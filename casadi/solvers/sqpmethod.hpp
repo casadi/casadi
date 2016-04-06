@@ -177,8 +177,8 @@ namespace casadi {
     /// Regularization
     bool regularize_;
 
-    /// Access Qpsol
-    const Function getQpsol() const { return qpsol_;}
+    /// Access Conic
+    const Function getConic() const { return qpsol_;}
 
     /// Print iteration header
     void printIteration(std::ostream &stream) const;

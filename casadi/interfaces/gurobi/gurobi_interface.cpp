@@ -30,8 +30,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_QPSOL_GUROBI_EXPORT
-  casadi_register_qpsol_gurobi(Qpsol::Plugin* plugin) {
+  int CASADI_CONIC_GUROBI_EXPORT
+  casadi_register_conic_gurobi(Conic::Plugin* plugin) {
     plugin->creator = GurobiInterface::creator;
     plugin->name = "gurobi";
     plugin->doc = GurobiInterface::meta_doc.c_str();
@@ -40,13 +40,13 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_QPSOL_GUROBI_EXPORT casadi_load_qpsol_gurobi() {
-    Qpsol::registerPlugin(casadi_register_qpsol_gurobi);
+  void CASADI_CONIC_GUROBI_EXPORT casadi_load_conic_gurobi() {
+    Conic::registerPlugin(casadi_register_conic_gurobi);
   }
 
   GurobiInterface::GurobiInterface(const std::string& name,
                                    const std::map<std::string, Sparsity>& st)
-    : Qpsol(name, st) {
+    : Conic(name, st) {
   }
 
   GurobiInterface::~GurobiInterface() {
@@ -54,7 +54,7 @@ namespace casadi {
   }
 
   Options GurobiInterface::options_
-  = {{&Qpsol::options_},
+  = {{&Conic::options_},
      {{"vtype",
        {OT_STRINGVECTOR,
         "Type of variables: [CONTINUOUS|binary|integer|semicont|semiint]"}}
@@ -63,7 +63,7 @@ namespace casadi {
 
   void GurobiInterface::init(const Dict& opts) {
     // Initialize the base classes
-    Qpsol::init(opts);
+    Conic::init(opts);
 
     // Default options
     std::vector<std::string> vtype;
@@ -77,9 +77,9 @@ namespace casadi {
 
     // Variable types
     if (!vtype.empty()) {
-      casadi_assert_message(vtype.size()==n_, "Option 'vtype' has wrong length");
-      vtype_.resize(n_);
-      for (int i=0; i<n_; ++i) {
+      casadi_assert_message(vtype.size()==nx_, "Option 'vtype' has wrong length");
+      vtype_.resize(nx_);
+      for (int i=0; i<nx_; ++i) {
         if (vtype[i]=="continuous") {
           vtype_[i] = GRB_CONTINUOUS;
         } else if (vtype[i]=="binary") {
@@ -97,10 +97,10 @@ namespace casadi {
     }
 
     // Temporary memory
-    alloc_w(n_, true); // val
-    alloc_iw(n_, true); // ind
-    alloc_iw(n_, true); // ind2
-    alloc_iw(n_, true); // tr_ind
+    alloc_w(nx_, true); // val
+    alloc_iw(nx_, true); // ind
+    alloc_iw(nx_, true); // ind2
+    alloc_iw(nx_, true); // tr_ind
   }
 
   void GurobiInterface::init_memory(void* mem) const {
@@ -116,27 +116,27 @@ namespace casadi {
     auto m = static_cast<GurobiMemory*>(mem);
 
     // Inputs
-    const double *h=arg[QPSOL_H],
-      *g=arg[QPSOL_G],
-      *a=arg[QPSOL_A],
-      *lba=arg[QPSOL_LBA],
-      *uba=arg[QPSOL_UBA],
-      *lbx=arg[QPSOL_LBX],
-      *ubx=arg[QPSOL_UBX],
-      *x0=arg[QPSOL_X0],
-      *lam_x0=arg[QPSOL_LAM_X0];
+    const double *h=arg[CONIC_H],
+      *g=arg[CONIC_G],
+      *a=arg[CONIC_A],
+      *lba=arg[CONIC_LBA],
+      *uba=arg[CONIC_UBA],
+      *lbx=arg[CONIC_LBX],
+      *ubx=arg[CONIC_UBX],
+      *x0=arg[CONIC_X0],
+      *lam_x0=arg[CONIC_LAM_X0];
 
     // Outputs
-    double *x=res[QPSOL_X],
-      *cost=res[QPSOL_COST],
-      *lam_a=res[QPSOL_LAM_A],
-      *lam_x=res[QPSOL_LAM_X];
+    double *x=res[CONIC_X],
+      *cost=res[CONIC_COST],
+      *lam_a=res[CONIC_LAM_A],
+      *lam_x=res[CONIC_LAM_X];
 
     // Temporary memory
-    double *val=w; w+=n_;
-    int *ind=iw; iw+=n_;
-    int *ind2=iw; iw+=n_;
-    int *tr_ind=iw; iw+=n_;
+    double *val=w; w+=nx_;
+    int *ind=iw; iw+=nx_;
+    int *ind2=iw; iw+=nx_;
+    int *tr_ind=iw; iw+=nx_;
 
     // Greate an empty model
     GRBmodel *model = 0;
@@ -145,7 +145,7 @@ namespace casadi {
       casadi_assert_message(!flag, GRBgeterrormsg(m->env));
 
       // Add variables
-      for (int i=0; i<n_; ++i) {
+      for (int i=0; i<nx_; ++i) {
         // Get bounds
         double lb = lbx ? lbx[i] : 0., ub = ubx ? ubx[i] : 0.;
         if (isinf(lb)) lb = -GRB_INFINITY;
@@ -172,8 +172,8 @@ namespace casadi {
       casadi_assert_message(!flag, GRBgeterrormsg(m->env));
 
       // Add quadratic terms
-      const int *H_colind=sparsity_in(QPSOL_H).colind(), *H_row=sparsity_in(QPSOL_H).row();
-      for (int i=0; i<n_; ++i) {
+      const int *H_colind=sparsity_in(CONIC_H).colind(), *H_row=sparsity_in(CONIC_H).row();
+      for (int i=0; i<nx_; ++i) {
 
         // Quadratic term nonzero indices
         int numqnz = H_colind[1]-H_colind[0];
@@ -199,9 +199,9 @@ namespace casadi {
       }
 
       // Add constraints
-      const int *A_colind=sparsity_in(QPSOL_A).colind(), *A_row=sparsity_in(QPSOL_A).row();
-      casadi_copy(A_colind, n_, tr_ind);
-      for (int i=0; i<nc_; ++i) {
+      const int *A_colind=sparsity_in(CONIC_A).colind(), *A_row=sparsity_in(CONIC_A).row();
+      casadi_copy(A_colind, nx_, tr_ind);
+      for (int i=0; i<na_; ++i) {
         // Get bounds
         double lb = lba ? lba[i] : 0., ub = uba ? uba[i] : 0.;
 //        if (isinf(lb)) lb = -GRB_INFINITY;
@@ -209,7 +209,7 @@ namespace casadi {
 
         // Constraint nonzeros
         int numnz = 0;
-        for (int j=0; j<n_; ++j) {
+        for (int j=0; j<nx_; ++j) {
           if (tr_ind[j]<A_colind[j+1] && A_row[tr_ind[j]]==i) {
             ind[numnz] = j;
             val[numnz] = a ? a[tr_ind[j]] : 0;
@@ -259,7 +259,7 @@ namespace casadi {
 
       // Get the optimal solution, if requested
       if (x) {
-        flag = GRBgetdblattrarray(model, GRB_DBL_ATTR_X, 0, n_, x);
+        flag = GRBgetdblattrarray(model, GRB_DBL_ATTR_X, 0, nx_, x);
         casadi_assert_message(!flag, GRBgeterrormsg(m->env));
       }
 

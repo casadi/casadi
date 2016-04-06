@@ -212,8 +212,8 @@ namespace casadi {
     /// Enable Code generation
     bool codegen_;
 
-    /// Access Qpsol
-    const Function getQpsol() const { return qpsol_;}
+    /// Access qpsol
+    const Function getConic() const { return qpsol_;}
 
     /// Regularization
     bool regularize_;

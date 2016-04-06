@@ -22,6 +22,10 @@ if(CPLEX_FOUND)
   add_subdirectory(cplex)
 endif()
 
+if(CLP_FOUND)
+  add_subdirectory(clp)
+endif()
+
 if(CSPARSE_FOUND)
   add_subdirectory(csparse)
 endif()

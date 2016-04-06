@@ -24,7 +24,7 @@ casadi_plugin(Nlpsol scpgen
   scpgen.hpp scpgen.cpp scpgen_meta.cpp)
 
 # Reformulations
-casadi_plugin(Qpsol nlpsol
+casadi_plugin(Conic nlpsol
   qp_to_nlp.hpp qp_to_nlp.cpp qp_to_nlp_meta.cpp)
 casadi_plugin(Rootfinder nlpsol
   implicit_to_nlp.hpp implicit_to_nlp.cpp implicit_to_nlp_meta.cpp)

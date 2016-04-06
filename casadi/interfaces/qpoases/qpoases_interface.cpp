@@ -33,8 +33,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_QPSOL_QPOASES_EXPORT
-  casadi_register_qpsol_qpoases(Qpsol::Plugin* plugin) {
+  int CASADI_CONIC_QPOASES_EXPORT
+  casadi_register_conic_qpoases(Conic::Plugin* plugin) {
     plugin->creator = QpoasesInterface::creator;
     plugin->name = "qpoases";
     plugin->doc = QpoasesInterface::meta_doc.c_str();
@@ -43,13 +43,13 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_QPSOL_QPOASES_EXPORT casadi_load_qpsol_qpoases() {
-    Qpsol::registerPlugin(casadi_register_qpsol_qpoases);
+  void CASADI_CONIC_QPOASES_EXPORT casadi_load_conic_qpoases() {
+    Conic::registerPlugin(casadi_register_conic_qpoases);
   }
 
   QpoasesInterface::QpoasesInterface(const std::string& name,
                                      const std::map<std::string, Sparsity>& st)
-    : Qpsol(name, st) {
+    : Conic(name, st) {
   }
 
   QpoasesInterface::~QpoasesInterface() {
@@ -57,7 +57,7 @@ namespace casadi {
   }
 
   Options QpoasesInterface::options_
-  = {{&Qpsol::options_},
+  = {{&Conic::options_},
      {{"sparse",
        {OT_BOOL,
         "Formulate the QP using sparse matrices. Default: false"}},
@@ -163,11 +163,11 @@ namespace casadi {
   };
 
   void QpoasesInterface::init(const Dict& opts) {
-    Qpsol::init(opts);
+    Conic::init(opts);
 
     // Default options
     sparse_ = false;
-    max_nWSR_ = 5 *(n_ + nc_);
+    max_nWSR_ = 5 *(nx_ + na_);
     max_cputime_ = -1;
     ops_.setToDefault();
 
@@ -240,18 +240,18 @@ namespace casadi {
 
     // Allocate work vectors
     if (sparse_) {
-      alloc_w(nnz_in(QPSOL_H), true); // h
-      alloc_w(nnz_in(QPSOL_A), true); // a
+      alloc_w(nnz_in(CONIC_H), true); // h
+      alloc_w(nnz_in(CONIC_A), true); // a
     } else {
-      alloc_w(n_*n_, true); // h
-      alloc_w(n_*nc_, true); // a
+      alloc_w(nx_*nx_, true); // h
+      alloc_w(nx_*na_, true); // a
     }
-    alloc_w(n_, true); // g
-    alloc_w(n_, true); // lbx
-    alloc_w(n_, true); // ubx
-    alloc_w(nc_, true); // lba
-    alloc_w(nc_, true); // uba
-    alloc_w(n_+nc_, true); // dual
+    alloc_w(nx_, true); // g
+    alloc_w(nx_, true); // lbx
+    alloc_w(nx_, true); // ubx
+    alloc_w(na_, true); // lba
+    alloc_w(na_, true); // uba
+    alloc_w(nx_+na_, true); // dual
   }
 
   void QpoasesInterface::init_memory(void* mem) const {
@@ -260,10 +260,10 @@ namespace casadi {
 
     // Create qpOASES instance
     if (m->qp) delete m->qp;
-    if (nc_==0) {
-      m->qp = new qpOASES::QProblemB(n_);
+    if (na_==0) {
+      m->qp = new qpOASES::QProblemB(nx_);
     } else {
-      m->sqp = new qpOASES::SQProblem(n_, nc_);
+      m->sqp = new qpOASES::SQProblem(nx_, na_);
     }
 
     // Pass to qpOASES
@@ -275,7 +275,7 @@ namespace casadi {
     auto m = static_cast<QpoasesMemory*>(mem);
 
     if (inputs_check_) {
-      checkInputs(arg[QPSOL_LBX], arg[QPSOL_UBX], arg[QPSOL_LBA], arg[QPSOL_UBA]);
+      checkInputs(arg[CONIC_LBX], arg[CONIC_UBX], arg[CONIC_LBA], arg[CONIC_UBA]);
     }
 
     // Maxiumum number of working set changes
@@ -284,23 +284,23 @@ namespace casadi {
     double *cputime_ptr = cputime<=0 ? 0 : &cputime;
 
     // Get the arguments to call qpOASES with
-    double* g=w; w += n_;
-    casadi_copy(arg[QPSOL_G], n_, g);
-    double* lb=w; w += n_;
-    casadi_copy(arg[QPSOL_LBX], n_, lb);
-    double* ub=w; w += n_;
-    casadi_copy(arg[QPSOL_UBX], n_, ub);
-    double* lbA=w; w += nc_;
-    casadi_copy(arg[QPSOL_LBA], nc_, lbA);
-    double* ubA=w; w += nc_;
-    casadi_copy(arg[QPSOL_UBA], nc_, ubA);
+    double* g=w; w += nx_;
+    casadi_copy(arg[CONIC_G], nx_, g);
+    double* lb=w; w += nx_;
+    casadi_copy(arg[CONIC_LBX], nx_, lb);
+    double* ub=w; w += nx_;
+    casadi_copy(arg[CONIC_UBX], nx_, ub);
+    double* lbA=w; w += na_;
+    casadi_copy(arg[CONIC_LBA], na_, lbA);
+    double* ubA=w; w += na_;
+    casadi_copy(arg[CONIC_UBA], na_, ubA);
 
     // Return flag
     int flag;
 
     // QP matrices sparsities
-    const Sparsity& hsp = sparsity_in(QPSOL_H);
-    const Sparsity& asp = sparsity_in(QPSOL_A);
+    const Sparsity& hsp = sparsity_in(CONIC_H);
+    const Sparsity& asp = sparsity_in(CONIC_A);
 
     // Sparse or dense mode?
     if (sparse_) {
@@ -308,7 +308,7 @@ namespace casadi {
       int* h_colind = const_cast<int*>(hsp.colind());
       int* h_row = const_cast<int*>(hsp.row());
       double* h=w; w += hsp.nnz();
-      casadi_copy(arg[QPSOL_H], hsp.nnz(), h);
+      casadi_copy(arg[CONIC_H], hsp.nnz(), h);
       if (m->h) delete m->h;
       m->h = new qpOASES::SymSparseMat(hsp.size1(), hsp.size2(), h_row, h_colind, h);
       m->h->createDiagInfo();
@@ -317,7 +317,7 @@ namespace casadi {
       int* a_colind = const_cast<int*>(asp.colind());
       int* a_row = const_cast<int*>(asp.row());
       double* a=w; w += asp.nnz();
-      casadi_copy(arg[QPSOL_A], asp.nnz(), a);
+      casadi_copy(arg[CONIC_A], asp.nnz(), a);
       if (m->a) delete m->a;
       m->a = new qpOASES::SparseMatrix(asp.size1(), asp.size2(), a_row, a_colind, a);
 
@@ -330,15 +330,15 @@ namespace casadi {
 
     } else {
       // Get quadratic term
-      double* h=w; w += n_*n_;
-      casadi_densify(arg[QPSOL_H], hsp, h, false);
+      double* h=w; w += nx_*nx_;
+      casadi_densify(arg[CONIC_H], hsp, h, false);
 
       // Get linear term
-      double* a = w; w += n_*nc_;
-      casadi_densify(arg[QPSOL_A], asp, a, true);
+      double* a = w; w += nx_*na_;
+      casadi_densify(arg[CONIC_A], asp, a, true);
 
       // Solve dense
-      if (nc_==0) {
+      if (na_==0) {
         if (m->called_once) {
           // Broken?
           //flag = m->qp->hotstart(g, lb, ub, nWSR, cputime_ptr);
@@ -364,18 +364,18 @@ namespace casadi {
     }
 
     // Get optimal cost
-    if (res[QPSOL_COST]) *res[QPSOL_COST] = m->qp->getObjVal();
+    if (res[CONIC_COST]) *res[CONIC_COST] = m->qp->getObjVal();
 
     // Get the primal solution
-    if (res[QPSOL_X]) m->qp->getPrimalSolution(res[QPSOL_X]);
+    if (res[CONIC_X]) m->qp->getPrimalSolution(res[CONIC_X]);
 
     // Get the dual solution
-    if (res[QPSOL_LAM_X] || res[QPSOL_LAM_A]) {
-      double* dual=w; w += n_+nc_;
+    if (res[CONIC_LAM_X] || res[CONIC_LAM_A]) {
+      double* dual=w; w += nx_+na_;
       m->qp->getDualSolution(dual);
-      casadi_scal(n_+nc_, -1., dual);
-      casadi_copy(dual, n_, res[QPSOL_LAM_X]);
-      casadi_copy(dual+n_, nc_, res[QPSOL_LAM_A]);
+      casadi_scal(nx_+na_, -1., dual);
+      casadi_copy(dual, nx_, res[CONIC_LAM_X]);
+      casadi_copy(dual+nx_, na_, res[CONIC_LAM_A]);
     }
   }
 

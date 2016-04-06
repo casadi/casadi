@@ -23,91 +23,91 @@
  */
 
 
-#include "qpsol_impl.hpp"
+#include "conic_impl.hpp"
 #include "nlpsol_impl.hpp"
 #include <typeinfo>
 
 using namespace std;
 namespace casadi {
 
-  bool has_qpsol(const string& name) {
-    return Qpsol::hasPlugin(name);
+  bool has_conic(const string& name) {
+    return Conic::hasPlugin(name);
   }
 
-  void load_qpsol(const string& name) {
-    Qpsol::loadPlugin(name);
+  void load_conic(const string& name) {
+    Conic::loadPlugin(name);
   }
 
-  string doc_qpsol(const string& name) {
-    return Qpsol::getPlugin(name).doc;
+  string doc_conic(const string& name) {
+    return Conic::getPlugin(name).doc;
   }
 
-  Function qpsol(const string& name, const string& solver,
-                               const SpDict& qp, const Dict& opts) {
+  Function conic(const string& name, const string& solver,
+                const SpDict& qp, const Dict& opts) {
     Function ret;
-    ret.assignNode(Qpsol::instantiatePlugin(name, solver, qp));
+    ret.assignNode(Conic::instantiatePlugin(name, solver, qp));
     ret->construct(opts);
     return ret;
   }
 
-  void Function::qpsol_debug(const string &filename) const {
+  void Function::conic_debug(const string &filename) const {
     ofstream file;
     file.open(filename.c_str());
-    qpsol_debug(file);
+    conic_debug(file);
   }
 
-  void Function::qpsol_debug(ostream &file) const {
+  void Function::conic_debug(ostream &file) const {
     casadi_assert(!is_null());
-    const Qpsol* n = dynamic_cast<const Qpsol*>(get());
+    const Conic* n = dynamic_cast<const Conic*>(get());
     casadi_assert_message(n!=0, "Not a QP solver");
     return n->generateNativeCode(file);
   }
 
-  vector<string> qpsol_in() {
-    vector<string> ret(qpsol_n_in());
-    for (size_t i=0; i<ret.size(); ++i) ret[i]=qpsol_in(i);
+  vector<string> conic_in() {
+    vector<string> ret(conic_n_in());
+    for (size_t i=0; i<ret.size(); ++i) ret[i]=conic_in(i);
     return ret;
   }
 
-  vector<string> qpsol_out() {
-    vector<string> ret(qpsol_n_out());
-    for (size_t i=0; i<ret.size(); ++i) ret[i]=qpsol_out(i);
+  vector<string> conic_out() {
+    vector<string> ret(conic_n_out());
+    for (size_t i=0; i<ret.size(); ++i) ret[i]=conic_out(i);
     return ret;
   }
 
-  string qpsol_in(int ind) {
-    switch (static_cast<QpsolInput>(ind)) {
-    case QPSOL_H:      return "h";
-    case QPSOL_G:      return "g";
-    case QPSOL_A:      return "a";
-    case QPSOL_LBA:    return "lba";
-    case QPSOL_UBA:    return "uba";
-    case QPSOL_LBX:    return "lbx";
-    case QPSOL_UBX:    return "ubx";
-    case QPSOL_X0:     return "x0";
-    case QPSOL_LAM_X0: return "lam_x0";
-    case QPSOL_NUM_IN: break;
+  string conic_in(int ind) {
+    switch (static_cast<ConicInput>(ind)) {
+    case CONIC_H:      return "h";
+    case CONIC_G:      return "g";
+    case CONIC_A:      return "a";
+    case CONIC_LBA:    return "lba";
+    case CONIC_UBA:    return "uba";
+    case CONIC_LBX:    return "lbx";
+    case CONIC_UBX:    return "ubx";
+    case CONIC_X0:     return "x0";
+    case CONIC_LAM_X0: return "lam_x0";
+    case CONIC_NUM_IN: break;
     }
     return string();
   }
 
-  string qpsol_out(int ind) {
-    switch (static_cast<QpsolOutput>(ind)) {
-    case QPSOL_X:     return "x";
-    case QPSOL_COST:  return "cost";
-    case QPSOL_LAM_A: return "lam_a";
-    case QPSOL_LAM_X: return "lam_x";
-    case QPSOL_NUM_OUT: break;
+  string conic_out(int ind) {
+    switch (static_cast<ConicOutput>(ind)) {
+    case CONIC_X:     return "x";
+    case CONIC_COST:  return "cost";
+    case CONIC_LAM_A: return "lam_a";
+    case CONIC_LAM_X: return "lam_x";
+    case CONIC_NUM_OUT: break;
     }
     return string();
   }
 
-  int qpsol_n_in() {
-    return QPSOL_NUM_IN;
+  int conic_n_in() {
+    return CONIC_NUM_IN;
   }
 
-  int qpsol_n_out() {
-    return QPSOL_NUM_OUT;
+  int conic_n_out() {
+    return CONIC_NUM_OUT;
   }
 
   template<typename M>
@@ -151,7 +151,7 @@ namespace casadi {
     Function prob(name + "_qp", {x, p}, {H, c, A, b});
 
     // Create the QP solver
-    Function qpsol_f = qpsol(name + "_qpsol", solver,
+    Function conic_f = conic(name + "_qpsol", solver,
                              {{"h", H.sparsity()}, {"a", A.sparsity()}}, opts);
 
     // Create an MXFunction with the right signature
@@ -173,24 +173,24 @@ namespace casadi {
     v = prob(v);
 
     // Call the QP solver
-    vector<MX> w(QPSOL_NUM_IN);
-    w[QPSOL_H] = v.at(0);
-    w[QPSOL_G] = v.at(1);
-    w[QPSOL_A] = v.at(2);
-    w[QPSOL_LBX] = ret_in[NLPSOL_LBX];
-    w[QPSOL_UBX] = ret_in[NLPSOL_UBX];
-    w[QPSOL_LBA] = ret_in[NLPSOL_LBG] - v.at(3);
-    w[QPSOL_UBA] = ret_in[NLPSOL_UBG] - v.at(3);
-    w[QPSOL_X0] = ret_in[NLPSOL_X0];
-    w[QPSOL_LAM_X0] = ret_in[NLPSOL_LAM_X0];
-    w = qpsol_f(w);
+    vector<MX> w(CONIC_NUM_IN);
+    w[CONIC_H] = v.at(0);
+    w[CONIC_G] = v.at(1);
+    w[CONIC_A] = v.at(2);
+    w[CONIC_LBX] = ret_in[NLPSOL_LBX];
+    w[CONIC_UBX] = ret_in[NLPSOL_UBX];
+    w[CONIC_LBA] = ret_in[NLPSOL_LBG] - v.at(3);
+    w[CONIC_UBA] = ret_in[NLPSOL_UBG] - v.at(3);
+    w[CONIC_X0] = ret_in[NLPSOL_X0];
+    w[CONIC_LAM_X0] = ret_in[NLPSOL_LAM_X0];
+    w = conic_f(w);
 
     // Get expressions for the solution
-    ret_out[NLPSOL_X] = w[QPSOL_X];
-    ret_out[NLPSOL_F] = w[QPSOL_COST];
-    ret_out[NLPSOL_G] = mtimes(v.at(2), w[QPSOL_X]) + v.at(3);
-    ret_out[NLPSOL_LAM_X] = w[QPSOL_LAM_X];
-    ret_out[NLPSOL_LAM_G] = w[QPSOL_LAM_A];
+    ret_out[NLPSOL_X] = w[CONIC_X];
+    ret_out[NLPSOL_F] = w[CONIC_COST];
+    ret_out[NLPSOL_G] = mtimes(v.at(2), w[CONIC_X]) + v.at(3);
+    ret_out[NLPSOL_LAM_X] = w[CONIC_LAM_X];
+    ret_out[NLPSOL_LAM_G] = w[CONIC_LAM_A];
     ret_out[NLPSOL_LAM_P] = MX::nan(p.sparsity());
     return Function(name, ret_in, ret_out, nlpsol_in(), nlpsol_out(),
                     {{"default_in", nlpsol_default_in()}});
@@ -207,7 +207,7 @@ namespace casadi {
   }
 
   // Constructor
-  Qpsol::Qpsol(const std::string& name, const std::map<std::string, Sparsity> &st)
+  Conic::Conic(const std::string& name, const std::map<std::string, Sparsity> &st)
     : FunctionInternal(name) {
     for (auto i=st.begin(); i!=st.end(); ++i) {
       if (i->first=="a") {
@@ -219,11 +219,18 @@ namespace casadi {
       }
     }
 
-    n_ = H_.size2();
-    nc_ = A_.is_null() ? 0 : A_.size1();
+    // We need either A or H
+    casadi_assert_message(!A_.is_null() || !H_.is_null(),
+      "Cannot determine dimension");
 
-    if (!A_.is_null()) {
-      casadi_assert_message(A_.size2()==n_,
+    // Generate A or H
+    if (A_.is_null()) {
+      A_ = Sparsity(0, H_.size2());
+    } else if (H_.is_null()) {
+      H_ = Sparsity(A_.size2(), A_.size2());
+    } else {
+      // Consistency check
+      casadi_assert_message(A_.size2()==H_.size2(),
         "Got incompatible dimensions.   min          x'Hx + G'x s.t.   LBA <= Ax <= UBA :"
         << std::endl <<
         "H: " << H_.dim() << " - A: " << A_.dim() << std::endl <<
@@ -235,46 +242,45 @@ namespace casadi {
       "H: " << H_.dim() <<
       "We need H square & symmetric" << std::endl);
 
-    // Sparsity
-    Sparsity x_sparsity = Sparsity::dense(n_, 1);
-    Sparsity bounds_sparsity = Sparsity::dense(nc_, 1);
+    nx_ = A_.size2();
+    na_ = A_.size1();
   }
 
-  Sparsity Qpsol::get_sparsity_in(int i) {
-    switch (static_cast<QpsolInput>(i)) {
-    case QPSOL_X0:
-    case QPSOL_G:
-    case QPSOL_LBX:
-    case QPSOL_UBX:
-    case QPSOL_LAM_X0:
-      return get_sparsity_out(QPSOL_X);
-    case QPSOL_LBA:
-    case QPSOL_UBA:
-      return get_sparsity_out(QPSOL_LAM_A);
-    case QPSOL_A:
+  Sparsity Conic::get_sparsity_in(int i) {
+    switch (static_cast<ConicInput>(i)) {
+    case CONIC_X0:
+    case CONIC_G:
+    case CONIC_LBX:
+    case CONIC_UBX:
+    case CONIC_LAM_X0:
+      return get_sparsity_out(CONIC_X);
+    case CONIC_LBA:
+    case CONIC_UBA:
+      return get_sparsity_out(CONIC_LAM_A);
+    case CONIC_A:
       return A_;
-    case QPSOL_H:
+    case CONIC_H:
       return H_;
-    case QPSOL_NUM_IN: break;
+    case CONIC_NUM_IN: break;
     }
     return Sparsity();
   }
 
-  Sparsity Qpsol::get_sparsity_out(int i) {
-    switch (static_cast<QpsolOutput>(i)) {
-    case QPSOL_COST:
+  Sparsity Conic::get_sparsity_out(int i) {
+    switch (static_cast<ConicOutput>(i)) {
+    case CONIC_COST:
       return Sparsity::scalar();
-    case QPSOL_X:
-    case QPSOL_LAM_X:
-      return Sparsity::dense(n_, 1);
-    case QPSOL_LAM_A:
-      return Sparsity::dense(nc_, 1);
-    case QPSOL_NUM_OUT: break;
+    case CONIC_X:
+    case CONIC_LAM_X:
+      return Sparsity::dense(nx_, 1);
+    case CONIC_LAM_A:
+      return Sparsity::dense(na_, 1);
+    case CONIC_NUM_OUT: break;
     }
     return Sparsity();
   }
 
-  Options Qpsol::options_
+  Options Conic::options_
   = {{&FunctionInternal::options_},
      {{"discrete",
        {OT_BOOLVECTOR,
@@ -282,7 +288,7 @@ namespace casadi {
      }
   };
 
-  void Qpsol::init(const Dict& opts) {
+  void Conic::init(const Dict& opts) {
     // Call the init method of the base class
     FunctionInternal::init(opts);
 
@@ -295,7 +301,7 @@ namespace casadi {
 
     // Check options
     if (!discrete_.empty()) {
-      casadi_assert_message(discrete_.size()==n_, "\"discrete\" option has wrong length");
+      casadi_assert_message(discrete_.size()==nx_, "\"discrete\" option has wrong length");
       if (std::find(discrete_.begin(), discrete_.end(), true)!=discrete_.end()) {
         casadi_assert_message(integer_support(),
                               "Discrete variables require a solver with integer support");
@@ -303,19 +309,19 @@ namespace casadi {
     }
   }
 
-  Qpsol::~Qpsol() {
+  Conic::~Conic() {
   }
 
-  void Qpsol::checkInputs(const double* lbx, const double* ubx,
+  void Conic::checkInputs(const double* lbx, const double* ubx,
                           const double* lba, const double* uba) const {
-    for (int i=0; i<n_; ++i) {
+    for (int i=0; i<nx_; ++i) {
       double lb = lbx ? lbx[i] : 0., ub = ubx ? ubx[i] : 0.;
       casadi_assert_message(lb <= ub,
                             "LBX[" << i << "] <= UBX[" << i << "] was violated. "
                             << "Got LBX[" << i << "]=" << lb <<
                             " and UBX[" << i << "] = " << ub << ".");
     }
-    for (int i=0; i<nc_; ++i) {
+    for (int i=0; i<na_; ++i) {
       double lb = lba ? lba[i] : 0., ub = uba ? uba[i] : 0.;
       casadi_assert_message(lb <= ub,
                             "LBA[" << i << "] <= UBA[" << i << "] was violated. "
@@ -324,22 +330,22 @@ namespace casadi {
     }
   }
 
-  void Qpsol::generateNativeCode(std::ostream& file) const {
-    casadi_error("Qpsol::generateNativeCode not defined for class "
+  void Conic::generateNativeCode(std::ostream& file) const {
+    casadi_error("Conic::generateNativeCode not defined for class "
                  << typeid(*this).name());
   }
 
-  std::map<std::string, Qpsol::Plugin> Qpsol::solvers_;
+  std::map<std::string, Conic::Plugin> Conic::solvers_;
 
-  const std::string Qpsol::infix_ = "qpsol";
+  const std::string Conic::infix_ = "conic";
 
-  double Qpsol::default_in(int ind) const {
+  double Conic::default_in(int ind) const {
     switch (ind) {
-    case QPSOL_LBX:
-    case QPSOL_LBA:
+    case CONIC_LBX:
+    case CONIC_LBA:
       return -std::numeric_limits<double>::infinity();
-    case QPSOL_UBX:
-    case QPSOL_UBA:
+    case CONIC_UBX:
+    case CONIC_UBA:
       return std::numeric_limits<double>::infinity();
     default:
       return 0;

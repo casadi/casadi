@@ -595,7 +595,7 @@ namespace casadi {
     spH_ = mtimes(spL_.T(), spL_);
     spA_ = mat_fcn_.sparsity_out(mat_jac_);
     casadi_assert_message(!qpsol_plugin.empty(), "'qpsol' option has not been set");
-    qpsol_ = qpsol("qpsol", qpsol_plugin, {{"h", spH_}, {"a", spA_}},
+    qpsol_ = conic("qpsol", qpsol_plugin, {{"h", spH_}, {"a", spA_}},
                    qpsol_options);
     if (verbose_) {
       userOut() << "Allocated QP solver." << endl;
@@ -1199,19 +1199,19 @@ namespace casadi {
 
     // Inputs
     fill_n(m->arg, qpsol_.n_in(), nullptr);
-    m->arg[QPSOL_H] = m->qpH;
-    m->arg[QPSOL_G] = m->gfk;
-    m->arg[QPSOL_A] = m->qpA;
-    m->arg[QPSOL_LBX] = m->qp_lbx;
-    m->arg[QPSOL_UBX] = m->qp_ubx;
-    m->arg[QPSOL_LBA] = m->qp_lba;
-    m->arg[QPSOL_UBA] = m->qp_uba;
+    m->arg[CONIC_H] = m->qpH;
+    m->arg[CONIC_G] = m->gfk;
+    m->arg[CONIC_A] = m->qpA;
+    m->arg[CONIC_LBX] = m->qp_lbx;
+    m->arg[CONIC_UBX] = m->qp_ubx;
+    m->arg[CONIC_LBA] = m->qp_lba;
+    m->arg[CONIC_UBA] = m->qp_uba;
 
     // Outputs
     fill_n(m->res, qpsol_.n_out(), nullptr);
-    m->res[QPSOL_X] = m->dxk; // Condensed primal step
-    m->res[QPSOL_LAM_X] = m->dlam_xk; // Multipliers (simple bounds)
-    m->res[QPSOL_LAM_A] = m->dlam_gk; // Multipliers (linear bounds)
+    m->res[CONIC_X] = m->dxk; // Condensed primal step
+    m->res[CONIC_LAM_X] = m->dlam_xk; // Multipliers (simple bounds)
+    m->res[CONIC_LAM_A] = m->dlam_gk; // Multipliers (linear bounds)
 
     // Solve the QP
     qpsol_(m->arg, m->res, m->iw, m->w, 0);

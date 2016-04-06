@@ -23,42 +23,9 @@
  */
 
 
-#ifndef CASADI_CORE_HPP
-#define CASADI_CORE_HPP
+      #include "clp_interface.hpp"
+      #include <string>
 
-// Scalar expressions (why do I need to put it up here?)
-#include "sx/sx_elem.hpp"
-
-// Generic tools
-#include "polynomial.hpp"
-#include "std_vector_tools.hpp"
-#include "global_options.hpp"
-#include "casadi_meta.hpp"
-
-// Matrices
-#include "matrix.hpp"
-
-// Matrix expressions
-#include "mx/mx.hpp"
-
-// Functions
-#include "function/oracle.hpp"
-#include "function/code_generator.hpp"
-#include "function/compiler.hpp"
-#include "function/callback.hpp"
-#include "function/integrator.hpp"
-#include "function/conic.hpp"
-#include "function/nlpsol.hpp"
-#include "function/rootfinder.hpp"
-#include "function/linsol.hpp"
-#include "function/jit.hpp"
-#include "function/external.hpp"
-
-// Misc
-#include "misc/integration_tools.hpp"
-#include "misc/nlp_builder.hpp"
-#include "misc/variable.hpp"
-#include "misc/dae_builder.hpp"
-#include "misc/xml_file.hpp"
-
-#endif // CASADI_CORE_HPP
+      const std::string casadi::ClpInterface::meta_doc=
+      "\n"
+      ;

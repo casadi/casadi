@@ -28,30 +28,30 @@ import unittest
 from types import *
 from helpers import *
 
-qpsols = []
+conics = []
 if has_nlpsol("ipopt"):
   ipopt_options = {"fixed_variable_treatment":"relax_bounds",
                    "jac_c_constant":"yes",
                    "jac_d_constant":"yes",
                    "hessian_constant":"yes",
                    "tol":1e-12}
-  qpsols.append(("nlpsol",{"nlpsol":"ipopt", "nlpsol_options.ipopt": ipopt_options},{}))
+  conics.append(("nlpsol",{"nlpsol":"ipopt", "nlpsol_options.ipopt": ipopt_options},{}))
 
-if has_qpsol("ooqp"):
-  qpsols.append(("ooqp",{},{"less_digits":1}))
+if has_conic("ooqp"):
+  conics.append(("ooqp",{},{"less_digits":1}))
 
-if has_qpsol("qpoases"):
-  qpsols.append(("qpoases",{},{}))
+if has_conic("qpoases"):
+  conics.append(("qpoases",{},{}))
 
-if has_qpsol("cplex"):
-  qpsols.append(("cplex",{},{}))
+if has_conic("cplex"):
+  conics.append(("cplex",{},{}))
 
-# if has_qpsol("sqic"):
-#   qpsols.append(("sqic",{},{}))
+# if has_conic("sqic"):
+#   conics.append(("sqic",{},{}))
 
-print qpsols
+print conics
 
-class QpsolTests(casadiTestCase):
+class ConicTests(casadiTestCase):
 
   def testboundsviol(self):
   
@@ -66,10 +66,10 @@ class QpsolTests(casadiTestCase):
     UBX = DM([inf,-inf])
 
 
-    for qpsol, qp_options, aux_options in qpsols:
-      self.message("general_convex: " + str(qpsol))
+    for conic, qp_options, aux_options in conics:
+      self.message("general_convex: " + str(conic))
 
-      solver = casadi.qpsol("mysolver",qpsol,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
+      solver = casadi.conic("mysolver",conic,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
       try:
         less_digits=aux_options["less_digits"]
@@ -99,10 +99,10 @@ class QpsolTests(casadiTestCase):
 
     options = {"mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
       
-    for qpsol, qp_options, aux_options in qpsols:
-      self.message("general_convex: " + str(qpsol))
+    for conic, qp_options, aux_options in conics:
+      self.message("general_convex: " + str(conic))
 
-      solver = casadi.qpsol("mysolver",qpsol,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
+      solver = casadi.conic("mysolver",conic,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
       try:
         less_digits=aux_options["less_digits"]
@@ -135,10 +135,10 @@ class QpsolTests(casadiTestCase):
     
     options = {"mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
       
-    for qpsol, qp_options, aux_options in qpsols:
-      self.message("general_convex: " + str(qpsol))
+    for conic, qp_options, aux_options in conics:
+      self.message("general_convex: " + str(conic))
 
-      solver = casadi.qpsol("mysolver",qpsol,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
+      solver = casadi.conic("mysolver",conic,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
       try:
         less_digits=aux_options["less_digits"]
@@ -156,16 +156,16 @@ class QpsolTests(casadiTestCase):
 
       solver_out = solver(**solver_in)
 
-      self.assertAlmostEqual(solver_out["x"][0],-1,max(1,6-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["x"][0],-1,max(1,6-less_digits),str(conic))
     
-      self.assertAlmostEqual(solver_out["lam_x"][0],0,max(1,6-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["lam_x"][0],0,max(1,6-less_digits),str(conic))
 
-      self.checkarray(solver_out["lam_a"],DM([0]),str(qpsol),digits=max(1,6-less_digits))
+      self.checkarray(solver_out["lam_a"],DM([0]),str(conic),digits=max(1,6-less_digits))
       
-      self.assertAlmostEqual(solver_out["cost"][0],-0.5,max(1,6-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["cost"][0],-0.5,max(1,6-less_digits),str(conic))
 
   def test_general_convex_dense(self):
-    self.message("Convex dense QP with solvers: " + str([qpsol for qpsol,options,aux_options in qpsols]))
+    self.message("Convex dense QP with solvers: " + str([conic for conic,options,aux_options in conics]))
     H = DM([[1,-1],[-1,2]])
     G = DM([-2,-6])
     A =  DM([[1, 1],[-1, 2],[2, 1]])
@@ -178,10 +178,10 @@ class QpsolTests(casadiTestCase):
 
     options = {"mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
       
-    for qpsol, qp_options, aux_options in qpsols:
-      self.message("general_convex: " + str(qpsol))
+    for conic, qp_options, aux_options in conics:
+      self.message("general_convex: " + str(conic))
 
-      solver = casadi.qpsol("mysolver",qpsol,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
+      solver = casadi.conic("mysolver",conic,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
       try:
         less_digits=aux_options["less_digits"]
@@ -199,42 +199,42 @@ class QpsolTests(casadiTestCase):
 
       solver_out = solver(**solver_in)
 
-      self.assertAlmostEqual(solver_out["x"][0],2.0/3,max(1,6-less_digits),str(qpsol))
-      self.assertAlmostEqual(solver_out["x"][1],4.0/3,max(1,6-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["x"][0],2.0/3,max(1,6-less_digits),str(conic))
+      self.assertAlmostEqual(solver_out["x"][1],4.0/3,max(1,6-less_digits),str(conic))
     
-      self.assertAlmostEqual(solver_out["lam_x"][0],0,max(1,6-less_digits),str(qpsol))
-      self.assertAlmostEqual(solver_out["lam_x"][1],0,max(1,6-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["lam_x"][0],0,max(1,6-less_digits),str(conic))
+      self.assertAlmostEqual(solver_out["lam_x"][1],0,max(1,6-less_digits),str(conic))
 
-      self.checkarray(solver_out["lam_a"],DM([3+1.0/9,4.0/9,0]),str(qpsol),digits=max(1,6-less_digits))
+      self.checkarray(solver_out["lam_a"],DM([3+1.0/9,4.0/9,0]),str(conic),digits=max(1,6-less_digits))
       
-      self.assertAlmostEqual(solver_out["cost"][0],-8-2.0/9,max(1,6-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["cost"][0],-8-2.0/9,max(1,6-less_digits),str(conic))
       
       solver_in["h"]=H*4
 
       solver_out = solver(**solver_in)
 
-      self.assertAlmostEqual(solver_out["x"][0],1,max(1,3-less_digits),str(qpsol))
-      self.assertAlmostEqual(solver_out["x"][1],1,max(1,3-less_digits),str(qpsol))
-      self.assertAlmostEqual(solver_out["cost"],-6,max(1,6-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["x"][0],1,max(1,3-less_digits),str(conic))
+      self.assertAlmostEqual(solver_out["x"][1],1,max(1,3-less_digits),str(conic))
+      self.assertAlmostEqual(solver_out["cost"],-6,max(1,6-less_digits),str(conic))
       
-      self.assertAlmostEqual(solver_out["lam_x"][0],0,max(1,6-less_digits),str(qpsol))
-      self.assertAlmostEqual(solver_out["lam_x"][1],0,max(1,6-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["lam_x"][0],0,max(1,6-less_digits),str(conic))
+      self.assertAlmostEqual(solver_out["lam_x"][1],0,max(1,6-less_digits),str(conic))
 
-      self.checkarray(solver_out["lam_a"],DM([2,0,0]),str(qpsol),digits=max(1,2-less_digits))
+      self.checkarray(solver_out["lam_a"],DM([2,0,0]),str(conic),digits=max(1,2-less_digits))
       
       solver_in["h"]=0
       
-      if 'qcqp' in str(qpsol): continue # Singular hessian
+      if 'qcqp' in str(conic): continue # Singular hessian
 
       solver_out = solver(**solver_in)
-      self.assertAlmostEqual(solver_out["x"][0],2.0/3,max(1,6-less_digits),str(qpsol))
-      self.assertAlmostEqual(solver_out["x"][1],4.0/3,max(1,6-less_digits),str(qpsol))
-      self.assertAlmostEqual(solver_out["cost"],-9-1.0/3,max(1,6-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["x"][0],2.0/3,max(1,6-less_digits),str(conic))
+      self.assertAlmostEqual(solver_out["x"][1],4.0/3,max(1,6-less_digits),str(conic))
+      self.assertAlmostEqual(solver_out["cost"],-9-1.0/3,max(1,6-less_digits),str(conic))
       
-      self.assertAlmostEqual(solver_out["lam_x"][0],0,max(1,6-less_digits),str(qpsol))
-      self.assertAlmostEqual(solver_out["lam_x"][1],0,max(1,6-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["lam_x"][0],0,max(1,6-less_digits),str(conic))
+      self.assertAlmostEqual(solver_out["lam_x"][1],0,max(1,6-less_digits),str(conic))
 
-      self.checkarray(solver_out["lam_a"],DM([10.0/3,4.0/3,0]),str(qpsol),digits=max(1,4-less_digits))
+      self.checkarray(solver_out["lam_a"],DM([10.0/3,4.0/3,0]),str(conic),digits=max(1,4-less_digits))
 
       solver_in["lba"]=[-inf]*3 #  Upper _and_ lower 
       solver_in["uba"]=[inf]*3  #  bounds infinite?
@@ -247,18 +247,18 @@ class QpsolTests(casadiTestCase):
         return
       solver_out = solver(**solver_in)
 
-      self.assertAlmostEqual(solver_out["x"][0],5,max(1,6-less_digits),str(qpsol))
-      self.assertAlmostEqual(solver_out["x"][1],5,max(1,6-less_digits),str(qpsol))
-      self.assertAlmostEqual(solver_out["cost"],-40,max(1,5-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["x"][0],5,max(1,6-less_digits),str(conic))
+      self.assertAlmostEqual(solver_out["x"][1],5,max(1,6-less_digits),str(conic))
+      self.assertAlmostEqual(solver_out["cost"],-40,max(1,5-less_digits),str(conic))
       
-      self.assertAlmostEqual(solver_out["lam_x"][0],2,max(1,6-less_digits),str(qpsol))
-      self.assertAlmostEqual(solver_out["lam_x"][1],6,max(1,6-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["lam_x"][0],2,max(1,6-less_digits),str(conic))
+      self.assertAlmostEqual(solver_out["lam_x"][1],6,max(1,6-less_digits),str(conic))
 
-      self.checkarray(solver_out["lam_a"],DM([0,0,0]),str(qpsol),digits=max(1,4-less_digits))
+      self.checkarray(solver_out["lam_a"],DM([0,0,0]),str(conic),digits=max(1,4-less_digits))
 
   @memory_heavy()
   def test_general_convex_sparse(self):
-    self.message("Convex sparse QP with solvers: " + str([qpsol for qpsol,options,aux_options in qpsols]))
+    self.message("Convex sparse QP with solvers: " + str([conic for conic,options,aux_options in conics]))
     H = c.diag([2,1,0.2,0.7,1.3])
 
     H[1,2]=0.1
@@ -275,10 +275,10 @@ class QpsolTests(casadiTestCase):
     UBX = DM([inf]*5)
 
   
-    for qpsol, qp_options, aux_options in qpsols:
-      self.message("general_convex: " + str(qpsol))
+    for conic, qp_options, aux_options in conics:
+      self.message("general_convex: " + str(conic))
 
-      solver = casadi.qpsol("mysolver",qpsol,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
+      solver = casadi.conic("mysolver",conic,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
       try:
         less_digits=aux_options["less_digits"]
@@ -296,16 +296,16 @@ class QpsolTests(casadiTestCase):
 
       solver_out = solver(**solver_in)
 
-      self.checkarray(solver_out["x"],DM([0.873908,0.95630465,0,0,0]),str(qpsol),digits=max(1,6-less_digits))
+      self.checkarray(solver_out["x"],DM([0.873908,0.95630465,0,0,0]),str(conic),digits=max(1,6-less_digits))
       
-      self.checkarray(solver_out["lam_x"],DM([0,0,-0.339076,-10.0873907,-0.252185]),6,str(qpsol),digits=max(1,6-less_digits))
+      self.checkarray(solver_out["lam_x"],DM([0,0,-0.339076,-10.0873907,-0.252185]),6,str(conic),digits=max(1,6-less_digits))
 
-      self.checkarray(solver_out["lam_a"],DM([0,2.52184767]),str(qpsol),digits=max(1,6-less_digits))
+      self.checkarray(solver_out["lam_a"],DM([0,2.52184767]),str(conic),digits=max(1,6-less_digits))
 
-      self.assertAlmostEqual(solver_out["cost"][0],-6.264669320767,max(1,6-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["cost"][0],-6.264669320767,max(1,6-less_digits),str(conic))
 
   def test_general_nonconvex_dense(self):
-    self.message("Non convex dense QP with solvers: " + str([qpsol for qpsol,options,aux_options in qpsols]))
+    self.message("Non convex dense QP with solvers: " + str([conic for conic,options,aux_options in conics]))
     H = DM([[1,-1],[-1,-2]])
     G = DM([-2,-6])
     A =  DM([[1, 1],[-1, 2],[2, 1]])
@@ -316,11 +316,11 @@ class QpsolTests(casadiTestCase):
     LBX = DM([0]*2)
     UBX = DM([inf]*2)
 
-    for qpsol, qp_options, aux_options in qpsols:
-      self.message("general_nonconvex: " + str(qpsol))
-      if not("cplex" in str(qpsol)):
+    for conic, qp_options, aux_options in conics:
+      self.message("general_nonconvex: " + str(conic))
+      if not("cplex" in str(conic)):
         continue
-      solver = casadi.qpsol("mysolver",qpsol, {'h':H.sparsity(),'a':A.sparsity()},qp_options)
+      solver = casadi.conic("mysolver",conic, {'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
       solver_in = {}
       solver_in["h"]=H
@@ -340,11 +340,11 @@ class QpsolTests(casadiTestCase):
 
     options = {"mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
       
-    for qpsol, qp_options, aux_options in qpsols:
-      self.message("equality: " + str(qpsol))
-      if "ooqp" in str(qpsol):
+    for conic, qp_options, aux_options in conics:
+      self.message("equality: " + str(conic))
+      if "ooqp" in str(conic):
         continue
-      solver = casadi.qpsol("mysolver",qpsol,{'h':H.sparsity(),'a':Sparsity.dense(3,2)},qp_options)
+      solver = casadi.conic("mysolver",conic,{'h':H.sparsity(),'a':Sparsity.dense(3,2)},qp_options)
 
       try:
         less_digits=aux_options["less_digits"]      
@@ -374,15 +374,15 @@ class QpsolTests(casadiTestCase):
 
       solver_out = solver(**solver_in)
 
-      self.assertAlmostEqual(solver_out["x"][0],0.5,max(1,6-less_digits),str(qpsol))
-      self.assertAlmostEqual(solver_out["x"][1],1.25,max(1,6-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["x"][0],0.5,max(1,6-less_digits),str(conic))
+      self.assertAlmostEqual(solver_out["x"][1],1.25,max(1,6-less_digits),str(conic))
     
-      self.assertAlmostEqual(solver_out["lam_x"][0],4.75,max(1,6-less_digits),str(qpsol))
-      self.assertAlmostEqual(solver_out["lam_x"][1],0,max(1,6-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["lam_x"][0],4.75,max(1,6-less_digits),str(conic))
+      self.assertAlmostEqual(solver_out["lam_x"][1],0,max(1,6-less_digits),str(conic))
 
-      self.checkarray(solver_out["lam_a"],DM([0,2,0]),str(qpsol),digits=max(1,6-less_digits))
+      self.checkarray(solver_out["lam_a"],DM([0,2,0]),str(conic),digits=max(1,6-less_digits))
       
-      self.assertAlmostEqual(solver_out["cost"][0],-7.4375,max(1,6-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["cost"][0],-7.4375,max(1,6-less_digits),str(conic))
     
       A =  DM([[1, 1],[-1, 2],[2, 1]])
       LBA = DM([2,-inf,-inf])
@@ -402,15 +402,15 @@ class QpsolTests(casadiTestCase):
 
       solver_out = solver(**solver_in)
 
-      self.assertAlmostEqual(solver_out["x"][0],0.4,max(1,4-less_digits),str(qpsol))
-      self.assertAlmostEqual(solver_out["x"][1],1.6,max(1,4-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["x"][0],0.4,max(1,4-less_digits),str(conic))
+      self.assertAlmostEqual(solver_out["x"][1],1.6,max(1,4-less_digits),str(conic))
     
-      self.assertAlmostEqual(solver_out["lam_x"][0],0,max(1,5-less_digits),str(qpsol))
-      self.assertAlmostEqual(solver_out["lam_x"][1],0,max(1,5-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["lam_x"][0],0,max(1,5-less_digits),str(conic))
+      self.assertAlmostEqual(solver_out["lam_x"][1],0,max(1,5-less_digits),str(conic))
 
-      self.checkarray(solver_out["lam_a"],DM([3.2,0,0]),str(qpsol),digits=max(1,5-less_digits))
+      self.checkarray(solver_out["lam_a"],DM([3.2,0,0]),str(conic),digits=max(1,5-less_digits))
        
-      self.assertAlmostEqual(solver_out["cost"][0],-8.4,max(1,5-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["cost"][0],-8.4,max(1,5-less_digits),str(conic))
 
   @memory_heavy()
   def test_degenerate_hessian(self):
@@ -430,10 +430,10 @@ class QpsolTests(casadiTestCase):
     LBX = DM([-10])
     UBX = DM([10])
 
-    for qpsol, qp_options, aux_options in qpsols:
-      self.message("degenerate hessian: " + str(qpsol))
-      if 'qcqp' in str(qpsol): continue
-      solver = casadi.qpsol("mysolver",qpsol,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
+    for conic, qp_options, aux_options in conics:
+      self.message("degenerate hessian: " + str(conic))
+      if 'qcqp' in str(conic): continue
+      solver = casadi.conic("mysolver",conic,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
       try:
         less_digits=aux_options["less_digits"]
@@ -451,13 +451,13 @@ class QpsolTests(casadiTestCase):
 
       solver_out = solver(**solver_in)
 
-      self.checkarray(solver_out["x"],DM([5.5,5,-10]),str(qpsol),digits=max(1,4-less_digits)) 
+      self.checkarray(solver_out["x"],DM([5.5,5,-10]),str(conic),digits=max(1,4-less_digits)) 
       
-      self.checkarray(solver_out["lam_x"],DM([0,0,-2.5]),str(qpsol),digits=max(1,4-less_digits))
+      self.checkarray(solver_out["lam_x"],DM([0,0,-2.5]),str(conic),digits=max(1,4-less_digits))
 
-      self.checkarray(solver_out["lam_a"],DM([1.5]),str(qpsol),digits=max(1,4-less_digits))
+      self.checkarray(solver_out["lam_a"],DM([1.5]),str(conic),digits=max(1,4-less_digits))
        
-      self.assertAlmostEqual(solver_out["cost"][0],-38.375,max(1,5-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["cost"][0],-38.375,max(1,5-less_digits),str(conic))
         
     
   def test_no_inequality(self):
@@ -476,9 +476,9 @@ class QpsolTests(casadiTestCase):
     UBX = DM([10])
 
 
-    for qpsol, qp_options, aux_options in qpsols:
-      self.message("no inequality: " + str(qpsol))
-      solver = casadi.qpsol("mysolver",qpsol,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
+    for conic, qp_options, aux_options in conics:
+      self.message("no inequality: " + str(conic))
+      solver = casadi.conic("mysolver",conic,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
       
       try:
         less_digits=aux_options["less_digits"]
@@ -496,16 +496,16 @@ class QpsolTests(casadiTestCase):
 
       solver_out = solver(**solver_in)
 
-      self.assertAlmostEqual(solver_out["x"][0],-0.5,max(1,6-less_digits),str(qpsol))
-      self.assertAlmostEqual(solver_out["x"][1],1,max(1,6-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["x"][0],-0.5,max(1,6-less_digits),str(conic))
+      self.assertAlmostEqual(solver_out["x"][1],1,max(1,6-less_digits),str(conic))
     
-      self.assertAlmostEqual(solver_out["lam_x"][0],0,max(1,6-less_digits),str(qpsol))
-      self.assertAlmostEqual(solver_out["lam_x"][1],0,max(1,6-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["lam_x"][0],0,max(1,6-less_digits),str(conic))
+      self.assertAlmostEqual(solver_out["lam_x"][1],0,max(1,6-less_digits),str(conic))
 
 
-      self.checkarray(solver_out["lam_a"],DM([3.5]),str(qpsol),digits=max(1,6-less_digits))
+      self.checkarray(solver_out["lam_a"],DM([3.5]),str(conic),digits=max(1,6-less_digits))
       
-      self.assertAlmostEqual(solver_out["cost"][0],-3.375,max(1,6-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["cost"][0],-3.375,max(1,6-less_digits),str(conic))
 
   def test_no_A(self):
     self.message("No A present")
@@ -521,11 +521,11 @@ class QpsolTests(casadiTestCase):
 
 
  
-    for qpsol, qp_options, aux_options in qpsols:
-      if "cplex" in str(qpsol):
+    for conic, qp_options, aux_options in conics:
+      if "cplex" in str(conic):
         continue
-      self.message("no A: " + str(qpsol))
-      solver = casadi.qpsol("mysolver",qpsol,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
+      self.message("no A: " + str(conic))
+      solver = casadi.conic("mysolver",conic,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
       
       try:
         less_digits=aux_options["less_digits"]
@@ -543,13 +543,13 @@ class QpsolTests(casadiTestCase):
 
       solver_out = solver(**solver_in)
 
-      self.checkarray(solver_out["x"],DM([10,8]),str(qpsol),digits=max(1,3-less_digits))
+      self.checkarray(solver_out["x"],DM([10,8]),str(conic),digits=max(1,3-less_digits))
       
-      self.checkarray(solver_out["lam_x"],DM([0,0]),str(qpsol),digits=max(1,4-less_digits))
+      self.checkarray(solver_out["lam_x"],DM([0,0]),str(conic),digits=max(1,4-less_digits))
 
-      self.checkarray(solver_out["lam_a"],DM([]),str(qpsol),digits=max(1,5-less_digits))
+      self.checkarray(solver_out["lam_a"],DM([]),str(conic),digits=max(1,5-less_digits))
       
-      self.assertAlmostEqual(solver_out["cost"][0],-34,max(1,5-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["cost"][0],-34,max(1,5-less_digits),str(conic))
       
   def test_standard_form(self):
     H = DM([[1,-1],[-1,2]])
@@ -562,8 +562,8 @@ class QpsolTests(casadiTestCase):
     LBX = DM([-10])
     UBX = DM([10])
 
-    for qpsol, qp_options, aux_options in qpsols:
-      solver = casadi.qpsol("mysolver",qpsol,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
+    for conic, qp_options, aux_options in conics:
+      solver = casadi.conic("mysolver",conic,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
       
       try:
@@ -582,13 +582,13 @@ class QpsolTests(casadiTestCase):
 
       solver_out = solver(**solver_in)
 
-      self.checkarray(solver_out["x"],DM([-0.2,1.2]),str(qpsol),digits=max(1,3-less_digits))
+      self.checkarray(solver_out["x"],DM([-0.2,1.2]),str(conic),digits=max(1,3-less_digits))
       
-      self.checkarray(solver_out["lam_x"],DM([0,0]),str(qpsol),digits=max(1,4-less_digits))
+      self.checkarray(solver_out["lam_x"],DM([0,0]),str(conic),digits=max(1,4-less_digits))
 
-      self.checkarray(solver_out["lam_a"],DM([3.4]),str(qpsol),digits=max(1,5-less_digits))
+      self.checkarray(solver_out["lam_a"],DM([3.4]),str(conic),digits=max(1,5-less_digits))
       
-      self.assertAlmostEqual(solver_out["cost"][0],-5.1,max(1,5-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["cost"][0],-5.1,max(1,5-less_digits),str(conic))
   
   @memory_heavy()
   def test_badscaling(self):
@@ -605,12 +605,12 @@ class QpsolTests(casadiTestCase):
     LBX = DM([-1000]*N)
     UBX = DM([1000]*N)
 
-    for qpsol, qp_options, aux_options in qpsols:
-      if 'cplex' in str(qpsol):
+    for conic, qp_options, aux_options in conics:
+      if 'cplex' in str(conic):
         continue
-      if 'worhp' in str(qpsol): # works but occasionaly throws segfaults, ulimit on travis?
+      if 'worhp' in str(conic): # works but occasionaly throws segfaults, ulimit on travis?
         continue
-      solver = casadi.qpsol("mysolver",qpsol,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
+      solver = casadi.conic("mysolver",conic,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
       try:
         less_digits=aux_options["less_digits"]
@@ -626,9 +626,9 @@ class QpsolTests(casadiTestCase):
 
       solver_out = solver(**solver_in)
 
-      self.checkarray(solver_out["x"],x0,str(qpsol)+str(qp_options),digits=max(1,2-less_digits))
-      self.assertAlmostEqual(solver_out["cost"][0],-0.5*mtimes([x0.T,H,x0]),max(1,3-less_digits),str(qpsol))
-      self.checkarray(solver_out["lam_x"],DM.zeros(N,1),str(qpsol),digits=max(1,4-less_digits))
+      self.checkarray(solver_out["x"],x0,str(conic)+str(qp_options),digits=max(1,2-less_digits))
+      self.assertAlmostEqual(solver_out["cost"][0],-0.5*mtimes([x0.T,H,x0]),max(1,3-less_digits),str(conic))
+      self.checkarray(solver_out["lam_x"],DM.zeros(N,1),str(conic),digits=max(1,4-less_digits))
       
   def test_redundant(self):
     self.message("Redundant constraints")
@@ -650,9 +650,9 @@ class QpsolTests(casadiTestCase):
       
       options = {"mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
         
-      for qpsol, qp_options, aux_options in qpsols:
-        if 'qcqp' in str(qpsol): continue
-        solver = casadi.qpsol("mysolver",qpsol,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
+      for conic, qp_options, aux_options in conics:
+        if 'qcqp' in str(conic): continue
+        solver = casadi.conic("mysolver",conic,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
         try:
           less_digits=aux_options["less_digits"]
@@ -669,10 +669,10 @@ class QpsolTests(casadiTestCase):
         solver_in["uba"]=UBA
         solver_out = solver(**solver_in)
 
-        self.checkarray(solver_out["x"],DM([-0.19230768069,1.6846153915,0.692307690769276]),str(qpsol),digits=max(1,6-less_digits))
-        self.assertAlmostEqual(solver_out["cost"][0],-5.850384678537,max(1,5-less_digits),str(qpsol))
-        self.checkarray(solver_out["lam_x"],DM([0,0,0]),str(qpsol),digits=max(1,6-less_digits))
-        self.checkarray(mtimes(A.T,solver_out["lam_a"]),DM([3.876923073076,2.4384615365384965,-1]),str(qpsol),digits=max(1,6-less_digits))
+        self.checkarray(solver_out["x"],DM([-0.19230768069,1.6846153915,0.692307690769276]),str(conic),digits=max(1,6-less_digits))
+        self.assertAlmostEqual(solver_out["cost"][0],-5.850384678537,max(1,5-less_digits),str(conic))
+        self.checkarray(solver_out["lam_x"],DM([0,0,0]),str(conic),digits=max(1,6-less_digits))
+        self.checkarray(mtimes(A.T,solver_out["lam_a"]),DM([3.876923073076,2.4384615365384965,-1]),str(conic),digits=max(1,6-less_digits))
         
   def test_linear(self):
     H = DM(2,2)
@@ -684,9 +684,9 @@ class QpsolTests(casadiTestCase):
     G = DM([ 2, 1 ])
 
 
-    for qpsol, qp_options, aux_options in qpsols:
-      if 'qcqp' in str(qpsol): continue
-      solver = casadi.qpsol("mysolver",qpsol,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
+    for conic, qp_options, aux_options in conics:
+      if 'qcqp' in str(conic): continue
+      solver = casadi.conic("mysolver",conic,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
       try:
         less_digits=aux_options["less_digits"]
@@ -704,12 +704,12 @@ class QpsolTests(casadiTestCase):
 
       solver_out = solver(**solver_in)
 
-      self.checkarray(solver_out["x"],DM([0.5,1.5]),str(qpsol),digits=max(1,5-less_digits))
-      self.checkarray(solver_out["lam_x"],DM([0,0]),str(qpsol),digits=max(1,5-less_digits))
+      self.checkarray(solver_out["x"],DM([0.5,1.5]),str(conic),digits=max(1,5-less_digits))
+      self.checkarray(solver_out["lam_x"],DM([0,0]),str(conic),digits=max(1,5-less_digits))
 
-      self.checkarray(solver_out["lam_a"],DM([0.5,-1.5,0]),str(qpsol),digits=max(1,5-less_digits))
+      self.checkarray(solver_out["lam_a"],DM([0.5,-1.5,0]),str(conic),digits=max(1,5-less_digits))
       
-      self.assertAlmostEqual(solver_out["cost"][0],2.5,max(1,5-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["cost"][0],2.5,max(1,5-less_digits),str(conic))
       
   def test_linear2(self):
     H = DM(2,2)
@@ -721,10 +721,10 @@ class QpsolTests(casadiTestCase):
     G = DM([ 2.0, 1.0 ])
 
 
-    for qpsol, qp_options, aux_options in qpsols:
-      if 'qcqp' in str(qpsol): continue
-      if 'nlp' in str(qpsol): continue
-      solver = casadi.qpsol("msyolver",qpsol,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
+    for conic, qp_options, aux_options in conics:
+      if 'qcqp' in str(conic): continue
+      if 'nlp' in str(conic): continue
+      solver = casadi.conic("msyolver",conic,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
       try:
         less_digits=aux_options["less_digits"]
@@ -742,12 +742,12 @@ class QpsolTests(casadiTestCase):
 
       solver_out = solver(**solver_in)
 
-      self.checkarray(solver_out["x"],DM([2,3]),str(qpsol),digits=max(1,5-less_digits))
-      self.checkarray(solver_out["lam_x"],DM([0,-3]),str(qpsol),digits=max(1,5-less_digits))
+      self.checkarray(solver_out["x"],DM([2,3]),str(conic),digits=max(1,5-less_digits))
+      self.checkarray(solver_out["lam_x"],DM([0,-3]),str(conic),digits=max(1,5-less_digits))
 
-      self.checkarray(solver_out["lam_a"],DM([2,0,0]),str(qpsol),digits=max(1,5-less_digits))
+      self.checkarray(solver_out["lam_a"],DM([2,0,0]),str(conic),digits=max(1,5-less_digits))
       
-      self.assertAlmostEqual(solver_out["cost"][0],7,max(1,5-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["cost"][0],7,max(1,5-less_digits),str(conic))
       
 if __name__ == '__main__':
     unittest.main()

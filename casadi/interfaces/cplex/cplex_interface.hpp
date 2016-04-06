@@ -25,24 +25,24 @@
 #ifndef CASADI_CPLEX_INTERFACE_HPP
 #define CASADI_CPLEX_INTERFACE_HPP
 
-#include "casadi/core/function/qpsol_impl.hpp"
-#include <casadi/interfaces/cplex/casadi_qpsol_cplex_export.h>
+#include "casadi/core/function/conic_impl.hpp"
+#include <casadi/interfaces/cplex/casadi_conic_cplex_export.h>
 #include "ilcplex/cplex.h"
 
 #include <string>
 
-/** \defgroup plugin_Qpsol_cplex
+/** \defgroup plugin_Conic_cplex
 
       Interface to Cplex solver for sparse Quadratic Programs
 */
 
-/** \pluginsection{Qpsol,cplex} */
+/** \pluginsection{Conic,cplex} */
 
 /// \cond INTERNAL
 
 namespace casadi {
 
-  struct CASADI_QPSOL_CPLEX_EXPORT CplexMemory {
+  struct CASADI_CONIC_CPLEX_EXPORT CplexMemory {
     /// Indicates if we have to warm-start
     bool is_warm;
 
@@ -81,18 +81,18 @@ namespace casadi {
     ~CplexMemory();
   };
 
-  /** \brief \pluginbrief{Qpsol,cplex}
+  /** \brief \pluginbrief{Conic,cplex}
 
-      @copydoc Qpsol_doc
-      @copydoc plugin_Qpsol_cplex
+      @copydoc Conic_doc
+      @copydoc plugin_Conic_cplex
 
       \author Attila Kozma, Joel Andersson
       \date 2012
   */
-  class CASADI_QPSOL_CPLEX_EXPORT CplexInterface : public Qpsol {
+  class CASADI_CONIC_CPLEX_EXPORT CplexInterface : public Conic {
   public:
     /** \brief  Create a new QP Solver */
-    static Qpsol* creator(const std::string& name,
+    static Conic* creator(const std::string& name,
                                      const std::map<std::string, Sparsity>& st) {
       return new CplexInterface(name, st);
     }

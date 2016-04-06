@@ -21,23 +21,26 @@
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
 #
-from mx import *
-from sx import *
-from typemaps import *
-from integration import *
-from ocp import *
-from nlp import *
-from implicitfunction import *
-from ad import *
-from sparsity import *
-from linearsolver import *
-from matrix import *
-from conic import *
-from misc import *
-from function import *
-from tools import *
-from simulator import *
-from vectortools import *
+# -*- coding: utf-8 -*-
+from casadi import *
 
-if __name__ == '__main__':
-    unittest.main()
+# minimize    3x + 4y
+# subject to  x + 2y <= 14
+#            3x -  y >= 0
+#             x -  y <= 2
+
+
+# Objective
+A = Sparsity.dense(3, 2)
+
+# Create solver
+solver = conic('solver', 'qpoases', {'a':A})
+#solver = conic('solver', 'clp', {'a':A}) # Use clp
+
+g = DM([3,4])
+a = DM([[1, 2],[3, -1], [1, -1]])
+lba = DM([-inf, 0, -inf])
+uba = DM([14, inf, 2])
+
+sol = solver(g=g, a=a, lba=lba, uba=uba)
+print sol

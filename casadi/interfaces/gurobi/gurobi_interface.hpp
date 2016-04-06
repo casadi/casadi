@@ -26,24 +26,24 @@
 #ifndef CASADI_GUROBI_INTERFACE_HPP
 #define CASADI_GUROBI_INTERFACE_HPP
 
-#include "casadi/core/function/qpsol_impl.hpp"
-#include <casadi/interfaces/gurobi/casadi_qpsol_gurobi_export.h>
+#include "casadi/core/function/conic_impl.hpp"
+#include <casadi/interfaces/gurobi/casadi_conic_gurobi_export.h>
 
 // GUROBI header
 extern "C" {
 #include "gurobi_c.h" // NOLINT(build/include)
 }
 
-/** \defgroup plugin_Qpsol_gurobi
+/** \defgroup plugin_Conic_gurobi
     Interface to the GUROBI Solver for quadratic programming
 */
 
-/** \pluginsection{Qpsol,gurobi} */
+/** \pluginsection{Conic,gurobi} */
 
 /// \cond INTERNAL
 namespace casadi {
 
-  struct CASADI_QPSOL_GUROBI_EXPORT GurobiMemory {
+  struct CASADI_CONIC_GUROBI_EXPORT GurobiMemory {
     // Gurobi environment
     GRBenv *env;
 
@@ -54,20 +54,20 @@ namespace casadi {
     ~GurobiMemory();
   };
 
-  /** \brief \pluginbrief{Qpsol,gurobi}
+  /** \brief \pluginbrief{Conic,gurobi}
 
-      @copydoc Qpsol_doc
-      @copydoc plugin_Qpsol_gurobi
+      @copydoc Conic_doc
+      @copydoc plugin_Conic_gurobi
 
   */
-  class CASADI_QPSOL_GUROBI_EXPORT GurobiInterface : public Qpsol {
+  class CASADI_CONIC_GUROBI_EXPORT GurobiInterface : public Conic {
   public:
     /** \brief  Create a new Solver */
     explicit GurobiInterface(const std::string& name,
                              const std::map<std::string, Sparsity>& st);
 
     /** \brief  Create a new QP Solver */
-    static Qpsol* creator(const std::string& name,
+    static Conic* creator(const std::string& name,
                                      const std::map<std::string, Sparsity>& st) {
       return new GurobiInterface(name, st);
     }

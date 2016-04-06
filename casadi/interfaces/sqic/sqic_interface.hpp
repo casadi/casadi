@@ -26,33 +26,33 @@
 #ifndef CASADI_SQIC_INTERFACE_HPP
 #define CASADI_SQIC_INTERFACE_HPP
 
-#include "casadi/core/function/qpsol.hpp"
-#include <casadi/interfaces/sqic/casadi_qpsol_sqic_export.h>
+#include "casadi/core/function/conic.hpp"
+#include <casadi/interfaces/sqic/casadi_conic_sqic_export.h>
 
-/** \defgroup plugin_Qpsol_sqic
+/** \defgroup plugin_Conic_sqic
        Interface to the SQIC solver for quadratic programming
 */
 
-/** \pluginsection{Qpsol,sqic} */
+/** \pluginsection{Conic,sqic} */
 
 /// \cond INTERNAL
 namespace casadi {
 
-  /**  \brief \pluginbrief{Qpsol,sqic}
+  /**  \brief \pluginbrief{Conic,sqic}
 
-       @copydoc Qpsol_doc
-       @copydoc plugin_Qpsol_sqic
+       @copydoc Conic_doc
+       @copydoc plugin_Conic_sqic
        \author Joris Gillis
        \date 2013
 
   */
-  class CASADI_QPSOL_SQIC_EXPORT SqicInterface : public Qpsol {
+  class CASADI_CONIC_SQIC_EXPORT SqicInterface : public Conic {
   public:
     /** \brief  Constructor */
     explicit SqicInterface();
 
     /** \brief  Create a new QP Solver */
-    static Qpsol* creator(const std::map<std::string, Sparsity>& st) {
+    static Conic* creator(const std::map<std::string, Sparsity>& st) {
       return new SqicInterface(st);
     }
 

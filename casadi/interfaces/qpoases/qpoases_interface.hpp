@@ -26,21 +26,21 @@
 #ifndef CASADI_QPOASES_INTERFACE_HPP
 #define CASADI_QPOASES_INTERFACE_HPP
 
-#include "casadi/core/function/qpsol_impl.hpp"
-#include <casadi/interfaces/qpoases/casadi_qpsol_qpoases_export.h>
+#include "casadi/core/function/conic_impl.hpp"
+#include <casadi/interfaces/qpoases/casadi_conic_qpoases_export.h>
 #include <qpOASES.hpp>
 
-/** \defgroup plugin_Qpsol_qpoases
+/** \defgroup plugin_Conic_qpoases
 Interface to QPOases Solver for quadratic programming
 
 */
 
-/** \pluginsection{Qpsol,qpoases} */
+/** \pluginsection{Conic,qpoases} */
 
 /// \cond INTERNAL
 namespace casadi {
 
-  struct CASADI_QPSOL_QPOASES_EXPORT QpoasesMemory {
+  struct CASADI_CONIC_QPOASES_EXPORT QpoasesMemory {
     /// QP Solver
     union {
       qpOASES::SQProblem *sqp;
@@ -61,22 +61,22 @@ namespace casadi {
     ~QpoasesMemory();
   };
 
-  /** \brief \pluginbrief{Qpsol,qpoases}
+  /** \brief \pluginbrief{Conic,qpoases}
    *
    * @copydoc QPSolver_doc
-   * @copydoc plugin_Qpsol_qpoases
+   * @copydoc plugin_Conic_qpoases
    *
    * \author Joris Gillis, Joel Andersson
    * \date 2011
    *
    * */
-  class CASADI_QPSOL_QPOASES_EXPORT QpoasesInterface : public Qpsol {
+  class CASADI_CONIC_QPOASES_EXPORT QpoasesInterface : public Conic {
   public:
     /** \brief  Constructor */
     explicit QpoasesInterface();
 
     /** \brief  Create a new QP Solver */
-    static Qpsol* creator(const std::string& name,
+    static Conic* creator(const std::string& name,
                           const std::map<std::string, Sparsity>& st) {
       return new QpoasesInterface(name, st);
     }

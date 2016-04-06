@@ -27,7 +27,7 @@
 
 #include "casadi/core/std_vector_tools.hpp"
 #include "casadi/core/calculus.hpp"
-#include "casadi/core/function/qpsol.hpp"
+#include "casadi/core/function/conic.hpp"
 
 #include <ctime>
 #include <iomanip>
@@ -179,7 +179,7 @@ namespace casadi {
 
     // Allocate a QP solver
     casadi_assert_message(!qpsol_plugin.empty(), "'qpsol' option has not been set");
-    qpsol_ = qpsol("qpsol", qpsol_plugin, {{"h", Hsp_}, {"a", Asp_}},
+    qpsol_ = conic("qpsol", qpsol_plugin, {{"h", Hsp_}, {"a", Asp_}},
                    qpsol_options);
     alloc(qpsol_);
 
@@ -787,20 +787,20 @@ namespace casadi {
                            double* x_opt, double* lambda_x_opt, double* lambda_A_opt) const {
     // Inputs
     fill_n(m->arg, qpsol_.n_in(), nullptr);
-    m->arg[QPSOL_H] = H;
-    m->arg[QPSOL_G] = g;
-    m->arg[QPSOL_X0] = x_opt;
-    m->arg[QPSOL_LBX] = lbx;
-    m->arg[QPSOL_UBX] = ubx;
-    m->arg[QPSOL_A] = A;
-    m->arg[QPSOL_LBA] = lbA;
-    m->arg[QPSOL_UBA] = ubA;
+    m->arg[CONIC_H] = H;
+    m->arg[CONIC_G] = g;
+    m->arg[CONIC_X0] = x_opt;
+    m->arg[CONIC_LBX] = lbx;
+    m->arg[CONIC_UBX] = ubx;
+    m->arg[CONIC_A] = A;
+    m->arg[CONIC_LBA] = lbA;
+    m->arg[CONIC_UBA] = ubA;
 
     // Outputs
     fill_n(m->res, qpsol_.n_out(), nullptr);
-    m->res[QPSOL_X] = x_opt;
-    m->res[QPSOL_LAM_X] = lambda_x_opt;
-    m->res[QPSOL_LAM_A] = lambda_A_opt;
+    m->res[CONIC_X] = x_opt;
+    m->res[CONIC_LAM_X] = lambda_x_opt;
+    m->res[CONIC_LAM_A] = lambda_A_opt;
 
     // Solve the QP
     qpsol_(m->arg, m->res, m->iw, m->w, 0);

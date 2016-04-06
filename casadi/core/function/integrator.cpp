@@ -52,29 +52,6 @@ namespace casadi {
   }
 
   Function integrator(const string& name, const string& solver,
-                      const Function& dae, const Dict& opts) {
-    Oracle* p;
-    if (dae.is_a("sxfunction")) {
-      p = Integrator::fun2problem<SX>(dae);
-    } else {
-      p = Integrator::fun2problem<MX>(dae);
-    }
-    return integrator(name, solver, p, opts);
-  }
-
-  Function integrator(const string& name, const string& solver,
-                      const pair<Function, Function>& dae,
-                      const Dict& opts) {
-    Oracle* p;
-    if (dae.first.is_a("sxfunction")) {
-      p = Integrator::fun2problem<SX>(dae.first, dae.second);
-    } else {
-      p = Integrator::fun2problem<MX>(dae.first, dae.second);
-    }
-    return integrator(name, solver, p, opts);
-  }
-
-  Function integrator(const string& name, const string& solver,
                       Oracle* dae, const Dict& opts) {
     Function ret;
     ret.assignNode(Integrator::getPlugin(solver).creator(name, dae));

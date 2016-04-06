@@ -531,13 +531,13 @@ class requires(object):
       print "Not available %s, skipping unittests" % self.att
       return None
       
-class requires_qpsol(object):
+class requires_conic(object):
   def __init__(self,n):
     self.n = n
   
   def __call__(self,c):
     try:
-      load_qpsol(self.n)
+      load_conic(self.n)
       return c
     except:
       print "Not available QP plugin %s, skipping unittests" % self.n

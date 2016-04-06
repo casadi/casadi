@@ -22,48 +22,62 @@
  *
  */
 
-
-#ifndef CASADI_QP_TO_NLP_HPP
-#define CASADI_QP_TO_NLP_HPP
+#ifndef CASADI_CLP_INTERFACE_HPP
+#define CASADI_CLP_INTERFACE_HPP
 
 #include "casadi/core/function/conic_impl.hpp"
-#include <casadi/solvers/casadi_conic_nlpsol_export.h>
+#include <casadi/interfaces/clp/casadi_conic_clp_export.h>
 
+#include "ClpSimplex.hpp"
+#include "ClpFactorization.hpp"
+#include "ClpNetworkMatrix.hpp"
 
-/** \defgroup plugin_Conic_nlp
-   Solve QPs using an Nlpsol
+#include <string>
+
+/** \defgroup plugin_Conic_clp
+
+      Interface to Clp solver for sparse Quadratic Programs
 */
 
-/** \pluginsection{Conic,nlp} */
+/** \pluginsection{Conic,clp} */
 
 /// \cond INTERNAL
+
 namespace casadi {
 
-  /** \brief \pluginbrief{Conic,nlp}
+  struct CASADI_CONIC_CLP_EXPORT ClpMemory {
+    /// Constructor
+    ClpMemory();
+
+    /// Destructor
+    ~ClpMemory();
+  };
+
+  /** \brief \pluginbrief{Conic,clp}
 
       @copydoc Conic_doc
-      @copydoc plugin_Conic_nlp
+      @copydoc plugin_Conic_clp
 
-      \author Joris Gillis
-      \date 2011
+      \author Attila Kozma, Joel Andersson
+      \date 2012
   */
-  class CASADI_CONIC_NLPSOL_EXPORT QpToNlp : public Conic {
+  class CASADI_CONIC_CLP_EXPORT ClpInterface : public Conic {
   public:
-    /** \brief  Create a new Solver */
-    explicit QpToNlp(const std::string& name,
-                     const std::map<std::string, Sparsity> &st);
-
     /** \brief  Create a new QP Solver */
     static Conic* creator(const std::string& name,
                           const std::map<std::string, Sparsity>& st) {
-      return new QpToNlp(name, st);
+      return new ClpInterface(name, st);
     }
 
-    /** \brief  Destructor */
-    virtual ~QpToNlp();
+    /// Constructor using sparsity patterns
+    explicit ClpInterface(const std::string& name,
+                            const std::map<std::string, Sparsity>& st);
+
+    /// Destructor
+    virtual ~ClpInterface();
 
     // Get name of the plugin
-    virtual const char* plugin_name() const { return "nlpsol";}
+    virtual const char* plugin_name() const { return "clp";}
 
     ///@{
     /** \brief Options */
@@ -71,18 +85,25 @@ namespace casadi {
     virtual const Options& get_options() const { return options_;}
     ///@}
 
-    /** \brief  Initialize */
+    // Initialize the solver
     virtual void init(const Dict& opts);
 
+    /** \brief Create memory block */
+    virtual void* alloc_memory() const { return new ClpMemory();}
+
+    /** \brief Free memory block */
+    virtual void free_memory(void *mem) const { delete static_cast<ClpMemory*>(mem);}
+
+    /** \brief Initalize memory block */
+    virtual void init_memory(void* mem) const;
+
+    // Solve the QP
     virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
 
     /// A documentation string
     static const std::string meta_doc;
 
-    /// Solve with
-    Function solver_;
   };
-
-} // namespace casadi
+} // end namespace casadi
 /// \endcond
-#endif // CASADI_QP_TO_NLP_HPP
+#endif // CASADI_CLP_INTERFACE_HPP
