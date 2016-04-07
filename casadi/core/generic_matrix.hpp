@@ -150,24 +150,14 @@ namespace casadi {
     int colind(int col) const { return sparsity().colind(col); }
     ///@}
 
-    /** \brief Get the location of all non-zero elements as they would appear in a Dense matrix
-        A : DenseMatrix  4 x 3
-        B : SparseMatrix 4 x 3 , 5 structural non-zeros
-
-        k = A.find()
-        A[k] will contain the elements of A that are non-zero in B
-    */
-    std::vector<int> find(bool ind1=SWIG_IND1) const { return sparsity().find(ind1);}
-
     /** \brief Get the sparsity pattern */
     SWIG_CONSTREF(Sparsity) sparsity() const;
 
 #ifndef SWIG
     /// \cond INTERNAL
-    /** \brief Access the sparsity, make a copy if there are multiple references to it */
+    /** \brief Access the sparsity */
     Sparsity& sparsityRef();
     /// \endcond
-
 
     /// \cond CLUTTER
     /**  @{  */
