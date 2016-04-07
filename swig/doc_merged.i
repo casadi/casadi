@@ -3443,16 +3443,6 @@ Calculate Jacobian.
 
 ";
 
-%feature("docstring") casadi::GenericMatrix::find "
-
-Get the location of all non-zero elements as they would appear in a Dense
-matrix A : DenseMatrix 4 x 3 B : SparseMatrix 4 x 3 , 5 structural non-
-zeros.
-
-k = A.find() A[k] will contain the elements of A that are non-zero in B
-
-";
-
 %feature("docstring") casadi::GenericMatrix::is_square "
 
 Check if the matrix expression is square.
@@ -4241,16 +4231,6 @@ Check if the matrix is upper triangular.
 
 %feature("docstring") friendwrap_all "[INTERNAL]  Returns true only if
 every element in the matrix is true.
-
-";
-
-%feature("docstring") casadi::Matrix::find "
-
-Get the location of all non-zero elements as they would appear in a Dense
-matrix A : DenseMatrix 4 x 3 B : SparseMatrix 4 x 3 , 5 structural non-
-zeros.
-
-k = A.find() A[k] will contain the elements of A that are non-zero in B
 
 ";
 
@@ -5310,16 +5290,6 @@ to the internal class
 %feature("docstring") casadi::MX::nnz "
 
 Get the number of (structural) non-zero elements.
-
-";
-
-%feature("docstring") casadi::MX::find "
-
-Get the location of all non-zero elements as they would appear in a Dense
-matrix A : DenseMatrix 4 x 3 B : SparseMatrix 4 x 3 , 5 structural non-
-zeros.
-
-k = A.find() A[k] will contain the elements of A that are non-zero in B
 
 ";
 
