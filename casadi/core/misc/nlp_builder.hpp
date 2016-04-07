@@ -78,7 +78,7 @@ class CASADI_EXPORT NlpBuilder : public PrintableObject<NlpBuilder> {
   protected:
 
     /// Read an expression from an NL-file (Polish infix format)
-    static SXElem read_expr(std::istream &stream, const std::vector<SXElem>& v);
+    static SXElem read_expr(std::istream &stream, const std::vector<SXElem>& v, bool binary);
 
 #endif // SWIG
 };

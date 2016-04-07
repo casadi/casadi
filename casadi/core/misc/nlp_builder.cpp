@@ -30,6 +30,21 @@
 using namespace std;
 namespace casadi {
 
+// Helper function
+template<typename T>
+T nlread(istream& nlfile, bool binary) {
+  casadi_assert(nlfile.good());
+  T ret;
+  if (binary) {
+    nlfile.read(reinterpret_cast<char*>(&ret), sizeof(T));
+  } else {
+    nlfile >> ret;
+  }
+ cout << "read "  << ret << endl;
+  cout << " good = " << nlfile.good() << endl;
+  return ret;
+}
+
 void NlpBuilder::parse_nl(const std::string& filename, const Dict& options) {
   // Note: The implementation of this function follows the
   // "Writing .nl Files" paper by David M. Gay (2005)
@@ -50,6 +65,7 @@ void NlpBuilder::parse_nl(const std::string& filename, const Dict& options) {
 
   // Open the NL file for reading
   ifstream nlfile;
+  bool binary = false;
   nlfile.open(filename.c_str());
   if (verbose) userOut() << "Reading file \"" << filename << "\"" << endl;
 
@@ -60,10 +76,19 @@ void NlpBuilder::parse_nl(const std::string& filename, const Dict& options) {
     getline(nlfile, header[k]);
   }
 
-  // Assert that the file is not in binary form
-  casadi_assert_message(header.at(0).at(0)=='g',
-                        "File could not be read, or file is binary format "
-                        "(currently not supported)");
+  // If the file binary, then reopen
+  if (header.at(0).at(0)=='b') {
+    binary = true;
+    // Get current position in the file
+    int pos = nlfile.tellg();
+    // Reopen the file in binary mode
+    nlfile.close();
+    nlfile.open(filename.c_str(), ios::binary);
+    // Go to the previous position
+    nlfile.seekg(pos);
+  } else {
+    casadi_assert(header.at(0).at(0)=='g');
+  }
 
   // Get the number of objectives and constraints
   stringstream ss(header[1]);
@@ -102,6 +127,8 @@ void NlpBuilder::parse_nl(const std::string& filename, const Dict& options) {
     char key;
     nlfile >> key;
 
+cout << "key = "  << key << endl;
+
     // Break if end of file
     if (nlfile.eof()) break;
 
@@ -125,8 +152,9 @@ void NlpBuilder::parse_nl(const std::string& filename, const Dict& options) {
       case 'V':
       {
         // Read header
-        int i, j, k;
-        nlfile >> i >> j >> k;
+        int i = nlread<int>(nlfile, binary);
+        int j = nlread<int>(nlfile, binary);
+        int k = nlread<int>(nlfile, binary);
 
         // Make sure that v is long enough
         if (i >= v.size()) {
@@ -139,9 +167,8 @@ void NlpBuilder::parse_nl(const std::string& filename, const Dict& options) {
         // Add the linear terms
         for (int jj=0; jj<j; ++jj) {
           // Linear term
-          int pl;
-          double cl;
-          nlfile >> pl >> cl;
+          int pl = nlread<int>(nlfile, binary);
+          double cl = nlread<double>(nlfile, binary);
 
           // Add to variable definition (assuming it has already been defined)
           casadi_assert_message(!v.at(pl).isNan(), "Circular dependencies not supported");
@@ -149,7 +176,7 @@ void NlpBuilder::parse_nl(const std::string& filename, const Dict& options) {
         }
 
         // Finally, add the nonlinear term
-        v[i] += read_expr(nlfile, v);
+        v[i] += read_expr(nlfile, v, binary);
 
         break;
       }
@@ -158,11 +185,12 @@ void NlpBuilder::parse_nl(const std::string& filename, const Dict& options) {
       case 'C':
       {
         // Get the number
-        int i;
-        nlfile >> i;
+        int i = nlread<int>(nlfile, binary);
+        cout << " i = "  << i << endl;
+casadi_assert(nlfile.good());
 
         // Parse and save expression
-        g->at(i) = read_expr(nlfile, v);
+        g->at(i) = read_expr(nlfile, v, binary);
 
         break;
       }
@@ -178,15 +206,13 @@ void NlpBuilder::parse_nl(const std::string& filename, const Dict& options) {
       case 'O':
       {
         // Get the number
-        int i;
-        nlfile >> i;
+        int i = nlread<int>(nlfile, binary);
 
         // Should the objective be maximized
-        int sigma;
-        nlfile >> sigma;
+        int sigma = nlread<int>(nlfile, binary);
 
         // Parse and save expression
-        f->at(i) = read_expr(nlfile, v);
+        f->at(i) = read_expr(nlfile, v, binary);
 
         // Negate the expression if we maximize
         if (sigma!=0) {
@@ -200,15 +226,13 @@ void NlpBuilder::parse_nl(const std::string& filename, const Dict& options) {
       case 'd':
       {
         // Read the number of guesses supplied
-        int m;
-        nlfile >> m;
+        int m = nlread<int>(nlfile, binary);
 
         // Process initial guess for the fual variables
         for (int i=0; i<m; ++i) {
           // Offset and value
-          int offset;
-          double d;
-          nlfile >> offset >> d;
+          int offset = nlread<int>(nlfile, binary);
+          double d = nlread<double>(nlfile, binary);
 
           // Save initial guess
           lambda_init->at(offset) = d;
@@ -221,15 +245,13 @@ void NlpBuilder::parse_nl(const std::string& filename, const Dict& options) {
       case 'x':
       {
         // Read the number of guesses supplied
-        int m;
-        nlfile >> m;
+        int m = nlread<int>(nlfile, binary);
 
         // Process initial guess
         for (int i=0; i<m; ++i) {
           // Offset and value
-          int offset;
-          double d;
-          nlfile >> offset >> d;
+          int offset = nlread<int>(nlfile, binary);
+          double d = nlread<double>(nlfile, binary);
 
           // Save initial guess
           x_init->at(offset) = d;
@@ -245,31 +267,23 @@ void NlpBuilder::parse_nl(const std::string& filename, const Dict& options) {
         for (int i=0; i<n_con; ++i) {
 
           // Read constraint type
-          int c_type;
-          nlfile >> c_type;
-
-          // Temporary
-          double c;
+          int c_type = nlread<int>(nlfile, binary);
 
           switch (c_type) {
             // Upper and lower bounds
             case 0:
-              nlfile >> c;
-              g_lb->at(i) = c;
-              nlfile >> c;
-              g_ub->at(i) = c;
+              g_lb->at(i) = nlread<double>(nlfile, binary);
+              g_ub->at(i) = nlread<double>(nlfile, binary);
               continue;
 
             // Only upper bounds
             case 1:
-              nlfile >> c;
-              g_ub->at(i) = c;
+              g_ub->at(i) = nlread<double>(nlfile, binary);
               continue;
 
             // Only lower bounds
             case 2:
-              nlfile >> c;
-              g_lb->at(i) = c;
+              g_lb->at(i) = nlread<double>(nlfile, binary);
               continue;
 
             // No bounds
@@ -278,16 +292,15 @@ void NlpBuilder::parse_nl(const std::string& filename, const Dict& options) {
 
             // Equality constraints
             case 4:
-              nlfile >> c;
-              g_lb->at(i) = g_ub->at(i) = c;
+              g_lb->at(i) = g_ub->at(i) = nlread<double>(nlfile, binary);
               continue;
 
               // Complementary constraints
               case 5:
               {
                 // Read the indices
-                int ck, ci;
-                nlfile >> ck >> ci;
+                int ck = nlread<int>(nlfile, binary);
+                int ci = nlread<int>(nlfile, binary);
                 if (verbose) {
                   userOut<true, PL_WARN>()
                     << "Complementary constraints unsupported: ignored" << endl;
@@ -309,31 +322,23 @@ void NlpBuilder::parse_nl(const std::string& filename, const Dict& options) {
         for (int i=0; i<n_var; ++i) {
 
           // Read constraint type
-          int c_type;
-          nlfile >> c_type;
-
-          // Temporary
-          double c;
+          int c_type = nlread<int>(nlfile, binary);
 
           switch (c_type) {
             // Upper and lower bounds
             case 0:
-              nlfile >> c;
-              x_lb->at(i) = c;
-              nlfile >> c;
-              x_ub->at(i) = c;
+              x_lb->at(i) = nlread<double>(nlfile, binary);
+              x_ub->at(i) = nlread<double>(nlfile, binary);
               continue;
 
             // Only upper bounds
             case 1:
-              nlfile >> c;
-              x_ub->at(i) = c;
+              x_ub->at(i) = nlread<double>(nlfile, binary);
               continue;
 
            // Only lower bounds
            case 2:
-              nlfile >> c;
-              x_lb->at(i) = c;
+              x_lb->at(i) = nlread<double>(nlfile, binary);
               continue;
 
            // No bounds
@@ -342,8 +347,7 @@ void NlpBuilder::parse_nl(const std::string& filename, const Dict& options) {
 
            // Equality constraints
            case 4:
-              nlfile >> c;
-              x_lb->at(i) = x_ub->at(i) = c;
+              x_lb->at(i) = x_ub->at(i) = nlread<double>(nlfile, binary);
               continue;
 
            default:
@@ -361,14 +365,13 @@ void NlpBuilder::parse_nl(const std::string& filename, const Dict& options) {
         vector<int> rowind(n_var+1);
 
         // Get the number of offsets
-        int k;
-        nlfile >> k;
+        int k = nlread<int>(nlfile, binary);
         casadi_assert(k==n_var-1);
 
         // Get the row offsets
         rowind[0]=0;
         for (int i=0; i<k; ++i) {
-          nlfile >> rowind[i+1];
+          rowind[i+1] = nlread<int>(nlfile, binary);
         }
         break;
       }
@@ -377,15 +380,14 @@ void NlpBuilder::parse_nl(const std::string& filename, const Dict& options) {
       case 'J':
       {
         // Get constraint number and number of terms
-        int i, k;
-        nlfile >> i >> k;
+        int i = nlread<int>(nlfile, binary);
+        int k = nlread<int>(nlfile, binary);
 
         // Get terms
         for (int kk=0; kk<k; ++kk) {
           // Get the term
-          int j;
-          double c;
-          nlfile >> j >> c;
+          int j = nlread<int>(nlfile, binary);
+          double c = nlread<double>(nlfile, binary);
 
           // Add to constraints
           g->at(i) += c*v.at(j);
@@ -397,15 +399,14 @@ void NlpBuilder::parse_nl(const std::string& filename, const Dict& options) {
       case 'G':
       {
         // Get objective number and number of terms
-        int i, k;
-        nlfile >> i >> k;
+        int i = nlread<int>(nlfile, binary);
+        int k = nlread<int>(nlfile, binary);
 
         // Get terms
         for (int kk=0; kk<k; ++kk) {
           // Get the term
-          int j;
-          double c;
-          nlfile >> j >> c;
+          int j = nlread<int>(nlfile, binary);
+          double c = nlread<double>(nlfile, binary);
 
           // Add to objective
           f->at(i) += c*v.at(j);
@@ -419,14 +420,16 @@ void NlpBuilder::parse_nl(const std::string& filename, const Dict& options) {
   nlfile.close();
 }
 
-SXElem NlpBuilder::read_expr(std::istream &stream, const std::vector<SXElem>& v) {
+SXElem NlpBuilder::read_expr(std::istream &stream, const std::vector<SXElem>& v, bool binary) {
   // Read the instruction
   char inst;
+  casadi_assert(stream.good());
   stream >> inst;
+  cout << " inst = \""  << inst << "\"" << endl;
+  cout << "good = "  << stream.good() << endl;
 
   // Temporaries
   int i;
-  double d;
 
   // Error message
   stringstream msg;
@@ -436,25 +439,23 @@ SXElem NlpBuilder::read_expr(std::istream &stream, const std::vector<SXElem>& v)
     // Symbolic variable
     case 'v':
       // Read the variable number
-      stream >> i;
+      i = nlread<int>(stream, binary);
 
       // Return the corresponding expression
       return v.at(i);
 
     // Numeric expression
     case 'n':
-
       // Read the floating point number
-      stream >> d;
-
-      // Return an expression containing the number
-      return d;
+      return nlread<double>(stream, binary);
 
     // Operation
     case 'o':
 
       // Read the operation
-      stream >> i;
+      i = nlread<int>(stream, binary);
+
+cout << " operation["  << i << "]"  << endl;
 
       // Process
       switch (i) {
@@ -465,7 +466,7 @@ SXElem NlpBuilder::read_expr(std::istream &stream, const std::vector<SXElem>& v)
         case 51:  case 52:  case 53:
         {
           // Read dependency
-          SXElem x = read_expr(stream, v);
+          SXElem x = read_expr(stream, v, binary);
 
           // Perform operation
           switch (i) {
@@ -503,8 +504,11 @@ SXElem NlpBuilder::read_expr(std::istream &stream, const std::vector<SXElem>& v)
         case 57:  case 58:  case 73:
         {
           // Read dependencies
-          SXElem x = read_expr(stream, v);
-          SXElem y = read_expr(stream, v);
+         cout << " reading x " << endl;
+          SXElem x = read_expr(stream, v, binary);
+          cout <<  "x = "  << x << endl;
+          SXElem y = read_expr(stream, v, binary);
+          cout <<  "y = "  << y << endl;
 
           // Perform operation
           switch (i) {
@@ -541,13 +545,12 @@ SXElem NlpBuilder::read_expr(std::istream &stream, const std::vector<SXElem>& v)
         case 11: case 12: case 54: case 59: case 60: case 61: case 70: case 71: case 74:
         {
           // Number of elements in the sum
-          int n;
-          stream >> n;
+          int n = nlread<int>(stream, binary);
 
           // Collect the arguments
           vector<SXElem> args(n);
           for (int k=0; k<n; ++k) {
-            args[k] = read_expr(stream, v);
+            args[k] = read_expr(stream, v, binary);
           }
 
           // Perform the operation
