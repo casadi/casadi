@@ -136,24 +136,22 @@ namespace casadi {
     /// Is a null pointer?
     bool is_null() const;
 
-/// \cond INTERNAL
-#ifndef SWIG
-    /** \brief Get a weak reference to the object */
-    WeakRef* weak();
-#endif // SWIG
-/// \endcond
-
     /** \brief Returns a number that is unique for a given Node.
      * If the Object does not point to any node, "0" is returned.
      */
     size_t __hash__() const;
 
+/// \cond INTERNAL
+#ifndef SWIG
+    /** \brief Get a weak reference to the object */
+    WeakRef* weak();
   protected:
     void count_up(); // increase counter of the node
     void count_down(); // decrease counter of the node
   private:
     SharedObjectNode *node;
-
+#endif // SWIG
+/// \endcond
   };
 
 #ifndef SWIG
@@ -291,4 +289,3 @@ namespace casadi {
 
 
 #endif // CASADI_SHARED_OBJECT_HPP
-
