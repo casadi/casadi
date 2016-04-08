@@ -88,7 +88,7 @@ for k in range(nk):
 
   # Add state at end of control interval to NLP
   w.append(X[k+1])
-  if k==nk:
+  if k==nk-1:
     w_min += xf_min
     w_max += xf_max
   else:
@@ -139,4 +139,3 @@ plt.xlabel('time')
 plt.legend(['x0 trajectory','x1 trajectory','u trajectory'])
 plt.grid()
 plt.show()
-
