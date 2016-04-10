@@ -893,6 +893,20 @@ class Functiontests(casadiTestCase):
     
     self.checkfunction(F,Fref,inputs=[z,x0],digits=5,allow_nondiff=True,evals=False)
     self.check_codegen(F,inputs=[z,x0])
+    
+  def test_depends_on(self):
+    x = SX.sym("x")
+    y = x**2
+    try:
+        depends_on(x,y)
+    except Exception as e:
+        s = str(e)
+    self.assertTrue("not symbolic" in s)
+    try:
+        Function("f",[y],[x])
+    except Exception as e:
+        s = str(e)
+    self.assertTrue("not symbolic" in s)        
 
 if __name__ == '__main__':
     unittest.main()

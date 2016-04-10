@@ -157,7 +157,7 @@ namespace casadi {
       if (!inputv[i].is_valid_input()) {
         casadi_error("XFunction::XFunction: Xfunction input arguments must be"
                      " purely symbolic." << std::endl
-                     << "Argument " << i << "(" << name_in(i) << ") is not symbolic.");
+                     << "Argument " << i << "(" << get_name_in(i) << ") is not symbolic.");
       }
     }
 
