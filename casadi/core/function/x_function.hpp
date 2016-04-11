@@ -49,11 +49,14 @@ namespace casadi {
 
     /** \brief  Constructor  */
     XFunction(const std::string& name,
-                      const std::vector<MatType>& inputv,
-                      const std::vector<MatType>& outputv);
+              const std::vector<MatType>& inputv,
+              const std::vector<MatType>& outputv);
 
     /** \brief  Destructor */
     virtual ~XFunction() {}
+
+    /** \brief  Initialize */
+    virtual void init(const Dict& opts);
 
     /** \brief  Topological sorting of the nodes based on Depth-First Search (DFS) */
     static void sort_depth_first(std::stack<NodeType*>& s, std::vector<NodeType*>& nodes);
@@ -147,30 +150,36 @@ namespace casadi {
   template<typename DerivedType, typename MatType, typename NodeType>
   XFunction<DerivedType, MatType, NodeType>::
   XFunction(const std::string& name,
-                    const std::vector<MatType>& inputv,
-                    const std::vector<MatType>& outputv)
+            const std::vector<MatType>& inputv,
+            const std::vector<MatType>& outputv)
     : FunctionInternal(name), inputv_(inputv),  outputv_(outputv) {
+  }
+
+  template<typename DerivedType, typename MatType, typename NodeType>
+  void XFunction<DerivedType, MatType, NodeType>::init(const Dict& opts) {
+    // Call the init function of the base class
+    FunctionInternal::init(opts);
 
     // Make sure that inputs are symbolic
-    for (int i=0; i<inputv.size(); ++i) {
-      if (inputv[i].nnz()==0) continue;   // That's okay
-      if (!inputv[i].is_valid_input()) {
+    for (int i=0; i<n_in(); ++i) {
+      if (inputv_.at(i).nnz()>0 && !inputv_.at(i).is_valid_input()) {
         casadi_error("XFunction::XFunction: Xfunction input arguments must be"
                      " purely symbolic." << std::endl
-                     << "Argument " << i << "(" << get_name_in(i) << ") is not symbolic.");
+                     << "Argument " << i << "(" << name_in(i) << ") is not symbolic.");
       }
     }
 
     // Check for duplicate entries among the input expressions
     bool has_duplicates = false;
-    for (auto it = inputv_.begin(); it != inputv_.end(); ++it) {
-      has_duplicates = it->has_duplicates() || has_duplicates;
+    for (auto&& i : inputv_) {
+      if (i.has_duplicates()) {
+        has_duplicates = true;
+        break;
+      }
     }
 
     // Reset temporaries
-    for (auto it = inputv_.begin(); it != inputv_.end(); ++it) {
-      it->resetInput();
-    }
+    for (auto&& i : inputv_) i.resetInput();
 
     if (has_duplicates) {
       userOut<true, PL_WARN>() << "Input expressions:" << std::endl;
@@ -180,7 +189,6 @@ namespace casadi {
       casadi_error("The input expressions are not independent (or were not reset properly).");
     }
   }
-
 
   template<typename DerivedType, typename MatType, typename NodeType>
   void XFunction<DerivedType, MatType, NodeType>::sort_depth_first(
