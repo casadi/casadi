@@ -215,10 +215,6 @@ namespace casadi {
     /// Convert dictionary to Problem
     template<typename XType>
       static Oracle* map2problem(const std::map<std::string, XType>& d);
-
-    /// Get the (legacy) dae forward function
-    template<typename XType>
-      static Oracle* fun2problem(Function nlp);
   };
 
   template<typename XType>
@@ -237,13 +233,6 @@ namespace casadi {
         casadi_error("No such field: " + i.first);
       }
     }
-    return Oracle::construct(nl_in, nl_out, NL_INPUTS, NL_OUTPUTS);
-  }
-
-  template<typename XType>
-  Oracle* Nlpsol::fun2problem(Function nlp) {
-    std::vector<XType> nl_in = XType::get_input(nlp);
-    std::vector<XType> nl_out = nlp(nl_in);
     return Oracle::construct(nl_in, nl_out, NL_INPUTS, NL_OUTPUTS);
   }
 

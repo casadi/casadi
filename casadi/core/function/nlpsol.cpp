@@ -65,15 +65,6 @@ namespace casadi {
   }
 
   Function nlpsol(const string& name, const string& solver,
-                  const Function& nlp, const Dict& opts) {
-    if (nlp.is_a("sxfunction")) {
-      return nlpsol(name, solver, Nlpsol::fun2problem<SX>(nlp), opts);
-    } else {
-      return nlpsol(name, solver, Nlpsol::fun2problem<MX>(nlp), opts);
-    }
-  }
-
-  Function nlpsol(const string& name, const string& solver,
                   Oracle* nlp, const Dict& opts) {
     Function ret;
     ret.assignNode(Nlpsol::instantiatePlugin(name, solver, nlp));
