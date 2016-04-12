@@ -111,8 +111,8 @@ namespace casadi {
   size_t External::get_n_in() {
     if (n_in_) {
       return n_in_();
-    } else if (li_.meta().has(name_ + "_N_IN")) {
-      return li_.meta().to_int(name_ + "_N_IN");
+    } else if (li_.has_meta(name_ + "_N_IN")) {
+      return li_.meta_int(name_ + "_N_IN");
     } else {
       // Fall back to base class
       return FunctionInternal::get_n_in();
@@ -122,8 +122,8 @@ namespace casadi {
   size_t External::get_n_out() {
     if (n_out_) {
       return n_out_();
-    } else if (li_.meta().has(name_ + "_N_OUT")) {
-      return li_.meta().to_int(name_ + "_N_OUT");
+    } else if (li_.has_meta(name_ + "_N_OUT")) {
+      return li_.meta_int(name_ + "_N_OUT");
     } else {
       // Fall back to base class
       return FunctionInternal::get_n_out();
@@ -136,9 +136,9 @@ namespace casadi {
       const char* n = name_in_(i);
       casadi_assert_message(n!=0, "Error querying input name");
       return n;
-    } else if (li_.meta().has(name_ + "_NAME_IN", i)) {
+    } else if (li_.has_meta(name_ + "_NAME_IN", i)) {
       // Read meta
-      return li_.meta().to_string(name_ + "_NAME_IN", i);
+      return li_.meta_string(name_ + "_NAME_IN", i);
     } else {
       // Default name
       return FunctionInternal::get_name_in(i);
@@ -151,9 +151,9 @@ namespace casadi {
       const char* n = name_out_(i);
       casadi_assert_message(n!=0, "Error querying output name");
       return n;
-    } else if (li_.meta().has(name_ + "_NAME_OUT", i)) {
+    } else if (li_.has_meta(name_ + "_NAME_OUT", i)) {
       // Read meta
-      return li_.meta().to_string(name_ + "_NAME_OUT", i);
+      return li_.meta_string(name_ + "_NAME_OUT", i);
     } else {
       // Default name
       return FunctionInternal::get_name_out(i);
@@ -164,8 +164,8 @@ namespace casadi {
     // Use sparsity retrieval function, if present
     if (sparsity_in_) {
       return Sparsity::compressed(sparsity_in_(i));
-    } else if (li_.meta().has(name_ + "_SPARSITY_IN", i)) {
-      return Sparsity::compressed(li_.meta().to_vector<int>(name_ + "_SPARSITY_IN", i));
+    } else if (li_.has_meta(name_ + "_SPARSITY_IN", i)) {
+      return Sparsity::compressed(li_.meta_vector<int>(name_ + "_SPARSITY_IN", i));
     } else {
       // Fall back to base class
       return FunctionInternal::get_sparsity_in(i);
@@ -176,8 +176,8 @@ namespace casadi {
     // Use sparsity retrieval function, if present
     if (sparsity_out_) {
       return Sparsity::compressed(sparsity_out_(i));
-    } else if (li_.meta().has(name_ + "_SPARSITY_OUT", i)) {
-      return Sparsity::compressed(li_.meta().to_vector<int>(name_ + "_SPARSITY_OUT", i));
+    } else if (li_.has_meta(name_ + "_SPARSITY_OUT", i)) {
+      return Sparsity::compressed(li_.meta_vector<int>(name_ + "_SPARSITY_OUT", i));
     } else {
       // Fall back to base class
       return FunctionInternal::get_sparsity_out(i);
@@ -199,8 +199,8 @@ namespace casadi {
     if (work_) {
       int flag = work_(&sz_arg, &sz_res, &sz_iw, &sz_w);
       casadi_assert_message(flag==0, "External: \"work\" failed");
-    } else if (li_.meta().has(name_ + "_WORK")) {
-      vector<int> v = li_.meta().to_vector<int>(name_ + "_WORK");
+    } else if (li_.has_meta(name_ + "_WORK")) {
+      vector<int> v = li_.meta_vector<int>(name_ + "_WORK");
       casadi_assert(v.size()==4);
       sz_arg = v[0];
       sz_res = v[1];
@@ -229,8 +229,8 @@ namespace casadi {
     getint_t n_mem = (getint_t)li_.get(name_ + "_n_mem");
     if (n_mem) {
       n_mem_ = n_mem();
-    } else if (li_.meta().has(name_ + "_N_MEM")) {
-      n_mem_ = li_.meta().to_int(name_ + "_N_MEM");
+    } else if (li_.has_meta(name_ + "_N_MEM")) {
+      n_mem_ = li_.meta_int(name_ + "_N_MEM");
     }
   }
 

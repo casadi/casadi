@@ -75,8 +75,12 @@ namespace casadi {
     return (*this)->getFunction(symname);
   }
 
-  const ParsedFile& Compiler::meta() const {
-    return (*this)->meta_;
+  bool Library::has_meta(const std::string& cmd, int ind) const {
+    return (*this)->meta().has(cmd, ind);
+  }
+
+  std::string Library::get_meta(const std::string& cmd, int ind) const {
+    return (*this)->meta().to_text(cmd, ind);
   }
 
   Library::Library() {
@@ -104,10 +108,6 @@ namespace casadi {
 
   signal_t Library::get(const std::string& sym) {
     return (*this)->get(sym);
-  }
-
-  const ParsedFile& Library::meta() const {
-    return (*this)->meta();
   }
 
 } // namespace casadi

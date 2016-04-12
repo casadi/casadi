@@ -27,7 +27,6 @@
 #define CASADI_COMPILER_HPP
 
 #include "function.hpp"
-#include "../casadi_file.hpp"
 
 namespace casadi {
 
@@ -77,9 +76,6 @@ namespace casadi {
 #ifndef SWIG
     /// Get a function pointer for numerical evaluation
     void* get_function(const std::string& symname);
-
-    /// Get meta information
-    const ParsedFile& meta() const;
 #endif // SWIG
   };
 
@@ -106,16 +102,62 @@ namespace casadi {
     // Check if symbol exists
     bool has(const std::string& sym) const;
 
+    /** \brief Does a meta entry exist? */
+    bool has_meta(const std::string& cmd, int ind=-1) const;
+
+    /** \brief Get entry as a text */
+    std::string get_meta(const std::string& cmd, int ind=-1) const;
+
 #ifndef SWIG
+    /** Convert indexed command */
+    static inline std::string indexed(const std::string& cmd, int ind) {
+      std::stringstream ss;
+      ss << cmd << "[" << ind << "]";
+      return ss.str();
+    }
+
+    /** \brief Convert to a type */
+    template<typename T>
+    T to(const std::string& cmd, int ind=-1) const {
+      std::istringstream ss(get_meta(cmd, ind));
+      T ret;
+      ss >> ret;
+      return ret;
+    }
+
+    /** \brief Get entry as a string */
+    std::string meta_string(const std::string& cmd, int ind=-1) const {
+      return to<std::string>(cmd, ind);
+    }
+
+    /** \brief Get entry as a vector */
+    template<typename T>
+    std::vector<T> meta_vector(const std::string& cmd, int ind=-1) const {
+      std::istringstream ss(get_meta(cmd, ind));
+      T tmp;
+      std::vector<T> ret;
+      while (ss >> tmp) ret.push_back(tmp);
+      return ret;
+    }
+
+    /** \brief Get entry as a set */
+    template<typename T>
+    std::set<T> meta_set(const std::string& cmd, int ind=-1) const {
+      std::set<T> ret;
+      for (auto&& e : meta_vector<T>(cmd, ind)) ret.insert(e);
+      return ret;
+    }
+
+    /** \brief Get entry as an integer */
+    int meta_int(const std::string& cmd, int ind=-1) const {
+      return to<int>(cmd, ind);
+    }
+
     // Dummy type
     signal_t get(const std::string& sym);
-
-    // Get meta
-    const ParsedFile& meta() const;
 #endif // SWIG
   };
 
 } // namespace casadi
 
 #endif // CASADI_COMPILER_HPP
-

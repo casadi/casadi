@@ -153,8 +153,8 @@ namespace casadi {
 
   JitLibrary::JitLibrary(const Compiler& compiler)
     : compiler_(compiler) {
-    if (compiler.meta().has("SYMBOLS")) {
-      meta_symbols_ = compiler.meta().to_set<std::string>("SYMBOLS");
+    if (compiler->meta_.has("SYMBOLS")) {
+      meta_symbols_ = compiler->meta_.to_set<std::string>("SYMBOLS");
     }
   }
 
@@ -174,7 +174,7 @@ namespace casadi {
   }
 
   const ParsedFile& JitLibrary::meta() const {
-    return compiler_.meta();
+    return compiler_->meta_;
   }
 
 } // namespace casadi
