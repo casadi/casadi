@@ -155,23 +155,4 @@ namespace casadi {
 #endif // WITH_DL
   }
 
-  JitLibrary::JitLibrary(const Compiler& compiler)
-    : compiler_(compiler) {
-  }
-
-  JitLibrary::~JitLibrary() {
-  }
-
-  bool JitLibrary::has(const std::string& sym) const {
-    return compiler_->has_function(sym);
-  }
-
-  signal_t JitLibrary::get(const std::string& sym) {
-    return (signal_t)compiler_.get_function(sym);
-  }
-
-  const ParsedFile& JitLibrary::meta() const {
-    return compiler_->meta_;
-  }
-
 } // namespace casadi

@@ -80,30 +80,6 @@ namespace casadi {
     /// Get a function pointer for numerical evaluation
     signal_t get_function(const std::string& symname);
 #endif // SWIG
-  };
-
-  // Forward declaration of internal class
-  class LibraryInternal;
-
-  /** \brief Library, either just-in-time compiled or dynamically loaded
-  */
-  class CASADI_EXPORT Library : public SharedObject {
-  public:
-    /// Default constructor
-    Library();
-
-    // Constructor, DLL
-    explicit Library(const std::string& bin_name);
-
-    // Constructor, JIT
-    explicit Library(const Compiler& compiler);
-
-    /// Access functions of the node
-    LibraryInternal* operator->();
-    const LibraryInternal* operator->() const;
-
-    // Check if symbol exists
-    bool has(const std::string& sym) const;
 
     /** \brief Does a meta entry exist? */
     bool has_meta(const std::string& cmd, int ind=-1) const;
@@ -147,7 +123,6 @@ namespace casadi {
     template<typename T>
     std::set<T> meta_set(const std::string& cmd, int ind=-1) const {
       std::set<T> ret;
-      for (auto&& e : meta_vector<T>(cmd, ind)) ret.insert(e);
       return ret;
     }
 
@@ -155,9 +130,6 @@ namespace casadi {
     int meta_int(const std::string& cmd, int ind=-1) const {
       return to<int>(cmd, ind);
     }
-
-    // Dummy type
-    signal_t get(const std::string& sym);
 #endif // SWIG
   };
 

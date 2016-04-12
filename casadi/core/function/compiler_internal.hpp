@@ -112,29 +112,6 @@ namespace casadi {
     std::set<std::string> meta_symbols_;
   };
 
-  /** \brief Just-in-time compiled or dynamically linked library
-      \author Joel Andersson
-      \date 2016
-  */
-  class CASADI_EXPORT
-  LibraryInternal : public SharedObjectNode {
-  public:
-    /// Constructor
-    explicit LibraryInternal() {}
-
-    /// Destructor
-    virtual ~LibraryInternal() {}
-
-    // Check if symbol exists
-    virtual bool has(const std::string& sym) const = 0;
-
-    // Dummy type
-    virtual signal_t get(const std::string& sym) = 0;
-
-    // Get meta
-    virtual const ParsedFile& meta() const = 0;
-  };
-
   /** \brief Dynamically linked library
       \author Joel Andersson
       \date 2016
@@ -162,33 +139,6 @@ namespace casadi {
     /// Can meta information be read?
     virtual bool can_have_meta() const { return false;}
   };
-
-  /** \brief Just-in-time library
-      \author Joel Andersson
-      \date 2016
-  */
-  class CASADI_EXPORT
-  JitLibrary : public LibraryInternal {
-  private:
-    Compiler compiler_;
-  public:
-
-    // Constructor
-    explicit JitLibrary(const Compiler& compiler);
-
-    // Destructor
-    virtual ~JitLibrary();
-
-    // Check if symbol exists
-    virtual bool has(const std::string& sym) const;
-
-    // Dummy type
-    virtual signal_t get(const std::string& sym);
-
-    // Get meta
-    virtual const ParsedFile& meta() const;
-  };
-
 
 } // namespace casadi
 /// \endcond

@@ -33,10 +33,10 @@
 namespace casadi {
   using namespace std;
 
-  Function external(const string& name, Library li,
+  Function external(const string& name, const Compiler& li,
                     const Dict& opts) {
     Function ret;
-    if (li.has(name + "_simple")) {
+    if (li.has_function(name + "_simple")) {
       // Simplified, lower overhead external
       ret.assignNode(new SimplifiedExternal(name, li));
     } else {
@@ -53,52 +53,47 @@ namespace casadi {
 
   Function external(const string& name, const string& bin_name,
                     const Dict& opts) {
-    return external(name, Library(bin_name), opts);
+    return external(name, Compiler(bin_name, "jit"), opts);
   }
 
-  Function external(const string& name, const Compiler& compiler,
-                    const Dict& opts) {
-    return external(name, Library(compiler), opts);
-  }
-
-  External::External(const std::string& name, const Library& li)
+  External::External(const std::string& name, const Compiler& li)
     : FunctionInternal(name), li_(li) {
 
     // Increasing/decreasing reference counter
-    incref_ = (signal_t)li_.get(name_ + "_incref");
-    decref_ = (signal_t)li_.get(name_ + "_decref");
+    incref_ = (signal_t)li_.get_function(name_ + "_incref");
+    decref_ = (signal_t)li_.get_function(name_ + "_decref");
 
     // Getting number of inputs and outputs
-    n_in_ = (getint_t)li_.get(name + "_n_in");
-    n_out_ = (getint_t)li_.get(name + "_n_out");
+    n_in_ = (getint_t)li_.get_function(name + "_n_in");
+    n_out_ = (getint_t)li_.get_function(name + "_n_out");
 
     // Getting names of inputs and outputs
-    name_in_ = (name_t)li_.get(name + "_name_in");
-    name_out_ = (name_t)li_.get(name + "_name_out");
+    name_in_ = (name_t)li_.get_function(name + "_name_in");
+    name_out_ = (name_t)li_.get_function(name + "_name_out");
 
     // Work vector sizes
-    work_ = (work_t)li_.get(name_ + "_work");
+    work_ = (work_t)li_.get_function(name_ + "_work");
 
     // Increase reference counter - external function memory initialized at this point
     if (incref_) incref_();
   }
 
-  SimplifiedExternal::SimplifiedExternal(const std::string& name, const Library& li)
+  SimplifiedExternal::SimplifiedExternal(const std::string& name, const Compiler& li)
     : External(name, li) {
 
     // Function for numerical evaluation
-    simple_ = (simple_t)li_.get(name_ + "_simple");
+    simple_ = (simple_t)li_.get_function(name_ + "_simple");
   }
 
-  GenericExternal::GenericExternal(const std::string& name, const Library& li)
+  GenericExternal::GenericExternal(const std::string& name, const Compiler& li)
     : External(name, li) {
 
     // Functions for retrieving sparsities of inputs and outputs
-    sparsity_in_ = (sparsity_t)li_.get(name + "_sparsity_in");
-    sparsity_out_ = (sparsity_t)li_.get(name + "_sparsity_out");
+    sparsity_in_ = (sparsity_t)li_.get_function(name + "_sparsity_in");
+    sparsity_out_ = (sparsity_t)li_.get_function(name + "_sparsity_out");
 
     // Function for numerical evaluation
-    eval_ = (eval_t)li_.get(name_);
+    eval_ = (eval_t)li_.get_function(name_);
 
     n_mem_ = 0;
   }
@@ -189,8 +184,8 @@ namespace casadi {
     FunctionInternal::init(opts);
 
     // Reference counting?
-    has_refcount_ = li_.has(name_ + "_incref");
-    casadi_assert_message(has_refcount_==li_.has(name_ + "_decref"),
+    has_refcount_ = li_.has_function(name_ + "_incref");
+    casadi_assert_message(has_refcount_==li_.has_function(name_ + "_decref"),
                           "External functions must provide functions for both increasing "
                           "and decreasing the reference count, or neither.");
 
@@ -226,7 +221,7 @@ namespace casadi {
     External::init(opts);
 
     // Maximum number of memory objects
-    getint_t n_mem = (getint_t)li_.get(name_ + "_n_mem");
+    getint_t n_mem = (getint_t)li_.get_function(name_ + "_n_mem");
     if (n_mem) {
       n_mem_ = n_mem();
     } else if (li_.has_meta(name_ + "_N_MEM")) {
@@ -248,7 +243,7 @@ namespace casadi {
 
   bool External::hasFullJacobian() const {
     if (FunctionInternal::hasFullJacobian()) return true;
-    return li_.has(name_ + "_jac");
+    return li_.has_function(name_ + "_jac");
   }
 
   Function External
@@ -276,7 +271,7 @@ namespace casadi {
     for (int i=64; i>0; i/=2) {
       stringstream ss;
       ss << "fwd" << i << "_" << name_;
-      if (li_.has(ss.str())) return i;
+      if (li_.has_function(ss.str())) return i;
     }
     return 0;
   }
@@ -297,7 +292,7 @@ namespace casadi {
     for (int i=64; i>0; i/=2) {
       stringstream ss;
       ss << "adj" << i << "_" << name_;
-      if (li_.has(ss.str())) return i;
+      if (li_.has_function(ss.str())) return i;
     }
     return 0;
   }

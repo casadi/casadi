@@ -48,14 +48,6 @@ namespace casadi {
   CASADI_EXPORT Function external(const std::string& name, const Compiler& compiler,
                                   const Dict& opts=Dict());
 
-#ifndef SWIG
-  /** \brief  Load an external function
-   * Library given
-   */
-  CASADI_EXPORT Function external(const std::string& name, Library li,
-                                  const Dict& opts=Dict());
-#endif // SWIG
-
 } // namespace casadi
 
 #endif // CASADI_EXTERNAL_HPP

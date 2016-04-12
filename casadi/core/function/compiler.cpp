@@ -81,40 +81,12 @@ namespace casadi {
     return (*this)->get_function(symname);
   }
 
-  bool Library::has_meta(const std::string& cmd, int ind) const {
-    return (*this)->meta().has(cmd, ind);
+  bool Compiler::has_meta(const std::string& cmd, int ind) const {
+    return (*this)->meta_.has(cmd, ind);
   }
 
-  std::string Library::get_meta(const std::string& cmd, int ind) const {
-    return (*this)->meta().to_text(cmd, ind);
-  }
-
-  Library::Library() {
-  }
-
-  Library::Library(const std::string& bin_name) {
-    Compiler compiler(bin_name, "dll");
-    assignNode(new JitLibrary(compiler));
-  }
-
-  Library::Library(const Compiler& compiler) {
-    assignNode(new JitLibrary(compiler));
-  }
-
-  LibraryInternal* Library::operator->() {
-    return static_cast<LibraryInternal*>(SharedObject::operator->());
-  }
-
-  const LibraryInternal* Library::operator->() const {
-    return static_cast<const LibraryInternal*>(SharedObject::operator->());
-  }
-
-  bool Library::has(const std::string& sym) const {
-    return (*this)->has(sym);
-  }
-
-  signal_t Library::get(const std::string& sym) {
-    return (*this)->get(sym);
+  std::string Compiler::get_meta(const std::string& cmd, int ind) const {
+    return (*this)->meta_.to_text(cmd, ind);
   }
 
 } // namespace casadi
