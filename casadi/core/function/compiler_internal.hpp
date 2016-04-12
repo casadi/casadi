@@ -29,7 +29,6 @@
 #include "compiler.hpp"
 #include "function_internal.hpp"
 #include "plugin_interface.hpp"
-#include "../casadi_file.hpp"
 
 
 /// \cond INTERNAL
@@ -96,17 +95,36 @@ namespace casadi {
     /// Get a function pointer for numerical evaluation
     bool has_function(const std::string& symname) const;
 
+    /** \brief Does an entry exist? */
+    bool has_meta(const std::string& cmd, int ind=-1) const;
+
+    /** \brief Get entry as a text */
+    std::string get_meta(const std::string& cmd, int ind=-1) const;
+
     /// Get meta information, if any
     void get_meta(std::vector<std::string>& lines, int& offset) const;
 
     /// Can meta information be read?
     virtual bool can_have_meta() const { return true;}
 
+    /** \brief Parse a list of strings */
+    void parse(const std::vector<std::string>& lines, int offset);
+
+    /** \brief Get entry as a text */
+    std::string to_text(const std::string& cmd, int ind=-1) const;
+
+    /** Convert indexed command */
+    static inline std::string indexed(const std::string& cmd, int ind) {
+      std::stringstream ss;
+      ss << cmd << "[" << ind << "]";
+      return ss.str();
+    }
+
     /// C filename
     std::string name_;
 
-    /// Meta information
-    ParsedFile meta_;
+    /** \brief Map of commands */
+    std::map<std::string, std::pair<int, std::string> > commands_;
 
     /// Symbols
     std::set<std::string> meta_symbols_;

@@ -30,6 +30,36 @@
 
 namespace casadi {
 
+#ifndef SWIG
+    /** \brief Convert to a type */
+    template<typename T>
+    T text2type(const std::string& text) {
+      std::istringstream ss(text);
+      T ret;
+      ss >> ret;
+      return ret;
+    }
+
+    /** \brief Get entry as a vector */
+    template<typename T>
+    std::vector<T> text2vector(const std::string& text) {
+      std::istringstream ss(text);
+      T tmp;
+      std::vector<T> ret;
+      while (ss >> tmp) ret.push_back(tmp);
+      return ret;
+    }
+
+    /** \brief Get entry as a set */
+    template<typename T>
+    std::set<T> text2set(const std::string& text) {
+      std::vector<T> v = text2vector<T>(text);
+      std::set<T> ret;
+      for (auto&& i : v) ret.insert(i);
+      return ret;
+    }
+#endif // SWIG
+
   // Forward declaration of internal class
   class CompilerInternal;
 
@@ -98,10 +128,7 @@ namespace casadi {
     /** \brief Convert to a type */
     template<typename T>
     T to(const std::string& cmd, int ind=-1) const {
-      std::istringstream ss(get_meta(cmd, ind));
-      T ret;
-      ss >> ret;
-      return ret;
+      return text2type<T>(get_meta(cmd, ind));
     }
 
     /** \brief Get entry as a string */
@@ -112,18 +139,13 @@ namespace casadi {
     /** \brief Get entry as a vector */
     template<typename T>
     std::vector<T> meta_vector(const std::string& cmd, int ind=-1) const {
-      std::istringstream ss(get_meta(cmd, ind));
-      T tmp;
-      std::vector<T> ret;
-      while (ss >> tmp) ret.push_back(tmp);
-      return ret;
+      return text2vector<T>(get_meta(cmd, ind));
     }
 
     /** \brief Get entry as a set */
     template<typename T>
     std::set<T> meta_set(const std::string& cmd, int ind=-1) const {
-      std::set<T> ret;
-      return ret;
+      return text2set<T>(get_meta(cmd, ind));
     }
 
     /** \brief Get entry as an integer */

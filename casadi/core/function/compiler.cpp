@@ -82,11 +82,11 @@ namespace casadi {
   }
 
   bool Compiler::has_meta(const std::string& cmd, int ind) const {
-    return (*this)->meta_.has(cmd, ind);
+    return (*this)->has_meta(cmd, ind);
   }
 
   std::string Compiler::get_meta(const std::string& cmd, int ind) const {
-    return (*this)->meta_.to_text(cmd, ind);
+    return (*this)->get_meta(cmd, ind);
   }
 
 } // namespace casadi
