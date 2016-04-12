@@ -3938,6 +3938,18 @@ Print a representation of the object.
 
 ";
 
+%feature("docstring") casadi::Library::get_meta "
+
+Get entry as a text.
+
+";
+
+%feature("docstring") casadi::Library::has_meta "
+
+Does a meta entry exist?
+
+";
+
 %feature("docstring") casadi::Library::is_null "
 
 Is a null pointer?

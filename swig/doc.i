@@ -5611,6 +5611,20 @@ Print a representation of the object.
 
 ";
 
+%feature("docstring")  casadi::Library::get_meta(const std::string &cmd, int
+ind=-1) const  "
+
+Get entry as a text.
+
+";
+
+%feature("docstring")  casadi::Library::has_meta(const std::string &cmd, int
+ind=-1) const  "
+
+Does a meta entry exist?
+
+";
+
 %feature("docstring")  casadi::SharedObject::is_null() const  "
 
 Is a null pointer?
