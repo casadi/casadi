@@ -49,10 +49,10 @@ namespace casadi {
     /// Default constructor
     Compiler();
 
-    /// Compiler factory (new syntax, includes initialization)
+    /// Compiler factory
     explicit Compiler(const std::string& name,
-                         const std::string& compiler,
-                         const Dict& opts=Dict());
+                      const std::string& compiler,
+                      const Dict& opts=Dict());
 
     /// Access functions of the node
     CompilerInternal* operator->();

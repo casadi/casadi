@@ -37,6 +37,8 @@ namespace casadi {
                            const Dict& opts) {
     if (compiler=="none") {
       assignNode(new CompilerInternal(name));
+    } else if (compiler=="dll") {
+      assignNode(new DllLibrary(name));
     } else {
       assignNode(CompilerInternal::getPlugin(compiler).creator(name));
     }
@@ -87,7 +89,8 @@ namespace casadi {
   }
 
   Library::Library(const std::string& bin_name) {
-    assignNode(new DllLibrary(bin_name));
+    Compiler compiler(bin_name, "dll");
+    assignNode(new JitLibrary(compiler));
   }
 
   Library::Library(const Compiler& compiler) {

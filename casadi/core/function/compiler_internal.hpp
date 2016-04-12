@@ -131,14 +131,13 @@ namespace casadi {
       \date 2016
   */
   class CASADI_EXPORT
-  DllLibrary : public LibraryInternal {
+  DllLibrary : public CompilerInternal {
   private:
 #if defined(WITH_DL) && defined(_WIN32) // also for 64-bit
     typedef HINSTANCE handle_t;
 #else
     typedef void* handle_t;
 #endif
-    std::string bin_name_;
     handle_t handle_;
   public:
 

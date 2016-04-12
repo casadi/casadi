@@ -98,16 +98,16 @@ namespace casadi {
   }
 
   DllLibrary::DllLibrary(const std::string& bin_name)
-    : bin_name_(bin_name), handle_(0) {
+    : CompilerInternal(bin_name), handle_(0) {
 #ifdef WITH_DL
 #ifdef _WIN32
-    handle_ = LoadLibrary(TEXT(bin_name_.c_str()));
+    handle_ = LoadLibrary(TEXT(name_.c_str()));
     casadi_assert_message(handle_!=0, "CommonExternal: Cannot open \""
-                          << bin_name_ << "\". Error code (WIN32): "<< GetLastError());
+                          << name_ << "\". Error code (WIN32): "<< GetLastError());
 #else // _WIN32
-    handle_ = dlopen(bin_name_.c_str(), RTLD_LAZY);
+    handle_ = dlopen(name_.c_str(), RTLD_LAZY);
     casadi_assert_message(handle_!=0, "CommonExternal: Cannot open \""
-                          << bin_name_ << "\". Error code: "<< dlerror());
+                          << name_ << "\". Error code: "<< dlerror());
     // reset error
     dlerror();
 #endif // _WIN32
