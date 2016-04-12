@@ -107,7 +107,7 @@ namespace casadi {
     virtual const char* plugin_name() const { return "clang";}
 
     /// Get a function pointer for numerical evaluation
-    virtual void* getFunction(const std::string& symname);
+    virtual signal_t get_function(const std::string& symname);
 
     // Helper function for reading includes
     static std::vector<std::pair<std::string, bool> >

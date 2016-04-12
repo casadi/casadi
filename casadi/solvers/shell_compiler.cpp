@@ -146,9 +146,9 @@ namespace casadi {
     dlerror();
   }
 
-  void* ShellCompiler::getFunction(const std::string& symname) {
-    void* ret;
-    ret = reinterpret_cast<void*>(dlsym(handle_, symname.c_str()));
+  signal_t ShellCompiler::get_function(const std::string& symname) {
+    signal_t ret;
+    ret = reinterpret_cast<signal_t>(dlsym(handle_, symname.c_str()));
     if (dlerror()) {
       ret=0;
       dlerror(); // Reset error flags

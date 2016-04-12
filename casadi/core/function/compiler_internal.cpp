@@ -69,10 +69,15 @@ namespace casadi {
 
   void CompilerInternal::init(const Dict& opts) {
     // Read meta information from file
-    std::vector<std::string> lines;
-    int offset;
-    get_meta(lines, offset);
-    meta_ = ParsedFile(lines, offset);
+    if (can_have_meta()) {
+      std::vector<std::string> lines;
+      int offset;
+      get_meta(lines, offset);
+      meta_ = ParsedFile(lines, offset);
+      if (meta_.has("SYMBOLS")) {
+        meta_symbols_ = meta_.to_set<std::string>("SYMBOLS");
+      }
+    }
   }
 
   void CompilerInternal::get_meta(std::vector<std::string>& lines, int& offset) const {
@@ -95,6 +100,14 @@ namespace casadi {
         casadi_error("End-of-file reached while searching for \"*/\"");
       }
     }
+  }
+
+  bool CompilerInternal::has_function(const std::string& symname) const {
+    // Check if in meta information
+    if (meta_symbols_.count(symname)) return true;
+
+    // Convert to a dummy function pointer
+    return const_cast<CompilerInternal*>(this)->get_function(symname)!=0;
   }
 
   DllLibrary::DllLibrary(const std::string& bin_name)
@@ -127,11 +140,7 @@ namespace casadi {
 #endif // WITH_DL
   }
 
-  bool DllLibrary::has(const std::string& sym) const {
-    return const_cast<DllLibrary*>(this)->get(sym)!=0;
-  }
-
-  signal_t DllLibrary::get(const std::string& sym) {
+  signal_t DllLibrary::get_function(const std::string& sym) {
 #ifdef WITH_DL
 #ifdef _WIN32
     return (signal_t)GetProcAddress(handle_, TEXT(sym.c_str()));
@@ -146,27 +155,15 @@ namespace casadi {
 #endif // WITH_DL
   }
 
-  const ParsedFile& DllLibrary::meta() const {
-    static ParsedFile singleton;
-    return singleton;
-  }
-
   JitLibrary::JitLibrary(const Compiler& compiler)
     : compiler_(compiler) {
-    if (compiler->meta_.has("SYMBOLS")) {
-      meta_symbols_ = compiler->meta_.to_set<std::string>("SYMBOLS");
-    }
   }
 
   JitLibrary::~JitLibrary() {
   }
 
   bool JitLibrary::has(const std::string& sym) const {
-    // Check if in meta information
-    if (meta_symbols_.count(sym)) return true;
-
-    // Convert to a dummy function pointer
-    return const_cast<JitLibrary*>(this)->get(sym)!=0;
+    return compiler_->has_function(sym);
   }
 
   signal_t JitLibrary::get(const std::string& sym) {

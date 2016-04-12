@@ -91,16 +91,25 @@ namespace casadi {
     virtual const char* plugin_name() const { return "none";}
 
     /// Get a function pointer for numerical evaluation
-    virtual void* getFunction(const std::string& symname) { return 0;}
+    virtual signal_t get_function(const std::string& symname) { return 0;}
+
+    /// Get a function pointer for numerical evaluation
+    bool has_function(const std::string& symname) const;
 
     /// Get meta information, if any
     void get_meta(std::vector<std::string>& lines, int& offset) const;
+
+    /// Can meta information be read?
+    virtual bool can_have_meta() const { return true;}
 
     /// C filename
     std::string name_;
 
     /// Meta information
     ParsedFile meta_;
+
+    /// Symbols
+    std::set<std::string> meta_symbols_;
   };
 
   /** \brief Just-in-time compiled or dynamically linked library
@@ -147,14 +156,11 @@ namespace casadi {
     // Destructor
     virtual ~DllLibrary();
 
-    // Check if symbol exists
-    virtual bool has(const std::string& sym) const;
-
     // Dummy type
-    virtual signal_t get(const std::string& sym);
+    virtual signal_t get_function(const std::string& symname);
 
-    // Get meta
-    virtual const ParsedFile& meta() const;
+    /// Can meta information be read?
+    virtual bool can_have_meta() const { return false;}
   };
 
   /** \brief Just-in-time library
@@ -165,7 +171,6 @@ namespace casadi {
   JitLibrary : public LibraryInternal {
   private:
     Compiler compiler_;
-    std::set<std::string> meta_symbols_;
   public:
 
     // Constructor

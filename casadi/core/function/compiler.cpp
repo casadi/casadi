@@ -73,8 +73,12 @@ namespace casadi {
     return (*this)->plugin_name();
   }
 
-  void* Compiler::get_function(const std::string& symname) {
-    return (*this)->getFunction(symname);
+  bool Compiler::has_function(const std::string& symname) const {
+    return (*this)->has_function(symname);
+  }
+
+  signal_t Compiler::get_function(const std::string& symname) {
+    return (*this)->get_function(symname);
   }
 
   bool Library::has_meta(const std::string& cmd, int ind) const {

@@ -233,10 +233,10 @@ namespace casadi {
     executionEngine_->finalizeObject();
   }
 
-  void* ClangCompiler::getFunction(const std::string& symname) {
+  signal_t ClangCompiler::get_function(const std::string& symname) {
     llvm::Function* f = module_->getFunction(symname);
     if (f) {
-      return executionEngine_->getPointerToFunction(f);
+      return reinterpret_cast<signal_t>(executionEngine_->getPointerToFunction(f));
     } else {
       return 0;
     }

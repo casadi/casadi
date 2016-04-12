@@ -73,9 +73,12 @@ namespace casadi {
     /// Query plugin name
     std::string plugin_name() const;
 
+    // Check if symbol exists
+    bool has_function(const std::string& symname) const;
+
 #ifndef SWIG
     /// Get a function pointer for numerical evaluation
-    void* get_function(const std::string& symname);
+    signal_t get_function(const std::string& symname);
 #endif // SWIG
   };
 

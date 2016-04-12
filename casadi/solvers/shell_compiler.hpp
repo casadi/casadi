@@ -76,7 +76,7 @@ namespace casadi {
     virtual const char* plugin_name() const { return "shell";}
 
     /// Get a function pointer for numerical evaluation
-    virtual void* getFunction(const std::string& symname);
+    virtual signal_t get_function(const std::string& symname);
   protected:
     /// Temporary file
     std::string bin_name_;
