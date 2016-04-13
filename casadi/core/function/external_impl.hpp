@@ -86,6 +86,10 @@ namespace casadi {
     /** \brief Add a dependent function */
     virtual void addDependency(CodeGenerator& g) const;
 
+    /** \brief Generate code the function */
+    virtual void generateFunction(CodeGenerator& g, const std::string& fname,
+                                  bool decl_static) const;
+
     /** \brief Get name in codegen */
     virtual std::string codegen_name(const CodeGenerator& g) const;
 

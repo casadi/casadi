@@ -117,6 +117,12 @@ namespace casadi {
     /** \brief Get entry as a text */
     std::string get_meta(const std::string& cmd, int ind=-1) const;
 
+    /// Check if a function is inlined
+    bool inlined(const std::string& symname) const;
+
+    /// Get the function body, if inlined
+    std::string body(const std::string& symname) const;
+
 #ifndef SWIG
     /** Convert indexed command */
     static inline std::string indexed(const std::string& cmd, int ind) {

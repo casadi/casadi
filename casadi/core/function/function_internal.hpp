@@ -462,6 +462,12 @@ namespace casadi {
     /** \brief Use simplified signature */
     virtual bool simplifiedCall() const { return false;}
 
+    /** \brief Generate shorthand macro */
+    void addShorthand(CodeGenerator& g, const std::string& name) const;
+
+    /** \brief Get name of the evaluation function */
+    std::string eval_name() const;
+
     /** \brief Get name in codegen */
     virtual std::string codegen_name(const CodeGenerator& g) const;
 

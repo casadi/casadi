@@ -108,6 +108,12 @@ namespace casadi {
     void read_external(const std::string& sym, bool inlined,
                        std::istream& file, int& offset);
 
+    // Check if a function is inlined
+    bool inlined(const std::string& symname) const;
+
+    /// Get the function body, if inlined
+    std::string body(const std::string& symname) const;
+
     /// Can meta information be read?
     virtual bool can_have_meta() const { return true;}
 

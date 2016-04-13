@@ -89,4 +89,12 @@ namespace casadi {
     return (*this)->get_meta(cmd, ind);
   }
 
+  bool Compiler::inlined(const std::string& symname) const {
+    return (*this)->inlined(symname);
+  }
+
+  std::string Compiler::body(const std::string& symname) const {
+    return (*this)->body(symname);
+  }
+
 } // namespace casadi

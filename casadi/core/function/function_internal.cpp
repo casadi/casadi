@@ -2108,6 +2108,26 @@ namespace casadi {
     return ss.str();
   }
 
+  void FunctionInternal::addShorthand(CodeGenerator& g, const string& name) const {
+    if (simplifiedCall()) {
+      g.body
+        << "#define " << name << "(arg, res) "
+        << "CASADI_PREFIX(" << name << ")(arg, res)" << endl << endl;
+    } else {
+      g.body
+        << "#define " << name << "(arg, res, iw, w, mem) "
+        << "CASADI_PREFIX(" << name << ")(arg, res, iw, w, mem)" << endl << endl;
+    }
+  }
+
+  std::string FunctionInternal::eval_name() const {
+    if (simplifiedCall()) {
+      return name_ + "_simple";
+    } else {
+      return name_;
+    }
+  }
+
   void FunctionInternal::addDependency(CodeGenerator& g) const {
     // Get the current number of functions before looking for it
     size_t num_f_before = g.added_dependencies_.size();
@@ -2127,15 +2147,7 @@ namespace casadi {
       generateFunction(g, "CASADI_PREFIX(" + name + ")", true);
 
       // Shorthand
-      if (simplifiedCall()) {
-        g.body
-          << "#define " << name << "(arg, res) "
-          << "CASADI_PREFIX(" << name << ")(arg, res)" << endl << endl;
-      } else {
-        g.body
-          << "#define " << name << "(arg, res, iw, w, mem) "
-          << "CASADI_PREFIX(" << name << ")(arg, res, iw, w, mem)" << endl << endl;
-      }
+      addShorthand(g, name);
 
       // Codegen reference count functions, if needed
       if (has_refcount_) {

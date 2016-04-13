@@ -246,4 +246,15 @@ namespace casadi {
     return meta_.find(cmd) != meta_.end();
   }
 
+  bool CompilerInternal::inlined(const std::string& symname) const {
+    auto it = external_.find(symname);
+    return it!=external_.end() && it->second.first;
+  }
+
+  std::string CompilerInternal::body(const std::string& symname) const {
+    auto it = external_.find(symname);
+    casadi_assert(it!=external_.end() && it->second.first);
+    return it->second.second;
+  }
+
 } // namespace casadi

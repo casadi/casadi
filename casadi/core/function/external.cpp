@@ -229,8 +229,20 @@ namespace casadi {
     }
   }
 
+  void External::generateFunction(CodeGenerator& g, const std::string& fname,
+                                  bool decl_static) const {
+    g.body
+      << signature(fname) << " {" << endl
+      << li_.body(eval_name())
+      << endl;
+  }
+
   void External::addDependency(CodeGenerator& g) const {
-    g.addExternal(signature(name_) + ";");
+    if (li_.inlined(eval_name())) {
+      FunctionInternal::addDependency(g);
+    } else {
+      g.addExternal(signature(name_) + ";");
+    }
     if (has_refcount_) {
       g.addExternal("void " + name_ + "_incref(void);");
       g.addExternal("void " + name_ + "_decref(void);");
@@ -238,7 +250,11 @@ namespace casadi {
   }
 
   std::string External::codegen_name(const CodeGenerator& g) const {
-    return name_;
+    if (li_.inlined(eval_name())) {
+      return FunctionInternal::codegen_name(g);
+    } else {
+      return name_;
+    }
   }
 
   bool External::hasFullJacobian() const {
