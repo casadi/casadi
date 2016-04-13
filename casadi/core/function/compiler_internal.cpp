@@ -77,19 +77,30 @@ namespace casadi {
         // Update offset
         offset++;
 
-        // Try to find a /*CASADI delimiter
-        if (line.find("/*CASADIMETA") != string::npos) {
-          parse_meta(file, offset);
+        // Try to find a /*CASADIMETA delimiter
+        string cmd = "/*CASADIMETA";
+        size_t pos = line.find(cmd);
+        if (pos != string::npos) {
+          read_meta(file, offset);
+          continue;
         }
-      }
 
-      if (has_meta("SYMBOLS")) {
-        meta_symbols_ = text2set<std::string>(commands_.at("SYMBOLS").second);
+        // Try to find a /*CASADIEXTERNAL delimiter
+        cmd = "/*CASADIEXTERNAL";
+        pos = line.find(cmd);
+        if (pos != string::npos) {
+          istringstream ss(line.substr(pos+cmd.size()));
+          string sym;
+          bool inlined;
+          ss >> sym >> inlined;
+          read_external(sym, inlined, file, offset);
+          continue;
+        }
       }
     }
   }
 
-  void CompilerInternal::parse_meta(istream& file, int& offset) {
+  void CompilerInternal::read_meta(istream& file, int& offset) {
     // Loop over the lines
     std::string line;
     while (getline(file, line)) {
@@ -130,15 +141,50 @@ namespace casadi {
       }
 
       // Insert new element in map
-      auto new_el = commands_.insert(make_pair(cmd, make_pair(offset, ss.str())));
+      auto new_el = meta_.insert(make_pair(cmd, make_pair(offset, ss.str())));
       casadi_assert_message(new_el.second, "Duplicate entry: \"" + cmd + "\"");
     }
     casadi_error("End-of-file reached while searching for \"*/\"");
   }
 
+  void CompilerInternal::
+  read_external(const string& sym, bool inlined, istream& file, int& offset) {
+    // New entry
+    stringstream ss;
+
+    // Are we still in the function declaration
+    bool in_declaration = true;
+
+    // Loop over the lines
+    std::string line;
+    while (getline(file, line)) {
+      offset++;
+
+      // Skip line if still in declaration
+      if (in_declaration) {
+        size_t stop = line.find('{');
+        if (stop != string::npos) in_declaration = false;
+        continue;
+      }
+
+      // End of declaration found?
+      if (line.find("/*CASADIEXTERNAL") != string::npos) {
+        auto new_el = external_.insert(make_pair(sym, make_pair(inlined, ss.str())));
+        casadi_assert_message(new_el.second, "Duplicate symbol: \"" + sym + "\"");
+        return;
+      }
+
+      // Add to entry
+      if (inlined) {
+        ss << line << endl;
+      }
+    }
+    casadi_error("End-of-file reached while searching for \"/*CASADIEXTERNAL\"");
+  }
+
   bool CompilerInternal::has_function(const std::string& symname) const {
     // Check if in meta information
-    if (meta_symbols_.count(symname)) return true;
+    if (external_.find(symname)!=external_.end()) return true;
 
     // Convert to a dummy function pointer
     return const_cast<CompilerInternal*>(this)->get_function(symname)!=0;
@@ -192,12 +238,12 @@ namespace casadi {
   std::string CompilerInternal::get_meta(const std::string& cmd, int ind) const {
     if (ind>=0) return get_meta(indexed(cmd, ind));
     casadi_assert_message(has_meta(cmd), "No such command: " + cmd);
-    return commands_.at(cmd).second;
+    return meta_.at(cmd).second;
   }
 
   bool CompilerInternal::has_meta(const std::string& cmd, int ind) const {
     if (ind>=0) return has_meta(indexed(cmd, ind));
-    return commands_.find(cmd) != commands_.end();
+    return meta_.find(cmd) != meta_.end();
   }
 
 } // namespace casadi

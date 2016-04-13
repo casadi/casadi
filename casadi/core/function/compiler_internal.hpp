@@ -101,8 +101,12 @@ namespace casadi {
     /** \brief Get entry as a text */
     std::string get_meta(const std::string& cmd, int ind=-1) const;
 
-    /// Get meta information, if any
-    void parse_meta(std::istream& file, int& offset);
+    /// Get meta information
+    void read_meta(std::istream& file, int& offset);
+
+    /// Get an external function declaration
+    void read_external(const std::string& sym, bool inlined,
+                       std::istream& file, int& offset);
 
     /// Can meta information be read?
     virtual bool can_have_meta() const { return true;}
@@ -120,11 +124,11 @@ namespace casadi {
     /// C filename
     std::string name_;
 
-    /** \brief Map of commands */
-    std::map<std::string, std::pair<int, std::string> > commands_;
+    /// Meta data
+    std::map<std::string, std::pair<int, std::string> > meta_;
 
-    /// Symbols
-    std::set<std::string> meta_symbols_;
+    /// External functions
+    std::map<std::string, std::pair<bool, std::string> > external_;
   };
 
   /** \brief Dynamically linked library
