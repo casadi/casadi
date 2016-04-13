@@ -36,41 +36,6 @@ y=SX.sym("y")
 f = (1-x)**2+100*(y-x**2)**2
 nlp={'x':vertcat(x,y), 'f':f,'g':x+y}
 fcn = Function('f', [x, y], [f])
- 
-# #! Simple callback
-# #! ===============
-# #! First we demonstrate a callback that does nothing more than printing some information on the screen
-
-# it = 0
-
-# @pycallback
-# def simplecallback(f):
-#   global it
-#   print "====Hey, I'm an iteration===="
-#   print "X_OPT = ", f.getOutput("x")
-#   print f.getStat("iteration")
-#   it = it + 1
-#   if it > 5:
-#     print "5 Iterations, that is quite enough!"
-#     return 1 # With this statement you can halt the iterations
-#   else:
-#     return 0
-
-# opts = {}
-# opts["iteration_callback"] = simplecallback
-# opts["tol"] = 1e-8
-# opts["max_iter"] = 20
-# solver = nlpsol("solver", "ipopt", nlp, opts)
-# solver.setInput([-10]*2,"lbx")
-# solver.setInput([10]*2,"ubx")
-# solver.setInput([-10],"lbg")
-# solver.setInput([10],"ubg")
-# solver.evaluate()
-
-#! Matplotlib callback
-#! ===================
-#! Now let's do some useful visualisations
-#! We create a callable python class, i.e. one that has a __call__ member
 
 from pylab import figure, subplot, contourf, colorbar, draw, show, plot, title
 
