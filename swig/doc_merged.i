@@ -1078,6 +1078,8 @@ Query plugin name.
 
 ";
 
+%feature("docstring") casadi::Compiler::has_function "";
+
 %feature("docstring") casadi::Compiler::getDescription "
 
 Return a string with a description (for SWIG)
@@ -1098,6 +1100,12 @@ pointer to the internal class
 %feature("docstring") casadi::Compiler::getRepresentation "
 
 Return a string with a representation (for SWIG)
+
+";
+
+%feature("docstring") casadi::Compiler::get_meta "
+
+Get entry as a text.
 
 ";
 
@@ -1200,6 +1208,12 @@ Joris Gillis
 
 C++ includes: compiler.hpp ";
 
+%feature("docstring") casadi::Compiler::has_meta "
+
+Does a meta entry exist?
+
+";
+
 %feature("docstring") casadi::Compiler::is_null "
 
 Is a null pointer?
@@ -1223,7 +1237,7 @@ Default constructor.
 >  Compiler(str name, str compiler, Dict opts=Dict())
 ------------------------------------------------------------------------
 
-Compiler factory (new syntax, includes initialization)
+Compiler factory.
 
 ";
 
@@ -3913,9 +3927,6 @@ NULL)
 // File: classcasadi_1_1Jit.xml
 
 
-// File: classcasadi_1_1JitLibrary.xml
-
-
 // File: classcasadi_1_1KernelSum.xml
 
 
@@ -3923,79 +3934,6 @@ NULL)
 
 
 // File: classcasadi_1_1LapackQr.xml
-
-
-// File: classcasadi_1_1Library.xml
-%feature("docstring") casadi::Library::getDescription "
-
-Return a string with a description (for SWIG)
-
-";
-
-%feature("docstring") casadi::Library::repr "
-
-Print a representation of the object.
-
-";
-
-%feature("docstring") casadi::Library::get_meta "
-
-Get entry as a text.
-
-";
-
-%feature("docstring") casadi::Library::has_meta "
-
-Does a meta entry exist?
-
-";
-
-%feature("docstring") casadi::Library::is_null "
-
-Is a null pointer?
-
-";
-
-%feature("docstring") casadi::Library::__hash__ "
-
-Returns a number that is unique for a given Node. If the Object does not
-point to any node, \"0\" is returned.
-
-";
-
-%feature("docstring") casadi::Library::has "";
-
-%feature("docstring") casadi::Library "
-
-Library, either just-in-time compiled or dynamically loaded.
-
-C++ includes: compiler.hpp ";
-
-%feature("docstring") casadi::Library::Library "
-
->  Library()
-------------------------------------------------------------------------
-
-Default constructor.
-
-";
-
-%feature("docstring") casadi::Library::print "
-
-Print a description of the object.
-
-";
-
-%feature("docstring") casadi::Library::printPtr "[INTERNAL]  Print the
-pointer to the internal class
-
-";
-
-%feature("docstring") casadi::Library::getRepresentation "
-
-Return a string with a representation (for SWIG)
-
-";
 
 
 // File: classcasadi_1_1Linsol.xml

@@ -1826,6 +1826,9 @@ Query plugin name.
 
 ";
 
+%feature("docstring")  casadi::Compiler::has_function(const std::string
+&symname) const  " ";
+
 %feature("docstring")  casadi::PrintableObject< SharedObject
 >::getDescription() const "
 
@@ -1850,6 +1853,13 @@ internal class
 >::getRepresentation() const "
 
 Return a string with a representation (for SWIG)
+
+";
+
+%feature("docstring")  casadi::Compiler::get_meta(const std::string &cmd,
+int ind=-1) const  "
+
+Get entry as a text.
 
 ";
 
@@ -1953,6 +1963,13 @@ Joris Gillis
 
 C++ includes: compiler.hpp ";
 
+%feature("docstring")  casadi::Compiler::has_meta(const std::string &cmd,
+int ind=-1) const  "
+
+Does a meta entry exist?
+
+";
+
 %feature("docstring")  casadi::SharedObject::is_null() const  "
 
 Is a null pointer?
@@ -1975,7 +1992,7 @@ Default constructor.
 %feature("docstring") casadi::Compiler::Compiler(const std::string &name,
 const std::string &compiler, const Dict &opts=Dict()) "
 
-Compiler factory (new syntax, includes initialization)
+Compiler factory.
 
 ";
 
@@ -5584,9 +5601,6 @@ IpoptInterface &ipoptInterface, IpoptMemory *mem) " [INTERNAL] ";
 // File: classcasadi_1_1Jit.xml
 
 
-// File: classcasadi_1_1JitLibrary.xml
-
-
 // File: classcasadi_1_1KernelSum.xml
 
 
@@ -5594,90 +5608,6 @@ IpoptInterface &ipoptInterface, IpoptMemory *mem) " [INTERNAL] ";
 
 
 // File: classcasadi_1_1LapackQr.xml
-
-
-// File: classcasadi_1_1Library.xml
-%feature("docstring")  casadi::PrintableObject< SharedObject
->::getDescription() const "
-
-Return a string with a description (for SWIG)
-
-";
-
-%feature("docstring")  casadi::SharedObject::repr(std::ostream
-&stream=casadi::userOut(), bool trailing_newline=true) const  "
-
-Print a representation of the object.
-
-";
-
-%feature("docstring")  casadi::Library::get_meta(const std::string &cmd, int
-ind=-1) const  "
-
-Get entry as a text.
-
-";
-
-%feature("docstring")  casadi::Library::has_meta(const std::string &cmd, int
-ind=-1) const  "
-
-Does a meta entry exist?
-
-";
-
-%feature("docstring")  casadi::SharedObject::is_null() const  "
-
-Is a null pointer?
-
-";
-
-%feature("docstring") casadi::Library::__hash__ "
-
-Returns a number that is unique for a given Node. If the Object does not
-point to any node, \"0\" is returned.
-
-";
-
-%feature("docstring")  casadi::Library::has(const std::string &sym) const  "
-";
-
-%feature("docstring") casadi::Library "
-
-Library, either just-in-time compiled or dynamically loaded.
-
-C++ includes: compiler.hpp ";
-
-%feature("docstring") casadi::Library::Library() "
-
-Default constructor.
-
-";
-
-%feature("docstring") casadi::Library::Library(const std::string &bin_name)
-" ";
-
-%feature("docstring") casadi::Library::Library(const Compiler &compiler) "
-";
-
-%feature("docstring")  casadi::SharedObject::print(std::ostream
-&stream=casadi::userOut(), bool trailing_newline=true) const  "
-
-Print a description of the object.
-
-";
-
-%feature("docstring")  casadi::SharedObject::printPtr(std::ostream
-&stream=casadi::userOut()) const  " [INTERNAL]  Print the pointer to the
-internal class
-
-";
-
-%feature("docstring")  casadi::PrintableObject< SharedObject
->::getRepresentation() const "
-
-Return a string with a representation (for SWIG)
-
-";
 
 
 // File: classcasadi_1_1Linsol.xml
