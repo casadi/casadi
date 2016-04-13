@@ -102,13 +102,10 @@ namespace casadi {
     std::string get_meta(const std::string& cmd, int ind=-1) const;
 
     /// Get meta information, if any
-    void get_meta(std::vector<std::string>& lines, int& offset) const;
+    void parse_meta(std::istream& file, int& offset);
 
     /// Can meta information be read?
     virtual bool can_have_meta() const { return true;}
-
-    /** \brief Parse a list of strings */
-    void parse(const std::vector<std::string>& lines, int offset);
 
     /** \brief Get entry as a text */
     std::string to_text(const std::string& cmd, int ind=-1) const;

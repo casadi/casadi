@@ -70,36 +70,70 @@ namespace casadi {
   void CompilerInternal::init(const Dict& opts) {
     // Read meta information from file
     if (can_have_meta()) {
-      std::vector<std::string> lines;
-      int offset;
-      get_meta(lines, offset);
-      parse(lines, offset);
+      int offset = 0;
+      ifstream file(name_);
+      std::string line;
+      while (getline(file, line)) {
+        // Update offset
+        offset++;
+
+        // Try to find a /*CASADI delimiter
+        if (line.find("/*CASADIMETA") != string::npos) {
+          parse_meta(file, offset);
+        }
+      }
+
       if (has_meta("SYMBOLS")) {
         meta_symbols_ = text2set<std::string>(commands_.at("SYMBOLS").second);
       }
     }
   }
 
-  void CompilerInternal::get_meta(std::vector<std::string>& lines, int& offset) const {
-    // Open source file and search for meta information
-    ifstream file(name_);
+  void CompilerInternal::parse_meta(istream& file, int& offset) {
+    // Loop over the lines
     std::string line;
-    offset = 0;
-    lines.clear();
     while (getline(file, line)) {
-      // Update offset
       offset++;
 
-      // Try to find a /*CASADI delimiter
-      if (line.find("/*CASADIMETA") != string::npos) {
-        // Delimimiter found, find */ delimiter
-        while (getline(file, line)) {
-          if (line.find("*/") != string::npos) return; // Successful return
-          lines.push_back(line);
+      // End of meta found?
+      if (line.find("*/") != string::npos) return;
+
+      // If comment or empty line, skip
+      if (line.empty() || line.at(0)=='#') continue;
+
+      // Get command string
+      casadi_assert_message(line.at(0)==':',
+                            "Syntax error: " + line + " is not a command string");
+      string cmd = line.substr(1, line.find(' ')-1);
+
+      // New entry
+      stringstream ss;
+
+      // Collect the meta data
+      line = line.substr(cmd.size()+2);
+      while (true) {
+        // Find the backslash, if any
+        size_t stop = line.find('\\');
+
+        // Add to entry
+        ss << line.substr(0, stop);
+
+        // Break if not multiline
+        if (stop == string::npos) break;
+
+        // Read another line
+        ss << std::endl;
+        if (!getline(file, line)) {
+          casadi_error("Failed to read \"" + cmd + "\"");
         }
-        casadi_error("End-of-file reached while searching for \"*/\"");
+        offset++;
       }
+
+      // Insert new element in map
+      auto new_el = commands_.insert(make_pair(cmd, make_pair(offset, ss.str())));
+      casadi_assert_message(new_el.second, "Duplicate entry: \"" + cmd + "\"");
     }
+    casadi_error("End-of-file reached while searching for \"*/\"");
   }
 
   bool CompilerInternal::has_function(const std::string& symname) const {
@@ -164,52 +198,6 @@ namespace casadi {
   bool CompilerInternal::has_meta(const std::string& cmd, int ind) const {
     if (ind>=0) return has_meta(indexed(cmd, ind));
     return commands_.find(cmd) != commands_.end();
-  }
-
-  void CompilerInternal::parse(const std::vector<std::string>& lines, int offset) {
-    // Loop over the lines
-    auto line_it = lines.cbegin();
-    while (line_it!=lines.cend()) {
-      // If comment or empty line, skip
-      if (line_it->empty() || line_it->at(0)=='#') {
-        line_it++;
-        continue;
-      }
-
-      // Current line number
-      int line_no = line_it - lines.cbegin() + 1 + offset;
-
-      // Get command string
-      casadi_assert_message(line_it->at(0)==':',
-                            "Syntax error: " + *line_it + " is not a command string");
-      string cmd = line_it->substr(1, line_it->find(' ')-1);
-
-      // New entry
-      stringstream ss;
-
-      // Collect the meta data
-      size_t start = cmd.size()+2;
-      while (true) {
-        // Find the backslash, if any
-        size_t stop = line_it->find('\\');
-
-        // Add to entry
-        ss << line_it->substr(start, stop-start);
-
-        // Break if no more lines or not multiline
-        if (++line_it==lines.cend() || stop == string::npos) break;
-
-        // Multiline entry
-        if (start!=stop) ss << std::endl;
-
-        // No offset for subsequent lines
-        start = 0;
-      }
-
-      // Insert new element in map
-      auto new_el = commands_.insert(make_pair(cmd, make_pair(line_no, ss.str())));
-      casadi_assert_message(new_el.second, "Duplicate entry: \"" + cmd + "\"");
-    }
   }
 
 } // namespace casadi
