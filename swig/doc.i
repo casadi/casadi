@@ -1829,6 +1829,13 @@ Query plugin name.
 %feature("docstring")  casadi::Compiler::has_function(const std::string
 &symname) const  " ";
 
+%feature("docstring")  casadi::Compiler::body(const std::string &symname)
+const  "
+
+Get the function body, if inlined.
+
+";
+
 %feature("docstring")  casadi::PrintableObject< SharedObject
 >::getDescription() const "
 
@@ -1846,6 +1853,13 @@ Print a description of the object.
 %feature("docstring")  casadi::SharedObject::printPtr(std::ostream
 &stream=casadi::userOut()) const  " [INTERNAL]  Print the pointer to the
 internal class
+
+";
+
+%feature("docstring")  casadi::Compiler::inlined(const std::string &symname)
+const  "
+
+Check if a function is inlined.
 
 ";
 

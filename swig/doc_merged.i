@@ -1080,6 +1080,12 @@ Query plugin name.
 
 %feature("docstring") casadi::Compiler::has_function "";
 
+%feature("docstring") casadi::Compiler::body "
+
+Get the function body, if inlined.
+
+";
+
 %feature("docstring") casadi::Compiler::getDescription "
 
 Return a string with a description (for SWIG)
@@ -1094,6 +1100,12 @@ Print a description of the object.
 
 %feature("docstring") casadi::Compiler::printPtr "[INTERNAL]  Print the
 pointer to the internal class
+
+";
+
+%feature("docstring") casadi::Compiler::inlined "
+
+Check if a function is inlined.
 
 ";
 
