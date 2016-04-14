@@ -53,7 +53,7 @@ namespace casadi {
 
   Function external(const string& name, const string& bin_name,
                     const Dict& opts) {
-    return external(name, Compiler(bin_name, "jit"), opts);
+    return external(name, Compiler(bin_name, "dll"), opts);
   }
 
   External::External(const std::string& name, const Compiler& li)
