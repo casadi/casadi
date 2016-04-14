@@ -2158,13 +2158,13 @@ Depending on the circumstances, the user can implement custom \texttt{Function}
 objects in a number of different ways:
 
 \begin{itemize}
-\item Inheriting from \texttt{FunctionInternal} or \texttt{Callback}
+\item Subclassing \texttt{FunctionInternal}
+\item Subclassing \texttt{Callback}
 \item Importing a function with \texttt{external}
-\item Providing a \texttt{.casadi} file
 \end{itemize}
 
 We elaborate on this in the following.
-\section{Inheriting from \texttt{FunctionInternal} or \texttt{Callback}}
+\section{Subclassing \texttt{FunctionInternal}}
 All function objects presented in Chapter~\ref{ch:function} are implemented
 in \CasADi as C++ classes inheriting from the \texttt{FunctionInternal} abstract
 base class. In principle, a user with familiarity with C++ programming, should
@@ -2174,8 +2174,9 @@ is the C++ API documentation, choosing "switch to internal" to expose the intern
 API.
 
 Since \texttt{FunctionInternal} is not considered part of the stable, public API,
-we recommend against this, unless the plan is to make a contribution to \CasADi.
+we advice against this in general, unless the plan is to make a contribution to \CasADi.
 
+\section{Subclassing \texttt{Callback}}
 The \texttt{Callback} class provides a public API to \texttt{FunctionInternal}
 and inheriting from this class has the same effect as inheriting directly from
 \texttt{FunctionInternal}. Thanks to \emph{cross-language polymorphism}, it
@@ -2413,14 +2414,6 @@ function named \verb|fwd1_fname|, where 1 can be replaced by 2, 4, 8, 16,
 For reverse mode directional derivatives, replace \verb|fwd| with \verb|adj|.
 
 This is an experimental feature.
-
-\section{Providing a \texttt{.casadi} file}
-We are currently experimenting with introducing a \texttt{.casadi} file format
-that allows function objects to be specified in a way that allows constructing
-a standard \CasADi function object from it. This feature is currently at
-a proof-of-concept stage, not ready to be used for actual applications.
-
-Contact the \CasADi developers directly if you are interested in this feature.
 
 %%%%%%%%%%%%%
 \chapter{The \texttt{DaeBuilder} class} \label{ch:daebuilder}
