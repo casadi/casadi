@@ -62,7 +62,7 @@ namespace casadi {
   class Variable;
   class DaeBuilder;
   class XmlFile;
-  class Compiler;
+  class Importer;
 
 #ifndef SWIG
   // Workarond for MinGW bug

@@ -1915,7 +1915,7 @@ print f(3.14)
 \end{pytexoutput}
 
 We can also rely on \CasADi performing the compilation \emph{just-in-time}
-using \CasADi's \texttt{Compiler} class. This is a plugin class, which at the
+using \CasADi's \texttt{Importer} class. This is a plugin class, which at the
 time of writing had two supported plugins, namely \verb|'clang'|, which invokes
 the \emph{LLVM/Clang} compiler framework (distributed with \CasADi), and \verb|'shell'|,
 which invokes the system compiler via the command line. The latter is only
@@ -1924,7 +1924,7 @@ available on Linux/OS X:
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Python]
 # Python
-C = Compiler('ff.c','clang')
+C = Importer('ff.c','clang')
 f = external('f',C);
 print f(3.14)
 \end{lstlisting}
@@ -1932,7 +1932,7 @@ print f(3.14)
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Matlab]
 % MATLAB
-C = Compiler('ff.c','clang');
+C = Importer('ff.c','clang');
 f = external('f',C);
 disp(f(3.14))
 \end{lstlisting}

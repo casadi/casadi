@@ -23,10 +23,10 @@
  */
 
 
-#ifndef CASADI_COMPILER_INTERNAL_HPP
-#define CASADI_COMPILER_INTERNAL_HPP
+#ifndef CASADI_IMPORTER_INTERNAL_HPP
+#define CASADI_IMPORTER_INTERNAL_HPP
 
-#include "compiler.hpp"
+#include "importer.hpp"
 #include "function_internal.hpp"
 #include "plugin_interface.hpp"
 
@@ -34,22 +34,22 @@
 /// \cond INTERNAL
 namespace casadi {
 
-/** \brief Compiler internal class
+/** \brief Importer internal class
 
-  @copydoc Compiler_doc
+  @copydoc Importer_doc
   \author Joel Andersson
   \date 2010-2013
 */
   class CASADI_EXPORT
-  CompilerInternal : public SharedObjectNode,
-                     public PluginInterface<CompilerInternal> {
+  ImporterInternal : public SharedObjectNode,
+                     public PluginInterface<ImporterInternal> {
 
   public:
     /// Constructor
-    explicit CompilerInternal(const std::string& name);
+    explicit ImporterInternal(const std::string& name);
 
     /// Destructor
-    virtual ~CompilerInternal();
+    virtual ~ImporterInternal();
 
     /** \brief Print */
     virtual void print(std::ostream &stream) const;
@@ -58,7 +58,7 @@ namespace casadi {
     virtual void repr(std::ostream &stream) const;
 
     // Creator function for internal class
-    typedef CompilerInternal* (*Creator)(const std::string& name);
+    typedef ImporterInternal* (*Creator)(const std::string& name);
 
     /** \brief Construct
         Prepares the function for evaluation
@@ -84,7 +84,7 @@ namespace casadi {
     static const std::string infix_;
 
     /// Short name
-    static std::string shortname() { return "compiler";}
+    static std::string shortname() { return "importer";}
 
     /// Queery plugin name
     virtual const char* plugin_name() const { return "none";}
@@ -142,7 +142,7 @@ namespace casadi {
       \date 2016
   */
   class CASADI_EXPORT
-  DllLibrary : public CompilerInternal {
+  DllLibrary : public ImporterInternal {
   private:
 #if defined(WITH_DL) && defined(_WIN32) // also for 64-bit
     typedef HINSTANCE handle_t;
@@ -167,4 +167,4 @@ namespace casadi {
 
 } // namespace casadi
 /// \endcond
-#endif // CASADI_COMPILER_INTERNAL_HPP
+#endif // CASADI_IMPORTER_INTERNAL_HPP

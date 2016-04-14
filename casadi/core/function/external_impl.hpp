@@ -49,7 +49,7 @@ namespace casadi {
   class CASADI_EXPORT External : public FunctionInternal {
   protected:
     /** \brief Information about the library */
-    Compiler li_;
+    Importer li_;
 
     /** \brief Increase/decrease reference counter */
     signal_t incref_, decref_;
@@ -72,7 +72,7 @@ namespace casadi {
   public:
 
     /** \brief Constructor */
-    External(const std::string& name, const Compiler& li);
+    External(const std::string& name, const Importer& li);
 
     /** \brief Destructor */
     virtual ~External() = 0;
@@ -127,7 +127,7 @@ namespace casadi {
   class CASADI_EXPORT SimplifiedExternal : public External {
   public:
     /** \brief Constructor */
-    SimplifiedExternal(const std::string& name, const Compiler& li);
+    SimplifiedExternal(const std::string& name, const Importer& li);
 
     /** \brief  Destructor */
     virtual ~SimplifiedExternal() { this->clear_memory();}
@@ -154,7 +154,7 @@ namespace casadi {
 
   public:
     /** \brief Constructor */
-    GenericExternal(const std::string& name, const Compiler& li);
+    GenericExternal(const std::string& name, const Importer& li);
 
     /** \brief  Destructor */
     virtual ~GenericExternal() { this->clear_memory();}

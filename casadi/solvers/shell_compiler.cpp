@@ -36,7 +36,7 @@ namespace casadi {
 
   extern "C"
   int CASADI_COMPILER_SHELL_EXPORT
-  casadi_register_compiler_shell(CompilerInternal::Plugin* plugin) {
+  casadi_register_importer_shell(ImporterInternal::Plugin* plugin) {
     plugin->creator = ShellCompiler::creator;
     plugin->name = "shell";
     plugin->doc = ShellCompiler::meta_doc.c_str();
@@ -45,12 +45,12 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_COMPILER_SHELL_EXPORT casadi_load_compiler_shell() {
-    CompilerInternal::registerPlugin(casadi_register_compiler_shell);
+  void CASADI_COMPILER_SHELL_EXPORT casadi_load_importer_shell() {
+    ImporterInternal::registerPlugin(casadi_register_importer_shell);
   }
 
   ShellCompiler::ShellCompiler(const std::string& name) :
-    CompilerInternal(name) {
+    ImporterInternal(name) {
       handle_ = 0;
   }
 
@@ -66,7 +66,7 @@ namespace casadi {
   }
 
   Options ShellCompiler::options_
-  = {{&CompilerInternal::options_},
+  = {{&ImporterInternal::options_},
      {{"compiler",
        {OT_STRING,
         "Compiler command"}},
@@ -83,7 +83,7 @@ namespace casadi {
 
   void ShellCompiler::init(const Dict& opts) {
     // Base class
-    CompilerInternal::init(opts);
+    ImporterInternal::init(opts);
 
     // Default options
     string compiler = "gcc";

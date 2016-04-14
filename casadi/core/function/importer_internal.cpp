@@ -23,36 +23,36 @@
  */
 
 
-#include "compiler_internal.hpp"
+#include "importer_internal.hpp"
 
 using namespace std;
 namespace casadi {
 
-  CompilerInternal::CompilerInternal(const std::string& name) : name_(name) {
+  ImporterInternal::ImporterInternal(const std::string& name) : name_(name) {
   }
 
-  CompilerInternal::~CompilerInternal() {
+  ImporterInternal::~ImporterInternal() {
   }
 
-  void CompilerInternal::print(ostream &stream) const {
-    stream << "Compiler" << endl;
+  void ImporterInternal::print(ostream &stream) const {
+    stream << "Importer" << endl;
   }
 
-  void CompilerInternal::repr(ostream &stream) const {
-    stream << "Compiler" << endl;
+  void ImporterInternal::repr(ostream &stream) const {
+    stream << "Importer" << endl;
   }
 
-  std::map<std::string, CompilerInternal::Plugin> CompilerInternal::solvers_;
+  std::map<std::string, ImporterInternal::Plugin> ImporterInternal::solvers_;
 
-  const std::string CompilerInternal::infix_ = "compiler";
+  const std::string ImporterInternal::infix_ = "compiler";
 
-  Options CompilerInternal::options_
+  Options ImporterInternal::options_
   = {{},
      {{}
      }
   };
 
-  void CompilerInternal::construct(const Dict& opts) {
+  void ImporterInternal::construct(const Dict& opts) {
     // Get a reference to the options structure
     const Options& options = get_options();
 
@@ -67,7 +67,7 @@ namespace casadi {
     init(opts);
   }
 
-  void CompilerInternal::init(const Dict& opts) {
+  void ImporterInternal::init(const Dict& opts) {
     // Read meta information from file
     if (can_have_meta()) {
       int offset = 0;
@@ -118,7 +118,7 @@ namespace casadi {
     }
   }
 
-  void CompilerInternal::read_meta(istream& file, int& offset) {
+  void ImporterInternal::read_meta(istream& file, int& offset) {
     // Loop over the lines
     std::string line;
     while (getline(file, line)) {
@@ -165,7 +165,7 @@ namespace casadi {
     casadi_error("End-of-file reached while searching for \"*/\"");
   }
 
-  void CompilerInternal::
+  void ImporterInternal::
   read_external(const string& sym, bool inlined, istream& file, int& offset) {
     // New entry
     stringstream ss;
@@ -200,16 +200,16 @@ namespace casadi {
     casadi_error("End-of-file reached while searching for \"/*CASADIEXTERNAL\"");
   }
 
-  bool CompilerInternal::has_function(const std::string& symname) const {
+  bool ImporterInternal::has_function(const std::string& symname) const {
     // Check if in meta information
     if (external_.find(symname)!=external_.end()) return true;
 
     // Convert to a dummy function pointer
-    return const_cast<CompilerInternal*>(this)->get_function(symname)!=0;
+    return const_cast<ImporterInternal*>(this)->get_function(symname)!=0;
   }
 
   DllLibrary::DllLibrary(const std::string& bin_name)
-    : CompilerInternal(bin_name), handle_(0) {
+    : ImporterInternal(bin_name), handle_(0) {
 #ifdef WITH_DL
 #ifdef _WIN32
     handle_ = LoadLibrary(TEXT(name_.c_str()));
@@ -253,23 +253,23 @@ namespace casadi {
 #endif // WITH_DL
   }
 
-  std::string CompilerInternal::get_meta(const std::string& cmd, int ind) const {
+  std::string ImporterInternal::get_meta(const std::string& cmd, int ind) const {
     if (ind>=0) return get_meta(indexed(cmd, ind));
     casadi_assert_message(has_meta(cmd), "No such command: " + cmd);
     return meta_.at(cmd).second;
   }
 
-  bool CompilerInternal::has_meta(const std::string& cmd, int ind) const {
+  bool ImporterInternal::has_meta(const std::string& cmd, int ind) const {
     if (ind>=0) return has_meta(indexed(cmd, ind));
     return meta_.find(cmd) != meta_.end();
   }
 
-  bool CompilerInternal::inlined(const std::string& symname) const {
+  bool ImporterInternal::inlined(const std::string& symname) const {
     auto it = external_.find(symname);
     return it!=external_.end() && it->second.first;
   }
 
-  std::string CompilerInternal::body(const std::string& symname) const {
+  std::string ImporterInternal::body(const std::string& symname) const {
     auto it = external_.find(symname);
     casadi_assert(it!=external_.end() && it->second.first);
     return it->second.second;

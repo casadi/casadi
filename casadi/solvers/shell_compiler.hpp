@@ -26,7 +26,7 @@
 #ifndef CASADI_SHELL_INTERFACE_HPP
 #define CASADI_SHELL_INTERFACE_HPP
 
-#include "casadi/core/function/compiler_internal.hpp"
+#include "casadi/core/function/importer_internal.hpp"
 #include <casadi/solvers/casadi_compiler_shell_export.h>
 
 /** \defgroup plugin_Compiler_shell
@@ -46,14 +46,14 @@ namespace casadi {
    @copydoc Compiler_doc
    @copydoc plugin_Compiler_shell
    * */
-  class CASADI_COMPILER_SHELL_EXPORT ShellCompiler : public CompilerInternal {
+  class CASADI_COMPILER_SHELL_EXPORT ShellCompiler : public ImporterInternal {
   public:
 
     /** \brief Constructor */
     explicit ShellCompiler(const std::string& name);
 
     /** \brief  Create a new JIT function */
-    static CompilerInternal* creator(const std::string& name) {
+    static ImporterInternal* creator(const std::string& name) {
       return new ShellCompiler(name);
     }
 

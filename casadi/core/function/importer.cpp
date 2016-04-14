@@ -23,77 +23,77 @@
  */
 
 
-#include "compiler.hpp"
-#include "compiler_internal.hpp"
+#include "importer.hpp"
+#include "importer_internal.hpp"
 
 using namespace std;
 namespace casadi {
 
-  Compiler::Compiler() {
+  Importer::Importer() {
   }
 
-  Compiler::Compiler(const std::string& name,
+  Importer::Importer(const std::string& name,
                            const std::string& compiler,
                            const Dict& opts) {
     if (compiler=="none") {
-      assignNode(new CompilerInternal(name));
+      assignNode(new ImporterInternal(name));
     } else if (compiler=="dll") {
       assignNode(new DllLibrary(name));
     } else {
-      assignNode(CompilerInternal::getPlugin(compiler).creator(name));
+      assignNode(ImporterInternal::getPlugin(compiler).creator(name));
     }
     (*this)->construct(opts);
   }
 
-  CompilerInternal* Compiler::operator->() {
-    return static_cast<CompilerInternal*>(SharedObject::operator->());
+  ImporterInternal* Importer::operator->() {
+    return static_cast<ImporterInternal*>(SharedObject::operator->());
   }
 
-  const CompilerInternal* Compiler::operator->() const {
-    return static_cast<const CompilerInternal*>(SharedObject::operator->());
+  const ImporterInternal* Importer::operator->() const {
+    return static_cast<const ImporterInternal*>(SharedObject::operator->());
   }
 
-  bool Compiler::test_cast(const SharedObjectNode* ptr) {
-    return dynamic_cast<const CompilerInternal*>(ptr)!=0;
+  bool Importer::test_cast(const SharedObjectNode* ptr) {
+    return dynamic_cast<const ImporterInternal*>(ptr)!=0;
   }
 
-  bool Compiler::hasPlugin(const std::string& name) {
-    return CompilerInternal::hasPlugin(name);
+  bool Importer::hasPlugin(const std::string& name) {
+    return ImporterInternal::hasPlugin(name);
   }
 
-  void Compiler::loadPlugin(const std::string& name) {
-    CompilerInternal::loadPlugin(name);
+  void Importer::loadPlugin(const std::string& name) {
+    ImporterInternal::loadPlugin(name);
   }
 
-  std::string Compiler::doc(const std::string& name) {
-    return CompilerInternal::getPlugin(name).doc;
+  std::string Importer::doc(const std::string& name) {
+    return ImporterInternal::getPlugin(name).doc;
   }
 
-  std::string Compiler::plugin_name() const {
+  std::string Importer::plugin_name() const {
     return (*this)->plugin_name();
   }
 
-  bool Compiler::has_function(const std::string& symname) const {
+  bool Importer::has_function(const std::string& symname) const {
     return (*this)->has_function(symname);
   }
 
-  signal_t Compiler::get_function(const std::string& symname) {
+  signal_t Importer::get_function(const std::string& symname) {
     return (*this)->get_function(symname);
   }
 
-  bool Compiler::has_meta(const std::string& cmd, int ind) const {
+  bool Importer::has_meta(const std::string& cmd, int ind) const {
     return (*this)->has_meta(cmd, ind);
   }
 
-  std::string Compiler::get_meta(const std::string& cmd, int ind) const {
+  std::string Importer::get_meta(const std::string& cmd, int ind) const {
     return (*this)->get_meta(cmd, ind);
   }
 
-  bool Compiler::inlined(const std::string& symname) const {
+  bool Importer::inlined(const std::string& symname) const {
     return (*this)->inlined(symname);
   }
 
-  std::string Compiler::body(const std::string& symname) const {
+  std::string Importer::body(const std::string& symname) const {
     return (*this)->body(symname);
   }
 

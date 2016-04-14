@@ -84,7 +84,7 @@ y_data = X_measured[0,:].T
 # When noise is absent, the fit will be perfect.
 
 # Use just-in-time compilation to speed up the evaluation
-if Compiler.hasPlugin('clang'):
+if Importer.hasPlugin('clang'):
   opts = {'jit':True, "jit_options":{"flags":['-O3']}}
 else:
   print "WARNING; running without jit. This may result in very slow evaluation times"

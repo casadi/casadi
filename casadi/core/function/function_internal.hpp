@@ -31,7 +31,7 @@
 #include <set>
 #include <stack>
 #include "code_generator.hpp"
-#include "compiler.hpp"
+#include "importer.hpp"
 #include "../sparse_storage.hpp"
 #include "../options.hpp"
 
@@ -802,7 +802,7 @@ namespace casadi {
 
     /// Just-in-time compiler
     std::string compilerplugin_;
-    Compiler compiler_;
+    Importer compiler_;
     Dict jit_options_;
 
     // Penalty factor for using a complete Jacobian to calculate directional derivatives

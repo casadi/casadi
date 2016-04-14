@@ -60,7 +60,7 @@ namespace casadi {
   }
 
   Function nlpsol(const string& name, const string& solver,
-                  const Compiler& compiler, const Dict& opts) {
+                  const Importer& compiler, const Dict& opts) {
     return nlpsol(name, solver, Oracle::construct(compiler, "nlp"), opts);
   }
 

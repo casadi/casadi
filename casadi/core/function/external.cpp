@@ -33,7 +33,7 @@
 namespace casadi {
   using namespace std;
 
-  Function external(const string& name, const Compiler& li,
+  Function external(const string& name, const Importer& li,
                     const Dict& opts) {
     Function ret;
     if (li.has_function(name + "_simple")) {
@@ -53,10 +53,10 @@ namespace casadi {
 
   Function external(const string& name, const string& bin_name,
                     const Dict& opts) {
-    return external(name, Compiler(bin_name, "dll"), opts);
+    return external(name, Importer(bin_name, "dll"), opts);
   }
 
-  External::External(const std::string& name, const Compiler& li)
+  External::External(const std::string& name, const Importer& li)
     : FunctionInternal(name), li_(li) {
 
     // Increasing/decreasing reference counter
@@ -78,14 +78,14 @@ namespace casadi {
     if (incref_) incref_();
   }
 
-  SimplifiedExternal::SimplifiedExternal(const std::string& name, const Compiler& li)
+  SimplifiedExternal::SimplifiedExternal(const std::string& name, const Importer& li)
     : External(name, li) {
 
     // Function for numerical evaluation
     simple_ = (simple_t)li_.get_function(name_ + "_simple");
   }
 
-  GenericExternal::GenericExternal(const std::string& name, const Compiler& li)
+  GenericExternal::GenericExternal(const std::string& name, const Importer& li)
     : External(name, li) {
 
     // Functions for retrieving sparsities of inputs and outputs

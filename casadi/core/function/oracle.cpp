@@ -225,14 +225,14 @@ namespace casadi {
     return new XOracle<MX>(in, out, ischeme, oscheme);
   }
 
-  Oracle* Oracle::construct(const Compiler& compiler, const std::string& all_io) {
-    return new LibOracle<Compiler>(compiler, all_io);
+  Oracle* Oracle::construct(const Importer& compiler, const std::string& all_io) {
+    return new LibOracle<Importer>(compiler, all_io);
   }
 
   Oracle* Oracle::construct(const std::string& fname, const std::string& all_io) {
     // If fname ends with .c, JIT
     if (fname.size()>2 && fname.compare(fname.size()-2, fname.size(), ".c")==0) {
-      Compiler compiler(fname, "clang");
+      Importer compiler(fname, "clang");
       return construct(compiler, all_io);
     } else {
       return new LibOracle<std::string>(fname, all_io);

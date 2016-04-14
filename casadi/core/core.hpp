@@ -44,7 +44,7 @@
 // Functions
 #include "function/oracle.hpp"
 #include "function/code_generator.hpp"
-#include "function/compiler.hpp"
+#include "function/importer.hpp"
 #include "function/callback.hpp"
 #include "function/integrator.hpp"
 #include "function/conic.hpp"

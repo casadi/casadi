@@ -571,7 +571,7 @@ namespace casadi {
         userOut() << "Starting compilation"  << endl;
       }
       time_t time1 = time(0);
-      compiler_ = Compiler(cname, compilerplugin_, jit_options_);
+      compiler_ = Importer(cname, compilerplugin_, jit_options_);
       time_t time2 = time(0);
       double comp_time = difftime(time2, time1);
       if (verbose_) {

@@ -352,7 +352,7 @@ namespace casadi {
       CodeGenerator gen;
       gen.add(function());
       gen.generate("jit_tmp.c");
-      compiler_ = Compiler("jit_tmp.c", compilerplugin_, jit_options_);
+      compiler_ = Importer("jit_tmp.c", compilerplugin_, jit_options_);
 
       // Try to load with simplified syntax
       simple_ = (simple_t)compiler_.get_function(name() + "_simple");

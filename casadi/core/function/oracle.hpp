@@ -26,7 +26,7 @@
 #define CASADI_ORACLE_HPP
 
 #include "function.hpp"
-#include "compiler.hpp"
+#include "importer.hpp"
 
 namespace casadi {
 
@@ -54,7 +54,7 @@ namespace casadi {
                              const std::string& all_io="all_io");
 
     // Construct using a compiler instance
-    static Oracle* construct(const Compiler& compiler,
+    static Oracle* construct(const Importer& compiler,
                              const std::string& all_io="all_io");
 
     // Destructor

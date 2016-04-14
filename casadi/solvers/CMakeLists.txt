@@ -34,7 +34,7 @@ casadi_plugin(Linsol symbolicqr
 
 if(WITH_DL AND NOT WIN32)
   # Simple just-in-time compiler, using shell commands
-  casadi_plugin(Compiler shell
+  casadi_plugin(Importer shell
     shell_compiler.hpp
     shell_compiler.cpp
     shell_compiler_meta.cpp)

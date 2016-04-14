@@ -105,7 +105,7 @@ set(CASADI_SRCS
   function/map.hpp                 function/map.cpp
   function/mapaccum.hpp            function/mapaccum.cpp
   function/kernel_sum.hpp          function/kernel_sum.cpp
-  function/compiler.hpp            function/compiler.cpp            function/compiler_internal.hpp function/compiler_internal.cpp
+  function/importer.hpp            function/importer.cpp            function/importer_internal.hpp function/importer_internal.cpp
 
   # MISC useful stuff
   misc/integration_tools.hpp       misc/integration_tools.cpp

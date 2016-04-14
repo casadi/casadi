@@ -23,8 +23,8 @@
  */
 
 
-#ifndef CASADI_COMPILER_HPP
-#define CASADI_COMPILER_HPP
+#ifndef CASADI_IMPORTER_HPP
+#define CASADI_IMPORTER_HPP
 
 #include "function.hpp"
 
@@ -61,32 +61,32 @@ namespace casadi {
 #endif // SWIG
 
   // Forward declaration of internal class
-  class CompilerInternal;
+  class ImporterInternal;
 
-  /** \brief Compiler
+  /** \brief Importer
 
       Just-in-time compilation of code
 
-      \generalsection{Compiler}
-      \pluginssection{Compiler}
+      \generalsection{Importer}
+      \pluginssection{Importer}
 
       \author Joris Gillis
       \date 2015
   */
-  class CASADI_EXPORT Compiler : public SharedObject {
+  class CASADI_EXPORT Importer : public SharedObject {
   public:
 
     /// Default constructor
-    Compiler();
+    Importer();
 
-    /// Compiler factory
-    explicit Compiler(const std::string& name,
+    /// Importer factory
+    explicit Importer(const std::string& name,
                       const std::string& compiler,
                       const Dict& opts=Dict());
 
     /// Access functions of the node
-    CompilerInternal* operator->();
-    const CompilerInternal* operator->() const;
+    ImporterInternal* operator->();
+    const ImporterInternal* operator->() const;
 
     /// Check if a particular cast is allowed
     static bool test_cast(const SharedObjectNode* ptr);
@@ -163,4 +163,4 @@ namespace casadi {
 
 } // namespace casadi
 
-#endif // CASADI_COMPILER_HPP
+#endif // CASADI_IMPORTER_HPP

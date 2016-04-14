@@ -820,7 +820,7 @@ class Functiontests(casadiTestCase):
     for sf,sF in zip(scheme_out_fun,scheme_out_F):
       self.assertTrue(sf==sF)
       
-  # @requiresPlugin(Compiler,"clang")
+  # @requiresPlugin(Importer,"clang")
   # def test_jitfunction_clang(self):
   #   x = MX.sym("x")
   #   F = Function("f",[x],[x**2],{'jit':True})
@@ -828,31 +828,31 @@ class Functiontests(casadiTestCase):
   #   out = F([5])
   #   self.checkarray(out[0],25)
 
-  # @requiresPlugin(Compiler,"clang")
+  # @requiresPlugin(Importer,"clang")
   # def test_clang_c(self):
-  #   compiler = Compiler('../data/helloworld.c', 'clang')
+  #   compiler = Importer('../data/helloworld.c', 'clang')
   #   f = external("helloworld_c", compiler)
   #   [v] = f([])
   #   self.checkarray(2.37683, v, digits=4)
 
-  # @requiresPlugin(Compiler,"clang")
+  # @requiresPlugin(Importer,"clang")
   # def test_clang_cxx(self):
-  #   compiler = Compiler('../data/helloworld.cxx', 'clang')
+  #   compiler = Importer('../data/helloworld.cxx', 'clang')
   #   f = external("helloworld_cxx", compiler)
   #   [v] = f([])
   #   self.checkarray(2.37683, v, digits=4)
 
-  # @requiresPlugin(Compiler,"shell")
+  # @requiresPlugin(Importer,"shell")
   # def test_shell_c(self):
-  #   compiler = Compiler('../data/helloworld.c', 'shell')
+  #   compiler = Importer('../data/helloworld.c', 'shell')
   #   f = external("helloworld_c", compiler)
   #   [v] = f([])
   #   self.checkarray(2.37683, v, digits=4)
 
-  # @requiresPlugin(Compiler,"shell")
+  # @requiresPlugin(Importer,"shell")
   # def test_shell_cxx(self):
   #   opts = {'compiler':'g++'}
-  #   compiler = Compiler('../data/helloworld.cxx', 'shell', opts)
+  #   compiler = Importer('../data/helloworld.cxx', 'shell', opts)
   #   f = external("helloworld_cxx", compiler)
   #   [v] = f([])
   #   self.checkarray(2.37683, v, digits=4)

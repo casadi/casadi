@@ -26,7 +26,7 @@
 #ifndef CASADI_CLANG_COMPILER_HPP
 #define CASADI_CLANG_COMPILER_HPP
 
-#include "casadi/core/function/compiler_internal.hpp"
+#include "casadi/core/function/importer_internal.hpp"
 #include <casadi/interfaces/clang/casadi_compiler_clang_export.h>
 
 #include <clang/CodeGen/CodeGenAction.h>
@@ -77,14 +77,14 @@ namespace casadi {
    @copydoc Compiler_doc
    @copydoc plugin_Compiler_clang
    * */
-  class CASADI_COMPILER_CLANG_EXPORT ClangCompiler : public CompilerInternal {
+  class CASADI_COMPILER_CLANG_EXPORT ClangCompiler : public ImporterInternal {
   public:
 
     /** \brief Constructor */
     explicit ClangCompiler(const std::string& name);
 
     /** \brief  Create a new JIT function */
-    static CompilerInternal* creator(const std::string& name) {
+    static ImporterInternal* creator(const std::string& name) {
       return new ClangCompiler(name);
     }
 
