@@ -90,9 +90,27 @@ namespace casadi {
         pos = line.find(cmd);
         if (pos != string::npos) {
           istringstream ss(line.substr(pos+cmd.size()));
+          // Read name
           string sym;
-          bool inlined;
-          ss >> sym >> inlined;
+          ss >> sym;
+          casadi_assert(ss.good());
+          // Default attributes
+          bool inlined = false;
+
+          // Read attributes: FIXME(@jaeandersson): Hacky
+          size_t eqpos = line.find('=', pos+cmd.size());
+          if (eqpos != string::npos) {
+            string attr = "inline";
+            if (line.compare(eqpos-attr.size(), attr.size(), attr)==0) {
+              casadi_assert(line.size()>eqpos+1);
+              if (line.at(eqpos+1)=='1') {
+                inlined=true;
+              } else {
+                casadi_assert(line.at(eqpos+1)=='0');
+              }
+            }
+          }
+
           read_external(sym, inlined, file, offset);
           continue;
         }
