@@ -51,6 +51,7 @@ namespace casadi {
 
   ShellCompiler::ShellCompiler(const std::string& name) :
     CompilerInternal(name) {
+      handle_ = 0;
   }
 
   ShellCompiler::~ShellCompiler() {
