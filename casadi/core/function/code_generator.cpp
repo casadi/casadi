@@ -571,6 +571,15 @@ namespace casadi {
         << codegen_str_project_define
         << endl << endl;
       break;
+    case AUX_DENSIFY:
+      this->auxiliaries
+        << "#define CASADI_CAST(TYPE, ARG) static_cast<TYPE>(ARG)" << endl
+        << "#define real1_t real_t" << endl
+        << "#define real2_t real_t" << endl
+        << codegen_str_densify
+        << codegen_str_densify_define
+        << endl << endl;
+      break;
     case AUX_TRANS:
       this->auxiliaries << codegen_str_trans
         << "#define trans(x, sp_x, y, sp_y, tmp) CASADI_PREFIX(trans)(x, sp_x, y, sp_y, tmp)"
@@ -781,6 +790,29 @@ namespace casadi {
       << sparsity(sp_res) << ", " << w << ");";
     return s.str();
   }
+
+  std::string
+  CodeGenerator::densify(const std::string& arg, const Sparsity& sp_arg,
+                      const std::string& res, bool tr) {
+    // Create call
+    addAuxiliary(CodeGenerator::AUX_FILL);
+    addAuxiliary(CodeGenerator::AUX_DENSIFY);
+
+    stringstream s;
+    s << "densify(" << arg << ", " << sparsity(sp_arg) << ", " << res << ", "
+      << tr << ");";
+    return s.str();
+  }
+
+  std::string
+  CodeGenerator::scal(std::size_t n, double alpha, const std::string& arg) {
+    // Create call
+    addAuxiliary(CodeGenerator::AUX_SCAL);
+    stringstream s;
+    s << "scal(" << n << "," << constant(alpha) << ", " << arg << ");";
+    return s.str();
+  }
+
 
   std::string CodeGenerator::printf(const std::string& str, const std::vector<std::string>& arg) {
     addInclude("stdio.h");

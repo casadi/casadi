@@ -798,6 +798,7 @@ namespace casadi {
     std::string compilerplugin_;
     Compiler compiler_;
     Dict jit_options_;
+    Dict codegen_options_;
 
     // Penalty factor for using a complete Jacobian to calculate directional derivatives
     double jac_penalty_;

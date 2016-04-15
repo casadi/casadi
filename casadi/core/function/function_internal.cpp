@@ -254,6 +254,9 @@ namespace casadi {
       {"jit_options",
        {OT_DICT,
         "Options to be passed to the jit compiler."}},
+      {"codegen_options",
+         {OT_DICT,
+          "Options to be passed to the code generator."}},
       {"derivative_of",
        {OT_FUNCTION,
         "The function is a derivative of another function. "
@@ -289,6 +292,8 @@ namespace casadi {
         compilerplugin_ = op.second.to_string();
       } else if (op.first=="jit_options") {
         jit_options_ = op.second;
+      } else if (op.first=="codegen_options") {
+        codegen_options_ = op.second;
       } else if (op.first=="derivative_of") {
         derivative_of_ = op.second;
       }
@@ -349,7 +354,7 @@ namespace casadi {
 
   void FunctionInternal::finalize() {
     if (jit_) {
-      CodeGenerator gen;
+      CodeGenerator gen(codegen_options_);
       gen.add(function());
       gen.generate("jit_tmp.c");
       compiler_ = Compiler("jit_tmp.c", compilerplugin_, jit_options_);
@@ -360,6 +365,12 @@ namespace casadi {
       if (simple_==0) {
         eval_ = (eval_t)compiler_.get_function(name());
         casadi_assert_message(eval_!=0, "Cannot load JIT'ed function.");
+
+        incref_t incref_ = (incref_t)compiler_.get_function(name()+"_incref");
+        if (incref_==0) {
+          casadi_assert_message(eval_!=0, "Cannot load incref function.");
+        }
+        incref_();
       }
     }
 
@@ -465,6 +476,7 @@ namespace casadi {
                  {"jit", jit_},
                  {"compiler", compilerplugin_},
                  {"jit_options", jit_options_},
+                 {"codegen_options", codegen_options_},
                  {"derivative_of", function()}};
     return getGradient(ss.str(), iind, oind, opts);
   }
@@ -492,6 +504,7 @@ namespace casadi {
                  {"jit", jit_},
                  {"compiler", compilerplugin_},
                  {"jit_options", jit_options_},
+                 {"codegen_options", codegen_options_},
                  {"derivative_of", function()}};
     return getTangent(ss.str(), iind, oind, opts);
   }
@@ -539,6 +552,7 @@ namespace casadi {
     opts["jit"] = jit_;
     opts["compiler"] = compilerplugin_;
     opts["jit_options"] = jit_options_;
+    opts["codegen_options"] = codegen_options_;
 
     // Wrap the function
     vector<MX> arg = mx_in();
@@ -1476,6 +1490,7 @@ namespace casadi {
                    {"jit", jit_},
                    {"compiler", compilerplugin_},
                    {"jit_options", jit_options_},
+                   {"codegen_options", codegen_options_},
                    {"derivative_of", function()}};
       Function ret = getJacobian(ss.str(), iind, oind, compact, symmetric, opts);
 
@@ -1563,6 +1578,7 @@ namespace casadi {
                  {"jit", jit_},
                  {"compiler", compilerplugin_},
                  {"jit_options", jit_options_},
+                 {"codegen_options", codegen_options_},
                  {"derivative_of", function()}};
 
     // Return value
@@ -1660,6 +1676,7 @@ namespace casadi {
                  {"jit", jit_},
                  {"compiler", compilerplugin_},
                  {"jit_options", jit_options_},
+                {"codegen_options", codegen_options_},
                  {"derivative_of", function()}};
 
     // Return value

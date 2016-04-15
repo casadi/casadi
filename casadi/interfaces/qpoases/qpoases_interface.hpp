@@ -115,6 +115,21 @@ namespace casadi {
     /// A documentation string
     static const std::string meta_doc;
 
+    /** \brief Codegen incref for dependencies */
+    virtual void codegen_incref(CodeGenerator& g) const;
+
+    /** \brief Codegen decref for dependencies */
+    virtual void codegen_decref(CodeGenerator& g) const;
+
+    /** \brief Generate code for the declarations of the C function */
+    virtual void generateDeclarations(CodeGenerator& g) const;
+
+    /** \brief Generate code for the function body */
+    virtual void generateBody(CodeGenerator& g) const;
+
+    /** \brief Export / Generate C code for the dependency function */
+    //virtual void generate_dependencies(const std::string& fname, const Dict& opts);
+
   protected:
 
     ///@{

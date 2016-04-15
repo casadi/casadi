@@ -129,6 +129,7 @@ namespace casadi {
       AUX_SIGN,
       AUX_MTIMES,
       AUX_PROJECT,
+      AUX_DENSIFY,
       AUX_TRANS,
       AUX_TO_MEX,
       AUX_FROM_MEX
@@ -164,6 +165,13 @@ namespace casadi {
     std::string project(const std::string& arg, const Sparsity& sp_arg,
                         const std::string& res, const Sparsity& sp_res,
                         const std::string& w);
+
+    /** \brief SCAL: x <- alpha*x */
+    std::string scal(std::size_t n, double alpha, const std::string& arg);
+
+    /** \brief comvert sparse to dense */
+    std::string densify(const std::string& arg, const Sparsity& sp_arg,
+                        const std::string& res, bool tr);
 
     /** \brief Create matrix in MATLAB's MEX format */
     std::string to_mex(const Sparsity& sp, const std::string& arg);
@@ -263,4 +271,3 @@ namespace casadi {
 } // namespace casadi
 
 #endif // CASADI_CODE_GENERATOR_HPP
-

@@ -50,6 +50,7 @@ namespace casadi {
   QpoasesInterface::QpoasesInterface(const std::string& name,
                                      const std::map<std::string, Sparsity>& st)
     : Qpsol(name, st) {
+      has_refcount_ = true;
   }
 
   QpoasesInterface::~QpoasesInterface() {
@@ -278,6 +279,8 @@ namespace casadi {
       checkInputs(arg[QPSOL_LBX], arg[QPSOL_UBX], arg[QPSOL_LBA], arg[QPSOL_UBA]);
     }
 
+    double * w_orig = w;
+
     // Maxiumum number of working set changes
     int nWSR = max_nWSR_;
     double cputime = max_cputime_;
@@ -336,6 +339,7 @@ namespace casadi {
       // Get linear term
       double* a = w; w += n_*nc_;
       casadi_densify(arg[QPSOL_A], asp, a, true);
+
 
       // Solve dense
       if (nc_==0) {
@@ -730,6 +734,229 @@ namespace casadi {
     }
   }
 
+  std::string codegen_BooleanType(qpOASES::BooleanType b) {
+    switch (b) {
+    case qpOASES::BT_TRUE:              return "qpOASES::BT_TRUE";
+    case qpOASES::BT_FALSE:             return "qpOASES::BT_FALSE";
+    }
+    casadi_error("not_implemented");
+  }
+
+
+  std::string codegen_SubjectToStatus(qpOASES::SubjectToStatus b) {
+    switch (b) {
+    case qpOASES::ST_INACTIVE:          return "qpOASES::ST_INACTIVE";
+    case qpOASES::ST_LOWER:             return "qpOASES::ST_LOWER";
+    case qpOASES::ST_UPPER:             return "qpOASES::ST_UPPER";
+    case qpOASES::ST_INFEASIBLE_LOWER:  return "qpOASES::ST_INFEASIBLE_LOWER";
+    case qpOASES::ST_INFEASIBLE_UPPER:  return "qpOASES::ST_INFEASIBLE_UPPER";
+    case qpOASES::ST_UNDEFINED:         return "qpOASES::ST_UNDEFINED";
+    }
+    casadi_error("not_implemented");
+  }
+
+  void QpoasesInterface::codegen_incref(CodeGenerator& g) const {
+    std::string mem = codegen_name(g) + "_mem";
+    g.body << "  " << mem << ".h = 0;" << endl;
+    g.body << "  " << mem << ".a = 0;" << endl;
+    g.body << "  " << mem << ".qp = 0;" << endl;
+    if (nc_==0) {
+      g.body << "  " << mem << ".qp = new qpOASES::QProblemB(" << n_ << ");" << endl;
+
+    } else {
+      g.body << "  " << mem << ".sqp = new qpOASES::SQProblem(";
+      g.body << n_ << "," << nc_ << ");" << endl;
+    }
+    g.body << "  " << mem << ".called_once = false;" << endl;
+
+    g.body << "  qpOASES::Options ops;" << endl;
+    std::string print_level = from_PrintLevel(ops_.printLevel);
+    for (auto & c : print_level) c = toupper(c);
+    g.body << "  ops.printLevel = qpOASES::PL_" << print_level << ";" << endl;
+    g.body << "  ops.enableRamping = " << codegen_BooleanType(ops_.enableRamping) << ";" << endl;
+    g.body << "  ops.enableFarBounds = ";
+    g.body << codegen_BooleanType(ops_.enableFarBounds) << ";" << endl;
+    g.body << "  ops.enableFlippingBounds = ";
+    g.body << codegen_BooleanType(ops_.enableFlippingBounds) << ";" << endl;
+    g.body << "  ops.enableRegularisation = ";
+    g.body << codegen_BooleanType(ops_.enableRegularisation)<< ";" << endl;
+    g.body << "  ops.enableFullLITests = ";
+    g.body << codegen_BooleanType(ops_.enableFullLITests) << ";" << endl;
+    g.body << "  ops.enableNZCTests = ";
+    g.body << codegen_BooleanType(ops_.enableNZCTests) << ";" << endl;
+    g.body << "  ops.enableRegularisation = ";
+    g.body << codegen_BooleanType(ops_.enableRegularisation) << ";" << endl;
+    g.body << "  ops.enableCholeskyRefactorisation = ";
+    g.body << ops_.enableCholeskyRefactorisation << ";" << endl;
+    g.body << "  ops.terminationTolerance = " << ops_.terminationTolerance << ";" << endl;
+    g.body << "  ops.boundTolerance = " << ops_.boundTolerance << ";" << endl;
+    g.body << "  ops.boundRelaxation = " << ops_.boundRelaxation << ";" << endl;
+    g.body << "  ops.epsNum = " << ops_.epsNum << ";" << endl;
+    g.body << "  ops.epsDen = " << ops_.epsDen << ";" << endl;
+    g.body << "  ops.maxPrimalJump = " << ops_.maxPrimalJump << ";" << endl;
+    g.body << "  ops.maxDualJump = " << ops_.maxDualJump << ";" << endl;
+    g.body << "  ops.initialRamping = " << ops_.initialRamping << ";" << endl;
+    g.body << "  ops.finalRamping = " << ops_.finalRamping << ";" << endl;
+    g.body << "  ops.initialFarBounds = " << ops_.initialFarBounds << ";" << endl;
+    g.body << "  ops.growFarBounds = " << ops_.growFarBounds << ";" << endl;
+    g.body << "  ops.initialStatusBounds = ";
+    g.body << codegen_SubjectToStatus(ops_.initialStatusBounds) << ";" << endl;
+    g.body << "  ops.epsFlipping = " << ops_.epsFlipping << ";" << endl;
+    g.body << "  ops.numRegularisationSteps = " << ops_.numRegularisationSteps << ";" << endl;
+    g.body << "  ops.epsRegularisation = " << ops_.epsRegularisation << ";" << endl;
+    g.body << "  ops.numRefinementSteps = " << ops_.numRefinementSteps << ";" << endl;
+    g.body << "  ops.epsIterRef = " << ops_.epsIterRef << ";" << endl;
+    g.body << "  ops.epsLITests = " << ops_.epsLITests << ";" << endl;
+    g.body << "  ops.epsNZCTests = " << ops_.epsNZCTests << ";" << endl;
+    g.body << "  " << mem << ".qp->setOptions(ops);" << endl;
+  }
+  void QpoasesInterface::codegen_decref(CodeGenerator& g) const {
+
+  }
+  void QpoasesInterface::generateBody(CodeGenerator& g) const {
+    casadi_assert(!sparse_);
+    g.body << "  int nWSR = " << max_nWSR_ << ";" << endl;
+    double cputime = max_cputime_;
+    std::string cputime_ptr;
+    if (cputime<=0) {
+      g.body << "  double *cputime_ptr = 0;" << endl;
+      cputime_ptr = "cputime_ptr";
+    } else {
+      g.body << "  double cputime = " << max_cputime_ << ";" << endl;
+      cputime_ptr = "&cputime";
+    }
+
+    int offset = 0;
+    int offset_g = offset;
+    g.body << "  ";
+    g.body << g.copy("arg[" + g.to_string(QPSOL_G) + "]", n_, "w+"+ g.to_string(offset)) << endl;
+    offset += n_;
+    int offset_lb = offset;
+    g.body << "  ";
+    g.body << g.copy("arg[" + g.to_string(QPSOL_LBX) + "]", n_, "w+"+g.to_string(offset)) << endl;
+    offset += n_;
+    int offset_ub = offset;
+    g.body << "  ";
+    g.body << g.copy("arg[" + g.to_string(QPSOL_UBX) + "]", n_, "w+"+g.to_string(offset)) << endl;
+    offset += n_;
+    int offset_lba = offset;
+    g.body << "  ";
+    g.body << g.copy("arg["+g.to_string(QPSOL_LBA) + "]", nc_, "w+"+g.to_string(offset)) << endl;
+    offset += nc_;
+    int offset_uba = offset;
+    g.body << "  ";
+    g.body << g.copy("arg["+g.to_string(QPSOL_UBA) + "]", nc_, "w+"+g.to_string(offset)) << endl;
+    offset += nc_;
+
+    // QP matrices sparsities
+    const Sparsity& hsp = sparsity_in(QPSOL_H);
+    const Sparsity& asp = sparsity_in(QPSOL_A);
+
+    int offset_h = offset;
+    g.body << "  ";
+    g.body << g.densify("arg["+g.to_string(QPSOL_H) + "]", hsp, "w+"+g.to_string(offset), false);
+    g.body << endl;
+    offset += n_*n_;
+    int offset_a = offset;
+    g.body << "  ";
+    g.body << g.densify("arg["+g.to_string(QPSOL_A) + "]", asp, "w+"+g.to_string(offset), true);
+    g.body << endl;
+    offset += n_*nc_;
+
+    if (nc_==0) {
+      g.body << "  if (" << codegen_name(g) << "_mem.called_once) {" << endl;
+      g.body << "    " << codegen_name(g) << "_mem.qp->reset();" << endl;
+      g.body << "    " << codegen_name(g) << "_mem.qp->init(w+"<< g.to_string(offset_h) << ", ";
+      g.body << "w+"<< g.to_string(offset_g) << ", ";
+      g.body << "w+"<< g.to_string(offset_lb) << ", ";
+      g.body << "w+"<< g.to_string(offset_ub) << ", ";
+      g.body << "nWSR, " << cputime_ptr << ");" << endl;
+      g.body << "  } else {" << endl;
+      g.body << "    " << codegen_name(g) << "_mem.qp->init(w+"<< g.to_string(offset_h) << ", ";
+      g.body << "w+"<< g.to_string(offset_g) << ", ";
+      g.body << "w+"<< g.to_string(offset_lb) << ", ";
+      g.body << "w+"<< g.to_string(offset_ub) << ", ";
+      g.body << "nWSR, " << cputime_ptr << ");" << endl;
+      g.body << "  }" << endl;
+    } else {
+      g.body << "  if (" << codegen_name(g) << "_mem.called_once) {" << endl;
+      g.body << "    " << codegen_name(g) << "_mem.sqp->hotstart(";
+      g.body << "w+"<< g.to_string(offset_h) << ", ";
+      g.body << "w+"<< g.to_string(offset_g) << ", ";
+      g.body << "w+"<< g.to_string(offset_a) << ", ";
+      g.body << "w+"<< g.to_string(offset_lb) << ", ";
+      g.body << "w+"<< g.to_string(offset_ub) << ", ";
+      g.body << "w+"<< g.to_string(offset_lba) << ", ";
+      g.body << "w+"<< g.to_string(offset_uba) << ", ";
+      g.body << "nWSR, " << cputime_ptr << ");" << endl;
+      g.body << "  } else {" << endl;
+      g.body << "    " << codegen_name(g) << "_mem.sqp->init(";
+      g.body << "w+"<< g.to_string(offset_h) << ", ";
+      g.body << "w+"<< g.to_string(offset_g) << ", ";
+      g.body << "w+"<< g.to_string(offset_a) << ", ";
+      g.body << "w+"<< g.to_string(offset_lb) << ", ";
+      g.body << "w+"<< g.to_string(offset_ub) << ", ";
+      g.body << "w+"<< g.to_string(offset_lba) << ", ";
+      g.body << "w+"<< g.to_string(offset_uba) << ", ";
+      g.body << "nWSR, " << cputime_ptr << ");" << endl;
+      g.body << "  }" << endl;
+    }
+
+    g.body << "  " <<  codegen_name(g) << "_mem.called_once = true;" << endl;
+
+    g.body << "  if (res["+g.to_string(QPSOL_COST) + "]) {" << endl;
+    g.body << "    *res["+g.to_string(QPSOL_COST) + "] = ";
+    g.body << codegen_name(g) << "_mem.qp->getObjVal();" << endl;
+    g.body << "  }" << endl;
+
+    g.body << "  if (res["+g.to_string(QPSOL_X) + "]) {" << endl;
+    g.body << "    " << codegen_name(g) << "_mem.qp->getPrimalSolution(";
+    g.body << "    res["+g.to_string(QPSOL_X) + "]);" << endl;
+    g.body << "  }" << endl;
+
+    g.body << "  if (res["+g.to_string(QPSOL_LAM_X) + "] || ";
+    g.body << "res["+g.to_string(QPSOL_LAM_A) + "]) {" << endl;
+    g.body << "    " << codegen_name(g) << "_mem.qp->getDualSolution(";
+    g.body << "w+"<< g.to_string(offset) << ");" << endl;
+    g.body << "    " << g.scal(n_+nc_, -1., "w+"+ g.to_string(offset)) << endl;
+    g.body << "    " <<  g.copy("w+"+g.to_string(offset), n_, "res["+g.to_string(QPSOL_LAM_X)+"]");
+    g.body << endl;
+    offset+= n_;
+    g.body << "    " <<  g.copy("w+"+g.to_string(offset), nc_, "res["+g.to_string(QPSOL_LAM_A)+"]");
+    g.body << endl;
+    g.body << "  }" << endl;
+  }
+
+  //void QpoasesInterface::generate_dependencies(const std::string& fname, const Dict& opts) {
+    //CodeGenerator gen(opts);
+    //for (const Function& f : all_functions_) gen.add(f);
+    //gen.generate(fname);
+  //}
+
+  void QpoasesInterface::generateDeclarations(CodeGenerator& g) const {
+
+    g.body << "#undef real_t" << endl;
+    g.body << "#undef copy" << endl;
+    g.body << "#include <qpOASES.hpp>" << endl;
+    g.body << "#define copy(x, n, y) CASADI_PREFIX(copy)(x, n, y)" << endl;
+    g.body << "#define real_t double" << endl;
+    g.body << "#define ALLOW_QPROBLEMB true" << endl;
+    g.body << "#define ALLOW_ALL_OPTIONS" << endl;
+    g.body << "struct " << codegen_name(g) << "_" << "QpoasesMemory {" << endl;
+    g.body << "  union {" << endl;
+    g.body << "    qpOASES::SQProblem *sqp;" << endl;
+    g.body << "    qpOASES::QProblemB *qp;" << endl;
+    g.body << "  };" << endl;
+    g.body << "  qpOASES::SymSparseMat *h;" << endl;
+    g.body << "  qpOASES::SparseMatrix *a;" << endl;
+    g.body << "  bool called_once;" << endl;
+    g.body << "};" << endl;
+    g.body << codegen_name(g) << "_QpoasesMemory " << codegen_name(g) << "_mem;" << endl;
+
+    // Generate code for the embedded functions
+    addDependency(g);
+  }
+
   QpoasesMemory::QpoasesMemory() {
     this->qp = 0;
     this->h = 0;
@@ -741,5 +968,6 @@ namespace casadi {
     if (this->h) delete this->h;
     if (this->a) delete this->a;
   }
+
 
 } // namespace casadi

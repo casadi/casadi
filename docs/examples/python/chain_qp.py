@@ -50,7 +50,7 @@ z_i - 0.1*y_i >= 0.5
 from casadi import *
 
 # Constants
-N = 40
+N = 4
 m_i = 40.0/N
 D_i = 70.0*N
 g0 = 9.81
@@ -112,30 +112,34 @@ for i in range(1, N+1):
 # Formulate QP
 qp = {'x':vertcat(*x), 'f':Vchain, 'g':vertcat(*g)}
 
+QP = Function("F",qp,["x"],["f","g"])
+X= MX.sym("X",qp["x"].shape)
+QP = Function("F",[X],QP(X))
+QP.generate("code2")
+
 # Solve with IPOPT
-solver = qpsol('solver', 'qpoases', qp, {'sparse':True})
+solver = qpsol('solver', 'qpoases', qp, {'sparse':False})
 #solver = qpsol('solver', 'gurobi', qp)
 #solver = nlpsol('solver', 'ipopt', qp)
 
+LBX = MX.sym("x",2*N)
+
 # Get the optimal solution
-sol = solver(lbx=lbx, ubx=ubx, lbg=lbg, ubg=ubg)
-x_opt = sol['x']
-f_opt = sol['f']
+sol = solver(lbx=LBX, ubx=ubx, lbg=lbg, ubg=ubg)
+
+jit = True
+
+if jit:
+  opts = {"jit":True,"compiler":"shell","codegen_options":{"cpp":True},"jit_options":{"compiler":"g++","flags":["-g","-I/home/jgillis/programs/casadi/external_packages/qpOASES/include/","-lcasadi_qpoases","-L/home/jgillis/programs/casadi/build3/lib"]}}
+else:
+  opts = {}
+
+solverf = Function("f",[LBX],[sol["x"],sol["f"]],opts)
+
+x_opt, f_opt = solverf(lbx)
 print 'f_opt = ', f_opt
 
 # Retrieve the result
 Y0 = x_opt[0::2]
 Z0 = x_opt[1::2]
 
-# Plot the result
-import matplotlib.pyplot as plt
-plt.plot(Y0,Z0,'o-')
-ys = linspace(-2.,2.,100)
-zs = 0.5 + 0.1*ys
-plt.plot(ys,zs,'--')
-plt.xlabel('y [m]')
-plt.ylabel('z [m]')
-plt.title('hanging chain QP')
-plt.grid(True)
-plt.legend(['Chain','z - 0.1y >= 0.5'],loc=9)
-plt.show()
