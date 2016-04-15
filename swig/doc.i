@@ -10012,6 +10012,10 @@ General information
 |                 |                 | one is          |                 |
 |                 |                 | constructed.    |                 |
 +-----------------+-----------------+-----------------+-----------------+
+| codegen_options | OT_DICT         | Options to be   | casadi::Functio |
+|                 |                 | passed to the   | nInternal       |
+|                 |                 | code generator. |                 |
++-----------------+-----------------+-----------------+-----------------+
 | compiler        | OT_STRING       | Just-in-time    | casadi::Functio |
 |                 |                 | compiler plugin | nInternal       |
 |                 |                 | to be used.     |                 |
@@ -10932,6 +10936,10 @@ General information
 |                 |                 | Cf. option      |                 |
 |                 |                 | \"ad_weight\".    |                 |
 +-----------------+-----------------+-----------------+-----------------+
+| codegen_options | OT_DICT         | Options to be   | casadi::Functio |
+|                 |                 | passed to the   | nInternal       |
+|                 |                 | code generator. |                 |
++-----------------+-----------------+-----------------+-----------------+
 | compiler        | OT_STRING       | Just-in-time    | casadi::Functio |
 |                 |                 | compiler plugin | nInternal       |
 |                 |                 | to be used.     |                 |
@@ -11501,6 +11509,10 @@ General information
 |                 |                 | respectively.   |                 |
 |                 |                 | Cf. option      |                 |
 |                 |                 | \"ad_weight\".    |                 |
++-----------------+-----------------+-----------------+-----------------+
+| codegen_options | OT_DICT         | Options to be   | casadi::Functio |
+|                 |                 | passed to the   | nInternal       |
+|                 |                 | code generator. |                 |
 +-----------------+-----------------+-----------------+-----------------+
 | compiler        | OT_STRING       | Just-in-time    | casadi::Functio |
 |                 |                 | compiler plugin | nInternal       |
@@ -12518,6 +12530,10 @@ General information
 |                 |                 | respectively.   |                 |
 |                 |                 | Cf. option      |                 |
 |                 |                 | \"ad_weight\".    |                 |
++-----------------+-----------------+-----------------+-----------------+
+| codegen_options | OT_DICT         | Options to be   | casadi::Functio |
+|                 |                 | passed to the   | nInternal       |
+|                 |                 | code generator. |                 |
 +-----------------+-----------------+-----------------+-----------------+
 | compiler        | OT_STRING       | Just-in-time    | casadi::Functio |
 |                 |                 | compiler plugin | nInternal       |
