@@ -60,22 +60,22 @@
 #include <llvm/Support/raw_os_ostream.h>
 //#include <llvm/ExecutionEngine/ExecutionEngine.h>
 
-/** \defgroup plugin_Compiler_clang
+/** \defgroup plugin_Importer_clang
       Interface to the JIT compiler CLANG
 */
 
-/** \pluginsection{Compiler,clang} */
+/** \pluginsection{Importer,clang} */
 
 /// \cond INTERNAL
 namespace casadi {
-  /** \brief \pluginbrief{Compiler,clang}
+  /** \brief \pluginbrief{Importer,clang}
 
 
    \author Joris Gillis
    \date 2015
    *
-   @copydoc Compiler_doc
-   @copydoc plugin_Compiler_clang
+   @copydoc Importer_doc
+   @copydoc plugin_Importer_clang
    * */
   class CASADI_IMPORTER_CLANG_EXPORT ClangCompiler : public ImporterInternal {
   public:

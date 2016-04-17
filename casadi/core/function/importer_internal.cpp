@@ -44,7 +44,7 @@ namespace casadi {
 
   std::map<std::string, ImporterInternal::Plugin> ImporterInternal::solvers_;
 
-  const std::string ImporterInternal::infix_ = "compiler";
+  const std::string ImporterInternal::infix_ = "importer";
 
   Options ImporterInternal::options_
   = {{},
