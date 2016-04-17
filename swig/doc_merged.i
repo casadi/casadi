@@ -1071,189 +1071,6 @@ Generate a file, return code as string.
 // File: classcasadi_1_1CollocationIntegrator.xml
 
 
-// File: classcasadi_1_1Compiler.xml
-%feature("docstring") casadi::Compiler::plugin_name "
-
-Query plugin name.
-
-";
-
-%feature("docstring") casadi::Compiler::has_function "";
-
-%feature("docstring") casadi::Compiler::body "
-
-Get the function body, if inlined.
-
-";
-
-%feature("docstring") casadi::Compiler::getDescription "
-
-Return a string with a description (for SWIG)
-
-";
-
-%feature("docstring") casadi::Compiler::print "
-
-Print a description of the object.
-
-";
-
-%feature("docstring") casadi::Compiler::printPtr "[INTERNAL]  Print the
-pointer to the internal class
-
-";
-
-%feature("docstring") casadi::Compiler::inlined "
-
-Check if a function is inlined.
-
-";
-
-%feature("docstring") casadi::Compiler::getRepresentation "
-
-Return a string with a representation (for SWIG)
-
-";
-
-%feature("docstring") casadi::Compiler::get_meta "
-
-Get entry as a text.
-
-";
-
-%feature("docstring") casadi::Compiler::repr "
-
-Print a representation of the object.
-
-";
-
-%feature("docstring") casadi::Compiler "
-
-Compiler.
-
-Just-in-time compilation of code
-
-General information
-===================
-
-
-
-List of plugins
-===============
-
-
-
-- clang
-
-- shell
-
-Note: some of the plugins in this list might not be available on your
-system. Also, there might be extra plugins available to you that are not
-listed here. You can obtain their documentation with
-Compiler.doc(\"myextraplugin\")
-
-
-
---------------------------------------------------------------------------------
-
-clang
------
-
-
-
-Interface to the JIT compiler CLANG
-
->List of available options
-
-+------------------------+------------------------+------------------------+
-|           Id           |          Type          |      Description       |
-+========================+========================+========================+
-| flags                  | OT_STRINGVECTOR        | Compile flags for the  |
-|                        |                        | JIT compiler. Default: |
-|                        |                        | None                   |
-+------------------------+------------------------+------------------------+
-| include_path           | OT_STRING              | Include paths for the  |
-|                        |                        | JIT compiler. The      |
-|                        |                        | include directory      |
-|                        |                        | shipped with CasADi    |
-|                        |                        | will be automatically  |
-|                        |                        | appended.              |
-+------------------------+------------------------+------------------------+
-
---------------------------------------------------------------------------------
-
-
-
---------------------------------------------------------------------------------
-
-shell
------
-
-
-
-Interface to the JIT compiler SHELL
-
->List of available options
-
-+------------------------+------------------------+------------------------+
-|           Id           |          Type          |      Description       |
-+========================+========================+========================+
-| compiler               | OT_STRING              | Compiler command       |
-+------------------------+------------------------+------------------------+
-| compiler_setup         | OT_STRING              | Compiler setup         |
-|                        |                        | command. Intended to   |
-|                        |                        | be fixed. The 'flag'   |
-|                        |                        | option is the prefered |
-|                        |                        | way to set custom      |
-|                        |                        | flags.                 |
-+------------------------+------------------------+------------------------+
-| flags                  | OT_STRINGVECTOR        | Compile flags for the  |
-|                        |                        | JIT compiler. Default: |
-|                        |                        | None                   |
-+------------------------+------------------------+------------------------+
-
---------------------------------------------------------------------------------
-
-
-
-Joris Gillis
-
-C++ includes: compiler.hpp ";
-
-%feature("docstring") casadi::Compiler::has_meta "
-
-Does a meta entry exist?
-
-";
-
-%feature("docstring") casadi::Compiler::is_null "
-
-Is a null pointer?
-
-";
-
-%feature("docstring") casadi::Compiler::__hash__ "
-
-Returns a number that is unique for a given Node. If the Object does not
-point to any node, \"0\" is returned.
-
-";
-
-%feature("docstring") casadi::Compiler::Compiler "
-
->  Compiler()
-------------------------------------------------------------------------
-
-Default constructor.
-
->  Compiler(str name, str compiler, Dict opts=Dict())
-------------------------------------------------------------------------
-
-Compiler factory.
-
-";
-
-
 // File: classcasadi_1_1Concat.xml
 
 
@@ -3828,6 +3645,121 @@ C++ includes: global_options.hpp ";
 
 
 // File: classcasadi_1_1ImplicitToNlp.xml
+
+
+// File: classcasadi_1_1Importer.xml
+%feature("docstring") casadi::Importer::repr "
+
+Print a representation of the object.
+
+";
+
+%feature("docstring") casadi::Importer::body "
+
+Get the function body, if inlined.
+
+";
+
+%feature("docstring") casadi::Importer::getRepresentation "
+
+Return a string with a representation (for SWIG)
+
+";
+
+%feature("docstring") casadi::Importer::has_meta "
+
+Does a meta entry exist?
+
+";
+
+%feature("docstring") casadi::Importer::printPtr "[INTERNAL]  Print the
+pointer to the internal class
+
+";
+
+%feature("docstring") casadi::Importer "
+
+Importer.
+
+Just-in-time compilation of code
+
+General information
+===================
+
+
+
+List of plugins
+===============
+
+
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+Importer.doc(\"myextraplugin\")
+
+Joris Gillis
+
+C++ includes: importer.hpp ";
+
+%feature("docstring") casadi::Importer::plugin_name "
+
+Query plugin name.
+
+";
+
+%feature("docstring") casadi::Importer::has_function "";
+
+%feature("docstring") casadi::Importer::Importer "
+
+>  Importer()
+------------------------------------------------------------------------
+
+Default constructor.
+
+>  Importer(str name, str compiler, Dict opts=Dict())
+------------------------------------------------------------------------
+
+Importer factory.
+
+";
+
+%feature("docstring") casadi::Importer::is_null "
+
+Is a null pointer?
+
+";
+
+%feature("docstring") casadi::Importer::get_meta "
+
+Get entry as a text.
+
+";
+
+%feature("docstring") casadi::Importer::print "
+
+Print a description of the object.
+
+";
+
+%feature("docstring") casadi::Importer::getDescription "
+
+Return a string with a description (for SWIG)
+
+";
+
+%feature("docstring") casadi::Importer::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
+
+";
+
+%feature("docstring") casadi::Importer::inlined "
+
+Check if a function is inlined.
+
+";
 
 
 // File: classcasadi_1_1InfSX.xml
@@ -7728,7 +7660,7 @@ Load an external function File name is assumed to be ./<f_name>.so.
 
 Load an external function File name given.
 
->  Function external(str name, Compiler compiler, Dict opts=Dict())
+>  Function external(str name, Importer compiler, Dict opts=Dict())
 ------------------------------------------------------------------------
 
 Load a just-in-time compiled external function File name given.

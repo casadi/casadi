@@ -29,22 +29,22 @@
 #include "casadi/core/function/importer_internal.hpp"
 #include <casadi/solvers/casadi_importer_shell_export.h>
 
-/** \defgroup plugin_Compiler_shell
+/** \defgroup plugin_Importer_shell
       Interface to the JIT compiler SHELL
 */
 
-/** \pluginsection{Compiler,shell} */
+/** \pluginsection{Importer,shell} */
 
 /// \cond INTERNAL
 namespace casadi {
-  /** \brief \pluginbrief{Compiler,shell}
+  /** \brief \pluginbrief{Importer,shell}
 
 
-   \author Joris Gillis
+   \author Joel Andersson
    \date 2015
    *
-   @copydoc Compiler_doc
-   @copydoc plugin_Compiler_shell
+   @copydoc Importer_doc
+   @copydoc plugin_Importer_shell
    * */
   class CASADI_IMPORTER_SHELL_EXPORT ShellCompiler : public ImporterInternal {
   public:
