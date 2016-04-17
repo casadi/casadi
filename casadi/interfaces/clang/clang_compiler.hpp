@@ -27,7 +27,7 @@
 #define CASADI_CLANG_COMPILER_HPP
 
 #include "casadi/core/function/importer_internal.hpp"
-#include <casadi/interfaces/clang/casadi_compiler_clang_export.h>
+#include <casadi/interfaces/clang/casadi_importer_clang_export.h>
 
 #include <clang/CodeGen/CodeGenAction.h>
 #include <clang/Basic/DiagnosticOptions.h>
@@ -77,7 +77,7 @@ namespace casadi {
    @copydoc Compiler_doc
    @copydoc plugin_Compiler_clang
    * */
-  class CASADI_COMPILER_CLANG_EXPORT ClangCompiler : public ImporterInternal {
+  class CASADI_IMPORTER_CLANG_EXPORT ClangCompiler : public ImporterInternal {
   public:
 
     /** \brief Constructor */

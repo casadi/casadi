@@ -41,7 +41,7 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_COMPILER_CLANG_EXPORT
+  int CASADI_IMPORTER_CLANG_EXPORT
   casadi_register_importer_clang(ImporterInternal::Plugin* plugin) {
     plugin->creator = ClangCompiler::creator;
     plugin->name = "clang";
@@ -51,7 +51,7 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_COMPILER_CLANG_EXPORT casadi_load_importer_clang() {
+  void CASADI_IMPORTER_CLANG_EXPORT casadi_load_importer_clang() {
     ImporterInternal::registerPlugin(casadi_register_importer_clang);
   }
 
