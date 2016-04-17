@@ -557,7 +557,8 @@ namespace casadi {
     f_.sz_work(sz_arg, sz_res, sz_iw, sz_w);
 
     if (n_threads_==0) {
-#pragma omp parallel for
+      int err = 0;
+#pragma omp parallel for reduction(+: err)
       for (int i=0; i<n_; ++i) {
         const double** arg_i = arg + n_in_ + sz_arg*i;
         for (int j=0; j<n_in_; ++j) {
@@ -569,10 +570,17 @@ namespace casadi {
         }
         int* iw_i = iw + i*sz_iw;
         double* w_i = w + i*sz_w;
-        f_->eval(0, arg_i, res_i, iw_i, w_i);
+        try {
+          f_->eval(0, arg_i, res_i, iw_i, w_i);
+        } catch (exception& e) {
+          userOut<true, PL_WARN>() << e.what() << endl;
+          err++;
+        }
       }
+      casadi_assert_message(err==0, "Exception was raised inside OpenMP loop.");
     } else {
-#pragma omp parallel for num_threads(n_threads_)
+      int err = 0;
+#pragma omp parallel for num_threads(n_threads_) reduction(+: err)
       for (int i=0; i<n_; ++i) {
         const double** arg_i = arg + n_in_ + sz_arg*i;
         for (int j=0; j<n_in_; ++j) {
@@ -584,8 +592,14 @@ namespace casadi {
         }
         int* iw_i = iw + i*sz_iw;
         double* w_i = w + i*sz_w;
-        f_->eval(0, arg_i, res_i, iw_i, w_i);
+        try {
+          f_->eval(0, arg_i, res_i, iw_i, w_i);
+        } catch (exception& e) {
+          userOut<true, PL_WARN>() << e.what() << endl;
+          err++;
+        }
       }
+      casadi_assert_message(err==0, "Exception was raised inside OpenMP loop.");
     }
   }
 
