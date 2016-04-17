@@ -27,7 +27,7 @@
 #define CASADI_SHELL_INTERFACE_HPP
 
 #include "casadi/core/function/importer_internal.hpp"
-#include <casadi/solvers/casadi_compiler_shell_export.h>
+#include <casadi/solvers/casadi_importer_shell_export.h>
 
 /** \defgroup plugin_Compiler_shell
       Interface to the JIT compiler SHELL
@@ -46,7 +46,7 @@ namespace casadi {
    @copydoc Compiler_doc
    @copydoc plugin_Compiler_shell
    * */
-  class CASADI_COMPILER_SHELL_EXPORT ShellCompiler : public ImporterInternal {
+  class CASADI_IMPORTER_SHELL_EXPORT ShellCompiler : public ImporterInternal {
   public:
 
     /** \brief Constructor */
