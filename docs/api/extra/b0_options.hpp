@@ -10,7 +10,7 @@
 </table>
 */
 /// \endcond
-/** \addtogroup plugin_Compiler_clang
+/** \addtogroup plugin_Importer_clang
 \n
 \par
 <a name='options'></a><table>
@@ -1842,7 +1842,7 @@
 </table>
 */
 /// \endcond
-/** \addtogroup plugin_Compiler_shell
+/** \addtogroup plugin_Importer_shell
 \n
 \par
 <a name='options'></a><table>

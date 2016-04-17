@@ -3693,10 +3693,78 @@ List of plugins
 
 
 
+- clang
+
+- shell
+
 Note: some of the plugins in this list might not be available on your
 system. Also, there might be extra plugins available to you that are not
 listed here. You can obtain their documentation with
 Importer.doc(\"myextraplugin\")
+
+
+
+--------------------------------------------------------------------------------
+
+clang
+-----
+
+
+
+Interface to the JIT compiler CLANG
+
+>List of available options
+
++------------------------+------------------------+------------------------+
+|           Id           |          Type          |      Description       |
++========================+========================+========================+
+| flags                  | OT_STRINGVECTOR        | Compile flags for the  |
+|                        |                        | JIT compiler. Default: |
+|                        |                        | None                   |
++------------------------+------------------------+------------------------+
+| include_path           | OT_STRING              | Include paths for the  |
+|                        |                        | JIT compiler. The      |
+|                        |                        | include directory      |
+|                        |                        | shipped with CasADi    |
+|                        |                        | will be automatically  |
+|                        |                        | appended.              |
++------------------------+------------------------+------------------------+
+
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+
+shell
+-----
+
+
+
+Interface to the JIT compiler SHELL
+
+>List of available options
+
++------------------------+------------------------+------------------------+
+|           Id           |          Type          |      Description       |
++========================+========================+========================+
+| compiler               | OT_STRING              | Compiler command       |
++------------------------+------------------------+------------------------+
+| compiler_setup         | OT_STRING              | Compiler setup         |
+|                        |                        | command. Intended to   |
+|                        |                        | be fixed. The 'flag'   |
+|                        |                        | option is the prefered |
+|                        |                        | way to set custom      |
+|                        |                        | flags.                 |
++------------------------+------------------------+------------------------+
+| flags                  | OT_STRINGVECTOR        | Compile flags for the  |
+|                        |                        | JIT compiler. Default: |
+|                        |                        | None                   |
++------------------------+------------------------+------------------------+
+
+--------------------------------------------------------------------------------
+
+
 
 Joris Gillis
 
