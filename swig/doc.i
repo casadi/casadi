@@ -1819,198 +1819,6 @@ Generate a file, return code as string.
 // File: classcasadi_1_1CollocationIntegrator.xml
 
 
-// File: classcasadi_1_1Compiler.xml
-%feature("docstring")  casadi::Compiler::plugin_name() const  "
-
-Query plugin name.
-
-";
-
-%feature("docstring")  casadi::Compiler::has_function(const std::string
-&symname) const  " ";
-
-%feature("docstring")  casadi::Compiler::body(const std::string &symname)
-const  "
-
-Get the function body, if inlined.
-
-";
-
-%feature("docstring")  casadi::PrintableObject< SharedObject
->::getDescription() const "
-
-Return a string with a description (for SWIG)
-
-";
-
-%feature("docstring")  casadi::SharedObject::print(std::ostream
-&stream=casadi::userOut(), bool trailing_newline=true) const  "
-
-Print a description of the object.
-
-";
-
-%feature("docstring")  casadi::SharedObject::printPtr(std::ostream
-&stream=casadi::userOut()) const  " [INTERNAL]  Print the pointer to the
-internal class
-
-";
-
-%feature("docstring")  casadi::Compiler::inlined(const std::string &symname)
-const  "
-
-Check if a function is inlined.
-
-";
-
-%feature("docstring")  casadi::PrintableObject< SharedObject
->::getRepresentation() const "
-
-Return a string with a representation (for SWIG)
-
-";
-
-%feature("docstring")  casadi::Compiler::get_meta(const std::string &cmd,
-int ind=-1) const  "
-
-Get entry as a text.
-
-";
-
-%feature("docstring")  casadi::SharedObject::repr(std::ostream
-&stream=casadi::userOut(), bool trailing_newline=true) const  "
-
-Print a representation of the object.
-
-";
-
-%feature("docstring") casadi::Compiler "
-
-Compiler.
-
-Just-in-time compilation of code
-
-General information
-===================
-
-
-
-List of plugins
-===============
-
-
-
-- clang
-
-- shell
-
-Note: some of the plugins in this list might not be available on your
-system. Also, there might be extra plugins available to you that are not
-listed here. You can obtain their documentation with
-Compiler.doc(\"myextraplugin\")
-
-
-
---------------------------------------------------------------------------------
-
-clang
------
-
-
-
-Interface to the JIT compiler CLANG
-
->List of available options
-
-+------------------------+------------------------+------------------------+
-|           Id           |          Type          |      Description       |
-+========================+========================+========================+
-| flags                  | OT_STRINGVECTOR        | Compile flags for the  |
-|                        |                        | JIT compiler. Default: |
-|                        |                        | None                   |
-+------------------------+------------------------+------------------------+
-| include_path           | OT_STRING              | Include paths for the  |
-|                        |                        | JIT compiler. The      |
-|                        |                        | include directory      |
-|                        |                        | shipped with CasADi    |
-|                        |                        | will be automatically  |
-|                        |                        | appended.              |
-+------------------------+------------------------+------------------------+
-
---------------------------------------------------------------------------------
-
-
-
---------------------------------------------------------------------------------
-
-shell
------
-
-
-
-Interface to the JIT compiler SHELL
-
->List of available options
-
-+------------------------+------------------------+------------------------+
-|           Id           |          Type          |      Description       |
-+========================+========================+========================+
-| compiler               | OT_STRING              | Compiler command       |
-+------------------------+------------------------+------------------------+
-| compiler_setup         | OT_STRING              | Compiler setup         |
-|                        |                        | command. Intended to   |
-|                        |                        | be fixed. The 'flag'   |
-|                        |                        | option is the prefered |
-|                        |                        | way to set custom      |
-|                        |                        | flags.                 |
-+------------------------+------------------------+------------------------+
-| flags                  | OT_STRINGVECTOR        | Compile flags for the  |
-|                        |                        | JIT compiler. Default: |
-|                        |                        | None                   |
-+------------------------+------------------------+------------------------+
-
---------------------------------------------------------------------------------
-
-
-
-Joris Gillis
-
-C++ includes: compiler.hpp ";
-
-%feature("docstring")  casadi::Compiler::has_meta(const std::string &cmd,
-int ind=-1) const  "
-
-Does a meta entry exist?
-
-";
-
-%feature("docstring")  casadi::SharedObject::is_null() const  "
-
-Is a null pointer?
-
-";
-
-%feature("docstring") casadi::Compiler::__hash__ "
-
-Returns a number that is unique for a given Node. If the Object does not
-point to any node, \"0\" is returned.
-
-";
-
-%feature("docstring") casadi::Compiler::Compiler() "
-
-Default constructor.
-
-";
-
-%feature("docstring") casadi::Compiler::Compiler(const std::string &name,
-const std::string &compiler, const Dict &opts=Dict()) "
-
-Compiler factory.
-
-";
-
-
 // File: classcasadi_1_1Concat.xml
 
 
@@ -5473,6 +5281,130 @@ C++ includes: global_options.hpp ";
 
 
 // File: classcasadi_1_1ImplicitToNlp.xml
+
+
+// File: classcasadi_1_1Importer.xml
+%feature("docstring")  casadi::SharedObject::repr(std::ostream
+&stream=casadi::userOut(), bool trailing_newline=true) const  "
+
+Print a representation of the object.
+
+";
+
+%feature("docstring")  casadi::Importer::body(const std::string &symname)
+const  "
+
+Get the function body, if inlined.
+
+";
+
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getRepresentation() const "
+
+Return a string with a representation (for SWIG)
+
+";
+
+%feature("docstring")  casadi::Importer::has_meta(const std::string &cmd,
+int ind=-1) const  "
+
+Does a meta entry exist?
+
+";
+
+%feature("docstring")  casadi::SharedObject::printPtr(std::ostream
+&stream=casadi::userOut()) const  " [INTERNAL]  Print the pointer to the
+internal class
+
+";
+
+%feature("docstring") casadi::Importer "
+
+Importer.
+
+Just-in-time compilation of code
+
+General information
+===================
+
+
+
+List of plugins
+===============
+
+
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+Importer.doc(\"myextraplugin\")
+
+Joris Gillis
+
+C++ includes: importer.hpp ";
+
+%feature("docstring")  casadi::Importer::plugin_name() const  "
+
+Query plugin name.
+
+";
+
+%feature("docstring")  casadi::Importer::has_function(const std::string
+&symname) const  " ";
+
+%feature("docstring") casadi::Importer::Importer() "
+
+Default constructor.
+
+";
+
+%feature("docstring") casadi::Importer::Importer(const std::string &name,
+const std::string &compiler, const Dict &opts=Dict()) "
+
+Importer factory.
+
+";
+
+%feature("docstring")  casadi::SharedObject::is_null() const  "
+
+Is a null pointer?
+
+";
+
+%feature("docstring")  casadi::Importer::get_meta(const std::string &cmd,
+int ind=-1) const  "
+
+Get entry as a text.
+
+";
+
+%feature("docstring")  casadi::SharedObject::print(std::ostream
+&stream=casadi::userOut(), bool trailing_newline=true) const  "
+
+Print a description of the object.
+
+";
+
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getDescription() const "
+
+Return a string with a description (for SWIG)
+
+";
+
+%feature("docstring") casadi::Importer::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
+
+";
+
+%feature("docstring")  casadi::Importer::inlined(const std::string &symname)
+const  "
+
+Check if a function is inlined.
+
+";
 
 
 // File: classcasadi_1_1InfSX.xml
@@ -10070,7 +10002,7 @@ Load an external function File name given.
 ";
 
 %feature("docstring")  casadi::external(const std::string &name, const
-Compiler &compiler, const Dict &opts=Dict()) "
+Importer &compiler, const Dict &opts=Dict()) "
 
 Load a just-in-time compiled external function File name given.
 
@@ -13356,7 +13288,7 @@ std::string &solver, const MXDict &nlp, const Dict &opts=Dict()) " ";
 std::string &solver, const std::string &fname, const Dict &opts=Dict()) " ";
 
 %feature("docstring")  casadi::nlpsol(const std::string &name, const
-std::string &solver, const Compiler &compiler, const Dict &opts=Dict()) " ";
+std::string &solver, const Importer &compiler, const Dict &opts=Dict()) " ";
 
 %feature("docstring")  casadi::linsol(const std::string &name, const
 std::string &solver, const Sparsity &sp, int nrhs, const Dict &opts=Dict())
