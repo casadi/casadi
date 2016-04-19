@@ -85,9 +85,9 @@ namespace casadi {
   }
 
   void Switch::init(const Dict& opts) {
+
     // Initialize the functions, get input and output sparsities
     // Input and output sparsities
-    std::vector<Sparsity> sp_in, sp_out;
     int num_in = -1, num_out=-1;
     for (int k=0; k<=f_.size(); ++k) {
       Function& fk = k<f_.size() ? f_[k] : f_def_;
@@ -96,24 +96,10 @@ namespace casadi {
         // Number of inputs and outputs
         num_in=fk.n_in();
         num_out=fk.n_out();
-        // Output sparsity
-        sp_out.resize(num_out);
-        for (int i=0; i<num_out; ++i) sp_out[i] = fk.sparsity_out(i);
-        // Input sparsity
-        sp_in.resize(num_in);
-        for (int i=0; i<num_in; ++i) sp_in[i] = fk.sparsity_in(i);
       } else {
         // Assert matching number of inputs and outputs
         casadi_assert(num_in==fk.n_in());
         casadi_assert(num_out==fk.n_out());
-        // Intersect with output sparsity
-        for (int i=0; i<num_out; ++i) {
-          sp_out[i] = sp_out[i].intersect(fk.sparsity_out(i));
-        }
-        // Intersect with input sparsity
-        for (int i=0; i<num_in; ++i) {
-          sp_in[i] = sp_in[i].intersect(fk.sparsity_in(i));
-        }
       }
     }
 
@@ -122,6 +108,30 @@ namespace casadi {
 
     // Call the initialization method of the base class
     FunctionInternal::init(opts);
+
+    std::vector<MX> syms = mx_in();
+    std::vector<MX> sym_in;
+    sym_in.insert(sym_in.begin(), syms.begin()+1, syms.end());
+
+    // Make the sparsities match
+    for (int k=0; k<=f_.size(); ++k) {
+      Function& f = k<f_.size() ? f_[k] : f_def_;
+      std::vector<MX> f_in = sym_in;
+      for (int i=0;i<f_in.size();i++) {
+        f_in[i] = project(f_in[i], f.sparsity_in(i));
+      }
+      std::vector<MX> f_out = f(f_in);
+      for (int i=0;i<f_out.size();i++) {
+        f_out[i] = project(f_out[i], sparsity_out(i));
+      }
+      Function f_new("wrap_"+f.name(), sym_in, f_out);
+
+      if (k<f_.size()) {
+        f_[k] = f_new;
+      } else {
+        f_def_ = f_new;
+      }
+    }
 
     // Get required work
     for (int k=0; k<=f_.size(); ++k) {

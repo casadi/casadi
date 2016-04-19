@@ -90,6 +90,9 @@ namespace casadi {
 
     // Default case;
     Function f_def_;
+
+    // Size of buffer for project action
+    int w_project_;
   };
 
 } // namespace casadi
