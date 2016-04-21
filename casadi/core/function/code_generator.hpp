@@ -35,6 +35,11 @@ namespace casadi {
 
   class CASADI_EXPORT CodeGenerator {
   public:
+#ifdef WITH_DEPRECATED_FEATURES
+    /// Constructor
+    CodeGenerator(const Dict& opts = Dict());
+#endif // DWITH_DEPRECATED_FEATURES
+
     /// Constructor
     CodeGenerator(const std::string& name, const Dict& opts = Dict());
 
@@ -49,8 +54,12 @@ namespace casadi {
     /// Generate a file, return code as string
     std::string dump() const;
 
-    /// Generate file(s), returns the filename
-    std::string generate() const;
+    /** \brief Generate file(s)
+      The "prefix" argument will be prepended to the generated files and may
+      be a directory or a file prefix.
+      returns the filename
+    */
+    std::string generate(const std::string& prefix="") const;
 
     /// Compile and load function
     std::string compile(const std::string& compiler="gcc -fPIC -O2");

@@ -32,6 +32,16 @@
 using namespace std;
 namespace casadi {
 
+#ifdef WITH_DEPRECATED_FEATURES
+  CodeGenerator::CodeGenerator(const Dict& opts) {
+    casadi_error("The constructor of CodeGenerator has changed. "
+                 "Please provide the file name as the first argument to the "
+                 "constructor, i.e. CodeGenerator(name, [options]). "
+                 "Also note that CodeGenerator::generate now takes a prefix "
+                 "(e.g. a directory) instead of the filename");
+  }
+#endif // DWITH_DEPRECATED_FEATURES
+
   CodeGenerator::CodeGenerator(const std::string& name, const Dict& opts) {
     // Default options
     this->verbose = false;
@@ -153,10 +163,16 @@ namespace casadi {
       << "#endif /* real_t */" << endl << endl;
   }
 
-  std::string CodeGenerator::generate() const {
+  std::string CodeGenerator::generate(const std::string& prefix) const {
+    // Throw an error if the prefix contains the filename, since since syntax
+    // has changed
+    casadi_assert_message(prefix.find(this->name + this->suffix)==string::npos,
+       "The signature of CodeGenerator::generate has changed. "
+       "Instead of providing the filename, only provide the prefix.");
+
     // Create c file
     ofstream s;
-    string fullname = this->name + this->suffix;
+    string fullname = prefix + this->name + this->suffix;
     file_open(s, fullname);
 
     // Generate the actual function
@@ -174,7 +190,7 @@ namespace casadi {
     // Generate header
     if (this->with_header) {
       // Create a header file
-      file_open(s, this->name + ".h");
+      file_open(s, prefix + this->name + ".h");
 
       // Define the real_t type (typically double)
       generate_real_t(s);
