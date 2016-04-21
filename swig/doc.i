@@ -1782,6 +1782,12 @@ absolute path <...>
 %feature("docstring") casadi::CodeGenerator "C++ includes:
 code_generator.hpp ";
 
+%feature("docstring")  casadi::CodeGenerator::dump() const  "
+
+Generate a file, return code as string.
+
+";
+
 %feature("docstring")  casadi::CodeGenerator::compile(const std::string
 &name, const std::string &compiler="gcc -fPIC -O2") "
 
@@ -1795,8 +1801,8 @@ Add a function (name generated)
 
 ";
 
-%feature("docstring") casadi::CodeGenerator::CodeGenerator(const Dict
-&opts=Dict()) "
+%feature("docstring") casadi::CodeGenerator::CodeGenerator(const std::string
+&name, const Dict &opts=Dict()) "
 
 Constructor.
 
@@ -1805,13 +1811,7 @@ Constructor.
 %feature("docstring")  casadi::CodeGenerator::generate(const std::string
 &name) const  "
 
-Generate a file.
-
-";
-
-%feature("docstring")  casadi::CodeGenerator::generate() const  "
-
-Generate a file, return code as string.
+Generate file(s)
 
 ";
 
