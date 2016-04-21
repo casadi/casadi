@@ -61,7 +61,7 @@ namespace casadi {
       {OT_BOOL,
        "C-code generation"}}
 #ifdef WITH_DEPRECATED_FEATURES
-     ,{"compiler",
+     , {"compiler",
       {OT_STRING,
        "Compiler command to be used for compiling generated code"}}
 #endif // WITH_DEPRECATED_FEATURES

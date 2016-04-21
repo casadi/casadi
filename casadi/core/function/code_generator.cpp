@@ -846,8 +846,11 @@ namespace casadi {
     return printf(str, arg);
   }
 
-#if 0
+#ifdef WITH_DEPRECATED_FEATURES
   std::string CodeGenerator::compile(const std::string& compiler) {
+    casadi_warning("CodeGenerator::compile has been deprecated. "
+                   "Create an Importer instance instead, e.g. "
+                   "Importer(cg.generate(), ...)");
     // Flag to get a DLL
 #ifdef __APPLE__
     string dlflag = " -dynamiclib";
@@ -874,7 +877,7 @@ namespace casadi {
     // Return name of compiled function
     return dlname;
   }
-#endif
+#endif // WITH_DEPRECATED_FEATURES
 
   std::string CodeGenerator::mtimes(const std::string& x, const Sparsity& sp_x,
                                     const std::string& y, const Sparsity& sp_y,
