@@ -185,6 +185,15 @@ namespace casadi {
                        const std::string& arg3);
   private:
 
+    /// Print file header
+    void file_open(std::ofstream& f, const std::string& name) const;
+
+    /// Print file header
+    void file_close(std::ofstream& f) const;
+
+    // Declare real_t
+    void define_real_t(std::ostream &s) const;
+
     /// SQUARE
     void auxSq();
 
@@ -263,4 +272,3 @@ namespace casadi {
 } // namespace casadi
 
 #endif // CASADI_CODE_GENERATOR_HPP
-
