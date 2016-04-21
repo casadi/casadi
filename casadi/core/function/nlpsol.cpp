@@ -607,7 +607,7 @@ namespace casadi {
   }
 
   void Nlpsol::generate_dependencies(const std::string& fname, const Dict& opts) {
-    CodeGenerator gen(opts);
+    CodeGenerator gen(fname, opts);
     gen.add(nlp_->all_io("nlp"));
     for (const Function& f : all_functions_) gen.add(f);
     gen.generate(fname);

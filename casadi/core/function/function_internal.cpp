@@ -349,7 +349,7 @@ namespace casadi {
 
   void FunctionInternal::finalize() {
     if (jit_) {
-      CodeGenerator gen;
+      CodeGenerator gen("jit_tmp");
       gen.add(function());
       gen.generate("jit_tmp.c");
       compiler_ = Importer("jit_tmp.c", compilerplugin_, jit_options_);
@@ -2185,7 +2185,7 @@ namespace casadi {
   Function FunctionInternal::dynamicCompilation(Function f, std::string fname, std::string fdescr,
                                                 std::string compiler) {
     // Codegen and compile
-    CodeGenerator g;
+    CodeGenerator g(fname);
     g.add(f);
     string dlname = g.compile(fname, compiler);
 

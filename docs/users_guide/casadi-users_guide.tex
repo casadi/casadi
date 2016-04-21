@@ -1793,7 +1793,7 @@ You can generate a C file containing multiple \CasADi functions by working with 
 # Python
 f = Function('f',[x],[sin(x)])
 g = Function('g',[x],[cos(x)])
-C = CodeGenerator()
+C = CodeGenerator('gen.c')
 C.add(f)
 C.add(g)
 C.generate('gen.c')
@@ -1804,7 +1804,7 @@ C.generate('gen.c')
 % MATLAB
 f = Function('f',{x},{sin(x)});
 g = Function('g',{x},{cos(x)});
-C = CodeGenerator();
+C = CodeGenerator('gen.c');
 C.add(f);
 C.add(g);
 C.generate('gen.c');
@@ -1814,7 +1814,7 @@ C.generate('gen.c');
 # Python
 f = Function('f',[x],[sin(x)])
 g = Function('g',[x],[cos(x)])
-C = CodeGenerator()
+C = CodeGenerator('gen.c')
 C.add(f)
 C.add(g)
 C.generate('fg.c')

@@ -36,21 +36,21 @@ namespace casadi {
   class CASADI_EXPORT CodeGenerator {
   public:
     /// Constructor
-    CodeGenerator(const Dict& opts = Dict());
+    CodeGenerator(const std::string& name, const Dict& opts = Dict());
 
     /// Add a function (name generated)
     void add(const Function& f);
 
 #ifndef SWIG
     /// Generate the code to a stream
-    void generate(std::ostream& s) const;
+    void dump(std::ostream& s) const;
 #endif // SWIG
 
-    /// Generate a file
-    void generate(const std::string& name) const;
-
     /// Generate a file, return code as string
-    std::string generate() const;
+    std::string dump() const;
+
+    /// Generate file(s)
+    void generate(const std::string& name) const;
 
     /// Compile and load function
     std::string compile(const std::string& name, const std::string& compiler="gcc -fPIC -O2");
@@ -191,8 +191,14 @@ namespace casadi {
     /// Print file header
     void file_close(std::ofstream& f) const;
 
-    // Declare real_t
-    void define_real_t(std::ostream &s) const;
+    // Generate real_t definition
+    void generate_real_t(std::ostream &s) const;
+
+    // Generate mex entry point
+    void generate_mex(std::ostream &s) const;
+
+    // Generate main entry point
+    void generate_main(std::ostream &s) const;
 
     /// SQUARE
     void auxSq();
@@ -203,6 +209,9 @@ namespace casadi {
     //  private:
   public:
     /// \cond INTERNAL
+
+    // Name of generated file
+    std::string name, suffix;
 
     // Real-type used for the codegen
     std::string real_t;

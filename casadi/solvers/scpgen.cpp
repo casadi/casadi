@@ -536,13 +536,6 @@ namespace casadi {
 
     // Generate c code and load as DLL
     if (codegen_) {
-      // Codegen the functions
-      CodeGenerator gen;
-      gen.add(res_fcn);
-      gen.add(mat_fcn);
-      gen.add(vec_fcn);
-      gen.add(exp_fcn);
-
       // Name of temporary file
       string cname;
 #ifdef HAVE_MKSTEMPS
@@ -558,6 +551,13 @@ namespace casadi {
       cname = cname_array;
       free(cname_array);
 #endif
+
+      // Codegen the functions
+      CodeGenerator gen(cname);
+      gen.add(res_fcn);
+      gen.add(mat_fcn);
+      gen.add(vec_fcn);
+      gen.add(exp_fcn);
 
       // Generate code
       if (verbose_) {

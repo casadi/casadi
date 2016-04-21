@@ -32,7 +32,7 @@
 using namespace std;
 namespace casadi {
 
-  CodeGenerator::CodeGenerator(const Dict& opts) {
+  CodeGenerator::CodeGenerator(const std::string& name, const Dict& opts) {
     // Default options
     this->verbose = false;
     this->mex = false;
@@ -62,6 +62,19 @@ namespace casadi {
         casadi_error("Unrecongnized option: " << e.first);
       }
     }
+
+    // Divide name into base and suffix (if any)
+    string::size_type dotpos = name.rfind('.');
+    if (dotpos==string::npos) {
+      this->name = name;
+      this->suffix = this->cpp ? ".cpp" : ".c";
+    } else {
+      this->name = name.substr(0, dotpos);
+      this->suffix = name.substr(dotpos);
+    }
+
+    // Make sure that the base name is sane
+    casadi_assert(Function::check_name(this->name));
 
     // Includes needed
     if (this->main) addInclude("stdio.h");
@@ -97,9 +110,9 @@ namespace casadi {
     this->exposed_fname.push_back(f.name());
   }
 
-  std::string CodeGenerator::generate() const {
+  std::string CodeGenerator::dump() const {
     stringstream s;
-    generate(s);
+    dump(s);
     return s.str();
   }
 
@@ -130,7 +143,7 @@ namespace casadi {
     f.close();
   }
 
-  void CodeGenerator::define_real_t(std::ostream &s) const {
+  void CodeGenerator::generate_real_t(std::ostream &s) const {
     s << "#ifndef real_t" << endl
       << "#define real_t " << this->real_t << endl
       << "#define to_double(x) "
@@ -152,29 +165,120 @@ namespace casadi {
       suffix = name.substr(dotpos);
     }
 
-    // File(s) being generated, header is optional
-    ofstream s;
-
     // Make sure that the base name is sane
     casadi_assert(Function::check_name(basename));
 
-    // Create files
+    // Create c file
+    ofstream s;
     file_open(s, basename + suffix);
 
+    // Generate the actual function
+    dump(s);
+
+    // Mex entry point
+    if (this->mex) generate_mex(s);
+
+    // Main entry point
+    if (this->main) generate_main(s);
+
+    // Finalize file
+    file_close(s);
+
+    // Generate header
+    if (this->with_header) {
+      // Create a header file
+      file_open(s, basename + ".h");
+
+      // Define the real_t type (typically double)
+      generate_real_t(s);
+
+      // Add declarations
+      s << this->header.str();
+
+      // Finalize file
+      file_close(s);
+    }
+  }
+
+  void CodeGenerator::generate_mex(std::ostream &s) const {
+    // Begin conditional compilation
+    s << "#ifdef MATLAB_MEX_FILE" << endl;
+
+    // Function prototype
+    if (this->cpp) s << "extern \"C\"" << endl; // C linkage
+    s << "void mexFunction(int resc, mxArray *resv[], int argc, const mxArray *argv[]) {"
+      << endl;
+
+    // Create a buffer
+    size_t buf_len = 0;
+    for (int i=0; i<exposed_fname.size(); ++i) {
+      buf_len = std::max(buf_len, exposed_fname[i].size());
+    }
+    s << "  char buf[" << (buf_len+1) << "];" << endl;
+
+    // Read string argument
+    s << "  int buf_ok = --argc >= 0 && !mxGetString(*argv++, buf, sizeof(buf));" << endl;
+
+    // Create switch
+    s << "  if (!buf_ok) {" << endl
+      << "    /* name error */" << endl;
+    for (int i=0; i<exposed_fname.size(); ++i) {
+      s << "  } else if (strcmp(buf, \"" << exposed_fname[i] << "\")==0) {" << endl
+        << "    return mex_" << exposed_fname[i] << "(resc, resv, argc, argv);" << endl;
+    }
+    s << "  }" << endl;
+
+    // Error
+    s << "  mexErrMsgTxt(\"First input should be a command string. Possible values:";
+    for (int i=0; i<exposed_fname.size(); ++i) {
+      s << " '" << exposed_fname[i] << "'";
+    }
+    s << "\");" << endl;
+
+    // End conditional compilation and function
+    s << "}" << endl
+         << "#endif" << endl;
+  }
+
+  void CodeGenerator::generate_main(std::ostream &s) const {
+    s << "int main(int argc, char* argv[]) {" << endl;
+
+    // Create switch
+    s << "  if (argc<2) {" << endl
+      << "    /* name error */" << endl;
+    for (int i=0; i<exposed_fname.size(); ++i) {
+      s << "  } else if (strcmp(argv[1], \"" << exposed_fname[i] << "\")==0) {" << endl
+        << "    return main_" << exposed_fname[i] << "(argc-2, argv+2);" << endl;
+    }
+    s << "  }" << endl;
+
+    // Error
+    s << "  fprintf(stderr, \"First input should be a command string. Possible values:";
+    for (int i=0; i<exposed_fname.size(); ++i) {
+      s << " '" << exposed_fname[i] << "'";
+    }
+    s << "\\n\");" << endl;
+
+    // End main
+    s << "  return 1;" << endl
+      << "}" << endl;
+  }
+
+  void CodeGenerator::dump(std::ostream& s) const {
     // Prefix internal symbols to avoid symbol collisions
     s << "#ifdef CODEGEN_PREFIX" << endl
          << "  #define NAMESPACE_CONCAT(NS, ID) _NAMESPACE_CONCAT(NS, ID)" << endl
          << "  #define _NAMESPACE_CONCAT(NS, ID) NS ## ID" << endl
          << "  #define CASADI_PREFIX(ID) NAMESPACE_CONCAT(CODEGEN_PREFIX, ID)" << endl
          << "#else /* CODEGEN_PREFIX */" << endl
-         << "  #define CASADI_PREFIX(ID) " << basename << "_ ## ID" << endl
+         << "  #define CASADI_PREFIX(ID) " << this->name << "_ ## ID" << endl
          << "#endif /* CODEGEN_PREFIX */" << endl << endl;
 
     s << this->includes.str();
     s << endl;
 
     // Real type (usually double)
-    define_real_t(s);
+    generate_real_t(s);
 
     // External function declarations
     if (!added_externals_.empty()) {
@@ -194,95 +298,6 @@ namespace casadi {
          << "#define fmax(x,y) CASADI_PREFIX(fmax)(x,y)" << endl
          << "#endif" << endl << endl;
 
-    // Generate the actual function
-    generate(s);
-
-    // Mex gateway
-    if (this->mex) {
-      // Begin conditional compilation
-      s << "#ifdef MATLAB_MEX_FILE" << endl;
-
-      // Function prototype
-      if (this->cpp) s << "extern \"C\"" << endl; // C linkage
-      s << "void mexFunction(int resc, mxArray *resv[], int argc, const mxArray *argv[]) {"
-           << endl;
-
-      // Create a buffer
-      size_t buf_len = 0;
-      for (int i=0; i<exposed_fname.size(); ++i) {
-        buf_len = std::max(buf_len, exposed_fname[i].size());
-      }
-      s << "  char buf[" << (buf_len+1) << "];" << endl;
-
-      // Read string argument
-      s << "  int buf_ok = --argc >= 0 && !mxGetString(*argv++, buf, sizeof(buf));" << endl;
-
-      // Create switch
-      s << "  if (!buf_ok) {" << endl
-           << "    /* name error */" << endl;
-      for (int i=0; i<exposed_fname.size(); ++i) {
-        s << "  } else if (strcmp(buf, \"" << exposed_fname[i] << "\")==0) {" << endl
-             << "    return mex_" << exposed_fname[i] << "(resc, resv, argc, argv);" << endl;
-      }
-      s << "  }" << endl;
-
-      // Error
-      s << "  mexErrMsgTxt(\"First input should be a command string. Possible values:";
-      for (int i=0; i<exposed_fname.size(); ++i) {
-        s << " '" << exposed_fname[i] << "'";
-      }
-      s << "\");" << endl;
-
-      // End conditional compilation and function
-      s << "}" << endl
-           << "#endif" << endl;
-    }
-
-    // Generate main
-    if (this->main) {
-      s << "int main(int argc, char* argv[]) {" << endl;
-
-      // Create switch
-      s << "  if (argc<2) {" << endl
-           << "    /* name error */" << endl;
-      for (int i=0; i<exposed_fname.size(); ++i) {
-        s << "  } else if (strcmp(argv[1], \"" << exposed_fname[i] << "\")==0) {" << endl
-             << "    return main_" << exposed_fname[i] << "(argc-2, argv+2);" << endl;
-      }
-      s << "  }" << endl;
-
-      // Error
-      s << "  fprintf(stderr, \"First input should be a command string. Possible values:";
-      for (int i=0; i<exposed_fname.size(); ++i) {
-        s << " '" << exposed_fname[i] << "'";
-      }
-      s << "\\n\");" << endl;
-
-      // End main
-      s << "  return 1;" << endl
-           << "}" << endl;
-    }
-
-    // Finalize file
-    file_close(s);
-
-    // Generate header
-    if (this->with_header) {
-      // Create a header file
-      file_open(s, basename + ".h");
-
-      // Define the real_t type (typically double)
-      define_real_t(s);
-
-      // Add declarations
-      s << this->header.str();
-
-      // Finalize file
-      file_close(s);
-    }
-  }
-
-  void CodeGenerator::generate(std::ostream& s) const {
     // Codegen auxiliary functions
     s << this->auxiliaries.str();
 
