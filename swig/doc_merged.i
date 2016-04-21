@@ -1061,7 +1061,7 @@ Constructor.
 
 %feature("docstring") casadi::CodeGenerator::generate "
 
-Generate file(s)
+Generate file(s), returns the filename.
 
 ";
 
