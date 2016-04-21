@@ -1055,13 +1055,22 @@ Add a function (name generated)
 
 %feature("docstring") casadi::CodeGenerator::CodeGenerator "
 
+>  CodeGenerator(Dict opts=Dict())
+------------------------------------------------------------------------
+[INTERNAL] 
+Constructor.
+
+>  CodeGenerator(str name, Dict opts=Dict())
+------------------------------------------------------------------------
+
 Constructor.
 
 ";
 
 %feature("docstring") casadi::CodeGenerator::generate "
 
-Generate file(s), returns the filename.
+Generate file(s) The \"prefix\" argument will be prepended to the generated
+files and may be a directory or a file prefix. returns the filename.
 
 ";
 

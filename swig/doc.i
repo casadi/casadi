@@ -1801,6 +1801,11 @@ Add a function (name generated)
 
 ";
 
+%feature("docstring") casadi::CodeGenerator::CodeGenerator(const Dict
+&opts=Dict()) " [INTERNAL]  Constructor.
+
+";
+
 %feature("docstring") casadi::CodeGenerator::CodeGenerator(const std::string
 &name, const Dict &opts=Dict()) "
 
@@ -1808,9 +1813,11 @@ Constructor.
 
 ";
 
-%feature("docstring")  casadi::CodeGenerator::generate() const  "
+%feature("docstring")  casadi::CodeGenerator::generate(const std::string
+&prefix="") const  "
 
-Generate file(s), returns the filename.
+Generate file(s) The \"prefix\" argument will be prepended to the generated
+files and may be a directory or a file prefix. returns the filename.
 
 ";
 
