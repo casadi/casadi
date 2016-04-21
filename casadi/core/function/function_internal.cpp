@@ -351,8 +351,7 @@ namespace casadi {
     if (jit_) {
       CodeGenerator gen("jit_tmp");
       gen.add(function());
-      gen.generate("jit_tmp.c");
-      compiler_ = Importer("jit_tmp.c", compilerplugin_, jit_options_);
+      compiler_ = Importer(gen.generate(), compilerplugin_, jit_options_);
 
       // Try to load with simplified syntax
       simple_ = (simple_t)compiler_.get_function(name() + "_simple");
@@ -2187,7 +2186,7 @@ namespace casadi {
     // Codegen and compile
     CodeGenerator g(fname);
     g.add(f);
-    string dlname = g.compile(fname, compiler);
+    string dlname = g.compile(compiler);
 
     // Load it
     return external(f.name(), dlname);

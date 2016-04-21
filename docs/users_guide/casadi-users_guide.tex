@@ -1796,7 +1796,7 @@ g = Function('g',[x],[cos(x)])
 C = CodeGenerator('gen.c')
 C.add(f)
 C.add(g)
-C.generate('gen.c')
+C.generate()
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
@@ -1807,7 +1807,7 @@ g = Function('g',{x},{cos(x)});
 C = CodeGenerator('gen.c');
 C.add(f);
 C.add(g);
-C.generate('gen.c');
+C.generate();
 \end{lstlisting}
 \end{minipage}
 \begin{pytexoutput}
@@ -1817,7 +1817,7 @@ g = Function('g',[x],[cos(x)])
 C = CodeGenerator('gen.c')
 C.add(f)
 C.add(g)
-C.generate('fg.c')
+C.generate()
 \end{pytexoutput}
 
 Both the \texttt{generate} function and the \texttt{CodeGenerator} constructor take an optional

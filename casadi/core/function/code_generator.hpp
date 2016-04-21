@@ -49,11 +49,11 @@ namespace casadi {
     /// Generate a file, return code as string
     std::string dump() const;
 
-    /// Generate file(s)
-    void generate(const std::string& name) const;
+    /// Generate file(s), returns the filename
+    std::string generate() const;
 
     /// Compile and load function
-    std::string compile(const std::string& name, const std::string& compiler="gcc -fPIC -O2");
+    std::string compile(const std::string& compiler="gcc -fPIC -O2");
 
     /// Add an include file optionally using a relative path "..." instead of an absolute path <...>
     void addInclude(const std::string& new_include, bool relative_path=false,

@@ -610,7 +610,7 @@ namespace casadi {
     CodeGenerator gen(fname, opts);
     gen.add(nlp_->all_io("nlp"));
     for (const Function& f : all_functions_) gen.add(f);
-    gen.generate(fname);
+    gen.generate();
   }
 
   Function Nlpsol::create_function(const std::string& fname,

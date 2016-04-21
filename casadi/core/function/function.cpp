@@ -907,7 +907,7 @@ namespace casadi {
   void Function::generate(const string& fname, const Dict& opts) {
     CodeGenerator gen(fname, opts);
     gen.add(*this);
-    gen.generate(fname);
+    gen.generate();
   }
 
   void Function::generate_dependencies(const string& fname, const Dict& opts) {

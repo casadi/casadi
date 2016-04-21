@@ -153,24 +153,11 @@ namespace casadi {
       << "#endif /* real_t */" << endl << endl;
   }
 
-  void CodeGenerator::generate(const std::string& name) const {
-    // Divide name into base and suffix (.c by default)
-    string basename, suffix;
-    string::size_type dotpos = name.rfind('.');
-    if (dotpos==string::npos) {
-      basename = name;
-      suffix = this->cpp ? ".cpp" : ".c";
-    } else {
-      basename = name.substr(0, dotpos);
-      suffix = name.substr(dotpos);
-    }
-
-    // Make sure that the base name is sane
-    casadi_assert(Function::check_name(basename));
-
+  std::string CodeGenerator::generate() const {
     // Create c file
     ofstream s;
-    file_open(s, basename + suffix);
+    string fullname = this->name + this->suffix;
+    file_open(s, fullname);
 
     // Generate the actual function
     dump(s);
@@ -187,7 +174,7 @@ namespace casadi {
     // Generate header
     if (this->with_header) {
       // Create a header file
-      file_open(s, basename + ".h");
+      file_open(s, this->name + ".h");
 
       // Define the real_t type (typically double)
       generate_real_t(s);
@@ -198,6 +185,7 @@ namespace casadi {
       // Finalize file
       file_close(s);
     }
+    return fullname;
   }
 
   void CodeGenerator::generate_mex(std::ostream &s) const {
@@ -842,8 +830,7 @@ namespace casadi {
     return printf(str, arg);
   }
 
-  std::string CodeGenerator::compile(const std::string& name,
-                                     const std::string& compiler) {
+  std::string CodeGenerator::compile(const std::string& compiler) {
     // Flag to get a DLL
 #ifdef __APPLE__
     string dlflag = " -dynamiclib";
@@ -852,7 +839,7 @@ namespace casadi {
 #endif // __APPLE__
 
     // File names
-    string cname = name + (this->cpp ? ".cpp" : ".c"), dlname = "./" + name + ".so";
+    string cname = name + this->suffix, dlname = "./" + name + ".so";
 
     // Remove existing files, if any
     string rm_command = "rm -rf " + cname + " " + dlname;
@@ -860,7 +847,7 @@ namespace casadi {
     casadi_assert_message(flag==0, "Failed to remove old source");
 
     // Codegen it
-    generate(name);
+    generate();
 
     // Compile it
     string compile_command = compiler + " " + dlflag + " " + cname + " -o " + dlname;

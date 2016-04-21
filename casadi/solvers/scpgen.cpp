@@ -564,7 +564,7 @@ namespace casadi {
         userOut() << "Generating \"" << cname << "\""  << endl;
       }
       string name = cname.substr(0, cname.find_first_of('.'));
-      gen.generate(name);
+      gen.generate();
 
       // Complile and run
       if (verbose_) {
