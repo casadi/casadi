@@ -2181,17 +2181,6 @@ namespace casadi {
     casadi_error("'generate_dependencies' not defined for " + type_name());
   }
 
-  Function FunctionInternal::dynamicCompilation(Function f, std::string fname, std::string fdescr,
-                                                std::string compiler) {
-    // Codegen and compile
-    CodeGenerator g(fname);
-    g.add(f);
-    string dlname = g.compile(compiler);
-
-    // Load it
-    return external(f.name(), dlname);
-  }
-
   void FunctionInternal::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     // Get the number of inputs and outputs
     int n_in = this->n_in();

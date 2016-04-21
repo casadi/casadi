@@ -62,7 +62,7 @@ namespace casadi {
     std::string generate(const std::string& prefix="") const;
 
     /// Compile and load function
-    std::string compile(const std::string& compiler="gcc -fPIC -O2");
+    //std::string compile(const std::string& compiler="gcc -fPIC -O2");
 
     /// Add an include file optionally using a relative path "..." instead of an absolute path <...>
     void addInclude(const std::string& new_include, bool relative_path=false,

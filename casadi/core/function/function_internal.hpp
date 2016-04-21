@@ -647,10 +647,6 @@ namespace casadi {
     /** \brief  Log the status of the solver, function given */
     void log(const std::string& fcn, const std::string& msg) const;
 
-    /// Codegen function
-    Function dynamicCompilation(Function f, std::string fname, std::string fdescr,
-                                std::string compiler);
-
     /** \brief  Propagate sparsity forward */
     virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
 

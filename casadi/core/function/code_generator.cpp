@@ -846,6 +846,7 @@ namespace casadi {
     return printf(str, arg);
   }
 
+#if 0
   std::string CodeGenerator::compile(const std::string& compiler) {
     // Flag to get a DLL
 #ifdef __APPLE__
@@ -873,6 +874,7 @@ namespace casadi {
     // Return name of compiled function
     return dlname;
   }
+#endif
 
   std::string CodeGenerator::mtimes(const std::string& x, const Sparsity& sp_x,
                                     const std::string& y, const Sparsity& sp_y,

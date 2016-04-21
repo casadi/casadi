@@ -59,11 +59,13 @@ namespace casadi {
   = {{&FunctionInternal::options_},
     {{"codegen",
       {OT_BOOL,
-       "C-code generation"}},
-     {"compiler",
+       "C-code generation"}}
+#ifdef WITH_DEPRECATED_FEATURES
+     ,{"compiler",
       {OT_STRING,
        "Compiler command to be used for compiling generated code"}}
-    }
+#endif // WITH_DEPRECATED_FEATURES
+   }
   };
 
   void SymbolicQr::init(const Dict& opts) {
@@ -72,25 +74,21 @@ namespace casadi {
 
     // Default options
     bool codegen = false;
-    string compiler = "gcc -fPIC -O2";
 
     // Read options
     for (auto&& op : opts) {
       if (op.first=="codegen") {
         codegen = op.second;
       } else if (op.first=="compiler") {
-        compiler = op.second.to_string();
+        casadi_error("Option \"compiler\" has been removed");
       }
     }
 
-    // Make sure that command processor is available
+    // Codegen options
+    Dict fopts;
     if (codegen) {
-#ifdef WITH_DL
-      int flag = system(static_cast<const char*>(0));
-      casadi_assert_message(flag!=0, "No command procesor available");
-#else // WITH_DL
-      casadi_error("Codegen requires CasADi to be compiled with option \"WITH_DL\" enabled");
-#endif // WITH_DL
+      fopts["compiler"] = compilerplugin_;
+      fopts["jit_options"] = jit_options_;
     }
 
     // Symbolic expression for A
@@ -112,17 +110,7 @@ namespace casadi {
     // Generate the QR factorization function
     SX Q1, R1;
     qr(Aperm, Q1, R1);
-    Function fact_fcn("QR_fact", {A}, {Q1, R1});
-
-    // Optionally generate c code and load as DLL
-    if (codegen) {
-      stringstream ss;
-      ss << "symbolic_qr_fact_fcn_" << this;
-      fact_fcn_ = dynamicCompilation(fact_fcn, ss.str(),
-                                     "Symbolic QR factorization function", compiler);
-    } else {
-      fact_fcn_ = fact_fcn;
-    }
+    fact_fcn_ = Function("QR_fact", {A}, {Q1, R1}, fopts);
     alloc(fact_fcn_);
 
     // Symbolic expressions for solve function
@@ -144,16 +132,7 @@ namespace casadi {
 
     // Generate the QR solve function
     vector<SX> solv_in = {Q, R, b};
-    Function solv_fcn("QR_solv", solv_in, {x});
-
-    // Optionally generate c code and load as DLL
-    if (codegen) {
-      stringstream ss;
-      ss << "symbolic_qr_solv_fcn_N_" << this;
-      solv_fcn_N_ = dynamicCompilation(solv_fcn, ss.str(), "QR_solv_N", compiler);
-    } else {
-      solv_fcn_N_ = solv_fcn;
-    }
+    solv_fcn_N_ = Function("QR_solv", solv_in, {x}, fopts);
     alloc(solv_fcn_N_);
 
     // Solve transposed
@@ -171,16 +150,7 @@ namespace casadi {
     x = xperm(inv_rowperm, Slice());
 
     // Mofify the QR solve function
-    solv_fcn = Function("QR_solv_T", solv_in, {x});
-
-    // Optionally generate c code and load as DLL
-    if (codegen) {
-      stringstream ss;
-      ss << "symbolic_qr_solv_fcn_T_" << this;
-      solv_fcn_T_ = dynamicCompilation(solv_fcn, ss.str(), "QR_solv_T", compiler);
-    } else {
-      solv_fcn_T_ = solv_fcn;
-    }
+    solv_fcn_T_ = Function("QR_solv_T", solv_in, {x}, fopts);
     alloc(solv_fcn_T_);
 
     // Temporary storage
