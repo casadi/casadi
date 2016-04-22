@@ -2093,6 +2093,30 @@ namespace casadi {
       s << "  return 0;" << endl
         << "}" << endl << endl;
     }
+
+    if (g.with_mem) {
+      // Allocate memory
+      s << g.declare("casadi_mem* " + fname + "_alloc()") << " {" << endl
+        << "  return casadi_alloc(" << fname << "_infref," << endl
+        << "    " << fname << "_n_in," << endl
+        << "    " << fname << "_n_out," << endl
+        << "    " << fname << "_name_in," << endl
+        << "    " << fname << "_name_out," << endl
+        << "    " << fname << "_sparsity_in," << endl
+        << "    " << fname << "_sparsity_out," << endl
+        << "    " << fname << "_work);" << endl
+        << "}" << endl;
+
+      // Evaluate
+      s << g.declare("int " + fname + "_eval(casadi_mem* mem)") << " {" << endl
+        << "  casadi_eval(mem, " << fname << ");" << endl
+        << "}" << endl;
+
+      // Free memory
+      s << g.declare("void " + fname + "_free(casadi_mem* mem)") << " {" << endl
+        << "  casadi_free(mem, " << fname << "_decref);" << endl
+        << "}" << endl;
+    }
   }
 
   std::string FunctionInternal::codegen_name(const CodeGenerator& g) const {

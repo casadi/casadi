@@ -51,6 +51,7 @@ namespace casadi {
     this->real_t = "double";
     this->codegen_scalars = false;
     this->with_header = false;
+    this->with_mem = false;
 
     // Read options
     for (auto&& e : opts) {
@@ -68,6 +69,8 @@ namespace casadi {
         this->codegen_scalars = e.second;
       } else if (e.first=="with_header") {
         this->with_header = e.second;
+      } else if (e.first=="with_mem") {
+        this->with_mem = e.second;
       } else {
         casadi_error("Unrecongnized option: " << e.first);
       }
@@ -89,9 +92,15 @@ namespace casadi {
     // Includes needed
     if (this->main) addInclude("stdio.h");
 
-    // Mex and main needs string.h
+    // Mex and main need string.h
     if (this->mex || this->main) {
       addInclude("string.h");
+    }
+
+    // Memory struct entry point
+    if (this->with_mem) {
+      addInclude("casadi_mem.h");
+      this->header << "#include <casadi_mem.h>" << endl;
     }
 
     // Mex file?

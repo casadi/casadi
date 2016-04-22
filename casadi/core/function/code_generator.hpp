@@ -227,6 +227,9 @@ namespace casadi {
     // Real-type used for the codegen
     std::string real_t;
 
+    // Should we create a memory entry point?
+    bool with_mem;
+
     // Generate header file?
     bool with_header;
 
