@@ -53,12 +53,15 @@ typedef struct {
   const char* name;
   int nrow;
   int ncol;
+  int nnz;
+  int numel;
   const int* colind;
   const int* row;
 } casadi_io;
 
 /* Decompress a sparsity pattern */
 inline void casadi_decompress(const int* sp, int* nrow, int* ncol,
+                              int* nnz, int* numel,
                               const int** colind, const int** row) {
   /* Scalar sparsity pattern if sp is null */
   if (sp==0) {
@@ -72,9 +75,9 @@ inline void casadi_decompress(const int* sp, int* nrow, int* ncol,
   *nrow = *sp++;
   *ncol = *sp++;
   *colind = sp;
-  int nnz = sp[*ncol];
-  int numel = *nrow * *ncol;
-  *row = nnz==numel ? 0 : sp + *ncol + 1;
+  *nnz = sp[*ncol];
+  *numel = *nrow * *ncol;
+  *row = *nnz==*numel ? 0 : sp + *ncol + 1;
 }
 
 /* Memory needed for evaluation */
@@ -89,23 +92,29 @@ typedef struct {
   int n_in, n_out;
   casadi_io* in;
   casadi_io* out;
+  /* Function pointers */
+  casadi_eval_t eval;
+  casadi_signal_t decref;
 } casadi_mem;
 
 /* Allocate memory */
 inline casadi_mem*
-casadi_alloc(casadi_signal_t incref,
+casadi_alloc(casadi_signal_t incref, casadi_signal_t decref,
              casadi_getint_t n_in, casadi_getint_t n_out,
              casadi_name_t name_in, casadi_name_t name_out,
              casadi_sparsity_t sparsity_in, casadi_sparsity_t sparsity_out,
-             casadi_work_t work) {
+             casadi_work_t work, casadi_eval_t eval) {
   int i;
-
   /* Increase reference counter */
   if (incref) incref();
 
   /* Allocate memory */
   casadi_mem* mem = (casadi_mem*)malloc(sizeof(casadi_mem));
   assert(mem!=0);
+
+  /* Store function pointers */
+  mem->decref = decref;
+  mem->eval = eval;
 
   /* Number of inputs and outputs */
   mem->n_in = n_in ? n_in() : 1;
@@ -122,6 +131,7 @@ casadi_alloc(casadi_signal_t incref,
     mem->in[i].name = name_in ? name_in(i) : 0;
     casadi_decompress(sparsity_in ? sparsity_in(i) : 0,
                       &mem->in[i].nrow, &mem->in[i].ncol,
+                      &mem->in[i].nnz, &mem->in[i].numel,
                       &mem->in[i].colind, &mem->in[i].row);
   }
 
@@ -130,6 +140,7 @@ casadi_alloc(casadi_signal_t incref,
     mem->out[i].name = name_out ? name_out(i) : 0;
     casadi_decompress(sparsity_out ? sparsity_out(i) : 0,
                       &mem->out[i].nrow, &mem->out[i].ncol,
+                      &mem->out[i].nnz, &mem->out[i].numel,
                       &mem->out[i].colind, &mem->out[i].row);
   }
 
@@ -157,13 +168,13 @@ casadi_alloc(casadi_signal_t incref,
 }
 
 /* Evaluate */
-inline int casadi_eval(casadi_mem* mem, casadi_eval_t eval) {
+inline int casadi_eval(casadi_mem* mem) {
   assert(mem!=0);
-  return eval(mem->arg, mem->res, mem->iw, mem->w, mem->mem);
+  return mem->eval(mem->arg, mem->res, mem->iw, mem->w, mem->mem);
 }
 
 /* Free memory */
-inline void casadi_free(casadi_mem* mem, casadi_signal_t decref) {
+inline void casadi_free(casadi_mem* mem) {
   assert(mem!=0);
 
   /* Free io meta data */
@@ -176,11 +187,11 @@ inline void casadi_free(casadi_mem* mem, casadi_signal_t decref) {
   if (mem->iw) free(mem->iw);
   if (mem->w) free(mem->w);
 
+  /* Decrease reference counter */
+  if (mem->decref) mem->decref();
+
   /* Free memory structure */
   free(mem);
-
-  /* Decrease reference counter */
-  if (decref) decref();
 }
 
 #ifdef __cplusplus
