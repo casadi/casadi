@@ -1,3 +1,6 @@
+%exception  casadi::CodeGenerator::compile(const std::string &compiler="gcc -fPIC -O2") {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::FStats::reset() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }

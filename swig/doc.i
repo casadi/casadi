@@ -1789,9 +1789,7 @@ Generate a file, return code as string.
 ";
 
 %feature("docstring")  casadi::CodeGenerator::compile(const std::string
-&compiler="gcc -fPIC -O2") "
-
-Compile and load function.
+&compiler="gcc -fPIC -O2") " [INTERNAL]  Compile and load function.
 
 ";
 

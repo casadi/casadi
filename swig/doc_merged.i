@@ -1041,9 +1041,8 @@ Generate a file, return code as string.
 
 ";
 
-%feature("docstring") casadi::CodeGenerator::compile "
-
-Compile and load function.
+%feature("docstring") casadi::CodeGenerator::compile "[INTERNAL]  Compile
+and load function.
 
 ";
 
