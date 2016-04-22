@@ -52,6 +52,9 @@ matrix:
         - pushd test && make trunktesterbot_no_unittests_py && popd
         - pushd test && make unittests_py_slow && popd
         - pushd build && make json && popd
+      after_success:
+        - sudo pip install cpp-coveralls
+        - coveralls --exclude swig --exclude CMakeFiles --gcov-options '\-lp'
     - compiler: gcc
       os: linux
       env: TESTMODE=docs
