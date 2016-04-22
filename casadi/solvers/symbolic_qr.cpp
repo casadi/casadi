@@ -59,12 +59,10 @@ namespace casadi {
   = {{&FunctionInternal::options_},
     {{"codegen",
       {OT_BOOL,
-       "C-code generation"}}
-#ifdef WITH_DEPRECATED_FEATURES
-     , {"compiler",
+       "C-code generation"}},
+      {"compiler",
       {OT_STRING,
        "Compiler command to be used for compiling generated code"}}
-#endif // WITH_DEPRECATED_FEATURES
    }
   };
 
