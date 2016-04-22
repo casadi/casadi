@@ -112,29 +112,29 @@ casadi_alloc(casadi_signal_t incref,
   mem->n_out = n_out ? n_out() : 1;
 
   /* Allocate io memory */
-  mem->in = (casadi_io*)malloc(n_in*sizeof(casadi_io));
-  assert(n_in==0 || mem->in!=0);
-  mem->out = (casadi_io*)malloc(n_out*sizeof(casadi_io));
-  assert(n_out==0 || mem->out!=0);
+  mem->in = (casadi_io*)malloc(mem->n_in*sizeof(casadi_io));
+  assert(mem->n_in==0 || mem->in!=0);
+  mem->out = (casadi_io*)malloc(mem->n_out*sizeof(casadi_io));
+  assert(mem->n_out==0 || mem->out!=0);
 
   /* Input meta data */
-  for (i=0; i<n_in; ++i) {
+  for (i=0; i<mem->n_in; ++i) {
     mem->in[i].name = name_in ? name_in(i) : 0;
-    casadi_decompress(sparsity_in ? sparsity_in() : 0,
+    casadi_decompress(sparsity_in ? sparsity_in(i) : 0,
                       &mem->in[i].nrow, &mem->in[i].ncol,
                       &mem->in[i].colind, &mem->in[i].row);
   }
 
   /* Output meta data */
-  for (i=0; i<n_out; ++i) {
+  for (i=0; i<mem->n_out; ++i) {
     mem->out[i].name = name_out ? name_out(i) : 0;
-    casadi_decompress(sparsity_out ? sparsity_out() : 0,
+    casadi_decompress(sparsity_out ? sparsity_out(i) : 0,
                       &mem->out[i].nrow, &mem->out[i].ncol,
                       &mem->out[i].colind, &mem->out[i].row);
   }
 
   /* Work vector sizes */
-  int sz_arg=n_in, sz_res_n_out, sz_iw=0, sz_w=0;
+  int sz_arg=mem->n_in, sz_res=mem->n_out, sz_iw=0, sz_w=0;
   if (work) {
     int flag = work(&sz_arg, &sz_res, &sz_iw, &sz_w);
     assert(flag==0);

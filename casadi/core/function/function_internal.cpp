@@ -2097,7 +2097,7 @@ namespace casadi {
     if (g.with_mem) {
       // Allocate memory
       s << g.declare("casadi_mem* " + fname + "_alloc()") << " {" << endl
-        << "  return casadi_alloc(" << fname << "_infref," << endl
+        << "  return casadi_alloc(" << fname << "_incref," << endl
         << "    " << fname << "_n_in," << endl
         << "    " << fname << "_n_out," << endl
         << "    " << fname << "_name_in," << endl
@@ -2109,7 +2109,7 @@ namespace casadi {
 
       // Evaluate
       s << g.declare("int " + fname + "_eval(casadi_mem* mem)") << " {" << endl
-        << "  casadi_eval(mem, " << fname << ");" << endl
+        << "  return casadi_eval(mem, " << fname << ");" << endl
         << "}" << endl;
 
       // Free memory

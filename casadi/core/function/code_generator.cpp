@@ -165,10 +165,6 @@ namespace casadi {
   void CodeGenerator::generate_real_t(std::ostream &s) const {
     s << "#ifndef real_t" << endl
       << "#define real_t " << this->real_t << endl
-      << "#define to_double(x) "
-      << (this->cpp ? "static_cast<double>(x)" : "(double) x") << endl
-      << "#define to_int(x) "
-      << (this->cpp ? "static_cast<int>(x)" : "(int) x") << endl
       << "#endif /* real_t */" << endl << endl;
   }
 
@@ -292,6 +288,12 @@ namespace casadi {
 
     // Real type (usually double)
     generate_real_t(s);
+
+    // Type conversion
+    s << "#define to_double(x) "
+      << (this->cpp ? "static_cast<double>(x)" : "(double) x") << endl
+      << "#define to_int(x) "
+      << (this->cpp ? "static_cast<int>(x)" : "(int) x") << endl;
 
     // External function declarations
     if (!added_externals_.empty()) {
