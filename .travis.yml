@@ -54,7 +54,7 @@ matrix:
         - pushd build && make json && popd
       after_success:
         - sudo pip install cpp-coveralls
-        - coveralls --exclude swig --exclude CMakeFiles --gcov-options '\-lp'
+        - coveralls --exclude swig --exclude --exclude _temp.cc --exclude docs CMakeFiles --gcov-options '\-lp'
     - compiler: gcc
       os: linux
       env: TESTMODE=docs
