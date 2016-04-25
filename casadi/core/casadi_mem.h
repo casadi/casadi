@@ -141,6 +141,9 @@ inline void casadi_init(casadi_mem* mem, casadi_functions* f) {
     assert(flag==0);
   }
 
+  /* TODO: Check out a memory object */
+  mem->mem = 0;
+
   /* No io structs allocated */
   mem->in = 0;
   mem->out = 0;
@@ -155,6 +158,8 @@ inline void casadi_init(casadi_mem* mem, casadi_functions* f) {
 /* Free claimed static memory */
 inline void casadi_deinit(casadi_mem* mem) {
   assert(mem!=0);
+
+  /* TODO: Release a memory object */
 
   /* Decrease reference counter */
   if (mem->f->decref) mem->f->decref();
