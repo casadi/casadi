@@ -321,7 +321,7 @@ namespace casadi {
   }
 
   Function Mapaccum
-  ::get_forward(const std::string& name, int nfwd, Dict& opts) {
+  ::get_forward_old(const std::string& name, int nfwd, Dict& opts) {
 
     // Obtain forward mode of the primitive function
     /*
@@ -443,7 +443,7 @@ namespace casadi {
   }
 
   Function Mapaccum
-  ::get_reverse(const std::string& name, int nadj, Dict& opts) {
+  ::get_reverse_old(const std::string& name, int nadj, Dict& opts) {
 
     // Obtain Reverse mode of the primitive function
     /*

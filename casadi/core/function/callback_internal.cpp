@@ -106,7 +106,8 @@ namespace casadi {
     return self_->get_jacobian(name, opts);
   }
 
-  Function CallbackInternal::get_forward(const std::string& name, int nfwd, Dict& opts) {
+  Function CallbackInternal::
+  get_forward_old(const std::string& name, int nfwd, Dict& opts) {
     casadi_assert_message(self_!=0, "Callback object has been deleted");
     return self_->get_forward(name, nfwd, opts);
   }
@@ -116,7 +117,8 @@ namespace casadi {
     return self_->get_n_forward();
   }
 
-  Function CallbackInternal::get_reverse(const std::string& name, int nadj, Dict& opts) {
+  Function CallbackInternal::
+  get_reverse_old(const std::string& name, int nadj, Dict& opts) {
     casadi_assert_message(self_!=0, "Callback object has been deleted");
     return self_->get_reverse(name, nadj, opts);
   }

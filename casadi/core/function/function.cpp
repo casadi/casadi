@@ -873,11 +873,11 @@ namespace casadi {
   }
 
   Function Function::forward(int nfwd) {
-    return (*this)->forward(nfwd);
+    return (*this)->forward_old(nfwd);
   }
 
   Function Function::reverse(int nadj) {
-    return (*this)->reverse(nadj);
+    return (*this)->reverse_old(nadj);
   }
 
   void Function::set_forward(const Function& fcn, int nfwd) {

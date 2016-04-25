@@ -1498,7 +1498,7 @@ namespace casadi {
     return getNumericJacobian(name, iind, oind, compact, symmetric, opts);
   }
 
-  Function FunctionInternal::forward(int nfwd) {
+  Function FunctionInternal::forward_old(int nfwd) {
     casadi_assert(nfwd>=0);
 
     // Check if there are enough forward directions allocated
@@ -1566,7 +1566,7 @@ namespace casadi {
 
     // Return value
     casadi_assert(get_n_forward()>0);
-    Function ret = get_forward(name, nfwd, opts);
+    Function ret = get_forward_old(name, nfwd, opts);
 
     // Consistency check for inputs
     for (int i=0; i<ret.n_in(); ++i) {
@@ -1595,7 +1595,7 @@ namespace casadi {
     return ret;
   }
 
-  Function FunctionInternal::reverse(int nadj) {
+  Function FunctionInternal::reverse_old(int nadj) {
     casadi_assert(nadj>=0);
 
     // Check if there are enough adjoint directions allocated
@@ -1663,7 +1663,7 @@ namespace casadi {
 
     // Return value
     casadi_assert(get_n_reverse()>0);
-    Function ret = get_reverse(name, nadj, opts);
+    Function ret = get_reverse_old(name, nadj, opts);
 
     // Consistency check for inputs
     for (int i=0; i<ret.n_in(); ++i) {
@@ -1714,12 +1714,12 @@ namespace casadi {
     derivative_adj_[nadj] = fcn;
   }
 
-  Function FunctionInternal::get_forward(const std::string& name, int nfwd, Dict& opts) {
+  Function FunctionInternal::get_forward_old(const std::string& name, int nfwd, Dict& opts) {
     // TODO(@jaeandersson): Fallback on finite differences
     casadi_error("'get_forward' not defined for " + type_name());
   }
 
-  Function FunctionInternal::get_reverse(const std::string& name, int nadj, Dict& opts) {
+  Function FunctionInternal::get_reverse_old(const std::string& name, int nadj, Dict& opts) {
     casadi_error("'get_reverse' not defined for " + type_name());
   }
 
@@ -2417,7 +2417,7 @@ namespace casadi {
     }
 
     // Create derivative function
-    Function dfcn = forward(nfwd);
+    Function dfcn = forward_old(nfwd);
 
     // Create the evaluation node
     vector<MX> x = Call::create(dfcn, darg);
@@ -2499,7 +2499,7 @@ namespace casadi {
     }
 
     // Create derivative function
-    Function dfcn = reverse(nadj);
+    Function dfcn = reverse_old(nadj);
 
     // Create the evaluation node
     vector<MX> x = Call::create(dfcn, darg);

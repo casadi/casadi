@@ -1003,7 +1003,7 @@ namespace casadi {
     return ret;
   }
 
-  Function Integrator::get_forward(const std::string& name, int nfwd, Dict& opts) {
+  Function Integrator::get_forward_old(const std::string& name, int nfwd, Dict& opts) {
     log("Integrator::get_forward", "begin");
 
     // Integrator options
@@ -1147,7 +1147,7 @@ namespace casadi {
     return Function(name, ret_in, ret_out, opts);
   }
 
-  Function Integrator::get_reverse(const std::string& name, int nadj, Dict& opts) {
+  Function Integrator::get_reverse_old(const std::string& name, int nadj, Dict& opts) {
     log("Integrator::get_reverse", "begin");
 
     // Integrator options

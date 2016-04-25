@@ -220,7 +220,7 @@ namespace casadi {
   }
 
   Function PureMap
-  ::get_forward(const std::string& name, int nfwd, Dict& opts) {
+  ::get_forward_old(const std::string& name, int nfwd, Dict& opts) {
     // Differentiate mapped function
     Function df = f_.forward(nfwd);
 
@@ -232,7 +232,7 @@ namespace casadi {
   }
 
   Function PureMap
-  ::get_reverse(const std::string& name, int nadj, Dict& opts) {
+  ::get_reverse_old(const std::string& name, int nadj, Dict& opts) {
     // Differentiate mapped function
     Function df = f_.reverse(nadj);
 
@@ -409,7 +409,7 @@ namespace casadi {
   }
 
   Function MapSum
-  ::get_forward(const std::string& name, int nfwd, Dict& opts) {
+  ::get_forward_old(const std::string& name, int nfwd, Dict& opts) {
 
     // Differentiate mapped function
     Function df = f_.forward(nfwd);
@@ -443,7 +443,7 @@ namespace casadi {
   }
 
   Function MapSum
-  ::get_reverse(const std::string& name, int nadj, Dict& opts) {
+  ::get_reverse_old(const std::string& name, int nadj, Dict& opts) {
     // Differentiate mapped function
     Function df = f_.reverse(nadj);
 

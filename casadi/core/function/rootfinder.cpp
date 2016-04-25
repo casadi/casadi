@@ -188,7 +188,7 @@ Function Function::rootfinder_fun() {
   }
 
   Function Rootfinder
-  ::get_forward(const std::string& name, int nfwd, Dict& opts) {
+  ::get_forward_old(const std::string& name, int nfwd, Dict& opts) {
     // Symbolic expression for the input
     vector<MX> arg = mx_in();
     arg[iin_] = MX::sym(arg[iin_].name() + "_guess",
@@ -206,7 +206,7 @@ Function Function::rootfinder_fun() {
   }
 
   Function Rootfinder
-  ::get_reverse(const std::string& name, int nadj, Dict& opts) {
+  ::get_reverse_old(const std::string& name, int nadj, Dict& opts) {
     // Symbolic expression for the input
     vector<MX> arg = mx_in();
     arg[iin_] = MX::sym(arg[iin_].name() + "_guess",

@@ -173,7 +173,7 @@ namespace casadi {
   }
 
   Function Switch
-  ::get_forward(const std::string& name, int nfwd, Dict& opts) {
+  ::get_forward_old(const std::string& name, int nfwd, Dict& opts) {
     // Derivative of each case
     vector<Function> der(f_.size());
     for (int k=0; k<f_.size(); ++k) {
@@ -215,7 +215,7 @@ namespace casadi {
   }
 
   Function Switch
-  ::get_reverse(const std::string& name, int nadj, Dict& opts) {
+  ::get_reverse_old(const std::string& name, int nadj, Dict& opts) {
     // Derivative of each case
     vector<Function> der(f_.size());
     for (int k=0; k<f_.size(); ++k) {
