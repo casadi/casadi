@@ -67,6 +67,7 @@ inline void casadi_decompress(const int* sp, int* nrow, int* ncol,
     /* Scalar sparsity pattern if sp is null */
     const int scalar_colind[2] = {0, 1};
     *nrow = *nrow = 1;
+    *nnz = *numel = 1;
     *colind = scalar_colind;
     *row = 0;
   } else {
