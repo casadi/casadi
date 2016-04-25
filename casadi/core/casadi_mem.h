@@ -69,6 +69,7 @@ inline void casadi_decompress(const int* sp, int* nrow, int* ncol,
     *nrow = *nrow = 1;
     *colind = scalar_colind;
     *row = 0;
+    return;
   }
 
   /* Decompress */
