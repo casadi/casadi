@@ -101,6 +101,7 @@ typedef struct {
   casadi_functions* f;
 
   /* Work arrays */
+  int sz_arg, sz_res, sz_iw, sz_w;
   const real_t** arg;
   real_t** res;
   int* iw;
@@ -113,30 +114,57 @@ typedef struct {
   casadi_io* out;
 } casadi_mem;
 
-/* Allocate memory */
-inline casadi_mem* casadi_alloc(casadi_functions* f) {
-  int i;
-  assert(f!=0);
+/* Initialize */
+inline void casadi_init(casadi_mem* mem, casadi_functions* f) {
+  int flag;
 
-  /* Allocate memory */
-  casadi_mem* mem = (casadi_mem*)malloc(sizeof(casadi_mem));
+  /* Check arguments */
   assert(mem!=0);
+  assert(f!=0);
 
   /* Store function pointers */
   mem->f = f;
 
   /* Increase reference counter */
-  if (mem->f->incref) mem->f->incref();
+  if (f->incref) f->incref();
 
   /* Number of inputs and outputs */
   mem->n_in = f->n_in ? f->n_in() : 1;
   mem->n_out = f->n_out ? f->n_out() : 1;
 
-  /* Allocate io memory */
-  mem->in = (casadi_io*)malloc(mem->n_in*sizeof(casadi_io));
-  assert(mem->n_in==0 || mem->in!=0);
-  mem->out = (casadi_io*)malloc(mem->n_out*sizeof(casadi_io));
-  assert(mem->n_out==0 || mem->out!=0);
+  /* Work vector sizes */
+  mem->sz_arg=mem->n_in;
+  mem->sz_res=mem->n_out;
+  mem->sz_iw= mem->sz_w = 0;
+  if (f->work) {
+    flag = f->work(&mem->sz_arg, &mem->sz_res, &mem->sz_iw, &mem->sz_w);
+    assert(flag==0);
+  }
+
+  /* No io structs allocated */
+  mem->in = 0;
+  mem->out = 0;
+
+  /* No work vectors allocated */
+  mem->arg = 0;
+  mem->res = 0;
+  mem->iw = 0;
+  mem->w = 0;
+}
+
+/* Free claimed static memory */
+inline void casadi_deinit(casadi_mem* mem) {
+  assert(mem!=0);
+
+  /* Decrease reference counter */
+  if (mem->f->decref) mem->f->decref();
+}
+
+/* Initialize */
+inline void casadi_init_arrays(casadi_mem* mem) {
+  int i;
+  assert(mem!=0);
+  casadi_functions* f = mem->f;
 
   /* Input meta data */
   for (i=0; i<mem->n_in; ++i) {
@@ -155,38 +183,31 @@ inline casadi_mem* casadi_alloc(casadi_functions* f) {
                       &mem->out[i].nnz, &mem->out[i].numel,
                       &mem->out[i].colind, &mem->out[i].row);
   }
+}
 
-  /* Work vector sizes */
-  int sz_arg=mem->n_in, sz_res=mem->n_out, sz_iw=0, sz_w=0;
-  if (f->work) {
-    int flag = f->work(&sz_arg, &sz_res, &sz_iw, &sz_w);
-    assert(flag==0);
-  }
+/* Allocate dynamic memory */
+inline int casadi_alloc_arrays(casadi_mem* mem) {
+  /* Allocate io memory */
+  mem->in = (casadi_io*)malloc(mem->n_in*sizeof(casadi_io));
+  if (mem->n_in!=0 && mem->in==0) return 1;
+  mem->out = (casadi_io*)malloc(mem->n_out*sizeof(casadi_io));
+  if (mem->n_out!=0 && mem->out==0) return 1;
 
   /* Allocate work vectors */
-  mem->arg = (const real_t**)malloc(sz_arg*sizeof(const real_t*));
-  assert(sz_arg==0 || mem->arg!=0);
-  mem->res = (real_t**)malloc(sz_res*sizeof(real_t*));
-  assert(sz_res==0 || mem->res!=0);
-  mem->iw = (int*)malloc(sz_iw*sizeof(int));
-  assert(sz_iw==0 || mem->iw!=0);
-  mem->w = (real_t*)malloc(sz_w*sizeof(real_t));
-  assert(sz_w==0 || mem->w!=0);
+  mem->arg = (const real_t**)malloc(mem->sz_arg*sizeof(const real_t*));
+  if (mem->sz_arg!=0 && mem->arg==0) return 1;
+  mem->res = (real_t**)malloc(mem->sz_res*sizeof(real_t*));
+  if (mem->sz_res!=0 && mem->res==0) return 1;
+  mem->iw = (int*)malloc(mem->sz_iw*sizeof(int));
+  if (mem->sz_iw!=0 && mem->iw==0) return 1;
+  mem->w = (real_t*)malloc(mem->sz_w*sizeof(real_t));
+  if (mem->sz_w!=0 && mem->w==0) return 1;
 
-  /* Checkout memory object (TODO) */
-  mem->mem = 0;
-
-  return mem;
+  return 0;
 }
 
-/* Evaluate */
-inline int casadi_eval(casadi_mem* mem) {
-  assert(mem!=0);
-  return mem->f->eval(mem->arg, mem->res, mem->iw, mem->w, mem->mem);
-}
-
-/* Free memory */
-inline void casadi_free(casadi_mem* mem) {
+/* Free dynamic memory */
+inline void casadi_free_arrays(casadi_mem* mem) {
   assert(mem!=0);
 
   /* Free io meta data */
@@ -198,9 +219,44 @@ inline void casadi_free(casadi_mem* mem) {
   if (mem->res) free(mem->res);
   if (mem->iw) free(mem->iw);
   if (mem->w) free(mem->w);
+}
 
-  /* Decrease reference counter */
-  if (mem->f->decref) mem->f->decref();
+/* Evaluate */
+inline int casadi_eval(casadi_mem* mem) {
+  assert(mem!=0);
+  return mem->f->eval(mem->arg, mem->res, mem->iw, mem->w, mem->mem);
+}
+
+/* Create a memory struct with dynamic memory allocation */
+inline casadi_mem* casadi_alloc(casadi_functions* f) {
+  int flag;
+
+  /* Allocate struct */
+  casadi_mem* mem = (casadi_mem*)malloc(sizeof(casadi_mem));
+  assert(mem!=0);
+
+  /* Initialize struct */
+  casadi_init(mem, f);
+
+  /* Dynamically allocate arrays */
+  flag = casadi_alloc_arrays(mem);
+  assert(flag==0);
+
+  /* Initialize allocated arrays */
+  casadi_init_arrays(mem);
+
+  return mem;
+}
+
+/* Free memory struct */
+inline void casadi_free(casadi_mem* mem) {
+  assert(mem!=0);
+
+  /* Free dynamically allocated arrays */
+  casadi_free_arrays(mem);
+
+  /* Free claimed static memory */
+  casadi_deinit(mem);
 
   /* Free memory structure */
   free(mem);
