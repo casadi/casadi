@@ -2106,7 +2106,8 @@ namespace casadi {
         << "    " << fname << "_name_out," << endl
         << "    " << fname << "_sparsity_in," << endl
         << "    " << fname << "_sparsity_out," << endl
-        << "    " << fname << "_work" << endl
+        << "    " << fname << "_work," << endl
+        << "    " << fname << endl
         << "  };" << endl
         << "  return &fun;" << endl
         << "}" << endl;
