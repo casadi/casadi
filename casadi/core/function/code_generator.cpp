@@ -99,8 +99,8 @@ namespace casadi {
 
     // Memory struct entry point
     if (this->with_mem) {
-      addInclude("casadi_mem.h");
-      this->header << "#include <casadi_mem.h>" << endl;
+      addInclude("casadi_mem.h", true);
+      this->header << "#include \"casadi_mem.h\"" << endl;
     }
 
     // Mex file?
