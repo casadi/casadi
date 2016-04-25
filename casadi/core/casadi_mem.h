@@ -30,8 +30,9 @@
 extern "C" {
 #endif
 
-/* Needed for malloc and free */
+#ifndef CASADI_STATIC
 #include <stdlib.h>
+#endif /* CASADI_STATIC */
 #include <assert.h>
 
 /* Floating point type */
@@ -191,6 +192,7 @@ inline void casadi_init_arrays(casadi_mem* mem) {
 }
 
 /* Allocate dynamic memory */
+#ifndef CASADI_STATIC
 inline int casadi_alloc_arrays(casadi_mem* mem) {
   /* Allocate io memory */
   mem->in = (casadi_io*)malloc(mem->n_in*sizeof(casadi_io));
@@ -210,8 +212,10 @@ inline int casadi_alloc_arrays(casadi_mem* mem) {
 
   return 0;
 }
+#endif /* CASADI_STATIC */
 
 /* Free dynamic memory */
+#ifndef CASADI_STATIC
 inline void casadi_free_arrays(casadi_mem* mem) {
   assert(mem!=0);
 
@@ -225,6 +229,7 @@ inline void casadi_free_arrays(casadi_mem* mem) {
   if (mem->iw) free(mem->iw);
   if (mem->w) free(mem->w);
 }
+#endif /* CASADI_STATIC */
 
 /* Evaluate */
 inline int casadi_eval(casadi_mem* mem) {
@@ -233,6 +238,7 @@ inline int casadi_eval(casadi_mem* mem) {
 }
 
 /* Create a memory struct with dynamic memory allocation */
+#ifndef CASADI_STATIC
 inline casadi_mem* casadi_alloc(casadi_functions* f) {
   int flag;
 
@@ -252,8 +258,10 @@ inline casadi_mem* casadi_alloc(casadi_functions* f) {
 
   return mem;
 }
+#endif /* CASADI_STATIC */
 
 /* Free memory struct */
+#ifndef CASADI_STATIC
 inline void casadi_free(casadi_mem* mem) {
   assert(mem!=0);
 
@@ -266,6 +274,7 @@ inline void casadi_free(casadi_mem* mem) {
   /* Free memory structure */
   free(mem);
 }
+#endif /* CASADI_STATIC */
 
 #ifdef __cplusplus
 }
