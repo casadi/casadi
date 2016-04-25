@@ -63,22 +63,21 @@ typedef struct {
 inline void casadi_decompress(const int* sp, int* nrow, int* ncol,
                               int* nnz, int* numel,
                               const int** colind, const int** row) {
-  /* Scalar sparsity pattern if sp is null */
   if (sp==0) {
+    /* Scalar sparsity pattern if sp is null */
     const int scalar_colind[2] = {0, 1};
     *nrow = *nrow = 1;
     *colind = scalar_colind;
     *row = 0;
-    return;
+  } else {
+    /* Decompress */
+    *nrow = *sp++;
+    *ncol = *sp++;
+    *colind = sp;
+    *nnz = sp[*ncol];
+    *numel = *nrow * *ncol;
+    *row = *nnz==*numel ? 0 : sp + *ncol + 1;
   }
-
-  /* Decompress */
-  *nrow = *sp++;
-  *ncol = *sp++;
-  *colind = sp;
-  *nnz = sp[*ncol];
-  *numel = *nrow * *ncol;
-  *row = *nnz==*numel ? 0 : sp + *ncol + 1;
 }
 
 /* All entry points */
