@@ -2096,17 +2096,19 @@ namespace casadi {
 
     if (g.with_mem) {
       // Allocate memory
-      s << g.declare("void " + fname + "_functions(casadi_functions* f)") << " {" << endl
-        << "  f->incref = " << fname << "_incref;" << endl
-        << "  f->decref = " << fname << "_decref;" << endl
-        << "  f->n_in = " << fname << "_n_in;" << endl
-        << "  f->n_out = " << fname << "_n_out;" << endl
-        << "  f->name_in = " << fname << "_name_in;" << endl
-        << "  f->name_out = " << fname << "_name_out;" << endl
-        << "  f->sparsity_in = " << fname << "_sparsity_in;" << endl
-        << "  f->sparsity_out = " << fname << "_sparsity_out;" << endl
-        << "  f->work = " << fname << "_work;" << endl
-        << "  f->eval = " << fname << ";" << endl
+      s << g.declare("casadi_functions* " + fname + "_functions(void)") << " {" << endl
+        << "  static casadi_functions fun = {" << endl
+        << "    " << fname << "_incref," << endl
+        << "    " << fname << "_decref," << endl
+        << "    " << fname << "_n_in," << endl
+        << "    " << fname << "_n_out," << endl
+        << "    " << fname << "_name_in," << endl
+        << "    " << fname << "_name_out," << endl
+        << "    " << fname << "_sparsity_in," << endl
+        << "    " << fname << "_sparsity_out," << endl
+        << "    " << fname << "_work" << endl
+        << "  };" << endl
+        << "  return &fun;" << endl
         << "}" << endl;
     }
   }
