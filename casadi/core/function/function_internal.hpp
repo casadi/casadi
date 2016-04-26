@@ -881,7 +881,7 @@ namespace casadi {
   // Template implementations
   template<typename MatType>
   bool FunctionInternal::purgable(const std::vector<MatType>& v) {
-    for (typename std::vector<MatType>::const_iterator i=v.begin(); i!=v.end(); ++i) {
+    for (auto i=v.begin(); i!=v.end(); ++i) {
       if (!i->is_zero()) return false;
     }
     return true;
@@ -894,9 +894,7 @@ namespace casadi {
     for (int dir=0; dir<nfwd; ++dir) {
       // Replace symbolic inputs
       int iind=0;
-      for (typename std::vector<MatType>::iterator i=fseed[dir].begin();
-          i!=fseed[dir].end();
-          ++i, ++iind) {
+      for (auto i=fseed[dir].begin(); i!=fseed[dir].end(); ++i, ++iind) {
         // Name of the forward seed
         std::stringstream ss;
         ss << "f";

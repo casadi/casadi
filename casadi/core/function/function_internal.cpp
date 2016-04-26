@@ -1883,13 +1883,34 @@ namespace casadi {
   }
 
   Function FunctionInternal::get_forward_old(const std::string& name, int nfwd, Dict& opts) {
-    // TODO(@jaeandersson): Fallback on finite differences
     casadi_error("'get_forward' not defined for " + type_name());
   }
 
   Function FunctionInternal::get_forward(const std::string& name, int nfwd, Dict& opts) {
-    // TODO(@jaeandersson): Fallback on finite differences
-    casadi_error("'get_forward' not defined for " + type_name());
+    // Call old implementation
+    Function d = forward_old(nfwd);
+    // Get expressions for inputs and outputs
+    vector<MX> arg = MX::get_input(d);
+    vector<MX> res = d(arg);
+    // Concatenate inputs
+    vector<MX> v(nfwd);
+    for (int i=0; i<n_in(); ++i) {
+      for (int d=0; d<nfwd; ++d) {
+        v[d] = arg.at((d+1)*n_in()+n_out()+i);
+      }
+      arg.at(n_in()+n_out()+i) = horzcat(v);
+    }
+    arg.resize(n_in()+n_out()+n_in());
+    // Concatenate outputs
+    for (int i=0; i<n_out(); ++i) {
+      for (int d=0; d<nfwd; ++d) {
+        v[d] = res.at(d*n_out()+i);
+      }
+      res.at(i) = horzcat(v);
+    }
+    res.resize(n_out());
+    // Construct new function
+    return Function(name, arg, res, opts);
   }
 
   Function FunctionInternal::get_reverse_old(const std::string& name, int nadj, Dict& opts) {
@@ -1897,7 +1918,30 @@ namespace casadi {
   }
 
   Function FunctionInternal::get_reverse(const std::string& name, int nadj, Dict& opts) {
-    casadi_error("'get_reverse' not defined for " + type_name());
+    // Call old implementation
+    Function d = reverse_old(nadj);
+    // Get expressions for inputs and outputs
+    vector<MX> arg = MX::get_input(d);
+    vector<MX> res = d(arg);
+    // Concatenate inputs
+    vector<MX> v(nadj);
+    for (int i=0; i<n_out(); ++i) {
+      for (int d=0; d<nadj; ++d) {
+        v[d] = arg.at(n_in()+(d+1)*n_out()+i);
+      }
+      arg.at(n_in()+n_out()+i) = horzcat(v);
+    }
+    arg.resize(n_in()+n_out()+n_out());
+    // Concatenate outputs
+    for (int i=0; i<n_in(); ++i) {
+      for (int d=0; d<nadj; ++d) {
+        v[d] = res.at(d*n_in()+i);
+      }
+      res.at(i) = horzcat(v);
+    }
+    res.resize(n_in());
+    // Construct new function
+    return Function(name, arg, res, opts);
   }
 
   int FunctionInternal::nnz_in() const {
