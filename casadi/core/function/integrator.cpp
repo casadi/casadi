@@ -630,10 +630,8 @@ namespace casadi {
       casadi_assert(res_it==g_res.end());
     }
 
-    // Adjoint derivatives of f
-    f_arg.resize(DAE_NUM_IN);
-
     // Collect arguments for calling d
+    f_arg.insert(f_arg.end(), f_res.begin(), f_res.end());
     tmp.resize(DAE_NUM_OUT);
     fill(tmp.begin(), tmp.end(), MatType());
     for (int dir=0; dir<nadj; ++dir) {
@@ -644,9 +642,9 @@ namespace casadi {
     }
 
     // Call der
-    Function d = f_.derivative(0, nadj);
-    vector<MatType> res = d(f_arg);
-    res_it = res.begin() + DAE_NUM_OUT;
+    Function d1 = f_.reverse(nadj);
+    vector<MatType> res = d1(f_arg);
+    res_it = res.begin();
 
     // Record locations in augg for later
     int g_ode_ind = g_ode.size();
@@ -669,7 +667,7 @@ namespace casadi {
     if (!g_.is_null()) {
 
       // Adjoint derivatives of g
-      d = g_.derivative(0, nadj);
+      Function d = g_.derivative(0, nadj);
       g_arg.resize(RDAE_NUM_IN);
       g_arg.reserve(d.n_in());
 
