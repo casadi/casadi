@@ -55,6 +55,48 @@ namespace casadi {
       map_in[dual_name] = XType::sym(dual_name, out_[i].sparsity());
     }
 
+    // Forward directional derivative seeds
+    vector<XType> fwd_in, fwd_seed;
+    for (int i=0; i<in_.size(); ++i) {
+      string fwd_name = "fwd_" + ischeme_[i];
+      for (auto&& e : s_in) {
+        if (e==fwd_name) {
+          fwd_in.push_back(in_[i]);
+          fwd_seed.push_back(XType::sym(fwd_name, fwd_in.back().sparsity()));
+          map_in[fwd_name] = fwd_seed.back();
+          break;
+        }
+      }
+    }
+
+    // Forward directional derivatives
+    if (!fwd_in.empty()) {
+      // Which expressions to differentiate
+      vector<XType> fwd_out;
+      vector<string> fwd_name;
+      for (int i=0; i<out_.size(); ++i) {
+        string n = "fwd_" + oscheme_[i];
+        for (auto&& e : s_out) {
+          if (e==n) {
+            fwd_out.push_back(out_[i]);
+            fwd_name.push_back(n);
+            break;
+          }
+        }
+      }
+      casadi_assert(!fwd_out.empty());
+
+      // Calculate directional derivatives
+      Function df("df", fwd_in, fwd_out);
+      vector<vector<XType>> fwd_sens;
+      df.forward(fwd_in, fwd_out, {fwd_seed}, fwd_sens, true, false);
+
+      // Gather derivatives
+      for (int i=0; i<fwd_name.size(); ++i) {
+        map_out[fwd_name[i]] = project(fwd_sens.at(0).at(i), fwd_out[i].sparsity());
+      }
+    }
+
     // Add linear combinations
     for (auto i : lincomb) {
       XType lc = 0;
@@ -105,7 +147,7 @@ namespace casadi {
       // Try to locate in list of outputs
       auto it = map_out.find(s);
       if (it!=map_out.end()) {
-        // Non-differentiated output
+        // Already treated
         r = it->second;
       } else {
         // Must be an operator
@@ -317,4 +359,3 @@ namespace casadi {
   }
 
 } // namespace casadi
-
