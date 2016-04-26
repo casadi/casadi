@@ -444,8 +444,6 @@ namespace casadi {
     if (!g_.is_null()) {
 
       // Forward derivatives of g
-      Function d = g_.derivative(nfwd, 0);
-      g_arg.reserve(d.n_in());
       tmp.resize(RDAE_NUM_IN);
       fill(tmp.begin(), tmp.end(), MatType());
 
@@ -465,8 +463,17 @@ namespace casadi {
         g_arg.insert(g_arg.end(), tmp.begin(), tmp.end());
       }
 
+      // Get nondifferentiated expressions
+      arg1 = vector<MatType>(g_arg.begin(), g_arg.begin()+RDAE_NUM_IN);
+      res1 = g_(arg1);
+      vector<MatType> g_arg1 = arg1;
+      g_arg1.insert(g_arg1.end(), res1.begin(), res1.end());
+      g_arg1.insert(g_arg1.end(), g_arg.begin()+RDAE_NUM_IN, g_arg.end());
+
       // Call d
-      res = d(g_arg);
+      d1 = g_.forward(nfwd);
+      res = d1(g_arg1);
+      res.insert(res.begin(), res1.begin(), res1.end());
       res_it = res.begin();
 
       // Collect right-hand-sides
