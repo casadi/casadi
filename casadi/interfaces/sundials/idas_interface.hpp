@@ -341,6 +341,16 @@ namespace casadi {
     enum JTimesOut {
       JTIMES_FWD_ODE, JTIMES_FWD_ALG, JTIMES_NUM_OUT
     };
+
+    // jtimesB signature
+    enum JTimesBIn {
+      JTIMESB_T, JTIMESB_X, JTIMESB_Z, JTIMESB_P,
+      JTIMESB_RX, JTIMESB_RZ, JTIMESB_RP,
+      JTIMESB_FWD_RX, JTIMESB_FWD_RZ, JTIMESB_NUM_IN
+    };
+    enum JTimesBOut {
+      JTIMESB_FWD_RODE, JTIMESB_FWD_RALG, JTIMESB_NUM_OUT
+    };
   };
 
 } // namespace casadi

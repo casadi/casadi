@@ -164,7 +164,7 @@ namespace casadi {
 
     // Jacobian times vector functions
     Function g_fwd_;
-    Function jtimes_, rjtimes_;
+    Function jtimes_, jtimesB_;
 
     /** \brief  Get the integrator Jacobian for the forward problem */
     virtual Function getJac()=0;
