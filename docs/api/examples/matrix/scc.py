@@ -26,16 +26,16 @@ import numpy
 
 # Let's construct a block diagonal structure
 A = diagcat(1,DM([[2,3],[3,4]]),DM([[5,6,7],[6,8,9],[7,9,10]]),11)
-print A
+print(A)
 A.sparsity().spy()
 
 numpy.random.seed(2)
 
 # We randomly permute this nice structure
-perm =  list(numpy.random.permutation(range(A.size1())))
+perm =  list(numpy.random.permutation(list(range(A.size1()))))
 AP = A[perm,perm]
 
-print AP
+print(AP)
 AP.sparsity().spy()
 
 # And use scc to recover the blocks
@@ -43,7 +43,7 @@ n,p,r = AP.sparsity().scc()
 
 APrestored = AP[p,p]
 
-print APrestored
+print(APrestored)
 APrestored.sparsity().spy()
-print "# blocks: ", n
-print "block boundaries: ", r[:n]
+print("# blocks: ", n)
+print("block boundaries: ", r[:n])

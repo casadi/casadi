@@ -29,8 +29,8 @@ b1 = DM([[2,3],[4,5]])
 b2 = DM([[6,7,8],[9,10,11],[12,13,14]])
 A = diagcat(1,b1,b2,15)
 
-print "original: "
-print A
+print("original: ")
+print(A)
 
 #! Ruin the nice structure
 numpy.random.seed(0)
@@ -40,17 +40,17 @@ p2 = numpy.random.permutation(A.size2())
 S = A[p1,:]
 #S = A[p1,p2]
 
-print "randomly permuted: "
-print S
+print("randomly permuted: ")
+print(S)
 nb, rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock = S.sparsity().btf()
 
-print "number of blocks: ", nb
-print "rowperm: ", rowperm
-print "colperm: ", colperm
-print "restored:"
-print S[rowperm,colperm]
-print "rowblock: ", rowblock
-print "colblock: ", colblock
-print "coarse_rowblock: ", coarse_rowblock
-print "coarse_colblock: ", coarse_colblock
+print("number of blocks: ", nb)
+print("rowperm: ", rowperm)
+print("colperm: ", colperm)
+print("restored:")
+print(S[rowperm,colperm])
+print("rowblock: ", rowblock)
+print("colblock: ", colblock)
+print("coarse_rowblock: ", coarse_rowblock)
+print("coarse_colblock: ", coarse_colblock)
 

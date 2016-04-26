@@ -49,7 +49,7 @@ if has_nlpsol("ipopt") and has_nlpsol("sqpmethod"):
   solvers.append(("sqpmethod",{"qpsol": "nlpsol","qpsol_options": qpsol_options}))
   solvers.append(("sqpmethod",{"qpsol": "nlpsol","qpsol_options": qpsol_options,"hessian_approximation": "limited-memory","tol_du":1e-10,"tol_pr":1e-10}))
 
-print solvers
+print(solvers)
 """
 try:
   load_nlpsol("knitro")
@@ -479,9 +479,9 @@ class NLPtests(casadiTestCase):
       solver_in["lbg"]=[-10]*N
       solver_in["ubg"]=[10]*N
       solver_out = solver(**solver_in)
-      print "residuals"
-      print array(solver_out["x"]).squeeze()-x0
-      print "bazmeg", solver_out["f"]
+      print("residuals")
+      print(array(solver_out["x"]).squeeze()-x0)
+      print("bazmeg", solver_out["f"])
       self.assertAlmostEqual(solver_out["f"][0],0,10,str(Solver))
       self.checkarray(array(solver_out["x"]).squeeze(),x0,str(Solver),digits=8)
       self.checkarray(solver_out["lam_x"],DM([0]*10),8,str(Solver),digits=8)
@@ -749,8 +749,8 @@ class NLPtests(casadiTestCase):
     N = 50 
 
     x = SX.sym("x",N)
-    x0 = DM(range(N))
-    H = diag(range(1,N+1))
+    x0 = DM(list(range(N)))
+    H = diag(list(range(1,N+1)))
     obj = 0.5*mtimes([(x-x0).T,H,(x-x0)])
 
     nlp = {'x':x, 'f':obj}
@@ -905,8 +905,8 @@ class NLPtests(casadiTestCase):
   def test_permute(self):
     for Solver, solver_options in solvers:
       if "snopt" not in str(Solver): continue
-      for permute_g in itertools.permutations(range(3)):
-        for permute_x in itertools.permutations(range(4)):
+      for permute_g in itertools.permutations(list(range(3))):
+        for permute_x in itertools.permutations(list(range(4))):
           x=SX.sym("x",4)
           x1,x2,x3,x4 = x[permute_x]
           g = [x1**2+x2**2+x3,
@@ -945,8 +945,8 @@ class NLPtests(casadiTestCase):
   def test_permute2(self):
     for Solver, solver_options in solvers:
       if "snopt" not in str(Solver): continue
-      for permute_g in itertools.permutations(range(3)):
-        for permute_x in itertools.permutations(range(4)):
+      for permute_g in itertools.permutations(list(range(3))):
+        for permute_x in itertools.permutations(list(range(4))):
           x=SX.sym("x",4)
           x1,x2,x3,x4 = x[permute_x]
           g = [x1**2+x2+x3,
@@ -985,8 +985,8 @@ class NLPtests(casadiTestCase):
   def test_permute3(self):
     for Solver, solver_options in solvers:
       if "snopt" not in str(Solver): continue
-      for permute_g in itertools.permutations(range(3)):
-        for permute_x in itertools.permutations(range(4)):
+      for permute_g in itertools.permutations(list(range(3))):
+        for permute_x in itertools.permutations(list(range(4))):
           x=SX.sym("x",4)
           x1,x2,x3,x4 = x[permute_x]
           g = [x1**2+x2+x3,
@@ -1129,4 +1129,3 @@ class NLPtests(casadiTestCase):
 if __name__ == '__main__':
     unittest.main()
     print solvers
-

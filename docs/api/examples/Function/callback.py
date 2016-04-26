@@ -44,7 +44,7 @@ class Fac(Callback):
   def eval(self, arg):
     x = arg[0]
     y = 1
-    for i in range(x):
+    for i in range(int(x)):
       y*=(i+1)
     return [y]
 
@@ -53,7 +53,7 @@ fac = Fac('fac')
 #! Evaluate numerically
 y = fac(4)
 
-print "4! = ", y
+print("4! = ", y)
 
 #! Using the function in a graph
 #!==============================
@@ -65,4 +65,4 @@ f = Function('f', [x],[y])
 
 y = f(5)
 
-print "5! = ", y
+print("5! = ", y)

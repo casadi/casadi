@@ -56,9 +56,9 @@ integrators.append(("collocation",["dae","ode"],{"rootfinder":"kinsol","number_o
 
 integrators.append(("rk",["ode"],{"number_of_finite_elements": 1000}))
 
-print "Will test these integrators:"
+print("Will test these integrators:")
 for cl, t, options in integrators:
-  print cl, " : ", t
+  print(cl, " : ", t)
 
 class Integrationtests(casadiTestCase):
 
@@ -205,9 +205,9 @@ class Integrationtests(casadiTestCase):
             dae = din.copy()
             dae.update(dout)
             dae.update(rdin)
-            for k, v in rdout.iteritems(): dae['r'+k] = v
+            for k, v in rdout.items(): dae['r'+k] = v
             
-            for k in solution.keys():
+            for k in list(solution.keys()):
               solution[k] = substitute(solution[k],vertcat(*[tstart,tend]),vertcat(*[tstart_,tend_]))
 
             sol = solutionin.copy()
@@ -235,7 +235,7 @@ class Integrationtests(casadiTestCase):
             for a_options in solveroptions("B"):
               for f_options in solveroptions():
                 message = "f_options: %s , a_options: %s" % (str(f_options) , str(a_options))
-                print message
+                print(message)
                 opts = {}
                 opts["exact_jacobianB"] = True
                 opts["gather_stats"] = True
@@ -244,22 +244,22 @@ class Integrationtests(casadiTestCase):
                 opts["t0"] = tstart_
                 opts["tf"] = tend_
                 for op in (options, f_options, a_options):
-                  for (k,v) in op.items():
+                  for (k,v) in list(op.items()):
                     opts[k] = v
                 integrator = casadi.integrator("integrator", Integrator, dae, opts)
                 integrator_in = {}
-                for k,v in point.items():
+                for k,v in list(point.items()):
                   if not fs.sparsity_in(k).is_empty():
                     integrator_in[k]=v
 
                 integrator_out = integrator(**integrator_in)
                 fs_out = fs(**integrator_in)
-                print "res=",integrator_out["xf"]-fs_out["xf"], fs_out["xf"]
-                print "Rres=",integrator_out["rxf"]-fs_out["rxf"], fs_out["rxf"]
+                print("res=",integrator_out["xf"]-fs_out["xf"], fs_out["xf"])
+                print("Rres=",integrator_out["rxf"]-fs_out["rxf"], fs_out["rxf"])
                 # self.checkarray(integrator_out["rxf"],fs_out["rxf"],digits=4)
                 stats = integrator.stats()
                 
-                print stats
+                print(stats)
                 self.assertTrue(stats["nsteps"]<1500)
                 self.assertTrue(stats["nstepsB"]<2500)
                 self.assertTrue(stats["nlinsetups"]<100)
@@ -319,9 +319,9 @@ class Integrationtests(casadiTestCase):
           dae = din.copy()
           dae.update(dout)
           dae.update(rdin)
-          for k, v in rdout.iteritems(): dae['r'+k] = v
+          for k, v in rdout.items(): dae['r'+k] = v
             
-          for k in solution.keys():
+          for k in list(solution.keys()):
             solution[k] = substitute(solution[k],vertcat(*[tstart,tend]),vertcat(*[tstart_,tend_]))
           
           sol = solutionin.copy()
@@ -348,19 +348,19 @@ class Integrationtests(casadiTestCase):
           for a_options in solveroptions("B"):
             for f_options in solveroptions():
               message = "f_options: %s , a_options: %s" % (str(f_options) , str(a_options))
-              print message
+              print(message)
 
               opts = {}
               opts["exact_jacobianB"] = True
               opts["t0"] = tstart_
               opts["tf"] = tend_
               for op in (options, f_options, a_options):
-                 for (k,v) in op.items():
+                 for (k,v) in list(op.items()):
                     opts[k] = v
               integrator = casadi.integrator("integrator", Integrator, dae, opts)
               integrator_in = {}
               
-              for k,v in point.items():
+              for k,v in list(point.items()):
                 if not integrator.sparsity_in(k).is_empty():
                   integrator_in[k]=v
 
@@ -475,18 +475,18 @@ class Integrationtests(casadiTestCase):
         yield (["ode"],{'x':q,'p':p},{'ode': vertcat(*[q[1],p[0]+q[1]**2 ])},{},{},{'x0':q, 'p': p} ,{'xf': vertcat(*[s1,s2])},{'x0': A, 'p': p0},(0,0.4) )
       
       for tt in checks():
-        print tt
+        print(tt)
         for p_features, din, dout, rdin, rdout, solutionin, solution, point, (tstart_, tend_) in variations(*tt):
           if p_features[0] in features:
             message = "%s: %s => %s, %s => %s, explicit (%s) tstart = %f" % (Integrator,str(din),str(dout),str(rdin),str(rdout),str(solution),tstart_)
-            print message
+            print(message)
 
             dae = din.copy()
             dae.update(dout)
             dae.update(rdin)
-            for k, v in rdout.iteritems(): dae['r'+k] = v
+            for k, v in rdout.items(): dae['r'+k] = v
             
-            for k in solution.keys():
+            for k in list(solution.keys()):
               solution[k] = substitute(solution[k],vertcat(*[tstart,tend]),vertcat(*[tstart_,tend_]))
             
             sol = solutionin.copy()
@@ -506,7 +506,7 @@ class Integrationtests(casadiTestCase):
             integrator = casadi.integrator("integrator", Integrator, dae, opts)
             integrator_in = {}
           
-            for k,v in point.items():
+            for k,v in list(point.items()):
               if not integrator.sparsity_in(k).is_empty():
                 integrator_in[k]=v
 
@@ -576,7 +576,7 @@ class Integrationtests(casadiTestCase):
     ## Integrate
     integrator_out = integrator(**integrator_in)
     # print result
-    print integrator_out["xf"]
+    print(integrator_out["xf"])
     
   def test_issue92(self):
     self.message("regression check for issue 92")
@@ -601,7 +601,7 @@ class Integrationtests(casadiTestCase):
 
     J=f.jacobian(0)
     J_out = J([1,0])
-    print "jac=",J_out[0].nz[0]-exp(1)
+    print("jac=",J_out[0].nz[0]-exp(1))
     self.assertAlmostEqual(J_out[0][0,0],exp(1),5,"Evaluation output mismatch")
     
   def test_eval(self):
@@ -691,7 +691,7 @@ class Integrationtests(casadiTestCase):
     J=qe.jacobian(0)
     J_out = J(A, p0)
     outB=J_out[0].full()
-    print outA-outB
+    print(outA-outB)
     
   def test_hess3(self):
     self.message('CVodes integration: hessian to p: Jacobian of integrator.jacobian')
@@ -740,7 +740,7 @@ class Integrationtests(casadiTestCase):
 
     JT = Function("JT", [q0,p],[MX.jac(qe, 1,0)[0].T])
     JT_out = JT([num['q0']], [num['p']])
-    print JT_out
+    print(JT_out)
 
     H  = JT.jacobian(1)
     H_out = H([num['q0']], [num['p']])
@@ -838,7 +838,7 @@ class Integrationtests(casadiTestCase):
     return # this should return identical zero
     H=qeJ.jacobian(0,0)
     H_out = H(A, vec(B))
-    print array(H_out[0])
+    print(array(H_out[0]))
     
     
   def test_mathieu_system(self):
@@ -870,7 +870,7 @@ class Integrationtests(casadiTestCase):
     qendJ =qendJ(x0=q0,p=par)['dxf_dx0']
     qeJ=Function("qeJ", [q0,par],[qendJ])
     qe_out = qe(A, B)
-    print array(qe_out)
+    print(array(qe_out))
 
   def test_nl_system(self):
     """
@@ -914,8 +914,8 @@ class Integrationtests(casadiTestCase):
     qeJ=Function("qeJ", [q0,par],[qendJ])
     qe_out = qe(A, p0)
 
-    print qe_out[0]
-    print qe_out[1]
+    print(qe_out[0])
+    print(qe_out[1])
     
     self.assertAlmostEqual(qe_out[0],(2*y0-log(yc0**2/p0+1))/2-log(cos(arctan(yc0/sqrt(p0))+sqrt(p0)*te)),11,"Nonlin ODE")
     self.assertAlmostEqual(qe_out[1],sqrt(p0)*tan(arctan(yc0/sqrt(p0))+sqrt(p0)*te),11,"Nonlin ODE")
@@ -957,8 +957,8 @@ class Integrationtests(casadiTestCase):
     def sec(x):
       return 1.0/cos(x)
     Hr = array([[0,0],[0,-(2*yc0*tan(arctan(yc0)+te))/(yc0**4+2*yc0**2+1)+sec(arctan(yc0)+te)**2/(yc0**4+2*yc0**2+1)+(2*yc0**2)/(yc0**4+2*yc0**2+1)-1/(yc0**2+1)],[0,0],[0,-(2*yc0*tan(arctan(yc0)+te)**2)/(yc0**4+2*yc0**2+1)+(2*sec(arctan(yc0)+te)**2*tan(arctan(yc0)+te))/(yc0**4+2*yc0**2+1)-(2*yc0)/(yc0**4+2*yc0**2+1)]])
-    print array(H_out[0])
-    print Hr
+    print(array(H_out[0]))
+    print(Hr)
         
 
   def test_hessian2D(self):

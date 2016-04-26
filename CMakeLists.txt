@@ -82,6 +82,7 @@ option(OLD_LLVM "Use pre-3.5 LLVM" OFF)
 option(WITH_CLANG "Compile the interface to clang JIT" OFF)
 option(WITH_MATLAB "Compile the MATLAB front-end (experimental)" OFF)
 option(WITH_PYTHON "Compile the Python front-end" OFF)
+option(WITH_PYTHON3 "Use Python 3.*" OFF)
 option(WITH_JSON "Compile the JSON front-end" OFF)
 option(WITH_DEBIAN_BUILD "Add -DWITH_DEBIAN_BUILD (used for debian-specific warnings)" OFF)
 option(WITH_DEEPBIND "Load plugins with RTLD_DEEPBIND (can be used to resolve conflicting libraries in e.g. MATLAB)" OFF)
@@ -110,6 +111,12 @@ if(Fortran_language_works)
   enable_language(Fortran OPTIONAL)
 endif()
 #end workaround
+
+# CppLint will load python (Python 2 by default)
+# This brings trouble when we want to create a Python3 interface later
+if (WITH_PYTHON3)
+find_package(PythonInterp 3 REQUIRED)
+endif()
 
 include(CppLint)
 include(SpellCheck)

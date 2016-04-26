@@ -35,15 +35,15 @@ z += 4*z
 f = Function("f", [x,y],[z])
 
 #! The default representation is just the name of the function
-print f.__repr__()
+print(f.__repr__())
 
 #! A print statement will call __str__()
 #! The result will look like a node-by-node tree evaluation
-print f
+print(f)
 
 #! The generate method will insert this node-by-node evaluation in exported C code
 f.generate("f_generated")
 
 #! This is how the exported code looks like:
-print file('f_generated.c').read()
+print(open('f_generated.c').read())
 

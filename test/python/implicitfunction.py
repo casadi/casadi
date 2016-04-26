@@ -48,7 +48,7 @@ except:
   pass
 
 
-print solvers
+print(solvers)
 
 class ImplicitFunctiontests(casadiTestCase):
   
@@ -84,7 +84,7 @@ class ImplicitFunctiontests(casadiTestCase):
       f=Function("f", [x,A,b],[mtimes(A,x)-b,mtimes(C_,x)])
       for ad_weight_sp in [0,1]:
         for ad_weight in [0,1]:
-          print ad_weight, ad_weight_sp
+          print(ad_weight, ad_weight_sp)
           options2 = dict(options)
           options2["ad_weight_sp"] = ad_weight_sp
           options2["ad_weight"] = ad_weight
@@ -207,7 +207,7 @@ class ImplicitFunctiontests(casadiTestCase):
       if 'kinsol' in str(Solver): continue
       if 'newton' in str(Solver): continue
       
-      print Solver, options
+      print(Solver, options)
       x=SX.sym("x",2)
       f=Function("f", [x],[vertcat(*[mtimes((x+3).T,(x-2)),mtimes((x-4).T,(x+vertcat(*[1,2])))])])
       options2 = dict(options)
@@ -253,13 +253,13 @@ class ImplicitFunctiontests(casadiTestCase):
 
     G = F.gradient(0,0)
     G_out = G(x0_val)
-    print G_out[0]
-    print G
+    print(G_out[0])
+    print(G)
 
     J = F.jacobian(0,0)
     J_out = J(x0_val)
-    print J_out[0]
-    print J
+    print(J_out[0])
+    print(J)
     
     self.checkarray(G_out[0],DM([2]))
     self.checkarray(J_out[0],DM([2]))

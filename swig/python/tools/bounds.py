@@ -42,11 +42,11 @@ def reportBounds(value,lowerbound,upperbound,labels=None,tol=1e-8,showNonViolati
     raise Exception("Labels (%d) must be same size as values (%d)" % (len(labels),len(v)))
   
   if ( all(value <= upperbound + tol) and all(value >= lowerbound - tol) ):
-    print "All %d bounds are met: " % value.size()
+    print("All %d bounds are met: " % value.size())
   else:
-    print "Problem with bounds : "
+    print("Problem with bounds : ")
   
-  print "-"*60
+  print("-"*60)
 
   # The length of the numeric fields
   fieldlength = 10
@@ -101,7 +101,7 @@ def reportBounds(value,lowerbound,upperbound,labels=None,tol=1e-8,showNonViolati
     if nonregular:
       indicator = " !REGULAR "
   
-    print "%15s | %*s | %*s" % (identifier, (fieldlength + 6) * 3 , midfield, indicator_length+3, indicator)
+    print("%15s | %*s | %*s" % (identifier, (fieldlength + 6) * 3 , midfield, indicator_length+3, indicator))
   
-  print "-" * 60
+  print("-" * 60)
   

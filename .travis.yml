@@ -46,6 +46,44 @@ matrix:
         - pushd build && make json && popd
     - compiler: gcc
       os: linux
+      env:
+        - TESTMODE=full-py3
+        - WITH_PYTHON3=ON
+      script:
+        - sudo apt-get remove cmake
+        - sudo add-apt-repository ppa:george-edison55/precise-backports -y
+        - sudo add-apt-repository ppa:takluyver/python3  -y
+        - sudo apt-get update -qq
+        - sudo apt-get install cmake valgrind libgomp1 python3-dev python3-numpy python3-scipy python3-matplotlib python3-setuptools -y
+        - sudo easy_install3 pip==7.1.2
+        - mkdir build
+        - pushd build
+        - cmake --version
+        - python3 --version
+        - cmake -DWITH_OPENMP=OFF -DCMAKE_BUILD_TYPE=Debug -DOLD_LLVM=ON -DWITH_CLANG=ON -DWITH_ECOS=ON -DWITH_MOSEK=ON -DWITH_PYTHON=ON -DWITH_WORHP=ON -DWITH_SLICOT=OFF -DWITH_OOQP=ON -DWITH_PROFILING=ON -DWITH_DOC=ON -DWITH_EXAMPLES=ON -DWITH_EXTRA_WARNINGS=ON -DWITH_PYTHON=ON -DWITH_PYTHON3=ON -DWITH_JSON=ON ..
+
+        - make -j2
+        - sudo make -j2 install
+        - popd
+        - python3 -c "from casadi.tools import *;loadAllCompiledPlugins()"
+        
+        #- (while true ; do sleep 60 ; echo "ping" ; done ) &
+        #- source /home/travis/build/testbot/restricted/env.sh
+        #- ssh-keyscan $GATE_SERVER >> ~/.ssh/known_hosts
+        #- whoami
+        #- echo "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA3mEl1i8wiojyJdJnwrmC3RTWCIGgUM4lmtWNWu4p4QyiBry2iB7y2qno48pZqkV/EFRsyWWeEDvbdA4etYlceKZaGJFAdqJig/247qPbamU5W5++d7zkGwA5nQDH147/+JMYk4na9RoGl2iOHMyxi7Wq0WkN11u0Slp2awluvV9UXpBl/XD74eYmUfOFop6y+Hkg/K2hyytg8vAkp33x/vy8JxSK93vbnLGsrVOVjp6Epf7Jo2C8ZHX9eVL2sfi7icjNbt6s9AnU076tBURBIEQbg+Sa8nK7v6zzJNZbn9G85t0M64BKMvcRH1BXf0VvIeBQs/yv9uZLaC9SFvj+4Q== u0052373@xen-vm03.mech.kuleuven.be" >> ~/.ssh/authorized_keys
+        #- ssh -i /home/travis/build/testbot/id_rsa_travis $USER_GATE@$GATE_SERVER -R 19922:localhost:22 -N
+        #- pushd test && make unittests_py_valgrind && popd
+        #- sudo apt-get install graphviz python3-lxml texlive-science texlive-latex-base texlive-latex-recommended texlive-latex-extra -y
+        #- sudo pip3 install pydot3
+        # travis-wait seems to stop at 20 mins, regardless if output is being generated
+        #- (while true ; do sleep 60 ; echo "ping" ; done ) &
+
+        #- pushd test && make trunktesterbot_no_unittests_py && popd
+        #- pushd test && make unittests_py_slow && popd
+        #- pushd build && make json && popd
+    - compiler: gcc
+      os: linux
       env: TESTMODE=docs
       script:
         - set -e

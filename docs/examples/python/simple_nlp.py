@@ -50,8 +50,8 @@ solver = nlpsol("solver", MySolver, nlp, opts)
 sol = solver(lbg=0)
 
 # Print solution
-print "-----"
-print "objective at solution = ", sol["f"]
-print "primal solution = ", sol["x"]
-print "dual solution (x) = ", sol["lam_x"]
-print "dual solution (g) = ", sol["lam_g"]
+print("-----")
+print("objective at solution = ", sol["f"])
+print("primal solution = ", sol["x"])
+print("dual solution (x) = ", sol["lam_x"])
+print("dual solution (g) = ", sol["lam_g"])

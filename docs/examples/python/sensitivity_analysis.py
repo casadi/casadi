@@ -25,7 +25,7 @@
 
 from casadi import *
 from copy import deepcopy
-print "Testing sensitivity analysis in CasADi"
+print("Testing sensitivity analysis in CasADi")
 
 # All ODE and DAE integrators to be tested
 DAE_integrators = ["idas","collocation"]
@@ -33,8 +33,8 @@ ODE_integrators = ["cvodes","rk"] + DAE_integrators
 
 for Integrators in (ODE_integrators,DAE_integrators):    
   if Integrators==ODE_integrators: # rocket example
-    print "******"
-    print "Testing ODE example"
+    print("******")
+    print("Testing ODE example")
     
     # Time 
     t = SX.sym("t")
@@ -72,8 +72,8 @@ for Integrators in (ODE_integrators,DAE_integrators):
     u0 = 0.4
   
   else: # Simple DAE example
-    print "******"
-    print "Testing DAE example"
+    print("******")
+    print("Testing DAE example")
     
     # Differential state
     x = SX.sym("x")
@@ -107,9 +107,9 @@ for Integrators in (ODE_integrators,DAE_integrators):
 
   # Integrator
   for MyIntegrator in Integrators:
-    print "========"
-    print "Integrator: ", MyIntegrator
-    print "========"
+    print("========")
+    print("Integrator: ", MyIntegrator)
+    print("========")
     
     # Integrator options
     opts = {"tf":tf}
@@ -125,7 +125,7 @@ for Integrators in (ODE_integrators,DAE_integrators):
     res = I(**arg)
     xf = res["xf"]
     qf = res["qf"]
-    print "%50s" % "Unperturbed solution:", "xf  = ", xf, ", qf  = ", qf
+    print("%50s" % "Unperturbed solution:", "xf  = ", xf, ", qf  = ", qf)
 
     # Perturb solution to get a finite difference approximation
     h = 0.001
@@ -133,7 +133,7 @@ for Integrators in (ODE_integrators,DAE_integrators):
     res = I(**arg)
     fd_xf = (res["xf"]-xf)/h
     fd_qf = (res["qf"]-qf)/h
-    print "%50s" % "Finite difference approximation:", "d(xf)/d(p) = ", fd_xf, ", d(qf)/d(p) = ", fd_qf
+    print("%50s" % "Finite difference approximation:", "d(xf)/d(p) = ", fd_xf, ", d(qf)/d(p) = ", fd_qf)
 
     # Calculate once, forward
     I_fwd = I.derivative(1, 0)
@@ -145,7 +145,7 @@ for Integrators in (ODE_integrators,DAE_integrators):
     res = I_fwd(**arg)
     fwd_xf = res["fwd0_xf"]
     fwd_qf = res["fwd0_qf"]
-    print "%50s" % "Forward sensitivities:", "d(xf)/d(p) = ", fwd_xf, ", d(qf)/d(p) = ", fwd_qf
+    print("%50s" % "Forward sensitivities:", "d(xf)/d(p) = ", fwd_xf, ", d(qf)/d(p) = ", fwd_qf)
 
     # Calculate once, adjoint
     I_adj = I.derivative(0, 1)
@@ -157,14 +157,14 @@ for Integrators in (ODE_integrators,DAE_integrators):
     res = I_adj(**arg)
     adj_x0 = res["adj0_x0"]
     adj_p = res["adj0_p"]
-    print "%50s" % "Adjoint sensitivities:", "d(qf)/d(x0) = ", adj_x0, ", d(qf)/d(p) = ", adj_p
+    print("%50s" % "Adjoint sensitivities:", "d(qf)/d(x0) = ", adj_x0, ", d(qf)/d(p) = ", adj_p)
 
     # Perturb adjoint solution to get a finite difference approximation of the second order sensitivities
     arg["der_p"] = u0+h
     res = I_adj(**arg)
     fd_adj_x0 = (res["adj0_x0"]-adj_x0)/h
     fd_adj_p = (res["adj0_p"]-adj_p)/h
-    print "%50s" % "FD of adjoint sensitivities:", "d2(qf)/d(x0)d(p) = ", fd_adj_x0, ", d2(qf)/d(p)d(p) = ", fd_adj_p
+    print("%50s" % "FD of adjoint sensitivities:", "d2(qf)/d(x0)d(p) = ", fd_adj_x0, ", d2(qf)/d(p)d(p) = ", fd_adj_p)
 
     # Forward over adjoint to get the second order sensitivities
     I_foa = I_adj.derivative(1, 0)
@@ -177,7 +177,7 @@ for Integrators in (ODE_integrators,DAE_integrators):
     res = I_foa(**arg)
     fwd_adj_x0 = res["fwd0_adj0_x0"]
     fwd_adj_p = res["fwd0_adj0_p"]
-    print "%50s" % "Forward over adjoint sensitivities:", "d2(qf)/d(x0)d(p) = ", fwd_adj_x0, ", d2(qf)/d(p)d(p) = ", fwd_adj_p
+    print("%50s" % "Forward over adjoint sensitivities:", "d2(qf)/d(x0)d(p) = ", fwd_adj_x0, ", d2(qf)/d(p)d(p) = ", fwd_adj_p)
 
     # Adjoint over adjoint to get the second order sensitivities
     I_aoa = I_adj.derivative(0, 1)
@@ -190,6 +190,6 @@ for Integrators in (ODE_integrators,DAE_integrators):
     res = I_aoa(**arg)
     adj_adj_x0 = res["adj0_der_x0"]
     adj_adj_p = res["adj0_der_p"]
-    print "%50s" % "Adjoint over adjoint sensitivities:", "d2(qf)/d(x0)d(p) = ", adj_adj_x0, ", d2(qf)/d(p)d(p) = ", adj_adj_p
+    print("%50s" % "Adjoint over adjoint sensitivities:", "d2(qf)/d(x0)d(p) = ", adj_adj_x0, ", d2(qf)/d(p)d(p) = ", adj_adj_p)
 
   

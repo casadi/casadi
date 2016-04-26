@@ -38,7 +38,7 @@ f = Function("f", [x,y],[z])
 #! We expand the MX expression into an SX expression
 fSX = f.expand('fSX')
 
-print "Expanded expression = ", fSX
+print("Expanded expression = ", fSX)
 
 
 #! Limitations
@@ -54,4 +54,4 @@ G = Function("G", [x,y], [g])
 try:
   G.expand('G_sx')
 except Exception as e:
-  print e
+  print(e)

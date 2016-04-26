@@ -32,4 +32,4 @@ except:
   pass
 
 if success:
-  from graph import dotgraph, dotdraw, dotsave
+  from .graph import dotgraph, dotdraw, dotsave

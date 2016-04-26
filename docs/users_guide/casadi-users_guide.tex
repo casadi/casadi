@@ -255,7 +255,7 @@ which creates a 5-by-1 matrix, i.e. a vector, and a 4-by-2 matrix with symbolic 
 # Python
 f = x**2 + 10
 f = sqrt(f)
-print 'f:', f
+print('f:', f)
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
@@ -270,7 +270,7 @@ display(f)
 \begin{pytexoutput}
 f = x**2 + 10
 f = sqrt(f)
-print 'f:', f
+print('f:', f)
 \end{pytexoutput}
 
 You can also create constant \texttt{SX} instances \emph{without} any symbolic primitives:
@@ -293,7 +293,7 @@ Note the difference between a sparse matrix with \emph{structural} zeros and a d
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Python]
 # Python
-print 'B4:', B4
+print( 'B4:', B4)
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
@@ -304,7 +304,7 @@ display(B4)
 \end{minipage}
 
 \begin{pytexoutput}
-print 'B4:', B4
+print('B4:', B4)
 \end{pytexoutput}
 
 The following list summarizes the most commonly used ways of constructing new \texttt{SX} expressions:
@@ -385,8 +385,8 @@ Let us perform a simple operation using the \texttt{SX} above:
 x = SX.sym('x',2,2)
 y = SX.sym('y')
 f = 3*x + y
-print f
-print f.shape
+print(f)
+print(f.shape)
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
@@ -404,8 +404,8 @@ disp(size(f))
 x = SX.sym('x',2,2)
 y = SX.sym('y')
 f = 3*x + y
-print f
-print f.shape
+print(f)
+print(f.shape)
 \end{pytexoutput}
 
 As you can see, the output of this operation is a 2-by-2 matrix. Note how the multiplication and the addition were performed elementwise and new expressions (of type \texttt{SX}) were created for each entry of the result matrix.
@@ -420,8 +420,8 @@ The syntax of \texttt{MX} mirrors that of \texttt{SX}:
 x = MX.sym('x',2,2)
 y = MX.sym('y')
 f = 3*x + y
-print f
-print f.shape
+print(f)
+print(f.shape)
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
@@ -439,8 +439,8 @@ disp(size(f))
 x = MX.sym('x',2,2)
 y = MX.sym('y')
 f = 3*x + y
-print f
-print f.shape
+print(f)
+print(f.shape)
 \end{pytexoutput}
 
 Note how the result consists of only two operations (one multiplication and one addition) using \texttt{MX} symbolics, whereas the \texttt{SX} equivalent has eight (two for each element of the resulting matrix). As a consequence, \texttt{MX} can be more economical when working with operations that are naturally vector or matrix valued with many elements. As we shall see in Chapter~\ref{ch:function}, it is also much more general since we allow calls to arbitrary functions that cannot be expanded in terms of elementary operations.
@@ -451,7 +451,7 @@ Note how the result consists of only two operations (one multiplication and one 
 \begin{lstlisting}[language=Python]
 # Python
 x = MX.sym('x',2,2)
-print x[0,0]
+print(x[0,0])
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
@@ -464,7 +464,7 @@ x(1,1)
 
 \begin{pytexoutput}
 x = MX.sym('x',2,2)
-print x[0,0]
+print(x[0,0])
 \end{pytexoutput}
 
 The output should be understood as an expression that is equal to the first (i.e. index 0 in C++) structurally non-zero element of \texttt{x}, unlike \texttt{x\_0} in the \texttt{SX} case above, which is the name of a symbolic primitive in the first (index 0) location of the matrix.
@@ -478,7 +478,7 @@ x = MX.sym('x',2)
 A = MX(2,2)
 A[0,0] = x[0]
 A[1,1] = x[0]+x[1]
-print 'A:', A
+print('A:', A)
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
@@ -497,7 +497,7 @@ x = MX.sym('x',2)
 A = MX(2,2)
 A[0,0] = x[0]
 A[1,1] = x[0]+x[1]
-print 'A:', A
+print('A:', A)
 \end{pytexoutput}
 
 The interpretation of the (admittedly cryptic) output is that starting with an all zero sparse matrix, an element is assigned to \texttt{x\_0}. It is then projected to a matrix of different sparsity and an another element is assigned to \texttt{x\_0+x\_1}.
@@ -526,7 +526,7 @@ The \texttt{Sparsity} class can be used to create non-standard matrices, e.g.
 \begin{minipage}[t]{0.7\textwidth}
 \begin{lstlisting}[language=Python]
 # Python
-print SX.sym('x',Sparsity.lower(3))
+print(SX.sym('x',Sparsity.lower(3)))
 \end{lstlisting}
 \begin{lstlisting}[language=Matlab]
 % MATLAB
@@ -536,7 +536,7 @@ disp(SX.sym('x',Sparsity.lower(3)))
 \begin{minipage}[t]{0.3\textwidth}
 
 \begin{pytexoutput}
-print SX.sym('x',Sparsity.lower(3))
+print(SX.sym('x',Sparsity.lower(3)))
 \end{pytexoutput}
 \end{minipage}
 
@@ -549,9 +549,9 @@ Indexing can be done with one index or two indices. With two indices, you refere
 \begin{lstlisting}[language=Python]
 # Python
 M = SX([[3,7],[4,5]])
-print M[0,:]
+print(M[0,:])
 M[0,:] = 1
-print M
+print(M)
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
@@ -566,9 +566,9 @@ disp(M)
 
 \begin{pytexoutput}
 M = SX([[3,7],[4,5]])
-print M[0,:]
+print(M[0,:])
 M[0,:] = 1
-print M
+print(M)
 \end{pytexoutput}
 
 Unlike Python's NumPy, \CasADi slices are not views into the data of the left hand side; rather, a slice access copies the data. As a result, the matrix $M$ is not changed at all in the following example:
@@ -577,7 +577,7 @@ Unlike Python's NumPy, \CasADi slices are not views into the data of the left ha
 # Python
 M = SX([[3,7],[4,5]])
 M[0,:][0,0] = 1
-print M
+print(M)
 \end{pytex}
 
 The getting and setting matrix elements is elaborated in the following. The discussion applies to all of \CasADi's matrix types.
@@ -588,7 +588,7 @@ The getting and setting matrix elements is elaborated in the following. The disc
 \begin{lstlisting}[language=Python]
 # Python
 M = diag(SX([3,4,5,6]))
-print M
+print(M)
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
@@ -600,12 +600,12 @@ disp(M)
 \end{minipage}
 \begin{pytexoutput}
 M = diag(SX([3,4,5,6]))
-print M
+print(M)
 \end{pytexoutput}
 
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Python]
-print M[0,0], M[1,0], M[-1,-1]
+print(M[0,0], M[1,0], M[-1,-1])
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
@@ -615,12 +615,12 @@ M(1,1), M(2,1), M(end,end)
 \end{minipage}
 
 \begin{pytexoutput}
-print M[0,0], M[1,0], M[-1,-1]
+print(M[0,0], M[1,0], M[-1,-1])
 \end{pytexoutput}
 
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Python]
-print M[5], M[-6]
+print(M[5], M[-6])
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
@@ -630,7 +630,7 @@ M(6), M(end-5)
 \end{minipage}
 
 \begin{pytexoutput}
-print M[5], M[-6]
+print(M[5], M[-6])
 \end{pytexoutput}
 
 
@@ -638,7 +638,7 @@ print M[5], M[-6]
 
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Python]
-print M[:,1]
+print(M[:,1])
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
@@ -648,12 +648,12 @@ disp(M(:,2))
 \end{minipage}
 
 \begin{pytexoutput}
-print M[:,1]
+print(M[:,1])
 \end{pytexoutput}
 
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Python]
-print M[1:,1:4:2]
+print(M[1:,1:4:2])
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
@@ -663,7 +663,7 @@ disp(M(2:end,2:2:4))
 \end{minipage}
 
 \begin{pytexoutput}
-print M[1:,1:4:2]
+print(M[1:,1:4:2])
 \end{pytexoutput}
 
 In C++, \CasADi's \texttt{Slice} helper class can be used. For the example above, this means \lstinline[language=C++]{M(Slice(),1)} and \lstinline[language=C++]{M(Slice(1,-1),Slice(1,4,2))}, respectively.
@@ -673,7 +673,7 @@ In C++, \CasADi's \texttt{Slice} helper class can be used. For the example above
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Python]
 M = SX([[3,7,8,9],[4,5,6,1]])
-print M
+print(M)
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
@@ -684,12 +684,12 @@ disp(M)
 \end{minipage}
 \begin{pytexoutput}
 M = SX([[3,7,8,9],[4,5,6,1]])
-print M
+print(M)
 \end{pytexoutput}
 
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Python]
-print M[0,[0,3]], M[[5,-6]]
+print(M[0,[0,3]], M[[5,-6]])
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
@@ -698,7 +698,7 @@ M(1,[1,4]), M([6,numel(M)-5])
 \end{lstlisting}
 \end{minipage}
 \begin{pytexoutput}
-print M[0,[0,3]], M[[5,-6]]
+print(M[0,[0,3]], M[[5,-6]])
 \end{pytexoutput}
 
 \section{Arithmetic operations}
@@ -708,7 +708,7 @@ print M[0,[0,3]], M[[5,-6]]
 \begin{lstlisting}[language=Python]
 x = SX.sym('x')
 y = SX.sym('y',2,2)
-print sin(y)-x
+print(sin(y)-x)
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
@@ -721,7 +721,7 @@ sin(y)-x
 \begin{pytexoutput}
 x = SX.sym('x')
 y = SX.sym('y',2,2)
-print sin(y)-x
+print(sin(y)-x)
 \end{pytexoutput}
 
 In C++ and Python (but not in MATLAB), the standard multiplication operation (using \verb|*|) is reserved for elementwise multiplication (in MATLAB \verb|.*|). For \textbf{matrix multiplication}, use
@@ -729,7 +729,7 @@ In C++ and Python (but not in MATLAB), the standard multiplication operation (us
 
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Python]
-print y*y, mtimes(y,y)
+print(y*y, mtimes(y,y))
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
@@ -738,7 +738,7 @@ y.*y, y*y
 \end{lstlisting}
 \end{minipage}
 \begin{pytexoutput}
-print y*y, mtimes(y,y)
+print(y*y, mtimes(y,y))
 \end{pytexoutput}
 
 As is customary in MATLAB, multiplication using \verb|*| and \verb|.*| are equivalent when either of the arguments is a scalar.
@@ -748,7 +748,7 @@ As is customary in MATLAB, multiplication using \verb|*| and \verb|.*| are equiv
 
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Python]
-print y.T
+print(y.T)
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
@@ -757,7 +757,7 @@ y'
 \end{lstlisting}
 \end{minipage}
 \begin{pytexoutput}
-print y.T
+print(y.T)
 \end{pytexoutput}
 
 \textbf{Reshaping} means changing the number of rows and columns but retaining the number of elements and the relative location of the nonzeros. This is a computationally very cheap operation which is performed using the syntax:
@@ -765,7 +765,7 @@ print y.T
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Python]
 x = SX.eye(4)
-print reshape(x,2,8)
+print(reshape(x,2,8))
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
@@ -776,7 +776,7 @@ reshape(x,2,8)
 \end{minipage}
 \begin{pytexoutput}
 x = SX.eye(4)
-print reshape(x,2,8)
+print(reshape(x,2,8))
 \end{pytexoutput}
 
 \textbf{Concatenation} means stacking matrices horizontally or vertically. Due to the column-major way of storing elements in \CasADi, it is most efficient to stack matrices horizontally. Matrices that are in fact column vectors (i.e. consisting of a single column), can also be stacked efficiently vertically. Vertical and horizontal concatenation is performed using the functions \texttt{vertcat} and \texttt{horzcat} (that take a list of input arguments) in Python and C++ and with square brackets in MATLAB:
@@ -785,7 +785,7 @@ print reshape(x,2,8)
 \begin{lstlisting}[language=Python]
 x = SX.sym('x',5)
 y = SX.sym('y',5)
-print vertcat(x,y)
+print(vertcat(x,y))
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
@@ -798,12 +798,12 @@ y = SX.sym('y',5);
 \begin{pytexoutput}
 x = SX.sym('x',5)
 y = SX.sym('y',5)
-print vertcat(x,y)
+print(vertcat(x,y))
 \end{pytexoutput}
 
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Python]
-print horzcat(x,y)
+print(horzcat(x,y))
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
@@ -812,7 +812,7 @@ print horzcat(x,y)
 \end{lstlisting}
 \end{minipage}
 \begin{pytexoutput}
-print horzcat(x,y)
+print(horzcat(x,y))
 \end{pytexoutput}
 
 \textbf{Horizontal and vertical splitting} are the inverse operations of the above introduced horizontal and vertical concatenation. To split up an expression horizontally into $n$ smaller expressions, you need to provide, in addition to the expression being splitted, a vector \emph{offset} of length $n+1$. The first element of the \emph{offset} vector must be 0 and the last element must be the number of columns. Remaining elements must follow in a non-decreasing order. The output $i$ of the splitting operation then contains the columns $c$ with $\textit{offset}[i] \le c < \textit{offset}[i+1]$. The following demonstrates the syntax:
@@ -821,7 +821,7 @@ print horzcat(x,y)
 \begin{lstlisting}[language=Python]
 x = SX.sym('x',5,2)
 w = horzsplit(x,[0,1,2])
-print w[0], w[1]
+print(w[0], w[1])
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
@@ -834,7 +834,7 @@ w{1}, w{2}
 \begin{pytexoutput}
 x = SX.sym('x',5,2)
 w = horzsplit(x,[0,1,2])
-print w[0], w[1]
+print(w[0], w[1])
 \end{pytexoutput}
 
 The vertsplit operation works analogously, but with the \emph{offset} vector referring to rows:
@@ -842,7 +842,7 @@ The vertsplit operation works analogously, but with the \emph{offset} vector ref
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Python]
 w = vertsplit(x,[0,3,5])
-print w[0], w[1]
+print(w[0], w[1])
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
@@ -853,7 +853,7 @@ w{1}, w{2}
 \end{minipage}
 \begin{pytexoutput}
 w = vertsplit(x,[0,3,5])
-print w[0], w[1]
+print(w[0], w[1])
 \end{pytexoutput}
 
 Note that it is always possible to use slice element access instead of horizontal and vertical splitting, for the above vertical splitting:
@@ -861,7 +861,7 @@ Note that it is always possible to use slice element access instead of horizonta
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Python]
 w = [x[0:3,:], x[3:5,:]]
-print w[0], w[1]
+print(w[0], w[1])
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
@@ -872,7 +872,7 @@ w{1}, w{2}
 \end{minipage}
 \begin{pytexoutput}
 w = [x[0:3,:], x[3:5,:]]
-print w[0], w[1]
+print(w[0], w[1])
 \end{pytexoutput}
 
 For \texttt{SX} graphs, this alternative way is completely equivalent, but for \texttt{MX} graphs using \texttt{horzsplit}/\texttt{vertsplit} is \emph{significantly more efficient when all the splitted expressions are needed}.
@@ -882,7 +882,7 @@ For \texttt{SX} graphs, this alternative way is completely equivalent, but for \
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Python]
 x = SX.sym('x',2,2)
-print dot(x,x)
+print(dot(x,x))
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
@@ -893,7 +893,7 @@ dot(x,x)
 \end{minipage}
 \begin{pytexoutput}
 x = SX.sym('x',2,2)
-print dot(x,x)
+print(dot(x,x))
 \end{pytexoutput}
 
 Many of the above operations are also defined for the \texttt{Sparsity} class (Section~\ref{sec:sparsity_class}), e.g. \texttt{vertcat}, \texttt{horzsplit}, transposing, addition (which returns the \emph{union} of two sparsity patterns) and multiplication (which returns the \emph{intersection} of two sparsity patterns).
@@ -904,7 +904,7 @@ You can check if a matrix or sparsity pattern has a certain property by calling 
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Python]
 y = SX.sym('y',10,1)
-print y.shape
+print(y.shape)
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
@@ -915,7 +915,7 @@ size(y)
 \end{minipage}
 \begin{pytexoutput}
 y = SX.sym('y',10,1)
-print y.shape
+print(y.shape)
 \end{pytexoutput}
 
 Note that in MATLAB, \lstinline[language=Matlab]{obj.myfcn(arg)} and \lstinline[language=Matlab]{myfcn(obj, arg)} are both valid ways of calling a member function \texttt{myfcn}. The latter variant is probably preferable from a style viewpoint.
@@ -946,7 +946,7 @@ The last queries are examples of queries for which \emph{false negative} returns
 \begin{lstlisting}[language=Python]
 A = MX.sym('A',3,3)
 b = MX.sym('b',3)
-print solve(A,b)
+print(solve(A,b))
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
@@ -959,7 +959,7 @@ solve(A,b)
 \begin{pytexoutput}
 A = MX.sym('A',3,3)
 b = MX.sym('b',3)
-print solve(A,b)
+print(solve(A,b))
 \end{pytexoutput}
 
 \section{Calculus -- algorithmic differentiation}
@@ -997,7 +997,7 @@ An expression for a Jacobian is obtained using the syntax:
 \begin{lstlisting}[language=Python]
 A = SX.sym('A',3,2)
 x = SX.sym('x',2)
-print jacobian(mtimes(A,x),x)
+print(jacobian(mtimes(A,x),x))
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
@@ -1010,14 +1010,14 @@ jacobian(A*x,x)
 \begin{pytexoutput}
 A = SX.sym('A',3,2)
 x = SX.sym('x',2)
-print jacobian(mtimes(A,x),x)
+print(jacobian(mtimes(A,x),x))
 \end{pytexoutput}
 
 When the differentiated expression is a scalar, you can also calculate the gradient in the matrix sense:
 
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Python]
-print gradient(dot(A,A),A)
+print(gradient(dot(A,A),A))
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
@@ -1026,7 +1026,7 @@ gradient(dot(A,A),A)
 \end{lstlisting}
 \end{minipage}
 \begin{pytexoutput}
-print gradient(dot(A,A),A)
+print(gradient(dot(A,A),A))
 \end{pytexoutput}
 
 Hessians, and as a by-product gradients, are obtained as follows:
@@ -1034,7 +1034,7 @@ Hessians, and as a by-product gradients, are obtained as follows:
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Python]
 [H,g] = hessian(dot(x,x),x)
-print 'H:', H
+print('H:', H)
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
@@ -1045,7 +1045,7 @@ display(H)
 \end{minipage}
 \begin{pytexoutput}
 [H,g] = hessian(dot(x,x),x)
-print 'H:', H
+print('H:', H)
 \end{pytexoutput}
 
 For calculating a Jacobian-times-vector product, the \texttt{jtimes} function -- performing forward mode AD -- is often more efficient than creating the full Jacobian and performing a matrix-vector multiplication:
@@ -1054,7 +1054,7 @@ For calculating a Jacobian-times-vector product, the \texttt{jtimes} function --
 \begin{lstlisting}[language=Python]
 v = SX.sym('v',2)
 f = mtimes(A,x)
-print jtimes(f,x,v)
+print(jtimes(f,x,v))
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
@@ -1067,7 +1067,7 @@ jtimes(f,x,v)
 \begin{pytexoutput}
 v = SX.sym('v',2)
 f = mtimes(A,x)
-print jtimes(f,x,v)
+print(jtimes(f,x,v))
 \end{pytexoutput}
 
 The \texttt{jtimes} function optionally calculates the transposed-Jacobian-times-vector product, i.e. reverse mode AD:
@@ -1076,7 +1076,7 @@ The \texttt{jtimes} function optionally calculates the transposed-Jacobian-times
 \begin{lstlisting}[language=Python]
 w = SX.sym('w',3)
 f = mtimes(A,x)
-print jtimes(f,x,w,True)
+print(jtimes(f,x,w,True))
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
@@ -1089,7 +1089,7 @@ jtimes(f,x,w,true)
 \begin{pytexoutput}
 w = SX.sym('w',3)
 f = mtimes(A,x)
-print jtimes(f,x,w,True)
+print(jtimes(f,x,w,True))
 \end{pytexoutput}
 
 \chapter{Function objects} \label{ch:function}
@@ -1212,8 +1212,8 @@ To call a function object, you either pass the argument in the correct order:
 \begin{lstlisting}[language=Python]
 # Python
 r0, q0 = f(1.1,3.3)
-print 'r0:',r0
-print 'q0:',q0
+print('r0:',r0)
+print('q0:',q0)
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
@@ -1227,8 +1227,8 @@ display(q0)
 \begin{pytexoutput}
 # Python
 r0, q0 = f(1.1,3.3)
-print 'r0:',r0
-print 'q0:',q0
+print('r0:',r0)
+print('q0:',q0)
 \end{pytexoutput}
 
 or the arguments and their names as follows, which will result in a dictionary (\texttt{dict} in Python, \texttt{struct} in MATLAB and \lstinline[language=C++]{std::map<std::string, MatrixType>} in C++):
@@ -1237,7 +1237,7 @@ or the arguments and their names as follows, which will result in a dictionary (
 \begin{lstlisting}[language=Python]
 # Python
 res = f(x=1.1, y=3.3)
-print 'res:', res
+print('res:', res)
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
@@ -1250,7 +1250,7 @@ display(res)
 \begin{pytexoutput}
 # Python
 res = f(x=1.1, y=3.3)
-print 'res:', res
+print('res:', res)
 \end{pytexoutput}
 
 When calling a function object, the dimensions (but not necessarily the sparsity patterns) of the evaluation arguments have to match those of the function inputs, with two exceptions:
@@ -1266,10 +1266,10 @@ When the number of inputs to a function object is large or changing, an alternat
 # Python
 arg = [1.1,3.3]
 res = f.call(arg)
-print 'res:', res
+print('res:', res)
 arg = {'x':1.1,'y':3.3}
 res = f.call(arg)
-print 'res:', res
+print('res:', res)
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
@@ -1287,10 +1287,10 @@ display(res)
 # Python
 arg = [1.1,3.3]
 res = f.call(arg)
-print 'res:', res
+print('res:', res)
 arg = {'x':1.1,'y':3.3}
 res = f.call(arg)
-print 'res:', res
+print('res:', res)
 \end{pytexoutput}
 
 \section{Converting \texttt{MX} to \texttt{SX}}
@@ -1406,7 +1406,7 @@ be done by evaluating the created function object:
 \begin{lstlisting}[language=Python]
 # Python
 r = F(x0=0, z0=0, p=0.1)
-print r['xf']
+print(r['xf'])
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
@@ -1419,7 +1419,7 @@ disp(r.xf)
 \begin{pytexoutput}
 # Python
 r = F(x0=0, z0=0, p=0.1)
-print r['xf']
+print(r['xf'])
 \end{pytexoutput}
 
 The time horizon is assumed to be fixed\footnote{for problems with free end time, you can always scale time by introducing an extra parameter and substitute $t$ for a dimensionless time variable that goes from 0 to 1} and can be changed from its default [0, 1] by setting the options "t0" and "tf".
@@ -1505,7 +1505,7 @@ function \texttt{S}:
 r = S(x0=[2.5,3.0,0.75],\
       lbg=0, ubg=0)
 x_opt = r['x']
-print 'x_opt: ', x_opt
+print('x_opt: ', x_opt)
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
@@ -1527,7 +1527,7 @@ r = S(x0=[2.5,3.0,0.75],\
 }
 \begin{pytexoutput}
 x_opt = r['x']
-print 'x_opt: ', x_opt
+print( 'x_opt: ', x_opt)
 \end{pytexoutput}
 
 \section{Quadratic programming} \label{sec:qpsol}
@@ -1590,7 +1590,7 @@ created with \texttt{nlpsol}. Since the solution is unique, it is less important
 # Python
 r = S(lbg=0)
 x_opt = r['x']
-print 'x_opt: ', x_opt
+print('x_opt: ', x_opt)
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
@@ -1610,7 +1610,7 @@ r = S(lbg=0)
 }
 \begin{pytexoutput}
 x_opt = r['x']
-print 'x_opt: ', x_opt
+print('x_opt: ', x_opt)
 \end{pytexoutput}
 
 \subsection{Low-level interface}
@@ -1702,7 +1702,7 @@ The returned \texttt{Function} instance will have a \emph{different} input/outpu
 r = S(h=H, g=g, \
       a=A, lba=lba)
 x_opt = r['x']
-print 'x_opt: ', x_opt
+print('x_opt: ', x_opt)
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
@@ -1724,7 +1724,7 @@ r = S(h=H, g=g, \
 }
 \begin{pytexoutput}
 x_opt = r['x']
-print 'x_opt: ', x_opt
+print('x_opt: ', x_opt)
 \end{pytexoutput}
 
 \chapter{Generating C-code}
@@ -1897,7 +1897,7 @@ described in the previous section, we can then create a \texttt{Function}
 \begin{lstlisting}[language=Python]
 # Python
 f = external('f', './ff.so')
-print f(3.14)
+print(f(3.14))
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
@@ -1912,7 +1912,7 @@ disp(f(3.14))
 from os import system
 system('gcc -fPIC -shared ff.c -o ff.so')
 f = external('f', './ff.so')
-print f(3.14)
+print(f(3.14))
 \end{pytexoutput}
 
 We can also rely on \CasADi performing the compilation \emph{just-in-time}
@@ -1927,7 +1927,7 @@ available on Linux/OS X:
 # Python
 C = Compiler('ff.c','clang')
 f = external('f',C);
-print f(3.14)
+print(f(3.14))
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
@@ -1939,10 +1939,9 @@ disp(f(3.14))
 \end{lstlisting}
 \end{minipage}
 \begin{pytexoutput}
-# Python
-C = Compiler('ff.c','clang')
-f = external('f',C);
-print f(3.14)
+print('''
+[0.00159265, 0.00159265]
+''')
 \end{pytexoutput}
 
 We will return to the \texttt{external} function in Section~\ref{sec:external}.
@@ -1960,12 +1959,12 @@ mex ff.c -largeArrayDims
 disp(ff('f', 3.14))
 \end{lstlisting}
 \begin{pytexoutput}
-print '''
+print('''
 Building with 'Xcode with Clang'.
 MEX completed successfully.
    (1,1)       0.0016
    (2,1)       0.0016
-'''
+''')
 \end{pytexoutput}
 
 Note that the result of the execution is always a MATLAB sparse matrix.
@@ -1991,7 +1990,7 @@ gcc ff.c -o ff
 cat ff_out.txt
 \end{lstlisting}
 \begin{pytexoutput}
-print '0.00159265 0.00159265'
+print('0.00159265 0.00159265')
 \end{pytexoutput}
 
 \subsection*{Linking against generated code from a C/C++ application}
@@ -2236,7 +2235,7 @@ calculations.
 # Use the function
 f = MyCallback('f', 0.5)
 res = f(2)
-print res
+print(res)
 \end{lstlisting}
 
 \subsection*{MATLAB}

@@ -87,7 +87,7 @@ y_data = X_measured[0,:].T
 if Compiler.hasPlugin('clang'):
   opts = {'jit':True, "jit_options":{"flags":['-O3']}}
 else:
-  print "WARNING; running without jit. This may result in very slow evaluation times"
+  print("WARNING; running without jit. This may result in very slow evaluation times")
   opts = {}
 
 ############ Create a Gauss-Newton solver ##########
@@ -113,7 +113,7 @@ solver = gauss_newton(e,nlp, params)
 
 sol = solver(x0=param_guess)
 
-print sol["x"]*scale
+print(sol["x"]*scale)
 
 assert(norm_inf(sol["x"]*scale-param_truth)<1e-8)
 
@@ -142,6 +142,6 @@ solver = gauss_newton(e,nlp, V)
 
 sol = solver(x0=x0,lbg=0,ubg=0)
 
-print sol["x"][:4]*scale
+print(sol["x"][:4]*scale)
 
 assert(norm_inf(sol["x"][:4]*scale-param_truth)<1e-8)
