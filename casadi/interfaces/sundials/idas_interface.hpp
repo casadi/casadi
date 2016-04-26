@@ -333,10 +333,17 @@ namespace casadi {
 
     //  Initial values for \p xdot and \p z
     std::vector<double> init_xdot_;
+
+    // jtimes signature
+    enum JTimesIn {
+      JTIMES_T, JTIMES_X, JTIMES_Z, JTIMES_P, JTIMES_FWD_X, JTIMES_FWD_Z, JTIMES_NUM_IN
+    };
+    enum JTimesOut {
+      JTIMES_FWD_ODE, JTIMES_FWD_ALG, JTIMES_NUM_OUT
+    };
   };
 
 } // namespace casadi
 
 /// \endcond
 #endif // CASADI_IDAS_INTERFACE_HPP
-

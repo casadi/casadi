@@ -154,8 +154,10 @@ namespace casadi {
     if (exact_jacobian_) {
       switch (linsol_f_) {
       case SD_ITERATIVE:
-        f_fwd_ = f_.derivative(1, 0);
-        alloc(f_fwd_);
+        casadi_assert(dae_!=0);
+        jtimes_ = dae_->create("jtimes",
+          {"t", "x", "z", "p", "fwd_x", "fwd_z"}, {"fwd_ode", "fwd_alg"});
+        alloc(jtimes_);
         break;
       default: break;
       }
@@ -346,22 +348,16 @@ namespace casadi {
     // Get time
     m->time1 = clock();
 
-    // Evaluate f_fwd_
-    m->arg[DAE_T] = &t;
-    m->arg[DAE_X] = NV_DATA_S(xz);
-    m->arg[DAE_Z] = NV_DATA_S(xz)+nx_;
-    m->arg[DAE_P] = get_ptr(m->p);
-    m->arg[DAE_NUM_IN + DAE_T] = 0;
-    m->arg[DAE_NUM_IN + DAE_X] = NV_DATA_S(v);
-    m->arg[DAE_NUM_IN + DAE_Z] = NV_DATA_S(v)+nx_;
-    m->arg[DAE_NUM_IN + DAE_P] = 0;
-    m->res[DAE_ODE] = 0;
-    m->res[DAE_ALG] = 0;
-    m->res[DAE_QUAD] = 0;
-    m->res[DAE_NUM_OUT + DAE_ODE] = NV_DATA_S(Jv);
-    m->res[DAE_NUM_OUT + DAE_ALG] = NV_DATA_S(Jv) + nx_;
-    m->res[DAE_NUM_OUT + DAE_QUAD] = 0;
-    f_fwd_(m->arg, m->res, m->iw, m->w, 0);
+    // Evaluate jtimes_
+    m->arg[JTIMES_T] = &t;
+    m->arg[JTIMES_X] = NV_DATA_S(xz);
+    m->arg[JTIMES_Z] = NV_DATA_S(xz)+nx_;
+    m->arg[JTIMES_P] = get_ptr(m->p);
+    m->arg[JTIMES_FWD_X] = NV_DATA_S(v);
+    m->arg[JTIMES_FWD_Z] = NV_DATA_S(v)+nx_;
+    m->res[JTIMES_FWD_ODE] = NV_DATA_S(Jv);
+    m->res[JTIMES_FWD_ALG] = NV_DATA_S(Jv) + nx_;
+    jtimes_(m->arg, m->res, m->iw, m->w, 0);
 
     // Subtract state derivative to get residual
     casadi_axpy(nx_, -cj, NV_DATA_S(v), NV_DATA_S(Jv));
