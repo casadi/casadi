@@ -665,13 +665,10 @@ namespace casadi {
     casadi_assert(res_it==res.end());
 
     if (!g_.is_null()) {
-
       // Adjoint derivatives of g
-      Function d = g_.derivative(0, nadj);
-      g_arg.resize(RDAE_NUM_IN);
-      g_arg.reserve(d.n_in());
 
       // Collect arguments for calling der
+      g_arg.insert(g_arg.end(), g_res.begin(), g_res.end());
       tmp.resize(RDAE_NUM_OUT);
       fill(tmp.begin(), tmp.end(), MatType());
       for (int dir=0; dir<nadj; ++dir) {
@@ -682,8 +679,9 @@ namespace casadi {
       }
 
       // Call der
-      vector<MatType> res = d(g_arg);
-      res_it = res.begin() + RDAE_NUM_OUT;
+      d1 = g_.reverse(nadj);
+      vector<MatType> res = d1(g_arg);
+      res_it = res.begin();
 
       // Collect right-hand-sides
       tmp.resize(RDAE_NUM_IN);
@@ -706,8 +704,8 @@ namespace casadi {
       if (nrp_>0) g_arg[RDAE_RP] = MatType::zeros(g_arg[RDAE_RP].sparsity());
 
       // Call der again
-      res = d(g_arg);
-      res_it = res.begin() + RDAE_NUM_OUT;
+      res = d1(g_arg);
+      res_it = res.begin();
 
       // Collect right-hand-sides and add contribution to the forward integration
       tmp.resize(RDAE_NUM_IN);
