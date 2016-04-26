@@ -346,7 +346,9 @@ namespace casadi {
      *    if no cached version is available.
      */
     Function forward_old(int nfwd);
+    Function forward(int nfwd);
     virtual Function get_forward_old(const std::string& name, int nfwd, Dict& opts);
+    virtual Function get_forward(const std::string& name, int nfwd, Dict& opts);
     virtual int get_n_forward() const { return 0;}
     void set_forward(const Function& fcn, int nfwd);
     ///@}
@@ -358,7 +360,9 @@ namespace casadi {
      *    if no cached version is available.
      */
     Function reverse_old(int nadj);
+    Function reverse(int nadj);
     virtual Function get_reverse_old(const std::string& name, int nadj, Dict& opts);
+    virtual Function get_reverse(const std::string& name, int nadj, Dict& opts);
     virtual int get_n_reverse() const { return 0;}
     void set_reverse(const Function& fcn, int nadj);
     ///@}
@@ -774,6 +778,9 @@ namespace casadi {
 
     /** \brief Reference counting in codegen? */
     bool has_refcount_;
+
+    /// Cache for functions to evaluate directional derivatives
+    std::vector<WeakRef> forward_, reverse_;
 
     /// Cache for functions to evaluate directional derivatives
     std::vector<WeakRef> derivative_fwd_, derivative_adj_;

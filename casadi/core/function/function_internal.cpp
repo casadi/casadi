@@ -1595,6 +1595,90 @@ namespace casadi {
     return ret;
   }
 
+  Function FunctionInternal::forward(int nfwd) {
+    casadi_assert(nfwd>=0);
+
+    // Check if there are enough forward directions allocated
+    if (nfwd>=forward_.size()) {
+      forward_.resize(nfwd+1);
+    }
+
+    // Quick return if already cached
+    if (forward_[nfwd].alive()) {
+      return shared_cast<Function>(forward_[nfwd].shared());
+    }
+
+    // Give it a suitable name
+    stringstream ss;
+    ss << "fwd" << nfwd << "_" << name_;
+    string name = ss.str();
+
+    // Get the number of inputs and outputs
+    int n_in = this->n_in();
+    int n_out = this->n_out();
+
+    // Names of inputs
+    std::vector<std::string> i_names;
+    i_names.reserve(n_in + n_out + n_in);
+
+    // Nondifferentiated inputs
+    for (int i=0; i<n_in; ++i) {
+      i_names.push_back("der_" + ischeme_.at(i));
+    }
+
+    // Nondifferentiated outputs (given)
+    for (int i=0; i<n_out; ++i) {
+      i_names.push_back("der_" + oscheme_.at(i));
+    }
+
+    // Forward seeds
+    for (int i=0; i<n_in; ++i) {
+      ss.str(string());
+      ss << "fwd" << "_" << ischeme_.at(i);
+      i_names.push_back(ss.str());
+    }
+
+    // Names of outputs
+    std::vector<std::string> o_names;
+    o_names.reserve(n_out*nfwd);
+
+    // Forward sensitivities
+    for (int i=0; i<n_out; ++i) {
+      ss.str(string());
+      ss << "fwd" << "_" << oscheme_.at(i);
+      o_names.push_back(ss.str());
+    }
+
+    // Options
+    Dict opts = {{"input_scheme", i_names},
+                 {"output_scheme", o_names},
+                 {"jit", jit_},
+                 {"compiler", compilerplugin_},
+                 {"jit_options", jit_options_},
+                 {"derivative_of", function()}};
+
+    // Return value
+    casadi_assert(get_n_forward()>0);
+    Function ret = get_forward(name, nfwd, opts);
+
+    // Consistency check for inputs
+    casadi_assert(ret.n_in()==n_in + n_out + n_in);
+    int ind=0;
+    for (int i=0; i<n_in; ++i) ret.assert_size_in(ind++, size1_in(i), size2_in(i));
+    for (int i=0; i<n_out; ++i) ret.assert_size_in(ind++, size1_out(i), size2_out(i));
+    for (int i=0; i<n_in; ++i) ret.assert_size_in(ind++, size1_in(i), nfwd*size2_in(i));
+
+    // Consistency check for outputs
+    casadi_assert(ret.n_out()==n_out);
+    for (int i=0; i<n_out; ++i) ret.assert_size_out(i, size1_out(i), nfwd*size2_out(i));
+
+    // Save to cache
+    forward_[nfwd] = ret;
+
+    // Return generated function
+    return ret;
+  }
+
   Function FunctionInternal::reverse_old(int nadj) {
     casadi_assert(nadj>=0);
 
@@ -1692,6 +1776,90 @@ namespace casadi {
     return ret;
   }
 
+  Function FunctionInternal::reverse(int nadj) {
+    casadi_assert(nadj>=0);
+
+    // Check if there are enough adjoint directions allocated
+    if (nadj>=reverse_.size()) {
+      reverse_.resize(nadj+1);
+    }
+
+    // Quick return if already cached
+    if (reverse_[nadj].alive()) {
+      return shared_cast<Function>(reverse_[nadj].shared());
+    }
+
+    // Give it a suitable name
+    stringstream ss;
+    ss << "adj" << nadj << "_" << name_;
+    string name = ss.str();
+
+    // Get the number of inputs and outputs
+    int n_in = this->n_in();
+    int n_out = this->n_out();
+
+    // Names of inputs
+    std::vector<std::string> i_names;
+    i_names.reserve(n_in + n_out + n_out);
+
+    // Nondifferentiated inputs
+    for (int i=0; i<n_in; ++i) {
+      i_names.push_back("der_" + ischeme_.at(i));
+    }
+
+    // Nondifferentiated outputs (given)
+    for (int i=0; i<n_out; ++i) {
+      i_names.push_back("der_" + oscheme_.at(i));
+    }
+
+    // Adjoint seeds
+    for (int i=0; i<n_out; ++i) {
+      ss.str(string());
+      ss << "adj" << "_" << oscheme_.at(i);
+      i_names.push_back(ss.str());
+    }
+
+    // Names of outputs
+    std::vector<std::string> o_names;
+    o_names.reserve(n_in);
+
+    // Adjoint sensitivities
+    for (int i=0; i<n_in; ++i) {
+      ss.str(string());
+      ss << "adj" << "_" << ischeme_.at(i);
+      o_names.push_back(ss.str());
+    }
+
+    // Options
+    Dict opts = {{"input_scheme", i_names},
+                 {"output_scheme", o_names},
+                 {"jit", jit_},
+                 {"compiler", compilerplugin_},
+                 {"jit_options", jit_options_},
+                 {"derivative_of", function()}};
+
+    // Return value
+    casadi_assert(get_n_reverse()>0);
+    Function ret = get_reverse(name, nadj, opts);
+
+    // Consistency check for inputs
+    casadi_assert(ret.n_in()==n_in + n_out + n_out);
+    int ind=0;
+    for (int i=0; i<n_in; ++i) ret.assert_size_in(ind++, size1_in(i), size2_in(i));
+    for (int i=0; i<n_out; ++i) ret.assert_size_in(ind++, size1_out(i), size2_out(i));
+    for (int i=0; i<n_out; ++i) ret.assert_size_in(ind++, size1_out(i), nadj*size2_out(i));
+
+    // Consistency check for outputs
+    casadi_assert(ret.n_out()==n_in);
+    for (int i=0; i<n_in; ++i) ret.assert_size_out(i, size1_in(i), nadj*size2_in(i));
+
+    // Save to cache
+    reverse_[nadj] = ret;
+
+    // Return generated function
+    return ret;
+  }
+
   void FunctionInternal::set_forward(const Function& fcn, int nfwd) {
 
     // Check if there are enough forward directions allocated
@@ -1719,7 +1887,16 @@ namespace casadi {
     casadi_error("'get_forward' not defined for " + type_name());
   }
 
+  Function FunctionInternal::get_forward(const std::string& name, int nfwd, Dict& opts) {
+    // TODO(@jaeandersson): Fallback on finite differences
+    casadi_error("'get_forward' not defined for " + type_name());
+  }
+
   Function FunctionInternal::get_reverse_old(const std::string& name, int nadj, Dict& opts) {
+    casadi_error("'get_reverse' not defined for " + type_name());
+  }
+
+  Function FunctionInternal::get_reverse(const std::string& name, int nadj, Dict& opts) {
     casadi_error("'get_reverse' not defined for " + type_name());
   }
 

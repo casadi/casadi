@@ -956,6 +956,12 @@ namespace casadi {
      */
     static std::string fix_name(const std::string& name);
 
+    /// Assert that an input dimension is equal so some given value
+    void assert_size_in(int i, int nrow, int ncol) const;
+
+    /// Assert that an output dimension is equal so some given value
+    void assert_size_out(int i, int nrow, int ncol) const;
+
     /// Checkout a memory object
     int checkout();
 
