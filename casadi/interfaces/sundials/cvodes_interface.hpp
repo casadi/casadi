@@ -312,10 +312,17 @@ namespace casadi {
     bool monitor_rhsB_;
     bool monitor_rhs_;
     bool monitor_rhsQB_;
+
+    // jtimes signature
+    enum JTimesIn {
+      JTIMES_T, JTIMES_X, JTIMES_P, JTIMES_FWD_X, JTIMES_NUM_IN
+    };
+    enum JTimesOut {
+      JTIMES_FWD_ODE, JTIMES_NUM_OUT
+    };
   };
 
 } // namespace casadi
 
 /// \endcond
 #endif // CASADI_CVODES_INTERFACE_HPP
-
