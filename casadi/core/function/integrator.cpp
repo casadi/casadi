@@ -371,7 +371,7 @@ namespace casadi {
 
     // Create augmented problem
     MatType aug_t = MatType::sym("aug_t", t());
-    MatType aug_x = MatType::sym("aug_x", x().size1(), offset.x.back());
+    vector<MatType> aug_x1 = MatType::sym("aug_x", x(), nfwd+1);
     MatType aug_z = MatType::sym("aug_z", std::max(z().size1(), rz().size1()), offset.z.back());
     MatType aug_p = MatType::sym("aug_p", std::max(p().size1(), rp().size1()), offset.p.back());
     MatType aug_rx = MatType::sym("aug_rx", x().size1(), offset.rx.back());
@@ -379,8 +379,6 @@ namespace casadi {
     MatType aug_rp = MatType::sym("aug_rp", std::max(q().size1(), rp().size1()), offset.rp.back());
 
     // Split up the augmented vectors
-    vector<MatType> aug_x_split = horzsplit(aug_x, offset.x);
-    auto aug_x_split_it = aug_x_split.begin();
     vector<MatType> aug_z_split = horzsplit(aug_z, offset.z);
     auto aug_z_split_it = aug_z_split.begin();
     vector<MatType> aug_p_split = horzsplit(aug_p, offset.p);
@@ -411,7 +409,7 @@ namespace casadi {
     // Collect arguments for calling d
     for (int dir=-1; dir<nfwd; ++dir) {
       tmp[DAE_T] = dir<0 ? aug_t : zero_t;
-      if ( nx_>0) tmp[DAE_X] = *aug_x_split_it++;
+      if ( nx_>0) tmp[DAE_X] = aug_x1.at(dir+1);
       if ( nz_>0) tmp[DAE_Z] = *aug_z_split_it++;
       if ( np_>0) tmp[DAE_P] = *aug_p_split_it++;
       f_arg.insert(f_arg.end(), tmp.begin(), tmp.end());
@@ -445,14 +443,13 @@ namespace casadi {
       fill(tmp.begin(), tmp.end(), MatType());
 
       // Reset iterators
-      aug_x_split_it = aug_x_split.begin();
       aug_z_split_it = aug_z_split.begin();
       aug_p_split_it = aug_p_split.begin();
 
       // Collect arguments for calling d
       for (int dir=-1; dir<nfwd; ++dir) {
         tmp[RDAE_T] = dir<0 ? aug_t : zero_t;
-        if ( nx_>0) tmp[RDAE_X] = *aug_x_split_it++;
+        if ( nx_>0) tmp[RDAE_X] = aug_x1.at(1+dir);
         if ( nz_>0) tmp[RDAE_Z] = *aug_z_split_it++;
         if ( np_>0) tmp[RDAE_P] = *aug_p_split_it++;
         if (nrx_>0) tmp[RDAE_RX] = *aug_rx_split_it++;
@@ -482,7 +479,7 @@ namespace casadi {
 
     // Form the augmented forward integration
     ret["t"] = aug_t;
-    ret["x"] = aug_x;
+    ret["x"] = horzcat(aug_x1);
     ret["z"] = aug_z;
     ret["p"] = aug_p;
     if (!f_ode.empty()) ret["ode"] = densify(horzcat(f_ode));
@@ -500,7 +497,6 @@ namespace casadi {
     }
 
     // Consistency check
-    casadi_assert(aug_x_split_it == aug_x_split.end());
     casadi_assert(aug_z_split_it == aug_z_split.end());
     casadi_assert(aug_p_split_it == aug_p_split.end());
     casadi_assert(aug_rx_split_it == aug_rx_split.end());
