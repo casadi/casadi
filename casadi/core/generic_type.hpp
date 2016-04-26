@@ -33,7 +33,7 @@
 
 namespace casadi {
 
-#ifndef SWIG
+#if !defined(SWIG) || defined(SWIGXML)
 
   /** \brief  Types of options */
   enum TypeID {
@@ -58,7 +58,7 @@ namespace casadi {
       \date 2010
   */
   class CASADI_EXPORT GenericType
-#ifndef SWIG
+#if !defined(SWIG) || defined(SWIGXML)
     : public SharedObject
 #endif // SWIG
   {
@@ -66,7 +66,7 @@ namespace casadi {
     /// C++ equivalent of Python's dict or MATLAB's struct
     typedef std::map<std::string, GenericType> Dict;
 
-#ifndef SWIG
+#if !defined(SWIG) || defined(SWIGXML)
 
     /// Default constructor
     GenericType();
@@ -86,13 +86,16 @@ namespace casadi {
     GenericType(const Dict& dict);
     GenericType(void* ptr);
 
+#ifndef SWIG
     /// Get a description of a type
     static std::string get_type_description(TypeID type);
+#endif
 
     /// Get a description of the object's type
     std::string get_description() const { return get_type_description(getType()); }
 
     /// Construct a GenericType given an TypeID
+#ifndef SWIG
     static GenericType from_type(TypeID type);
 
     ///@{
@@ -110,11 +113,14 @@ namespace casadi {
     operator const Dict&() const { return as_dict();}
     ///@}
 
-    // Get type of object
-    TypeID getType() const;
-
     bool can_cast_to(TypeID other) const;
     bool can_cast_to(const GenericType& other) const { return can_cast_to(other.getType()) ;}
+#endif
+
+#if !defined(SWIG) || defined(SWIGXML)
+    // Get type of object
+    TypeID getType() const;
+#endif
 
     ///@{
     /** \brief Check if a particular type */
