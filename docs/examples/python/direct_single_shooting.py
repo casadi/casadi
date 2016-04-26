@@ -64,8 +64,8 @@ else:
 
 # Evaluate at a test point
 Fk = F(x0=[0.2,0.3],p=0.4)
-print Fk['xf']
-print Fk['qf']
+print(Fk['xf'])
+print(Fk['qf'])
 
 # Start with an empty NLP
 w=[]

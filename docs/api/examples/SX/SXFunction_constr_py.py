@@ -32,13 +32,13 @@ z = SX.sym("z",2,3) # An n-by-m matrix symbolic primitive
 ins =  [x,y] # function inputs
 outs = [x,y,vertcat(x,y),y*x,0]
 
-print outs
+print(outs)
 
 f = Function("f", ins, outs)
 
 #! f now has two inputs and a 4 outputs:
-print f.n_in()
-print f.n_out()
+print(f.n_in())
+print(f.n_out())
 
 #! The outputs has the following string representation.
 #! Note how all elements of out have been converted to SX by
@@ -46,4 +46,4 @@ print f.n_out()
 
 f_out = f(*f.sx_in())
 for i in range(3):
-  print f_out[i]
+  print(f_out[i])

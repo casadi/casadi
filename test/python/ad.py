@@ -100,7 +100,7 @@ class ADtests(casadiTestCase):
       return [X]
 
     def testje(xyz):
-      print vertcat(*[xyz.nz[0],xyz.nz[0]+2*xyz.nz[1]**2,xyz.nz[0]+2*xyz.nz[1]**3+3*xyz.nz[2]**4,xyz.nz[3]]).shape
+      print(vertcat(*[xyz.nz[0],xyz.nz[0]+2*xyz.nz[1]**2,xyz.nz[0]+2*xyz.nz[1]**3+3*xyz.nz[2]**4,xyz.nz[3]]).shape)
       
     self.mxoutputs = {
        "column": {
@@ -158,13 +158,13 @@ class ADtests(casadiTestCase):
             
             y = SX.sym("y",f.sparsity_in(0))
             
-            fseeds = map(lambda x: DM(f.sparsity_in(0),x), seeds)
-            aseeds = map(lambda x: DM(f.sparsity_out(0),x), seeds)
+            fseeds = [DM(f.sparsity_in(0),x) for x in seeds]
+            aseeds = [DM(f.sparsity_out(0),x) for x in seeds]
             res = f(y)
-            fwdsens = f.forward([y], [res], map(lambda x: [x],fseeds))
-            adjsens = f.reverse([y], [res], map(lambda x: [x],aseeds))
-            fwdsens = map(lambda x: x[0],fwdsens)
-            adjsens = map(lambda x: x[0],adjsens)
+            fwdsens = f.forward([y], [res], [[x] for x in fseeds])
+            adjsens = f.reverse([y], [res], [[x] for x in aseeds])
+            fwdsens = [x[0] for x in fwdsens]
+            adjsens = [x[0] for x in adjsens]
             
             fe = Function("fe", [y], [res])
             
@@ -198,13 +198,13 @@ class ADtests(casadiTestCase):
             
             y = MX.sym("y",f.sparsity_in(0))
             
-            fseeds = map(lambda x: DM(f.sparsity_in(0),x), seeds)
-            aseeds = map(lambda x: DM(f.sparsity_out(0),x), seeds)
+            fseeds = [DM(f.sparsity_in(0),x) for x in seeds]
+            aseeds = [DM(f.sparsity_out(0),x) for x in seeds]
             res = f(y)
-            fwdsens = f.forward([y],[res],map(lambda x: [x],fseeds))
-            adjsens = f.reverse([y],[res],map(lambda x: [x],aseeds))
-            fwdsens = map(lambda x: x[0],fwdsens)
-            adjsens = map(lambda x: x[0],adjsens)
+            fwdsens = f.forward([y],[res],[[x] for x in fseeds])
+            adjsens = f.reverse([y],[res],[[x] for x in aseeds])
+            fwdsens = [x[0] for x in fwdsens]
+            adjsens = [x[0] for x in adjsens]
             
             fe = Function('fe', [y], [res])
             
@@ -240,13 +240,13 @@ class ADtests(casadiTestCase):
             
             y = SX.sym("y",f.sparsity_in(0))
             
-            fseeds = map(lambda x: DM(f.sparsity_in(0),x), seeds)
-            aseeds = map(lambda x: DM(f.sparsity_out(0),x), seeds)
+            fseeds = [DM(f.sparsity_in(0),x) for x in seeds]
+            aseeds = [DM(f.sparsity_out(0),x) for x in seeds]
             res = f(y)
-            fwdsens = f.forward([y],[res],map(lambda x: [x],fseeds))
-            adjsens = f.reverse([y],[res],map(lambda x: [x],aseeds))
-            fwdsens = map(lambda x: x[0],fwdsens)
-            adjsens = map(lambda x: x[0],adjsens)
+            fwdsens = f.forward([y],[res],[[x] for x in fseeds])
+            adjsens = f.reverse([y],[res],[[x] for x in aseeds])
+            fwdsens = [x[0] for x in fwdsens]
+            adjsens = [x[0] for x in adjsens]
             
             fe = Function("fe", [y], [res])
             
@@ -581,7 +581,7 @@ class ADtests(casadiTestCase):
           (in1,v1,x.nz[IM([[1,0]])].T*y.nz[IM([[0,2]])],blockcat([[MX(1,1),y.nz[0]],[y.nz[2],MX(1,1)]])),
           (in1,v1,x.nz[c.diag([1,0])]*y.nz[c.diag([0,2])],blockcat([[MX(1,1),y.nz[0]],[MX(1,1),MX(1,1)],[MX(1,1),MX(1,1)],[y.nz[2],MX(1,1)]])),
      ]:
-      print out
+      print(out)
       fun = Function("fun", inputs,[out,jac])
       funsx = fun.expand("expand_fun")
       fun_ad = [Function("fun", inputs,[out,jac], {'ad_weight':w, 'ad_weight_sp':w}) for w in [0,1]]
@@ -712,7 +712,7 @@ class ADtests(casadiTestCase):
 
       # Remainder of eval testing
       for store,order in [(storage,"first-order"),(storage2,"second-order")]:
-        for stk,st in store.items():
+        for stk,st in list(store.items()):
           for i in range(len(st)-1):
             for k,(a,b) in enumerate(zip(st[0],st[i+1])):
               if b.numel()==0 and sparsify(a).nnz()==0: continue

@@ -44,12 +44,17 @@ def removedummybackend(dir):
     os.remove(dir+'/pylab.pyc')
   if os.path.exists(dir+'/pylab.py'):
     os.remove(dir+'/pylab.py')
-    
+
+python = "python"
+
+if "WITH_PYTHON3" in os.environ:
+  python = "python3"
+
 t = TestSuite(dirname=src,
   suffix="py",
   preRun=setdummybackend,
   postRun=removedummybackend,
-  command = lambda dir,fn, opt:  ["python","-W","error::SyntaxWarning","-W","error:This CasADi:DeprecationWarning", fn] + opt,
+  command = lambda dir,fn, opt:  [python,"-W","error::SyntaxWarning","-W","error:This CasADi:DeprecationWarning", fn] + opt,
   skipdirs=[".svn","ctemplate"],
     args=sys.argv[2:]
   )

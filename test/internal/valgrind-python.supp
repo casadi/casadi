@@ -725,3 +725,23 @@ fun:PyParser_ASTFromFile
    fun:PyString_FromFormat
    obj:*umath*
 }
+
+{
+   py3 A
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   fun:PyBytes_FromStringAndSize
+   fun:PyUnicodeUCS4_EncodeUTF8
+   obj:/usr/lib/python3/dist-packages/numpy/lib/_compiled_base.cpython-32mu.so
+}
+
+{
+   py3 B
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:realloc
+   fun:_PyBytes_Resize
+   fun:PyUnicodeUCS4_EncodeUTF8
+   obj:/usr/lib/python3/dist-packages/numpy/lib/_compiled_base.cpython-32mu.so
+}

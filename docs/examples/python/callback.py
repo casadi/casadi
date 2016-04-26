@@ -40,7 +40,7 @@ class MyCallback(Callback):
 
   # Initialize the object
   def init(self):
-     print 'initializing object'
+     print('initializing object')
 
   # Evaluate numerically
   def eval(self, arg):
@@ -51,4 +51,4 @@ class MyCallback(Callback):
 # Use the function
 f = MyCallback('f', 0.5)
 res = f(2)
-print res
+print(res)

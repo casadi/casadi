@@ -962,7 +962,7 @@ class SXtests(casadiTestCase):
     e = eig_symbolic(x)
     
     f = Function("f", [x],[e])
-    f_in = [0]*f.n_in();f_in[0]=DM(f.sparsity_in(0),range(1,8))
+    f_in = [0]*f.n_in();f_in[0]=DM(f.sparsity_in(0),list(range(1,8)))
     f_in[0].print_dense()
     f_out = f.call(f_in)
     self.checkarray(f_out[0],DM([1,-0.29150,10.29150]),digits=5)
@@ -978,7 +978,7 @@ class SXtests(casadiTestCase):
     e = eig_symbolic(x)
     
     f = Function("f", [x],[e])
-    f_in = [0]*f.n_in();f_in[0]=DM(f.sparsity_in(0),range(1,7))
+    f_in = [0]*f.n_in();f_in[0]=DM(f.sparsity_in(0),list(range(1,7)))
     f_in[0].print_dense()
     f_out = f.call(f_in)
     self.checkarray(f_out[0],DM([1,3,6]),digits=5)
@@ -987,8 +987,8 @@ class SXtests(casadiTestCase):
   
     f = Function("f", [x],[eig_symbolic(x)])
     fin = DM(x.sparsity(),0)
-    fin[Sparsity.diag(5)] = c.diag(range(5))
-    self.checkarray(f(fin), DM(range(5)))
+    fin[Sparsity.diag(5)] = c.diag(list(range(5)))
+    self.checkarray(f(fin), DM(list(range(5))))
     
   def test_jacobian_empty(self):
     x = SX.sym("x",3)
@@ -1034,12 +1034,13 @@ class SXtests(casadiTestCase):
     
   @skip(platform_arch==32)
   @memory_heavy()
+  @unittest.skipIf(sys.version_info >= (3, 0),"pickle is not compatible")
   def test_large_hessian(self):
     import pickle
 
-    A = pickle.load(file("../data/apoa1-2.pkl",'r'))
+    A = pickle.load(open("../data/apoa1-2.pkl","r"))
 
-    H = DM(A,range(A.nnz()))
+    H = DM(A,list(range(A.nnz())))
     H = H + H.T
     
     H = H[:20000,:20000]

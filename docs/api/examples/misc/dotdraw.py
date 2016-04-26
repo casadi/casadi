@@ -31,7 +31,7 @@ b = SX.sym("b")
 c = sin(a**5 + b)
 
 c = c - b/ sqrt(fabs(c))
-print c
+print(c)
 
 dotdraw(c)
 

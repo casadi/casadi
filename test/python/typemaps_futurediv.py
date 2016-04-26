@@ -22,7 +22,7 @@
 #
 #
 
-from __future__ import division
+
 from casadi import *
 import casadi as c
 import numpy
@@ -49,7 +49,7 @@ class typemaptests(casadiTestCase):
     self.message("make sure that floor_div raises errors")
     for x in [SX.sym("x"),MX.sym("x"),DM([3]),SX.sym("x")]:
       for y in [2,2.0,DM(3),numpy.matrix([2.0])]:
-        print (x,y)
+        print((x,y))
         self.assertRaises(Exception,lambda : x//y)
         self.assertRaises(Exception,lambda : y//x)
   
@@ -193,37 +193,37 @@ class typemaptests(casadiTestCase):
     ## numeric & SX
     for s in nums:
       for z in [SX.sym("x"), SX.sym("x"), SX.sym("x",2,2)]:
-        print "z = %s, s = %s" % (str(z),str(s))
-        print "  z = %s, s = %s" % (type(z),type(s))
+        print("z = %s, s = %s" % (str(z),str(s)))
+        print("  z = %s, s = %s" % (type(z),type(s)))
         tests(z,s)
        
     # numeric & MX
     for s in nums:
       for z in [MX.sym("x",2,2)]:
-        print "z = %s, s = %s" % (str(z),str(s))
-        print "  z = %s, s = %s" % (type(z),type(s))
+        print("z = %s, s = %s" % (str(z),str(s)))
+        print("  z = %s, s = %s" % (type(z),type(s)))
         tests(z,s)
         
     # SX & SX
     for s in [SX.sym("x"), SX.sym("x"), SX.sym("x",2,2)]:
       for z in [SX.sym("x"),SX.sym("x"), SX.sym("x",2,2)]:
-        print "z = %s, s = %s" % (str(z),str(s))
-        print "  z = %s, s = %s" % (type(z),type(s))
+        print("z = %s, s = %s" % (str(z),str(s)))
+        print("  z = %s, s = %s" % (type(z),type(s)))
         tests(z,s)
          
     ## MX & MX
     for s in [MX.sym("x"),MX.sym("x",2,2)]:
       for z in [MX.sym("x"),MX.sym("x",2,2)]:
-        print "z = %s, s = %s" % (str(z),str(s))
-        print "  z = %s, s = %s" % (type(z),type(s))
+        print("z = %s, s = %s" % (str(z),str(s)))
+        print("  z = %s, s = %s" % (type(z),type(s)))
         tests(z,s)
         
     for (s,x,y) in [
                   (matrix([[1,2],[3,4]]),SX.sym("x",2,2),MX.sym("x",2,2))    
                   ]:
       for z,ztype in zip([x,y],[[type(SX()),type(SX())],[type(MX())]]):
-        print "z = %s, s = %s" % (str(z),str(s))
-        print "  z = %s, s = %s" % (type(z),type(s))
+        print("z = %s, s = %s" % (str(z),str(s)))
+        print("  z = %s, s = %s" % (type(z),type(s)))
         doit(z,s,lambda z,s: -z)
         -s
         doit(z,s,lambda z,s: z+s)

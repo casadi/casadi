@@ -95,7 +95,7 @@ class ComplexityTests(casadiTestCase):
 
       p = (1-student.cdf(t,m))
       if self.debug:
-        print "If the order were really %d, then the measurements have a p-score of %.8f" % (order,p)
+        print("If the order were really %d, then the measurements have a p-score of %.8f" % (order,p))
       if p >= rejectat:
         results.append(order)
 
@@ -104,12 +104,12 @@ class ComplexityTests(casadiTestCase):
       order = results[0]
       a = mean(ts - order*Ns)
       sigmaa = std(ts - order*Ns)/sqrt(m)
-      print "O(f) = %.3e N^%d [s]    | 95%% confidence:   [%.3e , %.3e] N^%d [s]" % (exp(a),order,exp(student.ppf(conf, m, loc=a, scale=sigmaa)),exp(student.ppf(1-conf, m, loc=a, scale=sigmaa)),order)
+      print("O(f) = %.3e N^%d [s]    | 95%% confidence:   [%.3e , %.3e] N^%d [s]" % (exp(a),order,exp(student.ppf(conf, m, loc=a, scale=sigmaa)),exp(student.ppf(1-conf, m, loc=a, scale=sigmaa)),order))
     else:
-      print "raw fit O(f) = %.3e N^(%.3f) [s]" % (exp(a),b)
+      print("raw fit O(f) = %.3e N^(%.3f) [s]" % (exp(a),b))
 
     
-    for i, order in zip(range(len(orders))[1:],orders[1:]):
+    for i, order in zip(list(range(len(orders)))[1:],orders[1:]):
       if b < order and b > order-1 and not(order in results) and not(order -1 in results):
         results.append(-order)
     
@@ -137,7 +137,7 @@ class ComplexityTests(casadiTestCase):
       N=int(N*1.5)
       N+=1
       if self.check: break
-    print ""
+    print("")
 
     Ns = array(Ns)
     ts = array(ts)

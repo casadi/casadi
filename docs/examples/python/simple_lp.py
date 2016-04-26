@@ -43,4 +43,4 @@ lba = DM([-inf, 0, -inf])
 uba = DM([14, inf, 2])
 
 sol = solver(g=g, a=a, lba=lba, uba=uba)
-print sol
+print(sol)

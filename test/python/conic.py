@@ -49,7 +49,7 @@ if has_conic("cplex"):
 # if has_conic("sqic"):
 #   conics.append(("sqic",{},{}))
 
-print conics
+print(conics)
 
 class ConicTests(casadiTestCase):
 
@@ -595,8 +595,8 @@ class ConicTests(casadiTestCase):
     #return
     self.message("Badly scaled problem")
     N = 50
-    H = c.diag(range(1,N+1))
-    x0 = DM(range(N))
+    H = c.diag(list(range(1,N+1)))
+    x0 = DM(list(range(N)))
     
     G = -1.0*mtimes(H,x0)
 

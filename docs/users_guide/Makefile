@@ -1,4 +1,8 @@
-REVISION=$(shell python -c "import casadi;print casadi.__version__")
+PYTHON=python
+ifdef WITH_PYTHON3
+PYTHON=python3
+endif
+REVISION=$(shell $(PYTHON) -c "import casadi;print(casadi.__version__)")
 
 default: html pdf
 

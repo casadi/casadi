@@ -182,7 +182,7 @@ class Functiontests(casadiTestCase):
     
     for n in ([63,64,65,127,128,129] if args.run_slow else [63,64,65]):
       for m in ([63,64,65,127,128,129] if args.run_slow else [63,64,65]):
-        print (n,m)
+        print((n,m))
         sp = Sparsity.dense(n,m)
         
         test(sp)
@@ -267,7 +267,7 @@ class Functiontests(casadiTestCase):
       d = Sparsity.dense(i,i)
       test(d)
       
-      d = Sparsity.diag(i) + Sparsity.triplet(i,i,[0]*i,range(i))+Sparsity.triplet(i,i,range(i),[0]*i)
+      d = Sparsity.diag(i) + Sparsity.triplet(i,i,[0]*i,list(range(i)))+Sparsity.triplet(i,i,list(range(i)),[0]*i)
       test(d)
 
 
@@ -344,7 +344,7 @@ class Functiontests(casadiTestCase):
     n = 1
     x = SX.sym("x",n)
 
-    M = Function("M", [x],[mtimes((x-DM(range(n))),x.T)])
+    M = Function("M", [x],[mtimes((x-DM(list(range(n)))),x.T)])
 
     P = MX.sym("P",n,n)
     X = MX.sym("X",n)
@@ -383,8 +383,8 @@ class Functiontests(casadiTestCase):
           
           xf = rk4(VXk[k],VUk[k])
 
-          xfp = vertsplit(xf,n/2)
-          vp = vertsplit(VXk[k+1],n/2)
+          xfp = vertsplit(xf,int(n/2))
+          vp = vertsplit(VXk[k+1],int(n/2))
 
           g.append(xfp[0] - vp[0])
           g.append(xfp[1] - vp[1])
@@ -492,21 +492,21 @@ class Functiontests(casadiTestCase):
           ([Z[0]],[Z[0]]*n),
           ([MX()]*3,[MX()]*3),
         ]:
-      print "args", Z_alt
+      print("args", Z_alt)
 
       for parallelization in ["serial","openmp","unroll"] if args.run_slow else ["serial"]:
-        print parallelization
-        res = fun.map(map(lambda x: horzcat(*x),[X,Y,Z_alt,V]),parallelization)
+        print(parallelization)
+        res = fun.map([horzcat(*x) for x in [X,Y,Z_alt,V]],parallelization)
 
 
-        F = Function("F",X+Y+Z+V,map(sin,res))
+        F = Function("F",X+Y+Z+V,list(map(sin,res)))
 
         resref = [[] for i in range(fun.n_out())]
         for r in zip(X,Y,Z_alt2,V):
           for i,e in enumerate(map(sin,fun.call(r))):
             resref[i] = resref[i] + [e]
 
-        Fref = Function("F",X+Y+Z+V,map(lambda x: horzcat(*x),resref))
+        Fref = Function("F",X+Y+Z+V,[horzcat(*x) for x in resref])
         
         np.random.seed(0)
         X_ = [ DM(i.sparsity(),np.random.random(i.nnz())) for i in X ] 
@@ -538,17 +538,17 @@ class Functiontests(casadiTestCase):
     for Z_alt in [Z,[MX()]*3]:
       zi+= 1
       for parallelization in ["serial","openmp","unroll"]:
-        res = fun.mapsum(map(lambda x: horzcat(*x),[X,Y,Z_alt,V]),parallelization) # Joris - clean alternative for this?
+        res = fun.mapsum([horzcat(*x) for x in [X,Y,Z_alt,V]],parallelization) # Joris - clean alternative for this?
 
         for ad_weight_sp in [0,1]:
-          F = Function("F",X+Y+Z+V,map(sin,res),{"ad_weight": 0,"ad_weight_sp":ad_weight_sp})
+          F = Function("F",X+Y+Z+V,list(map(sin,res)),{"ad_weight": 0,"ad_weight_sp":ad_weight_sp})
 
           resref = [0 for i in range(fun.n_out())]
           for r in zip(X,Y,Z_alt,V):
             for i,e in enumerate(fun.call(r)):
               resref[i] = resref[i] + e
 
-          Fref = Function("F",X+Y+Z+V,map(sin,resref))
+          Fref = Function("F",X+Y+Z+V,list(map(sin,resref)))
           
           np.random.seed(0)
           X_ = [ DM(i.sparsity(),np.random.random(i.nnz())) for i in X ] 
@@ -863,9 +863,9 @@ class Functiontests(casadiTestCase):
     m = 40
  
     try:
-      xx, yy = np.meshgrid(range(n), range(m),indexing="ij")
+      xx, yy = np.meshgrid(list(range(n)), list(range(m)),indexing="ij")
     except:
-      yy, xx = np.meshgrid(range(m), range(n))
+      yy, xx = np.meshgrid(list(range(m)), list(range(n)))
 
     z = np.cos(xx/4.0+yy/3.0)
 
@@ -884,8 +884,8 @@ class Functiontests(casadiTestCase):
 
     Fref = f.map("f","serial",n*m,[2],[0])
     
-    print Fref(horzcat(*[vec(xx),vec(yy)]).T,vec(z),x0)
-    print F(z,x0)
+    print(Fref(horzcat(*[vec(xx),vec(yy)]).T,vec(z),x0))
+    print(F(z,x0))
     
     zs = MX.sym("z", z.shape)
     xs = MX.sym("x",2)

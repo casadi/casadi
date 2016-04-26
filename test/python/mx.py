@@ -30,6 +30,12 @@ from types import *
 from helpers import *
 from copy import deepcopy
 
+import sys
+
+if sys.version_info >= (3, 0):   
+  TupleType = tuple
+
+
 warnings.filterwarnings("ignore",category=DeprecationWarning)
 
 scipy_available = True
@@ -345,8 +351,8 @@ class MXtests(casadiTestCase):
     self.message("trans")
     a = MX(0,1)
     b = a.T
-    self.assertEquals(b.size1(),1)
-    self.assertEquals(b.size2(),0)
+    self.assertEqual(b.size1(),1)
+    self.assertEqual(b.size2(),0)
     
   def test_MXtrans(self):
     self.message("trans(MX)")
@@ -767,7 +773,7 @@ class MXtests(casadiTestCase):
     
     def randsparsity(m,n):
       sp = Sparsity(m,n)
-      for i in range((n*m)/2):
+      for i in range(int((n*m)/2)):
         sp.add_nz(numpy.random.randint(m),numpy.random.randint(n))
       return sp
       
@@ -837,11 +843,11 @@ class MXtests(casadiTestCase):
     
     def randsparsity(m,n):
       sp = Sparsity(m,n)
-      for k in range((n*m)/2):
+      for k in range(int((n*m)/2)):
         i = numpy.random.randint(m)
         j = numpy.random.randint(n)
-        if not(i == m/2):
-          if n==1 or not(j == n/2):
+        if not(i == int(m/2)):
+          if n==1 or not(j == int(n/2)):
             sp.add_nz(i,j)
       return sp
       
@@ -1287,27 +1293,27 @@ class MXtests(casadiTestCase):
     self.message("reshape")
     X = MX.sym("X",10)
 
-    i = IM(Sparsity.lower(3),range(6))
+    i = IM(Sparsity.lower(3),list(range(6)))
 
     i.print_dense()
-    print i.T.nz[:]
+    print(i.T.nz[:])
 
     T = X.nz[i]
 
     f = Function("f", [X], [T.T.nz[:]**2])
-    f_out = f(range(10))
+    f_out = f(list(range(10)))
     
     self.checkarray(IM([0,1,9,4,16,25]),f_out)
 
     Y = MX.sym("Y",10)
 
     ff = Function("ff", [Y],f.call([Y],True))
-    ff_out = ff(range(10))
+    ff_out = ff(list(range(10)))
 
     self.checkarray(IM([0,1,9,4,16,25]),ff_out)
     
     J = Function("J", [X],[MX.jac(f)])
-    J_out = J(range(10))
+    J_out = J(list(range(10)))
     
     i = horzcat(*[diag([0,2,4,6,8,10]),IM.zeros(6,4)])
     i[[2,3],:] = i[[3,2],:]
@@ -1317,7 +1323,7 @@ class MXtests(casadiTestCase):
     f = Function("f", [X],[(T.T).nz[:]**2], {"ad_weight":1, "ad_weight_sp":1})
     
     J = Function("J", [X],[MX.jac(f)])
-    J_in = [0]*J.n_in();J_in[0]=range(10)
+    J_in = [0]*J.n_in();J_in[0]=list(range(10))
     J_out = J(*J_in)
     
     i = horzcat(*[diag([0,2,4,6,8,10]),IM.zeros(6,4)])
@@ -1332,7 +1338,7 @@ class MXtests(casadiTestCase):
     T = vertcat(*[X[4],X[2]])
 
     f = Function("f", [X],[T**2])
-    f_in = [0]*f.n_in();f_in[0]=range(10)
+    f_in = [0]*f.n_in();f_in[0]=list(range(10))
     f_out = f.call(f_in)
     
     self.checkarray(IM([16,4]),f_out[0])
@@ -1340,13 +1346,13 @@ class MXtests(casadiTestCase):
     Y = MX.sym("Y",10)
 
     ff = Function("ff", [Y],f.call([Y],True))
-    ff_in = [0]*ff.n_in();ff_in[0]=range(10)
+    ff_in = [0]*ff.n_in();ff_in[0]=list(range(10))
     ff_out = ff(*ff_in)
 
     self.checkarray(IM([16,4]),ff_out)
     
     J = Function("J", [X],[MX.jac(f)])
-    J_in = [0]*J.n_in();J_in[0]=range(10)
+    J_in = [0]*J.n_in();J_in[0]=list(range(10))
     J_out = J(*J_in)
     
     i = IM.zeros(2,10)
@@ -1358,7 +1364,7 @@ class MXtests(casadiTestCase):
     f = Function("f", [X],[T**2], {"ad_weight":1, "ad_weight_sp":1})
     
     J = Function("J", [X],[MX.jac(f)])
-    J_in = [0]*J.n_in();J_in[0]=range(10)
+    J_in = [0]*J.n_in();J_in[0]=list(range(10))
     J_out = J(*J_in)
 
     self.checkarray(i,J_out)
@@ -1398,7 +1404,7 @@ class MXtests(casadiTestCase):
   def test_tril2symm(self):
     x = MX.sym("x",Sparsity.lower(3))
     f = Function("f", [x],[tril2symm(x)])
-    f_in = [0]*f.n_in();f_in[0]=DM(f.sparsity_in(0),range(6))
+    f_in = [0]*f.n_in();f_in[0]=DM(f.sparsity_in(0),list(range(6)))
     f_out = f(*f_in)
     self.checkarray(f_out,DM([[0,1,2],[1,3,4],[2,4,5]]))
     
@@ -1501,8 +1507,10 @@ class MXtests(casadiTestCase):
     a = MX.sym("X",Sparsity.lower(5))
     v = vertsplit(a,[0,2,4,5])
     
+    Nr = int(5*6/2)
+    
     f = Function("f", [a],v)
-    f_in = [0]*f.n_in();f_in[0]=DM(f.sparsity_in(0),range(5*6/2))
+    f_in = [0]*f.n_in();f_in[0]=DM(f.sparsity_in(0),list(range(Nr)))
 
     f_out = f.call(f_in)
     v = [f_out[i] for i in range(len(v))]
@@ -1515,7 +1523,7 @@ class MXtests(casadiTestCase):
     v = vertsplit(a)
     
     f = Function("f", [a],v)
-    f_in = [0]*f.n_in();f_in[0]=DM(f.sparsity_in(0),range(5*6/2))
+    f_in = [0]*f.n_in();f_in[0]=DM(f.sparsity_in(0),list(range(Nr)))
 
     f_out = f.call(f_in)
     v = [f_out[i] for i in range(len(v))]
@@ -1530,7 +1538,7 @@ class MXtests(casadiTestCase):
     v = vertsplit(a,2)
     
     f = Function("f", [a],v)
-    f_in = [0]*f.n_in();f_in[0]=DM(f.sparsity_in(0),range(5*6/2))
+    f_in = [0]*f.n_in();f_in[0]=DM(f.sparsity_in(0),list(range(Nr)))
 
     f_out = f.call(f_in)
     v = [f_out[i] for i in range(len(v))]
@@ -1543,7 +1551,7 @@ class MXtests(casadiTestCase):
     v = vertsplit(a,[0,0,3,a.size1()])
     
     f = Function("f", [a],v)
-    f_in = [0]*f.n_in();f_in[0]=DM(f.sparsity_in(0),range(5*6/2))
+    f_in = [0]*f.n_in();f_in[0]=DM(f.sparsity_in(0),list(range(Nr)))
 
     f_out = f(*f_in)
     V = [f_out[i] for i in range(len(v))]
@@ -1558,8 +1566,9 @@ class MXtests(casadiTestCase):
     a = MX.sym("X",Sparsity.lower(5))
     v = horzsplit(a,[0,2,4,5])
     
+    Nr = int(5*6/2)
     f = Function("f", [a],v)
-    f_in = DM(f.sparsity_in(0),range(5*6/2))
+    f_in = DM(f.sparsity_in(0),list(range(Nr)))
 
     f_out = f(f_in)
     v = [f_out[i] for i in range(len(v))]
@@ -1571,7 +1580,7 @@ class MXtests(casadiTestCase):
     v = horzsplit(a)
     
     f = Function("f", [a],v)
-    f_in = DM(f.sparsity_in(0),range(5*6/2))
+    f_in = DM(f.sparsity_in(0),list(range(Nr)))
     f_out = f(f_in)
     v = [f_out[i] for i in range(len(v))]
     self.assertEqual(len(v),a.size1())
@@ -1584,7 +1593,7 @@ class MXtests(casadiTestCase):
     v = horzsplit(a,2)
 
     f = Function("f", [a],v)
-    f_in = DM(f.sparsity_in(0),range(5*6/2))
+    f_in = DM(f.sparsity_in(0),list(range(Nr)))
     f_out = f(f_in)
     v = [f_out[i] for i in range(len(v))]
     
@@ -1595,7 +1604,7 @@ class MXtests(casadiTestCase):
     
     v = horzsplit(a,[0,0,3,a.size2()])
     f = Function("f", [a],v)
-    f_in = DM(f.sparsity_in(0),range(5*6/2))
+    f_in = DM(f.sparsity_in(0),list(range(Nr)))
     f_out = f(f_in)
     V = [f_out[i] for i in range(len(v))]
     
@@ -1609,13 +1618,14 @@ class MXtests(casadiTestCase):
     a = MX.sym("X",Sparsity.lower(5))
     v = blocksplit(a,[0,2,4,5],[0,1,3,5])
     
+    Nr = int(5*6/2)
     fs = [Function("fs", [a],vr) for vr in v]
-    v = [fs[i](DM(fs[i].sparsity_in(0),range(5*6/2))) for i in range(3)]
+    v = [fs[i](DM(fs[i].sparsity_in(0),list(range(Nr)))) for i in range(3)]
     
     self.checkarray(v[0][0],DM([0,1]))
     self.checkarray(v[0][1],DM([[0,0],[5,0]]))
     self.checkarray(v[1][0],DM([2,3]))
-    self.checkarray(blockcat(v),DM(fs[0].sparsity_in(0),range(5*6/2)))
+    self.checkarray(blockcat(v),DM(fs[0].sparsity_in(0),list(range(Nr))))
 
   def test_mxnulloutput(self):
      a = MX(5,0)
@@ -1753,7 +1763,7 @@ class MXtests(casadiTestCase):
           for (casadiop, numpyop,name, flags) in self.pool.zip():
             if 'nozero' in flags and (v==0 or not sp.is_dense()): continue
             r = casadiop([x])
-            print r
+            print(r)
             self.assertTrue(r.is_constant())
             
             self.checkarray(r.to_DM(),numpyop(x_),str([x_,name]))
@@ -1836,7 +1846,7 @@ class MXtests(casadiTestCase):
     t1 = matrix_expand(e,[d])
     self.assertEqual(n_nodes(t1),6)
     
-    print e,t0,t1
+    print(e,t0,t1)
     
     
     outs = []
@@ -1847,10 +1857,10 @@ class MXtests(casadiTestCase):
       f_out = f(*f_in)
       
       outs.append(f_out)
-      if outs>1:
+      if len(outs)>1:
         self.checkarray(outs[0],outs[-1])
       
-    print outs
+    print(outs)
     
   def test_kron(self):
     a = sparsify(DM([[1,0,6],[2,7,0]]))
@@ -1877,7 +1887,7 @@ class MXtests(casadiTestCase):
     y = project(x, Sparsity.lower(3).T)
     
     f = Function("f", [x],[y])
-    f_in=DM(f.sparsity_in(0),range(1,4*3/2+1))
+    f_in=DM(f.sparsity_in(0),list(range(1,int(4*3/2+1))))
     f_out = f(f_in)
     
     self.checkarray(f_out,DM([[1,0,0],[0,4,0],[0,0,6]]))
@@ -1944,7 +1954,7 @@ class MXtests(casadiTestCase):
      
     A = sparsify(DM(A))
 
-    b = DM(range(15))
+    b = DM(list(range(15)))
     H = 5
 
     Bs = MX.sym("Bs",b.sparsity())
@@ -1995,7 +2005,7 @@ class MXtests(casadiTestCase):
     x = MX.sym("x",10)
     y = MX.sym("y")
     z = MX.sym("z")
-    x_ = DM(range(10))
+    x_ = DM(list(range(10)))
     y_ = DM([20])
     z_ = DM([30])
     
@@ -2019,24 +2029,23 @@ class MXtests(casadiTestCase):
     self.checkarray(evalvertcat(*g),vertcat(*[x_[5:],x_[:5]]))
     self.checkarray(evalvertcat(*g+[y]),vertcat(*[x_[5:],x_[:5],y_]))
     self.checkarray(evalvertcat(*[z]+g+[y] + g+[z]),vertcat(*[z_,x_[5:],x_[:5],y_,x_[5:],x_[:5],z_]))
-    
-    import __builtin__
+
 
 
     w = vertsplit(x,2)
-    r = __builtin__.sum([vertsplit(i) for i in w],[])
+    r = builtins.sum([vertsplit(i) for i in w],[])
     
     self.checkarray(evalvertcat(*r),x_)
 
     w = vertsplit(x,2)
-    r = __builtin__.sum([vertsplit(i)+[y] for i in w],[])
-    print "vertcat:", r
-    print "result:", vertcat(*r)
+    r = builtins.sum([vertsplit(i)+[y] for i in w],[])
+    print("vertcat:", r)
+    print("result:", vertcat(*r))
 
     w = vertsplit(x,2)
-    r = __builtin__.sum([vertsplit(i) for i in w],[])
-    print "vertcat:", r
-    print "result:", vertcat(*r+[y])
+    r = builtins.sum([vertsplit(i) for i in w],[])
+    print("vertcat:", r)
+    print("result:", vertcat(*r+[y]))
     
     self.assertTrue(is_equal(vertcat(*vertsplit(x)),x))
     
@@ -2044,7 +2053,7 @@ class MXtests(casadiTestCase):
     x = MX.sym("x",1,10)
     y = MX.sym("y")
     z = MX.sym("z")
-    x_ = DM(range(10)).T
+    x_ = DM(list(range(10))).T
     y_ = DM([20])
     z_ = DM([30])
     
@@ -2066,30 +2075,28 @@ class MXtests(casadiTestCase):
     self.checkarray(evalhorzcat(*g+[y]),horzcat(*[x_[0,5:],x_[0,:5],y_]))
     self.checkarray(evalhorzcat(*[z]+g+[y] + g+[z]),horzcat(*[z_,x_[0,5:],x_[0,:5],y_,x_[0,5:],x_[0,:5],z_]))
     
-    import __builtin__
-
 
     w = horzsplit(x,2)
-    r = __builtin__.sum([horzsplit(i) for i in w],[])
+    r = builtins.sum([horzsplit(i) for i in w],[])
     
     self.checkarray(evalhorzcat(*r),x_)
 
     w = horzsplit(x,2)
-    r = __builtin__.sum([horzsplit(i)+[y] for i in w],[])
-    print "vertcat:", r
-    print "result:", horzcat(*r)
+    r = builtins.sum([horzsplit(i)+[y] for i in w],[])
+    print("vertcat:", r)
+    print("result:", horzcat(*r))
 
     w = horzsplit(x,2)
-    r = __builtin__.sum([horzsplit(i) for i in w],[])
-    print "vertcat:", r
-    print "result:", horzcat(*r+[y])
+    r = builtins.sum([horzsplit(i) for i in w],[])
+    print("vertcat:", r)
+    print("result:", horzcat(*r+[y]))
 
     self.assertTrue(is_equal(horzcat(*horzsplit(x)),x))
     
   def test_vertsplit_simp(self):
     
     dvars = [MX.sym("abcdefghijklm"[i]) for i in range(5) ]
-    dvars_ = range(5)
+    dvars_ = list(range(5))
 
     zz = MX.sym("zz",2)
     zz_ = DM([11,12])
@@ -2099,10 +2106,10 @@ class MXtests(casadiTestCase):
     z_ = DM([30])
     
     aa = MX.sym("aa",5)
-    aa_ = range(100,105)
+    aa_ = list(range(100,105))
     
     def evalvertsplit(a,*args):
-      print vertsplit(a,*args)
+      print(vertsplit(a,*args))
       f = Function("f", dvars+[y,z,zz,aa],vertsplit(a,*args))
       f_in = [0]*f.n_in()
       for i in range(5):
@@ -2168,7 +2175,7 @@ class MXtests(casadiTestCase):
   def test_horzsplit_simp(self):
     
     dvars = [MX.sym("abcdefghijklm"[i]) for i in range(5) ]
-    dvars_ = range(5)
+    dvars_ = list(range(5))
 
     zz = MX.sym("zz",1,2)
     zz_ = DM([11,12]).T
@@ -2178,10 +2185,10 @@ class MXtests(casadiTestCase):
     z_ = DM([30])
     
     aa = MX.sym("aa",1,5)
-    aa_ = range(100,105)
+    aa_ = list(range(100,105))
     
     def evalhorzsplit(a,*args):
-      print horzsplit(a,*args)
+      print(horzsplit(a,*args))
       f = Function("f", dvars+[y,z,zz,aa],horzsplit(a,*args))
       f_in = [0]*f.n_in()
       for i in range(5):
@@ -2256,11 +2263,11 @@ class MXtests(casadiTestCase):
 
     sp = Sparsity.triplet(3,3,[0,1,2,2],[0,0,1,2])
 
-    f = Function("f", [x],[x.nz[IM(sp,range(sp.nnz()))]])
+    f = Function("f", [x],[x.nz[IM(sp,list(range(sp.nnz())))]])
 
     g = Function("g", [x],[MX(sp,x)])
     
-    f_in = [0]*f.n_in();f_in[0]=DM(range(1,5))
+    f_in = [0]*f.n_in();f_in[0]=DM(list(range(1,5)))
     
     self.checkfunction(f,g,inputs=f_in)
     
@@ -2273,7 +2280,7 @@ class MXtests(casadiTestCase):
 
     g = Function("g", [sx],[sx.reshape((2,2))])
     
-    f_in = [0]*f.n_in();f_in[0]=DM(range(1,5))
+    f_in = [0]*f.n_in();f_in[0]=DM(list(range(1,5)))
     
     self.checkfunction(f,g,inputs=f_in)
     
@@ -2410,10 +2417,10 @@ class MXtests(casadiTestCase):
     for fun in [lambda x: x[0]*x[1],lambda x: x[0]*sin(x[1])]:
       def hessian1(f, x): return hessian(f, x)[0]
       for op in [c.gradient, jacobian, hessian1]:
-        print fun, op
+        print(fun, op)
         x = MX.sym("x",2)
-        print fun(x)
-        print op(fun(x),x)
+        print(fun(x))
+        print(op(fun(x),x))
         f = Function("f", [x],[op(fun(x),x)])        
 
         x = SX.sym("x",2)

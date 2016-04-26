@@ -30,7 +30,7 @@ x = SX.sym("x")
 y = SX.sym("y")
 z_= x*y
 z = z_+x 
-print type(z), z
+print(type(z), z)
 
 #! We need SXFuncion to manipulate the SX graph
 f = Function('f', [vertcat(x,y)],[z])
@@ -39,12 +39,12 @@ f = Function('f', [vertcat(x,y)],[z])
 w = SX.sym("w")
 q = f(vertcat(w,y))
 #! f.eval() returns a tuple with all outputs, we selected the first
-print type(q), q
+print(type(q), q)
 #! Note how q is now an SX
 
 #! We can take a shortcut via substitute:
 q = substitute(z,x,w)
-print type(q), q
+print(type(q), q)
 
 #! Note that substitution of non-symbolic SX nodes is not permitted:
 #  substitute([z],[z_],[w])  This would throw an error

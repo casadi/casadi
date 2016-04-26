@@ -31,7 +31,7 @@ class Symbolictests(casadiTestCase):
   @slow()
   @memory_heavy()
   def test_in_place_simplification(self):
-    print "In place simplification"
+    print("In place simplification")
 
     variables = ["a","b"]
     numbers = [1.3,0.7001]
@@ -91,7 +91,7 @@ class Symbolictests(casadiTestCase):
                self.assertTrue(numpy.isnan(float(r)) or numpy.isinf(float(r)))
                continue
              if (abs(num-r)>1e-10):
-               print i , op3, " -> ", e
+               print(i , op3, " -> ", e)
                self.assertTrue(False)
 
 if __name__ == '__main__':

@@ -34,6 +34,13 @@ import time
 import argparse
 import struct
 
+if sys.version_info >= (3, 0):
+  import builtins
+else:
+  import __builtin__
+  builtins = __builtin__
+
+
 platform_arch = 8 * struct.calcsize("P")
 
 parser = argparse.ArgumentParser()
@@ -48,7 +55,7 @@ args = parser.parse_args()
 import sys
 sys.argv[1:] = ['-v'] + args.unittest_args
 
-from StringIO import StringIO
+from io import StringIO
 
 
 class LazyString(object):
@@ -63,7 +70,7 @@ class LazyString(object):
      
   def __str__(self):
     d = self.context
-    exec "ret = " + self.f.replace("\n","\\n") in d
+    exec("ret = " + self.f.replace("\n","\\n"), d)
     return str(d["ret"])
 
 class TeeString(StringIO):
@@ -110,7 +117,7 @@ class FunctionPool:
     self.names.append(name)
     self.flags.append(flags)
   def zip(self):
-    return zip(self.casadioperators,self.numpyoperators,self.names,self.flags)
+    return list(zip(self.casadioperators,self.numpyoperators,self.names,self.flags))
 
 
 def toSX_fun(fun):
@@ -126,27 +133,46 @@ class casadiTestCase(unittest.TestCase):
 
   def tearDown(self):
     t = time.time() - self.startTime
-    print "deltaT %s: %.3f" % ( self.id(), t)
+    print("deltaT %s: %.3f" % ( self.id(), t))
 
   def __init__(self,*margs,**kwargs):
     self.startTime = time.time()
-    fun = getattr(getattr(self,margs[0]),'im_func')
-    if not hasattr(fun,'tag_memory_heavy'):
-      fun.tag_memory_heavy = False
-    if not hasattr(fun,'tag_slow'):
-      fun.tag_slow = False
-    
-    if args.ignore_memory_heavy and fun.tag_memory_heavy:
-      fun.__unittest_skip__ = True
-      fun.__unittest_skip_why__ = "Ignoring memory_heavy tests (--ignore_memory_heavy)"
-    if args.ignore_memory_light and not(fun.tag_memory_heavy):
-      fun.__unittest_skip__ = True
-      fun.__unittest_skip_why__ = "Ignoring memory_light tests (--ignore_memory_light)"
-
-    if not(args.run_slow) and fun.tag_slow:
-      fun.__unittest_skip__ = True
-      fun.__unittest_skip_why__ = "Ignoring slow tests (--run_slow)"
+    if sys.version_info >= (3, 0):
+      fun = getattr(self,margs[0])
+      if not hasattr(fun,'tag_memory_heavy'):
+        fun.__dict__["tag_memory_heavy"] = False
+      if not hasattr(fun,'tag_slow'):
+        fun.__dict__["tag_slow"] = False
       
+      if args.ignore_memory_heavy and fun.tag_memory_heavy:
+        fun.__dict__["__unittest_skip__"] = True
+        fun.__dict__["__unittest_skip_why__"] = "Ignoring memory_heavy tests (--ignore_memory_heavy)"
+      if args.ignore_memory_light and not(fun.tag_memory_heavy):
+        fun.__dict__["__unittest_skip__"] = True
+        fun.__dict__["__unittest_skip_why__"] = "Ignoring memory_light tests (--ignore_memory_light)"
+
+      if not(args.run_slow) and fun.tag_slow:
+        fun.__dict__["__unittest_skip__"] = True
+        fun.__dict__["__unittest_skip_why__"] = "Ignoring slow tests (--run_slow)"
+        
+    else:
+      fun = getattr(getattr(self,margs[0]),'im_func')
+      if not hasattr(fun,'tag_memory_heavy'):
+        fun.tag_memory_heavy = False
+      if not hasattr(fun,'tag_slow'):
+        fun.tag_slow = False
+      
+      if args.ignore_memory_heavy and fun.tag_memory_heavy:
+        fun.__unittest_skip__ = True
+        fun.__unittest_skip_why__ = "Ignoring memory_heavy tests (--ignore_memory_heavy)"
+      if args.ignore_memory_light and not(fun.tag_memory_heavy):
+        fun.__unittest_skip__ = True
+        fun.__unittest_skip_why__ = "Ignoring memory_light tests (--ignore_memory_light)"
+
+      if not(args.run_slow) and fun.tag_slow:
+        fun.__unittest_skip__ = True
+        fun.__unittest_skip_why__ = "Ignoring slow tests (--run_slow)"
+        
     unittest.TestCase.__init__(self,*margs,**kwargs)
 
   def randDM(self,n,m=1,sparsity=1,valuegenerator=lambda : random.normal(0,1),symm=False ):
@@ -167,7 +193,7 @@ class casadiTestCase(unittest.TestCase):
         return ret
   
   def message(self,s):
-      print s
+      print(s)
       sys.stdout.flush()
 
   def assertAlmostEqual(self,first, second, places=7, msg=""):
@@ -267,7 +293,7 @@ class casadiTestCase(unittest.TestCase):
       try:
         f_in[i]=setx0[i]
       except Exception as e:
-         print f.size_in(i)
+         print(f.size_in(i))
          raise e
          raise Exception("ERROR! Tried to set input with %s which is of type  %s \n%s" %(str(x0[i]), str(type(x0[i])),name))
     f_out = f.call(f_in)
@@ -292,7 +318,7 @@ class casadiTestCase(unittest.TestCase):
       function=ft(x)
       frx=fr(x0)
     except Exception as e:
-      print "Error calling functions in %s" % name
+      print("Error calling functions in %s" % name)
       raise e
     self.evaluationCheck([function],frx,x,x0,name,failmessage,fmod=fmod,setx0=setx0)
 
@@ -310,7 +336,7 @@ class casadiTestCase(unittest.TestCase):
       d = inputs
       inputs = [0]*trial.n_in()
       ns = trial.name_in()
-      for k,v in d.items():
+      for k,v in list(d.items()):
         inputs[ns.index(k)] = v
         
     if indirect:
@@ -476,7 +502,7 @@ class casadiTestCase(unittest.TestCase):
 
       # Remainder of eval testing
       for store,order in [(storage,"first-order"),(storage2,"second-order")][:evals]:
-        for stk,st in store.items():
+        for stk,st in list(store.items()):
           for i in range(len(st)-1):
             for k,(a,b) in enumerate(zip(st[0],st[i+1])):
               if b.numel()==0 and sparsify(a).nnz()==0: continue
@@ -510,14 +536,14 @@ class run_only(object):
       self.args.append(a)
 
   def __call__(self, c):
-    print "run_only:"
+    print("run_only:")
     for i in dir(c):
       if i.startswith('test_'):
         n = i[5:]
         if not n in self.args:
           delattr(c,i)
         else:
-          print i
+          print(i)
     return c
 
 class requires(object):
@@ -528,7 +554,7 @@ class requires(object):
     if hasattr(casadi,self.att):
       return c
     else:
-      print "Not available %s, skipping unittests" % self.att
+      print("Not available %s, skipping unittests" % self.att)
       return None
       
 class requires_conic(object):
@@ -540,7 +566,7 @@ class requires_conic(object):
       load_conic(self.n)
       return c
     except:
-      print "Not available QP plugin %s, skipping unittests" % self.n
+      print("Not available QP plugin %s, skipping unittests" % self.n)
       return None
 
 class requires_nlpsol(object):
@@ -552,7 +578,7 @@ class requires_nlpsol(object):
       load_nlpsol(self.n)
       return c
     except:
-      print "Not available NLP plugin %s, skipping unittests" % self.n
+      print("Not available NLP plugin %s, skipping unittests" % self.n)
       return None
 
 class requires_integrator(object):
@@ -564,7 +590,7 @@ class requires_integrator(object):
       load_integrator(self.n)
       return c
     except:
-      print "Not available integrator plugin %s, skipping unittests" % self.n
+      print("Not available integrator plugin %s, skipping unittests" % self.n)
       return None
 
 class requires_rootfinder(object):
@@ -576,7 +602,7 @@ class requires_rootfinder(object):
       load_rootfinder(self.n)
       return c
     except:
-      print "Not available RFP plugin %s, skipping unittests" % self.n
+      print("Not available RFP plugin %s, skipping unittests" % self.n)
       return None
 
 class requires_linsol(object):
@@ -588,7 +614,7 @@ class requires_linsol(object):
       load_linsol(self.n)
       return c
     except:
-      print "Not available linear solver plugin %s, skipping unittests" % self.n
+      print("Not available linear solver plugin %s, skipping unittests" % self.n)
       return None
 
 class requiresPlugin(object):
@@ -601,7 +627,7 @@ class requiresPlugin(object):
       self.att.loadPlugin(self.n)
       return c
     except:
-      print "Not available %s plugin %s, skipping unittests" % (str(self.att),self.n)
+      print("Not available %s plugin %s, skipping unittests" % (str(self.att),self.n))
       return None
 
 class skip(object):
@@ -615,7 +641,7 @@ class skip(object):
         delattr(c,i)
       return c
     else:
-      print self.skiptext(c.__name__)
+      print(self.skiptext(c.__name__))
       return None
    
   def skiptext(self,name):
@@ -629,8 +655,8 @@ class memory_heavy(object):
     pass
     
   def __call__(self, c):
-    print c
-    c.tag_memory_heavy = True
+    print(c)
+    c.__dict__["tag_memory_heavy"] = True
     return c
     
 class slow(object):
@@ -638,6 +664,6 @@ class slow(object):
     pass
     
   def __call__(self, c):
-    print "slow", c
-    c.tag_slow = True
+    print("slow", c)
+    c.__dict__["tag_slow"] = True
     return c

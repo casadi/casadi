@@ -49,7 +49,7 @@ B = DM([[1,1],[0,1],[1,0]])
 
 # Inspect the open-loop system
 [D,V] = linalg.eig(A)
-print 'Open-loop eigenvalues: ', D
+print('Open-loop eigenvalues: ', D)
 
 tn = linspace(0,te,N)
 

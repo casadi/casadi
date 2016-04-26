@@ -69,13 +69,13 @@ f = Function('f', [x_all, z_all, p_all], [ode, alg], ['x', 'z', 'p'], ['ode', 'a
 
 #! Let's check we have consistent initial conditions:
 res = f(p=P_, x=X_, z=Z_)
-print res['ode'] # This should be same as XDOT_
-print res['alg'] # This should be all zeros
+print(res['ode']) # This should be same as XDOT_
+print(res['alg']) # This should be all zeros
 
 
 #! Let's check our jacobian $\frac{dg}{dy}$:
 j = jacobian(alg,lambd)
-print j
+print(j)
 #! Note that the jacobian is not invertible: it is not of DAE-index 1
 #!
 #! This system is not solvable with idas, because it is of DAE-index 3.
@@ -90,7 +90,7 @@ I = integrator('I', 'idas', dae, {'calc_ic':False, 'init_xdot':XDOT_})
 try:
   I(p=P_, x0=X_, z0=Z_)
 except Exception as e:
-  print e
+  print(e)
   
 #! We construct a reworked version od the DAE (index reduced), now it is DAE-index 1
 ode = vertcat(u,lambd*x)
@@ -108,19 +108,19 @@ Z_ = [4,1.0/4,1147.0/720] # algebraic state
 
 #! Let's check we have consistent initial conditions:
 res = f(p=P_, x=X_, z=Z_)
-print res['ode'] # This should be the same as XDOT_
-print res['alg'] # This should be all zeros
+print(res['ode']) # This should be the same as XDOT_
+print(res['alg']) # This should be all zeros
 
 #! Let's check our jacobian:
 J = f.jacobian('z', 'alg')
 res = J(p=P_, x=X_, z=Z_)
-print array(res["dalg_dz"])
+print(array(res["dalg_dz"]))
 #! $\frac{dg}{dy}$ is invertible this time.
 
 #! We create a DAE system solver
 I = integrator('I', 'idas', dae, {'t0':0, 'tf':1, 'init_xdot':XDOT_})
 res = I(p=P_, x0=X_, z0=Z_)
-print res['xf']
+print(res['xf'])
 
 #! Possible problems
 #! ==================
@@ -133,7 +133,7 @@ X_ = [5,0]  # states
 try:
   I(p=P_, x0=X_, z0=Z_)
 except Exception as e:
-  print e 
+  print(e) 
 
 #! Although this initialisation is consistent,
 #! it coincides with a singular point.

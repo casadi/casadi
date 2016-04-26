@@ -27,11 +27,11 @@ from numpy import *
 import matplotlib.pyplot as plt
 
 # Excercise 1, chapter 10 from Larry Biegler's book
-print "program started"
+print("program started")
 
 # Test with different number of elements
 for N in range(1,11):
-  print "N = ", N
+  print("N = ", N)
   
   # Degree of interpolating polynomial
   K = 2
@@ -68,7 +68,7 @@ for N in range(1,11):
       if(k != j):
         L *= (tau-tau_root[k])/(tau_root[j]-tau_root[k])
 
-    print "l(", j, ") = ", L
+    print("l(", j, ") = ", L)
 
     f = Function("l_" + str(j), [tau],[L])
     
@@ -79,7 +79,7 @@ for N in range(1,11):
   D = DM.zeros(K+1)
   for j in range(K+1):
     D[j] = l[j](1.)
-  print "D = ", D
+  print("D = ", D)
 
   # Get the coefficients of the collocation equation using AD
   C = DM.zeros(K+1,K+1)
@@ -87,7 +87,7 @@ for N in range(1,11):
     tfcn = l[j].tangent()
     for k in range(K+1):
       C[j,k], _ = tfcn(tau_root[k])
-  print "C = ", C
+  print("C = ", C)
   
   # Collocated states
   Z = SX.sym("Z",N,K+1)
@@ -114,7 +114,7 @@ for N in range(1,11):
 
   g = vertcat(*g)
 
-  print "g = ", g
+  print("g = ", g)
 
   # NLP
   nlp = {'x':x, 'f':x[0]**2, 'g':g}
@@ -153,14 +153,14 @@ for N in range(1,11):
     for j in range(K+1):
       t_opt[j + (K+1)*i] = h*(i + tau_root[j])
   
-  print "time points: ", t_opt
+  print("time points: ", t_opt)
 
   # Print the optimal cost
-  print "optimal cost: ", float(res["f"])
+  print("optimal cost: ", float(res["f"]))
 
   # Print the optimal solution
   xopt = res["x"].nonzeros()
-  print "optimal solution: ", xopt
+  print("optimal solution: ", xopt)
  
   # plot to screen
   plt.plot(t_opt,xopt)

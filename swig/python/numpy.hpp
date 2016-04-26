@@ -21,6 +21,10 @@
 #define array_size(a,i)     (PyArray_DIM(((PyArrayObject *)a),i))
 #define array_data(a)       (PyArray_DATA(((PyArrayObject *)a)))
 
+#if PY_MAJOR_VERSION >= 3
+#define PyInt_Type PyLong_Type
+#endif 
+
 /* Convert the given PyObject to a NumPy array with the given
  * typecode.  On success, return a valid PyArrayObject* with the
  * correct type.  On failure, the python error string will be set and

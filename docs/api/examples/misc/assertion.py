@@ -35,7 +35,7 @@ f = Function("f", [x], [z])
 
 z0 = f(5)
 
-print z0
+print(z0)
 
 #! For some mysterious reason we get NaN here
 
@@ -48,8 +48,8 @@ f = Function("f", [x],[z])
 try:
   z0 = f(5)
 except Exception as e:
-  print "An exception was raised here:"
-  print e
+  print("An exception was raised here:")
+  print(e)
 
 
 #! You can combine this with Callback to do powerful assertions
@@ -63,7 +63,7 @@ class Dummy(Callback):
     import numpy
     x = arg[0]
     m = max(numpy.real(numpy.linalg.eig(blockcat([[x,-1],[-1,2]]))[0]))
-    print "m=",m
+    print("m=",m)
     return [int(m>2)]
 
 foo = Dummy("foo")
