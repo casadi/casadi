@@ -521,6 +521,12 @@ Get the sparsity of an output This function is called during construction.
 
 ";
 
+%feature("docstring") casadi::Callback::assert_size_out "
+
+Assert that an output dimension is equal so some given value.
+
+";
+
 %feature("docstring") casadi::Callback::name_in "
 
 >  [str] Function.name_in() const 
@@ -538,6 +544,12 @@ Get input scheme name by index.
 %feature("docstring") casadi::Callback::has_free "
 
 Does the function have free variables.
+
+";
+
+%feature("docstring") casadi::Callback::assert_size_in "
+
+Assert that an input dimension is equal so some given value.
 
 ";
 
@@ -2085,8 +2097,9 @@ adheres to SCHEME_NLPINput
 
 ";
 
-%feature("docstring") casadi::Function::sz_w "[INTERNAL]  Get required
-length of w field.
+%feature("docstring") casadi::Function::assert_size_out "
+
+Assert that an output dimension is equal so some given value.
 
 ";
 
@@ -2613,6 +2626,12 @@ Does the function have free variables.
 
 ";
 
+%feature("docstring") casadi::Function::assert_size_in "
+
+Assert that an input dimension is equal so some given value.
+
+";
+
 %feature("docstring") casadi::Function::getAtomicOutput "
 
 Get the (integer) output argument of an atomic operation.
@@ -2634,6 +2653,11 @@ Get input dimension.
 %feature("docstring") casadi::Function::call "
 
 Evaluate the function symbolically or numerically.
+
+";
+
+%feature("docstring") casadi::Function::sz_w "[INTERNAL]  Get required
+length of w field.
 
 ";
 

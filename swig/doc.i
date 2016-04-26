@@ -878,6 +878,13 @@ Get the sparsity of an output This function is called during construction.
 
 ";
 
+%feature("docstring")  casadi::Function::assert_size_out(int i, int nrow,
+int ncol) const  "
+
+Assert that an output dimension is equal so some given value.
+
+";
+
 %feature("docstring")  casadi::Function::name_in() const  "
 
 Get input scheme.
@@ -893,6 +900,13 @@ Get input scheme name by index.
 %feature("docstring")  casadi::Function::has_free() const  "
 
 Does the function have free variables.
+
+";
+
+%feature("docstring")  casadi::Function::assert_size_in(int i, int nrow, int
+ncol) const  "
+
+Assert that an input dimension is equal so some given value.
 
 ";
 
@@ -3203,8 +3217,10 @@ adheres to SCHEME_NLPINput
 
 ";
 
-%feature("docstring")  casadi::Function::sz_w() const  " [INTERNAL]  Get
-required length of w field.
+%feature("docstring")  casadi::Function::assert_size_out(int i, int nrow,
+int ncol) const  "
+
+Assert that an output dimension is equal so some given value.
 
 ";
 
@@ -4048,6 +4064,13 @@ Does the function have free variables.
 
 ";
 
+%feature("docstring")  casadi::Function::assert_size_in(int i, int nrow, int
+ncol) const  "
+
+Assert that an input dimension is equal so some given value.
+
+";
+
 %feature("docstring")  casadi::Function::getAtomicOutput(int k) const  "
 
 Get the (integer) output argument of an atomic operation.
@@ -4115,6 +4138,11 @@ Evaluate the function symbolically or numerically.
 &output_res, bool always_inline=false, bool never_inline=false) "
 
 Evaluate the function symbolically or numerically.
+
+";
+
+%feature("docstring")  casadi::Function::sz_w() const  " [INTERNAL]  Get
+required length of w field.
 
 ";
 
