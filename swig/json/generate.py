@@ -277,14 +277,7 @@ for d in r.findall('*//namespace/cdecl'):
   name = d.find('attributelist/attribute[@name="name"]').attrib["value"]
   if dname == "dummy": continue
   code = ""
-  isIOSchemeHelper = False
-  friendwrap = "friendwrap" in name
-
-  maybeCode = d.find('attributelist/attribute[@name="code"]')
-  if maybeCode is not None:
-    msg = '// This comment lets the haskell bindings know this is a scheme helper'
-    if msg in maybeCode.attrib['value']:
-      isIOSchemeHelper = True
+  friendwrap = "casadi_" in name
 
   if friendwrap:
     dname= "casadi_" + dname
@@ -312,7 +305,6 @@ for d in r.findall('*//namespace/cdecl'):
                     'funReturn':rettype,
                     'funDocs':"",#docs,
                     'funDocslink':"",
-                    'funIsIOSchemeHelper':isIOSchemeHelper,
                     'funFriendwrap':friendwrap})
 
 
