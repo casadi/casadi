@@ -564,9 +564,7 @@ namespace casadi {
     vector<MatType> f_ode, f_alg, f_quad, g_ode, g_alg, g_quad;
 
     // Forward derivatives of f
-    Function d = f_.derivative(0, 0);
     vector<MatType> f_arg;
-    f_arg.reserve(d.n_in());
     tmp.resize(DAE_NUM_IN);
     fill(tmp.begin(), tmp.end(), MatType());
 
@@ -578,8 +576,8 @@ namespace casadi {
     f_arg.insert(f_arg.end(), tmp.begin(), tmp.end());
 
     // Call d
-    vector<MatType> res = d(f_arg);
-    auto res_it = res.begin();
+    vector<MatType> f_res = f_(f_arg);
+    auto res_it = f_res.begin();
 
     // Collect right-hand-sides
     tmp.resize(DAE_NUM_OUT);
@@ -591,14 +589,12 @@ namespace casadi {
     if ( nq_>0) f_quad.push_back(tmp[DAE_QUAD]);
 
     // Consistency check
-    casadi_assert(res_it==res.end());
+    casadi_assert(res_it==f_res.end());
 
-    vector<MatType> g_arg;
+    vector<MatType> g_arg, g_res;
     if (!g_.is_null()) {
 
       // Forward derivatives of g
-      d = g_.derivative(0, 0);
-      g_arg.reserve(d.n_in());
       tmp.resize(RDAE_NUM_IN);
       fill(tmp.begin(), tmp.end(), MatType());
 
@@ -618,8 +614,8 @@ namespace casadi {
       g_arg.insert(g_arg.end(), tmp.begin(), tmp.end());
 
       // Call d
-      res = d(g_arg);
-      res_it = res.begin();
+      g_res = g_(g_arg);
+      res_it = g_res.begin();
 
       // Collect right-hand-sides
       tmp.resize(RDAE_NUM_OUT);
@@ -631,13 +627,11 @@ namespace casadi {
       if (nrq_>0) g_quad.push_back(tmp[RDAE_QUAD]);
 
       // Consistency check
-      casadi_assert(res_it==res.end());
+      casadi_assert(res_it==g_res.end());
     }
 
     // Adjoint derivatives of f
-    d = f_.derivative(0, nadj);
     f_arg.resize(DAE_NUM_IN);
-    f_arg.reserve(d.n_in());
 
     // Collect arguments for calling d
     tmp.resize(DAE_NUM_OUT);
@@ -650,7 +644,8 @@ namespace casadi {
     }
 
     // Call der
-    res = d(f_arg);
+    Function d = f_.derivative(0, nadj);
+    vector<MatType> res = d(f_arg);
     res_it = res.begin() + DAE_NUM_OUT;
 
     // Record locations in augg for later
@@ -689,7 +684,7 @@ namespace casadi {
       }
 
       // Call der
-      res = d(g_arg);
+      vector<MatType> res = d(g_arg);
       res_it = res.begin() + RDAE_NUM_OUT;
 
       // Collect right-hand-sides
