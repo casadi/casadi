@@ -1257,4 +1257,13 @@ namespace casadi {
                           << " but got " << size1_out(i) <<  "-by-" << size2_out(i));
   }
 
+  Function Function::
+  factory(const std::string& name,
+          const std::vector<std::string>& s_in,
+          const std::vector<std::string>& s_out,
+          const std::vector<Function::LinComb>& lincomb,
+          const Dict& opts) const {
+     return (*this)->factory(name, s_in, s_out, lincomb, opts);
+  }
+
 } // namespace casadi

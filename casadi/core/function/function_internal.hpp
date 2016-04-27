@@ -105,6 +105,13 @@ namespace casadi {
     /** \brief Get a public class instance */
     Function function() const { return shared_from_this<Function>();}
 
+    // Factory
+    virtual Function factory(const std::string& name,
+                             const std::vector<std::string>& s_in,
+                             const std::vector<std::string>& s_out,
+                             const std::vector<Function::LinComb>& lincomb,
+                             const Dict& opts) const;
+
     ///@{
     /** \brief Names of function input and outputs */
     virtual std::string get_name_in(int i);

@@ -3190,4 +3190,14 @@ namespace casadi {
     unused_.push(mem);
   }
 
+  Function FunctionInternal::
+  factory(const std::string& name,
+          const std::vector<std::string>& s_in,
+          const std::vector<std::string>& s_out,
+          const std::vector<Function::LinComb>& lincomb,
+          const Dict& opts) const {
+    casadi_error("'factory' not defined for " + type_name());
+    return Function();
+  }
+
 } // namespace casadi

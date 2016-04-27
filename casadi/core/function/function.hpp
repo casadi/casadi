@@ -283,6 +283,16 @@ namespace casadi {
     const Sparsity& sparsity_out(const std::string& iname) const;
     /// @}
 
+    // A linear combination of inputs
+    typedef std::pair<std::string, std::vector<std::string> > LinComb;
+
+    // Factory
+    Function factory(const std::string& name,
+                     const std::vector<std::string>& s_in,
+                     const std::vector<std::string>& s_out,
+                     const std::vector<LinComb>& lincomb=std::vector<LinComb>(),
+                     const Dict& opts=Dict()) const;
+
     /** \brief Print dimensions of inputs and outputs */
     void printDimensions(std::ostream &stream=casadi::userOut()) const;
 

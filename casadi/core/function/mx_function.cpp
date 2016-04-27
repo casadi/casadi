@@ -90,7 +90,7 @@ namespace casadi {
 
     // Add the list of nodes
     int ind=0;
-    for (vector<MX>::iterator it = outputv_.begin(); it != outputv_.end(); ++it, ++ind) {
+    for (vector<MX>::iterator it = out_.begin(); it != out_.end(); ++it, ++ind) {
       // Add outputs to the list
       s.push(static_cast<MXNode*>(it->get()));
       sort_depth_first(s, nodes);
@@ -143,7 +143,7 @@ namespace casadi {
         // Add input and output argument
         if (op==OP_OUTPUT) {
           ae.arg.resize(1);
-          ae.arg[0] = outputv_.at(curr_oind)->temp;
+          ae.arg[0] = out_.at(curr_oind)->temp;
           ae.res.resize(1);
           ae.res[0] = curr_oind++;
         } else {
@@ -322,9 +322,9 @@ namespace casadi {
     }
 
     // Add input instructions, loop over inputs
-    for (int ind=0; ind<inputv_.size(); ++ind) {
+    for (int ind=0; ind<in_.size(); ++ind) {
       // Loop over symbolic primitives of each input
-      vector<MX> prim = inputv_[ind].primitives();
+      vector<MX> prim = in_[ind].primitives();
       int nz_offset=0;
       for (int p=0; p<prim.size(); ++p) {
         int i = prim[p].getTemp()-1;
@@ -552,11 +552,11 @@ namespace casadi {
                                                   bool compact, bool symmetric, const Dict& opts) {
     // Create expressions for the Jacobian
     vector<MX> ret_out;
-    ret_out.reserve(1+outputv_.size());
+    ret_out.reserve(1+out_.size());
     ret_out.push_back(jac(iind, oind, compact, symmetric, false, true));
-    ret_out.insert(ret_out.end(), outputv_.begin(), outputv_.end());
+    ret_out.insert(ret_out.end(), out_.begin(), out_.end());
 
-    return Function(name, inputv_, ret_out, opts);
+    return Function(name, in_, ret_out, opts);
   }
 
   std::vector<MX> MXFunction::symbolicOutput(const std::vector<MX>& arg) {
@@ -564,14 +564,14 @@ namespace casadi {
     const int checking_depth = 2;
     bool input_given = true;
     for (int i=0; i<arg.size() && input_given; ++i) {
-      if (!is_equal(arg[i], inputv_[i], checking_depth)) {
+      if (!is_equal(arg[i], in_[i], checking_depth)) {
         input_given = false;
       }
     }
 
     // Return output if possible, else fall back to base class
     if (input_given) {
-      return outputv_;
+      return out_;
     } else {
       return FunctionInternal::symbolicOutput(arg);
     }
@@ -579,7 +579,7 @@ namespace casadi {
 
   std::vector<MX> MXFunction::create_call(const std::vector<MX>& arg) {
     if (isInput(arg)) {
-      return outputv_;
+      return out_;
     } else {
       return FunctionInternal::create_call(arg);
     }
@@ -596,11 +596,11 @@ namespace casadi {
     casadi_assert_message(arg.size()==n_in(), "Wrong number of input arguments");
 
     // Resize the number of outputs
-    res.resize(outputv_.size());
+    res.resize(out_.size());
 
     // Copy output if known
     if (isInput(arg)) {
-      copy(outputv_.begin(), outputv_.end(), res.begin());
+      copy(out_.begin(), out_.end(), res.begin());
       return;
     }
 
@@ -611,7 +611,7 @@ namespace casadi {
     // Split up inputs analogous to symbolic primitives
     vector<vector<MX> > arg_split(arg.size());
     for (int i=0; i<arg.size(); ++i)
-      arg_split[i] = inputv_[i].split_primitives(arg[i]);
+      arg_split[i] = in_[i].split_primitives(arg[i]);
 
     vector<MX> arg1, res1;
 
@@ -695,7 +695,7 @@ namespace casadi {
 
     // Allocate forward sensitivities
     for (int d=0; d<nfwd; ++d) {
-      fsens[d].resize(outputv_.size());
+      fsens[d].resize(out_.size());
     }
 
     // Work vector, forward derivatives
@@ -708,7 +708,7 @@ namespace casadi {
     for (int d=0; d<nfwd; ++d) {
       fseed_split[d].resize(fseed[d].size());
       for (int i=0; i<fseed[d].size(); ++i) {
-        fseed_split[d][i] = inputv_[i].split_primitives(fseed[d][i]);
+        fseed_split[d][i] = in_[i].split_primitives(fseed[d][i]);
       }
     }
 
@@ -825,9 +825,9 @@ namespace casadi {
     // Allocate splited adjoint sensitivities
     vector<vector<vector<MX> > > asens_split(nadj);
     for (int d=0; d<nadj; ++d) {
-      asens_split[d].resize(inputv_.size());
-      for (int i=0; i<inputv_.size(); ++i) {
-        asens_split[d][i].resize(inputv_[i].n_primitives());
+      asens_split[d].resize(in_.size());
+      for (int i=0; i<in_.size(); ++i) {
+        asens_split[d][i].resize(in_[i].n_primitives());
       }
     }
 
@@ -942,9 +942,9 @@ namespace casadi {
 
     // Get adjoint sensitivities
     for (int d=0; d<nadj; ++d) {
-      asens[d].resize(inputv_.size());
-      for (int i=0; i<inputv_.size(); ++i) {
-        asens[d][i] = inputv_[i].join_primitives(asens_split[d][i]);
+      asens[d].resize(in_.size());
+      for (int i=0; i<in_.size(); ++i) {
+        asens[d][i] = in_[i].join_primitives(asens_split[d][i]);
       }
     }
 
@@ -994,15 +994,15 @@ namespace casadi {
   Function MXFunction::expand(const std::vector<SX>& inputvsx) {
 
     // Create inputs with the same name and sparsity as the matrix valued symbolic inputs
-    vector<SX> arg(inputv_.size());
+    vector<SX> arg(in_.size());
     if (inputvsx.empty()) { // No symbolic input provided
       for (int i=0; i<arg.size(); ++i) {
         // Start with matrix with the correct sparsity
-        arg[i] = SX::zeros(inputv_[i].sparsity());
+        arg[i] = SX::zeros(in_[i].sparsity());
 
         // Divide input into primitives and create corresponding SX
         auto ait = arg[i]->begin();
-        vector<MX> prim = inputv_[i].primitives();
+        vector<MX> prim = in_[i].primitives();
         for (auto pit=prim.begin(); pit!=prim.end(); ++pit) {
           SX t = SX::sym(pit->name(), pit->sparsity());
           copy(t->begin(), t->end(), ait);
@@ -1012,11 +1012,11 @@ namespace casadi {
       }
     } else { // Use provided symbolic input
       // Make sure number of inputs matches
-      casadi_assert(inputvsx.size()==inputv_.size());
+      casadi_assert(inputvsx.size()==in_.size());
 
       // Make sure that sparsity matches
       for (int i=0; i<inputvsx.size(); ++i) {
-        casadi_assert(inputvsx[i].sparsity() == inputv_[i].sparsity());
+        casadi_assert(inputvsx[i].sparsity() == in_[i].sparsity());
       }
 
       // Copy to argument vector
@@ -1024,9 +1024,9 @@ namespace casadi {
     }
 
     // Create output vector with correct sparsity
-    vector<SX> res(outputv_.size());
+    vector<SX> res(out_.size());
     for (int i=0; i<res.size(); ++i) {
-      res[i] = SX::zeros(outputv_[i].sparsity());
+      res[i] = SX::zeros(out_[i].sparsity());
     }
 
     // Evaluate symbolically
@@ -1266,14 +1266,14 @@ namespace casadi {
     }
 
     // Definition of intermediate variables
-    vector<MX> f_in = inputv_;
+    vector<MX> f_in = in_;
     f_in.insert(f_in.end(), y.begin(), y.end());
     vector<MX> f_out = f_G;
     f_out.insert(f_out.end(), g.begin(), g.end());
     vdef_fcn = Function("lifting_variable_definition", f_in, f_out);
 
     // Initial guess of intermediate variables
-    f_in = inputv_;
+    f_in = in_;
     f_out = x_init;
     vinit_fcn = Function("lifting_variable_guess", f_in, f_out);
   }
@@ -1324,11 +1324,11 @@ namespace casadi {
   }
 
   const MX MXFunction::mx_in(int ind) const {
-    return inputv_.at(ind);
+    return in_.at(ind);
   }
 
   const std::vector<MX> MXFunction::mx_in() const {
-    return inputv_;
+    return in_;
   }
 
   std::string MXFunction::type_name() const {
@@ -1342,4 +1342,3 @@ namespace casadi {
   }
 
 } // namespace casadi
-
