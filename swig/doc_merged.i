@@ -103,16 +103,7 @@ of the outputs.
 
 ";
 
-%feature("docstring") casadi::Callback::mapsum "
-
-Evaluate symbolically in parallel and sum (matrix graph)
-
-Parameters:
------------
-
-parallelization:  Type of parallelization used: unroll|serial|openmp
-
-";
+%feature("docstring") casadi::Callback::factory "";
 
 %feature("docstring") casadi::Callback::free_sx "
 
@@ -672,6 +663,17 @@ Joris Gillis
 %feature("docstring") casadi::Callback::set_jac_sparsity "
 
 Generate the sparsity of a Jacobian block
+
+";
+
+%feature("docstring") casadi::Callback::mapsum "
+
+Evaluate symbolically in parallel and sum (matrix graph)
+
+Parameters:
+-----------
+
+parallelization:  Type of parallelization used: unroll|serial|openmp
 
 ";
 
@@ -2196,6 +2198,8 @@ corresponding to the Hessian and the gradients.
 Expand a function to SX.
 
 ";
+
+%feature("docstring") casadi::Function::factory "";
 
 %feature("docstring") casadi::Function::checkout "
 

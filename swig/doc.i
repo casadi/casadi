@@ -172,17 +172,10 @@ of the outputs.
 
 ";
 
-%feature("docstring")  casadi::Function::mapsum(const std::vector< MX >
-&arg, const std::string &parallelization="serial") "
-
-Evaluate symbolically in parallel and sum (matrix graph)
-
-Parameters:
------------
-
-parallelization:  Type of parallelization used: unroll|serial|openmp
-
-";
+%feature("docstring")  casadi::Function::factory(const std::string &name,
+const std::vector< std::string > &s_in, const std::vector< std::string >
+&s_out, const std::vector< LinComb > &lincomb=std::vector< LinComb >(),
+const Dict &opts=Dict()) const  " ";
 
 %feature("docstring")  casadi::Function::free_sx() const  "
 
@@ -1179,6 +1172,18 @@ Generate the sparsity of a Jacobian block
 &sp, const std::string &iind, const std::string &oind, bool compact=false) "
 
 Generate the sparsity of a Jacobian block
+
+";
+
+%feature("docstring")  casadi::Function::mapsum(const std::vector< MX >
+&arg, const std::string &parallelization="serial") "
+
+Evaluate symbolically in parallel and sum (matrix graph)
+
+Parameters:
+-----------
+
+parallelization:  Type of parallelization used: unroll|serial|openmp
 
 ";
 
@@ -3403,6 +3408,11 @@ const Dict &opts=Dict()) const  "
 Expand a function to SX.
 
 ";
+
+%feature("docstring")  casadi::Function::factory(const std::string &name,
+const std::vector< std::string > &s_in, const std::vector< std::string >
+&s_out, const std::vector< LinComb > &lincomb=std::vector< LinComb >(),
+const Dict &opts=Dict()) const  " ";
 
 %feature("docstring")  casadi::Function::checkout() "
 
