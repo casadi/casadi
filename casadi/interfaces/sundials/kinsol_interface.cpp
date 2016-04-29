@@ -231,9 +231,7 @@ namespace casadi {
         casadi_error("KINSOL: Unknown sparse solver");
       }
       if (exact_jacobian_) {
-        // Form the Jacobian-times-vector function
-        f_fwd_ = f_.derivative(1, 0);
-        alloc(f_fwd_);
+        get_jtimes();
       }
       if (use_preconditioner_) {
         // Make sure that a Jacobian has been provided
@@ -251,14 +249,21 @@ namespace casadi {
       casadi_assert(!linsol_.is_null());
 
       // Form the Jacobian-times-vector function
-      f_fwd_ = f_.derivative(1, 0);
-      alloc(f_fwd_);
+      get_jtimes();
 
       // Allocate space for Jacobian
       alloc_w(jac_.nnz_out(0), true);
     } else {
       casadi_error("Unknown linear solver");
     }
+  }
+
+  void KinsolInterface::get_jtimes() {
+    vector<string> jtimes_in = f_.name_in();
+    jtimes_in.push_back("fwd_" + f_.name_in(iin_));
+    vector<string> jtimes_out = {"fwd_" + f_.name_out(iout_)};
+    jtimes_ = f_.factory("jtimes", jtimes_in, jtimes_out);
+    alloc(jtimes_);
   }
 
   void KinsolInterface::eval(void* mem, const double** arg, double** res,
@@ -504,11 +509,9 @@ namespace casadi {
     // Evaluate f_fwd_
     copy(m.arg, m.arg + n_in(), arg1);
     arg1[iin_] = NV_DATA_S(u);
-    fill_n(arg1 + n_in(), n_in(), nullptr);
-    arg1[n_in()+iin_] = NV_DATA_S(v);
-    fill_n(res1, f_fwd_.n_out(), nullptr);
-    res1[n_out()] = NV_DATA_S(Jv);
-    f_fwd_(arg1, res1, m.iw, m.w, 0);
+    arg1[n_in()] = NV_DATA_S(v);
+    res1[0] = NV_DATA_S(Jv);
+    jtimes_(arg1, res1, m.iw, m.w, 0);
 
     // Log time duration
     m.time2 = clock();

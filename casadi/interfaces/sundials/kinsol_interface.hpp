@@ -147,7 +147,10 @@ namespace casadi {
     double abstol_;
 
     // Jacobian times vector function
-    Function f_fwd_;
+    Function jtimes_;
+
+    // Get jtimes_
+    void get_jtimes();
 
     // Raise an error specific to KinSol
     void kinsol_error(const std::string& module, int flag, bool fatal=true) const;
@@ -201,4 +204,3 @@ namespace casadi {
 
 /// \endcond
 #endif // CASADI_KINSOL_INTERFACE_HPP
-
