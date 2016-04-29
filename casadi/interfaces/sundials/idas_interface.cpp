@@ -49,7 +49,7 @@ namespace casadi {
     Integrator::registerPlugin(casadi_register_integrator_idas);
   }
 
-  IdasInterface::IdasInterface(const std::string& name, Oracle* dae)
+  IdasInterface::IdasInterface(const std::string& name, const Function& dae)
     : SundialsInterface(name, dae) {
   }
 
@@ -154,8 +154,7 @@ namespace casadi {
     if (exact_jacobian_) {
       switch (linsol_f_) {
       case SD_ITERATIVE:
-        casadi_assert(dae_!=0);
-        jtimes_ = dae2_.factory("jtimes",
+        jtimes_ = dae_.factory("jtimes",
           {"t", "x", "z", "p", "fwd_x", "fwd_z"}, {"fwd_ode", "fwd_alg"});
         alloc(jtimes_);
         break;
@@ -166,8 +165,7 @@ namespace casadi {
     if (exact_jacobianB_) {
       switch (linsol_g_) {
       case SD_ITERATIVE:
-        casadi_assert(dae_!=0);
-        jtimesB_ = dae2_.factory("jtimesB",
+        jtimesB_ = dae_.factory("jtimesB",
           {"t", "x", "z", "p", "rx", "rz", "rp", "fwd_rx", "fwd_rz"},
           {"fwd_rode", "fwd_ralg"});
         alloc(jtimesB_);

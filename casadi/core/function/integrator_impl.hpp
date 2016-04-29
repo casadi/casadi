@@ -48,7 +48,7 @@ namespace casadi {
   Integrator : public FunctionInternal, public PluginInterface<Integrator> {
   public:
     /** \brief  Constructor */
-    Integrator(const std::string& name, Oracle* dae);
+    Integrator(const std::string& name, const Function& dae);
 
     /** \brief  Destructor */
     virtual ~Integrator()=0;
@@ -195,8 +195,7 @@ namespace casadi {
     Dict opts_;
 
     // Dae
-    Oracle* dae_;
-    Function dae2_;
+    Function dae_;
 
     /// One step
     Function onestep_;
@@ -218,7 +217,7 @@ namespace casadi {
     int ntout_;
 
     // Creator function for internal class
-    typedef Integrator* (*Creator)(const std::string& name, Oracle* dae);
+    typedef Integrator* (*Creator)(const std::string& name, const Function& dae);
 
     // No static functions exposed
     struct Exposed{ };
@@ -231,11 +230,11 @@ namespace casadi {
 
     /// Convert dictionary to Problem
     template<typename XType>
-      static Oracle* map2problem(const std::map<std::string, XType>& d);
+      static Function map2problem(const std::map<std::string, XType>& d);
   };
 
   template<typename XType>
-  Oracle* Integrator::map2problem(const std::map<std::string, XType>& d) {
+  Function Integrator::map2problem(const std::map<std::string, XType>& d) {
     std::vector<XType> de_in(DE_NUM_IN), de_out(DE_NUM_OUT);
     for (auto&& i : d) {
       if (i.first=="t") {
@@ -268,7 +267,7 @@ namespace casadi {
         casadi_error("No such field: " + i.first);
       }
     }
-    return Oracle::construct(de_in, de_out, DE_INPUTS, DE_OUTPUTS);
+    return Function("dae", de_in, de_out, DE_INPUTS, DE_OUTPUTS);
   }
 
   struct CASADI_EXPORT FixedStepMemory : public IntegratorMemory {
@@ -295,7 +294,7 @@ namespace casadi {
   public:
 
     /// Constructor
-    explicit FixedStepIntegrator(const std::string& name, Oracle* dae);
+    explicit FixedStepIntegrator(const std::string& name, const Function& dae);
 
     /// Destructor
     virtual ~FixedStepIntegrator();
@@ -360,7 +359,7 @@ namespace casadi {
   public:
 
     /// Constructor
-    explicit ImplicitFixedStepIntegrator(const std::string& name, Oracle* dae);
+    explicit ImplicitFixedStepIntegrator(const std::string& name, const Function& dae);
 
     /// Destructor
     virtual ~ImplicitFixedStepIntegrator();

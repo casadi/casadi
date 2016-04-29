@@ -26,7 +26,7 @@
 #ifndef CASADI_INTEGRATOR_HPP
 #define CASADI_INTEGRATOR_HPP
 
-#include "oracle.hpp"
+#include "function.hpp"
 #include "linsol.hpp"
 #include "rootfinder.hpp"
 
@@ -85,7 +85,7 @@ namespace casadi {
                                     const MXDict& dae, const Dict& opts=Dict());
 #ifndef SWIG
   CASADI_EXPORT Function integrator(const std::string& name, const std::string& solver,
-                                    Oracle* dae, const Dict& opts=Dict());
+                                    const Function& dae, const Dict& opts=Dict());
 #endif // SWIG
   ///@}
 

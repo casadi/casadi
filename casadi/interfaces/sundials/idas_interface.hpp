@@ -92,10 +92,10 @@ namespace casadi {
   public:
 
     /** \brief  Constructor */
-    explicit IdasInterface(const std::string& name, Oracle* dae);
+    explicit IdasInterface(const std::string& name, const Function& dae);
 
     /** \brief  Create a new integrator */
-    static Integrator* creator(const std::string& name, Oracle* dae) {
+    static Integrator* creator(const std::string& name, const Function& dae) {
       return new IdasInterface(name, dae);
     }
 

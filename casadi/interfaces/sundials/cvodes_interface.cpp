@@ -46,7 +46,7 @@ namespace casadi {
     Integrator::registerPlugin(casadi_register_integrator_cvodes);
   }
 
-  CvodesInterface::CvodesInterface(const std::string& name, Oracle* dae)
+  CvodesInterface::CvodesInterface(const std::string& name, const Function& dae)
     : SundialsInterface(name, dae) {
   }
 
@@ -116,8 +116,7 @@ namespace casadi {
     if (exact_jacobian_) {
       switch (linsol_f_) {
       case SD_ITERATIVE:
-        casadi_assert(dae_!=0);
-        jtimes_ = dae2_.factory("jtimes", {"t", "x", "p", "fwd_x"}, {"fwd_ode"});
+        jtimes_ = dae_.factory("jtimes", {"t", "x", "p", "fwd_x"}, {"fwd_ode"});
         alloc(jtimes_);
         break;
       default: break;
@@ -127,8 +126,7 @@ namespace casadi {
     if (exact_jacobianB_) {
       switch (linsol_g_) {
       case SD_ITERATIVE:
-        casadi_assert(dae_!=0);
-        jtimesB_ = dae2_.factory("jtimesB",
+        jtimesB_ = dae_.factory("jtimesB",
           {"t", "x", "p", "rx", "rp", "fwd_rx"}, {"fwd_rode"});
         alloc(jtimesB_);
         break;

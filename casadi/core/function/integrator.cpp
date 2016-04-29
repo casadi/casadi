@@ -52,7 +52,7 @@ namespace casadi {
   }
 
   Function integrator(const string& name, const string& solver,
-                      Oracle* dae, const Dict& opts) {
+                      const Function& dae, const Dict& opts) {
     Function ret;
     ret.assignNode(Integrator::getPlugin(solver).creator(name, dae));
     ret->construct(opts);
@@ -112,13 +112,11 @@ namespace casadi {
     return INTEGRATOR_NUM_OUT;
   }
 
-  Integrator::Integrator(const std::string& name, Oracle* dae)
+  Integrator::Integrator(const std::string& name, const Function& dae)
     : FunctionInternal(name), dae_(dae) {
 
-    casadi_assert(dae_!=0);
-    dae2_ = dae_->all_io("dae");
-    f_ = dae2_.factory("f", {"x", "z", "p", "t"}, {"ode", "alg", "quad"});
-    g_ = dae2_.factory("g", {"rx", "rz", "rp", "x", "z", "p", "t"},
+    f_ = dae_.factory("f", {"x", "z", "p", "t"}, {"ode", "alg", "quad"});
+    g_ = dae_.factory("g", {"rx", "rz", "rp", "x", "z", "p", "t"},
                      {"rode", "ralg", "rquad"});
 
     // Negative number of parameters for consistancy checking
@@ -143,7 +141,6 @@ namespace casadi {
   }
 
   Integrator::~Integrator() {
-    if (dae_) delete dae_;
   }
 
   Sparsity Integrator::get_sparsity_in(int i) {
@@ -276,12 +273,7 @@ namespace casadi {
     }
 
     // Replace MX oracle with SX oracle?
-    if (expand && dae_) {
-      dae2_ = dae2_.expand();
-      Oracle* dae_new = dae_->expand();
-      delete dae_;
-      dae_ = dae_new;
-    }
+    if (expand) dae_ = dae_.expand();
 
     // Store a copy of the options, for creating augmented integrators
     opts_ = opts;
@@ -1390,7 +1382,7 @@ namespace casadi {
                  << typeid(*this).name());
   }
 
-  FixedStepIntegrator::FixedStepIntegrator(const std::string& name, Oracle* dae)
+  FixedStepIntegrator::FixedStepIntegrator(const std::string& name, const Function& dae)
     : Integrator(name, dae) {
 
     // Default options
@@ -1621,7 +1613,7 @@ namespace casadi {
   }
 
   ImplicitFixedStepIntegrator::
-  ImplicitFixedStepIntegrator(const std::string& name, Oracle* dae)
+  ImplicitFixedStepIntegrator(const std::string& name, const Function& dae)
     : FixedStepIntegrator(name, dae) {
   }
 
