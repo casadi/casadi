@@ -251,8 +251,14 @@ namespace casadi {
       }
     }
 
+    // New implementation
+    casadi_assert(nlp_!=0);
+    nlp2_ = nlp_->all_io();
+
     // Replace MX oracle with SX oracle?
     if (expand && nlp_) {
+      nlp2_ = nlp2_.expand();
+
       Oracle* nlp_new = nlp_->expand();
       delete nlp_;
       nlp_ = nlp_new;

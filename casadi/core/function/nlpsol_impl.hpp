@@ -92,6 +92,7 @@ namespace casadi {
   private:
     /// The NLP
     Oracle* nlp_;
+    Function nlp2_;
 
   public:
     /// Constructor
