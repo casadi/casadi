@@ -896,6 +896,13 @@ Does the function have free variables.
 
 ";
 
+%feature("docstring")  casadi::Function::nl_var(const std::string &s_in,
+const std::vector< std::string > &s_out) const  "
+
+Which variables enter nonlinearly.
+
+";
+
 %feature("docstring")  casadi::Function::assert_size_in(int i, int nrow, int
 ncol) const  "
 
@@ -4031,6 +4038,13 @@ oind:  The index of the output
 
 The default behavior of this class is defined by the derived class. Note
 that the input must be scalar. In other cases, use the Jacobian instead.
+
+";
+
+%feature("docstring")  casadi::Function::nl_var(const std::string &s_in,
+const std::vector< std::string > &s_out) const  "
+
+Which variables enter nonlinearly.
 
 ";
 
