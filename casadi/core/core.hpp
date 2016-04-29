@@ -42,7 +42,6 @@
 #include "mx/mx.hpp"
 
 // Functions
-#include "function/oracle.hpp"
 #include "function/code_generator.hpp"
 #include "function/importer.hpp"
 #include "function/callback.hpp"

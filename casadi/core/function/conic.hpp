@@ -26,7 +26,7 @@
 #ifndef CASADI_CONIC_HPP
 #define CASADI_CONIC_HPP
 
-#include "oracle.hpp"
+#include "function.hpp"
 
 namespace casadi {
 
