@@ -91,6 +91,10 @@ namespace casadi {
                              const std::vector<Function::LinComb>& lincomb,
                              const Dict& opts) const;
 
+    /** \brief Which variables enter nonlinearly */
+    virtual std::vector<bool> nl_var(const std::string& s_in,
+                                    const std::vector<std::string>& s_out) const;
+
     /** \brief Return gradient function  */
     virtual Function getGradient(const std::string& name, int iind, int oind, const Dict& opts);
 
@@ -1326,6 +1330,28 @@ namespace casadi {
     }
     return ret;
 
+  }
+
+  template<typename DerivedType, typename MatType, typename NodeType>
+  std::vector<bool> XFunction<DerivedType, MatType, NodeType>::
+  nl_var(const std::string& s_in, const std::vector<std::string>& s_out) const {
+    using namespace std;
+
+    // Input arguments
+    auto it = find(ischeme_.begin(), ischeme_.end(), s_in);
+    casadi_assert(it!=ischeme_.end());
+    MatType arg = in_.at(it-ischeme_.begin());
+
+    // Output arguments
+    vector<MatType> res;
+    for (auto&& s : s_out) {
+      it = find(oscheme_.begin(), oscheme_.end(), s);
+      casadi_assert(it!=oscheme_.end());
+      res.push_back(out_.at(it-oscheme_.begin()));
+    }
+
+    // Extract variables entering nonlinearly
+    return MatType::nl_var(veccat(res), arg);
   }
 
 } // namespace casadi

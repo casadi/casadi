@@ -81,10 +81,6 @@ namespace casadi {
     /** \brief Get type name */
     virtual std::string type_name() const = 0;
 
-    /** \brief Which variables enter nonlinearly */
-    virtual std::vector<bool> nl_var(const std::string& s_in,
-                                     const std::vector<std::string>& s_out) const;
-
     /** \brief Generate a function with all inputs and outputs */
     virtual Function all_io(const std::string& fname="all_io",
                             const Dict& opts=Dict()) const;
@@ -126,10 +122,6 @@ namespace casadi {
 
     /** \brief Get type name */
     virtual std::string type_name() const;
-
-    /** \brief Which variables enter nonlinearly */
-    virtual std::vector<bool> nl_var(const std::string& s_in,
-                                     const std::vector<std::string>& s_out) const;
 
     /** \brief Generate a function with all inputs and outputs */
     virtual Function all_io(const std::string& fname, const Dict& opts) const;

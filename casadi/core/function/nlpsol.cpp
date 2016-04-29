@@ -640,9 +640,4 @@ namespace casadi {
     alloc(fcn);
   }
 
-  std::vector<bool> Nlpsol::nl_var(const std::string& s_in,
-                                   const std::vector<std::string>& s_out) const {
-    return nlp_->nl_var(s_in, s_out);
-  }
-
 } // namespace casadi

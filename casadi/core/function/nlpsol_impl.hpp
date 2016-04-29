@@ -89,10 +89,12 @@ namespace casadi {
     // All NLP functions
     std::vector<Function> all_functions_;
 
+    /// The NLP
+    Function nlp2_;
+
   private:
     /// The NLP
     Oracle* nlp_;
-    Function nlp2_;
 
   public:
     /// Constructor
@@ -160,10 +162,6 @@ namespace casadi {
 
     /** Register the function for evaluation and statistics gathering */
     void register_function(const Function& fcn);
-
-    /** \brief Which variables enter nonlinearly */
-    std::vector<bool> nl_var(const std::string& s_in,
-                             const std::vector<std::string>& s_out) const;
 
     // Evaluate numerically
     virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;

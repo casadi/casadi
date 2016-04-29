@@ -1266,4 +1266,9 @@ namespace casadi {
      return (*this)->factory(name, s_in, s_out, lincomb, opts);
   }
 
+  vector<bool> Function::nl_var(const string& s_in,
+                                const vector<string>& s_out) const {
+    return (*this)->nl_var(s_in, s_out);
+  }
+
 } // namespace casadi

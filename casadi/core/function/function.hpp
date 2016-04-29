@@ -293,6 +293,10 @@ namespace casadi {
                      const std::vector<LinComb>& lincomb=std::vector<LinComb>(),
                      const Dict& opts=Dict()) const;
 
+    /** \brief Which variables enter nonlinearly */
+    std::vector<bool> nl_var(const std::string& s_in,
+                             const std::vector<std::string>& s_out) const;
+
     /** \brief Print dimensions of inputs and outputs */
     void printDimensions(std::ostream &stream=casadi::userOut()) const;
 

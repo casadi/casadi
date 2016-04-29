@@ -30,27 +30,6 @@ using namespace std;
 
 namespace casadi {
 
-  template<typename XType>
-  std::vector<bool>
-  XOracle<XType>::nl_var(const std::string& s_in,
-                         const std::vector<std::string>& s_out) const {
-    // Input arguments
-    auto it = find(ischeme_.begin(), ischeme_.end(), s_in);
-    casadi_assert(it!=ischeme_.end());
-    XType arg = in_.at(it-ischeme_.begin());
-
-    // Output arguments
-    vector<XType> res;
-    for (auto&& s : s_out) {
-      it = find(oscheme_.begin(), oscheme_.end(), s);
-      casadi_assert(it!=oscheme_.end());
-      res.push_back(out_.at(it-oscheme_.begin()));
-    }
-
-    // Extract variables entering nonlinearly
-    return XType::nl_var(veccat(res), arg);
-  }
-
   Oracle* Oracle::construct(const std::vector<SX>& in,
                             const std::vector<SX>& out,
                             const std::vector<std::string>& ischeme,
@@ -77,11 +56,6 @@ namespace casadi {
     } else {
       return new LibOracle<std::string>(fname, all_io);
     }
-  }
-
-  std::vector<bool> Oracle::nl_var(const std::string& s_in,
-                                   const std::vector<std::string>& s_out) const {
-    casadi_error("'nl_var' not defined for " + type_name());
   }
 
   std::string Oracle::name_in(int i) const {

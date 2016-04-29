@@ -198,7 +198,7 @@ namespace casadi {
       }
       hesslag_sp_ = hess_l_fcn_.sparsity_out(0);
     } else if (pass_nonlinear_variables_) {
-      nl_ex_ = nl_var("x", {"f", "g"});
+      nl_ex_ = nlp2_.nl_var("x", {"f", "g"});
     }
 
     // Allocate work vectors

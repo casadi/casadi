@@ -3200,4 +3200,10 @@ namespace casadi {
     return Function();
   }
 
+  vector<bool> FunctionInternal::
+  nl_var(const string& s_in, const vector<string>& s_out) const {
+    casadi_error("'nl_var' not defined for " + type_name());
+    return vector<bool>();
+  }
+
 } // namespace casadi

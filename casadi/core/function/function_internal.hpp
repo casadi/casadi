@@ -112,6 +112,10 @@ namespace casadi {
                              const std::vector<Function::LinComb>& lincomb,
                              const Dict& opts) const;
 
+    /** \brief Which variables enter nonlinearly */
+    virtual std::vector<bool> nl_var(const std::string& s_in,
+                                     const std::vector<std::string>& s_out) const;
+
     ///@{
     /** \brief Names of function input and outputs */
     virtual std::string get_name_in(int i);
