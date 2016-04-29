@@ -48,7 +48,7 @@ namespace casadi {
     Nlpsol::registerPlugin(casadi_register_nlpsol_worhp);
   }
 
-  WorhpInterface::WorhpInterface(const std::string& name, Oracle* nlp)
+  WorhpInterface::WorhpInterface(const std::string& name, const Function& nlp)
     : Nlpsol(name, nlp) {
   }
 

@@ -99,14 +99,14 @@ namespace casadi {
   */
   class CASADI_NLPSOL_SCPGEN_EXPORT Scpgen : public Nlpsol {
   public:
-    explicit Scpgen(const std::string& name, Oracle* nlp);
+    explicit Scpgen(const std::string& name, const Function& nlp);
     virtual ~Scpgen();
 
     // Get name of the plugin
     virtual const char* plugin_name() const { return "scpgen";}
 
     /** \brief  Create a new NLP Solver */
-    static Nlpsol* creator(const std::string& name, Oracle* nlp) {
+    static Nlpsol* creator(const std::string& name, const Function& nlp) {
       return new Scpgen(name, nlp);
     }
 

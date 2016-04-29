@@ -87,7 +87,7 @@ namespace casadi {
     Sparsity hesslag_sp_;
 
     // Constructor
-    explicit WorhpInterface(const std::string& name, Oracle* nlp);
+    explicit WorhpInterface(const std::string& name, const Function& nlp);
 
     // Destructor
     virtual ~WorhpInterface();
@@ -96,7 +96,7 @@ namespace casadi {
     virtual const char* plugin_name() const { return "worhp";}
 
     /** \brief  Create a new NLP Solver */
-    static Nlpsol* creator(const std::string& name, Oracle* nlp) {
+    static Nlpsol* creator(const std::string& name, const Function& nlp) {
       return new WorhpInterface(name, nlp);
     }
 

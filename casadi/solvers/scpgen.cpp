@@ -53,7 +53,7 @@ namespace casadi {
     Nlpsol::registerPlugin(casadi_register_nlpsol_scpgen);
   }
 
-  Scpgen::Scpgen(const std::string& name, Oracle* nlp) : Nlpsol(name, nlp) {
+  Scpgen::Scpgen(const std::string& name, const Function& nlp) : Nlpsol(name, nlp) {
     casadi_warning("SCPgen is under development");
   }
 

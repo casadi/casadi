@@ -85,7 +85,7 @@ namespace casadi {
     Sparsity jacg_sp_;
 
     // Constructor
-    explicit SnoptInterface(const std::string& name, Oracle* nlp);
+    explicit SnoptInterface(const std::string& name, const Function& nlp);
 
     // Destructor
     virtual ~SnoptInterface();
@@ -94,7 +94,7 @@ namespace casadi {
     virtual const char* plugin_name() const { return "snopt";}
 
     /** \brief  Create a new NLP Solver */
-    static Nlpsol* creator(const std::string& name, Oracle* nlp) {
+    static Nlpsol* creator(const std::string& name, const Function& nlp) {
       return new SnoptInterface(name, nlp);
     }
 

@@ -49,7 +49,7 @@ namespace casadi {
     Nlpsol::registerPlugin(casadi_register_nlpsol_snopt);
   }
 
-  SnoptInterface::SnoptInterface(const std::string& name, Oracle* nlp)
+  SnoptInterface::SnoptInterface(const std::string& name, const Function& nlp)
     : Nlpsol(name, nlp) {
   }
 

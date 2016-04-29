@@ -74,14 +74,14 @@ namespace casadi {
     Sparsity jacg_sp_;
     Sparsity hesslag_sp_;
 
-    explicit KnitroInterface(const std::string& name, Oracle* nlp);
+    explicit KnitroInterface(const std::string& name, const Function& nlp);
     virtual ~KnitroInterface();
 
     // Get name of the plugin
     virtual const char* plugin_name() const { return "knitro";}
 
     /** \brief  Create a new NLP Solver */
-    static Nlpsol* creator(const std::string& name, Oracle* nlp) {
+    static Nlpsol* creator(const std::string& name, const Function& nlp) {
       return new KnitroInterface(name, nlp);
     }
 

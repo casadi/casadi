@@ -90,15 +90,11 @@ namespace casadi {
     std::vector<Function> all_functions_;
 
     /// The NLP
-    Function nlp2_;
-
-  private:
-    /// The NLP
-    Oracle* nlp_;
+    Function nlp_;
 
   public:
     /// Constructor
-    Nlpsol(const std::string& name, Oracle* nlp);
+    Nlpsol(const std::string& name, const Function& nlp);
 
     /// Destructor
     virtual ~Nlpsol() = 0;
@@ -154,11 +150,12 @@ namespace casadi {
                           int* iw, double* w) const;
 
     /** Create an NLP function */
-    Function create_function(const std::string& fname,
-                             const std::vector<std::string>& s_in,
-                             const std::vector<std::string>& s_out,
-                             const std::vector<LinComb>& lincomb=std::vector<LinComb>(),
-                             const Dict& opts=Dict(), bool reg=true);
+    Function
+    create_function(const std::string& fname,
+                    const std::vector<std::string>& s_in,
+                    const std::vector<std::string>& s_out,
+                    const std::vector<Function::LinComb>& lincomb=std::vector<Function::LinComb>(),
+                    const Dict& opts=Dict(), bool reg=true);
 
     /** Register the function for evaluation and statistics gathering */
     void register_function(const Function& fcn);
@@ -170,7 +167,7 @@ namespace casadi {
     virtual void solve(void* mem) const = 0;
 
     // Creator function for internal class
-    typedef Nlpsol* (*Creator)(const std::string& name, Oracle* nlp);
+    typedef Nlpsol* (*Creator)(const std::string& name, const Function& nlp);
 
     // No static functions exposed
     struct Exposed{ };
@@ -213,11 +210,11 @@ namespace casadi {
 
     /// Convert dictionary to Problem
     template<typename XType>
-      static Oracle* map2problem(const std::map<std::string, XType>& d);
+      static Function map2problem(const std::map<std::string, XType>& d);
   };
 
   template<typename XType>
-  Oracle* Nlpsol::map2problem(const std::map<std::string, XType>& d) {
+  Function Nlpsol::map2problem(const std::map<std::string, XType>& d) {
     std::vector<XType> nl_in(NL_NUM_IN), nl_out(NL_NUM_OUT);
     for (auto&& i : d) {
       if (i.first=="x") {
@@ -232,7 +229,7 @@ namespace casadi {
         casadi_error("No such field: " + i.first);
       }
     }
-    return Oracle::construct(nl_in, nl_out, NL_INPUTS, NL_OUTPUTS);
+    return Function("nlp", nl_in, nl_out, NL_INPUTS, NL_OUTPUTS);
   }
 
 } // namespace casadi

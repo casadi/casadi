@@ -24,6 +24,7 @@
 
 
 #include "nlpsol_impl.hpp"
+#include "external.hpp"
 #include "casadi/core/timing.hpp"
 
 #include <iostream>
@@ -56,16 +57,22 @@ namespace casadi {
 
   Function nlpsol(const std::string& name, const std::string& solver,
                   const std::string& fname, const Dict& opts) {
-    return nlpsol(name, solver, Oracle::construct(fname, "nlp"), opts);
+    // If fname ends with .c, JIT
+    if (fname.size()>2 && fname.compare(fname.size()-2, fname.size(), ".c")==0) {
+      Importer compiler(fname, "clang");
+      return nlpsol(name, solver, compiler, opts);
+    } else {
+      return nlpsol(name, solver, external("nlp", fname), opts);
+    }
   }
 
   Function nlpsol(const string& name, const string& solver,
                   const Importer& compiler, const Dict& opts) {
-    return nlpsol(name, solver, Oracle::construct(compiler, "nlp"), opts);
+    return nlpsol(name, solver, external("nlp", compiler), opts);
   }
 
   Function nlpsol(const string& name, const string& solver,
-                  Oracle* nlp, const Dict& opts) {
+                  const Function& nlp, const Dict& opts) {
     Function ret;
     ret.assignNode(Nlpsol::instantiatePlugin(name, solver, nlp));
     ret->construct(opts);
@@ -139,7 +146,7 @@ namespace casadi {
     return NLPSOL_NUM_OUT;
   }
 
-  Nlpsol::Nlpsol(const std::string& name, Oracle* nlp)
+  Nlpsol::Nlpsol(const std::string& name, const Function& nlp)
     : FunctionInternal(name), nlp_(nlp) {
 
     // Set default options
@@ -151,7 +158,6 @@ namespace casadi {
   }
 
   Nlpsol::~Nlpsol() {
-    if (nlp_) delete nlp_;
     clear_memory();
   }
 
@@ -167,7 +173,7 @@ namespace casadi {
     case NLPSOL_LAM_G0:
       return get_sparsity_out(NLPSOL_G);
     case NLPSOL_P:
-      return nlp_->sparsity_in(NL_P);
+      return nlp_.sparsity_in(NL_P);
     case NLPSOL_NUM_IN: break;
     }
     return Sparsity();
@@ -179,10 +185,10 @@ namespace casadi {
       return Sparsity::scalar();
     case NLPSOL_X:
     case NLPSOL_LAM_X:
-      return nlp_->sparsity_in(NL_X);
+      return nlp_.sparsity_in(NL_X);
     case NLPSOL_LAM_G:
     case NLPSOL_G:
-      return nlp_->sparsity_out(NL_G);
+      return nlp_.sparsity_out(NL_G);
     case NLPSOL_LAM_P:
       return get_sparsity_in(NLPSOL_P);
     case NLPSOL_NUM_OUT: break;
@@ -251,18 +257,8 @@ namespace casadi {
       }
     }
 
-    // New implementation
-    casadi_assert(nlp_!=0);
-    nlp2_ = nlp_->all_io("nlp");
-
     // Replace MX oracle with SX oracle?
-    if (expand && nlp_) {
-      nlp2_ = nlp2_.expand();
-
-      Oracle* nlp_new = nlp_->expand();
-      delete nlp_;
-      nlp_ = nlp_new;
-    }
+    if (expand) nlp_ = nlp_.expand();
 
     // Get dimensions
     nx_ = nnz_out(NLPSOL_X);
@@ -614,7 +610,7 @@ namespace casadi {
 
   void Nlpsol::generate_dependencies(const std::string& fname, const Dict& opts) {
     CodeGenerator gen(fname, opts);
-    gen.add(nlp_->all_io("nlp"));
+    gen.add(nlp_);
     for (const Function& f : all_functions_) gen.add(f);
     gen.generate();
   }
@@ -622,11 +618,10 @@ namespace casadi {
   Function Nlpsol::create_function(const std::string& fname,
                                    const std::vector<std::string>& s_in,
                                    const std::vector<std::string>& s_out,
-                                   const std::vector<LinComb>& lincomb,
+                                   const std::vector<Function::LinComb>& lincomb,
                                    const Dict& opts, bool reg) {
     // Generate the function
-    casadi_assert(nlp_!=0);
-    Function ret = nlp2_.factory(fname, s_in, s_out, lincomb, opts);
+    Function ret = nlp_.factory(fname, s_in, s_out, lincomb, opts);
     if (reg) register_function(ret);
     return ret;
   }
