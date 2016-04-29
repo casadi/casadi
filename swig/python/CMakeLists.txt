@@ -25,12 +25,12 @@ endif()
 
 # Find packages
 if(WITH_PYTHON3)
-find_package(PythonLibs 3 REQUIRED)
-find_package(PythonInterp 3 REQUIRED)
-elseif()
-find_package(PythonLibs REQUIRED)
-find_package(PythonInterp REQUIRED)
+set(MINPYVERSION "3")
+else()
+set(MINPYVERSION "2.7")
 endif()
+find_package(PythonInterp ${MINPYVERSION} REQUIRED)
+find_package(PythonLibs ${MINPYVERSION} REQUIRED)
 find_package(NUMPY REQUIRED)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
