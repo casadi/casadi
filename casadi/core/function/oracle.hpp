@@ -78,13 +78,6 @@ namespace casadi {
     // Output names
     virtual std::string name_out(int i) const;
 
-    // Factory
-    virtual Function create(const std::string& fname,
-                            const std::vector<std::string>& s_in,
-                            const std::vector<std::string>& s_out,
-                            const std::vector<LinComb>& lincomb=std::vector<LinComb>(),
-                            const Dict& opts=Dict()) const = 0;
-
     /** \brief Get type name */
     virtual std::string type_name() const = 0;
 
@@ -131,13 +124,6 @@ namespace casadi {
     // Output names
     virtual std::string name_out(int i) const { return oscheme_.at(i);}
 
-    // Factory
-    virtual Function create(const std::string& fname,
-                            const std::vector<std::string>& s_in,
-                            const std::vector<std::string>& s_out,
-                            const std::vector<LinComb>& lincomb,
-                            const Dict& opts) const;
-
     /** \brief Get type name */
     virtual std::string type_name() const;
 
@@ -170,13 +156,6 @@ namespace casadi {
 
     // Output sparsity
     virtual const Sparsity& sparsity_out(int i) const;
-
-    // Factory
-    virtual Function create(const std::string& fname,
-                            const std::vector<std::string>& s_in,
-                            const std::vector<std::string>& s_out,
-                            const std::vector<LinComb>& lincomb,
-                            const Dict& opts) const;
 
     /** \brief Get type name */
     virtual std::string type_name() const;
