@@ -196,6 +196,7 @@ namespace casadi {
 
     // Dae
     Oracle* dae_;
+    Function dae2_;
 
     /// One step
     Function onestep_;

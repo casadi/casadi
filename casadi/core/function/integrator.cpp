@@ -115,9 +115,11 @@ namespace casadi {
   Integrator::Integrator(const std::string& name, Oracle* dae)
     : FunctionInternal(name), dae_(dae) {
 
-    f_ = dae_->create("dae", {"x", "z", "p", "t"}, {"ode", "alg", "quad"});
-    g_ = dae_->create("rdae", {"rx", "rz", "rp", "x", "z", "p", "t"},
-                      {"rode", "ralg", "rquad"});
+    casadi_assert(dae_!=0);
+    dae2_ = dae_->all_io("dae");
+    f_ = dae2_.factory("f", {"x", "z", "p", "t"}, {"ode", "alg", "quad"});
+    g_ = dae2_.factory("g", {"rx", "rz", "rp", "x", "z", "p", "t"},
+                     {"rode", "ralg", "rquad"});
 
     // Negative number of parameters for consistancy checking
     np_ = -1;
@@ -275,6 +277,7 @@ namespace casadi {
 
     // Replace MX oracle with SX oracle?
     if (expand && dae_) {
+      dae2_ = dae2_.expand();
       Oracle* dae_new = dae_->expand();
       delete dae_;
       dae_ = dae_new;
