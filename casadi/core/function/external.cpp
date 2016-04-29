@@ -313,4 +313,33 @@ namespace casadi {
     return 0;
   }
 
+  Function External::factory(const std::string& name,
+                             const std::vector<std::string>& s_in,
+                             const std::vector<std::string>& s_out,
+                             const std::vector<Function::LinComb>& lincomb,
+                             const Dict& opts) const {
+    // Retrieve function
+    casadi_assert_message(li_.has_function(name),
+      "Cannot find \"" + name + "\"");
+    Function ret = external(name, li_, opts);
+
+    // Inputs consistency checks
+    casadi_assert_message(s_in.size() == ret.n_in(),
+      "Inconsistent #in for \"" + name + "\"");
+    for (int i=0; i<s_in.size(); ++i) {
+      casadi_assert_message(s_in[i] == ret.name_in(i),
+        "Inconsistent input names for \"" + name + "\"");
+    }
+
+    // Outputs consistency checks
+    casadi_assert_message(s_out.size() == ret.n_out(),
+      "inconsistent #out for \"" + name + "\"");
+    for (int i=0; i<s_out.size(); ++i) {
+      casadi_assert_message(s_out[i] == ret.name_out(i),
+        "inconsistent output names for \"" + name + "\"");
+    }
+
+    return ret;
+  }
+
 } // namespace casadi

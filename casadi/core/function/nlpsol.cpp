@@ -253,7 +253,7 @@ namespace casadi {
 
     // New implementation
     casadi_assert(nlp_!=0);
-    nlp2_ = nlp_->all_io();
+    nlp2_ = nlp_->all_io("nlp");
 
     // Replace MX oracle with SX oracle?
     if (expand && nlp_) {
@@ -626,7 +626,7 @@ namespace casadi {
                                    const Dict& opts, bool reg) {
     // Generate the function
     casadi_assert(nlp_!=0);
-    Function ret = nlp_->create(fname, s_in, s_out, lincomb, opts);
+    Function ret = nlp2_.factory(fname, s_in, s_out, lincomb, opts);
     if (reg) register_function(ret);
     return ret;
   }

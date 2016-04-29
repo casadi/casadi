@@ -180,6 +180,13 @@ namespace casadi {
 
     /** \brief Get type name */
     virtual std::string type_name() const;
+
+    /** \brief Generate a function with all inputs and outputs */
+    virtual Function all_io(const std::string& fname, const Dict& opts) const {
+      casadi_assert(fname==all_io_.name());
+      casadi_assert(opts.empty());
+      return all_io_;
+    }
   };
 
 #endif // SWIG
