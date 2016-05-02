@@ -618,10 +618,10 @@ namespace casadi {
   Function Nlpsol::create_function(const std::string& fname,
                                    const std::vector<std::string>& s_in,
                                    const std::vector<std::string>& s_out,
-                                   const std::vector<Function::LinComb>& lincomb,
+                                   const Function::AuxOut& aux,
                                    const Dict& opts, bool reg) {
     // Generate the function
-    Function ret = nlp_.factory(fname, s_in, s_out, lincomb, opts);
+    Function ret = nlp_.factory(fname, s_in, s_out, aux, opts);
     if (reg) register_function(ret);
     return ret;
   }

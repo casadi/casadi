@@ -88,7 +88,7 @@ namespace casadi {
     virtual Function factory(const std::string& name,
                              const std::vector<std::string>& s_in,
                              const std::vector<std::string>& s_out,
-                             const std::vector<Function::LinComb>& lincomb,
+                             const Function::AuxOut& aux,
                              const Dict& opts) const;
 
     /** \brief Which variables enter nonlinearly */
@@ -1131,27 +1131,33 @@ namespace casadi {
   factory(const std::string& name,
           const std::vector<std::string>& s_in,
           const std::vector<std::string>& s_out,
-          const std::vector<Function::LinComb>& lincomb,
+          const Function::AuxOut& aux,
           const Dict& opts) const {
     using namespace std;
 
-    // Create maps for all inputs and outputs
-    map<string, MatType> map_in, map_out;
+    // All known expressions
+    map<string, MatType> expr_in, expr_out;
+
+    // Inputs of function being assembled
+    vector<MatType> ret_in(s_in.size());
+
+    // Outputs of function being assembled
+    vector<MatType> ret_out(s_out.size());
 
     // Non-differentiated inputs
     for (int i=0; i<in_.size(); ++i) {
-      map_in[ischeme_[i]] = in_[i];
+      expr_in[ischeme_[i]] = in_[i];
     }
 
     // Non-differentiated outputs
     for (int i=0; i<out_.size(); ++i) {
-      map_out[oscheme_[i]] = out_[i];
+      expr_out[oscheme_[i]] = out_[i];
     }
 
     // Dual variables
     for (int i=0; i<out_.size(); ++i) {
       string dual_name = "lam_" + oscheme_[i];
-      map_in[dual_name] = MatType::sym(dual_name, out_[i].sparsity());
+      expr_in[dual_name] = MatType::sym(dual_name, out_[i].sparsity());
     }
 
     // Forward directional derivative seeds
@@ -1162,7 +1168,7 @@ namespace casadi {
         if (e==fwd_name) {
           fwd_in.push_back(in_[i]);
           fwd_seed.push_back(MatType::sym(fwd_name, fwd_in.back().sparsity()));
-          map_in[fwd_name] = fwd_seed.back();
+          expr_in[fwd_name] = fwd_seed.back();
           break;
         }
       }
@@ -1192,29 +1198,23 @@ namespace casadi {
 
       // Gather derivatives
       for (int i=0; i<fwd_name.size(); ++i) {
-        map_out[fwd_name[i]] = project(fwd_sens.at(0).at(i), fwd_out[i].sparsity());
+        expr_out[fwd_name[i]] = project(fwd_sens.at(0).at(i), fwd_out[i].sparsity());
       }
     }
 
     // Add linear combinations
-    for (auto i : lincomb) {
+    for (auto i : aux) {
       MatType lc = 0;
       for (auto j : i.second) {
-        lc += dot(map_in.at("lam_" + j), map_out.at(j));
+        lc += dot(expr_in.at("lam_" + j), expr_out.at(j));
       }
-      map_out[i.first] = lc;
+      expr_out[i.first] = lc;
     }
-
-    // Inputs of function being assembled
-    vector<MatType> ret_in(s_in.size());
 
     // Handle inputs
     for (int i=0; i<ret_in.size(); ++i) {
-      ret_in[i] = map_in.at(s_in[i]);
+      ret_in[i] = expr_in.at(s_in[i]);
     }
-
-    // Outputs of function being assembled
-    vector<MatType> ret_out(s_out.size());
 
     // List of valid attributes
     const vector<string> all_attr = {"transpose", "triu", "tril", "densify", "sym", "withdiag"};
@@ -1244,8 +1244,8 @@ namespace casadi {
       }
 
       // Try to locate in list of outputs
-      auto it = map_out.find(s);
-      if (it!=map_out.end()) {
+      auto it = expr_out.find(s);
+      if (it!=expr_out.end()) {
         // Already treated
         r = it->second;
       } else {
@@ -1261,8 +1261,8 @@ namespace casadi {
           pos = s.find('_');
           casadi_assert_message(pos<s.size(), s_out[i] + " is ill-posed");
           string res = s.substr(0, pos);
-          auto res_i = map_out.find(res);
-          casadi_assert_message(res_i!=map_out.end(),
+          auto res_i = expr_out.find(res);
+          casadi_assert_message(res_i!=expr_out.end(),
                                 "Unrecognized output " + res + " in " + s_out[i]);
           s = s.substr(pos+1);
 
@@ -1277,8 +1277,8 @@ namespace casadi {
           } else {
             arg = s;
           }
-          auto arg_i = map_in.find(arg);
-          casadi_assert_message(arg_i!=map_in.end(),
+          auto arg_i = expr_in.find(arg);
+          casadi_assert_message(arg_i!=expr_in.end(),
                                 "Unrecognized input " + arg + " in " + s_out[i]);
 
           // Calculate gradient or Jacobian
@@ -1329,7 +1329,6 @@ namespace casadi {
       casadi_error(ss.str());
     }
     return ret;
-
   }
 
   template<typename DerivedType, typename MatType, typename NodeType>

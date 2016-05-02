@@ -284,13 +284,13 @@ namespace casadi {
     /// @}
 
     // A linear combination of inputs
-    typedef std::pair<std::string, std::vector<std::string> > LinComb;
+    typedef std::map<std::string, std::vector<std::string> > AuxOut;
 
     // Factory
     Function factory(const std::string& name,
                      const std::vector<std::string>& s_in,
                      const std::vector<std::string>& s_out,
-                     const std::vector<LinComb>& lincomb=std::vector<LinComb>(),
+                     const AuxOut& aux=AuxOut(),
                      const Dict& opts=Dict()) const;
 
     /** \brief Which variables enter nonlinearly */

@@ -154,7 +154,7 @@ namespace casadi {
     create_function(const std::string& fname,
                     const std::vector<std::string>& s_in,
                     const std::vector<std::string>& s_out,
-                    const std::vector<Function::LinComb>& lincomb=std::vector<Function::LinComb>(),
+                    const Function::AuxOut& aux=Function::AuxOut(),
                     const Dict& opts=Dict(), bool reg=true);
 
     /** Register the function for evaluation and statistics gathering */

@@ -109,7 +109,7 @@ namespace casadi {
     virtual Function factory(const std::string& name,
                              const std::vector<std::string>& s_in,
                              const std::vector<std::string>& s_out,
-                             const std::vector<Function::LinComb>& lincomb,
+                             const Function::AuxOut& aux,
                              const Dict& opts) const;
 
     /** \brief Which variables enter nonlinearly */
