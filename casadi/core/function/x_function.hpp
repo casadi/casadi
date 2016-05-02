@@ -1126,6 +1126,80 @@ namespace casadi {
     }
   }
 
+  // Helper class
+  template<typename MatType>
+  class Factory {
+  public:
+
+    // All auxiliary outputs
+    const Function::AuxOut& aux_;
+
+    // All input and output expressions created so far
+    std::map<std::string, MatType> in_, out_;
+
+    // Constructor
+    Factory(const Function::AuxOut& aux) : aux_(aux) {}
+
+    // Add an input expression
+    void add_input(const std::string& s, const MatType& e);
+
+    // Add an output expression
+    void add_output(const std::string& s, const MatType& e);
+
+    // Request a factory input
+    void request_input(const std::string& s);
+
+    // Request a factory output
+    void request_output(const std::string& s);
+
+    // Calculate requested outputs
+    void calculate();
+
+    // Retrieve an input
+    MatType get_input(const std::string& s);
+
+    // Retrieve an output
+    MatType get_output(const std::string& s);
+  };
+
+  template<typename MatType>
+  void Factory<MatType>::
+  add_input(const std::string& s, const MatType& e) {
+    auto it = in_.insert(make_pair(s, e));
+    casadi_assert_message(it.second, "Duplicate input expression \"" + s + "\"");
+  }
+
+  template<typename MatType>
+  void Factory<MatType>::
+  add_output(const std::string& s, const MatType& e) {
+    auto it = out_.insert(make_pair(s, e));
+    casadi_assert_message(it.second, "Duplicate output expression \"" + s + "\"");
+  }
+
+  template<typename MatType>
+  void Factory<MatType>::
+  request_input(const std::string& s) {
+  }
+
+  template<typename MatType>
+  void Factory<MatType>::
+  request_output(const std::string& s) {
+  }
+
+  template<typename MatType>
+  void Factory<MatType>::calculate() {
+  }
+
+  template<typename MatType>
+  MatType Factory<MatType>::get_input(const std::string& s) {
+    return MatType();
+  }
+
+  template<typename MatType>
+  MatType Factory<MatType>::get_output(const std::string& s) {
+    return MatType();
+  }
+
   template<typename DerivedType, typename MatType, typename NodeType>
   Function XFunction<DerivedType, MatType, NodeType>::
   factory(const std::string& name,
@@ -1135,29 +1209,34 @@ namespace casadi {
           const Dict& opts) const {
     using namespace std;
 
-    // All known expressions
-    map<string, MatType> expr_in, expr_out;
+    // Create an expression factory
+    Factory<MatType> f(aux);
+    for (int i=0; i<in_.size(); ++i) f.add_input(ischeme_[i], in_[i]);
+    for (int i=0; i<out_.size(); ++i) f.add_output(oscheme_[i], out_[i]);
 
-    // Inputs of function being assembled
-    vector<MatType> ret_in(s_in.size());
+    // Specify input and output expressions to be calculated
+    for (const string& s : s_in) f.request_input(s);
+    for (const string& s : s_out) f.request_output(s);
 
-    // Outputs of function being assembled
-    vector<MatType> ret_out(s_out.size());
+    // Calculate expressions
+    f.calculate();
 
-    // Non-differentiated inputs
-    for (int i=0; i<in_.size(); ++i) {
-      expr_in[ischeme_[i]] = in_[i];
-    }
+    // Get input expressions
+    vector<MatType> ret_in;
+    ret_in.reserve(s_in.size());
+    for (const string& s : s_in) ret_in.push_back(f.get_input(s));
 
-    // Non-differentiated outputs
-    for (int i=0; i<out_.size(); ++i) {
-      expr_out[oscheme_[i]] = out_[i];
-    }
+    // Get output expressions
+    vector<MatType> ret_out;
+    ret_out.reserve(s_out.size());
+    for (const string& s : s_out) ret_out.push_back(f.get_output(s));
+
+    // Legacy
 
     // Dual variables
     for (int i=0; i<out_.size(); ++i) {
       string dual_name = "lam_" + oscheme_[i];
-      expr_in[dual_name] = MatType::sym(dual_name, out_[i].sparsity());
+      f.in_[dual_name] = MatType::sym(dual_name, out_[i].sparsity());
     }
 
     // Forward directional derivative seeds
@@ -1168,7 +1247,7 @@ namespace casadi {
         if (e==fwd_name) {
           fwd_in.push_back(in_[i]);
           fwd_seed.push_back(MatType::sym(fwd_name, fwd_in.back().sparsity()));
-          expr_in[fwd_name] = fwd_seed.back();
+          f.in_[fwd_name] = fwd_seed.back();
           break;
         }
       }
@@ -1198,7 +1277,7 @@ namespace casadi {
 
       // Gather derivatives
       for (int i=0; i<fwd_name.size(); ++i) {
-        expr_out[fwd_name[i]] = project(fwd_sens.at(0).at(i), fwd_out[i].sparsity());
+        f.out_[fwd_name[i]] = project(fwd_sens.at(0).at(i), fwd_out[i].sparsity());
       }
     }
 
@@ -1206,14 +1285,14 @@ namespace casadi {
     for (auto i : aux) {
       MatType lc = 0;
       for (auto j : i.second) {
-        lc += dot(expr_in.at("lam_" + j), expr_out.at(j));
+        lc += dot(f.in_.at("lam_" + j), f.out_.at(j));
       }
-      expr_out[i.first] = lc;
+      f.out_[i.first] = lc;
     }
 
     // Handle inputs
     for (int i=0; i<ret_in.size(); ++i) {
-      ret_in[i] = expr_in.at(s_in[i]);
+      ret_in[i] = f.in_.at(s_in[i]);
     }
 
     // List of valid attributes
@@ -1244,8 +1323,8 @@ namespace casadi {
       }
 
       // Try to locate in list of outputs
-      auto it = expr_out.find(s);
-      if (it!=expr_out.end()) {
+      auto it = f.out_.find(s);
+      if (it!=f.out_.end()) {
         // Already treated
         r = it->second;
       } else {
@@ -1261,8 +1340,8 @@ namespace casadi {
           pos = s.find('_');
           casadi_assert_message(pos<s.size(), s_out[i] + " is ill-posed");
           string res = s.substr(0, pos);
-          auto res_i = expr_out.find(res);
-          casadi_assert_message(res_i!=expr_out.end(),
+          auto res_i = f.out_.find(res);
+          casadi_assert_message(res_i!=f.out_.end(),
                                 "Unrecognized output " + res + " in " + s_out[i]);
           s = s.substr(pos+1);
 
@@ -1277,8 +1356,8 @@ namespace casadi {
           } else {
             arg = s;
           }
-          auto arg_i = expr_in.find(arg);
-          casadi_assert_message(arg_i!=expr_in.end(),
+          auto arg_i = f.in_.find(arg);
+          casadi_assert_message(arg_i!=f.in_.end(),
                                 "Unrecognized input " + arg + " in " + s_out[i]);
 
           // Calculate gradient or Jacobian
