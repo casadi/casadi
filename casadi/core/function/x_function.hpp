@@ -1137,8 +1137,11 @@ namespace casadi {
     // All input and output expressions created so far
     std::map<std::string, MatType> in_, out_;
 
-    // Forward directional derivatives
+    // Forward mode directional derivatives
     std::vector<std::string> fwd_in_, fwd_out_;
+
+    // Reverse mode directional derivatives
+    std::vector<std::string> adj_in_, adj_out_;
 
     // Constructor
     Factory(const Function::AuxOut& aux) : aux_(aux) {}
@@ -1203,10 +1206,14 @@ namespace casadi {
     casadi_assert_message(has_prefix(s), "Cannot process \"" + s + "\"");
     pair<string, string> ss = split_prefix(s);
 
-    // Forward directional derivative
     if (ss.first=="fwd") {
+      // Forward mode directional derivative
       casadi_assert_message(has_in(ss.second), "Cannot process \"" + s + "\"");
       fwd_in_.push_back(ss.second);
+    } else if (ss.first=="adj") {
+      // Reverse mode directional derivative
+      casadi_assert_message(has_out(ss.second), "Cannot process \"" + s + "\"");
+      adj_in_.push_back(ss.second);
     }
   }
 
@@ -1222,10 +1229,14 @@ namespace casadi {
     casadi_assert_message(has_prefix(s), "Cannot process \"" + s + "\"");
     pair<string, string> ss = split_prefix(s);
 
-    // Forward directional derivative
     if (ss.first=="fwd") {
+      // Forward mode directional derivative
       casadi_assert_message(has_out(ss.second), "Cannot process \"" + s + "\"");
       fwd_out_.push_back(ss.second);
+    } else if (ss.first=="adj") {
+      // Reverse mode directional derivative
+      casadi_assert_message(has_in(ss.second), "Cannot process \"" + s + "\"");
+      adj_out_.push_back(ss.second);
     }
   }
 
@@ -1241,12 +1252,12 @@ namespace casadi {
       casadi_assert_message(it.second, "Cannot process \"" + dual_name + "\"");
     }
 
-    // Forward directional derivatives
+    // Forward mode directional derivatives
     if (!fwd_out_.empty()) {
       casadi_assert(!fwd_in_.empty());
       vector<MatType> arg, res;
       vector<vector<MatType>> seed(1), sens(1);
-      // Inputs and forward seeds
+      // Inputs and forward mode seeds
       for (const string& s : fwd_in_) {
         arg.push_back(in_[s]);
         string fname = "fwd_" + s;
@@ -1266,6 +1277,35 @@ namespace casadi {
         out_["fwd_" + fwd_out_[i]] = project(sens[0].at(i), res.at(i).sparsity());
       }
     }
+
+    // Reverse mode directional derivatives
+    if (!adj_out_.empty()) {
+      casadi_assert(!adj_in_.empty());
+      vector<MatType> arg, res;
+      vector<vector<MatType>> seed(1), sens(1);
+      // Inputs
+      for (const string& s : adj_in_) {
+        arg.push_back(in_[s]);
+      }
+      // Outputs and reverse mode seeds
+      for (const string& s : adj_out_) {
+        res.push_back(out_[s]);
+        string aname = "adj_" + s;
+        seed[0].push_back(MatType::sym(aname, res.back().sparsity()));
+        in_[aname] = seed[0].back();
+      }
+      // Calculate directional derivatives
+      Function df("df", arg, res, adj_in_, adj_out_);
+      df.reverse(arg, res, seed, sens, true, false);
+
+      // Get directional derivatives
+      for (int i=0; i<adj_out_.size(); ++i) {
+        out_["adj_" + adj_out_[i]] = project(sens[0].at(i), arg.at(i).sparsity());
+      }
+    }
+
+
+
   }
 
   template<typename MatType>
