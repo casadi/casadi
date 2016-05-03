@@ -1233,6 +1233,14 @@ namespace casadi {
   void Factory<MatType>::calculate() {
     using namespace std;
 
+    // Dual variables
+    for (auto&& e : out_) {
+      string dual_name = "lam_" + e.first;
+      auto it = in_.insert(make_pair(dual_name,
+        MatType::sym(dual_name, e.second.sparsity())));
+      casadi_assert_message(it.second, "Cannot process \"" + dual_name + "\"");
+    }
+
     // Forward directional derivatives
     if (!fwd_out_.empty()) {
       casadi_assert(!fwd_in_.empty());
@@ -1262,7 +1270,9 @@ namespace casadi {
 
   template<typename MatType>
   MatType Factory<MatType>::get_input(const std::string& s) {
-    return MatType();
+    auto it = in_.find(s);
+    casadi_assert(it!=in_.end());
+    return it->second;
   }
 
   template<typename MatType>
@@ -1319,12 +1329,6 @@ namespace casadi {
 
     // Legacy
 
-    // Dual variables
-    for (int i=0; i<out_.size(); ++i) {
-      string dual_name = "lam_" + oscheme_[i];
-      f.in_[dual_name] = MatType::sym(dual_name, out_[i].sparsity());
-    }
-
     // Add linear combinations
     for (auto i : aux) {
       MatType lc = 0;
@@ -1332,11 +1336,6 @@ namespace casadi {
         lc += dot(f.in_.at("lam_" + j), f.out_.at(j));
       }
       f.out_[i.first] = lc;
-    }
-
-    // Handle inputs
-    for (int i=0; i<ret_in.size(); ++i) {
-      ret_in[i] = f.in_.at(s_in[i]);
     }
 
     // List of valid attributes
