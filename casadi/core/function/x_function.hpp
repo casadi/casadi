@@ -1137,6 +1137,9 @@ namespace casadi {
     // All input and output expressions created so far
     std::map<std::string, MatType> in_, out_;
 
+    // Forward directional derivatives
+    std::vector<std::string> fwd_in_, fwd_out_;
+
     // Constructor
     Factory(const Function::AuxOut& aux) : aux_(aux) {}
 
@@ -1160,6 +1163,18 @@ namespace casadi {
 
     // Retrieve an output
     MatType get_output(const std::string& s);
+
+    // Helper function
+    static bool has_prefix(const std::string& s);
+
+    // Split prefix
+    static std::pair<std::string, std::string> split_prefix(const std::string& s);
+
+    // Check if input exists
+    bool has_in(const std::string& s) const { return in_.find(s)!=in_.end();}
+
+    // Check if out exists
+    bool has_out(const std::string& s) const { return out_.find(s)!=out_.end();}
   };
 
   template<typename MatType>
@@ -1179,15 +1194,70 @@ namespace casadi {
   template<typename MatType>
   void Factory<MatType>::
   request_input(const std::string& s) {
+    using namespace std;
+
+    // Quick return if already available
+    if (has_in(s)) return;
+
+    // Get prefix
+    casadi_assert_message(has_prefix(s), "Cannot process \"" + s + "\"");
+    pair<string, string> ss = split_prefix(s);
+
+    // Forward directional derivative
+    if (ss.first=="fwd") {
+      casadi_assert_message(has_in(ss.second), "Cannot process \"" + s + "\"");
+      fwd_in_.push_back(ss.second);
+    }
   }
 
   template<typename MatType>
   void Factory<MatType>::
   request_output(const std::string& s) {
+    using namespace std;
+
+    // Quick return if already available
+    if (has_out(s)) return;
+
+    // Get prefix
+    casadi_assert_message(has_prefix(s), "Cannot process \"" + s + "\"");
+    pair<string, string> ss = split_prefix(s);
+
+    // Forward directional derivative
+    if (ss.first=="fwd") {
+      casadi_assert_message(has_out(ss.second), "Cannot process \"" + s + "\"");
+      fwd_out_.push_back(ss.second);
+    }
   }
 
   template<typename MatType>
   void Factory<MatType>::calculate() {
+    using namespace std;
+
+    // Forward directional derivatives
+    if (!fwd_out_.empty()) {
+      casadi_assert(!fwd_in_.empty());
+      vector<MatType> arg, res;
+      vector<vector<MatType>> seed(1), sens(1);
+      // Inputs and forward seeds
+      for (const string& s : fwd_in_) {
+        arg.push_back(in_[s]);
+        string fname = "fwd_" + s;
+        seed[0].push_back(MatType::sym(fname, arg.back().sparsity()));
+        in_[fname] = seed[0].back();
+      }
+      // Outputs
+      for (const string& s : fwd_out_) {
+        res.push_back(out_[s]);
+      }
+      // Calculate directional derivatives
+      Function df("df", arg, res, fwd_in_, fwd_out_);
+      df.forward(arg, res, seed, sens, true, false);
+
+      // Get directional derivatives
+      for (int i=0; i<fwd_out_.size(); ++i) {
+        out_["fwd_" + fwd_out_[i]] = project(sens[0].at(i), res.at(i).sparsity());
+      }
+    }
   }
 
   template<typename MatType>
@@ -1198,6 +1268,22 @@ namespace casadi {
   template<typename MatType>
   MatType Factory<MatType>::get_output(const std::string& s) {
     return MatType();
+  }
+
+  template<typename MatType>
+  bool Factory<MatType>::
+  has_prefix(const std::string& s) {
+    return s.find('_') < s.size();
+  }
+
+  template<typename MatType>
+  std::pair<std::string, std::string> Factory<MatType>::
+  split_prefix(const std::string& s) {
+    // Get prefix
+    casadi_assert(!s.empty());
+    size_t pos = s.find('_');
+    casadi_assert_message(pos<s.size(), "Cannot process \"" + s + "\"");
+    return make_pair(s.substr(0, pos), s.substr(pos+1, std::string::npos));
   }
 
   template<typename DerivedType, typename MatType, typename NodeType>
@@ -1237,48 +1323,6 @@ namespace casadi {
     for (int i=0; i<out_.size(); ++i) {
       string dual_name = "lam_" + oscheme_[i];
       f.in_[dual_name] = MatType::sym(dual_name, out_[i].sparsity());
-    }
-
-    // Forward directional derivative seeds
-    vector<MatType> fwd_in, fwd_seed;
-    for (int i=0; i<in_.size(); ++i) {
-      string fwd_name = "fwd_" + ischeme_[i];
-      for (auto&& e : s_in) {
-        if (e==fwd_name) {
-          fwd_in.push_back(in_[i]);
-          fwd_seed.push_back(MatType::sym(fwd_name, fwd_in.back().sparsity()));
-          f.in_[fwd_name] = fwd_seed.back();
-          break;
-        }
-      }
-    }
-
-    // Forward directional derivatives
-    if (!fwd_in.empty()) {
-      // Which expressions to differentiate
-      vector<MatType> fwd_out;
-      vector<string> fwd_name;
-      for (int i=0; i<out_.size(); ++i) {
-        string n = "fwd_" + oscheme_[i];
-        for (auto&& e : s_out) {
-          if (e==n) {
-            fwd_out.push_back(out_[i]);
-            fwd_name.push_back(n);
-            break;
-          }
-        }
-      }
-      casadi_assert(!fwd_out.empty());
-
-      // Calculate directional derivatives
-      Function df("df", fwd_in, fwd_out);
-      vector<vector<MatType>> fwd_sens;
-      df.forward(fwd_in, fwd_out, {fwd_seed}, fwd_sens, true, false);
-
-      // Gather derivatives
-      for (int i=0; i<fwd_name.size(); ++i) {
-        f.out_[fwd_name[i]] = project(fwd_sens.at(0).at(i), fwd_out[i].sparsity());
-      }
     }
 
     // Add linear combinations
