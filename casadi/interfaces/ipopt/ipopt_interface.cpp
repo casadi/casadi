@@ -170,14 +170,14 @@ namespace casadi {
     f_fcn_ = create_function("nlp_f", {"x", "p"}, {"f"});
     g_fcn_ = create_function("nlp_g", {"x", "p"}, {"g"});
     if (grad_f_fcn_.is_null()) {
-      grad_f_fcn_ = create_function("nlp_grad_f", {"x", "p"}, {"f", "grad_f_x"});
+      grad_f_fcn_ = create_function("nlp_grad_f", {"x", "p"}, {"f", "grad:f:x"});
     } else {
       casadi_assert(grad_f_fcn_.n_in()==2);
       casadi_assert(grad_f_fcn_.n_out()==2);
       register_function(grad_f_fcn_);
     }
     if (jac_g_fcn_.is_null()) {
-      jac_g_fcn_ = create_function("nlp_jac_g", {"x", "p"}, {"g", "jac_g_x"});
+      jac_g_fcn_ = create_function("nlp_jac_g", {"x", "p"}, {"g", "jac:g:x"});
     } else {
       casadi_assert(jac_g_fcn_.n_in()==2);
       casadi_assert(jac_g_fcn_.n_out()==2);
@@ -189,8 +189,8 @@ namespace casadi {
     if (exact_hessian_) {
       if (hess_l_fcn_.is_null()) {
         hess_l_fcn_ =
-          create_function("nlp_hess_l", {"x", "p", "lam_f", "lam_g"},
-                          {"hess_gamma_x_x"}, {{"gamma", {"f", "g"}}});
+          create_function("nlp_hess_l", {"x", "p", "lam:f", "lam:g"},
+                          {"hess:gamma:x:x"}, {{"gamma", {"f", "g"}}});
       } else {
         casadi_assert(hess_l_fcn_.n_in()==4);
         casadi_assert(hess_l_fcn_.n_out()==1);

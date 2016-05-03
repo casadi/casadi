@@ -89,10 +89,10 @@ namespace casadi {
 
     // Setup NLP functions
     fg_fcn_ = create_function("nlp_fg", {"x", "p"}, {"f", "g"});
-    gf_jg_fcn_ = create_function("nlp_gf_jg", {"x", "p"}, {"grad_f_x", "jac_g_x"});
+    gf_jg_fcn_ = create_function("nlp_gf_jg", {"x", "p"}, {"grad:f:x", "jac:g:x"});
     jacg_sp_ = gf_jg_fcn_.sparsity_out(1);
-    hess_l_fcn_ = create_function("nlp_jac_f", {"x", "p", "lam_f", "lam_g"},
-                                  {"hess_gamma_x_x"},
+    hess_l_fcn_ = create_function("nlp_jac_f", {"x", "p", "lam:f", "lam:g"},
+                                  {"hess:gamma:x:x"},
                                   {{"gamma", {"f", "g"}}});
     hesslag_sp_ = hess_l_fcn_.sparsity_out(0);
 

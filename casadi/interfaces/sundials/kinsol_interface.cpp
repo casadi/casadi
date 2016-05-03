@@ -260,8 +260,8 @@ namespace casadi {
 
   void KinsolInterface::get_jtimes() {
     vector<string> jtimes_in = f_.name_in();
-    jtimes_in.push_back("fwd_" + f_.name_in(iin_));
-    vector<string> jtimes_out = {"fwd_" + f_.name_out(iout_)};
+    jtimes_in.push_back("fwd:" + f_.name_in(iin_));
+    vector<string> jtimes_out = {"fwd:" + f_.name_out(iout_)};
     jtimes_ = f_.factory("jtimes", jtimes_in, jtimes_out);
     alloc(jtimes_);
   }

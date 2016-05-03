@@ -23,6 +23,7 @@
 #
 # -*- coding: utf-8 -*-
 
+from __future__ import print_function
 from casadi import *
 from copy import deepcopy
 print("Testing sensitivity analysis in CasADi")
@@ -134,53 +135,35 @@ for Integrators in (ODE_integrators,DAE_integrators):
     print("%50s" % "Finite difference approximation:", "d(xf)/d(p) = ", fd_xf, ", d(qf)/d(p) = ", fd_qf)
 
     # Calculate once, forward
-    I_fwd = I.factory("I_fwd", ["x0", "z0", "p", "fwd_p"], ["fwd_xf", "fwd_qf"])
+    I_fwd = I.factory("I_fwd", ["x0", "z0", "p", "fwd:p"], ["fwd:xf", "fwd:qf"])
     res = I_fwd(x0=x0, p=u0, fwd_p=1)
     fwd_xf = res["fwd_xf"]
     fwd_qf = res["fwd_qf"]
     print("%50s" % "Forward sensitivities:", "d(xf)/d(p) = ", fwd_xf, ", d(qf)/d(p) = ", fwd_qf)
 
     # Calculate once, adjoint
-    I_adj = I.derivative(0, 1)
-    arg = {}
-    arg["der_x0"] = x0
-    arg["der_p"] = u0
-    arg["adj0_xf"] = 0
-    arg["adj0_qf"] = 1
-    res = I_adj(**arg)
-    adj_x0 = res["adj0_x0"]
-    adj_p = res["adj0_p"]
+    I_adj = I.factory("I_adj", ["x0", "z0", "p", "adj:qf"], ["adj:x0", "adj:p"])
+    res = I_adj(x0=x0, p=u0, adj_qf=1)
+    adj_x0 = res["adj_x0"]
+    adj_p = res["adj_p"]
     print("%50s" % "Adjoint sensitivities:", "d(qf)/d(x0) = ", adj_x0, ", d(qf)/d(p) = ", adj_p)
 
     # Perturb adjoint solution to get a finite difference approximation of the second order sensitivities
-    arg["der_p"] = u0+h
-    res = I_adj(**arg)
-    fd_adj_x0 = (res["adj0_x0"]-adj_x0)/h
-    fd_adj_p = (res["adj0_p"]-adj_p)/h
+    res = I_adj(x0=x0, p=u0+h, adj_qf=1)
+    fd_adj_x0 = (res["adj_x0"]-adj_x0)/h
+    fd_adj_p = (res["adj_p"]-adj_p)/h
     print("%50s" % "FD of adjoint sensitivities:", "d2(qf)/d(x0)d(p) = ", fd_adj_x0, ", d2(qf)/d(p)d(p) = ", fd_adj_p)
 
     # Forward over adjoint to get the second order sensitivities
-    I_foa = I_adj.derivative(1, 0)
-    arg = {}
-    arg["der_der_x0"] = x0
-    arg["der_der_p"] = u0
-    arg["fwd0_der_p"] = 1
-    arg["der_adj0_xf"] = 0
-    arg["der_adj0_qf"] = 1
-    res = I_foa(**arg)
-    fwd_adj_x0 = res["fwd0_adj0_x0"]
-    fwd_adj_p = res["fwd0_adj0_p"]
+    I_foa = I_adj.factory('I_foa', ["x0", "z0", "p", "adj_qf", "fwd:p"], ["fwd:adj_x0", "fwd:adj_p"])
+    res = I_foa(x0=x0, p=u0, adj_qf=1, fwd_p=1)
+    fwd_adj_x0 = res["fwd_adj_x0"]
+    fwd_adj_p = res["fwd_adj_p"]
     print("%50s" % "Forward over adjoint sensitivities:", "d2(qf)/d(x0)d(p) = ", fwd_adj_x0, ", d2(qf)/d(p)d(p) = ", fwd_adj_p)
 
     # Adjoint over adjoint to get the second order sensitivities
-    I_aoa = I_adj.derivative(0, 1)
-    arg = {}
-    arg["der_der_x0"] = x0
-    arg["der_der_p"] = u0
-    arg["der_adj0_xf"] = 0
-    arg["der_adj0_qf"] = 1
-    arg["adj0_adj0_p"] = 1
-    res = I_aoa(**arg)
-    adj_adj_x0 = res["adj0_der_x0"]
-    adj_adj_p = res["adj0_der_p"]
+    I_aoa = I_adj.factory('I_aoa', ["x0", "z0", "p", "adj_qf", "adj:adj_p"], ["adj:x0", "adj:p"])
+    res = I_aoa(x0=x0, p=u0, adj_qf=1, adj_adj_p=1)
+    adj_adj_x0 = res["adj_x0"]
+    adj_adj_p = res["adj_p"]
     print("%50s" % "Adjoint over adjoint sensitivities:", "d2(qf)/d(x0)d(p) = ", adj_adj_x0, ", d2(qf)/d(p)d(p) = ", adj_adj_p)

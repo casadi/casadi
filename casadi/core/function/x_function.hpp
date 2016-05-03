@@ -1159,10 +1159,10 @@ namespace casadi {
     void add_output(const std::string& s, const MatType& e);
 
     // Request a factory input
-    void request_input(const std::string& s);
+    std::string request_input(const std::string& s);
 
     // Request a factory output
-    void request_output(const std::string& s);
+    std::string request_output(const std::string& s);
 
     // Calculate requested outputs
     void calculate();
@@ -1201,12 +1201,12 @@ namespace casadi {
   }
 
   template<typename MatType>
-  void Factory<MatType>::
+  std::string Factory<MatType>::
   request_input(const std::string& s) {
     using namespace std;
 
     // Quick return if already available
-    if (has_in(s)) return;
+    if (has_in(s)) return s;
 
     // Get prefix
     casadi_assert_message(has_prefix(s), "Cannot process \"" + s + "\"");
@@ -1221,15 +1221,20 @@ namespace casadi {
       casadi_assert_message(has_out(ss.second), "Cannot process \"" + s + "\"");
       adj_in_.push_back(ss.second);
     }
+
+    // Replace colons with underscore
+    string ret = s;
+    replace(ret.begin(), ret.end(), ':', '_');
+    return ret;
   }
 
   template<typename MatType>
-  void Factory<MatType>::
+  std::string Factory<MatType>::
   request_output(const std::string& s) {
     using namespace std;
 
     // Quick return if already available
-    if (has_out(s)) return;
+    if (has_out(s)) return s;
 
     // Get prefix
     casadi_assert_message(has_prefix(s), "Cannot process \"" + s + "\"");
@@ -1244,6 +1249,11 @@ namespace casadi {
       casadi_assert_message(has_in(ss.second), "Cannot process \"" + s + "\"");
       adj_out_.push_back(ss.second);
     }
+
+    // Replace colons with underscore
+    string ret = s;
+    replace(ret.begin(), ret.end(), ':', '_');
+    return ret;
   }
 
   template<typename MatType>
@@ -1252,23 +1262,20 @@ namespace casadi {
 
     // Dual variables
     for (auto&& e : out_) {
-      string dual_name = "lam_" + e.first;
-      auto it = in_.insert(make_pair(dual_name,
-        MatType::sym(dual_name, e.second.sparsity())));
-      casadi_assert_message(it.second, "Cannot process \"" + dual_name + "\"");
+      in_["lam:" + e.first] = MatType::sym("lam_" + e.first, e.second.sparsity());
     }
 
     // Forward mode directional derivatives
     if (!fwd_out_.empty()) {
       casadi_assert(!fwd_in_.empty());
+
       vector<MatType> arg, res;
       vector<vector<MatType>> seed(1), sens(1);
       // Inputs and forward mode seeds
       for (const string& s : fwd_in_) {
         arg.push_back(in_[s]);
-        string fname = "fwd_" + s;
-        seed[0].push_back(MatType::sym(fname, arg.back().sparsity()));
-        in_[fname] = seed[0].back();
+        seed[0].push_back(MatType::sym("fwd_" + s, arg.back().sparsity()));
+        in_["fwd:" + s] = seed[0].back();
       }
       // Outputs
       for (const string& s : fwd_out_) {
@@ -1280,7 +1287,7 @@ namespace casadi {
 
       // Get directional derivatives
       for (int i=0; i<fwd_out_.size(); ++i) {
-        out_["fwd_" + fwd_out_[i]] = project(sens[0].at(i), res.at(i).sparsity());
+        out_["fwd:" + fwd_out_[i]] = project(sens[0].at(i), res.at(i).sparsity());
       }
     }
 
@@ -1290,15 +1297,14 @@ namespace casadi {
       vector<MatType> arg, res;
       vector<vector<MatType>> seed(1), sens(1);
       // Inputs
-      for (const string& s : adj_in_) {
+      for (const string& s : adj_out_) {
         arg.push_back(in_[s]);
       }
       // Outputs and reverse mode seeds
-      for (const string& s : adj_out_) {
+      for (const string& s : adj_in_) {
         res.push_back(out_[s]);
-        string aname = "adj_" + s;
-        seed[0].push_back(MatType::sym(aname, res.back().sparsity()));
-        in_[aname] = seed[0].back();
+        seed[0].push_back(MatType::sym("adj_" + s, res.back().sparsity()));
+        in_["adj:" + s] = seed[0].back();
       }
       // Calculate directional derivatives
       Function df("df", arg, res, adj_in_, adj_out_);
@@ -1306,18 +1312,15 @@ namespace casadi {
 
       // Get directional derivatives
       for (int i=0; i<adj_out_.size(); ++i) {
-        out_["adj_" + adj_out_[i]] = project(sens[0].at(i), arg.at(i).sparsity());
+        out_["adj:" + adj_out_[i]] = project(sens[0].at(i), arg.at(i).sparsity());
       }
     }
-
-
-
   }
 
   template<typename MatType>
   MatType Factory<MatType>::get_input(const std::string& s) {
     auto it = in_.find(s);
-    casadi_assert(it!=in_.end());
+    casadi_assert_message(it!=in_.end(), "Cannot retrieve \"" + s + "\"");
     return it->second;
   }
 
@@ -1329,7 +1332,7 @@ namespace casadi {
   template<typename MatType>
   bool Factory<MatType>::
   has_prefix(const std::string& s) {
-    return s.find('_') < s.size();
+    return s.find(':') < s.size();
   }
 
   template<typename MatType>
@@ -1337,7 +1340,7 @@ namespace casadi {
   split_prefix(const std::string& s) {
     // Get prefix
     casadi_assert(!s.empty());
-    size_t pos = s.find('_');
+    size_t pos = s.find(':');
     casadi_assert_message(pos<s.size(), "Cannot process \"" + s + "\"");
     return make_pair(s.substr(0, pos), s.substr(pos+1, std::string::npos));
   }
@@ -1357,8 +1360,9 @@ namespace casadi {
     for (int i=0; i<out_.size(); ++i) f.add_output(oscheme_[i], out_[i]);
 
     // Specify input and output expressions to be calculated
-    for (const string& s : s_in) f.request_input(s);
-    for (const string& s : s_out) f.request_output(s);
+    vector<string> ret_iname, ret_oname;
+    for (const string& s : s_in) ret_iname.push_back(f.request_input(s));
+    for (const string& s : s_out) ret_oname.push_back(f.request_output(s));
 
     // Calculate expressions
     f.calculate();
@@ -1379,7 +1383,7 @@ namespace casadi {
     for (auto i : aux) {
       MatType lc = 0;
       for (auto j : i.second) {
-        lc += dot(f.in_.at("lam_" + j), f.out_.at(j));
+        lc += dot(f.in_.at("lam:" + j), f.out_.at(j));
       }
       f.out_[i.first] = lc;
     }
@@ -1397,8 +1401,8 @@ namespace casadi {
       // Separarate attributes
       vector<string> attr;
       while (true) {
-        // Find the first underscore separator
-        size_t pos = s.find('_');
+        // Find the first separator
+        size_t pos = s.find(':');
         if (pos>=s.size()) break; // No more underscore
         string a = s.substr(0, pos);
 
@@ -1418,7 +1422,7 @@ namespace casadi {
         r = it->second;
       } else {
         // Must be an operator
-        size_t pos = s.find('_');
+        size_t pos = s.find(':');
         casadi_assert_message(pos<s.size(), s_out[i] + " is not an output or operator");
         string op = s.substr(0, pos);
         s = s.substr(pos+1);
@@ -1426,7 +1430,7 @@ namespace casadi {
         // Handle different types of operators
         if (op=="grad" || op=="jac" || op=="hess") {
           // Output
-          pos = s.find('_');
+          pos = s.find(':');
           casadi_assert_message(pos<s.size(), s_out[i] + " is ill-posed");
           string res = s.substr(0, pos);
           auto res_i = f.out_.find(res);
@@ -1437,7 +1441,7 @@ namespace casadi {
           // Input
           string arg;
           if (op=="hess") {
-            pos = s.find('_');
+            pos = s.find(':');
             casadi_assert_message(pos<s.size(), s_out[i] + " is ill-posed");
             arg = s.substr(0, pos);
             s = s.substr(pos+1);
@@ -1484,7 +1488,7 @@ namespace casadi {
     }
 
     // Create function and return
-    Function ret(name, ret_in, ret_out, s_in, s_out, opts);
+    Function ret(name, ret_in, ret_out, ret_iname, ret_oname, opts);
     if (ret.has_free()) {
       stringstream ss;
       ss << "Cannot generate " << name << " as the expressions contain free variables: ";

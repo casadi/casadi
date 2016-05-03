@@ -155,7 +155,7 @@ namespace casadi {
       switch (linsol_f_) {
       case SD_ITERATIVE:
         jtimes_ = dae_.factory("jtimes",
-          {"t", "x", "z", "p", "fwd_x", "fwd_z"}, {"fwd_ode", "fwd_alg"});
+          {"t", "x", "z", "p", "fwd:x", "fwd:z"}, {"fwd:ode", "fwd:alg"});
         alloc(jtimes_);
         break;
       default: break;
@@ -166,8 +166,8 @@ namespace casadi {
       switch (linsol_g_) {
       case SD_ITERATIVE:
         jtimesB_ = dae_.factory("jtimesB",
-          {"t", "x", "z", "p", "rx", "rz", "rp", "fwd_rx", "fwd_rz"},
-          {"fwd_rode", "fwd_ralg"});
+          {"t", "x", "z", "p", "rx", "rz", "rp", "fwd:rx", "fwd:rz"},
+          {"fwd:rode", "fwd:ralg"});
         alloc(jtimesB_);
         break;
       default: break;

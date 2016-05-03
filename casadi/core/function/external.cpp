@@ -327,7 +327,9 @@ namespace casadi {
     casadi_assert_message(s_in.size() == ret.n_in(),
       "Inconsistent #in for \"" + name + "\"");
     for (int i=0; i<s_in.size(); ++i) {
-      casadi_assert_message(s_in[i] == ret.name_in(i),
+      string s = s_in[i];
+      replace(s.begin(), s.end(), ':', '_');
+      casadi_assert_message(s == ret.name_in(i),
         "Inconsistent input names for \"" + name + "\"");
     }
 
@@ -335,7 +337,9 @@ namespace casadi {
     casadi_assert_message(s_out.size() == ret.n_out(),
       "inconsistent #out for \"" + name + "\"");
     for (int i=0; i<s_out.size(); ++i) {
-      casadi_assert_message(s_out[i] == ret.name_out(i),
+      string s = s_out[i];
+      replace(s.begin(), s.end(), ':', '_');
+      casadi_assert_message(s == ret.name_out(i),
         "inconsistent output names for \"" + name + "\"");
     }
 

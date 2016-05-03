@@ -112,11 +112,11 @@ namespace casadi {
     // Setup NLP functions
     f_fcn_ = create_function("nlp_f", {"x", "p"}, {"f"});
     g_fcn_ = create_function("nlp_g", {"x", "p"}, {"g"});
-    grad_f_fcn_ = create_function("nlp_grad_f", {"x", "p"}, {"f", "grad_f_x"});
-    jac_g_fcn_ = create_function("nlp_jac_g", {"x", "p"}, {"g", "jac_g_x"});
+    grad_f_fcn_ = create_function("nlp_grad_f", {"x", "p"}, {"f", "grad:f:x"});
+    jac_g_fcn_ = create_function("nlp_jac_g", {"x", "p"}, {"g", "jac:g:x"});
     jacg_sp_ = jac_g_fcn_.sparsity_out(1);
-    hess_l_fcn_ = create_function("nlp_jac_f", {"x", "p", "lam_f", "lam_g"},
-                                  {"transpose_hess_gamma_x_x"},
+    hess_l_fcn_ = create_function("nlp_jac_f", {"x", "p", "lam:f", "lam:g"},
+                                  {"transpose:hess:gamma:x:x"},
                                   {{"gamma", {"f", "g"}}});
     hesslag_sp_ = hess_l_fcn_.sparsity_out(0);
 
