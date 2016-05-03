@@ -10,6 +10,33 @@
 %exception  casadi::FStats::toc() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Factory< MatType >::add_input(const std::string &s, const MatType &e) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Factory< MatType >::add_output(const std::string &s, const MatType &e) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Factory< MatType >::calculate() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Factory< MatType >::get_input(const std::string &s) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Factory< MatType >::get_output(const std::string &s) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Factory< MatType >::has_in(const std::string &s) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Factory< MatType >::has_out(const std::string &s) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Factory< MatType >::request_input(const std::string &s) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Factory< MatType >::request_output(const std::string &s) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::Function::checkInputs() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -239,6 +266,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::FStats::FStats() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception casadi::Factory< MatType >::Factory(const Function::AuxOut &aux) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::Matrix< Scalar >::Matrix(const Sparsity &sp, const Scalar &val, bool dummy) {

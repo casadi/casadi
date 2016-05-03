@@ -1673,6 +1673,31 @@ Add an ordinary differential equation.
 // File: classcasadi_1_1External.xml
 
 
+// File: classcasadi_1_1Factory.xml
+%feature("docstring") casadi::Factory::has_in "[INTERNAL] ";
+
+%feature("docstring") casadi::Factory::add_output "[INTERNAL] ";
+
+%feature("docstring") casadi::Factory::calculate "[INTERNAL] ";
+
+%feature("docstring") casadi::Factory::get_output "[INTERNAL] ";
+
+%feature("docstring") casadi::Factory "[INTERNAL] C++ includes:
+x_function.hpp ";
+
+%feature("docstring") casadi::Factory::request_output "[INTERNAL] ";
+
+%feature("docstring") casadi::Factory::get_input "[INTERNAL] ";
+
+%feature("docstring") casadi::Factory::add_input "[INTERNAL] ";
+
+%feature("docstring") casadi::Factory::has_out "[INTERNAL] ";
+
+%feature("docstring") casadi::Factory::request_input "[INTERNAL] ";
+
+%feature("docstring") casadi::Factory::Factory "[INTERNAL] ";
+
+
 // File: classcasadi_1_1Find.xml
 
 

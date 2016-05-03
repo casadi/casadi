@@ -174,8 +174,7 @@ of the outputs.
 
 %feature("docstring")  casadi::Function::factory(const std::string &name,
 const std::vector< std::string > &s_in, const std::vector< std::string >
-&s_out, const std::vector< LinComb > &lincomb=std::vector< LinComb >(),
-const Dict &opts=Dict()) const  " ";
+&s_out, const AuxOut &aux=AuxOut(), const Dict &opts=Dict()) const  " ";
 
 %feature("docstring")  casadi::Function::free_sx() const  "
 
@@ -2456,6 +2455,41 @@ Add an ordinary differential equation.
 // File: classcasadi_1_1External.xml
 
 
+// File: classcasadi_1_1Factory.xml
+%feature("docstring")  casadi::Factory< MatType >::has_in(const std::string
+&s) const  " [INTERNAL] ";
+
+%feature("docstring")  casadi::Factory< MatType >::add_output(const
+std::string &s, const MatType &e) " [INTERNAL] ";
+
+%feature("docstring")  casadi::Factory< MatType >::calculate() " [INTERNAL]
+";
+
+%feature("docstring")  casadi::Factory< MatType >::get_output(const
+std::string &s) " [INTERNAL] ";
+
+%feature("docstring") casadi::Factory "[INTERNAL] C++ includes:
+x_function.hpp ";
+
+%feature("docstring")  casadi::Factory< MatType >::request_output(const
+std::string &s) " [INTERNAL] ";
+
+%feature("docstring")  casadi::Factory< MatType >::get_input(const
+std::string &s) " [INTERNAL] ";
+
+%feature("docstring")  casadi::Factory< MatType >::add_input(const
+std::string &s, const MatType &e) " [INTERNAL] ";
+
+%feature("docstring")  casadi::Factory< MatType >::has_out(const std::string
+&s) const  " [INTERNAL] ";
+
+%feature("docstring")  casadi::Factory< MatType >::request_input(const
+std::string &s) " [INTERNAL] ";
+
+%feature("docstring") casadi::Factory< MatType >::Factory(const
+Function::AuxOut &aux) " [INTERNAL] ";
+
+
 // File: classcasadi_1_1Find.xml
 
 
@@ -3418,8 +3452,7 @@ Expand a function to SX.
 
 %feature("docstring")  casadi::Function::factory(const std::string &name,
 const std::vector< std::string > &s_in, const std::vector< std::string >
-&s_out, const std::vector< LinComb > &lincomb=std::vector< LinComb >(),
-const Dict &opts=Dict()) const  " ";
+&s_out, const AuxOut &aux=AuxOut(), const Dict &opts=Dict()) const  " ";
 
 %feature("docstring")  casadi::Function::checkout() "
 
