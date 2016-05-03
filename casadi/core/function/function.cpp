@@ -718,7 +718,11 @@ namespace casadi {
   }
 
   bool Function::spCanEvaluate(bool fwd) {
-    return (*this)->spCanEvaluate(fwd);
+    if (fwd) {
+      return (*this)->has_spfwd();
+    } else {
+      return (*this)->has_sprev();
+    }
   }
 
   Function Function::derivative(int nfwd, int nadj) {

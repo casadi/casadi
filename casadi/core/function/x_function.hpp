@@ -58,6 +58,12 @@ namespace casadi {
     /** \brief  Initialize */
     virtual void init(const Dict& opts);
 
+    ///@{
+    /// Is the class able to propagate seeds through the algorithm?
+    virtual bool has_spfwd() const { return true;}
+    virtual bool has_sprev() const { return true;}
+    ///@}
+
     /** \brief  Topological sorting of the nodes based on Depth-First Search (DFS) */
     static void sort_depth_first(std::stack<NodeType*>& s, std::vector<NodeType*>& nodes);
 

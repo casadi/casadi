@@ -518,7 +518,7 @@ namespace casadi {
     return f.tangent(iind, oind);
   }
 
-  Function FunctionInternal::wrapMXFunction() {
+  Function FunctionInternal::wrapMXFunction() const {
     // Construct options of the wrapping MXFunction
     Dict opts;
 
@@ -528,8 +528,8 @@ namespace casadi {
     opts["output_scheme"] = oscheme_;
 
     // Propagate AD parameters
-    opts["ad_weight"] = adWeight();
-    opts["ad_weight_sp"] = adWeightSp();
+    opts["ad_weight"] = ad_weight();
+    opts["ad_weight_sp"] = sp_weight();
 
     // Propagate information about AD
     opts["derivative_of"] = derivative_of_;
@@ -725,7 +725,7 @@ namespace casadi {
   }
 
   Sparsity FunctionInternal::getJacSparsityHierarchicalSymm(int iind, int oind) {
-    casadi_assert(spCanEvaluate(true));
+    casadi_assert(has_spfwd());
 
     // Number of nonzero inputs
     int nz = nnz_in(iind);
@@ -997,7 +997,7 @@ namespace casadi {
     bool hasrun = false;
 
     // Get weighting factor
-    double sp_w = adWeightSp();
+    double sp_w = sp_weight();
 
     // Lookup table for bvec_t
     std::vector<bvec_t> bvec_lookup;
@@ -1243,7 +1243,7 @@ namespace casadi {
 
   Sparsity FunctionInternal::getJacSparsity(int iind, int oind, bool symmetric) {
     // Check if we are able to propagate dependencies through the function
-    if (spCanEvaluate(true) || spCanEvaluate(false)) {
+    if (has_spfwd() || has_sprev()) {
       Sparsity sp;
       if (nnz_in(iind)>3*bvec_size && nnz_out(oind)>3*bvec_size &&
             GlobalOptions::hierarchical_sparsity) {
@@ -1266,7 +1266,7 @@ namespace casadi {
         if (nz_out%bvec_size) nsweep_adj++;
 
         // Get weighting factor
-        double w = adWeightSp();
+        double w = sp_weight();
 
         // Use forward mode?
         if (w*nsweep_fwd <= (1-w)*nsweep_adj) {
@@ -1372,7 +1372,7 @@ namespace casadi {
     } else {
       casadi_assert(get_n_forward()>0 || get_n_reverse()>0);
       // Get weighting factor
-      double w = adWeight();
+      double w = ad_weight();
 
       // Which AD mode?
       bool test_ad_fwd=w<1, test_ad_adj=w>0;
@@ -2063,7 +2063,7 @@ namespace casadi {
     // Form Jacobian
     MX J;
     {
-      Function tmp("tmp", {arg}, {res}, {{"ad_weight", adWeight()}});
+      Function tmp("tmp", {arg}, {res}, {{"ad_weight", ad_weight()}});
       J = MX::jac(tmp);
     }
 
@@ -2555,7 +2555,7 @@ namespace casadi {
     if (jac_penalty_*nnz_in()<nfwd) return true;
 
     // Heuristic 2: Jac calculated via reverse mode likely cheaper
-    double w = adWeight();
+    double w = ad_weight();
     if (get_n_reverse()>0 && jac_penalty_*(1-w)*nnz_out()<w*nfwd)
       return true;
 
@@ -2570,7 +2570,7 @@ namespace casadi {
     if (jac_penalty_*nnz_out()<nadj) return true;
 
     // Heuristic 2: Jac calculated via forward mode likely cheaper
-    double w = adWeight();
+    double w = ad_weight();
     if (get_n_forward()>0 && jac_penalty_*w*nnz_in()<(1-w)*nadj)
       return true;
 
@@ -2782,7 +2782,7 @@ namespace casadi {
     casadi_error("Not implemented");
   }
 
-  double FunctionInternal::adWeight() {
+  double FunctionInternal::ad_weight() const {
     // If reverse mode derivatives unavailable, use forward
     if (get_n_reverse()==0) return 0;
 
@@ -2793,12 +2793,12 @@ namespace casadi {
     return ad_weight_;
   }
 
-  double FunctionInternal::adWeightSp() {
+  double FunctionInternal::sp_weight() const {
     // If reverse mode propagation unavailable, use forward
-    if (!spCanEvaluate(false)) return 0;
+    if (!has_sprev()) return 0;
 
     // If forward mode propagation unavailable, use reverse
-    if (!spCanEvaluate(true)) return 1;
+    if (!has_spfwd()) return 1;
 
     // Use the (potentially user set) option
     return ad_weight_sp_;
@@ -3196,8 +3196,8 @@ namespace casadi {
           const std::vector<std::string>& s_out,
           const Function::AuxOut& aux,
           const Dict& opts) const {
-    casadi_error("'factory' not defined for " + type_name());
-    return Function();
+    Function f = wrapMXFunction();
+    return f.factory(name, s_in, s_out, aux, opts);
   }
 
   vector<bool> FunctionInternal::

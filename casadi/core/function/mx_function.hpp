@@ -166,9 +166,6 @@ namespace casadi {
     /** \brief  Propagate sparsity backwards */
     virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
 
-    /// Is the class able to propagate seeds through the algorithm?
-    virtual bool spCanEvaluate(bool fwd) { return true;}
-
     // print an element of an algorithm
     void print(std::ostream &stream, const AlgEl& el) const;
 
@@ -205,4 +202,3 @@ namespace casadi {
 /// \endcond
 
 #endif // CASADI_MX_FUNCTION_HPP
-

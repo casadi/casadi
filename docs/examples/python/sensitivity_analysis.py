@@ -31,14 +31,14 @@ print("Testing sensitivity analysis in CasADi")
 DAE_integrators = ["idas","collocation"]
 ODE_integrators = ["cvodes","rk"] + DAE_integrators
 
-for Integrators in (ODE_integrators,DAE_integrators):    
+for Integrators in (ODE_integrators,DAE_integrators):
   if Integrators==ODE_integrators: # rocket example
     print("******")
     print("Testing ODE example")
-    
-    # Time 
+
+    # Time
     t = SX.sym("t")
-      
+
     # Parameter
     u = SX.sym("u")
 
@@ -49,13 +49,13 @@ for Integrators in (ODE_integrators,DAE_integrators):
     # Constants
     alpha = 0.05 # friction
     beta = 0.1   # fuel consumption rate
-      
+
     # Differential equation
     ode = vertcat(
       v,
       (u-alpha*v*v)/m,
       -beta*u*u)
-      
+
     # Quadrature
     quad = v**3 + ((3-sin(t)) - u)**2
 
@@ -70,35 +70,35 @@ for Integrators in (ODE_integrators,DAE_integrators):
 
     # Parameter
     u0 = 0.4
-  
+
   else: # Simple DAE example
     print("******")
     print("Testing DAE example")
-    
+
     # Differential state
     x = SX.sym("x")
-    
+
     # Algebraic variable
     z = SX.sym("z")
-    
+
     # Parameter
     u = SX.sym("u")
-    
+
     # Differential equation
     ode = -x + 0.5*x*x + u + 0.5*z
-    
+
     # Algebraic constraint
     alg = z + exp(z) - 1.0 + x
-    
+
     # Quadrature
     quad = x*x + 3.0*u*u
 
     # DAE callback function
     dae = {'x':x, 'z':z, 'p':u, 'ode':ode, 'alg':alg, 'quad':quad}
-    
+
     # End time
     tf = 5.
-    
+
     # Initial position
     x0 = 1.
 
@@ -110,7 +110,7 @@ for Integrators in (ODE_integrators,DAE_integrators):
     print("========")
     print("Integrator: ", MyIntegrator)
     print("========")
-    
+
     # Integrator options
     opts = {"tf":tf}
     if MyIntegrator=="collocation":
@@ -121,30 +121,23 @@ for Integrators in (ODE_integrators,DAE_integrators):
     I = integrator("I", MyIntegrator, dae, opts)
 
     # Integrate to get results
-    arg = {"x0":x0, "p":u0}
-    res = I(**arg)
+    res = I(x0=x0, p=u0)
     xf = res["xf"]
     qf = res["qf"]
     print("%50s" % "Unperturbed solution:", "xf  = ", xf, ", qf  = ", qf)
 
     # Perturb solution to get a finite difference approximation
     h = 0.001
-    arg["p"] = u0+h
-    res = I(**arg)
+    res = I(x0=x0, p=u0+h)
     fd_xf = (res["xf"]-xf)/h
     fd_qf = (res["qf"]-qf)/h
     print("%50s" % "Finite difference approximation:", "d(xf)/d(p) = ", fd_xf, ", d(qf)/d(p) = ", fd_qf)
 
     # Calculate once, forward
-    I_fwd = I.derivative(1, 0)
-    arg = {}
-    arg["der_x0"] = x0
-    arg["der_p"] = u0
-    arg["fwd0_x0"] = 0
-    arg["fwd0_p"] = 1
-    res = I_fwd(**arg)
-    fwd_xf = res["fwd0_xf"]
-    fwd_qf = res["fwd0_qf"]
+    I_fwd = I.factory("I_fwd", ["x0", "z0", "p", "fwd_p"], ["fwd_xf", "fwd_qf"])
+    res = I_fwd(x0=x0, p=u0, fwd_p=1)
+    fwd_xf = res["fwd_xf"]
+    fwd_qf = res["fwd_qf"]
     print("%50s" % "Forward sensitivities:", "d(xf)/d(p) = ", fwd_xf, ", d(qf)/d(p) = ", fwd_qf)
 
     # Calculate once, adjoint
@@ -191,5 +184,3 @@ for Integrators in (ODE_integrators,DAE_integrators):
     adj_adj_x0 = res["adj0_der_x0"]
     adj_adj_p = res["adj0_der_p"]
     print("%50s" % "Adjoint over adjoint sensitivities:", "d2(qf)/d(x0)d(p) = ", adj_adj_x0, ", d2(qf)/d(p)d(p) = ", adj_adj_p)
-
-  

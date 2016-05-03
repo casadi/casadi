@@ -122,8 +122,11 @@ namespace casadi {
     virtual std::string get_name_out(int i);
     ///@}
 
+    ///@{
     /** \brief  Is the class able to propagate seeds through the algorithm? */
-    virtual bool spCanEvaluate(bool fwd) { return false;}
+    virtual bool has_spfwd() const { return false;}
+    virtual bool has_sprev() const { return false;}
+    ///@}
 
     ///@{
     /** \brief  Evaluate numerically */
@@ -382,11 +385,11 @@ namespace casadi {
     bool hasDerivative() const;
 
     /** \brief  Weighting factor for chosing forward/reverse mode */
-    virtual double adWeight();
+    virtual double ad_weight() const;
 
     /** \brief  Weighting factor for chosing forward/reverse mode,
         sparsity propagation */
-    virtual double adWeightSp();
+    virtual double sp_weight() const;
 
     /** \brief Gradient expression */
     virtual MX grad_mx(int iind=0, int oind=0);
@@ -465,7 +468,7 @@ namespace casadi {
     *
     *  The function is not initialized
     */
-    Function wrapMXFunction();
+    Function wrapMXFunction() const;
 
     /** \brief Generate code the function */
     virtual void generateFunction(CodeGenerator& g, const std::string& fname,

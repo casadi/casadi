@@ -136,8 +136,11 @@ namespace casadi {
     /** \brief  Propagate sparsity backwards */
     virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
 
-    /** \brief  Is the class able to propagate seeds through the algorithm? */
-    virtual bool spCanEvaluate(bool fwd) { return true; }
+    ///@{
+    /// Is the class able to propagate seeds through the algorithm?
+    virtual bool has_spfwd() const { return true;}
+    virtual bool has_sprev() const { return true;}
+    ///@}
 
     /** \brief Generate code for the declarations of the C function */
     virtual void generateDeclarations(CodeGenerator& g) const;
@@ -200,8 +203,11 @@ namespace casadi {
     /** \brief  Propagate sparsity backwards */
     virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
 
-    /** \brief  Is the class able to propagate seeds through the algorithm? */
-    virtual bool spCanEvaluate(bool fwd) { return true; }
+    ///@{
+    /// Is the class able to propagate seeds through the algorithm?
+    virtual bool has_spfwd() const { return true;}
+    virtual bool has_sprev() const { return true;}
+    ///@}
 
     /// @{
     /** \brief Sparsities of function inputs and outputs */
