@@ -892,16 +892,16 @@ namespace casadi {
     (*this)->set_reverse(fcn, nadj);
   }
 
-  void Function::printDimensions(ostream &stream) const {
-    (*this)->printDimensions(stream);
+  void Function::print_dimensions(ostream &stream) const {
+    (*this)->print_dimensions(stream);
   }
 
-  void Function::printOptions(ostream &stream) const {
-    (*this)->printOptions(stream);
+  void Function::print_options(ostream &stream) const {
+    (*this)->print_options(stream);
   }
 
-  void Function::printOption(const std::string &name, std::ostream &stream) const {
-    (*this)->printOption(name, stream);
+  void Function::print_option(const std::string &name, std::ostream &stream) const {
+    (*this)->print_option(name, stream);
   }
 
   void Function::print_free(std::ostream &stream) const {

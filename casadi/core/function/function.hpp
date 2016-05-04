@@ -298,13 +298,30 @@ namespace casadi {
                              const std::vector<std::string>& s_out) const;
 
     /** \brief Print dimensions of inputs and outputs */
-    void printDimensions(std::ostream &stream=casadi::userOut()) const;
+    void print_dimensions(std::ostream &stream=casadi::userOut()) const;
 
     /** \brief Print options to a stream */
-    void printOptions(std::ostream &stream=casadi::userOut()) const;
+    void print_options(std::ostream &stream=casadi::userOut()) const;
 
     /** \brief Print all information there is to know about a certain option */
-    void printOption(const std::string &name, std::ostream &stream = casadi::userOut()) const;
+    void print_option(const std::string &name, std::ostream &stream = casadi::userOut()) const;
+
+    #ifdef WITH_DEPRECATED_FEATURES
+    /// [DEPRECATED] printDimensions has been renamed print_dimensions
+    void printDimensions(std::ostream &stream=casadi::userOut()) const {
+      print_dimensions(stream);
+    }
+
+    /// [DEPRECATED] printOptions has been renamed print_options
+    void printOptions(std::ostream &stream=casadi::userOut()) const {
+      print_options(stream);
+    }
+
+    /// [DEPRECATED] printOption has been renamed print_option
+    void printOption(const std::string &name, std::ostream &stream = casadi::userOut()) const {
+      print_option(name, stream);
+    }
+    #endif // WITH_DEPRECATED_FEATURES
 
     /** \brief Print free variables */
     void print_free(std::ostream &stream=casadi::userOut()) const;

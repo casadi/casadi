@@ -520,13 +520,13 @@ namespace casadi {
     virtual void checkInputs() const {}
 
     /** \brief Print dimensions of inputs and outputs */
-    void printDimensions(std::ostream &stream) const;
+    void print_dimensions(std::ostream &stream) const;
 
     /** \brief Print list of options */
-    void printOptions(std::ostream &stream) const;
+    void print_options(std::ostream &stream) const;
 
     /** \brief Print all information there is to know about a certain option */
-    void printOption(const std::string &name, std::ostream &stream) const;
+    void print_option(const std::string &name, std::ostream &stream) const;
 
     /** \brief Print free variables */
     virtual void print_free(std::ostream &stream) const;

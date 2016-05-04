@@ -221,7 +221,7 @@ Inside the for loop (line 35-39), the integrate(...) method is used to get the a
 \subsection subsection4_1_2 Integrator options
 In the following subsection we would like to introduce the most important integrator options. Most of the options are directly available and usable
  known from the CVODES documentation, altough this is very detailed and quite often one cannot find what he is looking for. One can get the 
- list of actual options by invoking the casadi::Sundials::CVodesIntegrator::printOptions() method.
+ list of actual options by invoking the casadi::Sundials::CVodesIntegrator::print_options() method.
 <center>
 <table style="border-style: solid; border-width: 1px; width: 80%;" cellpadding="3" cellspacing="3">
         <tr>

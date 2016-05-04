@@ -175,9 +175,9 @@ namespace casadi {
         ss << endl;
         ss << "Did you mean one of the following?" << endl;
         for (auto&& s : options.suggestions(op.first)) {
-          printOption(s, ss);
+          print_option(s, ss);
         }
-        ss << "Use printOptions() to get a full list of options." << endl;
+        ss << "Use print_options() to get a full list of options." << endl;
         casadi_error(ss.str());
       }
 
@@ -405,7 +405,7 @@ namespace casadi {
     spFwd(arg, res, iw, w, mem);
   }
 
-  void FunctionInternal::printDimensions(ostream &stream) const {
+  void FunctionInternal::print_dimensions(ostream &stream) const {
     stream << " Number of inputs: " << n_in() << endl;
     for (int i=0; i<n_in(); ++i) {
       stream << "  Input " << i  << " (\"" << name_in(i) << "\"): "
@@ -418,13 +418,13 @@ namespace casadi {
     }
   }
 
-  void FunctionInternal::printOptions(std::ostream &stream) const {
+  void FunctionInternal::print_options(std::ostream &stream) const {
     stream << "\"Option name\" [type] = value" << endl;
     get_options().print(stream);
     stream << endl;
   }
 
-  void FunctionInternal::printOption(const std::string &name, std::ostream &stream) const {
+  void FunctionInternal::print_option(const std::string &name, std::ostream &stream) const {
     const Options::Entry* entry = get_options().find(name);
     if (entry!=0) {
       entry->print(name, stream);
@@ -438,7 +438,7 @@ namespace casadi {
   }
 
   void FunctionInternal::print(ostream &stream) const {
-    printDimensions(stream);
+    print_dimensions(stream);
   }
 
   void FunctionInternal::repr(ostream &stream) const {
