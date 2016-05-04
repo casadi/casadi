@@ -82,7 +82,6 @@ namespace casadi {
     ///@{
     /// Is the class able to propagate seeds through the algorithm?
     virtual bool has_spfwd() const { return true;}
-    virtual bool has_sprev() const { return true;}
     ///@}
 
     ///@{
