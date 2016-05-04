@@ -118,5 +118,8 @@ namespace casadi {
     gen.generate();
   }
 
+  void OracleFunction::expand() {
+    oracle_ = oracle_.expand();
+  }
 
 } // namespace casadi

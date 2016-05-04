@@ -65,6 +65,9 @@ namespace casadi {
     /** \brief Get oracle */
     virtual const Function& oracle() const { return oracle_;}
 
+    // Replace MX oracle with SX oracle?
+    void expand();
+
     /** Create an oracle function */
     Function
     create_function(const std::string& fname,

@@ -115,25 +115,19 @@ namespace casadi {
   Integrator::Integrator(const std::string& name, const Function& oracle)
     : OracleFunction(name, oracle) {
 
-    f_ = oracle_.factory("f", {"x", "z", "p", "t"}, {"ode", "alg", "quad"});
-    g_ = oracle_.factory("g", {"rx", "rz", "rp", "x", "z", "p", "t"},
-                     {"rode", "ralg", "rquad"});
-
     // Negative number of parameters for consistancy checking
     np_ = -1;
 
     // Get the sparsities
-    t_ = f_.sparsity_in(DAE_T);
-    x_ = f_.sparsity_in(DAE_X);
-    z_ = f_.sparsity_in(DAE_Z);
-    p_ = f_.sparsity_in(DAE_P);
-    q_ = f_.sparsity_out(DAE_QUAD);
-    if (!g_.is_null()) {
-      rx_ = g_.sparsity_in(RDAE_RX);
-      rz_ = g_.sparsity_in(RDAE_RZ);
-      rp_ = g_.sparsity_in(RDAE_RP);
-      rq_ = g_.sparsity_out(RDAE_QUAD);
-    }
+    t_ = oracle_.sparsity_in(DE_T);
+    x_ = oracle_.sparsity_in(DE_X);
+    z_ = oracle_.sparsity_in(DE_Z);
+    p_ = oracle_.sparsity_in(DE_P);
+    q_ = oracle_.sparsity_out(DE_QUAD);
+    rx_ = oracle_.sparsity_in(DE_RX);
+    rz_ = oracle_.sparsity_in(DE_RZ);
+    rp_ = oracle_.sparsity_in(DE_RP);
+    rq_ = oracle_.sparsity_out(DE_RQUAD);
 
     // Default options
     print_stats_ = false;
@@ -273,7 +267,12 @@ namespace casadi {
     }
 
     // Replace MX oracle with SX oracle?
-    if (expand) oracle_ = oracle_.expand();
+    if (expand) this->expand();
+
+    // Create functions for the forward and reverse problem
+    f_ = create_function("f", {"x", "z", "p", "t"}, {"ode", "alg", "quad"});
+    g_ = create_function("g", {"rx", "rz", "rp", "x", "z", "p", "t"},
+                        {"rode", "ralg", "rquad"});
 
     // Store a copy of the options, for creating augmented integrators
     opts_ = opts;
@@ -299,38 +298,8 @@ namespace casadi {
     nrp_ = rp().nnz();
     nrq_ = rq().nnz();
 
-    // Consistency checks
-    casadi_assert(!f_.is_null());
-    casadi_assert_message(f_.n_in()==DAE_NUM_IN,
-                          "Wrong number of inputs for the DAE callback function");
-    casadi_assert_message(f_.n_out()==DAE_NUM_OUT,
-                          "Wrong number of outputs for the DAE callback function");
-    if (!g_.is_null()) {
-      casadi_assert_message(g_.n_in()==RDAE_NUM_IN,
-                            "Wrong number of inputs for the backwards DAE callback function");
-      casadi_assert_message(g_.n_out()==RDAE_NUM_OUT,
-                            "Wrong number of outputs for the backwards DAE callback function");
-    }
-    casadi_assert_message(f_.size_out(DAE_ODE)==x().size(),
-                          "Inconsistent dimensions. Expecting DAE_ODE output of shape "
-                          << size_in(INTEGRATOR_X0) << ", but got "
-                          << f_.size_out(DAE_ODE) << " instead.");
-    casadi_assert(f_.sparsity_out(DAE_ODE)==x());
-    casadi_assert_message(f_.size_out(DAE_ALG)==z().size(),
-                          "Inconsistent dimensions. Expecting DAE_ALG output of shape "
-                          << z().size() << ", but got "
-                          << f_.size_out(DAE_ALG) << " instead.");
-    casadi_assert(f_.sparsity_out(DAE_ALG)==z());
-    if (!g_.is_null()) {
-      casadi_assert(g_.sparsity_in(RDAE_P)==p());
-      casadi_assert(g_.sparsity_in(RDAE_X)==x());
-      casadi_assert(g_.sparsity_in(RDAE_Z)==z());
-      casadi_assert(g_.sparsity_out(RDAE_ODE)==rx());
-      casadi_assert(g_.sparsity_out(RDAE_ALG)==rz());
-    }
-
     // Warn if sparse inputs (was previously an error)
-    casadi_assert_warning(f_.sparsity_in(DAE_X).is_dense(),
+    casadi_assert_warning(oracle_.sparsity_in(DE_X).is_dense(),
                           "Sparse states in integrators are experimental");
 
     // Form a linear solver for the sparsity propagation
@@ -340,15 +309,9 @@ namespace casadi {
     }
 
     // Allocate sufficiently large work vectors
-    size_t sz_w = f_.sz_w();
-    alloc(f_);
-    if (!g_.is_null()) {
-      alloc(g_);
-      sz_w = max(sz_w, g_.sz_w());
-    }
-    sz_w = max(sz_w, static_cast<size_t>(nx_+nz_));
-    sz_w = max(sz_w, static_cast<size_t>(nrx_+nrz_));
-    alloc_w(sz_w + nx_ + nz_ + nrx_ + nrz_);
+    alloc_w(nx_+nz_);
+    alloc_w(nrx_+nrz_);
+    alloc_w(nx_ + nz_ + nrx_ + nrz_, true);
   }
 
   void Integrator::init_memory(void* mem) const {
