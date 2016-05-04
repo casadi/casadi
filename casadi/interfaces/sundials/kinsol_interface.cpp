@@ -798,6 +798,7 @@ namespace casadi {
   }
 
   void KinsolInterface::init_memory(void* mem) const {
+    Rootfinder::init_memory(mem);
     auto m = static_cast<KinsolMemory*>(mem);
 
     // Current solution

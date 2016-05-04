@@ -315,6 +315,7 @@ namespace casadi {
   }
 
   void Integrator::init_memory(void* mem) const {
+    OracleFunction::init_memory(mem);
   }
 
   template<typename MatType>

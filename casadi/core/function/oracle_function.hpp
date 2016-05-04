@@ -86,6 +86,15 @@ namespace casadi {
 
     /** \brief Export / Generate C code for the generated functions */
     virtual void generate_dependencies(const std::string& fname, const Dict& opts);
+
+    /** \brief Initalize memory block */
+    virtual void init_memory(void* mem) const;
+
+    /// Print statistics
+    void print_fstats(const OracleMemory* m) const;
+
+    /// Get all statistics
+    virtual Dict get_stats(void* mem) const;
   };
 
 } // namespace casadi

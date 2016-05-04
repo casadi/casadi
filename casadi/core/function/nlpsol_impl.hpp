@@ -151,12 +151,6 @@ namespace casadi {
     // No static functions exposed
     struct Exposed{ };
 
-    /// Print statistics
-    void print_fstats(const NlpsolMemory* m) const;
-
-    /// Get all statistics
-    virtual Dict get_stats(void* mem) const;
-
     /// Collection of solvers
     static std::map<std::string, Plugin> solvers_;
 
