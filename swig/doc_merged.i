@@ -41,6 +41,12 @@ Get the number of inputs This function is called during construction.
 
 ";
 
+%feature("docstring") casadi::Callback::get_n_out "
+
+Get the number of outputs This function is called during construction.
+
+";
+
 %feature("docstring") casadi::Callback::size_in "
 
 Get input dimension.
@@ -104,6 +110,12 @@ of the outputs.
 ";
 
 %feature("docstring") casadi::Callback::factory "";
+
+%feature("docstring") casadi::Callback::print_free "
+
+Print free variables.
+
+";
 
 %feature("docstring") casadi::Callback::free_sx "
 
@@ -183,9 +195,9 @@ of the outputs.
 
 ";
 
-%feature("docstring") casadi::Callback::get_n_out "
+%feature("docstring") casadi::Callback::print_dimensions "
 
-Get the number of outputs This function is called during construction.
+Print dimensions of inputs and outputs.
 
 ";
 
@@ -203,7 +215,7 @@ Get the (integer) input arguments of an atomic operation.
 
 %feature("docstring") casadi::Callback::printOption "
 
-Print all information there is to know about a certain option.
+[DEPRECATED] printOption has been renamed print_option
 
 ";
 
@@ -282,6 +294,12 @@ Number of nodes in the algorithm.
 
 Get symbolic primitives equivalent to the output expressions There is no
 guarantee that subsequent calls return unique answers.
+
+";
+
+%feature("docstring") casadi::Callback::print_options "
+
+Print options to a stream.
 
 ";
 
@@ -696,7 +714,7 @@ length of res field.
 
 %feature("docstring") casadi::Callback::printOptions "
 
-Print options to a stream.
+[DEPRECATED] printOptions has been renamed print_options
 
 ";
 
@@ -708,7 +726,7 @@ Return Jacobian of all input elements with respect to all output elements.
 
 %feature("docstring") casadi::Callback::printDimensions "
 
-Print dimensions of inputs and outputs.
+[DEPRECATED] printDimensions has been renamed print_dimensions
 
 ";
 
@@ -800,6 +818,12 @@ Parameters:
 -----------
 
 parallelization:  Type of parallelization used: unroll|serial|openmp
+
+";
+
+%feature("docstring") casadi::Callback::print_option "
+
+Print all information there is to know about a certain option.
 
 ";
 
@@ -1836,7 +1860,7 @@ Get an atomic operation operator index.
 
 %feature("docstring") casadi::Function::printOptions "
 
-Print options to a stream.
+[DEPRECATED] printOptions has been renamed print_options
 
 ";
 
@@ -1860,9 +1884,15 @@ of the outputs.
 
 ";
 
-%feature("docstring") casadi::Function::printDimensions "
+%feature("docstring") casadi::Function::print_dimensions "
 
 Print dimensions of inputs and outputs.
+
+";
+
+%feature("docstring") casadi::Function::printDimensions "
+
+[DEPRECATED] printDimensions has been renamed print_dimensions
 
 ";
 
@@ -2068,7 +2098,7 @@ Is a null pointer?
 
 %feature("docstring") casadi::Function::printOption "
 
-Print all information there is to know about a certain option.
+[DEPRECATED] printOption has been renamed print_option
 
 ";
 
@@ -2241,6 +2271,12 @@ Checkout a memory object.
 %feature("docstring") casadi::Function::rootfinder_jac "
 
 Access Jacobian of the ths function for a rootfinder.
+
+";
+
+%feature("docstring") casadi::Function::print_option "
+
+Print all information there is to know about a certain option.
 
 ";
 
@@ -2629,6 +2665,12 @@ that the input must be scalar. In other cases, use the Jacobian instead.
 
 ";
 
+%feature("docstring") casadi::Function::print_free "
+
+Print free variables.
+
+";
+
 %feature("docstring") casadi::Function::nl_var "
 
 Which variables enter nonlinearly.
@@ -2746,6 +2788,12 @@ Get the length of the work vector.
 
 %feature("docstring") casadi::Function::sz_arg "[INTERNAL]  Get required
 length of arg field.
+
+";
+
+%feature("docstring") casadi::Function::print_options "
+
+Print options to a stream.
 
 ";
 

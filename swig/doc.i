@@ -88,6 +88,12 @@ Get the number of inputs This function is called during construction.
 
 ";
 
+%feature("docstring")  casadi::Callback::get_n_out() "
+
+Get the number of outputs This function is called during construction.
+
+";
+
 %feature("docstring")  casadi::Function::size_in(int ind) const  "
 
 Get input dimension.
@@ -175,6 +181,13 @@ of the outputs.
 %feature("docstring")  casadi::Function::factory(const std::string &name,
 const std::vector< std::string > &s_in, const std::vector< std::string >
 &s_out, const AuxOut &aux=AuxOut(), const Dict &opts=Dict()) const  " ";
+
+%feature("docstring")  casadi::Function::print_free(std::ostream
+&stream=casadi::userOut()) const  "
+
+Print free variables.
+
+";
 
 %feature("docstring")  casadi::Function::free_sx() const  "
 
@@ -297,9 +310,10 @@ of the outputs.
 
 ";
 
-%feature("docstring")  casadi::Callback::get_n_out() "
+%feature("docstring")  casadi::Function::print_dimensions(std::ostream
+&stream=casadi::userOut()) const  "
 
-Get the number of outputs This function is called during construction.
+Print dimensions of inputs and outputs.
 
 ";
 
@@ -325,7 +339,7 @@ Get the (integer) input arguments of an atomic operation.
 %feature("docstring")  casadi::Function::printOption(const std::string
 &name, std::ostream &stream=casadi::userOut()) const  "
 
-Print all information there is to know about a certain option.
+[DEPRECATED] printOption has been renamed print_option
 
 ";
 
@@ -490,6 +504,13 @@ guarantee that subsequent calls return unique answers.
 
 Get symbolic primitives equivalent to the output expressions There is no
 guarantee that subsequent calls return unique answers.
+
+";
+
+%feature("docstring")  casadi::Function::print_options(std::ostream
+&stream=casadi::userOut()) const  "
+
+Print options to a stream.
 
 ";
 
@@ -1207,7 +1228,7 @@ required length of res field.
 %feature("docstring")  casadi::Function::printOptions(std::ostream
 &stream=casadi::userOut()) const  "
 
-Print options to a stream.
+[DEPRECATED] printOptions has been renamed print_options
 
 ";
 
@@ -1221,7 +1242,7 @@ Return Jacobian of all input elements with respect to all output elements.
 %feature("docstring")  casadi::Function::printDimensions(std::ostream
 &stream=casadi::userOut()) const  "
 
-Print dimensions of inputs and outputs.
+[DEPRECATED] printDimensions has been renamed print_dimensions
 
 ";
 
@@ -1420,6 +1441,13 @@ Parameters:
 -----------
 
 parallelization:  Type of parallelization used: unroll|serial|openmp
+
+";
+
+%feature("docstring")  casadi::Function::print_option(const std::string
+&name, std::ostream &stream=casadi::userOut()) const  "
+
+Print all information there is to know about a certain option.
 
 ";
 
@@ -2775,7 +2803,7 @@ Get an atomic operation operator index.
 %feature("docstring")  casadi::Function::printOptions(std::ostream
 &stream=casadi::userOut()) const  "
 
-Print options to a stream.
+[DEPRECATED] printOptions has been renamed print_options
 
 ";
 
@@ -2815,10 +2843,17 @@ of the outputs.
 
 ";
 
-%feature("docstring")  casadi::Function::printDimensions(std::ostream
+%feature("docstring")  casadi::Function::print_dimensions(std::ostream
 &stream=casadi::userOut()) const  "
 
 Print dimensions of inputs and outputs.
+
+";
+
+%feature("docstring")  casadi::Function::printDimensions(std::ostream
+&stream=casadi::userOut()) const  "
+
+[DEPRECATED] printDimensions has been renamed print_dimensions
 
 ";
 
@@ -3184,7 +3219,7 @@ Is a null pointer?
 %feature("docstring")  casadi::Function::printOption(const std::string
 &name, std::ostream &stream=casadi::userOut()) const  "
 
-Print all information there is to know about a certain option.
+[DEPRECATED] printOption has been renamed print_option
 
 ";
 
@@ -3463,6 +3498,13 @@ Checkout a memory object.
 %feature("docstring")  casadi::Function::rootfinder_jac() "
 
 Access Jacobian of the ths function for a rootfinder.
+
+";
+
+%feature("docstring")  casadi::Function::print_option(const std::string
+&name, std::ostream &stream=casadi::userOut()) const  "
+
+Print all information there is to know about a certain option.
 
 ";
 
@@ -4074,6 +4116,13 @@ that the input must be scalar. In other cases, use the Jacobian instead.
 
 ";
 
+%feature("docstring")  casadi::Function::print_free(std::ostream
+&stream=casadi::userOut()) const  "
+
+Print free variables.
+
+";
+
 %feature("docstring")  casadi::Function::nl_var(const std::string &s_in,
 const std::vector< std::string > &s_out) const  "
 
@@ -4292,6 +4341,13 @@ Get the length of the work vector.
 
 %feature("docstring")  casadi::Function::sz_arg() const  " [INTERNAL]  Get
 required length of arg field.
+
+";
+
+%feature("docstring")  casadi::Function::print_options(std::ostream
+&stream=casadi::userOut()) const  "
+
+Print options to a stream.
 
 ";
 
