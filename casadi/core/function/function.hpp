@@ -306,6 +306,9 @@ namespace casadi {
     /** \brief Print all information there is to know about a certain option */
     void printOption(const std::string &name, std::ostream &stream = casadi::userOut()) const;
 
+    /** \brief Print free variables */
+    void print_free(std::ostream &stream=casadi::userOut()) const;
+
     ///@{
     /** \brief Generate a Jacobian function of output \a oind with respect to input \a iind
      * \param iind The index of the input

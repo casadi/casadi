@@ -157,6 +157,11 @@ class CASADI_EXPORT SXFunction :
   /** \brief Does the function have free variables */
   virtual bool has_free() const { return !free_vars_.empty();}
 
+  /** \brief Print free variables */
+  virtual void print_free(std::ostream &stream) const {
+    stream << free_vars_;
+  }
+
   /** \brief Hessian (forward over adjoint) via source code transformation */
   SX hess(int iind=0, int oind=0);
 

@@ -433,6 +433,10 @@ namespace casadi {
     }
   }
 
+  void FunctionInternal::print_free(std::ostream &stream) const {
+    stream << "[]";
+  }
+
   void FunctionInternal::print(ostream &stream) const {
     printDimensions(stream);
   }

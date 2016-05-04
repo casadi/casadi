@@ -191,6 +191,11 @@ namespace casadi {
     /** \brief Does the function have free variables */
     virtual bool has_free() const { return !free_vars_.empty();}
 
+    /** \brief Print free variables */
+    virtual void print_free(std::ostream &stream) const {
+      stream << free_vars_;
+    }
+
     /** \brief Number of nodes in the algorithm */
     virtual int n_nodes() const { return algorithm_.size();}
 

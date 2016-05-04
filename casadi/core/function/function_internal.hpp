@@ -528,6 +528,9 @@ namespace casadi {
     /** \brief Print all information there is to know about a certain option */
     void printOption(const std::string &name, std::ostream &stream) const;
 
+    /** \brief Print free variables */
+    virtual void print_free(std::ostream &stream) const;
+
     /** \brief Get the unidirectional or bidirectional partition */
     void getPartition(int iind, int oind, Sparsity& D1, Sparsity& D2, bool compact, bool symmetric);
 
