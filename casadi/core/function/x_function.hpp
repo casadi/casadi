@@ -1132,6 +1132,32 @@ namespace casadi {
     }
   }
 
+  struct Block {
+    std::string ex, arg;
+    Block(const std::string& s) {
+      size_t pos = s.find(':');
+      if (pos<s.size()) {
+        this->ex = s.substr(0, pos);
+        this->arg = s.substr(pos+1, std::string::npos);
+      }
+    }
+  };
+
+  struct HBlock {
+    std::string ex, arg1, arg2;
+    HBlock(const std::string& s) {
+      size_t pos1 = s.find(':');
+      if (pos1<s.size()) {
+        size_t pos2 = s.find(':', pos1+1);
+        if (pos2<s.size()) {
+          this->ex = s.substr(0, pos1);
+          this->arg1 = s.substr(pos1+1, pos2-pos1-1);
+          this->arg2 = s.substr(pos2+1, std::string::npos);
+        }
+      }
+    }
+  };
+
   // Helper class
   template<typename MatType>
   class Factory {
@@ -1148,6 +1174,12 @@ namespace casadi {
 
     // Reverse mode directional derivatives
     std::vector<std::string> adj_in_, adj_out_;
+
+    // Jacobian/gradient blocks
+    std::vector<Block> jac_, grad_;
+
+    // Hessian blocks
+    std::vector<HBlock> hess_;
 
     // Constructor
     Factory(const Function::AuxOut& aux) : aux_(aux) {}
@@ -1183,7 +1215,12 @@ namespace casadi {
     bool has_in(const std::string& s) const { return in_.find(s)!=in_.end();}
 
     // Check if out exists
-    bool has_out(const std::string& s) const { return out_.find(s)!=out_.end();}
+    bool has_out(const std::string& s) const {
+      // Standard output
+      if (out_.find(s)!=out_.end()) return true;
+      // Auxiliary output?
+      return aux_.find(s)!=aux_.end();
+    }
   };
 
   template<typename MatType>
@@ -1242,12 +1279,28 @@ namespace casadi {
 
     if (ss.first=="fwd") {
       // Forward mode directional derivative
-      casadi_assert_message(has_out(ss.second), "Cannot process \"" + s + "\"");
+      casadi_assert(has_out(ss.second));
       fwd_out_.push_back(ss.second);
     } else if (ss.first=="adj") {
       // Reverse mode directional derivative
-      casadi_assert_message(has_in(ss.second), "Cannot process \"" + s + "\"");
+      casadi_assert(has_in(ss.second));
       adj_out_.push_back(ss.second);
+    } else if (ss.first=="jac") {
+      jac_.push_back(ss.second);
+      casadi_assert(has_out(jac_.back().ex));
+      casadi_assert(has_in(jac_.back().arg));
+    } else if (ss.first=="grad") {
+      grad_.push_back(ss.second);
+      casadi_assert(has_out(grad_.back().ex));
+      casadi_assert(has_in(grad_.back().arg));
+    } else if (ss.first=="hess") {
+      hess_.push_back(ss.second);
+      casadi_assert(has_out(hess_.back().ex));
+      casadi_assert(has_in(hess_.back().arg1));
+      casadi_assert(has_in(hess_.back().arg2));
+    } else {
+      // Assume attribute
+      request_output(ss.second);
     }
 
     // Replace colons with underscore
@@ -1315,6 +1368,39 @@ namespace casadi {
         out_["adj:" + adj_out_[i]] = project(sens[0].at(i), arg.at(i).sparsity());
       }
     }
+
+    // Add linear combinations
+    for (auto i : aux_) {
+      MatType lc = 0;
+      for (auto j : i.second) {
+        lc += dot(in_.at("lam:" + j), out_.at(j));
+      }
+      out_[i.first] = lc;
+    }
+
+    // Jacobian blocks
+    for (auto &&b : jac_) {
+      const MatType& ex = out_.at(b.ex);
+      const MatType& arg = in_.at(b.arg);
+      out_["jac:" + b.ex + ":" + b.arg] = jacobian(ex, arg);
+    }
+
+    // Gradient blocks
+    for (auto &&b : grad_) {
+      const MatType& ex = out_.at(b.ex);
+      const MatType& arg = in_.at(b.arg);
+      out_["grad:" + b.ex + ":" + b.arg]
+        = project(gradient(ex, arg), arg.sparsity());
+    }
+
+    // Hessian blocks
+    for (auto &&b : hess_) {
+      const MatType& ex = out_.at(b.ex);
+      casadi_assert_message(b.arg1==b.arg2, "Mixed Hessian terms not supported");
+      const MatType& arg1 = in_.at(b.arg1);
+      const MatType& arg2 = in_.at(b.arg2);
+      out_["hess:" + b.ex + ":" + b.arg1 + ":" + b.arg2] = triu(hessian(ex, arg1));
+    }
   }
 
   template<typename MatType>
@@ -1326,7 +1412,35 @@ namespace casadi {
 
   template<typename MatType>
   MatType Factory<MatType>::get_output(const std::string& s) {
-    return MatType();
+    using namespace std;
+
+    // Quick return if output
+    auto it = out_.find(s);
+    if (it!=out_.end()) return it->second;
+
+    // Assume attribute
+    casadi_assert_message(has_prefix(s), "Cannot process \"" + s + "\"");
+    pair<string, string> ss = split_prefix(s);
+    string a = ss.first;
+    MatType r = get_output(ss.second);
+
+    // Process attributes
+    if (a=="transpose") {
+      return r.T();
+    } else if (a=="triu") {
+      return triu(r);
+    } else if (a=="tril") {
+      return tril(r);
+    } else if (a=="densify") {
+      return densify(r);
+    } else if (a=="sym") {
+      return triu2symm(r);
+    } else if (a=="withdiag") {
+      return project(r, r.sparsity() + Sparsity::diag(r.size1()));
+    } else {
+      casadi_error("Cannot process attribute \"" + a + "\"");
+      return MatType();
+    }
   }
 
   template<typename MatType>
@@ -1359,10 +1473,25 @@ namespace casadi {
     for (int i=0; i<in_.size(); ++i) f.add_input(ischeme_[i], in_[i]);
     for (int i=0; i<out_.size(); ++i) f.add_output(oscheme_[i], out_[i]);
 
-    // Specify input and output expressions to be calculated
-    vector<string> ret_iname, ret_oname;
-    for (const string& s : s_in) ret_iname.push_back(f.request_input(s));
-    for (const string& s : s_out) ret_oname.push_back(f.request_output(s));
+    // Specify input expressions to be calculated
+    vector<string> ret_iname;
+    for (const string& s : s_in) {
+      try {
+        ret_iname.push_back(f.request_input(s));
+      } catch (CasadiException& ex) {
+        casadi_error("Cannot process factory input \"" + s + "\":" + ex.what());
+      }
+    }
+
+    // Specify output expressions to be calculated
+    vector<string> ret_oname;
+    for (const string& s : s_out) {
+      try {
+        ret_oname.push_back(f.request_output(s));
+      } catch (CasadiException& ex) {
+        casadi_error("Cannot process factory output \"" + s + "\":" + ex.what());
+      }
+    }
 
     // Calculate expressions
     f.calculate();
@@ -1377,127 +1506,12 @@ namespace casadi {
     ret_out.reserve(s_out.size());
     for (const string& s : s_out) ret_out.push_back(f.get_output(s));
 
-    // Legacy
-
-    // Add linear combinations
-    for (auto i : aux) {
-      MatType lc = 0;
-      for (auto j : i.second) {
-        lc += dot(f.in_.at("lam:" + j), f.out_.at(j));
-      }
-      f.out_[i.first] = lc;
-    }
-
-    // List of valid attributes
-    const vector<string> all_attr = {"transpose", "triu", "tril", "densify", "sym", "withdiag"};
-
-    // Handle outputs
-    for (int i=0; i<ret_out.size(); ++i) {
-      MatType& r = ret_out[i];
-
-      // Output name
-      string s = s_out[i];
-
-      // Separarate attributes
-      vector<string> attr;
-      while (true) {
-        // Find the first separator
-        size_t pos = s.find(':');
-        if (pos>=s.size()) break; // No more underscore
-        string a = s.substr(0, pos);
-
-        // Try to match with attributes
-        auto it = std::find(all_attr.begin(), all_attr.end(), a);
-        if (it==all_attr.end()) break; // No more attribute
-
-        // Save attribute and strip from s
-        attr.push_back(*it);
-        s = s.substr(pos+1, string::npos);
-      }
-
-      // Try to locate in list of outputs
-      auto it = f.out_.find(s);
-      if (it!=f.out_.end()) {
-        // Already treated
-        r = it->second;
-      } else {
-        // Must be an operator
-        size_t pos = s.find(':');
-        casadi_assert_message(pos<s.size(), s_out[i] + " is not an output or operator");
-        string op = s.substr(0, pos);
-        s = s.substr(pos+1);
-
-        // Handle different types of operators
-        if (op=="grad" || op=="jac" || op=="hess") {
-          // Output
-          pos = s.find(':');
-          casadi_assert_message(pos<s.size(), s_out[i] + " is ill-posed");
-          string res = s.substr(0, pos);
-          auto res_i = f.out_.find(res);
-          casadi_assert_message(res_i!=f.out_.end(),
-                                "Unrecognized output " + res + " in " + s_out[i]);
-          s = s.substr(pos+1);
-
-          // Input
-          string arg;
-          if (op=="hess") {
-            pos = s.find(':');
-            casadi_assert_message(pos<s.size(), s_out[i] + " is ill-posed");
-            arg = s.substr(0, pos);
-            s = s.substr(pos+1);
-            casadi_assert_message(s==arg, "Mixed Hessian terms not supported");
-          } else {
-            arg = s;
-          }
-          auto arg_i = f.in_.find(arg);
-          casadi_assert_message(arg_i!=f.in_.end(),
-                                "Unrecognized input " + arg + " in " + s_out[i]);
-
-          // Calculate gradient or Jacobian
-          if (op=="jac") {
-            r = MatType::jacobian(res_i->second, arg_i->second);
-          } else if (op=="grad") {
-            r = project(MatType::gradient(res_i->second, arg_i->second), arg_i->second.sparsity());
-          } else {
-            casadi_assert(op=="hess");
-            r = triu(MatType::hessian(res_i->second, arg_i->second));
-          }
-        } else {
-          casadi_error("Unknown operator: " + op);
-        }
-      }
-
-      // Apply attributes (starting from the right-most one)
-      for (auto a=attr.rbegin(); a!=attr.rend(); ++a) {
-        if (*a=="transpose") {
-          r = r = r.T();
-        } else if (*a=="triu") {
-          r = triu(r);
-        } else if (*a=="tril") {
-          r = tril(r);
-        } else if (*a=="densify") {
-          r = densify(r);
-        } else if (*a=="sym") {
-          r = triu2symm(r);
-        } else if (*a=="withdiag") {
-          r = project(r, r.sparsity() + Sparsity::diag(r.size1()));
-        } else {
-          casadi_assert(0);
-        }
-      }
-    }
-
     // Create function and return
     Function ret(name, ret_in, ret_out, ret_iname, ret_oname, opts);
     if (ret.has_free()) {
       stringstream ss;
       ss << "Cannot generate " << name << " as the expressions contain free variables: ";
-      if (ret.is_a("sxfunction")) {
-        ss << ret.free_sx();
-      } else {
-        casadi_assert(ret.is_a("mxfunction"));
-        ss << ret.free_mx();
-      }
+      ret.print_free(ss);
       casadi_error(ss.str());
     }
     return ret;
