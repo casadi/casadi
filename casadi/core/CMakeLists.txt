@@ -89,6 +89,7 @@ set(CASADI_SRCS
   function/callback.cpp            function/callback.hpp            # Interface for user-defined function classes (public API)
   function/callback_internal.cpp function/callback_internal.hpp     # Interface for user-defined function classes (internal API)
   function/plugin_interface.hpp                                     # Plugin interface for Function
+  function/factory.hpp                                              # Helper class for derivative function generation
   function/x_function.hpp                                           # Base class for SXFunction and MXFunction
   function/sx_function.hpp         function/sx_function.cpp
   function/mx_function.hpp         function/mx_function.cpp
