@@ -86,6 +86,7 @@ set(CASADI_SRCS
   # A dynamically created function with AD capabilities
   function/function.hpp            function/function.cpp            # Function object class (public API)
   function/function_internal.hpp   function/function_internal.cpp   # Function object class (internal API)
+  function/oracle_function.hpp     function/oracle_function.cpp     # Specialization of FunctionInternal to hold an oracle
   function/callback.cpp            function/callback.hpp            # Interface for user-defined function classes (public API)
   function/callback_internal.cpp function/callback_internal.hpp     # Interface for user-defined function classes (internal API)
   function/plugin_interface.hpp                                     # Plugin interface for Function

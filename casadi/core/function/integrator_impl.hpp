@@ -27,7 +27,7 @@
 #define CASADI_INTEGRATOR_IMPL_HPP
 
 #include "integrator.hpp"
-#include "function_internal.hpp"
+#include "oracle_function.hpp"
 #include "plugin_interface.hpp"
 
 /// \cond INTERNAL
@@ -35,7 +35,7 @@
 namespace casadi {
 
   /** \brief Integrator memory */
-  struct CASADI_EXPORT IntegratorMemory : public WorkMemory {
+  struct CASADI_EXPORT IntegratorMemory : public OracleMemory {
   };
 
   /** \brief Internal storage for integrator related data
@@ -45,7 +45,7 @@ namespace casadi {
       \date 2010
   */
   class CASADI_EXPORT
-  Integrator : public FunctionInternal, public PluginInterface<Integrator> {
+  Integrator : public OracleFunction, public PluginInterface<Integrator> {
   public:
     /** \brief  Constructor */
     Integrator(const std::string& name, const Function& dae);

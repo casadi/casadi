@@ -27,15 +27,19 @@
 #define CASADI_ROOTFINDER_IMPL_HPP
 
 #include "rootfinder.hpp"
-#include "function_internal.hpp"
+#include "oracle_function.hpp"
 #include "plugin_interface.hpp"
 
 /// \cond INTERNAL
 namespace casadi {
 
+  /** \brief Integrator memory */
+  struct CASADI_EXPORT RootfinderMemory : public OracleMemory {
+  };
+
   /// Internal class
   class CASADI_EXPORT
-  Rootfinder : public FunctionInternal, public PluginInterface<Rootfinder> {
+  Rootfinder : public OracleFunction, public PluginInterface<Rootfinder> {
   public:
     /** \brief Constructor
      *

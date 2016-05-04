@@ -75,7 +75,7 @@ Function Function::rootfinder_fun() {
   }
 
   Rootfinder::Rootfinder(const std::string& name, const Function& f)
-    : FunctionInternal(name), f_(f) {
+    : OracleFunction(name, f), f_(f) {
 
     // Default options
     iin_ = 0;

@@ -27,24 +27,20 @@
 #define CASADI_NLPSOL_IMPL_HPP
 
 #include "nlpsol.hpp"
-#include "function_internal.hpp"
+#include "oracle_function.hpp"
 #include "plugin_interface.hpp"
-#include "../timing.hpp"
 
 
 /// \cond INTERNAL
 namespace casadi {
 
   /** \brief Integrator memory */
-  struct CASADI_EXPORT NlpsolMemory : public WorkMemory {
+  struct CASADI_EXPORT NlpsolMemory : public OracleMemory {
     // Outputs
     double *x, *f, *g, *lam_x, *lam_g, *lam_p;
 
     // Inputs
     const double *x0, *p, *lbx, *ubx, *lbg, *ubg, *lam_x0, *lam_g0;
-
-    // Function specific statistics
-    std::map<std::string, FStats> fstats;
 
     // number of iterations
     int n_iter;
@@ -57,7 +53,7 @@ namespace casadi {
       \date 2010-2013
   */
   class CASADI_EXPORT
-  Nlpsol : public FunctionInternal, public PluginInterface<Nlpsol> {
+  Nlpsol : public OracleFunction, public PluginInterface<Nlpsol> {
   public:
     /// Number of variables
     int nx_;

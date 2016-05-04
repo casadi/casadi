@@ -53,25 +53,15 @@ namespace casadi {
     return r;
   }
 
-  /** \brief Function memory with temporary work vectors */
-  struct CASADI_EXPORT WorkMemory {
-    // Work vectors
-    const double** arg;
-    double** res;
-    int* iw;
-    double* w;
-  };
-
   /** \brief Internal class for Function
       \author Joel Andersson
       \date 2010-2015
   */
   class CASADI_EXPORT FunctionInternal : public SharedObjectNode {
-  protected:
-    /** \brief Constructor (accessible from the Function class and derived classes) */
+  public:
+    /** \brief Constructor */
     FunctionInternal(const std::string& name);
 
-  public:
     /** \brief  Destructor */
     virtual ~FunctionInternal() = 0;
 

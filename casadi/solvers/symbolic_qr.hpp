@@ -44,9 +44,12 @@ namespace casadi {
   typedef std::vector<SXPtr> SXPtrV;
 
   /** \brief Memory for SymbolicQR  */
-  struct CASADI_LINSOL_SYMBOLICQR_EXPORT SymbolicQrMemory : public WorkMemory {
-    // Destructor
-    virtual ~SymbolicQrMemory() {}
+  struct CASADI_LINSOL_SYMBOLICQR_EXPORT SymbolicQrMemory {
+    // Work vectors
+    const double** arg;
+    double** res;
+    int* iw;
+    double* w;
 
     // Storage for QR factorization
     std::vector<double> q, r;
@@ -127,4 +130,3 @@ namespace casadi {
 
 /// \endcond
 #endif // CASADI_SYMBOLIC_QR_HPP
-

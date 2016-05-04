@@ -51,7 +51,7 @@ namespace casadi {
   class KinsolInterface;
 
   // Memory
-  struct CASADI_ROOTFINDER_KINSOL_EXPORT KinsolMemory : public WorkMemory {
+  struct CASADI_ROOTFINDER_KINSOL_EXPORT KinsolMemory : public RootfinderMemory {
     /// Function object
     const KinsolInterface& self;
 

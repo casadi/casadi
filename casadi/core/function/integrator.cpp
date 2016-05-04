@@ -113,7 +113,7 @@ namespace casadi {
   }
 
   Integrator::Integrator(const std::string& name, const Function& dae)
-    : FunctionInternal(name), dae_(dae) {
+    : OracleFunction(name, dae), dae_(dae) {
 
     f_ = dae_.factory("f", {"x", "z", "p", "t"}, {"ode", "alg", "quad"});
     g_ = dae_.factory("g", {"rx", "rz", "rp", "x", "z", "p", "t"},

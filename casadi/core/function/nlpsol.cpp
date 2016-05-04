@@ -147,7 +147,7 @@ namespace casadi {
   }
 
   Nlpsol::Nlpsol(const std::string& name, const Function& nlp)
-    : FunctionInternal(name), nlp_(nlp) {
+    : OracleFunction(name, nlp), nlp_(nlp) {
 
     // Set default options
     callback_step_ = 1;
