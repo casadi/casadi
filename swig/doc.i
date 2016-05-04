@@ -8147,6 +8147,9 @@ C++ includes: nonzeros.hpp ";
 // File: classcasadi_1_1OneSX.xml
 
 
+// File: classcasadi_1_1OracleFunction.xml
+
+
 // File: classcasadi_1_1ParsedFile.xml
 %feature("docstring") casadi::ParsedFile::ParsedFile() "
 
