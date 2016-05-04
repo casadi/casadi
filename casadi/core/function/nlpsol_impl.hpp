@@ -82,15 +82,9 @@ namespace casadi {
     // Print timing statistics
     bool print_time_;
 
-    // All NLP functions
-    std::vector<Function> all_functions_;
-
-    /// The NLP
-    Function nlp_;
-
   public:
     /// Constructor
-    Nlpsol(const std::string& name, const Function& nlp);
+    Nlpsol(const std::string& name, const Function& oracle);
 
     /// Destructor
     virtual ~Nlpsol() = 0;
@@ -145,17 +139,6 @@ namespace casadi {
     virtual void set_temp(void* mem, const double** arg, double** res,
                           int* iw, double* w) const;
 
-    /** Create an NLP function */
-    Function
-    create_function(const std::string& fname,
-                    const std::vector<std::string>& s_in,
-                    const std::vector<std::string>& s_out,
-                    const Function::AuxOut& aux=Function::AuxOut(),
-                    const Dict& opts=Dict(), bool reg=true);
-
-    /** Register the function for evaluation and statistics gathering */
-    void register_function(const Function& fcn);
-
     // Evaluate numerically
     virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
 
@@ -163,24 +146,16 @@ namespace casadi {
     virtual void solve(void* mem) const = 0;
 
     // Creator function for internal class
-    typedef Nlpsol* (*Creator)(const std::string& name, const Function& nlp);
+    typedef Nlpsol* (*Creator)(const std::string& name, const Function& oracle);
 
     // No static functions exposed
     struct Exposed{ };
 
-    // Calculate an oracle function
-    int calc_function(NlpsolMemory* m, const Function& fcn,
-                      std::initializer_list<const double*> arg,
-                      std::initializer_list<double*> res) const;
+    /// Print statistics
+    void print_fstats(const NlpsolMemory* m) const;
 
-   /// Print statistics
-   void print_fstats(const NlpsolMemory* m) const;
-
-   /// Get all statistics
-   virtual Dict get_stats(void* mem) const;
-
-    /** \brief Export / Generate C code for the dependency function */
-    virtual void generate_dependencies(const std::string& fname, const Dict& opts);
+    /// Get all statistics
+    virtual Dict get_stats(void* mem) const;
 
     /// Collection of solvers
     static std::map<std::string, Plugin> solvers_;

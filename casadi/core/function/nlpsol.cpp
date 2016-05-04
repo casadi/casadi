@@ -146,8 +146,8 @@ namespace casadi {
     return NLPSOL_NUM_OUT;
   }
 
-  Nlpsol::Nlpsol(const std::string& name, const Function& nlp)
-    : OracleFunction(name, nlp), nlp_(nlp) {
+  Nlpsol::Nlpsol(const std::string& name, const Function& oracle)
+    : OracleFunction(name, oracle) {
 
     // Set default options
     callback_step_ = 1;
@@ -173,7 +173,7 @@ namespace casadi {
     case NLPSOL_LAM_G0:
       return get_sparsity_out(NLPSOL_G);
     case NLPSOL_P:
-      return nlp_.sparsity_in(NL_P);
+      return oracle_.sparsity_in(NL_P);
     case NLPSOL_NUM_IN: break;
     }
     return Sparsity();
@@ -185,10 +185,10 @@ namespace casadi {
       return Sparsity::scalar();
     case NLPSOL_X:
     case NLPSOL_LAM_X:
-      return nlp_.sparsity_in(NL_X);
+      return oracle_.sparsity_in(NL_X);
     case NLPSOL_LAM_G:
     case NLPSOL_G:
-      return nlp_.sparsity_out(NL_G);
+      return oracle_.sparsity_out(NL_G);
     case NLPSOL_LAM_P:
       return get_sparsity_in(NLPSOL_P);
     case NLPSOL_NUM_OUT: break;
@@ -258,7 +258,7 @@ namespace casadi {
     }
 
     // Replace MX oracle with SX oracle?
-    if (expand) nlp_ = nlp_.expand();
+    if (expand) oracle_ = oracle_.expand();
 
     // Get dimensions
     nx_ = nnz_out(NLPSOL_X);
@@ -551,88 +551,6 @@ namespace casadi {
       stats["t_proc_" +s.first] = s.second.t_proc;
     }
     return stats;
-  }
-
-  int Nlpsol::calc_function(NlpsolMemory* m, const Function& fcn,
-                            std::initializer_list<const double*> arg,
-                            std::initializer_list<double*> res) const {
-    // Respond to a possible Crl+C signals
-    InterruptHandler::check();
-
-    // Get statistics structure
-    FStats& fstats = m->fstats.at(fcn.name());
-
-    // Prepare stats, start timer
-    fstats.tic();
-
-    // Number of inputs and outputs
-    int n_in = fcn.n_in(), n_out = fcn.n_out();
-
-    // Input buffers
-    fill_n(m->arg, n_in, nullptr);
-    auto arg_it = arg.begin();
-    for (int i=0; i<n_in; ++i) m->arg[i] = *arg_it++;
-    casadi_assert(arg_it==arg.end());
-
-    // Output buffers
-    fill_n(m->res, n_out, nullptr);
-    auto res_it = res.begin();
-    for (int i=0; i<n_out; ++i) m->res[i] = *res_it++;
-    casadi_assert(res_it==res.end());
-
-    // Evaluate memory-less
-    try {
-      fcn(m->arg, m->res, m->iw, m->w, 0);
-    } catch(exception& ex) {
-      // Fatal error
-      userOut<true, PL_WARN>()
-        << name() << ":" << fcn.name() << " failed:" << ex.what() << endl;
-      return 1;
-    }
-
-    // Make sure not NaN or Inf
-    for (int i=0; i<n_out; ++i) {
-      if (!m->res[i]) continue;
-      if (!all_of(m->res[i], m->res[i]+fcn.nnz_out(i), [](double v) { return isfinite(v);})) {
-        userOut<true, PL_WARN>()
-          << name() << ":" << fcn.name() << " failed: NaN or Inf detected for output "
-          << fcn.name_out(i) << endl;
-        return -1;
-      }
-    }
-
-    // Update stats
-    fstats.toc();
-
-    // Success
-    return 0;
-  }
-
-  void Nlpsol::generate_dependencies(const std::string& fname, const Dict& opts) {
-    CodeGenerator gen(fname, opts);
-    gen.add(nlp_);
-    for (const Function& f : all_functions_) gen.add(f);
-    gen.generate();
-  }
-
-  Function Nlpsol::create_function(const std::string& fname,
-                                   const std::vector<std::string>& s_in,
-                                   const std::vector<std::string>& s_out,
-                                   const Function::AuxOut& aux,
-                                   const Dict& opts, bool reg) {
-    // Generate the function
-    Function ret = nlp_.factory(fname, s_in, s_out, aux, opts);
-    if (reg) register_function(ret);
-    return ret;
-  }
-
-  void Nlpsol::register_function(const Function& fcn) {
-    // Make sure that the function names are unique
-    for (const Function& f : all_functions_) casadi_assert(fcn.name()!=f.name());
-
-    // Add to the list
-    all_functions_.push_back(fcn);
-    alloc(fcn);
   }
 
 } // namespace casadi

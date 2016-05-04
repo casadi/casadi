@@ -259,10 +259,10 @@ namespace casadi {
   }
 
   void KinsolInterface::get_jtimes() {
-    vector<string> jtimes_in = f_.name_in();
-    jtimes_in.push_back("fwd:" + f_.name_in(iin_));
-    vector<string> jtimes_out = {"fwd:" + f_.name_out(iout_)};
-    jtimes_ = f_.factory("jtimes", jtimes_in, jtimes_out);
+    vector<string> jtimes_in = oracle_.name_in();
+    jtimes_in.push_back("fwd:" + oracle_.name_in(iin_));
+    vector<string> jtimes_out = {"fwd:" + oracle_.name_out(iout_)};
+    jtimes_ = oracle_.factory("jtimes", jtimes_in, jtimes_out);
     alloc(jtimes_);
   }
 
@@ -312,7 +312,7 @@ namespace casadi {
       arg1[iin_] = NV_DATA_S(m->u);
       copy_n(res, n_out(), res1);
       res1[iout_] = 0;
-      f_(arg1, res1, iw, w, 0);
+      oracle_(arg1, res1, iw, w, 0);
     }
   }
 
@@ -329,7 +329,7 @@ namespace casadi {
     arg1[iin_] = NV_DATA_S(u);
     fill_n(res1, n_out(), static_cast<double*>(0));
     res1[iout_] = NV_DATA_S(fval);
-    f_(arg1, res1, m.iw, m.w, 0);
+    oracle_(arg1, res1, m.iw, m.w, 0);
 
     // Print it, if requested
     if (monitored("eval_f")) {

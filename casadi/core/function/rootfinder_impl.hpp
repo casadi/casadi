@@ -45,26 +45,26 @@ namespace casadi {
      *
      * \param f   Function mapping from (n+1) inputs to 1 output.
      */
-    Rootfinder(const std::string& name, const Function& f);
+    Rootfinder(const std::string& name, const Function& oracle);
 
     /// Destructor
     virtual ~Rootfinder() = 0;
     ///@{
     /** \brief Number of function inputs and outputs */
-    virtual size_t get_n_in() { return f_.n_in();}
-    virtual size_t get_n_out() { return f_.n_out();}
+    virtual size_t get_n_in() { return oracle_.n_in();}
+    virtual size_t get_n_out() { return oracle_.n_out();}
     ///@}
 
     /// @{
     /** \brief Sparsities of function inputs and outputs */
-    virtual Sparsity get_sparsity_in(int i) { return f_.sparsity_in(i);}
-    virtual Sparsity get_sparsity_out(int i) { return f_.sparsity_out(i);}
+    virtual Sparsity get_sparsity_in(int i) { return oracle_.sparsity_in(i);}
+    virtual Sparsity get_sparsity_out(int i) { return oracle_.sparsity_out(i);}
     /// @}
 
     ///@{
     /** \brief Names of function input and outputs */
-    virtual std::string get_name_in(int i) { return f_.name_in(i);}
-    virtual std::string get_name_out(int i) { return f_.name_out(i);}
+    virtual std::string get_name_in(int i) { return oracle_.name_in(i);}
+    virtual std::string get_name_out(int i) { return oracle_.name_out(i);}
     /// @}
 
     ///@{
@@ -115,9 +115,6 @@ namespace casadi {
     /// Number of equations
     int n_;
 
-    /// The function f(z, x1, x2, ..., xn) == 0
-    Function f_;
-
     /// Jacobian of f with respect to z
     Function jac_;
 
@@ -131,7 +128,7 @@ namespace casadi {
     int iin_, iout_;
 
     // Creator function for internal class
-    typedef Rootfinder* (*Creator)(const std::string& name, const Function& f);
+    typedef Rootfinder* (*Creator)(const std::string& name, const Function& oracle);
 
     // No static functions exposed
     struct Exposed{ };

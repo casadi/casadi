@@ -48,7 +48,7 @@ namespace casadi {
   Integrator : public OracleFunction, public PluginInterface<Integrator> {
   public:
     /** \brief  Constructor */
-    Integrator(const std::string& name, const Function& dae);
+    Integrator(const std::string& name, const Function& oracle);
 
     /** \brief  Destructor */
     virtual ~Integrator()=0;
@@ -197,9 +197,6 @@ namespace casadi {
     // Copy of the options
     Dict opts_;
 
-    // Dae
-    Function dae_;
-
     /// One step
     Function onestep_;
 
@@ -220,7 +217,7 @@ namespace casadi {
     int ntout_;
 
     // Creator function for internal class
-    typedef Integrator* (*Creator)(const std::string& name, const Function& dae);
+    typedef Integrator* (*Creator)(const std::string& name, const Function& oracle);
 
     // No static functions exposed
     struct Exposed{ };

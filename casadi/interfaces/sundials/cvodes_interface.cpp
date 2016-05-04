@@ -116,7 +116,7 @@ namespace casadi {
     if (exact_jacobian_) {
       switch (linsol_f_) {
       case SD_ITERATIVE:
-        jtimes_ = dae_.factory("jtimes", {"t", "x", "p", "fwd:x"}, {"fwd:ode"});
+        jtimes_ = oracle_.factory("jtimes", {"t", "x", "p", "fwd:x"}, {"fwd:ode"});
         alloc(jtimes_);
         break;
       default: break;
@@ -126,7 +126,7 @@ namespace casadi {
     if (exact_jacobianB_) {
       switch (linsol_g_) {
       case SD_ITERATIVE:
-        jtimesB_ = dae_.factory("jtimesB",
+        jtimesB_ = oracle_.factory("jtimesB",
           {"t", "x", "p", "rx", "rp", "fwd:rx"}, {"fwd:rode"});
         alloc(jtimesB_);
         break;

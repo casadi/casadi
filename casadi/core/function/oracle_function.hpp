@@ -49,12 +49,40 @@ namespace casadi {
       \date 2016
   */
   class CASADI_EXPORT OracleFunction : public FunctionInternal {
+  protected:
+    /// Oracle: Used to generate other functions
+    Function oracle_;
+
+    // All NLP functions
+    std::vector<Function> all_functions_;
   public:
     /** \brief  Constructor */
     OracleFunction(const std::string& name, const Function& oracle);
 
     /** \brief  Destructor */
     virtual ~OracleFunction() = 0;
+
+    /** \brief Get oracle */
+    virtual const Function& oracle() const { return oracle_;}
+
+    /** Create an oracle function */
+    Function
+    create_function(const std::string& fname,
+                    const std::vector<std::string>& s_in,
+                    const std::vector<std::string>& s_out,
+                    const Function::AuxOut& aux=Function::AuxOut(),
+                    const Dict& opts=Dict(), bool reg=true);
+
+    /** Register the function for evaluation and statistics gathering */
+    void register_function(const Function& fcn);
+
+    // Calculate an oracle function
+    int calc_function(OracleMemory* m, const Function& fcn,
+                      std::initializer_list<const double*> arg,
+                      std::initializer_list<double*> res) const;
+
+    /** \brief Export / Generate C code for the generated functions */
+    virtual void generate_dependencies(const std::string& fname, const Dict& opts);
   };
 
 } // namespace casadi

@@ -3210,4 +3210,10 @@ namespace casadi {
     return vector<bool>();
   }
 
+  const Function& FunctionInternal::oracle() const {
+    casadi_error("'oracle' not defined for " + type_name());
+    static Function singleton;
+    return singleton;
+  }
+
 } // namespace casadi

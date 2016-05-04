@@ -371,6 +371,9 @@ namespace casadi {
     void set_reverse(const Function& fcn, int nadj);
     ///@}
 
+    /** \brief Get oracle */
+    virtual const Function& oracle() const;
+
     /** \brief Can derivatives be calculated in any way? */
     bool hasDerivative() const;
 

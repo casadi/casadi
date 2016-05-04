@@ -112,11 +112,11 @@ namespace casadi {
     return INTEGRATOR_NUM_OUT;
   }
 
-  Integrator::Integrator(const std::string& name, const Function& dae)
-    : OracleFunction(name, dae), dae_(dae) {
+  Integrator::Integrator(const std::string& name, const Function& oracle)
+    : OracleFunction(name, oracle) {
 
-    f_ = dae_.factory("f", {"x", "z", "p", "t"}, {"ode", "alg", "quad"});
-    g_ = dae_.factory("g", {"rx", "rz", "rp", "x", "z", "p", "t"},
+    f_ = oracle_.factory("f", {"x", "z", "p", "t"}, {"ode", "alg", "quad"});
+    g_ = oracle_.factory("g", {"rx", "rz", "rp", "x", "z", "p", "t"},
                      {"rode", "ralg", "rquad"});
 
     // Negative number of parameters for consistancy checking
@@ -273,7 +273,7 @@ namespace casadi {
     }
 
     // Replace MX oracle with SX oracle?
-    if (expand) dae_ = dae_.expand();
+    if (expand) oracle_ = oracle_.expand();
 
     // Store a copy of the options, for creating augmented integrators
     opts_ = opts;
