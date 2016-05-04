@@ -1706,8 +1706,8 @@ Add an ordinary differential equation.
 
 %feature("docstring") casadi::Factory::get_output "[INTERNAL] ";
 
-%feature("docstring") casadi::Factory "[INTERNAL] C++ includes:
-x_function.hpp ";
+%feature("docstring") casadi::Factory "[INTERNAL] C++ includes: factory.hpp
+";
 
 %feature("docstring") casadi::Factory::request_output "[INTERNAL] ";
 

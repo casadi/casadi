@@ -2496,8 +2496,8 @@ std::string &s, const MatType &e) " [INTERNAL] ";
 %feature("docstring")  casadi::Factory< MatType >::get_output(const
 std::string &s) " [INTERNAL] ";
 
-%feature("docstring") casadi::Factory "[INTERNAL] C++ includes:
-x_function.hpp ";
+%feature("docstring") casadi::Factory "[INTERNAL] C++ includes: factory.hpp
+";
 
 %feature("docstring")  casadi::Factory< MatType >::request_output(const
 std::string &s) " [INTERNAL] ";
