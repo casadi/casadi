@@ -142,7 +142,7 @@ class CASADI_EXPORT CasadiException : public std::exception {
 // This assertion if for errors caused by bugs in CasADi, use it instead of C:s assert(),
 // but never in destructors
 #if NDEBUG
-#define casadi_assert(x) casadi_assert_message(x, "Please notify the CasADi developers.")
+#define casadi_assert(x) casadi_assert_message(x, "Assertion failed.")
 #else
 #define casadi_assert(x) casadi_assert_message(x, \
     "(Hint for developers: GlobalOptions.setCatchErrorsSwig(False)" \
