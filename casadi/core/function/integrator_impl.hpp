@@ -157,10 +157,10 @@ namespace casadi {
     AugOffset getAugOffset(int nfwd, int nadj);
 
     /// Create sparsity pattern of the extended Jacobian (forward problem)
-    Sparsity spJacF();
+    Sparsity sp_jac_dae();
 
     /// Create sparsity pattern of the extended Jacobian (backward problem)
-    Sparsity spJacG();
+    Sparsity sp_jac_rdae();
 
     // Sparities
     Sparsity t_, x_, z_, p_, q_, rx_, rz_, rp_, rq_;

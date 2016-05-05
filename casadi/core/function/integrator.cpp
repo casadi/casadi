@@ -306,9 +306,9 @@ namespace casadi {
                           "Sparse states in integrators are experimental");
 
     // Form a linear solver for the sparsity propagation
-    linsol_f_ = linsol("linsol_f", "none", spJacF(), 1);
+    linsol_f_ = linsol("linsol_f", "none", sp_jac_dae(), 1);
     if (!g_.is_null()) {
-      linsol_g_ = linsol("linsol_g", "none", spJacG(), 1);
+      linsol_g_ = linsol("linsol_g", "none", sp_jac_rdae(), 1);
     }
 
     // Allocate sufficiently large work vectors
@@ -1300,9 +1300,9 @@ namespace casadi {
     return opts_;
   }
 
-  Sparsity Integrator::spJacF() {
+  Sparsity Integrator::sp_jac_dae() {
     // Start with the sparsity pattern of the ODE part
-    Sparsity jac_ode_x = f_.sparsity_jac(DAE_X, DAE_ODE);
+    Sparsity jac_ode_x = oracle_.sparsity_jac(DE_X, DE_ODE);
 
     // Add diagonal to get interdependencies
     jac_ode_x = jac_ode_x + Sparsity::diag(nx_);
@@ -1311,16 +1311,16 @@ namespace casadi {
     if (nz_==0) return jac_ode_x;
 
     // Add contribution from algebraic variables and equations
-    Sparsity jac_ode_z = f_.sparsity_jac(DAE_Z, DAE_ODE);
-    Sparsity jac_alg_x = f_.sparsity_jac(DAE_X, DAE_ALG);
-    Sparsity jac_alg_z = f_.sparsity_jac(DAE_Z, DAE_ALG);
+    Sparsity jac_ode_z = oracle_.sparsity_jac(DE_Z, DE_ODE);
+    Sparsity jac_alg_x = oracle_.sparsity_jac(DE_X, DE_ALG);
+    Sparsity jac_alg_z = oracle_.sparsity_jac(DE_Z, DE_ALG);
     return blockcat(jac_ode_x, jac_ode_z,
                     jac_alg_x, jac_alg_z);
   }
 
-  Sparsity Integrator::spJacG() {
+  Sparsity Integrator::sp_jac_rdae() {
     // Start with the sparsity pattern of the ODE part
-    Sparsity jac_ode_x = g_.sparsity_jac(RDAE_RX, RDAE_ODE);
+    Sparsity jac_ode_x = oracle_.sparsity_jac(DE_RX, DE_RODE);
 
     // Add diagonal to get interdependencies
     jac_ode_x = jac_ode_x + Sparsity::diag(nrx_);
@@ -1329,9 +1329,9 @@ namespace casadi {
     if (nrz_==0) return jac_ode_x;
 
     // Add contribution from algebraic variables and equations
-    Sparsity jac_ode_z = g_.sparsity_jac(RDAE_RZ, RDAE_ODE);
-    Sparsity jac_alg_x = g_.sparsity_jac(RDAE_RX, RDAE_ALG);
-    Sparsity jac_alg_z = g_.sparsity_jac(RDAE_RZ, RDAE_ALG);
+    Sparsity jac_ode_z = oracle_.sparsity_jac(DE_RZ, DE_RODE);
+    Sparsity jac_alg_x = oracle_.sparsity_jac(DE_RX, DE_RALG);
+    Sparsity jac_alg_z = oracle_.sparsity_jac(DE_RZ, DE_RALG);
     return blockcat(jac_ode_x, jac_ode_z,
                     jac_alg_x, jac_alg_z);
   }
