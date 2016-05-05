@@ -283,7 +283,7 @@ namespace casadi {
   }
 
   void Linsol::
-  linsol_spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem,
+  linsol_sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem,
                bool tr, int nrhs) {
     // Sparsities
     const Sparsity& A_sp = sparsity_in(LINSOL_A);
@@ -320,7 +320,7 @@ namespace casadi {
   }
 
   void Linsol::
-  linsol_spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem,
+  linsol_sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem,
                bool tr, int nrhs) {
     // Sparsities
     const Sparsity& A_sp = sparsity_in(LINSOL_A);

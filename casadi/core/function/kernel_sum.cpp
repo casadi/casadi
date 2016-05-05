@@ -74,7 +74,7 @@ namespace casadi {
 
   static bvec_t Orring(bvec_t x, bvec_t y) { return x | y; }
 
-  void KernelSum::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+  void KernelSum::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     // First input is non-differentiable
 
     int num_in = f_.n_in(), num_out = f_.n_out();

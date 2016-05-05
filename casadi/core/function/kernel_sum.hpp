@@ -77,7 +77,7 @@ namespace casadi {
     /** \brief  Evaluate numerically, work vectors given */
     virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
 
-    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
+    virtual void sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
 
     ///@{
     /// Is the class able to propagate seeds through the algorithm?

@@ -468,7 +468,7 @@ namespace casadi {
     }
   }
 
-  void MXFunction::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+  void MXFunction::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     // Temporaries to hold pointers to operation input and outputs
     const bvec_t** arg1=arg+n_in();
     bvec_t** res1=res+n_out();
@@ -502,12 +502,12 @@ namespace casadi {
           res1[i] = it->res[i]>=0 ? w+workloc_[it->res[i]] : 0;
 
         // Propagate sparsity forwards
-        it->data->spFwd(arg1, res1, iw, w, 0);
+        it->data->sp_fwd(arg1, res1, iw, w, 0);
       }
     }
   }
 
-  void MXFunction::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+  void MXFunction::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     // Temporaries to hold pointers to operation input and outputs
     bvec_t** arg1=arg+n_in();
     bvec_t** res1=res+n_out();
@@ -543,7 +543,7 @@ namespace casadi {
           res1[i] = it->res[i]>=0 ? w+workloc_[it->res[i]] : 0;
 
         // Propagate sparsity backwards
-        it->data->spAdj(arg1, res1, iw, w, 0);
+        it->data->sp_rev(arg1, res1, iw, w, 0);
       }
     }
   }

@@ -177,11 +177,11 @@ namespace casadi {
     evalGen(arg, res, iw, w);
   }
 
-  void PureMap::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+  void PureMap::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     evalGen(arg, res, iw, w);
   }
 
-  void PureMap::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+  void PureMap::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     int n_in = n_in_, n_out = n_out_;
     bvec_t** arg1 = arg+this->n_in();
     bvec_t** res1 = res+this->n_out();
@@ -192,7 +192,7 @@ namespace casadi {
       for (int j=0; j<n_out; ++j) {
         res1[j]= res[j] ? res[j]+i*f_.nnz_out(j): 0;
       }
-      f_->spAdj(arg1, res1, iw, w, 0);
+      f_->sp_rev(arg1, res1, iw, w, 0);
     }
   }
 
@@ -362,11 +362,11 @@ namespace casadi {
 
   static bvec_t Orring(bvec_t x, bvec_t y) { return x | y; }
 
-  void MapSum::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+  void MapSum::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     evalGen<bvec_t>(arg, res, iw, w, &Orring);
   }
 
-  void MapSum::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+  void MapSum::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     int num_in = f_.n_in(), num_out = f_.n_out();
 
     bvec_t** arg1 = arg+f_.sz_arg();
@@ -396,7 +396,7 @@ namespace casadi {
         }
       }
 
-      f_->spAdj(arg1, res1, iw, w, 0);
+      f_->sp_rev(arg1, res1, iw, w, 0);
     }
 
     // Reset all seeds

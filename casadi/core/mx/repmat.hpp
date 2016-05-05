@@ -64,10 +64,10 @@ namespace casadi {
     virtual void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res);
 
     /** \brief  Propagate sparsity forward */
-    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
+    virtual void sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
 
     /** \brief  Propagate sparsity backwards */
-    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
+    virtual void sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
 
     /** \brief Calculate forward mode directional derivatives */
     virtual void evalFwd(const std::vector<std::vector<MX> >& fseed,
@@ -117,10 +117,10 @@ namespace casadi {
     virtual void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res);
 
     /** \brief  Propagate sparsity forward */
-    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
+    virtual void sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
 
     /** \brief  Propagate sparsity backwards */
-    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
+    virtual void sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
 
     /** \brief Calculate forward mode directional derivatives */
     virtual void evalFwd(const std::vector<std::vector<MX> >& fseed,

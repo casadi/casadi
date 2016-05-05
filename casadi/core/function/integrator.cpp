@@ -714,8 +714,8 @@ namespace casadi {
     return ret;
   }
 
-  void Integrator::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
-    log("Integrator::spFwd", "begin");
+  void Integrator::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+    log("Integrator::sp_fwd", "begin");
 
     // Work vectors
     bvec_t *tmp_x = w; w += nx_;
@@ -794,11 +794,11 @@ namespace casadi {
         oracle_(arg1, res1, iw, w, 0);
       }
     }
-    log("Integrator::spFwd", "end");
+    log("Integrator::sp_fwd", "end");
   }
 
-  void Integrator::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
-    log("Integrator::spAdj", "begin");
+  void Integrator::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+    log("Integrator::sp_rev", "begin");
 
     // Work vectors
     bvec_t** arg1 = arg+n_in();
@@ -909,7 +909,7 @@ namespace casadi {
     arg1[DE_Z] = 0; // arg[INTEGRATOR_Z0] is a guess, no dependency
     oracle_.rev(arg1, res1, iw, w, 0);
 
-    log("Integrator::spAdj", "end");
+    log("Integrator::sp_rev", "end");
   }
 
   Integrator::AugOffset Integrator::getAugOffset(int nfwd, int nadj) {

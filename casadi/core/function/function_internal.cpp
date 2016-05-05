@@ -402,7 +402,7 @@ namespace casadi {
   }
 
   void FunctionInternal::_eval(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
-    spFwd(arg, res, iw, w, mem);
+    sp_fwd(arg, res, iw, w, mem);
   }
 
   void FunctionInternal::print_dimensions(ostream &stream) const {
@@ -612,14 +612,14 @@ namespace casadi {
     typedef const bvec_t* arg_t;
     static inline void sp(FunctionInternal *f, const bvec_t** arg, bvec_t** res,
                           int* iw, bvec_t* w, int mem) {
-      f->spFwd(arg, res, iw, w, mem);
+      f->sp_fwd(arg, res, iw, w, mem);
     }
   };
   template<> struct JacSparsityTraits<false> {
     typedef bvec_t* arg_t;
     static inline void sp(FunctionInternal *f, bvec_t** arg, bvec_t** res,
                           int* iw, bvec_t* w, int mem) {
-      f->spAdj(arg, res, iw, w, mem);
+      f->sp_rev(arg, res, iw, w, mem);
     }
   };
 
@@ -881,7 +881,7 @@ namespace casadi {
             lookup(duplicates.sparsity()) = -bvec_size;
 
             // Propagate the dependencies
-            spFwd(get_ptr(arg), get_ptr(res), get_ptr(iw), get_ptr(w), 0);
+            sp_fwd(get_ptr(arg), get_ptr(res), get_ptr(iw), get_ptr(w), 0);
 
             // Temporary bit work vector
             bvec_t spsens;
@@ -1166,10 +1166,10 @@ namespace casadi {
 
             // Propagate the dependencies
             if (use_fwd) {
-              spFwd(get_ptr(arg_fwd), get_ptr(res), get_ptr(iw), get_ptr(w), 0);
+              sp_fwd(get_ptr(arg_fwd), get_ptr(res), get_ptr(iw), get_ptr(w), 0);
             } else {
               fill(w.begin(), w.end(), 0);
-              spAdj(get_ptr(arg_adj), get_ptr(res), get_ptr(iw), get_ptr(w), 0);
+              sp_rev(get_ptr(arg_adj), get_ptr(res), get_ptr(iw), get_ptr(w), 0);
             }
 
             // Temporary bit work vector
@@ -2425,7 +2425,7 @@ namespace casadi {
     casadi_error("'generate_dependencies' not defined for " + type_name());
   }
 
-  void FunctionInternal::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+  void FunctionInternal::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     // Get the number of inputs and outputs
     int n_in = this->n_in();
     int n_out = this->n_out();
@@ -2459,7 +2459,7 @@ namespace casadi {
     }
   }
 
-  void FunctionInternal::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+  void FunctionInternal::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     // Get the number of inputs and outputs
     int n_in = this->n_in();
     int n_out = this->n_out();
@@ -2988,15 +2988,15 @@ namespace casadi {
   }
 
   void FunctionInternal::
-  linsol_spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem,
+  linsol_sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem,
                bool tr, int nrhs) {
-    casadi_error("'linsol_spFwd' not defined for " + type_name());
+    casadi_error("'linsol_sp_fwd' not defined for " + type_name());
   }
 
   void FunctionInternal::
-  linsol_spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem,
+  linsol_sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem,
                bool tr, int nrhs) {
-    casadi_error("'linsol_spAdj' not defined for " + type_name());
+    casadi_error("'linsol_sp_rev' not defined for " + type_name());
   }
 
   std::vector<std::vector<MX> >

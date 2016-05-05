@@ -76,7 +76,7 @@ namespace casadi {
     *res[0] = casadi_bilin(arg[0], dep(0).sparsity(), arg[1], arg[2]);
   }
 
-  void Bilin::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+  void Bilin::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     /* Get sparsities */
     int ncol_A = sparsity().size2();
     const int *colind_A = dep(0).colind(), *row_A = dep(0).row();
@@ -99,7 +99,7 @@ namespace casadi {
     *res[0] = r;
   }
 
-  void Bilin::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+  void Bilin::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     /* Get sparsities */
     int ncol_A = sparsity().size2();
     const int *colind_A = dep(0).colind(), *row_A = dep(0).row();

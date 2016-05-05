@@ -99,13 +99,13 @@ namespace casadi {
   }
 
   template<bool Tr>
-  void Solve<Tr>::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
-    linsol_->linsol_spFwd(arg, res, iw, w, mem, Tr, dep(0).size2());
+  void Solve<Tr>::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+    linsol_->linsol_sp_fwd(arg, res, iw, w, mem, Tr, dep(0).size2());
   }
 
   template<bool Tr>
-  void Solve<Tr>::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
-    linsol_->linsol_spAdj(arg, res, iw, w, mem, Tr, dep(0).size2());
+  void Solve<Tr>::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+    linsol_->linsol_sp_rev(arg, res, iw, w, mem, Tr, dep(0).size2());
   }
 
   template<bool Tr>

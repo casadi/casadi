@@ -194,11 +194,11 @@ namespace casadi {
     evalGen(arg, res, iw, w, std::plus<SXElem>());
   }
 
-  void Mapaccum::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+  void Mapaccum::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     evalGen(arg, res, iw, w, orop);
   }
 
-  void Mapaccum::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
+  void Mapaccum::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
 
     int num_in = f_.n_in(), num_out = f_.n_out();
 
@@ -294,7 +294,7 @@ namespace casadi {
       }
 
       // Evaluate the function
-      f_->spAdj(arg1, res1, iw, w, 0);
+      f_->sp_rev(arg1, res1, iw, w, 0);
 
     }
 
