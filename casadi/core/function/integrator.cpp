@@ -327,40 +327,39 @@ namespace casadi {
 
     // Get input expressions
     vector<MatType> arg = MatType::get_input(oracle_);
-    MatType t, x, z, p, rx, rz, rp;
     vector<MatType> aug_x, aug_z, aug_p, aug_rx, aug_rz, aug_rp;
-    t = arg.at(DE_T);
-    aug_x.push_back(x = arg.at(DE_X));
-    aug_z.push_back(z = arg.at(DE_Z));
-    aug_p.push_back(p = arg.at(DE_P));
-    aug_rx.push_back(rx = arg.at(DE_RX));
-    aug_rz.push_back(rz = arg.at(DE_RZ));
-    aug_rp.push_back(rp = arg.at(DE_RP));
+    MatType aug_t = arg.at(DE_T);
+    aug_x.push_back(arg.at(DE_X));
+    aug_z.push_back(arg.at(DE_Z));
+    aug_p.push_back(arg.at(DE_P));
+    aug_rx.push_back(arg.at(DE_RX));
+    aug_rz.push_back(arg.at(DE_RZ));
+    aug_rp.push_back(arg.at(DE_RP));
 
     // Get output expressions
     vector<MatType> res = oracle_(arg);
-    MatType ode, alg, quad, rode, ralg, rquad;
     vector<MatType> aug_ode, aug_alg, aug_quad, aug_rode, aug_ralg, aug_rquad;
-    aug_ode.push_back(ode = res.at(DE_ODE));
-    aug_alg.push_back(alg = res.at(DE_ALG));
-    aug_quad.push_back(quad = res.at(DE_QUAD));
-    aug_rode.push_back(rode = res.at(DE_RODE));
-    aug_ralg.push_back(ralg = res.at(DE_RALG));
-    aug_rquad.push_back(rquad = res.at(DE_RQUAD));
+    aug_ode.push_back(res.at(DE_ODE));
+    aug_alg.push_back(res.at(DE_ALG));
+    aug_quad.push_back(res.at(DE_QUAD));
+    aug_rode.push_back(res.at(DE_RODE));
+    aug_ralg.push_back(res.at(DE_RALG));
+    aug_rquad.push_back(res.at(DE_RQUAD));
 
     // Zero of time dimension
-    MatType zero_t = MatType::zeros(t.sparsity());
+    MatType zero_t = MatType::zeros(t());
 
     // Forward directional derivatives
     vector<vector<MatType>> seed(nfwd, vector<MatType>(DE_NUM_IN));
     for (int d=0; d<nfwd; ++d) {
       seed[d][DE_T] = zero_t;
-      aug_x.push_back(seed[d][DE_X] = MatType::sym("aug_x" + to_string(d), x.sparsity()));
-      aug_z.push_back(seed[d][DE_Z] = MatType::sym("aug_z" + to_string(d), z.sparsity()));
-      aug_p.push_back(seed[d][DE_P] = MatType::sym("aug_p" + to_string(d), p.sparsity()));
-      aug_rx.push_back(seed[d][DE_RX] = MatType::sym("aug_rx" + to_string(d), rx.sparsity()));
-      aug_rz.push_back(seed[d][DE_RZ] = MatType::sym("aug_rz" + to_string(d), rz.sparsity()));
-      aug_rp.push_back(seed[d][DE_RP] = MatType::sym("aug_rp" + to_string(d), rp.sparsity()));
+      string pref = "aug" + to_string(d) + "_";
+      aug_x.push_back(seed[d][DE_X] = MatType::sym(pref + "x", x()));
+      aug_z.push_back(seed[d][DE_Z] = MatType::sym(pref + "z", z()));
+      aug_p.push_back(seed[d][DE_P] = MatType::sym(pref + "p", p()));
+      aug_rx.push_back(seed[d][DE_RX] = MatType::sym(pref + "rx", rx()));
+      aug_rz.push_back(seed[d][DE_RZ] = MatType::sym(pref + "rz", rz()));
+      aug_rp.push_back(seed[d][DE_RP] = MatType::sym(pref + "rp", rp()));
     }
 
     // Calculate directional derivatives
@@ -368,18 +367,20 @@ namespace casadi {
     oracle_.forward(arg, res, seed, sens, true);
 
     // Collect sensitivity equations
+    casadi_assert(sens.size()==nfwd);
     for (int d=0; d<nfwd; ++d) {
-      aug_ode.push_back(project(sens[d][DE_ODE], ode.sparsity()));
-      aug_alg.push_back(project(sens[d][DE_ALG], alg.sparsity()));
-      aug_quad.push_back(project(sens[d][DE_QUAD], quad.sparsity()));
-      aug_rode.push_back(project(sens[d][DE_RODE], rode.sparsity()));
-      aug_ralg.push_back(project(sens[d][DE_RALG], ralg.sparsity()));
-      aug_rquad.push_back(project(sens[d][DE_RQUAD], rquad.sparsity()));
+      casadi_assert(sens[d].size()==DE_NUM_OUT);
+      aug_ode.push_back(project(sens[d][DE_ODE], x()));
+      aug_alg.push_back(project(sens[d][DE_ALG], z()));
+      aug_quad.push_back(project(sens[d][DE_QUAD], q()));
+      aug_rode.push_back(project(sens[d][DE_RODE], rx()));
+      aug_ralg.push_back(project(sens[d][DE_RALG], rz()));
+      aug_rquad.push_back(project(sens[d][DE_RQUAD], rq()));
     }
 
     // Construct return object
     map<string, MatType> ret;
-    ret["t"] = t;
+    ret["t"] = aug_t;
     ret["x"] = horzcat(aug_x);
     ret["z"] = horzcat(aug_z);
     ret["p"] = horzcat(aug_p);
