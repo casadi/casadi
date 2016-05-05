@@ -59,7 +59,7 @@ namespace casadi {
     KinsolMemory(const KinsolInterface& s);
 
     /// Destructor
-    virtual ~KinsolMemory();
+    ~KinsolMemory();
 
     /// KINSOL memory block
     void* mem;

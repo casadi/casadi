@@ -221,9 +221,11 @@ namespace casadi {
     stream.unsetf(std::ios::floatfield);
   }
 
-  NewtonMemory::NewtonMemory() {
-    return_status = 0;
-    iter = 0;
+  void Newton::init_memory(void* mem) const {
+    Rootfinder::init_memory(mem);
+    auto m = static_cast<NewtonMemory*>(mem);
+    m->return_status = 0;
+    m->iter = 0;
   }
 
 } // namespace casadi

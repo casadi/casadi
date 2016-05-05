@@ -39,11 +39,8 @@
 namespace casadi {
 
   // Memory
-  struct CASADI_ROOTFINDER_NEWTON_EXPORT NewtonMemory {
-    /// Constructor
-    NewtonMemory();
-
-    /// Stats
+  struct CASADI_ROOTFINDER_NEWTON_EXPORT NewtonMemory
+    : public RootfinderMemory {
     const char* return_status;
     int iter;
   };
@@ -83,6 +80,9 @@ namespace casadi {
 
     /** \brief Create memory block */
     virtual void* alloc_memory() const { return new NewtonMemory();}
+
+    /** \brief Initalize memory block */
+    virtual void init_memory(void* mem) const;
 
     /** \brief Free memory block */
     virtual void free_memory(void *mem) const { delete static_cast<NewtonMemory*>(mem);}
