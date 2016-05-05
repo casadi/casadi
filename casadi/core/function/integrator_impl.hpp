@@ -146,7 +146,7 @@ namespace casadi {
 
     /** \brief Generate a augmented DAE system with \a nfwd forward sensitivities  */
     template<typename MatType>
-      std::map<std::string, MatType> aug_fwd(int nfwd, AugOffset& offset);
+      std::map<std::string, MatType> aug_fwd(int nfwd);
 
     /** \brief Generate a augmented DAE system with \a nfwd forward sensitivities
     * and \a nadj adjoint sensitivities */
