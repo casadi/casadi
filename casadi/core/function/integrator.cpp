@@ -725,11 +725,11 @@ namespace casadi {
 
     // Propagate forward
     const bvec_t** arg1 = arg+n_in();
-    fill_n(arg1, DE_NUM_IN, nullptr);
+    fill_n(arg1, static_cast<size_t>(DE_NUM_IN), nullptr);
     arg1[DE_X] = arg[INTEGRATOR_X0];
     arg1[DE_P] = arg[INTEGRATOR_P];
     bvec_t** res1 = res+n_out();
-    fill_n(res1, DE_NUM_OUT, nullptr);
+    fill_n(res1, static_cast<size_t>(DE_NUM_OUT), nullptr);
     res1[DE_ODE] = tmp_x;
     res1[DE_ALG] = tmp_z;
     oracle_(arg1, res1, iw, w, 0);
@@ -759,14 +759,14 @@ namespace casadi {
 
     if (nrx_>0) {
       // Propagate through g
-      fill_n(arg1, DE_NUM_IN, nullptr);
+      fill_n(arg1, static_cast<size_t>(DE_NUM_IN), nullptr);
       arg1[DE_X] = tmp_x;
       arg1[DE_P] = arg[INTEGRATOR_P];
       arg1[DE_Z] = tmp_z;
       arg1[DE_RX] = arg[INTEGRATOR_X0];
       arg1[DE_RX] = arg[INTEGRATOR_RX0];
       arg1[DE_RP] = arg[INTEGRATOR_RP];
-      fill_n(res1, DE_NUM_OUT, nullptr);
+      fill_n(res1, static_cast<size_t>(DE_NUM_OUT), nullptr);
       res1[DE_RODE] = tmp_rx;
       res1[DE_RALG] = tmp_rz;
       oracle_(arg1, res1, iw, w, 0);
@@ -854,8 +854,8 @@ namespace casadi {
       }
 
       // Get dependencies from backward quadratures
-      fill_n(res1, DE_NUM_OUT, nullptr);
-      fill_n(arg1, DE_NUM_IN, nullptr);
+      fill_n(res1, static_cast<size_t>(DE_NUM_OUT), nullptr);
+      fill_n(arg1, static_cast<size_t>(DE_NUM_IN), nullptr);
       res1[DE_RQUAD] = rqf;
       arg1[DE_X] = tmp_x;
       arg1[DE_Z] = tmp_z;
@@ -884,8 +884,8 @@ namespace casadi {
     }
 
     // Get dependencies from forward quadratures
-    fill_n(res1, DE_NUM_OUT, nullptr);
-    fill_n(arg1, DE_NUM_IN, nullptr);
+    fill_n(res1, static_cast<size_t>(DE_NUM_OUT), nullptr);
+    fill_n(arg1, static_cast<size_t>(DE_NUM_IN), nullptr);
     res1[DE_QUAD] = qf;
     arg1[DE_X] = tmp_x;
     arg1[DE_Z] = tmp_z;
