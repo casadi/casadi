@@ -884,18 +884,14 @@ namespace casadi {
     }
 
     // Temp stringstream
-    stringstream ss;
-    ss << "aug_f" << nfwd << name_;
+    string iname = "aug_f" + to_string(nfwd) + name_;
 
     // Create integrator for augmented DAE
     Function aug_int;
-    AugOffset offset = getAugOffset(nfwd, 0);
     if (oracle_.is_a("sxfunction")) {
-      SXDict aug_dae = aug_fwd<SX>(nfwd);
-      aug_int = integrator(ss.str(), plugin_name(), aug_dae, aug_opts);
+      aug_int = integrator(iname, plugin_name(), aug_fwd<SX>(nfwd), aug_opts);
     } else {
-      MXDict aug_dae = aug_fwd<MX>(nfwd);
-      aug_int = integrator(ss.str(), plugin_name(), aug_dae, aug_opts);
+      aug_int = integrator(iname, plugin_name(), aug_fwd<MX>(nfwd), aug_opts);
     }
 
     // All inputs of the return function
@@ -905,60 +901,33 @@ namespace casadi {
     // Augmented state
     vector<MX> x0_augv, p_augv, z0_augv, rx0_augv, rp_augv, rz0_augv;
 
-    // Inputs or forward/adjoint seeds in one direction
-    vector<MX> dd;
-
     // Add nondifferentiated inputs and forward seeds
-    dd.resize(INTEGRATOR_NUM_IN);
     for (int dir=-1; dir<nfwd; ++dir) {
+      // Suffix
+      string suff;
+      if (dir>=0) suff = "_" + to_string(dir);
 
-      // Differential state
-      ss.clear();
-      ss << "x0";
-      if (dir>=0) ss << "_" << dir;
-      dd[INTEGRATOR_X0] = MX::sym(ss.str(), x());
-      x0_augv.push_back(dd[INTEGRATOR_X0]);
+      // Augmented problem
+      vector<MX> din(INTEGRATOR_NUM_IN);
+      x0_augv.push_back(din[INTEGRATOR_X0] = MX::sym("x0" + suff, x()));
+      p_augv.push_back(din[INTEGRATOR_P] = MX::sym("p" + suff, p()));
+      z0_augv.push_back(din[INTEGRATOR_Z0] = MX::sym("z0" + suff, z()));
+      rx0_augv.push_back(din[INTEGRATOR_RX0] = MX::sym("rx0" + suff, rx()));
+      rp_augv.push_back(din[INTEGRATOR_RP] = MX::sym("rp" + suff, rp()));
+      rz0_augv.push_back(din[INTEGRATOR_RZ0] = MX::sym("rz0" + suff, rz()));
+      ret_in.insert(ret_in.end(), din.begin(), din.end());
 
-      // Parameter
-      ss.clear();
-      ss << "p";
-      if (dir>=0) ss << "_" << dir;
-      dd[INTEGRATOR_P] = MX::sym(ss.str(), p());
-      p_augv.push_back(dd[INTEGRATOR_P]);
-
-      // Initial guess for algebraic variable
-      ss.clear();
-      ss << "r0";
-      if (dir>=0) ss << "_" << dir;
-      dd[INTEGRATOR_Z0] = MX::sym(ss.str(), z());
-      z0_augv.push_back(dd[INTEGRATOR_Z0]);
-
-      // Backward state
-      ss.clear();
-      ss << "rx0";
-      if (dir>=0) ss << "_" << dir;
-      dd[INTEGRATOR_RX0] = MX::sym(ss.str(), rx());
-      rx0_augv.push_back(dd[INTEGRATOR_RX0]);
-
-      // Backward parameter
-      ss.clear();
-      ss << "rp";
-      if (dir>=0) ss << "_" << dir;
-      dd[INTEGRATOR_RP] = MX::sym(ss.str(), rp());
-      rp_augv.push_back(dd[INTEGRATOR_RP]);
-
-      // Initial guess for backward algebraic variable
-      ss.clear();
-      ss << "rz0";
-      if (dir>=0) ss << "_" << dir;
-      dd[INTEGRATOR_RZ0] = MX::sym(ss.str(), rz());
-      rz0_augv.push_back(dd[INTEGRATOR_RZ0]);
-
-      // Add to input vector
-      ret_in.insert(ret_in.end(), dd.begin(), dd.end());
-
-      // Make space for dummy outputs
-      if (dir==-1) ret_in.resize(ret_in.size() + INTEGRATOR_NUM_OUT);
+      // Dummy outputs
+      if (dir==-1) {
+        vector<MX> dout(INTEGRATOR_NUM_OUT);
+        dout[INTEGRATOR_XF]  = MX::sym("xf_dummy", Sparsity(size_out(INTEGRATOR_XF)));
+        dout[INTEGRATOR_QF]  = MX::sym("qf_dummy", Sparsity(q().size()));
+        dout[INTEGRATOR_ZF]  = MX::sym("zf_dummy", Sparsity(z().size()));
+        dout[INTEGRATOR_RXF]  = MX::sym("rxf_dummy", Sparsity(rx().size()));
+        dout[INTEGRATOR_RQF]  = MX::sym("rqf_dummy", Sparsity(rq().size()));
+        dout[INTEGRATOR_RZF]  = MX::sym("rzf_dummy", Sparsity(rz().size()));
+        ret_in.insert(ret_in.end(), dout.begin(), dout.end());
+      }
     }
 
     // Call the integrator
@@ -972,6 +941,7 @@ namespace casadi {
     vector<MX> integrator_out = aug_int(integrator_in);
 
     // Augmented results
+    AugOffset offset = getAugOffset(nfwd, 0);
     vector<MX> xf_aug = horzsplit(integrator_out[INTEGRATOR_XF], offset.x);
     vector<MX> qf_aug = horzsplit(integrator_out[INTEGRATOR_QF], offset.q);
     vector<MX> zf_aug = horzsplit(integrator_out[INTEGRATOR_ZF], offset.z);
@@ -985,22 +955,12 @@ namespace casadi {
     vector<MX>::const_iterator rqf_aug_it = rqf_aug.begin();
     vector<MX>::const_iterator rzf_aug_it = rzf_aug.begin();
 
-    // Add dummy inputs (outputs of the nondifferentiated funciton)
-    dd.resize(INTEGRATOR_NUM_OUT);
-    dd[INTEGRATOR_XF]  = MX::sym("xf_dummy", Sparsity(size_out(INTEGRATOR_XF)));
-    dd[INTEGRATOR_QF]  = MX::sym("qf_dummy", Sparsity(q().size()));
-    dd[INTEGRATOR_ZF]  = MX::sym("zf_dummy", Sparsity(z().size()));
-    dd[INTEGRATOR_RXF]  = MX::sym("rxf_dummy", Sparsity(rx().size()));
-    dd[INTEGRATOR_RQF]  = MX::sym("rqf_dummy", Sparsity(rq().size()));
-    dd[INTEGRATOR_RZF]  = MX::sym("rzf_dummy", Sparsity(rz().size()));
-    std::copy(dd.begin(), dd.end(), ret_in.begin()+INTEGRATOR_NUM_IN);
-
     // All outputs of the return function
     vector<MX> ret_out;
     ret_out.reserve(INTEGRATOR_NUM_OUT*nfwd);
 
     // Collect the forward sensitivities
-    fill(dd.begin(), dd.end(), MX());
+    vector<MX> dd(INTEGRATOR_NUM_IN);
     for (int dir=-1; dir<nfwd; ++dir) {
       if ( nx_>0) dd[INTEGRATOR_XF]  = *xf_aug_it++;
       if ( nq_>0) dd[INTEGRATOR_QF]  = *qf_aug_it++;
