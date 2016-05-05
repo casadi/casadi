@@ -274,6 +274,9 @@ namespace casadi {
     g_ = create_function("g", {"rx", "rz", "rp", "x", "z", "p", "t"},
                         {"rode", "ralg", "rquad"});
 
+    // For sparsity pattern propagation
+    alloc(oracle_);
+
     // Store a copy of the options, for creating augmented integrators
     opts_ = opts;
 
@@ -720,79 +723,75 @@ namespace casadi {
     bvec_t *tmp_rx = w; w += nrx_;
     bvec_t *tmp_rz = w; w += nrz_;
 
-    // Propagate through f
+    // Propagate forward
     const bvec_t** arg1 = arg+n_in();
-    fill(arg1, arg1+DAE_NUM_IN, static_cast<bvec_t*>(0));
-    arg1[DAE_X] = arg[INTEGRATOR_X0];
-    arg1[DAE_P] = arg[INTEGRATOR_P];
+    fill_n(arg1, DE_NUM_IN, nullptr);
+    arg1[DE_X] = arg[INTEGRATOR_X0];
+    arg1[DE_P] = arg[INTEGRATOR_P];
     bvec_t** res1 = res+n_out();
-    fill(res1, res1+DAE_NUM_OUT, static_cast<bvec_t*>(0));
-    res1[DAE_ODE] = tmp_x;
-    res1[DAE_ALG] = tmp_z;
-    f_(arg1, res1, iw, w, 0);
+    fill_n(res1, DE_NUM_OUT, nullptr);
+    res1[DE_ODE] = tmp_x;
+    res1[DE_ALG] = tmp_z;
+    oracle_(arg1, res1, iw, w, 0);
     if (arg[INTEGRATOR_X0]) {
       const bvec_t *tmp = arg[INTEGRATOR_X0];
       for (int i=0; i<nx_; ++i) tmp_x[i] |= *tmp++;
     }
 
     // "Solve" in order to resolve interdependencies (cf. Rootfinder)
-    copy(tmp_x, tmp_x+nx_+nz_, w);
+    copy_n(tmp_x, nx_+nz_, w);
     fill_n(tmp_x, nx_+nz_, 0);
     casadi_assert(!linsol_f_.is_null());
     linsol_f_.linsol_spsolve(tmp_x, w, false);
 
     // Get xf and zf
-    if (res[INTEGRATOR_XF])
-      copy(tmp_x, tmp_x+nx_, res[INTEGRATOR_XF]);
-    if (res[INTEGRATOR_ZF])
-      copy(tmp_z, tmp_z+nz_, res[INTEGRATOR_ZF]);
+    if (res[INTEGRATOR_XF]) copy_n(tmp_x, nx_, res[INTEGRATOR_XF]);
+    if (res[INTEGRATOR_ZF]) copy_n(tmp_z, nz_, res[INTEGRATOR_ZF]);
 
     // Propagate to quadratures
     if (nq_>0 && res[INTEGRATOR_QF]) {
-      arg1[DAE_X] = tmp_x;
-      arg1[DAE_Z] = tmp_z;
-      res1[DAE_ODE] = res1[DAE_ALG] = 0;
-      res1[DAE_QUAD] = res[INTEGRATOR_QF];
-      f_(arg1, res1, iw, w, 0);
+      arg1[DE_X] = tmp_x;
+      arg1[DE_Z] = tmp_z;
+      res1[DE_ODE] = res1[DE_ALG] = 0;
+      res1[DE_QUAD] = res[INTEGRATOR_QF];
+      oracle_(arg1, res1, iw, w, 0);
     }
 
-    if (!g_.is_null()) {
+    if (nrx_>0) {
       // Propagate through g
-      fill(arg1, arg1+RDAE_NUM_IN, static_cast<bvec_t*>(0));
-      arg1[RDAE_X] = tmp_x;
-      arg1[RDAE_P] = arg[INTEGRATOR_P];
-      arg1[RDAE_Z] = tmp_z;
-      arg1[RDAE_RX] = arg[INTEGRATOR_X0];
-      arg1[RDAE_RX] = arg[INTEGRATOR_RX0];
-      arg1[RDAE_RP] = arg[INTEGRATOR_RP];
-      fill(res1, res1+RDAE_NUM_OUT, static_cast<bvec_t*>(0));
-      res1[RDAE_ODE] = tmp_rx;
-      res1[RDAE_ALG] = tmp_rz;
-      g_(arg1, res1, iw, w, 0);
+      fill_n(arg1, DE_NUM_IN, nullptr);
+      arg1[DE_X] = tmp_x;
+      arg1[DE_P] = arg[INTEGRATOR_P];
+      arg1[DE_Z] = tmp_z;
+      arg1[DE_RX] = arg[INTEGRATOR_X0];
+      arg1[DE_RX] = arg[INTEGRATOR_RX0];
+      arg1[DE_RP] = arg[INTEGRATOR_RP];
+      fill_n(res1, DE_NUM_OUT, nullptr);
+      res1[DE_RODE] = tmp_rx;
+      res1[DE_RALG] = tmp_rz;
+      oracle_(arg1, res1, iw, w, 0);
       if (arg[INTEGRATOR_RX0]) {
         const bvec_t *tmp = arg[INTEGRATOR_RX0];
         for (int i=0; i<nrx_; ++i) tmp_rx[i] |= *tmp++;
       }
 
       // "Solve" in order to resolve interdependencies (cf. Rootfinder)
-      copy(tmp_rx, tmp_rx+nrx_+nrz_, w);
+      copy_n(tmp_rx, nrx_+nrz_, w);
       fill_n(tmp_rx, nrx_+nrz_, 0);
       casadi_assert(!linsol_g_.is_null());
       linsol_g_.linsol_spsolve(tmp_rx, w, false);
 
       // Get rxf and rzf
-      if (res[INTEGRATOR_RXF])
-        copy(tmp_rx, tmp_rx+nrx_, res[INTEGRATOR_RXF]);
-      if (res[INTEGRATOR_RZF])
-        copy(tmp_rz, tmp_rz+nrz_, res[INTEGRATOR_RZF]);
+      if (res[INTEGRATOR_RXF]) copy_n(tmp_rx, nrx_, res[INTEGRATOR_RXF]);
+      if (res[INTEGRATOR_RZF]) copy_n(tmp_rz, nrz_, res[INTEGRATOR_RZF]);
 
       // Propagate to quadratures
       if (nrq_>0 && res[INTEGRATOR_RQF]) {
-        arg1[RDAE_RX] = tmp_rx;
-        arg1[RDAE_RZ] = tmp_rz;
-        res1[RDAE_ODE] = res1[RDAE_ALG] = 0;
-        res1[RDAE_QUAD] = res[INTEGRATOR_RQF];
-        g_(arg1, res1, iw, w, 0);
+        arg1[DE_RX] = tmp_rx;
+        arg1[DE_RZ] = tmp_rz;
+        res1[DE_RODE] = res1[DE_RALG] = 0;
+        res1[DE_RQUAD] = res[INTEGRATOR_RQF];
+        oracle_(arg1, res1, iw, w, 0);
       }
     }
     log("Integrator::spFwd", "end");
@@ -855,60 +854,60 @@ namespace casadi {
       }
 
       // Get dependencies from backward quadratures
-      fill(res1, res1+RDAE_NUM_OUT, static_cast<bvec_t*>(0));
-      fill(arg1, arg1+RDAE_NUM_IN, static_cast<bvec_t*>(0));
-      res1[RDAE_QUAD] = rqf;
-      arg1[RDAE_X] = tmp_x;
-      arg1[RDAE_Z] = tmp_z;
-      arg1[RDAE_P] = p;
-      arg1[RDAE_RX] = tmp_rx;
-      arg1[RDAE_RZ] = tmp_rz;
-      arg1[RDAE_RP] = rp;
-      g_.rev(arg1, res1, iw, w, 0);
+      fill_n(res1, DE_NUM_OUT, nullptr);
+      fill_n(arg1, DE_NUM_IN, nullptr);
+      res1[DE_RQUAD] = rqf;
+      arg1[DE_X] = tmp_x;
+      arg1[DE_Z] = tmp_z;
+      arg1[DE_P] = p;
+      arg1[DE_RX] = tmp_rx;
+      arg1[DE_RZ] = tmp_rz;
+      arg1[DE_RP] = rp;
+      oracle_.rev(arg1, res1, iw, w, 0);
 
       // Propagate interdependencies
       casadi_assert(!linsol_g_.is_null());
       fill_n(w, nrx_+nrz_, 0);
       linsol_g_.linsol_spsolve(w, tmp_rx, true);
-      copy(w, w+nrx_+nrz_, tmp_rx);
+      copy_n(w, nrx_+nrz_, tmp_rx);
 
       // Direct dependency rx0 -> rxf
       if (rx0) for (int i=0; i<nrx_; ++i) rx0[i] |= tmp_rx[i];
 
       // Indirect dependency via g
-      res1[RDAE_ODE] = tmp_rx;
-      res1[RDAE_ALG] = tmp_rz;
-      res1[RDAE_QUAD] = 0;
-      arg1[RDAE_RX] = rx0;
-      arg1[RDAE_RZ] = 0; // arg[INTEGRATOR_RZ0] is a guess, no dependency
-      g_.rev(arg1, res1, iw, w, 0);
+      res1[DE_RODE] = tmp_rx;
+      res1[DE_RALG] = tmp_rz;
+      res1[DE_RQUAD] = 0;
+      arg1[DE_RX] = rx0;
+      arg1[DE_RZ] = 0; // arg[INTEGRATOR_RZ0] is a guess, no dependency
+      oracle_.rev(arg1, res1, iw, w, 0);
     }
 
     // Get dependencies from forward quadratures
-    fill(res1, res1+DAE_NUM_OUT, static_cast<bvec_t*>(0));
-    fill(arg1, arg1+DAE_NUM_IN, static_cast<bvec_t*>(0));
-    res1[DAE_QUAD] = qf;
-    arg1[DAE_X] = tmp_x;
-    arg1[DAE_Z] = tmp_z;
-    arg1[DAE_P] = p;
-    if (qf && nq_>0) f_.rev(arg1, res1, iw, w, 0);
+    fill_n(res1, DE_NUM_OUT, nullptr);
+    fill_n(arg1, DE_NUM_IN, nullptr);
+    res1[DE_QUAD] = qf;
+    arg1[DE_X] = tmp_x;
+    arg1[DE_Z] = tmp_z;
+    arg1[DE_P] = p;
+    if (qf && nq_>0) oracle_.rev(arg1, res1, iw, w, 0);
 
     // Propagate interdependencies
     casadi_assert(!linsol_f_.is_null());
     fill_n(w, nx_+nz_, 0);
     linsol_f_.linsol_spsolve(w, tmp_x, true);
-    copy(w, w+nx_+nz_, tmp_x);
+    copy_n(w, nx_+nz_, tmp_x);
 
     // Direct dependency x0 -> xf
     if (x0) for (int i=0; i<nx_; ++i) x0[i] |= tmp_x[i];
 
     // Indirect dependency through f
-    res1[DAE_ODE] = tmp_x;
-    res1[DAE_ALG] = tmp_z;
-    res1[DAE_QUAD] = 0;
-    arg1[DAE_X] = x0;
-    arg1[DAE_Z] = 0; // arg[INTEGRATOR_Z0] is a guess, no dependency
-    f_.rev(arg1, res1, iw, w, 0);
+    res1[DE_ODE] = tmp_x;
+    res1[DE_ALG] = tmp_z;
+    res1[DE_QUAD] = 0;
+    arg1[DE_X] = x0;
+    arg1[DE_Z] = 0; // arg[INTEGRATOR_Z0] is a guess, no dependency
+    oracle_.rev(arg1, res1, iw, w, 0);
 
     log("Integrator::spAdj", "end");
   }
