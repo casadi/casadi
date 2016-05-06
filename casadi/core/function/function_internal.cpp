@@ -350,7 +350,7 @@ namespace casadi {
   void FunctionInternal::finalize() {
     if (jit_) {
       CodeGenerator gen("jit_tmp");
-      gen.add(function());
+      gen.add(self());
       compiler_ = Importer(gen.generate(), compilerplugin_, jit_options_);
 
       // Try to load with simplified syntax
@@ -468,7 +468,7 @@ namespace casadi {
                  {"jit", jit_},
                  {"compiler", compilerplugin_},
                  {"jit_options", jit_options_},
-                 {"derivative_of", function()}};
+                 {"derivative_of", self()}};
     return getGradient(ss.str(), iind, oind, opts);
   }
 
@@ -495,7 +495,7 @@ namespace casadi {
                  {"jit", jit_},
                  {"compiler", compilerplugin_},
                  {"jit_options", jit_options_},
-                 {"derivative_of", function()}};
+                 {"derivative_of", self()}};
     return getTangent(ss.str(), iind, oind, opts);
   }
 
@@ -545,7 +545,7 @@ namespace casadi {
 
     // Wrap the function
     vector<MX> arg = mx_in();
-    vector<MX> res = function()(arg);
+    vector<MX> res = self()(arg);
     return Function("wrap_" + name_, arg, res, opts);
   }
 
@@ -582,7 +582,7 @@ namespace casadi {
   }
 
   std::vector<MX> FunctionInternal::symbolicOutput(const std::vector<MX>& arg) {
-    return function()(arg);
+    return self()(arg);
   }
 
   /// \cond INTERNAL
@@ -1479,7 +1479,7 @@ namespace casadi {
                    {"jit", jit_},
                    {"compiler", compilerplugin_},
                    {"jit_options", jit_options_},
-                   {"derivative_of", function()}};
+                   {"derivative_of", self()}};
       Function ret = getJacobian(ss.str(), iind, oind, compact, symmetric, opts);
 
       // Save in cache
@@ -1566,7 +1566,7 @@ namespace casadi {
                  {"jit", jit_},
                  {"compiler", compilerplugin_},
                  {"jit_options", jit_options_},
-                 {"derivative_of", function()}};
+                 {"derivative_of", self()}};
 
     // Return value
     casadi_assert(get_n_forward()>0);
@@ -1659,7 +1659,7 @@ namespace casadi {
                  {"jit", jit_},
                  {"compiler", compilerplugin_},
                  {"jit_options", jit_options_},
-                 {"derivative_of", function()}};
+                 {"derivative_of", self()}};
 
     // Return value
     casadi_assert(get_n_forward()>0);
@@ -1747,7 +1747,7 @@ namespace casadi {
                  {"jit", jit_},
                  {"compiler", compilerplugin_},
                  {"jit_options", jit_options_},
-                 {"derivative_of", function()}};
+                 {"derivative_of", self()}};
 
     // Return value
     casadi_assert(get_n_reverse()>0);
@@ -1840,7 +1840,7 @@ namespace casadi {
                  {"jit", jit_},
                  {"compiler", compilerplugin_},
                  {"jit_options", jit_options_},
-                 {"derivative_of", function()}};
+                 {"derivative_of", self()}};
 
     // Return value
     casadi_assert(get_n_reverse()>0);
@@ -1986,7 +1986,7 @@ namespace casadi {
   }
 
   std::vector<MX> FunctionInternal::create_call(const std::vector<MX>& arg) {
-    return Call::create(function(), arg);
+    return Call::create(self(), arg);
   }
 
   Function FunctionInternal::
@@ -2006,7 +2006,7 @@ namespace casadi {
       Dict opts;
       opts["input_scheme"] = ischeme_;
       opts["output_scheme"] = std::vector<std::string>(1, "jac");
-      opts["derivative_of"] = function();
+      opts["derivative_of"] = self();
 
       Function ret = getFullJacobian(name, opts);
 
@@ -2058,7 +2058,7 @@ namespace casadi {
       }
 
       // Evaluate symbolically
-      resv = function()(argv);
+      resv = self()(argv);
     }
 
     // Reuse the same output, if possible
@@ -3060,10 +3060,10 @@ namespace casadi {
     // Call the internal function
     Function ms;
     if (reduce_in.size()>0) {
-      ms = function().
+      ms = self().
         map("mapsum", parallelization, n, reduce_in, std::vector<int>());
     } else {
-      ms = function().map("map", parallelization, n);
+      ms = self().map("map", parallelization, n);
     }
     // Call the internal function
     return ms(x);
@@ -3092,7 +3092,7 @@ namespace casadi {
       }
     }
 
-    Function ms = function().map("mapsum", parallelization, n, reduce_in, range(n_out()));
+    Function ms = self().map("mapsum", parallelization, n, reduce_in, range(n_out()));
 
     // Call the internal function
     return ms(x);

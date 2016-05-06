@@ -93,7 +93,7 @@ namespace casadi {
     virtual void finalize();
 
     /** \brief Get a public class instance */
-    Function function() const { return shared_from_this<Function>();}
+    Function self() const { return shared_from_this<Function>();}
 
     // Factory
     virtual Function factory(const std::string& name,
