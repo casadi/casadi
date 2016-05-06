@@ -77,7 +77,7 @@ namespace casadi {
                     const Dict& opts=Dict(), bool reg=true);
 
     /** Register the function for evaluation and statistics gathering */
-    void register_function(const Function& fcn);
+    void register_function(const std::string& fname, const Function& fcn);
 
     // Calculate an oracle function
     int calc_function(OracleMemory* m, const std::string& fcn,
@@ -89,6 +89,9 @@ namespace casadi {
 
     // Get a dependency function
     virtual const Function& dependency(const std::string &name) const;
+
+    // Check if a particular dependency exists
+    virtual bool has_dependency(const std::string& fname) const;
 
     /** \brief Export / Generate C code for the generated functions */
     virtual void generate_dependencies(const std::string& fname, const Dict& opts);

@@ -1287,6 +1287,10 @@ namespace casadi {
     return (*this)->dependency(name);
   }
 
+  bool Function::has_dependency(const std::string& fname) const {
+    return (*this)->has_dependency(fname);
+  }
+
   Function Function::oracle() const {
     return (*this)->oracle();
   }

@@ -1046,6 +1046,9 @@ namespace casadi {
     // Get a dependency function
     Function dependency(const std::string &name) const;
 
+    // Check if a particular dependency exists
+    bool has_dependency(const std::string& fname) const;
+
     /// Access rhs function for a rootfinder
     Function rootfinder_fun();
 

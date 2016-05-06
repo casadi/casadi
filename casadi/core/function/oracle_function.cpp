@@ -46,13 +46,14 @@ namespace casadi {
                                    const Dict& opts, bool reg) {
     // Generate the function
     Function ret = oracle_.factory(fname, s_in, s_out, aux, opts);
-    if (reg) register_function(ret);
+    if (reg) register_function(fname, ret);
     return ret;
   }
 
-  void OracleFunction::register_function(const Function& fcn) {
-    auto res = all_functions_.insert(make_pair(fcn.name(), fcn));
-    casadi_assert_message(res.second, "Duplicate function " + fcn.name());
+  void OracleFunction::
+  register_function(const std::string& fname, const Function& fcn) {
+    auto res = all_functions_.insert(make_pair(fname, fcn));
+    casadi_assert_message(res.second, "Duplicate function " + fname);
     alloc(fcn);
   }
 
@@ -303,6 +304,10 @@ namespace casadi {
     casadi_assert_message(it!=all_functions_.end(),
       "No function \"" + name + "\" in " + this->name());
     return it->second;
+  }
+
+  bool OracleFunction::has_dependency(const std::string& fname) const {
+    return all_functions_.find(fname) != all_functions_.end();
   }
 
 

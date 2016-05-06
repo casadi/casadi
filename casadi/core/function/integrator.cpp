@@ -295,10 +295,10 @@ namespace casadi {
 
     // Form a linear solver for the sparsity propagation
     linsol_f_ = linsol("linsol_f", "none", sp_jac_dae(), 1);
-    register_function(linsol_f_);
+    register_function("linsol_f", linsol_f_);
     if (nrx_>0) {
       linsol_g_ = linsol("linsol_g", "none", sp_jac_rdae(), 1);
-      register_function(linsol_g_);
+      register_function("linsol_g", linsol_g_);
     }
 
     // Allocate sufficiently large work vectors

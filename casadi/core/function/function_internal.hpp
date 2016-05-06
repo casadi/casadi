@@ -108,6 +108,9 @@ namespace casadi {
     // Get a dependency function
     virtual const Function& dependency(const std::string &name) const;
 
+    // Check if a particular dependency exists
+    virtual bool has_dependency(const std::string& fname) const {return false;}
+
     /** \brief Which variables enter nonlinearly */
     virtual std::vector<bool> nl_var(const std::string& s_in,
                                      const std::vector<std::string>& s_out) const;
