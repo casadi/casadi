@@ -397,233 +397,75 @@ namespace casadi {
   }
 
   template<typename MatType>
-  map<string, MatType> Integrator::aug_adj(int nadj, AugOffset& offset) {
+  map<string, MatType> Integrator::aug_adj(int nadj) {
     log("Integrator::aug_adj", "call");
+    // Get input expressions
+    vector<MatType> arg = MatType::get_input(oracle_);
+    vector<MatType> aug_x, aug_z, aug_p, aug_rx, aug_rz, aug_rp;
+    MatType aug_t = arg.at(DE_T);
+    aug_x.push_back(arg.at(DE_X));
+    aug_z.push_back(arg.at(DE_Z));
+    aug_p.push_back(arg.at(DE_P));
+    aug_rx.push_back(arg.at(DE_RX));
+    aug_rz.push_back(arg.at(DE_RZ));
+    aug_rp.push_back(arg.at(DE_RP));
 
-    // Return object
+    // Get output expressions
+    vector<MatType> res = oracle_(arg);
+    vector<MatType> aug_ode, aug_alg, aug_quad, aug_rode, aug_ralg, aug_rquad;
+    aug_ode.push_back(res.at(DE_ODE));
+    aug_alg.push_back(res.at(DE_ALG));
+    aug_quad.push_back(res.at(DE_QUAD));
+    aug_rode.push_back(res.at(DE_RODE));
+    aug_ralg.push_back(res.at(DE_RALG));
+    aug_rquad.push_back(res.at(DE_RQUAD));
+
+    // Zero of time dimension
+    MatType zero_t = MatType::zeros(t());
+
+    // Reverse mode directional derivatives
+    vector<vector<MatType>> seed(nadj, vector<MatType>(DE_NUM_OUT));
+    for (int d=0; d<nadj; ++d) {
+      string pref = "aug" + to_string(d) + "_";
+      aug_rx.push_back(seed[d][DE_ODE] = MatType::sym(pref + "ode", x()));
+      aug_rz.push_back(seed[d][DE_ALG] = MatType::sym(pref + "alg", z()));
+      aug_rp.push_back(seed[d][DE_QUAD] = MatType::sym(pref + "quad", q()));
+      aug_x.push_back(seed[d][DE_RODE] = MatType::sym(pref + "rode", rx()));
+      aug_z.push_back(seed[d][DE_RALG] = MatType::sym(pref + "ralg", rz()));
+      aug_p.push_back(seed[d][DE_RQUAD] = MatType::sym(pref + "rquad", rq()));
+    }
+
+    // Calculate directional derivatives
+    vector<vector<MatType>> sens;
+    oracle_.reverse(arg, res, seed, sens, true);
+
+    // Collect sensitivity equations
+    casadi_assert(sens.size()==nadj);
+    for (int d=0; d<nadj; ++d) {
+      casadi_assert(sens[d].size()==DE_NUM_IN);
+      aug_rode.push_back(project(sens[d][DE_X], x()));
+      aug_ralg.push_back(project(sens[d][DE_Z], z()));
+      aug_rquad.push_back(project(sens[d][DE_P], p()));
+      aug_ode.push_back(project(sens[d][DE_RX], rx()));
+      aug_alg.push_back(project(sens[d][DE_RZ], rz()));
+      aug_quad.push_back(project(sens[d][DE_RP], rp()));
+    }
+
+    // Construct return object
     map<string, MatType> ret;
-
-    // Calculate offsets
-    offset = getAugOffset(0, nadj);
-
-    // Create augmented problem
-    MatType aug_t = MatType::sym("aug_t", t());
-    MatType aug_x = MatType::sym("aug_x", x().size1(), offset.x.back());
-    MatType aug_z = MatType::sym("aug_z", std::max(z().size1(), rz().size1()), offset.z.back());
-    MatType aug_p = MatType::sym("aug_p", std::max(p().size1(), rp().size1()), offset.p.back());
-    MatType aug_rx = MatType::sym("aug_rx", size1_in(INTEGRATOR_X0), offset.rx.back());
-    MatType aug_rz = MatType::sym("aug_rz", std::max(z().size1(), rz().size1()), offset.rz.back());
-    MatType aug_rp = MatType::sym("aug_rp", std::max(q().size1(), rp().size1()), offset.rp.back());
-
-    // Split up the augmented vectors
-    vector<MatType> aug_x_split = horzsplit(aug_x, offset.x);
-    auto aug_x_split_it = aug_x_split.begin();
-    vector<MatType> aug_z_split = horzsplit(aug_z, offset.z);
-    auto aug_z_split_it = aug_z_split.begin();
-    vector<MatType> aug_p_split = horzsplit(aug_p, offset.p);
-    auto aug_p_split_it = aug_p_split.begin();
-    vector<MatType> aug_rx_split = horzsplit(aug_rx, offset.rx);
-    auto aug_rx_split_it = aug_rx_split.begin();
-    vector<MatType> aug_rz_split = horzsplit(aug_rz, offset.rz);
-    auto aug_rz_split_it = aug_rz_split.begin();
-    vector<MatType> aug_rp_split = horzsplit(aug_rp, offset.rp);
-    auto aug_rp_split_it = aug_rp_split.begin();
-
-    // Temporary vector
-    vector<MatType> tmp;
-
-    // Zero with the dimension of t
-    MatType zero_t = DM::zeros(aug_t.sparsity());
-
-    // The DAE being constructed
-    vector<MatType> ode, alg, quad, rode, ralg, rquad;
-
-    // Forward derivatives of f
-    vector<MatType> f_arg;
-    tmp.resize(DAE_NUM_IN);
-    fill(tmp.begin(), tmp.end(), MatType());
-
-    // Collect arguments for calling d
-    tmp[DAE_T] = aug_t;
-    if ( nx_>0) tmp[DAE_X] = *aug_x_split_it++;
-    if ( nz_>0) tmp[DAE_Z] = *aug_z_split_it++;
-    if ( np_>0) tmp[DAE_P] = *aug_p_split_it++;
-    f_arg.insert(f_arg.end(), tmp.begin(), tmp.end());
-
-    // Call d
-    vector<MatType> f_res = f_(f_arg);
-    auto res_it = f_res.begin();
-
-    // Collect right-hand-sides
-    tmp.resize(DAE_NUM_OUT);
-    fill(tmp.begin(), tmp.end(), MatType());
-    copy(res_it, res_it+tmp.size(), tmp.begin());
-    res_it += tmp.size();
-    if ( nx_>0) ode.push_back(tmp[DAE_ODE]);
-    if ( nz_>0) alg.push_back(tmp[DAE_ALG]);
-    if ( nq_>0) quad.push_back(tmp[DAE_QUAD]);
-
-    // Consistency check
-    casadi_assert(res_it==f_res.end());
-
-    vector<MatType> g_arg, g_res;
-    if (!g_.is_null()) {
-
-      // Forward derivatives of g
-      tmp.resize(RDAE_NUM_IN);
-      fill(tmp.begin(), tmp.end(), MatType());
-
-      // Reset iterators
-      aug_x_split_it = aug_x_split.begin();
-      aug_z_split_it = aug_z_split.begin();
-      aug_p_split_it = aug_p_split.begin();
-
-      // Collect arguments for calling d
-      tmp[RDAE_T] = aug_t;
-      if ( nx_>0) tmp[RDAE_X] = *aug_x_split_it++;
-      if ( nz_>0) tmp[RDAE_Z] = *aug_z_split_it++;
-      if ( np_>0) tmp[RDAE_P] = *aug_p_split_it++;
-      if (nrx_>0) tmp[RDAE_RX] = *aug_rx_split_it++;
-      if (nrz_>0) tmp[RDAE_RZ] = *aug_rz_split_it++;
-      if (nrp_>0) tmp[RDAE_RP] = *aug_rp_split_it++;
-      g_arg.insert(g_arg.end(), tmp.begin(), tmp.end());
-
-      // Call d
-      g_res = g_(g_arg);
-      res_it = g_res.begin();
-
-      // Collect right-hand-sides
-      tmp.resize(RDAE_NUM_OUT);
-      fill(tmp.begin(), tmp.end(), MatType());
-      copy(res_it, res_it+tmp.size(), tmp.begin());
-      res_it += tmp.size();
-      if (nrx_>0) rode.push_back(tmp[RDAE_ODE]);
-      if (nrz_>0) ralg.push_back(tmp[RDAE_ALG]);
-      if (nrq_>0) rquad.push_back(tmp[RDAE_QUAD]);
-
-      // Consistency check
-      casadi_assert(res_it==g_res.end());
-    }
-
-    // Collect arguments for calling d
-    f_arg.insert(f_arg.end(), f_res.begin(), f_res.end());
-    tmp.resize(DAE_NUM_OUT);
-    fill(tmp.begin(), tmp.end(), MatType());
-    for (int dir=0; dir<nadj; ++dir) {
-      if ( nx_>0) tmp[DAE_ODE] = *aug_rx_split_it++;
-      if ( nz_>0) tmp[DAE_ALG] = *aug_rz_split_it++;
-      if ( nq_>0) tmp[DAE_QUAD] = *aug_rp_split_it++;
-      f_arg.insert(f_arg.end(), tmp.begin(), tmp.end());
-    }
-
-    // Call der
-    Function d1 = f_.reverse(nadj);
-    vector<MatType> res = d1(f_arg);
-    res_it = res.begin();
-
-    // Record locations in augg for later
-    int rode_ind = rode.size();
-    int ralg_ind = ralg.size();
-    int rquad_ind = rquad.size();
-
-    // Collect right-hand-sides
-    tmp.resize(DAE_NUM_IN);
-    for (int dir=0; dir<nadj; ++dir) {
-      copy(res_it, res_it+tmp.size(), tmp.begin());
-      res_it += tmp.size();
-      if ( nx_>0) rode.push_back(tmp[DAE_X]);
-      if ( nz_>0) ralg.push_back(tmp[DAE_Z]);
-      if ( np_>0) rquad.push_back(tmp[DAE_P]);
-    }
-
-    // Consistency check
-    casadi_assert(res_it==res.end());
-
-    if (!g_.is_null()) {
-      // Adjoint derivatives of g
-
-      // Collect arguments for calling der
-      g_arg.insert(g_arg.end(), g_res.begin(), g_res.end());
-      tmp.resize(RDAE_NUM_OUT);
-      fill(tmp.begin(), tmp.end(), MatType());
-      for (int dir=0; dir<nadj; ++dir) {
-        if (nrx_>0) tmp[RDAE_ODE] = *aug_x_split_it++;
-        if (nrz_>0) tmp[RDAE_ALG] = *aug_z_split_it++;
-        if (nrq_>0) tmp[RDAE_QUAD] = *aug_p_split_it++;
-        g_arg.insert(g_arg.end(), tmp.begin(), tmp.end());
-      }
-
-      // Call der
-      d1 = g_.reverse(nadj);
-      vector<MatType> res = d1(g_arg);
-      res_it = res.begin();
-
-      // Collect right-hand-sides
-      tmp.resize(RDAE_NUM_IN);
-      for (int dir=0; dir<nadj; ++dir) {
-        copy(res_it, res_it+tmp.size(), tmp.begin());
-        res_it += tmp.size();
-        if ( nx_>0) rode[rode_ind++] += tmp[RDAE_X];
-        if ( nz_>0) ralg[ralg_ind++] += tmp[RDAE_Z];
-        if ( np_>0) rquad[rquad_ind++] += tmp[RDAE_P];
-      }
-
-      // Consistency check
-      casadi_assert(rode_ind == rode.size());
-      casadi_assert(ralg_ind == ralg.size());
-      casadi_assert(rquad_ind == rquad.size());
-
-      // Remove the dependency of rx, rz, rp in the forward integration (see Joel's thesis)
-      if (nrx_>0) g_arg[RDAE_RX] = MatType::zeros(g_arg[RDAE_RX].sparsity());
-      if (nrz_>0) g_arg[RDAE_RZ] = MatType::zeros(g_arg[RDAE_RZ].sparsity());
-      if (nrp_>0) g_arg[RDAE_RP] = MatType::zeros(g_arg[RDAE_RP].sparsity());
-
-      // Call der again
-      res = d1(g_arg);
-      res_it = res.begin();
-
-      // Collect right-hand-sides and add contribution to the forward integration
-      tmp.resize(RDAE_NUM_IN);
-      for (int dir=0; dir<nadj; ++dir) {
-        copy(res_it, res_it+tmp.size(), tmp.begin());
-        res_it += tmp.size();
-        if (nrx_>0) ode.push_back(tmp[RDAE_RX]);
-        if (nrz_>0) alg.push_back(tmp[RDAE_RZ]);
-        if (nrp_>0) quad.push_back(tmp[RDAE_RP]);
-      }
-
-      // Consistency check
-      casadi_assert(res_it==res.end());
-    }
-
-    // Form the augmented forward integration
     ret["t"] = aug_t;
-    ret["x"] = aug_x;
-    ret["z"] = aug_z;
-    ret["p"] = aug_p;
-    if (!ode.empty()) ret["ode"] = densify(horzcat(ode));
-    if (!alg.empty()) ret["alg"] = densify(horzcat(alg));
-    if (!quad.empty()) ret["quad"] = densify(horzcat(quad));
-
-    // Form the augmented backward integration function
-    if (!rode.empty()) {
-      ret["rx"] = aug_rx;
-      ret["rz"] = aug_rz;
-      ret["rp"] = aug_rp;
-      if (!rode.empty()) ret["rode"] = densify(horzcat(rode));
-      if (!ralg.empty()) ret["ralg"] = densify(horzcat(ralg));
-      if (!rquad.empty()) ret["rquad"] = densify(horzcat(rquad));
-    }
-
-    // Consistency check
-    casadi_assert(aug_x_split_it == aug_x_split.end());
-    casadi_assert(aug_z_split_it == aug_z_split.end());
-    casadi_assert(aug_p_split_it == aug_p_split.end());
-    casadi_assert(aug_rx_split_it == aug_rx_split.end());
-    casadi_assert(aug_rz_split_it == aug_rz_split.end());
-    casadi_assert(aug_rp_split_it == aug_rp_split.end());
-
-    // Return functions
+    ret["x"] = horzcat(aug_x);
+    ret["z"] = horzcat(aug_z);
+    ret["p"] = horzcat(aug_p);
+    ret["ode"] = horzcat(aug_ode);
+    ret["alg"] = horzcat(aug_alg);
+    ret["quad"] = horzcat(aug_quad);
+    ret["rx"] = horzcat(aug_rx);
+    ret["rz"] = horzcat(aug_rz);
+    ret["rp"] = horzcat(aug_rp);
+    ret["rode"] = horzcat(aug_rode);
+    ret["ralg"] = horzcat(aug_ralg);
+    ret["rquad"] = horzcat(aug_rquad);
     return ret;
   }
 
@@ -993,14 +835,11 @@ namespace casadi {
 
     // Create integrator for augmented DAE
     Function aug_int;
-    AugOffset offset;
-    if (f_.is_a("sxfunction")) {
-      SXDict aug_dae = aug_adj<SX>(nadj, offset);
-      aug_int = integrator(ss.str(), plugin_name(), aug_dae, aug_opts);
+    AugOffset offset = getAugOffset(0, nadj);
+    if (oracle_.is_a("sxfunction")) {
+      aug_int = integrator(ss.str(), plugin_name(), aug_adj<SX>(nadj), aug_opts);
     } else {
-      casadi_assert(f_.is_a("mxfunction"));
-      MXDict aug_dae = aug_adj<MX>(nadj, offset);
-      aug_int = integrator(ss.str(), plugin_name(), aug_dae, aug_opts);
+      aug_int = integrator(ss.str(), plugin_name(), aug_adj<MX>(nadj), aug_opts);
     }
 
     // All inputs of the return function

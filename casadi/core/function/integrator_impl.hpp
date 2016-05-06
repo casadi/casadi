@@ -144,14 +144,11 @@ namespace casadi {
     /** \brief Set solver specific options to generated augmented integrators */
     virtual Dict getDerivativeOptions(bool fwd);
 
-    /** \brief Generate a augmented DAE system with \a nfwd forward sensitivities  */
-    template<typename MatType>
-      std::map<std::string, MatType> aug_fwd(int nfwd);
+    /** \brief Generate a augmented DAE system with \a nfwd forward sensitivities */
+    template<typename MatType> std::map<std::string, MatType> aug_fwd(int nfwd);
 
-    /** \brief Generate a augmented DAE system with \a nfwd forward sensitivities
-    * and \a nadj adjoint sensitivities */
-    template<typename MatType>
-      std::map<std::string, MatType> aug_adj(int nadj, AugOffset& offset);
+    /** \brief Generate a augmented DAE system with \a nadj adjoint sensitivities */
+    template<typename MatType> std::map<std::string, MatType> aug_adj(int nadj);
 
     /// Get offsets in augmented problem
     AugOffset getAugOffset(int nfwd, int nadj);
