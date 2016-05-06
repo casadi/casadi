@@ -168,7 +168,7 @@ namespace casadi {
     grad_f_fcn_ = create_function("nlp_grad_f", {"x", "p"}, {"f", "grad:f:x"});
     jac_g_fcn_ = create_function("nlp_jac_g", {"x", "p"}, {"g", "jac:g:x"});
     if (exact_hessian_) {
-      hess_l_fcn_ = create_function("nlp_jac_f", {"x", "p", "lam:f", "lam:g"},
+      hess_l_fcn_ = create_function("nlp_hess_l", {"x", "p", "lam:f", "lam:g"},
                                     {"sym:hess:gamma:x:x"},
                                     {{"gamma", {"f", "g"}}});
     }
@@ -710,7 +710,7 @@ namespace casadi {
   void Sqpmethod::eval_h(SqpmethodMemory* m, const double* x, const double* lambda,
                          double sigma, double* H) const {
     try {
-      calc_function(m, hess_l_fcn_, {x, m->p, &sigma, lambda}, {H});
+      calc_function(m, "nlp_hess_l", {x, m->p, &sigma, lambda}, {H});
 
       // Determing regularization parameter with Gershgorin theorem
       if (regularize_) {
@@ -732,7 +732,7 @@ namespace casadi {
       if (ng_==0) return;
 
       // Evaluate the function
-      calc_function(m, g_fcn_, {x, m->p}, {g});
+      calc_function(m, "nlp_g", {x, m->p}, {g});
 
     } catch(exception& ex) {
       userOut<true, PL_WARN>() << "eval_g failed: " << ex.what() << endl;
@@ -747,7 +747,7 @@ namespace casadi {
       if (ng_==0) return;
 
       // Evaluate the function
-      calc_function(m, jac_g_fcn_, {x, m->p}, {g, J});
+      calc_function(m, "nlp_jac_g", {x, m->p}, {g, J});
 
     } catch(exception& ex) {
       userOut<true, PL_WARN>() << "eval_jac_g failed: " << ex.what() << endl;
@@ -760,7 +760,7 @@ namespace casadi {
     try {
 
       // Evaluate the function
-      calc_function(m, grad_f_fcn_, {x, m->p}, {f, grad_f});
+      calc_function(m, "nlp_grad_f", {x, m->p}, {f, grad_f});
 
     } catch(exception& ex) {
       userOut<true, PL_WARN>() << "eval_grad_f failed: " << ex.what() << endl;
@@ -772,7 +772,7 @@ namespace casadi {
     try {
       // Evaluate the function
       double f;
-      calc_function(m, f_fcn_, {x, m->p}, {&f});
+      calc_function(m, "nlp_f", {x, m->p}, {&f});
 
       return f;
     } catch(exception& ex) {

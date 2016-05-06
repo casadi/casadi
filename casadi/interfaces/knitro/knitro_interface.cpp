@@ -91,7 +91,7 @@ namespace casadi {
     fg_fcn_ = create_function("nlp_fg", {"x", "p"}, {"f", "g"});
     gf_jg_fcn_ = create_function("nlp_gf_jg", {"x", "p"}, {"grad:f:x", "jac:g:x"});
     jacg_sp_ = gf_jg_fcn_.sparsity_out(1);
-    hess_l_fcn_ = create_function("nlp_jac_f", {"x", "p", "lam:f", "lam:g"},
+    hess_l_fcn_ = create_function("nlp_hess_l", {"x", "p", "lam:f", "lam:g"},
                                   {"hess:gamma:x:x"},
                                   {{"gamma", {"f", "g"}}});
     hesslag_sp_ = hess_l_fcn_.sparsity_out(0);
@@ -232,7 +232,7 @@ namespace casadi {
     if (m->f) *m->f = f;
 
     // Calculate constraints
-    if (m->g) calc_function(m, fg_fcn_, {m->wx, m->p}, {0, m->g});
+    if (m->g) calc_function(m, "nlp_fg", {m->wx, m->p}, {0, m->g});
 
     // Free memory (move to destructor!)
     KTR_free(&m->kc_handle);
@@ -251,15 +251,15 @@ namespace casadi {
       // Direct to the correct function
       switch (evalRequestCode) {
       case KTR_RC_EVALFC:
-        m->self.calc_function(m, m->self.fg_fcn_, {x, m->p}, {obj, c});
+        m->self.calc_function(m, "nlp_fg", {x, m->p}, {obj, c});
         break;
       case KTR_RC_EVALGA:
-        m->self.calc_function(m, m->self.gf_jg_fcn_, {x, m->p}, {objGrad, jac});
+        m->self.calc_function(m, "nlp_gf_jg", {x, m->p}, {objGrad, jac});
         break;
       case KTR_RC_EVALH:
         {
           double sigma = 1.;
-          if (m->self.calc_function(m, m->self.hess_l_fcn_, {x, m->p, &sigma, lambda}, {hessian})) {
+          if (m->self.calc_function(m, "nlp_hess_l", {x, m->p, &sigma, lambda}, {hessian})) {
             casadi_error("calc_hess_l failed");
           }
         }

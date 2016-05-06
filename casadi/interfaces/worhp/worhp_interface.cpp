@@ -115,7 +115,7 @@ namespace casadi {
     grad_f_fcn_ = create_function("nlp_grad_f", {"x", "p"}, {"f", "grad:f:x"});
     jac_g_fcn_ = create_function("nlp_jac_g", {"x", "p"}, {"g", "jac:g:x"});
     jacg_sp_ = jac_g_fcn_.sparsity_out(1);
-    hess_l_fcn_ = create_function("nlp_jac_f", {"x", "p", "lam:f", "lam:g"},
+    hess_l_fcn_ = create_function("nlp_hess_l", {"x", "p", "lam:f", "lam:g"},
                                   {"transpose:hess:gamma:x:x"},
                                   {{"gamma", {"f", "g"}}});
     hesslag_sp_ = hess_l_fcn_.sparsity_out(0);
@@ -351,30 +351,30 @@ namespace casadi {
       }
 
       if (GetUserAction(&m->worhp_c, evalF)) {
-        calc_function(m, f_fcn_, {m->worhp_o.X, m->p}, {&m->worhp_o.F});
+        calc_function(m, "nlp_f", {m->worhp_o.X, m->p}, {&m->worhp_o.F});
         if (m->f) *m->f = m->worhp_o.F; // Store cost, before scaling
         m->worhp_o.F *= m->worhp_w.ScaleObj;
         DoneUserAction(&m->worhp_c, evalF);
       }
 
       if (GetUserAction(&m->worhp_c, evalG)) {
-        calc_function(m, g_fcn_, {m->worhp_o.X, m->p}, {m->worhp_o.G});
+        calc_function(m, "nlp_g", {m->worhp_o.X, m->p}, {m->worhp_o.G});
         DoneUserAction(&m->worhp_c, evalG);
       }
 
       if (GetUserAction(&m->worhp_c, evalDF)) {
-        calc_function(m, grad_f_fcn_, {m->worhp_o.X, m->p}, {0, m->worhp_w.DF.val});
+        calc_function(m, "nlp_grad_f", {m->worhp_o.X, m->p}, {0, m->worhp_w.DF.val});
         casadi_scal(nx_, m->worhp_w.ScaleObj, m->worhp_w.DF.val);
         DoneUserAction(&m->worhp_c, evalDF);
       }
 
       if (GetUserAction(&m->worhp_c, evalDG)) {
-        calc_function(m, jac_g_fcn_, {m->worhp_o.X, m->p}, {0, m->worhp_w.DG.val});
+        calc_function(m, "nlp_jac_g", {m->worhp_o.X, m->p}, {0, m->worhp_w.DG.val});
         DoneUserAction(&m->worhp_c, evalDG);
       }
 
       if (GetUserAction(&m->worhp_c, evalHM)) {
-        calc_function(m, hess_l_fcn_, {m->worhp_o.X, m->p, &m->worhp_w.ScaleObj, m->worhp_o.Mu},
+        calc_function(m, "nlp_hess_l", {m->worhp_o.X, m->p, &m->worhp_w.ScaleObj, m->worhp_o.Mu},
                       {m->worhp_w.HM.val});
         // Diagonal values
         double *dval = m->w;

@@ -80,7 +80,7 @@ namespace casadi {
     void register_function(const Function& fcn);
 
     // Calculate an oracle function
-    int calc_function(OracleMemory* m, const Function& fcn,
+    int calc_function(OracleMemory* m, const std::string& fcn,
                       std::initializer_list<const double*> arg,
                       std::initializer_list<double*> res) const;
 

@@ -56,20 +56,23 @@ namespace casadi {
     alloc(fcn);
   }
 
-  int OracleFunction::calc_function(OracleMemory* m, const Function& fcn,
+  int OracleFunction::calc_function(OracleMemory* m, const std::string& fcn,
                             std::initializer_list<const double*> arg,
                             std::initializer_list<double*> res) const {
     // Respond to a possible Crl+C signals
     InterruptHandler::check();
 
+    // Get function
+    const Function& f = dependency(fcn);
+
     // Get statistics structure
-    FStats& fstats = m->fstats.at(fcn.name());
+    FStats& fstats = m->fstats.at(fcn);
 
     // Prepare stats, start timer
     fstats.tic();
 
     // Number of inputs and outputs
-    int n_in = fcn.n_in(), n_out = fcn.n_out();
+    int n_in = f.n_in(), n_out = f.n_out();
 
     // Input buffers
     fill_n(m->arg, n_in, nullptr);
@@ -85,21 +88,21 @@ namespace casadi {
 
     // Evaluate memory-less
     try {
-      fcn(m->arg, m->res, m->iw, m->w, 0);
+      f(m->arg, m->res, m->iw, m->w, 0);
     } catch(exception& ex) {
       // Fatal error
       userOut<true, PL_WARN>()
-        << name() << ":" << fcn.name() << " failed:" << ex.what() << endl;
+        << name() << ":" << fcn << " failed:" << ex.what() << endl;
       return 1;
     }
 
     // Make sure not NaN or Inf
     for (int i=0; i<n_out; ++i) {
       if (!m->res[i]) continue;
-      if (!all_of(m->res[i], m->res[i]+fcn.nnz_out(i), [](double v) { return isfinite(v);})) {
+      if (!all_of(m->res[i], m->res[i]+f.nnz_out(i), [](double v) { return isfinite(v);})) {
         userOut<true, PL_WARN>()
-          << name() << ":" << fcn.name() << " failed: NaN or Inf detected for output "
-          << fcn.name_out(i) << endl;
+          << name() << ":" << fcn << " failed: NaN or Inf detected for output "
+          << f.name_out(i) << endl;
         return -1;
       }
     }
