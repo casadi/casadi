@@ -1041,13 +1041,13 @@ namespace casadi {
     DM linsol_cholesky(bool tr=false, int mem=0) const;
 
     // Get a list of all functions
-    std::vector<std::string> dependency() const;
+    std::vector<std::string> get_function() const;
 
     // Get a dependency function
-    Function dependency(const std::string &name) const;
+    Function get_function(const std::string &name) const;
 
     // Check if a particular dependency exists
-    bool has_dependency(const std::string& fname) const;
+    bool has_function(const std::string& fname) const;
 
     /// Access rhs function for a rootfinder
     Function rootfinder_fun();

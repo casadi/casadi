@@ -3204,13 +3204,13 @@ namespace casadi {
     return f.factory(name, s_in, s_out, aux, opts);
   }
 
-  std::vector<std::string> FunctionInternal::dependency() const {
+  std::vector<std::string> FunctionInternal::get_function() const {
     // No functions
     return std::vector<std::string>();
   }
 
-  const Function& FunctionInternal::dependency(const std::string &name) const {
-    casadi_error("'dependency' not defined for " + type_name());
+  const Function& FunctionInternal::get_function(const std::string &name) const {
+    casadi_error("'get_function' not defined for " + type_name());
     static Function singleton;
     return singleton;
   }

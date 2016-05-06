@@ -103,13 +103,13 @@ namespace casadi {
                              const Dict& opts) const;
 
     // Get list of dependency functions
-    virtual std::vector<std::string> dependency() const;
+    virtual std::vector<std::string> get_function() const;
 
     // Get a dependency function
-    virtual const Function& dependency(const std::string &name) const;
+    virtual const Function& get_function(const std::string &name) const;
 
     // Check if a particular dependency exists
-    virtual bool has_dependency(const std::string& fname) const {return false;}
+    virtual bool has_function(const std::string& fname) const {return false;}
 
     /** \brief Which variables enter nonlinearly */
     virtual std::vector<bool> nl_var(const std::string& s_in,

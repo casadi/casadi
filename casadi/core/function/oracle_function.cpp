@@ -43,15 +43,15 @@ namespace casadi {
                                    const std::vector<std::string>& s_in,
                                    const std::vector<std::string>& s_out,
                                    const Function::AuxOut& aux,
-                                   const Dict& opts, bool reg) {
+                                   const Dict& opts) {
     // Generate the function
     Function ret = oracle_.factory(fname, s_in, s_out, aux, opts);
-    if (reg) register_function(fname, ret);
+    set_function(fname, ret);
     return ret;
   }
 
   void OracleFunction::
-  register_function(const std::string& fname, const Function& fcn) {
+  set_function(const std::string& fname, const Function& fcn) {
     auto res = all_functions_.insert(make_pair(fname, fcn));
     casadi_assert_message(res.second, "Duplicate function " + fname);
     alloc(fcn);
@@ -64,7 +64,7 @@ namespace casadi {
     InterruptHandler::check();
 
     // Get function
-    const Function& f = dependency(fcn);
+    const Function& f = get_function(fcn);
 
     // Get statistics structure
     FStats& fstats = m->fstats.at(fcn);
@@ -292,21 +292,21 @@ namespace casadi {
     }
   }
 
-  std::vector<std::string> OracleFunction::dependency() const {
+  std::vector<std::string> OracleFunction::get_function() const {
     std::vector<std::string> ret;
     ret.reserve(all_functions_.size());
     for (auto&& e : all_functions_) ret.push_back(e.first);
     return ret;
   }
 
-  const Function& OracleFunction::dependency(const std::string &name) const {
+  const Function& OracleFunction::get_function(const std::string &name) const {
     auto it = all_functions_.find(name);
     casadi_assert_message(it!=all_functions_.end(),
       "No function \"" + name + "\" in " + this->name());
     return it->second;
   }
 
-  bool OracleFunction::has_dependency(const std::string& fname) const {
+  bool OracleFunction::has_function(const std::string& fname) const {
     return all_functions_.find(fname) != all_functions_.end();
   }
 

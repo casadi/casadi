@@ -154,17 +154,17 @@ namespace casadi {
         Function f = op.second;
         casadi_assert(f.n_in()==4);
         casadi_assert(f.n_out()==1);
-        register_function("nlp_hess_l", f);
+        set_function("nlp_hess_l", f);
       } else if (op.first=="jac_g") {
         Function f = op.second;
         casadi_assert(f.n_in()==2);
         casadi_assert(f.n_out()==2);
-        register_function("nlp_jac_g", f);
+        set_function("nlp_jac_g", f);
       } else if (op.first=="grad_f") {
         Function f = op.second;
         casadi_assert(f.n_in()==2);
         casadi_assert(f.n_out()==2);
-        register_function("nlp_grad_f", f);
+        set_function("nlp_grad_f", f);
       }
     }
 
@@ -178,21 +178,21 @@ namespace casadi {
     // Setup NLP functions
     create_function("nlp_f", {"x", "p"}, {"f"});
     create_function("nlp_g", {"x", "p"}, {"g"});
-    if (!has_dependency("nlp_grad_f")) {
+    if (!has_function("nlp_grad_f")) {
       create_function("nlp_grad_f", {"x", "p"}, {"f", "grad:f:x"});
     }
-    if (!has_dependency("nlp_jac_g")) {
+    if (!has_function("nlp_jac_g")) {
       create_function("nlp_jac_g", {"x", "p"}, {"g", "jac:g:x"});
     }
-    jacg_sp_ = dependency("nlp_jac_g").sparsity_out(1);
+    jacg_sp_ = get_function("nlp_jac_g").sparsity_out(1);
 
     // Allocate temporary work vectors
     if (exact_hessian_) {
-      if (!has_dependency("nlp_hess_l")) {
+      if (!has_function("nlp_hess_l")) {
         create_function("nlp_hess_l", {"x", "p", "lam:f", "lam:g"},
                         {"hess:gamma:x:x"}, {{"gamma", {"f", "g"}}});
       }
-      hesslag_sp_ = dependency("nlp_hess_l").sparsity_out(0);
+      hesslag_sp_ = get_function("nlp_hess_l").sparsity_out(0);
     } else if (pass_nonlinear_variables_) {
       nl_ex_ = oracle_.nl_var("x", {"f", "g"});
     }
