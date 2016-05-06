@@ -186,6 +186,9 @@ namespace casadi {
       std::vector<double> tmp(NV_DATA_S(v), NV_DATA_S(v)+NV_LENGTH_S(v));
       userOut() << id << " = " << tmp << std::endl;
     }
+
+    /// Continuous time dynamics
+    Function f_, g_;
   };
 
   // Check if N_Vector is regular

@@ -96,6 +96,10 @@ namespace casadi {
   void IdasInterface::init(const Dict& opts) {
     log("IdasInterface::init", "begin");
 
+    f_ = create_function("f", {"x", "z", "p", "t"}, {"ode", "alg", "quad"});
+    g_ = create_function("g", {"rx", "rz", "rp", "x", "z", "p", "t"},
+                              {"rode", "ralg", "rquad"});
+
     // Call the base class init
     SundialsInterface::init(opts);
 

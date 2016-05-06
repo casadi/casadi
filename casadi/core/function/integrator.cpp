@@ -262,14 +262,6 @@ namespace casadi {
     // Replace MX oracle with SX oracle?
     if (expand) this->expand();
 
-    // Create functions for the forward and reverse problem
-    f_ = create_function("f", {"x", "z", "p", "t"}, {"ode", "alg", "quad"});
-    g_ = create_function("g", {"rx", "rz", "rp", "x", "z", "p", "t"},
-                        {"rode", "ralg", "rquad"});
-
-    // For sparsity pattern propagation
-    alloc(oracle_);
-
     // Store a copy of the options, for creating augmented integrators
     opts_ = opts;
 
@@ -283,6 +275,9 @@ namespace casadi {
 
     // Call the base class method
     FunctionInternal::init(opts);
+
+    // For sparsity pattern propagation
+    alloc(oracle_);
 
     // Get dimensions
     nx_ = x().nnz();

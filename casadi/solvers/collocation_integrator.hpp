@@ -103,6 +103,8 @@ namespace casadi {
     /// A documentation string
     static const std::string meta_doc;
 
+    /// Continuous time dynamics
+    Function f_, g_;
   };
 
 } // namespace casadi

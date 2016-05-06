@@ -170,6 +170,10 @@ namespace casadi {
     // Call the base class method
     Integrator::init(opts);
 
+    f_ = create_function("f", {"x", "z", "p", "t"}, {"ode", "alg", "quad"});
+    g_ = create_function("g", {"rx", "rz", "rp", "x", "z", "p", "t"},
+                              {"rode", "ralg", "rquad"});
+
     // Default options
     abstol_ = 1e-8;
     reltol_ = 1e-6;
@@ -287,7 +291,7 @@ namespace casadi {
     }
 
     // No Jacobian of g if g doesn't exist
-    if (g_.is_null()) {
+    if (nrx_==0) {
       exact_jacobianB_ = false;
     }
 
@@ -385,7 +389,7 @@ namespace casadi {
     }
 
     // Create a backwards Jacobian if requested
-    if (exact_jacobianB_ && !g_.is_null()) jacB_ = getJacB();
+    if (exact_jacobianB_ && nrx_>0) jacB_ = getJacB();
 
     if (!jacB_.is_null()) {
       alloc(jacB_);

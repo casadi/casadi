@@ -197,12 +197,6 @@ namespace casadi {
     /// One step
     Function onestep_;
 
-    /// ODE/DAE forward integration function
-    Function f_;
-
-    /// ODE/DAE backward integration function, if any
-    Function g_;
-
     /// Integrator for sparsity pattern propagation
     Function linsol_f_, linsol_g_;
 
