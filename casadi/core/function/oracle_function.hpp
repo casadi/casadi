@@ -54,7 +54,7 @@ namespace casadi {
     Function oracle_;
 
     // All NLP functions
-    std::vector<Function> all_functions_;
+    std::map<std::string, Function> all_functions_;
   public:
     /** \brief  Constructor */
     OracleFunction(const std::string& name, const Function& oracle);
@@ -83,6 +83,12 @@ namespace casadi {
     int calc_function(OracleMemory* m, const Function& fcn,
                       std::initializer_list<const double*> arg,
                       std::initializer_list<double*> res) const;
+
+    // Get list of dependency functions
+    virtual std::vector<std::string> dependency() const;
+
+    // Get a dependency function
+    virtual const Function& dependency(const std::string &name) const;
 
     /** \brief Export / Generate C code for the generated functions */
     virtual void generate_dependencies(const std::string& fname, const Dict& opts);

@@ -293,6 +293,9 @@ namespace casadi {
                      const AuxOut& aux=AuxOut(),
                      const Dict& opts=Dict()) const;
 
+    /** \brief Get oracle */
+    virtual Function oracle() const;
+
     /** \brief Which variables enter nonlinearly */
     std::vector<bool> nl_var(const std::string& s_in,
                              const std::vector<std::string>& s_out) const;
@@ -1037,6 +1040,12 @@ namespace casadi {
      */
     DM linsol_cholesky(bool tr=false, int mem=0) const;
 
+    // Get a list of all functions
+    std::vector<std::string> dependency() const;
+
+    // Get a dependency function
+    Function dependency(const std::string &name) const;
+
     /// Access rhs function for a rootfinder
     Function rootfinder_fun();
 
@@ -1046,8 +1055,15 @@ namespace casadi {
     /// Access linear solver of a rootfinder
     Function rootfinder_linsol();
 
-    /// Get the DAE for an integrator
-    Function integrator_dae();
+#ifdef WITH_DEPRECATED_FEATURES
+    /** \brief [DEPRECATED] Get the DAE for an integrator
+      To generate a function with the legacy syntax:
+      oracle().factory("f", {"x", "z", "p", "t"}, {"ode", "alg", "quad"})
+    */
+    Function integrator_dae() {
+      return oracle().factory("f", {"x", "z", "p", "t"}, {"ode", "alg", "quad"});
+    }
+#endif // WITH_DEPRECATED_FEATURES
 
     /** Generate native code in the interfaced language for debugging */
     void conic_debug(const std::string &filename) const;

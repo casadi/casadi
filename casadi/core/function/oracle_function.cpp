@@ -51,11 +51,8 @@ namespace casadi {
   }
 
   void OracleFunction::register_function(const Function& fcn) {
-    // Make sure that the function names are unique
-    for (const Function& f : all_functions_) casadi_assert(fcn.name()!=f.name());
-
-    // Add to the list
-    all_functions_.push_back(fcn);
+    auto res = all_functions_.insert(make_pair(fcn.name(), fcn));
+    casadi_assert_message(res.second, "Duplicate function " + fcn.name());
     alloc(fcn);
   }
 
@@ -117,7 +114,7 @@ namespace casadi {
   void OracleFunction::generate_dependencies(const std::string& fname, const Dict& opts) {
     CodeGenerator gen(fname, opts);
     gen.add(oracle_);
-    for (const Function& f : all_functions_) gen.add(f);
+    for (auto&& e : all_functions_) gen.add(e.second);
     gen.generate();
   }
 
@@ -286,9 +283,23 @@ namespace casadi {
     auto m = static_cast<OracleMemory*>(mem);
 
     // Create statistics
-    for (const Function& f : all_functions_) {
-      m->fstats[f.name()] = FStats();
+    for (auto&& e : all_functions_) {
+      m->fstats[e.first] = FStats();
     }
+  }
+
+  std::vector<std::string> OracleFunction::dependency() const {
+    std::vector<std::string> ret;
+    ret.reserve(all_functions_.size());
+    for (auto&& e : all_functions_) ret.push_back(e.first);
+    return ret;
+  }
+
+  const Function& OracleFunction::dependency(const std::string &name) const {
+    auto it = all_functions_.find(name);
+    casadi_assert_message(it!=all_functions_.end(),
+      "No function \"" + name + "\" in " + this->name());
+    return it->second;
   }
 
 

@@ -3204,6 +3204,17 @@ namespace casadi {
     return f.factory(name, s_in, s_out, aux, opts);
   }
 
+  std::vector<std::string> FunctionInternal::dependency() const {
+    // No functions
+    return std::vector<std::string>();
+  }
+
+  const Function& FunctionInternal::dependency(const std::string &name) const {
+    casadi_error("'dependency' not defined for " + type_name());
+    static Function singleton;
+    return singleton;
+  }
+
   vector<bool> FunctionInternal::
   nl_var(const string& s_in, const vector<string>& s_out) const {
     casadi_error("'nl_var' not defined for " + type_name());

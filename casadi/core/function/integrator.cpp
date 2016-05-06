@@ -59,13 +59,6 @@ namespace casadi {
     return ret;
   }
 
-  Function Function::integrator_dae() {
-    casadi_assert(!is_null());
-    Integrator* n = dynamic_cast<Integrator*>(get());
-    casadi_assert_message(n!=0, "Not an integrator");
-    return n->f_;
-  }
-
   vector<string> integrator_in() {
     vector<string> ret(integrator_n_in());
     for (size_t i=0; i<ret.size(); ++i) ret[i]=integrator_in(i);
@@ -307,8 +300,10 @@ namespace casadi {
 
     // Form a linear solver for the sparsity propagation
     linsol_f_ = linsol("linsol_f", "none", sp_jac_dae(), 1);
-    if (!g_.is_null()) {
+    register_function(linsol_f_);
+    if (nrx_>0) {
       linsol_g_ = linsol("linsol_g", "none", sp_jac_rdae(), 1);
+      register_function(linsol_g_);
     }
 
     // Allocate sufficiently large work vectors
@@ -582,7 +577,7 @@ namespace casadi {
       fill_n(tmp_z, nz_, 0);
     }
 
-    if (!g_.is_null()) {
+    if (nrx_>0) {
       // Work vectors
       bvec_t *tmp_rx = w; w += nrx_;
       bvec_t *tmp_rz = w; w += nrz_;

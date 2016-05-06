@@ -1279,4 +1279,16 @@ namespace casadi {
     return (*this)->nl_var(s_in, s_out);
   }
 
+  std::vector<std::string> Function::dependency() const {
+    return (*this)->dependency();
+  }
+
+  Function Function::dependency(const std::string &name) const {
+    return (*this)->dependency(name);
+  }
+
+  Function Function::oracle() const {
+    return (*this)->oracle();
+  }
+
 } // namespace casadi
