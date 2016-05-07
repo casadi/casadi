@@ -77,7 +77,10 @@ namespace casadi {
                     const Dict& opts=Dict());
 
     /** Register the function for evaluation and statistics gathering */
-    void set_function(const std::string& fname, const Function& fcn);
+    void set_function(const Function& fcn, const std::string& fname);
+
+    /** Register the function for evaluation and statistics gathering */
+    void set_function(const Function& fcn) { set_function(fcn, fcn.name()); }
 
     // Calculate an oracle function
     int calc_function(OracleMemory* m, const std::string& fcn,

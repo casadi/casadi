@@ -197,9 +197,6 @@ namespace casadi {
     /// One step
     Function onestep_;
 
-    /// Integrator for sparsity pattern propagation
-    Function linsol_f_, linsol_g_;
-
     /// Options
     bool print_stats_;
 

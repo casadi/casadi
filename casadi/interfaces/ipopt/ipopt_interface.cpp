@@ -154,17 +154,17 @@ namespace casadi {
         Function f = op.second;
         casadi_assert(f.n_in()==4);
         casadi_assert(f.n_out()==1);
-        set_function("nlp_hess_l", f);
+        set_function(f, "nlp_hess_l");
       } else if (op.first=="jac_g") {
         Function f = op.second;
         casadi_assert(f.n_in()==2);
         casadi_assert(f.n_out()==2);
-        set_function("nlp_jac_g", f);
+        set_function(f, "nlp_jac_g");
       } else if (op.first=="grad_f") {
         Function f = op.second;
         casadi_assert(f.n_in()==2);
         casadi_assert(f.n_out()==2);
-        set_function("nlp_grad_f", f);
+        set_function(f, "nlp_grad_f");
       }
     }
 

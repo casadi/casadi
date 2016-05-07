@@ -46,12 +46,12 @@ namespace casadi {
                                    const Dict& opts) {
     // Generate the function
     Function ret = oracle_.factory(fname, s_in, s_out, aux, opts);
-    set_function(fname, ret);
+    set_function(ret, fname);
     return ret;
   }
 
   void OracleFunction::
-  set_function(const std::string& fname, const Function& fcn) {
+  set_function(const Function& fcn, const std::string& fname) {
     auto res = all_functions_.insert(make_pair(fname, fcn));
     casadi_assert_message(res.second, "Duplicate function " + fname);
     alloc(fcn);
