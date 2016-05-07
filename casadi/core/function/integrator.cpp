@@ -301,12 +301,6 @@ namespace casadi {
       btf_jac_rdae_ = sp_jac_rdae_.btf();
     }
 
-    // Form a linear solver for the sparsity propagation
-    set_function(linsol("linsol_f", "none", sp_jac_dae_, 1));
-    if (nrx_>0) {
-      set_function(linsol("linsol_g", "none", sp_jac_rdae_, 1));
-    }
-
     // Allocate sufficiently large work vectors
     alloc_w(nx_+nz_);
     alloc_w(nrx_+nrz_);
