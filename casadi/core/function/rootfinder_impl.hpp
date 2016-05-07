@@ -120,6 +120,8 @@ namespace casadi {
 
     /// Linear solver
     Function linsol_;
+    Sparsity sp_jac_;
+    Sparsity::Btf btf_jac_;
 
     /// Constraints on decision variables
     std::vector<int> u_c_;

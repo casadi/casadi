@@ -156,6 +156,8 @@ Function Function::rootfinder_fun() {
 
     // Generate Jacobian if not provided
     if (jac_.is_null()) jac_ = oracle_.jacobian(iin_, iout_);
+    sp_jac_ = jac_.sparsity_out(0);
+    btf_jac_ = sp_jac_.btf();
 
     // Check for structural singularity in the Jacobian
     casadi_assert_message(
@@ -240,7 +242,7 @@ Function Function::rootfinder_fun() {
 
     // "Solve" in order to propagate to z
     fill_n(tmp2, n_, 0);
-    linsol_.linsol_spsolve(tmp2, tmp1, false);
+    sp_jac_.spsolve(btf_jac_, tmp2, tmp1, false);
     if (res[iout_]) copy(tmp2, tmp2+n_, res[iout_]);
 
     // Propagate to auxiliary outputs
@@ -279,7 +281,7 @@ Function Function::rootfinder_fun() {
 
     // "Solve" in order to get seed
     fill_n(tmp2, n_, 0);
-    linsol_.linsol_spsolve(tmp2, tmp1, true);
+    sp_jac_.spsolve(btf_jac_, tmp2, tmp1, true);
 
     // Propagate dependencies through the function
     for (int i=0; i<num_out; ++i) res1[i] = 0;
