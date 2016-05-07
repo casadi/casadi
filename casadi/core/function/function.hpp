@@ -1021,7 +1021,6 @@ namespace casadi {
     ///@{
     /// Propagate sparsity through a linear solve
     void linsol_spsolve(bvec_t* X, const bvec_t* B, bool tr=false) const;
-    void linsol_spsolve(DM& X, const DM& B, bool tr=false) const;
     ///@}
 
     /** \brief Solve the system of equations <tt>Lx = b</tt>

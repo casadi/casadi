@@ -120,10 +120,6 @@ namespace casadi {
     (*this)->linsol_spsolve(X, B, tr);
   }
 
-  void Function::linsol_spsolve(DM& X, const DM& B, bool tr) const {
-    (*this)->linsol_spsolve(X, B, tr);
-  }
-
   Linsol::Linsol(const std::string& name, const Sparsity& sparsity, int nrhs)
     : FunctionInternal(name), sparsity_(sparsity), nrhs_(nrhs) {
 
@@ -355,13 +351,6 @@ namespace casadi {
       B += n;
       X += n;
     }
-  }
-
-  void Linsol::
-  linsol_spsolve(DM& X, const DM& B, bool tr) const {
-    bvec_t* X_bvec = reinterpret_cast<bvec_t*>(X.ptr());
-    const bvec_t* B_bvec = reinterpret_cast<const bvec_t*>(B.ptr());
-    linsol_spsolve(X_bvec, B_bvec, tr);
   }
 
   void Linsol::linsol_spsolve(bvec_t* X, const bvec_t* B, bool tr) const {
