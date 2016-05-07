@@ -293,10 +293,18 @@ namespace casadi {
     casadi_assert_warning(oracle_.sparsity_in(DE_X).is_dense(),
                           "Sparse states in integrators are experimental");
 
-    // Form a linear solver for the sparsity propagation
-    set_function(linsol("linsol_f", "none", sp_jac_dae(), 1));
+    // Get the sparsities and BTF factorization of the forward and reverse DAE
+    sp_jac_dae_ = sp_jac_dae();
+    btf_jac_dae_ = sp_jac_dae_.btf();
     if (nrx_>0) {
-      set_function(linsol("linsol_g", "none", sp_jac_rdae(), 1));
+      sp_jac_rdae_ = sp_jac_rdae();
+      btf_jac_rdae_ = sp_jac_rdae_.btf();
+    }
+
+    // Form a linear solver for the sparsity propagation
+    set_function(linsol("linsol_f", "none", sp_jac_dae_, 1));
+    if (nrx_>0) {
+      set_function(linsol("linsol_g", "none", sp_jac_rdae_, 1));
     }
 
     // Allocate sufficiently large work vectors
@@ -484,8 +492,7 @@ namespace casadi {
     // "Solve" in order to resolve interdependencies (cf. Rootfinder)
     copy_n(tmp_x, nx_+nz_, w);
     fill_n(tmp_x, nx_+nz_, 0);
-    casadi_assert(has_function("linsol_f"));
-    get_function("linsol_f").linsol_spsolve(tmp_x, w, false);
+    sp_jac_dae_.spsolve(btf_jac_dae_, tmp_x, w, false);
 
     // Get xf and zf
     if (res[INTEGRATOR_XF]) copy_n(tmp_x, nx_, res[INTEGRATOR_XF]);
@@ -521,8 +528,7 @@ namespace casadi {
       // "Solve" in order to resolve interdependencies (cf. Rootfinder)
       copy_n(tmp_rx, nrx_+nrz_, w);
       fill_n(tmp_rx, nrx_+nrz_, 0);
-      casadi_assert(has_function("linsol_g"));
-      get_function("linsol_g").linsol_spsolve(tmp_rx, w, false);
+      sp_jac_rdae_.spsolve(btf_jac_rdae_, tmp_rx, w, false);
 
       // Get rxf and rzf
       if (res[INTEGRATOR_RXF]) copy_n(tmp_rx, nrx_, res[INTEGRATOR_RXF]);
@@ -609,9 +615,8 @@ namespace casadi {
       oracle_.rev(arg1, res1, iw, w, 0);
 
       // Propagate interdependencies
-      casadi_assert(has_function("linsol_g"));
       fill_n(w, nrx_+nrz_, 0);
-      get_function("linsol_g").linsol_spsolve(w, tmp_rx, true);
+      sp_jac_rdae_.spsolve(btf_jac_rdae_, w, tmp_rx, true);
       copy_n(w, nrx_+nrz_, tmp_rx);
 
       // Direct dependency rx0 -> rxf
@@ -636,9 +641,8 @@ namespace casadi {
     if (qf && nq_>0) oracle_.rev(arg1, res1, iw, w, 0);
 
     // Propagate interdependencies
-    casadi_assert(has_function("linsol_f"));
     fill_n(w, nx_+nz_, 0);
-    get_function("linsol_f").linsol_spsolve(w, tmp_x, true);
+    sp_jac_dae_.spsolve(btf_jac_dae_, w, tmp_x, true);
     copy_n(w, nx_+nz_, tmp_x);
 
     // Direct dependency x0 -> xf

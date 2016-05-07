@@ -159,6 +159,10 @@ namespace casadi {
     /// Create sparsity pattern of the extended Jacobian (backward problem)
     Sparsity sp_jac_rdae();
 
+    // Sparsity pattern of the extended Jacobians
+    Sparsity sp_jac_dae_, sp_jac_rdae_;
+    Sparsity::Btf btf_jac_dae_, btf_jac_rdae_;
+
     // Sparities
     Sparsity t_, x_, z_, p_, q_, rx_, rz_, rp_, rq_;
 
