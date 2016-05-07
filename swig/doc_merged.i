@@ -96,6 +96,8 @@ Print a description of the object.
 
 ";
 
+%feature("docstring") casadi::Callback::has_function "";
+
 %feature("docstring") casadi::Callback::rootfinder_jac "
 
 Access Jacobian of the ths function for a rootfinder.
@@ -514,7 +516,9 @@ matches one of the base classes (default true)
 
 %feature("docstring") casadi::Callback::integrator_dae "
 
-Get the DAE for an integrator.
+[DEPRECATED] Get the DAE for an integrator To generate a function with the
+legacy syntax: oracle().factory(\"f\", {\"x\", \"z\", \"p\", \"t\"},
+{\"ode\", \"alg\", \"quad\"})
 
 ";
 
@@ -727,6 +731,12 @@ Return Jacobian of all input elements with respect to all output elements.
 %feature("docstring") casadi::Callback::printDimensions "
 
 [DEPRECATED] printDimensions has been renamed print_dimensions
+
+";
+
+%feature("docstring") casadi::Callback::oracle "
+
+Get oracle.
 
 ";
 
@@ -993,6 +1003,8 @@ Set a function that calculates nfwd forward derivatives NOTE: Does not take
 ownership, only weak references to the derivatives are kept internally.
 
 ";
+
+%feature("docstring") casadi::Callback::get_function "";
 
 %feature("docstring") casadi::Callback::get_name_out "
 
@@ -1794,6 +1806,8 @@ Name of the function.
 
 ";
 
+%feature("docstring") casadi::Function::has_function "";
+
 %feature("docstring") casadi::Function::checkInputs "[INTERNAL]  Check if
 the numerical values of the supplied bounds make sense.
 
@@ -1846,9 +1860,17 @@ Get sparsity of a given output.
 
 ";
 
+%feature("docstring") casadi::Function::oracle "
+
+Get oracle.
+
+";
+
 %feature("docstring") casadi::Function::integrator_dae "
 
-Get the DAE for an integrator.
+[DEPRECATED] Get the DAE for an integrator To generate a function with the
+legacy syntax: oracle().factory(\"f\", {\"x\", \"z\", \"p\", \"t\"},
+{\"ode\", \"alg\", \"quad\"})
 
 ";
 
@@ -2089,6 +2111,8 @@ Get of number of input elements For a particular input or for all for all of
 the inputs.
 
 ";
+
+%feature("docstring") casadi::Function::get_function "";
 
 %feature("docstring") casadi::Function::is_null "
 

@@ -1,3 +1,6 @@
+%exception  casadi::Function::integrator_dae() {
+ CATCH_OR_NOT(DEPRECATED_MSG("") $action)
+}
 %exception  casadi::Function::printDimensions(std::ostream &stream=casadi::userOut()) const  {
  CATCH_OR_NOT(DEPRECATED_MSG("") $action)
 }

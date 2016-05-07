@@ -150,6 +150,9 @@ Print a description of the object.
 
 ";
 
+%feature("docstring")  casadi::Function::has_function(const std::string
+&fname) const  " ";
+
 %feature("docstring")  casadi::Function::rootfinder_jac() "
 
 Access Jacobian of the ths function for a rootfinder.
@@ -874,7 +877,9 @@ matches one of the base classes (default true)
 
 %feature("docstring")  casadi::Function::integrator_dae() "
 
-Get the DAE for an integrator.
+[DEPRECATED] Get the DAE for an integrator To generate a function with the
+legacy syntax: oracle().factory(\"f\", {\"x\", \"z\", \"p\", \"t\"},
+{\"ode\", \"alg\", \"quad\"})
 
 ";
 
@@ -1243,6 +1248,12 @@ Return Jacobian of all input elements with respect to all output elements.
 &stream=casadi::userOut()) const  "
 
 [DEPRECATED] printDimensions has been renamed print_dimensions
+
+";
+
+%feature("docstring")  casadi::Function::oracle() const  "
+
+Get oracle.
 
 ";
 
@@ -1733,6 +1744,11 @@ Set a function that calculates nfwd forward derivatives NOTE: Does not take
 ownership, only weak references to the derivatives are kept internally.
 
 ";
+
+%feature("docstring")  casadi::Function::get_function() const  " ";
+
+%feature("docstring")  casadi::Function::get_function(const std::string
+&name) const  " ";
 
 %feature("docstring")  casadi::Callback::get_name_out(int i) "
 
@@ -2657,6 +2673,9 @@ Name of the function.
 
 ";
 
+%feature("docstring")  casadi::Function::has_function(const std::string
+&fname) const  " ";
+
 %feature("docstring")  casadi::Function::checkInputs() const  " [INTERNAL]
 Check if the numerical values of the supplied bounds make sense.
 
@@ -2788,9 +2807,17 @@ Get sparsity of a given output.
 
 ";
 
+%feature("docstring")  casadi::Function::oracle() const  "
+
+Get oracle.
+
+";
+
 %feature("docstring")  casadi::Function::integrator_dae() "
 
-Get the DAE for an integrator.
+[DEPRECATED] Get the DAE for an integrator To generate a function with the
+legacy syntax: oracle().factory(\"f\", {\"x\", \"z\", \"p\", \"t\"},
+{\"ode\", \"alg\", \"quad\"})
 
 ";
 
@@ -3209,6 +3236,11 @@ Get of number of input elements For a particular input or for all for all of
 the inputs.
 
 ";
+
+%feature("docstring")  casadi::Function::get_function() const  " ";
+
+%feature("docstring")  casadi::Function::get_function(const std::string
+&name) const  " ";
 
 %feature("docstring")  casadi::SharedObject::is_null() const  "
 
