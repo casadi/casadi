@@ -3912,4 +3912,67 @@ namespace casadi {
     return vector<int>(row, row+nnz());
   }
 
+  void SparsityInternal::
+  spsolve(const Sparsity::Btf& btf, bvec_t* X, const bvec_t* B, bool tr) const {
+    const int* colind = this->colind();
+    const int* row = this->row();
+
+    if (!tr) {
+      for (int b=0; b<btf.nb; ++b) { // loop over the blocks forward
+
+        // Get dependencies from all right-hand-sides in the block ...
+        bvec_t block_dep = 0;
+        for (int el=btf.rowblock[b]; el<btf.rowblock[b+1]; ++el) {
+          int rr = btf.rowperm[el];
+          block_dep |= B[rr];
+        }
+
+        // ... as well as all other variables in the block
+        for (int el=btf.colblock[b]; el<btf.colblock[b+1]; ++el) {
+          int cc = btf.colperm[el];
+          block_dep |= X[cc];
+        }
+
+        // Propagate ...
+        for (int el=btf.colblock[b]; el<btf.colblock[b+1]; ++el) {
+          int cc = btf.colperm[el];
+
+          // ... to all variables in the block ...
+          X[cc] |= block_dep;
+
+          // ... as well as to other variables which depends on variables in the block
+          for (int k=colind[cc]; k<colind[cc+1]; ++k) {
+            int rr=row[k];
+            X[rr] |= block_dep;
+          }
+        }
+      }
+
+    } else { // transpose
+      for (int b=btf.nb-1; b>=0; --b) { // loop over the blocks backward
+
+        // Get dependencies ...
+        bvec_t block_dep = 0;
+        for (int el=btf.colblock[b]; el<btf.colblock[b+1]; ++el) {
+          int cc = btf.colperm[el];
+
+          // .. from all right-hand-sides in the block ...
+          block_dep |= B[cc];
+
+          // ... as well as from all depending variables ...
+          for (int k=colind[cc]; k<colind[cc+1]; ++k) {
+            int rr=row[k];
+            block_dep |= X[rr];
+          }
+        }
+
+        // Propagate to all variables in the block
+        for (int el=btf.rowblock[b]; el<btf.rowblock[b+1]; ++el) {
+          int rr = btf.rowperm[el];
+          X[rr] |= block_dep;
+        }
+      }
+    }
+  }
+
 } // namespace casadi

@@ -438,6 +438,9 @@ namespace casadi {
 
     /// Generate a script for Matlab or Octave which visualizes the sparsity using the spy command
     void spy_matlab(const std::string& mfile) const;
+
+    /// Propagate sparsity through a linear solve
+    void spsolve(const Sparsity::Btf& btf, bvec_t* X, const bvec_t* B, bool tr) const;
 };
 
 } // namespace casadi

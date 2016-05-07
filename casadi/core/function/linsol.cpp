@@ -365,68 +365,8 @@ namespace casadi {
   }
 
   void Linsol::linsol_spsolve(bvec_t* X, const bvec_t* B, bool tr) const {
-
     const Sparsity& A_sp = sparsity_in(LINSOL_A);
-    const int* A_colind = A_sp.colind();
-    const int* A_row = A_sp.row();
-    int nb = btf_.nb; // number of blocks
-
-    if (!tr) {
-      for (int b=0; b<nb; ++b) { // loop over the blocks forward
-
-        // Get dependencies from all right-hand-sides in the block ...
-        bvec_t block_dep = 0;
-        for (int el=btf_.rowblock[b]; el<btf_.rowblock[b+1]; ++el) {
-          int rr = btf_.rowperm[el];
-          block_dep |= B[rr];
-        }
-
-        // ... as well as all other variables in the block
-        for (int el=btf_.colblock[b]; el<btf_.colblock[b+1]; ++el) {
-          int cc = btf_.colperm[el];
-          block_dep |= X[cc];
-        }
-
-        // Propagate ...
-        for (int el=btf_.colblock[b]; el<btf_.colblock[b+1]; ++el) {
-          int cc = btf_.colperm[el];
-
-          // ... to all variables in the block ...
-          X[cc] |= block_dep;
-
-          // ... as well as to other variables which depends on variables in the block
-          for (int k=A_colind[cc]; k<A_colind[cc+1]; ++k) {
-            int rr=A_row[k];
-            X[rr] |= block_dep;
-          }
-        }
-      }
-
-    } else { // transpose
-      for (int b=nb-1; b>=0; --b) { // loop over the blocks backward
-
-        // Get dependencies ...
-        bvec_t block_dep = 0;
-        for (int el=btf_.colblock[b]; el<btf_.colblock[b+1]; ++el) {
-          int cc = btf_.colperm[el];
-
-          // .. from all right-hand-sides in the block ...
-          block_dep |= B[cc];
-
-          // ... as well as from all depending variables ...
-          for (int k=A_colind[cc]; k<A_colind[cc+1]; ++k) {
-            int rr=A_row[k];
-            block_dep |= X[rr];
-          }
-        }
-
-        // Propagate to all variables in the block
-        for (int el=btf_.rowblock[b]; el<btf_.rowblock[b+1]; ++el) {
-          int rr = btf_.rowperm[el];
-          X[rr] |= block_dep;
-        }
-      }
-    }
+    A_sp.spsolve(btf_, X, B, tr);
   }
 
   void Linsol::linsol_eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem,

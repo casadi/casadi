@@ -570,6 +570,10 @@ namespace casadi {
     return r;
   }
 
+  void Sparsity::spsolve(const Btf& btf, bvec_t* X, const bvec_t* B, bool tr) const {
+    (*this)->spsolve(btf, X, B, tr);
+  }
+
   bool Sparsity::rowsSequential(bool strictly) const {
     return (*this)->rowsSequential(strictly);
   }
