@@ -606,6 +606,17 @@ namespace casadi {
     int scc(std::vector<int>& SWIG_OUTPUT(index),
             std::vector<int>& SWIG_OUTPUT(offset)) const;
 
+#ifndef SWIG
+    /** \brief Structure to hold the block triangular form */
+    struct Btf {
+      int nb;
+      std::vector<int> rowperm, colperm;
+      std::vector<int> rowblock, colblock;
+      std::vector<int> coarse_rowblock, coarse_colblock;
+    };
+#endif // SWIG
+
+    /// @{
     /** \brief Calculate the block triangular form (BTF)
         See Direct Methods for Sparse Linear Systems by Davis (2006).
 
@@ -626,6 +637,10 @@ namespace casadi {
             std::vector<int>& SWIG_OUTPUT(coarse_rowblock),
             std::vector<int>& SWIG_OUTPUT(coarse_colblock),
             int seed=0) const;
+  #ifndef SWIG
+    Btf btf(int seed=0) const;
+  #endif // SWIG
+    /// @}
 
     /** \brief Get the location of all non-zero elements as they would appear in a Dense matrix
         A : DenseMatrix  4 x 3

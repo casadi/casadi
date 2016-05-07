@@ -563,6 +563,13 @@ namespace casadi {
                                       coarse_rowblock, coarse_colblock, seed);
   }
 
+  Sparsity::Btf Sparsity::btf(int seed) const {
+    Btf r;
+    r.nb = btf(r.rowperm, r.colperm, r.rowblock, r.colblock,
+               r.coarse_rowblock, r.coarse_rowblock, seed);
+    return r;
+  }
+
   bool Sparsity::rowsSequential(bool strictly) const {
     return (*this)->rowsSequential(strictly);
   }

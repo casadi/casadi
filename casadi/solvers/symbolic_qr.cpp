@@ -93,17 +93,17 @@ namespace casadi {
     SX A = SX::sym("A", sparsity_in(LINSOL_A));
 
     // Get the inverted column permutation
-    std::vector<int> inv_colperm(colperm_.size());
-    for (int k=0; k<colperm_.size(); ++k)
-      inv_colperm[colperm_[k]] = k;
+    std::vector<int> inv_colperm(btf_.colperm.size());
+    for (int k=0; k<btf_.colperm.size(); ++k)
+      inv_colperm[btf_.colperm[k]] = k;
 
     // Get the inverted row permutation
-    std::vector<int> inv_rowperm(rowperm_.size());
-    for (int k=0; k<rowperm_.size(); ++k)
-      inv_rowperm[rowperm_[k]] = k;
+    std::vector<int> inv_rowperm(btf_.rowperm.size());
+    for (int k=0; k<btf_.rowperm.size(); ++k)
+      inv_rowperm[btf_.rowperm[k]] = k;
 
     // Permute the linear system
-    SX Aperm = A(rowperm_, colperm_);
+    SX Aperm = A(btf_.rowperm, btf_.colperm);
 
     // Generate the QR factorization function
     SX Q1, R1;
@@ -120,7 +120,7 @@ namespace casadi {
     // We have Pb' * Q * R * Px * x = b <=> x = Px' * inv(R) * Q' * Pb * b
 
     // Permute the right hand sides
-    SX bperm = b(rowperm_, Slice());
+    SX bperm = b(btf_.rowperm, Slice());
 
     // Solve the factorized system
     SX xperm = SX::solve(R, mtimes(Q.T(), bperm));
@@ -139,7 +139,7 @@ namespace casadi {
     // <=> x = Pb' * Q * inv(R') * Px * b
 
     // Permute the right hand side
-    bperm = b(colperm_, Slice());
+    bperm = b(btf_.colperm, Slice());
 
     // Solve the factorized system
     xperm = mtimes(Q, SX::solve(R.T(), bperm));

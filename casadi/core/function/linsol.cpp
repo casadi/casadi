@@ -138,8 +138,7 @@ namespace casadi {
                           << " (in stead of "<< sparsity.size2() << ")");
 
     // Calculate the Dulmage-Mendelsohn decomposition
-    std::vector<int> coarse_rowblock, coarse_colblock;
-    sparsity.btf(rowperm_, colperm_, rowblock_, colblock_, coarse_rowblock, coarse_colblock);
+    btf_ = sparsity.btf();
 
     // Number of equations
     neq_ = sparsity.size2();
@@ -370,27 +369,27 @@ namespace casadi {
     const Sparsity& A_sp = sparsity_in(LINSOL_A);
     const int* A_colind = A_sp.colind();
     const int* A_row = A_sp.row();
-    int nb = rowblock_.size()-1; // number of blocks
+    int nb = btf_.nb; // number of blocks
 
     if (!tr) {
       for (int b=0; b<nb; ++b) { // loop over the blocks forward
 
         // Get dependencies from all right-hand-sides in the block ...
         bvec_t block_dep = 0;
-        for (int el=rowblock_[b]; el<rowblock_[b+1]; ++el) {
-          int rr = rowperm_[el];
+        for (int el=btf_.rowblock[b]; el<btf_.rowblock[b+1]; ++el) {
+          int rr = btf_.rowperm[el];
           block_dep |= B[rr];
         }
 
         // ... as well as all other variables in the block
-        for (int el=colblock_[b]; el<colblock_[b+1]; ++el) {
-          int cc = colperm_[el];
+        for (int el=btf_.colblock[b]; el<btf_.colblock[b+1]; ++el) {
+          int cc = btf_.colperm[el];
           block_dep |= X[cc];
         }
 
         // Propagate ...
-        for (int el=colblock_[b]; el<colblock_[b+1]; ++el) {
-          int cc = colperm_[el];
+        for (int el=btf_.colblock[b]; el<btf_.colblock[b+1]; ++el) {
+          int cc = btf_.colperm[el];
 
           // ... to all variables in the block ...
           X[cc] |= block_dep;
@@ -408,8 +407,8 @@ namespace casadi {
 
         // Get dependencies ...
         bvec_t block_dep = 0;
-        for (int el=colblock_[b]; el<colblock_[b+1]; ++el) {
-          int cc = colperm_[el];
+        for (int el=btf_.colblock[b]; el<btf_.colblock[b+1]; ++el) {
+          int cc = btf_.colperm[el];
 
           // .. from all right-hand-sides in the block ...
           block_dep |= B[cc];
@@ -422,8 +421,8 @@ namespace casadi {
         }
 
         // Propagate to all variables in the block
-        for (int el=rowblock_[b]; el<rowblock_[b+1]; ++el) {
-          int rr = rowperm_[el];
+        for (int el=btf_.rowblock[b]; el<btf_.rowblock[b+1]; ++el) {
+          int rr = btf_.rowperm[el];
           X[rr] |= block_dep;
         }
       }

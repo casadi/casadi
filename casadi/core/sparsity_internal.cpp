@@ -3913,5 +3913,3 @@ namespace casadi {
   }
 
 } // namespace casadi
-
-

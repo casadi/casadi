@@ -107,7 +107,7 @@ namespace casadi {
     ///@}
 
     /// Dulmage-Mendelsohn decomposition
-    std::vector<int> rowperm_, colperm_, rowblock_, colblock_;
+    Sparsity::Btf btf_;
 
     /// Get sparsity pattern
     int nrow() const { return size1_in(LINSOL_A);}
