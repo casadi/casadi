@@ -116,10 +116,6 @@ namespace casadi {
     return (*this)->linsol_cholesky(memory(mem), tr);
   }
 
-  void Function::linsol_spsolve(bvec_t* X, const bvec_t* B, bool tr) const {
-    (*this)->linsol_spsolve(X, B, tr);
-  }
-
   Linsol::Linsol(const std::string& name, const Sparsity& sparsity, int nrhs)
     : FunctionInternal(name), sparsity_(sparsity), nrhs_(nrhs) {
 
@@ -306,7 +302,7 @@ namespace casadi {
 
       // Propagate to X
       std::fill(X, X+n, 0);
-      linsol_spsolve(X, tmp, tr);
+      A_sp.spsolve(btf_, X, tmp, tr);
 
       // Continue to the next right-hand-side
       B += n;
@@ -331,7 +327,7 @@ namespace casadi {
     for (int r=0; r<nrhs; ++r) {
       // Solve transposed
       std::fill(tmp, tmp+n, 0);
-      linsol_spsolve(tmp, X, !tr);
+      A_sp.spsolve(btf_, tmp, X, !tr);
 
       // Clear seeds
       std::fill(X, X+n, 0);
@@ -351,11 +347,6 @@ namespace casadi {
       B += n;
       X += n;
     }
-  }
-
-  void Linsol::linsol_spsolve(bvec_t* X, const bvec_t* B, bool tr) const {
-    const Sparsity& A_sp = sparsity_in(LINSOL_A);
-    A_sp.spsolve(btf_, X, B, tr);
   }
 
   void Linsol::linsol_eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem,

@@ -100,11 +100,6 @@ namespace casadi {
     virtual void linsol_sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem,
                               bool tr, int nrhs);
 
-    ///@{
-    /// Propagate sparsity through a linear solve
-    virtual void linsol_spsolve(bvec_t* X, const bvec_t* B, bool tr) const;
-    ///@}
-
     /// Dulmage-Mendelsohn decomposition
     Sparsity::Btf btf_;
 
