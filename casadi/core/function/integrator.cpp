@@ -712,10 +712,8 @@ namespace casadi {
       aug_opts[i.first] = i.second;
     }
 
-    // Temp stringstream
-    string iname = "aug_f" + to_string(nfwd) + name_;
-
     // Create integrator for augmented DAE
+    string iname = "aug_f" + to_string(nfwd) + this->name();
     Function aug_int;
     if (oracle_.is_a("sxfunction")) {
       aug_int = integrator(iname, plugin_name(), aug_fwd<SX>(nfwd), aug_opts);
@@ -728,7 +726,7 @@ namespace casadi {
     ret_in.reserve(INTEGRATOR_NUM_IN*(1+nfwd) + INTEGRATOR_NUM_OUT);
 
     // Augmented state
-    vector<MX> x0_augv, p_augv, z0_augv, rx0_augv, rp_augv, rz0_augv;
+    vector<MX> x0_aug, p_aug, z0_aug, rx0_aug, rp_aug, rz0_aug;
 
     // Add nondifferentiated inputs and forward seeds
     for (int dir=-1; dir<nfwd; ++dir) {
@@ -738,12 +736,12 @@ namespace casadi {
 
       // Augmented problem
       vector<MX> din(INTEGRATOR_NUM_IN);
-      x0_augv.push_back(din[INTEGRATOR_X0] = MX::sym("x0" + suff, x()));
-      p_augv.push_back(din[INTEGRATOR_P] = MX::sym("p" + suff, p()));
-      z0_augv.push_back(din[INTEGRATOR_Z0] = MX::sym("z0" + suff, z()));
-      rx0_augv.push_back(din[INTEGRATOR_RX0] = MX::sym("rx0" + suff, rx()));
-      rp_augv.push_back(din[INTEGRATOR_RP] = MX::sym("rp" + suff, rp()));
-      rz0_augv.push_back(din[INTEGRATOR_RZ0] = MX::sym("rz0" + suff, rz()));
+      x0_aug.push_back(din[INTEGRATOR_X0] = MX::sym("x0" + suff, x()));
+      p_aug.push_back(din[INTEGRATOR_P] = MX::sym("p" + suff, p()));
+      z0_aug.push_back(din[INTEGRATOR_Z0] = MX::sym("z0" + suff, z()));
+      rx0_aug.push_back(din[INTEGRATOR_RX0] = MX::sym("rx0" + suff, rx()));
+      rp_aug.push_back(din[INTEGRATOR_RP] = MX::sym("rp" + suff, rp()));
+      rz0_aug.push_back(din[INTEGRATOR_RZ0] = MX::sym("rz0" + suff, rz()));
       ret_in.insert(ret_in.end(), din.begin(), din.end());
 
       // Dummy outputs
@@ -761,12 +759,12 @@ namespace casadi {
 
     // Call the integrator
     vector<MX> integrator_in(INTEGRATOR_NUM_IN);
-    integrator_in[INTEGRATOR_X0] = horzcat(x0_augv);
-    integrator_in[INTEGRATOR_P] = horzcat(p_augv);
-    integrator_in[INTEGRATOR_Z0] = horzcat(z0_augv);
-    integrator_in[INTEGRATOR_RX0] = horzcat(rx0_augv);
-    integrator_in[INTEGRATOR_RP] = horzcat(rp_augv);
-    integrator_in[INTEGRATOR_RZ0] = horzcat(rz0_augv);
+    integrator_in[INTEGRATOR_X0] = horzcat(x0_aug);
+    integrator_in[INTEGRATOR_P] = horzcat(p_aug);
+    integrator_in[INTEGRATOR_Z0] = horzcat(z0_aug);
+    integrator_in[INTEGRATOR_RX0] = horzcat(rx0_aug);
+    integrator_in[INTEGRATOR_RP] = horzcat(rp_aug);
+    integrator_in[INTEGRATOR_RZ0] = horzcat(rz0_aug);
     vector<MX> integrator_out = aug_int(integrator_in);
 
     // Augmented results
@@ -808,16 +806,13 @@ namespace casadi {
       aug_opts[i.first] = i.second;
     }
 
-    // Temp stringstream
-    stringstream ss;
-    ss << "aug_r" << nadj << name_;
-
     // Create integrator for augmented DAE
+    string iname = "aug_r" + to_string(nadj) + this->name();
     Function aug_int;
     if (oracle_.is_a("sxfunction")) {
-      aug_int = integrator(ss.str(), plugin_name(), aug_adj<SX>(nadj), aug_opts);
+      aug_int = integrator(iname, plugin_name(), aug_adj<SX>(nadj), aug_opts);
     } else {
-      aug_int = integrator(ss.str(), plugin_name(), aug_adj<MX>(nadj), aug_opts);
+      aug_int = integrator(iname, plugin_name(), aug_adj<MX>(nadj), aug_opts);
     }
 
     // All inputs of the return function
@@ -825,44 +820,21 @@ namespace casadi {
     ret_in.reserve(INTEGRATOR_NUM_IN + INTEGRATOR_NUM_OUT*(1+nadj));
 
     // Augmented state
-    vector<MX> x0_augv, p_augv, z0_augv, rx0_augv, rp_augv, rz0_augv;
+    vector<MX> x0_aug, p_aug, z0_aug, rx0_aug, rp_aug, rz0_aug;
 
     // Inputs or forward/adjoint seeds in one direction
-    vector<MX> dd;
-
-    // Add nondifferentiated inputs and forward seeds
-    dd.resize(INTEGRATOR_NUM_IN);
-    fill(dd.begin(), dd.end(), MX());
-
-    // Differential state
-    dd[INTEGRATOR_X0] = MX::sym("x0", x());
-    x0_augv.push_back(dd[INTEGRATOR_X0]);
-
-    // Parameter
-    dd[INTEGRATOR_P] = MX::sym("p", p());
-    p_augv.push_back(dd[INTEGRATOR_P]);
-
-    // Initial guess for algebraic variable
-    dd[INTEGRATOR_Z0] = MX::sym("r0", z());
-    z0_augv.push_back(dd[INTEGRATOR_Z0]);
-
-    // Backward state
-    dd[INTEGRATOR_RX0] = MX::sym("rx0", rx());
-    rx0_augv.push_back(dd[INTEGRATOR_RX0]);
-
-    // Backward parameter
-    dd[INTEGRATOR_RP] = MX::sym("rp", rp());
-    rp_augv.push_back(dd[INTEGRATOR_RP]);
-
-    // Initial guess for backward algebraic variable
-    dd[INTEGRATOR_RZ0] = MX::sym("rz0", rz());
-    rz0_augv.push_back(dd[INTEGRATOR_RZ0]);
-
-    // Add to input vector
+    vector<MX> dd(INTEGRATOR_NUM_IN);
+    x0_aug.push_back(dd[INTEGRATOR_X0] = MX::sym("x0", x()));
+    p_aug.push_back(dd[INTEGRATOR_P] = MX::sym("p", p()));
+    z0_aug.push_back(dd[INTEGRATOR_Z0] = MX::sym("r0", z()));
+    rx0_aug.push_back(dd[INTEGRATOR_RX0] = MX::sym("rx0", rx()));
+    rp_aug.push_back(dd[INTEGRATOR_RP] = MX::sym("rp", rp()));
+    rz0_aug.push_back(dd[INTEGRATOR_RZ0] = MX::sym("rz0", rz()));
     ret_in.insert(ret_in.end(), dd.begin(), dd.end());
 
     // Add dummy inputs (outputs of the nondifferentiated funciton)
     dd.resize(INTEGRATOR_NUM_OUT);
+    fill(dd.begin(), dd.end(), MX());
     dd[INTEGRATOR_XF]  = MX::sym("xf_dummy", Sparsity(x().size()));
     dd[INTEGRATOR_QF]  = MX::sym("qf_dummy", Sparsity(q().size()));
     dd[INTEGRATOR_ZF]  = MX::sym("zf_dummy", Sparsity(z().size()));
@@ -875,55 +847,28 @@ namespace casadi {
     dd.resize(INTEGRATOR_NUM_OUT);
     fill(dd.begin(), dd.end(), MX());
     for (int dir=0; dir<nadj; ++dir) {
+      // Suffix
+      string suff;
+      if (dir>=0) suff = "_" + to_string(dir);
 
-      // Differential states become backward differential state
-      ss.clear();
-      ss << "xf" << "_" << dir;
-      dd[INTEGRATOR_XF] = MX::sym(ss.str(), x());
-      rx0_augv.push_back(dd[INTEGRATOR_XF]);
-
-      // Quadratures become backward parameters
-      ss.clear();
-      ss << "qf" << "_" << dir;
-      dd[INTEGRATOR_QF] = MX::sym(ss.str(), q());
-      rp_augv.push_back(dd[INTEGRATOR_QF]);
-
-      // Algebraic variables become backward algebraic variables
-      ss.clear();
-      ss << "zf" << "_" << dir;
-      dd[INTEGRATOR_ZF] = MX::sym(ss.str(), z());
-      rz0_augv.push_back(dd[INTEGRATOR_ZF]);
-
-      // Backward differential states becomes forward differential states
-      ss.clear();
-      ss << "rxf" << "_" << dir;
-      dd[INTEGRATOR_RXF] = MX::sym(ss.str(), rx());
-      x0_augv.push_back(dd[INTEGRATOR_RXF]);
-
-      // Backward quadratures becomes (forward) parameters
-      ss.clear();
-      ss << "rqf" << "_" << dir;
-      dd[INTEGRATOR_RQF] = MX::sym(ss.str(), rq());
-      p_augv.push_back(dd[INTEGRATOR_RQF]);
-
-      // Backward differential states becomes forward differential states
-      ss.clear();
-      ss << "rzf" << "_" << dir;
-      dd[INTEGRATOR_RZF] = MX::sym(ss.str(), rz());
-      z0_augv.push_back(dd[INTEGRATOR_RZF]);
-
-      // Add to input vector
+      // Augmented problem
+      rx0_aug.push_back(dd[INTEGRATOR_XF] = MX::sym("xf" + suff, x()));
+      rp_aug.push_back(dd[INTEGRATOR_QF] = MX::sym("qf" + suff, q()));
+      rz0_aug.push_back(dd[INTEGRATOR_ZF] = MX::sym("zf" + suff, z()));
+      x0_aug.push_back(dd[INTEGRATOR_RXF] = MX::sym("rxf" + suff, rx()));
+      p_aug.push_back(dd[INTEGRATOR_RQF] = MX::sym("rqf" + suff, rq()));
+      z0_aug.push_back(dd[INTEGRATOR_RZF] = MX::sym("rzf" + suff, rz()));
       ret_in.insert(ret_in.end(), dd.begin(), dd.end());
     }
 
     // Call the integrator
     vector<MX> integrator_in(INTEGRATOR_NUM_IN);
-    integrator_in[INTEGRATOR_X0] = horzcat(x0_augv);
-    integrator_in[INTEGRATOR_P] = horzcat(p_augv);
-    integrator_in[INTEGRATOR_Z0] = horzcat(z0_augv);
-    integrator_in[INTEGRATOR_RX0] = horzcat(rx0_augv);
-    integrator_in[INTEGRATOR_RP] = horzcat(rp_augv);
-    integrator_in[INTEGRATOR_RZ0] = horzcat(rz0_augv);
+    integrator_in[INTEGRATOR_X0] = horzcat(x0_aug);
+    integrator_in[INTEGRATOR_P] = horzcat(p_aug);
+    integrator_in[INTEGRATOR_Z0] = horzcat(z0_aug);
+    integrator_in[INTEGRATOR_RX0] = horzcat(rx0_aug);
+    integrator_in[INTEGRATOR_RP] = horzcat(rp_aug);
+    integrator_in[INTEGRATOR_RZ0] = horzcat(rz0_aug);
     vector<MX> integrator_out = aug_int(integrator_in);
 
     // Augmented results
