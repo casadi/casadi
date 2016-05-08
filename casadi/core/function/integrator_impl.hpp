@@ -151,7 +151,7 @@ namespace casadi {
     template<typename MatType> std::map<std::string, MatType> aug_adj(int nadj);
 
     /// Get offsets in augmented problem
-    AugOffset getAugOffset(int nfwd, int nadj);
+    AugOffset getAugOffset(int nadj);
 
     /// Create sparsity pattern of the extended Jacobian (forward problem)
     Sparsity sp_jac_dae();

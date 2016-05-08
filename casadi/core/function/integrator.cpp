@@ -319,22 +319,22 @@ namespace casadi {
     vector<MatType> arg = MatType::get_input(oracle_);
     vector<MatType> aug_x, aug_z, aug_p, aug_rx, aug_rz, aug_rp;
     MatType aug_t = arg.at(DE_T);
-    aug_x.push_back(arg.at(DE_X));
-    aug_z.push_back(arg.at(DE_Z));
-    aug_p.push_back(arg.at(DE_P));
-    aug_rx.push_back(arg.at(DE_RX));
-    aug_rz.push_back(arg.at(DE_RZ));
-    aug_rp.push_back(arg.at(DE_RP));
+    aug_x.push_back(vec(arg.at(DE_X)));
+    aug_z.push_back(vec(arg.at(DE_Z)));
+    aug_p.push_back(vec(arg.at(DE_P)));
+    aug_rx.push_back(vec(arg.at(DE_RX)));
+    aug_rz.push_back(vec(arg.at(DE_RZ)));
+    aug_rp.push_back(vec(arg.at(DE_RP)));
 
     // Get output expressions
     vector<MatType> res = oracle_(arg);
     vector<MatType> aug_ode, aug_alg, aug_quad, aug_rode, aug_ralg, aug_rquad;
-    aug_ode.push_back(res.at(DE_ODE));
-    aug_alg.push_back(res.at(DE_ALG));
-    aug_quad.push_back(res.at(DE_QUAD));
-    aug_rode.push_back(res.at(DE_RODE));
-    aug_ralg.push_back(res.at(DE_RALG));
-    aug_rquad.push_back(res.at(DE_RQUAD));
+    aug_ode.push_back(vec(res.at(DE_ODE)));
+    aug_alg.push_back(vec(res.at(DE_ALG)));
+    aug_quad.push_back(vec(res.at(DE_QUAD)));
+    aug_rode.push_back(vec(res.at(DE_RODE)));
+    aug_ralg.push_back(vec(res.at(DE_RALG)));
+    aug_rquad.push_back(vec(res.at(DE_RQUAD)));
 
     // Zero of time dimension
     MatType zero_t = MatType::zeros(t());
@@ -344,12 +344,12 @@ namespace casadi {
     for (int d=0; d<nfwd; ++d) {
       seed[d][DE_T] = zero_t;
       string pref = "aug" + to_string(d) + "_";
-      aug_x.push_back(seed[d][DE_X] = MatType::sym(pref + "x", x()));
-      aug_z.push_back(seed[d][DE_Z] = MatType::sym(pref + "z", z()));
-      aug_p.push_back(seed[d][DE_P] = MatType::sym(pref + "p", p()));
-      aug_rx.push_back(seed[d][DE_RX] = MatType::sym(pref + "rx", rx()));
-      aug_rz.push_back(seed[d][DE_RZ] = MatType::sym(pref + "rz", rz()));
-      aug_rp.push_back(seed[d][DE_RP] = MatType::sym(pref + "rp", rp()));
+      aug_x.push_back(vec(seed[d][DE_X] = MatType::sym(pref + "x", x())));
+      aug_z.push_back(vec(seed[d][DE_Z] = MatType::sym(pref + "z", z())));
+      aug_p.push_back(vec(seed[d][DE_P] = MatType::sym(pref + "p", p())));
+      aug_rx.push_back(vec(seed[d][DE_RX] = MatType::sym(pref + "rx", rx())));
+      aug_rz.push_back(vec(seed[d][DE_RZ] = MatType::sym(pref + "rz", rz())));
+      aug_rp.push_back(vec(seed[d][DE_RP] = MatType::sym(pref + "rp", rp())));
     }
 
     // Calculate directional derivatives
@@ -360,12 +360,12 @@ namespace casadi {
     casadi_assert(sens.size()==nfwd);
     for (int d=0; d<nfwd; ++d) {
       casadi_assert(sens[d].size()==DE_NUM_OUT);
-      aug_ode.push_back(project(sens[d][DE_ODE], x()));
-      aug_alg.push_back(project(sens[d][DE_ALG], z()));
-      aug_quad.push_back(project(sens[d][DE_QUAD], q()));
-      aug_rode.push_back(project(sens[d][DE_RODE], rx()));
-      aug_ralg.push_back(project(sens[d][DE_RALG], rz()));
-      aug_rquad.push_back(project(sens[d][DE_RQUAD], rq()));
+      aug_ode.push_back(vec(project(sens[d][DE_ODE], x())));
+      aug_alg.push_back(vec(project(sens[d][DE_ALG], z())));
+      aug_quad.push_back(vec(project(sens[d][DE_QUAD], q())));
+      aug_rode.push_back(vec(project(sens[d][DE_RODE], rx())));
+      aug_ralg.push_back(vec(project(sens[d][DE_RALG], rz())));
+      aug_rquad.push_back(vec(project(sens[d][DE_RQUAD], rq())));
     }
 
     // Construct return object
@@ -393,22 +393,22 @@ namespace casadi {
     vector<MatType> arg = MatType::get_input(oracle_);
     vector<MatType> aug_x, aug_z, aug_p, aug_rx, aug_rz, aug_rp;
     MatType aug_t = arg.at(DE_T);
-    aug_x.push_back(arg.at(DE_X));
-    aug_z.push_back(arg.at(DE_Z));
-    aug_p.push_back(arg.at(DE_P));
-    aug_rx.push_back(arg.at(DE_RX));
-    aug_rz.push_back(arg.at(DE_RZ));
-    aug_rp.push_back(arg.at(DE_RP));
+    aug_x.push_back(vec(arg.at(DE_X)));
+    aug_z.push_back(vec(arg.at(DE_Z)));
+    aug_p.push_back(vec(arg.at(DE_P)));
+    aug_rx.push_back(vec(arg.at(DE_RX)));
+    aug_rz.push_back(vec(arg.at(DE_RZ)));
+    aug_rp.push_back(vec(arg.at(DE_RP)));
 
     // Get output expressions
     vector<MatType> res = oracle_(arg);
     vector<MatType> aug_ode, aug_alg, aug_quad, aug_rode, aug_ralg, aug_rquad;
-    aug_ode.push_back(res.at(DE_ODE));
-    aug_alg.push_back(res.at(DE_ALG));
-    aug_quad.push_back(res.at(DE_QUAD));
-    aug_rode.push_back(res.at(DE_RODE));
-    aug_ralg.push_back(res.at(DE_RALG));
-    aug_rquad.push_back(res.at(DE_RQUAD));
+    aug_ode.push_back(vec(res.at(DE_ODE)));
+    aug_alg.push_back(vec(res.at(DE_ALG)));
+    aug_quad.push_back(vec(res.at(DE_QUAD)));
+    aug_rode.push_back(vec(res.at(DE_RODE)));
+    aug_ralg.push_back(vec(res.at(DE_RALG)));
+    aug_rquad.push_back(vec(res.at(DE_RQUAD)));
 
     // Zero of time dimension
     MatType zero_t = MatType::zeros(t());
@@ -417,12 +417,12 @@ namespace casadi {
     vector<vector<MatType>> seed(nadj, vector<MatType>(DE_NUM_OUT));
     for (int d=0; d<nadj; ++d) {
       string pref = "aug" + to_string(d) + "_";
-      aug_rx.push_back(seed[d][DE_ODE] = MatType::sym(pref + "ode", x()));
-      aug_rz.push_back(seed[d][DE_ALG] = MatType::sym(pref + "alg", z()));
-      aug_rp.push_back(seed[d][DE_QUAD] = MatType::sym(pref + "quad", q()));
-      aug_x.push_back(seed[d][DE_RODE] = MatType::sym(pref + "rode", rx()));
-      aug_z.push_back(seed[d][DE_RALG] = MatType::sym(pref + "ralg", rz()));
-      aug_p.push_back(seed[d][DE_RQUAD] = MatType::sym(pref + "rquad", rq()));
+      aug_rx.push_back(vec(seed[d][DE_ODE] = MatType::sym(pref + "ode", x())));
+      aug_rz.push_back(vec(seed[d][DE_ALG] = MatType::sym(pref + "alg", z())));
+      aug_rp.push_back(vec(seed[d][DE_QUAD] = MatType::sym(pref + "quad", q())));
+      aug_x.push_back(vec(seed[d][DE_RODE] = MatType::sym(pref + "rode", rx())));
+      aug_z.push_back(vec(seed[d][DE_RALG] = MatType::sym(pref + "ralg", rz())));
+      aug_p.push_back(vec(seed[d][DE_RQUAD] = MatType::sym(pref + "rquad", rq())));
     }
 
     // Calculate directional derivatives
@@ -433,29 +433,29 @@ namespace casadi {
     casadi_assert(sens.size()==nadj);
     for (int d=0; d<nadj; ++d) {
       casadi_assert(sens[d].size()==DE_NUM_IN);
-      aug_rode.push_back(project(sens[d][DE_X], x()));
-      aug_ralg.push_back(project(sens[d][DE_Z], z()));
-      aug_rquad.push_back(project(sens[d][DE_P], p()));
-      aug_ode.push_back(project(sens[d][DE_RX], rx()));
-      aug_alg.push_back(project(sens[d][DE_RZ], rz()));
-      aug_quad.push_back(project(sens[d][DE_RP], rp()));
+      aug_rode.push_back(vec(project(sens[d][DE_X], x())));
+      aug_ralg.push_back(vec(project(sens[d][DE_Z], z())));
+      aug_rquad.push_back(vec(project(sens[d][DE_P], p())));
+      aug_ode.push_back(vec(project(sens[d][DE_RX], rx())));
+      aug_alg.push_back(vec(project(sens[d][DE_RZ], rz())));
+      aug_quad.push_back(vec(project(sens[d][DE_RP], rp())));
     }
 
     // Construct return object
     map<string, MatType> ret;
     ret["t"] = aug_t;
-    ret["x"] = horzcat(aug_x);
-    ret["z"] = horzcat(aug_z);
-    ret["p"] = horzcat(aug_p);
-    ret["ode"] = horzcat(aug_ode);
-    ret["alg"] = horzcat(aug_alg);
-    ret["quad"] = horzcat(aug_quad);
-    ret["rx"] = horzcat(aug_rx);
-    ret["rz"] = horzcat(aug_rz);
-    ret["rp"] = horzcat(aug_rp);
-    ret["rode"] = horzcat(aug_rode);
-    ret["ralg"] = horzcat(aug_ralg);
-    ret["rquad"] = horzcat(aug_rquad);
+    ret["x"] = vertcat(aug_x);
+    ret["z"] = vertcat(aug_z);
+    ret["p"] = vertcat(aug_p);
+    ret["ode"] = vertcat(aug_ode);
+    ret["alg"] = vertcat(aug_alg);
+    ret["quad"] = vertcat(aug_quad);
+    ret["rx"] = vertcat(aug_rx);
+    ret["rz"] = vertcat(aug_rz);
+    ret["rp"] = vertcat(aug_rp);
+    ret["rode"] = vertcat(aug_rode);
+    ret["ralg"] = vertcat(aug_ralg);
+    ret["rquad"] = vertcat(aug_rquad);
     return ret;
   }
 
@@ -653,7 +653,7 @@ namespace casadi {
     log("Integrator::sp_rev", "end");
   }
 
-  Integrator::AugOffset Integrator::getAugOffset(int nfwd, int nadj) {
+  Integrator::AugOffset Integrator::getAugOffset(int nadj) {
     // Form return object
     AugOffset ret;
     ret.x.resize(1, 0);
@@ -665,28 +665,26 @@ namespace casadi {
     ret.rq.resize(1, 0);
     ret.rp.resize(1, 0);
 
-    // Count nondifferentiated and forward sensitivities
-    for (int dir=-1; dir<nfwd; ++dir) {
-      ret.x.push_back(x().size2());
-      ret.z.push_back(z().size2());
-      ret.q.push_back(q().size2());
-      ret.p.push_back(p().size2());
-      ret.rx.push_back(rx().size2());
-      ret.rz.push_back(rz().size2());
-      ret.rq.push_back(rq().size2());
-      ret.rp.push_back(rp().size2());
-    }
+    // Count nondifferentiated
+    ret.x.push_back(x().numel());
+    ret.z.push_back(z().numel());
+    ret.q.push_back(q().numel());
+    ret.p.push_back(p().numel());
+    ret.rx.push_back(rx().numel());
+    ret.rz.push_back(rz().numel());
+    ret.rq.push_back(rq().numel());
+    ret.rp.push_back(rp().numel());
 
     // Count adjoint sensitivities
     for (int dir=0; dir<nadj; ++dir) {
-      ret.rx.push_back(x().size2());
-      ret.rz.push_back(z().size2());
-      ret.rq.push_back(p().size2());
-      ret.rp.push_back(q().size2());
-      ret.x.push_back(rx().size2());
-      ret.z.push_back(rz().size2());
-      ret.q.push_back(rp().size2());
-      ret.p.push_back(rq().size2());
+      ret.rx.push_back(x().numel());
+      ret.rz.push_back(z().numel());
+      ret.rq.push_back(p().numel());
+      ret.rp.push_back(q().numel());
+      ret.x.push_back(rx().numel());
+      ret.z.push_back(rz().numel());
+      ret.q.push_back(rp().numel());
+      ret.p.push_back(rq().numel());
     }
 
     // Get cummulative offsets
@@ -736,12 +734,12 @@ namespace casadi {
 
       // Augmented problem
       vector<MX> din(INTEGRATOR_NUM_IN);
-      x0_aug.push_back(din[INTEGRATOR_X0] = MX::sym("x0" + suff, x()));
-      p_aug.push_back(din[INTEGRATOR_P] = MX::sym("p" + suff, p()));
-      z0_aug.push_back(din[INTEGRATOR_Z0] = MX::sym("z0" + suff, z()));
-      rx0_aug.push_back(din[INTEGRATOR_RX0] = MX::sym("rx0" + suff, rx()));
-      rp_aug.push_back(din[INTEGRATOR_RP] = MX::sym("rp" + suff, rp()));
-      rz0_aug.push_back(din[INTEGRATOR_RZ0] = MX::sym("rz0" + suff, rz()));
+      x0_aug.push_back(vec(din[INTEGRATOR_X0] = MX::sym("x0" + suff, x())));
+      p_aug.push_back(vec(din[INTEGRATOR_P] = MX::sym("p" + suff, p())));
+      z0_aug.push_back(vec(din[INTEGRATOR_Z0] = MX::sym("z0" + suff, z())));
+      rx0_aug.push_back(vec(din[INTEGRATOR_RX0] = MX::sym("rx0" + suff, rx())));
+      rp_aug.push_back(vec(din[INTEGRATOR_RP] = MX::sym("rp" + suff, rp())));
+      rz0_aug.push_back(vec(din[INTEGRATOR_RZ0] = MX::sym("rz0" + suff, rz())));
       ret_in.insert(ret_in.end(), din.begin(), din.end());
 
       // Dummy outputs
@@ -766,15 +764,19 @@ namespace casadi {
     integrator_in[INTEGRATOR_RP] = horzcat(rp_aug);
     integrator_in[INTEGRATOR_RZ0] = horzcat(rz0_aug);
     vector<MX> integrator_out = aug_int(integrator_in);
+    for (auto&& e : integrator_out) {
+      // Workaround
+      if (e.size2()!=1+nfwd) e = reshape(e, -1, 1+nfwd);
+    }
 
     // Augmented results
-    AugOffset offset = getAugOffset(nfwd, 0);
-    vector<MX> xf_aug = horzsplit(integrator_out[INTEGRATOR_XF], offset.x);
-    vector<MX> qf_aug = horzsplit(integrator_out[INTEGRATOR_QF], offset.q);
-    vector<MX> zf_aug = horzsplit(integrator_out[INTEGRATOR_ZF], offset.z);
-    vector<MX> rxf_aug = horzsplit(integrator_out[INTEGRATOR_RXF], offset.rx);
-    vector<MX> rqf_aug = horzsplit(integrator_out[INTEGRATOR_RQF], offset.rq);
-    vector<MX> rzf_aug = horzsplit(integrator_out[INTEGRATOR_RZF], offset.rz);
+    vector<int> offset = range(1+nfwd+1);
+    vector<MX> xf_aug = horzsplit(integrator_out[INTEGRATOR_XF], offset);
+    vector<MX> qf_aug = horzsplit(integrator_out[INTEGRATOR_QF], offset);
+    vector<MX> zf_aug = horzsplit(integrator_out[INTEGRATOR_ZF], offset);
+    vector<MX> rxf_aug = horzsplit(integrator_out[INTEGRATOR_RXF], offset);
+    vector<MX> rqf_aug = horzsplit(integrator_out[INTEGRATOR_RQF], offset);
+    vector<MX> rzf_aug = horzsplit(integrator_out[INTEGRATOR_RZF], offset);
 
     // All outputs of the return function
     vector<MX> ret_out;
@@ -783,12 +785,12 @@ namespace casadi {
     // Collect the forward sensitivities
     vector<MX> dd(INTEGRATOR_NUM_IN);
     for (int dir=0; dir<nfwd; ++dir) {
-      dd[INTEGRATOR_XF]  = xf_aug.at(dir+1);
-      dd[INTEGRATOR_QF]  = qf_aug.at(dir+1);
-      dd[INTEGRATOR_ZF]  = zf_aug.at(dir+1);
-      dd[INTEGRATOR_RXF] = rxf_aug.at(dir+1);
-      dd[INTEGRATOR_RQF] = rqf_aug.at(dir+1);
-      dd[INTEGRATOR_RZF] = rzf_aug.at(dir+1);
+      dd[INTEGRATOR_XF]  = reshape(xf_aug.at(dir+1), x().size());
+      dd[INTEGRATOR_QF]  = reshape(qf_aug.at(dir+1), q().size());
+      dd[INTEGRATOR_ZF]  = reshape(zf_aug.at(dir+1), z().size());
+      dd[INTEGRATOR_RXF] = reshape(rxf_aug.at(dir+1), rx().size());
+      dd[INTEGRATOR_RQF] = reshape(rqf_aug.at(dir+1), rq().size());
+      dd[INTEGRATOR_RZF] = reshape(rzf_aug.at(dir+1), rz().size());
       ret_out.insert(ret_out.end(), dd.begin(), dd.end());
     }
     log("Integrator::get_forward", "end");
@@ -824,12 +826,12 @@ namespace casadi {
 
     // Inputs or forward/adjoint seeds in one direction
     vector<MX> dd(INTEGRATOR_NUM_IN);
-    x0_aug.push_back(dd[INTEGRATOR_X0] = MX::sym("x0", x()));
-    p_aug.push_back(dd[INTEGRATOR_P] = MX::sym("p", p()));
-    z0_aug.push_back(dd[INTEGRATOR_Z0] = MX::sym("r0", z()));
-    rx0_aug.push_back(dd[INTEGRATOR_RX0] = MX::sym("rx0", rx()));
-    rp_aug.push_back(dd[INTEGRATOR_RP] = MX::sym("rp", rp()));
-    rz0_aug.push_back(dd[INTEGRATOR_RZ0] = MX::sym("rz0", rz()));
+    x0_aug.push_back(vec(dd[INTEGRATOR_X0] = MX::sym("x0", x())));
+    p_aug.push_back(vec(dd[INTEGRATOR_P] = MX::sym("p", p())));
+    z0_aug.push_back(vec(dd[INTEGRATOR_Z0] = MX::sym("r0", z())));
+    rx0_aug.push_back(vec(dd[INTEGRATOR_RX0] = MX::sym("rx0", rx())));
+    rp_aug.push_back(vec(dd[INTEGRATOR_RP] = MX::sym("rp", rp())));
+    rz0_aug.push_back(vec(dd[INTEGRATOR_RZ0] = MX::sym("rz0", rz())));
     ret_in.insert(ret_in.end(), dd.begin(), dd.end());
 
     // Add dummy inputs (outputs of the nondifferentiated funciton)
@@ -852,33 +854,33 @@ namespace casadi {
       if (dir>=0) suff = "_" + to_string(dir);
 
       // Augmented problem
-      rx0_aug.push_back(dd[INTEGRATOR_XF] = MX::sym("xf" + suff, x()));
-      rp_aug.push_back(dd[INTEGRATOR_QF] = MX::sym("qf" + suff, q()));
-      rz0_aug.push_back(dd[INTEGRATOR_ZF] = MX::sym("zf" + suff, z()));
-      x0_aug.push_back(dd[INTEGRATOR_RXF] = MX::sym("rxf" + suff, rx()));
-      p_aug.push_back(dd[INTEGRATOR_RQF] = MX::sym("rqf" + suff, rq()));
-      z0_aug.push_back(dd[INTEGRATOR_RZF] = MX::sym("rzf" + suff, rz()));
+      rx0_aug.push_back(vec(dd[INTEGRATOR_XF] = MX::sym("xf" + suff, x())));
+      rp_aug.push_back(vec(dd[INTEGRATOR_QF] = MX::sym("qf" + suff, q())));
+      rz0_aug.push_back(vec(dd[INTEGRATOR_ZF] = MX::sym("zf" + suff, z())));
+      x0_aug.push_back(vec(dd[INTEGRATOR_RXF] = MX::sym("rxf" + suff, rx())));
+      p_aug.push_back(vec(dd[INTEGRATOR_RQF] = MX::sym("rqf" + suff, rq())));
+      z0_aug.push_back(vec(dd[INTEGRATOR_RZF] = MX::sym("rzf" + suff, rz())));
       ret_in.insert(ret_in.end(), dd.begin(), dd.end());
     }
 
     // Call the integrator
     vector<MX> integrator_in(INTEGRATOR_NUM_IN);
-    integrator_in[INTEGRATOR_X0] = horzcat(x0_aug);
-    integrator_in[INTEGRATOR_P] = horzcat(p_aug);
-    integrator_in[INTEGRATOR_Z0] = horzcat(z0_aug);
-    integrator_in[INTEGRATOR_RX0] = horzcat(rx0_aug);
-    integrator_in[INTEGRATOR_RP] = horzcat(rp_aug);
-    integrator_in[INTEGRATOR_RZ0] = horzcat(rz0_aug);
+    integrator_in[INTEGRATOR_X0] = vertcat(x0_aug);
+    integrator_in[INTEGRATOR_P] = vertcat(p_aug);
+    integrator_in[INTEGRATOR_Z0] = vertcat(z0_aug);
+    integrator_in[INTEGRATOR_RX0] = vertcat(rx0_aug);
+    integrator_in[INTEGRATOR_RP] = vertcat(rp_aug);
+    integrator_in[INTEGRATOR_RZ0] = vertcat(rz0_aug);
     vector<MX> integrator_out = aug_int(integrator_in);
 
     // Augmented results
-    AugOffset offset = getAugOffset(0, nadj);
-    vector<MX> xf_aug = horzsplit(integrator_out[INTEGRATOR_XF], offset.x);
-    vector<MX> qf_aug = horzsplit(integrator_out[INTEGRATOR_QF], offset.q);
-    vector<MX> zf_aug = horzsplit(integrator_out[INTEGRATOR_ZF], offset.z);
-    vector<MX> rxf_aug = horzsplit(integrator_out[INTEGRATOR_RXF], offset.rx);
-    vector<MX> rqf_aug = horzsplit(integrator_out[INTEGRATOR_RQF], offset.rq);
-    vector<MX> rzf_aug = horzsplit(integrator_out[INTEGRATOR_RZF], offset.rz);
+    AugOffset offset = getAugOffset(nadj);
+    vector<MX> xf_aug = vertsplit(integrator_out[INTEGRATOR_XF], offset.x);
+    vector<MX> qf_aug = vertsplit(integrator_out[INTEGRATOR_QF], offset.q);
+    vector<MX> zf_aug = vertsplit(integrator_out[INTEGRATOR_ZF], offset.z);
+    vector<MX> rxf_aug = vertsplit(integrator_out[INTEGRATOR_RXF], offset.rx);
+    vector<MX> rqf_aug = vertsplit(integrator_out[INTEGRATOR_RQF], offset.rq);
+    vector<MX> rzf_aug = vertsplit(integrator_out[INTEGRATOR_RZF], offset.rz);
 
     // All outputs of the return function
     vector<MX> ret_out;
@@ -888,15 +890,14 @@ namespace casadi {
     dd.resize(INTEGRATOR_NUM_IN);
     fill(dd.begin(), dd.end(), MX());
     for (int dir=0; dir<nadj; ++dir) {
-      dd[INTEGRATOR_X0]  = rxf_aug.at(dir+1);
-      dd[INTEGRATOR_P]   = rqf_aug.at(dir+1);
-      dd[INTEGRATOR_Z0]  = rzf_aug.at(dir+1);
-      dd[INTEGRATOR_RX0] = xf_aug.at(dir+1);
-      dd[INTEGRATOR_RP]  = qf_aug.at(dir+1);
-      dd[INTEGRATOR_RZ0] = zf_aug.at(dir+1);
+      dd[INTEGRATOR_X0]  = reshape(rxf_aug.at(dir+1), x().size());
+      dd[INTEGRATOR_P]   = reshape(rqf_aug.at(dir+1), p().size());
+      dd[INTEGRATOR_Z0]  = reshape(rzf_aug.at(dir+1), z().size());
+      dd[INTEGRATOR_RX0] = reshape(xf_aug.at(dir+1), rx().size());
+      dd[INTEGRATOR_RP]  = reshape(qf_aug.at(dir+1), rp().size());
+      dd[INTEGRATOR_RZ0] = reshape(zf_aug.at(dir+1), rz().size());
       ret_out.insert(ret_out.end(), dd.begin(), dd.end());
     }
-    for (auto&& e : ret_out) if (e.is_empty()) e=MX();
     log("Integrator::getDerivative", "end");
 
     // Create derivative function and return
