@@ -667,26 +667,26 @@ namespace casadi {
 
     // Count nondifferentiated and forward sensitivities
     for (int dir=-1; dir<nfwd; ++dir) {
-      if ( nx_>0) ret.x.push_back(x().size2());
-      if ( nz_>0) ret.z.push_back(z().size2());
-      if ( nq_>0) ret.q.push_back(q().size2());
-      if ( np_>0) ret.p.push_back(p().size2());
-      if (nrx_>0) ret.rx.push_back(rx().size2());
-      if (nrz_>0) ret.rz.push_back(rz().size2());
-      if (nrq_>0) ret.rq.push_back(rq().size2());
-      if (nrp_>0) ret.rp.push_back(rp().size2());
+      ret.x.push_back(x().size2());
+      ret.z.push_back(z().size2());
+      ret.q.push_back(q().size2());
+      ret.p.push_back(p().size2());
+      ret.rx.push_back(rx().size2());
+      ret.rz.push_back(rz().size2());
+      ret.rq.push_back(rq().size2());
+      ret.rp.push_back(rp().size2());
     }
 
     // Count adjoint sensitivities
     for (int dir=0; dir<nadj; ++dir) {
-      if ( nx_>0) ret.rx.push_back(x().size2());
-      if ( nz_>0) ret.rz.push_back(z().size2());
-      if ( np_>0) ret.rq.push_back(p().size2());
-      if ( nq_>0) ret.rp.push_back(q().size2());
-      if (nrx_>0) ret.x.push_back(rx().size2());
-      if (nrz_>0) ret.z.push_back(rz().size2());
-      if (nrp_>0) ret.q.push_back(rp().size2());
-      if (nrq_>0) ret.p.push_back(rq().size2());
+      ret.rx.push_back(x().size2());
+      ret.rz.push_back(z().size2());
+      ret.rq.push_back(p().size2());
+      ret.rp.push_back(q().size2());
+      ret.x.push_back(rx().size2());
+      ret.z.push_back(rz().size2());
+      ret.q.push_back(rp().size2());
+      ret.p.push_back(rq().size2());
     }
 
     // Get cummulative offsets
@@ -777,12 +777,6 @@ namespace casadi {
     vector<MX> rxf_aug = horzsplit(integrator_out[INTEGRATOR_RXF], offset.rx);
     vector<MX> rqf_aug = horzsplit(integrator_out[INTEGRATOR_RQF], offset.rq);
     vector<MX> rzf_aug = horzsplit(integrator_out[INTEGRATOR_RZF], offset.rz);
-    vector<MX>::const_iterator xf_aug_it = xf_aug.begin();
-    vector<MX>::const_iterator qf_aug_it = qf_aug.begin();
-    vector<MX>::const_iterator zf_aug_it = zf_aug.begin();
-    vector<MX>::const_iterator rxf_aug_it = rxf_aug.begin();
-    vector<MX>::const_iterator rqf_aug_it = rqf_aug.begin();
-    vector<MX>::const_iterator rzf_aug_it = rzf_aug.begin();
 
     // All outputs of the return function
     vector<MX> ret_out;
@@ -790,15 +784,14 @@ namespace casadi {
 
     // Collect the forward sensitivities
     vector<MX> dd(INTEGRATOR_NUM_IN);
-    for (int dir=-1; dir<nfwd; ++dir) {
-      if ( nx_>0) dd[INTEGRATOR_XF]  = *xf_aug_it++;
-      if ( nq_>0) dd[INTEGRATOR_QF]  = *qf_aug_it++;
-      if ( nz_>0) dd[INTEGRATOR_ZF]  = *zf_aug_it++;
-      if (nrx_>0) dd[INTEGRATOR_RXF] = *rxf_aug_it++;
-      if (nrq_>0) dd[INTEGRATOR_RQF] = *rqf_aug_it++;
-      if (nrz_>0) dd[INTEGRATOR_RZF] = *rzf_aug_it++;
-      if (dir>=0) // Nondifferentiated output ignored
-        ret_out.insert(ret_out.end(), dd.begin(), dd.end());
+    for (int dir=0; dir<nfwd; ++dir) {
+      dd[INTEGRATOR_XF]  = xf_aug.at(dir+1);
+      dd[INTEGRATOR_QF]  = qf_aug.at(dir+1);
+      dd[INTEGRATOR_ZF]  = zf_aug.at(dir+1);
+      dd[INTEGRATOR_RXF] = rxf_aug.at(dir+1);
+      dd[INTEGRATOR_RQF] = rqf_aug.at(dir+1);
+      dd[INTEGRATOR_RZF] = rzf_aug.at(dir+1);
+      ret_out.insert(ret_out.end(), dd.begin(), dd.end());
     }
     log("Integrator::get_forward", "end");
 
@@ -821,7 +814,6 @@ namespace casadi {
 
     // Create integrator for augmented DAE
     Function aug_int;
-    AugOffset offset = getAugOffset(0, nadj);
     if (oracle_.is_a("sxfunction")) {
       aug_int = integrator(ss.str(), plugin_name(), aug_adj<SX>(nadj), aug_opts);
     } else {
@@ -935,48 +927,31 @@ namespace casadi {
     vector<MX> integrator_out = aug_int(integrator_in);
 
     // Augmented results
+    AugOffset offset = getAugOffset(0, nadj);
     vector<MX> xf_aug = horzsplit(integrator_out[INTEGRATOR_XF], offset.x);
     vector<MX> qf_aug = horzsplit(integrator_out[INTEGRATOR_QF], offset.q);
     vector<MX> zf_aug = horzsplit(integrator_out[INTEGRATOR_ZF], offset.z);
     vector<MX> rxf_aug = horzsplit(integrator_out[INTEGRATOR_RXF], offset.rx);
     vector<MX> rqf_aug = horzsplit(integrator_out[INTEGRATOR_RQF], offset.rq);
     vector<MX> rzf_aug = horzsplit(integrator_out[INTEGRATOR_RZF], offset.rz);
-    vector<MX>::const_iterator xf_aug_it = xf_aug.begin();
-    vector<MX>::const_iterator qf_aug_it = qf_aug.begin();
-    vector<MX>::const_iterator zf_aug_it = zf_aug.begin();
-    vector<MX>::const_iterator rxf_aug_it = rxf_aug.begin();
-    vector<MX>::const_iterator rqf_aug_it = rqf_aug.begin();
-    vector<MX>::const_iterator rzf_aug_it = rzf_aug.begin();
 
     // All outputs of the return function
     vector<MX> ret_out;
     ret_out.reserve(INTEGRATOR_NUM_IN*nadj);
 
-    // Collect the nondifferentiated results and forward sensitivities
-    dd.resize(INTEGRATOR_NUM_OUT);
-    fill(dd.begin(), dd.end(), MX());
-    for (int dir=-1; dir<0; ++dir) {
-      if ( nx_>0) dd[INTEGRATOR_XF]  = *xf_aug_it++;
-      if ( nq_>0) dd[INTEGRATOR_QF]  = *qf_aug_it++;
-      if ( nz_>0) dd[INTEGRATOR_ZF]  = *zf_aug_it++;
-      if (nrx_>0) dd[INTEGRATOR_RXF] = *rxf_aug_it++;
-      if (nrq_>0) dd[INTEGRATOR_RQF] = *rqf_aug_it++;
-      if (nrz_>0) dd[INTEGRATOR_RZF] = *rzf_aug_it++;
-      //ret_out.insert(ret_out.end(), dd.begin(), dd.end());
-    }
-
     // Collect the adjoint sensitivities
     dd.resize(INTEGRATOR_NUM_IN);
     fill(dd.begin(), dd.end(), MX());
     for (int dir=0; dir<nadj; ++dir) {
-      if ( nx_>0) dd[INTEGRATOR_X0]  = *rxf_aug_it++;
-      if ( np_>0) dd[INTEGRATOR_P]   = *rqf_aug_it++;
-      if ( nz_>0) dd[INTEGRATOR_Z0]  = *rzf_aug_it++;
-      if (nrx_>0) dd[INTEGRATOR_RX0] = *xf_aug_it++;
-      if (nrp_>0) dd[INTEGRATOR_RP]  = *qf_aug_it++;
-      if (nrz_>0) dd[INTEGRATOR_RZ0] = *zf_aug_it++;
+      dd[INTEGRATOR_X0]  = rxf_aug.at(dir+1);
+      dd[INTEGRATOR_P]   = rqf_aug.at(dir+1);
+      dd[INTEGRATOR_Z0]  = rzf_aug.at(dir+1);
+      dd[INTEGRATOR_RX0] = xf_aug.at(dir+1);
+      dd[INTEGRATOR_RP]  = qf_aug.at(dir+1);
+      dd[INTEGRATOR_RZ0] = zf_aug.at(dir+1);
       ret_out.insert(ret_out.end(), dd.begin(), dd.end());
     }
+    for (auto&& e : ret_out) if (e.is_empty()) e=MX();
     log("Integrator::getDerivative", "end");
 
     // Create derivative function and return
