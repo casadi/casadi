@@ -683,7 +683,7 @@ namespace casadi {
       if ( nz_>0) ret.rz.push_back(z().size2());
       if ( np_>0) ret.rq.push_back(p().size2());
       if ( nq_>0) ret.rp.push_back(q().size2());
-      if (nrx_>0) ret.x.push_back(x().size2());
+      if (nrx_>0) ret.x.push_back(rx().size2());
       if (nrz_>0) ret.z.push_back(rz().size2());
       if (nrp_>0) ret.q.push_back(rp().size2());
       if (nrq_>0) ret.p.push_back(rq().size2());
