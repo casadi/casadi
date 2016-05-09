@@ -3966,11 +3966,12 @@ Joel Andersson >List of available options
 |                 |                 | the function    |                 |
 |                 |                 | name.           |                 |
 +-----------------+-----------------+-----------------+-----------------+
-| gather_stats    | OT_BOOL         | Flag to         | casadi::Functio |
-|                 |                 | indicate        | nInternal       |
-|                 |                 | whether         |                 |
-|                 |                 | statistics must |                 |
-|                 |                 | be gathered     |                 |
+| gather_stats    | OT_BOOL         | Deprecated      | casadi::Functio |
+|                 |                 | option          | nInternal       |
+|                 |                 | (ignored):      |                 |
+|                 |                 | Statistics are  |                 |
+|                 |                 | now always      |                 |
+|                 |                 | collected.      |                 |
 +-----------------+-----------------+-----------------+-----------------+
 | input_scheme    | OT_STRINGVECTOR | Custom input    | casadi::Functio |
 |                 |                 | scheme          | nInternal       |
@@ -10448,11 +10449,12 @@ General information
 |                 |                 | formulation     |                 |
 |                 |                 | [false]         |                 |
 +-----------------+-----------------+-----------------+-----------------+
-| gather_stats    | OT_BOOL         | Flag to         | casadi::Functio |
-|                 |                 | indicate        | nInternal       |
-|                 |                 | whether         |                 |
-|                 |                 | statistics must |                 |
-|                 |                 | be gathered     |                 |
+| gather_stats    | OT_BOOL         | Deprecated      | casadi::Functio |
+|                 |                 | option          | nInternal       |
+|                 |                 | (ignored):      |                 |
+|                 |                 | Statistics are  |                 |
+|                 |                 | now always      |                 |
+|                 |                 | collected.      |                 |
 +-----------------+-----------------+-----------------+-----------------+
 | grid            | OT_DOUBLEVECTOR | Time grid       | casadi::Integra |
 |                 |                 |                 | tor             |
@@ -11347,11 +11349,12 @@ General information
 |                 |                 | the function    |                 |
 |                 |                 | name.           |                 |
 +-----------------+-----------------+-----------------+-----------------+
-| gather_stats    | OT_BOOL         | Flag to         | casadi::Functio |
-|                 |                 | indicate        | nInternal       |
-|                 |                 | whether         |                 |
-|                 |                 | statistics must |                 |
-|                 |                 | be gathered     |                 |
+| gather_stats    | OT_BOOL         | Deprecated      | casadi::Functio |
+|                 |                 | option          | nInternal       |
+|                 |                 | (ignored):      |                 |
+|                 |                 | Statistics are  |                 |
+|                 |                 | now always      |                 |
+|                 |                 | collected.      |                 |
 +-----------------+-----------------+-----------------+-----------------+
 | implicit_input  | OT_INT          | Index of the    | casadi::Rootfin |
 |                 |                 | input that      | der             |
@@ -11835,11 +11838,12 @@ General information
 |                 |                 | discrete, i.e.  |                 |
 |                 |                 | integer-valued  |                 |
 +-----------------+-----------------+-----------------+-----------------+
-| gather_stats    | OT_BOOL         | Flag to         | casadi::Functio |
-|                 |                 | indicate        | nInternal       |
-|                 |                 | whether         |                 |
-|                 |                 | statistics must |                 |
-|                 |                 | be gathered     |                 |
+| gather_stats    | OT_BOOL         | Deprecated      | casadi::Functio |
+|                 |                 | option          | nInternal       |
+|                 |                 | (ignored):      |                 |
+|                 |                 | Statistics are  |                 |
+|                 |                 | now always      |                 |
+|                 |                 | collected.      |                 |
 +-----------------+-----------------+-----------------+-----------------+
 | input_scheme    | OT_STRINGVECTOR | Custom input    | casadi::Functio |
 |                 |                 | scheme          | nInternal       |
@@ -12982,11 +12986,12 @@ General information
 |                 |                 | formulation     |                 |
 |                 |                 | [false]         |                 |
 +-----------------+-----------------+-----------------+-----------------+
-| gather_stats    | OT_BOOL         | Flag to         | casadi::Functio |
-|                 |                 | indicate        | nInternal       |
-|                 |                 | whether         |                 |
-|                 |                 | statistics must |                 |
-|                 |                 | be gathered     |                 |
+| gather_stats    | OT_BOOL         | Deprecated      | casadi::Functio |
+|                 |                 | option          | nInternal       |
+|                 |                 | (ignored):      |                 |
+|                 |                 | Statistics are  |                 |
+|                 |                 | now always      |                 |
+|                 |                 | collected.      |                 |
 +-----------------+-----------------+-----------------+-----------------+
 | ignore_check_ve | OT_BOOL         | If set to true, | casadi::Nlpsol  |
 | c               |                 | the input shape |                 |
