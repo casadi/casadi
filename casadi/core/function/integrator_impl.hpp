@@ -136,11 +136,6 @@ namespace casadi {
     /** \brief  Set stop time for the integration */
     virtual void setStopTime(IntegratorMemory* mem, double tf) const;
 
-    // Helper structure
-    struct AugOffset {
-      std::vector<int> x, z, q, p, rx, rz, rq, rp;
-    };
-
     /** \brief Set solver specific options to generated augmented integrators */
     virtual Dict getDerivativeOptions(bool fwd);
 
@@ -149,9 +144,6 @@ namespace casadi {
 
     /** \brief Generate a augmented DAE system with \a nadj adjoint sensitivities */
     template<typename MatType> std::map<std::string, MatType> aug_adj(int nadj);
-
-    /// Get offsets in augmented problem
-    AugOffset getAugOffset(int nadj);
 
     /// Create sparsity pattern of the extended Jacobian (forward problem)
     Sparsity sp_jac_dae();

@@ -642,54 +642,6 @@ namespace casadi {
     log("Integrator::sp_rev", "end");
   }
 
-  Integrator::AugOffset Integrator::getAugOffset(int nadj) {
-    // Form return object
-    AugOffset ret;
-    ret.x.resize(1, 0);
-    ret.z.resize(1, 0);
-    ret.q.resize(1, 0);
-    ret.p.resize(1, 0);
-    ret.rx.resize(1, 0);
-    ret.rz.resize(1, 0);
-    ret.rq.resize(1, 0);
-    ret.rp.resize(1, 0);
-
-    // Count nondifferentiated
-    ret.x.push_back(x().numel());
-    ret.z.push_back(z().numel());
-    ret.q.push_back(q().numel());
-    ret.p.push_back(p().numel());
-    ret.rx.push_back(rx().numel());
-    ret.rz.push_back(rz().numel());
-    ret.rq.push_back(rq().numel());
-    ret.rp.push_back(rp().numel());
-
-    // Count adjoint sensitivities
-    for (int dir=0; dir<nadj; ++dir) {
-      ret.rx.push_back(x().numel());
-      ret.rz.push_back(z().numel());
-      ret.rq.push_back(p().numel());
-      ret.rp.push_back(q().numel());
-      ret.x.push_back(rx().numel());
-      ret.z.push_back(rz().numel());
-      ret.q.push_back(rp().numel());
-      ret.p.push_back(rq().numel());
-    }
-
-    // Get cummulative offsets
-    for (int i=1; i<ret.x.size(); ++i) ret.x[i] += ret.x[i-1];
-    for (int i=1; i<ret.z.size(); ++i) ret.z[i] += ret.z[i-1];
-    for (int i=1; i<ret.q.size(); ++i) ret.q[i] += ret.q[i-1];
-    for (int i=1; i<ret.p.size(); ++i) ret.p[i] += ret.p[i-1];
-    for (int i=1; i<ret.rx.size(); ++i) ret.rx[i] += ret.rx[i-1];
-    for (int i=1; i<ret.rz.size(); ++i) ret.rz[i] += ret.rz[i-1];
-    for (int i=1; i<ret.rq.size(); ++i) ret.rq[i] += ret.rq[i-1];
-    for (int i=1; i<ret.rp.size(); ++i) ret.rp[i] += ret.rp[i-1];
-
-    // Return the offsets
-    return ret;
-  }
-
   Function Integrator::get_forward_old(const std::string& name, int nfwd, Dict& opts) {
     log("Integrator::get_forward", "begin");
 
@@ -862,14 +814,33 @@ namespace casadi {
     integrator_in[INTEGRATOR_RZ0] = vertcat(rz0_aug);
     vector<MX> integrator_out = aug_int(integrator_in);
 
+    // Get offset in the splitted problem
+    vector<int> off_x = {0, x().numel()};
+    vector<int> off_z = {0, z().numel()};
+    vector<int> off_q = {0, q().numel()};
+    vector<int> off_p = {0, p().numel()};
+    vector<int> off_rx = {0, rx().numel()};
+    vector<int> off_rz = {0, rz().numel()};
+    vector<int> off_rq = {0, rq().numel()};
+    vector<int> off_rp = {0, rp().numel()};
+    for (int dir=0; dir<nadj; ++dir) {
+      off_x.push_back(off_x.back() + rx().numel());
+      off_z.push_back(off_z.back() + rz().numel());
+      off_q.push_back(off_q.back() + rp().numel());
+      off_p.push_back(off_p.back() + rq().numel());
+      off_rx.push_back(off_rx.back() + x().numel());
+      off_rz.push_back(off_rz.back() + z().numel());
+      off_rq.push_back(off_rq.back() + p().numel());
+      off_rp.push_back(off_rp.back() + q().numel());
+    }
+
     // Augmented results
-    AugOffset offset = getAugOffset(nadj);
-    vector<MX> xf_aug = vertsplit(integrator_out[INTEGRATOR_XF], offset.x);
-    vector<MX> qf_aug = vertsplit(integrator_out[INTEGRATOR_QF], offset.q);
-    vector<MX> zf_aug = vertsplit(integrator_out[INTEGRATOR_ZF], offset.z);
-    vector<MX> rxf_aug = vertsplit(integrator_out[INTEGRATOR_RXF], offset.rx);
-    vector<MX> rqf_aug = vertsplit(integrator_out[INTEGRATOR_RQF], offset.rq);
-    vector<MX> rzf_aug = vertsplit(integrator_out[INTEGRATOR_RZF], offset.rz);
+    vector<MX> xf_aug = vertsplit(integrator_out[INTEGRATOR_XF], off_x);
+    vector<MX> qf_aug = vertsplit(integrator_out[INTEGRATOR_QF], off_q);
+    vector<MX> zf_aug = vertsplit(integrator_out[INTEGRATOR_ZF], off_z);
+    vector<MX> rxf_aug = vertsplit(integrator_out[INTEGRATOR_RXF], off_rx);
+    vector<MX> rqf_aug = vertsplit(integrator_out[INTEGRATOR_RQF], off_rq);
+    vector<MX> rzf_aug = vertsplit(integrator_out[INTEGRATOR_RZF], off_rz);
 
     // All outputs of the return function
     vector<MX> ret_out;
