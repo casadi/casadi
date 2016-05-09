@@ -238,7 +238,6 @@ class Integrationtests(casadiTestCase):
                 print(message)
                 opts = {}
                 opts["exact_jacobianB"] = True
-                opts["gather_stats"] = True
                 #opts["verbose"] = True
                 #opts["monitor"] = ["djacB","resB","djac","res"])
                 opts["t0"] = tstart_
