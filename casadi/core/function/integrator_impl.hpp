@@ -163,20 +163,17 @@ namespace casadi {
     Sparsity sp_jac_dae_, sp_jac_rdae_;
     Sparsity::Btf btf_jac_dae_, btf_jac_rdae_;
 
-    // Sparities
-    Sparsity t_, x_, z_, p_, q_, rx_, rz_, rp_, rq_;
-
     ///@{
     // Shorthands
-    const Sparsity&  t() { return t_;}
-    const Sparsity&  x() { return x_;}
-    const Sparsity&  z() { return z_;}
-    const Sparsity&  p() { return p_;}
-    const Sparsity&  q() { return q_;}
-    const Sparsity& rx() { return rx_;}
-    const Sparsity& rz() { return rz_;}
-    const Sparsity& rp() { return rp_;}
-    const Sparsity& rq() { return rq_;}
+    const Sparsity&  t() { return oracle_.sparsity_in(DE_T);}
+    const Sparsity&  x() { return oracle_.sparsity_in(DE_X);}
+    const Sparsity&  z() { return oracle_.sparsity_in(DE_Z);}
+    const Sparsity&  p() { return oracle_.sparsity_in(DE_P);}
+    const Sparsity&  q() { return oracle_.sparsity_out(DE_QUAD);}
+    const Sparsity& rx() { return oracle_.sparsity_in(DE_RX);}
+    const Sparsity& rz() { return oracle_.sparsity_in(DE_RZ);}
+    const Sparsity& rp() { return oracle_.sparsity_in(DE_RP);}
+    const Sparsity& rq() { return oracle_.sparsity_out(DE_RQUAD);}
     ///@}
 
     /// Number of states for the forward integration

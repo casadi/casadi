@@ -111,17 +111,6 @@ namespace casadi {
     // Negative number of parameters for consistancy checking
     np_ = -1;
 
-    // Get the sparsities
-    t_ = oracle_.sparsity_in(DE_T);
-    x_ = oracle_.sparsity_in(DE_X);
-    z_ = oracle_.sparsity_in(DE_Z);
-    p_ = oracle_.sparsity_in(DE_P);
-    q_ = oracle_.sparsity_out(DE_QUAD);
-    rx_ = oracle_.sparsity_in(DE_RX);
-    rz_ = oracle_.sparsity_in(DE_RZ);
-    rp_ = oracle_.sparsity_in(DE_RP);
-    rq_ = oracle_.sparsity_out(DE_RQUAD);
-
     // Default options
     print_stats_ = false;
     output_t0_ = false;
@@ -132,12 +121,12 @@ namespace casadi {
 
   Sparsity Integrator::get_sparsity_in(int i) {
     switch (static_cast<IntegratorInput>(i)) {
-    case INTEGRATOR_X0: return x_;
-    case INTEGRATOR_P: return p_;
-    case INTEGRATOR_Z0: return z_;
-    case INTEGRATOR_RX0: return repmat(rx_, 1, ntout_);
-    case INTEGRATOR_RP: return repmat(rp_, 1, ntout_);
-    case INTEGRATOR_RZ0: return repmat(rz_, 1, ntout_);
+    case INTEGRATOR_X0: return x();
+    case INTEGRATOR_P: return p();
+    case INTEGRATOR_Z0: return z();
+    case INTEGRATOR_RX0: return repmat(rx(), 1, ntout_);
+    case INTEGRATOR_RP: return repmat(rp(), 1, ntout_);
+    case INTEGRATOR_RZ0: return repmat(rz(), 1, ntout_);
     case INTEGRATOR_NUM_IN: break;
     }
     return Sparsity();
@@ -145,12 +134,12 @@ namespace casadi {
 
   Sparsity Integrator::get_sparsity_out(int i) {
     switch (static_cast<IntegratorOutput>(i)) {
-    case INTEGRATOR_XF: return repmat(x_, 1, ntout_);
-    case INTEGRATOR_QF: return repmat(q_, 1, ntout_);
-    case INTEGRATOR_ZF: return repmat(z_, 1, ntout_);
-    case INTEGRATOR_RXF: return rx_;
-    case INTEGRATOR_RQF: return rq_;
-    case INTEGRATOR_RZF: return rz_;
+    case INTEGRATOR_XF: return repmat(x(), 1, ntout_);
+    case INTEGRATOR_QF: return repmat(q(), 1, ntout_);
+    case INTEGRATOR_ZF: return repmat(z(), 1, ntout_);
+    case INTEGRATOR_RXF: return rx();
+    case INTEGRATOR_RQF: return rq();
+    case INTEGRATOR_RZF: return rz();
     case INTEGRATOR_NUM_OUT: break;
     }
     return Sparsity();
@@ -191,9 +180,9 @@ namespace casadi {
 
       // Integrate forward
       advance(m, grid_[k], x, z, q);
-      if (x) x += x_.nnz();
-      if (z) z += z_.nnz();
-      if (q) q += q_.nnz();
+      if (x) x += nx_;
+      if (z) z += nz_;
+      if (q) q += nq_;
     }
 
     // If backwards integration is needed
