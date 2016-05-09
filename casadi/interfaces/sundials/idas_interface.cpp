@@ -703,12 +703,10 @@ namespace casadi {
     // Print statistics
     if (print_stats_) printStats(m, userOut());
 
-    if (gather_stats_) {
-      int flag = IDAGetIntegratorStats(m->mem, &m->nsteps, &m->nfevals, &m->nlinsetups,
-                                       &m->netfails, &m->qlast, &m->qcur, &m->hinused,
-                                       &m->hlast, &m->hcur, &m->tcur);
-      if (flag!=IDA_SUCCESS) idas_error("IDAGetIntegratorStats", flag);
-    }
+    int flag = IDAGetIntegratorStats(m->mem, &m->nsteps, &m->nfevals, &m->nlinsetups,
+                                     &m->netfails, &m->qlast, &m->qcur, &m->hinused,
+                                     &m->hlast, &m->hcur, &m->tcur);
+    if (flag!=IDA_SUCCESS) idas_error("IDAGetIntegratorStats", flag);
   }
 
   void IdasInterface::resetB(IntegratorMemory* mem, double t, const double* rx,
@@ -779,17 +777,15 @@ namespace casadi {
     casadi_copy(NV_DATA_S(m->rxz)+nrx_, nrz_, rz);
     casadi_copy(NV_DATA_S(m->rq), nrq_, rq);
 
-    if (gather_stats_) {
-      IDAMem IDA_mem = IDAMem(m->mem);
-      IDAadjMem IDAADJ_mem = IDA_mem->ida_adj_mem;
-      IDABMem IDAB_mem = IDAADJ_mem->IDAB_mem;
-      int flag = IDAGetIntegratorStats(IDAB_mem->IDA_mem, &m->nstepsB, &m->nfevalsB,
-                                       &m->nlinsetupsB,
-                                       &m->netfailsB, &m->qlastB, &m->qcurB, &m->hinusedB,
-                                       &m->hlastB,
-                                       &m->hcurB, &m->tcurB);
-      if (flag!=IDA_SUCCESS) idas_error("IDAGetIntegratorStatsB", flag);
-    }
+    IDAMem IDA_mem = IDAMem(m->mem);
+    IDAadjMem IDAADJ_mem = IDA_mem->ida_adj_mem;
+    IDABMem IDAB_mem = IDAADJ_mem->IDAB_mem;
+    int flag = IDAGetIntegratorStats(IDAB_mem->IDA_mem, &m->nstepsB, &m->nfevalsB,
+                                     &m->nlinsetupsB,
+                                     &m->netfailsB, &m->qlastB, &m->qcurB, &m->hinusedB,
+                                     &m->hlastB,
+                                     &m->hcurB, &m->tcurB);
+    if (flag!=IDA_SUCCESS) idas_error("IDAGetIntegratorStatsB", flag);
   }
 
   void IdasInterface::printStats(IntegratorMemory* mem, std::ostream &stream) const {

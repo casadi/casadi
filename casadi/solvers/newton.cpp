@@ -196,7 +196,7 @@ namespace casadi {
     }
 
     // Store the iteration count
-    if (gather_stats_) m->iter = iter;
+    m->iter = iter;
     if (success) m->return_status = "success";
 
     casadi_msg("Newton::solveNonLinear():end after " << iter << " steps");

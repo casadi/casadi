@@ -58,7 +58,6 @@ namespace casadi {
     user_data_ = 0;
     regularity_check_ = false;
     inputs_check_ = true;
-    gather_stats_ = false;
     jit_ = false;
     compilerplugin_ = "clang";
 
@@ -238,7 +237,7 @@ namespace casadi {
         "Throw exceptions when the numerical values of the inputs don't make sense"}},
       {"gather_stats",
        {OT_BOOL,
-        "Flag to indicate whether statistics must be gathered"}},
+        "Deprecated option (ignored): Statistics are now always collected."}},
       {"input_scheme",
        {OT_STRINGVECTOR,
         "Custom input scheme"}},
@@ -278,7 +277,7 @@ namespace casadi {
       } else if (op.first=="inputs_check") {
         inputs_check_ = op.second;
       } else if (op.first=="gather_stats") {
-        gather_stats_ = op.second;
+        casadi_warning("Deprecated option \"gather_stats\": Always enabled");
       } else if (op.first=="input_scheme") {
         ischeme_ = op.second;
       } else if (op.first=="output_scheme") {

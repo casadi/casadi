@@ -792,9 +792,6 @@ namespace casadi {
     /** \brief Dict of statistics (resulting from evaluate) */
     Dict stats_;
 
-    /** \brief Flag to indicate whether statistics must be gathered */
-    bool gather_stats_;
-
     /** \brief Reference counting in codegen? */
     bool has_refcount_;
 

@@ -354,17 +354,15 @@ namespace casadi {
     checkInputs(mem);
 
     // Reset statistics
-    if (gather_stats_) {
-      m->inf_pr.clear();
-      m->inf_du.clear();
-      m->mu.clear();
-      m->d_norm.clear();
-      m->regularization_size.clear();
-      m->alpha_pr.clear();
-      m->alpha_du.clear();
-      m->obj.clear();
-      m->ls_trials.clear();
-    }
+    m->inf_pr.clear();
+    m->inf_du.clear();
+    m->mu.clear();
+    m->d_norm.clear();
+    m->regularization_size.clear();
+    m->alpha_pr.clear();
+    m->alpha_du.clear();
+    m->obj.clear();
+    m->ls_trials.clear();
 
     // Reset number of iterations
     m->n_iter = 0;
@@ -405,17 +403,15 @@ namespace casadi {
     m->n_iter += 1;
     try {
       log("intermediate_callback started");
-      if (gather_stats_) {
-        m->inf_pr.push_back(inf_pr);
-        m->inf_du.push_back(inf_du);
-        m->mu.push_back(mu);
-        m->d_norm.push_back(d_norm);
-        m->regularization_size.push_back(regularization_size);
-        m->alpha_pr.push_back(alpha_pr);
-        m->alpha_du.push_back(alpha_du);
-        m->ls_trials.push_back(ls_trials);
-        m->obj.push_back(obj_value);
-      }
+      m->inf_pr.push_back(inf_pr);
+      m->inf_du.push_back(inf_du);
+      m->mu.push_back(mu);
+      m->d_norm.push_back(d_norm);
+      m->regularization_size.push_back(regularization_size);
+      m->alpha_pr.push_back(alpha_pr);
+      m->alpha_du.push_back(alpha_du);
+      m->ls_trials.push_back(ls_trials);
+      m->obj.push_back(obj_value);
       if (!fcallback_.is_null()) {
         m->fstats.at("callback_fun").tic();
         if (full_callback) {

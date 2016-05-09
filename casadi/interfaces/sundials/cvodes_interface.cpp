@@ -394,12 +394,10 @@ namespace casadi {
     // Print statistics
     if (print_stats_) printStats(m, userOut());
 
-    if (gather_stats_) {
-      int flag = CVodeGetIntegratorStats(m->mem, &m->nsteps, &m->nfevals, &m->nlinsetups,
-                                         &m->netfails, &m->qlast, &m->qcur, &m->hinused,
-                                         &m->hlast, &m->hcur, &m->tcur);
-      if (flag!=CV_SUCCESS) cvodes_error("CVodeGetIntegratorStats", flag);
-    }
+    int flag = CVodeGetIntegratorStats(m->mem, &m->nsteps, &m->nfevals, &m->nlinsetups,
+                                       &m->netfails, &m->qlast, &m->qcur, &m->hinused,
+                                       &m->hlast, &m->hcur, &m->tcur);
+    if (flag!=CV_SUCCESS) cvodes_error("CVodeGetIntegratorStats", flag);
 
     casadi_msg("CvodesInterface::integrate(" << t << ") end");
   }
@@ -451,16 +449,14 @@ namespace casadi {
     casadi_copy(NV_DATA_S(m->rxz), nrx_, rx);
     casadi_copy(NV_DATA_S(m->rq), nrq_, rq);
 
-    if (gather_stats_) {
-      CVodeMem cv_mem = static_cast<CVodeMem>(m->mem);
-      CVadjMem ca_mem = cv_mem->cv_adj_mem;
-      CVodeBMem cvB_mem = ca_mem->cvB_mem;
+    CVodeMem cv_mem = static_cast<CVodeMem>(m->mem);
+    CVadjMem ca_mem = cv_mem->cv_adj_mem;
+    CVodeBMem cvB_mem = ca_mem->cvB_mem;
 
-      int flag = CVodeGetIntegratorStats(cvB_mem->cv_mem, &m->nstepsB,
-                                         &m->nfevalsB, &m->nlinsetupsB, &m->netfailsB, &m->qlastB,
-                                         &m->qcurB, &m->hinusedB, &m->hlastB, &m->hcurB, &m->tcurB);
-      if (flag!=CV_SUCCESS) cvodes_error("CVodeGetIntegratorStats", flag);
-    }
+    int flag = CVodeGetIntegratorStats(cvB_mem->cv_mem, &m->nstepsB,
+                                       &m->nfevalsB, &m->nlinsetupsB, &m->netfailsB, &m->qlastB,
+                                       &m->qcurB, &m->hinusedB, &m->hlastB, &m->hcurB, &m->tcurB);
+    if (flag!=CV_SUCCESS) cvodes_error("CVodeGetIntegratorStats", flag);
   }
 
   void CvodesInterface::printStats(IntegratorMemory* mem, std::ostream &stream) const {
