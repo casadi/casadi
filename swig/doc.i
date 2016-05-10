@@ -13,6 +13,118 @@
 // File: classcasadi_1_1BinarySX.xml
 
 
+// File: classcasadi_1_1BonminUserClass.xml
+%feature("docstring") casadi::BonminUserClass "[INTERNAL] C++ includes:
+bonmin_nlp.hpp ";
+
+%feature("docstring")
+casadi::BonminUserClass::finalize_solution(TMINLP::SolverReturn status,
+Index n, const Number *x, Number obj_value) " [INTERNAL]  This method is
+called when the algorithm is complete so the TNLP can store/write the
+solution
+
+";
+
+%feature("docstring")  casadi::BonminUserClass::eval_g(Index n, const Number
+*x, bool new_x, Index m, Number *g) " [INTERNAL]  Method to return the
+constraint residuals
+
+";
+
+%feature("docstring")  casadi::BonminUserClass::eval_f(Index n, const Number
+*x, bool new_x, Number &obj_value) " [INTERNAL]  Method to return the
+objective value
+
+";
+
+%feature("docstring")
+casadi::BonminUserClass::get_constraints_linearity(Index m,
+Ipopt::TNLP::LinearityType *const_types) " [INTERNAL] ";
+
+%feature("docstring") casadi::BonminUserClass::BonminUserClass(const
+BonminInterface &bonminInterface, BonminMemory *mem) " [INTERNAL] ";
+
+%feature("docstring")  casadi::BonminUserClass::get_starting_point(Index n,
+bool init_x, Number *x, bool init_z, Number *z_L, Number *z_U, Index m, bool
+init_lambda, Number *lambda) " [INTERNAL]  Method to return the starting
+point for the algorithm
+
+";
+
+%feature("docstring")
+casadi::BonminUserClass::get_number_of_nonlinear_variables() "[INTERNAL]
+Specify the number of variables that appear in the Hessian
+
+";
+
+%feature("docstring")  casadi::BonminUserClass::eval_jac_g(Index n, const
+Number *x, bool new_x, Index m, Index nele_jac, Index *iRow, Index *jCol,
+Number *values) " [INTERNAL]  Method to return: 1) The structure of the
+Jacobian (if \"values\" is NULL) 2) The values of the Jacobian (if
+\"values\" is not NULL)
+
+";
+
+%feature("docstring")
+casadi::BonminUserClass::intermediate_callback(AlgorithmMode mode, Index
+iter, Number obj_value, Number inf_pr, Number inf_du, Number mu, Number
+d_norm, Number regularization_size, Number alpha_du, Number alpha_pr, Index
+ls_trials, const IpoptData *ip_data, IpoptCalculatedQuantities *ip_cq) "
+[INTERNAL]  This method is called at every iteration
+
+";
+
+%feature("docstring")  casadi::BonminUserClass::eval_h(Index n, const Number
+*x, bool new_x, Number obj_factor, Index m, const Number *lambda, bool
+new_lambda, Index nele_hess, Index *iRow, Index *jCol, Number *values) "
+[INTERNAL]  Method to return: 1) The structure of the hessian of the
+Lagrangian (if \"values\" is NULL) 2) The values of the hessian of the
+Lagrangian (if \"values\" is not NULL)
+
+";
+
+%feature("docstring")  casadi::BonminUserClass::get_variables_types(Index n,
+VariableType *var_types) " [INTERNAL] ";
+
+%feature("docstring") casadi::BonminUserClass::~BonminUserClass "[INTERNAL]
+";
+
+%feature("docstring")
+casadi::BonminUserClass::get_list_of_nonlinear_variables(Index
+num_nonlin_vars, Index *pos_nonlin_vars) " [INTERNAL]  Specify which
+variables that appear in the Hessian
+
+";
+
+%feature("docstring")  casadi::BonminUserClass::get_bounds_info(Index n,
+Number *x_l, Number *x_u, Index m, Number *g_l, Number *g_u) " [INTERNAL]
+Method to return the bounds for my problem
+
+";
+
+%feature("docstring")  casadi::BonminUserClass::sosConstraints() const  "
+[INTERNAL] ";
+
+%feature("docstring")  casadi::BonminUserClass::get_nlp_info(Index &n, Index
+&m, Index &nnz_jac_g, Index &nnz_h_lag, TNLP::IndexStyleEnum &index_style) "
+[INTERNAL]  Method to return some info about the nlp
+
+";
+
+%feature("docstring")  casadi::BonminUserClass::branchingInfo() const  "
+[INTERNAL] ";
+
+%feature("docstring")  casadi::BonminUserClass::eval_grad_f(Index n, const
+Number *x, bool new_x, Number *grad_f) " [INTERNAL]  Method to return the
+gradient of the objective
+
+";
+
+%feature("docstring")
+casadi::BonminUserClass::get_variables_linearity(Index n,
+Ipopt::TNLP::LinearityType *var_types) " [INTERNAL] ";
+
+
 // File: classcasadi_1_1Call.xml
 
 
@@ -10147,6 +10259,9 @@ Print a representation of the object.
 // File: classcasadi_1_1ZeroSX.xml
 
 
+// File: namespaceBonmin.xml
+
+
 // File: namespacecasadi.xml
 %feature("docstring")  casadi::matrixName< double >() "
 Get typename.
@@ -12974,6 +13089,12 @@ General information
 |                 |                 | the function    |                 |
 |                 |                 | name.           |                 |
 +-----------------+-----------------+-----------------+-----------------+
+| discrete        | OT_BOOLVECTOR   | Indicates which | casadi::Nlpsol  |
+|                 |                 | of the          |                 |
+|                 |                 | variables are   |                 |
+|                 |                 | discrete, i.e.  |                 |
+|                 |                 | integer-valued  |                 |
++-----------------+-----------------+-----------------+-----------------+
 | eval_errors_fat | OT_BOOL         | When errors     | casadi::Nlpsol  |
 | al              |                 | occur during    |                 |
 |                 |                 | evaluation of   |                 |
@@ -13187,6 +13308,8 @@ List of plugins
 
 
 
+- bonmin
+
 - ipopt
 
 - knitro
@@ -13203,6 +13326,118 @@ Note: some of the plugins in this list might not be available on your
 system. Also, there might be extra plugins available to you that are not
 listed here. You can obtain their documentation with
 Nlpsol.doc(\"myextraplugin\")
+
+
+
+--------------------------------------------------------------------------------
+
+bonmin
+------
+
+
+
+When in warmstart mode, output NLPSOL_LAM_X may be used as input
+
+NOTE: Even when max_iter == 0, it is not guaranteed that input(NLPSOL_X0) ==
+output(NLPSOL_X). Indeed if bounds on X or constraints are unmet, they will
+differ.
+
+For a good tutorial on BONMIN,
+seehttp://drops.dagstuhl.de/volltexte/2009/2089/pdf/09061.WaechterAndreas.Paper.2089.pdf
+
+A good resource about the algorithms in BONMIN is: Wachter and L. T.
+Biegler, On the Implementation of an Interior-Point Filter Line-Search
+Algorithm for Large-Scale Nonlinear Programming, Mathematical Programming
+106(1), pp. 25-57, 2006 (As Research Report RC 23149, IBM T. J. Watson
+Research Center, Yorktown, USA
+
+Caveats: with default options, multipliers for the decision variables are
+wrong for equality constraints. Change the 'fixed_variable_treatment' to
+'make_constraint' or 'relax_bounds' to obtain correct results.
+
+>List of available options
+
++------------------------+------------------------+------------------------+
+|           Id           |          Type          |      Description       |
++========================+========================+========================+
+| bonmin                 | OT_DICT                | Options to be passed   |
+|                        |                        | to BONMIN              |
++------------------------+------------------------+------------------------+
+| con_integer_md         | OT_DICT                | Integer metadata (a    |
+|                        |                        | dictionary with lists  |
+|                        |                        | of integers) about     |
+|                        |                        | constraints to be      |
+|                        |                        | passed to BONMIN       |
++------------------------+------------------------+------------------------+
+| con_numeric_md         | OT_DICT                | Numeric metadata (a    |
+|                        |                        | dictionary with lists  |
+|                        |                        | of reals) about        |
+|                        |                        | constraints to be      |
+|                        |                        | passed to BONMIN       |
++------------------------+------------------------+------------------------+
+| con_string_md          | OT_DICT                | String metadata (a     |
+|                        |                        | dictionary with lists  |
+|                        |                        | of strings) about      |
+|                        |                        | constraints to be      |
+|                        |                        | passed to BONMIN       |
++------------------------+------------------------+------------------------+
+| grad_f                 | OT_FUNCTION            | Function for           |
+|                        |                        | calculating the        |
+|                        |                        | gradient of the        |
+|                        |                        | objective (column,     |
+|                        |                        | autogenerated by       |
+|                        |                        | default)               |
++------------------------+------------------------+------------------------+
+| grad_f_options         | OT_DICT                | Options for the        |
+|                        |                        | autogenerated gradient |
+|                        |                        | of the objective.      |
++------------------------+------------------------+------------------------+
+| hess_lag               | OT_FUNCTION            | Function for           |
+|                        |                        | calculating the        |
+|                        |                        | Hessian of the         |
+|                        |                        | Lagrangian             |
+|                        |                        | (autogenerated by      |
+|                        |                        | default)               |
++------------------------+------------------------+------------------------+
+| hess_lag_options       | OT_DICT                | Options for the        |
+|                        |                        | autogenerated Hessian  |
+|                        |                        | of the Lagrangian.     |
++------------------------+------------------------+------------------------+
+| jac_g                  | OT_FUNCTION            | Function for           |
+|                        |                        | calculating the        |
+|                        |                        | Jacobian of the        |
+|                        |                        | constraints            |
+|                        |                        | (autogenerated by      |
+|                        |                        | default)               |
++------------------------+------------------------+------------------------+
+| jac_g_options          | OT_DICT                | Options for the        |
+|                        |                        | autogenerated Jacobian |
+|                        |                        | of the constraints.    |
++------------------------+------------------------+------------------------+
+| pass_nonlinear_variabl | OT_BOOL                | Pass list of variables |
+| es                     |                        | entering nonlinearly   |
+|                        |                        | to BONMIN              |
++------------------------+------------------------+------------------------+
+| var_integer_md         | OT_DICT                | Integer metadata (a    |
+|                        |                        | dictionary with lists  |
+|                        |                        | of integers) about     |
+|                        |                        | variables to be passed |
+|                        |                        | to BONMIN              |
++------------------------+------------------------+------------------------+
+| var_numeric_md         | OT_DICT                | Numeric metadata (a    |
+|                        |                        | dictionary with lists  |
+|                        |                        | of reals) about        |
+|                        |                        | variables to be passed |
+|                        |                        | to BONMIN              |
++------------------------+------------------------+------------------------+
+| var_string_md          | OT_DICT                | String metadata (a     |
+|                        |                        | dictionary with lists  |
+|                        |                        | of strings) about      |
+|                        |                        | variables to be passed |
+|                        |                        | to BONMIN              |
++------------------------+------------------------+------------------------+
+
+--------------------------------------------------------------------------------
 
 
 
