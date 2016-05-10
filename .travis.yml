@@ -84,11 +84,14 @@ matrix:
         #- sudo apt-get install graphviz python3-lxml texlive-science texlive-latex-base texlive-latex-recommended texlive-latex-extra -y
         #- sudo pip3 install pydot3
         # travis-wait seems to stop at 20 mins, regardless if output is being generated
-        #- (while true ; do sleep 60 ; echo "ping" ; done ) &
+        - (while true ; do sleep 60 ; echo "ping" ; done ) &
 
         #- pushd test && make trunktesterbot_no_unittests_py && popd
         #- pushd test && make unittests_py_slow && popd
         #- pushd build && make json && popd
+        - pushd test && make unittests_py && popd
+        - pushd test && make unittests_py_slow && popd
+        
     - compiler: gcc
       os: linux
       env: TESTMODE=docs

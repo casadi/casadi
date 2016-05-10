@@ -515,8 +515,8 @@ class casadiTestCase(unittest.TestCase):
 
   def check_codegen(self,F,inputs=None):
     if args.run_slow:
-      import md5
-      name = "codegen_%s" % md5.new("%f" % np.random.random()+str(F)+str(time.time())).hexdigest()
+      import hashlib
+      name = "codegen_%s" % (hashlib.md5(("%f" % np.random.random()+str(F)+str(time.time())).encode()).hexdigest())
       F.generate(name)
       import subprocess
       p = subprocess.Popen("gcc -fPIC -shared -O3 %s.c -o %s.so" % (name,name) ,shell=True).wait()
