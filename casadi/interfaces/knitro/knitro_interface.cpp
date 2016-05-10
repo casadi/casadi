@@ -218,7 +218,7 @@ namespace casadi {
     // Solve NLP
     double f;
     status = KTR_solve(m->kc_handle, m->wx, get_ptr(lambda), 0, &f,
-                       0, 0, 0, 0, 0, static_cast<void*>(&m));
+                       0, 0, 0, 0, 0, static_cast<void*>(m));
     m->return_status = return_codes(status);
 
     // Output primal solution
