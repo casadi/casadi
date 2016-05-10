@@ -115,7 +115,7 @@ namespace casadi {
     if (values) {
       // Evaluate Hessian
       if (solver_.calc_function(mem_, "nlp_hess_l",
-                                {x, mem_->p, &obj_factor, lambda}, {values})) return false;
+                      {x, mem_->p, &obj_factor, lambda}, {values})) return false;
       return true;
     } else {
       // Get the sparsity pattern

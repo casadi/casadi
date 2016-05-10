@@ -115,8 +115,8 @@ namespace casadi {
   virtual bool get_variables_types(Index n, VariableType* var_types);
   virtual bool get_variables_linearity(Index n, Ipopt::TNLP::LinearityType* var_types);
   virtual bool get_constraints_linearity(Index m, Ipopt::TNLP::LinearityType* const_types);
-  virtual const SosInfo * sosConstraints() const{return 0;}
-  virtual const BranchingInfo* branchingInfo() const{return 0;}
+  virtual const SosInfo * sosConstraints() const {return 0;}
+  virtual const BranchingInfo* branchingInfo() const {return 0;}
 
   private:
     BonminUserClass(const BonminUserClass&);
