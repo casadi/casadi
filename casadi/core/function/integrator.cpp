@@ -43,12 +43,12 @@ namespace casadi {
 
   Function integrator(const string& name, const string& solver,
                       const SXDict& dae, const Dict& opts) {
-    return integrator(name, solver, Integrator::map2problem(dae), opts);
+    return integrator(name, solver, Integrator::map2oracle("dae", dae), opts);
   }
 
   Function integrator(const string& name, const string& solver,
                       const MXDict& dae, const Dict& opts) {
-    return integrator(name, solver, Integrator::map2problem(dae), opts);
+    return integrator(name, solver, Integrator::map2oracle("dae", dae), opts);
   }
 
   Function integrator(const string& name, const string& solver,
@@ -652,13 +652,17 @@ namespace casadi {
     }
 
     // Create integrator for augmented DAE
-    string iname = "aug_f" + to_string(nfwd) + this->name();
-    Function aug_int;
+    Function aug_dae;
+    string aug_prefix = "fsens" + to_string(nfwd) + "_";
+    string dae_name = aug_prefix + oracle_.name();
+    Dict dae_opts = {{"derivative_of", oracle_}};
     if (oracle_.is_a("sxfunction")) {
-      aug_int = integrator(iname, plugin_name(), aug_fwd<SX>(nfwd), aug_opts);
+      aug_dae = map2oracle(dae_name, aug_fwd<SX>(nfwd), dae_opts);
     } else {
-      aug_int = integrator(iname, plugin_name(), aug_fwd<MX>(nfwd), aug_opts);
+      aug_dae = map2oracle(dae_name, aug_fwd<MX>(nfwd), dae_opts);
     }
+    Function aug_int = integrator(aug_prefix + this->name(), plugin_name(),
+      aug_dae, aug_opts);
 
     // All inputs of the return function
     vector<MX> ret_in;

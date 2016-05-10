@@ -211,12 +211,15 @@ namespace casadi {
 
     /// Convert dictionary to Problem
     template<typename XType>
-      static Function map2problem(const std::map<std::string, XType>& d);
+      static Function map2oracle(const std::string& name,
+        const std::map<std::string, XType>& d, const Dict& opts=Dict());
   };
 
   template<typename XType>
-  Function Integrator::map2problem(const std::map<std::string, XType>& d) {
+  Function Integrator::map2oracle(const std::string& name,
+    const std::map<std::string, XType>& d, const Dict& opts) {
     std::vector<XType> de_in(DE_NUM_IN), de_out(DE_NUM_OUT);
+
     for (auto&& i : d) {
       if (i.first=="t") {
         de_in[DE_T]=i.second;
@@ -248,7 +251,7 @@ namespace casadi {
         casadi_error("No such field: " + i.first);
       }
     }
-    return Function("dae", de_in, de_out, DE_INPUTS, DE_OUTPUTS);
+    return Function(name, de_in, de_out, DE_INPUTS, DE_OUTPUTS, opts);
   }
 
   struct CASADI_EXPORT FixedStepMemory : public IntegratorMemory {
