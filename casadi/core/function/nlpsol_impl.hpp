@@ -85,6 +85,9 @@ namespace casadi {
     /// Which variables are discrete?
     std::vector<bool> discrete_;
 
+    // Mixed integer problem?
+    bool mi_;
+
     /// Constructor
     Nlpsol(const std::string& name, const Function& oracle);
 

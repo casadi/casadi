@@ -46,7 +46,7 @@ namespace casadi {
     const KnitroInterface& self;
 
     // KNITRO context pointer
-    KTR_context_ptr kc_handle;
+    KTR_context_ptr kc;
 
     // Inputs
     double *wx, *wlbx, *wubx, *wlbg, *wubg;
@@ -109,6 +109,9 @@ namespace casadi {
 
     // Solve the NLP
     virtual void solve(void* mem) const;
+
+    /// Can discrete variables be treated
+    virtual bool integer_support() const { return true;}
 
     // KNITRO callback wrapper
     static int callback(const int evalRequestCode, const int n, const int m, const int nnzJ,

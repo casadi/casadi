@@ -268,11 +268,13 @@ namespace casadi {
     ng_ = nnz_out(NLPSOL_G);
 
     // Discrete marker
+    mi_ = false;
     if (!discrete_.empty()) {
       casadi_assert_message(discrete_.size()==nx_, "\"discrete\" option has wrong length");
       if (std::find(discrete_.begin(), discrete_.end(), true)!=discrete_.end()) {
         casadi_assert_message(integer_support(),
                               "Discrete variables require a solver with integer support");
+        mi_ = true;
       }
     }
 
