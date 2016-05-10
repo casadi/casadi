@@ -13,7 +13,7 @@ trunktesterbot_no_unittests_py: examples_indoc_py examples_indoc_cpp tutorials e
 trunktesterbot_knownbugs: unittests_py_knownbugs examples_indoc_py examples_indoc_cpp tutorials examples_code_py examples_code_cpp users_guide user_guide_snippets_py
 
 # Set to -memcheck if you want to include a check for memory leaks
-MEMCHECK = 
+MEMCHECK =
 
 lint :
 	cd ../build && make lint; cd ../test
@@ -67,7 +67,7 @@ examples_indoc_py:
 
 # No memchecks because it leaks like hell, and is slow
 examples_code_py:
-	python internal/test_py.py '../docs/examples/python' -skipfiles="c_code_generation.py parametric_sensitivities.py reduced_hessian.py"
+	python internal/test_py.py '../docs/examples/python' -skipfiles="c_code_generation.py parametric_sensitivities.py reduced_hessian.py lotka_volterra_minlp.py"
 
 examples_indoc_cpp:
 	python internal/test_cpp.py '../docs/api/examples' $(MEMCHECK)
@@ -87,4 +87,3 @@ users_guide:
 
 user_guide_snippets_py: users_guide
 	python internal/test_py.py '../docs/users_guide' -skipfiles="pytex.py temp_pytex.py"
-

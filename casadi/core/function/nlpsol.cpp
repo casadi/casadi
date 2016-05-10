@@ -224,7 +224,10 @@ namespace casadi {
       {"verbose_init",
        {OT_BOOL,
         "Print out timing information about "
-        "the different stages of initialization"}}
+        "the different stages of initialization"}},
+      {"discrete",
+       {OT_BOOLVECTOR,
+        "Indicates which of the variables are discrete, i.e. integer-valued"}}
      }
   };
 
@@ -251,6 +254,8 @@ namespace casadi {
         iteration_callback_ignore_errors_ = op.second;
       } else if (op.first=="print_time") {
         print_time_ = op.second;
+      } else if (op.first=="discrete") {
+        discrete_ = op.second;
       }
     }
 
@@ -261,6 +266,15 @@ namespace casadi {
     nx_ = nnz_out(NLPSOL_X);
     np_ = nnz_in(NLPSOL_P);
     ng_ = nnz_out(NLPSOL_G);
+
+    // Discrete marker
+    if (!discrete_.empty()) {
+      casadi_assert_message(discrete_.size()==nx_, "\"discrete\" option has wrong length");
+      if (std::find(discrete_.begin(), discrete_.end(), true)!=discrete_.end()) {
+        casadi_assert_message(integer_support(),
+                              "Discrete variables require a solver with integer support");
+      }
+    }
 
     if (!fcallback_.is_null()) {
       // Consistency checks

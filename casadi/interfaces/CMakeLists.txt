@@ -10,6 +10,10 @@ if(IPOPT_FOUND)
   add_subdirectory(ipopt)
 endif()
 
+if(BONMIN_FOUND)
+  add_subdirectory(bonmin)
+endif()
+
 if(QPOASES_FOUND)
   add_subdirectory(qpoases)
 endif()

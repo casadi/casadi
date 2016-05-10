@@ -82,7 +82,9 @@ namespace casadi {
     // Print timing statistics
     bool print_time_;
 
-  public:
+    /// Which variables are discrete?
+    std::vector<bool> discrete_;
+
     /// Constructor
     Nlpsol(const std::string& name, const Function& oracle);
 
@@ -130,6 +132,9 @@ namespace casadi {
 
     /** \brief Get default input value */
     virtual double default_in(int ind) const { return nlpsol_default_in(ind);}
+
+    /// Can discrete variables be treated
+    virtual bool integer_support() const { return false;}
 
     /** \brief Set the (persistent) work vectors */
     virtual void set_work(void* mem, const double**& arg, double**& res,
