@@ -657,10 +657,11 @@ namespace casadi {
     string dae_name = aug_prefix + oracle_.name();
     Dict dae_opts = {{"derivative_of", oracle_}};
     if (oracle_.is_a("sxfunction")) {
-      aug_dae = map2oracle(dae_name, aug_fwd<SX>(nfwd), dae_opts);
+      aug_dae = map2oracle(dae_name, aug_fwd<SX>(nfwd));
     } else {
-      aug_dae = map2oracle(dae_name, aug_fwd<MX>(nfwd), dae_opts);
+      aug_dae = map2oracle(dae_name, aug_fwd<MX>(nfwd));
     }
+    aug_opts["derivative_of"] = self();
     Function aug_int = integrator(aug_prefix + this->name(), plugin_name(),
       aug_dae, aug_opts);
 
@@ -757,12 +758,12 @@ namespace casadi {
     Function aug_dae;
     string aug_prefix = "asens" + to_string(nadj) + "_";
     string dae_name = aug_prefix + oracle_.name();
-    Dict dae_opts = {{"derivative_of", oracle_}};
     if (oracle_.is_a("sxfunction")) {
-      aug_dae = map2oracle(dae_name, aug_adj<SX>(nadj), dae_opts);
+      aug_dae = map2oracle(dae_name, aug_adj<SX>(nadj));
     } else {
-      aug_dae = map2oracle(dae_name, aug_adj<MX>(nadj), dae_opts);
+      aug_dae = map2oracle(dae_name, aug_adj<MX>(nadj));
     }
+    aug_opts["derivative_of"] = self();
     Function aug_int = integrator(aug_prefix + this->name(), plugin_name(),
       aug_dae, aug_opts);
 
@@ -1221,6 +1222,45 @@ namespace casadi {
                    G_, backward_rootfinder_options);
       alloc(backward_rootfinder_);
     }
+  }
+
+  template<typename XType>
+  Function Integrator::map2oracle(const std::string& name,
+    const std::map<std::string, XType>& d, const Dict& opts) {
+    std::vector<XType> de_in(DE_NUM_IN), de_out(DE_NUM_OUT);
+
+    for (auto&& i : d) {
+      if (i.first=="t") {
+        de_in[DE_T]=i.second;
+      } else if (i.first=="x") {
+        de_in[DE_X]=i.second;
+      } else if (i.first=="z") {
+        de_in[DE_Z]=i.second;
+      } else if (i.first=="p") {
+        de_in[DE_P]=i.second;
+      } else if (i.first=="rx") {
+        de_in[DE_RX]=i.second;
+      } else if (i.first=="rz") {
+        de_in[DE_RZ]=i.second;
+      } else if (i.first=="rp") {
+        de_in[DE_RP]=i.second;
+      } else if (i.first=="ode") {
+        de_out[DE_ODE]=i.second;
+      } else if (i.first=="alg") {
+        de_out[DE_ALG]=i.second;
+      } else if (i.first=="quad") {
+        de_out[DE_QUAD]=i.second;
+      } else if (i.first=="rode") {
+        de_out[DE_RODE]=i.second;
+      } else if (i.first=="ralg") {
+        de_out[DE_RALG]=i.second;
+      } else if (i.first=="rquad") {
+        de_out[DE_RQUAD]=i.second;
+      } else {
+        casadi_error("No such field: " + i.first);
+      }
+    }
+    return Function(name, de_in, de_out, DE_INPUTS, DE_OUTPUTS, opts);
   }
 
 } // namespace casadi
