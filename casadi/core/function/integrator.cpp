@@ -754,13 +754,17 @@ namespace casadi {
     }
 
     // Create integrator for augmented DAE
-    string iname = "aug_r" + to_string(nadj) + this->name();
-    Function aug_int;
+    Function aug_dae;
+    string aug_prefix = "asens" + to_string(nadj) + "_";
+    string dae_name = aug_prefix + oracle_.name();
+    Dict dae_opts = {{"derivative_of", oracle_}};
     if (oracle_.is_a("sxfunction")) {
-      aug_int = integrator(iname, plugin_name(), aug_adj<SX>(nadj), aug_opts);
+      aug_dae = map2oracle(dae_name, aug_adj<SX>(nadj), dae_opts);
     } else {
-      aug_int = integrator(iname, plugin_name(), aug_adj<MX>(nadj), aug_opts);
+      aug_dae = map2oracle(dae_name, aug_adj<MX>(nadj), dae_opts);
     }
+    Function aug_int = integrator(aug_prefix + this->name(), plugin_name(),
+      aug_dae, aug_opts);
 
     // All inputs of the return function
     vector<MX> ret_in;
