@@ -154,6 +154,8 @@ namespace casadi {
         qpsol_plugin = op.second.to_string();
       } else if (op.first=="qpsol_options") {
         qpsol_options = op.second;
+      } else if (op.first=="regularize") {
+        regularize_ = op.second;
       } else if (op.first=="print_header") {
         print_header_ = op.second;
       }
