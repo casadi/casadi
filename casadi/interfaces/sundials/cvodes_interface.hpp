@@ -178,19 +178,6 @@ namespace casadi {
   protected:
 
     // Sundials callback functions
-    void ehfun(CvodesMemory* m, int error_code, const char *module, const char *function,
-               char *msg) const;
-    void rhsS(CvodesMemory* m, int Ns, double t, N_Vector x, N_Vector xdot, N_Vector *xF,
-              N_Vector *xdotF, N_Vector tmp1, N_Vector tmp2) const;
-    void rhsS1(CvodesMemory* m, int Ns, double t, N_Vector x, N_Vector xdot, int iS, N_Vector xF,
-               N_Vector xdotF, N_Vector tmp1, N_Vector tmp2) const;
-    void rhsQS(CvodesMemory* m, int Ns, double t, N_Vector x, N_Vector *xF, N_Vector qdot,
-               N_Vector *qFdot, N_Vector tmp1, N_Vector tmp2) const;
-    void rhsB(CvodesMemory* m, double t, N_Vector x, N_Vector rx, N_Vector rxdot) const;
-    void rhsBS(CvodesMemory* m, double t, N_Vector x, N_Vector *xF, N_Vector xB,
-               N_Vector xdotB) const;
-    void rhsQB(CvodesMemory* m, double t, N_Vector x, N_Vector rx, N_Vector rqdot) const;
-    /// <tt>z = M^(-1).r</tt>
     void psolve(CvodesMemory* m, double t, N_Vector x, N_Vector xdot, N_Vector r, N_Vector z,
                 double gamma, double delta, int lr, N_Vector tmp) const;
     void psolveB(CvodesMemory* m, double t, N_Vector x, N_Vector xB, N_Vector xdotB, N_Vector rvecB,

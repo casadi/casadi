@@ -493,25 +493,13 @@ namespace casadi {
     try {
       casadi_assert(user_data);
       auto m = to_mem(user_data);
-      m->self.ehfun(m, error_code, module, function, msg);
+      auto& s = m->self;
+      if (!s.disable_internal_warnings_) {
+        userOut<true, PL_WARN>() << msg << endl;
+      }
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "ehfun failed: " << e.what() << endl;
     }
-  }
-
-  void CvodesInterface::ehfun(CvodesMemory* m, int error_code, const char *module,
-                              const char *function, char *msg) const {
-    if (!disable_internal_warnings_) {
-      userOut<true, PL_WARN>() << msg << endl;
-    }
-  }
-
-  void CvodesInterface::rhsS(CvodesMemory* m, int Ns, double t, N_Vector x, N_Vector xdot,
-                             N_Vector *xF, N_Vector *xdotF, N_Vector tmp1, N_Vector tmp2) const {
-    //    casadi_assert(Ns==nfdir_);
-
-    // Commented out since a new implementation currently cannot be tested
-    casadi_error("Commented out, #884, #794.");
   }
 
   int CvodesInterface::rhsS_wrapper(int Ns, double t, N_Vector x, N_Vector xdot, N_Vector *xF,
@@ -520,19 +508,12 @@ namespace casadi {
     try {
       casadi_assert(user_data);
       auto m = to_mem(user_data);
-      m->self.rhsS(m, Ns, t, x, xdot, xF, xdotF, tmp1, tmp2);
+      casadi_error("Commented out, #884, #794.");
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "fs failed: " << e.what() << endl;
       return 1;
     }
-  }
-
-  void CvodesInterface::rhsS1(CvodesMemory* m, int Ns, double t, N_Vector x, N_Vector xdot, int iS,
-                              N_Vector xF, N_Vector xdotF, N_Vector tmp1, N_Vector tmp2) const {
-
-    // Commented out since a new implementation currently cannot be tested
-    casadi_error("Commented out, #884, #794.");
   }
 
   int CvodesInterface::rhsS1_wrapper(int Ns, double t, N_Vector x, N_Vector xdot, int iS,
@@ -541,7 +522,7 @@ namespace casadi {
     try {
       casadi_assert(user_data);
       auto m = to_mem(user_data);
-      m->self.rhsS1(m, Ns, t, x, xdot, iS, xF, xdotF, tmp1, tmp2);
+      casadi_error("Commented out, #884, #794.");
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "fs failed: " << e.what() << endl;
@@ -551,7 +532,6 @@ namespace casadi {
 
   int CvodesInterface::rhsQ_wrapper(double t, N_Vector x, N_Vector qdot, void *user_data) {
     try {
-      casadi_assert(user_data);
       auto m = to_mem(user_data);
       auto& s = m->self;
       s.calc_function(m, "rhsQ", {NV_DATA_S(x), get_ptr(m->p), &t},
@@ -567,12 +547,12 @@ namespace casadi {
                                     N_Vector *qdotF, void *user_data,
                                     N_Vector tmp1, N_Vector tmp2) {
     try {
-      auto m = to_mem(user_data);
-      if (!m) {
+      if (!user_data) {
         // SUNDIALS BUG!!!
         for (int i=0; i<Ns; ++i) N_VConst(0.0, qdotF[i]);
         return 0;
       }
+      auto m = to_mem(user_data);
       casadi_error("Commented out, #884, #794.");
       return 0;
     } catch(exception& e) {
@@ -581,12 +561,6 @@ namespace casadi {
     }
   }
 
-  void CvodesInterface::rhsBS(CvodesMemory* m, double t, N_Vector x, N_Vector *xF, N_Vector rx,
-                              N_Vector rxdot) const {
-
-    // Commented out since a new implementation currently cannot be tested
-    casadi_error("Commented out, #884, #794.");
-  }
 
   int CvodesInterface::rhsB_wrapper(double t, N_Vector x, N_Vector rx, N_Vector rxdot,
                                    void *user_data) {
@@ -611,9 +585,8 @@ namespace casadi {
   int CvodesInterface::rhsBS_wrapper(double t, N_Vector x, N_Vector *xF, N_Vector xB,
                                     N_Vector xdotB, void *user_data) {
     try {
-      casadi_assert(user_data);
       auto m = to_mem(user_data);
-      m->self.rhsBS(m, t, x, xF, xB, xdotB);
+      casadi_error("Commented out, #884, #794.");
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "rhsBS failed: " << e.what() << endl;;
