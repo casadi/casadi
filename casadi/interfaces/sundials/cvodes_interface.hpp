@@ -192,10 +192,6 @@ namespace casadi {
     void rhsBS(CvodesMemory* m, double t, N_Vector x, N_Vector *xF, N_Vector xB,
                N_Vector xdotB) const;
     void rhsQB(CvodesMemory* m, double t, N_Vector x, N_Vector rx, N_Vector rqdot) const;
-    void jtimes(CvodesMemory* m, N_Vector v, N_Vector Jv, double t, N_Vector x, N_Vector xdot,
-                N_Vector tmp) const;
-    void jtimesB(CvodesMemory* m, N_Vector v, N_Vector Jv, double t, N_Vector x, N_Vector rx,
-                 N_Vector rxdot, N_Vector tmpB) const;
     void djac(CvodesMemory* m, long N, double t, N_Vector x, N_Vector xdot, DlsMat Jac,
               N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) const;
     void djacB(CvodesMemory* m, long NeqB, double t, N_Vector x, N_Vector xB, N_Vector xdotB,
@@ -319,28 +315,8 @@ namespace casadi {
     // Jacobian of the DAE with respect to the state and state derivatives
     Function jac_, jacB_;
 
-    // Jacobian times vector functions
-    Function jtimes_, jtimesB_;
-
     int lmm_; // linear multistep method
     int iter_; // nonlinear solver iteration
-
-    // jtimes signature
-    enum JTimesIn {
-      JTIMES_T, JTIMES_X, JTIMES_P, JTIMES_FWD_X, JTIMES_NUM_IN
-    };
-    enum JTimesOut {
-      JTIMES_FWD_ODE, JTIMES_NUM_OUT
-    };
-    // jtimesB signature
-    enum JTimesBIn {
-      JTIMESB_T, JTIMESB_X, JTIMESB_P,
-      JTIMESB_RX, JTIMESB_RP,
-      JTIMESB_FWD_RX, JTIMESB_NUM_IN
-    };
-    enum JTimesBOut {
-      JTIMESB_FWD_RODE, JTIMESB_NUM_OUT
-    };
   };
 
 } // namespace casadi

@@ -132,8 +132,7 @@ namespace casadi {
     if (exact_jacobian_) {
       switch (linsol_f_) {
       case SD_ITERATIVE:
-        jtimes_ = oracle_.factory("jtimes", {"t", "x", "p", "fwd:x"}, {"fwd:ode"});
-        alloc(jtimes_);
+        create_function("jtimes", {"t", "x", "p", "fwd:x"}, {"fwd:ode"});
         break;
       default: break;
       }
@@ -142,9 +141,8 @@ namespace casadi {
     if (exact_jacobianB_) {
       switch (linsol_g_) {
       case SD_ITERATIVE:
-        jtimesB_ = oracle_.factory("jtimesB",
+        create_function("jtimesB",
           {"t", "x", "p", "rx", "rp", "fwd:rx"}, {"fwd:rode"});
-        alloc(jtimesB_);
         break;
       default: break;
       }
@@ -707,9 +705,10 @@ namespace casadi {
   int CvodesInterface::jtimes_wrapper(N_Vector v, N_Vector Jv, double t, N_Vector x,
                                      N_Vector xdot, void *user_data, N_Vector tmp) {
     try {
-      casadi_assert(user_data);
       auto m = to_mem(user_data);
-      m->self.jtimes(m, v, Jv, t, x, xdot, tmp);
+      auto& s = m->self;
+      s.calc_function(m, "jtimes", {&t, NV_DATA_S(x), get_ptr(m->p), NV_DATA_S(v)},
+        {NV_DATA_S(Jv)});
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "jtimes failed: " << e.what() << endl;;
@@ -717,46 +716,20 @@ namespace casadi {
     }
   }
 
-  int CvodesInterface::jtimesB_wrapper(N_Vector vB, N_Vector JvB, double t, N_Vector x,
-                                      N_Vector xB, N_Vector xdotB, void *user_data ,
+  int CvodesInterface::jtimesB_wrapper(N_Vector v, N_Vector Jv, double t, N_Vector x,
+                                      N_Vector rx, N_Vector rxdot, void *user_data ,
                                       N_Vector tmpB) {
     try {
-      casadi_assert(user_data);
       auto m = to_mem(user_data);
-      m->self.jtimesB(m, vB, JvB, t, x, xB, xdotB, tmpB);
+      auto& s = m->self;
+      s.calc_function(m, "jtimesB",
+        {&t, NV_DATA_S(x), get_ptr(m->p), NV_DATA_S(rx), get_ptr(m->rp), NV_DATA_S(v)},
+        {NV_DATA_S(Jv)});
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "jtimes failed: " << e.what() << endl;;
       return 1;
     }
-  }
-
-  void CvodesInterface::jtimes(CvodesMemory* m, N_Vector v, N_Vector Jv, double t, N_Vector x,
-                              N_Vector xdot, N_Vector tmp) const {
-    log("CvodesInterface::jtimes", "begin");
-    // Evaluate jtimes_
-    m->arg[JTIMES_T] = &t;
-    m->arg[JTIMES_X] = NV_DATA_S(x);
-    m->arg[JTIMES_P] = get_ptr(m->p);
-    m->arg[JTIMES_FWD_X] = NV_DATA_S(v);
-    m->res[JTIMES_FWD_ODE] = NV_DATA_S(Jv);
-    jtimes_(m->arg, m->res, m->iw, m->w, 0);
-    log("CvodesInterface::jtimes", "end");
-  }
-
-  void CvodesInterface::jtimesB(CvodesMemory* m, N_Vector v, N_Vector Jv, double t, N_Vector x,
-                                N_Vector rx, N_Vector rxdot, N_Vector tmpB) const {
-    log("CvodesInterface::jtimesB", "begin");
-    // Evaluate jtimesB_
-    m->arg[JTIMESB_T] = &t;
-    m->arg[JTIMESB_X] = NV_DATA_S(x);
-    m->arg[JTIMESB_P] = get_ptr(m->p);
-    m->arg[JTIMESB_RX] = NV_DATA_S(rx);
-    m->arg[JTIMESB_RP] = get_ptr(m->rp);
-    m->arg[JTIMESB_FWD_RX] = NV_DATA_S(v);
-    m->res[JTIMESB_FWD_RODE] = NV_DATA_S(Jv);
-    jtimesB_(m->arg, m->res, m->iw, m->w, 0);
-    log("CvodesInterface::jtimesB", "end");
   }
 
   int CvodesInterface::djac_wrapper(long N, double t, N_Vector x, N_Vector xdot, DlsMat Jac,
