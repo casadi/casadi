@@ -146,13 +146,13 @@ namespace casadi {
 
     // Create a Jacobian if requested
     if (exact_jacobian_) {
-      set_function(getJac());
+      set_function(oracle_.is_a("sxfunction") ? getJacF<SX>() : getJacF<MX>());
       casadi_assert(get_function("jacF").sparsity_out(0) == sp_jac_dae_);
     }
 
     // Create a backwards Jacobian if requested
     if (exact_jacobianB_ && nrx_>0) {
-      set_function(getJacB());
+      set_function(oracle_.is_a("sxfunction") ? getJacB<SX>() : getJacB<MX>());
       casadi_assert(get_function("jacB").sparsity_out(0) == sp_jac_rdae_);
     }
 
@@ -1451,7 +1451,7 @@ namespace casadi {
   }
 
   template<typename MatType>
-  Function IdasInterface::getJacGen() {
+  Function IdasInterface::getJacF() {
     vector<MatType> a = MatType::get_input(oracle_);
     vector<MatType> r = oracle_(a);
 
@@ -1470,7 +1470,7 @@ namespace casadi {
   }
 
   template<typename MatType>
-  Function IdasInterface::getJacGenB() {
+  Function IdasInterface::getJacB() {
     vector<MatType> a = MatType::get_input(oracle_);
     vector<MatType> r = oracle_(a);
 
@@ -1487,22 +1487,6 @@ namespace casadi {
     return Function("jacB", {a[DE_T], a[DE_RX], a[DE_RZ], a[DE_RP],
                              a[DE_X], a[DE_Z], a[DE_P], cj},
                     {jac});
-  }
-
-  Function IdasInterface::getJacB() {
-    if (oracle_.is_a("sxfunction")) {
-      return getJacGenB<SX>();
-    } else {
-      return getJacGenB<MX>();
-    }
-  }
-
-  Function IdasInterface::getJac() {
-    if (oracle_.is_a("sxfunction")) {
-      return getJacGen<SX>();
-    } else {
-      return getJacGen<MX>();
-    }
   }
 
   IdasMemory::IdasMemory(const IdasInterface& s) : self(s) {

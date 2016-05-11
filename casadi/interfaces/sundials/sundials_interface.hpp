@@ -153,12 +153,6 @@ namespace casadi {
     /// Linear solver forward, backward
     Function linsol_, linsolB_;
 
-    /** \brief  Get the integrator Jacobian for the forward problem */
-    virtual Function getJac()=0;
-
-    /** \brief  Get the integrator Jacobian for the backward problem */
-    virtual Function getJacB()=0;
-
     // Get bandwidth for forward problem
     std::pair<int, int> getBandwidth() const;
 

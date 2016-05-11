@@ -162,7 +162,7 @@ namespace casadi {
     }
 
     /** \brief  Get the integrator Jacobian for the forward problem (generic) */
-    template<typename MatType> Function getJacGen();
+    template<typename MatType> Function getJacF();
 
     /** \brief  Get the integrator Jacobian for the backward problem (generic)
      *   Structure:
@@ -172,13 +172,7 @@ namespace casadi {
      *   | diff(gz, rx)                        |   diff(gz, rz) |
      * \endverbatim
      */
-    template<typename MatType> Function getJacGenB();
-
-    /** \brief  Get the integrator Jacobian for the forward problem */
-    virtual Function getJac();
-
-    /** \brief  Get the integrator Jacobian for the backward problem */
-    virtual Function getJacB();
+    template<typename MatType> Function getJacB();
 
     /// Correct the initial conditions, i.e. calculate
     void correctInitialConditions(IdasMemory* m) const;
