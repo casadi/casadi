@@ -956,57 +956,26 @@ namespace casadi {
     if (flag != IDA_SUCCESS) idas_error("IDASetStopTime", flag);
   }
 
-  void IdasInterface::
-  psolve(IdasMemory* m, double t, N_Vector xz, N_Vector xzdot, N_Vector rr, N_Vector rvec,
-         N_Vector zvec, double cj, double delta, N_Vector tmp) const {
-    log("IdasInterface::psolve", "begin");
-
-    // Copy input to output, if necessary
-    if (rvec!=zvec) {
-      N_VScale(1.0, rvec, zvec);
-    }
-
-    // Solve the (possibly factorized) system
-    casadi_assert_message(linsol_.nnz_out(0) == NV_LENGTH_S(zvec), "Assertion error: "
-                          << linsol_.nnz_out(0) << " == " << NV_LENGTH_S(zvec));
-    linsol_.linsol_solve(NV_DATA_S(zvec));
-    log("IdasInterface::psolve", "end");
-  }
-
   int IdasInterface::psolve_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector rr,
                                     N_Vector rvec, N_Vector zvec, double cj, double delta,
                                     void *user_data, N_Vector tmp) {
     try {
       auto m = to_mem(user_data);
       auto& s = m->self;
-      s.psolve(m, t, xz, xzdot, rr, rvec, zvec, cj, delta, tmp);
+      // Copy input to output, if necessary
+      if (rvec!=zvec) {
+        N_VScale(1.0, rvec, zvec);
+      }
+
+      // Solve the (possibly factorized) system
+      casadi_assert_message(s.linsol_.nnz_out(0) == NV_LENGTH_S(zvec), "Assertion error: "
+                            << s.linsol_.nnz_out(0) << " == " << NV_LENGTH_S(zvec));
+      s.linsol_.linsol_solve(NV_DATA_S(zvec));
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "psolve failed: " << e.what() << endl;
       return 1;
     }
-  }
-
-  void IdasInterface::
-  psolveB(IdasMemory* m, double t, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB,
-          N_Vector resvalB, N_Vector rvecB, N_Vector zvecB,
-          double cjB, double deltaB, N_Vector tmpB) const {
-    log("IdasInterface::psolveB", "begin");
-
-    // Copy input to output, if necessary
-    if (rvecB!=zvecB) {
-      N_VScale(1.0, rvecB, zvecB);
-    }
-
-    casadi_assert(!linsolB_.is_null());
-
-    // Solve the (possibly factorized) system
-    casadi_assert_message(linsolB_.nnz_out(0) == NV_LENGTH_S(zvecB),
-                          "Assertion error: " << linsolB_.nnz_out(0)
-                          << " == " << NV_LENGTH_S(zvecB));
-    linsolB_.linsol_solve(NV_DATA_S(zvecB));
-
-    log("IdasInterface::psolveB", "end");
   }
 
   int IdasInterface::psolveB_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB,
@@ -1016,7 +985,19 @@ namespace casadi {
     try {
       auto m = to_mem(user_data);
       auto& s = m->self;
-      s.psolveB(m, t, xz, xzdot, xzB, xzdotB, resvalB, rvecB, zvecB, cjB, deltaB, tmpB);
+      // Copy input to output, if necessary
+      if (rvecB!=zvecB) {
+        N_VScale(1.0, rvecB, zvecB);
+      }
+
+      casadi_assert(!s.linsolB_.is_null());
+
+      // Solve the (possibly factorized) system
+      casadi_assert_message(s.linsolB_.nnz_out(0) == NV_LENGTH_S(zvecB),
+                            "Assertion error: " << s.linsolB_.nnz_out(0)
+                            << " == " << NV_LENGTH_S(zvecB));
+      s.linsolB_.linsol_solve(NV_DATA_S(zvecB));
+
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "psolveB failed: " << e.what() << endl;
@@ -1030,7 +1011,14 @@ namespace casadi {
     try {
       auto m = to_mem(user_data);
       auto& s = m->self;
-      s.psetup(m, t, xz, xzdot, rr, cj, tmp1, tmp2, tmp3);
+      // Calculate Jacobian
+      s.calc_function(m, "jacF", {NV_DATA_S(xz), NV_DATA_S(xz)+s.nx_, get_ptr(m->p), &t, &cj},
+                              {m->jac});
+
+      // Prepare the solution of the linear system (e.g. factorize)
+      s.linsol_.setup(m->arg+LINSOL_NUM_IN, m->res+LINSOL_NUM_OUT, m->iw, m->w);
+      s.linsol_.linsol_factorize(m->jac);
+
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "psetup failed: " << e.what() << endl;
@@ -1038,53 +1026,27 @@ namespace casadi {
     }
   }
 
-  void IdasInterface::
-  psetupB(IdasMemory* m, double t, N_Vector xz, N_Vector xzdot, N_Vector rxz, N_Vector rxzdot,
-          N_Vector rresval, double cj,
-          N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B) const {
-    log("IdasInterface::psetupB", "begin");
-
-    // Calculate Jacobian
-    calc_function(m, "jacB", {NV_DATA_S(rxz), NV_DATA_S(rxz)+nrx_, get_ptr(m->rp),
-                               NV_DATA_S(xz), NV_DATA_S(xz)+nx_, get_ptr(m->p), &t, &cj},
-                              {m->jacB});
-
-    // Prepare the solution of the linear system (e.g. factorize)
-    linsolB_.setup(m->arg+LINSOL_NUM_IN, m->res+LINSOL_NUM_OUT, m->iw, m->w);
-    linsolB_.linsol_factorize(m->jacB);
-
-    log("IdasInterface::psetupB", "end");
-  }
-
   int IdasInterface::psetupB_wrapper(double t, N_Vector xz, N_Vector xzdot,
-                                    N_Vector xzB, N_Vector xzdotB,
-                                    N_Vector resvalB, double cjB, void *user_data,
+                                    N_Vector rxz, N_Vector rxzdot,
+                                    N_Vector rresval, double cj, void *user_data,
                                     N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B) {
     try {
       auto m = to_mem(user_data);
       auto& s = m->self;
-      s.psetupB(m, t, xz, xzdot, xzB, xzdotB, resvalB, cjB, tmp1B, tmp2B, tmp3B);
+      // Calculate Jacobian
+      s.calc_function(m, "jacB", {NV_DATA_S(rxz), NV_DATA_S(rxz)+s.nrx_, get_ptr(m->rp),
+                                 NV_DATA_S(xz), NV_DATA_S(xz)+s.nx_, get_ptr(m->p), &t, &cj},
+                                {m->jacB});
+
+      // Prepare the solution of the linear system (e.g. factorize)
+      s.linsolB_.setup(m->arg+LINSOL_NUM_IN, m->res+LINSOL_NUM_OUT, m->iw, m->w);
+      s.linsolB_.linsol_factorize(m->jacB);
+
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "psetupB failed: " << e.what() << endl;
       return 1;
     }
-  }
-
-  void IdasInterface::
-  psetup(IdasMemory* m, double t, N_Vector xz, N_Vector xzdot, N_Vector rr, double cj,
-         N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) const {
-    log("IdasInterface::psetup", "begin");
-
-    // Calculate Jacobian
-    calc_function(m, "jacF", {NV_DATA_S(xz), NV_DATA_S(xz)+nx_, get_ptr(m->p), &t, &cj},
-                            {m->jac});
-
-    // Prepare the solution of the linear system (e.g. factorize)
-    linsol_.setup(m->arg+LINSOL_NUM_IN, m->res+LINSOL_NUM_OUT, m->iw, m->w);
-    linsol_.linsol_factorize(m->jac);
-
-    log("IdasInterface::psetup", "end");
   }
 
   int IdasInterface::lsetup_wrapper(IDAMem IDA_mem, N_Vector xz, N_Vector xzdot, N_Vector resp,
@@ -1128,7 +1090,9 @@ namespace casadi {
         if (flag != IDA_SUCCESS) casadi_error("Could not interpolate forward states");
       }
       // Call the preconditioner setup function (which sets up the linear solver)
-      s.psetupB(m, t, IDAADJ_mem->ia_yyTmp, IDAADJ_mem->ia_ypTmp, xzB, xzdotB, 0, cj, vtemp1B, vtemp1B, vtemp3B);
+      if (psetupB_wrapper(t, IDAADJ_mem->ia_yyTmp, IDAADJ_mem->ia_ypTmp,
+        xzB, xzdotB, 0, cj, static_cast<void*>(m), vtemp1B, vtemp1B, vtemp3B)) return 1;
+
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "lsetupB failed: " << e.what() << endl;
@@ -1202,8 +1166,8 @@ namespace casadi {
       double delta = 0.0;
 
       // Call the preconditioner solve function (which solves the linear system)
-      s.psolveB(m, t, IDAADJ_mem->ia_yyTmp, IDAADJ_mem->ia_ypTmp, xzB, xzdotB,
-        rrB, b, b, cj, delta, 0);
+      if (psolveB_wrapper(t, IDAADJ_mem->ia_yyTmp, IDAADJ_mem->ia_ypTmp, xzB, xzdotB,
+        rrB, b, b, cj, delta, static_cast<void*>(m), 0)) return 1;
 
       // Scale the correction to account for change in cj
       if (s.cj_scaling_) {

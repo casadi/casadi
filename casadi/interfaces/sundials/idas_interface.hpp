@@ -189,18 +189,6 @@ namespace casadi {
   protected:
 
     // Sundials callback functions
-    void psolve(IdasMemory* m, double t, N_Vector xz, N_Vector xzdot, N_Vector rr, N_Vector rvec,
-                N_Vector zvec, double cj, double delta, N_Vector tmp) const;
-    void psolveB(IdasMemory* m, double t, N_Vector xz, N_Vector xzdot, N_Vector xzB,
-                 N_Vector xzdotB, N_Vector resvalB, N_Vector rvecB, N_Vector zvecB, double cjB,
-                 double deltaB, N_Vector tmpB) const;
-    void psetup(IdasMemory* m, double t, N_Vector xz, N_Vector xzdot, N_Vector rr, double cj,
-                N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) const;
-    void psetupB(IdasMemory* m, double t, N_Vector xz, N_Vector xzdot, N_Vector xzB,
-                 N_Vector xzdotB, N_Vector resvalB, double cjB,
-                 N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B) const;
-
-    // Static wrappers to be passed to Sundials
     static int res_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, void *user_data);
     static int resB_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB,
                             N_Vector rrB, void *user_data);
