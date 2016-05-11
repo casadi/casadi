@@ -204,7 +204,7 @@ namespace casadi {
 
   void CvodesInterface::init_memory(void* mem) const {
     SundialsInterface::init_memory(mem);
-    auto m = static_cast<CvodesMemory*>(mem);
+    auto m = to_mem(mem);
 
     // Create CVodes memory block
     m->mem = CVodeCreate(lmm_, iter_);
@@ -304,7 +304,7 @@ namespace casadi {
   int CvodesInterface::rhs_wrapper(double t, N_Vector x, N_Vector xdot, void *user_data) {
     try {
       casadi_assert(user_data);
-      CvodesMemory* m = static_cast<CvodesMemory*>(user_data);
+      auto m = to_mem(user_data);
       m->self.rhs(m, t, x, xdot);
       return 0;
     } catch(exception& e) {
@@ -316,7 +316,7 @@ namespace casadi {
   void CvodesInterface::reset(IntegratorMemory* mem, double t, const double* x,
                               const double* z, const double* _p) const {
     casadi_msg("CvodesInterface::reset begin");
-    CvodesMemory* m = static_cast<CvodesMemory*>(mem);
+    auto m = to_mem(mem);
 
     // Reset the base classes
     SundialsInterface::reset(mem, t, x, z, _p);
@@ -349,7 +349,7 @@ namespace casadi {
 
   void CvodesInterface::advance(IntegratorMemory* mem, double t, double* x,
                                 double* z, double* q) const {
-    auto m = static_cast<CvodesMemory*>(mem);
+    auto m = to_mem(mem);
 
     casadi_assert_message(t>=grid_.front(),
                           "CvodesInterface::integrate(" << t << "): "
@@ -399,7 +399,7 @@ namespace casadi {
 
   void CvodesInterface::resetB(IntegratorMemory* mem, double t, const double* rx,
                                const double* rz, const double* rp) const {
-    CvodesMemory* m = static_cast<CvodesMemory*>(mem);
+    auto m = to_mem(mem);
 
     // Reset the base classes
     SundialsInterface::resetB(mem, t, rx, rz, rp);
@@ -422,7 +422,7 @@ namespace casadi {
 
   void CvodesInterface::retreat(IntegratorMemory* mem, double t,
                                 double* rx, double* rz, double* rq) const {
-    auto m = static_cast<CvodesMemory*>(mem);
+    auto m = to_mem(mem);
 
     // Integrate, unless already at desired time
     if (t<m->t) {
@@ -455,7 +455,7 @@ namespace casadi {
   }
 
   void CvodesInterface::printStats(IntegratorMemory* mem, std::ostream &stream) const {
-    auto m = static_cast<CvodesMemory*>(mem);
+    auto m = to_mem(mem);
 
     long nsteps, nfevals, nlinsetups, netfails;
     int qlast, qcur;
@@ -511,7 +511,7 @@ namespace casadi {
                                      char *msg, void *user_data) {
     try {
       casadi_assert(user_data);
-      auto m = static_cast<CvodesMemory*>(user_data);
+      auto m = to_mem(user_data);
       m->self.ehfun(m, error_code, module, function, msg);
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "ehfun failed: " << e.what() << endl;
@@ -538,7 +538,7 @@ namespace casadi {
                                     N_Vector tmp1, N_Vector tmp2) {
     try {
       casadi_assert(user_data);
-      auto m = static_cast<CvodesMemory*>(user_data);
+      auto m = to_mem(user_data);
       m->self.rhsS(m, Ns, t, x, xdot, xF, xdotF, tmp1, tmp2);
       return 0;
     } catch(exception& e) {
@@ -559,7 +559,7 @@ namespace casadi {
                                     N_Vector tmp1, N_Vector tmp2) {
     try {
       casadi_assert(user_data);
-      auto m = static_cast<CvodesMemory*>(user_data);
+      auto m = to_mem(user_data);
       m->self.rhsS1(m, Ns, t, x, xdot, iS, xF, xdotF, tmp1, tmp2);
       return 0;
     } catch(exception& e) {
@@ -571,7 +571,7 @@ namespace casadi {
   int CvodesInterface::rhsQ_wrapper(double t, N_Vector x, N_Vector qdot, void *user_data) {
     try {
       casadi_assert(user_data);
-      auto m = static_cast<CvodesMemory*>(user_data);
+      auto m = to_mem(user_data);
       m->self.rhsQ(m, t, x, qdot);
       return 0;
     } catch(exception& e) {
@@ -602,7 +602,7 @@ namespace casadi {
                                     N_Vector *qdotF, void *user_data,
                                     N_Vector tmp1, N_Vector tmp2) {
     try {
-      CvodesMemory* m = static_cast<CvodesMemory*>(user_data);
+      auto m = to_mem(user_data);
       if (!m) {
         // SUNDIALS BUG!!!
         for (int i=0; i<Ns; ++i) N_VConst(0.0, qdotF[i]);
@@ -650,7 +650,7 @@ namespace casadi {
                                    void *user_data) {
     try {
       casadi_assert(user_data);
-      auto m = static_cast<CvodesMemory*>(user_data);
+      auto m = to_mem(user_data);
       m->self.rhsB(m, t, x, rx, rxdot);
       return 0;
     } catch(exception& e) {
@@ -663,7 +663,7 @@ namespace casadi {
                                     N_Vector xdotB, void *user_data) {
     try {
       casadi_assert(user_data);
-      auto m = static_cast<CvodesMemory*>(user_data);
+      auto m = to_mem(user_data);
       m->self.rhsBS(m, t, x, xF, xB, xdotB);
       return 0;
     } catch(exception& e) {
@@ -676,7 +676,7 @@ namespace casadi {
                                     N_Vector rqdot, void *user_data) {
     try {
       casadi_assert(user_data);
-      auto m = static_cast<CvodesMemory*>(user_data);
+      auto m = to_mem(user_data);
       m->self.rhsQB(m, t, x, rx, rqdot);
       return 0;
     } catch(exception& e) {
@@ -708,7 +708,7 @@ namespace casadi {
                                      N_Vector xdot, void *user_data, N_Vector tmp) {
     try {
       casadi_assert(user_data);
-      auto m = static_cast<CvodesMemory*>(user_data);
+      auto m = to_mem(user_data);
       m->self.jtimes(m, v, Jv, t, x, xdot, tmp);
       return 0;
     } catch(exception& e) {
@@ -722,7 +722,7 @@ namespace casadi {
                                       N_Vector tmpB) {
     try {
       casadi_assert(user_data);
-      auto m = static_cast<CvodesMemory*>(user_data);
+      auto m = to_mem(user_data);
       m->self.jtimesB(m, vB, JvB, t, x, xB, xdotB, tmpB);
       return 0;
     } catch(exception& e) {
@@ -763,7 +763,7 @@ namespace casadi {
                                    void *user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) {
     try {
       casadi_assert(user_data);
-      auto m = static_cast<CvodesMemory*>(user_data);
+      auto m = to_mem(user_data);
       m->self.djac(m, N, t, x, xdot, Jac, tmp1, tmp2, tmp3);
       return 0;
     } catch(exception& e) {
@@ -777,7 +777,7 @@ namespace casadi {
                                     N_Vector tmp3B) {
     try {
       casadi_assert(user_data);
-      auto m = static_cast<CvodesMemory*>(user_data);
+      auto m = to_mem(user_data);
       m->self.djacB(m, NeqB, t, x, xB, xdotB, JacB, tmp1B, tmp2B, tmp3B);
       return 0;
     } catch(exception& e) {
@@ -867,7 +867,7 @@ namespace casadi {
                                    N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) {
     try {
       casadi_assert(user_data);
-      auto m = static_cast<CvodesMemory*>(user_data);
+      auto m = to_mem(user_data);
       m->self.bjac(m, N, mupper, mlower, t, x, xdot, Jac, tmp1, tmp2, tmp3);
       return 0;
     } catch(exception& e) {
@@ -881,7 +881,7 @@ namespace casadi {
                                     N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B) {
     try {
       casadi_assert(user_data);
-      auto m = static_cast<CvodesMemory*>(user_data);
+      auto m = to_mem(user_data);
       m->self.bjacB(m, NeqB, mupperB, mlowerB, t, x, xB, xdotB, JacB, tmp1B, tmp2B, tmp3B);
       return 0;
     } catch(exception& e) {
@@ -974,7 +974,7 @@ namespace casadi {
 
   void CvodesInterface::setStopTime(IntegratorMemory* mem, double tf) const {
     // Set the stop time of the integration -- don't integrate past this point
-    auto m = static_cast<CvodesMemory*>(mem);
+    auto m = to_mem(mem);
     int flag = CVodeSetStopTime(m->mem, tf);
     if (flag != CV_SUCCESS) cvodes_error("CVodeSetStopTime", flag);
   }
@@ -983,8 +983,7 @@ namespace casadi {
                                       N_Vector z, double gamma, double delta, int lr,
                                       void *user_data, N_Vector tmp) {
     try {
-      auto m = static_cast<CvodesMemory*>(user_data);
-      casadi_assert(m);
+      auto m = to_mem(user_data);
       m->self.psolve(m, t, x, xdot, r, z, gamma, delta, lr, tmp);
       return 0;
     } catch(exception& e) {
@@ -997,8 +996,7 @@ namespace casadi {
                                       N_Vector rvecB, N_Vector zvecB, double gammaB,
                                       double deltaB, int lr, void *user_data, N_Vector tmpB) {
     try {
-      auto m = static_cast<CvodesMemory*>(user_data);
-      casadi_assert(m);
+      auto m = to_mem(user_data);
       m->self.psolveB(m, t, x, xB, xdotB, rvecB, zvecB, gammaB, deltaB, lr, tmpB);
       return 0;
     } catch(exception& e) {
@@ -1011,8 +1009,7 @@ namespace casadi {
                                      booleantype *jcurPtr, double gamma, void *user_data,
                                      N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) {
     try {
-      auto m = static_cast<CvodesMemory*>(user_data);
-      casadi_assert(m);
+      auto m = to_mem(user_data);
       m->self.psetup(m, t, x, xdot, jok, jcurPtr, gamma, tmp1, tmp2, tmp3);
       return 0;
     } catch(exception& e) {
@@ -1026,8 +1023,7 @@ namespace casadi {
                                       void *user_data, N_Vector tmp1B, N_Vector tmp2B,
                                       N_Vector tmp3B) {
     try {
-      auto m = static_cast<CvodesMemory*>(user_data);
-      casadi_assert(m);
+      auto m = to_mem(user_data);
       m->self.psetupB(m, t, x, xB, xdotB, jokB, jcurPtrB, gammaB, tmp1B, tmp2B, tmp3B);
       return 0;
     } catch(exception& e) {
@@ -1144,8 +1140,7 @@ namespace casadi {
                                      booleantype *jcurPtr,
                                      N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3) {
     try {
-      auto m = static_cast<CvodesMemory*>(cv_mem->cv_lmem);
-      casadi_assert(m);
+      auto m = to_mem(cv_mem->cv_lmem);
       m->self.lsetup(m, cv_mem, convfail, x, xdot, jcurPtr, vtemp1, vtemp2, vtemp3);
       return 0;
     } catch(exception& e) {
@@ -1158,8 +1153,7 @@ namespace casadi {
                                       booleantype *jcurPtr,
                                       N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3) {
     try {
-      auto m = static_cast<CvodesMemory*>(cv_mem->cv_lmem);
-      casadi_assert(m);
+      auto m = to_mem(cv_mem->cv_lmem);
       CVadjMem ca_mem;
       //CVodeBMem cvB_mem;
 
@@ -1229,8 +1223,7 @@ namespace casadi {
   int CvodesInterface::lsolve_wrapper(CVodeMem cv_mem, N_Vector b, N_Vector weight,
                                      N_Vector x, N_Vector xdot) {
     try {
-      auto m = static_cast<CvodesMemory*>(cv_mem->cv_lmem);
-      casadi_assert(m);
+      auto m = to_mem(cv_mem->cv_lmem);
       m->self.lsolve(m, cv_mem, b, weight, x, xdot);
       return 0;
     } catch(exception& e) {
@@ -1242,8 +1235,7 @@ namespace casadi {
   int CvodesInterface::lsolveB_wrapper(CVodeMem cv_mem, N_Vector b, N_Vector weight,
                                       N_Vector x, N_Vector xdot) {
     try {
-      auto m = static_cast<CvodesMemory*>(cv_mem->cv_lmem);
-      casadi_assert(m);
+      auto m = to_mem(cv_mem->cv_lmem);
       CVadjMem ca_mem;
       //CVodeBMem cvB_mem;
 

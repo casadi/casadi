@@ -153,6 +153,13 @@ namespace casadi {
     /** \brief  Print solver statistics */
     virtual void printStats(IntegratorMemory* mem, std::ostream &stream) const;
 
+    /** \brief Cast to memory object */
+    static CvodesMemory* to_mem(void *mem) {
+      CvodesMemory* m = static_cast<CvodesMemory*>(mem);
+      casadi_assert(m);
+      return m;
+    }
+
     /** \brief  Get the integrator Jacobian for the forward problem (generic) */
     template<typename MatType> Function getJacGen();
 

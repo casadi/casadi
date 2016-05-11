@@ -310,7 +310,7 @@ namespace casadi {
   int IdasInterface::res_wrapper(double t, N_Vector xz, N_Vector xzdot,
                                 N_Vector rr, void *user_data) {
     try {
-      IdasMemory *m = static_cast<IdasMemory*>(user_data);
+      auto m = to_mem(user_data);
       m->self.res(m, t, xz, xzdot, rr);
       return 0;
     } catch(int flag) { // recoverable error
@@ -324,7 +324,7 @@ namespace casadi {
   void IdasInterface::ehfun_wrapper(int error_code, const char *module, const char *function,
                                    char *msg, void *eh_data) {
     try {
-      IdasMemory* m = static_cast<IdasMemory*>(eh_data);
+      auto m = to_mem(eh_data);
       m->self.ehfun(m, error_code, module, function, msg);
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "ehfun failed: " << e.what() << endl;
@@ -354,7 +354,7 @@ namespace casadi {
                                    N_Vector Jv, double cj, void *user_data,
                                    N_Vector tmp1, N_Vector tmp2) {
     try {
-      IdasMemory* m = static_cast<IdasMemory*>(user_data);
+      auto m = to_mem(user_data);
       m->self.jtimes(m, t, xz, xzdot, rr, v, Jv, cj, tmp1, tmp2);
       return 0;
     } catch(exception& e) {
@@ -385,7 +385,7 @@ namespace casadi {
                                     double cjB, void *user_data,
                                     N_Vector tmp1B, N_Vector tmp2B) {
     try {
-      IdasMemory* m = static_cast<IdasMemory*>(user_data);
+      auto m = to_mem(user_data);
       m->self.jtimesB(m, t, xz, xzdot, xzB, xzdotB, resvalB, vB, JvB, cjB, tmp1B, tmp2B);
       return 0;
     } catch(exception& e) {
@@ -409,7 +409,7 @@ namespace casadi {
                                  N_Vector *xzF, N_Vector *xzdotF, N_Vector *rrF, void *user_data,
                                  N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) {
     try {
-      IdasMemory* m = static_cast<IdasMemory*>(user_data);
+      auto m = to_mem(user_data);
       m->self.resS(m, Ns, t, xz, xzdot, resval, xzF, xzdotF, rrF, tmp1, tmp2, tmp3);
       return 0;
     } catch(exception& e) {
@@ -420,7 +420,7 @@ namespace casadi {
 
   void IdasInterface::init_memory(void* mem) const {
     SundialsInterface::init_memory(mem);
-    auto m = static_cast<IdasMemory*>(mem);
+    auto m = to_mem(mem);
 
     // Sundials return flag
     int flag;
@@ -541,7 +541,7 @@ namespace casadi {
   void IdasInterface::reset(IntegratorMemory* mem, double t, const double* _x,
                             const double* _z, const double* _p) const {
     log("IdasInterface::reset", "begin");
-    auto m = static_cast<IdasMemory*>(mem);
+    auto m = to_mem(mem);
 
     // Reset the base classes
     SundialsInterface::reset(mem, t, _x, _z, _p);
@@ -605,7 +605,7 @@ namespace casadi {
 
   void IdasInterface::
   advance(IntegratorMemory* mem, double t, double* x, double* z, double* q) const {
-    auto m = static_cast<IdasMemory*>(mem);
+    auto m = to_mem(mem);
 
     casadi_assert_message(t>=grid_.front(), "IdasInterface::integrate(" << t << "): "
                           "Cannot integrate to a time earlier than t0 (" << grid_.front() << ")");
@@ -653,7 +653,7 @@ namespace casadi {
   void IdasInterface::resetB(IntegratorMemory* mem, double t, const double* rx,
                              const double* rz, const double* rp) const {
     log("IdasInterface::resetB", "begin");
-    auto m = static_cast<IdasMemory*>(mem);
+    auto m = to_mem(mem);
 
     // Reset the base classes
     SundialsInterface::resetB(mem, t, rx, rz, rp);
@@ -695,7 +695,7 @@ namespace casadi {
 
   void IdasInterface::retreat(IntegratorMemory* mem, double t, double* rx,
                               double* rz, double* rq) const {
-    auto m = static_cast<IdasMemory*>(mem);
+    auto m = to_mem(mem);
 
     // Integrate, unless already at desired time
     if (t<m->t) {
@@ -730,7 +730,7 @@ namespace casadi {
   }
 
   void IdasInterface::printStats(IntegratorMemory* mem, std::ostream &stream) const {
-    auto m = static_cast<IdasMemory*>(mem);
+    auto m = to_mem(mem);
 
     long nsteps, nfevals, nlinsetups, netfails;
     int qlast, qcur;
@@ -807,7 +807,7 @@ namespace casadi {
   int IdasInterface::rhsQ_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector rhsQ,
                                  void *user_data) {
     try {
-      IdasMemory* m = static_cast<IdasMemory*>(user_data);
+      auto m = to_mem(user_data);
       m->self.rhsQ(m, t, xz, xzdot, rhsQ);
       return 0;
     } catch(exception& e) {
@@ -844,7 +844,7 @@ namespace casadi {
                                   N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) {
 
     try {
-      IdasMemory* m = static_cast<IdasMemory*>(user_data);
+      auto m = to_mem(user_data);
       m->self.rhsQS(m, Ns, t, xz, xzdot, xzF, xzdotF, rrQ, qdotF, tmp1, tmp2, tmp3);
       return 0;
     } catch(exception& e) {
@@ -870,7 +870,7 @@ namespace casadi {
   int IdasInterface::resB_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector xzA,
                                  N_Vector xzdotA, N_Vector rrA, void *user_data) {
     try {
-      IdasMemory* m = static_cast<IdasMemory*>(user_data);
+      auto m = to_mem(user_data);
       m->self.resB(m, t, xz, xzdot, xzA, xzdotA, rrA);
       return 0;
     } catch(exception& e) {
@@ -896,7 +896,7 @@ namespace casadi {
   int IdasInterface::rhsQB_wrapper(double t, N_Vector y, N_Vector xzdot, N_Vector xzA,
                                   N_Vector xzdotA, N_Vector qdotA, void *user_data) {
     try {
-      IdasMemory* m = static_cast<IdasMemory*>(user_data);
+      auto m = to_mem(user_data);
       m->self.rhsQB(m, t, y, xzdot, xzA, xzdotA, qdotA);
       return 0;
     } catch(exception& e) {
@@ -932,7 +932,7 @@ namespace casadi {
                                  N_Vector rr, DlsMat Jac, void *user_data,
                                  N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) {
     try {
-      IdasMemory* m = static_cast<IdasMemory*>(user_data);
+      auto m = to_mem(user_data);
       m->self.djac(m, Neq, t, cj, xz, xzdot, rr, Jac, tmp1, tmp2, tmp3);
       return 0;
     } catch(exception& e) {
@@ -970,7 +970,7 @@ namespace casadi {
                                   void *user_data,
                                   N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B) {
     try {
-      IdasMemory* m = static_cast<IdasMemory*>(user_data);
+      auto m = to_mem(user_data);
       m->self.djacB(m, NeqB, t, cjB, xz, xzdot, xzB, xzdotB, rrB, JacB, tmp1B, tmp2B, tmp3B);
       return 0;
     } catch(exception& e) {
@@ -1007,7 +1007,7 @@ namespace casadi {
                                  DlsMat Jac, void *user_data,
                                  N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) {
     try {
-      IdasMemory* m = static_cast<IdasMemory*>(user_data);
+      auto m = to_mem(user_data);
       m->self.bjac(m, Neq, mupper, mlower, t, cj, xz, xzdot, rr, Jac, tmp1, tmp2, tmp3);
       return 0;
     } catch(exception& e) {
@@ -1047,7 +1047,7 @@ namespace casadi {
                 N_Vector resvalB, DlsMat JacB, void *user_data, N_Vector tmp1B,
                 N_Vector tmp2B, N_Vector tmp3B) {
     try {
-      IdasMemory* m = static_cast<IdasMemory*>(user_data);
+      auto m = to_mem(user_data);
       m->self.bjacB(m, NeqB, mupperB, mlowerB, t, cjB, xz, xzdot, xzB, xzdotB,
                    resvalB, JacB, tmp1B, tmp2B, tmp3B);
       return 0;
@@ -1059,7 +1059,7 @@ namespace casadi {
 
   void IdasInterface::setStopTime(IntegratorMemory* mem, double tf) const {
     // Set the stop time of the integration -- don't integrate past this point
-    auto m = static_cast<IdasMemory*>(mem);
+    auto m = to_mem(mem);
     int flag = IDASetStopTime(m->mem, tf);
     if (flag != IDA_SUCCESS) idas_error("IDASetStopTime", flag);
   }
@@ -1068,8 +1068,7 @@ namespace casadi {
                                     N_Vector rvec, N_Vector zvec, double cj, double delta,
                                     void *user_data, N_Vector tmp) {
     try {
-      IdasMemory* m = static_cast<IdasMemory*>(user_data);
-      casadi_assert(m);
+      auto m = to_mem(user_data);
       m->self.psolve(m, t, xz, xzdot, rr, rvec, zvec, cj, delta, tmp);
       return 0;
     } catch(exception& e) {
@@ -1083,8 +1082,7 @@ namespace casadi {
                                     N_Vector zvecB, double cjB, double deltaB,
                                     void *user_data, N_Vector tmpB) {
     try {
-      IdasMemory* m = static_cast<IdasMemory*>(user_data);
-      casadi_assert(m);
+      auto m = to_mem(user_data);
       m->self.psolveB(m, t, xz, xzdot, xzB, xzdotB, resvalB, rvecB, zvecB, cjB, deltaB, tmpB);
       return 0;
     } catch(exception& e) {
@@ -1097,8 +1095,7 @@ namespace casadi {
                                    double cj, void* user_data,
                                    N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) {
     try {
-      IdasMemory* m = static_cast<IdasMemory*>(user_data);
-      casadi_assert(m);
+      auto m = to_mem(user_data);
       m->self.psetup(m, t, xz, xzdot, rr, cj, tmp1, tmp2, tmp3);
       return 0;
     } catch(exception& e) {
@@ -1112,8 +1109,7 @@ namespace casadi {
                                     N_Vector resvalB, double cjB, void *user_data,
                                     N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B) {
     try {
-      IdasMemory* m = static_cast<IdasMemory*>(user_data);
-      casadi_assert(m);
+      auto m = to_mem(user_data);
       m->self.psetupB(m, t, xz, xzdot, xzB, xzdotB, resvalB, cjB, tmp1B, tmp2B, tmp3B);
       return 0;
     } catch(exception& e) {
@@ -1201,8 +1197,7 @@ namespace casadi {
   int IdasInterface::lsetup_wrapper(IDAMem IDA_mem, N_Vector xz, N_Vector xzdot, N_Vector resp,
                                     N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3) {
     try {
-      IdasMemory* m = static_cast<IdasMemory*>(IDA_mem->ida_lmem);
-      casadi_assert(m);
+      auto m = to_mem(IDA_mem->ida_lmem);
       m->self.lsetup(m, IDA_mem, xz, xzdot, resp, vtemp1, vtemp2, vtemp3);
       return 0;
     } catch(exception& e) {
@@ -1214,8 +1209,7 @@ namespace casadi {
   int IdasInterface::lsetupB_wrapper(IDAMem IDA_mem, N_Vector xzB, N_Vector xzdotB, N_Vector respB,
                                      N_Vector vtemp1B, N_Vector vtemp2B, N_Vector vtemp3B) {
     try {
-      IdasMemory* m = static_cast<IdasMemory*>(IDA_mem->ida_lmem);
-      casadi_assert(m);
+      auto m = to_mem(IDA_mem->ida_lmem);
       IDAadjMem IDAADJ_mem;
       //IDABMem IDAB_mem;
       int flag;
@@ -1249,8 +1243,7 @@ namespace casadi {
   int IdasInterface::lsolve_wrapper(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector xz,
                                    N_Vector xzdot, N_Vector rr) {
     try {
-      IdasMemory* m = static_cast<IdasMemory*>(IDA_mem->ida_lmem);
-      casadi_assert(m);
+      auto m = to_mem(IDA_mem->ida_lmem);
       m->self.lsolve(m, IDA_mem, b, weight, xz, xzdot, rr);
       return 0;
     } catch(int wrn) {
@@ -1265,8 +1258,7 @@ namespace casadi {
   int IdasInterface::lsolveB_wrapper(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector xzB,
                                     N_Vector xzdotB, N_Vector rrB) {
     try {
-      IdasMemory* m = static_cast<IdasMemory*>(IDA_mem->ida_lmem);
-      casadi_assert(m);
+      auto m = to_mem(IDA_mem->ida_lmem);
       IDAadjMem IDAADJ_mem;
       //IDABMem IDAB_mem;
       int flag;
