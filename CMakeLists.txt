@@ -112,17 +112,6 @@ if(Fortran_language_works)
 endif()
 #end workaround
 
-# CppLint will load python (Python 2 by default)
-# This brings trouble when we want to create a Python3 interface later
-if (WITH_PYTHON3)
-find_package(PythonInterp 3 REQUIRED)
-endif()
-
-include(CppLint)
-include(SpellCheck)
-include(embed_resources)
-include(GenerateExportHeader)
-
 ############################################################
 ####################### Policies ###########################
 ############################################################
@@ -572,6 +561,18 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib/)
 
 #####################################################
+######################### swig ######################
+#####################################################
+if(WITH_PYTHON OR WITH_MATLAB OR WITH_JSON)
+  add_subdirectory(swig)
+endif()
+
+include(CppLint)
+include(SpellCheck)
+include(embed_resources)
+include(GenerateExportHeader)
+
+#####################################################
 ################# include the rest ##################
 #####################################################
 add_subdirectory(external_packages)
@@ -584,13 +585,6 @@ add_subdirectory(misc)
 if(WITH_EXAMPLES)
   add_subdirectory(docs/examples)
   add_subdirectory(docs/api/examples/ctemplate)
-endif()
-
-#####################################################
-######################### swig ######################
-#####################################################
-if(WITH_PYTHON OR WITH_MATLAB OR WITH_JSON)
-  add_subdirectory(swig)
 endif()
 
 #####################################################
