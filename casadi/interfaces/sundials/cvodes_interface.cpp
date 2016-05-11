@@ -770,7 +770,16 @@ namespace casadi {
                                       void *user_data, N_Vector tmp) {
     try {
       auto m = to_mem(user_data);
-      m->self.psolve(m, t, x, xdot, r, z, gamma, delta, lr, tmp);
+      auto& s = m->self;
+      // Copy input to output, if necessary
+      if (r!=z) {
+        N_VScale(1.0, r, z);
+      }
+
+      // Solve the (possibly factorized) system
+      casadi_assert(s.linsol_.nnz_out(0) == NV_LENGTH_S(z));
+      s.linsol_.linsol_solve(NV_DATA_S(z));
+
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "psolve failed: " << e.what() << endl;;
@@ -783,7 +792,15 @@ namespace casadi {
                                       double deltaB, int lr, void *user_data, N_Vector tmpB) {
     try {
       auto m = to_mem(user_data);
-      m->self.psolveB(m, t, x, xB, xdotB, rvecB, zvecB, gammaB, deltaB, lr, tmpB);
+      auto& s = m->self;
+      // Copy input to output, if necessary
+      if (rvecB!=zvecB) {
+        N_VScale(1.0, rvecB, zvecB);
+      }
+
+      // Solve the (possibly factorized) system
+      casadi_assert(s.linsolB_.nnz_out(0) == NV_LENGTH_S(zvecB));
+      s.linsolB_.linsol_solve(NV_DATA_S(zvecB), 1);
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "psolveB failed: " << e.what() << endl;;
@@ -796,7 +813,16 @@ namespace casadi {
                                      N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) {
     try {
       auto m = to_mem(user_data);
-      m->self.psetup(m, t, x, xdot, jok, jcurPtr, gamma, tmp1, tmp2, tmp3);
+      auto& s = m->self;
+      // Calculate Jacobian
+      double d1 = -gamma, d2 = 1.;
+      s.calc_function(m, "jacF", {&t, NV_DATA_S(x), get_ptr(m->p), &d1, &d2},
+                              {m->jac});
+
+      // Prepare the solution of the linear system (e.g. factorize)
+      s.linsol_.setup(m->arg+LINSOL_NUM_IN, m->res+LINSOL_NUM_OUT, m->iw, m->w);
+      s.linsol_.linsol_factorize(m->jac);
+
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "psetup failed: " << e.what() << endl;;
@@ -804,81 +830,28 @@ namespace casadi {
     }
   }
 
-  int CvodesInterface::psetupB_wrapper(double t, N_Vector x, N_Vector xB, N_Vector xdotB,
+  int CvodesInterface::psetupB_wrapper(double t, N_Vector x, N_Vector rx, N_Vector rxdot,
                                       booleantype jokB, booleantype *jcurPtrB, double gammaB,
                                       void *user_data, N_Vector tmp1B, N_Vector tmp2B,
                                       N_Vector tmp3B) {
     try {
       auto m = to_mem(user_data);
-      m->self.psetupB(m, t, x, xB, xdotB, jokB, jcurPtrB, gammaB, tmp1B, tmp2B, tmp3B);
+      auto& s = m->self;
+      // Calculate Jacobian
+      double one=1;
+      s.calc_function(m, "jacB", {&t, NV_DATA_S(rx), get_ptr(m->rp),
+                                 NV_DATA_S(x), get_ptr(m->p), &gammaB, &one},
+                                {m->jacB});
+
+      // Prepare the solution of the linear system (e.g. factorize)
+      s.linsolB_.setup(m->arg+LINSOL_NUM_IN, m->res+LINSOL_NUM_OUT, m->iw, m->w);
+      s.linsolB_.linsol_factorize(m->jacB);
+
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "psetupB failed: " << e.what() << endl;;
       return 1;
     }
-  }
-
-  void CvodesInterface::psolve(CvodesMemory* m,
-                               double t, N_Vector x, N_Vector xdot, N_Vector r, N_Vector z,
-                               double gamma, double delta, int lr, N_Vector tmp) const {
-    // Copy input to output, if necessary
-    if (r!=z) {
-      N_VScale(1.0, r, z);
-    }
-
-    // Solve the (possibly factorized) system
-    casadi_assert(linsol_.nnz_out(0) == NV_LENGTH_S(z));
-    linsol_.linsol_solve(NV_DATA_S(z));
-  }
-
-  void CvodesInterface::psolveB(CvodesMemory* m,
-                                double t, N_Vector x, N_Vector xB, N_Vector xdotB, N_Vector rvecB,
-                                N_Vector zvecB, double gammaB, double deltaB,
-                                int lr, N_Vector tmpB) const {
-    // Copy input to output, if necessary
-    if (rvecB!=zvecB) {
-      N_VScale(1.0, rvecB, zvecB);
-    }
-
-    // Solve the (possibly factorized) system
-    casadi_assert(linsolB_.nnz_out(0) == NV_LENGTH_S(zvecB));
-    linsolB_.linsol_solve(NV_DATA_S(zvecB), 1);
-  }
-
-  void CvodesInterface::psetup(CvodesMemory* m,
-                               double t, N_Vector x, N_Vector xdot, booleantype jok,
-                               booleantype *jcurPtr, double gamma, N_Vector tmp1,
-                               N_Vector tmp2, N_Vector tmp3) const {
-    log("CvodesInterface::psetup", "begin");
-    // Calculate Jacobian
-    double d1 = -gamma, d2 = 1.;
-    calc_function(m, "jacF", {&t, NV_DATA_S(x), get_ptr(m->p), &d1, &d2},
-                            {m->jac});
-
-    // Prepare the solution of the linear system (e.g. factorize)
-    linsol_.setup(m->arg+LINSOL_NUM_IN, m->res+LINSOL_NUM_OUT, m->iw, m->w);
-    linsol_.linsol_factorize(m->jac);
-
-    log("CvodesInterface::psetup", "end");
-  }
-
-  void CvodesInterface::psetupB(CvodesMemory* m,
-                                double t, N_Vector x, N_Vector rx, N_Vector rxdot,
-                                booleantype jokB, booleantype *jcurPtrB, double gammaB,
-                                N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B) const {
-    log("CvodesInterface::psetupB", "begin");
-
-    // Calculate Jacobian
-    double one=1;
-    calc_function(m, "jacB", {&t, NV_DATA_S(rx), get_ptr(m->rp),
-                               NV_DATA_S(x), get_ptr(m->p), &gammaB, &one},
-                              {m->jacB});
-
-    // Prepare the solution of the linear system (e.g. factorize)
-    linsolB_.setup(m->arg+LINSOL_NUM_IN, m->res+LINSOL_NUM_OUT, m->iw, m->w);
-    linsolB_.linsol_factorize(m->jacB);
-
-    log("CvodesInterface::psetupB", "end");
   }
 
   int CvodesInterface::lsetup_wrapper(CVodeMem cv_mem, int convfail, N_Vector x, N_Vector xdot,
@@ -895,7 +868,8 @@ namespace casadi {
       double gamma = cv_mem->cv_gamma;
 
       // Call the preconditioner setup function (which sets up the linear solver)
-      s.psetup(m, t, x, xdot, FALSE, jcurPtr, gamma, vtemp1, vtemp2, vtemp3);
+      if (psetup_wrapper(t, x, xdot, FALSE, jcurPtr,
+        gamma, static_cast<void*>(m), vtemp1, vtemp2, vtemp3)) return 1;
 
       return 0;
     } catch(exception& e) {
