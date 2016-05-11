@@ -189,64 +189,61 @@ namespace casadi {
   protected:
 
     // Sundials callback functions
-    static int res_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, void *user_data);
-    static int resB_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB,
-                            N_Vector rrB, void *user_data);
-    static void ehfun_wrapper(int error_code, const char *module, const char *function, char *msg,
-                              void *eh_data);
-    static int jtimes_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, N_Vector v,
-                              N_Vector Jv, double cj, void *user_data,
-                              N_Vector tmp1, N_Vector tmp2);
-    static int jtimesB_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB,
-                               N_Vector resvalB, N_Vector vB, N_Vector JvB, double cjB,
-                               void *user_data, N_Vector tmp1B, N_Vector tmp2B);
-    static int resS_wrapper(int Ns, double t, N_Vector xz, N_Vector xzdot, N_Vector resval,
-                            N_Vector *xzF, N_Vector *xzdotF, N_Vector *resF, void *user_data,
-                            N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
-    static int rhsQ_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector qdot, void *user_data);
-    static int rhsQB_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB,
-                             N_Vector qdotA, void *user_data);
-    static int rhsQS_wrapper(int Ns, double t, N_Vector xz, N_Vector xzdot,
-                             N_Vector *xzF, N_Vector *xzdotF, N_Vector rrQ, N_Vector *qdotF,
-                             void *user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
-    static int psolve_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, N_Vector rvec,
-                              N_Vector zvec, double cj, double delta, void *user_data,
-                              N_Vector tmp);
-    static int psetup_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, double cj,
-                              void* user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
-    static int psolveB_wrapper(double t,
-                               N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB,
-                               N_Vector resvalB, N_Vector rvecB, N_Vector zvecB, double cjB,
-                               double deltaB, void *user_dataB, N_Vector tmpB);
-    static int psetupB_wrapper(double t,
-                               N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB,
-                               N_Vector resvalB, double cjB, void *user_dataB,
-                               N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
-    static int djac_wrapper(long Neq, double t, double cj, N_Vector xz, N_Vector xzdot,
-                            N_Vector rr, DlsMat Jac, void *user_data,
-                            N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
-    static int djacB_wrapper(long NeqB, double t, double cjB, N_Vector xz, N_Vector xzdot,
-                             N_Vector xzB, N_Vector xzdotB, N_Vector rrB, DlsMat JacB,
-                             void *user_data, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
-    static int bjac_wrapper(long Neq, long mupper, long mlower, double t, double cj, N_Vector xz,
-                            N_Vector xzdot, N_Vector rr, DlsMat Jac, void *user_data,
-                            N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
-    static int bjacB_wrapper(long NeqB, long mupperB, long mlowerB, double t, double cjB,
-                             N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB,
-                             N_Vector resvalB, DlsMat JacB, void *user_data,
-                             N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
-    static int lsetup_wrapper(IDAMem IDA_mem, N_Vector xz, N_Vector xzdot, N_Vector resp,
-                              N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3);
-    static int lsolve_wrapper(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector ycur,
-                              N_Vector xzdotcur, N_Vector rescur);
-    static int lsetupB_wrapper(IDAMem IDA_mem, N_Vector xz, N_Vector xzdot, N_Vector resp,
-                               N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3);
-    static int lsolveB_wrapper(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector ycur,
-                               N_Vector xzdotcur, N_Vector rescur);
+    static int res(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, void *user_data);
+    static int resB(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB,
+                    N_Vector rrB, void *user_data);
+    static void ehfun(int error_code, const char *module, const char *function, char *msg,
+                      void *eh_data);
+    static int jtimes(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, N_Vector v,
+                      N_Vector Jv, double cj, void *user_data,
+                      N_Vector tmp1, N_Vector tmp2);
+    static int jtimesB(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB,
+                       N_Vector resvalB, N_Vector vB, N_Vector JvB, double cjB,
+                       void *user_data, N_Vector tmp1B, N_Vector tmp2B);
+    static int resS(int Ns, double t, N_Vector xz, N_Vector xzdot, N_Vector resval,
+                    N_Vector *xzF, N_Vector *xzdotF, N_Vector *resF, void *user_data,
+                    N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
+    static int rhsQ(double t, N_Vector xz, N_Vector xzdot, N_Vector qdot, void *user_data);
+    static int rhsQB(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB,
+                     N_Vector qdotA, void *user_data);
+    static int rhsQS(int Ns, double t, N_Vector xz, N_Vector xzdot,
+                     N_Vector *xzF, N_Vector *xzdotF, N_Vector rrQ, N_Vector *qdotF,
+                     void *user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
+    static int psolve(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, N_Vector rvec,
+                      N_Vector zvec, double cj, double delta, void *user_data,
+                      N_Vector tmp);
+    static int psetup(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, double cj,
+                      void* user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
+    static int psolveB(double t,
+                       N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB,
+                       N_Vector resvalB, N_Vector rvecB, N_Vector zvecB, double cjB,
+                       double deltaB, void *user_dataB, N_Vector tmpB);
+    static int psetupB(double t,
+                       N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB,
+                       N_Vector resvalB, double cjB, void *user_dataB,
+                       N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
+    static int djac(long Neq, double t, double cj, N_Vector xz, N_Vector xzdot,
+                    N_Vector rr, DlsMat Jac, void *user_data,
+                    N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
+    static int djacB(long NeqB, double t, double cjB, N_Vector xz, N_Vector xzdot,
+                     N_Vector xzB, N_Vector xzdotB, N_Vector rrB, DlsMat JacB,
+                     void *user_data, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
+    static int bjac(long Neq, long mupper, long mlower, double t, double cj, N_Vector xz,
+                    N_Vector xzdot, N_Vector rr, DlsMat Jac, void *user_data,
+                    N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
+    static int bjacB(long NeqB, long mupperB, long mlowerB, double t, double cjB,
+                     N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB,
+                     N_Vector resvalB, DlsMat JacB, void *user_data,
+                     N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
+    static int lsetup(IDAMem IDA_mem, N_Vector xz, N_Vector xzdot, N_Vector resp,
+                      N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3);
+    static int lsolve(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector ycur,
+                      N_Vector xzdotcur, N_Vector rescur);
+    static int lsetupB(IDAMem IDA_mem, N_Vector xz, N_Vector xzdot, N_Vector resp,
+                       N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3);
+    static int lsolveB(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector ycur,
+                       N_Vector xzdotcur, N_Vector rescur);
   public:
-
-    // sensitivity method
-    int ism_;
 
     // Throw error
     static void idas_error(const std::string& module, int flag);
@@ -275,9 +272,6 @@ namespace casadi {
     // Initialize the user defined linear solver (backward integration)
     void initUserDefinedLinsolB(IdasMemory* m) const;
 
-    /// Continuous time dynamics
-    Function rhs_, rhsQ_, rhsB_, rhsQB_;
-
     // Options
     bool cj_scaling_;
     bool calc_ic_;
@@ -292,24 +286,6 @@ namespace casadi {
 
     //  Initial values for \p xdot and \p z
     std::vector<double> init_xdot_;
-
-    // jtimes signature
-    enum JTimesIn {
-      JTIMES_T, JTIMES_X, JTIMES_Z, JTIMES_P, JTIMES_FWD_X, JTIMES_FWD_Z, JTIMES_NUM_IN
-    };
-    enum JTimesOut {
-      JTIMES_FWD_ODE, JTIMES_FWD_ALG, JTIMES_NUM_OUT
-    };
-
-    // jtimesB signature
-    enum JTimesBIn {
-      JTIMESB_T, JTIMESB_X, JTIMESB_Z, JTIMESB_P,
-      JTIMESB_RX, JTIMESB_RZ, JTIMESB_RP,
-      JTIMESB_FWD_RX, JTIMESB_FWD_RZ, JTIMESB_NUM_IN
-    };
-    enum JTimesBOut {
-      JTIMESB_FWD_RODE, JTIMESB_FWD_RALG, JTIMESB_NUM_OUT
-    };
   };
 
 } // namespace casadi
