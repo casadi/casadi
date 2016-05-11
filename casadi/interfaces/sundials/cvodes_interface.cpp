@@ -87,6 +87,27 @@ namespace casadi {
       }
     }
 
+    f_ = create_function("f", {"x", "z", "p", "t"}, {"ode", "alg", "quad"});
+    g_ = create_function("g", {"rx", "rz", "rp", "x", "z", "p", "t"},
+                              {"rode", "ralg", "rquad"});
+
+    // Create a Jacobian if requested
+    if (exact_jacobian_) {
+      jac_ = getJac();
+      casadi_assert(jac_.sparsity_out(0) == sp_jac_dae_);
+      alloc(jac_);
+      alloc_w(jac_.nnz_out(0), true);
+    }
+
+    // Create a backwards Jacobian if requested
+    if (exact_jacobianB_ && nrx_>0) jacB_ = getJacB();
+
+    if (!jacB_.is_null()) {
+      alloc(jacB_);
+      casadi_assert(jacB_.sparsity_out(0) == sp_jac_rdae_);
+      alloc_w(jacB_.nnz_out(0), true);
+    }
+
     // Algebraic variables not supported
     casadi_assert_message(nz_==0 && nrz_==0,
                           "CVODES does not support algebraic variables");

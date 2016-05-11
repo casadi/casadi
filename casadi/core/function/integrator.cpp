@@ -287,11 +287,21 @@ namespace casadi {
 
     // Get the sparsities and BTF factorization of the forward and reverse DAE
     sp_jac_dae_ = sp_jac_dae();
+    casadi_assert_message(!sp_jac_dae_.is_singular(),
+                          "Jacobian of the forward problem is structurally rank-deficient. "
+                          "sprank(J)=" + to_string(sprank(sp_jac_dae_)) + "<"
+                          + to_string(nx_+nz_));
     btf_jac_dae_ = sp_jac_dae_.btf();
     if (nrx_>0) {
       sp_jac_rdae_ = sp_jac_rdae();
+      casadi_assert_message(!sp_jac_rdae_.is_singular(),
+                            "Jacobian of the backward problem is structurally rank-deficient. "
+                            "sprank(J)=" + to_string(sprank(sp_jac_rdae_)) + "<"
+                            + to_string(nrx_+nrz_));
       btf_jac_rdae_ = sp_jac_rdae_.btf();
     }
+
+    // Consistency check
 
     // Allocate sufficiently large work vectors
     alloc_w(nx_+nz_);

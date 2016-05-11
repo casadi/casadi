@@ -319,6 +319,15 @@ namespace casadi {
     // Initialize the user defined linear solver (backward integration)
     void initUserDefinedLinsolB(IdasMemory* m) const;
 
+    /// Continuous time dynamics
+    Function f_, g_;
+
+    // Jacobian of the DAE with respect to the state and state derivatives
+    Function jac_, jacB_;
+
+    // Jacobian times vector functions
+    Function jtimes_, jtimesB_;
+
     // Options
     bool cj_scaling_;
     bool calc_ic_;

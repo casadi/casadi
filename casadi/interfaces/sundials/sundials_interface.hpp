@@ -114,9 +114,6 @@ namespace casadi {
     virtual void resetB(IntegratorMemory* mem, double t, const double* rx,
                         const double* rz, const double* rp) const;
 
-    /// Linear solver forward, backward
-    Function linsol_, linsolB_;
-
     ///@{
     /// Options
     bool exact_jacobian_, exact_jacobianB_;
@@ -133,6 +130,8 @@ namespace casadi {
     int steps_per_checkpoint_;
     bool disable_internal_warnings_;
     int max_multistep_order_;
+    std::string linear_solver_, linear_solverB_;
+    Dict linear_solver_options_, linear_solver_optionsB_;
     ///@}
 
     /// Supported linear solvers in Sundials
@@ -159,11 +158,8 @@ namespace casadi {
     /// Use preconditioning
     bool use_preconditioner_, use_preconditionerB_;
 
-    // Jacobian of the DAE with respect to the state and state derivatives
-    Function jac_, jacB_;
-
-    // Jacobian times vector functions
-    Function jtimes_, jtimesB_;
+    /// Linear solver forward, backward
+    Function linsol_, linsolB_;
 
     /** \brief  Get the integrator Jacobian for the forward problem */
     virtual Function getJac()=0;
@@ -186,9 +182,6 @@ namespace casadi {
       std::vector<double> tmp(NV_DATA_S(v), NV_DATA_S(v)+NV_LENGTH_S(v));
       userOut() << id << " = " << tmp << std::endl;
     }
-
-    /// Continuous time dynamics
-    Function f_, g_;
   };
 
   // Check if N_Vector is regular

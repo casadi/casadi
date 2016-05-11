@@ -170,10 +170,6 @@ namespace casadi {
     // Call the base class method
     Integrator::init(opts);
 
-    f_ = create_function("f", {"x", "z", "p", "t"}, {"ode", "alg", "quad"});
-    g_ = create_function("g", {"rx", "rz", "rp", "x", "z", "p", "t"},
-                              {"rode", "ralg", "rquad"});
-
     // Default options
     abstol_ = 1e-8;
     reltol_ = 1e-6;
@@ -186,8 +182,6 @@ namespace casadi {
     string linear_solver_type = "dense";
     string iterative_solver = "gmres";
     string pretype = "none";
-    string linear_solver;
-    Dict linear_solver_options;
     upper_bandwidth_ = -1;
     lower_bandwidth_ = -1;
     upper_bandwidthB_ = -1;
@@ -223,9 +217,9 @@ namespace casadi {
       } else if (op.first=="pretype") {
         pretype = op.second.to_string();
       } else if (op.first=="linear_solver") {
-        linear_solver = op.second.to_string();
+        linear_solver_ = op.second.to_string();
       } else if (op.first=="linear_solver_options") {
-        linear_solver_options = op.second;
+        linear_solver_options_ = op.second;
       } else if (op.first=="upper_bandwidth") {
         upper_bandwidth_ = op.second;
       } else if (op.first=="lower_bandwidth") {
@@ -258,8 +252,8 @@ namespace casadi {
     std::string linear_solver_typeB = linear_solver_type;
     std::string iterative_solverB = iterative_solver;
     std::string pretypeB = pretype;
-    string linear_solverB = linear_solver;
-    Dict linear_solver_optionsB = linear_solver_options;
+    linear_solverB_ = linear_solver_;
+    linear_solver_optionsB_ = linear_solver_options_;
 
     // Read options again
     for (auto&& op : opts) {
@@ -284,9 +278,9 @@ namespace casadi {
       } else if (op.first=="pretypeB") {
         pretypeB = op.second.to_string();
       } else if (op.first=="linear_solverB") {
-        linear_solverB = op.second.to_string();
+        linear_solverB_ = op.second.to_string();
       } else if (op.first=="linear_solver_optionsB") {
-        linear_solver_optionsB = op.second;
+        linear_solver_optionsB_ = op.second;
       }
     }
 
@@ -369,59 +363,19 @@ namespace casadi {
       casadi_error("Unknown linear solver for backward integration: " + iterative_solverB);
     }
 
-    // Create a Jacobian if requested
-    if (exact_jacobian_) {
-      jac_ = getJac();
-      alloc(jac_);
-      alloc_w(jac_.nnz_out(0), true);
-    }
-
-    if (!jac_.is_null()) {
-      casadi_assert_message(jac_.size2_out(0)==jac_.size1_out(0),
-                            "SundialsInterface::init: the jacobian of the forward problem must "
-                            "be square but got " << jac_.sparsity_out(0).dim());
-
-      casadi_assert_message(!jac_.sparsity_out(0).is_singular(),
-                            "SundialsInterface::init: singularity - the jacobian of the forward "
-                            "problem is structurally rank-deficient. sprank(J)="
-                            << sprank(jac_.sparsity_out(0)) << " (in stead of "<< jac_.size2_out(0)
-                            << ")");
-    }
-
-    // Create a backwards Jacobian if requested
-    if (exact_jacobianB_ && nrx_>0) jacB_ = getJacB();
-
-    if (!jacB_.is_null()) {
-      alloc(jacB_);
-      alloc_w(jacB_.nnz_out(0), true);
-      casadi_assert_message(jacB_.size2_out(0)==jacB_.size1_out(0),
-                            "SundialsInterface::init: the jacobian of the backward problem must be "
-                            "square but got " << jacB_.sparsity_out(0).dim());
-
-      casadi_assert_message(!jacB_.sparsity_out(0).is_singular(),
-                            "SundialsInterface::init: singularity - the jacobian of the backward"
-                            " problem is structurally rank-deficient. sprank(J)="
-                            << sprank(jacB_.sparsity_out(0)) << " (instead of "
-                            << jacB_.size2_out(0) << ")");
-    }
-
     // Create a linear solver
-    if (!linear_solver.empty() && !jac_.is_null()) {
-      linsol_ = linsol("linsol", linear_solver, jac_.sparsity_out(0),
-                       1, linear_solver_options);
+    if (!linear_solver_.empty()) {
+      linsol_ = linsol("linsol", linear_solver_, sp_jac_dae_,
+                       1, linear_solver_options_);
       alloc(linsol_);
     }
 
     // Create a linear solver
-    if (!linear_solverB.empty() && !jacB_.is_null()) {
-      linsolB_ = linsol("linsolB", linear_solverB, jacB_.sparsity_out(0),
-                        1, linear_solver_optionsB);
+    if (!linear_solverB_.empty()) {
+      linsolB_ = linsol("linsolB", linear_solverB_, sp_jac_rdae_,
+                        1, linear_solver_optionsB_);
       alloc(linsolB_);
     }
-
-    // Allocate temporary memory
-    //alloc_w(np_, true); // p_
-    //alloc_w(nrp_, true); // rp_
   }
 
   void SundialsInterface::init_memory(void* mem) const {
@@ -481,20 +435,14 @@ namespace casadi {
     if (upper_bandwidth_>=0) {
       bw.first = upper_bandwidth_;
     } else {
-      casadi_assert_message(!jac_.is_null(),
-                            "\"upper_bandwidth\" has not been set and cannot be "
-                            "detected since exact Jacobian is not available.");
-      bw.first = jac_.sparsity_out(0).bw_upper();
+      bw.first = sp_jac_dae_.bw_upper();
     }
 
     // Get lower bandwidth
     if (lower_bandwidth_>=0) {
       bw.second = lower_bandwidth_;
     } else {
-      casadi_assert_message(!jac_.is_null(),
-                            "\"lower_bandwidth\" has not been set and cannot be "
-                            "detected since exact Jacobian is not available.");
-      bw.second = jac_.sparsity_out(0).bw_lower();
+      bw.second = sp_jac_dae_.bw_lower();
     }
 
     return bw;
@@ -507,22 +455,14 @@ namespace casadi {
     if (upper_bandwidthB_>=0) {
       bw.first = upper_bandwidthB_;
     } else {
-      casadi_assert_message(!jacB_.is_null(),
-                            "\"upper_bandwidthB\" has not been set and cannot be "
-                            "detected since exact Jacobian for backward problem "
-                            "is not available.");
-      bw.first = jacB_.sparsity_out(0).bw_upper();
+      bw.first = sp_jac_rdae_.bw_upper();
     }
 
     // Get lower bandwidth
     if (lower_bandwidthB_>=0) {
       bw.second = lower_bandwidthB_;
     } else {
-      casadi_assert_message(!jacB_.is_null(),
-                            "\"lower_bandwidthB\" has not been set and cannot be "
-                            "detected since exact Jacobian for backward problem "
-                            "is not available.");
-      bw.second = jacB_.sparsity_out(0).bw_lower();
+      bw.second = sp_jac_rdae_.bw_lower();
     }
 
     return bw;
