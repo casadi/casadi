@@ -192,15 +192,6 @@ namespace casadi {
     void rhsBS(CvodesMemory* m, double t, N_Vector x, N_Vector *xF, N_Vector xB,
                N_Vector xdotB) const;
     void rhsQB(CvodesMemory* m, double t, N_Vector x, N_Vector rx, N_Vector rqdot) const;
-    void djac(CvodesMemory* m, long N, double t, N_Vector x, N_Vector xdot, DlsMat Jac,
-              N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) const;
-    void djacB(CvodesMemory* m, long NeqB, double t, N_Vector x, N_Vector xB, N_Vector xdotB,
-               DlsMat JacB, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B) const;
-    void bjac(CvodesMemory* m, long N, long mupper, long mlower, double t, N_Vector x,
-              N_Vector xdot, DlsMat Jac, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) const;
-    void bjacB(CvodesMemory* m, long NeqB, long mupperB, long mlowerB, double t, N_Vector x,
-               N_Vector xB, N_Vector xdotB, DlsMat JacB, N_Vector tmp1B, N_Vector tmp2B,
-               N_Vector tmp3B) const;
     /// <tt>z = M^(-1).r</tt>
     void psolve(CvodesMemory* m, double t, N_Vector x, N_Vector xdot, N_Vector r, N_Vector z,
                 double gamma, double delta, int lr, N_Vector tmp) const;
@@ -311,9 +302,6 @@ namespace casadi {
 
     /// Continuous time dynamics
     Function f_, g_;
-
-    // Jacobian of the DAE with respect to the state and state derivatives
-    Function jac_, jacB_;
 
     int lmm_; // linear multistep method
     int iter_; // nonlinear solver iteration

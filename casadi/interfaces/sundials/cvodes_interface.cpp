@@ -93,20 +93,15 @@ namespace casadi {
 
     // Create a Jacobian if requested
     if (exact_jacobian_) {
-      jac_ = getJac();
-      casadi_assert(jac_.sparsity_out(0) == sp_jac_dae_);
-      alloc(jac_);
-      alloc_w(jac_.nnz_out(0), true);
+      set_function(getJac());
+      casadi_assert(get_function("jacF").sparsity_out(0) == sp_jac_dae_);
     }
 
     // Create a backwards Jacobian if requested
-    if (exact_jacobianB_ && nrx_>0) jacB_ = getJacB();
-
-    if (!jacB_.is_null()) {
-      alloc(jacB_);
-      casadi_assert(jacB_.sparsity_out(0) == sp_jac_rdae_);
-      alloc_w(jacB_.nnz_out(0), true);
-    }
+    if (exact_jacobianB_ && nrx_>0) {
+      set_function(getJacB());
+      casadi_assert(get_function("jacB").sparsity_out(0) == sp_jac_rdae_);
+    };
 
     // Algebraic variables not supported
     casadi_assert_message(nz_==0 && nrz_==0,
@@ -737,7 +732,21 @@ namespace casadi {
     try {
       casadi_assert(user_data);
       auto m = to_mem(user_data);
-      m->self.djac(m, N, t, x, xdot, Jac, tmp1, tmp2, tmp3);
+      auto& s = m->self;
+      double one=1;
+      s.calc_function(m, "jacF",
+        {&t, NV_DATA_S(x), get_ptr(m->p), &one, 0},
+        {m->jac});
+
+      // Save to Jac
+      const int* colind = s.sp_jac_dae_.colind();
+      int ncol = s.sp_jac_dae_.size2();
+      const int* row = s.sp_jac_dae_.row();
+      for (int cc=0; cc<ncol; ++cc) {
+        for (int el=colind[cc]; el<colind[cc+1]; ++el) {
+          DENSE_ELEM(Jac, row[el], cc) = m->jac[el];
+        }
+      }
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "djac failed: " << e.what() << endl;;
@@ -745,94 +754,32 @@ namespace casadi {
     }
   }
 
-  int CvodesInterface::djacB_wrapper(long NeqB, double t, N_Vector x, N_Vector xB, N_Vector xdotB,
+  int CvodesInterface::djacB_wrapper(long NeqB, double t, N_Vector x, N_Vector rx, N_Vector rxdot,
                                     DlsMat JacB, void *user_data, N_Vector tmp1B, N_Vector tmp2B,
                                     N_Vector tmp3B) {
     try {
       casadi_assert(user_data);
       auto m = to_mem(user_data);
-      m->self.djacB(m, NeqB, t, x, xB, xdotB, JacB, tmp1B, tmp2B, tmp3B);
+      auto& s = m->self;
+      double minus_one = -1;
+      s.calc_function(m, "jacB", {&t, NV_DATA_S(rx), get_ptr(m->rp),
+                                 NV_DATA_S(x), get_ptr(m->p), &minus_one, 0},
+                                {m->jacB});
+
+      // Save to JacB
+      const int* colind = s.sp_jac_rdae_.colind();
+      int ncol = s.sp_jac_rdae_.size2();
+      const int* row = s.sp_jac_rdae_.row();
+      for (int cc=0; cc<ncol; ++cc) {
+        for (int el=colind[cc]; el<colind[cc+1]; ++el) {
+          DENSE_ELEM(JacB, row[el], cc) = m->jacB[el];
+        }
+      }
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "djacB failed: " << e.what() << endl;;
       return 1;
     }
-  }
-
-  void CvodesInterface::djac(CvodesMemory* m, long N, double t, N_Vector x, N_Vector xdot,
-                             DlsMat Jac, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) const {
-    log("CvodesInterface::djac", "begin");
-
-    // Evaluate jac_
-    m->arg[DAE_T] = &t;
-    m->arg[DAE_X] = NV_DATA_S(x);
-    m->arg[DAE_Z] = 0;
-    m->arg[DAE_P] = get_ptr(m->p);
-    double one=1, zero=0;
-    m->arg[DAE_NUM_IN] = &one;
-    m->arg[DAE_NUM_IN+1] = &zero;
-    fill_n(m->res, jac_.n_out(), static_cast<double*>(0));
-    m->res[0] = m->w + jac_.sz_w();
-    jac_(m->arg, m->res, m->iw, m->w, 0);
-    double *val = m->res[0];
-
-    // Get sparsity and non-zero elements
-    const int* colind = jac_.sparsity_out(0).colind();
-    int ncol = jac_.size2_out(0);
-    const int* row = jac_.sparsity_out(0).row();
-
-    // Loop over columns
-    for (int cc=0; cc<ncol; ++cc) {
-      // Loop over non-zero entries
-      for (int el=colind[cc]; el<colind[cc+1]; ++el) {
-        // Get row
-        int rr = row[el];
-
-        // Set the element
-        DENSE_ELEM(Jac, rr, cc) = val[el];
-      }
-    }
-
-    log("CvodesInterface::djac", "end");
-  }
-
-  void CvodesInterface::djacB(CvodesMemory* m, long NeqB, double t, N_Vector x, N_Vector xB,
-                              N_Vector xdotB, DlsMat JacB, N_Vector tmp1B, N_Vector tmp2B,
-                              N_Vector tmp3B) const {
-    log("CvodesInterface::djacB", "begin");
-    // Evaluate jacB_
-    m->arg[RDAE_T] = &t;
-    m->arg[RDAE_X] = NV_DATA_S(x);
-    m->arg[RDAE_Z] = 0;
-    m->arg[RDAE_P] = get_ptr(m->p);
-    m->arg[RDAE_RX] = NV_DATA_S(xB);
-    m->arg[RDAE_RZ] = 0;
-    m->arg[RDAE_RP] = get_ptr(m->rp);
-    double minus_one = -1;
-    m->arg[RDAE_NUM_IN] = &minus_one;
-    m->arg[RDAE_NUM_IN+1] = 0;
-    fill_n(m->res, jacB_.n_out(), static_cast<double*>(0));
-    m->res[0] = m->w + jacB_.sz_w();
-    jacB_(m->arg, m->res, m->iw, m->w, 0);
-
-    // Get sparsity and non-zero elements
-    const int* colind = jacB_.sparsity_out(0).colind();
-    int ncol = jacB_.size2_out(0);
-    const int* row = jacB_.sparsity_out(0).row();
-    double *val = m->res[0];
-
-    // Loop over columns
-    for (int cc=0; cc<ncol; ++cc) {
-      // Loop over non-zero entries
-      for (int el=colind[cc]; el<colind[cc+1]; ++el) {
-        // Get row
-        int rr = row[el];
-
-        // Set the element
-        DENSE_ELEM(JacB, rr, cc) = val[el];
-      }
-    }
-    log("CvodesInterface::djacB", "end");
   }
 
   int CvodesInterface::bjac_wrapper(long N, long mupper, long mlower, double t, N_Vector x,
@@ -841,7 +788,22 @@ namespace casadi {
     try {
       casadi_assert(user_data);
       auto m = to_mem(user_data);
-      m->self.bjac(m, N, mupper, mlower, t, x, xdot, Jac, tmp1, tmp2, tmp3);
+      auto& s = m->self;
+      double one=1;
+      s.calc_function(m, "jacF", {&t, NV_DATA_S(x), get_ptr(m->p), &one, 0},
+                              {m->jac});
+
+      // Save to Jac
+      const int* colind = s.sp_jac_dae_.colind();
+      int ncol = s.sp_jac_dae_.size2();
+      const int* row = s.sp_jac_dae_.row();
+      for (int cc=0; cc<ncol; ++cc) {
+        for (int el=colind[cc]; el<colind[cc+1]; ++el) {
+          int rr = row[el];
+          if (cc-rr<=mupper && rr-cc<=mlower)
+            BAND_ELEM(Jac, rr, cc) = m->jac[el];
+        }
+      }
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "bjac failed: " << e.what() << endl;;
@@ -850,99 +812,33 @@ namespace casadi {
   }
 
   int CvodesInterface::bjacB_wrapper(long NeqB, long mupperB, long mlowerB, double t, N_Vector x,
-                                    N_Vector xB, N_Vector xdotB, DlsMat JacB, void *user_data,
+                                    N_Vector rx, N_Vector rxdot, DlsMat JacB, void *user_data,
                                     N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B) {
     try {
       casadi_assert(user_data);
       auto m = to_mem(user_data);
-      m->self.bjacB(m, NeqB, mupperB, mlowerB, t, x, xB, xdotB, JacB, tmp1B, tmp2B, tmp3B);
+      auto& s = m->self;
+      double minus_one = -1;
+      s.calc_function(m, "jacB", {&t, NV_DATA_S(rx), get_ptr(m->rp),
+                                 NV_DATA_S(x), get_ptr(m->p), &minus_one, 0},
+                                {m->jacB});
+
+      // Save to JacB
+      const int* colind = s.sp_jac_rdae_.colind();
+      int ncol = s.sp_jac_rdae_.size2();
+      const int* row = s.sp_jac_rdae_.row();
+      for (int cc=0; cc<ncol; ++cc) {
+        for (int el=colind[cc]; el<colind[cc+1]; ++el) {
+          int rr = row[el];
+          if (cc-rr<=mupperB && rr-cc<=mlowerB)
+            BAND_ELEM(JacB, rr, cc) = m->jacB[el];
+        }
+      }
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "bjacB failed: " << e.what() << endl;;
       return 1;
     }
-  }
-
-  void CvodesInterface::bjac(CvodesMemory* m, long N, long mupper, long mlower, double t,
-                             N_Vector x, N_Vector xdot,
-                             DlsMat Jac, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) const {
-    log("CvodesInterface::bjac", "begin");
-
-    // Evaluate jac_
-    m->arg[DAE_T] = &t;
-    m->arg[DAE_X] = NV_DATA_S(x);
-    m->arg[DAE_Z] = 0;
-    m->arg[DAE_P] = get_ptr(m->p);
-    double one=1;
-    m->arg[DAE_NUM_IN] = &one;
-    m->arg[DAE_NUM_IN+1] = 0;
-    fill_n(m->res, jac_.n_out(), static_cast<double*>(0));
-    m->res[0] = m->w + jac_.sz_w();
-    jac_(m->arg, m->res, m->iw, m->w, 0);
-    double *val = m->res[0];
-
-    // Get sparsity and non-zero elements
-    const int* colind = jac_.sparsity_out(0).colind();
-    int ncol = jac_.size2_out(0);
-    const int* row = jac_.sparsity_out(0).row();
-
-    // Loop over columns
-    for (int cc=0; cc<ncol; ++cc) {
-      // Loop over non-zero entries
-      for (int el=colind[cc]; el<colind[cc+1]; ++el) {
-        // Get row
-        int rr = row[el];
-
-        // Set the element
-        if (cc-rr<=mupper && rr-cc<=mlower)
-          BAND_ELEM(Jac, rr, cc) = val[el];
-      }
-    }
-
-    log("CvodesInterface::bjac", "end");
-  }
-
-  void CvodesInterface::bjacB(CvodesMemory* m,
-                              long NeqB, long mupperB, long mlowerB, double t, N_Vector x,
-                              N_Vector xB, N_Vector xdotB, DlsMat JacB, N_Vector tmp1B,
-                              N_Vector tmp2B, N_Vector tmp3B) const {
-    log("CvodesInterface::bjacB", "begin");
-
-    // Evaluate jacB_
-    m->arg[RDAE_T] = &t;
-    m->arg[RDAE_X] = NV_DATA_S(x);
-    m->arg[RDAE_Z] = 0;
-    m->arg[RDAE_P] = get_ptr(m->p);
-    m->arg[RDAE_RX] = NV_DATA_S(xB);
-    m->arg[RDAE_RZ] = 0;
-    m->arg[RDAE_RP] = get_ptr(m->rp);
-    double minus_one = -1;
-    m->arg[RDAE_NUM_IN] = &minus_one;
-    m->arg[RDAE_NUM_IN+1] = 0;
-    fill_n(m->res, jacB_.n_out(), static_cast<double*>(0));
-    m->res[0] = m->w + jacB_.sz_w();
-    jacB_(m->arg, m->res, m->iw, m->w, 0);
-
-    // Get sparsity and non-zero elements
-    const int* colind = jacB_.sparsity_out(0).colind();
-    int ncol = jacB_.size2_out(0);
-    const int* row = jacB_.sparsity_out(0).row();
-    double *val = m->res[0];
-
-    // Loop over columns
-    for (int cc=0; cc<ncol; ++cc) {
-      // Loop over non-zero entries
-      for (int el=colind[cc]; el<colind[cc+1]; ++el) {
-        // Get row
-        int rr = row[el];
-
-        // Set the element
-        if (cc-rr<=mupperB && rr-cc<=mlowerB)
-          BAND_ELEM(JacB, rr, cc) = val[el];
-      }
-    }
-
-    log("CvodesInterface::bjacB", "end");
   }
 
   void CvodesInterface::setStopTime(IntegratorMemory* mem, double tf) const {
@@ -1037,52 +933,33 @@ namespace casadi {
                                booleantype *jcurPtr, double gamma, N_Vector tmp1,
                                N_Vector tmp2, N_Vector tmp3) const {
     log("CvodesInterface::psetup", "begin");
-    // Evaluate jac_
-    m->arg[DAE_T] = &t;
-    m->arg[DAE_X] = NV_DATA_S(x);
-    m->arg[DAE_Z] = 0;
-    m->arg[DAE_P] = get_ptr(m->p);
+    // Calculate Jacobian
     double d1 = -gamma, d2 = 1.;
-    m->arg[DAE_NUM_IN] = &d1;
-    m->arg[DAE_NUM_IN+1] = &d2;
-    fill_n(m->res, jac_.n_out(), static_cast<double*>(0));
-    double *val = m->w;
-    double *w2 = m->w + jac_.nnz_out(0);
-    m->res[0] = val;
-    jac_(m->arg, m->res, m->iw, w2, 0);
+    calc_function(m, "jacF", {&t, NV_DATA_S(x), get_ptr(m->p), &d1, &d2},
+                            {m->jac});
 
     // Prepare the solution of the linear system (e.g. factorize)
-    linsol_.setup(m->arg+LINSOL_NUM_IN, m->res+LINSOL_NUM_OUT, m->iw, w2);
-    linsol_.linsol_factorize(val);
+    linsol_.setup(m->arg+LINSOL_NUM_IN, m->res+LINSOL_NUM_OUT, m->iw, m->w);
+    linsol_.linsol_factorize(m->jac);
 
     log("CvodesInterface::psetup", "end");
   }
 
   void CvodesInterface::psetupB(CvodesMemory* m,
-                                double t, N_Vector x, N_Vector xB, N_Vector xdotB,
+                                double t, N_Vector x, N_Vector rx, N_Vector rxdot,
                                 booleantype jokB, booleantype *jcurPtrB, double gammaB,
                                 N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B) const {
     log("CvodesInterface::psetupB", "begin");
-    // Evaluate jacB_
-    m->arg[RDAE_T] = &t;
-    m->arg[RDAE_X] = NV_DATA_S(x);
-    m->arg[RDAE_Z] = 0;
-    m->arg[RDAE_P] = get_ptr(m->p);
-    m->arg[RDAE_RX] = NV_DATA_S(xB);
-    m->arg[RDAE_RZ] = 0;
-    m->arg[RDAE_RP] = get_ptr(m->rp);
-    m->arg[RDAE_NUM_IN] = &gammaB;
+
+    // Calculate Jacobian
     double one=1;
-    m->arg[RDAE_NUM_IN+1] = &one;
-    fill_n(m->res, jacB_.n_out(), static_cast<double*>(0));
-    double *val = m->w;
-    double *w2 = m->w + jacB_.nnz_out(0);
-    m->res[0] = val;
-    jacB_(m->arg, m->res, m->iw, w2, 0);
+    calc_function(m, "jacB", {&t, NV_DATA_S(rx), get_ptr(m->rp),
+                               NV_DATA_S(x), get_ptr(m->p), &gammaB, &one},
+                              {m->jacB});
 
     // Prepare the solution of the linear system (e.g. factorize)
-    linsolB_.setup(m->arg+LINSOL_NUM_IN, m->res+LINSOL_NUM_OUT, m->iw, w2);
-    linsolB_.linsol_factorize(val);
+    linsolB_.setup(m->arg+LINSOL_NUM_IN, m->res+LINSOL_NUM_OUT, m->iw, m->w);
+    linsolB_.linsol_factorize(m->jacB);
 
     log("CvodesInterface::psetupB", "end");
   }
@@ -1280,9 +1157,7 @@ namespace casadi {
 
     // Add a preconditioner
     if (use_preconditioner_) {
-      // Make sure that a Jacobian has been provided
-      if (jac_.is_null())
-          throw CasadiException("CvodesInterface::init(): No Jacobian has been provided.");
+      casadi_assert_message(has_function("jacF"), "No Jacobian function");
 
       // Make sure that a linear solver has been provided
       if (linsol_.is_null())
@@ -1296,10 +1171,7 @@ namespace casadi {
   }
 
   void CvodesInterface::initUserDefinedLinsol(CvodesMemory* m) const {
-    // Make sure that a Jacobian has been provided
-    if (jac_.is_null())
-        throw CasadiException("CvodesInterface::initUserDefinedLinsol(): "
-                              "No Jacobian has been provided.");
+    casadi_assert_message(has_function("jacF"), "No Jacobian function");
 
     // Make sure that a linear solver has been provided
     if (linsol_.is_null())
@@ -1359,9 +1231,7 @@ namespace casadi {
 
     // Add a preconditioner
     if (use_preconditionerB_) {
-      // Make sure that a Jacobian has been provided
-      if (jacB_.is_null())
-        casadi_error("CvodesInterface::init(): No backwards Jacobian has been provided.");
+      casadi_assert_message(has_function("jacB"), "No Jacobian function");
 
       // Make sure that a linear solver has been provided
       if (linsolB_.is_null())
@@ -1376,10 +1246,7 @@ namespace casadi {
   }
 
   void CvodesInterface::initUserDefinedLinsolB(CvodesMemory* m) const {
-    // Make sure that a Jacobian has been provided
-    if (jacB_.is_null())
-        throw CasadiException("CvodesInterface::initUserDefinedLinsolB(): "
-                              "No backwards Jacobian has been provided.");
+    casadi_assert_message(has_function("jacB"), "No Jacobian function");
 
     // Make sure that a linear solver has been provided
     if (linsolB_.is_null())
@@ -1399,54 +1266,47 @@ namespace casadi {
 
   template<typename MatType>
   Function CvodesInterface::getJacGen() {
+    vector<MatType> a = MatType::get_input(oracle_);
+    vector<MatType> r = oracle_(a);
+
     // Get the Jacobian in the Newton iteration
     MatType c_x = MatType::sym("c_x");
     MatType c_xdot = MatType::sym("c_xdot");
-    MatType jac = c_x*MatType::jac(f_, DAE_X, DAE_ODE) + c_xdot*MatType::eye(nx_);
-
-    // Jacobian function
-    std::vector<MatType> jac_in = MatType::get_input(f_);
-    jac_in.push_back(c_x);
-    jac_in.push_back(c_xdot);
+    MatType jac = c_x*MatType::jacobian(r[DE_ODE], a[DE_X]) + c_xdot*MatType::eye(nx_);
 
     // Return generated function
-    return Function("jacf", jac_in, {jac});
+    return Function("jacF", {a[DE_T], a[DE_X], a[DE_P], c_x, c_xdot}, {jac});
   }
 
   template<typename MatType>
   Function CvodesInterface::getJacGenB() {
+    vector<MatType> a = MatType::get_input(oracle_);
+    vector<MatType> r = oracle_(a);
+
     // Get the Jacobian in the Newton iteration
     MatType c_x = MatType::sym("c_x");
     MatType c_xdot = MatType::sym("c_xdot");
-    MatType jac = c_x*MatType::jac(g_, RDAE_RX, RDAE_ODE) + c_xdot*MatType::eye(nrx_);
-
-    // Jacobian function
-    std::vector<MatType> jac_in = MatType::get_input(g_);
-    jac_in.push_back(c_x);
-    jac_in.push_back(c_xdot);
+    MatType jac = c_x*MatType::jacobian(r[DE_RODE], a[DE_RX]) + c_xdot*MatType::eye(nrx_);
 
     // return generated function
-    return Function("jacg", jac_in, {jac});
+    return Function("jacB",
+      {a[DE_T], a[DE_RX], a[DE_RP], a[DE_X], a[DE_P], c_x, c_xdot}, {jac});
   }
 
   Function CvodesInterface::getJacB() {
-    if (g_.is_a("sxfunction")) {
+    if (oracle_.is_a("sxfunction")) {
       return getJacGenB<SX>();
-    } else if (g_.is_a("mxfunction")) {
-      return getJacGenB<MX>();
     } else {
-      throw CasadiException("CvodesInterface::getJacB(): Not an SXFunction or MXFunction");
+      return getJacGenB<MX>();
     }
   }
 
 
   Function CvodesInterface::getJac() {
-    if (f_.is_a("sxfunction")) {
+    if (oracle_.is_a("sxfunction")) {
       return getJacGen<SX>();
-    } else if (f_.is_a("mxfunction")) {
-      return getJacGen<MX>();
     } else {
-      throw CasadiException("CvodesInterface::getJac(): Not an SXFunction or MXFunction");
+      return getJacGen<MX>();
     }
   }
 

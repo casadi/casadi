@@ -843,8 +843,9 @@ namespace casadi {
     try {
       auto m = to_mem(user_data);
       auto& s = m->self;
-      s.calc_function(m, "jacF", {NV_DATA_S(xz), NV_DATA_S(xz)+s.nx_, get_ptr(m->p), &t, &cj},
-                              {m->jac});
+      s.calc_function(m, "jacF",
+        {&t, NV_DATA_S(xz), NV_DATA_S(xz)+s.nx_, get_ptr(m->p), &cj},
+        {m->jac});
 
       // Save to Jac
       const int* colind = s.sp_jac_dae_.colind();
@@ -870,8 +871,8 @@ namespace casadi {
     try {
       auto m = to_mem(user_data);
       auto& s = m->self;
-      s.calc_function(m, "jacB", {NV_DATA_S(rxz), NV_DATA_S(rxz)+s.nrx_, get_ptr(m->rp),
-                                 NV_DATA_S(xz), NV_DATA_S(xz)+s.nx_, get_ptr(m->p), &t, &cj},
+      s.calc_function(m, "jacB", {&t, NV_DATA_S(rxz), NV_DATA_S(rxz)+s.nrx_, get_ptr(m->rp),
+                                 NV_DATA_S(xz), NV_DATA_S(xz)+s.nx_, get_ptr(m->p), &cj},
                                 {m->jacB});
 
       // Save to JacB
@@ -897,7 +898,7 @@ namespace casadi {
     try {
       auto m = to_mem(user_data);
       auto& s = m->self;
-      s.calc_function(m, "jacF", {NV_DATA_S(xz), NV_DATA_S(xz)+s.nx_, get_ptr(m->p), &t, &cj},
+      s.calc_function(m, "jacF", {&t, NV_DATA_S(xz), NV_DATA_S(xz)+s.nx_, get_ptr(m->p), &cj},
                               {m->jac});
 
       // Save to Jac
@@ -926,8 +927,8 @@ namespace casadi {
     try {
       auto m = to_mem(user_data);
       auto& s = m->self;
-      s.calc_function(m, "jacB", {NV_DATA_S(rxz), NV_DATA_S(rxz)+s.nrx_, get_ptr(m->rp),
-                                 NV_DATA_S(xz), NV_DATA_S(xz)+s.nx_, get_ptr(m->p), &t, &cj},
+      s.calc_function(m, "jacB", {&t, NV_DATA_S(rxz), NV_DATA_S(rxz)+s.nrx_, get_ptr(m->rp),
+                                 NV_DATA_S(xz), NV_DATA_S(xz)+s.nx_, get_ptr(m->p), &cj},
                                 {m->jacB});
 
       // Save to JacB
@@ -1012,7 +1013,7 @@ namespace casadi {
       auto m = to_mem(user_data);
       auto& s = m->self;
       // Calculate Jacobian
-      s.calc_function(m, "jacF", {NV_DATA_S(xz), NV_DATA_S(xz)+s.nx_, get_ptr(m->p), &t, &cj},
+      s.calc_function(m, "jacF", {&t, NV_DATA_S(xz), NV_DATA_S(xz)+s.nx_, get_ptr(m->p), &cj},
                               {m->jac});
 
       // Prepare the solution of the linear system (e.g. factorize)
@@ -1034,8 +1035,8 @@ namespace casadi {
       auto m = to_mem(user_data);
       auto& s = m->self;
       // Calculate Jacobian
-      s.calc_function(m, "jacB", {NV_DATA_S(rxz), NV_DATA_S(rxz)+s.nrx_, get_ptr(m->rp),
-                                 NV_DATA_S(xz), NV_DATA_S(xz)+s.nx_, get_ptr(m->p), &t, &cj},
+      s.calc_function(m, "jacB", {&t, NV_DATA_S(rxz), NV_DATA_S(rxz)+s.nrx_, get_ptr(m->rp),
+                                 NV_DATA_S(xz), NV_DATA_S(xz)+s.nx_, get_ptr(m->p), &cj},
                                 {m->jacB});
 
       // Prepare the solution of the linear system (e.g. factorize)
@@ -1464,7 +1465,7 @@ namespace casadi {
                             MatType::jacobian(r[DE_ALG], a[DE_Z])));
     }
 
-    return Function("jacF", {a[DE_X], a[DE_Z], a[DE_P], a[DE_T], cj},
+    return Function("jacF", {a[DE_T], a[DE_X], a[DE_Z], a[DE_P], cj},
                     {jac});
   }
 
@@ -1483,8 +1484,8 @@ namespace casadi {
                             MatType::jacobian(r[DE_RALG], a[DE_RZ])));
     }
 
-    return Function("jacB", {a[DE_RX], a[DE_RZ], a[DE_RP],
-                             a[DE_X], a[DE_Z], a[DE_P], a[DE_T], cj},
+    return Function("jacB", {a[DE_T], a[DE_RX], a[DE_RZ], a[DE_RP],
+                             a[DE_X], a[DE_Z], a[DE_P], cj},
                     {jac});
   }
 
