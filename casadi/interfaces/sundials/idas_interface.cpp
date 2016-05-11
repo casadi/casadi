@@ -139,21 +139,21 @@ namespace casadi {
 
     rhs_ = create_function("rhs", {"x", "z", "p", "t"}, {"ode", "alg"});
     rhsQ_ = create_function("rhsQ", {"x", "z", "p", "t"}, {"quad"});
-    g_ = create_function("g", {"rx", "rz", "rp", "x", "z", "p", "t"},
-                              {"rode", "ralg", "rquad"});
+    rhsB_ = create_function("rhsB", {"rx", "rz", "rp", "x", "z", "p", "t"},
+                                 {"rode", "ralg"});
+    rhsQB_ = create_function("rhsQB", {"rx", "rz", "rp", "x", "z", "p", "t"},
+                                 {"rquad"});
 
     // Create a Jacobian if requested
     if (exact_jacobian_) {
       set_function(getJac());
-      casadi_assert(get_function("jacf").sparsity_out(0) == sp_jac_dae_);
+      casadi_assert(get_function("jacF").sparsity_out(0) == sp_jac_dae_);
     }
 
     // Create a backwards Jacobian if requested
-    if (exact_jacobianB_ && nrx_>0) jacB_ = getJacB();
-
-    if (!jacB_.is_null()) {
-      alloc(jacB_);
-      casadi_assert(jacB_.sparsity_out(0) == sp_jac_rdae_);
+    if (exact_jacobianB_ && nrx_>0) {
+      set_function(getJacB());
+      casadi_assert(get_function("jacB").sparsity_out(0) == sp_jac_rdae_);
     }
 
     // Get initial conditions for the state derivatives
@@ -592,9 +592,7 @@ namespace casadi {
     log("IdasInterface::init", "attached linear solver");
 
     // Adjoint sensitivity problem
-    if (!g_.is_null()) {
-
-      // Allocate n-vectors
+    if (nrx_>0) {
       m->rxzdot = N_VNew_Serial(nrx_+nrz_);
       N_VConst(0.0, m->rxz);
       N_VConst(0.0, m->rxzdot);
@@ -948,18 +946,9 @@ namespace casadi {
       printvar("rxzdot", rxzdot);
     }
 
-    // Evaluate g_
-    m->arg[RDAE_T] = &t;
-    m->arg[RDAE_X] = NV_DATA_S(xz);
-    m->arg[RDAE_Z] = NV_DATA_S(xz)+nx_;
-    m->arg[RDAE_P] = get_ptr(m->p);
-    m->arg[RDAE_RX] = NV_DATA_S(rxz);
-    m->arg[RDAE_RZ] = NV_DATA_S(rxz)+nrx_;
-    m->arg[RDAE_RP] = get_ptr(m->rp);
-    m->res[RDAE_ODE] = NV_DATA_S(rr);
-    m->res[RDAE_ALG] = NV_DATA_S(rr) + nrx_;
-    m->res[RDAE_QUAD] = 0;
-    g_(m->arg, m->res, m->iw, m->w, 0);
+    calc_function(m, "rhsB", {NV_DATA_S(rxz), NV_DATA_S(rxz)+nrx_, get_ptr(m->rp),
+                              NV_DATA_S(xz), NV_DATA_S(xz)+nx_, get_ptr(m->p), &t},
+                            {NV_DATA_S(rr), NV_DATA_S(rr)+nrx_});
 
     // Subtract state derivative to get residual
     casadi_axpy(nrx_, 1., NV_DATA_S(rxzdot), NV_DATA_S(rr));
@@ -984,8 +973,8 @@ namespace casadi {
     }
   }
 
-  void IdasInterface::rhsQB(IdasMemory* m, double t, N_Vector xz, N_Vector xzdot, N_Vector xzA,
-                            N_Vector xzdotA, N_Vector qdotA) const {
+  void IdasInterface::rhsQB(IdasMemory* m, double t, N_Vector xz, N_Vector xzdot, N_Vector rxz,
+                            N_Vector rxzdot, N_Vector rqdot) const {
     log("IdasInterface::rhsQB", "begin");
 
     // Debug output
@@ -993,30 +982,21 @@ namespace casadi {
       printvar("t", t);
       printvar("xz", xz);
       printvar("xzdot", xzdot);
-      printvar("xzA", xzA);
-      printvar("xzdotA", xzdotA);
+      printvar("xzA", rxz);
+      printvar("xzdotA", rxzdot);
     }
 
-    // Evaluate g_
-    m->arg[RDAE_T] = &t;
-    m->arg[RDAE_X] = NV_DATA_S(xz);
-    m->arg[RDAE_Z] = NV_DATA_S(xz)+nx_;
-    m->arg[RDAE_P] = get_ptr(m->p);
-    m->arg[RDAE_RX] = NV_DATA_S(xzA);
-    m->arg[RDAE_RZ] = NV_DATA_S(xzA)+nrx_;
-    m->arg[RDAE_RP] = get_ptr(m->rp);
-    m->res[RDAE_ODE] = 0;
-    m->res[RDAE_ALG] = 0;
-    m->res[RDAE_QUAD] = NV_DATA_S(qdotA);
-    g_(m->arg, m->res, m->iw, m->w, 0);
+    calc_function(m, "rhsQB", {NV_DATA_S(rxz), NV_DATA_S(rxz)+nrx_, get_ptr(m->rp),
+                               NV_DATA_S(xz), NV_DATA_S(xz)+nx_, get_ptr(m->p), &t},
+                              {NV_DATA_S(rqdot)});
 
     // Debug output
     if (monitored("rhsQB")) {
-      printvar("qdotA", qdotA);
+      printvar("qdotA", rqdot);
     }
 
     // Negate (note definition of g)
-    casadi_scal(nrq_, -1., NV_DATA_S(qdotA));
+    casadi_scal(nrq_, -1., NV_DATA_S(rqdot));
 
     log("IdasInterface::rhsQB", "end");
   }
@@ -1043,7 +1023,7 @@ namespace casadi {
     m->time1 = clock();
 
     // Calculate Jacobian
-    calc_function(m, "jacf", {NV_DATA_S(xz), NV_DATA_S(xz)+nx_, get_ptr(m->p), &t, &cj},
+    calc_function(m, "jacF", {NV_DATA_S(xz), NV_DATA_S(xz)+nx_, get_ptr(m->p), &t, &cj},
                             {m->jac});
 
     // Save to Jac
@@ -1076,43 +1056,26 @@ namespace casadi {
   }
 
   void IdasInterface::
-  djacB(IdasMemory* m, long int NeqB, double t, double cjB, N_Vector xz, N_Vector xzdot,
-        N_Vector xzB, N_Vector xzdotB, N_Vector rrB, DlsMat JacB,
+  djacB(IdasMemory* m, long int NeqB, double t, double cj, N_Vector xz, N_Vector xzdot,
+        N_Vector rxz, N_Vector rxzdot, N_Vector rrr, DlsMat JacB,
         N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B) const {
     log("IdasInterface::djacB", "begin");
 
     // Get time
     m->time1 = clock();
 
-    // Evaluate jacB_
-    m->arg[RDAE_T] = &t;
-    m->arg[RDAE_X] = NV_DATA_S(xz);
-    m->arg[RDAE_Z] = NV_DATA_S(xz)+nx_;
-    m->arg[RDAE_P] = get_ptr(m->p);
-    m->arg[RDAE_RX] = NV_DATA_S(xzB);
-    m->arg[RDAE_RZ] = NV_DATA_S(xzB)+nrx_;
-    m->arg[RDAE_RP] = get_ptr(m->rp);
-    m->arg[RDAE_NUM_IN] = &cjB;
-    fill_n(m->res, jacB_.n_out(), nullptr);
-    m->res[0] = m->w + jacB_.sz_w();
-    jacB_(m->arg, m->res, m->iw, m->w, 0);
+    // Calculate Jacobian
+    calc_function(m, "jacB", {NV_DATA_S(rxz), NV_DATA_S(rxz)+nrx_, get_ptr(m->rp),
+                               NV_DATA_S(xz), NV_DATA_S(xz)+nx_, get_ptr(m->p), &t, &cj},
+                              {m->jacB});
 
-    // Get sparsity and non-zero elements
-    const int* colind = jacB_.sparsity_out(0).colind();
-    int ncol = jacB_.size2_out(0);
-    const int* row = jacB_.sparsity_out(0).row();
-    double *val = m->res[0];
-
-    // Loop over columns
+    // Save to JacB
+    const int* colind = sp_jac_rdae_.colind();
+    int ncol = sp_jac_rdae_.size2();
+    const int* row = sp_jac_rdae_.row();
     for (int cc=0; cc<ncol; ++cc) {
-      // Loop over non-zero entries
       for (int el=colind[cc]; el<colind[cc+1]; ++el) {
-
-        // Get row
-        int rr = row[el];
-
-        // Add to the element
-        DENSE_ELEM(JacB, rr, cc) = val[el];
+        DENSE_ELEM(JacB, row[el], cc) = m->jacB[el];
       }
     }
 
@@ -1144,7 +1107,7 @@ namespace casadi {
     m->time1 = clock();
 
     // Calculate Jacobian
-    calc_function(m, "jacf", {NV_DATA_S(xz), NV_DATA_S(xz)+nx_, get_ptr(m->p), &t, &cj},
+    calc_function(m, "jacF", {NV_DATA_S(xz), NV_DATA_S(xz)+nx_, get_ptr(m->p), &t, &cj},
                             {m->jac});
 
     // Save to Jac
@@ -1180,43 +1143,28 @@ namespace casadi {
   }
 
   void IdasInterface::bjacB(IdasMemory* m, long NeqB, long mupperB, long mlowerB, double t,
-                            double cjB, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB,
-                            N_Vector resvalB, DlsMat JacB, N_Vector tmp1B, N_Vector tmp2B,
+                            double cj, N_Vector xz, N_Vector xzdot, N_Vector rxz, N_Vector rxzdot,
+                            N_Vector rresval, DlsMat JacB, N_Vector tmp1B, N_Vector tmp2B,
                             N_Vector tmp3B) const {
     log("IdasInterface::bjacB", "begin");
 
     // Get time
     m->time1 = clock();
 
-    // Evaluate jacB_
-    m->arg[RDAE_T] = &t;
-    m->arg[RDAE_X] = NV_DATA_S(xz);
-    m->arg[RDAE_Z] = NV_DATA_S(xz)+nx_;
-    m->arg[RDAE_P] = get_ptr(m->p);
-    m->arg[RDAE_RX] = NV_DATA_S(xzB);
-    m->arg[RDAE_RZ] = NV_DATA_S(xzB)+nrx_;
-    m->arg[RDAE_RP] = get_ptr(m->rp);
-    m->arg[RDAE_NUM_IN] = &cjB;
-    fill_n(m->res, jacB_.n_out(), nullptr);
-    m->res[0] = m->w + jacB_.sz_w();
-    jacB_(m->arg, m->res, m->iw, m->w, 0);
+    // Calculate Jacobian
+    calc_function(m, "jacB", {NV_DATA_S(rxz), NV_DATA_S(rxz)+nrx_, get_ptr(m->rp),
+                               NV_DATA_S(xz), NV_DATA_S(xz)+nx_, get_ptr(m->p), &t, &cj},
+                              {m->jacB});
 
-    // Get sparsity and non-zero elements
-    const int* colind = jacB_.sparsity_out(0).colind();
-    int ncol = jacB_.size2_out(0);
-    const int* row = jacB_.sparsity_out(0).row();
-    double *val = m->res[0];
-
-    // Loop over columns
+    // Save to JacB
+    const int* colind = sp_jac_rdae_.colind();
+    int ncol = sp_jac_rdae_.size2();
+    const int* row = sp_jac_rdae_.row();
     for (int cc=0; cc<ncol; ++cc) {
-      // Loop over non-zero entries
       for (int el=colind[cc]; el<colind[cc+1]; ++el) {
-        // Get row
         int rr = row[el];
-
-        // Set the element
         if (cc-rr<=mupperB && rr-cc<=mlowerB)
-          BAND_ELEM(JacB, rr, cc) = val[el];
+          BAND_ELEM(JacB, rr, cc) = m->jacB[el];
       }
     }
 
@@ -1385,7 +1333,7 @@ namespace casadi {
     m->time1 = clock();
 
     // Calculate Jacobian
-    calc_function(m, "jacf", {NV_DATA_S(xz), NV_DATA_S(xz)+nx_, get_ptr(m->p), &t, &cj},
+    calc_function(m, "jacF", {NV_DATA_S(xz), NV_DATA_S(xz)+nx_, get_ptr(m->p), &t, &cj},
                             {m->jac});
 
     // Log time duration
@@ -1406,36 +1354,26 @@ namespace casadi {
 
 
   void IdasInterface::
-  psetupB(IdasMemory* m, double t, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB,
-          N_Vector resvalB, double cjB,
+  psetupB(IdasMemory* m, double t, N_Vector xz, N_Vector xzdot, N_Vector rxz, N_Vector rxzdot,
+          N_Vector rresval, double cj,
           N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B) const {
     log("IdasInterface::psetupB", "begin");
 
     // Get time
     m->time1 = clock();
 
-    // Evaluate jacB_
-    m->arg[RDAE_T] = &t;
-    m->arg[RDAE_X] = NV_DATA_S(xz);
-    m->arg[RDAE_Z] = NV_DATA_S(xz)+nx_;
-    m->arg[RDAE_P] = get_ptr(m->p);
-    m->arg[RDAE_RX] = NV_DATA_S(xzB);
-    m->arg[RDAE_RZ] = NV_DATA_S(xzB)+nrx_;
-    m->arg[RDAE_RP] = get_ptr(m->rp);
-    m->arg[RDAE_NUM_IN] = &cjB;
-    fill_n(m->res, jacB_.n_out(), nullptr);
-    double *val = m->w;
-    double *w2 = m->w + jacB_.nnz_out(0);
-    m->res[0] = val;
-    jacB_(m->arg, m->res, m->iw, w2, 0);
+    // Calculate Jacobian
+    calc_function(m, "jacB", {NV_DATA_S(rxz), NV_DATA_S(rxz)+nrx_, get_ptr(m->rp),
+                               NV_DATA_S(xz), NV_DATA_S(xz)+nx_, get_ptr(m->p), &t, &cj},
+                              {m->jacB});
 
     // Log time duration
     m->time2 = clock();
     m->t_lsetup_jac += static_cast<double>(m->time2-m->time1)/CLOCKS_PER_SEC;
 
     // Prepare the solution of the linear system (e.g. factorize)
-    linsolB_.setup(m->arg+LINSOL_NUM_IN, m->res+LINSOL_NUM_OUT, m->iw, w2);
-    linsolB_.linsol_factorize(val);
+    linsolB_.setup(m->arg+LINSOL_NUM_IN, m->res+LINSOL_NUM_OUT, m->iw, m->w);
+    linsolB_.linsol_factorize(m->jacB);
 
     // Log time duration
     m->time1 = clock();
@@ -1669,7 +1607,7 @@ namespace casadi {
 
     // Add a preconditioner
     if (use_preconditioner_) {
-      casadi_assert_message(has_function("jacf"), "No Jacobian function");
+      casadi_assert_message(has_function("jacF"), "No Jacobian function");
 
       // Make sure that a linear solver has been provided
       if (linsol_.is_null())
@@ -1683,7 +1621,7 @@ namespace casadi {
   }
 
   void IdasInterface::initUserDefinedLinsol(IdasMemory* m) const {
-    casadi_assert_message(has_function("jacf"), "No Jacobian function");
+    casadi_assert_message(has_function("jacF"), "No Jacobian function");
 
     // Make sure that a linear solver has been provided
     casadi_assert(!linsol_.is_null());
@@ -1853,9 +1791,7 @@ namespace casadi {
 
     // Add a preconditioner
     if (use_preconditionerB_) {
-      // Make sure that a Jacobian has been provided
-      if (jacB_.is_null())
-          throw CasadiException("IdasInterface::init(): No backwards Jacobian has been provided.");
+      casadi_assert_message(has_function("jacB"), "No Jacobian function");
 
       // Make sure that a linear solver has been provided
       if (linsolB_.is_null())
@@ -1870,8 +1806,7 @@ namespace casadi {
   }
 
   void IdasInterface::initUserDefinedLinsolB(IdasMemory* m) const {
-    // Make sure that a Jacobian has been provided
-    casadi_assert(!jacB_.is_null());
+    casadi_assert_message(has_function("jacB"), "No Jacobian function");
 
     // Make sure that a linear solver has been provided
     casadi_assert(!linsolB_.is_null());
@@ -1903,29 +1838,28 @@ namespace casadi {
                             MatType::jacobian(r[DE_ALG], a[DE_Z])));
     }
 
-    // Return generated function
-    return Function("jacf", {a[DE_X], a[DE_Z], a[DE_P], a[DE_T], cj},
+    return Function("jacF", {a[DE_X], a[DE_Z], a[DE_P], a[DE_T], cj},
                     {jac});
   }
 
   template<typename MatType>
   Function IdasInterface::getJacGenB() {
+    vector<MatType> a = MatType::get_input(oracle_);
+    vector<MatType> r = oracle_(a);
+
     // Get the Jacobian in the Newton iteration
     MatType cj = MatType::sym("cj");
-    MatType jac = MatType::jac(g_, RDAE_RX, RDAE_ODE) + cj*MatType::eye(nrx_);
+    MatType jac = MatType::jacobian(r[DE_RODE], a[DE_RX]) + cj*MatType::eye(nrx_);
     if (nrz_>0) {
       jac = horzcat(vertcat(jac,
-                            MatType::jac(g_, RDAE_RX, RDAE_ALG)),
-                    vertcat(MatType::jac(g_, RDAE_RZ, RDAE_ODE),
-                            MatType::jac(g_, RDAE_RZ, RDAE_ALG)));
+                            MatType::jacobian(r[DE_RALG], a[DE_RX])),
+                    vertcat(MatType::jacobian(r[DE_RODE], a[DE_RZ]),
+                            MatType::jacobian(r[DE_RALG], a[DE_RZ])));
     }
 
-    // Jacobian function
-    std::vector<MatType> jac_in = MatType::get_input(g_);
-    jac_in.push_back(cj);
-
-    // return generated function
-    return Function("jacg", jac_in, {jac});
+    return Function("jacB", {a[DE_RX], a[DE_RZ], a[DE_RP],
+                             a[DE_X], a[DE_Z], a[DE_P], a[DE_T], cj},
+                    {jac});
   }
 
   Function IdasInterface::getJacB() {

@@ -199,7 +199,7 @@ namespace casadi {
                N_Vector tmp3) const;
     void resB(IdasMemory* m, double t, N_Vector y, N_Vector xzdot, N_Vector xA, N_Vector xzdotB,
               N_Vector rrB) const;
-    void rhsQB(IdasMemory* m, double t, N_Vector y, N_Vector xzdot, N_Vector xA, N_Vector xzdotB,
+    void rhsQB(IdasMemory* m, double t, N_Vector y, N_Vector xzdot, N_Vector rxz, N_Vector xzdotB,
                N_Vector qdotA) const;
     void psolve(IdasMemory* m, double t, N_Vector xz, N_Vector xzdot, N_Vector rr, N_Vector rvec,
                 N_Vector zvec, double cj, double delta, N_Vector tmp) const;
@@ -320,10 +320,7 @@ namespace casadi {
     void initUserDefinedLinsolB(IdasMemory* m) const;
 
     /// Continuous time dynamics
-    Function rhs_, rhsQ_, g_;
-
-    // Jacobian of the DAE with respect to the state and state derivatives
-    Function jacB_;
+    Function rhs_, rhsQ_, rhsB_, rhsQB_;
 
     // Jacobian times vector functions
     Function jtimes_, jtimesB_;
