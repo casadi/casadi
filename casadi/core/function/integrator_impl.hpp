@@ -177,6 +177,9 @@ namespace casadi {
     /// Number of forward and backward parameters
     int np_, nrp_;
 
+    /// Number of sensitivities
+    int nsens_;
+
     // Time grid
     std::vector<double> grid_;
     int ngrid_;

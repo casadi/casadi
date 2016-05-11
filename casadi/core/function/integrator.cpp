@@ -278,6 +278,9 @@ namespace casadi {
     nrp_ = rp().nnz();
     nrq_ = rq().nnz();
 
+    // Number of sensitivities
+    nsens_ = x().size2()-1;
+
     // Warn if sparse inputs (was previously an error)
     casadi_assert_warning(oracle_.sparsity_in(DE_X).is_dense(),
                           "Sparse states in integrators are experimental");
@@ -1260,6 +1263,47 @@ namespace casadi {
         casadi_error("No such field: " + i.first);
       }
     }
+
+    // Make sure x and ode exist
+    casadi_assert_message(!de_in[DE_X].is_empty(), "Ill-posed ODE - no state");
+
+    // Number of right-hand-sides
+    int nrhs = de_in[DE_X].size2();
+
+    // Make sure consistent number of right-hand-sides
+    for (bool b : {true, false}) {
+      for (auto&& e : b ? de_in : de_out) {
+        // Skip time
+        if (&e == &de_in[DE_T]) continue;
+        // Number of rows
+        int nr = e.size1();
+        // Make sure no change in number of elements
+        casadi_assert_message(e.numel()==nr*nrhs, "Inconsistent number of rhs");
+        e = reshape(e, nr, nrhs);
+      }
+    }
+
+    // Consistent sparsity for x
+    casadi_assert_message(de_in[DE_X].size()==de_out[DE_ODE].size(),
+      "Dimension mismatch for 'ode'");
+    de_out[DE_ODE] = project(de_out[DE_ODE], de_in[DE_X].sparsity());
+
+    // Consistent sparsity for z
+    casadi_assert_message(de_in[DE_Z].size()==de_out[DE_ALG].size(),
+      "Dimension mismatch for 'alg'");
+    de_out[DE_ALG] = project(de_out[DE_ALG], de_in[DE_Z].sparsity());
+
+    // Consistent sparsity for rx
+    casadi_assert_message(de_in[DE_RX].size()==de_out[DE_RODE].size(),
+      "Dimension mismatch for 'rode'");
+    de_out[DE_RODE] = project(de_out[DE_RODE], de_in[DE_RX].sparsity());
+
+    // Consistent sparsity for rz
+    casadi_assert_message(de_in[DE_RZ].size()==de_out[DE_RALG].size(),
+      "Dimension mismatch for 'ralg'");
+    de_out[DE_RALG] = project(de_out[DE_RALG], de_in[DE_RZ].sparsity());
+
+    // Construct
     return Function(name, de_in, de_out, DE_INPUTS, DE_OUTPUTS, opts);
   }
 
