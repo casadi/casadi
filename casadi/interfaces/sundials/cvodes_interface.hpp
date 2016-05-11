@@ -318,10 +318,6 @@ namespace casadi {
     int lmm_; // linear multistep method
     int iter_; // nonlinear solver iteration
 
-    bool monitor_rhsB_;
-    bool monitor_rhs_;
-    bool monitor_rhsQB_;
-
     // jtimes signature
     enum JTimesIn {
       JTIMES_T, JTIMES_X, JTIMES_P, JTIMES_FWD_X, JTIMES_NUM_IN

@@ -112,11 +112,6 @@ namespace casadi {
     casadi_assert_message(nz_==0 && nrz_==0,
                           "CVODES does not support algebraic variables");
 
-    // Read options
-    monitor_rhsB_  = monitored("resB");
-    monitor_rhs_   = monitored("res");
-    monitor_rhsQB_ = monitored("resQB");
-
     if (linear_multistep_method=="adams") {
       lmm_ = CV_ADAMS;
     } else if (linear_multistep_method=="bdf") {
@@ -292,12 +287,6 @@ namespace casadi {
   void CvodesInterface::rhs(CvodesMemory* m, double t, N_Vector x, N_Vector xdot) const {
     log("CvodesInterface::rhs", "begin");
 
-    // Debug output
-    if (monitor_rhs_) {
-      printvar("t", t);
-      printvar("x", x);
-    }
-
     // Evaluate f_
     m->arg[DAE_T] = &t;
     m->arg[DAE_X] = NV_DATA_S(x);
@@ -307,11 +296,6 @@ namespace casadi {
     m->res[DAE_ALG] = 0;
     m->res[DAE_QUAD] = 0;
     f_(m->arg, m->res, m->iw, m->w, 0);
-
-    // Debug output
-    if (monitor_rhs_) {
-      printvar("xdot", xdot);
-    }
 
     log("CvodesInterface::rhs", "end");
 
@@ -636,13 +620,6 @@ namespace casadi {
   rhsB(CvodesMemory* m, double t, N_Vector x, N_Vector rx, N_Vector rxdot) const {
     log("CvodesInterface::rhsB", "begin");
 
-    // Debug output
-    if (monitor_rhsB_) {
-      printvar("t", t);
-      printvar("x", x);
-      printvar("rx", rx);
-    }
-
     // Evaluate g_
     m->arg[RDAE_T] = &t;
     m->arg[RDAE_X] = NV_DATA_S(x);
@@ -655,11 +632,6 @@ namespace casadi {
     m->res[RDAE_ALG] = 0;
     m->res[RDAE_QUAD] = 0;
     g_(m->arg, m->res, m->iw, m->w, 0);
-
-    // Debug output
-    if (monitor_rhsB_) {
-      printvar("rxdot", rxdot);
-    }
 
     // Negate (note definition of g)
     casadi_scal(nrx_, -1., NV_DATA_S(rxdot));
@@ -715,17 +687,6 @@ namespace casadi {
 
   void CvodesInterface::rhsQB(CvodesMemory* m, double t, N_Vector x, N_Vector rx,
                               N_Vector rqdot) const {
-    if (monitor_rhsQB_) {
-      userOut() << "CvodesInterface::rhsQB: begin" << endl;
-    }
-
-    // Debug output
-    if (monitor_rhsQB_) {
-      printvar("t", t);
-      printvar("x", x);
-      printvar("rx", rx);
-    }
-
     // Evaluate g_
     m->arg[RDAE_T] = &t;
     m->arg[RDAE_X] = NV_DATA_S(x);
@@ -739,17 +700,8 @@ namespace casadi {
     m->res[RDAE_QUAD] = NV_DATA_S(rqdot);
     g_(m->arg, m->res, m->iw, m->w, 0);
 
-    // Debug output
-    if (monitor_rhsQB_) {
-      printvar("rqdot", rqdot);
-    }
-
     // Negate (note definition of g)
     casadi_scal(nrq_, -1., NV_DATA_S(rqdot));
-
-    if (monitor_rhsQB_) {
-      userOut() << "CvodesInterface::rhsQB: end" << endl;
-    }
   }
 
   int CvodesInterface::jtimes_wrapper(N_Vector v, N_Vector Jv, double t, N_Vector x,

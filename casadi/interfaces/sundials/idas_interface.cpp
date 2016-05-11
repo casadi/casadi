@@ -294,23 +294,11 @@ namespace casadi {
   res(IdasMemory* m, double t, N_Vector xz, N_Vector xzdot, N_Vector rr) const {
     log("IdasInterface::res", "begin");
 
-    // Debug output
-    if (monitored("res")) {
-      printvar("t", t);
-      printvar("xz", xz);
-      printvar("xzdot", xzdot);
-    }
-
     calc_function(m, "rhs", {NV_DATA_S(xz), NV_DATA_S(xz)+nx_, get_ptr(m->p), &t},
                             {NV_DATA_S(rr), NV_DATA_S(rr)+nx_});
 
     // Subtract state derivative to get residual
     casadi_axpy(nx_, -1., NV_DATA_S(xzdot), NV_DATA_S(rr));
-
-    // Debug output
-    if (monitored("res")) {
-      printvar("res", rr);
-    }
 
     // Regularity check
     casadi_assert_message(!regularity_check_ || is_regular(rr),
@@ -379,15 +367,6 @@ namespace casadi {
                              N_Vector xzdotB, N_Vector resvalB, N_Vector vB,
                              N_Vector JvB, double cjB, N_Vector tmp1B, N_Vector tmp2B) const {
     log("IdasInterface::jtimesB", "begin");
-    // Debug output
-    if (monitored("jtimesB")) {
-      printvar("t", t);
-      printvar("xz", xz);
-      printvar("xzdot", xzdot);
-      printvar("xzB", xzB);
-      printvar("xzdotB", xzdotB);
-      printvar("vB", vB);
-    }
 
     calc_function(m, "jtimesB",
       {&t, NV_DATA_S(xz), NV_DATA_S(xz)+nx_, get_ptr(m->p),
@@ -397,11 +376,6 @@ namespace casadi {
 
     // Subtract state derivative to get residual
     casadi_axpy(nrx_, cjB, NV_DATA_S(vB), NV_DATA_S(JvB));
-
-    // Debug output
-    if (monitored("jtimesB")) {
-      printvar("JvB", JvB);
-    }
 
     log("IdasInterface::jtimesB", "end");
   }
@@ -883,26 +857,12 @@ namespace casadi {
                            N_Vector rxzdot, N_Vector rr) const {
     log("IdasInterface::resB", "begin");
 
-    // Debug output
-    if (monitored("resB")) {
-      printvar("t", t);
-      printvar("xz", xz);
-      printvar("xzdot", xzdot);
-      printvar("rxz", rxz);
-      printvar("rxzdot", rxzdot);
-    }
-
     calc_function(m, "rhsB", {NV_DATA_S(rxz), NV_DATA_S(rxz)+nrx_, get_ptr(m->rp),
                               NV_DATA_S(xz), NV_DATA_S(xz)+nx_, get_ptr(m->p), &t},
                             {NV_DATA_S(rr), NV_DATA_S(rr)+nrx_});
 
     // Subtract state derivative to get residual
     casadi_axpy(nrx_, 1., NV_DATA_S(rxzdot), NV_DATA_S(rr));
-
-    // Debug output
-    if (monitored("resB")) {
-      printvar("rr", rr);
-    }
 
     log("IdasInterface::resB", "end");
   }
@@ -923,23 +883,9 @@ namespace casadi {
                             N_Vector rxzdot, N_Vector rqdot) const {
     log("IdasInterface::rhsQB", "begin");
 
-    // Debug output
-    if (monitored("rhsQB")) {
-      printvar("t", t);
-      printvar("xz", xz);
-      printvar("xzdot", xzdot);
-      printvar("xzA", rxz);
-      printvar("xzdotA", rxzdot);
-    }
-
     calc_function(m, "rhsQB", {NV_DATA_S(rxz), NV_DATA_S(rxz)+nrx_, get_ptr(m->rp),
                                NV_DATA_S(xz), NV_DATA_S(xz)+nx_, get_ptr(m->p), &t},
                               {NV_DATA_S(rqdot)});
-
-    // Debug output
-    if (monitored("rhsQB")) {
-      printvar("qdotA", rqdot);
-    }
 
     // Negate (note definition of g)
     casadi_scal(nrq_, -1., NV_DATA_S(rqdot));
@@ -1211,23 +1157,8 @@ namespace casadi {
     casadi_assert_message(linsolB_.nnz_out(0) == NV_LENGTH_S(zvecB),
                           "Assertion error: " << linsolB_.nnz_out(0)
                           << " == " << NV_LENGTH_S(zvecB));
-    if (monitored("psolveB")) {
-      userOut() << "zvecB = " << std::endl;
-      for (int k=0;k<NV_LENGTH_S(zvecB);++k) {
-        userOut() << NV_DATA_S(zvecB)[k] << " " ;
-      }
-      userOut() << endl;
-    }
-
     linsolB_.linsol_solve(NV_DATA_S(zvecB));
 
-    if (monitored("psolveB")) {
-      userOut() << "zvecB sol = " << std::endl;
-      for (int k=0;k<NV_LENGTH_S(zvecB);++k) {
-        userOut() << NV_DATA_S(zvecB)[k] << " " ;
-      }
-      userOut() << endl;
-    }
     log("IdasInterface::psolveB", "end");
   }
 
