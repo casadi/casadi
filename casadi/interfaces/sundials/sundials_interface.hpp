@@ -53,6 +53,9 @@ namespace casadi {
     // Parameters
     std::vector<double> p, rp;
 
+    // Jacobian
+    double *jac, *jacB;
+
     // For timings
     clock_t time1, time2;
 
@@ -172,6 +175,10 @@ namespace casadi {
 
     // Get bandwidth for backward problem
     std::pair<int, int> getBandwidthB() const;
+
+    /** \brief Set the (persistent) work vectors */
+    virtual void set_work(void* mem, const double**& arg, double**& res,
+                          int*& iw, double*& w) const;
 
     // Print a variable
     static void printvar(const std::string& id, double v) {

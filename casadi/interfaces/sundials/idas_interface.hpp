@@ -320,10 +320,10 @@ namespace casadi {
     void initUserDefinedLinsolB(IdasMemory* m) const;
 
     /// Continuous time dynamics
-    Function f_, g_;
+    Function rhs_, rhsQ_, g_;
 
     // Jacobian of the DAE with respect to the state and state derivatives
-    Function jac_, jacB_;
+    Function jacB_;
 
     // Jacobian times vector functions
     Function jtimes_, jtimesB_;

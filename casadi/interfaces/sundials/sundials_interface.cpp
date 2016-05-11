@@ -363,6 +363,9 @@ namespace casadi {
       casadi_error("Unknown linear solver for backward integration: " + iterative_solverB);
     }
 
+    // Work vector
+    alloc_w(sp_jac_dae_.nnz(), true);
+
     // Create a linear solver
     if (!linear_solver_.empty()) {
       linsol_ = linsol("linsol", linear_solver_, sp_jac_dae_,
@@ -370,11 +373,16 @@ namespace casadi {
       alloc(linsol_);
     }
 
-    // Create a linear solver
-    if (!linear_solverB_.empty()) {
-      linsolB_ = linsol("linsolB", linear_solverB_, sp_jac_rdae_,
-                        1, linear_solver_optionsB_);
-      alloc(linsolB_);
+    if (nrx_>0) {
+      // Work vector
+      alloc_w(sp_jac_rdae_.nnz(), true);
+
+      // Create a linear solver
+      if (!linear_solverB_.empty()) {
+        linsolB_ = linsol("linsolB", linear_solverB_, sp_jac_rdae_,
+                          1, linear_solver_optionsB_);
+        alloc(linsolB_);
+      }
     }
   }
 
@@ -519,6 +527,20 @@ namespace casadi {
     stats["t_lsetup_jac"] = m->t_lsetup_jac;
     stats["t_lsetup_fac"] = m->t_lsetup_fac;
     return stats;
+  }
+
+  void SundialsInterface::set_work(void* mem, const double**& arg, double**& res,
+                                int*& iw, double*& w) const {
+    auto m = static_cast<SundialsMemory*>(mem);
+
+    // Set work in base classes
+    Integrator::set_work(mem, arg, res, iw, w);
+
+    // Work vectors
+    m->jac = w; w += sp_jac_dae_.nnz();
+    if (nrx_>0) {
+      m->jacB = w; w += sp_jac_rdae_.nnz();
+    }
   }
 
 } // namespace casadi
