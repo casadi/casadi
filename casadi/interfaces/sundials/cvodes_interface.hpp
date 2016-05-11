@@ -178,14 +178,12 @@ namespace casadi {
   protected:
 
     // Sundials callback functions
-    void rhs(CvodesMemory* m, double t, N_Vector x, N_Vector xdot) const;
     void ehfun(CvodesMemory* m, int error_code, const char *module, const char *function,
                char *msg) const;
     void rhsS(CvodesMemory* m, int Ns, double t, N_Vector x, N_Vector xdot, N_Vector *xF,
               N_Vector *xdotF, N_Vector tmp1, N_Vector tmp2) const;
     void rhsS1(CvodesMemory* m, int Ns, double t, N_Vector x, N_Vector xdot, int iS, N_Vector xF,
                N_Vector xdotF, N_Vector tmp1, N_Vector tmp2) const;
-    void rhsQ(CvodesMemory* m, double t, N_Vector x, N_Vector qdot) const;
     void rhsQS(CvodesMemory* m, int Ns, double t, N_Vector x, N_Vector *xF, N_Vector qdot,
                N_Vector *qFdot, N_Vector tmp1, N_Vector tmp2) const;
     void rhsB(CvodesMemory* m, double t, N_Vector x, N_Vector rx, N_Vector rxdot) const;
@@ -299,9 +297,6 @@ namespace casadi {
 
     // Initialize the user defined linear solver (backward integration)
     void initUserDefinedLinsolB(CvodesMemory* m) const;
-
-    /// Continuous time dynamics
-    Function f_, g_;
 
     int lmm_; // linear multistep method
     int iter_; // nonlinear solver iteration

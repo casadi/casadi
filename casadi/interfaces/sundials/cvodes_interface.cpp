@@ -87,9 +87,12 @@ namespace casadi {
       }
     }
 
-    f_ = create_function("f", {"x", "z", "p", "t"}, {"ode", "alg", "quad"});
-    g_ = create_function("g", {"rx", "rz", "rp", "x", "z", "p", "t"},
-                              {"rode", "ralg", "rquad"});
+    create_function("rhs", {"x", "p", "t"}, {"ode"});
+    create_function("rhsQ", {"x", "p", "t"}, {"quad"});
+    create_function("rhsB", {"rx", "rp", "x", "p", "t"},
+                            {"rode"});
+    create_function("rhsQB", {"rx", "rp", "x", "p", "t"},
+                             {"rquad"});
 
     // Create a Jacobian if requested
     if (exact_jacobian_) {
@@ -259,7 +262,7 @@ namespace casadi {
     }
 
     // Adjoint sensitivity problem
-    if (!g_.is_null()) {
+    if (nrx_>0) {
       // Get the interpolation type
       int interpType;
       if (interpolation_type_=="hermite") {
@@ -277,28 +280,13 @@ namespace casadi {
     }
   }
 
-  void CvodesInterface::rhs(CvodesMemory* m, double t, N_Vector x, N_Vector xdot) const {
-    log("CvodesInterface::rhs", "begin");
-
-    // Evaluate f_
-    m->arg[DAE_T] = &t;
-    m->arg[DAE_X] = NV_DATA_S(x);
-    m->arg[DAE_Z] = 0;
-    m->arg[DAE_P] = get_ptr(m->p);
-    m->res[DAE_ODE] = NV_DATA_S(xdot);
-    m->res[DAE_ALG] = 0;
-    m->res[DAE_QUAD] = 0;
-    f_(m->arg, m->res, m->iw, m->w, 0);
-
-    log("CvodesInterface::rhs", "end");
-
-  }
-
   int CvodesInterface::rhs_wrapper(double t, N_Vector x, N_Vector xdot, void *user_data) {
     try {
       casadi_assert(user_data);
       auto m = to_mem(user_data);
-      m->self.rhs(m, t, x, xdot);
+      auto& s = m->self;
+      s.calc_function(m, "rhs", {NV_DATA_S(x), get_ptr(m->p), &t},
+                              {NV_DATA_S(xdot)});
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "rhs failed: " << e.what() << endl;
@@ -565,30 +553,14 @@ namespace casadi {
     try {
       casadi_assert(user_data);
       auto m = to_mem(user_data);
-      m->self.rhsQ(m, t, x, qdot);
+      auto& s = m->self;
+      s.calc_function(m, "rhsQ", {NV_DATA_S(x), get_ptr(m->p), &t},
+                               {NV_DATA_S(qdot)});
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "rhsQ failed: " << e.what() << endl;;
       return 1;
     }
-  }
-
-  void CvodesInterface::rhsQ(CvodesMemory* m, double t, N_Vector x, N_Vector qdot) const {
-    // Evaluate f_
-    m->arg[DAE_T] = &t;
-    m->arg[DAE_X] = NV_DATA_S(x);
-    m->arg[DAE_Z] = 0;
-    m->arg[DAE_P] = get_ptr(m->p);
-    m->res[DAE_ODE] = 0;
-    m->res[DAE_ALG] = 0;
-    m->res[DAE_QUAD] = NV_DATA_S(qdot);
-    f_(m->arg, m->res, m->iw, m->w, 0);
-  }
-
-  void CvodesInterface::rhsQS(CvodesMemory* m, int Ns, double t, N_Vector x, N_Vector *xF,
-                              N_Vector qdot, N_Vector *qdotF, N_Vector tmp1, N_Vector tmp2) const {
-    // Commented out since a new implementation currently cannot be tested
-    casadi_error("Commented out, #884, #794.");
   }
 
   int CvodesInterface::rhsQS_wrapper(int Ns, double t, N_Vector x, N_Vector *xF, N_Vector qdot,
@@ -601,35 +573,12 @@ namespace casadi {
         for (int i=0; i<Ns; ++i) N_VConst(0.0, qdotF[i]);
         return 0;
       }
-      m->self.rhsQS(m, Ns, t, x, xF, qdot, qdotF, tmp1, tmp2);
+      casadi_error("Commented out, #884, #794.");
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "rhsQS failed: " << e.what() << endl;;
       return 1;
     }
-  }
-
-  void CvodesInterface::
-  rhsB(CvodesMemory* m, double t, N_Vector x, N_Vector rx, N_Vector rxdot) const {
-    log("CvodesInterface::rhsB", "begin");
-
-    // Evaluate g_
-    m->arg[RDAE_T] = &t;
-    m->arg[RDAE_X] = NV_DATA_S(x);
-    m->arg[RDAE_Z] = 0;
-    m->arg[RDAE_P] = get_ptr(m->p);
-    m->arg[RDAE_RX] = NV_DATA_S(rx);
-    m->arg[RDAE_RZ] = 0;
-    m->arg[RDAE_RP] = get_ptr(m->rp);
-    m->res[RDAE_ODE] = NV_DATA_S(rxdot);
-    m->res[RDAE_ALG] = 0;
-    m->res[RDAE_QUAD] = 0;
-    g_(m->arg, m->res, m->iw, m->w, 0);
-
-    // Negate (note definition of g)
-    casadi_scal(nrx_, -1., NV_DATA_S(rxdot));
-
-    log("CvodesInterface::rhsB", "end");
   }
 
   void CvodesInterface::rhsBS(CvodesMemory* m, double t, N_Vector x, N_Vector *xF, N_Vector rx,
@@ -644,7 +593,14 @@ namespace casadi {
     try {
       casadi_assert(user_data);
       auto m = to_mem(user_data);
-      m->self.rhsB(m, t, x, rx, rxdot);
+      auto& s = m->self;
+      s.calc_function(m, "rhsB", {NV_DATA_S(rx), get_ptr(m->rp),
+                                  NV_DATA_S(x), get_ptr(m->p), &t},
+                                 {NV_DATA_S(rxdot)});
+
+      // Negate (note definition of g)
+      casadi_scal(s.nrx_, -1., NV_DATA_S(rxdot));
+
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "rhsB failed: " << e.what() << endl;;
@@ -670,31 +626,19 @@ namespace casadi {
     try {
       casadi_assert(user_data);
       auto m = to_mem(user_data);
-      m->self.rhsQB(m, t, x, rx, rqdot);
+      auto& s = m->self;
+      s.calc_function(m, "rhsQB", {NV_DATA_S(rx), get_ptr(m->rp),
+                                 NV_DATA_S(x), get_ptr(m->p), &t},
+                                {NV_DATA_S(rqdot)});
+
+      // Negate (note definition of g)
+      casadi_scal(s.nrq_, -1., NV_DATA_S(rqdot));
+
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "rhsQB failed: " << e.what() << endl;;
       return 1;
     }
-  }
-
-  void CvodesInterface::rhsQB(CvodesMemory* m, double t, N_Vector x, N_Vector rx,
-                              N_Vector rqdot) const {
-    // Evaluate g_
-    m->arg[RDAE_T] = &t;
-    m->arg[RDAE_X] = NV_DATA_S(x);
-    m->arg[RDAE_Z] = 0;
-    m->arg[RDAE_P] = get_ptr(m->p);
-    m->arg[RDAE_RX] = NV_DATA_S(rx);
-    m->arg[RDAE_RZ] = 0;
-    m->arg[RDAE_RP] = get_ptr(m->rp);
-    m->res[RDAE_ODE] = 0;
-    m->res[RDAE_ALG] = 0;
-    m->res[RDAE_QUAD] = NV_DATA_S(rqdot);
-    g_(m->arg, m->res, m->iw, m->w, 0);
-
-    // Negate (note definition of g)
-    casadi_scal(nrq_, -1., NV_DATA_S(rqdot));
   }
 
   int CvodesInterface::jtimes_wrapper(N_Vector v, N_Vector Jv, double t, N_Vector x,
