@@ -1089,23 +1089,17 @@ namespace casadi {
 
   int IdasInterface::lsetup_wrapper(IDAMem IDA_mem, N_Vector xz, N_Vector xzdot, N_Vector resp,
                                     N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3) {
-    try {
-      auto m = to_mem(IDA_mem->ida_lmem);
-      auto& s = m->self;
-      // Current time
-      double t = IDA_mem->ida_tn;
+    // Current time
+    double t = IDA_mem->ida_tn;
 
-      // Multiple of df_dydot to be added to the matrix
-      double cj = IDA_mem->ida_cj;
+    // Multiple of df_dydot to be added to the matrix
+    double cj = IDA_mem->ida_cj;
 
-      // Call the preconditioner setup function (which sets up the linear solver)
-      s.psetup(m, t, xz, xzdot, 0, cj, vtemp1, vtemp1, vtemp3);
+    // Call the preconditioner setup function (which sets up the linear solver)
+    if (psetup_wrapper(t, xz, xzdot, 0, cj, IDA_mem->ida_lmem,
+      vtemp1, vtemp1, vtemp3)) return 1;
 
-      return 0;
-    } catch(exception& e) {
-      userOut<true, PL_WARN>() << "lsetup failed: " << e.what() << endl;
-      return -1;
-    }
+    return 0;
   }
 
   int IdasInterface::lsetupB_wrapper(IDAMem IDA_mem, N_Vector xzB, N_Vector xzdotB, N_Vector respB,
@@ -1147,6 +1141,7 @@ namespace casadi {
     try {
       auto m = to_mem(IDA_mem->ida_lmem);
       auto& s = m->self;
+
       // Current time
       double t = IDA_mem->ida_tn;
 
@@ -1157,7 +1152,8 @@ namespace casadi {
       double delta = 0.0;
 
       // Call the preconditioner solve function (which solves the linear system)
-      s.psolve(m, t, xz, xzdot, rr, b, b, cj, delta, 0);
+      if (psolve_wrapper(t, xz, xzdot, rr, b, b, cj,
+        delta, static_cast<void*>(m), 0)) return 1;
 
       // Scale the correction to account for change in cj
       if (s.cj_scaling_) {
