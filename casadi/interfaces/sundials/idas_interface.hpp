@@ -199,15 +199,6 @@ namespace casadi {
     void psetupB(IdasMemory* m, double t, N_Vector xz, N_Vector xzdot, N_Vector xzB,
                  N_Vector xzdotB, N_Vector resvalB, double cjB,
                  N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B) const;
-    void lsetup(IdasMemory* m, IDAMem IDA_mem, N_Vector xz, N_Vector xzdot, N_Vector resp,
-                N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3) const;
-    void lsetupB(IdasMemory* m, double t, double cj, N_Vector xz, N_Vector xzdot,
-                 N_Vector xzB, N_Vector xzdotB,
-                 N_Vector resp, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3) const;
-    void lsolve(IdasMemory* m, IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector xz,
-                N_Vector xzdot, N_Vector rr) const;
-    void lsolveB(IdasMemory* m, double t, double cj, double cjratio, N_Vector b, N_Vector weight,
-                 N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB, N_Vector rr) const;
 
     // Static wrappers to be passed to Sundials
     static int res_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, void *user_data);

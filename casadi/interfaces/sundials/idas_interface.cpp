@@ -1087,44 +1087,25 @@ namespace casadi {
     log("IdasInterface::psetup", "end");
   }
 
-  void IdasInterface::
-  lsetup(IdasMemory* m, IDAMem IDA_mem, N_Vector xz, N_Vector xzdot, N_Vector resp,
-         N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3) const {
-    log("IdasInterface::lsetup", "begin");
-
-    // Current time
-    double t = IDA_mem->ida_tn;
-
-    // Multiple of df_dydot to be added to the matrix
-    double cj = IDA_mem->ida_cj;
-
-    // Call the preconditioner setup function (which sets up the linear solver)
-    psetup(m, t, xz, xzdot, 0, cj, vtemp1, vtemp1, vtemp3);
-    log("IdasInterface::lsetup", "end");
-  }
-
   int IdasInterface::lsetup_wrapper(IDAMem IDA_mem, N_Vector xz, N_Vector xzdot, N_Vector resp,
                                     N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3) {
     try {
       auto m = to_mem(IDA_mem->ida_lmem);
       auto& s = m->self;
-      s.lsetup(m, IDA_mem, xz, xzdot, resp, vtemp1, vtemp2, vtemp3);
+      // Current time
+      double t = IDA_mem->ida_tn;
+
+      // Multiple of df_dydot to be added to the matrix
+      double cj = IDA_mem->ida_cj;
+
+      // Call the preconditioner setup function (which sets up the linear solver)
+      s.psetup(m, t, xz, xzdot, 0, cj, vtemp1, vtemp1, vtemp3);
+
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "lsetup failed: " << e.what() << endl;
       return -1;
     }
-  }
-
-  void IdasInterface::
-  lsetupB(IdasMemory* m, double t, double cj, N_Vector xz, N_Vector xzdot, N_Vector xzB,
-          N_Vector xzdotB, N_Vector resp,
-          N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3) const {
-    log("IdasInterface::lsetupB", "begin");
-
-    // Call the preconditioner setup function (which sets up the linear solver)
-    psetupB(m, t, xz, xzdot, xzB, xzdotB, 0, cj, vtemp1, vtemp1, vtemp3);
-    log("IdasInterface::lsetupB", "end");
   }
 
   int IdasInterface::lsetupB_wrapper(IDAMem IDA_mem, N_Vector xzB, N_Vector xzdotB, N_Vector respB,
@@ -1152,8 +1133,8 @@ namespace casadi {
                                    NULL, NULL);
         if (flag != IDA_SUCCESS) casadi_error("Could not interpolate forward states");
       }
-      s.lsetupB(m, t, cj, IDAADJ_mem->ia_yyTmp,
-                      IDAADJ_mem->ia_ypTmp, xzB, xzdotB, respB, vtemp1B, vtemp2B, vtemp3B);
+      // Call the preconditioner setup function (which sets up the linear solver)
+      s.psetupB(m, t, IDAADJ_mem->ia_yyTmp, IDAADJ_mem->ia_ypTmp, xzB, xzdotB, 0, cj, vtemp1B, vtemp1B, vtemp3B);
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "lsetupB failed: " << e.what() << endl;
@@ -1161,36 +1142,29 @@ namespace casadi {
     }
   }
 
-  void IdasInterface::
-  lsolve(IdasMemory* m, IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector xz,
-         N_Vector xzdot, N_Vector rr) const {
-    log("IdasInterface::lsolve", "begin");
-    // Current time
-    double t = IDA_mem->ida_tn;
-
-    // Multiple of df_dydot to be added to the matrix
-    double cj = IDA_mem->ida_cj;
-
-    // Accuracy
-    double delta = 0.0;
-
-    // Call the preconditioner solve function (which solves the linear system)
-    psolve(m, t, xz, xzdot, rr, b, b, cj, delta, 0);
-
-    // Scale the correction to account for change in cj
-    if (cj_scaling_) {
-      double cjratio = IDA_mem->ida_cjratio;
-      if (cjratio != 1.0) N_VScale(2.0/(1.0 + cjratio), b, b);
-    }
-    log("IdasInterface::lsolve", "end");
-  }
-
   int IdasInterface::lsolve_wrapper(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector xz,
                                    N_Vector xzdot, N_Vector rr) {
     try {
       auto m = to_mem(IDA_mem->ida_lmem);
       auto& s = m->self;
-      s.lsolve(m, IDA_mem, b, weight, xz, xzdot, rr);
+      // Current time
+      double t = IDA_mem->ida_tn;
+
+      // Multiple of df_dydot to be added to the matrix
+      double cj = IDA_mem->ida_cj;
+
+      // Accuracy
+      double delta = 0.0;
+
+      // Call the preconditioner solve function (which solves the linear system)
+      s.psolve(m, t, xz, xzdot, rr, b, b, cj, delta, 0);
+
+      // Scale the correction to account for change in cj
+      if (s.cj_scaling_) {
+        double cjratio = IDA_mem->ida_cjratio;
+        if (cjratio != 1.0) N_VScale(2.0/(1.0 + cjratio), b, b);
+      }
+
       return 0;
     } catch(int wrn) {
       /*    userOut<true, PL_WARN>() << "warning: " << wrn << endl;*/
@@ -1199,26 +1173,6 @@ namespace casadi {
       userOut<true, PL_WARN>() << "lsolve failed: " << e.what() << endl;
       return -1;
     }
-  }
-
-  void IdasInterface::
-  lsolveB(IdasMemory* m, double t, double cj, double cjratio, N_Vector b, N_Vector weight,
-          N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB,
-          N_Vector rr) const {
-    log("IdasInterface::lsolveB", "begin");
-
-    // Accuracy
-    double delta = 0.0;
-
-    // Call the preconditioner solve function (which solves the linear system)
-    psolveB(m, t, xz, xzdot, xzB, xzdotB, rr, b, b, cj, delta, 0);
-
-    // Scale the correction to account for change in cj
-    if (cj_scaling_) {
-      if (cjratio != 1.0) N_VScale(2.0/(1.0 + cjratio), b, b);
-    }
-
-    log("IdasInterface::lsolveB", "end");
   }
 
   int IdasInterface::lsolveB_wrapper(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector xzB,
@@ -1247,8 +1201,18 @@ namespace casadi {
                                    NULL, NULL);
         if (flag != IDA_SUCCESS) casadi_error("Could not interpolate forward states");
       }
-      s.lsolveB(m, t, cj, cjratio, b, weight, IDAADJ_mem->ia_yyTmp,
-                     IDAADJ_mem->ia_ypTmp, xzB, xzdotB, rrB);
+
+      // Accuracy
+      double delta = 0.0;
+
+      // Call the preconditioner solve function (which solves the linear system)
+      s.psolveB(m, t, IDAADJ_mem->ia_yyTmp, IDAADJ_mem->ia_ypTmp, xzB, xzdotB,
+        rrB, b, b, cj, delta, 0);
+
+      // Scale the correction to account for change in cj
+      if (s.cj_scaling_) {
+        if (cjratio != 1.0) N_VScale(2.0/(1.0 + cjratio), b, b);
+      }
       return 0;
     } catch(int wrn) {
       /*    userOut<true, PL_WARN>() << "warning: " << wrn << endl;*/
