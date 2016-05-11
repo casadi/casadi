@@ -519,15 +519,6 @@ namespace casadi {
     stats["hlastB"] = m->hlastB;
     stats["hcurB"] = m->hcurB;
     stats["tcurB"] = m->tcurB;
-
-    // Timers
-    stats["t_res"] = m->t_res;
-    stats["t_fres"] = m->t_fres;
-    stats["t_jac"] = m->t_jac;
-    stats["t_jacB"] = m->t_jacB;
-    stats["t_lsolve"] = m->t_lsolve;
-    stats["t_lsetup_jac"] = m->t_lsetup_jac;
-    stats["t_lsetup_fac"] = m->t_lsetup_fac;
     return stats;
   }
 

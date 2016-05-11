@@ -294,9 +294,6 @@ namespace casadi {
   res(IdasMemory* m, double t, N_Vector xz, N_Vector xzdot, N_Vector rr) const {
     log("IdasInterface::res", "begin");
 
-    // Get time
-    m->time1 = clock();
-
     // Debug output
     if (monitored("res")) {
       printvar("t", t);
@@ -319,8 +316,6 @@ namespace casadi {
     casadi_assert_message(!regularity_check_ || is_regular(rr),
                           "IdasInterface::res: not regular.");
 
-    m->time2 = clock();
-    m->t_res += static_cast<double>(m->time2-m->time1)/CLOCKS_PER_SEC;
     log("IdasInterface::res", "end");
   }
 
@@ -357,9 +352,6 @@ namespace casadi {
                              N_Vector v, N_Vector Jv, double cj,
                              N_Vector tmp1, N_Vector tmp2) const {
     log("IdasInterface::jtimes", "begin");
-    // Get time
-    m->time1 = clock();
-
     calc_function(m, "jtimes",
       {&t, NV_DATA_S(xz), NV_DATA_S(xz)+nx_, get_ptr(m->p), NV_DATA_S(v), NV_DATA_S(v)+nx_},
       {NV_DATA_S(Jv), NV_DATA_S(Jv)+nx_});
@@ -367,9 +359,6 @@ namespace casadi {
     // Subtract state derivative to get residual
     casadi_axpy(nx_, -cj, NV_DATA_S(v), NV_DATA_S(Jv));
 
-    // Log time duration
-    m->time2 = clock();
-    m->t_jac += static_cast<double>(m->time2-m->time1)/CLOCKS_PER_SEC;
     log("IdasInterface::jtimes", "end");
   }
 
@@ -390,9 +379,6 @@ namespace casadi {
                              N_Vector xzdotB, N_Vector resvalB, N_Vector vB,
                              N_Vector JvB, double cjB, N_Vector tmp1B, N_Vector tmp2B) const {
     log("IdasInterface::jtimesB", "begin");
-    // Get time
-    m->time1 = clock();
-
     // Debug output
     if (monitored("jtimesB")) {
       printvar("t", t);
@@ -417,9 +403,6 @@ namespace casadi {
       printvar("JvB", JvB);
     }
 
-    // Log time duration
-    m->time2 = clock();
-    m->t_jac += static_cast<double>(m->time2-m->time1)/CLOCKS_PER_SEC;
     log("IdasInterface::jtimesB", "end");
   }
 
@@ -442,15 +425,9 @@ namespace casadi {
                           N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) const {
     log("IdasInterface::resS", "begin");
 
-    // Record the current cpu time
-    m->time1 = clock();
-
     // Commented out since a new implementation currently cannot be tested
     casadi_error("Commented out, #884, #794.");
 
-    // Record timings
-    m->time2 = clock();
-    m->t_fres += static_cast<double>(m->time2-m->time1)/CLOCKS_PER_SEC;
     log("IdasInterface::resS", "end");
   }
 
@@ -597,10 +574,6 @@ namespace casadi {
 
     if (nrx_>0 && !m->isInitTaping)
       initTaping(m);
-
-    // Reset timers
-    m->t_res = m->t_fres = m->t_jac = m->t_jacB = m->t_lsolve
-      = m->t_lsetup_jac = m->t_lsetup_fac = 0;
 
     // Return flag
     int flag;
@@ -826,17 +799,6 @@ namespace casadi {
 
     stream << "number of checkpoints stored: " << m->ncheck << endl;
     stream << std::endl;
-
-    stream << "Time spent in the DAE residual: " << m->t_res << " s." << endl;
-    stream << "Time spent in the forward sensitivity residual: " << m->t_fres << " s." << endl;
-    stream << "Time spent in the jacobian function or jacobian times vector function: "
-           << m->t_jac << " s." << endl;
-    stream << "Time spent in the linear solver solve function: " << m->t_lsolve << " s." << endl;
-    stream << "Time spent to generate the jacobian in the linear solver setup function: "
-           << m->t_lsetup_jac << " s." << endl;
-    stream << "Time spent to factorize the jacobian in the linear solver setup function: "
-           << m->t_lsetup_fac << " s." << endl;
-    stream << std::endl;
   }
 
   void IdasInterface::idas_error(const string& module, int flag) {
@@ -1003,9 +965,6 @@ namespace casadi {
        N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) const {
     log("IdasInterface::djac", "begin");
 
-    // Get time
-    m->time1 = clock();
-
     // Calculate Jacobian
     calc_function(m, "jacF", {NV_DATA_S(xz), NV_DATA_S(xz)+nx_, get_ptr(m->p), &t, &cj},
                             {m->jac});
@@ -1020,9 +979,6 @@ namespace casadi {
       }
     }
 
-    // Log time duration
-    m->time2 = clock();
-    m->t_jac += static_cast<double>(m->time2-m->time1)/CLOCKS_PER_SEC;
     log("IdasInterface::djac", "end");
   }
 
@@ -1045,9 +1001,6 @@ namespace casadi {
         N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B) const {
     log("IdasInterface::djacB", "begin");
 
-    // Get time
-    m->time1 = clock();
-
     // Calculate Jacobian
     calc_function(m, "jacB", {NV_DATA_S(rxz), NV_DATA_S(rxz)+nrx_, get_ptr(m->rp),
                                NV_DATA_S(xz), NV_DATA_S(xz)+nx_, get_ptr(m->p), &t, &cj},
@@ -1063,9 +1016,6 @@ namespace casadi {
       }
     }
 
-    // Log time duration
-    m->time2 = clock();
-    m->t_jacB += static_cast<double>(m->time2-m->time1)/CLOCKS_PER_SEC;
     log("IdasInterface::djacB", "end");
   }
 
@@ -1087,9 +1037,6 @@ namespace casadi {
                            N_Vector xz, N_Vector xzdot, N_Vector rr, DlsMat Jac,
                            N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) const {
     log("IdasInterface::bjac", "begin");
-    // Get time
-    m->time1 = clock();
-
     // Calculate Jacobian
     calc_function(m, "jacF", {NV_DATA_S(xz), NV_DATA_S(xz)+nx_, get_ptr(m->p), &t, &cj},
                             {m->jac});
@@ -1106,9 +1053,6 @@ namespace casadi {
       }
     }
 
-    // Log time duration
-    m->time2 = clock();
-    m->t_jac += static_cast<double>(m->time2-m->time1)/CLOCKS_PER_SEC;
     log("IdasInterface::bjac", "end");
   }
 
@@ -1132,9 +1076,6 @@ namespace casadi {
                             N_Vector tmp3B) const {
     log("IdasInterface::bjacB", "begin");
 
-    // Get time
-    m->time1 = clock();
-
     // Calculate Jacobian
     calc_function(m, "jacB", {NV_DATA_S(rxz), NV_DATA_S(rxz)+nrx_, get_ptr(m->rp),
                                NV_DATA_S(xz), NV_DATA_S(xz)+nx_, get_ptr(m->p), &t, &cj},
@@ -1151,10 +1092,6 @@ namespace casadi {
           BAND_ELEM(JacB, rr, cc) = m->jacB[el];
       }
     }
-
-    // Log time duration
-    m->time2 = clock();
-    m->t_jacB += static_cast<double>(m->time2-m->time1)/CLOCKS_PER_SEC;
     log("IdasInterface::bjacB", "end");
   }
 
@@ -1244,9 +1181,6 @@ namespace casadi {
          N_Vector zvec, double cj, double delta, N_Vector tmp) const {
     log("IdasInterface::psolve", "begin");
 
-    // Get time
-    m->time1 = clock();
-
     // Copy input to output, if necessary
     if (rvec!=zvec) {
       N_VScale(1.0, rvec, zvec);
@@ -1256,10 +1190,6 @@ namespace casadi {
     casadi_assert_message(linsol_.nnz_out(0) == NV_LENGTH_S(zvec), "Assertion error: "
                           << linsol_.nnz_out(0) << " == " << NV_LENGTH_S(zvec));
     linsol_.linsol_solve(NV_DATA_S(zvec));
-
-    // Log time duration
-    m->time2 = clock();
-    m->t_lsolve += static_cast<double>(m->time2-m->time1)/CLOCKS_PER_SEC;
     log("IdasInterface::psolve", "end");
   }
 
@@ -1269,9 +1199,6 @@ namespace casadi {
           N_Vector resvalB, N_Vector rvecB, N_Vector zvecB,
           double cjB, double deltaB, N_Vector tmpB) const {
     log("IdasInterface::psolveB", "begin");
-
-    // Get time
-    m->time1 = clock();
 
     // Copy input to output, if necessary
     if (rvecB!=zvecB) {
@@ -1301,10 +1228,6 @@ namespace casadi {
       }
       userOut() << endl;
     }
-
-    // Log time duration
-    m->time2 = clock();
-    m->t_lsolve += static_cast<double>(m->time2-m->time1)/CLOCKS_PER_SEC;
     log("IdasInterface::psolveB", "end");
   }
 
@@ -1313,24 +1236,13 @@ namespace casadi {
          N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) const {
     log("IdasInterface::psetup", "begin");
 
-    // Get time
-    m->time1 = clock();
-
     // Calculate Jacobian
     calc_function(m, "jacF", {NV_DATA_S(xz), NV_DATA_S(xz)+nx_, get_ptr(m->p), &t, &cj},
                             {m->jac});
 
-    // Log time duration
-    m->time2 = clock();
-    m->t_lsetup_jac += static_cast<double>(m->time2-m->time1)/CLOCKS_PER_SEC;
-
     // Prepare the solution of the linear system (e.g. factorize)
     linsol_.setup(m->arg+LINSOL_NUM_IN, m->res+LINSOL_NUM_OUT, m->iw, m->w);
     linsol_.linsol_factorize(m->jac);
-
-    // Log time duration
-    m->time1 = clock();
-    m->t_lsetup_fac += static_cast<double>(m->time1-m->time2)/CLOCKS_PER_SEC;
 
     log("IdasInterface::psetup", "end");
 
@@ -1343,25 +1255,14 @@ namespace casadi {
           N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B) const {
     log("IdasInterface::psetupB", "begin");
 
-    // Get time
-    m->time1 = clock();
-
     // Calculate Jacobian
     calc_function(m, "jacB", {NV_DATA_S(rxz), NV_DATA_S(rxz)+nrx_, get_ptr(m->rp),
                                NV_DATA_S(xz), NV_DATA_S(xz)+nx_, get_ptr(m->p), &t, &cj},
                               {m->jacB});
 
-    // Log time duration
-    m->time2 = clock();
-    m->t_lsetup_jac += static_cast<double>(m->time2-m->time1)/CLOCKS_PER_SEC;
-
     // Prepare the solution of the linear system (e.g. factorize)
     linsolB_.setup(m->arg+LINSOL_NUM_IN, m->res+LINSOL_NUM_OUT, m->iw, m->w);
     linsolB_.linsol_factorize(m->jacB);
-
-    // Log time duration
-    m->time1 = clock();
-    m->t_lsetup_fac += static_cast<double>(m->time1-m->time2)/CLOCKS_PER_SEC;
 
     log("IdasInterface::psetupB", "end");
   }

@@ -292,9 +292,6 @@ namespace casadi {
   void CvodesInterface::rhs(CvodesMemory* m, double t, N_Vector x, N_Vector xdot) const {
     log("CvodesInterface::rhs", "begin");
 
-    // Get time
-    m->time1 = clock();
-
     // Debug output
     if (monitor_rhs_) {
       printvar("t", t);
@@ -315,10 +312,6 @@ namespace casadi {
     if (monitor_rhs_) {
       printvar("xdot", xdot);
     }
-
-    // Log time
-    m->time2 = clock();
-    m->t_res += static_cast<double>(m->time2-m->time1)/CLOCKS_PER_SEC;
 
     log("CvodesInterface::rhs", "end");
 
@@ -343,9 +336,6 @@ namespace casadi {
 
     // Reset the base classes
     SundialsInterface::reset(mem, t, x, z, _p);
-
-    // Reset timers
-    m->t_res = m->t_fres = m->t_jac = m->t_lsolve = m->t_lsetup_jac = m->t_lsetup_fac = 0;
 
     // Re-initialize
     int flag = CVodeReInit(m->mem, t, m->xz);
@@ -524,17 +514,6 @@ namespace casadi {
 
     stream << "number of checkpoints stored: " << m->ncheck << endl;
     stream << std::endl;
-
-    stream << "Time spent in the ODE residual: " << m->t_res << " s." << endl;
-    stream << "Time spent in the forward sensitivity residual: " << m->t_fres << " s." << endl;
-    stream << "Time spent in the jacobian function or jacobian times vector function: "
-           << m->t_jac << " s." << endl;
-    stream << "Time spent in the linear solver solve function: " << m->t_lsolve << " s." << endl;
-    stream << "Time spent to generate the jacobian in the linear solver setup function: "
-           << m->t_lsetup_jac << " s." << endl;
-    stream << "Time spent to factorize the jacobian in the linear solver setup function: "
-           << m->t_lsetup_fac << " s." << endl;
-    stream << std::endl;
   }
 
   void CvodesInterface::cvodes_error(const string& module, int flag) {
@@ -566,15 +545,8 @@ namespace casadi {
                              N_Vector *xF, N_Vector *xdotF, N_Vector tmp1, N_Vector tmp2) const {
     //    casadi_assert(Ns==nfdir_);
 
-    // Record the current cpu time
-    m->time1 = clock();
-
     // Commented out since a new implementation currently cannot be tested
     casadi_error("Commented out, #884, #794.");
-
-    // Record timings
-    m->time2 = clock();
-    m->t_fres += static_cast<double>(m->time2-m->time1)/CLOCKS_PER_SEC;
   }
 
   int CvodesInterface::rhsS_wrapper(int Ns, double t, N_Vector x, N_Vector xdot, N_Vector *xF,
@@ -810,9 +782,6 @@ namespace casadi {
   void CvodesInterface::jtimes(CvodesMemory* m, N_Vector v, N_Vector Jv, double t, N_Vector x,
                               N_Vector xdot, N_Vector tmp) const {
     log("CvodesInterface::jtimes", "begin");
-    // Get time
-    m->time1 = clock();
-
     // Evaluate jtimes_
     m->arg[JTIMES_T] = &t;
     m->arg[JTIMES_X] = NV_DATA_S(x);
@@ -820,20 +789,12 @@ namespace casadi {
     m->arg[JTIMES_FWD_X] = NV_DATA_S(v);
     m->res[JTIMES_FWD_ODE] = NV_DATA_S(Jv);
     jtimes_(m->arg, m->res, m->iw, m->w, 0);
-
-    // Log time duration
-    m->time2 = clock();
-    m->t_jac += static_cast<double>(m->time2-m->time1)/CLOCKS_PER_SEC;
-
     log("CvodesInterface::jtimes", "end");
   }
 
   void CvodesInterface::jtimesB(CvodesMemory* m, N_Vector v, N_Vector Jv, double t, N_Vector x,
                                 N_Vector rx, N_Vector rxdot, N_Vector tmpB) const {
     log("CvodesInterface::jtimesB", "begin");
-    // Get time
-    m->time1 = clock();
-
     // Evaluate jtimesB_
     m->arg[JTIMESB_T] = &t;
     m->arg[JTIMESB_X] = NV_DATA_S(x);
@@ -843,10 +804,6 @@ namespace casadi {
     m->arg[JTIMESB_FWD_RX] = NV_DATA_S(v);
     m->res[JTIMESB_FWD_RODE] = NV_DATA_S(Jv);
     jtimesB_(m->arg, m->res, m->iw, m->w, 0);
-
-    // Log time duration
-    m->time2 = clock();
-    m->t_jac += static_cast<double>(m->time2-m->time1)/CLOCKS_PER_SEC;
     log("CvodesInterface::jtimesB", "end");
   }
 
@@ -881,9 +838,6 @@ namespace casadi {
                              DlsMat Jac, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) const {
     log("CvodesInterface::djac", "begin");
 
-    // Get time
-    m->time1 = clock();
-
     // Evaluate jac_
     m->arg[DAE_T] = &t;
     m->arg[DAE_X] = NV_DATA_S(x);
@@ -914,10 +868,6 @@ namespace casadi {
       }
     }
 
-    // Log time duration
-    m->time2 = clock();
-    m->t_jac += static_cast<double>(m->time2-m->time1)/CLOCKS_PER_SEC;
-
     log("CvodesInterface::djac", "end");
   }
 
@@ -925,9 +875,6 @@ namespace casadi {
                               N_Vector xdotB, DlsMat JacB, N_Vector tmp1B, N_Vector tmp2B,
                               N_Vector tmp3B) const {
     log("CvodesInterface::djacB", "begin");
-    // Get time
-    m->time1 = clock();
-
     // Evaluate jacB_
     m->arg[RDAE_T] = &t;
     m->arg[RDAE_X] = NV_DATA_S(x);
@@ -960,10 +907,6 @@ namespace casadi {
         DENSE_ELEM(JacB, rr, cc) = val[el];
       }
     }
-
-    // Log time duration
-    m->time2 = clock();
-    m->t_jac += static_cast<double>(m->time2-m->time1)/CLOCKS_PER_SEC;
     log("CvodesInterface::djacB", "end");
   }
 
@@ -1000,9 +943,6 @@ namespace casadi {
                              DlsMat Jac, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) const {
     log("CvodesInterface::bjac", "begin");
 
-    // Get time
-    m->time1 = clock();
-
     // Evaluate jac_
     m->arg[DAE_T] = &t;
     m->arg[DAE_X] = NV_DATA_S(x);
@@ -1034,10 +974,6 @@ namespace casadi {
       }
     }
 
-    // Log time duration
-    m->time2 = clock();
-    m->t_jac += static_cast<double>(m->time2-m->time1)/CLOCKS_PER_SEC;
-
     log("CvodesInterface::bjac", "end");
   }
 
@@ -1046,9 +982,6 @@ namespace casadi {
                               N_Vector xB, N_Vector xdotB, DlsMat JacB, N_Vector tmp1B,
                               N_Vector tmp2B, N_Vector tmp3B) const {
     log("CvodesInterface::bjacB", "begin");
-
-    // Get time
-    m->time1 = clock();
 
     // Evaluate jacB_
     m->arg[RDAE_T] = &t;
@@ -1083,10 +1016,6 @@ namespace casadi {
           BAND_ELEM(JacB, rr, cc) = val[el];
       }
     }
-
-    // Log time duration
-    m->time2 = clock();
-    m->t_jac += static_cast<double>(m->time2-m->time1)/CLOCKS_PER_SEC;
 
     log("CvodesInterface::bjacB", "end");
   }
@@ -1158,9 +1087,6 @@ namespace casadi {
   void CvodesInterface::psolve(CvodesMemory* m,
                                double t, N_Vector x, N_Vector xdot, N_Vector r, N_Vector z,
                                double gamma, double delta, int lr, N_Vector tmp) const {
-    // Get time
-    m->time1 = clock();
-
     // Copy input to output, if necessary
     if (r!=z) {
       N_VScale(1.0, r, z);
@@ -1169,19 +1095,12 @@ namespace casadi {
     // Solve the (possibly factorized) system
     casadi_assert(linsol_.nnz_out(0) == NV_LENGTH_S(z));
     linsol_.linsol_solve(NV_DATA_S(z));
-
-    // Log time duration
-    m->time2 = clock();
-    m->t_lsolve += static_cast<double>(m->time2-m->time1)/CLOCKS_PER_SEC;
   }
 
   void CvodesInterface::psolveB(CvodesMemory* m,
                                 double t, N_Vector x, N_Vector xB, N_Vector xdotB, N_Vector rvecB,
                                 N_Vector zvecB, double gammaB, double deltaB,
                                 int lr, N_Vector tmpB) const {
-    // Get time
-    m->time1 = clock();
-
     // Copy input to output, if necessary
     if (rvecB!=zvecB) {
       N_VScale(1.0, rvecB, zvecB);
@@ -1190,10 +1109,6 @@ namespace casadi {
     // Solve the (possibly factorized) system
     casadi_assert(linsolB_.nnz_out(0) == NV_LENGTH_S(zvecB));
     linsolB_.linsol_solve(NV_DATA_S(zvecB), 1);
-
-    // Log time duration
-    m->time2 = clock();
-    m->t_lsolve += static_cast<double>(m->time2-m->time1)/CLOCKS_PER_SEC;
   }
 
   void CvodesInterface::psetup(CvodesMemory* m,
@@ -1201,9 +1116,6 @@ namespace casadi {
                                booleantype *jcurPtr, double gamma, N_Vector tmp1,
                                N_Vector tmp2, N_Vector tmp3) const {
     log("CvodesInterface::psetup", "begin");
-    // Get time
-    m->time1 = clock();
-
     // Evaluate jac_
     m->arg[DAE_T] = &t;
     m->arg[DAE_X] = NV_DATA_S(x);
@@ -1218,17 +1130,9 @@ namespace casadi {
     m->res[0] = val;
     jac_(m->arg, m->res, m->iw, w2, 0);
 
-    // Log time duration
-    m->time2 = clock();
-    m->t_lsetup_jac += static_cast<double>(m->time2-m->time1)/CLOCKS_PER_SEC;
-
     // Prepare the solution of the linear system (e.g. factorize)
     linsol_.setup(m->arg+LINSOL_NUM_IN, m->res+LINSOL_NUM_OUT, m->iw, w2);
     linsol_.linsol_factorize(val);
-
-    // Log time duration
-    m->time1 = clock();
-    m->t_lsetup_fac += static_cast<double>(m->time1-m->time2)/CLOCKS_PER_SEC;
 
     log("CvodesInterface::psetup", "end");
   }
@@ -1238,9 +1142,6 @@ namespace casadi {
                                 booleantype jokB, booleantype *jcurPtrB, double gammaB,
                                 N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B) const {
     log("CvodesInterface::psetupB", "begin");
-    // Get time
-    m->time1 = clock();
-
     // Evaluate jacB_
     m->arg[RDAE_T] = &t;
     m->arg[RDAE_X] = NV_DATA_S(x);
@@ -1258,17 +1159,10 @@ namespace casadi {
     m->res[0] = val;
     jacB_(m->arg, m->res, m->iw, w2, 0);
 
-    // Log time duration
-    m->time2 = clock();
-    m->t_lsetup_jac += static_cast<double>(m->time2-m->time1)/CLOCKS_PER_SEC;
-
     // Prepare the solution of the linear system (e.g. factorize)
     linsolB_.setup(m->arg+LINSOL_NUM_IN, m->res+LINSOL_NUM_OUT, m->iw, w2);
     linsolB_.linsol_factorize(val);
 
-    // Log time duration
-    m->time1 = clock();
-    m->t_lsetup_fac += static_cast<double>(m->time1-m->time2)/CLOCKS_PER_SEC;
     log("CvodesInterface::psetupB", "end");
   }
 
