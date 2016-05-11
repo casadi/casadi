@@ -189,12 +189,6 @@ namespace casadi {
     void psetupB(CvodesMemory* m, double t, N_Vector x, N_Vector xB, N_Vector xdotB,
                  booleantype jokB, booleantype *jcurPtrB, double gammaB,
                  N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B) const;
-    /// <tt>M = I-gamma*df/dx</tt>, factorize
-    void lsetup(CvodesMemory* m, CVodeMem cv_mem, int convfail, N_Vector ypred, N_Vector fpred,
-                booleantype *jcurPtr, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3) const;
-    void lsetupB(CvodesMemory* m, double t, double gamma, int convfail, N_Vector x, N_Vector xB,
-                 N_Vector xdotB, booleantype *jcurPtr, N_Vector vtemp1, N_Vector vtemp2,
-                 N_Vector vtemp3) const;
     /// <tt>b = M^(-1).b</tt>
     void lsolve(CvodesMemory* m, CVodeMem cv_mem, N_Vector b, N_Vector weight, N_Vector ycur,
                 N_Vector fcur) const;

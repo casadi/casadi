@@ -881,34 +881,22 @@ namespace casadi {
     log("CvodesInterface::psetupB", "end");
   }
 
-  void CvodesInterface::lsetup(CvodesMemory* m,
-                               CVodeMem cv_mem, int convfail, N_Vector x, N_Vector xdot,
-                               booleantype *jcurPtr,
-                               N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3) const {
-    // Current time
-    double t = cv_mem->cv_tn;
-
-    // Scaling factor before J
-    double gamma = cv_mem->cv_gamma;
-
-    // Call the preconditioner setup function (which sets up the linear solver)
-    psetup(m, t, x, xdot, FALSE, jcurPtr, gamma, vtemp1, vtemp2, vtemp3);
-  }
-
-  void CvodesInterface::lsetupB(CvodesMemory* m,
-                                double t, double gamma, int convfail,
-                                N_Vector x, N_Vector xB, N_Vector xdotB, booleantype *jcurPtr,
-                                N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3) const {
-    // Call the preconditioner setup function (which sets up the linear solver)
-    psetupB(m, t, x, xB, xdotB, FALSE, jcurPtr, gamma, vtemp1, vtemp2, vtemp3);
-  }
-
   int CvodesInterface::lsetup_wrapper(CVodeMem cv_mem, int convfail, N_Vector x, N_Vector xdot,
                                      booleantype *jcurPtr,
                                      N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3) {
     try {
       auto m = to_mem(cv_mem->cv_lmem);
-      m->self.lsetup(m, cv_mem, convfail, x, xdot, jcurPtr, vtemp1, vtemp2, vtemp3);
+      auto& s = m->self;
+
+      // Current time
+      double t = cv_mem->cv_tn;
+
+      // Scaling factor before J
+      double gamma = cv_mem->cv_gamma;
+
+      // Call the preconditioner setup function (which sets up the linear solver)
+      s.psetup(m, t, x, xdot, FALSE, jcurPtr, gamma, vtemp1, vtemp2, vtemp3);
+
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "lsetup failed: " << e.what() << endl;;
@@ -939,8 +927,10 @@ namespace casadi {
       flag = ca_mem->ca_IMget(cv_mem, t, ca_mem->ca_ytmp, NULL);
       if (flag != CV_SUCCESS) casadi_error("Could not interpolate forward states");
 
-      m->self.lsetupB(m, t, gamma, convfail, ca_mem->ca_ytmp, x, xdot,
-                          jcurPtr, vtemp1, vtemp2, vtemp3);
+      // Call the preconditioner setup function (which sets up the linear solver)
+      if (psetupB_wrapper(t, ca_mem->ca_ytmp, x, xdot, FALSE, jcurPtr,
+        gamma, static_cast<void*>(m), vtemp1, vtemp2, vtemp3)) return 1;
+
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "lsetupB failed: " << e.what() << endl;;
