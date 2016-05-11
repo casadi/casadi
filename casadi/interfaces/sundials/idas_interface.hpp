@@ -191,11 +191,6 @@ namespace casadi {
     // Sundials callback functions
     void ehfun(IdasMemory* m, int error_code, const char *module, const char *function,
                char *msg) const;
-    void jtimes(IdasMemory* m, double t, N_Vector xz, N_Vector xzdot, N_Vector rr,
-                N_Vector v, N_Vector Jv, double cj, N_Vector tmp1, N_Vector tmp2) const;
-    void jtimesB(IdasMemory* m, double t, N_Vector xz, N_Vector xzdot, N_Vector xzB,
-                 N_Vector xzdotB, N_Vector resvalB, N_Vector vB, N_Vector JvB,
-                 double cjB, N_Vector tmp1B, N_Vector tmp2B) const;
     void psolve(IdasMemory* m, double t, N_Vector xz, N_Vector xzdot, N_Vector rr, N_Vector rvec,
                 N_Vector zvec, double cj, double delta, N_Vector tmp) const;
     void psolveB(IdasMemory* m, double t, N_Vector xz, N_Vector xzdot, N_Vector xzB,
@@ -206,17 +201,6 @@ namespace casadi {
     void psetupB(IdasMemory* m, double t, N_Vector xz, N_Vector xzdot, N_Vector xzB,
                  N_Vector xzdotB, N_Vector resvalB, double cjB,
                  N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B) const;
-    void djac(IdasMemory* m, long Neq, double t, double cj, N_Vector xz, N_Vector xzdot,
-              N_Vector rr, DlsMat Jac, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) const;
-    void djacB(IdasMemory* m, long NeqB, double t, double cjB, N_Vector xz, N_Vector xzdot,
-               N_Vector xzB, N_Vector xzdotB, N_Vector rrB, DlsMat JacB,
-               N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B) const;
-    void bjac(IdasMemory* m, long Neq, long mupper, long mlower, double tt, double cj, N_Vector xz,
-              N_Vector xzdot, N_Vector rr, DlsMat Jac,
-              N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) const;
-    void bjacB(IdasMemory* m, long NeqB, long mupperB, long mlowerB, double tt, double cjB,
-               N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB, N_Vector resvalB,
-               DlsMat JacB, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B) const;
     void lsetup(IdasMemory* m, IDAMem IDA_mem, N_Vector xz, N_Vector xzdot, N_Vector resp,
                 N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3) const;
     void lsetupB(IdasMemory* m, double t, double cj, N_Vector xz, N_Vector xzdot,

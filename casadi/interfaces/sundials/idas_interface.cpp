@@ -325,49 +325,24 @@ namespace casadi {
     userOut<true, PL_WARN>() << msg << endl;
   }
 
-  void IdasInterface::jtimes(IdasMemory* m, double t, N_Vector xz, N_Vector xzdot, N_Vector rr,
-                             N_Vector v, N_Vector Jv, double cj,
-                             N_Vector tmp1, N_Vector tmp2) const {
-    log("IdasInterface::jtimes", "begin");
-    calc_function(m, "jtimes",
-      {&t, NV_DATA_S(xz), NV_DATA_S(xz)+nx_, get_ptr(m->p), NV_DATA_S(v), NV_DATA_S(v)+nx_},
-      {NV_DATA_S(Jv), NV_DATA_S(Jv)+nx_});
-
-    // Subtract state derivative to get residual
-    casadi_axpy(nx_, -cj, NV_DATA_S(v), NV_DATA_S(Jv));
-
-    log("IdasInterface::jtimes", "end");
-  }
-
   int IdasInterface::jtimes_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, N_Vector v,
                                    N_Vector Jv, double cj, void *user_data,
                                    N_Vector tmp1, N_Vector tmp2) {
     try {
       auto m = to_mem(user_data);
       auto& s = m->self;
-      s.jtimes(m, t, xz, xzdot, rr, v, Jv, cj, tmp1, tmp2);
+      s.calc_function(m, "jtimes",
+        {&t, NV_DATA_S(xz), NV_DATA_S(xz)+s.nx_, get_ptr(m->p), NV_DATA_S(v), NV_DATA_S(v)+s.nx_},
+        {NV_DATA_S(Jv), NV_DATA_S(Jv)+s.nx_});
+
+      // Subtract state derivative to get residual
+      casadi_axpy(s.nx_, -cj, NV_DATA_S(v), NV_DATA_S(Jv));
+
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "jtimes failed: " << e.what() << endl;
       return 1;
     }
-  }
-
-  void IdasInterface::jtimesB(IdasMemory* m, double t, N_Vector xz, N_Vector xzdot, N_Vector xzB,
-                             N_Vector xzdotB, N_Vector resvalB, N_Vector vB,
-                             N_Vector JvB, double cjB, N_Vector tmp1B, N_Vector tmp2B) const {
-    log("IdasInterface::jtimesB", "begin");
-
-    calc_function(m, "jtimesB",
-      {&t, NV_DATA_S(xz), NV_DATA_S(xz)+nx_, get_ptr(m->p),
-        NV_DATA_S(xzB), NV_DATA_S(xzB)+nrx_, get_ptr(m->rp),
-        NV_DATA_S(vB), NV_DATA_S(vB)+nrx_},
-      {NV_DATA_S(JvB), NV_DATA_S(JvB) + nrx_});
-
-    // Subtract state derivative to get residual
-    casadi_axpy(nrx_, cjB, NV_DATA_S(vB), NV_DATA_S(JvB));
-
-    log("IdasInterface::jtimesB", "end");
   }
 
   int IdasInterface::jtimesB_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB,
@@ -377,7 +352,15 @@ namespace casadi {
     try {
       auto m = to_mem(user_data);
       auto& s = m->self;
-      s.jtimesB(m, t, xz, xzdot, xzB, xzdotB, resvalB, vB, JvB, cjB, tmp1B, tmp2B);
+      s.calc_function(m, "jtimesB",
+        {&t, NV_DATA_S(xz), NV_DATA_S(xz)+s.nx_, get_ptr(m->p),
+          NV_DATA_S(xzB), NV_DATA_S(xzB)+s.nrx_, get_ptr(m->rp),
+          NV_DATA_S(vB), NV_DATA_S(vB)+s.nrx_},
+        {NV_DATA_S(JvB), NV_DATA_S(JvB) + s.nrx_});
+
+      // Subtract state derivative to get residual
+      casadi_axpy(s.nrx_, cjB, NV_DATA_S(vB), NV_DATA_S(JvB));
+
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "jtimesB failed: " << e.what() << endl;
@@ -859,36 +842,25 @@ namespace casadi {
     }
   }
 
-  void IdasInterface::
-  djac(IdasMemory* m, long Neq, double t, double cj, N_Vector xz, N_Vector xzdot,
-       N_Vector rr, DlsMat Jac,
-       N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) const {
-    log("IdasInterface::djac", "begin");
-
-    // Calculate Jacobian
-    calc_function(m, "jacF", {NV_DATA_S(xz), NV_DATA_S(xz)+nx_, get_ptr(m->p), &t, &cj},
-                            {m->jac});
-
-    // Save to Jac
-    const int* colind = sp_jac_dae_.colind();
-    int ncol = sp_jac_dae_.size2();
-    const int* row = sp_jac_dae_.row();
-    for (int cc=0; cc<ncol; ++cc) {
-      for (int el=colind[cc]; el<colind[cc+1]; ++el) {
-        DENSE_ELEM(Jac, row[el], cc) = m->jac[el];
-      }
-    }
-
-    log("IdasInterface::djac", "end");
-  }
-
   int IdasInterface::djac_wrapper(long Neq, double t, double cj, N_Vector xz, N_Vector xzdot,
                                  N_Vector rr, DlsMat Jac, void *user_data,
                                  N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) {
     try {
       auto m = to_mem(user_data);
       auto& s = m->self;
-      s.djac(m, Neq, t, cj, xz, xzdot, rr, Jac, tmp1, tmp2, tmp3);
+      s.calc_function(m, "jacF", {NV_DATA_S(xz), NV_DATA_S(xz)+s.nx_, get_ptr(m->p), &t, &cj},
+                              {m->jac});
+
+      // Save to Jac
+      const int* colind = s.sp_jac_dae_.colind();
+      int ncol = s.sp_jac_dae_.size2();
+      const int* row = s.sp_jac_dae_.row();
+      for (int cc=0; cc<ncol; ++cc) {
+        for (int el=colind[cc]; el<colind[cc+1]; ++el) {
+          DENSE_ELEM(Jac, row[el], cc) = m->jac[el];
+        }
+      }
+
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "djac failed: " << e.what() << endl;
@@ -896,66 +868,31 @@ namespace casadi {
     }
   }
 
-  void IdasInterface::
-  djacB(IdasMemory* m, long int NeqB, double t, double cj, N_Vector xz, N_Vector xzdot,
-        N_Vector rxz, N_Vector rxzdot, N_Vector rrr, DlsMat JacB,
-        N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B) const {
-    log("IdasInterface::djacB", "begin");
-
-    // Calculate Jacobian
-    calc_function(m, "jacB", {NV_DATA_S(rxz), NV_DATA_S(rxz)+nrx_, get_ptr(m->rp),
-                               NV_DATA_S(xz), NV_DATA_S(xz)+nx_, get_ptr(m->p), &t, &cj},
-                              {m->jacB});
-
-    // Save to JacB
-    const int* colind = sp_jac_rdae_.colind();
-    int ncol = sp_jac_rdae_.size2();
-    const int* row = sp_jac_rdae_.row();
-    for (int cc=0; cc<ncol; ++cc) {
-      for (int el=colind[cc]; el<colind[cc+1]; ++el) {
-        DENSE_ELEM(JacB, row[el], cc) = m->jacB[el];
-      }
-    }
-
-    log("IdasInterface::djacB", "end");
-  }
-
-  int IdasInterface::djacB_wrapper(long int NeqB, double t, double cjB, N_Vector xz, N_Vector xzdot,
-                                  N_Vector xzB, N_Vector xzdotB, N_Vector rrB, DlsMat JacB,
+  int IdasInterface::djacB_wrapper(long int NeqB, double t, double cj, N_Vector xz, N_Vector xzdot,
+                                  N_Vector rxz, N_Vector rxzdot, N_Vector rrr, DlsMat JacB,
                                   void *user_data,
                                   N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B) {
     try {
       auto m = to_mem(user_data);
       auto& s = m->self;
-      s.djacB(m, NeqB, t, cjB, xz, xzdot, xzB, xzdotB, rrB, JacB, tmp1B, tmp2B, tmp3B);
+      s.calc_function(m, "jacB", {NV_DATA_S(rxz), NV_DATA_S(rxz)+s.nrx_, get_ptr(m->rp),
+                                 NV_DATA_S(xz), NV_DATA_S(xz)+s.nx_, get_ptr(m->p), &t, &cj},
+                                {m->jacB});
+
+      // Save to JacB
+      const int* colind = s.sp_jac_rdae_.colind();
+      int ncol = s.sp_jac_rdae_.size2();
+      const int* row = s.sp_jac_rdae_.row();
+      for (int cc=0; cc<ncol; ++cc) {
+        for (int el=colind[cc]; el<colind[cc+1]; ++el) {
+          DENSE_ELEM(JacB, row[el], cc) = m->jacB[el];
+        }
+      }
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "djacB failed: " << e.what() << endl;
       return 1;
     }
-  }
-
-  void IdasInterface::bjac(IdasMemory* m, long Neq, long mupper, long mlower, double t, double cj,
-                           N_Vector xz, N_Vector xzdot, N_Vector rr, DlsMat Jac,
-                           N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) const {
-    log("IdasInterface::bjac", "begin");
-    // Calculate Jacobian
-    calc_function(m, "jacF", {NV_DATA_S(xz), NV_DATA_S(xz)+nx_, get_ptr(m->p), &t, &cj},
-                            {m->jac});
-
-    // Save to Jac
-    const int* colind = sp_jac_dae_.colind();
-    int ncol = sp_jac_dae_.size2();
-    const int* row = sp_jac_dae_.row();
-    for (int cc=0; cc<ncol; ++cc) {
-      for (int el=colind[cc]; el<colind[cc+1]; ++el) {
-        int rr = row[el];
-        if (cc-rr<=mupper && rr-cc<=mlower)
-          BAND_ELEM(Jac, rr, cc) = m->jac[el];
-      }
-    }
-
-    log("IdasInterface::bjac", "end");
   }
 
   int IdasInterface::bjac_wrapper(long Neq, long mupper, long mlower, double t, double cj,
@@ -965,7 +902,20 @@ namespace casadi {
     try {
       auto m = to_mem(user_data);
       auto& s = m->self;
-      s.bjac(m, Neq, mupper, mlower, t, cj, xz, xzdot, rr, Jac, tmp1, tmp2, tmp3);
+      s.calc_function(m, "jacF", {NV_DATA_S(xz), NV_DATA_S(xz)+s.nx_, get_ptr(m->p), &t, &cj},
+                              {m->jac});
+
+      // Save to Jac
+      const int* colind = s.sp_jac_dae_.colind();
+      int ncol = s.sp_jac_dae_.size2();
+      const int* row = s.sp_jac_dae_.row();
+      for (int cc=0; cc<ncol; ++cc) {
+        for (int el=colind[cc]; el<colind[cc+1]; ++el) {
+          int rr = row[el];
+          if (cc-rr<=mupper && rr-cc<=mlower)
+            BAND_ELEM(Jac, rr, cc) = m->jac[el];
+        }
+      }
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "bjac failed: " << e.what() << endl;
@@ -973,41 +923,29 @@ namespace casadi {
     }
   }
 
-  void IdasInterface::bjacB(IdasMemory* m, long NeqB, long mupperB, long mlowerB, double t,
-                            double cj, N_Vector xz, N_Vector xzdot, N_Vector rxz, N_Vector rxzdot,
-                            N_Vector rresval, DlsMat JacB, N_Vector tmp1B, N_Vector tmp2B,
-                            N_Vector tmp3B) const {
-    log("IdasInterface::bjacB", "begin");
-
-    // Calculate Jacobian
-    calc_function(m, "jacB", {NV_DATA_S(rxz), NV_DATA_S(rxz)+nrx_, get_ptr(m->rp),
-                               NV_DATA_S(xz), NV_DATA_S(xz)+nx_, get_ptr(m->p), &t, &cj},
-                              {m->jacB});
-
-    // Save to JacB
-    const int* colind = sp_jac_rdae_.colind();
-    int ncol = sp_jac_rdae_.size2();
-    const int* row = sp_jac_rdae_.row();
-    for (int cc=0; cc<ncol; ++cc) {
-      for (int el=colind[cc]; el<colind[cc+1]; ++el) {
-        int rr = row[el];
-        if (cc-rr<=mupperB && rr-cc<=mlowerB)
-          BAND_ELEM(JacB, rr, cc) = m->jacB[el];
-      }
-    }
-    log("IdasInterface::bjacB", "end");
-  }
-
   int IdasInterface::
-  bjacB_wrapper(long NeqB, long mupperB, long mlowerB, double t, double cjB,
-                N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB,
-                N_Vector resvalB, DlsMat JacB, void *user_data, N_Vector tmp1B,
+  bjacB_wrapper(long NeqB, long mupperB, long mlowerB, double t, double cj,
+                N_Vector xz, N_Vector xzdot, N_Vector rxz, N_Vector rxzdot,
+                N_Vector resval, DlsMat JacB, void *user_data, N_Vector tmp1B,
                 N_Vector tmp2B, N_Vector tmp3B) {
     try {
       auto m = to_mem(user_data);
       auto& s = m->self;
-      s.bjacB(m, NeqB, mupperB, mlowerB, t, cjB, xz, xzdot, xzB, xzdotB,
-                   resvalB, JacB, tmp1B, tmp2B, tmp3B);
+      s.calc_function(m, "jacB", {NV_DATA_S(rxz), NV_DATA_S(rxz)+s.nrx_, get_ptr(m->rp),
+                                 NV_DATA_S(xz), NV_DATA_S(xz)+s.nx_, get_ptr(m->p), &t, &cj},
+                                {m->jacB});
+
+      // Save to JacB
+      const int* colind = s.sp_jac_rdae_.colind();
+      int ncol = s.sp_jac_rdae_.size2();
+      const int* row = s.sp_jac_rdae_.row();
+      for (int cc=0; cc<ncol; ++cc) {
+        for (int el=colind[cc]; el<colind[cc+1]; ++el) {
+          int rr = row[el];
+          if (cc-rr<=mupperB && rr-cc<=mlowerB)
+            BAND_ELEM(JacB, rr, cc) = m->jacB[el];
+        }
+      }
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "bjacB failed: " << e.what() << endl;
