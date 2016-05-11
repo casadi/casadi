@@ -189,11 +189,6 @@ namespace casadi {
     void psetupB(CvodesMemory* m, double t, N_Vector x, N_Vector xB, N_Vector xdotB,
                  booleantype jokB, booleantype *jcurPtrB, double gammaB,
                  N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B) const;
-    /// <tt>b = M^(-1).b</tt>
-    void lsolve(CvodesMemory* m, CVodeMem cv_mem, N_Vector b, N_Vector weight, N_Vector ycur,
-                N_Vector fcur) const;
-    void lsolveB(CvodesMemory* m, double t, double gamma, N_Vector b, N_Vector weight, N_Vector x,
-                 N_Vector xB, N_Vector xdotB) const;
 
     // Static wrappers to be passed to Sundials
     static int rhs_wrapper(double t, N_Vector x, N_Vector xdot, void *user_data);

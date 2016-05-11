@@ -104,7 +104,7 @@ namespace casadi {
     if (exact_jacobianB_ && nrx_>0) {
       set_function(getJacB());
       casadi_assert(get_function("jacB").sparsity_out(0) == sp_jac_rdae_);
-    };
+    }
 
     // Algebraic variables not supported
     casadi_assert_message(nz_==0 && nrz_==0,
@@ -938,50 +938,28 @@ namespace casadi {
     }
   }
 
-  void CvodesInterface::lsolve(CvodesMemory* m,
-                               CVodeMem cv_mem, N_Vector b, N_Vector weight,
-                               N_Vector x, N_Vector xdot) const {
-    log("CvodesInterface::lsolve", "begin");
-
-    // Current time
-    double t = cv_mem->cv_tn;
-
-    // Scaling factor before J
-    double gamma = cv_mem->cv_gamma;
-
-    // Accuracy
-    double delta = 0.0;
-
-    // Left/right preconditioner
-    int lr = 1;
-
-    // Call the preconditioner solve function (which solves the linear system)
-    psolve(m, t, x, xdot, b, b, gamma, delta, lr, 0);
-
-    log("CvodesInterface::lsolve", "end");
-  }
-
-  void CvodesInterface::lsolveB(CvodesMemory* m,
-                                double t, double gamma, N_Vector b, N_Vector weight,
-                                N_Vector x, N_Vector xB, N_Vector xdotB) const {
-    log("CvodesInterface::lsolveB", "begin");
-    // Accuracy
-    double delta = 0.0;
-
-    // Left/right preconditioner
-    int lr = 1;
-
-    // Call the preconditioner solve function (which solves the linear system)
-    psolveB(m, t, x, xB, xdotB, b, b, gamma, delta, lr, 0);
-
-    log("CvodesInterface::lsolveB", "end");
-  }
-
   int CvodesInterface::lsolve_wrapper(CVodeMem cv_mem, N_Vector b, N_Vector weight,
                                      N_Vector x, N_Vector xdot) {
     try {
       auto m = to_mem(cv_mem->cv_lmem);
-      m->self.lsolve(m, cv_mem, b, weight, x, xdot);
+      auto& s = m->self;
+
+      // Current time
+      double t = cv_mem->cv_tn;
+
+      // Scaling factor before J
+      double gamma = cv_mem->cv_gamma;
+
+      // Accuracy
+      double delta = 0.0;
+
+      // Left/right preconditioner
+      int lr = 1;
+
+      // Call the preconditioner solve function (which solves the linear system)
+      if (psolve_wrapper(t, x, xdot, b, b, gamma, delta,
+        lr, static_cast<void*>(m), 0)) return 1;
+
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "lsolve failed: " << e.what() << endl;;
@@ -1011,7 +989,18 @@ namespace casadi {
       flag = ca_mem->ca_IMget(cv_mem, t, ca_mem->ca_ytmp, NULL);
       if (flag != CV_SUCCESS) casadi_error("Could not interpolate forward states");
 
-      m->self.lsolveB(m, t, gamma, b, weight, ca_mem->ca_ytmp, x, xdot);
+
+
+      // Accuracy
+      double delta = 0.0;
+
+      // Left/right preconditioner
+      int lr = 1;
+
+      // Call the preconditioner solve function (which solves the linear system)
+      if (psolveB_wrapper(t, ca_mem->ca_ytmp, x, xdot, b, b, gamma, delta, lr,
+        static_cast<void*>(m), 0)) return 1;
+
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "lsolveB failed: " << e.what() << endl;;
