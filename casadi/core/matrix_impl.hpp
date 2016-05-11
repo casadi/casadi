@@ -2397,6 +2397,11 @@ namespace casadi {
   }
 
   template<typename Scalar>
+  std::vector<Matrix<Scalar> > Matrix<Scalar>::get_free(const Function& f) {
+    throw CasadiException("\"get_free\" not defined for " + type_name());
+  }
+
+  template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::jac(const Function& f, int iind, int oind,
                                          bool compact, bool symmetric) {
     throw CasadiException("\"jac\" not defined for " + type_name());
@@ -2601,6 +2606,7 @@ namespace casadi {
                                  std::vector<std::string>& inter) const;
 
   template<> std::vector<SX> SX::get_input(const Function& f);
+  template<> std::vector<SX> SX::get_free(const Function& f);
 
   template<> SX SX::jac(const Function& f, int iind, int oind,
                         bool compact, bool symmetric);

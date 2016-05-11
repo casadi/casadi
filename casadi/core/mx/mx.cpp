@@ -1682,6 +1682,10 @@ namespace casadi {
     return f.mx_in();
   }
 
+  std::vector<MX> MX::get_free(const Function& f) {
+    return f.free_mx();
+  }
+
   std::string MX::type_name() {
     return "MX";
   }

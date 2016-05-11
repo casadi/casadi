@@ -368,6 +368,7 @@ namespace casadi {
 
     // Create a linear solver
     if (!linear_solver_.empty()) {
+      casadi_assert(!sp_jac_dae_.is_null());
       linsol_ = linsol("linsol", linear_solver_, sp_jac_dae_,
                        1, linear_solver_options_);
       alloc(linsol_);
@@ -378,6 +379,7 @@ namespace casadi {
       alloc_w(sp_jac_rdae_.nnz(), true);
 
       // Create a linear solver
+      casadi_assert(!sp_jac_rdae_.is_null());
       if (!linear_solverB_.empty()) {
         linsolB_ = linsol("linsolB", linear_solverB_, sp_jac_rdae_,
                           1, linear_solver_optionsB_);

@@ -2897,7 +2897,7 @@ namespace casadi {
     casadi_error("'free_mx' only defined for 'mxfunction'");
   }
 
-  SX FunctionInternal::free_sx() const {
+  std::vector<SX> FunctionInternal::free_sx() const {
     casadi_error("'free_sx' only defined for 'sxfunction'");
   }
 

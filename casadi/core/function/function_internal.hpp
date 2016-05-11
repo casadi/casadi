@@ -432,7 +432,7 @@ namespace casadi {
     virtual std::vector<MX> free_mx() const;
 
     /// Get free variables (SX)
-    virtual SX free_sx() const;
+    virtual std::vector<SX> free_sx() const;
 
     /** \brief Does the function have free variables */
     virtual bool has_free() const { return false;}

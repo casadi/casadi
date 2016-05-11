@@ -1194,7 +1194,7 @@ namespace casadi {
     return (*this)->is_a(type, recursive);
   }
 
-  SX Function::free_sx() const {
+  vector<SX> Function::free_sx() const {
     return (*this)->free_sx();
   }
 

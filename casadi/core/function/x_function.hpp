@@ -1183,10 +1183,13 @@ namespace casadi {
     // Create function and return
     Function ret(name, ret_in, ret_out, ret_iname, ret_oname, opts);
     if (ret.has_free()) {
-      stringstream ss;
-      ss << "Cannot generate " << name << " as the expressions contain free variables: ";
-      ret.print_free(ss);
-      casadi_error(ss.str());
+      // Substitute free variables with zeros
+      // We assume that the free variables are caused by false positive dependencies
+      vector<MatType> free_in = MatType::get_free(ret);
+      vector<MatType> free_sub = free_in;
+      for (auto&& e : free_sub) e = MatType::zeros(e.sparsity());
+      ret_out = substitute(ret_out, free_in, free_sub);
+      ret = Function(name, ret_in, ret_out, ret_iname, ret_oname, opts);
     }
     return ret;
   }

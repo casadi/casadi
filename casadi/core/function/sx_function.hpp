@@ -152,7 +152,11 @@ class CASADI_EXPORT SXFunction :
   ///@}
 
   /// Get free variables (SX)
-  virtual SX free_sx() const {return free_vars_;}
+  virtual std::vector<SX> free_sx() const {
+    std::vector<SX> ret(free_vars_.size());
+    std::copy(free_vars_.begin(), free_vars_.end(), ret.begin());
+    return ret;
+  }
 
   /** \brief Does the function have free variables */
   virtual bool has_free() const { return !free_vars_.empty();}

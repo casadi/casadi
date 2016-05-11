@@ -880,7 +880,7 @@ namespace casadi {
     ///@}
 
     /** \brief Get all the free variables of the function */
-    SX free_sx() const;
+    std::vector<SX> free_sx() const;
 
     /** \brief Get all the free variables of the function */
     std::vector<MX> free_mx() const;

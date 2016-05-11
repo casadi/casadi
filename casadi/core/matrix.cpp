@@ -720,10 +720,7 @@ namespace casadi {
   template<>
   vector<SX> SX::symvar(const SX& x) {
     Function f("tmp", vector<SX>{}, {x});
-    vector<SXElem> ret1 = f.free_sx().nonzeros();
-    vector<SX> ret(ret1.size());
-    copy(ret1.begin(), ret1.end(), ret.begin());
-    return ret;
+    return f.free_sx();
   }
 
   template<>
@@ -1000,6 +997,10 @@ namespace casadi {
 
   template<> vector<SX> SX::get_input(const Function& f) {
     return f.sx_in();
+  }
+
+  template<> vector<SX> SX::get_free(const Function& f) {
+    return f.free_sx();
   }
 
   template<> SX SX::jac(const Function& f, int iind, int oind, bool compact, bool symmetric) {
