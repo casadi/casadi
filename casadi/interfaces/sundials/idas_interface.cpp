@@ -173,9 +173,9 @@ namespace casadi {
     if (exact_jacobian_) {
       switch (linsol_f_) {
       case SD_ITERATIVE:
-        jtimes_ = oracle_.factory("jtimes",
-          {"t", "x", "z", "p", "fwd:x", "fwd:z"}, {"fwd:ode", "fwd:alg"});
-        alloc(jtimes_);
+        create_function("jtimes",
+          {"t", "x", "z", "p", "fwd:x", "fwd:z"},
+          {"fwd:ode", "fwd:alg"});
         break;
       default: break;
       }
@@ -184,10 +184,9 @@ namespace casadi {
     if (exact_jacobianB_) {
       switch (linsol_g_) {
       case SD_ITERATIVE:
-        jtimesB_ = oracle_.factory("jtimesB",
+        create_function("jtimesB",
           {"t", "x", "z", "p", "rx", "rz", "rp", "fwd:rx", "fwd:rz"},
           {"fwd:rode", "fwd:ralg"});
-        alloc(jtimesB_);
         break;
       default: break;
       }
@@ -361,16 +360,9 @@ namespace casadi {
     // Get time
     m->time1 = clock();
 
-    // Evaluate jtimes_
-    m->arg[JTIMES_T] = &t;
-    m->arg[JTIMES_X] = NV_DATA_S(xz);
-    m->arg[JTIMES_Z] = NV_DATA_S(xz)+nx_;
-    m->arg[JTIMES_P] = get_ptr(m->p);
-    m->arg[JTIMES_FWD_X] = NV_DATA_S(v);
-    m->arg[JTIMES_FWD_Z] = NV_DATA_S(v)+nx_;
-    m->res[JTIMES_FWD_ODE] = NV_DATA_S(Jv);
-    m->res[JTIMES_FWD_ALG] = NV_DATA_S(Jv) + nx_;
-    jtimes_(m->arg, m->res, m->iw, m->w, 0);
+    calc_function(m, "jtimes",
+      {&t, NV_DATA_S(xz), NV_DATA_S(xz)+nx_, get_ptr(m->p), NV_DATA_S(v), NV_DATA_S(v)+nx_},
+      {NV_DATA_S(Jv), NV_DATA_S(Jv)+nx_});
 
     // Subtract state derivative to get residual
     casadi_axpy(nx_, -cj, NV_DATA_S(v), NV_DATA_S(Jv));
@@ -411,19 +403,11 @@ namespace casadi {
       printvar("vB", vB);
     }
 
-    // Evaluate jtimesB_
-    m->arg[JTIMESB_T] = &t;
-    m->arg[JTIMESB_X] = NV_DATA_S(xz);
-    m->arg[JTIMESB_Z] = NV_DATA_S(xz)+nx_;
-    m->arg[JTIMESB_P] = get_ptr(m->p);
-    m->arg[JTIMESB_RX] = NV_DATA_S(xzB);
-    m->arg[JTIMESB_RZ] = NV_DATA_S(xzB)+nrx_;
-    m->arg[JTIMESB_RP] = get_ptr(m->rp);
-    m->arg[JTIMESB_FWD_RX] = NV_DATA_S(vB);
-    m->arg[JTIMESB_FWD_RZ] = NV_DATA_S(vB)+nrx_;
-    m->res[JTIMESB_FWD_RODE] = NV_DATA_S(JvB);
-    m->res[JTIMESB_FWD_RALG] = NV_DATA_S(JvB) + nrx_;
-    jtimesB_(m->arg, m->res, m->iw, m->w, 0);
+    calc_function(m, "jtimesB",
+      {&t, NV_DATA_S(xz), NV_DATA_S(xz)+nx_, get_ptr(m->p),
+        NV_DATA_S(xzB), NV_DATA_S(xzB)+nrx_, get_ptr(m->rp),
+        NV_DATA_S(vB), NV_DATA_S(vB)+nrx_},
+      {NV_DATA_S(JvB), NV_DATA_S(JvB) + nrx_});
 
     // Subtract state derivative to get residual
     casadi_axpy(nrx_, cjB, NV_DATA_S(vB), NV_DATA_S(JvB));

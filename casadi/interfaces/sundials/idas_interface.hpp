@@ -322,9 +322,6 @@ namespace casadi {
     /// Continuous time dynamics
     Function rhs_, rhsQ_, rhsB_, rhsQB_;
 
-    // Jacobian times vector functions
-    Function jtimes_, jtimesB_;
-
     // Options
     bool cj_scaling_;
     bool calc_ic_;
