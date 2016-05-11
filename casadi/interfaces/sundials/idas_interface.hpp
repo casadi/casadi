@@ -189,7 +189,6 @@ namespace casadi {
   protected:
 
     // Sundials callback functions
-    void res(IdasMemory* m, double t, N_Vector xz, N_Vector xzdot, N_Vector rr) const;
     void ehfun(IdasMemory* m, int error_code, const char *module, const char *function,
                char *msg) const;
     void jtimes(IdasMemory* m, double t, N_Vector xz, N_Vector xzdot, N_Vector rr,
@@ -197,17 +196,6 @@ namespace casadi {
     void jtimesB(IdasMemory* m, double t, N_Vector xz, N_Vector xzdot, N_Vector xzB,
                  N_Vector xzdotB, N_Vector resvalB, N_Vector vB, N_Vector JvB,
                  double cjB, N_Vector tmp1B, N_Vector tmp2B) const;
-    void resS(IdasMemory* m, int Ns, double t, N_Vector xz, N_Vector xzdot, N_Vector resval,
-              N_Vector *xzF, N_Vector* xzdotF, N_Vector *rrF,
-              N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) const;
-    void rhsQ(IdasMemory* m, double t, N_Vector xz, N_Vector xzdot, N_Vector qdot) const;
-    void rhsQS(IdasMemory* m, int Ns, double t, N_Vector xz, N_Vector xzdot, N_Vector *xzF,
-               N_Vector *xzdotF, N_Vector rrQ, N_Vector *qdotF, N_Vector tmp1, N_Vector tmp2,
-               N_Vector tmp3) const;
-    void resB(IdasMemory* m, double t, N_Vector y, N_Vector xzdot, N_Vector xA, N_Vector xzdotB,
-              N_Vector rrB) const;
-    void rhsQB(IdasMemory* m, double t, N_Vector y, N_Vector xzdot, N_Vector rxz, N_Vector xzdotB,
-               N_Vector qdotA) const;
     void psolve(IdasMemory* m, double t, N_Vector xz, N_Vector xzdot, N_Vector rr, N_Vector rvec,
                 N_Vector zvec, double cj, double delta, N_Vector tmp) const;
     void psolveB(IdasMemory* m, double t, N_Vector xz, N_Vector xzdot, N_Vector xzB,

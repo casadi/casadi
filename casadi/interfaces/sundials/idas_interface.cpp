@@ -290,29 +290,16 @@ namespace casadi {
     log("IdasInterface::initAdj", "end");
   }
 
-  void IdasInterface::
-  res(IdasMemory* m, double t, N_Vector xz, N_Vector xzdot, N_Vector rr) const {
-    log("IdasInterface::res", "begin");
-
-    calc_function(m, "rhs", {NV_DATA_S(xz), NV_DATA_S(xz)+nx_, get_ptr(m->p), &t},
-                            {NV_DATA_S(rr), NV_DATA_S(rr)+nx_});
-
-    // Subtract state derivative to get residual
-    casadi_axpy(nx_, -1., NV_DATA_S(xzdot), NV_DATA_S(rr));
-
-    // Regularity check
-    casadi_assert_message(!regularity_check_ || is_regular(rr),
-                          "IdasInterface::res: not regular.");
-
-    log("IdasInterface::res", "end");
-  }
-
   int IdasInterface::res_wrapper(double t, N_Vector xz, N_Vector xzdot,
                                 N_Vector rr, void *user_data) {
     try {
       auto m = to_mem(user_data);
       auto& s = m->self;
-      s.res(m, t, xz, xzdot, rr);
+      s.calc_function(m, "rhs", {NV_DATA_S(xz), NV_DATA_S(xz)+s.nx_, get_ptr(m->p), &t},
+                              {NV_DATA_S(rr), NV_DATA_S(rr)+s.nx_});
+
+      // Subtract state derivative to get residual
+      casadi_axpy(s.nx_, -1., NV_DATA_S(xzdot), NV_DATA_S(rr));
       return 0;
     } catch(int flag) { // recoverable error
       return flag;
@@ -398,24 +385,16 @@ namespace casadi {
     }
   }
 
-  void IdasInterface::resS(IdasMemory* m, int Ns, double t, N_Vector xz, N_Vector xzdot,
-                          N_Vector resval, N_Vector *xzF, N_Vector* xzdotF, N_Vector *rrF,
-                          N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) const {
-    log("IdasInterface::resS", "begin");
-
-    // Commented out since a new implementation currently cannot be tested
-    casadi_error("Commented out, #884, #794.");
-
-    log("IdasInterface::resS", "end");
-  }
-
   int IdasInterface::resS_wrapper(int Ns, double t, N_Vector xz, N_Vector xzdot, N_Vector resval,
                                  N_Vector *xzF, N_Vector *xzdotF, N_Vector *rrF, void *user_data,
                                  N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) {
     try {
       auto m = to_mem(user_data);
       auto& s = m->self;
-      s.resS(m, Ns, t, xz, xzdot, resval, xzF, xzdotF, rrF, tmp1, tmp2, tmp3);
+
+      // Commented out since a new implementation currently cannot be tested
+      casadi_error("Commented out, #884, #794.");
+
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "resS failed: " << e.what() << endl;
@@ -814,35 +793,14 @@ namespace casadi {
     try {
       auto m = to_mem(user_data);
       auto& s = m->self;
-      s.rhsQ(m, t, xz, xzdot, rhsQ);
+      s.calc_function(m, "rhsQ", {NV_DATA_S(xz), NV_DATA_S(xz)+s.nx_, get_ptr(m->p), &t},
+                               {NV_DATA_S(rhsQ)});
+
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "rhsQ failed: " << e.what() << endl;
       return 1;
     }
-  }
-
-  void IdasInterface::
-  rhsQ(IdasMemory* m, double t, N_Vector xz, N_Vector xzdot, N_Vector rhsQ) const {
-    log("IdasInterface::rhsQ", "begin");
-
-    calc_function(m, "rhsQ", {NV_DATA_S(xz), NV_DATA_S(xz)+nx_, get_ptr(m->p), &t},
-                             {NV_DATA_S(rhsQ)});
-
-    log("IdasInterface::rhsQ", "end");
-  }
-
-  void IdasInterface::
-  rhsQS(IdasMemory* m, int Ns, double t, N_Vector xz, N_Vector xzdot, N_Vector *xzF,
-        N_Vector *xzdotF, N_Vector rrQ, N_Vector *qdotF,
-        N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) const {
-
-    log("IdasInterface::rhsQS", "enter");
-
-    // Commented out since a new implementation currently cannot be tested
-    casadi_error("Commented out, #884, #794.");
-
-    log("IdasInterface::rhsQS", "end");
   }
 
   int IdasInterface::rhsQS_wrapper(int Ns, double t, N_Vector xz, N_Vector xzdot, N_Vector *xzF,
@@ -852,7 +810,10 @@ namespace casadi {
     try {
       auto m = to_mem(user_data);
       auto& s = m->self;
-      s.rhsQS(m, Ns, t, xz, xzdot, xzF, xzdotF, rrQ, qdotF, tmp1, tmp2, tmp3);
+
+      // Commented out since a new implementation currently cannot be tested
+      casadi_error("Commented out, #884, #794.");
+
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "rhsQS failed: " << e.what() << endl;
@@ -860,26 +821,18 @@ namespace casadi {
     }
   }
 
-  void IdasInterface::resB(IdasMemory* m, double t, N_Vector xz, N_Vector xzdot, N_Vector rxz,
-                           N_Vector rxzdot, N_Vector rr) const {
-    log("IdasInterface::resB", "begin");
-
-    calc_function(m, "rhsB", {NV_DATA_S(rxz), NV_DATA_S(rxz)+nrx_, get_ptr(m->rp),
-                              NV_DATA_S(xz), NV_DATA_S(xz)+nx_, get_ptr(m->p), &t},
-                            {NV_DATA_S(rr), NV_DATA_S(rr)+nrx_});
-
-    // Subtract state derivative to get residual
-    casadi_axpy(nrx_, 1., NV_DATA_S(rxzdot), NV_DATA_S(rr));
-
-    log("IdasInterface::resB", "end");
-  }
-
-  int IdasInterface::resB_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector xzA,
-                                 N_Vector xzdotA, N_Vector rrA, void *user_data) {
+  int IdasInterface::resB_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector rxz,
+                                 N_Vector rxzdot, N_Vector rr, void *user_data) {
     try {
       auto m = to_mem(user_data);
       auto& s = m->self;
-      s.resB(m, t, xz, xzdot, xzA, xzdotA, rrA);
+      s.calc_function(m, "rhsB", {NV_DATA_S(rxz), NV_DATA_S(rxz)+s.nrx_, get_ptr(m->rp),
+                                NV_DATA_S(xz), NV_DATA_S(xz)+s.nx_, get_ptr(m->p), &t},
+                              {NV_DATA_S(rr), NV_DATA_S(rr)+s.nrx_});
+
+      // Subtract state derivative to get residual
+      casadi_axpy(s.nrx_, 1., NV_DATA_S(rxzdot), NV_DATA_S(rr));
+
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "resB failed: " << e.what() << endl;
@@ -887,26 +840,18 @@ namespace casadi {
     }
   }
 
-  void IdasInterface::rhsQB(IdasMemory* m, double t, N_Vector xz, N_Vector xzdot, N_Vector rxz,
-                            N_Vector rxzdot, N_Vector rqdot) const {
-    log("IdasInterface::rhsQB", "begin");
-
-    calc_function(m, "rhsQB", {NV_DATA_S(rxz), NV_DATA_S(rxz)+nrx_, get_ptr(m->rp),
-                               NV_DATA_S(xz), NV_DATA_S(xz)+nx_, get_ptr(m->p), &t},
-                              {NV_DATA_S(rqdot)});
-
-    // Negate (note definition of g)
-    casadi_scal(nrq_, -1., NV_DATA_S(rqdot));
-
-    log("IdasInterface::rhsQB", "end");
-  }
-
-  int IdasInterface::rhsQB_wrapper(double t, N_Vector y, N_Vector xzdot, N_Vector xzA,
-                                  N_Vector xzdotA, N_Vector qdotA, void *user_data) {
+  int IdasInterface::rhsQB_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector rxz,
+                                  N_Vector rxzdot, N_Vector rqdot, void *user_data) {
     try {
       auto m = to_mem(user_data);
       auto& s = m->self;
-      s.rhsQB(m, t, y, xzdot, xzA, xzdotA, qdotA);
+      s.calc_function(m, "rhsQB", {NV_DATA_S(rxz), NV_DATA_S(rxz)+s.nrx_, get_ptr(m->rp),
+                                 NV_DATA_S(xz), NV_DATA_S(xz)+s.nx_, get_ptr(m->p), &t},
+                                {NV_DATA_S(rqdot)});
+
+      // Negate (note definition of g)
+      casadi_scal(s.nrq_, -1., NV_DATA_S(rqdot));
+
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "rhsQB failed: " << e.what() << endl;
