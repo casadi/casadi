@@ -314,15 +314,10 @@ namespace casadi {
     try {
       auto m = to_mem(eh_data);
       auto& s = m->self;
-      s.ehfun(m, error_code, module, function, msg);
+      userOut<true, PL_WARN>() << msg << endl;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "ehfun failed: " << e.what() << endl;
     }
-  }
-
-  void IdasInterface::ehfun(IdasMemory* m, int error_code, const char *module, const char *function,
-                            char *msg) const {
-    userOut<true, PL_WARN>() << msg << endl;
   }
 
   int IdasInterface::jtimes_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, N_Vector v,
@@ -961,6 +956,23 @@ namespace casadi {
     if (flag != IDA_SUCCESS) idas_error("IDASetStopTime", flag);
   }
 
+  void IdasInterface::
+  psolve(IdasMemory* m, double t, N_Vector xz, N_Vector xzdot, N_Vector rr, N_Vector rvec,
+         N_Vector zvec, double cj, double delta, N_Vector tmp) const {
+    log("IdasInterface::psolve", "begin");
+
+    // Copy input to output, if necessary
+    if (rvec!=zvec) {
+      N_VScale(1.0, rvec, zvec);
+    }
+
+    // Solve the (possibly factorized) system
+    casadi_assert_message(linsol_.nnz_out(0) == NV_LENGTH_S(zvec), "Assertion error: "
+                          << linsol_.nnz_out(0) << " == " << NV_LENGTH_S(zvec));
+    linsol_.linsol_solve(NV_DATA_S(zvec));
+    log("IdasInterface::psolve", "end");
+  }
+
   int IdasInterface::psolve_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector rr,
                                     N_Vector rvec, N_Vector zvec, double cj, double delta,
                                     void *user_data, N_Vector tmp) {
@@ -973,6 +985,28 @@ namespace casadi {
       userOut<true, PL_WARN>() << "psolve failed: " << e.what() << endl;
       return 1;
     }
+  }
+
+  void IdasInterface::
+  psolveB(IdasMemory* m, double t, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB,
+          N_Vector resvalB, N_Vector rvecB, N_Vector zvecB,
+          double cjB, double deltaB, N_Vector tmpB) const {
+    log("IdasInterface::psolveB", "begin");
+
+    // Copy input to output, if necessary
+    if (rvecB!=zvecB) {
+      N_VScale(1.0, rvecB, zvecB);
+    }
+
+    casadi_assert(!linsolB_.is_null());
+
+    // Solve the (possibly factorized) system
+    casadi_assert_message(linsolB_.nnz_out(0) == NV_LENGTH_S(zvecB),
+                          "Assertion error: " << linsolB_.nnz_out(0)
+                          << " == " << NV_LENGTH_S(zvecB));
+    linsolB_.linsol_solve(NV_DATA_S(zvecB));
+
+    log("IdasInterface::psolveB", "end");
   }
 
   int IdasInterface::psolveB_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB,
@@ -1004,79 +1038,6 @@ namespace casadi {
     }
   }
 
-  int IdasInterface::psetupB_wrapper(double t, N_Vector xz, N_Vector xzdot,
-                                    N_Vector xzB, N_Vector xzdotB,
-                                    N_Vector resvalB, double cjB, void *user_data,
-                                    N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B) {
-    try {
-      auto m = to_mem(user_data);
-      auto& s = m->self;
-      s.psetupB(m, t, xz, xzdot, xzB, xzdotB, resvalB, cjB, tmp1B, tmp2B, tmp3B);
-      return 0;
-    } catch(exception& e) {
-      userOut<true, PL_WARN>() << "psetupB failed: " << e.what() << endl;
-      return 1;
-    }
-  }
-
-  void IdasInterface::
-  psolve(IdasMemory* m, double t, N_Vector xz, N_Vector xzdot, N_Vector rr, N_Vector rvec,
-         N_Vector zvec, double cj, double delta, N_Vector tmp) const {
-    log("IdasInterface::psolve", "begin");
-
-    // Copy input to output, if necessary
-    if (rvec!=zvec) {
-      N_VScale(1.0, rvec, zvec);
-    }
-
-    // Solve the (possibly factorized) system
-    casadi_assert_message(linsol_.nnz_out(0) == NV_LENGTH_S(zvec), "Assertion error: "
-                          << linsol_.nnz_out(0) << " == " << NV_LENGTH_S(zvec));
-    linsol_.linsol_solve(NV_DATA_S(zvec));
-    log("IdasInterface::psolve", "end");
-  }
-
-
-  void IdasInterface::
-  psolveB(IdasMemory* m, double t, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB,
-          N_Vector resvalB, N_Vector rvecB, N_Vector zvecB,
-          double cjB, double deltaB, N_Vector tmpB) const {
-    log("IdasInterface::psolveB", "begin");
-
-    // Copy input to output, if necessary
-    if (rvecB!=zvecB) {
-      N_VScale(1.0, rvecB, zvecB);
-    }
-
-    casadi_assert(!linsolB_.is_null());
-
-    // Solve the (possibly factorized) system
-    casadi_assert_message(linsolB_.nnz_out(0) == NV_LENGTH_S(zvecB),
-                          "Assertion error: " << linsolB_.nnz_out(0)
-                          << " == " << NV_LENGTH_S(zvecB));
-    linsolB_.linsol_solve(NV_DATA_S(zvecB));
-
-    log("IdasInterface::psolveB", "end");
-  }
-
-  void IdasInterface::
-  psetup(IdasMemory* m, double t, N_Vector xz, N_Vector xzdot, N_Vector rr, double cj,
-         N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) const {
-    log("IdasInterface::psetup", "begin");
-
-    // Calculate Jacobian
-    calc_function(m, "jacF", {NV_DATA_S(xz), NV_DATA_S(xz)+nx_, get_ptr(m->p), &t, &cj},
-                            {m->jac});
-
-    // Prepare the solution of the linear system (e.g. factorize)
-    linsol_.setup(m->arg+LINSOL_NUM_IN, m->res+LINSOL_NUM_OUT, m->iw, m->w);
-    linsol_.linsol_factorize(m->jac);
-
-    log("IdasInterface::psetup", "end");
-
-  }
-
-
   void IdasInterface::
   psetupB(IdasMemory* m, double t, N_Vector xz, N_Vector xzdot, N_Vector rxz, N_Vector rxzdot,
           N_Vector rresval, double cj,
@@ -1095,6 +1056,53 @@ namespace casadi {
     log("IdasInterface::psetupB", "end");
   }
 
+  int IdasInterface::psetupB_wrapper(double t, N_Vector xz, N_Vector xzdot,
+                                    N_Vector xzB, N_Vector xzdotB,
+                                    N_Vector resvalB, double cjB, void *user_data,
+                                    N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B) {
+    try {
+      auto m = to_mem(user_data);
+      auto& s = m->self;
+      s.psetupB(m, t, xz, xzdot, xzB, xzdotB, resvalB, cjB, tmp1B, tmp2B, tmp3B);
+      return 0;
+    } catch(exception& e) {
+      userOut<true, PL_WARN>() << "psetupB failed: " << e.what() << endl;
+      return 1;
+    }
+  }
+
+  void IdasInterface::
+  psetup(IdasMemory* m, double t, N_Vector xz, N_Vector xzdot, N_Vector rr, double cj,
+         N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) const {
+    log("IdasInterface::psetup", "begin");
+
+    // Calculate Jacobian
+    calc_function(m, "jacF", {NV_DATA_S(xz), NV_DATA_S(xz)+nx_, get_ptr(m->p), &t, &cj},
+                            {m->jac});
+
+    // Prepare the solution of the linear system (e.g. factorize)
+    linsol_.setup(m->arg+LINSOL_NUM_IN, m->res+LINSOL_NUM_OUT, m->iw, m->w);
+    linsol_.linsol_factorize(m->jac);
+
+    log("IdasInterface::psetup", "end");
+  }
+
+  void IdasInterface::
+  lsetup(IdasMemory* m, IDAMem IDA_mem, N_Vector xz, N_Vector xzdot, N_Vector resp,
+         N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3) const {
+    log("IdasInterface::lsetup", "begin");
+
+    // Current time
+    double t = IDA_mem->ida_tn;
+
+    // Multiple of df_dydot to be added to the matrix
+    double cj = IDA_mem->ida_cj;
+
+    // Call the preconditioner setup function (which sets up the linear solver)
+    psetup(m, t, xz, xzdot, 0, cj, vtemp1, vtemp1, vtemp3);
+    log("IdasInterface::lsetup", "end");
+  }
+
   int IdasInterface::lsetup_wrapper(IDAMem IDA_mem, N_Vector xz, N_Vector xzdot, N_Vector resp,
                                     N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3) {
     try {
@@ -1106,6 +1114,17 @@ namespace casadi {
       userOut<true, PL_WARN>() << "lsetup failed: " << e.what() << endl;
       return -1;
     }
+  }
+
+  void IdasInterface::
+  lsetupB(IdasMemory* m, double t, double cj, N_Vector xz, N_Vector xzdot, N_Vector xzB,
+          N_Vector xzdotB, N_Vector resp,
+          N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3) const {
+    log("IdasInterface::lsetupB", "begin");
+
+    // Call the preconditioner setup function (which sets up the linear solver)
+    psetupB(m, t, xz, xzdot, xzB, xzdotB, 0, cj, vtemp1, vtemp1, vtemp3);
+    log("IdasInterface::lsetupB", "end");
   }
 
   int IdasInterface::lsetupB_wrapper(IDAMem IDA_mem, N_Vector xzB, N_Vector xzdotB, N_Vector respB,
@@ -1142,6 +1161,29 @@ namespace casadi {
     }
   }
 
+  void IdasInterface::
+  lsolve(IdasMemory* m, IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector xz,
+         N_Vector xzdot, N_Vector rr) const {
+    log("IdasInterface::lsolve", "begin");
+    // Current time
+    double t = IDA_mem->ida_tn;
+
+    // Multiple of df_dydot to be added to the matrix
+    double cj = IDA_mem->ida_cj;
+
+    // Accuracy
+    double delta = 0.0;
+
+    // Call the preconditioner solve function (which solves the linear system)
+    psolve(m, t, xz, xzdot, rr, b, b, cj, delta, 0);
+
+    // Scale the correction to account for change in cj
+    if (cj_scaling_) {
+      double cjratio = IDA_mem->ida_cjratio;
+      if (cjratio != 1.0) N_VScale(2.0/(1.0 + cjratio), b, b);
+    }
+    log("IdasInterface::lsolve", "end");
+  }
 
   int IdasInterface::lsolve_wrapper(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector xz,
                                    N_Vector xzdot, N_Vector rr) {
@@ -1157,6 +1199,26 @@ namespace casadi {
       userOut<true, PL_WARN>() << "lsolve failed: " << e.what() << endl;
       return -1;
     }
+  }
+
+  void IdasInterface::
+  lsolveB(IdasMemory* m, double t, double cj, double cjratio, N_Vector b, N_Vector weight,
+          N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB,
+          N_Vector rr) const {
+    log("IdasInterface::lsolveB", "begin");
+
+    // Accuracy
+    double delta = 0.0;
+
+    // Call the preconditioner solve function (which solves the linear system)
+    psolveB(m, t, xz, xzdot, xzB, xzdotB, rr, b, b, cj, delta, 0);
+
+    // Scale the correction to account for change in cj
+    if (cj_scaling_) {
+      if (cjratio != 1.0) N_VScale(2.0/(1.0 + cjratio), b, b);
+    }
+
+    log("IdasInterface::lsolveB", "end");
   }
 
   int IdasInterface::lsolveB_wrapper(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector xzB,
@@ -1196,79 +1258,6 @@ namespace casadi {
       return -1;
     }
   }
-
-  void IdasInterface::
-  lsetup(IdasMemory* m, IDAMem IDA_mem, N_Vector xz, N_Vector xzdot, N_Vector resp,
-         N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3) const {
-    log("IdasInterface::lsetup", "begin");
-
-    // Current time
-    double t = IDA_mem->ida_tn;
-
-    // Multiple of df_dydot to be added to the matrix
-    double cj = IDA_mem->ida_cj;
-
-    // Call the preconditioner setup function (which sets up the linear solver)
-    psetup(m, t, xz, xzdot, 0, cj, vtemp1, vtemp1, vtemp3);
-    log("IdasInterface::lsetup", "end");
-  }
-
-  void IdasInterface::
-  lsetupB(IdasMemory* m, double t, double cj, N_Vector xz, N_Vector xzdot, N_Vector xzB,
-          N_Vector xzdotB, N_Vector resp,
-          N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3) const {
-    log("IdasInterface::lsetupB", "begin");
-
-    // Call the preconditioner setup function (which sets up the linear solver)
-    psetupB(m, t, xz, xzdot, xzB, xzdotB, 0, cj, vtemp1, vtemp1, vtemp3);
-    log("IdasInterface::lsetupB", "end");
-  }
-
-
-  void IdasInterface::
-  lsolve(IdasMemory* m, IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector xz,
-         N_Vector xzdot, N_Vector rr) const {
-    log("IdasInterface::lsolve", "begin");
-    // Current time
-    double t = IDA_mem->ida_tn;
-
-    // Multiple of df_dydot to be added to the matrix
-    double cj = IDA_mem->ida_cj;
-
-    // Accuracy
-    double delta = 0.0;
-
-    // Call the preconditioner solve function (which solves the linear system)
-    psolve(m, t, xz, xzdot, rr, b, b, cj, delta, 0);
-
-    // Scale the correction to account for change in cj
-    if (cj_scaling_) {
-      double cjratio = IDA_mem->ida_cjratio;
-      if (cjratio != 1.0) N_VScale(2.0/(1.0 + cjratio), b, b);
-    }
-    log("IdasInterface::lsolve", "end");
-  }
-
-  void IdasInterface::
-  lsolveB(IdasMemory* m, double t, double cj, double cjratio, N_Vector b, N_Vector weight,
-          N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB,
-          N_Vector rr) const {
-    log("IdasInterface::lsolveB", "begin");
-
-    // Accuracy
-    double delta = 0.0;
-
-    // Call the preconditioner solve function (which solves the linear system)
-    psolveB(m, t, xz, xzdot, xzB, xzdotB, rr, b, b, cj, delta, 0);
-
-    // Scale the correction to account for change in cj
-    if (cj_scaling_) {
-      if (cjratio != 1.0) N_VScale(2.0/(1.0 + cjratio), b, b);
-    }
-
-    log("IdasInterface::lsolveB", "end");
-  }
-
 
   void IdasInterface::initDenseLinsol(IdasMemory* m) const {
     // Dense jacobian

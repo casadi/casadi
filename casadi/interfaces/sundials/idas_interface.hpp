@@ -189,8 +189,6 @@ namespace casadi {
   protected:
 
     // Sundials callback functions
-    void ehfun(IdasMemory* m, int error_code, const char *module, const char *function,
-               char *msg) const;
     void psolve(IdasMemory* m, double t, N_Vector xz, N_Vector xzdot, N_Vector rr, N_Vector rvec,
                 N_Vector zvec, double cj, double delta, N_Vector tmp) const;
     void psolveB(IdasMemory* m, double t, N_Vector xz, N_Vector xzdot, N_Vector xzB,
