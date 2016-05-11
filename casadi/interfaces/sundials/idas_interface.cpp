@@ -311,7 +311,8 @@ namespace casadi {
                                 N_Vector rr, void *user_data) {
     try {
       auto m = to_mem(user_data);
-      m->self.res(m, t, xz, xzdot, rr);
+      auto& s = m->self;
+      s.res(m, t, xz, xzdot, rr);
       return 0;
     } catch(int flag) { // recoverable error
       return flag;
@@ -325,7 +326,8 @@ namespace casadi {
                                    char *msg, void *eh_data) {
     try {
       auto m = to_mem(eh_data);
-      m->self.ehfun(m, error_code, module, function, msg);
+      auto& s = m->self;
+      s.ehfun(m, error_code, module, function, msg);
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "ehfun failed: " << e.what() << endl;
     }
@@ -355,7 +357,8 @@ namespace casadi {
                                    N_Vector tmp1, N_Vector tmp2) {
     try {
       auto m = to_mem(user_data);
-      m->self.jtimes(m, t, xz, xzdot, rr, v, Jv, cj, tmp1, tmp2);
+      auto& s = m->self;
+      s.jtimes(m, t, xz, xzdot, rr, v, Jv, cj, tmp1, tmp2);
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "jtimes failed: " << e.what() << endl;
@@ -386,7 +389,8 @@ namespace casadi {
                                     N_Vector tmp1B, N_Vector tmp2B) {
     try {
       auto m = to_mem(user_data);
-      m->self.jtimesB(m, t, xz, xzdot, xzB, xzdotB, resvalB, vB, JvB, cjB, tmp1B, tmp2B);
+      auto& s = m->self;
+      s.jtimesB(m, t, xz, xzdot, xzB, xzdotB, resvalB, vB, JvB, cjB, tmp1B, tmp2B);
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "jtimesB failed: " << e.what() << endl;
@@ -410,7 +414,8 @@ namespace casadi {
                                  N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) {
     try {
       auto m = to_mem(user_data);
-      m->self.resS(m, Ns, t, xz, xzdot, resval, xzF, xzdotF, rrF, tmp1, tmp2, tmp3);
+      auto& s = m->self;
+      s.resS(m, Ns, t, xz, xzdot, resval, xzF, xzdotF, rrF, tmp1, tmp2, tmp3);
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "resS failed: " << e.what() << endl;
@@ -808,7 +813,8 @@ namespace casadi {
                                  void *user_data) {
     try {
       auto m = to_mem(user_data);
-      m->self.rhsQ(m, t, xz, xzdot, rhsQ);
+      auto& s = m->self;
+      s.rhsQ(m, t, xz, xzdot, rhsQ);
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "rhsQ failed: " << e.what() << endl;
@@ -845,7 +851,8 @@ namespace casadi {
 
     try {
       auto m = to_mem(user_data);
-      m->self.rhsQS(m, Ns, t, xz, xzdot, xzF, xzdotF, rrQ, qdotF, tmp1, tmp2, tmp3);
+      auto& s = m->self;
+      s.rhsQS(m, Ns, t, xz, xzdot, xzF, xzdotF, rrQ, qdotF, tmp1, tmp2, tmp3);
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "rhsQS failed: " << e.what() << endl;
@@ -871,7 +878,8 @@ namespace casadi {
                                  N_Vector xzdotA, N_Vector rrA, void *user_data) {
     try {
       auto m = to_mem(user_data);
-      m->self.resB(m, t, xz, xzdot, xzA, xzdotA, rrA);
+      auto& s = m->self;
+      s.resB(m, t, xz, xzdot, xzA, xzdotA, rrA);
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "resB failed: " << e.what() << endl;
@@ -897,7 +905,8 @@ namespace casadi {
                                   N_Vector xzdotA, N_Vector qdotA, void *user_data) {
     try {
       auto m = to_mem(user_data);
-      m->self.rhsQB(m, t, y, xzdot, xzA, xzdotA, qdotA);
+      auto& s = m->self;
+      s.rhsQB(m, t, y, xzdot, xzA, xzdotA, qdotA);
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "rhsQB failed: " << e.what() << endl;
@@ -933,7 +942,8 @@ namespace casadi {
                                  N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) {
     try {
       auto m = to_mem(user_data);
-      m->self.djac(m, Neq, t, cj, xz, xzdot, rr, Jac, tmp1, tmp2, tmp3);
+      auto& s = m->self;
+      s.djac(m, Neq, t, cj, xz, xzdot, rr, Jac, tmp1, tmp2, tmp3);
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "djac failed: " << e.what() << endl;
@@ -971,7 +981,8 @@ namespace casadi {
                                   N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B) {
     try {
       auto m = to_mem(user_data);
-      m->self.djacB(m, NeqB, t, cjB, xz, xzdot, xzB, xzdotB, rrB, JacB, tmp1B, tmp2B, tmp3B);
+      auto& s = m->self;
+      s.djacB(m, NeqB, t, cjB, xz, xzdot, xzB, xzdotB, rrB, JacB, tmp1B, tmp2B, tmp3B);
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "djacB failed: " << e.what() << endl;
@@ -1008,7 +1019,8 @@ namespace casadi {
                                  N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) {
     try {
       auto m = to_mem(user_data);
-      m->self.bjac(m, Neq, mupper, mlower, t, cj, xz, xzdot, rr, Jac, tmp1, tmp2, tmp3);
+      auto& s = m->self;
+      s.bjac(m, Neq, mupper, mlower, t, cj, xz, xzdot, rr, Jac, tmp1, tmp2, tmp3);
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "bjac failed: " << e.what() << endl;
@@ -1048,7 +1060,8 @@ namespace casadi {
                 N_Vector tmp2B, N_Vector tmp3B) {
     try {
       auto m = to_mem(user_data);
-      m->self.bjacB(m, NeqB, mupperB, mlowerB, t, cjB, xz, xzdot, xzB, xzdotB,
+      auto& s = m->self;
+      s.bjacB(m, NeqB, mupperB, mlowerB, t, cjB, xz, xzdot, xzB, xzdotB,
                    resvalB, JacB, tmp1B, tmp2B, tmp3B);
       return 0;
     } catch(exception& e) {
@@ -1060,6 +1073,7 @@ namespace casadi {
   void IdasInterface::setStopTime(IntegratorMemory* mem, double tf) const {
     // Set the stop time of the integration -- don't integrate past this point
     auto m = to_mem(mem);
+    auto& s = m->self;
     int flag = IDASetStopTime(m->mem, tf);
     if (flag != IDA_SUCCESS) idas_error("IDASetStopTime", flag);
   }
@@ -1069,7 +1083,8 @@ namespace casadi {
                                     void *user_data, N_Vector tmp) {
     try {
       auto m = to_mem(user_data);
-      m->self.psolve(m, t, xz, xzdot, rr, rvec, zvec, cj, delta, tmp);
+      auto& s = m->self;
+      s.psolve(m, t, xz, xzdot, rr, rvec, zvec, cj, delta, tmp);
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "psolve failed: " << e.what() << endl;
@@ -1083,7 +1098,8 @@ namespace casadi {
                                     void *user_data, N_Vector tmpB) {
     try {
       auto m = to_mem(user_data);
-      m->self.psolveB(m, t, xz, xzdot, xzB, xzdotB, resvalB, rvecB, zvecB, cjB, deltaB, tmpB);
+      auto& s = m->self;
+      s.psolveB(m, t, xz, xzdot, xzB, xzdotB, resvalB, rvecB, zvecB, cjB, deltaB, tmpB);
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "psolveB failed: " << e.what() << endl;
@@ -1096,7 +1112,8 @@ namespace casadi {
                                    N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) {
     try {
       auto m = to_mem(user_data);
-      m->self.psetup(m, t, xz, xzdot, rr, cj, tmp1, tmp2, tmp3);
+      auto& s = m->self;
+      s.psetup(m, t, xz, xzdot, rr, cj, tmp1, tmp2, tmp3);
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "psetup failed: " << e.what() << endl;
@@ -1110,7 +1127,8 @@ namespace casadi {
                                     N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B) {
     try {
       auto m = to_mem(user_data);
-      m->self.psetupB(m, t, xz, xzdot, xzB, xzdotB, resvalB, cjB, tmp1B, tmp2B, tmp3B);
+      auto& s = m->self;
+      s.psetupB(m, t, xz, xzdot, xzB, xzdotB, resvalB, cjB, tmp1B, tmp2B, tmp3B);
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "psetupB failed: " << e.what() << endl;
@@ -1198,7 +1216,8 @@ namespace casadi {
                                     N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3) {
     try {
       auto m = to_mem(IDA_mem->ida_lmem);
-      m->self.lsetup(m, IDA_mem, xz, xzdot, resp, vtemp1, vtemp2, vtemp3);
+      auto& s = m->self;
+      s.lsetup(m, IDA_mem, xz, xzdot, resp, vtemp1, vtemp2, vtemp3);
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "lsetup failed: " << e.what() << endl;
@@ -1210,6 +1229,7 @@ namespace casadi {
                                      N_Vector vtemp1B, N_Vector vtemp2B, N_Vector vtemp3B) {
     try {
       auto m = to_mem(IDA_mem->ida_lmem);
+      auto& s = m->self;
       IDAadjMem IDAADJ_mem;
       //IDABMem IDAB_mem;
       int flag;
@@ -1230,7 +1250,7 @@ namespace casadi {
                                    NULL, NULL);
         if (flag != IDA_SUCCESS) casadi_error("Could not interpolate forward states");
       }
-      m->self.lsetupB(m, t, cj, IDAADJ_mem->ia_yyTmp,
+      s.lsetupB(m, t, cj, IDAADJ_mem->ia_yyTmp,
                       IDAADJ_mem->ia_ypTmp, xzB, xzdotB, respB, vtemp1B, vtemp2B, vtemp3B);
       return 0;
     } catch(exception& e) {
@@ -1244,7 +1264,8 @@ namespace casadi {
                                    N_Vector xzdot, N_Vector rr) {
     try {
       auto m = to_mem(IDA_mem->ida_lmem);
-      m->self.lsolve(m, IDA_mem, b, weight, xz, xzdot, rr);
+      auto& s = m->self;
+      s.lsolve(m, IDA_mem, b, weight, xz, xzdot, rr);
       return 0;
     } catch(int wrn) {
       /*    userOut<true, PL_WARN>() << "warning: " << wrn << endl;*/
@@ -1259,6 +1280,7 @@ namespace casadi {
                                     N_Vector xzdotB, N_Vector rrB) {
     try {
       auto m = to_mem(IDA_mem->ida_lmem);
+      auto& s = m->self;
       IDAadjMem IDAADJ_mem;
       //IDABMem IDAB_mem;
       int flag;
@@ -1280,7 +1302,7 @@ namespace casadi {
                                    NULL, NULL);
         if (flag != IDA_SUCCESS) casadi_error("Could not interpolate forward states");
       }
-      m->self.lsolveB(m, t, cj, cjratio, b, weight, IDAADJ_mem->ia_yyTmp,
+      s.lsolveB(m, t, cj, cjratio, b, weight, IDAADJ_mem->ia_yyTmp,
                      IDAADJ_mem->ia_ypTmp, xzB, xzdotB, rrB);
       return 0;
     } catch(int wrn) {
