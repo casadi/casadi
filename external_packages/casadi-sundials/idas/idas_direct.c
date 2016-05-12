@@ -1,14 +1,19 @@
 /*
  * -----------------------------------------------------------------
- * $Revision: 1.7 $
- * $Date: 2010/12/01 22:39:19 $
+ * $Revision: 4272 $
+ * $Date: 2014-12-02 11:19:41 -0800 (Tue, 02 Dec 2014) $
  * ----------------------------------------------------------------- 
  * Programmer: Radu Serban @ LLNL
  * -----------------------------------------------------------------
- * Copyright (c) 2006, The Regents of the University of California.
+ * LLNS Copyright Start
+ * Copyright (c) 2014, Lawrence Livermore National Security
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Lawrence Livermore National Laboratory in part under 
+ * Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
  * Produced at the Lawrence Livermore National Laboratory.
  * All rights reserved.
  * For details, see the LICENSE file.
+ * LLNS Copyright End
  * -----------------------------------------------------------------
  * This is the implementation file for an IDASDLS linear solver.
  * -----------------------------------------------------------------
@@ -48,12 +53,22 @@ static int idaDlsDenseJacBWrapper(long int NeqB, realtype tt, realtype c_jB,
                                   DlsMat JacB, void *ida_mem,
                                   N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
 
+static int idaDlsDenseJacBSWrapper(long int NeqB, realtype tt, realtype c_jB,
+                                   N_Vector yyB, N_Vector ypB, N_Vector rBr, 
+                                   DlsMat JacB, void *ida_mem,
+                                   N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
 
 static int idaDlsBandJacBWrapper(long int NeqB, long int mupperB, long int mlowerB,
                                  realtype tt, realtype c_jB, 
                                  N_Vector yyB, N_Vector ypB, N_Vector rrB,
                                  DlsMat JacB, void *ida_mem,
                                  N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
+
+static int idaDlsBandJacBSWrapper(long int NeqB, long int mupperB, long int mlowerB,
+                                  realtype tt, realtype c_jB, 
+                                  N_Vector yyB, N_Vector ypB, N_Vector rrB,
+                                  DlsMat JacB, void *ida_mem,
+                                  N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
 
 /*
  * =================================================================
@@ -365,7 +380,7 @@ int idaDlsDenseDQJac(long int N, realtype tt, realtype c_j,
   yp_data  = N_VGetArrayPointer(yp);
   if(constraints!=NULL) cns_data = N_VGetArrayPointer(constraints);
 
-  srur = RSqrt(uround);
+  srur = SUNRsqrt(uround);
 
   for (j=0; j < N; j++) {
 
@@ -380,7 +395,7 @@ int idaDlsDenseDQJac(long int N, realtype tt, realtype c_j,
     adjustments using yp_j and ewt_j if this is small, and a further
     adjustment to give it the same sign as hh*yp_j. */
 
-    inc = MAX( srur * MAX( ABS(yj), ABS(hh*ypj) ) , ONE/ewt_data[j] );
+    inc = SUNMAX( srur * SUNMAX( SUNRabs(yj), SUNRabs(hh*ypj) ) , ONE/ewt_data[j] );
 
     if (hh*ypj < ZERO) inc = -inc;
     inc = (yj + inc) - yj;
@@ -388,8 +403,8 @@ int idaDlsDenseDQJac(long int N, realtype tt, realtype c_j,
     /* Adjust sign(inc) again if y_j has an inequality constraint. */
     if (constraints != NULL) {
       conj = cns_data[j];
-      if (ABS(conj) == ONE)      {if((yj+inc)*conj <  ZERO) inc = -inc;}
-      else if (ABS(conj) == TWO) {if((yj+inc)*conj <= ZERO) inc = -inc;}
+      if (SUNRabs(conj) == ONE)      {if((yj+inc)*conj <  ZERO) inc = -inc;}
+      else if (SUNRabs(conj) == TWO) {if((yj+inc)*conj <= ZERO) inc = -inc;}
     }
 
     /* Increment y_j and yp_j, call res, and break on error return. */
@@ -482,9 +497,9 @@ int idaDlsBandDQJac(long int N, long int mupper, long int mlower,
 
   /* Compute miscellaneous values for the Jacobian computation. */
 
-  srur = RSqrt(uround);
+  srur = SUNRsqrt(uround);
   width = mlower + mupper + 1;
-  ngroups = MIN(width, N);
+  ngroups = SUNMIN(width, N);
 
   /* Loop over column groups. */
   for (group=1; group <= ngroups; group++) {
@@ -500,7 +515,7 @@ int idaDlsBandDQJac(long int N, long int mupper, long int mlower,
         adjustments using ypj and ewtj if this is small, and a further
         adjustment to give it the same sign as hh*ypj. */
 
-        inc = MAX( srur * MAX( ABS(yj), ABS(hh*ypj) ) , ONE/ewtj );
+        inc = SUNMAX( srur * SUNMAX( SUNRabs(yj), SUNRabs(hh*ypj) ) , ONE/ewtj );
 
         if (hh*ypj < ZERO) inc = -inc;
         inc = (yj + inc) - yj;
@@ -509,8 +524,8 @@ int idaDlsBandDQJac(long int N, long int mupper, long int mlower,
 
         if (constraints != NULL) {
           conj = cns_data[j];
-          if (ABS(conj) == ONE)      {if((yj+inc)*conj <  ZERO) inc = -inc;}
-          else if (ABS(conj) == TWO) {if((yj+inc)*conj <= ZERO) inc = -inc;}
+          if (SUNRabs(conj) == ONE)      {if((yj+inc)*conj <  ZERO) inc = -inc;}
+          else if (SUNRabs(conj) == TWO) {if((yj+inc)*conj <= ZERO) inc = -inc;}
         }
 
         /* Increment yj and ypj. */
@@ -538,20 +553,20 @@ int idaDlsBandDQJac(long int N, long int mupper, long int mlower,
       
       /* Set increment inc exactly as above. */
 
-      inc = MAX( srur * MAX( ABS(yj), ABS(hh*ypj) ) , ONE/ewtj );
+      inc = SUNMAX( srur * SUNMAX( SUNRabs(yj), SUNRabs(hh*ypj) ) , ONE/ewtj );
       if (hh*ypj < ZERO) inc = -inc;
       inc = (yj + inc) - yj;
       if (constraints != NULL) {
         conj = cns_data[j];
-        if (ABS(conj) == ONE)      {if((yj+inc)*conj <  ZERO) inc = -inc;}
-        else if (ABS(conj) == TWO) {if((yj+inc)*conj <= ZERO) inc = -inc;}
+        if (SUNRabs(conj) == ONE)      {if((yj+inc)*conj <  ZERO) inc = -inc;}
+        else if (SUNRabs(conj) == TWO) {if((yj+inc)*conj <= ZERO) inc = -inc;}
       }
       
       /* Load the difference quotient Jacobian elements for column j. */
 
       inc_inv = ONE/inc;
-      i1 = MAX(0, j-mupper);
-      i2 = MIN(j+mlower,N-1);
+      i1 = SUNMAX(0, j-mupper);
+      i2 = SUNMIN(j+mlower,N-1);
       
       for (i=i1; i<=i2; i++) 
             BAND_COL_ELEM(col_j,i,j) = inc_inv*(rtemp_data[i]-r_data[i]);
@@ -573,7 +588,10 @@ int idaDlsBandDQJac(long int N, long int mupper, long int mlower,
 /* Additional readability replacements */
 #define yyTmp       (IDAADJ_mem->ia_yyTmp)
 #define ypTmp       (IDAADJ_mem->ia_ypTmp)
+#define yySTmp      (IDAADJ_mem->ia_yySTmp)
+#define ypSTmp      (IDAADJ_mem->ia_ypSTmp)
 #define noInterp    (IDAADJ_mem->ia_noInterp)
+#define interpSensi (IDAADJ_mem->ia_interpSensi)
 
 /*
  * -----------------------------------------------------------------
@@ -639,6 +657,64 @@ int IDADlsSetDenseJacFnB(void *ida_mem, int which, IDADlsDenseJacFnB jacB)
   return(flag);
 }
 
+int IDADlsSetDenseJacFnBS(void *ida_mem, int which, IDADlsDenseJacFnBS jacBS)
+{
+  IDAMem IDA_mem;
+  IDAadjMem IDAADJ_mem;
+  IDABMem IDAB_mem;
+  IDADlsMemB idadlsB_mem;
+  void *ida_memB;
+  int flag;
+  
+  /* Is ida_mem allright? */
+  if (ida_mem == NULL) {
+    IDAProcessError(NULL, IDADLS_MEM_NULL, "IDASDLS", "IDADlsSetDenseJacFnBS", MSGD_CAMEM_NULL);
+    return(IDADLS_MEM_NULL);
+  }
+  IDA_mem = (IDAMem) ida_mem;
+
+  /* Is ASA initialized? */
+  if (IDA_mem->ida_adjMallocDone == FALSE) {
+    IDAProcessError(IDA_mem, IDADLS_NO_ADJ, "IDASDLS", "IDADlsSetDenseJacFnBS",  MSGD_NO_ADJ);
+    return(IDADLS_NO_ADJ);
+  }
+  IDAADJ_mem = IDA_mem->ida_adj_mem;
+
+  /* Check the value of which */
+  if ( which >= IDAADJ_mem->ia_nbckpbs ) {
+    IDAProcessError(IDA_mem, IDADLS_ILL_INPUT, "IDASDLS", "IDADlsSetDenseJacFnBS", MSGD_BAD_WHICH);
+    return(IDADLS_ILL_INPUT);
+  }
+
+  /* Find the IDABMem entry in the linked list corresponding to 'which'. */
+  IDAB_mem = IDAADJ_mem->IDAB_mem;
+  while (IDAB_mem != NULL) {
+    if( which == IDAB_mem->ida_index ) break;
+    /* advance */
+    IDAB_mem = IDAB_mem->ida_next;
+  }
+
+  /* Get the IDAMem corresponding to this backward problem. */
+  ida_memB = (void*) IDAB_mem->IDA_mem;
+
+  if (IDAB_mem->ida_lmem == NULL) {
+    IDAProcessError(IDAB_mem->IDA_mem, IDADLS_LMEMB_NULL, 
+                    "IDASDLS", "IDADlsSetDenseJacFnBS", MSGD_LMEMB_NULL);
+    return(IDADLS_LMEMB_NULL);
+  }
+  idadlsB_mem = (IDADlsMemB) IDAB_mem->ida_lmem;
+
+  idadlsB_mem->d_djacBS = jacBS;
+
+  if (jacBS != NULL) {
+    flag = IDADlsSetDenseJacFn(ida_memB, idaDlsDenseJacBSWrapper);
+  } else {
+    flag = IDADlsSetDenseJacFn(ida_memB, NULL);
+  }
+
+  return(flag);
+}
+
 int IDADlsSetBandJacFnB(void *ida_mem, int which, IDADlsBandJacFnB jacB)
 {
   IDAMem IDA_mem;
@@ -697,6 +773,65 @@ int IDADlsSetBandJacFnB(void *ida_mem, int which, IDADlsBandJacFnB jacB)
   return(flag);
 }
 
+int IDADlsSetBandJacFnBS(void *ida_mem, int which, IDADlsBandJacFnBS jacBS)
+{
+  IDAMem IDA_mem;
+  IDAadjMem IDAADJ_mem;
+  IDABMem IDAB_mem;
+  IDADlsMemB idadlsB_mem;
+  void *ida_memB;
+  int flag;
+  
+  /* Is ida_mem allright? */
+  if (ida_mem == NULL) {
+    IDAProcessError(NULL, IDADLS_MEM_NULL, "IDASDLS", "IDADlsSetBandJacFnBS", MSGD_CAMEM_NULL);
+    return(IDADLS_MEM_NULL);
+  }
+  IDA_mem = (IDAMem) ida_mem;
+
+  /* Is ASA initialized? */
+  if (IDA_mem->ida_adjMallocDone == FALSE) {
+    IDAProcessError(IDA_mem, IDADLS_NO_ADJ, "IDASDLS", "IDADlsSetBandJacFnBS",  MSGD_NO_ADJ);
+    return(IDADLS_NO_ADJ);
+  }
+  IDAADJ_mem = IDA_mem->ida_adj_mem;
+
+  /* Check the value of which */
+  if ( which >= IDAADJ_mem->ia_nbckpbs ) {
+    IDAProcessError(IDA_mem, IDADLS_ILL_INPUT, "IDASDLS", "IDADlsSetBandJacFnBS", MSGD_BAD_WHICH);
+    return(IDADLS_ILL_INPUT);
+  }
+
+  /* Find the IDABMem entry in the linked list corresponding to 'which'. */
+  IDAB_mem = IDAADJ_mem->IDAB_mem;
+  while (IDAB_mem != NULL) {
+    if( which == IDAB_mem->ida_index ) break;
+    /* advance */
+    IDAB_mem = IDAB_mem->ida_next;
+  }
+
+  /* Get the IDAMem corresponding to this backward problem. */
+  ida_memB = (void*) IDAB_mem->IDA_mem;
+
+  if (IDAB_mem->ida_lmem == NULL) {
+    IDAProcessError(IDAB_mem->IDA_mem, IDADLS_LMEMB_NULL, 
+                    "IDASDLS", "IDADlsSetBandJacFnBS", MSGD_LMEMB_NULL);
+    return(IDADLS_LMEMB_NULL);
+  }
+  idadlsB_mem = (IDADlsMemB) IDAB_mem->ida_lmem;
+
+  idadlsB_mem->d_bjacBS = jacBS;
+
+  if (jacBS != NULL) {
+    flag = IDADlsSetBandJacFn(ida_memB, idaDlsBandJacBSWrapper);
+  } else {
+    flag = IDADlsSetBandJacFn(ida_memB, NULL);
+  }
+
+  return(flag);
+}
+
+
 /*
  * -----------------------------------------------------------------
  * PRIVATE INTERFACE FUNCTIONS
@@ -735,7 +870,7 @@ static int idaDlsDenseJacBWrapper(long int NeqB, realtype tt, realtype c_jB,
   if (noInterp == FALSE) {
     flag = IDAADJ_mem->ia_getY(IDA_mem, tt, yyTmp, ypTmp, NULL, NULL);
     if (flag != IDA_SUCCESS) {
-      IDAProcessError(IDAB_mem->IDA_mem, -1, "IDASDLS", "idaDlsDenseJacWrapper", MSGD_BAD_T);
+      IDAProcessError(IDAB_mem->IDA_mem, -1, "IDASDLS", "idaDlsDenseJacBWrapper", MSGD_BAD_T);
       return(-1);
     }
   }
@@ -743,6 +878,56 @@ static int idaDlsDenseJacBWrapper(long int NeqB, realtype tt, realtype c_jB,
   /* Call user's adjoint dense djacB routine */
   flag = idadlsB_mem->d_djacB(NeqB, tt, c_jB, 
                               yyTmp, ypTmp, 
+                              yyB, ypB, rrB, 
+                              JacB, IDAB_mem->ida_user_data, 
+                              tmp1B, tmp2B, tmp3B);
+  return(flag);
+}
+
+/*
+ * idaDlsDenseJacBSWrapper
+ *
+ * This routine interfaces to the IDADenseJacFnBS routine provided 
+ * by the user. idaDlsDenseJacBSWrapper is of type IDADlsDenseJacFn.
+ * NOTE: data actually contains ida_mem
+ */
+
+static int idaDlsDenseJacBSWrapper(long int NeqB, realtype tt, realtype c_jB,
+                                  N_Vector yyB, N_Vector ypB, N_Vector rrB,
+                                  DlsMat JacB, void *ida_mem, 
+                                  N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B)
+{
+  IDAadjMem IDAADJ_mem;
+  IDAMem IDA_mem;
+  IDABMem IDAB_mem;
+  IDADlsMemB idadlsB_mem;
+  int flag;
+
+  IDA_mem = (IDAMem) ida_mem;
+  IDAADJ_mem = IDA_mem->ida_adj_mem;
+
+  /* Get current backward problem. */
+  IDAB_mem = IDAADJ_mem->ia_bckpbCrt;
+  
+  /* Get linear solver's data for this backward problem. */
+  idadlsB_mem = (IDADlsMemB) IDAB_mem->ida_lmem;
+
+  /* Get forward solution from interpolation. */
+  if( noInterp == FALSE) {
+    if (interpSensi)
+      flag = IDAADJ_mem->ia_getY(IDA_mem, tt, yyTmp, ypTmp, yySTmp, ypSTmp);
+    else
+      flag = IDAADJ_mem->ia_getY(IDA_mem, tt, yyTmp, ypTmp, NULL, NULL);
+  
+    if (flag != IDA_SUCCESS) {
+      IDAProcessError(IDAB_mem->IDA_mem, -1, "IDASDLS", "idaDlsDenseJacBSWrapper", MSGD_BAD_T);
+      return(-1);
+    }
+  }
+
+  /* Call user's adjoint dense djacBS routine */
+  flag = idadlsB_mem->d_djacBS(NeqB, tt, c_jB, 
+                              yyTmp, ypTmp, yySTmp, ypSTmp, 
                               yyB, ypB, rrB, 
                               JacB, IDAB_mem->ida_user_data, 
                               tmp1B, tmp2B, tmp3B);
@@ -782,7 +967,7 @@ static int idaDlsBandJacBWrapper(long int NeqB, long int mupperB, long int mlowe
   if (noInterp == FALSE) {
     flag = IDAADJ_mem->ia_getY(IDA_mem, tt, yyTmp, ypTmp, NULL, NULL);
     if (flag != IDA_SUCCESS) {
-      IDAProcessError(IDAB_mem->IDA_mem, -1, "IDASDLS", "idaDlsBandJacWrapper", MSGD_BAD_T);
+      IDAProcessError(IDAB_mem->IDA_mem, -1, "IDASDLS", "idaDlsBandJacBWrapper", MSGD_BAD_T);
       return(-1);
     }
   }
@@ -791,6 +976,58 @@ static int idaDlsBandJacBWrapper(long int NeqB, long int mupperB, long int mlowe
   flag = idadlsB_mem->d_bjacB(NeqB, mupperB, mlowerB, 
                               tt, c_jB,
                               yyTmp, ypTmp, 
+                              yyB, ypB, rrB,
+                              JacB, IDAB_mem->ida_user_data, 
+                              tmp1B, tmp2B, tmp3B);
+  return(flag);
+}
+
+/*
+ * idaDlsBandJacBSWrapper
+ *
+ * This routine interfaces to the IDABandJacFnBS routine provided 
+ * by the user. idaDlsBandJacBSWrapper is of type IDADlsBandJacFn.
+ * NOTE: data actually contains ida_mem
+ */
+
+static int idaDlsBandJacBSWrapper(long int NeqB, long int mupperB, long int mlowerB, 
+                                 realtype tt, realtype c_jB, 
+                                 N_Vector yyB, N_Vector ypB, N_Vector rrB, 
+                                 DlsMat JacB, void *ida_mem, 
+                                 N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B)
+{
+  IDAadjMem IDAADJ_mem;
+  IDAMem IDA_mem;
+  IDABMem IDAB_mem;
+  IDADlsMemB idadlsB_mem;
+  int flag;
+
+  IDA_mem = (IDAMem) ida_mem;
+  IDAADJ_mem = IDA_mem->ida_adj_mem;
+
+  /* Get current backward problem. */
+  IDAB_mem = IDAADJ_mem->ia_bckpbCrt;
+  
+  /* Get linear solver's data for this backward problem. */
+  idadlsB_mem = (IDADlsMemB) IDAB_mem->ida_lmem;
+
+  /* Get forward solution from interpolation. */
+  if( noInterp == FALSE) {
+    if (interpSensi)
+      flag = IDAADJ_mem->ia_getY(IDA_mem, tt, yyTmp, ypTmp, yySTmp, ypSTmp);
+    else
+      flag = IDAADJ_mem->ia_getY(IDA_mem, tt, yyTmp, ypTmp, NULL, NULL);
+  
+    if (flag != IDA_SUCCESS) {
+      IDAProcessError(IDAB_mem->IDA_mem, -1, "IDASDLS", "idaDlsBandJacBSWrapper", MSGD_BAD_T);
+      return(-1);
+    }
+  }
+
+  /* Call user's adjoint band bjacBS routine */
+  flag = idadlsB_mem->d_bjacBS(NeqB, mupperB, mlowerB, 
+                              tt, c_jB,
+                              yyTmp, ypTmp, yySTmp, ypSTmp, 
                               yyB, ypB, rrB,
                               JacB, IDAB_mem->ida_user_data, 
                               tmp1B, tmp2B, tmp3B);

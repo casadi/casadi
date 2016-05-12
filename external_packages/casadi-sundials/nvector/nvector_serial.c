@@ -1,15 +1,20 @@
 /*
  * -----------------------------------------------------------------
- * $Revision: 1.1 $
- * $Date: 2006/07/05 15:32:37 $
+ * $Revision: 4272 $
+ * $Date: 2014-12-02 11:19:41 -0800 (Tue, 02 Dec 2014) $
  * ----------------------------------------------------------------- 
  * Programmer(s): Scott D. Cohen, Alan C. Hindmarsh, Radu Serban,
  *                and Aaron Collier @ LLNL
  * -----------------------------------------------------------------
- * Copyright (c) 2002, The Regents of the University of California.
+ * LLNS Copyright Start
+ * Copyright (c) 2014, Lawrence Livermore National Security
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Lawrence Livermore National Laboratory in part under 
+ * Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
  * Produced at the Lawrence Livermore National Laboratory.
  * All rights reserved.
  * For details, see the LICENSE file.
+ * LLNS Copyright End
  * -----------------------------------------------------------------
  * This is the implementation file for a serial implementation
  * of the NVECTOR package.
@@ -100,7 +105,6 @@ N_Vector N_VNewEmpty_Serial(long int length)
   ops->nvinvtest         = N_VInvTest_Serial;
   ops->nvconstrmask      = N_VConstrMask_Serial;
   ops->nvminquotient     = N_VMinQuotient_Serial;
-  ops->nvlength          = N_VLength_Serial;
 
   /* Create content */
   content = NULL;
@@ -254,9 +258,9 @@ void N_VPrint_Serial(N_Vector x)
 
   for (i = 0; i < N; i++) {
 #if defined(SUNDIALS_EXTENDED_PRECISION)
-    printf("%11.8Lg\n", xd[i]);
+    printf("%35.32Lg\n", xd[i]);
 #elif defined(SUNDIALS_DOUBLE_PRECISION)
-    printf("%11.8lg\n", xd[i]);
+    printf("%19.16g\n", xd[i]);
 #else
     printf("%11.8g\n", xd[i]);
 #endif
@@ -315,7 +319,6 @@ N_Vector N_VCloneEmpty_Serial(N_Vector w)
   ops->nvinvtest         = w->ops->nvinvtest;
   ops->nvconstrmask      = w->ops->nvconstrmask;
   ops->nvminquotient     = w->ops->nvminquotient;
-  ops->nvlength          = w->ops->nvlength;
 
   /* Create content */
   content = NULL;
@@ -572,7 +575,7 @@ void N_VAbs_Serial(N_Vector x, N_Vector z)
   zd = NV_DATA_S(z);
 
   for (i = 0; i < N; i++)
-    zd[i] = ABS(xd[i]);
+    zd[i] = SUNRabs(xd[i]);
 
   return;
 }
@@ -641,7 +644,7 @@ realtype N_VMaxNorm_Serial(N_Vector x)
   xd = NV_DATA_S(x);
 
   for (i = 0; i < N; i++) {
-    if (ABS(xd[i]) > max) max = ABS(xd[i]);
+    if (SUNRabs(xd[i]) > max) max = SUNRabs(xd[i]);
   }
 
   return(max);
@@ -661,10 +664,10 @@ realtype N_VWrmsNorm_Serial(N_Vector x, N_Vector w)
 
   for (i = 0; i < N; i++) {
     prodi = xd[i]*wd[i];
-    sum += SQR(prodi);
+    sum += SUNSQR(prodi);
   }
 
-  return(RSqrt(sum/N));
+  return(SUNRsqrt(sum/N));
 }
 
 realtype N_VWrmsNormMask_Serial(N_Vector x, N_Vector w, N_Vector id)
@@ -683,11 +686,11 @@ realtype N_VWrmsNormMask_Serial(N_Vector x, N_Vector w, N_Vector id)
   for (i = 0; i < N; i++) {
     if (idd[i] > ZERO) {
       prodi = xd[i]*wd[i];
-      sum += SQR(prodi);
+      sum += SUNSQR(prodi);
     }
   }
 
-  return(RSqrt(sum / N));
+  return(SUNRsqrt(sum / N));
 }
 
 realtype N_VMin_Serial(N_Vector x)
@@ -723,10 +726,10 @@ realtype N_VWL2Norm_Serial(N_Vector x, N_Vector w)
 
   for (i = 0; i < N; i++) {
     prodi = xd[i]*wd[i];
-    sum += SQR(prodi);
+    sum += SUNSQR(prodi);
   }
 
-  return(RSqrt(sum));
+  return(SUNRsqrt(sum));
 }
 
 realtype N_VL1Norm_Serial(N_Vector x)
@@ -741,7 +744,7 @@ realtype N_VL1Norm_Serial(N_Vector x)
   xd = NV_DATA_S(x);
   
   for (i = 0; i<N; i++)  
-    sum += ABS(xd[i]);
+    sum += SUNRabs(xd[i]);
 
   return(sum);
 }
@@ -758,7 +761,7 @@ void N_VCompare_Serial(realtype c, N_Vector x, N_Vector z)
   zd = NV_DATA_S(z);
 
   for (i = 0; i < N; i++) {
-    zd[i] = (ABS(xd[i]) >= c) ? ONE : ZERO;
+    zd[i] = (SUNRabs(xd[i]) >= c) ? ONE : ZERO;
   }
 
   return;
@@ -768,6 +771,7 @@ booleantype N_VInvTest_Serial(N_Vector x, N_Vector z)
 {
   long int i, N;
   realtype *xd, *zd;
+  booleantype no_zero_found;
 
   xd = zd = NULL;
 
@@ -775,12 +779,15 @@ booleantype N_VInvTest_Serial(N_Vector x, N_Vector z)
   xd = NV_DATA_S(x);
   zd = NV_DATA_S(z);
 
+  no_zero_found = TRUE;
   for (i = 0; i < N; i++) {
-    if (xd[i] == ZERO) return(FALSE);
-    zd[i] = ONE/xd[i];
+    if (xd[i] == ZERO) 
+      no_zero_found = FALSE;
+    else
+      zd[i] = ONE/xd[i];
   }
 
-  return(TRUE);
+  return no_zero_found;
 }
 
 booleantype N_VConstrMask_Serial(N_Vector c, N_Vector x, N_Vector m)
@@ -831,7 +838,7 @@ realtype N_VMinQuotient_Serial(N_Vector num, N_Vector denom)
   for (i = 0; i < N; i++) {
     if (dd[i] == ZERO) continue;
     else {
-      if (!notEvenOnce) min = MIN(min, nd[i]/dd[i]);
+      if (!notEvenOnce) min = SUNMIN(min, nd[i]/dd[i]);
       else {
 	min = nd[i]/dd[i];
         notEvenOnce = FALSE;
@@ -840,11 +847,6 @@ realtype N_VMinQuotient_Serial(N_Vector num, N_Vector denom)
   }
 
   return(min);
-}
-
-long int N_VLength_Serial(N_Vector x)
-{
-  return NV_LENGTH_S(x);
 }
 
 /*

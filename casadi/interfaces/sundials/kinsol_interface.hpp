@@ -38,6 +38,7 @@
 #include <kinsol/kinsol_spbcgs.h>
 #include <kinsol/kinsol_sptfqmr.h>
 #include <kinsol/kinsol_impl.h> /* Needed for the provided linear solver */
+#include <kinsol/kinsol_spils_impl.h> /* Needed for the provided linear solver */
 #include <ctime>
 
 /** \defgroup plugin_Rootfinder_kinsol
@@ -174,7 +175,7 @@ namespace casadi {
       return m;
     }
 
-    /** \brief Callback functions */
+    /** \brief Callback functions (to be updated) */
     void func(KinsolMemory& m, N_Vector u, N_Vector fval) const;
     void djac(KinsolMemory& m, long N, N_Vector u, N_Vector fu,
               DlsMat J, N_Vector tmp1, N_Vector tmp2) const;
@@ -197,10 +198,12 @@ namespace casadi {
                               void* user_data, N_Vector tmp1, N_Vector tmp2);
     static int psolve_wrapper(N_Vector u, N_Vector uscale, N_Vector fval, N_Vector fscale,
                               N_Vector v, void* user_data, N_Vector tmp);
-    static int lsetup_wrapper(KINMem kin_mem);
-    static int lsolve_wrapper(KINMem kin_mem, N_Vector x, N_Vector b, double *res_norm);
-    static void ehfun_wrapper(int error_code, const char *module, const char *function,
-                              char *msg, void *eh_data);
+
+    /** \brief Callback functions (updated) */
+    static int lsetup(KINMem kin_mem);
+    static int lsolve(KINMem kin_mem, N_Vector x, N_Vector b, double *sJpnorm, double *sFdotJp);
+    static void ehfun(int error_code, const char *module, const char *function,
+                      char *msg, void *eh_data);
   };
 
 } // namespace casadi

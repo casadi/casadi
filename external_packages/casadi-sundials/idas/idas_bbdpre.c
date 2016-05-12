@@ -1,14 +1,19 @@
 /*
  * -----------------------------------------------------------------
- * $Revision: 1.11 $
- * $Date: 2011/03/23 21:12:45 $
+ * $Revision: 4272 $
+ * $Date: 2014-12-02 11:19:41 -0800 (Tue, 02 Dec 2014) $
  * ----------------------------------------------------------------- 
  * Programmer(s): Alan C. Hindmarsh and Radu Serban @ LLNL
  * -----------------------------------------------------------------
- * Copyright (c) 2002, The Regents of the University of California.
+ * LLNS Copyright Start
+ * Copyright (c) 2014, Lawrence Livermore National Security
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Lawrence Livermore National Laboratory in part under 
+ * Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
  * Produced at the Lawrence Livermore National Laboratory.
  * All rights reserved.
  * For details, see the LICENSE file.
+ * LLNS Copyright End
  * -----------------------------------------------------------------
  * This file contains implementations of routines for a
  * band-block-diagonal preconditioner, i.e. a block-diagonal
@@ -138,15 +143,15 @@ int IDABBDPrecInit(void *ida_mem, long int Nlocal,
   pdata->ida_mem = IDA_mem;
   pdata->glocal = Gres;
   pdata->gcomm = Gcomm;
-  pdata->mudq = MIN(Nlocal-1, MAX(0, mudq));
-  pdata->mldq = MIN(Nlocal-1, MAX(0, mldq));
-  muk = MIN(Nlocal-1, MAX(0, mukeep));
-  mlk = MIN(Nlocal-1, MAX(0, mlkeep));
+  pdata->mudq = SUNMIN(Nlocal-1, SUNMAX(0, mudq));
+  pdata->mldq = SUNMIN(Nlocal-1, SUNMAX(0, mldq));
+  muk = SUNMIN(Nlocal-1, SUNMAX(0, mukeep));
+  mlk = SUNMIN(Nlocal-1, SUNMAX(0, mlkeep));
   pdata->mukeep = muk;
   pdata->mlkeep = mlk;
 
   /* Set extended upper half-bandwidth for PP (required for pivoting). */
-  storage_mu = MIN(Nlocal-1, muk+mlk);
+  storage_mu = SUNMIN(Nlocal-1, muk+mlk);
 
   /* Allocate memory for preconditioner matrix. */
   pdata->PP = NULL;
@@ -180,7 +185,7 @@ int IDABBDPrecInit(void *ida_mem, long int Nlocal,
   pdata->tempv4 = tempv4;
   
   /* Set rel_yy based on input value dq_rel_yy (0 implies default). */
-  pdata->rel_yy = (dq_rel_yy > ZERO) ? dq_rel_yy : RSqrt(uround); 
+  pdata->rel_yy = (dq_rel_yy > ZERO) ? dq_rel_yy : SUNRsqrt(uround); 
 
   /* Store Nlocal to be used in IDABBDPrecSetup */
   pdata->n_local = Nlocal;
@@ -233,11 +238,11 @@ int IDABBDPrecReInit(void *ida_mem,
 
   /* Load half-bandwidths. */
   Nlocal = pdata->n_local;
-  pdata->mudq = MIN(Nlocal-1, MAX(0, mudq));
-  pdata->mldq = MIN(Nlocal-1, MAX(0, mldq));
+  pdata->mudq = SUNMIN(Nlocal-1, SUNMAX(0, mudq));
+  pdata->mldq = SUNMIN(Nlocal-1, SUNMAX(0, mldq));
 
   /* Set rel_yy based on input value dq_rel_yy (0 implies default). */
-  pdata->rel_yy = (dq_rel_yy > ZERO) ? dq_rel_yy : RSqrt(uround); 
+  pdata->rel_yy = (dq_rel_yy > ZERO) ? dq_rel_yy : SUNRsqrt(uround); 
 
   /* Re-initialize nge */
   pdata->nge = 0;
@@ -530,7 +535,7 @@ static int IBBDDQJac(IBBDPrecData pdata, realtype tt, realtype cj,
   /* Set bandwidth and number of column groups for band differencing. */
 
   width = mldq + mudq + 1;
-  ngroups = MIN(width, Nlocal);
+  ngroups = SUNMIN(width, Nlocal);
 
   /* Loop over groups. */
   for(group = 1; group <= ngroups; group++) {
@@ -544,15 +549,15 @@ static int IBBDDQJac(IBBDPrecData pdata, realtype tt, realtype cj,
       /* Set increment inc to yj based on rel_yy*abs(yj), with
          adjustments using ypj and ewtj if this is small, and a further
          adjustment to give it the same sign as hh*ypj. */
-      inc = rel_yy*MAX(ABS(yj), MAX( ABS(hh*ypj), ONE/ewtj));
+      inc = rel_yy*SUNMAX(SUNRabs(yj), SUNMAX( SUNRabs(hh*ypj), ONE/ewtj));
       if (hh*ypj < ZERO) inc = -inc;
       inc = (yj + inc) - yj;
       
       /* Adjust sign(inc) again if yj has an inequality constraint. */
       if (constraints != NULL) {
         conj = cnsdata[j];
-        if (ABS(conj) == ONE)      {if ((yj+inc)*conj <  ZERO) inc = -inc;}
-        else if (ABS(conj) == TWO) {if ((yj+inc)*conj <= ZERO) inc = -inc;}
+        if (SUNRabs(conj) == ONE)      {if ((yj+inc)*conj <  ZERO) inc = -inc;}
+        else if (SUNRabs(conj) == TWO) {if ((yj+inc)*conj <= ZERO) inc = -inc;}
       }
 
       /* Increment yj and ypj. */
@@ -574,20 +579,20 @@ static int IBBDDQJac(IBBDPrecData pdata, realtype tt, realtype cj,
       ewtj = ewtdata[j];
 
       /* Set increment inc as before .*/
-      inc = rel_yy*MAX(ABS(yj), MAX( ABS(hh*ypj), ONE/ewtj));
+      inc = rel_yy*SUNMAX(SUNRabs(yj), SUNMAX( SUNRabs(hh*ypj), ONE/ewtj));
       if (hh*ypj < ZERO) inc = -inc;
       inc = (yj + inc) - yj;
       if (constraints != NULL) {
         conj = cnsdata[j];
-        if (ABS(conj) == ONE)      {if ((yj+inc)*conj <  ZERO) inc = -inc;}
-        else if (ABS(conj) == TWO) {if ((yj+inc)*conj <= ZERO) inc = -inc;}
+        if (SUNRabs(conj) == ONE)      {if ((yj+inc)*conj <  ZERO) inc = -inc;}
+        else if (SUNRabs(conj) == TWO) {if ((yj+inc)*conj <= ZERO) inc = -inc;}
       }
 
       /* Form difference quotients and load into PP. */
       inc_inv = ONE/inc;
       col_j = BAND_COL(PP,j);
-      i1 = MAX(0, j-mukeep);
-      i2 = MIN(j+mlkeep, Nlocal-1);
+      i1 = SUNMAX(0, j-mukeep);
+      i2 = SUNMIN(j+mlkeep, Nlocal-1);
       for(i = i1; i <= i2; i++) BAND_COL_ELEM(col_j,i,j) =
                                   inc_inv * (gtempdata[i] - grefdata[i]);
     }

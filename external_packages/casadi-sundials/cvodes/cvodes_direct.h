@@ -1,14 +1,19 @@
 /*
  * -----------------------------------------------------------------
- * $Revision: 1.8 $
- * $Date: 2010/12/01 22:13:10 $
+ * $Revision: 4378 $
+ * $Date: 2015-02-19 10:55:14 -0800 (Thu, 19 Feb 2015) $
  * ----------------------------------------------------------------- 
  * Programmer: Radu Serban @ LLNL
  * -----------------------------------------------------------------
- * Copyright (c) 2006, The Regents of the University of California.
+ * LLNS Copyright Start
+ * Copyright (c) 2014, Lawrence Livermore National Security
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Lawrence Livermore National Laboratory in part under 
+ * Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
  * Produced at the Lawrence Livermore National Laboratory.
  * All rights reserved.
  * For details, see the LICENSE file.
+ * LLNS Copyright End
  * -----------------------------------------------------------------
  * Common header file for the direct linear solvers in CVODES.
  *
@@ -24,12 +29,12 @@
 #ifndef _CVSDLS_H
 #define _CVSDLS_H
 
+#include <sundials/sundials_direct.h>
+#include <sundials/sundials_nvector.h>
+
 #ifdef __cplusplus  /* wrapper to enable C++ usage */
 extern "C" {
 #endif
-
-#include <sundials/sundials_direct.h>
-#include <sundials/sundials_nvector.h>
 
 /*
  * =================================================================
@@ -324,6 +329,22 @@ typedef int (*CVDlsDenseJacFnB)(long int nB, realtype t,
 
 /*
  * -----------------------------------------------------------------
+ * Type: CVDlsDenseJacFnBS
+ * -----------------------------------------------------------------
+ * A dense Jacobian approximation function jacBS for the adjoint
+ * (backward) problem, sensitivity-dependent case,  must have the
+ *  prototype given below. 
+ * -----------------------------------------------------------------
+ */
+
+typedef int (*CVDlsDenseJacFnBS)(long int nB, realtype t,
+				N_Vector y, N_Vector *yS,
+				N_Vector yB, N_Vector fyB,
+				DlsMat JB, void *user_dataB, 
+				N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
+
+/*
+ * -----------------------------------------------------------------
  * Type : CVDlsBandJacFnB
  * -----------------------------------------------------------------
  * A band Jacobian approximation function jacB for the adjoint 
@@ -339,24 +360,50 @@ typedef int (*CVDlsBandJacFnB)(long int nB, long int mupperB, long int mlowerB,
 
 /*
  * -----------------------------------------------------------------
+ * Type : CVDlsBandJacFnBS
+ * -----------------------------------------------------------------
+ * A band Jacobian approximation function jacBS for the adjoint 
+ * (backward) problem, sensitivity-dependent case, must have the
+ * prototype given below.
+ * -----------------------------------------------------------------
+ */
+
+typedef int (*CVDlsBandJacFnBS)(long int nB, long int mupperB, long int mlowerB,
+			       realtype t, N_Vector y, N_Vector *yS,
+			       N_Vector yB, N_Vector fyB,
+			       DlsMat JB, void *user_dataB,
+			       N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
+
+/*
+ * -----------------------------------------------------------------
  * EXPORTED FUNCTIONS 
  * -----------------------------------------------------------------
  */
 
 /*
  * -----------------------------------------------------------------
- * Functions: CVDlsSetJacFnB
+ * Functions: CVDlsSet*JacFnB and CVDlsSet*JacFnBS
  * -----------------------------------------------------------------
  * CVDlsSetDenseJacFnB and CVDlsSetBandJacFnB specify the dense and
- * band, respectively, Jacobian functions to be used by a
- * CVSDIRECT linear solver for the bacward integration phase.
+ * band Jacobian functions, respectively, to be used by a
+ * CVSDIRECT linear solver for the backward integration phase, when
+ * the backward problem does not depend on forward sensitivities.
+ * CVDlsSetDenseJacFnBS and CVDlsSetBandJacFnBS specify the Jacobian
+ * functions when the backward problem does depend on sensitivities.
  * -----------------------------------------------------------------
  */
 
 SUNDIALS_EXPORT int CVDlsSetDenseJacFnB(void *cvode_mem, int which,
                                         CVDlsDenseJacFnB jacB);
+
+SUNDIALS_EXPORT int CVDlsSetDenseJacFnBS(void *cvode_mem, int which,
+                                         CVDlsDenseJacFnBS jacBS);
+
 SUNDIALS_EXPORT int CVDlsSetBandJacFnB(void *cvode_mem, int which,
                                        CVDlsBandJacFnB jacB);
+
+SUNDIALS_EXPORT int CVDlsSetBandJacFnBS(void *cvode_mem, int which,
+                                        CVDlsBandJacFnBS jacBS);
 
 #ifdef __cplusplus
 }

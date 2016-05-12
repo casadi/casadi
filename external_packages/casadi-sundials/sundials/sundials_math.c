@@ -1,15 +1,20 @@
 /*
  * -----------------------------------------------------------------
- * $Revision: 1.1 $
- * $Date: 2006/07/05 15:32:38 $
+ * $Revision: 4272 $
+ * $Date: 2014-12-02 11:19:41 -0800 (Tue, 02 Dec 2014) $
  * -----------------------------------------------------------------
  * Programmer(s): Scott D. Cohen, Alan C. Hindmarsh and
  *                Aaron Collier @ LLNL
  * -----------------------------------------------------------------
- * Copyright (c) 2002, The Regents of the University of California.
+ * LLNS Copyright Start
+ * Copyright (c) 2014, Lawrence Livermore National Security
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Lawrence Livermore National Laboratory in part under 
+ * Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
  * Produced at the Lawrence Livermore National Laboratory.
  * All rights reserved.
  * For details, see the LICENSE file.
+ * LLNS Copyright End
  * -----------------------------------------------------------------
  * This is the implementation file for a simple C-language math
  * library.
@@ -25,7 +30,7 @@
 #define ZERO RCONST(0.0)
 #define ONE  RCONST(1.0)
 
-realtype RPowerI(realtype base, int exponent)
+realtype SUNRpowerI(realtype base, int exponent)
 {
   int i, expt;
   realtype prod;
@@ -37,7 +42,7 @@ realtype RPowerI(realtype base, int exponent)
   return(prod);
 }
 
-realtype RPowerR(realtype base, realtype exponent)
+realtype SUNRpowerR(realtype base, realtype exponent)
 {
   if (base <= ZERO) return(ZERO);
 
@@ -52,7 +57,7 @@ realtype RPowerR(realtype base, realtype exponent)
 #endif
 }
 
-realtype RSqrt(realtype x)
+realtype SUNRsqrt(realtype x)
 {
   if (x <= ZERO) return(ZERO);
 
@@ -67,7 +72,7 @@ realtype RSqrt(realtype x)
 #endif
 }
 
-realtype RAbs(realtype x)
+realtype SUNRabs(realtype x)
 {
 #if defined(SUNDIALS_USE_GENERIC_MATH)
   return((realtype) fabs((double) x));
@@ -80,7 +85,7 @@ realtype RAbs(realtype x)
 #endif
 }
 
-realtype RExp(realtype x)
+realtype SUNRexp(realtype x)
 {
 #if defined(SUNDIALS_USE_GENERIC_MATH)
   return((realtype) exp((double) x));

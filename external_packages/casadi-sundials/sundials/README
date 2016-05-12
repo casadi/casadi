@@ -1,25 +1,25 @@
                           SUNDIALS 
                         Shared Module
-                 Release 2.5.0, March 2012
+                 Release 2.6.0, ??? 2014
 
 
 The family of solvers referred to as SUNDIALS consists of solvers 
-CVODE (ODE), CVODES (ODE with sensitivity analysis capabilities),
-IDA (DAE), IDAS (DAE with sensitivity analysis capabilities), and
-KINSOL (for nonlinear algebraic systems).
+ARKODE (ODE), CVODE (ODE), CVODES (ODE with sensitivity analysis 
+capabilities), IDA (DAE), IDAS (DAE with sensitivity analysis 
+capabilities), and KINSOL (for nonlinear algebraic systems).
 
 The various solvers of this family share many subordinate modules contained
 in this module:
 - generic NVECTOR module
-- generic linear solver modules (band, dense, lapack, spgmr, bcg, tfqmr)
+- generic linear solver modules (band, dense, lapack, sparse, pcg, spfgmr, spgmr, spbcg, sptfqmr)
 - definitions of SUNDIALS types (realtype, booleantype)
-- common math functions (RpowerI, RPowerR, RSqrt, RAbs,...)
+- common math functions (RpowerI, SUNRpowerR, SUNRsqrt, SUNRabs,...)
 
 
 A. Documentation
 ----------------
 All shared submodules are fully described in the user documentation for any of 
-the SUNDIALS solvers [1-5]. A PDF file for the user guide for a particular solver
+the SUNDIALS solvers [1-6]. A PDF file for the user guide for a particular solver
 is available in the solver's subdirectory under doc/.
 
 
@@ -33,26 +33,29 @@ For complete installation instructions see any of the user guides.
 C. References
 -------------
 
-[1] A. C. Hindmarsh and R. Serban, "User Documentation for CVODE v2.7.0," 
-    LLNL technical report UCRL-MA-208108, December 2011.
+[1] A. C. Hindmarsh and R. Serban, "User Documentation for CVODE v2.8.0," 
+    LLNL technical report UCRL-MA-208108, ??? 2014.
 
-[2] A. C. Hindmarsh and R. Serban, "User Documentation for CVODES v2.7.0," 
-    LLNL technical report UCRL-MA-208111, December 2011.
+[2] A. C. Hindmarsh and R. Serban, "User Documentation for CVODES v2.8.0," 
+    LLNL technical report UCRL-MA-208111, ??? 2014.
 
-[3] A. C. Hindmarsh and R. Serban, "User Documentation for IDA v2.7.0," 
-    LLNL technical report UCRL-MA-208112, December 2011.
+[3] A. C. Hindmarsh, R. Serban,and A. Collier, "User Documentation for IDA v2.8.0," 
+    LLNL technical report UCRL-MA-208112, ??? 2014.
 
-[4] R. Serban and C. Petra,  "User Documentation for IDAS v1.1.0," 
-    LLNL technical report UCRL-SM-234051, December 2011.
+[4] R. Serban, C. Petra, and A. C. Hindmarsh  "User Documentation for IDAS v1.2.0," 
+    LLNL technical report UCRL-SM-234051, ??? 2014.
 
 [5] A. M. Collier, A. C. Hindmarsh, R. Serban,and C. S. Woodward, "User 
-    Documentation for KINSOL v2.7.0," LLNL technical report UCRL-MA-208116, 
-    December 2011.
+    Documentation for KINSOL v2.8.0," LLNL technical report UCRL-MA-208116, 
+    ??? 2014.
+
+[6] D. R. Reynolds, ARKODE User Guide ???
 
 
 D. Releases
 -----------
 
+v. 2.6.0 - ???  2014
 v. 2.5.0 - Mar. 2012
 v. 2.4.0 - May  2009
 v. 2.3.0 - Nov. 2006
@@ -68,6 +71,19 @@ v. 0.0   - Mar. 2002
 
 E. Revision History
 -------------------
+
+v. 2.5.0 (Mar. 2012) ---> v. 2.6.0 (??? 2014)
+
+- New features
+   - Four additions were made to the linear system solvers that are
+     available for use with the various solvers.  In the serial case, an
+     interface to the KLU sparse direct solver was added.
+     For the parallel case, an interface to SuperLU_MT (the multi-threaded
+     version of SuperLU) was added as a thread-parallel sparse direct solver option.
+     As part of these additions, a sparse matrix (CSC format) structure 
+     was added, with associated operations.
+     Two Krylov solvers were added: a variation of GMRES called Flexible GMRES,
+     and a Preconditioned Conjugate Gradient (PCG) solver.
 
 v. 2.4.0 (May 2009) ---> v. 2.5.0 (Mar. 2012)
 ---------------------------------------------

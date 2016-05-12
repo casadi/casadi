@@ -1,14 +1,19 @@
 /*
  * -----------------------------------------------------------------
- * $Revision: 1.10 $
- * $Date: 2010/12/01 22:30:43 $
+ * $Revision: 4272 $
+ * $Date: 2014-12-02 11:19:41 -0800 (Tue, 02 Dec 2014) $
  * ----------------------------------------------------------------- 
  * Programmer: Radu Serban @ LLNL
  * -----------------------------------------------------------------
- * Copyright (c) 2006, The Regents of the University of California.
+ * LLNS Copyright Start
+ * Copyright (c) 2014, Lawrence Livermore National Security
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Lawrence Livermore National Laboratory in part under 
+ * Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
  * Produced at the Lawrence Livermore National Laboratory.
  * All rights reserved.
  * For details, see the LICENSE file.
+ * LLNS Copyright End
  * -----------------------------------------------------------------
  * This is the implementation file for the CVSDLS linear solvers
  * -----------------------------------------------------------------
@@ -51,7 +56,17 @@ static int cvDlsDenseJacBWrapper(long int nB, realtype t,
                                  DlsMat JB, void *cvode_mem,
                                  N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
 
+static int cvDlsDenseJacBSWrapper(long int nB, realtype t,
+                                 N_Vector yB, N_Vector fyB, 
+                                 DlsMat JB, void *cvode_mem,
+                                 N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
+
 static int cvDlsBandJacBWrapper(long int nB, long int mupperB, long int mlowerB, 
+                                realtype t, N_Vector yB, N_Vector fyB, 
+                                DlsMat Jac, void *cvode_mem, 
+                                N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
+
+static int cvDlsBandJacBSWrapper(long int nB, long int mupperB, long int mlowerB, 
                                 realtype t, N_Vector yB, N_Vector fyB, 
                                 DlsMat Jac, void *cvode_mem, 
                                 N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
@@ -362,10 +377,10 @@ int cvDlsDenseDQJac(long int N, realtype t,
   y_data   = N_VGetArrayPointer(y);
 
   /* Set minimum increment based on uround and norm of f */
-  srur = RSqrt(uround);
+  srur = SUNRsqrt(uround);
   fnorm = N_VWrmsNorm(fy, ewt);
   minInc = (fnorm != ZERO) ?
-           (MIN_INC_MULT * ABS(h) * uround * N * fnorm) : ONE;
+           (MIN_INC_MULT * SUNRabs(h) * uround * N * fnorm) : ONE;
 
   for (j = 0; j < N; j++) {
 
@@ -374,7 +389,7 @@ int cvDlsDenseDQJac(long int N, realtype t,
     N_VSetArrayPointer(DENSE_COL(Jac,j), jthCol);
 
     yjsaved = y_data[j];
-    inc = MAX(srur*ABS(yjsaved), minInc/ewt_data[j]);
+    inc = SUNMAX(srur*SUNRabs(yjsaved), minInc/ewt_data[j]);
     y_data[j] += inc;
 
     retval = f(t, y, ftemp, user_data);
@@ -441,21 +456,21 @@ int cvDlsBandDQJac(long int N, long int mupper, long int mlower,
   N_VScale(ONE, y, ytemp);
 
   /* Set minimum increment based on uround and norm of f */
-  srur = RSqrt(uround);
+  srur = SUNRsqrt(uround);
   fnorm = N_VWrmsNorm(fy, ewt);
   minInc = (fnorm != ZERO) ?
-           (MIN_INC_MULT * ABS(h) * uround * N * fnorm) : ONE;
+           (MIN_INC_MULT * SUNRabs(h) * uround * N * fnorm) : ONE;
 
   /* Set bandwidth and number of column groups for band differencing */
   width = mlower + mupper + 1;
-  ngroups = MIN(width, N);
+  ngroups = SUNMIN(width, N);
 
   /* Loop over column groups. */
   for (group=1; group <= ngroups; group++) {
     
     /* Increment all y_j in group */
     for(j=group-1; j < N; j+=width) {
-      inc = MAX(srur*ABS(y_data[j]), minInc/ewt_data[j]);
+      inc = SUNMAX(srur*SUNRabs(y_data[j]), minInc/ewt_data[j]);
       ytemp_data[j] += inc;
     }
 
@@ -469,10 +484,10 @@ int cvDlsBandDQJac(long int N, long int mupper, long int mlower,
     for (j=group-1; j < N; j+=width) {
       ytemp_data[j] = y_data[j];
       col_j = BAND_COL(Jac,j);
-      inc = MAX(srur*ABS(y_data[j]), minInc/ewt_data[j]);
+      inc = SUNMAX(srur*SUNRabs(y_data[j]), minInc/ewt_data[j]);
       inc_inv = ONE/inc;
-      i1 = MAX(0, j-mupper);
-      i2 = MIN(j+mlower, N-1);
+      i1 = SUNMAX(0, j-mupper);
+      i2 = SUNMIN(j+mlower, N-1);
       for (i=i1; i <= i2; i++)
         BAND_COL_ELEM(col_j,i,j) = inc_inv * (ftemp_data[i] - fy_data[i]);
     }
@@ -496,10 +511,13 @@ int cvDlsBandDQJac(long int N, long int mupper, long int mlower,
 #define ytmp  (ca_mem->ca_ytmp)
 #define yStmp (ca_mem->ca_yStmp)
 #define IMget (ca_mem->ca_IMget)
+#define IMinterpSensi (ca_mem->ca_IMinterpSensi)
 
 #define mtypeB     (cvdlsB_mem->d_typeB)
 #define djacB      (cvdlsB_mem->d_djacB)
+#define djacBS     (cvdlsB_mem->d_djacBS)
 #define bjacB      (cvdlsB_mem->d_bjacB)
+#define bjacBS     (cvdlsB_mem->d_bjacBS)
 
 /*
  * -----------------------------------------------------------------
@@ -562,6 +580,61 @@ int CVDlsSetDenseJacFnB(void *cvode_mem, int which, CVDlsDenseJacFnB jacB)
   return(flag);
 }
 
+int CVDlsSetDenseJacFnBS(void *cvode_mem, int which, CVDlsDenseJacFnBS jacBS)
+{
+  CVodeMem cv_mem;
+  CVadjMem ca_mem;
+  CVodeBMem cvB_mem;
+  CVDlsMemB cvdlsB_mem;
+  void *cvodeB_mem;
+  int flag;
+
+  /* Check if cvode_mem exists */
+  if (cvode_mem == NULL) {
+    cvProcessError(NULL, CVDLS_MEM_NULL, "CVSDLS", "CVDlsSetDenseJacFnBS", MSGD_CVMEM_NULL);
+    return(CVDLS_MEM_NULL);
+  }
+  cv_mem = (CVodeMem) cvode_mem;
+
+  /* Was ASA initialized? */
+  if (cv_mem->cv_adjMallocDone == FALSE) {
+    cvProcessError(cv_mem, CVDLS_NO_ADJ, "CVSDLS", "CVDlsSetDenseJacFnBS", MSGD_NO_ADJ);
+    return(CVDLS_NO_ADJ);
+  } 
+  ca_mem = cv_mem->cv_adj_mem;
+
+  /* Check which */
+  if ( which >= ca_mem->ca_nbckpbs ) {
+    cvProcessError(cv_mem, CVDLS_ILL_INPUT, "CVSDLS", "CVDlsSetDenseJacFnBS", MSGD_BAD_WHICH);
+    return(CVDLS_ILL_INPUT);
+  }
+
+  /* Find the CVodeBMem entry in the linked list corresponding to which */
+  cvB_mem = ca_mem->cvB_mem;
+  while (cvB_mem != NULL) {
+    if ( which == cvB_mem->cv_index ) break;
+    cvB_mem = cvB_mem->cv_next;
+  }
+
+  cvodeB_mem = (void *) (cvB_mem->cv_mem);
+
+  if (cvB_mem->cv_lmem == NULL) {
+    cvProcessError(cv_mem, CVDLS_LMEMB_NULL, "CVSDLS", "CVDlsSetDenseJacFnBS", MSGD_LMEMB_NULL);
+    return(CVDLS_LMEMB_NULL);
+  }
+  cvdlsB_mem = (CVDlsMemB) (cvB_mem->cv_lmem);
+
+  djacBS = jacBS;
+
+  if (jacBS != NULL) {
+    flag = CVDlsSetDenseJacFn(cvodeB_mem, cvDlsDenseJacBSWrapper);
+  } else {
+    flag = CVDlsSetDenseJacFn(cvodeB_mem, NULL);
+  }
+
+  return(flag);
+}
+
 int CVDlsSetBandJacFnB(void *cvode_mem, int which, CVDlsBandJacFnB jacB)
 {
   CVodeMem cv_mem;
@@ -617,6 +690,61 @@ int CVDlsSetBandJacFnB(void *cvode_mem, int which, CVDlsBandJacFnB jacB)
   return(flag);
 }
 
+int CVDlsSetBandJacFnBS(void *cvode_mem, int which, CVDlsBandJacFnBS jacBS)
+{
+  CVodeMem cv_mem;
+  CVadjMem ca_mem;
+  CVodeBMem cvB_mem;
+  CVDlsMemB cvdlsB_mem;
+  void *cvodeB_mem;
+  int flag;
+
+  /* Check if cvode_mem exists */
+  if (cvode_mem == NULL) {
+    cvProcessError(NULL, CVDLS_MEM_NULL, "CVSDLS", "CVDlsSetBandJacFnBS", MSGD_CVMEM_NULL);
+    return(CVDLS_MEM_NULL);
+  }
+  cv_mem = (CVodeMem) cvode_mem;
+
+  /* Was ASA initialized? */
+  if (cv_mem->cv_adjMallocDone == FALSE) {
+    cvProcessError(cv_mem, CVDLS_NO_ADJ, "CVSDLS", "CVDlsSetBandJacFnBS", MSGD_NO_ADJ);
+    return(CVDLS_NO_ADJ);
+  } 
+  ca_mem = cv_mem->cv_adj_mem;
+
+  /* Check which */
+  if ( which >= ca_mem->ca_nbckpbs ) {
+    cvProcessError(cv_mem, CVDLS_ILL_INPUT, "CVSDLS", "CVDlsSetBandJacFnBS", MSGD_BAD_WHICH);
+    return(CVDLS_ILL_INPUT);
+  }
+
+  /* Find the CVodeBMem entry in the linked list corresponding to which */
+  cvB_mem = ca_mem->cvB_mem;
+  while (cvB_mem != NULL) {
+    if ( which == cvB_mem->cv_index ) break;
+    cvB_mem = cvB_mem->cv_next;
+  }
+
+  cvodeB_mem = (void *) (cvB_mem->cv_mem);
+
+  if (cvB_mem->cv_lmem == NULL) {
+    cvProcessError(cv_mem, CVDLS_LMEMB_NULL, "CVSDLS", "CVDlsSetBandJacFnBS", MSGD_LMEMB_NULL);
+    return(CVDLS_LMEMB_NULL);
+  }
+  cvdlsB_mem = (CVDlsMemB) (cvB_mem->cv_lmem);
+
+  bjacBS = jacBS;
+
+  if (jacBS != NULL) {
+    flag = CVDlsSetBandJacFn(cvodeB_mem, cvDlsBandJacBSWrapper);
+  } else {
+    flag = CVDlsSetBandJacFn(cvodeB_mem, NULL);
+  }
+
+  return(flag);
+}
+
 
 /*
  * -----------------------------------------------------------------
@@ -631,7 +759,6 @@ int CVDlsSetBandJacFnB(void *cvode_mem, int which, CVDlsBandJacFnB jacB)
  * by the user. cvDlsDenseJacBWrapper is of type CVDlsDenseJacFn.
  * NOTE: data here contains cvode_mem
  */
-
 
 static int cvDlsDenseJacBWrapper(long int nB, realtype t,
                                  N_Vector yB, N_Vector fyB, 
@@ -664,7 +791,50 @@ static int cvDlsDenseJacBWrapper(long int nB, realtype t,
                  tmp1B, tmp2B, tmp3B);
 
   return(retval);
+}
 
+/*
+ * cvDlsDenseJacBSWrapper
+ *
+ * This routine interfaces to the CVDlsDenseJacFnBS routine provided 
+ * by the user. cvDlsDenseJacBSWrapper is of type CVDlsDenseJacFn.
+ * NOTE: data here contains cvode_mem
+ */
+
+static int cvDlsDenseJacBSWrapper(long int nB, realtype t,
+                                 N_Vector yB, N_Vector fyB, 
+                                 DlsMat JB, void *cvode_mem,
+                                 N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B)
+{
+  CVodeMem cv_mem;
+  CVadjMem ca_mem;
+  CVodeBMem cvB_mem;
+  CVDlsMemB cvdlsB_mem;
+  int retval, flag;
+
+  cv_mem = (CVodeMem) cvode_mem;
+
+  ca_mem = cv_mem->cv_adj_mem;
+
+  cvB_mem = ca_mem->ca_bckpbCrt;
+
+  cvdlsB_mem = (CVDlsMemB) (cvB_mem->cv_lmem);
+
+  /* Forward solution from interpolation */
+  if (IMinterpSensi)
+    flag = IMget(cv_mem, t, ytmp, yStmp);
+  else 
+    flag = IMget(cv_mem, t, ytmp, NULL);
+  if (flag != CV_SUCCESS) {
+    cvProcessError(cv_mem, -1, "CVSDLS", "cvDlsDenseJacBSWrapper", MSGD_BAD_TINTERP);
+    return(-1);
+  }
+
+  /* Call user's adjoint dense djacBS routine (of type CVDlsDenseJacFnBS) */
+  retval = djacBS(nB, t, ytmp, yStmp, yB, fyB, JB, cvB_mem->cv_user_data, 
+                  tmp1B, tmp2B, tmp3B);
+
+  return(retval);
 }
 
 
@@ -709,3 +879,46 @@ static int cvDlsBandJacBWrapper(long int nB, long int mupperB, long int mlowerB,
   return(retval);
 }
 
+/*
+ * cvDlsBandJacBSWrapper
+ *
+ * This routine interfaces to the CVBandJacFnBS routine provided 
+ * by the user. cvDlsBandJacBSWrapper is of type CVDlsBandJacFn.
+ * NOTE: data here contains cvode_mem
+ */
+
+static int cvDlsBandJacBSWrapper(long int nB, long int mupperB, long int mlowerB, 
+                                realtype t, N_Vector yB, N_Vector fyB, 
+                                DlsMat JB, void *cvode_mem, 
+                                N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B)
+{
+  CVodeMem cv_mem;
+  CVadjMem ca_mem;
+  CVodeBMem cvB_mem;
+  CVDlsMemB cvdlsB_mem;
+  int retval, flag;
+
+  cv_mem = (CVodeMem) cvode_mem;
+
+  ca_mem = cv_mem->cv_adj_mem;
+
+  cvB_mem = ca_mem->ca_bckpbCrt;
+
+  cvdlsB_mem = (CVDlsMemB) (cvB_mem->cv_lmem);
+
+  /* Forward solution from interpolation */
+  if (IMinterpSensi)
+    flag = IMget(cv_mem, t, ytmp, yStmp);
+  else 
+    flag = IMget(cv_mem, t, ytmp, NULL);
+  if (flag != CV_SUCCESS) {
+    cvProcessError(cv_mem, -1, "CVSDLS", "cvDlsBandJacBSWrapper", MSGD_BAD_TINTERP);
+    return(-1);
+  }
+
+  /* Call user's adjoint band bjacBS routine (of type CVDlsBandJacFnBS) */
+  retval = bjacBS(nB, mupperB, mlowerB, t, ytmp, yStmp, yB, fyB, JB,
+                  cvB_mem->cv_user_data, tmp1B, tmp2B, tmp3B);
+
+  return(retval);
+}

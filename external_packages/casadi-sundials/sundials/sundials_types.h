@@ -1,7 +1,7 @@
 /*
  * -----------------------------------------------------------------
- * $Revision: 1.2 $
- * $Date: 2006/11/29 00:05:07 $
+ * $Revision: 4378 $
+ * $Date: 2015-02-19 10:55:14 -0800 (Thu, 19 Feb 2015) $
  * ----------------------------------------------------------------- 
  * Programmer(s): Scott Cohen, Alan Hindmarsh, Radu Serban, and
  *                Aaron Collier @ LLNL
@@ -41,16 +41,16 @@
 #ifndef _SUNDIALSTYPES_H
 #define _SUNDIALSTYPES_H
 
-#ifdef __cplusplus  /* wrapper to enable C++ usage */
-extern "C" {
-#endif
-
 #ifndef _SUNDIALS_CONFIG_H
 #define _SUNDIALS_CONFIG_H
 #include <sundials/sundials_config.h>
 #endif
 
 #include <float.h>
+
+#ifdef __cplusplus  /* wrapper to enable C++ usage */
+extern "C" {
+#endif
 
 /*
  *------------------------------------------------------------------

@@ -1,14 +1,19 @@
 /*
  * -----------------------------------------------------------------
- * $Revision: 1.6 $
- * $Date: 2011/04/26 22:51:51 $
+ * $Revision: 4272 $
+ * $Date: 2014-12-02 11:19:41 -0800 (Tue, 02 Dec 2014) $
  * ----------------------------------------------------------------- 
  * Programmers: Radu Serban @ LLNL
  * -----------------------------------------------------------------
- * Copyright (c) 2002, The Regents of the University of California  
- * Produced at the Lawrence Livermore National Laboratory
- * All rights reserved
- * For details, see the LICENSE file
+ * LLNS Copyright Start
+ * Copyright (c) 2014, Lawrence Livermore National Security
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Lawrence Livermore National Laboratory in part under 
+ * Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
+ * Produced at the Lawrence Livermore National Laboratory.
+ * All rights reserved.
+ * For details, see the LICENSE file.
+ * LLNS Copyright End
  * -----------------------------------------------------------------
  * This is the implementation file for the IC calculation for IDAS.
  * It is independent of the linear solver in use.                  
@@ -227,8 +232,8 @@ int IDACalcIC(void *ida_mem, int icopt, realtype tout1)
     return(IDA_ILL_INPUT);
   }
 
-  tdist = ABS(tout1 - tn);
-  troundoff = TWO*uround*(ABS(tn) + ABS(tout1));    
+  tdist = SUNRabs(tout1 - tn);
+  troundoff = TWO*uround*(SUNRabs(tn) + SUNRabs(tout1));
   if(tdist < troundoff) {
     IDAProcessError(IDA_mem, IDA_ILL_INPUT, "IDAS", "IDACalcIC", MSG_IC_TOO_CLOSE);
     return(IDA_ILL_INPUT);
@@ -674,7 +679,7 @@ static int IDANewtonIC(IDAMem IDA_mem)
   }
 
   /* Test for convergence. Return now if the norm is small. */
-  if(sysindex == 0) fnorm *= tscale*ABS(cj);
+  if(sysindex == 0) fnorm *= tscale*SUNRabs(cj);
   if(fnorm <= epsNewt) return(IDA_SUCCESS);
   fnorm0 = fnorm;
 
@@ -906,7 +911,7 @@ static int IDAfnorm(IDAMem IDA_mem, realtype *fnorm)
   }
 
   /* Rescale norm if index = 0. */
-  if(sysindex == 0) (*fnorm) *= tscale*ABS(cj);
+  if(sysindex == 0) (*fnorm) *= tscale*SUNRabs(cj);
 
   return(IDA_SUCCESS);
 
@@ -1093,7 +1098,7 @@ static int IDASensNewtonIC(IDAMem IDA_mem)
   }
     /* Compute the norm of the step and return if it is small enough */
   fnorm = IDASensWrmsNorm(IDA_mem, deltaS, ewtS, FALSE);
-  if(sysindex == 0) fnorm *= tscale*ABS(cj);
+  if(sysindex == 0) fnorm *= tscale*SUNRabs(cj);
   if(fnorm <= epsNewt) return(IDA_SUCCESS);
   fnorm0 = fnorm;
 
@@ -1244,7 +1249,7 @@ static int IDASensfnorm(IDAMem IDA_mem, realtype *fnorm)
 
   /* Compute the WRMS-norm; rescale if index = 0. */
   *fnorm = IDASensWrmsNorm(IDA_mem, delnewS, ewtS, FALSE);
-  if(sysindex == 0) (*fnorm) *= tscale*ABS(cj);  
+  if(sysindex == 0) (*fnorm) *= tscale*SUNRabs(cj);
 
   return(IDA_SUCCESS);
 }

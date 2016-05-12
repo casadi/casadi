@@ -1,15 +1,20 @@
 /*
  * -----------------------------------------------------------------
- * $Revision: 1.8 $
- * $Date: 2010/12/01 22:43:33 $
+ * $Revision: 4368 $
+ * $Date: 2015-02-12 12:25:15 -0800 (Thu, 12 Feb 2015) $
  * -----------------------------------------------------------------
  * Programmer(s): Allan Taylor, Alan Hindmarsh, Radu Serban, and
  *                Aaron Collier @ LLNL
  * -----------------------------------------------------------------
- * Copyright (c) 2002, The Regents of the University of California.
+ * LLNS Copyright Start
+ * Copyright (c) 2014, Lawrence Livermore National Security
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Lawrence Livermore National Laboratory in part under 
+ * Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
  * Produced at the Lawrence Livermore National Laboratory.
  * All rights reserved.
  * For details, see the LICENSE file.
+ * LLNS Copyright End
  * -----------------------------------------------------------------
  * This is the implementation file for the optional input and output
  * functions for the KINSOL solver.
@@ -182,6 +187,61 @@ int KINSetUserData(void *kinmem, void *user_data)
 
   return(KIN_SUCCESS);
 }
+
+/*
+ * -----------------------------------------------------------------
+ * Function : KINSetMAA
+ * -----------------------------------------------------------------
+ */
+
+int KINSetMAA(void *kinmem, long int maa)
+{
+  KINMem kin_mem;
+
+  if (kinmem == NULL) {
+    KINProcessError(NULL, KIN_MEM_NULL, "KINSOL", "KINSetMAA", MSG_NO_MEM);
+    return(KIN_MEM_NULL);
+  }
+
+  kin_mem = (KINMem) kinmem;
+
+  if (maa < 0) {
+    KINProcessError(NULL, KIN_ILL_INPUT, "KINSOL", "KINSetMAA", MSG_BAD_MAA);
+    return(KIN_ILL_INPUT);
+  }
+
+  if (maa > kin_mem->kin_mxiter) maa = kin_mem->kin_mxiter;
+
+  kin_mem = (KINMem) kinmem;
+  kin_mem->kin_m_aa = maa;
+  kin_mem->kin_aamem_aa = (maa == 0) ? FALSE : TRUE;
+
+  return(KIN_SUCCESS);
+}
+
+/*
+ * -----------------------------------------------------------------
+ * Function : KINSetAAStopCrit
+ * -----------------------------------------------------------------
+ */
+
+/*  CSW: This function is currently not supported.
+
+int KINSetAAStopCrit(void *kinmem, booleantype setstop)
+{
+  KINMem kin_mem;
+
+  if (kinmem == NULL) {
+    KINProcessError(NULL, KIN_MEM_NULL, "KINSOL", "KINSetAAStopCrit", MSG_NO_MEM);
+    return(KIN_MEM_NULL);
+  }
+
+  kin_mem = (KINMem) kinmem;
+  kin_mem->kin_setstop_aa = setstop;
+
+  return(KIN_SUCCESS);
+}
+*/
 
 /*
  * -----------------------------------------------------------------
@@ -547,9 +607,9 @@ int KINSetMaxNewtonStep(void *kinmem, realtype mxnewtstep)
   }
 
   /* Note: passing a value of 0.0 will use the default
-     value (computed in KINSolinit) */
+     value (computed in KINSolInit) */
 
-  kin_mem->kin_mxnewtstep = mxnewtstep;
+  kin_mem->kin_mxnstepin = mxnewtstep;
 
   return(KIN_SUCCESS);
 }
@@ -610,9 +670,9 @@ int KINSetRelErrFunc(void *kinmem, realtype relfunc)
 
   if (relfunc == ZERO) {
     uround = kin_mem->kin_uround;
-    kin_mem->kin_sqrt_relfunc = RSqrt(uround);
+    kin_mem->kin_sqrt_relfunc = SUNRsqrt(uround);
   } else {
-    kin_mem->kin_sqrt_relfunc = RSqrt(relfunc);
+    kin_mem->kin_sqrt_relfunc = SUNRsqrt(relfunc);
   }
 
   return(KIN_SUCCESS);
@@ -643,7 +703,7 @@ int KINSetFuncNormTol(void *kinmem, realtype fnormtol)
 
   if (fnormtol == ZERO) {
     uround = kin_mem->kin_uround;
-    kin_mem->kin_fnormtol = RPowerR(uround,ONETHIRD);
+    kin_mem->kin_fnormtol = SUNRpowerR(uround,ONETHIRD);
   } else {
     kin_mem->kin_fnormtol = fnormtol;
   }
@@ -676,7 +736,7 @@ int KINSetScaledStepTol(void *kinmem, realtype scsteptol)
 
   if (scsteptol == ZERO) {
     uround = kin_mem->kin_uround;
-    kin_mem->kin_scsteptol = RPowerR(uround,TWOTHIRDS);
+    kin_mem->kin_scsteptol = SUNRpowerR(uround,TWOTHIRDS);
   } else {
     kin_mem->kin_scsteptol = scsteptol;
   }
@@ -905,7 +965,7 @@ int KINGetFuncNorm(void *kinmem, realtype *funcnorm)
   }
 
   kin_mem = (KINMem) kinmem;
-  *funcnorm = fnorm;
+  *funcnorm = kin_mem->kin_fnorm;
 
   return(KIN_SUCCESS);
 }

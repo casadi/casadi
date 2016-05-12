@@ -1,14 +1,19 @@
 /*
  * -----------------------------------------------------------------
- * $Revision: 1.7 $
- * $Date: 2010/12/01 22:46:56 $
+ * $Revision: 4272 $
+ * $Date: 2014-12-02 11:19:41 -0800 (Tue, 02 Dec 2014) $
  * -----------------------------------------------------------------
  * Programmer(s): Alan C. Hindmarsh and Radu Serban @ LLNL
  * -----------------------------------------------------------------
- * Copyright (c) 2002, The Regents of the University of California.
+ * LLNS Copyright Start
+ * Copyright (c) 2014, Lawrence Livermore National Security
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Lawrence Livermore National Laboratory in part under 
+ * Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
  * Produced at the Lawrence Livermore National Laboratory.
  * All rights reserved.
  * For details, see the LICENSE file.
+ * LLNS Copyright End
  * -----------------------------------------------------------------
  * This is the implementation file for a generic BAND linear
  * solver package.
@@ -52,6 +57,11 @@ void BandScale(realtype c, DlsMat A)
   bandScale(c, A->cols, A->M, A->mu, A->ml, A->s_mu);
 }
 
+void BandMatvec(DlsMat A, realtype *x, realtype *y)
+{
+  bandMatvec(A->cols, x, y, A->M, A->mu, A->ml, A->s_mu);
+}
+
 /*
  * -----------------------------------------------------
  * Functions working on realtype**
@@ -85,16 +95,16 @@ long int bandGBTRF(realtype **a, long int n, long int mu, long int ml, long int 
     col_k     = a[k];
     diag_k    = col_k + smu;
     sub_diag_k = diag_k + 1;
-    last_row_k = MIN(n-1,k+ml);
+    last_row_k = SUNMIN(n-1,k+ml);
 
     /* find l = pivot row number */
 
     l=k;
-    max = ABS(*diag_k);
+    max = SUNRabs(*diag_k);
     for (i=k+1, kptr=sub_diag_k; i <= last_row_k; i++, kptr++) { 
-      if (ABS(*kptr) > max) {
+      if (SUNRabs(*kptr) > max) {
 	l=i;
-	max = ABS(*kptr);
+	max = SUNRabs(*kptr);
       }
     }
     storage_l = ROW(l, k, smu);
@@ -116,18 +126,18 @@ long int bandGBTRF(realtype **a, long int n, long int mu, long int ml, long int 
     /* column k by -1.0 / a(k,k). After the above swap, */
     /* a(k,k) holds the pivot element. This scaling     */
     /* stores the pivot row multipliers -a(i,k)/a(k,k)  */
-    /* in a(i,k), i=k+1, ..., MIN(n-1,k+ml).            */
+    /* in a(i,k), i=k+1, ..., SUNMIN(n-1,k+ml).            */
     
     mult = -ONE / (*diag_k);
     for (i=k+1, kptr = sub_diag_k; i <= last_row_k; i++, kptr++)
       (*kptr) *= mult;
 
-    /* row_i = row_i - [a(i,k)/a(k,k)] row_k, i=k+1, ..., MIN(n-1,k+ml) */
+    /* row_i = row_i - [a(i,k)/a(k,k)] row_k, i=k+1, ..., SUNMIN(n-1,k+ml) */
     /* row k is the pivot row after swapping with row l.                */
     /* The computation is done one column at a time,                    */
-    /* column j=k+1, ..., MIN(k+smu,n-1).                               */
+    /* column j=k+1, ..., SUNMIN(k+smu,n-1).                               */
     
-    last_col_k = MIN(k+smu,n-1);
+    last_col_k = SUNMIN(k+smu,n-1);
     for (j=k+1; j <= last_col_k; j++) {
       
       col_j = a[j];
@@ -179,7 +189,7 @@ void bandGBTRS(realtype **a, long int n, long int smu, long int ml, long int *p,
       b[k] = mult;
     }
     diag_k = a[k]+smu;
-    last_row_k = MIN(n-1,k+ml);
+    last_row_k = SUNMIN(n-1,k+ml);
     for (i=k+1; i <= last_row_k; i++)
       b[i] += mult * diag_k[i-k];
   }
@@ -188,7 +198,7 @@ void bandGBTRS(realtype **a, long int n, long int smu, long int ml, long int *p,
   
   for (k=n-1; k >= 0; k--) {
     diag_k = a[k]+smu;
-    first_row_k = MAX(0,k-smu);
+    first_row_k = SUNMAX(0,k-smu);
     b[k] /= (*diag_k);
     mult = -b[k];
     for (i=first_row_k; i <= k-1; i++)
@@ -233,3 +243,22 @@ void bandAddIdentity(realtype **a, long int n, long int smu)
   for(j=0; j < n; j++)
     a[j][smu] += ONE;
 }
+
+void bandMatvec(realtype **a, realtype *x, realtype *y, long int n, 
+		long int mu, long int ml, long int smu)
+{
+  long int i, j, is, ie;
+  realtype *col_j;
+
+  for (i=0; i<n; i++)
+    y[i] = 0.0;
+
+  for(j=0; j<n; j++) {
+    col_j = a[j]+smu-mu;
+    is = (0 > j-mu) ? 0 : j-mu;
+    ie = (n-1 < j+ml) ? n-1 : j+ml;
+    for (i=is; i<=ie; i++)
+      y[i] += col_j[i-j+mu]*x[j];
+  }
+}
+

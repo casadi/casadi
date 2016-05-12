@@ -1,5 +1,5 @@
                            CVODES 
-                 Release 2.7.0, March 2012
+                 Release 2.8.1, March 30, 2015
                Alan C. Hindmarsh and Radu Serban
           Center for Applied Scientific Computing, LLNL
 
@@ -8,12 +8,11 @@ problem) given in explicit form y' = f(t,y,p) with sensitivity analysis
 capabilities (both forward and adjoint modes). 
 It is written in ANSI standard C.
 
-CVODES can be used both on serial and parallel (MPI) computers.  The 
+CVODES can be used both on serial and parallel computers.  The 
 main difference is in the NVECTOR module of vector kernels.  The desired 
 version is obtained when compiling the example files by linking the 
-appropriate library of NVECTOR kernels.  In the parallel version,
-communication between processors is done with the MPI (Message Passage
-Interface) system.
+appropriate library of NVECTOR kernels.  In the parallel versions,
+communication between processors is done with MPI, with OpenMP, or with Pthreads.
 
 When used with the serial NVECTOR module, CVODES provides both direct (dense 
 and band) and preconditioned Krylov (iterative) linear solvers. Three different
@@ -28,8 +27,8 @@ band-block-diagonal preconditioner.
 
 CVODES is part of a software family called SUNDIALS: SUite of Nonlinear and 
 DIfferential/ALgebraic equation Solvers [4].  This suite consists of CVODE, 
-CVODES, IDA, IDAS, and KINSOL.  The directory structure of the package supplied 
-reflects this family relationship.
+CVODES, ARKode, IDA, IDAS, and KINSOL.  The directory structure of the 
+package supplied reflects this family relationship.
 
 The notes below provide the location of documentation, directions for the 
 installation of the CVODES package, and relevant references. Following that 
@@ -46,19 +45,19 @@ and the CVODES Examples [2] (cvs_examples.pdf) documents.
 B. Installation
 ---------------
 
-For basic installation instructions see /sundials/INSTALL_NOTES. 
-For complete installation instructions see the "CVODES Installation Procedure"
+For basic installation instructions see the file /sundials/INSTALL_GUIDE.pdf. 
+For complete installation instructions see the "Installation Procedure"
 chapter in the CVODES User Guide.
 
 
 C. References
 -------------
 
-[1] A. C. Hindmarsh and R. Serban, "User Documentation for CVODES v2.7.0," 
-    LLNL technical report UCRL-SM-208111, December 2011.
+[1] A. C. Hindmarsh and R. Serban, "User Documentation for CVODES v2.8.0," 
+    LLNL technical report UCRL-SM-208111, ??? 2014.
 
-[2] A. C. Hindmarsh and R. Serban, "Example Programs for CVODES v2.7.0," 
-    LLNL technical report UCRL-SM-208115, December 2011.
+[2] A. C. Hindmarsh and R. Serban, "Example Programs for CVODES v2.8.0," 
+    LLNL technical report UCRL-SM-208115, ??? 2014.
 
 [3] R. Serban and A. C. Hindmarsh, "CVODES: the Sensitivity-Enabled ODE 
     solver in SUNDIALS," Proceedings of IDETC/CIE 2005, Sept. 2005, 
@@ -73,6 +72,8 @@ C. References
 D. Releases
 -----------
 
+v. 2.8.1   - Mar. 2015
+v. 2.8.0   - Mar. 2015
 v. 2.7.0   - Mar. 2012
 v. 2.6.0   - May  2009
 v. 2.5.0   - Nov. 2006
@@ -88,6 +89,62 @@ v. 1.0     - Jul. 2002 (first SUNDIALS release)
 E. Revision History
 -------------------
 
+
+v. 2.8.0 (Mar. 2015) ---> v. 2.8.1 (Mar. 2015)
+---------------------------------------------
+- Bug fixes
+  - Fixed loop limit bug in SlsAddMat function.
+  - In interfaces to KLU and SuperLUMT, added #include lines, 
+    and removed redundant KLU structure allocations.
+  - Minor documentation updates
+
+v. 2.7.0 (Mar. 2012) ---> v. 2.8.0 (Mar. 2015)
+---------------------------------------------
+
+- New features
+   - Two major additions were made to the linear system solvers that are
+     availble for use with the CVODE solver.  If using the supplied serial
+     NVECTOR module, interfaces to the KLU sparse direct solver and to the
+     SuperLU_MT solver (the multi-threaded version of SuperLU) were added.
+     As part of these additions, a sparse matrix (CSC format) structure 
+     was added to CVODES.
+   - Two new NVECTOR modules have been added for parallel computing
+     environments --- one for openMP, denoted NVECTOR_OPENMP,
+     and one for Pthreads, denoted NVECTOR_PTHREADS.
+   - An option was added in the case of Adjoint Sensitivity Analysis with
+     dense or banded Jacobian:  With a call to CVDlsSetDenseJacFnBS or
+     CVDlsSetBandJacFnBS, the user can specify a user-supplied Jacobian
+     function of type CVDls***JacFnBS, for the case where the backward
+     problem depends on the forward sensitivities.
+   - For the Adjoint Sensitivity Analysis case in which the backward problem
+     depends on the forward sensitivities, options have been added to allow
+     for user-supplied pset, psolve, and jtimes functions.
+
+- Bug fixes
+   - In cvRootfind, a minor bug was corrected, where the input
+     array rootdir was ignored, and a line was added to break out of
+     root-search loop if the initial interval size is below the tolerance
+     ttol.
+   - In CVLapackBand, the line smu = MIN(N-1,mu+ml) was changed to
+     smu = mu + ml to correct an illegal input error for DGBTRF/DGBTRS.
+   - In CVodeQuadSensInit, the line cv_mem->cv_fQS_data = ...
+     was corrected (missing Q).
+   - Two minor bugs were fixed regarding the testing of input on the first
+     call to CVode -- one involving tstop and one involving the
+     initialization of *tret.
+   - The initialization nefQS = 0 was added.
+
+- Changes to user interface
+   - In the User Guide, a paragraph was added in Section 6.2.1 on
+     CVodeAdjReInit, and a paragraph was added in Section 6.2.9 on
+     CVodeGetAdjY.
+
+- Other
+   - In order to avoid possible name conflicts, the mathematical macro and
+     function names MIN, MAX, SQR, RAbs, RSqrt, RExp, RPowerI, and RPowerR
+     were changed to SUNMIN, SUNMAX, SUNSQR, SUNRabs, SUNRsqrt, SUNRexp,
+     SRpowerI, and SUNRpowerR, respectively.  These names occur in both the
+     solver and in various example programs.
 
 v. 2.6.0 (May 2009) ---> v. 2.7.0 (Mar. 2012)
 ---------------------------------------------

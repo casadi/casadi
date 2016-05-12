@@ -1,14 +1,19 @@
 /*
  * -----------------------------------------------------------------
- * $Revision: 1.14 $
- * $Date: 2010/12/01 22:30:43 $
+ * $Revision: 4272 $
+ * $Date: 2014-12-02 11:19:41 -0800 (Tue, 02 Dec 2014) $
  * ----------------------------------------------------------------- 
  * Programmer(s): Radu Serban and Aaron Collier @ LLNL
  * -----------------------------------------------------------------
- * Copyright (c) 2005, The Regents of the University of California.
+ * LLNS Copyright Start
+ * Copyright (c) 2014, Lawrence Livermore National Security
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Lawrence Livermore National Laboratory in part under 
+ * Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
  * Produced at the Lawrence Livermore National Laboratory.
  * All rights reserved.
  * For details, see the LICENSE file.
+ * LLNS Copyright End
  * -----------------------------------------------------------------
  * This file contains implementations of routines for a
  * band-block-diagonal preconditioner, i.e. a block-diagonal
@@ -123,10 +128,10 @@ int CVBBDPrecInit(void *cvode_mem, long int Nlocal,
   pdata->cvode_mem = cvode_mem;
   pdata->gloc = gloc;
   pdata->cfn = cfn;
-  pdata->mudq = MIN(Nlocal-1, MAX(0,mudq));
-  pdata->mldq = MIN(Nlocal-1, MAX(0,mldq));
-  muk = MIN(Nlocal-1, MAX(0,mukeep));
-  mlk = MIN(Nlocal-1, MAX(0,mlkeep));
+  pdata->mudq = SUNMIN(Nlocal-1, SUNMAX(0,mudq));
+  pdata->mldq = SUNMIN(Nlocal-1, SUNMAX(0,mldq));
+  muk = SUNMIN(Nlocal-1, SUNMAX(0,mukeep));
+  mlk = SUNMIN(Nlocal-1, SUNMAX(0,mlkeep));
   pdata->mukeep = muk;
   pdata->mlkeep = mlk;
 
@@ -139,7 +144,7 @@ int CVBBDPrecInit(void *cvode_mem, long int Nlocal,
   }
 
   /* Allocate memory for preconditioner matrix */
-  storage_mu = MIN(Nlocal-1, muk + mlk);
+  storage_mu = SUNMIN(Nlocal-1, muk + mlk);
   pdata->savedP = NULL;
   pdata->savedP = NewBandMat(Nlocal, muk, mlk, storage_mu);
   if (pdata->savedP == NULL) {
@@ -160,7 +165,7 @@ int CVBBDPrecInit(void *cvode_mem, long int Nlocal,
   }
 
   /* Set pdata->dqrely based on input dqrely (0 implies default). */
-  pdata->dqrely = (dqrely > ZERO) ? dqrely : RSqrt(uround);
+  pdata->dqrely = (dqrely > ZERO) ? dqrely : SUNRsqrt(uround);
 
   /* Store Nlocal to be used in CVBBDPrecSetup */
   pdata->n_local = Nlocal;
@@ -214,11 +219,11 @@ int CVBBDPrecReInit(void *cvode_mem,
 
   /* Load half-bandwidths */
   Nlocal = pdata->n_local;
-  pdata->mudq = MIN(Nlocal-1, MAX(0,mudq));
-  pdata->mldq = MIN(Nlocal-1, MAX(0,mldq));
+  pdata->mudq = SUNMIN(Nlocal-1, SUNMAX(0,mudq));
+  pdata->mldq = SUNMIN(Nlocal-1, SUNMAX(0,mldq));
 
   /* Set pdata->dqrely based on input dqrely (0 implies default). */
-  pdata->dqrely = (dqrely > ZERO) ? dqrely : RSqrt(uround);
+  pdata->dqrely = (dqrely > ZERO) ? dqrely : SUNRsqrt(uround);
 
   /* Re-initialize nge */
   pdata->nge = 0;
@@ -524,18 +529,18 @@ static int cvBBDDQJac(CVBBDPrecData pdata, realtype t,
   /* Set minimum increment based on uround and norm of g */
   gnorm = N_VWrmsNorm(gy, ewt);
   minInc = (gnorm != ZERO) ?
-           (MIN_INC_MULT * ABS(h) * uround * Nlocal * gnorm) : ONE;
+           (MIN_INC_MULT * SUNRabs(h) * uround * Nlocal * gnorm) : ONE;
 
   /* Set bandwidth and number of column groups for band differencing */
   width = mldq + mudq + 1;
-  ngroups = MIN(width, Nlocal);
+  ngroups = SUNMIN(width, Nlocal);
 
   /* Loop over groups */  
   for (group=1; group <= ngroups; group++) {
     
     /* Increment all y_j in group */
     for(j=group-1; j < Nlocal; j+=width) {
-      inc = MAX(dqrely*ABS(y_data[j]), minInc/ewt_data[j]);
+      inc = SUNMAX(dqrely*SUNRabs(y_data[j]), minInc/ewt_data[j]);
       ytemp_data[j] += inc;
     }
 
@@ -548,10 +553,10 @@ static int cvBBDDQJac(CVBBDPrecData pdata, realtype t,
     for (j=group-1; j < Nlocal; j+=width) {
       ytemp_data[j] = y_data[j];
       col_j = BAND_COL(savedJ,j);
-      inc = MAX(dqrely*ABS(y_data[j]), minInc/ewt_data[j]);
+      inc = SUNMAX(dqrely*SUNRabs(y_data[j]), minInc/ewt_data[j]);
       inc_inv = ONE/inc;
-      i1 = MAX(0, j-mukeep);
-      i2 = MIN(j+mlkeep, Nlocal-1);
+      i1 = SUNMAX(0, j-mukeep);
+      i2 = SUNMIN(j+mlkeep, Nlocal-1);
       for (i=i1; i <= i2; i++)
         BAND_COL_ELEM(col_j,i,j) =
           inc_inv * (gtemp_data[i] - gy_data[i]);

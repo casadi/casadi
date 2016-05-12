@@ -1,14 +1,19 @@
 /*
  * -----------------------------------------------------------------
- * $Revision: 1.8 $
- * $Date: 2010/12/01 22:17:18 $
+ * $Revision: 4378 $
+ * $Date: 2015-02-19 10:55:14 -0800 (Thu, 19 Feb 2015) $
  * -----------------------------------------------------------------
  * Programmer: Radu Serban @ LLNL
  * -----------------------------------------------------------------
- * Copyright (c) 2006, The Regents of the University of California.
+ * LLNS Copyright Start
+ * Copyright (c) 2014, Lawrence Livermore National Security
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Lawrence Livermore National Laboratory in part under 
+ * Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
  * Produced at the Lawrence Livermore National Laboratory.
  * All rights reserved.
  * For details, see the LICENSE file.
+ * LLNS Copyright End
  * -----------------------------------------------------------------
  * This is the header file for a generic package of DENSE matrix
  * operations, based on the DlsMat type defined in sundials_direct.h.
@@ -24,11 +29,11 @@
 #ifndef _SUNDIALS_DENSE_H
 #define _SUNDIALS_DENSE_H
 
+#include <sundials/sundials_direct.h>
+
 #ifdef __cplusplus  /* wrapper to enable C++ usage */
 extern "C" {
 #endif
-
-#include <sundials/sundials_direct.h>
 
 /*
  * -----------------------------------------------------------------
@@ -179,6 +184,25 @@ SUNDIALS_EXPORT void denseScale(realtype c, realtype **a, long int m, long int n
  */
 
 SUNDIALS_EXPORT void denseAddIdentity(realtype **a, long int n);
+
+
+/*
+ * -----------------------------------------------------------------
+ * Function: DenseMatvec
+ * -----------------------------------------------------------------
+ * DenseMatvec computes the matrix-vector product y = A*x, where A 
+ * is an M-by-N matrix, x is a vector of length N, and y is a vector
+ * of length M.  No error checking is performed on the length of the
+ * arrays x and y.  Only y is modified in this routine.
+ *
+ * DenseMatvec is a wrapper around denseMatvec which performs the 
+ * actual product by accessing the data in the DlsMat A.
+ * -----------------------------------------------------------------
+ */
+
+SUNDIALS_EXPORT void DenseMatvec(DlsMat A, realtype *x, realtype *y);
+SUNDIALS_EXPORT void denseMatvec(realtype **a, realtype *x, realtype *y, long int m, long int n);
+
 
 #ifdef __cplusplus
 }

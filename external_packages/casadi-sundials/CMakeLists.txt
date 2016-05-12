@@ -1,10 +1,10 @@
 # This is a alternative version of the original CMakeLists.txt
 # Joel Andersson
-# K.U. Leuven 2012
+# K.U. Leuven 2012, 2016
 
 cmake_minimum_required(VERSION 2.8.6)
 
-project(sundials-2.5mod C)
+project(sundials-2.6.1mod C)
 include_directories(.)
 
 # cmake_policy use MACOSX_RPATH=ON by default

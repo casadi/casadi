@@ -1,14 +1,19 @@
 /*
  * -----------------------------------------------------------------
- * $Revision: 1.5 $
- * $Date: 2010/12/01 22:43:33 $
+ * $Revision: 4378 $
+ * $Date: 2015-02-19 10:55:14 -0800 (Thu, 19 Feb 2015) $
  * -----------------------------------------------------------------
  * Programmer(s): Radu Serban and Aaron Collier @ LLNL
  * -----------------------------------------------------------------
- * Copyright (c) 2002, The Regents of the University of California.
+ * LLNS Copyright Start
+ * Copyright (c) 2014, Lawrence Livermore National Security
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Lawrence Livermore National Laboratory in part under 
+ * Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
  * Produced at the Lawrence Livermore National Laboratory.
  * All rights reserved.
  * For details, see the LICENSE file.
+ * LLNS Copyright End
  * -----------------------------------------------------------------
  * Common implementation header file for the scaled, preconditioned
  * linear solver modules.
@@ -18,18 +23,19 @@
 #ifndef _KINSPILS_IMPL_H
 #define _KINSPILS_IMPL_H
 
+#include <kinsol/kinsol_spils.h>
+#include "kinsol_impl.h"
+
 #ifdef __cplusplus  /* wrapper to enable C++ usage */
 extern "C" {
 #endif
-
-#include <kinsol/kinsol_spils.h>
-#include "kinsol_impl.h"
 
 /* Types of iterative linear solvers */
 
 #define SPILS_SPGMR   1
 #define SPILS_SPBCG   2
 #define SPILS_SPTFQMR 3
+#define SPILS_SPFGMR  5
 
 /*
  * -----------------------------------------------------------------
@@ -125,7 +131,7 @@ typedef struct KINSpilsMemRec {
  * -----------------------------------------------------------------
  */
 
-/* KINSpgmr Atimes and PSolve routines called by generic SPGMR solver */
+/* KINSpgmr Atimes and PSolve routines called by generic solver */
 
 int KINSpilsAtimes(void *kinsol_mem, N_Vector v, N_Vector z);
 int KINSpilsPSolve(void *kinsol_mem, N_Vector r, N_Vector z, int lr);

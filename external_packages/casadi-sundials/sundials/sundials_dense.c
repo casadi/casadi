@@ -1,15 +1,20 @@
 /*
  * -----------------------------------------------------------------
- * $Revision: 1.7 $
- * $Date: 2010/12/01 22:46:56 $
+ * $Revision: 4272 $
+ * $Date: 2014-12-02 11:19:41 -0800 (Tue, 02 Dec 2014) $
  * -----------------------------------------------------------------
  * Programmer(s): Scott D. Cohen, Alan C. Hindmarsh and
  *                Radu Serban @ LLNL
  * -----------------------------------------------------------------
- * Copyright (c) 2002, The Regents of the University of California.
+ * LLNS Copyright Start
+ * Copyright (c) 2014, Lawrence Livermore National Security
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Lawrence Livermore National Laboratory in part under 
+ * Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
  * Produced at the Lawrence Livermore National Laboratory.
  * All rights reserved.
  * For details, see the LICENSE file.
+ * LLNS Copyright End
  * -----------------------------------------------------------------
  * This is the implementation file for a generic package of dense
  * matrix operations.
@@ -72,6 +77,11 @@ void DenseScale(realtype c, DlsMat A)
   denseScale(c, A->cols, A->M, A->N);
 }
 
+void DenseMatvec(DlsMat A, realtype *x, realtype *y)
+{
+  denseMatvec(A->cols, x, y, A->M, A->N);
+}
+
 long int denseGETRF(realtype **a, long int m, long int n, long int *p)
 {
   long int i, j, k, l;
@@ -86,7 +96,7 @@ long int denseGETRF(realtype **a, long int m, long int n, long int *p)
     /* find l = pivot row number */
     l=k;
     for (i=k+1; i < m; i++)
-      if (ABS(col_k[i]) > ABS(col_k[l])) l=i;
+      if (SUNRabs(col_k[i]) > SUNRabs(col_k[l])) l=i;
     p[k] = l;
 
     /* check for zero pivot element */
@@ -193,7 +203,7 @@ long int densePOTRF(realtype **a, long int m)
 
     a_diag = a_col_j[j];
     if (a_diag <= ZERO) return(j+1);
-    a_diag = RSqrt(a_diag);
+    a_diag = SUNRsqrt(a_diag);
 
     for(i=j; i<m; i++) a_col_j[i] /= a_diag;
     
@@ -270,7 +280,7 @@ int denseGEQRF(realtype **a, long int m, long int n, realtype *beta, realtype *v
     }
 
     if(s != ZERO) {
-      mu = RSqrt(ajj*ajj+s);
+      mu = SUNRsqrt(ajj*ajj+s);
       v1 = (ajj <= ZERO) ? ajj-mu : -s/(ajj+mu);
       v1_2 = v1*v1;
       beta[j] = TWO * v1_2 / (s + v1_2);
@@ -371,3 +381,20 @@ void denseAddIdentity(realtype **a, long int n)
   
   for (i=0; i < n; i++) a[i][i] += ONE;
 }
+
+void denseMatvec(realtype **a, realtype *x, realtype *y, long int m, long int n)
+{
+  long int i, j;
+  realtype *col_j;
+
+  for (i=0; i<m; i++) {
+    y[i] = 0.0;
+  }
+
+  for (j=0; j<n; j++) {
+    col_j = a[j];
+    for (i=0; i<m; i++)
+      y[i] += col_j[i]*x[j];
+  }
+}
+

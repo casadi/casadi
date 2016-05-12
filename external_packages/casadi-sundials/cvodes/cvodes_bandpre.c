@@ -1,14 +1,19 @@
 /*
  * -----------------------------------------------------------------
- * $Revision: 1.11 $
- * $Date: 2010/12/01 22:30:43 $
+ * $Revision: 4272 $
+ * $Date: 2014-12-02 11:19:41 -0800 (Tue, 02 Dec 2014) $
  * ----------------------------------------------------------------- 
  * Programmer(s): Radu Serban and Aaron Collier @ LLNL
  * -----------------------------------------------------------------
- * Copyright (c) 2005, The Regents of the University of California.
+ * LLNS Copyright Start
+ * Copyright (c) 2014, Lawrence Livermore National Security
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Lawrence Livermore National Laboratory in part under 
+ * Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
  * Produced at the Lawrence Livermore National Laboratory.
  * All rights reserved.
  * For details, see the LICENSE file.
+ * LLNS Copyright End
  * -----------------------------------------------------------------
  * This file contains implementations of the banded difference
  * quotient Jacobian-based preconditioner and solver routines for
@@ -113,8 +118,8 @@ int CVBandPrecInit(void *cvode_mem, long int N, long int mu, long int ml)
   /* Load pointers and bandwidths into pdata block. */
   pdata->cvode_mem = cvode_mem;
   pdata->N = N;
-  pdata->mu = mup = MIN(N-1, MAX(0,mu));
-  pdata->ml = mlp = MIN(N-1, MAX(0,ml));
+  pdata->mu = mup = SUNMIN(N-1, SUNMAX(0,mu));
+  pdata->ml = mlp = SUNMIN(N-1, SUNMAX(0,ml));
 
   /* Initialize nfeBP counter */
   pdata->nfeBP = 0;
@@ -130,7 +135,7 @@ int CVBandPrecInit(void *cvode_mem, long int N, long int mu, long int ml)
 
 
   /* Allocate memory for banded preconditioner. */
-  storagemu = MIN(N-1, mup+mlp);
+  storagemu = SUNMIN(N-1, mup+mlp);
   pdata->savedP = NULL;
   pdata->savedP = NewBandMat(N, mup, mlp, storagemu);
   if (pdata->savedP == NULL) {
@@ -192,7 +197,7 @@ int CVBandPrecGetWorkSpace(void *cvode_mem, long int *lenrwBP, long int *leniwBP
   N   = pdata->N;
   mu  = pdata->mu;
   ml  = pdata->ml;
-  smu = MIN( N-1, mu + ml);
+  smu = SUNMIN( N-1, mu + ml);
 
   *leniwBP = pdata->N;
   *lenrwBP = N * ( 2*ml + smu + mu + 2 );
@@ -444,20 +449,20 @@ static int cvBandPrecDQJac(CVBandPrecData pdata,
   N_VScale(ONE, y, ytemp);
 
   /* Set minimum increment based on uround and norm of f. */
-  srur = RSqrt(uround);
+  srur = SUNRsqrt(uround);
   fnorm = N_VWrmsNorm(fy, ewt);
   minInc = (fnorm != ZERO) ?
-           (MIN_INC_MULT * ABS(h) * uround * N * fnorm) : ONE;
+           (MIN_INC_MULT * SUNRabs(h) * uround * N * fnorm) : ONE;
 
   /* Set bandwidth and number of column groups for band differencing. */
   width = ml + mu + 1;
-  ngroups = MIN(width, N);
+  ngroups = SUNMIN(width, N);
   
   for (group = 1; group <= ngroups; group++) {
     
     /* Increment all y_j in group. */
     for(j = group-1; j < N; j += width) {
-      inc = MAX(srur*ABS(y_data[j]), minInc/ewt_data[j]);
+      inc = SUNMAX(srur*SUNRabs(y_data[j]), minInc/ewt_data[j]);
       ytemp_data[j] += inc;
     }
 
@@ -471,10 +476,10 @@ static int cvBandPrecDQJac(CVBandPrecData pdata,
     for (j = group-1; j < N; j += width) {
       ytemp_data[j] = y_data[j];
       col_j = BAND_COL(savedJ,j);
-      inc = MAX(srur*ABS(y_data[j]), minInc/ewt_data[j]);
+      inc = SUNMAX(srur*SUNRabs(y_data[j]), minInc/ewt_data[j]);
       inc_inv = ONE/inc;
-      i1 = MAX(0, j-mu);
-      i2 = MIN(j+ml, N-1);
+      i1 = SUNMAX(0, j-mu);
+      i2 = SUNMIN(j+ml, N-1);
       for (i=i1; i <= i2; i++)
         BAND_COL_ELEM(col_j,i,j) =
           inc_inv * (ftemp_data[i] - fy_data[i]);

@@ -1,14 +1,19 @@
 /*
  * -----------------------------------------------------------------
- * $Revision: 1.14 $
- * $Date: 2011/03/23 21:12:45 $
+ * $Revision: 4272 $
+ * $Date: 2014-12-02 11:19:41 -0800 (Tue, 02 Dec 2014) $
  * ----------------------------------------------------------------- 
  * Programmer(s): Alan C. Hindmarsh and Radu Serban @ LLNL
  * -----------------------------------------------------------------
- * Copyright (c) 2002, The Regents of the University of California.
+ * LLNS Copyright Start
+ * Copyright (c) 2014, Lawrence Livermore National Security
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Lawrence Livermore National Laboratory in part under 
+ * Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
  * Produced at the Lawrence Livermore National Laboratory.
  * All rights reserved.
  * For details, see the LICENSE file.
+ * LLNS Copyright End
  * -----------------------------------------------------------------
  * This is the implementation file for the IDAS banded linear
  * solver module, IDABAND. This module uses standard banded
@@ -179,7 +184,7 @@ int IDABand(void *ida_mem, long int Neq, long int mupper, long int mlower)
   idadls_mem->d_mu = mupper;
     
   /* Set extended upper half-bandwidth for JJ (required for pivoting). */
-  smu = MIN(Neq-1, mupper + mlower);
+  smu = SUNMIN(Neq-1, mupper + mlower);
 
   /* Allocate memory for JJ and pivot array. */
   JJ = NULL;
@@ -403,7 +408,7 @@ int IDABandB(void *ida_mem, int which,
 
   if (flag != IDADLS_SUCCESS) {
     free(idadlsB_mem);
-    IDAB_mem->ida_lmem  = NULL;
+    idadlsB_mem = NULL;
   }
 
   return(flag);

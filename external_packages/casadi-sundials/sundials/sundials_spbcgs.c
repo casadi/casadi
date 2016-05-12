@@ -1,14 +1,19 @@
 /*
  * -----------------------------------------------------------------
- * $Revision: 1.2 $
- * $Date: 2007/04/06 20:33:30 $
+ * $Revision: 4272 $
+ * $Date: 2014-12-02 11:19:41 -0800 (Tue, 02 Dec 2014) $
  * -----------------------------------------------------------------
  * Programmer(s): Peter Brown and Aaron Collier @ LLNL
  * -----------------------------------------------------------------
- * Copyright (c) 2004, The Regents of the University of California.
+ * LLNS Copyright Start
+ * Copyright (c) 2014, Lawrence Livermore National Security
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Lawrence Livermore National Laboratory in part under 
+ * Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
  * Produced at the Lawrence Livermore National Laboratory.
  * All rights reserved.
  * For details, see the LICENSE file.
+ * LLNS Copyright End
  * -----------------------------------------------------------------
  * This is the implementation file for the scaled, preconditioned
  * Bi-CGSTAB (SPBCG) iterative linear solver.
@@ -203,7 +208,7 @@ int SpbcgSolve(SpbcgMem mem, void *A_data, N_Vector x, N_Vector b,
   /* Set r_norm to L2 norm of r_star = sb P1_inv r_0, and
      return if small */
 
-  *res_norm = r_norm = rho = RSqrt(beta_denom);
+  *res_norm = r_norm = rho = SUNRsqrt(beta_denom);
   if (r_norm <= delta) return(SPBCG_SUCCESS);
 
   /* Copy r_star to r and p */
@@ -316,7 +321,7 @@ int SpbcgSolve(SpbcgMem mem, void *A_data, N_Vector x, N_Vector b,
 
     /* Set rho = norm(r) and check convergence */
 
-    *res_norm = rho = RSqrt(N_VDotProd(r, r));
+    *res_norm = rho = SUNRsqrt(N_VDotProd(r, r));
     if (rho <= delta) {
       converged = TRUE;
       break;

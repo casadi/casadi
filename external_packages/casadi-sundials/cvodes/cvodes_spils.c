@@ -1,14 +1,19 @@
 /*
  * -----------------------------------------------------------------
- * $Revision: 1.12 $
- * $Date: 2011/06/23 00:31:01 $
+ * $Revision: 4233 $
+ * $Date: 2014-10-08 16:11:32 -0700 (Wed, 08 Oct 2014) $
  * ----------------------------------------------------------------- 
  * Programmer(s):Radu Serban @ LLNL
  * -----------------------------------------------------------------
- * Copyright (c) 2005, The Regents of the University of California.
+ * LLNS Copyright Start
+ * Copyright (c) 2014, Lawrence Livermore National Security
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Lawrence Livermore National Laboratory in part under 
+ * Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
  * Produced at the Lawrence Livermore National Laboratory.
  * All rights reserved.
  * For details, see the LICENSE file.
+ * LLNS Copyright End
  * -----------------------------------------------------------------
  * This is the implementation file for the CVSPILS linear solvers.
  *
@@ -39,20 +44,28 @@
  * =================================================================
  */
 
-/* 
- * cvSpilsPrecSetupBWrapper has type CVSpilsPrecSetupFn
- * It wraps around the user-provided function of type CVSpilsPrecSetupFnB
+/*
+ * cvSpilsPrecSetupBWrapper and cvSpilsPrecSetupBSWrapper have type
+ * CVSpilsPrecSetupFn, and wrap around user-provided functions of
+ * type CVSpilsPrecSetupFnB and CVSpilsPrecSetupFnBS, respectively.
  */
 
-static int cvSpilsPrecSetupBWrapper(realtype t, N_Vector yB, 
-                                    N_Vector fyB, booleantype jokB, 
+static int cvSpilsPrecSetupBWrapper(realtype t, N_Vector yB,
+                                    N_Vector fyB, booleantype jokB,
                                     booleantype *jcurPtrB, realtype gammaB,
                                     void *cvode_mem,
                                     N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
 
-/* 
- * cvSpilsPrecSolveBWrapper has type CVSpilsPrecSolveFn 
- * It wraps around the user-provided function of type CVSpilsPrecSolveFnB
+static int cvSpilsPrecSetupBSWrapper(realtype t, N_Vector yB,
+                                     N_Vector fyB, booleantype jokB,
+                                     booleantype *jcurPtrB, realtype gammaB,
+                                     void *cvode_mem,
+                                     N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
+
+/*
+ * cvSpilsPrecSolveBWrapper and cvSpilsPrecSolveBSWrapper have type
+ * CVSpilsPrecSolveFn, and wrap around user-provided functions of
+ * type CVSpilsPrecSolveFnB and CVSpilsPrecSolveFnBS, respectively.
  */
 
 static int cvSpilsPrecSolveBWrapper(realtype t, N_Vector yB, N_Vector fyB,
@@ -60,14 +73,24 @@ static int cvSpilsPrecSolveBWrapper(realtype t, N_Vector yB, N_Vector fyB,
                                     realtype gammaB, realtype deltaB,
                                     int lrB, void *cvode_mem, N_Vector tmpB);
   
-/* 
- * cvSpilsJacTimesVecBWrapper has type CVSpilsJacTimesVecFn 
- * It wraps around the user-provided function of type CVSpilsJacTimesVecFnB
+static int cvSpilsPrecSolveBSWrapper(realtype t, N_Vector yB, N_Vector fyB,
+                                     N_Vector rB, N_Vector zB,
+                                     realtype gammaB, realtype deltaB,
+                                     int lrB, void *cvode_mem, N_Vector tmpB);
+  
+/*
+ * cvSpilsJacTimesVecBWrapper and cvSpilsJacTimesVecBSWrapper have type
+ * CVSpilsJacTimesVecFn, and wrap around user-provided functions of
+ * type CVSpilsJacTimesVecFnB and CVSpilsJacTimesVecFnBS, respectively.
  */
 
 static int cvSpilsJacTimesVecBWrapper(N_Vector vB, N_Vector JvB, realtype t, 
                                       N_Vector yB, N_Vector fyB, 
                                       void *cvode_mem, N_Vector tmpB);
+
+static int cvSpilsJacTimesVecBSWrapper(N_Vector vB, N_Vector JvB, realtype t, 
+                                       N_Vector yB, N_Vector fyB, 
+                                       void *cvode_mem, N_Vector tmpB);
 
 /* 
  * ================================================================
@@ -765,10 +788,14 @@ int CVSpilsDQJtimes(N_Vector v, N_Vector Jv, realtype t,
 #define ytmp  (ca_mem->ca_ytmp)
 #define yStmp (ca_mem->ca_yStmp)
 #define IMget (ca_mem->ca_IMget)
+#define IMinterpSensi (ca_mem->ca_IMinterpSensi)
 
 #define pset_B     (cvspilsB_mem->s_psetB)
+#define pset_BS     (cvspilsB_mem->s_psetBS)
 #define psolve_B   (cvspilsB_mem->s_psolveB)
+#define psolve_BS   (cvspilsB_mem->s_psolveBS)
 #define jtimes_B   (cvspilsB_mem->s_jtimesB)
+#define jtimes_BS   (cvspilsB_mem->s_jtimesBS)
 
 /*
  * -----------------------------------------------------------------
@@ -957,21 +984,21 @@ int CVSpilsSetPreconditionerB(void *cvode_mem, int which,
 
   /* Check if cvode_mem exists */
   if (cvode_mem == NULL) {
-    cvProcessError(NULL, CVSPILS_MEM_NULL, "CVSPILS", "CVSpilsSetPreconsitionerB", MSGS_CVMEM_NULL);
+    cvProcessError(NULL, CVSPILS_MEM_NULL, "CVSPILS", "CVSpilsSetPreconditionerB", MSGS_CVMEM_NULL);
     return(CVSPILS_MEM_NULL);
   }
   cv_mem = (CVodeMem) cvode_mem;
 
   /* Was ASA initialized? */
   if (cv_mem->cv_adjMallocDone == FALSE) {
-    cvProcessError(cv_mem, CVSPILS_NO_ADJ, "CVSPILS", "CVSpilsSetPreconsitionerB", MSGS_NO_ADJ);
+    cvProcessError(cv_mem, CVSPILS_NO_ADJ, "CVSPILS", "CVSpilsSetPreconditionerB", MSGS_NO_ADJ);
     return(CVSPILS_NO_ADJ);
   } 
   ca_mem = cv_mem->cv_adj_mem;
 
   /* Check which */
   if ( which >= ca_mem->ca_nbckpbs ) {
-    cvProcessError(cv_mem, CVSPILS_ILL_INPUT, "CVSPILS", "CVSpilsSetPreconsitionerB", MSGS_BAD_WHICH);
+    cvProcessError(cv_mem, CVSPILS_ILL_INPUT, "CVSPILS", "CVSpilsSetPreconditionerB", MSGS_BAD_WHICH);
     return(CVSPILS_ILL_INPUT);
   }
 
@@ -985,7 +1012,7 @@ int CVSpilsSetPreconditionerB(void *cvode_mem, int which,
   cvodeB_mem = (void *) (cvB_mem->cv_mem);
 
   if (cvB_mem->cv_lmem == NULL) {
-    cvProcessError(cv_mem, CVSPILS_LMEMB_NULL, "CVSPILS", "CVSpilsSetPreconditonerB", MSGS_LMEMB_NULL);
+    cvProcessError(cv_mem, CVSPILS_LMEMB_NULL, "CVSPILS", "CVSpilsSetPreconditionerB", MSGS_LMEMB_NULL);
     return(CVSPILS_LMEMB_NULL);
   }
   cvspilsB_mem = (CVSpilsMemB) (cvB_mem->cv_lmem);
@@ -993,7 +1020,69 @@ int CVSpilsSetPreconditionerB(void *cvode_mem, int which,
   pset_B   = psetB;
   psolve_B = psolveB;
 
-  flag = CVSpilsSetPreconditioner(cvodeB_mem, cvSpilsPrecSetupBWrapper, cvSpilsPrecSolveBWrapper);
+  if (psetB == NULL) {
+    flag = CVSpilsSetPreconditioner(cvodeB_mem, NULL, cvSpilsPrecSolveBWrapper);
+  } else {
+    flag = CVSpilsSetPreconditioner(cvodeB_mem, cvSpilsPrecSetupBWrapper, cvSpilsPrecSolveBWrapper);
+  }
+
+  return(flag);
+}
+
+int CVSpilsSetPreconditionerBS(void *cvode_mem, int which, 
+                               CVSpilsPrecSetupFnBS psetBS,
+                               CVSpilsPrecSolveFnBS psolveBS)
+{
+  CVodeMem cv_mem;
+  CVadjMem ca_mem;
+  CVodeBMem cvB_mem;
+  CVSpilsMemB cvspilsB_mem; 
+  void *cvodeB_mem;
+  int flag;
+
+  /* Check if cvode_mem exists */
+  if (cvode_mem == NULL) {
+    cvProcessError(NULL, CVSPILS_MEM_NULL, "CVSPILS", "CVSpilsSetPreconditionerBS", MSGS_CVMEM_NULL);
+    return(CVSPILS_MEM_NULL);
+  }
+  cv_mem = (CVodeMem) cvode_mem;
+
+  /* Was ASA initialized? */
+  if (cv_mem->cv_adjMallocDone == FALSE) {
+    cvProcessError(cv_mem, CVSPILS_NO_ADJ, "CVSPILS", "CVSpilsSetPreconditionerBS", MSGS_NO_ADJ);
+    return(CVSPILS_NO_ADJ);
+  } 
+  ca_mem = cv_mem->cv_adj_mem;
+
+  /* Check which */
+  if ( which >= ca_mem->ca_nbckpbs ) {
+    cvProcessError(cv_mem, CVSPILS_ILL_INPUT, "CVSPILS", "CVSpilsSetPreconditionerBS", MSGS_BAD_WHICH);
+    return(CVSPILS_ILL_INPUT);
+  }
+
+  /* Find the CVodeBMem entry in the linked list corresponding to which */
+  cvB_mem = ca_mem->cvB_mem;
+  while (cvB_mem != NULL) {
+    if ( which == cvB_mem->cv_index ) break;
+    cvB_mem = cvB_mem->cv_next;
+  }
+
+  cvodeB_mem = (void *) (cvB_mem->cv_mem);
+
+  if (cvB_mem->cv_lmem == NULL) {
+    cvProcessError(cv_mem, CVSPILS_LMEMB_NULL, "CVSPILS", "CVSpilsSetPreconditionerBS", MSGS_LMEMB_NULL);
+    return(CVSPILS_LMEMB_NULL);
+  }
+  cvspilsB_mem = (CVSpilsMemB) (cvB_mem->cv_lmem);
+
+  pset_BS   = psetBS;
+  psolve_BS = psolveBS;
+
+  if (psetBS == NULL) {
+    flag = CVSpilsSetPreconditioner(cvodeB_mem, NULL, cvSpilsPrecSolveBSWrapper);
+  } else {
+    flag = CVSpilsSetPreconditioner(cvodeB_mem, cvSpilsPrecSetupBSWrapper, cvSpilsPrecSolveBSWrapper);
+  }
 
   return(flag);
 }
@@ -1053,6 +1142,61 @@ int CVSpilsSetJacTimesVecFnB(void *cvode_mem, int which, CVSpilsJacTimesVecFnB j
   return(flag);
 }
 
+int CVSpilsSetJacTimesVecFnBS(void *cvode_mem, int which, CVSpilsJacTimesVecFnBS jtvBS)
+{
+  CVodeMem cv_mem;
+  CVadjMem ca_mem;
+  CVodeBMem cvB_mem;
+  CVSpilsMemB cvspilsB_mem; 
+  void *cvodeB_mem;
+  int flag;
+
+  /* Check if cvode_mem exists */
+  if (cvode_mem == NULL) {
+    cvProcessError(NULL, CVSPILS_MEM_NULL, "CVSPILS", "CVSpilsSetJacTimesVecFnBS", MSGS_CVMEM_NULL);
+    return(CVSPILS_MEM_NULL);
+  }
+  cv_mem = (CVodeMem) cvode_mem;
+
+  /* Was ASA initialized? */
+  if (cv_mem->cv_adjMallocDone == FALSE) {
+    cvProcessError(cv_mem, CVSPILS_NO_ADJ, "CVSPILS", "CVSpilsSetJacTimesVecFnBS", MSGS_NO_ADJ);
+    return(CVSPILS_NO_ADJ);
+  } 
+  ca_mem = cv_mem->cv_adj_mem;
+
+  /* Check which */
+  if ( which >= ca_mem->ca_nbckpbs ) {
+    cvProcessError(cv_mem, CVSPILS_ILL_INPUT, "CVSPILS", "CVSpilsSetJacTimesVecFnBS", MSGS_BAD_WHICH);
+    return(CVSPILS_ILL_INPUT);
+  }
+
+  /* Find the CVodeBMem entry in the linked list corresponding to which */
+  cvB_mem = ca_mem->cvB_mem;
+  while (cvB_mem != NULL) {
+    if ( which == cvB_mem->cv_index ) break;
+    cvB_mem = cvB_mem->cv_next;
+  }
+
+  cvodeB_mem = (void *) (cvB_mem->cv_mem);
+
+  if (cvB_mem->cv_lmem == NULL) {
+    cvProcessError(cv_mem, CVSPILS_LMEMB_NULL, "CVSPILS", "CVSpilsSetJacTimesVecFnBS", MSGS_LMEMB_NULL);
+    return(CVSPILS_LMEMB_NULL);
+  }
+  cvspilsB_mem = (CVSpilsMemB) (cvB_mem->cv_lmem);
+
+  jtimes_BS = jtvBS;
+
+  if (jtvBS != NULL) {
+    flag = CVSpilsSetJacTimesVecFn(cvodeB_mem, cvSpilsJacTimesVecBSWrapper);
+  } else {
+    flag = CVSpilsSetJacTimesVecFn(cvodeB_mem, NULL);
+  }
+
+  return(flag);
+}
+
 
 /*
  * -----------------------------------------------------------------
@@ -1101,6 +1245,49 @@ static int cvSpilsPrecSetupBWrapper(realtype t, N_Vector yB,
   return(retval);
 }
 
+/*
+ * cvSpilsPrecSetupBSWrapper
+ *
+ * This routine interfaces to the CVSpilsPrecSetupFnBS routine 
+ * provided by the user.
+ */
+
+static int cvSpilsPrecSetupBSWrapper(realtype t, N_Vector yB, 
+                                     N_Vector fyB, booleantype jokB, 
+                                     booleantype *jcurPtrB, realtype gammaB,
+                                     void *cvode_mem,
+                                     N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B)
+{
+  CVodeMem cv_mem;
+  CVadjMem ca_mem;
+  CVodeBMem cvB_mem;
+  CVSpilsMemB cvspilsB_mem;
+  int retval, flag;
+
+  cv_mem = (CVodeMem) cvode_mem;
+
+  ca_mem = cv_mem->cv_adj_mem;
+
+  cvB_mem = ca_mem->ca_bckpbCrt;
+
+  cvspilsB_mem = (CVSpilsMemB) (cvB_mem->cv_lmem);
+
+  /* Forward solution from interpolation */
+  if (IMinterpSensi)
+    flag = IMget(cv_mem, t, ytmp, yStmp);
+  else
+    flag = IMget(cv_mem, t, ytmp, NULL);
+  if (flag != CV_SUCCESS) {
+    cvProcessError(cv_mem, -1, "CVSPILS", "cvSpilsPrecSetupBSWrapper", MSGS_BAD_TINTERP);
+    return(-1);
+  } 
+
+  /* Call user's adjoint precondB routine */
+  retval = pset_BS(t, ytmp, yStmp, yB, fyB, jokB, jcurPtrB, gammaB,
+                   cvB_mem->cv_user_data, tmp1B, tmp2B, tmp3B);
+
+  return(retval);
+}
 
 /*
  * cvSpilsPrecSolveBWrapper
@@ -1142,6 +1329,48 @@ static int cvSpilsPrecSolveBWrapper(realtype t, N_Vector yB, N_Vector fyB,
   return(retval);
 }
 
+/*
+ * cvSpilsPrecSolveBSWrapper
+ *
+ * This routine interfaces to the CVSpilsPrecSolveFnBS routine 
+ * provided by the user.
+ */
+
+static int cvSpilsPrecSolveBSWrapper(realtype t, N_Vector yB, N_Vector fyB,
+                                     N_Vector rB, N_Vector zB,
+                                     realtype gammaB, realtype deltaB,
+                                     int lrB, void *cvode_mem, N_Vector tmpB)
+{
+  CVodeMem cv_mem;
+  CVadjMem ca_mem;
+  CVodeBMem cvB_mem;
+  CVSpilsMemB cvspilsB_mem;
+  int retval, flag;
+
+  cv_mem = (CVodeMem) cvode_mem;
+
+  ca_mem = cv_mem->cv_adj_mem;
+
+  cvB_mem = ca_mem->ca_bckpbCrt;
+
+  cvspilsB_mem = (CVSpilsMemB) (cvB_mem->cv_lmem);
+
+  /* Forward solution from interpolation */
+  if (IMinterpSensi)
+    flag = IMget(cv_mem, t, ytmp, yStmp);
+  else
+    flag = IMget(cv_mem, t, ytmp, NULL);
+  if (flag != CV_SUCCESS) {
+    cvProcessError(cv_mem, -1, "CVSPILS", "cvSpilsPrecSolveBSWrapper", MSGS_BAD_TINTERP);
+    return(-1);
+  }
+
+  /* Call user's adjoint psolveBS routine */
+  retval = psolve_BS(t, ytmp, yStmp, yB, fyB, rB, zB, gammaB, deltaB, 
+                     lrB, cvB_mem->cv_user_data, tmpB);
+
+  return(retval);
+}
 
 /*
  * cvSpilsJacTimesVecBWrapper
@@ -1181,3 +1410,43 @@ static int cvSpilsJacTimesVecBWrapper(N_Vector vB, N_Vector JvB, realtype t,
   return(retval);
 }
 
+/*
+ * cvSpilsJacTimesVecBSWrapper
+ *
+ * This routine interfaces to the CVSpilsJacTimesVecFnBS routine 
+ * provided by the user.
+ */
+
+static int cvSpilsJacTimesVecBSWrapper(N_Vector vB, N_Vector JvB, realtype t, 
+                                       N_Vector yB, N_Vector fyB, 
+                                       void *cvode_mem, N_Vector tmpB)
+{
+  CVodeMem cv_mem;
+  CVadjMem ca_mem;
+  CVodeBMem cvB_mem;
+  CVSpilsMemB cvspilsB_mem;
+  int retval, flag;
+
+  cv_mem = (CVodeMem) cvode_mem;
+
+  ca_mem = cv_mem->cv_adj_mem;
+
+  cvB_mem = ca_mem->ca_bckpbCrt;
+
+  cvspilsB_mem = (CVSpilsMemB) (cvB_mem->cv_lmem);
+
+  /* Forward solution from interpolation */
+  if (IMinterpSensi)
+    flag = IMget(cv_mem, t, ytmp, yStmp);
+  else
+    flag = IMget(cv_mem, t, ytmp, NULL);
+  if (flag != CV_SUCCESS) {
+    cvProcessError(cv_mem, -1, "CVSPILS", "cvSpilsJacTimesVecBSWrapper", MSGS_BAD_TINTERP);
+    return(-1);
+  } 
+
+  /* Call user's adjoint jtimesBS routine */
+  retval = jtimes_BS(vB, JvB, t, ytmp, yStmp, yB, fyB, cvB_mem->cv_user_data, tmpB);
+
+  return(retval);
+}

@@ -592,7 +592,7 @@ namespace casadi {
     m.t_lsolve += static_cast<double>(m.time2 - m.time1)/CLOCKS_PER_SEC;
   }
 
-  int KinsolInterface::lsetup_wrapper(KINMem kin_mem) {
+  int KinsolInterface::lsetup(KINMem kin_mem) {
     try {
       auto m = to_mem(kin_mem->kin_lmem);
       auto& s = m->self;
@@ -613,7 +613,7 @@ namespace casadi {
   }
 
   int KinsolInterface::
-  lsolve_wrapper(KINMem kin_mem, N_Vector x, N_Vector b, double *res_norm) {
+  lsolve(KINMem kin_mem, N_Vector x, N_Vector b, double *sJpnorm, double *sFdotJp) {
     try {
       auto m = to_mem(kin_mem->kin_lmem);
       auto& s = m->self;
@@ -630,12 +630,13 @@ namespace casadi {
       N_VScale(1.0, b, x);
       s.psolve(*m, u, uscale, fval, fscale, x, tmp1);
 
-      // Calculate residual
-      s.jtimes(*m, x, tmp2, u, 0);
-
-      // Calculate the error in residual norm
-      N_VLinearSum(1.0, b, -1.0, tmp2, tmp1);
-      *res_norm = sqrt(N_VDotProd(tmp1, tmp1));
+      // Calculate residuals
+      int flag = KINSpilsAtimes(kin_mem, x, b);
+      if (flag) return flag;
+      *sJpnorm = N_VWL2Norm(b, fscale);
+      N_VProd(b, fscale, b);
+      N_VProd(b, fscale, b);
+      *sFdotJp = N_VDotProd(fval, b);
 
       return 0;
     } catch(exception& e) {
@@ -645,7 +646,7 @@ namespace casadi {
   }
 
   void KinsolInterface::
-  ehfun_wrapper(int error_code, const char *module, const char *function,
+  ehfun(int error_code, const char *module, const char *function,
                 char *msg, void *eh_data) {
     try {
       auto m = to_mem(eh_data);
@@ -806,7 +807,7 @@ namespace casadi {
     casadi_assert_message(flag==KIN_SUCCESS, "KINSetUserData");
 
     // Set error handler function
-    flag = KINSetErrHandlerFn(m->mem, ehfun_wrapper, m);
+    flag = KINSetErrHandlerFn(m->mem, ehfun, m);
     casadi_assert_message(flag==KIN_SUCCESS, "KINSetErrHandlerFn");
 
     // Initialize KINSOL
@@ -884,8 +885,8 @@ namespace casadi {
       // Set fields in the IDA memory
       KINMem kin_mem = KINMem(m->mem);
       kin_mem->kin_lmem   = m;
-      kin_mem->kin_lsetup = lsetup_wrapper;
-      kin_mem->kin_lsolve = lsolve_wrapper;
+      kin_mem->kin_lsetup = lsetup;
+      kin_mem->kin_lsolve = lsolve;
       kin_mem->kin_setupNonNull = TRUE;
       break;
     }

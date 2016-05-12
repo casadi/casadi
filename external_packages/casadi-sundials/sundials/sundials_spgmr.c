@@ -1,15 +1,20 @@
 /*
  * -----------------------------------------------------------------
- * $Revision: 1.2 $
- * $Date: 2007/04/06 20:33:30 $
+ * $Revision: 4294 $
+ * $Date: 2014-12-15 13:18:40 -0800 (Mon, 15 Dec 2014) $
  * -----------------------------------------------------------------
  * Programmer(s): Scott D. Cohen, Alan C. Hindmarsh and
  *                Radu Serban @ LLNL
  * -----------------------------------------------------------------
- * Copyright (c) 2002, The Regents of the University of California.
+ * LLNS Copyright Start
+ * Copyright (c) 2014, Lawrence Livermore National Security
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Lawrence Livermore National Laboratory in part under 
+ * Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
  * Produced at the Lawrence Livermore National Laboratory.
  * All rights reserved.
  * For details, see the LICENSE file.
+ * LLNS Copyright End
  * -----------------------------------------------------------------
  * This is the implementation file for the scaled preconditioned
  * GMRES (SPGMR) iterative linear solver.
@@ -230,7 +235,7 @@ int SpgmrSolve(SpgmrMem mem, void *A_data, N_Vector x, N_Vector b,
   /* Set r_norm = beta to L2 norm of V[0] = s1 P1_inv r_0, and
      return if small.  */
 
-  *res_norm = r_norm = beta = RSqrt(N_VDotProd(V[0], V[0])); 
+  *res_norm = r_norm = beta = SUNRsqrt(N_VDotProd(V[0], V[0])); 
   if (r_norm <= delta)
     return(SPGMR_SUCCESS);
 
@@ -327,7 +332,7 @@ int SpgmrSolve(SpgmrMem mem, void *A_data, N_Vector x, N_Vector b,
       /*  Update residual norm estimate; break if convergence test passes. */
       
       rotation_product *= givens[2*l+1];
-      *res_norm = rho = ABS(rotation_product*r_norm);
+      *res_norm = rho = SUNRabs(rotation_product*r_norm);
       
       if (rho <= delta) { converged = TRUE; break; }
       
@@ -390,7 +395,7 @@ int SpgmrSolve(SpgmrMem mem, void *A_data, N_Vector x, N_Vector b,
     r_norm *= s_product;
     for (i = 0; i <= krydim; i++)
       yg[i] *= r_norm;
-    r_norm = ABS(r_norm);
+    r_norm = SUNRabs(r_norm);
     
     /* Multiply yg by V_(krydim+1) to get last residual vector; restart. */
     N_VScale(yg[0], V[0], V[0]);
@@ -436,19 +441,15 @@ int SpgmrSolve(SpgmrMem mem, void *A_data, N_Vector x, N_Vector b,
 void SpgmrFree(SpgmrMem mem)
 {
   int i, l_max;
-  realtype **Hes, *givens, *yg;
   
   if (mem == NULL) return;
 
   l_max  = mem->l_max;
-  Hes    = mem->Hes;
-  givens = mem->givens;
-  yg     = mem->yg;
 
-  for (i = 0; i <= l_max; i++) {free(Hes[i]); Hes[i] = NULL;}
-  free(Hes); Hes = NULL;
-  free(mem->givens); givens = NULL; 
-  free(mem->yg); yg = NULL;
+  for (i = 0; i <= l_max; i++) {free(mem->Hes[i]);}
+  free(mem->Hes);
+  free(mem->givens);
+  free(mem->yg);
 
   N_VDestroyVectorArray(mem->V, l_max+1);
   N_VDestroy(mem->xcor);

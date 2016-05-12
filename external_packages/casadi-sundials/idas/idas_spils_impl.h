@@ -1,14 +1,19 @@
 /*
  * -----------------------------------------------------------------
- * $Revision: 1.9 $
- * $Date: 2010/12/01 22:39:18 $
+ * $Revision: 4378 $
+ * $Date: 2015-02-19 10:55:14 -0800 (Thu, 19 Feb 2015) $
  * ----------------------------------------------------------------- 
  * Programmers: Alan C. Hindmarsh and Radu Serban @ LLNL
  * -----------------------------------------------------------------
- * Copyright (c) 2002, The Regents of the University of California.
+ * LLNS Copyright Start
+ * Copyright (c) 2014, Lawrence Livermore National Security
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Lawrence Livermore National Laboratory in part under 
+ * Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
  * Produced at the Lawrence Livermore National Laboratory.
  * All rights reserved.
  * For details, see the LICENSE file.
+ * LLNS Copyright End
  * -----------------------------------------------------------------
  * This is the common header file (private version) for the Scaled
  * Preconditioned Iterative Linear Solver modules.
@@ -18,12 +23,12 @@
 #ifndef _IDASSPILS_IMPL_H
 #define _IDASSPILS_IMPL_H
 
+#include <idas/idas_spils.h>
+#include "idas_impl.h"
+
 #ifdef __cplusplus  /* wrapper to enable C++ usage */
 extern "C" {
 #endif
-
-#include <idas/idas_spils.h>
-#include "idas_impl.h"
 
 /* Types of iterative linear solvers */
 
@@ -197,8 +202,11 @@ int IDASpilsDQJtimes(realtype tt,
 typedef struct IDASpilsMemRecB {
 
   IDASpilsJacTimesVecFnB s_jtimesB;
+  IDASpilsJacTimesVecFnBS s_jtimesBS;
   IDASpilsPrecSetupFnB s_psetB;
+  IDASpilsPrecSetupFnBS s_psetBS;
   IDASpilsPrecSolveFnB s_psolveB;
+  IDASpilsPrecSolveFnBS s_psolveBS;
   void *s_P_dataB;
 
 } *IDASpilsMemB;

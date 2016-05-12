@@ -1,14 +1,19 @@
 /*
  * -----------------------------------------------------------------
- * $Revision: 1.8 $
- * $Date: 2010/12/01 22:39:19 $
+ * $Revision: 4237 $
+ * $Date: 2014-10-15 16:19:59 -0700 (Wed, 15 Oct 2014) $
  * ----------------------------------------------------------------- 
  * Programmers: Alan C. Hindmarsh and Radu Serban @ LLNL
  * -----------------------------------------------------------------
- * Copyright (c) 2002, The Regents of the University of California  
- * Produced at the Lawrence Livermore National Laboratory
- * All rights reserved
- * For details, see the LICENSE file
+ * LLNS Copyright Start
+ * Copyright (c) 2014, Lawrence Livermore National Security
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Lawrence Livermore National Laboratory in part under 
+ * Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
+ * Produced at the Lawrence Livermore National Laboratory.
+ * All rights reserved.
+ * For details, see the LICENSE file.
+ * LLNS Copyright End
  * -----------------------------------------------------------------
  * This is the common implementation file for the IDAS Scaled              
  * Preconditioned Linear Solver modules.
@@ -38,24 +43,39 @@
  * =================================================================
  */
 
-static int IDAAspilsPrecSetup(realtype tt, 
-                              N_Vector yyB, N_Vector ypB, N_Vector rrB, 
-                              realtype c_jB, void *idaadj_mem,
-                              N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
+static int IDAAspilsPrecSetupB(realtype tt, 
+                               N_Vector yyB, N_Vector ypB, N_Vector rrB, 
+                               realtype c_jB, void *idaadj_mem,
+                               N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
 
-static int IDAAspilsPrecSolve(realtype tt, 
-                              N_Vector yyB, N_Vector ypB, N_Vector rrB, 
-                              N_Vector rvecB, N_Vector zvecB,
-                              realtype c_jB, realtype deltaB,
-                              void *idaadj_mem, N_Vector tmpB);
+static int IDAAspilsPrecSetupBS(realtype tt, 
+                                N_Vector yyB, N_Vector ypB, N_Vector rrB, 
+                                realtype c_jB, void *idaadj_mem,
+                                N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
 
-static int IDAAspilsJacTimesVec(realtype tt,
-                                N_Vector yyB, N_Vector ypB, N_Vector rrB,
-                                N_Vector vB, N_Vector JvB, 
-                                realtype c_jB, void *idaadj_mem, 
-                                N_Vector tmp1B, N_Vector tmp2B);
+static int IDAAspilsPrecSolveB(realtype tt, 
+                               N_Vector yyB, N_Vector ypB, N_Vector rrB, 
+                               N_Vector rvecB, N_Vector zvecB,
+                               realtype c_jB, realtype deltaB,
+                               void *idaadj_mem, N_Vector tmpB);
 
+static int IDAAspilsPrecSolveBS(realtype tt, 
+                                N_Vector yyB, N_Vector ypB, N_Vector rrB, 
+                                N_Vector rvecB, N_Vector zvecB,
+                                realtype c_jB, realtype deltaB,
+                                void *idaadj_mem, N_Vector tmpB);
 
+static int IDAAspilsJacTimesVecB(realtype tt,
+                                 N_Vector yyB, N_Vector ypB, N_Vector rrB,
+                                 N_Vector vB, N_Vector JvB, 
+                                 realtype c_jB, void *idaadj_mem, 
+                                 N_Vector tmp1B, N_Vector tmp2B);
+
+static int IDAAspilsJacTimesVecBS(realtype tt,
+                                  N_Vector yyB, N_Vector ypB, N_Vector rrB,
+                                  N_Vector vB, N_Vector JvB, 
+                                  realtype c_jB, void *idaadj_mem, 
+                                  N_Vector tmp1B, N_Vector tmp2B);
 
 /* 
  * ================================================================
@@ -621,7 +641,7 @@ int IDASpilsDQJtimes(realtype tt,
   IDAMem IDA_mem;
   IDASpilsMem idaspils_mem;
   N_Vector y_tmp, yp_tmp;
-  realtype sig, siginv;
+  realtype sig=ZERO, siginv;
   int iter, retval;
 
   /* data is ida_mem */
@@ -683,6 +703,9 @@ int IDASpilsDQJtimes(realtype tt,
 #define yyTmp        (IDAADJ_mem->ia_yyTmp)
 #define ypTmp        (IDAADJ_mem->ia_ypTmp)
 #define noInterp     (IDAADJ_mem->ia_noInterp)
+#define interpSensi  (IDAADJ_mem->ia_interpSensi)
+#define yySTmp      (IDAADJ_mem->ia_yySTmp)
+#define ypSTmp      (IDAADJ_mem->ia_ypSTmp)
 
 /*
  * -----------------------------------------------------------------
@@ -953,8 +976,76 @@ int IDASpilsSetPreconditionerB(void *ida_mem, int which,
   idaspilsB_mem->s_psetB   = psetB;
   idaspilsB_mem->s_psolveB = psolveB;
 
-  return IDASpilsSetPreconditioner(ida_memB, IDAAspilsPrecSetup, IDAAspilsPrecSolve);
+  if (psetB == NULL) {
+    return IDASpilsSetPreconditioner(ida_memB, NULL, IDAAspilsPrecSolveB);
+  } else {
+    return IDASpilsSetPreconditioner(ida_memB, IDAAspilsPrecSetupB, IDAAspilsPrecSolveB);
+  }
 }
+
+int IDASpilsSetPreconditionerBS(void *ida_mem, int which, 
+                                IDASpilsPrecSetupFnBS psetBS,
+                                IDASpilsPrecSolveFnBS psolveBS)
+{
+  IDAadjMem IDAADJ_mem;
+  IDAMem IDA_mem;
+  IDABMem IDAB_mem;
+  void *ida_memB;
+  IDASpilsMemB idaspilsB_mem;
+  
+  /* Check if ida_mem is allright. */
+  if (ida_mem == NULL) {
+    IDAProcessError(NULL, IDASPILS_MEM_NULL, "IDASSPILS", 
+                    "IDASpilsSetPreconditionerBS", MSGS_IDAMEM_NULL);
+    return(IDASPILS_MEM_NULL);
+  }
+  IDA_mem = (IDAMem) ida_mem;
+
+  /* Is ASA initialized? */
+  if (IDA_mem->ida_adjMallocDone == FALSE) {
+    IDAProcessError(IDA_mem, IDASPILS_NO_ADJ, "IDASSPILS", 
+                    "IDASpilsSetPreconditionerBS",  MSGS_NO_ADJ);
+    return(IDASPILS_NO_ADJ);
+  }
+  IDAADJ_mem = IDA_mem->ida_adj_mem;
+
+  /* Check the value of which */
+  if ( which >= IDAADJ_mem->ia_nbckpbs ) {
+    IDAProcessError(IDA_mem, IDASPILS_ILL_INPUT, "IDASSPILS", 
+                    "IDASpilsSetPreconditionerBS", MSGS_BAD_WHICH);
+    return(IDASPILS_ILL_INPUT);
+  }
+
+  /* Find the IDABMem entry in the linked list corresponding to 'which'. */
+  IDAB_mem = IDAADJ_mem->IDAB_mem;
+  while (IDAB_mem != NULL) {
+    if( which == IDAB_mem->ida_index ) break;
+    /* advance */
+    IDAB_mem = IDAB_mem->ida_next;
+  }
+  /* ida_mem corresponding to 'which' problem. */
+  ida_memB = (void *) IDAB_mem->IDA_mem;
+
+  if ( IDAB_mem->ida_lmem == NULL) {
+    IDAProcessError(IDA_mem, IDASPILS_LMEMB_NULL, "IDASSPILS", 
+                    "IDASpilsSetPreconditionerBS", MSGS_LMEMB_NULL);
+    return(IDASPILS_ILL_INPUT);
+  }
+
+  /* Get the IDASpilsMemB data. */
+  idaspilsB_mem = (IDASpilsMemB) IDAB_mem->ida_lmem;
+
+  /* Set preconditioners for the backward problem. */
+  idaspilsB_mem->s_psetBS   = psetBS;
+  idaspilsB_mem->s_psolveBS = psolveBS;
+
+  if (psetBS == NULL) {
+    return IDASpilsSetPreconditioner(ida_memB, NULL, IDAAspilsPrecSolveBS);
+  } else {
+    return IDASpilsSetPreconditioner(ida_memB, IDAAspilsPrecSetupBS, IDAAspilsPrecSolveBS);
+  }
+}
+
 
 int IDASpilsSetJacTimesVecFnB(void *ida_mem, int which, IDASpilsJacTimesVecFnB jtvB)
 {
@@ -1011,24 +1102,87 @@ int IDASpilsSetJacTimesVecFnB(void *ida_mem, int which, IDASpilsJacTimesVecFnB j
   idaspilsB_mem->s_jtimesB   = jtvB;
 
   if (jtvB != NULL) {
-    flag = IDASpilsSetJacTimesVecFn(ida_memB, IDAAspilsJacTimesVec);
+    flag = IDASpilsSetJacTimesVecFn(ida_memB, IDAAspilsJacTimesVecB);
   } else {
     flag = IDASpilsSetJacTimesVecFn(ida_memB, NULL);
   }
   return(flag);
 }
 
+int IDASpilsSetJacTimesVecFnBS(void *ida_mem, int which, IDASpilsJacTimesVecFnBS jtvBS)
+{
+  IDAadjMem IDAADJ_mem;
+  IDAMem IDA_mem;
+  IDABMem IDAB_mem;
+  IDASpilsMemB idaspilsB_mem;
+  void *ida_memB;
+  int flag;
+  
+  /* Check if ida_mem is allright. */
+  if (ida_mem == NULL) {
+    IDAProcessError(NULL, IDASPILS_MEM_NULL, "IDASSPILS", 
+                    "IDASpilsSetJacTimesVecFnBS", MSGS_IDAMEM_NULL);
+    return(IDASPILS_MEM_NULL);
+  }
+  IDA_mem = (IDAMem) ida_mem;
+
+  /* Is ASA initialized? */
+  if (IDA_mem->ida_adjMallocDone == FALSE) {
+    IDAProcessError(IDA_mem, IDASPILS_NO_ADJ, "IDASSPILS", 
+                    "IDASpilsSetJacTimesVecFnBS",  MSGS_NO_ADJ);
+    return(IDASPILS_NO_ADJ);
+  }
+  IDAADJ_mem = IDA_mem->ida_adj_mem;
+
+  /* Check the value of which */
+  if ( which >= IDAADJ_mem->ia_nbckpbs ) {
+    IDAProcessError(IDA_mem, IDASPILS_ILL_INPUT, "IDASSPILS", 
+                    "IDASpilsSetJacTimesVecFnBS", MSGS_BAD_WHICH);
+    return(IDASPILS_ILL_INPUT);
+  }
+
+  /* Find the IDABMem entry in the linked list corresponding to 'which'. */
+  IDAB_mem = IDAADJ_mem->IDAB_mem;
+  while (IDAB_mem != NULL) {
+    if( which == IDAB_mem->ida_index ) break;
+    /* advance */
+    IDAB_mem = IDAB_mem->ida_next;
+  }
+  /* ida_mem corresponding to 'which' problem. */
+  ida_memB = (void *) IDAB_mem->IDA_mem;
+
+  if ( IDAB_mem->ida_lmem == NULL) {
+    IDAProcessError(IDA_mem, IDASPILS_LMEMB_NULL, "IDASSPILS", 
+                    "IDASpilsSetJacTimesVecFnBS", MSGS_LMEMB_NULL);
+    return(IDASPILS_ILL_INPUT);
+  }
+
+  idaspilsB_mem = (IDASpilsMemB) IDAB_mem->ida_lmem;
+
+  /* Call the corresponding Set* function for the backward problem. */
+
+  idaspilsB_mem->s_jtimesBS = jtvBS;
+
+  if (jtvBS != NULL) {
+    flag = IDASpilsSetJacTimesVecFn(ida_memB, IDAAspilsJacTimesVecBS);
+  } else {
+    flag = IDASpilsSetJacTimesVecFn(ida_memB, NULL);
+  }
+  return(flag);
+}
+
+
 /*
  * -----------------------------------------------------------------
  * IDASSPILS private functions
  *
- * Those routines are interfaces the routines provided by user for
- * backward problems.
+ * These routines are interfaces to the routines provided by the
+ * user for backward problems.
  *
  * -----------------------------------------------------------------
  */
 
-static int IDAAspilsPrecSetup(realtype tt, 
+static int IDAAspilsPrecSetupB(realtype tt, 
                               N_Vector yyB, N_Vector ypB, N_Vector rrB, 
                               realtype c_jB, void *ida_mem,
                               N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B)
@@ -1044,27 +1198,64 @@ static int IDAAspilsPrecSetup(realtype tt,
   IDAB_mem = IDAADJ_mem->ia_bckpbCrt;
   idaspilsB_mem = (IDASpilsMemB)IDAB_mem->ida_lmem;
   
-  /* Get FORWARD solution from interpolation. */
+  /* Get forward solution from interpolation. */
   if (noInterp==FALSE) {
     flag = IDAADJ_mem->ia_getY(IDA_mem, tt, yyTmp, ypTmp, NULL, NULL);
     if (flag != IDA_SUCCESS) {
-      IDAProcessError(IDA_mem, -1, "IDASSPILS", "IDAAspilsPrecSetup", MSGS_BAD_T);
+      IDAProcessError(IDAB_mem->IDA_mem, -1, "IDASSPILS", "IDAAspilsPrecSetupB", MSGS_BAD_T);
       return(-1);
     }
   }
 
   /* Call user's adjoint precondB routine */
   flag = idaspilsB_mem->s_psetB(tt, yyTmp, ypTmp, yyB, ypB, rrB, 
-                               c_jB, IDAB_mem->ida_user_data,
-                               tmp1B, tmp2B, tmp3B);
+                                c_jB, IDAB_mem->ida_user_data,
+                                tmp1B, tmp2B, tmp3B);
   return(flag);
 }
 
-static int IDAAspilsPrecSolve(realtype tt, 
-                              N_Vector yyB, N_Vector ypB, N_Vector rrB, 
-                              N_Vector rvecB, N_Vector zvecB,
-                              realtype c_jB, realtype deltaB,
-                              void *ida_mem, N_Vector tmpB)
+static int IDAAspilsPrecSetupBS(realtype tt, 
+                               N_Vector yyB, N_Vector ypB, N_Vector rrB, 
+                               realtype c_jB, void *ida_mem,
+                               N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B)
+{
+  IDAMem IDA_mem;
+  IDAadjMem IDAADJ_mem;
+  IDASpilsMemB idaspilsB_mem;
+  IDABMem IDAB_mem;
+  int flag;
+
+  IDA_mem = (IDAMem) ida_mem;
+  IDAADJ_mem = IDA_mem->ida_adj_mem;
+  IDAB_mem = IDAADJ_mem->ia_bckpbCrt;
+  idaspilsB_mem = (IDASpilsMemB)IDAB_mem->ida_lmem;
+  
+  /* Get forward solution from interpolation. */
+  if( noInterp == FALSE) {
+    if (interpSensi)
+      flag = IDAADJ_mem->ia_getY(IDA_mem, tt, yyTmp, ypTmp, yySTmp, ypSTmp);
+    else
+      flag = IDAADJ_mem->ia_getY(IDA_mem, tt, yyTmp, ypTmp, NULL, NULL);
+    if (flag != IDA_SUCCESS) {
+      IDAProcessError(IDAB_mem->IDA_mem, -1, "IDASSPILS", "IDAAspilsPrecSetupBS", MSGS_BAD_T);
+      return(-1);
+    }
+  }
+
+  /* Call user's adjoint precondBS routine */
+  flag = idaspilsB_mem->s_psetBS(tt, yyTmp, ypTmp, yySTmp, ypSTmp,
+                                 yyB, ypB, rrB,
+                                 c_jB, IDAB_mem->ida_user_data,
+                                 tmp1B, tmp2B, tmp3B);
+  return(flag);
+}
+
+
+static int IDAAspilsPrecSolveB(realtype tt, 
+                               N_Vector yyB, N_Vector ypB, N_Vector rrB, 
+                               N_Vector rvecB, N_Vector zvecB,
+                               realtype c_jB, realtype deltaB,
+                               void *ida_mem, N_Vector tmpB)
 {
   IDAMem IDA_mem;
   IDAadjMem IDAADJ_mem;
@@ -1077,11 +1268,11 @@ static int IDAAspilsPrecSolve(realtype tt,
   IDAB_mem = IDAADJ_mem->ia_bckpbCrt;
   idaspilsB_mem = (IDASpilsMemB)IDAB_mem->ida_lmem;
   
-  /* Get FORWARD solution from interpolation. */
+  /* Get forward solution from interpolation. */
   if (noInterp==FALSE) {
     flag = IDAADJ_mem->ia_getY(IDA_mem, tt, yyTmp, ypTmp, NULL, NULL);
     if (flag != IDA_SUCCESS) {
-      IDAProcessError(IDA_mem, -1, "IDASSPILS", "IDAAspilsPrecSolve", MSGS_BAD_T);
+      IDAProcessError(IDAB_mem->IDA_mem, -1, "IDASSPILS", "IDAAspilsPrecSolveB", MSGS_BAD_T);
       return(-1);
     }
   }
@@ -1094,11 +1285,50 @@ static int IDAAspilsPrecSolve(realtype tt,
   return(flag);
 }
 
-static int IDAAspilsJacTimesVec(realtype tt,
-                                N_Vector yyB, N_Vector ypB, N_Vector rrB,
-                                N_Vector vB, N_Vector JvB, 
-                                realtype c_jB, void *ida_mem, 
-                                N_Vector tmp1B, N_Vector tmp2B)
+static int IDAAspilsPrecSolveBS(realtype tt, 
+                                N_Vector yyB, N_Vector ypB, N_Vector rrB, 
+                                N_Vector rvecB, N_Vector zvecB,
+                                realtype c_jB, realtype deltaB,
+                                void *ida_mem, N_Vector tmpB)
+{
+  IDAMem IDA_mem;
+  IDAadjMem IDAADJ_mem;
+  IDASpilsMemB idaspilsB_mem;
+  IDABMem IDAB_mem;
+  int flag;
+
+  IDA_mem = (IDAMem) ida_mem;
+  IDAADJ_mem = IDA_mem->ida_adj_mem;
+  IDAB_mem = IDAADJ_mem->ia_bckpbCrt;
+  idaspilsB_mem = (IDASpilsMemB)IDAB_mem->ida_lmem;
+  
+  /* Get forward solution from interpolation. */
+  if( noInterp == FALSE) {
+    if (interpSensi)
+      flag = IDAADJ_mem->ia_getY(IDA_mem, tt, yyTmp, ypTmp, yySTmp, ypSTmp);
+    else
+      flag = IDAADJ_mem->ia_getY(IDA_mem, tt, yyTmp, ypTmp, NULL, NULL);
+    if (flag != IDA_SUCCESS) {
+      IDAProcessError(IDAB_mem->IDA_mem, -1, "IDASSPILS", "IDAAspilsPrecSolveBS", MSGS_BAD_T);
+      return(-1);
+    }
+  }
+
+  /* Call user's adjoint psolveBS routine */
+  flag = idaspilsB_mem->s_psolveBS(tt, yyTmp, ypTmp, yySTmp, ypSTmp,
+                                   yyB, ypB, rrB,
+                                   rvecB, zvecB,
+                                   c_jB, deltaB,
+                                   IDAB_mem->ida_user_data, tmpB);
+  return(flag);
+}
+
+
+static int IDAAspilsJacTimesVecB(realtype tt,
+                                 N_Vector yyB, N_Vector ypB, N_Vector rrB,
+                                 N_Vector vB, N_Vector JvB, 
+                                 realtype c_jB, void *ida_mem, 
+                                 N_Vector tmp1B, N_Vector tmp2B)
 {
   IDAMem IDA_mem;
   IDAadjMem IDAADJ_mem;
@@ -1111,19 +1341,57 @@ static int IDAAspilsJacTimesVec(realtype tt,
   IDAB_mem = IDAADJ_mem->ia_bckpbCrt;
   idaspilsB_mem = (IDASpilsMemB)IDAB_mem->ida_lmem;
   
-  /* Get FORWARD solution from interpolation. */
+  /* Get forward solution from interpolation. */
   if (noInterp==FALSE) {
     flag = IDAADJ_mem->ia_getY(IDA_mem, tt, yyTmp, ypTmp, NULL, NULL);
     if (flag != IDA_SUCCESS) {
-      IDAProcessError(IDA_mem, -1, "IDASSPILS", "IDAAspilsJacTimesVec", MSGS_BAD_T);
+      IDAProcessError(IDAB_mem->IDA_mem, -1, "IDASSPILS", "IDAAspilsJacTimesVecB", MSGS_BAD_T);
       return(-1);
     }
   }
-  /* Call user's adjoint psolveB routine */
+  /* Call user's adjoint jtimesB routine */
   flag = idaspilsB_mem->s_jtimesB(tt, yyTmp, ypTmp, 
                                   yyB, ypB, rrB, 
                                   vB, JvB, 
                                   c_jB, IDAB_mem->ida_user_data, 
                                   tmp1B, tmp2B);
+  return(flag);
+}
+
+static int IDAAspilsJacTimesVecBS(realtype tt,
+                                  N_Vector yyB, N_Vector ypB, N_Vector rrB,
+                                  N_Vector vB, N_Vector JvB, 
+                                  realtype c_jB, void *ida_mem, 
+                                  N_Vector tmp1B, N_Vector tmp2B)
+{
+  IDAMem IDA_mem;
+  IDAadjMem IDAADJ_mem;
+  IDASpilsMemB idaspilsB_mem;
+  IDABMem IDAB_mem;
+  int flag;
+
+  IDA_mem = (IDAMem) ida_mem;
+  IDAADJ_mem = IDA_mem->ida_adj_mem;
+  IDAB_mem = IDAADJ_mem->ia_bckpbCrt;
+  idaspilsB_mem = (IDASpilsMemB)IDAB_mem->ida_lmem;
+  
+  /* Get forward solution from interpolation. */
+  if( noInterp == FALSE) {
+    if (interpSensi)
+      flag = IDAADJ_mem->ia_getY(IDA_mem, tt, yyTmp, ypTmp, yySTmp, ypSTmp);
+    else
+      flag = IDAADJ_mem->ia_getY(IDA_mem, tt, yyTmp, ypTmp, NULL, NULL);
+    if (flag != IDA_SUCCESS) {
+      IDAProcessError(IDAB_mem->IDA_mem, -1, "IDASSPILS", "IDAAspilsJacTimesVecBS", MSGS_BAD_T);
+      return(-1);
+    }
+  }
+
+  /* Call user's adjoint jtimesBS routine */
+  flag = idaspilsB_mem->s_jtimesBS(tt, yyTmp, ypTmp, yySTmp, ypSTmp,
+                                   yyB, ypB, rrB,
+                                   vB, JvB,
+                                   c_jB, IDAB_mem->ida_user_data,
+                                   tmp1B, tmp2B);
   return(flag);
 }

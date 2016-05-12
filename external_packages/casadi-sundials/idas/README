@@ -1,5 +1,5 @@
                                IDAS
-                    Release 1.1.0, March 2012
+                    Release 1.2.1, March 30, 2015
                            Radu Serban 
               Center for Applied Scientific Computing, LLNL
 
@@ -8,12 +8,12 @@ IDAS is a package for the solution of differential-algebraic equation (DAE)
 systems with sensitivity analysis capabilities (both forward and adjoint modes). 
 It is written in ANSI standard C.
 
-IDAS can be used both on serial and parallel (MPI) computers.  The main
+IDAS can be used both on serial and parallel computers.  The main
 difference is in the NVECTOR module of vector kernels.  The desired
 version is obtained when compiling the example files by linking the
-appropriate library of NVECTOR kernels.  In the parallel version,
-communication between processors is done with the MPI (Message Passage
-Interface) system.
+appropriate library of NVECTOR kernels.  In the parallel versions,
+communication between processors is done with MPI, with OpenMP, 
+or with Pthreads.
 
 When used with the serial NVECTOR module, IDAS provides both direct 
 (dense and band) linear solvers and preconditioned Krylov (iterative) 
@@ -27,8 +27,8 @@ preconditioner.
 
 IDAS is part of a software family called SUNDIALS: SUite of Nonlinear and 
 DIfferential/ALgebraic equation Solvers [3].  This suite consists of CVODE, 
-CVODES, IDA, IDAS, and KINSOL.  The directory structure of the package supplied 
-reflects this family relationship.
+CVODES, ARkode, IDA, IDAS, and KINSOL.  The directory structure of the 
+package supplied reflects this family relationship.
 
 Several examples problem programs are included, covering both serial
 and parallel cases, both small and large problem sizes, and both
@@ -49,19 +49,19 @@ and the IDAS Examples [2] (idas_examples.pdf) documents.
 B. Installation
 ---------------
 
-For basic installation instructions see the file /sundials/INSTALL_NOTES. 
-For complete installation instructions see the "IDAS Installation Procedure"
+For basic installation instructions see the file /sundials/INSTALL_GUIDE.pdf. 
+For complete installation instructions see the "Installation Procedure"
 chapter in the IDAS User Guide.
 
 
 C. References
 -------------
 
-[1] R. Serban and C. Petra,  "User Documentation for IDAS v1.1.0," 
-    LLNL technical report UCRL-SM-234051, December 2011.
+[1] R. Serban, C. Petra,and A. C. Hindmarsh,  "User Documentation for IDAS v1.2.1," 
+    LLNL technical report UCRL-SM-234051, March 2015.
 
-[2] R. Serban, "Example Programs for IDAS v1.1.0," 
-    LLNL technical report LLNL-TR-437091, December 2011.
+[2] R. Serban and A.C. Hindmarsh, "Example Programs for IDAS v1.2.1," 
+    LLNL technical report LLNL-TR-437091, March 2015.
 
 [3] A. C. Hindmarsh, P. N. Brown, K. E. Grant, S. L. Lee, R. Serban, 
     D. E. Shumaker, and C. S. Woodward, "SUNDIALS, Suite of Nonlinear and 
@@ -72,6 +72,8 @@ C. References
 D. Releases
 -----------
 
+v. 1.2.1   - Mar. 2015
+v. 1.2.0   - Mar. 2015
 v. 1.1.0   - Mar. 2012
 v. 1.0.0   - May  2009
 
@@ -79,7 +81,62 @@ v. 1.0.0   - May  2009
 E. Revision History
 -------------------
 
-v. 1.6.0 (May 2009) ---> v. 1.1.0 (Mar. 2012)
+v. 1.2.0 (Mar. 2015) ---> v. 1.2.1 (Mar. 2015)
+---------------------------------------------
+
+- Bug fixes
+  - Fixed loop limit bug in SlsAddMat function.
+  - In interfaces to KLU and SuperLUMT, added #include lines, 
+    and removed redundant KLU structure allocations.
+  - Minor documentation updates
+
+
+v. 1.1.0 (Mar. 2012) ---> v. 1.2.0 (Mar. 2015)
+---------------------------------------------
+
+- New features
+   - Two major additions were made to the linear system solvers that are
+     availble for use with the IDAS solver.  In the serial case, an
+     interface to the KLU sparse direct solver was added.
+     For the parallel case, an interface to SuperLU_MT (the multi-threaded
+     version of SuperLU) was added as a thread-parallel sparse direct solver option.
+     As part of these additions, a sparse matrix (CSC format) structure 
+     was added to IDAS.
+   - Two new NVECTOR modules have been added for parallel computing
+     environments --- one for openMP, denoted NVECTOR_OPENMP,
+     and one for Pthreads, denoted NVECTOR_PTHREADS.
+   - An option was added in the case of Adjoint Sensitivity Analysis with
+     dense or banded Jacobian:  With a call to IDADlsSetDenseJacFnBS or
+     IDADlsSetBandJacFnBS, the user can specify a user-supplied Jacobian
+     function of type IDADls***JacFnBS, for the case where the backward
+     problem depends on the forward sensitivities.
+   - For the Adjoint Sensitivity Analysis case in which the backward problem
+     depends on the forward sensitivities, options have been added to allow
+     for user-supplied set, psolve, and jtimes functions.
+
+- Bug fixes
+   - In IDARootfind, a minor bug was corrected, where the input
+     array rootdir was ignored, and a line was added to break out of
+     root-search loop if the initial interval size is below the tolerance
+     ttol.
+   - In IDALapackBand, the line smu = MIN(N-1,mu+ml) was changed to
+     smu = mu + ml to correct an illegal input error for DGBTRF/DGBTRS.
+   - A minor bug was fixed regarding the testing of the input tstop on the
+     first call to IDASolve..
+
+- Changes to user interface
+   - In the User Guide, a paragraph was added in Section 6.2.1 on
+     IDAAdjReInit, and a paragraph was added in Section 6.2.9 on
+     IDAGetAdjY.
+
+- Other
+   - In order to avoid possible name conflicts, the mathematical macro and
+     function names MIN, MAX, SQR, RAbs, RSqrt, RExp, RPowerI, and RPowerR
+     were changed to SUNMIN, SUNMAX, SUNSQR, SUNRabs, SUNRsqrt, SUNRexp,
+     SRpowerI, and SUNRpowerR, respectively.  These names occur in both the
+     solver and in various example programs.
+
+v. 1.0.0 (May 2009) ---> v. 1.1.0 (Mar. 2012)
 ---------------------------------------------
 
 - Bug fixes

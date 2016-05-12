@@ -1,14 +1,19 @@
 /*
  * -----------------------------------------------------------------
- * $Revision: 1.21 $
- * $Date: 2007/11/26 16:19:59 $
+ * $Revision: 4378 $
+ * $Date: 2015-02-19 10:55:14 -0800 (Thu, 19 Feb 2015) $
  * ----------------------------------------------------------------- 
  * Programmer(s): Radu Serban @ LLNL
  * -----------------------------------------------------------------
- * Copyright (c) 2005, The Regents of the University of California.
+ * LLNS Copyright Start
+ * Copyright (c) 2014, Lawrence Livermore National Security
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Lawrence Livermore National Laboratory in part under 
+ * Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
  * Produced at the Lawrence Livermore National Laboratory.
  * All rights reserved.
  * For details, see the LICENSE file.
+ * LLNS Copyright End
  * -----------------------------------------------------------------
  * Implementation header file for the main CVODES integrator.
  * -----------------------------------------------------------------
@@ -17,15 +22,15 @@
 #ifndef _CVODES_IMPL_H
 #define _CVODES_IMPL_H
 
-#ifdef __cplusplus  /* wrapper to enable C++ usage */
-extern "C" {
-#endif
-
 #include <stdarg.h>
 
 #include <cvodes/cvodes.h>
 #include <sundials/sundials_nvector.h>
 #include <sundials/sundials_types.h>
+
+#ifdef __cplusplus  /* wrapper to enable C++ usage */
+extern "C" {
+#endif
 
 /* 
  * =================================================================
@@ -591,7 +596,7 @@ struct CVodeBMemRec {
   /* Index of this backward problem */
   int cv_index;
 
-  /* Time at which the backward problem is intialized */
+  /* Time at which the backward problem is initialized */
   realtype cv_t0;
   
   /* CVODES memory for this backward problem */

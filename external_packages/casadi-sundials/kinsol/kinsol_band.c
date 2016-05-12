@@ -1,14 +1,19 @@
 /*
  * -----------------------------------------------------------------
- * $Revision: 1.11 $
- * $Date: 2011/03/23 23:37:59 $
+ * $Revision: 4272 $
+ * $Date: 2014-12-02 11:19:41 -0800 (Tue, 02 Dec 2014) $
  * ----------------------------------------------------------------- 
  * Programmer(s): Radu Serban @ LLNL
  * -----------------------------------------------------------------
- * Copyright (c) 2002, The Regents of the University of California.
+ * LLNS Copyright Start
+ * Copyright (c) 2014, Lawrence Livermore National Security
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Lawrence Livermore National Laboratory in part under 
+ * Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
  * Produced at the Lawrence Livermore National Laboratory.
  * All rights reserved.
  * For details, see the LICENSE file.
+ * LLNS Copyright End
  * -----------------------------------------------------------------
  * This is the implementation file for the KINBAND linear solver.
  * -----------------------------------------------------------------
@@ -39,7 +44,7 @@
 static int kinBandInit(KINMem kin_mem);
 static int kinBandSetup(KINMem kin_mem);
 static int kinBandsolve(KINMem kin_mem, N_Vector x, N_Vector b,
-                        realtype *res_norm);
+                        realtype *sJpnorm, realtype *sFdotJp);
 static void kinBandFree(KINMem kin_mem);
 
 /*
@@ -63,14 +68,13 @@ static void kinBandFree(KINMem kin_mem);
 #define uscale         (kin_mem->kin_uscale)
 #define fscale         (kin_mem->kin_fscale)
 #define sqrt_relfunc   (kin_mem->kin_sqrt_relfunc)
-#define sJpnorm        (kin_mem->kin_sJpnorm)
-#define sfdotJp        (kin_mem->kin_sfdotJp)
 #define errfp          (kin_mem->kin_errfp)
 #define infofp         (kin_mem->kin_infofp)
 #define setupNonNull   (kin_mem->kin_setupNonNull)
 #define vtemp1         (kin_mem->kin_vtemp1)
 #define vec_tmpl       (kin_mem->kin_vtemp1)
 #define vtemp2         (kin_mem->kin_vtemp2)
+#define strategy       (kin_mem->kin_globalstrategy)
 
 #define mtype          (kindls_mem->d_type)
 #define n              (kindls_mem->d_n)
@@ -176,7 +180,7 @@ int KINBand(void *kinmem, long int N, long int mupper, long int mlower)
   }
 
   /* Set extended upper half-bandwith for M (required for pivoting) */
-  smu = MIN(N-1, mu + ml);
+  smu = SUNMIN(N-1, mu + ml);
 
   /* Allocate memory for J and pivot array */
   J = NULL;
@@ -236,6 +240,14 @@ static int kinBandInit(KINMem kin_mem)
     J_data = kin_mem->kin_user_data;
   }
 
+  /* Stop Picard solve if user fails to provide Jacobian */
+  if ( (strategy == KIN_PICARD) && jacDQ )
+    {
+      KINProcessError(kin_mem, KIN_ILL_INPUT, "KINSOL", "kinBandInit", 
+		      MSG_NOL_FAIL);
+      return(KIN_ILL_INPUT);
+    }
+
   last_flag = KINDLS_SUCCESS;
   return(0);
 }
@@ -247,9 +259,8 @@ static int kinBandInit(KINMem kin_mem)
  * This routine does the setup operations for the band linear solver.
  * It makes a decision whether or not to call the Jacobian evaluation
  * routine based on various state variables, and if not it uses the 
- * saved copy.  In any case, it constructs the Newton matrix 
- * M = I - gamma*J, updates counters, and calls the band LU 
- * factorization routine.
+ * saved copy.  In any case, it constructs the Newton matrix J,
+ * updates counters, and calls the band LU factorization routine.
  * -----------------------------------------------------------------
  */
 
@@ -285,10 +296,12 @@ static int kinBandSetup(KINMem kin_mem)
  * -----------------------------------------------------------------
  * This routine handles the solve operation for the band linear solver
  * by calling the band backsolve routine.  The return value is 0.
+ * The argument *sJpnorm is ignored.
  * -----------------------------------------------------------------
  */
 
-static int kinBandsolve(KINMem kin_mem, N_Vector x, N_Vector b, realtype *res_norm)
+static int kinBandsolve(KINMem kin_mem, N_Vector x, N_Vector b,
+                        realtype *sJpnorm, realtype *sFdotJp)
 {
   KINDlsMem kindls_mem;
   realtype *xd;
@@ -305,23 +318,18 @@ static int kinBandsolve(KINMem kin_mem, N_Vector x, N_Vector b, realtype *res_no
 
   BandGBTRS(J, lpivots, xd);
 
-  /* Compute the terms Jpnorm and sfdotJp for use in the global strategy
-     routines and in KINForcingTerm. Both of these terms are subsequently
-     corrected if the step is reduced by constraints or the line search.
-     
-     sJpnorm is the norm of the scaled product (scaled by fscale) of
-     the current Jacobian matrix J and the step vector p.
+  /* Compute the term sFdotJp for use in the linesearch routine.
+     This term is subsequently corrected if the step is reduced by
+     constraints or the linesearch.
 
-     sfdotJp is the dot product of the scaled f vector and the scaled
-     vector J*p, where the scaling uses fscale. */
+     sFdotJp is the dot product of the scaled f vector and the scaled
+     vector J*p, where the scaling uses fscale.                            */
 
-  sJpnorm = N_VWL2Norm(b,fscale);
   N_VProd(b, fscale, b);
   N_VProd(b, fscale, b);
-  sfdotJp = N_VDotProd(fval, b);
+  *sFdotJp = N_VDotProd(fval, b);
 
   last_flag = KINDLS_SUCCESS;
-
   return(0);
 }
 

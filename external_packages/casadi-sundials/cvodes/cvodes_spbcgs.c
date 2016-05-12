@@ -1,14 +1,19 @@
 /*
  * -----------------------------------------------------------------
- * $Revision: 1.13 $
- * $Date: 2011/03/23 22:58:46 $
+ * $Revision: 4272 $
+ * $Date: 2014-12-02 11:19:41 -0800 (Tue, 02 Dec 2014) $
  * ----------------------------------------------------------------- 
  * Programmer(s): Aaron Collier and Radu Serban @ LLNL
  * -----------------------------------------------------------------
- * Copyright (c) 2005, The Regents of the University of California.
+ * LLNS Copyright Start
+ * Copyright (c) 2014, Lawrence Livermore National Security
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Lawrence Livermore National Laboratory in part under 
+ * Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
  * Produced at the Lawrence Livermore National Laboratory.
  * All rights reserved.
  * For details, see the LICENSE file.
+ * LLNS Copyright End
  * -----------------------------------------------------------------
  * This is the implementation file for the CVSPBCG linear solver.
  * -----------------------------------------------------------------
@@ -200,7 +205,7 @@ int CVSpbcg(void *cvode_mem, int pretype, int maxl)
 
   /* Compute sqrtN from a dot product */
   N_VConst(ONE, ytemp);
-  sqrtN = RSqrt(N_VDotProd(ytemp, ytemp));
+  sqrtN = SUNRsqrt(N_VDotProd(ytemp, ytemp));
 
   /* Call SpbcgMalloc to allocate workspace for Spbcg */
   spbcg_mem = NULL;
@@ -307,7 +312,7 @@ static int CVSpbcgSetup(CVodeMem cv_mem, int convfail, N_Vector ypred,
   cvspils_mem = (CVSpilsMem) lmem;
 
   /* Use nst, gamma/gammap, and convfail to set J eval. flag jok */
-  dgamma = ABS((gamma/gammap) - ONE);
+  dgamma = SUNRabs((gamma/gammap) - ONE);
   jbad = (nst == 0) || (nst > nstlpre + CVSPILS_MSBPRE) ||
       ((convfail == CV_FAIL_BAD_J) && (dgamma < CVSPILS_DGMAX)) ||
       (convfail == CV_FAIL_OTHER);

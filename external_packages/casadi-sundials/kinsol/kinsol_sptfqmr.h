@@ -1,14 +1,19 @@
 /*
  * -----------------------------------------------------------------
- * $Revision: 1.2 $
- * $Date: 2006/11/29 00:05:07 $
+ * $Revision: 4378 $
+ * $Date: 2015-02-19 10:55:14 -0800 (Thu, 19 Feb 2015) $
  * -----------------------------------------------------------------
  * Programmer(s): Aaron Collier @ LLNL
  * -----------------------------------------------------------------
- * Copyright (c) 2005, The Regents of the University of California.
+ * LLNS Copyright Start
+ * Copyright (c) 2014, Lawrence Livermore National Security
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Lawrence Livermore National Laboratory in part under 
+ * Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
  * Produced at the Lawrence Livermore National Laboratory.
  * All rights reserved.
  * For details, see the LICENSE file.
+ * LLNS Copyright End
  * -----------------------------------------------------------------
  * This is the public header file for the KINSOL scaled preconditioned
  * TFQMR linear solver module, KINSPTFQMR.
@@ -18,12 +23,12 @@
 #ifndef _KINSPTFQMR_H
 #define _KINSPTFQMR_H
 
+#include <kinsol/kinsol_spils.h>
+#include <sundials/sundials_sptfqmr.h>
+
 #ifdef __cplusplus  /* wrapper to enable C++ usage */
 extern "C" {
 #endif
-
-#include <kinsol/kinsol_spils.h>
-#include <sundials/sundials_sptfqmr.h>
 
 /*
  * -----------------------------------------------------------------

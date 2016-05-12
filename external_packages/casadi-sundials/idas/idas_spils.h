@@ -1,14 +1,19 @@
 /*
  * -----------------------------------------------------------------
- * $Revision: 1.12 $
- * $Date: 2010/12/01 22:15:15 $
+ * $Revision: 4378 $
+ * $Date: 2015-02-19 10:55:14 -0800 (Thu, 19 Feb 2015) $
  * ----------------------------------------------------------------- 
  * Programmers: Radu Serban @ LLNL
  * -----------------------------------------------------------------
- * Copyright (c) 2002, The Regents of the University of California  
- * Produced at the Lawrence Livermore National Laboratory
- * All rights reserved
- * For details, see the LICENSE file
+ * LLNS Copyright Start
+ * Copyright (c) 2014, Lawrence Livermore National Security
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Lawrence Livermore National Laboratory in part under 
+ * Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
+ * Produced at the Lawrence Livermore National Laboratory.
+ * All rights reserved.
+ * For details, see the LICENSE file.
+ * LLNS Copyright End
  * -----------------------------------------------------------------
  * This is the common header file for the Scaled and Preconditioned
  * Iterative Linear Solvers in IDAS.
@@ -18,12 +23,12 @@
 #ifndef _IDASSPILS_H
 #define _IDASSPILS_H
 
+#include <sundials/sundials_iterative.h>
+#include <sundials/sundials_nvector.h>
+
 #ifdef __cplusplus  /* wrapper to enable C++ usage */
 extern "C" {
 #endif
-
-#include <sundials/sundials_iterative.h>
-#include <sundials/sundials_nvector.h>
 
 /* 
  * -----------------------------------------------------------------
@@ -351,6 +356,22 @@ typedef int (*IDASpilsPrecSetupFnB)(realtype tt,
 
 /*
  * -----------------------------------------------------------------
+ * Type : IDASpilsPrecSetupFnBS
+ * -----------------------------------------------------------------
+ * A function PrecSetupBS for the adjoint (backward) problem must have 
+ * the prototype given below.
+ * -----------------------------------------------------------------
+ */
+typedef int (*IDASpilsPrecSetupFnBS)(realtype tt,
+                                     N_Vector yy, N_Vector yp,
+                                     N_Vector *yyS, N_Vector *ypS,
+                                     N_Vector yyB, N_Vector ypB, N_Vector rrB,
+                                     realtype c_jB, void *user_dataB,
+                                     N_Vector tmp1B, N_Vector tmp2B,
+                                     N_Vector tmp3B);
+
+/*
+ * -----------------------------------------------------------------
  * Type : IDASpilsPrecSolveFnB
  * -----------------------------------------------------------------
  * A function PrecSolveB for the adjoint (backward) problem  must 
@@ -364,6 +385,23 @@ typedef int (*IDASpilsPrecSolveFnB)(realtype tt,
 				    N_Vector rvecB, N_Vector zvecB,
 				    realtype c_jB, realtype deltaB,
 				    void *user_dataB, N_Vector tmpB);
+
+/*
+ * -----------------------------------------------------------------
+ * Type : IDASpilsPrecSolveFnBS
+ * -----------------------------------------------------------------
+ * A function PrecSolveBS for the adjoint (backward) problem  must 
+ * have the prototype given below.
+ * -----------------------------------------------------------------
+ */
+
+typedef int (*IDASpilsPrecSolveFnBS)(realtype tt,
+                                     N_Vector yy, N_Vector yp,
+                                     N_Vector *yyS, N_Vector *ypS,
+                                     N_Vector yyB, N_Vector ypB, N_Vector rrB,
+                                     N_Vector rvecB, N_Vector zvecB,
+                                     realtype c_jB, realtype deltaB,
+                                     void *user_dataB, N_Vector tmpB);
 
 /*
  * -----------------------------------------------------------------
@@ -383,26 +421,45 @@ typedef int (*IDASpilsJacTimesVecFnB)(realtype t,
 
 /*
  * -----------------------------------------------------------------
+ * Type : IDASpilsJacTimesVecFnBS
+ * -----------------------------------------------------------------
+ * A function jtimesBS for the adjoint (backward) problem must have 
+ * the prototype given below.
+ * -----------------------------------------------------------------
+ */
+
+typedef int (*IDASpilsJacTimesVecFnBS)(realtype t,
+                                       N_Vector yy, N_Vector yp,
+                                       N_Vector *yyS, N_Vector *ypS,
+                                       N_Vector yyB, N_Vector ypB, N_Vector rrB,
+                                       N_Vector vB, N_Vector JvB, 
+                                       realtype c_jB, void *user_dataB, 
+                                       N_Vector tmp1B, N_Vector tmp2B);
+
+/*
+ * -----------------------------------------------------------------
  * Functions
  * -----------------------------------------------------------------
  */
 
 SUNDIALS_EXPORT int IDASpilsSetGSTypeB(void *ida_mem, int which, int gstypeB);
-
 SUNDIALS_EXPORT int IDASpilsSetMaxRestartsB(void *ida_mem, int which, int maxrsB);
-
 SUNDIALS_EXPORT int IDASpilsSetEpsLinB(void *ida_mem, int which, realtype eplifacB);
-
 SUNDIALS_EXPORT int IDASpilsSetMaxlB(void *ida_mem, int which, int maxlB);
-
 SUNDIALS_EXPORT int IDASpilsSetIncrementFactorB(void *ida_mem, int which, 
                                                 realtype dqincfacB);
 
 SUNDIALS_EXPORT int IDASpilsSetPreconditionerB(void *ida_mem, int which,
                                                IDASpilsPrecSetupFnB psetB,
 					       IDASpilsPrecSolveFnB psolveB);
+SUNDIALS_EXPORT int IDASpilsSetPreconditionerBS(void *ida_mem, int which,
+                                                IDASpilsPrecSetupFnBS psetBS,
+                                                IDASpilsPrecSolveFnBS psolveBS);
+
 SUNDIALS_EXPORT int IDASpilsSetJacTimesVecFnB(void *ida_mem, int which,
                                               IDASpilsJacTimesVecFnB jtvB);
+SUNDIALS_EXPORT int IDASpilsSetJacTimesVecFnBS(void *ida_mem, int which,
+                                               IDASpilsJacTimesVecFnBS jtvBS);
 
 
 

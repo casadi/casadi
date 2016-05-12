@@ -1,14 +1,19 @@
 /*
  * -----------------------------------------------------------------
- * $Revision: 1.2 $
- * $Date: 2006/11/29 00:05:07 $
+ * $Revision: 4378 $
+ * $Date: 2015-02-19 10:55:14 -0800 (Thu, 19 Feb 2015) $
  * ----------------------------------------------------------------- 
  * Programmer(s): Radu Serban and Aaron Collier @ LLNL
  * -----------------------------------------------------------------
- * Copyright (c) 2002, The Regents of the University of California.
+ * LLNS Copyright Start
+ * Copyright (c) 2014, Lawrence Livermore National Security
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Lawrence Livermore National Laboratory in part under 
+ * Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
  * Produced at the Lawrence Livermore National Laboratory.
  * All rights reserved.
  * For details, see the LICENSE file.
+ * LLNS Copyright End
  * -----------------------------------------------------------------
  * This is the header file for a generic NVECTOR package.
  * It defines the N_Vector structure (_generic_N_Vector) which
@@ -43,11 +48,11 @@
 #ifndef _NVECTOR_H
 #define _NVECTOR_H
 
+#include <sundials/sundials_types.h>
+
 #ifdef __cplusplus  /* wrapper to enable C++ usage */
 extern "C" {
 #endif
-
-#include <sundials/sundials_types.h>
 
 /*
  * -----------------------------------------------------------------
@@ -91,7 +96,6 @@ struct _generic_N_Vector_Ops {
   booleantype (*nvinvtest)(N_Vector, N_Vector);
   booleantype (*nvconstrmask)(N_Vector, N_Vector, N_Vector);
   realtype    (*nvminquotient)(N_Vector, N_Vector);
-  long int    (*nvlength)(N_Vector);
 };
 
 /*
@@ -339,7 +343,7 @@ SUNDIALS_EXPORT void N_VCompare(realtype c, N_Vector x, N_Vector z);
 SUNDIALS_EXPORT booleantype N_VInvTest(N_Vector x, N_Vector z);
 SUNDIALS_EXPORT booleantype N_VConstrMask(N_Vector c, N_Vector x, N_Vector m);
 SUNDIALS_EXPORT realtype N_VMinQuotient(N_Vector num, N_Vector denom);
-SUNDIALS_EXPORT long int N_VLength(N_Vector x);
+
 /*
  * -----------------------------------------------------------------
  * Additional functions exported by NVECTOR module

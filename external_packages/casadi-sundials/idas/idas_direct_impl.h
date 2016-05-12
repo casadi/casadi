@@ -1,14 +1,19 @@
 /*
  * -----------------------------------------------------------------
- * $Revision: 1.7 $
- * $Date: 2010/12/01 22:39:18 $
+ * $Revision: 4378 $
+ * $Date: 2015-02-19 10:55:14 -0800 (Thu, 19 Feb 2015) $
  * ----------------------------------------------------------------- 
  * Programmer: Radu Serban @ LLNL
  * -----------------------------------------------------------------
- * Copyright (c) 2006, The Regents of the University of California.
+ * LLNS Copyright Start
+ * Copyright (c) 2014, Lawrence Livermore National Security
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Lawrence Livermore National Laboratory in part under 
+ * Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
  * Produced at the Lawrence Livermore National Laboratory.
  * All rights reserved.
  * For details, see the LICENSE file.
+ * LLNS Copyright End
  * -----------------------------------------------------------------
  * Implementation header file for the IDADLS linear solvers.
  * -----------------------------------------------------------------
@@ -17,11 +22,11 @@
 #ifndef _IDASDLS_IMPL_H
 #define _IDASDLS_IMPL_H
 
+#include <idas/idas_direct.h>
+
 #ifdef __cplusplus  /* wrapper to enable C++ usage */
 extern "C" {
 #endif
-
-#include <idas/idas_direct.h>
 
 /*
  * =================================================================
@@ -108,7 +113,9 @@ typedef struct IDADlsMemRecB {
   int d_typeB;
 
   IDADlsDenseJacFnB d_djacB;
-  IDADlsBandJacFnB  d_bjacB;
+  IDADlsDenseJacFnBS d_djacBS;
+  IDADlsBandJacFnB d_bjacB;
+  IDADlsBandJacFnBS d_bjacBS;
 
 } *IDADlsMemB;
 

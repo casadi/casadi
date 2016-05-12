@@ -1,14 +1,19 @@
 /*
  * -----------------------------------------------------------------
- * $Revision: 1.19 $
- * $Date: 2010/12/01 22:30:43 $
+ * $Revision: 4272 $
+ * $Date: 2014-12-02 11:19:41 -0800 (Tue, 02 Dec 2014) $
  * -----------------------------------------------------------------
  * Programmer(s): Alan C. Hindmarsh and Radu Serban @ LLNL
  * -----------------------------------------------------------------
- * Copyright (c) 2005, The Regents of the University of California.
+ * LLNS Copyright Start
+ * Copyright (c) 2014, Lawrence Livermore National Security
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Lawrence Livermore National Laboratory in part under 
+ * Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
  * Produced at the Lawrence Livermore National Laboratory.
  * All rights reserved.
  * For details, see the LICENSE file.
+ * LLNS Copyright End
  * -----------------------------------------------------------------
  * This is the implementation file for the optional input and output
  * functions for the CVODES solver.
@@ -152,8 +157,8 @@ int CVodeSetMaxOrd(void *cvode_mem, int maxord)
   /* Cannot increase maximum order beyond the value that
      was used when allocating memory */
   qmax_alloc = cv_mem->cv_qmax_alloc;
-  qmax_alloc = MIN(qmax_alloc, cv_mem->cv_qmax_allocQ);
-  qmax_alloc = MIN(qmax_alloc, cv_mem->cv_qmax_allocS);  
+  qmax_alloc = SUNMIN(qmax_alloc, cv_mem->cv_qmax_allocQ);
+  qmax_alloc = SUNMIN(qmax_alloc, cv_mem->cv_qmax_allocS);
 
   if (maxord > qmax_alloc) {
     cvProcessError(cv_mem, CV_ILL_INPUT, "CVODES", "CVodeSetMaxOrd", MSGCV_BAD_MAXORD);
@@ -363,7 +368,7 @@ int CVodeSetStopTime(void *cvode_mem, realtype tstop)
   if (cv_mem->cv_nst > 0) {
 
     if ( (tstop - cv_mem->cv_tn) * cv_mem->cv_h < ZERO ) {
-      cvProcessError(cv_mem, CV_ILL_INPUT, "CVODES", "CVodeSetStopTime", MSGCV_BAD_TSTOP, cv_mem->cv_tn);
+      cvProcessError(cv_mem, CV_ILL_INPUT, "CVODES", "CVodeSetStopTime", MSGCV_BAD_TSTOP, tstop, cv_mem->cv_tn);
       return(CV_ILL_INPUT);
     }
 
@@ -645,7 +650,7 @@ int CVodeSetSensParams(void *cvode_mem, realtype *p, realtype *pbar, int *plist)
         cvProcessError(cv_mem, CV_ILL_INPUT, "CVODES", "CVodeSetSensParams", MSGCV_BAD_PBAR);
         return(CV_ILL_INPUT);
       }
-      cv_mem->cv_pbar[is] = ABS(pbar[is]);
+      cv_mem->cv_pbar[is] = SUNRabs(pbar[is]);
     }
   else
     for (is=0; is<Ns; is++)

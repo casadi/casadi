@@ -1,14 +1,19 @@
 /*
  * -----------------------------------------------------------------
- * $Revision: 1.15 $
- * $Date: 2011/12/07 23:28:51 $
+ * $Revision: 4272 $
+ * $Date: 2014-12-02 11:19:41 -0800 (Tue, 02 Dec 2014) $
  * ----------------------------------------------------------------- 
  * Programmer(s): Radu Serban @ LLNL
  * -----------------------------------------------------------------
- * Copyright (c) 2002, The Regents of the University of California.
+ * LLNS Copyright Start
+ * Copyright (c) 2014, Lawrence Livermore National Security
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Lawrence Livermore National Laboratory in part under 
+ * Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
  * Produced at the Lawrence Livermore National Laboratory.
  * All rights reserved.
  * For details, see the LICENSE file.
+ * LLNS Copyright End
  * -----------------------------------------------------------------
  * This is the implementation file for the IDAA adjoint integrator.
  * -----------------------------------------------------------------
@@ -305,7 +310,7 @@ int IDAAdjInit(void *ida_mem, long int steps, int interp)
 
   /* By default we will store but not interpolate sensitivities
    *  - storeSensi will be set in IDASolveF to FALSE if FSA is not enabled
-   *    or if the user forced this through IDASetAdjNoSensi 
+   *    or if the user forced this through IDAAdjSetNoSensi 
    *  - interpSensi will be set in IDASolveB to TRUE if storeSensi is TRUE 
    *    and if at least one backward problem requires sensitivities 
    *  - noInterp will be set in IDACalcICB to TRUE before the call to
@@ -1429,7 +1434,7 @@ int IDASolveB(void *ida_mem, realtype tBout, int itaskB)
   IDAadjMem IDAADJ_mem;
   CkpntMem ck_mem;
   IDABMem IDAB_mem, tmp_IDAB_mem;
-  int flag, sign;
+  int flag=0, sign;
   realtype tfuzz, tBret, tBn;
   booleantype gotCkpnt, reachedTBout, isActive;
 
@@ -1509,8 +1514,8 @@ int IDASolveB(void *ida_mem, realtype tBout, int itaskB)
 
   /* Check if tBout is legal */
   if ( (sign*(tBout-tinitial) < ZERO) || (sign*(tfinal-tBout) < ZERO) ) {
-    tfuzz = HUNDRED*uround*(ABS(tinitial) + ABS(tfinal));
-    if ( (sign*(tBout-tinitial) < ZERO) && (ABS(tBout-tinitial) < tfuzz) ) {
+    tfuzz = HUNDRED*uround*(SUNRabs(tinitial) + SUNRabs(tfinal));
+    if ( (sign*(tBout-tinitial) < ZERO) && (SUNRabs(tBout-tinitial) < tfuzz) ) {
       tBout = tinitial;
     } else {
       IDAProcessError(IDA_mem, IDA_ILL_INPUT, "IDAA", "IDASolveB", MSGAM_BAD_TBOUT);
@@ -2484,7 +2489,7 @@ static int IDAAhermiteGetY(IDAMem IDA_mem, realtype t,
   realtype factor1, factor2, factor3;
 
   N_Vector y0, yd0, y1, yd1;
-  N_Vector *yS0, *ySd0, *yS1, *ySd1;
+  N_Vector *yS0=NULL, *ySd0=NULL, *yS1, *ySd1;
 
   int flag, is, NS;
   long int indx;
@@ -2891,7 +2896,7 @@ static int IDAApolynomialGetY(IDAMem IDA_mem, realtype t,
   }
 
   /* Scaling factor */
-  delt = ABS(dt_mem[indx]->t - dt_mem[indx-1]->t);
+  delt = SUNRabs(dt_mem[indx]->t - dt_mem[indx-1]->t);
 
   /* Find the direction of the forward integration */
   dir = (tfinal - tinitial > ZERO) ? 1 : -1;
@@ -3152,7 +3157,7 @@ static int IDAAfindIndex(IDAMem ida_mem, realtype t,
 
     if ( *indx == 0 ) {
       /* t is beyond leftmost limit. Is it too far? */  
-      if ( ABS(t - dt_mem[0]->t) > FUZZ_FACTOR * uround ) {
+      if ( SUNRabs(t - dt_mem[0]->t) > FUZZ_FACTOR * uround ) {
         return(IDA_GETY_BADT);
       }
     }

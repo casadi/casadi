@@ -60,7 +60,7 @@ option(WITH_SNOPT "Compile the SNOPT interface if SNOPT libraries can be found" 
 option(WITH_SNOPT_FORCE_DUMMY "Compile the SNOPT interface against a dummy library (for Debian distribution; breaks normal snopt build)" OFF)
 option(WITH_ACADO "Compile the interfaces to ACADO and qpOASES, if it can be found" OFF)
 option(WITH_EIGEN3 "Use Eigen3 backend for matrix operations" OFF)
-option(WITH_BUILD_SUNDIALS "Compile the included source code for Sundials 2.5" ON)
+option(WITH_BUILD_SUNDIALS "Compile the included source code for Sundials 2.6.1" ON)
 option(WITH_SUNDIALS "Compile the interface to Sundials" ON)
 option(WITH_QPOASES "Compile the interface to qpOASES (the source code for qpOASES 3.0beta is included)" ON)
 option(WITH_BUILD_DSDP "Compile the the included source code for DSDP" ON)

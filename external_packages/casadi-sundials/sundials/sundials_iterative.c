@@ -1,15 +1,20 @@
 /*
  * -----------------------------------------------------------------
- * $Revision: 1.1 $
- * $Date: 2006/07/05 15:32:38 $
+ * $Revision: 4272 $
+ * $Date: 2014-12-02 11:19:41 -0800 (Tue, 02 Dec 2014) $
  * ----------------------------------------------------------------- 
  * Programmer(s): Scott D. Cohen, Alan C. Hindmarsh and
  *                Radu Serban @ LLNL
  * -----------------------------------------------------------------
- * Copyright (c) 2002, The Regents of the University of California.
+ * LLNS Copyright Start
+ * Copyright (c) 2014, Lawrence Livermore National Security
+ * This work was performed under the auspices of the U.S. Department 
+ * of Energy by Lawrence Livermore National Laboratory in part under 
+ * Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
  * Produced at the Lawrence Livermore National Laboratory.
  * All rights reserved.
  * For details, see the LICENSE file.
+ * LLNS Copyright End
  * -----------------------------------------------------------------
  * This is the implementation file for the iterative.h header
  * file. It contains the implementation of functions that may be
@@ -42,9 +47,9 @@ int ModifiedGS(N_Vector *v, realtype **h, int k, int p,
   int  i, k_minus_1, i0;
   realtype new_norm_2, new_product, vk_norm, temp;
   
-  vk_norm = RSqrt(N_VDotProd(v[k],v[k]));
+  vk_norm = SUNRsqrt(N_VDotProd(v[k],v[k]));
   k_minus_1 = k - 1;
-  i0 = MAX(k-p, 0);
+  i0 = SUNMAX(k-p, 0);
   
   /* Perform modified Gram-Schmidt */
   
@@ -55,7 +60,7 @@ int ModifiedGS(N_Vector *v, realtype **h, int k, int p,
 
   /* Compute the norm of the new vector at v[k] */
 
-  *new_vk_norm = RSqrt(N_VDotProd(v[k], v[k]));
+  *new_vk_norm = SUNRsqrt(N_VDotProd(v[k], v[k]));
 
   /* If the norm of the new vector at v[k] is less than
      FACTOR (== 1000) times unit roundoff times the norm of the
@@ -74,12 +79,12 @@ int ModifiedGS(N_Vector *v, realtype **h, int k, int p,
     if ((temp + new_product) == temp) continue;
     h[i][k_minus_1] += new_product;
     N_VLinearSum(ONE, v[k],-new_product, v[i], v[k]);
-    new_norm_2 += SQR(new_product);
+    new_norm_2 += SUNSQR(new_product);
   }
 
   if (new_norm_2 != ZERO) {
-    new_product = SQR(*new_vk_norm) - new_norm_2;
-    *new_vk_norm = (new_product > ZERO) ? RSqrt(new_product) : ZERO;
+    new_product = SUNSQR(*new_vk_norm) - new_norm_2;
+    *new_vk_norm = (new_product > ZERO) ? SUNRsqrt(new_product) : ZERO;
   }
 
   return(0);
@@ -104,9 +109,9 @@ int ClassicalGS(N_Vector *v, realtype **h, int k, int p,
   
   /* Perform Classical Gram-Schmidt */
 
-  vk_norm = RSqrt(N_VDotProd(v[k], v[k]));
+  vk_norm = SUNRsqrt(N_VDotProd(v[k], v[k]));
 
-  i0 = MAX(k-p, 0);
+  i0 = SUNMAX(k-p, 0);
   for (i=i0; i < k; i++) {
     h[i][k_minus_1] = N_VDotProd(v[i], v[k]);
   }
@@ -117,7 +122,7 @@ int ClassicalGS(N_Vector *v, realtype **h, int k, int p,
 
   /* Compute the norm of the new vector at v[k] */
 
-  *new_vk_norm = RSqrt(N_VDotProd(v[k], v[k]));
+  *new_vk_norm = SUNRsqrt(N_VDotProd(v[k], v[k]));
 
   /* Reorthogonalize if necessary */
 
@@ -137,7 +142,7 @@ int ClassicalGS(N_Vector *v, realtype **h, int k, int p,
     }
     N_VLinearSum(ONE, v[k], -ONE, temp, v[k]);
 
-    *new_vk_norm = RSqrt(N_VDotProd(v[k],v[k]));
+    *new_vk_norm = SUNRsqrt(N_VDotProd(v[k],v[k]));
   }
 
   return(0);
@@ -185,13 +190,13 @@ int QRfact(int n, realtype **h, realtype *q, int job)
       if( temp2 == ZERO) {
 	c = ONE;
 	s = ZERO;
-      } else if (ABS(temp2) >= ABS(temp1)) {
+      } else if (SUNRabs(temp2) >= SUNRabs(temp1)) {
 	temp3 = temp1/temp2;
-	s = -ONE/RSqrt(ONE+SQR(temp3));
+	s = -ONE/SUNRsqrt(ONE+SUNSQR(temp3));
 	c = -s*temp3;
       } else {
 	temp3 = temp2/temp1;
-	c = ONE/RSqrt(ONE+SQR(temp3));
+	c = ONE/SUNRsqrt(ONE+SUNSQR(temp3));
 	s = -c*temp3;
       }
       q[q_ptr] = c;
@@ -228,13 +233,13 @@ int QRfact(int n, realtype **h, realtype *q, int job)
     if (temp2 == ZERO) {
       c = ONE;
       s = ZERO;
-    } else if (ABS(temp2) >= ABS(temp1)) {
+    } else if (SUNRabs(temp2) >= SUNRabs(temp1)) {
       temp3 = temp1/temp2;
-      s = -ONE/RSqrt(ONE+SQR(temp3));
+      s = -ONE/SUNRsqrt(ONE+SUNSQR(temp3));
       c = -s*temp3;
     } else {
       temp3 = temp2/temp1;
-      c = ONE/RSqrt(ONE+SQR(temp3));
+      c = ONE/SUNRsqrt(ONE+SUNSQR(temp3));
       s = -c*temp3;
     }
     q_ptr = 2*n_minus_1;
