@@ -170,6 +170,10 @@ namespace casadi {
     // Call the base class method
     Integrator::init(opts);
 
+    // If sensitivity equations, make sure derivative_of_ is available
+    casadi_assert_message(ns_==0 || !derivative_of_.is_null(),
+      "Not implemented.");
+
     // Default options
     abstol_ = 1e-8;
     reltol_ = 1e-6;
