@@ -151,7 +151,7 @@ namespace casadi {
         "Absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]"}},
       {"linear_solver",
        {OT_STRING,
-        "A custom linear solver creator function"}},
+        "A custom linear solver creator function [default: csparse]"}},
       {"linear_solver_options",
        {OT_DICT,
         "Options to be passed to the linear solver"}},
@@ -183,6 +183,7 @@ namespace casadi {
     stop_at_end_ = true;
     use_preconditioner_ = false;
     max_krylov_ = 10;
+    linear_solver_ = "csparse";
     string linear_solver_type = "dense";
     string iterative_solver = "gmres";
     string pretype = "none";
