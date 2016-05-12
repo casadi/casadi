@@ -268,6 +268,14 @@ namespace casadi {
     // For sparsity pattern propagation
     alloc(oracle_);
 
+    // Error if sparse input
+    casadi_assert_message(x().is_dense(), "Sparse DAE not supported");
+    casadi_assert_message(z().is_dense(), "Sparse DAE not supported");
+    casadi_assert_message(p().is_dense(), "Sparse DAE not supported");
+    casadi_assert_message(rx().is_dense(), "Sparse DAE not supported");
+    casadi_assert_message(rz().is_dense(), "Sparse DAE not supported");
+    casadi_assert_message(rp().is_dense(), "Sparse DAE not supported");
+
     // Get dimensions
     nx_ = x().nnz();
     nz_ = z().nnz();
@@ -280,10 +288,6 @@ namespace casadi {
 
     // Number of sensitivities
     nsens_ = x().size2()-1;
-
-    // Warn if sparse inputs (was previously an error)
-    casadi_assert_warning(oracle_.sparsity_in(DE_X).is_dense(),
-                          "Sparse states in integrators are experimental");
 
     // Get the sparsities and BTF factorization of the forward and reverse DAE
     sp_jac_dae_ = sp_jac_dae();
