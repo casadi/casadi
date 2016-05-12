@@ -88,23 +88,23 @@ namespace casadi {
     }
 
     // Create function
-    create_function("rhs", {"x", "p", "t"}, {"ode"});
-    create_function("rhsQ", {"x", "p", "t"}, {"quad"});
-    create_function("rhsB", {"rx", "rp", "x", "p", "t"},
+    create_function("odeF", {"x", "p", "t"}, {"ode"});
+    create_function("quadF", {"x", "p", "t"}, {"quad"});
+    create_function("odeB", {"rx", "rp", "x", "p", "t"},
                     {"rode"});
-    create_function("rhsQB", {"rx", "rp", "x", "p", "t"},
+    create_function("quadB", {"rx", "rp", "x", "p", "t"},
                     {"rquad"});
 
     // Create a Jacobian if requested
     if (exact_jacobian_) {
       set_function(oracle_.is_a("sxfunction") ? getJacF<SX>() : getJacF<MX>());
-      casadi_assert(get_function("jacF").sparsity_out(0) == sp_jac_dae_);
+      init_linsol();
     }
 
     // Create a backwards Jacobian if requested
     if (exact_jacobianB_ && nrx_>0) {
       set_function(oracle_.is_a("sxfunction") ? getJacB<SX>() : getJacB<MX>());
-      casadi_assert(get_function("jacB").sparsity_out(0) == sp_jac_rdae_);
+      init_linsolB();
     }
 
     // Algebraic variables not supported
@@ -131,7 +131,7 @@ namespace casadi {
     if (exact_jacobian_) {
       switch (linsol_f_) {
       case SD_ITERATIVE:
-        create_function("jtimes", {"t", "x", "p", "fwd:x"}, {"fwd:ode"});
+        create_function("jtimesF", {"t", "x", "p", "fwd:x"}, {"fwd:ode"});
         break;
       default: break;
       }
@@ -286,7 +286,7 @@ namespace casadi {
       casadi_assert(user_data);
       auto m = to_mem(user_data);
       auto& s = m->self;
-      s.calc_function(m, "rhs", {NV_DATA_S(x), get_ptr(m->p), &t},
+      s.calc_function(m, "odeF", {NV_DATA_S(x), get_ptr(m->p), &t},
                       {NV_DATA_S(xdot)});
       return 0;
     } catch(exception& e) {
@@ -535,7 +535,7 @@ namespace casadi {
     try {
       auto m = to_mem(user_data);
       auto& s = m->self;
-      s.calc_function(m, "rhsQ", {NV_DATA_S(x), get_ptr(m->p), &t},
+      s.calc_function(m, "quadF", {NV_DATA_S(x), get_ptr(m->p), &t},
                       {NV_DATA_S(qdot)});
       return 0;
     } catch(exception& e) {
@@ -569,7 +569,7 @@ namespace casadi {
       casadi_assert(user_data);
       auto m = to_mem(user_data);
       auto& s = m->self;
-      s.calc_function(m, "rhsB", {NV_DATA_S(rx), get_ptr(m->rp),
+      s.calc_function(m, "odeB", {NV_DATA_S(rx), get_ptr(m->rp),
             NV_DATA_S(x), get_ptr(m->p), &t},
         {NV_DATA_S(rxdot)});
 
@@ -601,7 +601,7 @@ namespace casadi {
       casadi_assert(user_data);
       auto m = to_mem(user_data);
       auto& s = m->self;
-      s.calc_function(m, "rhsQB", {NV_DATA_S(rx), get_ptr(m->rp),
+      s.calc_function(m, "quadB", {NV_DATA_S(rx), get_ptr(m->rp),
             NV_DATA_S(x), get_ptr(m->p), &t},
         {NV_DATA_S(rqdot)});
 
@@ -620,7 +620,7 @@ namespace casadi {
     try {
       auto m = to_mem(user_data);
       auto& s = m->self;
-      s.calc_function(m, "jtimes", {&t, NV_DATA_S(x), get_ptr(m->p), NV_DATA_S(v)},
+      s.calc_function(m, "jtimesF", {&t, NV_DATA_S(x), get_ptr(m->p), NV_DATA_S(v)},
                       {NV_DATA_S(Jv)});
       return 0;
     } catch(exception& e) {
@@ -657,9 +657,10 @@ namespace casadi {
                       {m->jac});
 
       // Save to Jac
-      const int* colind = s.sp_jac_dae_.colind();
-      int ncol = s.sp_jac_dae_.size2();
-      const int* row = s.sp_jac_dae_.row();
+      const Sparsity& sp = s.get_function("jacF").sparsity_out(0);
+      const int* colind = sp.colind();
+      int ncol = sp.size2();
+      const int* row = sp.row();
       for (int cc=0; cc<ncol; ++cc) {
         for (int el=colind[cc]; el<colind[cc+1]; ++el) {
           DENSE_ELEM(Jac, row[el], cc) = m->jac[el];
@@ -685,9 +686,10 @@ namespace casadi {
         {m->jacB});
 
       // Save to JacB
-      const int* colind = s.sp_jac_rdae_.colind();
-      int ncol = s.sp_jac_rdae_.size2();
-      const int* row = s.sp_jac_rdae_.row();
+      const Sparsity& sp = s.get_function("jacB").sparsity_out(0);
+      const int* colind = sp.colind();
+      int ncol = sp.size2();
+      const int* row = sp.row();
       for (int cc=0; cc<ncol; ++cc) {
         for (int el=colind[cc]; el<colind[cc+1]; ++el) {
           DENSE_ELEM(JacB, row[el], cc) = m->jacB[el];
@@ -712,9 +714,10 @@ namespace casadi {
                       {m->jac});
 
       // Save to Jac
-      const int* colind = s.sp_jac_dae_.colind();
-      int ncol = s.sp_jac_dae_.size2();
-      const int* row = s.sp_jac_dae_.row();
+      const Sparsity& sp = s.get_function("jacF").sparsity_out(0);
+      const int* colind = sp.colind();
+      int ncol = sp.size2();
+      const int* row = sp.row();
       for (int cc=0; cc<ncol; ++cc) {
         for (int el=colind[cc]; el<colind[cc+1]; ++el) {
           int rr = row[el];
@@ -742,9 +745,10 @@ namespace casadi {
         {m->jacB});
 
       // Save to JacB
-      const int* colind = s.sp_jac_rdae_.colind();
-      int ncol = s.sp_jac_rdae_.size2();
-      const int* row = s.sp_jac_rdae_.row();
+      const Sparsity& sp = s.get_function("jacB").sparsity_out(0);
+      const int* colind = sp.colind();
+      int ncol = sp.size2();
+      const int* row = sp.row();
       for (int cc=0; cc<ncol; ++cc) {
         for (int el=colind[cc]; el<colind[cc+1]; ++el) {
           int rr = row[el];
@@ -778,8 +782,9 @@ namespace casadi {
       }
 
       // Solve the (possibly factorized) system
-      casadi_assert(s.linsol_.nnz_out(0) == NV_LENGTH_S(z));
-      s.linsol_.linsol_solve(NV_DATA_S(z));
+      const Function& linsol = s.get_function("linsolF");
+      casadi_assert(linsol.nnz_out(0) == NV_LENGTH_S(z));
+      linsol.linsol_solve(NV_DATA_S(z));
 
       return 0;
     } catch(exception& e) {
@@ -800,8 +805,9 @@ namespace casadi {
       }
 
       // Solve the (possibly factorized) system
-      casadi_assert(s.linsolB_.nnz_out(0) == NV_LENGTH_S(zvecB));
-      s.linsolB_.linsol_solve(NV_DATA_S(zvecB), 1);
+      const Function& linsolB = s.get_function("linsolB");
+      casadi_assert(linsolB.nnz_out(0) == NV_LENGTH_S(zvecB));
+      linsolB.linsol_solve(NV_DATA_S(zvecB), 1);
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "psolveB failed: " << e.what() << endl;;
@@ -821,8 +827,9 @@ namespace casadi {
                       {m->jac});
 
       // Prepare the solution of the linear system (e.g. factorize)
-      s.linsol_.setup(m->arg+LINSOL_NUM_IN, m->res+LINSOL_NUM_OUT, m->iw, m->w);
-      s.linsol_.linsol_factorize(m->jac);
+      const Function& linsol = s.get_function("linsolF");
+      linsol.setup(m->arg+LINSOL_NUM_IN, m->res+LINSOL_NUM_OUT, m->iw, m->w);
+      linsol.linsol_factorize(m->jac);
 
       return 0;
     } catch(exception& e) {
@@ -845,8 +852,9 @@ namespace casadi {
         {m->jacB});
 
       // Prepare the solution of the linear system (e.g. factorize)
-      s.linsolB_.setup(m->arg+LINSOL_NUM_IN, m->res+LINSOL_NUM_OUT, m->iw, m->w);
-      s.linsolB_.linsol_factorize(m->jacB);
+      const Function& linsolB = s.get_function("linsolB");
+      linsolB.setup(m->arg+LINSOL_NUM_IN, m->res+LINSOL_NUM_OUT, m->iw, m->w);
+      linsolB.linsol_factorize(m->jacB);
 
       return 0;
     } catch(exception& e) {
@@ -1029,13 +1037,7 @@ namespace casadi {
     // Add a preconditioner
     if (use_preconditioner_) {
       casadi_assert_message(has_function("jacF"), "No Jacobian function");
-
-      // Make sure that a linear solver has been provided
-      if (linsol_.is_null())
-        throw CasadiException("CvodesInterface::init(): "
-                              "No user defined linear solver has been provided.");
-
-      // Pass to IDA
+      casadi_assert_message(has_function("linsolF"), "No linear solver");
       flag = CVSpilsSetPreconditioner(m->mem, psetup, psolve);
       if (flag != CV_SUCCESS) cvodes_error("CVSpilsSetPreconditioner", flag);
     }
@@ -1043,13 +1045,7 @@ namespace casadi {
 
   void CvodesInterface::initUserDefinedLinsol(CvodesMemory* m) const {
     casadi_assert_message(has_function("jacF"), "No Jacobian function");
-
-    // Make sure that a linear solver has been provided
-    if (linsol_.is_null())
-      throw CasadiException("CvodesInterface::initUserDefinedLinsol(): "
-                            "No user defined linear solver has been provided.");
-
-    //  Set fields in the IDA memory
+    casadi_assert_message(has_function("linsolF"), "No linear solver");
     CVodeMem cv_mem = static_cast<CVodeMem>(m->mem);
     cv_mem->cv_lmem   = m;
     cv_mem->cv_lsetup = lsetup;
@@ -1103,13 +1099,7 @@ namespace casadi {
     // Add a preconditioner
     if (use_preconditionerB_) {
       casadi_assert_message(has_function("jacB"), "No Jacobian function");
-
-      // Make sure that a linear solver has been provided
-      if (linsolB_.is_null())
-        casadi_error("CvodesInterface::init(): "
-                     "No user defined backwards  linear solver has been provided.");
-
-      // Pass to IDA
+      casadi_assert_message(has_function("linsolB"), "No linear solver");
       flag = CVSpilsSetPreconditionerB(m->mem, m->whichB, psetupB, psolveB);
       if (flag != CV_SUCCESS) cvodes_error("CVSpilsSetPreconditionerB", flag);
     }
@@ -1118,17 +1108,11 @@ namespace casadi {
 
   void CvodesInterface::initUserDefinedLinsolB(CvodesMemory* m) const {
     casadi_assert_message(has_function("jacB"), "No Jacobian function");
-
-    // Make sure that a linear solver has been provided
-    if (linsolB_.is_null())
-      throw CasadiException("CvodesInterface::initUserDefinedLinsolB(): "
-                            "No user defined backward linear solver has been provided.");
-
+    casadi_assert_message(has_function("linsolB"), "No linear solver");
     CVodeMem cv_mem = static_cast<CVodeMem>(m->mem);
     CVadjMem ca_mem = cv_mem->cv_adj_mem;
     CVodeBMem cvB_mem = ca_mem->cvB_mem;
     cvB_mem->cv_lmem   = m;
-
     cvB_mem->cv_mem->cv_lmem = m;
     cvB_mem->cv_mem->cv_lsetup = lsetupB;
     cvB_mem->cv_mem->cv_lsolve = lsolveB;

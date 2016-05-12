@@ -367,30 +367,24 @@ namespace casadi {
     } else {
       casadi_error("Unknown linear solver for backward integration: " + iterative_solverB);
     }
+  }
 
+  void SundialsInterface::init_linsol() {
     // Work vector
-    alloc_w(sp_jac_dae_.nnz(), true);
+    alloc_w(get_function("jacF").nnz_out(0), true);
 
     // Create a linear solver
-    if (!linear_solver_.empty()) {
-      casadi_assert(!sp_jac_dae_.is_null());
-      linsol_ = linsol("linsol", linear_solver_, sp_jac_dae_,
-                       1, linear_solver_options_);
-      alloc(linsol_);
-    }
+    set_function(linsol("linsolF", linear_solver_, get_function("jacF").sparsity_out(0),
+                 1, linear_solver_options_));
+  }
 
-    if (nrx_>0) {
-      // Work vector
-      alloc_w(sp_jac_rdae_.nnz(), true);
+  void SundialsInterface::init_linsolB() {
+    // Work vector
+    alloc_w(get_function("jacB").nnz_out(0), true);
 
-      // Create a linear solver
-      casadi_assert(!sp_jac_rdae_.is_null());
-      if (!linear_solverB_.empty()) {
-        linsolB_ = linsol("linsolB", linear_solverB_, sp_jac_rdae_,
-                          1, linear_solver_optionsB_);
-        alloc(linsolB_);
-      }
-    }
+    // Create a linear solver
+    set_function(linsol("linsolB", linear_solverB_, get_function("jacB").sparsity_out(0),
+                 1, linear_solver_optionsB_));
   }
 
   void SundialsInterface::init_memory(void* mem) const {
@@ -535,9 +529,9 @@ namespace casadi {
     Integrator::set_work(mem, arg, res, iw, w);
 
     // Work vectors
-    m->jac = w; w += sp_jac_dae_.nnz();
+    m->jac = w; w += get_function("jacF").nnz_out(0);
     if (nrx_>0) {
-      m->jacB = w; w += sp_jac_rdae_.nnz();
+      m->jacB = w; w += get_function("jacB").nnz_out(0);
     }
   }
 

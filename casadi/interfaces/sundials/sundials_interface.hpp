@@ -95,6 +95,12 @@ namespace casadi {
     /** \brief Initalize memory block */
     virtual void init_memory(void* mem) const;
 
+    ///@{
+    // Initialize linear solver
+    void init_linsol();
+    void init_linsolB();
+    ///@}
+
     /// Get all statistics
     virtual Dict get_stats(void* mem) const;
 
@@ -149,9 +155,6 @@ namespace casadi {
 
     /// Use preconditioning
     bool use_preconditioner_, use_preconditionerB_;
-
-    /// Linear solver forward, backward
-    Function linsol_, linsolB_;
 
     // Get bandwidth for forward problem
     std::pair<int, int> getBandwidth() const;
