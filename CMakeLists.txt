@@ -402,7 +402,7 @@ add_feature_info(lapack-interface LAPACK_FOUND "Interface to LAPACK.")
 if(WITH_SUNDIALS)
   if(WITH_BUILD_SUNDIALS)
     # build the included sundials
-    set(SUNDIALS_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_packages/sundials-2.5mod)
+    set(SUNDIALS_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_packages/casadi-sundials)
     set(SUNDIALS_LIBRARIES casadi_sundials)
     set(SUNDIALS_FOUND ON)
   else()
