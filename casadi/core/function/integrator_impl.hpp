@@ -169,16 +169,16 @@ namespace casadi {
     ///@}
 
     /// Number of states for the forward integration
-    int nx_, nz_, nq_;
+    int nx_, nz_, nq_, nx1_, nz1_, nq1_;
 
     /// Number of states for the backward integration
-    int nrx_, nrz_, nrq_;
+    int nrx_, nrz_, nrq_, nrx1_, nrz1_, nrq1_;
 
     /// Number of forward and backward parameters
-    int np_, nrp_;
+    int np_, nrp_, np1_, nrp1_;
 
     /// Number of sensitivities
-    int nsens_;
+    int ns_;
 
     // Time grid
     std::vector<double> grid_;

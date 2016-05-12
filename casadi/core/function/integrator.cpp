@@ -276,7 +276,17 @@ namespace casadi {
     casadi_assert_message(rz().is_dense(), "Sparse DAE not supported");
     casadi_assert_message(rp().is_dense(), "Sparse DAE not supported");
 
-    // Get dimensions
+    // Get dimensions (excluding sensitivity equations)
+    nx1_ = x().size1();
+    nz1_ = z().size1();
+    nq1_ = q().size1();
+    np1_  = p().size1();
+    nrx1_ = rx().size1();
+    nrz1_ = rz().size1();
+    nrp1_ = rp().size1();
+    nrq1_ = rq().size1();
+
+    // Get dimensions (including sensitivity equations)
     nx_ = x().nnz();
     nz_ = z().nnz();
     nq_ = q().nnz();
@@ -287,7 +297,7 @@ namespace casadi {
     nrq_ = rq().nnz();
 
     // Number of sensitivities
-    nsens_ = x().size2()-1;
+    ns_ = x().size2()-1;
 
     // Get the sparsities and BTF factorization of the forward and reverse DAE
     sp_jac_dae_ = sp_jac_dae();

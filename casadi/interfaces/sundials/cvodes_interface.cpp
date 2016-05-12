@@ -87,6 +87,7 @@ namespace casadi {
       }
     }
 
+    // Create function
     create_function("rhs", {"x", "p", "t"}, {"ode"});
     create_function("rhsQ", {"x", "p", "t"}, {"quad"});
     create_function("rhsB", {"rx", "rp", "x", "p", "t"},
