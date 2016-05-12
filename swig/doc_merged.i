@@ -8452,6 +8452,7 @@ experience a dramatic speed-up by using a sparse linear solver:
 +------------------------+------------------------+------------------------+
 | linear_solver          | OT_STRING              | A custom linear solver |
 |                        |                        | creator function       |
+|                        |                        | [default: csparse]     |
 +------------------------+------------------------+------------------------+
 | linear_solverB         | OT_STRING              | A custom linear solver |
 |                        |                        | creator function for   |
@@ -8684,6 +8685,7 @@ experience a dramatic speed-up by using a sparse linear solver:
 +------------------------+------------------------+------------------------+
 | linear_solver          | OT_STRING              | A custom linear solver |
 |                        |                        | creator function       |
+|                        |                        | [default: csparse]     |
 +------------------------+------------------------+------------------------+
 | linear_solverB         | OT_STRING              | A custom linear solver |
 |                        |                        | creator function for   |

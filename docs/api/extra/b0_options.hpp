@@ -330,7 +330,7 @@
 <tr><td>iterative_solver</td><td>OT_STRING</td><td>Iterative solver: GMRES|bcgstab|tfqmr</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>iterative_solverB</td><td>OT_STRING</td><td>Iterative solver for backward integration</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_multistep_method</td><td>OT_STRING</td><td>Integrator scheme: BDF|adams</td><td>casadi::CvodesInterface</td></tr>
-<tr><td>linear_solver</td><td>OT_STRING</td><td>A custom linear solver creator function</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>linear_solver</td><td>OT_STRING</td><td>A custom linear solver creator function [default: csparse]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solverB</td><td>OT_STRING</td><td>A custom linear solver creator function for backwards integration [default: equal to linear_solver]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICT</td><td>Options to be passed to the linear solver</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solver_optionsB</td><td>OT_DICT</td><td>Options to be passed to the linear solver for backwards integration [default: equal to linear_solver_options]</td><td>casadi::SundialsInterface</td></tr>
@@ -380,7 +380,7 @@
 <tr><td>iterative_solver</td><td>OT_STRING</td><td>Iterative solver: GMRES|bcgstab|tfqmr</td></tr>
 <tr><td>iterative_solverB</td><td>OT_STRING</td><td>Iterative solver for backward integration</td></tr>
 <tr><td>linear_multistep_method</td><td>OT_STRING</td><td>Integrator scheme: BDF|adams</td></tr>
-<tr><td>linear_solver</td><td>OT_STRING</td><td>A custom linear solver creator function</td></tr>
+<tr><td>linear_solver</td><td>OT_STRING</td><td>A custom linear solver creator function [default: csparse]</td></tr>
 <tr><td>linear_solverB</td><td>OT_STRING</td><td>A custom linear solver creator function for backwards integration [default: equal to linear_solver]</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICT</td><td>Options to be passed to the linear solver</td></tr>
 <tr><td>linear_solver_optionsB</td><td>OT_DICT</td><td>Options to be passed to the linear solver for backwards integration [default: equal to linear_solver_options]</td></tr>
@@ -429,7 +429,7 @@
 <tr><td>iterative_solver</td><td>OT_STRING</td><td>Iterative solver: GMRES|bcgstab|tfqmr</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>iterative_solverB</td><td>OT_STRING</td><td>Iterative solver for backward integration</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_multistep_method</td><td>OT_STRING</td><td>Integrator scheme: BDF|adams</td><td>casadi::CvodesInterface</td></tr>
-<tr><td>linear_solver</td><td>OT_STRING</td><td>A custom linear solver creator function</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>linear_solver</td><td>OT_STRING</td><td>A custom linear solver creator function [default: csparse]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solverB</td><td>OT_STRING</td><td>A custom linear solver creator function for backwards integration [default: equal to linear_solver]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICT</td><td>Options to be passed to the linear solver</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solver_optionsB</td><td>OT_DICT</td><td>Options to be passed to the linear solver for backwards integration [default: equal to linear_solver_options]</td><td>casadi::SundialsInterface</td></tr>
@@ -630,7 +630,7 @@
 <tr><td>interpolation_type</td><td>OT_STRING</td><td>Type of interpolation for the adjoint sensitivities</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>iterative_solver</td><td>OT_STRING</td><td>Iterative solver: GMRES|bcgstab|tfqmr</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>iterative_solverB</td><td>OT_STRING</td><td>Iterative solver for backward integration</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>linear_solver</td><td>OT_STRING</td><td>A custom linear solver creator function</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>linear_solver</td><td>OT_STRING</td><td>A custom linear solver creator function [default: csparse]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solverB</td><td>OT_STRING</td><td>A custom linear solver creator function for backwards integration [default: equal to linear_solver]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICT</td><td>Options to be passed to the linear solver</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solver_optionsB</td><td>OT_DICT</td><td>Options to be passed to the linear solver for backwards integration [default: equal to linear_solver_options]</td><td>casadi::SundialsInterface</td></tr>
@@ -687,7 +687,7 @@
 <tr><td>interpolation_type</td><td>OT_STRING</td><td>Type of interpolation for the adjoint sensitivities</td></tr>
 <tr><td>iterative_solver</td><td>OT_STRING</td><td>Iterative solver: GMRES|bcgstab|tfqmr</td></tr>
 <tr><td>iterative_solverB</td><td>OT_STRING</td><td>Iterative solver for backward integration</td></tr>
-<tr><td>linear_solver</td><td>OT_STRING</td><td>A custom linear solver creator function</td></tr>
+<tr><td>linear_solver</td><td>OT_STRING</td><td>A custom linear solver creator function [default: csparse]</td></tr>
 <tr><td>linear_solverB</td><td>OT_STRING</td><td>A custom linear solver creator function for backwards integration [default: equal to linear_solver]</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICT</td><td>Options to be passed to the linear solver</td></tr>
 <tr><td>linear_solver_optionsB</td><td>OT_DICT</td><td>Options to be passed to the linear solver for backwards integration [default: equal to linear_solver_options]</td></tr>
@@ -743,7 +743,7 @@
 <tr><td>interpolation_type</td><td>OT_STRING</td><td>Type of interpolation for the adjoint sensitivities</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>iterative_solver</td><td>OT_STRING</td><td>Iterative solver: GMRES|bcgstab|tfqmr</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>iterative_solverB</td><td>OT_STRING</td><td>Iterative solver for backward integration</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>linear_solver</td><td>OT_STRING</td><td>A custom linear solver creator function</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>linear_solver</td><td>OT_STRING</td><td>A custom linear solver creator function [default: csparse]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solverB</td><td>OT_STRING</td><td>A custom linear solver creator function for backwards integration [default: equal to linear_solver]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICT</td><td>Options to be passed to the linear solver</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solver_optionsB</td><td>OT_DICT</td><td>Options to be passed to the linear solver for backwards integration [default: equal to linear_solver_options]</td><td>casadi::SundialsInterface</td></tr>
@@ -2121,7 +2121,7 @@
 <tr><td>interpolation_type</td><td>OT_STRING</td><td>Type of interpolation for the adjoint sensitivities</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>iterative_solver</td><td>OT_STRING</td><td>Iterative solver: GMRES|bcgstab|tfqmr</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>iterative_solverB</td><td>OT_STRING</td><td>Iterative solver for backward integration</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>linear_solver</td><td>OT_STRING</td><td>A custom linear solver creator function</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>linear_solver</td><td>OT_STRING</td><td>A custom linear solver creator function [default: csparse]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solverB</td><td>OT_STRING</td><td>A custom linear solver creator function for backwards integration [default: equal to linear_solver]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICT</td><td>Options to be passed to the linear solver</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solver_optionsB</td><td>OT_DICT</td><td>Options to be passed to the linear solver for backwards integration [default: equal to linear_solver_options]</td><td>casadi::SundialsInterface</td></tr>
@@ -2178,7 +2178,7 @@
 <tr><td>interpolation_type</td><td>OT_STRING</td><td>Type of interpolation for the adjoint sensitivities</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>iterative_solver</td><td>OT_STRING</td><td>Iterative solver: GMRES|bcgstab|tfqmr</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>iterative_solverB</td><td>OT_STRING</td><td>Iterative solver for backward integration</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>linear_solver</td><td>OT_STRING</td><td>A custom linear solver creator function</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>linear_solver</td><td>OT_STRING</td><td>A custom linear solver creator function [default: csparse]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solverB</td><td>OT_STRING</td><td>A custom linear solver creator function for backwards integration [default: equal to linear_solver]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICT</td><td>Options to be passed to the linear solver</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solver_optionsB</td><td>OT_DICT</td><td>Options to be passed to the linear solver for backwards integration [default: equal to linear_solver_options]</td><td>casadi::SundialsInterface</td></tr>
