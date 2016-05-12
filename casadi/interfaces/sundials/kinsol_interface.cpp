@@ -594,9 +594,17 @@ namespace casadi {
 
   int KinsolInterface::lsetup_wrapper(KINMem kin_mem) {
     try {
-      auto this_ = static_cast<KinsolMemory*>(kin_mem->kin_lmem);
-      casadi_assert(this_);
-      this_->self.lsetup(*this_, kin_mem);
+      auto m = to_mem(kin_mem->kin_lmem);
+      auto& s = m->self;
+
+      N_Vector u =  kin_mem->kin_uu;
+      N_Vector uscale = kin_mem->kin_uscale;
+      N_Vector fval = kin_mem->kin_fval;
+      N_Vector fscale = kin_mem->kin_fscale;
+      N_Vector tmp1 = kin_mem->kin_vtemp1;
+      N_Vector tmp2 = kin_mem->kin_vtemp2;
+      s.psetup(*m, u, uscale, fval, fscale, tmp1, tmp2);
+
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "lsetup failed: " << e.what() << endl;;
@@ -604,22 +612,31 @@ namespace casadi {
     }
   }
 
-  void KinsolInterface::lsetup(KinsolMemory& m, KINMem kin_mem) const {
-    N_Vector u =  kin_mem->kin_uu;
-    N_Vector uscale = kin_mem->kin_uscale;
-    N_Vector fval = kin_mem->kin_fval;
-    N_Vector fscale = kin_mem->kin_fscale;
-    N_Vector tmp1 = kin_mem->kin_vtemp1;
-    N_Vector tmp2 = kin_mem->kin_vtemp2;
-    psetup(m, u, uscale, fval, fscale, tmp1, tmp2);
-  }
-
   int KinsolInterface::
   lsolve_wrapper(KINMem kin_mem, N_Vector x, N_Vector b, double *res_norm) {
     try {
-      auto this_ = static_cast<KinsolMemory*>(kin_mem->kin_lmem);
-      casadi_assert(this_);
-      this_->self.lsolve(*this_, kin_mem, x, b, res_norm);
+      auto m = to_mem(kin_mem->kin_lmem);
+      auto& s = m->self;
+
+      // Get vectors
+      N_Vector u =  kin_mem->kin_uu;
+      N_Vector uscale = kin_mem->kin_uscale;
+      N_Vector fval = kin_mem->kin_fval;
+      N_Vector fscale = kin_mem->kin_fscale;
+      N_Vector tmp1 = kin_mem->kin_vtemp1;
+      N_Vector tmp2 = kin_mem->kin_vtemp2;
+
+      // Solve the linear system
+      N_VScale(1.0, b, x);
+      s.psolve(*m, u, uscale, fval, fscale, x, tmp1);
+
+      // Calculate residual
+      s.jtimes(*m, x, tmp2, u, 0);
+
+      // Calculate the error in residual norm
+      N_VLinearSum(1.0, b, -1.0, tmp2, tmp1);
+      *res_norm = sqrt(N_VDotProd(tmp1, tmp1));
+
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "lsolve failed: " << e.what() << endl;;
@@ -627,44 +644,17 @@ namespace casadi {
     }
   }
 
-  void KinsolInterface::lsolve(KinsolMemory& m, KINMem kin_mem,
-                            N_Vector x, N_Vector b, double *res_norm) const {
-    // Get vectors
-    N_Vector u =  kin_mem->kin_uu;
-    N_Vector uscale = kin_mem->kin_uscale;
-    N_Vector fval = kin_mem->kin_fval;
-    N_Vector fscale = kin_mem->kin_fscale;
-    N_Vector tmp1 = kin_mem->kin_vtemp1;
-    N_Vector tmp2 = kin_mem->kin_vtemp2;
-
-    // Solve the linear system
-    N_VScale(1.0, b, x);
-    psolve(m, u, uscale, fval, fscale, x, tmp1);
-
-    // Calculate residual
-    jtimes(m, x, tmp2, u, 0);
-
-    // Calculate the error in residual norm
-    N_VLinearSum(1.0, b, -1.0, tmp2, tmp1);
-    *res_norm = sqrt(N_VDotProd(tmp1, tmp1));
-  }
-
   void KinsolInterface::
   ehfun_wrapper(int error_code, const char *module, const char *function,
                 char *msg, void *eh_data) {
     try {
-      casadi_assert(eh_data);
-      auto this_ = static_cast<KinsolMemory*>(eh_data);
-      this_->self.ehfun(*this_, error_code, module, function, msg);
+      auto m = to_mem(eh_data);
+      auto& s = m->self;
+      if (!s.disable_internal_warnings_) {
+        userOut<true, PL_WARN>() << msg << endl;
+      }
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "ehfun failed: " << e.what() << endl;
-    }
-  }
-
-  void KinsolInterface::ehfun(KinsolMemory& m, int error_code, const char *module,
-                           const char *function, char *msg) const {
-    if (!disable_internal_warnings_) {
-      userOut<true, PL_WARN>() << msg << endl;
     }
   }
 

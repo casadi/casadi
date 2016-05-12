@@ -167,6 +167,13 @@ namespace casadi {
     /** \brief Initalize memory block */
     virtual void init_memory(void* mem) const;
 
+    /** \brief Cast to memory object */
+    static KinsolMemory* to_mem(void *mem) {
+      KinsolMemory* m = static_cast<KinsolMemory*>(mem);
+      casadi_assert(m);
+      return m;
+    }
+
     /** \brief Callback functions */
     void func(KinsolMemory& m, N_Vector u, N_Vector fval) const;
     void djac(KinsolMemory& m, long N, N_Vector u, N_Vector fu,
@@ -178,10 +185,6 @@ namespace casadi {
                 N_Vector tmp1, N_Vector tmp2) const;
     void psolve(KinsolMemory& m, N_Vector u, N_Vector uscale,
                 N_Vector fval, N_Vector fscale, N_Vector v, N_Vector tmp) const;
-    void lsetup(KinsolMemory& m, KINMem kin_mem) const;
-    void lsolve(KinsolMemory& m, KINMem kin_mem, N_Vector x, N_Vector b, double *res_norm) const;
-    void ehfun(KinsolMemory& m, int error_code, const char *module,
-               const char *function, char *msg) const;
 
     /** \brief Wrappers to callback functions*/
     static int func_wrapper(N_Vector u, N_Vector fval, void *user_data);
