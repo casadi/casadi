@@ -87,28 +87,56 @@ namespace casadi {
       }
     }
 
-    // Create function
-    create_function("odeF", {"x", "p", "t"}, {"ode"});
-    create_function("quadF", {"x", "p", "t"}, {"quad"});
-    create_function("odeB", {"rx", "rp", "x", "p", "t"},
-                    {"rode"});
-    create_function("quadB", {"rx", "rp", "x", "p", "t"},
-                    {"rquad"});
+    if (ns_==0) {
+      // Create functions
+      create_function("odeF", {"t", "x", "p"}, {"ode"});
+      create_function("quadF", {"t", "x", "p"}, {"quad"});
+      create_function("odeB", {"t", "rx", "rp", "x", "p"}, {"rode"});
+      create_function("quadB", {"t", "rx", "rp", "x", "p"}, {"rquad"});
+    } else {
+      // Fetch nondifferentiated functions
+      Function f = derivative_of_.get_function("odeF");
+      set_function(f, "odeF");
+      set_function(f.forward(ns_), "odeFS");
+      if (nq1_>0) {
+        f = derivative_of_.get_function("quadF");
+        set_function(f, "quadF");
+        set_function(f.forward(ns_), "quadFS");
+      }
+      if (nrx1_>0) {
+        f = derivative_of_.get_function("odeB");
+        set_function(f, "odeB");
+        set_function(f.forward(ns_), "odeBS");
+      }
+      if (nrq1_>0) {
+        f = derivative_of_.get_function("quadB");
+        set_function(f, "quadB");
+        set_function(f.forward(ns_), "quadBS");
+      }
+    }
 
     // Create a Jacobian if requested
     if (exact_jacobian_) {
-      set_function(oracle_.is_a("sxfunction") ? getJacF<SX>() : getJacF<MX>());
+      if (ns_==0) {
+        set_function(oracle_.is_a("sxfunction") ? getJacF<SX>() : getJacF<MX>(), "jacF");
+      } else {
+        set_function(derivative_of_.get_function("jacF"), "jacF");
+      }
       init_linsol();
     }
 
     // Create a backwards Jacobian if requested
-    if (exact_jacobianB_ && nrx_>0) {
-      set_function(oracle_.is_a("sxfunction") ? getJacB<SX>() : getJacB<MX>());
+    if (exact_jacobianB_ && nrx1_>0) {
+      if (ns_==0) {
+        set_function(oracle_.is_a("sxfunction") ? getJacB<SX>() : getJacB<MX>(), "jacB");
+      } else {
+        set_function(derivative_of_.get_function("jacB"), "jacB");
+      }
       init_linsolB();
     }
 
     // Algebraic variables not supported
-    casadi_assert_message(nz_==0 && nrz_==0,
+    casadi_assert_message(nz1_==0 && nrz_==0,
                           "CVODES does not support algebraic variables");
 
     if (linear_multistep_method=="adams") {
@@ -245,7 +273,7 @@ namespace casadi {
     if (flag!=CV_SUCCESS) cvodes_error("CVodeSetUserData", flag);
 
     // Quadrature equations
-    if (nq_>0) {
+    if (nq1_>0) {
       // Initialize quadratures in CVodes
       flag = CVodeQuadInit(m->mem, rhsQ, m->q);
       if (flag != CV_SUCCESS) cvodes_error("CVodeQuadInit", flag);
@@ -262,8 +290,37 @@ namespace casadi {
       }
     }
 
+    // Forward sensitivity analysis
+    if (ns_>0) {
+      // Initialize forward sensitivity analysis
+      flag = CVodeSensInit(m->mem, ns_, CV_SIMULTANEOUS, rhsS, m->xzS);
+      if (flag!=CV_SUCCESS) cvodes_error("CVodeSensInit", flag);
+
+      // Set sensitivity tolerances
+      vector<double> abstolv(ns_, abstol_);
+      flag = CVodeSensSStolerances(m->mem, reltol_, get_ptr(abstolv));
+      if (flag!=CV_SUCCESS) cvodes_error("CVodeSensSStolerances", flag);
+
+      // Quadrature equations
+      if (nq1_>0) {
+        // Initialize quadratures in CVodes
+        flag = CVodeQuadSensInit(m->mem, rhsQS, m->qS);
+        if (flag != CV_SUCCESS) cvodes_error("CVodeQuadSensInit", flag);
+
+        // Should the quadrature errors be used for step size control?
+        if (quad_err_con_) {
+          flag = CVodeSetQuadSensErrCon(m->mem, true);
+          if (flag != CV_SUCCESS) cvodes_error("CVodeSetQuadErrCon", flag);
+
+          // Quadrature error tolerances
+          flag = CVodeQuadSensSStolerances(m->mem, reltol_, get_ptr(abstolv));
+          if (flag != CV_SUCCESS) cvodes_error("CVodeQuadSStolerances", flag);
+        }
+      }
+    }
+
     // Adjoint sensitivity problem
-    if (nrx_>0) {
+    if (nrx1_>0) {
       // Get the interpolation type
       int interpType;
       if (interpolation_type_=="hermite") {
@@ -286,7 +343,7 @@ namespace casadi {
       casadi_assert(user_data);
       auto m = to_mem(user_data);
       auto& s = m->self;
-      const double* arg[] = {NV_DATA_S(x), get_ptr(m->p), &t};
+      const double* arg[] = {&t, NV_DATA_S(x), get_ptr(m->p)};
       double* res[] = {NV_DATA_S(xdot)};
       s.calc_function(m, "odeF", arg, res);
       return 0;
@@ -309,18 +366,20 @@ namespace casadi {
     if (flag!=CV_SUCCESS) cvodes_error("CVodeReInit", flag);
 
     // Re-initialize quadratures
-    if (nq_>0) {
+    if (nq1_>0) {
       N_VConst(0.0, m->q);
       flag = CVodeQuadReInit(m->mem, m->q);
       if (flag != CV_SUCCESS) cvodes_error("CVodeQuadReInit", flag);
     }
 
-    // Turn off sensitivities
-    flag = CVodeSensToggleOff(m->mem);
-    if (flag != CV_SUCCESS) cvodes_error("CVodeSensToggleOff", flag);
+    // Re-initialize sensitivities
+    if (ns_>0) {
+      flag = CVodeSensReInit(m->mem, CV_SIMULTANEOUS, m->xzS);
+      if (flag != CV_SUCCESS) cvodes_error("CVodeSensReInit", flag);
+    }
 
     // Re-initialize backward integration
-    if (nrx_>0) {
+    if (nrx1_>0) {
       flag = CVodeAdjReInit(m->mem);
       if (flag != CV_SUCCESS) cvodes_error("CVodeAdjReInit", flag);
     }
@@ -347,7 +406,7 @@ namespace casadi {
     const double ttol = 1e-9;
     if (fabs(m->t-t)>=ttol) {
       // Integrate forward ...
-      if (nrx_>0) {
+      if (nrx1_>0) {
         // ... with taping
         int flag = CVodeF(m->mem, t, m->xz, &m->t, CV_NORMAL, &m->ncheck);
         if (flag!=CV_SUCCESS && flag!=CV_TSTOP_RETURN) cvodes_error("CVodeF", flag);
@@ -355,19 +414,34 @@ namespace casadi {
         // ... without taping
         int flag = CVode(m->mem, t, m->xz, &m->t, CV_NORMAL);
         if (flag!=CV_SUCCESS && flag!=CV_TSTOP_RETURN) cvodes_error("CVode", flag);
+
+        // Get sensitivities
+        if (ns_>0) {
+          double tret;
+          int flag = CVodeGetSens(m->mem, &tret, m->xzS);
+          if (flag!=CV_SUCCESS) cvodes_error("CVodeGetSens", flag);
+        }
       }
 
       // Get quadratures
-      if (nq_>0) {
+      if (nq1_>0) {
         double tret;
         int flag = CVodeGetQuad(m->mem, &tret, m->q);
         if (flag!=CV_SUCCESS) cvodes_error("CVodeGetQuad", flag);
+
+        // sensitivities
+        if (ns_>0) {
+          int flag = CVodeGetQuadSens(m->mem, &tret, m->qS);
+          if (flag!=CV_SUCCESS) cvodes_error("CVodeGetQuadSens", flag);
+        }
       }
     }
 
     // Set function outputs
-    casadi_copy(NV_DATA_S(m->xz), nx_, x);
-    casadi_copy(NV_DATA_S(m->q), nq_, q);
+    casadi_copy(NV_DATA_S(m->xz), nx1_, x);
+    for (int d=0; d<ns_; ++d) casadi_copy(NV_DATA_S(m->xzS[d]), nx1_, x+(d+1)*nx1_);
+    casadi_copy(NV_DATA_S(m->q), nq1_, q);
+    for (int d=0; d<ns_; ++d) casadi_copy(NV_DATA_S(m->qS[d]), nq1_, q+(d+1)*nq1_);
 
     // Print statistics
     if (print_stats_) printStats(m, userOut());
@@ -417,15 +491,15 @@ namespace casadi {
       if (flag!=CV_SUCCESS) cvodes_error("CVodeGetB", flag);
 
       // Get backward qudratures
-      if (nrq_>0) {
+      if (nrq1_>0) {
         flag = CVodeGetQuadB(m->mem, m->whichB, &m->t, m->rq);
         if (flag!=CV_SUCCESS) cvodes_error("CVodeGetQuadB", flag);
       }
     }
 
     // Save outputs
-    casadi_copy(NV_DATA_S(m->rxz), nrx_, rx);
-    casadi_copy(NV_DATA_S(m->rq), nrq_, rq);
+    casadi_copy(NV_DATA_S(m->rxz), nrx1_, rx);
+    casadi_copy(NV_DATA_S(m->rq), nrq1_, rq);
 
     CVodeMem cv_mem = static_cast<CVodeMem>(m->mem);
     CVadjMem ca_mem = cv_mem->cv_adj_mem;
@@ -504,13 +578,37 @@ namespace casadi {
     }
   }
 
-  int CvodesInterface::rhsS(int Ns, double t, N_Vector x, N_Vector xdot, N_Vector *xF,
-                            N_Vector *xdotF, void *user_data,
+  int CvodesInterface::rhsS(int Ns, double t, N_Vector x, N_Vector xdot, N_Vector *xS,
+                            N_Vector *xdotS, void *user_data,
                             N_Vector tmp1, N_Vector tmp2) {
     try {
-      casadi_assert(user_data);
       auto m = to_mem(user_data);
-      casadi_error("Commented out, #884, #794.");
+      auto& s = m->self;
+      // Inputs and outputs
+      const double** arg = m->arg;
+      double** res = m->res;
+      // All parameters
+      const double* p = get_ptr(m->p);
+      // Nondifferentiated inputs
+      *arg++ = &t;
+      *arg++ = NV_DATA_S(x);
+      *arg++ = p;
+      p += s.np1_;
+      // Nondifferentiated outputs
+      *arg++ = NV_DATA_S(xdot);
+      // Forward seeds
+      for (int d=0; d<s.ns_; ++d) {
+        *arg++ = 0;
+        *arg++ = NV_DATA_S(xS[d]);
+        *arg++ = p;
+        p += s.np1_;
+      }
+      // Forward sensitivities
+      for (int d=0; d<s.ns_; ++d) {
+        *res++ = NV_DATA_S(xdotS[d]);
+      }
+      // Evaluate
+      s.calc_function(m, "odeFS");
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "fs failed: " << e.what() << endl;
@@ -536,7 +634,7 @@ namespace casadi {
     try {
       auto m = to_mem(user_data);
       auto& s = m->self;
-      const double* arg[] = {NV_DATA_S(x), get_ptr(m->p), &t};
+      const double* arg[] = {&t, NV_DATA_S(x), get_ptr(m->p)};
       double* res[] = {NV_DATA_S(qdot)};
       s.calc_function(m, "quadF", arg, res);
       return 0;
@@ -546,17 +644,42 @@ namespace casadi {
     }
   }
 
-  int CvodesInterface::rhsQS(int Ns, double t, N_Vector x, N_Vector *xF, N_Vector qdot,
-                             N_Vector *qdotF, void *user_data,
+  int CvodesInterface::rhsQS(int Ns, double t, N_Vector x, N_Vector *xS, N_Vector qdot,
+                             N_Vector *qdotS, void *user_data,
                              N_Vector tmp1, N_Vector tmp2) {
     try {
       if (!user_data) {
         // SUNDIALS BUG!!!
-        for (int i=0; i<Ns; ++i) N_VConst(0.0, qdotF[i]);
+        for (int i=0; i<Ns; ++i) N_VConst(0.0, qdotS[i]);
         return 0;
       }
       auto m = to_mem(user_data);
-      casadi_error("Commented out, #884, #794.");
+      auto& s = m->self;
+      // Inputs and outputs
+      const double** arg = m->arg;
+      double** res = m->res;
+      // All parameters
+      const double* p = get_ptr(m->p);
+      // Nondifferentiated inputs
+      *arg++ = &t;
+      *arg++ = NV_DATA_S(x);
+      *arg++ = p;
+      p += s.np1_;
+      // Nondifferentiated outputs
+      *arg++ = NV_DATA_S(qdot);
+      // Forward seeds
+      for (int d=0; d<s.ns_; ++d) {
+        *arg++ = 0;
+        *arg++ = NV_DATA_S(xS[d]);
+        *arg++ = p;
+        p += s.np1_;
+      }
+      // Forward sensitivities
+      for (int d=0; d<s.ns_; ++d) {
+        *res++ = NV_DATA_S(qdotS[d]);
+      }
+      // Evaluate
+      s.calc_function(m, "quadFS");
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "rhsQS failed: " << e.what() << endl;;
@@ -571,13 +694,13 @@ namespace casadi {
       casadi_assert(user_data);
       auto m = to_mem(user_data);
       auto& s = m->self;
-      const double* arg[] = {NV_DATA_S(rx), get_ptr(m->rp),
-        NV_DATA_S(x), get_ptr(m->p), &t};
+      const double* arg[] = {&t, NV_DATA_S(rx), get_ptr(m->rp),
+        NV_DATA_S(x), get_ptr(m->p)};
       double* res[] = {NV_DATA_S(rxdot)};
       s.calc_function(m, "odeB", arg, res);
 
       // Negate (note definition of g)
-      casadi_scal(s.nrx_, -1., NV_DATA_S(rxdot));
+      casadi_scal(s.nrx1_, -1., NV_DATA_S(rxdot));
 
       return 0;
     } catch(exception& e) {
@@ -604,13 +727,13 @@ namespace casadi {
       casadi_assert(user_data);
       auto m = to_mem(user_data);
       auto& s = m->self;
-      const double* arg[] = {NV_DATA_S(rx), get_ptr(m->rp),
-        NV_DATA_S(x), get_ptr(m->p), &t};
+      const double* arg[] = {&t, NV_DATA_S(rx), get_ptr(m->rp),
+        NV_DATA_S(x), get_ptr(m->p)};
       double* res[] = {NV_DATA_S(rqdot)};
       s.calc_function(m, "quadB", arg, res);
 
       // Negate (note definition of g)
-      casadi_scal(s.nrq_, -1., NV_DATA_S(rqdot));
+      casadi_scal(s.nrq1_, -1., NV_DATA_S(rqdot));
 
       return 0;
     } catch(exception& e) {
@@ -1003,7 +1126,7 @@ namespace casadi {
   }
 
   void CvodesInterface::initDenseLinsol(CvodesMemory* m) const {
-    int flag = CVDense(m->mem, nx_);
+    int flag = CVDense(m->mem, nx1_);
     if (flag!=CV_SUCCESS) cvodes_error("CVDense", flag);
     if (exact_jacobian_) {
       flag = CVDlsSetDenseJacFn(m->mem, djac);
@@ -1013,7 +1136,7 @@ namespace casadi {
 
   void CvodesInterface::initBandedLinsol(CvodesMemory* m) const {
     pair<int, int> bw = getBandwidth();
-    int flag = CVBand(m->mem, nx_, bw.first, bw.second);
+    int flag = CVBand(m->mem, nx1_, bw.first, bw.second);
     if (flag!=CV_SUCCESS) cvodes_error("CVBand", flag);
     if (exact_jacobian_) {
       flag = CVDlsSetBandJacFn(m->mem, bjac);
@@ -1065,7 +1188,7 @@ namespace casadi {
   }
 
   void CvodesInterface::initDenseLinsolB(CvodesMemory* m) const {
-    int flag = CVDenseB(m->mem, m->whichB, nrx_);
+    int flag = CVDenseB(m->mem, m->whichB, nrx1_);
     if (flag!=CV_SUCCESS) cvodes_error("CVDenseB", flag);
     if (exact_jacobianB_) {
       flag = CVDlsSetDenseJacFnB(m->mem, m->whichB, djacB);
@@ -1075,7 +1198,7 @@ namespace casadi {
 
   void CvodesInterface::initBandedLinsolB(CvodesMemory* m) const {
     pair<int, int> bw = getBandwidthB();
-    int flag = CVBandB(m->mem, m->whichB, nrx_, bw.first, bw.second);
+    int flag = CVBandB(m->mem, m->whichB, nrx1_, bw.first, bw.second);
     if (flag!=CV_SUCCESS) cvodes_error("CVBandB", flag);
 
     if (exact_jacobianB_) {
@@ -1138,7 +1261,7 @@ namespace casadi {
     // Get the Jacobian in the Newton iteration
     MatType c_x = MatType::sym("c_x");
     MatType c_xdot = MatType::sym("c_xdot");
-    MatType jac = c_x*MatType::jacobian(r[DE_ODE], a[DE_X]) + c_xdot*MatType::eye(nx_);
+    MatType jac = c_x*MatType::jacobian(r[DE_ODE], a[DE_X]) + c_xdot*MatType::eye(nx1_);
 
     // Return generated function
     return Function("jacF", {a[DE_T], a[DE_X], a[DE_P], c_x, c_xdot}, {jac});
@@ -1152,14 +1275,14 @@ namespace casadi {
     // Get the Jacobian in the Newton iteration
     MatType c_x = MatType::sym("c_x");
     MatType c_xdot = MatType::sym("c_xdot");
-    MatType jac = c_x*MatType::jacobian(r[DE_RODE], a[DE_RX]) + c_xdot*MatType::eye(nrx_);
+    MatType jac = c_x*MatType::jacobian(r[DE_RODE], a[DE_RX]) + c_xdot*MatType::eye(nrx1_);
 
     // return generated function
     return Function("jacB",
                     {a[DE_T], a[DE_RX], a[DE_RP], a[DE_X], a[DE_P], c_x, c_xdot}, {jac});
   }
 
-  CvodesMemory::CvodesMemory(const CvodesInterface& s) : self(s) {
+  CvodesMemory::CvodesMemory(const CvodesInterface& s) : SundialsMemory(s), self(s) {
     this->mem = 0;
     this->isInitAdj = false;
 

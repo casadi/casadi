@@ -99,6 +99,8 @@ namespace casadi {
     // Call the base class init
     SundialsInterface::init(opts);
 
+    casadi_assert(ns_==0);
+
     // Default options
     cj_scaling_ = false;
     calc_ic_ = true;
@@ -1379,7 +1381,7 @@ namespace casadi {
                     {jac});
   }
 
-  IdasMemory::IdasMemory(const IdasInterface& s) : self(s) {
+  IdasMemory::IdasMemory(const IdasInterface& s) : SundialsMemory(s), self(s) {
     this->mem = 0;
     this->xzdot = 0;
     this->rxzdot = 0;

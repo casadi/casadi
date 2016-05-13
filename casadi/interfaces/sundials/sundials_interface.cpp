@@ -374,8 +374,12 @@ namespace casadi {
     alloc_w(get_function("jacF").nnz_out(0), true);
 
     // Create a linear solver
-    set_function(linsol("linsolF", linear_solver_, get_function("jacF").sparsity_out(0),
-                 1, linear_solver_options_));
+    if (ns_==0) {
+      set_function(linsol("linsolF", linear_solver_, get_function("jacF").sparsity_out(0),
+                   1, linear_solver_options_));
+    } else {
+      set_function(derivative_of_.get_function("linsolF"));
+    }
   }
 
   void SundialsInterface::init_linsolB() {
@@ -383,8 +387,12 @@ namespace casadi {
     alloc_w(get_function("jacB").nnz_out(0), true);
 
     // Create a linear solver
-    set_function(linsol("linsolB", linear_solverB_, get_function("jacB").sparsity_out(0),
-                 1, linear_solver_optionsB_));
+    if (ns_==0) {
+      set_function(linsol("linsolB", linear_solverB_, get_function("jacB").sparsity_out(0),
+                   1, linear_solver_optionsB_));
+    } else {
+      set_function(derivative_of_.get_function("linsolB"));
+    }
   }
 
   void SundialsInterface::init_memory(void* mem) const {
@@ -392,10 +400,18 @@ namespace casadi {
     auto m = static_cast<SundialsMemory*>(mem);
 
     // Allocate n-vectors
-    m->xz = N_VNew_Serial(nx_+nz_);
-    m->q = N_VNew_Serial(nq_);
-    m->rxz = N_VNew_Serial(nrx_+nrz_);
-    m->rq = N_VNew_Serial(nrq_);
+    m->xz = N_VNew_Serial(nx1_+nz1_);
+    m->q = N_VNew_Serial(nq1_);
+    m->rxz = N_VNew_Serial(nrx1_+nrz1_);
+    m->rq = N_VNew_Serial(nrq1_);
+
+    // Allocate n-vectors for sensitivities
+    if (ns_) {
+      m->xzS = N_VCloneVectorArray_Serial(ns_, m->xz);
+      m->qS = N_VCloneVectorArray_Serial(ns_, m->q);
+      m->rxzS = N_VCloneVectorArray_Serial(ns_, m->rxz);
+      m->rqS = N_VCloneVectorArray_Serial(ns_, m->rq);
+    }
 
     // Allocate memory
     m->p.resize(np_);
@@ -412,12 +428,18 @@ namespace casadi {
     // Set parameters
     casadi_copy(p, np_, get_ptr(m->p));
 
-    // Set the state
-    casadi_copy(x, nx_, NV_DATA_S(m->xz));
-    casadi_copy(z, nz_, NV_DATA_S(m->xz)+nx_);
+    // Set the state and sensitivities
+    for (int s=-1; s<ns_; ++s) {
+      N_Vector &v = s<0 ? m->xz : m->xzS[s];
+      casadi_copy(x, nx1_, NV_DATA_S(v));
+      x += nx1_;
+      casadi_copy(z, nz1_, NV_DATA_S(v)+nx1_);
+      z += nz1_;
+    }
 
     // Reset summation states
     N_VConst(0., m->q);
+    for (int s=0; s<ns_; ++s) N_VConst(0., m->qS[s]);
   }
 
   void SundialsInterface::resetB(IntegratorMemory* mem, double t, const double* rx,
@@ -430,11 +452,18 @@ namespace casadi {
     // Set parameters
     casadi_copy(rp, nrp_, get_ptr(m->rp));
 
-    // Get the backward state
-    casadi_copy(rx, nrx_, NV_DATA_S(m->rxz));
+    // Set the backward state and sensitivities
+    for (int s=-1; s<ns_; ++s) {
+      N_Vector &v = s<0 ? m->rxz : m->rxzS[s];
+      casadi_copy(rx, nrx1_, NV_DATA_S(v));
+      rx += nrx1_;
+      casadi_copy(rz, nrz1_, NV_DATA_S(v)+nrx1_);
+      rz += nrz1_;
+    }
 
     // Reset summation states
     N_VConst(0., m->rq);
+    for (int s=0; s<ns_; ++s) N_VConst(0., m->rqS[s]);
   }
 
   std::pair<int, int> SundialsInterface::getBandwidth() const {
@@ -477,11 +506,15 @@ namespace casadi {
     return bw;
   }
 
-  SundialsMemory::SundialsMemory() {
+  SundialsMemory::SundialsMemory(const SundialsInterface& s) : self(s) {
     this->xz  = 0;
     this->q = 0;
     this->rxz = 0;
     this->rq = 0;
+    this->xzS = 0;
+    this->qS = 0;
+    this->rxzS = 0;
+    this->rqS = 0;
   }
 
   SundialsMemory::~SundialsMemory() {
@@ -489,6 +522,10 @@ namespace casadi {
     if (this->q) N_VDestroy_Serial(this->q);
     if (this->rxz) N_VDestroy_Serial(this->rxz);
     if (this->rq) N_VDestroy_Serial(this->rq);
+    if (this->xzS) N_VDestroyVectorArray_Serial(this->xzS, self.ns_);
+    if (this->qS) N_VDestroyVectorArray_Serial(this->qS, self.ns_);
+    if (this->rxzS) N_VDestroyVectorArray_Serial(this->rxzS, self.ns_);
+    if (this->rqS) N_VDestroyVectorArray_Serial(this->rqS, self.ns_);
   }
 
   Dict SundialsInterface::get_stats(void* mem) const {

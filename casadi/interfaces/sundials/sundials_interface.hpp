@@ -39,16 +39,28 @@
 /// \cond INTERNAL
 namespace casadi {
 
+  // Forward declaration
+  class SundialsInterface;
+
   // IdasMemory
   struct CASADI_SUNDIALS_COMMON_EXPORT SundialsMemory : public IntegratorMemory {
+    /// Function object
+    const SundialsInterface& self;
+
     // Current time
     double t;
 
     // N-vectors for the forward integration
     N_Vector xz, xzdot, q;
 
+    // N-vectors for the forward sensitivities
+    N_Vector *xzS, *xzdotS, *qS;
+
     // N-vectors for the backward integration
     N_Vector rxz, rxzdot, rq;
+
+    // N-vectors for the backward sensitivities
+    N_Vector *rxzS, *rxzdotS, *rqS;
 
     // Parameters
     std::vector<double> p, rp;
@@ -69,7 +81,7 @@ namespace casadi {
     int ncheck;
 
     /// Constructor
-    SundialsMemory();
+    SundialsMemory(const SundialsInterface& s);
 
     /// Destructor
     ~SundialsMemory();
