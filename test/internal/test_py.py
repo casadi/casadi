@@ -48,7 +48,7 @@ def removedummybackend(dir):
 python = "python"
 
 if "WITH_PYTHON3" in os.environ:
-  python = "python3"
+  python = "python3.4"
 
 t = TestSuite(dirname=src,
   suffix="py",

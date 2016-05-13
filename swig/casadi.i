@@ -1124,9 +1124,9 @@ import_array();
       if (PySlice_Check(p)) {
         PySliceObject *r = (PySliceObject*)(p);
         if (m) {
-          (**m).start = (r->start == Py_None || PyInt_AsLong(r->start) < std::numeric_limits<int>::min())
+          (**m).start = (r->start == Py_None || PyInt_AsLong(r->start) <= std::numeric_limits<int>::min())
             ? std::numeric_limits<int>::min() : PyInt_AsLong(r->start);
-          (**m).stop  = (r->stop ==Py_None || PyInt_AsLong(r->stop)> std::numeric_limits<int>::max())
+          (**m).stop  = (r->stop ==Py_None || PyInt_AsLong(r->stop)>= std::numeric_limits<int>::max())
             ? std::numeric_limits<int>::max() : PyInt_AsLong(r->stop);
           if(r->step !=Py_None) (**m).step  = PyInt_AsLong(r->step);
         }
