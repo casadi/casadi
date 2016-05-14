@@ -77,12 +77,16 @@ namespace casadi {
     int n_in = f.n_in(), n_out = f.n_out();
 
     // Input buffers
-    fill_n(m->arg, n_in, nullptr);
-    for (int i=0; i<n_in; ++i) m->arg[i] = *arg++;
+    if (arg) {
+      fill_n(m->arg, n_in, nullptr);
+      for (int i=0; i<n_in; ++i) m->arg[i] = *arg++;
+    }
 
     // Output buffers
-    fill_n(m->res, n_out, nullptr);
-    for (int i=0; i<n_out; ++i) m->res[i] = *res++;
+    if (res) {
+      fill_n(m->res, n_out, nullptr);
+      for (int i=0; i<n_out; ++i) m->res[i] = *res++;
+    }
 
     // Evaluate memory-less
     try {
