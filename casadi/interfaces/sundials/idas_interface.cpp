@@ -295,8 +295,9 @@ namespace casadi {
     try {
       auto m = to_mem(user_data);
       auto& s = m->self;
-      s.calc_function(m, "daeF", {NV_DATA_S(xz), NV_DATA_S(xz)+s.nx_, get_ptr(m->p), &t},
-                              {NV_DATA_S(rr), NV_DATA_S(rr)+s.nx_});
+      const double* arg[] = {NV_DATA_S(xz), NV_DATA_S(xz)+s.nx_, get_ptr(m->p), &t};
+      double* res[] = {NV_DATA_S(rr), NV_DATA_S(rr)+s.nx_};
+      s.calc_function(m, "daeF", arg, res);
 
       // Subtract state derivative to get residual
       casadi_axpy(s.nx_, -1., NV_DATA_S(xzdot), NV_DATA_S(rr));
@@ -326,9 +327,10 @@ namespace casadi {
     try {
       auto m = to_mem(user_data);
       auto& s = m->self;
-      s.calc_function(m, "jtimesF",
-        {&t, NV_DATA_S(xz), NV_DATA_S(xz)+s.nx_, get_ptr(m->p), NV_DATA_S(v), NV_DATA_S(v)+s.nx_},
-        {NV_DATA_S(Jv), NV_DATA_S(Jv)+s.nx_});
+      const double* arg[] = {&t, NV_DATA_S(xz), NV_DATA_S(xz)+s.nx_,
+        get_ptr(m->p), NV_DATA_S(v), NV_DATA_S(v)+s.nx_};
+      double* res[] = {NV_DATA_S(Jv), NV_DATA_S(Jv)+s.nx_};
+      s.calc_function(m, "jtimesF", arg, res);
 
       // Subtract state derivative to get residual
       casadi_axpy(s.nx_, -cj, NV_DATA_S(v), NV_DATA_S(Jv));
@@ -347,11 +349,10 @@ namespace casadi {
     try {
       auto m = to_mem(user_data);
       auto& s = m->self;
-      s.calc_function(m, "jtimesB",
-        {&t, NV_DATA_S(xz), NV_DATA_S(xz)+s.nx_, get_ptr(m->p),
-          NV_DATA_S(xzB), NV_DATA_S(xzB)+s.nrx_, get_ptr(m->rp),
-          NV_DATA_S(vB), NV_DATA_S(vB)+s.nrx_},
-        {NV_DATA_S(JvB), NV_DATA_S(JvB) + s.nrx_});
+      const double* arg[] = {&t, NV_DATA_S(xz), NV_DATA_S(xz)+s.nx_, get_ptr(m->p),
+                NV_DATA_S(xzB), NV_DATA_S(xzB)+s.nrx_, get_ptr(m->rp),
+                NV_DATA_S(vB), NV_DATA_S(vB)+s.nrx_};
+      double* res[] = {NV_DATA_S(JvB), NV_DATA_S(JvB) + s.nrx_};
 
       // Subtract state derivative to get residual
       casadi_axpy(s.nrx_, cjB, NV_DATA_S(vB), NV_DATA_S(JvB));
@@ -771,8 +772,9 @@ namespace casadi {
     try {
       auto m = to_mem(user_data);
       auto& s = m->self;
-      s.calc_function(m, "quadF", {NV_DATA_S(xz), NV_DATA_S(xz)+s.nx_, get_ptr(m->p), &t},
-                               {NV_DATA_S(rhsQ)});
+      const double* arg[] = {NV_DATA_S(xz), NV_DATA_S(xz)+s.nx_, get_ptr(m->p), &t};
+      double* res[] = {NV_DATA_S(rhsQ)};
+      s.calc_function(m, "quadF", arg, res);
 
       return 0;
     } catch(exception& e) {
@@ -804,9 +806,10 @@ namespace casadi {
     try {
       auto m = to_mem(user_data);
       auto& s = m->self;
-      s.calc_function(m, "daeB", {NV_DATA_S(rxz), NV_DATA_S(rxz)+s.nrx_, get_ptr(m->rp),
-                                NV_DATA_S(xz), NV_DATA_S(xz)+s.nx_, get_ptr(m->p), &t},
-                              {NV_DATA_S(rr), NV_DATA_S(rr)+s.nrx_});
+      const double* arg[] = {NV_DATA_S(rxz), NV_DATA_S(rxz)+s.nrx_, get_ptr(m->rp),
+                             NV_DATA_S(xz), NV_DATA_S(xz)+s.nx_, get_ptr(m->p), &t};
+      double* res[] = {NV_DATA_S(rr), NV_DATA_S(rr)+s.nrx_};
+      s.calc_function(m, "daeB", arg, res);
 
       // Subtract state derivative to get residual
       casadi_axpy(s.nrx_, 1., NV_DATA_S(rxzdot), NV_DATA_S(rr));
@@ -823,9 +826,10 @@ namespace casadi {
     try {
       auto m = to_mem(user_data);
       auto& s = m->self;
-      s.calc_function(m, "quadB", {NV_DATA_S(rxz), NV_DATA_S(rxz)+s.nrx_, get_ptr(m->rp),
-                                 NV_DATA_S(xz), NV_DATA_S(xz)+s.nx_, get_ptr(m->p), &t},
-                                {NV_DATA_S(rqdot)});
+      const double* arg[] = {NV_DATA_S(rxz), NV_DATA_S(rxz)+s.nrx_, get_ptr(m->rp),
+                             NV_DATA_S(xz), NV_DATA_S(xz)+s.nx_, get_ptr(m->p), &t};
+      double* res[] = {NV_DATA_S(rqdot)};
+      s.calc_function(m, "quadB", arg, res);
 
       // Negate (note definition of g)
       casadi_scal(s.nrq_, -1., NV_DATA_S(rqdot));
@@ -843,9 +847,9 @@ namespace casadi {
     try {
       auto m = to_mem(user_data);
       auto& s = m->self;
-      s.calc_function(m, "jacF",
-        {&t, NV_DATA_S(xz), NV_DATA_S(xz)+s.nx_, get_ptr(m->p), &cj},
-        {m->jac});
+      const double* arg[] = {&t, NV_DATA_S(xz), NV_DATA_S(xz)+s.nx_, get_ptr(m->p), &cj};
+      double* res[] = {m->jac};
+      s.calc_function(m, "jacF", arg, res);
 
       // Save to Jac
       const Sparsity& sp = s.get_function("jacF").sparsity_out(0);
@@ -872,9 +876,10 @@ namespace casadi {
     try {
       auto m = to_mem(user_data);
       auto& s = m->self;
-      s.calc_function(m, "jacB", {&t, NV_DATA_S(rxz), NV_DATA_S(rxz)+s.nrx_, get_ptr(m->rp),
-                                 NV_DATA_S(xz), NV_DATA_S(xz)+s.nx_, get_ptr(m->p), &cj},
-                                {m->jacB});
+      const double* arg[] = {&t, NV_DATA_S(rxz), NV_DATA_S(rxz)+s.nrx_, get_ptr(m->rp),
+                             NV_DATA_S(xz), NV_DATA_S(xz)+s.nx_, get_ptr(m->p), &cj};
+      double* res[] = {m->jacB};
+      s.calc_function(m, "jacB", arg, res);
 
       // Save to JacB
       const Sparsity& sp = s.get_function("jacB").sparsity_out(0);
@@ -900,8 +905,9 @@ namespace casadi {
     try {
       auto m = to_mem(user_data);
       auto& s = m->self;
-      s.calc_function(m, "jacF", {&t, NV_DATA_S(xz), NV_DATA_S(xz)+s.nx_, get_ptr(m->p), &cj},
-                              {m->jac});
+      const double* arg[] = {&t, NV_DATA_S(xz), NV_DATA_S(xz)+s.nx_, get_ptr(m->p), &cj};
+      double* res[] = {m->jac};
+      s.calc_function(m, "jacF", arg, res);
 
       // Save to Jac
       const Sparsity& sp = s.get_function("jacF").sparsity_out(0);
@@ -930,9 +936,10 @@ namespace casadi {
     try {
       auto m = to_mem(user_data);
       auto& s = m->self;
-      s.calc_function(m, "jacB", {&t, NV_DATA_S(rxz), NV_DATA_S(rxz)+s.nrx_, get_ptr(m->rp),
-                                 NV_DATA_S(xz), NV_DATA_S(xz)+s.nx_, get_ptr(m->p), &cj},
-                                {m->jacB});
+      const double* arg[] = {&t, NV_DATA_S(rxz), NV_DATA_S(rxz)+s.nrx_, get_ptr(m->rp),
+                             NV_DATA_S(xz), NV_DATA_S(xz)+s.nx_, get_ptr(m->p), &cj};
+      double* res[] = {m->jacB};
+      s.calc_function(m, "jacB", arg, res);
 
       // Save to JacB
       const Sparsity& sp = s.get_function("jacB").sparsity_out(0);
@@ -1016,9 +1023,9 @@ namespace casadi {
     try {
       auto m = to_mem(user_data);
       auto& s = m->self;
-      // Calculate Jacobian
-      s.calc_function(m, "jacF", {&t, NV_DATA_S(xz), NV_DATA_S(xz)+s.nx_, get_ptr(m->p), &cj},
-                              {m->jac});
+      const double* arg[] = {&t, NV_DATA_S(xz), NV_DATA_S(xz)+s.nx_, get_ptr(m->p), &cj};
+      double* res[] = {m->jac};
+      s.calc_function(m, "jacF", arg, res);
 
       // Prepare the solution of the linear system (e.g. factorize)
       const Function& linsol = s.get_function("linsolF");
@@ -1039,10 +1046,10 @@ namespace casadi {
     try {
       auto m = to_mem(user_data);
       auto& s = m->self;
-      // Calculate Jacobian
-      s.calc_function(m, "jacB", {&t, NV_DATA_S(rxz), NV_DATA_S(rxz)+s.nrx_, get_ptr(m->rp),
-                                 NV_DATA_S(xz), NV_DATA_S(xz)+s.nx_, get_ptr(m->p), &cj},
-                                {m->jacB});
+      const double* arg[] = {&t, NV_DATA_S(rxz), NV_DATA_S(rxz)+s.nrx_, get_ptr(m->rp),
+                             NV_DATA_S(xz), NV_DATA_S(xz)+s.nx_, get_ptr(m->p), &cj};
+      double* res[] = {m->jacB};
+      s.calc_function(m, "jacB", arg, res);
 
       // Prepare the solution of the linear system (e.g. factorize)
       const Function& linsolB = s.get_function("linsolB");

@@ -712,7 +712,9 @@ namespace casadi {
   void Sqpmethod::eval_h(SqpmethodMemory* m, const double* x, const double* lambda,
                          double sigma, double* H) const {
     try {
-      calc_function(m, "nlp_hess_l", {x, m->p, &sigma, lambda}, {H});
+      const double* arg[] = {x, m->p, &sigma, lambda};
+      double* res[] = {H};
+      calc_function(m, "nlp_hess_l", arg, res);
 
       // Determing regularization parameter with Gershgorin theorem
       if (regularize_) {
@@ -730,12 +732,10 @@ namespace casadi {
 
   void Sqpmethod::eval_g(SqpmethodMemory* m, const double* x, double* g) const {
     try {
-      // Quick return if no constraints
-      if (ng_==0) return;
-
-      // Evaluate the function
-      calc_function(m, "nlp_g", {x, m->p}, {g});
-
+      if (ng_==0) return; // Quick return if no constraints
+      const double* arg[] = {x, m->p};
+      double* res[] = {g};
+      calc_function(m, "nlp_g", arg, res);
     } catch(exception& ex) {
       userOut<true, PL_WARN>() << "eval_g failed: " << ex.what() << endl;
       throw;
@@ -744,13 +744,10 @@ namespace casadi {
 
   void Sqpmethod::eval_jac_g(SqpmethodMemory* m, const double* x, double* g, double* J) const {
     try {
-
-      // Quich finish if no constraints
-      if (ng_==0) return;
-
-      // Evaluate the function
-      calc_function(m, "nlp_jac_g", {x, m->p}, {g, J});
-
+      if (ng_==0) return; // Quich finish if no constraints
+      const double* arg[] = {x, m->p};
+      double* res[] = {g, J};
+      calc_function(m, "nlp_jac_g", arg, res);
     } catch(exception& ex) {
       userOut<true, PL_WARN>() << "eval_jac_g failed: " << ex.what() << endl;
       throw;
@@ -760,10 +757,9 @@ namespace casadi {
   void Sqpmethod::eval_grad_f(SqpmethodMemory* m, const double* x,
                               double* f, double* grad_f) const {
     try {
-
-      // Evaluate the function
-      calc_function(m, "nlp_grad_f", {x, m->p}, {f, grad_f});
-
+      const double* arg[] = {x, m->p};
+      double* res[] = {f, grad_f};
+      calc_function(m, "nlp_grad_f", arg, res);
     } catch(exception& ex) {
       userOut<true, PL_WARN>() << "eval_grad_f failed: " << ex.what() << endl;
       throw;
@@ -772,10 +768,10 @@ namespace casadi {
 
   double Sqpmethod::eval_f(SqpmethodMemory* m, const double* x) const {
     try {
-      // Evaluate the function
       double f;
-      calc_function(m, "nlp_f", {x, m->p}, {&f});
-
+      const double* arg[] = {x, m->p};
+      double* res[] = {&f};
+      calc_function(m, "nlp_f", arg, res);
       return f;
     } catch(exception& ex) {
       userOut<true, PL_WARN>() << "eval_f failed: " << ex.what() << endl;

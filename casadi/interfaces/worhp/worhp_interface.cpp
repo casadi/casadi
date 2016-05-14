@@ -351,31 +351,40 @@ namespace casadi {
       }
 
       if (GetUserAction(&m->worhp_c, evalF)) {
-        calc_function(m, "nlp_f", {m->worhp_o.X, m->p}, {&m->worhp_o.F});
+        const double* arg[] = {m->worhp_o.X, m->p};
+        double* res[] = {&m->worhp_o.F};
+        calc_function(m, "nlp_f", arg, res);
         if (m->f) *m->f = m->worhp_o.F; // Store cost, before scaling
         m->worhp_o.F *= m->worhp_w.ScaleObj;
         DoneUserAction(&m->worhp_c, evalF);
       }
 
       if (GetUserAction(&m->worhp_c, evalG)) {
-        calc_function(m, "nlp_g", {m->worhp_o.X, m->p}, {m->worhp_o.G});
+        const double* arg[] = {m->worhp_o.X, m->p};
+        double* res[] = {m->worhp_o.G};
+        calc_function(m, "nlp_g", arg, res);
         DoneUserAction(&m->worhp_c, evalG);
       }
 
       if (GetUserAction(&m->worhp_c, evalDF)) {
-        calc_function(m, "nlp_grad_f", {m->worhp_o.X, m->p}, {0, m->worhp_w.DF.val});
+        const double* arg[] = {m->worhp_o.X, m->p};
+        double* res[] = {0, m->worhp_w.DF.val};
+        calc_function(m, "nlp_grad_f", arg, res);
         casadi_scal(nx_, m->worhp_w.ScaleObj, m->worhp_w.DF.val);
         DoneUserAction(&m->worhp_c, evalDF);
       }
 
       if (GetUserAction(&m->worhp_c, evalDG)) {
-        calc_function(m, "nlp_jac_g", {m->worhp_o.X, m->p}, {0, m->worhp_w.DG.val});
+        const double* arg[] = {m->worhp_o.X, m->p};
+        double* res[] = {0, m->worhp_w.DG.val};
+        calc_function(m, "nlp_jac_g", arg, res);
         DoneUserAction(&m->worhp_c, evalDG);
       }
 
       if (GetUserAction(&m->worhp_c, evalHM)) {
-        calc_function(m, "nlp_hess_l", {m->worhp_o.X, m->p, &m->worhp_w.ScaleObj, m->worhp_o.Mu},
-                      {m->worhp_w.HM.val});
+        const double* arg[] = {m->worhp_o.X, m->p, &m->worhp_w.ScaleObj, m->worhp_o.Mu};
+        double* res[] = {m->worhp_w.HM.val};
+        calc_function(m, "nlp_hess_l", arg, res);
         // Diagonal values
         double *dval = m->w;
         casadi_fill(dval, nx_, 0.);

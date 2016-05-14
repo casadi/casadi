@@ -69,17 +69,23 @@ namespace casadi {
 
   // returns the value of the objective function
   bool BonminUserClass::eval_f(Index n, const Number* x, bool new_x, Number& obj_value) {
-    return solver_.calc_function(mem_, "nlp_f", {x, mem_->p}, {&obj_value})==0;
+    const double* arg[] = {x, mem_->p};
+    double* res[] = {&obj_value};
+    return solver_.calc_function(mem_, "nlp_f", arg, res)==0;
   }
 
   // return the gradient of the objective function grad_ {x} f(x)
   bool BonminUserClass::eval_grad_f(Index n, const Number* x, bool new_x, Number* grad_f) {
-    return solver_.calc_function(mem_, "nlp_grad_f", {x, mem_->p}, {0, grad_f})==0;
+    const double* arg[] = {x, mem_->p};
+    double* res[] = {0, grad_f};
+    return solver_.calc_function(mem_, "nlp_grad_f", arg, res)==0;
   }
 
   // return the value of the constraints: g(x)
   bool BonminUserClass::eval_g(Index n, const Number* x, bool new_x, Index m, Number* g) {
-    return solver_.calc_function(mem_, "nlp_g", {x, mem_->p}, {g})==0;
+    const double* arg[] = {x, mem_->p};
+    double* res[] = {g};
+    return solver_.calc_function(mem_, "nlp_g", arg, res)==0;
   }
 
   // return the structure or values of the jacobian
@@ -88,7 +94,9 @@ namespace casadi {
                                   Number* values) {
     if (values) {
       // Evaluate Jacobian
-      return solver_.calc_function(mem_, "nlp_jac_g", {x, mem_->p}, {0, values})==0;
+      const double* arg[] = {x, mem_->p};
+      double* res[] = {0, values};
+      return solver_.calc_function(mem_, "nlp_jac_g", arg, res)==0;
     } else {
       // Get the sparsity pattern
       int ncol = solver_.jacg_sp_.size2();
@@ -114,8 +122,9 @@ namespace casadi {
                               Index* jCol, Number* values) {
     if (values) {
       // Evaluate Hessian
-      if (solver_.calc_function(mem_, "nlp_hess_l",
-                      {x, mem_->p, &obj_factor, lambda}, {values})) return false;
+      const double* arg[] = {x, mem_->p, &obj_factor, lambda};
+      double* res[] = {values};
+      if (solver_.calc_function(mem_, "nlp_hess_l", arg, res)) return false;
       return true;
     } else {
       // Get the sparsity pattern

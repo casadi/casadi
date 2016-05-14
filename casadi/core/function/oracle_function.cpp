@@ -57,9 +57,10 @@ namespace casadi {
     alloc(fcn);
   }
 
-  int OracleFunction::calc_function(OracleMemory* m, const std::string& fcn,
-                            std::initializer_list<const double*> arg,
-                            std::initializer_list<double*> res) const {
+  int OracleFunction::
+  calc_function(OracleMemory* m, const std::string& fcn,
+                const double* const* arg, double* const* res) const {
+
     // Respond to a possible Crl+C signals
     InterruptHandler::check();
 
@@ -77,15 +78,11 @@ namespace casadi {
 
     // Input buffers
     fill_n(m->arg, n_in, nullptr);
-    auto arg_it = arg.begin();
-    for (int i=0; i<n_in; ++i) m->arg[i] = *arg_it++;
-    casadi_assert(arg_it==arg.end());
+    for (int i=0; i<n_in; ++i) m->arg[i] = *arg++;
 
     // Output buffers
     fill_n(m->res, n_out, nullptr);
-    auto res_it = res.begin();
-    for (int i=0; i<n_out; ++i) m->res[i] = *res_it++;
-    casadi_assert(res_it==res.end());
+    for (int i=0; i<n_out; ++i) m->res[i] = *res++;
 
     // Evaluate memory-less
     try {

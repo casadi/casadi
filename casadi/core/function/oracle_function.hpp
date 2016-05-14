@@ -84,8 +84,7 @@ namespace casadi {
 
     // Calculate an oracle function
     int calc_function(OracleMemory* m, const std::string& fcn,
-                      std::initializer_list<const double*> arg,
-                      std::initializer_list<double*> res) const;
+                      const double* const* arg, double* const* res) const;
 
     // Get list of dependency functions
     virtual std::vector<std::string> get_function() const;

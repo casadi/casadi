@@ -264,7 +264,11 @@ namespace casadi {
     if (m->f) *m->f = f;
 
     // Calculate constraints
-    if (m->g) calc_function(m, "nlp_fg", {m->wx, m->p}, {0, m->g});
+    if (m->g) {
+      const double* arg[] = {m->wx, m->p};
+      double* res[] = {0, m->g};
+      calc_function(m, "nlp_fg", arg, res);
+    }
 
     // Free memory (move to destructor!)
     KTR_free(&m->kc);
@@ -283,15 +287,25 @@ namespace casadi {
       // Direct to the correct function
       switch (evalRequestCode) {
       case KTR_RC_EVALFC:
-        m->self.calc_function(m, "nlp_fg", {x, m->p}, {obj, c});
+      {
+        const double* arg[] = {x, m->p};
+        double* res[] = {obj, c};
+        m->self.calc_function(m, "nlp_fg", arg, res);
         break;
+      }
       case KTR_RC_EVALGA:
-        m->self.calc_function(m, "nlp_gf_jg", {x, m->p}, {objGrad, jac});
+      {
+        const double* arg[] = {x, m->p};
+        double* res[] = {objGrad, jac};
+        m->self.calc_function(m, "nlp_gf_jg", arg, res);
         break;
+      }
       case KTR_RC_EVALH:
         {
           double sigma = 1.;
-          if (m->self.calc_function(m, "nlp_hess_l", {x, m->p, &sigma, lambda}, {hessian})) {
+          const double* arg[] = {x, m->p, &sigma, lambda};
+          double* res[] = {hessian};
+          if (m->self.calc_function(m, "nlp_hess_l", arg, res)) {
             casadi_error("calc_hess_l failed");
           }
         }
