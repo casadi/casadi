@@ -8471,8 +8471,8 @@ experience a dramatic speed-up by using a sparse linear solver:
 |                        |                        | linear_solver_options] |
 +------------------------+------------------------+------------------------+
 | linear_solver_type     | OT_STRING              | Type of iterative      |
-|                        |                        | solver: user_defined|D |
-|                        |                        | ENSE|banded|iterative  |
+|                        |                        | solver: USER_DEFINED|d |
+|                        |                        | ense|banded|iterative  |
 +------------------------+------------------------+------------------------+
 | linear_solver_typeB    | OT_STRING              | Linear solver for      |
 |                        |                        | backward integration   |
@@ -8704,8 +8704,8 @@ experience a dramatic speed-up by using a sparse linear solver:
 |                        |                        | linear_solver_options] |
 +------------------------+------------------------+------------------------+
 | linear_solver_type     | OT_STRING              | Type of iterative      |
-|                        |                        | solver: user_defined|D |
-|                        |                        | ENSE|banded|iterative  |
+|                        |                        | solver: USER_DEFINED|d |
+|                        |                        | ense|banded|iterative  |
 +------------------------+------------------------+------------------------+
 | linear_solver_typeB    | OT_STRING              | Linear solver for      |
 |                        |                        | backward integration   |
