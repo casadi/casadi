@@ -200,8 +200,17 @@ namespace casadi {
     snProblem prob;
 
     // Evaluate gradF and jacG at initial value
-    calc_function(m, "nlp_jac_g", {m->x0, m->p}, {0, m->jac_gk});
-    calc_function(m, "nlp_jac_f", {m->x0, m->p}, {0, m->jac_fk});
+    const double** arg = m->arg;
+    *arg++ = m->x0;
+    *arg++ = m->p;
+    double** res = m->res;
+    *res++ = 0;
+    *res++ = m->jac_gk;
+    calc_function(m, "nlp_jac_g");
+    res = m->res;
+    *res++ = 0;
+    *res++ = m->jac_fk;
+    calc_function(m, "nlp_jac_f");
 
     // perform the mapping:
     // populate A_data_ (the nonzeros of A)
@@ -349,7 +358,13 @@ namespace casadi {
       for (int k = 0; k < nnObj; ++k) m->xk2[k] = x[k];
 
       // Evaluate gradF with the linear variables put to zero
-      calc_function(m, "nlp_jac_f", {m->xk2, m->p}, {fObj, m->jac_fk});
+      const double** arg = m->arg;
+      *arg++ = m->xk2;
+      *arg++ = m->p;
+      double** res = m->res;
+      *res++ = fObj;
+      *res++ = m->jac_fk;
+      calc_function(m, "nlp_jac_f");
 
       // provide nonlinear part of objective gradient to SNOPT
       for (int k = 0; k < nnObj; ++k) {
@@ -372,7 +387,13 @@ namespace casadi {
         }
 
         // Evaluate jacG with the linear variabes put to zero
-        calc_function(m, "nlp_jac_g", {m->xk2, m->p}, {m->gk, m->jac_gk});
+        const double** arg = m->arg;
+        *arg++ = m->xk2;
+        *arg++ = m->p;
+        double** res = m->res;
+        *res++ = m->gk;
+        *res++ = m->jac_gk;
+        calc_function(m, "nlp_jac_g");
 
         // provide nonlinear part of constraint jacobian to SNOPT
         int kk = 0;
