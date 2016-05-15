@@ -66,7 +66,7 @@ namespace casadi {
         "Lower band-width of banded Jacobian (estimations)"}},
       {"linear_solver_type",
        {OT_STRING,
-        "Type of iterative solver: user_defined|DENSE|banded|iterative"}},
+        "Type of iterative solver: USER_DEFINED|dense|banded|iterative"}},
       {"iterative_solver",
        {OT_STRING,
         "Iterative solver: GMRES|bcgstab|tfqmr"}},
@@ -184,7 +184,7 @@ namespace casadi {
     use_preconditioner_ = false;
     max_krylov_ = 10;
     linear_solver_ = "csparse";
-    string linear_solver_type = "dense";
+    string linear_solver_type = "user_defined";
     string iterative_solver = "gmres";
     string pretype = "none";
     upper_bandwidth_ = -1;
