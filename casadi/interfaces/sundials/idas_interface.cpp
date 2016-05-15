@@ -353,6 +353,7 @@ namespace casadi {
                 NV_DATA_S(xzB), NV_DATA_S(xzB)+s.nrx_, get_ptr(m->rp),
                 NV_DATA_S(vB), NV_DATA_S(vB)+s.nrx_};
       double* res[] = {NV_DATA_S(JvB), NV_DATA_S(JvB) + s.nrx_};
+      s.calc_function(m, "jtimesB", arg, res);
 
       // Subtract state derivative to get residual
       casadi_axpy(s.nrx_, cjB, NV_DATA_S(vB), NV_DATA_S(JvB));
