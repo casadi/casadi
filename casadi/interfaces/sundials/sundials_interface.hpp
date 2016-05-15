@@ -62,6 +62,9 @@ namespace casadi {
     // N-vectors for the backward sensitivities
     N_Vector *rxzS, *rxzdotS, *rqS;
 
+    // Current xz, xzS (hacky!)
+    N_Vector xz_tmp, *xzS_tmp;
+
     // Parameters
     std::vector<double> p, rp;
 

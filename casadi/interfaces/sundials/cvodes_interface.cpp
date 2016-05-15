@@ -136,7 +136,7 @@ namespace casadi {
     }
 
     // Algebraic variables not supported
-    casadi_assert_message(nz1_==0 && nrz_==0,
+    casadi_assert_message(nz1_==0 && nrz1_==0,
                           "CVODES does not support algebraic variables");
 
     if (linear_multistep_method=="adams") {
@@ -184,8 +184,13 @@ namespace casadi {
 
     // Initialize the backward problem
     double tB0 = grid_.back();
-    flag = CVodeInitB(m->mem, m->whichB, rhsB, tB0, m->rxz);
-    if (flag != CV_SUCCESS) cvodes_error("CVodeInitB", flag);
+    if (ns_==0) {
+      flag = CVodeInitB(m->mem, m->whichB, rhsB, tB0, m->rxz);
+      if (flag != CV_SUCCESS) cvodes_error("CVodeInitB", flag);
+    } else {
+      flag = CVodeInitBS(m->mem, m->whichB, rhsB1, tB0, m->rxz);
+      if (flag != CV_SUCCESS) cvodes_error("CVodeInitBS", flag);
+    }
 
     // Set tolerances
     flag = CVodeSStolerancesB(m->mem, m->whichB, reltolB_, abstolB_);
@@ -221,6 +226,38 @@ namespace casadi {
 
       flag = CVodeQuadSStolerancesB(m->mem, m->whichB, reltolB_, abstolB_);
       if (flag != CV_SUCCESS) cvodes_error("CVodeQuadSStolerancesB", flag);
+    }
+
+    // Forward-over-adjoint sensitivity analysis
+    if (ns_>0) {
+      // Get memory block
+      void* memB = CVodeGetAdjCVodeBmem(m->mem, m->whichB);
+
+      // Initialize forward sensitivity analysis for the backward problem
+      flag = CVodeSensInit(memB, ns_, CV_SIMULTANEOUS, rhsBS, m->rxzS);
+      if (flag!=CV_SUCCESS) cvodes_error("CVodeSensInitB", flag);
+
+      // Set sensitivity tolerances
+      vector<double> abstolv(ns_, abstol_);
+      flag = CVodeSensSStolerances(memB, reltol_, get_ptr(abstolv));
+      if (flag!=CV_SUCCESS) cvodes_error("CVodeSensSStolerancesB", flag);
+
+      // Quadrature equations
+      if (nq1_>0) {
+        // Initialize quadratures in CVodes
+        flag = CVodeQuadSensInit(memB, rhsBQS, m->rqS);
+        if (flag != CV_SUCCESS) cvodes_error("CVodeQuadSensInitB", flag);
+
+        // Should the quadrature errors be used for step size control?
+        if (quad_err_con_) {
+          flag = CVodeSetQuadSensErrCon(memB, true);
+          if (flag != CV_SUCCESS) cvodes_error("CVodeSetQuadSensErrConB", flag);
+
+          // Quadrature error tolerances
+          flag = CVodeQuadSensSStolerances(memB, reltol_, get_ptr(abstolv));
+          if (flag != CV_SUCCESS) cvodes_error("CVodeQuadSStolerancesB", flag);
+        }
+      }
     }
 
     // Mark initialized
@@ -480,7 +517,7 @@ namespace casadi {
   void CvodesInterface::retreat(IntegratorMemory* mem, double t,
                                 double* rx, double* rz, double* rq) const {
     auto m = to_mem(mem);
-
+    cout << "retreat beg" << endl;
     // Integrate, unless already at desired time
     if (t<m->t) {
       int flag = CVodeB(m->mem, t, CV_NORMAL);
@@ -496,6 +533,7 @@ namespace casadi {
         if (flag!=CV_SUCCESS) cvodes_error("CVodeGetQuadB", flag);
       }
     }
+    cout << "retreat done" << endl;
 
     // Save outputs
     casadi_copy(NV_DATA_S(m->rxz), nrx1_, rx);
@@ -509,6 +547,7 @@ namespace casadi {
                                        &m->nfevalsB, &m->nlinsetupsB, &m->netfailsB, &m->qlastB,
                                        &m->qcurB, &m->hinusedB, &m->hlastB, &m->hcurB, &m->tcurB);
     if (flag!=CV_SUCCESS) cvodes_error("CVodeGetIntegratorStats", flag);
+    cout << "retreat end" << endl;
   }
 
   void CvodesInterface::printStats(IntegratorMemory* mem, std::ostream &stream) const {
@@ -687,11 +726,78 @@ namespace casadi {
     }
   }
 
+  int CvodesInterface::rhsBQS(int Ns, double t, N_Vector rx, N_Vector *rxS, N_Vector rqdot,
+                             N_Vector *rqdotS, void *user_data,
+                             N_Vector tmp1, N_Vector tmp2) {
+    try {
+      if (!user_data) {
+        // SUNDIALS BUG!!!
+        for (int i=0; i<Ns; ++i) N_VConst(0.0, rqdotS[i]);
+        return 0;
+      }
+      // User data points to forward memory?
+      casadi_assert(user_data);
+      auto cv_mem = static_cast<CVodeMem>(user_data);
+      auto m = to_mem(cv_mem->cv_user_data);
+      auto& s = m->self;
+      // Inputs and outputs
+      const double** arg = m->arg;
+      double** res = m->res;
+      // All parameters
+      const double* p = get_ptr(m->p);
+      const double* rp = get_ptr(m->rp);
+      // Nondifferentiated inputs
+      *arg++ = &t;
+      *arg++ = NV_DATA_S(rx);
+      *arg++ = rp;
+      rp += s.nrp1_;
+      *arg++ = NV_DATA_S(m->xz_tmp);
+      *arg++ = p;
+      p += s.np1_;
+      // Nondifferentiated outputs
+      *arg++ = NV_DATA_S(rqdot);
+      // Forward seeds
+      for (int d=0; d<s.ns_; ++d) {
+        *arg++ = 0;
+        *arg++ = NV_DATA_S(rxS[d]);
+        *arg++ = rp;
+        rp += s.nrp1_;
+        *arg++ = NV_DATA_S(m->xzS_tmp[d]);
+        *arg++ = p;
+        p += s.np1_;
+      }
+      // Forward sensitivities
+      for (int d=0; d<s.ns_; ++d) {
+        *res++ = NV_DATA_S(rqdotS[d]);
+      }
+      // Evaluate
+      s.calc_function(m, "quadBS");
+      return 0;
+    } catch(exception& e) {
+      userOut<true, PL_WARN>() << "rhsBQS failed: " << e.what() << endl;;
+      return 1;
+    }
+  }
+
+  int CvodesInterface::rhsB1(double t, N_Vector x, N_Vector *xS, N_Vector rx,
+                            N_Vector rxdot, void *user_data) {
+    auto m = to_mem(user_data);
+    auto& s = m->self;
+
+    N_VScale(1., x, m->xz_tmp);
+    cout << "storing:" << endl;
+    cout << "m = " << m << endl;
+    for (int d=0; d<s.ns_; ++d) {
+      N_VScale(1., xS[d], m->xzS_tmp[d]);
+      N_VPrint_Serial(m->xzS_tmp[d]);
+    }
+
+    return rhsB(t, x, rx, rxdot, user_data);
+  }
 
   int CvodesInterface::rhsB(double t, N_Vector x, N_Vector rx, N_Vector rxdot,
                             void *user_data) {
     try {
-      casadi_assert(user_data);
       auto m = to_mem(user_data);
       auto& s = m->self;
       const double* arg[] = {&t, NV_DATA_S(rx), get_ptr(m->rp),
@@ -708,12 +814,46 @@ namespace casadi {
       return 1;
     }
   }
-
-  int CvodesInterface::rhsBS(double t, N_Vector x, N_Vector *xF, N_Vector xB,
-                             N_Vector xdotB, void *user_data) {
+  int CvodesInterface::rhsBS(int Ns, double t, N_Vector rx, N_Vector rxdot, N_Vector *rxS,
+                  N_Vector *rxdotS, void *user_data, N_Vector tmp1, N_Vector tmp2) {
     try {
-      auto m = to_mem(user_data);
-      casadi_error("Commented out, #884, #794.");
+      // User data points to forward memory?
+      casadi_assert(user_data);
+      auto cv_mem = static_cast<CVodeMem>(user_data);
+      auto m = to_mem(cv_mem->cv_user_data);
+      auto& s = m->self;
+      // Inputs and outputs
+      const double** arg = m->arg;
+      double** res = m->res;
+      // All parameters
+      const double* p = get_ptr(m->p);
+      const double* rp = get_ptr(m->rp);
+      // Nondifferentiated inputs
+      *arg++ = &t;
+      *arg++ = NV_DATA_S(rx);
+      *arg++ = rp;
+      rp += s.nrp1_;
+      *arg++ = NV_DATA_S(m->xz_tmp);
+      *arg++ = p;
+      p += s.np1_;
+      // Nondifferentiated outputs
+      *arg++ = NV_DATA_S(rxdot);
+      // Forward seeds
+      for (int d=0; d<s.ns_; ++d) {
+        *arg++ = 0;
+        *arg++ = NV_DATA_S(rxS[d]);
+        *arg++ = rp;
+        rp += s.nrp1_;
+        *arg++ = NV_DATA_S(m->xzS_tmp[d]);
+        *arg++ = p;
+        p += s.np1_;
+      }
+      // Forward sensitivities
+      for (int d=0; d<s.ns_; ++d) {
+        *res++ = NV_DATA_S(rxdotS[d]);
+      }
+      // Evaluate
+      s.calc_function(m, "odeBS");
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "rhsBS failed: " << e.what() << endl;;

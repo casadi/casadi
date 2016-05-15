@@ -411,6 +411,10 @@ namespace casadi {
       m->qS = N_VCloneVectorArray_Serial(ns_, m->q);
       m->rxzS = N_VCloneVectorArray_Serial(ns_, m->rxz);
       m->rqS = N_VCloneVectorArray_Serial(ns_, m->rq);
+      if (nrx_>0) {
+        m->xz_tmp = N_VClone_Serial(m->xz);
+        m->xzS_tmp = N_VCloneVectorArray_Serial(ns_, m->xz);
+      }
     }
 
     // Allocate memory
@@ -515,6 +519,8 @@ namespace casadi {
     this->qS = 0;
     this->rxzS = 0;
     this->rqS = 0;
+    this->xz_tmp = 0;
+    this->xzS_tmp = 0;
   }
 
   SundialsMemory::~SundialsMemory() {
@@ -526,6 +532,8 @@ namespace casadi {
     if (this->qS) N_VDestroyVectorArray_Serial(this->qS, self.ns_);
     if (this->rxzS) N_VDestroyVectorArray_Serial(this->rxzS, self.ns_);
     if (this->rqS) N_VDestroyVectorArray_Serial(this->rqS, self.ns_);
+    if (this->xz_tmp) N_VDestroy_Serial(this->xz_tmp);
+    if (this->xzS_tmp) N_VDestroyVectorArray_Serial(this->xzS_tmp, self.ns_);
   }
 
   Dict SundialsInterface::get_stats(void* mem) const {
