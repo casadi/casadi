@@ -351,40 +351,49 @@ namespace casadi {
       }
 
       if (GetUserAction(&m->worhp_c, evalF)) {
-        const double* arg[] = {m->worhp_o.X, m->p};
-        double* res[] = {&m->worhp_o.F};
-        calc_function(m, "nlp_f", arg, res);
+        m->arg[0] = m->worhp_o.X;
+        m->arg[1] = m->p;
+        m->res[0] = &m->worhp_o.F;
+        calc_function(m, "nlp_f");
         if (m->f) *m->f = m->worhp_o.F; // Store cost, before scaling
         m->worhp_o.F *= m->worhp_w.ScaleObj;
         DoneUserAction(&m->worhp_c, evalF);
       }
 
       if (GetUserAction(&m->worhp_c, evalG)) {
-        const double* arg[] = {m->worhp_o.X, m->p};
-        double* res[] = {m->worhp_o.G};
-        calc_function(m, "nlp_g", arg, res);
+        m->arg[0] = m->worhp_o.X;
+        m->arg[1] = m->p;
+        m->res[0] = m->worhp_o.G;
+        calc_function(m, "nlp_g");
         DoneUserAction(&m->worhp_c, evalG);
       }
 
       if (GetUserAction(&m->worhp_c, evalDF)) {
-        const double* arg[] = {m->worhp_o.X, m->p};
-        double* res[] = {0, m->worhp_w.DF.val};
-        calc_function(m, "nlp_grad_f", arg, res);
+        m->arg[0] = m->worhp_o.X;
+        m->arg[1] = m->p;
+        m->res[0] = 0;
+        m->res[1] = m->worhp_w.DF.val;
+        calc_function(m, "nlp_grad_f");
         casadi_scal(nx_, m->worhp_w.ScaleObj, m->worhp_w.DF.val);
         DoneUserAction(&m->worhp_c, evalDF);
       }
 
       if (GetUserAction(&m->worhp_c, evalDG)) {
-        const double* arg[] = {m->worhp_o.X, m->p};
-        double* res[] = {0, m->worhp_w.DG.val};
-        calc_function(m, "nlp_jac_g", arg, res);
+        m->arg[0] = m->worhp_o.X;
+        m->arg[1] = m->p;
+        m->res[0] = 0;
+        m->res[1] = m->worhp_w.DG.val;
+        calc_function(m, "nlp_jac_g");
         DoneUserAction(&m->worhp_c, evalDG);
       }
 
       if (GetUserAction(&m->worhp_c, evalHM)) {
-        const double* arg[] = {m->worhp_o.X, m->p, &m->worhp_w.ScaleObj, m->worhp_o.Mu};
-        double* res[] = {m->worhp_w.HM.val};
-        calc_function(m, "nlp_hess_l", arg, res);
+        m->arg[0] = m->worhp_o.X;
+        m->arg[1] = m->p;
+        m->arg[2] = &m->worhp_w.ScaleObj;
+        m->arg[3] = m->worhp_o.Mu;
+        m->res[0] = m->worhp_w.HM.val;
+        calc_function(m, "nlp_hess_l");
         // Diagonal values
         double *dval = m->w;
         casadi_fill(dval, nx_, 0.);

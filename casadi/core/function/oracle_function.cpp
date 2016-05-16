@@ -59,7 +59,7 @@ namespace casadi {
 
   int OracleFunction::
   calc_function(OracleMemory* m, const std::string& fcn,
-                const double* const* arg, double* const* res) const {
+                const double* const* arg) const {
 
     // Respond to a possible Crl+C signals
     InterruptHandler::check();
@@ -80,12 +80,6 @@ namespace casadi {
     if (arg) {
       fill_n(m->arg, n_in, nullptr);
       for (int i=0; i<n_in; ++i) m->arg[i] = *arg++;
-    }
-
-    // Output buffers
-    if (res) {
-      fill_n(m->res, n_out, nullptr);
-      for (int i=0; i<n_out; ++i) m->res[i] = *res++;
     }
 
     // Evaluate memory-less

@@ -286,9 +286,11 @@ namespace casadi {
       casadi_assert(user_data);
       auto m = to_mem(user_data);
       auto& s = m->self;
-      const double* arg[] = {NV_DATA_S(x), get_ptr(m->p), &t};
-      double* res[] = {NV_DATA_S(xdot)};
-      s.calc_function(m, "odeF", arg, res);
+      m->arg[0] = NV_DATA_S(x);
+      m->arg[1] = get_ptr(m->p);
+      m->arg[2] = &t;
+      m->res[0] = NV_DATA_S(xdot);
+      s.calc_function(m, "odeF");
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "rhs failed: " << e.what() << endl;
@@ -536,9 +538,11 @@ namespace casadi {
     try {
       auto m = to_mem(user_data);
       auto& s = m->self;
-      const double* arg[] = {NV_DATA_S(x), get_ptr(m->p), &t};
-      double* res[] = {NV_DATA_S(qdot)};
-      s.calc_function(m, "quadF", arg, res);
+      m->arg[0] = NV_DATA_S(x);
+      m->arg[1] = get_ptr(m->p);
+      m->arg[2] = &t;
+      m->res[0] = NV_DATA_S(qdot);
+      s.calc_function(m, "quadF");
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "rhsQ failed: " << e.what() << endl;;
@@ -571,10 +575,13 @@ namespace casadi {
       casadi_assert(user_data);
       auto m = to_mem(user_data);
       auto& s = m->self;
-      const double* arg[] = {NV_DATA_S(rx), get_ptr(m->rp),
-        NV_DATA_S(x), get_ptr(m->p), &t};
-      double* res[] = {NV_DATA_S(rxdot)};
-      s.calc_function(m, "odeB", arg, res);
+      m->arg[0] = NV_DATA_S(rx);
+      m->arg[1] = get_ptr(m->rp);
+      m->arg[2] = NV_DATA_S(x);
+      m->arg[3] = get_ptr(m->p);
+      m->arg[4] = &t;
+      m->res[0] = NV_DATA_S(rxdot);
+      s.calc_function(m, "odeB");
 
       // Negate (note definition of g)
       casadi_scal(s.nrx_, -1., NV_DATA_S(rxdot));
@@ -604,10 +611,13 @@ namespace casadi {
       casadi_assert(user_data);
       auto m = to_mem(user_data);
       auto& s = m->self;
-      const double* arg[] = {NV_DATA_S(rx), get_ptr(m->rp),
-        NV_DATA_S(x), get_ptr(m->p), &t};
-      double* res[] = {NV_DATA_S(rqdot)};
-      s.calc_function(m, "quadB", arg, res);
+      m->arg[0] = NV_DATA_S(rx);
+      m->arg[1] = get_ptr(m->rp);
+      m->arg[2] = NV_DATA_S(x);
+      m->arg[3] = get_ptr(m->p);
+      m->arg[4] = &t;
+      m->res[0] = NV_DATA_S(rqdot);
+      s.calc_function(m, "quadB");
 
       // Negate (note definition of g)
       casadi_scal(s.nrq_, -1., NV_DATA_S(rqdot));
@@ -624,9 +634,12 @@ namespace casadi {
     try {
       auto m = to_mem(user_data);
       auto& s = m->self;
-      const double* arg[] = {&t, NV_DATA_S(x), get_ptr(m->p), NV_DATA_S(v)};
-      double* res[] = {NV_DATA_S(Jv)};
-      s.calc_function(m, "jtimesF", arg, res);
+      m->arg[0] = &t;
+      m->arg[1] = NV_DATA_S(x);
+      m->arg[2] = get_ptr(m->p);
+      m->arg[3] = NV_DATA_S(v);
+      m->res[0] = NV_DATA_S(Jv);
+      s.calc_function(m, "jtimesF");
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "jtimes failed: " << e.what() << endl;;
@@ -640,10 +653,14 @@ namespace casadi {
     try {
       auto m = to_mem(user_data);
       auto& s = m->self;
-      const double* arg[] = {&t, NV_DATA_S(x), get_ptr(m->p),
-        NV_DATA_S(rx), get_ptr(m->rp), NV_DATA_S(v)};
-      double* res[] = {NV_DATA_S(Jv)};
-      s.calc_function(m, "jtimesB", arg, res);
+      m->arg[0] = &t;
+      m->arg[1] = NV_DATA_S(x);
+      m->arg[2] = get_ptr(m->p);
+      m->arg[3] = NV_DATA_S(rx);
+      m->arg[4] = get_ptr(m->rp);
+      m->arg[5] = NV_DATA_S(v);
+      m->res[0] = NV_DATA_S(Jv);
+      s.calc_function(m, "jtimesB");
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "jtimes failed: " << e.what() << endl;;
@@ -658,9 +675,13 @@ namespace casadi {
       auto m = to_mem(user_data);
       auto& s = m->self;
       double one=1;
-      const double* arg[] = {&t, NV_DATA_S(x), get_ptr(m->p), &one, 0};
-      double* res[] = {m->jac};
-      s.calc_function(m, "jacF", arg, res);
+      m->arg[0] = &t;
+      m->arg[1] = NV_DATA_S(x);
+      m->arg[2] = get_ptr(m->p);
+      m->arg[3] = &one;
+      m->arg[4] = 0;
+      m->res[0] = m->jac;
+      s.calc_function(m, "jacF");
 
       // Save to Jac
       const Sparsity& sp = s.get_function("jacF").sparsity_out(0);
@@ -687,10 +708,15 @@ namespace casadi {
       auto m = to_mem(user_data);
       auto& s = m->self;
       double minus_one = -1;
-      const double* arg[] = {&t, NV_DATA_S(rx), get_ptr(m->rp),
-            NV_DATA_S(x), get_ptr(m->p), &minus_one, 0};
-      double* res[] = {m->jacB};
-      s.calc_function(m, "jacB", arg, res);
+      m->arg[0] = &t;
+      m->arg[1] = NV_DATA_S(rx);
+      m->arg[2] = get_ptr(m->rp);
+      m->arg[3] = NV_DATA_S(x);
+      m->arg[4] = get_ptr(m->p);
+      m->arg[5] = &minus_one;
+      m->arg[6] = 0;
+      m->res[0] = m->jacB;
+      s.calc_function(m, "jacB");
 
       // Save to JacB
       const Sparsity& sp = s.get_function("jacB").sparsity_out(0);
@@ -717,9 +743,13 @@ namespace casadi {
       auto m = to_mem(user_data);
       auto& s = m->self;
       double one=1;
-      const double* arg[] = {&t, NV_DATA_S(x), get_ptr(m->p), &one, 0};
-      double* res[] = {m->jac};
-      s.calc_function(m, "jacF", arg, res);
+      m->arg[0] = &t;
+      m->arg[1] = NV_DATA_S(x);
+      m->arg[2] = get_ptr(m->p);
+      m->arg[3] = &one;
+      m->arg[4] = 0;
+      m->res[0] = m->jac;
+      s.calc_function(m, "jacF");
 
       // Save to Jac
       const Sparsity& sp = s.get_function("jacF").sparsity_out(0);
@@ -748,10 +778,15 @@ namespace casadi {
       auto m = to_mem(user_data);
       auto& s = m->self;
       double minus_one = -1;
-      const double* arg[] = {&t, NV_DATA_S(rx), get_ptr(m->rp),
-            NV_DATA_S(x), get_ptr(m->p), &minus_one, 0};
-      double* res[] = {m->jacB};
-      s.calc_function(m, "jacB", arg, res);
+      m->arg[0] = &t;
+      m->arg[1] = NV_DATA_S(rx);
+      m->arg[2] = get_ptr(m->rp);
+      m->arg[3] = NV_DATA_S(x);
+      m->arg[4] = get_ptr(m->p);
+      m->arg[5] = &minus_one;
+      m->arg[6] = 0;
+      m->res[0] = m->jacB;
+      s.calc_function(m, "jacB");
 
       // Save to JacB
       const Sparsity& sp = s.get_function("jacB").sparsity_out(0);
@@ -832,9 +867,13 @@ namespace casadi {
       auto& s = m->self;
       // Calculate Jacobian
       double d1 = -gamma, d2 = 1.;
-      const double* arg[] = {&t, NV_DATA_S(x), get_ptr(m->p), &d1, &d2};
-      double* res[] = {m->jac};
-      s.calc_function(m, "jacF", arg, res);
+      m->arg[0] = &t;
+      m->arg[1] = NV_DATA_S(x);
+      m->arg[2] = get_ptr(m->p);
+      m->arg[3] = &d1;
+      m->arg[4] = &d2;
+      m->res[0] = m->jac;
+      s.calc_function(m, "jacF");
 
       // Prepare the solution of the linear system (e.g. factorize)
       const Function& linsol = s.get_function("linsolF");
@@ -857,10 +896,15 @@ namespace casadi {
       auto& s = m->self;
       // Calculate Jacobian
       double one=1;
-      const double* arg[] = {&t, NV_DATA_S(rx), get_ptr(m->rp),
-            NV_DATA_S(x), get_ptr(m->p), &gammaB, &one};
-      double* res[] = {m->jacB};
-      s.calc_function(m, "jacB", arg, res);
+      m->arg[0] = &t;
+      m->arg[1] = NV_DATA_S(rx);
+      m->arg[2] = get_ptr(m->rp);
+      m->arg[3] = NV_DATA_S(x);
+      m->arg[4] = get_ptr(m->p);
+      m->arg[5] = &gammaB;
+      m->arg[6] = &one;
+      m->res[0] = m->jacB;
+      s.calc_function(m, "jacB");
 
       // Prepare the solution of the linear system (e.g. factorize)
       const Function& linsolB = s.get_function("linsolB");
