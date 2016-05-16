@@ -5,19 +5,26 @@ add_custom_target(python DEPENDS _casadi)
 
 # Workaround for OS X
 if(APPLE)
+  if(WITH_PYTHON3)
+  set(PYTHON_CONFIG_NAME python3-config)
+  else()
+  set(PYTHON_CONFIG_NAME python-config)
+  endif()
   find_program(PYTHON_CONFIG_EXECUTABLE
-               NAMES python-config DOC "python-config executable")
+               NAMES ${PYTHON_CONFIG_NAME} DOC "python-config executable")
   if(PYTHON_CONFIG_EXECUTABLE)
     execute_process(COMMAND ${PYTHON_CONFIG_EXECUTABLE} --prefix
                     OUTPUT_VARIABLE PYTHON_PREFIX_STRING
                     RESULT_VARIABLE PYTHON_PREFIX_FAILED
                     ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
     if(NOT PYTHON_PREFIX_FAILED)
-      find_library(PYTHON_LIBRARY NAMES python2.7
+      file(GLOB LOCAL_PYTHON_NAME RELATIVE ${PYTHON_PREFIX_STRING}/lib "${PYTHON_PREFIX_STRING}/lib/python*.*")
+      find_library(PYTHON_LIBRARY NAMES ${LOCAL_PYTHON_NAME}
         PATHS ${PYTHON_PREFIX_STRING}/lib NO_DEFAULT_PATH)
+      file(GLOB LOCAL_PYTHON_NAME "${PYTHON_PREFIX_STRING}/include/python*")
       find_path(PYTHON_INCLUDE_DIR
         NAMES Python.h
-        PATHS ${PYTHON_PREFIX_STRING}/include/python2.7 NO_DEFAULT_PATH)
+        PATHS ${LOCAL_PYTHON_NAME} NO_DEFAULT_PATH)
     endif()
     message(STATUS ${PYTHON_INCLUDE_DIR})
   endif()
