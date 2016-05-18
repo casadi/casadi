@@ -287,7 +287,7 @@ namespace casadi {
       auto m = to_mem(user_data);
       auto& s = m->self;
       m->arg[0] = NV_DATA_S(x);
-      m->arg[1] = get_ptr(m->p);
+      m->arg[1] = m->p;
       m->arg[2] = &t;
       m->res[0] = NV_DATA_S(xdot);
       s.calc_function(m, "odeF");
@@ -539,7 +539,7 @@ namespace casadi {
       auto m = to_mem(user_data);
       auto& s = m->self;
       m->arg[0] = NV_DATA_S(x);
-      m->arg[1] = get_ptr(m->p);
+      m->arg[1] = m->p;
       m->arg[2] = &t;
       m->res[0] = NV_DATA_S(qdot);
       s.calc_function(m, "quadF");
@@ -576,9 +576,9 @@ namespace casadi {
       auto m = to_mem(user_data);
       auto& s = m->self;
       m->arg[0] = NV_DATA_S(rx);
-      m->arg[1] = get_ptr(m->rp);
+      m->arg[1] = m->rp;
       m->arg[2] = NV_DATA_S(x);
-      m->arg[3] = get_ptr(m->p);
+      m->arg[3] = m->p;
       m->arg[4] = &t;
       m->res[0] = NV_DATA_S(rxdot);
       s.calc_function(m, "odeB");
@@ -612,9 +612,9 @@ namespace casadi {
       auto m = to_mem(user_data);
       auto& s = m->self;
       m->arg[0] = NV_DATA_S(rx);
-      m->arg[1] = get_ptr(m->rp);
+      m->arg[1] = m->rp;
       m->arg[2] = NV_DATA_S(x);
-      m->arg[3] = get_ptr(m->p);
+      m->arg[3] = m->p;
       m->arg[4] = &t;
       m->res[0] = NV_DATA_S(rqdot);
       s.calc_function(m, "quadB");
@@ -636,7 +636,7 @@ namespace casadi {
       auto& s = m->self;
       m->arg[0] = &t;
       m->arg[1] = NV_DATA_S(x);
-      m->arg[2] = get_ptr(m->p);
+      m->arg[2] = m->p;
       m->arg[3] = NV_DATA_S(v);
       m->res[0] = NV_DATA_S(Jv);
       s.calc_function(m, "jtimesF");
@@ -655,9 +655,9 @@ namespace casadi {
       auto& s = m->self;
       m->arg[0] = &t;
       m->arg[1] = NV_DATA_S(x);
-      m->arg[2] = get_ptr(m->p);
+      m->arg[2] = m->p;
       m->arg[3] = NV_DATA_S(rx);
-      m->arg[4] = get_ptr(m->rp);
+      m->arg[4] = m->rp;
       m->arg[5] = NV_DATA_S(v);
       m->res[0] = NV_DATA_S(Jv);
       s.calc_function(m, "jtimesB");
@@ -677,7 +677,7 @@ namespace casadi {
       double one=1;
       m->arg[0] = &t;
       m->arg[1] = NV_DATA_S(x);
-      m->arg[2] = get_ptr(m->p);
+      m->arg[2] = m->p;
       m->arg[3] = &one;
       m->arg[4] = 0;
       m->res[0] = m->jac;
@@ -710,9 +710,9 @@ namespace casadi {
       double minus_one = -1;
       m->arg[0] = &t;
       m->arg[1] = NV_DATA_S(rx);
-      m->arg[2] = get_ptr(m->rp);
+      m->arg[2] = m->rp;
       m->arg[3] = NV_DATA_S(x);
-      m->arg[4] = get_ptr(m->p);
+      m->arg[4] = m->p;
       m->arg[5] = &minus_one;
       m->arg[6] = 0;
       m->res[0] = m->jacB;
@@ -745,7 +745,7 @@ namespace casadi {
       double one=1;
       m->arg[0] = &t;
       m->arg[1] = NV_DATA_S(x);
-      m->arg[2] = get_ptr(m->p);
+      m->arg[2] = m->p;
       m->arg[3] = &one;
       m->arg[4] = 0;
       m->res[0] = m->jac;
@@ -780,9 +780,9 @@ namespace casadi {
       double minus_one = -1;
       m->arg[0] = &t;
       m->arg[1] = NV_DATA_S(rx);
-      m->arg[2] = get_ptr(m->rp);
+      m->arg[2] = m->rp;
       m->arg[3] = NV_DATA_S(x);
-      m->arg[4] = get_ptr(m->p);
+      m->arg[4] = m->p;
       m->arg[5] = &minus_one;
       m->arg[6] = 0;
       m->res[0] = m->jacB;
@@ -869,7 +869,7 @@ namespace casadi {
       double d1 = -gamma, d2 = 1.;
       m->arg[0] = &t;
       m->arg[1] = NV_DATA_S(x);
-      m->arg[2] = get_ptr(m->p);
+      m->arg[2] = m->p;
       m->arg[3] = &d1;
       m->arg[4] = &d2;
       m->res[0] = m->jac;
@@ -898,9 +898,9 @@ namespace casadi {
       double one=1;
       m->arg[0] = &t;
       m->arg[1] = NV_DATA_S(rx);
-      m->arg[2] = get_ptr(m->rp);
+      m->arg[2] = m->rp;
       m->arg[3] = NV_DATA_S(x);
-      m->arg[4] = get_ptr(m->p);
+      m->arg[4] = m->p;
       m->arg[5] = &gammaB;
       m->arg[6] = &one;
       m->res[0] = m->jacB;

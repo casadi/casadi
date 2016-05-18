@@ -51,7 +51,7 @@ namespace casadi {
     N_Vector rxz, rxzdot, rq;
 
     // Parameters
-    std::vector<double> p, rp;
+    double *p, *rp;
 
     // Jacobian
     double *jac, *jacB;

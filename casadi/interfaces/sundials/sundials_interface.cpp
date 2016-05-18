@@ -367,6 +367,10 @@ namespace casadi {
     } else {
       casadi_error("Unknown linear solver for backward integration: " + iterative_solverB);
     }
+
+    // Allocate work vectors
+    alloc_w(np_, true); // p
+    alloc_w(nrp_, true); // rp
   }
 
   void SundialsInterface::init_linsol() {
@@ -396,10 +400,6 @@ namespace casadi {
     m->q = N_VNew_Serial(nq_);
     m->rxz = N_VNew_Serial(nrx_+nrz_);
     m->rq = N_VNew_Serial(nrq_);
-
-    // Allocate memory
-    m->p.resize(np_);
-    m->rp.resize(nrp_);
   }
 
   void SundialsInterface::reset(IntegratorMemory* mem, double t, const double* x,
@@ -410,7 +410,7 @@ namespace casadi {
     m->t = t;
 
     // Set parameters
-    casadi_copy(p, np_, get_ptr(m->p));
+    casadi_copy(p, np_, m->p);
 
     // Set the state
     casadi_copy(x, nx_, NV_DATA_S(m->xz));
@@ -428,7 +428,7 @@ namespace casadi {
     m->t = t;
 
     // Set parameters
-    casadi_copy(rp, nrp_, get_ptr(m->rp));
+    casadi_copy(rp, nrp_, m->rp);
 
     // Get the backward state
     casadi_copy(rx, nrx_, NV_DATA_S(m->rxz));
@@ -529,6 +529,8 @@ namespace casadi {
     Integrator::set_work(mem, arg, res, iw, w);
 
     // Work vectors
+    m->p = w; w += np_;
+    m->rp = w; w += nrp_;
     m->jac = w; w += get_function("jacF").nnz_out(0);
     if (nrx_>0) {
       m->jacB = w; w += get_function("jacB").nnz_out(0);
