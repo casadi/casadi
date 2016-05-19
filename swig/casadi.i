@@ -1154,7 +1154,7 @@ import_array();
         Py_ssize_t pos = 0;
         while (PyDict_Next(p, &pos, &key, &value)) {
           if (!(PyString_Check(key) || PyUnicode_Check(key))) return false;
-          if (m) {      
+          if (m) {
             char* c_key = SWIG_Python_str_AsChar(key);
             M *v=&(**m)[std::string(c_key)], *v2=v;
             SWIG_Python_str_DelForPy3(c_key);
@@ -1513,10 +1513,10 @@ import_array();
     bool PyObjectHasClassName(PyObject* p, const char * name) {
       PyObject * classo = PyObject_GetAttrString( p, "__class__");
       PyObject * classname = PyObject_GetAttrString( classo, "__name__");
-      
+
       char* c_classname = SWIG_Python_str_AsChar(classname);
       bool ret = strcmp(c_classname, name)==0;
-      
+
       Py_DECREF(classo);Py_DECREF(classname);
       SWIG_Python_str_DelForPy3(c_classname);
       return ret;
@@ -3460,6 +3460,7 @@ namespace casadi{
 %include <casadi/core/function/nlpsol.hpp>
 %include <casadi/core/function/rootfinder.hpp>
 %include <casadi/core/function/linsol.hpp>
+%include <casadi/core/function/interpolant.hpp>
 
 %feature("copyctor", "0") casadi::CodeGenerator;
 %include <casadi/core/function/code_generator.hpp>
@@ -3842,7 +3843,7 @@ import copy
 locals_copy = copy.copy(locals())
 for name,cl in locals_copy.items():
   if not inspect.isclass(cl): continue
-  
+
 if sys.version_info >= (3, 0):
   for k,v in inspect.getmembers(cl, lambda x: inspect.ismethod(x) or inspect.isfunction(x)):
     if k == "__del__" or v.__name__ == "<lambda>": continue

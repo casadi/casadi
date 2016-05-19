@@ -101,6 +101,7 @@ set(CASADI_SRCS
   function/integrator.hpp          function/integrator_impl.hpp    function/integrator.cpp
   function/nlpsol.hpp              function/nlpsol_impl.hpp        function/nlpsol.cpp
   function/conic.hpp               function/conic_impl.hpp         function/conic.cpp
+  function/interpolant.hpp         function/interpolant_impl.hpp   function/interpolant.cpp
   function/code_generator.hpp      function/code_generator.cpp
   function/switch.hpp              function/switch.cpp
   function/map.hpp                 function/map.cpp
