@@ -59,6 +59,24 @@ namespace casadi {
               const std::vector<std::vector<double> >& grid,
               const std::vector<double>& values)
               : FunctionInternal(name), grid_(grid), values_(values) {
+    // Dimension at least 1
+    casadi_assert_message(grid_.size()>0, "At least one input required");
+    casadi_assert_message(values_.size()>0, "At least one output required");
+
+    // Consistency check, number of elements
+    unsigned int nel=1;
+    for (auto&& g : grid) nel *= g.size();
+    casadi_assert_message(nel==values_.size(), "Inconsistent number of elements");
+
+    // Grid must be strictly increasing
+    for (auto&& g : grid) {
+      double last = -inf;
+      for (auto&& e : g) {
+        casadi_assert_message(!isinf(e) && e>last,
+          "Gridpoints must be finite and strictly increasing");
+        last = e;
+      }
+    }
   }
 
   Interpolant::~Interpolant() {
