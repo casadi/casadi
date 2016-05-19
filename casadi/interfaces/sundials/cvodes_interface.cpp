@@ -1006,8 +1006,7 @@ namespace casadi {
   }
 
   void CvodesInterface::initBandedLinsol(CvodesMemory* m) const {
-    pair<int, int> bw = getBandwidth();
-    THROWING(CVBand, m->mem, nx_, bw.first, bw.second);
+    THROWING(CVBand, m->mem, nx_, ubw_, lbw_);
     if (exact_jacobian_) {
       THROWING(CVDlsSetBandJacFn, m->mem, bjac);
     }
@@ -1049,8 +1048,7 @@ namespace casadi {
   }
 
   void CvodesInterface::initBandedLinsolB(CvodesMemory* m) const {
-    pair<int, int> bw = getBandwidthB();
-    THROWING(CVBandB, m->mem, m->whichB, nrx_, bw.first, bw.second);
+    THROWING(CVBandB, m->mem, m->whichB, nrx_, ubwB_, lbwB_);
     if (exact_jacobianB_) THROWING(CVDlsSetBandJacFnB, m->mem, m->whichB, bjacB);
   }
 

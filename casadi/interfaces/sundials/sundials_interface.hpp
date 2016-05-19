@@ -121,8 +121,8 @@ namespace casadi {
     int max_num_steps_;
     bool finite_difference_fsens_;
     bool stop_at_end_;
-    int upper_bandwidth_, lower_bandwidth_;
-    int upper_bandwidthB_, lower_bandwidthB_;
+    int ubw_, lbw_;
+    int ubwB_, lbwB_;
     bool quad_err_con_;
     std::string interpolation_type_;
     int steps_per_checkpoint_;
@@ -155,12 +155,6 @@ namespace casadi {
 
     /// Use preconditioning
     bool use_preconditioner_, use_preconditionerB_;
-
-    // Get bandwidth for forward problem
-    std::pair<int, int> getBandwidth() const;
-
-    // Get bandwidth for backward problem
-    std::pair<int, int> getBandwidthB() const;
 
     /** \brief Set the (persistent) work vectors */
     virtual void set_work(void* mem, const double**& arg, double**& res,

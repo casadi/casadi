@@ -1163,9 +1163,7 @@ namespace casadi {
   }
 
   void IdasInterface::initBandedLinsol(IdasMemory* m) const {
-    // Banded jacobian
-    pair<int, int> bw = getBandwidth();
-    THROWING(IDABand, m->mem, nx_+nz_, bw.first, bw.second);
+    THROWING(IDABand, m->mem, nx_+nz_, ubw_, lbw_);
     if (exact_jacobian_) {
       THROWING(IDADlsSetBandJacFn, m->mem, bjac);
     }
@@ -1211,8 +1209,7 @@ namespace casadi {
   }
 
   void IdasInterface::initBandedLinsolB(IdasMemory* m) const {
-    pair<int, int> bw = getBandwidthB();
-    THROWING(IDABandB, m->mem, m->whichB, nrx_+nrz_, bw.first, bw.second);
+    THROWING(IDABandB, m->mem, m->whichB, nrx_+nrz_, ubwB_, lbwB_);
     if (exact_jacobianB_) {
       THROWING(IDADlsSetBandJacFnB, m->mem, m->whichB, bjacB);
     }

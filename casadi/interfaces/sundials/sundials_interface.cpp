@@ -187,10 +187,10 @@ namespace casadi {
     string linear_solver_type = "user_defined";
     string iterative_solver = "gmres";
     string pretype = "none";
-    upper_bandwidth_ = -1;
-    lower_bandwidth_ = -1;
-    upper_bandwidthB_ = -1;
-    lower_bandwidthB_ = -1;
+    ubw_ = -1;
+    lbw_ = -1;
+    ubwB_ = -1;
+    lbwB_ = -1;
     quad_err_con_ = false;
     interpolation_type_ = "hermite";
     steps_per_checkpoint_ = 20;
@@ -226,13 +226,13 @@ namespace casadi {
       } else if (op.first=="linear_solver_options") {
         linear_solver_options_ = op.second;
       } else if (op.first=="upper_bandwidth") {
-        upper_bandwidth_ = op.second;
+        ubw_ = op.second;
       } else if (op.first=="lower_bandwidth") {
-        lower_bandwidth_ = op.second;
+        lbw_ = op.second;
       } else if (op.first=="upper_bandwidthB") {
-        upper_bandwidthB_ = op.second;
+        ubwB_ = op.second;
       } else if (op.first=="lower_bandwidthB") {
-        lower_bandwidthB_ = op.second;
+        lbwB_ = op.second;
       } else if (op.first=="quad_err_con") {
         quad_err_con_ = op.second;
       } else if (op.first=="interpolation_type") {
@@ -374,21 +374,33 @@ namespace casadi {
   }
 
   void SundialsInterface::init_linsol() {
+    // Get sparsity
+    const Sparsity& sp = get_function("jacF").sparsity_out(0);
+
     // Work vector
-    alloc_w(get_function("jacF").nnz_out(0), true);
+    alloc_w(sp.nnz(), true);
 
     // Create a linear solver
-    set_function(linsol("linsolF", linear_solver_, get_function("jacF").sparsity_out(0),
-                 1, linear_solver_options_));
+    set_function(linsol("linsolF", linear_solver_, sp, 1, linear_solver_options_));
+
+    // Update bandwidths
+    lbw_ = sp.bw_lower();
+    ubw_ = sp.bw_upper();
   }
 
   void SundialsInterface::init_linsolB() {
+    // Get sparsity
+    const Sparsity& sp = get_function("jacB").sparsity_out(0);
+
     // Work vector
-    alloc_w(get_function("jacB").nnz_out(0), true);
+    alloc_w(sp.nnz(), true);
 
     // Create a linear solver
-    set_function(linsol("linsolB", linear_solverB_, get_function("jacB").sparsity_out(0),
-                 1, linear_solver_optionsB_));
+    set_function(linsol("linsolB", linear_solverB_, sp, 1, linear_solver_optionsB_));
+
+    // Update bandwidths
+    lbwB_ = sp.bw_lower();
+    ubwB_ = sp.bw_upper();
   }
 
   void SundialsInterface::init_memory(void* mem) const {
@@ -435,46 +447,6 @@ namespace casadi {
 
     // Reset summation states
     N_VConst(0., m->rq);
-  }
-
-  std::pair<int, int> SundialsInterface::getBandwidth() const {
-    std::pair<int, int> bw;
-
-    // Get upper bandwidth
-    if (upper_bandwidth_>=0) {
-      bw.first = upper_bandwidth_;
-    } else {
-      bw.first = sp_jac_dae_.bw_upper();
-    }
-
-    // Get lower bandwidth
-    if (lower_bandwidth_>=0) {
-      bw.second = lower_bandwidth_;
-    } else {
-      bw.second = sp_jac_dae_.bw_lower();
-    }
-
-    return bw;
-  }
-
-  std::pair<int, int> SundialsInterface::getBandwidthB() const {
-    std::pair<int, int> bw;
-
-    // Get upper bandwidth
-    if (upper_bandwidthB_>=0) {
-      bw.first = upper_bandwidthB_;
-    } else {
-      bw.first = sp_jac_rdae_.bw_upper();
-    }
-
-    // Get lower bandwidth
-    if (lower_bandwidthB_>=0) {
-      bw.second = lower_bandwidthB_;
-    } else {
-      bw.second = sp_jac_rdae_.bw_lower();
-    }
-
-    return bw;
   }
 
   SundialsMemory::SundialsMemory() {
