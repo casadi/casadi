@@ -5774,6 +5774,9 @@ Check if a function is inlined.
 // File: classcasadi_1_1Integrator.xml
 
 
+// File: classcasadi_1_1Interpolant.xml
+
+
 // File: classcasadi_1_1InterruptHandler.xml
 %feature("docstring") casadi::InterruptHandler "[INTERNAL]  Takes care of
 user interrupts (Ctrl+C)
@@ -10407,23 +10410,9 @@ Explicitly load a plugin dynamically.
 
 ";
 
-%feature("docstring")  casadi::hash_combine(std::size_t &seed, T v) "
+%feature("docstring")  casadi::has_interpolant(const std::string &name) "
 
-Generate a hash value incrementally (function taken from boost)
-
-";
-
-%feature("docstring")  casadi::hash_combine(std::size_t &seed, const int *v,
-int sz) "
-
-Generate a hash value incrementally, array.
-
-";
-
-%feature("docstring")  casadi::hash_combine(std::size_t &seed, const
-std::vector< int > &v) "
-
-Generate a hash value incrementally (function taken from boost)
+Check if a particular plugin is available.
 
 ";
 
@@ -11285,15 +11274,15 @@ Joel Andersson
 %feature("docstring")  casadi::integrator(const std::string &name, const
 std::string &solver, const MXDict &dae, const Dict &opts=Dict()) " ";
 
-%feature("docstring")  casadi::hasNegative(const std::vector< T > &v) "
-
-Check if the vector has negative entries.
+%feature("docstring")  casadi::casadi_iamax(int n, const real_t *x, int
+inc_x) " [INTERNAL]  IAMAX: index corresponding to the entry with the
+largest absolute value.
 
 ";
 
-%feature("docstring")  casadi::casadi_project(const real_t *x, const int
-*sp_x, real_t *y, const int *sp_y, real_t *w) " [INTERNAL]  Sparse copy: y
-<- x, w work vector (length >= number of rows)
+%feature("docstring")  casadi::hasNegative(const std::vector< T > &v) "
+
+Check if the vector has negative entries.
 
 ";
 
@@ -11316,6 +11305,12 @@ Read matrix, matlab style.
 %feature("docstring")  casadi::casadi_mtimes(const real_t *x, const int
 *sp_x, const real_t *y, const int *sp_y, real_t *z, const int *sp_z, real_t
 *w, int tr) " [INTERNAL]  Sparse matrix-matrix multiplication: z <- z + x*y.
+
+";
+
+%feature("docstring")  casadi::doc_interpolant(const std::string &name) "
+
+Get the documentation string for a plugin.
 
 ";
 
@@ -11780,6 +11775,26 @@ Q-transpose (lapack)
 
 ";
 
+%feature("docstring")  casadi::hash_combine(std::size_t &seed, T v) "
+
+Generate a hash value incrementally (function taken from boost)
+
+";
+
+%feature("docstring")  casadi::hash_combine(std::size_t &seed, const int *v,
+int sz) "
+
+Generate a hash value incrementally, array.
+
+";
+
+%feature("docstring")  casadi::hash_combine(std::size_t &seed, const
+std::vector< int > &v) "
+
+Generate a hash value incrementally (function taken from boost)
+
+";
+
 %feature("docstring")  casadi::has_integrator(const std::string &name) "
 
 Check if a particular plugin is available.
@@ -11817,6 +11832,12 @@ Explicitly load a plugin dynamically.
 %feature("docstring")  casadi::dgeqrf_(int *m, int *n, double *a, int *lda,
 double *tau, double *work, int *lwork, int *info) " [INTERNAL]  QR-factorize
 dense matrix (lapack)
+
+";
+
+%feature("docstring")  casadi::load_interpolant(const std::string &name) "
+
+Explicitly load a plugin dynamically.
 
 ";
 
@@ -12692,15 +12713,40 @@ Get the number of QP solver outputs.
 
 ";
 
-%feature("docstring")  casadi::casadi_iamax(int n, const real_t *x, int
-inc_x) " [INTERNAL]  IAMAX: index corresponding to the entry with the
-largest absolute value.
+%feature("docstring")  casadi::casadi_project(const real_t *x, const int
+*sp_x, real_t *y, const int *sp_y, real_t *w) " [INTERNAL]  Sparse copy: y
+<- x, w work vector (length >= number of rows)
 
 ";
 
 %feature("docstring")  casadi::matrixName< int >() "
 
 Get typename.
+
+";
+
+%feature("docstring")  casadi::interpolant(const std::string &name, const
+std::string &solver, const std::vector< std::vector< double > > &grid, const
+std::vector< double > &values, const Dict &opts=Dict()) "
+
+An interpolant function for lookup table data
+
+General information
+===================
+
+
+
+List of plugins
+===============
+
+
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+Interpolant.doc(\"myextraplugin\")
+
+Joel Andersson
 
 ";
 

@@ -4068,6 +4068,9 @@ Check if a function is inlined.
 // File: classcasadi_1_1Integrator.xml
 
 
+// File: classcasadi_1_1Interpolant.xml
+
+
 // File: classcasadi_1_1InterruptHandler.xml
 %feature("docstring") casadi::InterruptHandler "[INTERNAL]  Takes care of
 user interrupts (Ctrl+C)
@@ -8004,19 +8007,9 @@ Explicitly load a plugin dynamically.
 
 ";
 
-%feature("docstring") casadi::hash_combine "
+%feature("docstring") casadi::has_interpolant "
 
->  void hash_combine(std.size_t &seed, T v)
-
->  void hash_combine(std.size_t &seed, [int ] v)
-------------------------------------------------------------------------
-
-Generate a hash value incrementally (function taken from boost)
-
->  void hash_combine(std.size_t &seed, const int *v, int sz)
-------------------------------------------------------------------------
-
-Generate a hash value incrementally, array.
+Check if a particular plugin is available.
 
 ";
 
@@ -8876,14 +8869,14 @@ Joel Andersson
 
 ";
 
-%feature("docstring") casadi::hasNegative "
-
-Check if the vector has negative entries.
+%feature("docstring") casadi::casadi_iamax "[INTERNAL]  IAMAX: index
+corresponding to the entry with the largest absolute value.
 
 ";
 
-%feature("docstring") casadi::casadi_project "[INTERNAL]  Sparse copy: y <-
-x, w work vector (length >= number of rows)
+%feature("docstring") casadi::hasNegative "
+
+Check if the vector has negative entries.
 
 ";
 
@@ -8905,6 +8898,12 @@ Read matrix, matlab style.
 
 %feature("docstring") casadi::casadi_mtimes "[INTERNAL]  Sparse matrix-
 matrix multiplication: z <- z + x*y.
+
+";
+
+%feature("docstring") casadi::doc_interpolant "
+
+Get the documentation string for a plugin.
 
 ";
 
@@ -9362,6 +9361,22 @@ with Q-transpose (lapack)
 
 ";
 
+%feature("docstring") casadi::hash_combine "
+
+>  void hash_combine(std.size_t &seed, T v)
+
+>  void hash_combine(std.size_t &seed, [int ] v)
+------------------------------------------------------------------------
+
+Generate a hash value incrementally (function taken from boost)
+
+>  void hash_combine(std.size_t &seed, const int *v, int sz)
+------------------------------------------------------------------------
+
+Generate a hash value incrementally, array.
+
+";
+
 %feature("docstring") casadi::has_integrator "
 
 Check if a particular plugin is available.
@@ -9397,6 +9412,12 @@ Explicitly load a plugin dynamically.
 
 %feature("docstring") casadi::dgeqrf_ "[INTERNAL]  QR-factorize dense
 matrix (lapack)
+
+";
+
+%feature("docstring") casadi::load_interpolant "
+
+Explicitly load a plugin dynamically.
 
 ";
 
@@ -10234,14 +10255,37 @@ Get the number of QP solver outputs.
 
 ";
 
-%feature("docstring") casadi::casadi_iamax "[INTERNAL]  IAMAX: index
-corresponding to the entry with the largest absolute value.
+%feature("docstring") casadi::casadi_project "[INTERNAL]  Sparse copy: y <-
+x, w work vector (length >= number of rows)
 
 ";
 
 %feature("docstring") casadi::matrixName< int > "
 
 Get typename.
+
+";
+
+%feature("docstring") casadi::interpolant "
+
+An interpolant function for lookup table data
+
+General information
+===================
+
+
+
+List of plugins
+===============
+
+
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+Interpolant.doc(\"myextraplugin\")
+
+Joel Andersson
 
 ";
 
