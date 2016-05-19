@@ -50,6 +50,9 @@ namespace casadi {
     // N-vectors for the backward integration
     N_Vector rxz, rxzdot, rq;
 
+    // Initialize or reinitialize?
+    bool first_callB;
+
     // Parameters
     double *p, *rp;
 
@@ -124,7 +127,6 @@ namespace casadi {
     int ubw_, lbw_;
     int ubwB_, lbwB_;
     bool quad_err_con_;
-    std::string interpolation_type_;
     int steps_per_checkpoint_;
     bool disable_internal_warnings_;
     int max_multistep_order_;
@@ -133,19 +135,19 @@ namespace casadi {
     ///@}
 
     /// Supported linear solvers in Sundials
-    enum LinsolType {SD_USER_DEFINED, SD_DENSE, SD_BANDED, SD_ITERATIVE};
+    enum LinsolType {SD_USER_DEFINED, SD_DENSE, SD_BANDED, SD_ITERATIVE}
+      linsol_f_, linsol_g_;
 
     /// Supported iterative solvers in Sundials
-    enum IterativeSolverType {SD_GMRES, SD_BCGSTAB, SD_TFQMR};
+    enum IterativeSolverType {SD_GMRES, SD_BCGSTAB, SD_TFQMR}
+      itsol_f_, itsol_g_;
+
+    // Supported interpolations in Sundials
+    enum InterpType {SD_POLYNOMIAL, SD_HERMITE}
+      interp_;
 
     /// Linear solver data (dense)
     struct LinSolDataDense {};
-
-    /// Linear solver
-    LinsolType linsol_f_, linsol_g_;
-
-    /// Iterative solver
-    IterativeSolverType itsol_f_, itsol_g_;
 
     /// Preconditioning
     int pretype_f_, pretype_g_;

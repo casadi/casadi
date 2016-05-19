@@ -65,10 +65,6 @@ namespace casadi {
     // Idas memory block
     void* mem;
 
-    // Has the adjoint problem been initialized
-    bool isInitAdj;
-    bool isInitTaping;
-
     // Ids of backward problem
     int whichB;
 

@@ -192,7 +192,7 @@ namespace casadi {
     ubwB_ = -1;
     lbwB_ = -1;
     quad_err_con_ = false;
-    interpolation_type_ = "hermite";
+    string interpolation_type = "hermite";
     steps_per_checkpoint_ = 20;
     disable_internal_warnings_ = false;
     max_multistep_order_ = 5;
@@ -236,7 +236,7 @@ namespace casadi {
       } else if (op.first=="quad_err_con") {
         quad_err_con_ = op.second;
       } else if (op.first=="interpolation_type") {
-        interpolation_type_ = op.second.to_string();
+        interpolation_type = op.second.to_string();
       } else if (op.first=="steps_per_checkpoint") {
         steps_per_checkpoint_ = op.second;
       } else if (op.first=="disable_internal_warnings") {
@@ -368,6 +368,15 @@ namespace casadi {
       casadi_error("Unknown linear solver for backward integration: " + iterative_solverB);
     }
 
+    // interpolation_type
+    if (interpolation_type=="hermite") {
+      interp_ = SD_HERMITE;
+    } else if (interpolation_type=="polynomial") {
+      interp_ = SD_POLYNOMIAL;
+    } else {
+      casadi_error("Unknown interpolation type: " + interpolation_type);
+    }
+
     // Allocate work vectors
     alloc_w(np_, true); // p
     alloc_w(nrp_, true); // rp
@@ -468,6 +477,7 @@ namespace casadi {
     this->q = 0;
     this->rxz = 0;
     this->rq = 0;
+    this->first_callB = true;
   }
 
   SundialsMemory::~SundialsMemory() {

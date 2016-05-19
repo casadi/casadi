@@ -196,24 +196,6 @@ namespace casadi {
     log("IdasInterface::init", "end");
   }
 
-  void IdasInterface::initTaping(IdasMemory* m) const {
-    casadi_assert(!m->isInitTaping);
-
-    // Get the interpolation type
-    int interpType;
-    if (interpolation_type_=="hermite") {
-      interpType = IDA_HERMITE;
-    } else if (interpolation_type_=="polynomial") {
-      interpType = IDA_POLYNOMIAL;
-    } else {
-      casadi_error("\"interpolation_type\" must be \"hermite\" or \"polynomial\"");
-    }
-
-    // Initialize adjoint sensitivities
-    THROWING(IDAAdjInit, m->mem, steps_per_checkpoint_, interpType);
-    m->isInitTaping = true;
-  }
-
   int IdasInterface::res(double t, N_Vector xz, N_Vector xzdot,
                                 N_Vector rr, void *user_data) {
     try {
@@ -439,8 +421,13 @@ namespace casadi {
     }
     log("IdasInterface::init", "initialized adjoint sensitivities");
 
-    m->isInitTaping = false;
-    m->isInitAdj = false;
+    // Initialize adjoint sensitivities
+    if (nrx_>0) {
+      int interpType = interp_==SD_HERMITE ? IDA_HERMITE : IDA_POLYNOMIAL;
+      THROWING(IDAAdjInit, m->mem, steps_per_checkpoint_, interpType);
+    }
+
+    m->first_callB = true;
   }
 
   void IdasInterface::reset(IntegratorMemory* mem, double t, const double* _x,
@@ -450,9 +437,6 @@ namespace casadi {
 
     // Reset the base classes
     SundialsInterface::reset(mem, t, _x, _z, _p);
-
-    if (nrx_>0 && !m->isInitTaping)
-      initTaping(m);
 
     // Return flag
     int flag;
@@ -539,7 +523,7 @@ namespace casadi {
     // Reset the base classes
     SundialsInterface::resetB(mem, t, rx, rz, rp);
 
-    if (!m->isInitAdj) { // First call
+    if (m->first_callB) { // First call
       // Create backward problem
       THROWING(IDACreateB, m->mem, &m->whichB);
 
@@ -610,7 +594,7 @@ namespace casadi {
       }
 
       // Mark initialized
-      m->isInitAdj = true;
+      m->first_callB = false;
     } else { // Re-initialize
       THROWING(IDAReInitB, m->mem, m->whichB, grid_.back(), m->rxz, m->rxzdot);
 
@@ -1229,8 +1213,6 @@ namespace casadi {
     this->mem = 0;
     this->xzdot = 0;
     this->rxzdot = 0;
-    this->isInitAdj = false;
-    this->isInitTaping = false;
 
     // Reset checkpoints counter
     this->ncheck = 0;

@@ -218,22 +218,13 @@ namespace casadi {
       }
     }
 
-    // Adjoint sensitivity problem
+    // Initialize adjoint sensitivities
     if (nrx_>0) {
-      // Get the interpolation type
-      int interpType;
-      if (interpolation_type_=="hermite") {
-        interpType = CV_HERMITE;
-      } else if (interpolation_type_=="polynomial") {
-        interpType = CV_POLYNOMIAL;
-      } else {
-        casadi_error("\"interpolation_type\" must be \"hermite\" or \"polynomial\"");
-      }
-
-      // Initialize adjoint sensitivities
+      int interpType = interp_==SD_HERMITE ? CV_HERMITE : CV_POLYNOMIAL;
       THROWING(CVodeAdjInit, m->mem, steps_per_checkpoint_, interpType);
-      m->isInitAdj = false;
     }
+
+    m->first_callB = true;
   }
 
   int CvodesInterface::rhs(double t, N_Vector x, N_Vector xdot, void *user_data) {
@@ -337,7 +328,7 @@ namespace casadi {
     SundialsInterface::resetB(mem, t, rx, rz, rp);
 
     int flag;
-    if (!m->isInitAdj) { // First call
+    if (m->first_callB) {
       // Create backward problem (use the same lmm and iter)
       THROWING(CVodeCreateB, m->mem, lmm_, iter_, &m->whichB);
 
@@ -392,7 +383,7 @@ namespace casadi {
       }
 
       // Mark initialized
-      m->isInitAdj = true;
+      m->first_callB = false;
     } else {
       THROWING(CVodeReInitB, m->mem, m->whichB, grid_.back(), m->rxz);
       THROWING(CVodeQuadReInitB, m->mem, m->whichB, m->rq);
@@ -1064,7 +1055,6 @@ namespace casadi {
 
   CvodesMemory::CvodesMemory(const CvodesInterface& s) : self(s) {
     this->mem = 0;
-    this->isInitAdj = false;
 
     // Reset checkpoints counter
     this->ncheck = 0;

@@ -70,11 +70,6 @@ namespace casadi {
     // CVodes memory block
     void* mem;
 
-    bool isInitAdj;
-
-    /// number of checkpoints stored so far
-    int ncheck;
-
     // Ids of backward problem
     int whichB;
 
