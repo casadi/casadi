@@ -91,21 +91,20 @@ namespace casadi {
     // Create function
     create_function("odeF", {"x", "p", "t"}, {"ode"});
     create_function("quadF", {"x", "p", "t"}, {"quad"});
-    create_function("odeB", {"rx", "rp", "x", "p", "t"},
-                    {"rode"});
-    create_function("quadB", {"rx", "rp", "x", "p", "t"},
-                    {"rquad"});
+    create_function("odeB", {"rx", "rp", "x", "p", "t"}, {"rode"});
+    create_function("quadB", {"rx", "rp", "x", "p", "t"}, {"rquad"});
 
     // Create a Jacobian if requested
     if (exact_jacobian_) {
       set_function(oracle_.is_a("sxfunction") ? getJacF<SX>() : getJacF<MX>());
-      init_linsol();
+      init_jacF();
     }
 
     // Create a backwards Jacobian if requested
-    if (exact_jacobianB_ && nrx_>0) {
-      set_function(oracle_.is_a("sxfunction") ? getJacB<SX>() : getJacB<MX>());
-      init_linsolB();
+    if (nrx_>0) {
+      if (exact_jacobianB_) {
+        set_function(oracle_.is_a("sxfunction") ? getJacB<SX>() : getJacB<MX>());
+      }
     }
 
     // Algebraic variables not supported
@@ -186,21 +185,11 @@ namespace casadi {
     case SD_BCGSTAB: THROWING(CVSpbcg, m->mem, pretype_f_, max_krylov_); break;
     case SD_TFQMR: THROWING(CVSptfqmr, m->mem, pretype_f_, max_krylov_); break;
     }
-
-    // Attach functions for jacobian information
     if (exact_jacobian_) THROWING(CVSpilsSetJacTimesVecFn, m->mem, jtimes);
-
-    // Add a preconditioner
-    if (use_preconditioner_) {
-      casadi_assert_message(has_function("jacF"), "No Jacobian function");
-      casadi_assert_message(has_function("linsolF"), "No linear solver");
-      THROWING(CVSpilsSetPreconditioner, m->mem, psetup, psolve);
-    }
+    if (use_precon_) THROWING(CVSpilsSetPreconditioner, m->mem, psetup, psolve);
     break;
     case SD_USER_DEFINED:
     {
-      casadi_assert_message(has_function("jacF"), "No Jacobian function");
-      casadi_assert_message(has_function("linsolF"), "No linear solver");
       CVodeMem cv_mem = static_cast<CVodeMem>(m->mem);
       cv_mem->cv_lmem   = m;
       cv_mem->cv_lsetup = lsetup;
@@ -382,7 +371,7 @@ namespace casadi {
       if (exact_jacobianB_) THROWING(CVSpilsSetJacTimesVecFnB, m->mem, m->whichB, jtimesB);
 
       // Add a preconditioner
-      if (use_preconditionerB_) {
+      if (use_preconB_) {
         casadi_assert_message(has_function("jacB"), "No Jacobian function");
         casadi_assert_message(has_function("linsolB"), "No linear solver");
         THROWING(CVSpilsSetPreconditionerB, m->mem, m->whichB, psetupB, psolveB);
@@ -426,11 +415,7 @@ namespace casadi {
     // Integrate, unless already at desired time
     if (t<m->t) {
       THROWING(CVodeB, m->mem, t, CV_NORMAL);
-
-      // Get backward state
       THROWING(CVodeGetB, m->mem, m->whichB, &m->t, m->rxz);
-
-      // Get backward qudratures
       if (nrq_>0) {
         THROWING(CVodeGetQuadB, m->mem, m->whichB, &m->t, m->rq);
       }

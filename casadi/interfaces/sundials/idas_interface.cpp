@@ -138,21 +138,23 @@ namespace casadi {
 
     create_function("daeF", {"x", "z", "p", "t"}, {"ode", "alg"});
     create_function("quadF", {"x", "z", "p", "t"}, {"quad"});
-    create_function("daeB", {"rx", "rz", "rp", "x", "z", "p", "t"},
-                            {"rode", "ralg"});
-    create_function("quadB", {"rx", "rz", "rp", "x", "z", "p", "t"},
-                             {"rquad"});
+    create_function("daeB", {"rx", "rz", "rp", "x", "z", "p", "t"}, {"rode", "ralg"});
+    create_function("quadB", {"rx", "rz", "rp", "x", "z", "p", "t"}, {"rquad"});
 
     // Create a Jacobian if requested
     if (exact_jacobian_) {
       set_function(oracle_.is_a("sxfunction") ? getJacF<SX>() : getJacF<MX>());
-      init_linsol();
+      init_jacF();
+    } else {
+
     }
 
     // Create a backwards Jacobian if requested
-    if (exact_jacobianB_ && nrx_>0) {
-      set_function(oracle_.is_a("sxfunction") ? getJacB<SX>() : getJacB<MX>());
-      init_linsolB();
+    if (nrx_>0) {
+      if (exact_jacobianB_) {
+        set_function(oracle_.is_a("sxfunction") ? getJacB<SX>() : getJacB<MX>());
+        init_jacB();
+      }
     }
 
     // Get initial conditions for the state derivatives
@@ -392,27 +394,16 @@ namespace casadi {
     if (exact_jacobian_) THROWING(IDADlsSetBandJacFn, m->mem, bjac);
     break;
     case SD_ITERATIVE:
-    // Attach an iterative solver
     switch (itsol_f_) {
     case SD_GMRES: THROWING(IDASpgmr, m->mem, max_krylov_); break;
     case SD_BCGSTAB: THROWING(IDASpbcg, m->mem, max_krylov_); break;
     case SD_TFQMR: THROWING(IDASptfqmr, m->mem, max_krylov_); break;
     }
-
-    // Attach functions for jacobian information
     if (exact_jacobian_) THROWING(IDASpilsSetJacTimesVecFn, m->mem, jtimes);
-
-    // Add a preconditioner
-    if (use_preconditioner_) {
-      casadi_assert_message(has_function("jacF"), "No Jacobian function");
-      casadi_assert_message(has_function("linsolF"), "No linear solver");
-      THROWING(IDASpilsSetPreconditioner, m->mem, psetup, psolve);
-    }
+    if (use_precon_) THROWING(IDASpilsSetPreconditioner, m->mem, psetup, psolve);
     break;
     case SD_USER_DEFINED:
     {
-      casadi_assert_message(has_function("jacF"), "No Jacobian function");
-      casadi_assert_message(has_function("linsolF"), "No linear solver");
       IDAMem IDA_mem = IDAMem(m->mem);
       IDA_mem->ida_lmem   = m;
       IDA_mem->ida_lsetup = lsetup;
@@ -599,7 +590,7 @@ namespace casadi {
       }
 
       // Add a preconditioner
-      if (use_preconditionerB_) {
+      if (use_preconB_) {
         casadi_assert_message(has_function("jacB"), "No Jacobian function");
         casadi_assert_message(has_function("linsolB"), "No linear solver");
         THROWING(IDASpilsSetPreconditionerB, m->mem, m->whichB, psetupB, psolveB);

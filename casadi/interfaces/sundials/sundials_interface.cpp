@@ -181,7 +181,7 @@ namespace casadi {
     max_num_steps_ = 10000;
     finite_difference_fsens_ = false;
     stop_at_end_ = true;
-    use_preconditioner_ = false;
+    use_precon_ = false;
     max_krylov_ = 10;
     linear_solver_ = "csparse";
     string linear_solver_type = "user_defined";
@@ -212,7 +212,7 @@ namespace casadi {
       } else if (op.first=="stop_at_end") {
         stop_at_end_ = op.second;
       } else if (op.first=="use_preconditioner") {
-        use_preconditioner_ = op.second;
+        use_precon_ = op.second;
       } else if (op.first=="max_krylov") {
         max_krylov_ = op.second;
       } else if (op.first=="linear_solver_type") {
@@ -252,7 +252,7 @@ namespace casadi {
     fsens_reltol_ = reltol_;
     abstolB_ = abstol_;
     reltolB_ = reltol_;
-    use_preconditionerB_ = use_preconditioner_;
+    use_preconB_ = use_precon_;
     max_krylovB_ = max_krylov_;
     std::string linear_solver_typeB = linear_solver_type;
     std::string iterative_solverB = iterative_solver;
@@ -273,7 +273,7 @@ namespace casadi {
       } else if (op.first=="reltolB") {
         reltolB_ = op.second;
       } else if (op.first=="use_preconditionerB") {
-        use_preconditionerB_ = op.second;
+        use_preconB_ = op.second;
       } else if (op.first=="max_krylovB") {
         max_krylovB_ = op.second;
       } else if (op.first=="linear_solver_typeB") {
@@ -371,9 +371,23 @@ namespace casadi {
     // Allocate work vectors
     alloc_w(np_, true); // p
     alloc_w(nrp_, true); // rp
+
+    // Is exact Jacobian required?
+    if (linsol_f_==SD_USER_DEFINED ||
+      (linsol_f_==SD_ITERATIVE && use_precon_)) {
+        casadi_assert_message(exact_jacobian_, "Exact Jacobian required");
+    }
+
+    // Is exact Jacobian required?
+    if (nrx_>0) {
+      if (linsol_g_==SD_USER_DEFINED ||
+        (linsol_g_==SD_ITERATIVE && use_preconB_)) {
+          casadi_assert_message(exact_jacobianB_, "Exact Jacobian required");
+      }
+    }
   }
 
-  void SundialsInterface::init_linsol() {
+  void SundialsInterface::init_jacF() {
     // Get sparsity
     const Sparsity& sp = get_function("jacF").sparsity_out(0);
 
@@ -388,7 +402,7 @@ namespace casadi {
     ubw_ = sp.bw_upper();
   }
 
-  void SundialsInterface::init_linsolB() {
+  void SundialsInterface::init_jacB() {
     // Get sparsity
     const Sparsity& sp = get_function("jacB").sparsity_out(0);
 

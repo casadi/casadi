@@ -97,8 +97,8 @@ namespace casadi {
 
     ///@{
     // Initialize linear solver
-    void init_linsol();
-    void init_linsolB();
+    void init_jacF();
+    void init_jacB();
     ///@}
 
     /// Get all statistics
@@ -154,7 +154,7 @@ namespace casadi {
     int max_krylov_, max_krylovB_;
 
     /// Use preconditioning
-    bool use_preconditioner_, use_preconditionerB_;
+    bool use_precon_, use_preconB_;
 
     /** \brief Set the (persistent) work vectors */
     virtual void set_work(void* mem, const double**& arg, double**& res,
