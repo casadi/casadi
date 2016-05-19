@@ -215,81 +215,6 @@ namespace casadi {
     m->isInitTaping = true;
   }
 
-  void IdasInterface::initAdj(IdasMemory* m) const {
-    log("IdasInterface::initAdj", "start");
-
-    casadi_assert(!m->isInitAdj);
-    int flag;
-
-    // Create backward problem
-    flag = IDACreateB(m->mem, &m->whichB);
-    if (flag != IDA_SUCCESS) idas_error("IDACreateB", flag);
-
-    // Initialize the backward problem
-    double tB0 = grid_.back();
-    flag = IDAInitB(m->mem, m->whichB, resB, tB0, m->rxz, m->rxzdot);
-    if (flag != IDA_SUCCESS) idas_error("IDAInitB", flag);
-
-    // Set tolerances
-    flag = IDASStolerancesB(m->mem, m->whichB, reltolB_, abstolB_);
-    if (flag!=IDA_SUCCESS) idas_error("IDASStolerancesB", flag);
-
-    // User data
-    flag = IDASetUserDataB(m->mem, m->whichB, m);
-    if (flag != IDA_SUCCESS) idas_error("IDASetUserDataB", flag);
-
-    // Maximum number of steps
-    IDASetMaxNumStepsB(m->mem, m->whichB, max_num_steps_);
-    if (flag != IDA_SUCCESS) idas_error("IDASetMaxNumStepsB", flag);
-
-    // Set algebraic components
-    N_Vector id = N_VNew_Serial(nrx_+nrz_);
-    fill_n(NV_DATA_S(id), nrx_, 1);
-    fill_n(NV_DATA_S(id)+nrx_, nrz_, 0);
-
-    // Pass this information to IDAS
-    flag = IDASetIdB(m->mem, m->whichB, id);
-    if (flag != IDA_SUCCESS) idas_error("IDASetIdB", flag);
-
-    // Delete the allocated memory
-    N_VDestroy_Serial(id);
-
-    // attach linear solver
-    switch (linsol_g_) {
-    case SD_DENSE:
-      initDenseLinsolB(m);
-      break;
-    case SD_BANDED:
-      initBandedLinsolB(m);
-      break;
-    case SD_ITERATIVE:
-      initIterativeLinsolB(m);
-      break;
-    case SD_USER_DEFINED:
-      initUserDefinedLinsolB(m);
-      break;
-    default: casadi_error("Uncaught switch");
-    }
-
-    // Quadratures for the adjoint problem
-    flag = IDAQuadInitB(m->mem, m->whichB, rhsQB, m->rq);
-    if (flag!=IDA_SUCCESS) idas_error("IDAQuadInitB", flag);
-
-    // Quadrature error control
-    if (quad_err_con_) {
-      flag = IDASetQuadErrConB(m->mem, m->whichB, true);
-      if (flag != IDA_SUCCESS) idas_error("IDASetQuadErrConB", flag);
-
-      flag = IDAQuadSStolerancesB(m->mem, m->whichB, reltolB_, abstolB_);
-      if (flag != IDA_SUCCESS) idas_error("IDAQuadSStolerancesB", flag);
-    }
-
-    // Mark initialized
-    m->isInitAdj = true;
-
-    log("IdasInterface::initAdj", "end");
-  }
-
   int IdasInterface::res(double t, N_Vector xz, N_Vector xzdot,
                                 N_Vector rr, void *user_data) {
     try {
@@ -634,14 +559,70 @@ namespace casadi {
                              const double* rz, const double* rp) const {
     log("IdasInterface::resetB", "begin");
     auto m = to_mem(mem);
+    int flag;
 
     // Reset the base classes
     SundialsInterface::resetB(mem, t, rx, rz, rp);
 
-    int flag;
+    if (!m->isInitAdj) { // First call
+      // Create backward problem
+      flag = IDACreateB(m->mem, &m->whichB);
+      if (flag != IDA_SUCCESS) idas_error("IDACreateB", flag);
 
-    // Reset adjoint sensitivities for the parameters
-    if (m->isInitAdj) {
+      // Initialize the backward problem
+      double tB0 = grid_.back();
+      flag = IDAInitB(m->mem, m->whichB, resB, tB0, m->rxz, m->rxzdot);
+      if (flag != IDA_SUCCESS) idas_error("IDAInitB", flag);
+
+      // Set tolerances
+      flag = IDASStolerancesB(m->mem, m->whichB, reltolB_, abstolB_);
+      if (flag!=IDA_SUCCESS) idas_error("IDASStolerancesB", flag);
+
+      // User data
+      flag = IDASetUserDataB(m->mem, m->whichB, m);
+      if (flag != IDA_SUCCESS) idas_error("IDASetUserDataB", flag);
+
+      // Maximum number of steps
+      IDASetMaxNumStepsB(m->mem, m->whichB, max_num_steps_);
+      if (flag != IDA_SUCCESS) idas_error("IDASetMaxNumStepsB", flag);
+
+      // Set algebraic components
+      N_Vector id = N_VNew_Serial(nrx_+nrz_);
+      fill_n(NV_DATA_S(id), nrx_, 1);
+      fill_n(NV_DATA_S(id)+nrx_, nrz_, 0);
+
+      // Pass this information to IDAS
+      flag = IDASetIdB(m->mem, m->whichB, id);
+      if (flag != IDA_SUCCESS) idas_error("IDASetIdB", flag);
+
+      // Delete the allocated memory
+      N_VDestroy_Serial(id);
+
+      // attach linear solver
+      switch (linsol_g_) {
+      case SD_DENSE: initDenseLinsolB(m); break;
+      case SD_BANDED: initBandedLinsolB(m); break;
+      case SD_ITERATIVE: initIterativeLinsolB(m); break;
+      case SD_USER_DEFINED: initUserDefinedLinsolB(m); break;
+      default: casadi_error("Uncaught switch");
+      }
+
+      // Quadratures for the adjoint problem
+      flag = IDAQuadInitB(m->mem, m->whichB, rhsQB, m->rq);
+      if (flag!=IDA_SUCCESS) idas_error("IDAQuadInitB", flag);
+
+      // Quadrature error control
+      if (quad_err_con_) {
+        flag = IDASetQuadErrConB(m->mem, m->whichB, true);
+        if (flag != IDA_SUCCESS) idas_error("IDASetQuadErrConB", flag);
+
+        flag = IDAQuadSStolerancesB(m->mem, m->whichB, reltolB_, abstolB_);
+        if (flag != IDA_SUCCESS) idas_error("IDAQuadSStolerancesB", flag);
+      }
+
+      // Mark initialized
+      m->isInitAdj = true;
+    } else { // Re-initialize
       flag = IDAReInitB(m->mem, m->whichB, grid_.back(), m->rxz, m->rxzdot);
       if (flag != IDA_SUCCESS) idas_error("IDAReInitB", flag);
 
@@ -649,11 +630,8 @@ namespace casadi {
         flag = IDAQuadReInit(IDAGetAdjIDABmem(m->mem, m->whichB), m->rq);
         // flag = IDAQuadReInitB(m->mem, m->whichB[dir], m->rq[dir]); // BUG in Sundials
         //                                                      // do not use this!
+        if (flag!=IDA_SUCCESS) idas_error("IDAQuadReInitB", flag);
       }
-      if (flag!=IDA_SUCCESS) idas_error("IDAQuadReInitB", flag);
-    } else {
-      // Initialize the adjoint integration
-      initAdj(m);
     }
 
     // Correct initial values for the integration if necessary

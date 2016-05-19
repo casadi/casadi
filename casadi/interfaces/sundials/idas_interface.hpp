@@ -117,9 +117,6 @@ namespace casadi {
     /** \brief Initialize the taping */
     void initTaping(IdasMemory* m) const;
 
-    /** \brief Initialize the backward problem (can only be called after the first integration) */
-    virtual void initAdj(IdasMemory* m) const;
-
     /** \brief Create memory block */
     virtual void* alloc_memory() const { return new IdasMemory(*this);}
 

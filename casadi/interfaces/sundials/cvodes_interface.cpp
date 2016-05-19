@@ -148,57 +148,6 @@ namespace casadi {
     }
   }
 
-  void CvodesInterface::initAdj(CvodesMemory* m) const {
-
-    // Create backward problem (use the same lmm and iter)
-    int flag = CVodeCreateB(m->mem, lmm_, iter_, &m->whichB);
-    if (flag != CV_SUCCESS) cvodes_error("CVodeCreateB", flag);
-
-    // Initialize the backward problem
-    double tB0 = grid_.back();
-    flag = CVodeInitB(m->mem, m->whichB, rhsB, tB0, m->rxz);
-    if (flag != CV_SUCCESS) cvodes_error("CVodeInitB", flag);
-
-    // Set tolerances
-    flag = CVodeSStolerancesB(m->mem, m->whichB, reltolB_, abstolB_);
-    if (flag!=CV_SUCCESS) cvodes_error("CVodeSStolerancesB", flag);
-
-    // User data
-    flag = CVodeSetUserDataB(m->mem, m->whichB, m);
-    if (flag != CV_SUCCESS) cvodes_error("CVodeSetUserDataB", flag);
-
-    // attach linear solver to backward problem
-    switch (linsol_g_) {
-    case SD_DENSE:
-      initDenseLinsolB(m);
-      break;
-    case SD_BANDED:
-      initBandedLinsolB(m);
-      break;
-    case SD_ITERATIVE:
-      initIterativeLinsolB(m);
-      break;
-    case SD_USER_DEFINED:
-      initUserDefinedLinsolB(m);
-      break;
-    }
-
-    // Quadratures for the backward problem
-    flag = CVodeQuadInitB(m->mem, m->whichB, rhsQB, m->rq);
-    if (flag!=CV_SUCCESS) cvodes_error("CVodeQuadInitB", flag);
-
-    if (quad_err_con_) {
-      flag = CVodeSetQuadErrConB(m->mem, m->whichB, true);
-      if (flag != CV_SUCCESS) cvodes_error("CVodeSetQuadErrConB", flag);
-
-      flag = CVodeQuadSStolerancesB(m->mem, m->whichB, reltolB_, abstolB_);
-      if (flag != CV_SUCCESS) cvodes_error("CVodeQuadSStolerancesB", flag);
-    }
-
-    // Mark initialized
-    m->isInitAdj = true;
-  }
-
   void CvodesInterface::init_memory(void* mem) const {
     SundialsInterface::init_memory(mem);
     auto m = to_mem(mem);
@@ -390,17 +339,52 @@ namespace casadi {
     SundialsInterface::resetB(mem, t, rx, rz, rp);
 
     int flag;
-    if (m->isInitAdj) {
+    if (!m->isInitAdj) { // First call
+      // Create backward problem (use the same lmm and iter)
+      int flag = CVodeCreateB(m->mem, lmm_, iter_, &m->whichB);
+      if (flag != CV_SUCCESS) cvodes_error("CVodeCreateB", flag);
+
+      // Initialize the backward problem
+      double tB0 = grid_.back();
+      flag = CVodeInitB(m->mem, m->whichB, rhsB, tB0, m->rxz);
+      if (flag != CV_SUCCESS) cvodes_error("CVodeInitB", flag);
+
+      // Set tolerances
+      flag = CVodeSStolerancesB(m->mem, m->whichB, reltolB_, abstolB_);
+      if (flag!=CV_SUCCESS) cvodes_error("CVodeSStolerancesB", flag);
+
+      // User data
+      flag = CVodeSetUserDataB(m->mem, m->whichB, m);
+      if (flag != CV_SUCCESS) cvodes_error("CVodeSetUserDataB", flag);
+
+      // attach linear solver to backward problem
+      switch (linsol_g_) {
+      case SD_DENSE: initDenseLinsolB(m); break;
+      case SD_BANDED: initBandedLinsolB(m); break;
+      case SD_ITERATIVE: initIterativeLinsolB(m); break;
+      case SD_USER_DEFINED: initUserDefinedLinsolB(m); break;
+      }
+
+      // Quadratures for the backward problem
+      flag = CVodeQuadInitB(m->mem, m->whichB, rhsQB, m->rq);
+      if (flag!=CV_SUCCESS) cvodes_error("CVodeQuadInitB", flag);
+
+      if (quad_err_con_) {
+        flag = CVodeSetQuadErrConB(m->mem, m->whichB, true);
+        if (flag != CV_SUCCESS) cvodes_error("CVodeSetQuadErrConB", flag);
+
+        flag = CVodeQuadSStolerancesB(m->mem, m->whichB, reltolB_, abstolB_);
+        if (flag != CV_SUCCESS) cvodes_error("CVodeQuadSStolerancesB", flag);
+      }
+
+      // Mark initialized
+      m->isInitAdj = true;
+    } else {
       flag = CVodeReInitB(m->mem, m->whichB, grid_.back(), m->rxz);
       if (flag != CV_SUCCESS) cvodes_error("CVodeReInitB", flag);
 
       flag = CVodeQuadReInitB(m->mem, m->whichB, m->rq);
       if (flag!=CV_SUCCESS) cvodes_error("CVodeQuadReInitB", flag);
-
-    } else {
-
-      // Initialize the adjoint integration
-      initAdj(m);
     }
     casadi_msg("CvodesInterface::resetB end");
   }

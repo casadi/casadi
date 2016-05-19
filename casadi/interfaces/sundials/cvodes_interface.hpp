@@ -116,9 +116,6 @@ namespace casadi {
     /** \brief  Initialize stage */
     virtual void init(const Dict& opts);
 
-    /** \brief Initialize the adjoint problem (can only be called after the first integration) */
-    virtual void initAdj(CvodesMemory* m) const;
-
     /** \brief Create memory block */
     virtual void* alloc_memory() const { return new CvodesMemory(*this);}
 
