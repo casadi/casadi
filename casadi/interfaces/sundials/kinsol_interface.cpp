@@ -69,7 +69,7 @@ namespace casadi {
     f_scale_ = 0;
 
     // Default options
-    exact_jacobian_ = true;
+    exact_jac_ = true;
     disable_internal_warnings_ = false;
     max_iter_ = 0;
     maxl_ = 0;
@@ -148,7 +148,7 @@ namespace casadi {
       if (op.first=="strategy") {
         strategy = op.second.to_string();
       } else if (op.first=="exact_jacobian") {
-        exact_jacobian_ = op.second;
+        exact_jac_ = op.second;
       } else if (op.first=="u_scale") {
         u_scale = op.second;
       } else if (op.first=="f_scale") {
@@ -207,7 +207,7 @@ namespace casadi {
     // Type of linear solver
     if (linear_solver_type=="dense") {
       linear_solver_type_ = DENSE;
-      if (exact_jacobian_) {
+      if (exact_jac_) {
         // For storing Jacobian nonzeros
         alloc_w(jac_.nnz_out(0), true);
       }
@@ -215,7 +215,7 @@ namespace casadi {
       linear_solver_type_ = BANDED;
       casadi_assert(upper_bandwidth_>=0);
       casadi_assert(lower_bandwidth_>=0);
-      if (exact_jacobian_) {
+      if (exact_jac_) {
         // For storing Jacobian nonzeros
         alloc_w(jac_.nnz_out(0), true);
       }
@@ -230,7 +230,7 @@ namespace casadi {
       } else {
         casadi_error("KINSOL: Unknown sparse solver");
       }
-      if (exact_jacobian_) {
+      if (exact_jac_) {
         get_jtimes();
       }
       if (use_preconditioner_) {
@@ -837,7 +837,7 @@ namespace casadi {
       flag = KINDense(m->mem, n_);
       casadi_assert_message(flag==KIN_SUCCESS, "KINDense");
 
-      if (exact_jacobian_) {
+      if (exact_jac_) {
         flag = KINDlsSetDenseJacFn(m->mem, djac_wrapper);
         casadi_assert_message(flag==KIN_SUCCESS, "KINDlsSetDenseJacFn");
       }
@@ -847,7 +847,7 @@ namespace casadi {
       flag = KINBand(m->mem, n_, upper_bandwidth_, lower_bandwidth_);
       casadi_assert_message(flag==KIN_SUCCESS, "KINBand");
 
-      if (exact_jacobian_) {
+      if (exact_jac_) {
         flag = KINDlsSetBandJacFn(m->mem, bjac_wrapper);
         casadi_assert_message(flag==KIN_SUCCESS, "KINDlsBandJacFn");
       }
@@ -870,7 +870,7 @@ namespace casadi {
       }
 
       // Attach functions for Jacobian information
-      if (exact_jacobian_) {
+      if (exact_jac_) {
         flag = KINSpilsSetJacTimesVecFn(m->mem, jtimes_wrapper);
         casadi_assert_message(flag==KIN_SUCCESS, "KINSpilsSetJacTimesVecFn");
       }

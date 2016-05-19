@@ -125,7 +125,7 @@ namespace casadi {
     int max_iter_;
 
     // Use exact Jacobian?
-    bool exact_jacobian_;
+    bool exact_jac_;
 
     // Type of linear solver
     enum LinsolType { DENSE, BANDED, ITERATIVE, USER_DEFINED};

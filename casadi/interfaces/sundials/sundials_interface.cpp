@@ -177,7 +177,7 @@ namespace casadi {
     // Default options
     abstol_ = 1e-8;
     reltol_ = 1e-6;
-    exact_jacobian_ = true;
+    exact_jac_ = true;
     max_num_steps_ = 10000;
     finite_difference_fsens_ = false;
     stop_at_end_ = true;
@@ -204,7 +204,7 @@ namespace casadi {
       } else if (op.first=="reltol") {
         reltol_ = op.second;
       } else if (op.first=="exact_jacobian") {
-        exact_jacobian_ = op.second;
+        exact_jac_ = op.second;
       } else if (op.first=="max_num_steps") {
         max_num_steps_ = op.second;
       } else if (op.first=="finite_difference_fsens") {
@@ -247,7 +247,7 @@ namespace casadi {
     }
 
     // Default dependent options
-    exact_jacobianB_ = exact_jacobian_;
+    exact_jacB_ = exact_jac_;
     fsens_abstol_ = abstol_;
     fsens_reltol_ = reltol_;
     abstolB_ = abstol_;
@@ -263,7 +263,7 @@ namespace casadi {
     // Read options again
     for (auto&& op : opts) {
       if (op.first=="exact_jacobianB") {
-        exact_jacobianB_ = op.second;
+        exact_jacB_ = op.second;
       } else if (op.first=="fsens_abstol") {
         fsens_abstol_ = op.second;
       } else if (op.first=="fsens_reltol") {
@@ -291,7 +291,7 @@ namespace casadi {
 
     // No Jacobian of g if g doesn't exist
     if (nrx_==0) {
-      exact_jacobianB_ = false;
+      exact_jacB_ = false;
     }
 
     // Linear solver for forward integration
@@ -375,14 +375,14 @@ namespace casadi {
     // Is exact Jacobian required?
     if (linsol_f_==SD_USER_DEFINED ||
       (linsol_f_==SD_ITERATIVE && use_precon_)) {
-        casadi_assert_message(exact_jacobian_, "Exact Jacobian required");
+        casadi_assert_message(exact_jac_, "Exact Jacobian required");
     }
 
     // Is exact Jacobian required?
     if (nrx_>0) {
       if (linsol_g_==SD_USER_DEFINED ||
         (linsol_g_==SD_ITERATIVE && use_preconB_)) {
-          casadi_assert_message(exact_jacobianB_, "Exact Jacobian required");
+          casadi_assert_message(exact_jacB_, "Exact Jacobian required");
       }
     }
   }

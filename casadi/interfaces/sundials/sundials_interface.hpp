@@ -114,7 +114,7 @@ namespace casadi {
 
     ///@{
     /// Options
-    bool exact_jacobian_, exact_jacobianB_;
+    bool exact_jac_, exact_jacB_;
     double abstol_, reltol_;
     double fsens_abstol_, fsens_reltol_;
     double abstolB_, reltolB_;

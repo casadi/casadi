@@ -95,15 +95,16 @@ namespace casadi {
     create_function("quadB", {"rx", "rp", "x", "p", "t"}, {"rquad"});
 
     // Create a Jacobian if requested
-    if (exact_jacobian_) {
+    if (exact_jac_) {
       set_function(oracle_.is_a("sxfunction") ? getJacF<SX>() : getJacF<MX>());
       init_jacF();
     }
 
     // Create a backwards Jacobian if requested
     if (nrx_>0) {
-      if (exact_jacobianB_) {
+      if (exact_jacB_) {
         set_function(oracle_.is_a("sxfunction") ? getJacB<SX>() : getJacB<MX>());
+        init_jacB();
       }
     }
 
@@ -128,7 +129,7 @@ namespace casadi {
     }
 
     // Attach functions for jacobian information
-    if (exact_jacobian_) {
+    if (exact_jac_) {
       switch (linsol_f_) {
       case SD_ITERATIVE:
         create_function("jtimesF", {"t", "x", "p", "fwd:x"}, {"fwd:ode"});
@@ -137,7 +138,7 @@ namespace casadi {
       }
     }
 
-    if (exact_jacobianB_) {
+    if (exact_jacB_) {
       switch (linsol_g_) {
       case SD_ITERATIVE:
         create_function("jtimesB",
@@ -173,11 +174,11 @@ namespace casadi {
     switch (linsol_f_) {
     case SD_DENSE:
     THROWING(CVDense, m->mem, nx_);
-    if (exact_jacobian_) THROWING(CVDlsSetDenseJacFn, m->mem, djac);
+    if (exact_jac_) THROWING(CVDlsSetDenseJacFn, m->mem, djac);
     break;
     case SD_BANDED:
     THROWING(CVBand, m->mem, nx_, ubw_, lbw_);
-    if (exact_jacobian_) THROWING(CVDlsSetBandJacFn, m->mem, bjac);
+    if (exact_jac_) THROWING(CVDlsSetBandJacFn, m->mem, bjac);
     break;
     case SD_ITERATIVE:
     switch (itsol_f_) {
@@ -185,7 +186,7 @@ namespace casadi {
     case SD_BCGSTAB: THROWING(CVSpbcg, m->mem, pretype_f_, max_krylov_); break;
     case SD_TFQMR: THROWING(CVSptfqmr, m->mem, pretype_f_, max_krylov_); break;
     }
-    if (exact_jacobian_) THROWING(CVSpilsSetJacTimesVecFn, m->mem, jtimes);
+    if (exact_jac_) THROWING(CVSpilsSetJacTimesVecFn, m->mem, jtimes);
     if (use_precon_) THROWING(CVSpilsSetPreconditioner, m->mem, psetup, psolve);
     break;
     case SD_USER_DEFINED:
@@ -354,11 +355,11 @@ namespace casadi {
       switch (linsol_g_) {
       case SD_DENSE:
       THROWING(CVDenseB, m->mem, m->whichB, nrx_);
-      if (exact_jacobianB_) THROWING(CVDlsSetDenseJacFnB, m->mem, m->whichB, djacB);
+      if (exact_jacB_) THROWING(CVDlsSetDenseJacFnB, m->mem, m->whichB, djacB);
       break;
       case SD_BANDED:
       THROWING(CVBandB, m->mem, m->whichB, nrx_, ubwB_, lbwB_);
-      if (exact_jacobianB_) THROWING(CVDlsSetBandJacFnB, m->mem, m->whichB, bjacB);
+      if (exact_jacB_) THROWING(CVDlsSetBandJacFnB, m->mem, m->whichB, bjacB);
       break;
       case SD_ITERATIVE:
       switch (itsol_g_) {
@@ -366,21 +367,11 @@ namespace casadi {
       case SD_BCGSTAB: THROWING(CVSpbcgB, m->mem, m->whichB, pretype_g_, max_krylovB_); break;
       case SD_TFQMR: THROWING(CVSptfqmrB, m->mem, m->whichB, pretype_g_, max_krylovB_); break;
       }
-
-      // Attach functions for jacobian information
-      if (exact_jacobianB_) THROWING(CVSpilsSetJacTimesVecFnB, m->mem, m->whichB, jtimesB);
-
-      // Add a preconditioner
-      if (use_preconB_) {
-        casadi_assert_message(has_function("jacB"), "No Jacobian function");
-        casadi_assert_message(has_function("linsolB"), "No linear solver");
-        THROWING(CVSpilsSetPreconditionerB, m->mem, m->whichB, psetupB, psolveB);
-      }
+      if (exact_jacB_) THROWING(CVSpilsSetJacTimesVecFnB, m->mem, m->whichB, jtimesB);
+      if (use_preconB_) THROWING(CVSpilsSetPreconditionerB, m->mem, m->whichB, psetupB, psolveB);
       break;
       case SD_USER_DEFINED:
       {
-        casadi_assert_message(has_function("jacB"), "No Jacobian function");
-        casadi_assert_message(has_function("linsolB"), "No linear solver");
         CVodeMem cv_mem = static_cast<CVodeMem>(m->mem);
         CVadjMem ca_mem = cv_mem->cv_adj_mem;
         CVodeBMem cvB_mem = ca_mem->cvB_mem;

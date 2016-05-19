@@ -142,7 +142,7 @@ namespace casadi {
     create_function("quadB", {"rx", "rz", "rp", "x", "z", "p", "t"}, {"rquad"});
 
     // Create a Jacobian if requested
-    if (exact_jacobian_) {
+    if (exact_jac_) {
       set_function(oracle_.is_a("sxfunction") ? getJacF<SX>() : getJacF<MX>());
       init_jacF();
     } else {
@@ -151,7 +151,7 @@ namespace casadi {
 
     // Create a backwards Jacobian if requested
     if (nrx_>0) {
-      if (exact_jacobianB_) {
+      if (exact_jacB_) {
         set_function(oracle_.is_a("sxfunction") ? getJacB<SX>() : getJacB<MX>());
         init_jacB();
       }
@@ -171,7 +171,7 @@ namespace casadi {
     }
 
     // Attach functions for jacobian information
-    if (exact_jacobian_) {
+    if (exact_jac_) {
       switch (linsol_f_) {
       case SD_ITERATIVE:
         create_function("jtimesF",
@@ -182,7 +182,7 @@ namespace casadi {
       }
     }
 
-    if (exact_jacobianB_) {
+    if (exact_jacB_) {
       switch (linsol_g_) {
       case SD_ITERATIVE:
         create_function("jtimesB",
@@ -387,11 +387,11 @@ namespace casadi {
     switch (linsol_f_) {
     case SD_DENSE:
     THROWING(IDADense, m->mem, nx_+nz_);
-    if (exact_jacobian_) THROWING(IDADlsSetDenseJacFn, m->mem, djac);
+    if (exact_jac_) THROWING(IDADlsSetDenseJacFn, m->mem, djac);
     break;
     case SD_BANDED:
     THROWING(IDABand, m->mem, nx_+nz_, ubw_, lbw_);
-    if (exact_jacobian_) THROWING(IDADlsSetBandJacFn, m->mem, bjac);
+    if (exact_jac_) THROWING(IDADlsSetBandJacFn, m->mem, bjac);
     break;
     case SD_ITERATIVE:
     switch (itsol_f_) {
@@ -399,7 +399,7 @@ namespace casadi {
     case SD_BCGSTAB: THROWING(IDASpbcg, m->mem, max_krylov_); break;
     case SD_TFQMR: THROWING(IDASptfqmr, m->mem, max_krylov_); break;
     }
-    if (exact_jacobian_) THROWING(IDASpilsSetJacTimesVecFn, m->mem, jtimes);
+    if (exact_jac_) THROWING(IDASpilsSetJacTimesVecFn, m->mem, jtimes);
     if (use_precon_) THROWING(IDASpilsSetPreconditioner, m->mem, psetup, psolve);
     break;
     case SD_USER_DEFINED:
@@ -571,11 +571,11 @@ namespace casadi {
       switch (linsol_g_) {
       case SD_DENSE:
       THROWING(IDADenseB, m->mem, m->whichB, nrx_+nrz_);
-      if (exact_jacobianB_) THROWING(IDADlsSetDenseJacFnB, m->mem, m->whichB, djacB);
+      if (exact_jacB_) THROWING(IDADlsSetDenseJacFnB, m->mem, m->whichB, djacB);
       break;
       case SD_BANDED:
       THROWING(IDABandB, m->mem, m->whichB, nrx_+nrz_, ubwB_, lbwB_);
-      if (exact_jacobianB_) THROWING(IDADlsSetBandJacFnB, m->mem, m->whichB, bjacB);
+      if (exact_jacB_) THROWING(IDADlsSetBandJacFnB, m->mem, m->whichB, bjacB);
       break;
       case SD_ITERATIVE:
       switch (itsol_g_) {
@@ -583,30 +583,15 @@ namespace casadi {
       case SD_BCGSTAB: THROWING(IDASpbcgB, m->mem, m->whichB, max_krylovB_); break;
       case SD_TFQMR: THROWING(IDASptfqmrB, m->mem, m->whichB, max_krylovB_); break;
       }
-
-      // Attach functions for jacobian information
-      if (exact_jacobianB_) {
-        THROWING(IDASpilsSetJacTimesVecFnB, m->mem, m->whichB, jtimesB);
-      }
-
-      // Add a preconditioner
-      if (use_preconB_) {
-        casadi_assert_message(has_function("jacB"), "No Jacobian function");
-        casadi_assert_message(has_function("linsolB"), "No linear solver");
-        THROWING(IDASpilsSetPreconditionerB, m->mem, m->whichB, psetupB, psolveB);
-      }
+      if (exact_jacB_) THROWING(IDASpilsSetJacTimesVecFnB, m->mem, m->whichB, jtimesB);
+      if (use_preconB_) THROWING(IDASpilsSetPreconditionerB, m->mem, m->whichB, psetupB, psolveB);
       break;
       case SD_USER_DEFINED:
       {
-        casadi_assert_message(has_function("jacB"), "No Jacobian function");
-        casadi_assert_message(has_function("linsolB"), "No linear solver");
-
-        //  Set fields in the IDA memory
         IDAMem IDA_mem = IDAMem(m->mem);
         IDAadjMem IDAADJ_mem = IDA_mem->ida_adj_mem;
         IDABMem IDAB_mem = IDAADJ_mem->IDAB_mem;
         IDAB_mem->ida_lmem   = m;
-
         IDAB_mem->IDA_mem->ida_lmem = m;
         IDAB_mem->IDA_mem->ida_lsetup = lsetupB;
         IDAB_mem->IDA_mem->ida_lsolve = lsolveB;
