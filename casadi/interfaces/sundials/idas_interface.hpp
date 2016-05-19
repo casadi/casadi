@@ -237,7 +237,7 @@ namespace casadi {
   public:
 
     // Throw error
-    static void idas_error(const std::string& module, int flag);
+    static void idas_error(const char* module, int flag);
 
     // Initialize the dense linear solver
     void initDenseLinsol(IdasMemory* m) const;

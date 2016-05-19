@@ -24,12 +24,11 @@
 
 
 #include "idas_interface.hpp"
-
 #include "casadi/core/std_vector_tools.hpp"
 
-#ifdef WITH_SYSTEM_SUNDIALS
-#include <external_packages/sundials-2.5mod/idas/idas_spils_impl.h>
-#endif
+// Macro for error handling
+#define THROWING(fcn, ...) \
+idas_error(CASADI_ASSERT_STR(fcn) CASADI_ASSERT_WHERE, fcn(__VA_ARGS__))
 
 using namespace std;
 namespace casadi {
@@ -209,9 +208,7 @@ namespace casadi {
     }
 
     // Initialize adjoint sensitivities
-    int flag = IDAAdjInit(m->mem, steps_per_checkpoint_, interpType);
-    if (flag != IDA_SUCCESS) idas_error("IDAAdjInit", flag);
-
+    THROWING(IDAAdjInit, m->mem, steps_per_checkpoint_, interpType);
     m->isInitTaping = true;
   }
 
@@ -378,8 +375,7 @@ namespace casadi {
     }
 
     // Maximum number of steps
-    IDASetMaxNumSteps(m->mem, max_num_steps_);
-    if (flag != IDA_SUCCESS) idas_error("IDASetMaxNumSteps", flag);
+    THROWING(IDASetMaxNumSteps, m->mem, max_num_steps_);
 
     // Set algebraic components
     N_Vector id = N_VNew_Serial(nx_+nz_);
@@ -387,8 +383,7 @@ namespace casadi {
     fill_n(NV_DATA_S(id)+nx_, nz_, 0);
 
     // Pass this information to IDAS
-    flag = IDASetId(m->mem, id);
-    if (flag != IDA_SUCCESS) idas_error("IDASetId", flag);
+    THROWING(IDASetId, m->mem, id);
 
     // Delete the allocated memory
     N_VDestroy_Serial(id);
@@ -414,18 +409,15 @@ namespace casadi {
     if (nq_>0) {
 
       // Initialize quadratures in IDAS
-      flag = IDAQuadInit(m->mem, rhsQ, m->q);
-      if (flag != IDA_SUCCESS) idas_error("IDAQuadInit", flag);
+      THROWING(IDAQuadInit, m->mem, rhsQ, m->q);
 
       // Should the quadrature errors be used for step size control?
       if (quad_err_con_) {
-        flag = IDASetQuadErrCon(m->mem, true);
-        casadi_assert_message(flag == IDA_SUCCESS, "IDASetQuadErrCon");
+        THROWING(IDASetQuadErrCon, m->mem, true);
 
         // Quadrature error tolerances
         // TODO(Joel): vector absolute tolerances
-        flag = IDAQuadSStolerances(m->mem, reltol_, abstol_);
-        if (flag != IDA_SUCCESS) idas_error("IDAQuadSStolerances", flag);
+        THROWING(IDAQuadSStolerances, m->mem, reltol_, abstol_);
       }
     }
 
@@ -459,21 +451,13 @@ namespace casadi {
 
     // Re-initialize
     copy(init_xdot_.begin(), init_xdot_.end(), NV_DATA_S(m->xzdot));
-    flag = IDAReInit(m->mem, grid_.front(), m->xz, m->xzdot);
-    if (flag != IDA_SUCCESS) idas_error("IDAReInit", flag);
-    log("IdasInterface::reset", "re-initialized IVP solution");
-
+    THROWING(IDAReInit, m->mem, grid_.front(), m->xz, m->xzdot);
 
     // Re-initialize quadratures
-    if (nq_>0) {
-      flag = IDAQuadReInit(m->mem, m->q);
-      if (flag != IDA_SUCCESS) idas_error("IDAQuadReInit", flag);
-      log("IdasInterface::reset", "re-initialized quadratures");
-    }
+    if (nq_>0) THROWING(IDAQuadReInit, m->mem, m->q);
 
     // Turn off sensitivities
-    flag = IDASensToggleOff(m->mem);
-    if (flag != IDA_SUCCESS) idas_error("IDASensToggleOff", flag);
+    THROWING(IDASensToggleOff, m->mem);
 
     // Correct initial conditions, if necessary
     if (calc_ic_) {
@@ -482,8 +466,7 @@ namespace casadi {
 
     // Re-initialize backward integration
     if (nrx_>0) {
-      flag = IDAAdjReInit(m->mem);
-      if (flag != IDA_SUCCESS) idas_error("IDAAdjReInit", flag);
+      THROWING(IDAAdjReInit, m->mem);
     }
 
     // Set the stop time of the integration -- don't integrate past this point
@@ -494,18 +477,8 @@ namespace casadi {
 
 
   void IdasInterface::correctInitialConditions(IdasMemory* m) const {
-    log("IdasInterface::correctInitialConditions", "begin");
-
-    // Calculate consistent initial conditions
-    int flag = IDACalcIC(m->mem, IDA_YA_YDP_INIT , first_time_);
-    if (flag != IDA_SUCCESS) idas_error("IDACalcIC", flag);
-
-    // Retrieve the initial values
-    flag = IDAGetConsistentIC(m->mem, m->xz, m->xzdot);
-    if (flag != IDA_SUCCESS) idas_error("IDAGetConsistentIC", flag);
-
-    // Print progress
-    log("IdasInterface::correctInitialConditions", "end");
+    THROWING(IDACalcIC, m->mem, IDA_YA_YDP_INIT , first_time_);
+    THROWING(IDAGetConsistentIC, m->mem, m->xz, m->xzdot);
   }
 
   void IdasInterface::
@@ -523,21 +496,16 @@ namespace casadi {
     double ttol = 1e-9;   // tolerance
     if (fabs(m->t-t)>=ttol) {
       // Integrate forward ...
-      if (nrx_>0) {
-        // ... with taping
-        int flag = IDASolveF(m->mem, t, &m->t, m->xz, m->xzdot, IDA_NORMAL, &m->ncheck);
-        if (flag != IDA_SUCCESS && flag != IDA_TSTOP_RETURN) idas_error("IDASolveF", flag);
-      } else {
-        // ... without taping
-        int flag = IDASolve(m->mem, t, &m->t, m->xz, m->xzdot, IDA_NORMAL);
-        if (flag != IDA_SUCCESS && flag != IDA_TSTOP_RETURN) idas_error("IDASolve", flag);
+      if (nrx_>0) { // ... with taping
+        THROWING(IDASolveF, m->mem, t, &m->t, m->xz, m->xzdot, IDA_NORMAL, &m->ncheck);
+      } else { // ... without taping
+        THROWING(IDASolve, m->mem, t, &m->t, m->xz, m->xzdot, IDA_NORMAL);
       }
 
       // Get quadratures
       if (nq_>0) {
         double tret;
-        int flag = IDAGetQuad(m->mem, &tret, m->q);
-        if (flag != IDA_SUCCESS) idas_error("IDAGetQuad", flag);
+        THROWING(IDAGetQuad, m->mem, &tret, m->q);
       }
     }
 
@@ -549,10 +517,9 @@ namespace casadi {
     // Print statistics
     if (print_stats_) printStats(m, userOut());
 
-    int flag = IDAGetIntegratorStats(m->mem, &m->nsteps, &m->nfevals, &m->nlinsetups,
-                                     &m->netfails, &m->qlast, &m->qcur, &m->hinused,
-                                     &m->hlast, &m->hcur, &m->tcur);
-    if (flag!=IDA_SUCCESS) idas_error("IDAGetIntegratorStats", flag);
+    THROWING(IDAGetIntegratorStats, m->mem, &m->nsteps, &m->nfevals, &m->nlinsetups,
+             &m->netfails, &m->qlast, &m->qcur, &m->hinused,
+             &m->hlast, &m->hcur, &m->tcur);
   }
 
   void IdasInterface::resetB(IntegratorMemory* mem, double t, const double* rx,
@@ -566,25 +533,20 @@ namespace casadi {
 
     if (!m->isInitAdj) { // First call
       // Create backward problem
-      flag = IDACreateB(m->mem, &m->whichB);
-      if (flag != IDA_SUCCESS) idas_error("IDACreateB", flag);
+      THROWING(IDACreateB, m->mem, &m->whichB);
 
       // Initialize the backward problem
       double tB0 = grid_.back();
-      flag = IDAInitB(m->mem, m->whichB, resB, tB0, m->rxz, m->rxzdot);
-      if (flag != IDA_SUCCESS) idas_error("IDAInitB", flag);
+      THROWING(IDAInitB, m->mem, m->whichB, resB, tB0, m->rxz, m->rxzdot);
 
       // Set tolerances
-      flag = IDASStolerancesB(m->mem, m->whichB, reltolB_, abstolB_);
-      if (flag!=IDA_SUCCESS) idas_error("IDASStolerancesB", flag);
+      THROWING(IDASStolerancesB, m->mem, m->whichB, reltolB_, abstolB_);
 
       // User data
-      flag = IDASetUserDataB(m->mem, m->whichB, m);
-      if (flag != IDA_SUCCESS) idas_error("IDASetUserDataB", flag);
+      THROWING(IDASetUserDataB, m->mem, m->whichB, m);
 
       // Maximum number of steps
-      IDASetMaxNumStepsB(m->mem, m->whichB, max_num_steps_);
-      if (flag != IDA_SUCCESS) idas_error("IDASetMaxNumStepsB", flag);
+      THROWING(IDASetMaxNumStepsB, m->mem, m->whichB, max_num_steps_);
 
       // Set algebraic components
       N_Vector id = N_VNew_Serial(nrx_+nrz_);
@@ -592,8 +554,7 @@ namespace casadi {
       fill_n(NV_DATA_S(id)+nrx_, nrz_, 0);
 
       // Pass this information to IDAS
-      flag = IDASetIdB(m->mem, m->whichB, id);
-      if (flag != IDA_SUCCESS) idas_error("IDASetIdB", flag);
+      THROWING(IDASetIdB, m->mem, m->whichB, id);
 
       // Delete the allocated memory
       N_VDestroy_Serial(id);
@@ -608,43 +569,31 @@ namespace casadi {
       }
 
       // Quadratures for the adjoint problem
-      flag = IDAQuadInitB(m->mem, m->whichB, rhsQB, m->rq);
-      if (flag!=IDA_SUCCESS) idas_error("IDAQuadInitB", flag);
+      THROWING(IDAQuadInitB, m->mem, m->whichB, rhsQB, m->rq);
 
       // Quadrature error control
       if (quad_err_con_) {
-        flag = IDASetQuadErrConB(m->mem, m->whichB, true);
-        if (flag != IDA_SUCCESS) idas_error("IDASetQuadErrConB", flag);
-
-        flag = IDAQuadSStolerancesB(m->mem, m->whichB, reltolB_, abstolB_);
-        if (flag != IDA_SUCCESS) idas_error("IDAQuadSStolerancesB", flag);
+        THROWING(IDASetQuadErrConB, m->mem, m->whichB, true);
+        THROWING(IDAQuadSStolerancesB, m->mem, m->whichB, reltolB_, abstolB_);
       }
 
       // Mark initialized
       m->isInitAdj = true;
     } else { // Re-initialize
-      flag = IDAReInitB(m->mem, m->whichB, grid_.back(), m->rxz, m->rxzdot);
-      if (flag != IDA_SUCCESS) idas_error("IDAReInitB", flag);
+      THROWING(IDAReInitB, m->mem, m->whichB, grid_.back(), m->rxz, m->rxzdot);
 
       if (nrq_>0) {
-        flag = IDAQuadReInit(IDAGetAdjIDABmem(m->mem, m->whichB), m->rq);
-        // flag = IDAQuadReInitB(m->mem, m->whichB[dir], m->rq[dir]); // BUG in Sundials
-        //                                                      // do not use this!
-        if (flag!=IDA_SUCCESS) idas_error("IDAQuadReInitB", flag);
+        // Workaround (bug in SUNDIALS)
+        // THROWING(IDAQuadReInitB, m->mem, m->whichB[dir], m->rq[dir]);
+        void* memB = IDAGetAdjIDABmem(m->mem, m->whichB);
+        THROWING(IDAQuadReInit, memB, m->rq);
       }
     }
 
     // Correct initial values for the integration if necessary
     if (calc_icB_) {
-      log("IdasInterface::resetB", "IDACalcICB begin");
-      flag = IDACalcICB(m->mem, m->whichB, grid_.front(), m->xz, m->xzdot);
-      if (flag != IDA_SUCCESS) idas_error("IDACalcICB", flag);
-      log("IdasInterface::resetB", "IDACalcICB end");
-
-      // Retrieve the initial values
-      flag = IDAGetConsistentICB(m->mem, m->whichB, m->rxz, m->rxzdot);
-      if (flag != IDA_SUCCESS) idas_error("IDAGetConsistentICB", flag);
-
+      THROWING(IDACalcICB, m->mem, m->whichB, grid_.front(), m->xz, m->xzdot);
+      THROWING(IDAGetConsistentICB, m->mem, m->whichB, m->rxz, m->rxzdot);
     }
 
     log("IdasInterface::resetB", "end");
@@ -657,17 +606,10 @@ namespace casadi {
 
     // Integrate, unless already at desired time
     if (t<m->t) {
-      int flag = IDASolveB(m->mem, t, IDA_NORMAL);
-      if (flag<IDA_SUCCESS) idas_error("IDASolveB", flag);
-
-      // Get backward state
-      flag = IDAGetB(m->mem, m->whichB, &m->t, m->rxz, m->rxzdot);
-      if (flag!=IDA_SUCCESS) idas_error("IDAGetB", flag);
-
-      // Get backward qudratures
+      THROWING(IDASolveB, m->mem, t, IDA_NORMAL);
+      THROWING(IDAGetB, m->mem, m->whichB, &m->t, m->rxz, m->rxzdot);
       if (nrq_>0) {
-        flag = IDAGetQuadB(m->mem, m->whichB, &m->t, m->rq);
-        if (flag!=IDA_SUCCESS) idas_error("IDAGetQuadB", flag);
+        THROWING(IDAGetQuadB, m->mem, m->whichB, &m->t, m->rq);
       }
     }
 
@@ -679,12 +621,9 @@ namespace casadi {
     IDAMem IDA_mem = IDAMem(m->mem);
     IDAadjMem IDAADJ_mem = IDA_mem->ida_adj_mem;
     IDABMem IDAB_mem = IDAADJ_mem->IDAB_mem;
-    int flag = IDAGetIntegratorStats(IDAB_mem->IDA_mem, &m->nstepsB, &m->nfevalsB,
-                                     &m->nlinsetupsB,
-                                     &m->netfailsB, &m->qlastB, &m->qcurB, &m->hinusedB,
-                                     &m->hlastB,
-                                     &m->hcurB, &m->tcurB);
-    if (flag!=IDA_SUCCESS) idas_error("IDAGetIntegratorStatsB", flag);
+    THROWING(IDAGetIntegratorStats, IDAB_mem->IDA_mem, &m->nstepsB, &m->nfevalsB,
+             &m->nlinsetupsB, &m->netfailsB, &m->qlastB, &m->qcurB, &m->hinusedB,
+             &m->hlastB, &m->hcurB, &m->tcurB);
   }
 
   void IdasInterface::printStats(IntegratorMemory* mem, std::ostream &stream) const {
@@ -693,21 +632,18 @@ namespace casadi {
     long nsteps, nfevals, nlinsetups, netfails;
     int qlast, qcur;
     double hinused, hlast, hcur, tcur;
-    int flag = IDAGetIntegratorStats(m->mem, &nsteps, &nfevals, &nlinsetups, &netfails, &qlast,
-                                     &qcur, &hinused, &hlast, &hcur, &tcur);
-    if (flag!=IDA_SUCCESS) idas_error("IDAGetIntegratorStats", flag);
+    THROWING(IDAGetIntegratorStats, m->mem, &nsteps, &nfevals, &nlinsetups, &netfails, &qlast,
+             &qcur, &hinused, &hlast, &hcur, &tcur);
 
     // Get the number of right hand side evaluations in the linear solver
     long nfevals_linsol=0;
     switch (linsol_f_) {
     case SD_DENSE:
     case SD_BANDED:
-      flag = IDADlsGetNumResEvals(m->mem, &nfevals_linsol);
-      if (flag!=IDA_SUCCESS) idas_error("IDADlsGetNumResEvals", flag);
+      THROWING(IDADlsGetNumResEvals, m->mem, &nfevals_linsol);
       break;
     case SD_ITERATIVE:
-      flag = IDASpilsGetNumResEvals(m->mem, &nfevals_linsol);
-      if (flag!=IDA_SUCCESS) idas_error("IDASpilsGetNumResEvals", flag);
+      THROWING(IDASpilsGetNumResEvals, m->mem, &nfevals_linsol);
       break;
     default:
       nfevals_linsol = 0;
@@ -733,32 +669,15 @@ namespace casadi {
     stream << std::endl;
   }
 
-  void IdasInterface::idas_error(const string& module, int flag) {
-    // Find the error
-    char* flagname = IDAGetReturnFlagName(flag);
+  void IdasInterface::idas_error(const char* module, int flag) {
+    // Successfull return or warning
+    if (flag>=IDA_SUCCESS) return;
+    // Construct error message
     stringstream ss;
-    ss << "Module \"" << module << "\" returned flag " << flag << " (\"" << flagname << "\").";
-    ss << " Consult Idas documentation." << std::endl;
+    char* flagname = IDAGetReturnFlagName(flag);
+    ss << module << " returned \"" << flagname << "\"."
+       << " Consult IDAS documentation.";
     free(flagname);
-
-    // Heuristics
-    if (
-        (module=="IDACalcIC" && (flag==IDA_CONV_FAIL || flag==IDA_NO_RECOVERY ||
-                                 flag==IDA_LINESEARCH_FAIL)) ||
-        (module=="IDASolve" && flag ==IDA_ERR_FAIL)
-        ) {
-      ss << "Some common causes for this error: " << std::endl;
-      ss << "  - providing an initial guess for which 0=g(y, z, t) is not invertible wrt y. "
-         << std::endl;
-      ss << "  - having a DAE-index higher than 1 such that 0=g(y, z, t) is not invertible wrt y "
-          "over the whole domain." << std::endl;
-      ss << "  - having set abstol or reltol too small." << std::endl;
-      ss << "  - using 'calcic'=True for systems that are not semi-explicit index-one. "
-          "You must provide consistent initial conditions yourself in this case. " << std::endl;
-      ss << "  - your problem is too hard for IDAcalcIC to solve. Provide consistent "
-          "initial conditions yourself." << std::endl;
-    }
-
     casadi_error(ss.str());
   }
 
@@ -993,8 +912,7 @@ namespace casadi {
     // Set the stop time of the integration -- don't integrate past this point
     auto m = to_mem(mem);
     auto& s = m->self;
-    int flag = IDASetStopTime(m->mem, tf);
-    if (flag != IDA_SUCCESS) idas_error("IDASetStopTime", flag);
+    THROWING(IDASetStopTime, m->mem, tf);
   }
 
   int IdasInterface::psolve(double t, N_Vector xz, N_Vector xzdot, N_Vector rr,
@@ -1238,58 +1156,40 @@ namespace casadi {
 
   void IdasInterface::initDenseLinsol(IdasMemory* m) const {
     // Dense jacobian
-    int flag = IDADense(m->mem, nx_+nz_);
-    if (flag != IDA_SUCCESS) idas_error("IDADense", flag);
+    THROWING(IDADense, m->mem, nx_+nz_);
     if (exact_jacobian_) {
-      flag = IDADlsSetDenseJacFn(m->mem, djac);
-      if (flag!=IDA_SUCCESS) idas_error("IDADlsSetDenseJacFn", flag);
+      THROWING(IDADlsSetDenseJacFn, m->mem, djac);
     }
   }
 
   void IdasInterface::initBandedLinsol(IdasMemory* m) const {
     // Banded jacobian
     pair<int, int> bw = getBandwidth();
-    int flag = IDABand(m->mem, nx_+nz_, bw.first, bw.second);
-    if (flag != IDA_SUCCESS) idas_error("IDABand", flag);
-
-    // Banded Jacobian information
+    THROWING(IDABand, m->mem, nx_+nz_, bw.first, bw.second);
     if (exact_jacobian_) {
-      flag = IDADlsSetBandJacFn(m->mem, bjac);
-      if (flag != IDA_SUCCESS) idas_error("IDADlsSetBandJacFn", flag);
+      THROWING(IDADlsSetBandJacFn, m->mem, bjac);
     }
   }
 
   void IdasInterface::initIterativeLinsol(IdasMemory* m) const {
     // Attach an iterative solver
-    int flag;
     switch (itsol_f_) {
-    case SD_GMRES:
-      flag = IDASpgmr(m->mem, max_krylov_);
-      if (flag != IDA_SUCCESS) idas_error("IDASpgmr", flag);
-      break;
-    case SD_BCGSTAB:
-      flag = IDASpbcg(m->mem, max_krylov_);
-      if (flag != IDA_SUCCESS) idas_error("IDASpbcg", flag);
-      break;
-    case SD_TFQMR:
-      flag = IDASptfqmr(m->mem, max_krylov_);
-      if (flag != IDA_SUCCESS) idas_error("IDASptfqmr", flag);
-      break;
+    case SD_GMRES: THROWING(IDASpgmr, m->mem, max_krylov_); break;
+    case SD_BCGSTAB: THROWING(IDASpbcg, m->mem, max_krylov_); break;
+    case SD_TFQMR: THROWING(IDASptfqmr, m->mem, max_krylov_); break;
     default: casadi_error("Uncaught switch");
     }
 
     // Attach functions for jacobian information
     if (exact_jacobian_) {
-      flag = IDASpilsSetJacTimesVecFn(m->mem, jtimes);
-      if (flag != IDA_SUCCESS) idas_error("IDASpilsSetJacTimesVecFn", flag);
+      THROWING(IDASpilsSetJacTimesVecFn, m->mem, jtimes);
     }
 
     // Add a preconditioner
     if (use_preconditioner_) {
       casadi_assert_message(has_function("jacF"), "No Jacobian function");
       casadi_assert_message(has_function("linsolF"), "No linear solver");
-      flag = IDASpilsSetPreconditioner(m->mem, psetup, psolve);
-      if (flag != IDA_SUCCESS) idas_error("IDASpilsSetPreconditioner", flag);
+      THROWING(IDASpilsSetPreconditioner, m->mem, psetup, psolve);
     }
   }
 
@@ -1304,61 +1204,38 @@ namespace casadi {
   }
 
   void IdasInterface::initDenseLinsolB(IdasMemory* m) const {
-    // Dense jacobian
-    int flag = IDADenseB(m->mem, m->whichB, nrx_+nrz_);
-    if (flag != IDA_SUCCESS) idas_error("IDADenseB", flag);
+    THROWING(IDADenseB, m->mem, m->whichB, nrx_+nrz_);
     if (exact_jacobianB_) {
-      // Pass to IDA
-      flag = IDADlsSetDenseJacFnB(m->mem, m->whichB, djacB);
-      if (flag!=IDA_SUCCESS) idas_error("IDADlsSetDenseJacFnB", flag);
+      THROWING(IDADlsSetDenseJacFnB, m->mem, m->whichB, djacB);
     }
   }
 
   void IdasInterface::initBandedLinsolB(IdasMemory* m) const {
     pair<int, int> bw = getBandwidthB();
-    int flag = IDABandB(m->mem, m->whichB, nrx_+nrz_, bw.first, bw.second);
-    if (flag != IDA_SUCCESS) idas_error("IDABand", flag);
+    THROWING(IDABandB, m->mem, m->whichB, nrx_+nrz_, bw.first, bw.second);
     if (exact_jacobianB_) {
-      // Pass to IDA
-      flag = IDADlsSetBandJacFnB(m->mem, m->whichB, bjacB);
-      if (flag!=IDA_SUCCESS) idas_error("IDADlsSetBandJacFnB", flag);
+      THROWING(IDADlsSetBandJacFnB, m->mem, m->whichB, bjacB);
     }
   }
 
   void IdasInterface::initIterativeLinsolB(IdasMemory* m) const {
-    int flag;
     switch (itsol_g_) {
-    case SD_GMRES:
-      flag = IDASpgmrB(m->mem, m->whichB, max_krylovB_);
-      if (flag != IDA_SUCCESS) idas_error("IDASpgmrB", flag);
-      break;
-    case SD_BCGSTAB:
-      flag = IDASpbcgB(m->mem, m->whichB, max_krylovB_);
-      if (flag != IDA_SUCCESS) idas_error("IDASpbcgB", flag);
-      break;
-    case SD_TFQMR:
-      flag = IDASptfqmrB(m->mem, m->whichB, max_krylovB_);
-      if (flag != IDA_SUCCESS) idas_error("IDASptfqmrB", flag);
-      break;
+    case SD_GMRES: THROWING(IDASpgmrB, m->mem, m->whichB, max_krylovB_); break;
+    case SD_BCGSTAB: THROWING(IDASpbcgB, m->mem, m->whichB, max_krylovB_); break;
+    case SD_TFQMR: THROWING(IDASptfqmrB, m->mem, m->whichB, max_krylovB_); break;
     default: casadi_error("Uncaught switch");
     }
 
     // Attach functions for jacobian information
     if (exact_jacobianB_) {
-#ifdef WITH_SYSTEM_SUNDIALS
-      flag = IDASpilsSetJacTimesVecFnBPatched(m->mem, m->whichB, jtimesB);
-#else
-      flag = IDASpilsSetJacTimesVecFnB(m->mem, m->whichB, jtimesB);
-#endif
-      if (flag != IDA_SUCCESS) idas_error("IDASpilsSetJacTimesVecFnB", flag);
+      THROWING(IDASpilsSetJacTimesVecFnB, m->mem, m->whichB, jtimesB);
     }
 
     // Add a preconditioner
     if (use_preconditionerB_) {
       casadi_assert_message(has_function("jacB"), "No Jacobian function");
       casadi_assert_message(has_function("linsolB"), "No linear solver");
-      flag = IDASpilsSetPreconditionerB(m->mem, m->whichB, psetupB, psolveB);
-      if (flag != IDA_SUCCESS) idas_error("IDASpilsSetPreconditionerB", flag);
+      THROWING(IDASpilsSetPreconditionerB, m->mem, m->whichB, psetupB, psolveB);
     }
 
   }
