@@ -37,10 +37,6 @@
 #include <cvodes/cvodes_impl.h> /* Needed for the provided linear solver */
 #include <ctime>
 
-// Macro for error handling
-#define CVCALL(fcn, ...) \
-cvodes_error(CASADI_ASSERT_STR(fcn) CASADI_ASSERT_WHERE, fcn(__VA_ARGS__))
-
 /** \defgroup plugin_Integrator_cvodes
 
       Interface to CVodes from the Sundials suite.
