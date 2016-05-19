@@ -226,18 +226,6 @@ namespace casadi {
     // Throw error
     static void cvodes_error(const char* module, int flag);
 
-    // Initialize the iterative linear solver
-    void initIterativeLinsol(CvodesMemory* m) const;
-
-    // Initialize the user defined linear solver
-    void initUserDefinedLinsol(CvodesMemory* m) const;
-
-    // Initialize the iterative linear solver (backward integration)
-    void initIterativeLinsolB(CvodesMemory* m) const;
-
-    // Initialize the user defined linear solver (backward integration)
-    void initUserDefinedLinsolB(CvodesMemory* m) const;
-
     int lmm_; // linear multistep method
     int iter_; // nonlinear solver iteration
   };

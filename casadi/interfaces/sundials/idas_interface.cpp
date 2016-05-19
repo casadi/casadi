@@ -392,12 +392,34 @@ namespace casadi {
     if (exact_jacobian_) THROWING(IDADlsSetBandJacFn, m->mem, bjac);
     break;
     case SD_ITERATIVE:
-      initIterativeLinsol(m);
-      break;
+    // Attach an iterative solver
+    switch (itsol_f_) {
+    case SD_GMRES: THROWING(IDASpgmr, m->mem, max_krylov_); break;
+    case SD_BCGSTAB: THROWING(IDASpbcg, m->mem, max_krylov_); break;
+    case SD_TFQMR: THROWING(IDASptfqmr, m->mem, max_krylov_); break;
+    }
+
+    // Attach functions for jacobian information
+    if (exact_jacobian_) THROWING(IDASpilsSetJacTimesVecFn, m->mem, jtimes);
+
+    // Add a preconditioner
+    if (use_preconditioner_) {
+      casadi_assert_message(has_function("jacF"), "No Jacobian function");
+      casadi_assert_message(has_function("linsolF"), "No linear solver");
+      THROWING(IDASpilsSetPreconditioner, m->mem, psetup, psolve);
+    }
+    break;
     case SD_USER_DEFINED:
-      initUserDefinedLinsol(m);
+    {
+      casadi_assert_message(has_function("jacF"), "No Jacobian function");
+      casadi_assert_message(has_function("linsolF"), "No linear solver");
+      IDAMem IDA_mem = IDAMem(m->mem);
+      IDA_mem->ida_lmem   = m;
+      IDA_mem->ida_lsetup = lsetup;
+      IDA_mem->ida_lsolve = lsolve;
+      IDA_mem->ida_setupNonNull = TRUE;
       break;
-    default: casadi_error("Uncaught switch");
+    }
     }
 
     // Quadrature equations
@@ -564,9 +586,42 @@ namespace casadi {
       THROWING(IDABandB, m->mem, m->whichB, nrx_+nrz_, ubwB_, lbwB_);
       if (exact_jacobianB_) THROWING(IDADlsSetBandJacFnB, m->mem, m->whichB, bjacB);
       break;
-      case SD_ITERATIVE: initIterativeLinsolB(m); break;
-      case SD_USER_DEFINED: initUserDefinedLinsolB(m); break;
-      default: casadi_error("Uncaught switch");
+      case SD_ITERATIVE:
+      switch (itsol_g_) {
+      case SD_GMRES: THROWING(IDASpgmrB, m->mem, m->whichB, max_krylovB_); break;
+      case SD_BCGSTAB: THROWING(IDASpbcgB, m->mem, m->whichB, max_krylovB_); break;
+      case SD_TFQMR: THROWING(IDASptfqmrB, m->mem, m->whichB, max_krylovB_); break;
+      }
+
+      // Attach functions for jacobian information
+      if (exact_jacobianB_) {
+        THROWING(IDASpilsSetJacTimesVecFnB, m->mem, m->whichB, jtimesB);
+      }
+
+      // Add a preconditioner
+      if (use_preconditionerB_) {
+        casadi_assert_message(has_function("jacB"), "No Jacobian function");
+        casadi_assert_message(has_function("linsolB"), "No linear solver");
+        THROWING(IDASpilsSetPreconditionerB, m->mem, m->whichB, psetupB, psolveB);
+      }
+      break;
+      case SD_USER_DEFINED:
+      {
+        casadi_assert_message(has_function("jacB"), "No Jacobian function");
+        casadi_assert_message(has_function("linsolB"), "No linear solver");
+
+        //  Set fields in the IDA memory
+        IDAMem IDA_mem = IDAMem(m->mem);
+        IDAadjMem IDAADJ_mem = IDA_mem->ida_adj_mem;
+        IDABMem IDAB_mem = IDAADJ_mem->IDAB_mem;
+        IDAB_mem->ida_lmem   = m;
+
+        IDAB_mem->IDA_mem->ida_lmem = m;
+        IDAB_mem->IDA_mem->ida_lsetup = lsetupB;
+        IDAB_mem->IDA_mem->ida_lsolve = lsolveB;
+        IDAB_mem->IDA_mem->ida_setupNonNull = TRUE;
+        break;
+      }
       }
 
       // Quadratures for the adjoint problem
@@ -1153,76 +1208,6 @@ namespace casadi {
       userOut<true, PL_WARN>() << "lsolveB failed: " << e.what() << endl;
       return -1;
     }
-  }
-
-  void IdasInterface::initIterativeLinsol(IdasMemory* m) const {
-    // Attach an iterative solver
-    switch (itsol_f_) {
-    case SD_GMRES: THROWING(IDASpgmr, m->mem, max_krylov_); break;
-    case SD_BCGSTAB: THROWING(IDASpbcg, m->mem, max_krylov_); break;
-    case SD_TFQMR: THROWING(IDASptfqmr, m->mem, max_krylov_); break;
-    default: casadi_error("Uncaught switch");
-    }
-
-    // Attach functions for jacobian information
-    if (exact_jacobian_) {
-      THROWING(IDASpilsSetJacTimesVecFn, m->mem, jtimes);
-    }
-
-    // Add a preconditioner
-    if (use_preconditioner_) {
-      casadi_assert_message(has_function("jacF"), "No Jacobian function");
-      casadi_assert_message(has_function("linsolF"), "No linear solver");
-      THROWING(IDASpilsSetPreconditioner, m->mem, psetup, psolve);
-    }
-  }
-
-  void IdasInterface::initUserDefinedLinsol(IdasMemory* m) const {
-    casadi_assert_message(has_function("jacF"), "No Jacobian function");
-    casadi_assert_message(has_function("linsolF"), "No linear solver");
-    IDAMem IDA_mem = IDAMem(m->mem);
-    IDA_mem->ida_lmem   = m;
-    IDA_mem->ida_lsetup = lsetup;
-    IDA_mem->ida_lsolve = lsolve;
-    IDA_mem->ida_setupNonNull = TRUE;
-  }
-
-  void IdasInterface::initIterativeLinsolB(IdasMemory* m) const {
-    switch (itsol_g_) {
-    case SD_GMRES: THROWING(IDASpgmrB, m->mem, m->whichB, max_krylovB_); break;
-    case SD_BCGSTAB: THROWING(IDASpbcgB, m->mem, m->whichB, max_krylovB_); break;
-    case SD_TFQMR: THROWING(IDASptfqmrB, m->mem, m->whichB, max_krylovB_); break;
-    default: casadi_error("Uncaught switch");
-    }
-
-    // Attach functions for jacobian information
-    if (exact_jacobianB_) {
-      THROWING(IDASpilsSetJacTimesVecFnB, m->mem, m->whichB, jtimesB);
-    }
-
-    // Add a preconditioner
-    if (use_preconditionerB_) {
-      casadi_assert_message(has_function("jacB"), "No Jacobian function");
-      casadi_assert_message(has_function("linsolB"), "No linear solver");
-      THROWING(IDASpilsSetPreconditionerB, m->mem, m->whichB, psetupB, psolveB);
-    }
-
-  }
-
-  void IdasInterface::initUserDefinedLinsolB(IdasMemory* m) const {
-    casadi_assert_message(has_function("jacB"), "No Jacobian function");
-    casadi_assert_message(has_function("linsolB"), "No linear solver");
-
-    //  Set fields in the IDA memory
-    IDAMem IDA_mem = IDAMem(m->mem);
-    IDAadjMem IDAADJ_mem = IDA_mem->ida_adj_mem;
-    IDABMem IDAB_mem = IDAADJ_mem->IDAB_mem;
-    IDAB_mem->ida_lmem   = m;
-
-    IDAB_mem->IDA_mem->ida_lmem = m;
-    IDAB_mem->IDA_mem->ida_lsetup = lsetupB;
-    IDAB_mem->IDA_mem->ida_lsolve = lsolveB;
-    IDAB_mem->IDA_mem->ida_setupNonNull = TRUE;
   }
 
   template<typename MatType>

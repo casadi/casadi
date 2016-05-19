@@ -181,11 +181,33 @@ namespace casadi {
     if (exact_jacobian_) THROWING(CVDlsSetBandJacFn, m->mem, bjac);
     break;
     case SD_ITERATIVE:
-      initIterativeLinsol(m);
-      break;
+    switch (itsol_f_) {
+    case SD_GMRES: THROWING(CVSpgmr, m->mem, pretype_f_, max_krylov_); break;
+    case SD_BCGSTAB: THROWING(CVSpbcg, m->mem, pretype_f_, max_krylov_); break;
+    case SD_TFQMR: THROWING(CVSptfqmr, m->mem, pretype_f_, max_krylov_); break;
+    }
+
+    // Attach functions for jacobian information
+    if (exact_jacobian_) THROWING(CVSpilsSetJacTimesVecFn, m->mem, jtimes);
+
+    // Add a preconditioner
+    if (use_preconditioner_) {
+      casadi_assert_message(has_function("jacF"), "No Jacobian function");
+      casadi_assert_message(has_function("linsolF"), "No linear solver");
+      THROWING(CVSpilsSetPreconditioner, m->mem, psetup, psolve);
+    }
+    break;
     case SD_USER_DEFINED:
-      initUserDefinedLinsol(m);
+    {
+      casadi_assert_message(has_function("jacF"), "No Jacobian function");
+      casadi_assert_message(has_function("linsolF"), "No linear solver");
+      CVodeMem cv_mem = static_cast<CVodeMem>(m->mem);
+      cv_mem->cv_lmem   = m;
+      cv_mem->cv_lsetup = lsetup;
+      cv_mem->cv_lsolve = lsolve;
+      cv_mem->cv_setupNonNull = TRUE;
       break;
+    }
     }
 
     // Set user data
@@ -350,11 +372,36 @@ namespace casadi {
       if (exact_jacobianB_) THROWING(CVDlsSetBandJacFnB, m->mem, m->whichB, bjacB);
       break;
       case SD_ITERATIVE:
-      initIterativeLinsolB(m);
+      switch (itsol_g_) {
+      case SD_GMRES: THROWING(CVSpgmrB, m->mem, m->whichB, pretype_g_, max_krylovB_); break;
+      case SD_BCGSTAB: THROWING(CVSpbcgB, m->mem, m->whichB, pretype_g_, max_krylovB_); break;
+      case SD_TFQMR: THROWING(CVSptfqmrB, m->mem, m->whichB, pretype_g_, max_krylovB_); break;
+      }
+
+      // Attach functions for jacobian information
+      if (exact_jacobianB_) THROWING(CVSpilsSetJacTimesVecFnB, m->mem, m->whichB, jtimesB);
+
+      // Add a preconditioner
+      if (use_preconditionerB_) {
+        casadi_assert_message(has_function("jacB"), "No Jacobian function");
+        casadi_assert_message(has_function("linsolB"), "No linear solver");
+        THROWING(CVSpilsSetPreconditionerB, m->mem, m->whichB, psetupB, psolveB);
+      }
       break;
       case SD_USER_DEFINED:
-      initUserDefinedLinsolB(m);
-      break;
+      {
+        casadi_assert_message(has_function("jacB"), "No Jacobian function");
+        casadi_assert_message(has_function("linsolB"), "No linear solver");
+        CVodeMem cv_mem = static_cast<CVodeMem>(m->mem);
+        CVadjMem ca_mem = cv_mem->cv_adj_mem;
+        CVodeBMem cvB_mem = ca_mem->cvB_mem;
+        cvB_mem->cv_lmem   = m;
+        cvB_mem->cv_mem->cv_lmem = m;
+        cvB_mem->cv_mem->cv_lsetup = lsetupB;
+        cvB_mem->cv_mem->cv_lsolve = lsolveB;
+        cvB_mem->cv_mem->cv_setupNonNull = TRUE;
+        break;
+      }
       }
 
       // Quadratures for the backward problem
@@ -1008,69 +1055,6 @@ namespace casadi {
       userOut<true, PL_WARN>() << "lsolveB failed: " << e.what() << endl;;
       return 1;
     }
-  }
-
-  void CvodesInterface::initIterativeLinsol(CvodesMemory* m) const {
-    // Attach the sparse solver
-    int flag;
-    switch (itsol_f_) {
-    case SD_GMRES: THROWING(CVSpgmr, m->mem, pretype_f_, max_krylov_); break;
-    case SD_BCGSTAB: THROWING(CVSpbcg, m->mem, pretype_f_, max_krylov_); break;
-    case SD_TFQMR: THROWING(CVSptfqmr, m->mem, pretype_f_, max_krylov_); break;
-    }
-
-    // Attach functions for jacobian information
-    if (exact_jacobian_) THROWING(CVSpilsSetJacTimesVecFn, m->mem, jtimes);
-
-    // Add a preconditioner
-    if (use_preconditioner_) {
-      casadi_assert_message(has_function("jacF"), "No Jacobian function");
-      casadi_assert_message(has_function("linsolF"), "No linear solver");
-      THROWING(CVSpilsSetPreconditioner, m->mem, psetup, psolve);
-    }
-  }
-
-  void CvodesInterface::initUserDefinedLinsol(CvodesMemory* m) const {
-    casadi_assert_message(has_function("jacF"), "No Jacobian function");
-    casadi_assert_message(has_function("linsolF"), "No linear solver");
-    CVodeMem cv_mem = static_cast<CVodeMem>(m->mem);
-    cv_mem->cv_lmem   = m;
-    cv_mem->cv_lsetup = lsetup;
-    cv_mem->cv_lsolve = lsolve;
-    cv_mem->cv_setupNonNull = TRUE;
-  }
-
-  void CvodesInterface::initIterativeLinsolB(CvodesMemory* m) const {
-    int flag;
-    switch (itsol_g_) {
-    case SD_GMRES: THROWING(CVSpgmrB, m->mem, m->whichB, pretype_g_, max_krylovB_); break;
-    case SD_BCGSTAB: THROWING(CVSpbcgB, m->mem, m->whichB, pretype_g_, max_krylovB_); break;
-    case SD_TFQMR: THROWING(CVSptfqmrB, m->mem, m->whichB, pretype_g_, max_krylovB_); break;
-    }
-
-    // Attach functions for jacobian information
-    if (exact_jacobianB_) THROWING(CVSpilsSetJacTimesVecFnB, m->mem, m->whichB, jtimesB);
-
-    // Add a preconditioner
-    if (use_preconditionerB_) {
-      casadi_assert_message(has_function("jacB"), "No Jacobian function");
-      casadi_assert_message(has_function("linsolB"), "No linear solver");
-      THROWING(CVSpilsSetPreconditionerB, m->mem, m->whichB, psetupB, psolveB);
-    }
-
-  }
-
-  void CvodesInterface::initUserDefinedLinsolB(CvodesMemory* m) const {
-    casadi_assert_message(has_function("jacB"), "No Jacobian function");
-    casadi_assert_message(has_function("linsolB"), "No linear solver");
-    CVodeMem cv_mem = static_cast<CVodeMem>(m->mem);
-    CVadjMem ca_mem = cv_mem->cv_adj_mem;
-    CVodeBMem cvB_mem = ca_mem->cvB_mem;
-    cvB_mem->cv_lmem   = m;
-    cvB_mem->cv_mem->cv_lmem = m;
-    cvB_mem->cv_mem->cv_lsetup = lsetupB;
-    cvB_mem->cv_mem->cv_lsolve = lsolveB;
-    cvB_mem->cv_mem->cv_setupNonNull = TRUE;
   }
 
   template<typename MatType>

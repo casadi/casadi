@@ -239,18 +239,6 @@ namespace casadi {
     // Throw error
     static void idas_error(const char* module, int flag);
 
-    // Initialize the iterative linear solver
-    void initIterativeLinsol(IdasMemory* m) const;
-
-    // Initialize the user defined linear solver
-    void initUserDefinedLinsol(IdasMemory* m) const;
-
-    // Initialize the iterative linear solver (backward integration)
-    void initIterativeLinsolB(IdasMemory* m) const;
-
-    // Initialize the user defined linear solver (backward integration)
-    void initUserDefinedLinsolB(IdasMemory* m) const;
-
     // Options
     bool cj_scaling_;
     bool calc_ic_;
