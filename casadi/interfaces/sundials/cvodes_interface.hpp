@@ -37,6 +37,10 @@
 #include <cvodes/cvodes_impl.h> /* Needed for the provided linear solver */
 #include <ctime>
 
+// Macro for error handling
+#define CVCALL(fcn, ...) \
+cvodes_error(CASADI_ASSERT_STR(fcn) CASADI_ASSERT_WHERE, fcn(__VA_ARGS__))
+
 /** \defgroup plugin_Integrator_cvodes
 
       Interface to CVodes from the Sundials suite.
@@ -224,7 +228,7 @@ namespace casadi {
                        N_Vector x, N_Vector xdot);
 
     // Throw error
-    static void cvodes_error(const std::string& module, int flag);
+    static void cvodes_error(const char* module, int flag);
 
     // Initialize the dense linear solver
     void initDenseLinsol(CvodesMemory* m) const;
