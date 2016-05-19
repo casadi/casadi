@@ -342,36 +342,29 @@ namespace casadi {
     log("IdasInterface::init", "IDA initialized");
 
     // Set error handler function
-    flag = IDASetErrHandlerFn(m->mem, ehfun, &m);
-    casadi_assert_message(flag == IDA_SUCCESS, "IDASetErrHandlerFn");
+    THROWING(IDASetErrHandlerFn, m->mem, ehfun, &m);
 
     // Include algebraic variables in error testing
-    flag = IDASetSuppressAlg(m->mem, suppress_algebraic_);
-    casadi_assert_message(flag == IDA_SUCCESS, "IDASetSuppressAlg");
+    THROWING(IDASetSuppressAlg, m->mem, suppress_algebraic_);
 
     // Maxinum order for the multistep method
-    flag = IDASetMaxOrd(m->mem, max_multistep_order_);
-    casadi_assert_message(flag == IDA_SUCCESS, "IDASetMaxOrd");
+    THROWING(IDASetMaxOrd, m->mem, max_multistep_order_);
 
     // Set user data
-    flag = IDASetUserData(m->mem, m);
-    casadi_assert_message(flag == IDA_SUCCESS, "IDASetUserData");
+    THROWING(IDASetUserData, m->mem, m);
 
     // Set maximum step size
-    flag = IDASetMaxStep(m->mem, max_step_size_);
-    casadi_assert_message(flag == IDA_SUCCESS, "IDASetMaxStep");
+    THROWING(IDASetMaxStep, m->mem, max_step_size_);
 
     if (!abstolv_.empty()) {
       // Vector absolute tolerances
       N_Vector nv_abstol = N_VNew_Serial(abstolv_.size());
       copy(abstolv_.begin(), abstolv_.end(), NV_DATA_S(nv_abstol));
-      flag = IDASVtolerances(m->mem, reltol_, nv_abstol);
-      casadi_assert_message(flag == IDA_SUCCESS, "IDASVtolerances");
+      THROWING(IDASVtolerances, m->mem, reltol_, nv_abstol);
       N_VDestroy_Serial(nv_abstol);
     } else {
       // Scalar absolute tolerances
-      flag = IDASStolerances(m->mem, reltol_, abstol_);
-      casadi_assert_message(flag == IDA_SUCCESS, "IDASStolerances");
+      THROWING(IDASStolerances, m->mem, reltol_, abstol_);
     }
 
     // Maximum number of steps
