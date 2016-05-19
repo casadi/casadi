@@ -226,23 +226,11 @@ namespace casadi {
     // Throw error
     static void cvodes_error(const char* module, int flag);
 
-    // Initialize the dense linear solver
-    void initDenseLinsol(CvodesMemory* m) const;
-
-    // Initialize the banded linear solver
-    void initBandedLinsol(CvodesMemory* m) const;
-
     // Initialize the iterative linear solver
     void initIterativeLinsol(CvodesMemory* m) const;
 
     // Initialize the user defined linear solver
     void initUserDefinedLinsol(CvodesMemory* m) const;
-
-    // Initialize the dense linear solver (backward integration)
-    void initDenseLinsolB(CvodesMemory* m) const;
-
-    // Initialize the banded linear solver (backward integration)
-    void initBandedLinsolB(CvodesMemory* m) const;
 
     // Initialize the iterative linear solver (backward integration)
     void initIterativeLinsolB(CvodesMemory* m) const;

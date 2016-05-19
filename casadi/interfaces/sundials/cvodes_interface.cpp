@@ -173,11 +173,13 @@ namespace casadi {
     // attach a linear solver
     switch (linsol_f_) {
     case SD_DENSE:
-      initDenseLinsol(m);
-      break;
+    THROWING(CVDense, m->mem, nx_);
+    if (exact_jacobian_) THROWING(CVDlsSetDenseJacFn, m->mem, djac);
+    break;
     case SD_BANDED:
-      initBandedLinsol(m);
-      break;
+    THROWING(CVBand, m->mem, nx_, ubw_, lbw_);
+    if (exact_jacobian_) THROWING(CVDlsSetBandJacFn, m->mem, bjac);
+    break;
     case SD_ITERATIVE:
       initIterativeLinsol(m);
       break;
@@ -339,10 +341,20 @@ namespace casadi {
 
       // attach linear solver to backward problem
       switch (linsol_g_) {
-      case SD_DENSE: initDenseLinsolB(m); break;
-      case SD_BANDED: initBandedLinsolB(m); break;
-      case SD_ITERATIVE: initIterativeLinsolB(m); break;
-      case SD_USER_DEFINED: initUserDefinedLinsolB(m); break;
+      case SD_DENSE:
+      THROWING(CVDenseB, m->mem, m->whichB, nrx_);
+      if (exact_jacobianB_) THROWING(CVDlsSetDenseJacFnB, m->mem, m->whichB, djacB);
+      break;
+      case SD_BANDED:
+      THROWING(CVBandB, m->mem, m->whichB, nrx_, ubwB_, lbwB_);
+      if (exact_jacobianB_) THROWING(CVDlsSetBandJacFnB, m->mem, m->whichB, bjacB);
+      break;
+      case SD_ITERATIVE:
+      initIterativeLinsolB(m);
+      break;
+      case SD_USER_DEFINED:
+      initUserDefinedLinsolB(m);
+      break;
       }
 
       // Quadratures for the backward problem
@@ -998,20 +1010,6 @@ namespace casadi {
     }
   }
 
-  void CvodesInterface::initDenseLinsol(CvodesMemory* m) const {
-    THROWING(CVDense, m->mem, nx_);
-    if (exact_jacobian_) {
-      THROWING(CVDlsSetDenseJacFn, m->mem, djac);
-    }
-  }
-
-  void CvodesInterface::initBandedLinsol(CvodesMemory* m) const {
-    THROWING(CVBand, m->mem, nx_, ubw_, lbw_);
-    if (exact_jacobian_) {
-      THROWING(CVDlsSetBandJacFn, m->mem, bjac);
-    }
-  }
-
   void CvodesInterface::initIterativeLinsol(CvodesMemory* m) const {
     // Attach the sparse solver
     int flag;
@@ -1040,16 +1038,6 @@ namespace casadi {
     cv_mem->cv_lsetup = lsetup;
     cv_mem->cv_lsolve = lsolve;
     cv_mem->cv_setupNonNull = TRUE;
-  }
-
-  void CvodesInterface::initDenseLinsolB(CvodesMemory* m) const {
-    THROWING(CVDenseB, m->mem, m->whichB, nrx_);
-    if (exact_jacobianB_) THROWING(CVDlsSetDenseJacFnB, m->mem, m->whichB, djacB);
-  }
-
-  void CvodesInterface::initBandedLinsolB(CvodesMemory* m) const {
-    THROWING(CVBandB, m->mem, m->whichB, nrx_, ubwB_, lbwB_);
-    if (exact_jacobianB_) THROWING(CVDlsSetBandJacFnB, m->mem, m->whichB, bjacB);
   }
 
   void CvodesInterface::initIterativeLinsolB(CvodesMemory* m) const {

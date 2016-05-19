@@ -384,11 +384,13 @@ namespace casadi {
     // attach a linear solver
     switch (linsol_f_) {
     case SD_DENSE:
-      initDenseLinsol(m);
-      break;
+    THROWING(IDADense, m->mem, nx_+nz_);
+    if (exact_jacobian_) THROWING(IDADlsSetDenseJacFn, m->mem, djac);
+    break;
     case SD_BANDED:
-      initBandedLinsol(m);
-      break;
+    THROWING(IDABand, m->mem, nx_+nz_, ubw_, lbw_);
+    if (exact_jacobian_) THROWING(IDADlsSetBandJacFn, m->mem, bjac);
+    break;
     case SD_ITERATIVE:
       initIterativeLinsol(m);
       break;
@@ -554,8 +556,14 @@ namespace casadi {
 
       // attach linear solver
       switch (linsol_g_) {
-      case SD_DENSE: initDenseLinsolB(m); break;
-      case SD_BANDED: initBandedLinsolB(m); break;
+      case SD_DENSE:
+      THROWING(IDADenseB, m->mem, m->whichB, nrx_+nrz_);
+      if (exact_jacobianB_) THROWING(IDADlsSetDenseJacFnB, m->mem, m->whichB, djacB);
+      break;
+      case SD_BANDED:
+      THROWING(IDABandB, m->mem, m->whichB, nrx_+nrz_, ubwB_, lbwB_);
+      if (exact_jacobianB_) THROWING(IDADlsSetBandJacFnB, m->mem, m->whichB, bjacB);
+      break;
       case SD_ITERATIVE: initIterativeLinsolB(m); break;
       case SD_USER_DEFINED: initUserDefinedLinsolB(m); break;
       default: casadi_error("Uncaught switch");
@@ -1147,21 +1155,6 @@ namespace casadi {
     }
   }
 
-  void IdasInterface::initDenseLinsol(IdasMemory* m) const {
-    // Dense jacobian
-    THROWING(IDADense, m->mem, nx_+nz_);
-    if (exact_jacobian_) {
-      THROWING(IDADlsSetDenseJacFn, m->mem, djac);
-    }
-  }
-
-  void IdasInterface::initBandedLinsol(IdasMemory* m) const {
-    THROWING(IDABand, m->mem, nx_+nz_, ubw_, lbw_);
-    if (exact_jacobian_) {
-      THROWING(IDADlsSetBandJacFn, m->mem, bjac);
-    }
-  }
-
   void IdasInterface::initIterativeLinsol(IdasMemory* m) const {
     // Attach an iterative solver
     switch (itsol_f_) {
@@ -1192,20 +1185,6 @@ namespace casadi {
     IDA_mem->ida_lsetup = lsetup;
     IDA_mem->ida_lsolve = lsolve;
     IDA_mem->ida_setupNonNull = TRUE;
-  }
-
-  void IdasInterface::initDenseLinsolB(IdasMemory* m) const {
-    THROWING(IDADenseB, m->mem, m->whichB, nrx_+nrz_);
-    if (exact_jacobianB_) {
-      THROWING(IDADlsSetDenseJacFnB, m->mem, m->whichB, djacB);
-    }
-  }
-
-  void IdasInterface::initBandedLinsolB(IdasMemory* m) const {
-    THROWING(IDABandB, m->mem, m->whichB, nrx_+nrz_, ubwB_, lbwB_);
-    if (exact_jacobianB_) {
-      THROWING(IDADlsSetBandJacFnB, m->mem, m->whichB, bjacB);
-    }
   }
 
   void IdasInterface::initIterativeLinsolB(IdasMemory* m) const {
