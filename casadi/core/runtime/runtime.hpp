@@ -123,6 +123,13 @@ namespace casadi {
   /// Evaluate a polynomial
   template<typename real_t>
   real_t CASADI_PREFIX(polyval)(const real_t* p, int n, real_t x);
+
+  // Loop over corners of a hypercube
+  int CASADI_PREFIX(flip)(int* corner, int ndim);
+
+  // Find the interval to which a value belongs
+  template<typename real_t>
+  int CASADI_PREFIX(low)(real_t x, const double* grid, int ng);
 }
 
 // Implementations
@@ -485,7 +492,7 @@ namespace casadi {
     int cc, rr, el;
     for (cc=0; cc<ncol_A; ++cc) {
       /* Loop over the nonzeros of A */
-      for (el=colind_A[cc]; el<colind_A[cc+1]; ++el) {        
+      for (el=colind_A[cc]; el<colind_A[cc+1]; ++el) {
         /* Get the row */
         rr=row_A[el];
 
@@ -540,6 +547,29 @@ namespace casadi {
       r = r*x + p[i];
     }
     return r;
+  }
+
+  inline
+  int CASADI_PREFIX(flip)(int* corner, int ndim) {
+    int i;
+    for (i=0; i<ndim; ++i) {
+      if (corner[i]) {
+        corner[i]=0;
+      } else {
+        corner[i]=1;
+        return 1;
+      }
+    }
+    return 0;
+  }
+
+  template<typename real_t>
+  int CASADI_PREFIX(low)(real_t x, const double* grid, int ng) {
+    int i;
+    for (i=0; i<ng-2; ++i) {
+      if (x < grid[i]) break;
+    }
+    return i;
   }
 
 } // namespace casadi

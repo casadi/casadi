@@ -82,7 +82,7 @@ namespace casadi {
       const double* g = get_ptr(grid_) + offset_[i];
       int ng = offset_[i+1]-offset_[i];
       // Find left index
-      int j = index[i] = low(x, g, ng);
+      int j = index[i] = casadi_low(x, g, ng);
       // Get interpolation/extrapolation alpha
       alpha[i] = (x-g[j])/(g[j+1]-g[j]);
     }
@@ -108,7 +108,7 @@ namespace casadi {
 
       // Add contribution to return value
       ret += w*values_.at(ind);
-    } while (flip(corner, ndim_));
+    } while (casadi_flip(corner, ndim_));
 
     // Return interpolation
     res[0][0] = ret;

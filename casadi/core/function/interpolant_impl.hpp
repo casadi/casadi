@@ -77,29 +77,6 @@ namespace casadi {
     // No static functions exposed
     struct Exposed{ };
 
-    // Helper function - loop over corners
-    // NOTE Move to runtime, if needed in codegen
-    static inline bool flip(int* corner, int ndim) {
-      for (int i=0; i<ndim; ++i) {
-        if (corner[i]) {
-          corner[i]=0;
-        } else {
-          corner[i]=1;
-          return true;
-        }
-      }
-      return false;
-    }
-
-    // Helper function - get lower index
-    // NOTE Move to runtime, if needed in codegen
-    static inline int low(double x, const double* grid, int ng) {
-      for (int i=0; i<ng-2; ++i) {
-        if (x < grid[i]) return i;
-      }
-      return ng-2;
-    }
-
     /// Collection of solvers
     static std::map<std::string, Plugin> solvers_;
 
