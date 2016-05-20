@@ -62,33 +62,47 @@ namespace casadi {
     alloc_iw(grid_.size(), true); // corner
   }
 
+  bool casadi_flip(int* corner, int ndim) {
+    for (int i=0; i<ndim; ++i) {
+      if (corner[i]) {
+        corner[i]=0;
+      } else {
+        corner[i]=1;
+        return true;
+      }
+    }
+    return false;
+  }
+
   void LinearInterpolant::eval(void* mem, const double** arg, double** res,
                                int* iw, double* w) const {
     // Number of Dimensions
     int ndim = grid_.size();
-    // Left index and fraction of interval
+
+    // Work vectors
     double* alpha = w; w += ndim;
     int* index = iw; iw += ndim;
+    int* corner = iw; iw += ndim;
+
+    // Left index and fraction of interval
     for (int i=0; i<ndim; ++i) {
       // Number of gridpoints
       int ng = grid_[i].size();
       // Get x-value
       double x = arg[0] ? arg[0][i] : 0;
       // Find left index
-      int ind = -1;
-      for (int j=0; j<ng; ++j, ++ind) {
-        if (x < grid_[i][j]) break;
+      int ind;
+      for (ind=0; ind<ng-2; ++ind) {
+        if (x < grid_[i][ind]) break;
       }
-      // Confine to [0, ng-2]
-      index[i] = ind = max(0, min(ind, ng-2));
+      index[i] = ind;
       // Get interpolation/extrapolation alpha
       alpha[i] = (x-grid_[i][ind])/(grid_[i][ind+1]-grid_[i][ind]);
     }
     // Loop over all corners, add contribution to output
     double ret = 0;
-    int* corner = iw; iw += ndim;
     casadi_fill(corner, ndim, 0);
-    while (true) {
+    do {
       // Get weight and value for corner
       double w=1;
       int ld=1; // leading dimension
@@ -101,21 +115,7 @@ namespace casadi {
 
       // Add contribution to return value
       ret += w*values_.at(ind);
-
-      // Find next corner
-      bool done = true;
-      for (int i=0; i<ndim; ++i) {
-        if (corner[i]) {
-          corner[i]=0;
-        } else {
-          corner[i]=1;
-          done = false;
-          break;
-        }
-      }
-      // Has all corners been visited?
-      if (done) break;
-    }
+    } while (casadi_flip(corner, ndim));
 
     // Return interpolation
     casadi_copy(&ret, 1, res[0]);
