@@ -946,7 +946,7 @@ fun:PyParser_ASTFromFile
    fun:PyEval_EvalCodeEx
 }
 
-{  
+{
    py3.4 O
    Memcheck:Addr4
    obj:/usr/bin/python*

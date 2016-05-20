@@ -25,7 +25,7 @@
 
 def nullfun(*args,**kwargs):
   pass
-  
+
 plot = nullfun
 xlabel = nullfun
 ylabel = nullfun

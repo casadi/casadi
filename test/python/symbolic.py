@@ -50,21 +50,21 @@ class Symbolictests(casadiTestCase):
 
     def nodes():
       for b in variables:
-        for u in unary_operations: 
+        for u in unary_operations:
           yield u(b)
-          
+
     def operations(a,b):
-      for op in binary_operations: 
-        for u in unary_operations: 
+      for op in binary_operations:
+        for u in unary_operations:
           yield u(op(a,b))
-      for u in unary_operations: 
+      for u in unary_operations:
         yield u(a)
         yield u(b)
 
     def operations_toplevel(a,b):
-      for op in binary_operations: 
+      for op in binary_operations:
         yield op(a,b)
-        
+
     def operations_node():
       for b1 in nodes():
         for b2 in nodes():
@@ -72,7 +72,7 @@ class Symbolictests(casadiTestCase):
             yield op
       for b1 in nodes():
         yield b1
-        
+
     for a_s, b_s in [(SX.sym("a"),SX.sym("b")),(MX.sym("a"),MX.sym("b"))]:
       i=0
       for op1 in operations_node():

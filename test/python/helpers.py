@@ -67,7 +67,7 @@ class LazyString(object):
      return LazyString('str(self) + other')
   def __radd__(self, other):
      return LazyString('other + str(self)')
-     
+
   def __str__(self):
     d = self.context
     exec("ret = " + self.f.replace("\n","\\n"), d)
@@ -77,7 +77,7 @@ class TeeString(StringIO):
   def __init__(self,stream):
     StringIO.__init__(self)
     self.stream = stream
-        
+
   def write(self, data):
     StringIO.write(self,data)
     self.stream.write(data)
@@ -92,7 +92,7 @@ class Stdout():
 
     def __exit__(self, type, value, traceback):
         sys.stdout = self.stream.stream
-        
+
 class Stderr():
     def __init__(self):
         self.stream = TeeString(sys.stderr)
@@ -103,8 +103,8 @@ class Stderr():
 
     def __exit__(self, type, value, traceback):
         sys.stderr = self.stream.stream
-        
-        
+
+
 class FunctionPool:
   def __init__(self):
     self.numpyoperators=[]
@@ -123,7 +123,7 @@ class FunctionPool:
 def toSX_fun(fun):
   ins = fun.sx_in()
   return Function("f",ins,fun.call(ins))
-  
+
 def toMX_fun(fun):
   ins = fun.mx_in()
   return Function("f",ins,fun(ins))
@@ -143,7 +143,7 @@ class casadiTestCase(unittest.TestCase):
         fun.__dict__["tag_memory_heavy"] = False
       if not hasattr(fun,'tag_slow'):
         fun.__dict__["tag_slow"] = False
-      
+
       if args.ignore_memory_heavy and fun.tag_memory_heavy:
         fun.__dict__["__unittest_skip__"] = True
         fun.__dict__["__unittest_skip_why__"] = "Ignoring memory_heavy tests (--ignore_memory_heavy)"
@@ -154,14 +154,14 @@ class casadiTestCase(unittest.TestCase):
       if not(args.run_slow) and fun.tag_slow:
         fun.__dict__["__unittest_skip__"] = True
         fun.__dict__["__unittest_skip_why__"] = "Ignoring slow tests (--run_slow)"
-        
+
     else:
       fun = getattr(getattr(self,margs[0]),'im_func')
       if not hasattr(fun,'tag_memory_heavy'):
         fun.tag_memory_heavy = False
       if not hasattr(fun,'tag_slow'):
         fun.tag_slow = False
-      
+
       if args.ignore_memory_heavy and fun.tag_memory_heavy:
         fun.__unittest_skip__ = True
         fun.__unittest_skip_why__ = "Ignoring memory_heavy tests (--ignore_memory_heavy)"
@@ -172,7 +172,7 @@ class casadiTestCase(unittest.TestCase):
       if not(args.run_slow) and fun.tag_slow:
         fun.__unittest_skip__ = True
         fun.__unittest_skip_why__ = "Ignoring slow tests (--run_slow)"
-        
+
     unittest.TestCase.__init__(self,*margs,**kwargs)
 
   def randDM(self,n,m=1,sparsity=1,valuegenerator=lambda : random.normal(0,1),symm=False ):
@@ -191,7 +191,7 @@ class casadiTestCase(unittest.TestCase):
         return (ret + ret.T)/2
       else:
         return ret
-  
+
   def message(self,s):
       print(s)
       sys.stdout.flush()
@@ -210,12 +210,12 @@ class casadiTestCase(unittest.TestCase):
       """
       Checks for equality of two numpy matrices.
       The check uses dense form.
-      
+
       zr - reference
       zt - to test
-      
+
       name - a descriptor that will be included in error messages
-      
+
       """
       if isinstance(zr,tuple):
         zr=array([list(zr)])
@@ -233,7 +233,7 @@ class casadiTestCase(unittest.TestCase):
         zr=array(zr,ndmin=2).T
       if len(zt.shape)==1:
         zt=array(zt,ndmin=2).T
-        
+
 
       self.assertEqual(zt.shape[0],zr.shape[0],"In %s: %s dimension error. Got %s, expected %s. %s <-> %s" % (name,failmessage,str(zt.shape),str(zr.shape),str(zt),str(zr)))
       self.assertEqual(len(zt.shape),len(zr.shape),"In %s: %s dimension error. Got %s, expected %s. %s <-> %s" % (name,failmessage,str(zt.shape),str(zr.shape),str(zt),str(zr)))
@@ -256,13 +256,13 @@ class casadiTestCase(unittest.TestCase):
 
   def evaluationCheck(self,yt,yr,x,x0,name="",failmessage="",fmod=None,setx0=None):
     """ General unit test for checking casadi evaluation against a reference solution.
-    
+
         Checks if yr is the same as Function(name,x,yt) , evaluated for x0
-    
+
         x: the symbolic seed for the test. It should be of a form accepted as first argument of Function
         yt: the test expression.
         yr: the reference solution: a numpy matrix.
-        
+
         name - a descriptor that will be included in error messages
     """
     self.message(":"+ name)
@@ -270,24 +270,24 @@ class casadiTestCase(unittest.TestCase):
       sample = x[0]
     else :
       sample = x
-      
+
 
     if isinstance(sample,SX):
       f = Function("f", x, yt)
     else:
       f = Function("f", x, yt)
-    
+
     if (not(fmod is None)):
       f=fmod(f,x)
     if not(type(x0)==list):
       x0=[x0]
-    
+
     if setx0 is None:
       setx0=x0
-      
+
     if not(type(setx0)==list):
       setx0=[setx0]
-      
+
     f_in = [0]*f.n_in()
     for i in range(len(x0)):
       try:
@@ -299,16 +299,16 @@ class casadiTestCase(unittest.TestCase):
     f_out = f.call(f_in)
     zt = f_out[0].full()
     self.checkarray(yr,zt,name,failmessage)
-    
+
   def numpyEvaluationCheck(self,ft,fr,x,x0,name="",failmessage="",fmod=None,setx0=None):
     """ General unit test for checking casadi versus numpy evaluation.
-    
+
         Checks if 'fr(x0)' yields the same as Function(name,x,[ft(x)]) , evaluated for x0
-    
+
         x: the symbolic seed for the test. It should be of a form accepted as first argument of Function
         ft: the test function. This function should operate on the casadi matrix x and return MX or SX.
         fr: the reference function. This function works on the array x0.
-        
+
         name - a descriptor that will be included in error messages
     """
     self.message(":"+ name)
@@ -322,7 +322,7 @@ class casadiTestCase(unittest.TestCase):
       raise e
     self.evaluationCheck([function],frx,x,x0,name,failmessage,fmod=fmod,setx0=setx0)
 
-  
+
   def numpyEvaluationCheckPool(self,pool,x,x0,name="",fmod=None,setx0=None,excludeflags=set()):
     """ Performs a numpyEvaluationCheck for all members of a function pool"""
     for i in range(len(pool.numpyoperators)):
@@ -338,7 +338,7 @@ class casadiTestCase(unittest.TestCase):
       ns = trial.name_in()
       for k,v in list(d.items()):
         inputs[ns.index(k)] = v
-        
+
     if indirect:
       ins = trial.mx_in()
       extra_trial = Function("extra_trial", ins,trial(ins))
@@ -346,11 +346,11 @@ class casadiTestCase(unittest.TestCase):
 
     if digits_sens is None:
       digits_sens = digits
-     
+
     for i in range(trial.n_in()):
       if (allow_empty and (trial.sparsity_in(i).is_empty() or solution.sparsity_in(i).is_empty() )): continue
       message = "input(%d)" % i
-      
+
     for i in range(2): # repeated evaluation
       try:
         trial_outputs = trial.call(inputs)
@@ -366,7 +366,7 @@ class casadiTestCase(unittest.TestCase):
         if (allow_empty and (trial.sparsity_out(i).is_empty() or solution.sparsity_out(i).is_empty() )): continue
         if (allow_nondiff and (trial.sparsity_out(i).nnz()==0 or solution.sparsity_out(i).nnz()==0 )): continue
         self.checkarray(trial_outputs[i],solution_outputs[i],"",digits=digits,failmessage=failmessage+": "+message)
-    
+
     if jacobian:
       for i in range(trial.n_in()):
         if (allow_empty and (trial.sparsity_in(i).is_empty() or solution.sparsity_in(i).is_empty() )): continue
@@ -377,7 +377,7 @@ class casadiTestCase(unittest.TestCase):
           solutionjac = solution.jacobian(i,j)
           self.assertEqual(solutionjac.n_in(),solution.n_in())
           self.assertEqual(solutionjac.n_out(),solution.n_out()+1)
-          
+
           self.checkfunction(trialjac,solutionjac,inputs=inputs,fwd=fwd if sens_der else False,adj=adj if sens_der else False,jacobian=False,gradient=False,hessian=False,evals=False,digits=digits_sens,failmessage="(%s).jacobian(%d,%d)" % (failmessage,i,j),allow_empty=allow_empty,verbose=verbose,allow_nondiff=allow_nondiff)
 
     if gradient:
@@ -404,7 +404,7 @@ class casadiTestCase(unittest.TestCase):
             solutionhess = solution.hessian(i,j)
             self.assertEqual(solutionhess.n_in(),solution.n_in())
             self.assertEqual(solutionhess.n_out(),solution.n_out()+2)
-            self.checkfunction(trialhess,solutionhess,inputs=inputs,fwd=fwd  if sens_der else False,adj=adj  if sens_der else False,jacobian=False,gradient=False,hessian=False,evals=False,digits=digits_sens,failmessage="(%s).hessian(%d,%d)" % (failmessage,i,j),allow_empty=allow_empty,verbose=verbose,allow_nondiff=allow_nondiff)     
+            self.checkfunction(trialhess,solutionhess,inputs=inputs,fwd=fwd  if sens_der else False,adj=adj  if sens_der else False,jacobian=False,gradient=False,hessian=False,evals=False,digits=digits_sens,failmessage="(%s).hessian(%d,%d)" % (failmessage,i,j),allow_empty=allow_empty,verbose=verbose,allow_nondiff=allow_nondiff)
 
     if evals is True:
       evals = 2
@@ -426,28 +426,28 @@ class casadiTestCase(unittest.TestCase):
           return ret
         else:
           return x
-        
+
       #spmods = [lambda x: x , remove_first, remove_last]
       spmods = [lambda x: x]
       #spmods = [lambda x: x , remove_first]
-      
+
       sym = MX.sym
-      
+
       storage2 = {}
       storage = {}
-      
+
       ndir = 2
-      
+
       def vec(l):
         ret = []
         for i in l:
           ret.extend(i)
         return ret
-        
+
       vf_reference = None
-        
+
       for f in [solution,trial]:
-      
+
         # dense
         for spmod,spmod2 in itertools.product(spmods,repeat=2):
           fseeds = [[sym("f",spmod(f.sparsity_in(i))) for i in range(f.n_in())]  for d in range(ndir)]
@@ -456,24 +456,24 @@ class casadiTestCase(unittest.TestCase):
           res = f.call(inputss)
           fwdsens = f.forward(inputss, res, fseeds)
           adjsens = f.reverse(inputss, res, aseeds)
-          
+
           vf = Function("vf", inputss+vec([fseeds[i]+aseeds[i] for i in range(ndir)]),list(res) + vec([list(fwdsens[i])+list(adjsens[i]) for i in range(ndir)]))
-        
+
           vf_in = list(inputs)
           # Complete random seeding
           for i in range(f.n_in(),vf.n_in()):
             random.seed(i)
             vf_in.append(DM(vf.sparsity_in(i),random.random(vf.nnz_in(i))))
-          
+
           vf_out = vf.call(vf_in)
           storagekey = (spmod,spmod2)
           if not(storagekey in storage):
             storage[storagekey] = []
           storage[storagekey].append(vf_out)
-          
+
           if vf_reference is None:
             vf_reference = vf
-            
+
           if evals>1:
 
             # Second order sensitivities
@@ -481,19 +481,19 @@ class casadiTestCase(unittest.TestCase):
               fseeds2 = [[sym("f",vf_reference.sparsity_in(i)) for i in range(vf.n_in())] for d in range(ndir)]
               aseeds2 = [[sym("a",vf_reference.sparsity_out(i))  for i in range(vf.n_out()) ] for d in range(ndir)]
               inputss2 = [sym("i",vf_reference.sparsity_in(i)) for i in range(vf.n_in())]
-              
+
               res2 = vf.call(inputss2)
               fwdsens2 = vf.forward(inputss2, res2, fseeds2)
               adjsens2 = vf.reverse(inputss2, res2, aseeds2)
 
               vf2 = Function("vf2", inputss2+vec([fseeds2[i]+aseeds2[i] for i in range(ndir)]),list(res2) + vec([list(fwdsens2[i])+list(adjsens2[i]) for i in range(ndir)]))
-              
+
               vf2_in = list(inputs)
 
               for i in range(f.n_in(),vf2.n_in()):
                 random.seed(i)
                 vf2_in.append(DM(vf2.sparsity_in(i),random.random(vf2.nnz_in(i))))
-              
+
               vf2_out = vf2.call(vf2_in)
               storagekey = (spmod,spmod2)
               if not(storagekey in storage2):
@@ -507,11 +507,11 @@ class casadiTestCase(unittest.TestCase):
             for k,(a,b) in enumerate(zip(st[0],st[i+1])):
               if b.numel()==0 and sparsify(a).nnz()==0: continue
               if a.numel()==0 and sparsify(b).nnz()==0: continue
-              
+
               if (allow_nondiff and (a.nnz()==0 or b.nnz()==0 )): continue
               #self.checkarray(IM(a.sparsity(),1),IM(b.sparsity(),1),("%s, output(%d)" % (order,k))+str(vf.getInput(0))+failmessage,digits=digits_sens)
               self.checkarray(a,b,("%s, output(%d)" % (order,k))+failmessage,digits=digits_sens)
-              
+
 
   def check_codegen(self,F,inputs=None):
     if args.run_slow:
@@ -521,10 +521,10 @@ class casadiTestCase(unittest.TestCase):
       import subprocess
       p = subprocess.Popen("gcc -fPIC -shared -O3 %s.c -o %s.so" % (name,name) ,shell=True).wait()
       F2 = external(F.name(), './' + name + '.so')
-      
+
       Fout = F.call(inputs)
       Fout2 = F2.call(inputs)
-      
+
       for i in range(F.n_out()):
         self.checkarray(Fout[i],Fout2[i])
 
@@ -549,18 +549,18 @@ class run_only(object):
 class requires(object):
   def __init__(self,att):
     self.att = att
-  
+
   def __call__(self,c):
     if hasattr(casadi,self.att):
       return c
     else:
       print("Not available %s, skipping unittests" % self.att)
       return None
-      
+
 class requires_conic(object):
   def __init__(self,n):
     self.n = n
-  
+
   def __call__(self,c):
     try:
       load_conic(self.n)
@@ -572,7 +572,7 @@ class requires_conic(object):
 class requires_nlpsol(object):
   def __init__(self,n):
     self.n = n
-  
+
   def __call__(self,c):
     try:
       load_nlpsol(self.n)
@@ -584,7 +584,7 @@ class requires_nlpsol(object):
 class requires_integrator(object):
   def __init__(self,n):
     self.n = n
-  
+
   def __call__(self,c):
     try:
       load_integrator(self.n)
@@ -596,7 +596,7 @@ class requires_integrator(object):
 class requires_rootfinder(object):
   def __init__(self,n):
     self.n = n
-  
+
   def __call__(self,c):
     try:
       load_rootfinder(self.n)
@@ -608,7 +608,7 @@ class requires_rootfinder(object):
 class requires_linsol(object):
   def __init__(self,n):
     self.n = n
-  
+
   def __call__(self,c):
     try:
       load_linsol(self.n)
@@ -621,7 +621,7 @@ class requiresPlugin(object):
   def __init__(self,att,n):
     self.att = att
     self.n = n
-  
+
   def __call__(self,c):
     try:
       self.att.loadPlugin(self.n)
@@ -643,26 +643,26 @@ class skip(object):
     else:
       print(self.skiptext(c.__name__))
       return None
-   
+
   def skiptext(self,name):
     return "Skipping test '%s'" % name
 
 def known_bug():
   return unittest.skipIf(not(args.known_bugs),"known bug (run with --known_bugs to include it)")
-    
+
 class memory_heavy(object):
   def __init__(self):
     pass
-    
+
   def __call__(self, c):
     print(c)
     c.__dict__["tag_memory_heavy"] = True
     return c
-    
+
 class slow(object):
   def __init__(self):
     pass
-    
+
   def __call__(self, c):
     print("slow", c)
     c.__dict__["tag_slow"] = True

@@ -54,7 +54,7 @@ class typemaptests(casadiTestCase):
       self.checkarray(m,zt.full(),"IM(numpy.ndarray).full()")
       #if scipy_available:
       #  self.checkarray(m,zt.sparse(),"IM(numpy.ndarray).sparse()")
-      
+
   def test_0(self):
     self.message("Typemap array -> DM")
     arrays = [array([[1,2],[3,4],[5,6]],dtype=double),array([[3.2,4.6,9.9]])]
@@ -66,7 +66,7 @@ class typemaptests(casadiTestCase):
       self.checkarray(m,zt.full(),"DM(numpy.ndarray).full()")
       if scipy_available:
         self.checkarray(m,zt.sparse(),"DM(numpy.ndarray).sparse()")
-      
+
   def test_1(self):
     self.message("DM -> DM")
     arrays = [DM(Sparsity(4,3,[0,2,2,3],[1,2,1]),[3,2.3,8])]
@@ -78,7 +78,7 @@ class typemaptests(casadiTestCase):
       self.checkarray(m,zt.full(),"DM(DM).full()")
       if scipy_available:
         self.checkarray(m,zt.sparse(),"DM(DM).sparse()")
-   
+
   def test_2(self):
     self.message("crs_matrix -> DM")
     if not(scipy_available):
@@ -94,14 +94,14 @@ class typemaptests(casadiTestCase):
       self.checkarray(m,zt.full(),"DM(crs_matrix).full()")
       if scipy_available:
         self.checkarray(m,zt.sparse(),"DM(crs_matrix).sparse()")
-      
-      
+
+
   def test_setget(self):
     return # get/set with return-by-reference has been dropped
     self.message("DM set/get")
     data = n.array([3,2.3,8])
     dm=DM(Sparsity(3,4,[0,0,2,3,3],[0,2,0]),[3,2.3,8])
-    
+
     if scipy_available:
       c=dm.sparse()
     z=n.zeros((3,4))
@@ -119,11 +119,11 @@ class typemaptests(casadiTestCase):
     dm.set(z)
     self.checkarray(dm.full() > 0,dm,"set(2Dmatrix)")
     z=n.zeros((12,5))
-    
+
     if scipy_available:
       dm.set(c)
       self.checkarray(c,dm,"set(csr_matrix)")
-    
+
       z=n.zeros(3)
       dm.get_nz(z)
       self.checkarray(n.matrix(z),n.matrix(data),"get(1Dndarray)")
@@ -135,7 +135,7 @@ class typemaptests(casadiTestCase):
       dm.get(c)
 
       self.checkarray(c,dm,"get(csr_matrix)")
-      
+
       with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         c[0,0]=1
@@ -145,7 +145,7 @@ class typemaptests(casadiTestCase):
     self.message("DM conversions")
     w = DM(Sparsity(4,3,[0,2,2,3],[1,2,1]),[3,2.3,8])
     d = array([[1,2,3],[4,5,6]])
-    
+
     list(w.nonzeros())
     tuple(w.nonzeros())
     w.full()
@@ -160,25 +160,25 @@ class typemaptests(casadiTestCase):
     #print DM(array([1,2,3,6]),2,2).full()
 
     #print DM(array([1,2,3,6]),2,2).full()
-    
+
   def test_autoconversion(self):
     self.message("Auto conversion DM")
     x=array([2.3])
     s = DM([[1,2],[3,4]])
     n = array(s)
-    
+
     self.checkarray(x[0]*s,s*x[0],"")
     self.checkarray(x[0]*s,n*x[0],"")
-    
+
     self.checkarray(x[0]/s,1/(s/x[0]),"")
     self.checkarray(x[0]/s,x[0]/n,"")
-    
+
     self.checkarray(x[0]-s,-(s-x[0]),"")
     self.checkarray(x[0]-s,x[0]-n,"")
-    
+
     self.checkarray(x[0]+s,s+x[0],"")
     self.checkarray(x[0]+s,x[0]+n,"")
-    
+
     w=array([2.3])[0]
     w+=s
     self.checkarray(w,2.3+n,"")
@@ -186,42 +186,42 @@ class typemaptests(casadiTestCase):
     w=array([2.3])[0]
     w-=s
     self.checkarray(w,2.3-n,"")
-    
+
     w=array([2.3])[0]
     w*=s
     self.checkarray(w,2.3*n,"")
-    
+
     w=array([2.3])[0]
     w/=s
     self.checkarray(w,2.3/n,"")
-    
+
     x=[2.3]
 
     self.checkarray(x[0]*s,s*x[0],"")
     self.checkarray(x[0]*s,n*x[0],"")
-    
+
     self.checkarray(x[0]/s,1/(s/x[0]),"")
     self.checkarray(x[0]/s,x[0]/n,"")
-    
+
     self.checkarray(x[0]-s,-(s-x[0]),"")
     self.checkarray(x[0]-s,x[0]-n,"")
-    
+
     self.checkarray(x[0]+s,s+x[0],"")
     self.checkarray(x[0]+s,x[0]+n,"")
-    
-    
+
+
     w=2.3
     w+=s
     self.checkarray(w,2.3+n,"")
-    
+
     w=2.3
     w-=s
     self.checkarray(w,2.3-n,"")
-    
+
     w=2.3
     w*=s
     self.checkarray(w,2.3*n,"")
-    
+
     w=2.3
     w/=s
     self.checkarray(w,2.3/n,"")
@@ -231,43 +231,43 @@ class typemaptests(casadiTestCase):
     s = DM([[1,2],[3,4]])
     x = SX(3)
     y = MX(3)
-    
+
     def doit(z,s,fun):
       if type(z) in [type(SX()),type(SX())]:
         ztype = [type(SX()),type(SX())]
-      
+
       if type(z) in [type(MX())]:
         ztype = [type(MX())]
-        
+
       r = fun(z,s)
-            
+
       if type(z) is type(SX()) and type(s) is type(SX()):
         self.assertTrue(type(r) is type(SX()))
-        
+
 
       self.assertTrue(type(r) in ztype,"Expected %s but got %s" % (str(ztype),str(type(r))))
-      
+
       hasNum = True
       if type(s) in [type(SX()),type(MX()),type(SX())]:
         hasNum = False
-      
+
       if hasNum:
         dummy = [1.3,2.7,9.4,1.0]
 
         f=Function("f", [z],[r])
         f_in = DM(f.sparsity_in(0),dummy[0:f.nnz_in(0)])
         f_out = f(f_in)
-        
+
         f_=Function("f", [z],[z])
         f__in = DM(f_.sparsity_in(0),dummy[0:f.nnz_in(0)])
         f__out = f_(f__in)
-        
+
 
         self.checkarray(fun(f__out,DM(s)),f_out,"operation",str(f__out)+str(s)+":"+str(fun(f__out,DM(s)))+"->"+str(f_out)+":"+str(s)+str(z)+"->"+str(r))
       else:
         dummy = [1.3,2.7,9.4,1.0]
         dummy2 = [0.3,2.4,1.4,1.7]
-        
+
         f=Function("f", [z,s],[r])
         f_in = [DM(f.sparsity_in(0),dummy[0:f.nnz_in(0)]), DM(f.sparsity_in(1),dummy2[0:f.nnz_in(1)])]
         f_out = f(*f_in)
@@ -277,8 +277,8 @@ class typemaptests(casadiTestCase):
         f__out = f_(*f__in)
 
         self.checkarray(fun(f__out[0],f__out[1]),f_out,"operation"+str(f__out[0])+","+str(f__out[1])+":"+str(f_out))
-    
-    
+
+
     def tests(z,s):
       doit(z,s,lambda z,s: -z)
       doit(z,s,lambda z,s: z+s)
@@ -303,14 +303,14 @@ class typemaptests(casadiTestCase):
       doit(z,s,lambda z,s: copysign(s,z))
 
     nums = [array([[1,2],[3,4]]),DM([[1,2],[3,4]]), DM(4), array(4),4.0,4]
-        
+
     ## numeric & SX
     for s in nums:
       for z in [SX.sym("x"), SX.sym("x",2,2)]:
         print("z = %s, s = %s" % (str(z),str(s)))
         print("  z = %s, s = %s" % (type(z),type(s)))
         tests(z,s)
-       
+
     # numeric & MX
     for s in nums:
       for z in [MX.sym("x",2,2)]:
@@ -324,9 +324,9 @@ class typemaptests(casadiTestCase):
         print("z = %s, s = %s" % (str(z),str(s)))
         print("  z = %s, s = %s" % (type(z),type(s)))
         tests(z,s)
-        
+
     for (s,x,y) in [
-                  (matrix([[1,2],[3,4]]),SX.sym("x",2,2),MX.sym("x",2,2))    
+                  (matrix([[1,2],[3,4]]),SX.sym("x",2,2),MX.sym("x",2,2))
                   ]:
       for z,ztype in zip([x,y],[[type(SX()),type(SX())],[type(MX())]]):
         print("z = %s, s = %s" % (str(z),str(s)))
@@ -341,26 +341,26 @@ class typemaptests(casadiTestCase):
         doit(z,s,lambda s,z: s-z)
         doit(z,s,lambda z,s: z/s)
         doit(z,s,lambda s,z: s/z)
-        
+
   def test_conversion_operators(self):
     self.message("COnversion operations")
-    
+
 
     def doit(z,s,fun):
       if type(z) in [type(SX()),type(SX())]:
         ztype = [type(SX()),type(SX())]
-      
+
       if type(z) in [type(MX())]:
         ztype = [type(MX())]
-        
+
       r = fun(z,s)
-            
+
       if type(z) is type(SX()) and type(s) is type(SX()):
         self.assertTrue(type(r) is type(SX()))
-        
+
 
       self.assertTrue(type(r) in ztype,"Expected %s but got %s" % (str(ztype),str(type(r))))
-      
+
     def tests(z,s):
       doit(z,s,lambda z,s: s>=z)
       doit(z,s,lambda z,s: s>z)
@@ -368,40 +368,40 @@ class typemaptests(casadiTestCase):
       doit(z,s,lambda z,s: s<z)
       doit(z,s,lambda z,s: s==z)
       doit(z,s,lambda z,s: s!=z)
-      
+
     nums = [array([[1,2],[3,4]]),DM([[1,2],[3,4]]), DM(4), array(4),4.0,4]
-        
+
     ## numeric & SX
     for s in nums:
       for z in [SX.sym("x"), SX.sym("x"), SX.sym("x",2,2)]:
         print("z = %s, s = %s" % (str(z),str(s)))
         print("  z = %s, s = %s" % (type(z),type(s)))
         tests(z,s)
-       
+
     # numeric & MX
     for s in nums:
       for z in [MX.sym("x",2,2)]:
         print("z = %s, s = %s" % (str(z),str(s)))
         print("  z = %s, s = %s" % (type(z),type(s)))
         tests(z,s)
-        
+
     # SX & SX
     for s in [SX.sym("x"), SX.sym("x"), SX.sym("x",2,2)]:
       for z in [SX.sym("x"),SX.sym("x"), SX.sym("x",2,2)]:
         print("z = %s, s = %s" % (str(z),str(s)))
         print("  z = %s, s = %s" % (type(z),type(s)))
         tests(z,s)
-         
+
     # MX & MX
     for s in [MX.sym("x"),MX.sym("x",2,2)]:
       for z in [MX.sym("x"),MX.sym("x",2,2)]:
         print("z = %s, s = %s" % (str(z),str(s)))
         print("  z = %s, s = %s" % (type(z),type(s)))
         tests(z,s)
-        
+
   def test_set(self):
     self.message("DM set on dense matrices")
-    
+
     # should be integers
     goallist = [1,2,3]
     goal = array([goallist]).T
@@ -414,7 +414,7 @@ class typemaptests(casadiTestCase):
     }
     w=DM(goal)
     self.checkarray(w,goal,"Constructor")
-    
+
     for name, value in list(test.items()):
       w.nz[:] = value
       self.checkarray(w,goal,"name")
@@ -425,14 +425,14 @@ class typemaptests(casadiTestCase):
     }
     w=DM(goal)
     self.checkarray(w,goal,"Constructor")
-    
+
     for name, value in list(test.items()):
       w[:,:] = value
       self.checkarray(w,goal,"name")
 
   def test_DMSXcast(self):
     self.message("Casting DM to SX")
-    
+
     W = SX(DM([[1,2,3],[4,5,6]]))
 
     self.assertEqual(W.size1(),2)
@@ -441,18 +441,18 @@ class typemaptests(casadiTestCase):
   def test_DMMXcast(self):
     self.message("Casting DM to MX")
     W = MX(DM([[1,2,3],[4,5,6]]))
-    
+
     self.assertEqual(W.size1(),2)
     self.assertEqual(W.size2(),3)
-    
+
   def test_DMSX(self):
     self.message("Casting DM to SX")
-    
+
     w = DM([[1,2,3],[4,5,6]])
     x = SX.sym("x")
-    
+
     f = Function("f", [x],[w])
-    
+
     W = f(*f.sx_in())
     self.assertEqual(W.size1(),2)
     self.assertEqual(W.size2(),3)
@@ -461,9 +461,9 @@ class typemaptests(casadiTestCase):
     self.message("Casting DM to MX")
     w = DM([[1,2,3],[4,5,6]])
     x = MX.sym("x")
-    
+
     f = Function("f", [x],[w])
-    
+
     W = f(*f.mx_in())
 
     self.assertEqual(W.size1(),2)
@@ -471,17 +471,17 @@ class typemaptests(casadiTestCase):
 
   def test_setgetslice(self):
     self.message("set/get on DM using slices")
-    
+
     w = DM([[0,0]])
 
     A = matrix([[1.0,2],[3,4]])
     B = matrix([[4.0,5],[6,7]])
-    
+
     w[:,:] = A[0,:]
     self.checkarray(w,A[0,:],"set")
     B[0,:] = w
     self.checkarray(B[0,:],A[0,:],"get")
-    
+
     w = DM([[0],[0]])
 
 
@@ -489,40 +489,40 @@ class typemaptests(casadiTestCase):
     self.checkarray(w,A[:,0],"set")
     B[:,0] = w
     self.checkarray(B[:,0],A[:,0],"get")
-    
+
     w = DM([[1,2],[3,4]])
     A = zeros((8,7))
     B = zeros((8,7))
     A[2:7:3,:7:4] = w
     B[2:7:3,:7:4] = w
     self.checkarray(A,B,"get")
-    
+
   def test_vertcatprecedence(self):
     self.message("Argument precedence DM")
     a = DM([1,2])
     self.assertTrue(isinstance(vertcat(*[a,a]),DM))
-    
+
     a = DM([1,2])
     self.assertTrue(isinstance(vertcat(*[a,[1,2,3]]),DM))
-    
-    
+
+
     a = MX([1,2])
     print(vertcat(*[a,[1,2,3]]))
     self.assertTrue(isinstance(vertcat(*[a,[1,2,3]]),MX))
-    
+
   def test_issue190(self):
     self.message("regression test issue #190")
     x=SX.sym("x")
     x * array(1)
     x * array(1.2)
 
-    SX.sym("x") * array(1.0) 
+    SX.sym("x") * array(1.0)
     MX.sym("x") * array(1.0)
-    
+
   def test_array_cat(self):
     horzcat(*(SX.sym("x",4,3),ones((4,3))))
-    
-    
+
+
   def test_issue(self):
     self.message("std::vector<double> typemap.")
     a = array([0,2,2,3])
@@ -534,15 +534,15 @@ class typemaptests(casadiTestCase):
     DM(Sparsity(4,3,[0,2,2,3],[1,2,1]),(0.738,0.39,0.99))
     DM(Sparsity(4,3,[0,2,2,3],[1,2,1]),list(b))
     DM(Sparsity(4,3,[0,2,2,3],[1,2,1]),b)
-    
+
   def test_imatrix(self):
     self.message("IM")
-    
+
     A = IM.ones(2,2)
     B = A + 1
     self.assertEqual(type(B),type(A))
     self.checkarray(array(B),repmat(DM(2),2,2),"Imatrix")
-    
+
   def test_issue314(self):
     self.message("regression test for #314: SX sparsity constructor")
     SX(Sparsity.diag(3),[1,2,3])
@@ -552,7 +552,7 @@ class typemaptests(casadiTestCase):
       m = DM.ones(5,5)
       m[:,:] = DM(4)
       self.checkarray(m,DM.ones(5,5)*4)
-      
+
   @unittest.skipIf(sys.version_info>=(3,0), "To lazy to fix")
   def test_issue570(self):
     self.message("Issue #570: long int")
@@ -562,33 +562,33 @@ class typemaptests(casadiTestCase):
     print(longint + casadi.SX.sym('x'))
     print(casadi.SX.sym('x') + longint)
     print(longint + casadi.SX.sym('x'))
-    
+
   def test_casting_DM(self):
     self.message("casting DM")
-    
+
     x = SX.sym("x")
     f = Function("f", [x],[x])
     class Foo:
       def __DM__(self):
         return DM([4])
-    
+
     self.assertEqual(f(Foo()),4)
 
     class Foo:
       def __DM__(self):
         return SX([4])
-        
+
     self.assertRaises(NotImplementedError,lambda :f(Foo()))
-    
+
     class Foo:
       def __DM__(self):
         raise Exception("15")
-        
+
     self.assertRaises(NotImplementedError,lambda :f(Foo()))
 
     class Foo:
       pass
-        
+
     self.assertRaises(NotImplementedError,lambda :f(Foo()))
 
   def test_casting_IM(self):
@@ -597,85 +597,85 @@ class typemaptests(casadiTestCase):
     class Foo:
       def __IM__(self):
         return IM([[4,6],[2,4]])
-        
+
     self.assertEqual(det(Foo()),4)
 
     class Foo:
       def __IM__(self):
         return SX([[4,6],[2,4]])
-        
+
     self.assertRaises(NotImplementedError,lambda :det(Foo()))
-    
+
     class Foo:
       def __IM__(self):
         raise Exception("15")
-        
+
     self.assertRaises(NotImplementedError,lambda :det(Foo()))
 
     class Foo:
       pass
-        
+
     self.assertRaises(NotImplementedError,lambda : det(Foo()))
 
   def test_casting_SX(self):
     self.message("casting SX")
-    
-    
+
+
     x = SX.sym("x")
-    
+
     class Foo:
       def __SX__(self):
         return x
-        
+
     Function("tmp", [x],[Foo()])
-    
+
     class Foo:
       def __SX__(self):
         return MX.sym("x")
-        
+
     self.assertRaises(NotImplementedError,lambda : Function("tmp", [x],[Foo()]))
-    
+
     class Foo:
       def __SX__(self):
         raise Exception("15")
-        
+
     self.assertRaises(NotImplementedError,lambda : Function("tmp", [x],[Foo()]))
 
     class Foo:
       pass
-        
+
     self.assertRaises(NotImplementedError,lambda :Function("tmp", [x],[Foo()]))
 
 
   def test_casting_MX(self):
     self.message("casting MX")
-    
-    
+
+
     x = MX.sym("x")
-    
+
     class Foo:
       def __MX__(self):
         return x
-        
+
     Function("tmp", [x],[Foo()])
-    
+
     class Foo:
       def __MX__(self):
         return SX.sym("x")
-        
+
     self.assertRaises(NotImplementedError,lambda : Function("tmp", [x],[Foo()]))
-    
+
     class Foo:
       def __MX__(self):
         raise Exception("15")
-        
+
     self.assertRaises(NotImplementedError,lambda : Function("tmp", [x],[Foo()]))
 
     class Foo:
       pass
-        
+
     self.assertRaises(NotImplementedError,lambda :Function("tmp", [x],[Foo()]))
-    
+
   def test_OUTPUT(self):
     self.message("OUTPUT typemap")
     a = SX.sym("A",3,3)
@@ -683,22 +683,22 @@ class typemaptests(casadiTestCase):
 
   def test_cvar(self):
     self.message("We must not have cvar, to avoid bug #652")
-    # Wrap all static global things in #ifdef SWIG 
+    # Wrap all static global things in #ifdef SWIG
     with self.assertRaises(Exception):
       cvar
-      
+
   def test_ufuncsum(self):
     self.message("ufunc.add")
-    
+
     self.checkarray(DM(sum(DM([1,2,3]).nonzeros())),DM(6))
-    
+
   def test_sxmatrix(self):
 
     def val(a):
       f = Function("f", [],[a])
       f_out = f.call([])
       return f_out[0]
-      
+
     for i in [SX(1),1,1.0]:
       a = array([[1,2],[3,4]])
       print(val(SX(a)))
@@ -709,28 +709,28 @@ class typemaptests(casadiTestCase):
 
 
       a = numpy.matrix([[1,2],[3,4]])
-      
+
       print(val(SX(a)))
       print(DM([[1,2],[3,4]]))
 
       self.checkarray(val(SX(a)),DM([[1,2],[3,4]]))
       self.checkarray(val(SX(a.T).T),DM([[1,2],[3,4]]))
-      
+
   def test_issue1158(self):
     A = numpy.zeros((0,2))
     a = DM(A)
     self.assertEqual(a.shape[0],0)
     self.assertEqual(a.shape[1],2)
-    
+
   def test_matrices(self):
 
-    Ds = [    
+    Ds = [
           numpy.matrix([[1,2],[3,4]]),
           numpy.matrix([[1,2],[3,4.0]]),
           array([[1,2],[3,4]]),
           array([[1,2],[3,4.0]]),
         ]
-        
+
     if scipy_available:
       Ds+=[
           csc_matrix(([1.0,3.0,2.0,4.0],[0,1,0,1],[0,2,4]),shape=(2,2),dtype=numpy.double),
@@ -742,7 +742,7 @@ class typemaptests(casadiTestCase):
     for D in Ds:
       print(D)
       d = DM.ones(2,2)
-      
+
       x = SX.sym("x",d.sparsity())
       f = Function("f", [x],[x])
       fin = DM(d.sparsity(),0)
@@ -766,7 +766,7 @@ class typemaptests(casadiTestCase):
     b = atleast_2d(None)
     with self.assertRaises(NotImplementedError):
       c = repmat(b, 1, 1)
-      
+
   @known_bug()
   def test_IMDMarray(self):
     num = [2,2.0,IM(2),DM(2)]
@@ -782,8 +782,8 @@ class typemaptests(casadiTestCase):
     x=SX.sym("x")
     with self.assertRaises(RuntimeError):
       solver = nlpsol("mysolver", "ipopt", {"x":x,"f":x**2}, {"ipopt": {"acceptable_tol": SX.sym("x")}})
-      
+
     nlpsol("mysolver", "ipopt", {"x":x,"f":x**2}, {"ipopt": {"acceptable_tol": 1}})
-    
+
 if __name__ == '__main__':
     unittest.main()

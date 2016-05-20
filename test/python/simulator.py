@@ -74,11 +74,11 @@ class Simulatortests(casadiTestCase):
     num = self.num
     N = 4
     tc = n.linspace(0,num['tend'], N)
-    
+
     t=SX.sym('t')
     q=SX.sym('q')
     p=SX.sym('p')
-    
+
     f={'t':t, 'x':q, 'p':p, 'ode':q/p*t**2}
     opts = {}
     opts['reltol'] = 1e-15
@@ -94,9 +94,9 @@ class Simulatortests(casadiTestCase):
     f_in = {}
     f_in['x0']=0.3
     f_in['p']=0.7
-    
+
     self.checkfunction(integrator,solution,inputs=f_in,adj=False,jacobian=False,sens_der=False,evals=False,digits=6)
-    
+
   def test_simulator_time_offset(self):
     self.message('CVodes integration: simulator time offset')
     num=self.num
@@ -119,7 +119,7 @@ class Simulatortests(casadiTestCase):
     p=num['p']
 
     self.assertAlmostEqual(integrator_out[0][0,-1],q0*exp((tend**3-0.7**3)/(3*p)),9,'Evaluation output mismatch')
-            
+
 if __name__ == '__main__':
     unittest.main()
 

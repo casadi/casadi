@@ -58,5 +58,5 @@ t = TestSuite(dirname=src,
   skipdirs=[".svn","ctemplate"],
     args=sys.argv[2:]
   )
-  
+
 t.run()

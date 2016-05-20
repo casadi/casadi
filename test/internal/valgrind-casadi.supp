@@ -110,7 +110,7 @@
    fun:_wrap_DM___radd____SWIG_0
 }
 
-#Error in swig 
+#Error in swig
 {
    swigerror1
    Memcheck:Cond
@@ -162,7 +162,7 @@
    fun:_ZN4swig18traits_from_stdseqISt6vectorIN6CasADi2MXESaIS3_EES3_E4fromERKS5_
 }
 
-{  
+{
    swigerror4
    Memcheck:Addr4
    fun:PyObject_GC_Del
