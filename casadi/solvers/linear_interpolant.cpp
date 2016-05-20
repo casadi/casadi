@@ -62,20 +62,11 @@ namespace casadi {
     alloc_iw(grid_.size(), true); // corner
   }
 
-  bool casadi_flip(int* corner, int ndim) {
-    for (int i=0; i<ndim; ++i) {
-      if (corner[i]) {
-        corner[i]=0;
-      } else {
-        corner[i]=1;
-        return true;
-      }
-    }
-    return false;
-  }
-
   void LinearInterpolant::eval(void* mem, const double** arg, double** res,
                                int* iw, double* w) const {
+    // Quick return?
+    if (!res[0]) return;
+
     // Number of Dimensions
     int ndim = grid_.size();
 
@@ -86,21 +77,20 @@ namespace casadi {
 
     // Left index and fraction of interval
     for (int i=0; i<ndim; ++i) {
-      // Number of gridpoints
-      int ng = grid_[i].size();
-      // Get x-value
+      // input
       double x = arg[0] ? arg[0][i] : 0;
+      // Grid
+      const double* g = get_ptr(grid_[i]);
+      int ng = grid_[i].size();
       // Find left index
-      int ind;
-      for (ind=0; ind<ng-2; ++ind) {
-        if (x < grid_[i][ind]) break;
-      }
-      index[i] = ind;
+      int j = index[i] = low(x, g, ng);
       // Get interpolation/extrapolation alpha
-      alpha[i] = (x-grid_[i][ind])/(grid_[i][ind+1]-grid_[i][ind]);
+      alpha[i] = (x-g[j])/(g[j+1]-g[j]);
     }
-    // Loop over all corners, add contribution to output
+    // Return value
     double ret = 0;
+
+    // Loop over all corners, add contribution to output
     casadi_fill(corner, ndim, 0);
     do {
       // Get weight and value for corner
@@ -108,17 +98,21 @@ namespace casadi {
       int ld=1; // leading dimension
       int ind=0;
       for (int i=0; i<ndim; ++i) {
-        w *= corner[i] ? alpha[i] : 1-alpha[i];
+        if (corner[i]) {
+          w *= alpha[i];
+        } else {
+          w *= 1-alpha[i];
+        }
         ind += (index[i]+corner[i])*ld;
         ld *= grid_[i].size();
       }
 
       // Add contribution to return value
       ret += w*values_.at(ind);
-    } while (casadi_flip(corner, ndim));
+    } while (flip(corner, ndim));
 
     // Return interpolation
-    casadi_copy(&ret, 1, res[0]);
+    res[0][0] = ret;
   }
 
 } // namespace casadi
