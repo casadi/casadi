@@ -5917,6 +5917,9 @@ IpoptInterface &ipoptInterface, IpoptMemory *mem) " [INTERNAL] ";
 // File: classcasadi_1_1LapackQr.xml
 
 
+// File: classcasadi_1_1LinearInterpolant.xml
+
+
 // File: classcasadi_1_1Linsol.xml
 
 
@@ -12741,10 +12744,27 @@ List of plugins
 
 
 
+- linear
+
 Note: some of the plugins in this list might not be available on your
 system. Also, there might be extra plugins available to you that are not
 listed here. You can obtain their documentation with
 Interpolant.doc(\"myextraplugin\")
+
+
+
+--------------------------------------------------------------------------------
+
+linear
+------
+
+
+
+
+
+--------------------------------------------------------------------------------
+
+
 
 Joel Andersson
 
