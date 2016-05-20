@@ -43,7 +43,8 @@ namespace casadi {
   public:
     /// Constructor
     Interpolant(const std::string& name,
-                const std::vector<std::vector<double> >& grid,
+                const std::vector<double>& grid,
+                const std::vector<int>& offset,
                 const std::vector<double>& values);
 
     /// Destructor
@@ -69,7 +70,8 @@ namespace casadi {
 
     // Creator function for internal class
     typedef Interpolant* (*Creator)(const std::string& name,
-                                    const std::vector<std::vector<double> >& grid,
+                                    const std::vector<double>& grid,
+                                    const std::vector<int>& offset,
                                     const std::vector<double>& values);
 
     // No static functions exposed
@@ -104,8 +106,14 @@ namespace casadi {
     /// Infix
     static const std::string infix_;
 
+    // Number of dimensions
+    int ndim_;
+
     // Input grid
-    std::vector<std::vector<double> > grid_;
+    std::vector<double> grid_;
+
+    // Offset for each dimension
+    std::vector<int> offset_;
 
     // Values at gridpoints
     std::vector<double> values_;

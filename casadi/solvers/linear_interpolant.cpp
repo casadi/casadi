@@ -45,8 +45,10 @@ namespace casadi {
 
   LinearInterpolant::
   LinearInterpolant(const string& name,
-                    const vector<vector<double> >& grid,
-                    const vector<double>& values) : Interpolant(name, grid, values) {
+                    const std::vector<double>& grid,
+                    const std::vector<int>& offset,
+                    const vector<double>& values)
+                    : Interpolant(name, grid, offset, values) {
   }
 
   LinearInterpolant::~LinearInterpolant() {
@@ -57,9 +59,9 @@ namespace casadi {
     Interpolant::init(opts);
 
     // Temporary memory
-    alloc_w(grid_.size(), true); // alpha
-    alloc_iw(grid_.size(), true); // index
-    alloc_iw(grid_.size(), true); // corner
+    alloc_w(ndim_, true); // alpha
+    alloc_iw(ndim_, true); // index
+    alloc_iw(ndim_, true); // corner
   }
 
   void LinearInterpolant::eval(void* mem, const double** arg, double** res,
@@ -67,21 +69,18 @@ namespace casadi {
     // Quick return?
     if (!res[0]) return;
 
-    // Number of Dimensions
-    int ndim = grid_.size();
-
     // Work vectors
-    double* alpha = w; w += ndim;
-    int* index = iw; iw += ndim;
-    int* corner = iw; iw += ndim;
+    double* alpha = w; w += ndim_;
+    int* index = iw; iw += ndim_;
+    int* corner = iw; iw += ndim_;
 
     // Left index and fraction of interval
-    for (int i=0; i<ndim; ++i) {
+    for (int i=0; i<ndim_; ++i) {
       // input
       double x = arg[0] ? arg[0][i] : 0;
       // Grid
-      const double* g = get_ptr(grid_[i]);
-      int ng = grid_[i].size();
+      const double* g = get_ptr(grid_) + offset_[i];
+      int ng = offset_[i+1]-offset_[i];
       // Find left index
       int j = index[i] = low(x, g, ng);
       // Get interpolation/extrapolation alpha
@@ -91,25 +90,25 @@ namespace casadi {
     double ret = 0;
 
     // Loop over all corners, add contribution to output
-    casadi_fill(corner, ndim, 0);
+    casadi_fill(corner, ndim_, 0);
     do {
       // Get weight and value for corner
       double w=1;
       int ld=1; // leading dimension
       int ind=0;
-      for (int i=0; i<ndim; ++i) {
+      for (int i=0; i<ndim_; ++i) {
         if (corner[i]) {
           w *= alpha[i];
         } else {
           w *= 1-alpha[i];
         }
         ind += (index[i]+corner[i])*ld;
-        ld *= grid_[i].size();
+        ld *= offset_[i+1]-offset_[i];
       }
 
       // Add contribution to return value
       ret += w*values_.at(ind);
-    } while (flip(corner, ndim));
+    } while (flip(corner, ndim_));
 
     // Return interpolation
     res[0][0] = ret;

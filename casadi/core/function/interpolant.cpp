@@ -48,19 +48,9 @@ namespace casadi {
                        const std::vector<std::vector<double> >& grid,
                        const std::vector<double>& values,
                        const Dict& opts) {
-    Function ret;
-    ret.assignNode(Interpolant::getPlugin(solver).creator(name, grid, values));
-    ret->construct(opts);
-    return ret;
-  }
 
-  Interpolant::
-  Interpolant(const std::string& name,
-              const std::vector<std::vector<double> >& grid,
-              const std::vector<double>& values)
-              : FunctionInternal(name), grid_(grid), values_(values) {
     // Dimension at least 1
-    casadi_assert_message(grid_.size()>0, "At least one input required");
+    casadi_assert_message(grid.size()>0, "At least one input required");
 
     // Consistency check, number of elements
     unsigned int nel=1;
@@ -68,7 +58,7 @@ namespace casadi {
       casadi_assert_message(g.size()>=2, "Need at least two grid points for every input")
       nel *= g.size();
     }
-    casadi_assert_message(nel==values_.size(), "Inconsistent number of elements");
+    casadi_assert_message(nel==values.size(), "Inconsistent number of elements");
 
     // Grid must be strictly increasing
     for (auto&& g : grid) {
@@ -79,6 +69,33 @@ namespace casadi {
         last = e;
       }
     }
+
+    // Get offset for each input dimension
+    vector<int> offset;
+    offset.reserve(grid.size()+1);
+    offset.push_back(0);
+    for (auto&& g : grid) offset.push_back(offset.back()+g.size());
+
+    // Stack input grids
+    vector<double> stacked;
+    stacked.reserve(offset.back());
+    for (auto&& g : grid) stacked.insert(stacked.end(), g.begin(), g.end());
+
+
+    Function ret;
+    ret.assignNode(Interpolant::getPlugin(solver).creator(name, stacked, offset, values));
+    ret->construct(opts);
+    return ret;
+  }
+
+  Interpolant::
+  Interpolant(const std::string& name,
+              const std::vector<double>& grid,
+              const std::vector<int>& offset,
+              const std::vector<double>& values)
+              : FunctionInternal(name), grid_(grid), offset_(offset), values_(values) {
+    // Number of grid points
+    ndim_ = offset_.size()-1;
   }
 
   Interpolant::~Interpolant() {
@@ -86,7 +103,7 @@ namespace casadi {
 
   Sparsity Interpolant::get_sparsity_in(int i) {
     casadi_assert(i==0);
-    return Sparsity::dense(grid_.size());
+    return Sparsity::dense(ndim_);
   }
 
   Sparsity Interpolant::get_sparsity_out(int i) {
