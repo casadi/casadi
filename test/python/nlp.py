@@ -1128,4 +1128,4 @@ class NLPtests(casadiTestCase):
       
 if __name__ == '__main__':
     unittest.main()
-    print solvers
+    print(solvers)
