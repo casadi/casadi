@@ -14,10 +14,11 @@ for pl = strsplit(CasadiMeta.getPlugins(),';')
     eval(['load_rootfinder(''' name ''')'])
   elseif strcmp(cls, 'Linsol')
     eval(['load_linsol(''' name ''')'])
+  elseif strcmp(cls, 'Interpolant')
+    eval(['load_interpolant(''' name ''')'])
   else
     eval([cls '.loadPlugin(''' name ''')'])
   end
 
 
 end
-

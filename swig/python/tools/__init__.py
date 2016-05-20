@@ -32,7 +32,7 @@ def print_subclasses(myclass, depth=0):
   print(("  " * depth) + " - " + myclass.__name__)
   for s in myclass.__subclasses__():
     print_subclasses(s,depth=depth+1)
-    
+
 def loadAllCompiledPlugins():
   for k in CasadiMeta.getPlugins().split(";"):
     cls, name = k.split("::")
@@ -47,5 +47,7 @@ def loadAllCompiledPlugins():
       casadi.load_rootfinder(name)
     elif cls=='Linsol':
       casadi.load_linsol(name)
+    elif cls=='Interpolant':
+      casadi.load_interpolant(name)
     else:
       getattr(casadi,cls).loadPlugin(name)
