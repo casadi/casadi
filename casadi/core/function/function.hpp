@@ -836,6 +836,14 @@ namespace casadi {
     /// Get a const pointer to the node
     FunctionInternal* get() const;
 
+    /// Get a pointer and typecast
+    template<typename T>
+    T* get() const {
+      T* ret = dynamic_cast<T*>(get());
+      casadi_assert(ret!=0);
+      return ret;
+    }
+
     /** \brief  Const access functions of the node */
     FunctionInternal* operator->() const;
 
