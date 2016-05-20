@@ -5920,6 +5920,9 @@ IpoptInterface &ipoptInterface, IpoptMemory *mem) " [INTERNAL] ";
 // File: classcasadi_1_1LinearInterpolant.xml
 
 
+// File: classcasadi_1_1LinearInterpolantJac.xml
+
+
 // File: classcasadi_1_1Linsol.xml
 
 
@@ -10412,6 +10415,10 @@ Explicitly load a plugin dynamically.
 Explicitly load a plugin dynamically.
 
 ";
+
+%feature("docstring")  casadi::casadi_interpn_grad(real_t *grad, int ndim,
+const real_t *grid, const int *offset, const real_t *values, const real_t
+*x, int *iw, real_t *w) " [INTERNAL] ";
 
 %feature("docstring")  casadi::has_interpolant(const std::string &name) "
 

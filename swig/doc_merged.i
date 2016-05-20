@@ -4183,6 +4183,9 @@ NULL)
 // File: classcasadi_1_1LinearInterpolant.xml
 
 
+// File: classcasadi_1_1LinearInterpolantJac.xml
+
+
 // File: classcasadi_1_1Linsol.xml
 
 
@@ -8009,6 +8012,8 @@ Explicitly load a plugin dynamically.
 Explicitly load a plugin dynamically.
 
 ";
+
+%feature("docstring") casadi::casadi_interpn_grad "[INTERNAL] ";
 
 %feature("docstring") casadi::has_interpolant "
 
