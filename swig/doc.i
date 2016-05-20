@@ -12658,6 +12658,9 @@ x) " [INTERNAL]  Evaluate a polynomial.
 
 ";
 
+%feature("docstring")  casadi::casadi_flip(int *corner, int ndim) "
+[INTERNAL] ";
+
 %feature("docstring")  casadi::simpleIntegrator(Function f, const
 std::string &integrator="cvodes", const Dict &integrator_options=Dict()) "
 
@@ -12721,6 +12724,10 @@ Get the number of QP solver outputs.
 <- x, w work vector (length >= number of rows)
 
 ";
+
+%feature("docstring")  casadi::casadi_interpn_linear(int ndim, const real_t
+*grid, const int *offset, const real_t *values, const real_t *x, int *iw,
+real_t *w) " [INTERNAL] ";
 
 %feature("docstring")  casadi::matrixName< int >() "
 
@@ -12823,6 +12830,9 @@ Get integrator output scheme of integrators.
 Get output scheme name by index.
 
 ";
+
+%feature("docstring")  casadi::casadi_low(real_t x, const double *grid, int
+ng) " [INTERNAL] ";
 
 %feature("docstring")  casadi::casadi_trans(const real_t *x, const int
 *sp_x, real_t *y, const int *sp_y, int *tmp) " [INTERNAL]  TRANS: y <-

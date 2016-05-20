@@ -10208,6 +10208,8 @@ polynomial.
 
 ";
 
+%feature("docstring") casadi::casadi_flip "[INTERNAL] ";
+
 %feature("docstring") casadi::simpleIntegrator "
 
 Simplified wrapper for the Integrator class Constructs an integrator using
@@ -10262,6 +10264,8 @@ Get the number of QP solver outputs.
 x, w work vector (length >= number of rows)
 
 ";
+
+%feature("docstring") casadi::casadi_interpn_linear "[INTERNAL] ";
 
 %feature("docstring") casadi::matrixName< int > "
 
@@ -10364,6 +10368,8 @@ Get integrator output scheme of integrators.
 Get output scheme name by index.
 
 ";
+
+%feature("docstring") casadi::casadi_low "[INTERNAL] ";
 
 %feature("docstring") casadi::casadi_trans "[INTERNAL]  TRANS: y <-
 trans(x)
