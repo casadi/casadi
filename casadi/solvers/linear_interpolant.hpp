@@ -37,13 +37,14 @@
 /// \cond INTERNAL
 
 namespace casadi {
-
   /** \brief \pluginbrief{Interpolant,linear}
+    Implements a multilinear interpolant: For 1D, the interpolating polynomial
+    will be linear. For 2D, the interpolating polynomial will be bilinear, etc.
 
-      @copydoc Interpolant_doc
-      @copydoc plugin_Interpolant_linear
-      \author Joel Andersson
-      \date 2013
+    @copydoc Interpolant_doc
+    @copydoc plugin_Interpolant_linear
+    \author Joel Andersson
+    \date 2016
   */
   class CASADI_INTERPOLANT_LINEAR_EXPORT LinearInterpolant : public Interpolant {
   public:
