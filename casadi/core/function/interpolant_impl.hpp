@@ -67,12 +67,6 @@ namespace casadi {
     virtual std::string get_name_out(int i);
     /// @}
 
-    /// Initialize
-    virtual void init(const Dict& opts);
-
-    /// Solve the system of equations
-    virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
-
     // Creator function for internal class
     typedef Interpolant* (*Creator)(const std::string& name,
                                     const std::vector<std::vector<double> >& grid,
@@ -91,7 +85,7 @@ namespace casadi {
     std::vector<std::vector<double> > grid_;
 
     // Values at gridpoints
-    const std::vector<double>& values_;
+    std::vector<double> values_;
   };
 
 

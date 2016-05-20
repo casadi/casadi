@@ -32,6 +32,11 @@ casadi_plugin(Linsol symbolicqr
   symbolic_qr.hpp symbolic_qr.cpp symbolic_qr_meta.cpp
 )
 
+# Linear interpolant
+casadi_plugin(Interpolant linear
+  linear_interpolant.hpp linear_interpolant.cpp linear_interpolant_meta.cpp
+)
+
 if(WITH_DL AND NOT WIN32)
   # Simple just-in-time compiler, using shell commands
   casadi_plugin(Importer shell

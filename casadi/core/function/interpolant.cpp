@@ -61,11 +61,13 @@ namespace casadi {
               : FunctionInternal(name), grid_(grid), values_(values) {
     // Dimension at least 1
     casadi_assert_message(grid_.size()>0, "At least one input required");
-    casadi_assert_message(values_.size()>0, "At least one output required");
 
     // Consistency check, number of elements
     unsigned int nel=1;
-    for (auto&& g : grid) nel *= g.size();
+    for (auto&& g : grid) {
+      casadi_assert_message(g.size()>=2, "Need at least two grid points for every input")
+      nel *= g.size();
+    }
     casadi_assert_message(nel==values_.size(), "Inconsistent number of elements");
 
     // Grid must be strictly increasing
@@ -100,17 +102,6 @@ namespace casadi {
   std::string Interpolant::get_name_out(int i) {
     casadi_assert(i==0);
     return "f";
-  }
-
-  void Interpolant::init(const Dict& opts) {
-    // Call the base class initializer
-    FunctionInternal::init(opts);
-
-  }
-
-  void Interpolant::eval(void* mem, const double** arg, double** res,
-                    int* iw, double* w) const {
-    casadi_error("not implemented");
   }
 
   std::map<std::string, Interpolant::Plugin> Interpolant::solvers_;
