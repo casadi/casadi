@@ -73,8 +73,30 @@ namespace casadi {
     /// Evaluate numerically
     virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
 
+    ///@{
+    /** \brief Full Jacobian */
+    virtual bool hasFullJacobian() const { return true;}
+    virtual Function getFullJacobian(const std::string& name, const Dict& opts);
+    ///@}
+
     /// A documentation string
     static const std::string meta_doc;
+  };
+
+  /** First order derivatives */
+  class CASADI_EXPORT LinearInterpolantJac : public FunctionInternal {
+  public:
+    /// Constructor
+    LinearInterpolantJac(const std::string& name) : FunctionInternal(name) {}
+
+    /// Destructor
+    virtual ~LinearInterpolantJac() {}
+
+    // Initialize
+    virtual void init(const Dict& opts);
+
+    /// Evaluate numerically
+    virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
   };
 
 } // namespace casadi

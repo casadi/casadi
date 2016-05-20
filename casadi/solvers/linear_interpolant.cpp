@@ -58,10 +58,9 @@ namespace casadi {
     // Call the base class initializer
     Interpolant::init(opts);
 
-    // Temporary memory
-    alloc_w(ndim_, true); // alpha
-    alloc_iw(ndim_, true); // index
-    alloc_iw(ndim_, true); // corner
+    // Needed by casadi_interpn
+    alloc_w(ndim_, true);
+    alloc_iw(2*ndim_, true);
   }
 
   void LinearInterpolant::eval(void* mem, const double** arg, double** res,
@@ -70,6 +69,31 @@ namespace casadi {
       res[0][0] = casadi_interpn(ndim_, get_ptr(grid_), get_ptr(offset_),
                                  get_ptr(values_), arg[0], iw, w);
     }
+  }
+
+  Function LinearInterpolant::
+  getFullJacobian(const std::string& name, const Dict& opts) {
+    Function ret;
+    ret.assignNode(new LinearInterpolantJac(name));
+    ret->construct(opts);
+    return ret;
+  }
+
+  void LinearInterpolantJac::init(const Dict& opts) {
+    // Call the base class initializer
+    FunctionInternal::init(opts);
+
+    // Needed by casadi_interpn
+    auto m = derivative_of_.get<LinearInterpolant>();
+    alloc_w(2*m->ndim_, true);
+    alloc_iw(2*m->ndim_, true);
+  }
+
+  void LinearInterpolantJac::eval(void* mem, const double** arg, double** res,
+                               int* iw, double* w) const {
+    auto m = derivative_of_.get<LinearInterpolant>();
+    casadi_interpn_grad(res[0], m->ndim_, get_ptr(m->grid_), get_ptr(m->offset_),
+                        get_ptr(m->values_), arg[0], iw, w);
   }
 
 } // namespace casadi

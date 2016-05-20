@@ -38,8 +38,7 @@ namespace casadi {
       @copydoc Interpolant_doc
   */
   class CASADI_EXPORT Interpolant
-  : public FunctionInternal,
-    public PluginInterface<Interpolant> {
+  : public FunctionInternal, public PluginInterface<Interpolant> {
   public:
     /// Constructor
     Interpolant(const std::string& name,
@@ -95,7 +94,6 @@ namespace casadi {
     // Values at gridpoints
     std::vector<double> values_;
   };
-
 
 } // namespace casadi
 /// \endcond
