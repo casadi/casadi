@@ -223,8 +223,8 @@ namespace casadi {
   void IdasInterface::ehfun(int error_code, const char *module, const char *function,
                                    char *msg, void *eh_data) {
     try {
-      auto m = to_mem(eh_data);
-      auto& s = m->self;
+      //auto m = to_mem(eh_data);
+      //auto& s = m->self;
       userOut<true, PL_WARN>() << msg << endl;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "ehfun failed: " << e.what() << endl;
@@ -292,7 +292,7 @@ namespace casadi {
                                  N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) {
     try {
       auto m = to_mem(user_data);
-      auto& s = m->self;
+      //auto& s = m->self;
 
       // Commented out since a new implementation currently cannot be tested
       casadi_error("Commented out, #884, #794.");
@@ -307,9 +307,6 @@ namespace casadi {
   void IdasInterface::init_memory(void* mem) const {
     SundialsInterface::init_memory(mem);
     auto m = to_mem(mem);
-
-    // Sundials return flag
-    int flag;
 
     // Create IDAS memory block
     m->mem = IDACreate();
@@ -438,9 +435,6 @@ namespace casadi {
     // Reset the base classes
     SundialsInterface::reset(mem, t, _x, _z, _p);
 
-    // Return flag
-    int flag;
-
     // Re-initialize
     copy(init_xdot_.begin(), init_xdot_.end(), NV_DATA_S(m->xzdot));
     THROWING(IDAReInit, m->mem, grid_.front(), m->xz, m->xzdot);
@@ -518,7 +512,6 @@ namespace casadi {
                              const double* rz, const double* rp) const {
     log("IdasInterface::resetB", "begin");
     auto m = to_mem(mem);
-    int flag;
 
     // Reset the base classes
     SundialsInterface::resetB(mem, t, rx, rz, rp);
@@ -721,8 +714,8 @@ namespace casadi {
                                   N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) {
 
     try {
-      auto m = to_mem(user_data);
-      auto& s = m->self;
+      //auto m = to_mem(user_data);
+      //auto& s = m->self;
 
       // Commented out since a new implementation currently cannot be tested
       casadi_error("Commented out, #884, #794.");
@@ -1055,10 +1048,9 @@ namespace casadi {
                                      N_Vector vtemp1B, N_Vector vtemp2B, N_Vector vtemp3B) {
     try {
       auto m = to_mem(IDA_mem->ida_lmem);
-      auto& s = m->self;
+      //auto& s = m->self;
       IDAadjMem IDAADJ_mem;
       //IDABMem IDAB_mem;
-      int flag;
 
       // Current time
       double t = IDA_mem->ida_tn; // TODO(Joel): is this correct?
@@ -1072,7 +1064,7 @@ namespace casadi {
 
       // Get FORWARD solution from interpolation.
       if (IDAADJ_mem->ia_noInterp==FALSE) {
-        flag = IDAADJ_mem->ia_getY(IDA_mem, t, IDAADJ_mem->ia_yyTmp, IDAADJ_mem->ia_ypTmp,
+        int flag = IDAADJ_mem->ia_getY(IDA_mem, t, IDAADJ_mem->ia_yyTmp, IDAADJ_mem->ia_ypTmp,
                                    NULL, NULL);
         if (flag != IDA_SUCCESS) casadi_error("Could not interpolate forward states");
       }

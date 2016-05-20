@@ -92,7 +92,7 @@ namespace casadi {
     auto m = static_cast<LapackQrMemory*>(mem);
 
     // Dimensions
-    int nrow = this->nrow();
+    //int nrow = this->nrow();
     int ncol = this->ncol();
 
     // Properties of R

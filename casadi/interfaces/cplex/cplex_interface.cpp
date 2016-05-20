@@ -294,11 +294,9 @@ namespace casadi {
     // Temporaries
     double* lam_a=w; w += na_;
 
-    int status;
-
     // We change method in crossover
     if (m->is_warm && qp_method_ == 7) {
-      status = CPXsetintparam(m->env, CPX_PARAM_QPMETHOD, 1);
+      (void)CPXsetintparam(m->env, CPX_PARAM_QPMETHOD, 1);
     }
 
     for (int i = 0; i < na_; ++i) {
@@ -415,7 +413,7 @@ namespace casadi {
 
     // Retrieving the basis
     if (qp_method_ != 0 && qp_method_ != 4) {
-      status = CPXgetbase(m->env, m->lp, get_ptr(m->cstat), get_ptr(m->rstat));
+      (void)CPXgetbase(m->env, m->lp, get_ptr(m->cstat), get_ptr(m->rstat));
     }
 
     // Flip the sign of the multipliers

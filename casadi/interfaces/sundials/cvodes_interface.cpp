@@ -327,7 +327,6 @@ namespace casadi {
     // Reset the base classes
     SundialsInterface::resetB(mem, t, rx, rz, rp);
 
-    int flag;
     if (m->first_callB) {
       // Create backward problem (use the same lmm and iter)
       THROWING(CVodeCreateB, m->mem, lmm_, iter_, &m->whichB);
@@ -490,7 +489,7 @@ namespace casadi {
                             N_Vector tmp1, N_Vector tmp2) {
     try {
       casadi_assert(user_data);
-      auto m = to_mem(user_data);
+      //auto m = to_mem(user_data);
       casadi_error("Commented out, #884, #794.");
       return 0;
     } catch(exception& e) {
@@ -504,7 +503,7 @@ namespace casadi {
                              N_Vector tmp1, N_Vector tmp2) {
     try {
       casadi_assert(user_data);
-      auto m = to_mem(user_data);
+      //auto m = to_mem(user_data);
       casadi_error("Commented out, #884, #794.");
       return 0;
     } catch(exception& e) {
@@ -538,7 +537,7 @@ namespace casadi {
         for (int i=0; i<Ns; ++i) N_VConst(0.0, qdotF[i]);
         return 0;
       }
-      auto m = to_mem(user_data);
+      //auto m = to_mem(user_data);
       casadi_error("Commented out, #884, #794.");
       return 0;
     } catch(exception& e) {
@@ -575,7 +574,7 @@ namespace casadi {
   int CvodesInterface::rhsBS(double t, N_Vector x, N_Vector *xF, N_Vector xB,
                              N_Vector xdotB, void *user_data) {
     try {
-      auto m = to_mem(user_data);
+      //auto m = to_mem(user_data);
       casadi_error("Commented out, #884, #794.");
       return 0;
     } catch(exception& e) {
@@ -901,7 +900,7 @@ namespace casadi {
                               N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3) {
     try {
       auto m = to_mem(cv_mem->cv_lmem);
-      auto& s = m->self;
+      //auto& s = m->self;
 
       // Current time
       double t = cv_mem->cv_tn;
@@ -958,7 +957,7 @@ namespace casadi {
                               N_Vector x, N_Vector xdot) {
     try {
       auto m = to_mem(cv_mem->cv_lmem);
-      auto& s = m->self;
+      //auto& s = m->self;
 
       // Current time
       double t = cv_mem->cv_tn;
