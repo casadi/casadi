@@ -11291,6 +11291,10 @@ Check if the vector has negative entries.
 
 %feature("docstring")  casadi::check_exposed(T t) " [INTERNAL] ";
 
+%feature("docstring")  casadi::casadi_interpn(int ndim, const real_t *grid,
+const int *offset, const real_t *values, const real_t *x, int *iw, real_t
+*w) " [INTERNAL] ";
+
 %feature("docstring")  casadi::read_matlab(std::istream &stream,
 std::vector< T > &v) "
 
@@ -12682,6 +12686,10 @@ scheme:  Collocation scheme, as excepted by collocationPoints function.
 
 ";
 
+%feature("docstring")  casadi::casadi_interpn_interpolate(int ndim, const
+int *offset, const real_t *values, const real_t *alpha, const int *index,
+const int *corner, real_t *coeff) " [INTERNAL] ";
+
 %feature("docstring")  casadi::nlpsol_default_in(int ind) "
 
 Default input for an NLP solver.
@@ -12695,6 +12703,10 @@ Default input for an NLP solver.
 ";
 
 %feature("docstring") casadi::_nl_var "[INTERNAL] ";
+
+%feature("docstring")  casadi::casadi_interpn_weights(int ndim, const real_t
+*grid, const int *offset, const real_t *x, real_t *alpha, int *index) "
+[INTERNAL] ";
 
 %feature("docstring")  casadi::casadi_norm_inf(int n, const real_t *x) "
 [INTERNAL]  Inf-norm of a vector * Returns the largest element in absolute
@@ -12724,10 +12736,6 @@ Get the number of QP solver outputs.
 <- x, w work vector (length >= number of rows)
 
 ";
-
-%feature("docstring")  casadi::casadi_interpn_linear(int ndim, const real_t
-*grid, const int *offset, const real_t *values, const real_t *x, int *iw,
-real_t *w) " [INTERNAL] ";
 
 %feature("docstring")  casadi::matrixName< int >() "
 

@@ -8885,6 +8885,8 @@ Check if the vector has negative entries.
 
 %feature("docstring") casadi::check_exposed "[INTERNAL] ";
 
+%feature("docstring") casadi::casadi_interpn "[INTERNAL] ";
+
 %feature("docstring") casadi::read_matlab "
 
 >  void read_matlab(std.istream &stream,[T ] v)
@@ -10230,6 +10232,8 @@ scheme:  Collocation scheme, as excepted by collocationPoints function.
 
 ";
 
+%feature("docstring") casadi::casadi_interpn_interpolate "[INTERNAL] ";
+
 %feature("docstring") casadi::nlpsol_default_in "
 
 Default input for an NLP solver.
@@ -10237,6 +10241,8 @@ Default input for an NLP solver.
 ";
 
 %feature("docstring") casadi::_nl_var "[INTERNAL] ";
+
+%feature("docstring") casadi::casadi_interpn_weights "[INTERNAL] ";
 
 %feature("docstring") casadi::casadi_norm_inf "[INTERNAL]  Inf-norm of a
 vector * Returns the largest element in absolute value
@@ -10264,8 +10270,6 @@ Get the number of QP solver outputs.
 x, w work vector (length >= number of rows)
 
 ";
-
-%feature("docstring") casadi::casadi_interpn_linear "[INTERNAL] ";
 
 %feature("docstring") casadi::matrixName< int > "
 
