@@ -84,6 +84,7 @@ matrix:
         #- pushd build && make json && popd
         - pushd test && make unittests_py && popd
         - pushd test && make unittests_py_slow && popd
+        - pushd test && make examples_code_py && popd
         
     - compiler: gcc
       os: linux
