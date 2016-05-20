@@ -133,7 +133,7 @@ namespace casadi {
 
   // Multiinear interpolant
   template<typename real_t>
-  real_t CASADI_PREFIX(interpn_linear)(int ndim, const real_t* grid, const int* offset,
+  real_t CASADI_PREFIX(interpn)(int ndim, const real_t* grid, const int* offset,
     const real_t* values, const real_t* x, int* iw, real_t* w);
 }
 
@@ -578,7 +578,7 @@ namespace casadi {
   }
 
   template<typename real_t>
-  real_t CASADI_PREFIX(interpn_linear)(int ndim, const real_t* grid, const int* offset,
+  real_t CASADI_PREFIX(interpn)(int ndim, const real_t* grid, const int* offset,
     const real_t* values, const real_t* x, int* iw, real_t* w) {
     /* Work vectors */
     real_t* alpha = w; w += ndim;
@@ -587,25 +587,25 @@ namespace casadi {
     /* Left index and fraction of interval */
     int i;
     for (i=0; i<ndim; ++i) {
-      // Grid point
+      /* Grid point */
       real_t xi = x ? x[i] : 0;
-      // Grid
+      /* Grid */
       const real_t* g = grid + offset[i];
       int ng = offset[i+1]-offset[i];
-      // Find left index
+      /* Find left index */
       int j = index[i] = CASADI_PREFIX(low)(xi, g, ng);
-      // Get interpolation/extrapolation alpha
+      /* Get interpolation/extrapolation alpha */
       alpha[i] = (xi-g[j])/(g[j+1]-g[j]);
     }
-    // Return value
+    /* Return value */
     real_t ret = 0;
 
-    // Loop over all corners, add contribution to output
+    /* Loop over all corners, add contribution to output */
     CASADI_PREFIX(fill)(corner, ndim, 0);
     do {
-      // Get weight and value for corner
+      /* Get weight and value for corner */
       double w=1;
-      int ld=1; // leading dimension
+      int ld=1; /* leading dimension */
       const real_t* v = values;
       for (i=0; i<ndim; ++i) {
         if (corner[i]) {
@@ -617,11 +617,11 @@ namespace casadi {
         ld *= offset[i+1]-offset[i];
       }
 
-      // Add contribution to return value
+      /* Add contribution to return value */
       ret += w**v;
     } while (CASADI_PREFIX(flip)(corner, ndim));
 
-    // Return interpolation
+    /* Return interpolation */
     return ret;
   }
 

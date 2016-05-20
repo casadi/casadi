@@ -67,8 +67,8 @@ namespace casadi {
   void LinearInterpolant::eval(void* mem, const double** arg, double** res,
                                int* iw, double* w) const {
     if (res[0]) {
-      res[0][0] = casadi_interpn_linear(ndim_, get_ptr(grid_), get_ptr(offset_),
-                                        get_ptr(values_), arg[0], iw, w);
+      res[0][0] = casadi_interpn(ndim_, get_ptr(grid_), get_ptr(offset_),
+                                 get_ptr(values_), arg[0], iw, w);
     }
   }
 
