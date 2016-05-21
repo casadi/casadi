@@ -618,6 +618,7 @@ namespace casadi {
     int ld=1; /* leading dimension */
     int i;
     for (i=0; i<ndim; ++i) {
+      if (coeff) *coeff++ = c;
       if (corner[i]) {
         c *= alpha[i];
       } else {
@@ -625,7 +626,6 @@ namespace casadi {
       }
       values += (index[i]+corner[i])*ld;
       ld *= offset[i+1]-offset[i];
-      if (coeff) *coeff++ = c;
     }
     if (coeff) {
       return *values;
@@ -677,10 +677,10 @@ namespace casadi {
       int i;
       for (i=ndim-1; i>=0; --i) {
         if (corner[i]) {
-          grad[i] += v;
+          grad[i] += v*coeff[i];
           v *= alpha[i];
         } else {
-          grad[i] -= v;
+          grad[i] -= v*coeff[i];
           v *= 1-alpha[i];
         }
       }
