@@ -25,7 +25,12 @@
 
 from .graph import *
 from .bounds import *
-from .structure import repeated, entry, struct_symSX, struct_symMX, struct_SX, struct_MX, struct_MX_mutable, nesteddict, index, indexf, struct, struct_load
+
+import sys
+if sys.version_info >= (3,0):
+  from .structure3 import repeated, entry, struct_symSX, struct_symMX, struct_SX, struct_MX, struct_MX_mutable, nesteddict, index, indexf, struct, struct_load
+else:
+  from .structure import repeated, entry, struct_symSX, struct_symMX, struct_SX, struct_MX, struct_MX_mutable, nesteddict, index, indexf, struct, struct_load  
 from .io import nice_stdout, capture_stdout
 
 def print_subclasses(myclass, depth=0):

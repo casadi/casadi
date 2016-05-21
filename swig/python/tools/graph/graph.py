@@ -635,10 +635,13 @@ def dotgraph(s,direction="BT",**kwargs):
 
   try:
     def getHashSX(e):
-      try:
-        return e.element_hash()
-      except:
-        return SX__hash__backup(e)
+      if e.is_scalar(True):
+        try:
+          return e.element_hash()
+        except:
+          return SX__hash__backup(e)
+      else:
+        return 0
         
     SX__hash__backup = SX.__hash__
     SX.__hash__ = getHashSX
