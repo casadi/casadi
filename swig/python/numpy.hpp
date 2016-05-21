@@ -45,6 +45,7 @@ PyArrayObject* obj_to_array_allow_conversion(PyObject* input, int typecode,
     ary = (PyArrayObject*) py_obj;
     *is_new_object = 1;
   }
+  PyErr_Clear();
   return ary;
 }
 
@@ -67,6 +68,7 @@ PyArrayObject* make_contiguous(PyArrayObject* ary, int* is_new_object,
 							   max_dims);
     *is_new_object = 1;
   }
+  PyErr_Clear();
   return result;
 }
 
