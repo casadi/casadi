@@ -287,23 +287,6 @@ namespace casadi {
     }
   }
 
-  int IdasInterface::resS(int Ns, double t, N_Vector xz, N_Vector xzdot, N_Vector resval,
-                                 N_Vector *xzF, N_Vector *xzdotF, N_Vector *rrF, void *user_data,
-                                 N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) {
-    try {
-      auto m = to_mem(user_data);
-      //auto& s = m->self;
-
-      // Commented out since a new implementation currently cannot be tested
-      casadi_error("Commented out, #884, #794.");
-
-      return 0;
-    } catch(exception& e) {
-      userOut<true, PL_WARN>() << "resS failed: " << e.what() << endl;
-      return 1;
-    }
-  }
-
   void IdasInterface::init_memory(void* mem) const {
     SundialsInterface::init_memory(mem);
     auto m = to_mem(mem);
@@ -705,24 +688,6 @@ namespace casadi {
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "rhsQ failed: " << e.what() << endl;
-      return 1;
-    }
-  }
-
-  int IdasInterface::rhsQS(int Ns, double t, N_Vector xz, N_Vector xzdot, N_Vector *xzF,
-                                  N_Vector *xzdotF, N_Vector rrQ, N_Vector *qdotF, void *user_data,
-                                  N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) {
-
-    try {
-      //auto m = to_mem(user_data);
-      //auto& s = m->self;
-
-      // Commented out since a new implementation currently cannot be tested
-      casadi_error("Commented out, #884, #794.");
-
-      return 0;
-    } catch(exception& e) {
-      userOut<true, PL_WARN>() << "rhsQS failed: " << e.what() << endl;
       return 1;
     }
   }

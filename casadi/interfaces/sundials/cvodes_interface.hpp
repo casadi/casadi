@@ -167,18 +167,8 @@ namespace casadi {
     static int rhs(double t, N_Vector x, N_Vector xdot, void *user_data);
     static void ehfun(int error_code, const char *module, const char *function, char *msg,
                       void *user_data);
-    static int rhsS(int Ns, double t, N_Vector x, N_Vector xdot, N_Vector *xF,
-                    N_Vector *xdotF, void *user_data, N_Vector tmp1, N_Vector tmp2);
-    static int rhsS1(int Ns, double t, N_Vector x, N_Vector xdot, int iS,
-                     N_Vector xF, N_Vector xdotF, void *user_data,
-                     N_Vector tmp1, N_Vector tmp2);
     static int rhsQ(double t, N_Vector x, N_Vector qdot, void *user_data);
-    static int rhsQS(int Ns, double t, N_Vector x, N_Vector *xF,
-                     N_Vector qdot, N_Vector *qdotF,
-                     void *user_data, N_Vector tmp1, N_Vector tmp2);
     static int rhsB(double t, N_Vector x, N_Vector xB, N_Vector xdotB, void *user_data);
-    static int rhsBS(double t, N_Vector x, N_Vector *xF, N_Vector xB, N_Vector xdotB,
-                     void *user_data);
     static int rhsQB(double t, N_Vector x, N_Vector xB, N_Vector qdotB, void *user_data);
     static int jtimes(N_Vector v, N_Vector Jv, double t, N_Vector x, N_Vector xdot,
                       void *user_data, N_Vector tmp);

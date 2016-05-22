@@ -484,34 +484,6 @@ namespace casadi {
     }
   }
 
-  int CvodesInterface::rhsS(int Ns, double t, N_Vector x, N_Vector xdot, N_Vector *xF,
-                            N_Vector *xdotF, void *user_data,
-                            N_Vector tmp1, N_Vector tmp2) {
-    try {
-      casadi_assert(user_data);
-      //auto m = to_mem(user_data);
-      casadi_error("Commented out, #884, #794.");
-      return 0;
-    } catch(exception& e) {
-      userOut<true, PL_WARN>() << "fs failed: " << e.what() << endl;
-      return 1;
-    }
-  }
-
-  int CvodesInterface::rhsS1(int Ns, double t, N_Vector x, N_Vector xdot, int iS,
-                             N_Vector xF, N_Vector xdotF, void *user_data,
-                             N_Vector tmp1, N_Vector tmp2) {
-    try {
-      casadi_assert(user_data);
-      //auto m = to_mem(user_data);
-      casadi_error("Commented out, #884, #794.");
-      return 0;
-    } catch(exception& e) {
-      userOut<true, PL_WARN>() << "fs failed: " << e.what() << endl;
-      return 1;
-    }
-  }
-
   int CvodesInterface::rhsQ(double t, N_Vector x, N_Vector qdot, void *user_data) {
     try {
       auto m = to_mem(user_data);
@@ -527,25 +499,6 @@ namespace casadi {
       return 1;
     }
   }
-
-  int CvodesInterface::rhsQS(int Ns, double t, N_Vector x, N_Vector *xF, N_Vector qdot,
-                             N_Vector *qdotF, void *user_data,
-                             N_Vector tmp1, N_Vector tmp2) {
-    try {
-      if (!user_data) {
-        // SUNDIALS BUG!!!
-        for (int i=0; i<Ns; ++i) N_VConst(0.0, qdotF[i]);
-        return 0;
-      }
-      //auto m = to_mem(user_data);
-      casadi_error("Commented out, #884, #794.");
-      return 0;
-    } catch(exception& e) {
-      userOut<true, PL_WARN>() << "rhsQS failed: " << e.what() << endl;;
-      return 1;
-    }
-  }
-
 
   int CvodesInterface::rhsB(double t, N_Vector x, N_Vector rx, N_Vector rxdot,
                             void *user_data) {
@@ -567,18 +520,6 @@ namespace casadi {
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "rhsB failed: " << e.what() << endl;;
-      return 1;
-    }
-  }
-
-  int CvodesInterface::rhsBS(double t, N_Vector x, N_Vector *xF, N_Vector xB,
-                             N_Vector xdotB, void *user_data) {
-    try {
-      //auto m = to_mem(user_data);
-      casadi_error("Commented out, #884, #794.");
-      return 0;
-    } catch(exception& e) {
-      userOut<true, PL_WARN>() << "rhsBS failed: " << e.what() << endl;;
       return 1;
     }
   }

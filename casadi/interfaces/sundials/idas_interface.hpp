@@ -187,15 +187,9 @@ namespace casadi {
     static int jtimesB(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB,
                        N_Vector resvalB, N_Vector vB, N_Vector JvB, double cjB,
                        void *user_data, N_Vector tmp1B, N_Vector tmp2B);
-    static int resS(int Ns, double t, N_Vector xz, N_Vector xzdot, N_Vector resval,
-                    N_Vector *xzF, N_Vector *xzdotF, N_Vector *resF, void *user_data,
-                    N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
     static int rhsQ(double t, N_Vector xz, N_Vector xzdot, N_Vector qdot, void *user_data);
     static int rhsQB(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB,
                      N_Vector qdotA, void *user_data);
-    static int rhsQS(int Ns, double t, N_Vector xz, N_Vector xzdot,
-                     N_Vector *xzF, N_Vector *xzdotF, N_Vector rrQ, N_Vector *qdotF,
-                     void *user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
     static int psolve(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, N_Vector rvec,
                       N_Vector zvec, double cj, double delta, void *user_data,
                       N_Vector tmp);
@@ -243,9 +237,6 @@ namespace casadi {
     double max_step_size_;
     std::vector<double> abstolv_, fsens_abstolv_;
     double first_time_;
-
-    // Disable IDAS internal warning messages
-    bool disable_internal_warnings_;
 
     //  Initial values for \p xdot and \p z
     std::vector<double> init_xdot_;
