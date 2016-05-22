@@ -858,8 +858,6 @@ namespace casadi {
 
       // Solve the (possibly factorized) system
       const Function& linsol = s.get_function("linsolF");
-      casadi_assert_message(linsol.nnz_out(0) == NV_LENGTH_S(zvec), "Assertion error: "
-                            << linsol.nnz_out(0) << " == " << NV_LENGTH_S(zvec));
       linsol.linsol_solve(NV_DATA_S(zvec));
       return 0;
     } catch(exception& e) {
@@ -881,10 +879,6 @@ namespace casadi {
       }
 
       const Function& linsolB = s.get_function("linsolB");
-      casadi_assert(!linsolB.is_null());
-      casadi_assert_message(linsolB.nnz_out(0) == NV_LENGTH_S(zvecB),
-                            "Assertion error: " << linsolB.nnz_out(0)
-                            << " == " << NV_LENGTH_S(zvecB));
       linsolB.linsol_solve(NV_DATA_S(zvecB));
 
       return 0;

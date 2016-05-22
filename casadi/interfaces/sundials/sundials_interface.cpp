@@ -404,7 +404,7 @@ namespace casadi {
     alloc_w(sp.nnz(), true);
 
     // Create a linear solver
-    set_function(linsol("linsolF", linear_solver_, sp, 1, linear_solver_options_));
+    set_function(linsol("linsolF", linear_solver_, sp, 0, linear_solver_options_));
 
     // Update bandwidths
     lbw_ = sp.bw_lower();
@@ -419,7 +419,7 @@ namespace casadi {
     alloc_w(sp.nnz(), true);
 
     // Create a linear solver
-    set_function(linsol("linsolB", linear_solverB_, sp, 1, linear_solver_optionsB_));
+    set_function(linsol("linsolB", linear_solverB_, sp, 0, linear_solver_optionsB_));
 
     // Update bandwidths
     lbwB_ = sp.bw_lower();

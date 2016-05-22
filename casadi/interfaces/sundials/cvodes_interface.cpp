@@ -700,7 +700,6 @@ namespace casadi {
 
       // Solve the (possibly factorized) system
       const Function& linsol = s.get_function("linsolF");
-      casadi_assert(linsol.nnz_out(0) == NV_LENGTH_S(z));
       linsol.linsol_solve(NV_DATA_S(z));
 
       return 0;
@@ -723,7 +722,6 @@ namespace casadi {
 
       // Solve the (possibly factorized) system
       const Function& linsolB = s.get_function("linsolB");
-      casadi_assert(linsolB.nnz_out(0) == NV_LENGTH_S(zvecB));
       linsolB.linsol_solve(NV_DATA_S(zvecB), 1);
       return 0;
     } catch(exception& e) {
