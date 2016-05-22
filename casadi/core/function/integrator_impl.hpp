@@ -107,7 +107,7 @@ namespace casadi {
     virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
 
     /** \brief  Print solver statistics */
-    virtual void printStats(IntegratorMemory* mem, std::ostream &stream) const {}
+    virtual void print_stats(IntegratorMemory* mem, std::ostream &stream) const {}
 
     /** \brief  Propagate sparsity forward */
     virtual void sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);

@@ -483,9 +483,7 @@ namespace casadi {
     casadi_copy(NV_DATA_S(m->xz)+nx_, nz_, z);
     casadi_copy(NV_DATA_S(m->q), nq_, q);
 
-    // Print statistics
-    if (print_stats_) printStats(m, userOut());
-
+    // Get stats
     THROWING(IDAGetIntegratorStats, m->mem, &m->nsteps, &m->nfevals, &m->nlinsetups,
              &m->netfails, &m->qlast, &m->qcur, &m->hinused,
              &m->hlast, &m->hcur, &m->tcur);
@@ -610,55 +608,13 @@ namespace casadi {
     casadi_copy(NV_DATA_S(m->rxz)+nrx_, nrz_, rz);
     casadi_copy(NV_DATA_S(m->rq), nrq_, rq);
 
+    // Get stats
     IDAMem IDA_mem = IDAMem(m->mem);
     IDAadjMem IDAADJ_mem = IDA_mem->ida_adj_mem;
     IDABMem IDAB_mem = IDAADJ_mem->IDAB_mem;
     THROWING(IDAGetIntegratorStats, IDAB_mem->IDA_mem, &m->nstepsB, &m->nfevalsB,
              &m->nlinsetupsB, &m->netfailsB, &m->qlastB, &m->qcurB, &m->hinusedB,
              &m->hlastB, &m->hcurB, &m->tcurB);
-  }
-
-  void IdasInterface::printStats(IntegratorMemory* mem, std::ostream &stream) const {
-    auto m = to_mem(mem);
-
-    long nsteps, nfevals, nlinsetups, netfails;
-    int qlast, qcur;
-    double hinused, hlast, hcur, tcur;
-    THROWING(IDAGetIntegratorStats, m->mem, &nsteps, &nfevals, &nlinsetups, &netfails, &qlast,
-             &qcur, &hinused, &hlast, &hcur, &tcur);
-
-    // Get the number of right hand side evaluations in the linear solver
-    long nfevals_linsol=0;
-    switch (linsol_f_) {
-    case SD_DENSE:
-    case SD_BANDED:
-      THROWING(IDADlsGetNumResEvals, m->mem, &nfevals_linsol);
-      break;
-    case SD_ITERATIVE:
-      THROWING(IDASpilsGetNumResEvals, m->mem, &nfevals_linsol);
-      break;
-    default:
-      nfevals_linsol = 0;
-    }
-
-    stream << "number of steps taken by IDAS:            " << nsteps << std::endl;
-    stream << "number of calls to the user's f function: " << (nfevals + nfevals_linsol)
-           << std::endl;
-    stream << "   step calculation:                      " << nfevals << std::endl;
-    stream << "   linear solver:                         " << nfevals_linsol << std::endl;
-    stream << "number of calls made to the linear solver setup function: " << nlinsetups
-           << std::endl;
-    stream << "number of error test failures: " << netfails << std::endl;
-    stream << "method order used on the last internal step: " << qlast << std::endl;
-    stream << "method order to be used on the next internal step: " << qcur << std::endl;
-    stream << "actual value of initial step size: " << hinused << std::endl;
-    stream << "step size taken on the last internal step: " << hlast << std::endl;
-    stream << "step size to be attempted on the next internal step: " << hcur << std::endl;
-    stream << "current internal time reached: " << tcur << std::endl;
-    stream << std::endl;
-
-    stream << "number of checkpoints stored: " << m->ncheck << endl;
-    stream << std::endl;
   }
 
   void IdasInterface::idas_error(const char* module, int flag) {
@@ -1180,11 +1136,5 @@ namespace casadi {
     if (this->xzdot) N_VDestroy_Serial(this->xzdot);
     if (this->rxzdot) N_VDestroy_Serial(this->rxzdot);
   }
-
-  Dict IdasInterface::get_stats(void* mem) const {
-    Dict stats = SundialsInterface::get_stats(mem);
-    return stats;
-  }
-
 
 } // namespace casadi

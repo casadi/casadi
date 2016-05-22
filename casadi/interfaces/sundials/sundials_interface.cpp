@@ -517,6 +517,38 @@ namespace casadi {
     return stats;
   }
 
+  void SundialsInterface::print_stats(IntegratorMemory* mem, ostream &stream) const {
+    auto m = to_mem(mem);
+    stream << "FORWARD INTEGRATION:" << endl;
+    stream << "Number of steps taken by SUNDIALS: " << m->nsteps << endl;
+    stream << "Number of calls to the user’s f function: " << m->nfevals << endl;
+    stream << "Number of calls made to the linear solver setup function: "
+           << m->nlinsetups << endl;
+    stream << "Number of error test failures: " << m->netfails << endl;
+    stream << "Method order used on the last internal step: "  << m->qlast << endl;
+    stream << "Method order to be used on the next internal step: " << m->qcur << endl;
+    stream << "Actual value of initial step size: " << m->hinused << endl;
+    stream << "Step size taken on the last internal step: " << m->hlast << endl;
+    stream << "Step size to be attempted on the next internal step: " << m->hcur << endl;
+    stream << "Current internal time reached: " << m->tcur << endl;
+    stream << "Number of checkpoints stored: " << m->ncheck << endl;
+    if (nrx_>0) {
+      stream << "BACKWARD INTEGRATION:" << endl;
+      stream << "Number of steps taken by SUNDIALS: " << m->nstepsB << endl;
+      stream << "Number of calls to the user’s f function: " << m->nfevalsB << endl;
+      stream << "Number of calls made to the linear solver setup function: "
+             << m->nlinsetupsB << endl;
+      stream << "Number of error test failures: " << m->netfailsB << endl;
+      stream << "Method order used on the last internal step: "  << m->qlastB << endl;
+      stream << "Method order to be used on the next internal step: " << m->qcurB << endl;
+      stream << "Actual value of initial step size: " << m->hinusedB << endl;
+      stream << "Step size taken on the last internal step: " << m->hlastB << endl;
+      stream << "Step size to be attempted on the next internal step: " << m->hcurB << endl;
+      stream << "Current internal time reached: " << m->tcurB << endl;
+    }
+    stream << endl;
+  }
+
   void SundialsInterface::set_work(void* mem, const double**& arg, double**& res,
                                 int*& iw, double*& w) const {
     auto m = static_cast<SundialsMemory*>(mem);

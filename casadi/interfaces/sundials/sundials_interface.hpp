@@ -107,6 +107,9 @@ namespace casadi {
     /// Get all statistics
     virtual Dict get_stats(void* mem) const;
 
+    /** \brief  Print solver statistics */
+    virtual void print_stats(IntegratorMemory* mem, std::ostream &stream) const;
+
     /** \brief  Reset the forward problem and bring the time back to t0 */
     virtual void reset(IntegratorMemory* mem, double t, const double* x,
                        const double* z, const double* p) const;
@@ -114,6 +117,13 @@ namespace casadi {
     /** \brief  Reset the backward problem and take time to tf */
     virtual void resetB(IntegratorMemory* mem, double t, const double* rx,
                         const double* rz, const double* rp) const;
+
+    /** \brief Cast to memory object */
+    static SundialsMemory* to_mem(void *mem) {
+      SundialsMemory* m = static_cast<SundialsMemory*>(mem);
+      casadi_assert(m);
+      return m;
+    }
 
     ///@{
     /// Options

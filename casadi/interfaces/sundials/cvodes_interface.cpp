@@ -310,12 +310,10 @@ namespace casadi {
     casadi_copy(NV_DATA_S(m->xz), nx_, x);
     casadi_copy(NV_DATA_S(m->q), nq_, q);
 
-    // Print statistics
-    if (print_stats_) printStats(m, userOut());
-
+    // Get stats
     THROWING(CVodeGetIntegratorStats, m->mem, &m->nsteps, &m->nfevals, &m->nlinsetups,
-                                         &m->netfails, &m->qlast, &m->qcur, &m->hinused,
-                                         &m->hlast, &m->hcur, &m->tcur);
+             &m->netfails, &m->qlast, &m->qcur, &m->hinused,
+             &m->hlast, &m->hcur, &m->tcur);
 
     casadi_msg("CvodesInterface::integrate(" << t << ") end");
   }
@@ -406,56 +404,13 @@ namespace casadi {
     casadi_copy(NV_DATA_S(m->rxz), nrx_, rx);
     casadi_copy(NV_DATA_S(m->rq), nrq_, rq);
 
+    // Get stats
     CVodeMem cv_mem = static_cast<CVodeMem>(m->mem);
     CVadjMem ca_mem = cv_mem->cv_adj_mem;
     CVodeBMem cvB_mem = ca_mem->cvB_mem;
-
     THROWING(CVodeGetIntegratorStats, cvB_mem->cv_mem, &m->nstepsB,
            &m->nfevalsB, &m->nlinsetupsB, &m->netfailsB, &m->qlastB,
            &m->qcurB, &m->hinusedB, &m->hlastB, &m->hcurB, &m->tcurB);
-  }
-
-  void CvodesInterface::printStats(IntegratorMemory* mem, std::ostream &stream) const {
-    auto m = to_mem(mem);
-
-    long nsteps, nfevals, nlinsetups, netfails;
-    int qlast, qcur;
-    double hinused, hlast, hcur, tcur;
-    THROWING(CVodeGetIntegratorStats, m->mem, &nsteps, &nfevals, &nlinsetups, &netfails, &qlast,
-           &qcur, &hinused, &hlast, &hcur, &tcur);
-
-    // Get the number of right hand side evaluations in the linear solver
-    long nfevals_linsol=0;
-    switch (linsol_f_) {
-    case SD_DENSE:
-    case SD_BANDED:
-      THROWING(CVDlsGetNumRhsEvals, m->mem, &nfevals_linsol);
-      break;
-    case SD_ITERATIVE:
-      THROWING(CVSpilsGetNumRhsEvals, m->mem, &nfevals_linsol);
-      break;
-    default:
-      nfevals_linsol = 0;
-    }
-
-    stream << "number of steps taken by CVODES:          " << nsteps << std::endl;
-    stream << "number of calls to the user's f function: " << (nfevals + nfevals_linsol)
-           << std::endl;
-    stream << "   step calculation:                      " << nfevals << std::endl;
-    stream << "   linear solver:                         " << nfevals_linsol << std::endl;
-    stream << "number of calls made to the linear solver setup function: " << nlinsetups
-           << std::endl;
-    stream << "number of error test failures: " << netfails << std::endl;
-    stream << "method order used on the last internal step: " << qlast << std::endl;
-    stream << "method order to be used on the next internal step: " << qcur << std::endl;
-    stream << "actual value of initial step size: " << hinused << std::endl;
-    stream << "step size taken on the last internal step: " << hlast << std::endl;
-    stream << "step size to be attempted on the next internal step: " << hcur << std::endl;
-    stream << "current internal time reached: " << tcur << std::endl;
-    stream << std::endl;
-
-    stream << "number of checkpoints stored: " << m->ncheck << endl;
-    stream << std::endl;
   }
 
   void CvodesInterface::cvodes_error(const char* module, int flag) {
@@ -1002,11 +957,6 @@ namespace casadi {
 
   CvodesMemory::~CvodesMemory() {
     if (this->mem) CVodeFree(&this->mem);
-  }
-
-  Dict CvodesInterface::get_stats(void* mem) const {
-    Dict stats = SundialsInterface::get_stats(mem);
-    return stats;
   }
 
 } // namespace casadi

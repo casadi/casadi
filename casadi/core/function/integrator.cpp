@@ -195,7 +195,7 @@ namespace casadi {
     }
 
     // Print statistics
-    if (print_stats_) printStats(m, userOut());
+    if (print_stats_) print_stats(m, userOut());
   }
 
   Options Integrator::options_

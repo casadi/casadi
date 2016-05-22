@@ -120,9 +120,6 @@ namespace casadi {
     /** \brief Initalize memory block */
     virtual void init_memory(void* mem) const;
 
-    /// Get all statistics
-    virtual Dict get_stats(void* mem) const;
-
     /** \brief  Reset the forward problem and bring the time back to t0 */
     virtual void reset(IntegratorMemory* mem, double t, const double* x,
                        const double* z, const double* p) const;
@@ -141,9 +138,6 @@ namespace casadi {
 
     /** \brief  Set the stop time of the forward integration */
     virtual void setStopTime(IntegratorMemory* mem, double tf) const;
-
-    /** \brief  Print solver statistics */
-    virtual void printStats(IntegratorMemory* mem, std::ostream &stream) const;
 
     /** \brief Cast to memory object */
     static CvodesMemory* to_mem(void *mem) {
