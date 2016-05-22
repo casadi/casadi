@@ -927,6 +927,12 @@ namespace casadi {
     MatType c_xdot = MatType::sym("c_xdot");
     MatType jac = c_x*MatType::jacobian(r[DE_ODE], a[DE_X]) + c_xdot*MatType::eye(nx_);
 
+    // Remove second order terms (for smooth implementation of #940)
+    if (ns_>0) {
+      const Sparsity& sp_new = derivative_of_.get_function("jacF").sparsity_out(0);
+      jac = project(jac, diagcat(vector<Sparsity>(1+ns_, sp_new)));
+    }
+
     // Return generated function
     return Function("jacF", {a[DE_T], a[DE_X], a[DE_P], c_x, c_xdot}, {jac});
   }
@@ -940,6 +946,12 @@ namespace casadi {
     MatType c_x = MatType::sym("c_x");
     MatType c_xdot = MatType::sym("c_xdot");
     MatType jac = c_x*MatType::jacobian(r[DE_RODE], a[DE_RX]) + c_xdot*MatType::eye(nrx_);
+
+    // Remove second order terms (for smooth implementation of #940)
+    if (ns_>0) {
+      const Sparsity& sp_new = derivative_of_.get_function("jacB").sparsity_out(0);
+      jac = project(jac, diagcat(vector<Sparsity>(1+ns_, sp_new)));
+    }
 
     // return generated function
     return Function("jacB",

@@ -1092,6 +1092,12 @@ namespace casadi {
                             MatType::jacobian(r[DE_ALG], a[DE_Z])));
     }
 
+    // Remove second order terms (for smooth implementation of #940)
+    if (ns_>0) {
+      const Sparsity& sp_new = derivative_of_.get_function("jacF").sparsity_out(0);
+      jac = project(jac, diagcat(vector<Sparsity>(1+ns_, sp_new)));
+    }
+
     return Function("jacF", {a[DE_T], a[DE_X], a[DE_Z], a[DE_P], cj},
                     {jac});
   }
@@ -1109,6 +1115,12 @@ namespace casadi {
                             MatType::jacobian(r[DE_RALG], a[DE_RX])),
                     vertcat(MatType::jacobian(r[DE_RODE], a[DE_RZ]),
                             MatType::jacobian(r[DE_RALG], a[DE_RZ])));
+    }
+
+    // Remove second order terms (for smooth implementation of #940)
+    if (ns_>0) {
+      const Sparsity& sp_new = derivative_of_.get_function("jacB").sparsity_out(0);
+      jac = project(jac, diagcat(vector<Sparsity>(1+ns_, sp_new)));
     }
 
     return Function("jacB", {a[DE_T], a[DE_RX], a[DE_RZ], a[DE_RP],
