@@ -197,19 +197,6 @@ namespace casadi {
                        N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB,
                        N_Vector resvalB, double cjB, void *user_dataB,
                        N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
-    static int djac(long Neq, double t, double cj, N_Vector xz, N_Vector xzdot,
-                    N_Vector rr, DlsMat Jac, void *user_data,
-                    N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
-    static int djacB(long NeqB, double t, double cjB, N_Vector xz, N_Vector xzdot,
-                     N_Vector xzB, N_Vector xzdotB, N_Vector rrB, DlsMat JacB,
-                     void *user_data, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
-    static int bjac(long Neq, long mupper, long mlower, double t, double cj, N_Vector xz,
-                    N_Vector xzdot, N_Vector rr, DlsMat Jac, void *user_data,
-                    N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
-    static int bjacB(long NeqB, long mupperB, long mlowerB, double t, double cjB,
-                     N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB,
-                     N_Vector resvalB, DlsMat JacB, void *user_data,
-                     N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
     static int lsetup(IDAMem IDA_mem, N_Vector xz, N_Vector xzdot, N_Vector resp,
                       N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3);
     static int lsolve(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector ycur,

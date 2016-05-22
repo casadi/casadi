@@ -220,16 +220,10 @@ class Integrationtests(casadiTestCase):
               yield {"iterative_solver"+post: "tfqmr", "use_preconditionerB": True, "linear_solverB" : "csparse"} # Bug in Sundials? Preconditioning seems to be needed
 
             def solveroptions(post=""):
-              yield {"linear_solver_type" +post: "dense" }
-              allowedOpts = ["user_defined","dense","banded","iterative"]
-              #allowedOpts.remove("iterative") # disabled, see #1231
-              if "iterative" in allowedOpts:
-                  for it in itoptions(post):
+              for it in itoptions(post):
                       d = {"linear_solver_type" +post: "iterative" }
                       d.update(it)
                       yield d
-              if "banded" in allowedOpts:
-                  yield {"linear_solver_type" +post: "banded" }
               yield {"linear_solver_type" +post: "user_defined", "linear_solver"+post: "csparse" }
 
             for a_options in solveroptions("B"):
@@ -333,15 +327,10 @@ class Integrationtests(casadiTestCase):
             yield {"iterative_solver"+post: "tfqmr", "use_preconditionerB": True, "linear_solverB" : "csparse"} # Bug in Sundials? Preconditioning seems to be needed
 
           def solveroptions(post=""):
-            yield {"linear_solver_type" +post: "dense" }
-            allowedOpts = ["user_defined","dense","banded","iterative"]
-            if "iterative" in allowedOpts:
-                for it in itoptions(post):
+            for it in itoptions(post):
                     d = {"linear_solver_type" +post: "iterative" }
                     d.update(it)
                     yield d
-            if "banded" in allowedOpts:
-                yield {"linear_solver_type" +post: "banded" }
             yield {"linear_solver_type" +post: "user_defined", "linear_solver"+post: "csparse" }
 
           for a_options in solveroptions("B"):

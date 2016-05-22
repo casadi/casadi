@@ -145,7 +145,7 @@ namespace casadi {
     ///@}
 
     /// Supported linear solvers in Sundials
-    enum LinsolType {SD_USER_DEFINED, SD_DENSE, SD_BANDED, SD_ITERATIVE}
+    enum LinsolType {SD_USER_DEFINED, SD_ITERATIVE}
       linsol_f_, linsol_g_;
 
     /// Supported iterative solvers in Sundials

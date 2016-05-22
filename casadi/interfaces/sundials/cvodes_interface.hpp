@@ -168,18 +168,6 @@ namespace casadi {
                       void *user_data, N_Vector tmp);
     static int jtimesB(N_Vector vB, N_Vector JvB, double t, N_Vector x, N_Vector xB,
                        N_Vector xdotB, void *user_data , N_Vector tmpB);
-    static int djac(long N, double t, N_Vector x, N_Vector xdot, DlsMat Jac,
-                    void *user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
-    static int djacB(long NeqB, double t, N_Vector x, N_Vector xB, N_Vector xdotB,
-                     DlsMat JacB, void *user_data,
-                     N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
-    static int bjac(long N, long mupper, long mlower, double t, N_Vector x, N_Vector xdot,
-                    DlsMat Jac, void *user_data,
-                    N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
-    static int bjacB(long NeqB, long mupperB, long mlowerB, double t,
-                     N_Vector x, N_Vector xB,
-                     N_Vector xdotB, DlsMat JacB, void *user_data,
-                     N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
     static int psolve(double t, N_Vector x, N_Vector xdot, N_Vector r, N_Vector z,
                       double gamma, double delta, int lr, void *user_data, N_Vector tmp);
     static int psolveB(double t, N_Vector x, N_Vector xB, N_Vector xdotB, N_Vector rvecB,

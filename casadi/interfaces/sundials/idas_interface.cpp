@@ -347,14 +347,6 @@ namespace casadi {
 
     // attach a linear solver
     switch (linsol_f_) {
-    case SD_DENSE:
-    THROWING(IDADense, m->mem, nx_+nz_);
-    if (exact_jac_) THROWING(IDADlsSetDenseJacFn, m->mem, djac);
-    break;
-    case SD_BANDED:
-    THROWING(IDABand, m->mem, nx_+nz_, ubw_, lbw_);
-    if (exact_jac_) THROWING(IDADlsSetBandJacFn, m->mem, bjac);
-    break;
     case SD_ITERATIVE:
     switch (itsol_f_) {
     case SD_GMRES: THROWING(IDASpgmr, m->mem, max_krylov_); break;
@@ -527,14 +519,6 @@ namespace casadi {
 
       // attach linear solver
       switch (linsol_g_) {
-      case SD_DENSE:
-      THROWING(IDADenseB, m->mem, m->whichB, nrx_+nrz_);
-      if (exact_jacB_) THROWING(IDADlsSetDenseJacFnB, m->mem, m->whichB, djacB);
-      break;
-      case SD_BANDED:
-      THROWING(IDABandB, m->mem, m->whichB, nrx_+nrz_, ubwB_, lbwB_);
-      if (exact_jacB_) THROWING(IDADlsSetBandJacFnB, m->mem, m->whichB, bjacB);
-      break;
       case SD_ITERATIVE:
       switch (itsol_g_) {
       case SD_GMRES: THROWING(IDASpgmrB, m->mem, m->whichB, max_krylovB_); break;
@@ -695,145 +679,6 @@ namespace casadi {
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "rhsQB failed: " << e.what() << endl;
-      return 1;
-    }
-  }
-
-  int IdasInterface::djac(long Neq, double t, double cj, N_Vector xz, N_Vector xzdot,
-                                 N_Vector rr, DlsMat Jac, void *user_data,
-                                 N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) {
-    try {
-      auto m = to_mem(user_data);
-      auto& s = m->self;
-      m->arg[0] = &t;
-      m->arg[1] = NV_DATA_S(xz);
-      m->arg[2] = NV_DATA_S(xz)+s.nx_;
-      m->arg[3] = m->p;
-      m->arg[4] = &cj;
-      m->res[0] = m->jac;
-      s.calc_function(m, "jacF");
-
-      // Save to Jac
-      const Sparsity& sp = s.get_function("jacF").sparsity_out(0);
-      const int* colind = sp.colind();
-      int ncol = sp.size2();
-      const int* row = sp.row();
-      for (int cc=0; cc<ncol; ++cc) {
-        for (int el=colind[cc]; el<colind[cc+1]; ++el) {
-          DENSE_ELEM(Jac, row[el], cc) = m->jac[el];
-        }
-      }
-
-      return 0;
-    } catch(exception& e) {
-      userOut<true, PL_WARN>() << "djac failed: " << e.what() << endl;
-      return 1;
-    }
-  }
-
-  int IdasInterface::djacB(long int NeqB, double t, double cj, N_Vector xz, N_Vector xzdot,
-                                  N_Vector rxz, N_Vector rxzdot, N_Vector rrr, DlsMat JacB,
-                                  void *user_data,
-                                  N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B) {
-    try {
-      auto m = to_mem(user_data);
-      auto& s = m->self;
-      m->arg[0] = &t;
-      m->arg[1] = NV_DATA_S(rxz);
-      m->arg[2] = NV_DATA_S(rxz)+s.nrx_;
-      m->arg[3] = m->rp;
-      m->arg[4] = NV_DATA_S(xz);
-      m->arg[5] = NV_DATA_S(xz)+s.nx_;
-      m->arg[6] = m->p;
-      m->arg[7] = &cj;
-      m->res[0] = m->jacB;
-      s.calc_function(m, "jacB");
-
-      // Save to JacB
-      const Sparsity& sp = s.get_function("jacB").sparsity_out(0);
-      const int* colind = sp.colind();
-      int ncol = sp.size2();
-      const int* row = sp.row();
-      for (int cc=0; cc<ncol; ++cc) {
-        for (int el=colind[cc]; el<colind[cc+1]; ++el) {
-          DENSE_ELEM(JacB, row[el], cc) = m->jacB[el];
-        }
-      }
-      return 0;
-    } catch(exception& e) {
-      userOut<true, PL_WARN>() << "djacB failed: " << e.what() << endl;
-      return 1;
-    }
-  }
-
-  int IdasInterface::bjac(long Neq, long mupper, long mlower, double t, double cj,
-                                 N_Vector xz, N_Vector xzdot, N_Vector rr,
-                                 DlsMat Jac, void *user_data,
-                                 N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) {
-    try {
-      auto m = to_mem(user_data);
-      auto& s = m->self;
-      m->arg[0] = &t;
-      m->arg[1] = NV_DATA_S(xz);
-      m->arg[2] = NV_DATA_S(xz)+s.nx_;
-      m->arg[3] = m->p;
-      m->arg[4] = &cj;
-      m->res[0] = m->jac;
-      s.calc_function(m, "jacF");
-
-      // Save to Jac
-      const Sparsity& sp = s.get_function("jacF").sparsity_out(0);
-      const int* colind = sp.colind();
-      int ncol = sp.size2();
-      const int* row = sp.row();
-      for (int cc=0; cc<ncol; ++cc) {
-        for (int el=colind[cc]; el<colind[cc+1]; ++el) {
-          int rr = row[el];
-          if (cc-rr<=mupper && rr-cc<=mlower)
-            BAND_ELEM(Jac, rr, cc) = m->jac[el];
-        }
-      }
-      return 0;
-    } catch(exception& e) {
-      userOut<true, PL_WARN>() << "bjac failed: " << e.what() << endl;
-      return 1;
-    }
-  }
-
-  int IdasInterface::
-  bjacB(long NeqB, long mupperB, long mlowerB, double t, double cj,
-                N_Vector xz, N_Vector xzdot, N_Vector rxz, N_Vector rxzdot,
-                N_Vector resval, DlsMat JacB, void *user_data, N_Vector tmp1B,
-                N_Vector tmp2B, N_Vector tmp3B) {
-    try {
-      auto m = to_mem(user_data);
-      auto& s = m->self;
-      m->arg[0] = &t;
-      m->arg[1] = NV_DATA_S(rxz);
-      m->arg[2] = NV_DATA_S(rxz)+s.nrx_;
-      m->arg[3] = m->rp;
-      m->arg[4] = NV_DATA_S(xz);
-      m->arg[5] = NV_DATA_S(xz)+s.nx_;
-      m->arg[6] = m->p;
-      m->arg[7] = &cj;
-      m->res[0] = m->jacB;
-      s.calc_function(m, "jacB");
-
-      // Save to JacB
-      const Sparsity& sp = s.get_function("jacB").sparsity_out(0);
-      const int* colind = sp.colind();
-      int ncol = sp.size2();
-      const int* row = sp.row();
-      for (int cc=0; cc<ncol; ++cc) {
-        for (int el=colind[cc]; el<colind[cc+1]; ++el) {
-          int rr = row[el];
-          if (cc-rr<=mupperB && rr-cc<=mlowerB)
-            BAND_ELEM(JacB, rr, cc) = m->jacB[el];
-        }
-      }
-      return 0;
-    } catch(exception& e) {
-      userOut<true, PL_WARN>() << "bjacB failed: " << e.what() << endl;
       return 1;
     }
   }

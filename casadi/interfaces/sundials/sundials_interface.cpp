@@ -66,7 +66,7 @@ namespace casadi {
         "Lower band-width of banded Jacobian (estimations)"}},
       {"linear_solver_type",
        {OT_STRING,
-        "Type of iterative solver: USER_DEFINED|dense|banded|iterative"}},
+        "Type of iterative solver: USER_DEFINED|iterative"}},
       {"iterative_solver",
        {OT_STRING,
         "Iterative solver: GMRES|bcgstab|tfqmr"}},
@@ -295,11 +295,7 @@ namespace casadi {
     }
 
     // Linear solver for forward integration
-    if (linear_solver_type=="dense") {
-      linsol_f_ = SD_DENSE;
-    } else if (linear_solver_type=="banded") {
-      linsol_f_ = SD_BANDED;
-    } else if (linear_solver_type=="iterative") {
+    if (linear_solver_type=="iterative") {
       linsol_f_ = SD_ITERATIVE;
 
       // Iterative solver
@@ -332,11 +328,7 @@ namespace casadi {
     }
 
     // Linear solver for backward integration
-    if (linear_solver_typeB=="dense") {
-      linsol_g_ = SD_DENSE;
-    } else if (linear_solver_typeB=="banded") {
-      linsol_g_ = SD_BANDED;
-    } else if (linear_solver_typeB=="iterative") {
+    if (linear_solver_typeB=="iterative") {
       linsol_g_ = SD_ITERATIVE;
 
       // Iterative solver
