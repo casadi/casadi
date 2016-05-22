@@ -8472,21 +8472,11 @@ experience a dramatic speed-up by using a sparse linear solver:
 |                        |                        | linear_solver_options] |
 +------------------------+------------------------+------------------------+
 | linear_solver_type     | OT_STRING              | Type of iterative      |
-|                        |                        | solver: USER_DEFINED|d |
-|                        |                        | ense|banded|iterative  |
+|                        |                        | solver:                |
+|                        |                        | USER_DEFINED|iterative |
 +------------------------+------------------------+------------------------+
 | linear_solver_typeB    | OT_STRING              | Linear solver for      |
 |                        |                        | backward integration   |
-+------------------------+------------------------+------------------------+
-| lower_bandwidth        | OT_INT                 | Lower band-width of    |
-|                        |                        | banded Jacobian        |
-|                        |                        | (estimations)          |
-+------------------------+------------------------+------------------------+
-| lower_bandwidthB       | OT_INT                 | lower band-width of    |
-|                        |                        | banded jacobians for   |
-|                        |                        | backward integration   |
-|                        |                        | [default: equal to     |
-|                        |                        | lower_bandwidth]       |
 +------------------------+------------------------+------------------------+
 | max_krylov             | OT_INT                 | Maximum Krylov         |
 |                        |                        | subspace size          |
@@ -8536,16 +8526,6 @@ experience a dramatic speed-up by using a sparse linear solver:
 | stop_at_end            | OT_BOOL                | Stop the integrator at |
 |                        |                        | the end of the         |
 |                        |                        | interval               |
-+------------------------+------------------------+------------------------+
-| upper_bandwidth        | OT_INT                 | Upper band-width of    |
-|                        |                        | banded Jacobian        |
-|                        |                        | (estimations)          |
-+------------------------+------------------------+------------------------+
-| upper_bandwidthB       | OT_INT                 | Upper band-width of    |
-|                        |                        | banded jacobians for   |
-|                        |                        | backward integration   |
-|                        |                        | [default: equal to     |
-|                        |                        | upper_bandwidth]       |
 +------------------------+------------------------+------------------------+
 | use_preconditioner     | OT_BOOL                | Precondition an        |
 |                        |                        | iterative solver       |
@@ -8705,21 +8685,11 @@ experience a dramatic speed-up by using a sparse linear solver:
 |                        |                        | linear_solver_options] |
 +------------------------+------------------------+------------------------+
 | linear_solver_type     | OT_STRING              | Type of iterative      |
-|                        |                        | solver: USER_DEFINED|d |
-|                        |                        | ense|banded|iterative  |
+|                        |                        | solver:                |
+|                        |                        | USER_DEFINED|iterative |
 +------------------------+------------------------+------------------------+
 | linear_solver_typeB    | OT_STRING              | Linear solver for      |
 |                        |                        | backward integration   |
-+------------------------+------------------------+------------------------+
-| lower_bandwidth        | OT_INT                 | Lower band-width of    |
-|                        |                        | banded Jacobian        |
-|                        |                        | (estimations)          |
-+------------------------+------------------------+------------------------+
-| lower_bandwidthB       | OT_INT                 | lower band-width of    |
-|                        |                        | banded jacobians for   |
-|                        |                        | backward integration   |
-|                        |                        | [default: equal to     |
-|                        |                        | lower_bandwidth]       |
 +------------------------+------------------------+------------------------+
 | max_krylov             | OT_INT                 | Maximum Krylov         |
 |                        |                        | subspace size          |
@@ -8772,16 +8742,6 @@ experience a dramatic speed-up by using a sparse linear solver:
 | suppress_algebraic     | OT_BOOL                | Suppress algebraic     |
 |                        |                        | variables in the error |
 |                        |                        | testing                |
-+------------------------+------------------------+------------------------+
-| upper_bandwidth        | OT_INT                 | Upper band-width of    |
-|                        |                        | banded Jacobian        |
-|                        |                        | (estimations)          |
-+------------------------+------------------------+------------------------+
-| upper_bandwidthB       | OT_INT                 | Upper band-width of    |
-|                        |                        | banded jacobians for   |
-|                        |                        | backward integration   |
-|                        |                        | [default: equal to     |
-|                        |                        | upper_bandwidth]       |
 +------------------------+------------------------+------------------------+
 | use_preconditioner     | OT_BOOL                | Precondition an        |
 |                        |                        | iterative solver       |

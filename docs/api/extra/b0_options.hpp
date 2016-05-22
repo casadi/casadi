@@ -334,10 +334,8 @@
 <tr><td>linear_solverB</td><td>OT_STRING</td><td>A custom linear solver creator function for backwards integration [default: equal to linear_solver]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICT</td><td>Options to be passed to the linear solver</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solver_optionsB</td><td>OT_DICT</td><td>Options to be passed to the linear solver for backwards integration [default: equal to linear_solver_options]</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>linear_solver_type</td><td>OT_STRING</td><td>Type of iterative solver: USER_DEFINED|dense|banded|iterative</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>linear_solver_type</td><td>OT_STRING</td><td>Type of iterative solver: USER_DEFINED|iterative</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solver_typeB</td><td>OT_STRING</td><td>Linear solver for backward integration</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>lower_bandwidth</td><td>OT_INT</td><td>Lower band-width of banded Jacobian (estimations)</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>lower_bandwidthB</td><td>OT_INT</td><td>lower band-width of banded jacobians for backward integration [default: equal to lower_bandwidth]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_krylov</td><td>OT_INT</td><td>Maximum Krylov subspace size</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_krylovB</td><td>OT_INT</td><td>Maximum krylov subspace size for backward integration</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_multistep_order</td><td>OT_INT</td><td>Maximum order for the (variable-order) multistep method</td><td>casadi::SundialsInterface</td></tr>
@@ -351,8 +349,6 @@
 <tr><td>sensitivity_method</td><td>OT_STRING</td><td>Sensitivity method: SIMULTANEOUS|staggered</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>steps_per_checkpoint</td><td>OT_INT</td><td>Number of steps between two consecutive checkpoints</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>stop_at_end</td><td>OT_BOOL</td><td>Stop the integrator at the end of the interval</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>upper_bandwidth</td><td>OT_INT</td><td>Upper band-width of banded Jacobian (estimations)</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>upper_bandwidthB</td><td>OT_INT</td><td>Upper band-width of banded jacobians for backward integration [default: equal to upper_bandwidth]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition an iterative solver</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>use_preconditionerB</td><td>OT_BOOL</td><td>Precondition an iterative solver for the backwards problem [default: equal to use_preconditioner]</td><td>casadi::SundialsInterface</td></tr>
 </table>
@@ -384,10 +380,8 @@
 <tr><td>linear_solverB</td><td>OT_STRING</td><td>A custom linear solver creator function for backwards integration [default: equal to linear_solver]</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICT</td><td>Options to be passed to the linear solver</td></tr>
 <tr><td>linear_solver_optionsB</td><td>OT_DICT</td><td>Options to be passed to the linear solver for backwards integration [default: equal to linear_solver_options]</td></tr>
-<tr><td>linear_solver_type</td><td>OT_STRING</td><td>Type of iterative solver: USER_DEFINED|dense|banded|iterative</td></tr>
+<tr><td>linear_solver_type</td><td>OT_STRING</td><td>Type of iterative solver: USER_DEFINED|iterative</td></tr>
 <tr><td>linear_solver_typeB</td><td>OT_STRING</td><td>Linear solver for backward integration</td></tr>
-<tr><td>lower_bandwidth</td><td>OT_INT</td><td>Lower band-width of banded Jacobian (estimations)</td></tr>
-<tr><td>lower_bandwidthB</td><td>OT_INT</td><td>lower band-width of banded jacobians for backward integration [default: equal to lower_bandwidth]</td></tr>
 <tr><td>max_krylov</td><td>OT_INT</td><td>Maximum Krylov subspace size</td></tr>
 <tr><td>max_krylovB</td><td>OT_INT</td><td>Maximum krylov subspace size for backward integration</td></tr>
 <tr><td>max_multistep_order</td><td>OT_INT</td><td>Maximum order for the (variable-order) multistep method</td></tr>
@@ -401,8 +395,6 @@
 <tr><td>sensitivity_method</td><td>OT_STRING</td><td>Sensitivity method: SIMULTANEOUS|staggered</td></tr>
 <tr><td>steps_per_checkpoint</td><td>OT_INT</td><td>Number of steps between two consecutive checkpoints</td></tr>
 <tr><td>stop_at_end</td><td>OT_BOOL</td><td>Stop the integrator at the end of the interval</td></tr>
-<tr><td>upper_bandwidth</td><td>OT_INT</td><td>Upper band-width of banded Jacobian (estimations)</td></tr>
-<tr><td>upper_bandwidthB</td><td>OT_INT</td><td>Upper band-width of banded jacobians for backward integration [default: equal to upper_bandwidth]</td></tr>
 <tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition an iterative solver</td></tr>
 <tr><td>use_preconditionerB</td><td>OT_BOOL</td><td>Precondition an iterative solver for the backwards problem [default: equal to use_preconditioner]</td></tr>
 </table>
@@ -433,10 +425,8 @@
 <tr><td>linear_solverB</td><td>OT_STRING</td><td>A custom linear solver creator function for backwards integration [default: equal to linear_solver]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICT</td><td>Options to be passed to the linear solver</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solver_optionsB</td><td>OT_DICT</td><td>Options to be passed to the linear solver for backwards integration [default: equal to linear_solver_options]</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>linear_solver_type</td><td>OT_STRING</td><td>Type of iterative solver: USER_DEFINED|dense|banded|iterative</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>linear_solver_type</td><td>OT_STRING</td><td>Type of iterative solver: USER_DEFINED|iterative</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solver_typeB</td><td>OT_STRING</td><td>Linear solver for backward integration</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>lower_bandwidth</td><td>OT_INT</td><td>Lower band-width of banded Jacobian (estimations)</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>lower_bandwidthB</td><td>OT_INT</td><td>lower band-width of banded jacobians for backward integration [default: equal to lower_bandwidth]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_krylov</td><td>OT_INT</td><td>Maximum Krylov subspace size</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_krylovB</td><td>OT_INT</td><td>Maximum krylov subspace size for backward integration</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_multistep_order</td><td>OT_INT</td><td>Maximum order for the (variable-order) multistep method</td><td>casadi::SundialsInterface</td></tr>
@@ -450,8 +440,6 @@
 <tr><td>sensitivity_method</td><td>OT_STRING</td><td>Sensitivity method: SIMULTANEOUS|staggered</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>steps_per_checkpoint</td><td>OT_INT</td><td>Number of steps between two consecutive checkpoints</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>stop_at_end</td><td>OT_BOOL</td><td>Stop the integrator at the end of the interval</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>upper_bandwidth</td><td>OT_INT</td><td>Upper band-width of banded Jacobian (estimations)</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>upper_bandwidthB</td><td>OT_INT</td><td>Upper band-width of banded jacobians for backward integration [default: equal to upper_bandwidth]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition an iterative solver</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>use_preconditionerB</td><td>OT_BOOL</td><td>Precondition an iterative solver for the backwards problem [default: equal to use_preconditioner]</td><td>casadi::SundialsInterface</td></tr>
 </table>
@@ -634,10 +622,8 @@
 <tr><td>linear_solverB</td><td>OT_STRING</td><td>A custom linear solver creator function for backwards integration [default: equal to linear_solver]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICT</td><td>Options to be passed to the linear solver</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solver_optionsB</td><td>OT_DICT</td><td>Options to be passed to the linear solver for backwards integration [default: equal to linear_solver_options]</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>linear_solver_type</td><td>OT_STRING</td><td>Type of iterative solver: USER_DEFINED|dense|banded|iterative</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>linear_solver_type</td><td>OT_STRING</td><td>Type of iterative solver: USER_DEFINED|iterative</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solver_typeB</td><td>OT_STRING</td><td>Linear solver for backward integration</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>lower_bandwidth</td><td>OT_INT</td><td>Lower band-width of banded Jacobian (estimations)</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>lower_bandwidthB</td><td>OT_INT</td><td>lower band-width of banded jacobians for backward integration [default: equal to lower_bandwidth]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_krylov</td><td>OT_INT</td><td>Maximum Krylov subspace size</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_krylovB</td><td>OT_INT</td><td>Maximum krylov subspace size for backward integration</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_multistep_order</td><td>OT_INT</td><td>Maximum order for the (variable-order) multistep method</td><td>casadi::SundialsInterface</td></tr>
@@ -652,8 +638,6 @@
 <tr><td>steps_per_checkpoint</td><td>OT_INT</td><td>Number of steps between two consecutive checkpoints</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>stop_at_end</td><td>OT_BOOL</td><td>Stop the integrator at the end of the interval</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>suppress_algebraic</td><td>OT_BOOL</td><td>Suppress algebraic variables in the error testing</td><td>casadi::IdasInterface</td></tr>
-<tr><td>upper_bandwidth</td><td>OT_INT</td><td>Upper band-width of banded Jacobian (estimations)</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>upper_bandwidthB</td><td>OT_INT</td><td>Upper band-width of banded jacobians for backward integration [default: equal to upper_bandwidth]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition an iterative solver</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>use_preconditionerB</td><td>OT_BOOL</td><td>Precondition an iterative solver for the backwards problem [default: equal to use_preconditioner]</td><td>casadi::SundialsInterface</td></tr>
 </table>
@@ -691,10 +675,8 @@
 <tr><td>linear_solverB</td><td>OT_STRING</td><td>A custom linear solver creator function for backwards integration [default: equal to linear_solver]</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICT</td><td>Options to be passed to the linear solver</td></tr>
 <tr><td>linear_solver_optionsB</td><td>OT_DICT</td><td>Options to be passed to the linear solver for backwards integration [default: equal to linear_solver_options]</td></tr>
-<tr><td>linear_solver_type</td><td>OT_STRING</td><td>Type of iterative solver: USER_DEFINED|dense|banded|iterative</td></tr>
+<tr><td>linear_solver_type</td><td>OT_STRING</td><td>Type of iterative solver: USER_DEFINED|iterative</td></tr>
 <tr><td>linear_solver_typeB</td><td>OT_STRING</td><td>Linear solver for backward integration</td></tr>
-<tr><td>lower_bandwidth</td><td>OT_INT</td><td>Lower band-width of banded Jacobian (estimations)</td></tr>
-<tr><td>lower_bandwidthB</td><td>OT_INT</td><td>lower band-width of banded jacobians for backward integration [default: equal to lower_bandwidth]</td></tr>
 <tr><td>max_krylov</td><td>OT_INT</td><td>Maximum Krylov subspace size</td></tr>
 <tr><td>max_krylovB</td><td>OT_INT</td><td>Maximum krylov subspace size for backward integration</td></tr>
 <tr><td>max_multistep_order</td><td>OT_INT</td><td>Maximum order for the (variable-order) multistep method</td></tr>
@@ -709,8 +691,6 @@
 <tr><td>steps_per_checkpoint</td><td>OT_INT</td><td>Number of steps between two consecutive checkpoints</td></tr>
 <tr><td>stop_at_end</td><td>OT_BOOL</td><td>Stop the integrator at the end of the interval</td></tr>
 <tr><td>suppress_algebraic</td><td>OT_BOOL</td><td>Suppress algebraic variables in the error testing</td></tr>
-<tr><td>upper_bandwidth</td><td>OT_INT</td><td>Upper band-width of banded Jacobian (estimations)</td></tr>
-<tr><td>upper_bandwidthB</td><td>OT_INT</td><td>Upper band-width of banded jacobians for backward integration [default: equal to upper_bandwidth]</td></tr>
 <tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition an iterative solver</td></tr>
 <tr><td>use_preconditionerB</td><td>OT_BOOL</td><td>Precondition an iterative solver for the backwards problem [default: equal to use_preconditioner]</td></tr>
 </table>
@@ -747,10 +727,8 @@
 <tr><td>linear_solverB</td><td>OT_STRING</td><td>A custom linear solver creator function for backwards integration [default: equal to linear_solver]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICT</td><td>Options to be passed to the linear solver</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solver_optionsB</td><td>OT_DICT</td><td>Options to be passed to the linear solver for backwards integration [default: equal to linear_solver_options]</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>linear_solver_type</td><td>OT_STRING</td><td>Type of iterative solver: USER_DEFINED|dense|banded|iterative</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>linear_solver_type</td><td>OT_STRING</td><td>Type of iterative solver: USER_DEFINED|iterative</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solver_typeB</td><td>OT_STRING</td><td>Linear solver for backward integration</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>lower_bandwidth</td><td>OT_INT</td><td>Lower band-width of banded Jacobian (estimations)</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>lower_bandwidthB</td><td>OT_INT</td><td>lower band-width of banded jacobians for backward integration [default: equal to lower_bandwidth]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_krylov</td><td>OT_INT</td><td>Maximum Krylov subspace size</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_krylovB</td><td>OT_INT</td><td>Maximum krylov subspace size for backward integration</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_multistep_order</td><td>OT_INT</td><td>Maximum order for the (variable-order) multistep method</td><td>casadi::SundialsInterface</td></tr>
@@ -765,8 +743,6 @@
 <tr><td>steps_per_checkpoint</td><td>OT_INT</td><td>Number of steps between two consecutive checkpoints</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>stop_at_end</td><td>OT_BOOL</td><td>Stop the integrator at the end of the interval</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>suppress_algebraic</td><td>OT_BOOL</td><td>Suppress algebraic variables in the error testing</td><td>casadi::IdasInterface</td></tr>
-<tr><td>upper_bandwidth</td><td>OT_INT</td><td>Upper band-width of banded Jacobian (estimations)</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>upper_bandwidthB</td><td>OT_INT</td><td>Upper band-width of banded jacobians for backward integration [default: equal to upper_bandwidth]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition an iterative solver</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>use_preconditionerB</td><td>OT_BOOL</td><td>Precondition an iterative solver for the backwards problem [default: equal to use_preconditioner]</td><td>casadi::SundialsInterface</td></tr>
 </table>
@@ -2125,10 +2101,8 @@
 <tr><td>linear_solverB</td><td>OT_STRING</td><td>A custom linear solver creator function for backwards integration [default: equal to linear_solver]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICT</td><td>Options to be passed to the linear solver</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solver_optionsB</td><td>OT_DICT</td><td>Options to be passed to the linear solver for backwards integration [default: equal to linear_solver_options]</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>linear_solver_type</td><td>OT_STRING</td><td>Type of iterative solver: USER_DEFINED|dense|banded|iterative</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>linear_solver_type</td><td>OT_STRING</td><td>Type of iterative solver: USER_DEFINED|iterative</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solver_typeB</td><td>OT_STRING</td><td>Linear solver for backward integration</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>lower_bandwidth</td><td>OT_INT</td><td>Lower band-width of banded Jacobian (estimations)</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>lower_bandwidthB</td><td>OT_INT</td><td>lower band-width of banded jacobians for backward integration [default: equal to lower_bandwidth]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_krylov</td><td>OT_INT</td><td>Maximum Krylov subspace size</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_krylovB</td><td>OT_INT</td><td>Maximum krylov subspace size for backward integration</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_multistep_order</td><td>OT_INT</td><td>Maximum order for the (variable-order) multistep method</td><td>casadi::SundialsInterface</td></tr>
@@ -2148,8 +2122,6 @@
 <tr><td>stop_at_end</td><td>OT_BOOL</td><td>Stop the integrator at the end of the interval</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>t0</td><td>OT_DOUBLE</td><td>Beginning of the time horizon</td><td>casadi::Integrator</td></tr>
 <tr><td>tf</td><td>OT_DOUBLE</td><td>End of the time horizon</td><td>casadi::Integrator</td></tr>
-<tr><td>upper_bandwidth</td><td>OT_INT</td><td>Upper band-width of banded Jacobian (estimations)</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>upper_bandwidthB</td><td>OT_INT</td><td>Upper band-width of banded jacobians for backward integration [default: equal to upper_bandwidth]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition an iterative solver</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>use_preconditionerB</td><td>OT_BOOL</td><td>Precondition an iterative solver for the backwards problem [default: equal to use_preconditioner]</td><td>casadi::SundialsInterface</td></tr>
 </table>
@@ -2182,10 +2154,8 @@
 <tr><td>linear_solverB</td><td>OT_STRING</td><td>A custom linear solver creator function for backwards integration [default: equal to linear_solver]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICT</td><td>Options to be passed to the linear solver</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solver_optionsB</td><td>OT_DICT</td><td>Options to be passed to the linear solver for backwards integration [default: equal to linear_solver_options]</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>linear_solver_type</td><td>OT_STRING</td><td>Type of iterative solver: USER_DEFINED|dense|banded|iterative</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>linear_solver_type</td><td>OT_STRING</td><td>Type of iterative solver: USER_DEFINED|iterative</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solver_typeB</td><td>OT_STRING</td><td>Linear solver for backward integration</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>lower_bandwidth</td><td>OT_INT</td><td>Lower band-width of banded Jacobian (estimations)</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>lower_bandwidthB</td><td>OT_INT</td><td>lower band-width of banded jacobians for backward integration [default: equal to lower_bandwidth]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_krylov</td><td>OT_INT</td><td>Maximum Krylov subspace size</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_krylovB</td><td>OT_INT</td><td>Maximum krylov subspace size for backward integration</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_multistep_order</td><td>OT_INT</td><td>Maximum order for the (variable-order) multistep method</td><td>casadi::SundialsInterface</td></tr>
@@ -2205,8 +2175,6 @@
 <tr><td>stop_at_end</td><td>OT_BOOL</td><td>Stop the integrator at the end of the interval</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>t0</td><td>OT_DOUBLE</td><td>Beginning of the time horizon</td><td>casadi::Integrator</td></tr>
 <tr><td>tf</td><td>OT_DOUBLE</td><td>End of the time horizon</td><td>casadi::Integrator</td></tr>
-<tr><td>upper_bandwidth</td><td>OT_INT</td><td>Upper band-width of banded Jacobian (estimations)</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>upper_bandwidthB</td><td>OT_INT</td><td>Upper band-width of banded jacobians for backward integration [default: equal to upper_bandwidth]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition an iterative solver</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>use_preconditionerB</td><td>OT_BOOL</td><td>Precondition an iterative solver for the backwards problem [default: equal to use_preconditioner]</td><td>casadi::SundialsInterface</td></tr>
 </table>
