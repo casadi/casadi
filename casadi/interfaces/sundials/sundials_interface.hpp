@@ -134,8 +134,6 @@ namespace casadi {
     int max_num_steps_;
     bool finite_difference_fsens_;
     bool stop_at_end_;
-    int ubw_, lbw_;
-    int ubwB_, lbwB_;
     bool quad_err_con_;
     int steps_per_checkpoint_;
     bool disable_internal_warnings_;

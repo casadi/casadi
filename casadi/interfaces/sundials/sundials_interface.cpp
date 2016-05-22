@@ -58,12 +58,6 @@ namespace casadi {
        {OT_BOOL,
         "Use exact Jacobian information for the backward integration "
         "[default: equal to exact_jacobian]"}},
-      {"upper_bandwidth",
-       {OT_INT,
-        "Upper band-width of banded Jacobian (estimations)"}},
-      {"lower_bandwidth",
-       {OT_INT,
-        "Lower band-width of banded Jacobian (estimations)"}},
       {"linear_solver_type",
        {OT_STRING,
         "Type of iterative solver: USER_DEFINED|iterative"}},
@@ -123,14 +117,6 @@ namespace casadi {
       {"interpolation_type",
        {OT_STRING,
         "Type of interpolation for the adjoint sensitivities"}},
-      {"upper_bandwidthB",
-       {OT_INT,
-        "Upper band-width of banded jacobians for backward integration "
-        "[default: equal to upper_bandwidth]"}},
-      {"lower_bandwidthB",
-       {OT_INT,
-        "lower band-width of banded jacobians for backward integration "
-        "[default: equal to lower_bandwidth]"}},
       {"linear_solver_typeB",
        {OT_STRING,
         "Linear solver for backward integration"}},
@@ -187,10 +173,6 @@ namespace casadi {
     string linear_solver_type = "user_defined";
     string iterative_solver = "gmres";
     string pretype = "none";
-    ubw_ = -1;
-    lbw_ = -1;
-    ubwB_ = -1;
-    lbwB_ = -1;
     quad_err_con_ = false;
     string interpolation_type = "hermite";
     steps_per_checkpoint_ = 20;
@@ -225,14 +207,6 @@ namespace casadi {
         linear_solver_ = op.second.to_string();
       } else if (op.first=="linear_solver_options") {
         linear_solver_options_ = op.second;
-      } else if (op.first=="upper_bandwidth") {
-        ubw_ = op.second;
-      } else if (op.first=="lower_bandwidth") {
-        lbw_ = op.second;
-      } else if (op.first=="upper_bandwidthB") {
-        ubwB_ = op.second;
-      } else if (op.first=="lower_bandwidthB") {
-        lbwB_ = op.second;
       } else if (op.first=="quad_err_con") {
         quad_err_con_ = op.second;
       } else if (op.first=="interpolation_type") {
@@ -397,10 +371,6 @@ namespace casadi {
 
     // Create a linear solver
     set_function(linsol("linsolF", linear_solver_, sp, 0, linear_solver_options_));
-
-    // Update bandwidths
-    lbw_ = sp.bw_lower();
-    ubw_ = sp.bw_upper();
   }
 
   void SundialsInterface::init_jacB() {
@@ -412,10 +382,6 @@ namespace casadi {
 
     // Create a linear solver
     set_function(linsol("linsolB", linear_solverB_, sp, 0, linear_solver_optionsB_));
-
-    // Update bandwidths
-    lbwB_ = sp.bw_lower();
-    ubwB_ = sp.bw_upper();
   }
 
   void SundialsInterface::init_memory(void* mem) const {
