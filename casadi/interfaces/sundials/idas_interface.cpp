@@ -1093,7 +1093,7 @@ namespace casadi {
     }
 
     // Remove second order terms (for smooth implementation of #940)
-    if (ns_>0) {
+    if (ns_>0 && nz_==0) {
       const Sparsity& sp_new = derivative_of_.get_function("jacF").sparsity_out(0);
       jac = project(jac, diagcat(vector<Sparsity>(1+ns_, sp_new)));
     }
@@ -1118,7 +1118,7 @@ namespace casadi {
     }
 
     // Remove second order terms (for smooth implementation of #940)
-    if (ns_>0) {
+    if (ns_>0 && nrz_==0) {
       const Sparsity& sp_new = derivative_of_.get_function("jacB").sparsity_out(0);
       jac = project(jac, diagcat(vector<Sparsity>(1+ns_, sp_new)));
     }
