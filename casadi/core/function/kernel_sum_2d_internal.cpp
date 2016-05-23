@@ -764,7 +764,8 @@ namespace casadi {
     code << "    p[1] = jg;" << endl;
     code << "    p[0] = ig;" << endl;
     for (int i=0;i<lut_args_.size();++i) {
-      code << "  args_local[" << offsets[lut_args_[i]] << "] = " << " im_luts[" << i*s_i_*s_j_ << "+k];" << endl;
+      code << "  args_local[" << offsets[lut_args_[i]] << "] = ";
+      code << " im_luts[" << i*s_i_*s_j_ << "+k];" << endl;
     }
     if (image_type_==16) {
       code << "    value = vload_half(k, im_in);" << endl;
@@ -1060,11 +1061,11 @@ namespace casadi {
     g.body << "  int kk = 0;" << endl;
     for (int i=2;i<f_.nIn();++i) {
       if (std::find(lut_args_.begin(), lut_args_.end(), i) == lut_args_.end()) {
-	    g.body << "  for (k=0;k<" << f_.inputSparsity(i).nnz() << ";++k) {" << endl;
+        g.body << "  for (k=0;k<" << f_.inputSparsity(i).nnz() << ";++k) {" << endl;
         g.body << "    h_args[kk] = arg[" << i-1 << "][k];" << endl;
         g.body << "    kk++;" << endl;
         g.body << "  }" << endl;
-	  }
+      }
     }
 
     g.body << "  int err;" << endl;
@@ -1085,7 +1086,7 @@ namespace casadi {
     g.body << "  int idelta = imax - imin;" << endl;
 
     g.body << "  if (idelta==0 || jdelta==0) return 0;" << endl;
-    
+
 
     if (pointer_input_ && image_type_<64) {
       if (image_type_==16) {
@@ -1106,7 +1107,8 @@ namespace casadi {
         g.body << "  check_cl_error(err);" << endl;
         for (int i=0;i<lut_args_.size();++i) {
           g.body << "  buffer_origin[0] = bs*" << i*s_i_*s_j_ << ";" << endl;
-          g.body << "  cl_mem V" << i << " =  (cl_mem) *((uint64_t *) arg[" << lut_args_[i]-1 <<"]);" << endl;
+          g.body << "  cl_mem V" << i << " = ";
+          g.body << " (cl_mem) *((uint64_t *) arg[" << lut_args_[i]-1 <<"]);" << endl;
           g.body << "  err = clEnqueueCopyBufferRect(commands" << ind << "_,";
           g.body << " V" << i << ", d_luts" << ind << "_, ";
           g.body << " host_origin, buffer_origin, region, bs*";
@@ -1136,12 +1138,12 @@ namespace casadi {
       g.body << "  check_cl_error(err);" << endl;
     }
 
-	// Copy data from host to buffer
+    // Copy data from host to buffer
     g.body << "  err = clEnqueueWriteBuffer(commands" << ind << "_, d_args" << ind << "_, CL_TRUE,";
     g.body << " 0, sizeof(float)*" << arg_length_ << ", h_args, 0, NULL, NULL);" << endl;
     g.body << "  check_cl_error(err);" << endl;
-    
-	// Set two integer kernel arguments
+
+    // Set two integer kernel arguments
     g.body << "  err  = clSetKernelArg(kernel" << ind << "_, 4, sizeof(int), &imin);" << endl;
     g.body << "  err  |= clSetKernelArg(kernel" << ind << "_, 5, sizeof(int), &jmin);" << endl;
     g.body << "  err  |= clSetKernelArg(kernel" << ind << "_, 6, sizeof(int), &idelta);" << endl;
