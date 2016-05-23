@@ -396,11 +396,11 @@ namespace casadi {
     // Re-initialize quadratures
     if (nq_>0) THROWING(IDAQuadReInit, m->mem, m->q);
 
-    // Turn off sensitivities
-    THROWING(IDASensToggleOff, m->mem);
-
     // Correct initial conditions, if necessary
-    if (calc_ic_) correctInitialConditions(m);
+    if (calc_ic_) {
+      THROWING(IDACalcIC, m->mem, IDA_YA_YDP_INIT , first_time_);
+      THROWING(IDAGetConsistentIC, m->mem, m->xz, m->xzdot);
+    }
 
     // Re-initialize backward integration
     if (nrx_>0) THROWING(IDAAdjReInit, m->mem);
@@ -409,12 +409,6 @@ namespace casadi {
     if (stop_at_end_) setStopTime(m, grid_.back());
 
     log("IdasInterface::reset", "end");
-  }
-
-
-  void IdasInterface::correctInitialConditions(IdasMemory* m) const {
-    THROWING(IDACalcIC, m->mem, IDA_YA_YDP_INIT , first_time_);
-    THROWING(IDAGetConsistentIC, m->mem, m->xz, m->xzdot);
   }
 
   void IdasInterface::

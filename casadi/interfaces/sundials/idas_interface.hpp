@@ -161,9 +161,6 @@ namespace casadi {
      */
     template<typename MatType> Function getJacB();
 
-    /// Correct the initial conditions, i.e. calculate
-    void correctInitialConditions(IdasMemory* m) const;
-
     /// A documentation string
     static const std::string meta_doc;
 

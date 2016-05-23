@@ -234,9 +234,6 @@ namespace casadi {
       THROWING(CVodeQuadReInit, m->mem, m->q);
     }
 
-    // Turn off sensitivities
-    THROWING(CVodeSensToggleOff, m->mem);
-
     // Re-initialize backward integration
     if (nrx_>0) {
       THROWING(CVodeAdjReInit, m->mem);
