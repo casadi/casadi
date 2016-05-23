@@ -472,6 +472,21 @@ namespace casadi {
     ret["rode"] = vertcat(aug_rode);
     ret["ralg"] = vertcat(aug_ralg);
     ret["rquad"] = vertcat(aug_rquad);
+
+    // Make sure that forward problem does not depend on backward states
+    Function f("f", {ret["t"], ret["x"], ret["z"], ret["p"]},
+                    {ret["ode"], ret["alg"], ret["quad"]});
+    if (f.has_free()) {
+      // Replace dependencies of rx, rz and rp with zeros
+      f = Function("f", {ret["rx"], ret["rz"], ret["rp"]},
+                        {ret["ode"], ret["alg"], ret["quad"]});
+      vector<MatType> v = {0, 0, 0};
+      v = f(v);
+      ret["ode"] = v.at(0);
+      ret["alg"] = v.at(1);
+      ret["quad"] = v.at(2);
+    }
+
     return ret;
   }
 
