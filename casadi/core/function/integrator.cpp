@@ -478,9 +478,10 @@ namespace casadi {
                     {ret["ode"], ret["alg"], ret["quad"]});
     if (f.has_free()) {
       // Replace dependencies of rx, rz and rp with zeros
-      f = Function("f", {ret["rx"], ret["rz"], ret["rp"]},
+      f = Function("f", {ret["t"], ret["x"], ret["z"], ret["p"],
+                         ret["rx"], ret["rz"], ret["rp"]},
                         {ret["ode"], ret["alg"], ret["quad"]});
-      vector<MatType> v = {0, 0, 0};
+      vector<MatType> v = {ret["t"], ret["x"], ret["z"], ret["p"], 0, 0, 0};
       v = f(v);
       ret["ode"] = v.at(0);
       ret["alg"] = v.at(1);
