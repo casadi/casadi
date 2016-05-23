@@ -136,7 +136,7 @@ namespace casadi {
     int max_multistep_order_;
     std::string linear_solver_;
     Dict linear_solver_options_;
-    bool iterative_;
+    bool use_iterative_solver_;
     ///@}
 
     /// Supported iterative solvers in Sundials

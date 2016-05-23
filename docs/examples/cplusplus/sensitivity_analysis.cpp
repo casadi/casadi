@@ -44,18 +44,18 @@ struct Test {
 Test simpleODE(){
   // Time
   SX t = SX::sym("t");
-  
+
   // Parameter
   SX u = SX::sym("u");
-  
+
   // Differential states
   SX s = SX::sym("s"), v = SX::sym("v"), m = SX::sym("m");
   SX x = vertcat(s, v, m);
-  
+
   // Constants
   double alpha = 0.05; // friction
   double beta = 0.1;   // fuel consumption rate
-  
+
   // Differential equation
   SX ode = vertcat(v, (u-alpha*v*v)/m, -beta*u*u);
 
@@ -74,10 +74,10 @@ Test simpleODE(){
 }
 
 /** \brief Generate a simple DAE */
-Test simpleDAE(){  
+Test simpleDAE(){
   // Parameter
   SX u = SX::sym("u");
-  
+
   // Differential state
   SX x = SX::sym("x");
 
@@ -92,7 +92,7 @@ Test simpleDAE(){
 
   // Quadrature
   SX quad = x*x + 3.0*u*u;
-  
+
   // Return DAE
   Test r;
   r.dae = decltype(r.dae){{"x", x}, {"z", z}, {"p", u}, {"ode", ode}, {"alg", alg}, {"quad", quad}};
@@ -143,7 +143,7 @@ int main(){
 
       // Buffers for evaluation
       std::map<std::string, DM> arg, res;
-      
+
       // Integrate to get results
       arg = decltype(arg){{"x0", test.x0},
                           {"p", test.u0}};
@@ -185,7 +185,7 @@ int main(){
       vector<double> fd_adj_x0((res.at("adj0_x0")-adj_x0)/h);
       vector<double> fd_adj_p((res.at("adj0_p")-adj_p)/h);
       cout << setw(50) << "FD of adjoint sensitivities: " << "d2(qf)/d(x0)d(p) = " << fd_adj_x0 << ", d2(qf)/d(p)d(p) = " << fd_adj_p << endl;
-      
+
       // Forward over adjoint to get the second order sensitivities
       Function I_foa = I_adj.derivative(1, 0);
       arg = decltype(arg){{"der_der_x0", test.x0},

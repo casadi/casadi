@@ -123,7 +123,7 @@ namespace casadi {
     }
 
     // Attach functions for jacobian information
-    if (iterative_) {
+    if (use_iterative_solver_) {
       create_function("jtimesF", {"t", "x", "p", "fwd:x"}, {"fwd:ode"});
       if (nrx_>0) {
         create_function("jtimesB",
@@ -157,7 +157,7 @@ namespace casadi {
     THROWING(CVodeSetMaxNumSteps, m->mem, max_num_steps_);
 
     // attach a linear solver
-    if (iterative_) {
+    if (use_iterative_solver_) {
       int pretype = use_precon_ ? PREC_LEFT : PREC_NONE;
       switch (itsol_) {
       case SD_GMRES: THROWING(CVSpgmr, m->mem, pretype, max_krylov_); break;
@@ -299,7 +299,7 @@ namespace casadi {
       THROWING(CVodeInitB, m->mem, m->whichB, rhsB, grid_.back(), m->rxz);
       THROWING(CVodeSStolerancesB, m->mem, m->whichB, reltol_, abstol_);
       THROWING(CVodeSetUserDataB, m->mem, m->whichB, m);
-      if (iterative_) {
+      if (use_iterative_solver_) {
         int pretype = use_precon_ ? PREC_LEFT : PREC_NONE;
         switch (itsol_) {
         case SD_GMRES: THROWING(CVSpgmrB, m->mem, m->whichB, pretype, max_krylov_); break;

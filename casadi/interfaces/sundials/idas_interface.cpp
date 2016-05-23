@@ -164,7 +164,7 @@ namespace casadi {
     }
 
     // Attach functions for jacobian information
-    if (iterative_) {
+    if (use_iterative_solver_) {
       create_function("jtimesF",
         {"t", "x", "z", "p", "fwd:x", "fwd:z"},
         {"fwd:ode", "fwd:alg"});
@@ -328,7 +328,7 @@ namespace casadi {
     N_VDestroy_Serial(id);
 
     // attach a linear solver
-    if (iterative_) {
+    if (use_iterative_solver_) {
       switch (itsol_) {
       case SD_GMRES: THROWING(IDASpgmr, m->mem, max_krylov_); break;
       case SD_BCGSTAB: THROWING(IDASpbcg, m->mem, max_krylov_); break;
@@ -472,7 +472,7 @@ namespace casadi {
       N_VDestroy_Serial(id);
 
       // attach linear solver
-      if (iterative_) {
+      if (use_iterative_solver_) {
         switch (itsol_) {
         case SD_GMRES: THROWING(IDASpgmrB, m->mem, m->whichB, max_krylov_); break;
         case SD_BCGSTAB: THROWING(IDASpbcgB, m->mem, m->whichB, max_krylov_); break;

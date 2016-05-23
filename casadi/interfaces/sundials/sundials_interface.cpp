@@ -51,9 +51,9 @@ namespace casadi {
       {"abstol",
        {OT_DOUBLE,
         "Absolute tolerence for the IVP solution"}},
-      {"linear_solver_type",
-       {OT_STRING,
-        "Type of iterative solver: USER_DEFINED|iterative"}},
+      {"use_iterative_solver",
+       {OT_BOOL,
+        "Use iterative solver as opposed to a direct solver"}},
       {"iterative_solver",
        {OT_STRING,
         "Iterative solver: GMRES|bcgstab|tfqmr"}},
@@ -68,7 +68,7 @@ namespace casadi {
         "Maximum order for the (variable-order) multistep method"}},
       {"use_preconditioner",
        {OT_BOOL,
-        "Precondition an iterative solver"}},
+        "Precondition the iterative solver [default: true]"}},
       {"stop_at_end",
        {OT_BOOL,
         "Stop the integrator at the end of the interval"}},
@@ -112,7 +112,7 @@ namespace casadi {
     use_precon_ = true;
     max_krylov_ = 10;
     linear_solver_ = "csparse";
-    string linear_solver_type = "user_defined";
+    use_iterative_solver_ = false;
     string iterative_solver = "gmres";
     quad_err_con_ = false;
     string interpolation_type = "hermite";
@@ -134,8 +134,8 @@ namespace casadi {
         use_precon_ = op.second;
       } else if (op.first=="max_krylov") {
         max_krylov_ = op.second;
-      } else if (op.first=="linear_solver_type") {
-        linear_solver_type = op.second.to_string();
+      } else if (op.first=="use_iterative_solver") {
+        use_iterative_solver_ = op.second;
       } else if (op.first=="iterative_solver") {
         iterative_solver = op.second.to_string();
       } else if (op.first=="linear_solver") {
@@ -156,10 +156,7 @@ namespace casadi {
     }
 
     // Linear solver for forward integration
-    if (linear_solver_type=="user_defined") {
-      iterative_ = false;
-    } else if (linear_solver_type=="iterative") {
-      iterative_ = true;
+    if (use_iterative_solver_) {
       if (iterative_solver=="gmres") {
         itsol_ = SD_GMRES;
       } else if (iterative_solver=="bcgstab") {
@@ -169,8 +166,6 @@ namespace casadi {
       } else {
         casadi_error("Unknown iterative solver: " + iterative_solver);
       }
-    } else {
-      casadi_error("Unknown linear solver: " + linear_solver_type);
     }
 
     // interpolation_type

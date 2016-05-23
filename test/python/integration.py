@@ -221,10 +221,10 @@ class Integrationtests(casadiTestCase):
 
             def solveroptions():
               for it in itoptions():
-                      d = {"linear_solver_type": "iterative" }
+                      d = {"use_iterative_solver": True }
                       d.update(it)
                       yield d
-              yield {"linear_solver_type": "user_defined", "linear_solver": "csparse" }
+              yield {"use_iterative_solver": False, "linear_solver": "csparse" }
 
             for f_options in solveroptions():
                 message = "f_options: %s" % str(f_options)
@@ -324,10 +324,10 @@ class Integrationtests(casadiTestCase):
 
           def solveroptions():
             for it in itoptions():
-                    d = {"linear_solver_type": "iterative" }
+                    d = {"use_iterative_solver": True }
                     d.update(it)
                     yield d
-            yield {"linear_solver_type": "user_defined", "linear_solver": "csparse" }
+            yield {"use_iterative_solver": False, "linear_solver": "csparse" }
 
           for f_options in solveroptions():
               message = "f_options: %s" % str(f_options)
