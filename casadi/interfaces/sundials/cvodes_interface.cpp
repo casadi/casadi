@@ -94,15 +94,11 @@ namespace casadi {
     create_function("odeB", {"rx", "rp", "x", "p", "t"}, {"rode"});
     create_function("quadB", {"rx", "rp", "x", "p", "t"}, {"rquad"});
 
-    // Create a Jacobian if requested
+    // Create Jacobians if requested
     if (exact_jac_) {
       set_function(oracle_.is_a("sxfunction") ? getJacF<SX>() : getJacF<MX>());
       init_jacF();
-    }
-
-    // Create a backwards Jacobian if requested
-    if (nrx_>0) {
-      if (exact_jacB_) {
+      if (nrx_>0) {
         set_function(oracle_.is_a("sxfunction") ? getJacB<SX>() : getJacB<MX>());
         init_jacB();
       }
@@ -129,22 +125,11 @@ namespace casadi {
     }
 
     // Attach functions for jacobian information
-    if (exact_jac_) {
-      switch (linsol_f_) {
-      case SD_ITERATIVE:
-        create_function("jtimesF", {"t", "x", "p", "fwd:x"}, {"fwd:ode"});
-        break;
-      default: break;
-      }
-    }
-
-    if (exact_jacB_) {
-      switch (linsol_g_) {
-      case SD_ITERATIVE:
+    if (exact_jac_ && linsol_==SD_ITERATIVE) {
+      create_function("jtimesF", {"t", "x", "p", "fwd:x"}, {"fwd:ode"});
+      if (nrx_>0) {
         create_function("jtimesB",
                         {"t", "x", "p", "rx", "rp", "fwd:rx"}, {"fwd:rode"});
-        break;
-      default: break;
       }
     }
   }
@@ -171,11 +156,11 @@ namespace casadi {
     THROWING(CVodeSetMaxNumSteps, m->mem, max_num_steps_);
 
     // attach a linear solver
-    switch (linsol_f_) {
+    switch (linsol_) {
     case SD_ITERATIVE:
     {
       int pretype = use_precon_ ? PREC_LEFT : PREC_NONE;
-      switch (itsol_f_) {
+      switch (itsol_) {
       case SD_GMRES: THROWING(CVSpgmr, m->mem, pretype, max_krylov_); break;
       case SD_BCGSTAB: THROWING(CVSpbcg, m->mem, pretype, max_krylov_); break;
       case SD_TFQMR: THROWING(CVSptfqmr, m->mem, pretype, max_krylov_); break;
@@ -329,23 +314,23 @@ namespace casadi {
       THROWING(CVodeInitB, m->mem, m->whichB, rhsB, tB0, m->rxz);
 
       // Set tolerances
-      THROWING(CVodeSStolerancesB, m->mem, m->whichB, reltolB_, abstolB_);
+      THROWING(CVodeSStolerancesB, m->mem, m->whichB, reltol_, abstol_);
 
       // User data
       THROWING(CVodeSetUserDataB, m->mem, m->whichB, m);
 
       // attach linear solver to backward problem
-      switch (linsol_g_) {
+      switch (linsol_) {
       case SD_ITERATIVE:
       {
-        int pretype = use_preconB_ ? PREC_LEFT : PREC_NONE;
-        switch (itsol_g_) {
-        case SD_GMRES: THROWING(CVSpgmrB, m->mem, m->whichB, pretype, max_krylovB_); break;
-        case SD_BCGSTAB: THROWING(CVSpbcgB, m->mem, m->whichB, pretype, max_krylovB_); break;
-        case SD_TFQMR: THROWING(CVSptfqmrB, m->mem, m->whichB, pretype, max_krylovB_); break;
+        int pretype = use_precon_ ? PREC_LEFT : PREC_NONE;
+        switch (itsol_) {
+        case SD_GMRES: THROWING(CVSpgmrB, m->mem, m->whichB, pretype, max_krylov_); break;
+        case SD_BCGSTAB: THROWING(CVSpbcgB, m->mem, m->whichB, pretype, max_krylov_); break;
+        case SD_TFQMR: THROWING(CVSptfqmrB, m->mem, m->whichB, pretype, max_krylov_); break;
         }
-        if (exact_jacB_) THROWING(CVSpilsSetJacTimesVecFnB, m->mem, m->whichB, jtimesB);
-        if (use_preconB_) THROWING(CVSpilsSetPreconditionerB, m->mem, m->whichB, psetupB, psolveB);
+        if (exact_jac_) THROWING(CVSpilsSetJacTimesVecFnB, m->mem, m->whichB, jtimesB);
+        if (use_precon_) THROWING(CVSpilsSetPreconditionerB, m->mem, m->whichB, psetupB, psolveB);
       }
       break;
       case SD_USER_DEFINED:
@@ -366,7 +351,7 @@ namespace casadi {
       THROWING(CVodeQuadInitB, m->mem, m->whichB, rhsQB, m->rq);
       if (quad_err_con_) {
         THROWING(CVodeSetQuadErrConB, m->mem, m->whichB, true);
-        THROWING(CVodeQuadSStolerancesB, m->mem, m->whichB, reltolB_, abstolB_);
+        THROWING(CVodeQuadSStolerancesB, m->mem, m->whichB, reltol_, abstol_);
       }
 
       // Mark initialized

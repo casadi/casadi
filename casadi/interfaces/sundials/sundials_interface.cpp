@@ -159,7 +159,6 @@ namespace casadi {
     reltol_ = 1e-6;
     exact_jac_ = true;
     max_num_steps_ = 10000;
-    finite_difference_fsens_ = false;
     stop_at_end_ = true;
     use_precon_ = false;
     max_krylov_ = 10;
@@ -182,8 +181,6 @@ namespace casadi {
         exact_jac_ = op.second;
       } else if (op.first=="max_num_steps") {
         max_num_steps_ = op.second;
-      } else if (op.first=="finite_difference_fsens") {
-        finite_difference_fsens_ = op.second;
       } else if (op.first=="stop_at_end") {
         stop_at_end_ = op.second;
       } else if (op.first=="use_preconditioner") {
@@ -211,89 +208,24 @@ namespace casadi {
       }
     }
 
-    // Default dependent options
-    exact_jacB_ = exact_jac_;
-    fsens_abstol_ = abstol_;
-    fsens_reltol_ = reltol_;
-    abstolB_ = abstol_;
-    reltolB_ = reltol_;
-    use_preconB_ = use_precon_;
-    max_krylovB_ = max_krylov_;
-    std::string linear_solver_typeB = linear_solver_type;
-    std::string iterative_solverB = iterative_solver;
-    linear_solverB_ = linear_solver_;
-    linear_solver_optionsB_ = linear_solver_options_;
-
-    // Read options again
-    for (auto&& op : opts) {
-      if (op.first=="exact_jacobianB") {
-        exact_jacB_ = op.second;
-      } else if (op.first=="fsens_abstol") {
-        fsens_abstol_ = op.second;
-      } else if (op.first=="fsens_reltol") {
-        fsens_reltol_ = op.second;
-      } else if (op.first=="abstolB") {
-        abstolB_ = op.second;
-      } else if (op.first=="reltolB") {
-        reltolB_ = op.second;
-      } else if (op.first=="use_preconditionerB") {
-        use_preconB_ = op.second;
-      } else if (op.first=="max_krylovB") {
-        max_krylovB_ = op.second;
-      } else if (op.first=="linear_solver_typeB") {
-        linear_solver_typeB = op.second.to_string();
-      } else if (op.first=="iterative_solverB") {
-        iterative_solverB = op.second.to_string();
-      } else if (op.first=="linear_solverB") {
-        linear_solverB_ = op.second.to_string();
-      } else if (op.first=="linear_solver_optionsB") {
-        linear_solver_optionsB_ = op.second;
-      }
-    }
-
-    // No Jacobian of g if g doesn't exist
-    if (nrx_==0) {
-      exact_jacB_ = false;
-    }
-
     // Linear solver for forward integration
     if (linear_solver_type=="iterative") {
-      linsol_f_ = SD_ITERATIVE;
+      linsol_ = SD_ITERATIVE;
 
       // Iterative solver
       if (iterative_solver=="gmres") {
-        itsol_f_ = SD_GMRES;
+        itsol_ = SD_GMRES;
       } else if (iterative_solver=="bcgstab") {
-        itsol_f_ = SD_BCGSTAB;
+        itsol_ = SD_BCGSTAB;
       } else if (iterative_solver=="tfqmr") {
-        itsol_f_ = SD_TFQMR;
+        itsol_ = SD_TFQMR;
       } else {
         casadi_error("Unknown iterative solver for forward integration: " + iterative_solver);
       }
     } else if (linear_solver_type=="user_defined") {
-      linsol_f_ = SD_USER_DEFINED;
+      linsol_ = SD_USER_DEFINED;
     } else {
       casadi_error("Unknown linear solver for forward integration: " + linear_solver_type);
-    }
-
-    // Linear solver for backward integration
-    if (linear_solver_typeB=="iterative") {
-      linsol_g_ = SD_ITERATIVE;
-
-      // Iterative solver
-      if (iterative_solverB=="gmres") {
-        itsol_g_ = SD_GMRES;
-      } else if (iterative_solverB=="bcgstab") {
-        itsol_g_ = SD_BCGSTAB;
-      } else if (iterative_solverB=="tfqmr") {
-        itsol_g_ = SD_TFQMR;
-      } else {
-        casadi_error("Unknown sparse solver for backward integration: " + iterative_solverB);
-      }
-    } else if (linear_solver_typeB=="user_defined") {
-      linsol_g_ = SD_USER_DEFINED;
-    } else {
-      casadi_error("Unknown linear solver for backward integration: " + iterative_solverB);
     }
 
     // interpolation_type
@@ -308,20 +240,6 @@ namespace casadi {
     // Allocate work vectors
     alloc_w(np_, true); // p
     alloc_w(nrp_, true); // rp
-
-    // Is exact Jacobian required?
-    if (linsol_f_==SD_USER_DEFINED ||
-      (linsol_f_==SD_ITERATIVE && use_precon_)) {
-        casadi_assert_message(exact_jac_, "Exact Jacobian required");
-    }
-
-    // Is exact Jacobian required?
-    if (nrx_>0) {
-      if (linsol_g_==SD_USER_DEFINED ||
-        (linsol_g_==SD_ITERATIVE && use_preconB_)) {
-          casadi_assert_message(exact_jacB_, "Exact Jacobian required");
-      }
-    }
   }
 
   void SundialsInterface::init_jacF() {
@@ -343,7 +261,7 @@ namespace casadi {
     alloc_w(sp.nnz(), true);
 
     // Create a linear solver
-    set_function(linsol("linsolB", linear_solverB_, sp, 0, linear_solver_optionsB_));
+    set_function(linsol("linsolB", linear_solver_, sp, 0, linear_solver_options_));
   }
 
   void SundialsInterface::init_memory(void* mem) const {

@@ -127,41 +127,35 @@ namespace casadi {
 
     ///@{
     /// Options
-    bool exact_jac_, exact_jacB_;
+    bool exact_jac_;
     double abstol_, reltol_;
-    double fsens_abstol_, fsens_reltol_;
-    double abstolB_, reltolB_;
     int max_num_steps_;
-    bool finite_difference_fsens_;
     bool stop_at_end_;
     bool quad_err_con_;
     int steps_per_checkpoint_;
     bool disable_internal_warnings_;
     int max_multistep_order_;
-    std::string linear_solver_, linear_solverB_;
-    Dict linear_solver_options_, linear_solver_optionsB_;
+    std::string linear_solver_;
+    Dict linear_solver_options_;
     ///@}
 
     /// Supported linear solvers in Sundials
-    enum LinsolType {SD_USER_DEFINED, SD_ITERATIVE}
-      linsol_f_, linsol_g_;
+    enum LinsolType {SD_USER_DEFINED, SD_ITERATIVE} linsol_;
 
     /// Supported iterative solvers in Sundials
-    enum IterativeSolverType {SD_GMRES, SD_BCGSTAB, SD_TFQMR}
-      itsol_f_, itsol_g_;
+    enum IterativeSolverType {SD_GMRES, SD_BCGSTAB, SD_TFQMR} itsol_;
 
     // Supported interpolations in Sundials
-    enum InterpType {SD_POLYNOMIAL, SD_HERMITE}
-      interp_;
+    enum InterpType {SD_POLYNOMIAL, SD_HERMITE} interp_;
 
     /// Linear solver data (dense)
     struct LinSolDataDense {};
 
     /// Max Krylov size
-    int max_krylov_, max_krylovB_;
+    int max_krylov_;
 
     /// Use preconditioning
-    bool use_precon_, use_preconB_;
+    bool use_precon_;
 
     /** \brief Set the (persistent) work vectors */
     virtual void set_work(void* mem, const double**& arg, double**& res,

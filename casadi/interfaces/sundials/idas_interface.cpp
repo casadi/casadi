@@ -141,17 +141,12 @@ namespace casadi {
     create_function("daeB", {"rx", "rz", "rp", "x", "z", "p", "t"}, {"rode", "ralg"});
     create_function("quadB", {"rx", "rz", "rp", "x", "z", "p", "t"}, {"rquad"});
 
-    // Create a Jacobian if requested
     if (exact_jac_) {
+      // Create a Jacobian if requested
       set_function(oracle_.is_a("sxfunction") ? getJacF<SX>() : getJacF<MX>());
       init_jacF();
-    } else {
-
-    }
-
-    // Create a backwards Jacobian if requested
-    if (nrx_>0) {
-      if (exact_jacB_) {
+      // Create a backwards Jacobian if requested
+      if (nrx_>0) {
         set_function(oracle_.is_a("sxfunction") ? getJacB<SX>() : getJacB<MX>());
         init_jacB();
       }
@@ -171,25 +166,14 @@ namespace casadi {
     }
 
     // Attach functions for jacobian information
-    if (exact_jac_) {
-      switch (linsol_f_) {
-      case SD_ITERATIVE:
-        create_function("jtimesF",
-          {"t", "x", "z", "p", "fwd:x", "fwd:z"},
-          {"fwd:ode", "fwd:alg"});
-        break;
-      default: break;
-      }
-    }
-
-    if (exact_jacB_) {
-      switch (linsol_g_) {
-      case SD_ITERATIVE:
+    if (exact_jac_ && linsol_==SD_ITERATIVE) {
+      create_function("jtimesF",
+        {"t", "x", "z", "p", "fwd:x", "fwd:z"},
+        {"fwd:ode", "fwd:alg"});
+      if (nrx_>0) {
         create_function("jtimesB",
           {"t", "x", "z", "p", "rx", "rz", "rp", "fwd:rx", "fwd:rz"},
           {"fwd:rode", "fwd:ralg"});
-        break;
-      default: break;
       }
     }
 
@@ -346,9 +330,9 @@ namespace casadi {
     N_VDestroy_Serial(id);
 
     // attach a linear solver
-    switch (linsol_f_) {
+    switch (linsol_) {
     case SD_ITERATIVE:
-    switch (itsol_f_) {
+    switch (itsol_) {
     case SD_GMRES: THROWING(IDASpgmr, m->mem, max_krylov_); break;
     case SD_BCGSTAB: THROWING(IDASpbcg, m->mem, max_krylov_); break;
     case SD_TFQMR: THROWING(IDASptfqmr, m->mem, max_krylov_); break;
@@ -498,7 +482,7 @@ namespace casadi {
       THROWING(IDAInitB, m->mem, m->whichB, resB, tB0, m->rxz, m->rxzdot);
 
       // Set tolerances
-      THROWING(IDASStolerancesB, m->mem, m->whichB, reltolB_, abstolB_);
+      THROWING(IDASStolerancesB, m->mem, m->whichB, reltol_, abstol_);
 
       // User data
       THROWING(IDASetUserDataB, m->mem, m->whichB, m);
@@ -518,15 +502,15 @@ namespace casadi {
       N_VDestroy_Serial(id);
 
       // attach linear solver
-      switch (linsol_g_) {
+      switch (linsol_) {
       case SD_ITERATIVE:
-      switch (itsol_g_) {
-      case SD_GMRES: THROWING(IDASpgmrB, m->mem, m->whichB, max_krylovB_); break;
-      case SD_BCGSTAB: THROWING(IDASpbcgB, m->mem, m->whichB, max_krylovB_); break;
-      case SD_TFQMR: THROWING(IDASptfqmrB, m->mem, m->whichB, max_krylovB_); break;
+      switch (itsol_) {
+      case SD_GMRES: THROWING(IDASpgmrB, m->mem, m->whichB, max_krylov_); break;
+      case SD_BCGSTAB: THROWING(IDASpbcgB, m->mem, m->whichB, max_krylov_); break;
+      case SD_TFQMR: THROWING(IDASptfqmrB, m->mem, m->whichB, max_krylov_); break;
       }
-      if (exact_jacB_) THROWING(IDASpilsSetJacTimesVecFnB, m->mem, m->whichB, jtimesB);
-      if (use_preconB_) THROWING(IDASpilsSetPreconditionerB, m->mem, m->whichB, psetupB, psolveB);
+      if (exact_jac_) THROWING(IDASpilsSetJacTimesVecFnB, m->mem, m->whichB, jtimesB);
+      if (use_precon_) THROWING(IDASpilsSetPreconditionerB, m->mem, m->whichB, psetupB, psolveB);
       break;
       case SD_USER_DEFINED:
       {
@@ -548,7 +532,7 @@ namespace casadi {
       // Quadrature error control
       if (quad_err_con_) {
         THROWING(IDASetQuadErrConB, m->mem, m->whichB, true);
-        THROWING(IDAQuadSStolerancesB, m->mem, m->whichB, reltolB_, abstolB_);
+        THROWING(IDAQuadSStolerancesB, m->mem, m->whichB, reltol_, abstol_);
       }
 
       // Mark initialized

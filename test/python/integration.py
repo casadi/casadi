@@ -214,29 +214,25 @@ class Integrationtests(casadiTestCase):
             sol.update(solution)
             fs = Function("fs", sol, casadi.integrator_in(), casadi.integrator_out())
 
-            def itoptions(post=""):
-              yield {"iterative_solver"+post: "gmres"}
-              yield {"iterative_solver"+post: "bcgstab"}
-              #yield {"iterative_solver"+post: "tfqmr"} # Bug in Sundials?
+            def itoptions():
+              yield {"iterative_solver": "gmres"}
+              yield {"iterative_solver": "bcgstab"}
+             # yield {"iterative_solver": "tfqmr"} # Bug in Sundials?
 
-            def solveroptions(post=""):
-              for it in itoptions(post):
-                      d = {"linear_solver_type" +post: "iterative" }
+            def solveroptions():
+              for it in itoptions():
+                      d = {"linear_solver_type": "iterative" }
                       d.update(it)
                       yield d
-              yield {"linear_solver_type" +post: "user_defined", "linear_solver"+post: "csparse" }
+              yield {"linear_solver_type": "user_defined", "linear_solver": "csparse" }
 
-            for a_options in solveroptions("B"):
-              for f_options in solveroptions():
-                message = "f_options: %s , a_options: %s" % (str(f_options) , str(a_options))
+            for f_options in solveroptions():
+                message = "f_options: %s" % str(f_options)
                 print(message)
                 opts = {}
-                opts["exact_jacobianB"] = True
-                #opts["verbose"] = True
-                #opts["monitor"] = ["djacB","resB","djac","res"])
                 opts["t0"] = tstart_
                 opts["tf"] = tend_
-                for op in (options, f_options, a_options):
+                for op in (options, f_options):
                   for (k,v) in list(op.items()):
                     opts[k] = v
                 integrator = casadi.integrator("integrator", Integrator, dae, opts)
@@ -321,28 +317,26 @@ class Integrationtests(casadiTestCase):
           sol.update(solution)
           fs = Function("fs", sol, casadi.integrator_in(), casadi.integrator_out())
 
-          def itoptions(post=""):
-            yield {"iterative_solver"+post: "gmres"}
-            yield {"iterative_solver"+post: "bcgstab"}
-            #yield {"iterative_solver"+post: "tfqmr"} # Bug in Sundials?
+          def itoptions():
+            yield {"iterative_solver": "gmres"}
+            yield {"iterative_solver": "bcgstab"}
+            #yield {"iterative_solver": "tfqmr"} # Bug in Sundials?
 
-          def solveroptions(post=""):
-            for it in itoptions(post):
-                    d = {"linear_solver_type" +post: "iterative" }
+          def solveroptions():
+            for it in itoptions():
+                    d = {"linear_solver_type": "iterative" }
                     d.update(it)
                     yield d
-            yield {"linear_solver_type" +post: "user_defined", "linear_solver"+post: "csparse" }
+            yield {"linear_solver_type": "user_defined", "linear_solver": "csparse" }
 
-          for a_options in solveroptions("B"):
-            for f_options in solveroptions():
-              message = "f_options: %s , a_options: %s" % (str(f_options) , str(a_options))
+          for f_options in solveroptions():
+              message = "f_options: %s" % str(f_options)
               print(message)
 
               opts = {}
-              opts["exact_jacobianB"] = True
               opts["t0"] = tstart_
               opts["tf"] = tend_
-              for op in (options, f_options, a_options):
+              for op in (options, f_options):
                  for (k,v) in list(op.items()):
                     opts[k] = v
               integrator = casadi.integrator("integrator", Integrator, dae, opts)
