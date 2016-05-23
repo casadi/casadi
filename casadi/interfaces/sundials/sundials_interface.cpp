@@ -50,14 +50,10 @@ namespace casadi {
         "Relative tolerence for the IVP solution"}},
       {"abstol",
        {OT_DOUBLE,
-        "Absolute tolerence  for the IVP solution"}},
+        "Absolute tolerence for the IVP solution"}},
       {"exact_jacobian",
        {OT_BOOL,
-        "Use exact Jacobian information for the forward integration"}},
-      {"exact_jacobianB",
-       {OT_BOOL,
-        "Use exact Jacobian information for the backward integration "
-        "[default: equal to exact_jacobian]"}},
+        "Use exact Jacobian information"}},
       {"linear_solver_type",
        {OT_STRING,
         "Type of iterative solver: USER_DEFINED|iterative"}},
@@ -76,10 +72,6 @@ namespace casadi {
       {"use_preconditioner",
        {OT_BOOL,
         "Precondition an iterative solver"}},
-      {"use_preconditionerB",
-       {OT_BOOL,
-        "Precondition an iterative solver for the backwards problem "
-        "[default: equal to use_preconditioner]"}},
       {"stop_at_end",
        {OT_BOOL,
         "Stop the integrator at the end of the interval"}},
@@ -92,57 +84,18 @@ namespace casadi {
       {"fsens_err_con",
        {OT_BOOL,
         "include the forward sensitivities in all error controls"}},
-      {"finite_difference_fsens",
-       {OT_BOOL,
-        "Use finite differences to approximate the forward sensitivity equations "
-        "(if AD is not available)"}},
-      {"fsens_reltol",
-       {OT_DOUBLE,
-        "Relative tolerence for the forward sensitivity solution [default: equal to reltol]"}},
-      {"fsens_abstol",
-       {OT_DOUBLE,
-        "Absolute tolerence for the forward sensitivity solution [default: equal to abstol]"}},
-      {"fsens_scaling_factors",
-       {OT_DOUBLEVECTOR,
-        "Scaling factor for the components if finite differences is used"}},
-      {"fsens_sensitiviy_parameters",
-       {OT_INTVECTOR,
-        "Specifies which components will be used when estimating the sensitivity equations"}},
       {"steps_per_checkpoint",
        {OT_INT,
         "Number of steps between two consecutive checkpoints"}},
       {"interpolation_type",
        {OT_STRING,
         "Type of interpolation for the adjoint sensitivities"}},
-      {"linear_solver_typeB",
-       {OT_STRING,
-        "Linear solver for backward integration"}},
-      {"iterative_solverB",
-       {OT_STRING,
-        "Iterative solver for backward integration"}},
-      {"max_krylovB",
-       {OT_INT,
-        "Maximum krylov subspace size for backward integration"}},
-      {"reltolB",
-       {OT_DOUBLE,
-        "Relative tolerence for the adjoint sensitivity solution [default: equal to reltol]"}},
-      {"abstolB",
-       {OT_DOUBLE,
-        "Absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]"}},
       {"linear_solver",
        {OT_STRING,
         "A custom linear solver creator function [default: csparse]"}},
       {"linear_solver_options",
        {OT_DICT,
-        "Options to be passed to the linear solver"}},
-      {"linear_solverB",
-       {OT_STRING,
-        "A custom linear solver creator function for backwards integration "
-        "[default: equal to linear_solver]"}},
-      {"linear_solver_optionsB",
-       {OT_DICT,
-        "Options to be passed to the linear solver for backwards integration "
-        "[default: equal to linear_solver_options]"}}
+        "Options to be passed to the linear solver"}}
      }
   };
 
@@ -209,10 +162,10 @@ namespace casadi {
     }
 
     // Linear solver for forward integration
-    if (linear_solver_type=="iterative") {
-      linsol_ = SD_ITERATIVE;
-
-      // Iterative solver
+    if (linear_solver_type=="user_defined") {
+      iterative_ = false;
+    } else if (linear_solver_type=="iterative") {
+      iterative_ = true;
       if (iterative_solver=="gmres") {
         itsol_ = SD_GMRES;
       } else if (iterative_solver=="bcgstab") {
@@ -220,12 +173,10 @@ namespace casadi {
       } else if (iterative_solver=="tfqmr") {
         itsol_ = SD_TFQMR;
       } else {
-        casadi_error("Unknown iterative solver for forward integration: " + iterative_solver);
+        casadi_error("Unknown iterative solver: " + iterative_solver);
       }
-    } else if (linear_solver_type=="user_defined") {
-      linsol_ = SD_USER_DEFINED;
     } else {
-      casadi_error("Unknown linear solver for forward integration: " + linear_solver_type);
+      casadi_error("Unknown linear solver: " + linear_solver_type);
     }
 
     // interpolation_type

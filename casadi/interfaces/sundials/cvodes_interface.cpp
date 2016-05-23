@@ -125,7 +125,7 @@ namespace casadi {
     }
 
     // Attach functions for jacobian information
-    if (exact_jac_ && linsol_==SD_ITERATIVE) {
+    if (exact_jac_ && iterative_) {
       create_function("jtimesF", {"t", "x", "p", "fwd:x"}, {"fwd:ode"});
       if (nrx_>0) {
         create_function("jtimesB",
@@ -156,9 +156,7 @@ namespace casadi {
     THROWING(CVodeSetMaxNumSteps, m->mem, max_num_steps_);
 
     // attach a linear solver
-    switch (linsol_) {
-    case SD_ITERATIVE:
-    {
+    if (iterative_) {
       int pretype = use_precon_ ? PREC_LEFT : PREC_NONE;
       switch (itsol_) {
       case SD_GMRES: THROWING(CVSpgmr, m->mem, pretype, max_krylov_); break;
@@ -167,17 +165,12 @@ namespace casadi {
       }
       if (exact_jac_) THROWING(CVSpilsSetJacTimesVecFn, m->mem, jtimes);
       if (use_precon_) THROWING(CVSpilsSetPreconditioner, m->mem, psetup, psolve);
-    }
-    break;
-    case SD_USER_DEFINED:
-    {
+    } else {
       CVodeMem cv_mem = static_cast<CVodeMem>(m->mem);
       cv_mem->cv_lmem   = m;
       cv_mem->cv_lsetup = lsetup;
       cv_mem->cv_lsolve = lsolve;
       cv_mem->cv_setupNonNull = TRUE;
-      break;
-    }
     }
 
     // Set user data
@@ -306,23 +299,12 @@ namespace casadi {
     SundialsInterface::resetB(mem, t, rx, rz, rp);
 
     if (m->first_callB) {
-      // Create backward problem (use the same lmm and iter)
+      // Create backward problem
       THROWING(CVodeCreateB, m->mem, lmm_, iter_, &m->whichB);
-
-      // Initialize the backward problem
-      double tB0 = grid_.back();
-      THROWING(CVodeInitB, m->mem, m->whichB, rhsB, tB0, m->rxz);
-
-      // Set tolerances
+      THROWING(CVodeInitB, m->mem, m->whichB, rhsB, grid_.back(), m->rxz);
       THROWING(CVodeSStolerancesB, m->mem, m->whichB, reltol_, abstol_);
-
-      // User data
       THROWING(CVodeSetUserDataB, m->mem, m->whichB, m);
-
-      // attach linear solver to backward problem
-      switch (linsol_) {
-      case SD_ITERATIVE:
-      {
+      if (iterative_) {
         int pretype = use_precon_ ? PREC_LEFT : PREC_NONE;
         switch (itsol_) {
         case SD_GMRES: THROWING(CVSpgmrB, m->mem, m->whichB, pretype, max_krylov_); break;
@@ -331,10 +313,7 @@ namespace casadi {
         }
         if (exact_jac_) THROWING(CVSpilsSetJacTimesVecFnB, m->mem, m->whichB, jtimesB);
         if (use_precon_) THROWING(CVSpilsSetPreconditionerB, m->mem, m->whichB, psetupB, psolveB);
-      }
-      break;
-      case SD_USER_DEFINED:
-      {
+      } else {
         CVodeMem cv_mem = static_cast<CVodeMem>(m->mem);
         CVadjMem ca_mem = cv_mem->cv_adj_mem;
         CVodeBMem cvB_mem = ca_mem->cvB_mem;
@@ -343,8 +322,6 @@ namespace casadi {
         cvB_mem->cv_mem->cv_lsetup = lsetupB;
         cvB_mem->cv_mem->cv_lsolve = lsolveB;
         cvB_mem->cv_mem->cv_setupNonNull = TRUE;
-        break;
-      }
       }
 
       // Quadratures for the backward problem

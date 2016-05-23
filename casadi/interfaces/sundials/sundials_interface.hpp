@@ -137,10 +137,8 @@ namespace casadi {
     int max_multistep_order_;
     std::string linear_solver_;
     Dict linear_solver_options_;
+    bool iterative_;
     ///@}
-
-    /// Supported linear solvers in Sundials
-    enum LinsolType {SD_USER_DEFINED, SD_ITERATIVE} linsol_;
 
     /// Supported iterative solvers in Sundials
     enum IterativeSolverType {SD_GMRES, SD_BCGSTAB, SD_TFQMR} itsol_;

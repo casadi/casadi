@@ -166,7 +166,7 @@ namespace casadi {
     }
 
     // Attach functions for jacobian information
-    if (exact_jac_ && linsol_==SD_ITERATIVE) {
+    if (exact_jac_ && iterative_) {
       create_function("jtimesF",
         {"t", "x", "z", "p", "fwd:x", "fwd:z"},
         {"fwd:ode", "fwd:alg"});
@@ -330,25 +330,20 @@ namespace casadi {
     N_VDestroy_Serial(id);
 
     // attach a linear solver
-    switch (linsol_) {
-    case SD_ITERATIVE:
-    switch (itsol_) {
-    case SD_GMRES: THROWING(IDASpgmr, m->mem, max_krylov_); break;
-    case SD_BCGSTAB: THROWING(IDASpbcg, m->mem, max_krylov_); break;
-    case SD_TFQMR: THROWING(IDASptfqmr, m->mem, max_krylov_); break;
-    }
-    if (exact_jac_) THROWING(IDASpilsSetJacTimesVecFn, m->mem, jtimes);
-    if (use_precon_) THROWING(IDASpilsSetPreconditioner, m->mem, psetup, psolve);
-    break;
-    case SD_USER_DEFINED:
-    {
+    if (iterative_) {
+      switch (itsol_) {
+      case SD_GMRES: THROWING(IDASpgmr, m->mem, max_krylov_); break;
+      case SD_BCGSTAB: THROWING(IDASpbcg, m->mem, max_krylov_); break;
+      case SD_TFQMR: THROWING(IDASptfqmr, m->mem, max_krylov_); break;
+      }
+      if (exact_jac_) THROWING(IDASpilsSetJacTimesVecFn, m->mem, jtimes);
+      if (use_precon_) THROWING(IDASpilsSetPreconditioner, m->mem, psetup, psolve);
+    } else {
       IDAMem IDA_mem = IDAMem(m->mem);
       IDA_mem->ida_lmem   = m;
       IDA_mem->ida_lsetup = lsetup;
       IDA_mem->ida_lsolve = lsolve;
       IDA_mem->ida_setupNonNull = TRUE;
-      break;
-    }
     }
 
     // Quadrature equations
@@ -405,14 +400,10 @@ namespace casadi {
     THROWING(IDASensToggleOff, m->mem);
 
     // Correct initial conditions, if necessary
-    if (calc_ic_) {
-      correctInitialConditions(m);
-    }
+    if (calc_ic_) correctInitialConditions(m);
 
     // Re-initialize backward integration
-    if (nrx_>0) {
-      THROWING(IDAAdjReInit, m->mem);
-    }
+    if (nrx_>0) THROWING(IDAAdjReInit, m->mem);
 
     // Set the stop time of the integration -- don't integrate past this point
     if (stop_at_end_) setStopTime(m, grid_.back());
@@ -473,47 +464,31 @@ namespace casadi {
     // Reset the base classes
     SundialsInterface::resetB(mem, t, rx, rz, rp);
 
-    if (m->first_callB) { // First call
+    if (m->first_callB) {
       // Create backward problem
       THROWING(IDACreateB, m->mem, &m->whichB);
-
-      // Initialize the backward problem
-      double tB0 = grid_.back();
-      THROWING(IDAInitB, m->mem, m->whichB, resB, tB0, m->rxz, m->rxzdot);
-
-      // Set tolerances
+      THROWING(IDAInitB, m->mem, m->whichB, resB, grid_.back(), m->rxz, m->rxzdot);
       THROWING(IDASStolerancesB, m->mem, m->whichB, reltol_, abstol_);
-
-      // User data
       THROWING(IDASetUserDataB, m->mem, m->whichB, m);
-
-      // Maximum number of steps
       THROWING(IDASetMaxNumStepsB, m->mem, m->whichB, max_num_steps_);
 
       // Set algebraic components
       N_Vector id = N_VNew_Serial(nrx_+nrz_);
       fill_n(NV_DATA_S(id), nrx_, 1);
       fill_n(NV_DATA_S(id)+nrx_, nrz_, 0);
-
-      // Pass this information to IDAS
       THROWING(IDASetIdB, m->mem, m->whichB, id);
-
-      // Delete the allocated memory
       N_VDestroy_Serial(id);
 
       // attach linear solver
-      switch (linsol_) {
-      case SD_ITERATIVE:
-      switch (itsol_) {
-      case SD_GMRES: THROWING(IDASpgmrB, m->mem, m->whichB, max_krylov_); break;
-      case SD_BCGSTAB: THROWING(IDASpbcgB, m->mem, m->whichB, max_krylov_); break;
-      case SD_TFQMR: THROWING(IDASptfqmrB, m->mem, m->whichB, max_krylov_); break;
-      }
-      if (exact_jac_) THROWING(IDASpilsSetJacTimesVecFnB, m->mem, m->whichB, jtimesB);
-      if (use_precon_) THROWING(IDASpilsSetPreconditionerB, m->mem, m->whichB, psetupB, psolveB);
-      break;
-      case SD_USER_DEFINED:
-      {
+      if (iterative_) {
+        switch (itsol_) {
+        case SD_GMRES: THROWING(IDASpgmrB, m->mem, m->whichB, max_krylov_); break;
+        case SD_BCGSTAB: THROWING(IDASpbcgB, m->mem, m->whichB, max_krylov_); break;
+        case SD_TFQMR: THROWING(IDASptfqmrB, m->mem, m->whichB, max_krylov_); break;
+        }
+        if (exact_jac_) THROWING(IDASpilsSetJacTimesVecFnB, m->mem, m->whichB, jtimesB);
+        if (use_precon_) THROWING(IDASpilsSetPreconditionerB, m->mem, m->whichB, psetupB, psolveB);
+      } else {
         IDAMem IDA_mem = IDAMem(m->mem);
         IDAadjMem IDAADJ_mem = IDA_mem->ida_adj_mem;
         IDABMem IDAB_mem = IDAADJ_mem->IDAB_mem;
@@ -522,14 +497,10 @@ namespace casadi {
         IDAB_mem->IDA_mem->ida_lsetup = lsetupB;
         IDAB_mem->IDA_mem->ida_lsolve = lsolveB;
         IDAB_mem->IDA_mem->ida_setupNonNull = TRUE;
-        break;
-      }
       }
 
       // Quadratures for the adjoint problem
       THROWING(IDAQuadInitB, m->mem, m->whichB, rhsQB, m->rq);
-
-      // Quadrature error control
       if (quad_err_con_) {
         THROWING(IDASetQuadErrConB, m->mem, m->whichB, true);
         THROWING(IDAQuadSStolerancesB, m->mem, m->whichB, reltol_, abstol_);
@@ -537,9 +508,9 @@ namespace casadi {
 
       // Mark initialized
       m->first_callB = false;
-    } else { // Re-initialize
+    } else {
+      // Re-initialize
       THROWING(IDAReInitB, m->mem, m->whichB, grid_.back(), m->rxz, m->rxzdot);
-
       if (nrq_>0) {
         // Workaround (bug in SUNDIALS)
         // THROWING(IDAQuadReInitB, m->mem, m->whichB[dir], m->rq[dir]);
