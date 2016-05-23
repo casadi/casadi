@@ -143,7 +143,10 @@ namespace casadi {
     casadi_assert_message(m->mem!=0, "CVodeCreate: Creation failed");
 
     // Set error handler function
-    THROWING(CVodeSetErrHandlerFn, m->mem, ehfun, &m);
+    THROWING(CVodeSetErrHandlerFn, m->mem, ehfun, m);
+
+    // Set user data
+    THROWING(CVodeSetUserData, m->mem, m);
 
     // Initialize CVodes
     double t0 = 0;
@@ -172,9 +175,6 @@ namespace casadi {
       cv_mem->cv_lsolve = lsolve;
       cv_mem->cv_setupNonNull = TRUE;
     }
-
-    // Set user data
-    THROWING(CVodeSetUserData, m->mem, m);
 
     // Quadrature equations
     if (nq_>0) {

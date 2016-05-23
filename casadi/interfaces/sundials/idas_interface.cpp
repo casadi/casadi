@@ -277,7 +277,13 @@ namespace casadi {
 
     // Create IDAS memory block
     m->mem = IDACreate();
-    if (m->mem==0) throw CasadiException("IDACreate(): Creation failed");
+    casadi_assert_message(m->mem!=0, "IDACreate: Creation failed");
+
+    // Set error handler function
+    THROWING(IDASetErrHandlerFn, m->mem, ehfun, m);
+
+    // Set user data
+    THROWING(IDASetUserData, m->mem, m);
 
     // Allocate n-vectors for ivp
     m->xzdot = N_VNew_Serial(nx_+nz_);
@@ -289,17 +295,11 @@ namespace casadi {
     IDAInit(m->mem, res, t0, m->xz, m->xzdot);
     log("IdasInterface::init", "IDA initialized");
 
-    // Set error handler function
-    THROWING(IDASetErrHandlerFn, m->mem, ehfun, &m);
-
     // Include algebraic variables in error testing
     THROWING(IDASetSuppressAlg, m->mem, suppress_algebraic_);
 
     // Maxinum order for the multistep method
     THROWING(IDASetMaxOrd, m->mem, max_multistep_order_);
-
-    // Set user data
-    THROWING(IDASetUserData, m->mem, m);
 
     // Set maximum step size
     THROWING(IDASetMaxStep, m->mem, max_step_size_);

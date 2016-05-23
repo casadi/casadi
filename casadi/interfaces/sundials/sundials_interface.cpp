@@ -113,7 +113,7 @@ namespace casadi {
     exact_jac_ = true;
     max_num_steps_ = 10000;
     stop_at_end_ = true;
-    use_precon_ = false;
+    use_precon_ = true;
     max_krylov_ = 10;
     linear_solver_ = "csparse";
     string linear_solver_type = "user_defined";
