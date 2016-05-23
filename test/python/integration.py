@@ -217,7 +217,7 @@ class Integrationtests(casadiTestCase):
             def itoptions(post=""):
               yield {"iterative_solver"+post: "gmres"}
               yield {"iterative_solver"+post: "bcgstab"}
-              yield {"iterative_solver"+post: "tfqmr", "use_preconditionerB": True, "linear_solverB" : "csparse"} # Bug in Sundials? Preconditioning seems to be needed
+              #yield {"iterative_solver"+post: "tfqmr"} # Bug in Sundials?
 
             def solveroptions(post=""):
               for it in itoptions(post):
@@ -324,7 +324,7 @@ class Integrationtests(casadiTestCase):
           def itoptions(post=""):
             yield {"iterative_solver"+post: "gmres"}
             yield {"iterative_solver"+post: "bcgstab"}
-            yield {"iterative_solver"+post: "tfqmr", "use_preconditionerB": True, "linear_solverB" : "csparse"} # Bug in Sundials? Preconditioning seems to be needed
+            #yield {"iterative_solver"+post: "tfqmr"} # Bug in Sundials?
 
           def solveroptions(post=""):
             for it in itoptions(post):
