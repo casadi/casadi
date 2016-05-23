@@ -10785,37 +10785,12 @@ experience a dramatic speed-up by using a sparse linear solver:
 | abstol                 | OT_DOUBLE              | Absolute tolerence for |
 |                        |                        | the IVP solution       |
 +------------------------+------------------------+------------------------+
-| abstolB                | OT_DOUBLE              | Absolute tolerence for |
-|                        |                        | the adjoint            |
-|                        |                        | sensitivity solution   |
-|                        |                        | [default: equal to     |
-|                        |                        | abstol]                |
-+------------------------+------------------------+------------------------+
 | disable_internal_warni | OT_BOOL                | Disable SUNDIALS       |
 | ngs                    |                        | internal warning       |
 |                        |                        | messages               |
 +------------------------+------------------------+------------------------+
 | exact_jacobian         | OT_BOOL                | Use exact Jacobian     |
-|                        |                        | information for the    |
-|                        |                        | forward integration    |
-+------------------------+------------------------+------------------------+
-| exact_jacobianB        | OT_BOOL                | Use exact Jacobian     |
-|                        |                        | information for the    |
-|                        |                        | backward integration   |
-|                        |                        | [default: equal to     |
-|                        |                        | exact_jacobian]        |
-+------------------------+------------------------+------------------------+
-| finite_difference_fsen | OT_BOOL                | Use finite differences |
-| s                      |                        | to approximate the     |
-|                        |                        | forward sensitivity    |
-|                        |                        | equations (if AD is    |
-|                        |                        | not available)         |
-+------------------------+------------------------+------------------------+
-| fsens_abstol           | OT_DOUBLE              | Absolute tolerence for |
-|                        |                        | the forward            |
-|                        |                        | sensitivity solution   |
-|                        |                        | [default: equal to     |
-|                        |                        | abstol]                |
+|                        |                        | information            |
 +------------------------+------------------------+------------------------+
 | fsens_all_at_once      | OT_BOOL                | Calculate all right    |
 |                        |                        | hand sides of the      |
@@ -10826,31 +10801,12 @@ experience a dramatic speed-up by using a sparse linear solver:
 |                        |                        | sensitivities in all   |
 |                        |                        | error controls         |
 +------------------------+------------------------+------------------------+
-| fsens_reltol           | OT_DOUBLE              | Relative tolerence for |
-|                        |                        | the forward            |
-|                        |                        | sensitivity solution   |
-|                        |                        | [default: equal to     |
-|                        |                        | reltol]                |
-+------------------------+------------------------+------------------------+
-| fsens_scaling_factors  | OT_DOUBLEVECTOR        | Scaling factor for the |
-|                        |                        | components if finite   |
-|                        |                        | differences is used    |
-+------------------------+------------------------+------------------------+
-| fsens_sensitiviy_param | OT_INTVECTOR           | Specifies which        |
-| eters                  |                        | components will be     |
-|                        |                        | used when estimating   |
-|                        |                        | the sensitivity        |
-|                        |                        | equations              |
-+------------------------+------------------------+------------------------+
 | interpolation_type     | OT_STRING              | Type of interpolation  |
 |                        |                        | for the adjoint        |
 |                        |                        | sensitivities          |
 +------------------------+------------------------+------------------------+
 | iterative_solver       | OT_STRING              | Iterative solver:      |
 |                        |                        | GMRES|bcgstab|tfqmr    |
-+------------------------+------------------------+------------------------+
-| iterative_solverB      | OT_STRING              | Iterative solver for   |
-|                        |                        | backward integration   |
 +------------------------+------------------------+------------------------+
 | linear_multistep_metho | OT_STRING              | Integrator scheme:     |
 | d                      |                        | BDF|adams              |
@@ -10859,35 +10815,15 @@ experience a dramatic speed-up by using a sparse linear solver:
 |                        |                        | creator function       |
 |                        |                        | [default: csparse]     |
 +------------------------+------------------------+------------------------+
-| linear_solverB         | OT_STRING              | A custom linear solver |
-|                        |                        | creator function for   |
-|                        |                        | backwards integration  |
-|                        |                        | [default: equal to     |
-|                        |                        | linear_solver]         |
-+------------------------+------------------------+------------------------+
 | linear_solver_options  | OT_DICT                | Options to be passed   |
 |                        |                        | to the linear solver   |
-+------------------------+------------------------+------------------------+
-| linear_solver_optionsB | OT_DICT                | Options to be passed   |
-|                        |                        | to the linear solver   |
-|                        |                        | for backwards          |
-|                        |                        | integration [default:  |
-|                        |                        | equal to               |
-|                        |                        | linear_solver_options] |
 +------------------------+------------------------+------------------------+
 | linear_solver_type     | OT_STRING              | Type of iterative      |
 |                        |                        | solver:                |
 |                        |                        | USER_DEFINED|iterative |
 +------------------------+------------------------+------------------------+
-| linear_solver_typeB    | OT_STRING              | Linear solver for      |
-|                        |                        | backward integration   |
-+------------------------+------------------------+------------------------+
 | max_krylov             | OT_INT                 | Maximum Krylov         |
 |                        |                        | subspace size          |
-+------------------------+------------------------+------------------------+
-| max_krylovB            | OT_INT                 | Maximum krylov         |
-|                        |                        | subspace size for      |
-|                        |                        | backward integration   |
 +------------------------+------------------------+------------------------+
 | max_multistep_order    | OT_INT                 | Maximum order for the  |
 |                        |                        | (variable-order)       |
@@ -10906,12 +10842,6 @@ experience a dramatic speed-up by using a sparse linear solver:
 | reltol                 | OT_DOUBLE              | Relative tolerence for |
 |                        |                        | the IVP solution       |
 +------------------------+------------------------+------------------------+
-| reltolB                | OT_DOUBLE              | Relative tolerence for |
-|                        |                        | the adjoint            |
-|                        |                        | sensitivity solution   |
-|                        |                        | [default: equal to     |
-|                        |                        | reltol]                |
-+------------------------+------------------------+------------------------+
 | sensitivity_method     | OT_STRING              | Sensitivity method:    |
 |                        |                        | SIMULTANEOUS|staggered |
 +------------------------+------------------------+------------------------+
@@ -10926,12 +10856,6 @@ experience a dramatic speed-up by using a sparse linear solver:
 +------------------------+------------------------+------------------------+
 | use_preconditioner     | OT_BOOL                | Precondition an        |
 |                        |                        | iterative solver       |
-+------------------------+------------------------+------------------------+
-| use_preconditionerB    | OT_BOOL                | Precondition an        |
-|                        |                        | iterative solver for   |
-|                        |                        | the backwards problem  |
-|                        |                        | [default: equal to     |
-|                        |                        | use_preconditioner]    |
 +------------------------+------------------------+------------------------+
 
 --------------------------------------------------------------------------------
@@ -10967,12 +10891,6 @@ experience a dramatic speed-up by using a sparse linear solver:
 | abstol                 | OT_DOUBLE              | Absolute tolerence for |
 |                        |                        | the IVP solution       |
 +------------------------+------------------------+------------------------+
-| abstolB                | OT_DOUBLE              | Absolute tolerence for |
-|                        |                        | the adjoint            |
-|                        |                        | sensitivity solution   |
-|                        |                        | [default: equal to     |
-|                        |                        | abstol]                |
-+------------------------+------------------------+------------------------+
 | abstolv                | OT_DOUBLEVECTOR        | Absolute tolerarance   |
 |                        |                        | for each component     |
 +------------------------+------------------------+------------------------+
@@ -10996,33 +10914,14 @@ experience a dramatic speed-up by using a sparse linear solver:
 |                        |                        | messages               |
 +------------------------+------------------------+------------------------+
 | exact_jacobian         | OT_BOOL                | Use exact Jacobian     |
-|                        |                        | information for the    |
-|                        |                        | forward integration    |
-+------------------------+------------------------+------------------------+
-| exact_jacobianB        | OT_BOOL                | Use exact Jacobian     |
-|                        |                        | information for the    |
-|                        |                        | backward integration   |
-|                        |                        | [default: equal to     |
-|                        |                        | exact_jacobian]        |
+|                        |                        | information            |
 +------------------------+------------------------+------------------------+
 | extra_fsens_calc_ic    | OT_BOOL                | Call calc ic an extra  |
 |                        |                        | time, with fsens=0     |
 +------------------------+------------------------+------------------------+
-| finite_difference_fsen | OT_BOOL                | Use finite differences |
-| s                      |                        | to approximate the     |
-|                        |                        | forward sensitivity    |
-|                        |                        | equations (if AD is    |
-|                        |                        | not available)         |
-+------------------------+------------------------+------------------------+
 | first_time             | OT_DOUBLE              | First requested time   |
 |                        |                        | as a fraction of the   |
 |                        |                        | time interval          |
-+------------------------+------------------------+------------------------+
-| fsens_abstol           | OT_DOUBLE              | Absolute tolerence for |
-|                        |                        | the forward            |
-|                        |                        | sensitivity solution   |
-|                        |                        | [default: equal to     |
-|                        |                        | abstol]                |
 +------------------------+------------------------+------------------------+
 | fsens_abstolv          | OT_DOUBLEVECTOR        | Absolute tolerarance   |
 |                        |                        | for each component,    |
@@ -11031,22 +10930,6 @@ experience a dramatic speed-up by using a sparse linear solver:
 | fsens_err_con          | OT_BOOL                | include the forward    |
 |                        |                        | sensitivities in all   |
 |                        |                        | error controls         |
-+------------------------+------------------------+------------------------+
-| fsens_reltol           | OT_DOUBLE              | Relative tolerence for |
-|                        |                        | the forward            |
-|                        |                        | sensitivity solution   |
-|                        |                        | [default: equal to     |
-|                        |                        | reltol]                |
-+------------------------+------------------------+------------------------+
-| fsens_scaling_factors  | OT_DOUBLEVECTOR        | Scaling factor for the |
-|                        |                        | components if finite   |
-|                        |                        | differences is used    |
-+------------------------+------------------------+------------------------+
-| fsens_sensitiviy_param | OT_INTVECTOR           | Specifies which        |
-| eters                  |                        | components will be     |
-|                        |                        | used when estimating   |
-|                        |                        | the sensitivity        |
-|                        |                        | equations              |
 +------------------------+------------------------+------------------------+
 | init_xdot              | OT_DOUBLEVECTOR        | Initial values for the |
 |                        |                        | state derivatives      |
@@ -11058,42 +10941,19 @@ experience a dramatic speed-up by using a sparse linear solver:
 | iterative_solver       | OT_STRING              | Iterative solver:      |
 |                        |                        | GMRES|bcgstab|tfqmr    |
 +------------------------+------------------------+------------------------+
-| iterative_solverB      | OT_STRING              | Iterative solver for   |
-|                        |                        | backward integration   |
-+------------------------+------------------------+------------------------+
 | linear_solver          | OT_STRING              | A custom linear solver |
 |                        |                        | creator function       |
 |                        |                        | [default: csparse]     |
 +------------------------+------------------------+------------------------+
-| linear_solverB         | OT_STRING              | A custom linear solver |
-|                        |                        | creator function for   |
-|                        |                        | backwards integration  |
-|                        |                        | [default: equal to     |
-|                        |                        | linear_solver]         |
-+------------------------+------------------------+------------------------+
 | linear_solver_options  | OT_DICT                | Options to be passed   |
 |                        |                        | to the linear solver   |
-+------------------------+------------------------+------------------------+
-| linear_solver_optionsB | OT_DICT                | Options to be passed   |
-|                        |                        | to the linear solver   |
-|                        |                        | for backwards          |
-|                        |                        | integration [default:  |
-|                        |                        | equal to               |
-|                        |                        | linear_solver_options] |
 +------------------------+------------------------+------------------------+
 | linear_solver_type     | OT_STRING              | Type of iterative      |
 |                        |                        | solver:                |
 |                        |                        | USER_DEFINED|iterative |
 +------------------------+------------------------+------------------------+
-| linear_solver_typeB    | OT_STRING              | Linear solver for      |
-|                        |                        | backward integration   |
-+------------------------+------------------------+------------------------+
 | max_krylov             | OT_INT                 | Maximum Krylov         |
 |                        |                        | subspace size          |
-+------------------------+------------------------+------------------------+
-| max_krylovB            | OT_INT                 | Maximum krylov         |
-|                        |                        | subspace size for      |
-|                        |                        | backward integration   |
 +------------------------+------------------------+------------------------+
 | max_multistep_order    | OT_INT                 | Maximum order for the  |
 |                        |                        | (variable-order)       |
@@ -11110,12 +10970,6 @@ experience a dramatic speed-up by using a sparse linear solver:
 +------------------------+------------------------+------------------------+
 | reltol                 | OT_DOUBLE              | Relative tolerence for |
 |                        |                        | the IVP solution       |
-+------------------------+------------------------+------------------------+
-| reltolB                | OT_DOUBLE              | Relative tolerence for |
-|                        |                        | the adjoint            |
-|                        |                        | sensitivity solution   |
-|                        |                        | [default: equal to     |
-|                        |                        | reltol]                |
 +------------------------+------------------------+------------------------+
 | sensitivity_method     | OT_STRING              | Sensitivity method:    |
 |                        |                        | SIMULTANEOUS|staggered |
@@ -11135,12 +10989,6 @@ experience a dramatic speed-up by using a sparse linear solver:
 +------------------------+------------------------+------------------------+
 | use_preconditioner     | OT_BOOL                | Precondition an        |
 |                        |                        | iterative solver       |
-+------------------------+------------------------+------------------------+
-| use_preconditionerB    | OT_BOOL                | Precondition an        |
-|                        |                        | iterative solver for   |
-|                        |                        | the backwards problem  |
-|                        |                        | [default: equal to     |
-|                        |                        | use_preconditioner]    |
 +------------------------+------------------------+------------------------+
 
 --------------------------------------------------------------------------------
