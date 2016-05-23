@@ -45,8 +45,8 @@ namespace casadi {
   const std::string CompilerInternal::infix_ = "compiler";
 
   void CompilerInternal::cleanup() {
-    setupPtr mycleanup = (setupPtr) getFunction("jit_cleanup");
-    if (mycleanup) mycleanup();
+    //setupPtr mycleanup = (setupPtr) getFunction("jit_cleanup");
+    //if (mycleanup) mycleanup();
   }
 
 } // namespace casadi
