@@ -8495,13 +8495,6 @@ experience a dramatic speed-up by using a sparse linear solver:
 | nonlinear_solver_itera | OT_STRING              | Nonlinear solver type: |
 | tion                   |                        | NEWTON|functional      |
 +------------------------+------------------------+------------------------+
-| pretype                | OT_STRING              | Type of                |
-|                        |                        | preconditioning:       |
-|                        |                        | NONE|left|right|both   |
-+------------------------+------------------------+------------------------+
-| pretypeB               | OT_STRING              | Preconditioner for     |
-|                        |                        | backward integration   |
-+------------------------+------------------------+------------------------+
 | quad_err_con           | OT_BOOL                | Should the quadratures |
 |                        |                        | affect the step size   |
 |                        |                        | control                |
@@ -8706,13 +8699,6 @@ experience a dramatic speed-up by using a sparse linear solver:
 |                        |                        | integrator steps       |
 +------------------------+------------------------+------------------------+
 | max_step_size          | OT_DOUBLE              | Maximim step size      |
-+------------------------+------------------------+------------------------+
-| pretype                | OT_STRING              | Type of                |
-|                        |                        | preconditioning:       |
-|                        |                        | NONE|left|right|both   |
-+------------------------+------------------------+------------------------+
-| pretypeB               | OT_STRING              | Preconditioner for     |
-|                        |                        | backward integration   |
 +------------------------+------------------------+------------------------+
 | quad_err_con           | OT_BOOL                | Should the quadratures |
 |                        |                        | affect the step size   |

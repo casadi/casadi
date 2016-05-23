@@ -341,8 +341,6 @@
 <tr><td>max_multistep_order</td><td>OT_INT</td><td>Maximum order for the (variable-order) multistep method</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_num_steps</td><td>OT_INT</td><td>Maximum number of integrator steps</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>nonlinear_solver_iteration</td><td>OT_STRING</td><td>Nonlinear solver type: NEWTON|functional</td><td>casadi::CvodesInterface</td></tr>
-<tr><td>pretype</td><td>OT_STRING</td><td>Type of preconditioning: NONE|left|right|both</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>pretypeB</td><td>OT_STRING</td><td>Preconditioner for backward integration</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>quad_err_con</td><td>OT_BOOL</td><td>Should the quadratures affect the step size control</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>reltol</td><td>OT_DOUBLE</td><td>Relative tolerence for the IVP solution</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>reltolB</td><td>OT_DOUBLE</td><td>Relative tolerence for the adjoint sensitivity solution [default: equal to reltol]</td><td>casadi::SundialsInterface</td></tr>
@@ -387,8 +385,6 @@
 <tr><td>max_multistep_order</td><td>OT_INT</td><td>Maximum order for the (variable-order) multistep method</td></tr>
 <tr><td>max_num_steps</td><td>OT_INT</td><td>Maximum number of integrator steps</td></tr>
 <tr><td>nonlinear_solver_iteration</td><td>OT_STRING</td><td>Nonlinear solver type: NEWTON|functional</td></tr>
-<tr><td>pretype</td><td>OT_STRING</td><td>Type of preconditioning: NONE|left|right|both</td></tr>
-<tr><td>pretypeB</td><td>OT_STRING</td><td>Preconditioner for backward integration</td></tr>
 <tr><td>quad_err_con</td><td>OT_BOOL</td><td>Should the quadratures affect the step size control</td></tr>
 <tr><td>reltol</td><td>OT_DOUBLE</td><td>Relative tolerence for the IVP solution</td></tr>
 <tr><td>reltolB</td><td>OT_DOUBLE</td><td>Relative tolerence for the adjoint sensitivity solution [default: equal to reltol]</td></tr>
@@ -432,8 +428,6 @@
 <tr><td>max_multistep_order</td><td>OT_INT</td><td>Maximum order for the (variable-order) multistep method</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_num_steps</td><td>OT_INT</td><td>Maximum number of integrator steps</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>nonlinear_solver_iteration</td><td>OT_STRING</td><td>Nonlinear solver type: NEWTON|functional</td><td>casadi::CvodesInterface</td></tr>
-<tr><td>pretype</td><td>OT_STRING</td><td>Type of preconditioning: NONE|left|right|both</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>pretypeB</td><td>OT_STRING</td><td>Preconditioner for backward integration</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>quad_err_con</td><td>OT_BOOL</td><td>Should the quadratures affect the step size control</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>reltol</td><td>OT_DOUBLE</td><td>Relative tolerence for the IVP solution</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>reltolB</td><td>OT_DOUBLE</td><td>Relative tolerence for the adjoint sensitivity solution [default: equal to reltol]</td><td>casadi::SundialsInterface</td></tr>
@@ -629,8 +623,6 @@
 <tr><td>max_multistep_order</td><td>OT_INT</td><td>Maximum order for the (variable-order) multistep method</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_num_steps</td><td>OT_INT</td><td>Maximum number of integrator steps</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_step_size</td><td>OT_DOUBLE</td><td>Maximim step size</td><td>casadi::IdasInterface</td></tr>
-<tr><td>pretype</td><td>OT_STRING</td><td>Type of preconditioning: NONE|left|right|both</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>pretypeB</td><td>OT_STRING</td><td>Preconditioner for backward integration</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>quad_err_con</td><td>OT_BOOL</td><td>Should the quadratures affect the step size control</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>reltol</td><td>OT_DOUBLE</td><td>Relative tolerence for the IVP solution</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>reltolB</td><td>OT_DOUBLE</td><td>Relative tolerence for the adjoint sensitivity solution [default: equal to reltol]</td><td>casadi::SundialsInterface</td></tr>
@@ -682,8 +674,6 @@
 <tr><td>max_multistep_order</td><td>OT_INT</td><td>Maximum order for the (variable-order) multistep method</td></tr>
 <tr><td>max_num_steps</td><td>OT_INT</td><td>Maximum number of integrator steps</td></tr>
 <tr><td>max_step_size</td><td>OT_DOUBLE</td><td>Maximim step size</td></tr>
-<tr><td>pretype</td><td>OT_STRING</td><td>Type of preconditioning: NONE|left|right|both</td></tr>
-<tr><td>pretypeB</td><td>OT_STRING</td><td>Preconditioner for backward integration</td></tr>
 <tr><td>quad_err_con</td><td>OT_BOOL</td><td>Should the quadratures affect the step size control</td></tr>
 <tr><td>reltol</td><td>OT_DOUBLE</td><td>Relative tolerence for the IVP solution</td></tr>
 <tr><td>reltolB</td><td>OT_DOUBLE</td><td>Relative tolerence for the adjoint sensitivity solution [default: equal to reltol]</td></tr>
@@ -734,8 +724,6 @@
 <tr><td>max_multistep_order</td><td>OT_INT</td><td>Maximum order for the (variable-order) multistep method</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_num_steps</td><td>OT_INT</td><td>Maximum number of integrator steps</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_step_size</td><td>OT_DOUBLE</td><td>Maximim step size</td><td>casadi::IdasInterface</td></tr>
-<tr><td>pretype</td><td>OT_STRING</td><td>Type of preconditioning: NONE|left|right|both</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>pretypeB</td><td>OT_STRING</td><td>Preconditioner for backward integration</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>quad_err_con</td><td>OT_BOOL</td><td>Should the quadratures affect the step size control</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>reltol</td><td>OT_DOUBLE</td><td>Relative tolerence for the IVP solution</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>reltolB</td><td>OT_DOUBLE</td><td>Relative tolerence for the adjoint sensitivity solution [default: equal to reltol]</td><td>casadi::SundialsInterface</td></tr>
@@ -2109,8 +2097,6 @@
 <tr><td>max_num_steps</td><td>OT_INT</td><td>Maximum number of integrator steps</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>number_of_finite_elements</td><td>OT_INT</td><td>Number of finite elements</td><td>casadi::Integrator</td></tr>
 <tr><td>output_t0</td><td>OT_BOOL</td><td>Output the state at the initial time</td><td>casadi::Integrator</td></tr>
-<tr><td>pretype</td><td>OT_STRING</td><td>Type of preconditioning: NONE|left|right|both</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>pretypeB</td><td>OT_STRING</td><td>Preconditioner for backward integration</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>print_stats</td><td>OT_BOOL</td><td>Print out statistics after integration</td><td>casadi::Integrator</td></tr>
 <tr><td>quad_err_con</td><td>OT_BOOL</td><td>Should the quadratures affect the step size control</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>reltol</td><td>OT_DOUBLE</td><td>Relative tolerence for the IVP solution</td><td>casadi::SundialsInterface</td></tr>
@@ -2162,8 +2148,6 @@
 <tr><td>max_num_steps</td><td>OT_INT</td><td>Maximum number of integrator steps</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>number_of_finite_elements</td><td>OT_INT</td><td>Number of finite elements</td><td>casadi::Integrator</td></tr>
 <tr><td>output_t0</td><td>OT_BOOL</td><td>Output the state at the initial time</td><td>casadi::Integrator</td></tr>
-<tr><td>pretype</td><td>OT_STRING</td><td>Type of preconditioning: NONE|left|right|both</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>pretypeB</td><td>OT_STRING</td><td>Preconditioner for backward integration</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>print_stats</td><td>OT_BOOL</td><td>Print out statistics after integration</td><td>casadi::Integrator</td></tr>
 <tr><td>quad_err_con</td><td>OT_BOOL</td><td>Should the quadratures affect the step size control</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>reltol</td><td>OT_DOUBLE</td><td>Relative tolerence for the IVP solution</td><td>casadi::SundialsInterface</td></tr>
