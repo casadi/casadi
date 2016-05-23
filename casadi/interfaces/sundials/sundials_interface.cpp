@@ -64,9 +64,6 @@ namespace casadi {
       {"iterative_solver",
        {OT_STRING,
         "Iterative solver: GMRES|bcgstab|tfqmr"}},
-      {"pretype",
-       {OT_STRING,
-        "Type of preconditioning: NONE|left|right|both"}},
       {"max_krylov",
        {OT_INT,
         "Maximum Krylov subspace size"}},
@@ -123,9 +120,6 @@ namespace casadi {
       {"iterative_solverB",
        {OT_STRING,
         "Iterative solver for backward integration"}},
-      {"pretypeB",
-       {OT_STRING,
-        "Preconditioner for backward integration"}},
       {"max_krylovB",
        {OT_INT,
         "Maximum krylov subspace size for backward integration"}},
@@ -172,7 +166,6 @@ namespace casadi {
     linear_solver_ = "csparse";
     string linear_solver_type = "user_defined";
     string iterative_solver = "gmres";
-    string pretype = "none";
     quad_err_con_ = false;
     string interpolation_type = "hermite";
     steps_per_checkpoint_ = 20;
@@ -201,8 +194,6 @@ namespace casadi {
         linear_solver_type = op.second.to_string();
       } else if (op.first=="iterative_solver") {
         iterative_solver = op.second.to_string();
-      } else if (op.first=="pretype") {
-        pretype = op.second.to_string();
       } else if (op.first=="linear_solver") {
         linear_solver_ = op.second.to_string();
       } else if (op.first=="linear_solver_options") {
@@ -230,7 +221,6 @@ namespace casadi {
     max_krylovB_ = max_krylov_;
     std::string linear_solver_typeB = linear_solver_type;
     std::string iterative_solverB = iterative_solver;
-    std::string pretypeB = pretype;
     linear_solverB_ = linear_solver_;
     linear_solver_optionsB_ = linear_solver_options_;
 
@@ -254,8 +244,6 @@ namespace casadi {
         linear_solver_typeB = op.second.to_string();
       } else if (op.first=="iterative_solverB") {
         iterative_solverB = op.second.to_string();
-      } else if (op.first=="pretypeB") {
-        pretypeB = op.second.to_string();
       } else if (op.first=="linear_solverB") {
         linear_solverB_ = op.second.to_string();
       } else if (op.first=="linear_solver_optionsB") {
@@ -282,19 +270,6 @@ namespace casadi {
       } else {
         casadi_error("Unknown iterative solver for forward integration: " + iterative_solver);
       }
-
-      // Preconditioning type
-      if (pretype=="none") {
-        pretype_f_ = PREC_NONE;
-      } else if (pretype=="left") {
-        pretype_f_ = PREC_LEFT;
-      } else if (pretype=="right") {
-        pretype_f_ = PREC_RIGHT;
-      } else if (pretype=="both") {
-        pretype_f_ = PREC_BOTH;
-      } else {
-        casadi_error("Unknown preconditioning type for forward integration: " + pretype);
-      }
     } else if (linear_solver_type=="user_defined") {
       linsol_f_ = SD_USER_DEFINED;
     } else {
@@ -314,19 +289,6 @@ namespace casadi {
         itsol_g_ = SD_TFQMR;
       } else {
         casadi_error("Unknown sparse solver for backward integration: " + iterative_solverB);
-      }
-
-      // Preconditioning type
-      if (pretypeB=="none") {
-        pretype_g_ = PREC_NONE;
-      } else if (pretypeB=="left") {
-        pretype_g_ = PREC_LEFT;
-      } else if (pretypeB=="right") {
-        pretype_g_ = PREC_RIGHT;
-      } else if (pretypeB=="both") {
-        pretype_g_ = PREC_BOTH;
-      } else {
-        casadi_error("Unknown preconditioning type for backward integration: " + pretypeB);
       }
     } else if (linear_solver_typeB=="user_defined") {
       linsol_g_ = SD_USER_DEFINED;

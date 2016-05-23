@@ -157,9 +157,6 @@ namespace casadi {
     /// Linear solver data (dense)
     struct LinSolDataDense {};
 
-    /// Preconditioning
-    int pretype_f_, pretype_g_;
-
     /// Max Krylov size
     int max_krylov_, max_krylovB_;
 

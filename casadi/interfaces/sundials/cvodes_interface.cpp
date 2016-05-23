@@ -173,13 +173,16 @@ namespace casadi {
     // attach a linear solver
     switch (linsol_f_) {
     case SD_ITERATIVE:
-    switch (itsol_f_) {
-    case SD_GMRES: THROWING(CVSpgmr, m->mem, pretype_f_, max_krylov_); break;
-    case SD_BCGSTAB: THROWING(CVSpbcg, m->mem, pretype_f_, max_krylov_); break;
-    case SD_TFQMR: THROWING(CVSptfqmr, m->mem, pretype_f_, max_krylov_); break;
+    {
+      int pretype = use_precon_ ? PREC_LEFT : PREC_NONE;
+      switch (itsol_f_) {
+      case SD_GMRES: THROWING(CVSpgmr, m->mem, pretype, max_krylov_); break;
+      case SD_BCGSTAB: THROWING(CVSpbcg, m->mem, pretype, max_krylov_); break;
+      case SD_TFQMR: THROWING(CVSptfqmr, m->mem, pretype, max_krylov_); break;
+      }
+      if (exact_jac_) THROWING(CVSpilsSetJacTimesVecFn, m->mem, jtimes);
+      if (use_precon_) THROWING(CVSpilsSetPreconditioner, m->mem, psetup, psolve);
     }
-    if (exact_jac_) THROWING(CVSpilsSetJacTimesVecFn, m->mem, jtimes);
-    if (use_precon_) THROWING(CVSpilsSetPreconditioner, m->mem, psetup, psolve);
     break;
     case SD_USER_DEFINED:
     {
@@ -334,13 +337,16 @@ namespace casadi {
       // attach linear solver to backward problem
       switch (linsol_g_) {
       case SD_ITERATIVE:
-      switch (itsol_g_) {
-      case SD_GMRES: THROWING(CVSpgmrB, m->mem, m->whichB, pretype_g_, max_krylovB_); break;
-      case SD_BCGSTAB: THROWING(CVSpbcgB, m->mem, m->whichB, pretype_g_, max_krylovB_); break;
-      case SD_TFQMR: THROWING(CVSptfqmrB, m->mem, m->whichB, pretype_g_, max_krylovB_); break;
+      {
+        int pretype = use_preconB_ ? PREC_LEFT : PREC_NONE;
+        switch (itsol_g_) {
+        case SD_GMRES: THROWING(CVSpgmrB, m->mem, m->whichB, pretype, max_krylovB_); break;
+        case SD_BCGSTAB: THROWING(CVSpbcgB, m->mem, m->whichB, pretype, max_krylovB_); break;
+        case SD_TFQMR: THROWING(CVSptfqmrB, m->mem, m->whichB, pretype, max_krylovB_); break;
+        }
+        if (exact_jacB_) THROWING(CVSpilsSetJacTimesVecFnB, m->mem, m->whichB, jtimesB);
+        if (use_preconB_) THROWING(CVSpilsSetPreconditionerB, m->mem, m->whichB, psetupB, psolveB);
       }
-      if (exact_jacB_) THROWING(CVSpilsSetJacTimesVecFnB, m->mem, m->whichB, jtimesB);
-      if (use_preconB_) THROWING(CVSpilsSetPreconditionerB, m->mem, m->whichB, psetupB, psolveB);
       break;
       case SD_USER_DEFINED:
       {
