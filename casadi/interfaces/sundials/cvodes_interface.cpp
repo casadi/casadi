@@ -95,13 +95,11 @@ namespace casadi {
     create_function("quadB", {"rx", "rp", "x", "p", "t"}, {"rquad"});
 
     // Create Jacobians if requested
-    if (exact_jac_) {
-      set_function(oracle_.is_a("sxfunction") ? getJacF<SX>() : getJacF<MX>());
-      init_jacF();
-      if (nrx_>0) {
-        set_function(oracle_.is_a("sxfunction") ? getJacB<SX>() : getJacB<MX>());
-        init_jacB();
-      }
+    set_function(oracle_.is_a("sxfunction") ? getJacF<SX>() : getJacF<MX>());
+    init_jacF();
+    if (nrx_>0) {
+      set_function(oracle_.is_a("sxfunction") ? getJacB<SX>() : getJacB<MX>());
+      init_jacB();
     }
 
     // Algebraic variables not supported
@@ -125,7 +123,7 @@ namespace casadi {
     }
 
     // Attach functions for jacobian information
-    if (exact_jac_ && iterative_) {
+    if (iterative_) {
       create_function("jtimesF", {"t", "x", "p", "fwd:x"}, {"fwd:ode"});
       if (nrx_>0) {
         create_function("jtimesB",
@@ -166,7 +164,7 @@ namespace casadi {
       case SD_BCGSTAB: THROWING(CVSpbcg, m->mem, pretype, max_krylov_); break;
       case SD_TFQMR: THROWING(CVSptfqmr, m->mem, pretype, max_krylov_); break;
       }
-      if (exact_jac_) THROWING(CVSpilsSetJacTimesVecFn, m->mem, jtimes);
+      THROWING(CVSpilsSetJacTimesVecFn, m->mem, jtimes);
       if (use_precon_) THROWING(CVSpilsSetPreconditioner, m->mem, psetup, psolve);
     } else {
       CVodeMem cv_mem = static_cast<CVodeMem>(m->mem);
@@ -308,7 +306,7 @@ namespace casadi {
         case SD_BCGSTAB: THROWING(CVSpbcgB, m->mem, m->whichB, pretype, max_krylov_); break;
         case SD_TFQMR: THROWING(CVSptfqmrB, m->mem, m->whichB, pretype, max_krylov_); break;
         }
-        if (exact_jac_) THROWING(CVSpilsSetJacTimesVecFnB, m->mem, m->whichB, jtimesB);
+        THROWING(CVSpilsSetJacTimesVecFnB, m->mem, m->whichB, jtimesB);
         if (use_precon_) THROWING(CVSpilsSetPreconditionerB, m->mem, m->whichB, psetupB, psolveB);
       } else {
         CVodeMem cv_mem = static_cast<CVodeMem>(m->mem);

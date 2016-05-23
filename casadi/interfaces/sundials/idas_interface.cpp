@@ -141,15 +141,13 @@ namespace casadi {
     create_function("daeB", {"rx", "rz", "rp", "x", "z", "p", "t"}, {"rode", "ralg"});
     create_function("quadB", {"rx", "rz", "rp", "x", "z", "p", "t"}, {"rquad"});
 
-    if (exact_jac_) {
-      // Create a Jacobian if requested
-      set_function(oracle_.is_a("sxfunction") ? getJacF<SX>() : getJacF<MX>());
-      init_jacF();
-      // Create a backwards Jacobian if requested
-      if (nrx_>0) {
-        set_function(oracle_.is_a("sxfunction") ? getJacB<SX>() : getJacB<MX>());
-        init_jacB();
-      }
+    // Create a Jacobian if requested
+    set_function(oracle_.is_a("sxfunction") ? getJacF<SX>() : getJacF<MX>());
+    init_jacF();
+    // Create a backwards Jacobian if requested
+    if (nrx_>0) {
+      set_function(oracle_.is_a("sxfunction") ? getJacB<SX>() : getJacB<MX>());
+      init_jacB();
     }
 
     // Get initial conditions for the state derivatives
@@ -166,7 +164,7 @@ namespace casadi {
     }
 
     // Attach functions for jacobian information
-    if (exact_jac_ && iterative_) {
+    if (iterative_) {
       create_function("jtimesF",
         {"t", "x", "z", "p", "fwd:x", "fwd:z"},
         {"fwd:ode", "fwd:alg"});
@@ -336,7 +334,7 @@ namespace casadi {
       case SD_BCGSTAB: THROWING(IDASpbcg, m->mem, max_krylov_); break;
       case SD_TFQMR: THROWING(IDASptfqmr, m->mem, max_krylov_); break;
       }
-      if (exact_jac_) THROWING(IDASpilsSetJacTimesVecFn, m->mem, jtimes);
+      THROWING(IDASpilsSetJacTimesVecFn, m->mem, jtimes);
       if (use_precon_) THROWING(IDASpilsSetPreconditioner, m->mem, psetup, psolve);
     } else {
       IDAMem IDA_mem = IDAMem(m->mem);
@@ -480,7 +478,7 @@ namespace casadi {
         case SD_BCGSTAB: THROWING(IDASpbcgB, m->mem, m->whichB, max_krylov_); break;
         case SD_TFQMR: THROWING(IDASptfqmrB, m->mem, m->whichB, max_krylov_); break;
         }
-        if (exact_jac_) THROWING(IDASpilsSetJacTimesVecFnB, m->mem, m->whichB, jtimesB);
+        THROWING(IDASpilsSetJacTimesVecFnB, m->mem, m->whichB, jtimesB);
         if (use_precon_) THROWING(IDASpilsSetPreconditionerB, m->mem, m->whichB, psetupB, psolveB);
       } else {
         IDAMem IDA_mem = IDAMem(m->mem);

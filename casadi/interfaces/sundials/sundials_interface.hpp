@@ -127,7 +127,6 @@ namespace casadi {
 
     ///@{
     /// Options
-    bool exact_jac_;
     double abstol_, reltol_;
     int max_num_steps_;
     bool stop_at_end_;

@@ -51,9 +51,6 @@ namespace casadi {
       {"abstol",
        {OT_DOUBLE,
         "Absolute tolerence for the IVP solution"}},
-      {"exact_jacobian",
-       {OT_BOOL,
-        "Use exact Jacobian information"}},
       {"linear_solver_type",
        {OT_STRING,
         "Type of iterative solver: USER_DEFINED|iterative"}},
@@ -110,7 +107,6 @@ namespace casadi {
     // Default options
     abstol_ = 1e-8;
     reltol_ = 1e-6;
-    exact_jac_ = true;
     max_num_steps_ = 10000;
     stop_at_end_ = true;
     use_precon_ = true;
@@ -130,8 +126,6 @@ namespace casadi {
         abstol_ = op.second;
       } else if (op.first=="reltol") {
         reltol_ = op.second;
-      } else if (op.first=="exact_jacobian") {
-        exact_jac_ = op.second;
       } else if (op.first=="max_num_steps") {
         max_num_steps_ = op.second;
       } else if (op.first=="stop_at_end") {
