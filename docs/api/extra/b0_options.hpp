@@ -318,7 +318,10 @@
 <tr><td>disable_internal_warnings</td><td>OT_BOOL</td><td>Disable SUNDIALS internal warning messages</td><td>casadi::SundialsInterface</td></tr>
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 <tr><td>exact_jacobian</td><td>OT_BOOL</td><td>Use exact Jacobian information</td><td>casadi::SundialsInterface</td></tr>
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 =======
@@ -331,7 +334,10 @@
 <tr><td>linear_solver</td><td>OT_STRING</td><td>A custom linear solver creator function [default: csparse]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICT</td><td>Options to be passed to the linear solver</td><td>casadi::SundialsInterface</td></tr>
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 <tr><td>linear_solver_type</td><td>OT_STRING</td><td>Type of iterative solver: USER_DEFINED|iterative</td><td>casadi::SundialsInterface</td></tr>
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 <tr><td>max_krylov</td><td>OT_INT</td><td>Maximum Krylov subspace size</td><td>casadi::SundialsInterface</td></tr>
@@ -344,7 +350,12 @@
 <tr><td>steps_per_checkpoint</td><td>OT_INT</td><td>Number of steps between two consecutive checkpoints</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>stop_at_end</td><td>OT_BOOL</td><td>Stop the integrator at the end of the interval</td><td>casadi::SundialsInterface</td></tr>
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 <tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition an iterative solver</td><td>casadi::SundialsInterface</td></tr>
+=======
+<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
+>>>>>>> Stashed changes
 =======
 <tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
@@ -362,7 +373,10 @@
 <tr><td>disable_internal_warnings</td><td>OT_BOOL</td><td>Disable SUNDIALS internal warning messages</td></tr>
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 <tr><td>exact_jacobian</td><td>OT_BOOL</td><td>Use exact Jacobian information</td></tr>
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 =======
@@ -375,7 +389,10 @@
 <tr><td>linear_solver</td><td>OT_STRING</td><td>A custom linear solver creator function [default: csparse]</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICT</td><td>Options to be passed to the linear solver</td></tr>
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 <tr><td>linear_solver_type</td><td>OT_STRING</td><td>Type of iterative solver: USER_DEFINED|iterative</td></tr>
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 <tr><td>max_krylov</td><td>OT_INT</td><td>Maximum Krylov subspace size</td></tr>
@@ -388,7 +405,12 @@
 <tr><td>steps_per_checkpoint</td><td>OT_INT</td><td>Number of steps between two consecutive checkpoints</td></tr>
 <tr><td>stop_at_end</td><td>OT_BOOL</td><td>Stop the integrator at the end of the interval</td></tr>
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 <tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition an iterative solver</td></tr>
+=======
+<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td></tr>
+<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td></tr>
+>>>>>>> Stashed changes
 =======
 <tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td></tr>
 <tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td></tr>
@@ -405,7 +427,10 @@
 <tr><td>disable_internal_warnings</td><td>OT_BOOL</td><td>Disable SUNDIALS internal warning messages</td><td>casadi::SundialsInterface</td></tr>
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 <tr><td>exact_jacobian</td><td>OT_BOOL</td><td>Use exact Jacobian information</td><td>casadi::SundialsInterface</td></tr>
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 =======
@@ -418,7 +443,10 @@
 <tr><td>linear_solver</td><td>OT_STRING</td><td>A custom linear solver creator function [default: csparse]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICT</td><td>Options to be passed to the linear solver</td><td>casadi::SundialsInterface</td></tr>
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 <tr><td>linear_solver_type</td><td>OT_STRING</td><td>Type of iterative solver: USER_DEFINED|iterative</td><td>casadi::SundialsInterface</td></tr>
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 <tr><td>max_krylov</td><td>OT_INT</td><td>Maximum Krylov subspace size</td><td>casadi::SundialsInterface</td></tr>
@@ -431,7 +459,12 @@
 <tr><td>steps_per_checkpoint</td><td>OT_INT</td><td>Number of steps between two consecutive checkpoints</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>stop_at_end</td><td>OT_BOOL</td><td>Stop the integrator at the end of the interval</td><td>casadi::SundialsInterface</td></tr>
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 <tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition an iterative solver</td><td>casadi::SundialsInterface</td></tr>
+=======
+<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
+>>>>>>> Stashed changes
 =======
 <tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
@@ -598,7 +631,10 @@
 <tr><td>disable_internal_warnings</td><td>OT_BOOL</td><td>Disable SUNDIALS internal warning messages</td><td>casadi::SundialsInterface</td></tr>
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 <tr><td>exact_jacobian</td><td>OT_BOOL</td><td>Use exact Jacobian information</td><td>casadi::SundialsInterface</td></tr>
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 =======
@@ -613,7 +649,10 @@
 <tr><td>linear_solver</td><td>OT_STRING</td><td>A custom linear solver creator function [default: csparse]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICT</td><td>Options to be passed to the linear solver</td><td>casadi::SundialsInterface</td></tr>
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 <tr><td>linear_solver_type</td><td>OT_STRING</td><td>Type of iterative solver: USER_DEFINED|iterative</td><td>casadi::SundialsInterface</td></tr>
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 <tr><td>max_krylov</td><td>OT_INT</td><td>Maximum Krylov subspace size</td><td>casadi::SundialsInterface</td></tr>
@@ -627,7 +666,12 @@
 <tr><td>stop_at_end</td><td>OT_BOOL</td><td>Stop the integrator at the end of the interval</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>suppress_algebraic</td><td>OT_BOOL</td><td>Suppress algebraic variables in the error testing</td><td>casadi::IdasInterface</td></tr>
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 <tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition an iterative solver</td><td>casadi::SundialsInterface</td></tr>
+=======
+<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
+>>>>>>> Stashed changes
 =======
 <tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
@@ -649,7 +693,10 @@
 <tr><td>disable_internal_warnings</td><td>OT_BOOL</td><td>Disable SUNDIALS internal warning messages</td></tr>
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 <tr><td>exact_jacobian</td><td>OT_BOOL</td><td>Use exact Jacobian information</td></tr>
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 =======
@@ -664,7 +711,10 @@
 <tr><td>linear_solver</td><td>OT_STRING</td><td>A custom linear solver creator function [default: csparse]</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICT</td><td>Options to be passed to the linear solver</td></tr>
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 <tr><td>linear_solver_type</td><td>OT_STRING</td><td>Type of iterative solver: USER_DEFINED|iterative</td></tr>
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 <tr><td>max_krylov</td><td>OT_INT</td><td>Maximum Krylov subspace size</td></tr>
@@ -678,7 +728,12 @@
 <tr><td>stop_at_end</td><td>OT_BOOL</td><td>Stop the integrator at the end of the interval</td></tr>
 <tr><td>suppress_algebraic</td><td>OT_BOOL</td><td>Suppress algebraic variables in the error testing</td></tr>
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 <tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition an iterative solver</td></tr>
+=======
+<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td></tr>
+<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td></tr>
+>>>>>>> Stashed changes
 =======
 <tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td></tr>
 <tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td></tr>
@@ -699,7 +754,10 @@
 <tr><td>disable_internal_warnings</td><td>OT_BOOL</td><td>Disable SUNDIALS internal warning messages</td><td>casadi::SundialsInterface</td></tr>
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 <tr><td>exact_jacobian</td><td>OT_BOOL</td><td>Use exact Jacobian information</td><td>casadi::SundialsInterface</td></tr>
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 =======
@@ -714,7 +772,10 @@
 <tr><td>linear_solver</td><td>OT_STRING</td><td>A custom linear solver creator function [default: csparse]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICT</td><td>Options to be passed to the linear solver</td><td>casadi::SundialsInterface</td></tr>
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 <tr><td>linear_solver_type</td><td>OT_STRING</td><td>Type of iterative solver: USER_DEFINED|iterative</td><td>casadi::SundialsInterface</td></tr>
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 <tr><td>max_krylov</td><td>OT_INT</td><td>Maximum Krylov subspace size</td><td>casadi::SundialsInterface</td></tr>
@@ -728,7 +789,12 @@
 <tr><td>stop_at_end</td><td>OT_BOOL</td><td>Stop the integrator at the end of the interval</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>suppress_algebraic</td><td>OT_BOOL</td><td>Suppress algebraic variables in the error testing</td><td>casadi::IdasInterface</td></tr>
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 <tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition an iterative solver</td><td>casadi::SundialsInterface</td></tr>
+=======
+<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
+>>>>>>> Stashed changes
 =======
 <tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
@@ -2073,7 +2139,10 @@
 <tr><td>disable_internal_warnings</td><td>OT_BOOL</td><td>Disable SUNDIALS internal warning messages</td><td>casadi::SundialsInterface</td></tr>
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 <tr><td>exact_jacobian</td><td>OT_BOOL</td><td>Use exact Jacobian information</td><td>casadi::SundialsInterface</td></tr>
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 =======
@@ -2086,7 +2155,10 @@
 <tr><td>linear_solver</td><td>OT_STRING</td><td>A custom linear solver creator function [default: csparse]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICT</td><td>Options to be passed to the linear solver</td><td>casadi::SundialsInterface</td></tr>
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 <tr><td>linear_solver_type</td><td>OT_STRING</td><td>Type of iterative solver: USER_DEFINED|iterative</td><td>casadi::SundialsInterface</td></tr>
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 <tr><td>max_krylov</td><td>OT_INT</td><td>Maximum Krylov subspace size</td><td>casadi::SundialsInterface</td></tr>
@@ -2105,7 +2177,12 @@
 <tr><td>t0</td><td>OT_DOUBLE</td><td>Beginning of the time horizon</td><td>casadi::Integrator</td></tr>
 <tr><td>tf</td><td>OT_DOUBLE</td><td>End of the time horizon</td><td>casadi::Integrator</td></tr>
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 <tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition an iterative solver</td><td>casadi::SundialsInterface</td></tr>
+=======
+<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
+>>>>>>> Stashed changes
 =======
 <tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
@@ -2124,7 +2201,10 @@
 <tr><td>disable_internal_warnings</td><td>OT_BOOL</td><td>Disable SUNDIALS internal warning messages</td><td>casadi::SundialsInterface</td></tr>
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 <tr><td>exact_jacobian</td><td>OT_BOOL</td><td>Use exact Jacobian information</td><td>casadi::SundialsInterface</td></tr>
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 =======
@@ -2137,7 +2217,10 @@
 <tr><td>linear_solver</td><td>OT_STRING</td><td>A custom linear solver creator function [default: csparse]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICT</td><td>Options to be passed to the linear solver</td><td>casadi::SundialsInterface</td></tr>
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 <tr><td>linear_solver_type</td><td>OT_STRING</td><td>Type of iterative solver: USER_DEFINED|iterative</td><td>casadi::SundialsInterface</td></tr>
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 <tr><td>max_krylov</td><td>OT_INT</td><td>Maximum Krylov subspace size</td><td>casadi::SundialsInterface</td></tr>
@@ -2156,7 +2239,12 @@
 <tr><td>t0</td><td>OT_DOUBLE</td><td>Beginning of the time horizon</td><td>casadi::Integrator</td></tr>
 <tr><td>tf</td><td>OT_DOUBLE</td><td>End of the time horizon</td><td>casadi::Integrator</td></tr>
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 <tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition an iterative solver</td><td>casadi::SundialsInterface</td></tr>
+=======
+<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
+>>>>>>> Stashed changes
 =======
 <tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>

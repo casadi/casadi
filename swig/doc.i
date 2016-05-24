@@ -10791,9 +10791,12 @@ experience a dramatic speed-up by using a sparse linear solver:
 +------------------------+------------------------+------------------------+
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 | exact_jacobian         | OT_BOOL                | Use exact Jacobian     |
 |                        |                        | information            |
 +------------------------+------------------------+------------------------+
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 =======
@@ -10825,10 +10828,13 @@ experience a dramatic speed-up by using a sparse linear solver:
 |                        |                        | to the linear solver   |
 +------------------------+------------------------+------------------------+
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 | linear_solver_type     | OT_STRING              | Type of iterative      |
 |                        |                        | solver:                |
 |                        |                        | USER_DEFINED|iterative |
 +------------------------+------------------------+------------------------+
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 | max_krylov             | OT_INT                 | Maximum Krylov         |
@@ -10868,7 +10874,10 @@ experience a dramatic speed-up by using a sparse linear solver:
 |                        |                        | solver                 |
 +------------------------+------------------------+------------------------+
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
+=======
+>>>>>>> Stashed changes
 | use_preconditioner     | OT_BOOL                | Precondition the       |
 |                        |                        | iterative solver       |
 |                        |                        | [default: true]        |
@@ -10932,9 +10941,12 @@ experience a dramatic speed-up by using a sparse linear solver:
 +------------------------+------------------------+------------------------+
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 | exact_jacobian         | OT_BOOL                | Use exact Jacobian     |
 |                        |                        | information            |
 +------------------------+------------------------+------------------------+
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 =======
@@ -10972,10 +10984,13 @@ experience a dramatic speed-up by using a sparse linear solver:
 |                        |                        | to the linear solver   |
 +------------------------+------------------------+------------------------+
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 | linear_solver_type     | OT_STRING              | Type of iterative      |
 |                        |                        | solver:                |
 |                        |                        | USER_DEFINED|iterative |
 +------------------------+------------------------+------------------------+
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 | max_krylov             | OT_INT                 | Maximum Krylov         |
@@ -11018,7 +11033,10 @@ experience a dramatic speed-up by using a sparse linear solver:
 |                        |                        | solver                 |
 +------------------------+------------------------+------------------------+
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
+=======
+>>>>>>> Stashed changes
 | use_preconditioner     | OT_BOOL                | Precondition the       |
 |                        |                        | iterative solver       |
 |                        |                        | [default: true]        |
