@@ -10789,9 +10789,12 @@ experience a dramatic speed-up by using a sparse linear solver:
 | ngs                    |                        | internal warning       |
 |                        |                        | messages               |
 +------------------------+------------------------+------------------------+
+<<<<<<< Updated upstream
 | exact_jacobian         | OT_BOOL                | Use exact Jacobian     |
 |                        |                        | information            |
 +------------------------+------------------------+------------------------+
+=======
+>>>>>>> Stashed changes
 | fsens_all_at_once      | OT_BOOL                | Calculate all right    |
 |                        |                        | hand sides of the      |
 |                        |                        | sensitivity equations  |
@@ -10913,9 +10916,12 @@ experience a dramatic speed-up by using a sparse linear solver:
 | ngs                    |                        | internal warning       |
 |                        |                        | messages               |
 +------------------------+------------------------+------------------------+
+<<<<<<< Updated upstream
 | exact_jacobian         | OT_BOOL                | Use exact Jacobian     |
 |                        |                        | information            |
 +------------------------+------------------------+------------------------+
+=======
+>>>>>>> Stashed changes
 | extra_fsens_calc_ic    | OT_BOOL                | Call calc ic an extra  |
 |                        |                        | time, with fsens=0     |
 +------------------------+------------------------+------------------------+
