@@ -68,6 +68,9 @@ namespace casadi {
     int qlastB, qcurB;
     double hinusedB, hlastB, hcurB, tcurB;
 
+    // Temporary for max(z,rz)
+    double *ztmp;
+
     /// number of checkpoints stored so far
     int ncheck;
 
@@ -98,11 +101,8 @@ namespace casadi {
     /** \brief Initalize memory block */
     virtual void init_memory(void* mem) const;
 
-    ///@{
-    // Initialize linear solver
-    void init_jacF();
-    void init_jacB();
-    ///@}
+    // Get system Jacobian
+    virtual Function getJ(bool backward) const = 0;
 
     /// Get all statistics
     virtual Dict get_stats(void* mem) const;

@@ -94,14 +94,6 @@ namespace casadi {
     create_function("odeB", {"rx", "rp", "x", "p", "t"}, {"rode"});
     create_function("quadB", {"rx", "rp", "x", "p", "t"}, {"rquad"});
 
-    // Create Jacobians if requested
-    set_function(oracle_.is_a("sxfunction") ? getJacF<SX>() : getJacF<MX>());
-    init_jacF();
-    if (nrx_>0) {
-      set_function(oracle_.is_a("sxfunction") ? getJacB<SX>() : getJacB<MX>());
-      init_jacB();
-    }
-
     // Algebraic variables not supported
     casadi_assert_message(nz_==0 && nrz_==0,
                           "CVODES does not support algebraic variables");
@@ -508,7 +500,8 @@ namespace casadi {
 
       // Solve the (possibly factorized) system
       const Function& linsol = s.get_function("linsolF");
-      linsol.linsol_solve(NV_DATA_S(z));
+      casadi_assert(linsol.size1_out(0)*(1+s.ns_) == NV_LENGTH_S(z));
+      linsol.linsol_solve(NV_DATA_S(z), 1 + s.ns_);
 
       return 0;
     } catch(exception& e) {
@@ -530,7 +523,8 @@ namespace casadi {
 
       // Solve the (possibly factorized) system
       const Function& linsolB = s.get_function("linsolB");
-      linsolB.linsol_solve(NV_DATA_S(zvecB), 1);
+      casadi_assert(linsolB.size1_out(0)*(1+s.ns_) == NV_LENGTH_S(zvecB));
+      linsolB.linsol_solve(NV_DATA_S(zvecB), 1+s.ns_);
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "psolveB failed: " << e.what() << endl;;
@@ -725,45 +719,29 @@ namespace casadi {
     }
   }
 
-  template<typename MatType>
-  Function CvodesInterface::getJacF() {
-    vector<MatType> a = MatType::get_input(oracle_);
-    vector<MatType> r = oracle_(a);
-
-    // Get the Jacobian in the Newton iteration
-    MatType c_x = MatType::sym("c_x");
-    MatType c_xdot = MatType::sym("c_xdot");
-    MatType jac = c_x*MatType::jacobian(r[DE_ODE], a[DE_X]) + c_xdot*MatType::eye(nx_);
-
-    // Remove second order terms (for smooth implementation of #940)
-    if (ns_>0) {
-      const Sparsity& sp_new = derivative_of_.get_function("jacF").sparsity_out(0);
-      jac = project(jac, diagcat(vector<Sparsity>(1+ns_, sp_new)));
-    }
-
-    // Return generated function
-    return Function("jacF", {a[DE_T], a[DE_X], a[DE_P], c_x, c_xdot}, {jac});
+  Function CvodesInterface::getJ(bool b) const {
+    return oracle_.is_a("sxfunction") ? getJ<SX>(b) : getJ<MX>(b);
   }
 
   template<typename MatType>
-  Function CvodesInterface::getJacB() {
+  Function CvodesInterface::getJ(bool backward) const {
     vector<MatType> a = MatType::get_input(oracle_);
-    vector<MatType> r = oracle_(a);
-
-    // Get the Jacobian in the Newton iteration
+    vector<MatType> r = const_cast<Function&>(oracle_)(a);
     MatType c_x = MatType::sym("c_x");
     MatType c_xdot = MatType::sym("c_xdot");
-    MatType jac = c_x*MatType::jacobian(r[DE_RODE], a[DE_RX]) + c_xdot*MatType::eye(nrx_);
 
-    // Remove second order terms (for smooth implementation of #940)
-    if (ns_>0) {
-      const Sparsity& sp_new = derivative_of_.get_function("jacB").sparsity_out(0);
-      jac = project(jac, diagcat(vector<Sparsity>(1+ns_, sp_new)));
+    // Get the Jacobian in the Newton iteration
+    if (backward) {
+      MatType jac = c_x*MatType::jacobian(r[DE_RODE], a[DE_RX])
+                  + c_xdot*MatType::eye(nrx_);
+      return Function("jacB",
+                      {a[DE_T], a[DE_RX], a[DE_RP],
+                       a[DE_X], a[DE_P], c_x, c_xdot}, {jac});
+     } else {
+      MatType jac = c_x*MatType::jacobian(r[DE_ODE], a[DE_X])
+                  + c_xdot*MatType::eye(nx_);
+      return Function("jacF", {a[DE_T], a[DE_X], a[DE_P], c_x, c_xdot}, {jac});
     }
-
-    // return generated function
-    return Function("jacB",
-                    {a[DE_T], a[DE_RX], a[DE_RP], a[DE_X], a[DE_P], c_x, c_xdot}, {jac});
   }
 
   CvodesMemory::CvodesMemory(const CvodesInterface& s) : self(s) {

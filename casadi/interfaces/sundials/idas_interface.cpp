@@ -141,15 +141,6 @@ namespace casadi {
     create_function("daeB", {"rx", "rz", "rp", "x", "z", "p", "t"}, {"rode", "ralg"});
     create_function("quadB", {"rx", "rz", "rp", "x", "z", "p", "t"}, {"rquad"});
 
-    // Create a Jacobian if requested
-    set_function(oracle_.is_a("sxfunction") ? getJacF<SX>() : getJacF<MX>());
-    init_jacF();
-    // Create a backwards Jacobian if requested
-    if (nrx_>0) {
-      set_function(oracle_.is_a("sxfunction") ? getJacB<SX>() : getJacB<MX>());
-      init_jacB();
-    }
-
     // Get initial conditions for the state derivatives
     if (init_xdot_.empty()) {
       init_xdot_.resize(nx_, 0);
@@ -650,7 +641,34 @@ namespace casadi {
 
       // Solve the (possibly factorized) system
       const Function& linsol = s.get_function("linsolF");
-      linsol.linsol_solve(NV_DATA_S(zvec));
+      casadi_assert(linsol.size1_out(0)*(1+s.ns_) == NV_LENGTH_S(zvec));
+      double* v = NV_DATA_S(zvec);
+
+      // Reorder by nondifferentiated x and z
+      if (s.ns_>0 && s.nz_>0) {
+        casadi_copy(v+s.nx_, s.nz_, m->ztmp);
+        for (int d=s.ns_; d>0; --d) {
+          casadi_copy(v+d*s.nx1_, s.nx1_, v+d*(s.nx1_+s.nz1_));
+        }
+        for (int d=0; d<=s.ns_; ++d) {
+          casadi_copy(m->ztmp+d*s.nz1_, s.nz1_, v+d*(s.nx1_+s.nz1_)+s.nx1_);
+        }
+      }
+
+      // Solve with multiple right-hand-sides
+      linsol.linsol_solve(v, 1 + s.ns_);
+
+      // Return to the original ordering
+      if (s.ns_>0 && s.nz_>0) {
+        for (int d=0; d<=s.ns_; ++d) {
+          casadi_copy(v+d*(s.nx1_+s.nz1_)+s.nx1_, s.nz1_, m->ztmp+d*s.nz1_);
+        }
+        for (int d=1; d<=s.ns_; ++d) {
+          casadi_copy(v+d*(s.nx1_+s.nz1_), s.nx1_, v+d*s.nx1_);
+        }
+        casadi_copy(m->ztmp, s.nz_, v+s.nx_);
+      }
+
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "psolve failed: " << e.what() << endl;
@@ -671,7 +689,33 @@ namespace casadi {
       }
 
       const Function& linsolB = s.get_function("linsolB");
-      linsolB.linsol_solve(NV_DATA_S(zvecB));
+      casadi_assert(linsolB.size1_out(0)*(1+s.ns_) == NV_LENGTH_S(zvecB));
+      double* v = NV_DATA_S(zvecB);
+
+      // Reorder, grouping x and z for each sensitivity direction
+      if (s.ns_>0 && s.nrz_>0) {
+        casadi_copy(v+s.nrx_, s.nrz_, m->ztmp);
+        for (int d=s.ns_; d>0; --d) {
+          casadi_copy(v+d*s.nrx1_, s.nrx1_, v+d*(s.nrx1_+s.nrz1_));
+        }
+        for (int d=0; d<=s.ns_; ++d) {
+          casadi_copy(m->ztmp+d*s.nrz1_, s.nrz1_, v+d*(s.nrx1_+s.nrz1_)+s.nrx1_);
+        }
+      }
+
+      // Solve with multiple right-hand-sides
+      linsolB.linsol_solve(v, 1 + s.ns_);
+
+      // Return to the original ordering
+      if (s.ns_>0 && s.nrz_>0) {
+        for (int d=0; d<=s.ns_; ++d) {
+          casadi_copy(v+d*(s.nrx1_+s.nrz1_)+s.nrx1_, s.nrz1_, m->ztmp+d*s.nrz1_);
+        }
+        for (int d=1; d<=s.ns_; ++d) {
+          casadi_copy(v+d*(s.nrx1_+s.nrz1_), s.nrx1_, v+d*s.nrx1_);
+        }
+        casadi_copy(m->ztmp, s.nrz_, v+s.nrx_);
+      }
 
       return 0;
     } catch(exception& e) {
@@ -869,55 +913,37 @@ namespace casadi {
     }
   }
 
-  template<typename MatType>
-  Function IdasInterface::getJacF() {
-    vector<MatType> a = MatType::get_input(oracle_);
-    vector<MatType> r = oracle_(a);
-
-    // Get the Jacobian in the Newton iteration
-    MatType cj = MatType::sym("cj");
-    MatType jac = MatType::jacobian(r[DE_ODE], a[DE_X]) - cj*MatType::eye(nx_);
-    if (nz_>0) {
-      jac = horzcat(vertcat(jac,
-                            MatType::jacobian(r[DE_ALG], a[DE_X])),
-                    vertcat(MatType::jacobian(r[DE_ODE], a[DE_Z]),
-                            MatType::jacobian(r[DE_ALG], a[DE_Z])));
-    }
-
-    // Remove second order terms (for smooth implementation of #940)
-    if (ns_>0 && nz_==0) {
-      const Sparsity& sp_new = derivative_of_.get_function("jacF").sparsity_out(0);
-      jac = project(jac, diagcat(vector<Sparsity>(1+ns_, sp_new)));
-    }
-
-    return Function("jacF", {a[DE_T], a[DE_X], a[DE_Z], a[DE_P], cj},
-                    {jac});
+  Function IdasInterface::getJ(bool backward) const {
+    return oracle_.is_a("sxfunction") ? getJ<SX>(backward) : getJ<MX>(backward);
   }
 
   template<typename MatType>
-  Function IdasInterface::getJacB() {
+  Function IdasInterface::getJ(bool backward) const {
     vector<MatType> a = MatType::get_input(oracle_);
-    vector<MatType> r = oracle_(a);
+    vector<MatType> r = const_cast<Function&>(oracle_)(a);
+    MatType cj = MatType::sym("cj");
 
     // Get the Jacobian in the Newton iteration
-    MatType cj = MatType::sym("cj");
-    MatType jac = MatType::jacobian(r[DE_RODE], a[DE_RX]) + cj*MatType::eye(nrx_);
-    if (nrz_>0) {
-      jac = horzcat(vertcat(jac,
-                            MatType::jacobian(r[DE_RALG], a[DE_RX])),
-                    vertcat(MatType::jacobian(r[DE_RODE], a[DE_RZ]),
-                            MatType::jacobian(r[DE_RALG], a[DE_RZ])));
+    if (backward) {
+      MatType jac = MatType::jacobian(r[DE_RODE], a[DE_RX]) + cj*MatType::eye(nrx_);
+      if (nrz_>0) {
+        jac = horzcat(vertcat(jac,
+                              MatType::jacobian(r[DE_RALG], a[DE_RX])),
+                      vertcat(MatType::jacobian(r[DE_RODE], a[DE_RZ]),
+                              MatType::jacobian(r[DE_RALG], a[DE_RZ])));
+      }
+      return Function("jacB", {a[DE_T], a[DE_RX], a[DE_RZ], a[DE_RP],
+                               a[DE_X], a[DE_Z], a[DE_P], cj}, {jac});
+     } else {
+      MatType jac = MatType::jacobian(r[DE_ODE], a[DE_X]) - cj*MatType::eye(nx_);
+      if (nz_>0) {
+        jac = horzcat(vertcat(jac,
+                              MatType::jacobian(r[DE_ALG], a[DE_X])),
+                      vertcat(MatType::jacobian(r[DE_ODE], a[DE_Z]),
+                              MatType::jacobian(r[DE_ALG], a[DE_Z])));
+      }
+      return Function("jacF", {a[DE_T], a[DE_X], a[DE_Z], a[DE_P], cj}, {jac});
     }
-
-    // Remove second order terms (for smooth implementation of #940)
-    if (ns_>0 && nrz_==0) {
-      const Sparsity& sp_new = derivative_of_.get_function("jacB").sparsity_out(0);
-      jac = project(jac, diagcat(vector<Sparsity>(1+ns_, sp_new)));
-    }
-
-    return Function("jacB", {a[DE_T], a[DE_RX], a[DE_RZ], a[DE_RP],
-                             a[DE_X], a[DE_Z], a[DE_P], cj},
-                    {jac});
   }
 
   IdasMemory::IdasMemory(const IdasInterface& s) : self(s) {

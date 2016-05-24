@@ -177,31 +177,42 @@ namespace casadi {
       casadi_error("Unknown interpolation type: " + interpolation_type);
     }
 
+    // Get or create Jacobians and linear system solvers
+    for (bool backward : {false, true}) {
+      // Skip backward?
+      if (backward && nrx_==0) continue;
+
+      // Get Jacobian function
+      Function J, solver;
+      if (ns_==0) {
+        J = getJ(backward);
+      } else {
+        SundialsInterface* d = derivative_of_.get<SundialsInterface>();
+        casadi_assert(d!=0);
+        if (d->ns_==0) {
+          J = d->get_function(backward ? "jacB" : "jacF");
+          solver = d->get_function(backward ? "linsolB" : "linsolF");
+        } else {
+          J = d->getJ(backward);
+        }
+      }
+      set_function(J);
+      alloc_w(J.nnz_out(0), true);
+
+      // Allocate a linear solver
+      if (solver.is_null()) {
+        solver = linsol(backward ? "linsolB" : "linsolF", linear_solver_,
+                        J.sparsity_out(0), 0, linear_solver_options_);
+      }
+      set_function(solver);
+    }
+
     // Allocate work vectors
     alloc_w(np_, true); // p
     alloc_w(nrp_, true); // rp
-  }
-
-  void SundialsInterface::init_jacF() {
-    // Get sparsity
-    const Sparsity& sp = get_function("jacF").sparsity_out(0);
-
-    // Work vector
-    alloc_w(sp.nnz(), true);
-
-    // Create a linear solver
-    set_function(linsol("linsolF", linear_solver_, sp, 0, linear_solver_options_));
-  }
-
-  void SundialsInterface::init_jacB() {
-    // Get sparsity
-    const Sparsity& sp = get_function("jacB").sparsity_out(0);
-
-    // Work vector
-    alloc_w(sp.nnz(), true);
-
-    // Create a linear solver
-    set_function(linsol("linsolB", linear_solver_, sp, 0, linear_solver_options_));
+    if (ns_>0) {
+      alloc_w(max(nz_, nrz_), true); // ztmp
+    }
   }
 
   void SundialsInterface::init_memory(void* mem) const {
@@ -337,6 +348,9 @@ namespace casadi {
     // Work vectors
     m->p = w; w += np_;
     m->rp = w; w += nrp_;
+    if (ns_>0) {
+      m->ztmp = w; w += max(nz_, nrz_);
+    }
     m->jac = w; w += get_function("jacF").nnz_out(0);
     if (nrx_>0) {
       m->jacB = w; w += get_function("jacB").nnz_out(0);

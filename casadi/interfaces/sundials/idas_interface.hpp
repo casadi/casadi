@@ -148,18 +148,11 @@ namespace casadi {
       return m;
     }
 
-    /** \brief  Get the integrator Jacobian for the forward problem (generic) */
-    template<typename MatType> Function getJacF();
-
-    /** \brief  Get the integrator Jacobian for the backward problem (generic)
-     *   Structure:
-     *
-     * \verbatim
-     *   | diff(gx, rx) + cj*diff(gx, dot(rx))  |   diff(gx, rz) |
-     *   | diff(gz, rx)                        |   diff(gz, rz) |
-     * \endverbatim
-     */
-    template<typename MatType> Function getJacB();
+    ///@{
+    // Get system Jacobian
+    virtual Function getJ(bool backward) const;
+    template<typename MatType> Function getJ(bool backward) const;
+    ///@}
 
     /// A documentation string
     static const std::string meta_doc;
