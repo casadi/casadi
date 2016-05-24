@@ -136,23 +136,18 @@ namespace casadi {
     int max_multistep_order_;
     std::string linear_solver_;
     Dict linear_solver_options_;
-    bool use_iterative_solver_;
+    int max_krylov_;
+    bool use_precon_;
     ///@}
 
     /// Supported iterative solvers in Sundials
-    enum IterativeSolverType {SD_GMRES, SD_BCGSTAB, SD_TFQMR} itsol_;
+    enum NewtonScheme {SD_DIRECT, SD_GMRES, SD_BCGSTAB, SD_TFQMR} newton_scheme_;
 
     // Supported interpolations in Sundials
     enum InterpType {SD_POLYNOMIAL, SD_HERMITE} interp_;
 
     /// Linear solver data (dense)
     struct LinSolDataDense {};
-
-    /// Max Krylov size
-    int max_krylov_;
-
-    /// Use preconditioning
-    bool use_precon_;
 
     /** \brief Set the (persistent) work vectors */
     virtual void set_work(void* mem, const double**& arg, double**& res,

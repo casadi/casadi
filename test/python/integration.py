@@ -215,18 +215,12 @@ class Integrationtests(casadiTestCase):
             fs = Function("fs", sol, casadi.integrator_in(), casadi.integrator_out())
 
             def itoptions():
-              yield {"iterative_solver": "gmres"}
-              yield {"iterative_solver": "bcgstab"}
-             # yield {"iterative_solver": "tfqmr"} # Bug in Sundials?
+                yield {"newton_scheme": "direct"}
+                yield {"newton_scheme": "gmres"}
+                yield {"newton_scheme": "bcgstab"}
+                # yield {"newton_scheme": "tfqmr"} # Bug in Sundials?
 
-            def solveroptions():
-              for it in itoptions():
-                      d = {"use_iterative_solver": True }
-                      d.update(it)
-                      yield d
-              yield {"use_iterative_solver": False, "linear_solver": "csparse" }
-
-            for f_options in solveroptions():
+            for f_options in itoptions():
                 message = "f_options: %s" % str(f_options)
                 print(message)
                 opts = {}
@@ -318,18 +312,12 @@ class Integrationtests(casadiTestCase):
           fs = Function("fs", sol, casadi.integrator_in(), casadi.integrator_out())
 
           def itoptions():
-            yield {"iterative_solver": "gmres"}
-            yield {"iterative_solver": "bcgstab"}
-            #yield {"iterative_solver": "tfqmr"} # Bug in Sundials?
+            yield {"newton_scheme": "direct"}
+            yield {"newton_scheme": "gmres"}
+            yield {"newton_scheme": "bcgstab"}
+            #yield {"newton_scheme": "tfqmr"} # Bug in Sundials?
 
-          def solveroptions():
-            for it in itoptions():
-                    d = {"use_iterative_solver": True }
-                    d.update(it)
-                    yield d
-            yield {"use_iterative_solver": False, "linear_solver": "csparse" }
-
-          for f_options in solveroptions():
+          for f_options in itoptions():
               message = "f_options: %s" % str(f_options)
               print(message)
 

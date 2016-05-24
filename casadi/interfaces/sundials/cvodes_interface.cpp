@@ -115,7 +115,7 @@ namespace casadi {
     }
 
     // Attach functions for jacobian information
-    if (use_iterative_solver_) {
+    if (newton_scheme_!=SD_DIRECT) {
       create_function("jtimesF", {"t", "x", "p", "fwd:x"}, {"fwd:ode"});
       if (nrx_>0) {
         create_function("jtimesB",
@@ -149,21 +149,24 @@ namespace casadi {
     THROWING(CVodeSetMaxNumSteps, m->mem, max_num_steps_);
 
     // attach a linear solver
-    if (use_iterative_solver_) {
+    if (newton_scheme_==SD_DIRECT) {
+      // Direct scheme
+      CVodeMem cv_mem = static_cast<CVodeMem>(m->mem);
+      cv_mem->cv_lmem   = m;
+      cv_mem->cv_lsetup = lsetup;
+      cv_mem->cv_lsolve = lsolve;
+      cv_mem->cv_setupNonNull = TRUE;
+    } else {
+      // Iterative scheme
       int pretype = use_precon_ ? PREC_LEFT : PREC_NONE;
-      switch (itsol_) {
+      switch (newton_scheme_) {
+      case SD_DIRECT: casadi_assert(0);
       case SD_GMRES: THROWING(CVSpgmr, m->mem, pretype, max_krylov_); break;
       case SD_BCGSTAB: THROWING(CVSpbcg, m->mem, pretype, max_krylov_); break;
       case SD_TFQMR: THROWING(CVSptfqmr, m->mem, pretype, max_krylov_); break;
       }
       THROWING(CVSpilsSetJacTimesVecFn, m->mem, jtimes);
       if (use_precon_) THROWING(CVSpilsSetPreconditioner, m->mem, psetup, psolve);
-    } else {
-      CVodeMem cv_mem = static_cast<CVodeMem>(m->mem);
-      cv_mem->cv_lmem   = m;
-      cv_mem->cv_lsetup = lsetup;
-      cv_mem->cv_lsolve = lsolve;
-      cv_mem->cv_setupNonNull = TRUE;
     }
 
     // Quadrature equations
@@ -291,16 +294,8 @@ namespace casadi {
       THROWING(CVodeInitB, m->mem, m->whichB, rhsB, grid_.back(), m->rxz);
       THROWING(CVodeSStolerancesB, m->mem, m->whichB, reltol_, abstol_);
       THROWING(CVodeSetUserDataB, m->mem, m->whichB, m);
-      if (use_iterative_solver_) {
-        int pretype = use_precon_ ? PREC_LEFT : PREC_NONE;
-        switch (itsol_) {
-        case SD_GMRES: THROWING(CVSpgmrB, m->mem, m->whichB, pretype, max_krylov_); break;
-        case SD_BCGSTAB: THROWING(CVSpbcgB, m->mem, m->whichB, pretype, max_krylov_); break;
-        case SD_TFQMR: THROWING(CVSptfqmrB, m->mem, m->whichB, pretype, max_krylov_); break;
-        }
-        THROWING(CVSpilsSetJacTimesVecFnB, m->mem, m->whichB, jtimesB);
-        if (use_precon_) THROWING(CVSpilsSetPreconditionerB, m->mem, m->whichB, psetupB, psolveB);
-      } else {
+      if (newton_scheme_==SD_DIRECT) {
+        // Direct scheme
         CVodeMem cv_mem = static_cast<CVodeMem>(m->mem);
         CVadjMem ca_mem = cv_mem->cv_adj_mem;
         CVodeBMem cvB_mem = ca_mem->cvB_mem;
@@ -309,6 +304,17 @@ namespace casadi {
         cvB_mem->cv_mem->cv_lsetup = lsetupB;
         cvB_mem->cv_mem->cv_lsolve = lsolveB;
         cvB_mem->cv_mem->cv_setupNonNull = TRUE;
+      } else {
+        // Iterative scheme
+        int pretype = use_precon_ ? PREC_LEFT : PREC_NONE;
+        switch (newton_scheme_) {
+        case SD_DIRECT: casadi_assert(0);
+        case SD_GMRES: THROWING(CVSpgmrB, m->mem, m->whichB, pretype, max_krylov_); break;
+        case SD_BCGSTAB: THROWING(CVSpbcgB, m->mem, m->whichB, pretype, max_krylov_); break;
+        case SD_TFQMR: THROWING(CVSptfqmrB, m->mem, m->whichB, pretype, max_krylov_); break;
+        }
+        THROWING(CVSpilsSetJacTimesVecFnB, m->mem, m->whichB, jtimesB);
+        if (use_precon_) THROWING(CVSpilsSetPreconditionerB, m->mem, m->whichB, psetupB, psolveB);
       }
 
       // Quadratures for the backward problem

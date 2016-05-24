@@ -155,7 +155,7 @@ namespace casadi {
     }
 
     // Attach functions for jacobian information
-    if (use_iterative_solver_) {
+    if (newton_scheme_!=SD_DIRECT) {
       create_function("jtimesF",
         {"t", "x", "z", "p", "fwd:x", "fwd:z"},
         {"fwd:ode", "fwd:alg"});
@@ -319,20 +319,23 @@ namespace casadi {
     N_VDestroy_Serial(id);
 
     // attach a linear solver
-    if (use_iterative_solver_) {
-      switch (itsol_) {
+    if (newton_scheme_==SD_DIRECT) {
+      // Direct scheme
+      IDAMem IDA_mem = IDAMem(m->mem);
+      IDA_mem->ida_lmem   = m;
+      IDA_mem->ida_lsetup = lsetup;
+      IDA_mem->ida_lsolve = lsolve;
+      IDA_mem->ida_setupNonNull = TRUE;
+    } else {
+      // Iterative scheme
+      switch (newton_scheme_) {
+      case SD_DIRECT: casadi_assert(0);
       case SD_GMRES: THROWING(IDASpgmr, m->mem, max_krylov_); break;
       case SD_BCGSTAB: THROWING(IDASpbcg, m->mem, max_krylov_); break;
       case SD_TFQMR: THROWING(IDASptfqmr, m->mem, max_krylov_); break;
       }
       THROWING(IDASpilsSetJacTimesVecFn, m->mem, jtimes);
       if (use_precon_) THROWING(IDASpilsSetPreconditioner, m->mem, psetup, psolve);
-    } else {
-      IDAMem IDA_mem = IDAMem(m->mem);
-      IDA_mem->ida_lmem   = m;
-      IDA_mem->ida_lsetup = lsetup;
-      IDA_mem->ida_lsolve = lsolve;
-      IDA_mem->ida_setupNonNull = TRUE;
     }
 
     // Quadrature equations
@@ -463,15 +466,8 @@ namespace casadi {
       N_VDestroy_Serial(id);
 
       // attach linear solver
-      if (use_iterative_solver_) {
-        switch (itsol_) {
-        case SD_GMRES: THROWING(IDASpgmrB, m->mem, m->whichB, max_krylov_); break;
-        case SD_BCGSTAB: THROWING(IDASpbcgB, m->mem, m->whichB, max_krylov_); break;
-        case SD_TFQMR: THROWING(IDASptfqmrB, m->mem, m->whichB, max_krylov_); break;
-        }
-        THROWING(IDASpilsSetJacTimesVecFnB, m->mem, m->whichB, jtimesB);
-        if (use_precon_) THROWING(IDASpilsSetPreconditionerB, m->mem, m->whichB, psetupB, psolveB);
-      } else {
+      if (newton_scheme_==SD_DIRECT) {
+        // Direct scheme
         IDAMem IDA_mem = IDAMem(m->mem);
         IDAadjMem IDAADJ_mem = IDA_mem->ida_adj_mem;
         IDABMem IDAB_mem = IDAADJ_mem->IDAB_mem;
@@ -480,6 +476,16 @@ namespace casadi {
         IDAB_mem->IDA_mem->ida_lsetup = lsetupB;
         IDAB_mem->IDA_mem->ida_lsolve = lsolveB;
         IDAB_mem->IDA_mem->ida_setupNonNull = TRUE;
+      } else {
+        // Iterative scheme
+        switch (newton_scheme_) {
+        case SD_DIRECT: casadi_assert(0);
+        case SD_GMRES: THROWING(IDASpgmrB, m->mem, m->whichB, max_krylov_); break;
+        case SD_BCGSTAB: THROWING(IDASpbcgB, m->mem, m->whichB, max_krylov_); break;
+        case SD_TFQMR: THROWING(IDASptfqmrB, m->mem, m->whichB, max_krylov_); break;
+        }
+        THROWING(IDASpilsSetJacTimesVecFnB, m->mem, m->whichB, jtimesB);
+        if (use_precon_) THROWING(IDASpilsSetPreconditionerB, m->mem, m->whichB, psetupB, psolveB);
       }
 
       // Quadratures for the adjoint problem
