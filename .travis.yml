@@ -118,7 +118,7 @@ matrix:
         - |
           if [[ $TRAVIS_BRANCH == *develop* || $TRAVIS_BRANCH == *release* ]]
           then
-            git stash && git checkout $TRAVIS_BRANCH && git pull origin $TRAVIS_BRANCH && git stash pop || allowfail 1 && test $(git status --porcelain | wc -c) -eq 0 && sh /home/travis/build/testbot/helpers/acommit.sh "automatic documentation update" && git push git@github.com:casadi/casadi.git $TRAVIS_BRANCH
+            git stash && git checkout $TRAVIS_BRANCH && git pull origin $TRAVIS_BRANCH && git stash pop || allowfail 1 && test $(git status --porcelain | grep UU | wc -c) -eq 0 && sh /home/travis/build/testbot/helpers/acommit.sh "automatic documentation update" && git push git@github.com:casadi/casadi.git $TRAVIS_BRANCH
           fi
     - compiler: clang
       os: linux
