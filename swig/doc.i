@@ -10793,9 +10793,12 @@ experience a dramatic speed-up by using a sparse linear solver:
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 | exact_jacobian         | OT_BOOL                | Use exact Jacobian     |
 |                        |                        | information            |
 +------------------------+------------------------+------------------------+
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 =======
@@ -10833,10 +10836,13 @@ experience a dramatic speed-up by using a sparse linear solver:
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 | linear_solver_type     | OT_STRING              | Type of iterative      |
 |                        |                        | solver:                |
 |                        |                        | USER_DEFINED|iterative |
 +------------------------+------------------------+------------------------+
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 =======
@@ -10882,7 +10888,10 @@ experience a dramatic speed-up by using a sparse linear solver:
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 =======
@@ -10891,7 +10900,6 @@ experience a dramatic speed-up by using a sparse linear solver:
 |                        |                        | iterative solver       |
 |                        |                        | [default: true]        |
 +------------------------+------------------------+------------------------+
->>>>>>> Stashed changes
 
 --------------------------------------------------------------------------------
 
@@ -10952,9 +10960,12 @@ experience a dramatic speed-up by using a sparse linear solver:
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 | exact_jacobian         | OT_BOOL                | Use exact Jacobian     |
 |                        |                        | information            |
 +------------------------+------------------------+------------------------+
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 =======
@@ -10998,10 +11009,13 @@ experience a dramatic speed-up by using a sparse linear solver:
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 | linear_solver_type     | OT_STRING              | Type of iterative      |
 |                        |                        | solver:                |
 |                        |                        | USER_DEFINED|iterative |
 +------------------------+------------------------+------------------------+
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 =======
@@ -11050,7 +11064,10 @@ experience a dramatic speed-up by using a sparse linear solver:
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 =======
@@ -11059,7 +11076,6 @@ experience a dramatic speed-up by using a sparse linear solver:
 |                        |                        | iterative solver       |
 |                        |                        | [default: true]        |
 +------------------------+------------------------+------------------------+
->>>>>>> Stashed changes
 
 --------------------------------------------------------------------------------
 
