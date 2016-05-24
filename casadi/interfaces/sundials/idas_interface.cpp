@@ -71,9 +71,6 @@ namespace casadi {
       {"abstolv",
        {OT_DOUBLEVECTOR,
         "Absolute tolerarance for each component"}},
-      {"fsens_abstolv",
-       {OT_DOUBLEVECTOR,
-        "Absolute tolerarance for each component, forward sensitivities"}},
       {"max_step_size",
        {OT_DOUBLE,
         "Maximim step size"}},
@@ -83,9 +80,6 @@ namespace casadi {
       {"cj_scaling",
        {OT_BOOL,
         "IDAS scaling on cj for the user-defined linear solver module"}},
-      {"extra_fsens_calc_ic",
-       {OT_BOOL,
-        "Call calc ic an extra time, with fsens=0"}},
       {"init_xdot",
        {OT_DOUBLEVECTOR,
         "Initial values for the state derivatives"}}
@@ -118,8 +112,6 @@ namespace casadi {
         max_step_size_ = op.second;
       } else if (op.first=="abstolv") {
         abstolv_ = op.second;
-      } else if (op.first=="fsens_abstolv") {
-        fsens_abstolv_ = op.second;
       }
     }
 
