@@ -324,7 +324,10 @@
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 <tr><td>exact_jacobian</td><td>OT_BOOL</td><td>Use exact Jacobian information</td><td>casadi::SundialsInterface</td></tr>
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 =======
@@ -355,7 +358,10 @@
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 <tr><td>linear_solver_type</td><td>OT_STRING</td><td>Type of iterative solver: USER_DEFINED|iterative</td><td>casadi::SundialsInterface</td></tr>
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 =======
@@ -386,7 +392,12 @@
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 <tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition an iterative solver</td><td>casadi::SundialsInterface</td></tr>
+=======
+<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
+>>>>>>> Stashed changes
 =======
 <tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
@@ -434,7 +445,10 @@
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 <tr><td>exact_jacobian</td><td>OT_BOOL</td><td>Use exact Jacobian information</td></tr>
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 =======
@@ -465,7 +479,10 @@
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 <tr><td>linear_solver_type</td><td>OT_STRING</td><td>Type of iterative solver: USER_DEFINED|iterative</td></tr>
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 =======
@@ -496,7 +513,12 @@
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 <tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition an iterative solver</td></tr>
+=======
+<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td></tr>
+<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td></tr>
+>>>>>>> Stashed changes
 =======
 <tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td></tr>
 <tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td></tr>
@@ -543,7 +565,10 @@
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 <tr><td>exact_jacobian</td><td>OT_BOOL</td><td>Use exact Jacobian information</td><td>casadi::SundialsInterface</td></tr>
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 =======
@@ -574,7 +599,10 @@
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 <tr><td>linear_solver_type</td><td>OT_STRING</td><td>Type of iterative solver: USER_DEFINED|iterative</td><td>casadi::SundialsInterface</td></tr>
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 =======
@@ -605,7 +633,12 @@
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 <tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition an iterative solver</td><td>casadi::SundialsInterface</td></tr>
+=======
+<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
+>>>>>>> Stashed changes
 =======
 <tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
@@ -802,7 +835,10 @@
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 <tr><td>exact_jacobian</td><td>OT_BOOL</td><td>Use exact Jacobian information</td><td>casadi::SundialsInterface</td></tr>
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 =======
@@ -835,7 +871,10 @@
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 <tr><td>linear_solver_type</td><td>OT_STRING</td><td>Type of iterative solver: USER_DEFINED|iterative</td><td>casadi::SundialsInterface</td></tr>
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 =======
@@ -867,7 +906,12 @@
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 <tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition an iterative solver</td><td>casadi::SundialsInterface</td></tr>
+=======
+<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
+>>>>>>> Stashed changes
 =======
 <tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
@@ -919,7 +963,10 @@
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 <tr><td>exact_jacobian</td><td>OT_BOOL</td><td>Use exact Jacobian information</td></tr>
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 =======
@@ -952,7 +999,10 @@
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 <tr><td>linear_solver_type</td><td>OT_STRING</td><td>Type of iterative solver: USER_DEFINED|iterative</td></tr>
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 =======
@@ -984,7 +1034,12 @@
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 <tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition an iterative solver</td></tr>
+=======
+<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td></tr>
+<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td></tr>
+>>>>>>> Stashed changes
 =======
 <tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td></tr>
 <tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td></tr>
@@ -1035,7 +1090,10 @@
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 <tr><td>exact_jacobian</td><td>OT_BOOL</td><td>Use exact Jacobian information</td><td>casadi::SundialsInterface</td></tr>
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 =======
@@ -1068,7 +1126,10 @@
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 <tr><td>linear_solver_type</td><td>OT_STRING</td><td>Type of iterative solver: USER_DEFINED|iterative</td><td>casadi::SundialsInterface</td></tr>
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 =======
@@ -1100,7 +1161,12 @@
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 <tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition an iterative solver</td><td>casadi::SundialsInterface</td></tr>
+=======
+<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
+>>>>>>> Stashed changes
 =======
 <tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
@@ -2475,7 +2541,10 @@
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 <tr><td>exact_jacobian</td><td>OT_BOOL</td><td>Use exact Jacobian information</td><td>casadi::SundialsInterface</td></tr>
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 =======
@@ -2506,7 +2575,10 @@
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 <tr><td>linear_solver_type</td><td>OT_STRING</td><td>Type of iterative solver: USER_DEFINED|iterative</td><td>casadi::SundialsInterface</td></tr>
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 =======
@@ -2543,7 +2615,12 @@
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 <tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition an iterative solver</td><td>casadi::SundialsInterface</td></tr>
+=======
+<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
+>>>>>>> Stashed changes
 =======
 <tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
@@ -2592,7 +2669,10 @@
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 <tr><td>exact_jacobian</td><td>OT_BOOL</td><td>Use exact Jacobian information</td><td>casadi::SundialsInterface</td></tr>
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 =======
@@ -2623,7 +2703,10 @@
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 <tr><td>linear_solver_type</td><td>OT_STRING</td><td>Type of iterative solver: USER_DEFINED|iterative</td><td>casadi::SundialsInterface</td></tr>
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 =======
@@ -2660,7 +2743,12 @@
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 <tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition an iterative solver</td><td>casadi::SundialsInterface</td></tr>
+=======
+<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
+>>>>>>> Stashed changes
 =======
 <tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
