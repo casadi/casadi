@@ -23,7 +23,7 @@
  */
 
 
-/** 
+/**
 File superlu.c from the CSparse example collection
 Joel Andersson, K.U. Leuven, 2010
 */
@@ -36,38 +36,25 @@ using namespace std;
 int main(int argc, char *argv[])
 {
 
-  /* Initialize matrix A. */
+  // Sparsity pattern of A
   int ncol = 5, nrow = 5;
-  int nnz = 12;
-  
-  vector<int> colind(ncol+1);
-  vector<int> row(nnz);
-  
-  // Sparsity pattern
-  row[0] = 0; row[1] = 1; row[2] = 4; row[3] = 1;
-  row[4] = 2; row[5] = 4; row[6] = 0; row[7] = 2;
-  row[8] = 0; row[9] = 3; row[10]= 3; row[11]= 4;
-  colind[0] = 0; colind[1] = 3; colind[2] = 6; colind[3] = 8; colind[4] = 10; colind[5] = 12;
-  Sparsity spA(nrow,ncol,colind,row);
-  
+  vector<int> colind = {0, 3, 6, 8, 10, 12};
+  vector<int> row = {0, 1, 4, 1, 2, 4, 0, 2, 0, 3, 3, 4};
+  Sparsity spA(nrow, ncol, colind, row);
+
   // Create a solver instance
   Function linear_solver = linsol("linear_solver", "csparse", spA, 1);
-    
-  // Pass Non-zero elements
-  double   s, u, p, e, r, l;
-  s = 19.0; u = 21.0; p = 16.0; e = 5.0; r = 18.0; l = 12.0;
 
-  vector<double> a(nnz);
-  a[0] = s; a[1] = l; a[2] = l; a[3] = u; a[4] = l; a[5] = l;
-  a[6] = u; a[7] = p; a[8] = u; a[9] = e; a[10]= u; a[11]= r;
-  
+  // Nonzeros of A
+  vector<double> a = {19, 12, 12, 21, 12, 12, 21, 16, 21, 5, 21, 18};
+
   // Right hand side
-  vector<double> b(ncol,1.0);
+  vector<double> b(ncol, 1.0);
 
   // Solve
   vector<double> x;
   linear_solver({{"A", a}, {"B", b}}, {{"X", &x}});
-  
+
   // Print the solution
   cout << "solution            = " << x << endl;
 
@@ -79,7 +66,7 @@ int main(int argc, char *argv[])
 
   // Solve
   F({{"A", a}, {"B", b}}, {{"X", &x}});
-  
+
   // Print the solution
   cout << "solution (embedded) = " << x << endl;
 
