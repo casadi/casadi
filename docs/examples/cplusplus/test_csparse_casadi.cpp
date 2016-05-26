@@ -36,39 +36,26 @@ using namespace std;
 int main(int argc, char *argv[])
 {
 
-  // Sparsity pattern of A
+  // A
   int ncol = 5, nrow = 5;
   vector<int> colind = {0, 3, 6, 8, 10, 12};
   vector<int> row = {0, 1, 4, 1, 2, 4, 0, 2, 0, 3, 3, 4};
+  vector<double> nz = {19, 12, 12, 21, 12, 12, 21, 16, 21, 5, 21, 18};
   Sparsity spA(nrow, ncol, colind, row);
-
-  // Create a solver instance
-  Function linear_solver = linsol("linear_solver", "csparse", spA, 1);
-
-  // Nonzeros of A
-  vector<double> a = {19, 12, 12, 21, 12, 12, 21, 16, 21, 5, 21, 18};
+  DM A(spA, nz);
 
   // Right hand side
-  vector<double> b(ncol, 1.0);
+  DM b = DM::ones(ncol);
+
+  // Create a solver instance
+  Function F = linsol("linear_solver", "csparse", spA, 1);
 
   // Solve
-  vector<double> x;
-  linear_solver({{"A", a}, {"B", b}}, {{"X", &x}});
+  DMDict arg = {{"A", A}, {"B", b}};
+  DM x = F(arg).at("X");
 
   // Print the solution
-  cout << "solution            = " << x << endl;
-
-  // Embed in an MX graph
-  MX A = MX::sym("A", spA);
-  MX B = MX::sym("B", ncol);
-  MX X = linear_solver.linsol_solve(A, B);
-  Function F("F", {A, B}, {X}, {"A", "B"}, {"X"});
-
-  // Solve
-  F({{"A", a}, {"B", b}}, {{"X", &x}});
-
-  // Print the solution
-  cout << "solution (embedded) = " << x << endl;
+  cout << "solution = " << x << endl;
 
   return 0;
 }
