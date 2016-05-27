@@ -9093,10 +9093,6 @@ Check if the vector is strictly monotone.
 
 ";
 
-%feature("docstring") casadi::dlaqge_ "[INTERNAL]  Equilibrate the system.
-
-";
-
 %feature("docstring") casadi::to_slice "
 
 >  Slice to_slice(IM x, bool ind1=false)
@@ -9112,11 +9108,6 @@ Construct from an index vector (requires is_slice(v) to be true)
 ";
 
 %feature("docstring") casadi::casadi_copy "[INTERNAL]  COPY: y <-x.
-
-";
-
-%feature("docstring") casadi::dgeequ_ "[INTERNAL]  Calculate col and row
-scaling.
 
 ";
 
@@ -9142,11 +9133,6 @@ lookupvector[i]!=-1 <=> v contains i v[lookupvector[i]] == i <=> v contains
 i
 
 Duplicates are treated by looking up last occurrence
-
-";
-
-%feature("docstring") casadi::dormqr_ "[INTERNAL]  Multiply right hand side
-with Q-transpose (lapack)
 
 ";
 
@@ -9196,11 +9182,6 @@ void fname(const real_t* arg, real_t* res) { <FUNCTION_BODY> }
 %feature("docstring") casadi::load_rootfinder "
 
 Explicitly load a plugin dynamically.
-
-";
-
-%feature("docstring") casadi::dgeqrf_ "[INTERNAL]  QR-factorize dense
-matrix (lapack)
 
 ";
 
@@ -9862,11 +9843,6 @@ true)
 
 ";
 
-%feature("docstring") casadi::dtrsm_ "[INTERNAL]   Solve upper triangular
-system (lapack)
-
-";
-
 %feature("docstring") casadi::casadi_axpy "[INTERNAL]  AXPY: y <- a*x + y.
 
 ";
@@ -10033,11 +10009,6 @@ vector * Returns the largest element in absolute value
 
 ";
 
-%feature("docstring") casadi::dgetrf_ "[INTERNAL]  LU-Factorize dense
-matrix (lapack)
-
-";
-
 %feature("docstring") casadi::has_rootfinder "
 
 Check if a particular plugin is available.
@@ -10161,11 +10132,6 @@ Get output scheme name by index.
 
 %feature("docstring") casadi::casadi_trans "[INTERNAL]  TRANS: y <-
 trans(x)
-
-";
-
-%feature("docstring") casadi::dgetrs_ "[INTERNAL]   Solve a system of
-equation using an LU-factorized matrix (lapack)
 
 ";
 
@@ -11229,6 +11195,8 @@ List of plugins
 
 - csparse
 
+- ma27
+
 - lapacklu
 
 - lapackqr
@@ -11271,6 +11239,16 @@ Linsol with CSparse Interface
 
 
 
+
+--------------------------------------------------------------------------------
+
+ma27
+----
+
+
+
+Interface to the sparse direct linear solver MA27 Works for symmetric
+indefinite systems Partly adopted from qpOASES 3.2 Joel Andersson
 
 --------------------------------------------------------------------------------
 

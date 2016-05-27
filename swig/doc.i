@@ -11507,12 +11507,6 @@ Check if the vector is strictly monotone.
 
 ";
 
-%feature("docstring")  casadi::dlaqge_(int *m, int *n, double *a, int *lda,
-double *r, double *c, double *colcnd, double *rowcnd, double *amax, char
-*equed) " [INTERNAL]  Equilibrate the system.
-
-";
-
 %feature("docstring")  casadi::to_slice(const IM &x, bool ind1=false) "
 
 Convert IM to Slice.
@@ -11528,12 +11522,6 @@ Construct from an index vector (requires is_slice(v) to be true)
 
 %feature("docstring")  casadi::casadi_copy(const real_t *x, int n, real_t
 *y) " [INTERNAL]  COPY: y <-x.
-
-";
-
-%feature("docstring")  casadi::dgeequ_(int *m, int *n, double *a, int *lda,
-double *r, double *c, double *colcnd, double *rowcnd, double *amax, int
-*info) " [INTERNAL]  Calculate col and row scaling.
 
 ";
 
@@ -11558,13 +11546,6 @@ lookupvector[i]!=-1 <=> v contains i v[lookupvector[i]] == i <=> v contains
 i
 
 Duplicates are treated by looking up last occurrence
-
-";
-
-%feature("docstring")  casadi::dormqr_(char *side, char *trans, int *n, int
-*m, int *k, double *a, int *lda, double *tau, double *c, int *ldc, double
-*work, int *lwork, int *info) " [INTERNAL]  Multiply right hand side with
-Q-transpose (lapack)
 
 ";
 
@@ -11619,12 +11600,6 @@ void fname(const real_t* arg, real_t* res) { <FUNCTION_BODY> }
 %feature("docstring")  casadi::load_rootfinder(const std::string &name) "
 
 Explicitly load a plugin dynamically.
-
-";
-
-%feature("docstring")  casadi::dgeqrf_(int *m, int *n, double *a, int *lda,
-double *tau, double *work, int *lwork, int *info) " [INTERNAL]  QR-factorize
-dense matrix (lapack)
 
 ";
 
@@ -12306,12 +12281,6 @@ true)
 
 ";
 
-%feature("docstring")  casadi::dtrsm_(char *side, char *uplo, char *transa,
-char *diag, int *m, int *n, double *alpha, double *a, int *lda, double *b,
-int *ldb) " [INTERNAL]   Solve upper triangular system (lapack)
-
-";
-
 %feature("docstring")  casadi::casadi_axpy(int n, real_t alpha, const real_t
 *x, real_t *y) " [INTERNAL]  AXPY: y <- a*x + y.
 
@@ -12500,11 +12469,6 @@ value
 
 ";
 
-%feature("docstring")  casadi::dgetrf_(int *m, int *n, double *a, int *lda,
-int *ipiv, int *info) " [INTERNAL]  LU-Factorize dense matrix (lapack)
-
-";
-
 %feature("docstring")  casadi::has_rootfinder(const std::string &name) "
 
 Check if a particular plugin is available.
@@ -12631,12 +12595,6 @@ ng) " [INTERNAL] ";
 %feature("docstring")  casadi::casadi_trans(const real_t *x, const int
 *sp_x, real_t *y, const int *sp_y, int *tmp) " [INTERNAL]  TRANS: y <-
 trans(x)
-
-";
-
-%feature("docstring")  casadi::dgetrs_(char *trans, int *n, int *nrhs,
-double *a, int *lda, int *ipiv, double *b, int *ldb, int *info) " [INTERNAL]
-Solve a system of equation using an LU-factorized matrix (lapack)
 
 ";
 
@@ -13707,6 +13665,8 @@ List of plugins
 
 - csparse
 
+- ma27
+
 - lapacklu
 
 - lapackqr
@@ -13749,6 +13709,16 @@ Linsol with CSparse Interface
 
 
 
+
+--------------------------------------------------------------------------------
+
+ma27
+----
+
+
+
+Interface to the sparse direct linear solver MA27 Works for symmetric
+indefinite systems Partly adopted from qpOASES 3.2 Joel Andersson
 
 --------------------------------------------------------------------------------
 
