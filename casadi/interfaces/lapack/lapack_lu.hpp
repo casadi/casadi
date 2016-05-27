@@ -29,6 +29,23 @@
 #include "casadi/core/function/linsol_impl.hpp"
 #include <casadi/interfaces/lapack/casadi_linsol_lapacklu_export.h>
 
+extern "C" {
+  /// LU-Factorize dense matrix (lapack)
+  void dgetrf_(int *m, int *n, double *a, int *lda, int *ipiv, int *info);
+
+  /// Solve a system of equation using an LU-factorized matrix (lapack)
+  void dgetrs_(char* trans, int *n, int *nrhs, double *a,
+               int *lda, int *ipiv, double *b, int *ldb, int *info);
+
+  /// Calculate col and row scaling
+  void dgeequ_(int *m, int *n, double *a, int *lda, double *r, double *c,
+               double *colcnd, double *rowcnd, double *amax, int *info);
+
+  /// Equilibrate the system
+  void dlaqge_(int *m, int *n, double *a, int *lda, double *r, double *c,
+               double *colcnd, double *rowcnd, double *amax, char *equed);
+}
+
 namespace casadi {
 
 /** \defgroup plugin_Linsol_lapacklu
@@ -39,24 +56,7 @@ namespace casadi {
 */
 
 /** \pluginsection{Linsol,lapacklu} */
-
 /// \cond INTERNAL
-
-  /// LU-Factorize dense matrix (lapack)
-  extern "C" void dgetrf_(int *m, int *n, double *a, int *lda, int *ipiv, int *info);
-
-  /// Solve a system of equation using an LU-factorized matrix (lapack)
-  extern "C" void dgetrs_(char* trans, int *n, int *nrhs, double *a,
-                          int *lda, int *ipiv, double *b, int *ldb, int *info);
-
-  /// Calculate col and row scaling
-  extern "C" void dgeequ_(int *m, int *n, double *a, int *lda, double *r, double *c,
-                          double *colcnd, double *rowcnd, double *amax, int *info);
-
-  /// Equilibrate the system
-  extern "C" void dlaqge_(int *m, int *n, double *a, int *lda, double *r, double *c,
-                          double *colcnd, double *rowcnd, double *amax, char *equed);
-
   struct CASADI_LINSOL_LAPACKLU_EXPORT LapackLuMemory {
     // Matrix
     std::vector<double> mat;

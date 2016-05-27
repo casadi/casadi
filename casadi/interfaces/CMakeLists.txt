@@ -38,6 +38,10 @@ if(CLANG_FOUND)
   add_subdirectory(clang)
 endif()
 
+if(HSL_FOUND)
+  add_subdirectory(hsl)
+endif()
+
 if(OOQP_FOUND)
   add_subdirectory(ooqp)
 endif()

@@ -28,6 +28,7 @@
 
 #include <exception>
 #include <string>
+#include <vector>
 #include <sstream>
 #include <iostream>
 #include <stdexcept>
@@ -156,6 +157,27 @@ class CASADI_EXPORT CasadiException : public std::exception {
     casadi::userOut<true, casadi::PL_WARN>() << "CasADi warning: \"" << msg << "\" (assertion \"" \
       CASADI_ASSERT_STR(x) "\"" CASADI_ASSERT_WHERE " failed.)" << std::endl; \
   }
+
+// Formatted message
+#define casadi_assert_message1(x, msg, ...) \
+{ \
+  bool is_ok; \
+  try { \
+    is_ok = x; \
+  } catch(std::exception& ex) { \
+      throw casadi::CasadiException(std::string("When trying to check the assertion \"" \
+        CASADI_ASSERT_STR(x) "\"" CASADI_ASSERT_WHERE ", caught: \n")+ex.what()); \
+  } \
+ if (!is_ok) { \
+   std::string m = "The assertion \"" CASADI_ASSERT_STR(x) "\"" CASADI_ASSERT_WHERE " failed. %s";\
+   int sz = snprintf(0, 0, msg, __VA_ARGS__);\
+   char* buf = new char[sz+1];\
+   (void)snprintf(buf, sz+1, msg, __VA_ARGS__);\
+   m += buf;\
+   delete[] buf;\
+   throw casadi::CasadiException(m); \
+ }\
+}
 
 // This is for warnings to be issued when casadi is not in release mode
 #define casadi_warning(msg)                                                       \

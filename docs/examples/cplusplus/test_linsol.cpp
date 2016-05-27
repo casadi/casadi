@@ -41,21 +41,60 @@ int main(int argc, char *argv[])
   vector<int> colind = {0, 3, 6, 8, 10, 12};
   vector<int> row = {0, 1, 4, 1, 2, 4, 0, 2, 0, 3, 3, 4};
   vector<double> nz = {19, 12, 12, 21, 12, 12, 21, 16, 21, 5, 21, 18};
-  Sparsity spA(nrow, ncol, colind, row);
-  DM A(spA, nz);
+  DM A(Sparsity(nrow, ncol, colind, row), nz);
 
   // Right hand side
   DM b = DM::ones(ncol);
 
-  // Create a solver instance
-  Function F = linsol("linear_solver", "csparse", spA, 1);
+  // Type of linear systems
+  enum SymType {UNSYM, SYM, PD};
 
-  // Solve
-  DMDict arg = {{"A", A}, {"B", b}};
-  DM x = F(arg).at("X");
+  // All Linear solvers to be tested
+  struct Test {
+    string solver;
+    SymType type;
+  };
+  vector<Test> tests;
+  tests.push_back({"csparse", UNSYM});
+  tests.push_back({"lapacklu", UNSYM});
+  tests.push_back({"lapackqr", UNSYM});
+  tests.push_back({"ma27", SYM});
 
-  // Print the solution
-  cout << "solution = " << x << endl;
+  // Test all combinations
+  for (auto s : {UNSYM, SYM, PD}) {
+    DM A_test;
+    switch (s) {
+    case UNSYM:
+      cout << "Unsymmetric linear system" << endl;
+      A_test = A;
+      break;
+    case SYM:
+      cout << "Symmetric linear system" << endl;
+      A_test = A + A.T();
+      break;
+    case PD:
+      cout << "Positive definite linear system" << endl;
+      A_test = mtimes(A.T(), A);
+      break;
+    }
+    for (auto t : tests) {
+      if (t.type > s) continue; // Cannot be solved
+      if (!has_linsol(t.solver)) {
+        cout << t.solver << " not available" << endl;
+        continue;
+      }
+
+      // Create a solver instance
+      Function F = linsol("F", t.solver, A_test.sparsity(), 1);
+
+      // Solve
+      DMDict arg = {{"A", A_test}, {"B", b}};
+      DM x = F(arg).at("X");
+
+      // Print the solution
+      cout << "solution: " << x << " (" <<  t.solver << ")" << endl;
+    }
+  }
 
   return 0;
 }
