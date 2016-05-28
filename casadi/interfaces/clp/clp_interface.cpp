@@ -48,11 +48,6 @@ namespace casadi {
     : Conic(name, st) {
   }
 
-  Options ClpInterface::options_
-  = {{&Conic::options_},
-     {}
-  };
-
   void ClpInterface::init(const Dict& opts) {
     // Call the init method of the base class
     Conic::init(opts);
