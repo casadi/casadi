@@ -316,14 +316,12 @@
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
 <tr><td>abstol</td><td>OT_DOUBLE</td><td>Absolute tolerence for the IVP solution</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>disable_internal_warnings</td><td>OT_BOOL</td><td>Disable SUNDIALS internal warning messages</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>exact_jacobian</td><td>OT_BOOL</td><td>Use exact Jacobian information</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>fsens_all_at_once</td><td>OT_BOOL</td><td>Calculate all right hand sides of the sensitivity equations at once</td><td>casadi::CvodesInterface</td></tr>
 <tr><td>fsens_err_con</td><td>OT_BOOL</td><td>include the forward sensitivities in all error controls</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>interpolation_type</td><td>OT_STRING</td><td>Type of interpolation for the adjoint sensitivities</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_multistep_method</td><td>OT_STRING</td><td>Integrator scheme: BDF|adams</td><td>casadi::CvodesInterface</td></tr>
 <tr><td>linear_solver</td><td>OT_STRING</td><td>A custom linear solver creator function [default: csparse]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICT</td><td>Options to be passed to the linear solver</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>linear_solver_type</td><td>OT_STRING</td><td>Type of iterative solver: USER_DEFINED|iterative</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_krylov</td><td>OT_INT</td><td>Maximum Krylov subspace size</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_multistep_order</td><td>OT_INT</td><td>Maximum order for the (variable-order) multistep method</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_num_steps</td><td>OT_INT</td><td>Maximum number of integrator steps</td><td>casadi::SundialsInterface</td></tr>
@@ -334,25 +332,6 @@
 <tr><td>sensitivity_method</td><td>OT_STRING</td><td>Sensitivity method: SIMULTANEOUS|staggered</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>steps_per_checkpoint</td><td>OT_INT</td><td>Number of steps between two consecutive checkpoints</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>stop_at_end</td><td>OT_BOOL</td><td>Stop the integrator at the end of the interval</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition an iterative solver</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
 </table>
 */
@@ -365,14 +344,12 @@
 <tr><th>Id</th><th>Type</th><th>Description</th></tr>
 <tr><td>abstol</td><td>OT_DOUBLE</td><td>Absolute tolerence for the IVP solution</td></tr>
 <tr><td>disable_internal_warnings</td><td>OT_BOOL</td><td>Disable SUNDIALS internal warning messages</td></tr>
-<tr><td>exact_jacobian</td><td>OT_BOOL</td><td>Use exact Jacobian information</td></tr>
 <tr><td>fsens_all_at_once</td><td>OT_BOOL</td><td>Calculate all right hand sides of the sensitivity equations at once</td></tr>
 <tr><td>fsens_err_con</td><td>OT_BOOL</td><td>include the forward sensitivities in all error controls</td></tr>
 <tr><td>interpolation_type</td><td>OT_STRING</td><td>Type of interpolation for the adjoint sensitivities</td></tr>
 <tr><td>linear_multistep_method</td><td>OT_STRING</td><td>Integrator scheme: BDF|adams</td></tr>
 <tr><td>linear_solver</td><td>OT_STRING</td><td>A custom linear solver creator function [default: csparse]</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICT</td><td>Options to be passed to the linear solver</td></tr>
-<tr><td>linear_solver_type</td><td>OT_STRING</td><td>Type of iterative solver: USER_DEFINED|iterative</td></tr>
 <tr><td>max_krylov</td><td>OT_INT</td><td>Maximum Krylov subspace size</td></tr>
 <tr><td>max_multistep_order</td><td>OT_INT</td><td>Maximum order for the (variable-order) multistep method</td></tr>
 <tr><td>max_num_steps</td><td>OT_INT</td><td>Maximum number of integrator steps</td></tr>
@@ -383,25 +360,6 @@
 <tr><td>sensitivity_method</td><td>OT_STRING</td><td>Sensitivity method: SIMULTANEOUS|staggered</td></tr>
 <tr><td>steps_per_checkpoint</td><td>OT_INT</td><td>Number of steps between two consecutive checkpoints</td></tr>
 <tr><td>stop_at_end</td><td>OT_BOOL</td><td>Stop the integrator at the end of the interval</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition an iterative solver</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td></tr>
 <tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td></tr>
 </table>
 */
@@ -413,14 +371,12 @@
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
 <tr><td>abstol</td><td>OT_DOUBLE</td><td>Absolute tolerence for the IVP solution</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>disable_internal_warnings</td><td>OT_BOOL</td><td>Disable SUNDIALS internal warning messages</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>exact_jacobian</td><td>OT_BOOL</td><td>Use exact Jacobian information</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>fsens_all_at_once</td><td>OT_BOOL</td><td>Calculate all right hand sides of the sensitivity equations at once</td><td>casadi::CvodesInterface</td></tr>
 <tr><td>fsens_err_con</td><td>OT_BOOL</td><td>include the forward sensitivities in all error controls</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>interpolation_type</td><td>OT_STRING</td><td>Type of interpolation for the adjoint sensitivities</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_multistep_method</td><td>OT_STRING</td><td>Integrator scheme: BDF|adams</td><td>casadi::CvodesInterface</td></tr>
 <tr><td>linear_solver</td><td>OT_STRING</td><td>A custom linear solver creator function [default: csparse]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICT</td><td>Options to be passed to the linear solver</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>linear_solver_type</td><td>OT_STRING</td><td>Type of iterative solver: USER_DEFINED|iterative</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_krylov</td><td>OT_INT</td><td>Maximum Krylov subspace size</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_multistep_order</td><td>OT_INT</td><td>Maximum order for the (variable-order) multistep method</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_num_steps</td><td>OT_INT</td><td>Maximum number of integrator steps</td><td>casadi::SundialsInterface</td></tr>
@@ -431,24 +387,6 @@
 <tr><td>sensitivity_method</td><td>OT_STRING</td><td>Sensitivity method: SIMULTANEOUS|staggered</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>steps_per_checkpoint</td><td>OT_INT</td><td>Number of steps between two consecutive checkpoints</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>stop_at_end</td><td>OT_BOOL</td><td>Stop the integrator at the end of the interval</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition an iterative solver</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
 </table>
 */
@@ -610,15 +548,12 @@
 <tr><td>calc_icB</td><td>OT_BOOL</td><td>Use IDACalcIC to get consistent initial conditions for backwards system [default: equal to calc_ic].</td><td>casadi::IdasInterface</td></tr>
 <tr><td>cj_scaling</td><td>OT_BOOL</td><td>IDAS scaling on cj for the user-defined linear solver module</td><td>casadi::IdasInterface</td></tr>
 <tr><td>disable_internal_warnings</td><td>OT_BOOL</td><td>Disable SUNDIALS internal warning messages</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>exact_jacobian</td><td>OT_BOOL</td><td>Use exact Jacobian information</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>extra_fsens_calc_ic</td><td>OT_BOOL</td><td>Call calc ic an extra time, with fsens=0</td><td>casadi::IdasInterface</td></tr>
 <tr><td>first_time</td><td>OT_DOUBLE</td><td>First requested time as a fraction of the time interval</td><td>casadi::IdasInterface</td></tr>
 <tr><td>fsens_err_con</td><td>OT_BOOL</td><td>include the forward sensitivities in all error controls</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>init_xdot</td><td>OT_DOUBLEVECTOR</td><td>Initial values for the state derivatives</td><td>casadi::IdasInterface</td></tr>
 <tr><td>interpolation_type</td><td>OT_STRING</td><td>Type of interpolation for the adjoint sensitivities</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solver</td><td>OT_STRING</td><td>A custom linear solver creator function [default: csparse]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICT</td><td>Options to be passed to the linear solver</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>linear_solver_type</td><td>OT_STRING</td><td>Type of iterative solver: USER_DEFINED|iterative</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_krylov</td><td>OT_INT</td><td>Maximum Krylov subspace size</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_multistep_order</td><td>OT_INT</td><td>Maximum order for the (variable-order) multistep method</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_num_steps</td><td>OT_INT</td><td>Maximum number of integrator steps</td><td>casadi::SundialsInterface</td></tr>
@@ -630,24 +565,6 @@
 <tr><td>steps_per_checkpoint</td><td>OT_INT</td><td>Number of steps between two consecutive checkpoints</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>stop_at_end</td><td>OT_BOOL</td><td>Stop the integrator at the end of the interval</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>suppress_algebraic</td><td>OT_BOOL</td><td>Suppress algebraic variables in the error testing</td><td>casadi::IdasInterface</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition an iterative solver</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
 </table>
 */
@@ -664,15 +581,12 @@
 <tr><td>calc_icB</td><td>OT_BOOL</td><td>Use IDACalcIC to get consistent initial conditions for backwards system [default: equal to calc_ic].</td></tr>
 <tr><td>cj_scaling</td><td>OT_BOOL</td><td>IDAS scaling on cj for the user-defined linear solver module</td></tr>
 <tr><td>disable_internal_warnings</td><td>OT_BOOL</td><td>Disable SUNDIALS internal warning messages</td></tr>
-<tr><td>exact_jacobian</td><td>OT_BOOL</td><td>Use exact Jacobian information</td></tr>
-<tr><td>extra_fsens_calc_ic</td><td>OT_BOOL</td><td>Call calc ic an extra time, with fsens=0</td></tr>
 <tr><td>first_time</td><td>OT_DOUBLE</td><td>First requested time as a fraction of the time interval</td></tr>
 <tr><td>fsens_err_con</td><td>OT_BOOL</td><td>include the forward sensitivities in all error controls</td></tr>
 <tr><td>init_xdot</td><td>OT_DOUBLEVECTOR</td><td>Initial values for the state derivatives</td></tr>
 <tr><td>interpolation_type</td><td>OT_STRING</td><td>Type of interpolation for the adjoint sensitivities</td></tr>
 <tr><td>linear_solver</td><td>OT_STRING</td><td>A custom linear solver creator function [default: csparse]</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICT</td><td>Options to be passed to the linear solver</td></tr>
-<tr><td>linear_solver_type</td><td>OT_STRING</td><td>Type of iterative solver: USER_DEFINED|iterative</td></tr>
 <tr><td>max_krylov</td><td>OT_INT</td><td>Maximum Krylov subspace size</td></tr>
 <tr><td>max_multistep_order</td><td>OT_INT</td><td>Maximum order for the (variable-order) multistep method</td></tr>
 <tr><td>max_num_steps</td><td>OT_INT</td><td>Maximum number of integrator steps</td></tr>
@@ -684,25 +598,6 @@
 <tr><td>steps_per_checkpoint</td><td>OT_INT</td><td>Number of steps between two consecutive checkpoints</td></tr>
 <tr><td>stop_at_end</td><td>OT_BOOL</td><td>Stop the integrator at the end of the interval</td></tr>
 <tr><td>suppress_algebraic</td><td>OT_BOOL</td><td>Suppress algebraic variables in the error testing</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition an iterative solver</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td></tr>
 <tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td></tr>
 </table>
 */
@@ -718,15 +613,12 @@
 <tr><td>calc_icB</td><td>OT_BOOL</td><td>Use IDACalcIC to get consistent initial conditions for backwards system [default: equal to calc_ic].</td><td>casadi::IdasInterface</td></tr>
 <tr><td>cj_scaling</td><td>OT_BOOL</td><td>IDAS scaling on cj for the user-defined linear solver module</td><td>casadi::IdasInterface</td></tr>
 <tr><td>disable_internal_warnings</td><td>OT_BOOL</td><td>Disable SUNDIALS internal warning messages</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>exact_jacobian</td><td>OT_BOOL</td><td>Use exact Jacobian information</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>extra_fsens_calc_ic</td><td>OT_BOOL</td><td>Call calc ic an extra time, with fsens=0</td><td>casadi::IdasInterface</td></tr>
 <tr><td>first_time</td><td>OT_DOUBLE</td><td>First requested time as a fraction of the time interval</td><td>casadi::IdasInterface</td></tr>
 <tr><td>fsens_err_con</td><td>OT_BOOL</td><td>include the forward sensitivities in all error controls</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>init_xdot</td><td>OT_DOUBLEVECTOR</td><td>Initial values for the state derivatives</td><td>casadi::IdasInterface</td></tr>
 <tr><td>interpolation_type</td><td>OT_STRING</td><td>Type of interpolation for the adjoint sensitivities</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solver</td><td>OT_STRING</td><td>A custom linear solver creator function [default: csparse]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICT</td><td>Options to be passed to the linear solver</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>linear_solver_type</td><td>OT_STRING</td><td>Type of iterative solver: USER_DEFINED|iterative</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_krylov</td><td>OT_INT</td><td>Maximum Krylov subspace size</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_multistep_order</td><td>OT_INT</td><td>Maximum order for the (variable-order) multistep method</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_num_steps</td><td>OT_INT</td><td>Maximum number of integrator steps</td><td>casadi::SundialsInterface</td></tr>
@@ -738,25 +630,6 @@
 <tr><td>steps_per_checkpoint</td><td>OT_INT</td><td>Number of steps between two consecutive checkpoints</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>stop_at_end</td><td>OT_BOOL</td><td>Stop the integrator at the end of the interval</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>suppress_algebraic</td><td>OT_BOOL</td><td>Suppress algebraic variables in the error testing</td><td>casadi::IdasInterface</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition an iterative solver</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
 </table>
 */
@@ -2096,14 +1969,12 @@
 <tr><td>abstol</td><td>OT_DOUBLE</td><td>Absolute tolerence for the IVP solution</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>augmented_options</td><td>OT_DICT</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>casadi::Integrator</td></tr>
 <tr><td>disable_internal_warnings</td><td>OT_BOOL</td><td>Disable SUNDIALS internal warning messages</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>exact_jacobian</td><td>OT_BOOL</td><td>Use exact Jacobian information</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::Integrator</td></tr>
 <tr><td>fsens_err_con</td><td>OT_BOOL</td><td>include the forward sensitivities in all error controls</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>grid</td><td>OT_DOUBLEVECTOR</td><td>Time grid</td><td>casadi::Integrator</td></tr>
 <tr><td>interpolation_type</td><td>OT_STRING</td><td>Type of interpolation for the adjoint sensitivities</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solver</td><td>OT_STRING</td><td>A custom linear solver creator function [default: csparse]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICT</td><td>Options to be passed to the linear solver</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>linear_solver_type</td><td>OT_STRING</td><td>Type of iterative solver: USER_DEFINED|iterative</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_krylov</td><td>OT_INT</td><td>Maximum Krylov subspace size</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_multistep_order</td><td>OT_INT</td><td>Maximum order for the (variable-order) multistep method</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_num_steps</td><td>OT_INT</td><td>Maximum number of integrator steps</td><td>casadi::SundialsInterface</td></tr>
@@ -2120,24 +1991,6 @@
 <tr><td>stop_at_end</td><td>OT_BOOL</td><td>Stop the integrator at the end of the interval</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>t0</td><td>OT_DOUBLE</td><td>Beginning of the time horizon</td><td>casadi::Integrator</td></tr>
 <tr><td>tf</td><td>OT_DOUBLE</td><td>End of the time horizon</td><td>casadi::Integrator</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition an iterative solver</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
 </table>
 */
@@ -2151,14 +2004,12 @@
 <tr><td>abstol</td><td>OT_DOUBLE</td><td>Absolute tolerence for the IVP solution</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>augmented_options</td><td>OT_DICT</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>casadi::Integrator</td></tr>
 <tr><td>disable_internal_warnings</td><td>OT_BOOL</td><td>Disable SUNDIALS internal warning messages</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>exact_jacobian</td><td>OT_BOOL</td><td>Use exact Jacobian information</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::Integrator</td></tr>
 <tr><td>fsens_err_con</td><td>OT_BOOL</td><td>include the forward sensitivities in all error controls</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>grid</td><td>OT_DOUBLEVECTOR</td><td>Time grid</td><td>casadi::Integrator</td></tr>
 <tr><td>interpolation_type</td><td>OT_STRING</td><td>Type of interpolation for the adjoint sensitivities</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solver</td><td>OT_STRING</td><td>A custom linear solver creator function [default: csparse]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICT</td><td>Options to be passed to the linear solver</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>linear_solver_type</td><td>OT_STRING</td><td>Type of iterative solver: USER_DEFINED|iterative</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_krylov</td><td>OT_INT</td><td>Maximum Krylov subspace size</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_multistep_order</td><td>OT_INT</td><td>Maximum order for the (variable-order) multistep method</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_num_steps</td><td>OT_INT</td><td>Maximum number of integrator steps</td><td>casadi::SundialsInterface</td></tr>
@@ -2175,24 +2026,6 @@
 <tr><td>stop_at_end</td><td>OT_BOOL</td><td>Stop the integrator at the end of the interval</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>t0</td><td>OT_DOUBLE</td><td>Beginning of the time horizon</td><td>casadi::Integrator</td></tr>
 <tr><td>tf</td><td>OT_DOUBLE</td><td>End of the time horizon</td><td>casadi::Integrator</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition an iterative solver</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>use_iterative_solver</td><td>OT_BOOL</td><td>Use iterative solver as opposed to a direct solver</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
 </table>
 */
