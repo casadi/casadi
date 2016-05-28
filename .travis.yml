@@ -17,6 +17,7 @@ env:
     - MATLAB_ROOT=/home/travis/build/matlab
     - MATLABRELEASE=R2014b
     - CLANG=/home/travis/build/clang
+    - PKG_CONFIG_PATH=/home/travis/bonmin-install/lib/pkgconfig
 
 before_script:
   - set -e
@@ -254,6 +255,8 @@ before_install:
   - export PATH=/home/travis/build/swig/bin:$PATH
   - pushd testbot/restricted/cplex && mkdir cplex && tar -xf cplex12.4.tar.gz -C cplex && mkdir concert && tar -xf cplex12.4-concert.tar.gz -C concert && rm cplex12.4-concert.tar.gz && popd
   - pushd testbot/restricted && mkdir -p worhp && cd  worhp && 7za e ../libworhp_debian7_amd64_gcc47_1.7-12970f3.7z -y && popd
+  - travis_retry testbot/recipes/fetch.sh bonmin.tar.gz && mkdir bonmin && tar -xvf bonmin.tar.gz -C bonmin
+  - pushd /home/travis/ && ln -s  /home/travis/build/bonmin  bonmin-install  && popd
   - popd
   - sudo add-apt-repository ppa:umn-claoit-rce/compute-packages -y
   - sudo add-apt-repository ppa:nodakai/valgrind -y
