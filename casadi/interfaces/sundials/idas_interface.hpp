@@ -206,7 +206,7 @@ namespace casadi {
     bool calc_icB_;
     bool suppress_algebraic_;
     double max_step_size_;
-    std::vector<double> abstolv_, fsens_abstolv_;
+    std::vector<double> abstolv_;
     double first_time_;
 
     //  Initial values for \p xdot and \p z

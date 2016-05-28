@@ -82,11 +82,9 @@ if(WITH_SUNDIALS AND IPOPT_FOUND)
   target_link_libraries(multiple_shooting_from_scratch casadi)
 endif()
 
-# CSparse via CasADi
-if(WITH_CSPARSE)
-  add_executable(test_csparse_casadi test_csparse_casadi.cpp)
-  target_link_libraries(test_csparse_casadi casadi)
-endif()
+# Solve linear system of equations
+add_executable(test_linsol test_linsol.cpp)
+target_link_libraries(test_linsol casadi)
 
 # Test integrators
 if(WITH_SUNDIALS AND WITH_CSPARSE)

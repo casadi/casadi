@@ -29,6 +29,21 @@
 #include "casadi/core/function/linsol_impl.hpp"
 #include <casadi/interfaces/lapack/casadi_linsol_lapackqr_export.h>
 
+extern "C" {
+  /// QR-factorize dense matrix (lapack)
+  void dgeqrf_(int *m, int *n, double *a, int *lda, double *tau,
+               double *work, int *lwork, int *info);
+
+  /// Multiply right hand side with Q-transpose (lapack)
+  void dormqr_(char *side, char *trans, int *n, int *m, int *k, double *a,
+               int *lda, double *tau, double *c, int *ldc,
+               double *work, int *lwork, int *info);
+
+  /// Solve upper triangular system (lapack)
+  void dtrsm_(char *side, char *uplo, char *transa, char *diag, int *m, int *n,
+                         double *alpha, double *a, int *lda, double *b, int *ldb);
+}
+
 /** \defgroup plugin_Linsol_lapackqr
 *
 * This class solves the linear system <tt>A.x=b</tt> by making an QR factorization of A: \n
@@ -39,20 +54,6 @@
 
 /// \cond INTERNAL
 namespace casadi {
-
-  /// QR-factorize dense matrix (lapack)
-  extern "C" void dgeqrf_(int *m, int *n, double *a, int *lda, double *tau,
-                          double *work, int *lwork, int *info);
-
-  /// Multiply right hand side with Q-transpose (lapack)
-  extern "C" void dormqr_(char *side, char *trans, int *n, int *m, int *k, double *a,
-                          int *lda, double *tau, double *c, int *ldc,
-                          double *work, int *lwork, int *info);
-
-  /// Solve upper triangular system (lapack)
-  extern "C" void dtrsm_(char *side, char *uplo, char *transa, char *diag, int *m, int *n,
-                         double *alpha, double *a, int *lda, double *b, int *ldb);
-
   struct CASADI_LINSOL_LAPACKQR_EXPORT LapackQrMemory {
     // Matrix
     std::vector<double> mat;

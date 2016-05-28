@@ -131,8 +131,8 @@ namespace casadi {
       // Evaluate numerically
       mem_->arg[0] = x;
       mem_->arg[1] = mem_->p;
-      mem_->arg[3] = &obj_factor;
-      mem_->arg[4] = lambda;
+      mem_->arg[2] = &obj_factor;
+      mem_->arg[3] = lambda;
       mem_->res[0] = values;
       if (solver_.calc_function(mem_, "nlp_hess_l")) return false;
       return true;

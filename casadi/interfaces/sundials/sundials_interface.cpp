@@ -51,12 +51,9 @@ namespace casadi {
       {"abstol",
        {OT_DOUBLE,
         "Absolute tolerence for the IVP solution"}},
-      {"use_iterative_solver",
-       {OT_BOOL,
-        "Use iterative solver as opposed to a direct solver"}},
-      {"iterative_solver",
+      {"newton_scheme",
        {OT_STRING,
-        "Iterative solver: GMRES|bcgstab|tfqmr"}},
+        "Linear solver scheme in the Newton method: DIRECT|gmres|bcgstab|tfqmr"}},
       {"max_krylov",
        {OT_INT,
         "Maximum Krylov subspace size"}},
@@ -112,8 +109,7 @@ namespace casadi {
     use_precon_ = true;
     max_krylov_ = 10;
     linear_solver_ = "csparse";
-    use_iterative_solver_ = false;
-    string iterative_solver = "gmres";
+    string newton_scheme = "direct";
     quad_err_con_ = false;
     string interpolation_type = "hermite";
     steps_per_checkpoint_ = 20;
@@ -134,10 +130,8 @@ namespace casadi {
         use_precon_ = op.second;
       } else if (op.first=="max_krylov") {
         max_krylov_ = op.second;
-      } else if (op.first=="use_iterative_solver") {
-        use_iterative_solver_ = op.second;
-      } else if (op.first=="iterative_solver") {
-        iterative_solver = op.second.to_string();
+      } else if (op.first=="newton_scheme") {
+        newton_scheme = op.second.to_string();
       } else if (op.first=="linear_solver") {
         linear_solver_ = op.second.to_string();
       } else if (op.first=="linear_solver_options") {
@@ -155,20 +149,20 @@ namespace casadi {
       }
     }
 
-    // Linear solver for forward integration
-    if (use_iterative_solver_) {
-      if (iterative_solver=="gmres") {
-        itsol_ = SD_GMRES;
-      } else if (iterative_solver=="bcgstab") {
-        itsol_ = SD_BCGSTAB;
-      } else if (iterative_solver=="tfqmr") {
-        itsol_ = SD_TFQMR;
-      } else {
-        casadi_error("Unknown iterative solver: " + iterative_solver);
-      }
+    // Type of Newton scheme
+    if (newton_scheme=="direct") {
+      newton_scheme_ = SD_DIRECT;
+    } else if (newton_scheme=="gmres") {
+      newton_scheme_ = SD_GMRES;
+    } else if (newton_scheme=="bcgstab") {
+      newton_scheme_ = SD_BCGSTAB;
+    } else if (newton_scheme=="tfqmr") {
+      newton_scheme_ = SD_TFQMR;
+    } else {
+      casadi_error("Unknown Newton scheme: " + newton_scheme);
     }
 
-    // interpolation_type
+    // Interpolation_type
     if (interpolation_type=="hermite") {
       interp_ = SD_HERMITE;
     } else if (interpolation_type=="polynomial") {

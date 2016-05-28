@@ -8385,39 +8385,6 @@ experience a dramatic speed-up by using a sparse linear solver:
 | ngs                    |                        | internal warning       |
 |                        |                        | messages               |
 +------------------------+------------------------+------------------------+
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-| exact_jacobian         | OT_BOOL                | Use exact Jacobian     |
-|                        |                        | information            |
-+------------------------+------------------------+------------------------+
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
 | fsens_all_at_once      | OT_BOOL                | Calculate all right    |
 |                        |                        | hand sides of the      |
 |                        |                        | sensitivity equations  |
@@ -8431,9 +8398,6 @@ experience a dramatic speed-up by using a sparse linear solver:
 |                        |                        | for the adjoint        |
 |                        |                        | sensitivities          |
 +------------------------+------------------------+------------------------+
-| iterative_solver       | OT_STRING              | Iterative solver:      |
-|                        |                        | GMRES|bcgstab|tfqmr    |
-+------------------------+------------------------+------------------------+
 | linear_multistep_metho | OT_STRING              | Integrator scheme:     |
 | d                      |                        | BDF|adams              |
 +------------------------+------------------------+------------------------+
@@ -8444,37 +8408,6 @@ experience a dramatic speed-up by using a sparse linear solver:
 | linear_solver_options  | OT_DICT                | Options to be passed   |
 |                        |                        | to the linear solver   |
 +------------------------+------------------------+------------------------+
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-| linear_solver_type     | OT_STRING              | Type of iterative      |
-|                        |                        | solver:                |
-|                        |                        | USER_DEFINED|iterative |
-+------------------------+------------------------+------------------------+
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
 | max_krylov             | OT_INT                 | Maximum Krylov         |
 |                        |                        | subspace size          |
 +------------------------+------------------------+------------------------+
@@ -8484,6 +8417,11 @@ experience a dramatic speed-up by using a sparse linear solver:
 +------------------------+------------------------+------------------------+
 | max_num_steps          | OT_INT                 | Maximum number of      |
 |                        |                        | integrator steps       |
++------------------------+------------------------+------------------------+
+| newton_scheme          | OT_STRING              | Linear solver scheme   |
+|                        |                        | in the Newton method:  |
+|                        |                        | DIRECT|gmres|bcgstab|t |
+|                        |                        | fqmr                   |
 +------------------------+------------------------+------------------------+
 | nonlinear_solver_itera | OT_STRING              | Nonlinear solver type: |
 | tion                   |                        | NEWTON|functional      |
@@ -8507,36 +8445,6 @@ experience a dramatic speed-up by using a sparse linear solver:
 |                        |                        | the end of the         |
 |                        |                        | interval               |
 +------------------------+------------------------+------------------------+
-| use_iterative_solver   | OT_BOOL                | Use iterative solver   |
-|                        |                        | as opposed to a direct |
-|                        |                        | solver                 |
-+------------------------+------------------------+------------------------+
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-=======
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
 | use_preconditioner     | OT_BOOL                | Precondition the       |
 |                        |                        | iterative solver       |
 |                        |                        | [default: true]        |
@@ -8597,49 +8505,9 @@ experience a dramatic speed-up by using a sparse linear solver:
 | ngs                    |                        | internal warning       |
 |                        |                        | messages               |
 +------------------------+------------------------+------------------------+
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-| exact_jacobian         | OT_BOOL                | Use exact Jacobian     |
-|                        |                        | information            |
-+------------------------+------------------------+------------------------+
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-| extra_fsens_calc_ic    | OT_BOOL                | Call calc ic an extra  |
-|                        |                        | time, with fsens=0     |
-+------------------------+------------------------+------------------------+
 | first_time             | OT_DOUBLE              | First requested time   |
 |                        |                        | as a fraction of the   |
 |                        |                        | time interval          |
-+------------------------+------------------------+------------------------+
-| fsens_abstolv          | OT_DOUBLEVECTOR        | Absolute tolerarance   |
-|                        |                        | for each component,    |
-|                        |                        | forward sensitivities  |
 +------------------------+------------------------+------------------------+
 | fsens_err_con          | OT_BOOL                | include the forward    |
 |                        |                        | sensitivities in all   |
@@ -8652,9 +8520,6 @@ experience a dramatic speed-up by using a sparse linear solver:
 |                        |                        | for the adjoint        |
 |                        |                        | sensitivities          |
 +------------------------+------------------------+------------------------+
-| iterative_solver       | OT_STRING              | Iterative solver:      |
-|                        |                        | GMRES|bcgstab|tfqmr    |
-+------------------------+------------------------+------------------------+
 | linear_solver          | OT_STRING              | A custom linear solver |
 |                        |                        | creator function       |
 |                        |                        | [default: csparse]     |
@@ -8662,37 +8527,6 @@ experience a dramatic speed-up by using a sparse linear solver:
 | linear_solver_options  | OT_DICT                | Options to be passed   |
 |                        |                        | to the linear solver   |
 +------------------------+------------------------+------------------------+
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-| linear_solver_type     | OT_STRING              | Type of iterative      |
-|                        |                        | solver:                |
-|                        |                        | USER_DEFINED|iterative |
-+------------------------+------------------------+------------------------+
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
 | max_krylov             | OT_INT                 | Maximum Krylov         |
 |                        |                        | subspace size          |
 +------------------------+------------------------+------------------------+
@@ -8704,6 +8538,11 @@ experience a dramatic speed-up by using a sparse linear solver:
 |                        |                        | integrator steps       |
 +------------------------+------------------------+------------------------+
 | max_step_size          | OT_DOUBLE              | Maximim step size      |
++------------------------+------------------------+------------------------+
+| newton_scheme          | OT_STRING              | Linear solver scheme   |
+|                        |                        | in the Newton method:  |
+|                        |                        | DIRECT|gmres|bcgstab|t |
+|                        |                        | fqmr                   |
 +------------------------+------------------------+------------------------+
 | quad_err_con           | OT_BOOL                | Should the quadratures |
 |                        |                        | affect the step size   |
@@ -8728,36 +8567,6 @@ experience a dramatic speed-up by using a sparse linear solver:
 |                        |                        | variables in the error |
 |                        |                        | testing                |
 +------------------------+------------------------+------------------------+
-| use_iterative_solver   | OT_BOOL                | Use iterative solver   |
-|                        |                        | as opposed to a direct |
-|                        |                        | solver                 |
-+------------------------+------------------------+------------------------+
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-=======
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
 | use_preconditioner     | OT_BOOL                | Precondition the       |
 |                        |                        | iterative solver       |
 |                        |                        | [default: true]        |
@@ -9284,10 +9093,6 @@ Check if the vector is strictly monotone.
 
 ";
 
-%feature("docstring") casadi::dlaqge_ "[INTERNAL]  Equilibrate the system.
-
-";
-
 %feature("docstring") casadi::to_slice "
 
 >  Slice to_slice(IM x, bool ind1=false)
@@ -9303,11 +9108,6 @@ Construct from an index vector (requires is_slice(v) to be true)
 ";
 
 %feature("docstring") casadi::casadi_copy "[INTERNAL]  COPY: y <-x.
-
-";
-
-%feature("docstring") casadi::dgeequ_ "[INTERNAL]  Calculate col and row
-scaling.
 
 ";
 
@@ -9333,11 +9133,6 @@ lookupvector[i]!=-1 <=> v contains i v[lookupvector[i]] == i <=> v contains
 i
 
 Duplicates are treated by looking up last occurrence
-
-";
-
-%feature("docstring") casadi::dormqr_ "[INTERNAL]  Multiply right hand side
-with Q-transpose (lapack)
 
 ";
 
@@ -9387,11 +9182,6 @@ void fname(const real_t* arg, real_t* res) { <FUNCTION_BODY> }
 %feature("docstring") casadi::load_rootfinder "
 
 Explicitly load a plugin dynamically.
-
-";
-
-%feature("docstring") casadi::dgeqrf_ "[INTERNAL]  QR-factorize dense
-matrix (lapack)
 
 ";
 
@@ -10053,11 +9843,6 @@ true)
 
 ";
 
-%feature("docstring") casadi::dtrsm_ "[INTERNAL]   Solve upper triangular
-system (lapack)
-
-";
-
 %feature("docstring") casadi::casadi_axpy "[INTERNAL]  AXPY: y <- a*x + y.
 
 ";
@@ -10224,11 +10009,6 @@ vector * Returns the largest element in absolute value
 
 ";
 
-%feature("docstring") casadi::dgetrf_ "[INTERNAL]  LU-Factorize dense
-matrix (lapack)
-
-";
-
 %feature("docstring") casadi::has_rootfinder "
 
 Check if a particular plugin is available.
@@ -10352,11 +10132,6 @@ Get output scheme name by index.
 
 %feature("docstring") casadi::casadi_trans "[INTERNAL]  TRANS: y <-
 trans(x)
-
-";
-
-%feature("docstring") casadi::dgetrs_ "[INTERNAL]   Solve a system of
-equation using an LU-factorized matrix (lapack)
 
 ";
 
@@ -11420,6 +11195,8 @@ List of plugins
 
 - csparse
 
+- ma27
+
 - lapacklu
 
 - lapackqr
@@ -11462,6 +11239,16 @@ Linsol with CSparse Interface
 
 
 
+
+--------------------------------------------------------------------------------
+
+ma27
+----
+
+
+
+Interface to the sparse direct linear solver MA27 Works for symmetric
+indefinite systems Partly adopted from qpOASES 3.2 Joel Andersson
 
 --------------------------------------------------------------------------------
 
