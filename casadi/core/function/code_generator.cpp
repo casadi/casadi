@@ -368,23 +368,27 @@ namespace casadi {
     s << "  " << lhs << " = " << rhs << ";" << endl;
   }
 
-  void CodeGenerator::print_vector(std::ostream &s, const std::string& name, const vector<int>& v) {
-    s << "static const int " << name << "[] = {";
-    for (int i=0; i<v.size(); ++i) {
-      if (i!=0) s << ", ";
-      s << v[i];
+  std::string CodeGenerator::array(const std::string& type, const std::string& name, int len,
+                                   const std::string& def) {
+    std::stringstream s;
+    s << type << " ";
+    if (len==0) {
+      s << "*" << name << " = 0";
+    } else {
+      s << name << "[" << len << "]";
+      if (!def.empty()) s << " = " << def;
     }
-    s << "};" << endl;
+    s << ";" << endl;
+    return s.str();
+  }
+
+  void CodeGenerator::print_vector(std::ostream &s, const std::string& name, const vector<int>& v) {
+    s << array("static const int", name, v.size(), initializer(v));
   }
 
   void CodeGenerator::print_vector(std::ostream &s, const std::string& name,
                                   const vector<double>& v) {
-    s << "static const real_t " << name << "[] = {";
-    for (int i=0; i<v.size(); ++i) {
-      if (i!=0) s << ", ";
-      s << constant(v[i]);
-    }
-    s << "};" << endl;
+    s << array("static const real_t", name, v.size(), initializer(v));
   }
 
   void CodeGenerator::addInclude(const std::string& new_include, bool relative_path,
@@ -749,6 +753,28 @@ namespace casadi {
         s.flags(fmtfl); // reset current format flags
       }
     }
+    return s.str();
+  }
+
+  std::string CodeGenerator::initializer(const vector<double>& v) {
+    stringstream s;
+    s << "{";
+    for (int i=0; i<v.size(); ++i) {
+      if (i!=0) s << ", ";
+      s << constant(v[i]);
+    }
+    s << "}";
+    return s.str();
+  }
+
+  std::string CodeGenerator::initializer(const vector<int>& v) {
+    stringstream s;
+    s << "{";
+    for (int i=0; i<v.size(); ++i) {
+      if (i!=0) s << ", ";
+      s << v[i];
+    }
+    s << "}";
     return s.str();
   }
 

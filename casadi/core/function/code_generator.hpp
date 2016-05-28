@@ -103,6 +103,10 @@ namespace casadi {
     /** \brief Print a constant in a lossless but compact manner */
     static std::string constant(double v);
 
+    /** \brief Print an intializer */
+    static std::string initializer(const std::vector<double>& v);
+    static std::string initializer(const std::vector<int>& v);
+
     /** \brief Codegen inner product */
     std::string dot(int n, const std::string& x, const std::string& y);
 
@@ -156,6 +160,10 @@ namespace casadi {
 
     /** Get work vector element from index */
     std::string workel(int n) const;
+
+    /** Declare an array */
+    static std::string array(const std::string& type, const std::string& name, int len,
+                             const std::string& def=std::string());
 
     /** \brief  Print int vector to a c file */
     static void print_vector(std::ostream &s, const std::string& name,

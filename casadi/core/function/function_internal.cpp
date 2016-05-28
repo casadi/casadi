@@ -2220,13 +2220,13 @@ namespace casadi {
         sz_w = max(sz_w, static_cast<size_t>(s.size2())); // To be able to copy a row
       }
       sz_w += i_nnz + o_nnz;
-      s << "  int iw[" << sz_iw() << "];" << endl;
-      s << "  real_t w[" << sz_w << "];" << endl;
+      s << "  " << g.array("int", "iw", sz_iw());
+      s << "  " << g.array("real_t", "w", sz_w);
       string fw = "w+" + g.to_string(i_nnz + o_nnz);
 
       // Copy inputs to buffers
       int offset=0;
-      s << "  const real_t* arg[" << n_in << "] = {0};" << endl;
+      s << "  " << g.array("const real_t*", "arg", n_in, "{0}");
       for (int i=0; i<n_in; ++i) {
         std::string p = "argv[" + g.to_string(i) + "]";
         s << "  if (--argc>=0) arg[" << i << "] = "
@@ -2273,8 +2273,8 @@ namespace casadi {
 
       // Work vectors and input and output buffers
       size_t nr = sz_w() + nnz_in() + nnz_out();
-      s << "  int iw[" << sz_iw() << "];" << endl
-        << "  real_t w[" << nr << "];" << endl;
+      s << "  " << g.array("int", "iw", sz_iw())
+        << "  " << g.array("real_t", "w", nr);
 
       // Input buffers
       s << "  const real_t* arg[" << sz_arg() << "] = {";
