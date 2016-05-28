@@ -9491,14 +9491,9 @@ clp
 
 Interface to Clp solver for sparse Quadratic Programs
 
->List of available options
-
-+----+------+-------------+
-| Id | Type | Description |
-+====+======+=============+
-+----+------+-------------+
-
 --------------------------------------------------------------------------------
+
+
 
 
 
