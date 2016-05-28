@@ -85,7 +85,7 @@ namespace casadi {
   };
 
   /** First order derivatives */
-  class CASADI_EXPORT LinearInterpolantJac : public FunctionInternal {
+  class CASADI_INTERPOLANT_LINEAR_EXPORT LinearInterpolantJac : public FunctionInternal {
   public:
     /// Constructor
     LinearInterpolantJac(const std::string& name) : FunctionInternal(name) {}
