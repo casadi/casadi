@@ -67,7 +67,7 @@ examples_indoc_py:
 
 # No memchecks because it leaks like hell, and is slow
 examples_code_py:
-	python internal/test_py.py '../docs/examples/python' -skipfiles="c_code_generation.py parametric_sensitivities.py reduced_hessian.py lotka_volterra_minlp.py"
+	python internal/test_py.py '../docs/examples/python' -skipfiles="c_code_generation.py parametric_sensitivities.py reduced_hessian.py"
 
 examples_indoc_cpp:
 	python internal/test_cpp.py '../docs/api/examples' $(MEMCHECK)
