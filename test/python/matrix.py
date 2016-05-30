@@ -982,6 +982,11 @@ class Matrixtests(casadiTestCase):
     self.checkarray(inv_skew(skew(x)),x)
     y = DM([0.2,0.9,0.4])
     self.checkarray(mtimes(skew(x),y),cross(x,y))
+    
+  def test_nz_overflow(self):
+    d = DM([2,3])
+    r = d.nz[:]
+    self.checkarray(r,d)
 
 if __name__ == '__main__':
     unittest.main()
