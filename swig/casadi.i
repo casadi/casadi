@@ -1429,6 +1429,7 @@ import_array();
       {
         SX tmp, *mt=&tmp;
         if(casadi::to_ptr(p, m ? &mt : 0)) {
+          if (m && !mt->is_scalar()) return false;
           if (m) **m = mt->scalar();
           return true;
         }
