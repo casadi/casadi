@@ -125,7 +125,7 @@ simulated_X = DM.zeros(Nstates,Nsimulation)
 simulated_X[:,0] = DM([1,0]) # Initial state
 t = NP.linspace(0,(Nsimulation-1)*dt,Nsimulation) # Time grid
 simulated_U = DM(cos(t[0:-1])).T # control input for the simulation
-simulated_U[:,Nsimulation/2:] = 0.0
+simulated_U[:,int(Nsimulation/2):] = 0.0
 simulated_W = DM(sigma_w*NP.random.randn(Ndisturbances,Nsimulation-1)) # Process noise for the simulation
 for i in range(Nsimulation-1):
   simulated_X[:,i+1] = phi(simulated_X[:,i], simulated_U[:,i], simulated_W[:,i])
