@@ -66,7 +66,8 @@ namespace casadi {
         "Use Schur Complement Approach [false]"}},
       {"hessian_type",
        {OT_STRING,
-        "Type of Hessian - see qpOASES documentation [UNKNOWN|posdef|semidef|indef|zero|identity]]"}},
+        "Type of Hessian - see qpOASES documentation "
+        "[UNKNOWN|posdef|semidef|indef|zero|identity]]"}},
       {"max_shur",
        {OT_INT,
         "Maximal number of Schur updates [75]"}},
