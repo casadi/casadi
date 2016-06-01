@@ -60,7 +60,16 @@ namespace casadi {
   = {{&Conic::options_},
      {{"sparse",
        {OT_BOOL,
-        "Formulate the QP using sparse matrices. Default: false"}},
+        "Formulate the QP using sparse matrices. [false]"}},
+      {"shur",
+       {OT_BOOL,
+        "Use Schur Complement Approach [false]"}},
+      {"hessian_type",
+       {OT_STRING,
+        "Type of Hessian - see qpOASES documentation [UNKNOWN|posdef|semidef|indef|zero|identity]]"}},
+      {"max_shur",
+       {OT_INT,
+        "Maximal number of Schur updates [75]"}},
       {"nWSR",
        {OT_INT,
         "The maximum number of working set recalculations to be performed during "
@@ -167,6 +176,9 @@ namespace casadi {
 
     // Default options
     sparse_ = false;
+    shur_ = false;
+    hess_ = qpOASES::HessianType::HST_UNKNOWN;
+    max_shur_ = 75;
     max_nWSR_ = 5 *(nx_ + na_);
     max_cputime_ = -1;
     ops_.setToDefault();
@@ -175,6 +187,27 @@ namespace casadi {
     for (auto&& op : opts) {
       if (op.first=="sparse") {
         sparse_ = op.second;
+      } else if (op.first=="shur") {
+        shur_=  op.second;
+      } else if (op.first=="hessian_type") {
+        string h = op.second;
+        if (h=="unknown") {
+          hess_ = qpOASES::HessianType::HST_UNKNOWN;
+        } else if (h=="posdef") {
+          hess_ = qpOASES::HessianType::HST_POSDEF;
+        } else if (h=="semidef") {
+          hess_ = qpOASES::HessianType::HST_SEMIDEF;
+        } else if (h=="indef") {
+          hess_ = qpOASES::HessianType::HST_INDEF;
+        } else if (h=="zero") {
+          hess_ = qpOASES::HessianType::HST_ZERO;
+        } else if (h=="identity") {
+          hess_ = qpOASES::HessianType::HST_IDENTITY;
+        } else {
+          casadi_error("Unknown Hessian type \"" + h + "\"");
+        }
+      } else if (op.first=="max_shur") {
+        max_shur_ = op.second;
       } else if (op.first=="nWSR") {
         max_nWSR_ = op.second;
       } else if (op.first=="CPUtime") {
@@ -260,10 +293,12 @@ namespace casadi {
 
     // Create qpOASES instance
     if (m->qp) delete m->qp;
-    if (na_==0) {
-      m->qp = new qpOASES::QProblemB(nx_);
+    if (shur_) {
+      m->sqp = new qpOASES::SQProblemSchur(nx_, na_, hess_, max_shur_);
+    } else if (na_==0) {
+      m->qp = new qpOASES::QProblemB(nx_, hess_);
     } else {
-      m->sqp = new qpOASES::SQProblem(nx_, na_);
+      m->sqp = new qpOASES::SQProblem(nx_, na_, hess_);
     }
 
     // Pass to qpOASES

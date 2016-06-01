@@ -132,7 +132,10 @@ namespace casadi {
     int max_nWSR_;
     double max_cputime_;
     qpOASES::Options ops_;
+    qpOASES::HessianType hess_;
     bool sparse_;
+    bool shur_;
+    int max_shur_;
     ///@}
 
     /// Throw error
