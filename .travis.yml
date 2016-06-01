@@ -12,7 +12,7 @@ env:
     - ILOG_LICENSE_FILE=/home/travis/build/testbot/restricted/cplex/access.ilm
     - WORHP=/home/travis/build/testbot/restricted/worhp
     - WORHP_LICENSE_FILE=/home/travis/build/testbot/restricted/worhp/unlocked.lic
-    - SNOPT=/home/travis/build/snopt7
+    - SNOPT=/home/travis/build/snopt75
     - MATLABPATH=/home/travis/build/matlab-install
     - MATLAB_ROOT=/home/travis/build/matlab
     - MATLABRELEASE=R2014b
@@ -241,7 +241,7 @@ before_install:
   - travis_retry testbot/recipes/fetch.sh clang.tar.gz && mkdir clang && tar -xf clang.tar.gz -C clang && rm clang.tar.gz
   - travis_retry testbot/recipes/fetch.sh mosek7.tar.bz2 && tar -xf mosek7.tar.bz2 && rm mosek7.tar.bz2
   - git clone https://github.com/embotech/ecos.git && pushd ecos && make && popd
-  - travis_retry testbot/recipes/fetch.sh snopt7.tar.gz && mkdir snopt7 && tar -xf snopt7.tar.gz -C snopt7 && rm snopt7.tar.gz
+  - travis_retry testbot/recipes/fetch.sh snopt75.tar.gz && mkdir snopt75 && tar -xf snopt75.tar.gz -C snopt75 && rm snopt75.tar.gz
   - mkdir -p /home/travis/build/casadi/testbot
   - |
     if [ $NEEDMATLAB ]
