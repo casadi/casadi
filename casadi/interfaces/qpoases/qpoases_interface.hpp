@@ -115,6 +115,18 @@ namespace casadi {
     /// A documentation string
     static const std::string meta_doc;
 
+    /// qpOASES linear solver initialization
+    static int qpoases_init(void* mem, int dim, const int* colind, const int* row);
+
+    /// qpOASES linear solver symbolical factorization
+    static int qpoases_sfact(void* mem, const double* vals);
+
+    /// qpOASES linear solver numerical factorization
+    static int qpoases_nfact(void* mem, const double* vals);
+
+    /// qpOASES linear solver solve
+    static int qpoases_solve(void* mem, int nrhs, double* rhs);
+
   protected:
 
     ///@{

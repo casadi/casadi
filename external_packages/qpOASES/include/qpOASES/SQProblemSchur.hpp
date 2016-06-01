@@ -137,7 +137,7 @@ class SQProblemSchur : public SQProblem
                         linsol_init_t _linsol_init = 0,             /**< Linear solver initialization function */
                         linsol_sfact_t _linsol_sfact = 0,           /**< Linear solver symbolical factorization function */
                         linsol_nfact_t _linsol_nfact = 0,           /**< Linear solver numerical factorization function */
-                        linsol_nfact_t _linsol_solve = 0            /**< Linear solver solve function */
+                        linsol_solve_t _linsol_solve = 0            /**< Linear solver solve function */
                         );
 
         /** Copy constructor (deep copy). */
@@ -470,7 +470,7 @@ class SQProblemSchur : public SQProblem
         linsol_init_t linsol_init;          /**< Linear solver initialization function */
         linsol_sfact_t linsol_sfact;        /**< Linear solver symbolical factorization function */
         linsol_nfact_t linsol_nfact;        /**< Linear solver numerical factorization function */
-        linsol_nfact_t linsol_solve;        /**< Linear solver solve function */
+        linsol_solve_t linsol_solve;        /**< Linear solver solve function */
 };
 
 

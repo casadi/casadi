@@ -72,7 +72,7 @@ SQProblemSchur::SQProblemSchur( ) : SQProblem( )
 #elif defined SOLVER_MA27
     sparseSolver = new Ma27SparseSolver();
 #elif defined SOLVER_NONE
-    sparseSolver = new DummySparseSolver();
+    sparseSolver = new DummySparseSolver(0, 0, 0, 0, 0);
 #endif
 
     nSmax = 0;
@@ -98,7 +98,7 @@ SQProblemSchur::SQProblemSchur( ) : SQProblem( )
  */
 SQProblemSchur::SQProblemSchur( int_t _nV, int_t _nC, HessianType _hessianType, int_t maxSchurUpdates,
   linsol_memory_t _linsol_data, linsol_init_t _linsol_init,
-  linsol_sfact_t _linsol_sfact, linsol_nfact_t _linsol_nfact, linsol_nfact_t _linsol_solve)
+  linsol_sfact_t _linsol_sfact, linsol_nfact_t _linsol_nfact, linsol_solve_t _linsol_solve)
   : SQProblem( _nV,_nC,_hessianType ),
     linsol_data(_linsol_data), linsol_init(_linsol_init),
     linsol_sfact(_linsol_sfact), linsol_nfact(_linsol_nfact), linsol_solve(_linsol_solve) {
@@ -115,7 +115,7 @@ SQProblemSchur::SQProblemSchur( int_t _nV, int_t _nC, HessianType _hessianType, 
 #elif defined SOLVER_MA27
     sparseSolver = new Ma27SparseSolver();
 #elif defined SOLVER_NONE
-    sparseSolver = new DummySparseSolver();
+    sparseSolver = new DummySparseSolver(linsol_data, linsol_init, linsol_sfact, linsol_nfact, linsol_solve);
 #endif
 
     nSmax = maxSchurUpdates;
@@ -163,7 +163,7 @@ SQProblemSchur::SQProblemSchur( const SQProblemSchur& rhs ) : SQProblem( rhs ),
 #elif defined SOLVER_MA27
     sparseSolver = new Ma27SparseSolver();
 #elif defined SOLVER_NONE
-    sparseSolver = new DummySparseSolver();
+    sparseSolver = new DummySparseSolver(linsol_data, linsol_init, linsol_sfact, linsol_nfact, linsol_solve);
 #endif
     copy( rhs );
 }

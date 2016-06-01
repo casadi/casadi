@@ -329,21 +329,21 @@ typedef void* linsol_memory_t;
  */
 typedef int_t (*linsol_init_t)(linsol_memory_t mem,
                                int_t dim,
-                               int_t colind,
-                               int_t row);
+                               const int_t* colind,
+                               const int_t* row);
 
 /** Symbolical factorization function for a user-defined linear solver function
   * Requires knowledge if the numerical values in order to perform e.g.
   * partial pivoting or to eliminate numerical zeros from the sparsity pattern
   */
 typedef int_t (*linsol_sfact_t)(linsol_memory_t mem,
-                                real_t* vals);
+                                const real_t* vals);
 
 /** Numerical factorization function for a user-defined linear solver function
   * Assumes a (not necessarily up-to-date) symbolic factorization is available
   */
 typedef int_t (*linsol_nfact_t)(linsol_memory_t mem,
-                                real_t* vals);
+                                const real_t* vals);
 
 /** Solve a factorized linear system for a user-defined linear solver function
   * Multiple right-hand-sides. The solution overwrites the right-hand-side.

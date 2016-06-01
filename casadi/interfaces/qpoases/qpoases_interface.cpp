@@ -295,7 +295,8 @@ namespace casadi {
     // Create qpOASES instance
     if (m->qp) delete m->qp;
     if (shur_) {
-      m->sqp = new qpOASES::SQProblemSchur(nx_, na_, hess_, max_shur_);
+      m->sqp = new qpOASES::SQProblemSchur(nx_, na_, hess_, max_shur_,
+        mem, qpoases_init, qpoases_sfact, qpoases_nfact, qpoases_solve);
     } else if (na_==0) {
       m->qp = new qpOASES::QProblemB(nx_, hess_);
     } else {
@@ -777,5 +778,36 @@ namespace casadi {
     if (this->h) delete this->h;
     if (this->a) delete this->a;
   }
+
+  int QpoasesInterface::
+  qpoases_init(void* mem, int dim, const int* colind, const int* row) {
+    casadi_assert(mem!=0);
+    QpoasesMemory* m = static_cast<QpoasesMemory*>(mem);
+
+    cout << "dim = " << dim << endl;
+    for (int cc=0; cc<dim; ++cc) {
+      for (int kk=colind[cc]; kk<colind[cc+1]; ++kk) {
+        cout << "(" << row[kk] << ", " << cc << ")" << endl;
+      }
+    }
+
+    return 0;
+  }
+
+  int QpoasesInterface::qpoases_sfact(void* mem, const double* vals) {
+    cout << "qpoases_sfact" << endl;
+    return 0;
+  }
+
+  int QpoasesInterface::qpoases_nfact(void* mem, const double* vals) {
+    cout << "qpoases_nfact" << endl;
+    return 0;
+  }
+
+  int QpoasesInterface::qpoases_solve(void* mem, int nrhs, double* rhs) {
+    cout << "qpoases_solve" << endl;
+    return 0;
+  }
+
 
 } // namespace casadi

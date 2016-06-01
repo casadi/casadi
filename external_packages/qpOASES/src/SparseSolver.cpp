@@ -1070,6 +1070,19 @@ returnValue Ma57SparseSolver::copy(     const Ma57SparseSolver& rhs
 
 #ifdef SOLVER_NONE
 
+DummySparseSolver::DummySparseSolver(linsol_memory_t _linsol_data,
+                                     linsol_init_t _linsol_init,
+                                     linsol_sfact_t _linsol_sfact,
+                                     linsol_nfact_t _linsol_nfact,
+                                     linsol_solve_t _linsol_solve) :
+  linsol_data(_linsol_data),
+  linsol_init(_linsol_init),
+  linsol_sfact(_linsol_sfact),
+  linsol_nfact(_linsol_nfact),
+  linsol_solve(_linsol_solve)
+{
+}
+
 returnValue DummySparseSolver::setMatrixData(   int_t dim, /**< Dimension of the linear system. */
                                                 int_t numNonzeros, /**< Number of nonzeros in the matrix. */
                                                 const int_t* const airn, /**< Row indices for each matrix entry. */
@@ -1077,12 +1090,56 @@ returnValue DummySparseSolver::setMatrixData(   int_t dim, /**< Dimension of the
                                                 const real_t* const avals /**< Values for each matrix entry. */
                                                 )
 {
-    return THROWERROR(RET_NO_SPARSE_SOLVER);
+  // No user-defined linear solver
+  MyPrintf("here1!\n");
+  if (linsol_init==0) return THROWERROR(RET_NO_SPARSE_SOLVER);
+
+  // Sparsity pattern in compressed column format
+  int_t* colind = new int_t[dim+1];
+  int_t* row = new int_t[numNonzeros];
+
+  // Loop over columns
+  colind[0] = 0;
+  int_t k = 0;
+  for (int_t i=0; i<dim; ++i) {
+    // Loop over nonzeros of the column
+    while (acjn[i]-1==k) {
+      row[k] = airn[k]-1;
+      k++;
+    }
+    // Make sure nonzeros are ordered column-wise
+    if (acjn[i]-1<k) {
+      delete[] colind;
+      delete[] row;
+      return THROWERROR(RET_MATRIX_FACTORISATION_FAILED);
+    }
+    // Update column offset
+    colind[k+1] = k;
+  }
+
+  // Call initialization function
+  if (linsol_init(linsol_data, dim, colind, row)) {
+    delete[] colind;
+    delete[] row;
+    return THROWERROR(RET_MATRIX_FACTORISATION_FAILED);
+  }
+
+  // Free temporary memory
+  delete[] colind;
+  delete[] row;
+
+  return SUCCESSFUL_RETURN;
 }
 
 returnValue DummySparseSolver::factorize( )
 {
-    return THROWERROR(RET_NO_SPARSE_SOLVER);
+  MyPrintf("here2a!\n");
+  // No user-defined linear solver
+  if (linsol_nfact==0) return THROWERROR(RET_NO_SPARSE_SOLVER);
+
+  MyPrintf("here2!\n");
+
+  return SUCCESSFUL_RETURN;
 }
 
 returnValue DummySparseSolver::solve(   int_t dim, /**< Dimension of the linear system. */
@@ -1090,7 +1147,13 @@ returnValue DummySparseSolver::solve(   int_t dim, /**< Dimension of the linear 
                                         real_t* const sol /**< Solution of the linear system. */
                                         )
 {
-    return THROWERROR(RET_NO_SPARSE_SOLVER);
+  MyPrintf("here3a!\n");
+  // No user-defined linear solver
+  if (linsol_solve==0) return THROWERROR(RET_NO_SPARSE_SOLVER);
+
+  MyPrintf("here3!\n");
+
+  return SUCCESSFUL_RETURN;
 }
 
 #endif // SOLVER_NONE
