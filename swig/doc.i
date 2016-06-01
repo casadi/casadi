@@ -12119,6 +12119,12 @@ Interface to QPOases Solver for quadratic programming
 | growFarBounds          | OT_DOUBLE              | Factor to grow far     |
 |                        |                        | bounds.                |
 +------------------------+------------------------+------------------------+
+| hessian_type           | OT_STRING              | Type of Hessian - see  |
+|                        |                        | qpOASES documentation  |
+|                        |                        | [UNKNOWN|posdef|semide |
+|                        |                        | f|indef|zero|identity] |
+|                        |                        | ]                      |
++------------------------+------------------------+------------------------+
 | initialFarBounds       | OT_DOUBLE              | Initial size for far   |
 |                        |                        | bounds.                |
 +------------------------+------------------------+------------------------+
@@ -12138,6 +12144,9 @@ Interface to QPOases Solver for quadratic programming
 |                        |                        | in primal variables in |
 |                        |                        | nonzero curvature      |
 |                        |                        | tests.                 |
++------------------------+------------------------+------------------------+
+| max_shur               | OT_INT                 | Maximal number of      |
+|                        |                        | Schur updates [75]     |
 +------------------------+------------------------+------------------------+
 | nWSR                   | OT_INT                 | The maximum number of  |
 |                        |                        | working set            |
@@ -12159,9 +12168,12 @@ Interface to QPOases Solver for quadratic programming
 |                        |                        | solution, see Section  |
 |                        |                        | 5.7                    |
 +------------------------+------------------------+------------------------+
+| shur                   | OT_BOOL                | Use Schur Complement   |
+|                        |                        | Approach [false]       |
++------------------------+------------------------+------------------------+
 | sparse                 | OT_BOOL                | Formulate the QP using |
 |                        |                        | sparse matrices.       |
-|                        |                        | Default: false         |
+|                        |                        | [false]                |
 +------------------------+------------------------+------------------------+
 | terminationTolerance   | OT_DOUBLE              | Relative termination   |
 |                        |                        | tolerance to stop      |

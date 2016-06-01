@@ -1469,16 +1469,19 @@
 <tr><td>epsRegularisation</td><td>OT_DOUBLE</td><td>Scaling factor of identity matrix used for  Hessian regularisation.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>finalRamping</td><td>OT_DOUBLE</td><td>Final value for ramping strategy.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>growFarBounds</td><td>OT_DOUBLE</td><td>Factor to grow far bounds.</td><td>casadi::QpoasesInterface</td></tr>
+<tr><td>hessian_type</td><td>OT_STRING</td><td>Type of Hessian - see qpOASES documentation [UNKNOWN|posdef|semidef|indef|zero|identity]]</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>initialFarBounds</td><td>OT_DOUBLE</td><td>Initial size for far bounds.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>initialRamping</td><td>OT_DOUBLE</td><td>Start value for ramping strategy.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>initialStatusBounds</td><td>OT_STRING</td><td>Initial status of bounds at first iteration.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>maxDualJump</td><td>OT_DOUBLE</td><td>Maximum allowed jump in dual variables in  linear independence tests.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>maxPrimalJump</td><td>OT_DOUBLE</td><td>Maximum allowed jump in primal variables in  nonzero curvature tests.</td><td>casadi::QpoasesInterface</td></tr>
+<tr><td>max_shur</td><td>OT_INT</td><td>Maximal number of Schur updates [75]</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>nWSR</td><td>OT_INT</td><td>The maximum number of working set recalculations to be performed during the initial homotopy. Default is 5(nx + nc)</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>numRefinementSteps</td><td>OT_INT</td><td>Maximum number of iterative refinement steps.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>numRegularisationSteps</td><td>OT_INT</td><td>Maximum number of successive regularisation steps.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>printLevel</td><td>OT_STRING</td><td>Defines the amount of text output during QP solution, see Section 5.7</td><td>casadi::QpoasesInterface</td></tr>
-<tr><td>sparse</td><td>OT_BOOL</td><td>Formulate the QP using sparse matrices. Default: false</td><td>casadi::QpoasesInterface</td></tr>
+<tr><td>shur</td><td>OT_BOOL</td><td>Use Schur Complement Approach [false]</td><td>casadi::QpoasesInterface</td></tr>
+<tr><td>sparse</td><td>OT_BOOL</td><td>Formulate the QP using sparse matrices. [false]</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>terminationTolerance</td><td>OT_DOUBLE</td><td>Relative termination tolerance to stop homotopy.</td><td>casadi::QpoasesInterface</td></tr>
 </table>
 */
@@ -1510,16 +1513,19 @@
 <tr><td>epsRegularisation</td><td>OT_DOUBLE</td><td>Scaling factor of identity matrix used for  Hessian regularisation.</td></tr>
 <tr><td>finalRamping</td><td>OT_DOUBLE</td><td>Final value for ramping strategy.</td></tr>
 <tr><td>growFarBounds</td><td>OT_DOUBLE</td><td>Factor to grow far bounds.</td></tr>
+<tr><td>hessian_type</td><td>OT_STRING</td><td>Type of Hessian - see qpOASES documentation [UNKNOWN|posdef|semidef|indef|zero|identity]]</td></tr>
 <tr><td>initialFarBounds</td><td>OT_DOUBLE</td><td>Initial size for far bounds.</td></tr>
 <tr><td>initialRamping</td><td>OT_DOUBLE</td><td>Start value for ramping strategy.</td></tr>
 <tr><td>initialStatusBounds</td><td>OT_STRING</td><td>Initial status of bounds at first iteration.</td></tr>
 <tr><td>maxDualJump</td><td>OT_DOUBLE</td><td>Maximum allowed jump in dual variables in  linear independence tests.</td></tr>
 <tr><td>maxPrimalJump</td><td>OT_DOUBLE</td><td>Maximum allowed jump in primal variables in  nonzero curvature tests.</td></tr>
+<tr><td>max_shur</td><td>OT_INT</td><td>Maximal number of Schur updates [75]</td></tr>
 <tr><td>nWSR</td><td>OT_INT</td><td>The maximum number of working set recalculations to be performed during the initial homotopy. Default is 5(nx + nc)</td></tr>
 <tr><td>numRefinementSteps</td><td>OT_INT</td><td>Maximum number of iterative refinement steps.</td></tr>
 <tr><td>numRegularisationSteps</td><td>OT_INT</td><td>Maximum number of successive regularisation steps.</td></tr>
 <tr><td>printLevel</td><td>OT_STRING</td><td>Defines the amount of text output during QP solution, see Section 5.7</td></tr>
-<tr><td>sparse</td><td>OT_BOOL</td><td>Formulate the QP using sparse matrices. Default: false</td></tr>
+<tr><td>shur</td><td>OT_BOOL</td><td>Use Schur Complement Approach [false]</td></tr>
+<tr><td>sparse</td><td>OT_BOOL</td><td>Formulate the QP using sparse matrices. [false]</td></tr>
 <tr><td>terminationTolerance</td><td>OT_DOUBLE</td><td>Relative termination tolerance to stop homotopy.</td></tr>
 </table>
 */
@@ -1551,16 +1557,19 @@
 <tr><td>epsRegularisation</td><td>OT_DOUBLE</td><td>Scaling factor of identity matrix used for  Hessian regularisation.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>finalRamping</td><td>OT_DOUBLE</td><td>Final value for ramping strategy.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>growFarBounds</td><td>OT_DOUBLE</td><td>Factor to grow far bounds.</td><td>casadi::QpoasesInterface</td></tr>
+<tr><td>hessian_type</td><td>OT_STRING</td><td>Type of Hessian - see qpOASES documentation [UNKNOWN|posdef|semidef|indef|zero|identity]]</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>initialFarBounds</td><td>OT_DOUBLE</td><td>Initial size for far bounds.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>initialRamping</td><td>OT_DOUBLE</td><td>Start value for ramping strategy.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>initialStatusBounds</td><td>OT_STRING</td><td>Initial status of bounds at first iteration.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>maxDualJump</td><td>OT_DOUBLE</td><td>Maximum allowed jump in dual variables in  linear independence tests.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>maxPrimalJump</td><td>OT_DOUBLE</td><td>Maximum allowed jump in primal variables in  nonzero curvature tests.</td><td>casadi::QpoasesInterface</td></tr>
+<tr><td>max_shur</td><td>OT_INT</td><td>Maximal number of Schur updates [75]</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>nWSR</td><td>OT_INT</td><td>The maximum number of working set recalculations to be performed during the initial homotopy. Default is 5(nx + nc)</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>numRefinementSteps</td><td>OT_INT</td><td>Maximum number of iterative refinement steps.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>numRegularisationSteps</td><td>OT_INT</td><td>Maximum number of successive regularisation steps.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>printLevel</td><td>OT_STRING</td><td>Defines the amount of text output during QP solution, see Section 5.7</td><td>casadi::QpoasesInterface</td></tr>
-<tr><td>sparse</td><td>OT_BOOL</td><td>Formulate the QP using sparse matrices. Default: false</td><td>casadi::QpoasesInterface</td></tr>
+<tr><td>shur</td><td>OT_BOOL</td><td>Use Schur Complement Approach [false]</td><td>casadi::QpoasesInterface</td></tr>
+<tr><td>sparse</td><td>OT_BOOL</td><td>Formulate the QP using sparse matrices. [false]</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>terminationTolerance</td><td>OT_DOUBLE</td><td>Relative termination tolerance to stop homotopy.</td><td>casadi::QpoasesInterface</td></tr>
 </table>
 */
