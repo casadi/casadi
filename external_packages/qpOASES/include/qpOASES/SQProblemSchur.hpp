@@ -132,7 +132,12 @@ class SQProblemSchur : public SQProblem
         SQProblemSchur( int_t _nV,                                  /**< Number of variables. */
                         int_t _nC,                                  /**< Number of constraints. */
                         HessianType _hessianType = HST_UNKNOWN, /**< Type of Hessian matrix. */
-                        int_t maxSchurUpdates = 75                  /**< Maximal number of Schur updates */
+                        int_t maxSchurUpdates = 75,                 /**< Maximal number of Schur updates */
+                        linsol_memory_t _linsol_data = 0,           /**< Linear solver data */
+                        linsol_init_t _linsol_init = 0,             /**< Linear solver initialization function */
+                        linsol_sfact_t _linsol_sfact = 0,           /**< Linear solver symbolical factorization function */
+                        linsol_nfact_t _linsol_nfact = 0,           /**< Linear solver numerical factorization function */
+                        linsol_nfact_t _linsol_solve = 0            /**< Linear solver solve function */
                         );
 
         /** Copy constructor (deep copy). */
@@ -460,6 +465,12 @@ class SQProblemSchur : public SQProblem
 
         Indexlist boundsFreeStart;          /**< Index list for free bounds when major iteration started. */
         Indexlist constraintsActiveStart;   /**< Index list for active constraints when major iteration started. */
+
+        linsol_memory_t linsol_data;        /**< Linear solver data */
+        linsol_init_t linsol_init;          /**< Linear solver initialization function */
+        linsol_sfact_t linsol_sfact;        /**< Linear solver symbolical factorization function */
+        linsol_nfact_t linsol_nfact;        /**< Linear solver numerical factorization function */
+        linsol_nfact_t linsol_solve;        /**< Linear solver solve function */
 };
 
 
