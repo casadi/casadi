@@ -64,7 +64,7 @@ namespace casadi {
         "Options to be passed to SNOPT"}},
       {"start",
        {OT_STRING,
-        "Warm-start options for Worhp: cold|warm|hot"}},
+        "Warm-start options for Worhp: cold|warm|hot"}}
      }
   };
 
