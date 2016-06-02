@@ -72,6 +72,9 @@ namespace casadi {
     // Call the init method of the base class
     Nlpsol::init(opts);
 
+    // Default: cold start
+    Cold_ = 0;
+
     // Read user options
     for (auto&& op : opts) {
       if (op.first=="snopt") {
