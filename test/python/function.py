@@ -931,5 +931,286 @@ class Functiontests(casadiTestCase):
     self.assertTrue(same(F([-.6, 2.5]), 24.4))
     self.assertTrue(same(F([-.6, 3.5]), 34.4))
 
+
+  def test_Callback_Jacobian(self):
+    x = MX.sym("x")
+    y = MX.sym("y")
+
+    num_inputs = [0.2,0.7]
+
+    g = Function("g", [x,y],[sin(x+3*y)])
+
+    class Fun(Callback):
+        # sin(x+3*y)
+
+        def __init__(self):
+          Callback.__init__(self)
+          self.construct("Fun", {})
+        def get_n_in(self): return 2
+        def get_n_out(self): return 1
+
+        def eval(self,arg):
+          x = arg[0]
+          y = arg[1]
+          z0 = 3*y
+          z1 = x+z0
+          z2 = sin(z1)
+          return [z2]
+
+        def get_n_forward(self): return 0
+        def get_n_reverse(self): return 0
+
+        def has_jacobian(self): return True
+
+        def get_jacobian(self, name, opts):
+          x = SX.sym("x")
+          y = SX.sym("y")
+          J = Function(name, [x,y],[horzcat(cos(x+3*y),3*cos(x+3*y))], opts)
+          return J
+
+    f = Fun()
+
+    self.checkfunction(f,g,inputs=num_inputs,fwd=False,adj=False,indirect=False)
+
+
+
+  def test_iteration_Callback(self):
+
+    x=SX.sym("x")
+    y=SX.sym("y")
+
+    f = (1-x)**2+100*(y-x**2)**2
+    nlp={'x':vertcat(x,y), 'f':f,'g':x+y}
+    fcn = Function('f', [x, y], [f])
+
+    class MyCallback(Callback):
+      def __init__(self,nx, ng, np):
+        Callback.__init__(self)
+        self.foo = []
+
+        self.nx = nx
+        self.ng = ng
+        self.np = np
+        self.construct(name, {})
+
+      def get_n_in(self): return nlpsol_n_out()
+      def get_n_out(self): return 1
+
+
+      def get_sparsity_in(self, i):
+        n = nlpsol_out(i)
+        if n=='f':
+          return Sparsity. scalar()
+        elif n in ('x', 'lam_x'):
+          return Sparsity.dense(self.nx)
+        elif n in ('g', 'lam_g'):
+          return Sparsity.dense(self.ng)
+        else:
+          return Sparsity(0,0)
+      def eval(self, arg):
+        self.foo.append(arg)
+        return [0]
+
+    mycallback = MyCallback(2,1,0)
+    opts = {}
+    opts['iteration_callback'] = mycallback
+    opts['ipopt.tol'] = 1e-8
+    opts['ipopt.max_iter'] = 50
+    solver = nlpsol('solver', 'ipopt', nlp, opts)
+    sol = solver(lbx=-10, ubx=10, lbg=-10, ubg=10)
+    self.assertEqual(len(mycallback.foo),solver.stats()["iter_count"]+1)
+
+  def test_Callback(self):
+
+    x = MX.sym("x")
+    y = MX.sym("y")
+
+    num_inputs = [0.2,0.7]
+
+    g = Function("g", [x,y],[sin(x+3*y)])
+
+    # Simple syntax
+    def getP(indirect=True):
+
+      class Fun(Callback):
+
+        def __init__(self):
+          Callback.__init__(self)
+          self.construct("Fun", {})
+        def get_n_in(self): return 2
+        def get_n_out(self): return 1
+
+        def eval(self,arg):
+          x = arg[0]
+          y = arg[1]
+
+          z0 = 3*y
+          z1 = x+z0
+          z2 = sin(z1)
+          return [z2]
+
+      f = Fun()
+      f.__disown__()
+
+      if not indirect:
+        return f
+
+      f = Function("f", [x,y],[f(x,y)])
+
+      return f
+
+    for indirect in [True,False]:
+      f = getP(indirect=indirect)
+      self.checkfunction(f,g,inputs=num_inputs,sens_der=False,jacobian=False,gradient=False,hessian=False,evals=False)
+
+      with self.assertRaises(Exception):
+        f.gradient()
+
+      with self.assertRaises(Exception):
+        f.jacobian()
+
+      with self.assertRaises(Exception):
+        f.derivative()
+
+  def test_Callback_sens(self):
+    x = MX.sym("x")
+    y = MX.sym("y")
+
+    num_inputs = [0.2,0.7]
+
+    g = Function("g", [x,y],[sin(x+3*y)])
+
+    def getP(max_fwd=1,max_adj=1,has_fwd=True,has_adj=True,indirect=True):
+
+      class Fun(Callback):
+        # sin(x+3*y)
+
+        def __init__(self,opts):
+          Callback.__init__(self)
+          self.construct("Fun", opts)
+        def get_n_in(self): return 2
+        def get_n_out(self): return 1
+
+        def eval(self,arg):
+          x = arg[0]
+          y = arg[1]
+          z0 = 3*y
+          z1 = x+z0
+          z2 = sin(z1)
+          return [z2]
+
+        def get_n_forward(self): return max_fwd
+        if has_fwd:
+          def get_forward(self,name,nfwd,opts):
+            class ForwardFun(Callback):
+              # sin(x+3*y)
+
+              def __init__(self):
+                Callback.__init__(self)
+                self.construct(name, {"verbose":True})
+              def get_n_in(self): return 2+1+nfwd*2
+              def get_n_out(self): return nfwd
+
+              def eval(self,arg):
+                assert(max_fwd)
+                x,y = arg[0],arg[1]
+                z = arg[2]
+                seeds = arg[3:]
+
+                z0 = 3*y
+                z1 = x+z0
+                z2 = sin(z1)
+
+                ret = []
+
+                for i in range(3,len(arg),2):
+                  dx = arg[i]
+                  dy = arg[i+1]
+                  dz0 = 3*dy
+                  dz1 = dx+dz0
+                  dz2 = cos(z1)*dz1
+                  ret.append(dz2)
+
+                return ret
+            ffun = ForwardFun()
+            ffun.__disown__()
+            return ffun
+
+        def get_n_reverse(self): return max_adj
+        if has_adj:
+          def get_reverse(self,name,nadj,opts):
+            class BackwardFun(Callback):
+              # sin(x+3*y)
+
+              def __init__(self):
+                Callback.__init__(self)
+                self.construct(name, {"verbose":True})
+              def get_n_in(self): return 2+1+nadj
+              def get_n_out(self): return nadj*2
+
+              def eval(self,arg):
+                assert(max_adj)
+                x,y = arg[0],arg[1]
+                z = arg[2]
+                seeds = arg[3:]
+
+                z0 = 3*y
+                z1 = x+z0
+                z2 = sin(z1)
+
+                ret = []
+
+                for i in range(3,len(arg)):
+                  z_bar = arg[i]
+                  bx = 0
+                  by = 0
+                  bz1 = 0
+                  bz0 = 0
+
+                  bz2 = z_bar
+                  bz1 += bz2*cos(z1)
+                  bx+= bz1;bz0+= bz1
+                  by+= 3*bz0
+                  ret.append(bx)
+                  ret.append(by)
+                return ret
+
+            bfun = BackwardFun()
+            bfun.__disown__()
+            return bfun
+
+      opts = {"verbose":True}
+      f = Fun(opts)
+      f.__disown__()
+
+      if not indirect:
+        return f
+
+      f = Function("f", [x,y],[f(x,y)])
+
+      return f
+
+    for indirect in [True,False]:
+      f = getP(max_fwd=1,max_adj=1,indirect=indirect)
+
+      self.checkfunction(f,g,inputs=num_inputs,sens_der=False,hessian=False,evals=1)
+
+      f = getP(max_fwd=1,max_adj=0,indirect=indirect)
+
+      self.checkfunction(f,g,inputs=num_inputs,sens_der=False,hessian=False,adj=False,evals=1)
+
+      f = getP(max_fwd=0,max_adj=1,indirect=indirect)
+
+      self.checkfunction(f,g,inputs=num_inputs,sens_der=False,hessian=False,fwd=False,evals=1)
+
+
+      f = getP(max_fwd=1,max_adj=0,has_fwd=True,has_adj=False,indirect=indirect)
+
+      self.checkfunction(f,g,inputs=num_inputs,sens_der=False,hessian=False,adj=False,evals=1)
+
+      f = getP(max_fwd=0,max_adj=1,has_fwd=False,has_adj=True,indirect=indirect)
+
+      self.checkfunction(f,g,inputs=num_inputs,sens_der=False,hessian=False,fwd=False,evals=1)
+
 if __name__ == '__main__':
     unittest.main()
