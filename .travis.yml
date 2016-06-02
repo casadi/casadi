@@ -39,14 +39,6 @@ matrix:
         - popd
         - python -c "from casadi.tools import *;loadAllCompiledPlugins()"
         - pushd test && make unittests_py_valgrind && popd
-        - sudo apt-get install python-ipdb graphviz python-lxml texlive-science texlive-latex-base texlive-latex-recommended texlive-latex-extra -y
-        - sudo pip install pydot2
-        # travis-wait seems to stop at 20 mins, regardless if output is being generated
-        - (while true ; do sleep 60 ; echo "ping" ; done ) &
-
-        - pushd test && make trunktesterbot_no_unittests_py && popd
-        - pushd test && make unittests_py_slow && popd
-        - pushd build && make json && popd
       after_success:
         - cd build
         - git clone https://github.com/jgillis/cpp-coveralls.git
