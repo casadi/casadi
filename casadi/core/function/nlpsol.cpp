@@ -282,15 +282,21 @@ namespace casadi {
       // Consistency checks
       casadi_assert(!fcallback_.is_null());
       casadi_assert_message(fcallback_.n_out()==1 && fcallback_.numel_out()==1,
-                            "Callback function must return a scalar");
+                            "Callback function must return a scalar.");
       casadi_assert_message(fcallback_.n_in()==n_out(),
                             "Callback input signature must match the NLP solver output signature");
       for (int i=0; i<n_out(); ++i) {
         casadi_assert_message(fcallback_.size_in(i)==size_out(i),
-                              "Callback function input size mismatch");
+                              "Callback function input size mismatch. " <<
+                              "For argument '" << nlpsol_out(i) << "', callback has shape "
+                              << fcallback_.sparsity_in(i).dim() << " while NLP has " <<
+                              sparsity_out(i).dim() << ".");
         // TODO(@jaeandersson): Wrap fcallback_ in a function with correct sparsity
         casadi_assert_message(fcallback_.sparsity_in(i)==sparsity_out(i),
-                              "Not implemented");
+                              "Callback function input size mismatch. " <<
+                              "For argument " << nlpsol_out(i) << "', callback has shape "
+                              << fcallback_.sparsity_in(i).dim() << " while NLP has " <<
+                              sparsity_out(i).dim() << ".");
       }
 
       // Allocate temporary memory
