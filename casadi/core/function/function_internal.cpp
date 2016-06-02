@@ -2070,7 +2070,7 @@ namespace casadi {
     // Form Jacobian
     MX J;
     {
-      Function tmp("tmp", {arg}, {res}, {{"ad_weight", ad_weight()}});
+      Function tmp("tmp", {arg}, {res}, {{"ad_weight", ad_weight()},{"ad_weight_sp", sp_weight()}});
       J = MX::jac(tmp);
     }
 

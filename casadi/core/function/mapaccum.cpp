@@ -198,7 +198,7 @@ namespace casadi {
     evalGen(arg, res, iw, w, orop);
   }
 
-  void Mapaccum::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
+  void Mapaccum::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
 
     int num_in = f_.n_in(), num_out = f_.n_out();
 
