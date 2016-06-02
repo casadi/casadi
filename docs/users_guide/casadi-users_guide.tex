@@ -2189,8 +2189,8 @@ The derived class consists of the following parts:
   their names using \verb|get_name_in| and \verb|get_name_out|
   and their sparsity patterns \verb|get_sparsity_in| and \verb|get_sparsity_out|.
   \item An optional \verb|init| function called when the construction is complete.
-  \item A function for e.g. numerical and symbolical evaluation, derivative
-  calculation etc.
+  \item A function for numerical evaluation.
+  \item Optional functions for derivatives. You can choose to supply a full Jacobian (\verb|has_jacobian|, \verb|get_jacobian|), or choose to supply forward/reverse sensitivities (\verb|get_n_forward|, \verb|get_forward|,  \verb|get_n_reverse|, \verb|get_reverse|).
 \end{itemize}
 
 For a complete list of functions, see the C++ API documentation for
