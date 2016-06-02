@@ -999,7 +999,7 @@ class Functiontests(casadiTestCase):
       f = Fun()
     except Exception as e:
       s = str(e)
-      print s
+      print(s)
     self.assertTrue("get_sparsity_in" in s)
 
   def test_iteration_Callback(self):
