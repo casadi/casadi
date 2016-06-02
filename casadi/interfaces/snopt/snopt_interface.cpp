@@ -61,7 +61,10 @@ namespace casadi {
   = {{&Nlpsol::options_},
      {{"snopt",
        {OT_DICT,
-        "Options to be passed to SNOPT"}}
+        "Options to be passed to SNOPT"}},
+      {"start",
+       {OT_STRING,
+        "Warm-start options for Worhp: cold|warm|hot"}}
      }
   };
 
@@ -69,10 +72,24 @@ namespace casadi {
     // Call the init method of the base class
     Nlpsol::init(opts);
 
+    // Default: cold start
+    Cold_ = 0;
+
     // Read user options
     for (auto&& op : opts) {
       if (op.first=="snopt") {
         opts_ = op.second;
+      } else if (op.first=="start") {
+        std::string start = op.second.to_string();
+        if (start=="cold") {
+          Cold_ = 0;
+        } else if (start=="warm") {
+          Cold_ = 1;
+        } else if (start=="hot") {
+          Cold_ = 2;
+        } else {
+          casadi_error("Unknown start option: " + start);
+        }
       }
     }
 
@@ -315,8 +332,7 @@ namespace casadi {
     m->fstats.at("mainloop").toc();
 
     // Run SNOPT
-    int Cold = 0;
-    int info = solveC(&prob, Cold, &m->fk);
+    int info = solveC(&prob, Cold_, &m->fk);
     casadi_assert_message(99 != info, "snopt problem set up improperly");
 
     // Negate rc to match CasADi's definition
