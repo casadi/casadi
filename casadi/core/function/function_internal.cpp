@@ -290,6 +290,10 @@ namespace casadi {
         jit_options_ = op.second;
       } else if (op.first=="derivative_of") {
         derivative_of_ = op.second;
+      } else if (op.first=="ad_weight") {
+        ad_weight_ = op.second;
+      } else if (op.first=="ad_weight_sp") {
+        ad_weight_sp_ = op.second;
       }
     }
 
