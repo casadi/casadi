@@ -122,6 +122,18 @@ class CASADI_EXPORT CasadiException : public std::exception {
     throw casadi::CasadiException(ss_internal_.str());                  \
   }
 
+#define casadi_try_return(FCN, OBJ, ...) \
+try { \
+ return OBJ->FCN(__VA_ARGS__);\
+} catch (std::exception& ex) { \
+  std::stringstream ss;\
+  ss << "Error calling \"" CASADI_ASSERT_STR(FCN) "\" for object " << OBJ->name()\
+     << CASADI_ASSERT_WHERE << std::endl\
+     << "-------" << std::endl << \
+     ex.what();\
+  throw casadi::CasadiException(ss.str());\
+}
+
 // This assertion checks for illegal user inputs. It will not be checked if CASADI_NDEBUG is defined
 #define casadi_assert_message(x, msg) \
 { \

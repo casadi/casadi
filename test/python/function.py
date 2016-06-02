@@ -973,6 +973,34 @@ class Functiontests(casadiTestCase):
     self.checkfunction(f,g,inputs=num_inputs,fwd=False,adj=False,indirect=False)
 
 
+  def test_Callback_errors(self):
+
+    class Fun(Callback):
+
+        def __init__(self):
+          Callback.__init__(self)
+          self.construct("Fun", {})
+        def get_n_in(self): return 2
+        def get_n_out(self): return 1
+
+        def get_sparsity_in(i):
+          return 4
+
+        def eval(self,arg):
+          x = arg[0]
+          y = arg[1]
+
+          z0 = 3*y
+          z1 = x+z0
+          z2 = sin(z1)
+          return [z2]
+
+    try:
+      f = Fun()
+    except Exception as e:
+      s = str(e)
+      print s
+    self.assertTrue("get_sparsity_in" in s)
 
   def test_iteration_Callback(self):
 
