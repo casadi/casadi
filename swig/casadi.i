@@ -259,6 +259,9 @@ namespace std {
 %include "stl.i"
 #endif // SWIGXML
 
+// Note: Only from 3.0.0 onwards,
+// DirectorException inherits from std::exception
+#if SWIG_VERSION >= 0x030000
 // Exceptions handling
 %include "exception.i"
 %exception {
@@ -266,7 +269,7 @@ namespace std {
     $action
    } catch(const std::exception& e) {
     SWIG_exception(SWIG_RuntimeError, e.what());
-  }
+   }
 }
 
 // Python sometimes takes an approach to not check, but just try.
@@ -298,14 +301,74 @@ namespace std {
   }
 }
 #endif
+#else
+// Exceptions handling
+%include "exception.i"
+%exception {
+  try {
+    $action
+   } catch(const std::exception& e) {
+    SWIG_exception(SWIG_RuntimeError, e.what());
+   } catch (const Swig::DirectorException& e) {
+    SWIG_exception(SWIG_TypeError, e.getMessage());
+   }
+}
+
+// Python sometimes takes an approach to not check, but just try.
+// It expects a python error to be thrown.
+%exception __int__ {
+  try {
+    $action
+  } catch (const std::exception& e) {
+    SWIG_exception(SWIG_RuntimeError, e.what());
+  } catch (const Swig::DirectorException& e) {
+    SWIG_exception(SWIG_TypeError, e.getMessage());
+  }
+}
+
+#ifdef WITH_PYTHON3
+// See https://github.com/casadi/casadi/issues/701
+// Recent numpys will only catch TypeError or ValueError in printing logic
+%exception __bool__ {
+ try {
+    $action
+  } catch (const std::exception& e) {
+   SWIG_exception(SWIG_TypeError, e.what());
+  } catch (const Swig::DirectorException& e) {
+    SWIG_exception(SWIG_TypeError, e.getMessage());
+  }
+}
+#else
+%exception __nonzero__ {
+ try {
+    $action
+  } catch (const std::exception& e) {
+   SWIG_exception(SWIG_TypeError, e.what());
+  }
+  catch (const Swig::DirectorException& e) {
+    SWIG_exception(SWIG_TypeError, e.getMessage());
+  }
+}
+#endif
+#endif
 
 #ifdef SWIGPYTHON
 %feature("director:except") {
 	if ($error != NULL) {
+	  std::string msg;
     SWIG_PYTHON_THREAD_BEGIN_BLOCK;
+    PyObject *ptype, *pvalue, *ptraceback;
+    PyErr_Fetch(&ptype, &pvalue, &ptraceback);
+    PyObject* msg_py = PyObject_Str(pvalue);
+    char *msg_char = SWIG_Python_str_AsChar(msg_py);
+    msg = msg_char;
+    SWIG_Python_str_DelForPy3(msg_char);
+    Py_DECREF(msg_py);
+    PyErr_Restore(ptype, pvalue, ptraceback);
     PyErr_Print();
     SWIG_PYTHON_THREAD_END_BLOCK;
-		throw Swig::DirectorMethodException();
+
+		Swig::DirectorMethodException::raise(msg.c_str());
 	}
 }
 #endif //SWIGPYTHON

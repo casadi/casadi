@@ -420,7 +420,6 @@ class Functiontests(casadiTestCase):
 
     self.checkarray(out,25)
 
-  @known_bug()
   def test_callback_errors(self):
     class mycallback(Callback):
       def __init__(self, name, opts={}):
@@ -432,12 +431,12 @@ class Functiontests(casadiTestCase):
     foo = mycallback("my_f")
 
     x = MX.sym('x')
-    y = foo([x])
+    y = foo(x)
 
-    f = Function("f",[x],y)
+    f = Function("f",[x],[y])
 
     try:
-      f([3])
+      f(3)
     except Exception as e:
       self.assertTrue("foobar" in str(e))
 
