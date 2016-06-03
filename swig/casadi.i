@@ -3517,6 +3517,14 @@ namespace casadi{
         end
       end
     end
+    function out = full(self)
+      % Wrap this function in a Matlab function that applies 'full' on each output
+      out = @(varargin) subsref(cellfun(@(m) full(m),self.call([varargin num2cell(zeros(1,self.n_in()-length(varargin)))]),'UniformOutput',false),struct('type','{}','subs',{{':'}}));
+    end
+    function out = sparse(self)
+      % Wrap this function in a Matlab function that applies 'sparse' on each output
+      out = @(varargin) subsref(cellfun(@(m) sparse(m),self.call([varargin num2cell(zeros(1,self.n_in()-length(varargin)))]),'UniformOutput',false),struct('type','{}','subs',{{':'}}));
+    end
   %}
  }
 }

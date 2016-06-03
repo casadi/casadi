@@ -206,3 +206,19 @@ A = DM.ones(1,4);
 A(2) = 20;
 A(3:4) = [30,40];
 assert(all(full(A)==[1 20 30 40]))
+
+% Full/sparse Function
+
+x = SX.sym('x',2);
+t = SX.sym('t');
+
+rhs = [x(2);1000*(1 - x(1)^2)*x(2) - x(1)];
+ode = Function('ode',{t,x},{rhs});
+
+[T,X] = ode15s(full(ode),[0 300],[2 0]);
+
+[T,X] = ode15s(sparse(ode),[0 300],[2 0]);
+
+Jode = Function('ode',{t,x},{jacobian(rhs,x)});
+options = odeset('Jacobian',full(Jode));
+[T,X] = ode15s(full(ode),[0 300],[2 0],options);
