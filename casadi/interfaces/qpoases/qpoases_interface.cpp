@@ -71,6 +71,9 @@ namespace casadi {
       {"max_shur",
        {OT_INT,
         "Maximal number of Schur updates [75]"}},
+      {"linsol_plugin",
+       {OT_STRING,
+        "Linear solver plugin"}},
       {"nWSR",
        {OT_INT,
         "The maximum number of working set recalculations to be performed during "
@@ -183,6 +186,7 @@ namespace casadi {
     max_nWSR_ = 5 *(nx_ + na_);
     max_cputime_ = -1;
     ops_.setToDefault();
+    linsol_plugin_ = "ma27";
 
     // Read options
     for (auto&& op : opts) {
@@ -209,6 +213,8 @@ namespace casadi {
         }
       } else if (op.first=="max_shur") {
         max_shur_ = op.second;
+      } else if (op.first=="linsol_plugin") {
+        linsol_plugin_ = op.second;
       } else if (op.first=="nWSR") {
         max_nWSR_ = op.second;
       } else if (op.first=="CPUtime") {
@@ -767,7 +773,7 @@ namespace casadi {
     }
   }
 
-  QpoasesMemory::QpoasesMemory() {
+  QpoasesMemory::QpoasesMemory(const QpoasesInterface& self) : self(self) {
     this->qp = 0;
     this->h = 0;
     this->a = 0;
@@ -780,16 +786,33 @@ namespace casadi {
   }
 
   int QpoasesInterface::
-  qpoases_init(void* mem, int dim, const int* colind, const int* row) {
+  qpoases_init(void* mem, int dim, int nnz, const int* row, const int* col) {
     casadi_assert(mem!=0);
     QpoasesMemory* m = static_cast<QpoasesMemory*>(mem);
 
-    cout << "dim = " << dim << endl;
-    for (int cc=0; cc<dim; ++cc) {
-      for (int kk=colind[cc]; kk<colind[cc+1]; ++kk) {
-        cout << "(" << row[kk] << ", " << cc << ")" << endl;
+    // Start with the provided sparsity pattern (index-1)
+    vector<int> rowv, colv, nz_map;
+    for (int k=0; k<nnz; ++k) {
+      rowv.push_back(row[k]-1);
+      colv.push_back(col[k]-1);
+      nz_map.push_back(k);
+    }
+
+    // Add mirror image
+    for (int k=0; k<nnz; ++k) {
+      if (row[k]!=col[k]) {
+        rowv.push_back(col[k]-1);
+        colv.push_back(row[k]-1);
+        nz_map.push_back(k);
       }
     }
+
+    // Create sparsity pattern
+    Sparsity sp = Sparsity::triplet(dim, dim, rowv, colv, m->lin_map);
+    for (int& e : m->lin_map) e = nz_map[e];
+
+    // Create a linear solver instance
+    m->lin = linsol()
 
     return 0;
   }

@@ -325,12 +325,13 @@ typedef struct {
 typedef void* linsol_memory_t;
 
 /** Initialization function for a user-defined linear solver function
- * Sparsity pattern in compressed column format (upper triangular part only)
+ * Sparsity pattern in sparse triplet format (0-based)
  */
 typedef int_t (*linsol_init_t)(linsol_memory_t mem,
                                int_t dim,
-                               const int_t* colind,
-                               const int_t* row);
+                               int_t nnz,
+                               const int_t* row,
+                               const int_t* col);
 
 /** Symbolical factorization function for a user-defined linear solver function
   * Requires knowledge if the numerical values in order to perform e.g.

@@ -40,7 +40,13 @@ Interface to QPOases Solver for quadratic programming
 /// \cond INTERNAL
 namespace casadi {
 
+  // Forward declaration
+  class QpoasesInterface;
+
   struct CASADI_CONIC_QPOASES_EXPORT QpoasesMemory {
+    // Reference to the function
+    const QpoasesInterface& self;
+
     /// QP Solver
     union {
       qpOASES::SQProblem *sqp;
@@ -54,8 +60,14 @@ namespace casadi {
     /// Has qpOASES been called once?
     bool called_once;
 
+    // Map linear system nonzeros
+    std::vector<int> lin_map;
+
+    // Linear solver instance
+    Function lin;
+
     /// Constructor
-    QpoasesMemory();
+    QpoasesMemory(const QpoasesInterface& self);
 
     /// Destructor
     ~QpoasesMemory();
@@ -101,7 +113,7 @@ namespace casadi {
     virtual void init(const Dict& opts);
 
     /** \brief Create memory block */
-    virtual void* alloc_memory() const { return new QpoasesMemory();}
+    virtual void* alloc_memory() const { return new QpoasesMemory(*this);}
 
     /** \brief Free memory block */
     virtual void free_memory(void *mem) const { delete static_cast<QpoasesMemory*>(mem);}
@@ -116,7 +128,7 @@ namespace casadi {
     static const std::string meta_doc;
 
     /// qpOASES linear solver initialization
-    static int qpoases_init(void* mem, int dim, const int* colind, const int* row);
+    static int qpoases_init(void* mem, int dim, int nnz, const int* row, const int* col);
 
     /// qpOASES linear solver symbolical factorization
     static int qpoases_sfact(void* mem, const double* vals);
@@ -148,6 +160,7 @@ namespace casadi {
     bool sparse_;
     bool shur_;
     int max_shur_;
+    std::string linsol_plugin_;
     ///@}
 
     /// Throw error
