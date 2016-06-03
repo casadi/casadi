@@ -37,7 +37,8 @@ namespace casadi {
   /** Internal class
       @copydoc Linsol_doc
   */
-  class CASADI_EXPORT LinsolInternal : public FunctionInternal, public PluginInterface<LinsolInternal> {
+  class CASADI_EXPORT LinsolInternal
+    : public FunctionInternal, public PluginInterface<LinsolInternal> {
   public:
     /// Constructor
     LinsolInternal(const std::string& name, const Sparsity& sparsity, int nrhs);
