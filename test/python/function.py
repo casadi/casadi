@@ -1002,52 +1002,6 @@ class Functiontests(casadiTestCase):
       print(s)
     self.assertTrue("get_sparsity_in" in s)
 
-  def test_iteration_Callback(self):
-
-    x=SX.sym("x")
-    y=SX.sym("y")
-
-    f = (1-x)**2+100*(y-x**2)**2
-    nlp={'x':vertcat(x,y), 'f':f,'g':x+y}
-    fcn = Function('f', [x, y], [f])
-
-    class MyCallback(Callback):
-      def __init__(self,nx, ng, np):
-        Callback.__init__(self)
-        self.foo = []
-
-        self.nx = nx
-        self.ng = ng
-        self.np = np
-        self.construct(name, {})
-
-      def get_n_in(self): return nlpsol_n_out()
-      def get_n_out(self): return 1
-
-
-      def get_sparsity_in(self, i):
-        n = nlpsol_out(i)
-        if n=='f':
-          return Sparsity. scalar()
-        elif n in ('x', 'lam_x'):
-          return Sparsity.dense(self.nx)
-        elif n in ('g', 'lam_g'):
-          return Sparsity.dense(self.ng)
-        else:
-          return Sparsity(0,0)
-      def eval(self, arg):
-        self.foo.append(arg)
-        return [0]
-
-    mycallback = MyCallback(2,1,0)
-    opts = {}
-    opts['iteration_callback'] = mycallback
-    opts['ipopt.tol'] = 1e-8
-    opts['ipopt.max_iter'] = 50
-    solver = nlpsol('solver', 'ipopt', nlp, opts)
-    sol = solver(lbx=-10, ubx=10, lbg=-10, ubg=10)
-    self.assertEqual(len(mycallback.foo),solver.stats()["iter_count"]+1)
-
   def test_Callback(self):
 
     x = MX.sym("x")
