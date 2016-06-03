@@ -32,7 +32,7 @@ namespace casadi {
 
   extern "C"
   int CASADI_LINSOL_CSPARSECHOLESKY_EXPORT
-  casadi_register_linsol_csparsecholesky(Linsol::Plugin* plugin) {
+  casadi_register_linsol_csparsecholesky(LinsolInternal::Plugin* plugin) {
     plugin->creator = CSparseCholeskyInterface::creator;
     plugin->name = "csparsecholesky";
     plugin->doc = CSparseCholeskyInterface::meta_doc.c_str();
@@ -42,12 +42,12 @@ namespace casadi {
 
   extern "C"
   void CASADI_LINSOL_CSPARSECHOLESKY_EXPORT casadi_load_linsol_csparsecholesky() {
-    Linsol::registerPlugin(casadi_register_linsol_csparsecholesky);
+    LinsolInternal::registerPlugin(casadi_register_linsol_csparsecholesky);
   }
 
   CSparseCholeskyInterface::CSparseCholeskyInterface(const std::string& name,
                                                      const Sparsity& sparsity, int nrhs) :
-    Linsol(name, sparsity, nrhs) {
+    LinsolInternal(name, sparsity, nrhs) {
 
     casadi_assert_message(sparsity.is_symmetric(),
                           "CSparseCholeskyInterface: supplied sparsity must be symmetric, got "
@@ -65,7 +65,7 @@ namespace casadi {
 
   void CSparseCholeskyInterface::init(const Dict& opts) {
     // Call the init method of the base class
-    Linsol::init(opts);
+    LinsolInternal::init(opts);
   }
 
   void CSparseCholeskyInterface::init_memory(void* mem) const {

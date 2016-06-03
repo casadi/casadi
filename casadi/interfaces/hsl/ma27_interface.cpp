@@ -32,7 +32,7 @@ namespace casadi {
 
   extern "C"
   int CASADI_LINSOL_MA27_EXPORT
-  casadi_register_linsol_ma27(Linsol::Plugin* plugin) {
+  casadi_register_linsol_ma27(LinsolInternal::Plugin* plugin) {
     plugin->creator = Ma27Interface::creator;
     plugin->name = "ma27";
     plugin->doc = Ma27Interface::meta_doc.c_str();
@@ -42,12 +42,12 @@ namespace casadi {
 
   extern "C"
   void CASADI_LINSOL_MA27_EXPORT casadi_load_linsol_ma27() {
-    Linsol::registerPlugin(casadi_register_linsol_ma27);
+    LinsolInternal::registerPlugin(casadi_register_linsol_ma27);
   }
 
   Ma27Interface::Ma27Interface(const std::string& name,
                                      const Sparsity& sparsity, int nrhs)
-    : Linsol(name, sparsity, nrhs) {
+    : LinsolInternal(name, sparsity, nrhs) {
   }
 
   Ma27Interface::~Ma27Interface() {
@@ -56,7 +56,7 @@ namespace casadi {
 
   void Ma27Interface::init(const Dict& opts) {
     // Call the init method of the base class
-    Linsol::init(opts);
+    LinsolInternal::init(opts);
 
     // Dimensions
     int N = this->ncol();
@@ -76,7 +76,7 @@ namespace casadi {
     auto m = static_cast<Ma27Memory*>(mem);
 
     // Set work in base classes
-    Linsol::set_work(mem, arg, res, iw, w);
+    LinsolInternal::set_work(mem, arg, res, iw, w);
 
     // Work vectors
     int N = this->ncol();

@@ -26,7 +26,7 @@
 #ifndef CASADI_MA27_INTERFACE_HPP
 #define CASADI_MA27_INTERFACE_HPP
 
-#include "casadi/core/function/linsol_impl.hpp"
+#include "casadi/core/function/linsol_internal.hpp"
 #include <casadi/interfaces/hsl/casadi_linsol_ma27_export.h>
 
 extern "C" {
@@ -111,14 +111,14 @@ namespace casadi {
    * @copydoc Linsol_doc
    * @copydoc plugin_Linsol_ma27
    */
-  class CASADI_LINSOL_MA27_EXPORT Ma27Interface : public Linsol {
+  class CASADI_LINSOL_MA27_EXPORT Ma27Interface : public LinsolInternal {
   public:
 
     // Create a linear solver given a sparsity pattern and a number of right hand sides
     Ma27Interface(const std::string& name, const Sparsity& sp, int nrhs);
 
     /** \brief  Create a new Linsol */
-    static Linsol* creator(const std::string& name, const Sparsity& sp, int nrhs) {
+    static LinsolInternal* creator(const std::string& name, const Sparsity& sp, int nrhs) {
       return new Ma27Interface(name, sp, nrhs);
     }
 

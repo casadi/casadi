@@ -26,7 +26,7 @@
 #ifndef CASADI_LAPACK_LU_HPP
 #define CASADI_LAPACK_LU_HPP
 
-#include "casadi/core/function/linsol_impl.hpp"
+#include "casadi/core/function/linsol_internal.hpp"
 #include <casadi/interfaces/lapack/casadi_linsol_lapacklu_export.h>
 
 extern "C" {
@@ -77,13 +77,13 @@ namespace casadi {
    * @copydoc plugin_Linsol_lapacklu
    *
    */
-  class CASADI_LINSOL_LAPACKLU_EXPORT LapackLu : public Linsol {
+  class CASADI_LINSOL_LAPACKLU_EXPORT LapackLu : public LinsolInternal {
   public:
     // Create a linear solver given a sparsity pattern and a number of right hand sides
     LapackLu(const std::string& name, const Sparsity& sparsity, int nrhs);
 
     /** \brief  Create a new Linsol */
-    static Linsol* creator(const std::string& name, const Sparsity& sp, int nrhs) {
+    static LinsolInternal* creator(const std::string& name, const Sparsity& sp, int nrhs) {
       return new LapackLu(name, sp, nrhs);
     }
 

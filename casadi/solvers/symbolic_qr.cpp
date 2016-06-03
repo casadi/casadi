@@ -34,7 +34,7 @@ namespace casadi {
 
   extern "C"
   int CASADI_LINSOL_SYMBOLICQR_EXPORT
-  casadi_register_linsol_symbolicqr(Linsol::Plugin* plugin) {
+  casadi_register_linsol_symbolicqr(LinsolInternal::Plugin* plugin) {
     plugin->creator = SymbolicQr::creator;
     plugin->name = "symbolicqr";
     plugin->doc = SymbolicQr::meta_doc.c_str();
@@ -44,11 +44,11 @@ namespace casadi {
 
   extern "C"
   void CASADI_LINSOL_SYMBOLICQR_EXPORT casadi_load_linsol_symbolicqr() {
-    Linsol::registerPlugin(casadi_register_linsol_symbolicqr);
+    LinsolInternal::registerPlugin(casadi_register_linsol_symbolicqr);
   }
 
   SymbolicQr::SymbolicQr(const std::string& name, const Sparsity& sparsity, int nrhs) :
-    Linsol(name, sparsity, nrhs) {
+    LinsolInternal(name, sparsity, nrhs) {
   }
 
   SymbolicQr::~SymbolicQr() {
@@ -68,7 +68,7 @@ namespace casadi {
 
   void SymbolicQr::init(const Dict& opts) {
     // Call the base class initializer
-    Linsol::init(opts);
+    LinsolInternal::init(opts);
 
     // Default options
     bool codegen = false;

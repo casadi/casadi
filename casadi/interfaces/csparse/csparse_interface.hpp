@@ -34,7 +34,7 @@
 
 /// \cond INTERNAL
 #include <cs.h>
-#include "casadi/core/function/linsol_impl.hpp"
+#include "casadi/core/function/linsol_internal.hpp"
 #include <casadi/interfaces/csparse/casadi_linsol_csparse_export.h>
 
 namespace casadi {
@@ -58,18 +58,18 @@ namespace casadi {
     bool called_once_;
   };
 
-  /** \brief \pluginbrief{Linsol,csparse}
-   * @copydoc Linsol_doc
-   * @copydoc plugin_Linsol_csparse
+  /** \brief \pluginbrief{LinsolInternal,csparse}
+   * @copydoc LinsolInternal_doc
+   * @copydoc plugin_LinsolInternal_csparse
    */
-  class CASADI_LINSOL_CSPARSE_EXPORT CsparseInterface : public Linsol {
+  class CASADI_LINSOL_CSPARSE_EXPORT CsparseInterface : public LinsolInternal {
   public:
 
     // Create a linear solver given a sparsity pattern and a number of right hand sides
     CsparseInterface(const std::string& name, const Sparsity& sp, int nrhs);
 
-    /** \brief  Create a new Linsol */
-    static Linsol* creator(const std::string& name, const Sparsity& sp, int nrhs) {
+    /** \brief  Create a new LinsolInternal */
+    static LinsolInternal* creator(const std::string& name, const Sparsity& sp, int nrhs) {
       return new CsparseInterface(name, sp, nrhs);
     }
 

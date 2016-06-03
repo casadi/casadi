@@ -31,7 +31,7 @@ namespace casadi {
 
   extern "C"
   int CASADI_LINSOL_LAPACKQR_EXPORT
-  casadi_register_linsol_lapackqr(Linsol::Plugin* plugin) {
+  casadi_register_linsol_lapackqr(LinsolInternal::Plugin* plugin) {
     plugin->creator = LapackQr::creator;
     plugin->name = "lapackqr";
     plugin->doc = LapackQr::meta_doc.c_str();;
@@ -41,12 +41,12 @@ namespace casadi {
 
   extern "C"
   void CASADI_LINSOL_LAPACKQR_EXPORT casadi_load_linsol_lapackqr() {
-    Linsol::registerPlugin(casadi_register_linsol_lapackqr);
+    LinsolInternal::registerPlugin(casadi_register_linsol_lapackqr);
   }
 
   LapackQr::LapackQr(const std::string& name,
                                const Sparsity& sparsity, int nrhs) :
-    Linsol(name, sparsity, nrhs) {
+    LinsolInternal(name, sparsity, nrhs) {
   }
 
   LapackQr::~LapackQr() {
@@ -55,7 +55,7 @@ namespace casadi {
 
   void LapackQr::init(const Dict& opts) {
     // Call the base class initializer
-    Linsol::init(opts);
+    LinsolInternal::init(opts);
 
     // Currently only square matrices tested
     if (ncol()!=nrow()) throw CasadiException("LapackQr::init: currently only "

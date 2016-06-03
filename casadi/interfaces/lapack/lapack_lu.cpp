@@ -31,7 +31,7 @@ namespace casadi {
 
   extern "C"
   int CASADI_LINSOL_LAPACKLU_EXPORT
-  casadi_register_linsol_lapacklu(Linsol::Plugin* plugin) {
+  casadi_register_linsol_lapacklu(LinsolInternal::Plugin* plugin) {
     plugin->creator = LapackLu::creator;
     plugin->name = "lapacklu";
     plugin->doc = LapackLu::meta_doc.c_str();
@@ -41,12 +41,12 @@ namespace casadi {
 
   extern "C"
   void CASADI_LINSOL_LAPACKLU_EXPORT casadi_load_linsol_lapacklu() {
-    Linsol::registerPlugin(casadi_register_linsol_lapacklu);
+    LinsolInternal::registerPlugin(casadi_register_linsol_lapacklu);
   }
 
   LapackLu::LapackLu(const std::string& name,
                                const Sparsity& sparsity, int nrhs)
-    : Linsol(name, sparsity, nrhs) {
+    : LinsolInternal(name, sparsity, nrhs) {
 
     // Default options
     equilibriate_ = true;
@@ -70,7 +70,7 @@ namespace casadi {
 
   void LapackLu::init(const Dict& opts) {
     // Call the base class initializer
-    Linsol::init(opts);
+    LinsolInternal::init(opts);
 
     // Read options
     for (auto&& op : opts) {

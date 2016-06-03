@@ -23,7 +23,7 @@
  */
 
 
-#include "linsol_impl.hpp"
+#include "linsol_internal.hpp"
 #include "../std_vector_tools.hpp"
 #include "../mx/mx_node.hpp"
 #include <typeinfo>
@@ -69,24 +69,24 @@ namespace casadi {
   }
 
   bool has_linsol(const string& name) {
-    return Linsol::hasPlugin(name);
+    return LinsolInternal::hasPlugin(name);
   }
 
   void load_linsol(const string& name) {
-    Linsol::loadPlugin(name);
+    LinsolInternal::loadPlugin(name);
   }
 
   string doc_linsol(const string& name) {
-    return Linsol::getPlugin(name).doc;
+    return LinsolInternal::getPlugin(name).doc;
   }
 
   Function linsol(const std::string& name, const std::string& solver,
                   const Sparsity& sp, int nrhs, const Dict& opts) {
     Function ret;
     if (solver=="none") {
-      ret.assignNode(new Linsol(name, sp, nrhs));
+      ret.assignNode(new LinsolInternal(name, sp, nrhs));
     } else {
-      ret.assignNode(Linsol::getPlugin(solver).creator(name, sp, nrhs));
+      ret.assignNode(LinsolInternal::getPlugin(solver).creator(name, sp, nrhs));
     }
     ret->construct(opts);
     return ret;
@@ -116,16 +116,16 @@ namespace casadi {
     return (*this)->linsol_cholesky(memory(mem), tr);
   }
 
-  Linsol::Linsol(const std::string& name, const Sparsity& sparsity, int nrhs)
+  LinsolInternal::LinsolInternal(const std::string& name, const Sparsity& sparsity, int nrhs)
     : FunctionInternal(name), sparsity_(sparsity), nrhs_(nrhs) {
 
     // Make sure arguments are consistent
     casadi_assert(!sparsity.is_null());
     casadi_assert_message(sparsity.size2()==sparsity.size1(),
-                          "Linsol::init: the matrix must be square but got "
+                          "LinsolInternal::init: the matrix must be square but got "
                           << sparsity.dim());
     casadi_assert_message(!sparsity.is_singular(),
-                          "Linsol::init: singularity - the matrix is structurally "
+                          "LinsolInternal::init: singularity - the matrix is structurally "
                           "rank-deficient. sprank(J)=" << sprank(sparsity)
                           << " (in stead of "<< sparsity.size2() << ")");
 
@@ -136,10 +136,10 @@ namespace casadi {
     neq_ = sparsity.size2();
   }
 
-  Linsol::~Linsol() {
+  LinsolInternal::~LinsolInternal() {
   }
 
-  Sparsity Linsol::get_sparsity_in(int i) {
+  Sparsity LinsolInternal::get_sparsity_in(int i) {
     switch (static_cast<LinsolInput>(i)) {
     case LINSOL_A:
       return sparsity_;
@@ -150,7 +150,7 @@ namespace casadi {
     return Sparsity();
   }
 
-  Sparsity Linsol::get_sparsity_out(int i) {
+  Sparsity LinsolInternal::get_sparsity_out(int i) {
     switch (static_cast<LinsolOutput>(i)) {
     case LINSOL_X:
       return Sparsity::dense(neq_, nrhs_);
@@ -159,13 +159,13 @@ namespace casadi {
     return Sparsity();
   }
 
-  void Linsol::init(const Dict& opts) {
+  void LinsolInternal::init(const Dict& opts) {
     // Call the base class initializer
     FunctionInternal::init(opts);
 
   }
 
-  void Linsol::eval(void* mem, const double** arg, double** res,
+  void LinsolInternal::eval(void* mem, const double** arg, double** res,
                     int* iw, double* w) const {
     // Get inputs and outputs
     const double *A = arg[LINSOL_A];
@@ -200,7 +200,7 @@ namespace casadi {
     linsol_solve(mem, x, nrhs_, false);
   }
 
-  void Linsol::
+  void LinsolInternal::
   linsol_forward(const std::vector<MX>& arg, const std::vector<MX>& res,
                  const std::vector<std::vector<MX> >& fseed,
                  std::vector<std::vector<MX> >& fsens, bool tr) {
@@ -228,7 +228,7 @@ namespace casadi {
     }
   }
 
-  void Linsol::
+  void LinsolInternal::
   linsol_reverse(const std::vector<MX>& arg, const std::vector<MX>& res,
                  const std::vector<std::vector<MX> >& aseed,
                  std::vector<std::vector<MX> >& asens, bool tr) {
@@ -273,7 +273,7 @@ namespace casadi {
     }
   }
 
-  void Linsol::
+  void LinsolInternal::
   linsol_sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem,
                bool tr, int nrhs) {
     // Sparsities
@@ -310,7 +310,7 @@ namespace casadi {
     }
   }
 
-  void Linsol::
+  void LinsolInternal::
   linsol_sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem,
                bool tr, int nrhs) {
     // Sparsities
@@ -349,18 +349,18 @@ namespace casadi {
     }
   }
 
-  void Linsol::linsol_eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem,
+  void LinsolInternal::linsol_eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem,
                              bool tr, int nrhs) {
-    casadi_error("Linsol::eval_sxLinsol not defined for class "
+    casadi_error("LinsolInternal::eval_sxLinsol not defined for class "
                  << typeid(*this).name());
   }
 
-  MX Linsol::linsol_solve(const MX& A, const MX& B, bool tr) {
+  MX LinsolInternal::linsol_solve(const MX& A, const MX& B, bool tr) {
     return A->getSolve(B, tr, shared_from_this<Function>());
   }
 
-  std::map<std::string, Linsol::Plugin> Linsol::solvers_;
+  std::map<std::string, LinsolInternal::Plugin> LinsolInternal::solvers_;
 
-  const std::string Linsol::infix_ = "linsol";
+  const std::string LinsolInternal::infix_ = "linsol";
 
 } // namespace casadi

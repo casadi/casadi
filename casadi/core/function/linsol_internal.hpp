@@ -23,8 +23,8 @@
  */
 
 
-#ifndef CASADI_LINSOL_IMPL_HPP
-#define CASADI_LINSOL_IMPL_HPP
+#ifndef CASADI_LINSOL_INTERNAL_HPP
+#define CASADI_LINSOL_INTERNAL_HPP
 
 #include "linsol.hpp"
 #include "function_internal.hpp"
@@ -37,13 +37,13 @@ namespace casadi {
   /** Internal class
       @copydoc Linsol_doc
   */
-  class CASADI_EXPORT Linsol : public FunctionInternal, public PluginInterface<Linsol> {
+  class CASADI_EXPORT LinsolInternal : public FunctionInternal, public PluginInterface<LinsolInternal> {
   public:
     /// Constructor
-    Linsol(const std::string& name, const Sparsity& sparsity, int nrhs);
+    LinsolInternal(const std::string& name, const Sparsity& sparsity, int nrhs);
 
     /// Destructor
-    virtual ~Linsol();
+    virtual ~LinsolInternal();
 
     ///@{
     /** \brief Number of function inputs and outputs */
@@ -111,7 +111,7 @@ namespace casadi {
     const int* colind() const { return sparsity_in(LINSOL_A).colind();}
 
     // Creator function for internal class
-    typedef Linsol* (*Creator)(const std::string& name, const Sparsity& sp, int nrhs);
+    typedef LinsolInternal* (*Creator)(const std::string& name, const Sparsity& sp, int nrhs);
 
     // No static functions exposed
     struct Exposed{ };
@@ -139,4 +139,4 @@ namespace casadi {
 } // namespace casadi
 /// \endcond
 
-#endif // CASADI_LINSOL_IMPL_HPP
+#endif // CASADI_LINSOL_INTERNAL_HPP

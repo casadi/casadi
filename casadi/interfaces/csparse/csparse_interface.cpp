@@ -31,7 +31,7 @@ namespace casadi {
 
   extern "C"
   int CASADI_LINSOL_CSPARSE_EXPORT
-  casadi_register_linsol_csparse(Linsol::Plugin* plugin) {
+  casadi_register_linsol_csparse(LinsolInternal::Plugin* plugin) {
     plugin->creator = CsparseInterface::creator;
     plugin->name = "csparse";
     plugin->doc = CsparseInterface::meta_doc.c_str();
@@ -41,12 +41,12 @@ namespace casadi {
 
   extern "C"
   void CASADI_LINSOL_CSPARSE_EXPORT casadi_load_linsol_csparse() {
-    Linsol::registerPlugin(casadi_register_linsol_csparse);
+    LinsolInternal::registerPlugin(casadi_register_linsol_csparse);
   }
 
   CsparseInterface::CsparseInterface(const std::string& name,
                                      const Sparsity& sparsity, int nrhs)
-    : Linsol(name, sparsity, nrhs) {
+    : LinsolInternal(name, sparsity, nrhs) {
   }
 
   CsparseInterface::~CsparseInterface() {
@@ -60,7 +60,7 @@ namespace casadi {
 
   void CsparseInterface::init(const Dict& opts) {
     // Call the init method of the base class
-    Linsol::init(opts);
+    LinsolInternal::init(opts);
   }
 
   void CsparseInterface::init_memory(void* mem) const {
