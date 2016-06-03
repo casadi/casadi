@@ -222,3 +222,40 @@ ode = Function('ode',{t,x},{rhs});
 Jode = Function('ode',{t,x},{jacobian(rhs,x)});
 options = odeset('Jacobian',full(Jode));
 [T,X] = ode15s(full(ode),[0 300],[2 0],options);
+
+
+% boolvector typemap
+x = SX.sym('x');
+y = SX.sym('y');
+f = (x-2.6)^2 + (y-3.6)^2;
+nlp = struct('x', [x;y], 'f', f');
+
+if has_nlpsol('bonmin')
+  options = struct;
+  options.discrete = [false,false];
+  solver = nlpsol('solver', 'bonmin', nlp,options);
+  sol = solver('x0',[1 1]);
+
+  assert(all(full(sol.x)==[2.6;3.6]))
+
+  options = struct;
+  options.discrete = [true,false];
+  solver = nlpsol('solver', 'bonmin', nlp,options);
+  sol = solver('x0',[1 1]);
+
+  assert(all(full(sol.x)==[3;3.6]))
+
+  options = struct;
+  options.discrete = [false,true];
+  solver = nlpsol('solver', 'bonmin', nlp,options);
+  sol = solver('x0',[1 1]);
+
+  assert(all(full(sol.x)==[2.6;4]))
+
+  options = struct;
+  options.discrete = [true,true];
+  solver = nlpsol('solver', 'bonmin', nlp,options);
+  sol = solver('x0',[1 1]);
+
+  assert(all(full(sol.x)==[3;4]))
+end

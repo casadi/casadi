@@ -182,7 +182,10 @@ namespace casadi {
 
       // Check type
       casadi_assert_message(op.second.can_cast_to(entry->type),
-                            "Illegal type for " + op.first);
+                            "Illegal type for " + op.first + ": " +
+                            op.second.get_description() +
+                            " cannot be cast to " +
+                            GenericType::get_type_description(entry->type) + ".");
     }
 
     // Initialize the class hierarchy
