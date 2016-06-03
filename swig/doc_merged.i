@@ -4186,9 +4186,6 @@ NULL)
 // File: classcasadi_1_1LinearInterpolantJac.xml
 
 
-// File: classcasadi_1_1Linsol.xml
-
-
 // File: classcasadi_1_1Logger.xml
 %feature("docstring") casadi::Logger "
 
