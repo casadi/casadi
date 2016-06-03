@@ -27,6 +27,8 @@ benchmarks:
 
 python: unittests_py examples_indoc_py examples_code_py user_guide_snippets_py tutorials
 
+matlab: unittests_matlab examples_matlab
+
 python_knownbugs: unittests_py_knownbugs examples_indoc_py examples_code_py user_guide_snippets_py tutorials
 
 cpp: examples_indoc_cpp  examples_code_cpp
@@ -60,6 +62,9 @@ examples_code: examples_code_py examples_code_cpp
 
 unittests_matlab:
 	python internal/test_matlab.py matlab
+
+examples_matlab:
+	python internal/test_matlab.py '../examples/matlab'
 
 # No memchecks because there is a memory leak in SuperLU
 examples_indoc_py:
