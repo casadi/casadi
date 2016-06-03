@@ -30,11 +30,11 @@ using namespace std;
 namespace casadi {
 
   bool has_integrator(const string& name) {
-    return Integrator::hasPlugin(name);
+    return Integrator::has_plugin(name);
   }
 
   void load_integrator(const string& name) {
-    Integrator::loadPlugin(name);
+    Integrator::load_plugin(name);
   }
 
   string doc_integrator(const string& name) {

@@ -188,7 +188,7 @@ assert(all(size(u(1:2,:))==[2 5]));
 assert(all(size(u(1:2,1:3))==[2 3]));
 
 
-if Importer.hasPlugin('clang')
+if Importer.has_plugin('clang')
   x = MX.sym('x');
   F = Function('f',{x},{x^2},struct('jit',true));
 

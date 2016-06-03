@@ -57,12 +57,12 @@ namespace casadi {
     return dynamic_cast<const ImporterInternal*>(ptr)!=0;
   }
 
-  bool Importer::hasPlugin(const std::string& name) {
-    return ImporterInternal::hasPlugin(name);
+  bool Importer::has_plugin(const std::string& name) {
+    return ImporterInternal::has_plugin(name);
   }
 
-  void Importer::loadPlugin(const std::string& name) {
-    ImporterInternal::loadPlugin(name);
+  void Importer::load_plugin(const std::string& name) {
+    ImporterInternal::load_plugin(name);
   }
 
   std::string Importer::doc(const std::string& name) {

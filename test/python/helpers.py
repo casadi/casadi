@@ -624,7 +624,7 @@ class requiresPlugin(object):
 
   def __call__(self,c):
     try:
-      self.att.loadPlugin(self.n)
+      self.att.load_plugin(self.n)
       return c
     except:
       print("Not available %s plugin %s, skipping unittests" % (str(self.att),self.n))

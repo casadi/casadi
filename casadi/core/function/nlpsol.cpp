@@ -31,11 +31,11 @@ using namespace std;
 namespace casadi {
 
   bool has_nlpsol(const string& name) {
-    return Nlpsol::hasPlugin(name);
+    return Nlpsol::has_plugin(name);
   }
 
   void load_nlpsol(const string& name) {
-    Nlpsol::loadPlugin(name);
+    Nlpsol::load_plugin(name);
   }
 
   string doc_nlpsol(const string& name) {

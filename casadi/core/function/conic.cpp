@@ -31,11 +31,11 @@ using namespace std;
 namespace casadi {
 
   bool has_conic(const string& name) {
-    return Conic::hasPlugin(name);
+    return Conic::has_plugin(name);
   }
 
   void load_conic(const string& name) {
-    Conic::loadPlugin(name);
+    Conic::load_plugin(name);
   }
 
   string doc_conic(const string& name) {

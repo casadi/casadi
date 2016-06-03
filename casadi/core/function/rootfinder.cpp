@@ -34,11 +34,11 @@ using namespace std;
 namespace casadi {
 
   bool has_rootfinder(const string& name) {
-    return Rootfinder::hasPlugin(name);
+    return Rootfinder::has_plugin(name);
   }
 
   void load_rootfinder(const string& name) {
-    Rootfinder::loadPlugin(name);
+    Rootfinder::load_plugin(name);
   }
 
   string doc_rootfinder(const string& name) {

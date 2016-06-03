@@ -32,11 +32,11 @@ using namespace std;
 namespace casadi {
 
   bool has_interpolant(const string& name) {
-    return Interpolant::hasPlugin(name);
+    return Interpolant::has_plugin(name);
   }
 
   void load_interpolant(const string& name) {
-    Interpolant::loadPlugin(name);
+    Interpolant::load_plugin(name);
   }
 
   string doc_interpolant(const string& name) {

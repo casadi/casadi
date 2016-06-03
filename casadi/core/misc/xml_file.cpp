@@ -50,8 +50,8 @@ namespace casadi {
     return (*this)->parse(filename);
   }
 
-  void XmlFile::loadPlugin(const std::string& name) {
-    XmlFileInternal::loadPlugin(name);
+  void XmlFile::load_plugin(const std::string& name) {
+    XmlFileInternal::load_plugin(name);
   }
 
   std::string XmlFile::doc(const std::string& name) {

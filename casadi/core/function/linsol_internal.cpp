@@ -69,11 +69,11 @@ namespace casadi {
   }
 
   bool has_linsol(const string& name) {
-    return LinsolInternal::hasPlugin(name);
+    return LinsolInternal::has_plugin(name);
   }
 
   void load_linsol(const string& name) {
-    LinsolInternal::loadPlugin(name);
+    LinsolInternal::load_plugin(name);
   }
 
   string doc_linsol(const string& name) {
