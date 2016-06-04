@@ -3506,6 +3506,34 @@ namespace casadi{
 
 #ifdef SWIGMATLAB
 namespace casadi{
+%extend GenericMatrixCommon {
+  %matlabcode %{
+    function out = sum(self,varargin)
+      if length(varargin)==0
+        if isvector(self)
+          if iscolumn(self)
+            out = sum1(self);
+          else
+            out = sum2(self);
+          end
+        else
+          out = sum1(self);
+        end
+      elseif length(varargin)==1
+        i = varargin{1};
+        if i==1
+          out = sum1(self);
+        elseif i==2
+          out = sum2(self);
+        else
+          error('sum argument (if present) must be 1 or 2');
+        end
+      else
+        error('sum can have at most 1 argument');
+      end
+    end
+  %}
+}
 %extend Function {
   %matlabcode %{
     function varargout = paren(self, varargin)

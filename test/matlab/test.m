@@ -259,3 +259,14 @@ if has_nlpsol('bonmin')
 
   assert(all(full(sol.x)==[3;4]))
 end
+
+data = { [1 3;11 17] , [1 3] , [1;3] 3};
+
+for i=1:numel(data)
+  A = data{i};
+  B = reshape(DM(A),size(A));
+  assert(all(sum(A)==full(sum(B))))
+  assert(all(sum(A,1)==full(sum(B,1))))
+  assert(all(sum(A,2)==full(sum(B,2))))
+end
+
