@@ -30,6 +30,79 @@
 
 namespace casadi {
 
+  // Forward declaration of internal class
+  class LinsolInternal;
+
+  /** \brief Linear solver
+    * Create a solver for linear systems of equations
+    * Solves the linear system A*X = B or A^T*X = B for X
+    * with A square and non-singular
+    *
+    *  If A is structurally singular, an error will be thrown during init.
+    *  If A is numerically singular, the prepare step will fail.
+
+      \generalsection{Linsol}
+      \pluginssection{Linsol}
+
+      \author Joel Andersson
+      \date 2011-2016
+  */
+  class CASADI_EXPORT Linsol : public SharedObject {
+  public:
+
+    /// Default constructor
+    Linsol();
+
+    /// Importer factory
+    explicit Linsol(const std::string& name, const std::string& solver,
+                    const Sparsity& sp, const Dict& opts=Dict());
+
+    /// Access functions of the node
+    LinsolInternal* operator->();
+    const LinsolInternal* operator->() const;
+
+    /// Check if a particular cast is allowed
+    static bool test_cast(const SharedObjectNode* ptr);
+
+    /// Check if a plugin is available
+    static bool has_plugin(const std::string& name);
+
+    /// Explicitly load a plugin dynamically
+    static void load_plugin(const std::string& name);
+
+    /// Get solver specific documentation
+    static std::string doc(const std::string& name);
+
+    /// Query plugin name
+    std::string plugin_name() const;
+
+    /// Create a solve node
+    MX solve(const MX& A, const MX& B, bool tr=false);
+
+#ifndef SWIG
+    // Factorize linear system of equations
+    void factorize(const double* A) const;
+
+    // Solve factorized linear system of equations
+    void solve(double* x, int nrhs=1, bool tr=false) const;
+
+    /** \brief Solve the system of equations <tt>Lx = b</tt>
+        Only when a Cholesky factorization is available
+    */
+    void solveL(double* x, int nrhs, bool tr) const;
+#endif // SWIG
+
+    /** \brief Obtain a symbolic Cholesky factorization
+        Only for Cholesky solvers
+    */
+    Sparsity cholesky_sparsity(bool tr=false) const;
+
+    /** \brief Obtain a numeric Cholesky factorization
+        Only for Cholesky solvers
+     */
+    DM cholesky(bool tr=false) const;
+  };
+
 
   /** \defgroup main_linsol
    * Create a solver for linear systems of equations
