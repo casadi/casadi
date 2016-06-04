@@ -127,8 +127,18 @@ namespace casadi {
     /// This constructor enables implicit type conversion from a numeric type
     Matrix(double val);
 
+#if !(defined(SWIG) && defined(SWIGMATLAB))
     /// Dense matrix constructor with data given as vector of vectors
     explicit Matrix(const std::vector< std::vector<double> >& m);
+
+    /** \brief  Create an expression from a vector  */
+    template<typename A>
+    Matrix(const std::vector<A>& x) : sparsity_(Sparsity::dense(x.size(), 1)),
+      nonzeros_(std::vector<Scalar>(x.size())) {
+        auto x_it = x.begin();
+        for (auto&& d : nonzeros_) d = static_cast<Scalar>(*x_it++);
+    }
+#endif
 
     /** \brief Create a matrix from another matrix with a different entry type
      *  Assumes that the scalar conversion is valid.
@@ -137,14 +147,6 @@ namespace casadi {
     Matrix(const Matrix<A>& x) : sparsity_(x.sparsity()), nonzeros_(std::vector<Scalar>(x.nnz())) {
       auto x_it = x->begin();
       for (auto&& d : nonzeros_) d = static_cast<Scalar>(*x_it++);
-    }
-
-    /** \brief  Create an expression from a vector  */
-    template<typename A>
-    Matrix(const std::vector<A>& x) : sparsity_(Sparsity::dense(x.size(), 1)),
-      nonzeros_(std::vector<Scalar>(x.size())) {
-        auto x_it = x.begin();
-        for (auto&& d : nonzeros_) d = static_cast<Scalar>(*x_it++);
     }
 
 #ifndef SWIG
