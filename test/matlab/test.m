@@ -268,5 +268,18 @@ for i=1:numel(data)
   assert(all(sum(A)==full(sum(B))))
   assert(all(sum(A,1)==full(sum(B,1))))
   assert(all(sum(A,2)==full(sum(B,2))))
+
+  if isvector(A)
+    assert(all(norm(A)==full(norm(B))))
+    assert(all(norm(A,1)==full(norm(B,1))))
+    assert(all(norm(A,2)==full(norm(B,2))))
+    assert(all(norm(A,inf)==full(norm(B,inf))))
+    assert(all(norm(A,'inf')==full(norm(B,'inf'))))
+    assert(all(norm(A,'fro')==full(norm(B,'fro'))))
+  else
+    assert(all(norm(A,'fro')==full(norm(B,'fro'))))
+  end
 end
+
+
 

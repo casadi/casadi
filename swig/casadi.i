@@ -3532,6 +3532,31 @@ namespace casadi{
         error('sum can have at most 1 argument');
       end
     end
+    function out = norm(self,varargin)
+
+      if length(varargin)==0
+        out = norm_2(self);
+      elseif length(varargin)==1
+        i = varargin{1};
+        if i==1
+          out = norm_1(self);
+        elseif i==2
+          out = norm_2(self);
+        elseif i==inf | i=='inf'
+          out = norm_inf(self);
+        elseif i=='fro'
+          out = norm_F(self);
+          return
+        else
+          error('norm argument (if present) must be 1, 2 or inf or fro');
+        end
+      else
+        error('norm can have at most 1 argument');
+      end
+      if ~isvector(self)
+        error('only norms of vectors defined for now. You may try norm_1 norm_2 norm_inf norm_F.');
+      end
+    end
   %}
 }
 %extend Function {
