@@ -4186,6 +4186,254 @@ NULL)
 // File: classcasadi_1_1LinearInterpolantJac.xml
 
 
+// File: classcasadi_1_1Linsol.xml
+%feature("docstring") casadi::Linsol::cholesky "
+
+Obtain a numeric Cholesky factorization Only for Cholesky solvers.
+
+";
+
+%feature("docstring") casadi::Linsol::printPtr "[INTERNAL]  Print the
+pointer to the internal class
+
+";
+
+%feature("docstring") casadi::Linsol::cholesky_sparsity "
+
+Obtain a symbolic Cholesky factorization Only for Cholesky solvers.
+
+";
+
+%feature("docstring") casadi::Linsol::solve "
+
+Create a solve node.
+
+";
+
+%feature("docstring") casadi::Linsol::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
+
+";
+
+%feature("docstring") casadi::Linsol::Linsol "
+
+>  Linsol()
+------------------------------------------------------------------------
+
+Default constructor.
+
+>  Linsol(str name, str solver, Sparsity sp, Dict opts=Dict())
+------------------------------------------------------------------------
+
+Importer factory.
+
+";
+
+%feature("docstring") casadi::Linsol::print "
+
+Print a description of the object.
+
+";
+
+%feature("docstring") casadi::Linsol "
+
+Linear solver Create a solver for linear systems of equations Solves the
+linear system A*X = B or A^T*X = B for X with A square and non- singular.
+
+If A is structurally singular, an error will be thrown during init. If A is
+numerically singular, the prepare step will fail.
+
+General information
+===================
+
+
+
+>Input scheme: casadi::LinsolInput (LINSOL_NUM_IN = 2) []
+
++-----------+-------+----------------------------------------------+
+| Full name | Short |                 Description                  |
++===========+=======+==============================================+
+| LINSOL_A  |       | The square matrix A: sparse, (n x n)         |
++-----------+-------+----------------------------------------------+
+| LINSOL_B  |       | The right-hand-side matrix b: dense, (n x m) |
++-----------+-------+----------------------------------------------+
+
+>Output scheme: casadi::LinsolOutput (LINSOL_NUM_OUT = 1) []
+
++-----------+-------+---------------------------------------------+
+| Full name | Short |                 Description                 |
++===========+=======+=============================================+
+| LINSOL_X  |       | Solution to the linear system of equations. |
++-----------+-------+---------------------------------------------+
+
+List of plugins
+===============
+
+
+
+- csparsecholesky
+
+- csparse
+
+- ma27
+
+- lapacklu
+
+- lapackqr
+
+- symbolicqr
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+Linsol.doc(\"myextraplugin\")
+
+
+
+--------------------------------------------------------------------------------
+
+csparsecholesky
+---------------
+
+
+
+Linsol with CSparseCholesky Interface
+
+--------------------------------------------------------------------------------
+
+
+
+
+
+--------------------------------------------------------------------------------
+
+csparse
+-------
+
+
+
+Linsol with CSparse Interface
+
+--------------------------------------------------------------------------------
+
+
+
+
+
+--------------------------------------------------------------------------------
+
+ma27
+----
+
+
+
+Interface to the sparse direct linear solver MA27 Works for symmetric
+indefinite systems Partly adopted from qpOASES 3.2 Joel Andersson
+
+--------------------------------------------------------------------------------
+
+lapacklu
+--------
+
+
+
+This class solves the linear system A.x=b by making an LU factorization of
+A: A = L.U, with L lower and U upper triangular
+
+>List of available options
+
++------------------------+------------------------+------------------------+
+|           Id           |          Type          |      Description       |
++========================+========================+========================+
+| allow_equilibration_fa | OT_BOOL                | Non-fatal error when   |
+| ilure                  |                        | equilibration fails    |
++------------------------+------------------------+------------------------+
+| equilibration          | OT_BOOL                | Equilibrate the matrix |
++------------------------+------------------------+------------------------+
+
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+
+lapackqr
+--------
+
+
+
+This class solves the linear system A.x=b by making an QR factorization of
+A: A = Q.R, with Q orthogonal and R upper triangular
+
+--------------------------------------------------------------------------------
+
+
+
+
+
+--------------------------------------------------------------------------------
+
+symbolicqr
+----------
+
+
+
+Linsol based on QR factorization with sparsity pattern based reordering
+without partial pivoting
+
+>List of available options
+
++------------------------+------------------------+------------------------+
+|           Id           |          Type          |      Description       |
++========================+========================+========================+
+| codegen                | OT_BOOL                | C-code generation      |
++------------------------+------------------------+------------------------+
+| compiler               | OT_STRING              | Compiler command to be |
+|                        |                        | used for compiling     |
+|                        |                        | generated code         |
++------------------------+------------------------+------------------------+
+
+--------------------------------------------------------------------------------
+
+
+
+Joel Andersson
+
+C++ includes: linsol.hpp ";
+
+%feature("docstring") casadi::Linsol::repr "
+
+Print a representation of the object.
+
+";
+
+%feature("docstring") casadi::Linsol::is_null "
+
+Is a null pointer?
+
+";
+
+%feature("docstring") casadi::Linsol::getDescription "
+
+Return a string with a description (for SWIG)
+
+";
+
+%feature("docstring") casadi::Linsol::plugin_name "
+
+Query plugin name.
+
+";
+
+%feature("docstring") casadi::Linsol::getRepresentation "
+
+Return a string with a representation (for SWIG)
+
+";
+
+
 // File: classcasadi_1_1Logger.xml
 %feature("docstring") casadi::Logger "
 
@@ -5058,16 +5306,16 @@ This constructor enables implicit type conversion from a numeric type.
 
 Dense matrix constructor with data given as vector of vectors.
 
+>  array(Scalar) ([A ] x)
+------------------------------------------------------------------------
+
+Create an expression from a vector.
+
 >  array(Scalar) (array(A) x)
 ------------------------------------------------------------------------
 
 Create a matrix from another matrix with a different entry type Assumes that
 the scalar conversion is valid.
-
->  array(Scalar) ([A ] x)
-------------------------------------------------------------------------
-
-Create an expression from a vector.
 
 >  array(Scalar) ([Scalar ] x)
 
