@@ -49,11 +49,23 @@ namespace casadi {
   Matrix<double> Matrix<double>::
   solve(const Matrix<double>& A, const Matrix<double>& b,
         const string& lsolver, const Dict& dict) {
-    Function mysolver = linsol("tmp", lsolver, A.sparsity(), b.size2(), dict);
-    vector<DM> arg(LINSOL_NUM_IN);
-    arg.at(LINSOL_A) = A;
-    arg.at(LINSOL_B) = b;
-    return mysolver(arg).at(LINSOL_X);
+    // Create solver
+    Function mysolver = linsol("tmp", lsolver, A.sparsity(), 0, dict);
+
+    // Temporary memory
+    vector<const double*> arg(mysolver.sz_arg());
+    vector<double*> res(mysolver.sz_res());
+    vector<int> iw(mysolver.sz_iw());
+    vector<double> w(mysolver.sz_w());
+    mysolver.setup(get_ptr(arg), get_ptr(res), get_ptr(iw), get_ptr(w));
+
+    // Factorize
+    mysolver.linsol_factorize(A.ptr());
+
+    // Solve
+    DM x = densify(b);
+    mysolver.linsol_solve(x.ptr(), x.size2());
+    return x;
   }
 
   template<>

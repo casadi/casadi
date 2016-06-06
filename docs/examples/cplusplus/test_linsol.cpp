@@ -59,6 +59,7 @@ int main(int argc, char *argv[])
   tests.push_back({"lapacklu", UNSYM});
   tests.push_back({"lapackqr", UNSYM});
   tests.push_back({"ma27", SYM});
+  tests.push_back({"symbolicqr", UNSYM});
 
   // Test all combinations
   for (auto s : {UNSYM, SYM, PD}) {
@@ -87,9 +88,17 @@ int main(int argc, char *argv[])
       // Create a solver instance
       Function F = linsol("F", t.solver, A_test.sparsity(), 1);
 
+      // Temporary memory
+      vector<const double*> arg(F.sz_arg());
+      vector<double*> res(F.sz_res());
+      vector<int> iw(F.sz_iw());
+      vector<double> w(F.sz_w());
+      F.setup(get_ptr(arg), get_ptr(res), get_ptr(iw), get_ptr(w));
+
       // Solve
-      DMDict arg = {{"A", A_test}, {"B", b}};
-      DM x = F(arg).at("X");
+      F.linsol_factorize(A_test.ptr());
+      DM x = densify(b);
+      F.linsol_solve(x.ptr(), x.size2());
 
       // Print the solution
       cout << "solution: " << x << " (" <<  t.solver << ")" << endl;
