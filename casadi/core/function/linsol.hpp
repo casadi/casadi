@@ -141,6 +141,9 @@ namespace casadi {
   ///@{
   CASADI_EXPORT Function linsol(const std::string& name, const std::string& solver,
                                 const Sparsity& sp, int nrhs, const Dict& opts=Dict());
+
+  CASADI_EXPORT Function linsol_new(const std::string& name, const std::string& solver,
+                                const Sparsity& sp, int nrhs, const Dict& opts=Dict());
   ///@}
 
   /// Check if a particular plugin is available

@@ -80,6 +80,15 @@ namespace casadi {
     return LinsolInternal::getPlugin(name).doc;
   }
 
+  Function linsol_new(const std::string& name, const std::string& solver,
+                  const Sparsity& sp, int nrhs, const Dict& opts) {
+    Linsol F(name + "_linsol", solver, sp, opts);
+    MX A = MX::sym("A", sp);
+    MX b = MX::sym("b", sp.size2(), nrhs);
+    MX x = F.solve(A, b);
+    return Function(name, {A, b}, {x}, {"A", "B"}, {"X"});
+  }
+
   Function linsol(const std::string& name, const std::string& solver,
                   const Sparsity& sp, int nrhs, const Dict& opts) {
     casadi_assert(nrhs==0);
@@ -91,6 +100,23 @@ namespace casadi {
     }
     ret->construct(opts);
     return ret;
+  }
+
+  DM Function::linsol_solve(const DM& A, const DM& B, bool tr) {
+    // Temporary memory
+    vector<const double*> arg(sz_arg());
+    vector<double*> res(sz_res());
+    vector<int> iw(sz_iw());
+    vector<double> w(sz_w());
+    setup(get_ptr(arg), get_ptr(res), get_ptr(iw), get_ptr(w));
+
+    // Factorize
+    linsol_factorize(A.ptr());
+
+    // Solve
+    DM x = densify(B);
+    linsol_solve(x.ptr(), x.size2());
+    return x;
   }
 
   MX Function::linsol_solve(const MX& A, const MX& B, bool tr) {

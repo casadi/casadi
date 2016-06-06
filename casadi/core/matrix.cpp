@@ -51,21 +51,7 @@ namespace casadi {
         const string& lsolver, const Dict& dict) {
     // Create solver
     Function mysolver = linsol("tmp", lsolver, A.sparsity(), 0, dict);
-
-    // Temporary memory
-    vector<const double*> arg(mysolver.sz_arg());
-    vector<double*> res(mysolver.sz_res());
-    vector<int> iw(mysolver.sz_iw());
-    vector<double> w(mysolver.sz_w());
-    mysolver.setup(get_ptr(arg), get_ptr(res), get_ptr(iw), get_ptr(w));
-
-    // Factorize
-    mysolver.linsol_factorize(A.ptr());
-
-    // Solve
-    DM x = densify(b);
-    mysolver.linsol_solve(x.ptr(), x.size2());
-    return x;
+    return mysolver.linsol_solve(A, b, false);
   }
 
   template<>

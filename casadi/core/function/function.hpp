@@ -1016,6 +1016,9 @@ namespace casadi {
     /// Create a solve node
     MX linsol_solve(const MX& A, const MX& B, bool tr=false);
 
+    /// Solve linear system
+    DM linsol_solve(const DM& A, const DM& B, bool tr=false);
+
 #ifndef SWIG
     /// Get memory object
     void* memory(int ind) const;
