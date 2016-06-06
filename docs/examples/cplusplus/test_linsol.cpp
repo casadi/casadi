@@ -86,14 +86,7 @@ int main(int argc, char *argv[])
       }
 
       // Create a solver instance
-      Function F = linsol("F", t.solver, A_test.sparsity(), 1);
-
-      // Temporary memory
-      vector<const double*> arg(F.sz_arg());
-      vector<double*> res(F.sz_res());
-      vector<int> iw(F.sz_iw());
-      vector<double> w(F.sz_w());
-      F.setup(get_ptr(arg), get_ptr(res), get_ptr(iw), get_ptr(w));
+      Function F = linsol("F", t.solver, A_test.sparsity(), 0);
 
       // Solve
       F.linsol_factorize(A_test.ptr());

@@ -103,13 +103,6 @@ namespace casadi {
   }
 
   DM Function::linsol_solve(const DM& A, const DM& B, bool tr) {
-    // Temporary memory
-    vector<const double*> arg(sz_arg());
-    vector<double*> res(sz_res());
-    vector<int> iw(sz_iw());
-    vector<double> w(sz_w());
-    setup(get_ptr(arg), get_ptr(res), get_ptr(iw), get_ptr(w));
-
     // Factorize
     linsol_factorize(A.ptr());
 

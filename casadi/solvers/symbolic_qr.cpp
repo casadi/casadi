@@ -160,27 +160,29 @@ namespace casadi {
     // Allocate storage for QR factorization
     m->q.resize(fact_fcn_.nnz_out(0));
     m->r.resize(fact_fcn_.nnz_out(1));
+
+    // Allocate work vectors
+    m->arg.resize(sz_arg());
+    m->res.resize(sz_res());
+    m->iw.resize(sz_iw());
+    m->w.resize(sz_w());
   }
 
   void SymbolicQr::set_temp(void* mem, const double** arg, double** res,
                             int* iw, double* w) const {
     auto m = static_cast<SymbolicQrMemory*>(mem);
-    m->arg = arg;
-    m->res = res;
-    m->iw = iw;
-    m->w = w;
   }
 
   void SymbolicQr::linsol_factorize(void* mem, const double* A) const {
     auto m = static_cast<SymbolicQrMemory*>(mem);
 
     // Factorize
-    fill_n(m->arg, fact_fcn_.n_in(), nullptr);
+    fill_n(get_ptr(m->arg), fact_fcn_.n_in(), nullptr);
     m->arg[0] = A;
-    fill_n(m->res, fact_fcn_.n_out(), nullptr);
+    fill_n(get_ptr(m->res), fact_fcn_.n_out(), nullptr);
     m->res[0] = get_ptr(m->q);
     m->res[1] = get_ptr(m->r);
-    fact_fcn_(m->arg, m->res, m->iw, m->w);
+    fact_fcn_(get_ptr(m->arg), get_ptr(m->res), get_ptr(m->iw), get_ptr(m->w));
   }
 
   void SymbolicQr::linsol_solve(void* mem, double* x, int nrhs, bool tr) const {
@@ -190,15 +192,15 @@ namespace casadi {
     const Function& solv = tr ? solv_fcn_T_ : solv_fcn_N_;
 
     // Solve for all right hand sides
-    fill_n(m->arg, solv.n_in(), nullptr);
+    fill_n(get_ptr(m->arg), solv.n_in(), nullptr);
     m->arg[0] = get_ptr(m->q);
     m->arg[1] = get_ptr(m->r);
-    fill_n(m->res, solv.n_out(), nullptr);
+    fill_n(get_ptr(m->res), solv.n_out(), nullptr);
     for (int i=0; i<nrhs; ++i) {
-      copy_n(x, neq_, m->w); // Copy x to a temporary
-      m->arg[2] = m->w;
+      copy_n(x, neq_, get_ptr(m->w)); // Copy x to a temporary
+      m->arg[2] = get_ptr(m->w);
       m->res[0] = x;
-      solv(m->arg, m->res, m->iw, m->w+neq_, 0);
+      solv(get_ptr(m->arg), get_ptr(m->res), get_ptr(m->iw), get_ptr(m->w)+neq_, 0);
       x += neq_;
     }
   }

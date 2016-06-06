@@ -65,7 +65,7 @@ namespace casadi {
     ~Ma27Memory();
 
     /* Work vector for MA27AD */
-    int *iw1;
+    std::vector<int> iw1;
 
     /* Number of nonzeros in the current linear system. */
     int nnz;
@@ -74,10 +74,10 @@ namespace casadi {
     std::vector<double> nz;
 
     /* Row entries of matrix (IRN in MA27) */
-    int* irn;
+    std::vector<int> irn;
 
     /* Column entries of matrix (JCN in MA27) */
-    int* jcn;
+    std::vector<int> jcn;
 
     /* integer control values (ICNRL in MA27) */
     int icntl[30];
@@ -92,7 +92,7 @@ namespace casadi {
     std::vector<double> w;
 
     /* IKEEP in MA27 */
-    int* ikeep;
+    std::vector<int> ikeep;
 
     /* NSTEPS in MA27 */
     int nsteps;

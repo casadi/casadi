@@ -46,10 +46,10 @@ namespace casadi {
   /** \brief Memory for SymbolicQR  */
   struct CASADI_LINSOL_SYMBOLICQR_EXPORT SymbolicQrMemory {
     // Work vectors
-    const double** arg;
-    double** res;
-    int* iw;
-    double* w;
+    std::vector<const double*> arg;
+    std::vector<double*> res;
+    std::vector<int> iw;
+    std::vector<double> w;
 
     // Storage for QR factorization
     std::vector<double> q, r;
