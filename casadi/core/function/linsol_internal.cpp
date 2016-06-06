@@ -82,6 +82,7 @@ namespace casadi {
 
   Function linsol(const std::string& name, const std::string& solver,
                   const Sparsity& sp, int nrhs, const Dict& opts) {
+    casadi_assert(nrhs==0);
     Function ret;
     if (solver=="none") {
       ret.assignNode(new LinsolInternal(name, sp, nrhs));
