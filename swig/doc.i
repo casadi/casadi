@@ -1385,6 +1385,13 @@ Create a solve node.
 
 ";
 
+%feature("docstring")  casadi::Function::linsol_solve(const DM &A, const DM
+&B, bool tr=false) "
+
+Solve linear system.
+
+";
+
 %feature("docstring")  casadi::Callback::eval(const std::vector< DM > &arg)
 "
 
@@ -3491,6 +3498,13 @@ Get output dimension.
 &B, bool tr=false) "
 
 Create a solve node.
+
+";
+
+%feature("docstring")  casadi::Function::linsol_solve(const DM &A, const DM
+&B, bool tr=false) "
+
+Solve linear system.
 
 ";
 
@@ -10660,6 +10674,10 @@ Explicitly load a plugin dynamically.
 [INTERNAL]  SCAL: x <- alpha*x.
 
 ";
+
+%feature("docstring")  casadi::linsol_new(const std::string &name, const
+std::string &solver, const Sparsity &sp, int nrhs, const Dict &opts=Dict())
+" ";
 
 %feature("docstring")  casadi::load_linsol(const std::string &name) "
 

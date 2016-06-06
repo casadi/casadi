@@ -835,7 +835,15 @@ internally
 
 %feature("docstring") casadi::Callback::linsol_solve "
 
+>  MX Function.linsol_solve(MX A, MX B, bool tr=false)
+------------------------------------------------------------------------
+
 Create a solve node.
+
+>  DM Function.linsol_solve(DM A, DM B, bool tr=false)
+------------------------------------------------------------------------
+
+Solve linear system.
 
 ";
 
@@ -2307,7 +2315,15 @@ Get output dimension.
 
 %feature("docstring") casadi::Function::linsol_solve "
 
+>  MX Function.linsol_solve(MX A, MX B, bool tr=false)
+------------------------------------------------------------------------
+
 Create a solve node.
+
+>  DM Function.linsol_solve(DM A, DM B, bool tr=false)
+------------------------------------------------------------------------
+
+Solve linear system.
 
 ";
 
@@ -8251,6 +8267,8 @@ Explicitly load a plugin dynamically.
 %feature("docstring") casadi::casadi_scal "[INTERNAL]  SCAL: x <- alpha*x.
 
 ";
+
+%feature("docstring") casadi::linsol_new "";
 
 %feature("docstring") casadi::load_linsol "
 
