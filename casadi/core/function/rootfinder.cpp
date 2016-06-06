@@ -168,7 +168,7 @@ Function Function::rootfinder_fun() {
     // Get the linear solver creator function
     if (linsol_.is_null()) {
       linsol_ = linsol("linsol", linear_solver,
-                       jac_.sparsity_out(0), 1, linear_solver_options);
+                       jac_.sparsity_out(0), 0, linear_solver_options);
     } else {
       casadi_assert(linsol_.sparsity_in(0)==jac_.sparsity_out(0));
     }
