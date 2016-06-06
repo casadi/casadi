@@ -1638,7 +1638,7 @@ namespace casadi {
   }
 
   MX MX::solve(const MX& a, const MX& b, const std::string& lsolver, const Dict& dict) {
-    Function mysolver = linsol("tmp", lsolver, a.sparsity(), b.size2(), dict);
+    Function mysolver = linsol("tmp", lsolver, a.sparsity(), 0, dict);
     return mysolver.linsol_solve(a, b, false);
   }
 
