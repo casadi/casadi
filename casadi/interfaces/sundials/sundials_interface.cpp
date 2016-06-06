@@ -177,7 +177,7 @@ namespace casadi {
       if (backward && nrx_==0) continue;
 
       // Get Jacobian function
-      Function J, solver;
+      Function J;
       if (ns_==0) {
         J = getJ(backward);
       } else {
@@ -185,20 +185,12 @@ namespace casadi {
         casadi_assert(d!=0);
         if (d->ns_==0) {
           J = d->get_function(backward ? "jacB" : "jacF");
-          solver = d->get_function(backward ? "linsolB" : "linsolF");
         } else {
           J = d->getJ(backward);
         }
       }
       set_function(J);
       alloc_w(J.nnz_out(0), true);
-
-      // Allocate a linear solver
-      if (solver.is_null()) {
-        solver = linsol(backward ? "linsolB" : "linsolF", linear_solver_,
-                        J.sparsity_out(0), 0, linear_solver_options_);
-      }
-      set_function(solver);
     }
 
     // Allocate work vectors
@@ -218,6 +210,14 @@ namespace casadi {
     m->q = N_VNew_Serial(nq_);
     m->rxz = N_VNew_Serial(nrx_+nrz_);
     m->rq = N_VNew_Serial(nrq_);
+
+    // Allocate linear solvers
+    m->linsolF = Linsol("linsolF", linear_solver_,
+                        get_function("jacF").sparsity_out(0), linear_solver_options_);
+    if (nrx_>0) {
+      m->linsolB = Linsol("linsolB", linear_solver_,
+                          get_function("jacB").sparsity_out(0), linear_solver_options_);
+    }
   }
 
   void SundialsInterface::reset(IntegratorMemory* mem, double t, const double* x,

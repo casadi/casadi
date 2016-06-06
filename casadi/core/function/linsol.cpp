@@ -65,6 +65,16 @@ namespace casadi {
     return (*this)->plugin_name();
   }
 
+  DM Linsol::solve(const DM& A, const DM& B, bool tr) {
+    // Factorize
+    factorize(A.ptr());
+
+    // Solve
+    DM x = densify(B);
+    solve(x.ptr(), x.size2());
+    return x;
+  }
+
   MX Linsol::solve(const MX& A, const MX& B, bool tr) {
     return (*this)->linsol_solve(A, B, tr);
   }

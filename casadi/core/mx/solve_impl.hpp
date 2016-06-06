@@ -27,14 +27,14 @@
 #define CASADI_SOLVE_IMPL_HPP
 
 #include "solve.hpp"
-#include "../function/function_internal.hpp"
+#include "../function/linsol_internal.hpp"
 
 using namespace std;
 
 namespace casadi {
 
   template<bool Tr>
-  Solve<Tr>::Solve(const MX& r, const MX& A, const Function& linear_solver) :
+  Solve<Tr>::Solve(const MX& r, const MX& A, const Linsol& linear_solver) :
       linsol_(linear_solver) {
     casadi_assert_message(r.size1() == A.size2(), "Solve::Solve: dimension mismatch.");
     setDependencies(r, A);
@@ -53,9 +53,8 @@ namespace casadi {
   template<bool Tr>
   void Solve<Tr>::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
     if (arg[0]!=res[0]) copy(arg[0], arg[0]+dep(0).nnz(), res[0]);
-    linsol_.setup(arg+2, res+1, iw, w, mem);
-    linsol_.linsol_factorize(arg[1], mem);
-    linsol_.linsol_solve(res[0], dep(0).size2(), Tr, mem);
+    linsol_.factorize(arg[1]);
+    linsol_.solve(res[0], dep(0).size2(), Tr);
   }
 
   template<bool Tr>
@@ -110,22 +109,22 @@ namespace casadi {
 
   template<bool Tr>
   size_t Solve<Tr>::sz_arg() const {
-    return ndep() + linsol_.sz_arg();
+    return ndep() + linsol_->sz_arg();
   }
 
   template<bool Tr>
   size_t Solve<Tr>::sz_res() const {
-    return nout() + linsol_.sz_res();
+    return nout() + linsol_->sz_res();
   }
 
   template<bool Tr>
   size_t Solve<Tr>::sz_iw() const {
-    return linsol_.sz_iw();
+    return linsol_->sz_iw();
   }
 
   template<bool Tr>
   size_t Solve<Tr>::sz_w() const {
-    return linsol_.sz_w() + sparsity().size1();
+    return linsol_->sz_w() + sparsity().size1();
   }
 
 } // namespace casadi

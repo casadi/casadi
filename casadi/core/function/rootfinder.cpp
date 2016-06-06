@@ -59,13 +59,6 @@ Function Function::rootfinder_fun() {
     return n->jac_;
   }
 
-  Function Function::rootfinder_linsol() {
-    casadi_assert(!is_null());
-    Rootfinder* n = dynamic_cast<Rootfinder*>(get());
-    casadi_assert_message(n!=0, "Not a rootfinder");
-    return n->linsol_;
-  }
-
   Function rootfinder(const std::string& name, const std::string& solver,
                    const Function& f, const Dict& opts) {
     Function ret;
@@ -166,13 +159,8 @@ Function Function::rootfinder_fun() {
       "sprank(J)=" << sprank(jac_.sparsity_out(0)) << " (instead of "<< jac_.size1_out(0) << ")");
 
     // Get the linear solver creator function
-    if (linsol_.is_null()) {
-      linsol_ = linsol("linsol", linear_solver,
-                       jac_.sparsity_out(0), 0, linear_solver_options);
-    } else {
-      casadi_assert(linsol_.sparsity_in(0)==jac_.sparsity_out(0));
-    }
-    alloc(linsol_);
+    linsol_ = Linsol("linsol", linear_solver,
+                     jac_.sparsity_out(0), linear_solver_options);
 
     // Constraints
     casadi_assert_message(u_c_.size()==n_ || u_c_.empty(),

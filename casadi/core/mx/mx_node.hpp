@@ -30,6 +30,7 @@
 #include "../sx/sx_elem.hpp"
 #include "../calculus.hpp"
 #include "../function/code_generator.hpp"
+#include "../function/linsol.hpp"
 #include <vector>
 #include <stack>
 
@@ -358,7 +359,7 @@ namespace casadi {
     *      A->getSolve(b)
     *
     */
-    virtual MX getSolve(const MX& r, bool tr, const Function& linear_solver) const;
+    virtual MX getSolve(const MX& r, bool tr, const Linsol& linear_solver) const;
 
     /// Get the nonzeros of matrix
     virtual MX getGetNonzeros(const Sparsity& sp, const std::vector<int>& nz) const;

@@ -119,7 +119,7 @@ namespace casadi {
     Function jac_;
 
     /// Linear solver
-    Function linsol_;
+    Linsol linsol_;
     Sparsity sp_jac_;
     Sparsity::Btf btf_jac_;
 

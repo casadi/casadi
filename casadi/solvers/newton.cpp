@@ -160,9 +160,8 @@ namespace casadi {
       }
 
       // Factorize the linear solver with J
-      linsol_.setup(arg1 + LINSOL_NUM_IN, res1 + LINSOL_NUM_OUT, iw, w);
-      linsol_.linsol_factorize(jac);
-      linsol_.linsol_solve(f, 1, false);
+      linsol_.factorize(jac);
+      linsol_.solve(f, 1, false);
 
       // Check convergence again
       double abstolStep=0;

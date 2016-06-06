@@ -76,6 +76,9 @@ namespace casadi {
     /// Query plugin name
     std::string plugin_name() const;
 
+    /// Solve numerically
+    DM solve(const DM& A, const DM& B, bool tr=false);
+
     /// Create a solve node
     MX solve(const MX& A, const MX& B, bool tr=false);
 
@@ -139,8 +142,8 @@ namespace casadi {
   * \endif
   */
   ///@{
-  CASADI_EXPORT Function linsol(const std::string& name, const std::string& solver,
-                                const Sparsity& sp, int nrhs, const Dict& opts=Dict());
+  //CASADI_EXPORT Function linsol(const std::string& name, const std::string& solver,
+    //                            const Sparsity& sp, int nrhs, const Dict& opts=Dict());
 
   CASADI_EXPORT Function linsol_new(const std::string& name, const std::string& solver,
                                 const Sparsity& sp, int nrhs, const Dict& opts=Dict());

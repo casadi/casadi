@@ -235,9 +235,9 @@ class LinearSolverTests(casadiTestCase):
   def test_simple_trans(self):
     A = DM([[3,1],[7,2]])
     for Solver, options in lsolvers:
-      solver = casadi.linsol("solver", Solver, A.sparsity().T, 0, options)
+      solver = casadi.Linsol("solver", Solver, A.sparsity().T, options)
       b = DM([1,0.5])
-      x = solver.linsol_solve(A.T, b)
+      x = solver.solve(A.T, b)
       res = DM([1.5,-0.5])
       self.checkarray(x, res)
 
@@ -245,9 +245,9 @@ class LinearSolverTests(casadiTestCase):
     A = DM([[3,1],[7,2]])
     for Solver, options in lsolvers:
       print(Solver)
-      solver = casadi.linsol("solver", Solver, A.sparsity(), 0, options)
+      solver = casadi.Linsol("solver", Solver, A.sparsity(), options)
       b = DM([1,0.5])
-      x = solver.linsol_solve(A, b)
+      x = solver.solve(A, b)
       res = DM([-1.5,5.5])
       self.checkarray(x, res)
 
@@ -319,9 +319,9 @@ class LinearSolverTests(casadiTestCase):
       b = MX.sym("b",b_.sparsity())
       for Solver, options in lsolvers:
         print(Solver)
-        solver = casadi.linsol("solver", Solver, A.sparsity(), 0, options)
+        solver = casadi.Linsol("solver", Solver, A.sparsity(), options)
         for tr in [True, False]:
-          x = solver.linsol_solve(A,b,tr)
+          x = solver.solve(A,b,tr)
           f = Function("f", [A,b],[x])
           f_out = f(A_, b_)
 
@@ -368,8 +368,9 @@ class LinearSolverTests(casadiTestCase):
 
     M.sparsity().spy()
 
-    S = casadi.linsol("S", "csparsecholesky", M.sparsity(), 0)
-    S_in = [0]*S.n_in();S_in[0]=M
+    S = casadi.Linsol("S", "csparsecholesky", M.sparsity())
+    S_in = [0]*S.n_in()
+    S_in[0]=M
     S.linsol_prepare()
 
     self.checkarray(M,M.T)

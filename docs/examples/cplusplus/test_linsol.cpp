@@ -86,12 +86,12 @@ int main(int argc, char *argv[])
       }
 
       // Create a solver instance
-      Function F = linsol("F", t.solver, A_test.sparsity(), 0);
+      Linsol F("F", t.solver, A_test.sparsity());
 
       // Solve
-      F.linsol_factorize(A_test.ptr());
+      F.factorize(A_test.ptr());
       DM x = densify(b);
-      F.linsol_solve(x.ptr(), x.size2());
+      F.solve(x.ptr(), x.size2());
 
       // Print the solution
       cout << "solution: " << x << " (" <<  t.solver << ")" << endl;

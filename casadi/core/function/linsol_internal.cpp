@@ -376,7 +376,7 @@ namespace casadi {
   }
 
   MX LinsolInternal::linsol_solve(const MX& A, const MX& B, bool tr) {
-    return A->getSolve(B, tr, shared_from_this<Function>());
+    return A->getSolve(B, tr, shared_from_this<Linsol>());
   }
 
   std::map<std::string, LinsolInternal::Plugin> LinsolInternal::solvers_;
