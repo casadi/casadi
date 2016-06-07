@@ -99,7 +99,41 @@ namespace casadi {
 
   template<bool Tr>
   void Solve<Tr>::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
-    linsol_->linsol_sp_fwd(arg, res, iw, w, mem, Tr, dep(0).size2());
+    // Number of right-hand-sides
+    int nrhs = dep(0).size2();
+
+    // Sparsities
+    const Sparsity& A_sp = dep(1).sparsity();
+    const int* A_colind = A_sp.colind();
+    const int* A_row = A_sp.row();
+    int n = A_sp.size1();
+
+    // Get pointers to data
+    const bvec_t *B=arg[0], *A = arg[1];
+    bvec_t* X = res[0];
+    bvec_t* tmp = w;
+
+    // For all right-hand-sides
+    for (int r=0; r<nrhs; ++r) {
+      // Copy B to a temporary vector
+      copy(B, B+n, tmp);
+
+      // Add A_hat contribution to tmp
+      for (int cc=0; cc<n; ++cc) {
+        for (int k=A_colind[cc]; k<A_colind[cc+1]; ++k) {
+          int rr = A_row[k];
+          tmp[Tr ? cc : rr] |= A[k];
+        }
+      }
+
+      // Propagate to X
+      std::fill(X, X+n, 0);
+      A_sp.spsolve(X, tmp, Tr);
+
+      // Continue to the next right-hand-side
+      B += n;
+      X += n;
+    }
   }
 
   template<bool Tr>

@@ -75,10 +75,6 @@ namespace casadi {
                                 const std::vector<std::vector<MX> >& aseed,
                                 std::vector<std::vector<MX> >& asens, bool tr);
 
-    /** \brief  Propagate sparsity forward */
-    virtual void linsol_sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem,
-                              bool tr, int nrhs);
-
     /** \brief  Propagate sparsity backwards */
     virtual void linsol_sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem,
                               bool tr, int nrhs);
