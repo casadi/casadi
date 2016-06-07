@@ -4210,24 +4210,6 @@ General information
 
 
 
->Input scheme: casadi::LinsolInput (LINSOL_NUM_IN = 2) []
-
-+-----------+-------+----------------------------------------------+
-| Full name | Short |                 Description                  |
-+===========+=======+==============================================+
-| LINSOL_A  |       | The square matrix A: sparse, (n x n)         |
-+-----------+-------+----------------------------------------------+
-| LINSOL_B  |       | The right-hand-side matrix b: dense, (n x m) |
-+-----------+-------+----------------------------------------------+
-
->Output scheme: casadi::LinsolOutput (LINSOL_NUM_OUT = 1) []
-
-+-----------+-------+---------------------------------------------+
-| Full name | Short |                 Description                 |
-+===========+=======+=============================================+
-| LINSOL_X  |       | Solution to the linear system of equations. |
-+-----------+-------+---------------------------------------------+
-
 List of plugins
 ===============
 

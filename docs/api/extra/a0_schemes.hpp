@@ -31,14 +31,6 @@
 <tr><td>HESSLAG_GRAD_P</td><td></td><td>Gradient of the Lagrangian with respect to p.</td></tr>
 </table>
 */
-/** \defgroup scheme_LinsolInput
-<a name='schemes'></a><table>
-<caption>Input scheme: casadi::LinsolInput  (LINSOL_NUM_IN = 2) []</caption>
-<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>LINSOL_A</td><td></td><td>The square matrix A: sparse, (n x n)</td></tr>
-<tr><td>LINSOL_B</td><td></td><td>The right-hand-side matrix b: dense, (n x m)</td></tr>
-</table>
-*/
 /** \defgroup scheme_NlpsolInput
 <a name='schemes'></a><table>
 <caption>Input scheme: casadi::NlpsolInput  (NLPSOL_NUM_IN = 8) []</caption>
@@ -137,13 +129,6 @@
 <tr><td>RDAE_ODE</td><td></td><td>Right hand side of ODE.</td></tr>
 <tr><td>RDAE_ALG</td><td></td><td>Right hand side of algebraic equations.</td></tr>
 <tr><td>RDAE_QUAD</td><td></td><td>Right hand side of quadratures.</td></tr>
-</table>
-*/
-/** \defgroup scheme_LinsolOutput
-<a name='schemes'></a><table>
-<caption>Output scheme: casadi::LinsolOutput  (LINSOL_NUM_OUT = 1) []</caption>
-<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>LINSOL_X</td><td></td><td>Solution to the linear system of equations.</td></tr>
 </table>
 */
 /** \defgroup scheme_JacGOutput
