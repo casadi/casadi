@@ -57,7 +57,7 @@ namespace casadi {
 
 /** \pluginsection{Linsol,lapacklu} */
 /// \cond INTERNAL
-  struct CASADI_LINSOL_LAPACKLU_EXPORT LapackLuMemory {
+  struct CASADI_LINSOL_LAPACKLU_EXPORT LapackLuMemory : public LinsolMemory {
     // Matrix
     std::vector<double> mat;
 

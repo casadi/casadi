@@ -34,6 +34,11 @@
 
 namespace casadi {
 
+  struct CASADI_EXPORT LinsolMemory {
+    // Sparsity pattern (allowed to change)
+    std::vector<int> sparsity;
+  };
+
   /** Internal class
       @copydoc Linsol_doc
   */
@@ -54,6 +59,15 @@ namespace casadi {
 
     /// Initialize
     virtual void init(const Dict& opts);
+
+    /** \brief Create memory block */
+    virtual void* alloc_memory() const { return new LinsolMemory();}
+
+    /** \brief Free memory block */
+    virtual void free_memory(void *mem) const { delete static_cast<LinsolMemory*>(mem);}
+
+    /** \brief Initalize memory block */
+    virtual void init_memory(void* mem) const;
 
     // Solve numerically
     virtual void linsol_solve(void* mem, double* x, int nrhs, bool tr) const;

@@ -57,7 +57,7 @@ extern "C" {
 /** \pluginsection{Linsol,ma27} */
 /// \cond INTERNAL
 namespace casadi {
-  struct CASADI_LINSOL_MA27_EXPORT Ma27Memory {
+  struct CASADI_LINSOL_MA27_EXPORT Ma27Memory : public LinsolMemory {
     // Constructor
     Ma27Memory();
 

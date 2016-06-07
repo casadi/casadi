@@ -60,6 +60,15 @@ namespace casadi {
 
   }
 
+  void LinsolInternal::init_memory(void* mem) const {
+    auto m = static_cast<LinsolMemory*>(mem);
+
+    // Set initial sparsity pattern
+    if (!sparsity_.is_null()) {
+      m->sparsity = sparsity_.compress();
+    }
+  }
+
   void LinsolInternal::linsol_eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem,
                              bool tr, int nrhs) {
     casadi_error("eval_sx not defined for " + type_name());

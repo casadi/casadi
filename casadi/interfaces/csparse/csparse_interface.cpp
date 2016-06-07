@@ -63,6 +63,7 @@ namespace casadi {
   }
 
   void CsparseInterface::init_memory(void* mem) const {
+    LinsolInternal::init_memory(mem);
     auto m = static_cast<CsparseMemory*>(mem);
     m->N = 0;
     m->S = 0;

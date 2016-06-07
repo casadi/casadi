@@ -39,7 +39,7 @@
 
 namespace casadi {
 
-  struct CASADI_LINSOL_CSPARSECHOLESKY_EXPORT CsparseCholMemory {
+  struct CASADI_LINSOL_CSPARSECHOLESKY_EXPORT CsparseCholMemory : public LinsolMemory {
     // Destructor
     ~CsparseCholMemory();
 

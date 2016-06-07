@@ -85,6 +85,7 @@ namespace casadi {
   }
 
   void LapackLu::init_memory(void* mem) const {
+    LinsolInternal::init_memory(mem);
     auto m = static_cast<LapackLuMemory*>(mem);
 
     // Allocate matrix

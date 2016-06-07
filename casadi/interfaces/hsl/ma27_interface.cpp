@@ -68,6 +68,7 @@ namespace casadi {
   }
 
   void Ma27Interface::init_memory(void* mem) const {
+    LinsolInternal::init_memory(mem);
     auto m = static_cast<Ma27Memory*>(mem);
 
     // Set default options for MA27

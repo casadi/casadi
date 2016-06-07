@@ -38,7 +38,7 @@
 #include <casadi/interfaces/csparse/casadi_linsol_csparse_export.h>
 
 namespace casadi {
-  struct CASADI_LINSOL_CSPARSE_EXPORT CsparseMemory {
+  struct CASADI_LINSOL_CSPARSE_EXPORT CsparseMemory : public LinsolMemory {
     // Destructor
     ~CsparseMemory();
 

@@ -62,6 +62,7 @@ namespace casadi {
   }
 
   void LapackQr::init_memory(void* mem) const {
+    LinsolInternal::init_memory(mem);
     auto m = static_cast<LapackQrMemory*>(mem);
     m->mat.resize(ncol()*ncol());
     m->tau.resize(ncol());

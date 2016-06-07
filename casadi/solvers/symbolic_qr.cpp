@@ -160,6 +160,7 @@ namespace casadi {
   }
 
   void SymbolicQr::init_memory(void* mem) const {
+    LinsolInternal::init_memory(mem);
     auto m = static_cast<SymbolicQrMemory*>(mem);
     // Allocate storage for QR factorization
     m->q.resize(fact_fcn_.nnz_out(0));

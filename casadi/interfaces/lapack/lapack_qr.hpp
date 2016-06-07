@@ -54,7 +54,7 @@ extern "C" {
 
 /// \cond INTERNAL
 namespace casadi {
-  struct CASADI_LINSOL_LAPACKQR_EXPORT LapackQrMemory {
+  struct CASADI_LINSOL_LAPACKQR_EXPORT LapackQrMemory : public LinsolMemory {
     // Matrix
     std::vector<double> mat;
 
