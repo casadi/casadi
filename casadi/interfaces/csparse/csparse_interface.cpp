@@ -103,7 +103,7 @@ namespace casadi {
     m->called_once_ = true;
 
     // Make sure that all entries of the linear system are valid
-    for (int k=0; k<sparsity_.nnz(); ++k) {
+    for (int k=0; k<nnz(); ++k) {
       casadi_assert_message(!isnan(A[k]), "Nonzero " << k << " is not-a-number");
       casadi_assert_message(!isinf(A[k]), "Nonzero " << k << " is infinite");
     }
@@ -111,7 +111,8 @@ namespace casadi {
     if (verbose()) {
       userOut() << "CsparseInterface::prepare: numeric factorization" << endl;
       userOut() << "linear system to be factorized = " << endl;
-      DM(sparsity_, vector<double>(A, A+sparsity_.nnz())).print_sparse();
+      Sparsity sp = Sparsity::compressed(sparsity());
+      DM(sp, vector<double>(A, A+nnz())).print_sparse();
     }
 
     double tol = 1e-8;
@@ -119,7 +120,8 @@ namespace casadi {
     if (m->N) cs_nfree(m->N);
     m->N = cs_lu(&m->A, m->S, tol) ;                 // numeric LU factorization
     if (m->N==0) {
-      DM temp(sparsity_, vector<double>(A, A+sparsity_.nnz()));
+      Sparsity sp = Sparsity::compressed(sparsity());
+      DM temp(sp, vector<double>(A, A+sp.nnz()));
       temp = sparsify(temp);
       if (temp.sparsity().is_singular()) {
         stringstream ss;
@@ -130,7 +132,7 @@ namespace casadi {
             " sprank: " << sprank(temp.sparsity()) << " <-> " << temp.size2() << endl;
         if (verbose()) {
           ss << "Sparsity of the linear system: " << endl;
-          sparsity_.print(ss); // print detailed
+          sp.print(ss); // print detailed
         }
         throw CasadiException(ss.str());
       } else {
@@ -139,7 +141,7 @@ namespace casadi {
            << endl;
         if (verbose()) {
           ss << "Sparsity of the linear system: " << endl;
-          sparsity_.print(ss); // print detailed
+          sp.print(ss); // print detailed
         }
         throw CasadiException(ss.str());
       }

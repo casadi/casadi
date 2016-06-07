@@ -76,7 +76,7 @@ namespace casadi {
     int ncol = this->ncol();
 
     // Get the elements of the matrix, dense format
-    casadi_densify(A, sparsity_, get_ptr(m->mat), false);
+    casadi_densify(A, sparsity(), get_ptr(m->mat), false);
 
     // Factorize the matrix
     int info = -100;

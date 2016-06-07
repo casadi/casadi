@@ -90,10 +90,11 @@ namespace casadi {
     }
 
     // Symbolic expression for A
-    SX A = SX::sym("A", sparsity_);
+    Sparsity sp = Sparsity::compressed(sparsity());
+    SX A = SX::sym("A", sp);
 
     // BTF factorization
-    const Sparsity::Btf& btf = sparsity_.btf();
+    const Sparsity::Btf& btf = sp.btf();
 
     // Get the inverted column permutation
     std::vector<int> inv_colperm(btf.colperm.size());
@@ -117,7 +118,7 @@ namespace casadi {
     // Symbolic expressions for solve function
     SX Q = SX::sym("Q", Q1.sparsity());
     SX R = SX::sym("R", R1.sparsity());
-    SX b = SX::sym("b", sparsity_.size2(), 1);
+    SX b = SX::sym("b", ncol(), 1);
 
     // Solve non-transposed
     // We have Pb' * Q * R * Px * x = b <=> x = Px' * inv(R) * Q' * Pb * b
@@ -215,7 +216,8 @@ namespace casadi {
     casadi_assert(res[0]!=0);
 
     // Get A and factorize it
-    SX A = SX::zeros(sparsity_);
+    Sparsity sp = Sparsity::compressed(sparsity());
+    SX A = SX::zeros(sp);
     copy(arg[1], arg[1]+A.nnz(), A->begin());
     vector<SX> v = fact_fcn_(A);
 

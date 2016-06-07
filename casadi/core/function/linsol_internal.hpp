@@ -78,6 +78,7 @@ namespace casadi {
     int nrow() const { return sparsity_.size1();}
     int ncol() const { return sparsity_.size2();}
     int nnz() const { return sparsity_.nnz();}
+    const int* sparsity() const { return sparsity_;}
     const int* row() const { return sparsity_.row();}
     const int* colind() const { return sparsity_.colind();}
 
@@ -96,6 +97,7 @@ namespace casadi {
     // Get name of the plugin
     virtual const char* plugin_name() const = 0;
 
+  private:
     // Sparsity of the linear system
     Sparsity sparsity_;
   };

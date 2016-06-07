@@ -107,7 +107,7 @@ namespace casadi {
     int ncol = this->ncol();
 
     // Get the elements of the matrix, dense format
-    casadi_densify(A, sparsity_, get_ptr(m->mat), false);
+    casadi_densify(A, sparsity(), get_ptr(m->mat), false);
 
     if (equilibriate_) {
       // Calculate the col and row scaling factors
