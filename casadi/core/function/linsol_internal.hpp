@@ -49,26 +49,21 @@ namespace casadi {
     ///@{
     /** \brief Number of function inputs and outputs */
     virtual size_t get_n_in() { return LINSOL_NUM_IN;}
-    virtual size_t get_n_out() { return LINSOL_NUM_OUT;}
+    virtual size_t get_n_out() { return 0;}
     ///@}
 
     /// @{
     /** \brief Sparsities of function inputs and outputs */
     virtual Sparsity get_sparsity_in(int i);
-    virtual Sparsity get_sparsity_out(int i);
     /// @}
 
     ///@{
     /** \brief Names of function input and outputs */
     virtual std::string get_name_in(int i);
-    virtual std::string get_name_out(int i);
     /// @}
 
     /// Initialize
     virtual void init(const Dict& opts);
-
-    /// Solve the system of equations
-    virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
 
     // Solve numerically
     virtual void linsol_solve(void* mem, double* x, int nrhs, bool tr) const;
@@ -79,11 +74,6 @@ namespace casadi {
     /// Evaluate SX, possibly transposed
     virtual void linsol_eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem,
                                bool tr, int nrhs);
-
-    /// Evaluate SX
-    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) {
-      linsol_eval_sx(arg, res, iw, w, 0, false, size2_out(LINSOL_X));
-    }
 
     /** \brief Calculate forward mode directional derivatives */
     virtual void linsol_forward(const std::vector<MX>& arg, const std::vector<MX>& res,

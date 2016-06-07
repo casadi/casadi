@@ -35,10 +35,6 @@ namespace casadi {
     return LINSOL_NUM_IN;
   }
 
-  int linsol_n_out() {
-    return LINSOL_NUM_OUT;
-  }
-
   string linsol_in(int ind) {
     switch (static_cast<LinsolInput>(ind)) {
     case LINSOL_A:     return "A";
@@ -48,23 +44,9 @@ namespace casadi {
     return string();
   }
 
-  string linsol_out(int ind) {
-    switch (static_cast<LinsolOutput>(ind)) {
-    case LINSOL_X:     return "X";
-    case LINSOL_NUM_OUT: break;
-    }
-    return string();
-  }
-
   vector<string> linsol_in() {
     vector<string> ret(linsol_n_in());
     for (size_t i=0; i<ret.size(); ++i) ret[i]=linsol_in(i);
-    return ret;
-  }
-
-  vector<string> linsol_out() {
-    vector<string> ret(linsol_n_out());
-    for (size_t i=0; i<ret.size(); ++i) ret[i]=linsol_out(i);
     return ret;
   }
 
@@ -78,7 +60,6 @@ namespace casadi {
   }
 
   std::string LinsolInternal::get_name_in(int i) { return linsol_in(i);}
-  std::string LinsolInternal::get_name_out(int i) { return linsol_out(i);}
 
   LinsolInternal::LinsolInternal(const std::string& name, const Sparsity& sparsity, int nrhs)
     : FunctionInternal(name), sparsity_(sparsity), nrhs_(nrhs) {
@@ -114,54 +95,10 @@ namespace casadi {
     return Sparsity();
   }
 
-  Sparsity LinsolInternal::get_sparsity_out(int i) {
-    switch (static_cast<LinsolOutput>(i)) {
-    case LINSOL_X:
-      return Sparsity::dense(neq_, nrhs_);
-    case LINSOL_NUM_OUT: break;
-    }
-    return Sparsity();
-  }
-
   void LinsolInternal::init(const Dict& opts) {
     // Call the base class initializer
     FunctionInternal::init(opts);
 
-  }
-
-  void LinsolInternal::eval(void* mem, const double** arg, double** res,
-                    int* iw, double* w) const {
-    // Get inputs and outputs
-    const double *A = arg[LINSOL_A];
-    const double *b = arg[LINSOL_B];
-    arg += LINSOL_NUM_IN;
-    double *x = res[LINSOL_X];
-    res += LINSOL_NUM_OUT;
-
-    // If output not requested, nothing to do
-    if (!x) return;
-
-    // A zero linear system would be singular
-    if (A==0) {
-      casadi_fill(x, neq_*nrhs_, numeric_limits<double>::quiet_NaN());
-      return;
-    }
-
-    // If right hand side is zero, solution is trivially zero (if well-defined)
-    if (!b) {
-      casadi_fill(x, neq_*nrhs_, 0.);
-      return;
-    }
-
-    // Setup memory object
-    setup(mem, arg, res, iw, w);
-
-    // Factorize the linear system
-    linsol_factorize(mem, A);
-
-    // Solve the factorized system
-    casadi_copy(b, neq_*nrhs_, x);
-    linsol_solve(mem, x, nrhs_, false);
   }
 
   void LinsolInternal::
@@ -315,8 +252,7 @@ namespace casadi {
 
   void LinsolInternal::linsol_eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem,
                              bool tr, int nrhs) {
-    casadi_error("LinsolInternal::eval_sxLinsol not defined for class "
-                 << typeid(*this).name());
+    casadi_error("eval_sx not defined for " + type_name());
   }
 
   MX LinsolInternal::linsol_solve(const MX& A, const MX& B, bool tr) {

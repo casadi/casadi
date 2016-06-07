@@ -410,15 +410,8 @@ namespace casadi {
     LINSOL_B,
     LINSOL_NUM_IN};
 
-  /// Output arguments of a linear solver
-  enum LinsolOutput {
-    /// Solution to the linear system of equations
-    LINSOL_X,
-    LINSOL_NUM_OUT};
-
 #endif // SWIG
 
 } // namespace casadi
 
 #endif // CASADI_CASADI_TYPES_HPP
-
