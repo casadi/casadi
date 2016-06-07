@@ -78,8 +78,8 @@ namespace casadi {
     m->cntl[0] = 1e-8;     // Set pivot tolerance
 
     // Dynamically resized work vectors
-    int N = this->ncol();
-    int nnz = this->nnz();
+    int N = m->ncol();
+    int nnz = m->colind()[N];
     double liw_factor = 2;
     m->iw.resize(ceil(liw_factor * (2*nnz+3*N+1)));
     double la_factor = 2;
@@ -95,9 +95,9 @@ namespace casadi {
     casadi_assert(A!=0);
 
     // Get sparsity
-    const int ncol = this->ncol();
-    const int* colind = this->colind();
-    const int* row = this->row();
+    const int ncol = m->ncol();
+    const int* colind = m->colind();
+    const int* row = m->row();
 
     // Get actual nonzeros
     int nnz=0;
@@ -116,7 +116,7 @@ namespace casadi {
     m->nnz = nnz;
 
     // Order of the matrix
-    int N = this->ncol();
+    int N = m->ncol();
 
     // Symbolic factorization (MA27AD)
     int LIW = m->iw.size();
@@ -170,7 +170,7 @@ namespace casadi {
     auto m = static_cast<Ma27Memory*>(mem);
 
     // Solve for each right-hand-side
-    int N = this->ncol();
+    int N = m->ncol();
     int LA = m->nz.size();
     int LIW = m->iw.size();
     for (int k=0; k<nrhs; ++k) {

@@ -37,6 +37,13 @@ namespace casadi {
   struct CASADI_EXPORT LinsolMemory {
     // Sparsity pattern (allowed to change)
     std::vector<int> sparsity;
+
+    /// Get sparsity pattern
+    int nrow() const { return sparsity[0];}
+    int ncol() const { return sparsity[1];}
+    const int* colind() const { return &sparsity[2];}
+    const int* row() const { return colind() + ncol() + 1;}
+    int nnz() const { return colind()[ncol()];}
   };
 
   /** Internal class
@@ -88,14 +95,6 @@ namespace casadi {
     /// Get Cholesky factor
     virtual DM linsol_cholesky(void* mem, bool tr) const;
 
-    /// Get sparsity pattern
-    int nrow() const { return sparsity_.size1();}
-    int ncol() const { return sparsity_.size2();}
-    int nnz() const { return sparsity_.nnz();}
-    const int* sparsity() const { return sparsity_;}
-    const int* row() const { return sparsity_.row();}
-    const int* colind() const { return sparsity_.colind();}
-
     // Creator function for internal class
     typedef LinsolInternal* (*Creator)(const std::string& name, const Sparsity& sp);
 
@@ -111,7 +110,7 @@ namespace casadi {
     // Get name of the plugin
     virtual const char* plugin_name() const = 0;
 
-  private:
+  protected:
     // Sparsity of the linear system
     Sparsity sparsity_;
   };

@@ -55,18 +55,14 @@ namespace casadi {
   void LapackQr::init(const Dict& opts) {
     // Call the base class initializer
     LinsolInternal::init(opts);
-
-    // Currently only square matrices tested
-    if (ncol()!=nrow()) throw CasadiException("LapackQr::init: currently only "
-                                              "square matrices implemented.");
   }
 
   void LapackQr::init_memory(void* mem) const {
     LinsolInternal::init_memory(mem);
     auto m = static_cast<LapackQrMemory*>(mem);
-    m->mat.resize(ncol()*ncol());
-    m->tau.resize(ncol());
-    m->work.resize(10*ncol());
+    m->mat.resize(m->ncol() * m->ncol());
+    m->tau.resize(m->ncol());
+    m->work.resize(10*m->ncol());
   }
 
   void LapackQr::linsol_factorize(void* mem, const double* A) const {
@@ -74,10 +70,10 @@ namespace casadi {
 
     // Dimensions
     //int nrow = this->nrow();
-    int ncol = this->ncol();
+    int ncol = m->ncol();
 
     // Get the elements of the matrix, dense format
-    casadi_densify(A, sparsity(), get_ptr(m->mat), false);
+    casadi_densify(A, get_ptr(m->sparsity), get_ptr(m->mat), false);
 
     // Factorize the matrix
     int info = -100;
@@ -93,7 +89,7 @@ namespace casadi {
 
     // Dimensions
     //int nrow = this->nrow();
-    int ncol = this->ncol();
+    int ncol = m->ncol();
 
     // Properties of R
     char uploR = 'U';

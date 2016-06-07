@@ -90,11 +90,10 @@ namespace casadi {
     }
 
     // Symbolic expression for A
-    Sparsity sp = Sparsity::compressed(sparsity());
-    SX A = SX::sym("A", sp);
+    SX A = SX::sym("A", sparsity_);
 
     // BTF factorization
-    const Sparsity::Btf& btf = sp.btf();
+    const Sparsity::Btf& btf = sparsity_.btf();
 
     // Get the inverted column permutation
     std::vector<int> inv_colperm(btf.colperm.size());
@@ -118,7 +117,7 @@ namespace casadi {
     // Symbolic expressions for solve function
     SX Q = SX::sym("Q", Q1.sparsity());
     SX R = SX::sym("R", R1.sparsity());
-    SX b = SX::sym("b", ncol(), 1);
+    SX b = SX::sym("b", sparsity_.size2(), 1);
 
     // Solve non-transposed
     // We have Pb' * Q * R * Px * x = b <=> x = Px' * inv(R) * Q' * Pb * b
@@ -156,7 +155,7 @@ namespace casadi {
     alloc(solv_fcn_T_);
 
     // Temporary storage
-    alloc_w(nrow(), true);
+    alloc_w(sparsity_.size1(), true);
   }
 
   void SymbolicQr::init_memory(void* mem) const {
@@ -202,22 +201,23 @@ namespace casadi {
     m->arg[1] = get_ptr(m->r);
     fill_n(get_ptr(m->res), solv.n_out(), nullptr);
     for (int i=0; i<nrhs; ++i) {
-      copy_n(x, nrow(), get_ptr(m->w)); // Copy x to a temporary
+      copy_n(x, m->nrow(), get_ptr(m->w)); // Copy x to a temporary
       m->arg[2] = get_ptr(m->w);
       m->res[0] = x;
-      solv(get_ptr(m->arg), get_ptr(m->res), get_ptr(m->iw), get_ptr(m->w)+nrow(), 0);
-      x += nrow();
+      solv(get_ptr(m->arg), get_ptr(m->res), get_ptr(m->iw), get_ptr(m->w)+m->nrow(), 0);
+      x += m->nrow();
     }
   }
 
   void SymbolicQr::linsol_eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem,
                                  bool tr, int nrhs) {
+    auto m = static_cast<SymbolicQrMemory*>(memory(mem));
     casadi_assert(arg[0]!=0);
     casadi_assert(arg[1]!=0);
     casadi_assert(res[0]!=0);
 
     // Get A and factorize it
-    Sparsity sp = Sparsity::compressed(sparsity());
+    Sparsity sp = Sparsity::compressed(m->sparsity);
     SX A = SX::zeros(sp);
     copy(arg[1], arg[1]+A.nnz(), A->begin());
     vector<SX> v = fact_fcn_(A);

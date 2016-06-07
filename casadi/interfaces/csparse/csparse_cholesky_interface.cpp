@@ -73,12 +73,12 @@ namespace casadi {
     auto m = static_cast<CsparseCholMemory*>(mem);
     m->L = 0;
     m->S = 0;
-    m->A.nzmax = nnz();  // maximum number of entries
-    m->A.m = nrow(); // number of columns
-    m->A.n = ncol(); // number of rows
-    m->A.p = const_cast<int*>(colind()); // row pointers (size n+1)
+    m->A.nzmax = m->nnz();  // maximum number of entries
+    m->A.m = m->nrow(); // number of columns
+    m->A.n = m->ncol(); // number of rows
+    m->A.p = const_cast<int*>(m->colind()); // row pointers (size n+1)
     // or row indices (size nzmax)
-    m->A.i = const_cast<int*>(row()); // column indices, size nzmax
+    m->A.i = const_cast<int*>(m->row()); // column indices, size nzmax
     m->A.x = 0; // numerical values, size nzmax
     m->A.nz = -1; // of entries in triplet matrix, -1 for compressed-row
 
@@ -178,7 +178,7 @@ namespace casadi {
         cs_ltsolve(m->L->L, t) ;              // t = U\t
         cs_ipvec(m->S->q, t, x, m->A.n) ;      // x = P2\t
       }
-      x += ncol();
+      x += m->ncol();
     }
   }
 
@@ -194,7 +194,7 @@ namespace casadi {
       if (tr) cs_lsolve(m->L->L, t) ; // t = L\t
       if (!tr) cs_ltsolve(m->L->L, t) ; // t = U\t
       cs_ipvec(m->S->q, t, x, m->A.n) ;      // x = P2\t
-      x += ncol();
+      x += m->ncol();
     }
   }
 

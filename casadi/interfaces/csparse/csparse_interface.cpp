@@ -67,12 +67,12 @@ namespace casadi {
     auto m = static_cast<CsparseMemory*>(mem);
     m->N = 0;
     m->S = 0;
-    m->A.nzmax = nnz();  // maximum number of entries
-    m->A.m = nrow(); // number of rows
-    m->A.n = ncol(); // number of columns
-    m->A.p = const_cast<int*>(colind()); // column pointers (size n+1)
+    m->A.nzmax = m->nnz();  // maximum number of entries
+    m->A.m = m->nrow(); // number of rows
+    m->A.n = m->ncol(); // number of columns
+    m->A.p = const_cast<int*>(m->colind()); // column pointers (size n+1)
     // or column indices (size nzmax)
-    m->A.i = const_cast<int*>(row()); // row indices, size nzmax
+    m->A.i = const_cast<int*>(m->row()); // row indices, size nzmax
     m->A.x = 0; // numerical values, size nzmax
     m->A.nz = -1; // of entries in triplet matrix, -1 for compressed-col
 
@@ -104,7 +104,7 @@ namespace casadi {
     m->called_once_ = true;
 
     // Make sure that all entries of the linear system are valid
-    for (int k=0; k<nnz(); ++k) {
+    for (int k=0; k<m->nnz(); ++k) {
       casadi_assert_message(!isnan(A[k]), "Nonzero " << k << " is not-a-number");
       casadi_assert_message(!isinf(A[k]), "Nonzero " << k << " is infinite");
     }
@@ -112,8 +112,8 @@ namespace casadi {
     if (verbose()) {
       userOut() << "CsparseInterface::prepare: numeric factorization" << endl;
       userOut() << "linear system to be factorized = " << endl;
-      Sparsity sp = Sparsity::compressed(sparsity());
-      DM(sp, vector<double>(A, A+nnz())).print_sparse();
+      Sparsity sp = Sparsity::compressed(m->sparsity);
+      DM(sp, vector<double>(A, A+m->nnz())).print_sparse();
     }
 
     double tol = 1e-8;
@@ -121,7 +121,7 @@ namespace casadi {
     if (m->N) cs_nfree(m->N);
     m->N = cs_lu(&m->A, m->S, tol) ;                 // numeric LU factorization
     if (m->N==0) {
-      Sparsity sp = Sparsity::compressed(sparsity());
+      Sparsity sp = Sparsity::compressed(m->sparsity);
       DM temp(sp, vector<double>(A, A+sp.nnz()));
       temp = sparsify(temp);
       if (temp.sparsity().is_singular()) {
@@ -169,7 +169,7 @@ namespace casadi {
         cs_usolve(m->N->U, t) ;               // t = U\t
         cs_ipvec(m->S->q, t, x, m->A.n) ;      // x = P2\t
       }
-      x += ncol();
+      x += m->ncol();
     }
   }
 
