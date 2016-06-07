@@ -67,7 +67,7 @@ namespace casadi {
     if (arg[0].is_zero()) {
       res[0] = MX(arg[0].size());
     } else {
-      res[0] = linsol_->linsol_solve(arg[1], arg[0], Tr);
+      res[0] = linsol_.solve(arg[1], arg[0], Tr);
     }
   }
 
@@ -80,8 +80,28 @@ namespace casadi {
     vector<MX> res(nout());
     for (int i=0; i<res.size(); ++i) res[i] = getOutput(i);
 
-    // Call the cached functions
-    linsol_->linsol_forward(arg, res, fseed, fsens, Tr);
+    // Number of derivatives
+    int nfwd = fseed.size();
+    const MX& A = arg[1];
+    const MX& X = res[0];
+
+    // Solve for all directions at once
+    std::vector<MX> rhs(nfwd);
+    std::vector<int> col_offset(nfwd+1, 0);
+    for (int d=0; d<nfwd; ++d) {
+      const MX& B_hat = fseed[d][0];
+      const MX& A_hat = fseed[d][1];
+      rhs[d] = Tr ? B_hat - mtimes(A_hat.T(), X) : B_hat - mtimes(A_hat, X);
+      col_offset[d+1] = col_offset[d] + rhs[d].size2();
+    }
+    rhs = horzsplit(linsol_.solve(A, horzcat(rhs), Tr), col_offset);
+
+    // Fetch result
+    fsens.resize(nfwd);
+    for (int d=0; d<nfwd; ++d) {
+      fsens[d].resize(1);
+      fsens[d][0] = rhs[d];
+    }
   }
 
   template<bool Tr>
@@ -93,8 +113,45 @@ namespace casadi {
     vector<MX> res(nout());
     for (int i=0; i<res.size(); ++i) res[i] = getOutput(i);
 
-    // Call the cached functions
-    linsol_->linsol_reverse(arg, res, aseed, asens, Tr);
+    // Number of derivatives
+    int nadj = aseed.size();
+    const MX& A = arg[1];
+    const MX& X = res[0];
+
+    // Solve for all directions at once
+    std::vector<MX> rhs(nadj);
+    std::vector<int> col_offset(nadj+1, 0);
+    for (int d=0; d<nadj; ++d) {
+      rhs[d] = aseed[d][0];
+      col_offset[d+1] = col_offset[d] + rhs[d].size2();
+    }
+    rhs = horzsplit(linsol_.solve(A, horzcat(rhs), !Tr), col_offset);
+
+    // Collect sensitivities
+    asens.resize(nadj);
+    for (int d=0; d<nadj; ++d) {
+      asens[d].resize(2);
+
+      // Propagate to A
+      MX a;
+      if (!Tr) {
+        a = -mac(rhs[d], X.T(), MX::zeros(A.sparsity()));
+      } else {
+        a = -mac(X, rhs[d].T(), MX::zeros(A.sparsity()));
+      }
+      if (asens[d][1].is_empty(true)) {
+        asens[d][1] = a;
+      } else {
+        asens[d][1] += a;
+      }
+
+      // Propagate to B
+      if (asens[d][0].is_empty(true)) {
+        asens[d][0] = rhs[d];
+      } else {
+        asens[d][0] += rhs[d];
+      }
+    }
   }
 
   template<bool Tr>

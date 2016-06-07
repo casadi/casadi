@@ -24,9 +24,6 @@
 
 
 #include "linsol_internal.hpp"
-#include "../std_vector_tools.hpp"
-#include "../mx/mx_node.hpp"
-#include <typeinfo>
 
 using namespace std;
 namespace casadi {
@@ -63,86 +60,9 @@ namespace casadi {
 
   }
 
-  void LinsolInternal::
-  linsol_forward(const std::vector<MX>& arg, const std::vector<MX>& res,
-                 const std::vector<std::vector<MX> >& fseed,
-                 std::vector<std::vector<MX> >& fsens, bool tr) {
-    // Number of derivatives
-    int nfwd = fseed.size();
-    const MX& A = arg[1];
-    const MX& X = res[0];
-
-    // Solve for all directions at once
-    std::vector<MX> rhs(nfwd);
-    std::vector<int> col_offset(nfwd+1, 0);
-    for (int d=0; d<nfwd; ++d) {
-      const MX& B_hat = fseed[d][0];
-      const MX& A_hat = fseed[d][1];
-      rhs[d] = tr ? B_hat - mtimes(A_hat.T(), X) : B_hat - mtimes(A_hat, X);
-      col_offset[d+1] = col_offset[d] + rhs[d].size2();
-    }
-    rhs = horzsplit(linsol_solve(A, horzcat(rhs), tr), col_offset);
-
-    // Fetch result
-    fsens.resize(nfwd);
-    for (int d=0; d<nfwd; ++d) {
-      fsens[d].resize(1);
-      fsens[d][0] = rhs[d];
-    }
-  }
-
-  void LinsolInternal::
-  linsol_reverse(const std::vector<MX>& arg, const std::vector<MX>& res,
-                 const std::vector<std::vector<MX> >& aseed,
-                 std::vector<std::vector<MX> >& asens, bool tr) {
-    // Number of derivatives
-    int nadj = aseed.size();
-    const MX& A = arg[1];
-    const MX& X = res[0];
-
-    // Solve for all directions at once
-    std::vector<MX> rhs(nadj);
-    std::vector<int> col_offset(nadj+1, 0);
-    for (int d=0; d<nadj; ++d) {
-      rhs[d] = aseed[d][0];
-      col_offset[d+1] = col_offset[d] + rhs[d].size2();
-    }
-    rhs = horzsplit(linsol_solve(A, horzcat(rhs), !tr), col_offset);
-
-    // Collect sensitivities
-    asens.resize(nadj);
-    for (int d=0; d<nadj; ++d) {
-      asens[d].resize(2);
-
-      // Propagate to A
-      MX a;
-      if (!tr) {
-        a = -mac(rhs[d], X.T(), MX::zeros(A.sparsity()));
-      } else {
-        a = -mac(X, rhs[d].T(), MX::zeros(A.sparsity()));
-      }
-      if (asens[d][1].is_empty(true)) {
-        asens[d][1] = a;
-      } else {
-        asens[d][1] += a;
-      }
-
-      // Propagate to B
-      if (asens[d][0].is_empty(true)) {
-        asens[d][0] = rhs[d];
-      } else {
-        asens[d][0] += rhs[d];
-      }
-    }
-  }
-
   void LinsolInternal::linsol_eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem,
                              bool tr, int nrhs) {
     casadi_error("eval_sx not defined for " + type_name());
-  }
-
-  MX LinsolInternal::linsol_solve(const MX& A, const MX& B, bool tr) {
-    return A->getSolve(B, tr, shared_from_this<Linsol>());
   }
 
   void LinsolInternal::linsol_solve(void* mem, double* x, int nrhs, bool tr) const {

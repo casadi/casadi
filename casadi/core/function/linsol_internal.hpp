@@ -58,22 +58,9 @@ namespace casadi {
     // Solve numerically
     virtual void linsol_solve(void* mem, double* x, int nrhs, bool tr) const;
 
-    /// Create a solve node
-    virtual MX linsol_solve(const MX& A, const MX& B, bool tr);
-
     /// Evaluate SX, possibly transposed
     virtual void linsol_eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem,
                                bool tr, int nrhs);
-
-    /** \brief Calculate forward mode directional derivatives */
-    virtual void linsol_forward(const std::vector<MX>& arg, const std::vector<MX>& res,
-                                const std::vector<std::vector<MX> >& fseed,
-                                std::vector<std::vector<MX> >& fsens, bool tr);
-
-    /** \brief Calculate reverse mode directional derivatives */
-    virtual void linsol_reverse(const std::vector<MX>& arg, const std::vector<MX>& res,
-                                const std::vector<std::vector<MX> >& aseed,
-                                std::vector<std::vector<MX> >& asens, bool tr);
 
     /// Solve Cholesky
     virtual void linsol_solveL(void* mem, double* x, int nrhs, bool tr) const;

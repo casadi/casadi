@@ -24,6 +24,7 @@
 
 
 #include "linsol_internal.hpp"
+#include "../mx/mx_node.hpp"
 
 using namespace std;
 namespace casadi {
@@ -76,7 +77,7 @@ namespace casadi {
   }
 
   MX Linsol::solve(const MX& A, const MX& B, bool tr) {
-    return (*this)->linsol_solve(A, B, tr);
+    return A->getSolve(B, tr, *this);
   }
 
   void Linsol::solveL(double* x, int nrhs, bool tr) const {
