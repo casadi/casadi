@@ -39,18 +39,6 @@ namespace casadi {
     return LINSOL_NUM_OUT;
   }
 
-  vector<string> linsol_in() {
-    vector<string> ret(linsol_n_in());
-    for (size_t i=0; i<ret.size(); ++i) ret[i]=linsol_in(i);
-    return ret;
-  }
-
-  vector<string> linsol_out() {
-    vector<string> ret(linsol_n_out());
-    for (size_t i=0; i<ret.size(); ++i) ret[i]=linsol_out(i);
-    return ret;
-  }
-
   string linsol_in(int ind) {
     switch (static_cast<LinsolInput>(ind)) {
     case LINSOL_A:     return "A";
@@ -68,16 +56,16 @@ namespace casadi {
     return string();
   }
 
-  bool has_linsol(const string& name) {
-    return LinsolInternal::has_plugin(name);
+  vector<string> linsol_in() {
+    vector<string> ret(linsol_n_in());
+    for (size_t i=0; i<ret.size(); ++i) ret[i]=linsol_in(i);
+    return ret;
   }
 
-  void load_linsol(const string& name) {
-    LinsolInternal::load_plugin(name);
-  }
-
-  string doc_linsol(const string& name) {
-    return LinsolInternal::getPlugin(name).doc;
+  vector<string> linsol_out() {
+    vector<string> ret(linsol_n_out());
+    for (size_t i=0; i<ret.size(); ++i) ret[i]=linsol_out(i);
+    return ret;
   }
 
   Function linsol_new(const std::string& name, const std::string& solver,
@@ -89,52 +77,8 @@ namespace casadi {
     return Function(name, {A, b}, {x}, {"A", "B"}, {"X"});
   }
 
-  Function linsol(const std::string& name, const std::string& solver,
-                  const Sparsity& sp, int nrhs, const Dict& opts) {
-    casadi_assert(nrhs==0);
-    Function ret;
-    if (solver=="none") {
-      ret.assignNode(new LinsolInternal(name, sp, nrhs));
-    } else {
-      ret.assignNode(LinsolInternal::getPlugin(solver).creator(name, sp, nrhs));
-    }
-    ret->construct(opts);
-    return ret;
-  }
-
-  DM Function::linsol_solve(const DM& A, const DM& B, bool tr) {
-    // Factorize
-    linsol_factorize(A.ptr());
-
-    // Solve
-    DM x = densify(B);
-    linsol_solve(x.ptr(), x.size2());
-    return x;
-  }
-
-  MX Function::linsol_solve(const MX& A, const MX& B, bool tr) {
-    return (*this)->linsol_solve(A, B, tr);
-  }
-
-  void Function::linsol_solveL(double* x, int nrhs, bool tr, int mem) const {
-    (*this)->linsol_solveL(memory(mem), x, nrhs, tr);
-  }
-
-  void Function::linsol_factorize(const double* A, int mem) const {
-    (*this)->linsol_factorize(memory(mem), A);
-  }
-
-  void Function::linsol_solve(double* x, int nrhs, bool tr, int mem) const {
-    (*this)->linsol_solve(memory(mem), x, nrhs, tr);
-  }
-
-  Sparsity Function::linsol_cholesky_sparsity(bool tr, int mem) const {
-    return (*this)->linsol_cholesky_sparsity(memory(mem), tr);
-  }
-
-  DM Function::linsol_cholesky(bool tr, int mem) const {
-    return (*this)->linsol_cholesky(memory(mem), tr);
-  }
+  std::string LinsolInternal::get_name_in(int i) { return linsol_in(i);}
+  std::string LinsolInternal::get_name_out(int i) { return linsol_out(i);}
 
   LinsolInternal::LinsolInternal(const std::string& name, const Sparsity& sparsity, int nrhs)
     : FunctionInternal(name), sparsity_(sparsity), nrhs_(nrhs) {
@@ -377,6 +321,26 @@ namespace casadi {
 
   MX LinsolInternal::linsol_solve(const MX& A, const MX& B, bool tr) {
     return A->getSolve(B, tr, shared_from_this<Linsol>());
+  }
+
+  void LinsolInternal::linsol_solve(void* mem, double* x, int nrhs, bool tr) const {
+    casadi_error("'linsol_solve' not defined for " + type_name());
+  }
+
+  void LinsolInternal::linsol_solveL(void* mem, double* x, int nrhs, bool tr) const {
+    casadi_error("'linsol_solveL' not defined for " + type_name());
+  }
+
+  void LinsolInternal::linsol_factorize(void* mem, const double* A) const {
+    casadi_error("'linsol_factorize' not defined for " + type_name());
+  }
+
+  Sparsity LinsolInternal::linsol_cholesky_sparsity(void* mem, bool tr) const {
+    casadi_error("'linsol_cholesky_sparsity' not defined for " + type_name());
+  }
+
+  DM LinsolInternal::linsol_cholesky(void* mem, bool tr) const {
+    casadi_error("'linsol_cholesky' not defined for " + type_name());
   }
 
   std::map<std::string, LinsolInternal::Plugin> LinsolInternal::solvers_;

@@ -60,8 +60,8 @@ namespace casadi {
 
     ///@{
     /** \brief Names of function input and outputs */
-    virtual std::string get_name_in(int i) { return linsol_in(i);}
-    virtual std::string get_name_out(int i) { return linsol_out(i);}
+    virtual std::string get_name_in(int i);
+    virtual std::string get_name_out(int i);
     /// @}
 
     /// Initialize
@@ -70,8 +70,10 @@ namespace casadi {
     /// Solve the system of equations
     virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
 
+    // Solve numerically
+    virtual void linsol_solve(void* mem, double* x, int nrhs, bool tr) const;
+
     /// Create a solve node
-    using FunctionInternal::linsol_solve;
     virtual MX linsol_solve(const MX& A, const MX& B, bool tr);
 
     /// Evaluate SX, possibly transposed
@@ -100,6 +102,18 @@ namespace casadi {
     /** \brief  Propagate sparsity backwards */
     virtual void linsol_sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem,
                               bool tr, int nrhs);
+
+    /// Solve Cholesky
+    virtual void linsol_solveL(void* mem, double* x, int nrhs, bool tr) const;
+
+    /// Factorize the linear system
+    virtual void linsol_factorize(void* mem, const double* A) const;
+
+    /// Sparsity pattern of the cholesky factors
+    virtual Sparsity linsol_cholesky_sparsity(void* mem, bool tr) const;
+
+    /// Get Cholesky factor
+    virtual DM linsol_cholesky(void* mem, bool tr) const;
 
     /// Dulmage-Mendelsohn decomposition
     Sparsity::Btf btf_;
