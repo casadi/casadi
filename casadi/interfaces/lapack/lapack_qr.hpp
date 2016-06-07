@@ -74,11 +74,11 @@ namespace casadi {
   class CASADI_LINSOL_LAPACKQR_EXPORT LapackQr : public LinsolInternal {
   public:
     // Create a linear solver given a sparsity pattern and a number of right hand sides
-    LapackQr(const std::string& name, const Sparsity& sparsity, int nrhs);
+    LapackQr(const std::string& name, const Sparsity& sparsity);
 
     /** \brief  Create a new Linsol */
-    static LinsolInternal* creator(const std::string& name, const Sparsity& sp, int nrhs) {
-      return new LapackQr(name, sp, nrhs);
+    static LinsolInternal* creator(const std::string& name, const Sparsity& sp) {
+      return new LapackQr(name, sp);
     }
 
     // Destructor

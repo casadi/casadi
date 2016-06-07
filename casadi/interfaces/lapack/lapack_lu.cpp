@@ -44,9 +44,8 @@ namespace casadi {
     LinsolInternal::registerPlugin(casadi_register_linsol_lapacklu);
   }
 
-  LapackLu::LapackLu(const std::string& name,
-                               const Sparsity& sparsity, int nrhs)
-    : LinsolInternal(name, sparsity, nrhs) {
+  LapackLu::LapackLu(const std::string& name, const Sparsity& sparsity)
+    : LinsolInternal(name, sparsity) {
 
     // Default options
     equilibriate_ = true;

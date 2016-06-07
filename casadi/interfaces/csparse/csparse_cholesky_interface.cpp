@@ -46,8 +46,8 @@ namespace casadi {
   }
 
   CSparseCholeskyInterface::CSparseCholeskyInterface(const std::string& name,
-                                                     const Sparsity& sparsity, int nrhs) :
-    LinsolInternal(name, sparsity, nrhs) {
+                                                     const Sparsity& sparsity) :
+    LinsolInternal(name, sparsity) {
 
     casadi_assert_message(sparsity.is_symmetric(),
                           "CSparseCholeskyInterface: supplied sparsity must be symmetric, got "

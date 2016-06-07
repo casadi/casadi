@@ -40,8 +40,8 @@ namespace casadi {
     return Function(name, {A, b}, {x}, {"A", "B"}, {"X"});
   }
 
-  LinsolInternal::LinsolInternal(const std::string& name, const Sparsity& sparsity, int nrhs)
-    : FunctionInternal(name), sparsity_(sparsity), nrhs_(nrhs) {
+  LinsolInternal::LinsolInternal(const std::string& name, const Sparsity& sparsity)
+    : FunctionInternal(name), sparsity_(sparsity) {
 
     // Make sure arguments are consistent
     casadi_assert(!sparsity.is_null());
@@ -52,9 +52,6 @@ namespace casadi {
                           "LinsolInternal::init: singularity - the matrix is structurally "
                           "rank-deficient. sprank(J)=" << sprank(sparsity)
                           << " (in stead of "<< sparsity.size2() << ")");
-
-    // Number of equations
-    neq_ = sparsity.size2();
   }
 
   LinsolInternal::~LinsolInternal() {

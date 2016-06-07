@@ -44,9 +44,8 @@ namespace casadi {
     LinsolInternal::registerPlugin(casadi_register_linsol_lapackqr);
   }
 
-  LapackQr::LapackQr(const std::string& name,
-                               const Sparsity& sparsity, int nrhs) :
-    LinsolInternal(name, sparsity, nrhs) {
+  LapackQr::LapackQr(const std::string& name, const Sparsity& sparsity) :
+    LinsolInternal(name, sparsity) {
   }
 
   LapackQr::~LapackQr() {

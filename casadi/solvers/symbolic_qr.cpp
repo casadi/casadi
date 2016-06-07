@@ -47,8 +47,8 @@ namespace casadi {
     LinsolInternal::registerPlugin(casadi_register_linsol_symbolicqr);
   }
 
-  SymbolicQr::SymbolicQr(const std::string& name, const Sparsity& sparsity, int nrhs) :
-    LinsolInternal(name, sparsity, nrhs) {
+  SymbolicQr::SymbolicQr(const std::string& name, const Sparsity& sparsity) :
+    LinsolInternal(name, sparsity) {
   }
 
   SymbolicQr::~SymbolicQr() {
@@ -155,7 +155,7 @@ namespace casadi {
     alloc(solv_fcn_T_);
 
     // Temporary storage
-    alloc_w(neq_, true);
+    alloc_w(nrow(), true);
   }
 
   void SymbolicQr::init_memory(void* mem) const {
@@ -200,11 +200,11 @@ namespace casadi {
     m->arg[1] = get_ptr(m->r);
     fill_n(get_ptr(m->res), solv.n_out(), nullptr);
     for (int i=0; i<nrhs; ++i) {
-      copy_n(x, neq_, get_ptr(m->w)); // Copy x to a temporary
+      copy_n(x, nrow(), get_ptr(m->w)); // Copy x to a temporary
       m->arg[2] = get_ptr(m->w);
       m->res[0] = x;
-      solv(get_ptr(m->arg), get_ptr(m->res), get_ptr(m->iw), get_ptr(m->w)+neq_, 0);
-      x += neq_;
+      solv(get_ptr(m->arg), get_ptr(m->res), get_ptr(m->iw), get_ptr(m->w)+nrow(), 0);
+      x += nrow();
     }
   }
 

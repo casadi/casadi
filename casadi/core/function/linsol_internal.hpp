@@ -41,7 +41,7 @@ namespace casadi {
     : public FunctionInternal, public PluginInterface<LinsolInternal> {
   public:
     /// Constructor
-    LinsolInternal(const std::string& name, const Sparsity& sparsity, int nrhs);
+    LinsolInternal(const std::string& name, const Sparsity& sparsity);
 
     /// Destructor
     virtual ~LinsolInternal();
@@ -95,7 +95,7 @@ namespace casadi {
     const int* colind() const { return sparsity_.colind();}
 
     // Creator function for internal class
-    typedef LinsolInternal* (*Creator)(const std::string& name, const Sparsity& sp, int nrhs);
+    typedef LinsolInternal* (*Creator)(const std::string& name, const Sparsity& sp);
 
     // No static functions exposed
     struct Exposed{ };
@@ -107,16 +107,10 @@ namespace casadi {
     static const std::string infix_;
 
     // Get name of the plugin
-    virtual const char* plugin_name() const { return "none";}
+    virtual const char* plugin_name() const = 0;
 
     // Sparsity of the linear system
     Sparsity sparsity_;
-
-    // Number of equations
-    int neq_;
-
-    // Number of right-hand-sides
-    int nrhs_;
   };
 
 
