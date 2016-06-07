@@ -85,108 +85,15 @@ namespace casadi {
     mem_.clear();
   }
 
-  inline bool has_dot(const Dict& opts) {
-    for (auto&& op : opts) {
-      if (op.first.find('.') != string::npos || op.first.find("__") != string::npos) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  inline bool has_null(const Dict& opts) {
-    for (auto&& op : opts) {
-      if (op.second.is_null()) return true;
-    }
-    return false;
-  }
-
   void FunctionInternal::construct(const Dict& opts) {
-    // Drop nulls
-    if (has_null(opts)) {
-      // Create a new dictionary without the null entries
-      Dict mod_opts;
-      for (auto&& op : opts) {
-        if (!op.second.is_null()) mod_opts[op.first] = op.second;
-      }
-
+    // Sanitize dictionary is needed
+    if (!Options::is_sane(opts)) {
       // Call recursively
-      return construct(mod_opts);
+      return construct(Options::sanitize(opts));
     }
 
-    //  Treat the case where any of the options have a dot (dictionary shorthand)
-    if (has_dot(opts)) {
-      // New options dictionary being constructed
-      Dict mod_opts;
-
-      // Sub-dictionary and corresponding name being constructed
-      Dict sopts;
-      std::string sname;
-
-      // Process options
-      for (auto&& op : opts) {
-        // Find the dot if any
-        string::size_type dotpos = op.first.find('.'), dotpos_end;
-        if (dotpos==string::npos) {
-          dotpos = op.first.find("__");
-          if (dotpos!=string::npos) dotpos_end = dotpos+2;
-        } else {
-          dotpos_end = dotpos+1;
-        }
-
-        // Flush last sub-dictionary
-        if (!sname.empty() && (dotpos==string::npos
-                               || op.first.compare(0, dotpos, sname)!=0)) {
-          mod_opts[sname] = sopts;
-          sname.clear();
-          sopts.clear();
-        }
-
-        // Add to dictionary
-        if (dotpos != string::npos) {
-          sname = op.first.substr(0, dotpos);
-          sopts[op.first.substr(dotpos_end)] = op.second;
-        } else {
-          mod_opts[op.first] = op.second;
-        }
-      }
-
-      // Flush trailing sub-dictionary
-      if (!sname.empty()) {
-        mod_opts[sname] = sopts;
-      }
-
-      // Call recursively
-      return construct(mod_opts);
-    }
-
-    // Get a reference to the options structure
-    const Options& options = get_options();
-
-    // Make sure all options exist and have the correct type
-    for (auto&& op : opts) {
-      const Options::Entry* entry = options.find(op.first);
-
-      // Informative error message if option does not exist
-      if (entry==0) {
-        stringstream ss;
-        ss << "Unknown option: " << op.first << endl;
-        ss << endl;
-        ss << "Did you mean one of the following?" << endl;
-        for (auto&& s : options.suggestions(op.first)) {
-          print_option(s, ss);
-        }
-        ss << "Use print_options() to get a full list of options." << endl;
-        casadi_error(ss.str());
-      }
-
-      // Check type
-      casadi_assert_message(op.second.can_cast_to(entry->type),
-                            "Illegal type for " + op.first + ": " +
-                            op.second.get_description() +
-                            " cannot be cast to " +
-                            GenericType::get_type_description(entry->type) + ".");
-    }
+    // Make sure all options exist
+    get_options().check(opts);
 
     // Initialize the class hierarchy
     init(opts);
@@ -425,18 +332,11 @@ namespace casadi {
   }
 
   void FunctionInternal::print_options(std::ostream &stream) const {
-    stream << "\"Option name\" [type] = value" << endl;
-    get_options().print(stream);
-    stream << endl;
+    get_options().print_all(stream);
   }
 
   void FunctionInternal::print_option(const std::string &name, std::ostream &stream) const {
-    const Options::Entry* entry = get_options().find(name);
-    if (entry!=0) {
-      entry->print(name, stream);
-    } else {
-      stream << "  \"" << name << "\" does not exist.";
-    }
+    get_options().print_one(name, stream);
   }
 
   void FunctionInternal::print_free(std::ostream &stream) const {

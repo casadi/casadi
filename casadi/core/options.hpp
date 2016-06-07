@@ -67,6 +67,27 @@ namespace casadi {
     /** \brief Find best matches */
     void best_matches(const std::string& word,
                       std::vector<std::pair<double, std::string> >& best) const;
+
+    /// Does the dictionary contain a dot
+    static bool has_dot(const Dict& opts);
+
+    /// Does the dictionary has null objects
+    static bool has_null(const Dict& opts);
+
+    /// Is the dictionary sane
+    static bool is_sane(const Dict& opts);
+
+    /// Sanitize a options dictionary
+    static Dict sanitize(const Dict& opts);
+
+    /// Check if options exist
+    void check(const Dict& opts) const;
+
+    /** \brief Print list of options */
+    void print_all(std::ostream &stream) const;
+
+    /** \brief Print all information there is to know about a certain option */
+    void print_one(const std::string &name, std::ostream &stream) const;
   };
 
 #endif // SWIG
