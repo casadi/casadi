@@ -53,9 +53,6 @@ namespace casadi {
                           "rank-deficient. sprank(J)=" << sprank(sparsity)
                           << " (in stead of "<< sparsity.size2() << ")");
 
-    // Calculate the Dulmage-Mendelsohn decomposition
-    btf_ = sparsity.btf();
-
     // Number of equations
     neq_ = sparsity.size2();
   }
@@ -171,7 +168,7 @@ namespace casadi {
 
       // Propagate to X
       std::fill(X, X+n, 0);
-      A_sp.spsolve(btf_, X, tmp, tr);
+      A_sp.spsolve(X, tmp, tr);
 
       // Continue to the next right-hand-side
       B += n;
@@ -196,7 +193,7 @@ namespace casadi {
     for (int r=0; r<nrhs; ++r) {
       // Solve transposed
       std::fill(tmp, tmp+n, 0);
-      A_sp.spsolve(btf_, tmp, X, !tr);
+      A_sp.spsolve(tmp, X, !tr);
 
       // Clear seeds
       std::fill(X, X+n, 0);

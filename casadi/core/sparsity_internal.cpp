@@ -3937,7 +3937,8 @@ namespace casadi {
   }
 
   void SparsityInternal::
-  spsolve(const Sparsity::Btf& btf, bvec_t* X, const bvec_t* B, bool tr) const {
+  spsolve(bvec_t* X, const bvec_t* B, bool tr) const {
+    const Sparsity::Btf& btf = this->btf();
     const int* colind = this->colind();
     const int* row = this->row();
 

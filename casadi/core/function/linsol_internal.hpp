@@ -95,9 +95,6 @@ namespace casadi {
     /// Get Cholesky factor
     virtual DM linsol_cholesky(void* mem, bool tr) const;
 
-    /// Dulmage-Mendelsohn decomposition
-    Sparsity::Btf btf_;
-
     /// Get sparsity pattern
     int nrow() const { return sparsity_.size1();}
     int ncol() const { return sparsity_.size2();}

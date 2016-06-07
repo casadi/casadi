@@ -445,7 +445,7 @@ namespace casadi {
     void spy_matlab(const std::string& mfile) const;
 
     /// Propagate sparsity through a linear solve
-    void spsolve(const Sparsity::Btf& btf, bvec_t* X, const bvec_t* B, bool tr) const;
+    void spsolve(bvec_t* X, const bvec_t* B, bool tr) const;
 };
 
 } // namespace casadi

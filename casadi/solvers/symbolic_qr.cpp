@@ -92,18 +92,21 @@ namespace casadi {
     // Symbolic expression for A
     SX A = SX::sym("A", sparsity_);
 
+    // BTF factorization
+    const Sparsity::Btf& btf = sparsity_.btf();
+
     // Get the inverted column permutation
-    std::vector<int> inv_colperm(btf_.colperm.size());
-    for (int k=0; k<btf_.colperm.size(); ++k)
-      inv_colperm[btf_.colperm[k]] = k;
+    std::vector<int> inv_colperm(btf.colperm.size());
+    for (int k=0; k<btf.colperm.size(); ++k)
+      inv_colperm[btf.colperm[k]] = k;
 
     // Get the inverted row permutation
-    std::vector<int> inv_rowperm(btf_.rowperm.size());
-    for (int k=0; k<btf_.rowperm.size(); ++k)
-      inv_rowperm[btf_.rowperm[k]] = k;
+    std::vector<int> inv_rowperm(btf.rowperm.size());
+    for (int k=0; k<btf.rowperm.size(); ++k)
+      inv_rowperm[btf.rowperm[k]] = k;
 
     // Permute the linear system
-    SX Aperm = A(btf_.rowperm, btf_.colperm);
+    SX Aperm = A(btf.rowperm, btf.colperm);
 
     // Generate the QR factorization function
     SX Q1, R1;
@@ -120,7 +123,7 @@ namespace casadi {
     // We have Pb' * Q * R * Px * x = b <=> x = Px' * inv(R) * Q' * Pb * b
 
     // Permute the right hand sides
-    SX bperm = b(btf_.rowperm, Slice());
+    SX bperm = b(btf.rowperm, Slice());
 
     // Solve the factorized system
     SX xperm = SX::solve(R, mtimes(Q.T(), bperm));
@@ -139,7 +142,7 @@ namespace casadi {
     // <=> x = Pb' * Q * inv(R') * Px * b
 
     // Permute the right hand side
-    bperm = b(btf_.colperm, Slice());
+    bperm = b(btf.colperm, Slice());
 
     // Solve the factorized system
     xperm = mtimes(Q, SX::solve(R.T(), bperm));
