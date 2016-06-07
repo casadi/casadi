@@ -638,7 +638,7 @@ namespace casadi {
             std::vector<int>& SWIG_OUTPUT(coarse_colblock),
             int seed=0) const;
 #ifndef SWIG
-    Btf btf(int seed=0) const;
+    const Btf& btf() const;
 #endif // SWIG
     /// @}
 
