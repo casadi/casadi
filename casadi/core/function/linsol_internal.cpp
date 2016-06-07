@@ -139,45 +139,6 @@ namespace casadi {
     }
   }
 
-  void LinsolInternal::
-  linsol_sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem,
-               bool tr, int nrhs) {
-    // Sparsities
-    const Sparsity& A_sp = sparsity_;
-    const int* A_colind = A_sp.colind();
-    const int* A_row = A_sp.row();
-    int n = A_sp.size1();
-
-    // Get pointers to data
-    bvec_t *B=arg[0], *A=arg[1], *X=res[0];
-    bvec_t* tmp = w;
-
-    // For all right-hand-sides
-    for (int r=0; r<nrhs; ++r) {
-      // Solve transposed
-      std::fill(tmp, tmp+n, 0);
-      A_sp.spsolve(tmp, X, !tr);
-
-      // Clear seeds
-      std::fill(X, X+n, 0);
-
-      // Propagate to B
-      for (int i=0; i<n; ++i) B[i] |= tmp[i];
-
-      // Propagate to A
-      for (int cc=0; cc<n; ++cc) {
-        for (int k=A_colind[cc]; k<A_colind[cc+1]; ++k) {
-          int rr = A_row[k];
-          A[k] |= tmp[tr ? cc : rr];
-        }
-      }
-
-      // Continue to the next right-hand-side
-      B += n;
-      X += n;
-    }
-  }
-
   void LinsolInternal::linsol_eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem,
                              bool tr, int nrhs) {
     casadi_error("eval_sx not defined for " + type_name());

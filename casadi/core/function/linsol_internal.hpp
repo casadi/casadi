@@ -75,10 +75,6 @@ namespace casadi {
                                 const std::vector<std::vector<MX> >& aseed,
                                 std::vector<std::vector<MX> >& asens, bool tr);
 
-    /** \brief  Propagate sparsity backwards */
-    virtual void linsol_sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem,
-                              bool tr, int nrhs);
-
     /// Solve Cholesky
     virtual void linsol_solveL(void* mem, double* x, int nrhs, bool tr) const;
 
