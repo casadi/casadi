@@ -31,25 +31,6 @@
 using namespace std;
 namespace casadi {
 
-  int linsol_n_in() {
-    return LINSOL_NUM_IN;
-  }
-
-  string linsol_in(int ind) {
-    switch (static_cast<LinsolInput>(ind)) {
-    case LINSOL_A:     return "A";
-    case LINSOL_B:      return "B";
-    case LINSOL_NUM_IN: break;
-    }
-    return string();
-  }
-
-  vector<string> linsol_in() {
-    vector<string> ret(linsol_n_in());
-    for (size_t i=0; i<ret.size(); ++i) ret[i]=linsol_in(i);
-    return ret;
-  }
-
   Function linsol_new(const std::string& name, const std::string& solver,
                   const Sparsity& sp, int nrhs, const Dict& opts) {
     Linsol F(name + "_linsol", solver, sp, opts);
@@ -58,8 +39,6 @@ namespace casadi {
     MX x = F.solve(A, b);
     return Function(name, {A, b}, {x}, {"A", "B"}, {"X"});
   }
-
-  std::string LinsolInternal::get_name_in(int i) { return linsol_in(i);}
 
   LinsolInternal::LinsolInternal(const std::string& name, const Sparsity& sparsity, int nrhs)
     : FunctionInternal(name), sparsity_(sparsity), nrhs_(nrhs) {
@@ -82,17 +61,6 @@ namespace casadi {
   }
 
   LinsolInternal::~LinsolInternal() {
-  }
-
-  Sparsity LinsolInternal::get_sparsity_in(int i) {
-    switch (static_cast<LinsolInput>(i)) {
-    case LINSOL_A:
-      return sparsity_;
-    case LINSOL_B:
-      return Sparsity::dense(neq_, nrhs_);
-    case LINSOL_NUM_IN: break;
-    }
-    return Sparsity();
   }
 
   void LinsolInternal::init(const Dict& opts) {
@@ -178,7 +146,7 @@ namespace casadi {
   linsol_sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem,
                bool tr, int nrhs) {
     // Sparsities
-    const Sparsity& A_sp = sparsity_in(LINSOL_A);
+    const Sparsity& A_sp = sparsity_;
     const int* A_colind = A_sp.colind();
     const int* A_row = A_sp.row();
     int n = A_sp.size1();
@@ -215,7 +183,7 @@ namespace casadi {
   linsol_sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem,
                bool tr, int nrhs) {
     // Sparsities
-    const Sparsity& A_sp = sparsity_in(LINSOL_A);
+    const Sparsity& A_sp = sparsity_;
     const int* A_colind = A_sp.colind();
     const int* A_row = A_sp.row();
     int n = A_sp.size1();

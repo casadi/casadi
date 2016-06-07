@@ -48,19 +48,9 @@ namespace casadi {
 
     ///@{
     /** \brief Number of function inputs and outputs */
-    virtual size_t get_n_in() { return LINSOL_NUM_IN;}
+    virtual size_t get_n_in() { return 0;}
     virtual size_t get_n_out() { return 0;}
     ///@}
-
-    /// @{
-    /** \brief Sparsities of function inputs and outputs */
-    virtual Sparsity get_sparsity_in(int i);
-    /// @}
-
-    ///@{
-    /** \brief Names of function input and outputs */
-    virtual std::string get_name_in(int i);
-    /// @}
 
     /// Initialize
     virtual void init(const Dict& opts);
@@ -109,11 +99,11 @@ namespace casadi {
     Sparsity::Btf btf_;
 
     /// Get sparsity pattern
-    int nrow() const { return size1_in(LINSOL_A);}
-    int ncol() const { return size2_in(LINSOL_A);}
-    int nnz() const { return nnz_in(LINSOL_A);}
-    const int* row() const { return sparsity_in(LINSOL_A).row();}
-    const int* colind() const { return sparsity_in(LINSOL_A).colind();}
+    int nrow() const { return sparsity_.size1();}
+    int ncol() const { return sparsity_.size2();}
+    int nnz() const { return sparsity_.nnz();}
+    const int* row() const { return sparsity_.row();}
+    const int* colind() const { return sparsity_.colind();}
 
     // Creator function for internal class
     typedef LinsolInternal* (*Creator)(const std::string& name, const Sparsity& sp, int nrhs);

@@ -72,12 +72,12 @@ namespace casadi {
     auto m = static_cast<CsparseCholMemory*>(mem);
     m->L = 0;
     m->S = 0;
-    m->A.nzmax = nnz_in(0);  // maximum number of entries
-    m->A.m = size1_in(0); // number of columns
-    m->A.n = size2_in(0); // number of rows
-    m->A.p = const_cast<int*>(sparsity_in(0).colind()); // row pointers (size n+1)
+    m->A.nzmax = nnz();  // maximum number of entries
+    m->A.m = nrow(); // number of columns
+    m->A.n = ncol(); // number of rows
+    m->A.p = const_cast<int*>(colind()); // row pointers (size n+1)
     // or row indices (size nzmax)
-    m->A.i = const_cast<int*>(sparsity_in(0).row()); // column indices, size nzmax
+    m->A.i = const_cast<int*>(row()); // column indices, size nzmax
     m->A.x = 0; // numerical values, size nzmax
     m->A.nz = -1; // of entries in triplet matrix, -1 for compressed-row
 

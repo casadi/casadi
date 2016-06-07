@@ -402,14 +402,6 @@ namespace casadi {
     CONIC_LAM_X,
     CONIC_NUM_OUT};
 
-  /// Input arguments of a linear solver
-  enum LinsolInput {
-    /// The square matrix A: sparse, (n x n)
-    LINSOL_A,
-    /// The right-hand-side matrix b: dense,  (n x m)
-    LINSOL_B,
-    LINSOL_NUM_IN};
-
 #endif // SWIG
 
 } // namespace casadi
