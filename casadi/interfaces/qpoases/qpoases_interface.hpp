@@ -64,6 +64,9 @@ namespace casadi {
     // Map linear system nonzeros
     std::vector<int> lin_map;
 
+    // Sparsity pattern as sparse triplet
+    std::vector<int> row, col, nz_map;
+
     /// Constructor
     QpoasesMemory(const QpoasesInterface& self);
 

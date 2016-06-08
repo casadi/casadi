@@ -791,27 +791,34 @@ namespace casadi {
     QpoasesMemory* m = static_cast<QpoasesMemory*>(mem);
 
     // Start with the provided sparsity pattern (index-1)
-    vector<int> rowv, colv, nz_map;
+    m->row.clear();
+    m->col.clear();
+    m->nz_map.clear();
     for (int k=0; k<nnz; ++k) {
-      rowv.push_back(row[k]-1);
-      colv.push_back(col[k]-1);
-      nz_map.push_back(k);
+      m->row.push_back(row[k]-1);
+      m->col.push_back(col[k]-1);
+      m->nz_map.push_back(k);
     }
 
     // Add mirror image
     for (int k=0; k<nnz; ++k) {
       if (row[k]!=col[k]) {
-        rowv.push_back(col[k]-1);
-        colv.push_back(row[k]-1);
-        nz_map.push_back(k);
+        m->row.push_back(col[k]-1);
+        m->col.push_back(row[k]-1);
+        m->nz_map.push_back(k);
       }
     }
 
     // Create sparsity pattern
-    Sparsity sp = Sparsity::triplet(dim, dim, rowv, colv, m->lin_map);
-    for (int& e : m->lin_map) e = nz_map[e];
+    Sparsity sp = Sparsity::triplet(dim, dim, m->row, m->col, m->lin_map);
+    for (int& e : m->lin_map) e = m->nz_map[e];
+
+
+    cout << "------" << endl;
+
     // Create a linear solver instance
 //    m->lin = Linsol()
+    return 1;
 
     return 0;
   }

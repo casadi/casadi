@@ -915,7 +915,7 @@ namespace casadi {
     bool perfectly_ordered=true;
     for (int k=0; k<col.size(); ++k) {
       // Consistency check
-      casadi_assert_message(col[k]>=0 && col[k]<ncol, "Col index out of bounds");
+      casadi_assert_message(col[k]>=0 && col[k]<ncol, "Column index out of bounds");
       casadi_assert_message(row[k]>=0 && row[k]<nrow, "Row index out of bounds");
 
       // Check if ordering is already perfect
@@ -940,8 +940,7 @@ namespace casadi {
 
       // Identity mapping
       mapping.resize(row.size());
-      for (int k=0; k<row.size(); ++k)
-        mapping[k] = k;
+      for (int k=0; k<row.size(); ++k) mapping[k] = k;
 
       // Quick return
       return Sparsity(nrow, ncol, r_colind, r_row);
