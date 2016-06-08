@@ -38,12 +38,18 @@ namespace casadi {
     // Sparsity pattern (allowed to change)
     std::vector<int> sparsity;
 
+    // Current state of factorization
+    bool is_pivoted, is_factorized;
+
     /// Get sparsity pattern
     int nrow() const { return sparsity[0];}
     int ncol() const { return sparsity[1];}
     const int* colind() const { return &sparsity[2];}
     const int* row() const { return colind() + ncol() + 1;}
     int nnz() const { return colind()[ncol()];}
+
+    // Constructor
+    LinsolMemory() : is_pivoted(false), is_factorized(false) {}
   };
 
   /** Internal class
@@ -87,10 +93,10 @@ namespace casadi {
     virtual void linsol_solveL(void* mem, double* x, int nrhs, bool tr) const;
 
     // Set sparsity pattern
-    virtual bool fixed_sparsity() const {return true;}
-
-    // Set sparsity pattern
     virtual void set_sparsity(void* mem, const int* sp) const;
+
+    // Symbolic factorization - partial pivoting (optional)
+    virtual void pivoting(void* mem, const double* A) const {}
 
     /// Factorize the linear system
     virtual void linsol_factorize(void* mem, const double* A) const;
