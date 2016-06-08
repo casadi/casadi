@@ -439,7 +439,7 @@ namespace casadi {
     return MX::create(new Rank1(shared_from_this<MX>(), alpha, x, y));
   }
 
-  MX MXNode::getSolve(const MX& r, bool tr, const Function& linear_solver) const {
+  MX MXNode::getSolve(const MX& r, bool tr, const Linsol& linear_solver) const {
     if (tr) {
       return MX::create(new Solve<true>(densify(r), shared_from_this<MX>(), linear_solver));
     } else {

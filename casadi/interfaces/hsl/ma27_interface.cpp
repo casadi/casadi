@@ -32,7 +32,7 @@ namespace casadi {
 
   extern "C"
   int CASADI_LINSOL_MA27_EXPORT
-  casadi_register_linsol_ma27(Linsol::Plugin* plugin) {
+  casadi_register_linsol_ma27(LinsolInternal::Plugin* plugin) {
     plugin->creator = Ma27Interface::creator;
     plugin->name = "ma27";
     plugin->doc = Ma27Interface::meta_doc.c_str();
@@ -42,12 +42,11 @@ namespace casadi {
 
   extern "C"
   void CASADI_LINSOL_MA27_EXPORT casadi_load_linsol_ma27() {
-    Linsol::registerPlugin(casadi_register_linsol_ma27);
+    LinsolInternal::registerPlugin(casadi_register_linsol_ma27);
   }
 
-  Ma27Interface::Ma27Interface(const std::string& name,
-                                     const Sparsity& sparsity, int nrhs)
-    : Linsol(name, sparsity, nrhs) {
+  Ma27Interface::Ma27Interface(const std::string& name, const Sparsity& sparsity)
+    : LinsolInternal(name, sparsity) {
   }
 
   Ma27Interface::~Ma27Interface() {
@@ -56,19 +55,8 @@ namespace casadi {
 
   void Ma27Interface::init(const Dict& opts) {
     // Call the init method of the base class
-    Linsol::init(opts);
+    LinsolInternal::init(opts);
 
-    // Dimensions
-    int N = this->ncol();
-    int nnz = this->nnz();
-
-    // Work vectors
-    casadi_assert(nnz!=0);
-    alloc_w(nnz, true); // a
-    alloc_iw(nnz, true); // irn
-    alloc_iw(nnz, true); // jcn
-    alloc_iw(2*N, true); // IW1 in MA27AD
-    alloc_iw(3*N, true); // IKEEP in MA27AD
   }
 
   void Ma27Interface::set_work(void* mem, const double**& arg, double**& res,
@@ -76,18 +64,11 @@ namespace casadi {
     auto m = static_cast<Ma27Memory*>(mem);
 
     // Set work in base classes
-    Linsol::set_work(mem, arg, res, iw, w);
-
-    // Work vectors
-    int N = this->ncol();
-    int nnz = this->nnz();
-    m->irn = iw; iw += nnz;
-    m->jcn = iw; iw += nnz;
-    m->iw1 = iw; iw += 2*N;
-    m->ikeep = iw; iw += 3*N;
+    LinsolInternal::set_work(mem, arg, res, iw, w);
   }
 
   void Ma27Interface::init_memory(void* mem) const {
+    LinsolInternal::init_memory(mem);
     auto m = static_cast<Ma27Memory*>(mem);
 
     // Set default options for MA27
@@ -97,12 +78,16 @@ namespace casadi {
     m->cntl[0] = 1e-8;     // Set pivot tolerance
 
     // Dynamically resized work vectors
-    int N = this->ncol();
-    int nnz = this->nnz();
+    int N = m->ncol();
+    int nnz = m->colind()[N];
     double liw_factor = 2;
     m->iw.resize(ceil(liw_factor * (2*nnz+3*N+1)));
     double la_factor = 2;
     m->nz.resize(ceil(la_factor * nnz));
+    m->irn.resize(nnz);
+    m->jcn.resize(nnz);
+    m->iw1.resize(2*N);
+    m->ikeep.resize(3*N);
   }
 
   void Ma27Interface::linsol_factorize(void* mem, const double* A) const {
@@ -110,9 +95,9 @@ namespace casadi {
     casadi_assert(A!=0);
 
     // Get sparsity
-    const int ncol = this->ncol();
-    const int* colind = this->colind();
-    const int* row = this->row();
+    const int ncol = m->ncol();
+    const int* colind = m->colind();
+    const int* row = m->row();
 
     // Get actual nonzeros
     int nnz=0;
@@ -131,15 +116,15 @@ namespace casadi {
     m->nnz = nnz;
 
     // Order of the matrix
-    int N = this->ncol();
+    int N = m->ncol();
 
     // Symbolic factorization (MA27AD)
     int LIW = m->iw.size();
     int iflag = 0;
     int info[20];
     double ops;
-    ma27ad_(&N, &nnz, m->irn, m->jcn, &m->iw[0], &LIW, m->ikeep,
-            m->iw1, &m->nsteps, &iflag, m->icntl, m->cntl,
+    ma27ad_(&N, &nnz, get_ptr(m->irn), get_ptr(m->jcn), &m->iw[0], &LIW,
+            get_ptr(m->ikeep), get_ptr(m->iw1), &m->nsteps, &iflag, m->icntl, m->cntl,
             info, &ops);
     iflag = info[0];   // Information flag
     int ierror = info[1];  // Error flag
@@ -159,9 +144,9 @@ namespace casadi {
     // Numerical factorization (MA27BD)
     int LA = m->nz.size();
     LIW = m->iw.size();
-    ma27bd_(&N, &nnz, m->irn, m->jcn, get_ptr(m->nz),
-           &LA, get_ptr(m->iw), &LIW, m->ikeep, &m->nsteps,
-           &m->maxfrt, m->iw1, m->icntl, m->cntl, info);
+    ma27bd_(&N, &nnz, get_ptr(m->irn), get_ptr(m->jcn), get_ptr(m->nz),
+           &LA, get_ptr(m->iw), &LIW, get_ptr(m->ikeep), &m->nsteps,
+           &m->maxfrt, get_ptr(m->iw1), m->icntl, m->cntl, info);
     iflag = info[0];   // Information flag
     ierror = info[1];  // Error flag
     m->neig = info[14];   // Number of negative eigenvalues
@@ -185,21 +170,17 @@ namespace casadi {
     auto m = static_cast<Ma27Memory*>(mem);
 
     // Solve for each right-hand-side
-    int N = this->ncol();
+    int N = m->ncol();
     int LA = m->nz.size();
     int LIW = m->iw.size();
     for (int k=0; k<nrhs; ++k) {
       ma27cd_(&N, get_ptr(m->nz), &LA, get_ptr(m->iw), &LIW, get_ptr(m->w),
-              &m->maxfrt, x, m->iw1, &m->nsteps, m->icntl, m->cntl);
+              &m->maxfrt, x, get_ptr(m->iw1), &m->nsteps, m->icntl, m->cntl);
       x += N;
     }
   }
 
   Ma27Memory::Ma27Memory() {
-    irn = 0;
-    jcn = 0;
-    ikeep = 0;
-
     nnz = -1;
     neig = -1;
     rank = -1;

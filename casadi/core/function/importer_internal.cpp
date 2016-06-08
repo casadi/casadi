@@ -53,17 +53,16 @@ namespace casadi {
   };
 
   void ImporterInternal::construct(const Dict& opts) {
-    // Get a reference to the options structure
-    const Options& options = get_options();
-
-    // Make sure all options exist and have the correct type
-    for (auto&& op : opts) {
-      const Options::Entry* entry = options.find(op.first);
-      casadi_assert_message(entry!=0, "No such option: " + op.first);
-      casadi_assert_message(op.second.can_cast_to(entry->type),
-                            "Illegal type for " + op.first);
+    // Sanitize dictionary is needed
+    if (!Options::is_sane(opts)) {
+      // Call recursively
+      return construct(Options::sanitize(opts));
     }
 
+    // Make sure all options exist
+    get_options().check(opts);
+
+    // Initialize object
     init(opts);
   }
 

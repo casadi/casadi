@@ -637,9 +637,7 @@ namespace casadi {
         N_VScale(1.0, rvec, zvec);
       }
 
-      // Solve the (possibly factorized) system
-      const Function& linsol = s.get_function("linsolF");
-      casadi_assert(linsol.size1_out(0)*(1+s.ns_) == NV_LENGTH_S(zvec));
+      // Solve the factorized system
       double* v = NV_DATA_S(zvec);
 
       // Reorder by nondifferentiated x and z
@@ -654,7 +652,7 @@ namespace casadi {
       }
 
       // Solve with multiple right-hand-sides
-      linsol.linsol_solve(v, 1 + s.ns_);
+      m->linsolF.solve(v, 1 + s.ns_);
 
       // Return to the original ordering
       if (s.ns_>0 && s.nz_>0) {
@@ -686,8 +684,6 @@ namespace casadi {
         N_VScale(1.0, rvecB, zvecB);
       }
 
-      const Function& linsolB = s.get_function("linsolB");
-      casadi_assert(linsolB.size1_out(0)*(1+s.ns_) == NV_LENGTH_S(zvecB));
       double* v = NV_DATA_S(zvecB);
 
       // Reorder, grouping x and z for each sensitivity direction
@@ -702,7 +698,7 @@ namespace casadi {
       }
 
       // Solve with multiple right-hand-sides
-      linsolB.linsol_solve(v, 1 + s.ns_);
+      m->linsolB.solve(v, 1 + s.ns_);
 
       // Return to the original ordering
       if (s.ns_>0 && s.nrz_>0) {
@@ -736,10 +732,8 @@ namespace casadi {
       m->res[0] = m->jac;
       s.calc_function(m, "jacF");
 
-      // Prepare the solution of the linear system (e.g. factorize)
-      const Function& linsol = s.get_function("linsolF");
-      linsol.setup(m->arg+LINSOL_NUM_IN, m->res+LINSOL_NUM_OUT, m->iw, m->w);
-      linsol.linsol_factorize(m->jac);
+      // Factorize the linear system
+      m->linsolF.factorize(m->jac);
 
       return 0;
     } catch(exception& e) {
@@ -766,10 +760,8 @@ namespace casadi {
       m->res[0] = m->jacB;
       s.calc_function(m, "jacB");
 
-      // Prepare the solution of the linear system (e.g. factorize)
-      const Function& linsolB = s.get_function("linsolB");
-      linsolB.setup(m->arg+LINSOL_NUM_IN, m->res+LINSOL_NUM_OUT, m->iw, m->w);
-      linsolB.linsol_factorize(m->jacB);
+      // Factorize the linear system
+      m->linsolB.factorize(m->jacB);
 
       return 0;
     } catch(exception& e) {

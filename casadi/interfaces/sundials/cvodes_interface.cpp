@@ -504,10 +504,8 @@ namespace casadi {
         N_VScale(1.0, r, z);
       }
 
-      // Solve the (possibly factorized) system
-      const Function& linsol = s.get_function("linsolF");
-      casadi_assert(linsol.size1_out(0)*(1+s.ns_) == NV_LENGTH_S(z));
-      linsol.linsol_solve(NV_DATA_S(z), 1 + s.ns_);
+      // Solve the factorized system
+      m->linsolF.solve(NV_DATA_S(z), 1 + s.ns_);
 
       return 0;
     } catch(exception& e) {
@@ -527,10 +525,8 @@ namespace casadi {
         N_VScale(1.0, rvecB, zvecB);
       }
 
-      // Solve the (possibly factorized) system
-      const Function& linsolB = s.get_function("linsolB");
-      casadi_assert(linsolB.size1_out(0)*(1+s.ns_) == NV_LENGTH_S(zvecB));
-      linsolB.linsol_solve(NV_DATA_S(zvecB), 1+s.ns_);
+      // Solve the factorized system
+      m->linsolB.solve(NV_DATA_S(zvecB), 1+s.ns_);
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "psolveB failed: " << e.what() << endl;;
@@ -555,9 +551,7 @@ namespace casadi {
       s.calc_function(m, "jacF");
 
       // Prepare the solution of the linear system (e.g. factorize)
-      const Function& linsol = s.get_function("linsolF");
-      linsol.setup(m->arg+LINSOL_NUM_IN, m->res+LINSOL_NUM_OUT, m->iw, m->w);
-      linsol.linsol_factorize(m->jac);
+      m->linsolF.factorize(m->jac);
 
       return 0;
     } catch(exception& e) {
@@ -586,9 +580,7 @@ namespace casadi {
       s.calc_function(m, "jacB");
 
       // Prepare the solution of the linear system (e.g. factorize)
-      const Function& linsolB = s.get_function("linsolB");
-      linsolB.setup(m->arg+LINSOL_NUM_IN, m->res+LINSOL_NUM_OUT, m->iw, m->w);
-      linsolB.linsol_factorize(m->jacB);
+      m->linsolB.factorize(m->jacB);
 
       return 0;
     } catch(exception& e) {

@@ -34,12 +34,12 @@
 
 /// \cond INTERNAL
 #include <cs.h>
-#include "casadi/core/function/linsol_impl.hpp"
+#include "casadi/core/function/linsol_internal.hpp"
 #include <casadi/interfaces/csparse/casadi_linsol_csparsecholesky_export.h>
 
 namespace casadi {
 
-  struct CASADI_LINSOL_CSPARSECHOLESKY_EXPORT CsparseCholMemory {
+  struct CASADI_LINSOL_CSPARSECHOLESKY_EXPORT CsparseCholMemory : public LinsolMemory {
     // Destructor
     ~CsparseCholMemory();
 
@@ -64,14 +64,14 @@ namespace casadi {
    *
    */
   class CASADI_LINSOL_CSPARSECHOLESKY_EXPORT
-  CSparseCholeskyInterface : public Linsol {
+  CSparseCholeskyInterface : public LinsolInternal {
   public:
     // Create a linear solver given a sparsity pattern and a number of right hand sides
-    CSparseCholeskyInterface(const std::string& name, const Sparsity& sp, int nrhs);
+    CSparseCholeskyInterface(const std::string& name, const Sparsity& sp);
 
-    /** \brief  Create a new Linsol */
-    static Linsol* creator(const std::string& name, const Sparsity& sp, int nrhs) {
-      return new CSparseCholeskyInterface(name, sp, nrhs);
+    /** \brief  Create a new LinsolInternal */
+    static LinsolInternal* creator(const std::string& name, const Sparsity& sp) {
+      return new CSparseCholeskyInterface(name, sp);
     }
 
     // Destructor

@@ -88,7 +88,7 @@ set(CASADI_SRCS
   function/function_internal.hpp   function/function_internal.cpp   # Function object class (internal API)
   function/oracle_function.hpp     function/oracle_function.cpp     # Specialization of FunctionInternal to hold an oracle
   function/callback.cpp            function/callback.hpp            # Interface for user-defined function classes (public API)
-  function/callback_internal.cpp function/callback_internal.hpp     # Interface for user-defined function classes (internal API)
+  function/callback_internal.cpp   function/callback_internal.hpp   # Interface for user-defined function classes (internal API)
   function/plugin_interface.hpp                                     # Plugin interface for Function
   function/factory.hpp                                              # Helper class for derivative function generation
   function/x_function.hpp                                           # Base class for SXFunction and MXFunction
@@ -96,7 +96,7 @@ set(CASADI_SRCS
   function/mx_function.hpp         function/mx_function.cpp
   function/external.hpp            function/external.cpp
   function/jit.hpp                 function/jit.cpp
-  function/linsol.hpp              function/linsol_impl.hpp        function/linsol.cpp
+  function/linsol.hpp              function/linsol.cpp             function/linsol_internal.hpp  function/linsol_internal.cpp
   function/rootfinder.hpp          function/rootfinder_impl.hpp    function/rootfinder.cpp
   function/integrator.hpp          function/integrator_impl.hpp    function/integrator.cpp
   function/nlpsol.hpp              function/nlpsol_impl.hpp        function/nlpsol.cpp

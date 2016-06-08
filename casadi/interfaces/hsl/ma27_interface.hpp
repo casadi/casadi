@@ -26,7 +26,7 @@
 #ifndef CASADI_MA27_INTERFACE_HPP
 #define CASADI_MA27_INTERFACE_HPP
 
-#include "casadi/core/function/linsol_impl.hpp"
+#include "casadi/core/function/linsol_internal.hpp"
 #include <casadi/interfaces/hsl/casadi_linsol_ma27_export.h>
 
 extern "C" {
@@ -57,7 +57,7 @@ extern "C" {
 /** \pluginsection{Linsol,ma27} */
 /// \cond INTERNAL
 namespace casadi {
-  struct CASADI_LINSOL_MA27_EXPORT Ma27Memory {
+  struct CASADI_LINSOL_MA27_EXPORT Ma27Memory : public LinsolMemory {
     // Constructor
     Ma27Memory();
 
@@ -65,7 +65,7 @@ namespace casadi {
     ~Ma27Memory();
 
     /* Work vector for MA27AD */
-    int *iw1;
+    std::vector<int> iw1;
 
     /* Number of nonzeros in the current linear system. */
     int nnz;
@@ -74,10 +74,10 @@ namespace casadi {
     std::vector<double> nz;
 
     /* Row entries of matrix (IRN in MA27) */
-    int* irn;
+    std::vector<int> irn;
 
     /* Column entries of matrix (JCN in MA27) */
-    int* jcn;
+    std::vector<int> jcn;
 
     /* integer control values (ICNRL in MA27) */
     int icntl[30];
@@ -92,7 +92,7 @@ namespace casadi {
     std::vector<double> w;
 
     /* IKEEP in MA27 */
-    int* ikeep;
+    std::vector<int> ikeep;
 
     /* NSTEPS in MA27 */
     int nsteps;
@@ -111,15 +111,15 @@ namespace casadi {
    * @copydoc Linsol_doc
    * @copydoc plugin_Linsol_ma27
    */
-  class CASADI_LINSOL_MA27_EXPORT Ma27Interface : public Linsol {
+  class CASADI_LINSOL_MA27_EXPORT Ma27Interface : public LinsolInternal {
   public:
 
     // Create a linear solver given a sparsity pattern and a number of right hand sides
-    Ma27Interface(const std::string& name, const Sparsity& sp, int nrhs);
+    Ma27Interface(const std::string& name, const Sparsity& sp);
 
     /** \brief  Create a new Linsol */
-    static Linsol* creator(const std::string& name, const Sparsity& sp, int nrhs) {
-      return new Ma27Interface(name, sp, nrhs);
+    static LinsolInternal* creator(const std::string& name, const Sparsity& sp) {
+      return new Ma27Interface(name, sp);
     }
 
     // Destructor

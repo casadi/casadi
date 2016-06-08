@@ -856,30 +856,6 @@ namespace casadi {
     template<typename MatType>
     std::vector<std::vector<MatType> > symbolicAdjSeed(int nadj, const std::vector<MatType>& v);
 
-    ///@{
-    /// Linear solver specific (cf. Linsol class)
-    virtual void linsol_factorize(void* mem, const double* A) const;
-    virtual void linsol_solve(void* mem, double* x, int nrhs, bool tr) const;
-    virtual MX linsol_solve(const MX& A, const MX& B, bool tr);
-    virtual void linsol_spsolve(bvec_t* X, const bvec_t* B, bool tr) const;
-    virtual void linsol_spsolve(DM& X, const DM& B, bool tr) const;
-    virtual void linsol_solveL(void* mem, double* x, int nrhs, bool tr) const;
-    virtual Sparsity linsol_cholesky_sparsity(void* mem, bool tr) const;
-    virtual DM linsol_cholesky(void* mem, bool tr) const;
-    virtual void linsol_eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem,
-                               bool tr, int nrhs);
-    virtual void linsol_forward(const std::vector<MX>& arg, const std::vector<MX>& res,
-                                const std::vector<std::vector<MX> >& fseed,
-                                std::vector<std::vector<MX> >& fsens, bool tr);
-    virtual void linsol_reverse(const std::vector<MX>& arg, const std::vector<MX>& res,
-                                const std::vector<std::vector<MX> >& aseed,
-                                std::vector<std::vector<MX> >& asens, bool tr);
-    virtual void linsol_sp_fwd(const bvec_t** arg, bvec_t** res,
-                              int* iw, bvec_t* w, int mem, bool tr, int nrhs);
-    virtual void linsol_sp_rev(bvec_t** arg, bvec_t** res,
-                              int* iw, bvec_t* w, int mem, bool tr, int nrhs);
-    ///@}
-
   private:
     /// Memory objects
     std::vector<void*> mem_;

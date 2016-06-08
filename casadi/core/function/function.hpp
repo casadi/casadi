@@ -1013,34 +1013,10 @@ namespace casadi {
     /// Release a memory object
     void release(int mem);
 
-    /// Create a solve node
-    MX linsol_solve(const MX& A, const MX& B, bool tr=false);
-
 #ifndef SWIG
     /// Get memory object
     void* memory(int ind) const;
-
-    // Factorize linear system of equations
-    void linsol_factorize(const double* A, int mem=0) const;
-
-    // Solve factorized linear system of equations
-    void linsol_solve(double* x, int nrhs=1, bool tr=false, int mem=0) const;
-
-    /** \brief Solve the system of equations <tt>Lx = b</tt>
-        Only when a Cholesky factorization is available
-    */
-    void linsol_solveL(double* x, int nrhs, bool tr, int mem=0) const;
 #endif // SWIG
-
-    /** \brief Obtain a symbolic Cholesky factorization
-        Only for Cholesky solvers
-    */
-    Sparsity linsol_cholesky_sparsity(bool tr=false, int mem=0) const;
-
-    /** \brief Obtain a numeric Cholesky factorization
-        Only for Cholesky solvers
-     */
-    DM linsol_cholesky(bool tr=false, int mem=0) const;
 
     // Get a list of all functions
     std::vector<std::string> get_function() const;
@@ -1056,9 +1032,6 @@ namespace casadi {
 
     /// Access Jacobian of the ths function for a rootfinder
     Function rootfinder_jac();
-
-    /// Access linear solver of a rootfinder
-    Function rootfinder_linsol();
 
 #ifdef WITH_DEPRECATED_FEATURES
     /** \brief [DEPRECATED] Get the DAE for an integrator

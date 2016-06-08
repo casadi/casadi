@@ -26,7 +26,7 @@
 #ifndef CASADI_LAPACK_QR_HPP
 #define CASADI_LAPACK_QR_HPP
 
-#include "casadi/core/function/linsol_impl.hpp"
+#include "casadi/core/function/linsol_internal.hpp"
 #include <casadi/interfaces/lapack/casadi_linsol_lapackqr_export.h>
 
 extern "C" {
@@ -54,7 +54,7 @@ extern "C" {
 
 /// \cond INTERNAL
 namespace casadi {
-  struct CASADI_LINSOL_LAPACKQR_EXPORT LapackQrMemory {
+  struct CASADI_LINSOL_LAPACKQR_EXPORT LapackQrMemory : public LinsolMemory {
     // Matrix
     std::vector<double> mat;
 
@@ -71,14 +71,14 @@ namespace casadi {
    @copydoc plugin_Linsol_lapackqr
    *
    */
-  class CASADI_LINSOL_LAPACKQR_EXPORT LapackQr : public Linsol {
+  class CASADI_LINSOL_LAPACKQR_EXPORT LapackQr : public LinsolInternal {
   public:
     // Create a linear solver given a sparsity pattern and a number of right hand sides
-    LapackQr(const std::string& name, const Sparsity& sparsity, int nrhs);
+    LapackQr(const std::string& name, const Sparsity& sparsity);
 
     /** \brief  Create a new Linsol */
-    static Linsol* creator(const std::string& name, const Sparsity& sp, int nrhs) {
-      return new LapackQr(name, sp, nrhs);
+    static LinsolInternal* creator(const std::string& name, const Sparsity& sp) {
+      return new LapackQr(name, sp);
     }
 
     // Destructor

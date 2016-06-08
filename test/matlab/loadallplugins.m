@@ -17,7 +17,7 @@ for pl = strsplit(CasadiMeta.getPlugins(),';')
   elseif strcmp(cls, 'Interpolant')
     eval(['load_interpolant(''' name ''')'])
   else
-    eval([cls '.loadPlugin(''' name ''')'])
+    eval([cls '.load_plugin(''' name ''')'])
   end
 
 

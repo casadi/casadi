@@ -74,6 +74,9 @@ namespace casadi {
     /// number of checkpoints stored so far
     int ncheck;
 
+    /// Linear solver
+    Linsol linsolF, linsolB;
+
     /// Constructor
     SundialsMemory();
 

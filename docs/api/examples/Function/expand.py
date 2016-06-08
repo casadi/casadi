@@ -46,8 +46,8 @@ print("Expanded expression = ", fSX)
 #! Not all MX graphs can be expanded.
 #! Here is an example of a situation where it will not work.
 #!
-linear_solver = linsol("linear_solver", "csparse", x.sparsity(), 1)
-g = linear_solver.linsol_solve(x, y)
+linear_solver = Linsol("linear_solver", "csparse", x.sparsity())
+g = linear_solver.solve(x, y)
 G = Function("G", [x,y], [g])
 
 #! This function cannot be expanded.

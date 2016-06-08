@@ -34,11 +34,11 @@ using namespace std;
 namespace casadi {
 
   bool has_rootfinder(const string& name) {
-    return Rootfinder::hasPlugin(name);
+    return Rootfinder::has_plugin(name);
   }
 
   void load_rootfinder(const string& name) {
-    Rootfinder::loadPlugin(name);
+    Rootfinder::load_plugin(name);
   }
 
   string doc_rootfinder(const string& name) {
@@ -57,13 +57,6 @@ Function Function::rootfinder_fun() {
     Rootfinder* n = dynamic_cast<Rootfinder*>(get());
     casadi_assert_message(n!=0, "Not a rootfinder");
     return n->jac_;
-  }
-
-  Function Function::rootfinder_linsol() {
-    casadi_assert(!is_null());
-    Rootfinder* n = dynamic_cast<Rootfinder*>(get());
-    casadi_assert_message(n!=0, "Not a rootfinder");
-    return n->linsol_;
   }
 
   Function rootfinder(const std::string& name, const std::string& solver,
@@ -157,7 +150,6 @@ Function Function::rootfinder_fun() {
     // Generate Jacobian if not provided
     if (jac_.is_null()) jac_ = oracle_.jacobian(iin_, iout_);
     sp_jac_ = jac_.sparsity_out(0);
-    btf_jac_ = sp_jac_.btf();
 
     // Check for structural singularity in the Jacobian
     casadi_assert_message(
@@ -166,13 +158,8 @@ Function Function::rootfinder_fun() {
       "sprank(J)=" << sprank(jac_.sparsity_out(0)) << " (instead of "<< jac_.size1_out(0) << ")");
 
     // Get the linear solver creator function
-    if (linsol_.is_null()) {
-      linsol_ = linsol("linsol", linear_solver,
-                       jac_.sparsity_out(0), 1, linear_solver_options);
-    } else {
-      casadi_assert(linsol_.sparsity_in(0)==jac_.sparsity_out(0));
-    }
-    alloc(linsol_);
+    linsol_ = Linsol("linsol", linear_solver,
+                     jac_.sparsity_out(0), linear_solver_options);
 
     // Constraints
     casadi_assert_message(u_c_.size()==n_ || u_c_.empty(),
@@ -242,7 +229,7 @@ Function Function::rootfinder_fun() {
 
     // "Solve" in order to propagate to z
     fill_n(tmp2, n_, 0);
-    sp_jac_.spsolve(btf_jac_, tmp2, tmp1, false);
+    sp_jac_.spsolve(tmp2, tmp1, false);
     if (res[iout_]) copy(tmp2, tmp2+n_, res[iout_]);
 
     // Propagate to auxiliary outputs
@@ -281,7 +268,7 @@ Function Function::rootfinder_fun() {
 
     // "Solve" in order to get seed
     fill_n(tmp2, n_, 0);
-    sp_jac_.spsolve(btf_jac_, tmp2, tmp1, true);
+    sp_jac_.spsolve(tmp2, tmp1, true);
 
     // Propagate dependencies through the function
     for (int i=0; i<num_out; ++i) res1[i] = 0;

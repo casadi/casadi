@@ -259,6 +259,9 @@ namespace std {
 %include "stl.i"
 #endif // SWIGXML
 
+// Note: Only from 3.0.0 onwards,
+// DirectorException inherits from std::exception
+#if SWIG_VERSION >= 0x030000
 // Exceptions handling
 %include "exception.i"
 %exception {
@@ -266,7 +269,7 @@ namespace std {
     $action
    } catch(const std::exception& e) {
     SWIG_exception(SWIG_RuntimeError, e.what());
-  }
+   }
 }
 
 // Python sometimes takes an approach to not check, but just try.
@@ -298,14 +301,74 @@ namespace std {
   }
 }
 #endif
+#else
+// Exceptions handling
+%include "exception.i"
+%exception {
+  try {
+    $action
+   } catch(const std::exception& e) {
+    SWIG_exception(SWIG_RuntimeError, e.what());
+   } catch (const Swig::DirectorException& e) {
+    SWIG_exception(SWIG_TypeError, e.getMessage());
+   }
+}
+
+// Python sometimes takes an approach to not check, but just try.
+// It expects a python error to be thrown.
+%exception __int__ {
+  try {
+    $action
+  } catch (const std::exception& e) {
+    SWIG_exception(SWIG_RuntimeError, e.what());
+  } catch (const Swig::DirectorException& e) {
+    SWIG_exception(SWIG_TypeError, e.getMessage());
+  }
+}
+
+#ifdef WITH_PYTHON3
+// See https://github.com/casadi/casadi/issues/701
+// Recent numpys will only catch TypeError or ValueError in printing logic
+%exception __bool__ {
+ try {
+    $action
+  } catch (const std::exception& e) {
+   SWIG_exception(SWIG_TypeError, e.what());
+  } catch (const Swig::DirectorException& e) {
+    SWIG_exception(SWIG_TypeError, e.getMessage());
+  }
+}
+#else
+%exception __nonzero__ {
+ try {
+    $action
+  } catch (const std::exception& e) {
+   SWIG_exception(SWIG_TypeError, e.what());
+  }
+  catch (const Swig::DirectorException& e) {
+    SWIG_exception(SWIG_TypeError, e.getMessage());
+  }
+}
+#endif
+#endif
 
 #ifdef SWIGPYTHON
 %feature("director:except") {
 	if ($error != NULL) {
+	  std::string msg;
     SWIG_PYTHON_THREAD_BEGIN_BLOCK;
+    PyObject *ptype, *pvalue, *ptraceback;
+    PyErr_Fetch(&ptype, &pvalue, &ptraceback);
+    PyObject* msg_py = PyObject_Str(pvalue);
+    char *msg_char = SWIG_Python_str_AsChar(msg_py);
+    msg = msg_char;
+    SWIG_Python_str_DelForPy3(msg_char);
+    Py_DECREF(msg_py);
+    PyErr_Restore(ptype, pvalue, ptraceback);
     PyErr_Print();
     SWIG_PYTHON_THREAD_END_BLOCK;
-		throw Swig::DirectorMethodException();
+
+		Swig::DirectorMethodException::raise(msg.c_str());
 	}
 }
 #endif //SWIGPYTHON
@@ -731,6 +794,18 @@ import_array();
           return true;
         }
       }
+
+      if (mxIsLogical(p) && !mxIsLogicalScalar(p) &&mxGetNumberOfDimensions(p)==2
+          && (mxGetM(p)<=1 || mxGetN(p)<=1) ) {
+        int n = mxGetM(p)*mxGetN(p);
+        mxLogical* data = static_cast<mxLogical*>(mxGetData(p));
+        if (m) {
+          (**m).resize(n);
+          std::copy(data, data+n, (**m).begin());
+        }
+        return true;
+      }
+
       return false;
     }
 
@@ -3431,6 +3506,59 @@ namespace casadi{
 
 #ifdef SWIGMATLAB
 namespace casadi{
+%extend GenericMatrixCommon {
+  %matlabcode %{
+    function out = sum(self,varargin)
+      if length(varargin)==0
+        if isvector(self)
+          if iscolumn(self)
+            out = sum1(self);
+          else
+            out = sum2(self);
+          end
+        else
+          out = sum1(self);
+        end
+      elseif length(varargin)==1
+        i = varargin{1};
+        if i==1
+          out = sum1(self);
+        elseif i==2
+          out = sum2(self);
+        else
+          error('sum argument (if present) must be 1 or 2');
+        end
+      else
+        error('sum can have at most 1 argument');
+      end
+    end
+    function out = norm(self,varargin)
+
+      if length(varargin)==0
+        out = norm_2(self);
+      elseif length(varargin)==1
+        i = varargin{1};
+        if i==1
+          out = norm_1(self);
+        elseif i==2
+          out = norm_2(self);
+        elseif i==inf | i=='inf'
+          out = norm_inf(self);
+        elseif i=='fro'
+          out = norm_F(self);
+          return
+        else
+          error('norm argument (if present) must be 1, 2 or inf or fro');
+        end
+      else
+        error('norm can have at most 1 argument');
+      end
+      if ~isvector(self)
+        error('only norms of vectors defined for now. You may try norm_1 norm_2 norm_inf norm_F.');
+      end
+    end
+  %}
+}
 %extend Function {
   %matlabcode %{
     function varargout = paren(self, varargin)
@@ -3453,6 +3581,14 @@ namespace casadi{
           varargout{i} = res{i};
         end
       end
+    end
+    function out = full(self)
+      % Wrap this function in a Matlab function that applies 'full' on each output
+      out = @(varargin) subsref(cellfun(@(m) full(m),self.call([varargin num2cell(zeros(1,self.n_in()-length(varargin)))]),'UniformOutput',false),struct('type','{}','subs',{{':'}}));
+    end
+    function out = sparse(self)
+      % Wrap this function in a Matlab function that applies 'sparse' on each output
+      out = @(varargin) subsref(cellfun(@(m) sparse(m),self.call([varargin num2cell(zeros(1,self.n_in()-length(varargin)))]),'UniformOutput',false),struct('type','{}','subs',{{':'}}));
     end
   %}
  }

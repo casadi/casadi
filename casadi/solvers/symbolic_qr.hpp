@@ -26,7 +26,7 @@
 #ifndef CASADI_SYMBOLIC_QR_HPP
 #define CASADI_SYMBOLIC_QR_HPP
 
-#include "casadi/core/function/linsol_impl.hpp"
+#include "casadi/core/function/linsol_internal.hpp"
 #include <casadi/solvers/casadi_linsol_symbolicqr_export.h>
 
 /** \defgroup plugin_Linsol_symbolicqr
@@ -44,12 +44,12 @@ namespace casadi {
   typedef std::vector<SXPtr> SXPtrV;
 
   /** \brief Memory for SymbolicQR  */
-  struct CASADI_LINSOL_SYMBOLICQR_EXPORT SymbolicQrMemory {
+  struct CASADI_LINSOL_SYMBOLICQR_EXPORT SymbolicQrMemory : public LinsolMemory {
     // Work vectors
-    const double** arg;
-    double** res;
-    int* iw;
-    double* w;
+    std::vector<const double*> arg;
+    std::vector<double*> res;
+    std::vector<int> iw;
+    std::vector<double> w;
 
     // Storage for QR factorization
     std::vector<double> q, r;
@@ -62,10 +62,10 @@ namespace casadi {
       \author Joel Andersson
       \date 2013
   */
-  class CASADI_LINSOL_SYMBOLICQR_EXPORT SymbolicQr : public Linsol {
+  class CASADI_LINSOL_SYMBOLICQR_EXPORT SymbolicQr : public LinsolInternal {
   public:
     // Constructor
-    SymbolicQr(const std::string& name, const Sparsity& sparsity, int nrhs);
+    SymbolicQr(const std::string& name, const Sparsity& sparsity);
 
     // Destructor
     virtual ~SymbolicQr();
@@ -74,8 +74,8 @@ namespace casadi {
     virtual const char* plugin_name() const { return "symbolicqr";}
 
     /** \brief  Create a new Linsol */
-    static Linsol* creator(const std::string& name, const Sparsity& sp, int nrhs) {
-      return new SymbolicQr(name, sp, nrhs);
+    static LinsolInternal* creator(const std::string& name, const Sparsity& sp) {
+      return new SymbolicQr(name, sp);
     }
 
     ///@{

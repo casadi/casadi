@@ -12,7 +12,7 @@ env:
     - ILOG_LICENSE_FILE=/home/travis/build/testbot/restricted/cplex/access.ilm
     - WORHP=/home/travis/build/testbot/restricted/worhp
     - WORHP_LICENSE_FILE=/home/travis/build/testbot/restricted/worhp/unlocked.lic
-    - SNOPT=/home/travis/build/snopt7
+    - SNOPT=/home/travis/build/snopt75
     - MATLABPATH=/home/travis/build/matlab-install
     - MATLAB_ROOT=/home/travis/build/matlab
     - MATLABRELEASE=R2014b
@@ -27,7 +27,7 @@ matrix:
   include:
     - compiler: gcc
       os: linux
-      env: TESTMODE=full
+      env: TESTMODE=valgrind
       script:
         - sudo apt-get install valgrind libgomp1 -y
         - mkdir build
@@ -39,6 +39,23 @@ matrix:
         - popd
         - python -c "from casadi.tools import *;loadAllCompiledPlugins()"
         - pushd test && make unittests_py_valgrind && popd
+      after_success:
+        - cd build
+        - git clone https://github.com/jgillis/cpp-coveralls.git
+        - pushd cpp-coveralls && sudo python setup.py install && popd
+        - coveralls --verbose --root .. --exclude swig -E '.*cxx' -E '.*CMakeFiles.*' -E '.*casadiPYTHON_wrap.*' -E '.*lib.*' -E '.*_export.*'  --exclude experimental --exclude _temp.cc --exclude docs --exclude codegen --exclude external_packages --exclude cmake --exclude test --gcov-options '\-lp'
+    - compiler: gcc
+      os: linux
+      env: TESTMODE=full
+      script:
+        - sudo apt-get install valgrind libgomp1 -y
+        - mkdir build
+        - pushd build
+        - cmake -DWITH_OPENMP=ON -DOLD_LLVM=ON -DWITH_CLANG=ON -DWITH_ECOS=ON -DWITH_MOSEK=ON -DWITH_PYTHON=ON -DWITH_WORHP=ON -DWITH_SLICOT=OFF -DWITH_OOQP=ON -DWITH_PROFILING=ON -DWITH_DOC=ON -DWITH_EXAMPLES=ON -DWITH_COVERAGE=ON -DWITH_EXTRA_WARNINGS=ON -DWITH_PYTHON=ON -DWITH_JSON=ON ..
+
+        - make -j2
+        - sudo make -j2 install
+        - popd
         - sudo apt-get install python-ipdb graphviz python-lxml texlive-science texlive-latex-base texlive-latex-recommended texlive-latex-extra -y
         - sudo pip install pydot2
         # travis-wait seems to stop at 20 mins, regardless if output is being generated
@@ -223,7 +240,7 @@ matrix:
         - ssh-keyscan $GATE_SERVER >> ~/.ssh/known_hosts
         - ssh -i /home/travis/build/testbot/id_rsa_travis $USER_GATE@$GATE_SERVER -L 1701:$FLEX_SERVER:1701 -L 1719:$FLEX_SERVER:1719 -L 1718:$FLEX_SERVER:1718 -L 2015:$FLEX_SERVER:2015 -L 1815:$FLEX_SERVER:1815 -L 1715:$FLEX_SERVER:1715 -N &
         - sleep 3
-        - pushd test && PATH=/home/travis/build/matlab/bin/:$PATH make unittests_matlab && popd
+        - pushd test && PATH=/home/travis/build/matlab/bin/:$PATH make matlab && popd
 branches:
   except:
     - /.*appveyor.*/
@@ -241,7 +258,7 @@ before_install:
   - travis_retry testbot/recipes/fetch.sh clang.tar.gz && mkdir clang && tar -xf clang.tar.gz -C clang && rm clang.tar.gz
   - travis_retry testbot/recipes/fetch.sh mosek7.tar.bz2 && tar -xf mosek7.tar.bz2 && rm mosek7.tar.bz2
   - git clone https://github.com/embotech/ecos.git && pushd ecos && make && popd
-  - travis_retry testbot/recipes/fetch.sh snopt7.tar.gz && mkdir snopt7 && tar -xf snopt7.tar.gz -C snopt7 && rm snopt7.tar.gz
+  - travis_retry testbot/recipes/fetch.sh snopt75.tar.gz && mkdir snopt75 && tar -xf snopt75.tar.gz -C snopt75 && rm snopt75.tar.gz
   - mkdir -p /home/travis/build/casadi/testbot
   - |
     if [ $NEEDMATLAB ]

@@ -188,7 +188,7 @@ assert(all(size(u(1:2,:))==[2 5]));
 assert(all(size(u(1:2,1:3))==[2 3]));
 
 
-if Importer.hasPlugin('clang')
+if Importer.has_plugin('clang')
   x = MX.sym('x');
   F = Function('f',{x},{x^2},struct('jit',true));
 
@@ -206,3 +206,82 @@ A = DM.ones(1,4);
 A(2) = 20;
 A(3:4) = [30,40];
 assert(all(full(A)==[1 20 30 40]))
+
+% Full/sparse Function
+
+x = SX.sym('x',2);
+t = SX.sym('t');
+
+rhs = [x(2);1000*(1 - x(1)^2)*x(2) - x(1)];
+ode = Function('ode',{t,x},{rhs});
+
+[T,X] = ode15s(full(ode),[0 300],[2 0]);
+
+[T,X] = ode15s(sparse(ode),[0 300],[2 0]);
+
+Jode = Function('ode',{t,x},{jacobian(rhs,x)});
+options = odeset('Jacobian',full(Jode));
+[T,X] = ode15s(full(ode),[0 300],[2 0],options);
+
+
+% boolvector typemap
+x = SX.sym('x');
+y = SX.sym('y');
+f = (x-2.6)^2 + (y-3.6)^2;
+nlp = struct('x', [x;y], 'f', f');
+
+if has_nlpsol('bonmin')
+  options = struct;
+  options.discrete = [false,false];
+  solver = nlpsol('solver', 'bonmin', nlp,options);
+  sol = solver('x0',[1 1]);
+
+  assert(all(full(sol.x)==[2.6;3.6]))
+
+  options = struct;
+  options.discrete = [true,false];
+  solver = nlpsol('solver', 'bonmin', nlp,options);
+  sol = solver('x0',[1 1]);
+
+  assert(all(full(sol.x)==[3;3.6]))
+
+  options = struct;
+  options.discrete = [false,true];
+  solver = nlpsol('solver', 'bonmin', nlp,options);
+  sol = solver('x0',[1 1]);
+
+  assert(all(full(sol.x)==[2.6;4]))
+
+  options = struct;
+  options.discrete = [true,true];
+  solver = nlpsol('solver', 'bonmin', nlp,options);
+  sol = solver('x0',[1 1]);
+
+  assert(all(full(sol.x)==[3;4]))
+end
+
+data = { [1 3;11 17] , [1 3] , [1;3] 3};
+
+for i=1:numel(data)
+  A = data{i};
+  B = reshape(DM(A),size(A));
+  assert(all(sum(A)==full(sum(B))))
+  assert(all(sum(A,1)==full(sum(B,1))))
+  assert(all(sum(A,2)==full(sum(B,2))))
+
+  if isvector(A)
+    assert(all(norm(A)==full(norm(B))))
+    assert(all(norm(A,1)==full(norm(B,1))))
+    assert(all(norm(A,2)==full(norm(B,2))))
+    assert(all(norm(A,inf)==full(norm(B,inf))))
+    assert(all(norm(A,'inf')==full(norm(B,'inf'))))
+    assert(all(norm(A,'fro')==full(norm(B,'fro'))))
+  else
+    assert(all(norm(A,'fro')==full(norm(B,'fro'))))
+  end
+end
+
+assert(all(size(DM([1 3]))==[1 2]))
+assert(all(size(DM([1;3]))==[2 1]))
+
+

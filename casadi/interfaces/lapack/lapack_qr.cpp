@@ -31,7 +31,7 @@ namespace casadi {
 
   extern "C"
   int CASADI_LINSOL_LAPACKQR_EXPORT
-  casadi_register_linsol_lapackqr(Linsol::Plugin* plugin) {
+  casadi_register_linsol_lapackqr(LinsolInternal::Plugin* plugin) {
     plugin->creator = LapackQr::creator;
     plugin->name = "lapackqr";
     plugin->doc = LapackQr::meta_doc.c_str();;
@@ -41,12 +41,11 @@ namespace casadi {
 
   extern "C"
   void CASADI_LINSOL_LAPACKQR_EXPORT casadi_load_linsol_lapackqr() {
-    Linsol::registerPlugin(casadi_register_linsol_lapackqr);
+    LinsolInternal::registerPlugin(casadi_register_linsol_lapackqr);
   }
 
-  LapackQr::LapackQr(const std::string& name,
-                               const Sparsity& sparsity, int nrhs) :
-    Linsol(name, sparsity, nrhs) {
+  LapackQr::LapackQr(const std::string& name, const Sparsity& sparsity) :
+    LinsolInternal(name, sparsity) {
   }
 
   LapackQr::~LapackQr() {
@@ -55,18 +54,15 @@ namespace casadi {
 
   void LapackQr::init(const Dict& opts) {
     // Call the base class initializer
-    Linsol::init(opts);
-
-    // Currently only square matrices tested
-    if (ncol()!=nrow()) throw CasadiException("LapackQr::init: currently only "
-                                              "square matrices implemented.");
+    LinsolInternal::init(opts);
   }
 
   void LapackQr::init_memory(void* mem) const {
+    LinsolInternal::init_memory(mem);
     auto m = static_cast<LapackQrMemory*>(mem);
-    m->mat.resize(ncol()*ncol());
-    m->tau.resize(ncol());
-    m->work.resize(10*ncol());
+    m->mat.resize(m->ncol() * m->ncol());
+    m->tau.resize(m->ncol());
+    m->work.resize(10*m->ncol());
   }
 
   void LapackQr::linsol_factorize(void* mem, const double* A) const {
@@ -74,10 +70,10 @@ namespace casadi {
 
     // Dimensions
     //int nrow = this->nrow();
-    int ncol = this->ncol();
+    int ncol = m->ncol();
 
     // Get the elements of the matrix, dense format
-    casadi_densify(A, sparsity_, get_ptr(m->mat), false);
+    casadi_densify(A, get_ptr(m->sparsity), get_ptr(m->mat), false);
 
     // Factorize the matrix
     int info = -100;
@@ -93,7 +89,7 @@ namespace casadi {
 
     // Dimensions
     //int nrow = this->nrow();
-    int ncol = this->ncol();
+    int ncol = m->ncol();
 
     // Properties of R
     char uploR = 'U';

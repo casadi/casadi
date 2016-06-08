@@ -774,24 +774,10 @@ Generate native code in the interfaced language for debugging
 
 ";
 
-%feature("docstring")  casadi::Function::linsol_cholesky(bool tr=false, int
-mem=0) const  "
-
-Obtain a numeric Cholesky factorization Only for Cholesky solvers.
-
-";
-
 %feature("docstring")  casadi::PrintableObject< SharedObject
 >::getDescription() const "
 
 Return a string with a description (for SWIG)
-
-";
-
-%feature("docstring")  casadi::Function::linsol_cholesky_sparsity(bool
-tr=false, int mem=0) const  "
-
-Obtain a symbolic Cholesky factorization Only for Cholesky solvers.
 
 ";
 
@@ -1378,13 +1364,6 @@ internally
 
 ";
 
-%feature("docstring")  casadi::Function::linsol_solve(const MX &A, const MX
-&B, bool tr=false) "
-
-Create a solve node.
-
-";
-
 %feature("docstring")  casadi::Callback::eval(const std::vector< DM > &arg)
 "
 
@@ -1707,12 +1686,6 @@ Get sparsity of a given input.
 &iname) const  "
 
 Get sparsity of a given input.
-
-";
-
-%feature("docstring")  casadi::Function::rootfinder_linsol() "
-
-Access linear solver of a rootfinder.
 
 ";
 
@@ -3048,12 +3021,6 @@ Get the number of function inputs.
 
 ";
 
-%feature("docstring")  casadi::Function::rootfinder_linsol() "
-
-Access linear solver of a rootfinder.
-
-";
-
 %feature("docstring")  casadi::Function::mx_out(int ind) const  "
 
 Get symbolic primitives equivalent to the output expressions There is no
@@ -3487,13 +3454,6 @@ Get output dimension.
 
 ";
 
-%feature("docstring")  casadi::Function::linsol_solve(const MX &A, const MX
-&B, bool tr=false) "
-
-Create a solve node.
-
-";
-
 %feature("docstring")  casadi::Function::addMonitor(const std::string &mon)
 "
 
@@ -3865,13 +3825,6 @@ Generate native code in the interfaced language for debugging
 const  "
 
 Generate native code in the interfaced language for debugging
-
-";
-
-%feature("docstring")  casadi::Function::linsol_cholesky_sparsity(bool
-tr=false, int mem=0) const  "
-
-Obtain a symbolic Cholesky factorization Only for Cholesky solvers.
 
 ";
 
@@ -4468,13 +4421,6 @@ Get, if necessary generate, the sparsity of a Jacobian block
 &iind, const std::string &oind, bool compact=false, bool symmetric=false) "
 
 Get, if necessary generate, the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::Function::linsol_cholesky(bool tr=false, int
-mem=0) const  "
-
-Obtain a numeric Cholesky factorization Only for Cholesky solvers.
 
 ";
 
@@ -5924,6 +5870,246 @@ IpoptInterface &ipoptInterface, IpoptMemory *mem) " [INTERNAL] ";
 
 
 // File: classcasadi_1_1Linsol.xml
+%feature("docstring")  casadi::Linsol::cholesky(bool tr=false) const  "
+
+Obtain a numeric Cholesky factorization Only for Cholesky solvers.
+
+";
+
+%feature("docstring")  casadi::SharedObject::printPtr(std::ostream
+&stream=casadi::userOut()) const  " [INTERNAL]  Print the pointer to the
+internal class
+
+";
+
+%feature("docstring")  casadi::Linsol::cholesky_sparsity(bool tr=false)
+const  "
+
+Obtain a symbolic Cholesky factorization Only for Cholesky solvers.
+
+";
+
+%feature("docstring")  casadi::Linsol::solve(const DM &A, const DM &B, bool
+tr=false) "
+
+Solve numerically.
+
+";
+
+%feature("docstring")  casadi::Linsol::solve(const MX &A, const MX &B, bool
+tr=false) "
+
+Create a solve node.
+
+";
+
+%feature("docstring") casadi::Linsol::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
+
+";
+
+%feature("docstring") casadi::Linsol::Linsol() "
+
+Default constructor.
+
+";
+
+%feature("docstring") casadi::Linsol::Linsol(const std::string &name, const
+std::string &solver, const Sparsity &sp, const Dict &opts=Dict()) "
+
+Importer factory.
+
+";
+
+%feature("docstring")  casadi::SharedObject::print(std::ostream
+&stream=casadi::userOut(), bool trailing_newline=true) const  "
+
+Print a description of the object.
+
+";
+
+%feature("docstring") casadi::Linsol "
+
+Linear solver Create a solver for linear systems of equations Solves the
+linear system A*X = B or A^T*X = B for X with A square and non- singular.
+
+If A is structurally singular, an error will be thrown during init. If A is
+numerically singular, the prepare step will fail.
+
+General information
+===================
+
+
+
+List of plugins
+===============
+
+
+
+- csparsecholesky
+
+- csparse
+
+- ma27
+
+- lapacklu
+
+- lapackqr
+
+- symbolicqr
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+Linsol.doc(\"myextraplugin\")
+
+
+
+--------------------------------------------------------------------------------
+
+csparsecholesky
+---------------
+
+
+
+Linsol with CSparseCholesky Interface
+
+--------------------------------------------------------------------------------
+
+
+
+
+
+--------------------------------------------------------------------------------
+
+csparse
+-------
+
+
+
+Linsol with CSparse Interface
+
+--------------------------------------------------------------------------------
+
+
+
+
+
+--------------------------------------------------------------------------------
+
+ma27
+----
+
+
+
+Interface to the sparse direct linear solver MA27 Works for symmetric
+indefinite systems Partly adopted from qpOASES 3.2 Joel Andersson
+
+--------------------------------------------------------------------------------
+
+lapacklu
+--------
+
+
+
+This class solves the linear system A.x=b by making an LU factorization of
+A: A = L.U, with L lower and U upper triangular
+
+>List of available options
+
++------------------------+------------------------+------------------------+
+|           Id           |          Type          |      Description       |
++========================+========================+========================+
+| allow_equilibration_fa | OT_BOOL                | Non-fatal error when   |
+| ilure                  |                        | equilibration fails    |
++------------------------+------------------------+------------------------+
+| equilibration          | OT_BOOL                | Equilibrate the matrix |
++------------------------+------------------------+------------------------+
+
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+
+lapackqr
+--------
+
+
+
+This class solves the linear system A.x=b by making an QR factorization of
+A: A = Q.R, with Q orthogonal and R upper triangular
+
+--------------------------------------------------------------------------------
+
+
+
+
+
+--------------------------------------------------------------------------------
+
+symbolicqr
+----------
+
+
+
+Linsol based on QR factorization with sparsity pattern based reordering
+without partial pivoting
+
+>List of available options
+
++------------------------+------------------------+------------------------+
+|           Id           |          Type          |      Description       |
++========================+========================+========================+
+| codegen                | OT_BOOL                | C-code generation      |
++------------------------+------------------------+------------------------+
+| compiler               | OT_STRING              | Compiler command to be |
+|                        |                        | used for compiling     |
+|                        |                        | generated code         |
++------------------------+------------------------+------------------------+
+
+--------------------------------------------------------------------------------
+
+
+
+Joel Andersson
+
+C++ includes: linsol.hpp ";
+
+%feature("docstring")  casadi::SharedObject::repr(std::ostream
+&stream=casadi::userOut(), bool trailing_newline=true) const  "
+
+Print a representation of the object.
+
+";
+
+%feature("docstring")  casadi::SharedObject::is_null() const  "
+
+Is a null pointer?
+
+";
+
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getDescription() const "
+
+Return a string with a description (for SWIG)
+
+";
+
+%feature("docstring")  casadi::Linsol::plugin_name() const  "
+
+Query plugin name.
+
+";
+
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getRepresentation() const "
+
+Return a string with a representation (for SWIG)
+
+";
 
 
 // File: classcasadi_1_1Logger.xml
@@ -7097,18 +7283,18 @@ Dense matrix constructor with data given as vector of vectors.
 
 ";
 
+%feature("docstring") casadi::Matrix< Scalar >::Matrix(const std::vector< A
+> &x) "
+
+Create an expression from a vector.
+
+";
+
 %feature("docstring") casadi::Matrix< Scalar >::Matrix(const Matrix< A > &x)
 "
 
 Create a matrix from another matrix with a different entry type Assumes that
 the scalar conversion is valid.
-
-";
-
-%feature("docstring") casadi::Matrix< Scalar >::Matrix(const std::vector< A
-> &x) "
-
-Create an expression from a vector.
 
 ";
 
@@ -10277,15 +10463,14 @@ Get typename.
 
 ";
 
-%feature("docstring")  casadi::linsol_in() "
+%feature("docstring")  casadi::complement(const std::vector< int > &v, int
+size) "
 
-Linear solver input scheme.
+Returns the list of all i in [0, size[ not found in supplied list.
 
-";
-
-%feature("docstring")  casadi::linsol_in(int ind) "
-
-Linear solver input scheme.
+The supplied vector may contain duplicates and may be non-monotonous The
+supplied vector will be checked for bounds The result vector is guaranteed
+to be monotonously increasing
 
 ";
 
@@ -10311,17 +10496,6 @@ outer product mul(x, trans(x)) to A.
 
 %feature("docstring")  casadi::casadi_rank1(real_t *A, const int *sp_A,
 real_t alpha, const real_t *x, const real_t *y) " [INTERNAL] ";
-
-%feature("docstring")  casadi::complement(const std::vector< int > &v, int
-size) "
-
-Returns the list of all i in [0, size[ not found in supplied list.
-
-The supplied vector may contain duplicates and may be non-monotonous The
-supplied vector will be checked for bounds The result vector is guaranteed
-to be monotonously increasing
-
-";
 
 %feature("docstring")  casadi::swapIndices(const std::vector< std::vector< T
 > > &m) "
@@ -10350,7 +10524,7 @@ Check if the vector is non-increasing.
 
 %feature("docstring")  casadi::doc_linsol(const std::string &name) "
 
-Get the documentation string for a plugin.
+[DEPRECATED] Legacy - alias for Linsol::doc
 
 ";
 
@@ -10410,9 +10584,18 @@ Explicitly load a plugin dynamically.
 
 ";
 
+%feature("docstring")  casadi::linsol_new(const std::string &name, const
+std::string &solver, const Sparsity &sp, int nrhs, const Dict &opts=Dict())
+"
+
+[DEPRECATED] Create a linear solver (legacy syntax, use Linsol constructor
+instead)
+
+";
+
 %feature("docstring")  casadi::load_linsol(const std::string &name) "
 
-Explicitly load a plugin dynamically.
+[DEPRECATED] Legacy - alias for Linsol::load_plugin
 
 ";
 
@@ -12226,12 +12409,6 @@ Joel Andersson
 
 ";
 
-%feature("docstring")  casadi::linsol_n_out() "
-
-Number of linear solver outputs.
-
-";
-
 %feature("docstring")  casadi::doc_integrator(const std::string &name) "
 
 Get the documentation string for a plugin.
@@ -12325,26 +12502,8 @@ std::string &solver, const MXDict &qp, const Dict &opts=Dict()) " ";
 %feature("docstring")  casadi::zip(const std::vector< std::string > &id,
 const std::vector< T > &mat) " [INTERNAL] ";
 
-%feature("docstring")  casadi::linsol_out() "
-
-Linear solver output scheme.
-
-";
-
-%feature("docstring")  casadi::linsol_out(int ind) "
-
-Linear solver output scheme.
-
-";
-
 %feature("docstring")  casadi::replaceMat(const M &arg, const Sparsity &inp,
 bool hcat=false) " [INTERNAL] ";
-
-%feature("docstring")  casadi::linsol_n_in() "
-
-Number of linear solver inputs.
-
-";
 
 %feature("docstring")  casadi::collocationInterpolators(const std::vector<
 double > &tau_root, std::vector< std::vector< double > > &OUTPUT,
@@ -12693,7 +12852,7 @@ Get output scheme name by index.
 
 %feature("docstring")  casadi::has_linsol(const std::string &name) "
 
-Check if a particular plugin is available.
+[DEPRECATED] Legacy - alias for Linsol::has_plugin
 
 ";
 
@@ -13424,11 +13583,13 @@ SNOPT interface
 
 >List of available options
 
-+-------+---------+-------------------------------+
-|  Id   |  Type   |          Description          |
-+=======+=========+===============================+
-| snopt | OT_DICT | Options to be passed to SNOPT |
-+-------+---------+-------------------------------+
++-------+-----------+---------------------------------------------+
+|  Id   |   Type    |                 Description                 |
++=======+===========+=============================================+
+| snopt | OT_DICT   | Options to be passed to SNOPT               |
++-------+-----------+---------------------------------------------+
+| start | OT_STRING | Warm-start options for Worhp: cold|warm|hot |
++-------+-----------+---------------------------------------------+
 
 --------------------------------------------------------------------------------
 
@@ -13614,189 +13775,6 @@ std::string &solver, const std::string &fname, const Dict &opts=Dict()) " ";
 
 %feature("docstring")  casadi::nlpsol(const std::string &name, const
 std::string &solver, const Importer &compiler, const Dict &opts=Dict()) " ";
-
-%feature("docstring")  casadi::linsol(const std::string &name, const
-std::string &solver, const Sparsity &sp, int nrhs, const Dict &opts=Dict())
-"
-
-Create a solver for linear systems of equations Solves the linear system A*X
-= B or A^T*X = B for X with A square and non-singular
-
-If A is structurally singular, an error will be thrown during init. If A is
-numerically singular, the prepare step will fail.
-
-The usual procedure to use Linsol is: init()
-
-set the first input (A)
-
-prepare()
-
-set the second input (b)
-
-solve()
-
-Repeat steps 4 and 5 to work with other b vectors.
-
-The standard evaluation combines the prepare() and solve() step and may
-therefore more expensive if A is invariant.
-
-General information
-===================
-
-
-
->Input scheme: casadi::LinsolInput (LINSOL_NUM_IN = 2) []
-
-+-----------+-------+----------------------------------------------+
-| Full name | Short |                 Description                  |
-+===========+=======+==============================================+
-| LINSOL_A  |       | The square matrix A: sparse, (n x n)         |
-+-----------+-------+----------------------------------------------+
-| LINSOL_B  |       | The right-hand-side matrix b: dense, (n x m) |
-+-----------+-------+----------------------------------------------+
-
->Output scheme: casadi::LinsolOutput (LINSOL_NUM_OUT = 1) []
-
-+-----------+-------+---------------------------------------------+
-| Full name | Short |                 Description                 |
-+===========+=======+=============================================+
-| LINSOL_X  |       | Solution to the linear system of equations. |
-+-----------+-------+---------------------------------------------+
-
-List of plugins
-===============
-
-
-
-- csparsecholesky
-
-- csparse
-
-- ma27
-
-- lapacklu
-
-- lapackqr
-
-- symbolicqr
-
-Note: some of the plugins in this list might not be available on your
-system. Also, there might be extra plugins available to you that are not
-listed here. You can obtain their documentation with
-Linsol.doc(\"myextraplugin\")
-
-
-
---------------------------------------------------------------------------------
-
-csparsecholesky
----------------
-
-
-
-Linsol with CSparseCholesky Interface
-
---------------------------------------------------------------------------------
-
-
-
-
-
---------------------------------------------------------------------------------
-
-csparse
--------
-
-
-
-Linsol with CSparse Interface
-
---------------------------------------------------------------------------------
-
-
-
-
-
---------------------------------------------------------------------------------
-
-ma27
-----
-
-
-
-Interface to the sparse direct linear solver MA27 Works for symmetric
-indefinite systems Partly adopted from qpOASES 3.2 Joel Andersson
-
---------------------------------------------------------------------------------
-
-lapacklu
---------
-
-
-
-This class solves the linear system A.x=b by making an LU factorization of
-A: A = L.U, with L lower and U upper triangular
-
->List of available options
-
-+------------------------+------------------------+------------------------+
-|           Id           |          Type          |      Description       |
-+========================+========================+========================+
-| allow_equilibration_fa | OT_BOOL                | Non-fatal error when   |
-| ilure                  |                        | equilibration fails    |
-+------------------------+------------------------+------------------------+
-| equilibration          | OT_BOOL                | Equilibrate the matrix |
-+------------------------+------------------------+------------------------+
-
---------------------------------------------------------------------------------
-
-
-
---------------------------------------------------------------------------------
-
-lapackqr
---------
-
-
-
-This class solves the linear system A.x=b by making an QR factorization of
-A: A = Q.R, with Q orthogonal and R upper triangular
-
---------------------------------------------------------------------------------
-
-
-
-
-
---------------------------------------------------------------------------------
-
-symbolicqr
-----------
-
-
-
-Linsol based on QR factorization with sparsity pattern based reordering
-without partial pivoting
-
->List of available options
-
-+------------------------+------------------------+------------------------+
-|           Id           |          Type          |      Description       |
-+========================+========================+========================+
-| codegen                | OT_BOOL                | C-code generation      |
-+------------------------+------------------------+------------------------+
-| compiler               | OT_STRING              | Compiler command to be |
-|                        |                        | used for compiling     |
-|                        |                        | generated code         |
-+------------------------+------------------------+------------------------+
-
---------------------------------------------------------------------------------
-
-
-
-Joel Andersson
-
-";
 
 %feature("docstring")  casadi::userOut() "";
 

@@ -638,14 +638,14 @@ namespace casadi {
             std::vector<int>& SWIG_OUTPUT(coarse_colblock),
             int seed=0) const;
 #ifndef SWIG
-    Btf btf(int seed=0) const;
+    const Btf& btf() const;
 #endif // SWIG
     /// @}
 
 #ifndef SWIG
     /** \brief Propagate sparsity through a linear solve
      */
-    void spsolve(const Btf& btf, bvec_t* X, const bvec_t* B, bool tr) const;
+    void spsolve(bvec_t* X, const bvec_t* B, bool tr) const;
 #endif // SWIG
 
     /** \brief Get the location of all non-zero elements as they would appear in a Dense matrix

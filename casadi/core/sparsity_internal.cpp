@@ -34,6 +34,30 @@ using namespace std;
 
 namespace casadi {
 
+  SparsityInternal::
+  SparsityInternal(int nrow, int ncol, const int* colind, const int* row) :
+    sp_(2 + ncol+1 + colind[ncol]), btf_(0) {
+    sp_[0] = nrow;
+    sp_[1] = ncol;
+    std::copy(colind, colind+ncol+1, sp_.begin()+2);
+    std::copy(row, row+colind[ncol], sp_.begin()+2+ncol+1);
+    sanity_check(false);
+  }
+
+  SparsityInternal::~SparsityInternal() {
+    if (btf_) delete btf_;
+  }
+
+  const Sparsity::Btf& SparsityInternal::btf() const {
+    if (!btf_) {
+      btf_ = new Sparsity::Btf();
+      btf_->nb = btf(btf_->rowperm, btf_->colperm, btf_->rowblock, btf_->colblock,
+                     btf_->coarse_rowblock, btf_->coarse_rowblock, 0);
+    }
+    return *btf_;
+  }
+
+
   int SparsityInternal::numel() const {
     return size1()*size2();
   }
@@ -3913,7 +3937,8 @@ namespace casadi {
   }
 
   void SparsityInternal::
-  spsolve(const Sparsity::Btf& btf, bvec_t* X, const bvec_t* B, bool tr) const {
+  spsolve(bvec_t* X, const bvec_t* B, bool tr) const {
+    const Sparsity::Btf& btf = this->btf();
     const int* colind = this->colind();
     const int* row = this->row();
 

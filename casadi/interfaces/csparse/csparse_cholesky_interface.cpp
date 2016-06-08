@@ -32,7 +32,7 @@ namespace casadi {
 
   extern "C"
   int CASADI_LINSOL_CSPARSECHOLESKY_EXPORT
-  casadi_register_linsol_csparsecholesky(Linsol::Plugin* plugin) {
+  casadi_register_linsol_csparsecholesky(LinsolInternal::Plugin* plugin) {
     plugin->creator = CSparseCholeskyInterface::creator;
     plugin->name = "csparsecholesky";
     plugin->doc = CSparseCholeskyInterface::meta_doc.c_str();
@@ -42,12 +42,12 @@ namespace casadi {
 
   extern "C"
   void CASADI_LINSOL_CSPARSECHOLESKY_EXPORT casadi_load_linsol_csparsecholesky() {
-    Linsol::registerPlugin(casadi_register_linsol_csparsecholesky);
+    LinsolInternal::registerPlugin(casadi_register_linsol_csparsecholesky);
   }
 
   CSparseCholeskyInterface::CSparseCholeskyInterface(const std::string& name,
-                                                     const Sparsity& sparsity, int nrhs) :
-    Linsol(name, sparsity, nrhs) {
+                                                     const Sparsity& sparsity) :
+    LinsolInternal(name, sparsity) {
 
     casadi_assert_message(sparsity.is_symmetric(),
                           "CSparseCholeskyInterface: supplied sparsity must be symmetric, got "
@@ -65,19 +65,20 @@ namespace casadi {
 
   void CSparseCholeskyInterface::init(const Dict& opts) {
     // Call the init method of the base class
-    Linsol::init(opts);
+    LinsolInternal::init(opts);
   }
 
   void CSparseCholeskyInterface::init_memory(void* mem) const {
+    LinsolInternal::init_memory(mem);
     auto m = static_cast<CsparseCholMemory*>(mem);
     m->L = 0;
     m->S = 0;
-    m->A.nzmax = nnz_in(0);  // maximum number of entries
-    m->A.m = size1_in(0); // number of columns
-    m->A.n = size2_in(0); // number of rows
-    m->A.p = const_cast<int*>(sparsity_in(0).colind()); // row pointers (size n+1)
+    m->A.nzmax = m->nnz();  // maximum number of entries
+    m->A.m = m->nrow(); // number of columns
+    m->A.n = m->ncol(); // number of rows
+    m->A.p = const_cast<int*>(m->colind()); // row pointers (size n+1)
     // or row indices (size nzmax)
-    m->A.i = const_cast<int*>(sparsity_in(0).row()); // column indices, size nzmax
+    m->A.i = const_cast<int*>(m->row()); // column indices, size nzmax
     m->A.x = 0; // numerical values, size nzmax
     m->A.nz = -1; // of entries in triplet matrix, -1 for compressed-row
 
@@ -177,7 +178,7 @@ namespace casadi {
         cs_ltsolve(m->L->L, t) ;              // t = U\t
         cs_ipvec(m->S->q, t, x, m->A.n) ;      // x = P2\t
       }
-      x += ncol();
+      x += m->ncol();
     }
   }
 
@@ -193,7 +194,7 @@ namespace casadi {
       if (tr) cs_lsolve(m->L->L, t) ; // t = L\t
       if (!tr) cs_ltsolve(m->L->L, t) ; // t = U\t
       cs_ipvec(m->S->q, t, x, m->A.n) ;      // x = P2\t
-      x += ncol();
+      x += m->ncol();
     }
   }
 

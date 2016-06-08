@@ -153,7 +153,6 @@ namespace casadi {
 
     // Sparsity pattern of the extended Jacobians
     Sparsity sp_jac_dae_, sp_jac_rdae_;
-    Sparsity::Btf btf_jac_dae_, btf_jac_rdae_;
 
     ///@{
     // Shorthands

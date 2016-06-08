@@ -1819,6 +1819,7 @@
 <tr><td>iteration_callback_step</td><td>OT_INT</td><td>Only call the callback function every few iterations.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time</td><td>casadi::Nlpsol</td></tr>
 <tr><td>snopt</td><td>OT_DICT</td><td>Options to be passed to SNOPT</td><td>casadi::SnoptInterface</td></tr>
+<tr><td>start</td><td>OT_STRING</td><td>Warm-start options for Worhp: cold|warm|hot</td><td>casadi::SnoptInterface</td></tr>
 <tr><td>verbose_init</td><td>OT_BOOL</td><td>Print out timing information about the different stages of initialization</td><td>casadi::Nlpsol</td></tr>
 <tr><td>warn_initial_bounds</td><td>OT_BOOL</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>casadi::Nlpsol</td></tr>
 </table>
@@ -1831,6 +1832,7 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th></tr>
 <tr><td>snopt</td><td>OT_DICT</td><td>Options to be passed to SNOPT</td></tr>
+<tr><td>start</td><td>OT_STRING</td><td>Warm-start options for Worhp: cold|warm|hot</td></tr>
 </table>
 */
 /** \addtogroup general_SnoptInterface
@@ -1848,6 +1850,7 @@
 <tr><td>iteration_callback_step</td><td>OT_INT</td><td>Only call the callback function every few iterations.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time</td><td>casadi::Nlpsol</td></tr>
 <tr><td>snopt</td><td>OT_DICT</td><td>Options to be passed to SNOPT</td><td>casadi::SnoptInterface</td></tr>
+<tr><td>start</td><td>OT_STRING</td><td>Warm-start options for Worhp: cold|warm|hot</td><td>casadi::SnoptInterface</td></tr>
 <tr><td>verbose_init</td><td>OT_BOOL</td><td>Print out timing information about the different stages of initialization</td><td>casadi::Nlpsol</td></tr>
 <tr><td>warn_initial_bounds</td><td>OT_BOOL</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>casadi::Nlpsol</td></tr>
 </table>

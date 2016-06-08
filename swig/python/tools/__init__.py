@@ -55,4 +55,4 @@ def loadAllCompiledPlugins():
     elif cls=='Interpolant':
       casadi.load_interpolant(name)
     else:
-      getattr(casadi,cls).loadPlugin(name)
+      getattr(casadi,cls).load_plugin(name)

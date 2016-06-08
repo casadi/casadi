@@ -555,11 +555,8 @@ namespace casadi {
     m.time2 = clock();
     m.t_lsetup_jac += static_cast<double>(m.time2 - m.time1)/CLOCKS_PER_SEC;
 
-    // Prepare the solution of the linear system (e.g. factorize)
-    fill_n(m.arg, linsol_.n_in(), nullptr);
-    fill_n(m.res, linsol_.n_out(), nullptr);
-    linsol_.setup(m.arg, m.res, m.iw, w1);
-    linsol_.linsol_factorize(jac);
+    // Factorize the linear system
+    linsol_.factorize(jac);
 
     // Log time duration
     m.time1 = clock();
@@ -585,7 +582,7 @@ namespace casadi {
     m.time1 = clock();
 
     // Solve the factorized system
-    linsol_.linsol_solve(NV_DATA_S(v));
+    linsol_.solve(NV_DATA_S(v));
 
     // Log time duration
     m.time2 = clock();
