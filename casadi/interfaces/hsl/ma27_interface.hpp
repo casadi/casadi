@@ -137,6 +137,12 @@ namespace casadi {
     /** \brief Initalize memory block */
     virtual void init_memory(void* mem) const;
 
+    // Set sparsity pattern
+    virtual bool fixed_sparsity() const {return false;}
+
+    // Set sparsity pattern
+    virtual void set_sparsity(void* mem, const int* sp) const;
+
     // Factorize the linear system
     virtual void linsol_factorize(void* mem, const double* A) const;
 

@@ -278,6 +278,11 @@ namespace casadi {
       }
     }
 
+    // Create linear solver
+    if (shur_) {
+      linsol_ = Linsol("linsol", linsol_plugin_, Sparsity());
+    }
+
     // Allocate work vectors
     if (sparse_) {
       alloc_w(nnz_in(CONIC_H), true); // h
@@ -809,33 +814,29 @@ namespace casadi {
       }
     }
 
-    // Create sparsity pattern
+    // Create sparsity pattern: TODO(@jaeandersson) No memory allocation
     Sparsity sp = Sparsity::triplet(dim, dim, m->row, m->col, m->lin_map);
     for (int& e : m->lin_map) e = m->nz_map[e];
 
-
-    cout << "------" << endl;
-
-    // Create a linear solver instance
-//    m->lin = Linsol()
-    return 1;
+    // Pass to linear solver
+    m->self.linsol_.set_sparsity(sp);
 
     return 0;
   }
 
   int QpoasesInterface::qpoases_sfact(void* mem, const double* vals) {
     cout << "qpoases_sfact" << endl;
-    return 0;
+    return 1;
   }
 
   int QpoasesInterface::qpoases_nfact(void* mem, const double* vals) {
     cout << "qpoases_nfact" << endl;
-    return 0;
+    return 1;
   }
 
   int QpoasesInterface::qpoases_solve(void* mem, int nrhs, double* rhs) {
     cout << "qpoases_solve" << endl;
-    return 0;
+    return 1;
   }
 
 

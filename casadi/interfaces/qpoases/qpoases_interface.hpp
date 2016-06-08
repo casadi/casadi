@@ -171,7 +171,7 @@ namespace casadi {
     static std::string getErrorMessage(int flag);
 
     // Linear solver
-    Linsol lin;
+    Linsol linsol_;
 
   };
 

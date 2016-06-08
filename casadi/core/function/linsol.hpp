@@ -82,7 +82,13 @@ namespace casadi {
     /// Create a solve node
     MX solve(const MX& A, const MX& B, bool tr=false);
 
+    // Set sparsity pattern
+    bool fixed_sparsity() const;
+
 #ifndef SWIG
+    // Set sparsity pattern
+    void set_sparsity(const int* sp) const;
+
     // Factorize linear system of equations
     void factorize(const double* A) const;
 

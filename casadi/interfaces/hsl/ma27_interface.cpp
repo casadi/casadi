@@ -77,6 +77,13 @@ namespace casadi {
     m->icntl[1] = 0;       // Suppress diagnostic messages
     m->cntl[0] = 1e-8;     // Set pivot tolerance
 
+    if (!sparsity_.is_null()) set_sparsity(mem, sparsity_);
+  }
+
+  void Ma27Interface::set_sparsity(void* mem, const int* sp) const {
+    LinsolInternal::set_sparsity(mem, sp);
+    auto m = static_cast<Ma27Memory*>(mem);
+
     // Dynamically resized work vectors
     int N = m->ncol();
     int nnz = m->colind()[N];

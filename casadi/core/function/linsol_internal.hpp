@@ -86,6 +86,12 @@ namespace casadi {
     /// Solve Cholesky
     virtual void linsol_solveL(void* mem, double* x, int nrhs, bool tr) const;
 
+    // Set sparsity pattern
+    virtual bool fixed_sparsity() const {return true;}
+
+    // Set sparsity pattern
+    virtual void set_sparsity(void* mem, const int* sp) const;
+
     /// Factorize the linear system
     virtual void linsol_factorize(void* mem, const double* A) const;
 

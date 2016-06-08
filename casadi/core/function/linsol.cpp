@@ -84,6 +84,15 @@ namespace casadi {
     (*this)->linsol_solveL((*this)->memory(0), x, nrhs, tr);
   }
 
+  bool Linsol::fixed_sparsity() const {
+    return (*this)->fixed_sparsity();
+  }
+
+  void Linsol::set_sparsity(const int* sp) const {
+    casadi_assert(!fixed_sparsity());
+    (*this)->set_sparsity((*this)->memory(0), sp);
+  }
+
   void Linsol::factorize(const double* A) const {
     (*this)->linsol_factorize((*this)->memory(0), A);
   }
