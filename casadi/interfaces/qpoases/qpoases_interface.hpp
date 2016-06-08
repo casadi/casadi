@@ -27,6 +27,7 @@
 #define CASADI_QPOASES_INTERFACE_HPP
 
 #include "casadi/core/function/conic_impl.hpp"
+#include "casadi/core/function/linsol.hpp"
 #include <casadi/interfaces/qpoases/casadi_conic_qpoases_export.h>
 #include <qpOASES.hpp>
 
@@ -62,9 +63,6 @@ namespace casadi {
 
     // Map linear system nonzeros
     std::vector<int> lin_map;
-
-    // Linear solver instance
-    Function lin;
 
     /// Constructor
     QpoasesMemory(const QpoasesInterface& self);
@@ -168,6 +166,9 @@ namespace casadi {
 
     /// Get qpOASES error message
     static std::string getErrorMessage(int flag);
+
+    // Linear solver
+    Linsol lin;
 
   };
 

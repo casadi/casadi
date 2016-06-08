@@ -214,7 +214,7 @@ namespace casadi {
       } else if (op.first=="max_shur") {
         max_shur_ = op.second;
       } else if (op.first=="linsol_plugin") {
-        linsol_plugin_ = op.second;
+        linsol_plugin_ = string(op.second);
       } else if (op.first=="nWSR") {
         max_nWSR_ = op.second;
       } else if (op.first=="CPUtime") {
@@ -810,9 +810,8 @@ namespace casadi {
     // Create sparsity pattern
     Sparsity sp = Sparsity::triplet(dim, dim, rowv, colv, m->lin_map);
     for (int& e : m->lin_map) e = nz_map[e];
-
     // Create a linear solver instance
-    m->lin = linsol()
+//    m->lin = Linsol()
 
     return 0;
   }
