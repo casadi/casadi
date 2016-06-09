@@ -74,9 +74,6 @@ namespace casadi {
     /// number of checkpoints stored so far
     int ncheck;
 
-    /// Linear solver
-    Linsol linsolF, linsolB;
-
     /// Constructor
     SundialsMemory();
 
@@ -142,6 +139,9 @@ namespace casadi {
     int max_krylov_;
     bool use_precon_;
     ///@}
+
+    /// Linear solver
+    Linsol linsolF_, linsolB_;
 
     /// Supported iterative solvers in Sundials
     enum NewtonScheme {SD_DIRECT, SD_GMRES, SD_BCGSTAB, SD_TFQMR} newton_scheme_;

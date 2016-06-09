@@ -652,7 +652,7 @@ namespace casadi {
       }
 
       // Solve with multiple right-hand-sides
-      m->linsolF.solve(v, 1 + s.ns_);
+      s.linsolF_.solve(v, 1 + s.ns_);
 
       // Return to the original ordering
       if (s.ns_>0 && s.nz_>0) {
@@ -698,7 +698,7 @@ namespace casadi {
       }
 
       // Solve with multiple right-hand-sides
-      m->linsolB.solve(v, 1 + s.ns_);
+      s.linsolB_.solve(v, 1 + s.ns_);
 
       // Return to the original ordering
       if (s.ns_>0 && s.nrz_>0) {
@@ -733,7 +733,7 @@ namespace casadi {
       s.calc_function(m, "jacF");
 
       // Factorize the linear system
-      m->linsolF.factorize(m->jac);
+      s.linsolF_.factorize(m->jac);
 
       return 0;
     } catch(exception& e) {
@@ -761,7 +761,7 @@ namespace casadi {
       s.calc_function(m, "jacB");
 
       // Factorize the linear system
-      m->linsolB.factorize(m->jacB);
+      s.linsolB_.factorize(m->jacB);
 
       return 0;
     } catch(exception& e) {

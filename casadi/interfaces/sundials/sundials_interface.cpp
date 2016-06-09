@@ -199,6 +199,12 @@ namespace casadi {
     if (ns_>0) {
       alloc_w(max(nz_, nrz_), true); // ztmp
     }
+
+    // Allocate linear solvers
+    linsolF_ = Linsol("linsolF", linear_solver_, linear_solver_options_);
+    if (nrx_>0) {
+      linsolB_ = Linsol("linsolB", linear_solver_, linear_solver_options_);
+    }
   }
 
   void SundialsInterface::init_memory(void* mem) const {
@@ -211,12 +217,10 @@ namespace casadi {
     m->rxz = N_VNew_Serial(nrx_+nrz_);
     m->rq = N_VNew_Serial(nrq_);
 
-    // Allocate linear solvers
-    m->linsolF = Linsol("linsolF", linear_solver_, linear_solver_options_);
-    m->linsolF.reset(get_function("jacF").sparsity_out(0));
+    // Reset linear solvers
+    linsolF_.reset(get_function("jacF").sparsity_out(0));
     if (nrx_>0) {
-      m->linsolB = Linsol("linsolB", linear_solver_, linear_solver_options_);
-      m->linsolB.reset(get_function("jacB").sparsity_out(0));
+      linsolB_.reset(get_function("jacB").sparsity_out(0));
     }
   }
 

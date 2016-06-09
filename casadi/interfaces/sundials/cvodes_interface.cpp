@@ -505,7 +505,7 @@ namespace casadi {
       }
 
       // Solve the factorized system
-      m->linsolF.solve(NV_DATA_S(z), 1 + s.ns_);
+      s.linsolF_.solve(NV_DATA_S(z), 1 + s.ns_);
 
       return 0;
     } catch(exception& e) {
@@ -526,7 +526,7 @@ namespace casadi {
       }
 
       // Solve the factorized system
-      m->linsolB.solve(NV_DATA_S(zvecB), 1+s.ns_);
+      s.linsolB_.solve(NV_DATA_S(zvecB), 1+s.ns_);
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "psolveB failed: " << e.what() << endl;;
@@ -551,7 +551,7 @@ namespace casadi {
       s.calc_function(m, "jacF");
 
       // Prepare the solution of the linear system (e.g. factorize)
-      m->linsolF.factorize(m->jac);
+      s.linsolF_.factorize(m->jac);
 
       return 0;
     } catch(exception& e) {
@@ -580,7 +580,7 @@ namespace casadi {
       s.calc_function(m, "jacB");
 
       // Prepare the solution of the linear system (e.g. factorize)
-      m->linsolB.factorize(m->jacB);
+      s.linsolB_.factorize(m->jacB);
 
       return 0;
     } catch(exception& e) {
