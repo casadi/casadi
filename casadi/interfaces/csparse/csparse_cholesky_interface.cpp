@@ -104,7 +104,7 @@ namespace casadi {
     m->A.x = const_cast<double*>(A);
 
     // Make sure that all entries of the linear system are valid
-    int nnz = nnz_in(0);
+    int nnz = m->nnz();
     for (int k=0; k<nnz; ++k) {
       casadi_assert_message(!isnan(A[k]), "Nonzero " << k << " is not-a-number");
       casadi_assert_message(!isinf(A[k]), "Nonzero " << k << " is infinite");

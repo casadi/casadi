@@ -56,6 +56,7 @@ int main(int argc, char *argv[])
   };
   vector<Test> tests;
   tests.push_back({"csparse", UNSYM});
+  tests.push_back({"csparsecholesky", PD});
   tests.push_back({"lapacklu", UNSYM});
   tests.push_back({"lapackqr", UNSYM});
   tests.push_back({"ma27", SYM});
