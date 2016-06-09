@@ -5917,7 +5917,7 @@ Default constructor.
 ";
 
 %feature("docstring") casadi::Linsol::Linsol(const std::string &name, const
-std::string &solver, const Sparsity &sp, const Dict &opts=Dict()) "
+std::string &solver, const Dict &opts=Dict()) "
 
 Importer factory.
 
