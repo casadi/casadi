@@ -53,9 +53,6 @@ namespace casadi {
 
     // Temporary
     std::vector<double> temp_;
-
-    // Has the solve function been called once
-    bool called_once_;
   };
 
   /** \brief \pluginbrief{LinsolInternal,csparse}
@@ -90,6 +87,9 @@ namespace casadi {
 
     // Set sparsity pattern
     virtual void reset(void* mem, const int* sp) const;
+
+    // Symbolic factorization
+    virtual void pivoting(void* mem, const double* A) const;
 
     // Factorize the linear system
     virtual void factorize(void* mem, const double* A) const;

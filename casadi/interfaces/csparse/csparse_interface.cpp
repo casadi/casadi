@@ -84,10 +84,20 @@ namespace casadi {
 
     // Temporary
     m->temp_.resize(m->A.n);
-
-    // Has the routine been called once
-    m->called_once_ = false;
   }
+
+  void CsparseInterface::pivoting(void* mem, const double* A) const {
+    LinsolInternal::pivoting(mem, A);
+    auto m = static_cast<CsparseMemory*>(mem);
+
+    // Set the nonzeros of the matrix
+    m->A.x = const_cast<double*>(A);
+
+    // ordering and symbolic analysis
+    int order = 0; // ordering?
+    if (m->S) cs_sfree(m->S);
+    m->S = cs_sqr(order, &m->A, 0);
+   }
 
   void CsparseInterface::factorize(void* mem, const double* A) const {
     auto m = static_cast<CsparseMemory*>(mem);
@@ -95,19 +105,6 @@ namespace casadi {
 
     // Set the nonzeros of the matrix
     m->A.x = const_cast<double*>(A);
-
-    if (!m->called_once_) {
-      if (verbose()) {
-        userOut() << "CsparseInterface::prepare: symbolic factorization" << endl;
-      }
-
-      // ordering and symbolic analysis
-      int order = 0; // ordering?
-      if (m->S) cs_sfree(m->S);
-      m->S = cs_sqr(order, &m->A, 0) ;
-    }
-
-    m->called_once_ = true;
 
     // Make sure that all entries of the linear system are valid
     for (int k=0; k<m->nnz(); ++k) {
