@@ -135,4 +135,7 @@ endif()
 if (QPOASES_FOUND)
   add_executable(chain_qp chain_qp.cpp)
   target_link_libraries(chain_qp casadi)
+
+  add_executable(lowlevel_qp lowlevel_qp.cpp)
+  target_link_libraries(lowlevel_qp casadi)
 endif()

@@ -321,8 +321,36 @@ typedef struct {
     long nCharName;         /**< Number of character in name. */
 } MatMatrixHeader;
 
+/** User-defined linear solver memory type */
+typedef void* linsol_memory_t;
 
+/** Initialization function for a user-defined linear solver function
+ * Sparsity pattern in sparse triplet format (0-based)
+ */
+typedef int_t (*linsol_init_t)(linsol_memory_t mem,
+                               int_t dim,
+                               int_t nnz,
+                               const int_t* row,
+                               const int_t* col);
 
+/** Symbolical factorization function for a user-defined linear solver function
+  * Requires knowledge if the numerical values in order to perform e.g.
+  * partial pivoting or to eliminate numerical zeros from the sparsity pattern
+  */
+typedef int_t (*linsol_sfact_t)(linsol_memory_t mem,
+                                const real_t* vals);
+
+/** Numerical factorization function for a user-defined linear solver function
+  * Assumes a (not necessarily up-to-date) symbolic factorization is available
+  */
+typedef int_t (*linsol_nfact_t)(linsol_memory_t mem,
+                                const real_t* vals);
+
+/** Solve a factorized linear system for a user-defined linear solver function
+  * Multiple right-hand-sides. The solution overwrites the right-hand-side.
+  */
+typedef int_t (*linsol_solve_t)(linsol_memory_t mem,
+                                int_t nrhs, real_t* rhs);
 
 END_NAMESPACE_QPOASES
 

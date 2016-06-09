@@ -255,6 +255,8 @@ returnValue Ma27SparseSolver::setMatrixData( int_t dim_,
                            const real_t* const avals
                            )
 {
+  MyPrintf("dim_ = %d\n", dim_);
+  MyPrintf("numNonzeros_ = %d\n", numNonzeros_);
     reset( );
     dim = dim_;
     numNonzeros = numNonzeros_;
@@ -1070,6 +1072,19 @@ returnValue Ma57SparseSolver::copy(     const Ma57SparseSolver& rhs
 
 #ifdef SOLVER_NONE
 
+DummySparseSolver::DummySparseSolver(linsol_memory_t _linsol_data,
+                                     linsol_init_t _linsol_init,
+                                     linsol_sfact_t _linsol_sfact,
+                                     linsol_nfact_t _linsol_nfact,
+                                     linsol_solve_t _linsol_solve) :
+  linsol_data(_linsol_data),
+  linsol_init(_linsol_init),
+  linsol_sfact(_linsol_sfact),
+  linsol_nfact(_linsol_nfact),
+  linsol_solve(_linsol_solve)
+{
+}
+
 returnValue DummySparseSolver::setMatrixData(   int_t dim, /**< Dimension of the linear system. */
                                                 int_t numNonzeros, /**< Number of nonzeros in the matrix. */
                                                 const int_t* const airn, /**< Row indices for each matrix entry. */
@@ -1077,12 +1092,29 @@ returnValue DummySparseSolver::setMatrixData(   int_t dim, /**< Dimension of the
                                                 const real_t* const avals /**< Values for each matrix entry. */
                                                 )
 {
-    return THROWERROR(RET_NO_SPARSE_SOLVER);
+  // Trivial
+  if (dim==0) return SUCCESSFUL_RETURN;
+
+  // No user-defined linear solver
+  if (linsol_init==0) return THROWERROR(RET_NO_SPARSE_SOLVER);
+
+  // Call initialization function
+  if (linsol_init(linsol_data, dim, numNonzeros, airn, acjn)) {
+    return THROWERROR(RET_MATRIX_FACTORISATION_FAILED);
+  }
+
+  return SUCCESSFUL_RETURN;
 }
 
 returnValue DummySparseSolver::factorize( )
 {
-    return THROWERROR(RET_NO_SPARSE_SOLVER);
+  MyPrintf("here2a!\n");
+  // No user-defined linear solver
+  if (linsol_nfact==0) return THROWERROR(RET_NO_SPARSE_SOLVER);
+
+  MyPrintf("here2!\n");
+
+  return SUCCESSFUL_RETURN;
 }
 
 returnValue DummySparseSolver::solve(   int_t dim, /**< Dimension of the linear system. */
@@ -1090,7 +1122,13 @@ returnValue DummySparseSolver::solve(   int_t dim, /**< Dimension of the linear 
                                         real_t* const sol /**< Solution of the linear system. */
                                         )
 {
-    return THROWERROR(RET_NO_SPARSE_SOLVER);
+  MyPrintf("here3a! dim=%d\n", dim);
+  // No user-defined linear solver
+  if (linsol_solve==0) return THROWERROR(RET_NO_SPARSE_SOLVER);
+
+  MyPrintf("here3!\n");
+
+  return SUCCESSFUL_RETURN;
 }
 
 #endif // SOLVER_NONE

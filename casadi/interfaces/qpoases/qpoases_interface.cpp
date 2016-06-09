@@ -71,6 +71,9 @@ namespace casadi {
       {"max_shur",
        {OT_INT,
         "Maximal number of Schur updates [75]"}},
+      {"linsol_plugin",
+       {OT_STRING,
+        "Linear solver plugin"}},
       {"nWSR",
        {OT_INT,
         "The maximum number of working set recalculations to be performed during "
@@ -183,6 +186,7 @@ namespace casadi {
     max_nWSR_ = 5 *(nx_ + na_);
     max_cputime_ = -1;
     ops_.setToDefault();
+    linsol_plugin_ = "ma27";
 
     // Read options
     for (auto&& op : opts) {
@@ -209,6 +213,8 @@ namespace casadi {
         }
       } else if (op.first=="max_shur") {
         max_shur_ = op.second;
+      } else if (op.first=="linsol_plugin") {
+        linsol_plugin_ = string(op.second);
       } else if (op.first=="nWSR") {
         max_nWSR_ = op.second;
       } else if (op.first=="CPUtime") {
@@ -272,6 +278,11 @@ namespace casadi {
       }
     }
 
+    // Create linear solver
+    if (shur_) {
+      linsol_ = Linsol("linsol", linsol_plugin_);
+    }
+
     // Allocate work vectors
     if (sparse_) {
       alloc_w(nnz_in(CONIC_H), true); // h
@@ -295,7 +306,8 @@ namespace casadi {
     // Create qpOASES instance
     if (m->qp) delete m->qp;
     if (shur_) {
-      m->sqp = new qpOASES::SQProblemSchur(nx_, na_, hess_, max_shur_);
+      m->sqp = new qpOASES::SQProblemSchur(nx_, na_, hess_, max_shur_,
+        mem, qpoases_init, qpoases_sfact, qpoases_nfact, qpoases_solve);
     } else if (na_==0) {
       m->qp = new qpOASES::QProblemB(nx_, hess_);
     } else {
@@ -766,7 +778,7 @@ namespace casadi {
     }
   }
 
-  QpoasesMemory::QpoasesMemory() {
+  QpoasesMemory::QpoasesMemory(const QpoasesInterface& self) : self(self) {
     this->qp = 0;
     this->h = 0;
     this->a = 0;
@@ -777,5 +789,55 @@ namespace casadi {
     if (this->h) delete this->h;
     if (this->a) delete this->a;
   }
+
+  int QpoasesInterface::
+  qpoases_init(void* mem, int dim, int nnz, const int* row, const int* col) {
+    casadi_assert(mem!=0);
+    QpoasesMemory* m = static_cast<QpoasesMemory*>(mem);
+
+    // Start with the provided sparsity pattern (index-1)
+    m->row.clear();
+    m->col.clear();
+    m->nz_map.clear();
+    for (int k=0; k<nnz; ++k) {
+      m->row.push_back(row[k]-1);
+      m->col.push_back(col[k]-1);
+      m->nz_map.push_back(k);
+    }
+
+    // Add mirror image
+    for (int k=0; k<nnz; ++k) {
+      if (row[k]!=col[k]) {
+        m->row.push_back(col[k]-1);
+        m->col.push_back(row[k]-1);
+        m->nz_map.push_back(k);
+      }
+    }
+
+    // Create sparsity pattern: TODO(@jaeandersson) No memory allocation
+    Sparsity sp = Sparsity::triplet(dim, dim, m->row, m->col, m->lin_map);
+    for (int& e : m->lin_map) e = m->nz_map[e];
+
+    // Pass to linear solver
+    m->self.linsol_.reset(sp);
+
+    return 0;
+  }
+
+  int QpoasesInterface::qpoases_sfact(void* mem, const double* vals) {
+    cout << "qpoases_sfact" << endl;
+    return 1;
+  }
+
+  int QpoasesInterface::qpoases_nfact(void* mem, const double* vals) {
+    cout << "qpoases_nfact" << endl;
+    return 1;
+  }
+
+  int QpoasesInterface::qpoases_solve(void* mem, int nrhs, double* rhs) {
+    cout << "qpoases_solve" << endl;
+    return 1;
+  }
+
 
 } // namespace casadi

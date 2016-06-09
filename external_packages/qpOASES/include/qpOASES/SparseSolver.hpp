@@ -363,6 +363,13 @@ class DummySparseSolver: public SparseSolver
      *  PUBLIC MEMBER FUNCTIONS
      */
     public:
+        /** Constructor */
+        DummySparseSolver(linsol_memory_t _linsol_data,
+                          linsol_init_t _linsol_init,
+                          linsol_sfact_t _linsol_sfact,
+                          linsol_nfact_t _linsol_nfact,
+                          linsol_solve_t _linsol_solve);
+
         /** Set new matrix data.  The matrix is to be provided
             in the Harwell-Boeing format.  Only the lower
             triangular part should be set. */
@@ -381,6 +388,16 @@ class DummySparseSolver: public SparseSolver
                                     const real_t* const rhs,    /**< Values for the right hand side. */
                                     real_t* const sol           /**< Solution of the linear system. */
                                     );
+
+    /*
+     *  PRIVATE MEMBER VARIABLES
+     */
+    private:
+      linsol_memory_t linsol_data;
+      linsol_init_t linsol_init;
+      linsol_sfact_t linsol_sfact;
+      linsol_nfact_t linsol_nfact;
+      linsol_solve_t linsol_solve;
 };
 
 #endif // SOLVER_NONE

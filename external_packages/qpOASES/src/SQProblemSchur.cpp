@@ -72,7 +72,7 @@ SQProblemSchur::SQProblemSchur( ) : SQProblem( )
 #elif defined SOLVER_MA27
     sparseSolver = new Ma27SparseSolver();
 #elif defined SOLVER_NONE
-    sparseSolver = new DummySparseSolver();
+    sparseSolver = new DummySparseSolver(0, 0, 0, 0, 0);
 #endif
 
     nSmax = 0;
@@ -96,8 +96,12 @@ SQProblemSchur::SQProblemSchur( ) : SQProblem( )
 /*
  *  Q P r o b l e m
  */
-SQProblemSchur::SQProblemSchur( int_t _nV, int_t _nC, HessianType _hessianType, int_t maxSchurUpdates ) : SQProblem( _nV,_nC,_hessianType )
-{
+SQProblemSchur::SQProblemSchur( int_t _nV, int_t _nC, HessianType _hessianType, int_t maxSchurUpdates,
+  linsol_memory_t _linsol_data, linsol_init_t _linsol_init,
+  linsol_sfact_t _linsol_sfact, linsol_nfact_t _linsol_nfact, linsol_solve_t _linsol_solve)
+  : SQProblem( _nV,_nC,_hessianType ),
+    linsol_data(_linsol_data), linsol_init(_linsol_init),
+    linsol_sfact(_linsol_sfact), linsol_nfact(_linsol_nfact), linsol_solve(_linsol_solve) {
     /* We use the variables Q and R to store the QR factorization of S.
      * T is not required. */
     delete [] R; R = 0;
@@ -111,7 +115,7 @@ SQProblemSchur::SQProblemSchur( int_t _nV, int_t _nC, HessianType _hessianType, 
 #elif defined SOLVER_MA27
     sparseSolver = new Ma27SparseSolver();
 #elif defined SOLVER_NONE
-    sparseSolver = new DummySparseSolver();
+    sparseSolver = new DummySparseSolver(linsol_data, linsol_init, linsol_sfact, linsol_nfact, linsol_solve);
 #endif
 
     nSmax = maxSchurUpdates;
@@ -151,14 +155,15 @@ SQProblemSchur::SQProblemSchur( int_t _nV, int_t _nC, HessianType _hessianType, 
 /*
  *  Q P r o b l e m
  */
-SQProblemSchur::SQProblemSchur( const SQProblemSchur& rhs ) : SQProblem( rhs )
-{
+SQProblemSchur::SQProblemSchur( const SQProblemSchur& rhs ) : SQProblem( rhs ),
+  linsol_data(rhs.linsol_data), linsol_init(rhs.linsol_init),
+  linsol_sfact(rhs.linsol_sfact), linsol_nfact(rhs.linsol_nfact), linsol_solve(rhs.linsol_solve) {
 #ifdef SOLVER_MA57
     sparseSolver = new Ma57SparseSolver();
 #elif defined SOLVER_MA27
     sparseSolver = new Ma27SparseSolver();
 #elif defined SOLVER_NONE
-    sparseSolver = new DummySparseSolver();
+    sparseSolver = new DummySparseSolver(linsol_data, linsol_init, linsol_sfact, linsol_nfact, linsol_solve);
 #endif
     copy( rhs );
 }
@@ -650,7 +655,7 @@ returnValue SQProblemSchur::setupTQfactorisation( )
 /*
  *  a d d C o n s t r a i n t
  */
-returnValue SQProblemSchur::addConstraint(  int_t number, 
+returnValue SQProblemSchur::addConstraint(  int_t number,
                                             SubjectToStatus C_status,
                                             BooleanType updateCholesky,
                                             BooleanType ensureLI
@@ -2463,7 +2468,7 @@ returnValue SQProblemSchur::backsolveSchurQR( int_t dimS, const real_t* const rh
 }
 
 
-returnValue SQProblemSchur::stepCalcRhs(    int_t nFR, int_t nFX, int_t nAC, int_t* FR_idx, int_t* FX_idx, int_t* AC_idx, real_t& rhs_max, 
+returnValue SQProblemSchur::stepCalcRhs(    int_t nFR, int_t nFX, int_t nAC, int_t* FR_idx, int_t* FX_idx, int_t* AC_idx, real_t& rhs_max,
                                             const real_t* const delta_g, const real_t* const delta_lbA, const real_t* const delta_ubA,
                                             const real_t* const delta_lb, const real_t* const delta_ub,
                                             BooleanType Delta_bC_isZero, BooleanType Delta_bB_isZero,
@@ -3078,7 +3083,7 @@ returnValue SQProblemSchur::resetSchurComplement( BooleanType allowInertiaCorrec
     delete [] jcn;
     delete [] irn;
     delete [] avals;
-    
+
     if (retval != SUCCESSFUL_RETURN)
         return THROWERROR(RET_NO_SPARSE_SOLVER);
 
