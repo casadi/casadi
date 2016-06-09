@@ -101,7 +101,6 @@ namespace casadi {
 
   void CsparseInterface::factorize(void* mem, const double* A) const {
     auto m = static_cast<CsparseMemory*>(mem);
-    casadi_assert(A!=0);
 
     // Set the nonzeros of the matrix
     m->A.x = const_cast<double*>(A);

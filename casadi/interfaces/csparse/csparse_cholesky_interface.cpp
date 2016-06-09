@@ -90,6 +90,14 @@ namespace casadi {
 
     // Temporary
     m->temp.resize(m->A.n);
+  }
+
+  void CSparseCholeskyInterface::pivoting(void* mem, const double* A) const {
+    LinsolInternal::pivoting(mem, A);
+    auto m = static_cast<CsparseCholMemory*>(mem);
+
+    // Set the nonzeros of the matrix
+    m->A.x = const_cast<double*>(A);
 
     // ordering and symbolic analysis
     int order = 0; // ordering?
@@ -100,7 +108,6 @@ namespace casadi {
     auto m = static_cast<CsparseCholMemory*>(mem);
 
     // Set the nonzeros of the matrix
-    casadi_assert(A!=0);
     m->A.x = const_cast<double*>(A);
 
     // Make sure that all entries of the linear system are valid
