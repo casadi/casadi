@@ -4184,7 +4184,7 @@ point to any node, \"0\" is returned.
 
 Default constructor.
 
->  Linsol(str name, str solver, Sparsity sp, Dict opts=Dict())
+>  Linsol(str name, str solver, Dict opts=Dict())
 ------------------------------------------------------------------------
 
 Importer factory.
