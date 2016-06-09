@@ -595,7 +595,7 @@ namespace casadi {
     spH_ = mtimes(spL_.T(), spL_);
     spA_ = mat_fcn_.sparsity_out(mat_jac_);
     casadi_assert_message(!qpsol_plugin.empty(), "'qpsol' option has not been set");
-    qpsol_ = qpsol("qpsol", qpsol_plugin, {{"h", spH_}, {"a", spA_}},
+    qpsol_ = qpsol("qpsol", qpsol_plugin, SpDict{{"h", spH_}, {"a", spA_}},
                    qpsol_options);
     if (verbose_) {
       userOut() << "Allocated QP solver." << endl;

@@ -179,7 +179,7 @@ namespace casadi {
 
     // Allocate a QP solver
     casadi_assert_message(!qpsol_plugin.empty(), "'qpsol' option has not been set");
-    qpsol_ = qpsol("qpsol", qpsol_plugin, {{"h", Hsp_}, {"a", Asp_}},
+    qpsol_ = qpsol("qpsol", qpsol_plugin, SpDict{{"h", Hsp_}, {"a", Asp_}},
                    qpsol_options);
     alloc(qpsol_);
 
