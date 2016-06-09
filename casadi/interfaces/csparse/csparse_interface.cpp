@@ -64,7 +64,13 @@ namespace casadi {
 
   void CsparseInterface::init_memory(void* mem) const {
     LinsolInternal::init_memory(mem);
+    if (!sparsity_.is_null()) reset(mem, sparsity_);
+  }
+
+  void CsparseInterface::reset(void* mem, const int* sp) const {
+    LinsolInternal::reset(mem, sp);
     auto m = static_cast<CsparseMemory*>(mem);
+
     m->N = 0;
     m->S = 0;
     m->A.nzmax = m->nnz();  // maximum number of entries
@@ -74,7 +80,7 @@ namespace casadi {
     // or column indices (size nzmax)
     m->A.i = const_cast<int*>(m->row()); // row indices, size nzmax
     m->A.x = 0; // numerical values, size nzmax
-    m->A.nz = -1; // of entries in triplet matrix, -1 for compressed-col
+    m->A.nz = -1; // of entries in triplet matrix, -1 for compressed-column
 
     // Temporary
     m->temp_.resize(m->A.n);
@@ -83,7 +89,7 @@ namespace casadi {
     m->called_once_ = false;
   }
 
-  void CsparseInterface::linsol_factorize(void* mem, const double* A) const {
+  void CsparseInterface::factorize(void* mem, const double* A) const {
     auto m = static_cast<CsparseMemory*>(mem);
     casadi_assert(A!=0);
 
@@ -150,7 +156,7 @@ namespace casadi {
     casadi_assert(m->N!=0);
   }
 
-  void CsparseInterface::linsol_solve(void* mem, double* x, int nrhs, bool tr) const {
+  void CsparseInterface::solve(void* mem, double* x, int nrhs, bool tr) const {
     auto m = static_cast<CsparseMemory*>(mem);
     casadi_assert(m->N!=0);
 

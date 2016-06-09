@@ -89,14 +89,17 @@ namespace casadi {
     /** \brief Initalize memory block */
     virtual void init_memory(void* mem) const;
 
+    // Set sparsity pattern
+    virtual void reset(void* mem, const int* sp) const;
+
     // Factorize the linear system
-    virtual void linsol_factorize(void* mem, const double* A) const;
+    virtual void factorize(void* mem, const double* A) const;
 
     // Solve the linear system
-    virtual void linsol_solve(void* mem, double* x, int nrhs, bool tr) const;
+    virtual void solve(void* mem, double* x, int nrhs, bool tr) const;
 
     // Solve the system of equations <tt>Lx = b</tt>
-    virtual void linsol_solveL(void* mem, double* x, int nrhs, bool tr) const;
+    virtual void solve_cholesky(void* mem, double* x, int nrhs, bool tr) const;
 
     /// Obtain a symbolic Cholesky factorization
     virtual Sparsity linsol_cholesky_sparsity(void* mem, bool tr) const;

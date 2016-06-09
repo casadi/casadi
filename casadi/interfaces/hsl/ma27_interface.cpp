@@ -77,6 +77,13 @@ namespace casadi {
     m->icntl[1] = 0;       // Suppress diagnostic messages
     m->cntl[0] = 1e-8;     // Set pivot tolerance
 
+    if (!sparsity_.is_null()) reset(mem, sparsity_);
+  }
+
+  void Ma27Interface::reset(void* mem, const int* sp) const {
+    LinsolInternal::reset(mem, sp);
+    auto m = static_cast<Ma27Memory*>(mem);
+
     // Dynamically resized work vectors
     int N = m->ncol();
     int nnz = m->colind()[N];
@@ -90,7 +97,7 @@ namespace casadi {
     m->ikeep.resize(3*N);
   }
 
-  void Ma27Interface::linsol_factorize(void* mem, const double* A) const {
+  void Ma27Interface::factorize(void* mem, const double* A) const {
     auto m = static_cast<Ma27Memory*>(mem);
     casadi_assert(A!=0);
 
@@ -166,7 +173,7 @@ namespace casadi {
     if (m->iw.size() < m->maxfrt) m->iw.resize(m->maxfrt);
   }
 
-  void Ma27Interface::linsol_solve(void* mem, double* x, int nrhs, bool tr) const {
+  void Ma27Interface::solve(void* mem, double* x, int nrhs, bool tr) const {
     auto m = static_cast<Ma27Memory*>(mem);
 
     // Solve for each right-hand-side

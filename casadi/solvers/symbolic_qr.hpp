@@ -45,11 +45,17 @@ namespace casadi {
 
   /** \brief Memory for SymbolicQR  */
   struct CASADI_LINSOL_SYMBOLICQR_EXPORT SymbolicQrMemory : public LinsolMemory {
+    // Functions for factorization and (optionally transposed) solve
+    Function factorize, solve, solveT;
+
     // Work vectors
     std::vector<const double*> arg;
     std::vector<double*> res;
     std::vector<int> iw;
     std::vector<double> w;
+
+    // Allocate memory for a function
+    void alloc(const Function& f);
 
     // Storage for QR factorization
     std::vector<double> q, r;
@@ -96,34 +102,24 @@ namespace casadi {
     /** \brief Initalize memory block */
     virtual void init_memory(void* mem) const;
 
-    // Setup memory block
-    virtual void set_temp(void* mem, const double** arg, double** res,
-                          int* iw, double* w) const;
+    // Set sparsity pattern
+    virtual void reset(void* mem, const int* sp) const;
 
     // Factorize the linear system
-    virtual void linsol_factorize(void* mem, const double* A) const;
+    virtual void factorize(void* mem, const double* A) const;
 
     // Solve the linear system
-    virtual void linsol_solve(void* mem, double* x, int nrhs, bool tr) const;
-
-    /** \brief Generate code for the declarations of the C function */
-    virtual void generateDeclarations(CodeGenerator& g) const;
-
-    /** \brief Generate code for the body of the C function */
-    virtual void generateBody(CodeGenerator& g) const;
+    virtual void solve(void* mem, double* x, int nrhs, bool tr) const;
 
     /** \brief Evaluate symbolically (SX) */
     virtual void linsol_eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem,
                                bool tr, int nrhs);
 
-    // Factorization function
-    Function fact_fcn_;
-
-    // Solve function
-    Function solv_fcn_N_, solv_fcn_T_;
-
     /// A documentation string
     static const std::string meta_doc;
+
+    // Generated function options
+    Dict fopts_;
   };
 
 } // namespace casadi

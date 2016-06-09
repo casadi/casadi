@@ -38,12 +38,18 @@ namespace casadi {
     // Sparsity pattern (allowed to change)
     std::vector<int> sparsity;
 
+    // Current state of factorization
+    bool is_pivoted, is_factorized;
+
     /// Get sparsity pattern
     int nrow() const { return sparsity[0];}
     int ncol() const { return sparsity[1];}
     const int* colind() const { return &sparsity[2];}
     const int* row() const { return colind() + ncol() + 1;}
     int nnz() const { return colind()[ncol()];}
+
+    // Constructor
+    LinsolMemory() : is_pivoted(false), is_factorized(false) {}
   };
 
   /** Internal class
@@ -76,18 +82,24 @@ namespace casadi {
     /** \brief Initalize memory block */
     virtual void init_memory(void* mem) const;
 
-    // Solve numerically
-    virtual void linsol_solve(void* mem, double* x, int nrhs, bool tr) const;
-
     /// Evaluate SX, possibly transposed
     virtual void linsol_eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem,
                                bool tr, int nrhs);
 
     /// Solve Cholesky
-    virtual void linsol_solveL(void* mem, double* x, int nrhs, bool tr) const;
+    virtual void solve_cholesky(void* mem, double* x, int nrhs, bool tr) const;
+
+    // Set sparsity pattern
+    virtual void reset(void* mem, const int* sp) const;
+
+    // Symbolic factorization - partial pivoting (optional)
+    virtual void pivoting(void* mem, const double* A) const {}
 
     /// Factorize the linear system
-    virtual void linsol_factorize(void* mem, const double* A) const;
+    virtual void factorize(void* mem, const double* A) const;
+
+    // Solve numerically
+    virtual void solve(void* mem, double* x, int nrhs, bool tr) const;
 
     /// Sparsity pattern of the cholesky factors
     virtual Sparsity linsol_cholesky_sparsity(void* mem, bool tr) const;

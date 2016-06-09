@@ -89,6 +89,7 @@ int main(int argc, char *argv[])
       Linsol F("F", t.solver, A_test.sparsity());
 
       // Solve
+      F.pivoting(A_test.ptr());
       F.factorize(A_test.ptr());
       DM x = densify(b);
       F.solve(x.ptr(), x.size2());

@@ -160,6 +160,7 @@ namespace casadi {
       }
 
       // Factorize the linear solver with J
+      linsol_.pivoting(jac);
       linsol_.factorize(jac);
       linsol_.solve(f, 1, false);
 

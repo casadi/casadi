@@ -83,17 +83,29 @@ namespace casadi {
     }
 
     // Codegen options
-    Dict fopts;
     if (codegen) {
-      fopts["compiler"] = compilerplugin_;
-      fopts["jit_options"] = jit_options_;
+      fopts_["compiler"] = compilerplugin_;
+      fopts_["jit_options"] = jit_options_;
     }
+  }
+
+  void SymbolicQr::init_memory(void* mem) const {
+    LinsolInternal::init_memory(mem);
+    if (!sparsity_.is_null()) reset(mem, sparsity_);
+  }
+
+  void SymbolicQr::reset(void* mem, const int* sp) const {
+    LinsolInternal::reset(mem, sp);
+    auto m = static_cast<SymbolicQrMemory*>(mem);
+
+    // Get sparsity
+    Sparsity s = Sparsity::compressed(m->sparsity);
 
     // Symbolic expression for A
-    SX A = SX::sym("A", sparsity_);
+    SX A = SX::sym("A", s);
 
     // BTF factorization
-    const Sparsity::Btf& btf = sparsity_.btf();
+    const Sparsity::Btf& btf = s.btf();
 
     // Get the inverted column permutation
     std::vector<int> inv_colperm(btf.colperm.size());
@@ -111,8 +123,8 @@ namespace casadi {
     // Generate the QR factorization function
     SX Q1, R1;
     qr(Aperm, Q1, R1);
-    fact_fcn_ = Function("QR_fact", {A}, {Q1, R1}, fopts);
-    alloc(fact_fcn_);
+    m->factorize = Function("QR_fact", {A}, {Q1, R1}, fopts_);
+    m->alloc(m->factorize);
 
     // Symbolic expressions for solve function
     SX Q = SX::sym("Q", Q1.sparsity());
@@ -133,8 +145,8 @@ namespace casadi {
 
     // Generate the QR solve function
     vector<SX> solv_in = {Q, R, b};
-    solv_fcn_N_ = Function("QR_solv", solv_in, {x}, fopts);
-    alloc(solv_fcn_N_);
+    m->solve = Function("QR_solv", solv_in, {x}, fopts_);
+    m->alloc(m->solve);
 
     // Solve transposed
     // We have (Pb' * Q * R * Px)' * x = b
@@ -151,49 +163,34 @@ namespace casadi {
     x = xperm(inv_rowperm, Slice());
 
     // Mofify the QR solve function
-    solv_fcn_T_ = Function("QR_solv_T", solv_in, {x}, fopts);
-    alloc(solv_fcn_T_);
+    m->solveT = Function("QR_solv_T", solv_in, {x}, fopts_);
+    m->alloc(m->solveT);
 
     // Temporary storage
-    alloc_w(sparsity_.size1(), true);
-  }
+    m->w.resize(m->w.size() + s.size1());
 
-  void SymbolicQr::init_memory(void* mem) const {
-    LinsolInternal::init_memory(mem);
-    auto m = static_cast<SymbolicQrMemory*>(mem);
     // Allocate storage for QR factorization
-    m->q.resize(fact_fcn_.nnz_out(0));
-    m->r.resize(fact_fcn_.nnz_out(1));
-
-    // Allocate work vectors
-    m->arg.resize(sz_arg());
-    m->res.resize(sz_res());
-    m->iw.resize(sz_iw());
-    m->w.resize(sz_w());
+    m->q.resize(m->factorize.nnz_out(0));
+    m->r.resize(m->factorize.nnz_out(1));
   }
 
-  void SymbolicQr::set_temp(void* mem, const double** arg, double** res,
-                            int* iw, double* w) const {
-    auto m = static_cast<SymbolicQrMemory*>(mem);
-  }
-
-  void SymbolicQr::linsol_factorize(void* mem, const double* A) const {
+  void SymbolicQr::factorize(void* mem, const double* A) const {
     auto m = static_cast<SymbolicQrMemory*>(mem);
 
     // Factorize
-    fill_n(get_ptr(m->arg), fact_fcn_.n_in(), nullptr);
+    fill_n(get_ptr(m->arg), m->factorize.n_in(), nullptr);
     m->arg[0] = A;
-    fill_n(get_ptr(m->res), fact_fcn_.n_out(), nullptr);
+    fill_n(get_ptr(m->res), m->factorize.n_out(), nullptr);
     m->res[0] = get_ptr(m->q);
     m->res[1] = get_ptr(m->r);
-    fact_fcn_(get_ptr(m->arg), get_ptr(m->res), get_ptr(m->iw), get_ptr(m->w));
+    m->factorize(get_ptr(m->arg), get_ptr(m->res), get_ptr(m->iw), get_ptr(m->w));
   }
 
-  void SymbolicQr::linsol_solve(void* mem, double* x, int nrhs, bool tr) const {
+  void SymbolicQr::solve(void* mem, double* x, int nrhs, bool tr) const {
     auto m = static_cast<SymbolicQrMemory*>(mem);
 
     // Select solve function
-    const Function& solv = tr ? solv_fcn_T_ : solv_fcn_N_;
+    const Function& solv = tr ? m->solveT : m->solve;
 
     // Solve for all right hand sides
     fill_n(get_ptr(m->arg), solv.n_in(), nullptr);
@@ -220,10 +217,10 @@ namespace casadi {
     Sparsity sp = Sparsity::compressed(m->sparsity);
     SX A = SX::zeros(sp);
     copy(arg[1], arg[1]+A.nnz(), A->begin());
-    vector<SX> v = fact_fcn_(A);
+    vector<SX> v = m->factorize(A);
 
     // Select solve function
-    Function& solv = tr ? solv_fcn_T_ : solv_fcn_N_;
+    Function& solv = tr ? m->solveT : m->solve;
 
     // Solve for every right hand side
     v.push_back(SX::zeros(A.size1()));
@@ -237,16 +234,11 @@ namespace casadi {
     }
   }
 
-  void SymbolicQr::generateDeclarations(CodeGenerator& g) const {
-
-    // Generate code for the embedded functions
-    fact_fcn_->addDependency(g);
-    solv_fcn_N_->addDependency(g);
-    solv_fcn_T_->addDependency(g);
-  }
-
-  void SymbolicQr::generateBody(CodeGenerator& g) const {
-    casadi_error("Code generation for SymbolicQR still experimental");
+  void SymbolicQrMemory::alloc(const Function& f) {
+    arg.resize(max(arg.size(), f.sz_arg()));
+    res.resize(max(res.size(), f.sz_res()));
+    iw.resize(max(iw.size(), f.sz_iw()));
+    w.resize(max(w.size(), f.sz_w()));
   }
 
 } // namespace casadi

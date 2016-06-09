@@ -556,6 +556,7 @@ namespace casadi {
     m.t_lsetup_jac += static_cast<double>(m.time2 - m.time1)/CLOCKS_PER_SEC;
 
     // Factorize the linear system
+    linsol_.pivoting(jac);
     linsol_.factorize(jac);
 
     // Log time duration

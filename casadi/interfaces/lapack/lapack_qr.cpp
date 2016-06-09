@@ -59,13 +59,18 @@ namespace casadi {
 
   void LapackQr::init_memory(void* mem) const {
     LinsolInternal::init_memory(mem);
+    if (!sparsity_.is_null()) reset(mem, sparsity_);
+  }
+
+  void LapackQr::reset(void* mem, const int* sp) const {
+    LinsolInternal::reset(mem, sp);
     auto m = static_cast<LapackQrMemory*>(mem);
     m->mat.resize(m->ncol() * m->ncol());
     m->tau.resize(m->ncol());
     m->work.resize(10*m->ncol());
   }
 
-  void LapackQr::linsol_factorize(void* mem, const double* A) const {
+  void LapackQr::factorize(void* mem, const double* A) const {
     auto m = static_cast<LapackQrMemory*>(mem);
 
     // Dimensions
@@ -84,7 +89,7 @@ namespace casadi {
                                          "failed to factorize the Jacobian");
   }
 
-  void LapackQr::linsol_solve(void* mem, double* x, int nrhs, bool tr) const {
+  void LapackQr::solve(void* mem, double* x, int nrhs, bool tr) const {
     auto m = static_cast<LapackQrMemory*>(mem);
 
     // Dimensions

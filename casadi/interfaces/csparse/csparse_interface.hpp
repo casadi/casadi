@@ -88,11 +88,14 @@ namespace casadi {
     /** \brief Initalize memory block */
     virtual void init_memory(void* mem) const;
 
+    // Set sparsity pattern
+    virtual void reset(void* mem, const int* sp) const;
+
     // Factorize the linear system
-    virtual void linsol_factorize(void* mem, const double* A) const;
+    virtual void factorize(void* mem, const double* A) const;
 
     // Solve the linear system
-    virtual void linsol_solve(void* mem, double* x, int nrhs, bool tr) const;
+    virtual void solve(void* mem, double* x, int nrhs, bool tr) const;
 
     /// A documentation string
     static const std::string meta_doc;

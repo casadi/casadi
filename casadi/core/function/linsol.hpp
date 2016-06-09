@@ -83,6 +83,12 @@ namespace casadi {
     MX solve(const MX& A, const MX& B, bool tr=false);
 
 #ifndef SWIG
+    // Set sparsity pattern
+    void reset(const int* sp) const;
+
+    // Select pivots
+    void pivoting(const double* A) const;
+
     // Factorize linear system of equations
     void factorize(const double* A) const;
 
@@ -92,7 +98,7 @@ namespace casadi {
     /** \brief Solve the system of equations <tt>Lx = b</tt>
         Only when a Cholesky factorization is available
     */
-    void solveL(double* x, int nrhs, bool tr) const;
+    void solve_cholesky(double* x, int nrhs, bool tr) const;
 #endif // SWIG
 
     /** \brief Obtain a symbolic Cholesky factorization

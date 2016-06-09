@@ -41,14 +41,15 @@ namespace casadi {
     : FunctionInternal(name), sparsity_(sparsity) {
 
     // Make sure arguments are consistent
-    casadi_assert(!sparsity.is_null());
-    casadi_assert_message(sparsity.size2()==sparsity.size1(),
-                          "LinsolInternal::init: the matrix must be square but got "
-                          << sparsity.dim());
-    casadi_assert_message(!sparsity.is_singular(),
-                          "LinsolInternal::init: singularity - the matrix is structurally "
-                          "rank-deficient. sprank(J)=" << sprank(sparsity)
-                          << " (in stead of "<< sparsity.size2() << ")");
+    if (!sparsity_.is_null()) {
+      casadi_assert_message(sparsity.size2()==sparsity.size1(),
+                            "LinsolInternal::init: the matrix must be square but got "
+                            << sparsity.dim());
+      casadi_assert_message(!sparsity.is_singular(),
+                            "LinsolInternal::init: singularity - the matrix is structurally "
+                            "rank-deficient. sprank(J)=" << sprank(sparsity)
+                            << " (in stead of "<< sparsity.size2() << ")");
+    }
   }
 
   LinsolInternal::~LinsolInternal() {
@@ -74,16 +75,42 @@ namespace casadi {
     casadi_error("eval_sx not defined for " + type_name());
   }
 
-  void LinsolInternal::linsol_solve(void* mem, double* x, int nrhs, bool tr) const {
-    casadi_error("'linsol_solve' not defined for " + type_name());
+  void LinsolInternal::solve(void* mem, double* x, int nrhs, bool tr) const {
+    casadi_error("'solve' not defined for " + type_name());
   }
 
-  void LinsolInternal::linsol_solveL(void* mem, double* x, int nrhs, bool tr) const {
-    casadi_error("'linsol_solveL' not defined for " + type_name());
+  void LinsolInternal::solve_cholesky(void* mem, double* x, int nrhs, bool tr) const {
+    casadi_error("'solve_cholesky' not defined for " + type_name());
   }
 
-  void LinsolInternal::linsol_factorize(void* mem, const double* A) const {
-    casadi_error("'linsol_factorize' not defined for " + type_name());
+  void LinsolInternal::reset(void* mem, const int* sp) const {
+    auto m = static_cast<LinsolMemory*>(mem);
+
+    // Decompress pattern
+    int nrow = *sp++;
+    int ncol = *sp++;
+    const int* colind = sp;
+    int nnz = colind[ncol];
+    const int* row = nnz==nrow*ncol ? 0 : sp+ncol+1;
+
+    // Save to sparsity field
+    m->sparsity.clear();
+    m->sparsity.push_back(nrow);
+    m->sparsity.push_back(ncol);
+    m->sparsity.insert(m->sparsity.end(), colind, colind+ncol+1);
+    if (row) {
+      m->sparsity.insert(m->sparsity.end(), row, row+nnz);
+    } else {
+      for (int cc=0; cc<ncol; ++cc) {
+        for (int rr=0; rr<nrow; ++rr) {
+          m->sparsity.push_back(rr);
+        }
+      }
+    }
+  }
+
+  void LinsolInternal::factorize(void* mem, const double* A) const {
+    casadi_error("'factorize' not defined for " + type_name());
   }
 
   Sparsity LinsolInternal::linsol_cholesky_sparsity(void* mem, bool tr) const {

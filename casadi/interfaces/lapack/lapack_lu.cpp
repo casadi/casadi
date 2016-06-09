@@ -83,6 +83,11 @@ namespace casadi {
 
   void LapackLu::init_memory(void* mem) const {
     LinsolInternal::init_memory(mem);
+    if (!sparsity_.is_null()) reset(mem, sparsity_);
+  }
+
+  void LapackLu::reset(void* mem, const int* sp) const {
+    LinsolInternal::reset(mem, sp);
     auto m = static_cast<LapackLuMemory*>(mem);
 
     // Allocate matrix
@@ -97,7 +102,7 @@ namespace casadi {
     m->equed = 'N'; // No equilibration
   }
 
-  void LapackLu::linsol_factorize(void* mem, const double* A) const {
+  void LapackLu::factorize(void* mem, const double* A) const {
     auto m = static_cast<LapackLuMemory*>(mem);
 
     // Dimensions
@@ -146,7 +151,7 @@ namespace casadi {
                           "dgetrf_ failed to factorize the Jacobian");
   }
 
-  void LapackLu::linsol_solve(void* mem, double* x, int nrhs, bool tr) const {
+  void LapackLu::solve(void* mem, double* x, int nrhs, bool tr) const {
     auto m = static_cast<LapackLuMemory*>(mem);
 
     // Dimensions
