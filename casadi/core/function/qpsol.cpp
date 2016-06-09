@@ -152,7 +152,7 @@ namespace casadi {
 
     // Create the QP solver
     Function qpsol_f = qpsol(name + "_qpsol", solver,
-                             {{"h", H.sparsity()}, {"a", A.sparsity()}}, opts);
+                             SpDict{{"h", H.sparsity()}, {"a", A.sparsity()}}, opts);
 
     // Create an MXFunction with the right signature
     vector<MX> ret_in(NLPSOL_NUM_IN);
