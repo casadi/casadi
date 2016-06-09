@@ -133,7 +133,9 @@ namespace casadi {
   void Linsol::factorize(const double* A) const {
     casadi_assert(A!=0);
     auto m = static_cast<LinsolMemory*>((*this)->memory(0));
-    casadi_assert_message(m->is_pivoted, "Need to perform partial pivoting");
+
+    // Perform pivoting, if required
+    if (!m->is_pivoted) pivoting(A);
 
     m->is_factorized = false;
     (*this)->factorize(m, A);

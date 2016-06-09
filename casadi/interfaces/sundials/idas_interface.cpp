@@ -733,7 +733,6 @@ namespace casadi {
       s.calc_function(m, "jacF");
 
       // Factorize the linear system
-      m->linsolF.pivoting(m->jac);
       m->linsolF.factorize(m->jac);
 
       return 0;
@@ -762,7 +761,6 @@ namespace casadi {
       s.calc_function(m, "jacB");
 
       // Factorize the linear system
-      m->linsolB.pivoting(m->jacB);
       m->linsolB.factorize(m->jacB);
 
       return 0;
