@@ -49,7 +49,7 @@ namespace casadi {
   Matrix<double> Matrix<double>::
   solve(const Matrix<double>& A, const Matrix<double>& b,
         const string& lsolver, const Dict& dict) {
-    Linsol mysolver("tmp", lsolver, A.sparsity(), dict);
+    Linsol mysolver("tmp", lsolver, dict);
     return mysolver.solve(A, b, false);
   }
 

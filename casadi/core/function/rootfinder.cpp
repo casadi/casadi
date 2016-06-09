@@ -158,8 +158,7 @@ Function Function::rootfinder_fun() {
       "sprank(J)=" << sprank(jac_.sparsity_out(0)) << " (instead of "<< jac_.size1_out(0) << ")");
 
     // Get the linear solver creator function
-    linsol_ = Linsol("linsol", linear_solver,
-                     jac_.sparsity_out(0), linear_solver_options);
+    linsol_ = Linsol("linsol", linear_solver, linear_solver_options);
 
     // Constraints
     casadi_assert_message(u_c_.size()==n_ || u_c_.empty(),

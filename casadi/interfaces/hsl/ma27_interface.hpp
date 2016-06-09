@@ -115,11 +115,11 @@ namespace casadi {
   public:
 
     // Create a linear solver given a sparsity pattern and a number of right hand sides
-    Ma27Interface(const std::string& name, const Sparsity& sp);
+    Ma27Interface(const std::string& name);
 
     /** \brief  Create a new Linsol */
-    static LinsolInternal* creator(const std::string& name, const Sparsity& sp) {
-      return new Ma27Interface(name, sp);
+    static LinsolInternal* creator(const std::string& name) {
+      return new Ma27Interface(name);
     }
 
     // Destructor

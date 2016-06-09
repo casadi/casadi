@@ -212,11 +212,11 @@ namespace casadi {
     m->rq = N_VNew_Serial(nrq_);
 
     // Allocate linear solvers
-    m->linsolF = Linsol("linsolF", linear_solver_,
-                        get_function("jacF").sparsity_out(0), linear_solver_options_);
+    m->linsolF = Linsol("linsolF", linear_solver_, linear_solver_options_);
+    m->linsolF.reset(get_function("jacF").sparsity_out(0));
     if (nrx_>0) {
-      m->linsolB = Linsol("linsolB", linear_solver_,
-                          get_function("jacB").sparsity_out(0), linear_solver_options_);
+      m->linsolB = Linsol("linsolB", linear_solver_, linear_solver_options_);
+      m->linsolB.reset(get_function("jacB").sparsity_out(0));
     }
   }
 

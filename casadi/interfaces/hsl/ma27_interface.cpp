@@ -45,8 +45,8 @@ namespace casadi {
     LinsolInternal::registerPlugin(casadi_register_linsol_ma27);
   }
 
-  Ma27Interface::Ma27Interface(const std::string& name, const Sparsity& sparsity)
-    : LinsolInternal(name, sparsity) {
+  Ma27Interface::Ma27Interface(const std::string& name)
+    : LinsolInternal(name) {
   }
 
   Ma27Interface::~Ma27Interface() {
@@ -76,8 +76,6 @@ namespace casadi {
     m->icntl[0] = 0;       // Suppress error messages
     m->icntl[1] = 0;       // Suppress diagnostic messages
     m->cntl[0] = 1e-8;     // Set pivot tolerance
-
-    if (!sparsity_.is_null()) reset(mem, sparsity_);
   }
 
   void Ma27Interface::reset(void* mem, const int* sp) const {

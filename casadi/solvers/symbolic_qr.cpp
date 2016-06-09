@@ -47,8 +47,8 @@ namespace casadi {
     LinsolInternal::registerPlugin(casadi_register_linsol_symbolicqr);
   }
 
-  SymbolicQr::SymbolicQr(const std::string& name, const Sparsity& sparsity) :
-    LinsolInternal(name, sparsity) {
+  SymbolicQr::SymbolicQr(const std::string& name) :
+    LinsolInternal(name) {
   }
 
   SymbolicQr::~SymbolicQr() {
@@ -91,7 +91,6 @@ namespace casadi {
 
   void SymbolicQr::init_memory(void* mem) const {
     LinsolInternal::init_memory(mem);
-    if (!sparsity_.is_null()) reset(mem, sparsity_);
   }
 
   void SymbolicQr::reset(void* mem, const int* sp) const {
@@ -129,7 +128,7 @@ namespace casadi {
     // Symbolic expressions for solve function
     SX Q = SX::sym("Q", Q1.sparsity());
     SX R = SX::sym("R", R1.sparsity());
-    SX b = SX::sym("b", sparsity_.size2(), 1);
+    SX b = SX::sym("b", s.size2(), 1);
 
     // Solve non-transposed
     // We have Pb' * Q * R * Px * x = b <=> x = Px' * inv(R) * Q' * Pb * b

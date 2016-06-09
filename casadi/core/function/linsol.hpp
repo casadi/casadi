@@ -55,7 +55,7 @@ namespace casadi {
 
     /// Importer factory
     explicit Linsol(const std::string& name, const std::string& solver,
-                    const Sparsity& sp, const Dict& opts=Dict());
+                    const Dict& opts=Dict());
 
     /// Access functions of the node
     LinsolInternal* operator->();

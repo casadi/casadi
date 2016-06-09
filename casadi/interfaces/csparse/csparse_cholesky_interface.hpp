@@ -67,11 +67,11 @@ namespace casadi {
   CSparseCholeskyInterface : public LinsolInternal {
   public:
     // Create a linear solver given a sparsity pattern and a number of right hand sides
-    CSparseCholeskyInterface(const std::string& name, const Sparsity& sp);
+    CSparseCholeskyInterface(const std::string& name);
 
     /** \brief  Create a new LinsolInternal */
-    static LinsolInternal* creator(const std::string& name, const Sparsity& sp) {
-      return new CSparseCholeskyInterface(name, sp);
+    static LinsolInternal* creator(const std::string& name) {
+      return new CSparseCholeskyInterface(name);
     }
 
     // Destructor

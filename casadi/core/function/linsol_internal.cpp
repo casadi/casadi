@@ -30,26 +30,14 @@ namespace casadi {
 
   Function linsol_new(const std::string& name, const std::string& solver,
                   const Sparsity& sp, int nrhs, const Dict& opts) {
-    Linsol F(name + "_linsol", solver, sp, opts);
+    Linsol F(name + "_linsol", solver, opts);
     MX A = MX::sym("A", sp);
     MX b = MX::sym("b", sp.size2(), nrhs);
     MX x = F.solve(A, b);
     return Function(name, {A, b}, {x}, {"A", "B"}, {"X"});
   }
 
-  LinsolInternal::LinsolInternal(const std::string& name, const Sparsity& sparsity)
-    : FunctionInternal(name), sparsity_(sparsity) {
-
-    // Make sure arguments are consistent
-    if (!sparsity_.is_null()) {
-      casadi_assert_message(sparsity.size2()==sparsity.size1(),
-                            "LinsolInternal::init: the matrix must be square but got "
-                            << sparsity.dim());
-      casadi_assert_message(!sparsity.is_singular(),
-                            "LinsolInternal::init: singularity - the matrix is structurally "
-                            "rank-deficient. sprank(J)=" << sprank(sparsity)
-                            << " (in stead of "<< sparsity.size2() << ")");
-    }
+  LinsolInternal::LinsolInternal(const std::string& name) : FunctionInternal(name) {
   }
 
   LinsolInternal::~LinsolInternal() {
@@ -63,11 +51,6 @@ namespace casadi {
 
   void LinsolInternal::init_memory(void* mem) const {
     auto m = static_cast<LinsolMemory*>(mem);
-
-    // Set initial sparsity pattern
-    if (!sparsity_.is_null()) {
-      m->sparsity = sparsity_.compress();
-    }
   }
 
   void LinsolInternal::linsol_eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem,

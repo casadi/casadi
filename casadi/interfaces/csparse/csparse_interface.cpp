@@ -44,8 +44,8 @@ namespace casadi {
     LinsolInternal::registerPlugin(casadi_register_linsol_csparse);
   }
 
-  CsparseInterface::CsparseInterface(const std::string& name, const Sparsity& sparsity)
-    : LinsolInternal(name, sparsity) {
+  CsparseInterface::CsparseInterface(const std::string& name)
+    : LinsolInternal(name) {
   }
 
   CsparseInterface::~CsparseInterface() {
@@ -64,7 +64,6 @@ namespace casadi {
 
   void CsparseInterface::init_memory(void* mem) const {
     LinsolInternal::init_memory(mem);
-    if (!sparsity_.is_null()) reset(mem, sparsity_);
   }
 
   void CsparseInterface::reset(void* mem, const int* sp) const {
