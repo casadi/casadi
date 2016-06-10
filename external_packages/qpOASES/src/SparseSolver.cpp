@@ -1070,7 +1070,7 @@ returnValue Ma57SparseSolver::copy(     const Ma57SparseSolver& rhs
 
 #ifdef SOLVER_NONE
 
-DummySparseSolver::DummySparseSolver(linsol_memory_t _linsol_data,
+UserSparseSolver::UserSparseSolver(linsol_memory_t _linsol_data,
                                      linsol_init_t _linsol_init,
                                      linsol_sfact_t _linsol_sfact,
                                      linsol_nfact_t _linsol_nfact,
@@ -1091,14 +1091,14 @@ DummySparseSolver::DummySparseSolver(linsol_memory_t _linsol_data,
   rank = 0;
 }
 
-DummySparseSolver::~DummySparseSolver()
+UserSparseSolver::~UserSparseSolver()
 {
   if (row) delete[] row;
   if (col) delete[] col;
   if (val) delete[] val;
 }
 
-returnValue DummySparseSolver::setMatrixData(   int_t dim, /**< Dimension of the linear system. */
+returnValue UserSparseSolver::setMatrixData(   int_t dim, /**< Dimension of the linear system. */
                                                 int_t nnz, /**< Number of nonzeros in the matrix. */
                                                 const int_t* const airn, /**< Row indices for each matrix entry. */
                                                 const int_t* const acjn, /**< Column indices for each matrix entry. */
@@ -1156,7 +1156,7 @@ returnValue DummySparseSolver::setMatrixData(   int_t dim, /**< Dimension of the
   return SUCCESSFUL_RETURN;
 }
 
-returnValue DummySparseSolver::factorize( )
+returnValue UserSparseSolver::factorize( )
 {
   // Trivial return
   if (dim==0) {
@@ -1188,15 +1188,15 @@ returnValue DummySparseSolver::factorize( )
   return SUCCESSFUL_RETURN;
 }
 
-int_t DummySparseSolver::getNegativeEigenvalues( ) {
+int_t UserSparseSolver::getNegativeEigenvalues( ) {
   return neig;
 }
 
-int DummySparseSolver::getRank( ) {
+int UserSparseSolver::getRank( ) {
   return rank;
 }
 
-returnValue DummySparseSolver::solve(   int_t dim, /**< Dimension of the linear system. */
+returnValue UserSparseSolver::solve(   int_t dim, /**< Dimension of the linear system. */
                                         const real_t* const rhs, /**< Values for the right hand side. */
                                         real_t* const sol /**< Solution of the linear system. */
                                         )
