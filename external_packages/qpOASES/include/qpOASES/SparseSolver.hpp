@@ -350,19 +350,46 @@ class Ma57SparseSolver: public SparseSolver
 
 #ifdef SOLVER_NONE
 
-/**
- *  \brief Implementation of a dummy sparse solver. An error is thrown if a factorization is attempted.
+/** \brief User-defined linear solver
  *
- *  \author Dennis Janka
- *  \version 3.2
- *  \date 2015
+ * The user provides an opaque pointer (linsol_memory_t mem) and the following
+ * four functions:
+ * 1. int_t linsol_init(linsol_memory_t mem, int_t dim, int_t nnz,
+ *                      const int_t* row, const int_t* col);
+ *    Sets/resets the dimensions and sparsity pattern of the linear system to be
+ *    solved in each iteration.
+ * 2. int_t linsol_sfact)(linsol_memory_t mem, const real_t* vals);
+ *    Symbolic factorization step. This requires numerical values for the nonzero
+ *    elements in order to perform e.g. partial pivoting. Typically, the symbolic
+ *    factorization does not need to be up-to-date. Pass NULL if absent.
+ * 3. int_t linsol_nfact(linsol_memory_t mem,
+ *                       const real_t* vals, int_t* neig, int_t* rank);
+ *    Numerical factorization step. This is the actual factorization of the matrix.
+ *    In addition to performing the factorization, this routine must calculate
+ *    the number of negative eigenvalues as well as the rank of the matrix.
+ * 4. int_t linsol_solve(linsol_memory_t mem, int_t nrhs, real_t* rhs);
+ *    Solve the factorized linear system for one or multiple right-hand-sides.
+ *
+ *  \author Joel Andersson
+ *  \version 3.x
+ *  \date 2016
  */
-class DummySparseSolver: public SparseSolver
+class UserSparseSolver: public SparseSolver
 {
     /*
      *  PUBLIC MEMBER FUNCTIONS
      */
     public:
+        /** Constructor */
+        UserSparseSolver(linsol_memory_t _linsol_data,
+                          linsol_init_t _linsol_init,
+                          linsol_sfact_t _linsol_sfact,
+                          linsol_nfact_t _linsol_nfact,
+                          linsol_solve_t _linsol_solve);
+
+        /** Destructor */
+        virtual ~UserSparseSolver();
+
         /** Set new matrix data.  The matrix is to be provided
             in the Harwell-Boeing format.  Only the lower
             triangular part should be set. */
@@ -376,11 +403,47 @@ class DummySparseSolver: public SparseSolver
         /** Compute factorization of current matrix.  This method must be called before solve.*/
         virtual returnValue factorize( );
 
+        /** Return the number of negative eigenvalues. */
+        virtual int_t getNegativeEigenvalues( );
+
+        /** Return the rank after a factorization */
+        virtual int getRank( );
+
         /** Solve linear system with most recently set matrix data. */
         virtual returnValue solve(  int_t dim,                  /**< Dimension of the linear system. */
                                     const real_t* const rhs,    /**< Values for the right hand side. */
                                     real_t* const sol           /**< Solution of the linear system. */
                                     );
+
+    /*
+     *  PRIVATE MEMBER VARIABLES
+     */
+    private:
+      // Function pointers to user-defined functions
+      linsol_memory_t linsol_data;
+      linsol_init_t linsol_init;
+      linsol_sfact_t linsol_sfact;
+      linsol_nfact_t linsol_nfact;
+      linsol_solve_t linsol_solve;
+
+      // Current linear system dimension
+      int_t dim;
+
+      // Current number of nonzeros
+      int_t nnz;
+
+      // Length of the sparsity vectors
+      int_t allocated_nnz;
+
+      // Current sparse matrix (sparse triplet format)
+      int_t *row, *col;
+      double *val;
+
+      // Number of negative eigenvalues
+      int_t neig;
+
+      // Matrix rank
+      int_t rank;
 };
 
 #endif // SOLVER_NONE
