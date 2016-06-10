@@ -255,8 +255,6 @@ returnValue Ma27SparseSolver::setMatrixData( int_t dim_,
                            const real_t* const avals
                            )
 {
-  MyPrintf("dim_ = %d\n", dim_);
-  MyPrintf("numNonzeros_ = %d\n", numNonzeros_);
     reset( );
     dim = dim_;
     numNonzeros = numNonzeros_;
@@ -1183,6 +1181,9 @@ returnValue DummySparseSolver::factorize( )
     neig = -1;
     return THROWERROR(RET_MATRIX_FACTORISATION_FAILED);
   }
+
+  // Is the matrix singular?
+  if (rank<dim) return RET_KKT_MATRIX_SINGULAR;
 
   return SUCCESSFUL_RETURN;
 }

@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 2.8.6)
 
 project(qpOASES CXX)
 
-#add_definitions(-DSOLVER_MA27)
+add_definitions(-DSOLVER_MA27)
 
 # cmake_policy use MACOSX_RPATH=ON by default
 if(COMMAND cmake_policy)

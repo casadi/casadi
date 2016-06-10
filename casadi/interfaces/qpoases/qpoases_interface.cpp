@@ -810,10 +810,10 @@ namespace casadi {
         m->col.push_back(row[k]-1);
         m->nz_map.push_back(k);
       }
-
-      // Allocate memory for nonzeros
-      m->nz.resize(m->nz_map.size());
     }
+
+    // Allocate memory for nonzeros
+    m->nz.resize(m->nz_map.size());
 
     // Create sparsity pattern: TODO(@jaeandersson) No memory allocation
     Sparsity sp = Sparsity::triplet(dim, dim, m->row, m->col, m->lin_map);
@@ -830,7 +830,7 @@ namespace casadi {
     QpoasesMemory* m = static_cast<QpoasesMemory*>(mem);
 
     // Get nonzero elements (entire elements)
-    for (int i=0; i<m->nz.size(); ++i) m->nz[i] = vals[m->nz_map[i]];
+    for (int i=0; i<m->nz.size(); ++i) m->nz[i] = vals[m->lin_map[i]];
 
     // Pass to linear solver
     m->self.linsol_.pivoting(get_ptr(m->nz));
@@ -844,7 +844,7 @@ namespace casadi {
     QpoasesMemory* m = static_cast<QpoasesMemory*>(mem);
 
     // Get nonzero elements (entire elements)
-    for (int i=0; i<m->nz.size(); ++i) m->nz[i] = vals[m->nz_map[i]];
+    for (int i=0; i<m->nz.size(); ++i) m->nz[i] = vals[m->lin_map[i]];
 
     // Pass to linear solver
     m->self.linsol_.factorize(get_ptr(m->nz));
