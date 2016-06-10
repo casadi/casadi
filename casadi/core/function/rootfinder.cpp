@@ -175,6 +175,11 @@ Function Function::rootfinder_fun() {
     alloc_w(sz_w + 2*static_cast<size_t>(n_));
   }
 
+  void Rootfinder::init_memory(void* mem) const {
+    auto m = static_cast<RootfinderMemory*>(mem);
+    linsol_.reset(sp_jac_);
+  }
+
   Function Rootfinder
   ::get_forward_old(const std::string& name, int nfwd, Dict& opts) {
     // Symbolic expression for the input
