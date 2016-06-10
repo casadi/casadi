@@ -838,7 +838,8 @@ namespace casadi {
     return 0;
   }
 
-  int QpoasesInterface::qpoases_nfact(void* mem, const double* vals) {
+  int QpoasesInterface::
+  qpoases_nfact(void* mem, const double* vals, int* neig, int* rank) {
     casadi_assert(mem!=0);
     QpoasesMemory* m = static_cast<QpoasesMemory*>(mem);
 
@@ -847,6 +848,12 @@ namespace casadi {
 
     // Pass to linear solver
     m->self.linsol_.factorize(get_ptr(m->nz));
+
+    // Number of negative eigenvalues
+    if (neig) *neig = m->self.linsol_.neig();
+
+    // Rank of the matrix
+    if (rank) *rank = m->self.linsol_.rank();
 
     return 0;
   }

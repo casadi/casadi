@@ -110,6 +110,16 @@ namespace casadi {
         Only for Cholesky solvers
      */
     DM cholesky(bool tr=false) const;
+
+    /** \brief Number of negative eigenvalues
+      * Not available for all solvers
+      */
+    int neig() const;
+
+    /** \brief Matrix rank
+      * Not available for all solvers
+      */
+    int rank() const;
   };
 
 

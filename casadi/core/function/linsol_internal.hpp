@@ -107,6 +107,12 @@ namespace casadi {
     /// Get Cholesky factor
     virtual DM linsol_cholesky(void* mem, bool tr) const;
 
+    /// Number of negative eigenvalues
+    virtual int neig(void* mem) const;
+
+    /// Matrix rank
+    virtual int rank(void* mem) const;
+
     // Creator function for internal class
     typedef LinsolInternal* (*Creator)(const std::string& name);
 

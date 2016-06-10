@@ -143,6 +143,12 @@ namespace casadi {
     // Factorize the linear system
     virtual void factorize(void* mem, const double* A) const;
 
+    /// Number of negative eigenvalues
+    virtual int neig(void* mem) const;
+
+    /// Matrix rank
+    virtual int rank(void* mem) const;
+
     // Solve the linear system
     virtual void solve(void* mem, double* x, int nrhs, bool tr) const;
 

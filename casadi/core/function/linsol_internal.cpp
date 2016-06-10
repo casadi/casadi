@@ -104,6 +104,14 @@ namespace casadi {
     casadi_error("'linsol_cholesky' not defined for " + type_name());
   }
 
+  int LinsolInternal::neig(void* mem) const {
+    casadi_error("'neig' not defined for " + type_name());
+  }
+
+  int LinsolInternal::rank(void* mem) const {
+    casadi_error("'rank' not defined for " + type_name());
+  }
+
   std::map<std::string, LinsolInternal::Plugin> LinsolInternal::solvers_;
 
   const std::string LinsolInternal::infix_ = "linsol";

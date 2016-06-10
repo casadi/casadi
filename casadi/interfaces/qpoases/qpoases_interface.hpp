@@ -138,7 +138,7 @@ namespace casadi {
     static int qpoases_sfact(void* mem, const double* vals);
 
     /// qpOASES linear solver numerical factorization
-    static int qpoases_nfact(void* mem, const double* vals);
+    static int qpoases_nfact(void* mem, const double* vals, int* neig, int* rank);
 
     /// qpOASES linear solver solve
     static int qpoases_solve(void* mem, int nrhs, double* rhs);

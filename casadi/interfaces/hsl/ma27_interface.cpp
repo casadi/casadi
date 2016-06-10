@@ -171,6 +171,16 @@ namespace casadi {
     if (m->iw.size() < m->maxfrt) m->iw.resize(m->maxfrt);
   }
 
+  int Ma27Interface::neig(void* mem) const {
+    auto m = static_cast<Ma27Memory*>(mem);
+    return m->neig;
+  }
+
+  int Ma27Interface::rank(void* mem) const {
+    auto m = static_cast<Ma27Memory*>(mem);
+    return m->rank;
+  }
+
   void Ma27Interface::solve(void* mem, double* x, int nrhs, bool tr) const {
     auto m = static_cast<Ma27Memory*>(mem);
 

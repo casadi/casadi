@@ -386,6 +386,12 @@ class DummySparseSolver: public SparseSolver
         /** Compute factorization of current matrix.  This method must be called before solve.*/
         virtual returnValue factorize( );
 
+        /** Return the number of negative eigenvalues. */
+        virtual int_t getNegativeEigenvalues( );
+
+        /** Return the rank after a factorization */
+        virtual int getRank( );
+
         /** Solve linear system with most recently set matrix data. */
         virtual returnValue solve(  int_t dim,                  /**< Dimension of the linear system. */
                                     const real_t* const rhs,    /**< Values for the right hand side. */
@@ -415,6 +421,12 @@ class DummySparseSolver: public SparseSolver
       // Current sparse matrix (sparse triplet format)
       int_t *row, *col;
       double *val;
+
+      // Number of negative eigenvalues
+      int_t neig;
+
+      // Matrix rank
+      int_t rank;
 };
 
 #endif // SOLVER_NONE

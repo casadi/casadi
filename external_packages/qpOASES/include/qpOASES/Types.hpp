@@ -341,10 +341,11 @@ typedef int_t (*linsol_sfact_t)(linsol_memory_t mem,
                                 const real_t* vals);
 
 /** Numerical factorization function for a user-defined linear solver function
-  * Assumes a (not necessarily up-to-date) symbolic factorization is available
+  * Assumes a (not necessarily up-to-date) symbolic factorization is available.
+  * The routine must calculate the number of negative eigenvalues as well as rank.
   */
 typedef int_t (*linsol_nfact_t)(linsol_memory_t mem,
-                                const real_t* vals);
+                                const real_t* vals, int_t* neig, int_t* rank);
 
 /** Solve a factorized linear system for a user-defined linear solver function
   * Multiple right-hand-sides. The solution overwrites the right-hand-side.

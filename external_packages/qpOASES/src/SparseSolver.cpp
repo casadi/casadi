@@ -1089,6 +1089,8 @@ DummySparseSolver::DummySparseSolver(linsol_memory_t _linsol_data,
   val = 0;
   row = 0;
   col = 0;
+  neig = -1;
+  rank = 0;
 }
 
 DummySparseSolver::~DummySparseSolver()
@@ -1149,13 +1151,21 @@ returnValue DummySparseSolver::setMatrixData(   int_t dim, /**< Dimension of the
     return THROWERROR(RET_MATRIX_FACTORISATION_FAILED);
   }
 
+  // Number of eigenvalues and rank not available
+  neig = -1;
+  rank = 0;
+
   return SUCCESSFUL_RETURN;
 }
 
 returnValue DummySparseSolver::factorize( )
 {
   // Trivial return
-  if (dim==0) return SUCCESSFUL_RETURN;
+  if (dim==0) {
+    neig = 0;
+    rank = 0;
+    return SUCCESSFUL_RETURN;
+  }
 
   // Symbolic factorization (if any)
   if (linsol_sfact) {
@@ -1168,11 +1178,21 @@ returnValue DummySparseSolver::factorize( )
   if (linsol_nfact==0) return THROWERROR(RET_NO_SPARSE_SOLVER);
 
   // Numerical factorization
-  if (linsol_nfact(linsol_data, val)) {
+  if (linsol_nfact(linsol_data, val, &neig, &rank)) {
+    rank = 0;
+    neig = -1;
     return THROWERROR(RET_MATRIX_FACTORISATION_FAILED);
   }
 
   return SUCCESSFUL_RETURN;
+}
+
+int_t DummySparseSolver::getNegativeEigenvalues( ) {
+  return neig;
+}
+
+int DummySparseSolver::getRank( ) {
+  return rank;
 }
 
 returnValue DummySparseSolver::solve(   int_t dim, /**< Dimension of the linear system. */
