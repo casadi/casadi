@@ -27,6 +27,7 @@
 #define CASADI_QPOASES_INTERFACE_HPP
 
 #include "casadi/core/function/conic_impl.hpp"
+#include "casadi/core/function/linsol.hpp"
 #include <casadi/interfaces/qpoases/casadi_conic_qpoases_export.h>
 #include <qpOASES.hpp>
 
@@ -40,7 +41,13 @@ Interface to QPOases Solver for quadratic programming
 /// \cond INTERNAL
 namespace casadi {
 
+  // Forward declaration
+  class QpoasesInterface;
+
   struct CASADI_CONIC_QPOASES_EXPORT QpoasesMemory {
+    // Reference to the function
+    const QpoasesInterface& self;
+
     /// QP Solver
     union {
       qpOASES::SQProblem *sqp;
@@ -54,8 +61,17 @@ namespace casadi {
     /// Has qpOASES been called once?
     bool called_once;
 
+    // Map linear system nonzeros
+    std::vector<int> lin_map;
+
+    // Sparsity pattern as sparse triplet
+    std::vector<int> row, col, nz_map;
+
+    // Nonzero entries
+    std::vector<double> nz;
+
     /// Constructor
-    QpoasesMemory();
+    QpoasesMemory(const QpoasesInterface& self);
 
     /// Destructor
     ~QpoasesMemory();
@@ -101,7 +117,7 @@ namespace casadi {
     virtual void init(const Dict& opts);
 
     /** \brief Create memory block */
-    virtual void* alloc_memory() const { return new QpoasesMemory();}
+    virtual void* alloc_memory() const { return new QpoasesMemory(*this);}
 
     /** \brief Free memory block */
     virtual void free_memory(void *mem) const { delete static_cast<QpoasesMemory*>(mem);}
@@ -114,6 +130,18 @@ namespace casadi {
 
     /// A documentation string
     static const std::string meta_doc;
+
+    /// qpOASES linear solver initialization
+    static int qpoases_init(void* mem, int dim, int nnz, const int* row, const int* col);
+
+    /// qpOASES linear solver symbolical factorization
+    static int qpoases_sfact(void* mem, const double* vals);
+
+    /// qpOASES linear solver numerical factorization
+    static int qpoases_nfact(void* mem, const double* vals, int* neig, int* rank);
+
+    /// qpOASES linear solver solve
+    static int qpoases_solve(void* mem, int nrhs, double* rhs);
 
   protected:
 
@@ -136,6 +164,7 @@ namespace casadi {
     bool sparse_;
     bool shur_;
     int max_shur_;
+    std::string linsol_plugin_;
     ///@}
 
     /// Throw error
@@ -143,6 +172,9 @@ namespace casadi {
 
     /// Get qpOASES error message
     static std::string getErrorMessage(int flag);
+
+    // Linear solver
+    Linsol linsol_;
 
   };
 

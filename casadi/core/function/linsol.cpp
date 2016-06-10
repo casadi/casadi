@@ -142,6 +142,18 @@ namespace casadi {
     m->is_factorized = true;
   }
 
+  int Linsol::neig() const {
+    auto m = static_cast<LinsolMemory*>((*this)->memory(0));
+    casadi_assert(m->is_factorized);
+    return (*this)->neig(m);
+  }
+
+  int Linsol::rank() const {
+    auto m = static_cast<LinsolMemory*>((*this)->memory(0));
+    casadi_assert(m->is_factorized);
+    return (*this)->rank(m);
+  }
+
   void Linsol::solve(double* x, int nrhs, bool tr) const {
     auto m = static_cast<LinsolMemory*>((*this)->memory(0));
     casadi_assert_message(m->is_factorized, "Linear system has not been factorized");
