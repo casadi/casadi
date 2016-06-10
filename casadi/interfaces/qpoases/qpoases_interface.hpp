@@ -67,6 +67,9 @@ namespace casadi {
     // Sparsity pattern as sparse triplet
     std::vector<int> row, col, nz_map;
 
+    // Nonzero entries
+    std::vector<double> nz;
+
     /// Constructor
     QpoasesMemory(const QpoasesInterface& self);
 

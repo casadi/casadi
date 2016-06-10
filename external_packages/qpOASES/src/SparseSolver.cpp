@@ -1083,23 +1083,69 @@ DummySparseSolver::DummySparseSolver(linsol_memory_t _linsol_data,
   linsol_nfact(_linsol_nfact),
   linsol_solve(_linsol_solve)
 {
+  dim = 0;
+  nnz = 0;
+  allocated_nnz = 0;
+  val = 0;
+  row = 0;
+  col = 0;
+}
+
+DummySparseSolver::~DummySparseSolver()
+{
+  if (row) delete[] row;
+  if (col) delete[] col;
+  if (val) delete[] val;
 }
 
 returnValue DummySparseSolver::setMatrixData(   int_t dim, /**< Dimension of the linear system. */
-                                                int_t numNonzeros, /**< Number of nonzeros in the matrix. */
+                                                int_t nnz, /**< Number of nonzeros in the matrix. */
                                                 const int_t* const airn, /**< Row indices for each matrix entry. */
                                                 const int_t* const acjn, /**< Column indices for each matrix entry. */
                                                 const real_t* const avals /**< Values for each matrix entry. */
                                                 )
 {
-  // Trivial
+  // Reset linear solver
+  reset();
+
+  // Trivial return
+  this->dim = dim;
   if (dim==0) return SUCCESSFUL_RETURN;
 
   // No user-defined linear solver
   if (linsol_init==0) return THROWERROR(RET_NO_SPARSE_SOLVER);
 
+  // Count actual nonzeros
+  this->nnz = 0;
+  for (int_t i=0; i<nnz; ++i) if (avals[i]!=0) this->nnz++;
+
+  // Allocate more memory if needed
+  if (this->nnz > allocated_nnz) {
+    // Free existing memory
+    if (row) delete[] row;
+    if (col) delete[] col;
+    if (val) delete[] val;
+
+    // Allocate new memory (2x factor to avoid frequent reallocation)
+    allocated_nnz = 2*this->nnz;
+    row = new int_t[allocated_nnz];
+    col = new int_t[allocated_nnz];
+    val = new double[allocated_nnz];
+  }
+
+  // Save nonzeros
+  int_t k = 0;
+  for (int_t i=0; i<nnz; ++i) {
+    if (avals[i]!=0) {
+      row[k] = airn[i];
+      col[k] = acjn[i];
+      val[k] = avals[i];
+      k++;
+    }
+  }
+
   // Call initialization function
-  if (linsol_init(linsol_data, dim, numNonzeros, airn, acjn)) {
+  if (linsol_init(linsol_data, dim, this->nnz, row, col)) {
     return THROWERROR(RET_MATRIX_FACTORISATION_FAILED);
   }
 
@@ -1108,11 +1154,23 @@ returnValue DummySparseSolver::setMatrixData(   int_t dim, /**< Dimension of the
 
 returnValue DummySparseSolver::factorize( )
 {
-  MyPrintf("here2a!\n");
+  // Trivial return
+  if (dim==0) return SUCCESSFUL_RETURN;
+
+  // Symbolic factorization (if any)
+  if (linsol_sfact) {
+    if (linsol_sfact(linsol_data, val)) {
+      return THROWERROR(RET_MATRIX_FACTORISATION_FAILED);
+    }
+  }
+
   // No user-defined linear solver
   if (linsol_nfact==0) return THROWERROR(RET_NO_SPARSE_SOLVER);
 
-  MyPrintf("here2!\n");
+  // Numerical factorization
+  if (linsol_nfact(linsol_data, val)) {
+    return THROWERROR(RET_MATRIX_FACTORISATION_FAILED);
+  }
 
   return SUCCESSFUL_RETURN;
 }
@@ -1122,11 +1180,22 @@ returnValue DummySparseSolver::solve(   int_t dim, /**< Dimension of the linear 
                                         real_t* const sol /**< Solution of the linear system. */
                                         )
 {
-  MyPrintf("here3a! dim=%d\n", dim);
+  // Consistency check
+  if (dim!=this->dim) return THROWERROR( RET_INVALID_ARGUMENTS );
+
+  // Trivial return
+  if (dim==0) return SUCCESSFUL_RETURN;
+
   // No user-defined linear solver
   if (linsol_solve==0) return THROWERROR(RET_NO_SPARSE_SOLVER);
 
-  MyPrintf("here3!\n");
+  // Solution overwrites the right-hand-side
+  for (int_t i=0; i<dim; ++i) sol[i] = rhs[i];
+
+  // Linear system solve
+  if (linsol_solve(linsol_data, 1, sol)) {
+    return THROWERROR(RET_MATRIX_FACTORISATION_FAILED);
+  }
 
   return SUCCESSFUL_RETURN;
 }

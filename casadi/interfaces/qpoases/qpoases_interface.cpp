@@ -795,23 +795,24 @@ namespace casadi {
     casadi_assert(mem!=0);
     QpoasesMemory* m = static_cast<QpoasesMemory*>(mem);
 
-    // Start with the provided sparsity pattern (index-1)
+    // Get sparsity pattern in sparse triplet format
     m->row.clear();
     m->col.clear();
     m->nz_map.clear();
     for (int k=0; k<nnz; ++k) {
+      // Add upper(?) triangular part (and diagonal)
       m->row.push_back(row[k]-1);
       m->col.push_back(col[k]-1);
       m->nz_map.push_back(k);
-    }
-
-    // Add mirror image
-    for (int k=0; k<nnz; ++k) {
+      // Add lower(?) triangular part
       if (row[k]!=col[k]) {
         m->row.push_back(col[k]-1);
         m->col.push_back(row[k]-1);
         m->nz_map.push_back(k);
       }
+
+      // Allocate memory for nonzeros
+      m->nz.resize(m->nz_map.size());
     }
 
     // Create sparsity pattern: TODO(@jaeandersson) No memory allocation
@@ -825,19 +826,39 @@ namespace casadi {
   }
 
   int QpoasesInterface::qpoases_sfact(void* mem, const double* vals) {
-    cout << "qpoases_sfact" << endl;
-    return 1;
+    casadi_assert(mem!=0);
+    QpoasesMemory* m = static_cast<QpoasesMemory*>(mem);
+
+    // Get nonzero elements (entire elements)
+    for (int i=0; i<m->nz.size(); ++i) m->nz[i] = vals[m->nz_map[i]];
+
+    // Pass to linear solver
+    m->self.linsol_.pivoting(get_ptr(m->nz));
+
+    return 0;
   }
 
   int QpoasesInterface::qpoases_nfact(void* mem, const double* vals) {
-    cout << "qpoases_nfact" << endl;
-    return 1;
+    casadi_assert(mem!=0);
+    QpoasesMemory* m = static_cast<QpoasesMemory*>(mem);
+
+    // Get nonzero elements (entire elements)
+    for (int i=0; i<m->nz.size(); ++i) m->nz[i] = vals[m->nz_map[i]];
+
+    // Pass to linear solver
+    m->self.linsol_.factorize(get_ptr(m->nz));
+
+    return 0;
   }
 
   int QpoasesInterface::qpoases_solve(void* mem, int nrhs, double* rhs) {
-    cout << "qpoases_solve" << endl;
-    return 1;
-  }
+    casadi_assert(mem!=0);
+    QpoasesMemory* m = static_cast<QpoasesMemory*>(mem);
 
+    // Pass to linear solver
+    m->self.linsol_.solve(rhs, nrhs);
+
+    return 0;
+  }
 
 } // namespace casadi

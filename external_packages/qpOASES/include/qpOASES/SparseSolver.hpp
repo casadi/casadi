@@ -370,6 +370,9 @@ class DummySparseSolver: public SparseSolver
                           linsol_nfact_t _linsol_nfact,
                           linsol_solve_t _linsol_solve);
 
+        /** Destructor */
+        virtual ~DummySparseSolver();
+
         /** Set new matrix data.  The matrix is to be provided
             in the Harwell-Boeing format.  Only the lower
             triangular part should be set. */
@@ -393,11 +396,25 @@ class DummySparseSolver: public SparseSolver
      *  PRIVATE MEMBER VARIABLES
      */
     private:
+      // Function pointers to user-defined functions
       linsol_memory_t linsol_data;
       linsol_init_t linsol_init;
       linsol_sfact_t linsol_sfact;
       linsol_nfact_t linsol_nfact;
       linsol_solve_t linsol_solve;
+
+      // Current linear system dimension
+      int_t dim;
+
+      // Current number of nonzeros
+      int_t nnz;
+
+      // Length of the sparsity vectors
+      int_t allocated_nnz;
+
+      // Current sparse matrix (sparse triplet format)
+      int_t *row, *col;
+      double *val;
 };
 
 #endif // SOLVER_NONE
