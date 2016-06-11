@@ -4145,6 +4145,12 @@ Obtain a numeric Cholesky factorization Only for Cholesky solvers.
 
 ";
 
+%feature("docstring") casadi::Linsol::neig "
+
+Number of negative eigenvalues Not available for all solvers.
+
+";
+
 %feature("docstring") casadi::Linsol::printPtr "[INTERNAL]  Print the
 pointer to the internal class
 
@@ -4348,6 +4354,12 @@ C++ includes: linsol.hpp ";
 %feature("docstring") casadi::Linsol::repr "
 
 Print a representation of the object.
+
+";
+
+%feature("docstring") casadi::Linsol::rank "
+
+Matrix rank Not available for all solvers.
 
 ";
 
@@ -9902,6 +9914,8 @@ Interface to QPOases Solver for quadratic programming
 | initialStatusBounds    | OT_STRING              | Initial status of      |
 |                        |                        | bounds at first        |
 |                        |                        | iteration.             |
++------------------------+------------------------+------------------------+
+| linsol_plugin          | OT_STRING              | Linear solver plugin   |
 +------------------------+------------------------+------------------------+
 | maxDualJump            | OT_DOUBLE              | Maximum allowed jump   |
 |                        |                        | in dual variables in   |

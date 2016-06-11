@@ -1473,6 +1473,7 @@
 <tr><td>initialFarBounds</td><td>OT_DOUBLE</td><td>Initial size for far bounds.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>initialRamping</td><td>OT_DOUBLE</td><td>Start value for ramping strategy.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>initialStatusBounds</td><td>OT_STRING</td><td>Initial status of bounds at first iteration.</td><td>casadi::QpoasesInterface</td></tr>
+<tr><td>linsol_plugin</td><td>OT_STRING</td><td>Linear solver plugin</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>maxDualJump</td><td>OT_DOUBLE</td><td>Maximum allowed jump in dual variables in  linear independence tests.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>maxPrimalJump</td><td>OT_DOUBLE</td><td>Maximum allowed jump in primal variables in  nonzero curvature tests.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>max_shur</td><td>OT_INT</td><td>Maximal number of Schur updates [75]</td><td>casadi::QpoasesInterface</td></tr>
@@ -1517,6 +1518,7 @@
 <tr><td>initialFarBounds</td><td>OT_DOUBLE</td><td>Initial size for far bounds.</td></tr>
 <tr><td>initialRamping</td><td>OT_DOUBLE</td><td>Start value for ramping strategy.</td></tr>
 <tr><td>initialStatusBounds</td><td>OT_STRING</td><td>Initial status of bounds at first iteration.</td></tr>
+<tr><td>linsol_plugin</td><td>OT_STRING</td><td>Linear solver plugin</td></tr>
 <tr><td>maxDualJump</td><td>OT_DOUBLE</td><td>Maximum allowed jump in dual variables in  linear independence tests.</td></tr>
 <tr><td>maxPrimalJump</td><td>OT_DOUBLE</td><td>Maximum allowed jump in primal variables in  nonzero curvature tests.</td></tr>
 <tr><td>max_shur</td><td>OT_INT</td><td>Maximal number of Schur updates [75]</td></tr>
@@ -1561,6 +1563,7 @@
 <tr><td>initialFarBounds</td><td>OT_DOUBLE</td><td>Initial size for far bounds.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>initialRamping</td><td>OT_DOUBLE</td><td>Start value for ramping strategy.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>initialStatusBounds</td><td>OT_STRING</td><td>Initial status of bounds at first iteration.</td><td>casadi::QpoasesInterface</td></tr>
+<tr><td>linsol_plugin</td><td>OT_STRING</td><td>Linear solver plugin</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>maxDualJump</td><td>OT_DOUBLE</td><td>Maximum allowed jump in dual variables in  linear independence tests.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>maxPrimalJump</td><td>OT_DOUBLE</td><td>Maximum allowed jump in primal variables in  nonzero curvature tests.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>max_shur</td><td>OT_INT</td><td>Maximal number of Schur updates [75]</td><td>casadi::QpoasesInterface</td></tr>
