@@ -85,12 +85,19 @@
       mexEvalString("pause(0.0001);");
     }
 
+#ifdef HAVE_OCTAVE
+    // Never for Octave
+    static bool mexcheckinterrupted() {
+      return false;
+    }
+#else
     // Undocumented matlab feature
     extern "C" bool utIsInterruptPending();
 
     static bool mexcheckinterrupted() {
       return utIsInterruptPending();
     }
+#endif
   }
 %}
 %init %{
