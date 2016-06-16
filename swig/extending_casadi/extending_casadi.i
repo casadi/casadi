@@ -14,7 +14,15 @@ import_array();
 #endif // SWIGPYTHON
 // WORKAROUNDS END
 
+%include "exception.i"
 %import "../casadi.i"
+%exception {
+  try {
+    $action
+   } catch(const std::exception& e) {
+    SWIG_exception(SWIG_RuntimeError, e.what());
+  }
+}
 
 %{
 #include <swig/extending_casadi/extending_casadi.hpp>
