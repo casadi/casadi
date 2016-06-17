@@ -82,8 +82,9 @@ option(WITH_TINYXML "Compile the interface to TinyXML" ON)
 option(WITH_COVERAGE "Create coverage report" OFF)
 option(OLD_LLVM "Use pre-3.5 LLVM" OFF)
 option(WITH_CLANG "Compile the interface to clang JIT" OFF)
-option(WITH_MATLAB "Compile the MATLAB front-end (experimental)" OFF)
 option(WITH_PYTHON "Compile the Python front-end" OFF)
+option(WITH_MATLAB "Compile the MATLAB front-end" OFF)
+option(WITH_OCTAVE "Compile the Octave front-end (experimental)" OFF)
 option(WITH_PYTHON3 "Use Python 3.*" OFF)
 option(WITH_JSON "Compile the JSON front-end" OFF)
 option(WITH_DEBIAN_BUILD "Add -DWITH_DEBIAN_BUILD (used for debian-specific warnings)" OFF)
@@ -575,7 +576,7 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib/)
 #####################################################
 ######################### swig ######################
 #####################################################
-if(WITH_PYTHON OR WITH_MATLAB OR WITH_JSON)
+if(WITH_PYTHON OR WITH_MATLAB OR WITH_OCTAVE OR WITH_JSON)
   add_subdirectory(swig)
 endif()
 

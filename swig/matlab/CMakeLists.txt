@@ -1,26 +1,65 @@
 cmake_minimum_required(VERSION 2.8.6)
 
-# MATLAB front-end
-add_custom_target(matlab DEPENDS casadiMEX)
-
-# Find MATLAB
-find_package(MATLAB REQUIRED)
-
-include_directories(${MATLAB_INCLUDE_DIR})
-add_definitions(${MATLAB_EXTRA_CXXFLAGS})
-
-# Generate SWIG wrapper
+# Generate SWIG wrapper (for both MATLAB and Octave)
 set_source_files_properties(../casadi.i  PROPERTIES  CPLUSPLUS ON)
-swig_add_module(casadiMEX matlab ../casadi.i)
-swig_link_libraries(casadiMEX ${MATLAB_LIBRARIES} casadi)
-set_target_properties(casadiMEX PROPERTIES PREFIX "" SUFFIX .${MATLAB_MEX_EXT})
+swig_module_initialize(casadiMEX matlab)
+swig_add_source_to_module(casadiMEX FALSE MEX_FILE ../casadi.i)
+get_directory_property(swig_extra_clean_files ADDITIONAL_MAKE_CLEAN_FILES)
+set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${MEX_FILE}")
 
 # Install the generated front-end to ${CMAKE_INSTALL_PREFIX}
 install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/+casadi DESTINATION ${CMAKE_INSTALL_PREFIX})
-install(TARGETS casadiMEX DESTINATION ${CMAKE_INSTALL_PREFIX})
+
+# Install MATLAB/Octave helper files
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/SwigRef.m DESTINATION ${CMAKE_INSTALL_PREFIX})
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/SwigMem.m DESTINATION ${CMAKE_INSTALL_PREFIX})
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/SwigGet.m DESTINATION ${CMAKE_INSTALL_PREFIX})
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/SwigStorage.m DESTINATION ${CMAKE_INSTALL_PREFIX})
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/swig_typename_convertor_matlab2cpp.m
+              ${CMAKE_CURRENT_SOURCE_DIR}/swig_typename_convertor_cpp2matlab.m
+  DESTINATION ${CMAKE_INSTALL_PREFIX})
+
+# MATLAB specific stuff
+if (WITH_MATLAB)
+  # Make target
+  add_custom_target(matlab DEPENDS casadiMATLAB)
+
+  # Find MATLAB
+  find_package(MATLAB REQUIRED)
+  include_directories(${MATLAB_INCLUDE_DIR})
+  add_definitions(${MATLAB_EXTRA_CXXFLAGS})
+
+  # Compile MEX file
+  add_library(casadiMATLAB MODULE ${MEX_FILE})
+  target_link_libraries(casadiMATLAB ${MATLAB_LIBRARIES} casadi)
+  set_target_properties(casadiMATLAB
+    PROPERTIES OUTPUT_NAME "casadiMEX"
+               PREFIX ""
+               SUFFIX .${MATLAB_MEX_EXT})
+  install(TARGETS casadiMATLAB DESTINATION ${CMAKE_INSTALL_PREFIX})
+endif (WITH_MATLAB)
+
+# Octave specific stuff
+if (WITH_OCTAVE)
+  # Make target
+  add_custom_target(octave DEPENDS casadiOCTAVE)
+
+  # Find Octave
+  find_package(OCTAVE REQUIRED)
+  include_directories(${OCTAVE_INCLUDE_DIRS})
+
+  # Compile MEX file
+  add_library(casadiOCTAVE MODULE ${MEX_FILE})
+  target_link_libraries(casadiOCTAVE ${OCTAVE_LIBRARIES} casadi)
+  set_target_properties(casadiOCTAVE
+    PROPERTIES OUTPUT_NAME "casadiMEX"
+               PREFIX ""
+               SUFFIX .mex)
+  install(TARGETS casadiOCTAVE DESTINATION ${CMAKE_INSTALL_PREFIX})
+endif (WITH_OCTAVE)
 
 # Example of how to extend CasADi with additional features
-if (WITH_EXTENDING_CASADI)
+if (WITH_EXTENDING_CASADI AND WITH_MATLAB)
   set_source_files_properties(../extending_casadi/extending_casadi.i PROPERTIES CPLUSPLUS ON)
   swig_add_module(extending_casadiMEX matlab ../extending_casadi/extending_casadi.i)
   swig_link_libraries(extending_casadiMEX ${MATLAB_LIBRARIES} extending_casadi)
@@ -32,12 +71,3 @@ if (WITH_EXTENDING_CASADI)
 
   add_custom_target(extending_casadi_matlab DEPENDS extending_casadiMEX extending_casadi)
 endif()
-
-# Install matlab helper files
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/SwigRef.m DESTINATION ${CMAKE_INSTALL_PREFIX})
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/SwigMem.m DESTINATION ${CMAKE_INSTALL_PREFIX})
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/SwigGet.m DESTINATION ${CMAKE_INSTALL_PREFIX})
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/SwigStorage.m DESTINATION ${CMAKE_INSTALL_PREFIX})
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/swig_typename_convertor_matlab2cpp.m
-              ${CMAKE_CURRENT_SOURCE_DIR}/swig_typename_convertor_cpp2matlab.m
-  DESTINATION ${CMAKE_INSTALL_PREFIX})
