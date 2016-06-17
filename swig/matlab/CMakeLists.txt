@@ -26,11 +26,10 @@ if (WITH_MATLAB)
 
   # Find MATLAB
   find_package(MATLAB REQUIRED)
-  include_directories(${MATLAB_INCLUDE_DIR})
-  add_definitions(${MATLAB_EXTRA_CXXFLAGS})
 
   # Compile MEX file
   add_library(casadiMATLAB MODULE ${MEX_FILE})
+  target_include_directories(casadiMATLAB PUBLIC ${MATLAB_INCLUDE_DIR})
   target_link_libraries(casadiMATLAB ${MATLAB_LIBRARIES} casadi)
   set_target_properties(casadiMATLAB
     PROPERTIES OUTPUT_NAME "casadiMEX"
@@ -46,10 +45,10 @@ if (WITH_OCTAVE)
 
   # Find Octave
   find_package(OCTAVE REQUIRED)
-  include_directories(${OCTAVE_INCLUDE_DIRS})
 
   # Compile MEX file
   add_library(casadiOCTAVE MODULE ${MEX_FILE})
+  target_include_directories(casadiOCTAVE PUBLIC ${OCTAVE_INCLUDE_DIRS})
   target_link_libraries(casadiOCTAVE ${OCTAVE_LIBRARIES} casadi)
   set_target_properties(casadiOCTAVE
     PROPERTIES OUTPUT_NAME "casadiMEX"
