@@ -4414,7 +4414,7 @@ C++ includes: casadi_logger.hpp ";
 // File: classcasadi_1_1MapSumSerial.xml
 
 
-// File: singletoncasadi_1_1Matrix.xml
+// File: classcasadi_1_1Matrix.xml
 
 
 /*  Construct symbolic primitives  */
@@ -4423,9 +4423,8 @@ C++ includes: casadi_logger.hpp ";
 in the Symbolic Toolbox for Matlab but instead creating a CasADi symbolic
 primitive.
 
-*/ %feature("docstring") casadi::Matrix::print_scalar "
-
-Print scalar.
+*/ %feature("docstring") casadi::Matrix::print_scalar " [INTERNAL]  Print
+scalar.
 
 ";
 
@@ -4435,9 +4434,8 @@ Get the number of non-zeros in the upper triangular half.
 
 ";
 
-%feature("docstring") casadi::Matrix::repr "
-
-Print a representation of the object.
+%feature("docstring") casadi::Matrix::repr "[INTERNAL]  Print a
+representation of the object.
 
 ";
 
@@ -4446,10 +4444,8 @@ as a weighted sum (with constant weights)
 
 ";
 
-%feature("docstring") casadi::Matrix::is_constant "
-
-Check if the matrix is constant (note that false negative answers are
-possible)
+%feature("docstring") casadi::Matrix::is_constant "[INTERNAL]  Check if the
+matrix is constant (note that false negative answers are possible)
 
 ";
 
@@ -4482,9 +4478,8 @@ x+y^3)/6 $ $ (-3 x^2 y-x^3)/6+y+x $
 
 ";
 
-%feature("docstring") casadi::Matrix::grad "
-
-Gradient expression.
+%feature("docstring") casadi::Matrix::grad "[INTERNAL]  Gradient
+expression.
 
 ";
 
@@ -4496,7 +4491,7 @@ Gradient expression.
 
 >  void array(Scalar) .set(array(Scalar) m, bool ind1, Sparsity sp)
 ------------------------------------------------------------------------
-
+[INTERNAL] 
 Set a submatrix, single argument
 
 >  void array(Scalar) .set(array(Scalar) m, bool ind1, Slice rr, Slice cc)
@@ -4507,7 +4502,7 @@ Set a submatrix, single argument
 
 >  void array(Scalar) .set(array(Scalar) m, bool ind1, IM rr, IM cc)
 ------------------------------------------------------------------------
-
+[INTERNAL] 
 Set a submatrix, two arguments
 
 ";
@@ -4518,9 +4513,8 @@ Get the number of (structural) non-zero elements.
 
 ";
 
-%feature("docstring") casadi::Matrix::remove "
-
-Remove columns and rows Remove/delete rows and/or columns of a matrix.
+%feature("docstring") casadi::Matrix::remove "[INTERNAL]  Remove columns
+and rows Remove/delete rows and/or columns of a matrix.
 
 ";
 
@@ -4532,7 +4526,7 @@ Remove columns and rows Remove/delete rows and/or columns of a matrix.
 
 >  void array(Scalar) .get(array(Scalar) output_m, bool ind1, Sparsity sp) const 
 ------------------------------------------------------------------------
-
+[INTERNAL] 
 Get a submatrix, single argument
 
 >  void array(Scalar) .get(array(Scalar) output_m, bool ind1, Slice rr, Slice cc) const
@@ -4543,7 +4537,7 @@ Get a submatrix, single argument
 
 >  void array(Scalar) .get(array(Scalar) output_m, bool ind1, IM rr, IM cc) const 
 ------------------------------------------------------------------------
-
+[INTERNAL] 
 Get a submatrix, two arguments
 
 ";
@@ -4559,7 +4553,7 @@ Get a submatrix, two arguments
 
 ";
 
-%feature("docstring") casadi::Matrix::triplet "";
+%feature("docstring") casadi::Matrix::triplet "[INTERNAL] ";
 
 %feature("docstring") casadi::Matrix::getRepresentation "
 
@@ -4567,9 +4561,8 @@ Return a string with a representation (for SWIG)
 
 ";
 
-%feature("docstring") casadi::Matrix::sanity_check "
-
-Check if the dimensions and colind, row vectors are compatible.
+%feature("docstring") casadi::Matrix::sanity_check "[INTERNAL]  Check if
+the dimensions and colind, row vectors are compatible.
 
 Parameters:
 -----------
@@ -4579,9 +4572,8 @@ result
 
 ";
 
-%feature("docstring") casadi::Matrix::print_split "
-
-Get strings corresponding to the nonzeros and the interdependencies.
+%feature("docstring") casadi::Matrix::print_split "[INTERNAL]  Get strings
+corresponding to the nonzeros and the interdependencies.
 
 ";
 
@@ -4601,10 +4593,8 @@ Matrix-Matrix product.
 
 ";
 
-%feature("docstring") casadi::Matrix::is_integer "
-
-Check if the matrix is integer-valued (note that false negative answers are
-possible)
+%feature("docstring") casadi::Matrix::is_integer "[INTERNAL]  Check if the
+matrix is integer-valued (note that false negative answers are possible)
 
 ";
 
@@ -4633,15 +4623,13 @@ every element in the matrix is true.
 
 ";
 
-%feature("docstring") casadi::Matrix::is_regular "
-
-Checks if expression does not contain NaN or Inf.
+%feature("docstring") casadi::Matrix::is_regular "[INTERNAL]  Checks if
+expression does not contain NaN or Inf.
 
 ";
 
-%feature("docstring") casadi::Matrix::set_nz "
-
-Set a set of nonzeros
+%feature("docstring") casadi::Matrix::set_nz "[INTERNAL]  Set a set of
+nonzeros
 
 ";
 
@@ -4676,15 +4664,12 @@ Get string representation of dimensions. The representation is (nrow x ncol
 
 ";
 
-%feature("docstring") casadi::Matrix::get_nz "
-
-Get a set of nonzeros
+%feature("docstring") casadi::Matrix::get_nz "[INTERNAL]  Get a set of
+nonzeros
 
 ";
 
-%feature("docstring") casadi::Matrix::T "
-
-Transpose the matrix.
+%feature("docstring") casadi::Matrix::T "[INTERNAL]   Transpose the matrix.
 
 ";
 
@@ -4693,17 +4678,15 @@ element in the matrix is true.
 
 ";
 
-%feature("docstring") casadi::Matrix::is_smooth "
-
-Check if smooth.
+%feature("docstring") casadi::Matrix::is_smooth "[INTERNAL]  Check if
+smooth.
 
 ";
 
-%feature("docstring") casadi::Matrix::clear "";
+%feature("docstring") casadi::Matrix::clear "[INTERNAL] ";
 
-%feature("docstring") casadi::Matrix::is_minus_one "
-
-check if the matrix is -1 (note that false negative answers are possible)
+%feature("docstring") casadi::Matrix::is_minus_one "[INTERNAL]  check if
+the matrix is -1 (note that false negative answers are possible)
 
 ";
 
@@ -4722,16 +4705,12 @@ streams.
 
 ";
 
-%feature("docstring") casadi::Matrix::n_dep "
-
-Get the number of dependencies of a binary SXElem Only defined if symbolic
-scalar.
+%feature("docstring") casadi::Matrix::n_dep "[INTERNAL]  Get the number of
+dependencies of a binary SXElem Only defined if symbolic scalar.
 
 ";
 
-%feature("docstring") casadi::Matrix::hess "
-
-Hessian expression
+%feature("docstring") casadi::Matrix::hess "[INTERNAL]  Hessian expression
 
 ";
 
@@ -4741,9 +4720,8 @@ Check if the matrix expression is dense.
 
 ";
 
-%feature("docstring") casadi::Matrix::print_sparse "
-
-Print sparse matrix style.
+%feature("docstring") casadi::Matrix::print_sparse "[INTERNAL]  Print
+sparse matrix style.
 
 ";
 
@@ -4753,29 +4731,24 @@ Get the number of non-zeros in the lower triangular half.
 
 ";
 
-%feature("docstring") casadi::Matrix::reserve "";
+%feature("docstring") casadi::Matrix::reserve "[INTERNAL] ";
 
-%feature("docstring") casadi::Matrix::tang "
-
-Tangent expression.
+%feature("docstring") casadi::Matrix::tang "[INTERNAL]  Tangent expression.
 
 ";
 
-%feature("docstring") casadi::Matrix::is_one "
-
-check if the matrix is 1 (note that false negative answers are possible)
-
-";
-
-%feature("docstring") casadi::Matrix::inf "
-
-create a matrix with all inf
+%feature("docstring") casadi::Matrix::is_one "[INTERNAL]  check if the
+matrix is 1 (note that false negative answers are possible)
 
 ";
 
-%feature("docstring") casadi::Matrix::element_hash "
+%feature("docstring") casadi::Matrix::inf "[INTERNAL]  create a matrix with
+all inf
 
-Returns a number that is unique for a given symbolic scalar.
+";
+
+%feature("docstring") casadi::Matrix::element_hash "[INTERNAL]  Returns a
+number that is unique for a given symbolic scalar.
 
 Only defined if symbolic scalar.
 
@@ -4795,9 +4768,8 @@ Also called: slope function
 
 ";
 
-%feature("docstring") casadi::Matrix::print_vector "
-
-Print vector-style.
+%feature("docstring") casadi::Matrix::print_vector "[INTERNAL]  Print
+vector-style.
 
 ";
 
@@ -4814,7 +4786,7 @@ Check if the matrix is a column vector (i.e. size2()==1)
 
 ";
 
-%feature("docstring") casadi::Matrix::resize "";
+%feature("docstring") casadi::Matrix::resize "[INTERNAL] ";
 
 %feature("docstring") friendwrap_qr "[INTERNAL]  QR factorization using the
 modified Gram-Schmidt algorithm More stable than the classical Gram-Schmidt,
@@ -4860,10 +4832,9 @@ sparsity can be accessed with Sparsity& sparsity() Joel Andersson
 
 C++ includes: casadi_types.hpp ";
 
-%feature("docstring") casadi::Matrix::dep "
-
-Get expressions of the children of the expression Only defined if symbolic
-scalar. Wraps SXElem SXElem::dep(int ch=0) const.
+%feature("docstring") casadi::Matrix::dep "[INTERNAL]  Get expressions of
+the children of the expression Only defined if symbolic scalar. Wraps SXElem
+SXElem::dep(int ch=0) const.
 
 ";
 
@@ -4909,17 +4880,14 @@ symbolic primitives.
 
 ";
 
-%feature("docstring") casadi::Matrix::is_leaf "
-
-Check if SX is a leaf of the SX graph.
+%feature("docstring") casadi::Matrix::is_leaf "[INTERNAL]  Check if SX is a
+leaf of the SX graph.
 
 Only defined if symbolic scalar.
 
 ";
 
-%feature("docstring") casadi::Matrix::jac "
-
-Jacobian expression.
+%feature("docstring") casadi::Matrix::jac "[INTERNAL]  Jacobian expression.
 
 ";
 
@@ -4939,9 +4907,8 @@ Get the sparsity pattern. See the Sparsity class for details.
 
 ";
 
-%feature("docstring") casadi::Matrix::print_dense "
-
-Print dense matrix-stype.
+%feature("docstring") casadi::Matrix::print_dense "[INTERNAL]  Print dense
+matrix-stype.
 
 ";
 
@@ -4956,15 +4923,13 @@ nodes by their ID.
 
 ";
 
-%feature("docstring") casadi::Matrix::nan "
-
-create a matrix with all nan
+%feature("docstring") casadi::Matrix::nan "[INTERNAL]  create a matrix with
+all nan
 
 ";
 
-%feature("docstring") casadi::Matrix::is_commutative "
-
-Check whether a binary SX is commutative.
+%feature("docstring") casadi::Matrix::is_commutative "[INTERNAL]  Check
+whether a binary SX is commutative.
 
 Only defined if symbolic scalar.
 
@@ -4976,10 +4941,9 @@ Return a string with a description (for SWIG)
 
 ";
 
-%feature("docstring") casadi::Matrix::is_valid_input "
-
-Check if matrix can be used to define function inputs. Sparse matrices can
-return true if all non-zero elements are symbolic.
+%feature("docstring") casadi::Matrix::is_valid_input "[INTERNAL]  Check if
+matrix can be used to define function inputs. Sparse matrices can return
+true if all non-zero elements are symbolic.
 
 ";
 
@@ -5020,15 +4984,15 @@ Get the size along a particular dimensions.
 
 >  void array(Scalar) .erase([int ] rr, [int ] cc, bool ind1=false)
 ------------------------------------------------------------------------
-
-Erase a submatrix (leaving structural zeros in its place) Erase rows and/or
-columns of a matrix.
+[INTERNAL] 
+Erase a submatrix (leaving structural zeros in its place) Erase rows
+and/or columns of a matrix.
 
 >  void array(Scalar) .erase([int ] rr, bool ind1=false)
 ------------------------------------------------------------------------
-
-Erase a submatrix (leaving structural zeros in its place) Erase elements of
-a matrix.
+[INTERNAL] 
+Erase a submatrix (leaving structural zeros in its place) Erase
+elements of a matrix.
 
 ";
 
@@ -5042,7 +5006,7 @@ Check if the matrix is a row vector (i.e. size1()==1)
 
 >  bool array(Scalar) .__nonzero__() const 
 ------------------------------------------------------------------------
-
+[INTERNAL] 
 Returns the truth value of a Matrix.
 
 >  bool SX.__nonzero__() const
@@ -5119,10 +5083,8 @@ optionally both dimensions)
 
 ";
 
-%feature("docstring") casadi::Matrix::is_identity "
-
-check if the matrix is an identity matrix (note that false negative answers
-are possible)
+%feature("docstring") casadi::Matrix::is_identity "[INTERNAL]  check if the
+matrix is an identity matrix (note that false negative answers are possible)
 
 ";
 
@@ -5147,7 +5109,7 @@ x:  Scalar symbol that the polynomial is build up with
 
 ";
 
-%feature("docstring") casadi::Matrix::printme "";
+%feature("docstring") casadi::Matrix::printme "[INTERNAL] ";
 
 %feature("docstring") friendwrap_gauss_quadrature "
 
@@ -5189,16 +5151,14 @@ val:  vector with the value of the function for each interval (length n)
 
 ";
 
-%feature("docstring") casadi::Matrix::enlarge "
-
-Enlarge matrix Make the matrix larger by inserting empty rows and columns,
-keeping the existing non-zeros.
+%feature("docstring") casadi::Matrix::enlarge "[INTERNAL]  Enlarge matrix
+Make the matrix larger by inserting empty rows and columns, keeping the
+existing non-zeros.
 
 ";
 
-%feature("docstring") casadi::Matrix::is_symbolic "
-
-Check if symbolic (Dense) Sparse matrices invariable return false.
+%feature("docstring") casadi::Matrix::is_symbolic "[INTERNAL]  Check if
+symbolic (Dense) Sparse matrices invariable return false.
 
 ";
 
@@ -5224,60 +5184,60 @@ streams.
 
 >  array(Scalar) ()
 ------------------------------------------------------------------------
-
+[INTERNAL] 
 constructors
 
 empty 0-by-0 matrix constructor
 
 >  array(Scalar) (array(Scalar) m)
 ------------------------------------------------------------------------
-
+[INTERNAL] 
 Copy constructor.
 
 >  array(Scalar) (int nrow, int ncol)
 ------------------------------------------------------------------------
-
+[INTERNAL] 
 Create a sparse matrix with all structural zeros.
 
 >  array(Scalar) (Sparsity sp)
 ------------------------------------------------------------------------
-
+[INTERNAL] 
 Create a sparse matrix from a sparsity pattern. Same as
 Matrix::ones(sparsity)
 
 >  array(Scalar) (Sparsity sp, array(Scalar) d)
 ------------------------------------------------------------------------
-
+[INTERNAL] 
 Construct matrix with a given sparsity and nonzeros.
 
 >  array(Scalar) (double val)
 ------------------------------------------------------------------------
-
+[INTERNAL] 
 This constructor enables implicit type conversion from a numeric type.
 
 >  array(Scalar) ([[double ] ] m)
 ------------------------------------------------------------------------
-
+[INTERNAL] 
 Dense matrix constructor with data given as vector of vectors.
 
->  array(Scalar) ([A ] x)
+>  array(T) ([A ] x)
 ------------------------------------------------------------------------
 
 Create an expression from a vector.
 
->  array(Scalar) (array(A) x)
+>  array(T) (array(A) x)
 ------------------------------------------------------------------------
 
 Create a matrix from another matrix with a different entry type Assumes that
 the scalar conversion is valid.
 
->  array(Scalar) ([Scalar ] x)
+>  array(T) ([Scalar ] x)
 
->  array(Scalar) ((int,int) rc)
+>  array(T) ((int,int) rc)
 
->  array(Scalar) (Sparsity sp, Scalar val, bool dummy)
+>  array(T) (Sparsity sp, Scalar val, bool dummy)
 
->  array(Scalar) (Sparsity sp, [Scalar ] d, bool dummy)
+>  array(T) (Sparsity sp, [Scalar ] d, bool dummy)
 ------------------------------------------------------------------------
 [INTERNAL] 
 ";
@@ -5298,9 +5258,8 @@ window function
 
 ";
 
-%feature("docstring") casadi::Matrix::is_zero "
-
-check if the matrix is 0 (note that false negative answers are possible)
+%feature("docstring") casadi::Matrix::is_zero "[INTERNAL]  check if the
+matrix is 0 (note that false negative answers are possible)
 
 ";
 
@@ -5333,15 +5292,13 @@ node using SXElem::setTemp. Make sure to call resetInput() after usage.
 
 ";
 
-%feature("docstring") casadi::Matrix::name "
-
-Get name (only if symbolic scalar)
+%feature("docstring") casadi::Matrix::name "[INTERNAL]  Get name (only if
+symbolic scalar)
 
 ";
 
-%feature("docstring") casadi::Matrix::has_zeros "
-
-Check if the matrix has any zero entries which are not structural zeros.
+%feature("docstring") casadi::Matrix::has_zeros "[INTERNAL]  Check if the
+matrix has any zero entries which are not structural zeros.
 
 ";
 
@@ -5357,9 +5314,8 @@ Get the sparsity pattern. See the Sparsity class for details.
 
 ";
 
-%feature("docstring") casadi::Matrix::print "
-
-Print a description of the object.
+%feature("docstring") casadi::Matrix::print "[INTERNAL]  Print a
+description of the object.
 
 ";
 
