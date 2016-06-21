@@ -77,20 +77,22 @@ namespace casadi {
     /** \brief  Evaluate numerically, work vectors given */
     virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
 
-    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
+    virtual void sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
 
-    /** \brief  Is the class able to propagate seeds through the algorithm? */
-    virtual bool spCanEvaluate(bool fwd) { return fwd; }
+    ///@{
+    /// Is the class able to propagate seeds through the algorithm?
+    virtual bool has_spfwd() const { return true;}
+    ///@}
 
     ///@{
     /** \brief Generate a function that calculates \a nfwd forward derivatives */
-    virtual Function get_forward(const std::string& name, int nfwd, Dict& opts);
+    virtual Function get_forward_old(const std::string& name, int nfwd, Dict& opts);
     virtual int get_n_forward() const { return 64;}
     ///@}
 
     ///@{
     /** \brief Generate a function that calculates \a nadj adjoint derivatives */
-    virtual Function get_reverse(const std::string& name, int nadj, Dict& opts);
+    virtual Function get_reverse_old(const std::string& name, int nadj, Dict& opts);
     virtual int get_n_reverse() const { return 64;}
     ///@}
 

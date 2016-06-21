@@ -35,25 +35,36 @@ namespace casadi {
 
   class CASADI_EXPORT CodeGenerator {
   public:
+#ifdef WITH_DEPRECATED_FEATURES
     /// Constructor
     CodeGenerator(const Dict& opts = Dict());
+#endif // WITH_DEPRECATED_FEATURES
+
+    /// Constructor
+    CodeGenerator(const std::string& name, const Dict& opts = Dict());
 
     /// Add a function (name generated)
     void add(const Function& f);
 
 #ifndef SWIG
     /// Generate the code to a stream
-    void generate(std::ostream& s) const;
+    void dump(std::ostream& s) const;
 #endif // SWIG
 
-    /// Generate a file
-    void generate(const std::string& name) const;
-
     /// Generate a file, return code as string
-    std::string generate() const;
+    std::string dump() const;
 
+    /** \brief Generate file(s)
+      The "prefix" argument will be prepended to the generated files and may
+      be a directory or a file prefix.
+      returns the filename
+    */
+    std::string generate(const std::string& prefix="") const;
+
+#ifdef WITH_DEPRECATED_FEATURES
     /// Compile and load function
-    std::string compile(const std::string& name, const std::string& compiler="gcc -fPIC -O2");
+    std::string compile(const std::string& compiler="gcc -fPIC -O2");
+#endif // WITH_DEPRECATED_FEATURES
 
     /// Add an include file optionally using a relative path "..." instead of an absolute path <...>
     void addInclude(const std::string& new_include, bool relative_path=false,
@@ -91,6 +102,10 @@ namespace casadi {
 
     /** \brief Print a constant in a lossless but compact manner */
     static std::string constant(double v);
+
+    /** \brief Print an intializer */
+    static std::string initializer(const std::vector<double>& v);
+    static std::string initializer(const std::vector<int>& v);
 
     /** \brief Codegen inner product */
     std::string dot(int n, const std::string& x, const std::string& y);
@@ -146,6 +161,10 @@ namespace casadi {
     /** Get work vector element from index */
     std::string workel(int n) const;
 
+    /** Declare an array */
+    static std::string array(const std::string& type, const std::string& name, int len,
+                             const std::string& def=std::string());
+
     /** \brief  Print int vector to a c file */
     static void print_vector(std::ostream &s, const std::string& name,
                              const std::vector<int>& v);
@@ -185,6 +204,21 @@ namespace casadi {
                        const std::string& arg3);
   private:
 
+    /// Print file header
+    void file_open(std::ofstream& f, const std::string& name) const;
+
+    /// Print file header
+    void file_close(std::ofstream& f) const;
+
+    // Generate real_t definition
+    void generate_real_t(std::ostream &s) const;
+
+    // Generate mex entry point
+    void generate_mex(std::ostream &s) const;
+
+    // Generate main entry point
+    void generate_main(std::ostream &s) const;
+
     /// SQUARE
     void auxSq();
 
@@ -195,8 +229,14 @@ namespace casadi {
   public:
     /// \cond INTERNAL
 
+    // Name of generated file
+    std::string name, suffix;
+
     // Real-type used for the codegen
     std::string real_t;
+
+    // Should we create a memory entry point?
+    bool with_mem;
 
     // Generate header file?
     bool with_header;
@@ -263,4 +303,3 @@ namespace casadi {
 } // namespace casadi
 
 #endif // CASADI_CODE_GENERATOR_HPP
-

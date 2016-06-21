@@ -60,7 +60,7 @@ G = X+X
 nlp = {'x':X, 'f':F, 'g':G}
 
 solver = nlpsol("nlp","ipopt", nlp)
-solver.printOptions()
+solver.print_options()
 
 #! The default lower an upper bound on the optimizations variables is zero.
 #! Change them to unbouded as follows:

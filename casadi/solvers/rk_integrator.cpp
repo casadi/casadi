@@ -43,7 +43,7 @@ namespace casadi {
     Integrator::registerPlugin(casadi_register_integrator_rk);
   }
 
-  RkIntegrator::RkIntegrator(const std::string& name, Oracle* dae)
+  RkIntegrator::RkIntegrator(const std::string& name, const Function& dae)
     : FixedStepIntegrator(name, dae) {
   }
 
@@ -60,6 +60,9 @@ namespace casadi {
   }
 
   void RkIntegrator::setupFG() {
+    f_ = create_function("f", {"x", "z", "p", "t"}, {"ode", "alg", "quad"});
+    g_ = create_function("g", {"rx", "rz", "rp", "x", "z", "p", "t"},
+                              {"rode", "ralg", "rquad"});
 
     // Symbolic inputs
     MX x0 = MX::sym("x0", this->x());

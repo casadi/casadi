@@ -48,7 +48,7 @@ H = dot(lam,xdot) + L
 ldot = -gradient(H,x)
 
 ## The control must minimize the Hamiltonian, which is:
-print "Hamiltonian: ", H
+print("Hamiltonian: ", H)
 
 # H is of a convex quadratic form in u: H = u*u + p*u + q, let's get the coefficient p
 p = gradient(H,u)     # this gives us 2*u + p
@@ -60,7 +60,7 @@ u_opt = -p/2
 # We must constrain u to the interval [-0.75, 1.0], convexity of H ensures that the optimum is obtain at the bound when u_opt is outside the interval
 u_opt = fmin(u_opt,1.0)
 u_opt = fmax(u_opt,-0.75)
-print "optimal control: ", u_opt
+print("optimal control: ", u_opt)
 
 # Augment f with lam_dot and subtitute in the value for the optimal control
 f = vertcat(xdot,ldot)

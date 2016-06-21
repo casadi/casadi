@@ -35,7 +35,7 @@ t = TestSuite(dirname=src,
   inputs = {'det_minor': "5"},
     args=sys.argv[2:]
   )
-  
+
 t.run()
 
 

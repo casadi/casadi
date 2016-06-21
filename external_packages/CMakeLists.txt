@@ -54,7 +54,7 @@ if(WITH_BUILD_CSPARSE)
 endif()
 
 if(WITH_BUILD_SUNDIALS)
-  add_subdirectory(sundials-2.5mod)
+  add_subdirectory(casadi-sundials)
 endif()
 
 if(QPOASES_FOUND)

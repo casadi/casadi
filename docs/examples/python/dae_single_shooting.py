@@ -90,4 +90,4 @@ sol = solver(lbx = -0.75, # Lower variable bound
              lbg =  0.0,  # Lower constraint bound
              ubg =  0.0,  # Upper constraint bound
              x0  =  0.0) # Initial guess
-print sol
+print(sol)

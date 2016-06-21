@@ -5,27 +5,39 @@ add_custom_target(python DEPENDS _casadi)
 
 # Workaround for OS X
 if(APPLE)
+  if(WITH_PYTHON3)
+  set(PYTHON_CONFIG_NAME python3-config)
+  else()
+  set(PYTHON_CONFIG_NAME python-config)
+  endif()
   find_program(PYTHON_CONFIG_EXECUTABLE
-               NAMES python-config DOC "python-config executable")
+               NAMES ${PYTHON_CONFIG_NAME} DOC "python-config executable")
   if(PYTHON_CONFIG_EXECUTABLE)
     execute_process(COMMAND ${PYTHON_CONFIG_EXECUTABLE} --prefix
                     OUTPUT_VARIABLE PYTHON_PREFIX_STRING
                     RESULT_VARIABLE PYTHON_PREFIX_FAILED
                     ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
     if(NOT PYTHON_PREFIX_FAILED)
-      find_library(PYTHON_LIBRARY NAMES python2.7
+      file(GLOB LOCAL_PYTHON_NAME RELATIVE ${PYTHON_PREFIX_STRING}/lib "${PYTHON_PREFIX_STRING}/lib/python*.*")
+      find_library(PYTHON_LIBRARY NAMES ${LOCAL_PYTHON_NAME}
         PATHS ${PYTHON_PREFIX_STRING}/lib NO_DEFAULT_PATH)
+      file(GLOB LOCAL_PYTHON_NAME "${PYTHON_PREFIX_STRING}/include/python*")
       find_path(PYTHON_INCLUDE_DIR
         NAMES Python.h
-        PATHS ${PYTHON_PREFIX_STRING}/include/python2.7 NO_DEFAULT_PATH)
+        PATHS ${LOCAL_PYTHON_NAME} NO_DEFAULT_PATH)
     endif()
     message(STATUS ${PYTHON_INCLUDE_DIR})
   endif()
 endif()
 
 # Find packages
-find_package(PythonLibs REQUIRED)
-find_package(PythonInterp REQUIRED)
+if(WITH_PYTHON3)
+set(MINPYVERSION "3")
+else()
+set(MINPYVERSION "")
+endif()
+find_package(PythonInterp ${MINPYVERSION} REQUIRED)
+find_package(PythonLibs ${MINPYVERSION} REQUIRED)
 find_package(NUMPY REQUIRED)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
@@ -41,7 +53,10 @@ endif()
 
 set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-DPy_USING_UNICODE")
 set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-noproxydel")
-
+if(WITH_PYTHON3)
+set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-py3")
+set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-DWITH_PYTHON3")
+endif()
 # Generate SWIG wrapper
 set_source_files_properties(../casadi.i  PROPERTIES  CPLUSPLUS ON)
 swig_add_module(casadi python ../casadi.i)
@@ -154,9 +169,9 @@ if (WITH_EXTENDING_CASADI)
   swig_add_module(extending_casadi python ../extending_casadi/extending_casadi.i)
   swig_link_libraries(extending_casadi ${PYTHON_LIBRARIES} extending_casadi)
   if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-    set_target_properties(_extending_casadi PROPERTIES COMPILE_FLAGS "-Wno-dynamic-class-memaccess -Wno-self-assign ${MAYBE_WERROR}")
+    set_target_properties(_extending_casadi PROPERTIES COMPILE_FLAGS "-Wno-dynamic-class-memaccess -Wno-self-assign ${MAYBE_WERROR} -fno-builtin-strdup -fno-builtin-strndup")
   elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-    set_target_properties(_extending_casadi PROPERTIES COMPILE_FLAGS "-Wno-dynamic-class-memaccess -Wno-self-assign -Wno-maybe-uninitialized ${MAYBE_WERROR}")
+    set_target_properties(_extending_casadi PROPERTIES COMPILE_FLAGS "-Wno-dynamic-class-memaccess -Wno-self-assign -Wno-maybe-uninitialized ${MAYBE_WERROR} -fno-builtin-strdup -fno-builtin-strndup")
   endif()
   set(CASADI_PYTHON_LIBRARY ${SWIG_MODULE_extending_casadi_REAL_NAME}${CASADI_PYTHON_LIBRARY_SUFFIX})
 

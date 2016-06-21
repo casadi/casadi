@@ -7,6 +7,6 @@ classdef MyCallback < casadi.Callback
     function [res] = eval(self, arg)
       res{1} = arg{1}^2;
     end
-  end    
+  end
 end
 

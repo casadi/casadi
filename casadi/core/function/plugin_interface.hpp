@@ -85,13 +85,13 @@ namespace casadi {
     typedef int (*RegFcn)(Plugin* plugin);
 
     /// Check if a plugin is available or can be loaded
-    static bool hasPlugin(const std::string& pname, bool verbose=false);
+    static bool has_plugin(const std::string& pname, bool verbose=false);
 
     /// Instantiate a Plugin struct from a factory function
     static Plugin pluginFromRegFcn(RegFcn regfcn);
 
     /// Load a plugin dynamically
-    static Plugin loadPlugin(const std::string& pname, bool register_plugin=true);
+    static Plugin load_plugin(const std::string& pname, bool register_plugin=true);
 
     /// Register an integrator in the factory
     static void registerPlugin(const Plugin& plugin);
@@ -111,7 +111,7 @@ namespace casadi {
   };
 
   template<class Derived>
-  bool PluginInterface<Derived>::hasPlugin(const std::string& pname, bool verbose) {
+  bool PluginInterface<Derived>::has_plugin(const std::string& pname, bool verbose) {
 
     // Quick return if available
     if (Derived::solvers_.find(pname) != Derived::solvers_.end()) {
@@ -120,7 +120,7 @@ namespace casadi {
 
     // Try loading the plugin
     try {
-      (void)loadPlugin(pname, false);
+      (void)load_plugin(pname, false);
       return true;
     } catch (CasadiException& ex) {
       if (verbose) {
@@ -145,7 +145,7 @@ namespace casadi {
 
   template<class Derived>
   typename PluginInterface<Derived>::Plugin
-      PluginInterface<Derived>::loadPlugin(const std::string& pname, bool register_plugin) {
+      PluginInterface<Derived>::load_plugin(const std::string& pname, bool register_plugin) {
     // Issue warning and quick return if already loaded
     if (Derived::solvers_.find(pname) != Derived::solvers_.end()) {
       casadi_warning("PluginInterface: Solver " + pname + " is already in use. Ignored.");
@@ -210,7 +210,7 @@ namespace casadi {
 
     // Prepare error string
     std::stringstream errors;
-    errors << "PluginInterface::loadPlugin: Cannot load shared library '"
+    errors << "PluginInterface::load_plugin: Cannot load shared library '"
            << lib << "': " << std::endl;
     errors << "   (\n"
            << "    Searched directories: 1. casadipath from GlobalOptions\n"
@@ -274,7 +274,7 @@ namespace casadi {
     reg = (RegFcn)dlsym(handle, regName.c_str());
 #endif // _WIN32
     casadi_assert_message(reg!=0,
-      "PluginInterface::loadPlugin: no \"" + regName + "\" found in " + searchpath + ".");
+      "PluginInterface::load_plugin: no \"" + regName + "\" found in " + searchpath + ".");
 
     // Create a temporary struct
     Plugin plugin = pluginFromRegFcn(reg);
@@ -314,7 +314,7 @@ namespace casadi {
 
     // Load the solver if needed
     if (it==Derived::solvers_.end()) {
-      loadPlugin(pname);
+      load_plugin(pname);
       it=Derived::solvers_.find(pname);
     }
     casadi_assert(it!=Derived::solvers_.end());
@@ -328,7 +328,7 @@ namespace casadi {
                     const std::string& pname, Problem problem) {
 
     // Assert the plugin exists (needed for adaptors)
-    if (!hasPlugin(pname, true)) {
+    if (!has_plugin(pname, true)) {
       casadi_error("Plugin '" << pname << "' is not found.");
     }
     return getPlugin(pname).creator(fname, problem);

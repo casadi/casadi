@@ -10,6 +10,10 @@ if(IPOPT_FOUND)
   add_subdirectory(ipopt)
 endif()
 
+if(BONMIN_FOUND)
+  add_subdirectory(bonmin)
+endif()
+
 if(QPOASES_FOUND)
   add_subdirectory(qpoases)
 endif()
@@ -22,12 +26,20 @@ if(CPLEX_FOUND)
   add_subdirectory(cplex)
 endif()
 
+if(CLP_FOUND)
+  add_subdirectory(clp)
+endif()
+
 if(CSPARSE_FOUND)
   add_subdirectory(csparse)
 endif()
 
 if(CLANG_FOUND)
   add_subdirectory(clang)
+endif()
+
+if(HSL_FOUND)
+  add_subdirectory(hsl)
 endif()
 
 if(OOQP_FOUND)

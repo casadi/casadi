@@ -150,7 +150,7 @@ def splitQualifiers(x):
   return ([],x)
 
 def stripQualifiers(x):
-  return splitQualifiers(x)[1]
+  return splitQualifiers(x[0])[1]
 
 def internalClass(p):
   return stripQualifiers(p) in internalClasses
@@ -172,7 +172,8 @@ def getCanonicalParams(d,debug=""):
   params = []
   if d.find('attributelist/parmlist') is not None:
     for x in d.findall('attributelist/parmlist/parm/attributelist/attribute[@name="type"]'):
-      params.append( getCanonicalType(x.attrib['value']) )
+      	name = x.findall('../attribute[@name="name"]')[0].attrib['value']
+	params.append( (getCanonicalType(x.attrib['value']),"Output" if name=="OUTPUT" else "Normal") )
 
   return params
 print "elpased", time.time()-t0
@@ -199,8 +200,8 @@ for name,c in classes0.items():
 
     params = getCanonicalParams(d,debug="method")
 
-    if any([p.endswith("Creator") for p in params]): continue
-    if any([internalClass(p) for p in params]):
+    if any([p[0].endswith("Creator") for p in params]): continue
+    if any([internalClass(p[0]) for p in params]):
       numInternalMethods += 1
       continue
 
@@ -227,7 +228,7 @@ for name,c in classes0.items():
 
   for d in itertools.chain(c.findall('constructor'),c.findall('extend/constructor')):
     params = getCanonicalParams(d,debug="constructor")
-    if any([p.endswith("Creator") for p in params]): continue
+    if any([p[0].endswith("Creator") for p in params]): continue
     if any([internalClass(p) for p in params]):
       numInternalConstructors += 1
       continue
@@ -276,14 +277,7 @@ for d in r.findall('*//namespace/cdecl'):
   name = d.find('attributelist/attribute[@name="name"]').attrib["value"]
   if dname == "dummy": continue
   code = ""
-  isIOSchemeHelper = False
-  friendwrap = "friendwrap" in name
-
-  maybeCode = d.find('attributelist/attribute[@name="code"]')
-  if maybeCode is not None:
-    msg = '// This comment lets the haskell bindings know this is a scheme helper'
-    if msg in maybeCode.attrib['value']:
-      isIOSchemeHelper = True
+  friendwrap = "casadi_" in name
 
   if friendwrap:
     dname= "casadi_" + dname
@@ -295,8 +289,8 @@ for d in r.findall('*//namespace/cdecl'):
 
   params = getCanonicalParams(d,debug="function")
 
-  if any([p.endswith("Creator") for p in params]): continue
-  if any([internalClass(p) for p in params]):
+  if any([p.endswith("Creator") for p,_ in params]): continue
+  if any([internalClass(p) for p,_ in params]):
     numInternalFunctions += 1
     continue
 
@@ -311,7 +305,6 @@ for d in r.findall('*//namespace/cdecl'):
                     'funReturn':rettype,
                     'funDocs':"",#docs,
                     'funDocslink':"",
-                    'funIsIOSchemeHelper':isIOSchemeHelper,
                     'funFriendwrap':friendwrap})
 
 

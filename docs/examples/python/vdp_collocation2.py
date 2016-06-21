@@ -215,7 +215,7 @@ arg["ubg"] = NP.concatenate(ubg)
 res = solver(**arg)
 
 # Print the optimal cost
-print "optimal cost: ", float(res["f"])
+print("optimal cost: ", float(res["f"]))
 
 # Retrieve the solution
 opt = V(res["x"])

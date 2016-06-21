@@ -42,7 +42,7 @@ solver = nlpsol('solver', 'ipopt', nlp)
 sol = solver(lbx=-10, ubx=10)
 
 #! The solution is obviously 1:
-print sol['x']
+print(sol['x'])
 assert(abs(sol['x']-1)<1e-9)
 
 #! Constrained problem
@@ -66,8 +66,8 @@ sol = solver(lbx=-10, ubx=10, lbg=[0,2], ubg=[1,2])
 #$ Ipopt will recognise this situation as an equality constraint.
 
 #! The solution is obviously [2,0.5,0.5,1,1]:
-print sol['x']
-for (i,e) in zip(range(n),[2,0.5,0.5,1,1]):
+print(sol['x'])
+for (i,e) in zip(list(range(n)),[2,0.5,0.5,1,1]):
   assert(abs(sol['x'][i]-e)<1e-7)
 
 
@@ -87,12 +87,12 @@ solver = nlpsol('solver', 'ipopt', nlp)
 sol = solver(lbx=-10, ubx=10, p=a_)
 
 #! The solution is obviously a:
-print sol['x']
+print(sol['x'])
 assert(abs(sol['x']-a_)<1e-9)
 
 #! The parameter can change inbetween two solve calls:
 sol = solver(lbx=-10, ubx=10, p=2*a_)
 
 #! The solution is obviously 2*a:
-print sol['x']
+print(sol['x'])
 assert(abs(sol['x']-2*a_)<1e-9)

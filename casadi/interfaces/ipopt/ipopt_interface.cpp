@@ -55,7 +55,7 @@ namespace casadi {
     Nlpsol::registerPlugin(casadi_register_nlpsol_ipopt);
   }
 
-  IpoptInterface::IpoptInterface(const std::string& name, Oracle* nlp)
+  IpoptInterface::IpoptInterface(const std::string& name, const Function& nlp)
     : Nlpsol(name, nlp) {
   }
 
@@ -151,11 +151,20 @@ namespace casadi {
       } else if (op.first=="grad_f_options") {
         grad_f_options = op.second;
       } else if (op.first=="hess_lag") {
-        hess_l_fcn_ = op.second;
+        Function f = op.second;
+        casadi_assert(f.n_in()==4);
+        casadi_assert(f.n_out()==1);
+        set_function(f, "nlp_hess_l");
       } else if (op.first=="jac_g") {
-        jac_g_fcn_ = op.second;
+        Function f = op.second;
+        casadi_assert(f.n_in()==2);
+        casadi_assert(f.n_out()==2);
+        set_function(f, "nlp_jac_g");
       } else if (op.first=="grad_f") {
-        grad_f_fcn_ = op.second;
+        Function f = op.second;
+        casadi_assert(f.n_in()==2);
+        casadi_assert(f.n_out()==2);
+        set_function(f, "nlp_grad_f");
       }
     }
 
@@ -167,38 +176,25 @@ namespace casadi {
     }
 
     // Setup NLP functions
-    f_fcn_ = create_function("nlp_f", {"x", "p"}, {"f"});
-    g_fcn_ = create_function("nlp_g", {"x", "p"}, {"g"});
-    if (grad_f_fcn_.is_null()) {
-      grad_f_fcn_ = create_function("nlp_grad_f", {"x", "p"}, {"f", "grad_f_x"});
-    } else {
-      casadi_assert(grad_f_fcn_.n_in()==2);
-      casadi_assert(grad_f_fcn_.n_out()==2);
-      register_function(grad_f_fcn_);
+    create_function("nlp_f", {"x", "p"}, {"f"});
+    create_function("nlp_g", {"x", "p"}, {"g"});
+    if (!has_function("nlp_grad_f")) {
+      create_function("nlp_grad_f", {"x", "p"}, {"f", "grad:f:x"});
     }
-    if (jac_g_fcn_.is_null()) {
-      jac_g_fcn_ = create_function("nlp_jac_g", {"x", "p"}, {"g", "jac_g_x"});
-    } else {
-      casadi_assert(jac_g_fcn_.n_in()==2);
-      casadi_assert(jac_g_fcn_.n_out()==2);
-      register_function(jac_g_fcn_);
+    if (!has_function("nlp_jac_g")) {
+      create_function("nlp_jac_g", {"x", "p"}, {"g", "jac:g:x"});
     }
-    jacg_sp_ = jac_g_fcn_.sparsity_out(1);
+    jacg_sp_ = get_function("nlp_jac_g").sparsity_out(1);
 
     // Allocate temporary work vectors
     if (exact_hessian_) {
-      if (hess_l_fcn_.is_null()) {
-        hess_l_fcn_ =
-          create_function("nlp_hess_l", {"x", "p", "lam_f", "lam_g"},
-                          {"hess_gamma_x_x"}, {{"gamma", {"f", "g"}}});
-      } else {
-        casadi_assert(hess_l_fcn_.n_in()==4);
-        casadi_assert(hess_l_fcn_.n_out()==1);
-        register_function(hess_l_fcn_);
+      if (!has_function("nlp_hess_l")) {
+        create_function("nlp_hess_l", {"x", "p", "lam:f", "lam:g"},
+                        {"hess:gamma:x:x"}, {{"gamma", {"f", "g"}}});
       }
-      hesslag_sp_ = hess_l_fcn_.sparsity_out(0);
+      hesslag_sp_ = get_function("nlp_hess_l").sparsity_out(0);
     } else if (pass_nonlinear_variables_) {
-      nl_ex_ = nl_var("x", {"f", "g"});
+      nl_ex_ = oracle_.nl_var("x", {"f", "g"});
     }
 
     // Allocate work vectors
@@ -358,17 +354,15 @@ namespace casadi {
     checkInputs(mem);
 
     // Reset statistics
-    if (gather_stats_) {
-      m->inf_pr.clear();
-      m->inf_du.clear();
-      m->mu.clear();
-      m->d_norm.clear();
-      m->regularization_size.clear();
-      m->alpha_pr.clear();
-      m->alpha_du.clear();
-      m->obj.clear();
-      m->ls_trials.clear();
-    }
+    m->inf_pr.clear();
+    m->inf_du.clear();
+    m->mu.clear();
+    m->d_norm.clear();
+    m->regularization_size.clear();
+    m->alpha_pr.clear();
+    m->alpha_du.clear();
+    m->obj.clear();
+    m->ls_trials.clear();
 
     // Reset number of iterations
     m->n_iter = 0;
@@ -409,17 +403,15 @@ namespace casadi {
     m->n_iter += 1;
     try {
       log("intermediate_callback started");
-      if (gather_stats_) {
-        m->inf_pr.push_back(inf_pr);
-        m->inf_du.push_back(inf_du);
-        m->mu.push_back(mu);
-        m->d_norm.push_back(d_norm);
-        m->regularization_size.push_back(regularization_size);
-        m->alpha_pr.push_back(alpha_pr);
-        m->alpha_du.push_back(alpha_du);
-        m->ls_trials.push_back(ls_trials);
-        m->obj.push_back(obj_value);
-      }
+      m->inf_pr.push_back(inf_pr);
+      m->inf_du.push_back(inf_du);
+      m->mu.push_back(mu);
+      m->d_norm.push_back(d_norm);
+      m->regularization_size.push_back(regularization_size);
+      m->alpha_pr.push_back(alpha_pr);
+      m->alpha_du.push_back(alpha_du);
+      m->ls_trials.push_back(ls_trials);
+      m->obj.push_back(obj_value);
       if (!fcallback_.is_null()) {
         m->fstats.at("callback_fun").tic();
         if (full_callback) {

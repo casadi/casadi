@@ -47,7 +47,7 @@ namespace casadi {
     Nlpsol::registerPlugin(casadi_register_nlpsol_knitro);
   }
 
-  KnitroInterface::KnitroInterface(const std::string& name, Oracle* nlp)
+  KnitroInterface::KnitroInterface(const std::string& name, const Function& nlp)
     : Nlpsol(name, nlp) {
   }
 
@@ -89,10 +89,10 @@ namespace casadi {
 
     // Setup NLP functions
     fg_fcn_ = create_function("nlp_fg", {"x", "p"}, {"f", "g"});
-    gf_jg_fcn_ = create_function("nlp_gf_jg", {"x", "p"}, {"grad_f_x", "jac_g_x"});
+    gf_jg_fcn_ = create_function("nlp_gf_jg", {"x", "p"}, {"grad:f:x", "jac:g:x"});
     jacg_sp_ = gf_jg_fcn_.sparsity_out(1);
-    hess_l_fcn_ = create_function("nlp_jac_f", {"x", "p", "lam_f", "lam_g"},
-                                  {"hess_gamma_x_x"},
+    hess_l_fcn_ = create_function("nlp_hess_l", {"x", "p", "lam:f", "lam:g"},
+                                  {"hess:gamma:x:x"},
                                   {{"gamma", {"f", "g"}}});
     hesslag_sp_ = hess_l_fcn_.sparsity_out(0);
 
@@ -110,7 +110,7 @@ namespace casadi {
 
     // Commented out since I have not found out how to change the bounds
     // Allocate KNITRO memory block
-    /*  m.kc_handle = KTR_new(); */
+    /*  m.kc = KTR_new(); */
   }
 
   void KnitroInterface::set_work(void* mem, const double**& arg, double**& res,
@@ -132,9 +132,9 @@ namespace casadi {
     auto m = static_cast<KnitroMemory*>(mem);
 
     // Allocate KNITRO memory block (move back to init!)
-    casadi_assert(m->kc_handle==0);
-    m->kc_handle = KTR_new();
-    casadi_assert(m->kc_handle!=0);
+    casadi_assert(m->kc==0);
+    m->kc = KTR_new();
+    casadi_assert(m->kc!=0);
     int status;
 
     // Jacobian sparsity
@@ -150,10 +150,10 @@ namespace casadi {
     if (nnzH>0) {
       Hcol = hesslag_sp_.get_col();
       Hrow = hesslag_sp_.get_row();
-      status = KTR_set_int_param_by_name(m->kc_handle, "hessopt", KTR_HESSOPT_EXACT);
+      status = KTR_set_int_param_by_name(m->kc, "hessopt", KTR_HESSOPT_EXACT);
       casadi_assert_message(status==0, "KTR_set_int_param failed");
     } else {
-      status = KTR_set_int_param_by_name(m->kc_handle, "hessopt", KTR_HESSOPT_LBFGS);
+      status = KTR_set_int_param_by_name(m->kc, "hessopt", KTR_HESSOPT_LBFGS);
       casadi_assert_message(status==0, "KTR_set_int_param failed");
     }
 
@@ -161,20 +161,20 @@ namespace casadi {
     for (auto&& op : opts_) {
       // Try double
       if (op.second.can_cast_to(OT_DOUBLE)) {
-        status = KTR_set_double_param_by_name(m->kc_handle, op.first.c_str(), op.second);
+        status = KTR_set_double_param_by_name(m->kc, op.first.c_str(), op.second);
         if (status==0) continue;
       }
 
       // Try integer
       if (op.second.can_cast_to(OT_INT)) {
-        status = KTR_set_int_param_by_name(m->kc_handle, op.first.c_str(), op.second);
+        status = KTR_set_int_param_by_name(m->kc, op.first.c_str(), op.second);
         if (status==0) continue;
       }
 
       // try string
       if (op.second.can_cast_to(OT_STRING)) {
         string str = op.second.to_string();
-        status = KTR_set_char_param_by_name(m->kc_handle, op.first.c_str(), str.c_str());
+        status = KTR_set_char_param_by_name(m->kc, op.first.c_str(), str.c_str());
         if (status==0) continue;
       }
 
@@ -193,22 +193,46 @@ namespace casadi {
     for (int i=0; i<ng_; ++i) if (isinf(m->wlbg[i])) m->wlbg[i] = -KTR_INFBOUND;
     for (int i=0; i<ng_; ++i) if (isinf(m->wubg[i])) m->wubg[i] =  KTR_INFBOUND;
 
-    // Initialize KNITRO
-    status = KTR_init_problem(m->kc_handle, nx_, KTR_OBJGOAL_MINIMIZE,
-                              KTR_OBJTYPE_GENERAL, m->wlbx, m->wubx, ng_, get_ptr(contype_),
-                              m->wlbg, m->wubg, Jcol.size(), get_ptr(Jcol), get_ptr(Jrow),
-                              nnzH, get_ptr(Hrow), get_ptr(Hcol), m->wx, 0); // initial lambda
-    casadi_assert_message(status==0, "KTR_init_problem failed");
+    if (mi_) {
+      // Convexity status of the objective function
+      const int objFnType = KTR_FNTYPE_UNCERTAIN;
+
+      // Types of variables
+      vector<int> vtype;
+      vtype.reserve(nx_);
+      for (auto&& e : discrete_) {
+        vtype.push_back(e ? KTR_VARTYPE_INTEGER : KTR_VARTYPE_CONTINUOUS);
+      }
+
+      // Convexity status of the constraint functions
+      vector<int> ftype(ng_, KTR_FNTYPE_UNCERTAIN);
+
+      // Intialize
+      status =
+      KTR_mip_init_problem(m->kc, nx_, KTR_OBJGOAL_MINIMIZE, KTR_OBJTYPE_GENERAL,
+                           objFnType, get_ptr(vtype), m->wlbx, m->wubx,
+                           ng_, get_ptr(contype_), get_ptr(ftype),
+                           m->wlbg, m->wubg, Jcol.size(), get_ptr(Jcol), get_ptr(Jrow),
+                           nnzH, get_ptr(Hrow), get_ptr(Hcol), m->wx, 0);
+      casadi_assert_message(status==0, "KTR_mip_init_problem failed");
+    } else {
+      status =
+      KTR_init_problem(m->kc, nx_, KTR_OBJGOAL_MINIMIZE, KTR_OBJTYPE_GENERAL,
+                       m->wlbx, m->wubx, ng_, get_ptr(contype_),
+                       m->wlbg, m->wubg, Jcol.size(), get_ptr(Jcol), get_ptr(Jrow),
+                       nnzH, get_ptr(Hrow), get_ptr(Hcol), m->wx, 0); // initial lambda
+      casadi_assert_message(status==0, "KTR_init_problem failed");
+    }
 
     // Register callback functions
-    status = KTR_set_func_callback(m->kc_handle, &callback);
+    status = KTR_set_func_callback(m->kc, &callback);
     casadi_assert_message(status==0, "KTR_set_func_callback failed");
 
-    status = KTR_set_grad_callback(m->kc_handle, &callback);
+    status = KTR_set_grad_callback(m->kc, &callback);
     casadi_assert_message(status==0, "KTR_set_grad_callbackfailed");
 
     if (nnzH>0) {
-      status = KTR_set_hess_callback(m->kc_handle, &callback);
+      status = KTR_set_hess_callback(m->kc, &callback);
       casadi_assert_message(status==0, "KTR_set_hess_callbackfailed");
     }
 
@@ -217,8 +241,16 @@ namespace casadi {
 
     // Solve NLP
     double f;
-    status = KTR_solve(m->kc_handle, m->wx, get_ptr(lambda), 0, &f,
-                       0, 0, 0, 0, 0, static_cast<void*>(&m));
+    if (mi_) {
+      status =
+      KTR_mip_solve(m->kc, m->wx, get_ptr(lambda), 0, &f,
+                    0, 0, 0, 0, 0, static_cast<void*>(m));
+
+    } else {
+      status =
+      KTR_solve(m->kc, m->wx, get_ptr(lambda), 0, &f,
+                0, 0, 0, 0, 0, static_cast<void*>(m));
+    }
     m->return_status = return_codes(status);
 
     // Output primal solution
@@ -232,11 +264,17 @@ namespace casadi {
     if (m->f) *m->f = f;
 
     // Calculate constraints
-    if (m->g) calc_function(m, fg_fcn_, {m->wx, m->p}, {0, m->g});
+    if (m->g) {
+      m->arg[0] = m->wx;
+      m->arg[1] = m->p;
+      m->res[0] = 0;
+      m->res[1] = m->g;
+      calc_function(m, "nlp_fg");
+    }
 
     // Free memory (move to destructor!)
-    KTR_free(&m->kc_handle);
-    m->kc_handle = 0;
+    KTR_free(&m->kc);
+    m->kc = 0;
   }
 
   int KnitroInterface::callback(const int evalRequestCode, const int n, const int m, const int nnzJ,
@@ -251,15 +289,28 @@ namespace casadi {
       // Direct to the correct function
       switch (evalRequestCode) {
       case KTR_RC_EVALFC:
-        m->self.calc_function(m, m->self.fg_fcn_, {x, m->p}, {obj, c});
-        break;
+      m->arg[0] = x;
+      m->arg[1] = m->p;
+      m->res[0] = obj;
+      m->res[1] = c;
+      m->self.calc_function(m, "nlp_fg");
+      break;
       case KTR_RC_EVALGA:
-        m->self.calc_function(m, m->self.gf_jg_fcn_, {x, m->p}, {objGrad, jac});
-        break;
+      m->arg[0] = x;
+      m->arg[1] = m->p;
+      m->res[0] = objGrad;
+      m->res[1] = jac;
+      m->self.calc_function(m, "nlp_gf_jg");
+      break;
       case KTR_RC_EVALH:
         {
           double sigma = 1.;
-          if (m->self.calc_function(m, m->self.hess_l_fcn_, {x, m->p, &sigma, lambda}, {hessian})) {
+          m->arg[0] = x;
+          m->arg[1] = m->p;
+          m->arg[2] = &sigma;
+          m->arg[3] = lambda;
+          m->res[0] = hessian;
+          if (m->self.calc_function(m, "nlp_hess_l")) {
             casadi_error("calc_hess_l failed");
           }
         }
@@ -334,13 +385,13 @@ namespace casadi {
   }
 
   KnitroMemory::KnitroMemory(const KnitroInterface& self) : self(self) {
-    this->kc_handle = 0;
+    this->kc = 0;
   }
 
   KnitroMemory::~KnitroMemory() {
     // Currently no persistent memory since KNITRO requires knowledge of nature of bounds
-    // if (this->kc_handle) {
-    //   KTR_free(&this->kc_handle);
+    // if (this->kc) {
+    //   KTR_free(&this->kc);
     // }
   }
 

@@ -82,14 +82,22 @@
     // Flush the command window buffer (needed in gui mode)
     static void mexflush(bool error) {
       mexEvalString("drawnow('update');");
+      mexEvalString("pause(0.0001);");
     }
 
+#ifdef HAVE_OCTAVE
+    // Never for Octave
+    static bool mexcheckinterrupted() {
+      return false;
+    }
+#else
     // Undocumented matlab feature
     extern "C" bool utIsInterruptPending();
 
     static bool mexcheckinterrupted() {
       return utIsInterruptPending();
     }
+#endif
   }
 %}
 %init %{
@@ -258,6 +266,9 @@ namespace std {
 %include "stl.i"
 #endif // SWIGXML
 
+// Note: Only from 3.0.0 onwards,
+// DirectorException inherits from std::exception
+#if SWIG_VERSION >= 0x030000
 // Exceptions handling
 %include "exception.i"
 %exception {
@@ -265,7 +276,7 @@ namespace std {
     $action
    } catch(const std::exception& e) {
     SWIG_exception(SWIG_RuntimeError, e.what());
-  }
+   }
 }
 
 // Python sometimes takes an approach to not check, but just try.
@@ -278,8 +289,17 @@ namespace std {
   }
 }
 
+#ifdef WITH_PYTHON3
 // See https://github.com/casadi/casadi/issues/701
 // Recent numpys will only catch TypeError or ValueError in printing logic
+%exception __bool__ {
+ try {
+    $action
+  } catch (const std::exception& e) {
+   SWIG_exception(SWIG_TypeError, e.what());
+  }
+}
+#else
 %exception __nonzero__ {
  try {
     $action
@@ -287,14 +307,75 @@ namespace std {
    SWIG_exception(SWIG_TypeError, e.what());
   }
 }
+#endif
+#else
+// Exceptions handling
+%include "exception.i"
+%exception {
+  try {
+    $action
+   } catch(const std::exception& e) {
+    SWIG_exception(SWIG_RuntimeError, e.what());
+   } catch (const Swig::DirectorException& e) {
+    SWIG_exception(SWIG_TypeError, e.getMessage());
+   }
+}
+
+// Python sometimes takes an approach to not check, but just try.
+// It expects a python error to be thrown.
+%exception __int__ {
+  try {
+    $action
+  } catch (const std::exception& e) {
+    SWIG_exception(SWIG_RuntimeError, e.what());
+  } catch (const Swig::DirectorException& e) {
+    SWIG_exception(SWIG_TypeError, e.getMessage());
+  }
+}
+
+#ifdef WITH_PYTHON3
+// See https://github.com/casadi/casadi/issues/701
+// Recent numpys will only catch TypeError or ValueError in printing logic
+%exception __bool__ {
+ try {
+    $action
+  } catch (const std::exception& e) {
+   SWIG_exception(SWIG_TypeError, e.what());
+  } catch (const Swig::DirectorException& e) {
+    SWIG_exception(SWIG_TypeError, e.getMessage());
+  }
+}
+#else
+%exception __nonzero__ {
+ try {
+    $action
+  } catch (const std::exception& e) {
+   SWIG_exception(SWIG_TypeError, e.what());
+  }
+  catch (const Swig::DirectorException& e) {
+    SWIG_exception(SWIG_TypeError, e.getMessage());
+  }
+}
+#endif
+#endif
 
 #ifdef SWIGPYTHON
 %feature("director:except") {
 	if ($error != NULL) {
+	  std::string msg;
     SWIG_PYTHON_THREAD_BEGIN_BLOCK;
+    PyObject *ptype, *pvalue, *ptraceback;
+    PyErr_Fetch(&ptype, &pvalue, &ptraceback);
+    PyObject* msg_py = PyObject_Str(pvalue);
+    char *msg_char = SWIG_Python_str_AsChar(msg_py);
+    msg = msg_char;
+    SWIG_Python_str_DelForPy3(msg_char);
+    Py_DECREF(msg_py);
+    PyErr_Restore(ptype, pvalue, ptraceback);
     PyErr_Print();
     SWIG_PYTHON_THREAD_END_BLOCK;
-		throw Swig::DirectorMethodException();
+
+		Swig::DirectorMethodException::raise(msg.c_str());
 	}
 }
 #endif //SWIGPYTHON
@@ -325,7 +406,7 @@ import_array();
     bool is_null(GUESTOBJECT *p);
 
     /* Typemaps from CasADi types to types in the interfaced language:
-     * 
+     *
      * to_ptr: Converts a pointer in interfaced language to C++:
      *   Input: GUESTOBJECT pointer p
      *   Output: Pointer to pointer: At input, pointer to pointer to temporary
@@ -720,6 +801,18 @@ import_array();
           return true;
         }
       }
+
+      if (mxIsLogical(p) && !mxIsLogicalScalar(p) &&mxGetNumberOfDimensions(p)==2
+          && (mxGetM(p)<=1 || mxGetN(p)<=1) ) {
+        int n = mxGetM(p)*mxGetN(p);
+        mxLogical* data = static_cast<mxLogical*>(mxGetData(p));
+        if (m) {
+          (**m).resize(n);
+          std::copy(data, data+n, (**m).begin());
+        }
+        return true;
+      }
+
       return false;
     }
 
@@ -1051,9 +1144,11 @@ import_array();
       }
 
 #ifdef SWIGPYTHON
-      if (PyString_Check(p)) {
+      if (PyString_Check(p) || PyUnicode_Check(p)) {
         if (m) (*m)->clear();
-        if (m) (*m)->append(PyString_AsString(p));
+        char* my_char = SWIG_Python_str_AsChar(p);
+        if (m) (*m)->append(my_char);
+        SWIG_Python_str_DelForPy3(my_char);
         return true;
       }
 #endif // SWIGPYTHON
@@ -1098,6 +1193,7 @@ import_array();
       }
 
 #ifdef SWIGPYTHON
+
       // Python int
       if (PyInt_Check(p)) {
         if (m) {
@@ -1111,9 +1207,9 @@ import_array();
       if (PySlice_Check(p)) {
         PySliceObject *r = (PySliceObject*)(p);
         if (m) {
-          (**m).start = (r->start == Py_None || PyInt_AsLong(r->start) < std::numeric_limits<int>::min())
+          (**m).start = (r->start == Py_None || PyNumber_AsSsize_t(r->start, NULL) <= std::numeric_limits<int>::min())
             ? std::numeric_limits<int>::min() : PyInt_AsLong(r->start);
-          (**m).stop  = (r->stop ==Py_None || PyInt_AsLong(r->stop)> std::numeric_limits<int>::max())
+          (**m).stop  = (r->stop ==Py_None || PyNumber_AsSsize_t(r->stop, NULL)>= std::numeric_limits<int>::max())
             ? std::numeric_limits<int>::max() : PyInt_AsLong(r->stop);
           if(r->step !=Py_None) (**m).step  = PyInt_AsLong(r->step);
         }
@@ -1140,9 +1236,11 @@ import_array();
         PyObject *key, *value;
         Py_ssize_t pos = 0;
         while (PyDict_Next(p, &pos, &key, &value)) {
-          if (!PyString_Check(key)) return false;
+          if (!(PyString_Check(key) || PyUnicode_Check(key))) return false;
           if (m) {
-            M *v=&(**m)[std::string(PyString_AsString(key))], *v2=v;
+            char* c_key = SWIG_Python_str_AsChar(key);
+            M *v=&(**m)[std::string(c_key)], *v2=v;
+            SWIG_Python_str_DelForPy3(c_key);
             if (!casadi::to_ptr(value, &v)) return false;
             if (v!=v2) *v2=*v; // if only pointer changed
           } else {
@@ -1413,6 +1511,7 @@ import_array();
       {
         SX tmp, *mt=&tmp;
         if(casadi::to_ptr(p, m ? &mt : 0)) {
+          if (m && !mt->is_scalar()) return false;
           if (m) **m = mt->scalar();
           return true;
         }
@@ -1499,8 +1598,11 @@ import_array();
       PyObject * classo = PyObject_GetAttrString( p, "__class__");
       PyObject * classname = PyObject_GetAttrString( classo, "__name__");
 
-      bool ret = strcmp(PyString_AsString(classname),name)==0;
+      char* c_classname = SWIG_Python_str_AsChar(classname);
+      bool ret = strcmp(c_classname, name)==0;
+
       Py_DECREF(classo);Py_DECREF(classname);
+      SWIG_Python_str_DelForPy3(c_classname);
       return ret;
     }
 #endif // SWIGPYTHON
@@ -2182,6 +2284,9 @@ def veccat(*args): return _veccat(args)
 def vertcat(*args): return _vertcat(args)
 def horzcat(*args): return _horzcat(args)
 def diagcat(*args): return _diagcat(args)
+def vcat(args): return _vertcat(args)
+def hcat(args): return _horzcat(args)
+def dcat(args): return _diagcat(args)
 %}
 
 // Non-fatal errors (returning NotImplemented singleton)
@@ -2225,7 +2330,12 @@ if (!$1) {
 %rename(hash) __hash__;
 #endif // SWIGMATLAB
 
+#ifdef WITH_PYTHON3
+%rename(__bool__) __nonzero__;
+#endif
+
 #ifdef SWIGPYTHON
+
 %pythoncode %{
 class NZproxy:
   def __init__(self,matrix):
@@ -3183,14 +3293,26 @@ namespace casadi{
 
 %}
 
+
+#ifdef WITH_PYTHON3
+%pythoncode %{
+  def __bool__(self):
+    if self.numel()!=1:
+      raise Exception("Only a scalar can be cast to a float")
+    if self.nnz()==0:
+      return False
+    return float(self)!=0
+%}
+#else
 %pythoncode %{
   def __nonzero__(self):
     if self.numel()!=1:
       raise Exception("Only a scalar can be cast to a float")
     if self.nnz()==0:
-      return 0
+      return False
     return float(self)!=0
 %}
+#endif
 
 %pythoncode %{
   def __abs__(self):
@@ -3391,6 +3513,59 @@ namespace casadi{
 
 #ifdef SWIGMATLAB
 namespace casadi{
+%extend GenericMatrixCommon {
+  %matlabcode %{
+    function out = sum(self,varargin)
+      if length(varargin)==0
+        if isvector(self)
+          if iscolumn(self)
+            out = sum1(self);
+          else
+            out = sum2(self);
+          end
+        else
+          out = sum1(self);
+        end
+      elseif length(varargin)==1
+        i = varargin{1};
+        if i==1
+          out = sum1(self);
+        elseif i==2
+          out = sum2(self);
+        else
+          error('sum argument (if present) must be 1 or 2');
+        end
+      else
+        error('sum can have at most 1 argument');
+      end
+    end
+    function out = norm(self,varargin)
+
+      if length(varargin)==0
+        out = norm_2(self);
+      elseif length(varargin)==1
+        i = varargin{1};
+        if i==1
+          out = norm_1(self);
+        elseif i==2
+          out = norm_2(self);
+        elseif i==inf | i=='inf'
+          out = norm_inf(self);
+        elseif i=='fro'
+          out = norm_F(self);
+          return
+        else
+          error('norm argument (if present) must be 1, 2 or inf or fro');
+        end
+      else
+        error('norm can have at most 1 argument');
+      end
+      if ~isvector(self)
+        error('only norms of vectors defined for now. You may try norm_1 norm_2 norm_inf norm_F.');
+      end
+    end
+  %}
+}
 %extend Function {
   %matlabcode %{
     function varargout = paren(self, varargin)
@@ -3414,6 +3589,14 @@ namespace casadi{
         end
       end
     end
+    function out = full(self)
+      % Wrap this function in a Matlab function that applies 'full' on each output
+      out = @(varargin) subsref(cellfun(@(m) full(m),self.call([varargin num2cell(zeros(1,self.n_in()-length(varargin)))]),'UniformOutput',false),struct('type','{}','subs',{{':'}}));
+    end
+    function out = sparse(self)
+      % Wrap this function in a Matlab function that applies 'sparse' on each output
+      out = @(varargin) subsref(cellfun(@(m) sparse(m),self.call([varargin num2cell(zeros(1,self.n_in()-length(varargin)))]),'UniformOutput',false),struct('type','{}','subs',{{':'}}));
+    end
   %}
  }
 }
@@ -3421,10 +3604,11 @@ namespace casadi{
 %include <casadi/core/function/external.hpp>
 %include <casadi/core/function/jit.hpp>
 %include <casadi/core/function/integrator.hpp>
-%include <casadi/core/function/qpsol.hpp>
+%include <casadi/core/function/conic.hpp>
 %include <casadi/core/function/nlpsol.hpp>
 %include <casadi/core/function/rootfinder.hpp>
 %include <casadi/core/function/linsol.hpp>
+%include <casadi/core/function/interpolant.hpp>
 
 %feature("copyctor", "0") casadi::CodeGenerator;
 %include <casadi/core/function/code_generator.hpp>
@@ -3471,6 +3655,16 @@ namespace casadi {
 
 // Wrap the casadi_ prefixed functions in member functions
 #ifdef SWIGPYTHON
+#ifdef WITH_PYTHON3
+namespace casadi {
+  %extend GenericExpressionCommon {
+    %pythoncode %{
+      def __hash__(self): return SharedObject.__hash__(self)
+    %}
+  }
+}
+%rename(__hash__) element_hash;
+#endif
 namespace casadi {
   %extend GenericExpressionCommon {
     %pythoncode %{
@@ -3557,7 +3751,7 @@ namespace casadi {
 
 %feature("director") casadi::Callback;
 
-%include <casadi/core/function/compiler.hpp>
+%include <casadi/core/function/importer.hpp>
 %include <casadi/core/function/callback.hpp>
 %include <casadi/core/global_options.hpp>
 %include <casadi/core/casadi_meta.hpp>
@@ -3567,61 +3761,90 @@ namespace casadi {
 %include <casadi/core/misc/dae_builder.hpp>
 %include <casadi/core/misc/xml_file.hpp>
 #ifdef SWIGPYTHON
+
+#ifdef WITH_PYTHON3
 %pythoncode %{
-
-
-def swig_typename_convertor_cpp2python(s):
+def swig_monkeypatch(v,cl=True):
   import re
-  s = s.replace("C/C++ prototypes","Python usages")
-  s = s.replace("casadi::","")
-  s = s.replace("MXDict","str:MX")
-  s = s.replace("SXDict","str:SX")
-  s = s.replace("std::string","str")
-  s = s.replace(" const &","")
-  s = s.replace("casadi_","")
-  s = re.sub(r"\b((\w+)(< \w+ >)?)::\2\b",r"\1",s)
-  s = re.sub("(const )?Matrix< ?SXElem *>( &)?",r"SX",s)
-  s = re.sub("(const )?GenericMatrix< ?(\w+) *>( ?&)?",r"\2 ",s)
-  s = re.sub("(const )?Matrix< ?int *>( ?&)?",r"IM ",s)
-  s = re.sub("(const )?Matrix< ?double *>( ?&)?",r"DM ",s)
-  s = re.sub("(const )?Matrix< ?(\w+) *>( ?&)?",r"array(\2) ",s)
-  s = re.sub("(const )?GenericMatrix< ?([\w\(\)]+) *>( ?&)?",r"\2 ",s)
-  s = re.sub(r"const (\w+) &",r"\1 ",s)
-  s = re.sub(r"< [\w\(\)]+ +>\(",r"(",s)
-  for i in range(5):
-    s = re.sub(r"(const )? ?std::pair< ?([\w\(\)\]\[: ]+?) ?, ?([\w\(\)\]\[: ]+?) ?> ?&?",r"(\2,\3) ",s)
-    s = re.sub(r"(const )? ?std::vector< ?([\w\(\)\[\] ]+) ?(, ?std::allocator< ?\2 ?>)? ?> ?&?",r"[\2] ",s)
-  s = re.sub(r"\b(\w+)(< \w+ >)?::\1",r"\1",s)
-  s = s.replace("casadi::","")
-  s = s.replace("::",".")
-  s = s.replace(".operator ()","")
-  s = re.sub(r"([A-Z]\w+)Vector",r"[\1]",s)
-  return s
+  if hasattr(v,"__monkeypatched__"):
+    return v
+  def foo(*args,**kwargs):
+    try:
+      return v(*args,**kwargs)
+    except NotImplementedError as e:
+      import sys
+      exc_info = sys.exc_info()
+      if e.args[0].startswith("Wrong number or type of arguments for overloaded function"):
 
-def swig_typename_convertor_python2cpp(a):
-  try:
-    import numpy as np
-  except:
-    class NoExist:
-      pass
-    class Temp(object):
-      ndarray = NoExist
-    np = Temp()
-  if isinstance(a,list):
-    if len(a)>0:
-      return "[%s]" % "|".join(set([swig_typename_convertor_python2cpp(i) for i in a]))
-    else:
-      return "[]"
-  elif isinstance(a,tuple):
-    return "(%s)" % ",".join([swig_typename_convertor_python2cpp(i) for i in a])
-  elif isinstance(a,np.ndarray):
-    return "np.array(%s)" % ",".join(set([swig_typename_convertor_python2cpp(i) for i in np.array(a).flatten().tolist()]))
-  elif isinstance(a,dict):
-    return "|".join(set([swig_typename_convertor_python2cpp(i) for i in a.keys()])) +":"+ "|".join(set([swig_typename_convertor_python2cpp(i) for i in a.values()]))
+        s = e.args[0]
+        s = s.replace("'new_","'")
+        #s = re.sub(r"overloaded function '(\w+?)_(\w+)'",r"overloaded function '\1.\2'",s)
+        m = re.search("overloaded function '([\w\.]+)'",s)
+        if m:
+          name = m.group(1)
+          name = name.replace(".__call__","")
+        else:
+          name = "method"
+        ne = NotImplementedError(swig_typename_convertor_cpp2python(s)+"You have: %s(%s)\n" % (name,", ".join([swig_typename_convertor_python2cpp(i) for i in (args[1:] if cl else args)]+ ["%s=%s" % (k,swig_typename_convertor_python2cpp(vv)) for k,vv in kwargs.items()])))
+        raise ne.with_traceback(exc_info[2].tb_next)
+      else:
+        raise exc_info[1].with_traceback(exc_info[2].tb_next)
+    except TypeError as e:
+      import sys
+      exc_info = sys.exc_info()
 
-  return type(a).__name__
+      methodname = "method"
+      try:
+        methodname = exc_info[2].tb_next.tb_frame.f_code.co_name
+      except:
+        pass
 
-
+      if e.args[0].startswith("in method '"):
+        s = e.args[0]
+        s = re.sub(r"method '(\w+?)_(\w+)'",r"method '\1.\2'",s)
+        m = re.search("method '([\w\.]+)'",s)
+        if m:
+          name = m.group(1)
+          name = name.replace(".__call__","")
+        else:
+          name = "method"
+        ne = TypeError(swig_typename_convertor_cpp2python(s)+" expected.\nYou have: %s(%s)\n" % (name,", ".join([swig_typename_convertor_python2cpp(i) for i in (args[1:] if cl else args)])))
+        raise ne.with_traceback(exc_info[2].tb_next)
+      elif e.args[0].startswith("Expecting one of"):
+        s = e.args[0]
+        conversion = {"mul": "*", "div": "/", "add": "+", "sub": "-","le":"<=","ge":">=","lt":"<","gt":">","eq":"==","pow":"**"}
+        if methodname.startswith("__") and methodname[2:-2] in conversion:
+          ne = TypeError(swig_typename_convertor_cpp2python(s)+"\nYou try to do: %s %s %s.\n" % (  swig_typename_convertor_python2cpp(args[0]),conversion[methodname[2:-2]] ,swig_typename_convertor_python2cpp(args[1]) ))
+        elif methodname.startswith("__r") and methodname[3:-2] in conversion:
+          ne = TypeError(swig_typename_convertor_cpp2python(s)+"\nYou try to do: %s %s %s.\n" % ( swig_typename_convertor_python2cpp(args[1]),  conversion[methodname[3:-2]], swig_typename_convertor_python2cpp(args[0]) ))
+        else:
+          ne = TypeError(swig_typename_convertor_cpp2python(s)+"\nYou have: (%s)\n" % (", ".join([swig_typename_convertor_python2cpp(i) for i in (args[1:] if cl else args)])))
+        raise ne.with_traceback(exc_info[2].tb_next)
+      else:
+        s = e.args[0]
+        ne = TypeError(s+"\nYou have: (%s)\n" % (", ".join([swig_typename_convertor_python2cpp(i) for i in (args[1:] if cl else args)] + ["%s=%s" % (k,swig_typename_convertor_python2cpp(vv)) for k,vv in kwargs.items()]  )))
+        raise ne.with_traceback(exc_info[2].tb_next)
+    except AttributeError as e:
+      import sys
+      exc_info = sys.exc_info()
+      if e.args[0]=="type object 'object' has no attribute '__getattr__'":
+        # swig 3.0 bug
+        ne = AttributeError("Unkown attribute: %s has no attribute '%s'." % (str(args[1]),args[2]))
+        raise ne.with_traceback(exc_info[2].tb_next)
+      else:
+        raise exc_info[1].with_traceback(exc_info[2].tb_next)
+    except Exception as e:
+      import sys
+      exc_info = sys.exc_info()
+      raise exc_info[1].with_traceback(exc_info[2].tb_next)
+  if v.__doc__ is not None:
+    foo.__doc__ = swig_typename_convertor_cpp2python(v.__doc__)
+  foo.__name__ = v.__name__
+  foo.__monkeypatched__ = True
+  return foo
+%}
+#else
+%pythoncode %{
 def swig_monkeypatch(v,cl=True):
   import re
   if hasattr(v,"__monkeypatched__"):
@@ -3702,10 +3925,79 @@ def swig_monkeypatch(v,cl=True):
   foo.__monkeypatched__ = True
   return foo
 
-import inspect
+%}
+#endif
 
-for name,cl in locals().items():
+
+%pythoncode %{
+
+import sys
+def swig_typename_convertor_cpp2python(s):
+  import re
+  s = s.replace("C/C++ prototypes","Python usages")
+  s = s.replace("casadi::","")
+  s = s.replace("MXDict","str:MX")
+  s = s.replace("SXDict","str:SX")
+  s = s.replace("std::string","str")
+  s = s.replace(" const &","")
+  s = s.replace("casadi_","")
+  s = re.sub(r"\b((\w+)(< \w+ >)?)::\2\b",r"\1",s)
+  s = re.sub("(const )?Matrix< ?SXElem *>( &)?",r"SX",s)
+  s = re.sub("(const )?GenericMatrix< ?(\w+) *>( ?&)?",r"\2 ",s)
+  s = re.sub("(const )?Matrix< ?int *>( ?&)?",r"IM ",s)
+  s = re.sub("(const )?Matrix< ?double *>( ?&)?",r"DM ",s)
+  s = re.sub("(const )?Matrix< ?(\w+) *>( ?&)?",r"array(\2) ",s)
+  s = re.sub("(const )?GenericMatrix< ?([\w\(\)]+) *>( ?&)?",r"\2 ",s)
+  s = re.sub(r"const (\w+) &",r"\1 ",s)
+  s = re.sub(r"< [\w\(\)]+ +>\(",r"(",s)
+  for i in range(5):
+    s = re.sub(r"(const )? ?std::pair< ?([\w\(\)\]\[: ]+?) ?, ?([\w\(\)\]\[: ]+?) ?> ?&?",r"(\2,\3) ",s)
+    s = re.sub(r"(const )? ?std::vector< ?([\w\(\)\[\] ]+) ?(, ?std::allocator< ?\2 ?>)? ?> ?&?",r"[\2] ",s)
+  s = re.sub(r"\b(\w+)(< \w+ >)?::\1",r"\1",s)
+  s = s.replace("casadi::","")
+  s = s.replace("::",".")
+  s = s.replace(".operator ()","")
+  s = re.sub(r"([A-Z]\w+)Vector",r"[\1]",s)
+  return s
+
+def swig_typename_convertor_python2cpp(a):
+  try:
+    import numpy as np
+  except:
+    class NoExist:
+      pass
+    class Temp(object):
+      ndarray = NoExist
+    np = Temp()
+  if isinstance(a,list):
+    if len(a)>0:
+      return "[%s]" % "|".join(set([swig_typename_convertor_python2cpp(i) for i in a]))
+    else:
+      return "[]"
+  elif isinstance(a,tuple):
+    return "(%s)" % ",".join([swig_typename_convertor_python2cpp(i) for i in a])
+  elif isinstance(a,np.ndarray):
+    return "np.array(%s)" % ",".join(set([swig_typename_convertor_python2cpp(i) for i in np.array(a).flatten().tolist()]))
+  elif isinstance(a,dict):
+    if len(a)>0:
+      return "|".join(set([swig_typename_convertor_python2cpp(i) for i in a.keys()])) +":"+ "|".join(set([swig_typename_convertor_python2cpp(i) for i in a.values()]))
+    else:
+      return "dict"
+  return type(a).__name__
+
+import inspect
+import copy
+
+locals_copy = copy.copy(locals())
+for name,cl in locals_copy.items():
   if not inspect.isclass(cl): continue
+
+if sys.version_info >= (3, 0):
+  for k,v in inspect.getmembers(cl, lambda x: inspect.ismethod(x) or inspect.isfunction(x)):
+    if k == "__del__" or v.__name__ == "<lambda>": continue
+    vv = v
+    setattr(cl,k,swig_monkeypatch(vv))
+else:
   for k,v in inspect.getmembers(cl, inspect.ismethod):
     if k == "__del__" or v.__name__ == "<lambda>": continue
     vv = v
@@ -3713,8 +4005,8 @@ for name,cl in locals().items():
   for k,v in inspect.getmembers(cl, inspect.isfunction):
     setattr(cl,k,staticmethod(swig_monkeypatch(v,cl=False)))
 
-
-for name,v in locals().items():
+locals_copy = copy.copy(locals())
+for name,v in locals_copy.items():
   if not inspect.isfunction(v): continue
   if name.startswith("swig") : continue
   p = swig_monkeypatch(v,cl=False)

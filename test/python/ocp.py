@@ -39,19 +39,19 @@ class OCPtests(casadiTestCase):
     s=1.0
     r=1.0
     x0=100
-    
+
     N=100
-    
+
     X=SX.sym("X",N+1)
     U=SX.sym("U",N)
-    
+
     V = vertcat(*[X,U])
-    
+
     cost = 0
     for i in range(N):
       cost = cost + s*X[i]**2+r*U[i]**2
     cost = cost + q*X[N]**2
-    
+
     nlp = {'x':V, 'f':cost, 'g':vertcat(*[X[0]-x0,X[1:,0]-(a*X[:N,0]+b*U)])}
     opts = {}
     opts["ipopt.tol"] = 1e-5
@@ -99,13 +99,13 @@ class OCPtests(casadiTestCase):
     var = MX.sym("var",2,1)
     par = MX.sym("par",1,1)
     parMX= par
-    
+
     q0   = vertcat(*[var[0],par])
     par  = var[1]
     qend = integrator(x0=q0, p=par)["xf"]
-    
+
     parc = MX(0)
-    
+
     f = Function('f', [var,parMX],[qend[0]])
     nlp = {'x':var, 'f':-f(var,parc)}
     opts = {}
@@ -121,7 +121,7 @@ class OCPtests(casadiTestCase):
     solver_out = solver(**solver_in)
     self.assertAlmostEqual(solver_out["x"][0],1,8,"X_opt")
     self.assertAlmostEqual(solver_out["x"][1],0.2,8,"X_opt")
-    
+
     self.assertAlmostEqual(fmax(solver_out["lam_x"],0)[0],1,8,"Cost should be linear in y0")
     self.assertAlmostEqual(fmax(solver_out["lam_x"],0)[1],(sqrt(p0)*(te*yc0**2-yc0+p0*te)*tan(arctan(yc0/sqrt(p0))+sqrt(p0)*te)+yc0**2)/(2*p0*yc0**2+2*p0**2),8,"Cost should be linear in y0")
     self.assertAlmostEqual(-solver_out["f"][0],(2*y0-log(yc0**2/p0+1))/2-log(cos(arctan(yc0/sqrt(p0))+sqrt(p0)*te)),7,"Cost")
@@ -153,13 +153,13 @@ class OCPtests(casadiTestCase):
 
     var = MX.sym("var",2,1)
     par = MX.sym("par",1,1)
-    
+
     q0   = vertcat(*[var[0],par])
     parl  = var[1]
     qend = integrator(x0=q0,p=parl)["xf"]
-    
+
     parc = MX(dy0)
-    
+
     f = Function('f', [var,par],[qend[0]])
     nlp = {'x':var, 'f':-f(var,parc), 'g':var[0]-var[1]}
     opts = {}
@@ -178,67 +178,67 @@ class OCPtests(casadiTestCase):
 
     self.assertAlmostEqual(solver_out["x"][0],0.2,6,"X_opt")
     self.assertAlmostEqual(solver_out["x"][1],0.2,6,"X_opt")
-    
+
     self.assertAlmostEqual(fmax(solver_out["lam_x"],0)[0],0,8,"Constraint is supposed to be unactive")
     dfdp0 = (sqrt(p0)*(te*yc0**2-yc0+p0*te)*tan(arctan(yc0/sqrt(p0))+sqrt(p0)*te)+yc0**2)/(2*p0*yc0**2+2*p0**2)
     self.assertAlmostEqual(fmax(solver_out["lam_x"],0)[1],1+dfdp0,8)
     self.assertAlmostEqual(solver_out["lam_g"][0],1,8)
     self.assertAlmostEqual(-solver_out["f"][0],(2*y0-log(yc0**2/p0+1))/2-log(cos(arctan(yc0/sqrt(p0))+sqrt(p0)*te)),7,"Cost")
     self.assertAlmostEqual(fmax(-solver_out["lam_x"],0)[0],0,8,"Constraint is supposed to be unactive")
-    self.assertAlmostEqual(fmax(-solver_out["lam_x"],0)[1],0,8,"Constraint is supposed to be unactive") 
-    
+    self.assertAlmostEqual(fmax(-solver_out["lam_x"],0)[1],0,8,"Constraint is supposed to be unactive")
+
   @requiresPlugin(XmlFile,"tinyxml")
   def test_XML(self):
     self.message("JModelica XML parsing")
     ivp = DaeBuilder()
     ivp.parse_fmi('data/cstr.xml')
-    
+
     # Separate differential and algebraic variables
     ivp.split_dae()
-    
+
     self.assertTrue(len(ivp.q)==0)
     self.assertTrue(len(ivp.y)==1)
     m = vertcat(*ivp.ydef)
     self.assertTrue(isinstance(m,MX))
-    self.assertEquals(str(m),'cost')
-    print dir(ivp)
-    self.assertEquals(len(ivp.dae),3)
-    print type(ivp.s)
-    self.assertEquals(len(ivp.s),3) # there are three states
+    self.assertEqual(str(m),'cost')
+    print(dir(ivp))
+    self.assertEqual(len(ivp.dae),3)
+    print(type(ivp.s))
+    self.assertEqual(len(ivp.s),3) # there are three states
     c = ivp("cstr.c")
     T = ivp("cstr.T")
     cost = ivp("cost")
     self.assertTrue(isinstance(c,MX))
-    
-    self.assertEquals(c.name(),"cstr.c")
-    self.assertEquals(T.name(),"cstr.T")
-    self.assertEquals(cost.name(),"cost")
-    self.assertEquals(ivp.nominal("cstr.c"),1000)
-   
+
+    self.assertEqual(c.name(),"cstr.c")
+    self.assertEqual(T.name(),"cstr.T")
+    self.assertEqual(cost.name(),"cost")
+    self.assertEqual(ivp.nominal("cstr.c"),1000)
+
     u = ivp("u")
     #self.assertEquals(ivp.path.nnz(),3)
     #self.assertEquals(len(ivp.cfcn_lb),3)
     #self.assertEquals(len(ivp.cfcn_ub),3)
-    #self.assertTrue(ivp.cfcn[0].is_equal(T)) 
-    #self.assertTrue(ivp.cfcn[1].is_equal(u)) 
-    #self.assertTrue(ivp.cfcn[2].is_equal(u)) 
-    #self.assertTrue(ivp.cfcn_lb[0].isMinusInf()) 
-    #self.assertEquals(ivp.cfcn_lb[1].to_double(),230) 
-    #self.assertTrue(ivp.cfcn_lb[2].isMinusInf()) 
-    #self.assertEquals(ivp.cfcn_ub[0].to_double(),350) 
+    #self.assertTrue(ivp.cfcn[0].is_equal(T))
+    #self.assertTrue(ivp.cfcn[1].is_equal(u))
+    #self.assertTrue(ivp.cfcn[2].is_equal(u))
+    #self.assertTrue(ivp.cfcn_lb[0].isMinusInf())
+    #self.assertEquals(ivp.cfcn_lb[1].to_double(),230)
+    #self.assertTrue(ivp.cfcn_lb[2].isMinusInf())
+    #self.assertEquals(ivp.cfcn_ub[0].to_double(),350)
     #self.assertTrue(ivp.cfcn_ub[1].isInf())
-    #self.assertEquals(ivp.cfcn_ub[2].to_double(),370) 
-    print ivp.init
-    print c,T,cost
+    #self.assertEquals(ivp.cfcn_ub[2].to_double(),370)
+    print(ivp.init)
+    print(c,T,cost)
     #print c.atTime(0)
     f=Function('f', [vertcat(*[c,T,cost])],[vertcat(*ivp.init)])
-    return 
+    return
     f_out = f(f_in)
     self.checkarray(f_out[0],matrix([-956.271065,-250.051971,0]).T,"initeq")
 
-    
+
     mystates = []
-  
+
 if __name__ == '__main__':
     unittest.main()
 

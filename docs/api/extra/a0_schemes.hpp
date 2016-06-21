@@ -10,6 +10,16 @@
 <tr><td>INTEGRATOR_RZF</td><td></td><td>Backward algebraic variable at the initial time.</td></tr>
 </table>
 */
+/** \defgroup scheme_ConicOutput
+<a name='schemes'></a><table>
+<caption>Output scheme: casadi::ConicOutput  (CONIC_NUM_OUT = 4) []</caption>
+<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
+<tr><td>CONIC_X</td><td></td><td>The primal solution.</td></tr>
+<tr><td>CONIC_COST</td><td></td><td>The optimal cost.</td></tr>
+<tr><td>CONIC_LAM_A</td><td></td><td>The dual solution corresponding to linear bounds.</td></tr>
+<tr><td>CONIC_LAM_X</td><td></td><td>The dual solution corresponding to simple bounds.</td></tr>
+</table>
+*/
 /** \defgroup scheme_HessLagOutput
 <a name='schemes'></a><table>
 <caption>Output scheme: casadi::HessLagOutput  (HESSLAG_NUM_OUT = 5) []</caption>
@@ -19,24 +29,6 @@
 <tr><td>HESSLAG_G</td><td></td><td>Constraint function.</td></tr>
 <tr><td>HESSLAG_GRAD_X</td><td></td><td>Gradient of the Lagrangian with respect to x.</td></tr>
 <tr><td>HESSLAG_GRAD_P</td><td></td><td>Gradient of the Lagrangian with respect to p.</td></tr>
-</table>
-*/
-/** \defgroup scheme_LinsolInput
-<a name='schemes'></a><table>
-<caption>Input scheme: casadi::LinsolInput  (LINSOL_NUM_IN = 2) []</caption>
-<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>LINSOL_A</td><td></td><td>The square matrix A: sparse, (n x n)</td></tr>
-<tr><td>LINSOL_B</td><td></td><td>The right-hand-side matrix b: dense, (n x m)</td></tr>
-</table>
-*/
-/** \defgroup scheme_QpsolOutput
-<a name='schemes'></a><table>
-<caption>Output scheme: casadi::QpsolOutput  (QPSOL_NUM_OUT = 4) []</caption>
-<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>QPSOL_X</td><td></td><td>The primal solution.</td></tr>
-<tr><td>QPSOL_COST</td><td></td><td>The optimal cost.</td></tr>
-<tr><td>QPSOL_LAM_A</td><td></td><td>The dual solution corresponding to linear bounds.</td></tr>
-<tr><td>QPSOL_LAM_X</td><td></td><td>The dual solution corresponding to simple bounds.</td></tr>
 </table>
 */
 /** \defgroup scheme_NlpsolInput
@@ -139,28 +131,6 @@
 <tr><td>RDAE_QUAD</td><td></td><td>Right hand side of quadratures.</td></tr>
 </table>
 */
-/** \defgroup scheme_QpsolInput
-<a name='schemes'></a><table>
-<caption>Input scheme: casadi::QpsolInput  (QPSOL_NUM_IN = 9) []</caption>
-<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>QPSOL_H</td><td></td><td>The square matrix H: sparse, (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical.</td></tr>
-<tr><td>QPSOL_G</td><td></td><td>The vector g: dense, (n x 1)</td></tr>
-<tr><td>QPSOL_A</td><td></td><td>The matrix A: sparse, (nc x n) - product with x must be dense.</td></tr>
-<tr><td>QPSOL_LBA</td><td></td><td>dense, (nc x 1)</td></tr>
-<tr><td>QPSOL_UBA</td><td></td><td>dense, (nc x 1)</td></tr>
-<tr><td>QPSOL_LBX</td><td></td><td>dense, (n x 1)</td></tr>
-<tr><td>QPSOL_UBX</td><td></td><td>dense, (n x 1)</td></tr>
-<tr><td>QPSOL_X0</td><td></td><td>dense, (n x 1)</td></tr>
-<tr><td>QPSOL_LAM_X0</td><td></td><td>dense</td></tr>
-</table>
-*/
-/** \defgroup scheme_LinsolOutput
-<a name='schemes'></a><table>
-<caption>Output scheme: casadi::LinsolOutput  (LINSOL_NUM_OUT = 1) []</caption>
-<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>LINSOL_X</td><td></td><td>Solution to the linear system of equations.</td></tr>
-</table>
-*/
 /** \defgroup scheme_JacGOutput
 <a name='schemes'></a><table>
 <caption>Output scheme: casadi::JacGOutput  (JACG_NUM_OUT = 3) []</caption>
@@ -168,6 +138,21 @@
 <tr><td>JACG_JAC</td><td></td><td>Jacobian of the constraints.</td></tr>
 <tr><td>JACG_F</td><td></td><td>Objective function.</td></tr>
 <tr><td>JACG_G</td><td></td><td>Constraint function.</td></tr>
+</table>
+*/
+/** \defgroup scheme_ConicInput
+<a name='schemes'></a><table>
+<caption>Input scheme: casadi::ConicInput  (CONIC_NUM_IN = 9) []</caption>
+<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
+<tr><td>CONIC_H</td><td></td><td>The square matrix H: sparse, (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical.</td></tr>
+<tr><td>CONIC_G</td><td></td><td>The vector g: dense, (n x 1)</td></tr>
+<tr><td>CONIC_A</td><td></td><td>The matrix A: sparse, (nc x n) - product with x must be dense.</td></tr>
+<tr><td>CONIC_LBA</td><td></td><td>dense, (nc x 1)</td></tr>
+<tr><td>CONIC_UBA</td><td></td><td>dense, (nc x 1)</td></tr>
+<tr><td>CONIC_LBX</td><td></td><td>dense, (n x 1)</td></tr>
+<tr><td>CONIC_UBX</td><td></td><td>dense, (n x 1)</td></tr>
+<tr><td>CONIC_X0</td><td></td><td>dense, (n x 1)</td></tr>
+<tr><td>CONIC_LAM_X0</td><td></td><td>dense</td></tr>
 </table>
 */
 /** \defgroup scheme_JacGInput

@@ -33,7 +33,7 @@ OUTPUTSCHEME(IntegratorOutput)
 using namespace std;
 namespace casadi {
 
-  SundialsInterface::SundialsInterface(const std::string& name, Oracle* dae)
+  SundialsInterface::SundialsInterface(const std::string& name, const Function& dae)
     : Integrator(name, dae) {
   }
 
@@ -50,29 +50,10 @@ namespace casadi {
         "Relative tolerence for the IVP solution"}},
       {"abstol",
        {OT_DOUBLE,
-        "Absolute tolerence  for the IVP solution"}},
-      {"exact_jacobian",
-       {OT_BOOL,
-        "Use exact Jacobian information for the forward integration"}},
-      {"exact_jacobianB",
-       {OT_BOOL,
-        "Use exact Jacobian information for the backward integration "
-        "[default: equal to exact_jacobian]"}},
-      {"upper_bandwidth",
-       {OT_INT,
-        "Upper band-width of banded Jacobian (estimations)"}},
-      {"lower_bandwidth",
-       {OT_INT,
-        "Lower band-width of banded Jacobian (estimations)"}},
-      {"linear_solver_type",
+        "Absolute tolerence for the IVP solution"}},
+      {"newton_scheme",
        {OT_STRING,
-        "Type of iterative solver: user_defined|DENSE|banded|iterative"}},
-      {"iterative_solver",
-       {OT_STRING,
-        "Iterative solver: GMRES|bcgstab|tfqmr"}},
-      {"pretype",
-       {OT_STRING,
-        "Type of preconditioning: NONE|left|right|both"}},
+        "Linear solver scheme in the Newton method: DIRECT|gmres|bcgstab|tfqmr"}},
       {"max_krylov",
        {OT_INT,
         "Maximum Krylov subspace size"}},
@@ -84,11 +65,7 @@ namespace casadi {
         "Maximum order for the (variable-order) multistep method"}},
       {"use_preconditioner",
        {OT_BOOL,
-        "Precondition an iterative solver"}},
-      {"use_preconditionerB",
-       {OT_BOOL,
-        "Precondition an iterative solver for the backwards problem "
-        "[default: equal to use_preconditioner]"}},
+        "Precondition the iterative solver [default: true]"}},
       {"stop_at_end",
        {OT_BOOL,
         "Stop the integrator at the end of the interval"}},
@@ -101,68 +78,18 @@ namespace casadi {
       {"fsens_err_con",
        {OT_BOOL,
         "include the forward sensitivities in all error controls"}},
-      {"finite_difference_fsens",
-       {OT_BOOL,
-        "Use finite differences to approximate the forward sensitivity equations "
-        "(if AD is not available)"}},
-      {"fsens_reltol",
-       {OT_DOUBLE,
-        "Relative tolerence for the forward sensitivity solution [default: equal to reltol]"}},
-      {"fsens_abstol",
-       {OT_DOUBLE,
-        "Absolute tolerence for the forward sensitivity solution [default: equal to abstol]"}},
-      {"fsens_scaling_factors",
-       {OT_DOUBLEVECTOR,
-        "Scaling factor for the components if finite differences is used"}},
-      {"fsens_sensitiviy_parameters",
-       {OT_INTVECTOR,
-        "Specifies which components will be used when estimating the sensitivity equations"}},
       {"steps_per_checkpoint",
        {OT_INT,
         "Number of steps between two consecutive checkpoints"}},
       {"interpolation_type",
        {OT_STRING,
         "Type of interpolation for the adjoint sensitivities"}},
-      {"upper_bandwidthB",
-       {OT_INT,
-        "Upper band-width of banded jacobians for backward integration "
-        "[default: equal to upper_bandwidth]"}},
-      {"lower_bandwidthB",
-       {OT_INT,
-        "lower band-width of banded jacobians for backward integration "
-        "[default: equal to lower_bandwidth]"}},
-      {"linear_solver_typeB",
-       {OT_STRING,
-        "Linear solver for backward integration"}},
-      {"iterative_solverB",
-       {OT_STRING,
-        "Iterative solver for backward integration"}},
-      {"pretypeB",
-       {OT_STRING,
-        "Preconditioner for backward integration"}},
-      {"max_krylovB",
-       {OT_INT,
-        "Maximum krylov subspace size for backward integration"}},
-      {"reltolB",
-       {OT_DOUBLE,
-        "Relative tolerence for the adjoint sensitivity solution [default: equal to reltol]"}},
-      {"abstolB",
-       {OT_DOUBLE,
-        "Absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]"}},
       {"linear_solver",
        {OT_STRING,
-        "A custom linear solver creator function"}},
+        "A custom linear solver creator function [default: csparse]"}},
       {"linear_solver_options",
        {OT_DICT,
-        "Options to be passed to the linear solver"}},
-      {"linear_solverB",
-       {OT_STRING,
-        "A custom linear solver creator function for backwards integration "
-        "[default: equal to linear_solver]"}},
-      {"linear_solver_optionsB",
-       {OT_DICT,
-        "Options to be passed to the linear solver for backwards integration "
-        "[default: equal to linear_solver_options]"}}
+        "Options to be passed to the linear solver"}}
      }
   };
 
@@ -170,26 +97,21 @@ namespace casadi {
     // Call the base class method
     Integrator::init(opts);
 
+    // If sensitivity equations, make sure derivative_of_ is available
+    casadi_assert_message(ns_==0 || !derivative_of_.is_null(),
+      "Not implemented.");
+
     // Default options
     abstol_ = 1e-8;
     reltol_ = 1e-6;
-    exact_jacobian_ = true;
     max_num_steps_ = 10000;
-    finite_difference_fsens_ = false;
     stop_at_end_ = true;
-    use_preconditioner_ = false;
+    use_precon_ = true;
     max_krylov_ = 10;
-    string linear_solver_type = "dense";
-    string iterative_solver = "gmres";
-    string pretype = "none";
-    string linear_solver;
-    Dict linear_solver_options;
-    upper_bandwidth_ = -1;
-    lower_bandwidth_ = -1;
-    upper_bandwidthB_ = -1;
-    lower_bandwidthB_ = -1;
+    linear_solver_ = "csparse";
+    string newton_scheme = "direct";
     quad_err_con_ = false;
-    interpolation_type_ = "hermite";
+    string interpolation_type = "hermite";
     steps_per_checkpoint_ = 20;
     disable_internal_warnings_ = false;
     max_multistep_order_ = 5;
@@ -200,40 +122,24 @@ namespace casadi {
         abstol_ = op.second;
       } else if (op.first=="reltol") {
         reltol_ = op.second;
-      } else if (op.first=="exact_jacobian") {
-        exact_jacobian_ = op.second;
       } else if (op.first=="max_num_steps") {
         max_num_steps_ = op.second;
-      } else if (op.first=="finite_difference_fsens") {
-        finite_difference_fsens_ = op.second;
       } else if (op.first=="stop_at_end") {
         stop_at_end_ = op.second;
       } else if (op.first=="use_preconditioner") {
-        use_preconditioner_ = op.second;
+        use_precon_ = op.second;
       } else if (op.first=="max_krylov") {
         max_krylov_ = op.second;
-      } else if (op.first=="linear_solver_type") {
-        linear_solver_type = op.second.to_string();
-      } else if (op.first=="iterative_solver") {
-        iterative_solver = op.second.to_string();
-      } else if (op.first=="pretype") {
-        pretype = op.second.to_string();
+      } else if (op.first=="newton_scheme") {
+        newton_scheme = op.second.to_string();
       } else if (op.first=="linear_solver") {
-        linear_solver = op.second.to_string();
+        linear_solver_ = op.second.to_string();
       } else if (op.first=="linear_solver_options") {
-        linear_solver_options = op.second;
-      } else if (op.first=="upper_bandwidth") {
-        upper_bandwidth_ = op.second;
-      } else if (op.first=="lower_bandwidth") {
-        lower_bandwidth_ = op.second;
-      } else if (op.first=="upper_bandwidthB") {
-        upper_bandwidthB_ = op.second;
-      } else if (op.first=="lower_bandwidthB") {
-        lower_bandwidthB_ = op.second;
+        linear_solver_options_ = op.second;
       } else if (op.first=="quad_err_con") {
         quad_err_con_ = op.second;
       } else if (op.first=="interpolation_type") {
-        interpolation_type_ = op.second.to_string();
+        interpolation_type = op.second.to_string();
       } else if (op.first=="steps_per_checkpoint") {
         steps_per_checkpoint_ = op.second;
       } else if (op.first=="disable_internal_warnings") {
@@ -243,181 +149,62 @@ namespace casadi {
       }
     }
 
-    // Default dependent options
-    exact_jacobianB_ = exact_jacobian_;
-    fsens_abstol_ = abstol_;
-    fsens_reltol_ = reltol_;
-    abstolB_ = abstol_;
-    reltolB_ = reltol_;
-    use_preconditionerB_ = use_preconditioner_;
-    max_krylovB_ = max_krylov_;
-    std::string linear_solver_typeB = linear_solver_type;
-    std::string iterative_solverB = iterative_solver;
-    std::string pretypeB = pretype;
-    string linear_solverB = linear_solver;
-    Dict linear_solver_optionsB = linear_solver_options;
-
-    // Read options again
-    for (auto&& op : opts) {
-      if (op.first=="exact_jacobianB") {
-        exact_jacobianB_ = op.second;
-      } else if (op.first=="fsens_abstol") {
-        fsens_abstol_ = op.second;
-      } else if (op.first=="fsens_reltol") {
-        fsens_reltol_ = op.second;
-      } else if (op.first=="abstolB") {
-        abstolB_ = op.second;
-      } else if (op.first=="reltolB") {
-        reltolB_ = op.second;
-      } else if (op.first=="use_preconditionerB") {
-        use_preconditionerB_ = op.second;
-      } else if (op.first=="max_krylovB") {
-        max_krylovB_ = op.second;
-      } else if (op.first=="linear_solver_typeB") {
-        linear_solver_typeB = op.second.to_string();
-      } else if (op.first=="iterative_solverB") {
-        iterative_solverB = op.second.to_string();
-      } else if (op.first=="pretypeB") {
-        pretypeB = op.second.to_string();
-      } else if (op.first=="linear_solverB") {
-        linear_solverB = op.second.to_string();
-      } else if (op.first=="linear_solver_optionsB") {
-        linear_solver_optionsB = op.second;
-      }
-    }
-
-    // No Jacobian of g if g doesn't exist
-    if (g_.is_null()) {
-      exact_jacobianB_ = false;
-    }
-
-    // Linear solver for forward integration
-    if (linear_solver_type=="dense") {
-      linsol_f_ = SD_DENSE;
-    } else if (linear_solver_type=="banded") {
-      linsol_f_ = SD_BANDED;
-    } else if (linear_solver_type=="iterative") {
-      linsol_f_ = SD_ITERATIVE;
-
-      // Iterative solver
-      if (iterative_solver=="gmres") {
-        itsol_f_ = SD_GMRES;
-      } else if (iterative_solver=="bcgstab") {
-        itsol_f_ = SD_BCGSTAB;
-      } else if (iterative_solver=="tfqmr") {
-        itsol_f_ = SD_TFQMR;
-      } else {
-        casadi_error("Unknown iterative solver for forward integration: " + iterative_solver);
-      }
-
-      // Preconditioning type
-      if (pretype=="none") {
-        pretype_f_ = PREC_NONE;
-      } else if (pretype=="left") {
-        pretype_f_ = PREC_LEFT;
-      } else if (pretype=="right") {
-        pretype_f_ = PREC_RIGHT;
-      } else if (pretype=="both") {
-        pretype_f_ = PREC_BOTH;
-      } else {
-        casadi_error("Unknown preconditioning type for forward integration: " + pretype);
-      }
-    } else if (linear_solver_type=="user_defined") {
-      linsol_f_ = SD_USER_DEFINED;
+    // Type of Newton scheme
+    if (newton_scheme=="direct") {
+      newton_scheme_ = SD_DIRECT;
+    } else if (newton_scheme=="gmres") {
+      newton_scheme_ = SD_GMRES;
+    } else if (newton_scheme=="bcgstab") {
+      newton_scheme_ = SD_BCGSTAB;
+    } else if (newton_scheme=="tfqmr") {
+      newton_scheme_ = SD_TFQMR;
     } else {
-      casadi_error("Unknown linear solver for forward integration: " + linear_solver_type);
+      casadi_error("Unknown Newton scheme: " + newton_scheme);
     }
 
-    // Linear solver for backward integration
-    if (linear_solver_typeB=="dense") {
-      linsol_g_ = SD_DENSE;
-    } else if (linear_solver_typeB=="banded") {
-      linsol_g_ = SD_BANDED;
-    } else if (linear_solver_typeB=="iterative") {
-      linsol_g_ = SD_ITERATIVE;
-
-      // Iterative solver
-      if (iterative_solverB=="gmres") {
-        itsol_g_ = SD_GMRES;
-      } else if (iterative_solverB=="bcgstab") {
-        itsol_g_ = SD_BCGSTAB;
-      } else if (iterative_solverB=="tfqmr") {
-        itsol_g_ = SD_TFQMR;
-      } else {
-        casadi_error("Unknown sparse solver for backward integration: " + iterative_solverB);
-      }
-
-      // Preconditioning type
-      if (pretypeB=="none") {
-        pretype_g_ = PREC_NONE;
-      } else if (pretypeB=="left") {
-        pretype_g_ = PREC_LEFT;
-      } else if (pretypeB=="right") {
-        pretype_g_ = PREC_RIGHT;
-      } else if (pretypeB=="both") {
-        pretype_g_ = PREC_BOTH;
-      } else {
-        casadi_error("Unknown preconditioning type for backward integration: " + pretypeB);
-      }
-    } else if (linear_solver_typeB=="user_defined") {
-      linsol_g_ = SD_USER_DEFINED;
+    // Interpolation_type
+    if (interpolation_type=="hermite") {
+      interp_ = SD_HERMITE;
+    } else if (interpolation_type=="polynomial") {
+      interp_ = SD_POLYNOMIAL;
     } else {
-      casadi_error("Unknown linear solver for backward integration: " + iterative_solverB);
+      casadi_error("Unknown interpolation type: " + interpolation_type);
     }
 
-    // Create a Jacobian if requested
-    if (exact_jacobian_) {
-      jac_ = getJac();
-      alloc(jac_);
-      alloc_w(jac_.nnz_out(0), true);
+    // Get or create Jacobians and linear system solvers
+    for (bool backward : {false, true}) {
+      // Skip backward?
+      if (backward && nrx_==0) continue;
+
+      // Get Jacobian function
+      Function J;
+      if (ns_==0) {
+        J = getJ(backward);
+      } else {
+        SundialsInterface* d = derivative_of_.get<SundialsInterface>();
+        casadi_assert(d!=0);
+        if (d->ns_==0) {
+          J = d->get_function(backward ? "jacB" : "jacF");
+        } else {
+          J = d->getJ(backward);
+        }
+      }
+      set_function(J);
+      alloc_w(J.nnz_out(0), true);
     }
 
-    if (!jac_.is_null()) {
-      casadi_assert_message(jac_.size2_out(0)==jac_.size1_out(0),
-                            "SundialsInterface::init: the jacobian of the forward problem must "
-                            "be square but got " << jac_.sparsity_out(0).dim());
-
-      casadi_assert_message(!jac_.sparsity_out(0).is_singular(),
-                            "SundialsInterface::init: singularity - the jacobian of the forward "
-                            "problem is structurally rank-deficient. sprank(J)="
-                            << sprank(jac_.sparsity_out(0)) << " (in stead of "<< jac_.size2_out(0)
-                            << ")");
+    // Allocate work vectors
+    alloc_w(np_, true); // p
+    alloc_w(nrp_, true); // rp
+    if (ns_>0) {
+      alloc_w(max(nz_, nrz_), true); // ztmp
     }
 
-    // Create a backwards Jacobian if requested
-    if (exact_jacobianB_ && !g_.is_null()) jacB_ = getJacB();
-
-    if (!jacB_.is_null()) {
-      alloc(jacB_);
-      alloc_w(jacB_.nnz_out(0), true);
-      casadi_assert_message(jacB_.size2_out(0)==jacB_.size1_out(0),
-                            "SundialsInterface::init: the jacobian of the backward problem must be "
-                            "square but got " << jacB_.sparsity_out(0).dim());
-
-      casadi_assert_message(!jacB_.sparsity_out(0).is_singular(),
-                            "SundialsInterface::init: singularity - the jacobian of the backward"
-                            " problem is structurally rank-deficient. sprank(J)="
-                            << sprank(jacB_.sparsity_out(0)) << " (instead of "
-                            << jacB_.size2_out(0) << ")");
+    // Allocate linear solvers
+    linsolF_ = Linsol("linsolF", linear_solver_, linear_solver_options_);
+    if (nrx_>0) {
+      linsolB_ = Linsol("linsolB", linear_solver_, linear_solver_options_);
     }
-
-    // Create a linear solver
-    if (!linear_solver.empty() && !jac_.is_null()) {
-      linsol_ = linsol("linsol", linear_solver, jac_.sparsity_out(0),
-                       1, linear_solver_options);
-      alloc(linsol_);
-    }
-
-    // Create a linear solver
-    if (!linear_solverB.empty() && !jacB_.is_null()) {
-      linsolB_ = linsol("linsolB", linear_solverB, jacB_.sparsity_out(0),
-                        1, linear_solver_optionsB);
-      alloc(linsolB_);
-    }
-
-    // Allocate temporary memory
-    //alloc_w(np_, true); // p_
-    //alloc_w(nrp_, true); // rp_
   }
 
   void SundialsInterface::init_memory(void* mem) const {
@@ -430,9 +217,11 @@ namespace casadi {
     m->rxz = N_VNew_Serial(nrx_+nrz_);
     m->rq = N_VNew_Serial(nrq_);
 
-    // Allocate memory
-    m->p.resize(np_);
-    m->rp.resize(nrp_);
+    // Reset linear solvers
+    linsolF_.reset(get_function("jacF").sparsity_out(0));
+    if (nrx_>0) {
+      linsolB_.reset(get_function("jacB").sparsity_out(0));
+    }
   }
 
   void SundialsInterface::reset(IntegratorMemory* mem, double t, const double* x,
@@ -443,7 +232,7 @@ namespace casadi {
     m->t = t;
 
     // Set parameters
-    casadi_copy(p, np_, get_ptr(m->p));
+    casadi_copy(p, np_, m->p);
 
     // Set the state
     casadi_copy(x, nx_, NV_DATA_S(m->xz));
@@ -461,7 +250,7 @@ namespace casadi {
     m->t = t;
 
     // Set parameters
-    casadi_copy(rp, nrp_, get_ptr(m->rp));
+    casadi_copy(rp, nrp_, m->rp);
 
     // Get the backward state
     casadi_copy(rx, nrx_, NV_DATA_S(m->rxz));
@@ -470,65 +259,12 @@ namespace casadi {
     N_VConst(0., m->rq);
   }
 
-  std::pair<int, int> SundialsInterface::getBandwidth() const {
-    std::pair<int, int> bw;
-
-    // Get upper bandwidth
-    if (upper_bandwidth_>=0) {
-      bw.first = upper_bandwidth_;
-    } else {
-      casadi_assert_message(!jac_.is_null(),
-                            "\"upper_bandwidth\" has not been set and cannot be "
-                            "detected since exact Jacobian is not available.");
-      bw.first = jac_.sparsity_out(0).bw_upper();
-    }
-
-    // Get lower bandwidth
-    if (lower_bandwidth_>=0) {
-      bw.second = lower_bandwidth_;
-    } else {
-      casadi_assert_message(!jac_.is_null(),
-                            "\"lower_bandwidth\" has not been set and cannot be "
-                            "detected since exact Jacobian is not available.");
-      bw.second = jac_.sparsity_out(0).bw_lower();
-    }
-
-    return bw;
-  }
-
-  std::pair<int, int> SundialsInterface::getBandwidthB() const {
-    std::pair<int, int> bw;
-
-    // Get upper bandwidth
-    if (upper_bandwidthB_>=0) {
-      bw.first = upper_bandwidthB_;
-    } else {
-      casadi_assert_message(!jacB_.is_null(),
-                            "\"upper_bandwidthB\" has not been set and cannot be "
-                            "detected since exact Jacobian for backward problem "
-                            "is not available.");
-      bw.first = jacB_.sparsity_out(0).bw_upper();
-    }
-
-    // Get lower bandwidth
-    if (lower_bandwidthB_>=0) {
-      bw.second = lower_bandwidthB_;
-    } else {
-      casadi_assert_message(!jacB_.is_null(),
-                            "\"lower_bandwidthB\" has not been set and cannot be "
-                            "detected since exact Jacobian for backward problem "
-                            "is not available.");
-      bw.second = jacB_.sparsity_out(0).bw_lower();
-    }
-
-    return bw;
-  }
-
   SundialsMemory::SundialsMemory() {
     this->xz  = 0;
     this->q = 0;
     this->rxz = 0;
     this->rq = 0;
+    this->first_callB = true;
   }
 
   SundialsMemory::~SundialsMemory() {
@@ -565,18 +301,58 @@ namespace casadi {
     stats["hlastB"] = m->hlastB;
     stats["hcurB"] = m->hcurB;
     stats["tcurB"] = m->tcurB;
-
-    // Timers
-    stats["t_res"] = m->t_res;
-    stats["t_fres"] = m->t_fres;
-    stats["t_jac"] = m->t_jac;
-    stats["t_jacB"] = m->t_jacB;
-    stats["t_lsolve"] = m->t_lsolve;
-    stats["t_lsetup_jac"] = m->t_lsetup_jac;
-    stats["t_lsetup_fac"] = m->t_lsetup_fac;
     return stats;
   }
 
+  void SundialsInterface::print_stats(IntegratorMemory* mem, ostream &stream) const {
+    auto m = to_mem(mem);
+    stream << "FORWARD INTEGRATION:" << endl;
+    stream << "Number of steps taken by SUNDIALS: " << m->nsteps << endl;
+    stream << "Number of calls to the user’s f function: " << m->nfevals << endl;
+    stream << "Number of calls made to the linear solver setup function: "
+           << m->nlinsetups << endl;
+    stream << "Number of error test failures: " << m->netfails << endl;
+    stream << "Method order used on the last internal step: "  << m->qlast << endl;
+    stream << "Method order to be used on the next internal step: " << m->qcur << endl;
+    stream << "Actual value of initial step size: " << m->hinused << endl;
+    stream << "Step size taken on the last internal step: " << m->hlast << endl;
+    stream << "Step size to be attempted on the next internal step: " << m->hcur << endl;
+    stream << "Current internal time reached: " << m->tcur << endl;
+    stream << "Number of checkpoints stored: " << m->ncheck << endl;
+    if (nrx_>0) {
+      stream << "BACKWARD INTEGRATION:" << endl;
+      stream << "Number of steps taken by SUNDIALS: " << m->nstepsB << endl;
+      stream << "Number of calls to the user’s f function: " << m->nfevalsB << endl;
+      stream << "Number of calls made to the linear solver setup function: "
+             << m->nlinsetupsB << endl;
+      stream << "Number of error test failures: " << m->netfailsB << endl;
+      stream << "Method order used on the last internal step: "  << m->qlastB << endl;
+      stream << "Method order to be used on the next internal step: " << m->qcurB << endl;
+      stream << "Actual value of initial step size: " << m->hinusedB << endl;
+      stream << "Step size taken on the last internal step: " << m->hlastB << endl;
+      stream << "Step size to be attempted on the next internal step: " << m->hcurB << endl;
+      stream << "Current internal time reached: " << m->tcurB << endl;
+    }
+    stream << endl;
+  }
+
+  void SundialsInterface::set_work(void* mem, const double**& arg, double**& res,
+                                int*& iw, double*& w) const {
+    auto m = static_cast<SundialsMemory*>(mem);
+
+    // Set work in base classes
+    Integrator::set_work(mem, arg, res, iw, w);
+
+    // Work vectors
+    m->p = w; w += np_;
+    m->rp = w; w += nrp_;
+    if (ns_>0) {
+      m->ztmp = w; w += max(nz_, nrz_);
+    }
+    m->jac = w; w += get_function("jacF").nnz_out(0);
+    if (nrx_>0) {
+      m->jacB = w; w += get_function("jacB").nnz_out(0);
+    }
+  }
+
 } // namespace casadi
-
-

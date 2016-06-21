@@ -30,6 +30,7 @@
 #include "../sx/sx_elem.hpp"
 #include "../calculus.hpp"
 #include "../function/code_generator.hpp"
+#include "../function/linsol.hpp"
 #include <vector>
 #include <stack>
 
@@ -157,10 +158,10 @@ namespace casadi {
                          std::vector<std::vector<MX> >& asens);
 
     /** \brief  Propagate sparsity forward */
-    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
+    virtual void sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
 
     /** \brief  Propagate sparsity backwards */
-    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
+    virtual void sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
 
     /** \brief  Get the name */
     virtual const std::string& name() const;
@@ -358,7 +359,7 @@ namespace casadi {
     *      A->getSolve(b)
     *
     */
-    virtual MX getSolve(const MX& r, bool tr, const Function& linear_solver) const;
+    virtual MX getSolve(const MX& r, bool tr, const Linsol& linear_solver) const;
 
     /// Get the nonzeros of matrix
     virtual MX getGetNonzeros(const Sparsity& sp, const std::vector<int>& nz) const;

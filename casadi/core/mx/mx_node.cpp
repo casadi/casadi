@@ -330,7 +330,7 @@ namespace casadi {
                           + typeid(*this).name());
   }
 
-  void MXNode::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+  void MXNode::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     // By default, everything depends on everything
     bvec_t all_depend(0);
 
@@ -351,7 +351,7 @@ namespace casadi {
     }
   }
 
-  void MXNode::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+  void MXNode::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     // By default, everything depends on everything
     bvec_t all_depend(0);
 
@@ -439,7 +439,7 @@ namespace casadi {
     return MX::create(new Rank1(shared_from_this<MX>(), alpha, x, y));
   }
 
-  MX MXNode::getSolve(const MX& r, bool tr, const Function& linear_solver) const {
+  MX MXNode::getSolve(const MX& r, bool tr, const Linsol& linear_solver) const {
     if (tr) {
       return MX::create(new Solve<true>(densify(r), shared_from_this<MX>(), linear_solver));
     } else {

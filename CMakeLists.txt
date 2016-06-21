@@ -60,7 +60,7 @@ option(WITH_SNOPT "Compile the SNOPT interface if SNOPT libraries can be found" 
 option(WITH_SNOPT_FORCE_DUMMY "Compile the SNOPT interface against a dummy library (for Debian distribution; breaks normal snopt build)" OFF)
 option(WITH_ACADO "Compile the interfaces to ACADO and qpOASES, if it can be found" OFF)
 option(WITH_EIGEN3 "Use Eigen3 backend for matrix operations" OFF)
-option(WITH_BUILD_SUNDIALS "Compile the included source code for Sundials 2.5" ON)
+option(WITH_BUILD_SUNDIALS "Compile the included source code for Sundials 2.6.1" ON)
 option(WITH_SUNDIALS "Compile the interface to Sundials" ON)
 option(WITH_QPOASES "Compile the interface to qpOASES (the source code for qpOASES 3.0beta is included)" ON)
 option(WITH_BUILD_DSDP "Compile the the included source code for DSDP" ON)
@@ -71,8 +71,10 @@ option(WITH_BUILD_CSPARSE "Compile the included source code for CSparse" ON)
 option(WITH_CSPARSE "Compile the interface to CSparse" ON)
 option(WITH_GUROBI "Compile the interface to GUROBI" ON)
 option(WITH_IPOPT "Compile the interface to IPOPT" ON)
+option(WITH_BONMIN "Compile the interface to BONMIN" ON)
 option(WITH_KNITRO "Compile the interface to KNITRO" ON)
 option(WITH_CPLEX "Compile the interface to CPLEX" ON)
+option(WITH_CLP "Compile the CLP interface" ON)
 option(WITH_LAPACK "Compile the interface to LAPACK" ON)
 option(WITH_OPENCL "Compile with OpenCL support (experimental)" OFF)
 option(WITH_BUILD_TINYXML "Compile the included TinyXML source code" ON)
@@ -80,8 +82,10 @@ option(WITH_TINYXML "Compile the interface to TinyXML" ON)
 option(WITH_COVERAGE "Create coverage report" OFF)
 option(OLD_LLVM "Use pre-3.5 LLVM" OFF)
 option(WITH_CLANG "Compile the interface to clang JIT" OFF)
-option(WITH_MATLAB "Compile the MATLAB front-end (experimental)" OFF)
 option(WITH_PYTHON "Compile the Python front-end" OFF)
+option(WITH_MATLAB "Compile the MATLAB front-end" OFF)
+option(WITH_OCTAVE "Compile the Octave front-end (experimental)" OFF)
+option(WITH_PYTHON3 "Use Python 3.*" OFF)
 option(WITH_JSON "Compile the JSON front-end" OFF)
 option(WITH_DEBIAN_BUILD "Add -DWITH_DEBIAN_BUILD (used for debian-specific warnings)" OFF)
 option(WITH_DEEPBIND "Load plugins with RTLD_DEEPBIND (can be used to resolve conflicting libraries in e.g. MATLAB)" OFF)
@@ -110,11 +114,6 @@ if(Fortran_language_works)
   enable_language(Fortran OPTIONAL)
 endif()
 #end workaround
-
-include(CppLint)
-include(SpellCheck)
-include(embed_resources)
-include(GenerateExportHeader)
 
 ############################################################
 ####################### Policies ###########################
@@ -170,7 +169,7 @@ set(CMAKE_SKIP_BUILD_RPATH  FALSE)
 
 # when building, don't use the install RPATH already
 # (but later on when installing)
-set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE) 
+set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
 
 set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib;${CMAKE_INSTALL_PREFIX}/lib/casadi")
 
@@ -393,7 +392,7 @@ add_feature_info(lapack-interface LAPACK_FOUND "Interface to LAPACK.")
 if(WITH_SUNDIALS)
   if(WITH_BUILD_SUNDIALS)
     # build the included sundials
-    set(SUNDIALS_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_packages/sundials-2.5mod)
+    set(SUNDIALS_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_packages/casadi-sundials)
     set(SUNDIALS_LIBRARIES casadi_sundials)
     set(SUNDIALS_FOUND ON)
   else()
@@ -503,6 +502,11 @@ if(WITH_IPOPT)
 endif()
 add_feature_info(ipopt-interface IPOPT_FOUND "Interface to the NLP solver Ipopt.")
 
+if(WITH_BONMIN)
+  find_package(BONMIN)
+endif()
+add_feature_info(bonmin-interface BONMIN_FOUND "Interface to the MINLP framework Bonmin.")
+
 if(WITH_KNITRO)
   find_package(KNITRO)
 endif()
@@ -512,6 +516,11 @@ if(WITH_CPLEX)
   find_package(CPLEX)
 endif()
 add_feature_info(cplex-interface CPLEX_FOUND "Interface to the QP solver CPLEX.")
+
+if(WITH_CLP)
+  find_package(CLP)
+endif()
+add_feature_info(clp-interface CLP_FOUND "Interface to the LP solver CLP.")
 
 if(WITH_SNOPT)
   find_package(SNOPT)
@@ -565,6 +574,18 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib/)
 
 #####################################################
+######################### swig ######################
+#####################################################
+if(WITH_PYTHON OR WITH_MATLAB OR WITH_OCTAVE OR WITH_JSON)
+  add_subdirectory(swig)
+endif()
+
+include(CppLint)
+include(SpellCheck)
+include(embed_resources)
+include(GenerateExportHeader)
+
+#####################################################
 ################# include the rest ##################
 #####################################################
 add_subdirectory(external_packages)
@@ -577,13 +598,6 @@ add_subdirectory(misc)
 if(WITH_EXAMPLES)
   add_subdirectory(docs/examples)
   add_subdirectory(docs/api/examples/ctemplate)
-endif()
-
-#####################################################
-######################### swig ######################
-#####################################################
-if(WITH_PYTHON OR WITH_MATLAB OR WITH_JSON)
-  add_subdirectory(swig)
 endif()
 
 #####################################################

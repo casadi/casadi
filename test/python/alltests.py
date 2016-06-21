@@ -32,7 +32,7 @@ from ad import *
 from sparsity import *
 from linearsolver import *
 from matrix import *
-from qpsolver import *
+from conic import *
 from misc import *
 from function import *
 from tools import *

@@ -48,7 +48,7 @@ namespace casadi {
     Nlpsol::registerPlugin(casadi_register_nlpsol_worhp);
   }
 
-  WorhpInterface::WorhpInterface(const std::string& name, Oracle* nlp)
+  WorhpInterface::WorhpInterface(const std::string& name, const Function& nlp)
     : Nlpsol(name, nlp) {
   }
 
@@ -112,11 +112,11 @@ namespace casadi {
     // Setup NLP functions
     f_fcn_ = create_function("nlp_f", {"x", "p"}, {"f"});
     g_fcn_ = create_function("nlp_g", {"x", "p"}, {"g"});
-    grad_f_fcn_ = create_function("nlp_grad_f", {"x", "p"}, {"f", "grad_f_x"});
-    jac_g_fcn_ = create_function("nlp_jac_g", {"x", "p"}, {"g", "jac_g_x"});
+    grad_f_fcn_ = create_function("nlp_grad_f", {"x", "p"}, {"f", "grad:f:x"});
+    jac_g_fcn_ = create_function("nlp_jac_g", {"x", "p"}, {"g", "jac:g:x"});
     jacg_sp_ = jac_g_fcn_.sparsity_out(1);
-    hess_l_fcn_ = create_function("nlp_jac_f", {"x", "p", "lam_f", "lam_g"},
-                                  {"transpose_hess_gamma_x_x"},
+    hess_l_fcn_ = create_function("nlp_hess_l", {"x", "p", "lam:f", "lam:g"},
+                                  {"transpose:hess:gamma:x:x"},
                                   {{"gamma", {"f", "g"}}});
     hesslag_sp_ = hess_l_fcn_.sparsity_out(0);
 
@@ -351,31 +351,49 @@ namespace casadi {
       }
 
       if (GetUserAction(&m->worhp_c, evalF)) {
-        calc_function(m, f_fcn_, {m->worhp_o.X, m->p}, {&m->worhp_o.F});
+        m->arg[0] = m->worhp_o.X;
+        m->arg[1] = m->p;
+        m->res[0] = &m->worhp_o.F;
+        calc_function(m, "nlp_f");
         if (m->f) *m->f = m->worhp_o.F; // Store cost, before scaling
         m->worhp_o.F *= m->worhp_w.ScaleObj;
         DoneUserAction(&m->worhp_c, evalF);
       }
 
       if (GetUserAction(&m->worhp_c, evalG)) {
-        calc_function(m, g_fcn_, {m->worhp_o.X, m->p}, {m->worhp_o.G});
+        m->arg[0] = m->worhp_o.X;
+        m->arg[1] = m->p;
+        m->res[0] = m->worhp_o.G;
+        calc_function(m, "nlp_g");
         DoneUserAction(&m->worhp_c, evalG);
       }
 
       if (GetUserAction(&m->worhp_c, evalDF)) {
-        calc_function(m, grad_f_fcn_, {m->worhp_o.X, m->p}, {0, m->worhp_w.DF.val});
+        m->arg[0] = m->worhp_o.X;
+        m->arg[1] = m->p;
+        m->res[0] = 0;
+        m->res[1] = m->worhp_w.DF.val;
+        calc_function(m, "nlp_grad_f");
         casadi_scal(nx_, m->worhp_w.ScaleObj, m->worhp_w.DF.val);
         DoneUserAction(&m->worhp_c, evalDF);
       }
 
       if (GetUserAction(&m->worhp_c, evalDG)) {
-        calc_function(m, jac_g_fcn_, {m->worhp_o.X, m->p}, {0, m->worhp_w.DG.val});
+        m->arg[0] = m->worhp_o.X;
+        m->arg[1] = m->p;
+        m->res[0] = 0;
+        m->res[1] = m->worhp_w.DG.val;
+        calc_function(m, "nlp_jac_g");
         DoneUserAction(&m->worhp_c, evalDG);
       }
 
       if (GetUserAction(&m->worhp_c, evalHM)) {
-        calc_function(m, hess_l_fcn_, {m->worhp_o.X, m->p, &m->worhp_w.ScaleObj, m->worhp_o.Mu},
-                      {m->worhp_w.HM.val});
+        m->arg[0] = m->worhp_o.X;
+        m->arg[1] = m->p;
+        m->arg[2] = &m->worhp_w.ScaleObj;
+        m->arg[3] = m->worhp_o.Mu;
+        m->res[0] = m->worhp_w.HM.val;
+        calc_function(m, "nlp_hess_l");
         // Diagonal values
         double *dval = m->w;
         casadi_fill(dval, nx_, 0.);

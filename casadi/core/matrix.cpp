@@ -49,11 +49,8 @@ namespace casadi {
   Matrix<double> Matrix<double>::
   solve(const Matrix<double>& A, const Matrix<double>& b,
         const string& lsolver, const Dict& dict) {
-    Function mysolver = linsol("tmp", lsolver, A.sparsity(), b.size2(), dict);
-    vector<DM> arg(LINSOL_NUM_IN);
-    arg.at(LINSOL_A) = A;
-    arg.at(LINSOL_B) = b;
-    return mysolver(arg).at(LINSOL_X);
+    Linsol mysolver("tmp", lsolver, dict);
+    return mysolver.solve(A, b, false);
   }
 
   template<>
@@ -451,10 +448,10 @@ namespace casadi {
     for (int el=0; el<r.nnz(); ++el) {
       // Start by expanding the node to a weighted sum
       SX terms, weights;
-      expand(r[el], weights, terms);
+      expand(r.nz(el), weights, terms);
 
       // Make a scalar product to get the simplified expression
-      r[el] = mtimes(terms.T(), weights);
+      r.nz(el) = mtimes(terms.T(), weights);
     }
     return r;
   }
@@ -720,10 +717,7 @@ namespace casadi {
   template<>
   vector<SX> SX::symvar(const SX& x) {
     Function f("tmp", vector<SX>{}, {x});
-    vector<SXElem> ret1 = f.free_sx().nonzeros();
-    vector<SX> ret(ret1.size());
-    copy(ret1.begin(), ret1.end(), ret.begin());
-    return ret;
+    return f.free_sx();
   }
 
   template<>
@@ -1000,6 +994,10 @@ namespace casadi {
 
   template<> vector<SX> SX::get_input(const Function& f) {
     return f.sx_in();
+  }
+
+  template<> vector<SX> SX::get_free(const Function& f) {
+    return f.free_sx();
   }
 
   template<> SX SX::jac(const Function& f, int iind, int oind, bool compact, bool symmetric) {

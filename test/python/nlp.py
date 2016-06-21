@@ -32,7 +32,7 @@ import itertools
 #GlobalOptions.setCatchErrorsPython(False)
 
 solvers= []
- 
+
 #if has_nlpsol("worhp")  and not args.ignore_memory_heavy:
 #  solvers.append(("worhp",{"TolOpti":1e-20}))
   #solvers.append(("worhp",{"TolOpti":1e-20,"TolFeas":1e-20,"UserHM": False}))
@@ -49,7 +49,7 @@ if has_nlpsol("ipopt") and has_nlpsol("sqpmethod"):
   solvers.append(("sqpmethod",{"qpsol": "nlpsol","qpsol_options": qpsol_options}))
   solvers.append(("sqpmethod",{"qpsol": "nlpsol","qpsol_options": qpsol_options,"hessian_approximation": "limited-memory","tol_du":1e-10,"tol_pr":1e-10}))
 
-print solvers
+print(solvers)
 """
 try:
   load_nlpsol("knitro")
@@ -64,7 +64,7 @@ class NLPtests(casadiTestCase):
   def testboundsviol(self):
     x=SX.sym("x")
     nlp={'x':x, 'f':(x-1)**2, 'g':x}
-    
+
     for Solver, solver_options in solvers:
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
       solver_in = {}
@@ -86,16 +86,16 @@ class NLPtests(casadiTestCase):
       solver_in["ubg"]=[-20]
       with self.assertRaises(Exception):
         solver_out = solver(solver_in)
-        
+
   def testIPOPT(self):
     x=SX.sym("x")
     nlp={'x':x, 'f':(x-1)**2, 'g':x}
-    
+
     for Solver, solver_options in solvers:
       self.message("trivial " + str(Solver))
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
       solver_in = {}
-       
+
       solver_in["lbx"]=[-10]
       solver_in["ubx"]=[10]
       solver_in["lbg"]=[-10]
@@ -106,12 +106,12 @@ class NLPtests(casadiTestCase):
       self.assertAlmostEqual(solver_out["g"][0],1,9,str(Solver))
       self.assertAlmostEqual(solver_out["lam_x"][0],0,9,str(Solver))
       self.assertAlmostEqual(solver_out["lam_g"][0],0,9,str(Solver))
-      
+
   def testIPOPT_par(self):
     x=SX.sym("x")
     p=SX.sym("p")
     nlp={'x':x, 'p':p, 'f':(x-p)**2, 'g':x}
-    
+
     for Solver, solver_options in solvers:
       self.message("trivial " + str(Solver))
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
@@ -127,12 +127,12 @@ class NLPtests(casadiTestCase):
       self.assertAlmostEqual(solver_out["x"][0],1,9,str(Solver))
       self.assertAlmostEqual(solver_out["lam_x"][0],0,9,str(Solver))
       self.assertAlmostEqual(solver_out["lam_g"][0],0,9,str(Solver))
-      
+
   def testIPOPTinf(self):
     self.message("trivial IPOPT, infinity bounds")
     x=SX.sym("x")
     nlp={'x':x, 'f':(x-1)**2, 'g':x}
-    
+
     for Solver, solver_options in solvers:
       self.message(str(Solver))
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
@@ -155,14 +155,14 @@ class NLPtests(casadiTestCase):
       self.assertAlmostEqual(solver_out["x"][0],1,7,str(Solver) + str(solver_out["x"][0]-1))
       self.assertAlmostEqual(solver_out["lam_x"][0],0,9,str(Solver))
       self.assertAlmostEqual(solver_out["lam_g"][0],0,9,str(Solver))
-      
+
   def testIPOPTrb(self):
     self.message("rosenbrock, limited-memory hessian approx")
     x=SX.sym("x")
     y=SX.sym("y")
-    
+
     nlp={'x':vertcat(*[x,y]), 'f':(1-x)**2+100*(y-x**2)**2}
-    
+
     for Solver, solver_options in solvers:
       self.message(str(Solver))
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
@@ -175,12 +175,12 @@ class NLPtests(casadiTestCase):
       self.assertAlmostEqual(solver_out["x"][1],1,6,str(Solver))
       self.assertAlmostEqual(solver_out["lam_x"][0],0,5,str(Solver))
       self.assertAlmostEqual(solver_out["lam_x"][1],0,5,str(Solver))
-    
+
   def testIPOPTrb2(self):
     self.message("rosenbrock, limited-memory hessian approx")
     x=SX.sym("x")
     y=SX.sym("y")
-    
+
     nlp={'x':vertcat(*[x,y]), 'f':(1-x)**2+100*(y-x**2)**2, 'g':x+y}
     for Solver, solver_options in solvers:
       self.message(str(Solver))
@@ -191,7 +191,7 @@ class NLPtests(casadiTestCase):
       solver_in["lbg"]=[-10]
       solver_in["ubg"]=[10]
       solver_out = solver(**solver_in)
-      
+
       digits = 6
 
       self.assertAlmostEqual(solver_out["f"][0],0,digits,str(Solver))
@@ -200,12 +200,12 @@ class NLPtests(casadiTestCase):
       self.assertAlmostEqual(solver_out["lam_x"][0],0,5,str(Solver))
       self.assertAlmostEqual(solver_out["lam_x"][1],0,5,str(Solver))
       self.assertAlmostEqual(solver_out["lam_g"][0],0,5,str(Solver))
-      
+
   def testIPOPTrbf(self):
     self.message("rosenbrock fixed, limited-memory hessian approx")
     x=SX.sym("x")
     y=SX.sym("y")
-    
+
     nlp={'x':vertcat(*[x,y]), 'f':(1-x)**2+100*(y-x**2)**2, 'g':x+y}
     for Solver, solver_options in solvers:
       self.message(str(Solver))
@@ -232,16 +232,16 @@ class NLPtests(casadiTestCase):
         self.assertAlmostEqual(solver_out["lam_g"][0],0,6,str(Solver))
 
   def test_warmstart(self):
-  
+
     x=SX.sym("x")
     y=SX.sym("y")
-    
+
     obj = (1-x)**2+100*(y-x**2)**2
     nlp={'x':vertcat(*[x,y]), 'f':obj, 'g':x**2+y**2}
-    
+
     c_r = 4.56748075136258e-02;
     x_r = [7.86415156987791e-01,6.17698316967954e-01]
-    
+
     for Solver, solver_options in solvers:
       self.message(Solver)
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
@@ -253,9 +253,9 @@ class NLPtests(casadiTestCase):
       solver_in["ubg"]=[1]
       solver_out = solver(**solver_in)
       oldsolver_out = solver_out
-      
+
       digits = 5
-        
+
       self.assertAlmostEqual(solver_out["f"][0],c_r,digits,str(Solver))
       self.assertAlmostEqual(solver_out["x"][0],x_r[0],digits,str(Solver))
       self.assertAlmostEqual(solver_out["x"][1],x_r[1],digits,str(Solver))
@@ -281,24 +281,24 @@ class NLPtests(casadiTestCase):
         solver_in["x0"]=oldsolver_out["x"]
         solver_in["lam_g0"]=oldsolver_out["lam_g"]
         solver_in["lam_x0"] =oldsolver_out["lam_x"]
-        
-        
+
+
         solver_out = solver(**solver_in)
 
   def testIPOPTrhb2_gen(self):
     self.message("rosenbrock, exact hessian generated, constrained")
     x=SX.sym("x")
     y=SX.sym("y")
-    
+
     obj = (1-x)**2+100*(y-x**2)**2
     nlp={'x':vertcat(*[x,y]), 'f':obj, 'g':x**2+y**2}
-    
+
     c_r = 4.56748075136258e-02;
     x_r = [7.86415156987791e-01,6.17698316967954e-01]
-    
+
     sigma=SX.sym("sigma")
     lambd=SX.sym("lambd")
-  
+
     for Solver, solver_options in solvers:
       self.message(str(Solver))
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
@@ -309,21 +309,21 @@ class NLPtests(casadiTestCase):
       solver_in["lbg"]=[0]
       solver_in["ubg"]=[1]
       solver_out = solver(**solver_in)
-      
+
       digits = 5
-      
+
       self.assertAlmostEqual(solver_out["f"][0],c_r,digits,str(Solver) + str(solver_out["f"][0]) + ":" + str(c_r))
       self.assertAlmostEqual(solver_out["x"][0],x_r[0],digits,str(Solver))
       self.assertAlmostEqual(solver_out["x"][1],x_r[1],digits,str(Solver))
       self.assertAlmostEqual(solver_out["lam_x"][0],0,8,str(Solver))
       self.assertAlmostEqual(solver_out["lam_x"][1],0,8,str(Solver))
       self.assertAlmostEqual(solver_out["lam_g"][0],0.12149655447670,6,str(Solver))
-      
-      
+
+
   def test_jacG_empty(self):
     x=SX.sym("x")
     y=SX.sym("y")
-    
+
     obj = (1-x)**2+100*(y-x**2)**2
     nlp={'x':vertcat(*[x,y]), 'f':obj, 'g':1}
 
@@ -339,9 +339,9 @@ class NLPtests(casadiTestCase):
       solver_in["lbg"]=[0]
       solver_in["ubg"]=[2]
       solver_out = solver(**solver_in)
-      
+
       digits = 5
-        
+
       self.checkarray(solver_out["f"],DM([0]),str(Solver),digits=digits)
       self.checkarray(solver_out["x"],DM([1,1]),str(Solver),digits=digits)
       self.checkarray(solver_out["lam_x"],DM([0,0]),str(Solver),digits=digits)
@@ -352,13 +352,13 @@ class NLPtests(casadiTestCase):
     x=SX.sym("x")
     y=SX.sym("y")
     p=SX.sym("p")
-    
+
     obj = (p-x)**2+100*(y-x**2)**2
     nlp={'x':vertcat(*[x,y]), 'p':p, 'f':obj, 'g':x**2+y**2}
-    
+
     c_r = 4.56748075136258e-02;
     x_r = [7.86415156987791e-01,6.17698316967954e-01]
-    
+
     for Solver, solver_options in solvers:
       self.message(str(Solver))
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
@@ -371,7 +371,7 @@ class NLPtests(casadiTestCase):
       solver_in["ubg"]=[1]
       solver_in["p"]=[1]
       solver_out = solver(**solver_in)
-      
+
       digits = 5
 
       self.assertAlmostEqual(solver_out["f"][0],c_r,digits,str(Solver))
@@ -385,12 +385,12 @@ class NLPtests(casadiTestCase):
     self.message("rosenbrock, exact hessian generated")
     x=SX.sym("x")
     y=SX.sym("y")
-    
+
     obj=(1-x)**2+100*(y-x**2)**2
     nlp={'x':vertcat(*[x,y]), 'f':obj}
-    
+
     sigma=SX.sym("sigma")
-    
+
     for Solver, solver_options in solvers:
       self.message(str(Solver))
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
@@ -408,12 +408,12 @@ class NLPtests(casadiTestCase):
     self.message("rosenbrock, exact hessian generated, non-free x")
     x=SX.sym("x")
     y=SX.sym("y")
-    
+
     obj=(1-x)**2+100*(y-x**2)**2
     nlp={'x':vertcat(*[x,y]), 'f':obj}
-    
+
     sigma=SX.sym("sigma")
-    
+
     for Solver, solver_options in solvers:
       self.message(str(Solver))
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
@@ -439,13 +439,13 @@ class NLPtests(casadiTestCase):
     self.message("rosenbrock, exact hessian generated, parametric")
     x=SX.sym("x")
     y=SX.sym("y")
-    
+
     p=SX.sym("p")
     obj=(p-x)**2+100*(y-x**2)**2
     nlp={'x':vertcat(*[x,y]), 'p':p, 'f':obj}
-    
+
     sigma=SX.sym("sigma")
-    
+
     for Solver, solver_options in solvers:
       self.message(str(Solver))
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
@@ -457,7 +457,7 @@ class NLPtests(casadiTestCase):
       self.assertAlmostEqual(solver_out["f"][0],0,10,str(Solver))
       self.assertAlmostEqual(solver_out["x"][0],1,9,str(Solver))
       self.assertAlmostEqual(solver_out["x"][1],1,9,str(Solver))
-      
+
   @memory_heavy()
   def testIPOPTnorm(self):
     self.message("IPOPT min ||x||^2_2")
@@ -479,14 +479,14 @@ class NLPtests(casadiTestCase):
       solver_in["lbg"]=[-10]*N
       solver_in["ubg"]=[10]*N
       solver_out = solver(**solver_in)
-      print "residuals"
-      print array(solver_out["x"]).squeeze()-x0
-      print "bazmeg", solver_out["f"]
+      print("residuals")
+      print(array(solver_out["x"]).squeeze()-x0)
+      print("bazmeg", solver_out["f"])
       self.assertAlmostEqual(solver_out["f"][0],0,10,str(Solver))
       self.checkarray(array(solver_out["x"]).squeeze(),x0,str(Solver),digits=8)
       self.checkarray(solver_out["lam_x"],DM([0]*10),8,str(Solver),digits=8)
       self.assertAlmostEqual(solver_out["lam_g"][1],0,8,str(Solver))
-      
+
   def testIPOPTnoc(self):
     self.message("trivial IPOPT, no constraints")
     """ There is an assertion error thrown, but still it works"""
@@ -503,12 +503,12 @@ class NLPtests(casadiTestCase):
       solver_out = solver(**solver_in)
       self.assertAlmostEqual(solver_out["f"][0],0,10,str(Solver))
       self.assertAlmostEqual(solver_out["x"][0],1,9,str(Solver))
-    
+
   def testIPOPTmx(self):
     self.message("trivial IPOPT, using MX")
     x=MX.sym("x")
     nlp={'x':x, 'f':(x-1)**2, 'g':2*x}
-    
+
     for Solver, solver_options in solvers:
       self.message(str(Solver))
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
@@ -523,12 +523,12 @@ class NLPtests(casadiTestCase):
       solver_out = solver(**solver_in)
       self.assertAlmostEqual(solver_out["f"][0],0,10,str(Solver))
       self.assertAlmostEqual(solver_out["x"][0],1,9,str(Solver))
-    
+
   def testIPOPTc(self):
     self.message("trivial, overconstrained")
     x=SX.sym("x")
     nlp={'x':x, 'f':(x-1)**2, 'g':vertcat(*[x,x,x])}
-    
+
     for Solver, solver_options in solvers:
       self.message(str(Solver))
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
@@ -540,12 +540,12 @@ class NLPtests(casadiTestCase):
       solver_out = solver(**solver_in)
       self.assertAlmostEqual(solver_out["f"][0],0,9,str(Solver) )
       self.assertAlmostEqual(solver_out["x"][0],1,5,str(Solver))
-    
+
   def testIPOPTc2(self):
     self.message("trivial2, overconstrained")
     x=SX.sym("x")
     nlp={'x':x, 'f':(x-1)**2, 'g':vertcat(*[x,x,x+x])}
-    
+
     for Solver, solver_options in solvers:
       self.message(str(Solver))
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
@@ -557,12 +557,12 @@ class NLPtests(casadiTestCase):
       solver_out = solver(**solver_in)
       self.assertAlmostEqual(solver_out["f"][0],0,10,str(Solver))
       self.assertAlmostEqual(solver_out["x"][0],1,8,str(Solver))
-    
+
   def testIPOPTcmx(self):
     self.message("trivial , overconstrained, using MX")
     x=MX.sym("x")
     nlp={'x':x, 'f':(x-1)**2, 'g':vertcat(*[2*x,3*x,4*x])}
-    
+
     for Solver, solver_options in solvers:
       self.message(str(Solver))
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
@@ -596,7 +596,7 @@ class NLPtests(casadiTestCase):
     x=SX.sym("x")
     y=SX.sym("y")
     nlp={'x':vertcat(*[x,y]), 'f':0, 'g':vertcat(*[x-y,x,x+y])}
-    
+
     for Solver, solver_options in solvers:
       self.message(str(Solver))
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
@@ -608,12 +608,12 @@ class NLPtests(casadiTestCase):
       solver_out = solver(**solver_in)
       # todo: catch error when set([0, 3 , 5]) two times
       self.assertAlmostEqual(solver_out["x"][0],solver_out["x"][1],4 if "sqic" in str(solver_options) else 10,"IPOPT")
-      
+
   def testXfreeChange(self):
     self.message("Change in X settings")
     x=SX.sym("x")
     y=SX.sym("y")
-    
+
     nlp={'x':vertcat(*[x,y]), 'f':(1-x)**2+100*(y-x**2)**2, 'g':x+y}
     for Solver, solver_options in solvers:
       self.message(str(Solver))
@@ -637,7 +637,7 @@ class NLPtests(casadiTestCase):
 
 
       solver_out = solver(**solver_in)
-      
+
       self.assertAlmostEqual(solver_out["f"][0],0,10,str(Solver))
       self.assertAlmostEqual(solver_out["x"][0],1,7,str(Solver))
       self.assertAlmostEqual(solver_out["x"][1],1,7,str(Solver))
@@ -646,7 +646,7 @@ class NLPtests(casadiTestCase):
     self.message("active LBX")
     x=SX.sym("x")
     y=SX.sym("y")
-    
+
     nlp={'x':vertcat(*[x,y]), 'f':(1-x)**2+100*(y-x**2)**2, 'g':x+y}
     for Solver, solver_options in solvers:
       self.message(Solver)
@@ -677,7 +677,7 @@ class NLPtests(casadiTestCase):
     self.message("active LBG")
     x=SX.sym("x")
     y=SX.sym("y")
-    
+
     nlp={'x':vertcat(*[x,y]), 'f':(1-x)**2+100*(y-x**2)**2, 'g':x+y}
     for Solver, solver_options in solvers:
       self.message(str(Solver))
@@ -700,7 +700,7 @@ class NLPtests(casadiTestCase):
     self.message("active UBG")
     x=SX.sym("x")
     y=SX.sym("y")
-    
+
     nlp={'x':vertcat(*[x,y]), 'f':(1-x)**2+100*(y-x**2)**2, 'g':x+y}
     for Solver, solver_options in solvers:
       self.message(str(Solver))
@@ -718,12 +718,12 @@ class NLPtests(casadiTestCase):
       self.assertAlmostEqual(solver_out["lam_x"][0],0,8,str(Solver))
       self.assertAlmostEqual(solver_out["lam_x"][1],0,4,str(Solver))
       self.assertAlmostEqual(solver_out["lam_g"][0],4.75846495145007e-2,5,str(Solver))
-      
+
   def testactiveUBX(self):
     self.message("active UBX")
     x=SX.sym("x")
     y=SX.sym("y")
-    
+
     nlp={'x':vertcat(*[x,y]), 'f':(1-x)**2+100*(y-x**2)**2, 'g':x+y}
     for Solver, solver_options in solvers:
       self.message(str(Solver))
@@ -741,16 +741,16 @@ class NLPtests(casadiTestCase):
       self.assertAlmostEqual(solver_out["lam_x"][0],0,8,str(Solver))
       self.assertAlmostEqual(solver_out["lam_x"][1],5.39346608659e-2,4,str(Solver))
       self.assertAlmostEqual(solver_out["lam_g"][0],0,8,str(Solver))
-  
+
   @memory_heavy()
   def test_QP(self):
     self.message("QP")
 
-    N = 50 
+    N = 50
 
     x = SX.sym("x",N)
-    x0 = DM(range(N))
-    H = diag(range(1,N+1))
+    x0 = DM(list(range(N)))
+    H = diag(list(range(1,N+1)))
     obj = 0.5*mtimes([(x-x0).T,H,(x-x0)])
 
     nlp = {'x':x, 'f':obj}
@@ -765,7 +765,7 @@ class NLPtests(casadiTestCase):
       self.checkarray(solver_out["x"],x0,str(Solver),digits=2)
       self.assertAlmostEqual(solver_out["f"][0],0,3,str(Solver))
       self.checkarray(solver_out["lam_x"],DM.zeros(N,1),str(Solver),digits=4)
-           
+
   def test_QP2(self):
     H = DM([[1,-1],[-1,2]])
     G = DM([-2,-6])
@@ -788,7 +788,7 @@ class NLPtests(casadiTestCase):
       solver = nlpsol("mysolver", Solver, nlp, options)
       #{"tol":1e-8,"TolOpti":1e-25,"hessian_approximation":"limited-memory","max_iter":100,"MaxIter": 100,"print_level":0, "fixed_variable_treatment": "make_constraint"}).iteritems():
       solver_in = {}
-      
+
       solver_in["lbx"]=LBX
       solver_in["ubx"]=UBX
       solver_in["lbg"]=LBA
@@ -804,14 +804,14 @@ class NLPtests(casadiTestCase):
 
       self.assertAlmostEqual(solver_out["x"][0],0.5,6,str(Solver))
       self.assertAlmostEqual(solver_out["x"][1],1.25,6,str(Solver))
-    
+
       self.assertAlmostEqual(solver_out["lam_x"][0],4.75,6,str(Solver))
       self.assertAlmostEqual(solver_out["lam_x"][1],0,6,str(Solver))
 
       self.checkarray(solver_out["lam_g"],DM([0,2,0]),str(Solver),digits=6)
-      
+
       self.assertAlmostEqual(solver_out["f"][0],-7.4375,6,str(Solver))
-      
+
       solver = nlpsol("mysolver", Solver, nlp, options)
       solver_in["lbx"]=LBX
       solver_in["ubx"]=UBX
@@ -822,19 +822,19 @@ class NLPtests(casadiTestCase):
 
       self.assertAlmostEqual(solver_out["x"][0],0.5,6,str(Solver))
       self.assertAlmostEqual(solver_out["x"][1],1.25,6,str(Solver))
-    
+
       self.assertAlmostEqual(solver_out["lam_x"][0],4.75,6,str(Solver))
       self.assertAlmostEqual(solver_out["lam_x"][1],0,6,str(Solver))
 
       self.checkarray(solver_out["lam_g"],DM([0,2,0]),str(Solver),digits=6)
-      
+
       self.assertAlmostEqual(solver_out["f"][0],-7.4375,6,str(Solver))
 
   def test_QP2_unconvex(self):
     H = DM([[1,-1],[-1,-2]])
     G = DM([-2,-6])
     A =  DM([[1, 1],[-1, 2],[2, 1]])
-    
+
     LBA = DM([-inf]*3)
     UBA = DM([2, 2, 3])
 
@@ -860,16 +860,16 @@ class NLPtests(casadiTestCase):
 
       self.assertAlmostEqual(solver_out["x"][0],2.0/3,6,str(solver))
       self.assertAlmostEqual(solver_out["x"][1],4.0/3,6,str(solver))
-    
+
       self.assertAlmostEqual(solver_out["lam_x"][0],0,6,str(solver))
       self.assertAlmostEqual(solver_out["lam_x"][1],0,6,str(solver))
 
       self.checkarray(solver_out["lam_g"],DM([4+8.0/9,20.0/9,0]),str(solver),digits=6)
-      
+
       self.assertAlmostEqual(solver_out["f"][0],-10-16.0/9,6,str(solver))
 
       solver = nlpsol("mysolver", Solver, nlp, options)
-          
+
       solver_in["lbx"]=LBX
       solver_in["ubx"]=UBX
       solver_in["lbg"]=LBA
@@ -879,14 +879,14 @@ class NLPtests(casadiTestCase):
 
       self.assertAlmostEqual(solver_out["x"][0],2.0/3,6,str(solver))
       self.assertAlmostEqual(solver_out["x"][1],4.0/3,6,str(solver))
-    
+
       self.assertAlmostEqual(solver_out["lam_x"][0],0,6,str(solver))
       self.assertAlmostEqual(solver_out["lam_x"][1],0,6,str(solver))
 
       self.checkarray(solver_out["lam_g"],DM([4+8.0/9,20.0/9,0]),str(solver),digits=6)
-      
+
       self.assertAlmostEqual(solver_out["f"][0],-10-16.0/9,6,str(solver))
-      
+
   def test_bug(self):
     x = MX.sym("x", 3)
     y = MX.sym("y", 2)
@@ -900,13 +900,99 @@ class NLPtests(casadiTestCase):
     for Solver, solver_options in solvers:
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
       solver_in = {}
-      
+
+  @requires_nlpsol("ipopt")
+  def test_iteration_Callback(self):
+
+    x=SX.sym("x")
+    y=SX.sym("y")
+
+    f = (1-x)**2+100*(y-x**2)**2
+    nlp={'x':vertcat(x,y), 'f':f,'g':x+y}
+    fcn = Function('f', [x, y], [f])
+
+    class MyCallback(Callback):
+      def __init__(self,nx, ng, np):
+        Callback.__init__(self)
+        self.foo = []
+
+        self.nx = nx
+        self.ng = ng
+        self.np = np
+        self.construct(name, {})
+
+      def get_n_in(self): return nlpsol_n_out()
+      def get_n_out(self): return 1
+
+
+      def get_sparsity_in(self, i):
+        n = nlpsol_out(i)
+        if n=='f':
+          return Sparsity. scalar()
+        elif n in ('x', 'lam_x'):
+          return Sparsity.dense(self.nx)
+        elif n in ('g', 'lam_g'):
+          return Sparsity.dense(self.ng)
+        else:
+          return Sparsity(0,0)
+      def eval(self, arg):
+        self.foo.append(arg)
+        return [0]
+
+    mycallback = MyCallback(2,1,0)
+    opts = {}
+    opts['iteration_callback'] = mycallback
+    opts['ipopt.tol'] = 1e-8
+    opts['ipopt.max_iter'] = 50
+    solver = nlpsol('solver', 'ipopt', nlp, opts)
+    sol = solver(lbx=-10, ubx=10, lbg=-10, ubg=10)
+    self.assertEqual(len(mycallback.foo),solver.stats()["iter_count"]+1)
+    
+    class MyCallback(Callback):
+      def __init__(self,nx, ng, np):
+        Callback.__init__(self)
+        self.foo = []
+
+        self.nx = nx
+        self.ng = ng
+        self.np = np
+        self.construct(name, {})
+
+      def get_n_in(self): return nlpsol_n_out()
+      def get_n_out(self): return 1
+
+
+      def get_sparsity_in(self, i):
+        n = nlpsol_out(i)
+        if n=='f':
+          return Sparsity. scalar()
+        elif n in ('x', 'lam_x'):
+          return Sparsity.dense(self.nx)
+        elif n in ('g', 'lam_g'):
+          return Sparsity.dense(self.nx)
+        else:
+          return Sparsity(0,0)
+      def eval(self, arg):
+        self.foo.append(arg)
+        return [0]
+
+    mycallback = MyCallback(2,1,0)
+    opts = {}
+    opts['iteration_callback'] = mycallback
+    opts['ipopt.tol'] = 1e-8
+    opts['ipopt.max_iter'] = 50
+
+    try:
+      solver = nlpsol('solver', 'ipopt', nlp, opts)
+    except Exception as e:
+      self.assertTrue("Callback function input size mismatch" in str(e))
+    
   @requires_nlpsol("snopt")
   def test_permute(self):
     for Solver, solver_options in solvers:
       if "snopt" not in str(Solver): continue
-      for permute_g in itertools.permutations(range(3)):
-        for permute_x in itertools.permutations(range(4)):
+      for permute_g in itertools.permutations(list(range(3))):
+        for permute_x in itertools.permutations(list(range(4))):
           x=SX.sym("x",4)
           x1,x2,x3,x4 = x[permute_x]
           g = [x1**2+x2**2+x3,
@@ -914,25 +1000,25 @@ class NLPtests(casadiTestCase):
               2*x1+4*x2]
           f= (x1+x2+x3)**2+3*x3+5*x4
           F= {'x':x, 'f':f, 'g':vertcat(*g)[permute_g]}
-          
+
           solver = nlpsol("mysolver",Solver,F,solver_options)
-          
+
           ubx = solver.getInput("ubx")
           ubx[permute_x]= DM([inf,inf,inf,inf])
           solver_in["ubx"]=ubx
-          
-          
+
+
           lbx = solver.getInput("lbx")
           lbx[permute_x]= DM([-inf,-inf,0,0])
           solver_in["lbx"]=lbx
-          
+
           solver_in["ubg"]=DM([2,4,inf])[permute_g]
           solver_in["lbg"]=DM([2,4,0])[permute_g]
-          
+
           x0 = solver.getInput("x0")
           x0[permute_x] = DM([-0.070,1.41,0,0.0199])
           solver_in["x0"]=x0
-          
+
           solver_out = solver(solver_in)
 
           self.checkarray(solver_out["f"],DM([1.9001249992187681e+00]),digits=7)
@@ -945,8 +1031,8 @@ class NLPtests(casadiTestCase):
   def test_permute2(self):
     for Solver, solver_options in solvers:
       if "snopt" not in str(Solver): continue
-      for permute_g in itertools.permutations(range(3)):
-        for permute_x in itertools.permutations(range(4)):
+      for permute_g in itertools.permutations(list(range(3))):
+        for permute_x in itertools.permutations(list(range(4))):
           x=SX.sym("x",4)
           x1,x2,x3,x4 = x[permute_x]
           g = [x1**2+x2+x3,
@@ -954,25 +1040,25 @@ class NLPtests(casadiTestCase):
               2*x1+4*x2]
           f= x1**2+x3**2
           F= {'x':x, 'f':f, 'g':vertcat(*g)[permute_g]}
-          
+
           solver = nlpsol("mysolver",Solver,F,solver_options)
 
           ubx = solver.getInput("ubx")
           ubx[permute_x]= DM([inf,inf,inf,inf])
           solver_in["ubx"]=ubx
-          
+
           lbx = solver.getInput("lbx")
           lbx[permute_x]= DM([-inf,-inf,0,0])
           solver_in["lbx"]=lbx
 
           solver_in["ubg"]=DM([2,4,inf])[permute_g]
           solver_in["lbg"]=DM([2,4,0])[permute_g]
-          
+
           x0 = solver.getInput("x0")
-          
+
           x0[permute_x] = DM([-0.070,1.41,0,0.0199])
           solver_in["x0"]=x0
-          
+
           solver_out = solver(solver_in)
 
           self.checkarray(solver_out["f"],DM([0]),digits=8)
@@ -985,8 +1071,8 @@ class NLPtests(casadiTestCase):
   def test_permute3(self):
     for Solver, solver_options in solvers:
       if "snopt" not in str(Solver): continue
-      for permute_g in itertools.permutations(range(3)):
-        for permute_x in itertools.permutations(range(4)):
+      for permute_g in itertools.permutations(list(range(3))):
+        for permute_x in itertools.permutations(list(range(4))):
           x=SX.sym("x",4)
           x1,x2,x3,x4 = x[permute_x]
           g = [x1**2+x2+x3,
@@ -996,7 +1082,7 @@ class NLPtests(casadiTestCase):
           F= {'x':x, 'f':f, 'g':vertcat(*g)[permute_g]}
 
           solver = nlpsol("mysolver",Solver,F,solver_options)
-          
+
           ubx = solver.getInput("ubx")
           ubx[permute_x]= DM([inf,inf,inf,inf])
           solver_in["ubx"]=ubx
@@ -1004,14 +1090,14 @@ class NLPtests(casadiTestCase):
           lbx = solver.getInput("lbx")
           lbx[permute_x]= DM([-inf,-inf,0,0])
           solver_in["lbx"]=lbx
-          
+
           solver_in["ubg"]=DM([2,4,inf])[permute_g]
           solver_in["lbg"]=DM([2,4,0])[permute_g]
-          
-          x0 = solver.getInput("x0") 
+
+          x0 = solver.getInput("x0")
           x0[permute_x] = DM([1,-0.5,0.5,4])
           solver_in["x0"]=x0
-          
+
           solver_out = solver(solver_in)
 
           self.checkarray(solver_out["f"],DM([9.9030108869944522e-01]),failmessage=str(permute_x)+str(permute_g))
@@ -1019,9 +1105,9 @@ class NLPtests(casadiTestCase):
           self.checkarray(solver_out["lam_x"][permute_x],DM([0,0,0,0]),digits=7)
           self.checkarray(solver_out["lam_g"],DM([-8.0593503860219973e-01,6.52750754744e-10,-0.298516240384])[permute_g],failmessage=str(permute_x)+str(permute_g),digits=8)
           #self.checkarray(solver_out["g"],DM([2,4,5.50855])[permute_g])
-        
+
   @requires_nlpsol("snopt")
-  def test_classifications(self):      
+  def test_classifications(self):
     x=SX.sym("x")
     y=SX.sym("y")
     nlp={'x':vertcat(*[x,y]), 'f':(1-x)**2+7.7*y, 'g':y**2}
@@ -1036,13 +1122,13 @@ class NLPtests(casadiTestCase):
     solver_in["ubg"]=[10]
 
     solver_out = solver(**solver_in)
-    
+
     self.checkarray(solver_out["f"],DM([0]))
     self.checkarray(solver_out["x"],DM([1,0]))
     self.checkarray(solver_out["lam_x"],DM([0,-7.7]),digits=7)
     self.checkarray(solver_out["lam_g"],DM([0]))
-    
-  def test_pathological(self):      
+
+  def test_pathological(self):
     x=SX.sym("x")
     y=SX.sym("y")
     nlp={'x':vertcat(*[x,y]), 'f':(1-x)**2+y**2}
@@ -1052,18 +1138,18 @@ class NLPtests(casadiTestCase):
       if "worhp"==Solver or "stabilizedsqp"==Solver : continue
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
       solver_in = {}
-          
+
       solver_in["x0"]=[1,1]
       solver_in["lbx"]=[-10,-1]
       solver_in["ubx"]=[10,2]
 
       solver_out = solver(**solver_in)
-      
+
       self.checkarray(solver_out["f"],DM([0]),digits=7)
       self.checkarray(solver_out["x"],DM([1,0]),digits=7,failmessage=str(Solver))
       self.checkarray(solver_out["lam_x"],DM([0,-0]),digits=7,failmessage=str(Solver))
 
-  def test_pathological2(self):      
+  def test_pathological2(self):
     x=SX.sym("x")
     y=SX.sym("y")
     nlp={'x':vertcat(*[x,y]), 'f':(1-x)**2+y}
@@ -1078,12 +1164,12 @@ class NLPtests(casadiTestCase):
       solver_in["ubx"]=[10,2]
 
       solver_out = solver(**solver_in)
-      
+
       self.checkarray(solver_out["f"],DM([0]),digits=7)
       self.checkarray(solver_out["x"],DM([1,0]),digits=7)
       self.checkarray(solver_out["lam_x"],DM([0,-1]),digits=7)
 
-  def test_pathological3(self):      
+  def test_pathological3(self):
     x=SX.sym("x")
     y=SX.sym("y")
     nlp={'x':vertcat(*[x,y]), 'f':(1-x)**2, 'g':x+y}
@@ -1099,14 +1185,14 @@ class NLPtests(casadiTestCase):
       solver_in["ubx"]=[10,2]
       solver_in["lbg"]=[2]
       solver_in["ubg"]=[2]
-      
+
       solver_out = solver(**solver_in)
-      
+
       self.checkarray(solver_out["f"],DM([0]),digits=7)
       self.checkarray(solver_out["x"],DM([1,1]),digits=7)
       self.checkarray(solver_out["lam_x"],DM([0,0]),digits=7)
-    
-  def test_pathological4(self):      
+
+  def test_pathological4(self):
     x=SX.sym("x")
     nlp={'x':x, 'f':x*x}
 
@@ -1115,18 +1201,17 @@ class NLPtests(casadiTestCase):
       if "worhp"==Solver: continue
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
       solver_in = {}
-          
+
       solver_in["x0"]=[0]
       solver_in["lbx"]=[0]
       solver_in["ubx"]=[0]
-      
+
       solver_out = solver(**solver_in)
-      
+
       self.checkarray(solver_out["f"],DM([0]),digits=7)
       self.checkarray(solver_out["x"],DM([0]),digits=7)
       self.checkarray(solver_out["lam_x"],DM([0]),digits=7)
-      
+
 if __name__ == '__main__':
     unittest.main()
-    print solvers
-
+    print(solvers)

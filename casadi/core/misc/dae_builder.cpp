@@ -1164,7 +1164,7 @@ namespace casadi {
     casadi_assert(var.is_column() && var.is_symbolic());
     MX ret = MX::zeros(var.sparsity());
     for (int i=0; i<ret.nnz(); ++i) {
-      ret[i] = der(var[i].name());
+      ret.nz(i) = der(var.nz(i).name());
     }
     return ret;
   }
@@ -1305,7 +1305,7 @@ namespace casadi {
     std::vector<MX> prim = var.primitives();
     for (int i=0; i<prim.size(); ++i) {
       casadi_assert(prim[i].nnz()==1);
-      ret[i] = (this->*f)(prim[i].name());
+      ret.nz(i) = (this->*f)(prim[i].name());
     }
     return ret;
   }
@@ -1330,7 +1330,7 @@ namespace casadi {
     std::vector<MX> prim = var.primitives();
     for (int i=0; i<prim.size(); ++i) {
       casadi_assert(prim[i].nnz()==1);
-      (this->*f)(var[i].name(), val[i]);
+      (this->*f)(var.nz(i).name(), val.nz(i));
     }
   }
 
@@ -1973,4 +1973,3 @@ namespace casadi {
   }
 
 } // namespace casadi
-

@@ -13,7 +13,7 @@ trunktesterbot_no_unittests_py: examples_indoc_py examples_indoc_cpp tutorials e
 trunktesterbot_knownbugs: unittests_py_knownbugs examples_indoc_py examples_indoc_cpp tutorials examples_code_py examples_code_cpp users_guide user_guide_snippets_py
 
 # Set to -memcheck if you want to include a check for memory leaks
-MEMCHECK = 
+MEMCHECK =
 
 lint :
 	cd ../build && make lint; cd ../test
@@ -26,6 +26,8 @@ benchmarks:
 	cd python && python complexity.py; cd ..
 
 python: unittests_py examples_indoc_py examples_code_py user_guide_snippets_py tutorials
+
+matlab: unittests_matlab examples_matlab
 
 python_knownbugs: unittests_py_knownbugs examples_indoc_py examples_code_py user_guide_snippets_py tutorials
 
@@ -61,6 +63,9 @@ examples_code: examples_code_py examples_code_cpp
 unittests_matlab:
 	python internal/test_matlab.py matlab
 
+examples_matlab:
+	python internal/test_matlab.py '../examples/matlab'
+
 # No memchecks because there is a memory leak in SuperLU
 examples_indoc_py:
 	python internal/test_py.py '../docs/api/examples'
@@ -87,4 +92,3 @@ users_guide:
 
 user_guide_snippets_py: users_guide
 	python internal/test_py.py '../docs/users_guide' -skipfiles="pytex.py temp_pytex.py"
-

@@ -25,9 +25,12 @@ from casadi import SX, MX, print_operator
 import casadi as C
 
 try:
-  import pydot
+  from pydot import pydot
 except:
-  raise Exception("To use the functionality of casadi.tools.graph, you need to have pydot Installed. Try `easy_install pydot`.")  
+  try:
+    import pydot
+  except:
+    raise Exception("To use the functionality of casadi.tools.graph, you need to have pydot Installed. Try `easy_install pydot`.")
       
 #import ipdb
 
@@ -103,7 +106,7 @@ class DotArtist:
     sp = s.sparsity()
     deps = getDeps(s)
     if nzlabels is None:
-      nzlabels = map(str,range(sp.nnz()))
+      nzlabels = list(map(str,list(range(sp.nnz()))))
     nzlabelcounter = 0
     if s.nnz()==s.numel():
       graph.add_node(pydot.Node(id,label="%d x %d" % (s.size1(),s.size2()),shape='rectangle',color=self.sparsitycol,style="filled"))
@@ -632,10 +635,13 @@ def dotgraph(s,direction="BT",**kwargs):
 
   try:
     def getHashSX(e):
-      try:
-        return e.element_hash()
-      except:
-        return SX__hash__backup(e)
+      if e.is_scalar(True):
+        try:
+          return e.element_hash()
+        except:
+          return SX__hash__backup(e)
+      else:
+        return 0
         
     SX__hash__backup = SX.__hash__
     SX.__hash__ = getHashSX
@@ -658,11 +664,11 @@ def dotgraph(s,direction="BT",**kwargs):
     for node in allnodes:
       artists[node] = createArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists,**kwargs)
       
-    for artist in artists.itervalues():
+    for artist in artists.values():
       if artist is None: continue
       artist.draw()
     
-    file('source.dot','w').write(graph.to_string())
+    open('source.dot','w').write(graph.to_string())
   finally:
     SX.__hash__ = SX__hash__backup
   return graph
@@ -703,7 +709,7 @@ def dotdraw(s,direction="RL",**kwargs):
     from pylab import imread, imshow,show,figure, axes
   except:
     # We don't have pylab, so just write out to file
-    print "casadi.tools.graph.dotdraw: no pylab detected, will not show drawing on screen."
+    print("casadi.tools.graph.dotdraw: no pylab detected, will not show drawing on screen.")
     dotgraph(s,direction=direction,**kwargs).write_ps("temp.ps")
     return
    
@@ -712,7 +718,7 @@ def dotdraw(s,direction="RL",**kwargs):
     figure_name = '%s%d.%s' % ( show.basename, len(show.figure_list), show.figure_extension )
     show.figure_list += (figure_name, )
     dotgraph(s,direction=direction,**kwargs).write_pdf(figure_name)
-    print "Here goes figure %s (dotdraw)" % figure_name
+    print("Here goes figure %s (dotdraw)" % figure_name)
   else:
     # Matplotlib does not allow to display vector graphics on screen, 
     # so we fall back to png

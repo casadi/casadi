@@ -108,23 +108,17 @@ namespace casadi {
   class CASADI_NLPSOL_IPOPT_EXPORT IpoptInterface : public Nlpsol {
     friend class IpoptUserClass;
   public:
-    // NLP functions
-    Function f_fcn_;
-    Function g_fcn_;
-    Function grad_f_fcn_;
-    Function jac_g_fcn_;
-    Function hess_l_fcn_;
     Sparsity jacg_sp_;
     Sparsity hesslag_sp_;
 
-    explicit IpoptInterface(const std::string& name, Oracle* nlp);
+    explicit IpoptInterface(const std::string& name, const Function& nlp);
     virtual ~IpoptInterface();
 
     // Get name of the plugin
     virtual const char* plugin_name() const { return "ipopt";}
 
     /** \brief  Create a new NLP Solver */
-    static Nlpsol* creator(const std::string& name, Oracle* nlp) {
+    static Nlpsol* creator(const std::string& name, const Function& nlp) {
       return new IpoptInterface(name, nlp);
     }
 

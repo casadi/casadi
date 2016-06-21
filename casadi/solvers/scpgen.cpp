@@ -53,7 +53,7 @@ namespace casadi {
     Nlpsol::registerPlugin(casadi_register_nlpsol_scpgen);
   }
 
-  Scpgen::Scpgen(const std::string& name, Oracle* nlp) : Nlpsol(name, nlp) {
+  Scpgen::Scpgen(const std::string& name, const Function& nlp) : Nlpsol(name, nlp) {
     casadi_warning("SCPgen is under development");
   }
 
@@ -211,7 +211,7 @@ namespace casadi {
     }
 
     // Generate lifting functions
-    Function fg = create_function("fg", {"x", "p"}, {"f", "g"}, {}, Dict(), false);
+    Function fg = oracle();
     Function vdef_fcn, vinit_fcn;
     fg.generate_lifted(vdef_fcn, vinit_fcn);
     vinit_fcn_ = vinit_fcn;
@@ -536,13 +536,6 @@ namespace casadi {
 
     // Generate c code and load as DLL
     if (codegen_) {
-      // Codegen the functions
-      CodeGenerator gen;
-      gen.add(res_fcn);
-      gen.add(mat_fcn);
-      gen.add(vec_fcn);
-      gen.add(exp_fcn);
-
       // Name of temporary file
       string cname;
 #ifdef HAVE_MKSTEMPS
@@ -559,19 +552,26 @@ namespace casadi {
       free(cname_array);
 #endif
 
+      // Codegen the functions
+      CodeGenerator gen(cname);
+      gen.add(res_fcn);
+      gen.add(mat_fcn);
+      gen.add(vec_fcn);
+      gen.add(exp_fcn);
+
       // Generate code
       if (verbose_) {
         userOut() << "Generating \"" << cname << "\""  << endl;
       }
       string name = cname.substr(0, cname.find_first_of('.'));
-      gen.generate(name);
+      gen.generate();
 
       // Complile and run
       if (verbose_) {
         userOut() << "Starting compilation"  << endl;
       }
       time_t time1 = time(0);
-      compiler_ = Compiler(cname, compilerplugin_, jit_options_);
+      compiler_ = Importer(cname, compilerplugin_, jit_options_);
       time_t time2 = time(0);
       double comp_time = difftime(time2, time1);
       if (verbose_) {
@@ -595,7 +595,7 @@ namespace casadi {
     spH_ = mtimes(spL_.T(), spL_);
     spA_ = mat_fcn_.sparsity_out(mat_jac_);
     casadi_assert_message(!qpsol_plugin.empty(), "'qpsol' option has not been set");
-    qpsol_ = qpsol("qpsol", qpsol_plugin, {{"h", spH_}, {"a", spA_}},
+    qpsol_ = conic("qpsol", qpsol_plugin, {{"h", spH_}, {"a", spA_}},
                    qpsol_options);
     if (verbose_) {
       userOut() << "Allocated QP solver." << endl;
@@ -1199,19 +1199,19 @@ namespace casadi {
 
     // Inputs
     fill_n(m->arg, qpsol_.n_in(), nullptr);
-    m->arg[QPSOL_H] = m->qpH;
-    m->arg[QPSOL_G] = m->gfk;
-    m->arg[QPSOL_A] = m->qpA;
-    m->arg[QPSOL_LBX] = m->qp_lbx;
-    m->arg[QPSOL_UBX] = m->qp_ubx;
-    m->arg[QPSOL_LBA] = m->qp_lba;
-    m->arg[QPSOL_UBA] = m->qp_uba;
+    m->arg[CONIC_H] = m->qpH;
+    m->arg[CONIC_G] = m->gfk;
+    m->arg[CONIC_A] = m->qpA;
+    m->arg[CONIC_LBX] = m->qp_lbx;
+    m->arg[CONIC_UBX] = m->qp_ubx;
+    m->arg[CONIC_LBA] = m->qp_lba;
+    m->arg[CONIC_UBA] = m->qp_uba;
 
     // Outputs
     fill_n(m->res, qpsol_.n_out(), nullptr);
-    m->res[QPSOL_X] = m->dxk; // Condensed primal step
-    m->res[QPSOL_LAM_X] = m->dlam_xk; // Multipliers (simple bounds)
-    m->res[QPSOL_LAM_A] = m->dlam_gk; // Multipliers (linear bounds)
+    m->res[CONIC_X] = m->dxk; // Condensed primal step
+    m->res[CONIC_LAM_X] = m->dlam_xk; // Multipliers (simple bounds)
+    m->res[CONIC_LAM_A] = m->dlam_gk; // Multipliers (linear bounds)
 
     // Solve the QP
     qpsol_(m->arg, m->res, m->iw, m->w, 0);

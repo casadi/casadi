@@ -102,7 +102,7 @@ namespace casadi {
     args_call[iin_] = u;
     for (int i=0, i2=0; i<n_in(); ++i)
       if (i!=iin_) args_call[i] = inputs[i2++];
-    MX nlp_g = f_(args_call).at(iout_);
+    MX nlp_g = oracle_(args_call).at(iout_);
 
     // We're going to use two-argument objective and constraints to allow the use of parameters
     MXDict nlp = {{"x", u}, {"p", p}, {"f", nlp_f}, {"g", nlp_g}};
@@ -117,7 +117,7 @@ namespace casadi {
     alloc_w(n_, true); // ubx
 
     // Allocate storage for NLP solver parameters
-    alloc_w(f_.nnz_in() - nnz_in(iin_), true);
+    alloc_w(oracle_.nnz_in() - nnz_in(iin_), true);
 
     // Allocate storage for NLP primal solution
     alloc_w(n_, true);
@@ -156,7 +156,7 @@ namespace casadi {
     arg1[NLPSOL_P] = w;
     for (int i=0; i<n_in(); ++i) {
       if (i!=iin_) {
-        int n = f_.nnz_in(i);
+        int n = oracle_.nnz_in(i);
         if (arg[i]) {
           copy_n(arg[i], n, w);
         } else {
@@ -194,7 +194,7 @@ namespace casadi {
       arg1[iin_] = x;
       copy_n(res, n_out(), res1);
       res1[iout_] = 0;
-      f_(arg1, res1, iw, w, 0);
+      oracle_(arg1, res1, iw, w, 0);
     }
   }
 

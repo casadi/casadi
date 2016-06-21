@@ -49,7 +49,7 @@ namespace casadi {
   class CASADI_EXPORT External : public FunctionInternal {
   protected:
     /** \brief Information about the library */
-    Library li_;
+    Importer li_;
 
     /** \brief Increase/decrease reference counter */
     signal_t incref_, decref_;
@@ -72,10 +72,17 @@ namespace casadi {
   public:
 
     /** \brief Constructor */
-    External(const std::string& name, const Library& li);
+    External(const std::string& name, const Importer& li);
 
     /** \brief Destructor */
     virtual ~External() = 0;
+
+    // Factory
+    virtual Function factory(const std::string& name,
+                             const std::vector<std::string>& s_in,
+                             const std::vector<std::string>& s_out,
+                             const Function::AuxOut& aux,
+                             const Dict& opts) const;
 
     /** \brief Get type name */
     virtual std::string type_name() const { return "external";}
@@ -85,6 +92,10 @@ namespace casadi {
 
     /** \brief Add a dependent function */
     virtual void addDependency(CodeGenerator& g) const;
+
+    /** \brief Generate code the function */
+    virtual void generateFunction(CodeGenerator& g, const std::string& fname,
+                                  bool decl_static) const;
 
     /** \brief Get name in codegen */
     virtual std::string codegen_name(const CodeGenerator& g) const;
@@ -103,13 +114,13 @@ namespace casadi {
 
     ///@{
     /** \brief Forward mode derivatives */
-    virtual Function get_forward(const std::string& name, int nfwd, Dict& opts);
+    virtual Function get_forward_old(const std::string& name, int nfwd, Dict& opts);
     virtual int get_n_forward() const;
     ///@}
 
     ///@{
     /** \brief Reverse mode derivatives */
-    virtual Function get_reverse(const std::string& name, int nadj, Dict& opts);
+    virtual Function get_reverse_old(const std::string& name, int nadj, Dict& opts);
     virtual int get_n_reverse() const;
     ///@}
 
@@ -123,7 +134,7 @@ namespace casadi {
   class CASADI_EXPORT SimplifiedExternal : public External {
   public:
     /** \brief Constructor */
-    SimplifiedExternal(const std::string& name, const Library& li);
+    SimplifiedExternal(const std::string& name, const Importer& li);
 
     /** \brief  Destructor */
     virtual ~SimplifiedExternal() { this->clear_memory();}
@@ -150,7 +161,7 @@ namespace casadi {
 
   public:
     /** \brief Constructor */
-    GenericExternal(const std::string& name, const Library& li);
+    GenericExternal(const std::string& name, const Importer& li);
 
     /** \brief  Destructor */
     virtual ~GenericExternal() { this->clear_memory();}

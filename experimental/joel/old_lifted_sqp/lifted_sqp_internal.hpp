@@ -43,7 +43,7 @@ public:
   virtual void evaluate(int nfdir, int nadir);
   
   /// QP solver for the subproblems
-  Qpsol qpsol_;
+  Conic qpsol_;
 
   /// maximum number of sqp iterations
   int max_iter_; 

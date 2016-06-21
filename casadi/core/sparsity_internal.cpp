@@ -34,6 +34,30 @@ using namespace std;
 
 namespace casadi {
 
+  SparsityInternal::
+  SparsityInternal(int nrow, int ncol, const int* colind, const int* row) :
+    sp_(2 + ncol+1 + colind[ncol]), btf_(0) {
+    sp_[0] = nrow;
+    sp_[1] = ncol;
+    std::copy(colind, colind+ncol+1, sp_.begin()+2);
+    std::copy(row, row+colind[ncol], sp_.begin()+2+ncol+1);
+    sanity_check(false);
+  }
+
+  SparsityInternal::~SparsityInternal() {
+    if (btf_) delete btf_;
+  }
+
+  const Sparsity::Btf& SparsityInternal::btf() const {
+    if (!btf_) {
+      btf_ = new Sparsity::Btf();
+      btf_->nb = btf(btf_->rowperm, btf_->colperm, btf_->rowblock, btf_->colblock,
+                     btf_->coarse_rowblock, btf_->coarse_rowblock, 0);
+    }
+    return *btf_;
+  }
+
+
   int SparsityInternal::numel() const {
     return size1()*size2();
   }
@@ -3912,6 +3936,68 @@ namespace casadi {
     return vector<int>(row, row+nnz());
   }
 
+  void SparsityInternal::
+  spsolve(bvec_t* X, const bvec_t* B, bool tr) const {
+    const Sparsity::Btf& btf = this->btf();
+    const int* colind = this->colind();
+    const int* row = this->row();
+
+    if (!tr) {
+      for (int b=0; b<btf.nb; ++b) { // loop over the blocks forward
+
+        // Get dependencies from all right-hand-sides in the block ...
+        bvec_t block_dep = 0;
+        for (int el=btf.rowblock[b]; el<btf.rowblock[b+1]; ++el) {
+          int rr = btf.rowperm[el];
+          block_dep |= B[rr];
+        }
+
+        // ... as well as all other variables in the block
+        for (int el=btf.colblock[b]; el<btf.colblock[b+1]; ++el) {
+          int cc = btf.colperm[el];
+          block_dep |= X[cc];
+        }
+
+        // Propagate ...
+        for (int el=btf.colblock[b]; el<btf.colblock[b+1]; ++el) {
+          int cc = btf.colperm[el];
+
+          // ... to all variables in the block ...
+          X[cc] |= block_dep;
+
+          // ... as well as to other variables which depends on variables in the block
+          for (int k=colind[cc]; k<colind[cc+1]; ++k) {
+            int rr=row[k];
+            X[rr] |= block_dep;
+          }
+        }
+      }
+
+    } else { // transpose
+      for (int b=btf.nb-1; b>=0; --b) { // loop over the blocks backward
+
+        // Get dependencies ...
+        bvec_t block_dep = 0;
+        for (int el=btf.colblock[b]; el<btf.colblock[b+1]; ++el) {
+          int cc = btf.colperm[el];
+
+          // .. from all right-hand-sides in the block ...
+          block_dep |= B[cc];
+
+          // ... as well as from all depending variables ...
+          for (int k=colind[cc]; k<colind[cc+1]; ++k) {
+            int rr=row[k];
+            block_dep |= X[rr];
+          }
+        }
+
+        // Propagate to all variables in the block
+        for (int el=btf.rowblock[b]; el<btf.rowblock[b+1]; ++el) {
+          int rr = btf.rowperm[el];
+          X[rr] |= block_dep;
+        }
+      }
+    }
+  }
+
 } // namespace casadi
-
-

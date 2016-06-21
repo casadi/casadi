@@ -33,7 +33,7 @@ x = SX.sym("x",40)
 y = x[:-2]-2*x[1:-1]+x[2:]
 
 #! Let's see what the first 5 entries of y look like
-print y[:5]
+print(y[:5])
 
 #! Next, we construct a function
 f = Function("f", [x],[y])

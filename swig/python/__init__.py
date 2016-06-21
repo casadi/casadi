@@ -27,8 +27,12 @@ import warnings
 import os
 import numpy as np
 
-from casadi import *
-import casadi
+import sys
+if sys.version_info >= (3, 0):
+  from casadi.casadi import *
+else:
+  from casadi import *
+  import casadi
 
 # For plugin loading
 GlobalOptions.setCasadiPath(os.path.dirname(__file__))
@@ -37,11 +41,11 @@ import types
   
 def wrapper(f, warning,error=False):
     def new(*args, **kwargs):
-        print "*" * 40
-        print "Deprecation Warning"
-        print "-" * 40
-        print warning
-        print "*" * 40
+        print(("*" * 40))
+        print("Deprecation Warning")
+        print(("-" * 40))
+        print(warning)
+        print(("*" * 40))
         if error:
             raise Exception("Deprecation error: " + warning)
         return f(*args, **kwargs)

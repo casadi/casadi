@@ -58,27 +58,27 @@ for i in range(f.getAlgorithmSize()):
   
   if(op==OP_CONST):
     work[f.getAtomicOutput(i)] = f.getAtomicInputReal(i)
-    print 'work[', f.getAtomicOutput(i), '] = ', f.getAtomicInputReal(i)
+    print('work[', f.getAtomicOutput(i), '] = ', f.getAtomicInputReal(i))
   else:
     i1 = f.getAtomicOutput(i)
     i2,i3 = f.getAtomicInput(i)
     if op==OP_INPUT:
       work[i1] = input_val[i2][i3]
-      print 'work[', i1, '] = input[', i2, '][', i3,  ']', '                ---> ' , work[i1]
+      print('work[', i1, '] = input[', i2, '][', i3,  ']', '                ---> ' , work[i1])
     elif op==OP_OUTPUT:
       output_val[i1][i3] = work[i2]
-      print 'output[', i1, '][', i3, '] = work[', i2, ']','             ---> ', output_val[i1][i3]
+      print('output[', i1, '][', i3, '] = work[', i2, ']','             ---> ', output_val[i1][i3])
     elif op==OP_ADD:
       work[i1] = work[i2] + work[i3]
-      print 'work[', i1, '] = work[', i2, '] + work[', i3, ']','        ---> ', work[i1]
+      print('work[', i1, '] = work[', i2, '] + work[', i3, ']','        ---> ', work[i1])
     elif op==OP_MUL:
       work[i1] = work[i2] * work[i3]
-      print 'work[', i1, '] = work[', i2, '] * work[', i3, ']','        ---> ', work[i1]
+      print('work[', i1, '] = work[', i2, '] * work[', i3, ']','        ---> ', work[i1])
     else:
-      print 'Unknown operation: ', op
+      print('Unknown operation: ', op)
 
-print '------'
-print "Evaluated function: "
-print output_ex, ' = ', output_val
-print 'where ', input_ex, ' = ', input_val
+print('------')
+print("Evaluated function: ")
+print(output_ex, ' = ', output_val)
+print('where ', input_ex, ' = ', input_val)
       

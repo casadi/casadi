@@ -36,7 +36,7 @@
     Vg_i = m_i*g0*z_i
 
     The total potential energy is thus given by:
- 
+
     Vchain(y,z) = 1/2*sum{i=1,...,N-1} D_i ((y_i-y_{i+1})^2+(z_i-z_{i+1})^2) + g0 * sum{i=1,...,N} m_i * z_i
 
     where y=[y_1,...,y_N] and z=[z_1,...,z_N]
@@ -130,7 +130,7 @@ int main(){
   SXDict qp = {{"x", vertcat(x)}, {"f", Vchain}, {"g", vertcat(g)}};
 
   // Solve with a QP solver or NLP solver
-  Function solver = qpsol("solver", "qpoases", qp, {{"sparse", true}});
+  Function solver = qpsol("solver", "qpoases", qp, {{"sparse", true}, {"shur", false}});
   //Function solver = qpsol("solver", "cplex", qp);
   //Function solver = qpsol("solver", "ooqp", qp);
   //Function solver = qpsol("solver", "gurobi", qp);
@@ -140,7 +140,7 @@ int main(){
   DMDict arg = {{"lbx", lbx},
                 {"ubx", ubx},
                 {"lbg", lbg},
-                {"ubg", ubg}};  
+                {"ubg", ubg}};
   DMDict res = solver(arg);
   DM x_opt = res["x"];
   double f_opt(res["f"]);
@@ -172,7 +172,7 @@ int main(){
   file << "grid on;" << endl;
   file << "xlabel('y [m]');" << endl;
   file << "ylabel('z [m]');" << endl;
-    
+
   file.close();
   cout << "Results saved to \"" << filename << "\"" << endl;
 

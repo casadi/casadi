@@ -26,34 +26,34 @@
 #ifndef CASADI_SHELL_INTERFACE_HPP
 #define CASADI_SHELL_INTERFACE_HPP
 
-#include "casadi/core/function/compiler_internal.hpp"
-#include <casadi/solvers/casadi_compiler_shell_export.h>
+#include "casadi/core/function/importer_internal.hpp"
+#include <casadi/solvers/casadi_importer_shell_export.h>
 
-/** \defgroup plugin_Compiler_shell
+/** \defgroup plugin_Importer_shell
       Interface to the JIT compiler SHELL
 */
 
-/** \pluginsection{Compiler,shell} */
+/** \pluginsection{Importer,shell} */
 
 /// \cond INTERNAL
 namespace casadi {
-  /** \brief \pluginbrief{Compiler,shell}
+  /** \brief \pluginbrief{Importer,shell}
 
 
-   \author Joris Gillis
+   \author Joel Andersson
    \date 2015
    *
-   @copydoc Compiler_doc
-   @copydoc plugin_Compiler_shell
+   @copydoc Importer_doc
+   @copydoc plugin_Importer_shell
    * */
-  class CASADI_COMPILER_SHELL_EXPORT ShellCompiler : public CompilerInternal {
+  class CASADI_IMPORTER_SHELL_EXPORT ShellCompiler : public ImporterInternal {
   public:
 
     /** \brief Constructor */
     explicit ShellCompiler(const std::string& name);
 
     /** \brief  Create a new JIT function */
-    static CompilerInternal* creator(const std::string& name) {
+    static ImporterInternal* creator(const std::string& name) {
       return new ShellCompiler(name);
     }
 
@@ -76,7 +76,7 @@ namespace casadi {
     virtual const char* plugin_name() const { return "shell";}
 
     /// Get a function pointer for numerical evaluation
-    virtual void* getFunction(const std::string& symname);
+    virtual signal_t get_function(const std::string& symname);
   protected:
     /// Temporary file
     std::string bin_name_;

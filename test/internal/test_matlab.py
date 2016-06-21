@@ -28,7 +28,7 @@ import shutil
 
 from testsuite import TestSuite
 
-    
+
 t = TestSuite(dirname=src,
   suffix="m",
   command = lambda dir,fn, opt:  ["matlab","-nodisplay","-nosplash","-nodesktop","-nojvm"] + opt,
@@ -38,5 +38,5 @@ t = TestSuite(dirname=src,
    stderr_trigger=["^(?!(Reference counting|Warning|$))"],
    check_depreciation=True
    )
-  
+
 t.run()

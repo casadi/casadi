@@ -49,7 +49,7 @@ B = DM([[1,1],[0,1],[1,0]])
 
 # Inspect the open-loop system
 [D,V] = linalg.eig(A)
-print 'Open-loop eigenvalues: ', D
+print('Open-loop eigenvalues: ', D)
 
 tn = linspace(0,te,N)
 
@@ -78,7 +78,9 @@ u  = SX.sym('u',nu)
 
 x0 = DM([1,0,0])
 # no control
-u_ = (DM([[ -1, 1 ],[1,-1]]*((N-1)/2))).T
+u_ = repmat(DM([[ -1, 1 ],[1,-1]]),1,int((N-1)/2))
+
+print(u_)
 
 p = SX.sym('p')
 

@@ -31,7 +31,7 @@ namespace casadi {
 
   extern "C"
   int CASADI_LINSOL_LAPACKLU_EXPORT
-  casadi_register_linsol_lapacklu(Linsol::Plugin* plugin) {
+  casadi_register_linsol_lapacklu(LinsolInternal::Plugin* plugin) {
     plugin->creator = LapackLu::creator;
     plugin->name = "lapacklu";
     plugin->doc = LapackLu::meta_doc.c_str();
@@ -41,12 +41,11 @@ namespace casadi {
 
   extern "C"
   void CASADI_LINSOL_LAPACKLU_EXPORT casadi_load_linsol_lapacklu() {
-    Linsol::registerPlugin(casadi_register_linsol_lapacklu);
+    LinsolInternal::registerPlugin(casadi_register_linsol_lapacklu);
   }
 
-  LapackLu::LapackLu(const std::string& name,
-                               const Sparsity& sparsity, int nrhs)
-    : Linsol(name, sparsity, nrhs) {
+  LapackLu::LapackLu(const std::string& name)
+    : LinsolInternal(name) {
 
     // Default options
     equilibriate_ = true;
@@ -70,7 +69,7 @@ namespace casadi {
 
   void LapackLu::init(const Dict& opts) {
     // Call the base class initializer
-    Linsol::init(opts);
+    LinsolInternal::init(opts);
 
     // Read options
     for (auto&& op : opts) {
@@ -80,35 +79,37 @@ namespace casadi {
         allow_equilibration_failure_ = op.second;
       }
     }
-
-    // Get dimensions
-    casadi_assert(nrow()==ncol());
   }
 
   void LapackLu::init_memory(void* mem) const {
+    LinsolInternal::init_memory(mem);
+  }
+
+  void LapackLu::reset(void* mem, const int* sp) const {
+    LinsolInternal::reset(mem, sp);
     auto m = static_cast<LapackLuMemory*>(mem);
 
     // Allocate matrix
-    m->mat.resize(nrow() * ncol());
-    m->ipiv.resize(ncol());
+    m->mat.resize(m->nrow() * m->ncol());
+    m->ipiv.resize(m->ncol());
 
     // Equilibration
     if (equilibriate_) {
-      m->r.resize(nrow());
-      m->c.resize(ncol());
+      m->r.resize(m->nrow());
+      m->c.resize(m->ncol());
     }
     m->equed = 'N'; // No equilibration
   }
 
-  void LapackLu::linsol_factorize(void* mem, const double* A) const {
+  void LapackLu::factorize(void* mem, const double* A) const {
     auto m = static_cast<LapackLuMemory*>(mem);
 
     // Dimensions
-    int nrow = this->nrow();
-    int ncol = this->ncol();
+    int nrow = m->nrow();
+    int ncol = m->ncol();
 
     // Get the elements of the matrix, dense format
-    casadi_densify(A, sparsity_, get_ptr(m->mat), false);
+    casadi_densify(A, get_ptr(m->sparsity), get_ptr(m->mat), false);
 
     if (equilibriate_) {
       // Calculate the col and row scaling factors
@@ -149,12 +150,12 @@ namespace casadi {
                           "dgetrf_ failed to factorize the Jacobian");
   }
 
-  void LapackLu::linsol_solve(void* mem, double* x, int nrhs, bool tr) const {
+  void LapackLu::solve(void* mem, double* x, int nrhs, bool tr) const {
     auto m = static_cast<LapackLuMemory*>(mem);
 
     // Dimensions
-    int nrow = this->nrow();
-    int ncol = this->ncol();
+    int nrow = m->nrow();
+    int ncol = m->ncol();
 
     // Scale the right hand side
     if (tr) {

@@ -32,17 +32,17 @@ from casadi.tools import *
 class Vectortoolsstests(casadiTestCase):
   def test_complement(self):
     self.message("complement")
-    
+
     w = [2,1,4,6]
-    
+
     self.assertRaises(RuntimeError,lambda : complement(w,3) )
     self.assertRaises(RuntimeError,lambda : complement(w,6) )
-    
-    
+
+
     wc = list(complement(w,8))
     self.checkarray(DM(wc),DM([0,3,5,7]),"complement")
-    
-    
+
+
 
 if __name__ == '__main__':
     unittest.main()

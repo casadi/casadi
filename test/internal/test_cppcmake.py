@@ -36,11 +36,11 @@ from subprocess import *
 t = TestSuite(dirname=src,
   suffix="cpp",
   command = lambda dir,fn,opt:  ['./bin/'+fn.replace('.cpp','')]+opt,
-  workingdir = lambda dir: '../build', 
+  workingdir = lambda dir: '../build',
   skipdirs=[".svn","ctemplate"],
   args=sys.argv[2:]
   )
-  
+
 t.run()
 
 

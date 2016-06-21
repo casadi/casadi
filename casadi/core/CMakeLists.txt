@@ -85,27 +85,29 @@ set(CASADI_SRCS
 
   # A dynamically created function with AD capabilities
   function/function.hpp            function/function.cpp            # Function object class (public API)
-  function/oracle.hpp              function/oracle.cpp              # Oracle class (generating function objects)
   function/function_internal.hpp   function/function_internal.cpp   # Function object class (internal API)
+  function/oracle_function.hpp     function/oracle_function.cpp     # Specialization of FunctionInternal to hold an oracle
   function/callback.cpp            function/callback.hpp            # Interface for user-defined function classes (public API)
-  function/callback_internal.cpp function/callback_internal.hpp     # Interface for user-defined function classes (internal API)
+  function/callback_internal.cpp   function/callback_internal.hpp   # Interface for user-defined function classes (internal API)
   function/plugin_interface.hpp                                     # Plugin interface for Function
+  function/factory.hpp                                              # Helper class for derivative function generation
   function/x_function.hpp                                           # Base class for SXFunction and MXFunction
   function/sx_function.hpp         function/sx_function.cpp
   function/mx_function.hpp         function/mx_function.cpp
   function/external.hpp            function/external.cpp
   function/jit.hpp                 function/jit.cpp
-  function/linsol.hpp              function/linsol_impl.hpp        function/linsol.cpp
+  function/linsol.hpp              function/linsol.cpp             function/linsol_internal.hpp  function/linsol_internal.cpp
   function/rootfinder.hpp          function/rootfinder_impl.hpp    function/rootfinder.cpp
   function/integrator.hpp          function/integrator_impl.hpp    function/integrator.cpp
   function/nlpsol.hpp              function/nlpsol_impl.hpp        function/nlpsol.cpp
-  function/qpsol.hpp               function/qpsol_impl.hpp         function/qpsol.cpp
+  function/conic.hpp               function/conic_impl.hpp         function/conic.cpp
+  function/interpolant.hpp         function/interpolant_impl.hpp   function/interpolant.cpp
   function/code_generator.hpp      function/code_generator.cpp
   function/switch.hpp              function/switch.cpp
   function/map.hpp                 function/map.cpp
   function/mapaccum.hpp            function/mapaccum.cpp
   function/kernel_sum.hpp          function/kernel_sum.cpp
-  function/compiler.hpp            function/compiler.cpp            function/compiler_internal.hpp function/compiler_internal.cpp
+  function/importer.hpp            function/importer.cpp            function/importer_internal.hpp function/importer_internal.cpp
 
   # MISC useful stuff
   misc/integration_tools.hpp       misc/integration_tools.cpp

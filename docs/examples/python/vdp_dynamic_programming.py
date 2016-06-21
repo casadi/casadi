@@ -92,7 +92,7 @@ for u in U:
 # Calculate cost-to-go (no end cost) and optimal control
 J = zeros(X1.shape)
 U_opt = []
-for k in reversed(range(N)):
+for k in reversed(list(range(N))):
   # Cost to go for the previous step, optimal control action
   J_prev = inf*ones(X1.shape)
   u_prev = -ones(X1.shape,dtype=int)
@@ -130,7 +130,7 @@ for k in range(N):
   x2_opt.append(x2[i2])
 
 # Optimal cost
-print "Minimal cost: ", cost
+print("Minimal cost: ", cost)
 assert abs(cost-J[NX-1,NX/2])<1e-8 # Consistency check
 
 # Plot

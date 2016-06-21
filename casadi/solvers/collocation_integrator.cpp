@@ -45,7 +45,7 @@ namespace casadi {
     Integrator::registerPlugin(casadi_register_integrator_collocation);
   }
 
-  CollocationIntegrator::CollocationIntegrator(const std::string& name, Oracle* dae)
+  CollocationIntegrator::CollocationIntegrator(const std::string& name, const Function& dae)
     : ImplicitFixedStepIntegrator(name, dae) {
   }
 
@@ -82,6 +82,9 @@ namespace casadi {
   }
 
   void CollocationIntegrator::setupFG() {
+    f_ = create_function("f", {"x", "z", "p", "t"}, {"ode", "alg", "quad"});
+    g_ = create_function("g", {"rx", "rz", "rp", "x", "z", "p", "t"},
+                              {"rode", "ralg", "rquad"});
 
     // All collocation time points
     std::vector<double> tau_root = collocation_points(deg_, collocation_scheme_);

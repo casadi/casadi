@@ -340,7 +340,7 @@ void LiftedSQPInternal::init(){
   DM &lam_g_k = output(NLP_SOLVER_LAM_G);
 
   // Allocate a QP solver
-  QpsolCreator qpsol_creator = option("qpsol");
+  ConicCreator qpsol_creator = option("qpsol");
   qpsol_ = qpsol_creator(B1.sparsity(),B2.sparsity());
   
   // Set options if provided

@@ -194,11 +194,11 @@ namespace casadi {
     evalGen(arg, res, iw, w, std::plus<SXElem>());
   }
 
-  void Mapaccum::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+  void Mapaccum::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     evalGen(arg, res, iw, w, orop);
   }
 
-  void Mapaccum::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
+  void Mapaccum::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
 
     int num_in = f_.n_in(), num_out = f_.n_out();
 
@@ -294,7 +294,7 @@ namespace casadi {
       }
 
       // Evaluate the function
-      f_->spAdj(arg1, res1, iw, w, 0);
+      f_->sp_rev(arg1, res1, iw, w, 0);
 
     }
 
@@ -321,7 +321,7 @@ namespace casadi {
   }
 
   Function Mapaccum
-  ::get_forward(const std::string& name, int nfwd, Dict& opts) {
+  ::get_forward_old(const std::string& name, int nfwd, Dict& opts) {
 
     // Obtain forward mode of the primitive function
     /*
@@ -443,7 +443,7 @@ namespace casadi {
   }
 
   Function Mapaccum
-  ::get_reverse(const std::string& name, int nadj, Dict& opts) {
+  ::get_reverse_old(const std::string& name, int nadj, Dict& opts) {
 
     // Obtain Reverse mode of the primitive function
     /*

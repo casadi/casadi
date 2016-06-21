@@ -38,6 +38,7 @@
 #include <kinsol/kinsol_spbcgs.h>
 #include <kinsol/kinsol_sptfqmr.h>
 #include <kinsol/kinsol_impl.h> /* Needed for the provided linear solver */
+#include <kinsol/kinsol_spils_impl.h> /* Needed for the provided linear solver */
 #include <ctime>
 
 /** \defgroup plugin_Rootfinder_kinsol
@@ -51,7 +52,7 @@ namespace casadi {
   class KinsolInterface;
 
   // Memory
-  struct CASADI_ROOTFINDER_KINSOL_EXPORT KinsolMemory : public WorkMemory {
+  struct CASADI_ROOTFINDER_KINSOL_EXPORT KinsolMemory : public RootfinderMemory {
     /// Function object
     const KinsolInterface& self;
 
@@ -59,7 +60,7 @@ namespace casadi {
     KinsolMemory(const KinsolInterface& s);
 
     /// Destructor
-    virtual ~KinsolMemory();
+    ~KinsolMemory();
 
     /// KINSOL memory block
     void* mem;
@@ -124,7 +125,7 @@ namespace casadi {
     int max_iter_;
 
     // Use exact Jacobian?
-    bool exact_jacobian_;
+    bool exact_jac_;
 
     // Type of linear solver
     enum LinsolType { DENSE, BANDED, ITERATIVE, USER_DEFINED};
@@ -147,7 +148,10 @@ namespace casadi {
     double abstol_;
 
     // Jacobian times vector function
-    Function f_fwd_;
+    Function jtimes_;
+
+    // Get jtimes_
+    void get_jtimes();
 
     // Raise an error specific to KinSol
     void kinsol_error(const std::string& module, int flag, bool fatal=true) const;
@@ -164,7 +168,14 @@ namespace casadi {
     /** \brief Initalize memory block */
     virtual void init_memory(void* mem) const;
 
-    /** \brief Callback functions */
+    /** \brief Cast to memory object */
+    static KinsolMemory* to_mem(void *mem) {
+      KinsolMemory* m = static_cast<KinsolMemory*>(mem);
+      casadi_assert(m);
+      return m;
+    }
+
+    /** \brief Callback functions (to be updated) */
     void func(KinsolMemory& m, N_Vector u, N_Vector fval) const;
     void djac(KinsolMemory& m, long N, N_Vector u, N_Vector fu,
               DlsMat J, N_Vector tmp1, N_Vector tmp2) const;
@@ -175,10 +186,6 @@ namespace casadi {
                 N_Vector tmp1, N_Vector tmp2) const;
     void psolve(KinsolMemory& m, N_Vector u, N_Vector uscale,
                 N_Vector fval, N_Vector fscale, N_Vector v, N_Vector tmp) const;
-    void lsetup(KinsolMemory& m, KINMem kin_mem) const;
-    void lsolve(KinsolMemory& m, KINMem kin_mem, N_Vector x, N_Vector b, double *res_norm) const;
-    void ehfun(KinsolMemory& m, int error_code, const char *module,
-               const char *function, char *msg) const;
 
     /** \brief Wrappers to callback functions*/
     static int func_wrapper(N_Vector u, N_Vector fval, void *user_data);
@@ -191,14 +198,15 @@ namespace casadi {
                               void* user_data, N_Vector tmp1, N_Vector tmp2);
     static int psolve_wrapper(N_Vector u, N_Vector uscale, N_Vector fval, N_Vector fscale,
                               N_Vector v, void* user_data, N_Vector tmp);
-    static int lsetup_wrapper(KINMem kin_mem);
-    static int lsolve_wrapper(KINMem kin_mem, N_Vector x, N_Vector b, double *res_norm);
-    static void ehfun_wrapper(int error_code, const char *module, const char *function,
-                              char *msg, void *eh_data);
+
+    /** \brief Callback functions (updated) */
+    static int lsetup(KINMem kin_mem);
+    static int lsolve(KINMem kin_mem, N_Vector x, N_Vector b, double *sJpnorm, double *sFdotJp);
+    static void ehfun(int error_code, const char *module, const char *function,
+                      char *msg, void *eh_data);
   };
 
 } // namespace casadi
 
 /// \endcond
 #endif // CASADI_KINSOL_INTERFACE_HPP
-

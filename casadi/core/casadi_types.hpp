@@ -62,7 +62,7 @@ namespace casadi {
   class Variable;
   class DaeBuilder;
   class XmlFile;
-  class Compiler;
+  class Importer;
 
 #ifndef SWIG
   // Workarond for MinGW bug
@@ -368,57 +368,42 @@ namespace casadi {
   };
 
   /// Input arguments of a QP problem
-  enum QpsolInput {
+  enum ConicInput {
     /// The square matrix H: sparse, (n x n). Only the lower triangular part is actually used.
     /// The matrix is assumed to be symmetrical.
-    QPSOL_H,
+    CONIC_H,
     /// The vector g: dense,  (n x 1)
-    QPSOL_G,
+    CONIC_G,
     /// The matrix A: sparse, (nc x n) - product with x must be dense.
-    QPSOL_A,
+    CONIC_A,
     /// dense, (nc x 1)
-    QPSOL_LBA,
+    CONIC_LBA,
     /// dense, (nc x 1)
-    QPSOL_UBA,
+    CONIC_UBA,
     /// dense, (n x 1)
-    QPSOL_LBX,
+    CONIC_LBX,
     /// dense, (n x 1)
-    QPSOL_UBX,
+    CONIC_UBX,
     /// dense, (n x 1)
-    QPSOL_X0,
+    CONIC_X0,
     /// dense
-    QPSOL_LAM_X0,
-    QPSOL_NUM_IN};
+    CONIC_LAM_X0,
+    CONIC_NUM_IN};
 
   /// Output arguments of an QP Solver
-  enum QpsolOutput {
+  enum ConicOutput {
     /// The primal solution
-    QPSOL_X,
+    CONIC_X,
     /// The optimal cost
-    QPSOL_COST,
+    CONIC_COST,
     /// The dual solution corresponding to linear bounds
-    QPSOL_LAM_A,
+    CONIC_LAM_A,
     /// The dual solution corresponding to simple bounds
-    QPSOL_LAM_X,
-    QPSOL_NUM_OUT};
-
-  /// Input arguments of a linear solver
-  enum LinsolInput {
-    /// The square matrix A: sparse, (n x n)
-    LINSOL_A,
-    /// The right-hand-side matrix b: dense,  (n x m)
-    LINSOL_B,
-    LINSOL_NUM_IN};
-
-  /// Output arguments of a linear solver
-  enum LinsolOutput {
-    /// Solution to the linear system of equations
-    LINSOL_X,
-    LINSOL_NUM_OUT};
+    CONIC_LAM_X,
+    CONIC_NUM_OUT};
 
 #endif // SWIG
 
 } // namespace casadi
 
 #endif // CASADI_CASADI_TYPES_HPP
-

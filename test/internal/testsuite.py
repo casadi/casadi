@@ -38,7 +38,7 @@ def alarm_handler(signum, frame):
 def is_exe(root,name):
   fpath = os.path.join(root,name)
   return os.path.exists(fpath) and os.access(fpath, os.X_OK)
-  
+
 from os import kill
 from signal import signal
 
@@ -81,7 +81,7 @@ def run(args, input=None, cwd = None, shell = False, kill_tree = True, timeout =
         for pid in pids:
             # process might have died before getting to this line
             # so wrap to avoid OSError: no such process
-            try: 
+            try:
                 kill(pid, SIGKILL)
             except OSError:
                 pass
@@ -95,11 +95,11 @@ def killProcess(pid):
   for pid in pids:
       # process might have died before getting to this line
       # so wrap to avoid OSError: no such process
-      try: 
+      try:
           kill(pid, SIGKILL)
       except OSError:
           pass
-          
+
 def get_process_children(pid):
     p = Popen('ps --no-headers -o pid --ppid %d' % pid, shell = True,
               stdout = PIPE, stderr = PIPE)
@@ -112,42 +112,42 @@ if __name__ == '__main__':
 
 deprecated = re.compile("[dD]epr[ei]c[ie]?at[ei]")
 warning = re.compile("warning")
-    
+
 class TestSuite:
   def __init__(self,suffix=None,dirname=None,preRun=None,postRun=None,command=None,skipdirs=[],skipfiles=[],inputs={},workingdir = lambda x: x,allowable_returncodes=[],args=[],stderr_trigger=[],stdout_trigger=[],check_depreciation=True,check_warning=False):
     """
-    
+
     dirname: The directory that should be crawled for test problems.
-    
+
     command: A mapping of (dirname,filename) -> Popen command list.
              e.g  lambda dir,fn:  ['./'+fn]  for executable files
-             
+
     skipdirs: A list of directories that should be skipped during recursive traversal of dirname.
-    
+
     skipfiles: A list of matched files that should be skipped during recursive traversal of dirname.
-    
+
     suffix:  Only the files that end with this suffix will be tested.
              Omit argument or set to None to test any file.
-             
+
     inputs:  Can be a dictionary of filename -> string to pass numbers to STDIN of the process
-    
+
     workingdir: Specify the working directory for the process. The path may be relative to the /trunk/test path
-    
-    
+
+
     stderr_trigger: list of strings/regexes. If any string is found in std_err, it is considered an error, regardless of the return_code. A message may be attached to a trigger by packing the string/regex in a 2-tuple, with the second element the message.
-    
+
     stdout_trigger: list of strings/regexes. If any string is found in std_out, it is considered an error, regardless of the return_code. A message may be attached to a trigger by packing the string/regex in a 2-tuple, with the second element the message.
-    
+
     check_depreciation: raise an error if the output contains a depreciation warning
-    
+
     check_warning: raise an error if the output contains a warning
-    
+
     args: a list of command line options:
        -skipfiles="file1 file2"   get's added to skipfiles
        -memcheck           Include a check for memory leaks
        -passoptions="option1 option2"   get's passed onto the command constructor as third argument
-     
-    
+
+
     """
     if alarm_available:
         signal(SIGALRM, alarm_handler)
@@ -165,7 +165,7 @@ class TestSuite:
     self.skipdirs = skipdirs
     self.skipfiles = skipfiles
     self.inputs = inputs
-    self.allowable_returncodes = allowable_returncodes 
+    self.allowable_returncodes = allowable_returncodes
     self.workingdir = workingdir
     self.memcheck = False
     self.passoptions = []
@@ -209,7 +209,7 @@ class TestSuite:
             self.test(root,name,self.command)
       if not(self.postRun is None):
         self.postRun(root)
-        
+
     print "Ran %d tests, %d fails." % (self.stats['numtests'],self.stats['numfails'])
 
     if self.stats['numfails']>0:
@@ -230,8 +230,8 @@ class TestSuite:
       inputs = self.inputs
     if fn in inputs:
       inp = inputs[fn]
-      
-          
+
+
     alarm(60*60) # 1 hour
     try:
       stdoutdata, stderrdata = p.communicate(inp)
@@ -241,7 +241,7 @@ class TestSuite:
     alarm(0) # Remove alarm
     t = time.clock() - t0
     print "Ran for",t, "seconds"
-    
+
     stderr_trigger = False
     for trigger in self.stderr_trigger:
       trigger_message = str(trigger)
@@ -274,7 +274,7 @@ class TestSuite:
       print stderrdata
       print "="*30
       return
-      
+
     if self.memcheck:
       # --suppressions=../internal/valgrind-python.supp
       suppressions = ["internal/valgrind-python.supp","internal/valgrind-casadi.supp"]
@@ -305,7 +305,7 @@ class TestSuite:
             return
           debug = str(stdoutdata) + " -- " + str(stderrdata) + " -- " + str(f.returncode)
           raise Exception("valgrind output is not like expected: %s" % debug)
-          
+
       m = re.search('ERROR SUMMARY: (.*) errors', stdoutdata)
       errors = "0"
       if m:
@@ -326,12 +326,12 @@ class TestSuite:
             pass
           else:
             error_log = True
-          
+
         if error_log:
           diagnose_lines.append(l)
           if l.startswith("==") and re.search('casadi', l):
             error_casadi = True
-           
+
       diagnosis = "\n".join(diagnose_lines)
 
       errors = "0"  # disabling valgrind error-checking for now: samples are flooded with errors
@@ -344,4 +344,4 @@ class TestSuite:
         print stdoutdata
         print "="*30
         self.stats['numfails']+=1
-      
+

@@ -91,14 +91,14 @@ for sol in solvers:
     # need to convert back to csr
     if sol!="casadi" and use_lil:
       M = csr_matrix(M)
-      
+
     t_build = time.time()
     dur_build.append(t_build-t_before)
 
     # convert casadi matrix to csr
     if sol=="casadi":
       M = csr_matrix((M.nonzeros(),M.col(),M.rowind()),(M.size1(),M.size2()),dtype=float)
-    
+
     # Save the matrix
     SM.append(M)
 
@@ -107,7 +107,7 @@ for sol in solvers:
     col = list(int(i) for i in M.indices)
     rowind = list(int(i) for i in M.indptr)
     M = DM(dim[0],dim[1],col,rowind,M.data)
-    
+
     # Save the matrix
     CM.append(M)
 
@@ -124,7 +124,7 @@ for sol in solvers:
         M2_C = dot(CM[0],CM[1])
         #for i in range(100):
           #M = trans(M)
-        
+
         #M2 = trans(M)
         #M3 = trans(M2)
         #M4 = M2 + M3
@@ -138,10 +138,10 @@ for sol in solvers:
         #M3 = M2.transpose()
         #M4 = M2 + M3
         #M5 = N.dot(M4,M)
-      
+
     t_operation = time.time()
     dur_operation.append(t_operation-t_convert)
-    
+
 
   print "durations to build:                      ", dur_build
   print "durations for converting back and forth: ", dur_convert

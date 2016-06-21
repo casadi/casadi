@@ -1232,7 +1232,7 @@ namespace casadi {
                           << row.size() << ", " << col.size()  << " and " << d.nnz());
     std::vector<int> mapping;
     Sparsity sp = Sparsity::triplet(nrow, ncol, row, col, mapping);
-    return Matrix<Scalar>(sp, d[mapping]);
+    return Matrix<Scalar>(sp, d.nz(mapping));
   }
 
   template<typename Scalar>
@@ -2021,7 +2021,7 @@ namespace casadi {
       for (int j=0; j<a.size2(); ++j) {
         int k = a_sp.get_nz(i, j);
         if (k!=-1) {
-          blocks[i][j] = a[k]*b;
+          blocks[i][j] = a.nz(k)*b;
         }
       }
     }
@@ -2037,7 +2037,7 @@ namespace casadi {
 
     Matrix<Scalar> ret = zeros(sp);
 
-    for (int k=0; k<mapping.size(); k++) ret[k] = A[mapping[k]];
+    for (int k=0; k<mapping.size(); k++) ret.nz(k) = A.nz(mapping[k]);
     return ret;
   }
 
@@ -2397,6 +2397,11 @@ namespace casadi {
   }
 
   template<typename Scalar>
+  std::vector<Matrix<Scalar> > Matrix<Scalar>::get_free(const Function& f) {
+    throw CasadiException("\"get_free\" not defined for " + type_name());
+  }
+
+  template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::jac(const Function& f, int iind, int oind,
                                          bool compact, bool symmetric) {
     throw CasadiException("\"jac\" not defined for " + type_name());
@@ -2601,6 +2606,7 @@ namespace casadi {
                                  std::vector<std::string>& inter) const;
 
   template<> std::vector<SX> SX::get_input(const Function& f);
+  template<> std::vector<SX> SX::get_free(const Function& f);
 
   template<> SX SX::jac(const Function& f, int iind, int oind,
                         bool compact, bool symmetric);

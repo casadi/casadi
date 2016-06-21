@@ -27,7 +27,7 @@
 
 #include "casadi/core/std_vector_tools.hpp"
 #include "casadi/core/calculus.hpp"
-#include "casadi/core/function/qpsol.hpp"
+#include "casadi/core/function/conic.hpp"
 
 #include <ctime>
 #include <iomanip>
@@ -53,7 +53,7 @@ namespace casadi {
     Nlpsol::registerPlugin(casadi_register_nlpsol_sqpmethod);
   }
 
-  Sqpmethod::Sqpmethod(const std::string& name, Oracle* nlp)
+  Sqpmethod::Sqpmethod(const std::string& name, const Function& nlp)
     : Nlpsol(name, nlp) {
   }
 
@@ -154,6 +154,8 @@ namespace casadi {
         qpsol_plugin = op.second.to_string();
       } else if (op.first=="qpsol_options") {
         qpsol_options = op.second;
+      } else if (op.first=="regularize") {
+        regularize_ = op.second;
       } else if (op.first=="print_header") {
         print_header_ = op.second;
       }
@@ -165,11 +167,11 @@ namespace casadi {
     // Get/generate required functions
     f_fcn_ = create_function("nlp_f", {"x", "p"}, {"f"});
     g_fcn_ = create_function("nlp_g", {"x", "p"}, {"g"});
-    grad_f_fcn_ = create_function("nlp_grad_f", {"x", "p"}, {"f", "grad_f_x"});
-    jac_g_fcn_ = create_function("nlp_jac_g", {"x", "p"}, {"g", "jac_g_x"});
+    grad_f_fcn_ = create_function("nlp_grad_f", {"x", "p"}, {"f", "grad:f:x"});
+    jac_g_fcn_ = create_function("nlp_jac_g", {"x", "p"}, {"g", "jac:g:x"});
     if (exact_hessian_) {
-      hess_l_fcn_ = create_function("nlp_jac_f", {"x", "p", "lam_f", "lam_g"},
-                                    {"sym_hess_gamma_x_x"},
+      hess_l_fcn_ = create_function("nlp_hess_l", {"x", "p", "lam:f", "lam:g"},
+                                    {"sym:hess:gamma:x:x"},
                                     {{"gamma", {"f", "g"}}});
     }
 
@@ -179,7 +181,7 @@ namespace casadi {
 
     // Allocate a QP solver
     casadi_assert_message(!qpsol_plugin.empty(), "'qpsol' option has not been set");
-    qpsol_ = qpsol("qpsol", qpsol_plugin, {{"h", Hsp_}, {"a", Asp_}},
+    qpsol_ = conic("qpsol", qpsol_plugin, {{"h", Hsp_}, {"a", Asp_}},
                    qpsol_options);
     alloc(qpsol_);
 
@@ -710,7 +712,12 @@ namespace casadi {
   void Sqpmethod::eval_h(SqpmethodMemory* m, const double* x, const double* lambda,
                          double sigma, double* H) const {
     try {
-      calc_function(m, hess_l_fcn_, {x, m->p, &sigma, lambda}, {H});
+      m->arg[0] = x;
+      m->arg[1] = m->p;
+      m->arg[2] = &sigma;
+      m->arg[3] = lambda;
+      m->res[0] = H;
+      calc_function(m, "nlp_hess_l");
 
       // Determing regularization parameter with Gershgorin theorem
       if (regularize_) {
@@ -728,12 +735,11 @@ namespace casadi {
 
   void Sqpmethod::eval_g(SqpmethodMemory* m, const double* x, double* g) const {
     try {
-      // Quick return if no constraints
-      if (ng_==0) return;
-
-      // Evaluate the function
-      calc_function(m, g_fcn_, {x, m->p}, {g});
-
+      if (ng_==0) return; // Quick return if no constraints
+      m->arg[0] = x;
+      m->arg[1] = m->p;
+      m->res[0] = g;
+      calc_function(m, "nlp_g");
     } catch(exception& ex) {
       userOut<true, PL_WARN>() << "eval_g failed: " << ex.what() << endl;
       throw;
@@ -742,13 +748,12 @@ namespace casadi {
 
   void Sqpmethod::eval_jac_g(SqpmethodMemory* m, const double* x, double* g, double* J) const {
     try {
-
-      // Quich finish if no constraints
-      if (ng_==0) return;
-
-      // Evaluate the function
-      calc_function(m, jac_g_fcn_, {x, m->p}, {g, J});
-
+      if (ng_==0) return; // Quich finish if no constraints
+      m->arg[0] = x;
+      m->arg[1] = m->p;
+      m->res[0] = g;
+      m->res[1] = J;
+      calc_function(m, "nlp_jac_g");
     } catch(exception& ex) {
       userOut<true, PL_WARN>() << "eval_jac_g failed: " << ex.what() << endl;
       throw;
@@ -758,10 +763,11 @@ namespace casadi {
   void Sqpmethod::eval_grad_f(SqpmethodMemory* m, const double* x,
                               double* f, double* grad_f) const {
     try {
-
-      // Evaluate the function
-      calc_function(m, grad_f_fcn_, {x, m->p}, {f, grad_f});
-
+      m->arg[0] = x;
+      m->arg[1] = m->p;
+      m->res[0] = f;
+      m->res[1] = grad_f;
+      calc_function(m, "nlp_grad_f");
     } catch(exception& ex) {
       userOut<true, PL_WARN>() << "eval_grad_f failed: " << ex.what() << endl;
       throw;
@@ -770,10 +776,11 @@ namespace casadi {
 
   double Sqpmethod::eval_f(SqpmethodMemory* m, const double* x) const {
     try {
-      // Evaluate the function
       double f;
-      calc_function(m, f_fcn_, {x, m->p}, {&f});
-
+      m->arg[0] = x;
+      m->arg[1] = m->p;
+      m->res[0] = &f;
+      calc_function(m, "nlp_f");
       return f;
     } catch(exception& ex) {
       userOut<true, PL_WARN>() << "eval_f failed: " << ex.what() << endl;
@@ -787,20 +794,20 @@ namespace casadi {
                            double* x_opt, double* lambda_x_opt, double* lambda_A_opt) const {
     // Inputs
     fill_n(m->arg, qpsol_.n_in(), nullptr);
-    m->arg[QPSOL_H] = H;
-    m->arg[QPSOL_G] = g;
-    m->arg[QPSOL_X0] = x_opt;
-    m->arg[QPSOL_LBX] = lbx;
-    m->arg[QPSOL_UBX] = ubx;
-    m->arg[QPSOL_A] = A;
-    m->arg[QPSOL_LBA] = lbA;
-    m->arg[QPSOL_UBA] = ubA;
+    m->arg[CONIC_H] = H;
+    m->arg[CONIC_G] = g;
+    m->arg[CONIC_X0] = x_opt;
+    m->arg[CONIC_LBX] = lbx;
+    m->arg[CONIC_UBX] = ubx;
+    m->arg[CONIC_A] = A;
+    m->arg[CONIC_LBA] = lbA;
+    m->arg[CONIC_UBA] = ubA;
 
     // Outputs
     fill_n(m->res, qpsol_.n_out(), nullptr);
-    m->res[QPSOL_X] = x_opt;
-    m->res[QPSOL_LAM_X] = lambda_x_opt;
-    m->res[QPSOL_LAM_A] = lambda_A_opt;
+    m->res[CONIC_X] = x_opt;
+    m->res[CONIC_LAM_X] = lambda_x_opt;
+    m->res[CONIC_LAM_A] = lambda_A_opt;
 
     // Solve the QP
     qpsol_(m->arg, m->res, m->iw, m->w, 0);

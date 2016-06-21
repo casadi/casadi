@@ -44,10 +44,10 @@ class ComplexityTests(casadiTestCase):
   def checkOrders(self,Ns,ts):
     """
     Test the hypothesis that the slope of Ns is order.
-    
-    
+
+
     An order -N means that the order is between (N-1) and N
-    
+
     """
     # Test statistic http://stattrek.com/AP-Statistics-4/Test-Slope.aspx?Tutorial=Stat
     # http://mathworld.wolfram.com/LeastSquaresFitting.html
@@ -55,37 +55,37 @@ class ComplexityTests(casadiTestCase):
 
     orders   = self.testorders
     rejectat = self.rejectat
-    
+
     Ns = log(Ns)
     ts = log(ts)
-    
+
     m = Ns.shape[0]
 
     sigmaN = std(Ns)
     sigmaT = std(ts)
-        
+
     # covariance
     cov = mean(ts*Ns)-mean(ts)*mean(Ns)
-    
+
     # correlation coefficient
     rho = (mean(ts*Ns)-mean(ts)*mean(Ns))/sigmaN/sigmaT
-    
-    # sqrt(Variance) estimate 
+
+    # sqrt(Variance) estimate
     s = m/sqrt(m-2)*sqrt(sigmaT**2 - cov**2/sigmaN**2)
-    
+
     # Estimate for b
     b = sigmaT/sigmaN * rho
-    
+
     a = mean(ts) - b * mean(Ns)
-    
+
     # Standard error on estimate for b
     sigmab = s/sqrt(m*sigmaN**2)
-    
+
     # Standard deviation
     sigmaa = s * sqrt(1/m + mean(ts)**2/(m*sigmaT**2))
-    
+
     conf = 0.05
-    
+
 
     results = []
     for order in orders:
@@ -95,34 +95,34 @@ class ComplexityTests(casadiTestCase):
 
       p = (1-student.cdf(t,m))
       if self.debug:
-        print "If the order were really %d, then the measurements have a p-score of %.8f" % (order,p)
+        print("If the order were really %d, then the measurements have a p-score of %.8f" % (order,p))
       if p >= rejectat:
         results.append(order)
 
-    
+
     if len(results)==1:
       order = results[0]
       a = mean(ts - order*Ns)
       sigmaa = std(ts - order*Ns)/sqrt(m)
-      print "O(f) = %.3e N^%d [s]    | 95%% confidence:   [%.3e , %.3e] N^%d [s]" % (exp(a),order,exp(student.ppf(conf, m, loc=a, scale=sigmaa)),exp(student.ppf(1-conf, m, loc=a, scale=sigmaa)),order)
+      print("O(f) = %.3e N^%d [s]    | 95%% confidence:   [%.3e , %.3e] N^%d [s]" % (exp(a),order,exp(student.ppf(conf, m, loc=a, scale=sigmaa)),exp(student.ppf(1-conf, m, loc=a, scale=sigmaa)),order))
     else:
-      print "raw fit O(f) = %.3e N^(%.3f) [s]" % (exp(a),b)
+      print("raw fit O(f) = %.3e N^(%.3f) [s]" % (exp(a),b))
 
-    
-    for i, order in zip(range(len(orders))[1:],orders[1:]):
+
+    for i, order in zip(list(range(len(orders)))[1:],orders[1:]):
       if b < order and b > order-1 and not(order in results) and not(order -1 in results):
         results.append(-order)
-    
+
     return results
-      
-  
+
+
   def complexity(self,setupfun,fun, order, depth = 0):
-    
+
     N = 1
-    
+
     Ns = []
     ts = []
-    
+
     dt = 0
     while dt<self.maxt:
       sys.stdout.write("\r%d..." % N)
@@ -137,7 +137,7 @@ class ComplexityTests(casadiTestCase):
       N=int(N*1.5)
       N+=1
       if self.check: break
-    print ""
+    print("")
 
     Ns = array(Ns)
     ts = array(ts)
@@ -149,21 +149,21 @@ class ComplexityTests(casadiTestCase):
         return self.complexity(setupfun,fun, order, depth+1 )
       else:
         self.assertTrue(False,"We expected order %d, but found %s" % (order,str(orders)))
-    
-    
+
+
   def test_DMadd(self):
     self.message("DM add column vectors")
     def setupfun(self,N):
       return {'A': DM(N,1,0), 'B': DM(N,1,0)}
     def fun(self,N,setup):
       setup['A'] + setup['B']
-    
+
     self.complexity(setupfun,fun, 1)
-    
+
     self.message("DM add rows vectors")
     def setupfun(self,N):
       return {'A': DM(1,N,0), 'B': DM(1,N,0)}
-    
+
     self.complexity(setupfun,fun, 1)
 
 
@@ -177,7 +177,7 @@ class ComplexityTests(casadiTestCase):
       return {'f':f}
     def fun(self,N,setup):
       setup['f'].evaluate()
-    
+
     self.complexity(setupfun,fun, 1)
 
   def test_SX_funprodvec(self):
@@ -202,7 +202,7 @@ class ComplexityTests(casadiTestCase):
       return {'f':f}
     def fun(self,N,setup):
       setup['f'].evaluate()
-    
+
     self.complexity(setupfun,fun, 1)
 
 
@@ -247,20 +247,20 @@ class ComplexityTests(casadiTestCase):
       return {'A': DM(1,N,0), 'B': DM(N,1,0)}
     def fun(self,N,setup):
       c.dot(setup['A'],setup['B'])
-    
+
     self.complexity(setupfun,fun, 1)
-    
+
     self.message("DM outer dot vectors")
     def setupfun(self,N):
       return {'A': DM(N,1,0), 'B': DM(1,N,0)}
     def fun(self,N,setup):
       c.dot(setup['A'],setup['B'])
-    
+
     self.complexity(setupfun,fun, 2) # strangely, the dot product is O(N^2)
 
 
 
-    
+
 if __name__ == '__main__':
     unittest.main()
 

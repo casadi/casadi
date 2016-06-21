@@ -49,11 +49,10 @@ if(WITH_PYTHON)
    add_subdirectory(python)
 endif()
 
-if(WITH_MATLAB)
+if(WITH_MATLAB OR WITH_OCTAVE)
    add_subdirectory(matlab)
 endif()
 
 if(WITH_JSON)
    add_subdirectory(json)
 endif()
-

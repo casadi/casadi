@@ -26,7 +26,7 @@
 #ifndef CASADI_NLPSOL_HPP
 #define CASADI_NLPSOL_HPP
 
-#include "oracle.hpp"
+#include "function.hpp"
 
 namespace casadi {
 
@@ -71,14 +71,12 @@ namespace casadi {
   CASADI_EXPORT Function nlpsol(const std::string& name, const std::string& solver,
                                 const MXDict& nlp, const Dict& opts=Dict());
   CASADI_EXPORT Function nlpsol(const std::string& name, const std::string& solver,
-                                const Function& nlp, const Dict& opts=Dict());
-  CASADI_EXPORT Function nlpsol(const std::string& name, const std::string& solver,
                                 const std::string& fname, const Dict& opts=Dict());
   CASADI_EXPORT Function nlpsol(const std::string& name, const std::string& solver,
-                                const Compiler& compiler, const Dict& opts=Dict());
+                                const Importer& compiler, const Dict& opts=Dict());
 #ifndef SWIG
   CASADI_EXPORT Function nlpsol(const std::string& name, const std::string& solver,
-                                Oracle* nlp, const Dict& opts=Dict());
+                                const Function& nlp, const Dict& opts=Dict());
 #endif // SWIG
   ///@}
 

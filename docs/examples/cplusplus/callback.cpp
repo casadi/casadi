@@ -37,6 +37,8 @@ using namespace casadi;
    double d;
    // Private constructor
    MyCallback(double d) : d(d) {}
+   
+   ~MyCallback() { std::cout << "MyCallback is destroyed here." << std::endl; };
  public:
    // Creator function, creates an owning reference
    static Function create(const std::string& name, double d,
@@ -66,5 +68,31 @@ using namespace casadi;
    std::vector<DM> arg = {2};
    std::vector<DM> res = f(arg);
    std::cout << res << std::endl;
+   
+   // The callback instance is destroyed when
+   // there are no references left to it
+   
+   // Single reference
+   std::cout << "Let's overwrite f here." << std::endl;
+   f = Function();
+   std::cout << "Done." << std::endl;
+   
+   // Function reference
+   f = MyCallback::create("f", 0.5);
+   Function g = f;
+   f = Function();
+   std::cout << "Let's overwrite g here." << std::endl;
+   g = Function();
+   std::cout << "Done." << std::endl;
+   
+   // Embedding in a graph
+   f = MyCallback::create("f", 0.5);
+   MX x = MX::sym("x");
+   g = Function("g",{x},{f(x)}); 
+   f = Function();
+   std::cout << "Let's overwrite g here." << std::endl;
+   g = Function();
+   std::cout << "Done." << std::endl;
+   
    return 0;
  }

@@ -150,24 +150,14 @@ namespace casadi {
     int colind(int col) const { return sparsity().colind(col); }
     ///@}
 
-    /** \brief Get the location of all non-zero elements as they would appear in a Dense matrix
-        A : DenseMatrix  4 x 3
-        B : SparseMatrix 4 x 3 , 5 structural non-zeros
-
-        k = A.find()
-        A[k] will contain the elements of A that are non-zero in B
-    */
-    std::vector<int> find(bool ind1=SWIG_IND1) const { return sparsity().find(ind1);}
-
     /** \brief Get the sparsity pattern */
     SWIG_CONSTREF(Sparsity) sparsity() const;
 
 #ifndef SWIG
     /// \cond INTERNAL
-    /** \brief Access the sparsity, make a copy if there are multiple references to it */
+    /** \brief Access the sparsity */
     Sparsity& sparsityRef();
     /// \endcond
-
 
     /// \cond CLUTTER
     /**  @{  */
@@ -195,7 +185,7 @@ namespace casadi {
 
     /** \brief  Get vector nonzero or slice of nonzeros */
     template<typename K>
-    const MatType operator[](const K& k) const {
+    const MatType nz(const K& k) const {
       MatType ret;
       self().get_nz(ret, false, k);
       return ret;
@@ -203,9 +193,19 @@ namespace casadi {
 
     /** \brief  Access vector nonzero or slice of nonzeros */
     template<typename K>
-    NonZeros<MatType, K> operator[](const K& k) {
+    NonZeros<MatType, K> nz(const K& k) {
       return NonZeros<MatType, K>(self(), k);
     }
+
+#ifdef WITH_DEPRECATED_FEATURES
+    /** \brief  Get vector nonzero or slice of nonzeros, old syntax */
+    template<typename K>
+    const MatType operator[](const K& k) const { return nz(k);}
+
+    /** \brief  Access vector nonzero or slice of nonzeros, old syntax */
+    template<typename K>
+    NonZeros<MatType, K> operator[](const K& k) { return nz(k);}
+#endif // WITH_DEPRECATED_FEATURES
 
     /** \brief  Get vector element or slice */
     template<typename RR>

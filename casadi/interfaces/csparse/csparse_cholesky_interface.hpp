@@ -34,12 +34,12 @@
 
 /// \cond INTERNAL
 #include <cs.h>
-#include "casadi/core/function/linsol_impl.hpp"
+#include "casadi/core/function/linsol_internal.hpp"
 #include <casadi/interfaces/csparse/casadi_linsol_csparsecholesky_export.h>
 
 namespace casadi {
 
-  struct CASADI_LINSOL_CSPARSECHOLESKY_EXPORT CsparseCholMemory {
+  struct CASADI_LINSOL_CSPARSECHOLESKY_EXPORT CsparseCholMemory : public LinsolMemory {
     // Destructor
     ~CsparseCholMemory();
 
@@ -64,14 +64,14 @@ namespace casadi {
    *
    */
   class CASADI_LINSOL_CSPARSECHOLESKY_EXPORT
-  CSparseCholeskyInterface : public Linsol {
+  CSparseCholeskyInterface : public LinsolInternal {
   public:
     // Create a linear solver given a sparsity pattern and a number of right hand sides
-    CSparseCholeskyInterface(const std::string& name, const Sparsity& sp, int nrhs);
+    CSparseCholeskyInterface(const std::string& name);
 
-    /** \brief  Create a new Linsol */
-    static Linsol* creator(const std::string& name, const Sparsity& sp, int nrhs) {
-      return new CSparseCholeskyInterface(name, sp, nrhs);
+    /** \brief  Create a new LinsolInternal */
+    static LinsolInternal* creator(const std::string& name) {
+      return new CSparseCholeskyInterface(name);
     }
 
     // Destructor
@@ -89,14 +89,20 @@ namespace casadi {
     /** \brief Initalize memory block */
     virtual void init_memory(void* mem) const;
 
+    // Set sparsity pattern
+    virtual void reset(void* mem, const int* sp) const;
+
+    // Symbolic factorization
+    virtual void pivoting(void* mem, const double* A) const;
+
     // Factorize the linear system
-    virtual void linsol_factorize(void* mem, const double* A) const;
+    virtual void factorize(void* mem, const double* A) const;
 
     // Solve the linear system
-    virtual void linsol_solve(void* mem, double* x, int nrhs, bool tr) const;
+    virtual void solve(void* mem, double* x, int nrhs, bool tr) const;
 
     // Solve the system of equations <tt>Lx = b</tt>
-    virtual void linsol_solveL(void* mem, double* x, int nrhs, bool tr) const;
+    virtual void solve_cholesky(void* mem, double* x, int nrhs, bool tr) const;
 
     /// Obtain a symbolic Cholesky factorization
     virtual Sparsity linsol_cholesky_sparsity(void* mem, bool tr) const;

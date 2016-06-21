@@ -152,10 +152,19 @@ class CASADI_EXPORT SXFunction :
   ///@}
 
   /// Get free variables (SX)
-  virtual SX free_sx() const {return free_vars_;}
+  virtual std::vector<SX> free_sx() const {
+    std::vector<SX> ret(free_vars_.size());
+    std::copy(free_vars_.begin(), free_vars_.end(), ret.begin());
+    return ret;
+  }
 
   /** \brief Does the function have free variables */
   virtual bool has_free() const { return !free_vars_.empty();}
+
+  /** \brief Print free variables */
+  virtual void print_free(std::ostream &stream) const {
+    stream << free_vars_;
+  }
 
   /** \brief Hessian (forward over adjoint) via source code transformation */
   SX hess(int iind=0, int oind=0);
@@ -229,13 +238,10 @@ class CASADI_EXPORT SXFunction :
   virtual void generateBody(CodeGenerator& g) const;
 
   /** \brief  Propagate sparsity forward */
-  virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
+  virtual void sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
 
   /** \brief  Propagate sparsity backwards */
-  virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
-
-  /// Is the class able to propagate seeds through the algorithm?
-  virtual bool spCanEvaluate(bool fwd) { return true;}
+  virtual void sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
 
   /** \brief Return Jacobian of all input elements with respect to all output elements */
   virtual Function getFullJacobian();

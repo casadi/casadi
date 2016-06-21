@@ -51,8 +51,8 @@ res = solver(x0  = [2.5,3.0,0.75],
              lbg = 0)
 
 # Print solution
-print
-print "%50s " % "Optimal cost:", res["f"]
-print "%50s " % "Primal solution:", res["x"]
-print "%50s " % "Dual solution (simple bounds):", res["lam_x"]
-print "%50s " % "Dual solution (nonlinear bounds):", res["lam_g"]
+print()
+print("%50s " % "Optimal cost:", res["f"])
+print("%50s " % "Primal solution:", res["x"])
+print("%50s " % "Dual solution (simple bounds):", res["lam_x"])
+print("%50s " % "Dual solution (nonlinear bounds):", res["lam_g"])

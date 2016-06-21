@@ -85,17 +85,27 @@ namespace casadi {
 
   // returns the value of the objective function
   bool IpoptUserClass::eval_f(Index n, const Number* x, bool new_x, Number& obj_value) {
-    return solver_.calc_function(mem_, solver_.f_fcn_, {x, mem_->p}, {&obj_value})==0;
+    mem_->arg[0] = x;
+    mem_->arg[1] = mem_->p;
+    mem_->res[0] = &obj_value;
+    return solver_.calc_function(mem_, "nlp_f")==0;
   }
 
   // return the gradient of the objective function grad_ {x} f(x)
   bool IpoptUserClass::eval_grad_f(Index n, const Number* x, bool new_x, Number* grad_f) {
-    return solver_.calc_function(mem_, solver_.grad_f_fcn_, {x, mem_->p}, {0, grad_f})==0;
+    mem_->arg[0] = x;
+    mem_->arg[1] = mem_->p;
+    mem_->res[0] = 0;
+    mem_->res[1] = grad_f;
+    return solver_.calc_function(mem_, "nlp_grad_f")==0;
   }
 
   // return the value of the constraints: g(x)
   bool IpoptUserClass::eval_g(Index n, const Number* x, bool new_x, Index m, Number* g) {
-    return solver_.calc_function(mem_, solver_.g_fcn_, {x, mem_->p}, {g})==0;
+    mem_->arg[0] = x;
+    mem_->arg[1] = mem_->p;
+    mem_->res[0] = g;
+    return solver_.calc_function(mem_, "nlp_g")==0;
   }
 
   // return the structure or values of the jacobian
@@ -103,8 +113,12 @@ namespace casadi {
                                   Index m, Index nele_jac, Index* iRow, Index *jCol,
                                   Number* values) {
     if (values) {
-      // Evaluate Jacobian
-      return solver_.calc_function(mem_, solver_.jac_g_fcn_, {x, mem_->p}, {0, values})==0;
+      // Evaluate numerically
+      mem_->arg[0] = x;
+      mem_->arg[1] = mem_->p;
+      mem_->res[0] = 0;
+      mem_->res[1] = values;
+      return solver_.calc_function(mem_, "nlp_jac_g")==0;
     } else {
       // Get the sparsity pattern
       int ncol = solver_.jacg_sp_.size2();
@@ -129,9 +143,13 @@ namespace casadi {
                               bool new_lambda, Index nele_hess, Index* iRow,
                               Index* jCol, Number* values) {
     if (values) {
-      // Evaluate Hessian
-      if (solver_.calc_function(mem_, solver_.hess_l_fcn_,
-                                {x, mem_->p, &obj_factor, lambda}, {values})) return false;
+      // Evaluate numerically
+      mem_->arg[0] = x;
+      mem_->arg[1] = mem_->p;
+      mem_->arg[2] = &obj_factor;
+      mem_->arg[3] = lambda;
+      mem_->res[0] = values;
+      if (solver_.calc_function(mem_, "nlp_hess_l")) return false;
       return true;
     } else {
       // Get the sparsity pattern

@@ -37,8 +37,8 @@ namespace casadi {
   using namespace std;
 
   extern "C"
-  int CASADI_QPSOL_CPLEX_EXPORT
-  casadi_register_qpsol_cplex(Qpsol::Plugin* plugin) {
+  int CASADI_CONIC_CPLEX_EXPORT
+  casadi_register_conic_cplex(Conic::Plugin* plugin) {
     plugin->creator = CplexInterface::creator;
     plugin->name = "cplex";
     plugin->doc = CplexInterface::meta_doc.c_str();
@@ -47,17 +47,17 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_QPSOL_CPLEX_EXPORT casadi_load_qpsol_cplex() {
-    Qpsol::registerPlugin(casadi_register_qpsol_cplex);
+  void CASADI_CONIC_CPLEX_EXPORT casadi_load_conic_cplex() {
+    Conic::registerPlugin(casadi_register_conic_cplex);
   }
 
   CplexInterface::CplexInterface(const std::string& name,
                                  const std::map<std::string, Sparsity>& st)
-    : Qpsol(name, st) {
+    : Conic(name, st) {
   }
 
   Options CplexInterface::options_
-  = {{&Qpsol::options_},
+  = {{&Conic::options_},
      {{"cplex",
        {OT_DICT,
         "Options to be passed to CPLEX"}},
@@ -84,7 +84,7 @@ namespace casadi {
 
   void CplexInterface::init(const Dict& opts) {
     // Call the init method of the base class
-    Qpsol::init(opts);
+    Conic::init(opts);
 
     // Default options
     qp_method_ = 0;
@@ -119,23 +119,23 @@ namespace casadi {
 
     // Type of variable
     if (mip_) {
-      ctype_.resize(n_);
-      for (int i=0; i<n_; ++i) {
+      ctype_.resize(nx_);
+      for (int i=0; i<nx_; ++i) {
         ctype_[i] = discrete_[i] ? 'I' : 'C';
       }
     }
 
     // Allocate work vectors
-    alloc_w(n_, true); // g
-    alloc_w(n_, true); // lbx
-    alloc_w(n_, true); // ubx
-    alloc_w(nc_, true); // lba
-    alloc_w(nc_, true); // uba
-    alloc_w(nnz_in(QPSOL_H), true); // H
-    alloc_w(nnz_in(QPSOL_A), true); // A
-    alloc_w(n_, true); // x
-    alloc_w(n_, true); // lam_x
-    alloc_w(nc_, true); // lam_a
+    alloc_w(nx_, true); // g
+    alloc_w(nx_, true); // lbx
+    alloc_w(nx_, true); // ubx
+    alloc_w(na_, true); // lba
+    alloc_w(na_, true); // uba
+    alloc_w(nnz_in(CONIC_H), true); // H
+    alloc_w(nnz_in(CONIC_A), true); // A
+    alloc_w(nx_, true); // x
+    alloc_w(nx_, true); // lam_x
+    alloc_w(na_, true); // lam_a
   }
 
   void CplexInterface::init_memory(void* mem) const {
@@ -236,23 +236,23 @@ namespace casadi {
 
     // Allocation of data
     // Type of constraint
-    m->sense.resize(nc_);
+    m->sense.resize(na_);
     // Right-hand side of constraints
-    m->rhs.resize(nc_);
+    m->rhs.resize(na_);
     // Range value for lower AND  upper bounded constraints
-    m->rngval.resize(nc_);
+    m->rngval.resize(na_);
     // Basis for primal variables
-    m->cstat.resize(n_);
-    m->rstat.resize(nc_);
+    m->cstat.resize(nx_);
+    m->rstat.resize(na_);
 
     // Matrix A, count the number of elements per column
-    const Sparsity& A_sp = sparsity_in(QPSOL_A);
+    const Sparsity& A_sp = sparsity_in(CONIC_A);
     m->matcnt.resize(A_sp.size2());
     transform(A_sp.colind()+1, A_sp.colind() + A_sp.size2()+1, A_sp.colind(), m->matcnt.begin(),
               minus<int>());
 
     // Matrix H, count the number of elements per column
-    const Sparsity& H_sp = sparsity_in(QPSOL_H);
+    const Sparsity& H_sp = sparsity_in(CONIC_H);
     m->qmatcnt.resize(H_sp.size2());
     transform(H_sp.colind()+1, H_sp.colind() + H_sp.size2()+1, H_sp.colind(), m->qmatcnt.begin(),
               minus<int>());
@@ -268,40 +268,38 @@ namespace casadi {
     auto m = static_cast<CplexMemory*>(mem);
 
     if (inputs_check_) {
-      checkInputs(arg[QPSOL_LBX], arg[QPSOL_UBX], arg[QPSOL_LBA], arg[QPSOL_UBA]);
+      checkInputs(arg[CONIC_LBX], arg[CONIC_UBX], arg[CONIC_LBA], arg[CONIC_UBA]);
     }
 
     // Get inputs
-    double* g=w; w += n_;
-    casadi_copy(arg[QPSOL_G], n_, g);
-    double* lbx=w; w += n_;
-    casadi_copy(arg[QPSOL_LBX], n_, lbx);
-    double* ubx=w; w += n_;
-    casadi_copy(arg[QPSOL_UBX], n_, ubx);
-    double* lba=w; w += nc_;
-    casadi_copy(arg[QPSOL_LBA], nc_, lba);
-    double* uba=w; w += nc_;
-    casadi_copy(arg[QPSOL_UBA], nc_, uba);
-    double* H=w; w += nnz_in(QPSOL_H);
-    casadi_copy(arg[QPSOL_H], nnz_in(QPSOL_H), H);
-    double* A=w; w += nnz_in(QPSOL_A);
-    casadi_copy(arg[QPSOL_A], nnz_in(QPSOL_A), A);
-    double* x=w; w += n_;
-    casadi_copy(arg[QPSOL_X0], n_, x);
-    double* lam_x=w; w += n_;
-    casadi_copy(arg[QPSOL_LAM_X0], n_, lam_x);
+    double* g=w; w += nx_;
+    casadi_copy(arg[CONIC_G], nx_, g);
+    double* lbx=w; w += nx_;
+    casadi_copy(arg[CONIC_LBX], nx_, lbx);
+    double* ubx=w; w += nx_;
+    casadi_copy(arg[CONIC_UBX], nx_, ubx);
+    double* lba=w; w += na_;
+    casadi_copy(arg[CONIC_LBA], na_, lba);
+    double* uba=w; w += na_;
+    casadi_copy(arg[CONIC_UBA], na_, uba);
+    double* H=w; w += nnz_in(CONIC_H);
+    casadi_copy(arg[CONIC_H], nnz_in(CONIC_H), H);
+    double* A=w; w += nnz_in(CONIC_A);
+    casadi_copy(arg[CONIC_A], nnz_in(CONIC_A), A);
+    double* x=w; w += nx_;
+    casadi_copy(arg[CONIC_X0], nx_, x);
+    double* lam_x=w; w += nx_;
+    casadi_copy(arg[CONIC_LAM_X0], nx_, lam_x);
 
     // Temporaries
-    double* lam_a=w; w += nc_;
-
-    int status;
+    double* lam_a=w; w += na_;
 
     // We change method in crossover
     if (m->is_warm && qp_method_ == 7) {
-      status = CPXsetintparam(m->env, CPX_PARAM_QPMETHOD, 1);
+      (void)CPXsetintparam(m->env, CPX_PARAM_QPMETHOD, 1);
     }
 
-    for (int i = 0; i < nc_; ++i) {
+    for (int i = 0; i < na_; ++i) {
       // CPX_INFBOUND
 
       // Equality
@@ -327,20 +325,20 @@ namespace casadi {
     }
 
     // Copying objective, constraints, and bounds.
-    const Sparsity& A_sp = sparsity_in(QPSOL_A);
+    const Sparsity& A_sp = sparsity_in(CONIC_A);
     const int* matbeg = A_sp.colind();
     const int* matind = A_sp.row();
     const double* matval = A;
     const double* obj = g;
     const double* lb = lbx;
     const double* ub = ubx;
-    if (CPXcopylp(m->env, m->lp, n_, nc_, m->objsen, obj, get_ptr(m->rhs), get_ptr(m->sense),
+    if (CPXcopylp(m->env, m->lp, nx_, na_, m->objsen, obj, get_ptr(m->rhs), get_ptr(m->sense),
                   matbeg, get_ptr(m->matcnt), matind, matval, lb, ub, get_ptr(m->rngval))) {
       casadi_error("CPXcopylp failed");
     }
 
     // Preparing coefficient matrix Q
-    const Sparsity& H_sp = sparsity_in(QPSOL_H);
+    const Sparsity& H_sp = sparsity_in(CONIC_H);
     const int* qmatbeg = H_sp.colind();
     const int* qmatind = H_sp.row();
     const double* qmatval = H;
@@ -366,7 +364,7 @@ namespace casadi {
 
     // Solution
     double f;
-    std::vector<double> slack(nc_);
+    std::vector<double> slack(na_);
     int solstat;
 
     if (mip_) {
@@ -398,8 +396,8 @@ namespace casadi {
       }
 
       // Not a number as dual variables (not calculated with MIQP algorithm)
-      casadi_fill(lam_a, nc_, nan);
-      casadi_fill(lam_x, n_, nan);
+      casadi_fill(lam_a, na_, nan);
+      casadi_fill(lam_x, nx_, nan);
 
     } else {
       // Optimize
@@ -415,12 +413,12 @@ namespace casadi {
 
     // Retrieving the basis
     if (qp_method_ != 0 && qp_method_ != 4) {
-      status = CPXgetbase(m->env, m->lp, get_ptr(m->cstat), get_ptr(m->rstat));
+      (void)CPXgetbase(m->env, m->lp, get_ptr(m->cstat), get_ptr(m->rstat));
     }
 
     // Flip the sign of the multipliers
-    casadi_scal(nc_, -1., lam_a);
-    casadi_scal(n_, -1., lam_x);
+    casadi_scal(na_, -1., lam_a);
+    casadi_scal(nx_, -1., lam_x);
 
     int solnstat = CPXgetstat(m->env, m->lp);
     stringstream errormsg;
@@ -463,10 +461,10 @@ namespace casadi {
     }
 
     // Get the outputs
-    if (res[QPSOL_COST]) *res[QPSOL_COST] = f;
-    casadi_copy(lam_a, nc_, res[QPSOL_LAM_A]);
-    casadi_copy(lam_x, n_, res[QPSOL_LAM_X]);
-    casadi_copy(x, n_, res[QPSOL_X]);
+    if (res[CONIC_COST]) *res[CONIC_COST] = f;
+    casadi_copy(lam_a, na_, res[CONIC_LAM_A]);
+    casadi_copy(lam_x, nx_, res[CONIC_LAM_X]);
+    casadi_copy(x, nx_, res[CONIC_X]);
   }
 
   CplexInterface::~CplexInterface() {

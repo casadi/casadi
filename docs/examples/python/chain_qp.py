@@ -121,7 +121,7 @@ solver = qpsol('solver', 'qpoases', qp, {'sparse':True})
 sol = solver(lbx=lbx, ubx=ubx, lbg=lbg, ubg=ubg)
 x_opt = sol['x']
 f_opt = sol['f']
-print 'f_opt = ', f_opt
+print('f_opt = ', f_opt)
 
 # Retrieve the result
 Y0 = x_opt[0::2]

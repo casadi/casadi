@@ -31,7 +31,7 @@ namespace casadi {
 
   extern "C"
   int CASADI_LINSOL_CSPARSE_EXPORT
-  casadi_register_linsol_csparse(Linsol::Plugin* plugin) {
+  casadi_register_linsol_csparse(LinsolInternal::Plugin* plugin) {
     plugin->creator = CsparseInterface::creator;
     plugin->name = "csparse";
     plugin->doc = CsparseInterface::meta_doc.c_str();
@@ -41,12 +41,11 @@ namespace casadi {
 
   extern "C"
   void CASADI_LINSOL_CSPARSE_EXPORT casadi_load_linsol_csparse() {
-    Linsol::registerPlugin(casadi_register_linsol_csparse);
+    LinsolInternal::registerPlugin(casadi_register_linsol_csparse);
   }
 
-  CsparseInterface::CsparseInterface(const std::string& name,
-                                     const Sparsity& sparsity, int nrhs)
-    : Linsol(name, sparsity, nrhs) {
+  CsparseInterface::CsparseInterface(const std::string& name)
+    : LinsolInternal(name) {
   }
 
   CsparseInterface::~CsparseInterface() {
@@ -60,51 +59,53 @@ namespace casadi {
 
   void CsparseInterface::init(const Dict& opts) {
     // Call the init method of the base class
-    Linsol::init(opts);
+    LinsolInternal::init(opts);
   }
 
   void CsparseInterface::init_memory(void* mem) const {
+    LinsolInternal::init_memory(mem);
+  }
+
+  void CsparseInterface::reset(void* mem, const int* sp) const {
+    LinsolInternal::reset(mem, sp);
     auto m = static_cast<CsparseMemory*>(mem);
+
     m->N = 0;
     m->S = 0;
-    m->A.nzmax = nnz_in(0);  // maximum number of entries
-    m->A.m = size1_in(0); // number of rows
-    m->A.n = size2_in(0); // number of columns
-    m->A.p = const_cast<int*>(sparsity_in(0).colind()); // column pointers (size n+1)
+    m->A.nzmax = m->nnz();  // maximum number of entries
+    m->A.m = m->nrow(); // number of rows
+    m->A.n = m->ncol(); // number of columns
+    m->A.p = const_cast<int*>(m->colind()); // column pointers (size n+1)
     // or column indices (size nzmax)
-    m->A.i = const_cast<int*>(sparsity_in(0).row()); // row indices, size nzmax
+    m->A.i = const_cast<int*>(m->row()); // row indices, size nzmax
     m->A.x = 0; // numerical values, size nzmax
-    m->A.nz = -1; // of entries in triplet matrix, -1 for compressed-col
+    m->A.nz = -1; // of entries in triplet matrix, -1 for compressed-column
 
     // Temporary
     m->temp_.resize(m->A.n);
-
-    // Has the routine been called once
-    m->called_once_ = false;
   }
 
-  void CsparseInterface::linsol_factorize(void* mem, const double* A) const {
+  void CsparseInterface::pivoting(void* mem, const double* A) const {
+    LinsolInternal::pivoting(mem, A);
     auto m = static_cast<CsparseMemory*>(mem);
-    casadi_assert(A!=0);
 
     // Set the nonzeros of the matrix
     m->A.x = const_cast<double*>(A);
 
-    if (!m->called_once_) {
-      if (verbose()) {
-        userOut() << "CsparseInterface::prepare: symbolic factorization" << endl;
-      }
+    // ordering and symbolic analysis
+    int order = 0; // ordering?
+    if (m->S) cs_sfree(m->S);
+    m->S = cs_sqr(order, &m->A, 0);
+   }
 
-      // ordering and symbolic analysis
-      int order = 0; // ordering?
-      if (m->S) cs_sfree(m->S);
-      m->S = cs_sqr(order, &m->A, 0) ;
-    }
+  void CsparseInterface::factorize(void* mem, const double* A) const {
+    auto m = static_cast<CsparseMemory*>(mem);
 
-    m->called_once_ = true;
+    // Set the nonzeros of the matrix
+    m->A.x = const_cast<double*>(A);
 
     // Make sure that all entries of the linear system are valid
-    for (int k=0; k<sparsity_.nnz(); ++k) {
+    for (int k=0; k<m->nnz(); ++k) {
       casadi_assert_message(!isnan(A[k]), "Nonzero " << k << " is not-a-number");
       casadi_assert_message(!isinf(A[k]), "Nonzero " << k << " is infinite");
     }
@@ -112,7 +113,8 @@ namespace casadi {
     if (verbose()) {
       userOut() << "CsparseInterface::prepare: numeric factorization" << endl;
       userOut() << "linear system to be factorized = " << endl;
-      DM(sparsity_, vector<double>(A, A+sparsity_.nnz())).print_sparse();
+      Sparsity sp = Sparsity::compressed(m->sparsity);
+      DM(sp, vector<double>(A, A+m->nnz())).print_sparse();
     }
 
     double tol = 1e-8;
@@ -120,7 +122,8 @@ namespace casadi {
     if (m->N) cs_nfree(m->N);
     m->N = cs_lu(&m->A, m->S, tol) ;                 // numeric LU factorization
     if (m->N==0) {
-      DM temp(sparsity_, vector<double>(A, A+sparsity_.nnz()));
+      Sparsity sp = Sparsity::compressed(m->sparsity);
+      DM temp(sp, vector<double>(A, A+sp.nnz()));
       temp = sparsify(temp);
       if (temp.sparsity().is_singular()) {
         stringstream ss;
@@ -131,7 +134,7 @@ namespace casadi {
             " sprank: " << sprank(temp.sparsity()) << " <-> " << temp.size2() << endl;
         if (verbose()) {
           ss << "Sparsity of the linear system: " << endl;
-          sparsity_.print(ss); // print detailed
+          sp.print(ss); // print detailed
         }
         throw CasadiException(ss.str());
       } else {
@@ -140,7 +143,7 @@ namespace casadi {
            << endl;
         if (verbose()) {
           ss << "Sparsity of the linear system: " << endl;
-          sparsity_.print(ss); // print detailed
+          sp.print(ss); // print detailed
         }
         throw CasadiException(ss.str());
       }
@@ -148,7 +151,7 @@ namespace casadi {
     casadi_assert(m->N!=0);
   }
 
-  void CsparseInterface::linsol_solve(void* mem, double* x, int nrhs, bool tr) const {
+  void CsparseInterface::solve(void* mem, double* x, int nrhs, bool tr) const {
     auto m = static_cast<CsparseMemory*>(mem);
     casadi_assert(m->N!=0);
 
@@ -167,7 +170,7 @@ namespace casadi {
         cs_usolve(m->N->U, t) ;               // t = U\t
         cs_ipvec(m->S->q, t, x, m->A.n) ;      // x = P2\t
       }
-      x += ncol();
+      x += m->ncol();
     }
   }
 

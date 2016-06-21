@@ -23,19 +23,19 @@
  */
 
 
-/** \brief Writing a multiple shooting code from scratch 
+/** \brief Writing a multiple shooting code from scratch
 
-  This example demonstrates how to write a simple, yet powerful multiple shooting code from 
-  scratch using CasADi. For clarity, the code below uses a simple formulation with only states 
+  This example demonstrates how to write a simple, yet powerful multiple shooting code from
+  scratch using CasADi. For clarity, the code below uses a simple formulation with only states
   and controls, and no path constrants. It relies on CasADi machinery to keep track of sparsity,
   formulate ODE sensitivity equations and build up the Jacobian of the NLP constraint function.
-    
-  By extending the code below, it should be possible for a user to solve ever more complex 
-  problems. For example, one can easily make a multi-stage formulation by simply allocating 
+
+  By extending the code below, it should be possible for a user to solve ever more complex
+  problems. For example, one can easily make a multi-stage formulation by simply allocating
   another integrator instance and use the two integrators instances for different shooting nodes.
   By replacing the explicit CVodes integrator with the fully-implicit IDAS integrator, one can
   solve optimal control problems in differential-algebraic equations.
-  
+
   \author Joel Andersson
   \date 2011-2012
 */
@@ -54,7 +54,7 @@ int main(){
 
   // Number of differential states
   int nx = x.size1();
-  
+
   // Number of controls
   int nu = u.size1();
 
@@ -74,7 +74,7 @@ int main(){
 
   // Final time
   double tf = 20.0;
-  
+
   // Number of shooting nodes
   int ns = 50;
 
@@ -85,24 +85,24 @@ int main(){
 
   // Create an integrator (CVodes)
   Function F = integrator("integrator", "cvodes", dae, {{"t0", 0}, {"tf", tf/ns}});
-  
+
   // Total number of NLP variables
   int NV = nx*(ns+1) + nu*ns;
-  
+
   // Declare variable vector for the NLP
   MX V = MX::sym("V",NV);
 
   // NLP variable bounds and initial guess
   vector<double> v_min,v_max,v_init;
-  
+
   // Offset in V
-  int offset=0; 
+  int offset=0;
 
   // State at each shooting node and control for each shooting interval
   vector<MX> X, U;
   for(int k=0; k<ns; ++k){
     // Local state
-    X.push_back( V[Slice(offset,offset+nx)] );
+    X.push_back( V.nz(Slice(offset,offset+nx)));
     if(k==0){
       v_min.insert(v_min.end(), x0_min.begin(), x0_min.end());
       v_max.insert(v_max.end(), x0_max.begin(), x0_max.end());
@@ -112,28 +112,28 @@ int main(){
     }
     v_init.insert(v_init.end(), x_init.begin(), x_init.end());
     offset += nx;
-    
+
     // Local control
-    U.push_back( V[Slice(offset,offset+nu)] );
+    U.push_back( V.nz(Slice(offset,offset+nu)));
     v_min.insert(v_min.end(), u_min.begin(), u_min.end());
     v_max.insert(v_max.end(), u_max.begin(), u_max.end());
     v_init.insert(v_init.end(), u_init.begin(), u_init.end());
     offset += nu;
   }
-  
+
   // State at end
-  X.push_back(V[Slice(offset,offset+nx)]);
+  X.push_back(V.nz(Slice(offset,offset+nx)));
   v_min.insert(v_min.end(), xf_min.begin(), xf_min.end());
   v_max.insert(v_max.end(), xf_max.begin(), xf_max.end());
-  v_init.insert(v_init.end(), x_init.begin(), x_init.end());    
+  v_init.insert(v_init.end(), x_init.begin(), x_init.end());
   offset += nx;
-  
+
   // Make sure that the size of the variable vector is consistent with the number of variables that we have referenced
   casadi_assert(offset==NV);
 
   // Objective function
   MX J = 0;
-  
+
   //Constraint function and bounds
   vector<MX> g;
 
@@ -144,12 +144,12 @@ int main(){
 
     // Save continuity constraints
     g.push_back( I_out.at("xf") - X[k+1] );
-    
+
     // Add objective function contribution
     J += I_out.at("qf");
   }
-  
-  // NLP 
+
+  // NLP
   MXDict nlp = {{"x", V}, {"f", J}, {"g", vertcat(g)}};
 
   // Set options
@@ -171,10 +171,10 @@ int main(){
 
   // Solve the problem
   res = solver(arg);
-    
+
   // Optimal solution of the NLP
   vector<double> V_opt(res.at("x"));
-  
+
   // Get the optimal state trajectory
   vector<double> r_opt(ns+1), s_opt(ns+1);
   for(int i=0; i<=ns; ++i){
@@ -183,14 +183,14 @@ int main(){
   }
   cout << "r_opt = " << endl << r_opt << endl;
   cout << "s_opt = " << endl << s_opt << endl;
-  
+
   // Get the optimal control
   vector<double> u_opt(ns);
   for(int i=0; i<ns; ++i){
     u_opt[i] = V_opt.at(nx + i*(nx+1));
   }
   cout << "u_opt = " << endl << u_opt << endl;
-  
-  
+
+
   return 0;
 }

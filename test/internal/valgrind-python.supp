@@ -725,3 +725,594 @@ fun:PyParser_ASTFromFile
    fun:PyString_FromFormat
    obj:*umath*
 }
+
+{
+   py3 A
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   fun:PyBytes_FromStringAndSize
+   fun:PyUnicodeUCS4_EncodeUTF8
+   obj:/usr/lib/python3/dist-packages/numpy/lib/_compiled_base.cpython-32mu.so
+}
+
+{
+   py3 B
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:realloc
+   fun:_PyBytes_Resize
+   fun:PyUnicodeUCS4_EncodeUTF8
+   obj:/usr/lib/python3/dist-packages/numpy/lib/_compiled_base.cpython-32mu.so
+}
+
+{
+   py3.4 A
+   Memcheck:Addr4
+   ...
+   obj:/usr/bin/python*
+   fun:PyGrammar_RemoveAccelerators
+   fun:Py_Finalize
+   fun:Py_Exit
+}
+
+{
+   py3.4 B
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   ...
+   obj:/usr/bin/python*
+   fun:PyUnicode_New
+   fun:PyUnicode_Substring
+   ...
+   obj:/usr/bin/python*
+}
+
+{
+   py3.4 C
+   Memcheck:Addr4
+   ...
+   obj:/usr/bin/python*
+   fun:_PyGC_CollectNoFail
+}
+
+{
+   py3.4 E
+   Memcheck:Value8
+   ...
+   obj:/usr/bin/python*
+   fun:_PyGC_CollectNoFail
+}
+
+{
+   py3.4 Ebis
+   Memcheck:Cond
+   ...
+   obj:/usr/bin/python*
+   fun:_PyGC_CollectNoFail
+}
+
+{
+   py3.4 D
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   ...
+   obj:/usr/bin/python*
+   fun:PyBytes_FromStringAndSize
+}
+
+
+
+{
+   py3.4 F
+   Memcheck:Value8
+   ...
+   fun:_PyObject_GC_Malloc
+}
+
+{
+   py3.4 G
+   Memcheck:Addr4
+   ...
+   obj:/usr/bin/python*
+   fun:_PyModule_ClearDict
+   fun:PyImport_Cleanup
+   fun:Py_Finalize
+   fun:Py_Exit
+   ...
+   obj:/usr/bin/python*
+   fun:PyErr_PrintEx
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:main
+}
+
+{
+   py3.4 H
+   Memcheck:Cond
+   ...
+   obj:/usr/bin/python*
+   fun:PyType_GenericAlloc
+   ...
+   obj:/usr/bin/python*
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+}
+
+{
+   py3.4 I
+   Memcheck:Addr4
+   ...
+   obj:/usr/bin/python*
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalFrameEx
+   fun:PyEval_EvalCodeEx
+   ...
+   obj:/usr/bin/python*
+   fun:PyObject_SetAttr
+   fun:PyEval_EvalFrameEx
+   fun:PyEval_EvalCodeEx
+   ...
+}
+
+
+{
+   py3.4 J
+   Memcheck:Cond
+   ...
+   obj:/usr/bin/python*
+   fun:PyEval_EvalFrameEx
+   ...
+   obj:/usr/bin/python*
+   fun:PyEval_EvalCodeEx
+   ...
+   obj:/usr/bin/python*
+   fun:PyObject_Call
+   fun:_PyObject_CallMethodIdObjArgs
+}
+
+
+{
+   py3.4 K
+   Memcheck:Addr4
+   ...
+   obj:/usr/bin/python*
+   fun:PyFrame_ClearFreeList
+   ...
+   obj:/usr/bin/python*
+   fun:PyType_GenericAlloc
+   ...
+   obj:/usr/bin/python*
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:PyErr_SetObject
+   fun:PyErr_Format
+   fun:_PyObject_GetAttrId
+}
+
+
+{
+   py3.4 L
+   Memcheck:Value8
+   obj:/usr/bin/python*
+   fun:PyEval_EvalFrameEx
+   fun:PyEval_EvalFrameEx
+   fun:PyEval_EvalFrameEx
+   fun:PyEval_EvalFrameEx
+   fun:PyEval_EvalFrameEx
+   fun:PyEval_EvalFrameEx
+   fun:PyEval_EvalCodeEx
+   ...
+   obj:/usr/bin/python*
+   fun:PyObject_Call
+   fun:_PyObject_CallMethodIdObjArgs
+   fun:PyImport_ImportModuleLevelObject
+}
+
+
+{
+   py3.4 M
+   Memcheck:Addr4
+   obj:/usr/bin/python*
+   fun:PyFrame_ClearFreeList
+   obj:/usr/bin/python*
+   obj:/usr/bin/python*
+   obj:/usr/bin/python*
+   obj:/usr/bin/python*
+   fun:PyObject_Call
+   fun:PyEval_EvalFrameEx
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalFrameEx
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalFrameEx
+}
+
+{
+   py3.4 N
+   Memcheck:Addr4
+   obj:/usr/bin/python*
+   obj:/usr/bin/python*
+   obj:/usr/bin/python*
+   fun:PyEval_EvalFrameEx
+   fun:PyEval_EvalFrameEx
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalFrameEx
+   fun:PyEval_EvalCodeEx
+   obj:/usr/bin/python*
+   fun:PyObject_Call
+   fun:PyEval_EvalFrameEx
+   fun:PyEval_EvalCodeEx
+}
+
+{
+   py3.4 O
+   Memcheck:Addr4
+   obj:/usr/bin/python*
+   obj:*numpy*
+   obj:*numpy*
+   obj:*numpy*
+   fun:PyObject_CallFunctionObjArgs
+   obj:/usr/bin/python*
+   obj:/usr/bin/python*
+   fun:PyEval_EvalFrameEx
+   fun:PyEval_EvalCodeEx
+   obj:/usr/bin/python*
+   fun:PyObject_Call
+   fun:PyEval_EvalFrameEx
+}
+
+{
+   py3.4 Obis
+   Memcheck:Addr4
+   obj:/usr/bin/python*
+   obj:*numpy*
+   obj:*numpy*
+   obj:*numpy*
+   fun:PyObject_Call
+   fun:PyEval_EvalFrameEx
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalFrameEx
+   fun:PyEval_EvalFrameEx
+   fun:PyEval_EvalFrameEx
+   fun:PyEval_EvalCodeEx
+   obj:/usr/bin/python*
+}
+
+
+
+{
+   py3.4 P
+   Memcheck:Cond
+   obj:/usr/bin/python*
+   obj:/usr/bin/python*
+   obj:/usr/bin/python*
+   fun:_PyModule_ClearDict
+   fun:PyImport_Cleanup
+   fun:Py_Finalize
+   fun:Py_Exit
+   obj:/usr/bin/python*
+   fun:PyErr_PrintEx
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:main
+}
+
+{
+   py3.4 Pbis
+   Memcheck:Value8
+   obj:/usr/bin/python*
+   obj:/usr/bin/python*
+   obj:/usr/bin/python*
+   fun:_PyModule_ClearDict
+   fun:PyImport_Cleanup
+   fun:Py_Finalize
+   fun:Py_Exit
+   obj:/usr/bin/python*
+   fun:PyErr_PrintEx
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:main
+}
+
+{
+   py3.4 Ptris
+   Memcheck:Addr4
+   obj:/usr/bin/python*
+   obj:/usr/bin/python*
+   obj:/usr/bin/python*
+   fun:_PyModule_ClearDict
+   fun:PyImport_Cleanup
+   fun:Py_Finalize
+   fun:Py_Exit
+   obj:/usr/bin/python*
+   fun:PyErr_PrintEx
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:main
+}
+
+{
+   py3.4 Pquat
+   Memcheck:Addr8
+   obj:/usr/bin/python*
+   obj:/usr/bin/python*
+   obj:/usr/bin/python*
+   fun:_PyModule_ClearDict
+   fun:PyImport_Cleanup
+   fun:Py_Finalize
+   fun:Py_Exit
+   obj:/usr/bin/python*
+   fun:PyErr_PrintEx
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:main
+}
+
+
+{
+   py3.4 Q
+   Memcheck:Value8
+   obj:/usr/bin/python*
+   obj:/usr/bin/python*
+   obj:/usr/bin/python*
+   obj:/usr/bin/python*
+   fun:PyEval_EvalFrameEx
+   fun:PyEval_EvalFrameEx
+   fun:PyEval_EvalFrameEx
+   fun:PyEval_EvalFrameEx
+   fun:PyEval_EvalCodeEx
+   obj:/usr/bin/python*
+   fun:PyObject_Call
+   fun:_PyObject_CallMethodIdObjArgs
+}
+
+
+{
+   py3.4 R
+   Memcheck:Addr4
+   obj:/usr/bin/python*
+   obj:/usr/bin/python*
+   obj:/usr/bin/python*
+   obj:/usr/bin/python*
+   obj:/usr/bin/python*
+   obj:/usr/bin/python*
+   fun:_PyObject_GC_Malloc
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalFrameEx
+   fun:PyEval_EvalCodeEx
+   obj:/usr/bin/python*
+   obj:/usr/bin/python*
+}
+
+{
+   py3.4 S
+   Memcheck:Addr4
+   obj:/usr/bin/python*
+   fun:PyFrame_ClearFreeList
+   obj:/usr/bin/python*
+   obj:/usr/bin/python*
+   fun:PyGC_Collect
+   fun:Py_Finalize
+   fun:Py_Exit
+   obj:/usr/bin/python*
+   fun:PyErr_PrintEx
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:main
+}
+
+{
+   py3.4 T
+   Memcheck:Cond
+   obj:/usr/bin/python*
+   fun:_PyModule_ClearDict
+   fun:PyImport_Cleanup
+   fun:Py_Finalize
+   fun:Py_Exit
+   obj:/usr/bin/python*
+   fun:PyErr_PrintEx
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:main
+}
+
+
+{
+   py3.4 U
+   Memcheck:Addr4
+   obj:/usr/bin/python*
+   obj:/usr/bin/python*
+   obj:/usr/bin/python*
+   obj:/usr/bin/python*
+   fun:PyEval_EvalFrameEx
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalFrameEx
+   fun:PyEval_EvalFrameEx
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalFrameEx
+   fun:PyEval_EvalCodeEx
+   obj:/usr/bin/python*
+}
+
+
+
+{
+   py3.4 V
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   obj:/usr/bin/python*
+   fun:PyUnicode_New
+   fun:PyUnicode_Substring
+   obj:/usr/bin/python*
+   fun:PyEval_EvalFrameEx
+   fun:PyEval_EvalFrameEx
+   fun:PyEval_EvalCodeEx
+   obj:/usr/bin/python*
+   fun:PyEval_EvalFrameEx
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalFrameEx
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Value8
+   obj:/usr/bin/python*
+   obj:/usr/bin/python*
+   fun:_PyModule_ClearDict
+   fun:PyImport_Cleanup
+   fun:Py_Finalize
+   fun:Py_Exit
+   obj:/usr/bin/python*
+   fun:PyErr_PrintEx
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:main
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Cond
+   obj:/usr/bin/python*
+   obj:/usr/bin/python*
+   fun:_PyModule_ClearDict
+   fun:PyImport_Cleanup
+   fun:Py_Finalize
+   fun:Py_Exit
+   obj:/usr/bin/python*
+   fun:PyErr_PrintEx
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:main
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Cond
+   obj:/usr/bin/python*
+   fun:PyFrame_ClearFreeList
+   obj:/usr/bin/python*
+   obj:/usr/bin/python*
+   fun:PyGC_Collect
+   fun:Py_Finalize
+   fun:Py_Exit
+   obj:/usr/bin/python*
+   fun:PyErr_PrintEx
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:main
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Cond
+   obj:/usr/bin/python*
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalFrameEx
+   fun:PyEval_EvalCodeEx
+   obj:/usr/bin/python*
+   fun:PyObject_Call
+   fun:PyEval_EvalFrameEx
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalFrameEx
+   fun:PyEval_EvalCodeEx
+   obj:/usr/bin/python*
+   obj:/usr/bin/python*
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr4
+   obj:/usr/bin/python*
+   fun:PyEval_EvalFrameEx
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalFrameEx
+   fun:PyEval_EvalFrameEx
+   fun:PyEval_EvalCodeEx
+   obj:/usr/bin/python*
+   fun:PyObject_Call
+   fun:PyEval_EvalFrameEx
+   fun:PyEval_EvalCodeEx
+   obj:/usr/bin/python*
+   obj:/usr/bin/python*
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Cond
+   obj:/usr/bin/python*
+   obj:/usr/bin/python*
+   obj:/usr/bin/python*
+   obj:/usr/bin/python*
+   fun:_PyObject_GC_Malloc
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalFrameEx
+   fun:PyEval_EvalCodeEx
+   obj:/usr/bin/python*
+   obj:/usr/bin/python*
+   obj:/usr/bin/python*
+   obj:/usr/bin/python*
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Cond
+   obj:/usr/bin/python*
+   obj:/usr/bin/python*
+   obj:/usr/bin/python*
+   obj:/usr/bin/python*
+   fun:_PyModule_ClearDict
+   fun:PyImport_Cleanup
+   fun:Py_Finalize
+   fun:Py_Exit
+   obj:/usr/bin/python*
+   fun:PyErr_PrintEx
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Cond
+   obj:/usr/bin/python*
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalFrameEx
+   fun:PyEval_EvalCodeEx
+   obj:/usr/bin/python*
+   fun:PyObject_Call
+   fun:PyEval_EvalFrameEx
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalFrameEx
+   fun:PyEval_EvalCodeEx
+   obj:/usr/bin/python*
+   obj:/usr/bin/python*
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr4
+   obj:/usr/bin/python*
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalFrameEx
+   fun:PyEval_EvalCodeEx
+   obj:/usr/bin/python*
+   fun:PyObject_Call
+   fun:PyEval_EvalFrameEx
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalFrameEx
+   fun:PyEval_EvalCodeEx
+   obj:/usr/bin/python*
+   obj:/usr/bin/python*
+}
+
+
+
+
+
+
+
+
+
+

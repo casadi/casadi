@@ -26,8 +26,8 @@
 #ifndef CASADI_CLANG_COMPILER_HPP
 #define CASADI_CLANG_COMPILER_HPP
 
-#include "casadi/core/function/compiler_internal.hpp"
-#include <casadi/interfaces/clang/casadi_compiler_clang_export.h>
+#include "casadi/core/function/importer_internal.hpp"
+#include <casadi/interfaces/clang/casadi_importer_clang_export.h>
 
 #include <clang/CodeGen/CodeGenAction.h>
 #include <clang/Basic/DiagnosticOptions.h>
@@ -60,31 +60,31 @@
 #include <llvm/Support/raw_os_ostream.h>
 //#include <llvm/ExecutionEngine/ExecutionEngine.h>
 
-/** \defgroup plugin_Compiler_clang
+/** \defgroup plugin_Importer_clang
       Interface to the JIT compiler CLANG
 */
 
-/** \pluginsection{Compiler,clang} */
+/** \pluginsection{Importer,clang} */
 
 /// \cond INTERNAL
 namespace casadi {
-  /** \brief \pluginbrief{Compiler,clang}
+  /** \brief \pluginbrief{Importer,clang}
 
 
    \author Joris Gillis
    \date 2015
    *
-   @copydoc Compiler_doc
-   @copydoc plugin_Compiler_clang
+   @copydoc Importer_doc
+   @copydoc plugin_Importer_clang
    * */
-  class CASADI_COMPILER_CLANG_EXPORT ClangCompiler : public CompilerInternal {
+  class CASADI_IMPORTER_CLANG_EXPORT ClangCompiler : public ImporterInternal {
   public:
 
     /** \brief Constructor */
     explicit ClangCompiler(const std::string& name);
 
     /** \brief  Create a new JIT function */
-    static CompilerInternal* creator(const std::string& name) {
+    static ImporterInternal* creator(const std::string& name) {
       return new ClangCompiler(name);
     }
 
@@ -107,7 +107,7 @@ namespace casadi {
     virtual const char* plugin_name() const { return "clang";}
 
     /// Get a function pointer for numerical evaluation
-    virtual void* getFunction(const std::string& symname);
+    virtual signal_t get_function(const std::string& symname);
 
     // Helper function for reading includes
     static std::vector<std::pair<std::string, bool> >

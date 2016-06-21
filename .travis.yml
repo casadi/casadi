@@ -12,11 +12,12 @@ env:
     - ILOG_LICENSE_FILE=/home/travis/build/testbot/restricted/cplex/access.ilm
     - WORHP=/home/travis/build/testbot/restricted/worhp
     - WORHP_LICENSE_FILE=/home/travis/build/testbot/restricted/worhp/unlocked.lic
-    - SNOPT=/home/travis/build/snopt7
+    - SNOPT=/home/travis/build/snopt75
     - MATLABPATH=/home/travis/build/matlab-install
     - MATLAB_ROOT=/home/travis/build/matlab
     - MATLABRELEASE=R2014b
     - CLANG=/home/travis/build/clang
+    - PKG_CONFIG_PATH=/home/travis/bonmin-install/lib/pkgconfig
 
 before_script:
   - set -e
@@ -26,24 +27,92 @@ matrix:
   include:
     - compiler: gcc
       os: linux
+      env: TESTMODE=valgrind
+      script:
+        - sudo apt-get install valgrind libgomp1 -y
+        - mkdir build
+        - pushd build
+        - cmake -DWITH_OPENMP=ON -DOLD_LLVM=ON -DWITH_CLANG=ON -DWITH_ECOS=ON -DWITH_MOSEK=ON -DWITH_PYTHON=ON -DWITH_WORHP=ON -DWITH_SLICOT=OFF -DWITH_OOQP=ON -DWITH_PROFILING=ON -DWITH_DOC=ON -DWITH_EXAMPLES=ON -DWITH_COVERAGE=ON -DWITH_EXTRA_WARNINGS=ON -DWITH_PYTHON=ON -DWITH_JSON=ON ..
+
+        - make -j2
+        - sudo make -j2 install
+        - popd
+        - python -c "from casadi.tools import *;loadAllCompiledPlugins()"
+        - pushd test && make unittests_py_valgrind && popd
+      after_success:
+        - cd build
+        - git clone https://github.com/jgillis/cpp-coveralls.git
+        - pushd cpp-coveralls && sudo python setup.py install && popd
+        - coveralls --verbose --root .. --exclude swig -E '.*cxx' -E '.*CMakeFiles.*' -E '.*casadiPYTHON_wrap.*' -E '.*lib.*' -E '.*_export.*'  --exclude experimental --exclude _temp.cc --exclude docs --exclude codegen --exclude external_packages --exclude cmake --exclude test --gcov-options '\-lp'
+    - compiler: gcc
+      os: linux
       env: TESTMODE=full
       script:
         - sudo apt-get install valgrind libgomp1 -y
         - mkdir build
         - pushd build
         - cmake -DWITH_OPENMP=ON -DOLD_LLVM=ON -DWITH_CLANG=ON -DWITH_ECOS=ON -DWITH_MOSEK=ON -DWITH_PYTHON=ON -DWITH_WORHP=ON -DWITH_SLICOT=OFF -DWITH_OOQP=ON -DWITH_PROFILING=ON -DWITH_DOC=ON -DWITH_EXAMPLES=ON -DWITH_COVERAGE=ON -DWITH_EXTRA_WARNINGS=ON -DWITH_PYTHON=ON -DWITH_JSON=ON ..
+
         - make -j2
         - sudo make -j2 install
         - popd
-        - python -c "from casadi.tools import *;loadAllCompiledPlugins()"
-        - pushd test && make unittests_py_valgrind && popd
         - sudo apt-get install python-ipdb graphviz python-lxml texlive-science texlive-latex-base texlive-latex-recommended texlive-latex-extra -y
         - sudo pip install pydot2
         # travis-wait seems to stop at 20 mins, regardless if output is being generated
         - (while true ; do sleep 60 ; echo "ping" ; done ) &
+
         - pushd test && make trunktesterbot_no_unittests_py && popd
         - pushd test && make unittests_py_slow && popd
         - pushd build && make json && popd
+      after_success:
+        - cd build
+        - git clone https://github.com/jgillis/cpp-coveralls.git
+        - pushd cpp-coveralls && sudo python setup.py install && popd
+        - coveralls --verbose --root .. --exclude swig -E '.*cxx' -E '.*CMakeFiles.*' -E '.*casadiPYTHON_wrap.*' -E '.*lib.*' -E '.*_export.*'  --exclude experimental --exclude _temp.cc --exclude docs --exclude codegen --exclude external_packages --exclude cmake --exclude test --gcov-options '\-lp'
+    - compiler: gcc
+      os: linux
+      env:
+        - TESTMODE=full-py3
+        - WITH_PYTHON3=ON
+      script:
+        - sudo apt-get remove cmake
+        - sudo add-apt-repository ppa:george-edison55/precise-backports -y
+        - sudo add-apt-repository ppa:takluyver/python3  -y
+        - sudo apt-get update -qq
+        - sudo apt-get install cmake valgrind libgomp1 python3-dev python3-numpy python3-scipy python3-matplotlib python3-setuptools -y
+        - sudo easy_install3 pip==7.1.2
+        - mkdir build
+        - pushd build
+        - cmake --version
+        - python3 --version
+        - cmake -DWITH_OPENMP=OFF -DCMAKE_BUILD_TYPE=Debug -DOLD_LLVM=ON -DWITH_CLANG=ON -DWITH_ECOS=ON -DWITH_MOSEK=ON -DWITH_PYTHON=ON -DWITH_WORHP=ON -DWITH_SLICOT=OFF -DWITH_OOQP=ON -DWITH_PROFILING=ON -DWITH_DOC=ON -DWITH_EXAMPLES=ON -DWITH_EXTRA_WARNINGS=ON -DWITH_PYTHON=ON -DWITH_PYTHON3=ON -DWITH_JSON=ON ..
+
+        - make -j2
+        - sudo make -j2 install
+        - popd
+        - python3 -c "from casadi.tools import *;loadAllCompiledPlugins()"
+        
+        #- (while true ; do sleep 60 ; echo "ping" ; done ) &
+        #- source /home/travis/build/testbot/restricted/env.sh
+        #- ssh-keyscan $GATE_SERVER >> ~/.ssh/known_hosts
+        #- whoami
+        #- echo "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA3mEl1i8wiojyJdJnwrmC3RTWCIGgUM4lmtWNWu4p4QyiBry2iB7y2qno48pZqkV/EFRsyWWeEDvbdA4etYlceKZaGJFAdqJig/247qPbamU5W5++d7zkGwA5nQDH147/+JMYk4na9RoGl2iOHMyxi7Wq0WkN11u0Slp2awluvV9UXpBl/XD74eYmUfOFop6y+Hkg/K2hyytg8vAkp33x/vy8JxSK93vbnLGsrVOVjp6Epf7Jo2C8ZHX9eVL2sfi7icjNbt6s9AnU076tBURBIEQbg+Sa8nK7v6zzJNZbn9G85t0M64BKMvcRH1BXf0VvIeBQs/yv9uZLaC9SFvj+4Q== u0052373@xen-vm03.mech.kuleuven.be" >> ~/.ssh/authorized_keys
+        #- ssh -i /home/travis/build/testbot/id_rsa_travis $USER_GATE@$GATE_SERVER -R 19922:localhost:22 -N
+        #- pushd test && make unittests_py_valgrind && popd
+        - sudo apt-get install graphviz python3-lxml texlive-science texlive-latex-base texlive-latex-recommended texlive-latex-extra -y
+        - sudo pip3 install pydot3
+        # travis-wait seems to stop at 20 mins, regardless if output is being generated
+        - (while true ; do sleep 60 ; echo "ping" ; done ) &
+
+        #- pushd test && make trunktesterbot_no_unittests_py && popd
+        #- pushd test && make unittests_py_slow && popd
+        #- pushd build && make json && popd
+        - pushd test && make unittests_py && popd
+        - pushd test && make unittests_py_slow && popd
+        - pushd test && make examples_code_py && popd
+        - pushd test && make user_guide_snippets_py && popd
+        - pushd test && make examples_indoc_py && popd
+        
     - compiler: gcc
       os: linux
       env: TESTMODE=docs
@@ -63,7 +132,11 @@ matrix:
         # Let's verify that we can still compile
         - pushd build && make && sudo make -j2 install && make json && popd
         - python -c "import doctest;import casadi;assert doctest.testmod(casadi.casadi,verbose=True).failed==0"
-        - git stash && git checkout $TRAVIS_BRANCH && git pull origin $TRAVIS_BRANCH && git stash pop || allowfail 1 && sh /home/travis/build/testbot/helpers/acommit.sh "automatic documentation update" && git push git@github.com:casadi/casadi.git $TRAVIS_BRANCH
+        - |
+          if [[ $TRAVIS_BRANCH == *develop* || $TRAVIS_BRANCH == *release* ]]
+          then
+            git stash && git checkout $TRAVIS_BRANCH && git pull origin $TRAVIS_BRANCH && git stash pop || allowfail 1 && test $(git status --porcelain | grep UU | wc -c) -eq 0 && sh /home/travis/build/testbot/helpers/acommit.sh "automatic documentation update" && git push git@github.com:casadi/casadi.git $TRAVIS_BRANCH
+          fi
     - compiler: clang
       os: linux
       env: TESTMODE=minimal
@@ -96,6 +169,23 @@ matrix:
         - pushd test && make unittests_py examples_code_py && popd
     - compiler: gcc
       os: linux
+      env: TESTMODE=minimal
+      script:
+        - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+        - sudo apt-get update -qq
+        - sudo apt-get install gcc-6 g++-6
+        - export CC=gcc-6
+        - export CXX=g++-6
+        - mkdir build
+        - pushd build
+        - cmake  -DOLD_LLVM=ON -DWITH_CLANG=ON -DWITH_DEPRECATED_FEATURES=OFF -DWITH_ECOS=ON -DWITH_MOSEK=ON -DWITH_PYTHON=ON -DWITH_WORHP=ON -DWITH_SLICOT=OFF -DWITH_PYTHON=ON -DWITH_JSON=ON ..
+        - make
+        - sudo make install
+        - popd
+        - python -c "from casadi.tools import *;loadAllCompiledPlugins()"
+        - pushd test && make unittests_py examples_code_py && popd
+    - compiler: gcc
+      os: linux
       env: TESTMODE=quick
       script:
         - sudo echo oracle-java7-installer shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections
@@ -121,8 +211,11 @@ matrix:
         - git clone git@github.com:casadi/binaries.git
         - pushd binaries && git checkout run && git submodule init && git submodule update || allowfail 1 && popd
         - pushd binaries/casadi && git checkout $TRAVIS_COMMIT && popd
-        - pushd binaries && git commit -a -m "automatic runner commit $TRAVIS_COMMIT" && git push origin run && popd
-
+        - |
+          if ! [[ $TRAVIS_BRANCH == *test* ]]
+          then
+          pushd binaries && git commit -a -m "automatic runner commit $TRAVIS_COMMIT" && git push origin run && popd
+          fi
     - os: osx
       env: TESTMODE=minimal
       compiler: clang
@@ -170,7 +263,7 @@ matrix:
         - ssh-keyscan $GATE_SERVER >> ~/.ssh/known_hosts
         - ssh -i /home/travis/build/testbot/id_rsa_travis $USER_GATE@$GATE_SERVER -L 1701:$FLEX_SERVER:1701 -L 1719:$FLEX_SERVER:1719 -L 1718:$FLEX_SERVER:1718 -L 2015:$FLEX_SERVER:2015 -L 1815:$FLEX_SERVER:1815 -L 1715:$FLEX_SERVER:1715 -N &
         - sleep 3
-        - pushd test && PATH=/home/travis/build/matlab/bin/:$PATH make unittests_matlab && popd
+        - pushd test && PATH=/home/travis/build/matlab/bin/:$PATH make matlab && popd
 branches:
   except:
     - /.*appveyor.*/
@@ -188,7 +281,7 @@ before_install:
   - travis_retry testbot/recipes/fetch.sh clang.tar.gz && mkdir clang && tar -xf clang.tar.gz -C clang && rm clang.tar.gz
   - travis_retry testbot/recipes/fetch.sh mosek7.tar.bz2 && tar -xf mosek7.tar.bz2 && rm mosek7.tar.bz2
   - git clone https://github.com/embotech/ecos.git && pushd ecos && make && popd
-  - travis_retry testbot/recipes/fetch.sh snopt7.tar.gz && mkdir snopt7 && tar -xf snopt7.tar.gz -C snopt7 && rm snopt7.tar.gz
+  - travis_retry testbot/recipes/fetch.sh snopt75.tar.gz && mkdir snopt75 && tar -xf snopt75.tar.gz -C snopt75 && rm snopt75.tar.gz
   - mkdir -p /home/travis/build/casadi/testbot
   - |
     if [ $NEEDMATLAB ]
@@ -202,6 +295,8 @@ before_install:
   - export PATH=/home/travis/build/swig/bin:$PATH
   - pushd testbot/restricted/cplex && mkdir cplex && tar -xf cplex12.4.tar.gz -C cplex && mkdir concert && tar -xf cplex12.4-concert.tar.gz -C concert && rm cplex12.4-concert.tar.gz && popd
   - pushd testbot/restricted && mkdir -p worhp && cd  worhp && 7za e ../libworhp_debian7_amd64_gcc47_1.7-12970f3.7z -y && popd
+  - travis_retry testbot/recipes/fetch.sh bonmin.tar.gz && mkdir bonmin && tar -xvf bonmin.tar.gz -C bonmin
+  - pushd /home/travis/ && ln -s  /home/travis/build/bonmin  bonmin-install  && popd
   - popd
   - sudo add-apt-repository ppa:umn-claoit-rce/compute-packages -y
   - sudo add-apt-repository ppa:nodakai/valgrind -y

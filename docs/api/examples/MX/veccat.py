@@ -33,4 +33,4 @@ D = MX.sym("D",Sparsity.lower(4))  # Triangular matrix
 
 
 L = veccat(A,B,C,D)
-print L
+print(L)

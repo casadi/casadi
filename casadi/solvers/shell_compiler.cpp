@@ -35,8 +35,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_COMPILER_SHELL_EXPORT
-  casadi_register_compiler_shell(CompilerInternal::Plugin* plugin) {
+  int CASADI_IMPORTER_SHELL_EXPORT
+  casadi_register_importer_shell(ImporterInternal::Plugin* plugin) {
     plugin->creator = ShellCompiler::creator;
     plugin->name = "shell";
     plugin->doc = ShellCompiler::meta_doc.c_str();
@@ -45,12 +45,13 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_COMPILER_SHELL_EXPORT casadi_load_compiler_shell() {
-    CompilerInternal::registerPlugin(casadi_register_compiler_shell);
+  void CASADI_IMPORTER_SHELL_EXPORT casadi_load_importer_shell() {
+    ImporterInternal::registerPlugin(casadi_register_importer_shell);
   }
 
   ShellCompiler::ShellCompiler(const std::string& name) :
-    CompilerInternal(name) {
+    ImporterInternal(name) {
+      handle_ = 0;
   }
 
   ShellCompiler::~ShellCompiler() {
@@ -65,7 +66,7 @@ namespace casadi {
   }
 
   Options ShellCompiler::options_
-  = {{&CompilerInternal::options_},
+  = {{&ImporterInternal::options_},
      {{"compiler",
        {OT_STRING,
         "Compiler command"}},
@@ -82,7 +83,7 @@ namespace casadi {
 
   void ShellCompiler::init(const Dict& opts) {
     // Base class
-    CompilerInternal::init(opts);
+    ImporterInternal::init(opts);
 
     // Default options
     string compiler = "gcc";
@@ -146,9 +147,9 @@ namespace casadi {
     dlerror();
   }
 
-  void* ShellCompiler::getFunction(const std::string& symname) {
-    void* ret;
-    ret = reinterpret_cast<void*>(dlsym(handle_, symname.c_str()));
+  signal_t ShellCompiler::get_function(const std::string& symname) {
+    signal_t ret;
+    ret = reinterpret_cast<signal_t>(dlsym(handle_, symname.c_str()));
     if (dlerror()) {
       ret=0;
       dlerror(); // Reset error flags

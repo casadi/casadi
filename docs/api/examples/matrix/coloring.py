@@ -25,11 +25,11 @@ from casadi import *
 
 #! Read all about coloring in the seminal paper "What color is your Jacobian?" http://www.cs.odu.edu/~pothen/Papers/sirev2005.pdf
 def color(A):
-  print "="*80
-  print "Original:"
-  print repr(IM(A,1))
-  print "Colored: "
-  print repr(IM(A.uni_coloring(),1))
+  print("="*80)
+  print("Original:")
+  print(repr(IM(A,1)))
+  print("Colored: ")
+  print(repr(IM(A.uni_coloring(),1)))
 
 A = Sparsity.diag(5)
 color(A)
@@ -44,21 +44,21 @@ color(A+Sparsity.triplet(5,5,[0],[4]))
 color(A+Sparsity.triplet(5,5,[4],[0]))
 #! First 4 rows can be taken together, the fifth row is taken separately
 
-color(A+Sparsity.triplet(5,5,[0]*5,range(5)))
+color(A+Sparsity.triplet(5,5,[0]*5,list(range(5))))
 #! The first row is taken separately.
 #! The remainding rows are lumped together in one direction.
 
-color(A+Sparsity.triplet(5,5,range(5),[0]*5))
+color(A+Sparsity.triplet(5,5,list(range(5)),[0]*5))
 #! We need 5 directions.
 
 #! Next, we look at star_coloring
 
 def color(A):
-  print "="*80
-  print "Original:"
-  print repr(IM(A,1))
-  print "Star colored: "
-  print repr(IM(A.star_coloring(1),1))
+  print("="*80)
+  print("Original:")
+  print(repr(IM(A,1)))
+  print("Star colored: ")
+  print(repr(IM(A.star_coloring(1),1)))
   
 color(A)
 #! One direction needed to capture all
@@ -66,7 +66,7 @@ color(A)
 color(Sparsity.dense(5,5))
 #! We need 5 directions.
 
-color(A+Sparsity.triplet(5,5,[0]*5,range(5))+Sparsity.triplet(5,5,range(5),[0]*5))
+color(A+Sparsity.triplet(5,5,[0]*5,list(range(5)))+Sparsity.triplet(5,5,list(range(5)),[0]*5))
 #! The first row/col is taken separately.
 #! The remainding rows/cols are lumped together in one direction.
 

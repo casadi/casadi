@@ -37,8 +37,8 @@ using namespace std;
  */
 
 int main(){
-  /** Test problem 
-   * 
+  /** Test problem
+   *
    *    min x0^2 + x1^2
    *    s.t.    x0 + x1 - 10 = 0
    */
@@ -47,10 +47,10 @@ int main(){
   MX x = MX::sym("x", 2);
 
   // Objective
-  MX f = x[0]*x[0] + x[1]*x[1];
+  MX f = x(0)*x(0) + x(1)*x(1);
 
   // Constraints
-  MX g = x[0]+x[1]-10;
+  MX g = x(0)+x(1)-10;
 
   // Create an NLP solver instance
   Function solver = nlpsol("solver", "ipopt", {{"x", x}, {"f", f}, {"g", g}});
@@ -89,7 +89,6 @@ int main(){
   cout << "primal solution = " << res.at("x") << endl;
   cout << "dual solution (x) = " << res.at("lam_x") << endl;
   cout << "dual solution (g) = " << res.at("lam_g") << endl;
-  
+
   return 0;
 }
-

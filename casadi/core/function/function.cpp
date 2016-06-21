@@ -32,7 +32,7 @@
 #include "switch.hpp"
 #include "kernel_sum.hpp"
 #include "nlpsol.hpp"
-#include "qpsol.hpp"
+#include "conic.hpp"
 #include "jit.hpp"
 #include "../casadi_file.hpp"
 
@@ -416,12 +416,33 @@ namespace casadi {
     if (opts.find("output_scheme")==opts.end()) opts2["output_scheme"] = name_out();
 
     return Mapaccum::create(name, *this, n, accum_in, accum_out, opts2);
-}
+  }
+
+  Function Function::mapaccum(const string& name, int n,
+                              const vector<std::string>& accum_in,
+                              const vector<std::string>& accum_out,
+                              const Dict& opts) {
+    std::vector<int> accum_in_num;
+    for (int i=0;i<accum_in.size();++i) accum_in_num.push_back(index_in(accum_in[i]));
+    std::vector<int> accum_out_num;
+    for (int i=0;i<accum_out.size();++i) accum_out_num.push_back(index_out(accum_out[i]));
+    return mapaccum(name, n, accum_in_num, accum_out_num, opts);
+  }
 
   Function Function::map(const string& name, const std::string& parallelization, int n,
       const std::vector<int>& reduce_in, const std::vector<int>& reduce_out,
       const Dict& opts) {
     return MapBase::create(name, parallelization, *this, n, reduce_in, reduce_out, opts);
+  }
+
+  Function Function::map(const string& name, const std::string& parallelization, int n,
+      const std::vector<std::string>& reduce_in, const std::vector<std::string>& reduce_out,
+      const Dict& opts) {
+    std::vector<int> reduce_in_num;
+    for (int i=0;i<reduce_in.size();++i) reduce_in_num.push_back(index_in(reduce_in[i]));
+    std::vector<int> reduce_out_num;
+    for (int i=0;i<reduce_out.size();++i) reduce_out_num.push_back(index_out(reduce_out[i]));
+    return map(name, parallelization, n, reduce_in_num, reduce_out_num, opts);
   }
 
   Function Function::map(const string& name, const std::string& parallelization, int n,
@@ -674,11 +695,11 @@ namespace casadi {
   size_t Function::sz_w() const { return (*this)->sz_w();}
 
   void Function::operator()(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
-    (*const_cast<Function*>(this))->spFwd(arg, res, iw, w, mem);
+    (*const_cast<Function*>(this))->sp_fwd(arg, res, iw, w, mem);
   }
 
   void Function::rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
-    (*this)->spAdj(arg, res, iw, w, mem);
+    (*this)->sp_rev(arg, res, iw, w, mem);
   }
 
   void Function::set_work(const double**& arg, double**& res, int*& iw, double*& w,
@@ -697,7 +718,11 @@ namespace casadi {
   }
 
   bool Function::spCanEvaluate(bool fwd) {
-    return (*this)->spCanEvaluate(fwd);
+    if (fwd) {
+      return (*this)->has_spfwd();
+    } else {
+      return (*this)->has_sprev();
+    }
   }
 
   Function Function::derivative(int nfwd, int nadj) {
@@ -852,11 +877,11 @@ namespace casadi {
   }
 
   Function Function::forward(int nfwd) {
-    return (*this)->forward(nfwd);
+    return (*this)->forward_old(nfwd);
   }
 
   Function Function::reverse(int nadj) {
-    return (*this)->reverse(nadj);
+    return (*this)->reverse_old(nadj);
   }
 
   void Function::set_forward(const Function& fcn, int nfwd) {
@@ -867,16 +892,20 @@ namespace casadi {
     (*this)->set_reverse(fcn, nadj);
   }
 
-  void Function::printDimensions(ostream &stream) const {
-    (*this)->printDimensions(stream);
+  void Function::print_dimensions(ostream &stream) const {
+    (*this)->print_dimensions(stream);
   }
 
-  void Function::printOptions(ostream &stream) const {
-    (*this)->printOptions(stream);
+  void Function::print_options(ostream &stream) const {
+    (*this)->print_options(stream);
   }
 
-  void Function::printOption(const std::string &name, std::ostream &stream) const {
-    (*this)->printOption(name, stream);
+  void Function::print_option(const std::string &name, std::ostream &stream) const {
+    (*this)->print_option(name, stream);
+  }
+
+  void Function::print_free(std::ostream &stream) const {
+    (*this)->print_free(stream);
   }
 
   void Function::generate(const Dict& opts) {
@@ -884,9 +913,9 @@ namespace casadi {
   }
 
   void Function::generate(const string& fname, const Dict& opts) {
-    CodeGenerator gen(opts);
+    CodeGenerator gen(fname, opts);
     gen.add(*this);
-    gen.generate(fname);
+    gen.generate();
   }
 
   void Function::generate_dependencies(const string& fname, const Dict& opts) {
@@ -1165,7 +1194,7 @@ namespace casadi {
     return (*this)->is_a(type, recursive);
   }
 
-  SX Function::free_sx() const {
+  vector<SX> Function::free_sx() const {
     return (*this)->free_sx();
   }
 
@@ -1219,6 +1248,51 @@ namespace casadi {
 
   void* Function::memory(int ind) const {
     return (*this)->memory(ind);
+  }
+
+  void Function::assert_size_in(int i, int nrow, int ncol) const {
+    casadi_assert_message(size1_in(i)==nrow && size2_in(i)==ncol,
+                          "Incorrect shape for " << *this << " input " << i << " \""
+                          << name_in(i) << "\". Expected " << nrow << "-by-" << ncol
+                          << " but got " << size1_in(i) <<  "-by-" << size2_in(i));
+
+  }
+
+  void Function::assert_size_out(int i, int nrow, int ncol) const {
+    casadi_assert_message(size1_out(i)==nrow && size2_out(i)==ncol,
+                          "Incorrect shape for " << *this << " output " << i << " \""
+                          << name_out(i) << "\". Expected " << nrow << "-by-" << ncol
+                          << " but got " << size1_out(i) <<  "-by-" << size2_out(i));
+  }
+
+  Function Function::
+  factory(const std::string& name,
+          const std::vector<std::string>& s_in,
+          const std::vector<std::string>& s_out,
+          const AuxOut& aux,
+          const Dict& opts) const {
+     return (*this)->factory(name, s_in, s_out, aux, opts);
+  }
+
+  vector<bool> Function::nl_var(const string& s_in,
+                                const vector<string>& s_out) const {
+    return (*this)->nl_var(s_in, s_out);
+  }
+
+  std::vector<std::string> Function::get_function() const {
+    return (*this)->get_function();
+  }
+
+  Function Function::get_function(const std::string &name) const {
+    return (*this)->get_function(name);
+  }
+
+  bool Function::has_function(const std::string& fname) const {
+    return (*this)->has_function(fname);
+  }
+
+  Function Function::oracle() const {
+    return (*this)->oracle();
   }
 
 } // namespace casadi

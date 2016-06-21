@@ -42,10 +42,10 @@ nlp_solver = SCPgen
 qpsol = QPOasesSolver
 qpsol_options = {"printLevel" : "none"}
 
-#qpsol = NLPQpsol
+#qpsol = NLPConic
 #qpsol_options = {"nlp_solver":IpoptSolver, "nlp_solver_options": {"print_level" : 0}}
 
-#qpsol = OOQpsol
+#qpsol = OOConic
 #qpsol_options = {}
 
 # Create solver

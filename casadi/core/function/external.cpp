@@ -33,10 +33,10 @@
 namespace casadi {
   using namespace std;
 
-  Function external(const string& name, Library li,
+  Function external(const string& name, const Importer& li,
                     const Dict& opts) {
     Function ret;
-    if (li.has(name + "_simple")) {
+    if (li.has_function(name + "_simple")) {
       // Simplified, lower overhead external
       ret.assignNode(new SimplifiedExternal(name, li));
     } else {
@@ -53,52 +53,47 @@ namespace casadi {
 
   Function external(const string& name, const string& bin_name,
                     const Dict& opts) {
-    return external(name, Library(bin_name), opts);
+    return external(name, Importer(bin_name, "dll"), opts);
   }
 
-  Function external(const string& name, const Compiler& compiler,
-                    const Dict& opts) {
-    return external(name, Library(compiler), opts);
-  }
-
-  External::External(const std::string& name, const Library& li)
+  External::External(const std::string& name, const Importer& li)
     : FunctionInternal(name), li_(li) {
 
     // Increasing/decreasing reference counter
-    incref_ = (signal_t)li_.get(name_ + "_incref");
-    decref_ = (signal_t)li_.get(name_ + "_decref");
+    incref_ = (signal_t)li_.get_function(name_ + "_incref");
+    decref_ = (signal_t)li_.get_function(name_ + "_decref");
 
     // Getting number of inputs and outputs
-    n_in_ = (getint_t)li_.get(name + "_n_in");
-    n_out_ = (getint_t)li_.get(name + "_n_out");
+    n_in_ = (getint_t)li_.get_function(name + "_n_in");
+    n_out_ = (getint_t)li_.get_function(name + "_n_out");
 
     // Getting names of inputs and outputs
-    name_in_ = (name_t)li_.get(name + "_name_in");
-    name_out_ = (name_t)li_.get(name + "_name_out");
+    name_in_ = (name_t)li_.get_function(name + "_name_in");
+    name_out_ = (name_t)li_.get_function(name + "_name_out");
 
     // Work vector sizes
-    work_ = (work_t)li_.get(name_ + "_work");
+    work_ = (work_t)li_.get_function(name_ + "_work");
 
     // Increase reference counter - external function memory initialized at this point
     if (incref_) incref_();
   }
 
-  SimplifiedExternal::SimplifiedExternal(const std::string& name, const Library& li)
+  SimplifiedExternal::SimplifiedExternal(const std::string& name, const Importer& li)
     : External(name, li) {
 
     // Function for numerical evaluation
-    simple_ = (simple_t)li_.get(name_ + "_simple");
+    simple_ = (simple_t)li_.get_function(name_ + "_simple");
   }
 
-  GenericExternal::GenericExternal(const std::string& name, const Library& li)
+  GenericExternal::GenericExternal(const std::string& name, const Importer& li)
     : External(name, li) {
 
     // Functions for retrieving sparsities of inputs and outputs
-    sparsity_in_ = (sparsity_t)li_.get(name + "_sparsity_in");
-    sparsity_out_ = (sparsity_t)li_.get(name + "_sparsity_out");
+    sparsity_in_ = (sparsity_t)li_.get_function(name + "_sparsity_in");
+    sparsity_out_ = (sparsity_t)li_.get_function(name + "_sparsity_out");
 
     // Function for numerical evaluation
-    eval_ = (eval_t)li_.get(name_);
+    eval_ = (eval_t)li_.get_function(name_);
 
     n_mem_ = 0;
   }
@@ -111,8 +106,8 @@ namespace casadi {
   size_t External::get_n_in() {
     if (n_in_) {
       return n_in_();
-    } else if (li_.meta().has(name_ + "_N_IN")) {
-      return li_.meta().to_int(name_ + "_N_IN");
+    } else if (li_.has_meta(name_ + "_N_IN")) {
+      return li_.meta_int(name_ + "_N_IN");
     } else {
       // Fall back to base class
       return FunctionInternal::get_n_in();
@@ -122,8 +117,8 @@ namespace casadi {
   size_t External::get_n_out() {
     if (n_out_) {
       return n_out_();
-    } else if (li_.meta().has(name_ + "_N_OUT")) {
-      return li_.meta().to_int(name_ + "_N_OUT");
+    } else if (li_.has_meta(name_ + "_N_OUT")) {
+      return li_.meta_int(name_ + "_N_OUT");
     } else {
       // Fall back to base class
       return FunctionInternal::get_n_out();
@@ -136,9 +131,9 @@ namespace casadi {
       const char* n = name_in_(i);
       casadi_assert_message(n!=0, "Error querying input name");
       return n;
-    } else if (li_.meta().has(name_ + "_NAME_IN", i)) {
+    } else if (li_.has_meta(name_ + "_NAME_IN", i)) {
       // Read meta
-      return li_.meta().to_string(name_ + "_NAME_IN", i);
+      return li_.meta_string(name_ + "_NAME_IN", i);
     } else {
       // Default name
       return FunctionInternal::get_name_in(i);
@@ -151,9 +146,9 @@ namespace casadi {
       const char* n = name_out_(i);
       casadi_assert_message(n!=0, "Error querying output name");
       return n;
-    } else if (li_.meta().has(name_ + "_NAME_OUT", i)) {
+    } else if (li_.has_meta(name_ + "_NAME_OUT", i)) {
       // Read meta
-      return li_.meta().to_string(name_ + "_NAME_OUT", i);
+      return li_.meta_string(name_ + "_NAME_OUT", i);
     } else {
       // Default name
       return FunctionInternal::get_name_out(i);
@@ -164,8 +159,8 @@ namespace casadi {
     // Use sparsity retrieval function, if present
     if (sparsity_in_) {
       return Sparsity::compressed(sparsity_in_(i));
-    } else if (li_.meta().has(name_ + "_SPARSITY_IN", i)) {
-      return Sparsity::compressed(li_.meta().to_vector<int>(name_ + "_SPARSITY_IN", i));
+    } else if (li_.has_meta(name_ + "_SPARSITY_IN", i)) {
+      return Sparsity::compressed(li_.meta_vector<int>(name_ + "_SPARSITY_IN", i));
     } else {
       // Fall back to base class
       return FunctionInternal::get_sparsity_in(i);
@@ -176,8 +171,8 @@ namespace casadi {
     // Use sparsity retrieval function, if present
     if (sparsity_out_) {
       return Sparsity::compressed(sparsity_out_(i));
-    } else if (li_.meta().has(name_ + "_SPARSITY_OUT", i)) {
-      return Sparsity::compressed(li_.meta().to_vector<int>(name_ + "_SPARSITY_OUT", i));
+    } else if (li_.has_meta(name_ + "_SPARSITY_OUT", i)) {
+      return Sparsity::compressed(li_.meta_vector<int>(name_ + "_SPARSITY_OUT", i));
     } else {
       // Fall back to base class
       return FunctionInternal::get_sparsity_out(i);
@@ -189,8 +184,8 @@ namespace casadi {
     FunctionInternal::init(opts);
 
     // Reference counting?
-    has_refcount_ = li_.has(name_ + "_incref");
-    casadi_assert_message(has_refcount_==li_.has(name_ + "_decref"),
+    has_refcount_ = li_.has_function(name_ + "_incref");
+    casadi_assert_message(has_refcount_==li_.has_function(name_ + "_decref"),
                           "External functions must provide functions for both increasing "
                           "and decreasing the reference count, or neither.");
 
@@ -199,8 +194,8 @@ namespace casadi {
     if (work_) {
       int flag = work_(&sz_arg, &sz_res, &sz_iw, &sz_w);
       casadi_assert_message(flag==0, "External: \"work\" failed");
-    } else if (li_.meta().has(name_ + "_WORK")) {
-      vector<int> v = li_.meta().to_vector<int>(name_ + "_WORK");
+    } else if (li_.has_meta(name_ + "_WORK")) {
+      vector<int> v = li_.meta_vector<int>(name_ + "_WORK");
       casadi_assert(v.size()==4);
       sz_arg = v[0];
       sz_res = v[1];
@@ -226,16 +221,28 @@ namespace casadi {
     External::init(opts);
 
     // Maximum number of memory objects
-    getint_t n_mem = (getint_t)li_.get(name_ + "_n_mem");
+    getint_t n_mem = (getint_t)li_.get_function(name_ + "_n_mem");
     if (n_mem) {
       n_mem_ = n_mem();
-    } else if (li_.meta().has(name_ + "_N_MEM")) {
-      n_mem_ = li_.meta().to_int(name_ + "_N_MEM");
+    } else if (li_.has_meta(name_ + "_N_MEM")) {
+      n_mem_ = li_.meta_int(name_ + "_N_MEM");
     }
   }
 
+  void External::generateFunction(CodeGenerator& g, const std::string& fname,
+                                  bool decl_static) const {
+    g.body
+      << signature(fname) << " {" << endl
+      << li_.body(eval_name())
+      << endl;
+  }
+
   void External::addDependency(CodeGenerator& g) const {
-    g.addExternal(signature(name_) + ";");
+    if (li_.inlined(eval_name())) {
+      FunctionInternal::addDependency(g);
+    } else {
+      g.addExternal(signature(name_) + ";");
+    }
     if (has_refcount_) {
       g.addExternal("void " + name_ + "_incref(void);");
       g.addExternal("void " + name_ + "_decref(void);");
@@ -243,12 +250,16 @@ namespace casadi {
   }
 
   std::string External::codegen_name(const CodeGenerator& g) const {
-    return name_;
+    if (li_.inlined(eval_name())) {
+      return FunctionInternal::codegen_name(g);
+    } else {
+      return name_;
+    }
   }
 
   bool External::hasFullJacobian() const {
     if (FunctionInternal::hasFullJacobian()) return true;
-    return li_.has(name_ + "_jac");
+    return li_.has_function(name_ + "_jac");
   }
 
   Function External
@@ -261,7 +272,7 @@ namespace casadi {
   }
 
   Function External
-  ::get_forward(const std::string& name, int nfwd, Dict& opts) {
+  ::get_forward_old(const std::string& name, int nfwd, Dict& opts) {
     // Consistency check
     int n=1;
     while (n<nfwd) n*=2;
@@ -276,13 +287,13 @@ namespace casadi {
     for (int i=64; i>0; i/=2) {
       stringstream ss;
       ss << "fwd" << i << "_" << name_;
-      if (li_.has(ss.str())) return i;
+      if (li_.has_function(ss.str())) return i;
     }
     return 0;
   }
 
   Function External
-  ::get_reverse(const std::string& name, int nadj, Dict& opts) {
+  ::get_reverse_old(const std::string& name, int nadj, Dict& opts) {
     // Consistency check
     int n=1;
     while (n<nadj) n*=2;
@@ -297,9 +308,42 @@ namespace casadi {
     for (int i=64; i>0; i/=2) {
       stringstream ss;
       ss << "adj" << i << "_" << name_;
-      if (li_.has(ss.str())) return i;
+      if (li_.has_function(ss.str())) return i;
     }
     return 0;
+  }
+
+  Function External::factory(const std::string& name,
+                             const std::vector<std::string>& s_in,
+                             const std::vector<std::string>& s_out,
+                             const Function::AuxOut& aux,
+                             const Dict& opts) const {
+    // Retrieve function
+    casadi_assert_message(li_.has_function(name),
+      "Cannot find \"" + name + "\"");
+    Function ret = external(name, li_, opts);
+
+    // Inputs consistency checks
+    casadi_assert_message(s_in.size() == ret.n_in(),
+      "Inconsistent #in for \"" + name + "\"");
+    for (int i=0; i<s_in.size(); ++i) {
+      string s = s_in[i];
+      replace(s.begin(), s.end(), ':', '_');
+      casadi_assert_message(s == ret.name_in(i),
+        "Inconsistent input names for \"" + name + "\"");
+    }
+
+    // Outputs consistency checks
+    casadi_assert_message(s_out.size() == ret.n_out(),
+      "inconsistent #out for \"" + name + "\"");
+    for (int i=0; i<s_out.size(); ++i) {
+      string s = s_out[i];
+      replace(s.begin(), s.end(), ':', '_');
+      casadi_assert_message(s == ret.name_out(i),
+        "inconsistent output names for \"" + name + "\"");
+    }
+
+    return ret;
   }
 
 } // namespace casadi

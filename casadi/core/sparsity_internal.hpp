@@ -41,16 +41,17 @@ namespace casadi {
        for more info about the CCS format used in CasADi. */
     std::vector<int> sp_;
 
+    /* \brief The block-triangular factorization for the sparsity
+      Calculated on first call, then cached
+    */
+    mutable Sparsity::Btf* btf_;
+
   public:
     /// Construct a sparsity pattern from arrays
-    SparsityInternal(int nrow, int ncol, const int* colind, const int* row) :
-      sp_(2 + ncol+1 + colind[ncol]) {
-      sp_[0] = nrow;
-      sp_[1] = ncol;
-      std::copy(colind, colind+ncol+1, sp_.begin()+2);
-      std::copy(row, row+colind[ncol], sp_.begin()+2+ncol+1);
-      sanity_check(false);
-    }
+    SparsityInternal(int nrow, int ncol, const int* colind, const int* row);
+
+    /// Destructor
+    virtual ~SparsityInternal();
 
     /** \brief Get number of rows (see public class) */
     inline const std::vector<int>& sp() const { return sp_;}
@@ -136,6 +137,10 @@ namespace casadi {
       return T()->btfUpper(colperm, rowperm, colblock, rowblock,
                                                  coarse_colblock, coarse_rowblock, seed);
     }
+
+    /// Get cached block triangular form
+    const Sparsity::Btf& btf() const;
+
 
     /** \brief Compute the Dulmage-Mendelsohn decomposition
      *
@@ -438,6 +443,9 @@ namespace casadi {
 
     /// Generate a script for Matlab or Octave which visualizes the sparsity using the spy command
     void spy_matlab(const std::string& mfile) const;
+
+    /// Propagate sparsity through a linear solve
+    void spsolve(bvec_t* X, const bvec_t* B, bool tr) const;
 };
 
 } // namespace casadi

@@ -21,6 +21,10 @@
 #define array_size(a,i)     (PyArray_DIM(((PyArrayObject *)a),i))
 #define array_data(a)       (PyArray_DATA(((PyArrayObject *)a)))
 
+#if PY_MAJOR_VERSION >= 3
+#define PyInt_Type PyLong_Type
+#endif 
+
 /* Convert the given PyObject to a NumPy array with the given
  * typecode.  On success, return a valid PyArrayObject* with the
  * correct type.  On failure, the python error string will be set and
@@ -41,6 +45,7 @@ PyArrayObject* obj_to_array_allow_conversion(PyObject* input, int typecode,
     ary = (PyArrayObject*) py_obj;
     *is_new_object = 1;
   }
+  PyErr_Clear();
   return ary;
 }
 
@@ -63,6 +68,7 @@ PyArrayObject* make_contiguous(PyArrayObject* ary, int* is_new_object,
 							   max_dims);
     *is_new_object = 1;
   }
+  PyErr_Clear();
   return result;
 }
 

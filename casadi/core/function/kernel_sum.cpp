@@ -74,7 +74,7 @@ namespace casadi {
 
   static bvec_t Orring(bvec_t x, bvec_t y) { return x | y; }
 
-  void KernelSum::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+  void KernelSum::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     // First input is non-differentiable
 
     int num_in = f_.n_in(), num_out = f_.n_out();
@@ -199,10 +199,10 @@ namespace casadi {
   }
 
   Function KernelSum
-  ::get_forward(const std::string& name, int nfwd, Dict& opts) {
+  ::get_forward_old(const std::string& name, int nfwd, Dict& opts) {
 
     /* Write KernelSum2D in linear form:
-    *  
+    *
     *    S = F(V, X)  = sum_i  f ( P_i, v_i, X)
     *
     *  With a slight abuse of notation, we have:
@@ -217,7 +217,7 @@ namespace casadi {
     /* More exactly, the forward mode of the primitive is
     * fd( P_i, v_i, X, S, P_i_dot, v_i_dot, X_dot)
     *
-    * we need to bring this in the form 
+    * we need to bring this in the form
     *
     *     f_forward ( P_i, v_i, X, X_dot)
     *
@@ -278,9 +278,9 @@ namespace casadi {
   }
 
   Function KernelSum
-  ::get_reverse(const std::string& name, int nadj, Dict& opts) {
+  ::get_reverse_old(const std::string& name, int nadj, Dict& opts) {
     /* Write KernelSum2D in linear form:
-    *  
+    *
     *    S = F(V, X)  = sum_i  f ( P_i, v_i, X)
     *
     *  With a slight abuse of notation, we have:
@@ -297,7 +297,7 @@ namespace casadi {
     /* More exactly, the reverse mode of the primitive is
     * fd( P_i, v_i, X, S, S_bar) -> P_i_bar, v_i_bar, X_bar
     *
-    * we need to bring this in the form 
+    * we need to bring this in the form
     *
     *     f_reverse ( P_i, v_i, X, S_bar) -> X_bar
     *

@@ -560,7 +560,15 @@ namespace casadi {
                                   std::vector<int>& coarse_rowblock,
                                   std::vector<int>& coarse_colblock, int seed) const {
     return (*this)->btf(rowperm, colperm, rowblock, colblock,
-                                      coarse_rowblock, coarse_colblock, seed);
+                        coarse_rowblock, coarse_colblock, seed);
+  }
+
+  const Sparsity::Btf& Sparsity::btf() const {
+    return (*this)->btf();
+  }
+
+  void Sparsity::spsolve(bvec_t* X, const bvec_t* B, bool tr) const {
+    (*this)->spsolve(X, B, tr);
   }
 
   bool Sparsity::rowsSequential(bool strictly) const {
@@ -907,7 +915,7 @@ namespace casadi {
     bool perfectly_ordered=true;
     for (int k=0; k<col.size(); ++k) {
       // Consistency check
-      casadi_assert_message(col[k]>=0 && col[k]<ncol, "Col index out of bounds");
+      casadi_assert_message(col[k]>=0 && col[k]<ncol, "Column index out of bounds");
       casadi_assert_message(row[k]>=0 && row[k]<nrow, "Row index out of bounds");
 
       // Check if ordering is already perfect
@@ -932,8 +940,7 @@ namespace casadi {
 
       // Identity mapping
       mapping.resize(row.size());
-      for (int k=0; k<row.size(); ++k)
-        mapping[k] = k;
+      for (int k=0; k<row.size(); ++k) mapping[k] = k;
 
       // Quick return
       return Sparsity(nrow, ncol, r_colind, r_row);

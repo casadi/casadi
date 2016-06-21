@@ -26,8 +26,25 @@
 #ifndef CASADI_LAPACK_LU_HPP
 #define CASADI_LAPACK_LU_HPP
 
-#include "casadi/core/function/linsol_impl.hpp"
+#include "casadi/core/function/linsol_internal.hpp"
 #include <casadi/interfaces/lapack/casadi_linsol_lapacklu_export.h>
+
+extern "C" {
+  /// LU-Factorize dense matrix (lapack)
+  void dgetrf_(int *m, int *n, double *a, int *lda, int *ipiv, int *info);
+
+  /// Solve a system of equation using an LU-factorized matrix (lapack)
+  void dgetrs_(char* trans, int *n, int *nrhs, double *a,
+               int *lda, int *ipiv, double *b, int *ldb, int *info);
+
+  /// Calculate col and row scaling
+  void dgeequ_(int *m, int *n, double *a, int *lda, double *r, double *c,
+               double *colcnd, double *rowcnd, double *amax, int *info);
+
+  /// Equilibrate the system
+  void dlaqge_(int *m, int *n, double *a, int *lda, double *r, double *c,
+               double *colcnd, double *rowcnd, double *amax, char *equed);
+}
 
 namespace casadi {
 
@@ -39,25 +56,8 @@ namespace casadi {
 */
 
 /** \pluginsection{Linsol,lapacklu} */
-
 /// \cond INTERNAL
-
-  /// LU-Factorize dense matrix (lapack)
-  extern "C" void dgetrf_(int *m, int *n, double *a, int *lda, int *ipiv, int *info);
-
-  /// Solve a system of equation using an LU-factorized matrix (lapack)
-  extern "C" void dgetrs_(char* trans, int *n, int *nrhs, double *a,
-                          int *lda, int *ipiv, double *b, int *ldb, int *info);
-
-  /// Calculate col and row scaling
-  extern "C" void dgeequ_(int *m, int *n, double *a, int *lda, double *r, double *c,
-                          double *colcnd, double *rowcnd, double *amax, int *info);
-
-  /// Equilibrate the system
-  extern "C" void dlaqge_(int *m, int *n, double *a, int *lda, double *r, double *c,
-                          double *colcnd, double *rowcnd, double *amax, char *equed);
-
-  struct CASADI_LINSOL_LAPACKLU_EXPORT LapackLuMemory {
+  struct CASADI_LINSOL_LAPACKLU_EXPORT LapackLuMemory : public LinsolMemory {
     // Matrix
     std::vector<double> mat;
 
@@ -77,14 +77,14 @@ namespace casadi {
    * @copydoc plugin_Linsol_lapacklu
    *
    */
-  class CASADI_LINSOL_LAPACKLU_EXPORT LapackLu : public Linsol {
+  class CASADI_LINSOL_LAPACKLU_EXPORT LapackLu : public LinsolInternal {
   public:
     // Create a linear solver given a sparsity pattern and a number of right hand sides
-    LapackLu(const std::string& name, const Sparsity& sparsity, int nrhs);
+    LapackLu(const std::string& name);
 
     /** \brief  Create a new Linsol */
-    static Linsol* creator(const std::string& name, const Sparsity& sp, int nrhs) {
-      return new LapackLu(name, sp, nrhs);
+    static LinsolInternal* creator(const std::string& name) {
+      return new LapackLu(name);
     }
 
     /// Destructor
@@ -108,11 +108,14 @@ namespace casadi {
     /** \brief Initalize memory block */
     virtual void init_memory(void* mem) const;
 
+    // Set sparsity pattern
+    virtual void reset(void* mem, const int* sp) const;
+
     // Factorize the linear system
-    virtual void linsol_factorize(void* mem, const double* A) const;
+    virtual void factorize(void* mem, const double* A) const;
 
     // Solve the linear system
-    virtual void linsol_solve(void* mem, double* x, int nrhs, bool tr) const;
+    virtual void solve(void* mem, double* x, int nrhs, bool tr) const;
 
     /// A documentation string
     static const std::string meta_doc;

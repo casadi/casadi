@@ -135,11 +135,11 @@ namespace casadi {
     }
   }
 
-  void Call::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+  void Call::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     fcn_(arg, res, iw, w, mem);
   }
 
-  void Call::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+  void Call::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     fcn_.rev(arg, res, iw, w, mem);
   }
 

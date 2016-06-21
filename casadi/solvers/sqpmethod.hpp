@@ -98,14 +98,14 @@ namespace casadi {
     Function jac_g_fcn_;
     Function hess_l_fcn_;
 
-    explicit Sqpmethod(const std::string& name, Oracle* nlp);
+    explicit Sqpmethod(const std::string& name, const Function& nlp);
     virtual ~Sqpmethod();
 
   // Get name of the plugin
   virtual const char* plugin_name() const { return "sqpmethod";}
 
     /** \brief  Create a new NLP Solver */
-    static Nlpsol* creator(const std::string& name, Oracle* nlp) {
+    static Nlpsol* creator(const std::string& name, const Function& nlp) {
       return new Sqpmethod(name, nlp);
     }
 
@@ -177,8 +177,8 @@ namespace casadi {
     /// Regularization
     bool regularize_;
 
-    /// Access Qpsol
-    const Function getQpsol() const { return qpsol_;}
+    /// Access Conic
+    const Function getConic() const { return qpsol_;}
 
     /// Print iteration header
     void printIteration(std::ostream &stream) const;

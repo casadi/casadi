@@ -31,7 +31,7 @@
 #include <set>
 #include <stack>
 #include "code_generator.hpp"
-#include "compiler.hpp"
+#include "importer.hpp"
 #include "../sparse_storage.hpp"
 #include "../options.hpp"
 
@@ -53,25 +53,15 @@ namespace casadi {
     return r;
   }
 
-  /** \brief Function memory with temporary work vectors */
-  struct CASADI_EXPORT WorkMemory {
-    // Work vectors
-    const double** arg;
-    double** res;
-    int* iw;
-    double* w;
-  };
-
   /** \brief Internal class for Function
       \author Joel Andersson
       \date 2010-2015
   */
   class CASADI_EXPORT FunctionInternal : public SharedObjectNode {
-  protected:
-    /** \brief Constructor (accessible from the Function class and derived classes) */
+  public:
+    /** \brief Constructor */
     FunctionInternal(const std::string& name);
 
-  public:
     /** \brief  Destructor */
     virtual ~FunctionInternal() = 0;
 
@@ -103,7 +93,27 @@ namespace casadi {
     virtual void finalize();
 
     /** \brief Get a public class instance */
-    Function function() const { return shared_from_this<Function>();}
+    Function self() const { return shared_from_this<Function>();}
+
+    // Factory
+    virtual Function factory(const std::string& name,
+                             const std::vector<std::string>& s_in,
+                             const std::vector<std::string>& s_out,
+                             const Function::AuxOut& aux,
+                             const Dict& opts) const;
+
+    // Get list of dependency functions
+    virtual std::vector<std::string> get_function() const;
+
+    // Get a dependency function
+    virtual const Function& get_function(const std::string &name) const;
+
+    // Check if a particular dependency exists
+    virtual bool has_function(const std::string& fname) const {return false;}
+
+    /** \brief Which variables enter nonlinearly */
+    virtual std::vector<bool> nl_var(const std::string& s_in,
+                                     const std::vector<std::string>& s_out) const;
 
     ///@{
     /** \brief Names of function input and outputs */
@@ -111,8 +121,11 @@ namespace casadi {
     virtual std::string get_name_out(int i);
     ///@}
 
+    ///@{
     /** \brief  Is the class able to propagate seeds through the algorithm? */
-    virtual bool spCanEvaluate(bool fwd) { return false;}
+    virtual bool has_spfwd() const { return false;}
+    virtual bool has_sprev() const { return false;}
+    ///@}
 
     ///@{
     /** \brief  Evaluate numerically */
@@ -345,7 +358,9 @@ namespace casadi {
      *    and calls <tt>Function get_forward(int nfwd)</tt>
      *    if no cached version is available.
      */
+    Function forward_old(int nfwd);
     Function forward(int nfwd);
+    virtual Function get_forward_old(const std::string& name, int nfwd, Dict& opts);
     virtual Function get_forward(const std::string& name, int nfwd, Dict& opts);
     virtual int get_n_forward() const { return 0;}
     void set_forward(const Function& fcn, int nfwd);
@@ -357,21 +372,26 @@ namespace casadi {
      *    and calls <tt>Function get_reverse(int nadj)</tt>
      *    if no cached version is available.
      */
+    Function reverse_old(int nadj);
     Function reverse(int nadj);
+    virtual Function get_reverse_old(const std::string& name, int nadj, Dict& opts);
     virtual Function get_reverse(const std::string& name, int nadj, Dict& opts);
     virtual int get_n_reverse() const { return 0;}
     void set_reverse(const Function& fcn, int nadj);
     ///@}
 
+    /** \brief Get oracle */
+    virtual const Function& oracle() const;
+
     /** \brief Can derivatives be calculated in any way? */
     bool hasDerivative() const;
 
     /** \brief  Weighting factor for chosing forward/reverse mode */
-    virtual double adWeight();
+    virtual double ad_weight() const;
 
     /** \brief  Weighting factor for chosing forward/reverse mode,
         sparsity propagation */
-    virtual double adWeightSp();
+    virtual double sp_weight() const;
 
     /** \brief Gradient expression */
     virtual MX grad_mx(int iind=0, int oind=0);
@@ -412,7 +432,7 @@ namespace casadi {
     virtual std::vector<MX> free_mx() const;
 
     /// Get free variables (SX)
-    virtual SX free_sx() const;
+    virtual std::vector<SX> free_sx() const;
 
     /** \brief Does the function have free variables */
     virtual bool has_free() const { return false;}
@@ -450,7 +470,7 @@ namespace casadi {
     *
     *  The function is not initialized
     */
-    Function wrapMXFunction();
+    Function wrapMXFunction() const;
 
     /** \brief Generate code the function */
     virtual void generateFunction(CodeGenerator& g, const std::string& fname,
@@ -461,6 +481,12 @@ namespace casadi {
 
     /** \brief Use simplified signature */
     virtual bool simplifiedCall() const { return false;}
+
+    /** \brief Generate shorthand macro */
+    void addShorthand(CodeGenerator& g, const std::string& name) const;
+
+    /** \brief Get name of the evaluation function */
+    std::string eval_name() const;
 
     /** \brief Get name in codegen */
     virtual std::string codegen_name(const CodeGenerator& g) const;
@@ -496,13 +522,16 @@ namespace casadi {
     virtual void checkInputs() const {}
 
     /** \brief Print dimensions of inputs and outputs */
-    void printDimensions(std::ostream &stream) const;
+    void print_dimensions(std::ostream &stream) const;
 
     /** \brief Print list of options */
-    void printOptions(std::ostream &stream) const;
+    void print_options(std::ostream &stream) const;
 
     /** \brief Print all information there is to know about a certain option */
-    void printOption(const std::string &name, std::ostream &stream) const;
+    void print_option(const std::string &name, std::ostream &stream) const;
+
+    /** \brief Print free variables */
+    virtual void print_free(std::ostream &stream) const;
 
     /** \brief Get the unidirectional or bidirectional partition */
     void getPartition(int iind, int oind, Sparsity& D1, Sparsity& D2, bool compact, bool symmetric);
@@ -641,15 +670,11 @@ namespace casadi {
     /** \brief  Log the status of the solver, function given */
     void log(const std::string& fcn, const std::string& msg) const;
 
-    /// Codegen function
-    Function dynamicCompilation(Function f, std::string fname, std::string fdescr,
-                                std::string compiler);
-
     /** \brief  Propagate sparsity forward */
-    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
+    virtual void sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
 
     /** \brief  Propagate sparsity backwards */
-    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
+    virtual void sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
 
     /** \brief Get number of temporary variables needed */
     void sz_work(size_t& sz_arg, size_t& sz_res, size_t& sz_iw, size_t& sz_w) const;
@@ -767,13 +792,13 @@ namespace casadi {
     /** \brief Dict of statistics (resulting from evaluate) */
     Dict stats_;
 
-    /** \brief Flag to indicate whether statistics must be gathered */
-    bool gather_stats_;
-
     /** \brief Reference counting in codegen? */
     bool has_refcount_;
 
-    /// Cache for functions to evaluate directional derivatives (new)
+    /// Cache for functions to evaluate directional derivatives
+    std::vector<WeakRef> forward_, reverse_;
+
+    /// Cache for functions to evaluate directional derivatives
     std::vector<WeakRef> derivative_fwd_, derivative_adj_;
 
     /// Cache for full Jacobian
@@ -796,7 +821,7 @@ namespace casadi {
 
     /// Just-in-time compiler
     std::string compilerplugin_;
-    Compiler compiler_;
+    Importer compiler_;
     Dict jit_options_;
 
     // Penalty factor for using a complete Jacobian to calculate directional derivatives
@@ -831,30 +856,6 @@ namespace casadi {
     template<typename MatType>
     std::vector<std::vector<MatType> > symbolicAdjSeed(int nadj, const std::vector<MatType>& v);
 
-    ///@{
-    /// Linear solver specific (cf. Linsol class)
-    virtual void linsol_factorize(void* mem, const double* A) const;
-    virtual void linsol_solve(void* mem, double* x, int nrhs, bool tr) const;
-    virtual MX linsol_solve(const MX& A, const MX& B, bool tr);
-    virtual void linsol_spsolve(bvec_t* X, const bvec_t* B, bool tr) const;
-    virtual void linsol_spsolve(DM& X, const DM& B, bool tr) const;
-    virtual void linsol_solveL(void* mem, double* x, int nrhs, bool tr) const;
-    virtual Sparsity linsol_cholesky_sparsity(void* mem, bool tr) const;
-    virtual DM linsol_cholesky(void* mem, bool tr) const;
-    virtual void linsol_eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem,
-                               bool tr, int nrhs);
-    virtual void linsol_forward(const std::vector<MX>& arg, const std::vector<MX>& res,
-                                const std::vector<std::vector<MX> >& fseed,
-                                std::vector<std::vector<MX> >& fsens, bool tr);
-    virtual void linsol_reverse(const std::vector<MX>& arg, const std::vector<MX>& res,
-                                const std::vector<std::vector<MX> >& aseed,
-                                std::vector<std::vector<MX> >& asens, bool tr);
-    virtual void linsol_spFwd(const bvec_t** arg, bvec_t** res,
-                              int* iw, bvec_t* w, int mem, bool tr, int nrhs);
-    virtual void linsol_spAdj(bvec_t** arg, bvec_t** res,
-                              int* iw, bvec_t* w, int mem, bool tr, int nrhs);
-    ///@}
-
   private:
     /// Memory objects
     std::vector<void*> mem_;
@@ -872,7 +873,7 @@ namespace casadi {
   // Template implementations
   template<typename MatType>
   bool FunctionInternal::purgable(const std::vector<MatType>& v) {
-    for (typename std::vector<MatType>::const_iterator i=v.begin(); i!=v.end(); ++i) {
+    for (auto i=v.begin(); i!=v.end(); ++i) {
       if (!i->is_zero()) return false;
     }
     return true;
@@ -885,9 +886,7 @@ namespace casadi {
     for (int dir=0; dir<nfwd; ++dir) {
       // Replace symbolic inputs
       int iind=0;
-      for (typename std::vector<MatType>::iterator i=fseed[dir].begin();
-          i!=fseed[dir].end();
-          ++i, ++iind) {
+      for (auto i=fseed[dir].begin(); i!=fseed[dir].end(); ++i, ++iind) {
         // Name of the forward seed
         std::stringstream ss;
         ss << "f";

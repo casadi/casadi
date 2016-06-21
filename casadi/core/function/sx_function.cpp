@@ -46,7 +46,7 @@ namespace casadi {
                                          const vector<SX >& inputv,
                                          const vector<SX >& outputv)
     : XFunction<SXFunction, SX, SXNode>(name, inputv, outputv) {
-    casadi_assert(!outputv_.empty()); // NOTE: Remove?
+    casadi_assert(!out_.empty()); // NOTE: Remove?
 
     // Reset OpenCL memory
 #ifdef WITH_OPENCL
@@ -110,7 +110,7 @@ namespace casadi {
     // Create function
     Dict opts;
     opts["verbose"] = verbose_;
-    Function gfcn("gfcn", {inputv_.at(iind)}, {g}, opts);
+    Function gfcn("gfcn", {in_.at(iind)}, {g}, opts);
 
     // Calculate jacobian of gradient
     if (verbose()) {
@@ -285,7 +285,7 @@ namespace casadi {
 
     // Add the list of nodes
     int ind=0;
-    for (auto it = outputv_.begin(); it != outputv_.end(); ++it, ++ind) {
+    for (auto it = out_.begin(); it != out_.end(); ++it, ++ind) {
       int nz=0;
       for (auto itc = (*it)->begin(); itc != (*it)->end(); ++itc, ++nz) {
         // Add outputs to the list
@@ -322,8 +322,8 @@ namespace casadi {
 
     // Current output and nonzero, start with the first one
     int curr_oind, curr_nz=0;
-    for (curr_oind=0; curr_oind<outputv_.size(); ++curr_oind) {
-      if (outputv_[curr_oind].nnz()!=0) {
+    for (curr_oind=0; curr_oind<out_.size(); ++curr_oind) {
+      if (out_[curr_oind].nnz()!=0) {
         break;
       }
     }
@@ -356,16 +356,16 @@ namespace casadi {
         break;
       case OP_OUTPUT: // output instruction
         ae.i0 = curr_oind;
-        ae.i1 = outputv_[curr_oind]->at(curr_nz)->temp;
+        ae.i1 = out_[curr_oind]->at(curr_nz)->temp;
         ae.i2 = curr_nz;
 
         // Go to the next nonzero
         curr_nz++;
-        if (curr_nz>=outputv_[curr_oind].nnz()) {
+        if (curr_nz>=out_[curr_oind].nnz()) {
           curr_nz=0;
           curr_oind++;
-          for (; curr_oind<outputv_.size(); ++curr_oind) {
-            if (outputv_[curr_oind].nnz()!=0) {
+          for (; curr_oind<out_.size(); ++curr_oind) {
+            if (out_[curr_oind].nnz()!=0) {
               break;
             }
           }
@@ -465,9 +465,9 @@ namespace casadi {
     }
 
     // Add input instructions
-    for (int ind=0; ind<inputv_.size(); ++ind) {
+    for (int ind=0; ind<in_.size(); ++ind) {
       int nz=0;
-      for (auto itc = inputv_[ind]->begin(); itc != inputv_[ind]->end(); ++itc, ++nz) {
+      for (auto itc = in_[ind]->begin(); itc != in_[ind]->end(); ++itc, ++nz) {
         int i = itc->getTemp()-1;
         if (i>=0) {
           // Mark as input
@@ -776,7 +776,7 @@ namespace casadi {
     if (verbose()) userOut() << "SXFunction::evalAdj end" << endl;
   }
 
-  void SXFunction::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+  void SXFunction::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     // Propagate sparsity forward
     for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it) {
       switch (it->op) {
@@ -793,7 +793,7 @@ namespace casadi {
     }
   }
 
-  void SXFunction::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+  void SXFunction::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     fill_n(w, sz_w(), 0);
 
     // Propagate sparsity backward
@@ -827,8 +827,8 @@ namespace casadi {
   }
 
   Function SXFunction::getFullJacobian() {
-    SX J = SX::jacobian(veccat(outputv_), veccat(inputv_));
-    return Function(name_ + "_jac", inputv_, {J});
+    SX J = SX::jacobian(veccat(out_), veccat(in_));
+    return Function(name_ + "_jac", in_, {J});
   }
 
 
@@ -1399,11 +1399,11 @@ namespace casadi {
   }
 
   const SX SXFunction::sx_in(int ind) const {
-    return inputv_.at(ind);
+    return in_.at(ind);
   }
 
   const std::vector<SX> SXFunction::sx_in() const {
-    return inputv_;
+    return in_;
   }
 
   std::string SXFunction::type_name() const {

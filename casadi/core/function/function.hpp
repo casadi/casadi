@@ -283,14 +283,51 @@ namespace casadi {
     const Sparsity& sparsity_out(const std::string& iname) const;
     /// @}
 
+    // A linear combination of inputs
+    typedef std::map<std::string, std::vector<std::string> > AuxOut;
+
+    // Factory
+    Function factory(const std::string& name,
+                     const std::vector<std::string>& s_in,
+                     const std::vector<std::string>& s_out,
+                     const AuxOut& aux=AuxOut(),
+                     const Dict& opts=Dict()) const;
+
+    /** \brief Get oracle */
+    virtual Function oracle() const;
+
+    /** \brief Which variables enter nonlinearly */
+    std::vector<bool> nl_var(const std::string& s_in,
+                             const std::vector<std::string>& s_out) const;
+
     /** \brief Print dimensions of inputs and outputs */
-    void printDimensions(std::ostream &stream=casadi::userOut()) const;
+    void print_dimensions(std::ostream &stream=casadi::userOut()) const;
 
     /** \brief Print options to a stream */
-    void printOptions(std::ostream &stream=casadi::userOut()) const;
+    void print_options(std::ostream &stream=casadi::userOut()) const;
 
     /** \brief Print all information there is to know about a certain option */
-    void printOption(const std::string &name, std::ostream &stream = casadi::userOut()) const;
+    void print_option(const std::string &name, std::ostream &stream = casadi::userOut()) const;
+
+    #ifdef WITH_DEPRECATED_FEATURES
+    /// [DEPRECATED] printDimensions has been renamed print_dimensions
+    void printDimensions(std::ostream &stream=casadi::userOut()) const {
+      print_dimensions(stream);
+    }
+
+    /// [DEPRECATED] printOptions has been renamed print_options
+    void printOptions(std::ostream &stream=casadi::userOut()) const {
+      print_options(stream);
+    }
+
+    /// [DEPRECATED] printOption has been renamed print_option
+    void printOption(const std::string &name, std::ostream &stream = casadi::userOut()) const {
+      print_option(name, stream);
+    }
+    #endif // WITH_DEPRECATED_FEATURES
+
+    /** \brief Print free variables */
+    void print_free(std::ostream &stream=casadi::userOut()) const;
 
     ///@{
     /** \brief Generate a Jacobian function of output \a oind with respect to input \a iind
@@ -600,6 +637,10 @@ namespace casadi {
                       const std::vector<int>& accum_in,
                       const std::vector<int>& accum_out,
                       const Dict& opts=Dict());
+    Function mapaccum(const std::string& name, int n,
+                      const std::vector<std::string>& accum_in,
+                      const std::vector<std::string>& accum_out,
+                      const Dict& opts=Dict());
     ///@}
 
 
@@ -631,7 +672,12 @@ namespace casadi {
     */
 
     Function map(const std::string& name, const std::string& parallelization, int n,
-      const std::vector<int>& reduce_in, const std::vector<int>& reduce_out,
+      const std::vector<int>& reduce_in,
+      const std::vector<int>& reduce_out,
+      const Dict& opts=Dict());
+    Function map(const std::string& name, const std::string& parallelization, int n,
+      const std::vector<std::string>& reduce_in,
+      const std::vector<std::string>& reduce_out,
       const Dict& opts=Dict());
     Function map(const std::string& name, const std::string& parallelization, int n,
       const Dict& opts=Dict());
@@ -790,6 +836,14 @@ namespace casadi {
     /// Get a const pointer to the node
     FunctionInternal* get() const;
 
+    /// Get a pointer and typecast
+    template<typename T>
+    T* get() const {
+      T* ret = dynamic_cast<T*>(get());
+      casadi_assert(ret!=0);
+      return ret;
+    }
+
     /** \brief  Const access functions of the node */
     FunctionInternal* operator->() const;
 
@@ -834,7 +888,7 @@ namespace casadi {
     ///@}
 
     /** \brief Get all the free variables of the function */
-    SX free_sx() const;
+    std::vector<SX> free_sx() const;
 
     /** \brief Get all the free variables of the function */
     std::vector<MX> free_mx() const;
@@ -947,46 +1001,31 @@ namespace casadi {
      */
     static std::string fix_name(const std::string& name);
 
+    /// Assert that an input dimension is equal so some given value
+    void assert_size_in(int i, int nrow, int ncol) const;
+
+    /// Assert that an output dimension is equal so some given value
+    void assert_size_out(int i, int nrow, int ncol) const;
+
     /// Checkout a memory object
     int checkout();
 
     /// Release a memory object
     void release(int mem);
 
-    /// Create a solve node
-    MX linsol_solve(const MX& A, const MX& B, bool tr=false);
-
 #ifndef SWIG
     /// Get memory object
     void* memory(int ind) const;
-
-    // Factorize linear system of equations
-    void linsol_factorize(const double* A, int mem=0) const;
-
-    // Solve factorized linear system of equations
-    void linsol_solve(double* x, int nrhs=1, bool tr=false, int mem=0) const;
-
-    ///@{
-    /// Propagate sparsity through a linear solve
-    void linsol_spsolve(bvec_t* X, const bvec_t* B, bool tr=false) const;
-    void linsol_spsolve(DM& X, const DM& B, bool tr=false) const;
-    ///@}
-
-    /** \brief Solve the system of equations <tt>Lx = b</tt>
-        Only when a Cholesky factorization is available
-    */
-    void linsol_solveL(double* x, int nrhs, bool tr, int mem=0) const;
 #endif // SWIG
 
-    /** \brief Obtain a symbolic Cholesky factorization
-        Only for Cholesky solvers
-    */
-    Sparsity linsol_cholesky_sparsity(bool tr=false, int mem=0) const;
+    // Get a list of all functions
+    std::vector<std::string> get_function() const;
 
-    /** \brief Obtain a numeric Cholesky factorization
-        Only for Cholesky solvers
-     */
-    DM linsol_cholesky(bool tr=false, int mem=0) const;
+    // Get a dependency function
+    Function get_function(const std::string &name) const;
+
+    // Check if a particular dependency exists
+    bool has_function(const std::string& fname) const;
 
     /// Access rhs function for a rootfinder
     Function rootfinder_fun();
@@ -994,17 +1033,21 @@ namespace casadi {
     /// Access Jacobian of the ths function for a rootfinder
     Function rootfinder_jac();
 
-    /// Access linear solver of a rootfinder
-    Function rootfinder_linsol();
-
-    /// Get the DAE for an integrator
-    Function integrator_dae();
+#ifdef WITH_DEPRECATED_FEATURES
+    /** \brief [DEPRECATED] Get the DAE for an integrator
+      To generate a function with the legacy syntax:
+      oracle().factory("f", {"x", "z", "p", "t"}, {"ode", "alg", "quad"})
+    */
+    Function integrator_dae() {
+      return oracle().factory("f", {"x", "z", "p", "t"}, {"ode", "alg", "quad"});
+    }
+#endif // WITH_DEPRECATED_FEATURES
 
     /** Generate native code in the interfaced language for debugging */
-    void qpsol_debug(const std::string &filename) const;
+    void conic_debug(const std::string &filename) const;
 
     /** Generate native code in the interfaced language for debugging */
-    void qpsol_debug(std::ostream &file) const;
+    void conic_debug(std::ostream &file) const;
 
 #ifndef SWIG
     protected:

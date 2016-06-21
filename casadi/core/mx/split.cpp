@@ -61,7 +61,7 @@ namespace casadi {
     }
   }
 
-  void Split::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+  void Split::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     int nx = offset_.size()-1;
     for (int i=0; i<nx; ++i) {
       if (res[i]!=0) {
@@ -75,7 +75,7 @@ namespace casadi {
     }
   }
 
-  void Split::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+  void Split::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     int nx = offset_.size()-1;
     for (int i=0; i<nx; ++i) {
       if (res[i]!=0) {

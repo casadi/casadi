@@ -27,7 +27,7 @@
 #define CASADI_EXTERNAL_HPP
 
 #include "function.hpp"
-#include "compiler.hpp"
+#include "importer.hpp"
 
 namespace casadi {
 
@@ -45,16 +45,8 @@ namespace casadi {
   /** \brief  Load a just-in-time compiled external function
    * File name given
    */
-  CASADI_EXPORT Function external(const std::string& name, const Compiler& compiler,
+  CASADI_EXPORT Function external(const std::string& name, const Importer& compiler,
                                   const Dict& opts=Dict());
-
-#ifndef SWIG
-  /** \brief  Load an external function
-   * Library given
-   */
-  CASADI_EXPORT Function external(const std::string& name, Library li,
-                                  const Dict& opts=Dict());
-#endif // SWIG
 
 } // namespace casadi
 

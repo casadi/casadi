@@ -1184,9 +1184,9 @@ namespace casadi {
   MX MX::polyval(const MX& p, const MX& x) {
     casadi_assert_message(p.is_dense(), "polynomial coefficients vector must be a vector");
     casadi_assert_message(p.is_column() && p.nnz()>0, "polynomial coefficients must be a vector");
-    MX ret = p[0];
+    MX ret = p.nz(0);
     for (int i=1; i<p.nnz(); ++i) {
-      ret = ret*x + p[i];
+      ret = ret*x + p.nz(i);
     }
     return ret;
   }
@@ -1616,7 +1616,7 @@ namespace casadi {
       for (int j=0; j<a.size2(); ++j) {
         int k = a_sp.get_nz(i, j);
         if (k!=-1) {
-          blocks[i][j] = a[k]*b;
+          blocks[i][j] = a.nz(k)*b;
         }
       }
     }
@@ -1638,8 +1638,8 @@ namespace casadi {
   }
 
   MX MX::solve(const MX& a, const MX& b, const std::string& lsolver, const Dict& dict) {
-    Function mysolver = linsol("tmp", lsolver, a.sparsity(), b.size2(), dict);
-    return mysolver.linsol_solve(a, b, false);
+    Linsol mysolver("tmp", lsolver, dict);
+    return mysolver.solve(a, b, false);
   }
 
   MX MX::pinv(const MX& A, const std::string& lsolver, const Dict& dict) {
@@ -1680,6 +1680,10 @@ namespace casadi {
 
   std::vector<MX> MX::get_input(const Function& f) {
     return f.mx_in();
+  }
+
+  std::vector<MX> MX::get_free(const Function& f) {
+    return f.free_mx();
   }
 
   std::string MX::type_name() {

@@ -71,7 +71,7 @@ int main(){
 
   // PART 2: CONSTRUCT THE NLP
   MX U = MX::sym("U",nu); // control for all segments
- 
+
   // Initial position
   vector<double> X0(3);
   X0[0] = 0; // initial position
@@ -83,7 +83,7 @@ int main(){
   for(int k=0; k<nu; ++k){
     // Assemble the input
     vector<MX> input(2);
-    input[0] = U[k];
+    input[0] = U(k);
     input[1] = X;
 
     // Integrate
@@ -94,8 +94,8 @@ int main(){
   MX F = dot(U,U);
 
   // Terminal constraints
-  MX G = vertcat(X[0],X[1]);
-  
+  MX G = vertcat(X(0),X(1));
+
   // Create the NLP
   MXDict nlp = {{"x", U}, {"f", F}, {"g", G}};
 
@@ -125,4 +125,3 @@ int main(){
 
   return 0;
 }
-

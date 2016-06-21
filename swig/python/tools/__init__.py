@@ -23,29 +23,36 @@
 #
 # -*- coding: utf-8 -*-
 
-from graph import *
-from bounds import *
-from structure import repeated, entry, struct_symSX, struct_symMX, struct_SX, struct_MX, struct_MX_mutable, nesteddict, index, indexf, struct, struct_load
-from io import nice_stdout, capture_stdout
+from .graph import *
+from .bounds import *
+
+import sys
+if sys.version_info >= (3,0):
+  from .structure3 import repeated, entry, struct_symSX, struct_symMX, struct_SX, struct_MX, struct_MX_mutable, nesteddict, index, indexf, struct, struct_load
+else:
+  from .structure import repeated, entry, struct_symSX, struct_symMX, struct_SX, struct_MX, struct_MX_mutable, nesteddict, index, indexf, struct, struct_load  
+from .io import nice_stdout, capture_stdout
 
 def print_subclasses(myclass, depth=0):
-  print ("  " * depth) + " - " + myclass.__name__
+  print(("  " * depth) + " - " + myclass.__name__)
   for s in myclass.__subclasses__():
     print_subclasses(s,depth=depth+1)
-    
+
 def loadAllCompiledPlugins():
   for k in CasadiMeta.getPlugins().split(";"):
     cls, name = k.split("::")
-    print "Testing: ", cls, name
+    print("Testing: ", cls, name)
     if cls=='Integrator':
       casadi.load_integrator(name)
     elif cls=='Nlpsol':
       casadi.load_nlpsol(name)
-    elif cls=='Qpsol':
-      casadi.load_qpsol(name)
+    elif cls=='Conic':
+      casadi.load_conic(name)
     elif cls=='Rootfinder':
       casadi.load_rootfinder(name)
     elif cls=='Linsol':
       casadi.load_linsol(name)
+    elif cls=='Interpolant':
+      casadi.load_interpolant(name)
     else:
-      getattr(casadi,cls).loadPlugin(name)
+      getattr(casadi,cls).load_plugin(name)

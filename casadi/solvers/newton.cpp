@@ -93,7 +93,7 @@ namespace casadi {
       }
     }
 
-    casadi_assert_message(f_.n_in()>0,
+    casadi_assert_message(oracle_.n_in()>0,
                           "Newton: the supplied f must have at least one input.");
     casadi_assert_message(!linsol_.is_null(),
                           "Newton::init: linear_solver must be supplied");
@@ -160,9 +160,8 @@ namespace casadi {
       }
 
       // Factorize the linear solver with J
-      linsol_.setup(arg1 + LINSOL_NUM_IN, res1 + LINSOL_NUM_OUT, iw, w);
-      linsol_.linsol_factorize(jac);
-      linsol_.linsol_solve(f, 1, false);
+      linsol_.factorize(jac);
+      linsol_.solve(f, 1, false);
 
       // Check convergence again
       double abstolStep=0;
@@ -196,7 +195,7 @@ namespace casadi {
     }
 
     // Store the iteration count
-    if (gather_stats_) m->iter = iter;
+    m->iter = iter;
     if (success) m->return_status = "success";
 
     casadi_msg("Newton::solveNonLinear():end after " << iter << " steps");
@@ -221,9 +220,11 @@ namespace casadi {
     stream.unsetf(std::ios::floatfield);
   }
 
-  NewtonMemory::NewtonMemory() {
-    return_status = 0;
-    iter = 0;
+  void Newton::init_memory(void* mem) const {
+    Rootfinder::init_memory(mem);
+    auto m = static_cast<NewtonMemory*>(mem);
+    m->return_status = 0;
+    m->iter = 0;
   }
 
 } // namespace casadi

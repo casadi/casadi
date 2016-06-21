@@ -125,7 +125,7 @@ simulated_X = DM.zeros(Nstates,Nsimulation)
 simulated_X[:,0] = DM([1,0]) # Initial state
 t = NP.linspace(0,(Nsimulation-1)*dt,Nsimulation) # Time grid
 simulated_U = DM(cos(t[0:-1])).T # control input for the simulation
-simulated_U[:,Nsimulation/2:] = 0.0
+simulated_U[:,int(Nsimulation/2):] = 0.0
 simulated_W = DM(sigma_w*NP.random.randn(Ndisturbances,Nsimulation-1)) # Process noise for the simulation
 for i in range(Nsimulation-1):
   simulated_X[:,i+1] = phi(simulated_X[:,i], simulated_U[:,i], simulated_W[:,i])
@@ -166,7 +166,7 @@ estimated_W[:,0:N-1] = solution["W",lambda x: horzcat(*x)]
 for i in range(1,Nsimulation-N+1):
 
   # Update the arrival cost, using linearisations around the estimate of MHE at the beginning of the horizon (according to the 'Smoothed EKF Update'): first update the state and covariance with the measurement that will be deleted, and next propagate the state and covariance because of the shifting of the horizon
-  print "step %d/%d (%s)" % (i, Nsimulation-N , nlpsol.stats()["return_status"])
+  print("step %d/%d (%s)" % (i, Nsimulation-N , nlpsol.stats()["return_status"]))
   H0 = H(solution["X",0])[0]
   K = mtimes([P,H0.T,linalg.inv(mtimes([H0,P,H0.T])+R)])
   P = mtimes((DM.eye(Nstates)-mtimes(K,H0)),P)
@@ -215,5 +215,5 @@ plt.grid()
 plt.show()
 
 error = estimated_X[0,:]-simulated_X[0,:]
-print mtimes(error,error.T)
+print(mtimes(error,error.T))
 assert(mtimes(error,error.T)<0.01)

@@ -38,7 +38,7 @@ f = Function("f", [x,y],[z])
 #! We expand the MX expression into an SX expression
 fSX = f.expand('fSX')
 
-print "Expanded expression = ", fSX
+print("Expanded expression = ", fSX)
 
 
 #! Limitations
@@ -46,12 +46,12 @@ print "Expanded expression = ", fSX
 #! Not all MX graphs can be expanded.
 #! Here is an example of a situation where it will not work.
 #!
-linear_solver = linsol("linear_solver", "csparse", x.sparsity(), 1)
-g = linear_solver.linsol_solve(x, y)
+linear_solver = Linsol("linear_solver", "csparse")
+g = linear_solver.solve(x, y)
 G = Function("G", [x,y], [g])
 
 #! This function cannot be expanded.
 try:
   G.expand('G_sx')
 except Exception as e:
-  print e
+  print(e)

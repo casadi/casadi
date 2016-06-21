@@ -55,7 +55,7 @@
 \newenvironment{pytex}
 {%
   \addtocounter{pytexsubcount}{1}%                                             pytexsubcount++
-  \immediate\write\PYTEX@sf{print "pytex snippet::\arabic{pytexsubcount}"}%    print separator to stdout
+  \immediate\write\PYTEX@sf{print("pytex snippet::\arabic{pytexsubcount}")}%    print separator to stdout
   \global\PYTEX@acc={}%                                                        clear accumulator
   %                                                                            each line is added to accumulator
   \let\verbatim@processlinebackup\verbatim@processline%
@@ -83,7 +83,7 @@
 \newenvironment{pytexoutput}
 {%
   \addtocounter{pytexsubcount}{1}%                                             pytexsubcount++
-  \immediate\write\PYTEX@sf{print "pytex snippet::\arabic{pytexsubcount}"}%    print separator to stdout
+  \immediate\write\PYTEX@sf{print("pytex snippet::\arabic{pytexsubcount}")}%    print separator to stdout
   \global\PYTEX@acc={}%                                                        clear accumulator
   %                                                                            each line is added to accumulator
   \let\verbatim@processlinebackup\verbatim@processline%

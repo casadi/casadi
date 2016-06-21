@@ -52,11 +52,11 @@ qp = OnlineQPBenchMark('diesel')
 
 qpsols = []
 try:
-  qpsols.append(IpoptQpsol)
+  qpsols.append(IpoptConic)
 except:
   pass
 try:
-  qpsols.append(OOQpsol)
+  qpsols.append(OOConic)
 except:
   pass
 try:

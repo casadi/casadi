@@ -13,6 +13,91 @@
 // File: classcasadi_1_1BinarySX.xml
 
 
+// File: classcasadi_1_1BonminUserClass.xml
+%feature("docstring") casadi::BonminUserClass "[INTERNAL] C++ includes:
+bonmin_nlp.hpp ";
+
+%feature("docstring") casadi::BonminUserClass::finalize_solution "[INTERNAL]  This method is called when the algorithm is complete so the TNLP
+can store/write the solution
+
+";
+
+%feature("docstring") casadi::BonminUserClass::eval_g "[INTERNAL]  Method
+to return the constraint residuals
+
+";
+
+%feature("docstring") casadi::BonminUserClass::eval_f "[INTERNAL]  Method
+to return the objective value
+
+";
+
+%feature("docstring") casadi::BonminUserClass::get_constraints_linearity "[INTERNAL] ";
+
+%feature("docstring") casadi::BonminUserClass::BonminUserClass "[INTERNAL]
+";
+
+%feature("docstring") casadi::BonminUserClass::get_starting_point "[INTERNAL]  Method to return the starting point for the algorithm
+
+";
+
+%feature("docstring")
+casadi::BonminUserClass::get_number_of_nonlinear_variables "[INTERNAL]
+Specify the number of variables that appear in the Hessian
+
+";
+
+%feature("docstring") casadi::BonminUserClass::eval_jac_g "[INTERNAL]
+Method to return: 1) The structure of the Jacobian (if \"values\" is NULL)
+2) The values of the Jacobian (if \"values\" is not NULL)
+
+";
+
+%feature("docstring") casadi::BonminUserClass::intermediate_callback "[INTERNAL]  This method is called at every iteration
+
+";
+
+%feature("docstring") casadi::BonminUserClass::eval_h "[INTERNAL]  Method
+to return: 1) The structure of the hessian of the Lagrangian (if \"values\"
+is NULL) 2) The values of the hessian of the Lagrangian (if \"values\" is
+not NULL)
+
+";
+
+%feature("docstring") casadi::BonminUserClass::get_variables_types "[INTERNAL] ";
+
+%feature("docstring") casadi::BonminUserClass::~BonminUserClass "[INTERNAL]
+";
+
+%feature("docstring")
+casadi::BonminUserClass::get_list_of_nonlinear_variables "[INTERNAL]
+Specify which variables that appear in the Hessian
+
+";
+
+%feature("docstring") casadi::BonminUserClass::get_bounds_info "[INTERNAL]
+Method to return the bounds for my problem
+
+";
+
+%feature("docstring") casadi::BonminUserClass::sosConstraints "[INTERNAL]
+";
+
+%feature("docstring") casadi::BonminUserClass::get_nlp_info "[INTERNAL]
+Method to return some info about the nlp
+
+";
+
+%feature("docstring") casadi::BonminUserClass::branchingInfo "[INTERNAL] ";
+
+%feature("docstring") casadi::BonminUserClass::eval_grad_f "[INTERNAL]
+Method to return the gradient of the objective
+
+";
+
+%feature("docstring") casadi::BonminUserClass::get_variables_linearity "[INTERNAL] ";
+
+
 // File: classcasadi_1_1Call.xml
 
 
@@ -38,6 +123,12 @@ Export / Generate C code for the dependency function.
 %feature("docstring") casadi::Callback::get_n_in "
 
 Get the number of inputs This function is called during construction.
+
+";
+
+%feature("docstring") casadi::Callback::get_n_out "
+
+Get the number of outputs This function is called during construction.
 
 ";
 
@@ -90,6 +181,8 @@ Print a description of the object.
 
 ";
 
+%feature("docstring") casadi::Callback::has_function "";
+
 %feature("docstring") casadi::Callback::rootfinder_jac "
 
 Access Jacobian of the ths function for a rootfinder.
@@ -103,14 +196,11 @@ of the outputs.
 
 ";
 
-%feature("docstring") casadi::Callback::mapsum "
+%feature("docstring") casadi::Callback::factory "";
 
-Evaluate symbolically in parallel and sum (matrix graph)
+%feature("docstring") casadi::Callback::print_free "
 
-Parameters:
------------
-
-parallelization:  Type of parallelization used: unroll|serial|openmp
+Print free variables.
 
 ";
 
@@ -192,9 +282,9 @@ of the outputs.
 
 ";
 
-%feature("docstring") casadi::Callback::get_n_out "
+%feature("docstring") casadi::Callback::print_dimensions "
 
-Get the number of outputs This function is called during construction.
+Print dimensions of inputs and outputs.
 
 ";
 
@@ -212,7 +302,7 @@ Get the (integer) input arguments of an atomic operation.
 
 %feature("docstring") casadi::Callback::printOption "
 
-Print all information there is to know about a certain option.
+[DEPRECATED] printOption has been renamed print_option
 
 ";
 
@@ -294,6 +384,12 @@ guarantee that subsequent calls return unique answers.
 
 ";
 
+%feature("docstring") casadi::Callback::print_options "
+
+Print options to a stream.
+
+";
+
 %feature("docstring") casadi::Callback::checkout "
 
 Checkout a memory object.
@@ -359,21 +455,15 @@ corresponding to the Hessian and the gradients.
 
 ";
 
-%feature("docstring") casadi::Callback::linsol_cholesky "
+%feature("docstring") casadi::Callback::conic_debug "
 
-Obtain a numeric Cholesky factorization Only for Cholesky solvers.
+Generate native code in the interfaced language for debugging
 
 ";
 
 %feature("docstring") casadi::Callback::getDescription "
 
 Return a string with a description (for SWIG)
-
-";
-
-%feature("docstring") casadi::Callback::linsol_cholesky_sparsity "
-
-Obtain a symbolic Cholesky factorization Only for Cholesky solvers.
 
 ";
 
@@ -499,7 +589,9 @@ matches one of the base classes (default true)
 
 %feature("docstring") casadi::Callback::integrator_dae "
 
-Get the DAE for an integrator.
+[DEPRECATED] Get the DAE for an integrator To generate a function with the
+legacy syntax: oracle().factory(\"f\", {\"x\", \"z\", \"p\", \"t\"},
+{\"ode\", \"alg\", \"quad\"})
 
 ";
 
@@ -512,6 +604,12 @@ Return a string with a representation (for SWIG)
 %feature("docstring") casadi::Callback::get_sparsity_out "
 
 Get the sparsity of an output This function is called during construction.
+
+";
+
+%feature("docstring") casadi::Callback::assert_size_out "
+
+Assert that an output dimension is equal so some given value.
 
 ";
 
@@ -532,6 +630,18 @@ Get input scheme name by index.
 %feature("docstring") casadi::Callback::has_free "
 
 Does the function have free variables.
+
+";
+
+%feature("docstring") casadi::Callback::nl_var "
+
+Which variables enter nonlinearly.
+
+";
+
+%feature("docstring") casadi::Callback::assert_size_in "
+
+Assert that an input dimension is equal so some given value.
 
 ";
 
@@ -657,9 +767,14 @@ Generate the sparsity of a Jacobian block
 
 ";
 
-%feature("docstring") casadi::Callback::qpsol_debug "
+%feature("docstring") casadi::Callback::mapsum "
 
-Generate native code in the interfaced language for debugging
+Evaluate symbolically in parallel and sum (matrix graph)
+
+Parameters:
+-----------
+
+parallelization:  Type of parallelization used: unroll|serial|openmp
 
 ";
 
@@ -676,7 +791,7 @@ length of res field.
 
 %feature("docstring") casadi::Callback::printOptions "
 
-Print options to a stream.
+[DEPRECATED] printOptions has been renamed print_options
 
 ";
 
@@ -688,7 +803,13 @@ Return Jacobian of all input elements with respect to all output elements.
 
 %feature("docstring") casadi::Callback::printDimensions "
 
-Print dimensions of inputs and outputs.
+[DEPRECATED] printDimensions has been renamed print_dimensions
+
+";
+
+%feature("docstring") casadi::Callback::oracle "
+
+Get oracle.
 
 ";
 
@@ -697,12 +818,6 @@ Print dimensions of inputs and outputs.
 Set the Jacobian function of output oind with respect to input iind NOTE:
 Does not take ownership, only weak references to the Jacobians are kept
 internally
-
-";
-
-%feature("docstring") casadi::Callback::linsol_solve "
-
-Create a solve node.
 
 ";
 
@@ -728,6 +843,8 @@ Get an atomic operation operator index.
 %feature("docstring") casadi::Callback::map "
 
 >  Function Function.map(str name, str parallelization, int n, [int ] reduce_in, [int ] reduce_out, Dict opts=Dict())
+
+>  Function Function.map(str name, str parallelization, int n, [str ] reduce_in, [str ] reduce_out, Dict opts=Dict())
 
 >  Function Function.map(str name, str parallelization, int n, Dict opts=Dict())
 ------------------------------------------------------------------------
@@ -781,6 +898,12 @@ parallelization:  Type of parallelization used: unroll|serial|openmp
 
 ";
 
+%feature("docstring") casadi::Callback::print_option "
+
+Print all information there is to know about a certain option.
+
+";
+
 %feature("docstring") casadi::Callback::mapaccum "
 
 Create a mapaccumulated version of this function.
@@ -825,12 +948,6 @@ Get input dimension.
 %feature("docstring") casadi::Callback::sparsity_in "
 
 Get sparsity of a given input.
-
-";
-
-%feature("docstring") casadi::Callback::rootfinder_linsol "
-
-Access linear solver of a rootfinder.
 
 ";
 
@@ -948,6 +1065,8 @@ ownership, only weak references to the derivatives are kept internally.
 
 ";
 
+%feature("docstring") casadi::Callback::get_function "";
+
 %feature("docstring") casadi::Callback::get_name_out "
 
 Get the sparsity of an output This function is called during construction.
@@ -1033,9 +1152,14 @@ absolute path <...>
 %feature("docstring") casadi::CodeGenerator "C++ includes:
 code_generator.hpp ";
 
-%feature("docstring") casadi::CodeGenerator::compile "
+%feature("docstring") casadi::CodeGenerator::dump "
 
-Compile and load function.
+Generate a file, return code as string.
+
+";
+
+%feature("docstring") casadi::CodeGenerator::compile "[INTERNAL]  Compile
+and load function.
 
 ";
 
@@ -1047,21 +1171,22 @@ Add a function (name generated)
 
 %feature("docstring") casadi::CodeGenerator::CodeGenerator "
 
+>  CodeGenerator(Dict opts=Dict())
+------------------------------------------------------------------------
+[INTERNAL] 
+Constructor.
+
+>  CodeGenerator(str name, Dict opts=Dict())
+------------------------------------------------------------------------
+
 Constructor.
 
 ";
 
 %feature("docstring") casadi::CodeGenerator::generate "
 
->  void CodeGenerator.generate(str name) const 
-------------------------------------------------------------------------
-
-Generate a file.
-
->  str CodeGenerator.generate() const 
-------------------------------------------------------------------------
-
-Generate a file, return code as string.
+Generate file(s) The \"prefix\" argument will be prepended to the generated
+files and may be a directory or a file prefix. returns the filename.
 
 ";
 
@@ -1069,164 +1194,10 @@ Generate a file, return code as string.
 // File: classcasadi_1_1CollocationIntegrator.xml
 
 
-// File: classcasadi_1_1Compiler.xml
-%feature("docstring") casadi::Compiler::plugin_name "
-
-Query plugin name.
-
-";
-
-%feature("docstring") casadi::Compiler::getDescription "
-
-Return a string with a description (for SWIG)
-
-";
-
-%feature("docstring") casadi::Compiler::print "
-
-Print a description of the object.
-
-";
-
-%feature("docstring") casadi::Compiler::printPtr "[INTERNAL]  Print the
-pointer to the internal class
-
-";
-
-%feature("docstring") casadi::Compiler::getRepresentation "
-
-Return a string with a representation (for SWIG)
-
-";
-
-%feature("docstring") casadi::Compiler::repr "
-
-Print a representation of the object.
-
-";
-
-%feature("docstring") casadi::Compiler "
-
-Compiler.
-
-Just-in-time compilation of code
-
-General information
-===================
-
-
-
-List of plugins
-===============
-
-
-
-- clang
-
-- shell
-
-Note: some of the plugins in this list might not be available on your
-system. Also, there might be extra plugins available to you that are not
-listed here. You can obtain their documentation with
-Compiler.doc(\"myextraplugin\")
-
-
-
---------------------------------------------------------------------------------
-
-clang
------
-
-
-
-Interface to the JIT compiler CLANG
-
->List of available options
-
-+------------------------+------------------------+------------------------+
-|           Id           |          Type          |      Description       |
-+========================+========================+========================+
-| flags                  | OT_STRINGVECTOR        | Compile flags for the  |
-|                        |                        | JIT compiler. Default: |
-|                        |                        | None                   |
-+------------------------+------------------------+------------------------+
-| include_path           | OT_STRING              | Include paths for the  |
-|                        |                        | JIT compiler. The      |
-|                        |                        | include directory      |
-|                        |                        | shipped with CasADi    |
-|                        |                        | will be automatically  |
-|                        |                        | appended.              |
-+------------------------+------------------------+------------------------+
-
---------------------------------------------------------------------------------
-
-
-
---------------------------------------------------------------------------------
-
-shell
------
-
-
-
-Interface to the JIT compiler SHELL
-
->List of available options
-
-+------------------------+------------------------+------------------------+
-|           Id           |          Type          |      Description       |
-+========================+========================+========================+
-| compiler               | OT_STRING              | Compiler command       |
-+------------------------+------------------------+------------------------+
-| compiler_setup         | OT_STRING              | Compiler setup         |
-|                        |                        | command. Intended to   |
-|                        |                        | be fixed. The 'flag'   |
-|                        |                        | option is the prefered |
-|                        |                        | way to set custom      |
-|                        |                        | flags.                 |
-+------------------------+------------------------+------------------------+
-| flags                  | OT_STRINGVECTOR        | Compile flags for the  |
-|                        |                        | JIT compiler. Default: |
-|                        |                        | None                   |
-+------------------------+------------------------+------------------------+
-
---------------------------------------------------------------------------------
-
-
-
-Joris Gillis
-
-C++ includes: compiler.hpp ";
-
-%feature("docstring") casadi::Compiler::is_null "
-
-Is a null pointer?
-
-";
-
-%feature("docstring") casadi::Compiler::__hash__ "
-
-Returns a number that is unique for a given Node. If the Object does not
-point to any node, \"0\" is returned.
-
-";
-
-%feature("docstring") casadi::Compiler::Compiler "
-
->  Compiler()
-------------------------------------------------------------------------
-
-Default constructor.
-
->  Compiler(str name, str compiler, Dict opts=Dict())
-------------------------------------------------------------------------
-
-Compiler factory (new syntax, includes initialization)
-
-";
-
-
 // File: classcasadi_1_1Concat.xml
+
+
+// File: classcasadi_1_1Conic.xml
 
 
 // File: classcasadi_1_1Constant.xml
@@ -1799,6 +1770,31 @@ Add an ordinary differential equation.
 // File: classcasadi_1_1External.xml
 
 
+// File: classcasadi_1_1Factory.xml
+%feature("docstring") casadi::Factory::has_in "[INTERNAL] ";
+
+%feature("docstring") casadi::Factory::add_output "[INTERNAL] ";
+
+%feature("docstring") casadi::Factory::calculate "[INTERNAL] ";
+
+%feature("docstring") casadi::Factory::get_output "[INTERNAL] ";
+
+%feature("docstring") casadi::Factory "[INTERNAL] C++ includes: factory.hpp
+";
+
+%feature("docstring") casadi::Factory::request_output "[INTERNAL] ";
+
+%feature("docstring") casadi::Factory::get_input "[INTERNAL] ";
+
+%feature("docstring") casadi::Factory::add_input "[INTERNAL] ";
+
+%feature("docstring") casadi::Factory::has_out "[INTERNAL] ";
+
+%feature("docstring") casadi::Factory::request_input "[INTERNAL] ";
+
+%feature("docstring") casadi::Factory::Factory "[INTERNAL] ";
+
+
 // File: classcasadi_1_1Find.xml
 
 
@@ -1871,6 +1867,8 @@ Name of the function.
 
 ";
 
+%feature("docstring") casadi::Function::has_function "";
+
 %feature("docstring") casadi::Function::checkInputs "[INTERNAL]  Check if
 the numerical values of the supplied bounds make sense.
 
@@ -1923,9 +1921,17 @@ Get sparsity of a given output.
 
 ";
 
+%feature("docstring") casadi::Function::oracle "
+
+Get oracle.
+
+";
+
 %feature("docstring") casadi::Function::integrator_dae "
 
-Get the DAE for an integrator.
+[DEPRECATED] Get the DAE for an integrator To generate a function with the
+legacy syntax: oracle().factory(\"f\", {\"x\", \"z\", \"p\", \"t\"},
+{\"ode\", \"alg\", \"quad\"})
 
 ";
 
@@ -1937,7 +1943,7 @@ Get an atomic operation operator index.
 
 %feature("docstring") casadi::Function::printOptions "
 
-Print options to a stream.
+[DEPRECATED] printOptions has been renamed print_options
 
 ";
 
@@ -1954,12 +1960,6 @@ ownership, only weak references to the derivatives are kept internally.
 
 ";
 
-%feature("docstring") casadi::Function::qpsol_debug "
-
-Generate native code in the interfaced language for debugging
-
-";
-
 %feature("docstring") casadi::Function::numel_out "
 
 Get of number of output elements For a particular output or for all for all
@@ -1967,9 +1967,15 @@ of the outputs.
 
 ";
 
-%feature("docstring") casadi::Function::printDimensions "
+%feature("docstring") casadi::Function::print_dimensions "
 
 Print dimensions of inputs and outputs.
+
+";
+
+%feature("docstring") casadi::Function::printDimensions "
+
+[DEPRECATED] printDimensions has been renamed print_dimensions
 
 ";
 
@@ -2022,12 +2028,6 @@ Get output scheme name by index.
 %feature("docstring") casadi::Function::n_in "
 
 Get the number of function inputs.
-
-";
-
-%feature("docstring") casadi::Function::rootfinder_linsol "
-
-Access linear solver of a rootfinder.
 
 ";
 
@@ -2167,6 +2167,8 @@ the inputs.
 
 ";
 
+%feature("docstring") casadi::Function::get_function "";
+
 %feature("docstring") casadi::Function::is_null "
 
 Is a null pointer?
@@ -2175,7 +2177,7 @@ Is a null pointer?
 
 %feature("docstring") casadi::Function::printOption "
 
-Print all information there is to know about a certain option.
+[DEPRECATED] printOption has been renamed print_option
 
 ";
 
@@ -2237,8 +2239,9 @@ adheres to SCHEME_NLPINput
 
 ";
 
-%feature("docstring") casadi::Function::sz_w "[INTERNAL]  Get required
-length of w field.
+%feature("docstring") casadi::Function::assert_size_out "
+
+Assert that an output dimension is equal so some given value.
 
 ";
 
@@ -2269,12 +2272,6 @@ Get all the free variables of the function.
 %feature("docstring") casadi::Function::size_out "
 
 Get output dimension.
-
-";
-
-%feature("docstring") casadi::Function::linsol_solve "
-
-Create a solve node.
 
 ";
 
@@ -2336,6 +2333,8 @@ Expand a function to SX.
 
 ";
 
+%feature("docstring") casadi::Function::factory "";
+
 %feature("docstring") casadi::Function::checkout "
 
 Checkout a memory object.
@@ -2345,6 +2344,12 @@ Checkout a memory object.
 %feature("docstring") casadi::Function::rootfinder_jac "
 
 Access Jacobian of the ths function for a rootfinder.
+
+";
+
+%feature("docstring") casadi::Function::print_option "
+
+Print all information there is to know about a certain option.
 
 ";
 
@@ -2358,6 +2363,8 @@ the output elements).
 %feature("docstring") casadi::Function::map "
 
 >  Function Function.map(str name, str parallelization, int n, [int ] reduce_in, [int ] reduce_out, Dict opts=Dict())
+
+>  Function Function.map(str name, str parallelization, int n, [str ] reduce_in, [str ] reduce_out, Dict opts=Dict())
 
 >  Function Function.map(str name, str parallelization, int n, Dict opts=Dict())
 ------------------------------------------------------------------------
@@ -2436,9 +2443,9 @@ Number of nodes in the algorithm.
 
 ";
 
-%feature("docstring") casadi::Function::linsol_cholesky_sparsity "
+%feature("docstring") casadi::Function::conic_debug "
 
-Obtain a symbolic Cholesky factorization Only for Cholesky solvers.
+Generate native code in the interfaced language for debugging
 
 ";
 
@@ -2537,7 +2544,170 @@ $\\\\vec{s}_f$  NOTE: Functions are allowed to modify their input arguments
 when evaluating: implicitFunction, IDAS solver Further releases may disallow
 this.
 
-Joel Andersson
+Joel Andersson >List of available options
+
++-----------------+-----------------+-----------------+-----------------+
+|       Id        |      Type       |   Description   |     Used in     |
++=================+=================+=================+=================+
+| ad_weight       | OT_DOUBLE       | Weighting       | casadi::Functio |
+|                 |                 | factor for      | nInternal       |
+|                 |                 | derivative calc |                 |
+|                 |                 | ulation.When    |                 |
+|                 |                 | there is an     |                 |
+|                 |                 | option of       |                 |
+|                 |                 | either using    |                 |
+|                 |                 | forward or      |                 |
+|                 |                 | reverse mode    |                 |
+|                 |                 | directional     |                 |
+|                 |                 | derivatives,    |                 |
+|                 |                 | the condition a |                 |
+|                 |                 | d_weight*nf<=(1 |                 |
+|                 |                 | -ad_weight)*na  |                 |
+|                 |                 | is used where   |                 |
+|                 |                 | nf and na are   |                 |
+|                 |                 | estimates of    |                 |
+|                 |                 | the number of   |                 |
+|                 |                 | forward/reverse |                 |
+|                 |                 | mode            |                 |
+|                 |                 | directional     |                 |
+|                 |                 | derivatives     |                 |
+|                 |                 | needed. By      |                 |
+|                 |                 | default,        |                 |
+|                 |                 | ad_weight is    |                 |
+|                 |                 | calculated      |                 |
+|                 |                 | automatically,  |                 |
+|                 |                 | but this can be |                 |
+|                 |                 | overridden by   |                 |
+|                 |                 | setting this    |                 |
+|                 |                 | option. In      |                 |
+|                 |                 | particular, 0   |                 |
+|                 |                 | means forcing   |                 |
+|                 |                 | forward mode    |                 |
+|                 |                 | and 1 forcing   |                 |
+|                 |                 | reverse mode.   |                 |
+|                 |                 | Leave unset for |                 |
+|                 |                 | (class          |                 |
+|                 |                 | specific)       |                 |
+|                 |                 | heuristics.     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| ad_weight_sp    | OT_DOUBLE       | Weighting       | casadi::Functio |
+|                 |                 | factor for      | nInternal       |
+|                 |                 | sparsity        |                 |
+|                 |                 | pattern         |                 |
+|                 |                 | calculation cal |                 |
+|                 |                 | culation.Overri |                 |
+|                 |                 | des default     |                 |
+|                 |                 | behavior. Set   |                 |
+|                 |                 | to 0 and 1 to   |                 |
+|                 |                 | force forward   |                 |
+|                 |                 | and reverse     |                 |
+|                 |                 | mode            |                 |
+|                 |                 | respectively.   |                 |
+|                 |                 | Cf. option      |                 |
+|                 |                 | \"ad_weight\".    |                 |
++-----------------+-----------------+-----------------+-----------------+
+| compiler        | OT_STRING       | Just-in-time    | casadi::Functio |
+|                 |                 | compiler plugin | nInternal       |
+|                 |                 | to be used.     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| derivative_of   | OT_FUNCTION     | The function is | casadi::Functio |
+|                 |                 | a derivative of | nInternal       |
+|                 |                 | another         |                 |
+|                 |                 | function. The   |                 |
+|                 |                 | type of         |                 |
+|                 |                 | derivative      |                 |
+|                 |                 | (directional    |                 |
+|                 |                 | derivative,     |                 |
+|                 |                 | Jacobian) is    |                 |
+|                 |                 | inferred from   |                 |
+|                 |                 | the function    |                 |
+|                 |                 | name.           |                 |
++-----------------+-----------------+-----------------+-----------------+
+| gather_stats    | OT_BOOL         | Deprecated      | casadi::Functio |
+|                 |                 | option          | nInternal       |
+|                 |                 | (ignored):      |                 |
+|                 |                 | Statistics are  |                 |
+|                 |                 | now always      |                 |
+|                 |                 | collected.      |                 |
++-----------------+-----------------+-----------------+-----------------+
+| input_scheme    | OT_STRINGVECTOR | Custom input    | casadi::Functio |
+|                 |                 | scheme          | nInternal       |
++-----------------+-----------------+-----------------+-----------------+
+| inputs_check    | OT_BOOL         | Throw           | casadi::Functio |
+|                 |                 | exceptions when | nInternal       |
+|                 |                 | the numerical   |                 |
+|                 |                 | values of the   |                 |
+|                 |                 | inputs don't    |                 |
+|                 |                 | make sense      |                 |
++-----------------+-----------------+-----------------+-----------------+
+| jac_penalty     | OT_DOUBLE       | When requested  | casadi::Functio |
+|                 |                 | for a number of | nInternal       |
+|                 |                 | forward/reverse |                 |
+|                 |                 | directions, it  |                 |
+|                 |                 | may be cheaper  |                 |
+|                 |                 | to compute      |                 |
+|                 |                 | first the full  |                 |
+|                 |                 | jacobian and    |                 |
+|                 |                 | then multiply   |                 |
+|                 |                 | with seeds,     |                 |
+|                 |                 | rather than     |                 |
+|                 |                 | obtain the      |                 |
+|                 |                 | requested       |                 |
+|                 |                 | directions in a |                 |
+|                 |                 | straightforward |                 |
+|                 |                 | manner. Casadi  |                 |
+|                 |                 | uses a          |                 |
+|                 |                 | heuristic to    |                 |
+|                 |                 | decide which is |                 |
+|                 |                 | cheaper. A high |                 |
+|                 |                 | value of        |                 |
+|                 |                 | 'jac_penalty'   |                 |
+|                 |                 | makes it less   |                 |
+|                 |                 | likely for the  |                 |
+|                 |                 | heurstic to     |                 |
+|                 |                 | chose the full  |                 |
+|                 |                 | Jacobian        |                 |
+|                 |                 | strategy. The   |                 |
+|                 |                 | special value   |                 |
+|                 |                 | -1 indicates    |                 |
+|                 |                 | never to use    |                 |
+|                 |                 | the full        |                 |
+|                 |                 | Jacobian        |                 |
+|                 |                 | strategy        |                 |
++-----------------+-----------------+-----------------+-----------------+
+| jit             | OT_BOOL         | Use just-in-    | casadi::Functio |
+|                 |                 | time compiler   | nInternal       |
+|                 |                 | to speed up the |                 |
+|                 |                 | evaluation      |                 |
++-----------------+-----------------+-----------------+-----------------+
+| jit_options     | OT_DICT         | Options to be   | casadi::Functio |
+|                 |                 | passed to the   | nInternal       |
+|                 |                 | jit compiler.   |                 |
++-----------------+-----------------+-----------------+-----------------+
+| monitor         | OT_STRINGVECTOR | Monitors to be  | casadi::Functio |
+|                 |                 | activated       | nInternal       |
++-----------------+-----------------+-----------------+-----------------+
+| output_scheme   | OT_STRINGVECTOR | Custom output   | casadi::Functio |
+|                 |                 | scheme          | nInternal       |
++-----------------+-----------------+-----------------+-----------------+
+| regularity_chec | OT_BOOL         | Throw           | casadi::Functio |
+| k               |                 | exceptions when | nInternal       |
+|                 |                 | NaN or Inf      |                 |
+|                 |                 | appears during  |                 |
+|                 |                 | evaluation      |                 |
++-----------------+-----------------+-----------------+-----------------+
+| user_data       | OT_VOIDPTR      | A user-defined  | casadi::Functio |
+|                 |                 | field that can  | nInternal       |
+|                 |                 | be used to      |                 |
+|                 |                 | identify the    |                 |
+|                 |                 | function or     |                 |
+|                 |                 | pass additional |                 |
+|                 |                 | information     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| verbose         | OT_BOOL         | Verbose         | casadi::Functio |
+|                 |                 | evaluation  for | nInternal       |
+|                 |                 | debugging       |                 |
++-----------------+-----------------+-----------------+-----------------+
 
 C++ includes: function.hpp ";
 
@@ -2560,6 +2730,18 @@ oind:  The index of the output
 
 The default behavior of this class is defined by the derived class. Note
 that the input must be scalar. In other cases, use the Jacobian instead.
+
+";
+
+%feature("docstring") casadi::Function::print_free "
+
+Print free variables.
+
+";
+
+%feature("docstring") casadi::Function::nl_var "
+
+Which variables enter nonlinearly.
 
 ";
 
@@ -2595,6 +2777,12 @@ Does the function have free variables.
 
 ";
 
+%feature("docstring") casadi::Function::assert_size_in "
+
+Assert that an input dimension is equal so some given value.
+
+";
+
 %feature("docstring") casadi::Function::getAtomicOutput "
 
 Get the (integer) output argument of an atomic operation.
@@ -2616,6 +2804,11 @@ Get input dimension.
 %feature("docstring") casadi::Function::call "
 
 Evaluate the function symbolically or numerically.
+
+";
+
+%feature("docstring") casadi::Function::sz_w "[INTERNAL]  Get required
+length of w field.
 
 ";
 
@@ -2649,12 +2842,6 @@ Get, if necessary generate, the sparsity of a Jacobian block
 
 ";
 
-%feature("docstring") casadi::Function::linsol_cholesky "
-
-Obtain a numeric Cholesky factorization Only for Cholesky solvers.
-
-";
-
 %feature("docstring") casadi::Function::getWorkSize "
 
 Get the length of the work vector.
@@ -2663,6 +2850,12 @@ Get the length of the work vector.
 
 %feature("docstring") casadi::Function::sz_arg "[INTERNAL]  Get required
 length of arg field.
+
+";
+
+%feature("docstring") casadi::Function::print_options "
+
+Print options to a stream.
 
 ";
 
@@ -3274,16 +3467,6 @@ Calculate Jacobian.
 
 ";
 
-%feature("docstring") casadi::GenericMatrix::find "
-
-Get the location of all non-zero elements as they would appear in a Dense
-matrix A : DenseMatrix 4 x 3 B : SparseMatrix 4 x 3 , 5 structural non-
-zeros.
-
-k = A.find() A[k] will contain the elements of A that are non-zero in B
-
-";
-
 %feature("docstring") casadi::GenericMatrix::is_square "
 
 Check if the matrix expression is square.
@@ -3645,6 +3828,189 @@ C++ includes: global_options.hpp ";
 // File: classcasadi_1_1ImplicitToNlp.xml
 
 
+// File: classcasadi_1_1Importer.xml
+%feature("docstring") casadi::Importer::repr "
+
+Print a representation of the object.
+
+";
+
+%feature("docstring") casadi::Importer::body "
+
+Get the function body, if inlined.
+
+";
+
+%feature("docstring") casadi::Importer::getRepresentation "
+
+Return a string with a representation (for SWIG)
+
+";
+
+%feature("docstring") casadi::Importer::has_meta "
+
+Does a meta entry exist?
+
+";
+
+%feature("docstring") casadi::Importer::printPtr "[INTERNAL]  Print the
+pointer to the internal class
+
+";
+
+%feature("docstring") casadi::Importer "
+
+Importer.
+
+Just-in-time compilation of code
+
+General information
+===================
+
+
+
+List of plugins
+===============
+
+
+
+- clang
+
+- shell
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+Importer.doc(\"myextraplugin\")
+
+
+
+--------------------------------------------------------------------------------
+
+clang
+-----
+
+
+
+Interface to the JIT compiler CLANG
+
+>List of available options
+
++------------------------+------------------------+------------------------+
+|           Id           |          Type          |      Description       |
++========================+========================+========================+
+| flags                  | OT_STRINGVECTOR        | Compile flags for the  |
+|                        |                        | JIT compiler. Default: |
+|                        |                        | None                   |
++------------------------+------------------------+------------------------+
+| include_path           | OT_STRING              | Include paths for the  |
+|                        |                        | JIT compiler. The      |
+|                        |                        | include directory      |
+|                        |                        | shipped with CasADi    |
+|                        |                        | will be automatically  |
+|                        |                        | appended.              |
++------------------------+------------------------+------------------------+
+
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+
+shell
+-----
+
+
+
+Interface to the JIT compiler SHELL
+
+>List of available options
+
++------------------------+------------------------+------------------------+
+|           Id           |          Type          |      Description       |
++========================+========================+========================+
+| compiler               | OT_STRING              | Compiler command       |
++------------------------+------------------------+------------------------+
+| compiler_setup         | OT_STRING              | Compiler setup         |
+|                        |                        | command. Intended to   |
+|                        |                        | be fixed. The 'flag'   |
+|                        |                        | option is the prefered |
+|                        |                        | way to set custom      |
+|                        |                        | flags.                 |
++------------------------+------------------------+------------------------+
+| flags                  | OT_STRINGVECTOR        | Compile flags for the  |
+|                        |                        | JIT compiler. Default: |
+|                        |                        | None                   |
++------------------------+------------------------+------------------------+
+
+--------------------------------------------------------------------------------
+
+
+
+Joris Gillis
+
+C++ includes: importer.hpp ";
+
+%feature("docstring") casadi::Importer::plugin_name "
+
+Query plugin name.
+
+";
+
+%feature("docstring") casadi::Importer::has_function "";
+
+%feature("docstring") casadi::Importer::Importer "
+
+>  Importer()
+------------------------------------------------------------------------
+
+Default constructor.
+
+>  Importer(str name, str compiler, Dict opts=Dict())
+------------------------------------------------------------------------
+
+Importer factory.
+
+";
+
+%feature("docstring") casadi::Importer::is_null "
+
+Is a null pointer?
+
+";
+
+%feature("docstring") casadi::Importer::get_meta "
+
+Get entry as a text.
+
+";
+
+%feature("docstring") casadi::Importer::print "
+
+Print a description of the object.
+
+";
+
+%feature("docstring") casadi::Importer::getDescription "
+
+Return a string with a description (for SWIG)
+
+";
+
+%feature("docstring") casadi::Importer::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
+
+";
+
+%feature("docstring") casadi::Importer::inlined "
+
+Check if a function is inlined.
+
+";
+
+
 // File: classcasadi_1_1InfSX.xml
 
 
@@ -3652,6 +4018,9 @@ C++ includes: global_options.hpp ";
 
 
 // File: classcasadi_1_1Integrator.xml
+
+
+// File: classcasadi_1_1Interpolant.xml
 
 
 // File: classcasadi_1_1InterruptHandler.xml
@@ -3754,9 +4123,6 @@ NULL)
 // File: classcasadi_1_1Jit.xml
 
 
-// File: classcasadi_1_1JitLibrary.xml
-
-
 // File: classcasadi_1_1KernelSum.xml
 
 
@@ -3766,68 +4132,260 @@ NULL)
 // File: classcasadi_1_1LapackQr.xml
 
 
-// File: classcasadi_1_1Library.xml
-%feature("docstring") casadi::Library::getDescription "
+// File: classcasadi_1_1LinearInterpolant.xml
 
-Return a string with a description (for SWIG)
 
-";
+// File: classcasadi_1_1LinearInterpolantJac.xml
 
-%feature("docstring") casadi::Library::repr "
 
-Print a representation of the object.
+// File: classcasadi_1_1Linsol.xml
+%feature("docstring") casadi::Linsol::cholesky "
 
-";
-
-%feature("docstring") casadi::Library::is_null "
-
-Is a null pointer?
+Obtain a numeric Cholesky factorization Only for Cholesky solvers.
 
 ";
 
-%feature("docstring") casadi::Library::__hash__ "
+%feature("docstring") casadi::Linsol::neig "
+
+Number of negative eigenvalues Not available for all solvers.
+
+";
+
+%feature("docstring") casadi::Linsol::printPtr "[INTERNAL]  Print the
+pointer to the internal class
+
+";
+
+%feature("docstring") casadi::Linsol::cholesky_sparsity "
+
+Obtain a symbolic Cholesky factorization Only for Cholesky solvers.
+
+";
+
+%feature("docstring") casadi::Linsol::solve "
+
+>  DM Linsol.solve(DM A, DM B, bool tr=false)
+------------------------------------------------------------------------
+
+Solve numerically.
+
+>  MX Linsol.solve(MX A, MX B, bool tr=false)
+------------------------------------------------------------------------
+
+Create a solve node.
+
+";
+
+%feature("docstring") casadi::Linsol::__hash__ "
 
 Returns a number that is unique for a given Node. If the Object does not
 point to any node, \"0\" is returned.
 
 ";
 
-%feature("docstring") casadi::Library::has "";
+%feature("docstring") casadi::Linsol::Linsol "
 
-%feature("docstring") casadi::Library "
-
-Library, either just-in-time compiled or dynamically loaded.
-
-C++ includes: compiler.hpp ";
-
-%feature("docstring") casadi::Library::Library "
-
->  Library()
+>  Linsol()
 ------------------------------------------------------------------------
 
 Default constructor.
 
+>  Linsol(str name, str solver, Dict opts=Dict())
+------------------------------------------------------------------------
+
+Importer factory.
+
 ";
 
-%feature("docstring") casadi::Library::print "
+%feature("docstring") casadi::Linsol::print "
 
 Print a description of the object.
 
 ";
 
-%feature("docstring") casadi::Library::printPtr "[INTERNAL]  Print the
-pointer to the internal class
+%feature("docstring") casadi::Linsol "
+
+Linear solver Create a solver for linear systems of equations Solves the
+linear system A*X = B or A^T*X = B for X with A square and non- singular.
+
+If A is structurally singular, an error will be thrown during init. If A is
+numerically singular, the prepare step will fail.
+
+General information
+===================
+
+
+
+List of plugins
+===============
+
+
+
+- csparsecholesky
+
+- csparse
+
+- ma27
+
+- lapacklu
+
+- lapackqr
+
+- symbolicqr
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+Linsol.doc(\"myextraplugin\")
+
+
+
+--------------------------------------------------------------------------------
+
+csparsecholesky
+---------------
+
+
+
+Linsol with CSparseCholesky Interface
+
+--------------------------------------------------------------------------------
+
+
+
+
+
+--------------------------------------------------------------------------------
+
+csparse
+-------
+
+
+
+Linsol with CSparse Interface
+
+--------------------------------------------------------------------------------
+
+
+
+
+
+--------------------------------------------------------------------------------
+
+ma27
+----
+
+
+
+Interface to the sparse direct linear solver MA27 Works for symmetric
+indefinite systems Partly adopted from qpOASES 3.2 Joel Andersson
+
+--------------------------------------------------------------------------------
+
+lapacklu
+--------
+
+
+
+This class solves the linear system A.x=b by making an LU factorization of
+A: A = L.U, with L lower and U upper triangular
+
+>List of available options
+
++------------------------+------------------------+------------------------+
+|           Id           |          Type          |      Description       |
++========================+========================+========================+
+| allow_equilibration_fa | OT_BOOL                | Non-fatal error when   |
+| ilure                  |                        | equilibration fails    |
++------------------------+------------------------+------------------------+
+| equilibration          | OT_BOOL                | Equilibrate the matrix |
++------------------------+------------------------+------------------------+
+
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+
+lapackqr
+--------
+
+
+
+This class solves the linear system A.x=b by making an QR factorization of
+A: A = Q.R, with Q orthogonal and R upper triangular
+
+--------------------------------------------------------------------------------
+
+
+
+
+
+--------------------------------------------------------------------------------
+
+symbolicqr
+----------
+
+
+
+Linsol based on QR factorization with sparsity pattern based reordering
+without partial pivoting
+
+>List of available options
+
++------------------------+------------------------+------------------------+
+|           Id           |          Type          |      Description       |
++========================+========================+========================+
+| codegen                | OT_BOOL                | C-code generation      |
++------------------------+------------------------+------------------------+
+| compiler               | OT_STRING              | Compiler command to be |
+|                        |                        | used for compiling     |
+|                        |                        | generated code         |
++------------------------+------------------------+------------------------+
+
+--------------------------------------------------------------------------------
+
+
+
+Joel Andersson
+
+C++ includes: linsol.hpp ";
+
+%feature("docstring") casadi::Linsol::repr "
+
+Print a representation of the object.
 
 ";
 
-%feature("docstring") casadi::Library::getRepresentation "
+%feature("docstring") casadi::Linsol::rank "
+
+Matrix rank Not available for all solvers.
+
+";
+
+%feature("docstring") casadi::Linsol::is_null "
+
+Is a null pointer?
+
+";
+
+%feature("docstring") casadi::Linsol::getDescription "
+
+Return a string with a description (for SWIG)
+
+";
+
+%feature("docstring") casadi::Linsol::plugin_name "
+
+Query plugin name.
+
+";
+
+%feature("docstring") casadi::Linsol::getRepresentation "
 
 Return a string with a representation (for SWIG)
 
 ";
-
-
-// File: classcasadi_1_1Linsol.xml
 
 
 // File: classcasadi_1_1Logger.xml
@@ -4072,16 +4630,6 @@ Check if the matrix is upper triangular.
 
 %feature("docstring") friendwrap_all "[INTERNAL]  Returns true only if
 every element in the matrix is true.
-
-";
-
-%feature("docstring") casadi::Matrix::find "
-
-Get the location of all non-zero elements as they would appear in a Dense
-matrix A : DenseMatrix 4 x 3 B : SparseMatrix 4 x 3 , 5 structural non-
-zeros.
-
-k = A.find() A[k] will contain the elements of A that are non-zero in B
 
 ";
 
@@ -4712,16 +5260,16 @@ This constructor enables implicit type conversion from a numeric type.
 
 Dense matrix constructor with data given as vector of vectors.
 
+>  array(Scalar) ([A ] x)
+------------------------------------------------------------------------
+
+Create an expression from a vector.
+
 >  array(Scalar) (array(A) x)
 ------------------------------------------------------------------------
 
 Create a matrix from another matrix with a different entry type Assumes that
 the scalar conversion is valid.
-
->  array(Scalar) ([A ] x)
-------------------------------------------------------------------------
-
-Create an expression from a vector.
 
 >  array(Scalar) ([Scalar ] x)
 
@@ -5141,16 +5689,6 @@ to the internal class
 %feature("docstring") casadi::MX::nnz "
 
 Get the number of (structural) non-zero elements.
-
-";
-
-%feature("docstring") casadi::MX::find "
-
-Get the location of all non-zero elements as they would appear in a Dense
-matrix A : DenseMatrix 4 x 3 B : SparseMatrix 4 x 3 , 5 structural non-
-zeros.
-
-k = A.find() A[k] will contain the elements of A that are non-zero in B
 
 ";
 
@@ -5685,6 +6223,9 @@ C++ includes: nonzeros.hpp ";
 // File: classcasadi_1_1OneSX.xml
 
 
+// File: classcasadi_1_1OracleFunction.xml
+
+
 // File: classcasadi_1_1ParsedFile.xml
 %feature("docstring") casadi::ParsedFile::ParsedFile "
 
@@ -5905,9 +6446,6 @@ Return a string with a description (for SWIG)
 
 
 // File: classcasadi_1_1PureMap.xml
-
-
-// File: classcasadi_1_1Qpsol.xml
 
 
 // File: classcasadi_1_1QpToNlp.xml
@@ -7534,15 +8072,22 @@ Print a representation of the object.
 // File: classcasadi_1_1ZeroSX.xml
 
 
+// File: namespaceBonmin.xml
+
+
 // File: namespacecasadi.xml
 %feature("docstring") casadi::matrixName< double > "
 Get typename.
 
 ";
 
-%feature("docstring") casadi::linsol_in "
+%feature("docstring") casadi::complement "
 
-Linear solver input scheme.
+Returns the list of all i in [0, size[ not found in supplied list.
+
+The supplied vector may contain duplicates and may be non-monotonous The
+supplied vector will be checked for bounds The result vector is guaranteed
+to be monotonously increasing
 
 ";
 
@@ -7572,16 +8117,6 @@ Adds a multiple alpha/2 of the outer product mul(x, trans(x)) to A.
 [INTERNAL] 
 ";
 
-%feature("docstring") casadi::complement "
-
-Returns the list of all i in [0, size[ not found in supplied list.
-
-The supplied vector may contain duplicates and may be non-monotonous The
-supplied vector will be checked for bounds The result vector is guaranteed
-to be monotonously increasing
-
-";
-
 %feature("docstring") casadi::swapIndices "
 
 swap inner and outer indices of list of lists
@@ -7608,7 +8143,7 @@ Check if the vector is non-increasing.
 
 %feature("docstring") casadi::doc_linsol "
 
-Get the documentation string for a plugin.
+[DEPRECATED] Legacy - alias for Linsol::doc
 
 ";
 
@@ -7630,7 +8165,7 @@ Load an external function File name is assumed to be ./<f_name>.so.
 
 Load an external function File name given.
 
->  Function external(str name, Compiler compiler, Dict opts=Dict())
+>  Function external(str name, Importer compiler, Dict opts=Dict())
 ------------------------------------------------------------------------
 
 Load a just-in-time compiled external function File name given.
@@ -7665,39 +8200,24 @@ Explicitly load a plugin dynamically.
 
 ";
 
+%feature("docstring") casadi::linsol_new "
+
+[DEPRECATED] Create a linear solver (legacy syntax, use Linsol constructor
+instead)
+
+";
+
 %feature("docstring") casadi::load_linsol "
 
-Explicitly load a plugin dynamically.
+[DEPRECATED] Legacy - alias for Linsol::load_plugin
 
 ";
 
-%feature("docstring") casadi::qpsol_in "
+%feature("docstring") casadi::casadi_interpn_grad "[INTERNAL] ";
 
->  CASADI_EXPORT[str] qpsol_in()
-------------------------------------------------------------------------
+%feature("docstring") casadi::has_interpolant "
 
-Get input scheme of QP solvers.
-
->  str qpsol_in(int ind)
-------------------------------------------------------------------------
-
-Get QP solver input scheme name by index.
-
-";
-
-%feature("docstring") casadi::hash_combine "
-
->  void hash_combine(std.size_t &seed, T v)
-
->  void hash_combine(std.size_t &seed, [int ] v)
-------------------------------------------------------------------------
-
-Generate a hash value incrementally (function taken from boost)
-
->  void hash_combine(std.size_t &seed, const int *v, int sz)
-------------------------------------------------------------------------
-
-Generate a hash value incrementally, array.
+Check if a particular plugin is available.
 
 ";
 
@@ -7839,11 +8359,12 @@ General information
 |                 |                 | formulation     |                 |
 |                 |                 | [false]         |                 |
 +-----------------+-----------------+-----------------+-----------------+
-| gather_stats    | OT_BOOL         | Flag to         | casadi::Functio |
-|                 |                 | indicate        | nInternal       |
-|                 |                 | whether         |                 |
-|                 |                 | statistics must |                 |
-|                 |                 | be gathered     |                 |
+| gather_stats    | OT_BOOL         | Deprecated      | casadi::Functio |
+|                 |                 | option          | nInternal       |
+|                 |                 | (ignored):      |                 |
+|                 |                 | Statistics are  |                 |
+|                 |                 | now always      |                 |
+|                 |                 | collected.      |                 |
 +-----------------+-----------------+-----------------+-----------------+
 | grid            | OT_DOUBLEVECTOR | Time grid       | casadi::Integra |
 |                 |                 |                 | tor             |
@@ -8060,37 +8581,9 @@ experience a dramatic speed-up by using a sparse linear solver:
 | abstol                 | OT_DOUBLE              | Absolute tolerence for |
 |                        |                        | the IVP solution       |
 +------------------------+------------------------+------------------------+
-| abstolB                | OT_DOUBLE              | Absolute tolerence for |
-|                        |                        | the adjoint            |
-|                        |                        | sensitivity solution   |
-|                        |                        | [default: equal to     |
-|                        |                        | abstol]                |
-+------------------------+------------------------+------------------------+
 | disable_internal_warni | OT_BOOL                | Disable SUNDIALS       |
 | ngs                    |                        | internal warning       |
 |                        |                        | messages               |
-+------------------------+------------------------+------------------------+
-| exact_jacobian         | OT_BOOL                | Use exact Jacobian     |
-|                        |                        | information for the    |
-|                        |                        | forward integration    |
-+------------------------+------------------------+------------------------+
-| exact_jacobianB        | OT_BOOL                | Use exact Jacobian     |
-|                        |                        | information for the    |
-|                        |                        | backward integration   |
-|                        |                        | [default: equal to     |
-|                        |                        | exact_jacobian]        |
-+------------------------+------------------------+------------------------+
-| finite_difference_fsen | OT_BOOL                | Use finite differences |
-| s                      |                        | to approximate the     |
-|                        |                        | forward sensitivity    |
-|                        |                        | equations (if AD is    |
-|                        |                        | not available)         |
-+------------------------+------------------------+------------------------+
-| fsens_abstol           | OT_DOUBLE              | Absolute tolerence for |
-|                        |                        | the forward            |
-|                        |                        | sensitivity solution   |
-|                        |                        | [default: equal to     |
-|                        |                        | abstol]                |
 +------------------------+------------------------+------------------------+
 | fsens_all_at_once      | OT_BOOL                | Calculate all right    |
 |                        |                        | hand sides of the      |
@@ -8101,77 +8594,22 @@ experience a dramatic speed-up by using a sparse linear solver:
 |                        |                        | sensitivities in all   |
 |                        |                        | error controls         |
 +------------------------+------------------------+------------------------+
-| fsens_reltol           | OT_DOUBLE              | Relative tolerence for |
-|                        |                        | the forward            |
-|                        |                        | sensitivity solution   |
-|                        |                        | [default: equal to     |
-|                        |                        | reltol]                |
-+------------------------+------------------------+------------------------+
-| fsens_scaling_factors  | OT_DOUBLEVECTOR        | Scaling factor for the |
-|                        |                        | components if finite   |
-|                        |                        | differences is used    |
-+------------------------+------------------------+------------------------+
-| fsens_sensitiviy_param | OT_INTVECTOR           | Specifies which        |
-| eters                  |                        | components will be     |
-|                        |                        | used when estimating   |
-|                        |                        | the sensitivity        |
-|                        |                        | equations              |
-+------------------------+------------------------+------------------------+
 | interpolation_type     | OT_STRING              | Type of interpolation  |
 |                        |                        | for the adjoint        |
 |                        |                        | sensitivities          |
-+------------------------+------------------------+------------------------+
-| iterative_solver       | OT_STRING              | Iterative solver:      |
-|                        |                        | GMRES|bcgstab|tfqmr    |
-+------------------------+------------------------+------------------------+
-| iterative_solverB      | OT_STRING              | Iterative solver for   |
-|                        |                        | backward integration   |
 +------------------------+------------------------+------------------------+
 | linear_multistep_metho | OT_STRING              | Integrator scheme:     |
 | d                      |                        | BDF|adams              |
 +------------------------+------------------------+------------------------+
 | linear_solver          | OT_STRING              | A custom linear solver |
 |                        |                        | creator function       |
-+------------------------+------------------------+------------------------+
-| linear_solverB         | OT_STRING              | A custom linear solver |
-|                        |                        | creator function for   |
-|                        |                        | backwards integration  |
-|                        |                        | [default: equal to     |
-|                        |                        | linear_solver]         |
+|                        |                        | [default: csparse]     |
 +------------------------+------------------------+------------------------+
 | linear_solver_options  | OT_DICT                | Options to be passed   |
 |                        |                        | to the linear solver   |
 +------------------------+------------------------+------------------------+
-| linear_solver_optionsB | OT_DICT                | Options to be passed   |
-|                        |                        | to the linear solver   |
-|                        |                        | for backwards          |
-|                        |                        | integration [default:  |
-|                        |                        | equal to               |
-|                        |                        | linear_solver_options] |
-+------------------------+------------------------+------------------------+
-| linear_solver_type     | OT_STRING              | Type of iterative      |
-|                        |                        | solver: user_defined|D |
-|                        |                        | ENSE|banded|iterative  |
-+------------------------+------------------------+------------------------+
-| linear_solver_typeB    | OT_STRING              | Linear solver for      |
-|                        |                        | backward integration   |
-+------------------------+------------------------+------------------------+
-| lower_bandwidth        | OT_INT                 | Lower band-width of    |
-|                        |                        | banded Jacobian        |
-|                        |                        | (estimations)          |
-+------------------------+------------------------+------------------------+
-| lower_bandwidthB       | OT_INT                 | lower band-width of    |
-|                        |                        | banded jacobians for   |
-|                        |                        | backward integration   |
-|                        |                        | [default: equal to     |
-|                        |                        | lower_bandwidth]       |
-+------------------------+------------------------+------------------------+
 | max_krylov             | OT_INT                 | Maximum Krylov         |
 |                        |                        | subspace size          |
-+------------------------+------------------------+------------------------+
-| max_krylovB            | OT_INT                 | Maximum krylov         |
-|                        |                        | subspace size for      |
-|                        |                        | backward integration   |
 +------------------------+------------------------+------------------------+
 | max_multistep_order    | OT_INT                 | Maximum order for the  |
 |                        |                        | (variable-order)       |
@@ -8180,15 +8618,13 @@ experience a dramatic speed-up by using a sparse linear solver:
 | max_num_steps          | OT_INT                 | Maximum number of      |
 |                        |                        | integrator steps       |
 +------------------------+------------------------+------------------------+
+| newton_scheme          | OT_STRING              | Linear solver scheme   |
+|                        |                        | in the Newton method:  |
+|                        |                        | DIRECT|gmres|bcgstab|t |
+|                        |                        | fqmr                   |
++------------------------+------------------------+------------------------+
 | nonlinear_solver_itera | OT_STRING              | Nonlinear solver type: |
 | tion                   |                        | NEWTON|functional      |
-+------------------------+------------------------+------------------------+
-| pretype                | OT_STRING              | Type of                |
-|                        |                        | preconditioning:       |
-|                        |                        | NONE|left|right|both   |
-+------------------------+------------------------+------------------------+
-| pretypeB               | OT_STRING              | Preconditioner for     |
-|                        |                        | backward integration   |
 +------------------------+------------------------+------------------------+
 | quad_err_con           | OT_BOOL                | Should the quadratures |
 |                        |                        | affect the step size   |
@@ -8196,12 +8632,6 @@ experience a dramatic speed-up by using a sparse linear solver:
 +------------------------+------------------------+------------------------+
 | reltol                 | OT_DOUBLE              | Relative tolerence for |
 |                        |                        | the IVP solution       |
-+------------------------+------------------------+------------------------+
-| reltolB                | OT_DOUBLE              | Relative tolerence for |
-|                        |                        | the adjoint            |
-|                        |                        | sensitivity solution   |
-|                        |                        | [default: equal to     |
-|                        |                        | reltol]                |
 +------------------------+------------------------+------------------------+
 | sensitivity_method     | OT_STRING              | Sensitivity method:    |
 |                        |                        | SIMULTANEOUS|staggered |
@@ -8215,24 +8645,9 @@ experience a dramatic speed-up by using a sparse linear solver:
 |                        |                        | the end of the         |
 |                        |                        | interval               |
 +------------------------+------------------------+------------------------+
-| upper_bandwidth        | OT_INT                 | Upper band-width of    |
-|                        |                        | banded Jacobian        |
-|                        |                        | (estimations)          |
-+------------------------+------------------------+------------------------+
-| upper_bandwidthB       | OT_INT                 | Upper band-width of    |
-|                        |                        | banded jacobians for   |
-|                        |                        | backward integration   |
-|                        |                        | [default: equal to     |
-|                        |                        | upper_bandwidth]       |
-+------------------------+------------------------+------------------------+
-| use_preconditioner     | OT_BOOL                | Precondition an        |
+| use_preconditioner     | OT_BOOL                | Precondition the       |
 |                        |                        | iterative solver       |
-+------------------------+------------------------+------------------------+
-| use_preconditionerB    | OT_BOOL                | Precondition an        |
-|                        |                        | iterative solver for   |
-|                        |                        | the backwards problem  |
-|                        |                        | [default: equal to     |
-|                        |                        | use_preconditioner]    |
+|                        |                        | [default: true]        |
 +------------------------+------------------------+------------------------+
 
 --------------------------------------------------------------------------------
@@ -8268,12 +8683,6 @@ experience a dramatic speed-up by using a sparse linear solver:
 | abstol                 | OT_DOUBLE              | Absolute tolerence for |
 |                        |                        | the IVP solution       |
 +------------------------+------------------------+------------------------+
-| abstolB                | OT_DOUBLE              | Absolute tolerence for |
-|                        |                        | the adjoint            |
-|                        |                        | sensitivity solution   |
-|                        |                        | [default: equal to     |
-|                        |                        | abstol]                |
-+------------------------+------------------------+------------------------+
 | abstolv                | OT_DOUBLEVECTOR        | Absolute tolerarance   |
 |                        |                        | for each component     |
 +------------------------+------------------------+------------------------+
@@ -8296,58 +8705,13 @@ experience a dramatic speed-up by using a sparse linear solver:
 | ngs                    |                        | internal warning       |
 |                        |                        | messages               |
 +------------------------+------------------------+------------------------+
-| exact_jacobian         | OT_BOOL                | Use exact Jacobian     |
-|                        |                        | information for the    |
-|                        |                        | forward integration    |
-+------------------------+------------------------+------------------------+
-| exact_jacobianB        | OT_BOOL                | Use exact Jacobian     |
-|                        |                        | information for the    |
-|                        |                        | backward integration   |
-|                        |                        | [default: equal to     |
-|                        |                        | exact_jacobian]        |
-+------------------------+------------------------+------------------------+
-| extra_fsens_calc_ic    | OT_BOOL                | Call calc ic an extra  |
-|                        |                        | time, with fsens=0     |
-+------------------------+------------------------+------------------------+
-| finite_difference_fsen | OT_BOOL                | Use finite differences |
-| s                      |                        | to approximate the     |
-|                        |                        | forward sensitivity    |
-|                        |                        | equations (if AD is    |
-|                        |                        | not available)         |
-+------------------------+------------------------+------------------------+
 | first_time             | OT_DOUBLE              | First requested time   |
 |                        |                        | as a fraction of the   |
 |                        |                        | time interval          |
 +------------------------+------------------------+------------------------+
-| fsens_abstol           | OT_DOUBLE              | Absolute tolerence for |
-|                        |                        | the forward            |
-|                        |                        | sensitivity solution   |
-|                        |                        | [default: equal to     |
-|                        |                        | abstol]                |
-+------------------------+------------------------+------------------------+
-| fsens_abstolv          | OT_DOUBLEVECTOR        | Absolute tolerarance   |
-|                        |                        | for each component,    |
-|                        |                        | forward sensitivities  |
-+------------------------+------------------------+------------------------+
 | fsens_err_con          | OT_BOOL                | include the forward    |
 |                        |                        | sensitivities in all   |
 |                        |                        | error controls         |
-+------------------------+------------------------+------------------------+
-| fsens_reltol           | OT_DOUBLE              | Relative tolerence for |
-|                        |                        | the forward            |
-|                        |                        | sensitivity solution   |
-|                        |                        | [default: equal to     |
-|                        |                        | reltol]                |
-+------------------------+------------------------+------------------------+
-| fsens_scaling_factors  | OT_DOUBLEVECTOR        | Scaling factor for the |
-|                        |                        | components if finite   |
-|                        |                        | differences is used    |
-+------------------------+------------------------+------------------------+
-| fsens_sensitiviy_param | OT_INTVECTOR           | Specifies which        |
-| eters                  |                        | components will be     |
-|                        |                        | used when estimating   |
-|                        |                        | the sensitivity        |
-|                        |                        | equations              |
 +------------------------+------------------------+------------------------+
 | init_xdot              | OT_DOUBLEVECTOR        | Initial values for the |
 |                        |                        | state derivatives      |
@@ -8356,54 +8720,15 @@ experience a dramatic speed-up by using a sparse linear solver:
 |                        |                        | for the adjoint        |
 |                        |                        | sensitivities          |
 +------------------------+------------------------+------------------------+
-| iterative_solver       | OT_STRING              | Iterative solver:      |
-|                        |                        | GMRES|bcgstab|tfqmr    |
-+------------------------+------------------------+------------------------+
-| iterative_solverB      | OT_STRING              | Iterative solver for   |
-|                        |                        | backward integration   |
-+------------------------+------------------------+------------------------+
 | linear_solver          | OT_STRING              | A custom linear solver |
 |                        |                        | creator function       |
-+------------------------+------------------------+------------------------+
-| linear_solverB         | OT_STRING              | A custom linear solver |
-|                        |                        | creator function for   |
-|                        |                        | backwards integration  |
-|                        |                        | [default: equal to     |
-|                        |                        | linear_solver]         |
+|                        |                        | [default: csparse]     |
 +------------------------+------------------------+------------------------+
 | linear_solver_options  | OT_DICT                | Options to be passed   |
 |                        |                        | to the linear solver   |
 +------------------------+------------------------+------------------------+
-| linear_solver_optionsB | OT_DICT                | Options to be passed   |
-|                        |                        | to the linear solver   |
-|                        |                        | for backwards          |
-|                        |                        | integration [default:  |
-|                        |                        | equal to               |
-|                        |                        | linear_solver_options] |
-+------------------------+------------------------+------------------------+
-| linear_solver_type     | OT_STRING              | Type of iterative      |
-|                        |                        | solver: user_defined|D |
-|                        |                        | ENSE|banded|iterative  |
-+------------------------+------------------------+------------------------+
-| linear_solver_typeB    | OT_STRING              | Linear solver for      |
-|                        |                        | backward integration   |
-+------------------------+------------------------+------------------------+
-| lower_bandwidth        | OT_INT                 | Lower band-width of    |
-|                        |                        | banded Jacobian        |
-|                        |                        | (estimations)          |
-+------------------------+------------------------+------------------------+
-| lower_bandwidthB       | OT_INT                 | lower band-width of    |
-|                        |                        | banded jacobians for   |
-|                        |                        | backward integration   |
-|                        |                        | [default: equal to     |
-|                        |                        | lower_bandwidth]       |
-+------------------------+------------------------+------------------------+
 | max_krylov             | OT_INT                 | Maximum Krylov         |
 |                        |                        | subspace size          |
-+------------------------+------------------------+------------------------+
-| max_krylovB            | OT_INT                 | Maximum krylov         |
-|                        |                        | subspace size for      |
-|                        |                        | backward integration   |
 +------------------------+------------------------+------------------------+
 | max_multistep_order    | OT_INT                 | Maximum order for the  |
 |                        |                        | (variable-order)       |
@@ -8414,12 +8739,10 @@ experience a dramatic speed-up by using a sparse linear solver:
 +------------------------+------------------------+------------------------+
 | max_step_size          | OT_DOUBLE              | Maximim step size      |
 +------------------------+------------------------+------------------------+
-| pretype                | OT_STRING              | Type of                |
-|                        |                        | preconditioning:       |
-|                        |                        | NONE|left|right|both   |
-+------------------------+------------------------+------------------------+
-| pretypeB               | OT_STRING              | Preconditioner for     |
-|                        |                        | backward integration   |
+| newton_scheme          | OT_STRING              | Linear solver scheme   |
+|                        |                        | in the Newton method:  |
+|                        |                        | DIRECT|gmres|bcgstab|t |
+|                        |                        | fqmr                   |
 +------------------------+------------------------+------------------------+
 | quad_err_con           | OT_BOOL                | Should the quadratures |
 |                        |                        | affect the step size   |
@@ -8427,12 +8750,6 @@ experience a dramatic speed-up by using a sparse linear solver:
 +------------------------+------------------------+------------------------+
 | reltol                 | OT_DOUBLE              | Relative tolerence for |
 |                        |                        | the IVP solution       |
-+------------------------+------------------------+------------------------+
-| reltolB                | OT_DOUBLE              | Relative tolerence for |
-|                        |                        | the adjoint            |
-|                        |                        | sensitivity solution   |
-|                        |                        | [default: equal to     |
-|                        |                        | reltol]                |
 +------------------------+------------------------+------------------------+
 | sensitivity_method     | OT_STRING              | Sensitivity method:    |
 |                        |                        | SIMULTANEOUS|staggered |
@@ -8450,24 +8767,9 @@ experience a dramatic speed-up by using a sparse linear solver:
 |                        |                        | variables in the error |
 |                        |                        | testing                |
 +------------------------+------------------------+------------------------+
-| upper_bandwidth        | OT_INT                 | Upper band-width of    |
-|                        |                        | banded Jacobian        |
-|                        |                        | (estimations)          |
-+------------------------+------------------------+------------------------+
-| upper_bandwidthB       | OT_INT                 | Upper band-width of    |
-|                        |                        | banded jacobians for   |
-|                        |                        | backward integration   |
-|                        |                        | [default: equal to     |
-|                        |                        | upper_bandwidth]       |
-+------------------------+------------------------+------------------------+
-| use_preconditioner     | OT_BOOL                | Precondition an        |
+| use_preconditioner     | OT_BOOL                | Precondition the       |
 |                        |                        | iterative solver       |
-+------------------------+------------------------+------------------------+
-| use_preconditionerB    | OT_BOOL                | Precondition an        |
-|                        |                        | iterative solver for   |
-|                        |                        | the backwards problem  |
-|                        |                        | [default: equal to     |
-|                        |                        | use_preconditioner]    |
+|                        |                        | [default: true]        |
 +------------------------+------------------------+------------------------+
 
 --------------------------------------------------------------------------------
@@ -8565,13 +8867,9 @@ Check if the vector has negative entries.
 
 ";
 
-%feature("docstring") casadi::doc_qpsol "
-
-Get the documentation string for a plugin.
-
-";
-
 %feature("docstring") casadi::check_exposed "[INTERNAL] ";
+
+%feature("docstring") casadi::casadi_interpn "[INTERNAL] ";
 
 %feature("docstring") casadi::read_matlab "
 
@@ -8587,20 +8885,14 @@ Read matrix, matlab style.
 
 ";
 
-%feature("docstring") casadi::qpsol_n_out "
-
-Get the number of QP solver outputs.
-
-";
-
 %feature("docstring") casadi::casadi_mtimes "[INTERNAL]  Sparse matrix-
 matrix multiplication: z <- z + x*y.
 
 ";
 
-%feature("docstring") casadi::qpsol_n_in "
+%feature("docstring") casadi::doc_interpolant "
 
-Get the number of QP solver inputs.
+Get the documentation string for a plugin.
 
 ";
 
@@ -8749,11 +9041,12 @@ General information
 |                 |                 | the function    |                 |
 |                 |                 | name.           |                 |
 +-----------------+-----------------+-----------------+-----------------+
-| gather_stats    | OT_BOOL         | Flag to         | casadi::Functio |
-|                 |                 | indicate        | nInternal       |
-|                 |                 | whether         |                 |
-|                 |                 | statistics must |                 |
-|                 |                 | be gathered     |                 |
+| gather_stats    | OT_BOOL         | Deprecated      | casadi::Functio |
+|                 |                 | option          | nInternal       |
+|                 |                 | (ignored):      |                 |
+|                 |                 | Statistics are  |                 |
+|                 |                 | now always      |                 |
+|                 |                 | collected.      |                 |
 +-----------------+-----------------+-----------------+-----------------+
 | implicit_input  | OT_INT          | Index of the    | casadi::Rootfin |
 |                 |                 | input that      | der             |
@@ -9000,10 +9293,6 @@ Check if the vector is strictly monotone.
 
 ";
 
-%feature("docstring") casadi::dlaqge_ "[INTERNAL]  Equilibrate the system.
-
-";
-
 %feature("docstring") casadi::to_slice "
 
 >  Slice to_slice(IM x, bool ind1=false)
@@ -9022,8 +9311,17 @@ Construct from an index vector (requires is_slice(v) to be true)
 
 ";
 
-%feature("docstring") casadi::dgeequ_ "[INTERNAL]  Calculate col and row
-scaling.
+%feature("docstring") casadi::conic_in "
+
+>  CASADI_EXPORT[str] conic_in()
+------------------------------------------------------------------------
+
+Get input scheme of QP solvers.
+
+>  str conic_in(int ind)
+------------------------------------------------------------------------
+
+Get QP solver input scheme name by index.
 
 ";
 
@@ -9038,8 +9336,19 @@ Duplicates are treated by looking up last occurrence
 
 ";
 
-%feature("docstring") casadi::dormqr_ "[INTERNAL]  Multiply right hand side
-with Q-transpose (lapack)
+%feature("docstring") casadi::hash_combine "
+
+>  void hash_combine(std.size_t &seed, T v)
+
+>  void hash_combine(std.size_t &seed, [int ] v)
+------------------------------------------------------------------------
+
+Generate a hash value incrementally (function taken from boost)
+
+>  void hash_combine(std.size_t &seed, const int *v, int sz)
+------------------------------------------------------------------------
+
+Generate a hash value incrementally, array.
 
 ";
 
@@ -9076,8 +9385,9 @@ Explicitly load a plugin dynamically.
 
 ";
 
-%feature("docstring") casadi::dgeqrf_ "[INTERNAL]  QR-factorize dense
-matrix (lapack)
+%feature("docstring") casadi::load_interpolant "
+
+Explicitly load a plugin dynamically.
 
 ";
 
@@ -9098,80 +9408,7 @@ scheme:  'radau' or 'legendre'
 
 ";
 
-%feature("docstring") casadi::linsol_n_out "
-
-Number of linear solver outputs.
-
-";
-
-%feature("docstring") casadi::simpleIRK "
-
-Construct an implicit Runge-Kutta integrator using a collocation scheme The
-constructed function has three inputs, corresponding to initial state (x0),
-parameter (p) and integration time (h) and one output, corresponding to
-final state (xf).
-
-Parameters:
------------
-
-f:  ODE function with two inputs (x and p) and one output (xdot)
-
-N:  Number of integrator steps
-
-order:  Order of interpolating polynomials
-
-scheme:  Collocation scheme, as excepted by collocationPoints function.
-
-";
-
-%feature("docstring") casadi::ptrVec "[INTERNAL]  Convenience function,
-convert vectors to vectors of pointers.
-
-";
-
-%feature("docstring") casadi::to_slice2 "
-
-Construct nested slices from an index vector (requires is_slice2(v) to be
-true)
-
-";
-
-%feature("docstring") casadi::dtrsm_ "[INTERNAL]   Solve upper triangular
-system (lapack)
-
-";
-
-%feature("docstring") casadi::casadi_axpy "[INTERNAL]  AXPY: y <- a*x + y.
-
-";
-
-%feature("docstring") casadi::has_nlpsol "
-
-Check if a particular plugin is available.
-
-";
-
-%feature("docstring") casadi::casadi_getu "[INTERNAL]  Get the nonzeros for
-the upper triangular half.
-
-";
-
-%feature("docstring") casadi::doc_nlpsol "
-
-Get the documentation string for a plugin.
-
-";
-
-%feature("docstring") casadi::isMonotone "
-
-Check if the vector is monotone.
-
-";
-
-%feature("docstring") casadi::qpsol "
-
->  Function qpsol(str name, str solver, SpDict qp, Dict opts=Dict())
-------------------------------------------------------------------------
+%feature("docstring") casadi::conic "
 
 Create a QP solver Solves the following strictly convex problem:
 
@@ -9281,17 +9518,18 @@ General information
 |                 |                 | the function    |                 |
 |                 |                 | name.           |                 |
 +-----------------+-----------------+-----------------+-----------------+
-| discrete        | OT_BOOLVECTOR   | Indicates which | casadi::Qpsol   |
+| discrete        | OT_BOOLVECTOR   | Indicates which | casadi::Conic   |
 |                 |                 | of the          |                 |
 |                 |                 | variables are   |                 |
 |                 |                 | discrete, i.e.  |                 |
 |                 |                 | integer-valued  |                 |
 +-----------------+-----------------+-----------------+-----------------+
-| gather_stats    | OT_BOOL         | Flag to         | casadi::Functio |
-|                 |                 | indicate        | nInternal       |
-|                 |                 | whether         |                 |
-|                 |                 | statistics must |                 |
-|                 |                 | be gathered     |                 |
+| gather_stats    | OT_BOOL         | Deprecated      | casadi::Functio |
+|                 |                 | option          | nInternal       |
+|                 |                 | (ignored):      |                 |
+|                 |                 | Statistics are  |                 |
+|                 |                 | now always      |                 |
+|                 |                 | collected.      |                 |
 +-----------------+-----------------+-----------------+-----------------+
 | input_scheme    | OT_STRINGVECTOR | Custom input    | casadi::Functio |
 |                 |                 | scheme          | nInternal       |
@@ -9372,56 +9610,58 @@ General information
 |                 |                 | debugging       |                 |
 +-----------------+-----------------+-----------------+-----------------+
 
->Input scheme: casadi::QpsolInput (QPSOL_NUM_IN = 9) []
+>Input scheme: casadi::ConicInput (CONIC_NUM_IN = 9) []
 
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
-| QPSOL_H                |                        | The square matrix H:   |
+| CONIC_H                |                        | The square matrix H:   |
 |                        |                        | sparse, (n x n). Only  |
 |                        |                        | the lower triangular   |
 |                        |                        | part is actually used. |
 |                        |                        | The matrix is assumed  |
 |                        |                        | to be symmetrical.     |
 +------------------------+------------------------+------------------------+
-| QPSOL_G                |                        | The vector g: dense,   |
+| CONIC_G                |                        | The vector g: dense,   |
 |                        |                        | (n x 1)                |
 +------------------------+------------------------+------------------------+
-| QPSOL_A                |                        | The matrix A: sparse,  |
+| CONIC_A                |                        | The matrix A: sparse,  |
 |                        |                        | (nc x n) - product     |
 |                        |                        | with x must be dense.  |
 +------------------------+------------------------+------------------------+
-| QPSOL_LBA              |                        | dense, (nc x 1)        |
+| CONIC_LBA              |                        | dense, (nc x 1)        |
 +------------------------+------------------------+------------------------+
-| QPSOL_UBA              |                        | dense, (nc x 1)        |
+| CONIC_UBA              |                        | dense, (nc x 1)        |
 +------------------------+------------------------+------------------------+
-| QPSOL_LBX              |                        | dense, (n x 1)         |
+| CONIC_LBX              |                        | dense, (n x 1)         |
 +------------------------+------------------------+------------------------+
-| QPSOL_UBX              |                        | dense, (n x 1)         |
+| CONIC_UBX              |                        | dense, (n x 1)         |
 +------------------------+------------------------+------------------------+
-| QPSOL_X0               |                        | dense, (n x 1)         |
+| CONIC_X0               |                        | dense, (n x 1)         |
 +------------------------+------------------------+------------------------+
-| QPSOL_LAM_X0           |                        | dense                  |
+| CONIC_LAM_X0           |                        | dense                  |
 +------------------------+------------------------+------------------------+
 
->Output scheme: casadi::QpsolOutput (QPSOL_NUM_OUT = 4) []
+>Output scheme: casadi::ConicOutput (CONIC_NUM_OUT = 4) []
 
 +-------------+-------+---------------------------------------------------+
 |  Full name  | Short |                    Description                    |
 +=============+=======+===================================================+
-| QPSOL_X     |       | The primal solution.                              |
+| CONIC_X     |       | The primal solution.                              |
 +-------------+-------+---------------------------------------------------+
-| QPSOL_COST  |       | The optimal cost.                                 |
+| CONIC_COST  |       | The optimal cost.                                 |
 +-------------+-------+---------------------------------------------------+
-| QPSOL_LAM_A |       | The dual solution corresponding to linear bounds. |
+| CONIC_LAM_A |       | The dual solution corresponding to linear bounds. |
 +-------------+-------+---------------------------------------------------+
-| QPSOL_LAM_X |       | The dual solution corresponding to simple bounds. |
+| CONIC_LAM_X |       | The dual solution corresponding to simple bounds. |
 +-------------+-------+---------------------------------------------------+
 
 List of plugins
 ===============
 
 
+
+- clp
 
 - cplex
 
@@ -9438,7 +9678,22 @@ List of plugins
 Note: some of the plugins in this list might not be available on your
 system. Also, there might be extra plugins available to you that are not
 listed here. You can obtain their documentation with
-Qpsol.doc(\"myextraplugin\")
+Conic.doc(\"myextraplugin\")
+
+
+
+--------------------------------------------------------------------------------
+
+clp
+---
+
+
+
+Interface to Clp solver for sparse Quadratic Programs
+
+--------------------------------------------------------------------------------
+
+
 
 
 
@@ -9644,6 +9899,12 @@ Interface to QPOases Solver for quadratic programming
 | growFarBounds          | OT_DOUBLE              | Factor to grow far     |
 |                        |                        | bounds.                |
 +------------------------+------------------------+------------------------+
+| hessian_type           | OT_STRING              | Type of Hessian - see  |
+|                        |                        | qpOASES documentation  |
+|                        |                        | [UNKNOWN|posdef|semide |
+|                        |                        | f|indef|zero|identity] |
+|                        |                        | ]                      |
++------------------------+------------------------+------------------------+
 | initialFarBounds       | OT_DOUBLE              | Initial size for far   |
 |                        |                        | bounds.                |
 +------------------------+------------------------+------------------------+
@@ -9654,6 +9915,8 @@ Interface to QPOases Solver for quadratic programming
 |                        |                        | bounds at first        |
 |                        |                        | iteration.             |
 +------------------------+------------------------+------------------------+
+| linsol_plugin          | OT_STRING              | Linear solver plugin   |
++------------------------+------------------------+------------------------+
 | maxDualJump            | OT_DOUBLE              | Maximum allowed jump   |
 |                        |                        | in dual variables in   |
 |                        |                        | linear independence    |
@@ -9663,6 +9926,9 @@ Interface to QPOases Solver for quadratic programming
 |                        |                        | in primal variables in |
 |                        |                        | nonzero curvature      |
 |                        |                        | tests.                 |
++------------------------+------------------------+------------------------+
+| max_shur               | OT_INT                 | Maximal number of      |
+|                        |                        | Schur updates [75]     |
 +------------------------+------------------------+------------------------+
 | nWSR                   | OT_INT                 | The maximum number of  |
 |                        |                        | working set            |
@@ -9684,9 +9950,12 @@ Interface to QPOases Solver for quadratic programming
 |                        |                        | solution, see Section  |
 |                        |                        | 5.7                    |
 +------------------------+------------------------+------------------------+
+| shur                   | OT_BOOL                | Use Schur Complement   |
+|                        |                        | Approach [false]       |
++------------------------+------------------------+------------------------+
 | sparse                 | OT_BOOL                | Formulate the QP using |
 |                        |                        | sparse matrices.       |
-|                        |                        | Default: false         |
+|                        |                        | [false]                |
 +------------------------+------------------------+------------------------+
 | terminationTolerance   | OT_DOUBLE              | Relative termination   |
 |                        |                        | tolerance to stop      |
@@ -9739,21 +10008,76 @@ Joel Andersson
 
 ";
 
+%feature("docstring") casadi::doc_integrator "
+
+Get the documentation string for a plugin.
+
+";
+
+%feature("docstring") casadi::simpleIRK "
+
+Construct an implicit Runge-Kutta integrator using a collocation scheme The
+constructed function has three inputs, corresponding to initial state (x0),
+parameter (p) and integration time (h) and one output, corresponding to
+final state (xf).
+
+Parameters:
+-----------
+
+f:  ODE function with two inputs (x and p) and one output (xdot)
+
+N:  Number of integrator steps
+
+order:  Order of interpolating polynomials
+
+scheme:  Collocation scheme, as excepted by collocationPoints function.
+
+";
+
+%feature("docstring") casadi::ptrVec "[INTERNAL]  Convenience function,
+convert vectors to vectors of pointers.
+
+";
+
+%feature("docstring") casadi::to_slice2 "
+
+Construct nested slices from an index vector (requires is_slice2(v) to be
+true)
+
+";
+
+%feature("docstring") casadi::casadi_axpy "[INTERNAL]  AXPY: y <- a*x + y.
+
+";
+
+%feature("docstring") casadi::has_nlpsol "
+
+Check if a particular plugin is available.
+
+";
+
+%feature("docstring") casadi::casadi_getu "[INTERNAL]  Get the nonzeros for
+the upper triangular half.
+
+";
+
+%feature("docstring") casadi::doc_nlpsol "
+
+Get the documentation string for a plugin.
+
+";
+
+%feature("docstring") casadi::isMonotone "
+
+Check if the vector is monotone.
+
+";
+
+%feature("docstring") casadi::qpsol "";
+
 %feature("docstring") casadi::zip "[INTERNAL] ";
 
-%feature("docstring") casadi::linsol_out "
-
-Linear solver output scheme.
-
-";
-
 %feature("docstring") casadi::replaceMat "[INTERNAL] ";
-
-%feature("docstring") casadi::linsol_n_in "
-
-Number of linear solver inputs.
-
-";
 
 %feature("docstring") casadi::collocationInterpolators "
 
@@ -9837,19 +10161,7 @@ polynomial.
 
 ";
 
-%feature("docstring") casadi::qpsol_out "
-
->  CASADI_EXPORT[str] qpsol_out()
-------------------------------------------------------------------------
-
-Get QP solver output scheme of QP solvers.
-
->  str qpsol_out(int ind)
-------------------------------------------------------------------------
-
-Get output scheme name by index.
-
-";
+%feature("docstring") casadi::casadi_flip "[INTERNAL] ";
 
 %feature("docstring") casadi::simpleIntegrator "
 
@@ -9871,6 +10183,8 @@ scheme:  Collocation scheme, as excepted by collocationPoints function.
 
 ";
 
+%feature("docstring") casadi::casadi_interpn_interpolate "[INTERNAL] ";
+
 %feature("docstring") casadi::nlpsol_default_in "
 
 Default input for an NLP solver.
@@ -9879,19 +10193,22 @@ Default input for an NLP solver.
 
 %feature("docstring") casadi::_nl_var "[INTERNAL] ";
 
+%feature("docstring") casadi::casadi_interpn_weights "[INTERNAL] ";
+
 %feature("docstring") casadi::casadi_norm_inf "[INTERNAL]  Inf-norm of a
 vector * Returns the largest element in absolute value
-
-";
-
-%feature("docstring") casadi::dgetrf_ "[INTERNAL]  LU-Factorize dense
-matrix (lapack)
 
 ";
 
 %feature("docstring") casadi::has_rootfinder "
 
 Check if a particular plugin is available.
+
+";
+
+%feature("docstring") casadi::conic_n_out "
+
+Get the number of QP solver outputs.
 
 ";
 
@@ -9903,6 +10220,46 @@ x, w work vector (length >= number of rows)
 %feature("docstring") casadi::matrixName< int > "
 
 Get typename.
+
+";
+
+%feature("docstring") casadi::interpolant "
+
+An interpolant function for lookup table data
+
+General information
+===================
+
+
+
+List of plugins
+===============
+
+
+
+- linear
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+Interpolant.doc(\"myextraplugin\")
+
+
+
+--------------------------------------------------------------------------------
+
+linear
+------
+
+
+
+
+
+--------------------------------------------------------------------------------
+
+
+
+Joel Andersson
 
 ";
 
@@ -9926,13 +10283,25 @@ Check if the vector is strictly increasing.
 
 ";
 
-%feature("docstring") casadi::doc_integrator "
+%feature("docstring") casadi::doc_conic "
 
 Get the documentation string for a plugin.
 
 ";
 
 %feature("docstring") casadi::casadi_dot "[INTERNAL]  Inner product.
+
+";
+
+%feature("docstring") casadi::has_conic "
+
+Check if a particular plugin is available.
+
+";
+
+%feature("docstring") casadi::load_conic "
+
+Explicitly load a plugin dynamically.
 
 ";
 
@@ -9950,19 +10319,10 @@ Get output scheme name by index.
 
 ";
 
-%feature("docstring") casadi::load_qpsol "
-
-Explicitly load a plugin dynamically.
-
-";
+%feature("docstring") casadi::casadi_low "[INTERNAL] ";
 
 %feature("docstring") casadi::casadi_trans "[INTERNAL]  TRANS: y <-
 trans(x)
-
-";
-
-%feature("docstring") casadi::dgetrs_ "[INTERNAL]   Solve a system of
-equation using an LU-factorized matrix (lapack)
 
 ";
 
@@ -10054,7 +10414,7 @@ Get output scheme name by index.
 
 %feature("docstring") casadi::has_linsol "
 
-Check if a particular plugin is available.
+[DEPRECATED] Legacy - alias for Linsol::has_plugin
 
 ";
 
@@ -10163,6 +10523,12 @@ Get NLP solver input scheme name by index.
 |                        |                        | for bounds on G,       |
 |                        |                        | initial guess (ng x 1) |
 +------------------------+------------------------+------------------------+
+
+";
+
+%feature("docstring") casadi::conic_n_in "
+
+Get the number of QP solver inputs.
 
 ";
 
@@ -10285,6 +10651,12 @@ General information
 |                 |                 | the function    |                 |
 |                 |                 | name.           |                 |
 +-----------------+-----------------+-----------------+-----------------+
+| discrete        | OT_BOOLVECTOR   | Indicates which | casadi::Nlpsol  |
+|                 |                 | of the          |                 |
+|                 |                 | variables are   |                 |
+|                 |                 | discrete, i.e.  |                 |
+|                 |                 | integer-valued  |                 |
++-----------------+-----------------+-----------------+-----------------+
 | eval_errors_fat | OT_BOOL         | When errors     | casadi::Nlpsol  |
 | al              |                 | occur during    |                 |
 |                 |                 | evaluation of   |                 |
@@ -10297,11 +10669,12 @@ General information
 |                 |                 | formulation     |                 |
 |                 |                 | [false]         |                 |
 +-----------------+-----------------+-----------------+-----------------+
-| gather_stats    | OT_BOOL         | Flag to         | casadi::Functio |
-|                 |                 | indicate        | nInternal       |
-|                 |                 | whether         |                 |
-|                 |                 | statistics must |                 |
-|                 |                 | be gathered     |                 |
+| gather_stats    | OT_BOOL         | Deprecated      | casadi::Functio |
+|                 |                 | option          | nInternal       |
+|                 |                 | (ignored):      |                 |
+|                 |                 | Statistics are  |                 |
+|                 |                 | now always      |                 |
+|                 |                 | collected.      |                 |
 +-----------------+-----------------+-----------------+-----------------+
 | ignore_check_ve | OT_BOOL         | If set to true, | casadi::Nlpsol  |
 | c               |                 | the input shape |                 |
@@ -10497,6 +10870,8 @@ List of plugins
 
 
 
+- bonmin
+
 - ipopt
 
 - knitro
@@ -10513,6 +10888,118 @@ Note: some of the plugins in this list might not be available on your
 system. Also, there might be extra plugins available to you that are not
 listed here. You can obtain their documentation with
 Nlpsol.doc(\"myextraplugin\")
+
+
+
+--------------------------------------------------------------------------------
+
+bonmin
+------
+
+
+
+When in warmstart mode, output NLPSOL_LAM_X may be used as input
+
+NOTE: Even when max_iter == 0, it is not guaranteed that input(NLPSOL_X0) ==
+output(NLPSOL_X). Indeed if bounds on X or constraints are unmet, they will
+differ.
+
+For a good tutorial on BONMIN,
+seehttp://drops.dagstuhl.de/volltexte/2009/2089/pdf/09061.WaechterAndreas.Paper.2089.pdf
+
+A good resource about the algorithms in BONMIN is: Wachter and L. T.
+Biegler, On the Implementation of an Interior-Point Filter Line-Search
+Algorithm for Large-Scale Nonlinear Programming, Mathematical Programming
+106(1), pp. 25-57, 2006 (As Research Report RC 23149, IBM T. J. Watson
+Research Center, Yorktown, USA
+
+Caveats: with default options, multipliers for the decision variables are
+wrong for equality constraints. Change the 'fixed_variable_treatment' to
+'make_constraint' or 'relax_bounds' to obtain correct results.
+
+>List of available options
+
++------------------------+------------------------+------------------------+
+|           Id           |          Type          |      Description       |
++========================+========================+========================+
+| bonmin                 | OT_DICT                | Options to be passed   |
+|                        |                        | to BONMIN              |
++------------------------+------------------------+------------------------+
+| con_integer_md         | OT_DICT                | Integer metadata (a    |
+|                        |                        | dictionary with lists  |
+|                        |                        | of integers) about     |
+|                        |                        | constraints to be      |
+|                        |                        | passed to BONMIN       |
++------------------------+------------------------+------------------------+
+| con_numeric_md         | OT_DICT                | Numeric metadata (a    |
+|                        |                        | dictionary with lists  |
+|                        |                        | of reals) about        |
+|                        |                        | constraints to be      |
+|                        |                        | passed to BONMIN       |
++------------------------+------------------------+------------------------+
+| con_string_md          | OT_DICT                | String metadata (a     |
+|                        |                        | dictionary with lists  |
+|                        |                        | of strings) about      |
+|                        |                        | constraints to be      |
+|                        |                        | passed to BONMIN       |
++------------------------+------------------------+------------------------+
+| grad_f                 | OT_FUNCTION            | Function for           |
+|                        |                        | calculating the        |
+|                        |                        | gradient of the        |
+|                        |                        | objective (column,     |
+|                        |                        | autogenerated by       |
+|                        |                        | default)               |
++------------------------+------------------------+------------------------+
+| grad_f_options         | OT_DICT                | Options for the        |
+|                        |                        | autogenerated gradient |
+|                        |                        | of the objective.      |
++------------------------+------------------------+------------------------+
+| hess_lag               | OT_FUNCTION            | Function for           |
+|                        |                        | calculating the        |
+|                        |                        | Hessian of the         |
+|                        |                        | Lagrangian             |
+|                        |                        | (autogenerated by      |
+|                        |                        | default)               |
++------------------------+------------------------+------------------------+
+| hess_lag_options       | OT_DICT                | Options for the        |
+|                        |                        | autogenerated Hessian  |
+|                        |                        | of the Lagrangian.     |
++------------------------+------------------------+------------------------+
+| jac_g                  | OT_FUNCTION            | Function for           |
+|                        |                        | calculating the        |
+|                        |                        | Jacobian of the        |
+|                        |                        | constraints            |
+|                        |                        | (autogenerated by      |
+|                        |                        | default)               |
++------------------------+------------------------+------------------------+
+| jac_g_options          | OT_DICT                | Options for the        |
+|                        |                        | autogenerated Jacobian |
+|                        |                        | of the constraints.    |
++------------------------+------------------------+------------------------+
+| pass_nonlinear_variabl | OT_BOOL                | Pass list of variables |
+| es                     |                        | entering nonlinearly   |
+|                        |                        | to BONMIN              |
++------------------------+------------------------+------------------------+
+| var_integer_md         | OT_DICT                | Integer metadata (a    |
+|                        |                        | dictionary with lists  |
+|                        |                        | of integers) about     |
+|                        |                        | variables to be passed |
+|                        |                        | to BONMIN              |
++------------------------+------------------------+------------------------+
+| var_numeric_md         | OT_DICT                | Numeric metadata (a    |
+|                        |                        | dictionary with lists  |
+|                        |                        | of reals) about        |
+|                        |                        | variables to be passed |
+|                        |                        | to BONMIN              |
++------------------------+------------------------+------------------------+
+| var_string_md          | OT_DICT                | String metadata (a     |
+|                        |                        | dictionary with lists  |
+|                        |                        | of strings) about      |
+|                        |                        | variables to be passed |
+|                        |                        | to BONMIN              |
++------------------------+------------------------+------------------------+
+
+--------------------------------------------------------------------------------
 
 
 
@@ -10662,11 +11149,13 @@ SNOPT interface
 
 >List of available options
 
-+-------+---------+-------------------------------+
-|  Id   |  Type   |          Description          |
-+=======+=========+===============================+
-| snopt | OT_DICT | Options to be passed to SNOPT |
-+-------+---------+-------------------------------+
++-------+-----------+---------------------------------------------+
+|  Id   |   Type    |                 Description                 |
++=======+===========+=============================================+
+| snopt | OT_DICT   | Options to be passed to SNOPT               |
++-------+-----------+---------------------------------------------+
+| start | OT_STRING | Warm-start options for Worhp: cold|warm|hot |
++-------+-----------+---------------------------------------------+
 
 --------------------------------------------------------------------------------
 
@@ -10844,181 +11333,6 @@ Joel Andersson
 
 ";
 
-%feature("docstring") casadi::has_qpsol "
-
-Check if a particular plugin is available.
-
-";
-
-%feature("docstring") casadi::linsol "
-
-Create a solver for linear systems of equations Solves the linear system A*X
-= B or A^T*X = B for X with A square and non-singular
-
-If A is structurally singular, an error will be thrown during init. If A is
-numerically singular, the prepare step will fail.
-
-The usual procedure to use Linsol is: init()
-
-set the first input (A)
-
-prepare()
-
-set the second input (b)
-
-solve()
-
-Repeat steps 4 and 5 to work with other b vectors.
-
-The standard evaluation combines the prepare() and solve() step and may
-therefore more expensive if A is invariant.
-
-General information
-===================
-
-
-
->Input scheme: casadi::LinsolInput (LINSOL_NUM_IN = 2) []
-
-+-----------+-------+----------------------------------------------+
-| Full name | Short |                 Description                  |
-+===========+=======+==============================================+
-| LINSOL_A  |       | The square matrix A: sparse, (n x n)         |
-+-----------+-------+----------------------------------------------+
-| LINSOL_B  |       | The right-hand-side matrix b: dense, (n x m) |
-+-----------+-------+----------------------------------------------+
-
->Output scheme: casadi::LinsolOutput (LINSOL_NUM_OUT = 1) []
-
-+-----------+-------+---------------------------------------------+
-| Full name | Short |                 Description                 |
-+===========+=======+=============================================+
-| LINSOL_X  |       | Solution to the linear system of equations. |
-+-----------+-------+---------------------------------------------+
-
-List of plugins
-===============
-
-
-
-- csparsecholesky
-
-- csparse
-
-- lapacklu
-
-- lapackqr
-
-- symbolicqr
-
-Note: some of the plugins in this list might not be available on your
-system. Also, there might be extra plugins available to you that are not
-listed here. You can obtain their documentation with
-Linsol.doc(\"myextraplugin\")
-
-
-
---------------------------------------------------------------------------------
-
-csparsecholesky
----------------
-
-
-
-Linsol with CSparseCholesky Interface
-
---------------------------------------------------------------------------------
-
-
-
-
-
---------------------------------------------------------------------------------
-
-csparse
--------
-
-
-
-Linsol with CSparse Interface
-
---------------------------------------------------------------------------------
-
-
-
-
-
---------------------------------------------------------------------------------
-
-lapacklu
---------
-
-
-
-This class solves the linear system A.x=b by making an LU factorization of
-A: A = L.U, with L lower and U upper triangular
-
->List of available options
-
-+------------------------+------------------------+------------------------+
-|           Id           |          Type          |      Description       |
-+========================+========================+========================+
-| allow_equilibration_fa | OT_BOOL                | Non-fatal error when   |
-| ilure                  |                        | equilibration fails    |
-+------------------------+------------------------+------------------------+
-| equilibration          | OT_BOOL                | Equilibrate the matrix |
-+------------------------+------------------------+------------------------+
-
---------------------------------------------------------------------------------
-
-
-
---------------------------------------------------------------------------------
-
-lapackqr
---------
-
-
-
-This class solves the linear system A.x=b by making an QR factorization of
-A: A = Q.R, with Q orthogonal and R upper triangular
-
---------------------------------------------------------------------------------
-
-
-
-
-
---------------------------------------------------------------------------------
-
-symbolicqr
-----------
-
-
-
-Linsol based on QR factorization with sparsity pattern based reordering
-without partial pivoting
-
->List of available options
-
-+------------------------+------------------------+------------------------+
-|           Id           |          Type          |      Description       |
-+========================+========================+========================+
-| codegen                | OT_BOOL                | C-code generation      |
-+------------------------+------------------------+------------------------+
-| compiler               | OT_STRING              | Compiler command to be |
-|                        |                        | used for compiling     |
-|                        |                        | generated code         |
-+------------------------+------------------------+------------------------+
-
---------------------------------------------------------------------------------
-
-
-
-Joel Andersson
-
-";
-
 %feature("docstring") casadi::userOut "";
 
 %feature("docstring") casadi::casadi_norm_inf_mul "[INTERNAL]  Inf-norm of
@@ -11037,6 +11351,20 @@ y.size1()+x.size2()+1
 %feature("docstring") casadi::matrixName< SXElem > " [INTERNAL] ";
 
 %feature("docstring") casadi::casadi_fill "[INTERNAL]  FILL: x <- alpha.
+
+";
+
+%feature("docstring") casadi::conic_out "
+
+>  CASADI_EXPORT[str] conic_out()
+------------------------------------------------------------------------
+
+Get QP solver output scheme of QP solvers.
+
+>  str conic_out(int ind)
+------------------------------------------------------------------------
+
+Get output scheme name by index.
 
 ";
 

@@ -27,7 +27,7 @@
 #define CASADI_INTEGRATOR_IMPL_HPP
 
 #include "integrator.hpp"
-#include "function_internal.hpp"
+#include "oracle_function.hpp"
 #include "plugin_interface.hpp"
 
 /// \cond INTERNAL
@@ -35,7 +35,7 @@
 namespace casadi {
 
   /** \brief Integrator memory */
-  struct CASADI_EXPORT IntegratorMemory : public WorkMemory {
+  struct CASADI_EXPORT IntegratorMemory : public OracleMemory {
   };
 
   /** \brief Internal storage for integrator related data
@@ -45,10 +45,10 @@ namespace casadi {
       \date 2010
   */
   class CASADI_EXPORT
-  Integrator : public FunctionInternal, public PluginInterface<Integrator> {
+  Integrator : public OracleFunction, public PluginInterface<Integrator> {
   public:
     /** \brief  Constructor */
-    Integrator(const std::string& name, Oracle* dae);
+    Integrator(const std::string& name, const Function& oracle);
 
     /** \brief  Destructor */
     virtual ~Integrator()=0;
@@ -107,82 +107,77 @@ namespace casadi {
     virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
 
     /** \brief  Print solver statistics */
-    virtual void printStats(IntegratorMemory* mem, std::ostream &stream) const {}
+    virtual void print_stats(IntegratorMemory* mem, std::ostream &stream) const {}
 
     /** \brief  Propagate sparsity forward */
-    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
+    virtual void sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
 
     /** \brief  Propagate sparsity backwards */
-    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
+    virtual void sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
 
+    ///@{
     /// Is the class able to propagate seeds through the algorithm?
-    virtual bool spCanEvaluate(bool fwd) { return true;}
+    virtual bool has_spfwd() const { return true;}
+    virtual bool has_sprev() const { return true;}
+    ///@}
 
     ///@{
     /** \brief Generate a function that calculates \a nfwd forward derivatives */
-    virtual Function get_forward(const std::string& name, int nfwd, Dict& opts);
+    virtual Function get_forward_old(const std::string& name, int nfwd, Dict& opts);
     virtual int get_n_forward() const { return 64;}
     ///@}
 
     ///@{
     /** \brief Generate a function that calculates \a nadj adjoint derivatives */
-    virtual Function get_reverse(const std::string& name, int nadj, Dict& opts);
+    virtual Function get_reverse_old(const std::string& name, int nadj, Dict& opts);
     virtual int get_n_reverse() const { return 64;}
     ///@}
 
     /** \brief  Set stop time for the integration */
     virtual void setStopTime(IntegratorMemory* mem, double tf) const;
 
-    // Helper structure
-    struct AugOffset {
-      std::vector<int> x, z, q, p, rx, rz, rq, rp;
-    };
-
     /** \brief Set solver specific options to generated augmented integrators */
     virtual Dict getDerivativeOptions(bool fwd);
 
-    /** \brief Generate a augmented DAE system with \a nfwd forward sensitivities  */
-    template<typename MatType>
-      std::map<std::string, MatType> aug_fwd(int nfwd, AugOffset& offset);
+    /** \brief Generate a augmented DAE system with \a nfwd forward sensitivities */
+    template<typename MatType> std::map<std::string, MatType> aug_fwd(int nfwd);
 
-    /** \brief Generate a augmented DAE system with \a nfwd forward sensitivities
-    * and \a nadj adjoint sensitivities */
-    template<typename MatType>
-      std::map<std::string, MatType> aug_adj(int nadj, AugOffset& offset);
-
-    /// Get offsets in augmented problem
-    AugOffset getAugOffset(int nfwd, int nadj);
+    /** \brief Generate a augmented DAE system with \a nadj adjoint sensitivities */
+    template<typename MatType> std::map<std::string, MatType> aug_adj(int nadj);
 
     /// Create sparsity pattern of the extended Jacobian (forward problem)
-    Sparsity spJacF();
+    Sparsity sp_jac_dae();
 
     /// Create sparsity pattern of the extended Jacobian (backward problem)
-    Sparsity spJacG();
+    Sparsity sp_jac_rdae();
 
-    // Sparities
-    Sparsity t_, x_, z_, p_, q_, rx_, rz_, rp_, rq_;
+    // Sparsity pattern of the extended Jacobians
+    Sparsity sp_jac_dae_, sp_jac_rdae_;
 
     ///@{
     // Shorthands
-    const Sparsity&  t() { return t_;}
-    const Sparsity&  x() { return x_;}
-    const Sparsity&  z() { return z_;}
-    const Sparsity&  p() { return p_;}
-    const Sparsity&  q() { return q_;}
-    const Sparsity& rx() { return rx_;}
-    const Sparsity& rz() { return rz_;}
-    const Sparsity& rp() { return rp_;}
-    const Sparsity& rq() { return rq_;}
+    const Sparsity&  t() { return oracle_.sparsity_in(DE_T);}
+    const Sparsity&  x() { return oracle_.sparsity_in(DE_X);}
+    const Sparsity&  z() { return oracle_.sparsity_in(DE_Z);}
+    const Sparsity&  p() { return oracle_.sparsity_in(DE_P);}
+    const Sparsity&  q() { return oracle_.sparsity_out(DE_QUAD);}
+    const Sparsity& rx() { return oracle_.sparsity_in(DE_RX);}
+    const Sparsity& rz() { return oracle_.sparsity_in(DE_RZ);}
+    const Sparsity& rp() { return oracle_.sparsity_in(DE_RP);}
+    const Sparsity& rq() { return oracle_.sparsity_out(DE_RQUAD);}
     ///@}
 
     /// Number of states for the forward integration
-    int nx_, nz_, nq_;
+    int nx_, nz_, nq_, nx1_, nz1_, nq1_;
 
     /// Number of states for the backward integration
-    int nrx_, nrz_, nrq_;
+    int nrx_, nrz_, nrq_, nrx1_, nrz1_, nrq1_;
 
     /// Number of forward and backward parameters
-    int np_, nrp_;
+    int np_, nrp_, np1_, nrp1_;
+
+    /// Number of sensitivities
+    int ns_;
 
     // Time grid
     std::vector<double> grid_;
@@ -194,20 +189,8 @@ namespace casadi {
     // Copy of the options
     Dict opts_;
 
-    // Dae
-    Oracle* dae_;
-
     /// One step
     Function onestep_;
-
-    /// ODE/DAE forward integration function
-    Function f_;
-
-    /// ODE/DAE backward integration function, if any
-    Function g_;
-
-    /// Integrator for sparsity pattern propagation
-    Function linsol_f_, linsol_g_;
 
     /// Options
     bool print_stats_;
@@ -217,7 +200,7 @@ namespace casadi {
     int ntout_;
 
     // Creator function for internal class
-    typedef Integrator* (*Creator)(const std::string& name, Oracle* dae);
+    typedef Integrator* (*Creator)(const std::string& name, const Function& oracle);
 
     // No static functions exposed
     struct Exposed{ };
@@ -230,78 +213,9 @@ namespace casadi {
 
     /// Convert dictionary to Problem
     template<typename XType>
-      static Oracle* map2problem(const std::map<std::string, XType>& d);
-
-    /// Get the (legacy) dae forward function
-    template<typename XType>
-      static Oracle* fun2problem(Function f, Function g=Function());
+      static Function map2oracle(const std::string& name,
+        const std::map<std::string, XType>& d, const Dict& opts=Dict());
   };
-
-  template<typename XType>
-  Oracle* Integrator::map2problem(const std::map<std::string, XType>& d) {
-    std::vector<XType> de_in(DE_NUM_IN), de_out(DE_NUM_OUT);
-    for (auto&& i : d) {
-      if (i.first=="t") {
-        de_in[DE_T]=i.second;
-      } else if (i.first=="x") {
-        de_in[DE_X]=i.second;
-      } else if (i.first=="z") {
-        de_in[DE_Z]=i.second;
-      } else if (i.first=="p") {
-        de_in[DE_P]=i.second;
-      } else if (i.first=="rx") {
-        de_in[DE_RX]=i.second;
-      } else if (i.first=="rz") {
-        de_in[DE_RZ]=i.second;
-      } else if (i.first=="rp") {
-        de_in[DE_RP]=i.second;
-      } else if (i.first=="ode") {
-        de_out[DE_ODE]=i.second;
-      } else if (i.first=="alg") {
-        de_out[DE_ALG]=i.second;
-      } else if (i.first=="quad") {
-        de_out[DE_QUAD]=i.second;
-      } else if (i.first=="rode") {
-        de_out[DE_RODE]=i.second;
-      } else if (i.first=="ralg") {
-        de_out[DE_RALG]=i.second;
-      } else if (i.first=="rquad") {
-        de_out[DE_RQUAD]=i.second;
-      } else {
-        casadi_error("No such field: " + i.first);
-      }
-    }
-    return Oracle::construct(de_in, de_out, DE_INPUTS, DE_OUTPUTS);
-  }
-
-  template<typename XType>
-  Oracle* Integrator::fun2problem(Function f, Function g) {
-    std::vector<XType> dae_in(DE_NUM_IN), dae_out(DE_NUM_OUT);
-    std::vector<XType> v = XType::get_input(f), vf=v, vg=v;
-    dae_in[DE_T] = v[DAE_T];
-    dae_in[DE_X] = v[DAE_X];
-    dae_in[DE_Z] = v[DAE_Z];
-    dae_in[DE_P] = v[DAE_P];
-    v = f(v);
-    dae_out[DE_ODE] = v[DAE_ODE];
-    dae_out[DE_ALG] = v[DAE_ALG];
-    dae_out[DE_QUAD] = v[DAE_QUAD];
-    if (!g.is_null()) {
-      v = XType::get_input(g);
-      dae_in[DE_RX] = v[RDAE_RX];
-      dae_in[DE_RZ] = v[RDAE_RZ];
-      dae_in[DE_RP] = v[RDAE_RP];
-      vg[DAE_T] = v[RDAE_T];
-      vg[DAE_X] = v[RDAE_X];
-      vg[DAE_Z] = v[RDAE_Z];
-      vg[DAE_P] = v[RDAE_P];
-      v = substitute(g(v), vg, vf);
-      dae_out[DE_RODE] = v[RDAE_ODE];
-      dae_out[DE_RALG] = v[RDAE_ALG];
-      dae_out[DE_RQUAD] = v[RDAE_QUAD];
-    }
-    return Oracle::construct(dae_in, dae_out, DE_INPUTS, DE_OUTPUTS);
-  }
 
   struct CASADI_EXPORT FixedStepMemory : public IntegratorMemory {
     // Current time
@@ -327,7 +241,7 @@ namespace casadi {
   public:
 
     /// Constructor
-    explicit FixedStepIntegrator(const std::string& name, Oracle* dae);
+    explicit FixedStepIntegrator(const std::string& name, const Function& dae);
 
     /// Destructor
     virtual ~FixedStepIntegrator();
@@ -392,7 +306,7 @@ namespace casadi {
   public:
 
     /// Constructor
-    explicit ImplicitFixedStepIntegrator(const std::string& name, Oracle* dae);
+    explicit ImplicitFixedStepIntegrator(const std::string& name, const Function& dae);
 
     /// Destructor
     virtual ~ImplicitFixedStepIntegrator();

@@ -26,8 +26,23 @@
 #ifndef CASADI_LAPACK_QR_HPP
 #define CASADI_LAPACK_QR_HPP
 
-#include "casadi/core/function/linsol_impl.hpp"
+#include "casadi/core/function/linsol_internal.hpp"
 #include <casadi/interfaces/lapack/casadi_linsol_lapackqr_export.h>
+
+extern "C" {
+  /// QR-factorize dense matrix (lapack)
+  void dgeqrf_(int *m, int *n, double *a, int *lda, double *tau,
+               double *work, int *lwork, int *info);
+
+  /// Multiply right hand side with Q-transpose (lapack)
+  void dormqr_(char *side, char *trans, int *n, int *m, int *k, double *a,
+               int *lda, double *tau, double *c, int *ldc,
+               double *work, int *lwork, int *info);
+
+  /// Solve upper triangular system (lapack)
+  void dtrsm_(char *side, char *uplo, char *transa, char *diag, int *m, int *n,
+                         double *alpha, double *a, int *lda, double *b, int *ldb);
+}
 
 /** \defgroup plugin_Linsol_lapackqr
 *
@@ -39,21 +54,7 @@
 
 /// \cond INTERNAL
 namespace casadi {
-
-  /// QR-factorize dense matrix (lapack)
-  extern "C" void dgeqrf_(int *m, int *n, double *a, int *lda, double *tau,
-                          double *work, int *lwork, int *info);
-
-  /// Multiply right hand side with Q-transpose (lapack)
-  extern "C" void dormqr_(char *side, char *trans, int *n, int *m, int *k, double *a,
-                          int *lda, double *tau, double *c, int *ldc,
-                          double *work, int *lwork, int *info);
-
-  /// Solve upper triangular system (lapack)
-  extern "C" void dtrsm_(char *side, char *uplo, char *transa, char *diag, int *m, int *n,
-                         double *alpha, double *a, int *lda, double *b, int *ldb);
-
-  struct CASADI_LINSOL_LAPACKQR_EXPORT LapackQrMemory {
+  struct CASADI_LINSOL_LAPACKQR_EXPORT LapackQrMemory : public LinsolMemory {
     // Matrix
     std::vector<double> mat;
 
@@ -70,14 +71,14 @@ namespace casadi {
    @copydoc plugin_Linsol_lapackqr
    *
    */
-  class CASADI_LINSOL_LAPACKQR_EXPORT LapackQr : public Linsol {
+  class CASADI_LINSOL_LAPACKQR_EXPORT LapackQr : public LinsolInternal {
   public:
     // Create a linear solver given a sparsity pattern and a number of right hand sides
-    LapackQr(const std::string& name, const Sparsity& sparsity, int nrhs);
+    LapackQr(const std::string& name);
 
     /** \brief  Create a new Linsol */
-    static Linsol* creator(const std::string& name, const Sparsity& sp, int nrhs) {
-      return new LapackQr(name, sp, nrhs);
+    static LinsolInternal* creator(const std::string& name) {
+      return new LapackQr(name);
     }
 
     // Destructor
@@ -95,11 +96,14 @@ namespace casadi {
     /** \brief Initalize memory block */
     virtual void init_memory(void* mem) const;
 
+    // Set sparsity pattern
+    virtual void reset(void* mem, const int* sp) const;
+
     // Factorize the linear system
-    virtual void linsol_factorize(void* mem, const double* A) const;
+    virtual void factorize(void* mem, const double* A) const;
 
     // Solve the linear system
-    virtual void linsol_solve(void* mem, double* x, int nrhs, bool tr) const;
+    virtual void solve(void* mem, double* x, int nrhs, bool tr) const;
 
     /// A documentation string
     static const std::string meta_doc;

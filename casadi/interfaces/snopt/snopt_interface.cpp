@@ -49,7 +49,7 @@ namespace casadi {
     Nlpsol::registerPlugin(casadi_register_nlpsol_snopt);
   }
 
-  SnoptInterface::SnoptInterface(const std::string& name, Oracle* nlp)
+  SnoptInterface::SnoptInterface(const std::string& name, const Function& nlp)
     : Nlpsol(name, nlp) {
   }
 
@@ -61,7 +61,10 @@ namespace casadi {
   = {{&Nlpsol::options_},
      {{"snopt",
        {OT_DICT,
-        "Options to be passed to SNOPT"}}
+        "Options to be passed to SNOPT"}},
+      {"start",
+       {OT_STRING,
+        "Warm-start options for Worhp: cold|warm|hot"}}
      }
   };
 
@@ -69,16 +72,30 @@ namespace casadi {
     // Call the init method of the base class
     Nlpsol::init(opts);
 
+    // Default: cold start
+    Cold_ = 0;
+
     // Read user options
     for (auto&& op : opts) {
       if (op.first=="snopt") {
         opts_ = op.second;
+      } else if (op.first=="start") {
+        std::string start = op.second.to_string();
+        if (start=="cold") {
+          Cold_ = 0;
+        } else if (start=="warm") {
+          Cold_ = 1;
+        } else if (start=="hot") {
+          Cold_ = 2;
+        } else {
+          casadi_error("Unknown start option: " + start);
+        }
       }
     }
 
     // Get/generate required functions
-    jac_f_fcn_ = create_function("nlp_jac_f", {"x", "p"}, {"f", "jac_f_x"});
-    jac_g_fcn_ = create_function("nlp_jac_g", {"x", "p"}, {"g", "jac_g_x"});
+    jac_f_fcn_ = create_function("nlp_jac_f", {"x", "p"}, {"f", "jac:f:x"});
+    jac_g_fcn_ = create_function("nlp_jac_g", {"x", "p"}, {"g", "jac:g:x"});
     jacg_sp_ = jac_g_fcn_.sparsity_out(1);
 
     // prepare the mapping for constraints
@@ -114,7 +131,7 @@ namespace casadi {
     for (int j = 0; j < nnObj_; ++j) {
       if (d.colind(j) != d.colind(j+1)) {
         int k = d.colind(j);
-        d[k] = 0;
+        d.nz(k) = 0;
       }
     }
 
@@ -200,16 +217,17 @@ namespace casadi {
     snProblem prob;
 
     // Evaluate gradF and jacG at initial value
-    if (!jac_g_fcn_.is_null()) {
-      std::fill_n(m->arg, jac_g_fcn_.n_in(), nullptr);
-      m->arg[0] = m->x0;
-      m->arg[1] = m->p;
-      std::fill_n(m->res, jac_g_fcn_.n_out(), nullptr);
-      m->res[0] = 0;
-      m->res[1] = m->jac_gk;
-      jac_g_fcn_(m->arg, m->res, m->iw, m->w, 0);
-    }
-    calc_function(m, jac_f_fcn_, {m->x0, m->p}, {0, m->jac_fk});
+    const double** arg = m->arg;
+    *arg++ = m->x0;
+    *arg++ = m->p;
+    double** res = m->res;
+    *res++ = 0;
+    *res++ = m->jac_gk;
+    calc_function(m, "nlp_jac_g");
+    res = m->res;
+    *res++ = 0;
+    *res++ = m->jac_fk;
+    calc_function(m, "nlp_jac_f");
 
     // perform the mapping:
     // populate A_data_ (the nonzeros of A)
@@ -314,8 +332,7 @@ namespace casadi {
     m->fstats.at("mainloop").toc();
 
     // Run SNOPT
-    int Cold = 0;
-    int info = solveC(&prob, Cold, &m->fk);
+    int info = solveC(&prob, Cold_, &m->fk);
     casadi_assert_message(99 != info, "snopt problem set up improperly");
 
     // Negate rc to match CasADi's definition
@@ -357,7 +374,13 @@ namespace casadi {
       for (int k = 0; k < nnObj; ++k) m->xk2[k] = x[k];
 
       // Evaluate gradF with the linear variables put to zero
-      calc_function(m, jac_f_fcn_, {m->xk2, m->p}, {fObj, m->jac_fk});
+      const double** arg = m->arg;
+      *arg++ = m->xk2;
+      *arg++ = m->p;
+      double** res = m->res;
+      *res++ = fObj;
+      *res++ = m->jac_fk;
+      calc_function(m, "nlp_jac_f");
 
       // provide nonlinear part of objective gradient to SNOPT
       for (int k = 0; k < nnObj; ++k) {
@@ -380,13 +403,13 @@ namespace casadi {
         }
 
         // Evaluate jacG with the linear variabes put to zero
-        std::fill_n(m->arg, jac_g_fcn_.n_in(), nullptr);
-        m->arg[0] = m->xk2;
-        m->arg[1] = m->p;
-        std::fill_n(m->res, jac_g_fcn_.n_out(), nullptr);
-        m->res[0] = m->gk;
-        m->res[1] = m->jac_gk;
-        jac_g_fcn_(m->arg, m->res, m->iw, m->w, 0);
+        const double** arg = m->arg;
+        *arg++ = m->xk2;
+        *arg++ = m->p;
+        double** res = m->res;
+        *res++ = m->gk;
+        *res++ = m->jac_gk;
+        calc_function(m, "nlp_jac_g");
 
         // provide nonlinear part of constraint jacobian to SNOPT
         int kk = 0;

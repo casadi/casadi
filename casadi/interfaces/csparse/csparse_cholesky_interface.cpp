@@ -32,7 +32,7 @@ namespace casadi {
 
   extern "C"
   int CASADI_LINSOL_CSPARSECHOLESKY_EXPORT
-  casadi_register_linsol_csparsecholesky(Linsol::Plugin* plugin) {
+  casadi_register_linsol_csparsecholesky(LinsolInternal::Plugin* plugin) {
     plugin->creator = CSparseCholeskyInterface::creator;
     plugin->name = "csparsecholesky";
     plugin->doc = CSparseCholeskyInterface::meta_doc.c_str();
@@ -42,16 +42,11 @@ namespace casadi {
 
   extern "C"
   void CASADI_LINSOL_CSPARSECHOLESKY_EXPORT casadi_load_linsol_csparsecholesky() {
-    Linsol::registerPlugin(casadi_register_linsol_csparsecholesky);
+    LinsolInternal::registerPlugin(casadi_register_linsol_csparsecholesky);
   }
 
-  CSparseCholeskyInterface::CSparseCholeskyInterface(const std::string& name,
-                                                     const Sparsity& sparsity, int nrhs) :
-    Linsol(name, sparsity, nrhs) {
-
-    casadi_assert_message(sparsity.is_symmetric(),
-                          "CSparseCholeskyInterface: supplied sparsity must be symmetric, got "
-                          << sparsity.dim() << ".");
+  CSparseCholeskyInterface::CSparseCholeskyInterface(const std::string& name) :
+    LinsolInternal(name) {
   }
 
   CSparseCholeskyInterface::~CSparseCholeskyInterface() {
@@ -65,28 +60,60 @@ namespace casadi {
 
   void CSparseCholeskyInterface::init(const Dict& opts) {
     // Call the init method of the base class
-    Linsol::init(opts);
+    LinsolInternal::init(opts);
   }
 
   void CSparseCholeskyInterface::init_memory(void* mem) const {
+    LinsolInternal::init_memory(mem);
+  }
+
+  void CSparseCholeskyInterface::reset(void* mem, const int* sp) const {
+    LinsolInternal::reset(mem, sp);
     auto m = static_cast<CsparseCholMemory*>(mem);
+
     m->L = 0;
     m->S = 0;
-    m->A.nzmax = nnz_in(0);  // maximum number of entries
-    m->A.m = size1_in(0); // number of columns
-    m->A.n = size2_in(0); // number of rows
-    m->A.p = const_cast<int*>(sparsity_in(0).colind()); // row pointers (size n+1)
+    m->A.nzmax = m->nnz();  // maximum number of entries
+    m->A.m = m->nrow(); // number of columns
+    m->A.n = m->ncol(); // number of rows
+    m->A.p = const_cast<int*>(m->colind()); // row pointers (size n+1)
     // or row indices (size nzmax)
-    m->A.i = const_cast<int*>(sparsity_in(0).row()); // column indices, size nzmax
+    m->A.i = const_cast<int*>(m->row()); // column indices, size nzmax
     m->A.x = 0; // numerical values, size nzmax
     m->A.nz = -1; // of entries in triplet matrix, -1 for compressed-row
 
     // Temporary
     m->temp.resize(m->A.n);
+  }
+
+  void CSparseCholeskyInterface::pivoting(void* mem, const double* A) const {
+    LinsolInternal::pivoting(mem, A);
+    auto m = static_cast<CsparseCholMemory*>(mem);
+
+    // Set the nonzeros of the matrix
+    m->A.x = const_cast<double*>(A);
 
     // ordering and symbolic analysis
     int order = 0; // ordering?
     m->S = cs_schol(order, &m->A);
+  }
+
+  void CSparseCholeskyInterface::factorize(void* mem, const double* A) const {
+    auto m = static_cast<CsparseCholMemory*>(mem);
+
+    // Set the nonzeros of the matrix
+    m->A.x = const_cast<double*>(A);
+
+    // Make sure that all entries of the linear system are valid
+    int nnz = m->nnz();
+    for (int k=0; k<nnz; ++k) {
+      casadi_assert_message(!isnan(A[k]), "Nonzero " << k << " is not-a-number");
+      casadi_assert_message(!isinf(A[k]), "Nonzero " << k << " is infinite");
+    }
+
+    if (m->L) cs_nfree(m->L);
+    m->L = cs_chol(&m->A, m->S) ;                 // numeric Cholesky factorization
+    casadi_assert(m->L!=0);
   }
 
   Sparsity CSparseCholeskyInterface::linsol_cholesky_sparsity(void* mem, bool tr) const {
@@ -140,26 +167,7 @@ namespace casadi {
     return tr ? ret.T() : ret;
   }
 
-  void CSparseCholeskyInterface::linsol_factorize(void* mem, const double* A) const {
-    auto m = static_cast<CsparseCholMemory*>(mem);
-
-    // Set the nonzeros of the matrix
-    casadi_assert(A!=0);
-    m->A.x = const_cast<double*>(A);
-
-    // Make sure that all entries of the linear system are valid
-    int nnz = nnz_in(0);
-    for (int k=0; k<nnz; ++k) {
-      casadi_assert_message(!isnan(A[k]), "Nonzero " << k << " is not-a-number");
-      casadi_assert_message(!isinf(A[k]), "Nonzero " << k << " is infinite");
-    }
-
-    if (m->L) cs_nfree(m->L);
-    m->L = cs_chol(&m->A, m->S) ;                 // numeric Cholesky factorization
-    casadi_assert(m->L!=0);
-  }
-
-  void CSparseCholeskyInterface::linsol_solve(void* mem, double* x, int nrhs, bool tr) const {
+  void CSparseCholeskyInterface::solve(void* mem, double* x, int nrhs, bool tr) const {
     auto m = static_cast<CsparseCholMemory*>(mem);
 
     casadi_assert(m->L!=0);
@@ -177,11 +185,11 @@ namespace casadi {
         cs_ltsolve(m->L->L, t) ;              // t = U\t
         cs_ipvec(m->S->q, t, x, m->A.n) ;      // x = P2\t
       }
-      x += ncol();
+      x += m->ncol();
     }
   }
 
-  void CSparseCholeskyInterface::linsol_solveL(void* mem, double* x, int nrhs, bool tr) const {
+  void CSparseCholeskyInterface::solve_cholesky(void* mem, double* x, int nrhs, bool tr) const {
     auto m = static_cast<CsparseCholMemory*>(mem);
 
     casadi_assert(m->L!=0);
@@ -193,7 +201,7 @@ namespace casadi {
       if (tr) cs_lsolve(m->L->L, t) ; // t = L\t
       if (!tr) cs_ltsolve(m->L->L, t) ; // t = U\t
       cs_ipvec(m->S->q, t, x, m->A.n) ;      // x = P2\t
-      x += ncol();
+      x += m->ncol();
     }
   }
 

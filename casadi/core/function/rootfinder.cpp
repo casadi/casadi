@@ -34,11 +34,11 @@ using namespace std;
 namespace casadi {
 
   bool has_rootfinder(const string& name) {
-    return Rootfinder::hasPlugin(name);
+    return Rootfinder::has_plugin(name);
   }
 
   void load_rootfinder(const string& name) {
-    Rootfinder::loadPlugin(name);
+    Rootfinder::load_plugin(name);
   }
 
   string doc_rootfinder(const string& name) {
@@ -49,7 +49,7 @@ Function Function::rootfinder_fun() {
     casadi_assert(!is_null());
     Rootfinder* n = dynamic_cast<Rootfinder*>(get());
     casadi_assert_message(n!=0, "Not a rootfinder");
-    return n->f_;
+    return n->oracle();
   }
 
   Function Function::rootfinder_jac() {
@@ -57,13 +57,6 @@ Function Function::rootfinder_fun() {
     Rootfinder* n = dynamic_cast<Rootfinder*>(get());
     casadi_assert_message(n!=0, "Not a rootfinder");
     return n->jac_;
-  }
-
-  Function Function::rootfinder_linsol() {
-    casadi_assert(!is_null());
-    Rootfinder* n = dynamic_cast<Rootfinder*>(get());
-    casadi_assert_message(n!=0, "Not a rootfinder");
-    return n->linsol_;
   }
 
   Function rootfinder(const std::string& name, const std::string& solver,
@@ -74,8 +67,8 @@ Function Function::rootfinder_fun() {
     return ret;
   }
 
-  Rootfinder::Rootfinder(const std::string& name, const Function& f)
-    : FunctionInternal(name), f_(f) {
+  Rootfinder::Rootfinder(const std::string& name, const Function& oracle)
+    : OracleFunction(name, oracle) {
 
     // Default options
     iin_ = 0;
@@ -133,29 +126,30 @@ Function Function::rootfinder_fun() {
     }
 
     // Get the number of equations and check consistency
-    casadi_assert_message(iin_>=0 && iin_<f_.n_in() && f_.n_in()>0,
+    casadi_assert_message(iin_>=0 && iin_<oracle_.n_in() && oracle_.n_in()>0,
                           "Implicit input not in range");
-    casadi_assert_message(iout_>=0 && iout_<f_.n_out() && f_.n_out()>0,
+    casadi_assert_message(iout_>=0 && iout_<oracle_.n_out() && oracle_.n_out()>0,
                           "Implicit output not in range");
-    casadi_assert_message(f_.sparsity_out(iout_).is_dense()
-                          && f_.sparsity_out(iout_).is_column(),
+    casadi_assert_message(oracle_.sparsity_out(iout_).is_dense()
+                          && oracle_.sparsity_out(iout_).is_column(),
                           "Residual must be a dense vector");
-    casadi_assert_message(f_.sparsity_in(iin_).is_dense()
-                          && f_.sparsity_in(iin_).is_column(),
+    casadi_assert_message(oracle_.sparsity_in(iin_).is_dense()
+                          && oracle_.sparsity_in(iin_).is_column(),
                           "Unknown must be a dense vector");
-    n_ = f_.nnz_out(iout_);
-    casadi_assert_message(n_ == f_.nnz_in(iin_),
+    n_ = oracle_.nnz_out(iout_);
+    casadi_assert_message(n_ == oracle_.nnz_in(iin_),
                           "Dimension mismatch. Input size is "
-                          << f_.nnz_in(iin_)
+                          << oracle_.nnz_in(iin_)
                           << ", while output size is "
-                          << f_.nnz_out(iout_));
+                          << oracle_.nnz_out(iout_));
 
     // Call the base class initializer
     FunctionInternal::init(opts);
 
 
     // Generate Jacobian if not provided
-    if (jac_.is_null()) jac_ = f_.jacobian(iin_, iout_);
+    if (jac_.is_null()) jac_ = oracle_.jacobian(iin_, iout_);
+    sp_jac_ = jac_.sparsity_out(0);
 
     // Check for structural singularity in the Jacobian
     casadi_assert_message(
@@ -164,13 +158,7 @@ Function Function::rootfinder_fun() {
       "sprank(J)=" << sprank(jac_.sparsity_out(0)) << " (instead of "<< jac_.size1_out(0) << ")");
 
     // Get the linear solver creator function
-    if (linsol_.is_null()) {
-      linsol_ = linsol("linsol", linear_solver,
-                       jac_.sparsity_out(0), 1, linear_solver_options);
-    } else {
-      casadi_assert(linsol_.sparsity_in(0)==jac_.sparsity_out(0));
-    }
-    alloc(linsol_);
+    linsol_ = Linsol("linsol", linear_solver, linear_solver_options);
 
     // Constraints
     casadi_assert_message(u_c_.size()==n_ || u_c_.empty(),
@@ -178,8 +166,8 @@ Function Function::rootfinder_fun() {
                           << u_c_.size() << " and n = " << n_);
 
     // Allocate sufficiently large work vectors
-    alloc(f_);
-    size_t sz_w = f_.sz_w();
+    alloc(oracle_);
+    size_t sz_w = oracle_.sz_w();
     if (!jac_.is_null()) {
       alloc(jac_);
       sz_w = max(sz_w, jac_.sz_w());
@@ -187,8 +175,13 @@ Function Function::rootfinder_fun() {
     alloc_w(sz_w + 2*static_cast<size_t>(n_));
   }
 
+  void Rootfinder::init_memory(void* mem) const {
+    auto m = static_cast<RootfinderMemory*>(mem);
+    linsol_.reset(sp_jac_);
+  }
+
   Function Rootfinder
-  ::get_forward(const std::string& name, int nfwd, Dict& opts) {
+  ::get_forward_old(const std::string& name, int nfwd, Dict& opts) {
     // Symbolic expression for the input
     vector<MX> arg = mx_in();
     arg[iin_] = MX::sym(arg[iin_].name() + "_guess",
@@ -206,7 +199,7 @@ Function Function::rootfinder_fun() {
   }
 
   Function Rootfinder
-  ::get_reverse(const std::string& name, int nadj, Dict& opts) {
+  ::get_reverse_old(const std::string& name, int nadj, Dict& opts) {
     // Symbolic expression for the input
     vector<MX> arg = mx_in();
     arg[iin_] = MX::sym(arg[iin_].name() + "_guess",
@@ -223,7 +216,7 @@ Function Function::rootfinder_fun() {
     return Function(name, arg, res, opts);
   }
 
-  void Rootfinder::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+  void Rootfinder::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     int num_out = n_out();
     int num_in = n_in();
     bvec_t* tmp1 = w; w += n_;
@@ -236,11 +229,11 @@ Function Function::rootfinder_fun() {
     bvec_t** res1 = res+n_out();
     fill_n(res1, num_out, static_cast<bvec_t*>(0));
     res1[iout_] = tmp1;
-    f_(arg1, res1, iw, w, 0);
+    oracle_(arg1, res1, iw, w, 0);
 
     // "Solve" in order to propagate to z
     fill_n(tmp2, n_, 0);
-    linsol_.linsol_spsolve(tmp2, tmp1, false);
+    sp_jac_.spsolve(tmp2, tmp1, false);
     if (res[iout_]) copy(tmp2, tmp2+n_, res[iout_]);
 
     // Propagate to auxiliary outputs
@@ -248,11 +241,11 @@ Function Function::rootfinder_fun() {
       arg1[iin_] = tmp2;
       copy(res, res+num_out, res1);
       res1[iout_] = 0;
-      f_(arg1, res1, iw, w, 0);
+      oracle_(arg1, res1, iw, w, 0);
     }
   }
 
-  void Rootfinder::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+  void Rootfinder::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     int num_out = n_out();
     int num_in = n_in();
     bvec_t* tmp1 = w; w += n_;
@@ -274,18 +267,18 @@ Function Function::rootfinder_fun() {
     copy(arg, arg+num_in, arg1);
     arg1[iin_] = tmp1;
     if (num_out>1) {
-      f_.rev(arg1, res1, iw, w, 0);
+      oracle_.rev(arg1, res1, iw, w, 0);
     }
 
     // "Solve" in order to get seed
     fill_n(tmp2, n_, 0);
-    linsol_.linsol_spsolve(tmp2, tmp1, true);
+    sp_jac_.spsolve(tmp2, tmp1, true);
 
     // Propagate dependencies through the function
     for (int i=0; i<num_out; ++i) res1[i] = 0;
     res1[iout_] = tmp2;
     arg1[iin_] = 0; // just a guess
-    f_.rev(arg1, res1, iw, w, 0);
+    oracle_.rev(arg1, res1, iw, w, 0);
   }
 
   std::map<std::string, Rootfinder::Plugin> Rootfinder::solvers_;
@@ -313,7 +306,7 @@ Function Function::rootfinder_fun() {
     for (int d=0; d<nfwd; ++d) {
       f_fseed[d].at(iin_) = MX(size_in(iin_)); // ignore seeds for guess
     }
-    f_.forward(f_arg, f_res, f_fseed, fsens, always_inline, never_inline);
+    oracle_.forward(f_arg, f_res, f_fseed, fsens, always_inline, never_inline);
 
     // Get expression of Jacobian
     MX J = jac_(f_arg).front();
@@ -328,7 +321,7 @@ Function Function::rootfinder_fun() {
     int num_out = n_out();
     if (num_out>1) {
       for (int d=0; d<nfwd; ++d) f_fseed[d][iin_] = fsens[d][iout_];
-      f_.forward(f_arg, f_res, f_fseed, fsens, always_inline, never_inline);
+      oracle_.forward(f_arg, f_res, f_fseed, fsens, always_inline, never_inline);
       for (int d=0; d<nfwd; ++d) fsens[d][iout_] = f_fseed[d][iin_]; // Otherwise overwritten
     }
   }
@@ -366,7 +359,7 @@ Function Function::rootfinder_fun() {
     vector<MX> rhs(nadj);
     vector<vector<MX> > asens_aux;
     if (num_out>1) {
-      f_.reverse(f_arg, f_res, f_aseed, asens_aux, always_inline, never_inline);
+      oracle_.reverse(f_arg, f_res, f_aseed, asens_aux, always_inline, never_inline);
       for (int d=0; d<nadj; ++d) rhs[d] = vec(asens_aux[d][iin_] + aseed[d][iout_]);
     } else {
       for (int d=0; d<nadj; ++d) rhs[d] = vec(aseed[d][iout_]);
@@ -393,7 +386,7 @@ Function Function::rootfinder_fun() {
     }
 
     // Propagate through f_
-    f_.reverse(f_arg, f_res, f_aseed, asens, always_inline, never_inline);
+    oracle_.reverse(f_arg, f_res, f_aseed, asens, always_inline, never_inline);
 
     // No dependency on guess (2)
     for (int d=0; d<nadj; ++d) {

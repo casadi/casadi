@@ -27,40 +27,44 @@
 #define CASADI_ROOTFINDER_IMPL_HPP
 
 #include "rootfinder.hpp"
-#include "function_internal.hpp"
+#include "oracle_function.hpp"
 #include "plugin_interface.hpp"
 
 /// \cond INTERNAL
 namespace casadi {
 
+  /** \brief Integrator memory */
+  struct CASADI_EXPORT RootfinderMemory : public OracleMemory {
+  };
+
   /// Internal class
   class CASADI_EXPORT
-  Rootfinder : public FunctionInternal, public PluginInterface<Rootfinder> {
+  Rootfinder : public OracleFunction, public PluginInterface<Rootfinder> {
   public:
     /** \brief Constructor
      *
      * \param f   Function mapping from (n+1) inputs to 1 output.
      */
-    Rootfinder(const std::string& name, const Function& f);
+    Rootfinder(const std::string& name, const Function& oracle);
 
     /// Destructor
     virtual ~Rootfinder() = 0;
     ///@{
     /** \brief Number of function inputs and outputs */
-    virtual size_t get_n_in() { return f_.n_in();}
-    virtual size_t get_n_out() { return f_.n_out();}
+    virtual size_t get_n_in() { return oracle_.n_in();}
+    virtual size_t get_n_out() { return oracle_.n_out();}
     ///@}
 
     /// @{
     /** \brief Sparsities of function inputs and outputs */
-    virtual Sparsity get_sparsity_in(int i) { return f_.sparsity_in(i);}
-    virtual Sparsity get_sparsity_out(int i) { return f_.sparsity_out(i);}
+    virtual Sparsity get_sparsity_in(int i) { return oracle_.sparsity_in(i);}
+    virtual Sparsity get_sparsity_out(int i) { return oracle_.sparsity_out(i);}
     /// @}
 
     ///@{
     /** \brief Names of function input and outputs */
-    virtual std::string get_name_in(int i) { return f_.name_in(i);}
-    virtual std::string get_name_out(int i) { return f_.name_out(i);}
+    virtual std::string get_name_in(int i) { return oracle_.name_in(i);}
+    virtual std::string get_name_out(int i) { return oracle_.name_out(i);}
     /// @}
 
     ///@{
@@ -72,24 +76,30 @@ namespace casadi {
     /// Initialize
     virtual void init(const Dict& opts);
 
+    /** \brief Initalize memory block */
+    virtual void init_memory(void* mem) const;
+
     /** \brief  Propagate sparsity forward */
-    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
+    virtual void sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
 
     /** \brief  Propagate sparsity backwards */
-    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
+    virtual void sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
 
+    ///@{
     /// Is the class able to propagate seeds through the algorithm?
-    virtual bool spCanEvaluate(bool fwd) { return true;}
+    virtual bool has_spfwd() const { return true;}
+    virtual bool has_sprev() const { return true;}
+    ///@}
 
     ///@{
     /** \brief Generate a function that calculates \a nfwd forward derivatives */
-    virtual Function get_forward(const std::string& name, int nfwd, Dict& opts);
+    virtual Function get_forward_old(const std::string& name, int nfwd, Dict& opts);
     virtual int get_n_forward() const { return 64;}
     ///@}
 
     ///@{
     /** \brief Generate a function that calculates \a nadj adjoint derivatives */
-    virtual Function get_reverse(const std::string& name, int nadj, Dict& opts);
+    virtual Function get_reverse_old(const std::string& name, int nadj, Dict& opts);
     virtual int get_n_reverse() const { return 64;}
     ///@}
 
@@ -108,14 +118,12 @@ namespace casadi {
     /// Number of equations
     int n_;
 
-    /// The function f(z, x1, x2, ..., xn) == 0
-    Function f_;
-
     /// Jacobian of f with respect to z
     Function jac_;
 
     /// Linear solver
-    Function linsol_;
+    Linsol linsol_;
+    Sparsity sp_jac_;
 
     /// Constraints on decision variables
     std::vector<int> u_c_;
@@ -124,7 +132,7 @@ namespace casadi {
     int iin_, iout_;
 
     // Creator function for internal class
-    typedef Rootfinder* (*Creator)(const std::string& name, const Function& f);
+    typedef Rootfinder* (*Creator)(const std::string& name, const Function& oracle);
 
     // No static functions exposed
     struct Exposed{ };

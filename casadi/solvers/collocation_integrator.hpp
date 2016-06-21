@@ -58,10 +58,10 @@ namespace casadi {
   public:
 
     /// Constructor
-    explicit CollocationIntegrator(const std::string& name, Oracle* dae);
+    explicit CollocationIntegrator(const std::string& name, const Function& dae);
 
     /** \brief  Create a new integrator */
-    static Integrator* creator(const std::string& name, Oracle* dae) {
+    static Integrator* creator(const std::string& name, const Function& dae) {
       return new CollocationIntegrator(name, dae);
     }
 
@@ -103,6 +103,8 @@ namespace casadi {
     /// A documentation string
     static const std::string meta_doc;
 
+    /// Continuous time dynamics
+    Function f_, g_;
   };
 
 } // namespace casadi
