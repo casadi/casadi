@@ -251,6 +251,9 @@ matrix:
       language: generic
       env: NEEDMATLAB=1
       script:
+        - sudo apt-get install -y gcc-4.7 g++-4.7 gfortran-4.7
+        - export CC=gcc-4.7
+        - export CXX=g++-4.7
 
         # travis-wait seems to stop at 20 mins, regardless if output is being generated
         - (while true ; do sleep 60 ; echo "ping" ; done ) &
@@ -276,20 +279,21 @@ before_install:
   - pushd ../../ && git clone https://github.com/casadi/testbot.git
   - pushd testbot && git checkout merged && source recipes/setup.sh && popd
   - sudo apt-get install p7zip-full -y
-  
+  - |
+    if [ $NEEDMATLAB ]
+    then
+      export SLURP_GCC=4.7
+      slurp swig_matlab
+    else
+      slurp swig
+    fi
+
   - slurp hsl
   - slurp clang
   - travis_retry testbot/recipes/fetch.sh mosek7.tar.bz2 && tar -xf mosek7.tar.bz2 && rm mosek7.tar.bz2
   - slurp ecos
   - travis_retry testbot/recipes/fetch.sh snopt75.tar.gz && mkdir snopt75 && tar -xf snopt75.tar.gz -C snopt75 && rm snopt75.tar.gz
-  - mkdir -p /home/travis/build/casadi/testbot
-  - |
-    if [ $NEEDMATLAB ]
-    then
-      slurp swig_matlab
-    else
-      slurp swig
-    fi
+
   - pushd testbot/restricted/cplex && mkdir cplex && tar -xf cplex12.4.tar.gz -C cplex && mkdir concert && tar -xf cplex12.4-concert.tar.gz -C concert && rm cplex12.4-concert.tar.gz && popd
   - pushd testbot/restricted && mkdir -p worhp && cd  worhp && 7za e ../libworhp_debian7_amd64_gcc47_1.7-12970f3.7z -y && popd
   - slurp bonmin
