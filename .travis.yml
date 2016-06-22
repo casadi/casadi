@@ -271,6 +271,26 @@ matrix:
         - popd
         - matlabtunnel
         - pushd test && PATH=/home/travis/build/matlab/bin/:$PATH make matlab && popd
+    - compiler: gcc
+      os: linux
+      dist: trusty
+      language: generic
+      env: NEEDMATLAB=1
+      script:
+        - sudo apt-add-repository ppa:octave/stable -y
+        - sudo apt-get update -qq
+        - sudo apt-get install octave liboctave-dev -y
+
+        # travis-wait seems to stop at 20 mins, regardless if output is being generated
+        - (while true ; do sleep 60 ; echo "ping" ; done ) &
+
+        - mkdir build
+        - pushd build
+        - cmake  -DOLD_LLVM=ON -DCMAKE_INSTALL_PREFIX=/home/travis/build/matlab-install -DWITH_CLANG=ON -DWITH_ECOS=ON -DWITH_MOSEK=ON -DWITH_DEEPBIND=ON -DWITH_OCTAVE=ON -DWITH_WORHP=ON -DWITH_SLICOT=OFF -DWITH_OOQP=ON -DWITH_PROFILING=ON -DWITH_DOC=ON -DWITH_EXAMPLES=ON -DWITH_COVERAGE=ON -DWITH_EXTRA_WARNINGS=ON -DWITH_JSON=ON ..
+        - make -j2
+        - sudo make -j2 install
+        - popd
+        #- pushd test && PATH=/home/travis/build/matlab/bin/:$PATH make octave && popd
 branches:
   except:
     - /.*appveyor.*/

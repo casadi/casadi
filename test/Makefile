@@ -63,6 +63,9 @@ examples_code: examples_code_py examples_code_cpp
 unittests_matlab:
 	python internal/test_matlab.py matlab
 
+unittests_octave:
+	python internal/test_octave.py matlab
+
 examples_matlab:
 	python internal/test_matlab.py '../examples/matlab'
 

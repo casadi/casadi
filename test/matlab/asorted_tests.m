@@ -88,7 +88,7 @@ assert(flag);
 % Checking stdout
 
 delete 'diary'
-diary ON
+diary on
 x = DM.ones(2,2);
 
 x.print_dense();
@@ -103,7 +103,7 @@ opts.verbose = true
 
 intg = casadi.integrator('integrator', 'rk', ode, opts);
 intg.call(struct);
-diary OFF
+diary off
 
 logged = fileread('diary');
 assert(~isempty(strfind(logged,'1')))
