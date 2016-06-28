@@ -437,6 +437,32 @@ namespace casadi {
       return MatType::depends_on(f, arg);
     }
 
+    /** \brief For each element of the first argument, checks dependency on a second argument
+
+        If the element depends on any of arg, the corresponding entry of the return vector is true
+
+        \return boolean vector
+    */
+    inline friend std::vector<bool> vector_depends_on(const MatType& f, const MatType &arg) {
+      return MatType::vector_depends_on(f, arg);
+    }
+
+    /** \brief For each element of the first argument, checks linear dependency on a second argument
+
+        If the element depends linearly (or does not depend) on all of arg,
+        the corresponding entry of the return vector is true.
+
+        False negatives may occur: an expression may depend linearly on all of arg,
+        even though this method does not recognise that fact.
+        The opposite does not occur: if the method returns true,
+        the dependency cannot be nonlinear.
+
+        \return boolean vector
+    */
+    inline friend std::vector<bool> vector_linear_depends_on(const MatType& f, const MatType &arg) {
+      return MatType::vector_linear_depends_on(f, arg);
+    }
+
     /** \brief  Substitute variable v with expression vdef in an expression ex */
     friend inline MatType substitute(const MatType& ex, const MatType& v,
                                      const MatType& vdef) {
