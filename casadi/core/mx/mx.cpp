@@ -638,7 +638,7 @@ namespace casadi {
   }
 
   MX MX::mpower(const MX& a, const MX& b) {
-    casadi_assert_message(a.is_scalar() || b.is_scalar(), "Not implemented");
+    casadi_assert_message(a.is_scalar() && b.is_scalar(), "Not implemented");
     return pow(a, b);
   }
 

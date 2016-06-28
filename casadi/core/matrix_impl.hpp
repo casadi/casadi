@@ -895,7 +895,7 @@ namespace casadi {
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::mpower(const Matrix<Scalar>& a,
                                             const Matrix<Scalar>& b) {
-    casadi_assert_message(a.is_scalar() || b.is_scalar(), "Not implemented");
+    casadi_assert_message(a.is_scalar() && b.is_scalar(), "Not implemented");
     return pow(a, b);
   }
 
