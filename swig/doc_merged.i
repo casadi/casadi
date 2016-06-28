@@ -3153,7 +3153,23 @@ Arc sine.
 in the Symbolic Toolbox for Matlab but instead creating a CasADi symbolic
 primitive.
 
-*/ %feature("docstring") casadi::GenericMatrix::nnz_upper "
+*/ %feature("docstring") friendwrap_vector_linear_depends_on "
+
+For each element of the first argument, checks linear dependency on a second
+argument.
+
+If the element depends linearly (or does not depend) on all of arg, the
+corresponding entry of the return vector is true.
+
+False negatives may occur: an expression may depend linearly on all of arg,
+even though this method does not recognise that fact. The opposite does not
+occur: if the method returns true, the dependency cannot be nonlinear.
+
+boolean vector
+
+";
+
+%feature("docstring") casadi::GenericMatrix::nnz_upper "
 
 Get the number of non-zeros in the upper triangular half.
 
@@ -3534,6 +3550,18 @@ Matrix trace.
 %feature("docstring") friendwrap_gradient "
 
 Calculate Jacobian.
+
+";
+
+%feature("docstring") friendwrap_vector_depends_on "
+
+For each element of the first argument, checks dependency on a second
+argument.
+
+If the element depends on any of arg, the corresponding entry of the return
+vector is true
+
+boolean vector
 
 ";
 
