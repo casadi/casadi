@@ -73,4 +73,6 @@
  * In all other cases (other platforms or static libraries under
  * Windows), the SUNDIALS_EXPORT macro is empty
  */
+#ifndef  SUNDIALS_EXPORT
 #define SUNDIALS_EXPORT
+#endif

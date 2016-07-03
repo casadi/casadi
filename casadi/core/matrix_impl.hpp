@@ -2541,90 +2541,94 @@ namespace casadi {
 
   // Specialize functions in GenericMatrix<SX> and SX
   template<> inline std::string matrixName<SXElem>() { return "SX"; }
-  template<> SX GenericMatrix<SX>::sym(const std::string& name, const Sparsity& sp);
-  template<> bool SX::is_regular() const;
-  template<> bool SX::is_smooth() const;
-  template<> bool SX::is_leaf() const;
-  template<> bool SX::is_commutative() const;
-  template<> bool SX::is_symbolic() const;
-  template<> bool SX::is_valid_input() const;
-  template<> bool SX::has_duplicates();
-  template<> void SX::resetInput();
-  template<> SX SX::dep(int ch) const;
-  template<> int SX::n_dep() const;
-  template<> std::string SX::name() const;
-  template<> void SX::setEqualityCheckingDepth(int eq_depth);
-  template<> int SX::getEqualityCheckingDepth();
-  template<> size_t SX::element_hash() const;
-  template<> void SX::expand(const SX& f, SX& weights, SX& terms);
-  template<> SX SX::pw_const(const SX& t, const SX& tval, const SX& val);
-  template<> SX SX::pw_lin(const SX& t, const SX &tval, const SX &val);
-  template<> SX SX::if_else(const SX &cond, const SX &if_true, const SX &if_false,
+  template<> CASADI_EXPORT SX GenericMatrix<SX>::sym(const std::string& name, const Sparsity& sp);
+  template<> CASADI_EXPORT bool SX::is_regular() const;
+  template<> CASADI_EXPORT bool SX::is_smooth() const;
+  template<> CASADI_EXPORT bool SX::is_leaf() const;
+  template<> CASADI_EXPORT bool SX::is_commutative() const;
+  template<> CASADI_EXPORT bool SX::is_symbolic() const;
+  template<> CASADI_EXPORT bool SX::is_valid_input() const;
+  template<> CASADI_EXPORT bool SX::has_duplicates();
+  template<> CASADI_EXPORT void SX::resetInput();
+  template<> CASADI_EXPORT SX SX::dep(int ch) const;
+  template<> CASADI_EXPORT int SX::n_dep() const;
+  template<> CASADI_EXPORT std::string SX::name() const;
+  template<> CASADI_EXPORT void SX::setEqualityCheckingDepth(int eq_depth);
+  template<> CASADI_EXPORT int SX::getEqualityCheckingDepth();
+  template<> CASADI_EXPORT size_t SX::element_hash() const;
+  template<> CASADI_EXPORT void SX::expand(const SX& f, SX& weights, SX& terms);
+  template<> CASADI_EXPORT SX SX::pw_const(const SX& t, const SX& tval, const SX& val);
+  template<> CASADI_EXPORT SX SX::pw_lin(const SX& t, const SX &tval, const SX &val);
+  template<> CASADI_EXPORT SX SX::if_else(const SX &cond, const SX &if_true, const SX &if_false,
                             bool short_circuit);
-  template<> SX SX::gauss_quadrature(const SX& f, const SX &x, const SX &a,
+  template<> CASADI_EXPORT SX SX::gauss_quadrature(const SX& f, const SX &x, const SX &a,
                                      const SX &b, int order,
                                      const SX& w);
-  template<> SX SX::simplify(const SX& x);
-  template<> SX SX::substitute(const SX& ex, const SX& v, const SX& vdef);
-  template<> std::vector<SX > SX::substitute(const std::vector<SX >& ex,
+  template<> CASADI_EXPORT SX SX::simplify(const SX& x);
+  template<> CASADI_EXPORT SX SX::substitute(const SX& ex, const SX& v, const SX& vdef);
+  template<> CASADI_EXPORT std::vector<SX > SX::substitute(const std::vector<SX >& ex,
                                                 const std::vector<SX >& v,
                                                 const std::vector<SX >& vdef);
-  template<> void SX::substitute_inplace(const std::vector<SX >& v,
+  template<> CASADI_EXPORT void SX::substitute_inplace(const std::vector<SX >& v,
                                         std::vector<SX >& vdef,
                                         std::vector<SX >& ex,
                                         bool reverse);
-  template<> bool SX::depends_on(const SX &x, const SX &arg);
-  template<> std::vector<SX > SX::symvar(const SX &x);
-  template<> SX SX::jacobian(const SX &f, const SX &x, bool symmetric);
-  template<> SX SX::gradient(const SX &f, const SX &x);
-  template<> SX SX::tangent(const SX &f, const SX &x);
-  template<> SX SX::hessian(const SX &f, const SX &x);
-  template<> SX SX::hessian(const SX &f, const SX &x, SX &g);
-  template<> SX SX::jtimes(const SX &ex, const SX &arg, const SX &v, bool tr);
-  template<> std::vector<bool> SX::nl_var(const SX &expr, const SX &var);
-  template<> SX SX::taylor(const SX& f, const SX& x, const SX& a, int order);
-  template<> SX SX::mtaylor(const SX& f, const SX& x, const SX& a, int order);
-  template<> SX SX::mtaylor(const SX& f, const SX& x, const SX& a, int order,
+  template<> CASADI_EXPORT bool SX::depends_on(const SX &x, const SX &arg);
+  template<> CASADI_EXPORT std::vector<SX > SX::symvar(const SX &x);
+  template<> CASADI_EXPORT SX SX::jacobian(const SX &f, const SX &x, bool symmetric);
+  template<> CASADI_EXPORT SX SX::gradient(const SX &f, const SX &x);
+  template<> CASADI_EXPORT SX SX::tangent(const SX &f, const SX &x);
+  template<> CASADI_EXPORT SX SX::hessian(const SX &f, const SX &x);
+  template<> CASADI_EXPORT SX SX::hessian(const SX &f, const SX &x, SX &g);
+  template<> CASADI_EXPORT SX SX::jtimes(const SX &ex, const SX &arg, const SX &v, bool tr);
+  template<> CASADI_EXPORT std::vector<bool> SX::nl_var(const SX &expr, const SX &var);
+  template<> CASADI_EXPORT SX SX::taylor(const SX& f, const SX& x, const SX& a, int order);
+  template<> CASADI_EXPORT SX SX::mtaylor(const SX& f, const SX& x, const SX& a, int order);
+  template<> CASADI_EXPORT SX SX::mtaylor(const SX& f, const SX& x, const SX& a, int order,
                             const std::vector<int>& order_contributions);
-  template<> int SX::n_nodes(const SX& x);
-  template<> std::string
+  template<> CASADI_EXPORT int SX::n_nodes(const SX& x);
+  template<> CASADI_EXPORT std::string
   SX::print_operator(const SX& x, const std::vector<std::string>& args);
-  template<> void SX::shared(std::vector<SX >& ex,
+  template<> CASADI_EXPORT void SX::shared(std::vector<SX >& ex,
                                     std::vector<SX >& v,
                                     std::vector<SX >& vdef,
                                     const std::string& v_prefix,
                                     const std::string& v_suffix);
-  template<> SX SX::poly_coeff(const SX& f, const SX& x);
-  template<> SX SX::poly_roots(const SX& p);
-  template<> SX SX::eig_symbolic(const SX& m);
-  template<> void SX::print_split(std::vector<std::string>& nz,
+  template<> CASADI_EXPORT SX SX::poly_coeff(const SX& f, const SX& x);
+  template<> CASADI_EXPORT SX SX::poly_roots(const SX& p);
+  template<> CASADI_EXPORT SX SX::eig_symbolic(const SX& m);
+  template<> CASADI_EXPORT void SX::print_split(std::vector<std::string>& nz,
                                  std::vector<std::string>& inter) const;
 
-  template<> std::vector<SX> SX::get_input(const Function& f);
+  template<> CASADI_EXPORT std::vector<SX> SX::get_input(const Function& f);
 
-  template<> SX SX::jac(const Function& f, int iind, int oind,
+  template<> CASADI_EXPORT SX SX::jac(const Function& f, int iind, int oind,
                         bool compact, bool symmetric);
-  template<> SX SX::jac(const Function& f, const std::string& iname, int oind,
+  template<> CASADI_EXPORT SX SX::jac(const Function& f, const std::string& iname, int oind,
                         bool compact, bool symmetric);
-  template<> SX SX::jac(const Function& f, int iind, const std::string& oname,
+  template<> CASADI_EXPORT SX SX::jac(const Function& f, int iind, const std::string& oname,
                         bool compact, bool symmetric);
-  template<> SX SX::jac(const Function& f, const std::string& iname, const std::string& oname,
+  template<> CASADI_EXPORT SX SX::jac(const Function& f, const std::string& iname,
+                        const std::string& oname,
                         bool compact, bool symmetric);
 
-  template<> SX SX::grad(const Function& f, int iind, int oind);
-  template<> SX SX::grad(const Function& f, const std::string& iname, int oind);
-  template<> SX SX::grad(const Function& f, int iind, const std::string& oname);
-  template<> SX SX::grad(const Function& f, const std::string& iname, const std::string& oname);
+  template<> CASADI_EXPORT SX SX::grad(const Function& f, int iind, int oind);
+  template<> CASADI_EXPORT SX SX::grad(const Function& f, const std::string& iname, int oind);
+  template<> CASADI_EXPORT SX SX::grad(const Function& f, int iind, const std::string& oname);
+  template<> CASADI_EXPORT SX SX::grad(const Function& f, const std::string& iname,
+                        const std::string& oname);
 
-  template<> SX SX::tang(const Function& f, int iind, int oind);
-  template<> SX SX::tang(const Function& f, const std::string& iname, int oind);
-  template<> SX SX::tang(const Function& f, int iind, const std::string& oname);
-  template<> SX SX::tang(const Function& f, const std::string& iname, const std::string& oname);
+  template<> CASADI_EXPORT SX SX::tang(const Function& f, int iind, int oind);
+  template<> CASADI_EXPORT SX SX::tang(const Function& f, const std::string& iname, int oind);
+  template<> CASADI_EXPORT SX SX::tang(const Function& f, int iind, const std::string& oname);
+  template<> CASADI_EXPORT SX SX::tang(const Function& f, const std::string& iname,
+                        const std::string& oname);
 
-  template<> SX SX::hess(const Function& f, int iind, int oind);
-  template<> SX SX::hess(const Function& f, const std::string& iname, int oind);
-  template<> SX SX::hess(const Function& f, int iind, const std::string& oname);
-  template<> SX SX::hess(const Function& f, const std::string& iname, const std::string& oname);
+  template<> CASADI_EXPORT SX SX::hess(const Function& f, int iind, int oind);
+  template<> CASADI_EXPORT SX SX::hess(const Function& f, const std::string& iname, int oind);
+  template<> CASADI_EXPORT SX SX::hess(const Function& f, int iind, const std::string& oname);
+  template<> CASADI_EXPORT SX SX::hess(const Function& f, const std::string& iname,
+                        const std::string& oname);
 
 #ifndef CASADI_MATRIX_CPP
   // Templates instantiated in matrix.cpp

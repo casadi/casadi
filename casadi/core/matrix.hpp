@@ -77,7 +77,7 @@ namespace casadi {
       \date 2010-2014
   */
   template<typename Scalar>
-  class CASADI_EXPORT Matrix :
+  class Matrix :
     public MatrixCommon,
     public GenericExpression<Matrix<Scalar> >,
     public GenericMatrix<Matrix<Scalar> >,

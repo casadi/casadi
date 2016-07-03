@@ -581,6 +581,17 @@ namespace casadi {
                                                std::vector<int>& colblock,
                                                std::vector<int>& coarse_rowblock,
                                                std::vector<int>& coarse_colblock, int seed) const {
+    // Quick return; needed for MSVC
+    if (is_empty()) {
+      rowperm = std::vector<int>{};
+      colperm = std::vector<int>{};
+      rowblock = std::vector<int>{0};
+      colblock = std::vector<int>{0};
+      coarse_rowblock = std::vector<int>{0, 0, 0, 0, 0};
+      coarse_colblock = std::vector<int>{0, 0, 0, 0, 0};
+      return 0;
+    }
+
     // The transpose of the expression
     Sparsity trans;
 
@@ -3913,5 +3924,3 @@ namespace casadi {
   }
 
 } // namespace casadi
-
-

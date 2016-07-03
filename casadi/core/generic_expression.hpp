@@ -44,7 +44,7 @@ namespace casadi {
   \date 2012
 */
 template<typename ExType>
-class CASADI_EXPORT GenericExpression : public GenericExpressionCommon {
+class GenericExpression : public GenericExpressionCommon {
 #ifndef SWIG
   protected:
     // Helper functions

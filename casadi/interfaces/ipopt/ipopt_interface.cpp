@@ -220,14 +220,14 @@ namespace casadi {
     // Start an IPOPT application
     Ipopt::SmartPtr<Ipopt::IpoptApplication> *app = new Ipopt::SmartPtr<Ipopt::IpoptApplication>();
     m->app = static_cast<void*>(app);
-    *app = new Ipopt::IpoptApplication(false);
+    *app = IpoptApplicationFactory();
 
     // Direct output through casadi::userOut()
-    StreamJournal* jrnl_raw = new StreamJournal("console", J_ITERSUMMARY);
-    jrnl_raw->SetOutputStream(&casadi::userOut());
-    jrnl_raw->SetPrintLevel(J_DBG, J_NONE);
-    SmartPtr<Journal> jrnl = jrnl_raw;
-    (*app)->Jnlst()->AddJournal(jrnl);
+    //StreamJournal* jrnl_raw = new StreamJournal("console", J_ITERSUMMARY);
+    //jrnl_raw->SetOutputStream(&casadi::userOut());
+    //jrnl_raw->SetPrintLevel(J_DBG, J_NONE);
+    //SmartPtr<Journal> jrnl = jrnl_raw;
+    //(*app)->Jnlst()->AddJournal(jrnl);
 
     // Create an Ipopt user class -- need to use Ipopts spart pointer class
     Ipopt::SmartPtr<Ipopt::TNLP> *userclass = new Ipopt::SmartPtr<Ipopt::TNLP>();

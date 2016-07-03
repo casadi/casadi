@@ -45,9 +45,9 @@ macro(casadi_external_library name)
   endif()
 endmacro()
 
-if(WITH_BUILD_TINYXML)
-  add_subdirectory(tinyxml-2.6.2)
-endif()
+#if(WITH_BUILD_TINYXML)
+#  add_subdirectory(tinyxml-2.6.2)
+#endif()
 
 if(WITH_BUILD_CSPARSE)
   add_subdirectory(CSparse)

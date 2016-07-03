@@ -69,7 +69,7 @@ namespace casadi {
       \date 2012
   */
   template<typename MatType>
-  class CASADI_EXPORT GenericMatrix
+  class GenericMatrix
     : public GenericMatrixCommon,
       public SparsityInterface<MatType> {
     using SparsityInterface<MatType>::self;

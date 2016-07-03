@@ -136,4 +136,8 @@ set(SUNDIALS_SOURCES
   kinsol/kinsol_sptfqmr.c
 )
 
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+  SET( CMAKE_C_FLAGS  "${CMAKE_C_FLAGS}  -DSUNDIALS_EXPORT=__declspec(dllexport)" )
+endif()
+
 casadi_external_library(casadi_sundials ${SUNDIALS_INCLUDES} ${SUNDIALS_SOURCES})

@@ -37,6 +37,14 @@ namespace casadi {
   class Function;
 
 
+  class MX;
+
+  // Create matrix symbolic primitive
+  template<>
+  CASADI_EXPORT MX GenericMatrix<MX>::sym(const std::string& name, const Sparsity& sp);
+
+
+
   /** \brief MX - Matrix expression
 
       The MX class is used to build up trees made up from MXNodes. It is a more general
@@ -598,10 +606,6 @@ namespace casadi {
 
 #endif // SWIG
   };
-
-  // Create matrix symbolic primitive
-  template<>
-  MX GenericMatrix<MX>::sym(const std::string& name, const Sparsity& sp);
 
   ///@{
   /// Readability typedefs

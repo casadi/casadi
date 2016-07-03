@@ -7,6 +7,11 @@ if(PRECOND_TEST)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DPRECOND_TEST")
 endif()
 
+
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+  SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DSUNDIALS_EXPORT=__declspec(dllimport)" )
+endif()
+
 # SUNDIALS commons
 casadi_library(casadi_sundials_common sundials_interface.hpp sundials_interface.cpp)
 target_link_libraries(casadi_sundials_common ${SUNDIALS_LIBRARIES})

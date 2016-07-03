@@ -75,6 +75,7 @@ Test simpleODE(){
 
 /** \brief Generate a simple DAE */
 Test simpleDAE(){  
+
   // Parameter
   SX u = SX::sym("u");
   
@@ -112,6 +113,11 @@ struct Solver {
 
 int main(){
 
+
+  MX X = MX::sym("x");
+  
+  cout << X << endl;
+  
   // Test problems
   vector<Test> tests = {simpleODE(), simpleDAE()};
 
