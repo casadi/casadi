@@ -1,0 +1,7 @@
+cmake "-GVisual Studio 14 2015 Win64" -H. -B_builds -DWITH_IPOPT=OFF -DIPOPT_FOUND=ON -DIPOPT_LIBRARY_DIRS="E:/ipopt_deltares_VC15/lib/debug" -DIPOPT_LIBRARIES="Ipopt-vs2015.lib;IpOptFSS.lib" -DIPOPT_INCLUDE_DIRS="E:/ipopt_deltares_VC15/include/coin" // This needs to run on Windows
+
+cmake "-GVisual Studio 14 2015 Win64" -H. -B_builds -DWITH_IPOPT=OFF -DIPOPT_FOUND=ON -DIPOPT_LIBRARY_DIRS="E:/Ipopt-3.11.1-win64-intel13.1/lib" -DIPOPT_LIBRARIES="libipopt.lib;libcoinmumps.lib" -DIPOPT_INCLUDE_DIRS="E:/Ipopt-3.11.1-win64-intel13.1/include/coin" // This needs to run on Windows
+
+Ipopt-3.11.1-win64-intel13.1
+
+cmake --build _builds --config "Debug"
