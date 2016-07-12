@@ -3539,8 +3539,8 @@ namespace casadi{
     function out = sum(self,varargin)
       narginchk(1,2);
       if nargin==1
-        if isvector(self)
-          if iscolumn(self)
+        if is_vector(self)
+          if is_column(self)
             out = sum1(self);
           else
             out = sum2(self);
@@ -3578,9 +3578,21 @@ namespace casadi{
           error('norm argument (if present) must be 1, 2 or inf or fro');
         end
       end
-      if ~isvector(self)
+      if ~is_vector(self)
         error('only norms of vectors defined for now. You may try norm_1 norm_2 norm_inf norm_F.');
       end
+    end
+    function b = isrow(self)
+      b = is_row(self);
+    end
+    function b = iscolumn(self)
+      b = is_column(self);
+    end
+    function b = isvector(self)
+      b = is_vector(self);
+    end
+    function b = isscalar(self)
+      b = is_scalar(self);
     end
   %}
 }
