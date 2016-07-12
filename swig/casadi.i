@@ -3522,8 +3522,23 @@ namespace casadi{
 namespace casadi{
 %extend GenericMatrixCommon {
   %matlabcode %{
+    function varargout = subsref(self,s)
+      if numel(s)==1 & s.type=='()'
+        [varargout{1}] = paren(self, s.subs{:});
+      else
+        [varargout{1:nargout}] = builtin('subsref',self,s);
+      end
+    end
+    function self = subsasgn(self,s,v)
+      if numel(s)==1 & s.type=='()'
+        paren_asgn(self, v, s.subs{:});
+      else
+        self = builtin('subsasgn',self,s,v);
+      end
+    end
     function out = sum(self,varargin)
-      if length(varargin)==0
+      narginchk(1,2);
+      if nargin==1
         if isvector(self)
           if iscolumn(self)
             out = sum1(self);
@@ -3533,7 +3548,7 @@ namespace casadi{
         else
           out = sum1(self);
         end
-      elseif length(varargin)==1
+      else
         i = varargin{1};
         if i==1
           out = sum1(self);
@@ -3542,15 +3557,13 @@ namespace casadi{
         else
           error('sum argument (if present) must be 1 or 2');
         end
-      else
-        error('sum can have at most 1 argument');
       end
     end
     function out = norm(self,varargin)
-
-      if length(varargin)==0
+      narginchk(1,2);
+      if nargin==1
         out = norm_2(self);
-      elseif length(varargin)==1
+      else
         i = varargin{1};
         if i==1
           out = norm_1(self);
@@ -3564,8 +3577,6 @@ namespace casadi{
         else
           error('norm argument (if present) must be 1, 2 or inf or fro');
         end
-      else
-        error('norm can have at most 1 argument');
       end
       if ~isvector(self)
         error('only norms of vectors defined for now. You may try norm_1 norm_2 norm_inf norm_F.');
@@ -3575,7 +3586,14 @@ namespace casadi{
 }
 %extend Function {
   %matlabcode %{
-    function varargout = paren(self, varargin)
+    function varargout = subsref(self,s)
+      if numel(s)==1 & s.type=='()'
+        [varargout{1:nargout}]= paren(self, s.subs{:});
+      else
+        [varargout{1:nargout}] = builtin('subsref',self,s);
+      end
+   end
+   function varargout = paren(self, varargin)
       if nargin==1 || (nargin>=2 && ischar(varargin{1}))
         % Named inputs: return struct
         assert(nargout<2, 'Syntax error');

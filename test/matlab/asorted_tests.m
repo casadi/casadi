@@ -19,7 +19,7 @@ r = f(3)
 
 disp(r)
 
-res = r{1}-DM(cos(3))
+res = r-DM(cos(3))
 assert(is_zero(res))
 
 
@@ -110,6 +110,9 @@ assert(~isempty(strfind(logged,'1')))
 
 
 clear
+
+% Are we running Octave?
+is_octave = exist('OCTAVE_VERSION', 'builtin') ~= 0;
 
 
 x = SX.sym('x',4,5);
@@ -215,13 +218,15 @@ t = SX.sym('t');
 rhs = [x(2);1000*(1 - x(1)^2)*x(2) - x(1)];
 ode = Function('ode',{t,x},{rhs});
 
-[T,X] = ode15s(full(ode),[0 300],[2 0]);
+if ~is_octave
+  [T,X] = ode15s(full(ode),[0 300],[2 0]);
 
-[T,X] = ode15s(sparse(ode),[0 300],[2 0]);
+  [T,X] = ode15s(sparse(ode),[0 300],[2 0]);
 
-Jode = Function('ode',{t,x},{jacobian(rhs,x)});
-options = odeset('Jacobian',full(Jode));
-[T,X] = ode15s(full(ode),[0 300],[2 0],options);
+  Jode = Function('ode',{t,x},{jacobian(rhs,x)});
+  options = odeset('Jacobian',full(Jode));
+  [T,X] = ode15s(full(ode),[0 300],[2 0],options);
+end
 
 
 % boolvector typemap
