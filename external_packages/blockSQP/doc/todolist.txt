@@ -1,0 +1,15 @@
+TODO for Diss
+=============
+- Greenstadt, PSB, DFP updates
+
+Tuning of SQP method
+====================
+- First SQP step: right now we take the identity without globalization, that could end badly
+- Termination criteria: something like "requested accuracy could not be achieved". Right now, there are iterations without progress or globalization/restoration phase kicks in (see how SNOPT decides to terminate)
+- SR1 line search method for general nonlinear constraints (not only box constraints): modify qpOASES solution analysis routine appropriately, not sure how exactly (use dual variables...)
+
+Additional Features of SQP method
+=================================
+- Warm start and cold start feature: read in primal and dual variables (for cold start) and additionally Hessian approximation, active set and current filter (for warm starts) from text files (or binary files)
+- print information about the current SQP options
+
