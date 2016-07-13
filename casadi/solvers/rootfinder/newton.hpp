@@ -23,49 +23,51 @@
  */
 
 
-#ifndef CASADI_IMPLICIT_TO_NLP_HPP
-#define CASADI_IMPLICIT_TO_NLP_HPP
+#ifndef CASADI_NEWTON_HPP
+#define CASADI_NEWTON_HPP
 
 #include "casadi/core/function/rootfinder_impl.hpp"
-#include <casadi/solvers/casadi_rootfinder_nlpsol_export.h>
+#include <casadi/solvers/rootfinder/casadi_rootfinder_newton_export.h>
 
-/** \defgroup plugin_Rootfinder_nlp
-  Use an Nlpsol as Rootfinder solver
+/** \defgroup plugin_Rootfinder_newton
+     Implements simple newton iterations to solve an implicit function.
 */
-/** \pluginsection{Rootfinder,nlpsol} */
+
+/** \pluginsection{Rootfinder,newton} */
 
 /// \cond INTERNAL
 namespace casadi {
+
   // Memory
-  struct CASADI_ROOTFINDER_NLPSOL_EXPORT ImplicitToNlpMemory
+  struct CASADI_ROOTFINDER_NEWTON_EXPORT NewtonMemory
     : public RootfinderMemory {
-    /// Stats
-    Dict solver_stats;
+    const char* return_status;
+    int iter;
   };
 
-  /** \brief  \pluginbrief{Rootfinder,nlp}
+  /** \brief \pluginbrief{Rootfinder,newton}
 
-   @copydoc Rootfinder_doc
-   @copydoc plugin_Rootfinder_nlp
+      @copydoc Rootfinder_doc
+      @copydoc plugin_Rootfinder_newton
 
-   \author Joris Gillis
-   \date 2012
+      \author Joris Gillis
+      \date 2012
   */
-  class CASADI_ROOTFINDER_NLPSOL_EXPORT ImplicitToNlp : public Rootfinder {
+  class CASADI_ROOTFINDER_NEWTON_EXPORT Newton : public Rootfinder {
   public:
     /** \brief  Constructor */
-    explicit ImplicitToNlp(const std::string& name, const Function& f);
+    explicit Newton(const std::string& name, const Function& f);
 
     /** \brief  Destructor */
-    virtual ~ImplicitToNlp();
+    virtual ~Newton();
+
+    // Get name of the plugin
+    virtual const char* plugin_name() const { return "newton";}
 
     /** \brief  Create a new Rootfinder */
     static Rootfinder* creator(const std::string& name, const Function& f) {
-      return new ImplicitToNlp(name, f);
+      return new Newton(name, f);
     }
-
-    // Get name of the plugin
-    virtual const char* plugin_name() const { return "nlpsol";}
 
     ///@{
     /** \brief Options */
@@ -77,10 +79,13 @@ namespace casadi {
     virtual void init(const Dict& opts);
 
     /** \brief Create memory block */
-    virtual void* alloc_memory() const { return new ImplicitToNlpMemory();}
+    virtual void* alloc_memory() const { return new NewtonMemory();}
+
+    /** \brief Initalize memory block */
+    virtual void init_memory(void* mem) const;
 
     /** \brief Free memory block */
-    virtual void free_memory(void *mem) const { delete static_cast<ImplicitToNlpMemory*>(mem);}
+    virtual void free_memory(void *mem) const { delete static_cast<NewtonMemory*>(mem);}
 
     /// Solve the system of equations and calculate derivatives
     virtual void eval(void* mem, const double** arg, double** res,
@@ -89,10 +94,27 @@ namespace casadi {
     /// A documentation string
     static const std::string meta_doc;
 
-    /// NLP solver
-    Function solver_;
+  protected:
+    /// Maximum number of Newton iterations
+    int max_iter_;
+
+    /// Absolute tolerance that should be met on residual
+    double abstol_;
+
+    /// Absolute tolerance that should be met on step
+    double abstolStep_;
+
+    /// If true, each iteration will be printed
+    bool print_iteration_;
+
+    /// Print iteration header
+    void printIteration(std::ostream &stream) const;
+
+    /// Print iteration
+    void printIteration(std::ostream &stream, int iter,
+                        double abstol, double abstolStep) const;
   };
 
 } // namespace casadi
 /// \endcond
-#endif // CASADI_IMPLICIT_TO_NLP_HPP
+#endif // CASADI_NEWTON_HPP
