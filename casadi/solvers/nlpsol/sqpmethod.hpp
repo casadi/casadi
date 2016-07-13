@@ -29,7 +29,7 @@
 #include "casadi/core/function/nlpsol_impl.hpp"
 #include <deque>
 
-#include <casadi/solvers/casadi_nlpsol_sqpmethod_export.h>
+#include <casadi/solvers/nlpsol/casadi_nlpsol_sqpmethod_export.h>
 
 /** \defgroup plugin_Nlpsol_sqpmethod
  A textbook SQPMethod

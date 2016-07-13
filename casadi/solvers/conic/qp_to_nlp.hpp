@@ -23,42 +23,47 @@
  */
 
 
-#ifndef CASADI_SHELL_INTERFACE_HPP
-#define CASADI_SHELL_INTERFACE_HPP
+#ifndef CASADI_QP_TO_NLP_HPP
+#define CASADI_QP_TO_NLP_HPP
 
-#include "casadi/core/function/importer_internal.hpp"
-#include <casadi/solvers/casadi_importer_shell_export.h>
+#include "casadi/core/function/conic_impl.hpp"
+#include <casadi/solvers/conic/casadi_conic_nlpsol_export.h>
 
-/** \defgroup plugin_Importer_shell
-      Interface to the JIT compiler SHELL
+
+/** \defgroup plugin_Conic_nlp
+   Solve QPs using an Nlpsol
 */
 
-/** \pluginsection{Importer,shell} */
+/** \pluginsection{Conic,nlp} */
 
 /// \cond INTERNAL
 namespace casadi {
-  /** \brief \pluginbrief{Importer,shell}
 
+  /** \brief \pluginbrief{Conic,nlp}
 
-   \author Joel Andersson
-   \date 2015
-   *
-   @copydoc Importer_doc
-   @copydoc plugin_Importer_shell
-   * */
-  class CASADI_IMPORTER_SHELL_EXPORT ShellCompiler : public ImporterInternal {
+      @copydoc Conic_doc
+      @copydoc plugin_Conic_nlp
+
+      \author Joris Gillis
+      \date 2011
+  */
+  class CASADI_CONIC_NLPSOL_EXPORT QpToNlp : public Conic {
   public:
+    /** \brief  Create a new Solver */
+    explicit QpToNlp(const std::string& name,
+                     const std::map<std::string, Sparsity> &st);
 
-    /** \brief Constructor */
-    explicit ShellCompiler(const std::string& name);
-
-    /** \brief  Create a new JIT function */
-    static ImporterInternal* creator(const std::string& name) {
-      return new ShellCompiler(name);
+    /** \brief  Create a new QP Solver */
+    static Conic* creator(const std::string& name,
+                          const std::map<std::string, Sparsity>& st) {
+      return new QpToNlp(name, st);
     }
 
-    /** \brief Destructor */
-    virtual ~ShellCompiler();
+    /** \brief  Destructor */
+    virtual ~QpToNlp();
+
+    // Get name of the plugin
+    virtual const char* plugin_name() const { return "nlpsol";}
 
     ///@{
     /** \brief Options */
@@ -66,27 +71,18 @@ namespace casadi {
     virtual const Options& get_options() const { return options_;}
     ///@}
 
-    /** \brief Initialize */
+    /** \brief  Initialize */
     virtual void init(const Dict& opts);
+
+    virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
 
     /// A documentation string
     static const std::string meta_doc;
 
-    /// Get name of plugin
-    virtual const char* plugin_name() const { return "shell";}
-
-    /// Get a function pointer for numerical evaluation
-    virtual signal_t get_function(const std::string& symname);
-  protected:
-    /// Temporary file
-    std::string bin_name_;
-
-    // Shared library handle
-    typedef void* handle_t;
-    handle_t handle_;
+    /// Solve with
+    Function solver_;
   };
 
 } // namespace casadi
 /// \endcond
-
-#endif // CASADI_SHELL_INTERFACE_HPP
+#endif // CASADI_QP_TO_NLP_HPP

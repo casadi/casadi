@@ -27,7 +27,7 @@
 #define CASADI_SYMBOLIC_QR_HPP
 
 #include "casadi/core/function/linsol_internal.hpp"
-#include <casadi/solvers/casadi_linsol_symbolicqr_export.h>
+#include <casadi/solvers/linsol/casadi_linsol_symbolicqr_export.h>
 
 /** \defgroup plugin_Linsol_symbolicqr
 
