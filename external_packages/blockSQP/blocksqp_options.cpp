@@ -14,7 +14,7 @@
  *  Implementation of SQPoptions class that holds all algorithmic options.
  */
 
-#include "blocksqp_options.hpp"
+#include "blocksqp.hpp"
 
 namespace blockSQP
 {

@@ -15,7 +15,7 @@
  *  minimum l_2-norm NLP.
  */
 
-#include "blocksqp_restoration.hpp"
+#include "blocksqp.hpp"
 
 namespace blockSQP
 {

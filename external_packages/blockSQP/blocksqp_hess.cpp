@@ -16,11 +16,7 @@
  *
  */
 
-#include "blocksqp_iterate.hpp"
-#include "blocksqp_options.hpp"
-#include "blocksqp_stats.hpp"
-#include "blocksqp_method.hpp"
-#include "blocksqp_general_purpose.hpp"
+#include "blocksqp.hpp"
 
 namespace blockSQP
 {
@@ -608,4 +604,3 @@ void SQPmethod::updateDeltaGamma()
 }
 
 } // namespace blockSQP
-

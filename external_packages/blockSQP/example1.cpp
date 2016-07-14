@@ -1,4 +1,4 @@
-#include "blocksqp_method.hpp"
+#include "blocksqp.hpp"
 #include <limits>
 
 static double const myInf = std::numeric_limits<double>::infinity();    ///< Used to mark sparse zeros in Jacobian

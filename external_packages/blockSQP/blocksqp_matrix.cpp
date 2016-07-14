@@ -15,7 +15,7 @@
  *  matrix elements.
  */
 
-#include "blocksqp_matrix.hpp"
+#include "blocksqp.hpp"
 
 namespace blockSQP
 {

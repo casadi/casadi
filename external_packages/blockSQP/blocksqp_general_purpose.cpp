@@ -14,7 +14,7 @@
  *  Implementation of general purpose routines for matrix and vector computations.
  */
 
-#include "blocksqp_general_purpose.hpp"
+#include "blocksqp.hpp"
 
 namespace blockSQP
 {

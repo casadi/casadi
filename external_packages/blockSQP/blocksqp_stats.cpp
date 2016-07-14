@@ -14,10 +14,7 @@
  *  Implementation of SQPstats class that records statistics during an SQP run.
  */
 
-#include "blocksqp_iterate.hpp"
-#include "blocksqp_options.hpp"
-#include "blocksqp_stats.hpp"
-#include "blocksqp_general_purpose.hpp"
+#include "blocksqp.hpp"
 
 namespace blockSQP
 {

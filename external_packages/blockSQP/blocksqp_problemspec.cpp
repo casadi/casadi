@@ -14,7 +14,7 @@
  *  Implementation of problem-independent methods of ProblemSpec class.
  */
 
-#include "blocksqp_problemspec.hpp"
+#include "blocksqp.hpp"
 
 namespace blockSQP
 {
