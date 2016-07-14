@@ -88,231 +88,217 @@ namespace blocksqp {
     bool hasConverged = false;
     int whichDerv = param->whichSecondDerv;
 
-    if (!initCalled )
-      {
-        printf("init() must be called before run(). Aborting.\n");
-        return -1;
-      }
+    if (!initCalled ) {
+      printf("init() must be called before run(). Aborting.\n");
+      return -1;
+    }
 
-    if (warmStart == 0 || stats->itCount == 0 )
-      {
-        // SQP iteration 0
+    if (warmStart == 0 || stats->itCount == 0 ) {
+      // SQP iteration 0
 
-        /// Set initial Hessian approximation
-        calcInitialHessian();
+      /// Set initial Hessian approximation
+      calcInitialHessian();
 
-        /// Evaluate all functions and gradients for xi_0
-        if (param->sparseQP )
-          prob->evaluate( vars->xi, vars->lambda, &vars->obj, vars->constr, vars->gradObj,
-                          vars->jacNz, vars->jacIndRow, vars->jacIndCol, vars->hess, 1+whichDerv, &infoEval );
-        else
-          prob->evaluate( vars->xi, vars->lambda, &vars->obj, vars->constr, vars->gradObj,
-                          vars->constrJac, vars->hess, 1+whichDerv, &infoEval );
-        stats->nDerCalls++;
+      /// Evaluate all functions and gradients for xi_0
+      if (param->sparseQP )
+        prob->evaluate( vars->xi, vars->lambda, &vars->obj, vars->constr, vars->gradObj,
+                        vars->jacNz, vars->jacIndRow, vars->jacIndCol, vars->hess, 1+whichDerv, &infoEval );
+      else
+        prob->evaluate( vars->xi, vars->lambda, &vars->obj, vars->constr, vars->gradObj,
+                        vars->constrJac, vars->hess, 1+whichDerv, &infoEval );
+      stats->nDerCalls++;
 
-        /// Check if converged
-        hasConverged = calcOptTol();
-        stats->printProgress( prob, vars, param, hasConverged );
-        if (hasConverged )
-          return 0;
+      /// Check if converged
+      hasConverged = calcOptTol();
+      stats->printProgress( prob, vars, param, hasConverged );
+      if (hasConverged )
+        return 0;
 
-        stats->itCount++;
-      }
+      stats->itCount++;
+    }
 
     /*
      * SQP Loop: during first iteration, stats->itCount = 1
      */
-    for (it=0; it<maxIt; it++ )
-      {
-        /// Solve QP subproblem with qpOASES or QPOPT
-        updateStepBounds( 0 );
-        infoQP = solveQP( vars->deltaXi, vars->lambdaQP );
+    for (it=0; it<maxIt; it++ ) {
+      /// Solve QP subproblem with qpOASES or QPOPT
+      updateStepBounds( 0 );
+      infoQP = solveQP( vars->deltaXi, vars->lambdaQP );
 
-        if (infoQP == 1 )
-          {// 1.) Maximum number of iterations reached
-            printf("***Warning! Maximum number of QP iterations exceeded.***\n");
-            ;// just continue ...
+      if (infoQP == 1 )
+        {// 1.) Maximum number of iterations reached
+          printf("***Warning! Maximum number of QP iterations exceeded.***\n");
+          ;// just continue ...
+        }
+      else if (infoQP == 2 || infoQP > 3 )
+        {// 2.) QP error (e.g., unbounded), solve again with pos.def. diagonal matrix (identity)
+          printf("***QP error. Solve again with identity matrix.***\n");
+          resetHessian();
+          infoQP = solveQP( vars->deltaXi, vars->lambdaQP );
+          if (infoQP ) {
+            // If there is still an error, terminate.
+            printf( "***QP error. Stop.***\n" );
+            return -1;
+          } else {
+            vars->steptype = 1;
           }
-        else if (infoQP == 2 || infoQP > 3 )
-          {// 2.) QP error (e.g., unbounded), solve again with pos.def. diagonal matrix (identity)
-            printf("***QP error. Solve again with identity matrix.***\n");
-            resetHessian();
-            infoQP = solveQP( vars->deltaXi, vars->lambdaQP );
-            if (infoQP )
-              {// If there is still an error, terminate.
-                printf( "***QP error. Stop.***\n" );
-                return -1;
-              }
-            else
-              vars->steptype = 1;
+        } else if (infoQP == 3 ) {
+        // 3.) QP infeasible, try to restore feasibility
+        bool qpError = true;
+        skipLineSearch = true; // don't do line search with restoration step
+
+        // Try to reduce constraint violation by heuristic
+        if (vars->steptype < 2 ) {
+          printf("***QP infeasible. Trying to reduce constraint violation...");
+          qpError = feasibilityRestorationHeuristic();
+          if (!qpError ) {
+            vars->steptype = 2;
+            printf("Success.***\n");
+          } else {
+            printf("Failed.***\n");
           }
-        else if (infoQP == 3 )
-          {// 3.) QP infeasible, try to restore feasibility
-            bool qpError = true;
-            skipLineSearch = true; // don't do line search with restoration step
+        }
 
-            // Try to reduce constraint violation by heuristic
-            if (vars->steptype < 2 )
-              {
-                printf("***QP infeasible. Trying to reduce constraint violation...");
-                qpError = feasibilityRestorationHeuristic();
-                if (!qpError )
-                  {
-                    vars->steptype = 2;
-                    printf("Success.***\n");
-                  }
-                else
-                  printf("Failed.***\n");
-              }
+        // Invoke feasibility restoration phase
+        //if (qpError && vars->steptype < 3 && param->restoreFeas )
+        if (qpError && param->restoreFeas && vars->cNorm > 0.01 * param->nlinfeastol ) {
+          printf("***Start feasibility restoration phase.***\n");
+          vars->steptype = 3;
+          qpError = feasibilityRestorationPhase();
+        }
 
-            // Invoke feasibility restoration phase
-            //if (qpError && vars->steptype < 3 && param->restoreFeas )
-            if (qpError && param->restoreFeas && vars->cNorm > 0.01 * param->nlinfeastol )
-              {
-                printf("***Start feasibility restoration phase.***\n");
-                vars->steptype = 3;
-                qpError = feasibilityRestorationPhase();
-              }
-
-            // If everything failed, abort.
-            if (qpError )
-              {
-                printf( "***QP error. Stop.***\n" );
-                return -1;
-              }
-          }
-
-        /// Determine steplength alpha
-        if (param->globalization == 0 || (param->skipFirstGlobalization && stats->itCount == 1) )
-          {// No globalization strategy, but reduce step if function cannot be evaluated
-            if (fullstep() )
-              {
-                printf( "***Constraint or objective could not be evaluated at new point. Stop.***\n" );
-                return -1;
-              }
-            vars->steptype = 0;
-          }
-        else if (param->globalization == 1 && !skipLineSearch )
-          {// Filter line search based on Waechter et al., 2006 (Ipopt paper)
-            if (filterLineSearch() || vars->reducedStepCount > param->maxConsecReducedSteps )
-              {
-                // Filter line search did not produce a step. Now there are a few things we can try ...
-                bool lsError = true;
-
-                // Heuristic 1: Check if the full step reduces the KKT error by at least kappaF, if so, accept the step.
-                lsError = kktErrorReduction( );
-                if (!lsError )
-                  vars->steptype = -1;
-
-                // Heuristic 2: Try to reduce constraint violation by closing continuity gaps to produce an admissable iterate
-                if (lsError && vars->cNorm > 0.01 * param->nlinfeastol && vars->steptype < 2 )
-                  {// Don't do this twice in a row!
-
-                    printf("***Warning! Steplength too short. Trying to reduce constraint violation...");
-
-                    // Integration over whole time interval
-                    lsError = feasibilityRestorationHeuristic( );
-                    if (!lsError )
-                      {
-                        vars->steptype = 2;
-                        printf("Success.***\n");
-                      }
-                    else
-                      printf("Failed.***\n");
-                  }
-
-                // Heuristic 3: Recompute step with a diagonal Hessian
-                if (lsError && vars->steptype != 1 && vars->steptype != 2 )
-                  {// After closing continuity gaps, we already take a step with initial Hessian. If this step is not accepted then this will cause an infinite loop!
-
-                    printf("***Warning! Steplength too short. Trying to find a new step with identity Hessian.***\n");
-                    vars->steptype = 1;
-
-                    resetHessian();
-                    continue;
-                  }
-
-                // If this does not yield a successful step, start restoration phase
-                if (lsError && vars->cNorm > 0.01 * param->nlinfeastol && param->restoreFeas )
-                  {
-                    printf("***Warning! Steplength too short. Start feasibility restoration phase.***\n");
-                    vars->steptype = 3;
-
-                    // Solve NLP with minimum norm objective
-                    lsError = feasibilityRestorationPhase( );
-                  }
-
-                // If everything failed, abort.
-                if (lsError )
-                  {
-                    printf( "***Line search error. Stop.***\n" );
-                    return -1;
-                  }
-              }
-            else
-              vars->steptype = 0;
-          }
-
-        /// Calculate "old" Lagrange gradient: gamma = dL(xi_k, lambda_k+1)
-        calcLagrangeGradient( vars->gamma, 0 );
-
-        /// Evaluate functions and gradients at the new xi
-        if (param->sparseQP )
-          prob->evaluate( vars->xi, vars->lambda, &vars->obj, vars->constr, vars->gradObj,
-                          vars->jacNz, vars->jacIndRow, vars->jacIndCol, vars->hess, 1+whichDerv, &infoEval );
-        else
-          prob->evaluate( vars->xi, vars->lambda, &vars->obj, vars->constr, vars->gradObj,
-                          vars->constrJac, vars->hess, 1+whichDerv, &infoEval );
-        stats->nDerCalls++;
-
-        /// Check if converged
-        hasConverged = calcOptTol();
-
-        /// Print one line of output for the current iteration
-        stats->printProgress( prob, vars, param, hasConverged );
-        if (hasConverged && vars->steptype < 2 )
-          {
-            stats->itCount++;
-            if (param->debugLevel > 2 )
-              {
-                //printf("Computing finite differences Hessian at the solution ... \n");
-                //calcFiniteDiffHessian( );
-                //stats->printHessian( prob->nBlocks, vars->hess );
-                stats->dumpQPCpp( prob, vars, qp, param->sparseQP );
-              }
-            return 0; //Convergence achieved!
-          }
-
-        /// Calculate difference of old and new Lagrange gradient: gamma = -gamma + dL(xi_k+1, lambda_k+1)
-        calcLagrangeGradient( vars->gamma, 1 );
-
-        /// Revise Hessian approximation
-        if (param->hessUpdate < 4 && !param->hessLimMem )
-          calcHessianUpdate( param->hessUpdate, param->hessScaling );
-        else if (param->hessUpdate < 4 && param->hessLimMem )
-          calcHessianUpdateLimitedMemory( param->hessUpdate, param->hessScaling );
-        else if (param->hessUpdate == 4 )
-          calcFiniteDiffHessian( );
-
-        // If limited memory updates  are used, set pointers deltaXi and gamma to the next column in deltaMat and gammaMat
-        updateDeltaGamma();
-
-        stats->itCount++;
-        skipLineSearch = false;
+        // If everything failed, abort.
+        if (qpError ) {
+          printf( "***QP error. Stop.***\n" );
+          return -1;
+        }
       }
+
+      /// Determine steplength alpha
+      if (param->globalization == 0 || (param->skipFirstGlobalization && stats->itCount == 1) ) {
+        // No globalization strategy, but reduce step if function cannot be evaluated
+        if (fullstep()) {
+          printf( "***Constraint or objective could not be evaluated at new point. Stop.***\n" );
+          return -1;
+        }
+        vars->steptype = 0;
+      } else if (param->globalization == 1 && !skipLineSearch ) {
+        // Filter line search based on Waechter et al., 2006 (Ipopt paper)
+        if (filterLineSearch() || vars->reducedStepCount > param->maxConsecReducedSteps ) {
+          // Filter line search did not produce a step. Now there are a few things we can try ...
+          bool lsError = true;
+
+          // Heuristic 1: Check if the full step reduces the KKT error by at least kappaF, if so, accept the step.
+          lsError = kktErrorReduction( );
+          if (!lsError )
+            vars->steptype = -1;
+
+          // Heuristic 2: Try to reduce constraint violation by closing continuity gaps to produce an admissable iterate
+          if (lsError && vars->cNorm > 0.01 * param->nlinfeastol && vars->steptype < 2 ) {
+            // Don't do this twice in a row!
+
+            printf("***Warning! Steplength too short. Trying to reduce constraint violation...");
+
+            // Integration over whole time interval
+            lsError = feasibilityRestorationHeuristic( );
+            if (!lsError )
+              {
+                vars->steptype = 2;
+                printf("Success.***\n");
+              }
+            else
+              printf("Failed.***\n");
+          }
+
+          // Heuristic 3: Recompute step with a diagonal Hessian
+          if (lsError && vars->steptype != 1 && vars->steptype != 2 ) {
+            // After closing continuity gaps, we already take a step with initial Hessian. If this step is not accepted then this will cause an infinite loop!
+
+            printf("***Warning! Steplength too short. Trying to find a new step with identity Hessian.***\n");
+            vars->steptype = 1;
+
+            resetHessian();
+            continue;
+          }
+
+          // If this does not yield a successful step, start restoration phase
+          if (lsError && vars->cNorm > 0.01 * param->nlinfeastol && param->restoreFeas ) {
+            printf("***Warning! Steplength too short. Start feasibility restoration phase.***\n");
+            vars->steptype = 3;
+
+            // Solve NLP with minimum norm objective
+            lsError = feasibilityRestorationPhase( );
+          }
+
+          // If everything failed, abort.
+          if (lsError ) {
+            printf( "***Line search error. Stop.***\n" );
+            return -1;
+          }
+        } else {
+          vars->steptype = 0;
+        }
+      }
+
+      /// Calculate "old" Lagrange gradient: gamma = dL(xi_k, lambda_k+1)
+      calcLagrangeGradient( vars->gamma, 0 );
+
+      /// Evaluate functions and gradients at the new xi
+      if (param->sparseQP ) {
+        prob->evaluate( vars->xi, vars->lambda, &vars->obj, vars->constr, vars->gradObj,
+                        vars->jacNz, vars->jacIndRow, vars->jacIndCol, vars->hess, 1+whichDerv, &infoEval );
+      } else {
+        prob->evaluate( vars->xi, vars->lambda, &vars->obj, vars->constr, vars->gradObj,
+                        vars->constrJac, vars->hess, 1+whichDerv, &infoEval );
+      }
+      stats->nDerCalls++;
+
+      /// Check if converged
+      hasConverged = calcOptTol();
+
+      /// Print one line of output for the current iteration
+      stats->printProgress( prob, vars, param, hasConverged );
+      if (hasConverged && vars->steptype < 2 ) {
+        stats->itCount++;
+        if (param->debugLevel > 2 ) {
+          //printf("Computing finite differences Hessian at the solution ... \n");
+          //calcFiniteDiffHessian( );
+          //stats->printHessian( prob->nBlocks, vars->hess );
+          stats->dumpQPCpp( prob, vars, qp, param->sparseQP );
+        }
+        return 0; //Convergence achieved!
+      }
+
+      /// Calculate difference of old and new Lagrange gradient: gamma = -gamma + dL(xi_k+1, lambda_k+1)
+      calcLagrangeGradient( vars->gamma, 1 );
+
+      /// Revise Hessian approximation
+      if (param->hessUpdate < 4 && !param->hessLimMem ) {
+        calcHessianUpdate( param->hessUpdate, param->hessScaling );
+      } else if (param->hessUpdate < 4 && param->hessLimMem ) {
+        calcHessianUpdateLimitedMemory( param->hessUpdate, param->hessScaling );
+      } else if (param->hessUpdate == 4 ) {
+        calcFiniteDiffHessian( );
+      }
+
+      // If limited memory updates  are used, set pointers deltaXi and gamma to the next column in deltaMat and gammaMat
+      updateDeltaGamma();
+
+      stats->itCount++;
+      skipLineSearch = false;
+    }
 
     return 1;
   }
 
 
   void Blocksqp::finish() {
-    if (initCalled )
+    if (initCalled ) {
       initCalled = false;
-    else
-      {
-        printf("init() must be called before finish().\n");
-        return;
-      }
+    } else {
+      printf("init() must be called before finish().\n");
+      return;
+    }
 
     stats->finish( param );
   }
@@ -326,18 +312,21 @@ namespace blocksqp {
    * flag == 2: output dL(xi_k+1, lambda_k+1) - df(xi)
    */
   void Blocksqp::calcLagrangeGradient( const Matrix &lambda, const Matrix &gradObj, double *jacNz, int *jacIndRow, int *jacIndCol,
-                                        Matrix &gradLagrange, int flag ) {
+                                       Matrix &gradLagrange, int flag ) {
     int iVar, iCon;
 
     // Objective gradient
-    if (flag == 0 )
-      for (iVar=0; iVar<prob->nVar; iVar++ )
+    if (flag == 0 ) {
+      for (iVar=0; iVar<prob->nVar; iVar++ ) {
         gradLagrange( iVar ) = gradObj( iVar );
-    else if (flag == 1 )
-      for (iVar=0; iVar<prob->nVar; iVar++ )
+      }
+    } else if (flag == 1 ) {
+      for (iVar=0; iVar<prob->nVar; iVar++ ) {
         gradLagrange( iVar ) = gradObj( iVar ) - gradLagrange( iVar );
-    else
+      }
+    } else {
       gradLagrange.Initialize( 0.0 );
+    }
 
     // - lambdaT * constrJac
     for (iVar=0; iVar<prob->nVar; iVar++ )
@@ -345,8 +334,7 @@ namespace blocksqp {
         gradLagrange( iVar ) -= lambda( prob->nVar + jacIndRow[iCon] ) * jacNz[iCon];
 
     // - lambdaT * simpleBounds
-    for (iVar=0; iVar<prob->nVar; iVar++ )
-      gradLagrange( iVar ) -= lambda( iVar );
+    for (iVar=0; iVar<prob->nVar; iVar++ ) gradLagrange( iVar ) -= lambda( iVar );
   }
 
 
@@ -358,19 +346,21 @@ namespace blocksqp {
    * flag == 2: output dL(xi_k+1, lambda_k+1) - df(xi)
    */
   void Blocksqp::calcLagrangeGradient( const Matrix &lambda, const Matrix &gradObj, const Matrix &constrJac,
-                                        Matrix &gradLagrange, int flag )
-  {
+                                       Matrix &gradLagrange, int flag ) {
     int iVar, iCon;
 
     // Objective gradient
-    if (flag == 0 )
-      for (iVar=0; iVar<prob->nVar; iVar++ )
+    if (flag == 0 ) {
+      for (iVar=0; iVar<prob->nVar; iVar++ ) {
         gradLagrange( iVar ) = gradObj( iVar );
-    else if (flag == 1 )
-      for (iVar=0; iVar<prob->nVar; iVar++ )
+      }
+    } else if (flag == 1 ) {
+      for (iVar=0; iVar<prob->nVar; iVar++ ) {
         gradLagrange( iVar ) = gradObj( iVar ) - gradLagrange( iVar );
-    else
+      }
+    } else {
       gradLagrange.Initialize( 0.0 );
+    }
 
     // - lambdaT * constrJac
     for (iVar=0; iVar<prob->nVar; iVar++ )
@@ -378,8 +368,9 @@ namespace blocksqp {
         gradLagrange( iVar ) -= lambda( prob->nVar + iCon ) * constrJac( iCon, iVar );
 
     // - lambdaT * simpleBounds
-    for (iVar=0; iVar<prob->nVar; iVar++ )
+    for (iVar=0; iVar<prob->nVar; iVar++ ) {
       gradLagrange( iVar ) -= lambda( iVar );
+    }
   }
 
 
@@ -387,10 +378,11 @@ namespace blocksqp {
    * Wrapper if called with standard arguments
    */
   void Blocksqp::calcLagrangeGradient( Matrix &gradLagrange, int flag ) {
-    if (param->sparseQP )
+    if (param->sparseQP ) {
       calcLagrangeGradient( vars->lambda, vars->gradObj, vars->jacNz, vars->jacIndRow, vars->jacIndCol, gradLagrange, flag );
-    else
+    } else {
       calcLagrangeGradient( vars->lambda, vars->gradObj, vars->constrJac, gradLagrange, flag );
+    }
   }
 
 
@@ -1192,87 +1184,81 @@ namespace blocksqp {
 
     // Iterate until a point acceptable to the filter is found
     warmStart = 0;
-    for (it=0; it<maxRestIt; it++ )
-      {
-        // One iteration for minimum norm NLP
-        ret = restMethod->run( 1, warmStart );
-        warmStart = 1;
+    for (it=0; it<maxRestIt; it++) {
+      // One iteration for minimum norm NLP
+      ret = restMethod->run( 1, warmStart );
+      warmStart = 1;
 
-        // If restMethod yields error, stop restoration phase
-        if (ret == -1 )
-          break;
+      // If restMethod yields error, stop restoration phase
+      if (ret == -1 )
+        break;
 
-        // Get new xi from the restoration phase
-        for (i=0; i<prob->nVar; i++ )
-          vars->trialXi( i ) = restMethod->vars->xi( i );
+      // Get new xi from the restoration phase
+      for (i=0; i<prob->nVar; i++ )
+        vars->trialXi( i ) = restMethod->vars->xi( i );
 
-        // Compute objective at trial point
-        prob->evaluate( vars->trialXi, &objTrial, vars->constr, &info );
-        stats->nFunCalls++;
-        cNormTrial = lInfConstraintNorm( vars->trialXi, vars->constr, prob->bu, prob->bl );
-        if (info != 0 || objTrial < prob->objLo || objTrial > prob->objUp || !(objTrial == objTrial) || !(cNormTrial == cNormTrial) )
-          continue;
+      // Compute objective at trial point
+      prob->evaluate( vars->trialXi, &objTrial, vars->constr, &info );
+      stats->nFunCalls++;
+      cNormTrial = lInfConstraintNorm( vars->trialXi, vars->constr, prob->bu, prob->bl );
+      if (info != 0 || objTrial < prob->objLo || objTrial > prob->objUp || !(objTrial == objTrial) || !(cNormTrial == cNormTrial) )
+        continue;
 
-        // Is this iterate acceptable for the filter?
-        if (!pairInFilter( cNormTrial, objTrial ) )
-          {
-            // success
-            printf("Found a point acceptable for the filter.\n");
-            ret = 0;
-            break;
-          }
-
-        // If minimum norm NLP has converged, declare local infeasibility
-        if (restMethod->vars->tol < param->opttol && restMethod->vars->cNormS < param->nlinfeastol )
-          {
-            ret = 1;
-            break;
-          }
+      // Is this iterate acceptable for the filter?
+      if (!pairInFilter( cNormTrial, objTrial )) {
+        // success
+        printf("Found a point acceptable for the filter.\n");
+        ret = 0;
+        break;
       }
+
+      // If minimum norm NLP has converged, declare local infeasibility
+      if (restMethod->vars->tol < param->opttol && restMethod->vars->cNormS < param->nlinfeastol )
+        {
+          ret = 1;
+          break;
+        }
+    }
 
     // Success or locally infeasible
-    if (ret == 0 || ret == 1 )
-      {
-        // Store the infinity norm of the multiplier step
-        vars->lambdaStepNorm = 0.0;
-        // Compute restoration step
-        for (k=0; k<prob->nVar; k++ )
-          {
-            vars->deltaXi( k ) = vars->xi( k );
+    if (ret == 0 || ret == 1 ) {
+      // Store the infinity norm of the multiplier step
+      vars->lambdaStepNorm = 0.0;
+      // Compute restoration step
+      for (k=0; k<prob->nVar; k++ ) {
+        vars->deltaXi( k ) = vars->xi( k );
 
-            vars->xi( k ) = vars->trialXi( k );
+        vars->xi( k ) = vars->trialXi( k );
 
-            // Store lInf norm of dual step
-            if ((lStpNorm = fabs( restMethod->vars->lambda( k ) - vars->lambda( k ) )) > vars->lambdaStepNorm )
-              vars->lambdaStepNorm = lStpNorm;
-            vars->lambda( k ) = restMethod->vars->lambda( k );
-            vars->lambdaQP( k ) = restMethod->vars->lambdaQP( k );
+        // Store lInf norm of dual step
+        if ((lStpNorm = fabs( restMethod->vars->lambda( k ) - vars->lambda( k ) )) > vars->lambdaStepNorm )
+          vars->lambdaStepNorm = lStpNorm;
+        vars->lambda( k ) = restMethod->vars->lambda( k );
+        vars->lambdaQP( k ) = restMethod->vars->lambdaQP( k );
 
-            vars->deltaXi( k ) -= vars->xi( k );
-          }
-        for (k=prob->nVar; k<prob->nVar+prob->nCon; k++ )
-          {
-            // skip the dual variables for the slack variables in the restoration problem
-            if ((lStpNorm = fabs( restMethod->vars->lambda( 2*prob->nCon + k ) - vars->lambda( k ) )) > vars->lambdaStepNorm )
-              vars->lambdaStepNorm = lStpNorm;
-            vars->lambda( k ) = restMethod->vars->lambda( 2*prob->nCon + k );
-            vars->lambdaQP( k ) = restMethod->vars->lambdaQP( 2*prob->nCon + k );
-          }
-        vars->alpha = 1.0;
-        vars->nSOCS = 0;
-
-        // reset reduced step counter
-        vars->reducedStepCount = 0;
-
-        // reset Hessian and limited memory information
-        resetHessian();
+        vars->deltaXi( k ) -= vars->xi( k );
       }
-
-    if (ret == 1 )
-      {
-        stats->printProgress( prob, vars, param, 0 );
-        printf("The problem seems to be locally infeasible. Infeasibilities minimized.\n");
+      for (k=prob->nVar; k<prob->nVar+prob->nCon; k++ ) {
+        // skip the dual variables for the slack variables in the restoration problem
+        if ((lStpNorm = fabs( restMethod->vars->lambda( 2*prob->nCon + k ) - vars->lambda( k ) )) > vars->lambdaStepNorm )
+          vars->lambdaStepNorm = lStpNorm;
+        vars->lambda( k ) = restMethod->vars->lambda( 2*prob->nCon + k );
+        vars->lambdaQP( k ) = restMethod->vars->lambdaQP( 2*prob->nCon + k );
       }
+      vars->alpha = 1.0;
+      vars->nSOCS = 0;
+
+      // reset reduced step counter
+      vars->reducedStepCount = 0;
+
+      // reset Hessian and limited memory information
+      resetHessian();
+    }
+
+    if (ret == 1 ) {
+      stats->printProgress( prob, vars, param, 0 );
+      printf("The problem seems to be locally infeasible. Infeasibilities minimized.\n");
+    }
 
     // Clean up
     delete restMethod;
@@ -1335,11 +1321,10 @@ namespace blocksqp {
 
     // Compute the "step" taken by closing the continuity conditions
     /// \note deltaXi is reset by resetHessian(), so this doesn't matter
-    for (k=0; k<prob->nVar; k++ )
-      {
-        //vars->deltaXi( k ) = vars->trialXi( k ) - vars->xi( k );
-        vars->xi( k ) = vars->trialXi( k );
-      }
+    for (k=0; k<prob->nVar; k++ ) {
+      //vars->deltaXi( k ) = vars->trialXi( k ) - vars->xi( k );
+      vars->xi( k ) = vars->trialXi( k );
+    }
 
     // reduce Hessian and limited memory information
     resetHessian();
@@ -1365,33 +1350,32 @@ namespace blocksqp {
     prob->evaluate( vars->trialXi, &objTrial, trialConstr, &info );
     stats->nFunCalls++;
     cNormTrial = lInfConstraintNorm( vars->trialXi, trialConstr, prob->bu, prob->bl );
-    if (info != 0 || objTrial < prob->objLo || objTrial > prob->objUp || !(objTrial == objTrial) || !(cNormTrial == cNormTrial) )
-      {
-        // evaluation error
-        return 1;
-      }
+    if (info != 0 || objTrial < prob->objLo || objTrial > prob->objUp || !(objTrial == objTrial) || !(cNormTrial == cNormTrial) ) {
+      // evaluation error
+      return 1;
+    }
 
     // Compute KKT error of the new point
 
     // scaled norm of Lagrangian gradient
     trialGradLagrange.Dimension( prob->nVar ).Initialize( 0.0 );
-    if (param->sparseQP )
+    if (param->sparseQP ) {
       calcLagrangeGradient( vars->lambdaQP, vars->gradObj, vars->jacNz,
                             vars->jacIndRow, vars->jacIndCol, trialGradLagrange, 0 );
-    else
+    } else {
       calcLagrangeGradient( vars->lambdaQP, vars->gradObj, vars->constrJac,
                             trialGradLagrange, 0 );
+    }
 
     trialGradNorm = lInfVectorNorm( trialGradLagrange );
     trialTol = trialGradNorm /( 1.0 + lInfVectorNorm( vars->lambdaQP ) );
 
-    if (fmax( cNormTrial, trialTol ) < param->kappaF * fmax( vars->cNorm, vars->tol ) )
-      {
-        acceptStep( 1.0 );
-        return 0;
-      }
-    else
+    if (fmax( cNormTrial, trialTol ) < param->kappaF * fmax( vars->cNorm, vars->tol ) ) {
+      acceptStep( 1.0 );
+      return 0;
+    } else {
       return 1;
+    }
   }
 
   /**
@@ -1417,10 +1401,9 @@ namespace blocksqp {
     for (iter=filter->begin(); iter!=filter->end(); iter++ )
       if ((cNorm >= (1.0 - param->gammaTheta) * iter->first ||
            (cNorm < 0.01 * param->nlinfeastol && iter->first < 0.01 * param->nlinfeastol ) ) &&
-          obj >= iter->second - param->gammaF * iter->first )
-        {
-          return 1;
-        }
+          obj >= iter->second - param->gammaF * iter->first ) {
+        return 1;
+      }
 
     return 0;
   }
@@ -1432,12 +1415,11 @@ namespace blocksqp {
 
     // Remove all elements
     iter=vars->filter->begin();
-    while (iter != vars->filter->end())
-      {
-        std::set< std::pair<double,double> >::iterator iterToRemove = iter;
-        iter++;
-        vars->filter->erase( iterToRemove );
-      }
+    while (iter != vars->filter->end()) {
+      std::set< std::pair<double,double> >::iterator iterToRemove = iter;
+      iter++;
+      vars->filter->erase( iterToRemove );
+    }
 
     // Initialize with pair ( maxConstrViolation, objLowerBound );
     vars->filter->insert( initPair );
@@ -1457,18 +1439,16 @@ namespace blocksqp {
 
     // Remove dominated elements
     iter=vars->filter->begin();
-    while (iter != vars->filter->end())
-      {
-        //printf(" iter->first=%g, entry.first=%g, iter->second=%g, entry.second=%g\n",iter->first, entry.first, iter->second, entry.second);
-        if (iter->first > entry.first && iter->second > entry.second )
-          {
-            std::set< std::pair<double,double> >::iterator iterToRemove = iter;
-            iter++;
-            vars->filter->erase( iterToRemove );
-          }
-        else
-          iter++;
+    while (iter != vars->filter->end()) {
+      //printf(" iter->first=%g, entry.first=%g, iter->second=%g, entry.second=%g\n",iter->first, entry.first, iter->second, entry.second);
+      if (iter->first > entry.first && iter->second > entry.second ) {
+        std::set< std::pair<double,double> >::iterator iterToRemove = iter;
+        iter++;
+        vars->filter->erase( iterToRemove );
+      } else {
+        iter++;
       }
+    }
     // Print current filter
     //for (iter=vars->filter->begin(); iter!=vars->filter->end(); iter++ )
     //printf("(%g,%g), ", iter->first, iter->second);
@@ -1479,48 +1459,42 @@ namespace blocksqp {
     int maxblocksize = 1;
 
     // Set nBlocks structure according to if we use block updates or not
-    if (param->blockHess == 0 || prob->nBlocks == 1 )
-      {
-        nBlocks = 1;
-        blockIdx = new int[2];
-        blockIdx[0] = 0;
-        blockIdx[1] = prob->nVar;
-        maxblocksize = prob->nVar;
-        param->whichSecondDerv = 0;
+    if (param->blockHess == 0 || prob->nBlocks == 1 ) {
+      nBlocks = 1;
+      blockIdx = new int[2];
+      blockIdx[0] = 0;
+      blockIdx[1] = prob->nVar;
+      maxblocksize = prob->nVar;
+      param->whichSecondDerv = 0;
+    } else if (param->blockHess == 2 && prob->nBlocks > 1 ) {
+      // hybrid strategy: 1 block for constraints, 1 for objective
+      nBlocks = 2;
+      blockIdx = new int[3];
+      blockIdx[0] = 0;
+      blockIdx[1] = prob->blockIdx[prob->nBlocks-1];
+      blockIdx[2] = prob->nVar;
+    } else {
+      nBlocks = prob->nBlocks;
+      blockIdx = new int[nBlocks+1];
+      for (int k=0; k<nBlocks+1; k++ ) {
+        blockIdx[k] = prob->blockIdx[k];
+        if (k > 0 )
+          if (blockIdx[k] - blockIdx[k-1] > maxblocksize )
+            maxblocksize = blockIdx[k] - blockIdx[k-1];
       }
-    else if (param->blockHess == 2 && prob->nBlocks > 1 )
-      {// hybrid strategy: 1 block for constraints, 1 for objective
-        nBlocks = 2;
-        blockIdx = new int[3];
-        blockIdx[0] = 0;
-        blockIdx[1] = prob->blockIdx[prob->nBlocks-1];
-        blockIdx[2] = prob->nVar;
-      }
-    else
-      {
-        nBlocks = prob->nBlocks;
-        blockIdx = new int[nBlocks+1];
-        for (int k=0; k<nBlocks+1; k++ )
-          {
-            blockIdx[k] = prob->blockIdx[k];
-            if (k > 0 )
-              if (blockIdx[k] - blockIdx[k-1] > maxblocksize )
-                maxblocksize = blockIdx[k] - blockIdx[k-1];
-          }
-      }
+    }
 
     if (param->hessLimMem && param->hessMemsize == 0 )
       param->hessMemsize = maxblocksize;
 
     allocMin( prob );
 
-    if (!param->sparseQP )
-      {
-        constrJac.Dimension( prob->nCon, prob->nVar ).Initialize( 0.0 );
-        hessNz = new double[prob->nVar*prob->nVar];
-      }
-    else
+    if (!param->sparseQP ) {
+      constrJac.Dimension( prob->nCon, prob->nVar ).Initialize( 0.0 );
+      hessNz = new double[prob->nVar*prob->nVar];
+    } else {
       hessNz = NULL;
+    }
 
     jacNz = NULL;
     jacIndCol = NULL;
@@ -1535,11 +1509,10 @@ namespace blocksqp {
 
     noUpdateCounter = NULL;
 
-    if (full )
-      {
-        allocHess( param );
-        allocAlg( prob, param );
-      }
+    if (full ) {
+      allocHess( param );
+      allocAlg( prob, param );
+    }
   }
 
 
@@ -1558,26 +1531,23 @@ namespace blocksqp {
     gradLagrange = iter.gradLagrange;
 
     constrJac = iter.constrJac;
-    if (iter.jacNz != NULL )
-      {
-        int nVar = xi.M();
-        int nnz = iter.jacIndCol[nVar];
+    if (iter.jacNz != NULL ) {
+      int nVar = xi.M();
+      int nnz = iter.jacIndCol[nVar];
 
-        jacNz = new double[nnz];
-        for (i=0; i<nnz; i++ )
-          jacNz[i] = iter.jacNz[i];
+      jacNz = new double[nnz];
+      for (i=0; i<nnz; i++ )
+        jacNz[i] = iter.jacNz[i];
 
-        jacIndRow = new int[nnz + (nVar+1) + nVar];
-        for (i=0; i<nnz + (nVar+1) + nVar; i++ )
-          jacIndRow[i] = iter.jacIndRow[i];
-        jacIndCol = jacIndRow + nnz;
-      }
-    else
-      {
-        jacNz = NULL;
-        jacIndRow = NULL;
-        jacIndCol = NULL;
-      }
+      jacIndRow = new int[nnz + (nVar+1) + nVar];
+      for (i=0; i<nnz + (nVar+1) + nVar; i++ )
+        jacIndRow[i] = iter.jacIndRow[i];
+      jacIndCol = jacIndRow + nnz;
+    } else {
+      jacNz = NULL;
+      jacIndRow = NULL;
+      jacIndCol = NULL;
+    }
 
     noUpdateCounter = NULL;
     hessNz = NULL;
@@ -1626,15 +1596,13 @@ namespace blocksqp {
       }
 
     // For SR1 or finite differences, maintain two Hessians
-    if (param->hessUpdate == 1 || param->hessUpdate == 4 )
-      {
-        hess2 = new SymMatrix[nBlocks];
-        for (iBlock=0; iBlock<nBlocks; iBlock++ )
-          {
-            varDim = blockIdx[iBlock+1] - blockIdx[iBlock];
-            hess2[iBlock].Dimension( varDim ).Initialize( 0.0 );
-          }
+    if (param->hessUpdate == 1 || param->hessUpdate == 4 ) {
+      hess2 = new SymMatrix[nBlocks];
+      for (iBlock=0; iBlock<nBlocks; iBlock++ ) {
+        varDim = blockIdx[iBlock+1] - blockIdx[iBlock];
+        hess2[iBlock].Dimension( varDim ).Initialize( 0.0 );
       }
+    }
 
     // Set Hessian pointer
     hess = hess1;
@@ -1645,8 +1613,7 @@ namespace blocksqp {
    * Assumes that hessNz is already allocated.
    */
   void SQPiterate::convertHessian( Problemspec *prob, double eps, SymMatrix *&hess_ ) {
-    if (hessNz == NULL )
-      return;
+    if (hessNz == NULL ) return;
     int count = 0;
     int blockCnt = 0;
     for (int i=0; i<prob->nVar; i++ )
@@ -1694,36 +1661,33 @@ namespace blocksqp {
     count = 0; // runs over all nonzero elements
     colCountTotal = 0; // keep track of position in large matrix
     rowOffset = 0;
-    for (iBlock=0; iBlock<nBlocks; iBlock++ )
-      {
-        nCols = hess_[iBlock].N();
-        nRows = hess_[iBlock].M();
+    for (iBlock=0; iBlock<nBlocks; iBlock++ ) {
+      nCols = hess_[iBlock].N();
+      nRows = hess_[iBlock].M();
 
-        for (i=0; i<nCols; i++ )
-          {
-            // column 'colCountTotal' starts at element 'count'
-            hessIndCol_[colCountTotal] = count;
+      for (i=0; i<nCols; i++ ) {
+        // column 'colCountTotal' starts at element 'count'
+        hessIndCol_[colCountTotal] = count;
 
-            for (j=0; j<nRows; j++ )
-              if (fabs(hess_[iBlock]( i,j )) > eps )
-                {
-                  hessNz_[count] = hess_[iBlock]( i, j );
-                  hessIndRow_[count] = j + rowOffset;
-                  count++;
-                }
-            colCountTotal++;
-          }
-
-        rowOffset += nRows;
+        for (j=0; j<nRows; j++ )
+          if (fabs(hess_[iBlock]( i,j )) > eps )
+            {
+              hessNz_[count] = hess_[iBlock]( i, j );
+              hessIndRow_[count] = j + rowOffset;
+              count++;
+            }
+        colCountTotal++;
       }
+
+      rowOffset += nRows;
+    }
     hessIndCol_[colCountTotal] = count;
 
     // 3) Set reference to lower triangular matrix
-    for (j=0; j<prob->nVar; j++ )
-      {
-        for (i=hessIndCol_[j]; i<hessIndCol_[j+1] && hessIndRow_[i]<j; i++);
-        hessIndLo_[j] = i;
-      }
+    for (j=0; j<prob->nVar; j++ ) {
+      for (i=hessIndCol_[j]; i<hessIndCol_[j+1] && hessIndRow_[i]<j; i++);
+      hessIndLo_[j] = i;
+    }
 
     if (count != nnz )
       printf( "Error in convertHessian: %i elements processed, should be %i elements!\n", count, nnz );
@@ -1900,81 +1864,68 @@ namespace blocksqp {
     // Compute original Lagrange gradient
     calcLagrangeGradient( vars->lambda, vars->gradObj, vars->jacNz, vars->jacIndRow, vars->jacIndCol, vars->gradLagrange, 0 );
 
-    for (iVar = 0; iVar<maxBlock; iVar++ )
-      {
-        pert.Initialize( 0.0 );
+    for (iVar = 0; iVar<maxBlock; iVar++ ) {
+      pert.Initialize( 0.0 );
 
-        // Perturb all blocks simultaneously
-        for (iBlock=0; iBlock<vars->nBlocks; iBlock++ )
-          {
-            idx = vars->blockIdx[iBlock] + iVar;
-            // Skip blocks that have less than iVar variables
-            if (idx < vars->blockIdx[iBlock+1] )
-              {
-                pert( idx ) = myDelta * fabs( vars->xi( idx ) );
-                pert( idx ) = fmax( pert( idx ), minDelta );
+      // Perturb all blocks simultaneously
+      for (iBlock=0; iBlock<vars->nBlocks; iBlock++ ) {
+        idx = vars->blockIdx[iBlock] + iVar;
+        // Skip blocks that have less than iVar variables
+        if (idx < vars->blockIdx[iBlock+1] ) {
+          pert( idx ) = myDelta * fabs( vars->xi( idx ) );
+          pert( idx ) = fmax( pert( idx ), minDelta );
 
-                // If perturbation violates upper bound, try to perturb with negative
-                upperVio = vars->xi( idx ) + pert( idx ) - prob->bu( idx );
-                if (upperVio > 0 )
-                  {
-                    lowerVio = prob->bl( idx ) -  ( vars->xi( idx ) - pert( idx ) );
-                    // If perturbation violates also lower bound, take the largest perturbation possible
-                    if (lowerVio > 0 )
-                      {
-                        if (lowerVio > upperVio )
-                          pert( idx ) = -lowerVio;
-                        else
-                          pert( idx ) = upperVio;
-                      }
-                    // If perturbation does not violate lower bound, take -computed perturbation
-                    else
-                      {
-                        pert( idx ) = -pert( idx );
-                      }
-                  }
-              }
+          // If perturbation violates upper bound, try to perturb with negative
+          upperVio = vars->xi( idx ) + pert( idx ) - prob->bu( idx );
+          if (upperVio > 0 ) {
+            lowerVio = prob->bl( idx ) -  ( vars->xi( idx ) - pert( idx ) );
+            // If perturbation violates also lower bound, take the largest perturbation possible
+            if (lowerVio > 0 ) {
+              if (lowerVio > upperVio )
+                pert( idx ) = -lowerVio;
+              else
+                pert( idx ) = upperVio;
+            } else {
+              // If perturbation does not violate lower bound, take -computed perturbation
+              pert( idx ) = -pert( idx );
+            }
           }
-
-        // Add perturbation
-        for (k=0; k<prob->nVar; k++ )
-          vars->xi( k ) += pert( k );
-
-        // Compute perturbed Lagrange gradient
-        if (param->sparseQP )
-          {
-            prob->evaluate( vars->xi, vars->lambda, &dummy, varsP.constr, varsP.gradObj,
-                            varsP.jacNz, varsP.jacIndRow, varsP.jacIndCol, vars->hess, 1, &info );
-            calcLagrangeGradient( vars->lambda, varsP.gradObj, varsP.jacNz, varsP.jacIndRow,
-                                  varsP.jacIndCol, varsP.gradLagrange, 0 );
-          }
-        else
-          {
-            prob->evaluate( vars->xi, vars->lambda, &dummy, varsP.constr, varsP.gradObj, varsP.constrJac, vars->hess, 1, &info );
-            calcLagrangeGradient( vars->lambda, varsP.gradObj, varsP.constrJac, varsP.gradLagrange, 0 );
-          }
-
-        // Compute finite difference approximations: one column in every block
-        for (iBlock=0; iBlock<vars->nBlocks; iBlock++ )
-          {
-            idx1 = vars->blockIdx[iBlock] + iVar;
-            // Skip blocks that have less than iVar variables
-            if (idx1 < vars->blockIdx[iBlock+1] )
-              {
-                for (jVar=iVar; jVar<vars->blockIdx[iBlock+1]-vars->blockIdx[iBlock]; jVar++ )
-                  {// Take symmetrized matrices
-                    idx2 = vars->blockIdx[iBlock] + jVar;
-                    vars->hess[iBlock]( iVar, jVar ) =  ( varsP.gradLagrange( idx1 ) - vars->gradLagrange( idx2 ) );
-                    vars->hess[iBlock]( iVar, jVar ) += ( varsP.gradLagrange( idx2 ) - vars->gradLagrange( idx1 ) );
-                    vars->hess[iBlock]( iVar, jVar ) *= 0.5 / pert( idx1 );
-                  }
-              }
-          }
-
-        // Subtract perturbation
-        for (k=0; k<prob->nVar; k++ )
-          vars->xi( k ) -= pert( k );
+        }
       }
+
+      // Add perturbation
+      for (k=0; k<prob->nVar; k++ )
+        vars->xi( k ) += pert( k );
+
+      // Compute perturbed Lagrange gradient
+      if (param->sparseQP ) {
+        prob->evaluate( vars->xi, vars->lambda, &dummy, varsP.constr, varsP.gradObj,
+                        varsP.jacNz, varsP.jacIndRow, varsP.jacIndCol, vars->hess, 1, &info );
+        calcLagrangeGradient( vars->lambda, varsP.gradObj, varsP.jacNz, varsP.jacIndRow,
+                              varsP.jacIndCol, varsP.gradLagrange, 0 );
+      } else {
+        prob->evaluate( vars->xi, vars->lambda, &dummy, varsP.constr, varsP.gradObj, varsP.constrJac, vars->hess, 1, &info );
+        calcLagrangeGradient( vars->lambda, varsP.gradObj, varsP.constrJac, varsP.gradLagrange, 0 );
+      }
+
+      // Compute finite difference approximations: one column in every block
+      for (iBlock=0; iBlock<vars->nBlocks; iBlock++ ) {
+        idx1 = vars->blockIdx[iBlock] + iVar;
+        // Skip blocks that have less than iVar variables
+        if (idx1 < vars->blockIdx[iBlock+1] ) {
+          for (jVar=iVar; jVar<vars->blockIdx[iBlock+1]-vars->blockIdx[iBlock]; jVar++ )
+            {// Take symmetrized matrices
+              idx2 = vars->blockIdx[iBlock] + jVar;
+              vars->hess[iBlock]( iVar, jVar ) =  ( varsP.gradLagrange( idx1 ) - vars->gradLagrange( idx2 ) );
+              vars->hess[iBlock]( iVar, jVar ) += ( varsP.gradLagrange( idx2 ) - vars->gradLagrange( idx1 ) );
+              vars->hess[iBlock]( iVar, jVar ) *= 0.5 / pert( idx1 );
+            }
+        }
+      }
+
+      // Subtract perturbation
+      for (k=0; k<prob->nVar; k++ ) vars->xi( k ) -= pert( k );
+    }
 
     return info;
   }
@@ -1985,33 +1936,30 @@ namespace blocksqp {
     double scale;
     double myEps = 1.0e3 * param->eps;
 
-    if (option == 1 )
-      {// Shanno-Phua
-        scale = adotb( gamma, gamma ) / fmax( adotb( delta, gamma ), myEps );
-      }
-    else if (option == 2 )
-      {// Oren-Luenberger
-        scale = adotb( delta, gamma ) / fmax( adotb( delta, delta ), myEps );
-        scale = fmin( scale, 1.0 );
-      }
-    else if (option == 3 )
-      {// Geometric mean of 1 and 2
-        scale = sqrt( adotb( gamma, gamma ) / fmax( adotb( delta, delta ), myEps ) );
-      }
-    else
-      {// Invalid option, ignore
-        return;
-      }
+    if (option == 1 ) {
+      // Shanno-Phua
+      scale = adotb( gamma, gamma ) / fmax( adotb( delta, gamma ), myEps );
+    }
+    else if (option == 2 ) {
+      // Oren-Luenberger
+      scale = adotb( delta, gamma ) / fmax( adotb( delta, delta ), myEps );
+      scale = fmin( scale, 1.0 );
+    } else if (option == 3 ) {
+      // Geometric mean of 1 and 2
+      scale = sqrt( adotb( gamma, gamma ) / fmax( adotb( delta, delta ), myEps ) );
+    } else {
+      // Invalid option, ignore
+      return;
+    }
 
-    if (scale > 0.0 )
-      {
-        scale = fmax( scale, myEps );
-        for (i=0; i<vars->hess[iBlock].M(); i++ )
-          for (j=i; j<vars->hess[iBlock].M(); j++ )
-            vars->hess[iBlock]( i,j ) *= scale;
-      }
-    else
+    if (scale > 0.0 ) {
+      scale = fmax( scale, myEps );
+      for (i=0; i<vars->hess[iBlock].M(); i++ )
+        for (j=i; j<vars->hess[iBlock].M(); j++ )
+          vars->hess[iBlock]( i,j ) *= scale;
+    } else {
       scale = 1.0;
+    }
 
     // statistics: average sizing factor
     stats->averageSizingFactor += scale;
@@ -2034,33 +1982,33 @@ namespace blocksqp {
         deltaBdelta += delta( i ) * vars->hess[iBlock]( i, j ) * delta( j );
 
     // Centered Oren-Luenberger factor
-    if (vars->noUpdateCounter[iBlock] == -1 ) // in the first iteration, this should equal the OL factor
+    if (vars->noUpdateCounter[iBlock] == -1 ) {
+      // in the first iteration, this should equal the OL factor
       theta = 1.0;
-    else
+    } else {
       theta = fmin( param->colTau1, param->colTau2 * deltaNorm );
-    if (deltaNorm > myEps && deltaNormOld > myEps )
-      {
-        scale = (1.0 - theta)*deltaGammaOld / deltaNormOld + theta*deltaBdelta / deltaNorm;
-        if (scale > param->eps )
-          scale = ( (1.0 - theta)*deltaGammaOld / deltaNormOld + theta*deltaGamma / deltaNorm ) / scale;
-      }
-    else
+    }
+    if (deltaNorm > myEps && deltaNormOld > myEps ) {
+      scale = (1.0 - theta)*deltaGammaOld / deltaNormOld + theta*deltaBdelta / deltaNorm;
+      if (scale > param->eps )
+        scale = ( (1.0 - theta)*deltaGammaOld / deltaNormOld + theta*deltaGamma / deltaNorm ) / scale;
+    } else {
       scale = 1.0;
+    }
 
     // Size only if factor is between zero and one
-    if (scale < 1.0 && scale > 0.0 )
-      {
-        scale = fmax( param->colEps, scale );
-        //printf("Sizing value (COL) block %i = %g\n", iBlock, scale );
-        for (i=0; i<vars->hess[iBlock].M(); i++ )
-          for (j=i; j<vars->hess[iBlock].M(); j++ )
-            vars->hess[iBlock]( i,j ) *= scale;
+    if (scale < 1.0 && scale > 0.0 ) {
+      scale = fmax( param->colEps, scale );
+      //printf("Sizing value (COL) block %i = %g\n", iBlock, scale );
+      for (i=0; i<vars->hess[iBlock].M(); i++ )
+        for (j=i; j<vars->hess[iBlock].M(); j++ )
+          vars->hess[iBlock]( i,j ) *= scale;
 
-        // statistics: average sizing factor
-        stats->averageSizingFactor += scale;
-      }
-    else
+      // statistics: average sizing factor
+      stats->averageSizingFactor += scale;
+    } else {
       stats->averageSizingFactor += 1.0;
+    }
   }
 
   /**
@@ -2082,57 +2030,56 @@ namespace blocksqp {
     stats->hessDamped = 0;
     stats->averageSizingFactor = 0.0;
 
-    for (iBlock=0; iBlock<nBlocks; iBlock++ )
-      {
-        nVarLocal = vars->hess[iBlock].M();
+    for (iBlock=0; iBlock<nBlocks; iBlock++ ) {
+      nVarLocal = vars->hess[iBlock].M();
 
-        // smallGamma and smallDelta are subvectors of gamma and delta, corresponding to partially separability
-        smallGamma.Submatrix( vars->gammaMat, nVarLocal, vars->gammaMat.N(), vars->blockIdx[iBlock], 0 );
-        smallDelta.Submatrix( vars->deltaMat, nVarLocal, vars->deltaMat.N(), vars->blockIdx[iBlock], 0 );
+      // smallGamma and smallDelta are subvectors of gamma and delta, corresponding to partially separability
+      smallGamma.Submatrix( vars->gammaMat, nVarLocal, vars->gammaMat.N(), vars->blockIdx[iBlock], 0 );
+      smallDelta.Submatrix( vars->deltaMat, nVarLocal, vars->deltaMat.N(), vars->blockIdx[iBlock], 0 );
 
-        // Is this the first iteration or the first after a Hessian reset?
-        firstIter = ( vars->noUpdateCounter[iBlock] == -1 );
+      // Is this the first iteration or the first after a Hessian reset?
+      firstIter = ( vars->noUpdateCounter[iBlock] == -1 );
 
-        // Update sTs, sTs_ and sTy, sTy_
-        vars->deltaNormOld(iBlock) = vars->deltaNorm(iBlock);
-        vars->deltaGammaOld(iBlock) = vars->deltaGamma(iBlock);
-        vars->deltaNorm(iBlock) = adotb( smallDelta, smallDelta );
-        vars->deltaGamma(iBlock) = adotb( smallDelta, smallGamma );
+      // Update sTs, sTs_ and sTy, sTy_
+      vars->deltaNormOld(iBlock) = vars->deltaNorm(iBlock);
+      vars->deltaGammaOld(iBlock) = vars->deltaGamma(iBlock);
+      vars->deltaNorm(iBlock) = adotb( smallDelta, smallDelta );
+      vars->deltaGamma(iBlock) = adotb( smallDelta, smallGamma );
 
-        // Sizing before the update
-        if (hessScaling < 4 && firstIter )
-          sizeInitialHessian( smallGamma, smallDelta, iBlock, hessScaling );
-        else if (hessScaling == 4 )
+      // Sizing before the update
+      if (hessScaling < 4 && firstIter )
+        sizeInitialHessian( smallGamma, smallDelta, iBlock, hessScaling );
+      else if (hessScaling == 4 )
+        sizeHessianCOL( smallGamma, smallDelta, iBlock );
+
+      // Compute the new update
+      if (updateType == 1 ) {
+        calcSR1( smallGamma, smallDelta, iBlock );
+
+        // Prepare to compute fallback update as well
+        vars->hess = vars->hess2;
+
+        // Sizing the fallback update
+        if (param->fallbackScaling < 4 && firstIter )
+          sizeInitialHessian( smallGamma, smallDelta, iBlock, param->fallbackScaling );
+        else if (param->fallbackScaling == 4 )
           sizeHessianCOL( smallGamma, smallDelta, iBlock );
 
-        // Compute the new update
-        if (updateType == 1 )
-          {
-            calcSR1( smallGamma, smallDelta, iBlock );
-
-            // Prepare to compute fallback update as well
-            vars->hess = vars->hess2;
-
-            // Sizing the fallback update
-            if (param->fallbackScaling < 4 && firstIter )
-              sizeInitialHessian( smallGamma, smallDelta, iBlock, param->fallbackScaling );
-            else if (param->fallbackScaling == 4 )
-              sizeHessianCOL( smallGamma, smallDelta, iBlock );
-
-            // Compute fallback update
-            if (param->fallbackUpdate == 2 )
-              calcBFGS( smallGamma, smallDelta, iBlock );
-
-            // Reset pointer
-            vars->hess = vars->hess1;
-          }
-        else if (updateType == 2 )
+        // Compute fallback update
+        if (param->fallbackUpdate == 2 )
           calcBFGS( smallGamma, smallDelta, iBlock );
 
-        // If an update is skipped to often, reset Hessian block
-        if (vars->noUpdateCounter[iBlock] > param->maxConsecSkippedUpdates )
-          resetHessian( iBlock );
+        // Reset pointer
+        vars->hess = vars->hess1;
+      } else if (updateType == 2 ) {
+        calcBFGS( smallGamma, smallDelta, iBlock );
       }
+
+      // If an update is skipped to often, reset Hessian block
+      if (vars->noUpdateCounter[iBlock] > param->maxConsecSkippedUpdates ) {
+        resetHessian( iBlock );
+      }
+    }
 
     // statistics: average sizing factor
     stats->averageSizingFactor /= nBlocks;
@@ -2148,97 +2095,93 @@ namespace blocksqp {
     double averageSizingFactor;
 
     //if objective derv is computed exactly, don't set the last block!
-    if (param->whichSecondDerv == 1 && param->blockHess )
+    if (param->whichSecondDerv == 1 && param->blockHess ) {
       nBlocks = vars->nBlocks - 1;
-    else
+    } else {
       nBlocks = vars->nBlocks;
+    }
 
     // Statistics: how often is damping active, what is the average COL sizing factor?
     stats->hessDamped = 0;
     stats->hessSkipped = 0;
     stats->averageSizingFactor = 0.0;
 
-    for (iBlock=0; iBlock<nBlocks; iBlock++ )
-      {
-        nVarLocal = vars->hess[iBlock].M();
+    for (iBlock=0; iBlock<nBlocks; iBlock++ ) {
+      nVarLocal = vars->hess[iBlock].M();
 
-        // smallGamma and smallDelta are submatrices of gammaMat, deltaMat,
-        // i.e. subvectors of gamma and delta from m prev. iterations
-        smallGamma.Submatrix( vars->gammaMat, nVarLocal, vars->gammaMat.N(), vars->blockIdx[iBlock], 0 );
-        smallDelta.Submatrix( vars->deltaMat, nVarLocal, vars->deltaMat.N(), vars->blockIdx[iBlock], 0 );
+      // smallGamma and smallDelta are submatrices of gammaMat, deltaMat,
+      // i.e. subvectors of gamma and delta from m prev. iterations
+      smallGamma.Submatrix( vars->gammaMat, nVarLocal, vars->gammaMat.N(), vars->blockIdx[iBlock], 0 );
+      smallDelta.Submatrix( vars->deltaMat, nVarLocal, vars->deltaMat.N(), vars->blockIdx[iBlock], 0 );
 
-        // Memory structure
-        if (stats->itCount > smallGamma.N() )
-          {
-            m = smallGamma.N();
-            posOldest = stats->itCount % m;
-            posNewest = (stats->itCount-1) % m;
-          }
-        else
-          {
-            m = stats->itCount;
-            posOldest = 0;
-            posNewest = m-1;
-          }
+      // Memory structure
+      if (stats->itCount > smallGamma.N() ) {
+        m = smallGamma.N();
+        posOldest = stats->itCount % m;
+        posNewest = (stats->itCount-1) % m;
+      } else {
+        m = stats->itCount;
+        posOldest = 0;
+        posNewest = m-1;
+      }
 
-        // Set B_0 (pretend it's the first step)
-        calcInitialHessian( iBlock );
-        vars->deltaNorm( iBlock ) = 1.0;
-        vars->deltaNormOld( iBlock ) = 1.0;
-        vars->deltaGamma( iBlock ) = 0.0;
-        vars->deltaGammaOld( iBlock ) = 0.0;
-        vars->noUpdateCounter[iBlock] = -1;
+      // Set B_0 (pretend it's the first step)
+      calcInitialHessian( iBlock );
+      vars->deltaNorm( iBlock ) = 1.0;
+      vars->deltaNormOld( iBlock ) = 1.0;
+      vars->deltaGamma( iBlock ) = 0.0;
+      vars->deltaGammaOld( iBlock ) = 0.0;
+      vars->noUpdateCounter[iBlock] = -1;
 
-        // Size the initial update, but with the most recent delta/gamma-pair
-        gammai.Submatrix( smallGamma, nVarLocal, 1, 0, posNewest );
-        deltai.Submatrix( smallDelta, nVarLocal, 1, 0, posNewest );
-        sizeInitialHessian( gammai, deltai, iBlock, hessScaling );
+      // Size the initial update, but with the most recent delta/gamma-pair
+      gammai.Submatrix( smallGamma, nVarLocal, 1, 0, posNewest );
+      deltai.Submatrix( smallDelta, nVarLocal, 1, 0, posNewest );
+      sizeInitialHessian( gammai, deltai, iBlock, hessScaling );
 
-        for (i=0; i<m; i++ )
-          {
-            pos = (posOldest+i) % m;
+      for (i=0; i<m; i++ ) {
+        pos = (posOldest+i) % m;
 
-            // Get new vector from list
-            gammai.Submatrix( smallGamma, nVarLocal, 1, 0, pos );
-            deltai.Submatrix( smallDelta, nVarLocal, 1, 0, pos );
+        // Get new vector from list
+        gammai.Submatrix( smallGamma, nVarLocal, 1, 0, pos );
+        deltai.Submatrix( smallDelta, nVarLocal, 1, 0, pos );
 
-            // Update sTs, sTs_ and sTy, sTy_
-            vars->deltaNormOld(iBlock) = vars->deltaNorm(iBlock);
-            vars->deltaGammaOld(iBlock) = vars->deltaGamma(iBlock);
-            vars->deltaNorm(iBlock) = adotb( deltai, deltai );
-            vars->deltaGamma(iBlock) = adotb( gammai, deltai );
+        // Update sTs, sTs_ and sTy, sTy_
+        vars->deltaNormOld(iBlock) = vars->deltaNorm(iBlock);
+        vars->deltaGammaOld(iBlock) = vars->deltaGamma(iBlock);
+        vars->deltaNorm(iBlock) = adotb( deltai, deltai );
+        vars->deltaGamma(iBlock) = adotb( gammai, deltai );
 
-            // Save statistics, we want to record them only for the most recent update
-            averageSizingFactor = stats->averageSizingFactor;
-            hessDamped = stats->hessDamped;
-            hessSkipped = stats->hessSkipped;
+        // Save statistics, we want to record them only for the most recent update
+        averageSizingFactor = stats->averageSizingFactor;
+        hessDamped = stats->hessDamped;
+        hessSkipped = stats->hessSkipped;
 
-            // Selective sizing before the update
-            if (hessScaling == 4 )
-              sizeHessianCOL( gammai, deltai, iBlock );
+        // Selective sizing before the update
+        if (hessScaling == 4 )
+          sizeHessianCOL( gammai, deltai, iBlock );
 
-            // Compute the new update
-            if (updateType == 1 )
-              calcSR1( gammai, deltai, iBlock );
-            else if (updateType == 2 )
-              calcBFGS( gammai, deltai, iBlock );
+        // Compute the new update
+        if (updateType == 1 )
+          calcSR1( gammai, deltai, iBlock );
+        else if (updateType == 2 )
+          calcBFGS( gammai, deltai, iBlock );
 
-            stats->nTotalUpdates++;
+        stats->nTotalUpdates++;
 
-            // Count damping statistics only for the most recent update
-            if (pos != posNewest )
-              {
-                stats->hessDamped = hessDamped;
-                stats->hessSkipped = hessSkipped;
-                if (hessScaling == 4 )
-                  stats->averageSizingFactor = averageSizingFactor;
-              }
-          }
+        // Count damping statistics only for the most recent update
+        if (pos != posNewest ) {
+          stats->hessDamped = hessDamped;
+          stats->hessSkipped = hessSkipped;
+          if (hessScaling == 4 )
+            stats->averageSizingFactor = averageSizingFactor;
+        }
+      }
 
-        // If an update is skipped to often, reset Hessian block
-        if (vars->noUpdateCounter[iBlock] > param->maxConsecSkippedUpdates )
-          resetHessian( iBlock );
-      }//blocks
+      // If an update is skipped to often, reset Hessian block
+      if (vars->noUpdateCounter[iBlock] > param->maxConsecSkippedUpdates ) {
+        resetHessian( iBlock );
+      }
+    }//blocks
     stats->averageSizingFactor /= nBlocks;
   }
 
@@ -2279,47 +2222,43 @@ namespace blocksqp {
      * Interpolates between current approximation and unmodified BFGS */
     damped = 0;
     if (param->hessDamp )
-      if (h2 < param->hessDampFac * h1 / vars->alpha && fabs( h1 - h2 ) > 1.0e-12 )
-        {// At the first iteration h1 and h2 are equal due to COL scaling
+      if (h2 < param->hessDampFac * h1 / vars->alpha && fabs( h1 - h2 ) > 1.0e-12 ) {
+        // At the first iteration h1 and h2 are equal due to COL scaling
 
-          thetaPowell = (1.0 - param->hessDampFac)*h1 / ( h1 - h2 );
+        thetaPowell = (1.0 - param->hessDampFac)*h1 / ( h1 - h2 );
 
-          // Redefine gamma and h2 = delta^T * gamma
-          h2 = 0.0;
-          for (i=0; i<dim; i++ )
-            {
-              gamma2( i ) = thetaPowell*gamma2( i ) + (1.0 - thetaPowell)*Bdelta( i );
-              h2 += delta( i ) * gamma2( i );
-            }
-
-          // Also redefine deltaGamma for computation of sizing factor in the next iteration
-          vars->deltaGamma( iBlock ) = h2;
-
-          damped = 1;
+        // Redefine gamma and h2 = delta^T * gamma
+        h2 = 0.0;
+        for (i=0; i<dim; i++ ) {
+          gamma2( i ) = thetaPowell*gamma2( i ) + (1.0 - thetaPowell)*Bdelta( i );
+          h2 += delta( i ) * gamma2( i );
         }
+
+        // Also redefine deltaGamma for computation of sizing factor in the next iteration
+        vars->deltaGamma( iBlock ) = h2;
+
+        damped = 1;
+      }
 
     // For statistics: count number of damped blocks
     stats->hessDamped += damped;
 
     // B_k+1 = B_k - Bdelta * (Bdelta)^T / h1 + gamma * gamma^T / h2
     double myEps = 1.0e2 * param->eps;
-    if (fabs( h1 ) < myEps || fabs( h2 ) < myEps )
-      {// don't perform update because of bad condition, might introduce negative eigenvalues
-        //printf("block = %i, h1 = %g, h2 = %g\n", iBlock, h1, h2);
-        vars->noUpdateCounter[iBlock]++;
-        stats->hessDamped -= damped;
-        stats->hessSkipped++;
-        stats->nTotalSkippedUpdates++;
-      }
-    else
-      {
-        for (i=0; i<dim; i++ )
-          for (j=i; j<dim; j++ )
-            (*B)( i,j ) = (*B)( i,j ) - Bdelta( i ) * Bdelta( j ) / h1
-              + gamma2( i ) * gamma2( j ) / h2;
+    if (fabs( h1 ) < myEps || fabs( h2 ) < myEps ) {
+      // don't perform update because of bad condition, might introduce negative eigenvalues
+      vars->noUpdateCounter[iBlock]++;
+      stats->hessDamped -= damped;
+      stats->hessSkipped++;
+      stats->nTotalSkippedUpdates++;
+    } else {
+      for (i=0; i<dim; i++ )
+        for (j=i; j<dim; j++ )
+          (*B)( i,j ) = (*B)( i,j ) - Bdelta( i ) * Bdelta( j ) / h1
+            + gamma2( i ) * gamma2( j ) / h2;
 
-        vars->noUpdateCounter[iBlock] = 0;
-      }
+      vars->noUpdateCounter[iBlock] = 0;
+    }
   }
 
 
@@ -2336,30 +2275,26 @@ namespace blocksqp {
     // gmBdelta = gamma - B*delta
     // h = (gamma - B*delta)^T * delta
     gmBdelta.Dimension( dim );
-    for (i=0; i<dim; i++ )
-      {
-        gmBdelta( i ) = gamma( i );
-        for (k=0; k<dim; k++ )
-          gmBdelta( i ) -= ( (*B)( i,k ) * delta( k ) );
+    for (i=0; i<dim; i++ ) {
+      gmBdelta( i ) = gamma( i );
+      for (k=0; k<dim; k++ )
+        gmBdelta( i ) -= ( (*B)( i,k ) * delta( k ) );
 
-        h += ( gmBdelta( i ) * delta( i ) );
-      }
+      h += ( gmBdelta( i ) * delta( i ) );
+    }
 
     // B_k+1 = B_k + gmBdelta * gmBdelta^T / h
-    if (fabs( h ) < r * l2VectorNorm( delta ) * l2VectorNorm( gmBdelta ) || fabs( h ) < myEps )
-      {// Skip update if denominator is too small
-        //printf("block %i, h = %23.16e\n", iBlock, h );
-        vars->noUpdateCounter[iBlock]++;
-        stats->hessSkipped++;
-        stats->nTotalSkippedUpdates++;
-      }
-    else
-      {
-        for (i=0; i<dim; i++ )
-          for (j=i; j<dim; j++ )
-            (*B)( i,j ) = (*B)( i,j ) + gmBdelta( i ) * gmBdelta( j ) / h;
-        vars->noUpdateCounter[iBlock] = 0;
-      }
+    if (fabs( h ) < r * l2VectorNorm( delta ) * l2VectorNorm( gmBdelta ) || fabs( h ) < myEps ) {
+      // Skip update if denominator is too small
+      vars->noUpdateCounter[iBlock]++;
+      stats->hessSkipped++;
+      stats->nTotalSkippedUpdates++;
+    } else {
+      for (i=0; i<dim; i++ )
+        for (j=i; j<dim; j++ )
+          (*B)( i,j ) = (*B)( i,j ) + gmBdelta( i ) * gmBdelta( j ) / h;
+      vars->noUpdateCounter[iBlock] = 0;
+    }
   }
 
 
@@ -3362,38 +3297,34 @@ namespace blocksqp {
     int nCon = prob->nCon;
 
     // Bounds on step
-    for (i=0; i<nVar; i++ )
-      {
-        if (prob->bl(i) != param->inf )
-          vars->deltaBl( i ) = prob->bl( i ) - vars->xi( i );
-        else
-          vars->deltaBl( i ) = param->inf;
+    for (i=0; i<nVar; i++ ) {
+      if (prob->bl(i) != param->inf )
+        vars->deltaBl( i ) = prob->bl( i ) - vars->xi( i );
+      else
+        vars->deltaBl( i ) = param->inf;
 
-        if (prob->bu(i) != param->inf )
-          vars->deltaBu( i ) = prob->bu( i ) - vars->xi( i );
-        else
-          vars->deltaBu( i ) = param->inf;
-      }
+      if (prob->bu(i) != param->inf )
+        vars->deltaBu( i ) = prob->bu( i ) - vars->xi( i );
+      else
+        vars->deltaBu( i ) = param->inf;
+    }
 
     // Bounds on linearized constraints
-    for (i=0; i<nCon; i++ )
-      {
-        if (prob->bl( nVar+i ) != param->inf )
-          {
-            vars->deltaBl( nVar+i ) = prob->bl( nVar+i ) - vars->constr( i );
-            if (soc ) vars->deltaBl( nVar+i ) += vars->AdeltaXi( i );
-          }
-        else
-          vars->deltaBl( nVar+i ) = param->inf;
-
-        if (prob->bu( nVar+i ) != param->inf )
-          {
-            vars->deltaBu( nVar+i ) = prob->bu( nVar+i ) - vars->constr( i );
-            if (soc ) vars->deltaBu( nVar+i ) += vars->AdeltaXi( i );
-          }
-        else
-          vars->deltaBu( nVar+i ) = param->inf;
+    for (i=0; i<nCon; i++ ) {
+      if (prob->bl( nVar+i ) != param->inf ) {
+        vars->deltaBl( nVar+i ) = prob->bl( nVar+i ) - vars->constr( i );
+        if (soc ) vars->deltaBl( nVar+i ) += vars->AdeltaXi( i );
+      } else {
+        vars->deltaBl( nVar+i ) = param->inf;
       }
+
+      if (prob->bu( nVar+i ) != param->inf ) {
+        vars->deltaBu( nVar+i ) = prob->bu( nVar+i ) - vars->constr( i );
+        if (soc ) vars->deltaBu( nVar+i ) += vars->AdeltaXi( i );
+      } else {
+        vars->deltaBu( nVar+i ) = param->inf;
+      }
+    }
   }
 
   void Problemspec::evaluate( const Matrix &xi, double *objval, Matrix &constr, int *info ) {
@@ -3446,119 +3377,110 @@ namespace blocksqp {
      * 3: feasibility restoration phase has been called
      */
 
-    if (itCount == 0 )
-      {
-        if (param->printLevel > 0 )
-          {
-            prob->printInfo();
+    if (itCount == 0 ) {
+      if (param->printLevel > 0 ) {
+        prob->printInfo();
 
-            // Headline
-            printf("%-8s", "   it" );
-            printf("%-21s", " qpIt" );
-            printf("%-9s","obj" );
-            printf("%-11s","feas" );
-            printf("%-7s","opt" );
-            if (param->printLevel > 1 )
-              {
-                printf("%-11s","|lgrd|" );
-                printf("%-9s","|stp|" );
-                printf("%-10s","|lstp|" );
-              }
-            printf("%-8s","alpha" );
-            if (param->printLevel > 1 )
-              {
-                printf("%-6s","nSOCS" );
-                printf("%-18s","sk, da, sca" );
-                printf("%-6s","QPr,mu" );
-              }
-            printf("\n");
+        // Headline
+        printf("%-8s", "   it" );
+        printf("%-21s", " qpIt" );
+        printf("%-9s","obj" );
+        printf("%-11s","feas" );
+        printf("%-7s","opt" );
+        if (param->printLevel > 1 ) {
+          printf("%-11s","|lgrd|" );
+          printf("%-9s","|stp|" );
+          printf("%-10s","|lstp|" );
+        }
+        printf("%-8s","alpha" );
+        if (param->printLevel > 1 ) {
+          printf("%-6s","nSOCS" );
+          printf("%-18s","sk, da, sca" );
+          printf("%-6s","QPr,mu" );
+        }
+        printf("\n");
 
-            // Values for first iteration
-            printf("%5i  ", itCount );
-            printf("%11i ", 0 );
-            printf("% 10e  ", vars->obj );
-            printf("%-10.2e", vars->cNormS );
-            printf("%-10.2e", vars->tol );
-            printf("\n");
-          }
-
-        if (param->debugLevel > 0 )
-          {
-            // Print everything in a CSV file as well
-            fprintf( progressFile, "%23.16e, %23.16e, %23.16e, %23.16e, %23.16e, %23.16e, %23.16e, %23.16e, %i, %i, %23.16e, %i, %23.16e\n",
-                     vars->obj, vars->cNormS, vars->tol, 0.0, 0.0, 0.0, 0.0, 0.0, 0, 0, 0.0, 0, 0.0 );
-          }
+        // Values for first iteration
+        printf("%5i  ", itCount );
+        printf("%11i ", 0 );
+        printf("% 10e  ", vars->obj );
+        printf("%-10.2e", vars->cNormS );
+        printf("%-10.2e", vars->tol );
+        printf("\n");
       }
-    else
-      {
-        // Every twenty iterations print headline
-        if (itCount % 20 == 0 && param->printLevel > 0 )
-          {
-            printf("%-8s", "   it" );
-            printf("%-21s", " qpIt" );
-            printf("%-9s","obj" );
-            printf("%-11s","feas" );
-            printf("%-7s","opt" );
-            if (param->printLevel > 1 )
-              {
-                printf("%-11s","|lgrd|" );
-                printf("%-9s","|stp|" );
-                printf("%-10s","|lstp|" );
-              }
-            printf("%-8s","alpha" );
-            if (param->printLevel > 1 )
-              {
-                printf("%-6s","nSOCS" );
-                printf("%-18s","sk, da, sca" );
-                printf("%-6s","QPr,mu" );
-              }
-            printf("\n");
-          }
 
-        // All values
-        if (param->printLevel > 0 )
-          {
-            printf("%5i  ", itCount );
-            printf("%5i+%5i ", qpIterations, qpIterations2 );
-            printf("% 10e  ", vars->obj );
-            printf("%-10.2e", vars->cNormS );
-            printf("%-10.2e", vars->tol );
-            if (param->printLevel > 1 )
-              {
-                printf("%-10.2e", vars->gradNorm );
-                printf("%-10.2e", lInfVectorNorm( vars->deltaXi ) );
-                printf("%-10.2e", vars->lambdaStepNorm );
-              }
-
-            if ((vars->alpha == 1.0 && vars->steptype != -1) || !param->printColor )
-              printf("%-9.1e", vars->alpha );
-            else
-              printf("\033[0;36m%-9.1e\033[0m", vars->alpha );
-
-            if (param->printLevel > 1 )
-              {
-                if (vars->nSOCS == 0 || !param->printColor )
-                  printf("%5i", vars->nSOCS );
-                else
-                  printf("\033[0;36m%5i\033[0m", vars->nSOCS );
-                printf("%3i, %3i, %-9.1e", hessSkipped, hessDamped, averageSizingFactor );
-                printf("%i, %-9.1e", qpResolve, l1VectorNorm( vars->deltaH )/vars->nBlocks );
-              }
-            printf("\n");
-          }
-
-        if (param->debugLevel > 0 )
-          {
-            // Print everything in a CSV file as well
-            fprintf( progressFile, "%23.16e, %23.16e, %23.16e, %23.16e, %23.16e, %23.16e, %23.16e, %i, %i, %i, %23.16e, %i, %23.16e\n",
-                     vars->obj, vars->cNormS, vars->tol, vars->gradNorm, lInfVectorNorm( vars->deltaXi ),
-                     vars->lambdaStepNorm, vars->alpha, vars->nSOCS, hessSkipped, hessDamped, averageSizingFactor,
-                     qpResolve, l1VectorNorm( vars->deltaH )/vars->nBlocks );
-
-            // Print update sequence
-            fprintf( updateFile, "%i\t", qpResolve );
-          }
+      if (param->debugLevel > 0 ) {
+        // Print everything in a CSV file as well
+        fprintf( progressFile, "%23.16e, %23.16e, %23.16e, %23.16e, %23.16e, %23.16e, %23.16e, %23.16e, %i, %i, %23.16e, %i, %23.16e\n",
+                 vars->obj, vars->cNormS, vars->tol, 0.0, 0.0, 0.0, 0.0, 0.0, 0, 0, 0.0, 0, 0.0 );
       }
+    } else {
+      // Every twenty iterations print headline
+      if (itCount % 20 == 0 && param->printLevel > 0 ) {
+        printf("%-8s", "   it" );
+        printf("%-21s", " qpIt" );
+        printf("%-9s","obj" );
+        printf("%-11s","feas" );
+        printf("%-7s","opt" );
+        if (param->printLevel > 1 )
+          {
+            printf("%-11s","|lgrd|" );
+            printf("%-9s","|stp|" );
+            printf("%-10s","|lstp|" );
+          }
+        printf("%-8s","alpha" );
+        if (param->printLevel > 1 )
+          {
+            printf("%-6s","nSOCS" );
+            printf("%-18s","sk, da, sca" );
+            printf("%-6s","QPr,mu" );
+          }
+        printf("\n");
+      }
+
+      // All values
+      if (param->printLevel > 0 ) {
+        printf("%5i  ", itCount );
+        printf("%5i+%5i ", qpIterations, qpIterations2 );
+        printf("% 10e  ", vars->obj );
+        printf("%-10.2e", vars->cNormS );
+        printf("%-10.2e", vars->tol );
+        if (param->printLevel > 1 )
+          {
+            printf("%-10.2e", vars->gradNorm );
+            printf("%-10.2e", lInfVectorNorm( vars->deltaXi ) );
+            printf("%-10.2e", vars->lambdaStepNorm );
+          }
+
+        if ((vars->alpha == 1.0 && vars->steptype != -1) || !param->printColor ) {
+          printf("%-9.1e", vars->alpha );
+        } else {
+          printf("\033[0;36m%-9.1e\033[0m", vars->alpha );
+        }
+
+        if (param->printLevel > 1 ) {
+          if (vars->nSOCS == 0 || !param->printColor ) {
+            printf("%5i", vars->nSOCS );
+          } else {
+            printf("\033[0;36m%5i\033[0m", vars->nSOCS );
+          }
+          printf("%3i, %3i, %-9.1e", hessSkipped, hessDamped, averageSizingFactor );
+          printf("%i, %-9.1e", qpResolve, l1VectorNorm( vars->deltaH )/vars->nBlocks );
+        }
+        printf("\n");
+      }
+
+      if (param->debugLevel > 0 ) {
+        // Print everything in a CSV file as well
+        fprintf( progressFile, "%23.16e, %23.16e, %23.16e, %23.16e, %23.16e, %23.16e, %23.16e, %i, %i, %i, %23.16e, %i, %23.16e\n",
+                 vars->obj, vars->cNormS, vars->tol, vars->gradNorm, lInfVectorNorm( vars->deltaXi ),
+                 vars->lambdaStepNorm, vars->alpha, vars->nSOCS, hessSkipped, hessDamped, averageSizingFactor,
+                 qpResolve, l1VectorNorm( vars->deltaH )/vars->nBlocks );
+
+        // Print update sequence
+        fprintf( updateFile, "%i\t", qpResolve );
+      }
+    }
 
     // Print Debug information
     printDebug( vars, param );
@@ -3575,16 +3497,15 @@ namespace blocksqp {
     qpIterations2 = 0;
     qpResolve = 0;
 
-    if (param->printLevel > 0 )
-      {
-        if (hasConverged && vars->steptype < 2 )
-          {
-            if (param->printColor )
-              printf("\n\033[1;32m***CONVERGENCE ACHIEVED!***\n\033[0m");
-            else
-              printf("\n***CONVERGENCE ACHIEVED!***\n");
-          }
+    if (param->printLevel > 0 ) {
+      if (hasConverged && vars->steptype < 2 ) {
+        if (param->printColor ) {
+          printf("\n\033[1;32m***CONVERGENCE ACHIEVED!***\n\033[0m");
+        } else {
+          printf("\n***CONVERGENCE ACHIEVED!***\n");
+        }
       }
+    }
   }
 
 
@@ -3593,31 +3514,29 @@ namespace blocksqp {
 
     // Open files
 
-    if (param->debugLevel > 0 )
-      {
-        // SQP progress
-        strcpy( filename, outpath );
-        strcat( filename, "sqpits.csv" );
-        progressFile = fopen( filename, "w");
+    if (param->debugLevel > 0 ) {
+      // SQP progress
+      strcpy( filename, outpath );
+      strcat( filename, "sqpits.csv" );
+      progressFile = fopen( filename, "w");
 
-        // Update sequence
-        strcpy( filename, outpath );
-        strcat( filename, "updatesequence.txt" );
-        updateFile = fopen( filename, "w" );
-      }
+      // Update sequence
+      strcpy( filename, outpath );
+      strcat( filename, "updatesequence.txt" );
+      updateFile = fopen( filename, "w" );
+    }
 
-    if (param->debugLevel > 1 )
-      {
-        // Primal variables
-        strcpy( filename, outpath );
-        strcat( filename, "pv.csv" );
-        primalVarsFile = fopen( filename, "w");
+    if (param->debugLevel > 1 ) {
+      // Primal variables
+      strcpy( filename, outpath );
+      strcat( filename, "pv.csv" );
+      primalVarsFile = fopen( filename, "w");
 
-        // Dual variables
-        strcpy( filename, outpath );
-        strcat( filename, "dv.csv" );
-        dualVarsFile = fopen( filename, "w");
-      }
+      // Dual variables
+      strcpy( filename, outpath );
+      strcat( filename, "dv.csv" );
+      dualVarsFile = fopen( filename, "w");
+    }
 
     itCount = 0;
     qpItTotal = 0;
@@ -3742,19 +3661,17 @@ namespace blocksqp {
 
 
   void SQPstats::finish( SQPoptions *param ) {
-    if (param->debugLevel > 0 )
-      {
-        fprintf( progressFile, "\n" );
-        fclose( progressFile );
-        fprintf( updateFile, "\n" );
-        fclose( updateFile );
-      }
+    if (param->debugLevel > 0 ) {
+      fprintf( progressFile, "\n" );
+      fclose( progressFile );
+      fprintf( updateFile, "\n" );
+      fclose( updateFile );
+    }
 
-    if (param->debugLevel > 1 )
-      {
-        fclose( primalVarsFile );
-        fclose( dualVarsFile );
-      }
+    if (param->debugLevel > 1 ) {
+      fclose( primalVarsFile );
+      fclose( dualVarsFile );
+    }
   }
 
 
@@ -3767,14 +3684,13 @@ namespace blocksqp {
     int i;
 
     fprintf( outfile, "    double %s[%i] = { ", varname, len );
-    for (i=0; i<len; i++ )
-      {
-        fprintf( outfile, "%23.16e", vec[i] );
-        if (i != len-1 )
-          fprintf( outfile, ", " );
-        if ((i+1) % 10 == 0 )
-          fprintf( outfile, "\n          " );
-      }
+    for (i=0; i<len; i++ ) {
+      fprintf( outfile, "%23.16e", vec[i] );
+      if (i != len-1 )
+        fprintf( outfile, ", " );
+      if ((i+1) % 10 == 0 )
+        fprintf( outfile, "\n          " );
+    }
     fprintf( outfile, " };\n\n" );
   }
 
@@ -3783,14 +3699,13 @@ namespace blocksqp {
     int i;
 
     fprintf( outfile, "    int %s[%i] = { ", varname, len );
-    for (i=0; i<len; i++ )
-      {
-        fprintf( outfile, "%i", vec[i] );
-        if (i != len-1 )
-          fprintf( outfile, ", " );
-        if ((i+1) % 15 == 0 )
-          fprintf( outfile, "\n          " );
-      }
+    for (i=0; i<len; i++ ) {
+      fprintf( outfile, "%i", vec[i] );
+      if (i != len-1 )
+        fprintf( outfile, ", " );
+      if ((i+1) % 15 == 0 )
+        fprintf( outfile, "\n          " );
+    }
     fprintf( outfile, " };\n\n" );
   }
 
@@ -3810,41 +3725,38 @@ namespace blocksqp {
     fclose( outfile );
 
     // Print Hessian
-    if (sparseQP )
-      {
-        strcpy( filename, outpath );
-        strcat( filename, "qpoases_H_sparse.dat" );
-        outfile = fopen( filename, "w" );
-        for (i=0; i<prob->nVar+1; i++ )
-          fprintf( outfile, "%i ", vars->hessIndCol[i] );
-        fprintf( outfile, "\n" );
+    if (sparseQP ) {
+      strcpy( filename, outpath );
+      strcat( filename, "qpoases_H_sparse.dat" );
+      outfile = fopen( filename, "w" );
+      for (i=0; i<prob->nVar+1; i++ )
+        fprintf( outfile, "%i ", vars->hessIndCol[i] );
+      fprintf( outfile, "\n" );
 
-        for (i=0; i<vars->hessIndCol[prob->nVar]; i++ )
-          fprintf( outfile, "%i ", vars->hessIndRow[i] );
-        fprintf( outfile, "\n" );
+      for (i=0; i<vars->hessIndCol[prob->nVar]; i++ )
+        fprintf( outfile, "%i ", vars->hessIndRow[i] );
+      fprintf( outfile, "\n" );
 
-        for (i=0; i<vars->hessIndCol[prob->nVar]; i++ )
-          fprintf( outfile, "%23.16e ", vars->hessNz[i] );
-        fprintf( outfile, "\n" );
-        fclose( outfile );
-      }
+      for (i=0; i<vars->hessIndCol[prob->nVar]; i++ )
+        fprintf( outfile, "%23.16e ", vars->hessNz[i] );
+      fprintf( outfile, "\n" );
+      fclose( outfile );
+    }
     strcpy( filename, outpath );
     strcat( filename, "qpoases_H.dat" );
     outfile = fopen( filename, "w" );
     int blockCnt = 0;
-    for (i=0; i<n; i++ )
-      {
-        for (j=0; j<n; j++ )
-          {
-            if (i == vars->blockIdx[blockCnt+1] )
-              blockCnt++;
-            if (j >= vars->blockIdx[blockCnt] && j < vars->blockIdx[blockCnt+1] )
-              fprintf( outfile, "%23.16e ", vars->hess[blockCnt]( i - vars->blockIdx[blockCnt], j - vars->blockIdx[blockCnt] ) );
-            else
-              fprintf( outfile, "0.0 " );
-          }
-        fprintf( outfile, "\n" );
+    for (i=0; i<n; i++ ) {
+      for (j=0; j<n; j++ ) {
+        if (i == vars->blockIdx[blockCnt+1] ) blockCnt++;
+        if (j >= vars->blockIdx[blockCnt] && j < vars->blockIdx[blockCnt+1] ) {
+          fprintf( outfile, "%23.16e ", vars->hess[blockCnt]( i - vars->blockIdx[blockCnt], j - vars->blockIdx[blockCnt] ) );
+        } else {
+          fprintf( outfile, "0.0 " );
+        }
       }
+      fprintf( outfile, "\n" );
+    }
     fclose( outfile );
 
     // Print gradient
@@ -3860,51 +3772,45 @@ namespace blocksqp {
     strcpy( filename, outpath );
     strcat( filename, "qpoases_A.dat" );
     outfile = fopen( filename, "w" );
-    if (sparseQP )
-      {
-        // Always print dense Jacobian
-        Matrix constrJacTemp;
-        constrJacTemp.Dimension( prob->nCon, prob->nVar ).Initialize( 0.0 );
-        for (i=0; i<prob->nVar; i++ )
-          for (j=vars->jacIndCol[i]; j<vars->jacIndCol[i+1]; j++ )
-            constrJacTemp( vars->jacIndRow[j], i ) = vars->jacNz[j];
-        for (i=0; i<m; i++ )
-          {
-            for (j=0; j<n; j++ )
-              fprintf( outfile, "%23.16e ", constrJacTemp( i, j ) );
-            fprintf( outfile, "\n" );
-          }
-        fclose( outfile );
-      }
-    else
-      {
-        for (i=0; i<m; i++ )
-          {
-            for (j=0; j<n; j++ )
-              fprintf( outfile, "%23.16e ", vars->constrJac( i, j ) );
-            fprintf( outfile, "\n" );
-          }
-        fclose( outfile );
-      }
-
-    if (sparseQP )
-      {
-        strcpy( filename, outpath );
-        strcat( filename, "qpoases_A_sparse.dat" );
-        outfile = fopen( filename, "w" );
-        for (i=0; i<prob->nVar+1; i++ )
-          fprintf( outfile, "%i ", vars->jacIndCol[i] );
+    if (sparseQP ) {
+      // Always print dense Jacobian
+      Matrix constrJacTemp;
+      constrJacTemp.Dimension( prob->nCon, prob->nVar ).Initialize( 0.0 );
+      for (i=0; i<prob->nVar; i++ )
+        for (j=vars->jacIndCol[i]; j<vars->jacIndCol[i+1]; j++ )
+          constrJacTemp( vars->jacIndRow[j], i ) = vars->jacNz[j];
+      for (i=0; i<m; i++ ) {
+        for (j=0; j<n; j++ )
+          fprintf( outfile, "%23.16e ", constrJacTemp( i, j ) );
         fprintf( outfile, "\n" );
-
-        for (i=0; i<vars->jacIndCol[prob->nVar]; i++ )
-          fprintf( outfile, "%i ", vars->jacIndRow[i] );
-        fprintf( outfile, "\n" );
-
-        for (i=0; i<vars->jacIndCol[prob->nVar]; i++ )
-          fprintf( outfile, "%23.16e ", vars->jacNz[i] );
-        fprintf( outfile, "\n" );
-        fclose( outfile );
       }
+      fclose( outfile );
+    } else {
+      for (i=0; i<m; i++ ) {
+        for (j=0; j<n; j++ )
+          fprintf( outfile, "%23.16e ", vars->constrJac( i, j ) );
+        fprintf( outfile, "\n" );
+      }
+      fclose( outfile );
+    }
+
+    if (sparseQP ) {
+      strcpy( filename, outpath );
+      strcat( filename, "qpoases_A_sparse.dat" );
+      outfile = fopen( filename, "w" );
+      for (i=0; i<prob->nVar+1; i++ )
+        fprintf( outfile, "%i ", vars->jacIndCol[i] );
+      fprintf( outfile, "\n" );
+
+      for (i=0; i<vars->jacIndCol[prob->nVar]; i++ )
+        fprintf( outfile, "%i ", vars->jacIndRow[i] );
+      fprintf( outfile, "\n" );
+
+      for (i=0; i<vars->jacIndCol[prob->nVar]; i++ )
+        fprintf( outfile, "%23.16e ", vars->jacNz[i] );
+      fprintf( outfile, "\n" );
+      fclose( outfile );
+    }
 
     // Print variable lower bounds
     strcpy( filename, outpath );
@@ -3959,7 +3865,6 @@ namespace blocksqp {
     fprintf( outfile, "\n" );
     fclose( outfile );
   }
-
 
   void SQPstats::dumpQPMatlab( Problemspec *prob, SQPiterate *vars, int sparseQP ) {
     Matrix temp;
@@ -4160,25 +4065,24 @@ namespace blocksqp {
 
     // Second part: regularization term
     regTerm = 0.0;
-    for (i=0; i<parent->nVar; i++ )
-      {
-        diff = xiOrig( i ) - xiRef( i );
-        regTerm += diagScale( i ) * diff * diff;
-      }
+    for (i=0; i<parent->nVar; i++ ) {
+      diff = xiOrig( i ) - xiRef( i );
+      regTerm += diagScale( i ) * diff * diff;
+    }
     regTerm = 0.5 * zeta * regTerm;
     *objval += regTerm;
 
-    if (dmode > 0 )
-      {// compute objective gradient
+    if (dmode > 0 ) {
+      // compute objective gradient
 
-        // gradient w.r.t. xi (regularization term)
-        for (i=0; i<parent->nVar; i++ )
-          gradObj( i ) = zeta * diagScale( i ) * diagScale( i ) * (xiOrig( i ) - xiRef( i ));
+      // gradient w.r.t. xi (regularization term)
+      for (i=0; i<parent->nVar; i++ )
+        gradObj( i ) = zeta * diagScale( i ) * diagScale( i ) * (xiOrig( i ) - xiRef( i ));
 
-        // gradient w.r.t. slack variables
-        for (i=parent->nVar; i<nVar; i++ )
-          gradObj( i ) = rho * slack( i );
-      }
+      // gradient w.r.t. slack variables
+      for (i=parent->nVar; i<nVar; i++ )
+        gradObj( i ) = rho * slack( i );
+    }
 
     *info = 0;
   }
@@ -4208,15 +4112,13 @@ namespace blocksqp {
         jacNz[i] = jacNzOrig[i];
         jacIndRow[i] = jacIndRowOrig[i];
       }
-    for (i=0; i<parent->nVar; i++ )
-      jacIndCol[i] = jacIndColOrig[i];
+    for (i=0; i<parent->nVar; i++ ) jacIndCol[i] = jacIndColOrig[i];
 
     // Jacobian entries for slacks (one nonzero entry per column)
-    for (i=nnzOrig; i<nnz; i++ )
-      {
-        jacNz[i] = -1.0;
-        jacIndRow[i] = i-nnzOrig;
-      }
+    for (i=nnzOrig; i<nnz; i++ ) {
+      jacNz[i] = -1.0;
+      jacIndRow[i] = i-nnzOrig;
+    }
     for (i=parent->nVar; i<nVar+1; i++ )
       jacIndCol[i] = nnzOrig + i - parent->nVar;
 
@@ -4228,13 +4130,12 @@ namespace blocksqp {
     constrRef.Dimension( nCon );
     parent->evaluate( xiOrig, &objval, constrRef, &info );
 
-    for (i=0; i<nCon; i++ )
-      {
-        if (constrRef( i ) <= parent->bl( parent->nVar + i ) )// if lower bound is violated
-          slack( i ) = constrRef( i ) - parent->bl( parent->nVar + i );
-        else if (constrRef( i ) > parent->bu( parent->nVar + i ) )// if upper bound is violated
-          slack( i ) = constrRef( i ) - parent->bu( parent->nVar + i );
-      }
+    for (i=0; i<nCon; i++ ) {
+      if (constrRef( i ) <= parent->bl( parent->nVar + i ) )// if lower bound is violated
+        slack( i ) = constrRef( i ) - parent->bl( parent->nVar + i );
+      else if (constrRef( i ) > parent->bu( parent->nVar + i ) )// if upper bound is violated
+        slack( i ) = constrRef( i ) - parent->bu( parent->nVar + i );
+    }
 
     // Set diagonal scaling matrix
     diagScale.Dimension( parent->nVar ).Initialize( 1.0 );
@@ -4274,13 +4175,12 @@ namespace blocksqp {
     constrRef.Dimension( nCon );
     parent->evaluate( xiOrig, &objval, constrRef, &info );
 
-    for (i=0; i<nCon; i++ )
-      {
-        if (constrRef( i ) <= parent->bl( parent->nVar + i ) )// if lower bound is violated
-          slack( i ) = constrRef( i ) - parent->bl( parent->nVar + i );
-        else if (constrRef( i ) > parent->bu( parent->nVar + i ) )// if upper bound is violated
-          slack( i ) = constrRef( i ) - parent->bu( parent->nVar + i );
-      }
+    for (i=0; i<nCon; i++ ) {
+      if (constrRef( i ) <= parent->bl( parent->nVar + i ) )// if lower bound is violated
+        slack( i ) = constrRef( i ) - parent->bl( parent->nVar + i );
+      else if (constrRef( i ) > parent->bu( parent->nVar + i ) )// if upper bound is violated
+        slack( i ) = constrRef( i ) - parent->bu( parent->nVar + i );
+    }
 
     // Set diagonal scaling matrix
     diagScale.Dimension( parent->nVar ).Initialize( 1.0 );
