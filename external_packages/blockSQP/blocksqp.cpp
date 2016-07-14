@@ -1462,21 +1462,21 @@ namespace blocksqp {
       constrJac.Dimension( prob->nCon, prob->nVar ).Initialize( 0.0 );
       hessNz = new double[prob->nVar*prob->nVar];
     } else {
-      hessNz = NULL;
+      hessNz = 0;
     }
 
-    jacNz = NULL;
-    jacIndCol = NULL;
-    jacIndRow = NULL;
+    jacNz = 0;
+    jacIndCol = 0;
+    jacIndRow = 0;
 
-    hessIndCol = NULL;
-    hessIndRow = NULL;
-    hessIndLo = NULL;
-    hess = NULL;
-    hess1 = NULL;
-    hess2 = NULL;
+    hessIndCol = 0;
+    hessIndRow = 0;
+    hessIndLo = 0;
+    hess = 0;
+    hess1 = 0;
+    hess2 = 0;
 
-    noUpdateCounter = NULL;
+    noUpdateCounter = 0;
 
     if (full ) {
       allocHess( param );
@@ -1500,7 +1500,7 @@ namespace blocksqp {
     gradLagrange = iter.gradLagrange;
 
     constrJac = iter.constrJac;
-    if (iter.jacNz != NULL ) {
+    if (iter.jacNz != 0 ) {
       int nVar = xi.M();
       int nnz = iter.jacIndCol[nVar];
 
@@ -1513,19 +1513,19 @@ namespace blocksqp {
         jacIndRow[i] = iter.jacIndRow[i];
       jacIndCol = jacIndRow + nnz;
     } else {
-      jacNz = NULL;
-      jacIndRow = NULL;
-      jacIndCol = NULL;
+      jacNz = 0;
+      jacIndRow = 0;
+      jacIndCol = 0;
     }
 
-    noUpdateCounter = NULL;
-    hessNz = NULL;
-    hessIndCol = NULL;
-    hessIndRow = NULL;
-    hessIndLo = NULL;
-    hess = NULL;
-    hess1 = NULL;
-    hess2 = NULL;
+    noUpdateCounter = 0;
+    hessNz = 0;
+    hessIndCol = 0;
+    hessIndRow = 0;
+    hessIndLo = 0;
+    hess = 0;
+    hess1 = 0;
+    hess2 = 0;
   }
 
 
@@ -1582,7 +1582,7 @@ namespace blocksqp {
    * Assumes that hessNz is already allocated.
    */
   void SQPiterate::convertHessian( Problemspec *prob, double eps, SymMatrix *&hess_ ) {
-    if (hessNz == NULL ) return;
+    if (hessNz == 0 ) return;
     int count = 0;
     int blockCnt = 0;
     for (int i=0; i<prob->nVar; i++ )
@@ -1619,8 +1619,8 @@ namespace blocksqp {
             }
           }
 
-    if (hessNz_ != NULL ) delete[] hessNz_;
-    if (hessIndRow_ != NULL ) delete[] hessIndRow_;
+    if (hessNz_ != 0 ) delete[] hessNz_;
+    if (hessIndRow_ != 0 ) delete[] hessIndRow_;
 
     hessNz_ = new double[nnz];
     hessIndRow_ = new int[nnz + (prob->nVar+1) + prob->nVar];
@@ -1726,17 +1726,17 @@ namespace blocksqp {
   }
 
   SQPiterate::~SQPiterate( void ) {
-    if (blockIdx != NULL )
+    if (blockIdx != 0 )
       delete[] blockIdx;
-    if (noUpdateCounter != NULL )
+    if (noUpdateCounter != 0 )
       delete[] noUpdateCounter;
-    if (jacNz != NULL )
+    if (jacNz != 0 )
       delete[] jacNz;
-    if (jacIndRow != NULL )
+    if (jacIndRow != 0 )
       delete[] jacIndRow;
-    if (hessNz != NULL )
+    if (hessNz != 0 )
       delete[] hessNz;
-    if (hessIndRow != NULL )
+    if (hessIndRow != 0 )
       delete[] hessIndRow;
   }
 
@@ -1765,7 +1765,7 @@ namespace blocksqp {
       vars->hess[iBlock]( i, i ) = param->iniHessDiag;
 
     // If we maintain 2 Hessians, also reset the second one
-    if (vars->hess2 != NULL ) {
+    if (vars->hess2 != 0 ) {
       vars->hess2[iBlock].Initialize( 0.0 );
       for (int i=0; i<vars->hess2[iBlock].M(); i++ )
         vars->hess2[iBlock]( i, i ) = param->iniHessDiag;
@@ -2300,9 +2300,9 @@ namespace blocksqp {
     len = ldim*n;
 
     if ( len == 0 )
-      array = NULL;
+      array = 0;
     else
-      if ( ( array = new double[len] ) == NULL )
+      if ( ( array = new double[len] ) == 0 )
         Error("'new' failed");
 
     return 0;
@@ -2313,7 +2313,7 @@ namespace blocksqp {
     if ( tflag )
       Error("free cannot be called with Submatrix");
 
-    if ( array != NULL )
+    if ( array != 0 )
       delete[] array;
 
     return 0;
@@ -2580,9 +2580,9 @@ namespace blocksqp {
     len = m*(m+1)/2.0;
 
     if ( len == 0 )
-      array = NULL;
+      array = 0;
     else
-      if ( ( array = new double[len] ) == NULL )
+      if ( ( array = new double[len] ) == 0 )
         Error("'new' failed");
 
     return 0;
@@ -2590,7 +2590,7 @@ namespace blocksqp {
 
 
   int SymMatrix::free( void ) {
-    if (array != NULL )
+    if (array != 0 )
       delete[] array;
 
     return 0;
@@ -2805,7 +2805,7 @@ namespace blocksqp {
     int i, j;
     double *array;
 
-    if ( ( array = new double[A.N()*A.M()] ) == NULL )
+    if ( ( array = new double[A.N()*A.M()] ) == 0 )
       Error("'new' failed");
 
     for ( i = 0; i < A.N(); i++ )
@@ -3644,7 +3644,7 @@ namespace blocksqp {
 
 
   void SQPstats::printCppNull( FILE *outfile, char* varname ) {
-    fprintf( outfile, "    double *%s = NULL;\n", varname );
+    fprintf( outfile, "    double *%s = 0;\n", varname );
   }
 
 
@@ -4065,8 +4065,8 @@ namespace blocksqp {
     slack.Submatrix( xi, parent->nCon, 1, parent->nVar, 0 );
 
     // Call initialize of the parent problem. There, the sparse Jacobian is allocated
-    double *jacNzOrig = NULL;
-    int *jacIndRowOrig = NULL, *jacIndColOrig = NULL, nnz, nnzOrig;
+    double *jacNzOrig = 0;
+    int *jacIndRowOrig = 0, *jacIndColOrig = 0, nnz, nnzOrig;
     parent->initialize( xiOrig, lambda, jacNzOrig, jacIndRowOrig, jacIndColOrig );
     nnzOrig = jacIndColOrig[parent->nVar];
 
