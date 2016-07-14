@@ -883,31 +883,26 @@ namespace blocksqp {
 
     // Backtracking line search
     alpha = 1.0;
-    for (k=0; k<10; k++ )
-      {
-        // Compute new trial point
-        for (i=0; i<nVar; i++ )
-          vars->trialXi( i ) = vars->xi( i ) + alpha * vars->deltaXi( i );
+    for (k=0; k<10; k++ ) {
+      // Compute new trial point
+      for (i=0; i<nVar; i++ )
+        vars->trialXi( i ) = vars->xi( i ) + alpha * vars->deltaXi( i );
 
-        // Compute problem functions at trial point
-        prob->evaluate( vars->trialXi, &objTrial, vars->constr, &info );
-        stats->nFunCalls++;
-        cNormTrial = lInfConstraintNorm( vars->trialXi, vars->constr, prob->bu, prob->bl );
-        // Reduce step if evaluation fails, if lower bound is violated or if objective or a constraint is NaN
-        if (info != 0 || objTrial < prob->objLo || objTrial > prob->objUp || !(objTrial == objTrial) || !(cNormTrial == cNormTrial) )
-          {
-            printf("info=%i, objTrial=%g\n", info, objTrial );
-            // evaluation error, reduce stepsize
-            reduceStepsize( &alpha );
-            continue;
-          }
-        else
-          {
-            acceptStep( alpha );
-            return 0;
-          }
-      }// backtracking steps
-
+      // Compute problem functions at trial point
+      prob->evaluate( vars->trialXi, &objTrial, vars->constr, &info );
+      stats->nFunCalls++;
+      cNormTrial = lInfConstraintNorm( vars->trialXi, vars->constr, prob->bu, prob->bl );
+      // Reduce step if evaluation fails, if lower bound is violated or if objective or a constraint is NaN
+      if (info != 0 || objTrial < prob->objLo || objTrial > prob->objUp || !(objTrial == objTrial) || !(cNormTrial == cNormTrial) ) {
+        printf("info=%i, objTrial=%g\n", info, objTrial );
+        // evaluation error, reduce stepsize
+        reduceStepsize( &alpha );
+        continue;
+      } else {
+        acceptStep( alpha );
+        return 0;
+      }
+    }
     return 1;
   }
 
@@ -929,106 +924,92 @@ namespace blocksqp {
     cNorm = lInfConstraintNorm( vars->xi, vars->constr, prob->bu, prob->bl );
 
     // Backtracking line search
-    for (k=0; k<param->maxLineSearch; k++ )
-      {
-        // Compute new trial point
-        for (i=0; i<nVar; i++ )
-          vars->trialXi( i ) = vars->xi( i ) + alpha * vars->deltaXi( i );
+    for (k=0; k<param->maxLineSearch; k++ ) {
+      // Compute new trial point
+      for (i=0; i<nVar; i++ )
+        vars->trialXi( i ) = vars->xi( i ) + alpha * vars->deltaXi( i );
 
-        // Compute grad(f)^T * deltaXi
-        dfTdeltaXi = 0.0;
-        for (i=0; i<nVar; i++ )
-          dfTdeltaXi += vars->gradObj( i ) * vars->deltaXi( i );
+      // Compute grad(f)^T * deltaXi
+      dfTdeltaXi = 0.0;
+      for (i=0; i<nVar; i++ )
+        dfTdeltaXi += vars->gradObj( i ) * vars->deltaXi( i );
 
-        // Compute objective and at ||constr(trialXi)||_1 at trial point
-        prob->evaluate( vars->trialXi, &objTrial, vars->constr, &info );
-        stats->nFunCalls++;
-        cNormTrial = lInfConstraintNorm( vars->trialXi, vars->constr, prob->bu, prob->bl );
-        // Reduce step if evaluation fails, if lower bound is violated or if objective is NaN
-        if (info != 0 || objTrial < prob->objLo || objTrial > prob->objUp || !(objTrial == objTrial) || !(cNormTrial == cNormTrial) )
-          {
-            // evaluation error, reduce stepsize
-            reduceStepsize( &alpha );
-            continue;
-          }
+      // Compute objective and at ||constr(trialXi)||_1 at trial point
+      prob->evaluate( vars->trialXi, &objTrial, vars->constr, &info );
+      stats->nFunCalls++;
+      cNormTrial = lInfConstraintNorm( vars->trialXi, vars->constr, prob->bu, prob->bl );
+      // Reduce step if evaluation fails, if lower bound is violated or if objective is NaN
+      if (info != 0 || objTrial < prob->objLo || objTrial > prob->objUp || !(objTrial == objTrial) || !(cNormTrial == cNormTrial) )
+        {
+          // evaluation error, reduce stepsize
+          reduceStepsize( &alpha );
+          continue;
+        }
 
-        // Check acceptability to the filter
-        if (pairInFilter( cNormTrial, objTrial ) )
-          {
-            // Trial point is in the prohibited region defined by the filter, try second order correction
-            if (secondOrderCorrection( cNorm, cNormTrial, dfTdeltaXi, 0, k ) )
-              break; // SOC yielded suitable alpha, stop
-            else
-              {
+      // Check acceptability to the filter
+      if (pairInFilter( cNormTrial, objTrial )) {
+        // Trial point is in the prohibited region defined by the filter, try second order correction
+        if (secondOrderCorrection( cNorm, cNormTrial, dfTdeltaXi, 0, k )) {
+          break; // SOC yielded suitable alpha, stop
+        } else {
+          reduceStepsize( &alpha );
+          continue;
+        }
+      }
+
+      // Check sufficient decrease, case I:
+      // If we are (almost) feasible and a "switching condition" is satisfied
+      // require sufficient progress in the objective instead of bi-objective condition
+      if (cNorm <= param->thetaMin ) {
+        // Switching condition, part 1: grad(f)^T * deltaXi < 0 ?
+        if (dfTdeltaXi < 0 )
+          // Switching condition, part 2: alpha * ( - grad(f)^T * deltaXi )**sF > delta * cNorm**sTheta ?
+          if (alpha * pow( (-dfTdeltaXi), param->sF ) > param->delta * pow( cNorm, param->sTheta ) ) {
+            // Switching conditions hold: Require satisfaction of Armijo condition for objective
+            if (objTrial > vars->obj + param->eta*alpha*dfTdeltaXi ) {
+              // Armijo condition violated, try second order correction
+              if (secondOrderCorrection( cNorm, cNormTrial, dfTdeltaXi, 1, k ) ) {
+                break; // SOC yielded suitable alpha, stop
+              } else {
                 reduceStepsize( &alpha );
                 continue;
               }
+            } else {
+              // found suitable alpha, stop
+              acceptStep( alpha );
+              break;
+            }
           }
+      }
 
-        // Check sufficient decrease, case I:
-        // If we are (almost) feasible and a "switching condition" is satisfied
-        // require sufficient progress in the objective instead of bi-objective condition
-        if (cNorm <= param->thetaMin )
-          {
-            // Switching condition, part 1: grad(f)^T * deltaXi < 0 ?
-            if (dfTdeltaXi < 0 )
-              // Switching condition, part 2: alpha * ( - grad(f)^T * deltaXi )**sF > delta * cNorm**sTheta ?
-              if (alpha * pow( (-dfTdeltaXi), param->sF ) > param->delta * pow( cNorm, param->sTheta ) )
-                {
-                  // Switching conditions hold: Require satisfaction of Armijo condition for objective
-                  if (objTrial > vars->obj + param->eta*alpha*dfTdeltaXi )
-                    {
-                      // Armijo condition violated, try second order correction
-                      if (secondOrderCorrection( cNorm, cNormTrial, dfTdeltaXi, 1, k ) )
-                        break; // SOC yielded suitable alpha, stop
-                      else
-                        {
-                          reduceStepsize( &alpha );
-                          continue;
-                        }
-                    }
-                  else
-                    {
-                      // found suitable alpha, stop
-                      acceptStep( alpha );
-                      break;
-                    }
-                }
-          }
-
-        // Check sufficient decrease, case II:
-        // Bi-objective (filter) condition
-        if (cNormTrial < (1.0 - param->gammaTheta) * cNorm || objTrial < vars->obj - param->gammaF * cNorm )
-          {
-            // found suitable alpha, stop
-            acceptStep( alpha );
-            break;
-          }
-        else
-          {
-            // Trial point is dominated by current point, try second order correction
-            if (secondOrderCorrection( cNorm, cNormTrial, dfTdeltaXi, 0, k ) )
-              break; // SOC yielded suitable alpha, stop
-            else
-              {
-                reduceStepsize( &alpha );
-                continue;
-              }
-          }
-      }// backtracking steps
+      // Check sufficient decrease, case II:
+      // Bi-objective (filter) condition
+      if (cNormTrial < (1.0 - param->gammaTheta) * cNorm || objTrial < vars->obj - param->gammaF * cNorm ) {
+        // found suitable alpha, stop
+        acceptStep( alpha );
+        break;
+      } else {
+        // Trial point is dominated by current point, try second order correction
+        if (secondOrderCorrection( cNorm, cNormTrial, dfTdeltaXi, 0, k ) ) {
+          break; // SOC yielded suitable alpha, stop
+        } else {
+          reduceStepsize( &alpha );
+          continue;
+        }
+      }
+    }
 
     // No step could be found by the line search
-    if (k == param->maxLineSearch )
-      return 1;
+    if (k == param->maxLineSearch ) return 1;
 
     // Augment the filter if switching condition or Armijo condition does not hold
-    if (dfTdeltaXi >= 0 )
+    if (dfTdeltaXi >= 0 ) {
       augmentFilter( cNormTrial, objTrial );
-    else if (alpha * pow( (-dfTdeltaXi), param->sF ) > param->delta * pow( cNorm, param->sTheta ) )// careful with neg. exponents!
+    } else if (alpha * pow( (-dfTdeltaXi), param->sF ) > param->delta * pow( cNorm, param->sTheta ) ) { // careful with neg. exponents!
       augmentFilter( cNormTrial, objTrial );
-    else if (objTrial <= vars->obj + param->eta*alpha*dfTdeltaXi )
+    } else if (objTrial <= vars->obj + param->eta*alpha*dfTdeltaXi ) {
       augmentFilter( cNormTrial, objTrial );
-
+    }
 
     return 0;
   }
@@ -1044,11 +1025,9 @@ namespace blocksqp {
    */
   bool Blocksqp::secondOrderCorrection( double cNorm, double cNormTrial, double dfTdeltaXi, bool swCond, int it ) {
     // Perform SOC only on the first iteration of backtracking line search
-    if (it > 0 )
-      return false;
+    if (it > 0 ) return false;
     // If constraint violation of the trialstep is lower than the current one skip SOC
-    if (cNormTrial < cNorm )
-      return false;
+    if (cNormTrial < cNorm ) return false;
 
     int nSOCS = 0;
     double cNormTrialSOC, cNormOld, objTrialSOC;
@@ -1065,79 +1044,71 @@ namespace blocksqp {
 
     // Second order correction loop
     cNormOld = cNorm;
-    for (k=0; k<param->maxSOCiter; k++ )
-      {
-        nSOCS++;
+    for (k=0; k<param->maxSOCiter; k++ ) {
+      nSOCS++;
 
-        // Update bounds for SOC QP
-        updateStepBounds( 1 );
+      // Update bounds for SOC QP
+      updateStepBounds( 1 );
 
-        // Solve SOC QP to obtain new, corrected deltaXi
-        // (store in separate vector to avoid conflict with original deltaXi -> need it in linesearch!)
-        info = solveQP( deltaXiSOC, lambdaQPSOC, false );
-        if (info != 0 )
-          return false; // Could not solve QP, abort SOC
+      // Solve SOC QP to obtain new, corrected deltaXi
+      // (store in separate vector to avoid conflict with original deltaXi -> need it in linesearch!)
+      info = solveQP( deltaXiSOC, lambdaQPSOC, false );
+      if (info != 0 ) return false; // Could not solve QP, abort SOC
 
-        // Set new SOC trial point
-        for (i=0; i<nVar; i++ )
-          vars->trialXi( i ) = vars->xi( i ) + deltaXiSOC( i );
-
-        // Compute objective and ||constr(trialXiSOC)||_1 at SOC trial point
-        prob->evaluate( vars->trialXi, &objTrialSOC, vars->constr, &info );
-        stats->nFunCalls++;
-        cNormTrialSOC = lInfConstraintNorm( vars->trialXi, vars->constr, prob->bu, prob->bl );
-        if (info != 0 || objTrialSOC < prob->objLo || objTrialSOC > prob->objUp || !(objTrialSOC == objTrialSOC) || !(cNormTrialSOC == cNormTrialSOC) )
-          return false; // evaluation error, abort SOC
-
-        // Check acceptability to the filter (in SOC)
-        if (pairInFilter( cNormTrialSOC, objTrialSOC ) )
-          return false; // Trial point is in the prohibited region defined by the filter, abort SOC
-
-        // Check sufficient decrease, case I (in SOC)
-        // (Almost feasible and switching condition holds for line search alpha)
-        if (cNorm <= param->thetaMin && swCond )
-          {
-            if (objTrialSOC > vars->obj + param->eta*dfTdeltaXi )
-              {
-                // Armijo condition does not hold for SOC step, next SOC step
-
-                // If constraint violation gets worse by SOC, abort
-                if (cNormTrialSOC > param->kappaSOC * cNormOld )
-                  return false;
-                else
-                  cNormOld = cNormTrialSOC;
-                continue;
-              }
-            else
-              {
-                // found suitable alpha during SOC, stop
-                acceptStep( deltaXiSOC, lambdaQPSOC, 1.0, nSOCS );
-                return true;
-              }
-          }
-
-        // Check sufficient decrease, case II (in SOC)
-        if (cNorm > param->thetaMin || !swCond )
-          {
-            if (cNormTrialSOC < (1.0 - param->gammaTheta) * cNorm || objTrialSOC < vars->obj - param->gammaF * cNorm )
-              {
-                // found suitable alpha during SOC, stop
-                acceptStep( deltaXiSOC, lambdaQPSOC, 1.0, nSOCS );
-                return true;
-              }
-            else
-              {
-                // Trial point is dominated by current point, next SOC step
-
-                // If constraint violation gets worse by SOC, abort
-                if (cNormTrialSOC > param->kappaSOC * cNormOld )
-                  return false;
-                else
-                  cNormOld = cNormTrialSOC;
-                continue;
-              }
-          }
+      // Set new SOC trial point
+      for (i=0; i<nVar; i++ ) {
+        vars->trialXi( i ) = vars->xi( i ) + deltaXiSOC( i );
       }
+
+      // Compute objective and ||constr(trialXiSOC)||_1 at SOC trial point
+      prob->evaluate( vars->trialXi, &objTrialSOC, vars->constr, &info );
+      stats->nFunCalls++;
+      cNormTrialSOC = lInfConstraintNorm( vars->trialXi, vars->constr, prob->bu, prob->bl );
+      if (info != 0 || objTrialSOC < prob->objLo || objTrialSOC > prob->objUp || !(objTrialSOC == objTrialSOC) || !(cNormTrialSOC == cNormTrialSOC) )
+        return false; // evaluation error, abort SOC
+
+      // Check acceptability to the filter (in SOC)
+      if (pairInFilter( cNormTrialSOC, objTrialSOC ) ) return false; // Trial point is in the prohibited region defined by the filter, abort SOC
+
+      // Check sufficient decrease, case I (in SOC)
+      // (Almost feasible and switching condition holds for line search alpha)
+      if (cNorm <= param->thetaMin && swCond ) {
+        if (objTrialSOC > vars->obj + param->eta*dfTdeltaXi ) {
+          // Armijo condition does not hold for SOC step, next SOC step
+
+          // If constraint violation gets worse by SOC, abort
+          if (cNormTrialSOC > param->kappaSOC * cNormOld ) {
+            return false;
+          } else {
+            cNormOld = cNormTrialSOC;
+          }
+          continue;
+        } else {
+          // found suitable alpha during SOC, stop
+          acceptStep( deltaXiSOC, lambdaQPSOC, 1.0, nSOCS );
+          return true;
+        }
+      }
+
+      // Check sufficient decrease, case II (in SOC)
+      if (cNorm > param->thetaMin || !swCond ) {
+        if (cNormTrialSOC < (1.0 - param->gammaTheta) * cNorm || objTrialSOC < vars->obj - param->gammaF * cNorm ) {
+          // found suitable alpha during SOC, stop
+          acceptStep( deltaXiSOC, lambdaQPSOC, 1.0, nSOCS );
+          return true;
+        } else {
+          // Trial point is dominated by current point, next SOC step
+
+          // If constraint violation gets worse by SOC, abort
+          if (cNormTrialSOC > param->kappaSOC * cNormOld ) {
+            return false;
+          } else {
+            cNormOld = cNormTrialSOC;
+          }
+          continue;
+        }
+      }
+    }
 
     return false;
   }
@@ -1149,8 +1120,7 @@ namespace blocksqp {
    */
   int Blocksqp::feasibilityRestorationPhase() {
     // No Feasibility restoration phase
-    if (param->restoreFeas == 0 )
-      return -1;
+    if (param->restoreFeas == 0 ) return -1;
 
     stats->nRestPhaseCalls++;
 
@@ -1190,19 +1160,18 @@ namespace blocksqp {
       warmStart = 1;
 
       // If restMethod yields error, stop restoration phase
-      if (ret == -1 )
-        break;
+      if (ret == -1 ) break;
 
       // Get new xi from the restoration phase
-      for (i=0; i<prob->nVar; i++ )
+      for (i=0; i<prob->nVar; i++ ) {
         vars->trialXi( i ) = restMethod->vars->xi( i );
+      }
 
       // Compute objective at trial point
       prob->evaluate( vars->trialXi, &objTrial, vars->constr, &info );
       stats->nFunCalls++;
       cNormTrial = lInfConstraintNorm( vars->trialXi, vars->constr, prob->bu, prob->bl );
-      if (info != 0 || objTrial < prob->objLo || objTrial > prob->objUp || !(objTrial == objTrial) || !(cNormTrial == cNormTrial) )
-        continue;
+      if (info != 0 || objTrial < prob->objLo || objTrial > prob->objUp || !(objTrial == objTrial) || !(cNormTrial == cNormTrial) ) continue;
 
       // Is this iterate acceptable for the filter?
       if (!pairInFilter( cNormTrial, objTrial )) {
@@ -1213,11 +1182,10 @@ namespace blocksqp {
       }
 
       // If minimum norm NLP has converged, declare local infeasibility
-      if (restMethod->vars->tol < param->opttol && restMethod->vars->cNormS < param->nlinfeastol )
-        {
-          ret = 1;
-          break;
-        }
+      if (restMethod->vars->tol < param->opttol && restMethod->vars->cNormS < param->nlinfeastol ) {
+        ret = 1;
+        break;
+      }
     }
 
     // Success or locally infeasible
@@ -1288,8 +1256,10 @@ namespace blocksqp {
     for (k=0; k<prob->nVar; k++ ) // input: last successful step
       vars->trialXi( k ) = vars->xi( k );
     prob->reduceConstrVio( vars->trialXi, &info );
-    if (info )// If an error occured in restoration heuristics, abort
+    if (info ) {
+      // If an error occured in restoration heuristics, abort
       return -1;
+    }
 
     // Compute objective and constraints at the new (hopefully feasible) point
     prob->evaluate( vars->trialXi, &vars->obj, vars->constr, &info );
@@ -1299,11 +1269,10 @@ namespace blocksqp {
       return -1;
 
     // Is the new point acceptable for the filter?
-    if (pairInFilter( cNormTrial, vars->obj ) )
-      {
-        // point is in the taboo region, restoration heuristic not successful!
-        return -1;
-      }
+    if (pairInFilter( cNormTrial, vars->obj)) {
+      // point is in the taboo region, restoration heuristic not successful!
+      return -1;
+    }
 
     // If no error occured in the integration all shooting variables now
     // have the values obtained by a single shooting integration.
@@ -1642,12 +1611,13 @@ namespace blocksqp {
     for (iBlock=0; iBlock<nBlocks; iBlock++ )
       for (i=0; i<hess_[iBlock].N(); i++ )
         for (j=i; j<hess_[iBlock].N(); j++ )
-          if (fabs(hess_[iBlock]( i,j )) > eps )
-            {
+          if (fabs(hess_[iBlock]( i,j )) > eps ) {
+            nnz++;
+            if (i != j ) {
+              // off-diagonal elements count twice
               nnz++;
-              if (i != j )// off-diagonal elements count twice
-                nnz++;
             }
+          }
 
     if (hessNz_ != NULL ) delete[] hessNz_;
     if (hessIndRow_ != NULL ) delete[] hessIndRow_;
@@ -1795,17 +1765,15 @@ namespace blocksqp {
       vars->hess[iBlock]( i, i ) = param->iniHessDiag;
 
     // If we maintain 2 Hessians, also reset the second one
-    if (vars->hess2 != NULL )
-      {
-        vars->hess2[iBlock].Initialize( 0.0 );
-        for (int i=0; i<vars->hess2[iBlock].M(); i++ )
-          vars->hess2[iBlock]( i, i ) = param->iniHessDiag;
-      }
+    if (vars->hess2 != NULL ) {
+      vars->hess2[iBlock].Initialize( 0.0 );
+      for (int i=0; i<vars->hess2[iBlock].M(); i++ )
+        vars->hess2[iBlock]( i, i ) = param->iniHessDiag;
+    }
   }
 
 
-  void Blocksqp::resetHessian()
-  {
+  void Blocksqp::resetHessian() {
     for (int iBlock=0; iBlock<vars->nBlocks; iBlock++ )
       //if objective derv is computed exactly, don't set the last block!
       if (!(param->whichSecondDerv == 1 && param->blockHess && iBlock == vars->nBlocks - 1) )
