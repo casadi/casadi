@@ -209,7 +209,7 @@ void MyProblem::evaluate( const blocksqp::Matrix &xi, const blocksqp::Matrix &la
 int main() {
   int ret = 0;
   MyProblem *prob;
-  blocksqp::SQPmethod *meth;
+  blocksqp::Blocksqp *meth;
   blocksqp::SQPoptions *opts;
   blocksqp::SQPstats *stats;
   char outpath[255];
@@ -276,7 +276,7 @@ int main() {
   /* Create blockSQP method object and run algorithm */
   /*-------------------------------------------------*/
   stats = new blocksqp::SQPstats( outpath );
-  meth = new blocksqp::SQPmethod( prob, opts, stats );
+  meth = new blocksqp::Blocksqp( prob, opts, stats );
 
   meth->init();
   ret = meth->run( 100 );
@@ -291,9 +291,6 @@ int main() {
   printf("\nHessian approximation at the solution:\n");
   for (int i=0; i<meth->vars->nBlocks; i++ )
     meth->vars->hess[i].Print();
-  //printf("\nFallback Hessian at the solution:\n");
-  //for (int i=0; i<meth->vars->nBlocks; i++ )
-  //meth->vars->hess2[i].Print();
 
   // Clean up
   delete prob;
