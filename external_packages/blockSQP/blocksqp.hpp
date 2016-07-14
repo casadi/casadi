@@ -21,22 +21,17 @@
 #include <qpOASES.hpp>
 #include <set>
 
-namespace blockSQP
-{
+namespace blockSQP {
 
   typedef char PATHSTR[4096];
-
-  extern int Ccount; ///< Count constructor calls
-  extern int Dcount; ///< Count destructor calls
-  extern int Ecount; ///< Count assign operator calls
 
   /**
    * \brief Class for easy access of elements of a dense matrix.
    * \author Dennis Janka
    * \date 2012-2015
    */
-  class Matrix
-  {  private:
+  class Matrix {
+    private:
     int malloc( void );                                           ///< memory allocation
     int free( void );                                             ///< memory free
 
@@ -87,8 +82,7 @@ namespace blockSQP
    * \author Dennis Janka
    * \date 2012-2015
    */
-  class SymMatrix : public Matrix
-  {
+  class SymMatrix : public Matrix {
   protected:
     int malloc( void );
     int free( void );
@@ -126,8 +120,7 @@ namespace blockSQP
    * \author Dennis Janka
    * \date 2012-2015
    */
-  class Problemspec
-  {
+  class Problemspec {
     /*
      * VARIABLES
      */
@@ -215,8 +208,7 @@ namespace blockSQP
    * \author Dennis Janka
    * \date 2012-2015
    */
-  class SQPoptions
-  {
+  class SQPoptions {
     /*
      * Variables
      */
@@ -287,8 +279,7 @@ namespace blockSQP
    * \author Dennis Janka
    * \date 2012-2015
    */
-  class SQPiterate
-  {
+  class SQPiterate {
     /*
      * Variables
      */
@@ -385,8 +376,7 @@ namespace blockSQP
    * \author Dennis Janka
    * \date 2012-2015
    */
-  class SQPstats
-  {
+  class SQPstats {
     /*
      * Variables
      */
@@ -449,28 +439,6 @@ namespace blockSQP
     void finish( SQPoptions *param );
   };
 
-  //  Interface of some LAPACK routines.
-#ifdef __cplusplus
-  extern "C"
-  {
-#endif
-
-    void dsyev_( char *jobz, char *uplo, int *n, double *a, int *lda,
-                 double *w, double *work, int *lwork, int *info,
-                 int strlen_jobz, int strlen_uplo );
-
-    void dspev_( char *jobz, char *uplo, int *n, double *ap, double *w, double *z, int *ldz,
-                 double *work, int *info, int strlen_jobz, int strlen_uplo );
-
-    void dgetrf_( int *m, int *n, double *a, int *lda, int *ipiv, int *info );
-
-    void dgetri_( int *n, double *a, int *lda,
-                  int *ipiv, double *work, int *lwork, int *info );
-
-#ifdef __cplusplus
-  }
-#endif
-
   //  Declaration of general purpose routines for matrix and vector computations
   double l1VectorNorm( const Matrix &v );
   double l2VectorNorm( const Matrix &v );
@@ -494,8 +462,7 @@ namespace blockSQP
    * \author Dennis Janka
    * \date 2012-2015
    */
-  class SQPmethod
-  {
+  class SQPmethod {
     /*
      * Variables
      */
@@ -615,8 +582,7 @@ namespace blockSQP
    * \author Dennis Janka
    * \date 2012-2015
    */
-  class RestorationProblem : public Problemspec
-  {
+  class RestorationProblem : public Problemspec {
     /*
      * CLASS VARIABLES
      */

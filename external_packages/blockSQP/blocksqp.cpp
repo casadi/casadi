@@ -9,12 +9,27 @@
 /**
  * \file blocksqp.cpp
  * \author Dennis Janka, Joel Andersson
- * \date 2012-2015
+ * \date 2012-2015, 2016
  *
  */
 
 
 #include "blocksqp.hpp"
+
+// LAPACK routines
+extern "C" {
+  void dsyev_( char *jobz, char *uplo, int *n, double *a, int *lda,
+               double *w, double *work, int *lwork, int *info,
+               int strlen_jobz, int strlen_uplo );
+
+  void dspev_( char *jobz, char *uplo, int *n, double *ap, double *w, double *z, int *ldz,
+               double *work, int *info, int strlen_jobz, int strlen_uplo );
+
+  void dgetrf_( int *m, int *n, double *a, int *lda, int *ipiv, int *info );
+
+  void dgetri_( int *n, double *a, int *lda,
+                int *ipiv, double *work, int *lwork, int *info );
+}
 
 namespace blockSQP {
 
@@ -2370,12 +2385,6 @@ namespace blockSQP {
 
   /* ----------------------------------------------------------------------- */
 
-  int Ccount = 0;
-  int Dcount = 0;
-  int Ecount = 0;
-
-  /* ----------------------------------------------------------------------- */
-
   int Matrix::malloc( void ) {
     int len;
 
@@ -2409,67 +2418,22 @@ namespace blockSQP {
 
 
   double &Matrix::operator()( int i, int j ) {
-#ifdef MATRIX_DEBUG
-    if ( i < 0 || i >= m || j < 0 || j >= n )
-      Error("Invalid matrix entry");
-#endif
-
     return array[i+j*ldim];
   }
 
-  double &Matrix::operator()( int i, int j ) const
-  {
-#ifdef MATRIX_DEBUG
-    if ( i < 0 || i >= m || j < 0 || j >= n )
-      Error("Invalid matrix entry");
-#endif
-
+  double &Matrix::operator()( int i, int j ) const {
     return array[i+j*ldim];
   }
 
   double &Matrix::operator()( int i ) {
-#ifdef MATRIX_DEBUG
-    if ( i < 0 || i >= m )
-      Error("Invalid matrix entry");
-#endif
-
     return array[i];
   }
 
   double &Matrix::operator()( int i ) const {
-#ifdef MATRIX_DEBUG
-    if ( i < 0 || i >= m )
-      Error("Invalid matrix entry");
-#endif
-
     return array[i];
   }
 
-  //double Matrix::a( int i, int j ) const
-  //{
-  //#ifdef MATRIX_DEBUG
-  //if ( i < 0 || i >= m || j < 0 || j >= n )
-  //Error("Invalid matrix entry");
-  //#endif
-
-  //return array[i+j*ldim];
-  //}
-
-
-  //double Matrix::a( int i ) const
-  //{
-  //#ifdef MATRIX_DEBUG
-  //if ( i < 0 || i >= m )
-  //Error("Invalid matrix entry");
-  //#endif
-
-  //return array[i];
-  //}
-
-
   Matrix::Matrix( int M, int N, int LDIM ) {
-    Ccount++;
-
     m = M;
     n = N;
     ldim = LDIM;
@@ -2480,8 +2444,6 @@ namespace blockSQP {
 
 
   Matrix::Matrix( int M, int N, double *ARRAY, int LDIM ) {
-    Ccount++;
-
     m = M;
     n = N;
     array = ARRAY;
@@ -2495,8 +2457,6 @@ namespace blockSQP {
 
   Matrix::Matrix( const Matrix &A ) {
     int i, j;
-    //printf("copy constructor\n");
-    Ccount++;
 
     m = A.m;
     n = A.n;
@@ -2513,8 +2473,6 @@ namespace blockSQP {
 
   Matrix &Matrix::operator=( const Matrix &A ) {
     int i, j;
-    //printf("assignment operator\n");
-    Ecount++;
 
     if ( this != &A )
       {
@@ -2548,8 +2506,6 @@ namespace blockSQP {
 
 
   Matrix::~Matrix( void ) {
-    Dcount++;
-
     if ( !tflag )
       free();
   }
@@ -2739,11 +2695,6 @@ namespace blockSQP {
 
 
   double &SymMatrix::operator()( int i, int j ) {
-#ifdef MATRIX_DEBUG
-    if ( i < 0 || i >= m || j < 0 || j >= n )
-      Error("Invalid matrix entry");
-#endif
-
     int pos;
 
     if (i < j )//reference to upper triangular part
@@ -2756,11 +2707,6 @@ namespace blockSQP {
 
 
   double &SymMatrix::operator()( int i, int j ) const {
-#ifdef MATRIX_DEBUG
-    if ( i < 0 || i >= m || j < 0 || j >= n )
-      Error("Invalid matrix entry");
-#endif
-
     int pos;
 
     if (i < j )//reference to upper triangular part
@@ -2773,52 +2719,13 @@ namespace blockSQP {
 
 
   double &SymMatrix::operator()( int i ) {
-#ifdef MATRIX_DEBUG
-    if ( i >= m*(m+1)/2.0 )
-      Error("Invalid matrix entry");
-#endif
-
     return array[i];
   }
 
 
   double &SymMatrix::operator()( int i ) const {
-#ifdef MATRIX_DEBUG
-    if ( i >= m*(m+1)/2.0 )
-      Error("Invalid matrix entry");
-#endif
-
     return array[i];
   }
-
-
-  //double SymMatrix::a( int i, int j ) const {
-  //#ifdef MATRIX_DEBUG
-  //if ( i < 0 || i >= m || j < 0 || j >= n )
-  //Error("Invalid matrix entry");
-  //#endif
-
-  //int pos;
-
-  //if (j > i )//reference to upper triangular part
-  //pos = (int) (j + i*(m - (i+1.0)/2.0));
-  //else
-  //pos = (int) (i + j*(m - (j+1.0)/2.0));
-
-  //return array[pos];
-  //}
-
-
-  //double SymMatrix::a( int i ) const
-  //{
-  //#ifdef MATRIX_DEBUG
-  //if ( i >= m*(m+1)/2.0 )
-  //Error("Invalid matrix entry");
-  //#endif
-
-  //return array[i];
-  //}
-
 
   SymMatrix::SymMatrix( int M ) {
     m = M;
@@ -2828,7 +2735,6 @@ namespace blockSQP {
 
     malloc();
   }
-
 
   SymMatrix::SymMatrix( int M, double *ARRAY ) {
     m = M;
@@ -2897,8 +2803,6 @@ namespace blockSQP {
 
 
   SymMatrix::~SymMatrix( void ) {
-    Dcount++;
-
     if (!tflag )
       free();
   }
