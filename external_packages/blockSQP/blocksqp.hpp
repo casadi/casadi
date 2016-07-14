@@ -21,7 +21,7 @@
 #include <qpOASES.hpp>
 #include <set>
 
-namespace blockSQP {
+namespace blocksqp {
 
   typedef char PATHSTR[4096];
 
@@ -625,6 +625,6 @@ namespace blockSQP {
     virtual void printConstraints( const Matrix &constr, const Matrix &lambda );
   };
 
-} // namespace blockSQP
+} // namespace blocksqp
 
 #endif // BLOCKSQP_HPP

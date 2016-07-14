@@ -31,7 +31,7 @@ extern "C" {
                 int *ipiv, double *work, int *lwork, int *info );
 }
 
-namespace blockSQP {
+namespace blocksqp {
 
   SQPmethod::SQPmethod( Problemspec *problem, SQPoptions *parameters, SQPstats *statistics ) {
     prob = problem;
@@ -4321,4 +4321,4 @@ namespace blockSQP {
     printf("Minimum 2-norm NLP to find a point acceptable to the filter\n");
   }
 
-} // namespace blockSQP
+} // namespace blocksqp
