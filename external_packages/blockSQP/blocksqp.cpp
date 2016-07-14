@@ -788,22 +788,20 @@ namespace blocksqp {
     int nCon = constr.M();
 
     // Violation of simple bounds
-    for (i=0; i<nVar; i++ )
-      {
-        if (xi( i ) - bu( i ) > norm )
-          norm = xi( i ) - bu( i );
-        else if (bl( i ) - xi( i ) > norm )
-          norm = bl( i ) - xi( i );
-      }
+    for (i=0; i<nVar; i++ ) {
+      if (xi( i ) - bu( i ) > norm )
+        norm = xi( i ) - bu( i );
+      else if (bl( i ) - xi( i ) > norm )
+        norm = bl( i ) - xi( i );
+    }
 
     // Find out the largest constraint violation
-    for (i=0; i<nCon; i++ )
-      {
-        if (constr( i ) - bu( nVar+i ) > norm )
-          norm = constr( i ) - bu( nVar+i );
-        if (bl( nVar+i ) - constr( i ) > norm )
-          norm = bl( nVar+i ) - constr( i );
-      }
+    for (i=0; i<nCon; i++ ) {
+      if (constr( i ) - bu( nVar+i ) > norm )
+        norm = constr( i ) - bu( nVar+i );
+      if (bl( nVar+i ) - constr( i ) > norm )
+        norm = bl( nVar+i ) - constr( i );
+    }
 
     return norm;
   }
@@ -820,11 +818,10 @@ namespace blocksqp {
     vars->nSOCS = nSOCS;
 
     // Set new xi by accepting the current trial step
-    for (k=0; k<vars->xi.M(); k++ )
-      {
-        vars->xi( k ) = vars->trialXi( k );
-        vars->deltaXi( k ) = alpha * deltaXi( k );
-      }
+    for (k=0; k<vars->xi.M(); k++ ) {
+      vars->xi( k ) = vars->trialXi( k );
+      vars->deltaXi( k ) = alpha * deltaXi( k );
+    }
 
     // Store the infinity norm of the multiplier step
     vars->lambdaStepNorm = 0.0;
@@ -853,18 +850,17 @@ namespace blocksqp {
 
     // Update bounds on linearized constraints for the next SOC QP:
     // That is different from the update for the first SOC QP!
-    for (i=0; i<prob->nCon; i++ )
-      {
-        if (prob->bl( nVar+i ) != param->inf )
-          vars->deltaBl( nVar+i ) = (*alphaSOC)*vars->deltaBl( nVar+i ) - vars->constr( i );
-        else
-          vars->deltaBl( nVar+i ) = param->inf;
+    for (i=0; i<prob->nCon; i++ ) {
+      if (prob->bl( nVar+i ) != param->inf )
+        vars->deltaBl( nVar+i ) = (*alphaSOC)*vars->deltaBl( nVar+i ) - vars->constr( i );
+      else
+        vars->deltaBl( nVar+i ) = param->inf;
 
-        if (prob->bu( nVar+i ) != param->inf )
-          vars->deltaBu( nVar+i ) = (*alphaSOC)*vars->deltaBu( nVar+i ) - vars->constr( i );
-        else
-          vars->deltaBu( nVar+i ) = param->inf;
-      }
+      if (prob->bu( nVar+i ) != param->inf )
+        vars->deltaBu( nVar+i ) = (*alphaSOC)*vars->deltaBu( nVar+i ) - vars->constr( i );
+      else
+        vars->deltaBu( nVar+i ) = param->inf;
+    }
 
     *alphaSOC = (*alphaSOC) * 0.5;
   }
@@ -1743,8 +1739,7 @@ namespace blocksqp {
   /**
    * Initial Hessian: Identity matrix
    */
-  void Blocksqp::calcInitialHessian()
-  {
+  void Blocksqp::calcInitialHessian() {
     int iBlock;
 
     for (iBlock=0; iBlock<vars->nBlocks; iBlock++ )
