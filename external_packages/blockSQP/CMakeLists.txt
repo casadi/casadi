@@ -12,18 +12,8 @@ link_directories(/usr/local/lib/)
 
 set(BLOCKSQP_SRCS
   blocksqp.hpp
-  blocksqp_general_purpose.cpp
-  blocksqp_glob.cpp
-  blocksqp_hess.cpp
-  blocksqp_iter.cpp
-  blocksqp_main.cpp
-  blocksqp_matrix.cpp
-  blocksqp_options.cpp
-  blocksqp_problemspec.cpp
-  blocksqp_qp.cpp
-  blocksqp_restoration.cpp
-  blocksqp_stats.cpp
-  )
+  blocksqp.cpp
+)
 
 add_library(blocksqp ${BLOCKSQP_SRCS})
 add_executable(example1 example1.cpp)
