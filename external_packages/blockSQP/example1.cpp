@@ -209,7 +209,7 @@ void MyProblem::evaluate( const blocksqp::Matrix &xi, const blocksqp::Matrix &la
 int main() {
   int ret = 0;
   MyProblem *prob;
-  blocksqp::Blocksqp *meth;
+  blocksqp::SQPMethod *meth;
   blocksqp::SQPoptions *opts;
   blocksqp::SQPstats *stats;
   char outpath[255];
@@ -276,7 +276,7 @@ int main() {
   /* Create blockSQP method object and run algorithm */
   /*-------------------------------------------------*/
   stats = new blocksqp::SQPstats( outpath );
-  meth = new blocksqp::Blocksqp( prob, opts, stats );
+  meth = new blocksqp::SQPMethod( prob, opts, stats );
 
   meth->init();
   ret = meth->run( 100 );

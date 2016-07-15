@@ -33,7 +33,7 @@ extern "C" {
 
 namespace blocksqp {
 
-  Blocksqp::Blocksqp( Problemspec *problem, SQPoptions *parameters, SQPstats *statistics ) {
+  SQPMethod::SQPMethod( Problemspec *problem, SQPoptions *parameters, SQPstats *statistics ) {
     prob = problem;
     param = parameters;
     stats = statistics;
@@ -54,14 +54,14 @@ namespace blocksqp {
     initCalled = false;
   }
 
-  Blocksqp::~Blocksqp() {
+  SQPMethod::~SQPMethod() {
     delete qp;
     delete qpSave;
     delete vars;
   }
 
 
-  void Blocksqp::init() {
+  void SQPMethod::init() {
     // Print header and information about the algorithmic parameters
     printInfo( param->printLevel );
 
@@ -82,7 +82,7 @@ namespace blocksqp {
   }
 
 
-  int Blocksqp::run( int maxIt, int warmStart ) {
+  int SQPMethod::run( int maxIt, int warmStart ) {
     int it, infoQP = 0, infoEval = 0;
     bool skipLineSearch = false;
     bool hasConverged = false;
@@ -292,7 +292,7 @@ namespace blocksqp {
   }
 
 
-  void Blocksqp::finish() {
+  void SQPMethod::finish() {
     if (initCalled ) {
       initCalled = false;
     } else {
@@ -311,7 +311,7 @@ namespace blocksqp {
    * flag == 1: output dL(xi_k+1, lambda_k+1) - L(xi_k, lambda_k+1)
    * flag == 2: output dL(xi_k+1, lambda_k+1) - df(xi)
    */
-  void Blocksqp::calcLagrangeGradient( const Matrix &lambda, const Matrix &gradObj, double *jacNz, int *jacIndRow, int *jacIndCol,
+  void SQPMethod::calcLagrangeGradient( const Matrix &lambda, const Matrix &gradObj, double *jacNz, int *jacIndRow, int *jacIndCol,
                                        Matrix &gradLagrange, int flag ) {
     int iVar, iCon;
 
@@ -345,7 +345,7 @@ namespace blocksqp {
    * flag == 1: output dL(xi_k+1, lambda_k+1) - L(xi_k, lambda_k+1)
    * flag == 2: output dL(xi_k+1, lambda_k+1) - df(xi)
    */
-  void Blocksqp::calcLagrangeGradient( const Matrix &lambda, const Matrix &gradObj, const Matrix &constrJac,
+  void SQPMethod::calcLagrangeGradient( const Matrix &lambda, const Matrix &gradObj, const Matrix &constrJac,
                                        Matrix &gradLagrange, int flag ) {
     int iVar, iCon;
 
@@ -377,7 +377,7 @@ namespace blocksqp {
   /**
    * Wrapper if called with standard arguments
    */
-  void Blocksqp::calcLagrangeGradient( Matrix &gradLagrange, int flag ) {
+  void SQPMethod::calcLagrangeGradient( Matrix &gradLagrange, int flag ) {
     if (param->sparseQP ) {
       calcLagrangeGradient( vars->lambda, vars->gradObj, vars->jacNz, vars->jacIndRow, vars->jacIndCol, gradLagrange, flag );
     } else {
@@ -392,7 +392,7 @@ namespace blocksqp {
    * and
    * ||constrViolation||_infty / (1 + ||xi||_infty) <= TOL
    */
-  bool Blocksqp::calcOptTol() {
+  bool SQPMethod::calcOptTol() {
     // scaled norm of Lagrangian gradient
     calcLagrangeGradient( vars->gradLagrange, 0 );
     vars->gradNorm = lInfVectorNorm( vars->gradLagrange );
@@ -408,7 +408,7 @@ namespace blocksqp {
       return false;
   }
 
-  void Blocksqp::printInfo( int printLevel ) {
+  void SQPMethod::printInfo( int printLevel ) {
     char hessString1[100];
     char hessString2[100];
     char globString[100];
@@ -805,11 +805,11 @@ namespace blocksqp {
 
     return norm;
   }
-  void Blocksqp::acceptStep( double alpha ) {
+  void SQPMethod::acceptStep( double alpha ) {
     acceptStep( vars->deltaXi, vars->lambdaQP, alpha, 0 );
   }
 
-  void Blocksqp::acceptStep( const Matrix &deltaXi, const Matrix &lambdaQP, double alpha, int nSOCS ) {
+  void SQPMethod::acceptStep( const Matrix &deltaXi, const Matrix &lambdaQP, double alpha, int nSOCS ) {
     int k;
     double lStpNorm;
 
@@ -840,11 +840,11 @@ namespace blocksqp {
       vars->reducedStepCount = 0;
   }
 
-  void Blocksqp::reduceStepsize( double *alpha ) {
+  void SQPMethod::reduceStepsize( double *alpha ) {
     *alpha = (*alpha) * 0.5;
   }
 
-  void Blocksqp::reduceSOCStepsize( double *alphaSOC ) {
+  void SQPMethod::reduceSOCStepsize( double *alphaSOC ) {
     int i;
     int nVar = prob->nVar;
 
@@ -871,7 +871,7 @@ namespace blocksqp {
    * xi = xi + deltaXi
    * lambda = lambdaQP
    */
-  int Blocksqp::fullstep() {
+  int SQPMethod::fullstep() {
     double alpha;
     double objTrial, cNormTrial;
     int i, k, info;
@@ -909,7 +909,7 @@ namespace blocksqp {
    * as described in Ipopt paper (Waechter 2006)
    *
    */
-  int Blocksqp::filterLineSearch() {
+  int SQPMethod::filterLineSearch() {
     double alpha = 1.0;
     double cNorm, cNormTrial, objTrial, dfTdeltaXi;
 
@@ -1019,7 +1019,7 @@ namespace blocksqp {
    * s.t.  bl <= A^Td + constr(xi+alpha*deltaXi) - A^TdeltaXi <= bu
    *
    */
-  bool Blocksqp::secondOrderCorrection( double cNorm, double cNormTrial, double dfTdeltaXi, bool swCond, int it ) {
+  bool SQPMethod::secondOrderCorrection( double cNorm, double cNormTrial, double dfTdeltaXi, bool swCond, int it ) {
     // Perform SOC only on the first iteration of backtracking line search
     if (it > 0 ) return false;
     // If constraint violation of the trialstep is lower than the current one skip SOC
@@ -1114,7 +1114,7 @@ namespace blocksqp {
    *
    * "The dreaded restoration phase" -- Nick Gould
    */
-  int Blocksqp::feasibilityRestorationPhase() {
+  int SQPMethod::feasibilityRestorationPhase() {
     // No Feasibility restoration phase
     if (param->restoreFeas == 0 ) return -1;
 
@@ -1125,7 +1125,7 @@ namespace blocksqp {
     int warmStart;
     double cNormTrial, objTrial, lStpNorm;
     RestorationProblem *restProb;
-    Blocksqp *restMethod;
+    SQPMethod *restMethod;
     SQPoptions *restOpts;
     SQPstats *restStats;
 
@@ -1145,7 +1145,7 @@ namespace blocksqp {
     restOpts->nlinfeastol = param->nlinfeastol;
 
     // Create and initialize the SQP method for the minimum norm NLP
-    restMethod = new Blocksqp( restProb, restOpts, restStats );
+    restMethod = new SQPMethod( restProb, restOpts, restStats );
     restMethod->init();
 
     // Iterate until a point acceptable to the filter is found
@@ -1239,7 +1239,7 @@ namespace blocksqp {
    * the (pseudo) continuity constraints, i.e. do a single shooting
    * iteration with the current controls and measurement weights q and w
    */
-  int Blocksqp::feasibilityRestorationHeuristic() {
+  int SQPMethod::feasibilityRestorationHeuristic() {
     stats->nRestHeurCalls++;
 
     int info, k;
@@ -1301,7 +1301,7 @@ namespace blocksqp {
   /**
    * If the line search fails, check if the full step reduces the KKT error by a factor kappaF.
    */
-  int Blocksqp::kktErrorReduction( ) {
+  int SQPMethod::kktErrorReduction( ) {
     int i, info = 0;
     double objTrial, cNormTrial, trialGradNorm, trialTol;
     Matrix trialConstr, trialGradLagrange;
@@ -1347,7 +1347,7 @@ namespace blocksqp {
    * Check if current entry is accepted to the filter:
    * (cNorm, obj) in F_k
    */
-  bool Blocksqp::pairInFilter( double cNorm, double obj ) {
+  bool SQPMethod::pairInFilter( double cNorm, double obj ) {
     std::set< std::pair<double,double> >::iterator iter;
     std::set< std::pair<double,double> > *filter;
     filter = vars->filter;
@@ -1374,7 +1374,7 @@ namespace blocksqp {
   }
 
 
-  void Blocksqp::initializeFilter() {
+  void SQPMethod::initializeFilter() {
     std::set< std::pair<double,double> >::iterator iter;
     std::pair<double,double> initPair ( param->thetaMax, prob->objLo );
 
@@ -1395,7 +1395,7 @@ namespace blocksqp {
    * Augment the filter:
    * F_k+1 = F_k U { (c,f) | c > (1-gammaTheta)cNorm and f > obj-gammaF*c
    */
-  void Blocksqp::augmentFilter( double cNorm, double obj ) {
+  void SQPMethod::augmentFilter( double cNorm, double obj ) {
     std::set< std::pair<double,double> >::iterator iter;
     std::pair<double,double> entry ( (1.0 - param->gammaTheta)*cNorm, obj - param->gammaF*cNorm );
 
@@ -1739,7 +1739,7 @@ namespace blocksqp {
   /**
    * Initial Hessian: Identity matrix
    */
-  void Blocksqp::calcInitialHessian() {
+  void SQPMethod::calcInitialHessian() {
     int iBlock;
 
     for (iBlock=0; iBlock<vars->nBlocks; iBlock++ )
@@ -1752,7 +1752,7 @@ namespace blocksqp {
   /**
    * Initial Hessian for one block: Identity matrix
    */
-  void Blocksqp::calcInitialHessian( int iBlock ) {
+  void SQPMethod::calcInitialHessian( int iBlock ) {
     vars->hess[iBlock].Initialize( 0.0 );
 
     // Each block is a diagonal matrix
@@ -1768,7 +1768,7 @@ namespace blocksqp {
   }
 
 
-  void Blocksqp::resetHessian() {
+  void SQPMethod::resetHessian() {
     for (int iBlock=0; iBlock<vars->nBlocks; iBlock++ )
       //if objective derv is computed exactly, don't set the last block!
       if (!(param->whichSecondDerv == 1 && param->blockHess && iBlock == vars->nBlocks - 1) )
@@ -1776,7 +1776,7 @@ namespace blocksqp {
   }
 
 
-  void Blocksqp::resetHessian( int iBlock ) {
+  void SQPMethod::resetHessian( int iBlock ) {
     Matrix smallDelta, smallGamma;
     int nVarLocal = vars->hess[iBlock].M();
 
@@ -1805,7 +1805,7 @@ namespace blocksqp {
   /**
    * Approximate Hessian by finite differences
    */
-  int Blocksqp::calcFiniteDiffHessian() {
+  int SQPMethod::calcFiniteDiffHessian() {
     int iVar, jVar, k, iBlock, maxBlock, info, idx, idx1, idx2;
     double dummy, lowerVio, upperVio;
     Matrix pert;
@@ -1894,7 +1894,7 @@ namespace blocksqp {
   }
 
 
-  void Blocksqp::sizeInitialHessian( const Matrix &gamma, const Matrix &delta, int iBlock, int option ) {
+  void SQPMethod::sizeInitialHessian( const Matrix &gamma, const Matrix &delta, int iBlock, int option ) {
     int i, j;
     double scale;
     double myEps = 1.0e3 * param->eps;
@@ -1929,7 +1929,7 @@ namespace blocksqp {
   }
 
 
-  void Blocksqp::sizeHessianCOL( const Matrix &gamma, const Matrix &delta, int iBlock ) {
+  void SQPMethod::sizeHessianCOL( const Matrix &gamma, const Matrix &delta, int iBlock ) {
     int i, j;
     double theta, scale, myEps = 1.0e3 * param->eps;
     double deltaNorm, deltaNormOld, deltaGamma, deltaGammaOld, deltaBdelta;
@@ -1977,7 +1977,7 @@ namespace blocksqp {
   /**
    * Apply BFGS or SR1 update blockwise and size blocks
    */
-  void Blocksqp::calcHessianUpdate( int updateType, int hessScaling ) {
+  void SQPMethod::calcHessianUpdate( int updateType, int hessScaling ) {
     int iBlock, nBlocks;
     int nVarLocal;
     Matrix smallGamma, smallDelta;
@@ -2049,7 +2049,7 @@ namespace blocksqp {
   }
 
 
-  void Blocksqp::calcHessianUpdateLimitedMemory( int updateType, int hessScaling ) {
+  void SQPMethod::calcHessianUpdateLimitedMemory( int updateType, int hessScaling ) {
     int iBlock, nBlocks, nVarLocal;
     Matrix smallGamma, smallDelta;
     Matrix gammai, deltai;
@@ -2149,7 +2149,7 @@ namespace blocksqp {
   }
 
 
-  void Blocksqp::calcBFGS( const Matrix &gamma, const Matrix &delta, int iBlock ) {
+  void SQPMethod::calcBFGS( const Matrix &gamma, const Matrix &delta, int iBlock ) {
     int i, j, k, dim = gamma.M();
     Matrix Bdelta;
     SymMatrix *B;
@@ -2225,7 +2225,7 @@ namespace blocksqp {
   }
 
 
-  void Blocksqp::calcSR1( const Matrix &gamma, const Matrix &delta, int iBlock ) {
+  void SQPMethod::calcSR1( const Matrix &gamma, const Matrix &delta, int iBlock ) {
     int i, j, k, dim = gamma.M();
     Matrix gmBdelta;
     SymMatrix *B;
@@ -2265,7 +2265,7 @@ namespace blocksqp {
    * Set deltaXi and gamma as a column in the matrix containing
    * the m most recent delta and gamma
    */
-  void Blocksqp::updateDeltaGamma() {
+  void SQPMethod::updateDeltaGamma() {
     int nVar = vars->gammaMat.M();
     int m = vars->gammaMat.N();
 
@@ -2962,7 +2962,7 @@ namespace blocksqp {
       }
   }
 
-  void Blocksqp::computeNextHessian( int idx, int maxQP ) {
+  void SQPMethod::computeNextHessian( int idx, int maxQP ) {
     // Compute fallback update only once
     if (idx == 1 )
       {
@@ -3013,7 +3013,7 @@ namespace blocksqp {
    * Inner loop of SQP algorithm:
    * Solve a sequence of QPs until pos. def. assumption (G3*) is satisfied.
    */
-  int Blocksqp::solveQP( Matrix &deltaXi, Matrix &lambdaQP, bool matricesChanged ) {
+  int SQPMethod::solveQP( Matrix &deltaXi, Matrix &lambdaQP, bool matricesChanged ) {
     Matrix jacT;
     int maxQP, l;
     if (param->globalization == 1 &&
@@ -3254,7 +3254,7 @@ namespace blocksqp {
    * to variable bounds in the NLP or according to
    * trust region box radius
    */
-  void Blocksqp::updateStepBounds( bool soc ) {
+  void SQPMethod::updateStepBounds( bool soc ) {
     int i;
     int nVar = prob->nVar;
     int nCon = prob->nCon;

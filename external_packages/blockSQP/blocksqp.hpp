@@ -116,7 +116,7 @@ namespace blocksqp {
   double delta( int, int );
 
   /**
-   * \brief Base class for problem specification as required by Blocksqp.
+   * \brief Base class for problem specification as required by SQPMethod.
    * \author Dennis Janka
    * \date 2012-2015
    */
@@ -204,7 +204,7 @@ namespace blocksqp {
   };
 
   /**
-   * \brief Contains algorithmic options and parameters for Blocksqp.
+   * \brief Contains algorithmic options and parameters for SQPMethod.
    * \author Dennis Janka
    * \date 2012-2015
    */
@@ -462,7 +462,7 @@ namespace blocksqp {
    * \author Dennis Janka
    * \date 2012-2015
    */
-  class Blocksqp {
+  class SQPMethod {
     /*
      * Variables
      */
@@ -482,8 +482,8 @@ namespace blocksqp {
      */
   public:
     /// Construct a method for a given problem and set of algorithmic options
-    Blocksqp( Problemspec *problem, SQPoptions *parameters, SQPstats *statistics );
-    ~Blocksqp();
+    SQPMethod( Problemspec *problem, SQPoptions *parameters, SQPstats *statistics );
+    ~SQPMethod();
     /// Initialization, has to be called before run
     void init();
     /// Main Loop of SQP method
