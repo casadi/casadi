@@ -16,8 +16,3 @@ set(DSDP_LIBRARIES ${DSDP_LIBRARIES})
 casadi_external_library(casadi_dsdp ${DSDP_SRC})
 
 target_link_libraries(casadi_dsdp ${LAPACK_LIBRARIES} ${BLAS_LIBRARIES})
-
-install(DIRECTORY include
-  DESTINATION include/casadi/external_packages/DSDP
-  FILES_MATCHING PATTERN "*.h"
-  PATTERN ".svn" EXCLUDE)

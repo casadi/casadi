@@ -26,8 +26,3 @@ target_link_libraries(casadi_qpoases ${LAPACK_LIBRARIES} ${BLAS_LIBRARIES})
 
 # Uncomment to bypass user-defined linear solver (requires HSL)
 #target_link_libraries(casadi_qpoases ${HSL_LIBRARIES})
-
-install(DIRECTORY include
-  DESTINATION include/casadi/external_packages/qpOASES
-  FILES_MATCHING PATTERN "*.h"
-  PATTERN ".svn" EXCLUDE)

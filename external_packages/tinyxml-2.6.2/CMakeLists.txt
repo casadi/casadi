@@ -15,8 +15,3 @@ set(TINYXML_SRC
 )
 
 casadi_external_library(casadi_tinyxml ${TINYXML_SRC})
-
-install(DIRECTORY ./
-  DESTINATION include/casadi/external_packages/tinyxml-2.6.2
-  FILES_MATCHING PATTERN "*.h"
-  PATTERN ".svn" EXCLUDE)

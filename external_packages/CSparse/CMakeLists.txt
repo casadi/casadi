@@ -16,9 +16,3 @@ set(CSPARSE_SRC
 )
 
 casadi_external_library(casadi_csparse ${CSPARSE_SRC})
-
-install(DIRECTORY ./
-  DESTINATION include/casadi/external_packages/CSparse
-  FILES_MATCHING PATTERN "*.h"
-  PATTERN ".svn" EXCLUDE)
-
