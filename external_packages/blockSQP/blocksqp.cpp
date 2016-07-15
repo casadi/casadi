@@ -548,7 +548,7 @@ namespace blocksqp {
 
     // DSPEV computes all the eigenvalues and, optionally, eigenvectors of a
     // real symmetric matrix A in packed storage.
-    dspev_( "N", "L", &n, temp.ARRAY(), ev.ARRAY(), dummy, &iDummy,
+    dspev_( const_cast<char*>("N"), const_cast<char*>("L"), &n, temp.ARRAY(), ev.ARRAY(), dummy, &iDummy,
             work, &info, strlen("N"), strlen("L") );
 
     delete[] work;
