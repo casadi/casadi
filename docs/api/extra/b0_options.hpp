@@ -1419,7 +1419,7 @@
 </table>
 */
 /// \endcond
-/** \addtogroup plugin_Conic_nlp
+/** \addtogroup plugin_Conic_nlpsol
 \n
 \par
 <a name='options'></a><table>

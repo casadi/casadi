@@ -9657,7 +9657,7 @@ List of plugins
 
 - sqic
 
-- nlp
+- nlpsol
 
 Note: some of the plugins in this list might not be available on your
 system. Also, there might be extra plugins available to you that are not
@@ -9967,12 +9967,13 @@ Interface to the SQIC solver for quadratic programming
 
 --------------------------------------------------------------------------------
 
-nlp
----
+nlpsol
+------
 
 
 
-Solve QPs using an Nlpsol
+Solve QPs using an Nlpsol Use the 'nlpsol' option to specify the NLP solver
+to use.
 
 >List of available options
 

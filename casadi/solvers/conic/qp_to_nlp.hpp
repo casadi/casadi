@@ -30,19 +30,21 @@
 #include <casadi/solvers/conic/casadi_conic_nlpsol_export.h>
 
 
-/** \defgroup plugin_Conic_nlp
+/** \defgroup plugin_Conic_nlpsol
+ 
    Solve QPs using an Nlpsol
+   Use the 'nlpsol' option to specify the NLP solver to use.
 */
 
-/** \pluginsection{Conic,nlp} */
+/** \pluginsection{Conic,nlpsol} */
 
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief \pluginbrief{Conic,nlp}
+  /** \brief \pluginbrief{Conic,nlpsol}
 
       @copydoc Conic_doc
-      @copydoc plugin_Conic_nlp
+      @copydoc plugin_Conic_nlpsol
 
       \author Joris Gillis
       \date 2011
