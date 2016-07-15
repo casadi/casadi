@@ -85,7 +85,7 @@ class ConicTests(casadiTestCase):
       solver_in["uba"]=UBA
 
       with self.assertRaises(Exception):
-        solver_out = solver(solver_in)
+        solver_out = solver(**solver_in)
 
     H = DM([[1,-1],[-1,2]])
     G = DM([-2,-6])
@@ -118,7 +118,7 @@ class ConicTests(casadiTestCase):
       solver_in["uba"]=UBA
 
       with self.assertRaises(Exception):
-        solver_out = solver(solver_in)
+        solver_out = solver(**solver_in)
 
   def test_scalar(self):
     # 1/2 x H x + G' x
