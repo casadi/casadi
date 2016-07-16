@@ -1243,6 +1243,35 @@ class SXtests(casadiTestCase):
     self.checkarray(vector_linear_depends_on(e,vertcat(x,y)),[1, 1, 1, 1,1, 0, 1, 0, 0, 0, 1, 0])
     self.checkarray(vector_depends_on(e,vertcat(x,y)),[0, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1])
 
+      
+  def test_if_else_zero_sens(self):
+  
+    for X in [SX]:
+      print X
+      x=X.sym('x')
 
+
+      a = 1+3*x+sqrt(3*x)*x+7*x
+      b = 1+2*x+sin(2*x)*x +x 
+      z = if_else(x>0,a,b)*x
+
+      f = Function("f",[x],[z,jacobian(z,x)])
+      fa = Function("f",[x],[a*x,jacobian(a*x,x)])
+      fb = Function("f",[x],[b*x,jacobian(b*x,x)])
+      
+      for i,j in zip(f([3]),fa([3])):
+        self.checkarray(i,j)
+
+      for i,j in zip(f([-3]),fb([-3])):
+        self.checkarray(i,j)
+
+
+      f = Function("f",[x],[z])
+      fa = Function("f",[x],[a*x])
+      fb = Function("f",[x],[b*x])
+
+      self.checkfunction(f,fa,inputs=[3])
+      self.checkfunction(f,fb,inputs=[-3],evals=1)
+    
 if __name__ == '__main__':
     unittest.main()
