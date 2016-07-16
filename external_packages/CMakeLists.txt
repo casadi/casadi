@@ -61,7 +61,7 @@ if(QPOASES_FOUND)
   add_subdirectory(qpOASES)
 endif()
 
-if(WITH_BLOCKSQP)
+if(BLOCKSQP_FOUND)
   add_subdirectory(blockSQP)
 endif()
 
