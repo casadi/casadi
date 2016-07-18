@@ -76,10 +76,6 @@ namespace casadi {
     jacNz = new double[self.sp_jac_.nnz()];
   }
 
-  /*
-   * PROBLEM-SPECIFIC PART STARTS HERE
-   */
-
   void BlocksqpProblem::evaluate(const blocksqp::Matrix &xi, const blocksqp::Matrix &lambda,
                            double *objval, blocksqp::Matrix &constr,
                            blocksqp::Matrix &gradObj, double *&jacNz, int *&jacIndRow,
@@ -277,13 +273,20 @@ namespace casadi {
     meth->finish();
     if (ret==1) casadi_warning("Maximum number of iterations reached");
 
-    // Optimal cost
+    // Get ptimal cost
     if (m->f) *m->f = meth->vars->obj;
     // Get primal solution
     casadi_copy(meth->vars->xi.array, nx_, m->x);
-    // Get dual solution
-    casadi_copy(meth->vars->lambda.array, nx_, m->lam_x);
-    casadi_copy(meth->vars->lambda.array + nx_, ng_, m->lam_g);
+    // Get dual solution (simple bounds)
+    if (m->lam_x) {
+      casadi_copy(meth->vars->lambda.array, nx_, m->lam_x);
+      casadi_scal(nx_, -1., m->lam_x);
+    }
+    // Get dual solution (nonlinear bounds)
+    if (m->lam_g) {
+      casadi_copy(meth->vars->lambda.array + nx_, ng_, m->lam_g);
+      casadi_scal(ng_, -1., m->lam_g);
+    }
 
     // Clean up
     delete prob;
