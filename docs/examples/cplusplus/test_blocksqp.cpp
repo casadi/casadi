@@ -48,7 +48,7 @@ int main(){
                 {"g", g}};
 
   // Create an NLP solver
-  Function solver = nlpsol("solver", "ipopt", nlp);
+  Function solver = nlpsol("solver", "blocksqp", nlp);
 
   // Solve the Rosenbrock problem
   DMDict arg;
