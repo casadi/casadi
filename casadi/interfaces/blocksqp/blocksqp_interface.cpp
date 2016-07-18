@@ -32,69 +32,68 @@ namespace casadi {
 
   class MyProblem : public blocksqp::Problemspec {
   public:
-    blocksqp::Matrix xi0;                         ///< starting values for the optimization (dim nVar)
+    blocksqp::Matrix xi0;
 
   public:
-    MyProblem( int nVar_,               ///< number of variables
-               int nCon_,               ///< number of constraints
-               int nBlocks_,            ///< number of diagonal blocks in the Hessian
-               int *BlockIdx_,          ///< partition of the variable vector according to diagonal blocks (dim nBlocks+1)
-               const blocksqp::Matrix &bl_,       ///< lower bounds for variables and constraints (dim nVar+nCon)
-               const blocksqp::Matrix &bu_,       ///< upper bounds for variables and constraints (dim nVar+nCon)
-               const blocksqp::Matrix &xi0_       ///< starting values for the optimization (dim nVar)
-               );
+    MyProblem(int nVar_,
+              int nCon_,
+              int nBlocks_,
+              int *BlockIdx_,
+              const blocksqp::Matrix &bl_,
+              const blocksqp::Matrix &bu_,
+              const blocksqp::Matrix &xi0_);
 
-    /// Set initial values for xi (and possibly lambda) and parts of the Jacobian that correspond to linear constraints (dense version).
-    virtual void initialize( blocksqp::Matrix &xi,            ///< optimization variables
-                             blocksqp::Matrix &lambda,        ///< Lagrange multipliers
-                             blocksqp::Matrix &constrJac      ///< constraint Jacobian (dense)
-                             );
+    // Set initial values for xi (and possibly lambda) and parts of the
+    // Jacobian that correspond to linear constraints (dense version).
+    virtual void initialize(blocksqp::Matrix &xi,
+                            blocksqp::Matrix &lambda,
+                            blocksqp::Matrix &constrJac);
 
-    /// Set initial values for xi (and possibly lambda) and parts of the Jacobian that correspond to linear constraints (sparse version).
-    virtual void initialize( blocksqp::Matrix &xi,            ///< optimization variables
-                             blocksqp::Matrix &lambda,        ///< Lagrange multipliers
-                             double *&jacNz,        ///< nonzero elements of constraint Jacobian
-                             int *&jacIndRow,       ///< row indices of nonzero elements
-                             int *&jacIndCol        ///< starting indices of columns
-                             );
+    // Set initial values for xi (and possibly lambda) and parts of the
+    // Jacobian that correspond to linear constraints (sparse version).
+    virtual void initialize(blocksqp::Matrix &xi,
+                            blocksqp::Matrix &lambda,
+                            double *&jacNz,
+                            int *&jacIndRow,
+                            int *&jacIndCol);
 
     /// Evaluate objective, constraints, and derivatives (dense version).
-    virtual void evaluate( const blocksqp::Matrix &xi,        ///< optimization variables
-                           const blocksqp::Matrix &lambda,    ///< Lagrange multipliers
-                           double *objval,          ///< objective function value
-                           blocksqp::Matrix &constr,          ///< constraint function values
-                           blocksqp::Matrix &gradObj,         ///< gradient of objective
-                           blocksqp::Matrix &constrJac,       ///< constraint Jacobian (dense)
-                           blocksqp::SymMatrix *&hess,        ///< Hessian of the Lagrangian (blockwise)
-                           int dmode,               ///< derivative mode
-                           int *info                ///< error flag
-                           );
+    virtual void evaluate(const blocksqp::Matrix &xi,
+                          const blocksqp::Matrix &lambda,
+                          double *objval,
+                          blocksqp::Matrix &constr,
+                          blocksqp::Matrix &gradObj,
+                          blocksqp::Matrix &constrJac,
+                          blocksqp::SymMatrix *&hess,
+                          int dmode,
+                          int *info);
 
     /// Evaluate objective, constraints, and derivatives (sparse version).
-    virtual void evaluate( const blocksqp::Matrix &xi,        ///< optimization variables
-                           const blocksqp::Matrix &lambda,    ///< Lagrange multipliers
-                           double *objval,          ///< objective function value
-                           blocksqp::Matrix &constr,          ///< constraint function values
-                           blocksqp::Matrix &gradObj,         ///< gradient of objective
-                           double *&jacNz,          ///< nonzero elements of constraint Jacobian
-                           int *&jacIndRow,         ///< row indices of nonzero elements
-                           int *&jacIndCol,         ///< starting indices of columns
-                           blocksqp::SymMatrix *&hess,        ///< Hessian of the Lagrangian (blockwise)
-                           int dmode,               ///< derivative mode
-                           int *info                ///< error flag
-                           );
+    virtual void evaluate(const blocksqp::Matrix &xi,
+                          const blocksqp::Matrix &lambda,
+                          double *objval,
+                          blocksqp::Matrix &constr,
+                          blocksqp::Matrix &gradObj,
+                          double *&jacNz,
+                          int *&jacIndRow,
+                          int *&jacIndCol,
+                          blocksqp::SymMatrix *&hess,
+                          int dmode,
+                          int *info);
 
-    /// Generic method to convert dense constraint Jacobian to a sparse matrix in Harwell--Boeing (column compressed) format.
-    virtual void convertJacobian( const blocksqp::Matrix &constrJac,  ///< constraint Jacobian (dense)
-                                  double *&jacNz,           ///< nonzero elements of constraint Jacobian
-                                  int *&jacIndRow,          ///< row indices of nonzero elements
-                                  int *&jacIndCol,          ///< starting indices of columns
-                                  bool firstCall = 0        ///< indicates if this method is called for the first time
-                                  );
+    // Generic method to convert dense constraint Jacobian to a sparse matrix
+    // in Harwell--Boeing (column compressed) format.
+    virtual void convertJacobian(const blocksqp::Matrix &constrJac,
+                                 double *&jacNz,
+                                 int *&jacIndRow,
+                                 int *&jacIndCol,
+                                 bool firstCall = 0);
   };
 
 
-  MyProblem::MyProblem( int nVar_, int nCon_, int nBlocks_, int *blockIdx_, const blocksqp::Matrix &bl_, const blocksqp::Matrix &bu_, const blocksqp::Matrix &xi0_ ) {
+  MyProblem::MyProblem(int nVar_, int nCon_, int nBlocks_, int *blockIdx_,
+                       const blocksqp::Matrix &bl_, const blocksqp::Matrix &bu_,
+                       const blocksqp::Matrix &xi0_) {
     nVar = nVar_;
     nCon = nCon_;
 
@@ -104,39 +103,39 @@ namespace casadi {
       blockIdx[0] = 0;
       blockIdx[1] = nVar;
     } else {
-      for (int i=0; i<nBlocks+1; i++ )
-        blockIdx[i] = blockIdx_[i];
+      for (int i=0; i<nBlocks+1; i++) blockIdx[i] = blockIdx_[i];
     }
 
-    bl.Dimension( nVar + nCon ).Initialize( -inf );
-    bu.Dimension( nVar + nCon ).Initialize( inf );
+    bl.Dimension(nVar + nCon).Initialize(-inf);
+    bu.Dimension(nVar + nCon).Initialize(inf);
 
-    for (int i=0; i<nVar+nCon; i++ ) {
-      bl( i ) = bl_( i );
-      bu( i ) = bu_( i );
+    for (int i=0; i<nVar+nCon; i++) {
+      bl(i) = bl_(i);
+      bu(i) = bu_(i);
     }
 
     objLo = -inf;
     objUp = inf;
 
-    xi0.Dimension( nVar );
-    for (int i=0; i<nVar; i++ )
-      xi0( i ) = xi0_( i );
+    xi0.Dimension(nVar);
+    for (int i=0; i<nVar; i++)
+      xi0(i) = xi0_(i);
   }
 
 
-  void MyProblem::convertJacobian( const blocksqp::Matrix &constrJac, double *&jacNz, int *&jacIndRow, int *&jacIndCol, bool firstCall ) {
+  void MyProblem::convertJacobian(const blocksqp::Matrix &constrJac, double *&jacNz,
+                                  int *&jacIndRow, int *&jacIndCol, bool firstCall) {
     int nnz, count, i, j;
 
-    if (firstCall ) {
+    if (firstCall) {
       // 1st run: count nonzeros
       nnz = 0;
-      for (j=0; j<nVar; j++ )
-        for (i=0; i<nCon; i++ )
-          if (fabs( constrJac( i, j ) < inf )) nnz++;
+      for (j=0; j<nVar; j++)
+        for (i=0; i<nCon; i++)
+          if (fabs(constrJac(i, j) < inf)) nnz++;
 
-      if (jacNz != 0 ) delete[] jacNz;
-      if (jacIndRow != 0 ) delete[] jacIndRow;
+      if (jacNz != 0) delete[] jacNz;
+      if (jacIndRow != 0) delete[] jacIndRow;
 
       jacNz = new double[nnz];
       jacIndRow = new int[nnz + (nVar+1)];
@@ -148,88 +147,96 @@ namespace casadi {
 
     // 2nd run: store matrix entries columnwise in jacNz
     count = 0;
-    for (j=0; j<nVar; j++ ) {
+    for (j=0; j<nVar; j++) {
       jacIndCol[j] = count;
-      for (i=0; i<nCon; i++ )
-        if (fabs( constrJac( i, j ) < inf ) ) {
-          jacNz[count] = constrJac( i, j );
+      for (i=0; i<nCon; i++)
+        if (fabs(constrJac(i, j) < inf)) {
+          jacNz[count] = constrJac(i, j);
           jacIndRow[count] = i;
           count++;
         }
     }
     jacIndCol[nVar] = count;
-    if (count != nnz )
-      printf( "Error in convertJacobian: %i elements processed, should be %i elements!\n", count, nnz );
+    if (count != nnz)
+      printf("Error in convertJacobian: %i elements processed, "
+             "should be %i elements!\n", count, nnz);
   }
 
 
-  void MyProblem::initialize( blocksqp::Matrix &xi, blocksqp::Matrix &lambda, blocksqp::Matrix &constrJac ) {
+  void MyProblem::initialize(blocksqp::Matrix &xi, blocksqp::Matrix &lambda,
+                             blocksqp::Matrix &constrJac) {
     // set initial values for xi and lambda
-    lambda.Initialize( 0.0 );
-    for (int i=0; i<nVar; i++ )
-      xi( i ) = xi0( i );
+    lambda.Initialize(0.0);
+    for (int i=0; i<nVar; i++)
+      xi(i) = xi0(i);
   }
 
 
-  void MyProblem::initialize( blocksqp::Matrix &xi, blocksqp::Matrix &lambda, double *&jacNz, int *&jacIndRow, int *&jacIndCol ) {
+  void MyProblem::initialize(blocksqp::Matrix &xi, blocksqp::Matrix &lambda,
+                             double *&jacNz, int *&jacIndRow, int *&jacIndCol) {
     blocksqp::Matrix constrDummy, gradObjDummy, constrJac;
     blocksqp::SymMatrix *hessDummy;
     double objvalDummy;
     int info;
 
     // set initial values for xi and lambda
-    lambda.Initialize( 0.0 );
-    for (int i=0; i<nVar; i++ )
-      xi( i ) = xi0( i );
+    lambda.Initialize(0.0);
+    for (int i=0; i<nVar; i++)
+      xi(i) = xi0(i);
 
     // find out Jacobian sparsity pattern by evaluating derivatives once
-    constrDummy.Dimension( nCon ).Initialize( 0.0 );
-    gradObjDummy.Dimension( nVar ).Initialize( 0.0 );
-    constrJac.Dimension( nCon, nVar ).Initialize( inf );
-    evaluate( xi, lambda, &objvalDummy, constrDummy, gradObjDummy, constrJac, hessDummy, 1, &info );
+    constrDummy.Dimension(nCon).Initialize(0.0);
+    gradObjDummy.Dimension(nVar).Initialize(0.0);
+    constrJac.Dimension(nCon, nVar).Initialize(inf);
+    evaluate(xi, lambda, &objvalDummy, constrDummy, gradObjDummy, constrJac,
+             hessDummy, 1, &info);
 
     // allocate sparse Jacobian structures
-    convertJacobian( constrJac, jacNz, jacIndRow, jacIndCol, 1 );
+    convertJacobian(constrJac, jacNz, jacIndRow, jacIndCol, 1);
   }
 
   /*
    * PROBLEM-SPECIFIC PART STARTS HERE
    */
 
-  void MyProblem::evaluate( const blocksqp::Matrix &xi, const blocksqp::Matrix &lambda, double *objval, blocksqp::Matrix &constr,
-                            blocksqp::Matrix &gradObj, double *&jacNz, int *&jacIndRow, int *&jacIndCol,
-                            blocksqp::SymMatrix *&hess, int dmode, int *info ) {
+  void MyProblem::evaluate(const blocksqp::Matrix &xi, const blocksqp::Matrix &lambda,
+                           double *objval, blocksqp::Matrix &constr,
+                           blocksqp::Matrix &gradObj, double *&jacNz, int *&jacIndRow,
+                           int *&jacIndCol,
+                           blocksqp::SymMatrix *&hess, int dmode, int *info) {
     blocksqp::Matrix constrJac;
 
-    constrJac.Dimension( nCon, nVar ).Initialize( inf );
-    evaluate( xi, lambda, objval, constr, gradObj, constrJac, hess, dmode, info );
+    constrJac.Dimension(nCon, nVar).Initialize(inf);
+    evaluate(xi, lambda, objval, constr, gradObj, constrJac, hess, dmode, info);
 
     // Convert to sparse format
-    if (dmode != 0 )
-      convertJacobian( constrJac, jacNz, jacIndRow, jacIndCol, 0 );
+    if (dmode != 0)
+      convertJacobian(constrJac, jacNz, jacIndRow, jacIndCol, 0);
   }
 
 
-  void MyProblem::evaluate( const blocksqp::Matrix &xi, const blocksqp::Matrix &lambda, double *objval, blocksqp::Matrix &constr,
-                            blocksqp::Matrix &gradObj, blocksqp::Matrix &constrJac, blocksqp::SymMatrix *&hess,
-                            int dmode, int *info ) {
+  void MyProblem::evaluate(const blocksqp::Matrix &xi, const blocksqp::Matrix &lambda,
+                           double *objval, blocksqp::Matrix &constr,
+                           blocksqp::Matrix &gradObj, blocksqp::Matrix &constrJac,
+                           blocksqp::SymMatrix *&hess,
+                           int dmode, int *info) {
     *info = 0;
 
     /*
      * min   x1**2 - 0.5*x2**2
      * s.t.  x1 - x2 = 0
      */
-    if (dmode >= 0 ) {
+    if (dmode >= 0) {
       *objval = xi(0)*xi(0) - 0.5*xi(1)*xi(1);
-      constr( 0 ) = xi(0) - xi(1);
+      constr(0) = xi(0) - xi(1);
     }
 
-    if (dmode > 0 ) {
-      gradObj( 0 ) = 2.0 * xi(0);
-      gradObj( 1 ) = -xi(1);
+    if (dmode > 0) {
+      gradObj(0) = 2.0 * xi(0);
+      gradObj(1) = -xi(1);
 
-      constrJac( 0, 0 ) = 1.0;
-      constrJac( 0, 1 ) = -1.0;
+      constrJac(0, 0) = 1.0;
+      constrJac(0, 1) = -1.0;
     }
   }
 
@@ -288,7 +295,7 @@ namespace casadi {
   }
 
   void BlocksqpInterface::set_work(void* mem, const double**& arg, double**& res,
-                                 int*& iw, double*& w) const {
+                                   int*& iw, double*& w) const {
     auto m = static_cast<BlocksqpMemory*>(mem);
 
     // Set work in base classes
@@ -304,7 +311,7 @@ namespace casadi {
     blocksqp::SQPoptions *opts;
     blocksqp::SQPstats *stats;
     char outpath[255];
-    strcpy( outpath, "./" );
+    strcpy(outpath, "./");
 
     // Initial value
     blocksqp::Matrix x0;
@@ -326,12 +333,11 @@ namespace casadi {
 
     // Variable partition for block Hessian
     int nBlocks = nx_;
-    int blockIdx[nBlocks+1];
-    for (int i=0; i<nBlocks+1; i++ )
-      blockIdx[i] = i;
+    vector<int> blockIdx(nBlocks+1);
+    for (int i=0; i<nBlocks+1; i++) blockIdx[i] = i;
 
     // Create problem evaluation object
-    prob = new MyProblem( nx_, ng_, nBlocks, blockIdx, bl, bu, x0 );
+    prob = new MyProblem( nx_, ng_, nBlocks, get_ptr(blockIdx), bl, bu, x0 );
 
     /*------------------------*/
     /* Options for SQP solver */
@@ -345,7 +351,8 @@ namespace casadi {
     // 0: (scaled) identity, 1: SR1, 2: BFGS
     opts->hessUpdate = 0;
     // 0: initial Hessian is diagonal matrix, 1: scale initial Hessian according to Nocedal p.143,
-    // 2: scale initial Hessian with Oren-Luenberger factor 3: scale initial Hessian with geometric mean of 1 and 2
+    // 2: scale initial Hessian with Oren-Luenberger factor 3: scale initial Hessian
+    //    with geometric mean of 1 and 2
     // 4: scale Hessian in every step with centered Oren-Luenberger sizing according to Tapia paper
     opts->hessScaling = 0;
     // scaling strategy for fallback BFGS update if SR1 and globalization is used
@@ -368,7 +375,7 @@ namespace casadi {
     meth = new blocksqp::SQPMethod( prob, opts, stats );
 
     meth->init();
-    ret = meth->run( 100 );
+    ret = meth->run(100);
     meth->finish();
     if (ret==1) casadi_warning("Maximum number of iterations reached");
 
