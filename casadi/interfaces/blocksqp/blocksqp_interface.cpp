@@ -287,6 +287,35 @@ namespace casadi {
         //contype_ = op.second;
       }
     }
+
+    // Setup NLP functions
+    create_function("nlp_fg", {"x", "p"}, {"f", "g"});
+    create_function("nlp_gf_jg", {"x", "p"}, {"f", "g", "grad:f:x", "jac:g:x"});
+
+    // Get the sparsity pattern for the Hessian of the Lagrangian
+    Function grad_lag = oracle_.factory("grad_lag",
+                                        {"x", "p", "lam:f", "lam:g"}, {"grad:gamma:x"},
+                                        {{"gamma", {"f", "g"}}});
+    Sparsity Hsp = grad_lag.sparsity_jac("x", "grad_gamma_x", false, true);
+
+    // Make sure diagonal exists
+    Hsp = Hsp + Sparsity::diag(nx_);
+
+    // Find the strongly connected components of the Hessian
+    // Unlike Sparsity::scc, assume ordered
+    const int* colind = Hsp.colind();
+    const int* row = Hsp.row();
+    blocks_.push_back(0);
+    int ind = 0;
+    while (ind < nx_) {
+      // Find the next cutoff
+      int next=ind+1;
+      while (ind<next && ind<nx_) {
+        for (int k=colind[ind]; k<colind[ind+1]; ++k) next = max(next, 1+row[k]);
+        ind++;
+      }
+      blocks_.push_back(next);
+    }
   }
 
   void BlocksqpInterface::init_memory(void* mem) const {
@@ -331,13 +360,9 @@ namespace casadi {
       bu(nx_ + i) = m->ubg ? m->ubg[i] : 0;
     }
 
-    // Variable partition for block Hessian
-    int nBlocks = nx_;
-    vector<int> blockIdx(nBlocks+1);
-    for (int i=0; i<nBlocks+1; i++) blockIdx[i] = i;
-
     // Create problem evaluation object
-    prob = new MyProblem( nx_, ng_, nBlocks, get_ptr(blockIdx), bl, bu, x0 );
+    vector<int> blocks = blocks_;
+    prob = new MyProblem(nx_, ng_, blocks_.size()-1, get_ptr(blocks), bl, bu, x0);
 
     /*------------------------*/
     /* Options for SQP solver */
@@ -379,6 +404,8 @@ namespace casadi {
     meth->finish();
     if (ret==1) casadi_warning("Maximum number of iterations reached");
 
+    // Optimal cost
+    if (m->f) *m->f = meth->vars->obj;
     // Get primal solution
     casadi_copy(meth->vars->xi.array, nx_, m->x);
     // Get dual solution

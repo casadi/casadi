@@ -266,7 +266,7 @@ namespace casadi {
   }
 
   int SparsityInternal::scc(std::vector<int>& p,
-                                                    std::vector<int>& r) const {
+                            std::vector<int>& r) const {
     // NOTE: This implementation has been copied from CSparse and then modified,
     // it needs cleaning up to be proper C++
     vector<int> tmp;

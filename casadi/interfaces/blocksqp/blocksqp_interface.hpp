@@ -88,6 +88,9 @@ namespace casadi {
 
     /// A documentation string
     static const std::string meta_doc;
+
+    // Block partitioning
+    std::vector<int> blocks_;
   };
 
 } // namespace casadi
