@@ -54,77 +54,26 @@ namespace casadi {
     objUp = inf;
   }
 
-
-  void BlocksqpProblem::convertJacobian(const blocksqp::Matrix &constrJac, double *&jacNz,
-                                  int *&jacIndRow, int *&jacIndCol, bool firstCall) {
-    int nnz, count, i, j;
-
-    if (firstCall) {
-      // 1st run: count nonzeros
-      nnz = 0;
-      for (j=0; j<nVar; j++)
-        for (i=0; i<nCon; i++)
-          if (fabs(constrJac(i, j) < inf)) nnz++;
-
-      if (jacNz != 0) delete[] jacNz;
-      if (jacIndRow != 0) delete[] jacIndRow;
-
-      jacNz = new double[nnz];
-      jacIndRow = new int[nnz + (nVar+1)];
-      jacIndCol = jacIndRow + nnz;
-    } else {
-      nnz = jacIndCol[nVar];
-      /* arrays jacInd* are already allocated! */
-    }
-
-    // 2nd run: store matrix entries columnwise in jacNz
-    count = 0;
-    for (j=0; j<nVar; j++) {
-      jacIndCol[j] = count;
-      for (i=0; i<nCon; i++)
-        if (fabs(constrJac(i, j) < inf)) {
-          jacNz[count] = constrJac(i, j);
-          jacIndRow[count] = i;
-          count++;
-        }
-    }
-    jacIndCol[nVar] = count;
-    if (count != nnz)
-      printf("Error in convertJacobian: %i elements processed, "
-             "should be %i elements!\n", count, nnz);
-  }
-
-
   void BlocksqpProblem::initialize(blocksqp::Matrix &xi, blocksqp::Matrix &lambda,
                              blocksqp::Matrix &constrJac) {
-    // set initial values for xi and lambda
-    lambda.Initialize(0.0);
-    for (int i=0; i<nVar; i++)
-      xi(i) = m->x0 ? m->x0[i] : 0;
+    casadi_error("BlocksqpProblem::initialize (dense)");
   }
-
 
   void BlocksqpProblem::initialize(blocksqp::Matrix &xi, blocksqp::Matrix &lambda,
                              double *&jacNz, int *&jacIndRow, int *&jacIndCol) {
-    blocksqp::Matrix constrDummy, gradObjDummy, constrJac;
-    blocksqp::SymMatrix *hessDummy;
-    double objvalDummy;
-    int info;
+    // Primal-dual initial guess
+    double* x = xi.array;
+    double* lam_x = lambda.array;
+    double* lam_g = lam_x + self.nx_;
+    casadi_copy(m->x0, self.nx_, x);
+    casadi_copy(m->lam_x0, self.nx_, lam_x);
+    casadi_copy(m->lam_g0, self.ng_, lam_g);
 
-    // set initial values for xi and lambda
-    lambda.Initialize(0.0);
-    for (int i=0; i<nVar; i++)
-      xi(i) = m->x0 ? m->x0[i] : 0;
-
-    // find out Jacobian sparsity pattern by evaluating derivatives once
-    constrDummy.Dimension(nCon).Initialize(0.0);
-    gradObjDummy.Dimension(nVar).Initialize(0.0);
-    constrJac.Dimension(nCon, nVar).Initialize(inf);
-    evaluate(xi, lambda, &objvalDummy, constrDummy, gradObjDummy, constrJac,
-             hessDummy, 1, &info);
-
-    // allocate sparse Jacobian structures
-    convertJacobian(constrJac, jacNz, jacIndRow, jacIndCol, 1);
+    // Get Jacobian sparsity
+    jacIndRow = new int[self.sp_jac_.nnz()];
+    copy_n(self.sp_jac_.row(), self.sp_jac_.nnz(), jacIndRow);
+    jacIndCol = const_cast<int*>(self.sp_jac_.colind());
+    jacNz = new double[self.sp_jac_.nnz()];
   }
 
   /*
@@ -136,40 +85,42 @@ namespace casadi {
                            blocksqp::Matrix &gradObj, double *&jacNz, int *&jacIndRow,
                            int *&jacIndCol,
                            blocksqp::SymMatrix *&hess, int dmode, int *info) {
-    blocksqp::Matrix constrJac;
-
-    constrJac.Dimension(nCon, nVar).Initialize(inf);
-    evaluate(xi, lambda, objval, constr, gradObj, constrJac, hess, dmode, info);
-
-    // Convert to sparse format
-    if (dmode != 0)
-      convertJacobian(constrJac, jacNz, jacIndRow, jacIndCol, 0);
+    if (dmode==0) {
+      // No derivatives
+      m->arg[0] = xi.array; // x
+      m->arg[1] = m->p; // p
+      m->res[0] = objval; // f
+      m->res[1] = constr.array; // g
+      self.calc_function(m, "nlp_fg");
+    } else if (dmode==1) {
+      // First order derivatives
+      m->arg[0] = xi.array; // x
+      m->arg[1] = m->p; // p
+      m->res[0] = objval; // f
+      m->res[1] = constr.array; // g
+      m->res[2] = gradObj.array; // grad:f:x
+      m->res[3] = jacNz; // jac:g:x
+      self.calc_function(m, "nlp_gf_jg");
+    } else {
+      casadi_error("Not implemented");
+    }
+    *info = 0;
   }
-
 
   void BlocksqpProblem::evaluate(const blocksqp::Matrix &xi, const blocksqp::Matrix &lambda,
                            double *objval, blocksqp::Matrix &constr,
                            blocksqp::Matrix &gradObj, blocksqp::Matrix &constrJac,
                            blocksqp::SymMatrix *&hess,
                            int dmode, int *info) {
-    *info = 0;
-
-    /*
-     * min   x1**2 - 0.5*x2**2
-     * s.t.  x1 - x2 = 0
-     */
-    if (dmode >= 0) {
-      *objval = xi(0)*xi(0) - 0.5*xi(1)*xi(1);
-      constr(0) = xi(0) - xi(1);
+    if (dmode==0) {
+      double *jacNz = 0;
+      int *jacIndRow = 0;
+      int *jacIndCol = 0;
+      return evaluate(xi, lambda, objval, constr, gradObj, jacNz, jacIndRow,
+                      jacIndCol, hess, dmode, info);
     }
 
-    if (dmode > 0) {
-      gradObj(0) = 2.0 * xi(0);
-      gradObj(1) = -xi(1);
-
-      constrJac(0, 0) = 1.0;
-      constrJac(0, 1) = -1.0;
-    }
+    casadi_error("BlocksqpProblem::evaluate (dense)");
   }
 
   extern "C"
@@ -222,7 +173,9 @@ namespace casadi {
 
     // Setup NLP functions
     create_function("nlp_fg", {"x", "p"}, {"f", "g"});
-    create_function("nlp_gf_jg", {"x", "p"}, {"f", "g", "grad:f:x", "jac:g:x"});
+    Function gf_jg = create_function("nlp_gf_jg", {"x", "p"},
+                                    {"f", "g", "grad:f:x", "jac:g:x"});
+    sp_jac_ = gf_jg.sparsity_out("jac_g_x");
 
     // Get the sparsity pattern for the Hessian of the Lagrangian
     Function grad_lag = oracle_.factory("grad_lag",
@@ -248,6 +201,9 @@ namespace casadi {
       }
       blocks_.push_back(next);
     }
+
+    // Allocate memory
+    alloc_w(sp_jac_.nnz(), true); // jac
   }
 
   void BlocksqpInterface::init_memory(void* mem) const {
@@ -261,6 +217,9 @@ namespace casadi {
 
     // Set work in base classes
     Nlpsol::set_work(mem, arg, res, iw, w);
+
+    // Temporary memory
+    m->jac = w; w += sp_jac_.nnz();
   }
 
   void BlocksqpInterface::solve(void* mem) const {

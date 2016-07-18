@@ -42,6 +42,7 @@ namespace casadi {
   class BlocksqpInterface;
 
   struct CASADI_NLPSOL_BLOCKSQP_EXPORT BlocksqpMemory : public NlpsolMemory {
+    double* jac;
   };
 
   // Problem class
@@ -88,14 +89,6 @@ namespace casadi {
                           blocksqp::SymMatrix *&hess,
                           int dmode,
                           int *info);
-
-    // Generic method to convert dense constraint Jacobian to a sparse matrix
-    // in Harwell--Boeing (column compressed) format.
-    virtual void convertJacobian(const blocksqp::Matrix &constrJac,
-                                 double *&jacNz,
-                                 int *&jacIndRow,
-                                 int *&jacIndCol,
-                                 bool firstCall = 0);
   };
 
 
@@ -146,6 +139,9 @@ namespace casadi {
 
     // Block partitioning
     std::vector<int> blocks_;
+
+    // Jacobian sparsity
+    Sparsity sp_jac_;
   };
 
 } // namespace casadi
