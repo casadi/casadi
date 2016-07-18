@@ -44,6 +44,61 @@ namespace casadi {
   struct CASADI_NLPSOL_BLOCKSQP_EXPORT BlocksqpMemory : public NlpsolMemory {
   };
 
+  // Problem class
+  class BlocksqpProblem : public blocksqp::Problemspec {
+  public:
+    const BlocksqpInterface& self;
+    BlocksqpMemory* m;
+    BlocksqpProblem(const BlocksqpInterface& self, BlocksqpMemory* m);
+
+    // Set initial values for xi (and possibly lambda) and parts of the
+    // Jacobian that correspond to linear constraints (dense version).
+    virtual void initialize(blocksqp::Matrix &xi,
+                            blocksqp::Matrix &lambda,
+                            blocksqp::Matrix &constrJac);
+
+    // Set initial values for xi (and possibly lambda) and parts of the
+    // Jacobian that correspond to linear constraints (sparse version).
+    virtual void initialize(blocksqp::Matrix &xi,
+                            blocksqp::Matrix &lambda,
+                            double *&jacNz,
+                            int *&jacIndRow,
+                            int *&jacIndCol);
+
+    /// Evaluate objective, constraints, and derivatives (dense version).
+    virtual void evaluate(const blocksqp::Matrix &xi,
+                          const blocksqp::Matrix &lambda,
+                          double *objval,
+                          blocksqp::Matrix &constr,
+                          blocksqp::Matrix &gradObj,
+                          blocksqp::Matrix &constrJac,
+                          blocksqp::SymMatrix *&hess,
+                          int dmode,
+                          int *info);
+
+    /// Evaluate objective, constraints, and derivatives (sparse version).
+    virtual void evaluate(const blocksqp::Matrix &xi,
+                          const blocksqp::Matrix &lambda,
+                          double *objval,
+                          blocksqp::Matrix &constr,
+                          blocksqp::Matrix &gradObj,
+                          double *&jacNz,
+                          int *&jacIndRow,
+                          int *&jacIndCol,
+                          blocksqp::SymMatrix *&hess,
+                          int dmode,
+                          int *info);
+
+    // Generic method to convert dense constraint Jacobian to a sparse matrix
+    // in Harwell--Boeing (column compressed) format.
+    virtual void convertJacobian(const blocksqp::Matrix &constrJac,
+                                 double *&jacNz,
+                                 int *&jacIndRow,
+                                 int *&jacIndCol,
+                                 bool firstCall = 0);
+  };
+
+
   /** \brief \pluginbrief{Nlpsol,blocksqp}
      @copydoc Nlpsol_doc
      @copydoc plugin_Nlpsol_blocksqp

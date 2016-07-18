@@ -29,101 +29,33 @@
 using namespace std;
 namespace casadi {
 
-
-  class MyProblem : public blocksqp::Problemspec {
-  public:
-    blocksqp::Matrix xi0;
-
-  public:
-    MyProblem(int nVar_,
-              int nCon_,
-              int nBlocks_,
-              int *BlockIdx_,
-              const blocksqp::Matrix &bl_,
-              const blocksqp::Matrix &bu_,
-              const blocksqp::Matrix &xi0_);
-
-    // Set initial values for xi (and possibly lambda) and parts of the
-    // Jacobian that correspond to linear constraints (dense version).
-    virtual void initialize(blocksqp::Matrix &xi,
-                            blocksqp::Matrix &lambda,
-                            blocksqp::Matrix &constrJac);
-
-    // Set initial values for xi (and possibly lambda) and parts of the
-    // Jacobian that correspond to linear constraints (sparse version).
-    virtual void initialize(blocksqp::Matrix &xi,
-                            blocksqp::Matrix &lambda,
-                            double *&jacNz,
-                            int *&jacIndRow,
-                            int *&jacIndCol);
-
-    /// Evaluate objective, constraints, and derivatives (dense version).
-    virtual void evaluate(const blocksqp::Matrix &xi,
-                          const blocksqp::Matrix &lambda,
-                          double *objval,
-                          blocksqp::Matrix &constr,
-                          blocksqp::Matrix &gradObj,
-                          blocksqp::Matrix &constrJac,
-                          blocksqp::SymMatrix *&hess,
-                          int dmode,
-                          int *info);
-
-    /// Evaluate objective, constraints, and derivatives (sparse version).
-    virtual void evaluate(const blocksqp::Matrix &xi,
-                          const blocksqp::Matrix &lambda,
-                          double *objval,
-                          blocksqp::Matrix &constr,
-                          blocksqp::Matrix &gradObj,
-                          double *&jacNz,
-                          int *&jacIndRow,
-                          int *&jacIndCol,
-                          blocksqp::SymMatrix *&hess,
-                          int dmode,
-                          int *info);
-
-    // Generic method to convert dense constraint Jacobian to a sparse matrix
-    // in Harwell--Boeing (column compressed) format.
-    virtual void convertJacobian(const blocksqp::Matrix &constrJac,
-                                 double *&jacNz,
-                                 int *&jacIndRow,
-                                 int *&jacIndCol,
-                                 bool firstCall = 0);
-  };
-
-
-  MyProblem::MyProblem(int nVar_, int nCon_, int nBlocks_, int *blockIdx_,
-                       const blocksqp::Matrix &bl_, const blocksqp::Matrix &bu_,
-                       const blocksqp::Matrix &xi0_) {
-    nVar = nVar_;
-    nCon = nCon_;
-
-    nBlocks = nBlocks_;
+  BlocksqpProblem::BlocksqpProblem(const BlocksqpInterface& self, BlocksqpMemory* m)
+    : self(self), m(m) {
+    nVar = self.nx_;
+    nCon = self.ng_;
+    nBlocks = self.blocks_.size()-1;
     blockIdx = new int[nBlocks+1];
-    if (nBlocks == 1) {
-      blockIdx[0] = 0;
-      blockIdx[1] = nVar;
-    } else {
-      for (int i=0; i<nBlocks+1; i++) blockIdx[i] = blockIdx_[i];
-    }
+    for (int i=0; i<nBlocks+1; i++) blockIdx[i] = self.blocks_[i];
 
+    // Bounds on variables and constraints
     bl.Dimension(nVar + nCon).Initialize(-inf);
     bu.Dimension(nVar + nCon).Initialize(inf);
-
-    for (int i=0; i<nVar+nCon; i++) {
-      bl(i) = bl_(i);
-      bu(i) = bu_(i);
+    for (int i=0; i<self.nx_; ++i) {
+      bl(i) = m->lbx ? m->lbx[i] : 0;
+      bu(i) = m->ubx ? m->ubx[i] : 0;
+    }
+    for (int i=0; i<self.ng_; ++i) {
+      bl(self.nx_ + i) = m->lbg ? m->lbg[i] : 0;
+      bu(self.nx_ + i) = m->ubg ? m->ubg[i] : 0;
     }
 
+    // Bounds on objective function
     objLo = -inf;
     objUp = inf;
-
-    xi0.Dimension(nVar);
-    for (int i=0; i<nVar; i++)
-      xi0(i) = xi0_(i);
   }
 
 
-  void MyProblem::convertJacobian(const blocksqp::Matrix &constrJac, double *&jacNz,
+  void BlocksqpProblem::convertJacobian(const blocksqp::Matrix &constrJac, double *&jacNz,
                                   int *&jacIndRow, int *&jacIndCol, bool firstCall) {
     int nnz, count, i, j;
 
@@ -163,16 +95,16 @@ namespace casadi {
   }
 
 
-  void MyProblem::initialize(blocksqp::Matrix &xi, blocksqp::Matrix &lambda,
+  void BlocksqpProblem::initialize(blocksqp::Matrix &xi, blocksqp::Matrix &lambda,
                              blocksqp::Matrix &constrJac) {
     // set initial values for xi and lambda
     lambda.Initialize(0.0);
     for (int i=0; i<nVar; i++)
-      xi(i) = xi0(i);
+      xi(i) = m->x0 ? m->x0[i] : 0;
   }
 
 
-  void MyProblem::initialize(blocksqp::Matrix &xi, blocksqp::Matrix &lambda,
+  void BlocksqpProblem::initialize(blocksqp::Matrix &xi, blocksqp::Matrix &lambda,
                              double *&jacNz, int *&jacIndRow, int *&jacIndCol) {
     blocksqp::Matrix constrDummy, gradObjDummy, constrJac;
     blocksqp::SymMatrix *hessDummy;
@@ -182,7 +114,7 @@ namespace casadi {
     // set initial values for xi and lambda
     lambda.Initialize(0.0);
     for (int i=0; i<nVar; i++)
-      xi(i) = xi0(i);
+      xi(i) = m->x0 ? m->x0[i] : 0;
 
     // find out Jacobian sparsity pattern by evaluating derivatives once
     constrDummy.Dimension(nCon).Initialize(0.0);
@@ -199,7 +131,7 @@ namespace casadi {
    * PROBLEM-SPECIFIC PART STARTS HERE
    */
 
-  void MyProblem::evaluate(const blocksqp::Matrix &xi, const blocksqp::Matrix &lambda,
+  void BlocksqpProblem::evaluate(const blocksqp::Matrix &xi, const blocksqp::Matrix &lambda,
                            double *objval, blocksqp::Matrix &constr,
                            blocksqp::Matrix &gradObj, double *&jacNz, int *&jacIndRow,
                            int *&jacIndCol,
@@ -215,7 +147,7 @@ namespace casadi {
   }
 
 
-  void MyProblem::evaluate(const blocksqp::Matrix &xi, const blocksqp::Matrix &lambda,
+  void BlocksqpProblem::evaluate(const blocksqp::Matrix &xi, const blocksqp::Matrix &lambda,
                            double *objval, blocksqp::Matrix &constr,
                            blocksqp::Matrix &gradObj, blocksqp::Matrix &constrJac,
                            blocksqp::SymMatrix *&hess,
@@ -335,34 +267,16 @@ namespace casadi {
     auto m = static_cast<BlocksqpMemory*>(mem);
 
     int ret = 0;
-    MyProblem *prob;
+    BlocksqpProblem *prob;
     blocksqp::SQPMethod *meth;
     blocksqp::SQPoptions *opts;
     blocksqp::SQPstats *stats;
     char outpath[255];
     strcpy(outpath, "./");
 
-    // Initial value
-    blocksqp::Matrix x0;
-    x0.Dimension(nx_);
-    for (int i=0; i<nx_; ++i) x0(i) = m->x0 ? m->x0[i] : 0;
-
-    // Bounds on variables and constraints
-    blocksqp::Matrix bl, bu;
-    bl.Dimension(nx_ + ng_);
-    bu.Dimension(nx_ + ng_);
-    for (int i=0; i<nx_; ++i) {
-      bl(i) = m->lbx ? m->lbx[i] : 0;
-      bu(i) = m->ubx ? m->ubx[i] : 0;
-    }
-    for (int i=0; i<ng_; ++i) {
-      bl(nx_ + i) = m->lbg ? m->lbg[i] : 0;
-      bu(nx_ + i) = m->ubg ? m->ubg[i] : 0;
-    }
-
     // Create problem evaluation object
     vector<int> blocks = blocks_;
-    prob = new MyProblem(nx_, ng_, blocks_.size()-1, get_ptr(blocks), bl, bu, x0);
+    prob = new BlocksqpProblem(*this, m);
 
     /*------------------------*/
     /* Options for SQP solver */
