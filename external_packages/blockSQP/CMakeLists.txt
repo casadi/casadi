@@ -11,6 +11,3 @@ set(BLOCKSQP_SRCS
 
 casadi_external_library(casadi_blocksqp ${BLOCKSQP_SRCS})
 target_link_libraries(casadi_blocksqp ${QPOASES_LIBRARIES} ${LAPACK_LIBRARIES} ${BLAS_LIBRARIES})
-
-add_executable(blocksqp_example1 blocksqp_example1.cpp)
-target_link_libraries(blocksqp_example1 casadi_blocksqp)
