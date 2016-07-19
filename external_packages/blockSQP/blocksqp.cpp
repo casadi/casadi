@@ -125,13 +125,11 @@ namespace blocksqp {
       updateStepBounds( 0 );
       infoQP = solveQP( vars->deltaXi, vars->lambdaQP );
 
-      if (infoQP == 1 )
-        {// 1.) Maximum number of iterations reached
+      if (infoQP == 1 ) {
+          // 1.) Maximum number of iterations reached
           printf("***Warning! Maximum number of QP iterations exceeded.***\n");
-          ;// just continue ...
-        }
-      else if (infoQP == 2 || infoQP > 3 )
-        {// 2.) QP error (e.g., unbounded), solve again with pos.def. diagonal matrix (identity)
+      } else if (infoQP == 2 || infoQP > 3 ) {
+          // 2.) QP error (e.g., unbounded), solve again with pos.def. diagonal matrix (identity)
           printf("***QP error. Solve again with identity matrix.***\n");
           resetHessian();
           infoQP = solveQP( vars->deltaXi, vars->lambdaQP );

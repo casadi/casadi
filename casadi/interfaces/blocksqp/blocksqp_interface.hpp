@@ -42,6 +42,14 @@ namespace casadi {
   class BlocksqpInterface;
 
   struct CASADI_NLPSOL_BLOCKSQP_EXPORT BlocksqpMemory : public NlpsolMemory {
+    blocksqp::Problemspec* prob;
+    blocksqp::SQPiterate* vars;
+    blocksqp::SQPoptions* param;
+    blocksqp::SQPstats* stats;
+    qpOASES::SQProblem* qp;
+    qpOASES::SQProblem* qpSave;
+    bool initCalled;
+
     double* jac;
   };
 
@@ -142,6 +150,110 @@ namespace casadi {
 
     // Jacobian sparsity
     Sparsity sp_jac_;
+
+    // TO BE REFACTORED
+
+    /// Main Loop of SQP method
+    int run(BlocksqpMemory* m, int maxIt, int warmStart = 0) const;
+    /// Call after the last call of run, to close output files etc.
+    void finish(BlocksqpMemory* m) const;
+    /// Print information about the SQP method
+    void printInfo(BlocksqpMemory* m, int printLevel) const;
+    /// Compute gradient of Lagrangian function (dense version)
+    void calcLagrangeGradient(BlocksqpMemory* m, const blocksqp::Matrix &lambda,
+      const blocksqp::Matrix &gradObj,
+      const blocksqp::Matrix &constrJacFull, blocksqp::Matrix &gradLagrange, int flag) const;
+    /// Compute gradient of Lagrangian function (sparse version)
+    void calcLagrangeGradient(BlocksqpMemory* m, const blocksqp::Matrix &lambda,
+      const blocksqp::Matrix &gradObj, double *jacNz, int *jacIndRow, int *jacIndCol,
+      blocksqp::Matrix &gradLagrange, int flag) const;
+    /// Overloaded function for convenience, uses current variables of SQPiterate vars
+    void calcLagrangeGradient(BlocksqpMemory* m, blocksqp::Matrix &gradLagrange, int flag) const;
+    /// Update optimization tolerance (similar to SNOPT) in current iterate
+    bool calcOptTol(BlocksqpMemory* m) const;
+
+    /*
+     * Solve QP subproblem
+     */
+    // Update the bounds on the current step, i.e. the QP variables
+    void updateStepBounds(BlocksqpMemory* m, bool soc) const;
+    // Solve a QP with QPOPT or qpOASES to obtain a step deltaXi and estimates
+    // for the Lagrange multipliers
+    int solveQP(BlocksqpMemory* m, blocksqp::Matrix &deltaXi, blocksqp::Matrix &lambdaQP,
+      bool matricesChanged = true) const;
+    // Compute the next Hessian in the inner loop of increasingly convexified
+    // QPs and store it in vars->hess2
+    void computeNextHessian(BlocksqpMemory* m, int idx, int maxQP) const;
+
+    /*
+     * Globalization Strategy
+     */
+    /// No globalization strategy
+    int fullstep(BlocksqpMemory* m) const;
+    /// Set new primal dual iterate
+    void acceptStep(BlocksqpMemory* m, const blocksqp::Matrix &deltaXi, const blocksqp::Matrix &lambdaQP,
+      double alpha, int nSOCS) const;
+    // Overloaded function for convenience, uses current variables of SQPiterate vars
+    void acceptStep(BlocksqpMemory* m, double alpha) const;
+    // Reduce stepsize if a step is rejected
+    void reduceStepsize(BlocksqpMemory* m, double *alpha) const;
+    // Determine steplength alpha by a filter based line search similar to IPOPT
+    int filterLineSearch(BlocksqpMemory* m) const;
+    // Remove all entries from filter
+    void initializeFilter(BlocksqpMemory* m) const;
+    // Is a pair (cNorm, obj) in the current filter?
+    bool pairInFilter(BlocksqpMemory* m, double cNorm, double obj) const;
+    // Augment current filter by pair (cNorm, obj)
+    void augmentFilter(BlocksqpMemory* m, double cNorm, double obj) const;
+    // Perform a second order correction step (solve QP)
+    bool secondOrderCorrection(BlocksqpMemory* m, double cNorm, double cNormTrial, double dfTdeltaXi,
+      bool swCond, int it) const;
+    // Reduce stepsize if a second order correction step is rejected
+    void reduceSOCStepsize(BlocksqpMemory* m, double *alphaSOC) const;
+    // Start feasibility restoration heuristic
+    int feasibilityRestorationHeuristic(BlocksqpMemory* m) const;
+    // Start feasibility restoration phase (solve NLP)
+    int feasibilityRestorationPhase(BlocksqpMemory* m) const;
+    // Check if full step reduces KKT error
+    int kktErrorReduction(BlocksqpMemory* m) const;
+
+    /*
+     * Hessian Approximation
+     */
+    // Set initial Hessian: Identity matrix
+    void calcInitialHessian(BlocksqpMemory* m) const;
+    // [blockwise] Set initial Hessian: Identity matrix
+    void calcInitialHessian(BlocksqpMemory* m, int iBlock) const;
+    // Reset Hessian to identity and remove past information on Lagrange gradient and steps
+    void resetHessian(BlocksqpMemory* m) const;
+    // [blockwise] Reset Hessian to identity and remove past information on
+    // Lagrange gradient and steps
+    void resetHessian(BlocksqpMemory* m, int iBlock) const;
+    // Compute current Hessian approximation by finite differences
+    int calcFiniteDiffHessian(BlocksqpMemory* m) const;
+    // Compute full memory Hessian approximations based on update formulas
+    void calcHessianUpdate(BlocksqpMemory* m, int updateType, int hessScaling) const;
+    // Compute limited memory Hessian approximations based on update formulas
+    void calcHessianUpdateLimitedMemory(BlocksqpMemory* m, int updateType, int hessScaling) const;
+    // [blockwise] Compute new approximation for Hessian by SR1 update
+    void calcSR1(BlocksqpMemory* m, const blocksqp::Matrix &gamma, const blocksqp::Matrix &delta, int iBlock) const;
+    // [blockwise] Compute new approximation for Hessian by BFGS update with Powell modification
+    void calcBFGS(BlocksqpMemory* m, const blocksqp::Matrix &gamma, const blocksqp::Matrix &delta, int iBlock) const;
+    // Set pointer to correct step and Lagrange gradient difference in a limited memory context
+    void updateDeltaGamma(BlocksqpMemory* m) const;
+
+    /*
+     * Scaling of Hessian Approximation
+     */
+    // [blockwise] Update scalars for COL sizing of Hessian approximation
+    void updateScalars(BlocksqpMemory* m, const blocksqp::Matrix &gamma, const blocksqp::Matrix &delta,
+      int iBlock) const;
+    // [blockwise] Size Hessian using SP, OL, or mean sizing factor
+    void sizeInitialHessian(BlocksqpMemory* m, const blocksqp::Matrix &gamma,
+      const blocksqp::Matrix &delta, int iBlock, int option) const;
+    // [blockwise] Size Hessian using the COL scaling factor
+    void sizeHessianCOL(BlocksqpMemory* m, const blocksqp::Matrix &gamma, const blocksqp::Matrix &delta,
+      int iBlock) const;
   };
 
 } // namespace casadi
