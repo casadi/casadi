@@ -457,56 +457,6 @@ namespace blocksqp {
   double estimateSmallestEigenvalue( const Matrix &B );
   int inverse( const Matrix &A, Matrix &Ainv );
 
-
-  /**
-   * \brief Describes a minimum l_2-norm NLP for a given parent problem
-   *        that is solved during the feasibility restoration phase.
-   * \author Dennis Janka
-   * \date 2012-2015
-   */
-  class RestorationProblem : public Problemspec {
-    /*
-     * CLASS VARIABLES
-     */
-  public:
-    Problemspec *parent;
-    Matrix xiRef;
-    Matrix diagScale;
-    int neq;
-    bool *isEqCon;
-
-    double zeta;
-    double rho;
-
-    /*
-     * METHODS
-     */
-  public:
-    RestorationProblem( Problemspec *parent, const Matrix &xiReference );
-
-    /// Set initial values for xi and lambda, may also set matrix for linear constraints (dense version)
-    virtual void initialize( Matrix &xi, Matrix &lambda, Matrix &constrJac );
-
-    /// Set initial values for xi and lambda, may also set matrix for linear constraints (sparse version)
-    virtual void initialize( Matrix &xi, Matrix &lambda, double *&jacNz, int *&jacIndRow, int *&jacIndCol );
-
-    /// Evaluate all problem functions and their derivatives (dense version)
-    virtual void evaluate( const Matrix &xi, const Matrix &lambda,
-                           double *objval, Matrix &constr,
-                           Matrix &gradObj, Matrix &constrJac,
-                           SymMatrix *&hess, int dmode, int *info );
-
-    /// Evaluate all problem functions and their derivatives (sparse version)
-    virtual void evaluate( const Matrix &xi, const Matrix &lambda,
-                           double *objval, Matrix &constr,
-                           Matrix &gradObj, double *&jacNz, int *&jacIndRow, int *&jacIndCol,
-                           SymMatrix *&hess, int dmode, int *info );
-
-    virtual void printInfo();
-    virtual void printVariables( const Matrix &xi, const Matrix &lambda, int verbose );
-    virtual void printConstraints( const Matrix &constr, const Matrix &lambda );
-  };
-
 } // namespace blocksqp
 
 #endif // BLOCKSQP_HPP
