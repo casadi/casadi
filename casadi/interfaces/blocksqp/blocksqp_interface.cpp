@@ -222,53 +222,46 @@ namespace casadi {
     auto m = static_cast<BlocksqpMemory*>(mem);
 
     int ret = 0;
-    BlocksqpProblem *prob;
-    blocksqp::SQPoptions *opts;
-    blocksqp::SQPstats *stats;
     char outpath[255];
     strcpy(outpath, "./");
 
     // Create problem evaluation object
     vector<int> blocks = blocks_;
-    prob = new BlocksqpProblem(*this, m);
+    m->prob = new BlocksqpProblem(*this, m);
 
     /*------------------------*/
     /* Options for SQP solver */
     /*------------------------*/
-    opts = new blocksqp::SQPoptions();
-    opts->opttol = 1.0e-12;
-    opts->nlinfeastol = 1.0e-12;
+    m->param = new blocksqp::SQPoptions();
+    m->param->opttol = 1.0e-12;
+    m->param->nlinfeastol = 1.0e-12;
 
     // 0: no globalization, 1: filter line search
-    opts->globalization = 0;
+    m->param->globalization = 0;
     // 0: (scaled) identity, 1: SR1, 2: BFGS
-    opts->hessUpdate = 0;
+    m->param->hessUpdate = 0;
     // 0: initial Hessian is diagonal matrix, 1: scale initial Hessian according to Nocedal p.143,
     // 2: scale initial Hessian with Oren-Luenberger factor 3: scale initial Hessian
     //    with geometric mean of 1 and 2
     // 4: scale Hessian in every step with centered Oren-Luenberger sizing according to Tapia paper
-    opts->hessScaling = 0;
+    m->param->hessScaling = 0;
     // scaling strategy for fallback BFGS update if SR1 and globalization is used
-    opts->fallbackScaling = 0;
+    m->param->fallbackScaling = 0;
     // Size of limited memory
-    opts->hessLimMem = 0;
+    m->param->hessLimMem = 0;
     // If too many updates are skipped, reset Hessian
-    opts->maxConsecSkippedUpdates = 200;
+    m->param->maxConsecSkippedUpdates = 200;
     // 0: full space Hessian approximation (ignore block structure), 1: blockwise updates
-    opts->blockHess = 0;
-    opts->whichSecondDerv = 0;
-    opts->sparseQP = 1;
-    opts->printLevel = 2;
+    m->param->blockHess = 0;
+    m->param->whichSecondDerv = 0;
+    m->param->sparseQP = 1;
+    m->param->printLevel = 2;
 
 
     /*-------------------------------------------------*/
     /* Create blockSQP method object and run algorithm */
     /*-------------------------------------------------*/
-    stats = new blocksqp::SQPstats(outpath);
-
-    m->prob = prob;
-    m->param = opts;
-    m->stats = stats;
+    m->stats = new blocksqp::SQPstats(outpath);
 
     // Check if there are options that are infeasible and set defaults accordingly
     m->param->optionsConsistency();
@@ -329,9 +322,9 @@ namespace casadi {
     }
 
     // Clean up
-    delete prob;
-    delete stats;
-    delete opts;
+    delete m->prob;
+    delete m->stats;
+    delete m->param;
     delete m->qp;
     delete m->qpSave;
     delete m->vars;
