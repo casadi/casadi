@@ -55,12 +55,12 @@ namespace casadi {
   }
 
   void BlocksqpProblem::initialize(blocksqp::Matrix &xi, blocksqp::Matrix &lambda,
-                             blocksqp::Matrix &constrJac) {
+                                   blocksqp::Matrix &constrJac) {
     casadi_error("BlocksqpProblem::initialize (dense)");
   }
 
   void BlocksqpProblem::initialize(blocksqp::Matrix &xi, blocksqp::Matrix &lambda,
-                             double *&jacNz, int *&jacIndRow, int *&jacIndCol) {
+                                   double *&jacNz, int *&jacIndRow, int *&jacIndCol) {
     // Primal-dual initial guess
     double* x = xi.array;
     double* lam_x = lambda.array;
@@ -77,10 +77,10 @@ namespace casadi {
   }
 
   void BlocksqpProblem::evaluate(const blocksqp::Matrix &xi, const blocksqp::Matrix &lambda,
-                           double *objval, blocksqp::Matrix &constr,
-                           blocksqp::Matrix &gradObj, double *&jacNz, int *&jacIndRow,
-                           int *&jacIndCol,
-                           blocksqp::SymMatrix *&hess, int dmode, int *info) {
+                                 double *objval, blocksqp::Matrix &constr,
+                                 blocksqp::Matrix &gradObj, double *&jacNz, int *&jacIndRow,
+                                 int *&jacIndCol,
+                                 blocksqp::SymMatrix *&hess, int dmode, int *info) {
     if (dmode==0) {
       // No derivatives
       m->arg[0] = xi.array; // x
@@ -104,10 +104,10 @@ namespace casadi {
   }
 
   void BlocksqpProblem::evaluate(const blocksqp::Matrix &xi, const blocksqp::Matrix &lambda,
-                           double *objval, blocksqp::Matrix &constr,
-                           blocksqp::Matrix &gradObj, blocksqp::Matrix &constrJac,
-                           blocksqp::SymMatrix *&hess,
-                           int dmode, int *info) {
+                                 double *objval, blocksqp::Matrix &constr,
+                                 blocksqp::Matrix &gradObj, blocksqp::Matrix &constrJac,
+                                 blocksqp::SymMatrix *&hess,
+                                 int dmode, int *info) {
     if (dmode==0) {
       double *jacNz = 0;
       int *jacIndRow = 0;
@@ -170,7 +170,7 @@ namespace casadi {
     // Setup NLP functions
     create_function("nlp_fg", {"x", "p"}, {"f", "g"});
     Function gf_jg = create_function("nlp_gf_jg", {"x", "p"},
-                                    {"f", "g", "grad:f:x", "jac:g:x"});
+                                     {"f", "g", "grad:f:x", "jac:g:x"});
     sp_jac_ = gf_jg.sparsity_out("jac_g_x");
 
     // Get the sparsity pattern for the Hessian of the Lagrangian
@@ -273,14 +273,15 @@ namespace casadi {
     // Check if there are options that are infeasible and set defaults accordingly
     m->param->optionsConsistency();
 
-    m->vars = new blocksqp::SQPiterate( m->prob, m->param, 1);
+    m->vars = new blocksqp::SQPiterate(m->prob, m->param, 1);
 
-    if ( m->param->sparseQP < 2 ) {
-      m->qp = new qpOASES::SQProblem( m->prob->nVar, m->prob->nCon);
-      m->qpSave = new qpOASES::SQProblem( m->prob->nVar, m->prob->nCon);
+    if (m->param->sparseQP < 2) {
+      m->qp = new qpOASES::SQProblem(m->prob->nVar, m->prob->nCon);
+      m->qpSave = new qpOASES::SQProblem(m->prob->nVar, m->prob->nCon);
     } else {
-      m->qp = new qpOASES::SQProblemSchur( m->prob->nVar, m->prob->nCon, qpOASES::HST_UNKNOWN, 50);
-      m->qpSave = new qpOASES::SQProblemSchur( m->prob->nVar, m->prob->nCon, qpOASES::HST_UNKNOWN, 50);
+      m->qp = new qpOASES::SQProblemSchur(m->prob->nVar, m->prob->nCon, qpOASES::HST_UNKNOWN, 50);
+      m->qpSave = new qpOASES::SQProblemSchur(m->prob->nVar,
+        m->prob->nCon, qpOASES::HST_UNKNOWN, 50);
     }
 
     m->initCalled = false;
@@ -292,14 +293,16 @@ namespace casadi {
     m->stats->initStats(m->param);
     m->vars->initIterate(m->param);
 
-    // Initialize filter with pair ( maxConstrViolation, objLowerBound )
+    // Initialize filter with pair (maxConstrViolation, objLowerBound)
     initializeFilter(m);
 
     // Set initial values for all xi and set the Jacobian for linear constraints
-    if (m->param->sparseQP )
-      m->prob->initialize( m->vars->xi, m->vars->lambda, m->vars->jacNz, m->vars->jacIndRow, m->vars->jacIndCol);
-    else
-      m->prob->initialize( m->vars->xi, m->vars->lambda, m->vars->constrJac);
+    if (m->param->sparseQP) {
+      m->prob->initialize(m->vars->xi, m->vars->lambda, m->vars->jacNz,
+        m->vars->jacIndRow, m->vars->jacIndCol);
+    } else {
+      m->prob->initialize(m->vars->xi, m->vars->lambda, m->vars->constrJac);
+    }
 
     m->initCalled = true;
 
@@ -340,30 +343,34 @@ namespace casadi {
     bool hasConverged = false;
     int whichDerv = m->param->whichSecondDerv;
 
-    if (!m->initCalled ) {
+    if (!m->initCalled) {
       printf("init() must be called before run(). Aborting.\n");
       return -1;
     }
 
-    if (warmStart == 0 || m->stats->itCount == 0 ) {
+    if (warmStart == 0 || m->stats->itCount == 0) {
       // SQP iteration 0
 
       /// Set initial Hessian approximation
       calcInitialHessian(m);
 
       /// Evaluate all functions and gradients for xi_0
-      if (m->param->sparseQP )
-        m->prob->evaluate( m->vars->xi, m->vars->lambda, &m->vars->obj, m->vars->constr, m->vars->gradObj,
-                        m->vars->jacNz, m->vars->jacIndRow, m->vars->jacIndCol, m->vars->hess, 1+whichDerv, &infoEval);
-      else
-        m->prob->evaluate( m->vars->xi, m->vars->lambda, &m->vars->obj, m->vars->constr, m->vars->gradObj,
+      if (m->param->sparseQP) {
+        m->prob->evaluate(m->vars->xi, m->vars->lambda, &m->vars->obj,
+          m->vars->constr, m->vars->gradObj,
+                        m->vars->jacNz, m->vars->jacIndRow, m->vars->jacIndCol,
+                        m->vars->hess, 1+whichDerv, &infoEval);
+      } else {
+        m->prob->evaluate(m->vars->xi, m->vars->lambda, &m->vars->obj,
+          m->vars->constr, m->vars->gradObj,
                         m->vars->constrJac, m->vars->hess, 1+whichDerv, &infoEval);
+      }
       m->stats->nDerCalls++;
 
       /// Check if converged
       hasConverged = calcOptTol(m);
       m->stats->printProgress(m->prob, m->vars, m->param, hasConverged);
-      if (hasConverged )
+      if (hasConverged)
         return 0;
 
       m->stats->itCount++;
@@ -372,36 +379,36 @@ namespace casadi {
     /*
      * SQP Loop: during first iteration, m->stats->itCount = 1
      */
-    for (it=0; it<maxIt; it++ ) {
+    for (it=0; it<maxIt; it++) {
       /// Solve QP subproblem with qpOASES or QPOPT
       updateStepBounds(m, 0);
       infoQP = solveQP(m, m->vars->deltaXi, m->vars->lambdaQP);
 
-      if (infoQP == 1 ) {
+      if (infoQP == 1) {
           // 1.) Maximum number of iterations reached
           printf("***Warning! Maximum number of QP iterations exceeded.***\n");
-      } else if (infoQP == 2 || infoQP > 3 ) {
+      } else if (infoQP == 2 || infoQP > 3) {
           // 2.) QP error (e.g., unbounded), solve again with pos.def. diagonal matrix (identity)
           printf("***QP error. Solve again with identity matrix.***\n");
           resetHessian(m);
           infoQP = solveQP(m, m->vars->deltaXi, m->vars->lambdaQP);
-          if (infoQP ) {
+          if (infoQP) {
             // If there is still an error, terminate.
-            printf( "***QP error. Stop.***\n");
+            printf("***QP error. Stop.***\n");
             return -1;
           } else {
             m->vars->steptype = 1;
           }
-        } else if (infoQP == 3 ) {
+        } else if (infoQP == 3) {
         // 3.) QP infeasible, try to restore feasibility
         bool qpError = true;
         skipLineSearch = true; // don't do line search with restoration step
 
         // Try to reduce constraint violation by heuristic
-        if (m->vars->steptype < 2 ) {
+        if (m->vars->steptype < 2) {
           printf("***QP infeasible. Trying to reduce constraint violation...");
           qpError = feasibilityRestorationHeuristic(m);
-          if (!qpError ) {
+          if (!qpError) {
             m->vars->steptype = 2;
             printf("Success.***\n");
           } else {
@@ -410,61 +417,65 @@ namespace casadi {
         }
 
         // Invoke feasibility restoration phase
-        //if (qpError && m->vars->steptype < 3 && m->param->restoreFeas )
-        if (qpError && m->param->restoreFeas && m->vars->cNorm > 0.01 * m->param->nlinfeastol ) {
+        //if (qpError && m->vars->steptype < 3 && m->param->restoreFeas)
+        if (qpError && m->param->restoreFeas && m->vars->cNorm > 0.01 * m->param->nlinfeastol) {
           printf("***Start feasibility restoration phase.***\n");
           m->vars->steptype = 3;
           qpError = feasibilityRestorationPhase(m);
         }
 
         // If everything failed, abort.
-        if (qpError ) {
-          printf( "***QP error. Stop.***\n");
+        if (qpError) {
+          printf("***QP error. Stop.***\n");
           return -1;
         }
       }
 
       /// Determine steplength alpha
-      if (m->param->globalization == 0 || (m->param->skipFirstGlobalization && m->stats->itCount == 1) ) {
+      if (m->param->globalization == 0 || (m->param->skipFirstGlobalization
+        && m->stats->itCount == 1)) {
         // No globalization strategy, but reduce step if function cannot be evaluated
         if (fullstep(m)) {
-          printf( "***Constraint or objective could not be evaluated at new point. Stop.***\n");
+          printf("***Constraint or objective could not be evaluated at new point. Stop.***\n");
           return -1;
         }
         m->vars->steptype = 0;
-      } else if (m->param->globalization == 1 && !skipLineSearch ) {
+      } else if (m->param->globalization == 1 && !skipLineSearch) {
         // Filter line search based on Waechter et al., 2006 (Ipopt paper)
-        if (filterLineSearch(m) || m->vars->reducedStepCount > m->param->maxConsecReducedSteps ) {
+        if (filterLineSearch(m) || m->vars->reducedStepCount > m->param->maxConsecReducedSteps) {
           // Filter line search did not produce a step. Now there are a few things we can try ...
           bool lsError = true;
 
-          // Heuristic 1: Check if the full step reduces the KKT error by at least kappaF, if so, accept the step.
+          // Heuristic 1: Check if the full step reduces the KKT error by at
+          // least kappaF, if so, accept the step.
           lsError = kktErrorReduction(m);
-          if (!lsError )
+          if (!lsError)
             m->vars->steptype = -1;
 
-          // Heuristic 2: Try to reduce constraint violation by closing continuity gaps to produce an admissable iterate
-          if (lsError && m->vars->cNorm > 0.01 * m->param->nlinfeastol && m->vars->steptype < 2 ) {
+          // Heuristic 2: Try to reduce constraint violation by closing
+          // continuity gaps to produce an admissable iterate
+          if (lsError && m->vars->cNorm > 0.01 * m->param->nlinfeastol && m->vars->steptype < 2) {
             // Don't do this twice in a row!
 
             printf("***Warning! Steplength too short. Trying to reduce constraint violation...");
 
             // Integration over whole time interval
             lsError = feasibilityRestorationHeuristic(m);
-            if (!lsError )
-              {
+            if (!lsError) {
                 m->vars->steptype = 2;
                 printf("Success.***\n");
-              }
-            else
+              } else {
               printf("Failed.***\n");
+            }
           }
 
           // Heuristic 3: Recompute step with a diagonal Hessian
-          if (lsError && m->vars->steptype != 1 && m->vars->steptype != 2 ) {
-            // After closing continuity gaps, we already take a step with initial Hessian. If this step is not accepted then this will cause an infinite loop!
+          if (lsError && m->vars->steptype != 1 && m->vars->steptype != 2) {
+            // After closing continuity gaps, we already take a step with initial Hessian.
+            // If this step is not accepted then this will cause an infinite loop!
 
-            printf("***Warning! Steplength too short. Trying to find a new step with identity Hessian.***\n");
+            printf("***Warning! Steplength too short. "
+                  "Trying to find a new step with identity Hessian.***\n");
             m->vars->steptype = 1;
 
             resetHessian(m);
@@ -472,7 +483,7 @@ namespace casadi {
           }
 
           // If this does not yield a successful step, start restoration phase
-          if (lsError && m->vars->cNorm > 0.01 * m->param->nlinfeastol && m->param->restoreFeas ) {
+          if (lsError && m->vars->cNorm > 0.01 * m->param->nlinfeastol && m->param->restoreFeas) {
             printf("***Warning! Steplength too short. Start feasibility restoration phase.***\n");
             m->vars->steptype = 3;
 
@@ -481,8 +492,8 @@ namespace casadi {
           }
 
           // If everything failed, abort.
-          if (lsError ) {
-            printf( "***Line search error. Stop.***\n");
+          if (lsError) {
+            printf("***Line search error. Stop.***\n");
             return -1;
           }
         } else {
@@ -494,12 +505,13 @@ namespace casadi {
       calcLagrangeGradient(m, m->vars->gamma, 0);
 
       /// Evaluate functions and gradients at the new xi
-      if (m->param->sparseQP ) {
-        m->prob->evaluate(m->vars->xi, m->vars->lambda, &m->vars->obj, m->vars->constr, m->vars->gradObj,
-                          m->vars->jacNz, m->vars->jacIndRow, m->vars->jacIndCol, m->vars->hess, 1+whichDerv, &infoEval);
+      if (m->param->sparseQP) {
+        m->prob->evaluate(m->vars->xi, m->vars->lambda, &m->vars->obj, m->vars->constr,
+          m->vars->gradObj, m->vars->jacNz, m->vars->jacIndRow,
+          m->vars->jacIndCol, m->vars->hess, 1+whichDerv, &infoEval);
       } else {
-        m->prob->evaluate(m->vars->xi, m->vars->lambda, &m->vars->obj, m->vars->constr, m->vars->gradObj,
-                          m->vars->constrJac, m->vars->hess, 1+whichDerv, &infoEval);
+        m->prob->evaluate(m->vars->xi, m->vars->lambda, &m->vars->obj, m->vars->constr,
+            m->vars->gradObj, m->vars->constrJac, m->vars->hess, 1+whichDerv, &infoEval);
       }
       m->stats->nDerCalls++;
 
@@ -508,30 +520,32 @@ namespace casadi {
 
       /// Print one line of output for the current iteration
       m->stats->printProgress(m->prob, m->vars, m->param, hasConverged);
-      if (hasConverged && m->vars->steptype < 2 ) {
+      if (hasConverged && m->vars->steptype < 2) {
         m->stats->itCount++;
         if (m->param->debugLevel > 2) {
           //printf("Computing finite differences Hessian at the solution ... \n");
           //calcFiniteDiffHessian();
-          //m->stats->printHessian( m->prob->nBlocks, m->vars->hess);
+          //m->stats->printHessian(m->prob->nBlocks, m->vars->hess);
           m->stats->dumpQPCpp(m->prob, m->vars, m->qp, m->param->sparseQP);
         }
         return 0; //Convergence achieved!
       }
 
-      /// Calculate difference of old and new Lagrange gradient: gamma = -gamma + dL(xi_k+1, lambda_k+1)
+      /// Calculate difference of old and new Lagrange gradient:
+      // gamma = -gamma + dL(xi_k+1, lambda_k+1)
       calcLagrangeGradient(m, m->vars->gamma, 1);
 
       /// Revise Hessian approximation
-      if (m->param->hessUpdate < 4 && !m->param->hessLimMem ) {
+      if (m->param->hessUpdate < 4 && !m->param->hessLimMem) {
         calcHessianUpdate(m, m->param->hessUpdate, m->param->hessScaling);
-      } else if (m->param->hessUpdate < 4 && m->param->hessLimMem ) {
+      } else if (m->param->hessUpdate < 4 && m->param->hessLimMem) {
         calcHessianUpdateLimitedMemory(m, m->param->hessUpdate, m->param->hessScaling);
-      } else if (m->param->hessUpdate == 4 ) {
+      } else if (m->param->hessUpdate == 4) {
         calcFiniteDiffHessian(m);
       }
 
-      // If limited memory updates  are used, set pointers deltaXi and gamma to the next column in deltaMat and gammaMat
+      // If limited memory updates  are used, set pointers deltaXi and
+      // gamma to the next column in deltaMat and gammaMat
       updateDeltaGamma(m);
 
       m->stats->itCount++;
@@ -543,7 +557,7 @@ namespace casadi {
 
 
   void BlocksqpInterface::finish(BlocksqpMemory* m) const {
-    if (m->initCalled ) {
+    if (m->initCalled) {
       m->initCalled = false;
     } else {
       printf("init() must be called before finish().\n");
@@ -562,30 +576,31 @@ namespace casadi {
    * flag == 2: output dL(xi_k+1, lambda_k+1) - df(xi)
    */
   void BlocksqpInterface::
-  calcLagrangeGradient(BlocksqpMemory* m, const blocksqp::Matrix &lambda, const blocksqp::Matrix &gradObj,
-    double *jacNz, int *jacIndRow, int *jacIndCol, blocksqp::Matrix &gradLagrange, int flag ) const {
+  calcLagrangeGradient(BlocksqpMemory* m, const blocksqp::Matrix &lambda,
+    const blocksqp::Matrix &gradObj, double *jacNz, int *jacIndRow,
+    int *jacIndCol, blocksqp::Matrix &gradLagrange, int flag) const {
     int iVar, iCon;
 
     // Objective gradient
-    if (flag == 0 ) {
-      for (iVar=0; iVar<m->prob->nVar; iVar++ ) {
-        gradLagrange( iVar ) = gradObj( iVar);
+    if (flag == 0) {
+      for (iVar=0; iVar<m->prob->nVar; iVar++) {
+        gradLagrange(iVar) = gradObj(iVar);
       }
-    } else if (flag == 1 ) {
-      for (iVar=0; iVar<m->prob->nVar; iVar++ ) {
-        gradLagrange( iVar ) = gradObj( iVar ) - gradLagrange( iVar);
+    } else if (flag == 1) {
+      for (iVar=0; iVar<m->prob->nVar; iVar++) {
+        gradLagrange(iVar) = gradObj(iVar) - gradLagrange(iVar);
       }
     } else {
-      gradLagrange.Initialize( 0.0);
+      gradLagrange.Initialize(0.0);
     }
 
     // - lambdaT * constrJac
-    for (iVar=0; iVar<m->prob->nVar; iVar++ )
-      for (iCon=jacIndCol[iVar]; iCon<jacIndCol[iVar+1]; iCon++ )
-        gradLagrange( iVar ) -= lambda( m->prob->nVar + jacIndRow[iCon] ) * jacNz[iCon];
+    for (iVar=0; iVar<m->prob->nVar; iVar++)
+      for (iCon=jacIndCol[iVar]; iCon<jacIndCol[iVar+1]; iCon++)
+        gradLagrange(iVar) -= lambda(m->prob->nVar + jacIndRow[iCon]) * jacNz[iCon];
 
     // - lambdaT * simpleBounds
-    for (iVar=0; iVar<m->prob->nVar; iVar++ ) gradLagrange( iVar ) -= lambda( iVar);
+    for (iVar=0; iVar<m->prob->nVar; iVar++) gradLagrange(iVar) -= lambda(iVar);
   }
 
 
@@ -599,30 +614,30 @@ namespace casadi {
   void BlocksqpInterface::
   calcLagrangeGradient(BlocksqpMemory* m, const blocksqp::Matrix &lambda,
                        const blocksqp::Matrix &gradObj, const blocksqp::Matrix &constrJac,
-                       blocksqp::Matrix &gradLagrange, int flag ) const {
+                       blocksqp::Matrix &gradLagrange, int flag) const {
     int iVar, iCon;
 
     // Objective gradient
-    if (flag == 0 ) {
-      for (iVar=0; iVar<m->prob->nVar; iVar++ ) {
-        gradLagrange( iVar ) = gradObj( iVar);
+    if (flag == 0) {
+      for (iVar=0; iVar<m->prob->nVar; iVar++) {
+        gradLagrange(iVar) = gradObj(iVar);
       }
-    } else if (flag == 1 ) {
-      for (iVar=0; iVar<m->prob->nVar; iVar++ ) {
-        gradLagrange( iVar ) = gradObj( iVar ) - gradLagrange( iVar);
+    } else if (flag == 1) {
+      for (iVar=0; iVar<m->prob->nVar; iVar++) {
+        gradLagrange(iVar) = gradObj(iVar) - gradLagrange(iVar);
       }
     } else {
-      gradLagrange.Initialize( 0.0);
+      gradLagrange.Initialize(0.0);
     }
 
     // - lambdaT * constrJac
-    for (iVar=0; iVar<m->prob->nVar; iVar++ )
-      for (iCon=0; iCon<m->prob->nCon; iCon++ )
-        gradLagrange( iVar ) -= lambda( m->prob->nVar + iCon ) * constrJac( iCon, iVar);
+    for (iVar=0; iVar<m->prob->nVar; iVar++)
+      for (iCon=0; iCon<m->prob->nCon; iCon++)
+        gradLagrange(iVar) -= lambda(m->prob->nVar + iCon) * constrJac(iCon, iVar);
 
     // - lambdaT * simpleBounds
-    for (iVar=0; iVar<m->prob->nVar; iVar++ ) {
-      gradLagrange( iVar ) -= lambda( iVar);
+    for (iVar=0; iVar<m->prob->nVar; iVar++) {
+      gradLagrange(iVar) -= lambda(iVar);
     }
   }
 
@@ -632,10 +647,12 @@ namespace casadi {
    */
   void BlocksqpInterface::
   calcLagrangeGradient(BlocksqpMemory* m, blocksqp::Matrix &gradLagrange, int flag) const {
-    if (m->param->sparseQP ) {
-      calcLagrangeGradient(m, m->vars->lambda, m->vars->gradObj, m->vars->jacNz, m->vars->jacIndRow, m->vars->jacIndCol, gradLagrange, flag);
+    if (m->param->sparseQP) {
+      calcLagrangeGradient(m, m->vars->lambda, m->vars->gradObj, m->vars->jacNz,
+        m->vars->jacIndRow, m->vars->jacIndCol, gradLagrange, flag);
     } else {
-      calcLagrangeGradient(m, m->vars->lambda, m->vars->gradObj, m->vars->constrJac, gradLagrange, flag);
+      calcLagrangeGradient(m, m->vars->lambda, m->vars->gradObj, m->vars->constrJac,
+        gradLagrange, flag);
     }
   }
 
@@ -649,107 +666,111 @@ namespace casadi {
   bool BlocksqpInterface::calcOptTol(BlocksqpMemory* m) const {
     // scaled norm of Lagrangian gradient
     calcLagrangeGradient(m, m->vars->gradLagrange, 0);
-    m->vars->gradNorm = lInfVectorNorm( m->vars->gradLagrange);
-    m->vars->tol = m->vars->gradNorm /( 1.0 + lInfVectorNorm( m->vars->lambda ));
+    m->vars->gradNorm = lInfVectorNorm(m->vars->gradLagrange);
+    m->vars->tol = m->vars->gradNorm /(1.0 + lInfVectorNorm(m->vars->lambda));
 
     // norm of constraint violation
-    m->vars->cNorm  = lInfConstraintNorm( m->vars->xi, m->vars->constr, m->prob->bu, m->prob->bl);
-    m->vars->cNormS = m->vars->cNorm /( 1.0 + lInfVectorNorm( m->vars->xi ));
+    m->vars->cNorm  = lInfConstraintNorm(m->vars->xi, m->vars->constr, m->prob->bu, m->prob->bl);
+    m->vars->cNormS = m->vars->cNorm /(1.0 + lInfVectorNorm(m->vars->xi));
 
-    if (m->vars->tol <= m->param->opttol && m->vars->cNormS <= m->param->nlinfeastol )
+    if (m->vars->tol <= m->param->opttol && m->vars->cNormS <= m->param->nlinfeastol)
       return true;
     else
       return false;
   }
 
-  void BlocksqpInterface::printInfo(BlocksqpMemory* m, int printLevel ) const {
+  void BlocksqpInterface::printInfo(BlocksqpMemory* m, int printLevel) const {
     char hessString1[100];
     char hessString2[100];
     char globString[100];
     char qpString[100];
 
-    if (printLevel == 0 )
+    if (printLevel == 0)
       return;
 
     /* QP Solver */
-    if (m->param->sparseQP == 0 )
-      strcpy( qpString, "dense, reduced Hessian factorization");
-    else if (m->param->sparseQP == 1 )
-      strcpy( qpString, "sparse, reduced Hessian factorization");
-    else if (m->param->sparseQP == 2 )
-      strcpy( qpString, "sparse, Schur complement approach");
+    if (m->param->sparseQP == 0)
+      strcpy(qpString, "dense, reduced Hessian factorization");
+    else if (m->param->sparseQP == 1)
+      strcpy(qpString, "sparse, reduced Hessian factorization");
+    else if (m->param->sparseQP == 2)
+      strcpy(qpString, "sparse, Schur complement approach");
 
     /* Globalization */
-    if (m->param->globalization == 0 )
-      strcpy( globString, "none (full step)");
-    else if (m->param->globalization == 1 )
-      strcpy( globString, "filter line search");
+    if (m->param->globalization == 0)
+      strcpy(globString, "none (full step)");
+    else if (m->param->globalization == 1)
+      strcpy(globString, "filter line search");
 
     /* Hessian approximation */
-    if (m->param->blockHess && (m->param->hessUpdate == 1 || m->param->hessUpdate == 2) )
-      strcpy( hessString1, "block ");
+    if (m->param->blockHess && (m->param->hessUpdate == 1 || m->param->hessUpdate == 2))
+      strcpy(hessString1, "block ");
     else
-      strcpy( hessString1, "");
+      strcpy(hessString1, "");
 
-    if (m->param->hessLimMem && (m->param->hessUpdate == 1 || m->param->hessUpdate == 2) )
-      strcat( hessString1, "L-");
+    if (m->param->hessLimMem && (m->param->hessUpdate == 1 || m->param->hessUpdate == 2))
+      strcat(hessString1, "L-");
 
     /* Fallback Hessian */
-    if (m->param->hessUpdate == 1 || m->param->hessUpdate == 4 || (m->param->hessUpdate == 2 && !m->param->hessDamp) )
-      {
-        strcpy( hessString2, hessString1);
+    if (m->param->hessUpdate == 1 || m->param->hessUpdate == 4
+      || (m->param->hessUpdate == 2 && !m->param->hessDamp)) {
+        strcpy(hessString2, hessString1);
 
         /* Fallback Hessian update type */
-        if (m->param->fallbackUpdate == 0 )
-          strcat( hessString2, "Id");
-        else if (m->param->fallbackUpdate == 1 )
-          strcat( hessString2, "SR1");
-        else if (m->param->fallbackUpdate == 2 )
-          strcat( hessString2, "BFGS");
-        else if (m->param->fallbackUpdate == 4 )
-          strcat( hessString2, "Finite differences");
+        if (m->param->fallbackUpdate == 0) {
+          strcat(hessString2, "Id");
+        } else if (m->param->fallbackUpdate == 1) {
+          strcat(hessString2, "SR1");
+        } else if (m->param->fallbackUpdate == 2) {
+          strcat(hessString2, "BFGS");
+        } else if (m->param->fallbackUpdate == 4) {
+          strcat(hessString2, "Finite differences");
+        }
 
         /* Fallback Hessian scaling */
-        if (m->param->fallbackScaling == 1 )
-          strcat( hessString2, ", SP");
-        else if (m->param->fallbackScaling == 2 )
-          strcat( hessString2, ", OL");
-        else if (m->param->fallbackScaling == 3 )
-          strcat( hessString2, ", mean");
-        else if (m->param->fallbackScaling == 4 )
-          strcat( hessString2, ", selective sizing");
-      }
-    else
-      strcpy( hessString2, "-");
+        if (m->param->fallbackScaling == 1) {
+          strcat(hessString2, ", SP");
+        } else if (m->param->fallbackScaling == 2) {
+          strcat(hessString2, ", OL");
+        } else if (m->param->fallbackScaling == 3) {
+          strcat(hessString2, ", mean");
+        } else if (m->param->fallbackScaling == 4) {
+          strcat(hessString2, ", selective sizing");
+        }
+      } else {
+        strcpy(hessString2, "-");
+    }
 
     /* First Hessian update type */
-    if (m->param->hessUpdate == 0 )
-      strcat( hessString1, "Id");
-    else if (m->param->hessUpdate == 1 )
-      strcat( hessString1, "SR1");
-    else if (m->param->hessUpdate == 2 )
-      strcat( hessString1, "BFGS");
-    else if (m->param->hessUpdate == 4 )
-      strcat( hessString1, "Finite differences");
+    if (m->param->hessUpdate == 0) {
+      strcat(hessString1, "Id");
+    } else if (m->param->hessUpdate == 1) {
+      strcat(hessString1, "SR1");
+    } else if (m->param->hessUpdate == 2) {
+      strcat(hessString1, "BFGS");
+    } else if (m->param->hessUpdate == 4) {
+      strcat(hessString1, "Finite differences");
+    }
 
     /* First Hessian scaling */
-    if (m->param->hessScaling == 1 )
-      strcat( hessString1, ", SP");
-    else if (m->param->hessScaling == 2 )
-      strcat( hessString1, ", OL");
-    else if (m->param->hessScaling == 3 )
-      strcat( hessString1, ", mean");
-    else if (m->param->hessScaling == 4 )
-      strcat( hessString1, ", selective sizing");
+    if (m->param->hessScaling == 1) {
+      strcat(hessString1, ", SP");
+    } else if (m->param->hessScaling == 2) {
+      strcat(hessString1, ", OL");
+    } else if (m->param->hessScaling == 3) {
+      strcat(hessString1, ", mean");
+    } else if (m->param->hessScaling == 4) {
+      strcat(hessString1, ", selective sizing");
+    }
 
-    printf( "\n+---------------------------------------------------------------+\n");
-    printf( "| Starting blockSQP with the following algorithmic settings:    |\n");
-    printf( "+---------------------------------------------------------------+\n");
-    printf( "| qpOASES flavor            | %-34s|\n", qpString);
-    printf( "| Globalization             | %-34s|\n", globString);
-    printf( "| 1st Hessian approximation | %-34s|\n", hessString1);
-    printf( "| 2nd Hessian approximation | %-34s|\n", hessString2);
-    printf( "+---------------------------------------------------------------+\n\n");
+    printf("\n+---------------------------------------------------------------+\n");
+    printf("| Starting blockSQP with the following algorithmic settings:    |\n");
+    printf("+---------------------------------------------------------------+\n");
+    printf("| qpOASES flavor            | %-34s|\n", qpString);
+    printf("| Globalization             | %-34s|\n", globString);
+    printf("| 1st Hessian approximation | %-34s|\n", hessString1);
+    printf("| 2nd Hessian approximation | %-34s|\n", hessString2);
+    printf("+---------------------------------------------------------------+\n\n");
   }
 
   void BlocksqpInterface::
@@ -759,7 +780,7 @@ namespace casadi {
 
   void BlocksqpInterface::
   acceptStep(BlocksqpMemory* m, const blocksqp::Matrix &deltaXi,
-    const blocksqp::Matrix &lambdaQP, double alpha, int nSOCS ) const {
+    const blocksqp::Matrix &lambdaQP, double alpha, int nSOCS) const {
     int k;
     double lStpNorm;
 
@@ -768,23 +789,23 @@ namespace casadi {
     m->vars->nSOCS = nSOCS;
 
     // Set new xi by accepting the current trial step
-    for (k=0; k<m->vars->xi.M(); k++ ) {
-      m->vars->xi( k ) = m->vars->trialXi( k);
-      m->vars->deltaXi( k ) = alpha * deltaXi( k);
+    for (k=0; k<m->vars->xi.M(); k++) {
+      m->vars->xi(k) = m->vars->trialXi(k);
+      m->vars->deltaXi(k) = alpha * deltaXi(k);
     }
 
     // Store the infinity norm of the multiplier step
     m->vars->lambdaStepNorm = 0.0;
-    for (k=0; k<m->vars->lambda.M(); k++ )
-      if ((lStpNorm = fabs( alpha*lambdaQP( k ) - alpha*m->vars->lambda( k ) )) > m->vars->lambdaStepNorm )
+    for (k=0; k<m->vars->lambda.M(); k++)
+      if ((lStpNorm = fabs(alpha*lambdaQP(k) - alpha*m->vars->lambda(k))) > m->vars->lambdaStepNorm)
         m->vars->lambdaStepNorm = lStpNorm;
 
     // Set new multipliers
-    for (k=0; k<m->vars->lambda.M(); k++ )
-      m->vars->lambda( k ) = (1.0 - alpha)*m->vars->lambda( k ) + alpha*lambdaQP( k);
+    for (k=0; k<m->vars->lambda.M(); k++)
+      m->vars->lambda(k) = (1.0 - alpha)*m->vars->lambda(k) + alpha*lambdaQP(k);
 
     // Count consecutive reduced steps
-    if (m->vars->alpha < 1.0 )
+    if (m->vars->alpha < 1.0)
       m->vars->reducedStepCount++;
     else
       m->vars->reducedStepCount = 0;
@@ -802,16 +823,16 @@ namespace casadi {
 
     // Update bounds on linearized constraints for the next SOC QP:
     // That is different from the update for the first SOC QP!
-    for (i=0; i<m->prob->nCon; i++ ) {
-      if (m->prob->bl( nVar+i ) != m->param->inf )
-        m->vars->deltaBl( nVar+i ) = (*alphaSOC)*m->vars->deltaBl( nVar+i ) - m->vars->constr( i);
+    for (i=0; i<m->prob->nCon; i++) {
+      if (m->prob->bl(nVar+i) != m->param->inf)
+        m->vars->deltaBl(nVar+i) = (*alphaSOC)*m->vars->deltaBl(nVar+i) - m->vars->constr(i);
       else
-        m->vars->deltaBl( nVar+i ) = m->param->inf;
+        m->vars->deltaBl(nVar+i) = m->param->inf;
 
-      if (m->prob->bu( nVar+i ) != m->param->inf )
-        m->vars->deltaBu( nVar+i ) = (*alphaSOC)*m->vars->deltaBu( nVar+i ) - m->vars->constr( i);
+      if (m->prob->bu(nVar+i) != m->param->inf)
+        m->vars->deltaBu(nVar+i) = (*alphaSOC)*m->vars->deltaBu(nVar+i) - m->vars->constr(i);
       else
-        m->vars->deltaBu( nVar+i ) = m->param->inf;
+        m->vars->deltaBu(nVar+i) = m->param->inf;
     }
 
     *alphaSOC = (*alphaSOC) * 0.5;
@@ -831,17 +852,19 @@ namespace casadi {
 
     // Backtracking line search
     alpha = 1.0;
-    for (k=0; k<10; k++ ) {
+    for (k=0; k<10; k++) {
       // Compute new trial point
-      for (i=0; i<nVar; i++ )
-        m->vars->trialXi( i ) = m->vars->xi( i ) + alpha * m->vars->deltaXi( i);
+      for (i=0; i<nVar; i++)
+        m->vars->trialXi(i) = m->vars->xi(i) + alpha * m->vars->deltaXi(i);
 
       // Compute problem functions at trial point
-      m->prob->evaluate( m->vars->trialXi, &objTrial, m->vars->constr, &info);
+      m->prob->evaluate(m->vars->trialXi, &objTrial, m->vars->constr, &info);
       m->stats->nFunCalls++;
-      cNormTrial = lInfConstraintNorm( m->vars->trialXi, m->vars->constr, m->prob->bu, m->prob->bl);
-      // Reduce step if evaluation fails, if lower bound is violated or if objective or a constraint is NaN
-      if (info != 0 || objTrial < m->prob->objLo || objTrial > m->prob->objUp || !(objTrial == objTrial) || !(cNormTrial == cNormTrial) ) {
+      cNormTrial = lInfConstraintNorm(m->vars->trialXi, m->vars->constr, m->prob->bu, m->prob->bl);
+      // Reduce step if evaluation fails, if lower bound is violated
+      // or if objective or a constraint is NaN
+      if (info != 0 || objTrial < m->prob->objLo || objTrial > m->prob->objUp
+        || !(objTrial == objTrial) || !(cNormTrial == cNormTrial)) {
         printf("info=%i, objTrial=%g\n", info, objTrial);
         // evaluation error, reduce stepsize
         reduceStepsize(m, &alpha);
@@ -869,26 +892,26 @@ namespace casadi {
     int nVar = m->prob->nVar;
 
     // Compute ||constr(xi)|| at old point
-    cNorm = lInfConstraintNorm( m->vars->xi, m->vars->constr, m->prob->bu, m->prob->bl);
+    cNorm = lInfConstraintNorm(m->vars->xi, m->vars->constr, m->prob->bu, m->prob->bl);
 
     // Backtracking line search
-    for (k=0; k<m->param->maxLineSearch; k++ ) {
+    for (k=0; k<m->param->maxLineSearch; k++) {
       // Compute new trial point
-      for (i=0; i<nVar; i++ )
-        m->vars->trialXi( i ) = m->vars->xi( i ) + alpha * m->vars->deltaXi( i);
+      for (i=0; i<nVar; i++)
+        m->vars->trialXi(i) = m->vars->xi(i) + alpha * m->vars->deltaXi(i);
 
       // Compute grad(f)^T * deltaXi
       dfTdeltaXi = 0.0;
-      for (i=0; i<nVar; i++ )
-        dfTdeltaXi += m->vars->gradObj( i ) * m->vars->deltaXi( i);
+      for (i=0; i<nVar; i++)
+        dfTdeltaXi += m->vars->gradObj(i) * m->vars->deltaXi(i);
 
       // Compute objective and at ||constr(trialXi)||_1 at trial point
-      m->prob->evaluate( m->vars->trialXi, &objTrial, m->vars->constr, &info);
+      m->prob->evaluate(m->vars->trialXi, &objTrial, m->vars->constr, &info);
       m->stats->nFunCalls++;
-      cNormTrial = lInfConstraintNorm( m->vars->trialXi, m->vars->constr, m->prob->bu, m->prob->bl);
+      cNormTrial = lInfConstraintNorm(m->vars->trialXi, m->vars->constr, m->prob->bu, m->prob->bl);
       // Reduce step if evaluation fails, if lower bound is violated or if objective is NaN
-      if (info != 0 || objTrial < m->prob->objLo || objTrial > m->prob->objUp || !(objTrial == objTrial) || !(cNormTrial == cNormTrial) )
-        {
+      if (info != 0 || objTrial < m->prob->objLo || objTrial > m->prob->objUp
+        || !(objTrial == objTrial) || !(cNormTrial == cNormTrial)) {
           // evaluation error, reduce stepsize
           reduceStepsize(m, &alpha);
           continue;
@@ -896,7 +919,8 @@ namespace casadi {
 
       // Check acceptability to the filter
       if (pairInFilter(m, cNormTrial, objTrial)) {
-        // Trial point is in the prohibited region defined by the filter, try second order correction
+        // Trial point is in the prohibited region defined by
+        // the filter, try second order correction
         if (secondOrderCorrection(m, cNorm, cNormTrial, dfTdeltaXi, 0, k)) {
           break; // SOC yielded suitable alpha, stop
         } else {
@@ -908,11 +932,13 @@ namespace casadi {
       // Check sufficient decrease, case I:
       // If we are (almost) feasible and a "switching condition" is satisfied
       // require sufficient progress in the objective instead of bi-objective condition
-      if (cNorm <= m->param->thetaMin ) {
+      if (cNorm <= m->param->thetaMin) {
         // Switching condition, part 1: grad(f)^T * deltaXi < 0 ?
-        if (dfTdeltaXi < 0 )
-          // Switching condition, part 2: alpha * ( - grad(f)^T * deltaXi )**sF > delta * cNorm**sTheta ?
-          if (alpha * pow( (-dfTdeltaXi), m->param->sF ) > m->param->delta * pow( cNorm, m->param->sTheta)) {
+        if (dfTdeltaXi < 0)
+          // Switching condition, part 2: alpha * (- grad(f)^T * deltaXi)**sF
+          // > delta * cNorm**sTheta ?
+          if (alpha * pow((-dfTdeltaXi), m->param->sF)
+          > m->param->delta * pow(cNorm, m->param->sTheta)) {
             // Switching conditions hold: Require satisfaction of Armijo condition for objective
             if (objTrial > m->vars->obj + m->param->eta*alpha*dfTdeltaXi) {
               // Armijo condition violated, try second order correction
@@ -932,7 +958,8 @@ namespace casadi {
 
       // Check sufficient decrease, case II:
       // Bi-objective (filter) condition
-      if (cNormTrial < (1.0 - m->param->gammaTheta) * cNorm || objTrial < m->vars->obj - m->param->gammaF * cNorm ) {
+      if (cNormTrial < (1.0 - m->param->gammaTheta) * cNorm
+      || objTrial < m->vars->obj - m->param->gammaF * cNorm) {
         // found suitable alpha, stop
         acceptStep(m, alpha);
         break;
@@ -948,14 +975,16 @@ namespace casadi {
     }
 
     // No step could be found by the line search
-    if (k == m->param->maxLineSearch ) return 1;
+    if (k == m->param->maxLineSearch) return 1;
 
     // Augment the filter if switching condition or Armijo condition does not hold
-    if (dfTdeltaXi >= 0 ) {
+    if (dfTdeltaXi >= 0) {
       augmentFilter(m, cNormTrial, objTrial);
-    } else if (alpha * pow( (-dfTdeltaXi), m->param->sF ) > m->param->delta * pow( cNorm, m->param->sTheta ) ) { // careful with neg. exponents!
+    } else if (alpha * pow((-dfTdeltaXi), m->param->sF)
+      > m->param->delta * pow(cNorm, m->param->sTheta)) {
+      // careful with neg. exponents!
       augmentFilter(m, cNormTrial, objTrial);
-    } else if (objTrial <= m->vars->obj + m->param->eta*alpha*dfTdeltaXi ) {
+    } else if (objTrial <= m->vars->obj + m->param->eta*alpha*dfTdeltaXi) {
       augmentFilter(m, cNormTrial, objTrial);
     }
 
@@ -976,9 +1005,9 @@ namespace casadi {
     double dfTdeltaXi, bool swCond, int it) const {
 
     // Perform SOC only on the first iteration of backtracking line search
-    if (it > 0 ) return false;
+    if (it > 0) return false;
     // If constraint violation of the trialstep is lower than the current one skip SOC
-    if (cNormTrial < cNorm ) return false;
+    if (cNormTrial < cNorm) return false;
 
     int nSOCS = 0;
     double cNormTrialSOC, cNormOld, objTrialSOC;
@@ -995,40 +1024,47 @@ namespace casadi {
 
     // Second order correction loop
     cNormOld = cNorm;
-    for (k=0; k<m->param->maxSOCiter; k++ ) {
+    for (k=0; k<m->param->maxSOCiter; k++) {
       nSOCS++;
 
       // Update bounds for SOC QP
       updateStepBounds(m, 1);
 
       // Solve SOC QP to obtain new, corrected deltaXi
-      // (store in separate vector to avoid conflict with original deltaXi -> need it in linesearch!)
+      // (store in separate vector to avoid conflict with original deltaXi
+      // -> need it in linesearch!)
       info = solveQP(m, deltaXiSOC, lambdaQPSOC, false);
-      if (info != 0 ) return false; // Could not solve QP, abort SOC
+      if (info != 0) return false; // Could not solve QP, abort SOC
 
       // Set new SOC trial point
-      for (i=0; i<nVar; i++ ) {
-        m->vars->trialXi( i ) = m->vars->xi( i ) + deltaXiSOC( i);
+      for (i=0; i<nVar; i++) {
+        m->vars->trialXi(i) = m->vars->xi(i) + deltaXiSOC(i);
       }
 
       // Compute objective and ||constr(trialXiSOC)||_1 at SOC trial point
-      m->prob->evaluate( m->vars->trialXi, &objTrialSOC, m->vars->constr, &info);
+      m->prob->evaluate(m->vars->trialXi, &objTrialSOC, m->vars->constr, &info);
       m->stats->nFunCalls++;
-      cNormTrialSOC = lInfConstraintNorm( m->vars->trialXi, m->vars->constr, m->prob->bu, m->prob->bl);
-      if (info != 0 || objTrialSOC < m->prob->objLo || objTrialSOC > m->prob->objUp || !(objTrialSOC == objTrialSOC) || !(cNormTrialSOC == cNormTrialSOC) )
+      cNormTrialSOC = lInfConstraintNorm(m->vars->trialXi, m->vars->constr,
+        m->prob->bu, m->prob->bl);
+      if (info != 0 || objTrialSOC < m->prob->objLo || objTrialSOC > m->prob->objUp
+        || !(objTrialSOC == objTrialSOC) || !(cNormTrialSOC == cNormTrialSOC)) {
         return false; // evaluation error, abort SOC
+      }
 
       // Check acceptability to the filter (in SOC)
-      if (pairInFilter(m, cNormTrialSOC, objTrialSOC)) return false; // Trial point is in the prohibited region defined by the filter, abort SOC
+      if (pairInFilter(m, cNormTrialSOC, objTrialSOC)) {
+        // Trial point is in the prohibited region defined by the filter, abort SOC
+        return false;
+      }
 
       // Check sufficient decrease, case I (in SOC)
       // (Almost feasible and switching condition holds for line search alpha)
-      if (cNorm <= m->param->thetaMin && swCond ) {
-        if (objTrialSOC > m->vars->obj + m->param->eta*dfTdeltaXi ) {
+      if (cNorm <= m->param->thetaMin && swCond) {
+        if (objTrialSOC > m->vars->obj + m->param->eta*dfTdeltaXi) {
           // Armijo condition does not hold for SOC step, next SOC step
 
           // If constraint violation gets worse by SOC, abort
-          if (cNormTrialSOC > m->param->kappaSOC * cNormOld ) {
+          if (cNormTrialSOC > m->param->kappaSOC * cNormOld) {
             return false;
           } else {
             cNormOld = cNormTrialSOC;
@@ -1042,8 +1078,9 @@ namespace casadi {
       }
 
       // Check sufficient decrease, case II (in SOC)
-      if (cNorm > m->param->thetaMin || !swCond ) {
-        if (cNormTrialSOC < (1.0 - m->param->gammaTheta) * cNorm || objTrialSOC < m->vars->obj - m->param->gammaF * cNorm ) {
+      if (cNorm > m->param->thetaMin || !swCond) {
+        if (cNormTrialSOC < (1.0 - m->param->gammaTheta) * cNorm
+        || objTrialSOC < m->vars->obj - m->param->gammaF * cNorm) {
           // found suitable alpha during SOC, stop
           acceptStep(m, deltaXiSOC, lambdaQPSOC, 1.0, nSOCS);
           return true;
@@ -1051,7 +1088,7 @@ namespace casadi {
           // Trial point is dominated by current point, next SOC step
 
           // If constraint violation gets worse by SOC, abort
-          if (cNormTrialSOC > m->param->kappaSOC * cNormOld ) {
+          if (cNormTrialSOC > m->param->kappaSOC * cNormOld) {
             return false;
           } else {
             cNormOld = cNormTrialSOC;
@@ -1071,7 +1108,7 @@ namespace casadi {
    */
   int BlocksqpInterface::feasibilityRestorationPhase(BlocksqpMemory* m) const {
     // No Feasibility restoration phase
-    if (m->param->restoreFeas == 0 ) return -1;
+    if (m->param->restoreFeas == 0) return -1;
 
     m->stats->nRestPhaseCalls++;
 
@@ -1100,22 +1137,22 @@ namespace casadi {
     restOpts->nlinfeastol = m->param->nlinfeastol;
 
     // Create and initialize the SQP method for the minimum norm NLP
-    restMethod = new blocksqp::SQPMethod( restProb, restOpts, restStats);
+    restMethod = new blocksqp::SQPMethod(restProb, restOpts, restStats);
     restMethod->init();
 
     // Iterate until a point acceptable to the filter is found
     warmStart = 0;
     for (it=0; it<maxRestIt; it++) {
       // One iteration for minimum norm NLP
-      ret = restMethod->run( 1, warmStart);
+      ret = restMethod->run(1, warmStart);
       warmStart = 1;
 
       // If restMethod yields error, stop restoration phase
-      if (ret == -1 ) break;
+      if (ret == -1) break;
 
       // Get new xi from the restoration phase
-      for (i=0; i<m->prob->nVar; i++ ) {
-        m->vars->trialXi( i ) = restMethod->vars->xi( i);
+      for (i=0; i<m->prob->nVar; i++) {
+        m->vars->trialXi(i) = restMethod->vars->xi(i);
       }
 
       // Compute objective at trial point
@@ -1135,36 +1172,41 @@ namespace casadi {
       }
 
       // If minimum norm NLP has converged, declare local infeasibility
-      if (restMethod->vars->tol < m->param->opttol && restMethod->vars->cNormS < m->param->nlinfeastol ) {
+      if (restMethod->vars->tol < m->param->opttol
+        && restMethod->vars->cNormS < m->param->nlinfeastol) {
         ret = 1;
         break;
       }
     }
 
     // Success or locally infeasible
-    if (ret == 0 || ret == 1 ) {
+    if (ret == 0 || ret == 1) {
       // Store the infinity norm of the multiplier step
       m->vars->lambdaStepNorm = 0.0;
       // Compute restoration step
-      for (k=0; k<m->prob->nVar; k++ ) {
-        m->vars->deltaXi( k ) = m->vars->xi( k);
+      for (k=0; k<m->prob->nVar; k++) {
+        m->vars->deltaXi(k) = m->vars->xi(k);
 
-        m->vars->xi( k ) = m->vars->trialXi( k);
+        m->vars->xi(k) = m->vars->trialXi(k);
 
         // Store lInf norm of dual step
-        if ((lStpNorm = fabs( restMethod->vars->lambda( k ) - m->vars->lambda( k ) )) > m->vars->lambdaStepNorm )
+        if ((lStpNorm = fabs(restMethod->vars->lambda(k) - m->vars->lambda(k)))
+          > m->vars->lambdaStepNorm) {
           m->vars->lambdaStepNorm = lStpNorm;
-        m->vars->lambda( k ) = restMethod->vars->lambda( k);
-        m->vars->lambdaQP( k ) = restMethod->vars->lambdaQP( k);
+        }
+        m->vars->lambda(k) = restMethod->vars->lambda(k);
+        m->vars->lambdaQP(k) = restMethod->vars->lambdaQP(k);
 
-        m->vars->deltaXi( k ) -= m->vars->xi( k);
+        m->vars->deltaXi(k) -= m->vars->xi(k);
       }
-      for (k=m->prob->nVar; k<m->prob->nVar+m->prob->nCon; k++ ) {
+      for (k=m->prob->nVar; k<m->prob->nVar+m->prob->nCon; k++) {
         // skip the dual variables for the slack variables in the restoration problem
-        if ((lStpNorm = fabs( restMethod->vars->lambda( 2*m->prob->nCon + k ) - m->vars->lambda( k ) )) > m->vars->lambdaStepNorm )
+        if ((lStpNorm = fabs(restMethod->vars->lambda(2*m->prob->nCon + k)
+          - m->vars->lambda(k))) > m->vars->lambdaStepNorm) {
           m->vars->lambdaStepNorm = lStpNorm;
-        m->vars->lambda( k ) = restMethod->vars->lambda( 2*m->prob->nCon + k);
-        m->vars->lambdaQP( k ) = restMethod->vars->lambdaQP( 2*m->prob->nCon + k);
+        }
+        m->vars->lambda(k) = restMethod->vars->lambda(2*m->prob->nCon + k);
+        m->vars->lambdaQP(k) = restMethod->vars->lambdaQP(2*m->prob->nCon + k);
       }
       m->vars->alpha = 1.0;
       m->vars->nSOCS = 0;
@@ -1176,7 +1218,7 @@ namespace casadi {
       resetHessian(m);
     }
 
-    if (ret == 1 ) {
+    if (ret == 1) {
       m->stats->printProgress(m->prob, m->vars, m->param, 0);
       printf("The problem seems to be locally infeasible. Infeasibilities minimized.\n");
     }
@@ -1205,20 +1247,22 @@ namespace casadi {
     info = 0;
 
     // Call problem specific heuristic to reduce constraint violation.
-    // For shooting methods that means setting consistent values for shooting nodes by one forward integration.
-    for (k=0; k<m->prob->nVar; k++ ) // input: last successful step
-      m->vars->trialXi( k ) = m->vars->xi( k);
-    m->prob->reduceConstrVio( m->vars->trialXi, &info);
-    if (info ) {
+    // For shooting methods that means setting consistent values for
+    // shooting nodes by one forward integration.
+    for (k=0; k<m->prob->nVar; k++) // input: last successful step
+      m->vars->trialXi(k) = m->vars->xi(k);
+    m->prob->reduceConstrVio(m->vars->trialXi, &info);
+    if (info) {
       // If an error occured in restoration heuristics, abort
       return -1;
     }
 
     // Compute objective and constraints at the new (hopefully feasible) point
-    m->prob->evaluate( m->vars->trialXi, &m->vars->obj, m->vars->constr, &info);
+    m->prob->evaluate(m->vars->trialXi, &m->vars->obj, m->vars->constr, &info);
     m->stats->nFunCalls++;
-    cNormTrial = lInfConstraintNorm( m->vars->trialXi, m->vars->constr, m->prob->bu, m->prob->bl);
-    if (info != 0 || m->vars->obj < m->prob->objLo || m->vars->obj > m->prob->objUp || !(m->vars->obj == m->vars->obj) || !(cNormTrial == cNormTrial) )
+    cNormTrial = lInfConstraintNorm(m->vars->trialXi, m->vars->constr, m->prob->bu, m->prob->bl);
+    if (info != 0 || m->vars->obj < m->prob->objLo || m->vars->obj > m->prob->objUp
+      || !(m->vars->obj == m->vars->obj) || !(cNormTrial == cNormTrial))
       return -1;
 
     // Is the new point acceptable for the filter?
@@ -1238,14 +1282,14 @@ namespace casadi {
     m->vars->reducedStepCount = 0;
 
     // Reset lambda
-    m->vars->lambda.Initialize( 0.0);
-    m->vars->lambdaQP.Initialize( 0.0);
+    m->vars->lambda.Initialize(0.0);
+    m->vars->lambdaQP.Initialize(0.0);
 
     // Compute the "step" taken by closing the continuity conditions
     /// \note deltaXi is reset by resetHessian(), so this doesn't matter
-    for (k=0; k<m->prob->nVar; k++ ) {
-      //m->vars->deltaXi( k ) = m->vars->trialXi( k ) - m->vars->xi( k);
-      m->vars->xi( k ) = m->vars->trialXi( k);
+    for (k=0; k<m->prob->nVar; k++) {
+      //m->vars->deltaXi(k) = m->vars->trialXi(k) - m->vars->xi(k);
+      m->vars->xi(k) = m->vars->trialXi(k);
     }
 
     // reduce Hessian and limited memory information
@@ -1264,15 +1308,16 @@ namespace casadi {
     blocksqp::Matrix trialConstr, trialGradLagrange;
 
     // Compute new trial point
-    for (i=0; i<m->prob->nVar; i++ )
-      m->vars->trialXi( i ) = m->vars->xi( i ) + m->vars->deltaXi( i);
+    for (i=0; i<m->prob->nVar; i++)
+      m->vars->trialXi(i) = m->vars->xi(i) + m->vars->deltaXi(i);
 
     // Compute objective and ||constr(trialXi)|| at trial point
-    trialConstr.Dimension( m->prob->nCon ).Initialize( 0.0);
-    m->prob->evaluate( m->vars->trialXi, &objTrial, trialConstr, &info);
+    trialConstr.Dimension(m->prob->nCon).Initialize(0.0);
+    m->prob->evaluate(m->vars->trialXi, &objTrial, trialConstr, &info);
     m->stats->nFunCalls++;
-    cNormTrial = lInfConstraintNorm( m->vars->trialXi, trialConstr, m->prob->bu, m->prob->bl);
-    if (info != 0 || objTrial < m->prob->objLo || objTrial > m->prob->objUp || !(objTrial == objTrial) || !(cNormTrial == cNormTrial) ) {
+    cNormTrial = lInfConstraintNorm(m->vars->trialXi, trialConstr, m->prob->bu, m->prob->bl);
+    if (info != 0 || objTrial < m->prob->objLo || objTrial > m->prob->objUp
+      || !(objTrial == objTrial) || !(cNormTrial == cNormTrial)) {
       // evaluation error
       return 1;
     }
@@ -1280,8 +1325,8 @@ namespace casadi {
     // Compute KKT error of the new point
 
     // scaled norm of Lagrangian gradient
-    trialGradLagrange.Dimension( m->prob->nVar ).Initialize( 0.0);
-    if (m->param->sparseQP ) {
+    trialGradLagrange.Dimension(m->prob->nVar).Initialize(0.0);
+    if (m->param->sparseQP) {
       calcLagrangeGradient(m, m->vars->lambdaQP, m->vars->gradObj, m->vars->jacNz,
                             m->vars->jacIndRow, m->vars->jacIndCol, trialGradLagrange, 0);
     } else {
@@ -1289,10 +1334,10 @@ namespace casadi {
                             trialGradLagrange, 0);
     }
 
-    trialGradNorm = lInfVectorNorm( trialGradLagrange);
-    trialTol = trialGradNorm /( 1.0 + lInfVectorNorm( m->vars->lambdaQP ));
+    trialGradNorm = lInfVectorNorm(trialGradLagrange);
+    trialTol = trialGradNorm /(1.0 + lInfVectorNorm(m->vars->lambdaQP));
 
-    if (fmax( cNormTrial, trialTol ) < m->param->kappaF * fmax( m->vars->cNorm, m->vars->tol ) ) {
+    if (fmax(cNormTrial, trialTol) < m->param->kappaF * fmax(m->vars->cNorm, m->vars->tol)) {
       acceptStep(m, 1.0);
       return 0;
     } else {
@@ -1306,8 +1351,8 @@ namespace casadi {
    */
   bool BlocksqpInterface::
   pairInFilter(BlocksqpMemory* m, double cNorm, double obj) const {
-    std::set< std::pair<double,double> >::iterator iter;
-    std::set< std::pair<double,double> > *filter;
+    std::set< std::pair<double, double> >::iterator iter;
+    std::set< std::pair<double, double> > *filter;
     filter = m->vars->filter;
 
     /*
@@ -1321,10 +1366,10 @@ namespace casadi {
      * as dominated
      */
 
-    for (iter=filter->begin(); iter!=filter->end(); iter++ )
+    for (iter=filter->begin(); iter!=filter->end(); iter++)
       if ((cNorm >= (1.0 - m->param->gammaTheta) * iter->first ||
-           (cNorm < 0.01 * m->param->nlinfeastol && iter->first < 0.01 * m->param->nlinfeastol ) ) &&
-          obj >= iter->second - m->param->gammaF * iter->first ) {
+           (cNorm < 0.01 * m->param->nlinfeastol && iter->first < 0.01 * m->param->nlinfeastol)) &&
+          obj >= iter->second - m->param->gammaF * iter->first) {
         return 1;
       }
 
@@ -1333,19 +1378,19 @@ namespace casadi {
 
 
   void BlocksqpInterface::initializeFilter(BlocksqpMemory* m) const {
-    std::set< std::pair<double,double> >::iterator iter;
-    std::pair<double,double> initPair ( m->param->thetaMax, m->prob->objLo);
+    std::set< std::pair<double, double> >::iterator iter;
+    std::pair<double, double> initPair(m->param->thetaMax, m->prob->objLo);
 
     // Remove all elements
     iter=m->vars->filter->begin();
     while (iter != m->vars->filter->end()) {
-      std::set< std::pair<double,double> >::iterator iterToRemove = iter;
+      std::set< std::pair<double, double> >::iterator iterToRemove = iter;
       iter++;
-      m->vars->filter->erase( iterToRemove);
+      m->vars->filter->erase(iterToRemove);
     }
 
-    // Initialize with pair ( maxConstrViolation, objLowerBound);
-    m->vars->filter->insert( initPair);
+    // Initialize with pair (maxConstrViolation, objLowerBound);
+    m->vars->filter->insert(initPair);
   }
 
 
@@ -1355,28 +1400,24 @@ namespace casadi {
    */
   void BlocksqpInterface::
   augmentFilter(BlocksqpMemory* m, double cNorm, double obj) const {
-    std::set< std::pair<double,double> >::iterator iter;
-    std::pair<double,double> entry ( (1.0 - m->param->gammaTheta)*cNorm, obj - m->param->gammaF*cNorm);
+    std::set< std::pair<double, double> >::iterator iter;
+    std::pair<double, double> entry((1.0 - m->param->gammaTheta)*cNorm, obj
+      - m->param->gammaF*cNorm);
 
     // Augment filter by current element
-    m->vars->filter->insert( entry);
+    m->vars->filter->insert(entry);
 
     // Remove dominated elements
     iter=m->vars->filter->begin();
     while (iter != m->vars->filter->end()) {
-      //printf(" iter->first=%g, entry.first=%g, iter->second=%g, entry.second=%g\n",iter->first, entry.first, iter->second, entry.second);
-      if (iter->first > entry.first && iter->second > entry.second ) {
-        std::set< std::pair<double,double> >::iterator iterToRemove = iter;
+      if (iter->first > entry.first && iter->second > entry.second) {
+        std::set< std::pair<double, double> >::iterator iterToRemove = iter;
         iter++;
-        m->vars->filter->erase( iterToRemove);
+        m->vars->filter->erase(iterToRemove);
       } else {
         iter++;
       }
     }
-    // Print current filter
-    //for (iter=m->vars->filter->begin(); iter!=m->vars->filter->end(); iter++ )
-    //printf("(%g,%g), ", iter->first, iter->second);
-    //printf("\n");
   }
 
   /**
@@ -1385,9 +1426,10 @@ namespace casadi {
   void BlocksqpInterface::calcInitialHessian(BlocksqpMemory* m) const {
     int iBlock;
 
-    for (iBlock=0; iBlock<m->vars->nBlocks; iBlock++ )
+    for (iBlock=0; iBlock<m->vars->nBlocks; iBlock++)
       //if objective derv is computed exactly, don't set the last block!
-      if (!(m->param->whichSecondDerv == 1 && m->param->blockHess && iBlock == m->vars->nBlocks-1) )
+      if (!(m->param->whichSecondDerv == 1 && m->param->blockHess
+        && iBlock == m->vars->nBlocks-1))
         calcInitialHessian(m, iBlock);
   }
 
@@ -1395,27 +1437,29 @@ namespace casadi {
   /**
    * Initial Hessian for one block: Identity matrix
    */
-  void BlocksqpInterface::calcInitialHessian(BlocksqpMemory* m, int iBlock ) const {
-    m->vars->hess[iBlock].Initialize( 0.0);
+  void BlocksqpInterface::calcInitialHessian(BlocksqpMemory* m, int iBlock) const {
+    m->vars->hess[iBlock].Initialize(0.0);
 
     // Each block is a diagonal matrix
-    for (int i=0; i<m->vars->hess[iBlock].M(); i++ )
-      m->vars->hess[iBlock]( i, i ) = m->param->iniHessDiag;
+    for (int i=0; i<m->vars->hess[iBlock].M(); i++)
+      m->vars->hess[iBlock](i, i) = m->param->iniHessDiag;
 
     // If we maintain 2 Hessians, also reset the second one
-    if (m->vars->hess2 != 0 ) {
-      m->vars->hess2[iBlock].Initialize( 0.0);
-      for (int i=0; i<m->vars->hess2[iBlock].M(); i++ )
-        m->vars->hess2[iBlock]( i, i ) = m->param->iniHessDiag;
+    if (m->vars->hess2 != 0) {
+      m->vars->hess2[iBlock].Initialize(0.0);
+      for (int i=0; i<m->vars->hess2[iBlock].M(); i++)
+        m->vars->hess2[iBlock](i, i) = m->param->iniHessDiag;
     }
   }
 
 
   void BlocksqpInterface::resetHessian(BlocksqpMemory* m) const {
-    for (int iBlock=0; iBlock<m->vars->nBlocks; iBlock++ )
+    for (int iBlock=0; iBlock<m->vars->nBlocks; iBlock++) {
       //if objective derv is computed exactly, don't set the last block!
-      if (!(m->param->whichSecondDerv == 1 && m->param->blockHess && iBlock == m->vars->nBlocks - 1) )
+      if (!(m->param->whichSecondDerv == 1 && m->param->blockHess
+        && iBlock == m->vars->nBlocks - 1))
         resetHessian(m, iBlock);
+      }
   }
 
 
@@ -1424,21 +1468,24 @@ namespace casadi {
     int nVarLocal = m->vars->hess[iBlock].M();
 
     // smallGamma and smallDelta are either subvectors of gamma and delta
-    // or submatrices of gammaMat, deltaMat, i.e. subvectors of gamma and delta from m prev. iterations (for L-BFGS)
-    smallGamma.Submatrix( m->vars->gammaMat, nVarLocal, m->vars->gammaMat.N(), m->vars->blockIdx[iBlock], 0);
-    smallDelta.Submatrix( m->vars->deltaMat, nVarLocal, m->vars->deltaMat.N(), m->vars->blockIdx[iBlock], 0);
+    // or submatrices of gammaMat, deltaMat, i.e. subvectors of gamma and delta
+    // from m prev. iterations (for L-BFGS)
+    smallGamma.Submatrix(m->vars->gammaMat, nVarLocal, m->vars->gammaMat.N(),
+      m->vars->blockIdx[iBlock], 0);
+    smallDelta.Submatrix(m->vars->deltaMat, nVarLocal, m->vars->deltaMat.N(),
+      m->vars->blockIdx[iBlock], 0);
 
     // Remove past information on Lagrangian gradient difference
-    smallGamma.Initialize( 0.0);
+    smallGamma.Initialize(0.0);
 
     // Remove past information on steps
-    smallDelta.Initialize( 0.0);
+    smallDelta.Initialize(0.0);
 
     // Remove information on old scalars (used for COL sizing)
-    m->vars->deltaNorm( iBlock ) = 1.0;
-    m->vars->deltaGamma( iBlock ) = 0.0;
-    m->vars->deltaNormOld( iBlock ) = 1.0;
-    m->vars->deltaGammaOld( iBlock ) = 0.0;
+    m->vars->deltaNorm(iBlock) = 1.0;
+    m->vars->deltaGamma(iBlock) = 0.0;
+    m->vars->deltaNormOld(iBlock) = 1.0;
+    m->vars->deltaGammaOld(iBlock) = 0.0;
 
     m->vars->noUpdateCounter[iBlock] = -1;
 
@@ -1452,86 +1499,90 @@ namespace casadi {
     int iVar, jVar, k, iBlock, maxBlock, info, idx, idx1, idx2;
     double dummy, lowerVio, upperVio;
     blocksqp::Matrix pert;
-    blocksqp::SQPiterate varsP = blocksqp::SQPiterate( *m->vars);
+    blocksqp::SQPiterate varsP = blocksqp::SQPiterate(*m->vars);
 
     const double myDelta = 1.0e-4;
     const double minDelta = 1.0e-6;
 
-    pert.Dimension( m->prob->nVar);
+    pert.Dimension(m->prob->nVar);
 
     info = 0;
 
     // Find out the largest block
     maxBlock = 0;
-    for (iBlock=0; iBlock<m->vars->nBlocks; iBlock++ )
-      if (m->vars->blockIdx[iBlock+1] - m->vars->blockIdx[iBlock] > maxBlock )
+    for (iBlock=0; iBlock<m->vars->nBlocks; iBlock++)
+      if (m->vars->blockIdx[iBlock+1] - m->vars->blockIdx[iBlock] > maxBlock)
         maxBlock = m->vars->blockIdx[iBlock+1] - m->vars->blockIdx[iBlock];
 
     // Compute original Lagrange gradient
     calcLagrangeGradient(m, m->vars->lambda, m->vars->gradObj, m->vars->jacNz,
       m->vars->jacIndRow, m->vars->jacIndCol, m->vars->gradLagrange, 0);
 
-    for (iVar = 0; iVar<maxBlock; iVar++ ) {
-      pert.Initialize( 0.0);
+    for (iVar = 0; iVar<maxBlock; iVar++) {
+      pert.Initialize(0.0);
 
       // Perturb all blocks simultaneously
-      for (iBlock=0; iBlock<m->vars->nBlocks; iBlock++ ) {
+      for (iBlock=0; iBlock<m->vars->nBlocks; iBlock++) {
         idx = m->vars->blockIdx[iBlock] + iVar;
         // Skip blocks that have less than iVar variables
-        if (idx < m->vars->blockIdx[iBlock+1] ) {
-          pert( idx ) = myDelta * fabs( m->vars->xi( idx ));
-          pert( idx ) = fmax( pert( idx ), minDelta);
+        if (idx < m->vars->blockIdx[iBlock+1]) {
+          pert(idx) = myDelta * fabs(m->vars->xi(idx));
+          pert(idx) = fmax(pert(idx), minDelta);
 
           // If perturbation violates upper bound, try to perturb with negative
-          upperVio = m->vars->xi( idx ) + pert( idx ) - m->prob->bu( idx);
-          if (upperVio > 0 ) {
-            lowerVio = m->prob->bl( idx ) -  ( m->vars->xi( idx ) - pert( idx ));
+          upperVio = m->vars->xi(idx) + pert(idx) - m->prob->bu(idx);
+          if (upperVio > 0) {
+            lowerVio = m->prob->bl(idx) -  (m->vars->xi(idx) - pert(idx));
             // If perturbation violates also lower bound, take the largest perturbation possible
-            if (lowerVio > 0 ) {
-              if (lowerVio > upperVio )
-                pert( idx ) = -lowerVio;
+            if (lowerVio > 0) {
+              if (lowerVio > upperVio)
+                pert(idx) = -lowerVio;
               else
-                pert( idx ) = upperVio;
+                pert(idx) = upperVio;
             } else {
               // If perturbation does not violate lower bound, take -computed perturbation
-              pert( idx ) = -pert( idx);
+              pert(idx) = -pert(idx);
             }
           }
         }
       }
 
       // Add perturbation
-      for (k=0; k<m->prob->nVar; k++ )
-        m->vars->xi( k ) += pert( k);
+      for (k=0; k<m->prob->nVar; k++)
+        m->vars->xi(k) += pert(k);
 
       // Compute perturbed Lagrange gradient
-      if (m->param->sparseQP ) {
-        m->prob->evaluate( m->vars->xi, m->vars->lambda, &dummy, varsP.constr, varsP.gradObj,
+      if (m->param->sparseQP) {
+        m->prob->evaluate(m->vars->xi, m->vars->lambda, &dummy, varsP.constr, varsP.gradObj,
                         varsP.jacNz, varsP.jacIndRow, varsP.jacIndCol, m->vars->hess, 1, &info);
-        calcLagrangeGradient(m, m->vars->lambda, varsP.gradObj, varsP.jacNz, varsP.jacIndRow,
-                              varsP.jacIndCol, varsP.gradLagrange, 0);
+        calcLagrangeGradient(m, m->vars->lambda, varsP.gradObj, varsP.jacNz,
+          varsP.jacIndRow, varsP.jacIndCol, varsP.gradLagrange, 0);
       } else {
-        m->prob->evaluate( m->vars->xi, m->vars->lambda, &dummy, varsP.constr, varsP.gradObj, varsP.constrJac, m->vars->hess, 1, &info);
-        calcLagrangeGradient(m, m->vars->lambda, varsP.gradObj, varsP.constrJac, varsP.gradLagrange, 0);
+        m->prob->evaluate(m->vars->xi, m->vars->lambda, &dummy, varsP.constr, varsP.gradObj,
+          varsP.constrJac, m->vars->hess, 1, &info);
+        calcLagrangeGradient(m, m->vars->lambda, varsP.gradObj,
+          varsP.constrJac, varsP.gradLagrange, 0);
       }
 
       // Compute finite difference approximations: one column in every block
-      for (iBlock=0; iBlock<m->vars->nBlocks; iBlock++ ) {
+      for (iBlock=0; iBlock<m->vars->nBlocks; iBlock++) {
         idx1 = m->vars->blockIdx[iBlock] + iVar;
         // Skip blocks that have less than iVar variables
-        if (idx1 < m->vars->blockIdx[iBlock+1] ) {
-          for (jVar=iVar; jVar<m->vars->blockIdx[iBlock+1]-m->vars->blockIdx[iBlock]; jVar++ )
-            {// Take symmetrized matrices
+        if (idx1 < m->vars->blockIdx[iBlock+1]) {
+          for (jVar=iVar; jVar<m->vars->blockIdx[iBlock+1]-m->vars->blockIdx[iBlock]; jVar++) {
+            // Take symmetrized matrices
               idx2 = m->vars->blockIdx[iBlock] + jVar;
-              m->vars->hess[iBlock]( iVar, jVar ) =  ( varsP.gradLagrange( idx1 ) - m->vars->gradLagrange( idx2 ));
-              m->vars->hess[iBlock]( iVar, jVar ) += ( varsP.gradLagrange( idx2 ) - m->vars->gradLagrange( idx1 ));
-              m->vars->hess[iBlock]( iVar, jVar ) *= 0.5 / pert( idx1);
+              m->vars->hess[iBlock](iVar, jVar) = varsP.gradLagrange(idx1)
+                - m->vars->gradLagrange(idx2);
+              m->vars->hess[iBlock](iVar, jVar) += (varsP.gradLagrange(idx2)
+                - m->vars->gradLagrange(idx1));
+              m->vars->hess[iBlock](iVar, jVar) *= 0.5 / pert(idx1);
             }
         }
       }
 
       // Subtract perturbation
-      for (k=0; k<m->prob->nVar; k++ ) m->vars->xi( k ) -= pert( k);
+      for (k=0; k<m->prob->nVar; k++) m->vars->xi(k) -= pert(k);
     }
 
     return info;
@@ -1544,27 +1595,26 @@ namespace casadi {
     double scale;
     double myEps = 1.0e3 * m->param->eps;
 
-    if (option == 1 ) {
+    if (option == 1) {
       // Shanno-Phua
-      scale = adotb( gamma, gamma ) / fmax( adotb( delta, gamma ), myEps);
-    }
-    else if (option == 2 ) {
+      scale = adotb(gamma, gamma) / fmax(adotb(delta, gamma), myEps);
+    } else if (option == 2) {
       // Oren-Luenberger
-      scale = adotb( delta, gamma ) / fmax( adotb( delta, delta ), myEps);
-      scale = fmin( scale, 1.0);
-    } else if (option == 3 ) {
+      scale = adotb(delta, gamma) / fmax(adotb(delta, delta), myEps);
+      scale = fmin(scale, 1.0);
+    } else if (option == 3) {
       // Geometric mean of 1 and 2
-      scale = sqrt( adotb( gamma, gamma ) / fmax( adotb( delta, delta ), myEps ));
+      scale = sqrt(adotb(gamma, gamma) / fmax(adotb(delta, delta), myEps));
     } else {
       // Invalid option, ignore
       return;
     }
 
-    if (scale > 0.0 ) {
-      scale = fmax( scale, myEps);
-      for (i=0; i<m->vars->hess[iBlock].M(); i++ )
-        for (j=i; j<m->vars->hess[iBlock].M(); j++ )
-          m->vars->hess[iBlock]( i,j ) *= scale;
+    if (scale > 0.0) {
+      scale = fmax(scale, myEps);
+      for (i=0; i<m->vars->hess[iBlock].M(); i++)
+        for (j=i; j<m->vars->hess[iBlock].M(); j++)
+          m->vars->hess[iBlock](i, j) *= scale;
     } else {
       scale = 1.0;
     }
@@ -1586,32 +1636,32 @@ namespace casadi {
     deltaNormOld = m->vars->deltaNormOld(iBlock);
     deltaGammaOld = m->vars->deltaGammaOld(iBlock);
     deltaBdelta = 0.0;
-    for (i=0; i<delta.M(); i++ )
-      for (j=0; j<delta.M(); j++ )
-        deltaBdelta += delta( i ) * m->vars->hess[iBlock]( i, j ) * delta( j);
+    for (i=0; i<delta.M(); i++)
+      for (j=0; j<delta.M(); j++)
+        deltaBdelta += delta(i) * m->vars->hess[iBlock](i, j) * delta(j);
 
     // Centered Oren-Luenberger factor
-    if (m->vars->noUpdateCounter[iBlock] == -1 ) {
+    if (m->vars->noUpdateCounter[iBlock] == -1) {
       // in the first iteration, this should equal the OL factor
       theta = 1.0;
     } else {
-      theta = fmin( m->param->colTau1, m->param->colTau2 * deltaNorm);
+      theta = fmin(m->param->colTau1, m->param->colTau2 * deltaNorm);
     }
-    if (deltaNorm > myEps && deltaNormOld > myEps ) {
+    if (deltaNorm > myEps && deltaNormOld > myEps) {
       scale = (1.0 - theta)*deltaGammaOld / deltaNormOld + theta*deltaBdelta / deltaNorm;
-      if (scale > m->param->eps )
-        scale = ( (1.0 - theta)*deltaGammaOld / deltaNormOld + theta*deltaGamma / deltaNorm ) / scale;
+      if (scale > m->param->eps)
+        scale = ((1.0 - theta)*deltaGammaOld / deltaNormOld + theta*deltaGamma / deltaNorm) / scale;
     } else {
       scale = 1.0;
     }
 
     // Size only if factor is between zero and one
-    if (scale < 1.0 && scale > 0.0 ) {
-      scale = fmax( m->param->colEps, scale);
+    if (scale < 1.0 && scale > 0.0) {
+      scale = fmax(m->param->colEps, scale);
       //printf("Sizing value (COL) block %i = %g\n", iBlock, scale);
-      for (i=0; i<m->vars->hess[iBlock].M(); i++ )
-        for (j=i; j<m->vars->hess[iBlock].M(); j++ )
-          m->vars->hess[iBlock]( i,j ) *= scale;
+      for (i=0; i<m->vars->hess[iBlock].M(); i++)
+        for (j=i; j<m->vars->hess[iBlock].M(); j++)
+          m->vars->hess[iBlock](i, j) *= scale;
 
       // statistics: average sizing factor
       m->stats->averageSizingFactor += scale;
@@ -1631,7 +1681,7 @@ namespace casadi {
     bool firstIter;
 
     //if objective derv is computed exactly, don't set the last block!
-    if (m->param->whichSecondDerv == 1 && m->param->blockHess )
+    if (m->param->whichSecondDerv == 1 && m->param->blockHess)
       nBlocks = m->vars->nBlocks - 1;
     else
       nBlocks = m->vars->nBlocks;
@@ -1640,53 +1690,56 @@ namespace casadi {
     m->stats->hessDamped = 0;
     m->stats->averageSizingFactor = 0.0;
 
-    for (iBlock=0; iBlock<nBlocks; iBlock++ ) {
+    for (iBlock=0; iBlock<nBlocks; iBlock++) {
       nVarLocal = m->vars->hess[iBlock].M();
 
-      // smallGamma and smallDelta are subvectors of gamma and delta, corresponding to partially separability
-      smallGamma.Submatrix( m->vars->gammaMat, nVarLocal, m->vars->gammaMat.N(), m->vars->blockIdx[iBlock], 0);
-      smallDelta.Submatrix( m->vars->deltaMat, nVarLocal, m->vars->deltaMat.N(), m->vars->blockIdx[iBlock], 0);
+      // smallGamma and smallDelta are subvectors of gamma and delta,
+      // corresponding to partially separability
+      smallGamma.Submatrix(m->vars->gammaMat, nVarLocal, m->vars->gammaMat.N(),
+        m->vars->blockIdx[iBlock], 0);
+      smallDelta.Submatrix(m->vars->deltaMat, nVarLocal, m->vars->deltaMat.N(),
+        m->vars->blockIdx[iBlock], 0);
 
       // Is this the first iteration or the first after a Hessian reset?
-      firstIter = ( m->vars->noUpdateCounter[iBlock] == -1);
+      firstIter = (m->vars->noUpdateCounter[iBlock] == -1);
 
       // Update sTs, sTs_ and sTy, sTy_
       m->vars->deltaNormOld(iBlock) = m->vars->deltaNorm(iBlock);
       m->vars->deltaGammaOld(iBlock) = m->vars->deltaGamma(iBlock);
-      m->vars->deltaNorm(iBlock) = adotb( smallDelta, smallDelta);
-      m->vars->deltaGamma(iBlock) = adotb( smallDelta, smallGamma);
+      m->vars->deltaNorm(iBlock) = adotb(smallDelta, smallDelta);
+      m->vars->deltaGamma(iBlock) = adotb(smallDelta, smallGamma);
 
       // Sizing before the update
-      if (hessScaling < 4 && firstIter )
+      if (hessScaling < 4 && firstIter)
         sizeInitialHessian(m, smallGamma, smallDelta, iBlock, hessScaling);
-      else if (hessScaling == 4 )
+      else if (hessScaling == 4)
         sizeHessianCOL(m, smallGamma, smallDelta, iBlock);
 
       // Compute the new update
-      if (updateType == 1 ) {
+      if (updateType == 1) {
         calcSR1(m, smallGamma, smallDelta, iBlock);
 
         // Prepare to compute fallback update as well
         m->vars->hess = m->vars->hess2;
 
         // Sizing the fallback update
-        if (m->param->fallbackScaling < 4 && firstIter )
+        if (m->param->fallbackScaling < 4 && firstIter)
           sizeInitialHessian(m, smallGamma, smallDelta, iBlock, m->param->fallbackScaling);
-        else if (m->param->fallbackScaling == 4 )
+        else if (m->param->fallbackScaling == 4)
           sizeHessianCOL(m, smallGamma, smallDelta, iBlock);
 
         // Compute fallback update
-        if (m->param->fallbackUpdate == 2 )
+        if (m->param->fallbackUpdate == 2)
           calcBFGS(m, smallGamma, smallDelta, iBlock);
 
         // Reset pointer
         m->vars->hess = m->vars->hess1;
-      } else if (updateType == 2 ) {
+      } else if (updateType == 2) {
         calcBFGS(m, smallGamma, smallDelta, iBlock);
       }
 
       // If an update is skipped to often, reset Hessian block
-      if (m->vars->noUpdateCounter[iBlock] > m->param->maxConsecSkippedUpdates ) {
+      if (m->vars->noUpdateCounter[iBlock] > m->param->maxConsecSkippedUpdates) {
         resetHessian(m, iBlock);
       }
     }
@@ -1706,7 +1759,7 @@ namespace casadi {
     double averageSizingFactor;
 
     //if objective derv is computed exactly, don't set the last block!
-    if (m->param->whichSecondDerv == 1 && m->param->blockHess ) {
+    if (m->param->whichSecondDerv == 1 && m->param->blockHess) {
       nBlocks = m->vars->nBlocks - 1;
     } else {
       nBlocks = m->vars->nBlocks;
@@ -1717,16 +1770,18 @@ namespace casadi {
     m->stats->hessSkipped = 0;
     m->stats->averageSizingFactor = 0.0;
 
-    for (iBlock=0; iBlock<nBlocks; iBlock++ ) {
+    for (iBlock=0; iBlock<nBlocks; iBlock++) {
       nVarLocal = m->vars->hess[iBlock].M();
 
       // smallGamma and smallDelta are submatrices of gammaMat, deltaMat,
       // i.e. subvectors of gamma and delta from m prev. iterations
-      smallGamma.Submatrix( m->vars->gammaMat, nVarLocal, m->vars->gammaMat.N(), m->vars->blockIdx[iBlock], 0);
-      smallDelta.Submatrix( m->vars->deltaMat, nVarLocal, m->vars->deltaMat.N(), m->vars->blockIdx[iBlock], 0);
+      smallGamma.Submatrix(m->vars->gammaMat, nVarLocal, m->vars->gammaMat.N(),
+        m->vars->blockIdx[iBlock], 0);
+      smallDelta.Submatrix(m->vars->deltaMat, nVarLocal, m->vars->deltaMat.N(),
+        m->vars->blockIdx[iBlock], 0);
 
       // Memory structure
-      if (m->stats->itCount > smallGamma.N() ) {
+      if (m->stats->itCount > smallGamma.N()) {
         m2 = smallGamma.N();
         posOldest = m->stats->itCount % m2;
         posNewest = (m->stats->itCount-1) % m2;
@@ -1738,29 +1793,29 @@ namespace casadi {
 
       // Set B_0 (pretend it's the first step)
       calcInitialHessian(m, iBlock);
-      m->vars->deltaNorm(iBlock ) = 1.0;
-      m->vars->deltaNormOld(iBlock ) = 1.0;
-      m->vars->deltaGamma( iBlock ) = 0.0;
-      m->vars->deltaGammaOld( iBlock ) = 0.0;
+      m->vars->deltaNorm(iBlock) = 1.0;
+      m->vars->deltaNormOld(iBlock) = 1.0;
+      m->vars->deltaGamma(iBlock) = 0.0;
+      m->vars->deltaGammaOld(iBlock) = 0.0;
       m->vars->noUpdateCounter[iBlock] = -1;
 
       // Size the initial update, but with the most recent delta/gamma-pair
-      gammai.Submatrix( smallGamma, nVarLocal, 1, 0, posNewest);
-      deltai.Submatrix( smallDelta, nVarLocal, 1, 0, posNewest);
+      gammai.Submatrix(smallGamma, nVarLocal, 1, 0, posNewest);
+      deltai.Submatrix(smallDelta, nVarLocal, 1, 0, posNewest);
       sizeInitialHessian(m, gammai, deltai, iBlock, hessScaling);
 
-      for (i=0; i<m2; i++ ) {
+      for (i=0; i<m2; i++) {
         pos = (posOldest+i) % m2;
 
         // Get new vector from list
-        gammai.Submatrix( smallGamma, nVarLocal, 1, 0, pos);
-        deltai.Submatrix( smallDelta, nVarLocal, 1, 0, pos);
+        gammai.Submatrix(smallGamma, nVarLocal, 1, 0, pos);
+        deltai.Submatrix(smallDelta, nVarLocal, 1, 0, pos);
 
         // Update sTs, sTs_ and sTy, sTy_
         m->vars->deltaNormOld(iBlock) = m->vars->deltaNorm(iBlock);
         m->vars->deltaGammaOld(iBlock) = m->vars->deltaGamma(iBlock);
-        m->vars->deltaNorm(iBlock) = adotb( deltai, deltai);
-        m->vars->deltaGamma(iBlock) = adotb( gammai, deltai);
+        m->vars->deltaNorm(iBlock) = adotb(deltai, deltai);
+        m->vars->deltaGamma(iBlock) = adotb(gammai, deltai);
 
         // Save statistics, we want to record them only for the most recent update
         averageSizingFactor = m->stats->averageSizingFactor;
@@ -1771,34 +1826,36 @@ namespace casadi {
         if (hessScaling == 4) sizeHessianCOL(m, gammai, deltai, iBlock);
 
         // Compute the new update
-        if (updateType == 1 ) {
+        if (updateType == 1) {
           calcSR1(m, gammai, deltai, iBlock);
-        } else if (updateType == 2 ) {
+        } else if (updateType == 2) {
           calcBFGS(m, gammai, deltai, iBlock);
         }
 
         m->stats->nTotalUpdates++;
 
         // Count damping statistics only for the most recent update
-        if (pos != posNewest ) {
+        if (pos != posNewest) {
           m->stats->hessDamped = hessDamped;
           m->stats->hessSkipped = hessSkipped;
-          if (hessScaling == 4 )
+          if (hessScaling == 4)
             m->stats->averageSizingFactor = averageSizingFactor;
         }
       }
 
       // If an update is skipped to often, reset Hessian block
-      if (m->vars->noUpdateCounter[iBlock] > m->param->maxConsecSkippedUpdates ) {
+      if (m->vars->noUpdateCounter[iBlock] > m->param->maxConsecSkippedUpdates) {
         resetHessian(m, iBlock);
       }
-    }//blocks
+    }
+    //blocks
     m->stats->averageSizingFactor /= nBlocks;
   }
 
 
   void BlocksqpInterface::
-  calcBFGS(BlocksqpMemory* m, const blocksqp::Matrix &gamma, const blocksqp::Matrix &delta, int iBlock ) const {
+  calcBFGS(BlocksqpMemory* m, const blocksqp::Matrix &gamma,
+    const blocksqp::Matrix &delta, int iBlock) const {
     int i, j, k, dim = gamma.M();
     blocksqp::Matrix Bdelta;
     blocksqp::SymMatrix *B;
@@ -1820,10 +1877,9 @@ namespace casadi {
     // h1 = delta^T * B * delta
     // h2 = delta^T * gamma
     Bdelta.Dimension(dim).Initialize(0.0);
-    for (i=0; i<dim; i++ )
-      {
-        for (k=0; k<dim; k++ )
-          Bdelta(i) += (*B)(i,k) * delta(k);
+    for (i=0; i<dim; i++) {
+        for (k=0; k<dim; k++)
+          Bdelta(i) += (*B)(i, k) * delta(k);
 
         h1 += delta(i) * Bdelta(i);
         //h2 += delta(i) * gamma(i);
@@ -1833,21 +1889,21 @@ namespace casadi {
     /* Powell's damping strategy to maintain pos. def. (Nocedal/Wright p.537; SNOPT paper)
      * Interpolates between current approximation and unmodified BFGS */
     damped = 0;
-    if (m->param->hessDamp )
-      if (h2 < m->param->hessDampFac * h1 / m->vars->alpha && fabs( h1 - h2 ) > 1.0e-12 ) {
+    if (m->param->hessDamp)
+      if (h2 < m->param->hessDampFac * h1 / m->vars->alpha && fabs(h1 - h2) > 1.0e-12) {
         // At the first iteration h1 and h2 are equal due to COL scaling
 
-        thetaPowell = (1.0 - m->param->hessDampFac)*h1 / ( h1 - h2);
+        thetaPowell = (1.0 - m->param->hessDampFac)*h1 / (h1 - h2);
 
         // Redefine gamma and h2 = delta^T * gamma
         h2 = 0.0;
-        for (i=0; i<dim; i++ ) {
-          gamma2( i ) = thetaPowell*gamma2( i ) + (1.0 - thetaPowell)*Bdelta( i);
-          h2 += delta( i ) * gamma2( i);
+        for (i=0; i<dim; i++) {
+          gamma2(i) = thetaPowell*gamma2(i) + (1.0 - thetaPowell)*Bdelta(i);
+          h2 += delta(i) * gamma2(i);
         }
 
         // Also redefine deltaGamma for computation of sizing factor in the next iteration
-        m->vars->deltaGamma( iBlock ) = h2;
+        m->vars->deltaGamma(iBlock) = h2;
 
         damped = 1;
       }
@@ -1857,17 +1913,17 @@ namespace casadi {
 
     // B_k+1 = B_k - Bdelta * (Bdelta)^T / h1 + gamma * gamma^T / h2
     double myEps = 1.0e2 * m->param->eps;
-    if (fabs( h1 ) < myEps || fabs( h2 ) < myEps ) {
+    if (fabs(h1) < myEps || fabs(h2) < myEps) {
       // don't perform update because of bad condition, might introduce negative eigenvalues
       m->vars->noUpdateCounter[iBlock]++;
       m->stats->hessDamped -= damped;
       m->stats->hessSkipped++;
       m->stats->nTotalSkippedUpdates++;
     } else {
-      for (i=0; i<dim; i++ )
-        for (j=i; j<dim; j++ )
-          (*B)( i,j ) = (*B)( i,j ) - Bdelta( i ) * Bdelta( j ) / h1
-            + gamma2( i ) * gamma2( j ) / h2;
+      for (i=0; i<dim; i++)
+        for (j=i; j<dim; j++)
+          (*B)(i, j) = (*B)(i, j) - Bdelta(i) * Bdelta(j) / h1
+            + gamma2(i) * gamma2(j) / h2;
 
       m->vars->noUpdateCounter[iBlock] = 0;
     }
@@ -1875,7 +1931,8 @@ namespace casadi {
 
 
   void BlocksqpInterface::
-  calcSR1(BlocksqpMemory* m, const blocksqp::Matrix &gamma, const blocksqp::Matrix &delta, int iBlock) const {
+  calcSR1(BlocksqpMemory* m, const blocksqp::Matrix &gamma, const blocksqp::Matrix &delta,
+    int iBlock) const {
     int i, j, k, dim = gamma.M();
     blocksqp::Matrix gmBdelta;
     blocksqp::SymMatrix *B;
@@ -1887,25 +1944,25 @@ namespace casadi {
 
     // gmBdelta = gamma - B*delta
     // h = (gamma - B*delta)^T * delta
-    gmBdelta.Dimension( dim);
-    for (i=0; i<dim; i++ ) {
-      gmBdelta( i ) = gamma( i);
-      for (k=0; k<dim; k++ )
-        gmBdelta( i ) -= ( (*B)( i,k ) * delta( k ));
+    gmBdelta.Dimension(dim);
+    for (i=0; i<dim; i++) {
+      gmBdelta(i) = gamma(i);
+      for (k=0; k<dim; k++)
+        gmBdelta(i) -= ((*B)(i, k) * delta(k));
 
-      h += ( gmBdelta( i ) * delta( i ));
+      h += (gmBdelta(i) * delta(i));
     }
 
     // B_k+1 = B_k + gmBdelta * gmBdelta^T / h
-    if (fabs( h ) < r * l2VectorNorm( delta ) * l2VectorNorm( gmBdelta ) || fabs( h ) < myEps ) {
+    if (fabs(h) < r * l2VectorNorm(delta) * l2VectorNorm(gmBdelta) || fabs(h) < myEps) {
       // Skip update if denominator is too small
       m->vars->noUpdateCounter[iBlock]++;
       m->stats->hessSkipped++;
       m->stats->nTotalSkippedUpdates++;
     } else {
-      for (i=0; i<dim; i++ )
-        for (j=i; j<dim; j++ )
-          (*B)( i,j ) = (*B)( i,j ) + gmBdelta( i ) * gmBdelta( j ) / h;
+      for (i=0; i<dim; i++)
+        for (j=i; j<dim; j++)
+          (*B)(i, j) = (*B)(i, j) + gmBdelta(i) * gmBdelta(j) / h;
       m->vars->noUpdateCounter[iBlock] = 0;
     }
   }
@@ -1919,30 +1976,28 @@ namespace casadi {
     int nVar = m->vars->gammaMat.M();
     int m2 = m->vars->gammaMat.N();
 
-    if (m2 == 1 )
+    if (m2 == 1)
       return;
 
-    m->vars->deltaXi.Submatrix( m->vars->deltaMat, nVar, 1, 0, m->stats->itCount % m2);
-    m->vars->gamma.Submatrix( m->vars->gammaMat, nVar, 1, 0, m->stats->itCount % m2);
+    m->vars->deltaXi.Submatrix(m->vars->deltaMat, nVar, 1, 0, m->stats->itCount % m2);
+    m->vars->gamma.Submatrix(m->vars->gammaMat, nVar, 1, 0, m->stats->itCount % m2);
   }
 
   void BlocksqpInterface::
   computeNextHessian(BlocksqpMemory* m, int idx, int maxQP) const {
     // Compute fallback update only once
-    if (idx == 1 )
-      {
+    if (idx == 1) {
         // Switch storage
         m->vars->hess = m->vars->hess2;
 
         // If last block contains exact Hessian, we need to copy it
-        if (m->param->whichSecondDerv == 1 )
-          for (int i=0; i<m->vars->hess[m->prob->nBlocks-1].M(); i++ )
-            for (int j=i; j<m->vars->hess[m->prob->nBlocks-1].N(); j++ )
-              m->vars->hess2[m->prob->nBlocks-1]( i,j ) = m->vars->hess1[m->prob->nBlocks-1]( i,j );
+        if (m->param->whichSecondDerv == 1)
+          for (int i=0; i<m->vars->hess[m->prob->nBlocks-1].M(); i++)
+            for (int j=i; j<m->vars->hess[m->prob->nBlocks-1].N(); j++)
+              m->vars->hess2[m->prob->nBlocks-1](i, j) = m->vars->hess1[m->prob->nBlocks-1](i, j);
 
         // Limited memory: compute fallback update only when needed
-        if (m->param->hessLimMem )
-          {
+        if (m->param->hessLimMem) {
             m->stats->itCount--;
             int hessDampSave = m->param->hessDamp;
             m->param->hessDamp = 1;
@@ -1955,20 +2010,18 @@ namespace casadi {
       }
 
     // 'Nontrivial' convex combinations
-    if (maxQP > 2 )
-      {
+    if (maxQP > 2) {
         /* Convexification parameter: mu_l = l / (maxQP-1).
          * Compute it only in the first iteration, afterwards update
          * by recursion: mu_l/mu_(l-1) */
-        double idxF = (double) idx;
+        double idxF = idx;
         double mu = (idx==1) ? 1.0 / (maxQP-1) : idxF / (idxF - 1.0);
         double mu1 = 1.0 - mu;
-        for (int iBlock=0; iBlock<m->vars->nBlocks; iBlock++ )
-          for (int i=0; i<m->vars->hess[iBlock].M(); i++ )
-            for (int j=i; j<m->vars->hess[iBlock].N(); j++ )
-              {
-                m->vars->hess2[iBlock]( i,j ) *= mu;
-                m->vars->hess2[iBlock]( i,j ) += mu1 * m->vars->hess1[iBlock]( i,j );
+        for (int iBlock=0; iBlock<m->vars->nBlocks; iBlock++)
+          for (int i=0; i<m->vars->hess[iBlock].M(); i++)
+            for (int j=i; j<m->vars->hess[iBlock].N(); j++) {
+                m->vars->hess2[iBlock](i, j) *= mu;
+                m->vars->hess2[iBlock](i, j) += mu1 * m->vars->hess1[iBlock](i, j);
               }
       }
   }
@@ -1979,18 +2032,18 @@ namespace casadi {
    * Solve a sequence of QPs until pos. def. assumption (G3*) is satisfied.
    */
   int BlocksqpInterface::
-  solveQP(BlocksqpMemory* m, blocksqp::Matrix &deltaXi, blocksqp::Matrix &lambdaQP, bool matricesChanged) const {
+  solveQP(BlocksqpMemory* m, blocksqp::Matrix &deltaXi, blocksqp::Matrix &lambdaQP,
+    bool matricesChanged) const {
     blocksqp::Matrix jacT;
     int maxQP, l;
     if (m->param->globalization == 1 &&
         m->param->hessUpdate == 1 &&
         matricesChanged &&
-        m->stats->itCount > 1 )
-      {
+        m->stats->itCount > 1) {
         maxQP = m->param->maxConvQP + 1;
-      }
-    else
+      } else {
       maxQP = 1;
+    }
 
     /*
      * Prepare for qpOASES
@@ -1999,18 +2052,14 @@ namespace casadi {
     // Setup QProblem data
     qpOASES::Matrix *A;
     qpOASES::SymmetricMatrix *H;
-    if (matricesChanged )
-      {
-        if (m->param->sparseQP )
-          {
-            A = new qpOASES::SparseMatrix( m->prob->nCon, m->prob->nVar,
-                                           m->vars->jacIndRow, m->vars->jacIndCol, m->vars->jacNz );
-          }
-        else
-          {
+    if (matricesChanged) {
+        if (m->param->sparseQP) {
+            A = new qpOASES::SparseMatrix(m->prob->nCon, m->prob->nVar,
+                                           m->vars->jacIndRow, m->vars->jacIndCol, m->vars->jacNz);
+          } else {
             // transpose Jacobian (qpOASES needs row major arrays)
-            Transpose( m->vars->constrJac, jacT );
-            A = new qpOASES::DenseMatrix( m->prob->nCon, m->prob->nVar, m->prob->nVar, jacT.ARRAY() );
+            Transpose(m->vars->constrJac, jacT);
+            A = new qpOASES::DenseMatrix(m->prob->nCon, m->prob->nVar, m->prob->nVar, jacT.ARRAY());
           }
       }
     double *g = m->vars->gradObj.ARRAY();
@@ -2021,7 +2070,7 @@ namespace casadi {
 
     // qpOASES options
     qpOASES::Options opts;
-    if (matricesChanged && maxQP > 1 )
+    if (matricesChanged && maxQP > 1)
       opts.enableInertiaCorrection = qpOASES::BT_FALSE;
     else
       opts.enableInertiaCorrection = qpOASES::BT_TRUE;
@@ -2030,10 +2079,9 @@ namespace casadi {
     opts.printLevel = qpOASES::PL_NONE;
     opts.numRefinementSteps = 2;
     opts.epsLITests =  2.2204e-08;
-    m->qp->setOptions( opts );
+    m->qp->setOptions(opts);
 
-    if (maxQP > 1 )
-      {
+    if (maxQP > 1) {
         // Store last successful QP in temporary storage
         (*m->qpSave) = *m->qp;
         /** \todo Storing the active set would be enough but then the QP object
@@ -2053,98 +2101,94 @@ namespace casadi {
     /*
      * QP solving loop for convex combinations (sequential)
      */
-    for (l=0; l<maxQP; l++ ) {
+    for (l=0; l<maxQP; l++) {
         /*
          * Compute a new Hessian
          */
-        if (l > 0 ) {
+        if (l > 0) {
           // If the solution of the first QP was rejected, consider second Hessian
           m->stats->qpResolve++;
           *m->qp = *m->qpSave;
-          computeNextHessian(m, l, maxQP );
+          computeNextHessian(m, l, maxQP);
         }
 
-        if (l == maxQP-1 ) {
+        if (l == maxQP-1) {
           // Enable inertia correction for supposedly convex QPs, just in case
           opts.enableInertiaCorrection = qpOASES::BT_TRUE;
-          m->qp->setOptions(opts );
+          m->qp->setOptions(opts);
         }
 
         /*
          * Prepare the current Hessian for qpOASES
          */
-        if (matricesChanged )
-          {
-            if (m->param->sparseQP ) {
+        if (matricesChanged) {
+            if (m->param->sparseQP) {
                 // Convert block-Hessian to sparse format
-                m->vars->convertHessian( m->prob, m->param->eps, m->vars->hess, m->vars->hessNz,
-                                      m->vars->hessIndRow, m->vars->hessIndCol, m->vars->hessIndLo );
-                H = new qpOASES::SymSparseMat( m->prob->nVar, m->prob->nVar,
-                                               m->vars->hessIndRow, m->vars->hessIndCol, m->vars->hessNz );
+                m->vars->convertHessian(m->prob, m->param->eps, m->vars->hess, m->vars->hessNz,
+                                      m->vars->hessIndRow, m->vars->hessIndCol, m->vars->hessIndLo);
+                H = new qpOASES::SymSparseMat(m->prob->nVar, m->prob->nVar,
+                                               m->vars->hessIndRow, m->vars->hessIndCol,
+                                               m->vars->hessNz);
                 dynamic_cast<qpOASES::SymSparseMat*>(H)->createDiagInfo();
-              }
-            else
-              {
+              } else {
                 // Convert block-Hessian to double array
-                m->vars->convertHessian( m->prob, m->param->eps, m->vars->hess );
-                H = new qpOASES::SymDenseMat( m->prob->nVar, m->prob->nVar, m->prob->nVar, m->vars->hessNz );
+                m->vars->convertHessian(m->prob, m->param->eps, m->vars->hess);
+                H = new qpOASES::SymDenseMat(m->prob->nVar, m->prob->nVar,
+                  m->prob->nVar, m->vars->hessNz);
               }
           }
 
         /*
          * Call qpOASES
          */
-        if (m->param->debugLevel > 2 ) m->stats->dumpQPCpp( m->prob, m->vars, m->qp, m->param->sparseQP );
-        if (matricesChanged )
-          {
+        if (m->param->debugLevel > 2) {
+          m->stats->dumpQPCpp(m->prob, m->vars, m->qp, m->param->sparseQP);
+        }
+        if (matricesChanged) {
             maxIt = m->param->maxItQP;
             cpuTime = m->param->maxTimeQP;
             if (m->qp->getStatus() == qpOASES::QPS_HOMOTOPYQPSOLVED ||
-                m->qp->getStatus() == qpOASES::QPS_SOLVED )
-              {
-                ret = m->qp->hotstart( H, g, A, lb, lu, lbA, luA, maxIt, &cpuTime );
+                m->qp->getStatus() == qpOASES::QPS_SOLVED) {
+                ret = m->qp->hotstart(H, g, A, lb, lu, lbA, luA, maxIt, &cpuTime);
+              } else {
+                ret = m->qp->init(H, g, A, lb, lu, lbA, luA, maxIt, &cpuTime);
               }
-            else
-              {
-                ret = m->qp->init( H, g, A, lb, lu, lbA, luA, maxIt, &cpuTime );
-              }
-          }
-        else if (!matricesChanged ) // Second order correction: H and A do not change
-          {
+          } else if (!matricesChanged) {
+            // Second order correction: H and A do not change
             maxIt = 0.1*m->param->maxItQP;
             cpuTime = 0.1*m->param->maxTimeQP;
-            ret = m->qp->hotstart( g, lb, lu, lbA, luA, maxIt, &cpuTime );
+            ret = m->qp->hotstart(g, lb, lu, lbA, luA, maxIt, &cpuTime);
           }
 
         /*
          * Check assumption (G3*) if nonconvex QP was solved
          */
-        if (l < maxQP-1 && matricesChanged )
-          {
-            if (ret == qpOASES::SUCCESSFUL_RETURN )
-              {
-                if (m->param->sparseQP == 2 )
-                  ret = solAna.checkCurvatureOnStronglyActiveConstraints(dynamic_cast<qpOASES::SQProblemSchur*>(m->qp));
-                else
+        if (l < maxQP-1 && matricesChanged) {
+            if (ret == qpOASES::SUCCESSFUL_RETURN) {
+                if (m->param->sparseQP == 2) {
+                  ret = solAna.checkCurvatureOnStronglyActiveConstraints(
+                    dynamic_cast<qpOASES::SQProblemSchur*>(m->qp));
+                } else {
                   ret = solAna.checkCurvatureOnStronglyActiveConstraints(m->qp);
+                }
               }
 
-            if (ret == qpOASES::SUCCESSFUL_RETURN )
-              {// QP was solved successfully and curvature is positive after removing bounds
+            if (ret == qpOASES::SUCCESSFUL_RETURN) {
+              // QP was solved successfully and curvature is positive after removing bounds
                 m->stats->qpIterations = maxIt + 1;
                 break; // Success!
-              }
-            else
-              {// QP solution is rejected, save statistics
-                if (ret == qpOASES::RET_SETUP_AUXILIARYQP_FAILED )
+              } else {
+              // QP solution is rejected, save statistics
+                if (ret == qpOASES::RET_SETUP_AUXILIARYQP_FAILED)
                   m->stats->qpIterations2++;
                 else
                   m->stats->qpIterations2 += maxIt + 1;
                 m->stats->rejectedSR1++;
               }
+          } else {
+            // Convex QP was solved, no need to check assumption (G3*)
+            m->stats->qpIterations += maxIt + 1;
           }
-        else // Convex QP was solved, no need to check assumption (G3*)
-          m->stats->qpIterations += maxIt + 1;
 
       } // End of QP solving loop
 
@@ -2153,37 +2197,36 @@ namespace casadi {
      */
 
     // Get solution from qpOASES
-    m->qp->getPrimalSolution( deltaXi.ARRAY() );
-    m->qp->getDualSolution( lambdaQP.ARRAY() );
+    m->qp->getPrimalSolution(deltaXi.ARRAY());
+    m->qp->getDualSolution(lambdaQP.ARRAY());
     m->vars->qpObj = m->qp->getObjVal();
 
     // Compute constrJac*deltaXi, need this for second order correction step
-    if (m->param->sparseQP )
-      Atimesb( m->vars->jacNz, m->vars->jacIndRow, m->vars->jacIndCol, deltaXi, m->vars->AdeltaXi );
-    else
-      Atimesb( m->vars->constrJac, deltaXi, m->vars->AdeltaXi );
+    if (m->param->sparseQP) {
+      Atimesb(m->vars->jacNz, m->vars->jacIndRow, m->vars->jacIndCol, deltaXi, m->vars->AdeltaXi);
+    } else {
+      Atimesb(m->vars->constrJac, deltaXi, m->vars->AdeltaXi);
+    }
 
     // Print qpOASES error code, if any
-    if (ret != qpOASES::SUCCESSFUL_RETURN && matricesChanged )
-      printf( "qpOASES error message: \"%s\"\n",
-              qpOASES::getGlobalMessageHandler()->getErrorCodeMessage( ret ) );
+    if (ret != qpOASES::SUCCESSFUL_RETURN && matricesChanged)
+      printf("qpOASES error message: \"%s\"\n",
+              qpOASES::getGlobalMessageHandler()->getErrorCodeMessage(ret));
 
     // Point Hessian again to the first Hessian
     m->vars->hess = m->vars->hess1;
 
     /* For full-memory Hessian: Restore fallback Hessian if convex combinations
      * were used during the loop */
-    if (!m->param->hessLimMem && maxQP > 2 && matricesChanged )
-      {
-        double mu = 1.0 / ((double) l);
+    if (!m->param->hessLimMem && maxQP > 2 && matricesChanged) {
+        double mu = 1.0 / l;
         double mu1 = 1.0 - mu;
         int nBlocks = (m->param->whichSecondDerv == 1) ? m->vars->nBlocks-1 : m->vars->nBlocks;
-        for (int iBlock=0; iBlock<nBlocks; iBlock++ )
-          for (int i=0; i<m->vars->hess[iBlock].M(); i++ )
-            for (int j=i; j<m->vars->hess[iBlock].N(); j++ )
-              {
-                m->vars->hess2[iBlock]( i,j ) *= mu;
-                m->vars->hess2[iBlock]( i,j ) += mu1 * m->vars->hess1[iBlock]( i,j );
+        for (int iBlock=0; iBlock<nBlocks; iBlock++)
+          for (int i=0; i<m->vars->hess[iBlock].M(); i++)
+            for (int j=i; j<m->vars->hess[iBlock].N(); j++) {
+                m->vars->hess2[iBlock](i, j) *= mu;
+                m->vars->hess2[iBlock](i, j) += mu1 * m->vars->hess1[iBlock](i, j);
               }
       }
 
@@ -2193,19 +2236,19 @@ namespace casadi {
      * 2: Unbounded
      * 3: Infeasible
      * 4: Other error */
-    if (ret == qpOASES::SUCCESSFUL_RETURN )
+    if (ret == qpOASES::SUCCESSFUL_RETURN)
       return 0;
-    else if (ret == qpOASES::RET_MAX_NWSR_REACHED )
+    else if (ret == qpOASES::RET_MAX_NWSR_REACHED)
       return 1;
     else if (ret == qpOASES::RET_HESSIAN_NOT_SPD ||
              ret == qpOASES::RET_HESSIAN_INDEFINITE ||
              ret == qpOASES::RET_INIT_FAILED_UNBOUNDEDNESS ||
              ret == qpOASES::RET_QP_UNBOUNDED ||
-             ret == qpOASES::RET_HOTSTART_STOPPED_UNBOUNDEDNESS )
+             ret == qpOASES::RET_HOTSTART_STOPPED_UNBOUNDEDNESS)
       return 2;
     else if (ret == qpOASES::RET_INIT_FAILED_INFEASIBILITY ||
              ret == qpOASES::RET_QP_INFEASIBLE ||
-             ret == qpOASES::RET_HOTSTART_STOPPED_INFEASIBILITY )
+             ret == qpOASES::RET_HOTSTART_STOPPED_INFEASIBILITY)
       return 3;
     else
       return 4;
@@ -2217,38 +2260,38 @@ namespace casadi {
    * to variable bounds in the NLP or according to
    * trust region box radius
    */
-  void BlocksqpInterface::updateStepBounds(BlocksqpMemory* m, bool soc ) const {
+  void BlocksqpInterface::updateStepBounds(BlocksqpMemory* m, bool soc) const {
     int i;
     int nVar = m->prob->nVar;
     int nCon = m->prob->nCon;
 
     // Bounds on step
-    for (i=0; i<nVar; i++ ) {
-      if (m->prob->bl(i) != m->param->inf )
-        m->vars->deltaBl( i ) = m->prob->bl( i ) - m->vars->xi( i );
+    for (i=0; i<nVar; i++) {
+      if (m->prob->bl(i) != m->param->inf)
+        m->vars->deltaBl(i) = m->prob->bl(i) - m->vars->xi(i);
       else
-        m->vars->deltaBl( i ) = m->param->inf;
+        m->vars->deltaBl(i) = m->param->inf;
 
-      if (m->prob->bu(i) != m->param->inf )
-        m->vars->deltaBu( i ) = m->prob->bu( i ) - m->vars->xi( i );
+      if (m->prob->bu(i) != m->param->inf)
+        m->vars->deltaBu(i) = m->prob->bu(i) - m->vars->xi(i);
       else
-        m->vars->deltaBu( i ) = m->param->inf;
+        m->vars->deltaBu(i) = m->param->inf;
     }
 
     // Bounds on linearized constraints
-    for (i=0; i<nCon; i++ ) {
-      if (m->prob->bl( nVar+i ) != m->param->inf ) {
-        m->vars->deltaBl( nVar+i ) = m->prob->bl( nVar+i ) - m->vars->constr( i );
-        if (soc ) m->vars->deltaBl( nVar+i ) += m->vars->AdeltaXi( i );
+    for (i=0; i<nCon; i++) {
+      if (m->prob->bl(nVar+i) != m->param->inf) {
+        m->vars->deltaBl(nVar+i) = m->prob->bl(nVar+i) - m->vars->constr(i);
+        if (soc) m->vars->deltaBl(nVar+i) += m->vars->AdeltaXi(i);
       } else {
-        m->vars->deltaBl( nVar+i ) = m->param->inf;
+        m->vars->deltaBl(nVar+i) = m->param->inf;
       }
 
-      if (m->prob->bu( nVar+i ) != m->param->inf ) {
-        m->vars->deltaBu( nVar+i ) = m->prob->bu( nVar+i ) - m->vars->constr( i );
-        if (soc ) m->vars->deltaBu( nVar+i ) += m->vars->AdeltaXi( i );
+      if (m->prob->bu(nVar+i) != m->param->inf) {
+        m->vars->deltaBu(nVar+i) = m->prob->bu(nVar+i) - m->vars->constr(i);
+        if (soc) m->vars->deltaBu(nVar+i) += m->vars->AdeltaXi(i);
       } else {
-        m->vars->deltaBu( nVar+i ) = m->param->inf;
+        m->vars->deltaBu(nVar+i) = m->param->inf;
       }
     }
   }
