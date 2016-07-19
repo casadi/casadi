@@ -42,7 +42,7 @@
 /// \cond INTERNAL
 namespace casadi {
   // Forward declaration
-  class BlocksqpInterface;
+  class Blocksqp;
 
   struct CASADI_NLPSOL_BLOCKSQP_EXPORT BlocksqpMemory : public NlpsolMemory {
     blocksqp::Problemspec* prob;
@@ -59,9 +59,9 @@ namespace casadi {
   // Problem class
   class BlocksqpProblem : public blocksqp::Problemspec {
   public:
-    const BlocksqpInterface& self;
+    const Blocksqp& self;
     BlocksqpMemory* m;
-    BlocksqpProblem(const BlocksqpInterface& self, BlocksqpMemory* m);
+    BlocksqpProblem(const Blocksqp& self, BlocksqpMemory* m);
 
     // Set initial values for xi (and possibly lambda) and parts of the
     // Jacobian that correspond to linear constraints (dense version).
@@ -107,17 +107,17 @@ namespace casadi {
      @copydoc Nlpsol_doc
      @copydoc plugin_Nlpsol_blocksqp
   */
-  class CASADI_NLPSOL_BLOCKSQP_EXPORT BlocksqpInterface : public Nlpsol {
+  class CASADI_NLPSOL_BLOCKSQP_EXPORT Blocksqp : public Nlpsol {
   public:
-    explicit BlocksqpInterface(const std::string& name, const Function& nlp);
-    virtual ~BlocksqpInterface();
+    explicit Blocksqp(const std::string& name, const Function& nlp);
+    virtual ~Blocksqp();
 
     // Get name of the plugin
     virtual const char* plugin_name() const { return "blocksqp";}
 
     /** \brief  Create a new NLP Solver */
     static Nlpsol* creator(const std::string& name, const Function& nlp) {
-      return new BlocksqpInterface(name, nlp);
+      return new Blocksqp(name, nlp);
     }
 
     ///@{

@@ -29,7 +29,7 @@
 using namespace std;
 namespace casadi {
 
-  BlocksqpProblem::BlocksqpProblem(const BlocksqpInterface& self, BlocksqpMemory* m)
+  BlocksqpProblem::BlocksqpProblem(const Blocksqp& self, BlocksqpMemory* m)
     : self(self), m(m) {
     nVar = self.nx_;
     nCon = self.ng_;
@@ -122,9 +122,9 @@ namespace casadi {
   extern "C"
   int CASADI_NLPSOL_BLOCKSQP_EXPORT
   casadi_register_nlpsol_blocksqp(Nlpsol::Plugin* plugin) {
-    plugin->creator = BlocksqpInterface::creator;
+    plugin->creator = Blocksqp::creator;
     plugin->name = "blocksqp";
-    plugin->doc = BlocksqpInterface::meta_doc.c_str();
+    plugin->doc = Blocksqp::meta_doc.c_str();
     plugin->version = 30;
     return 0;
   }
@@ -134,16 +134,16 @@ namespace casadi {
     Nlpsol::registerPlugin(casadi_register_nlpsol_blocksqp);
   }
 
-  BlocksqpInterface::BlocksqpInterface(const std::string& name, const Function& nlp)
+  Blocksqp::Blocksqp(const std::string& name, const Function& nlp)
     : Nlpsol(name, nlp) {
   }
 
 
-  BlocksqpInterface::~BlocksqpInterface() {
+  Blocksqp::~Blocksqp() {
     clear_memory();
   }
 
-  Options BlocksqpInterface::options_
+  Options Blocksqp::options_
   = {{&Nlpsol::options_},
      {{"blocksqp",
        {OT_DICT,
@@ -154,7 +154,7 @@ namespace casadi {
      }
   };
 
-  void BlocksqpInterface::init(const Dict& opts) {
+  void Blocksqp::init(const Dict& opts) {
     // Call the init method of the base class
     Nlpsol::init(opts);
 
@@ -202,12 +202,12 @@ namespace casadi {
     alloc_w(sp_jac_.nnz(), true); // jac
   }
 
-  void BlocksqpInterface::init_memory(void* mem) const {
+  void Blocksqp::init_memory(void* mem) const {
     Nlpsol::init_memory(mem);
     auto m = static_cast<BlocksqpMemory*>(mem);
   }
 
-  void BlocksqpInterface::set_work(void* mem, const double**& arg, double**& res,
+  void Blocksqp::set_work(void* mem, const double**& arg, double**& res,
                                    int*& iw, double*& w) const {
     auto m = static_cast<BlocksqpMemory*>(mem);
 
@@ -218,7 +218,7 @@ namespace casadi {
     m->jac = w; w += sp_jac_.nnz();
   }
 
-  void BlocksqpInterface::solve(void* mem) const {
+  void Blocksqp::solve(void* mem) const {
     auto m = static_cast<BlocksqpMemory*>(mem);
 
     int ret = 0;
@@ -330,7 +330,7 @@ namespace casadi {
     delete m->vars;
   }
 
-  int BlocksqpInterface::run(BlocksqpMemory* m, int maxIt, int warmStart) const {
+  int Blocksqp::run(BlocksqpMemory* m, int maxIt, int warmStart) const {
     int it, infoQP = 0, infoEval = 0;
     bool skipLineSearch = false;
     bool hasConverged = false;
@@ -549,7 +549,7 @@ namespace casadi {
   }
 
 
-  void BlocksqpInterface::finish(BlocksqpMemory* m) const {
+  void Blocksqp::finish(BlocksqpMemory* m) const {
     if (m->initCalled) {
       m->initCalled = false;
     } else {
@@ -568,7 +568,7 @@ namespace casadi {
    * flag == 1: output dL(xi_k+1, lambda_k+1) - L(xi_k, lambda_k+1)
    * flag == 2: output dL(xi_k+1, lambda_k+1) - df(xi)
    */
-  void BlocksqpInterface::
+  void Blocksqp::
   calcLagrangeGradient(BlocksqpMemory* m, const blocksqp::Matrix &lambda,
     const blocksqp::Matrix &gradObj, double *jacNz, int *jacIndRow,
     int *jacIndCol, blocksqp::Matrix &gradLagrange, int flag) const {
@@ -604,7 +604,7 @@ namespace casadi {
    * flag == 1: output dL(xi_k+1, lambda_k+1) - L(xi_k, lambda_k+1)
    * flag == 2: output dL(xi_k+1, lambda_k+1) - df(xi)
    */
-  void BlocksqpInterface::
+  void Blocksqp::
   calcLagrangeGradient(BlocksqpMemory* m, const blocksqp::Matrix &lambda,
                        const blocksqp::Matrix &gradObj, const blocksqp::Matrix &constrJac,
                        blocksqp::Matrix &gradLagrange, int flag) const {
@@ -638,7 +638,7 @@ namespace casadi {
   /**
    * Wrapper if called with standard arguments
    */
-  void BlocksqpInterface::
+  void Blocksqp::
   calcLagrangeGradient(BlocksqpMemory* m, blocksqp::Matrix &gradLagrange, int flag) const {
     if (m->param->sparseQP) {
       calcLagrangeGradient(m, m->vars->lambda, m->vars->gradObj, m->vars->jacNz,
@@ -656,7 +656,7 @@ namespace casadi {
    * and
    * ||constrViolation||_infty / (1 + ||xi||_infty) <= TOL
    */
-  bool BlocksqpInterface::calcOptTol(BlocksqpMemory* m) const {
+  bool Blocksqp::calcOptTol(BlocksqpMemory* m) const {
     // scaled norm of Lagrangian gradient
     calcLagrangeGradient(m, m->vars->gradLagrange, 0);
     m->vars->gradNorm = lInfVectorNorm(m->vars->gradLagrange);
@@ -672,7 +672,7 @@ namespace casadi {
       return false;
   }
 
-  void BlocksqpInterface::printInfo(BlocksqpMemory* m, int printLevel) const {
+  void Blocksqp::printInfo(BlocksqpMemory* m, int printLevel) const {
     char hessString1[100];
     char hessString2[100];
     char globString[100];
@@ -766,12 +766,12 @@ namespace casadi {
     printf("+---------------------------------------------------------------+\n\n");
   }
 
-  void BlocksqpInterface::
+  void Blocksqp::
   acceptStep(BlocksqpMemory* m, double alpha) const {
     acceptStep(m, m->vars->deltaXi, m->vars->lambdaQP, alpha, 0);
   }
 
-  void BlocksqpInterface::
+  void Blocksqp::
   acceptStep(BlocksqpMemory* m, const blocksqp::Matrix &deltaXi,
     const blocksqp::Matrix &lambdaQP, double alpha, int nSOCS) const {
     int k;
@@ -804,12 +804,12 @@ namespace casadi {
       m->vars->reducedStepCount = 0;
   }
 
-  void BlocksqpInterface::
+  void Blocksqp::
   reduceStepsize(BlocksqpMemory* m, double *alpha) const {
     *alpha = (*alpha) * 0.5;
   }
 
-  void BlocksqpInterface::
+  void Blocksqp::
   reduceSOCStepsize(BlocksqpMemory* m, double *alphaSOC) const {
     int i;
     int nVar = m->prob->nVar;
@@ -837,7 +837,7 @@ namespace casadi {
    * xi = xi + deltaXi
    * lambda = lambdaQP
    */
-  int BlocksqpInterface::fullstep(BlocksqpMemory* m) const {
+  int Blocksqp::fullstep(BlocksqpMemory* m) const {
     double alpha;
     double objTrial, cNormTrial;
     int i, k, info;
@@ -877,7 +877,7 @@ namespace casadi {
    * as described in Ipopt paper (Waechter 2006)
    *
    */
-  int BlocksqpInterface::filterLineSearch(BlocksqpMemory* m) const {
+  int Blocksqp::filterLineSearch(BlocksqpMemory* m) const {
     double alpha = 1.0;
     double cNorm, cNormTrial, objTrial, dfTdeltaXi;
 
@@ -993,7 +993,7 @@ namespace casadi {
    * s.t.  bl <= A^Td + constr(xi+alpha*deltaXi) - A^TdeltaXi <= bu
    *
    */
-  bool BlocksqpInterface::
+  bool Blocksqp::
   secondOrderCorrection(BlocksqpMemory* m, double cNorm, double cNormTrial,
     double dfTdeltaXi, bool swCond, int it) const {
 
@@ -1099,7 +1099,7 @@ namespace casadi {
    *
    * "The dreaded restoration phase" -- Nick Gould
    */
-  int BlocksqpInterface::feasibilityRestorationPhase(BlocksqpMemory* m) const {
+  int Blocksqp::feasibilityRestorationPhase(BlocksqpMemory* m) const {
     // No Feasibility restoration phase
     if (m->param->restoreFeas == 0) return -1;
 
@@ -1113,7 +1113,7 @@ namespace casadi {
    * the (pseudo) continuity constraints, i.e. do a single shooting
    * iteration with the current controls and measurement weights q and w
    */
-  int BlocksqpInterface::feasibilityRestorationHeuristic(BlocksqpMemory* m) const {
+  int Blocksqp::feasibilityRestorationHeuristic(BlocksqpMemory* m) const {
     m->stats->nRestHeurCalls++;
 
     int info, k;
@@ -1177,7 +1177,7 @@ namespace casadi {
   /**
    * If the line search fails, check if the full step reduces the KKT error by a factor kappaF.
    */
-  int BlocksqpInterface::kktErrorReduction(BlocksqpMemory* m) const {
+  int Blocksqp::kktErrorReduction(BlocksqpMemory* m) const {
     int i, info = 0;
     double objTrial, cNormTrial, trialGradNorm, trialTol;
     blocksqp::Matrix trialConstr, trialGradLagrange;
@@ -1224,7 +1224,7 @@ namespace casadi {
    * Check if current entry is accepted to the filter:
    * (cNorm, obj) in F_k
    */
-  bool BlocksqpInterface::
+  bool Blocksqp::
   pairInFilter(BlocksqpMemory* m, double cNorm, double obj) const {
     std::set< std::pair<double, double> >::iterator iter;
     std::set< std::pair<double, double> > *filter;
@@ -1252,7 +1252,7 @@ namespace casadi {
   }
 
 
-  void BlocksqpInterface::initializeFilter(BlocksqpMemory* m) const {
+  void Blocksqp::initializeFilter(BlocksqpMemory* m) const {
     std::set< std::pair<double, double> >::iterator iter;
     std::pair<double, double> initPair(m->param->thetaMax, m->prob->objLo);
 
@@ -1273,7 +1273,7 @@ namespace casadi {
    * Augment the filter:
    * F_k+1 = F_k U { (c,f) | c > (1-gammaTheta)cNorm and f > obj-gammaF*c
    */
-  void BlocksqpInterface::
+  void Blocksqp::
   augmentFilter(BlocksqpMemory* m, double cNorm, double obj) const {
     std::set< std::pair<double, double> >::iterator iter;
     std::pair<double, double> entry((1.0 - m->param->gammaTheta)*cNorm, obj
@@ -1298,7 +1298,7 @@ namespace casadi {
   /**
    * Initial Hessian: Identity matrix
    */
-  void BlocksqpInterface::calcInitialHessian(BlocksqpMemory* m) const {
+  void Blocksqp::calcInitialHessian(BlocksqpMemory* m) const {
     int iBlock;
 
     for (iBlock=0; iBlock<m->vars->nBlocks; iBlock++)
@@ -1312,7 +1312,7 @@ namespace casadi {
   /**
    * Initial Hessian for one block: Identity matrix
    */
-  void BlocksqpInterface::calcInitialHessian(BlocksqpMemory* m, int iBlock) const {
+  void Blocksqp::calcInitialHessian(BlocksqpMemory* m, int iBlock) const {
     m->vars->hess[iBlock].Initialize(0.0);
 
     // Each block is a diagonal matrix
@@ -1328,7 +1328,7 @@ namespace casadi {
   }
 
 
-  void BlocksqpInterface::resetHessian(BlocksqpMemory* m) const {
+  void Blocksqp::resetHessian(BlocksqpMemory* m) const {
     for (int iBlock=0; iBlock<m->vars->nBlocks; iBlock++) {
       //if objective derv is computed exactly, don't set the last block!
       if (!(m->param->whichSecondDerv == 1 && m->param->blockHess
@@ -1338,7 +1338,7 @@ namespace casadi {
   }
 
 
-  void BlocksqpInterface::resetHessian(BlocksqpMemory* m, int iBlock) const {
+  void Blocksqp::resetHessian(BlocksqpMemory* m, int iBlock) const {
     blocksqp::Matrix smallDelta, smallGamma;
     int nVarLocal = m->vars->hess[iBlock].M();
 
@@ -1370,7 +1370,7 @@ namespace casadi {
   /**
    * Approximate Hessian by finite differences
    */
-  int BlocksqpInterface::calcFiniteDiffHessian(BlocksqpMemory* m) const {
+  int Blocksqp::calcFiniteDiffHessian(BlocksqpMemory* m) const {
     int iVar, jVar, k, iBlock, maxBlock, info, idx, idx1, idx2;
     double dummy, lowerVio, upperVio;
     blocksqp::Matrix pert;
@@ -1464,7 +1464,7 @@ namespace casadi {
   }
 
 
-  void BlocksqpInterface::sizeInitialHessian(BlocksqpMemory* m, const blocksqp::Matrix &gamma,
+  void Blocksqp::sizeInitialHessian(BlocksqpMemory* m, const blocksqp::Matrix &gamma,
     const blocksqp::Matrix &delta, int iBlock, int option) const {
     int i, j;
     double scale;
@@ -1499,7 +1499,7 @@ namespace casadi {
   }
 
 
-  void BlocksqpInterface::sizeHessianCOL(BlocksqpMemory* m, const blocksqp::Matrix &gamma,
+  void Blocksqp::sizeHessianCOL(BlocksqpMemory* m, const blocksqp::Matrix &gamma,
     const blocksqp::Matrix &delta, int iBlock) const {
     int i, j;
     double theta, scale, myEps = 1.0e3 * m->param->eps;
@@ -1548,7 +1548,7 @@ namespace casadi {
   /**
    * Apply BFGS or SR1 update blockwise and size blocks
    */
-  void BlocksqpInterface::
+  void Blocksqp::
   calcHessianUpdate(BlocksqpMemory* m, int updateType, int hessScaling) const {
     int iBlock, nBlocks;
     int nVarLocal;
@@ -1624,7 +1624,7 @@ namespace casadi {
   }
 
 
-  void BlocksqpInterface::
+  void Blocksqp::
   calcHessianUpdateLimitedMemory(BlocksqpMemory* m, int updateType, int hessScaling) const {
     int iBlock, nBlocks, nVarLocal;
     blocksqp::Matrix smallGamma, smallDelta;
@@ -1728,7 +1728,7 @@ namespace casadi {
   }
 
 
-  void BlocksqpInterface::
+  void Blocksqp::
   calcBFGS(BlocksqpMemory* m, const blocksqp::Matrix &gamma,
     const blocksqp::Matrix &delta, int iBlock) const {
     int i, j, k, dim = gamma.M();
@@ -1805,7 +1805,7 @@ namespace casadi {
   }
 
 
-  void BlocksqpInterface::
+  void Blocksqp::
   calcSR1(BlocksqpMemory* m, const blocksqp::Matrix &gamma, const blocksqp::Matrix &delta,
     int iBlock) const {
     int i, j, k, dim = gamma.M();
@@ -1847,7 +1847,7 @@ namespace casadi {
    * Set deltaXi and gamma as a column in the matrix containing
    * the m most recent delta and gamma
    */
-  void BlocksqpInterface::updateDeltaGamma(BlocksqpMemory* m) const {
+  void Blocksqp::updateDeltaGamma(BlocksqpMemory* m) const {
     int nVar = m->vars->gammaMat.M();
     int m2 = m->vars->gammaMat.N();
 
@@ -1858,7 +1858,7 @@ namespace casadi {
     m->vars->gamma.Submatrix(m->vars->gammaMat, nVar, 1, 0, m->stats->itCount % m2);
   }
 
-  void BlocksqpInterface::
+  void Blocksqp::
   computeNextHessian(BlocksqpMemory* m, int idx, int maxQP) const {
     // Compute fallback update only once
     if (idx == 1) {
@@ -1906,7 +1906,7 @@ namespace casadi {
    * Inner loop of SQP algorithm:
    * Solve a sequence of QPs until pos. def. assumption (G3*) is satisfied.
    */
-  int BlocksqpInterface::
+  int Blocksqp::
   solveQP(BlocksqpMemory* m, blocksqp::Matrix &deltaXi, blocksqp::Matrix &lambdaQP,
     bool matricesChanged) const {
     blocksqp::Matrix jacT;
@@ -2135,7 +2135,7 @@ namespace casadi {
    * to variable bounds in the NLP or according to
    * trust region box radius
    */
-  void BlocksqpInterface::updateStepBounds(BlocksqpMemory* m, bool soc) const {
+  void Blocksqp::updateStepBounds(BlocksqpMemory* m, bool soc) const {
     int i;
     int nVar = m->prob->nVar;
     int nCon = m->prob->nCon;

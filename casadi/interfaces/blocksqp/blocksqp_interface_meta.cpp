@@ -26,7 +26,7 @@
       #include "blocksqp_interface.hpp"
       #include <string>
 
-      const std::string casadi::BlocksqpInterface::meta_doc=
+      const std::string casadi::Blocksqp::meta_doc=
       "\n"
 "BLOCKSQP interface\n"
 "\n"
