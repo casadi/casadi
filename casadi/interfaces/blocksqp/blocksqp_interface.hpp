@@ -102,9 +102,6 @@ class BlocksqpProblem;
     blocksqp::Matrix gammaMat;  // Lagrangian gradient differences for last m steps
     blocksqp::Matrix gamma;  // alias for current Lagrangian gradient
 
-    int nBlocks;
-    int *blockIdx;
-
     blocksqp::SymMatrix *hess;  // [blockwise] pointer to current Hessian of the Lagrangian
     blocksqp::SymMatrix *hess1;  // [blockwise] first Hessian approximation
     blocksqp::SymMatrix *hess2;  // [blockwise] second Hessian approximation (convexified)
@@ -159,9 +156,6 @@ class BlocksqpProblem;
     double      objUp;    // upper bound for objective
     blocksqp::Matrix      bl;     // lower bounds of variables and constraints
     blocksqp::Matrix      bu;     // upper bounds of variables and constraints
-
-    int    nBlocks;  // number of separable blocks of Lagrangian
-    int*   blockIdx; // [blockwise] index in the variable vector where a block starts
 
     BlocksqpProblem(const Blocksqp& self, BlocksqpMemory* m);
 
@@ -264,6 +258,7 @@ class BlocksqpProblem;
     static const std::string meta_doc;
 
     // Block partitioning
+    int nblocks_;
     std::vector<int> blocks_;
 
     // Jacobian sparsity

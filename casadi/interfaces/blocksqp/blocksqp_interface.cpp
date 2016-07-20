@@ -33,9 +33,6 @@ namespace casadi {
     : self(self), m(m) {
     nVar = self.nx_;
     nCon = self.ng_;
-    nBlocks = self.blocks_.size()-1;
-    blockIdx = new int[nBlocks+1];
-    for (int i=0; i<nBlocks+1; i++) blockIdx[i] = self.blocks_[i];
 
     // Bounds on variables and constraints
     bl.Dimension(nVar + nCon).Initialize(-inf);
@@ -473,30 +470,46 @@ namespace casadi {
                                      {"f", "g", "grad:f:x", "jac:g:x"});
     sp_jac_ = gf_jg.sparsity_out("jac_g_x");
 
-    // Get the sparsity pattern for the Hessian of the Lagrangian
-    Function grad_lag = oracle_.factory("grad_lag",
-                                        {"x", "p", "lam:f", "lam:g"}, {"grad:gamma:x"},
-                                        {{"gamma", {"f", "g"}}});
-    Sparsity Hsp = grad_lag.sparsity_jac("x", "grad_gamma_x", false, true);
+    if (block_hess_ == 0) {
+      // No block-structured Hessian
+      blocks_ = {0, nx_};
+      which_second_derv_ = 0;
+    } else {
+      // Detect block structure
 
-    // Make sure diagonal exists
-    Hsp = Hsp + Sparsity::diag(nx_);
+      // Get the sparsity pattern for the Hessian of the Lagrangian
+      Function grad_lag = oracle_.factory("grad_lag",
+                                          {"x", "p", "lam:f", "lam:g"}, {"grad:gamma:x"},
+                                          {{"gamma", {"f", "g"}}});
+      Sparsity Hsp = grad_lag.sparsity_jac("x", "grad_gamma_x", false, true);
 
-    // Find the strongly connected components of the Hessian
-    // Unlike Sparsity::scc, assume ordered
-    const int* colind = Hsp.colind();
-    const int* row = Hsp.row();
-    blocks_.push_back(0);
-    int ind = 0;
-    while (ind < nx_) {
-      // Find the next cutoff
-      int next=ind+1;
-      while (ind<next && ind<nx_) {
-        for (int k=colind[ind]; k<colind[ind+1]; ++k) next = max(next, 1+row[k]);
-        ind++;
+      // Make sure diagonal exists
+      Hsp = Hsp + Sparsity::diag(nx_);
+
+      // Find the strongly connected components of the Hessian
+      // Unlike Sparsity::scc, assume ordered
+      const int* colind = Hsp.colind();
+      const int* row = Hsp.row();
+      blocks_.push_back(0);
+      int ind = 0;
+      while (ind < nx_) {
+        // Find the next cutoff
+        int next=ind+1;
+        while (ind<next && ind<nx_) {
+          for (int k=colind[ind]; k<colind[ind+1]; ++k) next = max(next, 1+row[k]);
+          ind++;
+        }
+        blocks_.push_back(next);
       }
-      blocks_.push_back(next);
+
+      // hybrid strategy: 1 block for constraints, 1 for objective
+      if (block_hess_ == 2 && blocks_.size() > 3) {
+        blocks_ = {0, *(blocks_.rbegin()+1), blocks_.back()};
+      }
     }
+
+    // Number of blocks
+    nblocks_ = blocks_.size()-1;
 
     // Allocate memory
     alloc_w(sp_jac_.nnz(), true); // jac
@@ -551,30 +564,10 @@ namespace casadi {
 
     int maxblocksize = 1;
 
-    // Set nBlocks structure according to if we use block updates or not
-    if (block_hess_ == 0 || m->prob->nBlocks == 1) {
-      m->nBlocks = 1;
-      m->blockIdx = new int[2];
-      m->blockIdx[0] = 0;
-      m->blockIdx[1] = m->prob->nVar;
-      maxblocksize = m->prob->nVar;
-      const_cast<Blocksqp*>(this)->which_second_derv_ = 0;
-    } else if (block_hess_ == 2 && m->prob->nBlocks > 1) {
-      // hybrid strategy: 1 block for constraints, 1 for objective
-      m->nBlocks = 2;
-      m->blockIdx = new int[3];
-      m->blockIdx[0] = 0;
-      m->blockIdx[1] = m->prob->blockIdx[m->prob->nBlocks-1];
-      m->blockIdx[2] = m->prob->nVar;
-    } else {
-      m->nBlocks = m->prob->nBlocks;
-      m->blockIdx = new int[m->nBlocks+1];
-      for (int k=0; k<m->nBlocks+1; k++) {
-        m->blockIdx[k] = m->prob->blockIdx[k];
-        if (k > 0)
-          if (m->blockIdx[k] - m->blockIdx[k-1] > maxblocksize)
-            maxblocksize = m->blockIdx[k] - m->blockIdx[k-1];
-      }
+    for (int k=0; k<nblocks_+1; k++) {
+      if (k > 0)
+        if (blocks_[k] - blocks_[k-1] > maxblocksize)
+          maxblocksize = blocks_[k] - blocks_[k-1];
     }
 
     if (hess_lim_mem_ && hess_memsize_ == 0)
@@ -662,7 +655,6 @@ namespace casadi {
     delete m->prob;
     delete m->qp;
     delete m->qpSave;
-    if (m->blockIdx != 0) delete[] m->blockIdx;
     if (m->noUpdateCounter != 0) delete[] m->noUpdateCounter;
     if (m->jacNz != 0) delete[] m->jacNz;
     if (m->jacIndRow != 0) delete[] m->jacIndRow;
@@ -858,7 +850,7 @@ namespace casadi {
         if (debug_level_ > 2) {
           //printf("Computing finite differences Hessian at the solution ... \n");
           //calcFiniteDiffHessian();
-          //m->printHessian(m->prob->nBlocks, m->hess);
+          //m->printHessian(nblocks_, m->hess);
           dumpQPCpp(m, m->prob, m->qp, sparse_qp_);
         }
         return 0; //Convergence achieved!
@@ -1650,10 +1642,10 @@ namespace casadi {
   void Blocksqp::calcInitialHessian(BlocksqpMemory* m) const {
     int iBlock;
 
-    for (iBlock=0; iBlock<m->nBlocks; iBlock++)
+    for (iBlock=0; iBlock<nblocks_; iBlock++)
       //if objective derv is computed exactly, don't set the last block!
       if (!(which_second_derv_ == 1 && block_hess_
-        && iBlock == m->nBlocks-1))
+        && iBlock == nblocks_-1))
         calcInitialHessian(m, iBlock);
   }
 
@@ -1678,8 +1670,8 @@ namespace casadi {
 
 
   void Blocksqp::resetHessian(BlocksqpMemory* m) const {
-    for (int iBlock=0; iBlock<m->nBlocks; iBlock++) {
-      if (!(which_second_derv_ == 1 && block_hess_ && iBlock == m->nBlocks - 1)) {
+    for (int iBlock=0; iBlock<nblocks_; iBlock++) {
+      if (!(which_second_derv_ == 1 && block_hess_ && iBlock == nblocks_ - 1)) {
         // if objective derv is computed exactly, don't set the last block!
         resetHessian(m, iBlock);
       }
@@ -1695,9 +1687,9 @@ namespace casadi {
     // or submatrices of gammaMat, deltaMat, i.e. subvectors of gamma and delta
     // from m prev. iterations (for L-BFGS)
     smallGamma.Submatrix(m->gammaMat, nVarLocal, m->gammaMat.N(),
-      m->blockIdx[iBlock], 0);
+      blocks_[iBlock], 0);
     smallDelta.Submatrix(m->deltaMat, nVarLocal, m->deltaMat.N(),
-      m->blockIdx[iBlock], 0);
+      blocks_[iBlock], 0);
 
     // Remove past information on Lagrangian gradient difference
     smallGamma.Initialize(0.0);
@@ -1809,9 +1801,9 @@ namespace casadi {
 
     //if objective derv is computed exactly, don't set the last block!
     if (which_second_derv_ == 1 && block_hess_)
-      nBlocks = m->nBlocks - 1;
+      nBlocks = nblocks_ - 1;
     else
-      nBlocks = m->nBlocks;
+      nBlocks = nblocks_;
 
     // Statistics: how often is damping active, what is the average COL sizing factor?
     m->hessDamped = 0;
@@ -1823,9 +1815,9 @@ namespace casadi {
       // smallGamma and smallDelta are subvectors of gamma and delta,
       // corresponding to partially separability
       smallGamma.Submatrix(m->gammaMat, nVarLocal, m->gammaMat.N(),
-        m->blockIdx[iBlock], 0);
+        blocks_[iBlock], 0);
       smallDelta.Submatrix(m->deltaMat, nVarLocal, m->deltaMat.N(),
-        m->blockIdx[iBlock], 0);
+        blocks_[iBlock], 0);
 
       // Is this the first iteration or the first after a Hessian reset?
       firstIter = (m->noUpdateCounter[iBlock] == -1);
@@ -1887,9 +1879,9 @@ namespace casadi {
 
     //if objective derv is computed exactly, don't set the last block!
     if (which_second_derv_ == 1 && block_hess_) {
-      nBlocks = m->nBlocks - 1;
+      nBlocks = nblocks_ - 1;
     } else {
-      nBlocks = m->nBlocks;
+      nBlocks = nblocks_;
     }
 
     // Statistics: how often is damping active, what is the average COL sizing factor?
@@ -1903,9 +1895,9 @@ namespace casadi {
       // smallGamma and smallDelta are submatrices of gammaMat, deltaMat,
       // i.e. subvectors of gamma and delta from m prev. iterations
       smallGamma.Submatrix(m->gammaMat, nVarLocal, m->gammaMat.N(),
-        m->blockIdx[iBlock], 0);
+        blocks_[iBlock], 0);
       smallDelta.Submatrix(m->deltaMat, nVarLocal, m->deltaMat.N(),
-        m->blockIdx[iBlock], 0);
+        blocks_[iBlock], 0);
 
       // Memory structure
       if (m->itCount > smallGamma.N()) {
@@ -2119,9 +2111,9 @@ namespace casadi {
 
         // If last block contains exact Hessian, we need to copy it
         if (which_second_derv_ == 1)
-          for (int i=0; i<m->hess[m->prob->nBlocks-1].M(); i++)
-            for (int j=i; j<m->hess[m->prob->nBlocks-1].N(); j++)
-              m->hess2[m->prob->nBlocks-1](i, j) = m->hess1[m->prob->nBlocks-1](i, j);
+          for (int i=0; i<m->hess[nblocks_-1].M(); i++)
+            for (int j=i; j<m->hess[nblocks_-1].N(); j++)
+              m->hess2[nblocks_-1](i, j) = m->hess1[nblocks_-1](i, j);
 
         // Limited memory: compute fallback update only when needed
         if (hess_lim_mem_) {
@@ -2144,7 +2136,7 @@ namespace casadi {
         double idxF = idx;
         double mu = (idx==1) ? 1.0 / (maxQP-1) : idxF / (idxF - 1.0);
         double mu1 = 1.0 - mu;
-        for (int iBlock=0; iBlock<m->nBlocks; iBlock++)
+        for (int iBlock=0; iBlock<nblocks_; iBlock++)
           for (int i=0; i<m->hess[iBlock].M(); i++)
             for (int j=i; j<m->hess[iBlock].N(); j++) {
                 m->hess2[iBlock](i, j) *= mu;
@@ -2348,7 +2340,7 @@ namespace casadi {
     if (!hess_lim_mem_ && maxQP > 2 && matricesChanged) {
         double mu = 1.0 / l;
         double mu1 = 1.0 - mu;
-        int nBlocks = (which_second_derv_ == 1) ? m->nBlocks-1 : m->nBlocks;
+        int nBlocks = (which_second_derv_ == 1) ? nblocks_-1 : nblocks_;
         for (int iBlock=0; iBlock<nBlocks; iBlock++)
           for (int i=0; i<m->hess[iBlock].M(); i++)
             for (int j=i; j<m->hess[iBlock].N(); j++) {
@@ -2512,7 +2504,7 @@ namespace casadi {
         if (print_level_ > 1) {
           printf("%5i", m->nSOCS);
           printf("%3i, %3i, %-9.1e", m->hessSkipped, m->hessDamped, m->averageSizingFactor);
-          printf("%i, %-9.1e", m->qpResolve, l1VectorNorm(m->deltaH)/m->nBlocks);
+          printf("%i, %-9.1e", m->qpResolve, l1VectorNorm(m->deltaH)/nblocks_);
         }
         printf("\n");
       }
@@ -2525,7 +2517,7 @@ namespace casadi {
                  lInfVectorNorm(m->deltaXi),
                  m->lambdaStepNorm, m->alpha, m->nSOCS, m->hessSkipped,
                  m->hessDamped, m->averageSizingFactor,
-                 m->qpResolve, l1VectorNorm(m->deltaH)/m->nBlocks);
+                 m->qpResolve, l1VectorNorm(m->deltaH)/nblocks_);
 
         // Print update sequence
         fprintf(m->updateFile, "%i\t", m->qpResolve);
@@ -2785,10 +2777,10 @@ namespace casadi {
     int blockCnt = 0;
     for (i=0; i<n; i++) {
       for (j=0; j<n; j++) {
-        if (i == m->blockIdx[blockCnt+1]) blockCnt++;
-        if (j >= m->blockIdx[blockCnt] && j < m->blockIdx[blockCnt+1]) {
-          fprintf(outfile, "%23.16e ", m->hess[blockCnt](i - m->blockIdx[blockCnt],
-            j - m->blockIdx[blockCnt]));
+        if (i == blocks_[blockCnt+1]) blockCnt++;
+        if (j >= blocks_[blockCnt] && j < blocks_[blockCnt+1]) {
+          fprintf(outfile, "%23.16e ", m->hess[blockCnt](i - blocks_[blockCnt],
+            j - blocks_[blockCnt]));
         } else {
           fprintf(outfile, "0.0 ");
         }
@@ -2997,17 +2989,17 @@ namespace casadi {
     int iBlock, varDim;
 
     // Create one Matrix for one diagonal block in the Hessian
-    m->hess1 = new blocksqp::SymMatrix[m->nBlocks];
-    for (iBlock=0; iBlock<m->nBlocks; iBlock++) {
-        varDim = m->blockIdx[iBlock+1] - m->blockIdx[iBlock];
+    m->hess1 = new blocksqp::SymMatrix[nblocks_];
+    for (iBlock=0; iBlock<nblocks_; iBlock++) {
+        varDim = blocks_[iBlock+1] - blocks_[iBlock];
         m->hess1[iBlock].Dimension(varDim).Initialize(0.0);
       }
 
     // For SR1 or finite differences, maintain two Hessians
     if (hess_update_ == 1 || hess_update_ == 4) {
-      m->hess2 = new blocksqp::SymMatrix[m->nBlocks];
-      for (iBlock=0; iBlock<m->nBlocks; iBlock++) {
-        varDim = m->blockIdx[iBlock+1] - m->blockIdx[iBlock];
+      m->hess2 = new blocksqp::SymMatrix[nblocks_];
+      for (iBlock=0; iBlock<nblocks_; iBlock++) {
+        varDim = blocks_[iBlock+1] - blocks_[iBlock];
         m->hess2[iBlock].Dimension(varDim).Initialize(0.0);
       }
     }
@@ -3027,11 +3019,11 @@ namespace casadi {
     int blockCnt = 0;
     for (int i=0; i<prob->nVar; i++)
       for (int j=0; j<prob->nVar; j++) {
-          if (i == m->blockIdx[blockCnt+1])
+          if (i == blocks_[blockCnt+1])
             blockCnt++;
-          if (j >= m->blockIdx[blockCnt] && j < m->blockIdx[blockCnt+1])
-            m->hessNz[count++] = m->hess[blockCnt](i - m->blockIdx[blockCnt],
-              j - m->blockIdx[blockCnt]);
+          if (j >= blocks_[blockCnt] && j < blocks_[blockCnt+1])
+            m->hessNz[count++] = m->hess[blockCnt](i - blocks_[blockCnt],
+              j - blocks_[blockCnt]);
           else
             m->hessNz[count++] = 0.0;
         }
@@ -3050,7 +3042,7 @@ namespace casadi {
 
     // 1) count nonzero elements
     nnz = 0;
-    for (iBlock=0; iBlock<m->nBlocks; iBlock++)
+    for (iBlock=0; iBlock<nblocks_; iBlock++)
       for (i=0; i<hess_[iBlock].N(); i++)
         for (j=i; j<hess_[iBlock].N(); j++)
           if (fabs(hess_[iBlock](i, j)) > eps) {
@@ -3073,7 +3065,7 @@ namespace casadi {
     count = 0; // runs over all nonzero elements
     colCountTotal = 0; // keep track of position in large matrix
     rowOffset = 0;
-    for (iBlock=0; iBlock<m->nBlocks; iBlock++) {
+    for (iBlock=0; iBlock<nblocks_; iBlock++) {
       nCols = hess_[iBlock].N();
       nRows = hess_[iBlock].M();
 
@@ -3133,7 +3125,7 @@ namespace casadi {
     m->lambdaQP.Dimension(nVar+nCon).Initialize(0.0);
 
     // line search parameters
-    m->deltaH.Dimension(m->nBlocks).Initialize(0.0);
+    m->deltaH.Dimension(nblocks_).Initialize(0.0);
 
     // filter as a set of pairs
     m->filter = new std::set< std::pair<double, double> >;
@@ -3143,15 +3135,15 @@ namespace casadi {
     m->gamma.Submatrix(m->gammaMat, nVar, 1, 0, 0);
 
     // Scalars that are used in various Hessian update procedures
-    m->noUpdateCounter = new int[m->nBlocks];
-    for (iBlock=0; iBlock<m->nBlocks; iBlock++)
+    m->noUpdateCounter = new int[nblocks_];
+    for (iBlock=0; iBlock<nblocks_; iBlock++)
       m->noUpdateCounter[iBlock] = -1;
 
     // For selective sizing: for each block save sTs, sTs_, sTy, sTy_
-    m->deltaNorm.Dimension(m->nBlocks).Initialize(1.0);
-    m->deltaNormOld.Dimension(m->nBlocks).Initialize(1.0);
-    m->deltaGamma.Dimension(m->nBlocks).Initialize(0.0);
-    m->deltaGammaOld.Dimension(m->nBlocks).Initialize(0.0);
+    m->deltaNorm.Dimension(nblocks_).Initialize(1.0);
+    m->deltaNormOld.Dimension(nblocks_).Initialize(1.0);
+    m->deltaGamma.Dimension(nblocks_).Initialize(0.0);
+    m->deltaGammaOld.Dimension(nblocks_).Initialize(0.0);
   }
 
 
