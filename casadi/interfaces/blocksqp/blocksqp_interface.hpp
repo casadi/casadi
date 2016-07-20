@@ -48,11 +48,36 @@ namespace casadi {
     blocksqp::Problemspec* prob;
     blocksqp::SQPiterate* vars;
     blocksqp::SQPoptions* param;
-    blocksqp::SQPstats* stats;
     qpOASES::SQProblem* qp;
     qpOASES::SQProblem* qpSave;
     bool initCalled;
 
+    // Stats
+    int itCount;                 ///< iteration number
+    int qpIterations;            ///< number of qp iterations in the current major iteration
+    int qpIterations2;           ///< number of qp iterations for solving convexified QPs
+    int qpItTotal;               ///< total number of qp iterations
+    int qpResolve;               ///< how often has QP to be convexified and resolved?
+    int nFunCalls;               ///< number of function calls
+    int nDerCalls;               ///< number of derivative calls
+    int nRestHeurCalls;          ///< number calls to feasibility restoration heuristic
+    int nRestPhaseCalls;         ///< number calls to feasibility restoration phase
+    int rejectedSR1;             ///< count how often the SR1 update is rejected
+    int hessSkipped;             ///< number of block updates skipped in the current iteration
+    int hessDamped;              ///< number of block updates damped in the current iteration
+    int nTotalUpdates;
+    int nTotalSkippedUpdates;
+    double averageSizingFactor;  ///< average value (over all blocks) of COL sizing factor
+    blocksqp::PATHSTR outpath;             ///< path where log files are stored
+
+    FILE *progressFile;          ///< save stats for each SQP step
+    FILE *updateFile;            ///< print update sequence (SR1/BFGS) to file
+    FILE *primalVarsFile;        ///< primal variables for every SQP iteration
+    FILE *dualVarsFile;          ///< dual variables for every SQP iteration
+    FILE *jacFile;               ///< Jacobian of one iteration
+    FILE *hessFile;              ///< Hessian of one iteration
+
+    // Temporary memory
     double* jac;
   };
 
@@ -259,6 +284,45 @@ namespace casadi {
     // [blockwise] Size Hessian using the COL scaling factor
     void sizeHessianCOL(BlocksqpMemory* m, const blocksqp::Matrix &gamma,
       const blocksqp::Matrix &delta, int iBlock) const;
+
+    /*
+    * STATS
+    */
+    /// Open output files
+    void initStats(BlocksqpMemory* m, blocksqp::SQPoptions *param) const;
+    /// Print Debug information in logfiles
+    void printDebug(BlocksqpMemory* m, blocksqp::SQPiterate *vars,
+      blocksqp::SQPoptions *param) const;
+    /// Print current iterate of primal variables to file
+    void printPrimalVars(BlocksqpMemory* m, const blocksqp::Matrix &xi) const;
+    /// Print current iterate of dual variables to file
+    void printDualVars(BlocksqpMemory* m, const blocksqp::Matrix &lambda) const;
+    /// Print all QP data to files to be read in MATLAB
+    void dumpQPMatlab(BlocksqpMemory* m, blocksqp::Problemspec *prob,
+      blocksqp::SQPiterate *vars, int sparseQP) const;
+    void dumpQPCpp(BlocksqpMemory* m, blocksqp::Problemspec *prob,
+      blocksqp::SQPiterate *vars, qpOASES::SQProblem *qp, int sparseQP) const;
+    void printVectorCpp(BlocksqpMemory* m, FILE *outfile, double *vec,
+      int len, char* varname) const;
+    void printVectorCpp(BlocksqpMemory* m, FILE *outfile, int *vec, int len,
+      char* varname) const;
+    void printCppNull(BlocksqpMemory* m, FILE *outfile, char* varname) const;
+    /// Print current (full) Jacobian to Matlab file
+    void printJacobian(BlocksqpMemory* m, const blocksqp::Matrix &constrJacFull) const;
+    void printJacobian(BlocksqpMemory* m, int nCon, int nVar, double *jacNz,
+      int *jacIndRow, int *jacIndCol) const;
+    /// Print current (full) Hessian to Matlab file
+    void printHessian(BlocksqpMemory* m, int nBlocks, blocksqp::SymMatrix *&hess) const;
+    void printHessian(BlocksqpMemory* m, int nVar, double *hesNz, int *hesIndRow,
+      int *hesIndCol) const;
+    /// Print a sparse Matrix in (column compressed) to a MATLAB readable file
+    void printSparseMatlab(BlocksqpMemory* m, FILE *file, int nRow, int nVar,
+      double *nz, int *indRow, int *indCol) const;
+    /// Print one line of output to stdout about the current iteration
+    void printProgress(BlocksqpMemory* m, blocksqp::Problemspec *prob,
+      blocksqp::SQPiterate *vars, blocksqp::SQPoptions *param, bool hasConverged) const;
+    /// Must be called before returning from run()
+    void finish(BlocksqpMemory* m, blocksqp::SQPoptions *param) const;
   };
 
 } // namespace casadi
