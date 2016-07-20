@@ -48,8 +48,6 @@ namespace casadi {
     qpOASES::SQProblem* qp;
     qpOASES::SQProblem* qpSave;
 
-    double      objLo;    // lower bound for objective
-    double      objUp;    // upper bound for objective
     blocksqp::Matrix      bl;     // lower bounds of variables and constraints
     blocksqp::Matrix      bu;     // upper bounds of variables and constraints
 
@@ -446,6 +444,8 @@ namespace casadi {
     double kappa_plus_max_;
     double delta_h0_;
     double eta_;
+    double obj_lo_;
+    double obj_up_;
   };
 
 } // namespace casadi

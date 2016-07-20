@@ -189,7 +189,13 @@ namespace casadi {
         "Filter line search parameter, cf. IPOPT paper"}},
       {"eta",
        {OT_DOUBLE,
-        "Filter line search parameter, cf. IPOPT paper"}}
+        "Filter line search parameter, cf. IPOPT paper"}},
+      {"obj_lo",
+       {OT_DOUBLE,
+        "Lower bound on objective function [-inf]"}},
+      {"obj_up",
+       {OT_DOUBLE,
+        "Upper bound on objective function [inf]"}}
      }
   };
 
@@ -243,6 +249,8 @@ namespace casadi {
     kappa_plus_max_ = 100.0;
     delta_h0_ = 1.0e-4;
     eta_ = 1.0e-4;
+    obj_lo_ = -inf;
+    obj_up_ = inf;
 
     // Read user options
     for (auto&& op : opts) {
@@ -336,6 +344,10 @@ namespace casadi {
         delta_h0_ = op.second;
       } else if (op.first=="eta") {
         eta_ = op.second;
+      } else if (op.first=="obj_lo") {
+        obj_lo_ = op.second;
+      } else if (op.first=="obj_up") {
+        obj_up_ = op.second;
       }
     }
 
@@ -443,10 +455,6 @@ namespace casadi {
       m->bl(nx_ + i) = m->lbg ? m->lbg[i] : 0;
       m->bu(nx_ + i) = m->ubg ? m->ubg[i] : 0;
     }
-
-    // Bounds on objective function
-    m->objLo = -inf;
-    m->objUp = inf;
 
     /*-------------------------------------------------*/
     /* Create blockSQP method object and run algorithm */
@@ -1084,7 +1092,7 @@ namespace casadi {
       cNormTrial = lInfConstraintNorm(m->trialXi, m->constr, m->bu, m->bl);
       // Reduce step if evaluation fails, if lower bound is violated
       // or if objective or a constraint is NaN
-      if (info != 0 || objTrial < m->objLo || objTrial > m->objUp
+      if (info != 0 || objTrial < obj_lo_ || objTrial > obj_up_
         || !(objTrial == objTrial) || !(cNormTrial == cNormTrial)) {
         printf("info=%i, objTrial=%g\n", info, objTrial);
         // evaluation error, reduce stepsize
@@ -1131,7 +1139,7 @@ namespace casadi {
       m->nFunCalls++;
       cNormTrial = lInfConstraintNorm(m->trialXi, m->constr, m->bu, m->bl);
       // Reduce step if evaluation fails, if lower bound is violated or if objective is NaN
-      if (info != 0 || objTrial < m->objLo || objTrial > m->objUp
+      if (info != 0 || objTrial < obj_lo_ || objTrial > obj_up_
         || !(objTrial == objTrial) || !(cNormTrial == cNormTrial)) {
           // evaluation error, reduce stepsize
           reduceStepsize(m, &alpha);
@@ -1266,7 +1274,7 @@ namespace casadi {
       m->nFunCalls++;
       cNormTrialSOC = lInfConstraintNorm(m->trialXi, m->constr,
         m->bu, m->bl);
-      if (info != 0 || objTrialSOC < m->objLo || objTrialSOC > m->objUp
+      if (info != 0 || objTrialSOC < obj_lo_ || objTrialSOC > obj_up_
         || !(objTrialSOC == objTrialSOC) || !(cNormTrialSOC == cNormTrialSOC)) {
         return false; // evaluation error, abort SOC
       }
@@ -1363,7 +1371,7 @@ namespace casadi {
     evaluate(m, m->trialXi, &m->obj, m->constr, &info);
     m->nFunCalls++;
     cNormTrial = lInfConstraintNorm(m->trialXi, m->constr, m->bu, m->bl);
-    if (info != 0 || m->obj < m->objLo || m->obj > m->objUp
+    if (info != 0 || m->obj < obj_lo_ || m->obj > obj_up_
       || !(m->obj == m->obj) || !(cNormTrial == cNormTrial))
       return -1;
 
@@ -1418,7 +1426,7 @@ namespace casadi {
     evaluate(m, m->trialXi, &objTrial, trialConstr, &info);
     m->nFunCalls++;
     cNormTrial = lInfConstraintNorm(m->trialXi, trialConstr, m->bu, m->bl);
-    if (info != 0 || objTrial < m->objLo || objTrial > m->objUp
+    if (info != 0 || objTrial < obj_lo_ || objTrial > obj_up_
       || !(objTrial == objTrial) || !(cNormTrial == cNormTrial)) {
       // evaluation error
       return 1;
@@ -1481,7 +1489,7 @@ namespace casadi {
 
   void Blocksqp::initializeFilter(BlocksqpMemory* m) const {
     std::set< std::pair<double, double> >::iterator iter;
-    std::pair<double, double> initPair(theta_max_, m->objLo);
+    std::pair<double, double> initPair(theta_max_, obj_lo_);
 
     // Remove all elements
     iter=m->filter->begin();
