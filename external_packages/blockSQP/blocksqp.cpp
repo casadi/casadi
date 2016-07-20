@@ -905,8 +905,6 @@ namespace blocksqp {
 
     // 0: no output, 1: normal output, 2: verbose output
     printLevel = 2;
-    // 1: (some) colorful output
-    printColor = 1;
 
     /* 0: no debug output, 1: print one line per iteration to file,
        2: extensive debug output to files (impairs performance) */

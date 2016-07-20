@@ -2234,20 +2234,11 @@ namespace casadi {
             printf("%-10.2e", m->gradNorm);
             printf("%-10.2e", lInfVectorNorm(m->deltaXi));
             printf("%-10.2e", m->lambdaStepNorm);
-          }
-
-        if ((m->alpha == 1.0 && m->steptype != -1) || !param->printColor) {
-          printf("%-9.1e", m->alpha);
-        } else {
-          printf("\033[0;36m%-9.1e\033[0m", m->alpha);
         }
+        printf("%-9.1e", m->alpha);
 
         if (param->printLevel > 1) {
-          if (m->nSOCS == 0 || !param->printColor) {
-            printf("%5i", m->nSOCS);
-          } else {
-            printf("\033[0;36m%5i\033[0m", m->nSOCS);
-          }
+          printf("%5i", m->nSOCS);
           printf("%3i, %3i, %-9.1e", m->hessSkipped, m->hessDamped, m->averageSizingFactor);
           printf("%i, %-9.1e", m->qpResolve, l1VectorNorm(m->deltaH)/m->nBlocks);
         }
@@ -2287,11 +2278,7 @@ namespace casadi {
 
     if (param->printLevel > 0) {
       if (hasConverged && m->steptype < 2) {
-        if (param->printColor) {
-          printf("\n\033[1;32m***CONVERGENCE ACHIEVED!***\n\033[0m");
-        } else {
-          printf("\n***CONVERGENCE ACHIEVED!***\n");
-        }
+        printf("\n***CONVERGENCE ACHIEVED!***\n");
       }
     }
   }

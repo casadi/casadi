@@ -214,7 +214,6 @@ namespace blocksqp {
      */
   public:
     int printLevel;                     ///< information about the current iteration
-    int printColor;                     ///< use colored terminal output
     int debugLevel;                     ///< amount of debug information that is printed during every iteration
     double eps;                         ///< values smaller than this are regarded as numerically zero
     double opttol;                      ///< optimality tolerance
