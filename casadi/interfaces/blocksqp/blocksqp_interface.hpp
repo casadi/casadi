@@ -44,8 +44,10 @@ namespace casadi {
   // Forward declaration
   class Blocksqp;
 
+class BlocksqpProblem;
+
   struct CASADI_NLPSOL_BLOCKSQP_EXPORT BlocksqpMemory : public NlpsolMemory {
-    blocksqp::Problemspec* prob;
+    BlocksqpProblem* prob;
     qpOASES::SQProblem* qp;
     qpOASES::SQProblem* qpSave;
     bool initCalled;
@@ -144,28 +146,41 @@ namespace casadi {
   };
 
   // Problem class
-  class BlocksqpProblem : public blocksqp::Problemspec {
+  class BlocksqpProblem {
   public:
     const Blocksqp& self;
     BlocksqpMemory* m;
+
+    int    nVar;   // number of variables
+    int    nCon;   // number of constraints
+    int    nnCon;  // number of nonlinear constraints
+
+    double      objLo;    // lower bound for objective
+    double      objUp;    // upper bound for objective
+    blocksqp::Matrix      bl;     // lower bounds of variables and constraints
+    blocksqp::Matrix      bu;     // upper bounds of variables and constraints
+
+    int    nBlocks;  // number of separable blocks of Lagrangian
+    int*   blockIdx; // [blockwise] index in the variable vector where a block starts
+
     BlocksqpProblem(const Blocksqp& self, BlocksqpMemory* m);
 
     // Set initial values for xi (and possibly lambda) and parts of the
     // Jacobian that correspond to linear constraints (dense version).
-    virtual void initialize(blocksqp::Matrix &xi,
-                            blocksqp::Matrix &lambda,
+    void initialize(blocksqp::Matrix &xi,
+                       blocksqp::Matrix &lambda,
                             blocksqp::Matrix &constrJac);
 
     // Set initial values for xi (and possibly lambda) and parts of the
     // Jacobian that correspond to linear constraints (sparse version).
-    virtual void initialize(blocksqp::Matrix &xi,
+    void initialize(blocksqp::Matrix &xi,
                             blocksqp::Matrix &lambda,
                             double *&jacNz,
                             int *&jacIndRow,
                             int *&jacIndCol);
 
     /// Evaluate objective, constraints, and derivatives (dense version).
-    virtual void evaluate(const blocksqp::Matrix &xi,
+    void evaluate(const blocksqp::Matrix &xi,
                           const blocksqp::Matrix &lambda,
                           double *objval,
                           blocksqp::Matrix &constr,
@@ -176,7 +191,7 @@ namespace casadi {
                           int *info);
 
     /// Evaluate objective, constraints, and derivatives (sparse version).
-    virtual void evaluate(const blocksqp::Matrix &xi,
+    void evaluate(const blocksqp::Matrix &xi,
                           const blocksqp::Matrix &lambda,
                           double *objval,
                           blocksqp::Matrix &constr,
@@ -187,6 +202,19 @@ namespace casadi {
                           blocksqp::SymMatrix *&hess,
                           int dmode,
                           int *info);
+
+    /// Short cut if no derivatives are needed
+    void evaluate(const blocksqp::Matrix &xi,
+                          double *objval,
+                          blocksqp::Matrix &constr,
+                          int *info);
+
+    void reduceConstrVio(blocksqp::Matrix &xi, int *info) {
+      *info = 1;
+    }
+
+    void printInfo() {
+    }
   };
 
 
@@ -357,8 +385,8 @@ namespace casadi {
     /// Print current iterate of dual variables to file
     void printDualVars(BlocksqpMemory* m, const blocksqp::Matrix &lambda) const;
     /// Print all QP data to files to be read in MATLAB
-    void dumpQPMatlab(BlocksqpMemory* m, blocksqp::Problemspec *prob, int sparseQP) const;
-    void dumpQPCpp(BlocksqpMemory* m, blocksqp::Problemspec *prob,
+    void dumpQPMatlab(BlocksqpMemory* m, BlocksqpProblem *prob, int sparseQP) const;
+    void dumpQPCpp(BlocksqpMemory* m, BlocksqpProblem *prob,
       qpOASES::SQProblem *qp, int sparseQP) const;
     void printVectorCpp(BlocksqpMemory* m, FILE *outfile, double *vec,
       int len, char* varname) const;
@@ -377,22 +405,22 @@ namespace casadi {
     void printSparseMatlab(BlocksqpMemory* m, FILE *file, int nRow, int nVar,
       double *nz, int *indRow, int *indCol) const;
     /// Print one line of output to stdout about the current iteration
-    void printProgress(BlocksqpMemory* m, blocksqp::Problemspec *prob,
+    void printProgress(BlocksqpMemory* m, BlocksqpProblem *prob,
                        bool hasConverged) const;
     /// Allocate variables that any SQP code needs
-    void allocMin(BlocksqpMemory* m, blocksqp::Problemspec* prob) const;
+    void allocMin(BlocksqpMemory* m, BlocksqpProblem* prob) const;
     /// Allocate diagonal block Hessian
     void allocHess(BlocksqpMemory* m) const;
     /// Convert *hess to column compressed sparse format
-    void convertHessian(BlocksqpMemory* m, blocksqp::Problemspec *prob, double eps,
+    void convertHessian(BlocksqpMemory* m, BlocksqpProblem *prob, double eps,
                          blocksqp::SymMatrix *&hess_,
                          double *&hessNz_, int *&hessIndRow_, int *&hessIndCol_,
                          int *&hessIndLo_) const;
     /// Convert *hess to double array (dense matrix)
-    void convertHessian(BlocksqpMemory* m, blocksqp::Problemspec *prob, double eps,
+    void convertHessian(BlocksqpMemory* m, BlocksqpProblem *prob, double eps,
                         blocksqp::SymMatrix *&hess_) const;
     /// Allocate variables specifically needed by vmused SQP method
-    void allocAlg(BlocksqpMemory* m, blocksqp::Problemspec* prob) const;
+    void allocAlg(BlocksqpMemory* m, BlocksqpProblem* prob) const;
     /// Set initial filter, objective function, tolerances etc.
     void initIterate(BlocksqpMemory* m) const;
 

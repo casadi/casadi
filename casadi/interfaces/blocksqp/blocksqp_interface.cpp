@@ -119,6 +119,28 @@ namespace casadi {
     casadi_error("BlocksqpProblem::evaluate (dense)");
   }
 
+  void BlocksqpProblem::evaluate(const blocksqp::Matrix &xi, double *objval,
+                                 blocksqp::Matrix &constr, int *info) {
+    blocksqp::Matrix lambdaDummy, gradObjDummy;
+    blocksqp::SymMatrix *hessDummy;
+    int dmode = 0;
+
+    blocksqp::Matrix constrJacDummy;
+    double *jacNzDummy;
+    int *jacIndRowDummy, *jacIndColDummy;
+    *info = 0;
+
+    // Try sparse version first
+    evaluate(xi, lambdaDummy, objval, constr, gradObjDummy, jacNzDummy,
+      jacIndRowDummy, jacIndColDummy, hessDummy, dmode, info);
+
+    // If sparse version is not implemented, try dense version
+    if (info) {
+      evaluate(xi, lambdaDummy, objval, constr, gradObjDummy,
+        constrJacDummy, hessDummy, dmode, info);
+    }
+  }
+
   extern "C"
   int CASADI_NLPSOL_BLOCKSQP_EXPORT
   casadi_register_nlpsol_blocksqp(Nlpsol::Plugin* plugin) {
@@ -2402,7 +2424,7 @@ namespace casadi {
   }
 
   void Blocksqp::
-  printProgress(BlocksqpMemory* m, blocksqp::Problemspec *prob,
+  printProgress(BlocksqpMemory* m, BlocksqpProblem *prob,
     bool hasConverged) const {
     /*
      * m->steptype:
@@ -2725,7 +2747,7 @@ namespace casadi {
 
 
   void Blocksqp::
-  dumpQPCpp(BlocksqpMemory* m, blocksqp::Problemspec *prob,
+  dumpQPCpp(BlocksqpMemory* m, BlocksqpProblem *prob,
     qpOASES::SQProblem *qp, int sparseQP) const {
     int i, j;
     blocksqp::PATHSTR filename;
@@ -2882,7 +2904,7 @@ namespace casadi {
     fclose(outfile);
   }
 
-  void Blocksqp::dumpQPMatlab(BlocksqpMemory* m, blocksqp::Problemspec *prob,
+  void Blocksqp::dumpQPMatlab(BlocksqpMemory* m, BlocksqpProblem *prob,
     int sparseQP) const {
     blocksqp::Matrix temp;
     blocksqp::PATHSTR filename;
@@ -2952,7 +2974,7 @@ namespace casadi {
    * required by all optimization
    * algorithms except for the Jacobian
    */
-  void Blocksqp::allocMin(BlocksqpMemory* m, blocksqp::Problemspec *prob) const {
+  void Blocksqp::allocMin(BlocksqpMemory* m, BlocksqpProblem *prob) const {
     // current iterate
     m->xi.Dimension(prob->nVar).Initialize(0.0);
 
@@ -2998,7 +3020,7 @@ namespace casadi {
    * Convert diagonal block Hessian to double array.
    * Assumes that hessNz is already allocated.
    */
-  void Blocksqp::convertHessian(BlocksqpMemory* m, blocksqp::Problemspec *prob,
+  void Blocksqp::convertHessian(BlocksqpMemory* m, BlocksqpProblem *prob,
     double eps, blocksqp::SymMatrix *&hess_) const {
     if (m->hessNz == 0) return;
     int count = 0;
@@ -3020,7 +3042,7 @@ namespace casadi {
    * Harwell-Boeing format (as used by qpOASES)
    */
   void Blocksqp::
-  convertHessian(BlocksqpMemory* m, blocksqp::Problemspec *prob, double eps,
+  convertHessian(BlocksqpMemory* m, BlocksqpProblem *prob, double eps,
                  blocksqp::SymMatrix *&hess_, double *&hessNz_,
                  int *&hessIndRow_, int *&hessIndCol_, int *&hessIndLo_) const {
     int iBlock, count, colCountTotal, rowOffset, i, j;
@@ -3089,7 +3111,7 @@ namespace casadi {
    * needed by the algorithm
    */
   void Blocksqp::
-  allocAlg(BlocksqpMemory* m, blocksqp::Problemspec *prob) const {
+  allocAlg(BlocksqpMemory* m, BlocksqpProblem *prob) const {
     int iBlock;
     int nVar = prob->nVar;
     int nCon = prob->nCon;
