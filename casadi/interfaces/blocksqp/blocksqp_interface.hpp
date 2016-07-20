@@ -46,7 +46,6 @@ namespace casadi {
 
   struct CASADI_NLPSOL_BLOCKSQP_EXPORT BlocksqpMemory : public NlpsolMemory {
     blocksqp::Problemspec* prob;
-    blocksqp::SQPoptions* param;
     qpOASES::SQProblem* qp;
     qpOASES::SQProblem* qpSave;
     bool initCalled;
@@ -350,9 +349,9 @@ namespace casadi {
     * STATS
     */
     /// Open output files
-    void initStats(BlocksqpMemory* m, blocksqp::SQPoptions *param) const;
+    void initStats(BlocksqpMemory* m) const;
     /// Print Debug information in logfiles
-    void printDebug(BlocksqpMemory* m, blocksqp::SQPoptions *param) const;
+    void printDebug(BlocksqpMemory* m) const;
     /// Print current iterate of primal variables to file
     void printPrimalVars(BlocksqpMemory* m, const blocksqp::Matrix &xi) const;
     /// Print current iterate of dual variables to file
@@ -379,15 +378,11 @@ namespace casadi {
       double *nz, int *indRow, int *indCol) const;
     /// Print one line of output to stdout about the current iteration
     void printProgress(BlocksqpMemory* m, blocksqp::Problemspec *prob,
-                       blocksqp::SQPoptions *param,
                        bool hasConverged) const;
-    /// Must be called before returning from run()
-    void finish(BlocksqpMemory* m, blocksqp::SQPoptions *param) const;
-
     /// Allocate variables that any SQP code needs
     void allocMin(BlocksqpMemory* m, blocksqp::Problemspec* prob) const;
     /// Allocate diagonal block Hessian
-    void allocHess(BlocksqpMemory* m, blocksqp::SQPoptions* param) const;
+    void allocHess(BlocksqpMemory* m) const;
     /// Convert *hess to column compressed sparse format
     void convertHessian(BlocksqpMemory* m, blocksqp::Problemspec *prob, double eps,
                          blocksqp::SymMatrix *&hess_,
@@ -397,10 +392,9 @@ namespace casadi {
     void convertHessian(BlocksqpMemory* m, blocksqp::Problemspec *prob, double eps,
                         blocksqp::SymMatrix *&hess_) const;
     /// Allocate variables specifically needed by vmused SQP method
-    void allocAlg(BlocksqpMemory* m, blocksqp::Problemspec* prob,
-                  blocksqp::SQPoptions* param) const;
+    void allocAlg(BlocksqpMemory* m, blocksqp::Problemspec* prob) const;
     /// Set initial filter, objective function, tolerances etc.
-    void initIterate(BlocksqpMemory* m, blocksqp::SQPoptions* param) const;
+    void initIterate(BlocksqpMemory* m) const;
 
     // General options
     int print_level_;
