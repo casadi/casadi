@@ -145,12 +145,141 @@ namespace casadi {
 
   Options Blocksqp::options_
   = {{&Nlpsol::options_},
-     {{"blocksqp",
-       {OT_DICT,
-        "Options to be passed to BLOCKSQP"}},
-      {"contype",
-       {OT_INTVECTOR,
-        "Type of constraint"}}
+     {{"print_level",
+       {OT_INT,
+        "Print level"}},
+      {"debug_level",
+       {OT_INT,
+        "Amount of debug information that is printed during every iteration"}},
+      {"eps",
+       {OT_DOUBLE,
+        "Values smaller than this are regarded as numerically zero"}},
+      {"opttol",
+       {OT_DOUBLE,
+        "Optimality tolerance"}},
+      {"nlinfeastol",
+       {OT_DOUBLE,
+        "Nonlinear feasibility tolerance"}},
+      {"sparse_qp",
+       {OT_INT,
+        "Which qpOASES variant is used (dense/sparse/Schur)"}},
+      {"globalization",
+       {OT_INT,
+        "Globalization strategy"}},
+      {"restore_feas",
+       {OT_INT,
+        "Use feasibility restoration phase"}},
+      {"max_line_search",
+       {OT_INT,
+        "Maximum number of steps in line search"}},
+      {"max_consec_reduced_steps",
+       {OT_INT,
+        "Maximum number of consecutive reduced steps"}},
+      {"max_consec_skipped_updates",
+       {OT_INT,
+        "Maximum number of consecutive skipped updates"}},
+      {"max_it_qp",
+       {OT_INT,
+        "Maximum number of QP iterations per SQP iteration"}},
+      {"block_hess",
+       {OT_INT,
+        "Blockwise Hessian approximation?"}},
+      {"hess_scaling",
+       {OT_INT,
+        "Scaling strategy for Hessian approximation"}},
+      {"fallback_scaling",
+       {OT_INT,
+        "If indefinite update is used, the type of fallback strategy"}},
+      {"max_time_qp",
+       {OT_DOUBLE,
+        "Maximum number of time in seconds per QP solve per SQP iteration"}},
+      {"ini_hess_diag",
+       {OT_DOUBLE,
+        "Initial Hessian guess: diagonal matrix diag(iniHessDiag)"}},
+      {"col_eps",
+       {OT_DOUBLE,
+        "Epsilon for COL scaling strategy"}},
+      {"col_tau1",
+       {OT_DOUBLE,
+        "tau1 for COL scaling strategy"}},
+      {"col_tau2",
+       {OT_DOUBLE,
+        "tau2 for COL scaling strategy"}},
+      {"hess_damp",
+       {OT_INT,
+        "Activate Powell damping for BFGS"}},
+      {"hess_damp_fac",
+       {OT_DOUBLE,
+        "Damping factor for BFGS Powell modification"}},
+      {"hess_update",
+       {OT_INT,
+        "Type of Hessian approximation"}},
+      {"fallback_update",
+       {OT_INT,
+        "If indefinite update is used, the type of fallback strategy"}},
+      {"hess_lim_mem",
+       {OT_INT,
+        "Full or limited memory"}},
+      {"hess_memsize",
+       {OT_INT,
+        "Memory size for L-BFGS updates"}},
+      {"which_second_derv",
+       {OT_INT,
+        "For which block should second derivatives be provided by the user"}},
+      {"skip_first_globalization",
+       {OT_BOOL,
+        "No globalization strategy in first iteration"}},
+      {"conv_strategy",
+       {OT_INT,
+        "Convexification strategy"}},
+      {"max_conv_qp",
+       {OT_INT,
+        "How many additional QPs may be solved for convexification per iteration?"}},
+      {"max_soc_iter",
+       {OT_INT,
+        "Maximum number of SOC line search iterations"}},
+      {"gamma_theta",
+       {OT_DOUBLE,
+        "Filter line search parameter, cf. IPOPT paper"}},
+      {"gamma_f",
+       {OT_DOUBLE,
+        "Filter line search parameter, cf. IPOPT paper"}},
+      {"kappa_soc",
+       {OT_DOUBLE,
+        "Filter line search parameter, cf. IPOPT paper"}},
+      {"kappa_f",
+       {OT_DOUBLE,
+        "Filter line search parameter, cf. IPOPT paper"}},
+      {"theta_max",
+       {OT_DOUBLE,
+        "Filter line search parameter, cf. IPOPT paper"}},
+      {"theta_min",
+       {OT_DOUBLE,
+        "Filter line search parameter, cf. IPOPT paper"}},
+      {"delta",
+       {OT_DOUBLE,
+        "Filter line search parameter, cf. IPOPT paper"}},
+      {"s_theta",
+       {OT_DOUBLE,
+        "Filter line search parameter, cf. IPOPT paper"}},
+      {"s_f",
+       {OT_DOUBLE,
+        "Filter line search parameter, cf. IPOPT paper"}},
+      {"kappa_minus",
+       {OT_DOUBLE,
+        "Filter line search parameter, cf. IPOPT paper"}},
+      {"kappa_plus",
+       {OT_DOUBLE,
+        "Filter line search parameter, cf. IPOPT paper"}},
+      {"kappa_plus_max",
+       {OT_DOUBLE,
+        "Filter line search parameter, cf. IPOPT paper"}},
+      {"delta_h0",
+       {OT_DOUBLE,
+        "Filter line search parameter, cf. IPOPT paper"}},
+      {"eta",
+       {OT_DOUBLE,
+        "Filter line search parameter, cf. IPOPT paper"}}
      }
   };
 
@@ -158,13 +287,160 @@ namespace casadi {
     // Call the init method of the base class
     Nlpsol::init(opts);
 
+    // Set default options
+    print_level_ = 2;
+    debug_level_ = 0;
+    eps_ = 1.0e-16;
+    opttol_ = 1.0e-6;
+    nlinfeastol_ = 1.0e-6;
+    sparse_qp_ = 2;
+    globalization_ = 1;
+    restore_feas_ = 1;
+    max_line_search_ = 20;
+    max_consec_reduced_steps_ = 100;
+    max_consec_skipped_updates_ = 100;
+    max_it_qp_ = 5000;
+    block_hess_ = 1;
+    hess_scaling_ = 2;
+    fallback_scaling_ = 4;
+    max_time_qp_ = 10000.0;
+    ini_hess_diag_ = 1.0;
+    col_eps_ = 0.1;
+    col_tau1_ = 0.5;
+    col_tau2_ = 1.0e4;
+    hess_damp_ = 1;
+    hess_damp_fac_ = 0.2;
+    hess_update_ = 1;
+    fallback_update_ = 2;
+    hess_lim_mem_ = 1;
+    hess_memsize_ = 20;
+    which_second_derv_ = 0;
+    skip_first_globalization_ = false;
+    conv_strategy_ = 0;
+    max_conv_qp_ = 1;
+    max_soc_iter_ = 3;
+    gamma_theta_ = 1.0e-5;
+    gamma_f_ = 1.0e-5;
+    kappa_soc_ = 0.99;
+    kappa_f_ = 0.999;
+    theta_max_ = 1.0e7;
+    theta_min_ = 1.0e-5;
+    delta_ = 1.0;
+    s_theta_ = 1.1;
+    s_f_ = 2.3;
+    kappa_minus_ = 0.333;
+    kappa_plus_ = 8.0;
+    kappa_plus_max_ = 100.0;
+    delta_h0_ = 1.0e-4;
+    eta_ = 1.0e-4;
+
     // Read user options
     for (auto&& op : opts) {
-      if (op.first=="blocksqp") {
-        //opts_ = op.second;
-      } else if (op.first=="contype") {
-        //contype_ = op.second;
+      if (op.first=="print_level") {
+        print_level_ = op.second;
+      } else if (op.first=="debug_level") {
+        debug_level_ = op.second;
+      } else if (op.first=="eps") {
+        eps_ = op.second;
+      } else if (op.first=="opttol") {
+        opttol_ = op.second;
+      } else if (op.first=="nlinfeastol") {
+        nlinfeastol_ = op.second;
+      } else if (op.first=="sparse_qp") {
+        sparse_qp_ = op.second;
+      } else if (op.first=="globalization") {
+        globalization_ = op.second;
+      } else if (op.first=="restore_feas") {
+        restore_feas_ = op.second;
+      } else if (op.first=="max_line_search") {
+        max_line_search_ = op.second;
+      } else if (op.first=="max_consec_reduced_steps") {
+        max_consec_reduced_steps_ = op.second;
+      } else if (op.first=="max_consec_skipped_updates") {
+        max_consec_skipped_updates_ = op.second;
+      } else if (op.first=="max_it_qp") {
+        max_it_qp_ = op.second;
+      } else if (op.first=="block_hess") {
+        block_hess_ = op.second;
+      } else if (op.first=="hess_scaling") {
+        hess_scaling_ = op.second;
+      } else if (op.first=="fallback_scaling") {
+        fallback_scaling_ = op.second;
+      } else if (op.first=="max_time_qp") {
+        max_time_qp_ = op.second;
+      } else if (op.first=="ini_hess_diag") {
+        ini_hess_diag_ = op.second;
+      } else if (op.first=="col_eps") {
+        col_eps_ = op.second;
+      } else if (op.first=="col_tau1") {
+        col_tau1_ = op.second;
+      } else if (op.first=="col_tau2") {
+        col_tau2_ = op.second;
+      } else if (op.first=="hess_damp") {
+        hess_damp_ = op.second;
+      } else if (op.first=="hess_damp_fac") {
+        hess_damp_fac_ = op.second;
+      } else if (op.first=="hess_update") {
+        hess_update_ = op.second;
+      } else if (op.first=="fallback_update") {
+        fallback_update_ = op.second;
+      } else if (op.first=="hess_lim_mem") {
+        hess_lim_mem_ = op.second;
+      } else if (op.first=="hess_memsize") {
+        hess_memsize_ = op.second;
+      } else if (op.first=="which_second_derv") {
+        which_second_derv_ = op.second;
+      } else if (op.first=="skip_first_globalization") {
+        skip_first_globalization_ = op.second;
+      } else if (op.first=="conv_strategy") {
+        conv_strategy_ = op.second;
+      } else if (op.first=="max_conv_qp") {
+        max_conv_qp_ = op.second;
+      } else if (op.first=="max_soc_iter") {
+        max_soc_iter_ = op.second;
+      } else if (op.first=="gamma_theta") {
+        gamma_theta_ = op.second;
+      } else if (op.first=="gamma_f") {
+        gamma_f_ = op.second;
+      } else if (op.first=="kappa_soc") {
+        kappa_soc_ = op.second;
+      } else if (op.first=="kappa_f") {
+        kappa_f_ = op.second;
+      } else if (op.first=="theta_max") {
+        theta_max_ = op.second;
+      } else if (op.first=="theta_min") {
+        theta_min_ = op.second;
+      } else if (op.first=="delta") {
+        delta_ = op.second;
+      } else if (op.first=="s_theta") {
+        s_theta_ = op.second;
+      } else if (op.first=="s_f") {
+        s_f_ = op.second;
+      } else if (op.first=="kappa_minus") {
+        kappa_minus_ = op.second;
+      } else if (op.first=="kappa_plus") {
+        kappa_plus_ = op.second;
+      } else if (op.first=="kappa_plus_max") {
+        kappa_plus_max_ = op.second;
+      } else if (op.first=="delta_h0") {
+        delta_h0_ = op.second;
+      } else if (op.first=="eta") {
+        eta_ = op.second;
       }
+    }
+
+    // If we compute second constraints derivatives switch to finite differences Hessian (convenience)
+    if (which_second_derv_ == 2 ) {
+      hess_update_ = 4;
+      block_hess_ = 1;
+    }
+
+    // If we don't use limited memory BFGS we need to store only one vector.
+    if (!hess_lim_mem_) hess_memsize_ = 1;
+    if (sparse_qp_ != 2 && hess_update_ == 1) {
+      printf( "SR1 update only works with qpOASES Schur complement version. Using BFGS updates instead.\n" );
+      hess_update_ = 2;
+      hess_scaling_ = fallback_scaling_;
     }
 
     // Setup NLP functions

@@ -52,93 +52,93 @@ namespace casadi {
     bool initCalled;
 
     // Stats
-    int itCount;      ///< iteration number
-    int qpIterations;      ///< number of qp iterations in the current major iteration
-    int qpIterations2;     ///< number of qp iterations for solving convexified QPs
-    int qpItTotal;    ///< total number of qp iterations
-    int qpResolve;    ///< how often has QP to be convexified and resolved?
-    int nFunCalls;    ///< number of function calls
-    int nDerCalls;    ///< number of derivative calls
-    int nRestHeurCalls;    ///< number calls to feasibility restoration heuristic
-    int nRestPhaseCalls;   ///< number calls to feasibility restoration phase
-    int rejectedSR1;       ///< count how often the SR1 update is rejected
-    int hessSkipped;       ///< number of block updates skipped in the current iteration
-    int hessDamped;   ///< number of block updates damped in the current iteration
+    int itCount;  // iteration number
+    int qpIterations;  // number of qp iterations in the current major iteration
+    int qpIterations2;  // number of qp iterations for solving convexified QPs
+    int qpItTotal;  // total number of qp iterations
+    int qpResolve;  // how often has QP to be convexified and resolved?
+    int nFunCalls;  // number of function calls
+    int nDerCalls;  // number of derivative calls
+    int nRestHeurCalls;  // number calls to feasibility restoration heuristic
+    int nRestPhaseCalls;  // number calls to feasibility restoration phase
+    int rejectedSR1;  // count how often the SR1 update is rejected
+    int hessSkipped;  // number of block updates skipped in the current iteration
+    int hessDamped;  // number of block updates damped in the current iteration
     int nTotalUpdates;
     int nTotalSkippedUpdates;
-    double averageSizingFactor;  ///< average value (over all blocks) of COL sizing factor
-    blocksqp::PATHSTR outpath;       ///< path where log files are stored
+    double averageSizingFactor;  // average value (over all blocks) of COL sizing factor
+    blocksqp::PATHSTR outpath;  // path where log files are stored
 
-    FILE *progressFile;    ///< save stats for each SQP step
-    FILE *updateFile;      ///< print update sequence (SR1/BFGS) to file
-    FILE *primalVarsFile;        ///< primal variables for every SQP iteration
-    FILE *dualVarsFile;    ///< dual variables for every SQP iteration
-    FILE *jacFile;    ///< Jacobian of one iteration
-    FILE *hessFile;   ///< Hessian of one iteration
+    FILE *progressFile;  // save stats for each SQP step
+    FILE *updateFile;  // print update sequence (SR1/BFGS) to file
+    FILE *primalVarsFile;  // primal variables for every SQP iteration
+    FILE *dualVarsFile;  // dual variables for every SQP iteration
+    FILE *jacFile;  // Jacobian of one iteration
+    FILE *hessFile;  // Hessian of one iteration
 
     // Variables that are updated during one SQP iteration
-    double obj;      ///< objective value
-    double qpObj;    ///< objective value of last QP subproblem
-    double cNorm;    ///< constraint violation
-    double cNormS;   ///< scaled constraint violation
-    double gradNorm;      ///< norm of Lagrangian gradient
-    double lambdaStepNorm;      ///< norm of step in dual variables
-    double tol;      ///< current optimality tolerance
+    double obj;  // objective value
+    double qpObj;  // objective value of last QP subproblem
+    double cNorm;  // constraint violation
+    double cNormS;  // scaled constraint violation
+    double gradNorm;  // norm of Lagrangian gradient
+    double lambdaStepNorm;  // norm of step in dual variables
+    double tol;  // current optimality tolerance
 
-    blocksqp::Matrix xi;///< variable vector
-    blocksqp::Matrix lambda;   ///< dual variables
-    blocksqp::Matrix constr;   ///< constraint vector
+    blocksqp::Matrix xi;// variable vector
+    blocksqp::Matrix lambda;  // dual variables
+    blocksqp::Matrix constr;  // constraint vector
 
-    blocksqp::Matrix constrJac;     ///< full constraint Jacobian (not used in sparse mode)
-    double *jacNz;   ///< nonzero elements of Jacobian (length)
-    int *jacIndRow;       ///< row indices (length)
-    int *jacIndCol;       ///< indices to first entry of columns (nCols+1)
+    blocksqp::Matrix constrJac;  // full constraint Jacobian (not used in sparse mode)
+    double *jacNz;  // nonzero elements of Jacobian (length)
+    int *jacIndRow;  // row indices (length)
+    int *jacIndCol;  // indices to first entry of columns (nCols+1)
 
-    blocksqp::Matrix deltaMat;      ///< last m primal steps
-    blocksqp::Matrix deltaXi;       ///< alias for current step
-    blocksqp::Matrix gradObj;       ///< gradient of objective
-    blocksqp::Matrix gradLagrange;        ///< gradient of Lagrangian
-    blocksqp::Matrix gammaMat;      ///< Lagrangian gradient differences for last m steps
-    blocksqp::Matrix gamma;    ///< alias for current Lagrangian gradient
+    blocksqp::Matrix deltaMat;  // last m primal steps
+    blocksqp::Matrix deltaXi;  // alias for current step
+    blocksqp::Matrix gradObj;  // gradient of objective
+    blocksqp::Matrix gradLagrange;  // gradient of Lagrangian
+    blocksqp::Matrix gammaMat;  // Lagrangian gradient differences for last m steps
+    blocksqp::Matrix gamma;  // alias for current Lagrangian gradient
 
     int nBlocks;
     int *blockIdx;
 
-    blocksqp::SymMatrix *hess;      ///< [blockwise] pointer to current Hessian of the Lagrangian
-    blocksqp::SymMatrix *hess1;     ///< [blockwise] first Hessian approximation
-    blocksqp::SymMatrix *hess2;     ///< [blockwise] second Hessian approximation (convexified)
-    double *hessNz;       ///< nonzero elements of Hessian (length)
-    int *hessIndRow;      ///< row indices (length)
-    int *hessIndCol;      ///< indices to first entry of columns (nCols+1)
-    int *hessIndLo;       ///< Indices to first entry of lower triangle (including diagonal) (nCols)
+    blocksqp::SymMatrix *hess;  // [blockwise] pointer to current Hessian of the Lagrangian
+    blocksqp::SymMatrix *hess1;  // [blockwise] first Hessian approximation
+    blocksqp::SymMatrix *hess2;  // [blockwise] second Hessian approximation (convexified)
+    double *hessNz;  // nonzero elements of Hessian (length)
+    int *hessIndRow;  // row indices (length)
+    int *hessIndCol;  // indices to first entry of columns (nCols+1)
+    int *hessIndLo;  // Indices to first entry of lower triangle (including diagonal) (nCols)
 
     /*
      * Variables for QP solver
      */
-    blocksqp::Matrix deltaBl;       ///< lower bounds for current step
-    blocksqp::Matrix deltaBu;       ///< upper bounds for current step
-    blocksqp::Matrix lambdaQP;      ///< dual variables of QP
-    blocksqp::Matrix AdeltaXi;      ///< product of constraint Jacobian with deltaXi
+    blocksqp::Matrix deltaBl;  // lower bounds for current step
+    blocksqp::Matrix deltaBu;  // upper bounds for current step
+    blocksqp::Matrix lambdaQP;  // dual variables of QP
+    blocksqp::Matrix AdeltaXi;  // product of constraint Jacobian with deltaXi
 
     /*
      * For modified BFGS updates
      */
-    blocksqp::Matrix deltaNorm;     ///< sTs
-    blocksqp::Matrix deltaNormOld;        ///< (from previous iteration)
-    blocksqp::Matrix deltaGamma;    ///< sTy
-    blocksqp::Matrix deltaGammaOld;       ///< (from previous iteration)
-    int *noUpdateCounter;       ///< count skipped updates for each block
+    blocksqp::Matrix deltaNorm;  // sTs
+    blocksqp::Matrix deltaNormOld;  // (from previous iteration)
+    blocksqp::Matrix deltaGamma;  // sTy
+    blocksqp::Matrix deltaGammaOld;  // (from previous iteration)
+    int *noUpdateCounter;  // count skipped updates for each block
 
     /*
      * Variables for globalization strategy
      */
-    int steptype;    ///< is current step a restoration step (1)?
-    double alpha;    ///< stepsize for line search
-    int nSOCS;       ///< number of second-order correction steps
-    int reducedStepCount;       ///< count number of consecutive reduced steps,
-    blocksqp::Matrix deltaH; ///< inertia correction (filter line search w indef Hessian)
-    blocksqp::Matrix trialXi;       ///< new trial iterate (for line search)
-    std::set< std::pair<double, double> > *filter; ///< Filter contains pairs (constrVio, objective)
+    int steptype;  // is current step a restoration step (1)?
+    double alpha;  // stepsize for line search
+    int nSOCS;  // number of second-order correction steps
+    int reducedStepCount;  // count number of consecutive reduced steps,
+    blocksqp::Matrix deltaH; // inertia correction (filter line search w indef Hessian)
+    blocksqp::Matrix trialXi;  // new trial iterate (for line search)
+    std::set< std::pair<double, double> > *filter; // Filter contains pairs (constrVio, objective)
 
     // Temporary memory
     double* jac;
@@ -401,6 +401,57 @@ namespace casadi {
                   blocksqp::SQPoptions* param) const;
     /// Set initial filter, objective function, tolerances etc.
     void initIterate(BlocksqpMemory* m, blocksqp::SQPoptions* param) const;
+
+    // General options
+    int print_level_;
+    int debug_level_; // amount of debug information that is printed during every iteration
+    double eps_;  // values smaller than this are regarded as numerically zero
+    double opttol_;  // optimality tolerance
+    double nlinfeastol_; // nonlinear feasibility tolerance
+
+    // Algorithmic options
+    int sparse_qp_;  // which qpOASES variant is used (dense/sparse/Schur)
+    int globalization_; // Globalization strategy
+    int restore_feas_;// Use feasibility restoration phase
+    int max_line_search_;  // Maximum number of steps in line search
+    int max_consec_reduced_steps_;// Maximum number of consecutive reduced steps
+    int max_consec_skipped_updates_; // Maximum number of consecutive skipped updates
+    int max_it_qp_;  // Maximum number of QP iterations per SQP iteration
+    int block_hess_;  // Blockwise Hessian approximation?
+    int hess_scaling_;// Scaling strategy for Hessian approximation
+    int fallback_scaling_;  // If indefinite update is used, the type of fallback strategy
+    double max_time_qp_;  // Maximum number of time in seconds per QP solve per SQP iteration
+    double ini_hess_diag_;  // Initial Hessian guess: diagonal matrix diag(iniHessDiag)
+    double col_eps_;  // epsilon for COL scaling strategy
+    double col_tau1_; // tau1 for COL scaling strategy
+    double col_tau2_; // tau2 for COL scaling strategy
+    int hess_damp_;  // activate Powell damping for BFGS
+    double hess_damp_fac_;  // damping factor for BFGS Powell modification
+    int hess_update_; // Type of Hessian approximation
+    int fallback_update_;  // If indefinite update is used, the type of fallback strategy
+    int hess_lim_mem_; // Full or limited memory
+    int hess_memsize_;// Memory size for L-BFGS updates
+    int which_second_derv_;  // For which block should second derivatives be provided by the user
+    bool skip_first_globalization_;  // No globalization strategy in first iteration
+    int conv_strategy_;  // Convexification strategy
+    int max_conv_qp_;  // How many additional QPs may be solved for convexification per iteration?
+
+    // Filter line search parameters, cf. IPOPT paper
+    int max_soc_iter_; // Maximum number of SOC line search iterations
+    double gamma_theta_;
+    double gamma_f_;
+    double kappa_soc_;
+    double kappa_f_;
+    double theta_max_;
+    double theta_min_;
+    double delta_;
+    double s_theta_;
+    double s_f_;
+    double kappa_minus_;
+    double kappa_plus_;
+    double kappa_plus_max_;
+    double delta_h0_;
+    double eta_;
   };
 
 } // namespace casadi
