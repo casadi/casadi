@@ -44,13 +44,19 @@ namespace casadi {
   // Forward declaration
   class Blocksqp;
 
-class BlocksqpProblem;
-
   struct CASADI_NLPSOL_BLOCKSQP_EXPORT BlocksqpMemory : public NlpsolMemory {
-    BlocksqpProblem* prob;
     qpOASES::SQProblem* qp;
     qpOASES::SQProblem* qpSave;
     bool initCalled;
+
+    int    nVar;   // number of variables
+    int    nCon;   // number of constraints
+    int    nnCon;  // number of nonlinear constraints
+
+    double      objLo;    // lower bound for objective
+    double      objUp;    // upper bound for objective
+    blocksqp::Matrix      bl;     // lower bounds of variables and constraints
+    blocksqp::Matrix      bu;     // upper bounds of variables and constraints
 
     // Stats
     int itCount;  // iteration number
@@ -141,76 +147,6 @@ class BlocksqpProblem;
     // Temporary memory
     double* jac;
   };
-
-  // Problem class
-  class BlocksqpProblem {
-  public:
-    const Blocksqp& self;
-    BlocksqpMemory* m;
-
-    int    nVar;   // number of variables
-    int    nCon;   // number of constraints
-    int    nnCon;  // number of nonlinear constraints
-
-    double      objLo;    // lower bound for objective
-    double      objUp;    // upper bound for objective
-    blocksqp::Matrix      bl;     // lower bounds of variables and constraints
-    blocksqp::Matrix      bu;     // upper bounds of variables and constraints
-
-    BlocksqpProblem(const Blocksqp& self, BlocksqpMemory* m);
-
-    // Set initial values for xi (and possibly lambda) and parts of the
-    // Jacobian that correspond to linear constraints (dense version).
-    void initialize(blocksqp::Matrix &xi,
-                       blocksqp::Matrix &lambda,
-                            blocksqp::Matrix &constrJac);
-
-    // Set initial values for xi (and possibly lambda) and parts of the
-    // Jacobian that correspond to linear constraints (sparse version).
-    void initialize(blocksqp::Matrix &xi,
-                            blocksqp::Matrix &lambda,
-                            double *&jacNz,
-                            int *&jacIndRow,
-                            int *&jacIndCol);
-
-    /// Evaluate objective, constraints, and derivatives (dense version).
-    void evaluate(const blocksqp::Matrix &xi,
-                          const blocksqp::Matrix &lambda,
-                          double *objval,
-                          blocksqp::Matrix &constr,
-                          blocksqp::Matrix &gradObj,
-                          blocksqp::Matrix &constrJac,
-                          blocksqp::SymMatrix *&hess,
-                          int dmode,
-                          int *info);
-
-    /// Evaluate objective, constraints, and derivatives (sparse version).
-    void evaluate(const blocksqp::Matrix &xi,
-                          const blocksqp::Matrix &lambda,
-                          double *objval,
-                          blocksqp::Matrix &constr,
-                          blocksqp::Matrix &gradObj,
-                          double *&jacNz,
-                          int *&jacIndRow,
-                          int *&jacIndCol,
-                          blocksqp::SymMatrix *&hess,
-                          int dmode,
-                          int *info);
-
-    /// Short cut if no derivatives are needed
-    void evaluate(const blocksqp::Matrix &xi,
-                          double *objval,
-                          blocksqp::Matrix &constr,
-                          int *info);
-
-    void reduceConstrVio(blocksqp::Matrix &xi, int *info) {
-      *info = 1;
-    }
-
-    void printInfo() {
-    }
-  };
-
 
   /** \brief \pluginbrief{Nlpsol,blocksqp}
      @copydoc Nlpsol_doc
@@ -380,9 +316,8 @@ class BlocksqpProblem;
     /// Print current iterate of dual variables to file
     void printDualVars(BlocksqpMemory* m, const blocksqp::Matrix &lambda) const;
     /// Print all QP data to files to be read in MATLAB
-    void dumpQPMatlab(BlocksqpMemory* m, BlocksqpProblem *prob, int sparseQP) const;
-    void dumpQPCpp(BlocksqpMemory* m, BlocksqpProblem *prob,
-      qpOASES::SQProblem *qp, int sparseQP) const;
+    void dumpQPMatlab(BlocksqpMemory* m, int sparseQP) const;
+    void dumpQPCpp(BlocksqpMemory* m, qpOASES::SQProblem *qp, int sparseQP) const;
     void printVectorCpp(BlocksqpMemory* m, FILE *outfile, double *vec,
       int len, char* varname) const;
     void printVectorCpp(BlocksqpMemory* m, FILE *outfile, int *vec, int len,
@@ -400,24 +335,71 @@ class BlocksqpProblem;
     void printSparseMatlab(BlocksqpMemory* m, FILE *file, int nRow, int nVar,
       double *nz, int *indRow, int *indCol) const;
     /// Print one line of output to stdout about the current iteration
-    void printProgress(BlocksqpMemory* m, BlocksqpProblem *prob,
-                       bool hasConverged) const;
+    void printProgress(BlocksqpMemory* m, bool hasConverged) const;
     /// Allocate variables that any SQP code needs
-    void allocMin(BlocksqpMemory* m, BlocksqpProblem* prob) const;
+    void allocMin(BlocksqpMemory* m) const;
     /// Allocate diagonal block Hessian
     void allocHess(BlocksqpMemory* m) const;
     /// Convert *hess to column compressed sparse format
-    void convertHessian(BlocksqpMemory* m, BlocksqpProblem *prob, double eps,
+    void convertHessian(BlocksqpMemory* m, double eps,
                          blocksqp::SymMatrix *&hess_,
                          double *&hessNz_, int *&hessIndRow_, int *&hessIndCol_,
                          int *&hessIndLo_) const;
     /// Convert *hess to double array (dense matrix)
-    void convertHessian(BlocksqpMemory* m, BlocksqpProblem *prob, double eps,
+    void convertHessian(BlocksqpMemory* m, double eps,
                         blocksqp::SymMatrix *&hess_) const;
     /// Allocate variables specifically needed by vmused SQP method
-    void allocAlg(BlocksqpMemory* m, BlocksqpProblem* prob) const;
+    void allocAlg(BlocksqpMemory* m) const;
     /// Set initial filter, objective function, tolerances etc.
     void initIterate(BlocksqpMemory* m) const;
+
+    // Set initial values for xi (and possibly lambda) and parts of the
+    // Jacobian that correspond to linear constraints (dense version).
+    void initialize(BlocksqpMemory* m, blocksqp::Matrix &xi,
+                    blocksqp::Matrix &lambda,
+                    blocksqp::Matrix &constrJac) const;
+
+    // Set initial values for xi (and possibly lambda) and parts of the
+    // Jacobian that correspond to linear constraints (sparse version).
+    void initialize(BlocksqpMemory* m, blocksqp::Matrix &xi,
+                    blocksqp::Matrix &lambda,
+                    double *&jacNz,
+                    int *&jacIndRow,
+                    int *&jacIndCol) const;
+
+    /// Evaluate objective, constraints, and derivatives (dense version).
+    void evaluate(BlocksqpMemory* m, const blocksqp::Matrix &xi,
+                  const blocksqp::Matrix &lambda,
+                  double *objval,
+                  blocksqp::Matrix &constr,
+                  blocksqp::Matrix &gradObj,
+                  blocksqp::Matrix &constrJac,
+                  blocksqp::SymMatrix *&hess,
+                  int dmode,
+                  int *info) const;
+
+    /// Evaluate objective, constraints, and derivatives (sparse version).
+    void evaluate(BlocksqpMemory* m, const blocksqp::Matrix &xi,
+                  const blocksqp::Matrix &lambda,
+                  double *objval,
+                  blocksqp::Matrix &constr,
+                  blocksqp::Matrix &gradObj,
+                  double *&jacNz,
+                  int *&jacIndRow,
+                  int *&jacIndCol,
+                  blocksqp::SymMatrix *&hess,
+                  int dmode,
+                  int *info) const;
+
+    /// Short cut if no derivatives are needed
+    void evaluate(BlocksqpMemory* m, const blocksqp::Matrix &xi,
+                  double *objval,
+                  blocksqp::Matrix &constr,
+                  int *info) const;
+
+    void reduceConstrVio(BlocksqpMemory* m, blocksqp::Matrix &xi, int *info) const {
+      *info = 1;
+    }
 
     // General options
     int print_level_;
