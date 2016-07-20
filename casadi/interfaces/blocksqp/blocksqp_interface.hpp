@@ -47,11 +47,6 @@ namespace casadi {
   struct CASADI_NLPSOL_BLOCKSQP_EXPORT BlocksqpMemory : public NlpsolMemory {
     qpOASES::SQProblem* qp;
     qpOASES::SQProblem* qpSave;
-    bool initCalled;
-
-    int    nVar;   // number of variables
-    int    nCon;   // number of constraints
-    int    nnCon;  // number of nonlinear constraints
 
     double      objLo;    // lower bound for objective
     double      objUp;    // upper bound for objective
