@@ -894,15 +894,15 @@ namespace casadi {
     // Update bounds on linearized constraints for the next SOC QP:
     // That is different from the update for the first SOC QP!
     for (i=0; i<m->prob->nCon; i++) {
-      if (m->prob->bl(nVar+i) != m->param->inf)
+      if (m->prob->bl(nVar+i) != inf)
         m->deltaBl(nVar+i) = (*alphaSOC)*m->deltaBl(nVar+i) - m->constr(i);
       else
-        m->deltaBl(nVar+i) = m->param->inf;
+        m->deltaBl(nVar+i) = inf;
 
-      if (m->prob->bu(nVar+i) != m->param->inf)
+      if (m->prob->bu(nVar+i) != inf)
         m->deltaBu(nVar+i) = (*alphaSOC)*m->deltaBu(nVar+i) - m->constr(i);
       else
-        m->deltaBu(nVar+i) = m->param->inf;
+        m->deltaBu(nVar+i) = inf;
     }
 
     *alphaSOC = (*alphaSOC) * 0.5;
@@ -2122,31 +2122,31 @@ namespace casadi {
 
     // Bounds on step
     for (i=0; i<nVar; i++) {
-      if (m->prob->bl(i) != m->param->inf)
+      if (m->prob->bl(i) != inf)
         m->deltaBl(i) = m->prob->bl(i) - m->xi(i);
       else
-        m->deltaBl(i) = m->param->inf;
+        m->deltaBl(i) = inf;
 
-      if (m->prob->bu(i) != m->param->inf)
+      if (m->prob->bu(i) != inf)
         m->deltaBu(i) = m->prob->bu(i) - m->xi(i);
       else
-        m->deltaBu(i) = m->param->inf;
+        m->deltaBu(i) = inf;
     }
 
     // Bounds on linearized constraints
     for (i=0; i<nCon; i++) {
-      if (m->prob->bl(nVar+i) != m->param->inf) {
+      if (m->prob->bl(nVar+i) != inf) {
         m->deltaBl(nVar+i) = m->prob->bl(nVar+i) - m->constr(i);
         if (soc) m->deltaBl(nVar+i) += m->AdeltaXi(i);
       } else {
-        m->deltaBl(nVar+i) = m->param->inf;
+        m->deltaBl(nVar+i) = inf;
       }
 
-      if (m->prob->bu(nVar+i) != m->param->inf) {
+      if (m->prob->bu(nVar+i) != inf) {
         m->deltaBu(nVar+i) = m->prob->bu(nVar+i) - m->constr(i);
         if (soc) m->deltaBu(nVar+i) += m->AdeltaXi(i);
       } else {
-        m->deltaBu(nVar+i) = m->param->inf;
+        m->deltaBu(nVar+i) = inf;
       }
     }
   }
@@ -2919,10 +2919,10 @@ namespace casadi {
     m->reducedStepCount = 0;
     m->steptype = 0;
 
-    m->obj = param->inf;
-    m->tol = param->inf;
+    m->obj = inf;
+    m->tol = inf;
     m->cNorm = param->thetaMax;
-    m->gradNorm = param->inf;
+    m->gradNorm = inf;
     m->lambdaStepNorm = 0.0;
   }
 

@@ -217,7 +217,6 @@ namespace blocksqp {
     int printColor;                     ///< use colored terminal output
     int debugLevel;                     ///< amount of debug information that is printed during every iteration
     double eps;                         ///< values smaller than this are regarded as numerically zero
-    double inf;                         ///< values larger than this are regarded as numerically infinity
     double opttol;                      ///< optimality tolerance
     double nlinfeastol;                 ///< nonlinear feasibility tolerance
 

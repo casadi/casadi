@@ -914,7 +914,6 @@ namespace blocksqp {
 
     //eps = 2.2204e-16;
     eps = 1.0e-16;
-    inf = 1.0e20;
     opttol = 1.0e-6;
     nlinfeastol = 1.0e-6;
 
