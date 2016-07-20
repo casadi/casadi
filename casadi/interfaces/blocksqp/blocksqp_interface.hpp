@@ -46,36 +46,99 @@ namespace casadi {
 
   struct CASADI_NLPSOL_BLOCKSQP_EXPORT BlocksqpMemory : public NlpsolMemory {
     blocksqp::Problemspec* prob;
-    blocksqp::SQPiterate* vars;
     blocksqp::SQPoptions* param;
     qpOASES::SQProblem* qp;
     qpOASES::SQProblem* qpSave;
     bool initCalled;
 
     // Stats
-    int itCount;                 ///< iteration number
-    int qpIterations;            ///< number of qp iterations in the current major iteration
-    int qpIterations2;           ///< number of qp iterations for solving convexified QPs
-    int qpItTotal;               ///< total number of qp iterations
-    int qpResolve;               ///< how often has QP to be convexified and resolved?
-    int nFunCalls;               ///< number of function calls
-    int nDerCalls;               ///< number of derivative calls
-    int nRestHeurCalls;          ///< number calls to feasibility restoration heuristic
-    int nRestPhaseCalls;         ///< number calls to feasibility restoration phase
-    int rejectedSR1;             ///< count how often the SR1 update is rejected
-    int hessSkipped;             ///< number of block updates skipped in the current iteration
-    int hessDamped;              ///< number of block updates damped in the current iteration
+    int itCount;      ///< iteration number
+    int qpIterations;      ///< number of qp iterations in the current major iteration
+    int qpIterations2;     ///< number of qp iterations for solving convexified QPs
+    int qpItTotal;    ///< total number of qp iterations
+    int qpResolve;    ///< how often has QP to be convexified and resolved?
+    int nFunCalls;    ///< number of function calls
+    int nDerCalls;    ///< number of derivative calls
+    int nRestHeurCalls;    ///< number calls to feasibility restoration heuristic
+    int nRestPhaseCalls;   ///< number calls to feasibility restoration phase
+    int rejectedSR1;       ///< count how often the SR1 update is rejected
+    int hessSkipped;       ///< number of block updates skipped in the current iteration
+    int hessDamped;   ///< number of block updates damped in the current iteration
     int nTotalUpdates;
     int nTotalSkippedUpdates;
     double averageSizingFactor;  ///< average value (over all blocks) of COL sizing factor
-    blocksqp::PATHSTR outpath;             ///< path where log files are stored
+    blocksqp::PATHSTR outpath;       ///< path where log files are stored
 
-    FILE *progressFile;          ///< save stats for each SQP step
-    FILE *updateFile;            ///< print update sequence (SR1/BFGS) to file
+    FILE *progressFile;    ///< save stats for each SQP step
+    FILE *updateFile;      ///< print update sequence (SR1/BFGS) to file
     FILE *primalVarsFile;        ///< primal variables for every SQP iteration
-    FILE *dualVarsFile;          ///< dual variables for every SQP iteration
-    FILE *jacFile;               ///< Jacobian of one iteration
-    FILE *hessFile;              ///< Hessian of one iteration
+    FILE *dualVarsFile;    ///< dual variables for every SQP iteration
+    FILE *jacFile;    ///< Jacobian of one iteration
+    FILE *hessFile;   ///< Hessian of one iteration
+
+    // Variables that are updated during one SQP iteration
+    double obj;      ///< objective value
+    double qpObj;    ///< objective value of last QP subproblem
+    double cNorm;    ///< constraint violation
+    double cNormS;   ///< scaled constraint violation
+    double gradNorm;      ///< norm of Lagrangian gradient
+    double lambdaStepNorm;      ///< norm of step in dual variables
+    double tol;      ///< current optimality tolerance
+
+    blocksqp::Matrix xi;///< variable vector
+    blocksqp::Matrix lambda;   ///< dual variables
+    blocksqp::Matrix constr;   ///< constraint vector
+
+    blocksqp::Matrix constrJac;     ///< full constraint Jacobian (not used in sparse mode)
+    double *jacNz;   ///< nonzero elements of Jacobian (length)
+    int *jacIndRow;       ///< row indices (length)
+    int *jacIndCol;       ///< indices to first entry of columns (nCols+1)
+
+    blocksqp::Matrix deltaMat;      ///< last m primal steps
+    blocksqp::Matrix deltaXi;       ///< alias for current step
+    blocksqp::Matrix gradObj;       ///< gradient of objective
+    blocksqp::Matrix gradLagrange;        ///< gradient of Lagrangian
+    blocksqp::Matrix gammaMat;      ///< Lagrangian gradient differences for last m steps
+    blocksqp::Matrix gamma;    ///< alias for current Lagrangian gradient
+
+    int nBlocks;
+    int *blockIdx;
+
+    blocksqp::SymMatrix *hess;      ///< [blockwise] pointer to current Hessian of the Lagrangian
+    blocksqp::SymMatrix *hess1;     ///< [blockwise] first Hessian approximation
+    blocksqp::SymMatrix *hess2;     ///< [blockwise] second Hessian approximation (convexified)
+    double *hessNz;       ///< nonzero elements of Hessian (length)
+    int *hessIndRow;      ///< row indices (length)
+    int *hessIndCol;      ///< indices to first entry of columns (nCols+1)
+    int *hessIndLo;       ///< Indices to first entry of lower triangle (including diagonal) (nCols)
+
+    /*
+     * Variables for QP solver
+     */
+    blocksqp::Matrix deltaBl;       ///< lower bounds for current step
+    blocksqp::Matrix deltaBu;       ///< upper bounds for current step
+    blocksqp::Matrix lambdaQP;      ///< dual variables of QP
+    blocksqp::Matrix AdeltaXi;      ///< product of constraint Jacobian with deltaXi
+
+    /*
+     * For modified BFGS updates
+     */
+    blocksqp::Matrix deltaNorm;     ///< sTs
+    blocksqp::Matrix deltaNormOld;        ///< (from previous iteration)
+    blocksqp::Matrix deltaGamma;    ///< sTy
+    blocksqp::Matrix deltaGammaOld;       ///< (from previous iteration)
+    int *noUpdateCounter;       ///< count skipped updates for each block
+
+    /*
+     * Variables for globalization strategy
+     */
+    int steptype;    ///< is current step a restoration step (1)?
+    double alpha;    ///< stepsize for line search
+    int nSOCS;       ///< number of second-order correction steps
+    int reducedStepCount;       ///< count number of consecutive reduced steps,
+    blocksqp::Matrix deltaH; ///< inertia correction (filter line search w indef Hessian)
+    blocksqp::Matrix trialXi;       ///< new trial iterate (for line search)
+    std::set< std::pair<double, double> > *filter; ///< Filter contains pairs (constrVio, objective)
 
     // Temporary memory
     double* jac;
@@ -257,8 +320,6 @@ namespace casadi {
     // [blockwise] Reset Hessian to identity and remove past information on
     // Lagrange gradient and steps
     void resetHessian(BlocksqpMemory* m, int iBlock) const;
-    // Compute current Hessian approximation by finite differences
-    int calcFiniteDiffHessian(BlocksqpMemory* m) const;
     // Compute full memory Hessian approximations based on update formulas
     void calcHessianUpdate(BlocksqpMemory* m, int updateType, int hessScaling) const;
     // Compute limited memory Hessian approximations based on update formulas
@@ -291,17 +352,15 @@ namespace casadi {
     /// Open output files
     void initStats(BlocksqpMemory* m, blocksqp::SQPoptions *param) const;
     /// Print Debug information in logfiles
-    void printDebug(BlocksqpMemory* m, blocksqp::SQPiterate *vars,
-      blocksqp::SQPoptions *param) const;
+    void printDebug(BlocksqpMemory* m, blocksqp::SQPoptions *param) const;
     /// Print current iterate of primal variables to file
     void printPrimalVars(BlocksqpMemory* m, const blocksqp::Matrix &xi) const;
     /// Print current iterate of dual variables to file
     void printDualVars(BlocksqpMemory* m, const blocksqp::Matrix &lambda) const;
     /// Print all QP data to files to be read in MATLAB
-    void dumpQPMatlab(BlocksqpMemory* m, blocksqp::Problemspec *prob,
-      blocksqp::SQPiterate *vars, int sparseQP) const;
+    void dumpQPMatlab(BlocksqpMemory* m, blocksqp::Problemspec *prob, int sparseQP) const;
     void dumpQPCpp(BlocksqpMemory* m, blocksqp::Problemspec *prob,
-      blocksqp::SQPiterate *vars, qpOASES::SQProblem *qp, int sparseQP) const;
+      qpOASES::SQProblem *qp, int sparseQP) const;
     void printVectorCpp(BlocksqpMemory* m, FILE *outfile, double *vec,
       int len, char* varname) const;
     void printVectorCpp(BlocksqpMemory* m, FILE *outfile, int *vec, int len,
@@ -320,9 +379,28 @@ namespace casadi {
       double *nz, int *indRow, int *indCol) const;
     /// Print one line of output to stdout about the current iteration
     void printProgress(BlocksqpMemory* m, blocksqp::Problemspec *prob,
-      blocksqp::SQPiterate *vars, blocksqp::SQPoptions *param, bool hasConverged) const;
+                       blocksqp::SQPoptions *param,
+                       bool hasConverged) const;
     /// Must be called before returning from run()
     void finish(BlocksqpMemory* m, blocksqp::SQPoptions *param) const;
+
+    /// Allocate variables that any SQP code needs
+    void allocMin(BlocksqpMemory* m, blocksqp::Problemspec* prob) const;
+    /// Allocate diagonal block Hessian
+    void allocHess(BlocksqpMemory* m, blocksqp::SQPoptions* param) const;
+    /// Convert *hess to column compressed sparse format
+    void convertHessian(BlocksqpMemory* m, blocksqp::Problemspec *prob, double eps,
+                         blocksqp::SymMatrix *&hess_,
+                         double *&hessNz_, int *&hessIndRow_, int *&hessIndCol_,
+                         int *&hessIndLo_) const;
+    /// Convert *hess to double array (dense matrix)
+    void convertHessian(BlocksqpMemory* m, blocksqp::Problemspec *prob, double eps,
+                        blocksqp::SymMatrix *&hess_) const;
+    /// Allocate variables specifically needed by vmused SQP method
+    void allocAlg(BlocksqpMemory* m, blocksqp::Problemspec* prob,
+                  blocksqp::SQPoptions* param) const;
+    /// Set initial filter, objective function, tolerances etc.
+    void initIterate(BlocksqpMemory* m, blocksqp::SQPoptions* param) const;
   };
 
 } // namespace casadi
