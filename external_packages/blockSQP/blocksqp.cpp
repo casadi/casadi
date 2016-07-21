@@ -18,10 +18,6 @@
 
 // LAPACK routines
 extern "C" {
-  void dsyev_( char *jobz, char *uplo, int *n, double *a, int *lda,
-               double *w, double *work, int *lwork, int *info,
-               int strlen_jobz, int strlen_uplo );
-
   void dspev_( char *jobz, char *uplo, int *n, double *ap, double *w, double *z, int *ldz,
                double *work, int *info, int strlen_jobz, int strlen_uplo );
 
