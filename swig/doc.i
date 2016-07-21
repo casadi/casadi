@@ -11637,6 +11637,8 @@ Check if the vector is strictly monotone.
 
 ";
 
+%feature("docstring")  casadi::casadi_eprintf(const char *fmt,...) " ";
+
 %feature("docstring")  casadi::to_slice(const IM &x, bool ind1=false) "
 
 Convert IM to Slice.
@@ -11738,6 +11740,8 @@ Explicitly load a plugin dynamically.
 Explicitly load a plugin dynamically.
 
 ";
+
+%feature("docstring")  casadi::casadi_printf(const char *fmt,...) " ";
 
 %feature("docstring")  casadi::integrator_n_in() "
 
@@ -12452,8 +12456,11 @@ std::string &solver, const MXDict &qp, const Dict &opts=Dict()) " ";
 %feature("docstring")  casadi::zip(const std::vector< std::string > &id,
 const std::vector< T > &mat) " [INTERNAL] ";
 
-%feature("docstring")  casadi::replaceMat(const M &arg, const Sparsity &inp,
-bool hcat=false) " [INTERNAL] ";
+%feature("docstring")  casadi::matrixName() "
+
+Get typename.
+
+";
 
 %feature("docstring")  casadi::collocationInterpolators(const std::vector<
 double > &tau_root, std::vector< std::vector< double > > &OUTPUT,
@@ -12491,11 +12498,8 @@ Number of NLP solver inputs.
 
 ";
 
-%feature("docstring")  casadi::matrixName() "
-
-Get typename.
-
-";
+%feature("docstring")  casadi::replaceMat(const M &arg, const Sparsity &inp,
+bool hcat=false) " [INTERNAL] ";
 
 %feature("docstring")  casadi::integrator_in() "
 

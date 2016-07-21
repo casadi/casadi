@@ -9277,6 +9277,8 @@ Check if the vector is strictly monotone.
 
 ";
 
+%feature("docstring") casadi::casadi_eprintf "";
+
 %feature("docstring") casadi::to_slice "
 
 >  Slice to_slice(IM x, bool ind1=false)
@@ -9374,6 +9376,8 @@ Explicitly load a plugin dynamically.
 Explicitly load a plugin dynamically.
 
 ";
+
+%feature("docstring") casadi::casadi_printf "";
 
 %feature("docstring") casadi::integrator_n_in "
 
@@ -10062,7 +10066,11 @@ Check if the vector is monotone.
 
 %feature("docstring") casadi::zip "[INTERNAL] ";
 
-%feature("docstring") casadi::replaceMat "[INTERNAL] ";
+%feature("docstring") casadi::matrixName "
+
+Get typename.
+
+";
 
 %feature("docstring") casadi::collocationInterpolators "
 
@@ -10098,11 +10106,7 @@ Number of NLP solver inputs.
 
 ";
 
-%feature("docstring") casadi::matrixName "
-
-Get typename.
-
-";
+%feature("docstring") casadi::replaceMat "[INTERNAL] ";
 
 %feature("docstring") casadi::integrator_in "
 
