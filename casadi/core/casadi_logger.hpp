@@ -173,6 +173,26 @@ namespace casadi {
     return instance;
   }
 
+  // C-style printing to std::cout
+  inline void casadi_printf(char* format, ...) {
+    char buffer[256];
+    va_list args;
+    va_start(args, format);
+    vsnprintf(buffer, 256, format, args);
+    userOut() << buffer;
+    va_end (args);
+  }
+
+  // C-style printing to std::cerr
+  inline void casadi_eprintf(char* format, ...) {
+    char buffer[256];
+    va_list args;
+    va_start(args, format);
+    vsnprintf(buffer, 256, format, args);
+    userOut<true, PL_WARN>() << buffer;
+    va_end (args);
+  }
+
 } // namespace casadi
 
 #endif // CASADI_LOGGER_HPP
