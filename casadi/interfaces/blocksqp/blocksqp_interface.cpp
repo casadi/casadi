@@ -361,7 +361,7 @@ namespace casadi {
     // If we don't use limited memory BFGS we need to store only one vector.
     if (!hess_lim_mem_) hess_memsize_ = 1;
     if (!shur_ && hess_update_ == 1) {
-      printf("SR1 update only works with qpOASES Schur complement version. "
+      casadi_eprintf("SR1 update only works with qpOASES Schur complement version. "
              "Using BFGS updates instead.\n");
       hess_update_ = 2;
       hess_scaling_ = fallback_scaling_;
@@ -576,7 +576,7 @@ namespace casadi {
       updateStats(m);
       if (hasConverged) {
         if (print_iteration_ && m->steptype < 2) {
-          printf("\n***CONVERGENCE ACHIEVED!***\n");
+          casadi_printf("\n***CONVERGENCE ACHIEVED!***\n");
         }
         return 0;
       }
@@ -593,15 +593,15 @@ namespace casadi {
 
       if (infoQP == 1) {
           // 1.) Maximum number of iterations reached
-          printf("***Warning! Maximum number of QP iterations exceeded.***\n");
+          casadi_eprintf("***Warning! Maximum number of QP iterations exceeded.***\n");
       } else if (infoQP == 2 || infoQP > 3) {
           // 2.) QP error (e.g., unbounded), solve again with pos.def. diagonal matrix (identity)
-          printf("***QP error. Solve again with identity matrix.***\n");
+          casadi_eprintf("***QP error. Solve again with identity matrix.***\n");
           resetHessian(m);
           infoQP = solveQP(m, m->deltaXi, m->lambdaQP);
           if (infoQP) {
             // If there is still an error, terminate.
-            printf("***QP error. Stop.***\n");
+            casadi_eprintf("***QP error. Stop.***\n");
             return -1;
           } else {
             m->steptype = 1;
@@ -613,27 +613,27 @@ namespace casadi {
 
         // Try to reduce constraint violation by heuristic
         if (m->steptype < 2) {
-          printf("***QP infeasible. Trying to reduce constraint violation...");
+          casadi_eprintf("***QP infeasible. Trying to reduce constraint violation...");
           qpError = feasibilityRestorationHeuristic(m);
           if (!qpError) {
             m->steptype = 2;
-            printf("Success.***\n");
+            casadi_printf("Success.***\n");
           } else {
-            printf("Failed.***\n");
+            casadi_eprintf("Failed.***\n");
           }
         }
 
         // Invoke feasibility restoration phase
         //if (qpError && m->steptype < 3 && restore_feas_)
         if (qpError && restore_feas_ && m->cNorm > 0.01 * nlinfeastol_) {
-          printf("***Start feasibility restoration phase.***\n");
+          casadi_printf("***Start feasibility restoration phase.***\n");
           m->steptype = 3;
           qpError = feasibilityRestorationPhase(m);
         }
 
         // If everything failed, abort.
         if (qpError) {
-          printf("***QP error. Stop.***\n");
+          casadi_eprintf("***QP error. Stop.***\n");
           return -1;
         }
       }
@@ -642,7 +642,7 @@ namespace casadi {
       if (globalization_ == 0 || (skip_first_globalization_ && m->itCount == 1)) {
         // No globalization strategy, but reduce step if function cannot be evaluated
         if (fullstep(m)) {
-          printf("***Constraint or objective could not be evaluated at new point. Stop.***\n");
+          casadi_eprintf("***Constraint or objective could not be evaluated at new point. Stop.***\n");
           return -1;
         }
         m->steptype = 0;
@@ -663,15 +663,15 @@ namespace casadi {
           if (lsError && m->cNorm > 0.01 * nlinfeastol_ && m->steptype < 2) {
             // Don't do this twice in a row!
 
-            printf("***Warning! Steplength too short. Trying to reduce constraint violation...");
+            casadi_eprintf("***Warning! Steplength too short. Trying to reduce constraint violation...");
 
             // Integration over whole time interval
             lsError = feasibilityRestorationHeuristic(m);
             if (!lsError) {
                 m->steptype = 2;
-                printf("Success.***\n");
+                casadi_printf("Success.***\n");
               } else {
-              printf("Failed.***\n");
+              casadi_eprintf("Failed.***\n");
             }
           }
 
@@ -680,7 +680,7 @@ namespace casadi {
             // After closing continuity gaps, we already take a step with initial Hessian.
             // If this step is not accepted then this will cause an infinite loop!
 
-            printf("***Warning! Steplength too short. "
+            casadi_eprintf("***Warning! Steplength too short. "
                   "Trying to find a new step with identity Hessian.***\n");
             m->steptype = 1;
 
@@ -690,7 +690,7 @@ namespace casadi {
 
           // If this does not yield a successful step, start restoration phase
           if (lsError && m->cNorm > 0.01 * nlinfeastol_ && restore_feas_) {
-            printf("***Warning! Steplength too short. Start feasibility restoration phase.***\n");
+            casadi_eprintf("***Warning! Steplength too short. Start feasibility restoration phase.***\n");
             m->steptype = 3;
 
             // Solve NLP with minimum norm objective
@@ -699,7 +699,7 @@ namespace casadi {
 
           // If everything failed, abort.
           if (lsError) {
-            printf("***Line search error. Stop.***\n");
+            casadi_eprintf("***Line search error. Stop.***\n");
             return -1;
           }
         } else {
@@ -723,7 +723,7 @@ namespace casadi {
       if (print_iteration_) printProgress(m);
       updateStats(m);
       if (hasConverged && m->steptype < 2) {
-        if (print_iteration_) printf("\n***CONVERGENCE ACHIEVED!***\n");
+        if (print_iteration_) casadi_printf("\n***CONVERGENCE ACHIEVED!***\n");
         m->itCount++;
         return 0; //Convergence achieved!
       }
@@ -898,14 +898,14 @@ namespace casadi {
       strcat(hessString1, ", selective sizing");
     }
 
-    printf("\n+---------------------------------------------------------------+\n");
-    printf("| Starting blockSQP with the following algorithmic settings:    |\n");
-    printf("+---------------------------------------------------------------+\n");
-    printf("| qpOASES flavor            | %-34s|\n", qpString);
-    printf("| Globalization             | %-34s|\n", globString);
-    printf("| 1st Hessian approximation | %-34s|\n", hessString1);
-    printf("| 2nd Hessian approximation | %-34s|\n", hessString2);
-    printf("+---------------------------------------------------------------+\n\n");
+    casadi_printf("\n+---------------------------------------------------------------+\n");
+    casadi_printf("| Starting blockSQP with the following algorithmic settings:    |\n");
+    casadi_printf("+---------------------------------------------------------------+\n");
+    casadi_printf("| qpOASES flavor            | %-34s|\n", qpString);
+    casadi_printf("| Globalization             | %-34s|\n", globString);
+    casadi_printf("| 1st Hessian approximation | %-34s|\n", hessString1);
+    casadi_printf("| 2nd Hessian approximation | %-34s|\n", hessString2);
+    casadi_printf("+---------------------------------------------------------------+\n\n");
   }
 
   void Blocksqp::
@@ -1000,7 +1000,7 @@ namespace casadi {
       // or if objective or a constraint is NaN
       if (info != 0 || objTrial < obj_lo_ || objTrial > obj_up_
         || !(objTrial == objTrial) || !(cNormTrial == cNormTrial)) {
-        printf("info=%i, objTrial=%g\n", info, objTrial);
+        casadi_printf("info=%i, objTrial=%g\n", info, objTrial);
         // evaluation error, reduce stepsize
         reduceStepsize(m, &alpha);
         continue;
@@ -1572,7 +1572,7 @@ namespace casadi {
     // Size only if factor is between zero and one
     if (scale < 1.0 && scale > 0.0) {
       scale = fmax(col_eps_, scale);
-      //printf("Sizing value (COL) block %i = %g\n", iBlock, scale);
+      //casadi_printf("Sizing value (COL) block %i = %g\n", iBlock, scale);
       for (i=0; i<m->hess[iBlock].M(); i++)
         for (j=i; j<m->hess[iBlock].M(); j++)
           m->hess[iBlock](i, j) *= scale;
@@ -2092,7 +2092,7 @@ namespace casadi {
 
     // Print qpOASES error code, if any
     if (ret != qpOASES::SUCCESSFUL_RETURN && matricesChanged)
-      printf("qpOASES error message: \"%s\"\n",
+      casadi_eprintf("qpOASES error message: \"%s\"\n",
               qpOASES::getGlobalMessageHandler()->getErrorCodeMessage(ret));
 
     // Point Hessian again to the first Hessian
@@ -2190,44 +2190,44 @@ namespace casadi {
 
      // Print headline every twenty iterations
     if (m->itCount % 20 == 0) {
-      printf("%-8s", "   it");
-      printf("%-21s", " qpIt");
-      printf("%-9s", "obj");
-      printf("%-11s", "feas");
-      printf("%-7s", "opt");
-      printf("%-11s", "|lgrd|");
-      printf("%-9s", "|stp|");
-      printf("%-10s", "|lstp|");
-      printf("%-8s", "alpha");
-      printf("%-6s", "nSOCS");
-      printf("%-18s", "sk, da, sca");
-      printf("%-6s", "QPr,mu");
-      printf("\n");
+      casadi_printf("%-8s", "   it");
+      casadi_printf("%-21s", " qpIt");
+      casadi_printf("%-9s", "obj");
+      casadi_printf("%-11s", "feas");
+      casadi_printf("%-7s", "opt");
+      casadi_printf("%-11s", "|lgrd|");
+      casadi_printf("%-9s", "|stp|");
+      casadi_printf("%-10s", "|lstp|");
+      casadi_printf("%-8s", "alpha");
+      casadi_printf("%-6s", "nSOCS");
+      casadi_printf("%-18s", "sk, da, sca");
+      casadi_printf("%-6s", "QPr,mu");
+      casadi_printf("\n");
     }
 
     if (m->itCount == 0) {
       // Values for first iteration
-      printf("%5i  ", m->itCount);
-      printf("%11i ", 0);
-      printf("% 10e  ", m->obj);
-      printf("%-10.2e", m->cNormS);
-      printf("%-10.2e", m->tol);
-      printf("\n");
+      casadi_printf("%5i  ", m->itCount);
+      casadi_printf("%11i ", 0);
+      casadi_printf("% 10e  ", m->obj);
+      casadi_printf("%-10.2e", m->cNormS);
+      casadi_printf("%-10.2e", m->tol);
+      casadi_printf("\n");
     } else {
       // All values
-      printf("%5i  ", m->itCount);
-      printf("%5i+%5i ", m->qpIterations, m->qpIterations2);
-      printf("% 10e  ", m->obj);
-      printf("%-10.2e", m->cNormS);
-      printf("%-10.2e", m->tol);
-      printf("%-10.2e", m->gradNorm);
-      printf("%-10.2e", lInfVectorNorm(m->deltaXi));
-      printf("%-10.2e", m->lambdaStepNorm);
-      printf("%-9.1e", m->alpha);
-      printf("%5i", m->nSOCS);
-      printf("%3i, %3i, %-9.1e", m->hessSkipped, m->hessDamped, m->averageSizingFactor);
-      printf("%i, %-9.1e", m->qpResolve, l1VectorNorm(m->deltaH)/nblocks_);
-      printf("\n");
+      casadi_printf("%5i  ", m->itCount);
+      casadi_printf("%5i+%5i ", m->qpIterations, m->qpIterations2);
+      casadi_printf("% 10e  ", m->obj);
+      casadi_printf("%-10.2e", m->cNormS);
+      casadi_printf("%-10.2e", m->tol);
+      casadi_printf("%-10.2e", m->gradNorm);
+      casadi_printf("%-10.2e", lInfVectorNorm(m->deltaXi));
+      casadi_printf("%-10.2e", m->lambdaStepNorm);
+      casadi_printf("%-9.1e", m->alpha);
+      casadi_printf("%5i", m->nSOCS);
+      casadi_printf("%3i, %3i, %-9.1e", m->hessSkipped, m->hessDamped, m->averageSizingFactor);
+      casadi_printf("%i, %-9.1e", m->qpResolve, l1VectorNorm(m->deltaH)/nblocks_);
+      casadi_printf("\n");
     }
   }
 
@@ -2366,7 +2366,7 @@ namespace casadi {
     }
 
     if (count != nnz)
-      printf("Error in convertHessian: %i elements processed, "
+      casadi_eprintf("Error in convertHessian: %i elements processed, "
             "should be %i elements!\n", count, nnz);
   }
 
