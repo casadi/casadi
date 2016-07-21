@@ -201,10 +201,6 @@ namespace casadi {
     void finish(BlocksqpMemory* m) const;
     /// Print information about the SQP method
     void printInfo(BlocksqpMemory* m, int printLevel) const;
-    /// Compute gradient of Lagrangian function (dense version)
-    void calcLagrangeGradient(BlocksqpMemory* m, const blocksqp::Matrix &lambda,
-      const blocksqp::Matrix &gradObj,
-      const blocksqp::Matrix &constrJacFull, blocksqp::Matrix &gradLagrange, int flag) const;
     /// Compute gradient of Lagrangian function (sparse version)
     void calcLagrangeGradient(BlocksqpMemory* m, const blocksqp::Matrix &lambda,
       const blocksqp::Matrix &gradObj, double *jacNz, int *jacIndRow, int *jacIndCol,
@@ -338,19 +334,10 @@ namespace casadi {
                          blocksqp::SymMatrix *&hess_,
                          double *&hessNz_, int *&hessIndRow_, int *&hessIndCol_,
                          int *&hessIndLo_) const;
-    /// Convert *hess to double array (dense matrix)
-    void convertHessian(BlocksqpMemory* m, double eps,
-                        blocksqp::SymMatrix *&hess_) const;
     /// Allocate variables specifically needed by vmused SQP method
     void allocAlg(BlocksqpMemory* m) const;
     /// Set initial filter, objective function, tolerances etc.
     void initIterate(BlocksqpMemory* m) const;
-
-    // Set initial values for xi (and possibly lambda) and parts of the
-    // Jacobian that correspond to linear constraints (dense version).
-    void initialize(BlocksqpMemory* m, blocksqp::Matrix &xi,
-                    blocksqp::Matrix &lambda,
-                    blocksqp::Matrix &constrJac) const;
 
     // Set initial values for xi (and possibly lambda) and parts of the
     // Jacobian that correspond to linear constraints (sparse version).

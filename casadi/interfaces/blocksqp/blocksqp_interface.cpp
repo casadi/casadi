@@ -807,45 +807,6 @@ namespace casadi {
     for (iVar=0; iVar<nx_; iVar++) gradLagrange(iVar) -= lambda(iVar);
   }
 
-
-  /**
-   * Compute gradient of Lagrangian or difference of Lagrangian gradients (dense version)
-   *
-   * flag == 0: output dL(xi, lambda)
-   * flag == 1: output dL(xi_k+1, lambda_k+1) - L(xi_k, lambda_k+1)
-   * flag == 2: output dL(xi_k+1, lambda_k+1) - df(xi)
-   */
-  void Blocksqp::
-  calcLagrangeGradient(BlocksqpMemory* m, const blocksqp::Matrix &lambda,
-                       const blocksqp::Matrix &gradObj, const blocksqp::Matrix &constrJac,
-                       blocksqp::Matrix &gradLagrange, int flag) const {
-    int iVar, iCon;
-
-    // Objective gradient
-    if (flag == 0) {
-      for (iVar=0; iVar<nx_; iVar++) {
-        gradLagrange(iVar) = gradObj(iVar);
-      }
-    } else if (flag == 1) {
-      for (iVar=0; iVar<nx_; iVar++) {
-        gradLagrange(iVar) = gradObj(iVar) - gradLagrange(iVar);
-      }
-    } else {
-      gradLagrange.Initialize(0.0);
-    }
-
-    // - lambdaT * constrJac
-    for (iVar=0; iVar<nx_; iVar++)
-      for (iCon=0; iCon<ng_; iCon++)
-        gradLagrange(iVar) -= lambda(nx_ + iCon) * constrJac(iCon, iVar);
-
-    // - lambdaT * simpleBounds
-    for (iVar=0; iVar<nx_; iVar++) {
-      gradLagrange(iVar) -= lambda(iVar);
-    }
-  }
-
-
   /**
    * Wrapper if called with standard arguments
    */
@@ -2815,27 +2776,6 @@ namespace casadi {
   }
 
   /**
-   * Convert diagonal block Hessian to double array.
-   * Assumes that hessNz is already allocated.
-   */
-  void Blocksqp::convertHessian(BlocksqpMemory* m,
-    double eps, blocksqp::SymMatrix *&hess_) const {
-    if (m->hessNz == 0) return;
-    int count = 0;
-    int blockCnt = 0;
-    for (int i=0; i<nx_; i++)
-      for (int j=0; j<nx_; j++) {
-          if (i == blocks_[blockCnt+1])
-            blockCnt++;
-          if (j >= blocks_[blockCnt] && j < blocks_[blockCnt+1])
-            m->hessNz[count++] = m->hess[blockCnt](i - blocks_[blockCnt],
-              j - blocks_[blockCnt]);
-          else
-            m->hessNz[count++] = 0.0;
-        }
-  }
-
-  /**
    * Convert array *hess to a single symmetric sparse matrix in
    * Harwell-Boeing format (as used by qpOASES)
    */
@@ -2963,13 +2903,6 @@ namespace casadi {
     m->cNorm = theta_max_;
     m->gradNorm = inf;
     m->lambdaStepNorm = 0.0;
-  }
-
-
-  void Blocksqp::
-  initialize(BlocksqpMemory* m, blocksqp::Matrix &xi, blocksqp::Matrix &lambda,
-             blocksqp::Matrix &constrJac) const {
-    casadi_error("initialize (dense)");
   }
 
   void Blocksqp::
