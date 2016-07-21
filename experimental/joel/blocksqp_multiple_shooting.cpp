@@ -152,23 +152,8 @@ int main(){
   // NLP
   MXDict nlp = {{"x", V}, {"f", J}, {"g", vertcat(g)}};
 
-  // Set options
-  Dict opts;
-  opts["opttol"] = 1.0e-12;
-  opts["nlinfeastol"] = 1.0e-12;
-  opts["globalization"] = 0;
-  opts["hess_update"] = 0;
-  opts["hess_scaling"] = 0;
-  opts["fallback_scaling"] = 0;
-  opts["hess_lim_mem"] = 0;
-  opts["max_consec_skipped_updates"] = 200;
-  opts["block_hess"] = 0;
-  opts["which_second_derv"] = 0;
-  opts["sparse_qp"] = 1;
-  opts["print_level"] = 2;
-
   // Create an NLP solver and buffers
-  Function solver = nlpsol("nlpsol", "blocksqp", nlp, opts);
+  Function solver = nlpsol("nlpsol", "blocksqp", nlp);
   std::map<std::string, DM> arg, res;
 
   // Bounds and initial guess
