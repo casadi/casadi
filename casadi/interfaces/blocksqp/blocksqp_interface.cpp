@@ -25,6 +25,7 @@
 
 #include "blocksqp_interface.hpp"
 #include "casadi/core/std_vector_tools.hpp"
+#include "casadi/core/function/conic.hpp"
 
 using namespace std;
 namespace casadi {
@@ -55,7 +56,13 @@ namespace casadi {
 
   Options Blocksqp::options_
   = {{&Nlpsol::options_},
-     {{"print_header",
+     {{"qpsol",
+       {OT_STRING,
+        "The QP solver to be used by the SQP method"}},
+      {"qpsol_options",
+       {OT_DICT,
+        "Options to be passed to the QP solver"}},
+      {"print_header",
        {OT_BOOL,
         "Print solver header at startup"}},
       {"print_iteration",
@@ -204,6 +211,8 @@ namespace casadi {
     Nlpsol::init(opts);
 
     // Set default options
+    string qpsol_plugin = "qpoases";
+    Dict qpsol_options;
     print_header_ = true;
     print_iteration_ = true;
     eps_ = 1.0e-16;
@@ -254,7 +263,11 @@ namespace casadi {
 
     // Read user options
     for (auto&& op : opts) {
-      if (op.first=="print_header") {
+      if (op.first=="qpsol") {
+        qpsol_plugin = op.second.to_string();
+      } else if (op.first=="qpsol_options") {
+        qpsol_options = op.second;
+      } else if (op.first=="print_header") {
         print_header_ = op.second;
       } else if (op.first=="print_iteration") {
           print_iteration_ = op.second;
@@ -371,12 +384,13 @@ namespace casadi {
     create_function("nlp_fg", {"x", "p"}, {"f", "g"});
     Function gf_jg = create_function("nlp_gf_jg", {"x", "p"},
                                      {"f", "g", "grad:f:x", "jac:g:x"});
-    sp_jac_ = gf_jg.sparsity_out("jac_g_x");
+    Asp_ = gf_jg.sparsity_out("jac_g_x");
 
     if (block_hess_ == 0) {
       // No block-structured Hessian
       blocks_ = {0, nx_};
       which_second_derv_ = 0;
+      Hsp_ = Sparsity::dense(nx_, nx_);
     } else {
       // Detect block structure
 
@@ -384,15 +398,15 @@ namespace casadi {
       Function grad_lag = oracle_.factory("grad_lag",
                                           {"x", "p", "lam:f", "lam:g"}, {"grad:gamma:x"},
                                           {{"gamma", {"f", "g"}}});
-      Sparsity Hsp = grad_lag.sparsity_jac("x", "grad_gamma_x", false, true);
+      Hsp_ = grad_lag.sparsity_jac("x", "grad_gamma_x", false, true);
 
       // Make sure diagonal exists
-      Hsp = Hsp + Sparsity::diag(nx_);
+      Hsp_ = Hsp_ + Sparsity::diag(nx_);
 
       // Find the strongly connected components of the Hessian
       // Unlike Sparsity::scc, assume ordered
-      const int* colind = Hsp.colind();
-      const int* row = Hsp.row();
+      const int* colind = Hsp_.colind();
+      const int* row = Hsp_.row();
       blocks_.push_back(0);
       int ind = 0;
       while (ind < nx_) {
@@ -414,8 +428,14 @@ namespace casadi {
     // Number of blocks
     nblocks_ = blocks_.size()-1;
 
+    // Allocate a QP solver
+    casadi_assert_message(!qpsol_plugin.empty(), "'qpsol' option has not been set");
+    qpsol_ = conic("qpsol", qpsol_plugin, {{"h", Hsp_}, {"a", Asp_}},
+                   qpsol_options);
+    alloc(qpsol_);
+
     // Allocate memory
-    alloc_w(sp_jac_.nnz(), true); // jac
+    alloc_w(Asp_.nnz(), true); // jac
   }
 
   void Blocksqp::init_memory(void* mem) const {
@@ -431,7 +451,7 @@ namespace casadi {
     Nlpsol::set_work(mem, arg, res, iw, w);
 
     // Temporary memory
-    m->jac = w; w += sp_jac_.nnz();
+    m->jac = w; w += Asp_.nnz();
   }
 
   void Blocksqp::solve(void* mem) const {
@@ -2444,10 +2464,10 @@ namespace casadi {
     casadi_copy(m->lam_g0, ng_, lam_g);
 
     // Get Jacobian sparsity
-    jacIndRow = new int[sp_jac_.nnz()];
-    copy_n(sp_jac_.row(), sp_jac_.nnz(), jacIndRow);
-    jacIndCol = const_cast<int*>(sp_jac_.colind());
-    jacNz = new double[sp_jac_.nnz()];
+    jacIndRow = new int[Asp_.nnz()];
+    copy_n(Asp_.row(), Asp_.nnz(), jacIndRow);
+    jacIndCol = const_cast<int*>(Asp_.colind());
+    jacNz = new double[Asp_.nnz()];
   }
 
   int Blocksqp::

@@ -182,8 +182,8 @@ namespace casadi {
     int nblocks_;
     std::vector<int> blocks_;
 
-    // Jacobian sparsity
-    Sparsity sp_jac_;
+    // Jacobian/Hessian sparsity
+    Sparsity Asp_, Hsp_;
 
     // TO BE REFACTORED
 
@@ -331,6 +331,9 @@ namespace casadi {
     void reduceConstrVio(BlocksqpMemory* m, blocksqp::Matrix &xi, int *info) const {
       *info = 1;
     }
+
+    /// QP solver for the subproblems
+    Function qpsol_;
 
     // General options
     bool print_header_;
