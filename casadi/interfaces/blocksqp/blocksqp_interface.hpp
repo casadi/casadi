@@ -29,6 +29,7 @@
 #include <casadi/interfaces/blocksqp/casadi_nlpsol_blocksqp_export.h>
 #include <blocksqp.hpp>
 #include "casadi/core/function/nlpsol_impl.hpp"
+#include <qpOASES.hpp>
 
 /** \defgroup plugin_Nlpsol_blocksqp
   * This is a modified version of blockSQP by Janka et al.

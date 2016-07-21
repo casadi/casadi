@@ -7,4 +7,4 @@ casadi_plugin(Nlpsol blocksqp
   blocksqp_interface.cpp
   blocksqp_interface_meta.cpp)
 
-casadi_plugin_link_libraries(Nlpsol blocksqp ${BLOCKSQP_LIBRARIES})
+casadi_plugin_link_libraries(Nlpsol blocksqp ${BLOCKSQP_LIBRARIES} ${QPOASES_LIBRARIES})
