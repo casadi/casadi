@@ -102,3 +102,9 @@ if(WITH_SUNDIALS AND WITH_CSPARSE)
   add_executable(issue_934 issue_934.cpp)
   target_link_libraries(issue_934 casadi_integration casadi_sundials_interface casadi_csparse_interface casadi ${CSPARSE_LIBRARIES} ${SUNDIALS_LIBRARIES} ${CASADI_DEPENDENCIES})
 endif()
+
+# Writing a multiple shooting code from scratch
+if(WITH_SUNDIALS AND IPOPT_FOUND)
+  add_executable(blocksqp_multiple_shooting blocksqp_multiple_shooting.cpp)
+  target_link_libraries(blocksqp_multiple_shooting casadi)
+endif()
