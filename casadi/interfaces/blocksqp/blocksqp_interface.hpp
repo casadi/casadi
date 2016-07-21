@@ -309,8 +309,8 @@ namespace casadi {
     /// Print current iterate of dual variables to file
     void printDualVars(BlocksqpMemory* m, const blocksqp::Matrix &lambda) const;
     /// Print all QP data to files to be read in MATLAB
-    void dumpQPMatlab(BlocksqpMemory* m, int sparseQP) const;
-    void dumpQPCpp(BlocksqpMemory* m, qpOASES::SQProblem *qp, int sparseQP) const;
+    void dumpQPMatlab(BlocksqpMemory* m) const;
+    void dumpQPCpp(BlocksqpMemory* m, qpOASES::SQProblem *qp) const;
     void printVectorCpp(BlocksqpMemory* m, FILE *outfile, double *vec,
       int len, char* varname) const;
     void printVectorCpp(BlocksqpMemory* m, FILE *outfile, int *vec, int len,
@@ -360,19 +360,8 @@ namespace casadi {
                     int *&jacIndRow,
                     int *&jacIndCol) const;
 
-    /// Evaluate objective, constraints, and derivatives (dense version).
-    void evaluate(BlocksqpMemory* m, const blocksqp::Matrix &xi,
-                  const blocksqp::Matrix &lambda,
-                  double *objval,
-                  blocksqp::Matrix &constr,
-                  blocksqp::Matrix &gradObj,
-                  blocksqp::Matrix &constrJac,
-                  blocksqp::SymMatrix *&hess,
-                  int dmode,
-                  int *info) const;
-
-    /// Evaluate objective, constraints, and derivatives (sparse version).
-    void evaluate(BlocksqpMemory* m, const blocksqp::Matrix &xi,
+    /// Evaluate objective and constraints, including derivatives
+    int evaluate(BlocksqpMemory* m, const blocksqp::Matrix &xi,
                   const blocksqp::Matrix &lambda,
                   double *objval,
                   blocksqp::Matrix &constr,
@@ -380,15 +369,12 @@ namespace casadi {
                   double *&jacNz,
                   int *&jacIndRow,
                   int *&jacIndCol,
-                  blocksqp::SymMatrix *&hess,
-                  int dmode,
-                  int *info) const;
+                  blocksqp::SymMatrix *&hess) const;
 
-    /// Short cut if no derivatives are needed
-    void evaluate(BlocksqpMemory* m, const blocksqp::Matrix &xi,
+    /// Evaluate objective and constraints, no derivatives
+    int evaluate(BlocksqpMemory* m, const blocksqp::Matrix &xi,
                   double *objval,
-                  blocksqp::Matrix &constr,
-                  int *info) const;
+                  blocksqp::Matrix &constr) const;
 
     void reduceConstrVio(BlocksqpMemory* m, blocksqp::Matrix &xi, int *info) const {
       *info = 1;
@@ -402,7 +388,7 @@ namespace casadi {
     double nlinfeastol_; // nonlinear feasibility tolerance
 
     // Algorithmic options
-    int sparse_qp_;  // which qpOASES variant is used (dense/sparse/Schur)
+    bool shur_;  // Use qpOASES Shur compliment approach
     int globalization_; // Globalization strategy
     int restore_feas_;// Use feasibility restoration phase
     int max_line_search_;  // Maximum number of steps in line search

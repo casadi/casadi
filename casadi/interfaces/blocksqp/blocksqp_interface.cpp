@@ -70,9 +70,9 @@ namespace casadi {
       {"nlinfeastol",
        {OT_DOUBLE,
         "Nonlinear feasibility tolerance"}},
-      {"sparse_qp",
-       {OT_INT,
-        "Which qpOASES variant is used (dense/sparse/Schur)"}},
+      {"shur",
+       {OT_BOOL,
+        "Use qpOASES Shur compliment approach"}},
       {"globalization",
        {OT_INT,
         "Globalization strategy"}},
@@ -209,7 +209,7 @@ namespace casadi {
     eps_ = 1.0e-16;
     opttol_ = 1.0e-6;
     nlinfeastol_ = 1.0e-6;
-    sparse_qp_ = 2;
+    shur_ = true;
     globalization_ = 1;
     restore_feas_ = 1;
     max_line_search_ = 20;
@@ -264,8 +264,8 @@ namespace casadi {
         opttol_ = op.second;
       } else if (op.first=="nlinfeastol") {
         nlinfeastol_ = op.second;
-      } else if (op.first=="sparse_qp") {
-        sparse_qp_ = op.second;
+      } else if (op.first=="shur") {
+        shur_ = op.second;
       } else if (op.first=="globalization") {
         globalization_ = op.second;
       } else if (op.first=="restore_feas") {
@@ -360,7 +360,7 @@ namespace casadi {
 
     // If we don't use limited memory BFGS we need to store only one vector.
     if (!hess_lim_mem_) hess_memsize_ = 1;
-    if (sparse_qp_ != 2 && hess_update_ == 1) {
+    if (!shur_ && hess_update_ == 1) {
       printf("SR1 update only works with qpOASES Schur complement version. "
              "Using BFGS updates instead.\n");
       hess_update_ = 2;
@@ -489,12 +489,8 @@ namespace casadi {
 
     allocMin(m);
 
-    if (!sparse_qp_) {
-      m->constrJac.Dimension(ng_, nx_).Initialize(0.0);
-      m->hessNz = new double[nx_ * nx_];
-    } else {
-      m->hessNz = 0;
-    }
+    m->constrJac.Dimension(ng_, nx_).Initialize(0.0);
+    m->hessNz = new double[nx_ * nx_];
 
     m->jacNz = 0;
     m->jacIndCol = 0;
@@ -512,10 +508,10 @@ namespace casadi {
     allocHess(m);
     allocAlg(m);
 
-    if (sparse_qp_ < 2) {
-      m->qp = new qpOASES::SQProblem(nx_, ng_);
-    } else {
+    if (shur_) {
       m->qp = new qpOASES::SQProblemSchur(nx_, ng_, qpOASES::HST_UNKNOWN, 50);
+    } else {
+      m->qp = new qpOASES::SQProblem(nx_, ng_);
     }
 
     // Print header and information about the algorithmic parameters
@@ -529,13 +525,7 @@ namespace casadi {
     initializeFilter(m);
 
     // Set initial values for all xi and set the Jacobian for linear constraints
-    if (sparse_qp_) {
-      initialize(m, m->xi, m->lambda, m->jacNz,
-        m->jacIndRow, m->jacIndCol);
-    } else {
-      initialize(m, m->xi, m->lambda, m->constrJac);
-    }
-
+    initialize(m, m->xi, m->lambda, m->jacNz, m->jacIndRow, m->jacIndCol);
     ret = run(m, 100);
     finish(m);
     if (ret==1) casadi_warning("Maximum number of iterations reached");
@@ -577,16 +567,10 @@ namespace casadi {
       calcInitialHessian(m);
 
       /// Evaluate all functions and gradients for xi_0
-      if (sparse_qp_) {
-        evaluate(m, m->xi, m->lambda, &m->obj,
-          m->constr, m->gradObj,
-                        m->jacNz, m->jacIndRow, m->jacIndCol,
-                        m->hess, 1+whichDerv, &infoEval);
-      } else {
-        evaluate(m, m->xi, m->lambda, &m->obj,
-          m->constr, m->gradObj,
-                        m->constrJac, m->hess, 1+whichDerv, &infoEval);
-      }
+      infoEval = evaluate(m, m->xi, m->lambda, &m->obj,
+                          m->constr, m->gradObj,
+                          m->jacNz, m->jacIndRow, m->jacIndCol,
+                          m->hess);
       m->nDerCalls++;
 
       /// Check if converged
@@ -727,14 +711,9 @@ namespace casadi {
       calcLagrangeGradient(m, m->gamma, 0);
 
       /// Evaluate functions and gradients at the new xi
-      if (sparse_qp_) {
-        evaluate(m, m->xi, m->lambda, &m->obj, m->constr,
-          m->gradObj, m->jacNz, m->jacIndRow,
-          m->jacIndCol, m->hess, 1+whichDerv, &infoEval);
-      } else {
-        evaluate(m, m->xi, m->lambda, &m->obj, m->constr,
-            m->gradObj, m->constrJac, m->hess, 1+whichDerv, &infoEval);
-      }
+      infoEval = evaluate(m, m->xi, m->lambda, &m->obj, m->constr,
+                          m->gradObj, m->jacNz, m->jacIndRow,
+                          m->jacIndCol, m->hess);
       m->nDerCalls++;
 
       /// Check if converged
@@ -748,7 +727,7 @@ namespace casadi {
           //printf("Computing finite differences Hessian at the solution ... \n");
           //calcFiniteDiffHessian();
           //m->printHessian(nblocks_, m->hess);
-          dumpQPCpp(m, m->qp, sparse_qp_);
+          dumpQPCpp(m, m->qp);
         }
         return 0; //Convergence achieved!
       }
@@ -872,13 +851,8 @@ namespace casadi {
    */
   void Blocksqp::
   calcLagrangeGradient(BlocksqpMemory* m, blocksqp::Matrix &gradLagrange, int flag) const {
-    if (sparse_qp_) {
-      calcLagrangeGradient(m, m->lambda, m->gradObj, m->jacNz,
-        m->jacIndRow, m->jacIndCol, gradLagrange, flag);
-    } else {
-      calcLagrangeGradient(m, m->lambda, m->gradObj, m->constrJac,
-        gradLagrange, flag);
-    }
+    calcLagrangeGradient(m, m->lambda, m->gradObj, m->jacNz,
+      m->jacIndRow, m->jacIndCol, gradLagrange, flag);
   }
 
 
@@ -914,12 +888,10 @@ namespace casadi {
       return;
 
     /* QP Solver */
-    if (sparse_qp_ == 0)
-      strcpy(qpString, "dense, reduced Hessian factorization");
-    else if (sparse_qp_ == 1)
-      strcpy(qpString, "sparse, reduced Hessian factorization");
-    else if (sparse_qp_ == 2)
+    if (shur_)
       strcpy(qpString, "sparse, Schur complement approach");
+    else
+      strcpy(qpString, "sparse, reduced Hessian factorization");
 
     /* Globalization */
     if (globalization_ == 0)
@@ -1083,7 +1055,7 @@ namespace casadi {
         m->trialXi(i) = m->xi(i) + alpha * m->deltaXi(i);
 
       // Compute problem functions at trial point
-      evaluate(m, m->trialXi, &objTrial, m->constr, &info);
+      info = evaluate(m, m->trialXi, &objTrial, m->constr);
       m->nFunCalls++;
       cNormTrial = lInfConstraintNorm(m->trialXi, m->constr, m->bu, m->bl);
       // Reduce step if evaluation fails, if lower bound is violated
@@ -1131,7 +1103,7 @@ namespace casadi {
         dfTdeltaXi += m->gradObj(i) * m->deltaXi(i);
 
       // Compute objective and at ||constr(trialXi)||_1 at trial point
-      evaluate(m, m->trialXi, &objTrial, m->constr, &info);
+      info = evaluate(m, m->trialXi, &objTrial, m->constr);
       m->nFunCalls++;
       cNormTrial = lInfConstraintNorm(m->trialXi, m->constr, m->bu, m->bl);
       // Reduce step if evaluation fails, if lower bound is violated or if objective is NaN
@@ -1266,7 +1238,7 @@ namespace casadi {
       }
 
       // Compute objective and ||constr(trialXiSOC)||_1 at SOC trial point
-      evaluate(m, m->trialXi, &objTrialSOC, m->constr, &info);
+      info = evaluate(m, m->trialXi, &objTrialSOC, m->constr);
       m->nFunCalls++;
       cNormTrialSOC = lInfConstraintNorm(m->trialXi, m->constr,
         m->bu, m->bl);
@@ -1364,7 +1336,7 @@ namespace casadi {
     }
 
     // Compute objective and constraints at the new (hopefully feasible) point
-    evaluate(m, m->trialXi, &m->obj, m->constr, &info);
+    info = evaluate(m, m->trialXi, &m->obj, m->constr);
     m->nFunCalls++;
     cNormTrial = lInfConstraintNorm(m->trialXi, m->constr, m->bu, m->bl);
     if (info != 0 || m->obj < obj_lo_ || m->obj > obj_up_
@@ -1419,7 +1391,7 @@ namespace casadi {
 
     // Compute objective and ||constr(trialXi)|| at trial point
     trialConstr.Dimension(ng_).Initialize(0.0);
-    evaluate(m, m->trialXi, &objTrial, trialConstr, &info);
+    info = evaluate(m, m->trialXi, &objTrial, trialConstr);
     m->nFunCalls++;
     cNormTrial = lInfConstraintNorm(m->trialXi, trialConstr, m->bu, m->bl);
     if (info != 0 || objTrial < obj_lo_ || objTrial > obj_up_
@@ -1432,13 +1404,8 @@ namespace casadi {
 
     // scaled norm of Lagrangian gradient
     trialGradLagrange.Dimension(nx_).Initialize(0.0);
-    if (sparse_qp_) {
-      calcLagrangeGradient(m, m->lambdaQP, m->gradObj, m->jacNz,
-                            m->jacIndRow, m->jacIndCol, trialGradLagrange, 0);
-    } else {
-      calcLagrangeGradient(m, m->lambdaQP, m->gradObj, m->constrJac,
-                            trialGradLagrange, 0);
-    }
+    calcLagrangeGradient(m, m->lambdaQP, m->gradObj, m->jacNz,
+                         m->jacIndRow, m->jacIndCol, trialGradLagrange, 0);
 
     trialGradNorm = lInfVectorNorm(trialGradLagrange);
     trialTol = trialGradNorm /(1.0 + lInfVectorNorm(m->lambdaQP));
@@ -2062,15 +2029,9 @@ namespace casadi {
     qpOASES::Matrix *A;
     qpOASES::SymmetricMatrix *H;
     if (matricesChanged) {
-        if (sparse_qp_) {
-            A = new qpOASES::SparseMatrix(ng_, nx_,
-                                           m->jacIndRow, m->jacIndCol, m->jacNz);
-          } else {
-            // transpose Jacobian (qpOASES needs row major arrays)
-            Transpose(m->constrJac, jacT);
-            A = new qpOASES::DenseMatrix(ng_, nx_, nx_, jacT.ARRAY());
-          }
-      }
+      A = new qpOASES::SparseMatrix(ng_, nx_,
+                                    m->jacIndRow, m->jacIndCol, m->jacNz);
+    }
     double *g = m->gradObj.ARRAY();
     double *lb = m->deltaBl.ARRAY();
     double *lu = m->deltaBu.ARRAY();
@@ -2119,27 +2080,20 @@ namespace casadi {
          * Prepare the current Hessian for qpOASES
          */
         if (matricesChanged) {
-            if (sparse_qp_) {
-                // Convert block-Hessian to sparse format
-                convertHessian(m, eps_, m->hess, m->hessNz,
-                                      m->hessIndRow, m->hessIndCol, m->hessIndLo);
-                H = new qpOASES::SymSparseMat(nx_, nx_,
-                                               m->hessIndRow, m->hessIndCol,
-                                               m->hessNz);
-                dynamic_cast<qpOASES::SymSparseMat*>(H)->createDiagInfo();
-              } else {
-                // Convert block-Hessian to double array
-                convertHessian(m, eps_, m->hess);
-                H = new qpOASES::SymDenseMat(nx_, nx_,
-                  nx_, m->hessNz);
-              }
-          }
+          // Convert block-Hessian to sparse format
+          convertHessian(m, eps_, m->hess, m->hessNz,
+                                m->hessIndRow, m->hessIndCol, m->hessIndLo);
+          H = new qpOASES::SymSparseMat(nx_, nx_,
+                                         m->hessIndRow, m->hessIndCol,
+                                         m->hessNz);
+          dynamic_cast<qpOASES::SymSparseMat*>(H)->createDiagInfo();
+        }
 
         /*
          * Call qpOASES
          */
         if (debug_level_ > 2) {
-          dumpQPCpp(m, m->qp, sparse_qp_);
+          dumpQPCpp(m, m->qp);
         }
         if (matricesChanged) {
             maxIt = max_it_qp_;
@@ -2162,7 +2116,7 @@ namespace casadi {
          */
         if (l < maxQP-1 && matricesChanged) {
             if (ret == qpOASES::SUCCESSFUL_RETURN) {
-                if (sparse_qp_ == 2) {
+                if (shur_) {
                   ret = solAna.checkCurvatureOnStronglyActiveConstraints(
                     dynamic_cast<qpOASES::SQProblemSchur*>(m->qp));
                 } else {
@@ -2199,11 +2153,7 @@ namespace casadi {
     m->qpObj = m->qp->getObjVal();
 
     // Compute constrJac*deltaXi, need this for second order correction step
-    if (sparse_qp_) {
-      Atimesb(m->jacNz, m->jacIndRow, m->jacIndCol, deltaXi, m->AdeltaXi);
-    } else {
-      Atimesb(m->constrJac, deltaXi, m->AdeltaXi);
-    }
+    Atimesb(m->jacNz, m->jacIndRow, m->jacIndCol, deltaXi, m->AdeltaXi);
 
     // Print qpOASES error code, if any
     if (ret != qpOASES::SUCCESSFUL_RETURN && matricesChanged)
@@ -2613,7 +2563,7 @@ namespace casadi {
 
 
   void Blocksqp::
-  dumpQPCpp(BlocksqpMemory* m, qpOASES::SQProblem *qp, int sparseQP) const {
+  dumpQPCpp(BlocksqpMemory* m, qpOASES::SQProblem *qp) const {
     int i, j;
     blocksqp::PATHSTR filename;
     FILE *outfile;
@@ -2627,23 +2577,21 @@ namespace casadi {
     fclose(outfile);
 
     // Print Hessian
-    if (sparseQP) {
-      strcpy(filename, m->outpath);
-      strcat(filename, "qpoases_H_sparse.dat");
-      outfile = fopen(filename, "w");
-      for (i=0; i<nx_+1; i++)
-        fprintf(outfile, "%i ", m->hessIndCol[i]);
-      fprintf(outfile, "\n");
+    strcpy(filename, m->outpath);
+    strcat(filename, "qpoases_H_sparse.dat");
+    outfile = fopen(filename, "w");
+    for (i=0; i<nx_+1; i++)
+      fprintf(outfile, "%i ", m->hessIndCol[i]);
+    fprintf(outfile, "\n");
 
-      for (i=0; i<m->hessIndCol[nx_]; i++)
-        fprintf(outfile, "%i ", m->hessIndRow[i]);
-      fprintf(outfile, "\n");
+    for (i=0; i<m->hessIndCol[nx_]; i++)
+      fprintf(outfile, "%i ", m->hessIndRow[i]);
+    fprintf(outfile, "\n");
 
-      for (i=0; i<m->hessIndCol[nx_]; i++)
-        fprintf(outfile, "%23.16e ", m->hessNz[i]);
-      fprintf(outfile, "\n");
-      fclose(outfile);
-    }
+    for (i=0; i<m->hessIndCol[nx_]; i++)
+      fprintf(outfile, "%23.16e ", m->hessNz[i]);
+    fprintf(outfile, "\n");
+    fclose(outfile);
     strcpy(filename, m->outpath);
     strcat(filename, "qpoases_H.dat");
     outfile = fopen(filename, "w");
@@ -2675,45 +2623,33 @@ namespace casadi {
     strcpy(filename, m->outpath);
     strcat(filename, "qpoases_A.dat");
     outfile = fopen(filename, "w");
-    if (sparseQP) {
-      // Always print dense Jacobian
-      blocksqp::Matrix constrJacTemp;
-      constrJacTemp.Dimension(ng_, nx_).Initialize(0.0);
-      for (i=0; i<nx_; i++)
-        for (j=m->jacIndCol[i]; j<m->jacIndCol[i+1]; j++)
-          constrJacTemp(m->jacIndRow[j], i) = m->jacNz[j];
-      for (i=0; i<ng_; i++) {
-        for (j=0; j<n; j++)
-          fprintf(outfile, "%23.16e ", constrJacTemp(i, j));
-        fprintf(outfile, "\n");
-      }
-      fclose(outfile);
-    } else {
-      for (i=0; i<ng_; i++) {
-        for (j=0; j<n; j++)
-          fprintf(outfile, "%23.16e ", m->constrJac(i, j));
-        fprintf(outfile, "\n");
-      }
-      fclose(outfile);
+    blocksqp::Matrix constrJacTemp;
+    constrJacTemp.Dimension(ng_, nx_).Initialize(0.0);
+    for (i=0; i<nx_; i++)
+      for (j=m->jacIndCol[i]; j<m->jacIndCol[i+1]; j++)
+        constrJacTemp(m->jacIndRow[j], i) = m->jacNz[j];
+    for (i=0; i<ng_; i++) {
+      for (j=0; j<n; j++)
+        fprintf(outfile, "%23.16e ", constrJacTemp(i, j));
+      fprintf(outfile, "\n");
     }
+    fclose(outfile);
 
-    if (sparseQP) {
-      strcpy(filename, m->outpath);
-      strcat(filename, "qpoases_A_sparse.dat");
-      outfile = fopen(filename, "w");
-      for (i=0; i<nx_+1; i++)
-        fprintf(outfile, "%i ", m->jacIndCol[i]);
-      fprintf(outfile, "\n");
+    strcpy(filename, m->outpath);
+    strcat(filename, "qpoases_A_sparse.dat");
+    outfile = fopen(filename, "w");
+    for (i=0; i<nx_+1; i++)
+      fprintf(outfile, "%i ", m->jacIndCol[i]);
+    fprintf(outfile, "\n");
 
-      for (i=0; i<m->jacIndCol[nx_]; i++)
-        fprintf(outfile, "%i ", m->jacIndRow[i]);
-      fprintf(outfile, "\n");
+    for (i=0; i<m->jacIndCol[nx_]; i++)
+      fprintf(outfile, "%i ", m->jacIndRow[i]);
+    fprintf(outfile, "\n");
 
-      for (i=0; i<m->jacIndCol[nx_]; i++)
-        fprintf(outfile, "%23.16e ", m->jacNz[i]);
-      fprintf(outfile, "\n");
-      fclose(outfile);
-    }
+    for (i=0; i<m->jacIndCol[nx_]; i++)
+      fprintf(outfile, "%23.16e ", m->jacNz[i]);
+    fprintf(outfile, "\n");
+    fclose(outfile);
 
     // Print variable lower bounds
     strcpy(filename, m->outpath);
@@ -2769,7 +2705,7 @@ namespace casadi {
     fclose(outfile);
   }
 
-  void Blocksqp::dumpQPMatlab(BlocksqpMemory* m, int sparseQP) const {
+  void Blocksqp::dumpQPMatlab(BlocksqpMemory* m) const {
     blocksqp::Matrix temp;
     blocksqp::PATHSTR filename;
     FILE *qpFile;
@@ -2807,10 +2743,8 @@ namespace casadi {
     fclose(vecFile);
 
     // Print sparse Jacobian and Hessian
-    if (sparseQP) {
-        printJacobian(m, ng_, nx_, m->jacNz, m->jacIndRow, m->jacIndCol);
-        printHessian(m, nx_, m->hessNz, m->hessIndRow, m->hessIndCol);
-      }
+    printJacobian(m, ng_, nx_, m->jacNz, m->jacIndRow, m->jacIndCol);
+    printHessian(m, nx_, m->hessNz, m->hessIndRow, m->hessIndCol);
 
     // Print a script that correctly reads everything
     strcpy(filename, m->outpath);
@@ -3056,73 +2990,32 @@ namespace casadi {
     jacNz = new double[sp_jac_.nnz()];
   }
 
-  void Blocksqp::
+  int Blocksqp::
   evaluate(BlocksqpMemory* m, const blocksqp::Matrix &xi,
            const blocksqp::Matrix &lambda,
            double *objval, blocksqp::Matrix &constr,
            blocksqp::Matrix &gradObj, double *&jacNz, int *&jacIndRow,
            int *&jacIndCol,
-           blocksqp::SymMatrix *&hess, int dmode, int *info) const {
-    if (dmode==0) {
-      // No derivatives
-      m->arg[0] = xi.array; // x
-      m->arg[1] = m->p; // p
-      m->res[0] = objval; // f
-      m->res[1] = constr.array; // g
-      calc_function(m, "nlp_fg");
-    } else if (dmode==1) {
-      // First order derivatives
-      m->arg[0] = xi.array; // x
-      m->arg[1] = m->p; // p
-      m->res[0] = objval; // f
-      m->res[1] = constr.array; // g
-      m->res[2] = gradObj.array; // grad:f:x
-      m->res[3] = jacNz; // jac:g:x
-      calc_function(m, "nlp_gf_jg");
-    } else {
-      casadi_error("Not implemented");
-    }
-    *info = 0;
+           blocksqp::SymMatrix *&hess) const {
+    m->arg[0] = xi.array; // x
+    m->arg[1] = m->p; // p
+    m->res[0] = objval; // f
+    m->res[1] = constr.array; // g
+    m->res[2] = gradObj.array; // grad:f:x
+    m->res[3] = jacNz; // jac:g:x
+    calc_function(m, "nlp_gf_jg");
+    return 0;
   }
 
-  void Blocksqp::
-  evaluate(BlocksqpMemory* m, const blocksqp::Matrix &xi, const blocksqp::Matrix &lambda,
-           double *objval, blocksqp::Matrix &constr,
-           blocksqp::Matrix &gradObj, blocksqp::Matrix &constrJac,
-           blocksqp::SymMatrix *&hess,
-           int dmode, int *info) const {
-    if (dmode==0) {
-      double *jacNz = 0;
-      int *jacIndRow = 0;
-      int *jacIndCol = 0;
-      return evaluate(m, xi, lambda, objval, constr, gradObj, jacNz, jacIndRow,
-                      jacIndCol, hess, dmode, info);
-    }
-
-    casadi_error("evaluate (dense)");
-  }
-
-  void Blocksqp::
+  int Blocksqp::
   evaluate(BlocksqpMemory* m, const blocksqp::Matrix &xi, double *objval,
-           blocksqp::Matrix &constr, int *info) const {
-    blocksqp::Matrix lambdaDummy, gradObjDummy;
-    blocksqp::SymMatrix *hessDummy;
-    int dmode = 0;
-
-    blocksqp::Matrix constrJacDummy;
-    double *jacNzDummy;
-    int *jacIndRowDummy, *jacIndColDummy;
-    *info = 0;
-
-    // Try sparse version first
-    evaluate(m, xi, lambdaDummy, objval, constr, gradObjDummy, jacNzDummy,
-      jacIndRowDummy, jacIndColDummy, hessDummy, dmode, info);
-
-    // If sparse version is not implemented, try dense version
-    if (info) {
-      evaluate(m, xi, lambdaDummy, objval, constr, gradObjDummy,
-        constrJacDummy, hessDummy, dmode, info);
-    }
+           blocksqp::Matrix &constr) const {
+    m->arg[0] = xi.array; // x
+    m->arg[1] = m->p; // p
+    m->res[0] = objval; // f
+    m->res[1] = constr.array; // g
+    calc_function(m, "nlp_fg");
+    return 0;
   }
 
 } // namespace casadi

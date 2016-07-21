@@ -124,7 +124,7 @@ opts["hess_lim_mem"] = 0
 opts["max_consec_skipped_updates"] = 200
 opts["block_hess"] = 0
 opts["which_second_derv"] = 0
-opts["sparse_qp"] = 1
+opts["shur"] = False
 opts["print_level"] = 2
 solver = nlpsol('solver', 'blocksqp', prob, opts);
 

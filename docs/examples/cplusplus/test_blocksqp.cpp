@@ -59,7 +59,7 @@ int main(){
   opts["max_consec_skipped_updates"] = 200;
   opts["block_hess"] = 0;
   opts["which_second_derv"] = 0;
-  opts["sparse_qp"] = 1;
+  opts["shur"] = false;
   opts["print_level"] = 2;
   Function solver = nlpsol("solver", "blocksqp", nlp, opts);
 
