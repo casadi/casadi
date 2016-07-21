@@ -21,9 +21,6 @@
 #include <set>
 
 namespace blocksqp {
-
-  typedef char PATHSTR[4096];
-
   /**
    * \brief Class for easy access of elements of a dense matrix.
    * \author Dennis Janka

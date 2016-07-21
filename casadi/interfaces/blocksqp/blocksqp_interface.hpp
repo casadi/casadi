@@ -67,14 +67,6 @@ namespace casadi {
     int nTotalUpdates;
     int nTotalSkippedUpdates;
     double averageSizingFactor;  // average value (over all blocks) of COL sizing factor
-    blocksqp::PATHSTR outpath;  // path where log files are stored
-
-    FILE *progressFile;  // save stats for each SQP step
-    FILE *updateFile;  // print update sequence (SR1/BFGS) to file
-    FILE *primalVarsFile;  // primal variables for every SQP iteration
-    FILE *dualVarsFile;  // dual variables for every SQP iteration
-    FILE *jacFile;  // Jacobian of one iteration
-    FILE *hessFile;  // Hessian of one iteration
 
     // Variables that are updated during one SQP iteration
     double obj;  // objective value
@@ -197,8 +189,6 @@ namespace casadi {
 
     /// Main Loop of SQP method
     int run(BlocksqpMemory* m, int maxIt, int warmStart = 0) const;
-    /// Call after the last call of run, to close output files etc.
-    void finish(BlocksqpMemory* m) const;
     /// Print information about the SQP method
     void printInfo(BlocksqpMemory* m, int printLevel) const;
     /// Compute gradient of Lagrangian function (sparse version)
@@ -298,31 +288,6 @@ namespace casadi {
     */
     /// Open output files
     void initStats(BlocksqpMemory* m) const;
-    /// Print Debug information in logfiles
-    void printDebug(BlocksqpMemory* m) const;
-    /// Print current iterate of primal variables to file
-    void printPrimalVars(BlocksqpMemory* m, const blocksqp::Matrix &xi) const;
-    /// Print current iterate of dual variables to file
-    void printDualVars(BlocksqpMemory* m, const blocksqp::Matrix &lambda) const;
-    /// Print all QP data to files to be read in MATLAB
-    void dumpQPMatlab(BlocksqpMemory* m) const;
-    void dumpQPCpp(BlocksqpMemory* m, qpOASES::SQProblem *qp) const;
-    void printVectorCpp(BlocksqpMemory* m, FILE *outfile, double *vec,
-      int len, char* varname) const;
-    void printVectorCpp(BlocksqpMemory* m, FILE *outfile, int *vec, int len,
-      char* varname) const;
-    void printCppNull(BlocksqpMemory* m, FILE *outfile, char* varname) const;
-    /// Print current (full) Jacobian to Matlab file
-    void printJacobian(BlocksqpMemory* m, const blocksqp::Matrix &constrJacFull) const;
-    void printJacobian(BlocksqpMemory* m, int nCon, int nVar, double *jacNz,
-      int *jacIndRow, int *jacIndCol) const;
-    /// Print current (full) Hessian to Matlab file
-    void printHessian(BlocksqpMemory* m, int nBlocks, blocksqp::SymMatrix *&hess) const;
-    void printHessian(BlocksqpMemory* m, int nVar, double *hesNz, int *hesIndRow,
-      int *hesIndCol) const;
-    /// Print a sparse Matrix in (column compressed) to a MATLAB readable file
-    void printSparseMatlab(BlocksqpMemory* m, FILE *file, int nRow, int nVar,
-      double *nz, int *indRow, int *indCol) const;
     /// Print one line of output to stdout about the current iteration
     void printProgress(BlocksqpMemory* m, bool hasConverged) const;
     /// Allocate variables that any SQP code needs
