@@ -58,9 +58,6 @@ namespace casadi {
      {{"print_level",
        {OT_INT,
         "Print level"}},
-      {"debug_level",
-       {OT_INT,
-        "Amount of debug information that is printed during every iteration"}},
       {"eps",
        {OT_DOUBLE,
         "Values smaller than this are regarded as numerically zero"}},
@@ -205,7 +202,6 @@ namespace casadi {
 
     // Set default options
     print_level_ = 2;
-    debug_level_ = 0;
     eps_ = 1.0e-16;
     opttol_ = 1.0e-6;
     nlinfeastol_ = 1.0e-6;
@@ -256,8 +252,6 @@ namespace casadi {
     for (auto&& op : opts) {
       if (op.first=="print_level") {
         print_level_ = op.second;
-      } else if (op.first=="debug_level") {
-        debug_level_ = op.second;
       } else if (op.first=="eps") {
         eps_ = op.second;
       } else if (op.first=="opttol") {
@@ -635,8 +629,7 @@ namespace casadi {
       }
 
       /// Determine steplength alpha
-      if (globalization_ == 0 || (skip_first_globalization_
-        && m->itCount == 1)) {
+      if (globalization_ == 0 || (skip_first_globalization_ && m->itCount == 1)) {
         // No globalization strategy, but reduce step if function cannot be evaluated
         if (fullstep(m)) {
           printf("***Constraint or objective could not be evaluated at new point. Stop.***\n");

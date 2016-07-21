@@ -334,7 +334,6 @@ namespace casadi {
 
     // General options
     int print_level_;
-    int debug_level_; // amount of debug information that is printed during every iteration
     double eps_;  // values smaller than this are regarded as numerically zero
     double opttol_;  // optimality tolerance
     double nlinfeastol_; // nonlinear feasibility tolerance
