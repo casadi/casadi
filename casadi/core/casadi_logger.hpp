@@ -30,6 +30,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <cstdarg>
 
 namespace casadi {
 
@@ -174,23 +175,23 @@ namespace casadi {
   }
 
   // C-style printing to std::cout
-  inline void casadi_printf(char* format, ...) {
-    char buffer[256];
+  inline void casadi_printf(const char* fmt, ...) {
+    char buf[256];
     va_list args;
-    va_start(args, format);
-    vsnprintf(buffer, 256, format, args);
-    userOut() << buffer;
-    va_end (args);
+    va_start(args, fmt);
+    vsnprintf(buf, 256, fmt, args);
+    userOut() << buf;
+    va_end(args);
   }
 
   // C-style printing to std::cerr
-  inline void casadi_eprintf(char* format, ...) {
-    char buffer[256];
+  inline void casadi_eprintf(const char* fmt, ...) {
+    char buf[256];
     va_list args;
-    va_start(args, format);
-    vsnprintf(buffer, 256, format, args);
-    userOut<true, PL_WARN>() << buffer;
-    va_end (args);
+    va_start(args, fmt);
+    vsnprintf(buf, 256, fmt, args);
+    userOut<true, PL_WARN>() << buf;
+    va_end(args);
   }
 
 } // namespace casadi
