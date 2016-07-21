@@ -55,9 +55,12 @@ namespace casadi {
 
   Options Blocksqp::options_
   = {{&Nlpsol::options_},
-     {{"print_level",
-       {OT_INT,
-        "Print level"}},
+     {{"print_header",
+       {OT_BOOL,
+        "Print solver header at startup"}},
+      {"print_iteration",
+       {OT_BOOL,
+        "Print SQP iterations"}},
       {"eps",
        {OT_DOUBLE,
         "Values smaller than this are regarded as numerically zero"}},
@@ -201,7 +204,8 @@ namespace casadi {
     Nlpsol::init(opts);
 
     // Set default options
-    print_level_ = 2;
+    print_header_ = true;
+    print_iteration_ = true;
     eps_ = 1.0e-16;
     opttol_ = 1.0e-6;
     nlinfeastol_ = 1.0e-6;
@@ -250,8 +254,10 @@ namespace casadi {
 
     // Read user options
     for (auto&& op : opts) {
-      if (op.first=="print_level") {
-        print_level_ = op.second;
+      if (op.first=="print_header") {
+        print_header_ = op.second;
+      } else if (op.first=="print_iteration") {
+          print_iteration_ = op.second;
       } else if (op.first=="eps") {
         eps_ = op.second;
       } else if (op.first=="opttol") {
@@ -507,7 +513,7 @@ namespace casadi {
     }
 
     // Print header and information about the algorithmic parameters
-    printInfo(m, print_level_);
+    if (print_header_) printInfo(m);
 
     // Open output files
     initStats(m);
@@ -566,10 +572,14 @@ namespace casadi {
 
       /// Check if converged
       hasConverged = calcOptTol(m);
-      printProgress(m, hasConverged);
-      if (hasConverged)
+      if (print_iteration_) printProgress(m);
+      updateStats(m);
+      if (hasConverged) {
+        if (print_iteration_ && m->steptype < 2) {
+          printf("\n***CONVERGENCE ACHIEVED!***\n");
+        }
         return 0;
-
+      }
       m->itCount++;
     }
 
@@ -710,8 +720,10 @@ namespace casadi {
       hasConverged = calcOptTol(m);
 
       /// Print one line of output for the current iteration
-      printProgress(m, hasConverged);
+      if (print_iteration_) printProgress(m);
+      updateStats(m);
       if (hasConverged && m->steptype < 2) {
+        if (print_iteration_) printf("\n***CONVERGENCE ACHIEVED!***\n");
         m->itCount++;
         return 0; //Convergence achieved!
       }
@@ -807,14 +819,11 @@ namespace casadi {
       return false;
   }
 
-  void Blocksqp::printInfo(BlocksqpMemory* m, int printLevel) const {
+  void Blocksqp::printInfo(BlocksqpMemory* m) const {
     char hessString1[100];
     char hessString2[100];
     char globString[100];
     char qpString[100];
-
-    if (printLevel == 0)
-      return;
 
     /* QP Solver */
     if (shur_)
@@ -2169,7 +2178,7 @@ namespace casadi {
     }
   }
 
-  void Blocksqp::printProgress(BlocksqpMemory* m, bool hasConverged) const {
+  void Blocksqp::printProgress(BlocksqpMemory* m) const {
     /*
      * m->steptype:
      *-1: full step was accepted because it reduces the KKT error although line search failed
@@ -2179,81 +2188,59 @@ namespace casadi {
      * 3: feasibility restoration phase has been called
      */
 
-    if (m->itCount == 0) {
-      if (print_level_ > 0) {
-        // Headline
-        printf("%-8s", "   it");
-        printf("%-21s", " qpIt");
-        printf("%-9s", "obj");
-        printf("%-11s", "feas");
-        printf("%-7s", "opt");
-        if (print_level_ > 1) {
-          printf("%-11s", "|lgrd|");
-          printf("%-9s", "|stp|");
-          printf("%-10s", "|lstp|");
-        }
-        printf("%-8s", "alpha");
-        if (print_level_ > 1) {
-          printf("%-6s", "nSOCS");
-          printf("%-18s", "sk, da, sca");
-          printf("%-6s", "QPr,mu");
-        }
-        printf("\n");
-
-        // Values for first iteration
-        printf("%5i  ", m->itCount);
-        printf("%11i ", 0);
-        printf("% 10e  ", m->obj);
-        printf("%-10.2e", m->cNormS);
-        printf("%-10.2e", m->tol);
-        printf("\n");
-      }
-
-    } else {
-      // Every twenty iterations print headline
-      if (m->itCount % 20 == 0 && print_level_ > 0) {
-        printf("%-8s", "   it");
-        printf("%-21s", " qpIt");
-        printf("%-9s", "obj");
-        printf("%-11s", "feas");
-        printf("%-7s", "opt");
-        if (print_level_ > 1) {
-            printf("%-11s", "|lgrd|");
-            printf("%-9s", "|stp|");
-            printf("%-10s", "|lstp|");
-          }
-        printf("%-8s", "alpha");
-        if (print_level_ > 1) {
-            printf("%-6s", "nSOCS");
-            printf("%-18s", "sk, da, sca");
-            printf("%-6s", "QPr,mu");
-          }
-        printf("\n");
-      }
-
-      // All values
-      if (print_level_ > 0) {
-        printf("%5i  ", m->itCount);
-        printf("%5i+%5i ", m->qpIterations, m->qpIterations2);
-        printf("% 10e  ", m->obj);
-        printf("%-10.2e", m->cNormS);
-        printf("%-10.2e", m->tol);
-        if (print_level_ > 1) {
-            printf("%-10.2e", m->gradNorm);
-            printf("%-10.2e", lInfVectorNorm(m->deltaXi));
-            printf("%-10.2e", m->lambdaStepNorm);
-        }
-        printf("%-9.1e", m->alpha);
-
-        if (print_level_ > 1) {
-          printf("%5i", m->nSOCS);
-          printf("%3i, %3i, %-9.1e", m->hessSkipped, m->hessDamped, m->averageSizingFactor);
-          printf("%i, %-9.1e", m->qpResolve, l1VectorNorm(m->deltaH)/nblocks_);
-        }
-        printf("\n");
-      }
+     // Print headline every twenty iterations
+    if (m->itCount % 20 == 0) {
+      printf("%-8s", "   it");
+      printf("%-21s", " qpIt");
+      printf("%-9s", "obj");
+      printf("%-11s", "feas");
+      printf("%-7s", "opt");
+      printf("%-11s", "|lgrd|");
+      printf("%-9s", "|stp|");
+      printf("%-10s", "|lstp|");
+      printf("%-8s", "alpha");
+      printf("%-6s", "nSOCS");
+      printf("%-18s", "sk, da, sca");
+      printf("%-6s", "QPr,mu");
+      printf("\n");
     }
 
+    if (m->itCount == 0) {
+      // Values for first iteration
+      printf("%5i  ", m->itCount);
+      printf("%11i ", 0);
+      printf("% 10e  ", m->obj);
+      printf("%-10.2e", m->cNormS);
+      printf("%-10.2e", m->tol);
+      printf("\n");
+    } else {
+      // All values
+      printf("%5i  ", m->itCount);
+      printf("%5i+%5i ", m->qpIterations, m->qpIterations2);
+      printf("% 10e  ", m->obj);
+      printf("%-10.2e", m->cNormS);
+      printf("%-10.2e", m->tol);
+      printf("%-10.2e", m->gradNorm);
+      printf("%-10.2e", lInfVectorNorm(m->deltaXi));
+      printf("%-10.2e", m->lambdaStepNorm);
+      printf("%-9.1e", m->alpha);
+      printf("%5i", m->nSOCS);
+      printf("%3i, %3i, %-9.1e", m->hessSkipped, m->hessDamped, m->averageSizingFactor);
+      printf("%i, %-9.1e", m->qpResolve, l1VectorNorm(m->deltaH)/nblocks_);
+      printf("\n");
+    }
+  }
+
+  void Blocksqp::initStats(BlocksqpMemory* m) const {
+    m->itCount = 0;
+    m->qpItTotal = 0;
+    m->qpIterations = 0;
+    m->hessSkipped = 0;
+    m->hessDamped = 0;
+    m->averageSizingFactor = 0.0;
+  }
+
+  void Blocksqp::updateStats(BlocksqpMemory* m) const {
     // Do not accidentally print hessSkipped in the next iteration
     m->hessSkipped = 0;
     m->hessDamped = 0;
@@ -2266,22 +2253,6 @@ namespace casadi {
     m->qpIterations = 0;
     m->qpIterations2 = 0;
     m->qpResolve = 0;
-
-    if (print_level_ > 0) {
-      if (hasConverged && m->steptype < 2) {
-        printf("\n***CONVERGENCE ACHIEVED!***\n");
-      }
-    }
-  }
-
-
-  void Blocksqp::initStats(BlocksqpMemory* m) const {
-    m->itCount = 0;
-    m->qpItTotal = 0;
-    m->qpIterations = 0;
-    m->hessSkipped = 0;
-    m->hessDamped = 0;
-    m->averageSizingFactor = 0.0;
   }
 
   /**

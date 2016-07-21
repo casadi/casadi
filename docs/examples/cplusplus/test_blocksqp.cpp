@@ -60,7 +60,6 @@ int main(){
   opts["block_hess"] = 0;
   opts["which_second_derv"] = 0;
   opts["shur"] = false;
-  opts["print_level"] = 2;
   Function solver = nlpsol("solver", "blocksqp", nlp, opts);
 
   // Solve the Rosenbrock problem

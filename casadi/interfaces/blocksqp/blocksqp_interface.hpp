@@ -190,7 +190,7 @@ namespace casadi {
     /// Main Loop of SQP method
     int run(BlocksqpMemory* m, int maxIt, int warmStart = 0) const;
     /// Print information about the SQP method
-    void printInfo(BlocksqpMemory* m, int printLevel) const;
+    void printInfo(BlocksqpMemory* m) const;
     /// Compute gradient of Lagrangian function (sparse version)
     void calcLagrangeGradient(BlocksqpMemory* m, const blocksqp::Matrix &lambda,
       const blocksqp::Matrix &gradObj, double *jacNz, int *jacIndRow, int *jacIndCol,
@@ -286,10 +286,10 @@ namespace casadi {
     /*
     * STATS
     */
-    /// Open output files
     void initStats(BlocksqpMemory* m) const;
+    void updateStats(BlocksqpMemory* m) const;
     /// Print one line of output to stdout about the current iteration
-    void printProgress(BlocksqpMemory* m, bool hasConverged) const;
+    void printProgress(BlocksqpMemory* m) const;
     /// Allocate variables that any SQP code needs
     void allocMin(BlocksqpMemory* m) const;
     /// Allocate diagonal block Hessian
@@ -333,7 +333,8 @@ namespace casadi {
     }
 
     // General options
-    int print_level_;
+    bool print_header_;
+    bool print_iteration_;
     double eps_;  // values smaller than this are regarded as numerically zero
     double opttol_;  // optimality tolerance
     double nlinfeastol_; // nonlinear feasibility tolerance
