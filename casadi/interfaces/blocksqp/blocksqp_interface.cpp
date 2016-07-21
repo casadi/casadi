@@ -514,11 +514,8 @@ namespace casadi {
 
     if (sparse_qp_ < 2) {
       m->qp = new qpOASES::SQProblem(nx_, ng_);
-      m->qpSave = new qpOASES::SQProblem(nx_, ng_);
     } else {
       m->qp = new qpOASES::SQProblemSchur(nx_, ng_, qpOASES::HST_UNKNOWN, 50);
-      m->qpSave = new qpOASES::SQProblemSchur(nx_,
-        ng_, qpOASES::HST_UNKNOWN, 50);
     }
 
     // Print header and information about the algorithmic parameters
@@ -560,7 +557,6 @@ namespace casadi {
 
     // Clean up
     delete m->qp;
-    delete m->qpSave;
     if (m->noUpdateCounter != 0) delete[] m->noUpdateCounter;
     if (m->jacNz != 0) delete[] m->jacNz;
     if (m->jacIndRow != 0) delete[] m->jacIndRow;
@@ -2094,17 +2090,6 @@ namespace casadi {
     opts.epsLITests =  2.2204e-08;
     m->qp->setOptions(opts);
 
-    if (maxQP > 1) {
-        // Store last successful QP in temporary storage
-        (*m->qpSave) = *m->qp;
-        /** \todo Storing the active set would be enough but then the QP object
-         *        must be properly reset after unsuccessful (SR1-)attempt.
-         *        Moreover, passing a guessed active set doesn't yield
-         *        exactly the same result as hotstarting a QP. This has
-         *        something to do with how qpOASES handles user-given
-         *        active sets (->check qpOASES source code). */
-      }
-
     // Other variables for qpOASES
     double cpuTime = matricesChanged ? max_time_qp_ : 0.1*max_time_qp_;
     int maxIt = matricesChanged ? max_it_qp_ : 0.1*max_it_qp_;
@@ -2121,7 +2106,6 @@ namespace casadi {
         if (l > 0) {
           // If the solution of the first QP was rejected, consider second Hessian
           m->qpResolve++;
-          *m->qp = *m->qpSave;
           computeNextHessian(m, l, maxQP);
         }
 

@@ -47,7 +47,6 @@ namespace casadi {
 
   struct CASADI_NLPSOL_BLOCKSQP_EXPORT BlocksqpMemory : public NlpsolMemory {
     qpOASES::SQProblem* qp;
-    qpOASES::SQProblem* qpSave;
 
     blocksqp::Matrix      bl;     // lower bounds of variables and constraints
     blocksqp::Matrix      bu;     // upper bounds of variables and constraints
