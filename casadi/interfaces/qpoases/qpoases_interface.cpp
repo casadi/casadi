@@ -171,7 +171,10 @@ namespace casadi {
         "Tolerance for linear independence tests."}},
       {"epsNZCTests",
        {OT_DOUBLE,
-        "Tolerance for nonzero curvature tests."}}
+        "Tolerance for nonzero curvature tests."}},
+      {"enableInertiaCorrection",
+       {OT_BOOL,
+        "Should working set be repaired when negative curvature is discovered during hotstart."}}
      }
   };
 
@@ -275,6 +278,8 @@ namespace casadi {
         ops_.epsLITests = op.second;
       } else if (op.first=="epsNZCTests") {
         ops_.epsNZCTests = op.second;
+      } else if (op.first=="enableInertiaCorrection") {
+        ops_.enableInertiaCorrection = to_BooleanType(op.second);
       }
     }
 
