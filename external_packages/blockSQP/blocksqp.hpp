@@ -27,27 +27,20 @@ namespace blocksqp {
    * \date 2012-2015
    */
   class Matrix {
-    private:
-    int malloc( void );                                           ///< memory allocation
-    int free( void );                                             ///< memory free
-
   public:
     int m;                                                        ///< internal number of rows
     int n;                                                        ///< internal number of columns
     int ldim;                                                     ///< internal leading dimension not necesserily equal to m or n
     double *array;                                                ///< array of how the matrix is stored in the memory
     int tflag;                                                    ///< 1 if it is a Teilmatrix
-
+  private:
+    int malloc();                                           ///< memory allocation
+    int free();                                             ///< memory free
+  public:
     Matrix( int = 1, int = 1, int = -1 );                         ///< constructor with standard arguments
     Matrix( int, int, double*, int = -1 );
     Matrix( const Matrix& A );
-    virtual ~Matrix( void );
-
-    int M( void ) const;                                          ///< number of rows
-    int N( void ) const;                                          ///< number of columns
-    int LDIM( void ) const;                                       ///< leading dimensions
-    double *ARRAY( void ) const;                                  ///< returns pointer to data array
-    int TFLAG( void ) const;                                      ///< returns this->tflag (1 if it is a submatrix and does not own the memory and 0 otherwise)
+    virtual ~Matrix();
 
     virtual double &operator()( int i, int j );                   ///< access element i,j of the matrix
     virtual double &operator()( int i, int j ) const;
@@ -63,14 +56,6 @@ namespace blocksqp {
     Matrix& Submatrix( const Matrix&, int, int, int = 0, int = 0 );
     /// Matrix that points on <tt>ARRAY</tt>
     Matrix& Arraymatrix( int M, int N, double* ARRAY, int LDIM = -1 );
-
-    /** Flag == 0: bracket output
-     * Flag == 1: Matlab output
-     * else: plain output */
-    const Matrix &Print( FILE* = stdout,   ///< file for output
-                         int = 13,       ///< number of digits
-                         int = 1         ///< Flag for format
-                         ) const;
   };
 
   /**
@@ -80,8 +65,8 @@ namespace blocksqp {
    */
   class SymMatrix : public Matrix {
   protected:
-    int malloc( void );
-    int free( void );
+    int malloc();
+    int free();
 
   public:
     SymMatrix( int = 1 );
@@ -90,7 +75,7 @@ namespace blocksqp {
     SymMatrix( int, int, double*, int = -1 );
     SymMatrix( const Matrix& A );
     SymMatrix( const SymMatrix& A );
-    virtual ~SymMatrix( void );
+    virtual ~SymMatrix();
 
     virtual double &operator()( int i, int j );
     virtual double &operator()( int i, int j ) const;

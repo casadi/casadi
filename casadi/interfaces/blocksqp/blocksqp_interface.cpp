@@ -944,19 +944,19 @@ namespace casadi {
     m->nSOCS = nSOCS;
 
     // Set new xi by accepting the current trial step
-    for (k=0; k<m->xi.M(); k++) {
+    for (k=0; k<m->xi.m; k++) {
       m->xi(k) = m->trialXi(k);
       m->deltaXi(k) = alpha * deltaXi(k);
     }
 
     // Store the infinity norm of the multiplier step
     m->lambdaStepNorm = 0.0;
-    for (k=0; k<m->lambda.M(); k++)
+    for (k=0; k<m->lambda.m; k++)
       if ((lStpNorm = fabs(alpha*lambdaQP(k) - alpha*m->lambda(k))) > m->lambdaStepNorm)
         m->lambdaStepNorm = lStpNorm;
 
     // Set new multipliers
-    for (k=0; k<m->lambda.M(); k++)
+    for (k=0; k<m->lambda.m; k++)
       m->lambda(k) = (1.0 - alpha)*m->lambda(k) + alpha*lambdaQP(k);
 
     // Count consecutive reduced steps
@@ -1173,8 +1173,8 @@ namespace casadi {
     // m->constrJac, m->AdeltaXi and m->gradObj are unchanged so far.
 
     // First SOC step
-    deltaXiSOC.Dimension(m->deltaXi.M()).Initialize(0.0);
-    lambdaQPSOC.Dimension(m->lambdaQP.M()).Initialize(0.0);
+    deltaXiSOC.Dimension(m->deltaXi.m).Initialize(0.0);
+    lambdaQPSOC.Dimension(m->lambdaQP.m).Initialize(0.0);
 
     // Second order correction loop
     cNormOld = cNorm;
@@ -1472,13 +1472,13 @@ namespace casadi {
     m->hess[iBlock].Initialize(0.0);
 
     // Each block is a diagonal matrix
-    for (int i=0; i<m->hess[iBlock].M(); i++)
+    for (int i=0; i<m->hess[iBlock].m; i++)
       m->hess[iBlock](i, i) = ini_hess_diag_;
 
     // If we maintain 2 Hessians, also reset the second one
     if (m->hess2 != 0) {
       m->hess2[iBlock].Initialize(0.0);
-      for (int i=0; i<m->hess2[iBlock].M(); i++)
+      for (int i=0; i<m->hess2[iBlock].m; i++)
         m->hess2[iBlock](i, i) = ini_hess_diag_;
     }
   }
@@ -1496,14 +1496,14 @@ namespace casadi {
 
   void Blocksqp::resetHessian(BlocksqpMemory* m, int iBlock) const {
     blocksqp::Matrix smallDelta, smallGamma;
-    int nVarLocal = m->hess[iBlock].M();
+    int nVarLocal = m->hess[iBlock].m;
 
     // smallGamma and smallDelta are either subvectors of gamma and delta
     // or submatrices of gammaMat, deltaMat, i.e. subvectors of gamma and delta
     // from m prev. iterations (for L-BFGS)
-    smallGamma.Submatrix(m->gammaMat, nVarLocal, m->gammaMat.N(),
+    smallGamma.Submatrix(m->gammaMat, nVarLocal, m->gammaMat.n,
       blocks_[iBlock], 0);
-    smallDelta.Submatrix(m->deltaMat, nVarLocal, m->deltaMat.N(),
+    smallDelta.Submatrix(m->deltaMat, nVarLocal, m->deltaMat.n,
       blocks_[iBlock], 0);
 
     // Remove past information on Lagrangian gradient difference
@@ -1546,8 +1546,8 @@ namespace casadi {
 
     if (scale > 0.0) {
       scale = fmax(scale, myEps);
-      for (i=0; i<m->hess[iBlock].M(); i++)
-        for (j=i; j<m->hess[iBlock].M(); j++)
+      for (i=0; i<m->hess[iBlock].m; i++)
+        for (j=i; j<m->hess[iBlock].m; j++)
           m->hess[iBlock](i, j) *= scale;
     } else {
       scale = 1.0;
@@ -1570,8 +1570,8 @@ namespace casadi {
     deltaNormOld = m->deltaNormOld(iBlock);
     deltaGammaOld = m->deltaGammaOld(iBlock);
     deltaBdelta = 0.0;
-    for (i=0; i<delta.M(); i++)
-      for (j=0; j<delta.M(); j++)
+    for (i=0; i<delta.m; i++)
+      for (j=0; j<delta.m; j++)
         deltaBdelta += delta(i) * m->hess[iBlock](i, j) * delta(j);
 
     // Centered Oren-Luenberger factor
@@ -1593,8 +1593,8 @@ namespace casadi {
     if (scale < 1.0 && scale > 0.0) {
       scale = fmax(col_eps_, scale);
       //casadi_printf("Sizing value (COL) block %i = %g\n", iBlock, scale);
-      for (i=0; i<m->hess[iBlock].M(); i++)
-        for (j=i; j<m->hess[iBlock].M(); j++)
+      for (i=0; i<m->hess[iBlock].m; i++)
+        for (j=i; j<m->hess[iBlock].m; j++)
           m->hess[iBlock](i, j) *= scale;
 
       // statistics: average sizing factor
@@ -1625,13 +1625,13 @@ namespace casadi {
     m->averageSizingFactor = 0.0;
 
     for (iBlock=0; iBlock<nBlocks; iBlock++) {
-      nVarLocal = m->hess[iBlock].M();
+      nVarLocal = m->hess[iBlock].m;
 
       // smallGamma and smallDelta are subvectors of gamma and delta,
       // corresponding to partially separability
-      smallGamma.Submatrix(m->gammaMat, nVarLocal, m->gammaMat.N(),
+      smallGamma.Submatrix(m->gammaMat, nVarLocal, m->gammaMat.n,
         blocks_[iBlock], 0);
-      smallDelta.Submatrix(m->deltaMat, nVarLocal, m->deltaMat.N(),
+      smallDelta.Submatrix(m->deltaMat, nVarLocal, m->deltaMat.n,
         blocks_[iBlock], 0);
 
       // Is this the first iteration or the first after a Hessian reset?
@@ -1705,18 +1705,18 @@ namespace casadi {
     m->averageSizingFactor = 0.0;
 
     for (iBlock=0; iBlock<nBlocks; iBlock++) {
-      nVarLocal = m->hess[iBlock].M();
+      nVarLocal = m->hess[iBlock].m;
 
       // smallGamma and smallDelta are submatrices of gammaMat, deltaMat,
       // i.e. subvectors of gamma and delta from m prev. iterations
-      smallGamma.Submatrix(m->gammaMat, nVarLocal, m->gammaMat.N(),
+      smallGamma.Submatrix(m->gammaMat, nVarLocal, m->gammaMat.n,
         blocks_[iBlock], 0);
-      smallDelta.Submatrix(m->deltaMat, nVarLocal, m->deltaMat.N(),
+      smallDelta.Submatrix(m->deltaMat, nVarLocal, m->deltaMat.n,
         blocks_[iBlock], 0);
 
       // Memory structure
-      if (m->itCount > smallGamma.N()) {
-        m2 = smallGamma.N();
+      if (m->itCount > smallGamma.n) {
+        m2 = smallGamma.n;
         posOldest = m->itCount % m2;
         posNewest = (m->itCount-1) % m2;
       } else {
@@ -1790,7 +1790,7 @@ namespace casadi {
   void Blocksqp::
   calcBFGS(BlocksqpMemory* m, const blocksqp::Matrix &gamma,
     const blocksqp::Matrix &delta, int iBlock) const {
-    int i, j, k, dim = gamma.M();
+    int i, j, k, dim = gamma.m;
     blocksqp::Matrix Bdelta;
     blocksqp::SymMatrix *B;
     double h1 = 0.0;
@@ -1867,7 +1867,7 @@ namespace casadi {
   void Blocksqp::
   calcSR1(BlocksqpMemory* m, const blocksqp::Matrix &gamma, const blocksqp::Matrix &delta,
     int iBlock) const {
-    int i, j, k, dim = gamma.M();
+    int i, j, k, dim = gamma.m;
     blocksqp::Matrix gmBdelta;
     blocksqp::SymMatrix *B;
     double myEps = 1.0e2 * eps_;
@@ -1907,8 +1907,8 @@ namespace casadi {
    * the m most recent delta and gamma
    */
   void Blocksqp::updateDeltaGamma(BlocksqpMemory* m) const {
-    int nVar = m->gammaMat.M();
-    int m2 = m->gammaMat.N();
+    int nVar = m->gammaMat.m;
+    int m2 = m->gammaMat.n;
 
     if (m2 == 1)
       return;
@@ -1926,8 +1926,8 @@ namespace casadi {
 
         // If last block contains exact Hessian, we need to copy it
         if (which_second_derv_ == 1)
-          for (int i=0; i<m->hess[nblocks_-1].M(); i++)
-            for (int j=i; j<m->hess[nblocks_-1].N(); j++)
+          for (int i=0; i<m->hess[nblocks_-1].m; i++)
+            for (int j=i; j<m->hess[nblocks_-1].n; j++)
               m->hess2[nblocks_-1](i, j) = m->hess1[nblocks_-1](i, j);
 
         // Limited memory: compute fallback update only when needed
@@ -1952,8 +1952,8 @@ namespace casadi {
         double mu = (idx==1) ? 1.0 / (maxQP-1) : idxF / (idxF - 1.0);
         double mu1 = 1.0 - mu;
         for (int iBlock=0; iBlock<nblocks_; iBlock++)
-          for (int i=0; i<m->hess[iBlock].M(); i++)
-            for (int j=i; j<m->hess[iBlock].N(); j++) {
+          for (int i=0; i<m->hess[iBlock].m; i++)
+            for (int j=i; j<m->hess[iBlock].n; j++) {
                 m->hess2[iBlock](i, j) *= mu;
                 m->hess2[iBlock](i, j) += mu1 * m->hess1[iBlock](i, j);
               }
@@ -1990,11 +1990,11 @@ namespace casadi {
       A = new qpOASES::SparseMatrix(ng_, nx_,
                                     m->jacIndRow, m->jacIndCol, m->jacNz);
     }
-    double *g = m->gradObj.ARRAY();
-    double *lb = m->deltaBl.ARRAY();
-    double *lu = m->deltaBu.ARRAY();
-    double *lbA = m->deltaBl.ARRAY() + nx_;
-    double *luA = m->deltaBu.ARRAY() + nx_;
+    double *g = m->gradObj.array;
+    double *lb = m->deltaBl.array;
+    double *lu = m->deltaBu.array;
+    double *lbA = m->deltaBl.array + nx_;
+    double *luA = m->deltaBu.array + nx_;
 
     // qpOASES options
     qpOASES::Options opts;
@@ -2103,8 +2103,8 @@ namespace casadi {
      */
 
     // Get solution from qpOASES
-    m->qp->getPrimalSolution(deltaXi.ARRAY());
-    m->qp->getDualSolution(lambdaQP.ARRAY());
+    m->qp->getPrimalSolution(deltaXi.array);
+    m->qp->getDualSolution(lambdaQP.array);
     m->qpObj = m->qp->getObjVal();
 
     // Compute constrJac*deltaXi, need this for second order correction step
@@ -2125,8 +2125,8 @@ namespace casadi {
         double mu1 = 1.0 - mu;
         int nBlocks = (which_second_derv_ == 1) ? nblocks_-1 : nblocks_;
         for (int iBlock=0; iBlock<nBlocks; iBlock++)
-          for (int i=0; i<m->hess[iBlock].M(); i++)
-            for (int j=i; j<m->hess[iBlock].N(); j++) {
+          for (int i=0; i<m->hess[iBlock].m; i++)
+            for (int j=i; j<m->hess[iBlock].n; j++) {
                 m->hess2[iBlock](i, j) *= mu;
                 m->hess2[iBlock](i, j) += mu1 * m->hess1[iBlock](i, j);
               }
@@ -2336,8 +2336,8 @@ namespace casadi {
     // 1) count nonzero elements
     nnz = 0;
     for (iBlock=0; iBlock<nblocks_; iBlock++)
-      for (i=0; i<hess_[iBlock].N(); i++)
-        for (j=i; j<hess_[iBlock].N(); j++)
+      for (i=0; i<hess_[iBlock].n; i++)
+        for (j=i; j<hess_[iBlock].n; j++)
           if (fabs(hess_[iBlock](i, j)) > eps) {
             nnz++;
             if (i != j) {
@@ -2359,8 +2359,8 @@ namespace casadi {
     colCountTotal = 0; // keep track of position in large matrix
     rowOffset = 0;
     for (iBlock=0; iBlock<nblocks_; iBlock++) {
-      nCols = hess_[iBlock].N();
-      nRows = hess_[iBlock].M();
+      nCols = hess_[iBlock].n;
+      nRows = hess_[iBlock].m;
 
       for (i=0; i<nCols; i++) {
         // column 'colCountTotal' starts at element 'count'
