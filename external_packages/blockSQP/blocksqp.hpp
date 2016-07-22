@@ -17,8 +17,6 @@
 
 #include "math.h"
 #include "stdio.h"
-#include "string.h"
-#include <set>
 
 namespace blocksqp {
   /**
@@ -37,25 +35,23 @@ namespace blocksqp {
     int malloc();                                           ///< memory allocation
     int free();                                             ///< memory free
   public:
-    Matrix( int = 1, int = 1, int = -1 );                         ///< constructor with standard arguments
-    Matrix( int, int, double*, int = -1 );
-    Matrix( const Matrix& A );
+    Matrix(int = 1, int = 1, int = -1);                         ///< constructor with standard arguments
+    Matrix(int, int, double*, int = -1);
+    Matrix(const Matrix& A);
     virtual ~Matrix();
 
-    virtual double &operator()( int i, int j );                   ///< access element i,j of the matrix
-    virtual double &operator()( int i, int j ) const;
-    virtual double &operator()( int i );                          ///< access element i of the matrix (columnwise)
-    virtual double &operator()( int i ) const;
-    virtual Matrix &operator=( const Matrix &A );                 ///< assignment operator
+    virtual double &operator()(int i, int j);                   ///< access element i,j of the matrix
+    virtual double &operator()(int i, int j) const;
+    virtual double &operator()(int i);                          ///< access element i of the matrix (columnwise)
+    virtual double &operator()(int i) const;
+    virtual Matrix &operator=(const Matrix &A);                 ///< assignment operator
 
-    Matrix &Dimension( int, int = 1, int = -1 );                  ///< set dimension (rows, columns, leading dimension)
-    Matrix &Initialize( double (*)( int, int ) );                 ///< set matrix elements i,j to f(i,j)
-    Matrix &Initialize( double );                                 ///< set all matrix elements to a constant
+    Matrix &Dimension(int, int = 1, int = -1);                  ///< set dimension (rows, columns, leading dimension)
+    Matrix &Initialize(double (*)(int, int));                 ///< set matrix elements i,j to f(i,j)
+    Matrix &Initialize(double);                                 ///< set all matrix elements to a constant
 
     /// Returns just a pointer to the full matrix
-    Matrix& Submatrix( const Matrix&, int, int, int = 0, int = 0 );
-    /// Matrix that points on <tt>ARRAY</tt>
-    Matrix& Arraymatrix( int M, int N, double* ARRAY, int LDIM = -1 );
+    Matrix& Submatrix(const Matrix&, int, int, int = 0, int = 0);
   };
 
   /**
@@ -69,50 +65,36 @@ namespace blocksqp {
     int free();
 
   public:
-    SymMatrix( int = 1 );
-    SymMatrix( int, double* );
-    SymMatrix( int, int, int );
-    SymMatrix( int, int, double*, int = -1 );
-    SymMatrix( const Matrix& A );
-    SymMatrix( const SymMatrix& A );
+    SymMatrix(int = 1);
+    SymMatrix(int, double*);
+    SymMatrix(int, int, int);
+    SymMatrix(int, int, double*, int = -1);
+    SymMatrix(const Matrix& A);
+    SymMatrix(const SymMatrix& A);
     virtual ~SymMatrix();
 
-    virtual double &operator()( int i, int j );
-    virtual double &operator()( int i, int j ) const;
-    virtual double &operator()( int i );
-    virtual double &operator()( int i ) const;
+    virtual double &operator()(int i, int j);
+    virtual double &operator()(int i, int j) const;
+    virtual double &operator()(int i);
+    virtual double &operator()(int i) const;
 
-    SymMatrix &Dimension( int = 1 );
-    SymMatrix &Dimension( int, int, int );
-    SymMatrix &Initialize( double (*)( int, int ) );
-    SymMatrix &Initialize( double );
+    SymMatrix &Dimension(int = 1);
+    SymMatrix &Dimension(int, int, int);
+    SymMatrix &Initialize(double (*)(int, int));
+    SymMatrix &Initialize(double);
 
-    SymMatrix& Submatrix( const Matrix&, int, int, int = 0, int = 0 );
-    SymMatrix& Arraymatrix( int, double* );
-    SymMatrix& Arraymatrix( int, int, double*, int = -1 );
+    SymMatrix& Submatrix(const Matrix&, int, int, int = 0, int = 0);
   };
 
-  Matrix Transpose( const Matrix& A); ///< Overwrites \f$ A \f$ with its transpose \f$ A^T \f$
-  Matrix &Transpose( const Matrix &A, Matrix &T ); ///< Computes \f$ T = A^T \f$
-  double delta( int, int );
-
   //  Declaration of general purpose routines for matrix and vector computations
-  double l1VectorNorm( const Matrix &v );
-  double l2VectorNorm( const Matrix &v );
-  double lInfVectorNorm( const Matrix &v );
+  double l1VectorNorm(const Matrix &v);
+  double l2VectorNorm(const Matrix &v);
+  double lInfVectorNorm(const Matrix &v);
+  double lInfConstraintNorm(const Matrix &xi, const Matrix &constr, const Matrix &bu, const Matrix &bl);
 
-  double l1ConstraintNorm( const Matrix &xi, const Matrix &constr, const Matrix &bu, const Matrix &bl, const Matrix &weights );
-  double l1ConstraintNorm( const Matrix &xi, const Matrix &constr, const Matrix &bu, const Matrix &bl );
-  double l2ConstraintNorm( const Matrix &xi, const Matrix &constr, const Matrix &bu, const Matrix &bl );
-  double lInfConstraintNorm( const Matrix &xi, const Matrix &constr, const Matrix &bu, const Matrix &bl );
-
-  double adotb( const Matrix &a, const Matrix &b );
-  void Atimesb( const Matrix &A, const Matrix &b, Matrix &result );
-  void Atimesb( double *Anz, int *AIndRow, int *AIndCol, const Matrix &b, Matrix &result );
-
-  int calcEigenvalues( const Matrix &B, Matrix &ev );
-  double estimateSmallestEigenvalue( const Matrix &B );
-  int inverse( const Matrix &A, Matrix &Ainv );
+  double adotb(const Matrix &a, const Matrix &b);
+  void Atimesb(const Matrix &A, const Matrix &b, Matrix &result);
+  void Atimesb(double *Anz, int *AIndRow, int *AIndCol, const Matrix &b, Matrix &result);
 
 } // namespace blocksqp
 

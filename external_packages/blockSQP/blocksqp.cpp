@@ -16,100 +16,7 @@
 
 #include "blocksqp.hpp"
 
-// LAPACK routines
-extern "C" {
-  void dspev_(char *jobz, char *uplo, int *n, double *ap, double *w, double *z, int *ldz,
-               double *work, int *info, int strlen_jobz, int strlen_uplo);
-
-  void dgetrf_(int *m, int *n, double *a, int *lda, int *ipiv, int *info);
-
-  void dgetri_(int *n, double *a, int *lda,
-                int *ipiv, double *work, int *lwork, int *info);
-}
-
 namespace blocksqp {
-
-
-  /**
-   * Compute the inverse of a matrix
-   * using LU decomposition (DGETRF and DGETRI)
-   */
-  int inverse(const Matrix &A, Matrix &Ainv) {
-    int i, j;
-    int n, ldim, lwork, info = 0;
-    int *ipiv;
-    double *work;
-
-    for (i=0; i<A.n; i++)
-      for (j=0; j<A.m; j++)
-        Ainv(j,i) = A(j,i);
-
-    n = Ainv.n;
-    ldim = Ainv.ldim;
-    ipiv = new int[n];
-    lwork = n*n;
-    work = new double[lwork];
-
-    // Compute LU factorization
-    dgetrf_(&n, &n, Ainv.array, &ldim, ipiv, &info);
-    if (info != 0)
-      printf("WARNING: DGETRF returned info=%i\n", info);
-    // Compute inverse
-    dgetri_(&n, Ainv.array, &ldim, ipiv, work, &lwork, &info);
-    if (info != 0)
-      printf("WARNING: DGETRI returned info=%i\n", info);
-
-    return info;
-  }
-
-  /**
-   * Compute eigenvalues of a symmetric matrix by DSPEV
-   */
-  int calcEigenvalues(const SymMatrix &B, Matrix &ev) {
-    int n;
-    SymMatrix temp;
-    double *work, *dummy = 0;
-    int info, iDummy = 1;
-
-    n = B.m;
-    ev.Dimension(n).Initialize(0.0);
-    work = new double[3*n];
-
-    // copy Matrix, will be overwritten
-    temp = SymMatrix(B);
-
-    // DSPEV computes all the eigenvalues and, optionally, eigenvectors of a
-    // real symmetric matrix A in packed storage.
-    dspev_(const_cast<char*>("N"), const_cast<char*>("L"), &n, temp.array, ev.array, dummy, &iDummy,
-            work, &info, strlen("N"), strlen("L"));
-
-    delete[] work;
-    return info;
-  }
-
-  /**
-   * Estimate the smalles eigenvalue of a sqare matrix
-   * with the help og Gershgorin's circle theorem
-   */
-  double estimateSmallestEigenvalue(const Matrix &B) {
-    int i, j;
-    double radius;
-    int dim = B.m;
-    double lambdaMin = 0.0;
-
-    // For each row, sum up off-diagonal elements
-    for (i=0; i<dim; i++) {
-        radius = 0.0;
-        for (j=0; j<dim; j++)
-          if (j != i)
-            radius += fabs(B(i, j));
-
-        if (B(i,i) - radius < lambdaMin)
-          lambdaMin = B(i,i) - radius;
-      }
-
-    return lambdaMin;
-  }
 
 
   /**
@@ -191,93 +98,6 @@ namespace blocksqp {
     }
     return norm;
   }
-
-
-  /**
-   * Calculate weighted l1 norm of constraint violations
-   */
-  double l1ConstraintNorm(const Matrix &xi, const Matrix &constr, const Matrix &bu, const Matrix &bl, const Matrix &weights) {
-    double norm = 0.0;
-    int i;
-    int nVar = xi.m;
-    if (weights.m < constr.m + nVar) {
-        printf("Weight vector too short!\n");
-        return 0.0;
-    }
-
-    // Weighted violation of simple bounds
-    for (i=0; i<nVar; i++) {
-      if (xi(i) > bu(i)) {
-          norm += fabs(weights(i)) * (xi(i) - bu(i));
-      } else if (xi(i) < bl(i)) {
-          norm += fabs(weights(i)) * (bl(i) - xi(i));
-      }
-    }
-
-    // Calculate weighted sum of constraint violations
-    for (i=0; i<constr.m; i++) {
-        if (constr(i) > bu(nVar+i))
-          norm += fabs(weights(nVar+i)) * (constr(i) - bu(nVar+i));
-        else if (constr(i) < bl(nVar+i))
-          norm += fabs(weights(nVar+i)) * (bl(nVar+i) - constr(i));
-    }
-
-    return norm;
-  }
-
-
-  /**
-   * Calculate l1 norm of constraint violations
-   */
-  double l1ConstraintNorm(const Matrix &xi, const Matrix &constr, const Matrix &bu, const Matrix &bl) {
-    double norm = 0.0;
-    int i;
-    int nVar = xi.m;
-
-    // Violation of simple bounds
-    for (i=0; i<nVar; i++) {
-        if (xi(i) > bu(i))
-          norm += xi(i) - bu(i);
-        else if (xi(i) < bl(i))
-          norm += bl(i) - xi(i);
-    }
-
-    // Calculate sum of constraint violations
-    for (i=0; i<constr.m; i++) {
-        if (constr(i) > bu(nVar+i))
-          norm += constr(i) - bu(nVar+i);
-        else if (constr(i) < bl(nVar+i))
-          norm += bl(nVar+i) - constr(i);
-    }
-    return norm;
-  }
-
-
-  /**
-   * Calculate l2 norm of constraint violations
-   */
-  double l2ConstraintNorm(const Matrix &xi, const Matrix &constr, const Matrix &bu, const Matrix &bl) {
-    double norm = 0.0;
-    int i;
-    int nVar = xi.m;
-
-    // Violation of simple bounds
-    for (i=0; i<nVar; i++)
-      if (xi(i) > bu(i))
-        norm += xi(i) - bu(i);
-    if (xi(i) < bl(i))
-      norm += bl(i) - xi(i);
-
-    // Calculate sum of constraint violations
-    for (i=0; i<constr.m; i++)
-      if (constr(i) > bu(nVar+i))
-        norm += pow(constr(i) - bu(nVar+i), 2);
-      else if (constr(i) < bl(nVar+i))
-        norm += pow(bl(nVar+i) - constr(i), 2);
-
-    return sqrt(norm);
-  }
-
 
   /**
    * Calculate l_Infinity norm of constraint violations
@@ -445,9 +265,6 @@ namespace blocksqp {
     return *this;
   }
 
-
-  /* ----------------------------------------------------------------------- */
-
   Matrix &Matrix::Submatrix(const Matrix &A, int M, int N, int i0, int j0) {
     if (i0 + M > A.m || j0 + N > A.n) Error("Cannot create Submatrix");
     if (!tflag) free();
@@ -456,18 +273,6 @@ namespace blocksqp {
     n = N;
     array = &A.array[i0+j0*A.ldim];
     ldim = A.ldim;
-    return *this;
-  }
-
-
-  Matrix &Matrix::Arraymatrix(int M, int N, double *ARRAY, int LDIM) {
-    if (!tflag) free();
-    tflag = 1;
-    m = M;
-    n = N;
-    array = ARRAY;
-    ldim = LDIM;
-    if (ldim < m) ldim = m;
     return *this;
   }
 
@@ -624,63 +429,9 @@ namespace blocksqp {
     return *this;
   }
 
-
   SymMatrix &SymMatrix::Submatrix(const Matrix &A, int M, int N, int i0, int j0) {
     Error("SymMatrix doesn't support Submatrix");
     return *this;
-  }
-
-
-  SymMatrix &SymMatrix::Arraymatrix(int M, double *ARRAY) {
-    if (!tflag)
-      free();
-
-    tflag = 1;
-    m = M;
-    n = M;
-    ldim = M;
-    array = ARRAY;
-
-    return *this;
-  }
-
-  SymMatrix &SymMatrix::Arraymatrix(int M, int N, double *ARRAY, int LDIM) {
-    if (!tflag) free();
-    tflag = 1;
-    m = M;
-    n = M;
-    ldim = M;
-    array = ARRAY;
-
-    return *this;
-  }
-
-  double delta(int i, int j) {
-    return (i == j) ? 1.0 : 0.0;
-  }
-
-  Matrix Transpose(const Matrix &A) {
-    double *array;
-
-    if ((array = new double[A.n*A.m]) == 0)
-      Error("'new' failed");
-
-    for (int i = 0; i < A.n; i++)
-      for (int j = 0; j < A.m; j++)
-        array[i+j*A.n] = A(j,i);
-
-    return Matrix(A.n, A.m, array, A.n);
-  }
-
-
-  Matrix &Transpose(const Matrix &A, Matrix &T) {
-    T.Dimension(A.n, A.m);
-
-    for (int i = 0; i < A.n; i++)
-      for (int j = 0; j < A.m; j++)
-        T(i, j) = A(j,i);
-
-    return T;
   }
 
 } // namespace blocksqp
