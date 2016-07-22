@@ -23,7 +23,7 @@
  */
 
 
-#include "blocksqp_interface.hpp"
+#include "blocksqp.hpp"
 #include "casadi/core/std_vector_tools.hpp"
 #include "casadi/core/function/conic.hpp"
 

@@ -23,12 +23,12 @@
  */
 
 
-      #include "blocksqp_interface.hpp"
+      #include "blocksqp.hpp"
       #include <string>
 
       const std::string casadi::Blocksqp::meta_doc=
       "\n"
-"BLOCKSQP interface\n"
+"BLOCKSQP\n"
 "\n"
 "\n"
 ;

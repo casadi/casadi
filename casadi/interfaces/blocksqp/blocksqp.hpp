@@ -23,8 +23,8 @@
  */
 
 
-#ifndef CASADI_BLOCKSQP_INTERFACE_HPP
-#define CASADI_BLOCKSQP_INTERFACE_HPP
+#ifndef CASADI_BLOCKSQP_HPP
+#define CASADI_BLOCKSQP_HPP
 
 #include <casadi/interfaces/blocksqp/casadi_nlpsol_blocksqp_export.h>
 #include "casadi/core/function/nlpsol_impl.hpp"
@@ -472,4 +472,4 @@ namespace casadi {
 } // namespace casadi
 
 /// \endcond
-#endif // CASADI_BLOCKSQP_INTERFACE_HPP
+#endif // CASADI_BLOCKSQP_HPP
