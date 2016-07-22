@@ -27,9 +27,89 @@
 #define CASADI_BLOCKSQP_INTERFACE_HPP
 
 #include <casadi/interfaces/blocksqp/casadi_nlpsol_blocksqp_export.h>
-#include <blocksqp.hpp>
 #include "casadi/core/function/nlpsol_impl.hpp"
 #include <qpOASES.hpp>
+
+namespace blocksqp {
+  /**
+   * \brief Class for easy access of elements of a dense matrix.
+   * \author Dennis Janka
+   * \date 2012-2015
+   */
+  class Matrix {
+  public:
+    int m;
+    int n;
+    int ldim;
+    double *array;
+    int tflag;
+  private:
+    int malloc();
+    int free();
+  public:
+    Matrix(int = 1, int = 1, int = -1);
+    Matrix(int, int, double*, int = -1);
+    Matrix(const Matrix& A);
+    virtual ~Matrix();
+
+    virtual double &operator()(int i, int j);
+    virtual double &operator()(int i, int j) const;
+    virtual double &operator()(int i);
+    virtual double &operator()(int i) const;
+    virtual Matrix &operator=(const Matrix &A);
+
+    Matrix &Dimension(int, int = 1, int = -1);
+    Matrix &Initialize(double (*)(int, int));
+    Matrix &Initialize(double val);
+
+    /// Returns just a pointer to the full matrix
+    Matrix& Submatrix(const Matrix&, int, int, int = 0, int = 0);
+  };
+
+  /**
+   * \brief Class for easy access of elements of a dense symmetric matrix.
+   * \author Dennis Janka
+   * \date 2012-2015
+   */
+  class SymMatrix : public Matrix {
+  protected:
+    int malloc();
+    int free();
+
+  public:
+    SymMatrix(int = 1);
+    SymMatrix(int, double*);
+    SymMatrix(int, int, int);
+    SymMatrix(int, int, double*, int = -1);
+    SymMatrix(const Matrix& A);
+    SymMatrix(const SymMatrix& A);
+    virtual ~SymMatrix();
+
+    virtual double &operator()(int i, int j);
+    virtual double &operator()(int i, int j) const;
+    virtual double &operator()(int i);
+    virtual double &operator()(int i) const;
+
+    SymMatrix &Dimension(int M = 1);
+    SymMatrix &Dimension(int M, int N, int LDIM);
+    SymMatrix &Initialize(double (*)(int, int));
+    SymMatrix &Initialize(double val);
+
+    SymMatrix& Submatrix(const Matrix &A, int M, int N, int i0=0, int j0=0);
+  };
+
+  //  Declaration of general purpose routines for matrix and vector computations
+  double l1VectorNorm(const Matrix &v);
+  double l2VectorNorm(const Matrix &v);
+  double lInfVectorNorm(const Matrix &v);
+  double lInfConstraintNorm(const Matrix &xi, const Matrix &constr,
+    const Matrix &bu, const Matrix &bl);
+
+  double adotb(const Matrix &a, const Matrix &b);
+  void Atimesb(const Matrix &A, const Matrix &b, Matrix &result);
+  void Atimesb(double *Anz, int *AIndRow, int *AIndCol, const Matrix &b, Matrix &result);
+
+} // namespace blocksqp
 
 /** \defgroup plugin_Nlpsol_blocksqp
   * This is a modified version of blockSQP by Janka et al.

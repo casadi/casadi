@@ -477,8 +477,6 @@ add_feature_info(qpoases-interface QPOASES_FOUND "Interface to the active-set QP
 
 # Use the included blockSQP
 if(WITH_BLOCKSQP AND QPOASES_FOUND)
-  set(BLOCKSQP_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_packages/blocksqp)
-  set(BLOCKSQP_LIBRARIES casadi_blocksqp)
   set(BLOCKSQP_FOUND true)
 endif()
 add_feature_info(blocksqp-interface BLOCKSQP_FOUND "Interface to the NLP solver blockSQP.")

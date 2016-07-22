@@ -61,10 +61,6 @@ if(QPOASES_FOUND)
   add_subdirectory(qpOASES)
 endif()
 
-if(BLOCKSQP_FOUND)
-  add_subdirectory(blockSQP)
-endif()
-
 if(WITH_BUILD_DSDP AND DSDP_FOUND)
   add_subdirectory(DSDP)
 endif()
