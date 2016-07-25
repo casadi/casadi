@@ -113,19 +113,7 @@ for k in range(N):
 
 # Create an NLP solver
 prob = {'f': J, 'x': vertcat(*w), 'g': vertcat(*g)}
-opts = {}
-opts["opttol"] = 1.0e-12
-opts["nlinfeastol"] = 1.0e-12
-opts["globalization"] = 0
-opts["hess_update"] = 0
-opts["hess_scaling"] = 0
-opts["fallback_scaling"] = 0
-opts["hess_lim_mem"] = 0
-opts["max_consec_skipped_updates"] = 200
-opts["block_hess"] = 0
-opts["which_second_derv"] = 0
-opts["shur"] = False
-solver = nlpsol('solver', 'blocksqp', prob, opts);
+solver = nlpsol('solver', 'blocksqp', prob);
 
 # Solve the NLP
 sol = solver(x0=w0, lbx=lbw, ubx=ubw, lbg=lbg, ubg=ubg)
