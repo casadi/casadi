@@ -46,7 +46,7 @@ namespace casadi {
 
   struct CASADI_CONIC_QPOASES_EXPORT QpoasesMemory {
     // Reference to the function
-    const QpoasesInterface& self;
+    const Linsol& linsol;
 
     /// QP Solver
     union {
@@ -71,7 +71,7 @@ namespace casadi {
     std::vector<double> nz;
 
     /// Constructor
-    QpoasesMemory(const QpoasesInterface& self);
+    QpoasesMemory(const Linsol& linsol);
 
     /// Destructor
     ~QpoasesMemory();
@@ -117,7 +117,7 @@ namespace casadi {
     virtual void init(const Dict& opts);
 
     /** \brief Create memory block */
-    virtual void* alloc_memory() const { return new QpoasesMemory(*this);}
+    virtual void* alloc_memory() const { return new QpoasesMemory(linsol_);}
 
     /** \brief Free memory block */
     virtual void free_memory(void *mem) const { delete static_cast<QpoasesMemory*>(mem);}

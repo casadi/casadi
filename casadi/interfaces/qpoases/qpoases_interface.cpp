@@ -783,7 +783,7 @@ namespace casadi {
     }
   }
 
-  QpoasesMemory::QpoasesMemory(const QpoasesInterface& self) : self(self) {
+  QpoasesMemory::QpoasesMemory(const Linsol& linsol) : linsol(linsol) {
     this->qp = 0;
     this->h = 0;
     this->a = 0;
@@ -825,7 +825,7 @@ namespace casadi {
     for (int& e : m->lin_map) e = m->nz_map[e];
 
     // Pass to linear solver
-    m->self.linsol_.reset(sp);
+    m->linsol.reset(sp);
 
     return 0;
   }
@@ -838,7 +838,7 @@ namespace casadi {
     for (int i=0; i<m->nz.size(); ++i) m->nz[i] = vals[m->lin_map[i]];
 
     // Pass to linear solver
-    m->self.linsol_.pivoting(get_ptr(m->nz));
+    m->linsol.pivoting(get_ptr(m->nz));
 
     return 0;
   }
@@ -852,13 +852,13 @@ namespace casadi {
     for (int i=0; i<m->nz.size(); ++i) m->nz[i] = vals[m->lin_map[i]];
 
     // Pass to linear solver
-    m->self.linsol_.factorize(get_ptr(m->nz));
+    m->linsol.factorize(get_ptr(m->nz));
 
     // Number of negative eigenvalues
-    if (neig) *neig = m->self.linsol_.neig();
+    if (neig) *neig = m->linsol.neig();
 
     // Rank of the matrix
-    if (rank) *rank = m->self.linsol_.rank();
+    if (rank) *rank = m->linsol.rank();
 
     return 0;
   }
@@ -868,7 +868,7 @@ namespace casadi {
     QpoasesMemory* m = static_cast<QpoasesMemory*>(mem);
 
     // Pass to linear solver
-    m->self.linsol_.solve(rhs, nrhs);
+    m->linsol.solve(rhs, nrhs);
 
     return 0;
   }
