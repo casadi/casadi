@@ -213,6 +213,7 @@ namespace casadi {
     // Set default options
     //string qpsol_plugin = "qpoases";
     //Dict qpsol_options;
+    linsol_plugin_ = "ma27";
     print_header_ = true;
     print_iteration_ = true;
     eps_ = 1.0e-16;
@@ -269,6 +270,8 @@ namespace casadi {
       } else if (op.first=="qpsol_options") {
         //qpsol_options = op.second;
         casadi_warning("Option 'qpsol_options' currently not supported, ignored");
+      } else if (op.first=="linsol_plugin") {
+        linsol_plugin_ = string(op.second);
       } else if (op.first=="print_header") {
         print_header_ = op.second;
       } else if (op.first=="print_iteration") {
@@ -436,6 +439,11 @@ namespace casadi {
     //               qpsol_options);
     //alloc(qpsol_);
 
+    // [Workaround] Create linear solver for qpOASES
+    if (shur_) {
+      linsol_ = Linsol("linsol", linsol_plugin_);
+    }
+
     // Allocate memory
     alloc_w(Asp_.nnz(), true); // jac
   }
@@ -443,6 +451,11 @@ namespace casadi {
   void Blocksqp::init_memory(void* mem) const {
     Nlpsol::init_memory(mem);
     auto m = static_cast<BlocksqpMemory*>(mem);
+
+    // Create qpOASES memory
+    if (shur_) {
+      m->qpoases_mem = new QpoasesMemory(linsol_);
+    }
   }
 
   void Blocksqp::set_work(void* mem, const double**& arg, double**& res,
@@ -529,7 +542,12 @@ namespace casadi {
     allocAlg(m);
 
     if (shur_) {
-      m->qp = new qpOASES::SQProblemSchur(nx_, ng_, qpOASES::HST_UNKNOWN, 50);
+      m->qp = new qpOASES::SQProblemSchur(nx_, ng_, qpOASES::HST_UNKNOWN, 50,
+                                          m->qpoases_mem,
+                                          QpoasesInterface::qpoases_init,
+                                          QpoasesInterface::qpoases_sfact,
+                                          QpoasesInterface::qpoases_nfact,
+                                          QpoasesInterface::qpoases_solve);
     } else {
       m->qp = new qpOASES::SQProblem(nx_, ng_);
     }
@@ -2500,6 +2518,14 @@ namespace casadi {
     m->res[1] = constr.array; // g
     calc_function(m, "nlp_fg");
     return 0;
+  }
+
+  BlocksqpMemory::BlocksqpMemory() {
+    qpoases_mem = 0;
+  }
+
+  BlocksqpMemory::~BlocksqpMemory() {
+    if (qpoases_mem) delete qpoases_mem;
   }
 
 } // namespace casadi

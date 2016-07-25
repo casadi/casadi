@@ -27,8 +27,9 @@
 #define CASADI_BLOCKSQP_HPP
 
 #include <casadi/interfaces/blocksqp/casadi_nlpsol_blocksqp_export.h>
+#include "casadi/core/function/linsol.hpp"
 #include "casadi/core/function/nlpsol_impl.hpp"
-#include <qpOASES.hpp>
+#include "../qpoases/qpoases_interface.hpp"
 
 namespace blocksqp {
   /**
@@ -126,7 +127,16 @@ namespace casadi {
   class Blocksqp;
 
   struct CASADI_NLPSOL_BLOCKSQP_EXPORT BlocksqpMemory : public NlpsolMemory {
+    /// Constructor
+    BlocksqpMemory();
+
+    /// Destructor
+    ~BlocksqpMemory();
+
     qpOASES::SQProblem* qp;
+
+    // [Workaround] qpOASES memory block
+    QpoasesMemory* qpoases_mem;
 
     blocksqp::Matrix      bl;     // lower bounds of variables and constraints
     blocksqp::Matrix      bu;     // upper bounds of variables and constraints
@@ -414,6 +424,10 @@ namespace casadi {
 
     /// QP solver for the subproblems
     //Function qpsol_;
+
+    // Linear solver in qpOASES
+    Linsol linsol_;
+    std::string linsol_plugin_;
 
     // General options
     bool print_header_;

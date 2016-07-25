@@ -7,3 +7,4 @@ casadi_plugin(Nlpsol blocksqp
   blocksqp_meta.cpp)
 
 casadi_plugin_link_libraries(Nlpsol blocksqp ${QPOASES_LIBRARIES})
+casadi_plugin_link_libraries(Nlpsol blocksqp casadi_conic_qpoases)
