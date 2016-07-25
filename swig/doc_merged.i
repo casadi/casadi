@@ -13,6 +13,9 @@
 // File: classcasadi_1_1BinarySX.xml
 
 
+// File: classcasadi_1_1Blocksqp.xml
+
+
 // File: classcasadi_1_1BonminUserClass.xml
 %feature("docstring") casadi::BonminUserClass "[INTERNAL] C++ includes:
 bonmin_nlp.hpp ";
@@ -5353,6 +5356,324 @@ marker for an input expression.
 ";
 
 
+// File: classblocksqp_1_1Matrix.xml
+%feature("docstring") blocksqp::Matrix::Submatrix "
+
+Returns just a pointer to the full matrix.
+
+";
+
+%feature("docstring") blocksqp::Matrix::Initialize "";
+
+%feature("docstring") blocksqp::Matrix::Matrix "";
+
+%feature("docstring") blocksqp::Matrix::~Matrix "";
+
+%feature("docstring") blocksqp::Matrix "
+
+Class for easy access of elements of a dense matrix.
+
+Dennis Janka
+
+>List of available options
+
++-----------------+-----------------+-----------------+-----------------+
+|       Id        |      Type       |   Description   |     Used in     |
++=================+=================+=================+=================+
+| block_hess      | OT_INT          | Blockwise       | blocksqp::Matri |
+|                 |                 | Hessian         | x               |
+|                 |                 | approximation?  |                 |
++-----------------+-----------------+-----------------+-----------------+
+| col_eps         | OT_DOUBLE       | Epsilon for COL | blocksqp::Matri |
+|                 |                 | scaling         | x               |
+|                 |                 | strategy        |                 |
++-----------------+-----------------+-----------------+-----------------+
+| col_tau1        | OT_DOUBLE       | tau1 for COL    | blocksqp::Matri |
+|                 |                 | scaling         | x               |
+|                 |                 | strategy        |                 |
++-----------------+-----------------+-----------------+-----------------+
+| col_tau2        | OT_DOUBLE       | tau2 for COL    | blocksqp::Matri |
+|                 |                 | scaling         | x               |
+|                 |                 | strategy        |                 |
++-----------------+-----------------+-----------------+-----------------+
+| conv_strategy   | OT_INT          | Convexification | blocksqp::Matri |
+|                 |                 | strategy        | x               |
++-----------------+-----------------+-----------------+-----------------+
+| delta           | OT_DOUBLE       | Filter line     | blocksqp::Matri |
+|                 |                 | search          | x               |
+|                 |                 | parameter, cf.  |                 |
+|                 |                 | IPOPT paper     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| delta_h0        | OT_DOUBLE       | Filter line     | blocksqp::Matri |
+|                 |                 | search          | x               |
+|                 |                 | parameter, cf.  |                 |
+|                 |                 | IPOPT paper     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| discrete        | OT_BOOLVECTOR   | Indicates which | casadi::Nlpsol  |
+|                 |                 | of the          |                 |
+|                 |                 | variables are   |                 |
+|                 |                 | discrete, i.e.  |                 |
+|                 |                 | integer-valued  |                 |
++-----------------+-----------------+-----------------+-----------------+
+| eps             | OT_DOUBLE       | Values smaller  | blocksqp::Matri |
+|                 |                 | than this are   | x               |
+|                 |                 | regarded as     |                 |
+|                 |                 | numerically     |                 |
+|                 |                 | zero            |                 |
++-----------------+-----------------+-----------------+-----------------+
+| eta             | OT_DOUBLE       | Filter line     | blocksqp::Matri |
+|                 |                 | search          | x               |
+|                 |                 | parameter, cf.  |                 |
+|                 |                 | IPOPT paper     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| eval_errors_fat | OT_BOOL         | When errors     | casadi::Nlpsol  |
+| al              |                 | occur during    |                 |
+|                 |                 | evaluation of   |                 |
+|                 |                 | f,g,...,stop    |                 |
+|                 |                 | the iterations  |                 |
++-----------------+-----------------+-----------------+-----------------+
+| expand          | OT_BOOL         | Replace MX with | casadi::Nlpsol  |
+|                 |                 | SX expressions  |                 |
+|                 |                 | in problem      |                 |
+|                 |                 | formulation     |                 |
+|                 |                 | [false]         |                 |
++-----------------+-----------------+-----------------+-----------------+
+| fallback_scalin | OT_INT          | If indefinite   | blocksqp::Matri |
+| g               |                 | update is used, | x               |
+|                 |                 | the type of     |                 |
+|                 |                 | fallback        |                 |
+|                 |                 | strategy        |                 |
++-----------------+-----------------+-----------------+-----------------+
+| fallback_update | OT_INT          | If indefinite   | blocksqp::Matri |
+|                 |                 | update is used, | x               |
+|                 |                 | the type of     |                 |
+|                 |                 | fallback        |                 |
+|                 |                 | strategy        |                 |
++-----------------+-----------------+-----------------+-----------------+
+| gamma_f         | OT_DOUBLE       | Filter line     | blocksqp::Matri |
+|                 |                 | search          | x               |
+|                 |                 | parameter, cf.  |                 |
+|                 |                 | IPOPT paper     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| gamma_theta     | OT_DOUBLE       | Filter line     | blocksqp::Matri |
+|                 |                 | search          | x               |
+|                 |                 | parameter, cf.  |                 |
+|                 |                 | IPOPT paper     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| globalization   | OT_INT          | Globalization   | blocksqp::Matri |
+|                 |                 | strategy        | x               |
++-----------------+-----------------+-----------------+-----------------+
+| hess_damp       | OT_INT          | Activate Powell | blocksqp::Matri |
+|                 |                 | damping for     | x               |
+|                 |                 | BFGS            |                 |
++-----------------+-----------------+-----------------+-----------------+
+| hess_damp_fac   | OT_DOUBLE       | Damping factor  | blocksqp::Matri |
+|                 |                 | for BFGS Powell | x               |
+|                 |                 | modification    |                 |
++-----------------+-----------------+-----------------+-----------------+
+| hess_lim_mem    | OT_INT          | Full or limited | blocksqp::Matri |
+|                 |                 | memory          | x               |
++-----------------+-----------------+-----------------+-----------------+
+| hess_memsize    | OT_INT          | Memory size for | blocksqp::Matri |
+|                 |                 | L-BFGS updates  | x               |
++-----------------+-----------------+-----------------+-----------------+
+| hess_scaling    | OT_INT          | Scaling         | blocksqp::Matri |
+|                 |                 | strategy for    | x               |
+|                 |                 | Hessian         |                 |
+|                 |                 | approximation   |                 |
++-----------------+-----------------+-----------------+-----------------+
+| hess_update     | OT_INT          | Type of Hessian | blocksqp::Matri |
+|                 |                 | approximation   | x               |
++-----------------+-----------------+-----------------+-----------------+
+| ignore_check_ve | OT_BOOL         | If set to true, | casadi::Nlpsol  |
+| c               |                 | the input shape |                 |
+|                 |                 | of F will not   |                 |
+|                 |                 | be checked.     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| ini_hess_diag   | OT_DOUBLE       | Initial Hessian | blocksqp::Matri |
+|                 |                 | guess: diagonal | x               |
+|                 |                 | matrix diag(ini |                 |
+|                 |                 | HessDiag)       |                 |
++-----------------+-----------------+-----------------+-----------------+
+| iteration_callb | OT_FUNCTION     | A function that | casadi::Nlpsol  |
+| ack             |                 | will be called  |                 |
+|                 |                 | at each         |                 |
+|                 |                 | iteration with  |                 |
+|                 |                 | the solver as   |                 |
+|                 |                 | input. Check    |                 |
+|                 |                 | documentation   |                 |
+|                 |                 | of Callback.    |                 |
++-----------------+-----------------+-----------------+-----------------+
+| iteration_callb | OT_BOOL         | If set to true, | casadi::Nlpsol  |
+| ack_ignore_erro |                 | errors thrown   |                 |
+| rs              |                 | by iteration_ca |                 |
+|                 |                 | llback will be  |                 |
+|                 |                 | ignored.        |                 |
++-----------------+-----------------+-----------------+-----------------+
+| iteration_callb | OT_INT          | Only call the   | casadi::Nlpsol  |
+| ack_step        |                 | callback        |                 |
+|                 |                 | function every  |                 |
+|                 |                 | few iterations. |                 |
++-----------------+-----------------+-----------------+-----------------+
+| kappa_f         | OT_DOUBLE       | Filter line     | blocksqp::Matri |
+|                 |                 | search          | x               |
+|                 |                 | parameter, cf.  |                 |
+|                 |                 | IPOPT paper     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| kappa_minus     | OT_DOUBLE       | Filter line     | blocksqp::Matri |
+|                 |                 | search          | x               |
+|                 |                 | parameter, cf.  |                 |
+|                 |                 | IPOPT paper     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| kappa_plus      | OT_DOUBLE       | Filter line     | blocksqp::Matri |
+|                 |                 | search          | x               |
+|                 |                 | parameter, cf.  |                 |
+|                 |                 | IPOPT paper     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| kappa_plus_max  | OT_DOUBLE       | Filter line     | blocksqp::Matri |
+|                 |                 | search          | x               |
+|                 |                 | parameter, cf.  |                 |
+|                 |                 | IPOPT paper     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| kappa_soc       | OT_DOUBLE       | Filter line     | blocksqp::Matri |
+|                 |                 | search          | x               |
+|                 |                 | parameter, cf.  |                 |
+|                 |                 | IPOPT paper     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| max_consec_redu | OT_INT          | Maximum number  | blocksqp::Matri |
+| ced_steps       |                 | of consecutive  | x               |
+|                 |                 | reduced steps   |                 |
++-----------------+-----------------+-----------------+-----------------+
+| max_consec_skip | OT_INT          | Maximum number  | blocksqp::Matri |
+| ped_updates     |                 | of consecutive  | x               |
+|                 |                 | skipped updates |                 |
++-----------------+-----------------+-----------------+-----------------+
+| max_conv_qp     | OT_INT          | How many        | blocksqp::Matri |
+|                 |                 | additional QPs  | x               |
+|                 |                 | may be solved   |                 |
+|                 |                 | for             |                 |
+|                 |                 | convexification |                 |
+|                 |                 | per iteration?  |                 |
++-----------------+-----------------+-----------------+-----------------+
+| max_it_qp       | OT_INT          | Maximum number  | blocksqp::Matri |
+|                 |                 | of QP           | x               |
+|                 |                 | iterations per  |                 |
+|                 |                 | SQP iteration   |                 |
++-----------------+-----------------+-----------------+-----------------+
+| max_line_search | OT_INT          | Maximum number  | blocksqp::Matri |
+|                 |                 | of steps in     | x               |
+|                 |                 | line search     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| max_soc_iter    | OT_INT          | Maximum number  | blocksqp::Matri |
+|                 |                 | of SOC line     | x               |
+|                 |                 | search          |                 |
+|                 |                 | iterations      |                 |
++-----------------+-----------------+-----------------+-----------------+
+| max_time_qp     | OT_DOUBLE       | Maximum number  | blocksqp::Matri |
+|                 |                 | of time in      | x               |
+|                 |                 | seconds per QP  |                 |
+|                 |                 | solve per SQP   |                 |
+|                 |                 | iteration       |                 |
++-----------------+-----------------+-----------------+-----------------+
+| nlinfeastol     | OT_DOUBLE       | Nonlinear       | blocksqp::Matri |
+|                 |                 | feasibility     | x               |
+|                 |                 | tolerance       |                 |
++-----------------+-----------------+-----------------+-----------------+
+| obj_lo          | OT_DOUBLE       | Lower bound on  | blocksqp::Matri |
+|                 |                 | objective       | x               |
+|                 |                 | function [-inf] |                 |
++-----------------+-----------------+-----------------+-----------------+
+| obj_up          | OT_DOUBLE       | Upper bound on  | blocksqp::Matri |
+|                 |                 | objective       | x               |
+|                 |                 | function [inf]  |                 |
++-----------------+-----------------+-----------------+-----------------+
+| opttol          | OT_DOUBLE       | Optimality      | blocksqp::Matri |
+|                 |                 | tolerance       | x               |
++-----------------+-----------------+-----------------+-----------------+
+| print_header    | OT_BOOL         | Print solver    | blocksqp::Matri |
+|                 |                 | header at       | x               |
+|                 |                 | startup         |                 |
++-----------------+-----------------+-----------------+-----------------+
+| print_iteration | OT_BOOL         | Print SQP       | blocksqp::Matri |
+|                 |                 | iterations      | x               |
++-----------------+-----------------+-----------------+-----------------+
+| print_time      | OT_BOOL         | print           | casadi::Nlpsol  |
+|                 |                 | information     |                 |
+|                 |                 | about execution |                 |
+|                 |                 | time            |                 |
++-----------------+-----------------+-----------------+-----------------+
+| qpsol           | OT_STRING       | The QP solver   | blocksqp::Matri |
+|                 |                 | to be used by   | x               |
+|                 |                 | the SQP method  |                 |
++-----------------+-----------------+-----------------+-----------------+
+| qpsol_options   | OT_DICT         | Options to be   | blocksqp::Matri |
+|                 |                 | passed to the   | x               |
+|                 |                 | QP solver       |                 |
++-----------------+-----------------+-----------------+-----------------+
+| restore_feas    | OT_INT          | Use feasibility | blocksqp::Matri |
+|                 |                 | restoration     | x               |
+|                 |                 | phase           |                 |
++-----------------+-----------------+-----------------+-----------------+
+| s_f             | OT_DOUBLE       | Filter line     | blocksqp::Matri |
+|                 |                 | search          | x               |
+|                 |                 | parameter, cf.  |                 |
+|                 |                 | IPOPT paper     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| s_theta         | OT_DOUBLE       | Filter line     | blocksqp::Matri |
+|                 |                 | search          | x               |
+|                 |                 | parameter, cf.  |                 |
+|                 |                 | IPOPT paper     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| shur            | OT_BOOL         | Use qpOASES     | blocksqp::Matri |
+|                 |                 | Shur compliment | x               |
+|                 |                 | approach        |                 |
++-----------------+-----------------+-----------------+-----------------+
+| skip_first_glob | OT_BOOL         | No              | blocksqp::Matri |
+| alization       |                 | globalization   | x               |
+|                 |                 | strategy in     |                 |
+|                 |                 | first iteration |                 |
++-----------------+-----------------+-----------------+-----------------+
+| theta_max       | OT_DOUBLE       | Filter line     | blocksqp::Matri |
+|                 |                 | search          | x               |
+|                 |                 | parameter, cf.  |                 |
+|                 |                 | IPOPT paper     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| theta_min       | OT_DOUBLE       | Filter line     | blocksqp::Matri |
+|                 |                 | search          | x               |
+|                 |                 | parameter, cf.  |                 |
+|                 |                 | IPOPT paper     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| verbose_init    | OT_BOOL         | Print out       | casadi::Nlpsol  |
+|                 |                 | timing          |                 |
+|                 |                 | information     |                 |
+|                 |                 | about the       |                 |
+|                 |                 | different       |                 |
+|                 |                 | stages of       |                 |
+|                 |                 | initialization  |                 |
++-----------------+-----------------+-----------------+-----------------+
+| warn_initial_bo | OT_BOOL         | Warn if the     | casadi::Nlpsol  |
+| unds            |                 | initial guess   |                 |
+|                 |                 | does not        |                 |
+|                 |                 | satisfy LBX and |                 |
+|                 |                 | UBX             |                 |
++-----------------+-----------------+-----------------+-----------------+
+| which_second_de | OT_INT          | For which block | blocksqp::Matri |
+| rv              |                 | should second   | x               |
+|                 |                 | derivatives be  |                 |
+|                 |                 | provided by the |                 |
+|                 |                 | user            |                 |
++-----------------+-----------------+-----------------+-----------------+
+
+Diagrams
+--------
+
+
+
+C++ includes: blocksqp.hpp ";
+
+%feature("docstring") blocksqp::Matrix::Dimension "";
+
+
 // File: classcasadi_1_1MinusInfSX.xml
 
 
@@ -7908,6 +8229,320 @@ Constructor.
 // File: classcasadi_1_1SymbolicSX.xml
 
 
+// File: classblocksqp_1_1SymMatrix.xml
+%feature("docstring") blocksqp::SymMatrix::SymMatrix "";
+
+%feature("docstring") blocksqp::SymMatrix::Submatrix "";
+
+%feature("docstring") blocksqp::SymMatrix "
+
+Class for easy access of elements of a dense symmetric matrix.
+
+Dennis Janka
+
+>List of available options
+
++-----------------+-----------------+-----------------+-----------------+
+|       Id        |      Type       |   Description   |     Used in     |
++=================+=================+=================+=================+
+| block_hess      | OT_INT          | Blockwise       | blocksqp::SymMa |
+|                 |                 | Hessian         | trix            |
+|                 |                 | approximation?  |                 |
++-----------------+-----------------+-----------------+-----------------+
+| col_eps         | OT_DOUBLE       | Epsilon for COL | blocksqp::SymMa |
+|                 |                 | scaling         | trix            |
+|                 |                 | strategy        |                 |
++-----------------+-----------------+-----------------+-----------------+
+| col_tau1        | OT_DOUBLE       | tau1 for COL    | blocksqp::SymMa |
+|                 |                 | scaling         | trix            |
+|                 |                 | strategy        |                 |
++-----------------+-----------------+-----------------+-----------------+
+| col_tau2        | OT_DOUBLE       | tau2 for COL    | blocksqp::SymMa |
+|                 |                 | scaling         | trix            |
+|                 |                 | strategy        |                 |
++-----------------+-----------------+-----------------+-----------------+
+| conv_strategy   | OT_INT          | Convexification | blocksqp::SymMa |
+|                 |                 | strategy        | trix            |
++-----------------+-----------------+-----------------+-----------------+
+| delta           | OT_DOUBLE       | Filter line     | blocksqp::SymMa |
+|                 |                 | search          | trix            |
+|                 |                 | parameter, cf.  |                 |
+|                 |                 | IPOPT paper     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| delta_h0        | OT_DOUBLE       | Filter line     | blocksqp::SymMa |
+|                 |                 | search          | trix            |
+|                 |                 | parameter, cf.  |                 |
+|                 |                 | IPOPT paper     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| discrete        | OT_BOOLVECTOR   | Indicates which | casadi::Nlpsol  |
+|                 |                 | of the          |                 |
+|                 |                 | variables are   |                 |
+|                 |                 | discrete, i.e.  |                 |
+|                 |                 | integer-valued  |                 |
++-----------------+-----------------+-----------------+-----------------+
+| eps             | OT_DOUBLE       | Values smaller  | blocksqp::SymMa |
+|                 |                 | than this are   | trix            |
+|                 |                 | regarded as     |                 |
+|                 |                 | numerically     |                 |
+|                 |                 | zero            |                 |
++-----------------+-----------------+-----------------+-----------------+
+| eta             | OT_DOUBLE       | Filter line     | blocksqp::SymMa |
+|                 |                 | search          | trix            |
+|                 |                 | parameter, cf.  |                 |
+|                 |                 | IPOPT paper     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| eval_errors_fat | OT_BOOL         | When errors     | casadi::Nlpsol  |
+| al              |                 | occur during    |                 |
+|                 |                 | evaluation of   |                 |
+|                 |                 | f,g,...,stop    |                 |
+|                 |                 | the iterations  |                 |
++-----------------+-----------------+-----------------+-----------------+
+| expand          | OT_BOOL         | Replace MX with | casadi::Nlpsol  |
+|                 |                 | SX expressions  |                 |
+|                 |                 | in problem      |                 |
+|                 |                 | formulation     |                 |
+|                 |                 | [false]         |                 |
++-----------------+-----------------+-----------------+-----------------+
+| fallback_scalin | OT_INT          | If indefinite   | blocksqp::SymMa |
+| g               |                 | update is used, | trix            |
+|                 |                 | the type of     |                 |
+|                 |                 | fallback        |                 |
+|                 |                 | strategy        |                 |
++-----------------+-----------------+-----------------+-----------------+
+| fallback_update | OT_INT          | If indefinite   | blocksqp::SymMa |
+|                 |                 | update is used, | trix            |
+|                 |                 | the type of     |                 |
+|                 |                 | fallback        |                 |
+|                 |                 | strategy        |                 |
++-----------------+-----------------+-----------------+-----------------+
+| gamma_f         | OT_DOUBLE       | Filter line     | blocksqp::SymMa |
+|                 |                 | search          | trix            |
+|                 |                 | parameter, cf.  |                 |
+|                 |                 | IPOPT paper     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| gamma_theta     | OT_DOUBLE       | Filter line     | blocksqp::SymMa |
+|                 |                 | search          | trix            |
+|                 |                 | parameter, cf.  |                 |
+|                 |                 | IPOPT paper     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| globalization   | OT_INT          | Globalization   | blocksqp::SymMa |
+|                 |                 | strategy        | trix            |
++-----------------+-----------------+-----------------+-----------------+
+| hess_damp       | OT_INT          | Activate Powell | blocksqp::SymMa |
+|                 |                 | damping for     | trix            |
+|                 |                 | BFGS            |                 |
++-----------------+-----------------+-----------------+-----------------+
+| hess_damp_fac   | OT_DOUBLE       | Damping factor  | blocksqp::SymMa |
+|                 |                 | for BFGS Powell | trix            |
+|                 |                 | modification    |                 |
++-----------------+-----------------+-----------------+-----------------+
+| hess_lim_mem    | OT_INT          | Full or limited | blocksqp::SymMa |
+|                 |                 | memory          | trix            |
++-----------------+-----------------+-----------------+-----------------+
+| hess_memsize    | OT_INT          | Memory size for | blocksqp::SymMa |
+|                 |                 | L-BFGS updates  | trix            |
++-----------------+-----------------+-----------------+-----------------+
+| hess_scaling    | OT_INT          | Scaling         | blocksqp::SymMa |
+|                 |                 | strategy for    | trix            |
+|                 |                 | Hessian         |                 |
+|                 |                 | approximation   |                 |
++-----------------+-----------------+-----------------+-----------------+
+| hess_update     | OT_INT          | Type of Hessian | blocksqp::SymMa |
+|                 |                 | approximation   | trix            |
++-----------------+-----------------+-----------------+-----------------+
+| ignore_check_ve | OT_BOOL         | If set to true, | casadi::Nlpsol  |
+| c               |                 | the input shape |                 |
+|                 |                 | of F will not   |                 |
+|                 |                 | be checked.     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| ini_hess_diag   | OT_DOUBLE       | Initial Hessian | blocksqp::SymMa |
+|                 |                 | guess: diagonal | trix            |
+|                 |                 | matrix diag(ini |                 |
+|                 |                 | HessDiag)       |                 |
++-----------------+-----------------+-----------------+-----------------+
+| iteration_callb | OT_FUNCTION     | A function that | casadi::Nlpsol  |
+| ack             |                 | will be called  |                 |
+|                 |                 | at each         |                 |
+|                 |                 | iteration with  |                 |
+|                 |                 | the solver as   |                 |
+|                 |                 | input. Check    |                 |
+|                 |                 | documentation   |                 |
+|                 |                 | of Callback.    |                 |
++-----------------+-----------------+-----------------+-----------------+
+| iteration_callb | OT_BOOL         | If set to true, | casadi::Nlpsol  |
+| ack_ignore_erro |                 | errors thrown   |                 |
+| rs              |                 | by iteration_ca |                 |
+|                 |                 | llback will be  |                 |
+|                 |                 | ignored.        |                 |
++-----------------+-----------------+-----------------+-----------------+
+| iteration_callb | OT_INT          | Only call the   | casadi::Nlpsol  |
+| ack_step        |                 | callback        |                 |
+|                 |                 | function every  |                 |
+|                 |                 | few iterations. |                 |
++-----------------+-----------------+-----------------+-----------------+
+| kappa_f         | OT_DOUBLE       | Filter line     | blocksqp::SymMa |
+|                 |                 | search          | trix            |
+|                 |                 | parameter, cf.  |                 |
+|                 |                 | IPOPT paper     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| kappa_minus     | OT_DOUBLE       | Filter line     | blocksqp::SymMa |
+|                 |                 | search          | trix            |
+|                 |                 | parameter, cf.  |                 |
+|                 |                 | IPOPT paper     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| kappa_plus      | OT_DOUBLE       | Filter line     | blocksqp::SymMa |
+|                 |                 | search          | trix            |
+|                 |                 | parameter, cf.  |                 |
+|                 |                 | IPOPT paper     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| kappa_plus_max  | OT_DOUBLE       | Filter line     | blocksqp::SymMa |
+|                 |                 | search          | trix            |
+|                 |                 | parameter, cf.  |                 |
+|                 |                 | IPOPT paper     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| kappa_soc       | OT_DOUBLE       | Filter line     | blocksqp::SymMa |
+|                 |                 | search          | trix            |
+|                 |                 | parameter, cf.  |                 |
+|                 |                 | IPOPT paper     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| max_consec_redu | OT_INT          | Maximum number  | blocksqp::SymMa |
+| ced_steps       |                 | of consecutive  | trix            |
+|                 |                 | reduced steps   |                 |
++-----------------+-----------------+-----------------+-----------------+
+| max_consec_skip | OT_INT          | Maximum number  | blocksqp::SymMa |
+| ped_updates     |                 | of consecutive  | trix            |
+|                 |                 | skipped updates |                 |
++-----------------+-----------------+-----------------+-----------------+
+| max_conv_qp     | OT_INT          | How many        | blocksqp::SymMa |
+|                 |                 | additional QPs  | trix            |
+|                 |                 | may be solved   |                 |
+|                 |                 | for             |                 |
+|                 |                 | convexification |                 |
+|                 |                 | per iteration?  |                 |
++-----------------+-----------------+-----------------+-----------------+
+| max_it_qp       | OT_INT          | Maximum number  | blocksqp::SymMa |
+|                 |                 | of QP           | trix            |
+|                 |                 | iterations per  |                 |
+|                 |                 | SQP iteration   |                 |
++-----------------+-----------------+-----------------+-----------------+
+| max_line_search | OT_INT          | Maximum number  | blocksqp::SymMa |
+|                 |                 | of steps in     | trix            |
+|                 |                 | line search     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| max_soc_iter    | OT_INT          | Maximum number  | blocksqp::SymMa |
+|                 |                 | of SOC line     | trix            |
+|                 |                 | search          |                 |
+|                 |                 | iterations      |                 |
++-----------------+-----------------+-----------------+-----------------+
+| max_time_qp     | OT_DOUBLE       | Maximum number  | blocksqp::SymMa |
+|                 |                 | of time in      | trix            |
+|                 |                 | seconds per QP  |                 |
+|                 |                 | solve per SQP   |                 |
+|                 |                 | iteration       |                 |
++-----------------+-----------------+-----------------+-----------------+
+| nlinfeastol     | OT_DOUBLE       | Nonlinear       | blocksqp::SymMa |
+|                 |                 | feasibility     | trix            |
+|                 |                 | tolerance       |                 |
++-----------------+-----------------+-----------------+-----------------+
+| obj_lo          | OT_DOUBLE       | Lower bound on  | blocksqp::SymMa |
+|                 |                 | objective       | trix            |
+|                 |                 | function [-inf] |                 |
++-----------------+-----------------+-----------------+-----------------+
+| obj_up          | OT_DOUBLE       | Upper bound on  | blocksqp::SymMa |
+|                 |                 | objective       | trix            |
+|                 |                 | function [inf]  |                 |
++-----------------+-----------------+-----------------+-----------------+
+| opttol          | OT_DOUBLE       | Optimality      | blocksqp::SymMa |
+|                 |                 | tolerance       | trix            |
++-----------------+-----------------+-----------------+-----------------+
+| print_header    | OT_BOOL         | Print solver    | blocksqp::SymMa |
+|                 |                 | header at       | trix            |
+|                 |                 | startup         |                 |
++-----------------+-----------------+-----------------+-----------------+
+| print_iteration | OT_BOOL         | Print SQP       | blocksqp::SymMa |
+|                 |                 | iterations      | trix            |
++-----------------+-----------------+-----------------+-----------------+
+| print_time      | OT_BOOL         | print           | casadi::Nlpsol  |
+|                 |                 | information     |                 |
+|                 |                 | about execution |                 |
+|                 |                 | time            |                 |
++-----------------+-----------------+-----------------+-----------------+
+| qpsol           | OT_STRING       | The QP solver   | blocksqp::SymMa |
+|                 |                 | to be used by   | trix            |
+|                 |                 | the SQP method  |                 |
++-----------------+-----------------+-----------------+-----------------+
+| qpsol_options   | OT_DICT         | Options to be   | blocksqp::SymMa |
+|                 |                 | passed to the   | trix            |
+|                 |                 | QP solver       |                 |
++-----------------+-----------------+-----------------+-----------------+
+| restore_feas    | OT_INT          | Use feasibility | blocksqp::SymMa |
+|                 |                 | restoration     | trix            |
+|                 |                 | phase           |                 |
++-----------------+-----------------+-----------------+-----------------+
+| s_f             | OT_DOUBLE       | Filter line     | blocksqp::SymMa |
+|                 |                 | search          | trix            |
+|                 |                 | parameter, cf.  |                 |
+|                 |                 | IPOPT paper     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| s_theta         | OT_DOUBLE       | Filter line     | blocksqp::SymMa |
+|                 |                 | search          | trix            |
+|                 |                 | parameter, cf.  |                 |
+|                 |                 | IPOPT paper     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| shur            | OT_BOOL         | Use qpOASES     | blocksqp::SymMa |
+|                 |                 | Shur compliment | trix            |
+|                 |                 | approach        |                 |
++-----------------+-----------------+-----------------+-----------------+
+| skip_first_glob | OT_BOOL         | No              | blocksqp::SymMa |
+| alization       |                 | globalization   | trix            |
+|                 |                 | strategy in     |                 |
+|                 |                 | first iteration |                 |
++-----------------+-----------------+-----------------+-----------------+
+| theta_max       | OT_DOUBLE       | Filter line     | blocksqp::SymMa |
+|                 |                 | search          | trix            |
+|                 |                 | parameter, cf.  |                 |
+|                 |                 | IPOPT paper     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| theta_min       | OT_DOUBLE       | Filter line     | blocksqp::SymMa |
+|                 |                 | search          | trix            |
+|                 |                 | parameter, cf.  |                 |
+|                 |                 | IPOPT paper     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| verbose_init    | OT_BOOL         | Print out       | casadi::Nlpsol  |
+|                 |                 | timing          |                 |
+|                 |                 | information     |                 |
+|                 |                 | about the       |                 |
+|                 |                 | different       |                 |
+|                 |                 | stages of       |                 |
+|                 |                 | initialization  |                 |
++-----------------+-----------------+-----------------+-----------------+
+| warn_initial_bo | OT_BOOL         | Warn if the     | casadi::Nlpsol  |
+| unds            |                 | initial guess   |                 |
+|                 |                 | does not        |                 |
+|                 |                 | satisfy LBX and |                 |
+|                 |                 | UBX             |                 |
++-----------------+-----------------+-----------------+-----------------+
+| which_second_de | OT_INT          | For which block | blocksqp::SymMa |
+| rv              |                 | should second   | trix            |
+|                 |                 | derivatives be  |                 |
+|                 |                 | provided by the |                 |
+|                 |                 | user            |                 |
++-----------------+-----------------+-----------------+-----------------+
+
+Diagrams
+--------
+
+
+
+C++ includes: blocksqp.hpp ";
+
+%feature("docstring") blocksqp::SymMatrix::Dimension "";
+
+%feature("docstring") blocksqp::SymMatrix::Initialize "";
+
+%feature("docstring") blocksqp::SymMatrix::~SymMatrix "";
+
+
 // File: classcasadi_1_1Transpose.xml
 
 
@@ -8054,6 +8689,20 @@ Print a representation of the object.
 
 
 // File: classcasadi_1_1ZeroSX.xml
+
+
+// File: namespaceblocksqp.xml
+%feature("docstring") blocksqp::Atimesb "
+";
+%feature("docstring") blocksqp::l2VectorNorm "";
+
+%feature("docstring") blocksqp::lInfVectorNorm "";
+
+%feature("docstring") blocksqp::adotb "";
+
+%feature("docstring") blocksqp::lInfConstraintNorm "";
+
+%feature("docstring") blocksqp::l1VectorNorm "";
 
 
 // File: namespaceBonmin.xml
@@ -9846,6 +10495,12 @@ Interface to QPOases Solver for quadratic programming
 |                        |                        | hardened (but more     |
 |                        |                        | expensive) LI test.    |
 +------------------------+------------------------+------------------------+
+| enableInertiaCorrectio | OT_BOOL                | Should working set be  |
+| n                      |                        | repaired when negative |
+|                        |                        | curvature is           |
+|                        |                        | discovered during      |
+|                        |                        | hotstart.              |
++------------------------+------------------------+------------------------+
 | enableNZCTests         | OT_BOOL                | Enables nonzero        |
 |                        |                        | curvature tests.       |
 +------------------------+------------------------+------------------------+
@@ -10859,6 +11514,8 @@ List of plugins
 
 
 
+- blocksqp
+
 - bonmin
 
 - ipopt
@@ -10877,6 +11534,200 @@ Note: some of the plugins in this list might not be available on your
 system. Also, there might be extra plugins available to you that are not
 listed here. You can obtain their documentation with
 Nlpsol.doc(\"myextraplugin\")
+
+
+
+--------------------------------------------------------------------------------
+
+blocksqp
+--------
+
+
+
+This is a modified version of blockSQP by Janka et al.
+
+Dennis Janka, Joel Andersson
+
+>List of available options
+
++------------------------+------------------------+------------------------+
+|           Id           |          Type          |      Description       |
++========================+========================+========================+
+| block_hess             | OT_INT                 | Blockwise Hessian      |
+|                        |                        | approximation?         |
++------------------------+------------------------+------------------------+
+| col_eps                | OT_DOUBLE              | Epsilon for COL        |
+|                        |                        | scaling strategy       |
++------------------------+------------------------+------------------------+
+| col_tau1               | OT_DOUBLE              | tau1 for COL scaling   |
+|                        |                        | strategy               |
++------------------------+------------------------+------------------------+
+| col_tau2               | OT_DOUBLE              | tau2 for COL scaling   |
+|                        |                        | strategy               |
++------------------------+------------------------+------------------------+
+| conv_strategy          | OT_INT                 | Convexification        |
+|                        |                        | strategy               |
++------------------------+------------------------+------------------------+
+| delta                  | OT_DOUBLE              | Filter line search     |
+|                        |                        | parameter, cf. IPOPT   |
+|                        |                        | paper                  |
++------------------------+------------------------+------------------------+
+| delta_h0               | OT_DOUBLE              | Filter line search     |
+|                        |                        | parameter, cf. IPOPT   |
+|                        |                        | paper                  |
++------------------------+------------------------+------------------------+
+| eps                    | OT_DOUBLE              | Values smaller than    |
+|                        |                        | this are regarded as   |
+|                        |                        | numerically zero       |
++------------------------+------------------------+------------------------+
+| eta                    | OT_DOUBLE              | Filter line search     |
+|                        |                        | parameter, cf. IPOPT   |
+|                        |                        | paper                  |
++------------------------+------------------------+------------------------+
+| fallback_scaling       | OT_INT                 | If indefinite update   |
+|                        |                        | is used, the type of   |
+|                        |                        | fallback strategy      |
++------------------------+------------------------+------------------------+
+| fallback_update        | OT_INT                 | If indefinite update   |
+|                        |                        | is used, the type of   |
+|                        |                        | fallback strategy      |
++------------------------+------------------------+------------------------+
+| gamma_f                | OT_DOUBLE              | Filter line search     |
+|                        |                        | parameter, cf. IPOPT   |
+|                        |                        | paper                  |
++------------------------+------------------------+------------------------+
+| gamma_theta            | OT_DOUBLE              | Filter line search     |
+|                        |                        | parameter, cf. IPOPT   |
+|                        |                        | paper                  |
++------------------------+------------------------+------------------------+
+| globalization          | OT_INT                 | Globalization strategy |
++------------------------+------------------------+------------------------+
+| hess_damp              | OT_INT                 | Activate Powell        |
+|                        |                        | damping for BFGS       |
++------------------------+------------------------+------------------------+
+| hess_damp_fac          | OT_DOUBLE              | Damping factor for     |
+|                        |                        | BFGS Powell            |
+|                        |                        | modification           |
++------------------------+------------------------+------------------------+
+| hess_lim_mem           | OT_INT                 | Full or limited memory |
++------------------------+------------------------+------------------------+
+| hess_memsize           | OT_INT                 | Memory size for L-BFGS |
+|                        |                        | updates                |
++------------------------+------------------------+------------------------+
+| hess_scaling           | OT_INT                 | Scaling strategy for   |
+|                        |                        | Hessian approximation  |
++------------------------+------------------------+------------------------+
+| hess_update            | OT_INT                 | Type of Hessian        |
+|                        |                        | approximation          |
++------------------------+------------------------+------------------------+
+| ini_hess_diag          | OT_DOUBLE              | Initial Hessian guess: |
+|                        |                        | diagonal matrix        |
+|                        |                        | diag(iniHessDiag)      |
++------------------------+------------------------+------------------------+
+| kappa_f                | OT_DOUBLE              | Filter line search     |
+|                        |                        | parameter, cf. IPOPT   |
+|                        |                        | paper                  |
++------------------------+------------------------+------------------------+
+| kappa_minus            | OT_DOUBLE              | Filter line search     |
+|                        |                        | parameter, cf. IPOPT   |
+|                        |                        | paper                  |
++------------------------+------------------------+------------------------+
+| kappa_plus             | OT_DOUBLE              | Filter line search     |
+|                        |                        | parameter, cf. IPOPT   |
+|                        |                        | paper                  |
++------------------------+------------------------+------------------------+
+| kappa_plus_max         | OT_DOUBLE              | Filter line search     |
+|                        |                        | parameter, cf. IPOPT   |
+|                        |                        | paper                  |
++------------------------+------------------------+------------------------+
+| kappa_soc              | OT_DOUBLE              | Filter line search     |
+|                        |                        | parameter, cf. IPOPT   |
+|                        |                        | paper                  |
++------------------------+------------------------+------------------------+
+| max_consec_reduced_ste | OT_INT                 | Maximum number of      |
+| ps                     |                        | consecutive reduced    |
+|                        |                        | steps                  |
++------------------------+------------------------+------------------------+
+| max_consec_skipped_upd | OT_INT                 | Maximum number of      |
+| ates                   |                        | consecutive skipped    |
+|                        |                        | updates                |
++------------------------+------------------------+------------------------+
+| max_conv_qp            | OT_INT                 | How many additional    |
+|                        |                        | QPs may be solved for  |
+|                        |                        | convexification per    |
+|                        |                        | iteration?             |
++------------------------+------------------------+------------------------+
+| max_it_qp              | OT_INT                 | Maximum number of QP   |
+|                        |                        | iterations per SQP     |
+|                        |                        | iteration              |
++------------------------+------------------------+------------------------+
+| max_line_search        | OT_INT                 | Maximum number of      |
+|                        |                        | steps in line search   |
++------------------------+------------------------+------------------------+
+| max_soc_iter           | OT_INT                 | Maximum number of SOC  |
+|                        |                        | line search iterations |
++------------------------+------------------------+------------------------+
+| max_time_qp            | OT_DOUBLE              | Maximum number of time |
+|                        |                        | in seconds per QP      |
+|                        |                        | solve per SQP          |
+|                        |                        | iteration              |
++------------------------+------------------------+------------------------+
+| nlinfeastol            | OT_DOUBLE              | Nonlinear feasibility  |
+|                        |                        | tolerance              |
++------------------------+------------------------+------------------------+
+| obj_lo                 | OT_DOUBLE              | Lower bound on         |
+|                        |                        | objective function     |
+|                        |                        | [-inf]                 |
++------------------------+------------------------+------------------------+
+| obj_up                 | OT_DOUBLE              | Upper bound on         |
+|                        |                        | objective function     |
+|                        |                        | [inf]                  |
++------------------------+------------------------+------------------------+
+| opttol                 | OT_DOUBLE              | Optimality tolerance   |
++------------------------+------------------------+------------------------+
+| print_header           | OT_BOOL                | Print solver header at |
+|                        |                        | startup                |
++------------------------+------------------------+------------------------+
+| print_iteration        | OT_BOOL                | Print SQP iterations   |
++------------------------+------------------------+------------------------+
+| qpsol                  | OT_STRING              | The QP solver to be    |
+|                        |                        | used by the SQP method |
++------------------------+------------------------+------------------------+
+| qpsol_options          | OT_DICT                | Options to be passed   |
+|                        |                        | to the QP solver       |
++------------------------+------------------------+------------------------+
+| restore_feas           | OT_INT                 | Use feasibility        |
+|                        |                        | restoration phase      |
++------------------------+------------------------+------------------------+
+| s_f                    | OT_DOUBLE              | Filter line search     |
+|                        |                        | parameter, cf. IPOPT   |
+|                        |                        | paper                  |
++------------------------+------------------------+------------------------+
+| s_theta                | OT_DOUBLE              | Filter line search     |
+|                        |                        | parameter, cf. IPOPT   |
+|                        |                        | paper                  |
++------------------------+------------------------+------------------------+
+| shur                   | OT_BOOL                | Use qpOASES Shur       |
+|                        |                        | compliment approach    |
++------------------------+------------------------+------------------------+
+| skip_first_globalizati | OT_BOOL                | No globalization       |
+| on                     |                        | strategy in first      |
+|                        |                        | iteration              |
++------------------------+------------------------+------------------------+
+| theta_max              | OT_DOUBLE              | Filter line search     |
+|                        |                        | parameter, cf. IPOPT   |
+|                        |                        | paper                  |
++------------------------+------------------------+------------------------+
+| theta_min              | OT_DOUBLE              | Filter line search     |
+|                        |                        | parameter, cf. IPOPT   |
+|                        |                        | paper                  |
++------------------------+------------------------+------------------------+
+| which_second_derv      | OT_INT                 | For which block should |
+|                        |                        | second derivatives be  |
+|                        |                        | provided by the user   |
++------------------------+------------------------+------------------------+
+
+--------------------------------------------------------------------------------
 
 
 

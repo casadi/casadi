@@ -1,4 +1,335 @@
 /// \cond INTERNAL
+/** \class blocksqp::Matrix
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
+<tr><td>block_hess</td><td>OT_INT</td><td>Blockwise Hessian approximation?</td><td>blocksqp::Matrix</td></tr>
+<tr><td>col_eps</td><td>OT_DOUBLE</td><td>Epsilon for COL scaling strategy</td><td>blocksqp::Matrix</td></tr>
+<tr><td>col_tau1</td><td>OT_DOUBLE</td><td>tau1 for COL scaling strategy</td><td>blocksqp::Matrix</td></tr>
+<tr><td>col_tau2</td><td>OT_DOUBLE</td><td>tau2 for COL scaling strategy</td><td>blocksqp::Matrix</td></tr>
+<tr><td>conv_strategy</td><td>OT_INT</td><td>Convexification strategy</td><td>blocksqp::Matrix</td></tr>
+<tr><td>delta</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>blocksqp::Matrix</td></tr>
+<tr><td>delta_h0</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>blocksqp::Matrix</td></tr>
+<tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
+<tr><td>eps</td><td>OT_DOUBLE</td><td>Values smaller than this are regarded as numerically zero</td><td>blocksqp::Matrix</td></tr>
+<tr><td>eta</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>blocksqp::Matrix</td></tr>
+<tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
+<tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::Nlpsol</td></tr>
+<tr><td>fallback_scaling</td><td>OT_INT</td><td>If indefinite update is used, the type of fallback strategy</td><td>blocksqp::Matrix</td></tr>
+<tr><td>fallback_update</td><td>OT_INT</td><td>If indefinite update is used, the type of fallback strategy</td><td>blocksqp::Matrix</td></tr>
+<tr><td>gamma_f</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>blocksqp::Matrix</td></tr>
+<tr><td>gamma_theta</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>blocksqp::Matrix</td></tr>
+<tr><td>globalization</td><td>OT_INT</td><td>Globalization strategy</td><td>blocksqp::Matrix</td></tr>
+<tr><td>hess_damp</td><td>OT_INT</td><td>Activate Powell damping for BFGS</td><td>blocksqp::Matrix</td></tr>
+<tr><td>hess_damp_fac</td><td>OT_DOUBLE</td><td>Damping factor for BFGS Powell modification</td><td>blocksqp::Matrix</td></tr>
+<tr><td>hess_lim_mem</td><td>OT_INT</td><td>Full or limited memory</td><td>blocksqp::Matrix</td></tr>
+<tr><td>hess_memsize</td><td>OT_INT</td><td>Memory size for L-BFGS updates</td><td>blocksqp::Matrix</td></tr>
+<tr><td>hess_scaling</td><td>OT_INT</td><td>Scaling strategy for Hessian approximation</td><td>blocksqp::Matrix</td></tr>
+<tr><td>hess_update</td><td>OT_INT</td><td>Type of Hessian approximation</td><td>blocksqp::Matrix</td></tr>
+<tr><td>ignore_check_vec</td><td>OT_BOOL</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>ini_hess_diag</td><td>OT_DOUBLE</td><td>Initial Hessian guess: diagonal matrix diag(iniHessDiag)</td><td>blocksqp::Matrix</td></tr>
+<tr><td>iteration_callback</td><td>OT_FUNCTION</td><td>A function that will be called at each iteration with the solver as input. Check documentation of Callback.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>iteration_callback_ignore_errors</td><td>OT_BOOL</td><td>If set to true, errors thrown by iteration_callback will be ignored.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>iteration_callback_step</td><td>OT_INT</td><td>Only call the callback function every few iterations.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>kappa_f</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>blocksqp::Matrix</td></tr>
+<tr><td>kappa_minus</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>blocksqp::Matrix</td></tr>
+<tr><td>kappa_plus</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>blocksqp::Matrix</td></tr>
+<tr><td>kappa_plus_max</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>blocksqp::Matrix</td></tr>
+<tr><td>kappa_soc</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>blocksqp::Matrix</td></tr>
+<tr><td>max_consec_reduced_steps</td><td>OT_INT</td><td>Maximum number of consecutive reduced steps</td><td>blocksqp::Matrix</td></tr>
+<tr><td>max_consec_skipped_updates</td><td>OT_INT</td><td>Maximum number of consecutive skipped updates</td><td>blocksqp::Matrix</td></tr>
+<tr><td>max_conv_qp</td><td>OT_INT</td><td>How many additional QPs may be solved for convexification per iteration?</td><td>blocksqp::Matrix</td></tr>
+<tr><td>max_it_qp</td><td>OT_INT</td><td>Maximum number of QP iterations per SQP iteration</td><td>blocksqp::Matrix</td></tr>
+<tr><td>max_line_search</td><td>OT_INT</td><td>Maximum number of steps in line search</td><td>blocksqp::Matrix</td></tr>
+<tr><td>max_soc_iter</td><td>OT_INT</td><td>Maximum number of SOC line search iterations</td><td>blocksqp::Matrix</td></tr>
+<tr><td>max_time_qp</td><td>OT_DOUBLE</td><td>Maximum number of time in seconds per QP solve per SQP iteration</td><td>blocksqp::Matrix</td></tr>
+<tr><td>nlinfeastol</td><td>OT_DOUBLE</td><td>Nonlinear feasibility tolerance</td><td>blocksqp::Matrix</td></tr>
+<tr><td>obj_lo</td><td>OT_DOUBLE</td><td>Lower bound on objective function [-inf]</td><td>blocksqp::Matrix</td></tr>
+<tr><td>obj_up</td><td>OT_DOUBLE</td><td>Upper bound on objective function [inf]</td><td>blocksqp::Matrix</td></tr>
+<tr><td>opttol</td><td>OT_DOUBLE</td><td>Optimality tolerance</td><td>blocksqp::Matrix</td></tr>
+<tr><td>print_header</td><td>OT_BOOL</td><td>Print solver header at startup</td><td>blocksqp::Matrix</td></tr>
+<tr><td>print_iteration</td><td>OT_BOOL</td><td>Print SQP iterations</td><td>blocksqp::Matrix</td></tr>
+<tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time</td><td>casadi::Nlpsol</td></tr>
+<tr><td>qpsol</td><td>OT_STRING</td><td>The QP solver to be used by the SQP method</td><td>blocksqp::Matrix</td></tr>
+<tr><td>qpsol_options</td><td>OT_DICT</td><td>Options to be passed to the QP solver</td><td>blocksqp::Matrix</td></tr>
+<tr><td>restore_feas</td><td>OT_INT</td><td>Use feasibility restoration phase</td><td>blocksqp::Matrix</td></tr>
+<tr><td>s_f</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>blocksqp::Matrix</td></tr>
+<tr><td>s_theta</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>blocksqp::Matrix</td></tr>
+<tr><td>shur</td><td>OT_BOOL</td><td>Use qpOASES Shur compliment approach</td><td>blocksqp::Matrix</td></tr>
+<tr><td>skip_first_globalization</td><td>OT_BOOL</td><td>No globalization strategy in first iteration</td><td>blocksqp::Matrix</td></tr>
+<tr><td>theta_max</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>blocksqp::Matrix</td></tr>
+<tr><td>theta_min</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>blocksqp::Matrix</td></tr>
+<tr><td>verbose_init</td><td>OT_BOOL</td><td>Print out timing information about the different stages of initialization</td><td>casadi::Nlpsol</td></tr>
+<tr><td>warn_initial_bounds</td><td>OT_BOOL</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>casadi::Nlpsol</td></tr>
+<tr><td>which_second_derv</td><td>OT_INT</td><td>For which block should second derivatives be provided by the user</td><td>blocksqp::Matrix</td></tr>
+</table>
+*/
+/// \endcond
+/// \cond INTERNAL
+/** \class blocksqp::SymMatrix
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
+<tr><td>block_hess</td><td>OT_INT</td><td>Blockwise Hessian approximation?</td><td>blocksqp::SymMatrix</td></tr>
+<tr><td>col_eps</td><td>OT_DOUBLE</td><td>Epsilon for COL scaling strategy</td><td>blocksqp::SymMatrix</td></tr>
+<tr><td>col_tau1</td><td>OT_DOUBLE</td><td>tau1 for COL scaling strategy</td><td>blocksqp::SymMatrix</td></tr>
+<tr><td>col_tau2</td><td>OT_DOUBLE</td><td>tau2 for COL scaling strategy</td><td>blocksqp::SymMatrix</td></tr>
+<tr><td>conv_strategy</td><td>OT_INT</td><td>Convexification strategy</td><td>blocksqp::SymMatrix</td></tr>
+<tr><td>delta</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>blocksqp::SymMatrix</td></tr>
+<tr><td>delta_h0</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>blocksqp::SymMatrix</td></tr>
+<tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
+<tr><td>eps</td><td>OT_DOUBLE</td><td>Values smaller than this are regarded as numerically zero</td><td>blocksqp::SymMatrix</td></tr>
+<tr><td>eta</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>blocksqp::SymMatrix</td></tr>
+<tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
+<tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::Nlpsol</td></tr>
+<tr><td>fallback_scaling</td><td>OT_INT</td><td>If indefinite update is used, the type of fallback strategy</td><td>blocksqp::SymMatrix</td></tr>
+<tr><td>fallback_update</td><td>OT_INT</td><td>If indefinite update is used, the type of fallback strategy</td><td>blocksqp::SymMatrix</td></tr>
+<tr><td>gamma_f</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>blocksqp::SymMatrix</td></tr>
+<tr><td>gamma_theta</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>blocksqp::SymMatrix</td></tr>
+<tr><td>globalization</td><td>OT_INT</td><td>Globalization strategy</td><td>blocksqp::SymMatrix</td></tr>
+<tr><td>hess_damp</td><td>OT_INT</td><td>Activate Powell damping for BFGS</td><td>blocksqp::SymMatrix</td></tr>
+<tr><td>hess_damp_fac</td><td>OT_DOUBLE</td><td>Damping factor for BFGS Powell modification</td><td>blocksqp::SymMatrix</td></tr>
+<tr><td>hess_lim_mem</td><td>OT_INT</td><td>Full or limited memory</td><td>blocksqp::SymMatrix</td></tr>
+<tr><td>hess_memsize</td><td>OT_INT</td><td>Memory size for L-BFGS updates</td><td>blocksqp::SymMatrix</td></tr>
+<tr><td>hess_scaling</td><td>OT_INT</td><td>Scaling strategy for Hessian approximation</td><td>blocksqp::SymMatrix</td></tr>
+<tr><td>hess_update</td><td>OT_INT</td><td>Type of Hessian approximation</td><td>blocksqp::SymMatrix</td></tr>
+<tr><td>ignore_check_vec</td><td>OT_BOOL</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>ini_hess_diag</td><td>OT_DOUBLE</td><td>Initial Hessian guess: diagonal matrix diag(iniHessDiag)</td><td>blocksqp::SymMatrix</td></tr>
+<tr><td>iteration_callback</td><td>OT_FUNCTION</td><td>A function that will be called at each iteration with the solver as input. Check documentation of Callback.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>iteration_callback_ignore_errors</td><td>OT_BOOL</td><td>If set to true, errors thrown by iteration_callback will be ignored.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>iteration_callback_step</td><td>OT_INT</td><td>Only call the callback function every few iterations.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>kappa_f</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>blocksqp::SymMatrix</td></tr>
+<tr><td>kappa_minus</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>blocksqp::SymMatrix</td></tr>
+<tr><td>kappa_plus</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>blocksqp::SymMatrix</td></tr>
+<tr><td>kappa_plus_max</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>blocksqp::SymMatrix</td></tr>
+<tr><td>kappa_soc</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>blocksqp::SymMatrix</td></tr>
+<tr><td>max_consec_reduced_steps</td><td>OT_INT</td><td>Maximum number of consecutive reduced steps</td><td>blocksqp::SymMatrix</td></tr>
+<tr><td>max_consec_skipped_updates</td><td>OT_INT</td><td>Maximum number of consecutive skipped updates</td><td>blocksqp::SymMatrix</td></tr>
+<tr><td>max_conv_qp</td><td>OT_INT</td><td>How many additional QPs may be solved for convexification per iteration?</td><td>blocksqp::SymMatrix</td></tr>
+<tr><td>max_it_qp</td><td>OT_INT</td><td>Maximum number of QP iterations per SQP iteration</td><td>blocksqp::SymMatrix</td></tr>
+<tr><td>max_line_search</td><td>OT_INT</td><td>Maximum number of steps in line search</td><td>blocksqp::SymMatrix</td></tr>
+<tr><td>max_soc_iter</td><td>OT_INT</td><td>Maximum number of SOC line search iterations</td><td>blocksqp::SymMatrix</td></tr>
+<tr><td>max_time_qp</td><td>OT_DOUBLE</td><td>Maximum number of time in seconds per QP solve per SQP iteration</td><td>blocksqp::SymMatrix</td></tr>
+<tr><td>nlinfeastol</td><td>OT_DOUBLE</td><td>Nonlinear feasibility tolerance</td><td>blocksqp::SymMatrix</td></tr>
+<tr><td>obj_lo</td><td>OT_DOUBLE</td><td>Lower bound on objective function [-inf]</td><td>blocksqp::SymMatrix</td></tr>
+<tr><td>obj_up</td><td>OT_DOUBLE</td><td>Upper bound on objective function [inf]</td><td>blocksqp::SymMatrix</td></tr>
+<tr><td>opttol</td><td>OT_DOUBLE</td><td>Optimality tolerance</td><td>blocksqp::SymMatrix</td></tr>
+<tr><td>print_header</td><td>OT_BOOL</td><td>Print solver header at startup</td><td>blocksqp::SymMatrix</td></tr>
+<tr><td>print_iteration</td><td>OT_BOOL</td><td>Print SQP iterations</td><td>blocksqp::SymMatrix</td></tr>
+<tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time</td><td>casadi::Nlpsol</td></tr>
+<tr><td>qpsol</td><td>OT_STRING</td><td>The QP solver to be used by the SQP method</td><td>blocksqp::SymMatrix</td></tr>
+<tr><td>qpsol_options</td><td>OT_DICT</td><td>Options to be passed to the QP solver</td><td>blocksqp::SymMatrix</td></tr>
+<tr><td>restore_feas</td><td>OT_INT</td><td>Use feasibility restoration phase</td><td>blocksqp::SymMatrix</td></tr>
+<tr><td>s_f</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>blocksqp::SymMatrix</td></tr>
+<tr><td>s_theta</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>blocksqp::SymMatrix</td></tr>
+<tr><td>shur</td><td>OT_BOOL</td><td>Use qpOASES Shur compliment approach</td><td>blocksqp::SymMatrix</td></tr>
+<tr><td>skip_first_globalization</td><td>OT_BOOL</td><td>No globalization strategy in first iteration</td><td>blocksqp::SymMatrix</td></tr>
+<tr><td>theta_max</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>blocksqp::SymMatrix</td></tr>
+<tr><td>theta_min</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>blocksqp::SymMatrix</td></tr>
+<tr><td>verbose_init</td><td>OT_BOOL</td><td>Print out timing information about the different stages of initialization</td><td>casadi::Nlpsol</td></tr>
+<tr><td>warn_initial_bounds</td><td>OT_BOOL</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>casadi::Nlpsol</td></tr>
+<tr><td>which_second_derv</td><td>OT_INT</td><td>For which block should second derivatives be provided by the user</td><td>blocksqp::SymMatrix</td></tr>
+</table>
+*/
+/// \endcond
+/// \cond INTERNAL
+/** \class casadi::Blocksqp
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
+<tr><td>block_hess</td><td>OT_INT</td><td>Blockwise Hessian approximation?</td><td>casadi::Blocksqp</td></tr>
+<tr><td>col_eps</td><td>OT_DOUBLE</td><td>Epsilon for COL scaling strategy</td><td>casadi::Blocksqp</td></tr>
+<tr><td>col_tau1</td><td>OT_DOUBLE</td><td>tau1 for COL scaling strategy</td><td>casadi::Blocksqp</td></tr>
+<tr><td>col_tau2</td><td>OT_DOUBLE</td><td>tau2 for COL scaling strategy</td><td>casadi::Blocksqp</td></tr>
+<tr><td>conv_strategy</td><td>OT_INT</td><td>Convexification strategy</td><td>casadi::Blocksqp</td></tr>
+<tr><td>delta</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
+<tr><td>delta_h0</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
+<tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
+<tr><td>eps</td><td>OT_DOUBLE</td><td>Values smaller than this are regarded as numerically zero</td><td>casadi::Blocksqp</td></tr>
+<tr><td>eta</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
+<tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
+<tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::Nlpsol</td></tr>
+<tr><td>fallback_scaling</td><td>OT_INT</td><td>If indefinite update is used, the type of fallback strategy</td><td>casadi::Blocksqp</td></tr>
+<tr><td>fallback_update</td><td>OT_INT</td><td>If indefinite update is used, the type of fallback strategy</td><td>casadi::Blocksqp</td></tr>
+<tr><td>gamma_f</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
+<tr><td>gamma_theta</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
+<tr><td>globalization</td><td>OT_INT</td><td>Globalization strategy</td><td>casadi::Blocksqp</td></tr>
+<tr><td>hess_damp</td><td>OT_INT</td><td>Activate Powell damping for BFGS</td><td>casadi::Blocksqp</td></tr>
+<tr><td>hess_damp_fac</td><td>OT_DOUBLE</td><td>Damping factor for BFGS Powell modification</td><td>casadi::Blocksqp</td></tr>
+<tr><td>hess_lim_mem</td><td>OT_INT</td><td>Full or limited memory</td><td>casadi::Blocksqp</td></tr>
+<tr><td>hess_memsize</td><td>OT_INT</td><td>Memory size for L-BFGS updates</td><td>casadi::Blocksqp</td></tr>
+<tr><td>hess_scaling</td><td>OT_INT</td><td>Scaling strategy for Hessian approximation</td><td>casadi::Blocksqp</td></tr>
+<tr><td>hess_update</td><td>OT_INT</td><td>Type of Hessian approximation</td><td>casadi::Blocksqp</td></tr>
+<tr><td>ignore_check_vec</td><td>OT_BOOL</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>ini_hess_diag</td><td>OT_DOUBLE</td><td>Initial Hessian guess: diagonal matrix diag(iniHessDiag)</td><td>casadi::Blocksqp</td></tr>
+<tr><td>iteration_callback</td><td>OT_FUNCTION</td><td>A function that will be called at each iteration with the solver as input. Check documentation of Callback.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>iteration_callback_ignore_errors</td><td>OT_BOOL</td><td>If set to true, errors thrown by iteration_callback will be ignored.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>iteration_callback_step</td><td>OT_INT</td><td>Only call the callback function every few iterations.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>kappa_f</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
+<tr><td>kappa_minus</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
+<tr><td>kappa_plus</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
+<tr><td>kappa_plus_max</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
+<tr><td>kappa_soc</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
+<tr><td>max_consec_reduced_steps</td><td>OT_INT</td><td>Maximum number of consecutive reduced steps</td><td>casadi::Blocksqp</td></tr>
+<tr><td>max_consec_skipped_updates</td><td>OT_INT</td><td>Maximum number of consecutive skipped updates</td><td>casadi::Blocksqp</td></tr>
+<tr><td>max_conv_qp</td><td>OT_INT</td><td>How many additional QPs may be solved for convexification per iteration?</td><td>casadi::Blocksqp</td></tr>
+<tr><td>max_it_qp</td><td>OT_INT</td><td>Maximum number of QP iterations per SQP iteration</td><td>casadi::Blocksqp</td></tr>
+<tr><td>max_line_search</td><td>OT_INT</td><td>Maximum number of steps in line search</td><td>casadi::Blocksqp</td></tr>
+<tr><td>max_soc_iter</td><td>OT_INT</td><td>Maximum number of SOC line search iterations</td><td>casadi::Blocksqp</td></tr>
+<tr><td>max_time_qp</td><td>OT_DOUBLE</td><td>Maximum number of time in seconds per QP solve per SQP iteration</td><td>casadi::Blocksqp</td></tr>
+<tr><td>nlinfeastol</td><td>OT_DOUBLE</td><td>Nonlinear feasibility tolerance</td><td>casadi::Blocksqp</td></tr>
+<tr><td>obj_lo</td><td>OT_DOUBLE</td><td>Lower bound on objective function [-inf]</td><td>casadi::Blocksqp</td></tr>
+<tr><td>obj_up</td><td>OT_DOUBLE</td><td>Upper bound on objective function [inf]</td><td>casadi::Blocksqp</td></tr>
+<tr><td>opttol</td><td>OT_DOUBLE</td><td>Optimality tolerance</td><td>casadi::Blocksqp</td></tr>
+<tr><td>print_header</td><td>OT_BOOL</td><td>Print solver header at startup</td><td>casadi::Blocksqp</td></tr>
+<tr><td>print_iteration</td><td>OT_BOOL</td><td>Print SQP iterations</td><td>casadi::Blocksqp</td></tr>
+<tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time</td><td>casadi::Nlpsol</td></tr>
+<tr><td>qpsol</td><td>OT_STRING</td><td>The QP solver to be used by the SQP method</td><td>casadi::Blocksqp</td></tr>
+<tr><td>qpsol_options</td><td>OT_DICT</td><td>Options to be passed to the QP solver</td><td>casadi::Blocksqp</td></tr>
+<tr><td>restore_feas</td><td>OT_INT</td><td>Use feasibility restoration phase</td><td>casadi::Blocksqp</td></tr>
+<tr><td>s_f</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
+<tr><td>s_theta</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
+<tr><td>shur</td><td>OT_BOOL</td><td>Use qpOASES Shur compliment approach</td><td>casadi::Blocksqp</td></tr>
+<tr><td>skip_first_globalization</td><td>OT_BOOL</td><td>No globalization strategy in first iteration</td><td>casadi::Blocksqp</td></tr>
+<tr><td>theta_max</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
+<tr><td>theta_min</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
+<tr><td>verbose_init</td><td>OT_BOOL</td><td>Print out timing information about the different stages of initialization</td><td>casadi::Nlpsol</td></tr>
+<tr><td>warn_initial_bounds</td><td>OT_BOOL</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>casadi::Nlpsol</td></tr>
+<tr><td>which_second_derv</td><td>OT_INT</td><td>For which block should second derivatives be provided by the user</td><td>casadi::Blocksqp</td></tr>
+</table>
+*/
+/// \endcond
+/** \addtogroup plugin_Nlpsol_blocksqp
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Description</th></tr>
+<tr><td>block_hess</td><td>OT_INT</td><td>Blockwise Hessian approximation?</td></tr>
+<tr><td>col_eps</td><td>OT_DOUBLE</td><td>Epsilon for COL scaling strategy</td></tr>
+<tr><td>col_tau1</td><td>OT_DOUBLE</td><td>tau1 for COL scaling strategy</td></tr>
+<tr><td>col_tau2</td><td>OT_DOUBLE</td><td>tau2 for COL scaling strategy</td></tr>
+<tr><td>conv_strategy</td><td>OT_INT</td><td>Convexification strategy</td></tr>
+<tr><td>delta</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td></tr>
+<tr><td>delta_h0</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td></tr>
+<tr><td>eps</td><td>OT_DOUBLE</td><td>Values smaller than this are regarded as numerically zero</td></tr>
+<tr><td>eta</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td></tr>
+<tr><td>fallback_scaling</td><td>OT_INT</td><td>If indefinite update is used, the type of fallback strategy</td></tr>
+<tr><td>fallback_update</td><td>OT_INT</td><td>If indefinite update is used, the type of fallback strategy</td></tr>
+<tr><td>gamma_f</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td></tr>
+<tr><td>gamma_theta</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td></tr>
+<tr><td>globalization</td><td>OT_INT</td><td>Globalization strategy</td></tr>
+<tr><td>hess_damp</td><td>OT_INT</td><td>Activate Powell damping for BFGS</td></tr>
+<tr><td>hess_damp_fac</td><td>OT_DOUBLE</td><td>Damping factor for BFGS Powell modification</td></tr>
+<tr><td>hess_lim_mem</td><td>OT_INT</td><td>Full or limited memory</td></tr>
+<tr><td>hess_memsize</td><td>OT_INT</td><td>Memory size for L-BFGS updates</td></tr>
+<tr><td>hess_scaling</td><td>OT_INT</td><td>Scaling strategy for Hessian approximation</td></tr>
+<tr><td>hess_update</td><td>OT_INT</td><td>Type of Hessian approximation</td></tr>
+<tr><td>ini_hess_diag</td><td>OT_DOUBLE</td><td>Initial Hessian guess: diagonal matrix diag(iniHessDiag)</td></tr>
+<tr><td>kappa_f</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td></tr>
+<tr><td>kappa_minus</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td></tr>
+<tr><td>kappa_plus</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td></tr>
+<tr><td>kappa_plus_max</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td></tr>
+<tr><td>kappa_soc</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td></tr>
+<tr><td>max_consec_reduced_steps</td><td>OT_INT</td><td>Maximum number of consecutive reduced steps</td></tr>
+<tr><td>max_consec_skipped_updates</td><td>OT_INT</td><td>Maximum number of consecutive skipped updates</td></tr>
+<tr><td>max_conv_qp</td><td>OT_INT</td><td>How many additional QPs may be solved for convexification per iteration?</td></tr>
+<tr><td>max_it_qp</td><td>OT_INT</td><td>Maximum number of QP iterations per SQP iteration</td></tr>
+<tr><td>max_line_search</td><td>OT_INT</td><td>Maximum number of steps in line search</td></tr>
+<tr><td>max_soc_iter</td><td>OT_INT</td><td>Maximum number of SOC line search iterations</td></tr>
+<tr><td>max_time_qp</td><td>OT_DOUBLE</td><td>Maximum number of time in seconds per QP solve per SQP iteration</td></tr>
+<tr><td>nlinfeastol</td><td>OT_DOUBLE</td><td>Nonlinear feasibility tolerance</td></tr>
+<tr><td>obj_lo</td><td>OT_DOUBLE</td><td>Lower bound on objective function [-inf]</td></tr>
+<tr><td>obj_up</td><td>OT_DOUBLE</td><td>Upper bound on objective function [inf]</td></tr>
+<tr><td>opttol</td><td>OT_DOUBLE</td><td>Optimality tolerance</td></tr>
+<tr><td>print_header</td><td>OT_BOOL</td><td>Print solver header at startup</td></tr>
+<tr><td>print_iteration</td><td>OT_BOOL</td><td>Print SQP iterations</td></tr>
+<tr><td>qpsol</td><td>OT_STRING</td><td>The QP solver to be used by the SQP method</td></tr>
+<tr><td>qpsol_options</td><td>OT_DICT</td><td>Options to be passed to the QP solver</td></tr>
+<tr><td>restore_feas</td><td>OT_INT</td><td>Use feasibility restoration phase</td></tr>
+<tr><td>s_f</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td></tr>
+<tr><td>s_theta</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td></tr>
+<tr><td>shur</td><td>OT_BOOL</td><td>Use qpOASES Shur compliment approach</td></tr>
+<tr><td>skip_first_globalization</td><td>OT_BOOL</td><td>No globalization strategy in first iteration</td></tr>
+<tr><td>theta_max</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td></tr>
+<tr><td>theta_min</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td></tr>
+<tr><td>which_second_derv</td><td>OT_INT</td><td>For which block should second derivatives be provided by the user</td></tr>
+</table>
+*/
+/** \addtogroup general_Blocksqp
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
+<tr><td>block_hess</td><td>OT_INT</td><td>Blockwise Hessian approximation?</td><td>casadi::Blocksqp</td></tr>
+<tr><td>col_eps</td><td>OT_DOUBLE</td><td>Epsilon for COL scaling strategy</td><td>casadi::Blocksqp</td></tr>
+<tr><td>col_tau1</td><td>OT_DOUBLE</td><td>tau1 for COL scaling strategy</td><td>casadi::Blocksqp</td></tr>
+<tr><td>col_tau2</td><td>OT_DOUBLE</td><td>tau2 for COL scaling strategy</td><td>casadi::Blocksqp</td></tr>
+<tr><td>conv_strategy</td><td>OT_INT</td><td>Convexification strategy</td><td>casadi::Blocksqp</td></tr>
+<tr><td>delta</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
+<tr><td>delta_h0</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
+<tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
+<tr><td>eps</td><td>OT_DOUBLE</td><td>Values smaller than this are regarded as numerically zero</td><td>casadi::Blocksqp</td></tr>
+<tr><td>eta</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
+<tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
+<tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::Nlpsol</td></tr>
+<tr><td>fallback_scaling</td><td>OT_INT</td><td>If indefinite update is used, the type of fallback strategy</td><td>casadi::Blocksqp</td></tr>
+<tr><td>fallback_update</td><td>OT_INT</td><td>If indefinite update is used, the type of fallback strategy</td><td>casadi::Blocksqp</td></tr>
+<tr><td>gamma_f</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
+<tr><td>gamma_theta</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
+<tr><td>globalization</td><td>OT_INT</td><td>Globalization strategy</td><td>casadi::Blocksqp</td></tr>
+<tr><td>hess_damp</td><td>OT_INT</td><td>Activate Powell damping for BFGS</td><td>casadi::Blocksqp</td></tr>
+<tr><td>hess_damp_fac</td><td>OT_DOUBLE</td><td>Damping factor for BFGS Powell modification</td><td>casadi::Blocksqp</td></tr>
+<tr><td>hess_lim_mem</td><td>OT_INT</td><td>Full or limited memory</td><td>casadi::Blocksqp</td></tr>
+<tr><td>hess_memsize</td><td>OT_INT</td><td>Memory size for L-BFGS updates</td><td>casadi::Blocksqp</td></tr>
+<tr><td>hess_scaling</td><td>OT_INT</td><td>Scaling strategy for Hessian approximation</td><td>casadi::Blocksqp</td></tr>
+<tr><td>hess_update</td><td>OT_INT</td><td>Type of Hessian approximation</td><td>casadi::Blocksqp</td></tr>
+<tr><td>ignore_check_vec</td><td>OT_BOOL</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>ini_hess_diag</td><td>OT_DOUBLE</td><td>Initial Hessian guess: diagonal matrix diag(iniHessDiag)</td><td>casadi::Blocksqp</td></tr>
+<tr><td>iteration_callback</td><td>OT_FUNCTION</td><td>A function that will be called at each iteration with the solver as input. Check documentation of Callback.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>iteration_callback_ignore_errors</td><td>OT_BOOL</td><td>If set to true, errors thrown by iteration_callback will be ignored.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>iteration_callback_step</td><td>OT_INT</td><td>Only call the callback function every few iterations.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>kappa_f</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
+<tr><td>kappa_minus</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
+<tr><td>kappa_plus</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
+<tr><td>kappa_plus_max</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
+<tr><td>kappa_soc</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
+<tr><td>max_consec_reduced_steps</td><td>OT_INT</td><td>Maximum number of consecutive reduced steps</td><td>casadi::Blocksqp</td></tr>
+<tr><td>max_consec_skipped_updates</td><td>OT_INT</td><td>Maximum number of consecutive skipped updates</td><td>casadi::Blocksqp</td></tr>
+<tr><td>max_conv_qp</td><td>OT_INT</td><td>How many additional QPs may be solved for convexification per iteration?</td><td>casadi::Blocksqp</td></tr>
+<tr><td>max_it_qp</td><td>OT_INT</td><td>Maximum number of QP iterations per SQP iteration</td><td>casadi::Blocksqp</td></tr>
+<tr><td>max_line_search</td><td>OT_INT</td><td>Maximum number of steps in line search</td><td>casadi::Blocksqp</td></tr>
+<tr><td>max_soc_iter</td><td>OT_INT</td><td>Maximum number of SOC line search iterations</td><td>casadi::Blocksqp</td></tr>
+<tr><td>max_time_qp</td><td>OT_DOUBLE</td><td>Maximum number of time in seconds per QP solve per SQP iteration</td><td>casadi::Blocksqp</td></tr>
+<tr><td>nlinfeastol</td><td>OT_DOUBLE</td><td>Nonlinear feasibility tolerance</td><td>casadi::Blocksqp</td></tr>
+<tr><td>obj_lo</td><td>OT_DOUBLE</td><td>Lower bound on objective function [-inf]</td><td>casadi::Blocksqp</td></tr>
+<tr><td>obj_up</td><td>OT_DOUBLE</td><td>Upper bound on objective function [inf]</td><td>casadi::Blocksqp</td></tr>
+<tr><td>opttol</td><td>OT_DOUBLE</td><td>Optimality tolerance</td><td>casadi::Blocksqp</td></tr>
+<tr><td>print_header</td><td>OT_BOOL</td><td>Print solver header at startup</td><td>casadi::Blocksqp</td></tr>
+<tr><td>print_iteration</td><td>OT_BOOL</td><td>Print SQP iterations</td><td>casadi::Blocksqp</td></tr>
+<tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time</td><td>casadi::Nlpsol</td></tr>
+<tr><td>qpsol</td><td>OT_STRING</td><td>The QP solver to be used by the SQP method</td><td>casadi::Blocksqp</td></tr>
+<tr><td>qpsol_options</td><td>OT_DICT</td><td>Options to be passed to the QP solver</td><td>casadi::Blocksqp</td></tr>
+<tr><td>restore_feas</td><td>OT_INT</td><td>Use feasibility restoration phase</td><td>casadi::Blocksqp</td></tr>
+<tr><td>s_f</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
+<tr><td>s_theta</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
+<tr><td>shur</td><td>OT_BOOL</td><td>Use qpOASES Shur compliment approach</td><td>casadi::Blocksqp</td></tr>
+<tr><td>skip_first_globalization</td><td>OT_BOOL</td><td>No globalization strategy in first iteration</td><td>casadi::Blocksqp</td></tr>
+<tr><td>theta_max</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
+<tr><td>theta_min</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
+<tr><td>verbose_init</td><td>OT_BOOL</td><td>Print out timing information about the different stages of initialization</td><td>casadi::Nlpsol</td></tr>
+<tr><td>warn_initial_bounds</td><td>OT_BOOL</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>casadi::Nlpsol</td></tr>
+<tr><td>which_second_derv</td><td>OT_INT</td><td>For which block should second derivatives be provided by the user</td><td>casadi::Blocksqp</td></tr>
+</table>
+*/
+/// \cond INTERNAL
 /** \class casadi::BonminInterface
 \n
 \par
@@ -1457,6 +1788,7 @@
 <tr><td>enableFarBounds</td><td>OT_BOOL</td><td>Enables the use of  far bounds.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>enableFlippingBounds</td><td>OT_BOOL</td><td>Enables the use of  flipping bounds.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>enableFullLITests</td><td>OT_BOOL</td><td>Enables condition-hardened  (but more expensive) LI test.</td><td>casadi::QpoasesInterface</td></tr>
+<tr><td>enableInertiaCorrection</td><td>OT_BOOL</td><td>Should working set be repaired when negative curvature is discovered during hotstart.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>enableNZCTests</td><td>OT_BOOL</td><td>Enables nonzero curvature  tests.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>enableRamping</td><td>OT_BOOL</td><td>Enables ramping.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>enableRegularisation</td><td>OT_BOOL</td><td>Enables automatic  Hessian regularisation.</td><td>casadi::QpoasesInterface</td></tr>
@@ -1502,6 +1834,7 @@
 <tr><td>enableFarBounds</td><td>OT_BOOL</td><td>Enables the use of  far bounds.</td></tr>
 <tr><td>enableFlippingBounds</td><td>OT_BOOL</td><td>Enables the use of  flipping bounds.</td></tr>
 <tr><td>enableFullLITests</td><td>OT_BOOL</td><td>Enables condition-hardened  (but more expensive) LI test.</td></tr>
+<tr><td>enableInertiaCorrection</td><td>OT_BOOL</td><td>Should working set be repaired when negative curvature is discovered during hotstart.</td></tr>
 <tr><td>enableNZCTests</td><td>OT_BOOL</td><td>Enables nonzero curvature  tests.</td></tr>
 <tr><td>enableRamping</td><td>OT_BOOL</td><td>Enables ramping.</td></tr>
 <tr><td>enableRegularisation</td><td>OT_BOOL</td><td>Enables automatic  Hessian regularisation.</td></tr>
@@ -1547,6 +1880,7 @@
 <tr><td>enableFarBounds</td><td>OT_BOOL</td><td>Enables the use of  far bounds.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>enableFlippingBounds</td><td>OT_BOOL</td><td>Enables the use of  flipping bounds.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>enableFullLITests</td><td>OT_BOOL</td><td>Enables condition-hardened  (but more expensive) LI test.</td><td>casadi::QpoasesInterface</td></tr>
+<tr><td>enableInertiaCorrection</td><td>OT_BOOL</td><td>Should working set be repaired when negative curvature is discovered during hotstart.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>enableNZCTests</td><td>OT_BOOL</td><td>Enables nonzero curvature  tests.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>enableRamping</td><td>OT_BOOL</td><td>Enables ramping.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>enableRegularisation</td><td>OT_BOOL</td><td>Enables automatic  Hessian regularisation.</td><td>casadi::QpoasesInterface</td></tr>
