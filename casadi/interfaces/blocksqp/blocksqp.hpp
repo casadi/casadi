@@ -413,7 +413,7 @@ namespace casadi {
     }
 
     /// QP solver for the subproblems
-    Function qpsol_;
+    //Function qpsol_;
 
     // General options
     bool print_header_;

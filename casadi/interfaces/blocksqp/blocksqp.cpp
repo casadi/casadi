@@ -211,8 +211,8 @@ namespace casadi {
     Nlpsol::init(opts);
 
     // Set default options
-    string qpsol_plugin = "qpoases";
-    Dict qpsol_options;
+    //string qpsol_plugin = "qpoases";
+    //Dict qpsol_options;
     print_header_ = true;
     print_iteration_ = true;
     eps_ = 1.0e-16;
@@ -264,9 +264,11 @@ namespace casadi {
     // Read user options
     for (auto&& op : opts) {
       if (op.first=="qpsol") {
-        qpsol_plugin = op.second.to_string();
+        //qpsol_plugin = op.second.to_string();
+        casadi_warning("Option 'qpsol' currently not supported, ignored");
       } else if (op.first=="qpsol_options") {
-        qpsol_options = op.second;
+        //qpsol_options = op.second;
+        casadi_warning("Option 'qpsol_options' currently not supported, ignored");
       } else if (op.first=="print_header") {
         print_header_ = op.second;
       } else if (op.first=="print_iteration") {
@@ -429,10 +431,10 @@ namespace casadi {
     nblocks_ = blocks_.size()-1;
 
     // Allocate a QP solver
-    casadi_assert_message(!qpsol_plugin.empty(), "'qpsol' option has not been set");
-    qpsol_ = conic("qpsol", qpsol_plugin, {{"h", Hsp_}, {"a", Asp_}},
-                   qpsol_options);
-    alloc(qpsol_);
+    //casadi_assert_message(!qpsol_plugin.empty(), "'qpsol' option has not been set");
+    //qpsol_ = conic("qpsol", qpsol_plugin, {{"h", Hsp_}, {"a", Asp_}},
+    //               qpsol_options);
+    //alloc(qpsol_);
 
     // Allocate memory
     alloc_w(Asp_.nnz(), true); // jac
