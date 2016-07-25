@@ -60,6 +60,12 @@ int main(){
   opts["block_hess"] = 0;
   opts["which_second_derv"] = 0;
   opts["shur"] = false;
+  opts["qpsol_options.enableInertiaCorrection"] = true;
+  opts["qpsol_options.enableEqualities"] = true;
+  opts["qpsol_options.initialStatusBounds"] = "inactive";
+  opts["qpsol_options.printLevel"] = "none";
+  opts["qpsol_options.numRefinementSteps"] = 2;
+  opts["qpsol_options.epsLITests"] = 2.2204e-08;
   Function solver = nlpsol("solver", "blocksqp", nlp, opts);
 
   // Solve the Rosenbrock problem

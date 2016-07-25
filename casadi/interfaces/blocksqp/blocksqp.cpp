@@ -2000,10 +2000,7 @@ namespace casadi {
 
     // qpOASES options
     qpOASES::Options opts;
-    if (matricesChanged && maxQP > 1)
-      opts.enableInertiaCorrection = qpOASES::BT_FALSE;
-    else
-      opts.enableInertiaCorrection = qpOASES::BT_TRUE;
+    opts.enableInertiaCorrection = qpOASES::BT_TRUE;
     opts.enableEqualities = qpOASES::BT_TRUE;
     opts.initialStatusBounds = qpOASES::ST_INACTIVE;
     opts.printLevel = qpOASES::PL_NONE;
@@ -2028,12 +2025,6 @@ namespace casadi {
           // If the solution of the first QP was rejected, consider second Hessian
           m->qpResolve++;
           computeNextHessian(m, l, maxQP);
-        }
-
-        if (l == maxQP-1) {
-          // Enable inertia correction for supposedly convex QPs, just in case
-          opts.enableInertiaCorrection = qpOASES::BT_TRUE;
-          m->qp->setOptions(opts);
         }
 
         /*
