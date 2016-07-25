@@ -152,17 +152,8 @@ int main(){
   // NLP
   MXDict nlp = {{"x", V}, {"f", J}, {"g", vertcat(g)}};
 
-  // qpOASES options
-  Dict opts;
-  opts["qpsol_options.enableInertiaCorrection"] = true;
-  opts["qpsol_options.enableEqualities"] = true;
-  opts["qpsol_options.initialStatusBounds"] = "inactive";
-  opts["qpsol_options.printLevel"] = "none";
-  opts["qpsol_options.numRefinementSteps"] = 2;
-  opts["qpsol_options.epsLITests"] = 2.2204e-08;
-
   // Create an NLP solver and buffers
-  Function solver = nlpsol("nlpsol", "blocksqp", nlp, opts);
+  Function solver = nlpsol("nlpsol", "blocksqp", nlp);
   std::map<std::string, DM> arg, res;
 
   // Bounds and initial guess
