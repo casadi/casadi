@@ -162,8 +162,8 @@ namespace casadi {
     qpOASES::Options ops_;
     qpOASES::HessianType hess_;
     bool sparse_;
-    bool shur_;
-    int max_shur_;
+    bool schur_;
+    int max_schur_;
     std::string linsol_plugin_;
     ///@}
 

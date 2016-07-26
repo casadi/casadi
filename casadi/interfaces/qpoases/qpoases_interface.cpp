@@ -61,14 +61,14 @@ namespace casadi {
      {{"sparse",
        {OT_BOOL,
         "Formulate the QP using sparse matrices. [false]"}},
-      {"shur",
+      {"schur",
        {OT_BOOL,
         "Use Schur Complement Approach [false]"}},
       {"hessian_type",
        {OT_STRING,
         "Type of Hessian - see qpOASES documentation "
         "[UNKNOWN|posdef|semidef|indef|zero|identity]]"}},
-      {"max_shur",
+      {"max_schur",
        {OT_INT,
         "Maximal number of Schur updates [75]"}},
       {"linsol_plugin",
@@ -183,9 +183,9 @@ namespace casadi {
 
     // Default options
     sparse_ = false;
-    shur_ = false;
+    schur_ = false;
     hess_ = qpOASES::HessianType::HST_UNKNOWN;
-    max_shur_ = 75;
+    max_schur_ = 75;
     max_nWSR_ = 5 *(nx_ + na_);
     max_cputime_ = -1;
     ops_.setToDefault();
@@ -195,8 +195,8 @@ namespace casadi {
     for (auto&& op : opts) {
       if (op.first=="sparse") {
         sparse_ = op.second;
-      } else if (op.first=="shur") {
-        shur_=  op.second;
+      } else if (op.first=="schur") {
+        schur_=  op.second;
       } else if (op.first=="hessian_type") {
         string h = op.second;
         if (h=="unknown") {
@@ -214,8 +214,8 @@ namespace casadi {
         } else {
           casadi_error("Unknown Hessian type \"" + h + "\"");
         }
-      } else if (op.first=="max_shur") {
-        max_shur_ = op.second;
+      } else if (op.first=="max_schur") {
+        max_schur_ = op.second;
       } else if (op.first=="linsol_plugin") {
         linsol_plugin_ = string(op.second);
       } else if (op.first=="nWSR") {
@@ -284,7 +284,7 @@ namespace casadi {
     }
 
     // Create linear solver
-    if (shur_) {
+    if (schur_) {
       linsol_ = Linsol("linsol", linsol_plugin_);
     }
 
@@ -310,8 +310,8 @@ namespace casadi {
 
     // Create qpOASES instance
     if (m->qp) delete m->qp;
-    if (shur_) {
-      m->sqp = new qpOASES::SQProblemSchur(nx_, na_, hess_, max_shur_,
+    if (schur_) {
+      m->sqp = new qpOASES::SQProblemSchur(nx_, na_, hess_, max_schur_,
         mem, qpoases_init, qpoases_sfact, qpoases_nfact, qpoases_solve);
     } else if (na_==0) {
       m->qp = new qpOASES::QProblemB(nx_, hess_);

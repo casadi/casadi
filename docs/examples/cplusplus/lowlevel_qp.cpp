@@ -415,7 +415,7 @@ int main(){
 
   // Create conic solver
   SpDict qp = {{"h", H.sparsity()}, {"a", A.sparsity()}};
-  Function F = conic("F", "qpoases", qp, {{"sparse", true}, {"shur", false}, {"max_shur", 20}, {"hessian_type", "posdef"}});
+  Function F = conic("F", "qpoases", qp, {{"sparse", true}, {"schur", false}, {"max_schur", 20}, {"hessian_type", "posdef"}});
   //Function F = conic("F", "cplex", qp);
   //Function F = conic("F", "ooqp", qp);
   //Function F = conic("F", "gurobi", qp);

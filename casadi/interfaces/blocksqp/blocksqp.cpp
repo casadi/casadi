@@ -77,9 +77,9 @@ namespace casadi {
       {"nlinfeastol",
        {OT_DOUBLE,
         "Nonlinear feasibility tolerance"}},
-      {"shur",
+      {"schur",
        {OT_BOOL,
-        "Use qpOASES Shur compliment approach"}},
+        "Use qpOASES Schur compliment approach"}},
       {"globalization",
        {OT_INT,
         "Globalization strategy"}},
@@ -219,7 +219,7 @@ namespace casadi {
     eps_ = 1.0e-16;
     opttol_ = 1.0e-6;
     nlinfeastol_ = 1.0e-6;
-    shur_ = true;
+    schur_ = true;
     globalization_ = 1;
     restore_feas_ = 1;
     max_line_search_ = 20;
@@ -282,8 +282,8 @@ namespace casadi {
         opttol_ = op.second;
       } else if (op.first=="nlinfeastol") {
         nlinfeastol_ = op.second;
-      } else if (op.first=="shur") {
-        shur_ = op.second;
+      } else if (op.first=="schur") {
+        schur_ = op.second;
       } else if (op.first=="globalization") {
         globalization_ = op.second;
       } else if (op.first=="restore_feas") {
@@ -378,7 +378,7 @@ namespace casadi {
 
     // If we don't use limited memory BFGS we need to store only one vector.
     if (!hess_lim_mem_) hess_memsize_ = 1;
-    if (!shur_ && hess_update_ == 1) {
+    if (!schur_ && hess_update_ == 1) {
       casadi_eprintf("SR1 update only works with qpOASES Schur complement version. "
              "Using BFGS updates instead.\n");
       hess_update_ = 2;
@@ -440,7 +440,7 @@ namespace casadi {
     //alloc(qpsol_);
 
     // [Workaround] Create linear solver for qpOASES
-    if (shur_) {
+    if (schur_) {
       linsol_ = Linsol("linsol", linsol_plugin_);
     }
 
@@ -453,7 +453,7 @@ namespace casadi {
     auto m = static_cast<BlocksqpMemory*>(mem);
 
     // Create qpOASES memory
-    if (shur_) {
+    if (schur_) {
       m->qpoases_mem = new QpoasesMemory(linsol_);
     }
   }
@@ -541,7 +541,7 @@ namespace casadi {
     allocHess(m);
     allocAlg(m);
 
-    if (shur_) {
+    if (schur_) {
       m->qp = new qpOASES::SQProblemSchur(nx_, ng_, qpOASES::HST_UNKNOWN, 50,
                                           m->qpoases_mem,
                                           QpoasesInterface::qpoases_init,
@@ -868,7 +868,7 @@ namespace casadi {
     char qpString[100];
 
     /* QP Solver */
-    if (shur_)
+    if (schur_)
       strcpy(qpString, "sparse, Schur complement approach");
     else
       strcpy(qpString, "sparse, reduced Hessian factorization");
@@ -2093,7 +2093,7 @@ namespace casadi {
          */
         if (l < maxQP-1 && matricesChanged) {
             if (ret == qpOASES::SUCCESSFUL_RETURN) {
-                if (shur_) {
+                if (schur_) {
                   ret = solAna.checkCurvatureOnStronglyActiveConstraints(
                     dynamic_cast<qpOASES::SQProblemSchur*>(m->qp));
                 } else {

@@ -437,7 +437,7 @@ namespace casadi {
     double nlinfeastol_; // nonlinear feasibility tolerance
 
     // Algorithmic options
-    bool shur_;  // Use qpOASES Shur compliment approach
+    bool schur_;  // Use qpOASES schur compliment approach
     int globalization_; // Globalization strategy
     int restore_feas_;// Use feasibility restoration phase
     int max_line_search_;  // Maximum number of steps in line search
