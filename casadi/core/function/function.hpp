@@ -823,13 +823,13 @@ namespace casadi {
     ///@}
 
     /** \brief Export / Generate C code for the function */
-    void generate(const std::string& fname, const Dict& opts=Dict());
+    std::string generate(const std::string& fname, const Dict& opts=Dict());
 
     /** \brief Export / Generate C code for the function */
-    void generate(const Dict& opts=Dict());
+    std::string generate(const Dict& opts=Dict());
 
     /** \brief Export / Generate C code for the dependency function */
-    void generate_dependencies(const std::string& fname, const Dict& opts=Dict());
+    std::string generate_dependencies(const std::string& fname, const Dict& opts=Dict());
 
 #ifndef SWIG
     /// \cond INTERNAL

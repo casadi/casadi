@@ -262,16 +262,20 @@ namespace casadi {
 
   void FunctionInternal::finalize() {
     if (jit_) {
-      CodeGenerator gen("jit_tmp");
-      gen.add(self());
-      compiler_ = Importer(gen.generate(), compilerplugin_, jit_options_);
+      string jit_name = "jit_tmp";
+      if (!jit_dependencies(jit_name)) {
+        // JIT everything
+        CodeGenerator gen(jit_name);
+        gen.add(self());
+        compiler_ = Importer(gen.generate(), compilerplugin_, jit_options_);
 
-      // Try to load with simplified syntax
-      simple_ = (simple_t)compiler_.get_function(name() + "_simple");
-      // If not succesful, try generic syntax
-      if (simple_==0) {
-        eval_ = (eval_t)compiler_.get_function(name());
-        casadi_assert_message(eval_!=0, "Cannot load JIT'ed function.");
+        // Try to load with simplified syntax
+        simple_ = (simple_t)compiler_.get_function(name() + "_simple");
+        // If not succesful, try generic syntax
+        if (simple_==0) {
+          eval_ = (eval_t)compiler_.get_function(name());
+          casadi_assert_message(eval_!=0, "Cannot load JIT'ed function.");
+        }
       }
     }
 
@@ -2328,7 +2332,7 @@ namespace casadi {
     casadi_error("'generateBody' not defined for " + type_name());
   }
 
-  void FunctionInternal::generate_dependencies(const std::string& fname, const Dict& opts) {
+  std::string FunctionInternal::generate_dependencies(const std::string& fname, const Dict& opts) {
     casadi_error("'generate_dependencies' not defined for " + type_name());
   }
 

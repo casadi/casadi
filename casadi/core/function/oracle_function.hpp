@@ -53,8 +53,14 @@ namespace casadi {
     /// Oracle: Used to generate other functions
     Function oracle_;
 
+    // Information about one function
+    struct RegFun {
+      Function f;
+      bool jit;
+    };
+
     // All NLP functions
-    std::map<std::string, Function> all_functions_;
+    std::map<std::string, RegFun> all_functions_;
   public:
     /** \brief  Constructor */
     OracleFunction(const std::string& name, const Function& oracle);
@@ -77,7 +83,7 @@ namespace casadi {
                     const Dict& opts=Dict());
 
     /** Register the function for evaluation and statistics gathering */
-    void set_function(const Function& fcn, const std::string& fname);
+    void set_function(const Function& fcn, const std::string& fname, bool jit=false);
 
     /** Register the function for evaluation and statistics gathering */
     void set_function(const Function& fcn) { set_function(fcn, fcn.name()); }
@@ -96,7 +102,10 @@ namespace casadi {
     virtual bool has_function(const std::string& fname) const;
 
     /** \brief Export / Generate C code for the generated functions */
-    virtual void generate_dependencies(const std::string& fname, const Dict& opts);
+    virtual std::string generate_dependencies(const std::string& fname, const Dict& opts);
+
+    /** \brief JIT for dependencies */
+    virtual bool jit_dependencies(const std::string& fname);
 
     /** \brief Initalize memory block */
     virtual void init_memory(void* mem) const;

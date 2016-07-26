@@ -24,6 +24,7 @@
 
 
 #include "oracle_function.hpp"
+#include "external.hpp"
 
 #include <iostream>
 #include <iomanip>
@@ -46,13 +47,13 @@ namespace casadi {
                                    const Dict& opts) {
     // Generate the function
     Function ret = oracle_.factory(fname, s_in, s_out, aux, opts);
-    set_function(ret, fname);
+    set_function(ret, fname, true);
     return ret;
   }
 
   void OracleFunction::
-  set_function(const Function& fcn, const std::string& fname) {
-    auto res = all_functions_.insert(make_pair(fname, fcn));
+  set_function(const Function& fcn, const std::string& fname, bool jit) {
+    auto res = all_functions_.insert(make_pair(fname, RegFun{fcn, jit}));
     casadi_assert_message(res.second, "Duplicate function " + fname);
     alloc(fcn);
   }
@@ -110,11 +111,27 @@ namespace casadi {
     return 0;
   }
 
-  void OracleFunction::generate_dependencies(const std::string& fname, const Dict& opts) {
+  std::string OracleFunction::
+  generate_dependencies(const std::string& fname, const Dict& opts) {
     CodeGenerator gen(fname, opts);
     gen.add(oracle_);
-    for (auto&& e : all_functions_) gen.add(e.second);
-    gen.generate();
+    for (auto&& e : all_functions_) {
+      if (e.second.jit) gen.add(e.second.f);
+    }
+    return gen.generate();
+  }
+
+  bool OracleFunction::jit_dependencies(const std::string& fname) {
+    // JIT dependent functions
+    compiler_ = Importer(generate_dependencies(fname, Dict()),
+                         compilerplugin_, jit_options_);
+
+    // Replace the Oracle functions with generated functions
+    for (auto&& e : all_functions_) {
+      if (e.second.jit) e.second.f = external(e.second.f.name(), compiler_);
+    }
+
+    return true;
   }
 
   void OracleFunction::expand() {
@@ -298,7 +315,7 @@ namespace casadi {
     auto it = all_functions_.find(name);
     casadi_assert_message(it!=all_functions_.end(),
       "No function \"" + name + "\" in " + this->name());
-    return it->second;
+    return it->second.f;
   }
 
   bool OracleFunction::has_function(const std::string& fname) const {

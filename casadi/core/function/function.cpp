@@ -908,18 +908,18 @@ namespace casadi {
     (*this)->print_free(stream);
   }
 
-  void Function::generate(const Dict& opts) {
-    generate(name(), opts);
+  std::string Function::generate(const Dict& opts) {
+    return generate(name(), opts);
   }
 
-  void Function::generate(const string& fname, const Dict& opts) {
+  std::string Function::generate(const string& fname, const Dict& opts) {
     CodeGenerator gen(fname, opts);
     gen.add(*this);
-    gen.generate();
+    return gen.generate();
   }
 
-  void Function::generate_dependencies(const string& fname, const Dict& opts) {
-    (*this)->generate_dependencies(fname, opts);
+  std::string Function::generate_dependencies(const string& fname, const Dict& opts) {
+    return (*this)->generate_dependencies(fname, opts);
   }
 
   void Function::checkInputs() const {
