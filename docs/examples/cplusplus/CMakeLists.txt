@@ -143,4 +143,7 @@ endif()
 if(BLOCKSQP_FOUND)
   add_executable(test_blocksqp test_blocksqp.cpp)
   target_link_libraries(test_blocksqp casadi)
+
+  add_executable(blocksqp_nl blocksqp_nl.cpp)
+  target_link_libraries(blocksqp_nl casadi)
 endif()
