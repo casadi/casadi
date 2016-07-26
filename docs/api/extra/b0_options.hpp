@@ -57,7 +57,7 @@
 <tr><td>restore_feas</td><td>OT_INT</td><td>Use feasibility restoration phase</td><td>blocksqp::Matrix</td></tr>
 <tr><td>s_f</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>blocksqp::Matrix</td></tr>
 <tr><td>s_theta</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>blocksqp::Matrix</td></tr>
-<tr><td>shur</td><td>OT_BOOL</td><td>Use qpOASES Shur compliment approach</td><td>blocksqp::Matrix</td></tr>
+<tr><td>schur</td><td>OT_BOOL</td><td>Use qpOASES Schur compliment approach</td><td>blocksqp::Matrix</td></tr>
 <tr><td>skip_first_globalization</td><td>OT_BOOL</td><td>No globalization strategy in first iteration</td><td>blocksqp::Matrix</td></tr>
 <tr><td>theta_max</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>blocksqp::Matrix</td></tr>
 <tr><td>theta_min</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>blocksqp::Matrix</td></tr>
@@ -126,7 +126,7 @@
 <tr><td>restore_feas</td><td>OT_INT</td><td>Use feasibility restoration phase</td><td>blocksqp::SymMatrix</td></tr>
 <tr><td>s_f</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>blocksqp::SymMatrix</td></tr>
 <tr><td>s_theta</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>blocksqp::SymMatrix</td></tr>
-<tr><td>shur</td><td>OT_BOOL</td><td>Use qpOASES Shur compliment approach</td><td>blocksqp::SymMatrix</td></tr>
+<tr><td>schur</td><td>OT_BOOL</td><td>Use qpOASES Schur compliment approach</td><td>blocksqp::SymMatrix</td></tr>
 <tr><td>skip_first_globalization</td><td>OT_BOOL</td><td>No globalization strategy in first iteration</td><td>blocksqp::SymMatrix</td></tr>
 <tr><td>theta_max</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>blocksqp::SymMatrix</td></tr>
 <tr><td>theta_min</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>blocksqp::SymMatrix</td></tr>
@@ -195,7 +195,7 @@
 <tr><td>restore_feas</td><td>OT_INT</td><td>Use feasibility restoration phase</td><td>casadi::Blocksqp</td></tr>
 <tr><td>s_f</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
 <tr><td>s_theta</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
-<tr><td>shur</td><td>OT_BOOL</td><td>Use qpOASES Shur compliment approach</td><td>casadi::Blocksqp</td></tr>
+<tr><td>schur</td><td>OT_BOOL</td><td>Use qpOASES Schur compliment approach</td><td>casadi::Blocksqp</td></tr>
 <tr><td>skip_first_globalization</td><td>OT_BOOL</td><td>No globalization strategy in first iteration</td><td>casadi::Blocksqp</td></tr>
 <tr><td>theta_max</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
 <tr><td>theta_min</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
@@ -255,7 +255,7 @@
 <tr><td>restore_feas</td><td>OT_INT</td><td>Use feasibility restoration phase</td></tr>
 <tr><td>s_f</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td></tr>
 <tr><td>s_theta</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td></tr>
-<tr><td>shur</td><td>OT_BOOL</td><td>Use qpOASES Shur compliment approach</td></tr>
+<tr><td>schur</td><td>OT_BOOL</td><td>Use qpOASES Schur compliment approach</td></tr>
 <tr><td>skip_first_globalization</td><td>OT_BOOL</td><td>No globalization strategy in first iteration</td></tr>
 <tr><td>theta_max</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td></tr>
 <tr><td>theta_min</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td></tr>
@@ -320,7 +320,7 @@
 <tr><td>restore_feas</td><td>OT_INT</td><td>Use feasibility restoration phase</td><td>casadi::Blocksqp</td></tr>
 <tr><td>s_f</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
 <tr><td>s_theta</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
-<tr><td>shur</td><td>OT_BOOL</td><td>Use qpOASES Shur compliment approach</td><td>casadi::Blocksqp</td></tr>
+<tr><td>schur</td><td>OT_BOOL</td><td>Use qpOASES Schur compliment approach</td><td>casadi::Blocksqp</td></tr>
 <tr><td>skip_first_globalization</td><td>OT_BOOL</td><td>No globalization strategy in first iteration</td><td>casadi::Blocksqp</td></tr>
 <tr><td>theta_max</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
 <tr><td>theta_min</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
@@ -1808,12 +1808,12 @@
 <tr><td>linsol_plugin</td><td>OT_STRING</td><td>Linear solver plugin</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>maxDualJump</td><td>OT_DOUBLE</td><td>Maximum allowed jump in dual variables in  linear independence tests.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>maxPrimalJump</td><td>OT_DOUBLE</td><td>Maximum allowed jump in primal variables in  nonzero curvature tests.</td><td>casadi::QpoasesInterface</td></tr>
-<tr><td>max_shur</td><td>OT_INT</td><td>Maximal number of Schur updates [75]</td><td>casadi::QpoasesInterface</td></tr>
+<tr><td>max_schur</td><td>OT_INT</td><td>Maximal number of Schur updates [75]</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>nWSR</td><td>OT_INT</td><td>The maximum number of working set recalculations to be performed during the initial homotopy. Default is 5(nx + nc)</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>numRefinementSteps</td><td>OT_INT</td><td>Maximum number of iterative refinement steps.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>numRegularisationSteps</td><td>OT_INT</td><td>Maximum number of successive regularisation steps.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>printLevel</td><td>OT_STRING</td><td>Defines the amount of text output during QP solution, see Section 5.7</td><td>casadi::QpoasesInterface</td></tr>
-<tr><td>shur</td><td>OT_BOOL</td><td>Use Schur Complement Approach [false]</td><td>casadi::QpoasesInterface</td></tr>
+<tr><td>schur</td><td>OT_BOOL</td><td>Use Schur Complement Approach [false]</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>sparse</td><td>OT_BOOL</td><td>Formulate the QP using sparse matrices. [false]</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>terminationTolerance</td><td>OT_DOUBLE</td><td>Relative termination tolerance to stop homotopy.</td><td>casadi::QpoasesInterface</td></tr>
 </table>
@@ -1854,12 +1854,12 @@
 <tr><td>linsol_plugin</td><td>OT_STRING</td><td>Linear solver plugin</td></tr>
 <tr><td>maxDualJump</td><td>OT_DOUBLE</td><td>Maximum allowed jump in dual variables in  linear independence tests.</td></tr>
 <tr><td>maxPrimalJump</td><td>OT_DOUBLE</td><td>Maximum allowed jump in primal variables in  nonzero curvature tests.</td></tr>
-<tr><td>max_shur</td><td>OT_INT</td><td>Maximal number of Schur updates [75]</td></tr>
+<tr><td>max_schur</td><td>OT_INT</td><td>Maximal number of Schur updates [75]</td></tr>
 <tr><td>nWSR</td><td>OT_INT</td><td>The maximum number of working set recalculations to be performed during the initial homotopy. Default is 5(nx + nc)</td></tr>
 <tr><td>numRefinementSteps</td><td>OT_INT</td><td>Maximum number of iterative refinement steps.</td></tr>
 <tr><td>numRegularisationSteps</td><td>OT_INT</td><td>Maximum number of successive regularisation steps.</td></tr>
 <tr><td>printLevel</td><td>OT_STRING</td><td>Defines the amount of text output during QP solution, see Section 5.7</td></tr>
-<tr><td>shur</td><td>OT_BOOL</td><td>Use Schur Complement Approach [false]</td></tr>
+<tr><td>schur</td><td>OT_BOOL</td><td>Use Schur Complement Approach [false]</td></tr>
 <tr><td>sparse</td><td>OT_BOOL</td><td>Formulate the QP using sparse matrices. [false]</td></tr>
 <tr><td>terminationTolerance</td><td>OT_DOUBLE</td><td>Relative termination tolerance to stop homotopy.</td></tr>
 </table>
@@ -1900,12 +1900,12 @@
 <tr><td>linsol_plugin</td><td>OT_STRING</td><td>Linear solver plugin</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>maxDualJump</td><td>OT_DOUBLE</td><td>Maximum allowed jump in dual variables in  linear independence tests.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>maxPrimalJump</td><td>OT_DOUBLE</td><td>Maximum allowed jump in primal variables in  nonzero curvature tests.</td><td>casadi::QpoasesInterface</td></tr>
-<tr><td>max_shur</td><td>OT_INT</td><td>Maximal number of Schur updates [75]</td><td>casadi::QpoasesInterface</td></tr>
+<tr><td>max_schur</td><td>OT_INT</td><td>Maximal number of Schur updates [75]</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>nWSR</td><td>OT_INT</td><td>The maximum number of working set recalculations to be performed during the initial homotopy. Default is 5(nx + nc)</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>numRefinementSteps</td><td>OT_INT</td><td>Maximum number of iterative refinement steps.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>numRegularisationSteps</td><td>OT_INT</td><td>Maximum number of successive regularisation steps.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>printLevel</td><td>OT_STRING</td><td>Defines the amount of text output during QP solution, see Section 5.7</td><td>casadi::QpoasesInterface</td></tr>
-<tr><td>shur</td><td>OT_BOOL</td><td>Use Schur Complement Approach [false]</td><td>casadi::QpoasesInterface</td></tr>
+<tr><td>schur</td><td>OT_BOOL</td><td>Use Schur Complement Approach [false]</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>sparse</td><td>OT_BOOL</td><td>Formulate the QP using sparse matrices. [false]</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>terminationTolerance</td><td>OT_DOUBLE</td><td>Relative termination tolerance to stop homotopy.</td><td>casadi::QpoasesInterface</td></tr>
 </table>

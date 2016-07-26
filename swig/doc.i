@@ -7632,8 +7632,9 @@ Dennis Janka
 |                 |                 | parameter, cf.  |                 |
 |                 |                 | IPOPT paper     |                 |
 +-----------------+-----------------+-----------------+-----------------+
-| shur            | OT_BOOL         | Use qpOASES     | blocksqp::Matri |
-|                 |                 | Shur compliment | x               |
+| schur           | OT_BOOL         | Use qpOASES     | blocksqp::Matri |
+|                 |                 | Schur           | x               |
+|                 |                 | compliment      |                 |
 |                 |                 | approach        |                 |
 +-----------------+-----------------+-----------------+-----------------+
 | skip_first_glob | OT_BOOL         | No              | blocksqp::Matri |
@@ -10847,8 +10848,9 @@ Dennis Janka
 |                 |                 | parameter, cf.  |                 |
 |                 |                 | IPOPT paper     |                 |
 +-----------------+-----------------+-----------------+-----------------+
-| shur            | OT_BOOL         | Use qpOASES     | blocksqp::SymMa |
-|                 |                 | Shur compliment | trix            |
+| schur           | OT_BOOL         | Use qpOASES     | blocksqp::SymMa |
+|                 |                 | Schur           | trix            |
+|                 |                 | compliment      |                 |
 |                 |                 | approach        |                 |
 +-----------------+-----------------+-----------------+-----------------+
 | skip_first_glob | OT_BOOL         | No              | blocksqp::SymMa |
@@ -12969,7 +12971,7 @@ Interface to QPOases Solver for quadratic programming
 |                        |                        | nonzero curvature      |
 |                        |                        | tests.                 |
 +------------------------+------------------------+------------------------+
-| max_shur               | OT_INT                 | Maximal number of      |
+| max_schur              | OT_INT                 | Maximal number of      |
 |                        |                        | Schur updates [75]     |
 +------------------------+------------------------+------------------------+
 | nWSR                   | OT_INT                 | The maximum number of  |
@@ -12992,7 +12994,7 @@ Interface to QPOases Solver for quadratic programming
 |                        |                        | solution, see Section  |
 |                        |                        | 5.7                    |
 +------------------------+------------------------+------------------------+
-| shur                   | OT_BOOL                | Use Schur Complement   |
+| schur                  | OT_BOOL                | Use Schur Complement   |
 |                        |                        | Approach [false]       |
 +------------------------+------------------------+------------------------+
 | sparse                 | OT_BOOL                | Formulate the QP using |
@@ -14139,7 +14141,7 @@ Dennis Janka, Joel Andersson
 |                        |                        | parameter, cf. IPOPT   |
 |                        |                        | paper                  |
 +------------------------+------------------------+------------------------+
-| shur                   | OT_BOOL                | Use qpOASES Shur       |
+| schur                  | OT_BOOL                | Use qpOASES Schur      |
 |                        |                        | compliment approach    |
 +------------------------+------------------------+------------------------+
 | skip_first_globalizati | OT_BOOL                | No globalization       |
