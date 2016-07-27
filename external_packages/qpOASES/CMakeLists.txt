@@ -6,6 +6,10 @@ cmake_minimum_required(VERSION 2.8.6)
 
 project(qpOASES CXX)
 
+if(WITH_NO_QPOASES_BANNER)
+  add_definitions(-D__NO_COPYRIGHT__)
+endif()
+
 # cmake_policy use MACOSX_RPATH=ON by default
 if(COMMAND cmake_policy)
   if(CMAKE_MAJOR_VERSION GREATER 2)
