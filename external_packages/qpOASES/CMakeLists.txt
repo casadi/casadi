@@ -28,5 +28,5 @@ target_link_libraries(casadi_qpoases ${LAPACK_LIBRARIES} ${BLAS_LIBRARIES})
 
 install(DIRECTORY include
   DESTINATION include/casadi/external_packages/qpOASES
-  FILES_MATCHING PATTERN "*.h"
+  FILES_MATCHING PATTERN "*.hpp" PATTERN "*.ipp"
   PATTERN ".svn" EXCLUDE)
