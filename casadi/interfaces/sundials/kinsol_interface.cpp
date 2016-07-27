@@ -331,12 +331,6 @@ namespace casadi {
     res1[iout_] = NV_DATA_S(fval);
     oracle_(arg1, res1, m.iw, m.w, 0);
 
-    // Print it, if requested
-    if (monitored("eval_f")) {
-      userOut() << "f = ";
-      N_VPrint_Serial(fval);
-    }
-
     // Make sure that all entries of the linear system are valid
     double *fdata = res1[iout_];
     for (int k=0; k<n_; ++k) {
@@ -417,11 +411,6 @@ namespace casadi {
         // Set the element
         DENSE_ELEM(J, rr, cc) = jac[el];
       }
-    }
-
-    if (monitored("eval_djac")) {
-      userOut() << "djac = ";
-      PrintMat(J);
     }
 
     // Log time duration
