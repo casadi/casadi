@@ -166,6 +166,9 @@ namespace casadi {
     /** \brief  Get the name */
     virtual const std::string& name() const;
 
+    /** \brief Get type name */
+    virtual std::string type_name() const;
+
     /** \brief  Check if valid function input */
     virtual bool is_valid_input() const { return false;}
 

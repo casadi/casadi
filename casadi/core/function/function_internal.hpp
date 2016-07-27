@@ -512,8 +512,11 @@ namespace casadi {
     /** \brief Export / Generate C code for the dependency function */
     virtual std::string generate_dependencies(const std::string& fname, const Dict& opts);
 
+    /** \brief Is codegen supported? */
+    virtual bool has_codegen() const { return false;}
+
     /** \brief Jit dependencies */
-    virtual bool jit_dependencies(const std::string& fname) { return false;}
+    virtual void jit_dependencies(const std::string& fname) {}
 
     /** \brief  Print */
     virtual void print(std::ostream &stream) const;

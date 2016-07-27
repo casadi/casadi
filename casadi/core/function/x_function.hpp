@@ -130,6 +130,9 @@ namespace casadi {
     /** \brief Generate code for the body of the C function */
     virtual void generateBody(CodeGenerator& g) const = 0;
 
+    /** \brief Is codegen supported? */
+    virtual bool has_codegen() const { return true;}
+
     /** \brief Helper function: Check if a vector equals inputv */
     virtual bool isInput(const std::vector<MatType>& arg) const;
 

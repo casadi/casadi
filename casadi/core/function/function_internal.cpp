@@ -263,7 +263,7 @@ namespace casadi {
   void FunctionInternal::finalize() {
     if (jit_) {
       string jit_name = "jit_tmp";
-      if (!jit_dependencies(jit_name)) {
+      if (has_codegen()) {
         // JIT everything
         CodeGenerator gen(jit_name);
         gen.add(self());
@@ -276,6 +276,9 @@ namespace casadi {
           eval_ = (eval_t)compiler_.get_function(name());
           casadi_assert_message(eval_!=0, "Cannot load JIT'ed function.");
         }
+      } else {
+        // Just jit dependencies
+        jit_dependencies(jit_name);
       }
     }
 
@@ -2329,7 +2332,10 @@ namespace casadi {
   }
 
   void FunctionInternal::generateBody(CodeGenerator& g) const {
-    casadi_error("'generateBody' not defined for " + type_name());
+    casadi_warning("The function \"" + name() + "\", which is of type \""
+                   + type_name() + "\" cannot be code generated. The generation "
+                   "will proceed, but compilation of the code will not be possible.");
+    g.body << "#error Code generation not supported for " << type_name() << endl;
   }
 
   std::string FunctionInternal::generate_dependencies(const std::string& fname, const Dict& opts) {

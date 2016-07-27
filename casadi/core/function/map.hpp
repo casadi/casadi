@@ -145,6 +145,9 @@ namespace casadi {
     /** \brief Generate code for the declarations of the C function */
     virtual void generateDeclarations(CodeGenerator& g) const;
 
+    /** \brief Is codegen supported? */
+    virtual bool has_codegen() const { return true;}
+
     /** \brief Generate code for the body of the C function */
     virtual void generateBody(CodeGenerator& g) const;
 

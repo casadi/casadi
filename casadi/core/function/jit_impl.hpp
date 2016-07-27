@@ -68,6 +68,9 @@ namespace casadi {
     /** \brief Use simplified signature */
     virtual bool simplifiedCall() const { return true;}
 
+    /** \brief Is codegen supported? */
+    virtual bool has_codegen() const { return true;}
+
     /** \brief Generate code for the function body */
     virtual void generateBody(CodeGenerator& g) const;
 

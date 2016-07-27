@@ -105,7 +105,7 @@ namespace casadi {
     virtual std::string generate_dependencies(const std::string& fname, const Dict& opts);
 
     /** \brief JIT for dependencies */
-    virtual bool jit_dependencies(const std::string& fname);
+    virtual void jit_dependencies(const std::string& fname);
 
     /** \brief Initalize memory block */
     virtual void init_memory(void* mem) const;

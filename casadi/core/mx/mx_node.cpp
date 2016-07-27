@@ -157,6 +157,10 @@ namespace casadi {
                           + typeid(*this).name());
   }
 
+  std::string MXNode::type_name() const {
+    return typeid(*this).name();
+  }
+
   bool MXNode::__nonzero__() const {
     casadi_error("Can only determine truth value of a numeric MX.");
 
@@ -380,7 +384,10 @@ namespace casadi {
 
   void MXNode::generate(CodeGenerator& g, const std::string& mem,
                         const vector<int>& arg, const vector<int>& res) const {
-    g.body << "#error " <<  typeid(*this).name() << ": " << arg << " => " << res << endl;
+    casadi_warning("Cannot code generate MX nodes of type " + type_name() +
+                   "The generation will proceed, but compilation of the code will "
+                   "not be possible.");
+    g.body << "#error " <<  type_name() << ": " << arg << " => " << res << endl;
   }
 
   double MXNode::to_double() const {

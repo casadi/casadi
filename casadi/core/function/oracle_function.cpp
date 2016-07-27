@@ -121,7 +121,7 @@ namespace casadi {
     return gen.generate();
   }
 
-  bool OracleFunction::jit_dependencies(const std::string& fname) {
+  void OracleFunction::jit_dependencies(const std::string& fname) {
     // JIT dependent functions
     compiler_ = Importer(generate_dependencies(fname, Dict()),
                          compilerplugin_, jit_options_);
@@ -130,8 +130,6 @@ namespace casadi {
     for (auto&& e : all_functions_) {
       if (e.second.jit) e.second.f = external(e.second.f.name(), compiler_);
     }
-
-    return true;
   }
 
   void OracleFunction::expand() {
