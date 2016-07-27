@@ -194,7 +194,7 @@ namespace casadi {
   }
 
   Options Nlpsol::options_
-  = {{&FunctionInternal::options_},
+  = {{&OracleFunction::options_},
      {{"expand",
        {OT_BOOL,
         "Replace MX with SX expressions in problem formulation [false]"}},
@@ -233,7 +233,7 @@ namespace casadi {
 
   void Nlpsol::init(const Dict& opts) {
     // Call the initialization method of the base class
-    FunctionInternal::init(opts);
+    OracleFunction::init(opts);
 
     // Default options
     bool expand = false;

@@ -199,7 +199,7 @@ namespace casadi {
   }
 
   Options Integrator::options_
-  = {{&FunctionInternal::options_},
+  = {{&OracleFunction::options_},
      {{"expand",
        {OT_BOOL,
         "Replace MX with SX expressions in problem formulation [false]"}},
@@ -263,7 +263,7 @@ namespace casadi {
     ntout_ = output_t0_ ? ngrid_ : ngrid_-1;
 
     // Call the base class method
-    FunctionInternal::init(opts);
+    OracleFunction::init(opts);
 
     // For sparsity pattern propagation
     alloc(oracle_);

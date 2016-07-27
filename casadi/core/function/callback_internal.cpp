@@ -81,13 +81,13 @@ namespace casadi {
     self_->init();
   }
 
-  void CallbackInternal::finalize() {
+  void CallbackInternal::finalize(const Dict& opts) {
     // Finalize this
     casadi_assert_message(self_!=0, "Callback object has been deleted");
     self_->finalize();
 
     // Finalize the base classes
-    FunctionInternal::finalize();
+    FunctionInternal::finalize(opts);
   }
 
   void CallbackInternal::

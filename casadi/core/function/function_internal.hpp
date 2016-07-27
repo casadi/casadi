@@ -90,7 +90,7 @@ namespace casadi {
         This function, which visits the class hierarchy in reverse order is run after
         init() has been completed.
     */
-    virtual void finalize();
+    virtual void finalize(const Dict& opts);
 
     /** \brief Get a public class instance */
     Function self() const { return shared_from_this<Function>();}
@@ -545,9 +545,6 @@ namespace casadi {
     /// Verbose mode?
     bool verbose() const;
 
-    /// Is function fcn being monitored
-    bool monitored(const std::string& mod) const;
-
     ///@{
     /** \brief Number of function inputs and outputs */
     inline int n_in() const { return isp_.size();}
@@ -792,9 +789,6 @@ namespace casadi {
     eval_t eval_;
     simple_t simple_;
 
-    /// Set of module names which are extra monitored
-    std::set<std::string> monitors_;
-
     /** \brief Dict of statistics (resulting from evaluate) */
     Dict stats_;
 
@@ -835,8 +829,6 @@ namespace casadi {
 
     // Weighting factor for derivative calculation and sparsity pattern calculation
     double ad_weight_, ad_weight_sp_;
-
-    bool monitor_inputs_, monitor_outputs_;
 
     /// Errors are thrown when NaN is produced
     bool regularity_check_;

@@ -62,7 +62,7 @@ namespace casadi {
     virtual void init(const Dict& opts);
 
     /** \brief Finalize the object creation */
-    virtual void finalize();
+    virtual void finalize(const Dict& opts);
 
     /** \brief  Evaluate numerically, work vectors given */
     virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;

@@ -622,14 +622,6 @@ namespace casadi {
     return dynamic_cast<const FunctionInternal*>(ptr)!=0;
   }
 
-  void Function::addMonitor(const string& mon) {
-    (*this)->monitors_.insert(mon);
-  }
-
-  void Function::removeMonitor(const string& mon) {
-    (*this)->monitors_.erase(mon);
-  }
-
   Dict Function::stats(int mem) const {
     return (*this)->_get_stats(mem);
   }

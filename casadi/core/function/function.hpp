@@ -953,15 +953,6 @@ namespace casadi {
     void setup(const double** arg, double** res, int* iw, double* w, int mem=0) const;
 #endif // SWIG
 
-    /// \endcond
-
-    /** \brief Add modules to be monitored */
-    void addMonitor(const std::string& mon);
-
-    /** \brief Remove modules to be monitored */
-    void removeMonitor(const std::string& mon);
-
-    /// \cond INTERNAL
     /** \brief Check if the numerical values of the supplied bounds make sense */
     void checkInputs() const;
 #ifndef SWIG

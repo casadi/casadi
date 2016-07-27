@@ -57,6 +57,7 @@ namespace casadi {
     struct RegFun {
       Function f;
       bool jit;
+      bool monitored = false;
     };
 
     // All NLP functions
@@ -67,6 +68,15 @@ namespace casadi {
 
     /** \brief  Destructor */
     virtual ~OracleFunction() = 0;
+
+    ///@{
+    /** \brief Options */
+    static Options options_;
+    virtual const Options& get_options() const { return options_;}
+    ///@}
+
+    /// Finalize initialization
+    virtual void finalize(const Dict& opts);
 
     /** \brief Get oracle */
     virtual const Function& oracle() const { return oracle_;}
@@ -97,6 +107,9 @@ namespace casadi {
 
     // Get a dependency function
     virtual const Function& get_function(const std::string &name) const;
+
+    // Is a function monitored?
+    virtual bool monitored(const std::string &name) const;
 
     // Check if a particular dependency exists
     virtual bool has_function(const std::string& fname) const;

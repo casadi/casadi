@@ -63,8 +63,6 @@ namespace casadi {
 
     eval_ = 0;
     simple_ = 0;
-    monitor_inputs_ = false;
-    monitor_outputs_ = false;
 
     has_refcount_ = false;
 
@@ -99,7 +97,7 @@ namespace casadi {
     init(opts);
 
     // Revisit class hierarchy in reverse order
-    finalize();
+    finalize(opts);
   }
 
   Options FunctionInternal::options_
@@ -136,9 +134,6 @@ namespace casadi {
        {OT_VOIDPTR,
         "A user-defined field that can be used to identify "
         "the function or pass additional information"}},
-      {"monitor",
-       {OT_STRINGVECTOR,
-        "Monitors to be activated"}},
       {"regularity_check",
        {OT_BOOL,
         "Throw exceptions when NaN or Inf appears during evaluation"}},
@@ -180,8 +175,6 @@ namespace casadi {
         jac_penalty_ = op.second;
       } else if (op.first=="user_data") {
         user_data_ = op.second.to_void_pointer();
-      } else if (op.first=="monitor") {
-        for (auto&& m : op.second.to_string_vector()) monitors_.insert(m);
       } else if (op.first=="regularity_check") {
         regularity_check_ = op.second;
       } else if (op.first=="inputs_check") {
@@ -246,8 +239,6 @@ namespace casadi {
       for (int i=0; i<n_out; ++i) oscheme_[i] = get_name_out(i);
     }
 
-    monitor_inputs_ = monitored("inputs");
-    monitor_outputs_ = monitored("outputs");
     alloc_arg(0);
     alloc_res(0);
   }
@@ -260,7 +251,7 @@ namespace casadi {
     return "o" + CodeGenerator::to_string(i);
   }
 
-  void FunctionInternal::finalize() {
+  void FunctionInternal::finalize(const Dict& opts) {
     if (jit_) {
       string jit_name = "jit_tmp";
       if (has_codegen()) {
@@ -488,10 +479,6 @@ namespace casadi {
 
   bool FunctionInternal::verbose() const {
     return verbose_;
-  }
-
-  bool FunctionInternal::monitored(const string& mod) const {
-    return monitors_.count(mod)>0;
   }
 
   std::vector<MX> FunctionInternal::symbolicOutput(const std::vector<MX>& arg) {

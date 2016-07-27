@@ -79,7 +79,7 @@ Function Function::rootfinder_fun() {
   }
 
   Options Rootfinder::options_
-  = {{&FunctionInternal::options_},
+  = {{&OracleFunction::options_},
      {{"linear_solver",
        {OT_STRING,
         "User-defined linear solver class. Needed for sensitivities."}},
@@ -144,8 +144,7 @@ Function Function::rootfinder_fun() {
                           << oracle_.nnz_out(iout_));
 
     // Call the base class initializer
-    FunctionInternal::init(opts);
-
+    OracleFunction::init(opts);
 
     // Generate Jacobian if not provided
     if (jac_.is_null()) jac_ = oracle_.jacobian(iin_, iout_);

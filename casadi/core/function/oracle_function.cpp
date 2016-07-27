@@ -40,6 +40,40 @@ namespace casadi {
   OracleFunction::~OracleFunction() {
   }
 
+  Options OracleFunction::options_
+  = {{&FunctionInternal::options_},
+     {{"monitor",
+       {OT_STRINGVECTOR,
+        "Set of user problem functions to be monitored"}}
+    }
+  };
+
+  void OracleFunction::finalize(const Dict& opts) {
+    // Default options
+    vector<string> monitor;
+
+    // Read options
+    for (auto&& op : opts) {
+      if (op.first=="monitor") {
+        monitor = op.second;
+      }
+    }
+
+    // Set corresponding monitors
+    for (const string& fname : monitor) {
+      auto it = all_functions_.find(fname);
+      if (it==all_functions_.end()) {
+        casadi_warning("Ignoring monitor " + fname);
+      } else {
+        casadi_assert_warning(!it->second.monitored, "Duplicate monitor " + fname);
+        it->second.monitored = true;
+      }
+    }
+
+    // Recursive call
+    FunctionInternal::finalize(opts);
+  }
+
   Function OracleFunction::create_function(const std::string& fname,
                                    const std::vector<std::string>& s_in,
                                    const std::vector<std::string>& s_out,
@@ -53,8 +87,10 @@ namespace casadi {
 
   void OracleFunction::
   set_function(const Function& fcn, const std::string& fname, bool jit) {
-    auto res = all_functions_.insert(make_pair(fname, RegFun{fcn, jit}));
-    casadi_assert_message(res.second, "Duplicate function " + fname);
+    casadi_assert_message(!has_function(fname), "Duplicate function " + fname);
+    RegFun& r = all_functions_[fname];
+    r.f = fcn;
+    r.jit = jit;
     alloc(fcn);
   }
 
@@ -68,19 +104,42 @@ namespace casadi {
     // Get function
     const Function& f = get_function(fcn);
 
+    // Is the function monitored?
+    bool monitored = this->monitored(fcn);
+
     // Get statistics structure
     FStats& fstats = m->fstats.at(fcn);
 
-    // Prepare stats, start timer
-    fstats.tic();
-
     // Number of inputs and outputs
     int n_in = f.n_in(), n_out = f.n_out();
+
+    // Prepare stats, start timer
+    fstats.tic();
 
     // Input buffers
     if (arg) {
       fill_n(m->arg, n_in, nullptr);
       for (int i=0; i<n_in; ++i) m->arg[i] = *arg++;
+    }
+
+    // Print inputs nonzeros
+    if (monitored) {
+      userOut() << fcn << " input nonzeros: " << endl;
+      for (int i=0; i<n_in; ++i) {
+        userOut() << " " << i << " (" << f.name_in(i) << "): ";
+        if (m->arg[i]) {
+          // Print nonzeros
+          userOut() << "[";
+          for (int k=0; k<f.nnz_in(i); ++k) {
+            if (k!=0) userOut() << ", ";
+            userOut() << m->arg[i][k];
+          }
+          userOut() << "]" << endl;
+        } else {
+          // All zero input
+          userOut() << "0" << endl;
+        }
+      }
     }
 
     // Evaluate memory-less
@@ -91,6 +150,26 @@ namespace casadi {
       userOut<true, PL_WARN>()
         << name() << ":" << fcn << " failed:" << ex.what() << endl;
       return 1;
+    }
+
+    // Print output nonzeros
+    if (monitored) {
+      userOut() << fcn << " output nonzeros: " << endl;
+      for (int i=0; i<n_out; ++i) {
+        userOut() << " " << i << " (" << f.name_out(i) << "): ";
+        if (m->res[i]) {
+          // Print nonzeros
+          userOut() << "[";
+          for (int k=0; k<f.nnz_out(i); ++k) {
+            if (k!=0) userOut() << ", ";
+            userOut() << m->res[i][k];
+          }
+          userOut() << "]" << endl;
+        } else {
+          // Ignored output
+          userOut() << " N/A" << endl;
+        }
+      }
     }
 
     // Make sure not NaN or Inf
@@ -305,7 +384,9 @@ namespace casadi {
   std::vector<std::string> OracleFunction::get_function() const {
     std::vector<std::string> ret;
     ret.reserve(all_functions_.size());
-    for (auto&& e : all_functions_) ret.push_back(e.first);
+    for (auto&& e : all_functions_) {
+      ret.push_back(e.first);
+    }
     return ret;
   }
 
@@ -314,6 +395,13 @@ namespace casadi {
     casadi_assert_message(it!=all_functions_.end(),
       "No function \"" + name + "\" in " + this->name());
     return it->second.f;
+  }
+
+  bool OracleFunction::monitored(const std::string &name) const {
+    auto it = all_functions_.find(name);
+    casadi_assert_message(it!=all_functions_.end(),
+      "No function \"" + name + "\" in " + this->name());
+    return it->second.monitored;
   }
 
   bool OracleFunction::has_function(const std::string& fname) const {
