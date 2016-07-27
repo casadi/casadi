@@ -6,6 +6,10 @@ cmake_minimum_required(VERSION 2.8.6)
 
 project(qpOASES CXX)
 
+if(WITH_NO_QPOASES_BANNER)
+  add_definitions(-D__NO_COPYRIGHT__)
+endif()
+
 # Uncomment to bypass user-defined linear solver (requires HSL)
 #add_definitions(-DSOLVER_MA27)
 
