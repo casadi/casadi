@@ -35,7 +35,7 @@
 using namespace casadi;
 using namespace std;
 
-int main(){
+int main(int argc, char *argv[]) {
   // End time
   double tf = 10.0;
 
@@ -68,7 +68,7 @@ int main(){
 
   // Nonlinear solver to use
   string solver = "newton";
-  //string solver = "ipopt";
+  if (argc>1) solver = argv[1]; // chose a different solver from command line
 
   // Coefficients of the collocation equation
   vector<vector<double> > C(d+1,vector<double>(d+1,0));
@@ -134,11 +134,11 @@ int main(){
   Dict opts;
   if (solver=="ipopt") {
     // Use an NLP solver
-    Dict nlpsol_options = {{"print_time", false}, {"print_level", 0}};
-    opts = Dict{{"nlpsol", "ipopt"}, {"nlpsol_options", nlpsol_options}};
+    opts["nlpsol"] = "ipopt";
+    opts["nlpsol_options"] = Dict{{"print_time", false}, {"ipopt.print_level", 0}};
     solver = "nlpsol";
-  } else {
-    opts = Dict{{"linear_solver", "csparse"}};
+  } else if (solver=="kinsol") {
+    opts["linear_solver_type"] = "user_defined";
   }
   Function ifcn = rootfinder("ifcn", solver, vfcn_sx, opts);
 
