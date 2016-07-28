@@ -381,6 +381,15 @@ namespace casadi {
     }
   }
 
+  void OracleFunction::set_temp(void* mem, const double** arg, double** res,
+                            int* iw, double* w) const {
+    auto m = static_cast<OracleMemory*>(mem);
+    m->arg = arg;
+    m->res = res;
+    m->iw = iw;
+    m->w = w;
+  }
+
   std::vector<std::string> OracleFunction::get_function() const {
     std::vector<std::string> ret;
     ret.reserve(all_functions_.size());

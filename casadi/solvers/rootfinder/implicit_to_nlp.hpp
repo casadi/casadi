@@ -41,6 +41,13 @@ namespace casadi {
     : public RootfinderMemory {
     /// Stats
     Dict solver_stats;
+
+    // Bounds
+    double *lbx, *ubx;
+    // Parameters
+    double *p;
+    // solution
+    double *x;
   };
 
   /** \brief  \pluginbrief{Rootfinder,nlp}
@@ -82,9 +89,12 @@ namespace casadi {
     /** \brief Free memory block */
     virtual void free_memory(void *mem) const { delete static_cast<ImplicitToNlpMemory*>(mem);}
 
+    /** \brief Set the (persistent) work vectors */
+    virtual void set_work(void* mem, const double**& arg, double**& res,
+                          int*& iw, double*& w) const;
+
     /// Solve the system of equations and calculate derivatives
-    virtual void eval(void* mem, const double** arg, double** res,
-                      int* iw, double* w) const;
+    virtual void solve(void* mem) const;
 
     /// A documentation string
     static const std::string meta_doc;

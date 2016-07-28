@@ -35,6 +35,11 @@ namespace casadi {
 
   /** \brief Integrator memory */
   struct CASADI_EXPORT RootfinderMemory : public OracleMemory {
+    // Inputs
+    const double** iarg;
+
+    // Outputs
+    double** ires;
   };
 
   /// Internal class
@@ -78,6 +83,16 @@ namespace casadi {
 
     /** \brief Initalize memory block */
     virtual void init_memory(void* mem) const;
+
+    /** \brief Set the (persistent) work vectors */
+    virtual void set_work(void* mem, const double**& arg, double**& res,
+                          int*& iw, double*& w) const;
+
+    // Evaluate numerically
+    virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
+
+    // Solve the NLP
+    virtual void solve(void* mem) const = 0;
 
     /** \brief  Propagate sparsity forward */
     virtual void sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);

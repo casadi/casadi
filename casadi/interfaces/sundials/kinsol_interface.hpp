@@ -68,6 +68,9 @@ namespace casadi {
     /// Variable
     N_Vector u;
 
+    // Current Jacobian
+    double* jac;
+
     /// For timings
     clock_t time1, time2;
 
@@ -107,7 +110,7 @@ namespace casadi {
     virtual void init(const Dict& opts);
 
     /// Solve the system of equations and calculate derivatives
-    virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
+    virtual void solve(void* mem) const;
 
     // Get name of the plugin
     virtual const char* plugin_name() const { return "kinsol";}
@@ -167,6 +170,10 @@ namespace casadi {
 
     /** \brief Initalize memory block */
     virtual void init_memory(void* mem) const;
+
+    /** \brief Set the (persistent) work vectors */
+    virtual void set_work(void* mem, const double**& arg, double**& res,
+                          int*& iw, double*& w) const;
 
     /** \brief Cast to memory object */
     static KinsolMemory* to_mem(void *mem) {

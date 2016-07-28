@@ -120,8 +120,18 @@ namespace casadi {
     /** \brief JIT for dependencies */
     virtual void jit_dependencies(const std::string& fname);
 
+    /** \brief Create memory block */
+    virtual void* alloc_memory() const { return new OracleMemory();}
+
+    /** \brief Free memory block */
+    virtual void free_memory(void *mem) const { delete static_cast<OracleMemory*>(mem);}
+
     /** \brief Initalize memory block */
     virtual void init_memory(void* mem) const;
+
+    /** \brief Set the work vectors */
+    virtual void set_temp(void* mem, const double** arg, double** res,
+                          int* iw, double* w) const;
 
     /// Print statistics
     void print_fstats(const OracleMemory* m) const;

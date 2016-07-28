@@ -914,15 +914,6 @@ namespace casadi {
     return Function(name, ret_in, ret_out, opts);
   }
 
-  void Integrator::set_temp(void* mem, const double** arg, double** res,
-                            int* iw, double* w) const {
-    auto m = static_cast<IntegratorMemory*>(mem);
-    m->arg = arg;
-    m->res = res;
-    m->iw = iw;
-    m->w = w;
-  }
-
   Dict Integrator::getDerivativeOptions(bool fwd) {
     // Copy all options
     return opts_;

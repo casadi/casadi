@@ -36,11 +36,11 @@ namespace casadi {
 
   /** \brief Integrator memory */
   struct CASADI_EXPORT NlpsolMemory : public OracleMemory {
-    // Outputs
-    double *x, *f, *g, *lam_x, *lam_g, *lam_p;
-
     // Inputs
     const double *x0, *p, *lbx, *ubx, *lbg, *ubg, *lam_x0, *lam_g0;
+
+    // Outputs
+    double *x, *f, *g, *lam_x, *lam_g, *lam_p;
 
     // number of iterations
     int n_iter;
@@ -142,10 +142,6 @@ namespace casadi {
     /** \brief Set the (persistent) work vectors */
     virtual void set_work(void* mem, const double**& arg, double**& res,
                           int*& iw, double*& w) const;
-
-    /** \brief Set the (temporary) work vectors */
-    virtual void set_temp(void* mem, const double** arg, double** res,
-                          int* iw, double* w) const;
 
     // Evaluate numerically
     virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;

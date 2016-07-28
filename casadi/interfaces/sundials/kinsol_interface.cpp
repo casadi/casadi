@@ -258,6 +258,13 @@ namespace casadi {
     }
   }
 
+  void KinsolInterface::set_work(void* mem, const double**& arg, double**& res,
+                        int*& iw, double*& w) const {
+      Rootfinder::set_work(mem, arg, res, iw, w);
+      auto m = static_cast<KinsolMemory*>(mem);
+      m->jac = w; w += jac_.nnz_out(0);
+   }
+
   void KinsolInterface::get_jtimes() {
     vector<string> jtimes_in = oracle_.name_in();
     jtimes_in.push_back("fwd:" + oracle_.name_in(iin_));
@@ -266,26 +273,15 @@ namespace casadi {
     alloc(jtimes_);
   }
 
-  void KinsolInterface::eval(void* mem, const double** arg, double** res,
-                             int* iw, double* w) const {
+  void KinsolInterface::solve(void* mem) const {
     auto m = static_cast<KinsolMemory*>(mem);
-
-    // Update IO references
-    m->arg = arg;
-    m->res = res;
-    m->iw = iw;
-    m->w = w;
 
     // Reset the counters
     m->t_func = 0;
     m->t_jac = 0;
 
     // Get the initial guess
-    if (arg[iin_]) {
-      copy(arg[iin_], arg[iin_]+nnz_in(iin_), NV_DATA_S(m->u));
-    } else {
-      N_VConst(0.0, m->u);
-    }
+    casadi_copy(m->iarg[iin_], nnz_in(iin_), NV_DATA_S(m->u));
 
     // Solve the nonlinear system of equations
     int flag = KINSol(m->mem, m->u, strategy_, u_scale_, f_scale_);
@@ -297,22 +293,16 @@ namespace casadi {
     }
 
     // Get the solution
-    if (res[iout_]) {
-      copy_n(NV_DATA_S(m->u), nnz_out(iout_), res[iout_]);
-    }
+    casadi_copy(NV_DATA_S(m->u), nnz_out(iout_), m->ires[iout_]);
 
     // Evaluate auxiliary outputs
     if (n_out()>0) {
-      // Temporary memory
-      const double** arg1 = arg + n_in();
-      double** res1 = res + n_out();
-
       // Evaluate f_
-      copy_n(arg, n_in(), arg1);
-      arg1[iin_] = NV_DATA_S(m->u);
-      copy_n(res, n_out(), res1);
-      res1[iout_] = 0;
-      oracle_(arg1, res1, iw, w, 0);
+      copy_n(m->iarg, n_in(), m->arg);
+      m->arg[iin_] = NV_DATA_S(m->u);
+      copy_n(m->ires, n_out(), m->res);
+      m->res[iout_] = 0;
+      oracle_(m->arg, m->res, m->iw, m->w, 0);
     }
   }
 
@@ -320,19 +310,15 @@ namespace casadi {
     // Get time
     m.time1 = clock();
 
-    // Temporary memory
-    const double** arg1 = m.arg + n_in();
-    double** res1 = m.res + n_out();
-
     // Evaluate f_
-    copy(m.arg, m.arg + n_in(), arg1);
-    arg1[iin_] = NV_DATA_S(u);
-    fill_n(res1, n_out(), static_cast<double*>(0));
-    res1[iout_] = NV_DATA_S(fval);
-    oracle_(arg1, res1, m.iw, m.w, 0);
+    copy_n(m.iarg, n_in(), m.arg);
+    m.arg[iin_] = NV_DATA_S(u);
+    fill_n(m.res, n_out(), nullptr);
+    m.res[iout_] = NV_DATA_S(fval);
+    oracle_(m.arg, m.res, m.iw, m.w, 0);
 
     // Make sure that all entries of the linear system are valid
-    double *fdata = res1[iout_];
+    double *fdata = NV_DATA_S(fval);
     for (int k=0; k<n_; ++k) {
       try {
         casadi_assert_message(!isnan(fdata[k]), "Nonzero " << k << " is not-a-number");
@@ -384,17 +370,12 @@ namespace casadi {
     // Get time
     m.time1 = clock();
 
-    // Temporary memory
-    const double** arg1 = m.arg + n_in();
-    double** res1 = m.res + n_out();
-    double* jac = m.w + jac_.sz_w();
-
     // Evaluate jac_
-    copy(m.arg, m.arg + n_in(), arg1);
-    arg1[iin_] = NV_DATA_S(u);
-    fill_n(res1, jac_.n_out(), static_cast<double*>(0));
-    res1[0] = jac;
-    jac_(arg1, res1, m.iw, m.w, 0);
+    copy_n(m.iarg, n_in(), m.arg);
+    m.arg[iin_] = NV_DATA_S(u);
+    fill_n(m.res, jac_.n_out(), nullptr);
+    m.res[0] = m.jac;
+    jac_(m.arg, m.res, m.iw, m.w, 0);
 
     // Get sparsity and non-zero elements
     const int* colind = jac_.sparsity_out(0).colind();
@@ -409,7 +390,7 @@ namespace casadi {
         int rr = row[el];
 
         // Set the element
-        DENSE_ELEM(J, rr, cc) = jac[el];
+        DENSE_ELEM(J, rr, cc) = m.jac[el];
       }
     }
 
@@ -437,17 +418,12 @@ namespace casadi {
     // Get time
     m.time1 = clock();
 
-    // Temporary memory
-    const double** arg1 = m.arg + n_in();
-    double** res1 = m.res + n_out();
-    double* jac = m.w + jac_.sz_w();
-
     // Evaluate jac_
-    copy(m.arg, m.arg + jac_.n_in(), arg1);
-    arg1[iin_] = NV_DATA_S(u);
-    fill_n(res1, jac_.n_out(), static_cast<double*>(0));
-    res1[0] = jac;
-    jac_(arg1, res1, m.iw, m.w, 0);
+    copy_n(m.iarg, n_in(), m.arg);
+    m.arg[iin_] = NV_DATA_S(u);
+    fill_n(m.res, jac_.n_out(), nullptr);
+    m.res[0] = m.jac;
+    jac_(m.arg, m.res, m.iw, m.w, 0);
 
     // Get sparsity and non-zero elements
     const int* colind = jac_.sparsity_out(0).colind();
@@ -463,7 +439,7 @@ namespace casadi {
 
         // Set the element
         if (rr-cc>=-mupper && rr-cc<=mlower) {
-          BAND_ELEM(J, rr, cc) = jac[el];
+          BAND_ELEM(J, rr, cc) = m.jac[el];
         }
       }
     }
@@ -491,16 +467,12 @@ namespace casadi {
     // Get time
     m.time1 = clock();
 
-    // Temporary memory
-    const double** arg1 = m.arg + n_in();
-    double** res1 = m.res + n_out();
-
     // Evaluate f_fwd_
-    copy(m.arg, m.arg + n_in(), arg1);
-    arg1[iin_] = NV_DATA_S(u);
-    arg1[n_in()] = NV_DATA_S(v);
-    res1[0] = NV_DATA_S(Jv);
-    jtimes_(arg1, res1, m.iw, m.w, 0);
+    copy_n(m.iarg, n_in(), m.arg);
+    m.arg[iin_] = NV_DATA_S(u);
+    m.arg[n_in()] = NV_DATA_S(v);
+    m.res[0] = NV_DATA_S(Jv);
+    jtimes_(m.arg, m.res, m.iw, m.w, 0);
 
     // Log time duration
     m.time2 = clock();
@@ -527,25 +499,19 @@ namespace casadi {
     // Get time
     m.time1 = clock();
 
-    // Temporary memory
-    const double** arg1 = m.arg + n_in();
-    double** res1 = m.res + n_out();
-    double* jac = m.w;
-    double* w1 = m.w + jac_.nnz_out(0);
-
     // Evaluate jac_
-    copy(m.arg, m.arg + jac_.n_in(), arg1);
-    arg1[iin_] = NV_DATA_S(u);
-    fill_n(res1, jac_.n_out(), static_cast<double*>(0));
-    res1[0] = jac;
-    jac_(arg1, res1, m.iw, w1, 0);
+    copy_n(m.iarg, n_in(), m.arg);
+    m.arg[iin_] = NV_DATA_S(u);
+    fill_n(m.res, jac_.n_out(), nullptr);
+    m.res[0] = m.jac;
+    jac_(m.arg, m.res, m.iw, m.w, 0);
 
     // Log time duration
     m.time2 = clock();
     m.t_lsetup_jac += static_cast<double>(m.time2 - m.time1)/CLOCKS_PER_SEC;
 
     // Factorize the linear system
-    linsol_.factorize(jac);
+    linsol_.factorize(m.jac);
 
     // Log time duration
     m.time1 = clock();

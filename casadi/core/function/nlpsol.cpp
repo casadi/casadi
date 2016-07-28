@@ -402,13 +402,4 @@ namespace casadi {
     res += NLPSOL_NUM_OUT;
   }
 
-  void Nlpsol::set_temp(void* mem, const double** arg, double** res,
-                        int* iw, double* w) const {
-    auto m = static_cast<NlpsolMemory*>(mem);
-    m->arg = arg;
-    m->res = res;
-    m->iw = iw;
-    m->w = w;
-  }
-
 } // namespace casadi

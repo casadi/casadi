@@ -123,66 +123,65 @@ namespace casadi {
     alloc_w(n_, true);
   }
 
-  void ImplicitToNlp::eval(void* mem, const double** arg, double** res,
-                           int* iw, double* w) const {
+  void ImplicitToNlp::set_work(void* mem, const double**& arg, double**& res,
+                        int*& iw, double*& w) const {
+      Rootfinder::set_work(mem, arg, res, iw, w);
+      auto m = static_cast<ImplicitToNlpMemory*>(mem);
+      m->lbx = w; w += n_;
+      m->ubx = w; w += n_;
+      m->p = w; w += oracle_.nnz_in() - nnz_in(iin_);
+      m->x = w; w += n_;
+   }
+
+  void ImplicitToNlp::solve(void* mem) const {
     auto m = static_cast<ImplicitToNlpMemory*>(mem);
 
     // Buffers for calling the NLP solver
-    const double** arg1 = arg + n_in();
-    double** res1 = res + n_out();
-    fill(arg1, arg1+NLPSOL_NUM_IN, nullptr);
-    fill(res1, res1+NLPSOL_NUM_OUT, nullptr);
+    fill_n(m->arg, static_cast<int>(NLPSOL_NUM_IN), nullptr);
+    fill_n(m->res, static_cast<int>(NLPSOL_NUM_OUT), nullptr);
 
     // Initial guess
-    arg1[NLPSOL_X] = arg[iin_];
+    m->arg[NLPSOL_X] = m->iarg[iin_];
 
     // Nonlinear bounds
-    arg1[NLPSOL_LBG] = 0;
-    arg1[NLPSOL_UBG] = 0;
+    m->arg[NLPSOL_LBG] = 0;
+    m->arg[NLPSOL_UBG] = 0;
 
     // Variable bounds
-    double* lbx = w; w += n_;
-    fill_n(lbx, n_, -std::numeric_limits<double>::infinity());
-    arg1[NLPSOL_LBX] = lbx;
-    double* ubx = w; w += n_;
-    fill_n(ubx, n_,  std::numeric_limits<double>::infinity());
-    arg1[NLPSOL_UBX] = ubx;
+    fill_n(m->lbx, n_, -std::numeric_limits<double>::infinity());
+    m->arg[NLPSOL_LBX] = m->lbx;
+    fill_n(m->ubx, n_,  std::numeric_limits<double>::infinity());
+    m->arg[NLPSOL_UBX] = m->ubx;
     for (int k=0; k<u_c_.size(); ++k) {
-      if (u_c_[k] > 0) lbx[k] = 0;
-      if (u_c_[k] < 0) ubx[k] = 0;
+      if (u_c_[k] > 0) m->lbx[k] = 0;
+      if (u_c_[k] < 0) m->ubx[k] = 0;
     }
 
     // NLP parameters
-    arg1[NLPSOL_P] = w;
+    m->arg[NLPSOL_P] = m->p;
+    double* pi = m->p;
     for (int i=0; i<n_in(); ++i) {
       if (i!=iin_) {
         int n = oracle_.nnz_in(i);
-        if (arg[i]) {
-          copy_n(arg[i], n, w);
-        } else {
-          fill_n(w, n, 0.);
-        }
-        w += n;
+        casadi_copy(m->iarg[i], n, pi);
+        pi += n;
       }
     }
 
     // Primal solution
-    double* x = w; w += n_;
-    res1[NLPSOL_X] = x;
+    m->res[NLPSOL_X] = m->x;
 
     // Solve the NLP
-    solver_(arg1, res1, iw, w, 0);
+    solver_(m->arg, m->res, m->iw, m->w, 0);
     m->solver_stats = solver_.stats();
 
     // Get the implicit variable
-    if (res[iout_]) {
-      copy_n(x, n_, res[iout_]);
-    }
+    casadi_copy(m->x, n_, m->ires[iout_]);
 
     // Check if any auxilary outputs to evaluate
     bool has_aux = false;
     for (int i=0; i<n_out(); ++i) {
-      if (i!=iout_ && res[i]) {
+      if (i!=iout_ && m->ires[i]) {
         has_aux = true;
         break;
       }
@@ -190,11 +189,11 @@ namespace casadi {
 
     // Evaluate auxilary outputs, if necessary
     if (has_aux) {
-      copy_n(arg, n_in(), arg1);
-      arg1[iin_] = x;
-      copy_n(res, n_out(), res1);
-      res1[iout_] = 0;
-      oracle_(arg1, res1, iw, w, 0);
+      copy_n(m->iarg, n_in(), m->arg);
+      m->arg[iin_] = m->x;
+      copy_n(m->ires, n_out(), m->res);
+      m->res[iout_] = 0;
+      oracle_(m->arg, m->res, m->iw, m->w, 0);
     }
   }
 

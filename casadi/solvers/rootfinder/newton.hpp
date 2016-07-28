@@ -41,7 +41,15 @@ namespace casadi {
   // Memory
   struct CASADI_ROOTFINDER_NEWTON_EXPORT NewtonMemory
     : public RootfinderMemory {
+    // Current guess
+    double* x;
+    // Current residual
+    double* f;
+    // Current Jacobian
+    double* jac;
+    // Return status
     const char* return_status;
+    // Number of iterations
     int iter;
   };
 
@@ -87,9 +95,12 @@ namespace casadi {
     /** \brief Free memory block */
     virtual void free_memory(void *mem) const { delete static_cast<NewtonMemory*>(mem);}
 
+    /** \brief Set the (persistent) work vectors */
+    virtual void set_work(void* mem, const double**& arg, double**& res,
+                          int*& iw, double*& w) const;
+
     /// Solve the system of equations and calculate derivatives
-    virtual void eval(void* mem, const double** arg, double** res,
-                      int* iw, double* w) const;
+    virtual void solve(void* mem) const;
 
     /// A documentation string
     static const std::string meta_doc;

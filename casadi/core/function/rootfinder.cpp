@@ -175,8 +175,30 @@ Function Function::rootfinder_fun() {
   }
 
   void Rootfinder::init_memory(void* mem) const {
+    OracleFunction::init_memory(mem);
     auto m = static_cast<RootfinderMemory*>(mem);
     linsol_.reset(sp_jac_);
+  }
+
+  void Rootfinder::eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
+    // Reset the solver, prepare for solution
+    setup(mem, arg, res, iw, w);
+
+    // Solve the NLP
+    solve(mem);
+  }
+
+  void Rootfinder::set_work(void* mem, const double**& arg, double**& res,
+                        int*& iw, double*& w) const {
+    auto m = static_cast<RootfinderMemory*>(mem);
+
+    // Get input pointers
+    m->iarg = arg;
+    arg += n_in();
+
+    // Get output pointers
+    m->ires = res;
+    res += n_out();
   }
 
   Function Rootfinder

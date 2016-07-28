@@ -104,32 +104,27 @@ namespace casadi {
     alloc_w(jac_.nnz_out(0), true); // J
   }
 
-  void Newton::eval(void* mem, const double** arg, double** res,
-                    int* iw, double* w) const {
+ void Newton::set_work(void* mem, const double**& arg, double**& res,
+                       int*& iw, double*& w) const {
+     Rootfinder::set_work(mem, arg, res, iw, w);
+     auto m = static_cast<NewtonMemory*>(mem);
+     m->x = w; w += n_;
+     m->f = w; w += jac_.nnz_out(1+iout_);
+     m->jac = w; w += jac_.nnz_out(0);
+  }
+
+  void Newton::solve(void* mem) const {
     auto m = static_cast<NewtonMemory*>(mem);
 
-    // IO buffers
-    const double** arg1 = arg + n_in();
-    double** res1 = res + n_out();
-
-    // Work vectors
-    double* x = w; w += n_;
-    double* f = w; w += jac_.nnz_out(1+iout_);
-    double* jac = w; w += jac_.nnz_out(0);
-
     // Get the initial guess
-    if (arg[iin_]) {
-      copy_n(arg[iin_], n_, x);
-    } else {
-      fill_n(x, n_, 0);
-    }
+    casadi_copy(m->iarg[iin_], n_, m->x);
 
     // Perform the Newton iterations
-    int iter=0;
+    m->iter=0;
     bool success = true;
     while (true) {
       // Break if maximum number of iterations already reached
-      if (iter >= max_iter_) {
+      if (m->iter >= max_iter_) {
         log("eval", "Max. iterations reached.");
         m->return_status = "max_iteration_reached";
         success = false;
@@ -137,21 +132,21 @@ namespace casadi {
       }
 
       // Start a new iteration
-      iter++;
+      m->iter++;
 
       // Use x to evaluate J
-      copy_n(arg, n_in(), arg1);
-      arg1[iin_] = x;
-      res1[0] = jac;
-      copy_n(res, n_out(), res1+1);
-      res1[1+iout_] = f;
-      jac_(arg1, res1, iw, w, 0);
+      copy_n(m->iarg, n_in(), m->arg);
+      m->arg[iin_] = m->x;
+      m->res[0] = m->jac;
+      copy_n(m->ires, n_out(), m->res+1);
+      m->res[1+iout_] = m->f;
+      jac_(m->arg, m->res, m->iw, m->w, 0);
 
       // Check convergence
       double abstol = 0;
       if (abstol_ != numeric_limits<double>::infinity()) {
         for (int i=0; i<n_; ++i) {
-          abstol = max(abstol, fabs(f[i]));
+          abstol = max(abstol, fabs(m->f[i]));
         }
         if (abstol <= abstol_) {
           casadi_msg("Converged to acceptable tolerance - abstol: " << abstol_);
@@ -160,14 +155,14 @@ namespace casadi {
       }
 
       // Factorize the linear solver with J
-      linsol_.factorize(jac);
-      linsol_.solve(f, 1, false);
+      linsol_.factorize(m->jac);
+      linsol_.solve(m->f, 1, false);
 
       // Check convergence again
       double abstolStep=0;
       if (numeric_limits<double>::infinity() != abstolStep_) {
         for (int i=0; i<n_; ++i) {
-          abstolStep = max(abstolStep, fabs(f[i]));
+          abstolStep = max(abstolStep, fabs(m->f[i]));
         }
         if (abstolStep <= abstolStep_) {
           casadi_msg("Converged to acceptable tolerance - abstolStep: " << abstolStep_);
@@ -177,28 +172,25 @@ namespace casadi {
 
       if (print_iteration_) {
         // Only print iteration header once in a while
-        if (iter % 10==0) {
+        if (m->iter % 10==0) {
           printIteration(userOut());
         }
 
         // Print iteration information
-        printIteration(userOut(), iter, abstol, abstolStep);
+        printIteration(userOut(), m->iter, abstol, abstolStep);
       }
 
       // Update Xk+1 = Xk - J^(-1) F
-      casadi_axpy(n_, -1., f, x);
+      casadi_axpy(n_, -1., m->f, m->x);
     }
 
     // Get the solution
-    if (res[iout_]) {
-      copy_n(x, n_, res[iout_]);
-    }
+    casadi_copy(m->x, n_, m->ires[iout_]);
 
     // Store the iteration count
-    m->iter = iter;
     if (success) m->return_status = "success";
 
-    casadi_msg("Newton::solveNonLinear():end after " << iter << " steps");
+    casadi_msg("Newton::solveNonLinear():end after " << m->iter << " steps");
   }
 
   void Newton::printIteration(std::ostream &stream) const {
