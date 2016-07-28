@@ -52,13 +52,6 @@ Function Function::rootfinder_fun() {
     return n->oracle();
   }
 
-  Function Function::rootfinder_jac() {
-    casadi_assert(!is_null());
-    Rootfinder* n = dynamic_cast<Rootfinder*>(get());
-    casadi_assert_message(n!=0, "Not a rootfinder");
-    return n->jac_;
-  }
-
   Function rootfinder(const std::string& name, const std::string& solver,
                    const Function& f, const Dict& opts) {
     Function ret;
@@ -107,6 +100,7 @@ Function Function::rootfinder_fun() {
     // Default (temporary) options
     Dict linear_solver_options;
     string linear_solver = "csparse";
+    Function jac; // Jacobian of f with respect to z
 
     // Read options
     for (auto&& op : opts) {
@@ -115,7 +109,7 @@ Function Function::rootfinder_fun() {
       } else if (op.first=="implicit_output") {
         iout_ = op.second;
       } else if (op.first=="jacobian_function") {
-        jac_ = op.second;
+        jac = op.second;
       } else if (op.first=="linear_solver_options") {
         linear_solver_options = op.second;
       } else if (op.first=="linear_solver") {
@@ -147,14 +141,14 @@ Function Function::rootfinder_fun() {
     OracleFunction::init(opts);
 
     // Generate Jacobian if not provided
-    if (jac_.is_null()) jac_ = oracle_.jacobian(iin_, iout_);
-    sp_jac_ = jac_.sparsity_out(0);
+    if (jac.is_null()) jac = oracle_.jacobian(iin_, iout_);
+    set_function(jac, "jac_f_z");
+    sp_jac_ = jac.sparsity_out(0);
 
     // Check for structural singularity in the Jacobian
-    casadi_assert_message(
-      !jac_.sparsity_out(0).is_singular(),
+    casadi_assert_message(!sp_jac_.is_singular(),
       "Rootfinder::init: singularity - the jacobian is structurally rank-deficient. "
-      "sprank(J)=" << sprank(jac_.sparsity_out(0)) << " (instead of "<< jac_.size1_out(0) << ")");
+      "sprank(J)=" << sprank(sp_jac_) << " (instead of "<< sp_jac_.size1() << ")");
 
     // Get the linear solver creator function
     linsol_ = Linsol("linsol", linear_solver, linear_solver_options);
@@ -167,9 +161,8 @@ Function Function::rootfinder_fun() {
     // Allocate sufficiently large work vectors
     alloc(oracle_);
     size_t sz_w = oracle_.sz_w();
-    if (!jac_.is_null()) {
-      alloc(jac_);
-      sz_w = max(sz_w, jac_.sz_w());
+    if (!jac.is_null()) {
+      sz_w = max(sz_w, jac.sz_w());
     }
     alloc_w(sz_w + 2*static_cast<size_t>(n_));
   }
@@ -330,7 +323,8 @@ Function Function::rootfinder_fun() {
     oracle_.forward(f_arg, f_res, f_fseed, fsens, always_inline, never_inline);
 
     // Get expression of Jacobian
-    MX J = jac_(f_arg).front();
+    Function jac = get_function("jac_f_z");
+    MX J = jac(f_arg).front();
 
     // Solve for all the forward derivatives at once
     vector<MX> rhs(nfwd);
@@ -363,7 +357,8 @@ Function Function::rootfinder_fun() {
     // Get expression of Jacobian
     vector<MX> f_arg(arg);
     f_arg[iin_] = res.at(iout_);
-    MX J = jac_(f_arg).front();
+    Function jac = get_function("jac_f_z");
+    MX J = jac(f_arg).front();
 
     // Get adjoint seeds for calling f
     int num_out = n_out();

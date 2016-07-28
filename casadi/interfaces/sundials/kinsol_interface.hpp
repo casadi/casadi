@@ -70,16 +70,6 @@ namespace casadi {
 
     // Current Jacobian
     double* jac;
-
-    /// For timings
-    clock_t time1, time2;
-
-    /// Accumulated time since last reset:
-    double t_func; // time spent in the residual function
-    double t_jac; // time spent in the Jacobian function
-    double t_lsolve; // preconditioner/linear solver solve function
-    double t_lsetup_jac; // preconditioner/linear solver setup function, generate Jacobian
-    double t_lsetup_fac; // preconditioner setup function, factorize Jacobian
   };
 
   /** \brief \pluginbrief{Rootfinder,kinsol}

@@ -133,9 +133,6 @@ namespace casadi {
     /// Number of equations
     int n_;
 
-    /// Jacobian of f with respect to z
-    Function jac_;
-
     /// Linear solver
     Linsol linsol_;
     Sparsity sp_jac_;

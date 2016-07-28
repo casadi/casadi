@@ -1025,9 +1025,6 @@ namespace casadi {
     /// Access rhs function for a rootfinder
     Function rootfinder_fun();
 
-    /// Access Jacobian of the ths function for a rootfinder
-    Function rootfinder_jac();
-
 #ifdef WITH_DEPRECATED_FEATURES
     /** \brief [DEPRECATED] Get the DAE for an integrator
       To generate a function with the legacy syntax:

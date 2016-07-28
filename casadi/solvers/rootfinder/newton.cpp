@@ -100,8 +100,8 @@ namespace casadi {
 
     // Allocate memory
     alloc_w(n_, true); // x
-    alloc_w(jac_.nnz_out(1+iout_), true); // F
-    alloc_w(jac_.nnz_out(0), true); // J
+    alloc_w(n_, true); // F
+    alloc_w(sp_jac_.nnz(), true); // J
   }
 
  void Newton::set_work(void* mem, const double**& arg, double**& res,
@@ -109,8 +109,8 @@ namespace casadi {
      Rootfinder::set_work(mem, arg, res, iw, w);
      auto m = static_cast<NewtonMemory*>(mem);
      m->x = w; w += n_;
-     m->f = w; w += jac_.nnz_out(1+iout_);
-     m->jac = w; w += jac_.nnz_out(0);
+     m->f = w; w += n_;
+     m->jac = w; w += sp_jac_.nnz();
   }
 
   void Newton::solve(void* mem) const {
@@ -140,7 +140,7 @@ namespace casadi {
       m->res[0] = m->jac;
       copy_n(m->ires, n_out(), m->res+1);
       m->res[1+iout_] = m->f;
-      jac_(m->arg, m->res, m->iw, m->w, 0);
+      calc_function(m, "jac_f_z");
 
       // Check convergence
       double abstol = 0;
