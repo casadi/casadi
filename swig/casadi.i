@@ -2061,6 +2061,16 @@ import_array();
  $1 = &m;
 }
 
+ // Directorin typemap; as output
+%typemap(directorin, noblock=1, fragment="casadi_all") xType, const xType {
+    if(!($input = casadi::from_ref($1))) %dirout_fail(SWIG_TypeError,"For director inputs, failed to convert input to " xName ".");
+ }
+
+ // Directorin typemap; as output
+%typemap(directorin, noblock=1, fragment="casadi_all") const xType& {
+    if(!($input = casadi::from_ptr(&$1))) %dirout_fail(SWIG_TypeError,"For director inputs, failed to convert input to " xName ".");
+ }
+
  // Enable dynamic dispatch
 %typemap(typecheck, noblock=1, fragment="casadi_all") xType &OUTPUT {
   $1 = casadi::to_ptr($input, static_cast< xType **>(0));
