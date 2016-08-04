@@ -66,7 +66,8 @@ unittests_matlab:
 
 unittests_octave:
 	python internal/test_octave.py octave
-
+	python internal/test_octave.py matlab -skipfiles="callback.m"
+  
 examples_matlab:
 	python internal/test_matlab.py '../examples/matlab'
 

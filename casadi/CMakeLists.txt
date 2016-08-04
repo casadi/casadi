@@ -57,7 +57,7 @@ macro(casadi_library_or_plugin name is_plugin)
         RUNTIME DESTINATION casadi
       )
     endif()
-    if (WITH_MATLAB)
+    if (WITH_MATLAB OR WITH_OCTAVE)
       install(TARGETS ${name}
         LIBRARY DESTINATION .
         ARCHIVE DESTINATION .
