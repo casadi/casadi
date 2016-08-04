@@ -28,6 +28,7 @@ benchmarks:
 python: unittests_py examples_indoc_py examples_code_py user_guide_snippets_py tutorials
 
 matlab: unittests_matlab examples_matlab
+octave: unittests_octave
 
 python_knownbugs: unittests_py_knownbugs examples_indoc_py examples_code_py user_guide_snippets_py tutorials
 
@@ -64,7 +65,7 @@ unittests_matlab:
 	python internal/test_matlab.py matlab
 
 unittests_octave:
-	python internal/test_octave.py matlab
+	python internal/test_octave.py octave
 
 examples_matlab:
 	python internal/test_matlab.py '../examples/matlab'
