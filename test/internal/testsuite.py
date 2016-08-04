@@ -110,7 +110,7 @@ if __name__ == '__main__':
     print run('find /', shell = True, timeout = 3)
     print run('find', shell = True)
 
-deprecated = re.compile("[dD]epr[ei]c[ie]?at[ei]")
+deprecated = re.compile(r"\b[dD]epr[ei]c[ie]?at[ei]")
 warning = re.compile("warning")
 
 class TestSuite:
