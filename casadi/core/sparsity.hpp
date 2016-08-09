@@ -162,7 +162,7 @@ namespace casadi {
     **/
     static Sparsity triplet(int nrow, int ncol,
                             const std::vector<int>& row, const std::vector<int>& col,
-                            std::vector<int>& mapping, bool invert_mapping=false);
+                            std::vector<int>& SWIG_OUTPUT(mapping), bool invert_mapping);
 
     /** \brief Create a sparsity pattern given the nonzeros in sparse triplet form
         (no nonzero mapping)
@@ -378,7 +378,7 @@ namespace casadi {
     *  \param[out] mapping the non-zeros of the original matrix
     *              for each non-zero of the new matrix
     */
-    Sparsity transpose(std::vector<int>& mapping, bool invert_mapping=false) const;
+    Sparsity transpose(std::vector<int>& SWIG_OUTPUT(mapping), bool invert_mapping=false) const;
 
     /// Check if the sparsity is the transpose of another
     bool is_transpose(const Sparsity& y) const;
@@ -494,7 +494,7 @@ namespace casadi {
     void enlargeColumns(int ncol, const std::vector<int>& cc, bool ind1=false);
 
     /** \brief Make a patten dense */
-    Sparsity makeDense(std::vector<int>& mapping) const;
+    Sparsity makeDense(std::vector<int>& SWIG_OUTPUT(mapping)) const;
 
     /** \brief Erase rows and/or columns of a matrix */
     std::vector<int> erase(const std::vector<int>& rr, const std::vector<int>& cc, bool ind1=false);
@@ -552,7 +552,7 @@ namespace casadi {
     * The same indices will be removed from the \a mapping vector,
     * which must have the same length as the number of nonzeros
     */
-    void removeDuplicates(std::vector<int>& mapping);
+    void removeDuplicates(std::vector<int>& SWIG_INOUT(mapping));
 
 #ifndef SWIG
     typedef std::unordered_multimap<std::size_t, WeakRef> CachingMap;
@@ -582,8 +582,8 @@ namespace casadi {
     /** \brief Depth-first search on the adjacency graph of the sparsity
         See Direct Methods for Sparse Linear Systems by Davis (2006).
     */
-    int dfs(int j, int top, std::vector<int>& xi, std::vector<int>& pstack,
-            const std::vector<int>& pinv, std::vector<bool>& marked) const;
+    int dfs(int j, int top, std::vector<int>& SWIG_INOUT(xi), std::vector<int>& SWIG_INOUT(pstack),
+            const std::vector<int>& pinv, std::vector<bool>& SWIG_INOUT(marked)) const;
 
     /** \brief Find the strongly connected components of the bigraph defined by the sparsity pattern
         of a square matrix

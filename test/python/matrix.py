@@ -989,7 +989,7 @@ class Matrixtests(casadiTestCase):
     self.checkarray(r,d)
 
   def test_DMcrash(self):
-    with self.assertRaises(TypeError):
+    with self.assertRaises(Exception):
       DM([DM([1,2]),DM([1,2])])
     a = DM([DM([1]),DM([2])])
     self.checkarray(a,DM([1,2]))

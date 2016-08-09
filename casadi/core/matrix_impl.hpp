@@ -1230,7 +1230,7 @@ namespace casadi {
                           "supplied lists must all be of equal length, but got: "
                           << row.size() << ", " << col.size()  << " and " << d.nnz());
     std::vector<int> mapping;
-    Sparsity sp = Sparsity::triplet(nrow, ncol, row, col, mapping);
+    Sparsity sp = Sparsity::triplet(nrow, ncol, row, col, mapping, false);
     return Matrix<Scalar>(sp, d.nz(mapping));
   }
 

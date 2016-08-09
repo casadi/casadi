@@ -663,18 +663,21 @@ class typemaptests(casadiTestCase):
       def __MX__(self):
         return SX.sym("x")
 
-    self.assertRaises(NotImplementedError,lambda : Function("tmp", [x],[Foo()]))
+    with self.assertRaises(NotImplementedError):
+      Function("tmp", [x],[Foo()])
 
     class Foo:
       def __MX__(self):
         raise Exception("15")
 
-    self.assertRaises(NotImplementedError,lambda : Function("tmp", [x],[Foo()]))
+    with self.assertRaises(Exception):
+      Function("tmp", [x],[Foo()])
 
     class Foo:
       pass
 
-    self.assertRaises(NotImplementedError,lambda :Function("tmp", [x],[Foo()]))
+    with self.assertRaises(NotImplementedError):
+      Function("tmp", [x],[Foo()])
 
   def test_OUTPUT(self):
     self.message("OUTPUT typemap")

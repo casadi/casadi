@@ -776,7 +776,7 @@ namespace casadi {
     return ret;
   }
 
-  MX MX::join_primitives(std::vector<MX>& v) const {
+  MX MX::join_primitives(const std::vector<MX>& v) const {
     casadi_assert_message(v.size()==n_primitives(), "Wrong number of primitives supplied");
     std::vector<MX>::const_iterator it=v.begin();
     MX ret = (*this)->join_primitives(it);

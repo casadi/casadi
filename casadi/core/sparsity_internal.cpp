@@ -2508,7 +2508,7 @@ namespace casadi {
 
     std::vector<int> sp_mapping;
     std::vector<int> mapping_ = mapping;
-    Sparsity ret = Sparsity::triplet(rr.size(), cc.size(), rows, columns, sp_mapping);
+    Sparsity ret = Sparsity::triplet(rr.size(), cc.size(), rows, columns, sp_mapping, false);
 
     for (int i=0; i<mapping.size(); ++i)
       mapping[i] = mapping_[sp_mapping[i]];

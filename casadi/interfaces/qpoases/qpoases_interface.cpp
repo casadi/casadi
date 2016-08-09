@@ -821,7 +821,7 @@ namespace casadi {
     m->nz.resize(m->nz_map.size());
 
     // Create sparsity pattern: TODO(@jaeandersson) No memory allocation
-    Sparsity sp = Sparsity::triplet(dim, dim, m->row, m->col, m->lin_map);
+    Sparsity sp = Sparsity::triplet(dim, dim, m->row, m->col, m->lin_map, false);
     for (int& e : m->lin_map) e = m->nz_map[e];
 
     // Pass to linear solver

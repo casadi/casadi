@@ -207,8 +207,9 @@ namespace casadi {
     ///@}
 
     ///@{
-    /** \brief  Get of number of input nonzeros
-     * For a particular input or for all for all of the inputs
+    /** \brief  Get number of input nonzeros
+     *
+     * For a particular input or for all of the inputs
      */
     int nnz_in() const;
     int nnz_in(int ind) const;
@@ -216,8 +217,9 @@ namespace casadi {
     ///@}
 
     ///@{
-    /** \brief  Get of number of output nonzeros
-     * For a particular output or for all for all of the outputs
+    /** \brief  Get number of output nonzeros
+     *
+     * For a particular output or for all of the outputs
      */
     int nnz_out() const;
     int nnz_out(int ind) const;
@@ -225,8 +227,9 @@ namespace casadi {
     ///@}
 
     ///@{
-    /** \brief  Get of number of input elements
-     * For a particular input or for all for all of the inputs
+    /** \brief  Get number of input elements
+     *
+     * For a particular input or for all of the inputs
      */
     int numel_in() const;
     int numel_in(int ind) const;
@@ -234,8 +237,9 @@ namespace casadi {
     ///@}
 
     ///@{
-    /** \brief  Get of number of output elements
-     * For a particular output or for all for all of the outputs
+    /** \brief  Get number of output elements
+     *
+     * For a particular output or for all of the outputs
      */
     int numel_out() const;
     int numel_out(int ind) const;

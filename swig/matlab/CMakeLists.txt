@@ -16,7 +16,7 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/SwigMem.m DESTINATION ${CMAKE_INSTALL_
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/SwigGet.m DESTINATION ${CMAKE_INSTALL_PREFIX})
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/SwigStorage.m DESTINATION ${CMAKE_INSTALL_PREFIX})
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/swig_typename_convertor_matlab2cpp.m
-              ${CMAKE_CURRENT_SOURCE_DIR}/swig_typename_convertor_cpp2matlab.m
+              ${CMAKE_CURRENT_SOURCE_DIR}/SwigType.m
   DESTINATION ${CMAKE_INSTALL_PREFIX})
 
 # MATLAB specific stuff

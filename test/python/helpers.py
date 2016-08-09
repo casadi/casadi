@@ -186,7 +186,7 @@ class casadiTestCase(unittest.TestCase):
       else:
         return ret
     else:
-      ret = casadi.reshape(DM([valuegenerator() for i in range(n*m)]),n,m)
+      ret = DM([valuegenerator() for i in range(n*m)]).reshape((n,m))
       if symm:
         return (ret + ret.T)/2
       else:

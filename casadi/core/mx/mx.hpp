@@ -222,7 +222,7 @@ namespace casadi {
     std::vector<MX> split_primitives(const MX& x) const;
 
     /** \brief Join an expression along symbolic primitives */
-    MX join_primitives(std::vector<MX>& v) const;
+    MX join_primitives(const std::vector<MX>& v) const;
 
     /// \cond INTERNAL
     /** \brief Detect duplicate symbolic expressions

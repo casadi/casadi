@@ -919,7 +919,7 @@ class NLPtests(casadiTestCase):
         self.nx = nx
         self.ng = ng
         self.np = np
-        self.construct(name, {})
+        self.construct("mycallback", {})
 
       def get_n_in(self): return nlpsol_n_out()
       def get_n_out(self): return 1
@@ -956,7 +956,7 @@ class NLPtests(casadiTestCase):
         self.nx = nx
         self.ng = ng
         self.np = np
-        self.construct(name, {})
+        self.construct("mycallback", {})
 
       def get_n_in(self): return nlpsol_n_out()
       def get_n_out(self): return 1
