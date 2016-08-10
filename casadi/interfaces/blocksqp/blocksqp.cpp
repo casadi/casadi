@@ -569,6 +569,8 @@ namespace casadi {
 
     // Get optimal cost
     if (m->f) *m->f = m->obj;
+    // Get constraints at solution
+    casadi_copy(m->constr.array, ng_, m->g);
     // Get primal solution
     casadi_copy(m->xi.array, nx_, m->x);
     // Get dual solution (simple bounds)
