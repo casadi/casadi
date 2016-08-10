@@ -168,7 +168,7 @@ namespace casadi {
     }
 
     // Real work array
-    if (m->iw.size() < m->maxfrt) m->iw.resize(m->maxfrt);
+    if (m->w.size() < m->maxfrt) m->w.resize(m->maxfrt);
   }
 
   int Ma27Interface::neig(void* mem) const {
