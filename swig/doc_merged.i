@@ -5546,6 +5546,10 @@ Dennis Janka
 |                 |                 | iterations per  |                 |
 |                 |                 | SQP iteration   |                 |
 +-----------------+-----------------+-----------------+-----------------+
+| max_iter        | OT_INT          | Maximum number  | blocksqp::Matri |
+|                 |                 | of SQP          | x               |
+|                 |                 | iterations      |                 |
++-----------------+-----------------+-----------------+-----------------+
 | max_line_search | OT_INT          | Maximum number  | blocksqp::Matri |
 |                 |                 | of steps in     | x               |
 |                 |                 | line search     |                 |
@@ -5637,6 +5641,9 @@ Dennis Janka
 |                 |                 | different       |                 |
 |                 |                 | stages of       |                 |
 |                 |                 | initialization  |                 |
++-----------------+-----------------+-----------------+-----------------+
+| warmstart       | OT_BOOL         | Use             | blocksqp::Matri |
+|                 |                 | warmstarting    | x               |
 +-----------------+-----------------+-----------------+-----------------+
 | warn_initial_bo | OT_BOOL         | Warn if the     | casadi::Nlpsol  |
 | unds            |                 | initial guess   |                 |
@@ -8417,6 +8424,10 @@ Dennis Janka
 |                 |                 | iterations per  |                 |
 |                 |                 | SQP iteration   |                 |
 +-----------------+-----------------+-----------------+-----------------+
+| max_iter        | OT_INT          | Maximum number  | blocksqp::SymMa |
+|                 |                 | of SQP          | trix            |
+|                 |                 | iterations      |                 |
++-----------------+-----------------+-----------------+-----------------+
 | max_line_search | OT_INT          | Maximum number  | blocksqp::SymMa |
 |                 |                 | of steps in     | trix            |
 |                 |                 | line search     |                 |
@@ -8508,6 +8519,9 @@ Dennis Janka
 |                 |                 | different       |                 |
 |                 |                 | stages of       |                 |
 |                 |                 | initialization  |                 |
++-----------------+-----------------+-----------------+-----------------+
+| warmstart       | OT_BOOL         | Use             | blocksqp::SymMa |
+|                 |                 | warmstarting    | trix            |
 +-----------------+-----------------+-----------------+-----------------+
 | warn_initial_bo | OT_BOOL         | Warn if the     | casadi::Nlpsol  |
 | unds            |                 | initial guess   |                 |
@@ -11193,6 +11207,9 @@ Dennis Janka, Joel Andersson
 |                        |                        | iterations per SQP     |
 |                        |                        | iteration              |
 +------------------------+------------------------+------------------------+
+| max_iter               | OT_INT                 | Maximum number of SQP  |
+|                        |                        | iterations             |
++------------------------+------------------------+------------------------+
 | max_line_search        | OT_INT                 | Maximum number of      |
 |                        |                        | steps in line search   |
 +------------------------+------------------------+------------------------+
@@ -11253,6 +11270,8 @@ Dennis Janka, Joel Andersson
 | theta_min              | OT_DOUBLE              | Filter line search     |
 |                        |                        | parameter, cf. IPOPT   |
 |                        |                        | paper                  |
++------------------------+------------------------+------------------------+
+| warmstart              | OT_BOOL                | Use warmstarting       |
 +------------------------+------------------------+------------------------+
 | which_second_derv      | OT_INT                 | For which block should |
 |                        |                        | second derivatives be  |

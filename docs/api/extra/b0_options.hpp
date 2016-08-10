@@ -43,6 +43,7 @@
 <tr><td>max_consec_skipped_updates</td><td>OT_INT</td><td>Maximum number of consecutive skipped updates</td><td>blocksqp::Matrix</td></tr>
 <tr><td>max_conv_qp</td><td>OT_INT</td><td>How many additional QPs may be solved for convexification per iteration?</td><td>blocksqp::Matrix</td></tr>
 <tr><td>max_it_qp</td><td>OT_INT</td><td>Maximum number of QP iterations per SQP iteration</td><td>blocksqp::Matrix</td></tr>
+<tr><td>max_iter</td><td>OT_INT</td><td>Maximum number of SQP iterations</td><td>blocksqp::Matrix</td></tr>
 <tr><td>max_line_search</td><td>OT_INT</td><td>Maximum number of steps in line search</td><td>blocksqp::Matrix</td></tr>
 <tr><td>max_soc_iter</td><td>OT_INT</td><td>Maximum number of SOC line search iterations</td><td>blocksqp::Matrix</td></tr>
 <tr><td>max_time_qp</td><td>OT_DOUBLE</td><td>Maximum number of time in seconds per QP solve per SQP iteration</td><td>blocksqp::Matrix</td></tr>
@@ -63,6 +64,7 @@
 <tr><td>theta_max</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>blocksqp::Matrix</td></tr>
 <tr><td>theta_min</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>blocksqp::Matrix</td></tr>
 <tr><td>verbose_init</td><td>OT_BOOL</td><td>Print out timing information about the different stages of initialization</td><td>casadi::Nlpsol</td></tr>
+<tr><td>warmstart</td><td>OT_BOOL</td><td>Use warmstarting</td><td>blocksqp::Matrix</td></tr>
 <tr><td>warn_initial_bounds</td><td>OT_BOOL</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>casadi::Nlpsol</td></tr>
 <tr><td>which_second_derv</td><td>OT_INT</td><td>For which block should second derivatives be provided by the user</td><td>blocksqp::Matrix</td></tr>
 </table>
@@ -113,6 +115,7 @@
 <tr><td>max_consec_skipped_updates</td><td>OT_INT</td><td>Maximum number of consecutive skipped updates</td><td>blocksqp::SymMatrix</td></tr>
 <tr><td>max_conv_qp</td><td>OT_INT</td><td>How many additional QPs may be solved for convexification per iteration?</td><td>blocksqp::SymMatrix</td></tr>
 <tr><td>max_it_qp</td><td>OT_INT</td><td>Maximum number of QP iterations per SQP iteration</td><td>blocksqp::SymMatrix</td></tr>
+<tr><td>max_iter</td><td>OT_INT</td><td>Maximum number of SQP iterations</td><td>blocksqp::SymMatrix</td></tr>
 <tr><td>max_line_search</td><td>OT_INT</td><td>Maximum number of steps in line search</td><td>blocksqp::SymMatrix</td></tr>
 <tr><td>max_soc_iter</td><td>OT_INT</td><td>Maximum number of SOC line search iterations</td><td>blocksqp::SymMatrix</td></tr>
 <tr><td>max_time_qp</td><td>OT_DOUBLE</td><td>Maximum number of time in seconds per QP solve per SQP iteration</td><td>blocksqp::SymMatrix</td></tr>
@@ -133,6 +136,7 @@
 <tr><td>theta_max</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>blocksqp::SymMatrix</td></tr>
 <tr><td>theta_min</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>blocksqp::SymMatrix</td></tr>
 <tr><td>verbose_init</td><td>OT_BOOL</td><td>Print out timing information about the different stages of initialization</td><td>casadi::Nlpsol</td></tr>
+<tr><td>warmstart</td><td>OT_BOOL</td><td>Use warmstarting</td><td>blocksqp::SymMatrix</td></tr>
 <tr><td>warn_initial_bounds</td><td>OT_BOOL</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>casadi::Nlpsol</td></tr>
 <tr><td>which_second_derv</td><td>OT_INT</td><td>For which block should second derivatives be provided by the user</td><td>blocksqp::SymMatrix</td></tr>
 </table>
@@ -183,6 +187,7 @@
 <tr><td>max_consec_skipped_updates</td><td>OT_INT</td><td>Maximum number of consecutive skipped updates</td><td>casadi::Blocksqp</td></tr>
 <tr><td>max_conv_qp</td><td>OT_INT</td><td>How many additional QPs may be solved for convexification per iteration?</td><td>casadi::Blocksqp</td></tr>
 <tr><td>max_it_qp</td><td>OT_INT</td><td>Maximum number of QP iterations per SQP iteration</td><td>casadi::Blocksqp</td></tr>
+<tr><td>max_iter</td><td>OT_INT</td><td>Maximum number of SQP iterations</td><td>casadi::Blocksqp</td></tr>
 <tr><td>max_line_search</td><td>OT_INT</td><td>Maximum number of steps in line search</td><td>casadi::Blocksqp</td></tr>
 <tr><td>max_soc_iter</td><td>OT_INT</td><td>Maximum number of SOC line search iterations</td><td>casadi::Blocksqp</td></tr>
 <tr><td>max_time_qp</td><td>OT_DOUBLE</td><td>Maximum number of time in seconds per QP solve per SQP iteration</td><td>casadi::Blocksqp</td></tr>
@@ -203,6 +208,7 @@
 <tr><td>theta_max</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
 <tr><td>theta_min</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
 <tr><td>verbose_init</td><td>OT_BOOL</td><td>Print out timing information about the different stages of initialization</td><td>casadi::Nlpsol</td></tr>
+<tr><td>warmstart</td><td>OT_BOOL</td><td>Use warmstarting</td><td>casadi::Blocksqp</td></tr>
 <tr><td>warn_initial_bounds</td><td>OT_BOOL</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>casadi::Nlpsol</td></tr>
 <tr><td>which_second_derv</td><td>OT_INT</td><td>For which block should second derivatives be provided by the user</td><td>casadi::Blocksqp</td></tr>
 </table>
@@ -245,6 +251,7 @@
 <tr><td>max_consec_skipped_updates</td><td>OT_INT</td><td>Maximum number of consecutive skipped updates</td></tr>
 <tr><td>max_conv_qp</td><td>OT_INT</td><td>How many additional QPs may be solved for convexification per iteration?</td></tr>
 <tr><td>max_it_qp</td><td>OT_INT</td><td>Maximum number of QP iterations per SQP iteration</td></tr>
+<tr><td>max_iter</td><td>OT_INT</td><td>Maximum number of SQP iterations</td></tr>
 <tr><td>max_line_search</td><td>OT_INT</td><td>Maximum number of steps in line search</td></tr>
 <tr><td>max_soc_iter</td><td>OT_INT</td><td>Maximum number of SOC line search iterations</td></tr>
 <tr><td>max_time_qp</td><td>OT_DOUBLE</td><td>Maximum number of time in seconds per QP solve per SQP iteration</td></tr>
@@ -263,6 +270,7 @@
 <tr><td>skip_first_globalization</td><td>OT_BOOL</td><td>No globalization strategy in first iteration</td></tr>
 <tr><td>theta_max</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td></tr>
 <tr><td>theta_min</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td></tr>
+<tr><td>warmstart</td><td>OT_BOOL</td><td>Use warmstarting</td></tr>
 <tr><td>which_second_derv</td><td>OT_INT</td><td>For which block should second derivatives be provided by the user</td></tr>
 </table>
 */
@@ -310,6 +318,7 @@
 <tr><td>max_consec_skipped_updates</td><td>OT_INT</td><td>Maximum number of consecutive skipped updates</td><td>casadi::Blocksqp</td></tr>
 <tr><td>max_conv_qp</td><td>OT_INT</td><td>How many additional QPs may be solved for convexification per iteration?</td><td>casadi::Blocksqp</td></tr>
 <tr><td>max_it_qp</td><td>OT_INT</td><td>Maximum number of QP iterations per SQP iteration</td><td>casadi::Blocksqp</td></tr>
+<tr><td>max_iter</td><td>OT_INT</td><td>Maximum number of SQP iterations</td><td>casadi::Blocksqp</td></tr>
 <tr><td>max_line_search</td><td>OT_INT</td><td>Maximum number of steps in line search</td><td>casadi::Blocksqp</td></tr>
 <tr><td>max_soc_iter</td><td>OT_INT</td><td>Maximum number of SOC line search iterations</td><td>casadi::Blocksqp</td></tr>
 <tr><td>max_time_qp</td><td>OT_DOUBLE</td><td>Maximum number of time in seconds per QP solve per SQP iteration</td><td>casadi::Blocksqp</td></tr>
@@ -330,6 +339,7 @@
 <tr><td>theta_max</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
 <tr><td>theta_min</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
 <tr><td>verbose_init</td><td>OT_BOOL</td><td>Print out timing information about the different stages of initialization</td><td>casadi::Nlpsol</td></tr>
+<tr><td>warmstart</td><td>OT_BOOL</td><td>Use warmstarting</td><td>casadi::Blocksqp</td></tr>
 <tr><td>warn_initial_bounds</td><td>OT_BOOL</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>casadi::Nlpsol</td></tr>
 <tr><td>which_second_derv</td><td>OT_INT</td><td>For which block should second derivatives be provided by the user</td><td>casadi::Blocksqp</td></tr>
 </table>
