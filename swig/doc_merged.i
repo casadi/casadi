@@ -143,12 +143,12 @@ Get input dimension.
 
 %feature("docstring") casadi::Callback::Callback "
 
->  Callback()
+>  casadi::Callback::Callback()
 ------------------------------------------------------------------------
 
 Default constructor.
 
->  Callback(Callback obj)
+>  casadi::Callback::Callback(const Callback &obj)
 ------------------------------------------------------------------------
 
 Copy constructor (throws an error)
@@ -194,8 +194,9 @@ Access Jacobian of the ths function for a rootfinder.
 
 %feature("docstring") casadi::Callback::nnz_out "
 
-Get of number of output nonzeros For a particular output or for all for all
-of the outputs.
+Get number of output nonzeros.
+
+For a particular output or for all of the outputs
 
 ";
 
@@ -215,12 +216,12 @@ Get all the free variables of the function.
 
 %feature("docstring") casadi::Callback::name_out "
 
->  [str] Function.name_out() const 
+>  std::vector<std::string> casadi::Function::name_out() const 
 ------------------------------------------------------------------------
 
 Get output scheme.
 
->  str Function.name_out(int ind) const 
+>  std::string casadi::Function::name_out(int ind) const 
 ------------------------------------------------------------------------
 
 Get output scheme name by index.
@@ -229,23 +230,24 @@ Get output scheme name by index.
 
 %feature("docstring") casadi::Callback::nnz_in "
 
-Get of number of input nonzeros For a particular input or for all for all of
-the inputs.
+Get number of input nonzeros.
+
+For a particular input or for all of the inputs
 
 ";
 
 %feature("docstring") casadi::Callback::forward "
 
->  void Function.forward([MX ] arg, [MX ] res, [[MX ] ] fseed,[[MX ] ] output_fsens, bool always_inline=false, bool never_inline=false)
+>  void casadi::Function::forward(const std::vector< MX > &arg, const std::vector< MX > &res, const std::vector< std::vector< MX > > &fseed, std::vector< std::vector< MX > > &output_fsens, bool always_inline=false, bool never_inline=false)
 
->  void Function.forward([SX ] arg, [SX ] res, [[SX ] ] fseed,[[SX ] ] output_fsens, bool always_inline=false, bool never_inline=false)
+>  void casadi::Function::forward(const std::vector< SX > &arg, const std::vector< SX > &res, const std::vector< std::vector< SX > > &fseed, std::vector< std::vector< SX > > &output_fsens, bool always_inline=false, bool never_inline=false)
 
->  void Function.forward([DM ] arg, [DM ] res, [[DM ] ] fseed,[[DM ] ] output_fsens, bool always_inline=false, bool never_inline=false)
+>  void casadi::Function::forward(const std::vector< DM > &arg, const std::vector< DM > &res, const std::vector< std::vector< DM > > &fseed, std::vector< std::vector< DM > > &output_fsens, bool always_inline=false, bool never_inline=false)
 ------------------------------------------------------------------------
 
 Create call to (cached) derivative function, forward mode.
 
->  Function Function.forward(int nfwd)
+>  Function casadi::Function::forward(int nfwd)
 ------------------------------------------------------------------------
 
 Get a function that calculates nfwd forward derivatives.
@@ -280,8 +282,9 @@ the lowest level.
 
 %feature("docstring") casadi::Callback::numel_out "
 
-Get of number of output elements For a particular output or for all for all
-of the outputs.
+Get number of output elements.
+
+For a particular output or for all of the outputs
 
 ";
 
@@ -401,16 +404,16 @@ Checkout a memory object.
 
 %feature("docstring") casadi::Callback::reverse "
 
->  void Function.reverse([MX ] arg, [MX ] res, [[MX ] ] aseed,[[MX ] ] output_asens, bool always_inline=false, bool never_inline=false)
+>  void casadi::Function::reverse(const std::vector< MX > &arg, const std::vector< MX > &res, const std::vector< std::vector< MX > > &aseed, std::vector< std::vector< MX > > &output_asens, bool always_inline=false, bool never_inline=false)
 
->  void Function.reverse([SX ] arg, [SX ] res, [[SX ] ] aseed,[[SX ] ] output_asens, bool always_inline=false, bool never_inline=false)
+>  void casadi::Function::reverse(const std::vector< SX > &arg, const std::vector< SX > &res, const std::vector< std::vector< SX > > &aseed, std::vector< std::vector< SX > > &output_asens, bool always_inline=false, bool never_inline=false)
 
->  void Function.reverse([DM ] arg, [DM ] res, [[DM ] ] aseed,[[DM ] ] output_asens, bool always_inline=false, bool never_inline=false)
+>  void casadi::Function::reverse(const std::vector< DM > &arg, const std::vector< DM > &res, const std::vector< std::vector< DM > > &aseed, std::vector< std::vector< DM > > &output_asens, bool always_inline=false, bool never_inline=false)
 ------------------------------------------------------------------------
 
 Create call to (cached) derivative function, reverse mode.
 
->  Function Function.reverse(int nadj)
+>  Function casadi::Function::reverse(int nadj)
 ------------------------------------------------------------------------
 
 Get a function that calculates nadj adjoint derivatives.
@@ -618,12 +621,12 @@ Assert that an output dimension is equal so some given value.
 
 %feature("docstring") casadi::Callback::name_in "
 
->  [str] Function.name_in() const 
+>  std::vector<std::string> casadi::Function::name_in() const 
 ------------------------------------------------------------------------
 
 Get input scheme.
 
->  str Function.name_in(int ind) const 
+>  std::string casadi::Function::name_in(int ind) const 
 ------------------------------------------------------------------------
 
 Get input scheme name by index.
@@ -672,11 +675,11 @@ that the input must be scalar. In other cases, use the Jacobian instead.
 
 %feature("docstring") casadi::Callback::derivative "
 
->  void Function.derivative([DM] arg, [DM] &output_res, [DMVector] fseed, [DMVector] &output_fsens, [DMVector] aseed, [DMVector] &output_asens, bool always_inline=false, bool never_inline=false)
+>  void casadi::Function::derivative(const DMVector &arg, DMVector &output_res, const DMVectorVector &fseed, DMVectorVector &output_fsens, const DMVectorVector &aseed, DMVectorVector &output_asens, bool always_inline=false, bool never_inline=false)
 
->  void Function.derivative([SX] arg, [SX] &output_res, [SXVector] fseed, [SXVector] &output_fsens, [SXVector] aseed, [SXVector] &output_asens, bool always_inline=false, bool never_inline=false)
+>  void casadi::Function::derivative(const SXVector &arg, SXVector &output_res, const SXVectorVector &fseed, SXVectorVector &output_fsens, const SXVectorVector &aseed, SXVectorVector &output_asens, bool always_inline=false, bool never_inline=false)
 
->  void Function.derivative([MX] arg, [MX] &output_res, [MXVector] fseed, [MXVector] &output_fsens, [MXVector] aseed, [MXVector] &output_asens, bool always_inline=false, bool never_inline=false)
+>  void casadi::Function::derivative(const MXVector &arg, MXVector &output_res, const MXVectorVector &fseed, MXVectorVector &output_fsens, const MXVectorVector &aseed, MXVectorVector &output_asens, bool always_inline=false, bool never_inline=false)
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate the function symbolically or numerically with directional
@@ -688,7 +691,7 @@ directions. The next two arguments are a set of adjoint directional
 seeds and the resulting adjoint directional derivatives, the length of
 the vector being the number of adjoint directions.
 
->  Function Function.derivative(int nfwd, int nadj)
+>  Function casadi::Function::derivative(int nfwd, int nadj)
 ------------------------------------------------------------------------
 
 Get a function that calculates nfwd forward derivatives and nadj adjoint
@@ -832,8 +835,9 @@ Evaluate numerically, temporary matrices and work vectors.
 
 %feature("docstring") casadi::Callback::numel_in "
 
-Get of number of input elements For a particular input or for all for all of
-the inputs.
+Get number of input elements.
+
+For a particular input or for all of the inputs
 
 ";
 
@@ -845,11 +849,11 @@ Get an atomic operation operator index.
 
 %feature("docstring") casadi::Callback::map "
 
->  Function Function.map(str name, str parallelization, int n, [int ] reduce_in, [int ] reduce_out, Dict opts=Dict())
+>  Function casadi::Function::map(const std::string &name, const std::string &parallelization, int n, const std::vector< int > &reduce_in, const std::vector< int > &reduce_out, const Dict &opts=Dict())
 
->  Function Function.map(str name, str parallelization, int n, [str ] reduce_in, [str ] reduce_out, Dict opts=Dict())
+>  Function casadi::Function::map(const std::string &name, const std::string &parallelization, int n, const std::vector< std::string > &reduce_in, const std::vector< std::string > &reduce_out, const Dict &opts=Dict())
 
->  Function Function.map(str name, str parallelization, int n, Dict opts=Dict())
+>  Function casadi::Function::map(const std::string &name, const std::string &parallelization, int n, const Dict &opts=Dict())
 ------------------------------------------------------------------------
 
 Create a mapped version of this function.
@@ -887,9 +891,9 @@ Parameters:
 
 parallelization:  Type of parallelization used: unroll|serial|openmp
 
->  [MX] Function.map([MX ] arg, str parallelization=\"serial\")
+>  std::vector<MX> casadi::Function::map(const std::vector< MX > &arg, const std::string &parallelization=\"serial\")
 
->  std.map<str, MX> Function.map(const std.map< str, MX > &arg, str parallelization=\"serial\")
+>  std::map<std::string, MX> casadi::Function::map(const std::map< std::string, MX > &arg, const std::string &parallelization=\"serial\")
 ------------------------------------------------------------------------
 
 Evaluate symbolically in parallel (matrix graph)
@@ -1093,12 +1097,12 @@ error.
 
 %feature("docstring") casadi::CasadiException::CasadiException "
 
->  CasadiException()
+>  casadi::CasadiException::CasadiException()
 ------------------------------------------------------------------------
 
 Default constructor.
 
->  CasadiException(str msg)
+>  casadi::CasadiException::CasadiException(const std::string &msg)
 ------------------------------------------------------------------------
 
 Form message string.
@@ -1162,12 +1166,12 @@ Add a function (name generated)
 
 %feature("docstring") casadi::CodeGenerator::CodeGenerator "
 
->  CodeGenerator(Dict opts=Dict())
+>  casadi::CodeGenerator::CodeGenerator(const Dict &opts=Dict())
 ------------------------------------------------------------------------
 [INTERNAL] 
 Constructor.
 
->  CodeGenerator(str name, Dict opts=Dict())
+>  casadi::CodeGenerator::CodeGenerator(const std::string &name, const Dict &opts=Dict())
 ------------------------------------------------------------------------
 
 Constructor.
@@ -1256,12 +1260,12 @@ Sort the DAE and implicitly defined states.
 
 %feature("docstring") casadi::DaeBuilder::start "
 
->  double DaeBuilder.start(str name, bool normalized=false) const 
+>  double casadi::DaeBuilder::start(const std::string &name, bool normalized=false) const 
 ------------------------------------------------------------------------
 
 Get the (optionally normalized) value at time 0 by name.
 
->  [double] DaeBuilder.start(MX var, bool normalized=false) const 
+>  std::vector<double> casadi::DaeBuilder::start(const MX &var, bool normalized=false) const 
 ------------------------------------------------------------------------
 
 Get the (optionally normalized) value(s) at time 0 by expression.
@@ -1270,14 +1274,14 @@ Get the (optionally normalized) value(s) at time 0 by expression.
 
 %feature("docstring") casadi::DaeBuilder::add_variable "
 
->  void DaeBuilder.add_variable(str name, Variable var)
+>  void casadi::DaeBuilder::add_variable(const std::string &name, const Variable &var)
 ------------------------------------------------------------------------
 
 Add a variable.
 
->  MX DaeBuilder.add_variable(str name, int n=1)
+>  MX casadi::DaeBuilder::add_variable(const std::string &name, int n=1)
 
->  MX DaeBuilder.add_variable(str name, Sparsity sp)
+>  MX casadi::DaeBuilder::add_variable(const std::string &name, const Sparsity &sp)
 ------------------------------------------------------------------------
 
 Add a new variable: returns corresponding symbolic expression.
@@ -1286,12 +1290,12 @@ Add a new variable: returns corresponding symbolic expression.
 
 %feature("docstring") casadi::DaeBuilder::min "
 
->  double DaeBuilder.min(str name, bool normalized=false) const 
+>  double casadi::DaeBuilder::min(const std::string &name, bool normalized=false) const 
 ------------------------------------------------------------------------
 
 Get the lower bound by name.
 
->  [double] DaeBuilder.min(MX var, bool normalized=false) const 
+>  std::vector<double> casadi::DaeBuilder::min(const MX &var, bool normalized=false) const 
 ------------------------------------------------------------------------
 
 Get the lower bound(s) by expression.
@@ -1306,12 +1310,12 @@ Add a quadrature equation.
 
 %feature("docstring") casadi::DaeBuilder::nominal "
 
->  double DaeBuilder.nominal(str name) const 
+>  double casadi::DaeBuilder::nominal(const std::string &name) const 
 ------------------------------------------------------------------------
 
 Get the nominal value by name.
 
->  [double] DaeBuilder.nominal(MX var) const 
+>  std::vector<double> casadi::DaeBuilder::nominal(const MX &var) const 
 ------------------------------------------------------------------------
 
 Get the nominal value(s) by expression.
@@ -1320,12 +1324,12 @@ Get the nominal value(s) by expression.
 
 %feature("docstring") casadi::DaeBuilder::max "
 
->  double DaeBuilder.max(str name, bool normalized=false) const 
+>  double casadi::DaeBuilder::max(const std::string &name, bool normalized=false) const 
 ------------------------------------------------------------------------
 
 Get the upper bound by name.
 
->  [double] DaeBuilder.max(MX var, bool normalized=false) const 
+>  std::vector<double> casadi::DaeBuilder::max(const MX &var, bool normalized=false) const 
 ------------------------------------------------------------------------
 
 Get the upper bound(s) by expression.
@@ -1340,12 +1344,12 @@ Transform the implicit DAE to a semi-explicit DAE.
 
 %feature("docstring") casadi::DaeBuilder::set_derivative_start "
 
->  void DaeBuilder.set_derivative_start(str name, double val, bool normalized=false)
+>  void casadi::DaeBuilder::set_derivative_start(const std::string &name, double val, bool normalized=false)
 ------------------------------------------------------------------------
 
 Set the (optionally normalized) derivative value at time 0 by name.
 
->  void DaeBuilder.set_derivative_start(MX var, [double ] val, bool normalized=false)
+>  void casadi::DaeBuilder::set_derivative_start(const MX &var, const std::vector< double > &val, bool normalized=false)
 ------------------------------------------------------------------------
 
 Set the (optionally normalized) derivative value(s) at time 0 by expression.
@@ -1509,12 +1513,12 @@ Add a new control.
 
 %feature("docstring") casadi::DaeBuilder::set_guess "
 
->  void DaeBuilder.set_guess(str name, double val, bool normalized=false)
+>  void casadi::DaeBuilder::set_guess(const std::string &name, double val, bool normalized=false)
 ------------------------------------------------------------------------
 
 Set the initial guess by name.
 
->  void DaeBuilder.set_guess(MX var, [double ] val, bool normalized=false)
+>  void casadi::DaeBuilder::set_guess(const MX &var, const std::vector< double > &val, bool normalized=false)
 ------------------------------------------------------------------------
 
 Set the initial guess(es) by expression.
@@ -1547,12 +1551,12 @@ Eliminate quadrature states and turn them into ODE states.
 
 %feature("docstring") casadi::DaeBuilder::derivative_start "
 
->  double DaeBuilder.derivative_start(str name, bool normalized=false) const 
+>  double casadi::DaeBuilder::derivative_start(const std::string &name, bool normalized=false) const 
 ------------------------------------------------------------------------
 
 Get the (optionally normalized) derivative value at time 0 by name.
 
->  [double] DaeBuilder.derivative_start(MX var, bool normalized=false) const 
+>  std::vector<double> casadi::DaeBuilder::derivative_start(const MX &var, bool normalized=false) const 
 ------------------------------------------------------------------------
 
 Get the (optionally normalized) derivative value(s) at time 0 by expression.
@@ -1561,12 +1565,12 @@ Get the (optionally normalized) derivative value(s) at time 0 by expression.
 
 %feature("docstring") casadi::DaeBuilder::set_nominal "
 
->  void DaeBuilder.set_nominal(str name, double val)
+>  void casadi::DaeBuilder::set_nominal(const std::string &name, double val)
 ------------------------------------------------------------------------
 
 Set the nominal value by name.
 
->  void DaeBuilder.set_nominal(MX var, [double ] val)
+>  void casadi::DaeBuilder::set_nominal(const MX &var, const std::vector< double > &val)
 ------------------------------------------------------------------------
 
 Set the nominal value(s) by expression.
@@ -1611,12 +1615,12 @@ Construct a function object.
 
 %feature("docstring") casadi::DaeBuilder::guess "
 
->  double DaeBuilder.guess(str name, bool normalized=false) const 
+>  double casadi::DaeBuilder::guess(const std::string &name, bool normalized=false) const 
 ------------------------------------------------------------------------
 
 Get the initial guess by name.
 
->  [double] DaeBuilder.guess(MX var, bool normalized=false) const 
+>  std::vector<double> casadi::DaeBuilder::guess(const MX &var, bool normalized=false) const 
 ------------------------------------------------------------------------
 
 Get the initial guess(es) by expression.
@@ -1631,12 +1635,12 @@ Access a variable by name
 
 %feature("docstring") casadi::DaeBuilder::set_max "
 
->  void DaeBuilder.set_max(str name, double val, bool normalized=false)
+>  void casadi::DaeBuilder::set_max(const std::string &name, double val, bool normalized=false)
 ------------------------------------------------------------------------
 
 Set the upper bound by name.
 
->  void DaeBuilder.set_max(MX var, [double ] val, bool normalized=false)
+>  void casadi::DaeBuilder::set_max(const MX &var, const std::vector< double > &val, bool normalized=false)
 ------------------------------------------------------------------------
 
 Set the upper bound(s) by expression.
@@ -1651,12 +1655,12 @@ Eliminate algebraic variables and equations transforming them into outputs.
 
 %feature("docstring") casadi::DaeBuilder::set_min "
 
->  void DaeBuilder.set_min(str name, double val, bool normalized=false)
+>  void casadi::DaeBuilder::set_min(const std::string &name, double val, bool normalized=false)
 ------------------------------------------------------------------------
 
 Set the lower bound by name.
 
->  void DaeBuilder.set_min(MX var, [double ] val, bool normalized=false)
+>  void casadi::DaeBuilder::set_min(const MX &var, const std::vector< double > &val, bool normalized=false)
 ------------------------------------------------------------------------
 
 Set the lower bound(s) by expression.
@@ -1665,12 +1669,12 @@ Set the lower bound(s) by expression.
 
 %feature("docstring") casadi::DaeBuilder::set_start "
 
->  void DaeBuilder.set_start(str name, double val, bool normalized=false)
+>  void casadi::DaeBuilder::set_start(const std::string &name, double val, bool normalized=false)
 ------------------------------------------------------------------------
 
 Set the (optionally normalized) value at time 0 by name.
 
->  void DaeBuilder.set_start(MX var, [double ] val, bool normalized=false)
+>  void casadi::DaeBuilder::set_start(const MX &var, const std::vector< double > &val, bool normalized=false)
 ------------------------------------------------------------------------
 
 Set the (optionally normalized) value(s) at time 0 by expression.
@@ -1679,12 +1683,12 @@ Set the (optionally normalized) value(s) at time 0 by expression.
 
 %feature("docstring") casadi::DaeBuilder::unit "
 
->  str DaeBuilder.unit(str name) const 
+>  std::string casadi::DaeBuilder::unit(const std::string &name) const 
 ------------------------------------------------------------------------
 
 Get the unit for a component.
 
->  str DaeBuilder.unit(MX var) const 
+>  std::string casadi::DaeBuilder::unit(const MX &var) const 
 ------------------------------------------------------------------------
 
 Get the unit given a vector of symbolic variables (all units must be
@@ -1712,12 +1716,12 @@ Eliminate dependent parameters.
 
 %feature("docstring") casadi::DaeBuilder::der "
 
->  MX DaeBuilder.der(str name) const 
+>  MX casadi::DaeBuilder::der(const std::string &name) const 
 ------------------------------------------------------------------------
 
 Get a derivative expression by name.
 
->  MX DaeBuilder.der(MX var) const 
+>  MX casadi::DaeBuilder::der(const MX &var) const 
 ------------------------------------------------------------------------
 
 Get a derivative expression by non-differentiated expression.
@@ -1842,8 +1846,9 @@ that the output must be scalar. In other cases, use the Jacobian instead.
 
 %feature("docstring") casadi::Function::nnz_in "
 
-Get of number of input nonzeros For a particular input or for all for all of
-the inputs.
+Get number of input nonzeros.
+
+For a particular input or for all of the inputs
 
 ";
 
@@ -1958,8 +1963,9 @@ ownership, only weak references to the derivatives are kept internally.
 
 %feature("docstring") casadi::Function::numel_out "
 
-Get of number of output elements For a particular output or for all for all
-of the outputs.
+Get number of output elements.
+
+For a particular output or for all of the outputs
 
 ";
 
@@ -2009,12 +2015,12 @@ point to any node, \"0\" is returned.
 
 %feature("docstring") casadi::Function::name_out "
 
->  [str] Function.name_out() const 
+>  std::vector<std::string> casadi::Function::name_out() const 
 ------------------------------------------------------------------------
 
 Get output scheme.
 
->  str Function.name_out(int ind) const 
+>  std::string casadi::Function::name_out(int ind) const 
 ------------------------------------------------------------------------
 
 Get output scheme name by index.
@@ -2083,11 +2089,11 @@ The the mapaccumulated version has the signature:
 
 %feature("docstring") casadi::Function::derivative "
 
->  void Function.derivative([DM] arg, [DM] &output_res, [DMVector] fseed, [DMVector] &output_fsens, [DMVector] aseed, [DMVector] &output_asens, bool always_inline=false, bool never_inline=false)
+>  void casadi::Function::derivative(const DMVector &arg, DMVector &output_res, const DMVectorVector &fseed, DMVectorVector &output_fsens, const DMVectorVector &aseed, DMVectorVector &output_asens, bool always_inline=false, bool never_inline=false)
 
->  void Function.derivative([SX] arg, [SX] &output_res, [SXVector] fseed, [SXVector] &output_fsens, [SXVector] aseed, [SXVector] &output_asens, bool always_inline=false, bool never_inline=false)
+>  void casadi::Function::derivative(const SXVector &arg, SXVector &output_res, const SXVectorVector &fseed, SXVectorVector &output_fsens, const SXVectorVector &aseed, SXVectorVector &output_asens, bool always_inline=false, bool never_inline=false)
 
->  void Function.derivative([MX] arg, [MX] &output_res, [MXVector] fseed, [MXVector] &output_fsens, [MXVector] aseed, [MXVector] &output_asens, bool always_inline=false, bool never_inline=false)
+>  void casadi::Function::derivative(const MXVector &arg, MXVector &output_res, const MXVectorVector &fseed, MXVectorVector &output_fsens, const MXVectorVector &aseed, MXVectorVector &output_asens, bool always_inline=false, bool never_inline=false)
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate the function symbolically or numerically with directional
@@ -2099,7 +2105,7 @@ directions. The next two arguments are a set of adjoint directional
 seeds and the resulting adjoint directional derivatives, the length of
 the vector being the number of adjoint directions.
 
->  Function Function.derivative(int nfwd, int nadj)
+>  Function casadi::Function::derivative(int nfwd, int nadj)
 ------------------------------------------------------------------------
 
 Get a function that calculates nfwd forward derivatives and nadj adjoint
@@ -2120,30 +2126,30 @@ adjoint sensitivities, one direction at a time.
 
 %feature("docstring") casadi::Function::Function "
 
->  Function(str name, [SX ] arg, [SX ] res, Dict opts=Dict())
+>  casadi::Function::Function(const std::string &name, const std::vector< SX > &arg, const std::vector< SX > &res, const Dict &opts=Dict())
 
->  Function(str name, [SX ] arg, [SX ] res, [str ] argn, [str ] resn, Dict opts=Dict())
+>  casadi::Function::Function(const std::string &name, const std::vector< SX > &arg, const std::vector< SX > &res, const std::vector< std::string > &argn, const std::vector< std::string > &resn, const Dict &opts=Dict())
 
->  Function(str name, const std.map< str, SX > &dict, [str ] argn, [str ] resn, Dict opts=Dict())
+>  casadi::Function::Function(const std::string &name, const std::map< std::string, SX > &dict, const std::vector< std::string > &argn, const std::vector< std::string > &resn, const Dict &opts=Dict())
 ------------------------------------------------------------------------
 
 Construct an SX function.
 
->  Function(str name, [MX ] arg, [MX ] res, Dict opts=Dict())
+>  casadi::Function::Function(const std::string &name, const std::vector< MX > &arg, const std::vector< MX > &res, const Dict &opts=Dict())
 
->  Function(str name, [MX ] arg, [MX ] res, [str ] argn, [str ] resn, Dict opts=Dict())
+>  casadi::Function::Function(const std::string &name, const std::vector< MX > &arg, const std::vector< MX > &res, const std::vector< std::string > &argn, const std::vector< std::string > &resn, const Dict &opts=Dict())
 
->  Function(str name, const std.map< str, MX > &dict, [str ] argn, [str ] resn, Dict opts=Dict())
+>  casadi::Function::Function(const std::string &name, const std::map< std::string, MX > &dict, const std::vector< std::string > &argn, const std::vector< std::string > &resn, const Dict &opts=Dict())
 ------------------------------------------------------------------------
 
 Construct an MX function.
 
->  Function()
+>  casadi::Function::Function()
 ------------------------------------------------------------------------
 
 Default constructor, null pointer.
 
->  Function(str fname)
+>  casadi::Function::Function(const std::string &fname)
 ------------------------------------------------------------------------
 
 Construct from a file.
@@ -2158,8 +2164,9 @@ Get type name.
 
 %feature("docstring") casadi::Function::numel_in "
 
-Get of number of input elements For a particular input or for all for all of
-the inputs.
+Get number of input elements.
+
+For a particular input or for all of the inputs
 
 ";
 
@@ -2186,16 +2193,16 @@ ownership, only weak references to the derivatives are kept internally.
 
 %feature("docstring") casadi::Function::forward "
 
->  void Function.forward([MX ] arg, [MX ] res, [[MX ] ] fseed,[[MX ] ] output_fsens, bool always_inline=false, bool never_inline=false)
+>  void casadi::Function::forward(const std::vector< MX > &arg, const std::vector< MX > &res, const std::vector< std::vector< MX > > &fseed, std::vector< std::vector< MX > > &output_fsens, bool always_inline=false, bool never_inline=false)
 
->  void Function.forward([SX ] arg, [SX ] res, [[SX ] ] fseed,[[SX ] ] output_fsens, bool always_inline=false, bool never_inline=false)
+>  void casadi::Function::forward(const std::vector< SX > &arg, const std::vector< SX > &res, const std::vector< std::vector< SX > > &fseed, std::vector< std::vector< SX > > &output_fsens, bool always_inline=false, bool never_inline=false)
 
->  void Function.forward([DM ] arg, [DM ] res, [[DM ] ] fseed,[[DM ] ] output_fsens, bool always_inline=false, bool never_inline=false)
+>  void casadi::Function::forward(const std::vector< DM > &arg, const std::vector< DM > &res, const std::vector< std::vector< DM > > &fseed, std::vector< std::vector< DM > > &output_fsens, bool always_inline=false, bool never_inline=false)
 ------------------------------------------------------------------------
 
 Create call to (cached) derivative function, forward mode.
 
->  Function Function.forward(int nfwd)
+>  Function casadi::Function::forward(int nfwd)
 ------------------------------------------------------------------------
 
 Get a function that calculates nfwd forward derivatives.
@@ -2290,8 +2297,9 @@ parallelization:  Type of parallelization used: unroll|serial|openmp
 
 %feature("docstring") casadi::Function::nnz_out "
 
-Get of number of output nonzeros For a particular output or for all for all
-of the outputs.
+Get number of output nonzeros.
+
+For a particular output or for all of the outputs
 
 ";
 
@@ -2352,11 +2360,11 @@ the output elements).
 
 %feature("docstring") casadi::Function::map "
 
->  Function Function.map(str name, str parallelization, int n, [int ] reduce_in, [int ] reduce_out, Dict opts=Dict())
+>  Function casadi::Function::map(const std::string &name, const std::string &parallelization, int n, const std::vector< int > &reduce_in, const std::vector< int > &reduce_out, const Dict &opts=Dict())
 
->  Function Function.map(str name, str parallelization, int n, [str ] reduce_in, [str ] reduce_out, Dict opts=Dict())
+>  Function casadi::Function::map(const std::string &name, const std::string &parallelization, int n, const std::vector< std::string > &reduce_in, const std::vector< std::string > &reduce_out, const Dict &opts=Dict())
 
->  Function Function.map(str name, str parallelization, int n, Dict opts=Dict())
+>  Function casadi::Function::map(const std::string &name, const std::string &parallelization, int n, const Dict &opts=Dict())
 ------------------------------------------------------------------------
 
 Create a mapped version of this function.
@@ -2394,9 +2402,9 @@ Parameters:
 
 parallelization:  Type of parallelization used: unroll|serial|openmp
 
->  [MX] Function.map([MX ] arg, str parallelization=\"serial\")
+>  std::vector<MX> casadi::Function::map(const std::vector< MX > &arg, const std::string &parallelization=\"serial\")
 
->  std.map<str, MX> Function.map(const std.map< str, MX > &arg, str parallelization=\"serial\")
+>  std::map<std::string, MX> casadi::Function::map(const std::map< std::string, MX > &arg, const std::string &parallelization=\"serial\")
 ------------------------------------------------------------------------
 
 Evaluate symbolically in parallel (matrix graph)
@@ -2453,12 +2461,12 @@ matches one of the base classes (default true)
 
 %feature("docstring") casadi::Function::name_in "
 
->  [str] Function.name_in() const 
+>  std::vector<std::string> casadi::Function::name_in() const 
 ------------------------------------------------------------------------
 
 Get input scheme.
 
->  str Function.name_in(int ind) const 
+>  std::string casadi::Function::name_in(int ind) const 
 ------------------------------------------------------------------------
 
 Get input scheme name by index.
@@ -2474,16 +2482,16 @@ guarantee that subsequent calls return unique answers.
 
 %feature("docstring") casadi::Function::reverse "
 
->  void Function.reverse([MX ] arg, [MX ] res, [[MX ] ] aseed,[[MX ] ] output_asens, bool always_inline=false, bool never_inline=false)
+>  void casadi::Function::reverse(const std::vector< MX > &arg, const std::vector< MX > &res, const std::vector< std::vector< MX > > &aseed, std::vector< std::vector< MX > > &output_asens, bool always_inline=false, bool never_inline=false)
 
->  void Function.reverse([SX ] arg, [SX ] res, [[SX ] ] aseed,[[SX ] ] output_asens, bool always_inline=false, bool never_inline=false)
+>  void casadi::Function::reverse(const std::vector< SX > &arg, const std::vector< SX > &res, const std::vector< std::vector< SX > > &aseed, std::vector< std::vector< SX > > &output_asens, bool always_inline=false, bool never_inline=false)
 
->  void Function.reverse([DM ] arg, [DM ] res, [[DM ] ] aseed,[[DM ] ] output_asens, bool always_inline=false, bool never_inline=false)
+>  void casadi::Function::reverse(const std::vector< DM > &arg, const std::vector< DM > &res, const std::vector< std::vector< DM > > &aseed, std::vector< std::vector< DM > > &output_asens, bool always_inline=false, bool never_inline=false)
 ------------------------------------------------------------------------
 
 Create call to (cached) derivative function, reverse mode.
 
->  Function Function.reverse(int nadj)
+>  Function casadi::Function::reverse(int nadj)
 ------------------------------------------------------------------------
 
 Get a function that calculates nadj adjoint derivatives.
@@ -3243,7 +3251,7 @@ Extract shared subexpressions from an set of expressions.
 
 %feature("docstring") friendwrap_solve "
 
->  MatType solve(MatType A, MatType b)
+>  MatType solve(const MatType &A, const MatType &b)
 ------------------------------------------------------------------------
 
 Solve a system of equations: A*x = b The solve routine works similar to
@@ -3269,7 +3277,7 @@ transformation is formed. Only the permutation part of this is however used.
 An improvement would be to solve block-by-block if there are multiple BLT
 blocks.
 
->  MatType solve(MatType A, MatType b, str lsolver, Dict dict=Dict())
+>  MatType solve(const MatType &A, const MatType &b, const std::string &lsolver, const Dict &dict=Dict())
 ------------------------------------------------------------------------
 
 Solve a system of equations: A*x = b.
@@ -3331,12 +3339,12 @@ x_default:  will be returned.
 
 %feature("docstring") friendwrap_densify "
 
->  MatType densify(MatType x)
+>  MatType densify(const MatType &x)
 ------------------------------------------------------------------------
 
 Make the matrix dense if not already.
 
->  MatType densify(MatType x, MatType val)
+>  MatType densify(const MatType &x, const MatType &val)
 ------------------------------------------------------------------------
 
 Make the matrix dense and assign nonzeros to a value.
@@ -3411,12 +3419,12 @@ Make a rank-1 update to a matrix A Calculates A + 1/2 * alpha * x*y'.
 
 %feature("docstring") casadi::GenericMatrix::size "
 
->  (int,int) MatType .size() const 
+>  std::pair<int, int> casadi::GenericMatrix< MatType >::size() const 
 ------------------------------------------------------------------------
 
 Get the shape.
 
->  int MatType .size(int axis) const 
+>  int casadi::GenericMatrix< MatType >::size(int axis) const 
 ------------------------------------------------------------------------
 
 Get the size along a particular dimensions.
@@ -3569,12 +3577,12 @@ Get the first dimension (i.e. number of rows)
 
 %feature("docstring") casadi::GenericMatrix::numel "
 
->  int MatType .numel() const 
+>  int casadi::GenericMatrix< MatType >::numel() const 
 ------------------------------------------------------------------------
 
 Get the number of elements.
 
->  int MatType .numel(int i) const 
+>  int casadi::GenericMatrix< MatType >::numel(int i) const 
 ------------------------------------------------------------------------
 
 Get the number of elements in slice (cf. MATLAB)
@@ -3590,12 +3598,12 @@ zero.
 
 %feature("docstring") friendwrap_substitute "
 
->  MatType substitute(MatType ex, MatType v, MatType vdef)
+>  MatType substitute(const MatType &ex, const MatType &v, const MatType &vdef)
 ------------------------------------------------------------------------
 
 Substitute variable v with expression vdef in an expression ex.
 
->  [MatType] substitute([MatType ] ex, [MatType ] v, [MatType ] vdef)
+>  std::vector<MatType> substitute(const std::vector< MatType > &ex, const std::vector< MatType > &v, const std::vector< MatType > &vdef)
 ------------------------------------------------------------------------
 
 Substitute variable var with expression expr in multiple expressions.
@@ -3674,45 +3682,45 @@ Get the number of (structural) non-zero elements.
 
 %feature("docstring") casadi::GenericMatrix::sym "
 
->  static MatType MatType .sym(str name, int nrow=1, int ncol=1)
+>  static MatType casadi::GenericMatrix< MatType >::sym(const std::string &name, int nrow=1, int ncol=1)
 ------------------------------------------------------------------------
 
 Create an nrow-by-ncol symbolic primitive.
 
->  static MatType MatType .sym(str name, (int,int) rc)
+>  static MatType casadi::GenericMatrix< MatType >::sym(const std::string &name, const std::pair< int, int > &rc)
 ------------------------------------------------------------------------
 
 Construct a symbolic primitive with given dimensions.
 
->  MatType MatType .sym(str name, Sparsity sp)
+>  MatType casadi::GenericMatrix< MatType >::sym(const std::string &name, const Sparsity &sp)
 ------------------------------------------------------------------------
 
 Create symbolic primitive with a given sparsity pattern.
 
->  [MatType ] MatType .sym(str name, Sparsity sp, int p)
+>  std::vector< MatType > casadi::GenericMatrix< MatType >::sym(const std::string &name, const Sparsity &sp, int p)
 ------------------------------------------------------------------------
 
 Create a vector of length p with with matrices with symbolic primitives of
 given sparsity.
 
->  static[MatType ] MatType .sym(str name, int nrow, int ncol, int p)
+>  static std::vector<MatType > casadi::GenericMatrix< MatType >::sym(const std::string &name, int nrow, int ncol, int p)
 ------------------------------------------------------------------------
 
 Create a vector of length p with nrow-by-ncol symbolic primitives.
 
->  [[MatType ] ] MatType .sym(str name, Sparsity sp, int p, int r)
+>  std::vector< std::vector< MatType > > casadi::GenericMatrix< MatType >::sym(const std::string &name, const Sparsity &sp, int p, int r)
 ------------------------------------------------------------------------
 
 Create a vector of length r of vectors of length p with symbolic primitives
 with given sparsity.
 
->  static[[MatType] ] MatType .sym(str name, int nrow, int ncol, int p, int r)
+>  static std::vector<std::vector<MatType> > casadi::GenericMatrix< MatType >::sym(const std::string &name, int nrow, int ncol, int p, int r)
 ------------------------------------------------------------------------
 
 Create a vector of length r of vectors of length p with nrow-by-ncol
 symbolic primitives.
 
->  SX SX .sym(str name, Sparsity sp)
+>  SX casadi::GenericMatrix< SX >::sym(const std::string &name, const Sparsity &sp)
 ------------------------------------------------------------------------
 [INTERNAL] 
 ";
@@ -3738,7 +3746,7 @@ Generate a skew symmetric matrix from a 3-vector.
 
 %feature("docstring") friendwrap_pinv "
 
->  MatType pinv(MatType A)
+>  MatType pinv(const MatType &A)
 ------------------------------------------------------------------------
 
 Computes the Moore-Penrose pseudo-inverse.
@@ -3751,7 +3759,7 @@ If the matrix A is slender (size1>size2), mul(pinv(A), A) is unity.
 
 pinv(A) = (A'A)^(-1) A'
 
->  MatType pinv(MatType A, str lsolver, Dict dict=Dict())
+>  MatType pinv(const MatType &A, const std::string &lsolver, const Dict &dict=Dict())
 ------------------------------------------------------------------------
 
 Computes the Moore-Penrose pseudo-inverse.
@@ -3965,12 +3973,12 @@ Query plugin name.
 
 %feature("docstring") casadi::Importer::Importer "
 
->  Importer()
+>  casadi::Importer::Importer()
 ------------------------------------------------------------------------
 
 Default constructor.
 
->  Importer(str name, str compiler, Dict opts=Dict())
+>  casadi::Importer::Importer(const std::string &name, const std::string &compiler, const Dict &opts=Dict())
 ------------------------------------------------------------------------
 
 Importer factory.
@@ -4168,12 +4176,12 @@ Obtain a symbolic Cholesky factorization Only for Cholesky solvers.
 
 %feature("docstring") casadi::Linsol::solve "
 
->  DM Linsol.solve(DM A, DM B, bool tr=false)
+>  DM casadi::Linsol::solve(const DM &A, const DM &B, bool tr=false)
 ------------------------------------------------------------------------
 
 Solve numerically.
 
->  MX Linsol.solve(MX A, MX B, bool tr=false)
+>  MX casadi::Linsol::solve(const MX &A, const MX &B, bool tr=false)
 ------------------------------------------------------------------------
 
 Create a solve node.
@@ -4189,12 +4197,12 @@ point to any node, \"0\" is returned.
 
 %feature("docstring") casadi::Linsol::Linsol "
 
->  Linsol()
+>  casadi::Linsol::Linsol()
 ------------------------------------------------------------------------
 
 Default constructor.
 
->  Linsol(str name, str solver, Dict opts=Dict())
+>  casadi::Linsol::Linsol(const std::string &name, const std::string &solver, const Dict &opts=Dict())
 ------------------------------------------------------------------------
 
 Importer factory.
@@ -4455,7 +4463,7 @@ matrix is constant (note that false negative answers are possible)
 
 %feature("docstring") friendwrap_mtaylor "
 
->  array(Scalar)  array(Scalar) .mtaylor(array(Scalar) ex, array(Scalar) x, array(Scalar) a, int order=1)
+>  Matrix< Scalar > casadi::Matrix< Scalar >::mtaylor(const Matrix< Scalar > &ex, const Matrix< Scalar > &x, const Matrix< Scalar > &a, int order=1)
 ------------------------------------------------------------------------
 [INTERNAL] 
 multivariate Taylor series expansion
@@ -4463,7 +4471,7 @@ multivariate Taylor series expansion
 Do Taylor expansions until the aggregated order of a term is equal to
 'order'. The aggregated order of $x^n y^m$ equals $n+m$.
 
->  array(Scalar)  array(Scalar) .mtaylor(array(Scalar) ex, array(Scalar) x, array(Scalar) a, int order, [int ] order_contributions)
+>  Matrix< Scalar > casadi::Matrix< Scalar >::mtaylor(const Matrix< Scalar > &ex, const Matrix< Scalar > &x, const Matrix< Scalar > &a, int order, const std::vector< int > &order_contributions)
 ------------------------------------------------------------------------
 [INTERNAL] 
 multivariate Taylor series expansion
@@ -4489,22 +4497,22 @@ expression.
 
 %feature("docstring") casadi::Matrix::set "
 
->  void array(Scalar) .set(array(Scalar) m, bool ind1, Slice rr)
+>  void casadi::Matrix< Scalar >::set(const Matrix< Scalar > &m, bool ind1, const Slice &rr)
 
->  void array(Scalar) .set(array(Scalar) m, bool ind1, IM rr)
+>  void casadi::Matrix< Scalar >::set(const Matrix< Scalar > &m, bool ind1, const Matrix< int > &rr)
 
->  void array(Scalar) .set(array(Scalar) m, bool ind1, Sparsity sp)
+>  void casadi::Matrix< Scalar >::set(const Matrix< Scalar > &m, bool ind1, const Sparsity &sp)
 ------------------------------------------------------------------------
 [INTERNAL] 
 Set a submatrix, single argument
 
->  void array(Scalar) .set(array(Scalar) m, bool ind1, Slice rr, Slice cc)
+>  void casadi::Matrix< Scalar >::set(const Matrix< Scalar > &m, bool ind1, const Slice &rr, const Slice &cc)
 
->  void array(Scalar) .set(array(Scalar) m, bool ind1, Slice rr, IM cc)
+>  void casadi::Matrix< Scalar >::set(const Matrix< Scalar > &m, bool ind1, const Slice &rr, const Matrix< int > &cc)
 
->  void array(Scalar) .set(array(Scalar) m, bool ind1, IM rr, Slice cc)
+>  void casadi::Matrix< Scalar >::set(const Matrix< Scalar > &m, bool ind1, const Matrix< int > &rr, const Slice &cc)
 
->  void array(Scalar) .set(array(Scalar) m, bool ind1, IM rr, IM cc)
+>  void casadi::Matrix< Scalar >::set(const Matrix< Scalar > &m, bool ind1, const Matrix< int > &rr, const Matrix< int > &cc)
 ------------------------------------------------------------------------
 [INTERNAL] 
 Set a submatrix, two arguments
@@ -4524,22 +4532,22 @@ and rows Remove/delete rows and/or columns of a matrix.
 
 %feature("docstring") casadi::Matrix::get "
 
->  void array(Scalar) .get(array(Scalar) output_m, bool ind1, Slice rr) const
+>  void casadi::Matrix< Scalar >::get(Matrix< Scalar > &output_m, bool ind1, const Slice &rr) const
 
->  void array(Scalar) .get(array(Scalar) output_m, bool ind1, IM rr) const
+>  void casadi::Matrix< Scalar >::get(Matrix< Scalar > &output_m, bool ind1, const Matrix< int > &rr) const
 
->  void array(Scalar) .get(array(Scalar) output_m, bool ind1, Sparsity sp) const 
+>  void casadi::Matrix< Scalar >::get(Matrix< Scalar > &output_m, bool ind1, const Sparsity &sp) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Get a submatrix, single argument
 
->  void array(Scalar) .get(array(Scalar) output_m, bool ind1, Slice rr, Slice cc) const
+>  void casadi::Matrix< Scalar >::get(Matrix< Scalar > &output_m, bool ind1, const Slice &rr, const Slice &cc) const
 
->  void array(Scalar) .get(array(Scalar) output_m, bool ind1, Slice rr, IM cc) const
+>  void casadi::Matrix< Scalar >::get(Matrix< Scalar > &output_m, bool ind1, const Slice &rr, const Matrix< int > &cc) const
 
->  void array(Scalar) .get(array(Scalar) output_m, bool ind1, IM rr, Slice cc) const
+>  void casadi::Matrix< Scalar >::get(Matrix< Scalar > &output_m, bool ind1, const Matrix< int > &rr, const Slice &cc) const
 
->  void array(Scalar) .get(array(Scalar) output_m, bool ind1, IM rr, IM cc) const 
+>  void casadi::Matrix< Scalar >::get(Matrix< Scalar > &output_m, bool ind1, const Matrix< int > &rr, const Matrix< int > &cc) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Get a submatrix, two arguments
@@ -4604,12 +4612,12 @@ matrix is integer-valued (note that false negative answers are possible)
 
 %feature("docstring") casadi::Matrix::numel "
 
->  int array(Scalar) .numel() const
+>  int casadi::GenericMatrix< Matrix< Scalar >  >::numel() const
 ------------------------------------------------------------------------
 
 Get the number of elements.
 
->  int array(Scalar) .numel(int i) const
+>  int casadi::GenericMatrix< Matrix< Scalar >  >::numel(int i) const
 ------------------------------------------------------------------------
 
 Get the number of elements in slice (cf. MATLAB)
@@ -4844,39 +4852,39 @@ SXElem::dep(int ch=0) const.
 
 %feature("docstring") casadi::Matrix::sym "
 
->  static array(Scalar)   array(Scalar) .sym(str name, int nrow=1, int ncol=1)
+>  static Matrix< Scalar >  casadi::GenericMatrix< Matrix< Scalar >  >::sym(const std::string &name, int nrow=1, int ncol=1)
 ------------------------------------------------------------------------
 
 Create an nrow-by-ncol symbolic primitive.
 
->  static array(Scalar)   array(Scalar) .sym(str name, (int,int) rc)
+>  static Matrix< Scalar >  casadi::GenericMatrix< Matrix< Scalar >  >::sym(const std::string &name, const std::pair< int, int > &rc)
 ------------------------------------------------------------------------
 
 Construct a symbolic primitive with given dimensions.
 
->  static array(Scalar)   array(Scalar) .sym(str name, Sparsity sp)
+>  static Matrix< Scalar >  casadi::GenericMatrix< Matrix< Scalar >  >::sym(const std::string &name, const Sparsity &sp)
 ------------------------------------------------------------------------
 
 Create symbolic primitive with a given sparsity pattern.
 
->  static[array(Scalar)   ] array(Scalar) .sym(str name, Sparsity sp, int p)
+>  static std::vector<Matrix< Scalar >  > casadi::GenericMatrix< Matrix< Scalar >  >::sym(const std::string &name, const Sparsity &sp, int p)
 ------------------------------------------------------------------------
 
 Create a vector of length p with with matrices with symbolic primitives of
 given sparsity.
 
->  static[array(Scalar)   ] array(Scalar) .sym(str name, int nrow, int ncol, int p)
+>  static std::vector<Matrix< Scalar >  > casadi::GenericMatrix< Matrix< Scalar >  >::sym(const std::string &name, int nrow, int ncol, int p)
 ------------------------------------------------------------------------
 
 Create a vector of length p with nrow-by-ncol symbolic primitives.
 
->  static[[array(Scalar)  ] ] array(Scalar) .sym(str name, Sparsity sp, int p, int r)
+>  static std::vector<std::vector<Matrix< Scalar > > > casadi::GenericMatrix< Matrix< Scalar >  >::sym(const std::string &name, const Sparsity &sp, int p, int r)
 ------------------------------------------------------------------------
 
 Create a vector of length r of vectors of length p with symbolic primitives
 with given sparsity.
 
->  static[[array(Scalar)  ] ] array(Scalar) .sym(str name, int nrow, int ncol, int p, int r)
+>  static std::vector<std::vector<Matrix< Scalar > > > casadi::GenericMatrix< Matrix< Scalar >  >::sym(const std::string &name, int nrow, int ncol, int p, int r)
 ------------------------------------------------------------------------
 
 Create a vector of length r of vectors of length p with nrow-by-ncol
@@ -4972,12 +4980,12 @@ streams.
 
 %feature("docstring") casadi::Matrix::size "
 
->  (int,int) array(Scalar) .size() const
+>  std::pair<int, int> casadi::GenericMatrix< Matrix< Scalar >  >::size() const
 ------------------------------------------------------------------------
 
 Get the shape.
 
->  int array(Scalar) .size(int axis) const
+>  int casadi::GenericMatrix< Matrix< Scalar >  >::size(int axis) const
 ------------------------------------------------------------------------
 
 Get the size along a particular dimensions.
@@ -4986,13 +4994,13 @@ Get the size along a particular dimensions.
 
 %feature("docstring") casadi::Matrix::erase "
 
->  void array(Scalar) .erase([int ] rr, [int ] cc, bool ind1=false)
+>  void casadi::Matrix< Scalar >::erase(const std::vector< int > &rr, const std::vector< int > &cc, bool ind1=false)
 ------------------------------------------------------------------------
 [INTERNAL] 
 Erase a submatrix (leaving structural zeros in its place) Erase rows
 and/or columns of a matrix.
 
->  void array(Scalar) .erase([int ] rr, bool ind1=false)
+>  void casadi::Matrix< Scalar >::erase(const std::vector< int > &rr, bool ind1=false)
 ------------------------------------------------------------------------
 [INTERNAL] 
 Erase a submatrix (leaving structural zeros in its place) Erase
@@ -5008,12 +5016,12 @@ Check if the matrix is a row vector (i.e. size1()==1)
 
 %feature("docstring") casadi::Matrix::__nonzero__ "
 
->  bool array(Scalar) .__nonzero__() const 
+>  bool casadi::Matrix< Scalar >::__nonzero__() const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Returns the truth value of a Matrix.
 
->  bool SX.__nonzero__() const
+>  bool casadi::Matrix< SXElem >::__nonzero__() const
 ------------------------------------------------------------------------
 [INTERNAL] 
 ";
@@ -5022,7 +5030,7 @@ Returns the truth value of a Matrix.
 
 %feature("docstring") friendwrap_taylor "
 
->  array(Scalar)  array(Scalar) .taylor(array(Scalar) ex, array(Scalar) x, array(Scalar) a, int order=1)
+>  Matrix< Scalar > casadi::Matrix< Scalar >::taylor(const Matrix< Scalar > &ex, const Matrix< Scalar > &x, const Matrix< Scalar > &a, int order=1)
 ------------------------------------------------------------------------
 [INTERNAL] 
 univariate Taylor series expansion
@@ -5041,7 +5049,7 @@ Example usage:
 
 
 
->  array(Scalar)  taylor(array(Scalar) ex, array(Scalar) x)
+>  Matrix<Scalar> taylor(const Matrix< Scalar > &ex, const Matrix< Scalar > &x)
 ------------------------------------------------------------------------
 
 univariate Taylor series expansion
@@ -5117,12 +5125,12 @@ x:  Scalar symbol that the polynomial is build up with
 
 %feature("docstring") friendwrap_gauss_quadrature "
 
->  array(Scalar)  array(Scalar) .gauss_quadrature(array(Scalar) f, array(Scalar) x, array(Scalar) a, array(Scalar) b, int order=5)
+>  Matrix< Scalar > casadi::Matrix< Scalar >::gauss_quadrature(const Matrix< Scalar > &f, const Matrix< Scalar > &x, const Matrix< Scalar > &a, const Matrix< Scalar > &b, int order=5)
 ------------------------------------------------------------------------
 [INTERNAL] 
 Integrate f from a to b using Gaussian quadrature with n points.
 
->  array(Scalar)  array(Scalar) .gauss_quadrature(array(Scalar) f, array(Scalar) x, array(Scalar) a, array(Scalar) b, int order, array(Scalar) w)
+>  Matrix< Scalar > casadi::Matrix< Scalar >::gauss_quadrature(const Matrix< Scalar > &f, const Matrix< Scalar > &x, const Matrix< Scalar > &a, const Matrix< Scalar > &b, int order, const Matrix< Scalar > &w)
 ------------------------------------------------------------------------
 [INTERNAL] 
  Matrix adjoint.
@@ -5186,62 +5194,62 @@ streams.
 
 %feature("docstring") casadi::Matrix::Matrix "
 
->  array(Scalar) ()
+>  casadi::Matrix< Scalar >::Matrix()
 ------------------------------------------------------------------------
 [INTERNAL] 
 constructors
 
 empty 0-by-0 matrix constructor
 
->  array(Scalar) (array(Scalar) m)
+>  casadi::Matrix< Scalar >::Matrix(const Matrix< Scalar > &m)
 ------------------------------------------------------------------------
 [INTERNAL] 
 Copy constructor.
 
->  array(Scalar) (int nrow, int ncol)
+>  casadi::Matrix< Scalar >::Matrix(int nrow, int ncol)
 ------------------------------------------------------------------------
 [INTERNAL] 
 Create a sparse matrix with all structural zeros.
 
->  array(Scalar) (Sparsity sp)
+>  casadi::Matrix< Scalar >::Matrix(const Sparsity &sp)
 ------------------------------------------------------------------------
 [INTERNAL] 
 Create a sparse matrix from a sparsity pattern. Same as
 Matrix::ones(sparsity)
 
->  array(Scalar) (Sparsity sp, array(Scalar) d)
+>  casadi::Matrix< Scalar >::Matrix(const Sparsity &sp, const Matrix< Scalar > &d)
 ------------------------------------------------------------------------
 [INTERNAL] 
 Construct matrix with a given sparsity and nonzeros.
 
->  array(Scalar) (double val)
+>  casadi::Matrix< Scalar >::Matrix(double val)
 ------------------------------------------------------------------------
 [INTERNAL] 
 This constructor enables implicit type conversion from a numeric type.
 
->  array(Scalar) ([[double ] ] m)
+>  casadi::Matrix< Scalar >::Matrix(const std::vector< std::vector< double > > &m)
 ------------------------------------------------------------------------
 [INTERNAL] 
 Dense matrix constructor with data given as vector of vectors.
 
->  array(T) ([A ] x)
+>  casadi::Matrix< T >::Matrix(const std::vector< A > &x)
 ------------------------------------------------------------------------
 
 Create an expression from a vector.
 
->  array(T) (array(A) x)
+>  casadi::Matrix< T >::Matrix(const Matrix< A > &x)
 ------------------------------------------------------------------------
 
 Create a matrix from another matrix with a different entry type Assumes that
 the scalar conversion is valid.
 
->  array(T) ([Scalar ] x)
+>  casadi::Matrix< T >::Matrix(const std::vector< Scalar > &x)
 
->  array(T) ((int,int) rc)
+>  casadi::Matrix< T >::Matrix(const std::pair< int, int > &rc)
 
->  array(T) (Sparsity sp, Scalar val, bool dummy)
+>  casadi::Matrix< T >::Matrix(const Sparsity &sp, const Scalar &val, bool dummy)
 
->  array(T) (Sparsity sp, [Scalar ] d, bool dummy)
+>  casadi::Matrix< T >::Matrix(const Sparsity &sp, const std::vector< Scalar > &d, bool dummy)
 ------------------------------------------------------------------------
 [INTERNAL] 
 ";
@@ -5731,13 +5739,13 @@ Return a string with a description (for SWIG)
 
 %feature("docstring") casadi::MX::erase "
 
->  void MX.erase([int ] rr, [int ] cc, bool ind1=false)
+>  void casadi::MX::erase(const std::vector< int > &rr, const std::vector< int > &cc, bool ind1=false)
 ------------------------------------------------------------------------
 
 Erase a submatrix (leaving structural zeros in its place) Erase rows and/or
 columns of a matrix.
 
->  void MX.erase([int ] rr, bool ind1=false)
+>  void casadi::MX::erase(const std::vector< int > &rr, bool ind1=false)
 ------------------------------------------------------------------------
 
 Erase a submatrix (leaving structural zeros in its place) Erase elements of
@@ -5772,11 +5780,11 @@ Check if evaluation output.
 
 %feature("docstring") casadi::MX::set "
 
->  void MX.set(MX m, bool ind1, Slice rr)
+>  void casadi::MX::set(const MX &m, bool ind1, const Slice &rr)
 
->  void MX.set(MX m, bool ind1, IM rr)
+>  void casadi::MX::set(const MX &m, bool ind1, const Matrix< int > &rr)
 
->  void MX.set(MX m, bool ind1, Sparsity sp)
+>  void casadi::MX::set(const MX &m, bool ind1, const Sparsity &sp)
 ------------------------------------------------------------------------
 
 Set a submatrix, single argument
@@ -5998,13 +6006,13 @@ check if zero (note that false negative answers are possible)
 
 %feature("docstring") friendwrap_graph_substitute "
 
->  MX graph_substitute(MX ex, [MX ] v, [MX ] vdef)
+>  MX graph_substitute(const MX &ex, const std::vector< MX > &v, const std::vector< MX > &vdef)
 ------------------------------------------------------------------------
 
 Substitute single expression in graph Substitute variable v with expression
 vdef in an expression ex, preserving nodes.
 
->  [MX] graph_substitute([MX ] ex, [MX ] v, [MX ] vdef)
+>  std::vector<MX> graph_substitute(const std::vector< MX > &ex, const std::vector< MX > &v, const std::vector< MX > &vdef)
 ------------------------------------------------------------------------
 
 Substitute multiple expressions in graph Substitute variable var with
@@ -6070,12 +6078,12 @@ check if zero (note that false negative answers are possible)
 
 %feature("docstring") casadi::MX::size "
 
->  (int,int) MX .size() const
+>  std::pair<int, int> casadi::GenericMatrix< MX  >::size() const
 ------------------------------------------------------------------------
 
 Get the shape.
 
->  int MX .size(int axis) const
+>  int casadi::GenericMatrix< MX  >::size(int axis) const
 ------------------------------------------------------------------------
 
 Get the size along a particular dimensions.
@@ -6130,12 +6138,12 @@ Check if norm.
 
 %feature("docstring") casadi::MX::numel "
 
->  int MX .numel() const
+>  int casadi::GenericMatrix< MX  >::numel() const
 ------------------------------------------------------------------------
 
 Get the number of elements.
 
->  int MX .numel(int i) const
+>  int casadi::GenericMatrix< MX  >::numel(int i) const
 ------------------------------------------------------------------------
 
 Get the number of elements in slice (cf. MATLAB)
@@ -6151,39 +6159,39 @@ keeping the existing non-zeros.
 
 %feature("docstring") casadi::MX::sym "
 
->  static MX  MX .sym(str name, int nrow=1, int ncol=1)
+>  static MX  casadi::GenericMatrix< MX  >::sym(const std::string &name, int nrow=1, int ncol=1)
 ------------------------------------------------------------------------
 
 Create an nrow-by-ncol symbolic primitive.
 
->  static MX  MX .sym(str name, (int,int) rc)
+>  static MX  casadi::GenericMatrix< MX  >::sym(const std::string &name, const std::pair< int, int > &rc)
 ------------------------------------------------------------------------
 
 Construct a symbolic primitive with given dimensions.
 
->  static MX  MX .sym(str name, Sparsity sp)
+>  static MX  casadi::GenericMatrix< MX  >::sym(const std::string &name, const Sparsity &sp)
 ------------------------------------------------------------------------
 
 Create symbolic primitive with a given sparsity pattern.
 
->  static[MX  ] MX .sym(str name, Sparsity sp, int p)
+>  static std::vector<MX  > casadi::GenericMatrix< MX  >::sym(const std::string &name, const Sparsity &sp, int p)
 ------------------------------------------------------------------------
 
 Create a vector of length p with with matrices with symbolic primitives of
 given sparsity.
 
->  static[MX  ] MX .sym(str name, int nrow, int ncol, int p)
+>  static std::vector<MX  > casadi::GenericMatrix< MX  >::sym(const std::string &name, int nrow, int ncol, int p)
 ------------------------------------------------------------------------
 
 Create a vector of length p with nrow-by-ncol symbolic primitives.
 
->  static[[MX ] ] MX .sym(str name, Sparsity sp, int p, int r)
+>  static std::vector<std::vector<MX > > casadi::GenericMatrix< MX  >::sym(const std::string &name, const Sparsity &sp, int p, int r)
 ------------------------------------------------------------------------
 
 Create a vector of length r of vectors of length p with symbolic primitives
 with given sparsity.
 
->  static[[MX ] ] MX .sym(str name, int nrow, int ncol, int p, int r)
+>  static std::vector<std::vector<MX > > casadi::GenericMatrix< MX  >::sym(const std::string &name, int nrow, int ncol, int p, int r)
 ------------------------------------------------------------------------
 
 Create a vector of length r of vectors of length p with nrow-by-ncol
@@ -6199,22 +6207,22 @@ Check if the matrix expression is square.
 
 %feature("docstring") casadi::MX::get "
 
->  void MX.get(MX &output_m, bool ind1, Slice rr) const
+>  void casadi::MX::get(MX &output_m, bool ind1, const Slice &rr) const
 
->  void MX.get(MX &output_m, bool ind1, IM rr) const
+>  void casadi::MX::get(MX &output_m, bool ind1, const Matrix< int > &rr) const
 
->  void MX.get(MX &output_m, bool ind1, Sparsity sp) const 
+>  void casadi::MX::get(MX &output_m, bool ind1, const Sparsity &sp) const 
 ------------------------------------------------------------------------
 
 Get a submatrix, single argument
 
->  void MX.get(MX &output_m, bool ind1, Slice rr, Slice cc) const
+>  void casadi::MX::get(MX &output_m, bool ind1, const Slice &rr, const Slice &cc) const
 
->  void MX.get(MX &output_m, bool ind1, Slice rr, IM cc) const
+>  void casadi::MX::get(MX &output_m, bool ind1, const Slice &rr, const Matrix< int > &cc) const
 
->  void MX.get(MX &output_m, bool ind1, IM rr, Slice cc) const
+>  void casadi::MX::get(MX &output_m, bool ind1, const Matrix< int > &rr, const Slice &cc) const
 
->  void MX.get(MX &output_m, bool ind1, IM rr, IM cc) const 
+>  void casadi::MX::get(MX &output_m, bool ind1, const Matrix< int > &rr, const Matrix< int > &cc) const 
 ------------------------------------------------------------------------
 
 Get a submatrix, two arguments
@@ -6270,42 +6278,42 @@ Get the name.
 
 %feature("docstring") casadi::MX::MX "
 
->  MX()
+>  casadi::MX::MX()
 ------------------------------------------------------------------------
 
 Default constructor.
 
->  MX(int nrow, int ncol)
+>  casadi::MX::MX(int nrow, int ncol)
 ------------------------------------------------------------------------
 
 Create a sparse matrix with all structural zeros.
 
->  MX(Sparsity sp)
+>  casadi::MX::MX(const Sparsity &sp)
 ------------------------------------------------------------------------
 
 Create a sparse matrix from a sparsity pattern. Same as MX::ones(sparsity)
 
->  MX(Sparsity sp, MX val)
+>  casadi::MX::MX(const Sparsity &sp, const MX &val)
 ------------------------------------------------------------------------
 
 Construct matrix with a given sparsity and nonzeros.
 
->  MX(double x)
+>  casadi::MX::MX(double x)
 ------------------------------------------------------------------------
 
 Create scalar constant (also implicit type conversion)
 
->  MX(MX x)
+>  casadi::MX::MX(const MX &x)
 ------------------------------------------------------------------------
 
 Copy constructor.
 
->  MX([double ] x)
+>  casadi::MX::MX(const std::vector< double > &x)
 ------------------------------------------------------------------------
 
 Create vector constant (also implicit type conversion)
 
->  MX(DM x)
+>  casadi::MX::MX(const Matrix< double > &x)
 ------------------------------------------------------------------------
 
 Create sparse matrix constant (also implicit type conversion)
@@ -6508,14 +6516,14 @@ C++ includes: nonzeros.hpp ";
 // File: classcasadi_1_1ParsedFile.xml
 %feature("docstring") casadi::ParsedFile::ParsedFile "
 
->  ParsedFile()
+>  casadi::ParsedFile::ParsedFile()
 ------------------------------------------------------------------------
 
 Default constructor (no commands)
 
->  ParsedFile(str fname)
+>  casadi::ParsedFile::ParsedFile(const std::string &fname)
 
->  ParsedFile([str ] lines, int offset=0)
+>  casadi::ParsedFile::ParsedFile(const std::vector< std::string > &lines, int offset=0)
 ------------------------------------------------------------------------
 
 Construct from a file.
@@ -6536,12 +6544,12 @@ Convert to a type.
 
 %feature("docstring") casadi::ParsedFile::parse "
 
->  void ParsedFile.parse(str fname)
+>  void casadi::ParsedFile::parse(const std::string &fname)
 ------------------------------------------------------------------------
 
 Parse a file.
 
->  void ParsedFile.parse([str ] lines, int offset)
+>  void casadi::ParsedFile::parse(const std::vector< std::string > &lines, int offset)
 ------------------------------------------------------------------------
 
 Parse a list of strings.
@@ -6610,27 +6618,27 @@ Create a new polynomial for the derivative.
 
 %feature("docstring") casadi::Polynomial::Polynomial "
 
->  Polynomial(real_t scalar=1)
+>  casadi::Polynomial::Polynomial(real_t scalar=1)
 ------------------------------------------------------------------------
 
 Construct a constant polynomial.
 
->  Polynomial(real_t p0, real_t p1)
+>  casadi::Polynomial::Polynomial(real_t p0, real_t p1)
 ------------------------------------------------------------------------
 
 Construct a linear polynomial.
 
->  Polynomial(real_t p0, real_t p1, real_t p2)
+>  casadi::Polynomial::Polynomial(real_t p0, real_t p1, real_t p2)
 ------------------------------------------------------------------------
 
 Construct a quadratic polynomial.
 
->  Polynomial(real_t p0, real_t p1, real_t p2, real_t p3)
+>  casadi::Polynomial::Polynomial(real_t p0, real_t p1, real_t p2, real_t p3)
 ------------------------------------------------------------------------
 
 Construct a cubic polynomial.
 
->  Polynomial([T ] coeff)
+>  casadi::Polynomial::Polynomial(const std::vector< T > &coeff)
 ------------------------------------------------------------------------
 
 Construct from a vector of polynomial coefficients.
@@ -6879,12 +6887,12 @@ C++ includes: slice.hpp ";
 
 %feature("docstring") casadi::Slice::all "
 
->  [int] Slice.all(int len, bool ind1=false) const 
+>  std::vector<int> casadi::Slice::all(int len, bool ind1=false) const 
 ------------------------------------------------------------------------
 
 Get a vector of indices.
 
->  [int] Slice.all(Slice outer, int len) const 
+>  std::vector<int> casadi::Slice::all(const Slice &outer, int len) const 
 ------------------------------------------------------------------------
 
 Get a vector of indices (nested slice)
@@ -6893,17 +6901,17 @@ Get a vector of indices (nested slice)
 
 %feature("docstring") casadi::Slice::Slice "
 
->  Slice()
+>  casadi::Slice::Slice()
 ------------------------------------------------------------------------
 
 Default constructor - all elements.
 
->  Slice(int i, bool ind1=false)
+>  casadi::Slice::Slice(int i, bool ind1=false)
 ------------------------------------------------------------------------
 
 A single element (explicit to avoid ambiguity with IM overload.
 
->  Slice(int start, int stop, int step=1)
+>  casadi::Slice::Slice(int start, int stop, int step=1)
 ------------------------------------------------------------------------
 
 A slice.
@@ -6949,12 +6957,12 @@ reference to an element
 
 %feature("docstring") casadi::SparseStorage::nonzeros "
 
->  [DataType ]  SparseStorage< DataType >.nonzeros()
+>  std::vector< DataType > & casadi::SparseStorage< DataType >::nonzeros()
 ------------------------------------------------------------------------
 [INTERNAL] 
 Access the non-zero elements.
 
->  [DataType ]  SparseStorage< DataType >.nonzeros() const 
+>  const std::vector< DataType > & casadi::SparseStorage< DataType >::nonzeros() const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Const access the non-zero elements.
@@ -6978,19 +6986,19 @@ access the sparsity - reference to data member.
 
 %feature("docstring") casadi::SparseStorage::SparseStorage "
 
->  SparseStorage(Sparsity sparsity, DataType val=DataType(0))
+>  casadi::SparseStorage< DataType >::SparseStorage(const Sparsity &sparsity, const DataType &val=DataType(0))
 ------------------------------------------------------------------------
 [INTERNAL] 
 Sparse matrix with a given sparsity
 
->  SparseStorage()
+>  casadi::SparseStorage< DataType >::SparseStorage()
 ------------------------------------------------------------------------
 [INTERNAL] 
 constructors
 
 empty 0-by-0 matrix constructor
 
->  SparseStorage(const SparseStorage< DataType > &m)
+>  casadi::SparseStorage< DataType >::SparseStorage(const SparseStorage< DataType > &m)
 ------------------------------------------------------------------------
 [INTERNAL] 
 Copy constructor.
@@ -7197,17 +7205,17 @@ j==i.
 
 %feature("docstring") casadi::Sparsity::Sparsity "
 
->  Sparsity(int dummy=0)
+>  casadi::Sparsity::Sparsity(int dummy=0)
 ------------------------------------------------------------------------
 
 Default constructor.
 
->  Sparsity(int nrow, int ncol)
+>  casadi::Sparsity::Sparsity(int nrow, int ncol)
 ------------------------------------------------------------------------
 
 Pattern with all structural zeros.
 
->  Sparsity(int nrow, int ncol, [int ] colind, [int ] row)
+>  casadi::Sparsity::Sparsity(int nrow, int ncol, const std::vector< int > &colind, const std::vector< int > &row)
 ------------------------------------------------------------------------
 
 Construct from sparsity pattern vectors given in compressed column storage
@@ -7334,7 +7342,7 @@ Get the sparsity in compressed row storage (CRS) format.
 
 %feature("docstring") casadi::Sparsity::sub "
 
->  Sparsity Sparsity.sub([int ] rr, [int ] cc,[int ] output_mapping, bool ind1=false) const 
+>  Sparsity casadi::Sparsity::sub(const std::vector< int > &rr, const std::vector< int > &cc, std::vector< int > &output_mapping, bool ind1=false) const 
 ------------------------------------------------------------------------
 
 Get a submatrix.
@@ -7342,7 +7350,7 @@ Get a submatrix.
 Returns the sparsity of the submatrix, with a mapping such that submatrix[k]
 = originalmatrix[mapping[k]]
 
->  Sparsity Sparsity.sub([int ] rr, Sparsity sp,[int ] output_mapping, bool ind1=false) const 
+>  Sparsity casadi::Sparsity::sub(const std::vector< int > &rr, const Sparsity &sp, std::vector< int > &output_mapping, bool ind1=false) const 
 ------------------------------------------------------------------------
 
 Get a set of elements.
@@ -7656,12 +7664,12 @@ point to any node, \"0\" is returned.
 
 %feature("docstring") casadi::Sparsity::size "
 
->  (int,int) Sparsity.size() const 
+>  std::pair<int, int> casadi::Sparsity::size() const 
 ------------------------------------------------------------------------
 
 Get the shape.
 
->  int Sparsity.size(int axis) const 
+>  int casadi::Sparsity::size(int axis) const 
 ------------------------------------------------------------------------
 
 Get the size along a particular dimensions.
@@ -7679,18 +7687,18 @@ true, the algorithm is equivalent to MATLAB's etree(A, 'col').
 
 %feature("docstring") casadi::Sparsity::get_nz "
 
->  int Sparsity.get_nz(int rr, int cc) const 
+>  int casadi::Sparsity::get_nz(int rr, int cc) const 
 ------------------------------------------------------------------------
 
 Get the index of an existing non-zero element return -1 if the element does
 not exist.
 
->  [int] Sparsity.get_nz([int ] rr, [int ] cc) const 
+>  std::vector<int> casadi::Sparsity::get_nz(const std::vector< int > &rr, const std::vector< int > &cc) const 
 ------------------------------------------------------------------------
 
 Get a set of non-zero element return -1 if the element does not exist.
 
->  void Sparsity.get_nz([int ] INOUT) const 
+>  void casadi::Sparsity::get_nz(std::vector< int > &INOUT) const 
 ------------------------------------------------------------------------
 
 Get the nonzero index for a set of elements The index vector is used both
@@ -7701,12 +7709,12 @@ column-wise. Elements not found in the sparsity pattern are set to -1.
 
 %feature("docstring") casadi::Sparsity::erase "
 
->  [int] Sparsity.erase([int ] rr, [int ] cc, bool ind1=false)
+>  std::vector<int> casadi::Sparsity::erase(const std::vector< int > &rr, const std::vector< int > &cc, bool ind1=false)
 ------------------------------------------------------------------------
 
 Erase rows and/or columns of a matrix.
 
->  [int] Sparsity.erase([int ] rr, bool ind1=false)
+>  std::vector<int> casadi::Sparsity::erase(const std::vector< int > &rr, bool ind1=false)
 ------------------------------------------------------------------------
 
 Erase elements of a matrix.
@@ -7736,7 +7744,7 @@ elements (i, j) with j>=i.
 // File: classcasadi_1_1SparsityInterface.xml
 %feature("docstring") friendwrap_diagsplit "
 
->  [MatType ] diagsplit(MatType x, [int ] output_offset1, [int ] output_offset2)
+>  std::vector< MatType > diagsplit(const MatType &x, const std::vector< int > &output_offset1, const std::vector< int > &output_offset2)
 ------------------------------------------------------------------------
 
 split diagonally, retaining square matrices
@@ -7752,7 +7760,7 @@ matrix will run to the end.
 
 diagcat(diagsplit(x, ...)) = x
 
->  [MatType ] diagsplit(MatType x, [int ] output_offset)
+>  std::vector< MatType > diagsplit(const MatType &x, const std::vector< int > &output_offset)
 ------------------------------------------------------------------------
 
 split diagonally, retaining square matrices
@@ -7765,7 +7773,7 @@ will run to the end.
 
 diagcat(diagsplit(x, ...)) = x
 
->  [MatType ] diagsplit(MatType x, int incr=1)
+>  std::vector< MatType > diagsplit(const MatType &x, int incr=1)
 ------------------------------------------------------------------------
 
 split diagonally, retaining groups of square matrices
@@ -7777,7 +7785,7 @@ incr:  Size of each matrix
 
 diagsplit(diagsplit(x, ...)) = x
 
->  [MatType ] diagsplit(MatType x, int incr1, int incr2)
+>  std::vector< MatType > diagsplit(const MatType &x, int incr1, int incr2)
 ------------------------------------------------------------------------
 
 split diagonally, retaining fixed-sized matrices
@@ -7810,12 +7818,12 @@ is equivalent to: z+mtimes(x,y).project(z.sparsity()).
 
 %feature("docstring") friendwrap_mtimes "
 
->  MatType mtimes(MatType x, MatType y)
+>  MatType mtimes(const MatType &x, const MatType &y)
 ------------------------------------------------------------------------
 
 Matrix product of two matrices.
 
->  MatType mtimes([MatType ] args)
+>  MatType mtimes(const std::vector< MatType > &args)
 ------------------------------------------------------------------------
 
 Matrix product of n matrices.
@@ -7854,7 +7862,7 @@ a b c d
 
 %feature("docstring") friendwrap_horzcat "
 
->  MatType horzcat([MatType ] v)
+>  MatType horzcat(const std::vector< MatType > &v)
 ------------------------------------------------------------------------
 
 Concatenate a list of matrices horizontally Alternative terminology:
@@ -7862,17 +7870,17 @@ horizontal stack, hstack, horizontal append, [a b].
 
 horzcat(horzsplit(x, ...)) = x
 
->  MatType horzcat(MatType x, MatType y)
+>  MatType horzcat(const MatType &x, const MatType &y)
 ------------------------------------------------------------------------
 
 Concatenate horizontally, two matrices.
 
->  MatType horzcat(MatType x, MatType y, MatType z)
+>  MatType horzcat(const MatType &x, const MatType &y, const MatType &z)
 ------------------------------------------------------------------------
 
 Concatenate horizontally, three matrices.
 
->  MatType horzcat(MatType x, MatType y, MatType z, MatType w)
+>  MatType horzcat(const MatType &x, const MatType &y, const MatType &z, const MatType &w)
 ------------------------------------------------------------------------
 
 Concatenate horizontally, four matrices.
@@ -7891,7 +7899,7 @@ C++ includes: sparsity_interface.hpp ";
 
 %feature("docstring") friendwrap_horzsplit "
 
->  [MatType ] horzsplit(MatType x, [int ] offset)
+>  std::vector<MatType > horzsplit(const MatType &x, const std::vector< int > &offset)
 ------------------------------------------------------------------------
 
 split horizontally, retaining groups of columns
@@ -7904,7 +7912,7 @@ run to the end.
 
 horzcat(horzsplit(x, ...)) = x
 
->  [MatType ] horzsplit(MatType x, int incr=1)
+>  std::vector<MatType > horzsplit(const MatType &x, int incr=1)
 ------------------------------------------------------------------------
 
 split horizontally, retaining fixed-sized groups of columns
@@ -7926,7 +7934,7 @@ concatenate vertically while vectorizing all arguments with vec
 
 %feature("docstring") friendwrap_blocksplit "
 
->  [[MatType ] ] blocksplit(MatType x, [int ] vert_offset, [int ] horz_offset)
+>  std::vector< std::vector< MatType > > blocksplit(const MatType &x, const std::vector< int > &vert_offset, const std::vector< int > &horz_offset)
 ------------------------------------------------------------------------
 
 chop up into blocks
@@ -7940,7 +7948,7 @@ horz_offset:  Defines the boundaries of the block columns
 
 blockcat(blocksplit(x,..., ...)) = x
 
->  [[MatType ] ] blocksplit(MatType x, int vert_incr=1, int horz_incr=1)
+>  std::vector< std::vector< MatType > > blocksplit(const MatType &x, int vert_incr=1, int horz_incr=1)
 ------------------------------------------------------------------------
 
 chop up into blocks
@@ -7964,7 +7972,7 @@ Repeat matrix A n times vertically and m times horizontally.
 
 %feature("docstring") friendwrap_vertcat "
 
->  MatType vertcat([MatType ] v)
+>  MatType vertcat(const std::vector< MatType > &v)
 ------------------------------------------------------------------------
 
 Concatenate a list of matrices vertically Alternative terminology: vertical
@@ -7972,17 +7980,17 @@ stack, vstack, vertical append, [a;b].
 
 vertcat(vertsplit(x, ...)) = x
 
->  MatType vertcat(MatType x, MatType y)
+>  MatType vertcat(const MatType &x, const MatType &y)
 ------------------------------------------------------------------------
 
 Concatenate vertically, two matrices.
 
->  MatType vertcat(MatType x, MatType y, MatType z)
+>  MatType vertcat(const MatType &x, const MatType &y, const MatType &z)
 ------------------------------------------------------------------------
 
 Concatenate vertically, three matrices.
 
->  MatType vertcat(MatType x, MatType y, MatType z, MatType w)
+>  MatType vertcat(const MatType &x, const MatType &y, const MatType &z, const MatType &w)
 ------------------------------------------------------------------------
 
 Concatenate vertically, four matrices.
@@ -8005,17 +8013,17 @@ Creates a block matrix in which each element (i, j) is a_ij*b
 
 %feature("docstring") friendwrap_reshape "
 
->  MatType reshape(MatType x, int nrow, int ncol)
+>  MatType reshape(const MatType &x, int nrow, int ncol)
 ------------------------------------------------------------------------
 
 Returns a reshaped version of the matrix.
 
->  MatType reshape(MatType x,(int,int) rc)
+>  MatType reshape(const MatType &x, std::pair< int, int > rc)
 ------------------------------------------------------------------------
 
 Returns a reshaped version of the matrix, dimensions as a vector.
 
->  MatType reshape(MatType x, Sparsity sp)
+>  MatType reshape(const MatType &x, const Sparsity &sp)
 ------------------------------------------------------------------------
 
 Reshape the matrix.
@@ -8030,22 +8038,22 @@ Reshape the matrix.
 
 %feature("docstring") friendwrap_diagcat "
 
->  MatType diagcat([MatType ] A)
+>  MatType diagcat(const std::vector< MatType > &A)
 ------------------------------------------------------------------------
 
 Construct a matrix with given block on the diagonal.
 
->  MatType diagcat(MatType x, MatType y)
+>  MatType diagcat(const MatType &x, const MatType &y)
 ------------------------------------------------------------------------
 
 Concatenate along diagonal, two matrices.
 
->  MatType diagcat(MatType x, MatType y, MatType z)
+>  MatType diagcat(const MatType &x, const MatType &y, const MatType &z)
 ------------------------------------------------------------------------
 
 Concatenate along diagonal, three matrices.
 
->  MatType diagcat(MatType x, MatType y, MatType z, MatType w)
+>  MatType diagcat(const MatType &x, const MatType &y, const MatType &z, const MatType &w)
 ------------------------------------------------------------------------
 
 Concatenate along diagonal, four matrices.
@@ -8054,7 +8062,7 @@ Concatenate along diagonal, four matrices.
 
 %feature("docstring") friendwrap_vertsplit "
 
->  [MatType ] vertsplit(MatType x, [int ] offset)
+>  std::vector<MatType > vertsplit(const MatType &x, const std::vector< int > &offset)
 ------------------------------------------------------------------------
 
 split vertically, retaining groups of rows
@@ -8069,7 +8077,7 @@ will run to the end.
 
 vertcat(vertsplit(x, ...)) = x
 
->  [MatType ] vertsplit(MatType x, int incr=1)
+>  std::vector<MatType > vertsplit(const MatType &x, int incr=1)
 ------------------------------------------------------------------------
 
 split vertically, retaining fixed-sized groups of rows
@@ -8118,12 +8126,12 @@ will have a size smaller than incr.
 
 %feature("docstring") friendwrap_blockcat "
 
->  MatType blockcat([[MatType ] ] v)
+>  MatType blockcat(const std::vector< std::vector< MatType > > &v)
 ------------------------------------------------------------------------
 
 Construct a matrix from a list of list of blocks.
 
->  MatType blockcat(MatType A, MatType B, MatType C, MatType D)
+>  MatType blockcat(const MatType &A, const MatType &B, const MatType &C, const MatType &D)
 ------------------------------------------------------------------------
 
 Construct a matrix from 4 blocks.
@@ -8564,12 +8572,12 @@ string with a description (for SWIG)
 
 %feature("docstring") casadi::WeakRef::WeakRef "
 
->  WeakRef(int dummy=0)
+>  casadi::WeakRef::WeakRef(int dummy=0)
 ------------------------------------------------------------------------
 [INTERNAL] 
 Default constructor.
 
->  WeakRef(SharedObject shared)
+>  casadi::WeakRef::WeakRef(SharedObject shared)
 ------------------------------------------------------------------------
 [INTERNAL] 
 Construct from a shared object (also implicit type conversion)
@@ -8701,12 +8709,12 @@ to be monotonously increasing
 
 %feature("docstring") casadi::inBounds "
 
->  bool inBounds([T ] v, int upper)
+>  bool casadi::inBounds(const std::vector< T > &v, int upper)
 ------------------------------------------------------------------------
 
 Check if for each element of v holds: v_i < upper.
 
->  bool inBounds([T ] v, int lower, int upper)
+>  bool casadi::inBounds(const std::vector< T > &v, int lower, int upper)
 ------------------------------------------------------------------------
 
 Check if for each element of v holds: lower <= v_i < upper.
@@ -8715,12 +8723,12 @@ Check if for each element of v holds: lower <= v_i < upper.
 
 %feature("docstring") casadi::casadi_rank1 "
 
->  void rank1(real_t *A, const int *sp_A, real_t alpha, const real_t *x)
+>  void casadi::casadi_rank1(real_t *A, const int *sp_A, real_t alpha, const real_t *x)
 ------------------------------------------------------------------------
 [INTERNAL] 
 Adds a multiple alpha/2 of the outer product mul(x, trans(x)) to A.
 
->  void rank1(real_t *A, const int *sp_A, real_t alpha, const real_t *x, const real_t *y)
+>  void casadi::casadi_rank1(real_t *A, const int *sp_A, real_t alpha, const real_t *x, const real_t *y)
 ------------------------------------------------------------------------
 [INTERNAL] 
 ";
@@ -8763,17 +8771,17 @@ Get the number of integrator outputs.
 
 %feature("docstring") casadi::external "
 
->  Function external(str name, Dict opts=Dict())
+>  Function casadi::external(const std::string &name, const Dict &opts=Dict())
 ------------------------------------------------------------------------
 
 Load an external function File name is assumed to be ./<f_name>.so.
 
->  Function external(str name, str bin_name, Dict opts=Dict())
+>  Function casadi::external(const std::string &name, const std::string &bin_name, const Dict &opts=Dict())
 ------------------------------------------------------------------------
 
 Load an external function File name given.
 
->  Function external(str name, Importer compiler, Dict opts=Dict())
+>  Function casadi::external(const std::string &name, const Importer &compiler, const Dict &opts=Dict())
 ------------------------------------------------------------------------
 
 Load a just-in-time compiled external function File name given.
@@ -8835,7 +8843,7 @@ Check if a particular plugin is available.
 
 %feature("docstring") casadi::integrator "
 
->  Function integrator(str name, str solver, const str:SX &dae, Dict opts=Dict())
+>  Function casadi::integrator(const std::string &name, const std::string &solver, const SXDict &dae, const Dict &opts=Dict())
 ------------------------------------------------------------------------
 
 Create an ODE/DAE integrator Solves an initial value problem (IVP) coupled
@@ -9327,12 +9335,12 @@ Check if the vector has negative entries.
 
 %feature("docstring") casadi::read_matlab "
 
->  void read_matlab(std.istream &stream,[T ] v)
+>  void casadi::read_matlab(std::istream &stream, std::vector< T > &v)
 ------------------------------------------------------------------------
 
 Read vector, matlab style.
 
->  void read_matlab(std.ifstream &file,[[T ] ] v)
+>  void casadi::read_matlab(std::ifstream &file, std::vector< std::vector< T > > &v)
 ------------------------------------------------------------------------
 
 Read matrix, matlab style.
@@ -9352,12 +9360,12 @@ Get the documentation string for a plugin.
 
 %feature("docstring") casadi::write_matlab "
 
->  void write_matlab(std.ostream &stream, [T ] v)
+>  void casadi::write_matlab(std::ostream &stream, const std::vector< T > &v)
 ------------------------------------------------------------------------
 
 Print vector, matlab style.
 
->  void write_matlab(std.ostream &stream, [[T ] ] v)
+>  void casadi::write_matlab(std::ostream &stream, const std::vector< std::vector< T > > &v)
 ------------------------------------------------------------------------
 
 Print matrix, matlab style.
@@ -9371,7 +9379,7 @@ sparse.
 
 %feature("docstring") casadi::hash_sparsity "
 
->  std.size_t hash_sparsity(int nrow, int ncol, [int ] colind, [int ] row)
+>  std::size_t casadi::hash_sparsity(int nrow, int ncol, const std::vector< int > &colind, const std::vector< int > &row)
 ------------------------------------------------------------------------
 
 Hash a sparsity pattern.
@@ -9597,12 +9605,12 @@ Check if the vector is strictly monotone.
 
 %feature("docstring") casadi::to_slice "
 
->  Slice to_slice(IM x, bool ind1=false)
+>  Slice casadi::to_slice(const IM &x, bool ind1=false)
 ------------------------------------------------------------------------
 
 Convert IM to Slice.
 
->  Slice to_slice([int ] v, bool ind1=false)
+>  Slice casadi::to_slice(const std::vector< int > &v, bool ind1=false)
 ------------------------------------------------------------------------
 
 Construct from an index vector (requires is_slice(v) to be true)
@@ -9615,12 +9623,12 @@ Construct from an index vector (requires is_slice(v) to be true)
 
 %feature("docstring") casadi::conic_in "
 
->  CASADI_EXPORT[str] conic_in()
+>  std::vector<std::string> casadi::conic_in()
 ------------------------------------------------------------------------
 
 Get input scheme of QP solvers.
 
->  str conic_in(int ind)
+>  std::string casadi::conic_in(int ind)
 ------------------------------------------------------------------------
 
 Get QP solver input scheme name by index.
@@ -9640,14 +9648,14 @@ Duplicates are treated by looking up last occurrence
 
 %feature("docstring") casadi::hash_combine "
 
->  void hash_combine(std.size_t &seed, T v)
+>  void casadi::hash_combine(std::size_t &seed, T v)
 
->  void hash_combine(std.size_t &seed, [int ] v)
+>  void casadi::hash_combine(std::size_t &seed, const std::vector< int > &v)
 ------------------------------------------------------------------------
 
 Generate a hash value incrementally (function taken from boost)
 
->  void hash_combine(std.size_t &seed, const int *v, int sz)
+>  void casadi::hash_combine(std::size_t &seed, const int *v, int sz)
 ------------------------------------------------------------------------
 
 Generate a hash value incrementally, array.
@@ -10429,12 +10437,12 @@ Number of NLP solver inputs.
 
 %feature("docstring") casadi::integrator_in "
 
->  CASADI_EXPORT[str] integrator_in()
+>  std::vector<std::string> casadi::integrator_in()
 ------------------------------------------------------------------------
 
 Get input scheme of integrators.
 
->  str integrator_in(int ind)
+>  std::string casadi::integrator_in(int ind)
 ------------------------------------------------------------------------
 
 Get integrator input scheme name by index.
@@ -10443,12 +10451,12 @@ Get integrator input scheme name by index.
 
 %feature("docstring") casadi::is_regular "
 
->  bool is_regular([T ] v)
+>  bool casadi::is_regular(const std::vector< T > &v)
 ------------------------------------------------------------------------
 
 Checks if array does not contain NaN or Inf.
 
->  bool is_regular([N_] v)
+>  bool casadi::is_regular(N_Vector v)
 ------------------------------------------------------------------------
 [INTERNAL] 
 ";
@@ -10573,12 +10581,12 @@ Joel Andersson
 
 %feature("docstring") casadi::is_slice "
 
->  bool is_slice(IM x, bool ind1=false)
+>  bool casadi::is_slice(const IM &x, bool ind1=false)
 ------------------------------------------------------------------------
 
 Is the IM a Slice.
 
->  bool is_slice([int ] v, bool ind1=false)
+>  bool casadi::is_slice(const std::vector< int > &v, bool ind1=false)
 ------------------------------------------------------------------------
 
 Check if an index vector can be represented more efficiently as a slice.
@@ -10615,12 +10623,12 @@ Explicitly load a plugin dynamically.
 
 %feature("docstring") casadi::integrator_out "
 
->  CASADI_EXPORT[str] integrator_out()
+>  std::vector<std::string> casadi::integrator_out()
 ------------------------------------------------------------------------
 
 Get integrator output scheme of integrators.
 
->  str integrator_out(int ind)
+>  std::string casadi::integrator_out(int ind)
 ------------------------------------------------------------------------
 
 Get output scheme name by index.
@@ -10648,7 +10656,7 @@ multiplication: z <- z + x*y.
 
 %feature("docstring") casadi::nlpsol_out "
 
->  CASADI_EXPORT[str] nlpsol_out()
+>  std::vector<std::string> casadi::nlpsol_out()
 ------------------------------------------------------------------------
 
 Get NLP solver output scheme of NLP solvers.
@@ -10683,7 +10691,7 @@ Get NLP solver output scheme of NLP solvers.
 |                        |                        | solution (np x 1)      |
 +------------------------+------------------------+------------------------+
 
->  str nlpsol_out(int ind)
+>  std::string casadi::nlpsol_out(int ind)
 ------------------------------------------------------------------------
 
 Get output scheme name by index.
@@ -10750,7 +10758,7 @@ order:  Order of interpolating polynomials
 
 %feature("docstring") casadi::nlpsol_in "
 
->  CASADI_EXPORT[str] nlpsol_in()
+>  std::vector<std::string> casadi::nlpsol_in()
 ------------------------------------------------------------------------
 
 Get input scheme of NLP solvers.
@@ -10791,7 +10799,7 @@ Get input scheme of NLP solvers.
 |                        |                        | initial guess (ng x 1) |
 +------------------------+------------------------+------------------------+
 
->  str nlpsol_in(int ind)
+>  std::string casadi::nlpsol_in(int ind)
 ------------------------------------------------------------------------
 
 Get NLP solver input scheme name by index.
@@ -10853,7 +10861,7 @@ Get the documentation string for a plugin.
 
 %feature("docstring") casadi::nlpsol "
 
->  Function nlpsol(str name, str solver, const str:SX &nlp, Dict opts=Dict())
+>  Function casadi::nlpsol(const std::string &name, const std::string &solver, const SXDict &nlp, const Dict &opts=Dict())
 ------------------------------------------------------------------------
 
 Create an NLP solver Creates a solver for the following parametric nonlinear
@@ -11706,12 +11714,12 @@ y.size1()+x.size2()+1
 
 %feature("docstring") casadi::conic_out "
 
->  CASADI_EXPORT[str] conic_out()
+>  std::vector<std::string> casadi::conic_out()
 ------------------------------------------------------------------------
 
 Get QP solver output scheme of QP solvers.
 
->  str conic_out(int ind)
+>  std::string casadi::conic_out(int ind)
 ------------------------------------------------------------------------
 
 Get output scheme name by index.
