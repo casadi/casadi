@@ -380,6 +380,7 @@ include_directories(${CMAKE_BINARY_DIR})
 # Optional auxillary dependencies
 find_package(BLAS QUIET)
 find_package(HSL QUIET)
+add_feature_info(hsl-interface HSL_FOUND "Interface to HSL.")
 find_package(WSMP QUIET)
 find_package(METIS QUIET)
 find_package(LibXml2 QUIET)
