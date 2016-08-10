@@ -498,11 +498,6 @@ class LinearSolverTests(casadiTestCase):
         A = A.T+A
         A[Sparsity.diag(n)] =1e-8
         A = densify(A)
-      print "test", A.sparsity().spy(), A
-      print np.linalg.eig(A)[0]
-      print b
-      
-
 
       As = MX.sym("A",A.sparsity())
       bs = MX.sym("B",b.sparsity())
