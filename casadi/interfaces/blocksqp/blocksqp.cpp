@@ -62,6 +62,9 @@ namespace casadi {
       {"qpsol_options",
        {OT_DICT,
         "Options to be passed to the QP solver"}},
+      {"linsol",
+       {OT_STRING,
+        "The linear solver to be used by the QP method"}},
       {"print_header",
        {OT_BOOL,
         "Print solver header at startup"}},
@@ -270,7 +273,7 @@ namespace casadi {
       } else if (op.first=="qpsol_options") {
         //qpsol_options = op.second;
         casadi_warning("Option 'qpsol_options' currently not supported, ignored");
-      } else if (op.first=="linsol_plugin") {
+      } else if (op.first=="linsol") {
         linsol_plugin_ = string(op.second);
       } else if (op.first=="print_header") {
         print_header_ = op.second;
