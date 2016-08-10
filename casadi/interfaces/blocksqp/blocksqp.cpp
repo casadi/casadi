@@ -98,6 +98,12 @@ namespace casadi {
       {"max_consec_skipped_updates",
        {OT_INT,
         "Maximum number of consecutive skipped updates"}},
+      {"max_iter",
+       {OT_INT,
+        "Maximum number of SQP iterations"}},
+      {"warmstart",
+       {OT_BOOL,
+        "Use warmstarting"}},
       {"max_it_qp",
        {OT_INT,
         "Maximum number of QP iterations per SQP iteration"}},
@@ -228,6 +234,8 @@ namespace casadi {
     max_line_search_ = 20;
     max_consec_reduced_steps_ = 100;
     max_consec_skipped_updates_ = 100;
+    max_iter_ = 100;
+    warmstart_ = false;
     max_it_qp_ = 5000;
     block_hess_ = 1;
     hess_scaling_ = 2;
@@ -297,6 +305,10 @@ namespace casadi {
         max_consec_reduced_steps_ = op.second;
       } else if (op.first=="max_consec_skipped_updates") {
         max_consec_skipped_updates_ = op.second;
+      } else if (op.first=="max_iter") {
+        max_iter_ = op.second;
+      } else if (op.first=="warmstart") {
+        warmstart_ = op.second;
       } else if (op.first=="max_it_qp") {
         max_it_qp_ = op.second;
       } else if (op.first=="block_hess") {
@@ -436,6 +448,13 @@ namespace casadi {
     // Number of blocks
     nblocks_ = blocks_.size()-1;
 
+    // Largest blocksize
+    int max_size = 0;
+    for (int i=0;i<blocks_.size()-1;++i) max_size = max(max_size, blocks_[i+1]-blocks_[i]);
+
+    log(std::string("BlockSqp::init: working with ") + to_string(nblocks_) +
+          " blocks of max size " + to_string(max_size) + ".");
+
     // Allocate a QP solver
     //casadi_assert_message(!qpsol_plugin.empty(), "'qpsol' option has not been set");
     //qpsol_ = conic("qpsol", qpsol_plugin, {{"h", Hsp_}, {"a", Asp_}},
@@ -567,7 +586,12 @@ namespace casadi {
 
     // Set initial values for all xi and set the Jacobian for linear constraints
     initialize(m, m->xi, m->lambda, m->jacNz, m->jacIndRow, m->jacIndCol);
-    ret = run(m, 100);
+
+    m->fstats.at("mainloop").tic();
+    ret = run(m, max_iter_, warmstart_);
+
+    m->fstats.at("mainloop").toc();
+
     if (ret==1) casadi_warning("Maximum number of iterations reached");
 
     // Get optimal cost

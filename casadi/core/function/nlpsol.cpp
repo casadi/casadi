@@ -375,6 +375,9 @@ namespace casadi {
 
     // Solve the NLP
     solve(mem);
+
+    // Show statistics
+    if (print_time_)  print_fstats(static_cast<OracleMemory*>(mem));
   }
 
   void Nlpsol::set_work(void* mem, const double**& arg, double**& res,

@@ -432,9 +432,6 @@ namespace casadi {
 
     StatusMsg(&m->worhp_o, &m->worhp_w, &m->worhp_p, &m->worhp_c);
 
-    // Show statistics
-    if (print_time_)  print_fstats(m);
-
     m->return_code = m->worhp_c.status;
     m->return_status = return_codes(m->worhp_c.status);
   }

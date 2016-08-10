@@ -444,6 +444,8 @@ namespace casadi {
     int max_consec_reduced_steps_;// Maximum number of consecutive reduced steps
     int max_consec_skipped_updates_; // Maximum number of consecutive skipped updates
     int max_it_qp_;  // Maximum number of QP iterations per SQP iteration
+    int max_iter_; // Maximum number of SQP steps
+    bool warmstart_; // Use warmstarting
     int block_hess_;  // Blockwise Hessian approximation?
     int hess_scaling_;// Scaling strategy for Hessian approximation
     int fallback_scaling_;  // If indefinite update is used, the type of fallback strategy

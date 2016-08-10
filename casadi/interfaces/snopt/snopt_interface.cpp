@@ -351,9 +351,6 @@ namespace casadi {
     // Copy optimal constraint values to output
     casadi_copy(m->gk, ng_, m->g);
 
-    // Show statistics
-    if (print_time_)  print_fstats(m);
-
     // Free memory
     deleteSNOPT(&prob);
   }

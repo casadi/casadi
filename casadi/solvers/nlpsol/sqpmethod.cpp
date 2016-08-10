@@ -630,8 +630,6 @@ namespace casadi {
     if (m->lam_x) casadi_copy(m->mu_x, nx_, m->lam_x);
     if (m->g) casadi_copy(m->gk, ng_, m->g);
 
-    // Show statistics
-    if (print_time_)  print_fstats(m);
   }
 
   void Sqpmethod::printIteration(std::ostream &stream) const {

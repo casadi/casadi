@@ -326,8 +326,6 @@ namespace casadi {
     casadi_copy(m->lam_xk, nx_, m->lam_x);
     casadi_copy(m->gk, ng_, m->g);
 
-    // Show statistics
-    if (print_time_)  print_fstats(m);
   }
 
   bool BonminInterface::
