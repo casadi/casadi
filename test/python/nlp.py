@@ -48,6 +48,13 @@ if has_nlpsol("ipopt") and has_nlpsol("sqpmethod"):
   qpsol_options = {"nlpsol": "ipopt", "nlpsol_options": {"ipopt.tol": 1e-12,"ipopt.fixed_variable_treatment":"make_constraint"} }
   solvers.append(("sqpmethod",{"qpsol": "nlpsol","qpsol_options": qpsol_options}))
   solvers.append(("sqpmethod",{"qpsol": "nlpsol","qpsol_options": qpsol_options,"hessian_approximation": "limited-memory","tol_du":1e-10,"tol_pr":1e-10}))
+  
+if has_nlpsol("blocksqp"):
+  try:
+    load_linsol("ma27")
+    solvers.append(("blocksqp",{}))
+  except:
+    pass
 
 print(solvers)
 """
