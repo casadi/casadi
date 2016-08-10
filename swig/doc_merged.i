@@ -5521,6 +5521,11 @@ Dennis Janka
 |                 |                 | parameter, cf.  |                 |
 |                 |                 | IPOPT paper     |                 |
 +-----------------+-----------------+-----------------+-----------------+
+| linsol          | OT_STRING       | The linear      | blocksqp::Matri |
+|                 |                 | solver to be    | x               |
+|                 |                 | used by the QP  |                 |
+|                 |                 | method          |                 |
++-----------------+-----------------+-----------------+-----------------+
 | max_consec_redu | OT_INT          | Maximum number  | blocksqp::Matri |
 | ced_steps       |                 | of consecutive  | x               |
 |                 |                 | reduced steps   |                 |
@@ -8387,6 +8392,11 @@ Dennis Janka
 |                 |                 | parameter, cf.  |                 |
 |                 |                 | IPOPT paper     |                 |
 +-----------------+-----------------+-----------------+-----------------+
+| linsol          | OT_STRING       | The linear      | blocksqp::SymMa |
+|                 |                 | solver to be    | trix            |
+|                 |                 | used by the QP  |                 |
+|                 |                 | method          |                 |
++-----------------+-----------------+-----------------+-----------------+
 | max_consec_redu | OT_INT          | Maximum number  | blocksqp::SymMa |
 | ced_steps       |                 | of consecutive  | trix            |
 |                 |                 | reduced steps   |                 |
@@ -11161,6 +11171,10 @@ Dennis Janka, Joel Andersson
 | kappa_soc              | OT_DOUBLE              | Filter line search     |
 |                        |                        | parameter, cf. IPOPT   |
 |                        |                        | paper                  |
++------------------------+------------------------+------------------------+
+| linsol                 | OT_STRING              | The linear solver to   |
+|                        |                        | be used by the QP      |
+|                        |                        | method                 |
 +------------------------+------------------------+------------------------+
 | max_consec_reduced_ste | OT_INT                 | Maximum number of      |
 | ps                     |                        | consecutive reduced    |

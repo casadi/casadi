@@ -38,6 +38,7 @@
 <tr><td>kappa_plus</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>blocksqp::Matrix</td></tr>
 <tr><td>kappa_plus_max</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>blocksqp::Matrix</td></tr>
 <tr><td>kappa_soc</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>blocksqp::Matrix</td></tr>
+<tr><td>linsol</td><td>OT_STRING</td><td>The linear solver to be used by the QP method</td><td>blocksqp::Matrix</td></tr>
 <tr><td>max_consec_reduced_steps</td><td>OT_INT</td><td>Maximum number of consecutive reduced steps</td><td>blocksqp::Matrix</td></tr>
 <tr><td>max_consec_skipped_updates</td><td>OT_INT</td><td>Maximum number of consecutive skipped updates</td><td>blocksqp::Matrix</td></tr>
 <tr><td>max_conv_qp</td><td>OT_INT</td><td>How many additional QPs may be solved for convexification per iteration?</td><td>blocksqp::Matrix</td></tr>
@@ -107,6 +108,7 @@
 <tr><td>kappa_plus</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>blocksqp::SymMatrix</td></tr>
 <tr><td>kappa_plus_max</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>blocksqp::SymMatrix</td></tr>
 <tr><td>kappa_soc</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>blocksqp::SymMatrix</td></tr>
+<tr><td>linsol</td><td>OT_STRING</td><td>The linear solver to be used by the QP method</td><td>blocksqp::SymMatrix</td></tr>
 <tr><td>max_consec_reduced_steps</td><td>OT_INT</td><td>Maximum number of consecutive reduced steps</td><td>blocksqp::SymMatrix</td></tr>
 <tr><td>max_consec_skipped_updates</td><td>OT_INT</td><td>Maximum number of consecutive skipped updates</td><td>blocksqp::SymMatrix</td></tr>
 <tr><td>max_conv_qp</td><td>OT_INT</td><td>How many additional QPs may be solved for convexification per iteration?</td><td>blocksqp::SymMatrix</td></tr>
@@ -176,6 +178,7 @@
 <tr><td>kappa_plus</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
 <tr><td>kappa_plus_max</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
 <tr><td>kappa_soc</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
+<tr><td>linsol</td><td>OT_STRING</td><td>The linear solver to be used by the QP method</td><td>casadi::Blocksqp</td></tr>
 <tr><td>max_consec_reduced_steps</td><td>OT_INT</td><td>Maximum number of consecutive reduced steps</td><td>casadi::Blocksqp</td></tr>
 <tr><td>max_consec_skipped_updates</td><td>OT_INT</td><td>Maximum number of consecutive skipped updates</td><td>casadi::Blocksqp</td></tr>
 <tr><td>max_conv_qp</td><td>OT_INT</td><td>How many additional QPs may be solved for convexification per iteration?</td><td>casadi::Blocksqp</td></tr>
@@ -237,6 +240,7 @@
 <tr><td>kappa_plus</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td></tr>
 <tr><td>kappa_plus_max</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td></tr>
 <tr><td>kappa_soc</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td></tr>
+<tr><td>linsol</td><td>OT_STRING</td><td>The linear solver to be used by the QP method</td></tr>
 <tr><td>max_consec_reduced_steps</td><td>OT_INT</td><td>Maximum number of consecutive reduced steps</td></tr>
 <tr><td>max_consec_skipped_updates</td><td>OT_INT</td><td>Maximum number of consecutive skipped updates</td></tr>
 <tr><td>max_conv_qp</td><td>OT_INT</td><td>How many additional QPs may be solved for convexification per iteration?</td></tr>
@@ -301,6 +305,7 @@
 <tr><td>kappa_plus</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
 <tr><td>kappa_plus_max</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
 <tr><td>kappa_soc</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
+<tr><td>linsol</td><td>OT_STRING</td><td>The linear solver to be used by the QP method</td><td>casadi::Blocksqp</td></tr>
 <tr><td>max_consec_reduced_steps</td><td>OT_INT</td><td>Maximum number of consecutive reduced steps</td><td>casadi::Blocksqp</td></tr>
 <tr><td>max_consec_skipped_updates</td><td>OT_INT</td><td>Maximum number of consecutive skipped updates</td><td>casadi::Blocksqp</td></tr>
 <tr><td>max_conv_qp</td><td>OT_INT</td><td>How many additional QPs may be solved for convexification per iteration?</td><td>casadi::Blocksqp</td></tr>
