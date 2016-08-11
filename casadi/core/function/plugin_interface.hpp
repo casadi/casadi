@@ -217,6 +217,7 @@ namespace casadi {
            << "                          2. CASADIPATH env var\n"
            << "                          3. PATH env var (Windows)\n"
            << "                          4. LD_LIBRARY_PATH env var (Linux)\n"
+           << "                          5. DYLD_LIBRARY_PATH env var (osx)\n"
            << "    A library may be 'not found' even if the file exists:\n"
            << "          * library is not compatible (different compiler/bitness)\n"
            << "          * the dependencies are not found\n"
