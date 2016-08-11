@@ -28,15 +28,29 @@ import shutil
 
 from testsuite import TestSuite
 
+iswindows = os.name=="nt"
 
-t = TestSuite(dirname=src,
-  suffix="m",
-  command = lambda dir,fn, opt:  ["matlab","-nodisplay","-nosplash","-nodesktop","-nojvm"] + opt,
-  skipdirs=[".svn","ctemplate","defs"],
-   inputs = lambda dir,fn : {fn: file(dir + "/" + fn,"r").read()},
-    args=sys.argv[2:],
-   stderr_trigger=["^(?!(Reference counting|Warning|$))"],
-   check_depreciation=True
-   )
+if iswindows:
+  t = TestSuite(dirname=src,
+    suffix="m",
+    command = lambda dir,fn, opt:  ["matlab","-nodisplay","-nosplash","-nodesktop","-nojvm","-logfile",fn + ".log","-wait","-r","try," + fn[:-2]+", disp('MATLABOKAY') , catch E , disp(getReport(E)), disp('MATLABERROR'), end;quit"] + opt,
+    skipdirs=[".svn","ctemplate","defs"],
+     inputs = lambda dir,fn : {fn: file(dir + "/" + fn,"r").read()},
+      args=sys.argv[2:],
+     stdout_trigger=["MATLABOKAY"],
+     custom_stdout=lambda dir,fn : file(dir + "/" + fn + ".log","r").read(),
+     default_fail=True
+     )
+else:
+  t = TestSuite(dirname=src,
+    suffix="m",
+    command = lambda dir,fn, opt:  ["matlab","-nodisplay","-nosplash","-nodesktop","-nojvm","-r",fn[:-2]+";clear"] + opt,
+    skipdirs=[".svn","ctemplate","defs"],
+     #inputs = lambda dir,fn : {fn: file(dir + "/" + fn,"r").read()},
+      args=sys.argv[2:],
+     stderr_trigger=["^(?!(Reference counting|Warning|$))"],
+     check_depreciation=True
+     )
+
 
 t.run()

@@ -114,7 +114,7 @@ deprecated = re.compile(r"\b[dD]epr[ei]c[ie]?at[ei]")
 warning = re.compile("warning")
 
 class TestSuite:
-  def __init__(self,suffix=None,dirname=None,preRun=None,postRun=None,command=None,skipdirs=[],skipfiles=[],inputs={},workingdir = lambda x: x,allowable_returncodes=[],args=[],stderr_trigger=[],stdout_trigger=[],check_depreciation=True,check_warning=False):
+  def __init__(self,suffix=None,dirname=None,preRun=None,postRun=None,command=None,skipdirs=[],skipfiles=[],inputs={},workingdir = lambda x: x,allowable_returncodes=[],args=[],stderr_trigger=[],stdout_trigger=[],check_depreciation=True,check_warning=False,custom_stdout=None,default_fail=False):
     """
 
     dirname: The directory that should be crawled for test problems.
@@ -171,6 +171,8 @@ class TestSuite:
     self.passoptions = []
     self.stderr_trigger = stderr_trigger
     self.stdout_trigger = stdout_trigger
+    self.custom_stdout = custom_stdout
+    self.default_fail=default_fail
     if check_depreciation:
       self.stderr_trigger.append((deprecated,"deprecated"))
       self.stdout_trigger.append((deprecated,"deprecated"))
@@ -240,6 +242,9 @@ class TestSuite:
       raise Exception("Timout.")
     alarm(0) # Remove alarm
     t = time.clock() - t0
+    if self.custom_stdout is not None:
+      stdoutdata = self.custom_stdout(dir,fn)
+    
     print "Ran for",t, "seconds"
 
     stderr_trigger = False
@@ -262,7 +267,13 @@ class TestSuite:
       if trigger_raised:
         print "stdout_trigger '%s' was raised." % trigger_message
         stdout_trigger = True
-    if (not(stderr_trigger) and (p.returncode==0 or (p.returncode in self.allowable_returncodes))):
+        
+    if self.default_fail:
+      passed = stdout_trigger or stderr_trigger
+    else:
+      passed = (not(stderr_trigger) and (p.returncode==0 or (p.returncode in self.allowable_returncodes)))
+    
+    if passed:
       pass
       #print "  > Succes: %0.2f [ms]" % (t*1000)
     else :
