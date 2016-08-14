@@ -35,7 +35,7 @@ namespace casadi {
     plugin->creator = GurobiInterface::creator;
     plugin->name = "gurobi";
     plugin->doc = GurobiInterface::meta_doc.c_str();
-    plugin->version = 30;
+    plugin->version = 31;
     return 0;
   }
 

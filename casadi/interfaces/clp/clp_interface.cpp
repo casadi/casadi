@@ -34,7 +34,7 @@ namespace casadi {
     plugin->creator = ClpInterface::creator;
     plugin->name = "clp";
     plugin->doc = ClpInterface::meta_doc.c_str();
-    plugin->version = 30;
+    plugin->version = 31;
     return 0;
   }
 
