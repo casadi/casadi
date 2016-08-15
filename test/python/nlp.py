@@ -909,7 +909,7 @@ class NLPtests(casadiTestCase):
       if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_x"][0],0,6,str(solver))
       if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_x"][1],0,6,str(solver))
 
-      self.checkarray(solver_out["lam_g"],DM([4+8.0/9,20.0/9,0]),str(solver),digits=6)
+      if "bonmin" not in str(Solver): self.checkarray(solver_out["lam_g"],DM([4+8.0/9,20.0/9,0]),str(solver),digits=6)
 
       self.assertAlmostEqual(solver_out["f"][0],-10-16.0/9,6,str(solver))
 
@@ -1151,8 +1151,8 @@ class NLPtests(casadiTestCase):
 
     self.checkarray(solver_out["f"],DM([0]))
     self.checkarray(solver_out["x"],DM([1,0]))
-    if "bonmin" not in str(Solver): self.checkarray(solver_out["lam_x"],DM([0,-7.7]),digits=7)
-    if "bonmin" not in str(Solver): self.checkarray(solver_out["lam_g"],DM([0]))
+    self.checkarray(solver_out["lam_x"],DM([0,-7.7]),digits=7)
+    self.checkarray(solver_out["lam_g"],DM([0]))
 
   def test_pathological(self):
     x=SX.sym("x")
