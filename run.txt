@@ -5,3 +5,22 @@ cmake "-GVisual Studio 14 2015 Win64" -H. -B_builds -DWITH_IPOPT=OFF -DIPOPT_FOU
 Ipopt-3.11.1-win64-intel13.1
 
 cmake --build _builds --config "Debug"
+
+clone casadi
+ 
+set PATH=%PATH%;E:\swigwin-3.0.10;
+cmake "-GVisual Studio 14 2015 Win64" -H. -B_builds2 -DWITH_PYTHON=ON -DCMAKE_INSTALL_PREFIX="E:\casadi_install" -DWITH_SELFCONTAINED=ON -DPYTHON_PREFIX="E:\casadi_install" -DWITH_IPOPT=OFF -DIPOPT_FOUND=ON -DIPOPT_LIBRARY_DIRS="E:/ipopt_deltares_VC15/lib/release" -DIPOPT_LIBRARIES="Ipopt-vs2015.lib;IpOptFSS.lib" -DIPOPT_INCLUDE_DIRS="E:/ipopt_deltares_VC15/include/coin"
+cmake --build _builds --config "Debug"
+cmake --build _builds --config "Release"
+
+
+set PATH=%PATH%;E:\casadi\_builds\lib\Debug
+
+_builds\bin\Debug\propagating_sparsity.exe
+
+cmake --build _builds2 --config "Release" --target install
+
+set PYTHONPATH=E:\casadi_install
+
+
+ipopt_deltares_VC15

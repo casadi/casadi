@@ -35,12 +35,24 @@
 namespace casadi {
   // Implementations
 
-  template<typename Scalar>
-  int Matrix<Scalar>::stream_precision_ = 6;
-  template<typename Scalar>
-  int Matrix<Scalar>::stream_width_ = 0;
-  template<typename Scalar>
-  bool Matrix<Scalar>::stream_scientific_ = false;
+  template<>
+  int Matrix<double>::stream_precision_ = 6;
+  template<>
+  int Matrix<int>::stream_precision_ = 6;
+  template<>
+  int Matrix<SXElem>::stream_precision_ = 6;
+  template<>
+  int Matrix<double>::stream_width_ = 0;
+  template<>
+  int Matrix<int>::stream_width_ = 0;
+  template<>
+  int Matrix<SXElem>::stream_width_ = 0;
+  template<>
+  bool Matrix<double>::stream_scientific_ = false;
+  template<>
+  bool Matrix<int>::stream_scientific_ = false;
+  template<>
+  bool Matrix<SXElem>::stream_scientific_ = false;
 
   template<typename Scalar>
   bool Matrix<Scalar>::__nonzero__() const {
@@ -2632,9 +2644,9 @@ namespace casadi {
 
 #ifndef CASADI_MATRIX_CPP
   // Templates instantiated in matrix.cpp
-  extern template class Matrix<double>;
-  extern template class Matrix<int>;
-  extern template class Matrix<SXElem>;
+  extern template class CASADI_EXPORT Matrix<double>;
+  extern template class CASADI_EXPORT Matrix<int>;
+  extern template class CASADI_EXPORT Matrix<SXElem>;
 #endif // CASADI_MATRIX_CPP
 
   template<typename MatType>

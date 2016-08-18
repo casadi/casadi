@@ -42,7 +42,7 @@ namespace casadi {
       \date 2010-2014
   */
   template<class Derived>
-  class CASADI_EXPORT PrintableObject {
+  class PrintableObject {
   public:
 
     /// Return a string with a description (for SWIG)

@@ -33,9 +33,9 @@ using namespace std;
 namespace casadi {
 
   // Instantiate templates
-  template class Matrix<double>;
-  template class Matrix<int>;
-  template class Matrix< SXElem >;
+  template CASADI_EXPORT class Matrix<double>;
+  template CASADI_EXPORT class Matrix<int>;
+  template CASADI_EXPORT class Matrix< SXElem >;
 
   bool CASADI_EXPORT is_slice(const IM& x, bool ind1) {
     return x.is_scalar() || (x.is_column() && x.is_dense() && is_slice(x.nonzeros(), ind1));
