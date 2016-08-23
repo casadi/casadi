@@ -296,12 +296,6 @@ Print a description of the object.
 
 ";
 
-%feature("docstring")  casadi::Function::rootfinder_jac() "
-
-Access Jacobian of the ths function for a rootfinder.
-
-";
-
 %feature("docstring")  casadi::Function::nnz_out() const  "
 
 Get number of output nonzeros.
@@ -3704,12 +3698,6 @@ const std::vector< std::string > &s_in, const std::vector< std::string >
 %feature("docstring")  casadi::Function::checkout() "
 
 Checkout a memory object.
-
-";
-
-%feature("docstring")  casadi::Function::rootfinder_jac() "
-
-Access Jacobian of the ths function for a rootfinder.
 
 ";
 

@@ -186,12 +186,6 @@ Print a description of the object.
 
 %feature("docstring") casadi::Callback::has_function "";
 
-%feature("docstring") casadi::Callback::rootfinder_jac "
-
-Access Jacobian of the ths function for a rootfinder.
-
-";
-
 %feature("docstring") casadi::Callback::nnz_out "
 
 Get number of output nonzeros.
@@ -2336,12 +2330,6 @@ Expand a function to SX.
 %feature("docstring") casadi::Function::checkout "
 
 Checkout a memory object.
-
-";
-
-%feature("docstring") casadi::Function::rootfinder_jac "
-
-Access Jacobian of the ths function for a rootfinder.
 
 ";
 
