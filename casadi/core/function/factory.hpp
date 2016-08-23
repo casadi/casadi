@@ -123,6 +123,13 @@ namespace casadi {
       // Auxiliary output?
       return aux_.find(s)!=aux_.end();
     }
+
+    // Get input scheme
+    std::vector<std::string> name_in() const;
+
+    // Get output scheme
+    std::vector<std::string> name_out() const;
+
   };
 
   template<typename MatType>
@@ -148,16 +155,21 @@ namespace casadi {
     if (has_in(s)) return s;
 
     // Get prefix
-    casadi_assert_message(has_prefix(s), "Cannot process \"" + s + "\"");
+    casadi_assert_message(has_prefix(s), "Cannot process \"" + s + "\" as input."
+                                         " Available: " + join(name_in()) + ".");
     pair<string, string> ss = split_prefix(s);
 
     if (ss.first=="fwd") {
       // Forward mode directional derivative
-      casadi_assert_message(has_in(ss.second), "Cannot process \"" + s + "\"");
+      casadi_assert_message(has_in(ss.second), "Cannot process \"" + ss.second + "\""
+                                               " (from \"" << s << "\") as input."
+                                               " Available: " + join(name_in()) + ".");
       fwd_in_.push_back(ss.second);
     } else if (ss.first=="adj") {
       // Reverse mode directional derivative
-      casadi_assert_message(has_out(ss.second), "Cannot process \"" + s + "\"");
+      casadi_assert_message(has_out(ss.second), "Cannot process \"" + ss.second + "\""
+                                                " (from \"" << s << "\") as output."
+                                                " Available: " + join(name_out()) + ".");
       adj_in_.push_back(ss.second);
     }
 
@@ -176,30 +188,51 @@ namespace casadi {
     if (has_out(s)) return s;
 
     // Get prefix
-    casadi_assert_message(has_prefix(s), "Cannot process \"" + s + "\"");
+    casadi_assert_message(has_prefix(s), "Cannot process \"" + s + "\" as output."
+                                         " Available: " + join(name_out()) + ".");
     pair<string, string> ss = split_prefix(s);
 
     if (ss.first=="fwd") {
       // Forward mode directional derivative
-      casadi_assert(has_out(ss.second));
+      casadi_assert_message(has_out(ss.second), "Cannot process \"" + ss.second + "\""
+                                                " (from \"" << s << "\") as output."
+                                                " Available: " + join(name_out()) + ".");
       fwd_out_.push_back(ss.second);
     } else if (ss.first=="adj") {
       // Reverse mode directional derivative
-      casadi_assert(has_in(ss.second));
+      casadi_assert_message(has_in(ss.second), "Cannot process \"" + ss.second + "\""
+                                               " (from \"" << s << "\") as input."
+                                               " Available: " + join(name_in()) + ".");
       adj_out_.push_back(ss.second);
     } else if (ss.first=="jac") {
       jac_.push_back(ss.second);
-      casadi_assert(has_out(jac_.back().ex));
-      casadi_assert(has_in(jac_.back().arg));
+      casadi_assert_message(has_out(jac_.back().ex), "Cannot process \"" + jac_.back().ex + "\""
+                                                " (from \"" << s << "\") as output."
+                                                " Available: " + join(name_out()) + ".");
+      casadi_assert_message(has_in(jac_.back().arg), "Cannot process \"" + jac_.back().arg + "\""
+                                               " (from \"" << s << "\") as input."
+                                               " Available: " + join(name_in()) + ".");
     } else if (ss.first=="grad") {
       grad_.push_back(ss.second);
-      casadi_assert(has_out(grad_.back().ex));
-      casadi_assert(has_in(grad_.back().arg));
+      casadi_assert_message(has_out(grad_.back().ex), "Cannot process \"" + grad_.back().ex + "\""
+                                                " (from \"" << s << "\") as output."
+                                                " Available: " + join(name_out()) + ".");
+      casadi_assert_message(has_in(grad_.back().arg), "Cannot process \"" + grad_.back().arg + "\""
+                                               " (from \"" << s << "\") as input."
+                                               " Available: " + join(name_in()) + ".");
     } else if (ss.first=="hess") {
       hess_.push_back(ss.second);
-      casadi_assert(has_out(hess_.back().ex));
-      casadi_assert(has_in(hess_.back().arg1));
-      casadi_assert(has_in(hess_.back().arg2));
+      casadi_assert_message(has_out(hess_.back().ex), "Cannot process \"" + hess_.back().ex + "\""
+                                                " (from \"" << s << "\") as output."
+                                                " Available: " + join(name_out()) + ".");
+      casadi_assert_message(has_in(hess_.back().arg1),
+                                               "Cannot process \"" + hess_.back().arg1 + "\""
+                                               " (from \"" << s << "\") as input."
+                                               " Available: " + join(name_in()) + ".");
+      casadi_assert_message(has_in(hess_.back().arg2),
+                                               "Cannot process \"" + hess_.back().arg2 + "\""
+                                               " (from \"" << s << "\") as input."
+                                               " Available: " + join(name_in()) + ".");
     } else {
       // Assume attribute
       request_output(ss.second);
@@ -359,6 +392,24 @@ namespace casadi {
     size_t pos = s.find(':');
     casadi_assert_message(pos<s.size(), "Cannot process \"" + s + "\"");
     return make_pair(s.substr(0, pos), s.substr(pos+1, std::string::npos));
+  }
+
+  template<typename MatType>
+  std::vector<std::string> Factory<MatType>::name_in() const {
+    std::vector<std::string> ret;
+    for (auto i : in_) {
+      ret.push_back(i.first);
+    }
+    return ret;
+  }
+
+  template<typename MatType>
+  std::vector<std::string> Factory<MatType>::name_out() const {
+    std::vector<std::string> ret;
+    for (auto i : out_) {
+      ret.push_back(i.first);
+    }
+    return ret;
   }
 
 } // namespace casadi
