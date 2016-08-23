@@ -226,6 +226,32 @@ class typemaptests(casadiTestCase):
     w/=s
     self.checkarray(w,2.3/n,"")
 
+  @unittest.skipIf(sys.version_info < (3, 5),"Operator was introduced in 3.5")
+  def test_matmul(self):
+    A = DM([[1,3],[4,5]])
+    B = DM([[7,2],[0,9]])
+    for L in [np.array(A),A]:
+      for R in [np.array(B),B]:
+        #y = L @ R
+        y = eval("L @ R",{"L":L,"R":R})
+        self.checkarray(y,mtimes(A,B))
+    As = SX.sym("x",2,2)
+    Bs = SX.sym("x",2,2)
+    for L in [As,A]:
+      for R in [Bs,B]:
+        #y = L @ R
+        y = eval("L @ R",{"L":L,"R":R})
+        yf = Function('y',[As,Bs],[y])
+        self.checkarray(yf(A,B),mtimes(A,B))
+    As = MX.sym("x",2,2)
+    Bs = MX.sym("x",2,2)
+    for L in [As,A]:
+      for R in [Bs,B]:
+        #y = L @ R
+        y = eval("L @ R",{"L":L,"R":R})
+        yf = Function('y',[As,Bs],[y])
+        self.checkarray(yf(A,B),mtimes(A,B))
+
   def test_autoconversionMX(self):
     self.message("Auto conversion MX")
     s = DM([[1,2],[3,4]])

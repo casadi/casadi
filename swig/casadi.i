@@ -3811,6 +3811,8 @@ namespace casadi {
   %extend GenericExpressionCommon {
     %pythoncode %{
       def __hash__(self): return SharedObject.__hash__(self)
+      def __matmul__(x, y): return _casadi.mtimes(x, y)
+      def __rmatmul__(x, y): return _casadi.mtimes(y, x)
     %}
   }
 }
