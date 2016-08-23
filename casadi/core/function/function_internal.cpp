@@ -255,11 +255,16 @@ namespace casadi {
     if (jit_) {
       string jit_name = "jit_tmp";
       if (has_codegen()) {
+        if (verbose())
+          log("FunctionInternal::finalize", "Codegenerating function '" + name() + "'.");
         // JIT everything
         CodeGenerator gen(jit_name);
         gen.add(self());
+        if (verbose())
+          log("FunctionInternal::finalize", "Compiling function '" + name() + "'..");
         compiler_ = Importer(gen.generate(), compilerplugin_, jit_options_);
-
+        if (verbose())
+          log("FunctionInternal::finalize", "Compiling function '" + name() + "' done.");
         // Try to load with simplified syntax
         simple_ = (simple_t)compiler_.get_function(name() + "_simple");
         // If not succesful, try generic syntax
