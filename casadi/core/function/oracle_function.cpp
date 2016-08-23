@@ -44,9 +44,24 @@ namespace casadi {
   = {{&FunctionInternal::options_},
      {{"monitor",
        {OT_STRINGVECTOR,
-        "Set of user problem functions to be monitored"}}
+        "Set of user problem functions to be monitored"}},
+      {"factory_options",
+       {OT_DICT,
+        "Options for auto-generated functions"}}
     }
   };
+
+  void OracleFunction::init(const Dict& opts) {
+
+    FunctionInternal::init(opts);
+
+    // Read options
+    for (auto&& op : opts) {
+      if (op.first=="factory_options") {
+        factory_options_ = op.second;
+      }
+    }
+  }
 
   void OracleFunction::finalize(const Dict& opts) {
     // Default options
@@ -80,9 +95,16 @@ namespace casadi {
                                    const Function::AuxOut& aux,
                                    const Dict& opts) {
     // Generate the function
-    Function ret = oracle_.factory(fname, s_in, s_out, aux, opts);
+    Function ret = oracle_.factory(fname, s_in, s_out, aux, combine(opts, factory_options_));
     set_function(ret, fname, true);
     return ret;
+  }
+
+  Function OracleFunction::create_function(const std::string& fname,
+                                   const std::vector<std::string>& s_in,
+                                   const std::vector<std::string>& s_out,
+                                   const Dict& opts) {
+    return create_function(fname, s_in, s_out, Function::AuxOut(), combine(opts, factory_options_));
   }
 
   void OracleFunction::

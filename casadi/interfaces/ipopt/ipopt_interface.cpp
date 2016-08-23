@@ -124,7 +124,7 @@ namespace casadi {
 
     // Default options
     pass_nonlinear_variables_ = false;
-    Dict hess_lag_options, jac_g_options, grad_f_options;
+    Dict hess_lag_options, jac_g_options, grad_f_options, oracle_options;
 
     // Read user options
     for (auto&& op : opts) {
@@ -179,10 +179,10 @@ namespace casadi {
     create_function("nlp_f", {"x", "p"}, {"f"});
     create_function("nlp_g", {"x", "p"}, {"g"});
     if (!has_function("nlp_grad_f")) {
-      create_function("nlp_grad_f", {"x", "p"}, {"f", "grad:f:x"});
+      create_function("nlp_grad_f", {"x", "p"}, {"f", "grad:f:x"}, grad_f_options);
     }
     if (!has_function("nlp_jac_g")) {
-      create_function("nlp_jac_g", {"x", "p"}, {"g", "jac:g:x"});
+      create_function("nlp_jac_g", {"x", "p"}, {"g", "jac:g:x"}, jac_g_options);
     }
     jacg_sp_ = get_function("nlp_jac_g").sparsity_out(1);
 
@@ -190,7 +190,7 @@ namespace casadi {
     if (exact_hessian_) {
       if (!has_function("nlp_hess_l")) {
         create_function("nlp_hess_l", {"x", "p", "lam:f", "lam:g"},
-                        {"hess:gamma:x:x"}, {{"gamma", {"f", "g"}}});
+                        {"hess:gamma:x:x"}, {{"gamma", {"f", "g"}}}, hess_lag_options);
       }
       hesslag_sp_ = get_function("nlp_hess_l").sparsity_out(0);
     } else if (pass_nonlinear_variables_) {
