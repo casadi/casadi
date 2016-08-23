@@ -81,6 +81,8 @@ namespace casadi {
   CASADI_EXPORT std::vector<int> range(int start, int stop, int step=1,
                                                 int len=std::numeric_limits<int>::max());
 
+  CASADI_EXPORT std::string join(const std::vector<std::string>& l, const std::string& delim=",");
+
   /**  \brief Range function
   * \param stop
   *

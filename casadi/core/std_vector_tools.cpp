@@ -91,4 +91,13 @@ namespace casadi {
     }
   }
 
+  std::string join(const std::vector<std::string>& l, const std::string& delim) {
+    std::stringstream ss;
+    for (int i=0;i<l.size();++i) {
+      if (i>0) ss << delim;
+      ss << l[i];
+    }
+    return ss.str();
+  }
+
 } // namespace casadi
