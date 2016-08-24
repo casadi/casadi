@@ -67,6 +67,7 @@ namespace casadi {
     // Both modes equally expensive by default (no "taping" needed)
     ad_weight_sp_ = 0.49; // Forward when tie
     jac_penalty_ = 2;
+    max_num_dir_ = optimized_num_dir;
     user_data_ = 0;
     regularity_check_ = false;
     inputs_check_ = true;
@@ -174,7 +175,11 @@ namespace casadi {
        {OT_FUNCTION,
         "The function is a derivative of another function. "
         "The type of derivative (directional derivative, Jacobian) "
-        "is inferred from the function name."}}
+        "is inferred from the function name."}},
+      {"max_num_dir",
+       {OT_INT,
+        "Specify the maximum number of directions for derivative functions."
+        " Overrules the builtin optimized_num_dir."}}
      }
   };
 
@@ -209,6 +214,8 @@ namespace casadi {
         ad_weight_ = op.second;
       } else if (op.first=="ad_weight_sp") {
         ad_weight_sp_ = op.second;
+      } else if (op.first=="max_num_dir") {
+        max_num_dir_ = op.second;
       }
     }
 
@@ -389,6 +396,7 @@ namespace casadi {
                  {"jit", jit_},
                  {"compiler", compilerplugin_},
                  {"jit_options", jit_options_},
+                 {"max_num_dir", max_num_dir_},
                  {"derivative_of", self()}};
     return getGradient(ss.str(), iind, oind, opts);
   }
@@ -416,6 +424,7 @@ namespace casadi {
                  {"jit", jit_},
                  {"compiler", compilerplugin_},
                  {"jit_options", jit_options_},
+                 {"max_num_dir", max_num_dir_},
                  {"derivative_of", self()}};
     return getTangent(ss.str(), iind, oind, opts);
   }
@@ -455,6 +464,7 @@ namespace casadi {
     // Propagate AD parameters
     opts["ad_weight"] = ad_weight();
     opts["ad_weight_sp"] = sp_weight();
+    opts["max_num_dir"] = max_num_dir_;
 
     // Propagate information about AD
     opts["derivative_of"] = derivative_of_;
@@ -1396,6 +1406,7 @@ namespace casadi {
                    {"jit", jit_},
                    {"compiler", compilerplugin_},
                    {"jit_options", jit_options_},
+                   {"max_num_dir", max_num_dir_},
                    {"derivative_of", self()}};
       Function ret = getJacobian(ss.str(), iind, oind, compact, symmetric, opts);
 
@@ -1483,6 +1494,7 @@ namespace casadi {
                  {"jit", jit_},
                  {"compiler", compilerplugin_},
                  {"jit_options", jit_options_},
+                 {"max_num_dir", max_num_dir_},
                  {"derivative_of", self()}};
 
     // Return value
@@ -1576,6 +1588,7 @@ namespace casadi {
                  {"jit", jit_},
                  {"compiler", compilerplugin_},
                  {"jit_options", jit_options_},
+                 {"max_num_dir", max_num_dir_},
                  {"derivative_of", self()}};
 
     // Return value
@@ -1664,6 +1677,7 @@ namespace casadi {
                  {"jit", jit_},
                  {"compiler", compilerplugin_},
                  {"jit_options", jit_options_},
+                 {"max_num_dir", max_num_dir_},
                  {"derivative_of", self()}};
 
     // Return value
@@ -1757,6 +1771,7 @@ namespace casadi {
                  {"jit", jit_},
                  {"compiler", compilerplugin_},
                  {"jit_options", jit_options_},
+                 {"max_num_dir", max_num_dir_},
                  {"derivative_of", self()}};
 
     // Return value

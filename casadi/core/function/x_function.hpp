@@ -657,8 +657,8 @@ namespace casadi {
     int nadir = D2.is_null() ? 0 : D2.size2();
 
     // Number of derivative directions supported by the function
-    int max_nfdir = optimized_num_dir;
-    int max_nadir = optimized_num_dir;
+    int max_nfdir = max_num_dir_;
+    int max_nadir = max_num_dir_;
 
     // Current forward and adjoint direction
     int offset_nfdir = 0, offset_nadir = 0;
