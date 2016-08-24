@@ -28,7 +28,6 @@ import unittest
 from types import *
 from helpers import *
 
-@run_only(["common_specific_options"])
 class Functiontests(casadiTestCase):
 
   def test_call_empty(self):
