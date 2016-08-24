@@ -75,7 +75,7 @@ namespace casadi {
       "Callback::eval: expected " + to_string(n_out()) + " outputs, got "
       + to_string(resv.size()) +".");
 
-    for (int i=0; i<n_in; ++i) {
+    for (int i=0; i<n_out(); ++i) {
       casadi_assert_message(resv[i].sparsity()==sparsity_out(i),
         "Callback::eval: Shape mismatch for output " << i << ": got " + resv[i].dim() +
         ", expected " + sparsity_out(i).dim() + ".");
