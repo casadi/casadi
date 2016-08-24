@@ -2674,6 +2674,15 @@ Joel Andersson >List of available options
 |                 |                 | passed to the   | nInternal       |
 |                 |                 | jit compiler.   |                 |
 +-----------------+-----------------+-----------------+-----------------+
+| max_num_dir     | OT_INT          | Specify the     | casadi::Functio |
+|                 |                 | maximum number  | nInternal       |
+|                 |                 | of directions   |                 |
+|                 |                 | for derivative  |                 |
+|                 |                 | functions.      |                 |
+|                 |                 | Overrules the   |                 |
+|                 |                 | builtin optimiz |                 |
+|                 |                 | ed_num_dir.     |                 |
++-----------------+-----------------+-----------------+-----------------+
 | output_scheme   | OT_STRINGVECTOR | Custom output   | casadi::Functio |
 |                 |                 | scheme          | nInternal       |
 +-----------------+-----------------+-----------------+-----------------+
@@ -9940,6 +9949,15 @@ General information
 | jit_options     | OT_DICT         | Options to be   | casadi::Functio |
 |                 |                 | passed to the   | nInternal       |
 |                 |                 | jit compiler.   |                 |
++-----------------+-----------------+-----------------+-----------------+
+| max_num_dir     | OT_INT          | Specify the     | casadi::Functio |
+|                 |                 | maximum number  | nInternal       |
+|                 |                 | of directions   |                 |
+|                 |                 | for derivative  |                 |
+|                 |                 | functions.      |                 |
+|                 |                 | Overrules the   |                 |
+|                 |                 | builtin optimiz |                 |
+|                 |                 | ed_num_dir.     |                 |
 +-----------------+-----------------+-----------------+-----------------+
 | output_scheme   | OT_STRINGVECTOR | Custom output   | casadi::Functio |
 |                 |                 | scheme          | nInternal       |
