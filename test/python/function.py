@@ -1053,6 +1053,59 @@ class Functiontests(casadiTestCase):
       with self.assertRaises(Exception):
         f.derivative()
 
+  def test_Callback_dimcheck(self):
+      class Fun(Callback):
+        def __init__(self):
+          Callback.__init__(self)
+          self.construct("Fun")
+        def get_n_in(self): return 2
+        def get_n_out(self): return 1
+
+        def eval(self,arg):
+          return [2, 1]
+      f = Fun()
+      
+      s = ""
+      try:
+        f(2)
+      except Exception as e:
+        s = str(e)
+      self.assertTrue("Incorrect number of inputs" in s)
+      class Fun(Callback):
+        def __init__(self):
+          Callback.__init__(self)
+          self.construct("Fun")
+        def get_n_in(self): return 2
+        def get_n_out(self): return 1
+
+        def eval(self,arg):
+          return [2, 1]
+      f = Fun()
+      
+      s = ""
+      try:
+        f(2,3)
+      except Exception as e:
+        s = str(e)
+      print s
+      self.assertTrue("Callback::eval" in s)
+      s = ""
+      class Fun(Callback):
+        def __init__(self):
+          Callback.__init__(self)
+          self.construct("Fun")
+        def get_n_in(self): return 2
+        def get_n_out(self): return 1
+
+        def eval(self,arg):
+          return [DM.zeros(2,2)]
+      f = Fun()
+      try:
+        f(2,3)
+      except Exception as e:
+        s = str(e)
+      self.assertTrue("Callback::eval" in s)
+
   def test_Callback_sens(self):
     x = MX.sym("x")
     y = MX.sym("y")
