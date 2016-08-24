@@ -1781,7 +1781,11 @@ Add an ordinary differential equation.
 
 %feature("docstring") casadi::Factory::request_input "[INTERNAL] ";
 
+%feature("docstring") casadi::Factory::name_out "[INTERNAL] ";
+
 %feature("docstring") casadi::Factory::Factory "[INTERNAL] ";
+
+%feature("docstring") casadi::Factory::name_in "[INTERNAL] ";
 
 
 // File: classcasadi_1_1Find.xml
@@ -8907,6 +8911,10 @@ General information
 |                 |                 | one is          |                 |
 |                 |                 | constructed.    |                 |
 +-----------------+-----------------+-----------------+-----------------+
+| common_options  | OT_DICT         | Options for     | casadi::OracleF |
+|                 |                 | auto-generated  | unction         |
+|                 |                 | functions       |                 |
++-----------------+-----------------+-----------------+-----------------+
 | expand          | OT_BOOL         | Replace MX with | casadi::Integra |
 |                 |                 | SX expressions  | tor             |
 |                 |                 | in problem      |                 |
@@ -8939,6 +8947,16 @@ General information
 | rootfinder_opti | OT_DICT         | Options to be   | casadi::Integra |
 | ons             |                 | passed to the   | tor             |
 |                 |                 | NLP Solver      |                 |
++-----------------+-----------------+-----------------+-----------------+
+| specific_option | OT_DICT         | Options for     | casadi::OracleF |
+| s               |                 | specific auto-  | unction         |
+|                 |                 | generated       |                 |
+|                 |                 | functions,      |                 |
+|                 |                 | overwriting the |                 |
+|                 |                 | defaults from   |                 |
+|                 |                 | common_options. |                 |
+|                 |                 | Nested          |                 |
+|                 |                 | dictionary.     |                 |
 +-----------------+-----------------+-----------------+-----------------+
 | t0              | OT_DOUBLE       | Beginning of    | casadi::Integra |
 |                 |                 | the time        | tor             |
@@ -9431,6 +9449,10 @@ General information
 +-----------------+-----------------+-----------------+-----------------+
 |       Id        |      Type       |   Description   |     Used in     |
 +=================+=================+=================+=================+
+| common_options  | OT_DICT         | Options for     | casadi::OracleF |
+|                 |                 | auto-generated  | unction         |
+|                 |                 | functions       |                 |
++-----------------+-----------------+-----------------+-----------------+
 | constraints     | OT_INTVECTOR    | Constrain the   | casadi::Rootfin |
 |                 |                 | unknowns. 0     | der             |
 |                 |                 | (default): no   |                 |
@@ -9473,6 +9495,16 @@ General information
 |                 |                 | problem         | unction         |
 |                 |                 | functions to be |                 |
 |                 |                 | monitored       |                 |
++-----------------+-----------------+-----------------+-----------------+
+| specific_option | OT_DICT         | Options for     | casadi::OracleF |
+| s               |                 | specific auto-  | unction         |
+|                 |                 | generated       |                 |
+|                 |                 | functions,      |                 |
+|                 |                 | overwriting the |                 |
+|                 |                 | defaults from   |                 |
+|                 |                 | common_options. |                 |
+|                 |                 | Nested          |                 |
+|                 |                 | dictionary.     |                 |
 +-----------------+-----------------+-----------------+-----------------+
 
 List of plugins
@@ -10405,11 +10437,7 @@ Check if the vector is monotone.
 
 %feature("docstring") casadi::zip "[INTERNAL] ";
 
-%feature("docstring") casadi::matrixName "
-
-Get typename.
-
-";
+%feature("docstring") casadi::replaceMat "[INTERNAL] ";
 
 %feature("docstring") casadi::collocationInterpolators "
 
@@ -10445,7 +10473,11 @@ Number of NLP solver inputs.
 
 ";
 
-%feature("docstring") casadi::replaceMat "[INTERNAL] ";
+%feature("docstring") casadi::matrixName "
+
+Get typename.
+
+";
 
 %feature("docstring") casadi::integrator_in "
 
@@ -10644,6 +10676,11 @@ Get integrator output scheme of integrators.
 ------------------------------------------------------------------------
 
 Get output scheme name by index.
+
+";
+
+%feature("docstring") casadi::combine "[INTERNAL]  Combine two
+dictionaries, giving priority to first one.
 
 ";
 
@@ -10905,6 +10942,10 @@ General information
 +-----------------+-----------------+-----------------+-----------------+
 |       Id        |      Type       |   Description   |     Used in     |
 +=================+=================+=================+=================+
+| common_options  | OT_DICT         | Options for     | casadi::OracleF |
+|                 |                 | auto-generated  | unction         |
+|                 |                 | functions       |                 |
++-----------------+-----------------+-----------------+-----------------+
 | discrete        | OT_BOOLVECTOR   | Indicates which | casadi::Nlpsol  |
 |                 |                 | of the          |                 |
 |                 |                 | variables are   |                 |
@@ -10957,6 +10998,16 @@ General information
 |                 |                 | information     |                 |
 |                 |                 | about execution |                 |
 |                 |                 | time            |                 |
++-----------------+-----------------+-----------------+-----------------+
+| specific_option | OT_DICT         | Options for     | casadi::OracleF |
+| s               |                 | specific auto-  | unction         |
+|                 |                 | generated       |                 |
+|                 |                 | functions,      |                 |
+|                 |                 | overwriting the |                 |
+|                 |                 | defaults from   |                 |
+|                 |                 | common_options. |                 |
+|                 |                 | Nested          |                 |
+|                 |                 | dictionary.     |                 |
 +-----------------+-----------------+-----------------+-----------------+
 | verbose_init    | OT_BOOL         | Print out       | casadi::Nlpsol  |
 |                 |                 | timing          |                 |
@@ -11438,20 +11489,12 @@ wrong for equality constraints. Change the 'fixed_variable_treatment' to
 |                        |                        | autogenerated by       |
 |                        |                        | default)               |
 +------------------------+------------------------+------------------------+
-| grad_f_options         | OT_DICT                | Options for the        |
-|                        |                        | autogenerated gradient |
-|                        |                        | of the objective.      |
-+------------------------+------------------------+------------------------+
 | hess_lag               | OT_FUNCTION            | Function for           |
 |                        |                        | calculating the        |
 |                        |                        | Hessian of the         |
 |                        |                        | Lagrangian             |
 |                        |                        | (autogenerated by      |
 |                        |                        | default)               |
-+------------------------+------------------------+------------------------+
-| hess_lag_options       | OT_DICT                | Options for the        |
-|                        |                        | autogenerated Hessian  |
-|                        |                        | of the Lagrangian.     |
 +------------------------+------------------------+------------------------+
 | ipopt                  | OT_DICT                | Options to be passed   |
 |                        |                        | to IPOPT               |
@@ -11462,10 +11505,6 @@ wrong for equality constraints. Change the 'fixed_variable_treatment' to
 |                        |                        | constraints            |
 |                        |                        | (autogenerated by      |
 |                        |                        | default)               |
-+------------------------+------------------------+------------------------+
-| jac_g_options          | OT_DICT                | Options for the        |
-|                        |                        | autogenerated Jacobian |
-|                        |                        | of the constraints.    |
 +------------------------+------------------------+------------------------+
 | pass_nonlinear_variabl | OT_BOOL                | Pass list of variables |
 | es                     |                        | entering nonlinearly   |

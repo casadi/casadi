@@ -43,6 +43,12 @@
 %exception  casadi::Factory< MatType >::has_out(const std::string &s) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Factory< MatType >::name_in() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Factory< MatType >::name_out() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::Factory< MatType >::request_input(const std::string &s) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -482,6 +488,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::check_exposed(T t) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::combine(const Dict &first, const Dict &second) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::is_regular(N_Vector v) {
