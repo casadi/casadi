@@ -39,6 +39,18 @@
 using namespace std;
 
 namespace casadi {
+  Dict combine(const Dict& first, const Dict& second) {
+    if (first.empty()) return second;
+    if (second.empty()) return first;
+
+    Dict ret = second;
+    for (auto&& op : first) {
+      ret[op.first] = op.second;
+    }
+
+    return ret;
+  }
+
   FunctionInternal::FunctionInternal(const std::string& name) : name_(name) {
     // Make sure valid function name
     if (!Function::check_name(name_)) {

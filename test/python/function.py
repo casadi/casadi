@@ -28,6 +28,7 @@ import unittest
 from types import *
 from helpers import *
 
+@run_only(["common_specific_options"])
 class Functiontests(casadiTestCase):
 
   def test_call_empty(self):
@@ -1192,6 +1193,39 @@ class Functiontests(casadiTestCase):
       f = getP(max_fwd=0,max_adj=1,has_fwd=False,has_adj=True,indirect=indirect)
 
       self.checkfunction(f,g,inputs=num_inputs,sens_der=False,hessian=False,fwd=False,evals=1)
+
+  @requires_nlpsol("ipopt")
+  def test_common_specific_options(self):
+    
+      x = SX.sym("x")
+
+      nlp = {"x": x, "f": x**2}
+
+      with capture() as out:
+        solver = nlpsol("solver","ipopt",nlp)
+      self.assertTrue("nlp_f" not in out[0])
+      with capture() as out:
+        solver = nlpsol("solver","ipopt",nlp,{"common_options":{"verbose":True}})
+      self.assertTrue("nlp_f" in out[0])
+      with capture() as out:
+        solver = nlpsol("solver","ipopt",nlp,{"specific_options":{ "nlp_f" : {"verbose":True}}})
+      self.assertTrue("nlp_f" in out[0])
+      with capture() as out:
+        solver = nlpsol("solver","ipopt",nlp,{"common_options":{"verbose":True},"specific_options":{ "nlp_f" : {"verbose":False}}})
+      self.assertTrue("nlp_f" not in out[0])
+      with capture() as out:
+        solver = nlpsol("solver","ipopt",nlp,{"common_options":{"verbose":False},"specific_options":{ "nlp_f" : {"verbose":True}}})
+      self.assertTrue("nlp_f" in out[0])
+
+      with capture() as out:
+        solver = nlpsol("solver","ipopt",nlp)
+      self.assertTrue(len(out[1])==0)
+      with capture() as out:
+        solver = nlpsol("solver","ipopt",nlp,{"specific_options":{ "nlp_foo" : {"verbose":True}}})
+      self.assertTrue("Ignoring" + out[1])
+      self.assertTrue("nlp_g" in out[1])
+      with self.assertRaises(Exception):
+        solver = nlpsol("solver","ipopt",nlp,{"specific_options":{ "nlp_foo" : 3}})
 
 if __name__ == '__main__':
     unittest.main()

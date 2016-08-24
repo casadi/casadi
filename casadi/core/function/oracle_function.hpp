@@ -53,6 +53,10 @@ namespace casadi {
     /// Oracle: Used to generate other functions
     Function oracle_;
 
+    /// Options for creating functions
+    Dict common_options_;
+    Dict specific_options_;
+
     // Information about one function
     struct RegFun {
       Function f;
@@ -75,6 +79,9 @@ namespace casadi {
     virtual const Options& get_options() const { return options_;}
     ///@}
 
+    /** Initialize  */
+    virtual void init(const Dict& opts);
+
     /// Finalize initialization
     virtual void finalize(const Dict& opts);
 
@@ -89,8 +96,7 @@ namespace casadi {
     create_function(const std::string& fname,
                     const std::vector<std::string>& s_in,
                     const std::vector<std::string>& s_out,
-                    const Function::AuxOut& aux=Function::AuxOut(),
-                    const Dict& opts=Dict());
+                    const Function::AuxOut& aux=Function::AuxOut());
 
     /** Register the function for evaluation and statistics gathering */
     void set_function(const Function& fcn, const std::string& fname, bool jit=false);

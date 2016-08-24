@@ -53,6 +53,9 @@ namespace casadi {
     return r;
   }
 
+  /// Combine two dictionaries, giving priority to first one
+  Dict CASADI_EXPORT combine(const Dict& first, const Dict& second);
+
   /** \brief Internal class for Function
       \author Joel Andersson
       \date 2010-2015

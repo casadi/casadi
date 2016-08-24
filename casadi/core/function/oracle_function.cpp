@@ -44,9 +44,36 @@ namespace casadi {
   = {{&FunctionInternal::options_},
      {{"monitor",
        {OT_STRINGVECTOR,
-        "Set of user problem functions to be monitored"}}
+        "Set of user problem functions to be monitored"}},
+      {"common_options",
+       {OT_DICT,
+        "Options for auto-generated functions"}},
+      {"specific_options",
+       {OT_DICT,
+        "Options for specific auto-generated functions,"
+        " overwriting the defaults from common_options. Nested dictionary."}}
     }
   };
+
+  void OracleFunction::init(const Dict& opts) {
+
+    FunctionInternal::init(opts);
+
+    // Read options
+    for (auto&& op : opts) {
+      if (op.first=="common_options") {
+        common_options_ = op.second;
+      } else if (op.first=="specific_options") {
+        specific_options_ = op.second;
+        for (auto&& i : specific_options_) {
+          casadi_assert_message(i.second.is_dict(),
+            "specific_option must be a nested dictionary."
+            " Type mismatch for entry '" + i.first+ "': "
+            " got type " + i.second.get_description() + ".");
+        }
+      }
+    }
+  }
 
   void OracleFunction::finalize(const Dict& opts) {
     // Default options
@@ -63,11 +90,19 @@ namespace casadi {
     for (const string& fname : monitor) {
       auto it = all_functions_.find(fname);
       if (it==all_functions_.end()) {
-        casadi_warning("Ignoring monitor " + fname);
+        casadi_warning("Ignoring monitor '" + fname + "'."
+                       " Available functions: " + join(get_function()) + ".");
       } else {
         casadi_assert_warning(!it->second.monitored, "Duplicate monitor " + fname);
         it->second.monitored = true;
       }
+    }
+
+    // Check specific options
+    for (auto&& i : specific_options_) {
+      if (all_functions_.find(i.first)==all_functions_.end())
+        casadi_warning("Ignoring specific_options entry '" + i.first+"'."
+                       " Available functions: " + join(get_function()) + ".");
     }
 
     // Recursive call
@@ -77,10 +112,17 @@ namespace casadi {
   Function OracleFunction::create_function(const std::string& fname,
                                    const std::vector<std::string>& s_in,
                                    const std::vector<std::string>& s_out,
-                                   const Function::AuxOut& aux,
-                                   const Dict& opts) {
+                                   const Function::AuxOut& aux) {
+    // Retrieve specific set of options if available
+    Dict specific_options;
+    auto it = specific_options_.find(fname);
+    if (it!=specific_options_.end()) specific_options = it->second;
+
+    // Combine specific and common options
+    Dict opt = combine(specific_options, common_options_);
+
     // Generate the function
-    Function ret = oracle_.factory(fname, s_in, s_out, aux, opts);
+    Function ret = oracle_.factory(fname, s_in, s_out, aux, opt);
     set_function(ret, fname, true);
     return ret;
   }
