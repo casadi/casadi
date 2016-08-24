@@ -108,10 +108,13 @@ import contextlib
 @contextlib.contextmanager
 def capture():
     import sys
-    from io import BytesIO
+    try:
+      from cStringIO import StringIO
+    except:
+      from io import StringIO
     oldout,olderr = sys.stdout, sys.stderr
     try:
-        out=[BytesIO(), BytesIO()]
+        out=[StringIO(), StringIO()]
         sys.stdout,sys.stderr = out
         yield out
     finally:

@@ -1087,7 +1087,6 @@ class Functiontests(casadiTestCase):
         f(2,3)
       except Exception as e:
         s = str(e)
-      print s
       self.assertTrue("Callback::eval" in s)
       s = ""
       class Fun(Callback):
