@@ -53,8 +53,6 @@ namespace casadi {
 
       If H is not positive-definite, the solver should throw an error.
 
-      \endverbatim
-
       \generalsection{Conic}
       \pluginssection{Conic}
 
