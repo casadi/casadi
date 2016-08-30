@@ -1452,7 +1452,7 @@ f(x,p)
 
 where $x \in \mathbb{R}^{nx}$ is the decision variable and $p \in \mathbb{R}^{np}$ is a known parameter vector.
 
-An NLP solver in \CasADi is a function that takes the parameter value, the bounds and a guess for the primal-dual solution and returns the optimal solution. Unlike integrator objects, NLP solver functions are currently not differentiable functions in \CasADi.
+An NLP solver in \CasADi is a function that takes the parameter value (\texttt{p}), the bounds (\texttt{lbx}, \texttt{ubx}, \texttt{lbg}, \texttt{ubg}) and a guess for the primal-dual solution (\texttt{x0}, \texttt{lam_x0}, \textt{lam_g0}) and returns the optimal solution. Unlike integrator objects, NLP solver functions are currently not differentiable functions in \CasADi.
 
 There are several NLP solvers interfaced with \CasADi. The most popular one is IPOPT, an open-source primal-dual interior point method which is included in \CasADi installations. Others, that require the installation of third-party software, include SNOPT, WORHP and KNITRO. Whatever the NLP solver used, the interface will automatically generate the information that it needs to solve the NLP, which may be solver and option dependent. Typically an NLP solver will need a function that gives the Jacobian of the constraint function and a Hessian of the Lagrangian function ($L(x,\lambda) = f(x) + \lambda^{\text{T}} \, g(x))$ with respect to $x$.
 
