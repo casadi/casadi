@@ -61,7 +61,7 @@ namespace casadi {
 
   void Ma27Interface::set_work(void* mem, const double**& arg, double**& res,
                                 int*& iw, double*& w) const {
-    auto m = static_cast<Ma27Memory*>(mem);
+    //auto m = static_cast<Ma27Memory*>(mem);
 
     // Set work in base classes
     LinsolInternal::set_work(mem, arg, res, iw, w);
@@ -133,7 +133,7 @@ namespace casadi {
             info, &ops);
     iflag = info[0];   // Information flag
     int ierror = info[1];  // Error flag
-    int nrlnec = info[4];  // recommended value for la
+    //int nrlnec = info[4];  // recommended value for la
     int nirnec = info[5];  // recommended value for liw
     casadi_assert_message(iflag==0, "ma27ad_ returns iflag = " <<
                           iflag << " with ierror = " << ierror);

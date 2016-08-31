@@ -298,7 +298,7 @@ namespace casadi {
                      const Dict& opts=Dict()) const;
 
     /** \brief Get oracle */
-    virtual Function oracle() const;
+    Function oracle() const;
 
     /** \brief Which variables enter nonlinearly */
     std::vector<bool> nl_var(const std::string& s_in,

@@ -460,9 +460,9 @@ namespace casadi {
     calc_function(&m, "jac_f_z");
 
     // Get sparsity and non-zero elements
-    const int* colind = sp_jac_.colind();
-    int ncol = sp_jac_.size2();
-    const int* row = sp_jac_.row();
+    //const int* colind = sp_jac_.colind();
+    //int ncol = sp_jac_.size2();
+    //const int* row = sp_jac_.row();
 
     // Factorize the linear system
     linsol_.factorize(m.jac);
@@ -519,7 +519,7 @@ namespace casadi {
       N_Vector fval = kin_mem->kin_fval;
       N_Vector fscale = kin_mem->kin_fscale;
       N_Vector tmp1 = kin_mem->kin_vtemp1;
-      N_Vector tmp2 = kin_mem->kin_vtemp2;
+      //N_Vector tmp2 = kin_mem->kin_vtemp2;
 
       // Solve the linear system
       N_VScale(1.0, b, x);

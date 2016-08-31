@@ -256,7 +256,7 @@ namespace casadi {
     casadi_assert_message(!jac_f_fcn_.is_null(), "blaasssshc");
 
     // Outputs
-    double Obj = 0; // TODO(Greg): get this from snopt
+    //double Obj = 0; // TODO(Greg): get this from snopt
 
     // snInit must be called first.
     //   9, 6 are print and summary unit numbers (for Fortran).

@@ -169,7 +169,7 @@ Function Function::rootfinder_fun() {
 
   void Rootfinder::init_memory(void* mem) const {
     OracleFunction::init_memory(mem);
-    auto m = static_cast<RootfinderMemory*>(mem);
+    //auto m = static_cast<RootfinderMemory*>(mem);
     linsol_.reset(sp_jac_);
   }
 

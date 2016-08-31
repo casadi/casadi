@@ -81,7 +81,6 @@ namespace casadi {
     mem_->arg[1] = mem_->p;
     mem_->res[0] = 0;
     mem_->res[1] = grad_f;
-    const double* arg[] = {x, mem_->p};
     return solver_.calc_function(mem_, "nlp_grad_f")==0;
   }
 

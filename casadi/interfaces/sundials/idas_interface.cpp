@@ -622,7 +622,7 @@ namespace casadi {
   void IdasInterface::setStopTime(IntegratorMemory* mem, double tf) const {
     // Set the stop time of the integration -- don't integrate past this point
     auto m = to_mem(mem);
-    auto& s = m->self;
+    //auto& s = m->self;
     THROWING(IDASetStopTime, m->mem, tf);
   }
 

@@ -210,7 +210,7 @@ namespace casadi {
 
   void BonminInterface::init_memory(void* mem) const {
     Nlpsol::init_memory(mem);
-    auto m = static_cast<BonminMemory*>(mem);
+    //auto m = static_cast<BonminMemory*>(mem);
   }
 
   void BonminInterface::set_work(void* mem, const double**& arg, double**& res,

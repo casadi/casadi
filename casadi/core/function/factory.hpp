@@ -333,7 +333,7 @@ namespace casadi {
       const MatType& ex = out_.at(b.ex);
       casadi_assert_message(b.arg1==b.arg2, "Mixed Hessian terms not supported");
       const MatType& arg1 = in_.at(b.arg1);
-      const MatType& arg2 = in_.at(b.arg2);
+      //const MatType& arg2 = in_.at(b.arg2);
       out_["hess:" + b.ex + ":" + b.arg1 + ":" + b.arg2] = triu(hessian(ex, arg1));
     }
   }
