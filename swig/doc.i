@@ -2022,7 +2022,7 @@ files and may be a directory or a file prefix. returns the filename.
 ";
 
 
-// File: classcasadi_1_1CollocationIntegrator.xml
+// File: classcasadi_1_1Collocation.xml
 
 
 // File: classcasadi_1_1Concat.xml
@@ -9374,10 +9374,10 @@ Return a string with a description (for SWIG)
 // File: classcasadi_1_1Reshape.xml
 
 
-// File: classcasadi_1_1RkIntegrator.xml
-
-
 // File: classcasadi_1_1Rootfinder.xml
+
+
+// File: classcasadi_1_1RungeKutta.xml
 
 
 // File: classcasadi_1_1Scpgen.xml
@@ -13286,7 +13286,7 @@ N:  Number of integrator steps
 
 order:  Order of interpolating polynomials
 
-scheme:  Collocation scheme, as excepted by collocationPoints function.
+scheme:   Collocation scheme, as excepted by collocationPoints function.
 
 ";
 
@@ -13479,7 +13479,7 @@ N:  Number of integrator steps
 
 order:  Order of interpolating polynomials
 
-scheme:  Collocation scheme, as excepted by collocationPoints function.
+scheme:   Collocation scheme, as excepted by collocationPoints function.
 
 ";
 

@@ -465,17 +465,17 @@
 </table>
 */
 /// \cond INTERNAL
-/** \class casadi::CollocationIntegrator
+/** \class casadi::Collocation
 \n
 \par
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
 <tr><td>augmented_options</td><td>OT_DICT</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
-<tr><td>collocation_scheme</td><td>OT_STRING</td><td>Collocation scheme: radau|legendre</td><td>casadi::CollocationIntegrator</td></tr>
+<tr><td>collocation_scheme</td><td>OT_STRING</td><td>Collocation scheme: radau|legendre</td><td>casadi::Collocation</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>grid</td><td>OT_DOUBLEVECTOR</td><td>Time grid</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
-<tr><td>interpolation_order</td><td>OT_INT</td><td>Order of the interpolating polynomials</td><td>casadi::CollocationIntegrator</td></tr>
+<tr><td>interpolation_order</td><td>OT_INT</td><td>Order of the interpolating polynomials</td><td>casadi::Collocation</td></tr>
 <tr><td>number_of_finite_elements</td><td>OT_INT</td><td>Number of finite elements</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>output_t0</td><td>OT_BOOL</td><td>Output the state at the initial time</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>print_stats</td><td>OT_BOOL</td><td>Print out statistics after integration</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
@@ -506,17 +506,17 @@
 <tr><td>tf</td><td>OT_DOUBLE</td><td>End of the time horizon</td></tr>
 </table>
 */
-/** \addtogroup general_CollocationIntegrator
+/** \addtogroup general_Collocation
 \n
 \par
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
 <tr><td>augmented_options</td><td>OT_DICT</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
-<tr><td>collocation_scheme</td><td>OT_STRING</td><td>Collocation scheme: radau|legendre</td><td>casadi::CollocationIntegrator</td></tr>
+<tr><td>collocation_scheme</td><td>OT_STRING</td><td>Collocation scheme: radau|legendre</td><td>casadi::Collocation</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>grid</td><td>OT_DOUBLEVECTOR</td><td>Time grid</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
-<tr><td>interpolation_order</td><td>OT_INT</td><td>Order of the interpolating polynomials</td><td>casadi::CollocationIntegrator</td></tr>
+<tr><td>interpolation_order</td><td>OT_INT</td><td>Order of the interpolating polynomials</td><td>casadi::Collocation</td></tr>
 <tr><td>number_of_finite_elements</td><td>OT_INT</td><td>Number of finite elements</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>output_t0</td><td>OT_BOOL</td><td>Output the state at the initial time</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>print_stats</td><td>OT_BOOL</td><td>Print out statistics after integration</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
