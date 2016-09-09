@@ -53,20 +53,20 @@ namespace casadi {
      \author Joel Andersson
      \date 2014
   */
-  class CASADI_INTEGRATOR_COLLOCATION_EXPORT CollocationIntegrator :
+  class CASADI_INTEGRATOR_COLLOCATION_EXPORT Collocation :
         public ImplicitFixedStepIntegrator {
   public:
 
     /// Constructor
-    explicit CollocationIntegrator(const std::string& name, const Function& dae);
+    explicit Collocation(const std::string& name, const Function& dae);
 
     /** \brief  Create a new integrator */
     static Integrator* creator(const std::string& name, const Function& dae) {
-      return new CollocationIntegrator(name, dae);
+      return new Collocation(name, dae);
     }
 
     /// Destructor
-    virtual ~CollocationIntegrator();
+    virtual ~Collocation();
 
     // Get name of the plugin
     virtual const char* plugin_name() const { return "collocation";}

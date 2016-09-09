@@ -23,7 +23,7 @@
  */
 
 
-#include "collocation_integrator.hpp"
+#include "collocation.hpp"
 #include "casadi/core/polynomial.hpp"
 #include "casadi/core/std_vector_tools.hpp"
 
@@ -33,9 +33,9 @@ namespace casadi {
   extern "C"
   int CASADI_INTEGRATOR_COLLOCATION_EXPORT
       casadi_register_integrator_collocation(Integrator::Plugin* plugin) {
-    plugin->creator = CollocationIntegrator::creator;
+    plugin->creator = Collocation::creator;
     plugin->name = "collocation";
-    plugin->doc = CollocationIntegrator::meta_doc.c_str();
+    plugin->doc = Collocation::meta_doc.c_str();
     plugin->version = 30;
     return 0;
   }
@@ -45,14 +45,14 @@ namespace casadi {
     Integrator::registerPlugin(casadi_register_integrator_collocation);
   }
 
-  CollocationIntegrator::CollocationIntegrator(const std::string& name, const Function& dae)
+  Collocation::Collocation(const std::string& name, const Function& dae)
     : ImplicitFixedStepIntegrator(name, dae) {
   }
 
-  CollocationIntegrator::~CollocationIntegrator() {
+  Collocation::~Collocation() {
   }
 
-  Options CollocationIntegrator::options_
+  Options Collocation::options_
   = {{&ImplicitFixedStepIntegrator::options_},
      {{"interpolation_order",
        {OT_INT,
@@ -63,7 +63,7 @@ namespace casadi {
      }
   };
 
-  void CollocationIntegrator::init(const Dict& opts) {
+  void Collocation::init(const Dict& opts) {
     // Default options
     deg_ = 3;
     collocation_scheme_ = "radau";
@@ -81,7 +81,7 @@ namespace casadi {
     ImplicitFixedStepIntegrator::init(opts);
   }
 
-  void CollocationIntegrator::setupFG() {
+  void Collocation::setupFG() {
     f_ = create_function("f", {"x", "z", "p", "t"}, {"ode", "alg", "quad"});
     g_ = create_function("g", {"rx", "rz", "rp", "x", "z", "p", "t"},
                               {"rode", "ralg", "rquad"});
@@ -299,7 +299,7 @@ namespace casadi {
     }
   }
 
-  void CollocationIntegrator::reset(IntegratorMemory* mem, double t, const double* x,
+  void Collocation::reset(IntegratorMemory* mem, double t, const double* x,
                                 const double* z, const double* p) const {
     auto m = static_cast<FixedStepMemory*>(mem);
 
@@ -316,7 +316,7 @@ namespace casadi {
     }
   }
 
-  void CollocationIntegrator::resetB(IntegratorMemory* mem, double t, const double* rx,
+  void Collocation::resetB(IntegratorMemory* mem, double t, const double* rx,
                                const double* rz, const double* rp) const {
     auto m = static_cast<FixedStepMemory*>(mem);
 

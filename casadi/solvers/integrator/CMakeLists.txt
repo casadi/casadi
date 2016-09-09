@@ -8,6 +8,6 @@ casadi_plugin(Integrator rk
 
 # Collocation integrator
 casadi_plugin(Integrator collocation
-  collocation_integrator.hpp
-  collocation_integrator.cpp
-  collocation_integrator_meta.cpp)
+  collocation.hpp
+  collocation.cpp
+  collocation_meta.cpp)
