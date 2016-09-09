@@ -628,11 +628,16 @@ namespace casadi {
         << "#ifdef MATLAB_MEX_FILE" << endl
         << "mxArray* CASADI_PREFIX(to_mex)(const int* sp, const real_t* x) {" << endl
         << "  int nrow = *sp++, ncol = *sp++, nnz = sp[ncol];" << endl
-        << "  mxArray* p = mxCreateSparse(nrow, ncol, nnz, mxREAL);" << endl
         << "  int i;" << endl
-        << "  mwIndex* j;" << endl
-        << "  for (i=0, j=mxGetJc(p); i<=ncol; ++i) *j++ = *sp++;" << endl
-        << "  for (i=0, j=mxGetIr(p); i<nnz; ++i) *j++ = *sp++;" << endl
+        << "  mxArray* p;" << endl
+        << "  if (nnz==nrow*ncol) {" << endl
+        << "    p = mxCreateDoubleMatrix(nrow, ncol, mxREAL);" << endl
+        << "  } else {" << endl
+        << "    p = mxCreateSparse(nrow, ncol, nnz, mxREAL);" << endl
+        << "    mwIndex* j;" << endl
+        << "    for (i=0, j=mxGetJc(p); i<=ncol; ++i) *j++ = *sp++;" << endl
+        << "    for (i=0, j=mxGetIr(p); i<nnz; ++i) *j++ = *sp++;" << endl
+        << "  }" << endl
         << "  if (x) {" << endl
         << "    double* d = (double*)mxGetData(p);" << endl
         << "    for (i=0; i<nnz; ++i) *d++ = to_double(*x++);" << endl
@@ -703,7 +708,7 @@ namespace casadi {
   std::string CodeGenerator::to_mex(const Sparsity& sp, const std::string& arg) {
     addAuxiliary(AUX_TO_MEX);
     stringstream s;
-    s << "to_mex(" << sparsity(sp) << ", " << arg << ");";
+    s<< "to_mex(" << sparsity(sp) << ", " << arg << ");"; 
     return s.str();
   }
 
