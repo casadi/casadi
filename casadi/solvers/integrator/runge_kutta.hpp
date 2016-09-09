@@ -23,8 +23,8 @@
  */
 
 
-#ifndef CASADI_RK_INTEGRATOR_HPP
-#define CASADI_RK_INTEGRATOR_HPP
+#ifndef CASADI_RUNGE_KUTTA_HPP
+#define CASADI_RUNGE_KUTTA_HPP
 
 #include "casadi/core/function/integrator_impl.hpp"
 #include <casadi/solvers/integrator/casadi_integrator_rk_export.h>
@@ -49,19 +49,19 @@ namespace casadi {
       \author Joel Andersson
       \date 2011-2014
   */
-  class CASADI_INTEGRATOR_RK_EXPORT RkIntegrator : public FixedStepIntegrator {
+  class CASADI_INTEGRATOR_RK_EXPORT RungeKutta : public FixedStepIntegrator {
   public:
 
     /// Constructor
-    explicit RkIntegrator(const std::string& name, const Function& dae);
+    explicit RungeKutta(const std::string& name, const Function& dae);
 
     /** \brief  Create a new integrator */
     static Integrator* creator(const std::string& name, const Function& dae) {
-      return new RkIntegrator(name, dae);
+      return new RungeKutta(name, dae);
     }
 
     /// Destructor
-    virtual ~RkIntegrator();
+    virtual ~RungeKutta();
 
     // Get name of the plugin
     virtual const char* plugin_name() const { return "rk";}
@@ -82,4 +82,4 @@ namespace casadi {
 } // namespace casadi
 
 /// \endcond
-#endif // CASADI_RK_INTEGRATOR_HPP
+#endif // CASADI_RUNGE_KUTTA_HPP

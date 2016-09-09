@@ -23,7 +23,7 @@
  */
 
 
-#include "rk_integrator.hpp"
+#include "runge_kutta.hpp"
 
 using namespace std;
 namespace casadi {
@@ -31,9 +31,9 @@ namespace casadi {
   extern "C"
   int CASADI_INTEGRATOR_RK_EXPORT
       casadi_register_integrator_rk(Integrator::Plugin* plugin) {
-    plugin->creator = RkIntegrator::creator;
+    plugin->creator = RungeKutta::creator;
     plugin->name = "rk";
-    plugin->doc = RkIntegrator::meta_doc.c_str();
+    plugin->doc = RungeKutta::meta_doc.c_str();
     plugin->version = 30;
     return 0;
   }
@@ -43,14 +43,14 @@ namespace casadi {
     Integrator::registerPlugin(casadi_register_integrator_rk);
   }
 
-  RkIntegrator::RkIntegrator(const std::string& name, const Function& dae)
+  RungeKutta::RungeKutta(const std::string& name, const Function& dae)
     : FixedStepIntegrator(name, dae) {
   }
 
-  RkIntegrator::~RkIntegrator() {
+  RungeKutta::~RungeKutta() {
   }
 
-  void RkIntegrator::init(const Dict& opts) {
+  void RungeKutta::init(const Dict& opts) {
     // Call the base class init
     FixedStepIntegrator::init(opts);
 
@@ -59,7 +59,7 @@ namespace casadi {
                           "Explicit Runge-Kutta integrators do not support algebraic variables");
   }
 
-  void RkIntegrator::setupFG() {
+  void RungeKutta::setupFG() {
     f_ = create_function("f", {"x", "z", "p", "t"}, {"ode", "alg", "quad"});
     g_ = create_function("g", {"rx", "rz", "rp", "x", "z", "p", "t"},
                               {"rode", "ralg", "rquad"});
