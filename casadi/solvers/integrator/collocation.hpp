@@ -23,8 +23,8 @@
  */
 
 
-#ifndef CASADI_COLLOCATION_INTEGRATOR_HPP
-#define CASADI_COLLOCATION_INTEGRATOR_HPP
+#ifndef CASADI_COLLOCATION_HPP
+#define CASADI_COLLOCATION_HPP
 
 #include "casadi/core/function/integrator_impl.hpp"
 #include "casadi/core/misc/integration_tools.hpp"
@@ -109,4 +109,4 @@ namespace casadi {
 
 } // namespace casadi
 /// \endcond
-#endif // CASADI_COLLOCATION_INTEGRATOR_HPP
+#endif // CASADI_COLLOCATION_HPP
