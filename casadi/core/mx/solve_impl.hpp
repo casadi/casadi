@@ -163,6 +163,7 @@ namespace casadi {
     int nrhs = dep(0).size2();
 
     // Sparsities
+    const Sparsity& B_sp = dep(0).sparsity();
     const Sparsity& A_sp = dep(1).sparsity();
     const int* A_colind = A_sp.colind();
     const int* A_row = A_sp.row();
@@ -172,6 +173,23 @@ namespace casadi {
     const bvec_t *B=arg[0], *A = arg[1];
     bvec_t* X = res[0];
     bvec_t* tmp = w;
+
+    // Short-circuit for dense A
+    if (A_sp.is_dense()) {
+      // Any change in A affects all of X
+      bvec_t A_or = bvec_or(A, A_sp);
+      bvec_t B_or = bvec_or(B, B_sp);
+
+      if (A_or == bvec_t(0) && B_or == bvec_t(0)) {
+        return;
+      }
+
+      if (A_or && ((A_or | B_or) == A_or)) {
+        for (int k=0;k<n*nrhs;++k)
+          X[k] |= A_or;
+        return;
+      }
+    }
 
     // For all right-hand-sides
     for (int r=0; r<nrhs; ++r) {

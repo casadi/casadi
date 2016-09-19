@@ -85,7 +85,8 @@ namespace casadi {
     Sparsity(int nrow, int ncol);
 
     /// Construct from sparsity pattern vectors given in compressed column storage format
-    Sparsity(int nrow, int ncol, const std::vector<int>& colind, const std::vector<int>& row);
+    Sparsity(int nrow, int ncol, const std::vector<int>& colind, const std::vector<int>& row,
+      bool sanity_check=true);
 
 #ifndef SWIG
     /// Construct from sparsity pattern vectors given in compressed column storage format

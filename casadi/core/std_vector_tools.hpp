@@ -120,7 +120,7 @@ namespace casadi {
   bool inBounds(const std::vector<T> &v, int lower, int upper);
 
   /** \brief swap inner and outer indices of list of lists
-  * 
+  *
   * \verbatim
   * [[apple0,apple1,...],[pear0,pear1,...]] ->
   *   [[apple0,pear0],[apple1,pear1],...]
@@ -245,6 +245,19 @@ namespace casadi {
   /// Get a pointer to the data contained in the vector
   template<typename T>
   const T* get_ptr(const std::vector<T> &v);
+
+
+
+  /// Print bvec_t as binary string (for debugging)
+  void bvec_print(bvec_t x);
+  /// Print bvec_t* as list of binary strings (for debugging)
+  void bvec_print(const bvec_t* x, const Sparsity& sp);
+
+  /// Apply or operation on all entries of bvec_t*
+  bvec_t bvec_or(const bvec_t* x, const Sparsity& sp);
+
+  /// Check if all entries of bvec_t* match a given pattern
+  bool bvec_match(const bvec_t* x, const Sparsity& sp, bvec_t pattern);
 
   /// \endcond
 

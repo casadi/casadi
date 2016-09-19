@@ -84,9 +84,9 @@ namespace casadi {
   }
 
   Sparsity::Sparsity(int nrow, int ncol, const std::vector<int>& colind,
-                     const std::vector<int>& row) {
+                     const std::vector<int>& row, bool sanity_check) {
     assign_cached(nrow, ncol, colind, row);
-    sanity_check(true);
+    if (sanity_check) this->sanity_check(true);
   }
 
   Sparsity::Sparsity(int nrow, int ncol, const int* colind, const int* row) {
@@ -781,6 +781,8 @@ namespace casadi {
     std::size_t ret=0;
     hash_combine(ret, nrow);
     hash_combine(ret, ncol);
+    if (colind[ncol]==nrow*ncol) // Special-case dense matrix
+      return ret;
     hash_combine(ret, colind, ncol+1);
     hash_combine(ret, row, colind[ncol]);
     return ret;
@@ -797,7 +799,7 @@ namespace casadi {
       for (int rr=0; rr<nrow; ++rr)
         row[rr+cc*nrow] = rr;
 
-    return Sparsity(nrow, ncol, colind, row);
+    return Sparsity(nrow, ncol, colind, row, false);
   }
 
   Sparsity Sparsity::upper(int n) {
@@ -1114,39 +1116,47 @@ namespace casadi {
     if (sp.empty()) return Sparsity(0, 0);
     if (sp.size()==1) return sp.front();
 
-    // Count total nnz
-    int nnz_total = 0;
-    for (int i=0; i<sp.size(); ++i) nnz_total += sp[i].nnz();
-
-    // Construct from vectors (triplet format)
-    vector<int> ret_row, ret_col;
-    ret_row.reserve(nnz_total);
-    ret_col.reserve(nnz_total);
+    // Obtain return dimensions
     int ret_ncol = 0;
     int ret_nrow = 0;
     for (int i=0; i<sp.size() && ret_nrow==0; ++i)
       ret_nrow = sp[i].size1();
 
-    // Append all patterns
-    for (vector<Sparsity>::const_iterator i=sp.begin(); i!=sp.end(); ++i) {
-      // Get sparsity pattern
-      int sp_nrow = i->size1();
-      int sp_ncol = i->size2();
-      const int* sp_colind = i->colind();
-      const int* sp_row = i->row();
+    for (const Sparsity & s : sp) {
+      ret_ncol += s.size2();
+      int sp_nrow = s.size1();
       casadi_assert_message(sp_nrow==ret_nrow || sp_nrow==0,
                             "Sparsity::horzcat: Mismatching number of rows");
+    }
+    // Count total nnz
+    int nnz_total = 0;
+    for (int i=0; i<sp.size(); ++i) nnz_total += sp[i].nnz();
+
+    // Simple case if dense
+    if (nnz_total == ret_nrow*ret_ncol)
+      return Sparsity::dense(ret_nrow, ret_ncol);
+
+    // Construct from vectors (triplet format)
+    vector<int> ret_row, ret_col;
+    ret_row.reserve(nnz_total);
+    ret_col.reserve(nnz_total);
+
+    int offset = 0;
+    // Append all patterns
+    for (const Sparsity & s : sp) {
+      // Get sparsity pattern
+      const int* sp_colind = s.colind();
+      const int* sp_row = s.row();
 
       // Add entries to pattern
-      for (int cc=0; cc<sp_ncol; ++cc) {
+      for (int cc=0; cc<s.size2(); ++cc) {
         for (int k=sp_colind[cc]; k<sp_colind[cc+1]; ++k) {
           ret_row.push_back(sp_row[k]);
-          ret_col.push_back(cc + ret_ncol);
+          ret_col.push_back(cc + offset);
         }
       }
-
       // Update offset
-      ret_ncol += sp_ncol;
+      offset += s.size2();
     }
     return Sparsity::triplet(ret_nrow, ret_ncol, ret_row, ret_col);
   }
@@ -1171,39 +1181,46 @@ namespace casadi {
     if (sp.empty()) return Sparsity(0, 0);
     if (sp.size()==1) return sp.front();
 
+    // Obtain return dimensions
+    int ret_nrow = 0;
+    int ret_ncol = 0;
+    for (int i=0; i<sp.size() && ret_ncol==0; ++i)
+      ret_ncol = sp[i].size2();
+    for (const Sparsity & s : sp) {
+      ret_nrow += s.size1();
+      int sp_ncol = s.size2();
+      casadi_assert_message(sp_ncol==ret_ncol || sp_ncol==0,
+                            "Sparsity::vertcat: Mismatching number of columns");
+    }
     // Count total nnz
     int nnz_total = 0;
     for (int i=0; i<sp.size(); ++i) nnz_total += sp[i].nnz();
+
+    // Simple case if dense
+    if (nnz_total == ret_nrow*ret_ncol)
+      return Sparsity::dense(ret_nrow, ret_ncol);
 
     // Construct from vectors (triplet format)
     vector<int> ret_row, ret_col;
     ret_row.reserve(nnz_total);
     ret_col.reserve(nnz_total);
-    int ret_nrow = 0;
-    int ret_ncol = 0;
-    for (int i=0; i<sp.size() && ret_ncol==0; ++i)
-      ret_ncol = sp[i].size2();
 
+    int offset = 0;
     // Append all patterns
-    for (vector<Sparsity>::const_iterator i=sp.begin(); i!=sp.end(); ++i) {
+    for (const Sparsity & s : sp) {
       // Get sparsity pattern
-      int sp_nrow = i->size1();
-      int sp_ncol = i->size2();
-      const int* sp_colind = i->colind();
-      const int* sp_row = i->row();
-      casadi_assert_message(sp_ncol==ret_ncol || sp_ncol==0,
-                            "Sparsity::vertcat: Mismatching number of columns");
+      const int* sp_colind = s.colind();
+      const int* sp_row = s.row();
 
       // Add entries to pattern
-      for (int cc=0; cc<sp_ncol; ++cc) {
+      for (int cc=0; cc<s.size2(); ++cc) {
         for (int k=sp_colind[cc]; k<sp_colind[cc+1]; ++k) {
-          ret_row.push_back(sp_row[k] + ret_nrow);
+          ret_row.push_back(sp_row[k] + offset);
           ret_col.push_back(cc);
         }
       }
-
       // Update offset
-      ret_nrow += sp_nrow;
+      offset += s.size1();
     }
     return Sparsity::triplet(ret_nrow, ret_ncol, ret_row, ret_col);
   }
@@ -1275,7 +1292,7 @@ namespace casadi {
       copy(row_x+colind_x[first_col], row_x+colind_x[last_col], row.begin());
 
       // Append to the list
-      ret.push_back(Sparsity(nrow, ncol, colind, row));
+      ret.push_back(Sparsity(nrow, ncol, colind, row, false));
     }
 
     // Return (RVO)
@@ -1423,10 +1440,107 @@ namespace casadi {
     return nnz;
   }
 
-  void Sparsity::mul_sparsityF(const bvec_t* x, const Sparsity& x_sp,
+  void mul_sparsityF_smart(const bvec_t* x, const Sparsity& x_sp,
                                const bvec_t* y, const Sparsity& y_sp,
                                bvec_t* z, const Sparsity& z_sp,
                                bvec_t* w) {
+    // Todo: modify z instead of overwrite
+
+    // Oring of x and y
+    bvec_t x_or = bvec_or(x, x_sp);
+    bvec_t y_or = bvec_or(y, y_sp);
+
+    // Check if all x, respectively y consist of all zeros
+    bool x_is_zero = x_or==bvec_t(0);
+    bool y_is_zero = y_or==bvec_t(0);
+
+    // Short-circuit case: x and y zero
+    if (x_is_zero && y_is_zero) {
+      return;
+    }
+
+    // Short-circuit case: repeated pattern
+    // e.g  x = zeros
+    //      y = 11110000
+    //          11110000
+    //          ...
+    //
+    //  -> z = 11110000
+    //         11110000
+    //         ...
+
+    // Check if x and y consists of exact copies of their respective oring
+    bool x_pattern = bvec_match(x, x_sp, x_or);
+    bool y_pattern = bvec_match(y, y_sp, y_or);
+
+    // Prospective result for z, initialised with a value that evaluates to false
+    bvec_t z_res = bvec_t(0);
+
+    // Use the x pattern if its zeros are also zero in y's oring
+    if (x_pattern && ((y_or | x_or) == x_or)) z_res = x_or;
+    if (y_pattern && ((x_or | y_or) == y_or)) z_res = y_or;
+
+    if (z_res) {
+      // Fill the result matrix with the pattern
+      for (int k=0;k<z_sp.nnz();++k)
+        z[k] |= z_res;
+      return;
+    }
+
+    if (x_sp.is_dense() && y_sp.is_dense() && z_sp.is_dense()) {
+      // Direct access to the arrays
+      const int* y_colind = y_sp.colind();
+      const int* y_row = y_sp.row();
+      const int* x_colind = x_sp.colind();
+      const int* x_row = x_sp.row();
+      const int* z_colind = z_sp.colind();
+      const int* z_row = z_sp.row();
+
+      // Loop over the columns of y and z
+      int ncol = z_sp.size2();
+      int nrow = z_sp.size1();
+      int m = y_sp.size1();
+
+      if (x_is_zero) {
+        for (int k=0; k<ncol; ++k) {
+          bvec_t yy = bvec_t(0);
+          // Loop over the nonzeros of y
+          for (int j=0; j<m; ++j)
+            yy |= y[k*m+j];
+          for (int i=0;i<nrow;++i)
+            z[k*nrow+i] |= yy;
+        }
+        return;
+      } else if (y_is_zero) {
+        fill(w, w+nrow, bvec_t(0));
+        // Loop over the nonzeros of y
+        for (int j=0; j<m; ++j) {
+          for (int i=0; i<nrow; ++i)
+            w[i] |= x[j*nrow+i];
+        }
+        for (int k=0; k<ncol; ++k) {
+          for (int i=0;i<nrow;++i)
+            z[k*nrow+i] |= w[i];
+        }
+        return;
+      }
+      // r(i,k) |= x(i,j) | r(j,k)
+      for (int k=0; k<ncol; ++k) {
+        bvec_t* ww = z+k*nrow;
+
+        // Loop over the nonzeros of y
+        for (int j=0; j<m; ++j) {
+
+          // Loop over corresponding columns of x
+          bvec_t yy = y[k*m+j];
+          for (int i=0; i<nrow; ++i) {
+            ww[i] |= x[j*nrow+i] | yy;
+          }
+        }
+      }
+      return;
+    }
+
     // Assert dimensions
     casadi_assert_message(z_sp.size1()==x_sp.size1() && x_sp.size2()==y_sp.size1()
                           && y_sp.size2()==z_sp.size2(),
@@ -1467,6 +1581,65 @@ namespace casadi {
       }
     }
   }
+
+
+    void Sparsity::mul_sparsityF(const bvec_t* x, const Sparsity& x_sp,
+                                 const bvec_t* y, const Sparsity& y_sp,
+                                 bvec_t* z, const Sparsity& z_sp,
+                                 bvec_t* w) {
+
+      mul_sparsityF_smart(x, x_sp, y, y_sp, z, z_sp, w);
+      return;
+
+      // Assert dimensions
+      casadi_assert_message(z_sp.size1()==x_sp.size1() && x_sp.size2()==y_sp.size1()
+                           && y_sp.size2()==z_sp.size2(),
+                           "Dimension error. Got x=" << x_sp.dim()
+                           << ", y=" << y_sp.dim()
+                           << " and z=" << z_sp.dim() << ".");
+
+      // Direct access to the arrays
+      const int* y_colind = y_sp.colind();
+      const int* y_row = y_sp.row();
+      const int* x_colind = x_sp.colind();
+      const int* x_row = x_sp.row();
+      const int* z_colind = z_sp.colind();
+      const int* z_row = z_sp.row();
+
+      // Loop over the columns of y and z
+      int ncol = z_sp.size2();
+      for (int cc=0; cc<ncol; ++cc) {
+       // Get the dense column of z
+       for (int kk=z_colind[cc]; kk<z_colind[cc+1]; ++kk) {
+         w[z_row[kk]] = z[kk];
+       }
+
+       // Loop over the nonzeros of y
+       for (int kk=y_colind[cc]; kk<y_colind[cc+1]; ++kk) {
+         int rr = y_row[kk];
+
+         // Loop over corresponding columns of x
+         bvec_t yy = y[kk];
+         for (int kk1=x_colind[rr]; kk1<x_colind[rr+1]; ++kk1) {
+           w[x_row[kk1]] |= x[kk1] | yy;
+         }
+       }
+
+       // Get the sparse column of z
+       for (int kk=z_colind[cc]; kk<z_colind[cc+1]; ++kk) {
+         z[kk] = w[z_row[kk]];
+       }
+      }
+
+      std::vector<bvec_t> z_alt(z_sp.nnz());
+      mul_sparsityF_smart(x, x_sp, y, y_sp, get_ptr(z_alt), z_sp, w);
+
+      bool equal = true;
+      for (int k=0;k<z_sp.nnz();++k)
+        equal &= z[k]==z_alt[k];
+      casadi_assert(equal);
+    }
+
 
   void Sparsity::mul_sparsityR(bvec_t* x, const Sparsity& x_sp,
                                bvec_t* y, const Sparsity& y_sp,

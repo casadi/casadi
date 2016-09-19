@@ -140,6 +140,10 @@ namespace casadi {
   }
 
   Sparsity SparsityInternal::T() const {
+    // Shortcut for dense
+    if (is_dense())
+      return Sparsity::dense(size2(), size1());
+
     // Dummy mapping
     vector<int> mapping;
 
@@ -2543,6 +2547,31 @@ namespace casadi {
       return y;
     }
 
+    // Quick return when no nonzeros present
+    if (y.nnz()==0) {
+      if (with_mapping) mapping.resize(nnz());
+      if (function0_is_zero) {
+        if (with_mapping)
+          fill(mapping.begin(), mapping.end(), 1 | 4);
+        return y;
+      } else {
+        if (with_mapping)
+          fill(mapping.begin(), mapping.end(), 1);
+        return shared_from_this<Sparsity>();
+      }
+    } else if (nnz()==0) {
+      if (with_mapping) mapping.resize(y.nnz());
+      if (f0x_is_zero) {
+        if (with_mapping)
+          fill(mapping.begin(), mapping.end(), 2 | 4);
+        return shared_from_this<Sparsity>();
+      } else {
+        if (with_mapping)
+          fill(mapping.begin(), mapping.end(), 2);
+        return y;
+      }
+    }
+
     if (f0x_is_zero) {
       if (function0_is_zero) {
         return combineGen<with_mapping, true, true>(y, mapping);
@@ -2621,7 +2650,7 @@ namespace casadi {
     }
 
     // Return cached object
-    return Sparsity(size1(), size2(), ret_colind, ret_row);
+    return Sparsity(size1(), size2(), ret_colind, ret_row, false);
   }
 
   bool SparsityInternal::is_equal(const Sparsity& y) const {
@@ -3022,7 +3051,7 @@ namespace casadi {
 
   void SparsityInternal::get_nz(std::vector<int>& indices) const {
     // Quick return if no elements
-    if (indices.empty()) return;
+    if (indices.empty() || is_dense()) return;
     const int* colind = this->colind();
     const int* row = this->row();
 
@@ -3443,6 +3472,9 @@ namespace casadi {
   Sparsity SparsityInternal::star_coloring(int ordering, int cutoff) const {
     casadi_assert_warning(size2()==size1(), "StarColoring requires a square matrix, but got "
                           << dim() << ".");
+    // Quick return for dense case
+    if (is_dense()) return Sparsity::diag(size1());
+
     // Reorder, if necessary
     if (ordering!=0) {
       casadi_assert(ordering==1);

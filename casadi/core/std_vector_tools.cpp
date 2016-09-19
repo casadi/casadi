@@ -100,4 +100,34 @@ namespace casadi {
     return ss.str();
   }
 
+  void bvec_print(bvec_t x) {
+    for (int i=0;i<64;++i) {
+      bool r = x & (bvec_t(1) << i);
+      userOut() << r ? "1" : "0";
+    }
+    userOut() << std::endl;
+  }
+
+  void bvec_print(const bvec_t* x, const Sparsity& sp) {
+    userOut() << "====" << std::endl;
+    for (int k=0;k<sp.nnz();++k) {
+      bvec_print(x[k]);
+    }
+    userOut() << "====" << std::endl;
+  }
+
+  bvec_t bvec_or(const bvec_t* x, const Sparsity& sp) {
+    bvec_t ref = bvec_t(0);
+    for (int i=0;i<sp.nnz();++i)
+      ref|=x[i];
+    return ref;
+  }
+
+  bool bvec_match(const bvec_t* x, const Sparsity& sp, bvec_t pattern) {
+    bool ret = true;
+    for (int i=0;i<sp.nnz();++i)
+      ret &= x[i]==pattern;
+    return ret;
+  }
+
 } // namespace casadi
