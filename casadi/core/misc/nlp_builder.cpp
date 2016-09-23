@@ -79,7 +79,7 @@ void NlpBuilder::parse_nl(const std::string& filename, const Dict& options) {
   this->x = SX::sym("x", 1, 1, n_var);
 
   // Allocate f and c
-  f = SX::zeros(n_obj);
+  this->f = 0;
   this->g.resize(n_con, 0);
 
   // Allocate bounds for x and primal initial guess
@@ -185,14 +185,10 @@ void NlpBuilder::parse_nl(const std::string& filename, const Dict& options) {
         // Should the objective be maximized
         int sigma;
         nlfile >> sigma;
+        SX sign = sigma!=0 ? -1 : 1;
 
         // Parse and save expression
-        f->at(i) = read_expr(nlfile, v);
-
-        // Negate the expression if we maximize
-        if (sigma!=0) {
-          f->at(i) = -f->at(i);
-        }
+        this->f += sign*read_expr(nlfile, v);
 
         break;
       }
@@ -409,7 +405,7 @@ void NlpBuilder::parse_nl(const std::string& filename, const Dict& options) {
           nlfile >> j >> c;
 
           // Add to objective
-          f->at(i) += c*v.at(j);
+          this->f += c*v.at(j);
         }
         break;
       }
@@ -602,13 +598,13 @@ SXElem NlpBuilder::read_expr(std::istream &stream, const std::vector<SXElem>& v)
 void NlpBuilder::print(std::ostream &stream, bool trailing_newline) const {
   stream << "NLP:" << endl;
   stream << "x = " << this->x << endl;
-  stream << "#f=" << f.nnz() << endl;
-  stream << "#g=" << this->g.size() << endl;
+  stream << "f = " << this->f << endl;
+  stream << "g = " << this->g << endl;
   if (trailing_newline) stream << endl;
 }
 
 void NlpBuilder::repr(std::ostream &stream, bool trailing_newline) const {
-  stream << "NLP(#f=" << f.nnz() << ",#g="<< this->g.size() << ")";
+  stream << "NLP(#x=" << this->x.size() << ", #g=" << this->g.size() << ")";
   if (trailing_newline) stream << endl;
 }
 
