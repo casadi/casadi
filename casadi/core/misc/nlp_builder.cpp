@@ -76,7 +76,7 @@ void NlpBuilder::parse_nl(const std::string& filename, const Dict& options) {
   }
 
   // Allocate variables
-  x = SX::sym("x", n_var);
+  this->x = SX::sym("x", 1, 1, n_var);
 
   // Allocate f and c
   f = SX::zeros(n_obj);
@@ -93,7 +93,8 @@ void NlpBuilder::parse_nl(const std::string& filename, const Dict& options) {
   this->lambda_init.resize(n_con, 0);
 
   // All variables, including dependent
-  vector<SXElem> v = x.nonzeros();
+  vector<SXElem> v;
+  for (auto&& xi : this->x) v.push_back(xi.scalar());
 
   // Process segments
   while (true) {
@@ -600,7 +601,7 @@ SXElem NlpBuilder::read_expr(std::istream &stream, const std::vector<SXElem>& v)
 
 void NlpBuilder::print(std::ostream &stream, bool trailing_newline) const {
   stream << "NLP:" << endl;
-  stream << "x = " << x << endl;
+  stream << "x = " << this->x << endl;
   stream << "#f=" << f.nnz() << endl;
   stream << "#g=" << g.nnz() << endl;
   if (trailing_newline) stream << endl;

@@ -40,7 +40,7 @@ nl = NlpBuilder()
 nl.parse_nl("../nl_files/hs107.nl",{"verbose":False})
 
 # NLP function
-nlp = {'x':nl.x, 'f':nl.f, 'g':nl.g}
+nlp = {'x':vertcat(*nl.x), 'f':nl.f, 'g':nl.g}
 
 # NLP solver options
 opts = {}
@@ -51,11 +51,10 @@ opts = {}
 
 # Create an NLP solver
 nlpsol = nlpsol("nlpsol", "ipopt", nlp, opts)
-  
+
 # Solve NLP
 res = nlpsol(lbx=nl.x_lb,
              ubx=nl.x_ub,
              lbg=nl.g_lb,
              ubg=nl.g_ub,
              x0=nl.x_init)
-

@@ -43,7 +43,7 @@ class CASADI_EXPORT NlpBuilder : public PrintableObject<NlpBuilder> {
     ///@{
 
       /// Variables
-      SX x;
+      std::vector<SX> x;
 
       /// Objective functions
       SX f;

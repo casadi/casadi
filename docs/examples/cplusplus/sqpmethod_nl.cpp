@@ -45,7 +45,7 @@ int main(int argc, char **argv){
   nl.parse_nl(problem);
 
   // NLP
-  SXDict nlp = {{"x", nl.x}, {"f", nl.f}, {"g", nl.g}};
+  SXDict nlp = {{"x", vertcat(nl.x)}, {"f", nl.f}, {"g", nl.g}};
 
   // Set options
   Dict opts;
