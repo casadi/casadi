@@ -83,8 +83,8 @@ void NlpBuilder::parse_nl(const std::string& filename, const Dict& options) {
   g = SX::zeros(n_con);
 
   // Allocate bounds for x and primal initial guess
-  x_lb = -DM::inf(x.sparsity());
-  x_ub = DM::inf(x.sparsity());
+  this->x_lb.resize(n_var, -inf);
+  this->x_ub.resize(n_var,  inf);
   x_init = DM::zeros(x.sparsity());
 
   // Allocate bounds for g and dual initial guess
@@ -319,21 +319,21 @@ void NlpBuilder::parse_nl(const std::string& filename, const Dict& options) {
             // Upper and lower bounds
             case 0:
               nlfile >> c;
-              x_lb->at(i) = c;
+              x_lb.at(i) = c;
               nlfile >> c;
-              x_ub->at(i) = c;
+              x_ub.at(i) = c;
               continue;
 
             // Only upper bounds
             case 1:
               nlfile >> c;
-              x_ub->at(i) = c;
+              x_ub.at(i) = c;
               continue;
 
            // Only lower bounds
            case 2:
               nlfile >> c;
-              x_lb->at(i) = c;
+              x_lb.at(i) = c;
               continue;
 
            // No bounds
@@ -343,7 +343,7 @@ void NlpBuilder::parse_nl(const std::string& filename, const Dict& options) {
            // Equality constraints
            case 4:
               nlfile >> c;
-              x_lb->at(i) = x_ub->at(i) = c;
+              x_lb.at(i) = x_ub.at(i) = c;
               continue;
 
            default:

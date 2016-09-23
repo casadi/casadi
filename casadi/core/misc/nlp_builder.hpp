@@ -52,7 +52,7 @@ class CASADI_EXPORT NlpBuilder : public PrintableObject<NlpBuilder> {
       SX g;
 
       /// Bounds on x
-      DM x_lb, x_ub;
+      std::vector<double> x_lb, x_ub;
 
       /// Bounds on g
       DM g_lb, g_ub;
