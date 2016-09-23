@@ -14737,6 +14737,11 @@ std::string &solver, const Importer &compiler, const Dict &opts=Dict()) "
 
 ";
 
+%feature("docstring")  casadi::nlpsol(const std::string &name, const
+std::string &solver, const NlpBuilder &nl, const Dict &opts=Dict()) "
+
+";
+
 %feature("docstring")  casadi::userOut() "
 
 ";
