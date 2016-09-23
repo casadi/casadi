@@ -58,10 +58,10 @@ class CASADI_EXPORT NlpBuilder : public PrintableObject<NlpBuilder> {
       std::vector<double> g_lb, g_ub;
 
       /// Primal initial guess
-      DM x_init;
+      std::vector<double> x_init;
 
       /// Dual initial guess
-      DM lambda_init;
+      std::vector<double> lambda_init;
 
     ///@}
 

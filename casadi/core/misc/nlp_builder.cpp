@@ -85,12 +85,12 @@ void NlpBuilder::parse_nl(const std::string& filename, const Dict& options) {
   // Allocate bounds for x and primal initial guess
   this->x_lb.resize(n_var, -inf);
   this->x_ub.resize(n_var,  inf);
-  x_init = DM::zeros(x.sparsity());
+  this->x_init.resize(n_var, 0);
 
   // Allocate bounds for g and dual initial guess
   this->g_lb.resize(n_con, -inf);
   this->g_ub.resize(n_con,  inf);
-  lambda_init = DM::zeros(g.sparsity());
+  this->lambda_init.resize(n_con, 0);
 
   // All variables, including dependent
   vector<SXElem> v = x.nonzeros();
@@ -211,7 +211,7 @@ void NlpBuilder::parse_nl(const std::string& filename, const Dict& options) {
           nlfile >> offset >> d;
 
           // Save initial guess
-          lambda_init->at(offset) = d;
+          this->lambda_init.at(offset) = d;
         }
 
         break;
@@ -232,7 +232,7 @@ void NlpBuilder::parse_nl(const std::string& filename, const Dict& options) {
           nlfile >> offset >> d;
 
           // Save initial guess
-          x_init->at(offset) = d;
+          this->x_init.at(offset) = d;
         }
 
         break;
@@ -319,21 +319,21 @@ void NlpBuilder::parse_nl(const std::string& filename, const Dict& options) {
             // Upper and lower bounds
             case 0:
               nlfile >> c;
-              x_lb.at(i) = c;
+              this->x_lb.at(i) = c;
               nlfile >> c;
-              x_ub.at(i) = c;
+              this->x_ub.at(i) = c;
               continue;
 
             // Only upper bounds
             case 1:
               nlfile >> c;
-              x_ub.at(i) = c;
+              this->x_ub.at(i) = c;
               continue;
 
            // Only lower bounds
            case 2:
               nlfile >> c;
-              x_lb.at(i) = c;
+              this->x_lb.at(i) = c;
               continue;
 
            // No bounds
@@ -343,7 +343,7 @@ void NlpBuilder::parse_nl(const std::string& filename, const Dict& options) {
            // Equality constraints
            case 4:
               nlfile >> c;
-              x_lb.at(i) = x_ub.at(i) = c;
+              this->x_lb.at(i) = this->x_ub.at(i) = c;
               continue;
 
            default:
