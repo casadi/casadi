@@ -93,8 +93,7 @@ void NlpBuilder::parse_nl(const std::string& filename, const Dict& options) {
   this->lambda_init.resize(n_con, 0);
 
   // All variables, including dependent
-  vector<SXElem> v;
-  for (auto&& xi : this->x) v.push_back(xi.scalar());
+  vector<SX> v = this->x;
 
   // Process segments
   while (true) {
@@ -145,7 +144,7 @@ void NlpBuilder::parse_nl(const std::string& filename, const Dict& options) {
           nlfile >> pl >> cl;
 
           // Add to variable definition (assuming it has already been defined)
-          casadi_assert_message(!v.at(pl).isNan(), "Circular dependencies not supported");
+          casadi_assert_message(!v.at(pl).is_empty(), "Circular dependencies not supported");
           v[i] += cl*v[pl];
         }
 
@@ -416,7 +415,7 @@ void NlpBuilder::parse_nl(const std::string& filename, const Dict& options) {
   nlfile.close();
 }
 
-SXElem NlpBuilder::read_expr(std::istream &stream, const std::vector<SXElem>& v) {
+SX NlpBuilder::read_expr(std::istream &stream, const std::vector<SX>& v) {
   // Read the instruction
   char inst;
   stream >> inst;
@@ -462,7 +461,7 @@ SXElem NlpBuilder::read_expr(std::istream &stream, const std::vector<SXElem>& v)
         case 51:  case 52:  case 53:
         {
           // Read dependency
-          SXElem x = read_expr(stream, v);
+          SX x = read_expr(stream, v);
 
           // Perform operation
           switch (i) {
@@ -500,8 +499,8 @@ SXElem NlpBuilder::read_expr(std::istream &stream, const std::vector<SXElem>& v)
         case 57:  case 58:  case 73:
         {
           // Read dependencies
-          SXElem x = read_expr(stream, v);
-          SXElem y = read_expr(stream, v);
+          SX x = read_expr(stream, v);
+          SX y = read_expr(stream, v);
 
           // Perform operation
           switch (i) {
@@ -542,7 +541,7 @@ SXElem NlpBuilder::read_expr(std::istream &stream, const std::vector<SXElem>& v)
           stream >> n;
 
           // Collect the arguments
-          vector<SXElem> args(n);
+          vector<SX> args(n);
           for (int k=0; k<n; ++k) {
             args[k] = read_expr(stream, v);
           }
@@ -560,8 +559,8 @@ SXElem NlpBuilder::read_expr(std::istream &stream, const std::vector<SXElem>& v)
             // case 74: return alldiff(args).scalar(); FIXME // rename?
             case 54:
             {
-              SXElem r = 0;
-              for (vector<SXElem>::const_iterator it=args.begin();
+              SX r = 0;
+              for (vector<SX>::const_iterator it=args.begin();
                    it!=args.end(); ++it) r += *it;
               return r;
             }
