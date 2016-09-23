@@ -26,6 +26,7 @@
 #include "nlpsol_impl.hpp"
 #include "external.hpp"
 #include "casadi/core/timing.hpp"
+#include "../misc/nlp_builder.hpp"
 
 using namespace std;
 namespace casadi {
@@ -50,6 +51,15 @@ namespace casadi {
   Function nlpsol(const string& name, const string& solver,
                   const MXDict& nlp, const Dict& opts) {
     return nlpsol(name, solver, Nlpsol::map2problem(nlp), opts);
+  }
+
+  Function nlpsol(const std::string& name, const std::string& solver,
+                  const NlpBuilder& nl, const Dict& opts) {
+     SXDict nlp;
+     nlp["x"] = vertcat(nl.x);
+     nlp["f"] = nl.f;
+     nlp["g"] = nl.g;
+     return nlpsol(name, solver, nlp, opts);
   }
 
   Function nlpsol(const std::string& name, const std::string& solver,

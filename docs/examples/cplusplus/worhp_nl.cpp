@@ -46,15 +46,12 @@ int main(int argc, char **argv){
   NlpBuilder nl;
   nl.parse_nl(problem);
 
-  // NLP
-  SXDict nlp = {{"x", vertcat(nl.x)}, {"f", nl.f}, {"g", nl.g}};
-
   // Set options
   Dict opts;
   //  opts["verbose"] = true;
 
   // Allocate NLP solver and buffers
-  Function solver = nlpsol("nlpsol", "worhp", nlp, opts);
+  Function solver = nlpsol("nlpsol", "worhp", nl, opts);
   std::map<std::string, DM> arg, res;
 
   // Solve NLP

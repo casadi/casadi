@@ -39,9 +39,6 @@ nl = NlpBuilder()
 # Parse an NL-file
 nl.parse_nl("../nl_files/hs107.nl",{"verbose":False})
 
-# NLP function
-nlp = {'x':vertcat(*nl.x), 'f':nl.f, 'g':nl.g}
-
 # NLP solver options
 opts = {}
 # opts["max_iter"] = 10
@@ -50,7 +47,7 @@ opts = {}
 # opts["hessian_approximation"] = "limited-memory"
 
 # Create an NLP solver
-nlpsol = nlpsol("nlpsol", "ipopt", nlp, opts)
+nlpsol = nlpsol("nlpsol", "ipopt", nl, opts)
 
 # Solve NLP
 res = nlpsol(lbx=nl.x_lb,

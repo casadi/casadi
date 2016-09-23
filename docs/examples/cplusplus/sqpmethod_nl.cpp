@@ -44,9 +44,6 @@ int main(int argc, char **argv){
   NlpBuilder nl;
   nl.parse_nl(problem);
 
-  // NLP
-  SXDict nlp = {{"x", vertcat(nl.x)}, {"f", nl.f}, {"g", nl.g}};
-
   // Set options
   Dict opts;
   // opts["max_iter"] = 10)
@@ -62,7 +59,7 @@ int main(int argc, char **argv){
   opts["qpsol_options.nlpsol_options.print_time"] = 0;
 
   // Allocate NLP solver and buffers
-  Function solver = nlpsol("nlpsol", "sqpmethod", nlp, opts);
+  Function solver = nlpsol("nlpsol", "sqpmethod", nl, opts);
   std::map<std::string, DM> arg, res;
 
   // Solve NLP
