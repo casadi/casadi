@@ -80,7 +80,7 @@ void NlpBuilder::parse_nl(const std::string& filename, const Dict& options) {
 
   // Allocate f and c
   f = SX::zeros(n_obj);
-  g = SX::zeros(n_con);
+  this->g.resize(n_con, 0);
 
   // Allocate bounds for x and primal initial guess
   this->x_lb.resize(n_var, -inf);
@@ -163,7 +163,7 @@ void NlpBuilder::parse_nl(const std::string& filename, const Dict& options) {
         nlfile >> i;
 
         // Parse and save expression
-        g->at(i) = read_expr(nlfile, v);
+        this->g.at(i) = read_expr(nlfile, v);
 
         break;
       }
@@ -389,7 +389,7 @@ void NlpBuilder::parse_nl(const std::string& filename, const Dict& options) {
           nlfile >> j >> c;
 
           // Add to constraints
-          g->at(i) += c*v.at(j);
+          this->g.at(i) += c*v.at(j);
         }
         break;
       }
@@ -603,12 +603,12 @@ void NlpBuilder::print(std::ostream &stream, bool trailing_newline) const {
   stream << "NLP:" << endl;
   stream << "x = " << this->x << endl;
   stream << "#f=" << f.nnz() << endl;
-  stream << "#g=" << g.nnz() << endl;
+  stream << "#g=" << this->g.size() << endl;
   if (trailing_newline) stream << endl;
 }
 
 void NlpBuilder::repr(std::ostream &stream, bool trailing_newline) const {
-  stream << "NLP(#f=" << f.nnz() << ",#g="<< g.nnz() << ")";
+  stream << "NLP(#f=" << f.nnz() << ",#g="<< this->g.size() << ")";
   if (trailing_newline) stream << endl;
 }
 

@@ -58,7 +58,7 @@ namespace casadi {
      SXDict nlp;
      nlp["x"] = vertcat(nl.x);
      nlp["f"] = nl.f;
-     nlp["g"] = nl.g;
+     nlp["g"] = vertcat(nl.g);
      return nlpsol(name, solver, nlp, opts);
   }
 

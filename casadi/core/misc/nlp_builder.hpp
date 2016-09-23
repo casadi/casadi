@@ -45,11 +45,11 @@ class CASADI_EXPORT NlpBuilder : public PrintableObject<NlpBuilder> {
       /// Variables
       std::vector<SX> x;
 
-      /// Objective functions
+      /// Objective
       SX f;
 
-      /// Constraint functions
-      SX g;
+      /// Constraints
+      std::vector<SX> g;
 
       /// Bounds on x
       std::vector<double> x_lb, x_ub;
