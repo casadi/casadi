@@ -55,7 +55,7 @@ class CASADI_EXPORT NlpBuilder : public PrintableObject<NlpBuilder> {
       std::vector<double> x_lb, x_ub;
 
       /// Bounds on g
-      DM g_lb, g_ub;
+      std::vector<double> g_lb, g_ub;
 
       /// Primal initial guess
       DM x_init;
