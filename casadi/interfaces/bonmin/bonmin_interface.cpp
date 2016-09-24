@@ -276,6 +276,32 @@ namespace casadi {
     return "Unknown";
   }
 
+
+  /** \brief Helper class to direct messages to userOut()
+  *
+  * IPOPT has the concept of a Jorunal/Journalist
+  * BOONMIN and CBC do not.
+  */
+  class BonMinMessageHandler : public CoinMessageHandler {
+  public:
+    BonMinMessageHandler(): CoinMessageHandler() { }
+    /// Core of the class: the method that directs the messages
+    virtual int print() {
+      userOut() << messageBuffer_ << std::endl;
+      return 0;
+    }
+    virtual ~BonMinMessageHandler() { }
+    BonMinMessageHandler(const BonMinMessageHandler &other): CoinMessageHandler(other) {}
+    BonMinMessageHandler(const CoinMessageHandler &other): CoinMessageHandler(other) {}
+    BonMinMessageHandler & operator=(const BonMinMessageHandler &rhs) {
+      BonMinMessageHandler::operator=(rhs);
+      return *this;
+    }
+    virtual CoinMessageHandler* clone() const {
+      return new BonMinMessageHandler(*this);
+    }
+  };
+
   void BonminInterface::solve(void* mem) const {
     auto m = static_cast<BonminMemory*>(mem);
 
@@ -302,8 +328,28 @@ namespace casadi {
     // MINLP instance
     SmartPtr<BonminUserClass> tminlp = new BonminUserClass(*this, m);
 
+    BonMinMessageHandler mh;
+
     // Start an BONMIN application
-    BonminSetup bonmin;
+    BonminSetup bonmin(&mh);
+
+    SmartPtr<OptionsList> options = new OptionsList();
+    SmartPtr<Journalist> journalist= new Journalist();
+    SmartPtr<Bonmin::RegisteredOptions> roptions = new Bonmin::RegisteredOptions();
+
+    {
+      // Direct output through casadi::userOut()
+      StreamJournal* jrnl_raw = new StreamJournal("console", J_ITERSUMMARY);
+      jrnl_raw->SetOutputStream(&casadi::userOut());
+      jrnl_raw->SetPrintLevel(J_DBG, J_NONE);
+      SmartPtr<Journal> jrnl = jrnl_raw;
+      journalist->AddJournal(jrnl);
+    }
+
+    options->SetJournalist(journalist);
+    options->SetRegisteredOptions(roptions);
+    bonmin.setOptionsAndJournalist(roptions, options, journalist);
+    bonmin.registerOptions();
 
     // Initialize
     bonmin.initialize(GetRawPtr(tminlp));
