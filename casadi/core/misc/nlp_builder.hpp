@@ -30,11 +30,11 @@
 
 namespace casadi {
 
-/** \brief A symbolic NLP representation
+  /** \brief A symbolic NLP representation
   \date 2012-2015
   \author Joel Andersson
-*/
-class CASADI_EXPORT NlpBuilder : public PrintableObject<NlpBuilder> {
+  */
+  class CASADI_EXPORT NlpBuilder : public PrintableObject<NlpBuilder> {
   public:
 
     /** @name Symbolic representation of the NLP
@@ -42,46 +42,66 @@ class CASADI_EXPORT NlpBuilder : public PrintableObject<NlpBuilder> {
     */
     ///@{
 
-      /// Variables
-      std::vector<MX> x;
+    /// Variables
+    std::vector<MX> x;
 
-      /// Objective
-      MX f;
+    /// Objective
+    MX f;
 
-      /// Constraints
-      std::vector<MX> g;
+    /// Constraints
+    std::vector<MX> g;
 
-      /// Bounds on x
-      std::vector<double> x_lb, x_ub;
+    /// Bounds on x
+    std::vector<double> x_lb, x_ub;
 
-      /// Bounds on g
-      std::vector<double> g_lb, g_ub;
+    /// Bounds on g
+    std::vector<double> g_lb, g_ub;
 
-      /// Primal initial guess
-      std::vector<double> x_init;
+    /// Primal initial guess
+    std::vector<double> x_init;
 
-      /// Dual initial guess
-      std::vector<double> lambda_init;
+    /// Dual initial guess
+    std::vector<double> lambda_init;
 
     ///@}
 
     /// Parse an AMPL och PyOmo NL-file
-    void parse_nl(const std::string& filename, const Dict& options = Dict());
+    void parse_nl(const std::string& filename, const Dict& opts = Dict());
 
     /// Print a description of the object
     void print(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
 
     /// Print a representation of the object
     void repr(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
+  };
 
 #ifndef SWIG
-  protected:
-
+  /** \Helper class for .nl import
+  The .nl format is described in "Writing .nl Files" paper by David M. Gay (2005)
+  \date 2016
+  \author Joel Andersson
+  */
+  class CASADI_EXPORT NlImporter {
+  public:
+    // Constructor
+    NlImporter(NlpBuilder& nlp, const std::string& filename, const Dict& opts);
+    // Destructor
+    ~NlImporter();
+  private:
+    // Reference to the class
+    NlpBuilder& nlp_;
+    // Options
+    bool verbose_;
+    // File stream
+    std::ifstream s_;
+    // All variables, including dependent
+    std::vector<MX> v_;
+    // Parse the file
+    void parse();
     /// Read an expression from an NL-file (Polish infix format)
-    static MX read_expr(std::istream &stream, const std::vector<MX>& v);
-
+    MX expr();
+  };
 #endif // SWIG
-};
 
 } // namespace casadi
 

@@ -30,252 +30,276 @@
 using namespace std;
 namespace casadi {
 
-void NlpBuilder::parse_nl(const std::string& filename, const Dict& options) {
-  // Note: The implementation of this function follows the
-  // "Writing .nl Files" paper by David M. Gay (2005)
+  void NlpBuilder::parse_nl(const std::string& filename, const Dict& opts) {
+    // Redirect to helper class
+    NlImporter(*this, filename, opts);
+  }
 
-  // Default options
-  bool verbose=false;
+  void NlpBuilder::print(std::ostream &stream, bool trailing_newline) const {
+    stream << "NLP:" << endl;
+    stream << "x = " << this->x << endl;
+    stream << "f = " << this->f << endl;
+    stream << "g = " << this->g << endl;
+    if (trailing_newline) stream << endl;
+  }
 
-  // Read user options
-  for (Dict::const_iterator it=options.begin(); it!=options.end(); ++it) {
-    if (it->first.compare("verbose")==0) {
-      verbose = it->second;
-    } else {
-      stringstream ss;
-      ss << "Unknown option \"" << it->first << "\"" << endl;
-      throw CasadiException(ss.str());
+  void NlpBuilder::repr(std::ostream &stream, bool trailing_newline) const {
+    stream << "NLP(#x=" << this->x.size() << ", #g=" << this->g.size() << ")";
+    if (trailing_newline) stream << endl;
+  }
+
+  NlImporter::NlImporter(NlpBuilder& nlp, const std::string& filename, const Dict& opts)
+  : nlp_(nlp) {
+    // Set default options
+    verbose_=false;
+
+    // Read user options
+    for (auto&& op : opts) {
+      if (op.first == "verbose") {
+        verbose_ = op.second;
+      } else {
+        stringstream ss;
+        ss << "Unknown option \"" << op.first << "\"" << endl;
+        throw CasadiException(ss.str());
+      }
     }
+    // Open file for reading
+    s_.open(filename.c_str());
+    if (verbose_) userOut() << "Reading file \"" << filename << "\"" << endl;
+
+    // Parse
+    parse();
   }
 
-  // Open the NL file for reading
-  ifstream nlfile;
-  nlfile.open(filename.c_str());
-  if (verbose) userOut() << "Reading file \"" << filename << "\"" << endl;
-
-  // Read the header of the NL-file (first 10 lines)
-  const int header_sz = 10;
-  vector<string> header(header_sz);
-  for (int k=0; k<header_sz; ++k) {
-    getline(nlfile, header[k]);
+  NlImporter::~NlImporter() {
+    // Close the NL file
+    s_.close();
   }
 
-  // Assert that the file is not in binary form
-  casadi_assert_message(header.at(0).at(0)=='g',
-                        "File could not be read, or file is binary format "
-                        "(currently not supported)");
+  void NlImporter::parse() {
+    // Read the header of the NL-file (first 10 lines)
+    const int header_sz = 10;
+    vector<string> header(header_sz);
+    for (int k=0; k<header_sz; ++k) {
+      getline(s_, header[k]);
+    }
 
-  // Get the number of objectives and constraints
-  stringstream ss(header[1]);
-  int n_var, n_con, n_obj, n_eq, n_lcon;
-  ss >> n_var >> n_con >> n_obj >> n_eq >> n_lcon;
+    // Assert that the file is not in binary form
+    casadi_assert_message(header.at(0).at(0)=='g',
+    "File could not be read, or file is binary format "
+    "(currently not supported)");
 
-  if (verbose) {
-    userOut() << "n_var = " << n_var << ", n_con  = " << n_con << ", n_obj = " << n_obj
-         << ", n_eq = " << n_eq << ", n_lcon = " << n_lcon << endl;
-  }
+    // Get the number of objectives and constraints
+    stringstream ss(header[1]);
+    int n_var, n_con, n_obj, n_eq, n_lcon;
+    ss >> n_var >> n_con >> n_obj >> n_eq >> n_lcon;
 
-  // Allocate variables
-  this->x = MX::sym("x", 1, 1, n_var);
+    if (verbose_) {
+      userOut() << "n_var = " << n_var << ", n_con  = " << n_con << ", n_obj = " << n_obj
+      << ", n_eq = " << n_eq << ", n_lcon = " << n_lcon << endl;
+    }
 
-  // Allocate f and c
-  this->f = 0;
-  this->g.resize(n_con, 0);
+    // Allocate variables
+    nlp_.x = MX::sym("x", 1, 1, n_var);
 
-  // Allocate bounds for x and primal initial guess
-  this->x_lb.resize(n_var, -inf);
-  this->x_ub.resize(n_var,  inf);
-  this->x_init.resize(n_var, 0);
+    // Allocate f and c
+    nlp_.f = 0;
+    nlp_.g.resize(n_con, 0);
 
-  // Allocate bounds for g and dual initial guess
-  this->g_lb.resize(n_con, -inf);
-  this->g_ub.resize(n_con,  inf);
-  this->lambda_init.resize(n_con, 0);
+    // Allocate bounds for x and primal initial guess
+    nlp_.x_lb.resize(n_var, -inf);
+    nlp_.x_ub.resize(n_var,  inf);
+    nlp_.x_init.resize(n_var, 0);
 
-  // All variables, including dependent
-  vector<MX> v = this->x;
+    // Allocate bounds for g and dual initial guess
+    nlp_.g_lb.resize(n_con, -inf);
+    nlp_.g_ub.resize(n_con,  inf);
+    nlp_.lambda_init.resize(n_con, 0);
 
-  // Process segments
-  while (true) {
-
-    // Read segment key
-    char key;
-    nlfile >> key;
-
-    // Break if end of file
-    if (nlfile.eof()) break;
+    // All variables, including dependent
+    v_ = nlp_.x;
 
     // Process segments
-    switch (key) {
-      // Imported function description
-      case 'F':
-        if (verbose) {
+    while (true) {
+
+      // Read segment key
+      char key;
+      s_ >> key;
+
+      // Break if end of file
+      if (s_.eof()) break;
+
+      // Process segments
+      switch (key) {
+        // Imported function description
+        case 'F':
+        if (verbose_) {
           userOut<true, PL_WARN>() << "Imported function description unsupported: ignored" << endl;
         }
         break;
 
-      // Suffix values
-      case 'S':
-        if (verbose) {
+        // Suffix values
+        case 'S':
+        if (verbose_) {
           userOut<true, PL_WARN>() << "Suffix values unsupported: ignored" << endl;
         }
         break;
 
-      // Defined variable definition
-      case 'V':
-      {
-        // Read header
-        int i, j, k;
-        nlfile >> i >> j >> k;
+        // Defined variable definition
+        case 'V':
+        {
+          // Read header
+          int i, j, k;
+          s_ >> i >> j >> k;
 
-        // Make sure that v is long enough
-        if (i >= v.size()) {
-          v.resize(i+1);
+          // Make sure that v is long enough
+          if (i >= v_.size()) {
+            v_.resize(i+1);
+          }
+
+          // Initialize element to zero
+          v_.at(i) = 0;
+
+          // Add the linear terms
+          for (int jj=0; jj<j; ++jj) {
+            // Linear term
+            int pl;
+            double cl;
+            s_ >> pl >> cl;
+
+            // Add to variable definition (assuming it has already been defined)
+            casadi_assert_message(!v_.at(pl).is_empty(), "Circular dependencies not supported");
+            v_.at(i) += cl*v_.at(pl);
+          }
+
+          // Finally, add the nonlinear term
+          v_.at(i) += expr();
+
+          break;
         }
 
-        // Initialize element to zero
-        v.at(i) = 0;
+        // Algebraic constraint body
+        case 'C':
+        {
+          // Get the number
+          int i;
+          s_ >> i;
 
-        // Add the linear terms
-        for (int jj=0; jj<j; ++jj) {
-          // Linear term
-          int pl;
-          double cl;
-          nlfile >> pl >> cl;
+          // Parse and save expression
+          nlp_.g.at(i) = expr();
 
-          // Add to variable definition (assuming it has already been defined)
-          casadi_assert_message(!v.at(pl).is_empty(), "Circular dependencies not supported");
-          v[i] += cl*v[pl];
+          break;
         }
 
-        // Finally, add the nonlinear term
-        v[i] += read_expr(nlfile, v);
-
-        break;
-      }
-
-      // Algebraic constraint body
-      case 'C':
-      {
-        // Get the number
-        int i;
-        nlfile >> i;
-
-        // Parse and save expression
-        this->g.at(i) = read_expr(nlfile, v);
-
-        break;
-      }
-
-      // Logical constraint expression
-      case 'L':
-        if (verbose) {
+        // Logical constraint expression
+        case 'L':
+        if (verbose_) {
           userOut<true, PL_WARN>() << "Logical constraint expression unsupported: ignored" << endl;
         }
         break;
 
-      // Objective function
-      case 'O':
-      {
-        // Get the number
-        int i;
-        nlfile >> i;
+        // Objective function
+        case 'O':
+        {
+          // Get the number
+          int i;
+          s_ >> i;
 
-        // Should the objective be maximized
-        int sigma;
-        nlfile >> sigma;
-        MX sign = sigma!=0 ? -1 : 1;
+          // Should the objective be maximized
+          int sigma;
+          s_ >> sigma;
+          MX sign = sigma!=0 ? -1 : 1;
 
-        // Parse and save expression
-        this->f += sign*read_expr(nlfile, v);
+          // Parse and save expression
+          nlp_.f += sign*expr();
 
-        break;
-      }
-
-      // Dual initial guess
-      case 'd':
-      {
-        // Read the number of guesses supplied
-        int m;
-        nlfile >> m;
-
-        // Process initial guess for the fual variables
-        for (int i=0; i<m; ++i) {
-          // Offset and value
-          int offset;
-          double d;
-          nlfile >> offset >> d;
-
-          // Save initial guess
-          this->lambda_init.at(offset) = d;
+          break;
         }
 
-        break;
-      }
+        // Dual initial guess
+        case 'd':
+        {
+          // Read the number of guesses supplied
+          int m;
+          s_ >> m;
 
-      // Primal initial guess
-      case 'x':
-      {
-        // Read the number of guesses supplied
-        int m;
-        nlfile >> m;
+          // Process initial guess for the fual variables
+          for (int i=0; i<m; ++i) {
+            // Offset and value
+            int offset;
+            double d;
+            s_ >> offset >> d;
 
-        // Process initial guess
-        for (int i=0; i<m; ++i) {
-          // Offset and value
-          int offset;
-          double d;
-          nlfile >> offset >> d;
+            // Save initial guess
+            nlp_.lambda_init.at(offset) = d;
+          }
 
-          // Save initial guess
-          this->x_init.at(offset) = d;
+          break;
         }
 
-        break;
-      }
+        // Primal initial guess
+        case 'x':
+        {
+          // Read the number of guesses supplied
+          int m;
+          s_ >> m;
 
-      // Bounds on algebraic constraint bodies ("ranges")
-      case 'r':
-      {
-        // For all constraints
-        for (int i=0; i<n_con; ++i) {
+          // Process initial guess
+          for (int i=0; i<m; ++i) {
+            // Offset and value
+            int offset;
+            double d;
+            s_ >> offset >> d;
 
-          // Read constraint type
-          int c_type;
-          nlfile >> c_type;
+            // Save initial guess
+            nlp_.x_init.at(offset) = d;
+          }
 
-          // Temporary
-          double c;
+          break;
+        }
 
-          switch (c_type) {
-            // Upper and lower bounds
-            case 0:
-              nlfile >> c;
-              g_lb.at(i) = c;
-              nlfile >> c;
-              g_ub.at(i) = c;
+        // Bounds on algebraic constraint bodies ("ranges")
+        case 'r':
+        {
+          // For all constraints
+          for (int i=0; i<n_con; ++i) {
+
+            // Read constraint type
+            int c_type;
+            s_ >> c_type;
+
+            // Temporary
+            double c;
+
+            switch (c_type) {
+              // Upper and lower bounds
+              case 0:
+              s_ >> c;
+              nlp_.g_lb.at(i) = c;
+              s_ >> c;
+              nlp_.g_ub.at(i) = c;
               continue;
 
-            // Only upper bounds
-            case 1:
-              nlfile >> c;
-              g_ub.at(i) = c;
+              // Only upper bounds
+              case 1:
+              s_ >> c;
+              nlp_.g_ub.at(i) = c;
               continue;
 
-            // Only lower bounds
-            case 2:
-              nlfile >> c;
-              g_lb.at(i) = c;
+              // Only lower bounds
+              case 2:
+              s_ >> c;
+              nlp_.g_lb.at(i) = c;
               continue;
 
-            // No bounds
-            case 3:
+              // No bounds
+              case 3:
               continue;
 
-            // Equality constraints
-            case 4:
-              nlfile >> c;
-              g_lb.at(i) = g_ub.at(i) = c;
+              // Equality constraints
+              case 4:
+              s_ >> c;
+              nlp_.g_lb.at(i) = nlp_.g_ub.at(i) = c;
               continue;
 
               // Complementary constraints
@@ -283,174 +307,171 @@ void NlpBuilder::parse_nl(const std::string& filename, const Dict& options) {
               {
                 // Read the indices
                 int ck, ci;
-                nlfile >> ck >> ci;
-                if (verbose) {
+                s_ >> ck >> ci;
+                if (verbose_) {
                   userOut<true, PL_WARN>()
-                    << "Complementary constraints unsupported: ignored" << endl;
+                  << "Complementary constraints unsupported: ignored" << endl;
                 }
                 continue;
               }
 
               default:
-                throw CasadiException("Illegal constraint type");
+              throw CasadiException("Illegal constraint type");
             }
           }
-        break;
-      }
+          break;
+        }
 
-      // Bounds on variable
-      case 'b':
-      {
-        // For all variable
-        for (int i=0; i<n_var; ++i) {
+        // Bounds on variable
+        case 'b':
+        {
+          // For all variable
+          for (int i=0; i<n_var; ++i) {
 
-          // Read constraint type
-          int c_type;
-          nlfile >> c_type;
+            // Read constraint type
+            int c_type;
+            s_ >> c_type;
 
-          // Temporary
-          double c;
+            // Temporary
+            double c;
 
-          switch (c_type) {
-            // Upper and lower bounds
-            case 0:
-              nlfile >> c;
-              this->x_lb.at(i) = c;
-              nlfile >> c;
-              this->x_ub.at(i) = c;
+            switch (c_type) {
+              // Upper and lower bounds
+              case 0:
+              s_ >> c;
+              nlp_.x_lb.at(i) = c;
+              s_ >> c;
+              nlp_.x_ub.at(i) = c;
               continue;
 
-            // Only upper bounds
-            case 1:
-              nlfile >> c;
-              this->x_ub.at(i) = c;
+              // Only upper bounds
+              case 1:
+              s_ >> c;
+              nlp_.x_ub.at(i) = c;
               continue;
 
-           // Only lower bounds
-           case 2:
-              nlfile >> c;
-              this->x_lb.at(i) = c;
+              // Only lower bounds
+              case 2:
+              s_ >> c;
+              nlp_.x_lb.at(i) = c;
               continue;
 
-           // No bounds
-           case 3:
+              // No bounds
+              case 3:
               continue;
 
-           // Equality constraints
-           case 4:
-              nlfile >> c;
-              this->x_lb.at(i) = this->x_ub.at(i) = c;
+              // Equality constraints
+              case 4:
+              s_ >> c;
+              nlp_.x_lb.at(i) = nlp_.x_ub.at(i) = c;
               continue;
 
-           default:
-             throw CasadiException("Illegal variable bound type");
+              default:
+              throw CasadiException("Illegal variable bound type");
+            }
           }
+
+          break;
         }
 
-        break;
-      }
+        // Jacobian row counts
+        case 'k':
+        {
+          // Get row offsets
+          vector<int> rowind(n_var+1);
 
-      // Jacobian row counts
-      case 'k':
-      {
-        // Get row offsets
-        vector<int> rowind(n_var+1);
+          // Get the number of offsets
+          int k;
+          s_ >> k;
+          casadi_assert(k==n_var-1);
 
-        // Get the number of offsets
-        int k;
-        nlfile >> k;
-        casadi_assert(k==n_var-1);
-
-        // Get the row offsets
-        rowind[0]=0;
-        for (int i=0; i<k; ++i) {
-          nlfile >> rowind[i+1];
+          // Get the row offsets
+          rowind[0]=0;
+          for (int i=0; i<k; ++i) {
+            s_ >> rowind[i+1];
+          }
+          break;
         }
-        break;
-      }
 
-      // Linear terms in the constraint function
-      case 'J':
-      {
-        // Get constraint number and number of terms
-        int i, k;
-        nlfile >> i >> k;
+        // Linear terms in the constraint function
+        case 'J':
+        {
+          // Get constraint number and number of terms
+          int i, k;
+          s_ >> i >> k;
 
-        // Get terms
-        for (int kk=0; kk<k; ++kk) {
-          // Get the term
-          int j;
-          double c;
-          nlfile >> j >> c;
+          // Get terms
+          for (int kk=0; kk<k; ++kk) {
+            // Get the term
+            int j;
+            double c;
+            s_ >> j >> c;
 
-          // Add to constraints
-          this->g.at(i) += c*v.at(j);
+            // Add to constraints
+            nlp_.g.at(i) += c*v_.at(j);
+          }
+          break;
         }
-        break;
-      }
 
-      // Linear terms in
-      case 'G':
-      {
-        // Get objective number and number of terms
-        int i, k;
-        nlfile >> i >> k;
+        // Linear terms in
+        case 'G':
+        {
+          // Get objective number and number of terms
+          int i, k;
+          s_ >> i >> k;
 
-        // Get terms
-        for (int kk=0; kk<k; ++kk) {
-          // Get the term
-          int j;
-          double c;
-          nlfile >> j >> c;
+          // Get terms
+          for (int kk=0; kk<k; ++kk) {
+            // Get the term
+            int j;
+            double c;
+            s_ >> j >> c;
 
-          // Add to objective
-          this->f += c*v.at(j);
+            // Add to objective
+            nlp_.f += c*v_.at(j);
+          }
+          break;
         }
-        break;
       }
     }
   }
 
-  // Close the NL file
-  nlfile.close();
-}
+  MX NlImporter::expr() {
+    // Read the instruction
+    char inst;
+    s_ >> inst;
 
-MX NlpBuilder::read_expr(std::istream &stream, const std::vector<MX>& v) {
-  // Read the instruction
-  char inst;
-  stream >> inst;
+    // Temporaries
+    int i;
+    double d;
 
-  // Temporaries
-  int i;
-  double d;
+    // Error message
+    stringstream msg;
 
-  // Error message
-  stringstream msg;
-
-  // Process instruction
-  switch (inst) {
-    // Symbolic variable
-    case 'v':
+    // Process instruction
+    switch (inst) {
+      // Symbolic variable
+      case 'v':
       // Read the variable number
-      stream >> i;
+      s_ >> i;
 
       // Return the corresponding expression
-      return v.at(i);
+      return v_.at(i);
 
-    // Numeric expression
-    case 'n':
+      // Numeric expression
+      case 'n':
 
       // Read the floating point number
-      stream >> d;
+      s_ >> d;
 
       // Return an expression containing the number
       return d;
 
-    // Operation
-    case 'o':
+      // Operation
+      case 'o':
 
       // Read the operation
-      stream >> i;
+      s_ >> i;
 
       // Process
       switch (i) {
@@ -461,7 +482,7 @@ MX NlpBuilder::read_expr(std::istream &stream, const std::vector<MX>& v) {
         case 51:  case 52:  case 53:
         {
           // Read dependency
-          MX x = read_expr(stream, v);
+          MX x = expr();
 
           // Perform operation
           switch (i) {
@@ -488,7 +509,7 @@ MX NlpBuilder::read_expr(std::istream &stream, const std::vector<MX>& v) {
             case 53:  return acos(x);
 
             default:
-              msg << "Unknown unary operation: \"" << i << "\"";
+            msg << "Unknown unary operation: \"" << i << "\"";
           }
           break;
         }
@@ -499,8 +520,8 @@ MX NlpBuilder::read_expr(std::istream &stream, const std::vector<MX>& v) {
         case 57:  case 58:  case 73:
         {
           // Read dependencies
-          MX x = read_expr(stream, v);
-          MX y = read_expr(stream, v);
+          MX x = expr();
+          MX y = expr();
 
           // Perform operation
           switch (i) {
@@ -511,7 +532,7 @@ MX NlpBuilder::read_expr(std::istream &stream, const std::vector<MX>& v) {
             // case 4:   return rem(x, y); FIXME
             case 5:   return pow(x, y);
             // case 6:   return x < y; // TODO(Joel): Verify this,
-                                       // what is the difference to 'le' == 23 below?
+            // what is the difference to 'le' == 23 below?
             case 20:  return logic_or(x, y);
             case 21:  return logic_and(x, y);
             case 22:  return x < y;
@@ -528,7 +549,7 @@ MX NlpBuilder::read_expr(std::istream &stream, const std::vector<MX>& v) {
             // case 73:  return iff(x, y); // FIXME
 
             default:
-              msg << "Unknown binary operation: \"" << i << "\"";
+            msg << "Unknown binary operation: \"" << i << "\"";
           }
           break;
         }
@@ -538,12 +559,12 @@ MX NlpBuilder::read_expr(std::istream &stream, const std::vector<MX>& v) {
         {
           // Number of elements in the sum
           int n;
-          stream >> n;
+          s_ >> n;
 
           // Collect the arguments
           vector<MX> args(n);
           for (int k=0; k<n; ++k) {
-            args[k] = read_expr(stream, v);
+            args[k] = expr();
           }
 
           // Perform the operation
@@ -561,50 +582,37 @@ MX NlpBuilder::read_expr(std::istream &stream, const std::vector<MX>& v) {
             {
               MX r = 0;
               for (vector<MX>::const_iterator it=args.begin();
-                   it!=args.end(); ++it) r += *it;
+              it!=args.end(); ++it) r += *it;
               return r;
             }
 
             default:
-              msg << "Unknown n-ary operation: \"" << i << "\"";
+            msg << "Unknown n-ary operation: \"" << i << "\"";
           }
           break;
         }
 
         // Piecewise linear terms, class 4 in Gay2005
         case 64:
-          msg << "Piecewise linear terms not supported";
-          break;
+        msg << "Piecewise linear terms not supported";
+        break;
 
         // If-then-else expressions, class 5 in Gay2005
         case 35: case 65: case 72:
-          msg << "If-then-else expressions not supported";
-          break;
+        msg << "If-then-else expressions not supported";
+        break;
 
         default:
-          msg << "Unknown operatio: \"" << i << "\"";
-     }
-     break;
+        msg << "Unknown operatio: \"" << i << "\"";
+      }
+      break;
 
-    default:
+      default:
       msg << "Unknown instruction: \"" << inst << "\"";
+    }
+
+    // Throw error message
+    throw CasadiException("Error in NlpBuilder::expr: " + msg.str());
   }
-
-  // Throw error message
-  throw CasadiException("Error in NlpBuilder::read_expr: " + msg.str());
-}
-
-void NlpBuilder::print(std::ostream &stream, bool trailing_newline) const {
-  stream << "NLP:" << endl;
-  stream << "x = " << this->x << endl;
-  stream << "f = " << this->f << endl;
-  stream << "g = " << this->g << endl;
-  if (trailing_newline) stream << endl;
-}
-
-void NlpBuilder::repr(std::ostream &stream, bool trailing_newline) const {
-  stream << "NLP(#x=" << this->x.size() << ", #g=" << this->g.size() << ")";
-  if (trailing_newline) stream << endl;
-}
 
 } // namespace casadi
