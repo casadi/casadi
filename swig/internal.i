@@ -133,13 +133,7 @@
 %exception  casadi::Matrix< Scalar >::cofactor(const Matrix< Scalar > &x, int i, int j) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Matrix< Scalar >::dep(int ch=0) const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::Matrix< Scalar >::eig_symbolic(const Matrix< Scalar > &m) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Matrix< Scalar >::element_hash() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Matrix< Scalar >::enlarge(int nrow, int ncol, const std::vector< int > &rr, const std::vector< int > &cc, bool ind1=false) {
@@ -193,37 +187,10 @@
 %exception  casadi::Matrix< Scalar >::get_nz(Matrix< Scalar > &output_m, bool ind1, const Slice &k) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Matrix< Scalar >::grad(const Function &f, const std::string &iname, const std::string &oname) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Matrix< Scalar >::grad(const Function &f, const std::string &iname, int oind=0) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Matrix< Scalar >::grad(const Function &f, int iind, const std::string &oname) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Matrix< Scalar >::grad(const Function &f, int iind=0, int oind=0) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Matrix< Scalar >::has_duplicates() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::Matrix< Scalar >::has_zeros() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Matrix< Scalar >::heaviside(const Matrix< Scalar > &x) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Matrix< Scalar >::hess(const Function &f, const std::string &iname, const std::string &oname) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Matrix< Scalar >::hess(const Function &f, const std::string &iname, int oind=0) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Matrix< Scalar >::hess(const Function &f, int iind, const std::string &oname) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Matrix< Scalar >::hess(const Function &f, int iind=0, int oind=0) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Matrix< Scalar >::inf(const Sparsity &sp) {
@@ -235,9 +202,6 @@
 %exception  casadi::Matrix< Scalar >::inf(int nrow=1, int ncol=1) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Matrix< Scalar >::is_commutative() const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::Matrix< Scalar >::is_constant() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -247,40 +211,13 @@
 %exception  casadi::Matrix< Scalar >::is_integer() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Matrix< Scalar >::is_leaf() const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::Matrix< Scalar >::is_minus_one() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Matrix< Scalar >::is_one() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Matrix< Scalar >::is_regular() const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Matrix< Scalar >::is_smooth() const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Matrix< Scalar >::is_symbolic() const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Matrix< Scalar >::is_valid_input() const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::Matrix< Scalar >::is_zero() const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Matrix< Scalar >::jac(const Function &f, const std::string &iname, const std::string &oname, bool compact=false, bool symmetric=false) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Matrix< Scalar >::jac(const Function &f, const std::string &iname, int oind=0, bool compact=false, bool symmetric=false) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Matrix< Scalar >::jac(const Function &f, int iind, const std::string &oname, bool compact=false, bool symmetric=false) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Matrix< Scalar >::jac(const Function &f, int iind=0, int oind=0, bool compact=false, bool symmetric=false) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Matrix< Scalar >::matrix_matrix(int op, const Matrix< Scalar > &x, const Matrix< Scalar > &y) {
@@ -293,12 +230,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Matrix< Scalar >::mtaylor(const Matrix< Scalar > &ex, const Matrix< Scalar > &x, const Matrix< Scalar > &a, int order=1) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Matrix< Scalar >::n_dep() const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Matrix< Scalar >::name() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Matrix< Scalar >::nan(const Sparsity &sp) {
@@ -329,9 +260,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Matrix< Scalar >::print_sparse(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Matrix< Scalar >::print_split(std::vector< std::string > &output_nz, std::vector< std::string > &output_inter) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Matrix< Scalar >::print_vector(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const  {
@@ -365,9 +293,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Matrix< Scalar >::reserve(int nnz, int ncol) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Matrix< Scalar >::resetInput() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Matrix< Scalar >::resize(int nrow, int ncol) {
@@ -409,18 +334,6 @@
 %exception  casadi::Matrix< Scalar >::sparsify(const Matrix< Scalar > &A, double tol=0) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Matrix< Scalar >::tang(const Function &f, const std::string &iname, const std::string &oname) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Matrix< Scalar >::tang(const Function &f, const std::string &iname, int oind=0) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Matrix< Scalar >::tang(const Function &f, int iind, const std::string &oname) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Matrix< Scalar >::tang(const Function &f, int iind=0, int oind=0) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::Matrix< Scalar >::taylor(const Matrix< Scalar > &ex, const Matrix< Scalar > &x, const Matrix< Scalar > &a, int order=1) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -443,6 +356,93 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Matrix< double >::solve(const Matrix< double > &a, const Matrix< double > &b, const std::string &lsolver, const Dict &dict) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SX::dep(int ch=0) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SX::element_hash() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SX::grad(const Function &f, const std::string &iname, const std::string &oname) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SX::grad(const Function &f, const std::string &iname, int oind=0) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SX::grad(const Function &f, int iind, const std::string &oname) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SX::grad(const Function &f, int iind=0, int oind=0) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SX::has_duplicates() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SX::hess(const Function &f, const std::string &iname, const std::string &oname) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SX::hess(const Function &f, const std::string &iname, int oind=0) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SX::hess(const Function &f, int iind, const std::string &oname) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SX::hess(const Function &f, int iind=0, int oind=0) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SX::is_commutative() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SX::is_leaf() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SX::is_regular() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SX::is_smooth() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SX::is_symbolic() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SX::is_valid_input() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SX::jac(const Function &f, const std::string &iname, const std::string &oname, bool compact=false, bool symmetric=false) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SX::jac(const Function &f, const std::string &iname, int oind=0, bool compact=false, bool symmetric=false) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SX::jac(const Function &f, int iind, const std::string &oname, bool compact=false, bool symmetric=false) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SX::jac(const Function &f, int iind=0, int oind=0, bool compact=false, bool symmetric=false) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SX::n_dep() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SX::name() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SX::print_split(std::vector< std::string > &output_nz, std::vector< std::string > &output_inter) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SX::resetInput() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SX::tang(const Function &f, const std::string &iname, const std::string &oname) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SX::tang(const Function &f, const std::string &iname, int oind=0) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SX::tang(const Function &f, int iind, const std::string &oname) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SX::tang(const Function &f, int iind=0, int oind=0) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::SharedObject::printPtr(std::ostream &stream=casadi::userOut()) const  {

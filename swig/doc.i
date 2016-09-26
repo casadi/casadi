@@ -6572,29 +6572,29 @@ x+y^3)/6 $ $ (-3 x^2 y-x^3)/6+y+x $
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::grad(const Function &f, int
-iind=0, int oind=0) "
+%feature("docstring")  casadi::SX::grad(const Function &f, int iind=0, int
+oind=0) "
 
 [INTERNAL]  Gradient expression.
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::grad(const Function &f,
-const std::string &iname, int oind=0) "
+%feature("docstring")  casadi::SX::grad(const Function &f, const std::string
+&iname, int oind=0) "
 
 [INTERNAL]  Gradient expression.
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::grad(const Function &f, int
-iind, const std::string &oname) "
+%feature("docstring")  casadi::SX::grad(const Function &f, int iind, const
+std::string &oname) "
 
 [INTERNAL]  Gradient expression.
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::grad(const Function &f,
-const std::string &iname, const std::string &oname) "
+%feature("docstring")  casadi::SX::grad(const Function &f, const std::string
+&iname, const std::string &oname) "
 
 [INTERNAL]  Gradient expression.
 
@@ -6768,8 +6768,8 @@ result
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::print_split(std::vector<
-std::string > &output_nz, std::vector< std::string > &output_inter) const  "
+%feature("docstring")  casadi::SX::print_split(std::vector< std::string >
+&output_nz, std::vector< std::string > &output_inter) const  "
 
 [INTERNAL]  Get strings corresponding to the nonzeros and the
 interdependencies.
@@ -6832,7 +6832,7 @@ Check if the matrix is upper triangular.
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::is_regular() const  "
+%feature("docstring")  casadi::SX::is_regular() const  "
 
 [INTERNAL]  Checks if expression does not contain NaN or Inf.
 
@@ -6915,7 +6915,7 @@ Get string representation of dimensions. The representation is (nrow x ncol
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::is_smooth() const  "
+%feature("docstring")  casadi::SX::is_smooth() const  "
 
 [INTERNAL]  Check if smooth.
 
@@ -6949,36 +6949,36 @@ streams.
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::n_dep() const  "
+%feature("docstring")  casadi::SX::n_dep() const  "
 
 [INTERNAL]  Get the number of dependencies of a binary SXElem Only defined
 if symbolic scalar.
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::hess(const Function &f, int
-iind=0, int oind=0) "
+%feature("docstring")  casadi::SX::hess(const Function &f, int iind=0, int
+oind=0) "
 
 [INTERNAL]  Hessian expression
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::hess(const Function &f,
-const std::string &iname, int oind=0) "
+%feature("docstring")  casadi::SX::hess(const Function &f, const std::string
+&iname, int oind=0) "
 
 [INTERNAL]  Hessian expression
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::hess(const Function &f, int
-iind, const std::string &oname) "
+%feature("docstring")  casadi::SX::hess(const Function &f, int iind, const
+std::string &oname) "
 
 [INTERNAL]  Hessian expression
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::hess(const Function &f,
-const std::string &iname, const std::string &oname) "
+%feature("docstring")  casadi::SX::hess(const Function &f, const std::string
+&iname, const std::string &oname) "
 
 [INTERNAL]  Hessian expression
 
@@ -7014,29 +7014,29 @@ Get the number of non-zeros in the lower triangular half.
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::tang(const Function &f, int
-iind=0, int oind=0) "
+%feature("docstring")  casadi::SX::tang(const Function &f, int iind=0, int
+oind=0) "
 
 [INTERNAL]  Tangent expression.
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::tang(const Function &f,
-const std::string &iname, int oind=0) "
+%feature("docstring")  casadi::SX::tang(const Function &f, const std::string
+&iname, int oind=0) "
 
 [INTERNAL]  Tangent expression.
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::tang(const Function &f, int
-iind, const std::string &oname) "
+%feature("docstring")  casadi::SX::tang(const Function &f, int iind, const
+std::string &oname) "
 
 [INTERNAL]  Tangent expression.
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::tang(const Function &f,
-const std::string &iname, const std::string &oname) "
+%feature("docstring")  casadi::SX::tang(const Function &f, const std::string
+&iname, const std::string &oname) "
 
 [INTERNAL]  Tangent expression.
 
@@ -7069,7 +7069,7 @@ int > &rc) "
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::element_hash() const  "
+%feature("docstring")  casadi::SX::element_hash() const  "
 
 [INTERNAL]  Returns a number that is unique for a given symbolic scalar.
 
@@ -7205,7 +7205,7 @@ sparsity can be accessed with Sparsity& sparsity() Joel Andersson
 
 C++ includes: casadi_types.hpp ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::dep(int ch=0) const  "
+%feature("docstring")  casadi::SX::dep(int ch=0) const  "
 
 [INTERNAL]  Get expressions of the children of the expression Only defined
 if symbolic scalar. Wraps SXElem SXElem::dep(int ch=0) const.
@@ -7264,7 +7264,7 @@ symbolic primitives.
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::is_leaf() const  "
+%feature("docstring")  casadi::SX::is_leaf() const  "
 
 [INTERNAL]  Check if SX is a leaf of the SX graph.
 
@@ -7272,31 +7272,30 @@ Only defined if symbolic scalar.
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::jac(const Function &f, int
-iind=0, int oind=0, bool compact=false, bool symmetric=false) "
+%feature("docstring")  casadi::SX::jac(const Function &f, int iind=0, int
+oind=0, bool compact=false, bool symmetric=false) "
 
 [INTERNAL]  Jacobian expression.
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::jac(const Function &f,
-const std::string &iname, int oind=0, bool compact=false, bool
-symmetric=false) "
+%feature("docstring")  casadi::SX::jac(const Function &f, const std::string
+&iname, int oind=0, bool compact=false, bool symmetric=false) "
 
 [INTERNAL]  Jacobian expression.
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::jac(const Function &f, int
-iind, const std::string &oname, bool compact=false, bool symmetric=false) "
+%feature("docstring")  casadi::SX::jac(const Function &f, int iind, const
+std::string &oname, bool compact=false, bool symmetric=false) "
 
 [INTERNAL]  Jacobian expression.
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::jac(const Function &f,
-const std::string &iname, const std::string &oname, bool compact=false, bool
-symmetric=false) "
+%feature("docstring")  casadi::SX::jac(const Function &f, const std::string
+&iname, const std::string &oname, bool compact=false, bool symmetric=false)
+"
 
 [INTERNAL]  Jacobian expression.
 
@@ -7363,7 +7362,7 @@ int > &rc) "
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::is_commutative() const  "
+%feature("docstring")  casadi::SX::is_commutative() const  "
 
 [INTERNAL]  Check whether a binary SX is commutative.
 
@@ -7378,7 +7377,7 @@ Return a string with a description (for SWIG)
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::is_valid_input() const  "
+%feature("docstring")  casadi::SX::is_valid_input() const  "
 
 [INTERNAL]  Check if matrix can be used to define function inputs. Sparse
 matrices can return true if all non-zero elements are symbolic.
@@ -7627,7 +7626,7 @@ and columns, keeping the existing non-zeros.
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::is_symbolic() const  "
+%feature("docstring")  casadi::SX::is_symbolic() const  "
 
 [INTERNAL]  Check if symbolic (Dense) Sparse matrices invariable return
 false.
@@ -7792,7 +7791,7 @@ Matrix< Scalar > &x, const Matrix< Scalar > &y) "
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::has_duplicates() "
+%feature("docstring")  casadi::SX::has_duplicates() "
 
 [INTERNAL]  Detect duplicate symbolic expressions If there are symbolic
 primitives appearing more than once, the function will return true and the
@@ -7802,7 +7801,7 @@ call resetInput() after usage.
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::name() const  "
+%feature("docstring")  casadi::SX::name() const  "
 
 [INTERNAL]  Get name (only if symbolic scalar)
 
@@ -7836,7 +7835,7 @@ Get the sparsity pattern. See the Sparsity class for details.
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::resetInput() "
+%feature("docstring")  casadi::SX::resetInput() "
 
 [INTERNAL]  Reset the marker for an input expression.
 
