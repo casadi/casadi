@@ -76,7 +76,7 @@ void NlpBuilder::parse_nl(const std::string& filename, const Dict& options) {
   }
 
   // Allocate variables
-  this->x = SX::sym("x", 1, 1, n_var);
+  this->x = MX::sym("x", 1, 1, n_var);
 
   // Allocate f and c
   this->f = 0;
@@ -93,7 +93,7 @@ void NlpBuilder::parse_nl(const std::string& filename, const Dict& options) {
   this->lambda_init.resize(n_con, 0);
 
   // All variables, including dependent
-  vector<SX> v = this->x;
+  vector<MX> v = this->x;
 
   // Process segments
   while (true) {
@@ -184,7 +184,7 @@ void NlpBuilder::parse_nl(const std::string& filename, const Dict& options) {
         // Should the objective be maximized
         int sigma;
         nlfile >> sigma;
-        SX sign = sigma!=0 ? -1 : 1;
+        MX sign = sigma!=0 ? -1 : 1;
 
         // Parse and save expression
         this->f += sign*read_expr(nlfile, v);
@@ -415,7 +415,7 @@ void NlpBuilder::parse_nl(const std::string& filename, const Dict& options) {
   nlfile.close();
 }
 
-SX NlpBuilder::read_expr(std::istream &stream, const std::vector<SX>& v) {
+MX NlpBuilder::read_expr(std::istream &stream, const std::vector<MX>& v) {
   // Read the instruction
   char inst;
   stream >> inst;
@@ -461,7 +461,7 @@ SX NlpBuilder::read_expr(std::istream &stream, const std::vector<SX>& v) {
         case 51:  case 52:  case 53:
         {
           // Read dependency
-          SX x = read_expr(stream, v);
+          MX x = read_expr(stream, v);
 
           // Perform operation
           switch (i) {
@@ -499,8 +499,8 @@ SX NlpBuilder::read_expr(std::istream &stream, const std::vector<SX>& v) {
         case 57:  case 58:  case 73:
         {
           // Read dependencies
-          SX x = read_expr(stream, v);
-          SX y = read_expr(stream, v);
+          MX x = read_expr(stream, v);
+          MX y = read_expr(stream, v);
 
           // Perform operation
           switch (i) {
@@ -541,7 +541,7 @@ SX NlpBuilder::read_expr(std::istream &stream, const std::vector<SX>& v) {
           stream >> n;
 
           // Collect the arguments
-          vector<SX> args(n);
+          vector<MX> args(n);
           for (int k=0; k<n; ++k) {
             args[k] = read_expr(stream, v);
           }
@@ -559,8 +559,8 @@ SX NlpBuilder::read_expr(std::istream &stream, const std::vector<SX>& v) {
             // case 74: return alldiff(args).scalar(); FIXME // rename?
             case 54:
             {
-              SX r = 0;
-              for (vector<SX>::const_iterator it=args.begin();
+              MX r = 0;
+              for (vector<MX>::const_iterator it=args.begin();
                    it!=args.end(); ++it) r += *it;
               return r;
             }

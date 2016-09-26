@@ -41,6 +41,7 @@ nl.parse_nl("../nl_files/hs107.nl",{"verbose":False})
 
 # NLP solver options
 opts = {}
+opts["expand"] = True
 # opts["max_iter"] = 10
 # opts["verbose"] = True
 # opts["linear_solver"] = "ma57"

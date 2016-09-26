@@ -55,7 +55,7 @@ namespace casadi {
 
   Function nlpsol(const std::string& name, const std::string& solver,
                   const NlpBuilder& nl, const Dict& opts) {
-     SXDict nlp;
+     MXDict nlp;
      nlp["x"] = vertcat(nl.x);
      nlp["f"] = nl.f;
      nlp["g"] = vertcat(nl.g);

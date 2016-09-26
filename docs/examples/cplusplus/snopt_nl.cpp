@@ -47,6 +47,7 @@ int main(int argc, char **argv){
 
   // Set options
   Dict opts;
+  opts["expand"] = true;
   // opts["detect_linear"] = true;
 
   // Allocate NLP solver and buffers

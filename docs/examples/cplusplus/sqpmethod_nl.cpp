@@ -46,6 +46,7 @@ int main(int argc, char **argv){
 
   // Set options
   Dict opts;
+  opts["expand"] = true;
   // opts["max_iter"] = 10)
   // opts["verbose"] = true;
   // opts["linear_solver"] = "ma57";

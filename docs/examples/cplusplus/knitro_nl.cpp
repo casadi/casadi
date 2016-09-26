@@ -47,6 +47,7 @@ int main(int argc, char **argv){
 
   // Set options
   Dict opts;
+  opts["expand"] = true;
   // opts["verbose"] = true;
 
   // Allocate NLP solver and buffers

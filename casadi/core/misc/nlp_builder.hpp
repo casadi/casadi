@@ -26,7 +26,7 @@
 #ifndef CASADI_NLP_BUILDER_HPP
 #define CASADI_NLP_BUILDER_HPP
 
-#include "../sx/sx_elem.hpp"
+#include "../mx/mx.hpp"
 
 namespace casadi {
 
@@ -43,13 +43,13 @@ class CASADI_EXPORT NlpBuilder : public PrintableObject<NlpBuilder> {
     ///@{
 
       /// Variables
-      std::vector<SX> x;
+      std::vector<MX> x;
 
       /// Objective
-      SX f;
+      MX f;
 
       /// Constraints
-      std::vector<SX> g;
+      std::vector<MX> g;
 
       /// Bounds on x
       std::vector<double> x_lb, x_ub;
@@ -78,7 +78,7 @@ class CASADI_EXPORT NlpBuilder : public PrintableObject<NlpBuilder> {
   protected:
 
     /// Read an expression from an NL-file (Polish infix format)
-    static SX read_expr(std::istream &stream, const std::vector<SX>& v);
+    static MX read_expr(std::istream &stream, const std::vector<MX>& v);
 
 #endif // SWIG
 };
