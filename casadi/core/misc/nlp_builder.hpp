@@ -96,8 +96,36 @@ namespace casadi {
     std::ifstream s_;
     // All variables, including dependent
     std::vector<MX> v_;
+    // Number of objectives and constraints
+    int n_var_, n_con_, n_obj_, n_eq_, n_lcon_;
     // Parse the file
     void parse();
+    // Imported function description
+    void F_segment();
+    // Suffix values
+    void S_segment();
+    // Defined variable definition
+    void V_segment();
+    // Algebraic constraint body
+    void C_segment();
+    // Logical constraint expression
+    void L_segment();
+    // Objective function
+    void O_segment();
+    // Dual initial guess
+    void d_segment();
+    // Primal initial guess
+    void x_segment();
+    // Bounds on algebraic constraint bodies ("ranges")
+    void r_segment();
+    // Bounds on variable
+    void b_segment();
+    // Jacobian row counts
+    void k_segment();
+    // Linear terms in the constraint function
+    void J_segment();
+    // Linear terms in the objective function
+    void G_segment();
     /// Read an expression from an NL-file (Polish infix format)
     MX expr();
   };

@@ -67,16 +67,6 @@ namespace casadi {
     s_.open(filename.c_str());
     if (verbose_) userOut() << "Reading file \"" << filename << "\"" << endl;
 
-    // Parse
-    parse();
-  }
-
-  NlImporter::~NlImporter() {
-    // Close the NL file
-    s_.close();
-  }
-
-  void NlImporter::parse() {
     // Read the header of the NL-file (first 10 lines)
     const int header_sz = 10;
     vector<string> header(header_sz);
@@ -91,347 +81,65 @@ namespace casadi {
 
     // Get the number of objectives and constraints
     stringstream ss(header[1]);
-    int n_var, n_con, n_obj, n_eq, n_lcon;
-    ss >> n_var >> n_con >> n_obj >> n_eq >> n_lcon;
-
+    ss >> n_var_ >> n_con_ >> n_obj_ >> n_eq_ >> n_lcon_;
     if (verbose_) {
-      userOut() << "n_var = " << n_var << ", n_con  = " << n_con << ", n_obj = " << n_obj
-      << ", n_eq = " << n_eq << ", n_lcon = " << n_lcon << endl;
+      userOut() << "n_var = " << n_var_ << ", n_con  = " << n_con_ << ", n_obj = " << n_obj_
+      << ", n_eq = " << n_eq_ << ", n_lcon = " << n_lcon_ << endl;
     }
 
     // Allocate variables
-    nlp_.x = MX::sym("x", 1, 1, n_var);
+    nlp_.x = MX::sym("x", 1, 1, n_var_);
 
     // Allocate f and c
     nlp_.f = 0;
-    nlp_.g.resize(n_con, 0);
+    nlp_.g.resize(n_con_, 0);
 
     // Allocate bounds for x and primal initial guess
-    nlp_.x_lb.resize(n_var, -inf);
-    nlp_.x_ub.resize(n_var,  inf);
-    nlp_.x_init.resize(n_var, 0);
+    nlp_.x_lb.resize(n_var_, -inf);
+    nlp_.x_ub.resize(n_var_,  inf);
+    nlp_.x_init.resize(n_var_, 0);
 
     // Allocate bounds for g and dual initial guess
-    nlp_.g_lb.resize(n_con, -inf);
-    nlp_.g_ub.resize(n_con,  inf);
-    nlp_.lambda_init.resize(n_con, 0);
+    nlp_.g_lb.resize(n_con_, -inf);
+    nlp_.g_ub.resize(n_con_,  inf);
+    nlp_.lambda_init.resize(n_con_, 0);
 
     // All variables, including dependent
     v_ = nlp_.x;
 
+    // Read segments
+    parse();
+  }
+
+  NlImporter::~NlImporter() {
+    // Close the NL file
+    s_.close();
+  }
+
+  void NlImporter::parse() {
+    // Segment key
+    char key;
+
     // Process segments
     while (true) {
-
       // Read segment key
-      char key;
       s_ >> key;
-
-      // Break if end of file
-      if (s_.eof()) break;
-
-      // Process segments
+      if (s_.eof()) break; // end of file encountered
       switch (key) {
-        // Imported function description
-        case 'F':
-        if (verbose_) {
-          userOut<true, PL_WARN>() << "Imported function description unsupported: ignored" << endl;
-        }
-        break;
-
-        // Suffix values
-        case 'S':
-        if (verbose_) {
-          userOut<true, PL_WARN>() << "Suffix values unsupported: ignored" << endl;
-        }
-        break;
-
-        // Defined variable definition
-        case 'V':
-        {
-          // Read header
-          int i, j, k;
-          s_ >> i >> j >> k;
-
-          // Make sure that v is long enough
-          if (i >= v_.size()) {
-            v_.resize(i+1);
-          }
-
-          // Initialize element to zero
-          v_.at(i) = 0;
-
-          // Add the linear terms
-          for (int jj=0; jj<j; ++jj) {
-            // Linear term
-            int pl;
-            double cl;
-            s_ >> pl >> cl;
-
-            // Add to variable definition (assuming it has already been defined)
-            casadi_assert_message(!v_.at(pl).is_empty(), "Circular dependencies not supported");
-            v_.at(i) += cl*v_.at(pl);
-          }
-
-          // Finally, add the nonlinear term
-          v_.at(i) += expr();
-
-          break;
-        }
-
-        // Algebraic constraint body
-        case 'C':
-        {
-          // Get the number
-          int i;
-          s_ >> i;
-
-          // Parse and save expression
-          nlp_.g.at(i) = expr();
-
-          break;
-        }
-
-        // Logical constraint expression
-        case 'L':
-        if (verbose_) {
-          userOut<true, PL_WARN>() << "Logical constraint expression unsupported: ignored" << endl;
-        }
-        break;
-
-        // Objective function
-        case 'O':
-        {
-          // Get the number
-          int i;
-          s_ >> i;
-
-          // Should the objective be maximized
-          int sigma;
-          s_ >> sigma;
-          MX sign = sigma!=0 ? -1 : 1;
-
-          // Parse and save expression
-          nlp_.f += sign*expr();
-
-          break;
-        }
-
-        // Dual initial guess
-        case 'd':
-        {
-          // Read the number of guesses supplied
-          int m;
-          s_ >> m;
-
-          // Process initial guess for the fual variables
-          for (int i=0; i<m; ++i) {
-            // Offset and value
-            int offset;
-            double d;
-            s_ >> offset >> d;
-
-            // Save initial guess
-            nlp_.lambda_init.at(offset) = d;
-          }
-
-          break;
-        }
-
-        // Primal initial guess
-        case 'x':
-        {
-          // Read the number of guesses supplied
-          int m;
-          s_ >> m;
-
-          // Process initial guess
-          for (int i=0; i<m; ++i) {
-            // Offset and value
-            int offset;
-            double d;
-            s_ >> offset >> d;
-
-            // Save initial guess
-            nlp_.x_init.at(offset) = d;
-          }
-
-          break;
-        }
-
-        // Bounds on algebraic constraint bodies ("ranges")
-        case 'r':
-        {
-          // For all constraints
-          for (int i=0; i<n_con; ++i) {
-
-            // Read constraint type
-            int c_type;
-            s_ >> c_type;
-
-            // Temporary
-            double c;
-
-            switch (c_type) {
-              // Upper and lower bounds
-              case 0:
-              s_ >> c;
-              nlp_.g_lb.at(i) = c;
-              s_ >> c;
-              nlp_.g_ub.at(i) = c;
-              continue;
-
-              // Only upper bounds
-              case 1:
-              s_ >> c;
-              nlp_.g_ub.at(i) = c;
-              continue;
-
-              // Only lower bounds
-              case 2:
-              s_ >> c;
-              nlp_.g_lb.at(i) = c;
-              continue;
-
-              // No bounds
-              case 3:
-              continue;
-
-              // Equality constraints
-              case 4:
-              s_ >> c;
-              nlp_.g_lb.at(i) = nlp_.g_ub.at(i) = c;
-              continue;
-
-              // Complementary constraints
-              case 5:
-              {
-                // Read the indices
-                int ck, ci;
-                s_ >> ck >> ci;
-                if (verbose_) {
-                  userOut<true, PL_WARN>()
-                  << "Complementary constraints unsupported: ignored" << endl;
-                }
-                continue;
-              }
-
-              default:
-              throw CasadiException("Illegal constraint type");
-            }
-          }
-          break;
-        }
-
-        // Bounds on variable
-        case 'b':
-        {
-          // For all variable
-          for (int i=0; i<n_var; ++i) {
-
-            // Read constraint type
-            int c_type;
-            s_ >> c_type;
-
-            // Temporary
-            double c;
-
-            switch (c_type) {
-              // Upper and lower bounds
-              case 0:
-              s_ >> c;
-              nlp_.x_lb.at(i) = c;
-              s_ >> c;
-              nlp_.x_ub.at(i) = c;
-              continue;
-
-              // Only upper bounds
-              case 1:
-              s_ >> c;
-              nlp_.x_ub.at(i) = c;
-              continue;
-
-              // Only lower bounds
-              case 2:
-              s_ >> c;
-              nlp_.x_lb.at(i) = c;
-              continue;
-
-              // No bounds
-              case 3:
-              continue;
-
-              // Equality constraints
-              case 4:
-              s_ >> c;
-              nlp_.x_lb.at(i) = nlp_.x_ub.at(i) = c;
-              continue;
-
-              default:
-              throw CasadiException("Illegal variable bound type");
-            }
-          }
-
-          break;
-        }
-
-        // Jacobian row counts
-        case 'k':
-        {
-          // Get row offsets
-          vector<int> rowind(n_var+1);
-
-          // Get the number of offsets
-          int k;
-          s_ >> k;
-          casadi_assert(k==n_var-1);
-
-          // Get the row offsets
-          rowind[0]=0;
-          for (int i=0; i<k; ++i) {
-            s_ >> rowind[i+1];
-          }
-          break;
-        }
-
-        // Linear terms in the constraint function
-        case 'J':
-        {
-          // Get constraint number and number of terms
-          int i, k;
-          s_ >> i >> k;
-
-          // Get terms
-          for (int kk=0; kk<k; ++kk) {
-            // Get the term
-            int j;
-            double c;
-            s_ >> j >> c;
-
-            // Add to constraints
-            nlp_.g.at(i) += c*v_.at(j);
-          }
-          break;
-        }
-
-        // Linear terms in
-        case 'G':
-        {
-          // Get objective number and number of terms
-          int i, k;
-          s_ >> i >> k;
-
-          // Get terms
-          for (int kk=0; kk<k; ++kk) {
-            // Get the term
-            int j;
-            double c;
-            s_ >> j >> c;
-
-            // Add to objective
-            nlp_.f += c*v_.at(j);
-          }
-          break;
-        }
+        case 'F': F_segment(); break;
+        case 'S': S_segment(); break;
+        case 'V': V_segment(); break;
+        case 'C': C_segment(); break;
+        case 'L': L_segment(); break;
+        case 'O': O_segment(); break;
+        case 'd': d_segment(); break;
+        case 'x': x_segment(); break;
+        case 'r': r_segment(); break;
+        case 'b': b_segment(); break;
+        case 'k': k_segment(); break;
+        case 'J': J_segment(); break;
+        case 'G': G_segment(); break;
+        default: casadi_error("Unknown .nl segment");
       }
     }
   }
@@ -614,5 +322,260 @@ namespace casadi {
     // Throw error message
     throw CasadiException("Error in NlpBuilder::expr: " + msg.str());
   }
+
+  void NlImporter::F_segment() {
+    casadi_error("Imported function description unsupported.");
+  }
+
+  void NlImporter::S_segment() {
+    casadi_error("Suffix values unsupported");
+  }
+
+  void NlImporter::V_segment() {
+    // Read header
+    int i, j, k;
+    s_ >> i >> j >> k;
+
+    // Make sure that v is long enough
+    if (i >= v_.size()) {
+      v_.resize(i+1);
+    }
+
+    // Initialize element to zero
+    v_.at(i) = 0;
+
+    // Add the linear terms
+    for (int jj=0; jj<j; ++jj) {
+      // Linear term
+      int pl;
+      double cl;
+      s_ >> pl >> cl;
+
+      // Add to variable definition (assuming it has already been defined)
+      casadi_assert_message(!v_.at(pl).is_empty(), "Circular dependencies not supported");
+      v_.at(i) += cl*v_.at(pl);
+    }
+
+    // Finally, add the nonlinear term
+    v_.at(i) += expr();
+  }
+
+  void NlImporter::C_segment() {
+    // Get the number
+    int i;
+    s_ >> i;
+
+    // Parse and save expression
+    nlp_.g.at(i) = expr();
+  }
+
+  void NlImporter::L_segment() {
+    casadi_error("Logical constraint expression unsupported");
+  }
+
+  void NlImporter::O_segment() {
+    // Get the number
+    int i;
+    s_ >> i;
+
+    // Should the objective be maximized
+    int sigma;
+    s_ >> sigma;
+    MX sign = sigma!=0 ? -1 : 1;
+
+    // Parse and save expression
+    nlp_.f += sign*expr();
+  }
+
+  void NlImporter::d_segment() {
+    // Read the number of guesses supplied
+    int m;
+    s_ >> m;
+
+    // Process initial guess for the fual variables
+    for (int i=0; i<m; ++i) {
+      // Offset and value
+      int offset;
+      double d;
+      s_ >> offset >> d;
+
+      // Save initial guess
+      nlp_.lambda_init.at(offset) = d;
+    }
+  }
+
+  void NlImporter::x_segment() {
+    // Read the number of guesses supplied
+    int m;
+    s_ >> m;
+
+    // Process initial guess
+    for (int i=0; i<m; ++i) {
+      // Offset and value
+      int offset;
+      double d;
+      s_ >> offset >> d;
+
+      // Save initial guess
+      nlp_.x_init.at(offset) = d;
+    }
+  }
+
+  void NlImporter::r_segment() {
+    // For all constraints
+    for (int i=0; i<n_con_; ++i) {
+
+      // Read constraint type
+      int c_type;
+      s_ >> c_type;
+
+      // Temporary
+      double c;
+
+      switch (c_type) {
+        // Upper and lower bounds
+        case 0:
+        s_ >> c;
+        nlp_.g_lb.at(i) = c;
+        s_ >> c;
+        nlp_.g_ub.at(i) = c;
+        continue;
+
+        // Only upper bounds
+        case 1:
+        s_ >> c;
+        nlp_.g_ub.at(i) = c;
+        continue;
+
+        // Only lower bounds
+        case 2:
+        s_ >> c;
+        nlp_.g_lb.at(i) = c;
+        continue;
+
+        // No bounds
+        case 3:
+        continue;
+
+        // Equality constraints
+        case 4:
+        s_ >> c;
+        nlp_.g_lb.at(i) = nlp_.g_ub.at(i) = c;
+        continue;
+
+        // Complementary constraints
+        case 5:
+        {
+          // Read the indices
+          int ck, ci;
+          s_ >> ck >> ci;
+          casadi_error("Complementary constraints unsupported");
+          continue;
+        }
+
+        default:
+        casadi_error("Illegal constraint type");
+      }
+    }
+  }
+
+  void NlImporter::b_segment() {
+    // For all variable
+    for (int i=0; i<n_var_; ++i) {
+
+      // Read constraint type
+      int c_type;
+      s_ >> c_type;
+
+      // Temporary
+      double c;
+
+      switch (c_type) {
+        // Upper and lower bounds
+        case 0:
+        s_ >> c;
+        nlp_.x_lb.at(i) = c;
+        s_ >> c;
+        nlp_.x_ub.at(i) = c;
+        continue;
+
+        // Only upper bounds
+        case 1:
+        s_ >> c;
+        nlp_.x_ub.at(i) = c;
+        continue;
+
+        // Only lower bounds
+        case 2:
+        s_ >> c;
+        nlp_.x_lb.at(i) = c;
+        continue;
+
+        // No bounds
+        case 3:
+        continue;
+
+        // Equality constraints
+        case 4:
+        s_ >> c;
+        nlp_.x_lb.at(i) = nlp_.x_ub.at(i) = c;
+        continue;
+
+        default:
+        casadi_error("Illegal variable bound type");
+      }
+    }
+  }
+
+  void NlImporter::k_segment() {
+    // Get row offsets
+    vector<int> rowind(n_var_+1);
+
+    // Get the number of offsets
+    int k;
+    s_ >> k;
+    casadi_assert(k==n_var_-1);
+
+    // Get the row offsets
+    rowind[0]=0;
+    for (int i=0; i<k; ++i) {
+      s_ >> rowind[i+1];
+    }
+  }
+
+  void NlImporter::J_segment() {
+    // Get constraint number and number of terms
+    int i, k;
+    s_ >> i >> k;
+
+    // Get terms
+    for (int kk=0; kk<k; ++kk) {
+      // Get the term
+      int j;
+      double c;
+      s_ >> j >> c;
+
+      // Add to constraints
+      nlp_.g.at(i) += c*v_.at(j);
+    }
+  }
+
+  void NlImporter::G_segment() {
+    // Get objective number and number of terms
+    int i, k;
+    s_ >> i >> k;
+
+    // Get terms
+    for (int kk=0; kk<k; ++kk) {
+      // Get the term
+      int j;
+      double c;
+      s_ >> j >> c;
+
+      // Add to objective
+      nlp_.f += c*v_.at(j);
+    }
+  }
+
 
 } // namespace casadi
