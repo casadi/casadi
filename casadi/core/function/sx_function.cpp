@@ -395,7 +395,7 @@ namespace casadi {
     stack<int> unused;
 
     // Work vector size
-    size_t worksize = 0;
+    worksize_ = 0;
 
     // Find a place in the work vector for the operation
     for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it) {
@@ -419,7 +419,7 @@ namespace casadi {
           unused.pop();
         } else {
           // Allocate a new variable
-          it->i0 = place[it->i0] = worksize++;
+          it->i0 = place[it->i0] = worksize_++;
         }
       }
 
@@ -442,15 +442,15 @@ namespace casadi {
     if (verbose()) {
       if (live_variables) {
         userOut() << "Using live variables: work array is "
-             <<  worksize << " instead of " << nodes.size() << endl;
+             <<  worksize_ << " instead of " << nodes.size() << endl;
       } else {
         userOut() << "Live variables disabled." << endl;
       }
     }
 
     // Allocate work vectors (symbolic/numeric)
-    alloc_w(worksize);
-    s_work_.resize(worksize);
+    alloc_w(worksize_);
+    s_work_.resize(worksize_);
 
     // Reset the temporary variables
     for (int i=0; i<nodes.size(); ++i) {

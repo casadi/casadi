@@ -173,7 +173,7 @@ class CASADI_EXPORT SXFunction :
   virtual int getAlgorithmSize() const { return algorithm_.size();}
 
   /** \brief Get the length of the work vector */
-  virtual int getWorkSize() const { return sz_w();}
+  virtual int getWorkSize() const { return worksize_;}
 
   /** \brief Get an atomic operation operator index */
   virtual int getAtomicOperation(int k) const { return algorithm_.at(k).op;}
@@ -208,6 +208,9 @@ class CASADI_EXPORT SXFunction :
 
   /** \brief  all binary nodes of the tree in the order of execution */
   std::vector<AlgEl> algorithm_;
+
+  // Work vector size
+  size_t worksize_;
 
   /// work vector for symbolic calculations (allocated first time)
   std::vector<SXElem> s_work_;
