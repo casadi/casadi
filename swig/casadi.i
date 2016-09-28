@@ -421,7 +421,7 @@ namespace std {
 
 %{
 #define SWIG_FILE_WITH_INIT
-#include "numpy.hpp"
+#include "casadi_numpy.hpp"
 %}
 
 %init %{
