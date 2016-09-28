@@ -436,7 +436,10 @@ import_array();
 
 #ifndef SWIGXML
 
-%fragment("casadi_decl", "header") {
+// Can be overloaded by specifying before importing casadi.i
+%fragment("casadi_extra_decl", "header") {}
+
+%fragment("casadi_decl", "header",fragment="casadi_extra_decl") {
   namespace casadi {
     /* Check if Null or None */
     bool is_null(GUESTOBJECT *p);
@@ -2033,8 +2036,11 @@ import_array();
   } // namespace casadi
  }
 
+// Can be overloaded by specifying before importing casadi.i
+%fragment("casadi_extra", "header") {}
+
 // Collect all fragments
-%fragment("casadi_all", "header", fragment="casadi_aux,casadi_bool,casadi_int,casadi_double,casadi_vector,casadi_function,casadi_generictype,casadi_string,casadi_slice,casadi_map,casadi_pair,casadi_sx,casadi_sxelem,casadi_mx,casadi_dmatrix,casadi_sparsity,casadi_imatrix") { }
+%fragment("casadi_all", "header", fragment="casadi_aux,casadi_extra,casadi_bool,casadi_int,casadi_double,casadi_vector,casadi_function,casadi_generictype,casadi_string,casadi_slice,casadi_map,casadi_pair,casadi_sx,casadi_sxelem,casadi_mx,casadi_dmatrix,casadi_sparsity,casadi_imatrix") { }
 
 #endif // SWIGXML
 
