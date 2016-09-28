@@ -208,14 +208,6 @@ namespace casadi {
     alloc_w(sz_w);
   }
 
-  void SimplifiedExternal::init(const Dict& opts) {
-    // Call recursively
-    External::init(opts);
-
-    // Arrays for holding inputs and outputs
-    alloc_w(n_in() + n_out());
-  }
-
   void GenericExternal::init(const Dict& opts) {
     // Call recursively
     External::init(opts);

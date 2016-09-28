@@ -413,8 +413,8 @@ namespace casadi {
     if (!use_ifdef.empty()) this->includes << "#endif" << endl;
   }
 
-  bool CodeGenerator::simplifiedCall(const Function& f) {
-    return f->simplifiedCall();
+  bool CodeGenerator::simplified_call(const Function& f) {
+    return f->simplified_call();
   }
 
   std::string CodeGenerator::

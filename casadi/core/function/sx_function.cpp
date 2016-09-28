@@ -187,7 +187,7 @@ namespace casadi {
   void SXFunction::generateBody(CodeGenerator& g) const {
 
     // Which variables have been declared
-    vector<bool> declared(sz_w(), false);
+    vector<bool> declared(worksize_, false);
 
     // Run the algorithm
     for (vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it) {
@@ -449,7 +449,7 @@ namespace casadi {
     }
 
     // Allocate work vectors (symbolic/numeric)
-    alloc_w(worksize_);
+    alloc_w(worksize_, true);
     s_work_.resize(worksize_);
 
     // Reset the temporary variables
@@ -794,7 +794,7 @@ namespace casadi {
   }
 
   void SXFunction::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
-    fill_n(w, sz_w(), 0);
+    fill_n(w, worksize_, 0);
 
     // Propagate sparsity backward
     for (vector<AlgEl>::reverse_iterator it=algorithm_.rbegin(); it!=algorithm_.rend(); ++it) {

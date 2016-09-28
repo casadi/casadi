@@ -90,7 +90,7 @@ namespace casadi {
     int getConstant(const std::vector<int>& v, bool allow_adding=false);
 
     /** \brief Use simplified signature */
-    static bool simplifiedCall(const Function& f);
+    static bool simplified_call(const Function& f);
 
     /** \brief Generate a call to a function (generic signature) */
     std::string operator()(const Function& f, const std::string& arg,

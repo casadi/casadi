@@ -260,6 +260,9 @@ namespace casadi {
 
     alloc_arg(0);
     alloc_res(0);
+
+    // Buffers for inputs and outputs
+    if (simplified_call()) alloc_w(nnz_in() + nnz_out(), true);
   }
 
   std::string FunctionInternal::get_name_in(int i) {
@@ -304,7 +307,7 @@ namespace casadi {
 
   void FunctionInternal::
   _eval(const double** arg, double** res, int* iw, double* w, int mem) {
-    if (simplifiedCall()) {
+    if (simplified_call()) {
       // Copy arguments to input buffers
       const double* arg1=w;
       for (int i=0; i<this->n_in(); ++i) {
@@ -2038,12 +2041,12 @@ namespace casadi {
     generateBody(g);
 
     // Finalize the function
-    if (!simplifiedCall()) g.body << "  return 0;" << endl;
+    if (!simplified_call()) g.body << "  return 0;" << endl;
     g.body << "}" << endl << endl;
   }
 
   std::string FunctionInternal::signature(const std::string& fname) const {
-    if (simplifiedCall()) {
+    if (simplified_call()) {
       return "void " + fname + "(const real_t* arg, real_t* res)";
     } else {
       return "int " + fname + "(const real_t** arg, real_t** res, int* iw, real_t* w, int mem)";
@@ -2091,7 +2094,7 @@ namespace casadi {
       << "}" << endl << endl;
 
     // Quick return if simplified syntax
-    if (simplifiedCall()) {
+    if (simplified_call()) {
       return;
     }
 
@@ -2285,7 +2288,7 @@ namespace casadi {
   }
 
   void FunctionInternal::addShorthand(CodeGenerator& g, const string& name) const {
-    if (simplifiedCall()) {
+    if (simplified_call()) {
       g.body
         << "#define " << name << "(arg, res) "
         << "CASADI_PREFIX(" << name << ")(arg, res)" << endl << endl;
@@ -2297,7 +2300,7 @@ namespace casadi {
   }
 
   std::string FunctionInternal::eval_name() const {
-    if (simplifiedCall()) {
+    if (simplified_call()) {
       return name_ + "_simple";
     } else {
       return name_;

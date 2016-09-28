@@ -139,11 +139,8 @@ namespace casadi {
     /** \brief  Destructor */
     virtual ~SimplifiedExternal() { this->clear_memory();}
 
-    /// Initialize
-    virtual void init(const Dict& opts);
-
     /** \brief Use simplified signature */
-    virtual bool simplifiedCall() const { return true;}
+    virtual bool simplified_call() const { return true;}
 
     /// @{
     /** \brief Retreive sparsities */

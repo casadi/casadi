@@ -319,7 +319,7 @@ namespace casadi {
         g.body << "    return 1;" << endl;
       } else {
         // Call function
-        if (g.simplifiedCall(fk)) {
+        if (g.simplified_call(fk)) {
           casadi_error("Not implemented.");
         } else {
           g.body << "    if (" << g(fk, "arg+1", "res", "iw", "w") << ") return 1;" << endl;
