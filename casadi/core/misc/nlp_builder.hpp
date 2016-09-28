@@ -65,8 +65,8 @@ namespace casadi {
 
     ///@}
 
-    /// Parse an AMPL och PyOmo NL-file
-    void parse_nl(const std::string& filename, const Dict& opts = Dict());
+    /// Import an .nl file
+    void import_nl(const std::string& filename, const Dict& opts = Dict());
 
     /// Print a description of the object
     void print(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;

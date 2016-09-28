@@ -44,7 +44,7 @@ int main(int argc, char **argv){
 
   // Parse an NL-file
   NlpBuilder nl;
-  nl.parse_nl(problem);
+  nl.import_nl(problem);
 
   // Set options
   Dict opts;

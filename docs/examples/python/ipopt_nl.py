@@ -37,7 +37,7 @@ Joel Andersson
 nl = NlpBuilder()
 
 # Parse an NL-file
-nl.parse_nl("../nl_files/hs107.nl",{"verbose":False})
+nl.import_nl("../nl_files/hs107.nl",{"verbose":False})
 
 # NLP solver options
 opts = {}

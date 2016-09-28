@@ -30,7 +30,7 @@
 using namespace std;
 namespace casadi {
 
-  void NlpBuilder::parse_nl(const std::string& filename, const Dict& opts) {
+  void NlpBuilder::import_nl(const std::string& filename, const Dict& opts) {
     // Redirect to helper class
     NlImporter(*this, filename, opts);
   }
