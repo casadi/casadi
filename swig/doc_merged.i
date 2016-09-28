@@ -6630,9 +6630,9 @@ Joel Andersson
 
 C++ includes: nlp_builder.hpp ";
 
-%feature("docstring") casadi::NlpBuilder::parse_nl "
+%feature("docstring") casadi::NlpBuilder::import_nl "
 
-Parse an AMPL och PyOmo NL-file.
+Import an .nl file.
 
 ";
 
