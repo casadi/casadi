@@ -106,9 +106,6 @@ namespace blocksqp {
   double lInfConstraintNorm(const Matrix &xi, const Matrix &constr,
     const Matrix &bu, const Matrix &bl);
 
-  void Atimesb(const Matrix &A, const Matrix &b, Matrix &result);
-  void Atimesb(double *Anz, int *AIndRow, int *AIndCol, const Matrix &b, Matrix &result);
-
 } // namespace blocksqp
 
 /** \defgroup plugin_Nlpsol_blocksqp

@@ -2164,7 +2164,8 @@ namespace casadi {
     m->qpObj = m->qp->getObjVal();
 
     // Compute constrJac*deltaXi, need this for second order correction step
-    Atimesb(m->jacNz, m->jacIndRow, m->jacIndCol, deltaXi, m->AdeltaXi);
+    casadi_fill(m->AdeltaXi.array, m->AdeltaXi.m, 0.);
+    casadi_mv(m->jacNz, Asp_, deltaXi.array, m->AdeltaXi.array, 0);
 
     // Print qpOASES error code, if any
     if (ret != qpOASES::SUCCESSFUL_RETURN && matricesChanged)
@@ -2567,24 +2568,6 @@ namespace casadi {
 // Legacy:
 
 namespace blocksqp {
-  void Atimesb(double *Anz, int *AIndRow, int *AIndCol, const Matrix &b, Matrix &result) {
-    int nCol = b.m;
-    int nRow = result.m;
-    int i, k;
-    for (i=0; i<nRow; i++) result(i) = 0.0;
-    for (i=0; i<nCol; i++) {
-        for (k=AIndCol[i]; k<AIndCol[i+1]; k++)
-          result(AIndRow[k]) += Anz[k] * b(i);
-    }
-  }
-
-  void Atimesb(const Matrix &A, const Matrix &b, Matrix &result) {
-    result.Initialize(0.0);
-    for (int i=0; i<A.m; i++)
-      for (int k=0; k<A.n; k++)
-        result(i) += A(i, k) * b(k);
-  }
-
   double l1VectorNorm(const Matrix &v) {
     double norm = 0.0;
 
