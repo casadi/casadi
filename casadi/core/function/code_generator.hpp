@@ -136,7 +136,7 @@ namespace casadi {
       AUX_DOT,
       AUX_BILIN,
       AUX_RANK1,
-      AUX_NRM2,
+      AUX_NORM_2,
       AUX_IAMAX,
       AUX_FILL,
       AUX_ASUM,

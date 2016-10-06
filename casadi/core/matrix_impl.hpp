@@ -1764,7 +1764,7 @@ namespace casadi {
 
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::norm_F(const Matrix<Scalar>& x) {
-    return sqrt(sum_square(x));
+    return casadi_norm_2(x.nnz(), x.ptr());
   }
 
   template<typename Scalar>

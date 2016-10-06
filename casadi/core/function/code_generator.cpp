@@ -590,9 +590,9 @@ namespace casadi {
         << codegen_str_iamax_define
         << endl;
       break;
-    case AUX_NRM2:
-      this->auxiliaries << codegen_str_nrm2
-        << codegen_str_nrm2_define
+    case AUX_NORM_2:
+      this->auxiliaries << codegen_str_norm_2
+        << codegen_str_norm_2_define
         << endl;
       break;
     case AUX_FILL:

@@ -84,9 +84,9 @@ namespace casadi {
   template<typename real_t>
   void CASADI_PREFIX(mv)(const real_t* x, const int* sp_x, const real_t* y, real_t* z, int tr);
 
-  /// NRM2: ||x||_2 -> return
+  /// NORM_2: ||x||_2 -> return
   template<typename real_t>
-  real_t CASADI_PREFIX(nrm2)(int n, const real_t* x, int inc_x);
+  real_t CASADI_PREFIX(norm_2)(int n, const real_t* x);
 
   /// TRANS: y <- trans(x)
   template<typename real_t>
@@ -387,14 +387,8 @@ namespace casadi {
   }
 
   template<typename real_t>
-  real_t CASADI_PREFIX(nrm2)(int n, const real_t* x, int inc_x) {
-    real_t r = 0;
-    int i;
-    for (i=0; i<n; ++i) {
-      r += *x**x;
-      x += inc_x;
-    }
-    return sqrt(r);
+  real_t CASADI_PREFIX(norm_2)(int n, const real_t* x) {
+    return sqrt(CASADI_PREFIX(dot)(n, x, x));
   }
 
   template<typename real_t>

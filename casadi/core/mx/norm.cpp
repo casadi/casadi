@@ -48,7 +48,7 @@ namespace casadi {
 
   template<typename T>
   void NormF::evalGen(const T** arg, T** res, int* iw, T* w, int mem) const {
-    *res[0] = sqrt(casadi_dot(dep().nnz(), arg[0], arg[0]));
+    *res[0] = casadi_norm_2(dep().nnz(), arg[0]);
   }
 
   void NormF::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) {
