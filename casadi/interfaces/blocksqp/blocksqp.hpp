@@ -100,9 +100,6 @@ namespace blocksqp {
   };
 
   //  Declaration of general purpose routines for matrix and vector computations
-  double l1VectorNorm(const Matrix &v);
-  double l2VectorNorm(const Matrix &v);
-  double lInfVectorNorm(const Matrix &v);
   double lInfConstraintNorm(const Matrix &xi, const Matrix &constr,
     const Matrix &bu, const Matrix &bl);
 

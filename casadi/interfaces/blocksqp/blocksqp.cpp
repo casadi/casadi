@@ -877,12 +877,12 @@ namespace casadi {
   bool Blocksqp::calcOptTol(BlocksqpMemory* m) const {
     // scaled norm of Lagrangian gradient
     calcLagrangeGradient(m, m->gradLagrange, 0);
-    m->gradNorm = lInfVectorNorm(m->gradLagrange);
-    m->tol = m->gradNorm /(1.0 + lInfVectorNorm(m->lambda));
+    m->gradNorm = casadi_norm_inf(m->gradLagrange.m, m->gradLagrange.array);
+    m->tol = m->gradNorm /(1.0 + casadi_norm_inf(m->lambda.m, m->lambda.array));
 
     // norm of constraint violation
     m->cNorm  = lInfConstraintNorm(m->xi, m->constr, m->bu, m->bl);
-    m->cNormS = m->cNorm /(1.0 + lInfVectorNorm(m->xi));
+    m->cNormS = m->cNorm /(1.0 + casadi_norm_inf(m->xi.m, m->xi.array));
 
     if (m->tol <= opttol_ && m->cNormS <= nlinfeastol_)
       return true;
@@ -1416,8 +1416,8 @@ namespace casadi {
     calcLagrangeGradient(m, m->lambdaQP, m->gradObj, m->jacNz,
                          m->jacIndRow, m->jacIndCol, trialGradLagrange, 0);
 
-    trialGradNorm = lInfVectorNorm(trialGradLagrange);
-    trialTol = trialGradNorm /(1.0 + lInfVectorNorm(m->lambdaQP));
+    trialGradNorm = casadi_norm_inf(trialGradLagrange.m, trialGradLagrange.array);
+    trialTol = trialGradNorm/(1.0+casadi_norm_inf(m->lambdaQP.m, m->lambdaQP.array));
 
     if (fmax(cNormTrial, trialTol) < kappa_f_ * fmax(m->cNorm, m->tol)) {
       acceptStep(m, 1.0);
@@ -1944,7 +1944,8 @@ namespace casadi {
     }
 
     // B_k+1 = B_k + gmBdelta * gmBdelta^T / h
-    if (fabs(h) < r * l2VectorNorm(delta) * l2VectorNorm(gmBdelta) || fabs(h) < myEps) {
+    if (fabs(h) < r * casadi_norm_2(delta.m, delta.array)
+      *casadi_norm_2(gmBdelta.m, gmBdelta.array) || fabs(h) < myEps) {
       // Skip update if denominator is too small
       m->noUpdateCounter[iBlock]++;
       m->hessSkipped++;
@@ -2298,12 +2299,13 @@ namespace casadi {
       casadi_printf("%-10.2e", m->cNormS);
       casadi_printf("%-10.2e", m->tol);
       casadi_printf("%-10.2e", m->gradNorm);
-      casadi_printf("%-10.2e", lInfVectorNorm(m->deltaXi));
+      casadi_printf("%-10.2e", casadi_norm_inf(m->deltaXi.m, m->deltaXi.array));
       casadi_printf("%-10.2e", m->lambdaStepNorm);
       casadi_printf("%-9.1e", m->alpha);
       casadi_printf("%5i", m->nSOCS);
       casadi_printf("%3i, %3i, %-9.1e", m->hessSkipped, m->hessDamped, m->averageSizingFactor);
-      casadi_printf("%i, %-9.1e", m->qpResolve, l1VectorNorm(m->deltaH)/nblocks_);
+      casadi_printf("%i, %-9.1e", m->qpResolve,
+        casadi_norm_1(m->deltaH.m, m->deltaH.array)/nblocks_);
       casadi_printf("\n");
     }
   }
@@ -2568,41 +2570,6 @@ namespace casadi {
 // Legacy:
 
 namespace blocksqp {
-  double l1VectorNorm(const Matrix &v) {
-    double norm = 0.0;
-
-    if (v.n != 1) {
-        printf("v is not a vector!\n");
-    } else {
-        for (int k=0; k<v.m; k++)
-          norm += fabs(v(k));
-    }
-    return norm;
-  }
-
-  double l2VectorNorm(const Matrix &v) {
-    double norm = 0.0;
-    if (v.n != 1) {
-      printf("v is not a vector!\n");
-    } else {
-      for (int k=0; k<v.m; k++)
-        norm += v(k)* v(k);
-    }
-    return sqrt(norm);
-  }
-
-  double lInfVectorNorm(const Matrix &v) {
-    double norm = 0.0;
-    if (v.n != 1) {
-        printf("v is not a vector!\n");
-    } else {
-      for (int k=0; k<v.m; k++)
-        if (fabs(v(k)) > norm)
-          norm = fabs(v(k));
-    }
-    return norm;
-  }
-
   double lInfConstraintNorm(const Matrix &xi, const Matrix &constr,
                             const Matrix &bu, const Matrix &bl) {
     double norm = 0.0;
