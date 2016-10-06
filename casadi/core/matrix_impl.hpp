@@ -1749,7 +1749,7 @@ namespace casadi {
 
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::norm_1(const Matrix<Scalar>& x) {
-    return dot(fabs(x), Matrix<Scalar>::ones(x.sparsity()));
+    return casadi_norm_1(x.nnz(), x.ptr());
   }
 
   template<typename Scalar>

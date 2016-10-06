@@ -84,13 +84,17 @@ namespace casadi {
   template<typename real_t>
   void CASADI_PREFIX(mv)(const real_t* x, const int* sp_x, const real_t* y, real_t* z, int tr);
 
-  /// NORM_2: ||x||_2 -> return
-  template<typename real_t>
-  real_t CASADI_PREFIX(norm_2)(int n, const real_t* x);
-
   /// TRANS: y <- trans(x)
   template<typename real_t>
   void CASADI_PREFIX(trans)(const real_t* x, const int* sp_x, real_t* y, const int* sp_y, int *tmp);
+
+  /// NORM_1: ||x||_1 -> return
+  template<typename real_t>
+  real_t CASADI_PREFIX(norm_1)(int n, const real_t* x);
+
+  /// NORM_2: ||x||_2 -> return
+  template<typename real_t>
+  real_t CASADI_PREFIX(norm_2)(int n, const real_t* x);
 
   /** Inf-norm of a vector *
       Returns the largest element in absolute value
@@ -387,11 +391,6 @@ namespace casadi {
   }
 
   template<typename real_t>
-  real_t CASADI_PREFIX(norm_2)(int n, const real_t* x) {
-    return sqrt(CASADI_PREFIX(dot)(n, x, x));
-  }
-
-  template<typename real_t>
   void CASADI_PREFIX(trans)(const real_t* x, const int* sp_x, real_t* y, const int* sp_y, int *tmp) {
     int ncol_x = sp_x[1];
     int nnz_x = sp_x[2 + ncol_x];
@@ -406,12 +405,23 @@ namespace casadi {
   }
 
   template<typename real_t>
+  real_t CASADI_PREFIX(norm_1)(int n, const real_t* x) {
+    real_t ret = 0;
+    int i;
+    for (i=0; i<n; ++i) ret += fabs(*x++);
+    return ret;
+  }
+
+  template<typename real_t>
+  real_t CASADI_PREFIX(norm_2)(int n, const real_t* x) {
+    return sqrt(CASADI_PREFIX(dot)(n, x, x));
+  }
+
+  template<typename real_t>
   real_t CASADI_PREFIX(norm_inf)(int n, const real_t* x) {
     real_t ret = 0;
-    int k;
-    for (k=0; k<n; ++k) {
-      ret = fmax(ret, fabs(x[k]));
-    }
+    int i;
+    for (i=0; i<n; ++i) ret = fmax(ret, fabs(*x++));
     return ret;
   }
 
