@@ -1582,14 +1582,17 @@ namespace casadi {
 
     if (option == 1) {
       // Shanno-Phua
-      scale = adotb(gamma, gamma) / fmax(adotb(delta, gamma), myEps);
+      scale = casadi_dot(gamma.m, gamma.array, gamma.array)
+        / fmax(casadi_dot(delta.m, delta.array, gamma.array), myEps);
     } else if (option == 2) {
       // Oren-Luenberger
-      scale = adotb(delta, gamma) / fmax(adotb(delta, delta), myEps);
+      scale = casadi_dot(delta.m, delta.array, gamma.array)
+        / fmax(casadi_dot(delta.m, delta.array, delta.array), myEps);
       scale = fmin(scale, 1.0);
     } else if (option == 3) {
       // Geometric mean of 1 and 2
-      scale = sqrt(adotb(gamma, gamma) / fmax(adotb(delta, delta), myEps));
+      scale = sqrt(casadi_dot(gamma.m, gamma.array, gamma.array)
+        / fmax(casadi_dot(delta.m, delta.array, delta.array), myEps));
     } else {
       // Invalid option, ignore
       return;
@@ -1691,8 +1694,10 @@ namespace casadi {
       // Update sTs, sTs_ and sTy, sTy_
       m->deltaNormOld(iBlock) = m->deltaNorm(iBlock);
       m->deltaGammaOld(iBlock) = m->deltaGamma(iBlock);
-      m->deltaNorm(iBlock) = adotb(smallDelta, smallDelta);
-      m->deltaGamma(iBlock) = adotb(smallDelta, smallGamma);
+      m->deltaNorm(iBlock) = casadi_dot(smallDelta.m, smallDelta.array,
+        smallDelta.array);
+      m->deltaGamma(iBlock) = casadi_dot(smallDelta.m, smallDelta.array,
+        smallGamma.array);
 
       // Sizing before the update
       if (hessScaling < 4 && firstIter)
@@ -1799,8 +1804,8 @@ namespace casadi {
         // Update sTs, sTs_ and sTy, sTy_
         m->deltaNormOld(iBlock) = m->deltaNorm(iBlock);
         m->deltaGammaOld(iBlock) = m->deltaGamma(iBlock);
-        m->deltaNorm(iBlock) = adotb(deltai, deltai);
-        m->deltaGamma(iBlock) = adotb(gammai, deltai);
+        m->deltaNorm(iBlock) = casadi_dot(deltai.m, deltai.array, deltai.array);
+        m->deltaGamma(iBlock) = casadi_dot(gammai.m, gammai.array, deltai.array);
 
         // Save statistics, we want to record them only for the most recent update
         averageSizingFactor = m->averageSizingFactor;
@@ -2562,20 +2567,6 @@ namespace casadi {
 // Legacy:
 
 namespace blocksqp {
-  double adotb(const Matrix &a, const Matrix &b) {
-    double norm = 0.0;
-
-    if (a.n != 1 || b.n != 1) {
-        printf("a or b is not a vector!\n");
-    } else if (a.m != b.m) {
-        printf("a and b must have the same dimension!\n");
-    } else {
-      for (int k=0; k<a.m; k++)
-        norm += a(k) * b(k);
-    }
-    return norm;
-  }
-
   void Atimesb(double *Anz, int *AIndRow, int *AIndCol, const Matrix &b, Matrix &result) {
     int nCol = b.m;
     int nRow = result.m;
