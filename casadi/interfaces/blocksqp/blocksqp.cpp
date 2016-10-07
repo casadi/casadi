@@ -658,7 +658,7 @@ namespace casadi {
     for (it=0; it<maxIt; it++) {
       /// Solve QP subproblem with qpOASES or QPOPT
       updateStepBounds(m, 0);
-      infoQP = solveQP(m, m->deltaXi, m->lambdaQP);
+      infoQP = solveQP(m, m->deltaXi.d, m->lambdaQP.d);
 
       if (infoQP == 1) {
           // 1.) Maximum number of iterations reached
@@ -667,7 +667,7 @@ namespace casadi {
           // 2.) QP error (e.g., unbounded), solve again with pos.def. diagonal matrix (identity)
           casadi_eprintf("***QP error. Solve again with identity matrix.***\n");
           resetHessian(m);
-          infoQP = solveQP(m, m->deltaXi, m->lambdaQP);
+          infoQP = solveQP(m, m->deltaXi.d, m->lambdaQP.d);
           if (infoQP) {
             // If there is still an error, terminate.
             casadi_eprintf("***QP error. Stop.***\n");
@@ -979,12 +979,12 @@ namespace casadi {
 
   void Blocksqp::
   acceptStep(BlocksqpMemory* m, double alpha) const {
-    acceptStep(m, m->deltaXi, m->lambdaQP, alpha, 0);
+    acceptStep(m, m->deltaXi.d, m->lambdaQP.d, alpha, 0);
   }
 
   void Blocksqp::
-  acceptStep(BlocksqpMemory* m, const blocksqp::Matrix &deltaXi,
-    const blocksqp::Matrix &lambdaQP, double alpha, int nSOCS) const {
+  acceptStep(BlocksqpMemory* m, const double* deltaXi,
+    const double* lambdaQP, double alpha, int nSOCS) const {
     int k;
     double lStpNorm;
 
@@ -995,18 +995,18 @@ namespace casadi {
     // Set new xi by accepting the current trial step
     for (k=0; k<m->xi.m; k++) {
       m->xi(k) = m->trialXi(k);
-      m->deltaXi(k) = alpha * deltaXi(k);
+      m->deltaXi(k) = alpha * deltaXi[k];
     }
 
     // Store the infinity norm of the multiplier step
     m->lambdaStepNorm = 0.0;
     for (k=0; k<m->lambda.m; k++)
-      if ((lStpNorm = fabs(alpha*lambdaQP(k) - alpha*m->lambda(k))) > m->lambdaStepNorm)
+      if ((lStpNorm = fabs(alpha*lambdaQP[k] - alpha*m->lambda(k))) > m->lambdaStepNorm)
         m->lambdaStepNorm = lStpNorm;
 
     // Set new multipliers
     for (k=0; k<m->lambda.m; k++)
-      m->lambda(k) = (1.0 - alpha)*m->lambda(k) + alpha*lambdaQP(k);
+      m->lambda(k) = (1.0 - alpha)*m->lambda(k) + alpha*lambdaQP[k];
 
     // Count consecutive reduced steps
     if (m->alpha < 1.0)
@@ -1239,7 +1239,7 @@ namespace casadi {
       // Solve SOC QP to obtain new, corrected deltaXi
       // (store in separate vector to avoid conflict with original deltaXi
       // -> need it in linesearch!)
-      info = solveQP(m, deltaXiSOC, lambdaQPSOC, false);
+      info = solveQP(m, deltaXiSOC.d, lambdaQPSOC.d, false);
       if (info != 0) return false; // Could not solve QP, abort SOC
 
       // Set new SOC trial point
@@ -1278,7 +1278,7 @@ namespace casadi {
           continue;
         } else {
           // found suitable alpha during SOC, stop
-          acceptStep(m, deltaXiSOC, lambdaQPSOC, 1.0, nSOCS);
+          acceptStep(m, deltaXiSOC.d, lambdaQPSOC.d, 1.0, nSOCS);
           return true;
         }
       }
@@ -1288,7 +1288,7 @@ namespace casadi {
         if (cNormTrialSOC < (1.0 - gamma_theta_) * cNorm
         || objTrialSOC < m->obj - gamma_f_ * cNorm) {
           // found suitable alpha during SOC, stop
-          acceptStep(m, deltaXiSOC, lambdaQPSOC, 1.0, nSOCS);
+          acceptStep(m, deltaXiSOC.d, lambdaQPSOC.d, 1.0, nSOCS);
           return true;
         } else {
           // Trial point is dominated by current point, next SOC step
@@ -1978,7 +1978,7 @@ namespace casadi {
    * Solve a sequence of QPs until pos. def. assumption (G3*) is satisfied.
    */
   int Blocksqp::
-  solveQP(BlocksqpMemory* m, blocksqp::Matrix &deltaXi, blocksqp::Matrix &lambdaQP,
+  solveQP(BlocksqpMemory* m, double* deltaXi, double* lambdaQP,
     bool matricesChanged) const {
     blocksqp::Matrix jacT;
     int maxQP, l;
@@ -2115,13 +2115,13 @@ namespace casadi {
      */
 
     // Get solution from qpOASES
-    m->qp->getPrimalSolution(deltaXi.d);
-    m->qp->getDualSolution(lambdaQP.d);
+    m->qp->getPrimalSolution(deltaXi);
+    m->qp->getDualSolution(lambdaQP);
     m->qpObj = m->qp->getObjVal();
 
     // Compute constrJac*deltaXi, need this for second order correction step
     casadi_fill(m->AdeltaXi.d, m->AdeltaXi.m, 0.);
-    casadi_mv(m->jacNz, Asp_, deltaXi.d, m->AdeltaXi.d, 0);
+    casadi_mv(m->jacNz, Asp_, deltaXi, m->AdeltaXi.d, 0);
 
     // Print qpOASES error code, if any
     if (ret != qpOASES::SUCCESSFUL_RETURN && matricesChanged)

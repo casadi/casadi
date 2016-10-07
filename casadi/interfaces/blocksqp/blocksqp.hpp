@@ -278,7 +278,7 @@ namespace casadi {
     void updateStepBounds(BlocksqpMemory* m, bool soc) const;
     // Solve a QP with QPOPT or qpOASES to obtain a step deltaXi and estimates
     // for the Lagrange multipliers
-    int solveQP(BlocksqpMemory* m, blocksqp::Matrix &deltaXi, blocksqp::Matrix &lambdaQP,
+    int solveQP(BlocksqpMemory* m, double* deltaXi, double* lambdaQP,
       bool matricesChanged = true) const;
     // Compute the next Hessian in the inner loop of increasingly convexified
     // QPs and store it in vars->hess2
@@ -290,8 +290,8 @@ namespace casadi {
     /// No globalization strategy
     int fullstep(BlocksqpMemory* m) const;
     /// Set new primal dual iterate
-    void acceptStep(BlocksqpMemory* m, const blocksqp::Matrix &deltaXi,
-      const blocksqp::Matrix &lambdaQP, double alpha, int nSOCS) const;
+    void acceptStep(BlocksqpMemory* m, const double* deltaXi,
+      const double* lambdaQP, double alpha, int nSOCS) const;
     // Overloaded function for convenience, uses current variables of SQPiterate vars
     void acceptStep(BlocksqpMemory* m, double alpha) const;
     // Reduce stepsize if a step is rejected
