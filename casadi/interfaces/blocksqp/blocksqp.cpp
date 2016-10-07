@@ -1529,25 +1529,27 @@ namespace casadi {
     calcInitialHessian(m, iBlock);
   }
 
-  void Blocksqp::sizeInitialHessian(BlocksqpMemory* m, const blocksqp::Matrix &gamma,
-    const blocksqp::Matrix &delta, int iBlock, int option) const {
+  void Blocksqp::
+  sizeInitialHessian(BlocksqpMemory* m, const double* gamma,
+                     const double* delta, int iBlock, int option) const {
+    int nVarLocal = m->hess[iBlock].m;
     int i, j;
     double scale;
     double myEps = 1.0e3 * eps_;
 
     if (option == 1) {
       // Shanno-Phua
-      scale = casadi_dot(gamma.m, gamma.d, gamma.d)
-        / fmax(casadi_dot(delta.m, delta.d, gamma.d), myEps);
+      scale = casadi_dot(nVarLocal, gamma, gamma)
+        / fmax(casadi_dot(nVarLocal, delta, gamma), myEps);
     } else if (option == 2) {
       // Oren-Luenberger
-      scale = casadi_dot(delta.m, delta.d, gamma.d)
-        / fmax(casadi_dot(delta.m, delta.d, delta.d), myEps);
+      scale = casadi_dot(nVarLocal, delta, gamma)
+        / fmax(casadi_dot(nVarLocal, delta, delta), myEps);
       scale = fmin(scale, 1.0);
     } else if (option == 3) {
       // Geometric mean of 1 and 2
-      scale = sqrt(casadi_dot(gamma.m, gamma.d, gamma.d)
-        / fmax(casadi_dot(delta.m, delta.d, delta.d), myEps));
+      scale = sqrt(casadi_dot(nVarLocal, gamma, gamma)
+        / fmax(casadi_dot(nVarLocal, delta, delta), myEps));
     } else {
       // Invalid option, ignore
       return;
@@ -1555,8 +1557,8 @@ namespace casadi {
 
     if (scale > 0.0) {
       scale = fmax(scale, myEps);
-      for (i=0; i<m->hess[iBlock].m; i++)
-        for (j=i; j<m->hess[iBlock].m; j++)
+      for (i=0; i<nVarLocal; i++)
+        for (j=i; j<nVarLocal; j++)
           m->hess[iBlock](i, j) *= scale;
     } else {
       scale = 1.0;
@@ -1656,7 +1658,7 @@ namespace casadi {
 
       // Sizing before the update
       if (hessScaling < 4 && firstIter)
-        sizeInitialHessian(m, smallGamma, smallDelta, iBlock, hessScaling);
+        sizeInitialHessian(m, smallGamma.d, smallDelta.d, iBlock, hessScaling);
       else if (hessScaling == 4)
         sizeHessianCOL(m, smallGamma, smallDelta, iBlock);
 
@@ -1669,7 +1671,7 @@ namespace casadi {
 
         // Sizing the fallback update
         if (fallback_scaling_ < 4 && firstIter)
-          sizeInitialHessian(m, smallGamma, smallDelta, iBlock, fallback_scaling_);
+          sizeInitialHessian(m, smallGamma.d, smallDelta.d, iBlock, fallback_scaling_);
         else if (fallback_scaling_ == 4)
           sizeHessianCOL(m, smallGamma, smallDelta, iBlock);
 
@@ -1747,7 +1749,7 @@ namespace casadi {
       // Size the initial update, but with the most recent delta/gamma-pair
       gammai.Submatrix(smallGamma, nVarLocal, 1, 0, posNewest);
       deltai.Submatrix(smallDelta, nVarLocal, 1, 0, posNewest);
-      sizeInitialHessian(m, gammai, deltai, iBlock, hessScaling);
+      sizeInitialHessian(m, gammai.d, deltai.d, iBlock, hessScaling);
 
       for (i=0; i<m2; i++) {
         pos = (posOldest+i) % m2;

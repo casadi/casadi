@@ -344,12 +344,9 @@ namespace casadi {
     /*
      * Scaling of Hessian Approximation
      */
-    // [blockwise] Update scalars for COL sizing of Hessian approximation
-    void updateScalars(BlocksqpMemory* m, const blocksqp::Matrix &gamma,
-      const blocksqp::Matrix &delta, int iBlock) const;
     // [blockwise] Size Hessian using SP, OL, or mean sizing factor
-    void sizeInitialHessian(BlocksqpMemory* m, const blocksqp::Matrix &gamma,
-      const blocksqp::Matrix &delta, int iBlock, int option) const;
+    void sizeInitialHessian(BlocksqpMemory* m, const double* gamma,
+      const double* delta, int iBlock, int option) const;
     // [blockwise] Size Hessian using the COL scaling factor
     void sizeHessianCOL(BlocksqpMemory* m, const blocksqp::Matrix &gamma,
       const blocksqp::Matrix &delta, int iBlock) const;
