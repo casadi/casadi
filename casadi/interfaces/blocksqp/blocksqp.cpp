@@ -568,7 +568,6 @@ namespace casadi {
 
     allocMin(m);
 
-    m->constrJac.Dimension(ng_, nx_).Initialize(0.0);
     m->hessNz = new double[nx_ * nx_];
 
     m->jacNz = 0;
@@ -1251,7 +1250,7 @@ namespace casadi {
     blocksqp::Matrix deltaXiSOC, lambdaQPSOC;
 
     // m->gk contains result at first trial point: c(xi+deltaXi)
-    // m->constrJac, m->jac_times_dxk and m->grad_fk are unchanged so far.
+    // m->jac_times_dxk and m->grad_fk are unchanged so far.
 
     // First SOC step
     deltaXiSOC.Dimension(m->deltaXi.m).Initialize(0.0);

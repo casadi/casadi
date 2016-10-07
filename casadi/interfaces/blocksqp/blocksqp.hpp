@@ -150,7 +150,6 @@ namespace casadi {
     double *lam_xk, *lam_gk; // dual variables
     double *gk;  // constraint vector
 
-    blocksqp::Matrix constrJac;  // full constraint Jacobian (not used in sparse mode)
     double *jacNz;  // nonzero elements of Jacobian (length)
     int *jacIndRow;  // row indices (length)
     int *jacIndCol;  // indices to first entry of columns (nCols+1)
