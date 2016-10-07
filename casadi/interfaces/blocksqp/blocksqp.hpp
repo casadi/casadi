@@ -257,6 +257,8 @@ namespace casadi {
     // Jacobian/Hessian sparsity
     Sparsity Asp_, Hsp_;
 
+    /// Main Loop of SQP method
+    int run(BlocksqpMemory* m, int maxIt, int warmStart = 0) const;
     /// Compute gradient of Lagrangian function (sparse version)
     void calcLagrangeGradient(BlocksqpMemory* m, const double* lambda,
       const double* gradObj, double *jacNz, int *jacIndRow, int *jacIndCol,
@@ -264,11 +266,6 @@ namespace casadi {
 
     /// Overloaded function for convenience, uses current variables of SQPiterate vars
     void calcLagrangeGradient(BlocksqpMemory* m, double* gradLagrange, int flag) const;
-
-    // TO BE REFACTORED
-
-    /// Main Loop of SQP method
-    int run(BlocksqpMemory* m, int maxIt, int warmStart = 0) const;
     /// Print information about the SQP method
     void printInfo(BlocksqpMemory* m) const;
     /// Update optimization tolerance (similar to SNOPT) in current iterate
@@ -387,20 +384,20 @@ namespace casadi {
                     int *&jacIndCol) const;
 
     /// Evaluate objective and constraints, including derivatives
-    int evaluate(BlocksqpMemory* m, const blocksqp::Matrix &xi,
-                  const blocksqp::Matrix &lambda,
+    int evaluate(BlocksqpMemory* m, const double *xi,
+                  const double *lambda,
                   double *objval,
-                  blocksqp::Matrix &constr,
-                  blocksqp::Matrix &gradObj,
+                  double *constr,
+                  double *gradObj,
                   double *&jacNz,
                   int *&jacIndRow,
                   int *&jacIndCol,
                   blocksqp::SymMatrix *&hess) const;
 
     /// Evaluate objective and constraints, no derivatives
-    int evaluate(BlocksqpMemory* m, const blocksqp::Matrix &xi,
+    int evaluate(BlocksqpMemory* m, const double *xi,
                   double *objval,
-                  blocksqp::Matrix &constr) const;
+                  double *constr) const;
 
     void reduceConstrVio(BlocksqpMemory* m, blocksqp::Matrix &xi, int *info) const {
       *info = 1;

@@ -633,8 +633,8 @@ namespace casadi {
       calcInitialHessian(m);
 
       /// Evaluate all functions and gradients for xi_0
-      infoEval = evaluate(m, m->xi, m->lambda, &m->obj,
-                          m->constr, m->gradObj,
+      infoEval = evaluate(m, m->xi.d, m->lambda.d, &m->obj,
+                          m->constr.d, m->gradObj.d,
                           m->jacNz, m->jacIndRow, m->jacIndCol,
                           m->hess);
       m->nDerCalls++;
@@ -782,8 +782,8 @@ namespace casadi {
       calcLagrangeGradient(m, m->gamma.d, 0);
 
       /// Evaluate functions and gradients at the new xi
-      infoEval = evaluate(m, m->xi, m->lambda, &m->obj, m->constr,
-                          m->gradObj, m->jacNz, m->jacIndRow,
+      infoEval = evaluate(m, m->xi.d, m->lambda.d, &m->obj, m->constr.d,
+                          m->gradObj.d, m->jacNz, m->jacIndRow,
                           m->jacIndCol, m->hess);
       m->nDerCalls++;
 
@@ -1062,7 +1062,7 @@ namespace casadi {
         m->trialXi(i) = m->xi(i) + alpha * m->deltaXi(i);
 
       // Compute problem functions at trial point
-      info = evaluate(m, m->trialXi, &objTrial, m->constr);
+      info = evaluate(m, m->trialXi.d, &objTrial, m->constr.d);
       m->nFunCalls++;
       cNormTrial = lInfConstraintNorm(m->trialXi.d, m->constr.d,
         m->bu.d, m->bl.d);
@@ -1112,7 +1112,7 @@ namespace casadi {
         dfTdeltaXi += m->gradObj(i) * m->deltaXi(i);
 
       // Compute objective and at ||constr(trialXi)||_1 at trial point
-      info = evaluate(m, m->trialXi, &objTrial, m->constr);
+      info = evaluate(m, m->trialXi.d, &objTrial, m->constr.d);
       m->nFunCalls++;
       cNormTrial = lInfConstraintNorm(m->trialXi.d, m->constr.d,
         m->bu.d, m->bl.d);
@@ -1248,7 +1248,7 @@ namespace casadi {
       }
 
       // Compute objective and ||constr(trialXiSOC)||_1 at SOC trial point
-      info = evaluate(m, m->trialXi, &objTrialSOC, m->constr);
+      info = evaluate(m, m->trialXi.d, &objTrialSOC, m->constr.d);
       m->nFunCalls++;
       cNormTrialSOC = lInfConstraintNorm(m->trialXi.d, m->constr.d,
         m->bu.d, m->bl.d);
@@ -1346,7 +1346,7 @@ namespace casadi {
     }
 
     // Compute objective and constraints at the new (hopefully feasible) point
-    info = evaluate(m, m->trialXi, &m->obj, m->constr);
+    info = evaluate(m, m->trialXi.d, &m->obj, m->constr.d);
     m->nFunCalls++;
     cNormTrial = lInfConstraintNorm(m->trialXi.d, m->constr.d,
       m->bu.d, m->bl.d);
@@ -1402,7 +1402,7 @@ namespace casadi {
 
     // Compute objective and ||constr(trialXi)|| at trial point
     trialConstr.Dimension(ng_).Initialize(0.0);
-    info = evaluate(m, m->trialXi, &objTrial, trialConstr);
+    info = evaluate(m, m->trialXi.d, &objTrial, trialConstr.d);
     m->nFunCalls++;
     cNormTrial = lInfConstraintNorm(m->trialXi.d, trialConstr.d,
       m->bu.d, m->bl.d);
@@ -2533,29 +2533,29 @@ namespace casadi {
   }
 
   int Blocksqp::
-  evaluate(BlocksqpMemory* m, const blocksqp::Matrix &xi,
-           const blocksqp::Matrix &lambda,
-           double *objval, blocksqp::Matrix &constr,
-           blocksqp::Matrix &gradObj, double *&jacNz, int *&jacIndRow,
+  evaluate(BlocksqpMemory* m, const double *xi,
+           const double *lambda,
+           double *objval, double *constr,
+           double *gradObj, double *&jacNz, int *&jacIndRow,
            int *&jacIndCol,
            blocksqp::SymMatrix *&hess) const {
-    m->arg[0] = xi.d; // x
+    m->arg[0] = xi; // x
     m->arg[1] = m->p; // p
     m->res[0] = objval; // f
-    m->res[1] = constr.d; // g
-    m->res[2] = gradObj.d; // grad:f:x
+    m->res[1] = constr; // g
+    m->res[2] = gradObj; // grad:f:x
     m->res[3] = jacNz; // jac:g:x
     calc_function(m, "nlp_gf_jg");
     return 0;
   }
 
   int Blocksqp::
-  evaluate(BlocksqpMemory* m, const blocksqp::Matrix &xi, double *objval,
-           blocksqp::Matrix &constr) const {
-    m->arg[0] = xi.d; // x
+  evaluate(BlocksqpMemory* m, const double *xi, double *objval,
+           double *constr) const {
+    m->arg[0] = xi; // x
     m->arg[1] = m->p; // p
     m->res[0] = objval; // f
-    m->res[1] = constr.d; // g
+    m->res[1] = constr; // g
     calc_function(m, "nlp_fg");
     return 0;
   }
