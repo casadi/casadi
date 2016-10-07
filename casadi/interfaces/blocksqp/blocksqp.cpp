@@ -881,7 +881,8 @@ namespace casadi {
     m->tol = m->gradNorm /(1.0 + casadi_norm_inf(m->lambda.m, m->lambda.array));
 
     // norm of constraint violation
-    m->cNorm  = lInfConstraintNorm(m->xi, m->constr, m->bu, m->bl);
+    m->cNorm  = lInfConstraintNorm(m->xi.array, m->constr.array,
+      m->bu.array, m->bl.array);
     m->cNormS = m->cNorm /(1.0 + casadi_norm_inf(m->xi.m, m->xi.array));
 
     if (m->tol <= opttol_ && m->cNormS <= nlinfeastol_)
@@ -1066,7 +1067,8 @@ namespace casadi {
       // Compute problem functions at trial point
       info = evaluate(m, m->trialXi, &objTrial, m->constr);
       m->nFunCalls++;
-      cNormTrial = lInfConstraintNorm(m->trialXi, m->constr, m->bu, m->bl);
+      cNormTrial = lInfConstraintNorm(m->trialXi.array, m->constr.array,
+        m->bu.array, m->bl.array);
       // Reduce step if evaluation fails, if lower bound is violated
       // or if objective or a constraint is NaN
       if (info != 0 || objTrial < obj_lo_ || objTrial > obj_up_
@@ -1098,7 +1100,8 @@ namespace casadi {
     int nVar = nx_;
 
     // Compute ||constr(xi)|| at old point
-    cNorm = lInfConstraintNorm(m->xi, m->constr, m->bu, m->bl);
+    cNorm = lInfConstraintNorm(m->xi.array, m->constr.array,
+      m->bu.array, m->bl.array);
 
     // Backtracking line search
     for (k=0; k<max_line_search_; k++) {
@@ -1114,7 +1117,8 @@ namespace casadi {
       // Compute objective and at ||constr(trialXi)||_1 at trial point
       info = evaluate(m, m->trialXi, &objTrial, m->constr);
       m->nFunCalls++;
-      cNormTrial = lInfConstraintNorm(m->trialXi, m->constr, m->bu, m->bl);
+      cNormTrial = lInfConstraintNorm(m->trialXi.array, m->constr.array,
+        m->bu.array, m->bl.array);
       // Reduce step if evaluation fails, if lower bound is violated or if objective is NaN
       if (info != 0 || objTrial < obj_lo_ || objTrial > obj_up_
         || !(objTrial == objTrial) || !(cNormTrial == cNormTrial)) {
@@ -1249,8 +1253,8 @@ namespace casadi {
       // Compute objective and ||constr(trialXiSOC)||_1 at SOC trial point
       info = evaluate(m, m->trialXi, &objTrialSOC, m->constr);
       m->nFunCalls++;
-      cNormTrialSOC = lInfConstraintNorm(m->trialXi, m->constr,
-        m->bu, m->bl);
+      cNormTrialSOC = lInfConstraintNorm(m->trialXi.array, m->constr.array,
+        m->bu.array, m->bl.array);
       if (info != 0 || objTrialSOC < obj_lo_ || objTrialSOC > obj_up_
         || !(objTrialSOC == objTrialSOC) || !(cNormTrialSOC == cNormTrialSOC)) {
         return false; // evaluation error, abort SOC
@@ -1347,7 +1351,8 @@ namespace casadi {
     // Compute objective and constraints at the new (hopefully feasible) point
     info = evaluate(m, m->trialXi, &m->obj, m->constr);
     m->nFunCalls++;
-    cNormTrial = lInfConstraintNorm(m->trialXi, m->constr, m->bu, m->bl);
+    cNormTrial = lInfConstraintNorm(m->trialXi.array, m->constr.array,
+      m->bu.array, m->bl.array);
     if (info != 0 || m->obj < obj_lo_ || m->obj > obj_up_
       || !(m->obj == m->obj) || !(cNormTrial == cNormTrial))
       return -1;
@@ -1402,7 +1407,8 @@ namespace casadi {
     trialConstr.Dimension(ng_).Initialize(0.0);
     info = evaluate(m, m->trialXi, &objTrial, trialConstr);
     m->nFunCalls++;
-    cNormTrial = lInfConstraintNorm(m->trialXi, trialConstr, m->bu, m->bl);
+    cNormTrial = lInfConstraintNorm(m->trialXi.array, trialConstr.array,
+      m->bu.array, m->bl.array);
     if (info != 0 || objTrial < obj_lo_ || objTrial > obj_up_
       || !(objTrial == objTrial) || !(cNormTrial == cNormTrial)) {
       // evaluation error
@@ -2565,19 +2571,18 @@ namespace casadi {
     if (qpoases_mem) delete qpoases_mem;
   }
 
+  double Blocksqp::
+  lInfConstraintNorm(const double* xi, const double* g,
+                     const double* bu, const double* bl) const {
+    return fmax(casadi_max_viol(nx_, xi, bl, bu),
+                casadi_max_viol(ng_, g, bl+nx_, bu+nx_));
+  }
+
 } // namespace casadi
 
 // Legacy:
 
 namespace blocksqp {
-  double lInfConstraintNorm(const Matrix &xi, const Matrix &constr,
-                            const Matrix &bu, const Matrix &bl) {
-    int nVar = xi.m;
-    int nCon = constr.m;
-    return fmax(casadi::casadi_max_viol(nVar, xi.array, bl.array, bu.array),
-                casadi::casadi_max_viol(nCon, constr.array,
-                  bl.array+nVar, bu.array+nVar));
-  }
 
   void Error(const char *F) {
     printf("Error: %s\n", F);
