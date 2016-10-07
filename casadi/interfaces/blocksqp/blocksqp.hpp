@@ -146,8 +146,8 @@ namespace casadi {
     double lambdaStepNorm;  // norm of step in dual variables
     double tol;  // current optimality tolerance
 
-    double* xk;// variable vector
-    blocksqp::Matrix lambda;  // dual variables
+    double *xk;// variable vector
+    double *lam_xk, *lam_gk; // dual variables
     blocksqp::Matrix constr;  // constraint vector
 
     blocksqp::Matrix constrJac;  // full constraint Jacobian (not used in sparse mode)
@@ -257,7 +257,8 @@ namespace casadi {
     /// Main Loop of SQP method
     int run(BlocksqpMemory* m, int maxIt, int warmStart = 0) const;
     /// Compute gradient of Lagrangian function (sparse version)
-    void calcLagrangeGradient(BlocksqpMemory* m, const double* lambda,
+    void calcLagrangeGradient(BlocksqpMemory* m,
+      const double* lam_x, const double* lam_g,
       const double* gradObj, double *jacNz, int *jacIndRow, int *jacIndCol,
       double *gradLagrange, int flag) const;
 
@@ -371,15 +372,13 @@ namespace casadi {
 
     // Set initial values for xk (and possibly lambda) and parts of the
     // Jacobian that correspond to linear constraints (sparse version).
-    void initialize(BlocksqpMemory* m, double* xk,
-                    double* lambda,
+    void initialize(BlocksqpMemory* m,
                     double *&jacNz,
                     int *&jacIndRow,
                     int *&jacIndCol) const;
 
     /// Evaluate objective and constraints, including derivatives
-    int evaluate(BlocksqpMemory* m, const double *xk,
-                  const double *lambda,
+    int evaluate(BlocksqpMemory* m,
                   double *objval,
                   double *constr,
                   double *gradObj,
