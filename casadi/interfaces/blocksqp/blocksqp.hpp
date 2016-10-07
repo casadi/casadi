@@ -175,7 +175,7 @@ namespace casadi {
      */
     double *lbx_qp, *ubx_qp, *lba_qp, *uba_qp;  // bounds for current step
     double* lam_qp;  // dual variables of QP
-    blocksqp::Matrix AdeltaXi;  // product of constraint Jacobian with deltaXi
+    double* jac_times_dxk;  // product of constraint Jacobian with dxk
 
     /*
      * For modified BFGS updates

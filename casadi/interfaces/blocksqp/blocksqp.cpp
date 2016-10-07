@@ -485,6 +485,7 @@ namespace casadi {
     alloc_w(nx_, true); // ubx_qp
     alloc_w(ng_, true); // lba_qp
     alloc_w(ng_, true); // uba_qp
+    alloc_w(ng_, true); // jac_times_dxk
   }
 
   void Blocksqp::init_memory(void* mem) const {
@@ -523,6 +524,7 @@ namespace casadi {
     m->ubx_qp = w; w += nx_;
     m->lba_qp = w; w += ng_;
     m->uba_qp = w; w += ng_;
+    m->jac_times_dxk = w; w += ng_;
   }
 
   void Blocksqp::solve(void* mem) const {
@@ -1249,7 +1251,7 @@ namespace casadi {
     blocksqp::Matrix deltaXiSOC, lambdaQPSOC;
 
     // m->gk contains result at first trial point: c(xi+deltaXi)
-    // m->constrJac, m->AdeltaXi and m->grad_fk are unchanged so far.
+    // m->constrJac, m->jac_times_dxk and m->grad_fk are unchanged so far.
 
     // First SOC step
     deltaXiSOC.Dimension(m->deltaXi.m).Initialize(0.0);
@@ -2150,8 +2152,8 @@ namespace casadi {
     m->qpObj = m->qp->getObjVal();
 
     // Compute constrJac*deltaXi, need this for second order correction step
-    casadi_fill(m->AdeltaXi.d, m->AdeltaXi.m, 0.);
-    casadi_mv(m->jacNz, Asp_, deltaXi, m->AdeltaXi.d, 0);
+    casadi_fill(m->jac_times_dxk, ng_, 0.);
+    casadi_mv(m->jacNz, Asp_, deltaXi, m->jac_times_dxk, 0);
 
     // Print qpOASES error code, if any
     if (ret != qpOASES::SUCCESSFUL_RETURN && matricesChanged)
@@ -2230,7 +2232,7 @@ namespace casadi {
       double lbg = m->lbg ? m->lbg[i] : 0;
       if (lbg != inf) {
         m->lba_qp[i] = lbg - m->gk[i];
-        if (soc) m->lba_qp[i] += m->AdeltaXi(i);
+        if (soc) m->lba_qp[i] += m->jac_times_dxk[i];
       } else {
         m->lba_qp[i] = inf;
       }
@@ -2238,7 +2240,7 @@ namespace casadi {
       double ubg = m->ubg ? m->ubg[i] : 0;
       if (ubg != inf) {
         m->uba_qp[i] = ubg - m->gk[i];
-        if (soc) m->uba_qp[i] += m->AdeltaXi(i);
+        if (soc) m->uba_qp[i] += m->jac_times_dxk[i];
       } else {
         m->uba_qp[i] = inf;
       }
@@ -2461,7 +2463,7 @@ namespace casadi {
     casadi_fill(m->uba_qp, ng_, 0.);
 
     // product of constraint Jacobian with step (deltaXi)
-    m->AdeltaXi.Dimension(nCon).Initialize(0.0);
+    casadi_fill(m->jac_times_dxk, ng_, 0.);
 
     // dual variables of QP (simple bounds and general constraints)
     casadi_fill(m->lam_qp, nx_+ng_, 0.);
