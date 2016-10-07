@@ -1679,12 +1679,12 @@ namespace casadi {
 
         // Compute fallback update
         if (fallback_update_ == 2)
-          calcBFGS(m, smallGamma, smallDelta, iBlock);
+          calcBFGS(m, smallGamma.d, smallDelta.d, iBlock);
 
         // Reset pointer
         m->hess = m->hess1;
       } else if (updateType == 2) {
-        calcBFGS(m, smallGamma, smallDelta, iBlock);
+        calcBFGS(m, smallGamma.d, smallDelta.d, iBlock);
       }
 
       // If an update is skipped to often, reset Hessian block
@@ -1778,7 +1778,7 @@ namespace casadi {
         if (updateType == 1) {
           calcSR1(m, gammai, deltai, iBlock);
         } else if (updateType == 2) {
-          calcBFGS(m, gammai, deltai, iBlock);
+          calcBFGS(m, gammai.d, deltai.d, iBlock);
         }
 
         m->nTotalUpdates++;
@@ -1803,9 +1803,9 @@ namespace casadi {
 
 
   void Blocksqp::
-  calcBFGS(BlocksqpMemory* m, const blocksqp::Matrix &gamma,
-    const blocksqp::Matrix &delta, int iBlock) const {
-    int i, j, k, dim = gamma.m;
+  calcBFGS(BlocksqpMemory* m, const double* gamma,
+    const double* delta, int iBlock) const {
+    int i, j, k, dim = m->hess[iBlock].m;
     blocksqp::Matrix Bdelta;
     blocksqp::SymMatrix *B;
     double h1 = 0.0;
@@ -1818,7 +1818,7 @@ namespace casadi {
      * This may be important in a limited memory context:
      * When information is "forgotten", B_i-1 is different and the
      *  original gamma might lead to an undamped update with the new B_i-1! */
-    blocksqp::Matrix gamma2 = gamma;
+    std::vector<double> gamma2(gamma, gamma+dim);
 
     B = &m->hess[iBlock];
 
@@ -1828,10 +1828,10 @@ namespace casadi {
     Bdelta.Dimension(dim).Initialize(0.0);
     for (i=0; i<dim; i++) {
         for (k=0; k<dim; k++)
-          Bdelta(i) += (*B)(i, k) * delta(k);
+          Bdelta(i) += (*B)(i, k) * delta[k];
 
-        h1 += delta(i) * Bdelta(i);
-        //h2 += delta(i) * gamma(i);
+        h1 += delta[i] * Bdelta(i);
+        //h2 += delta[i] * gamma[i];
       }
     h2 = m->deltaGamma(iBlock);
 
@@ -1847,8 +1847,8 @@ namespace casadi {
         // Redefine gamma and h2 = delta^T * gamma
         h2 = 0.0;
         for (i=0; i<dim; i++) {
-          gamma2(i) = thetaPowell*gamma2(i) + (1.0 - thetaPowell)*Bdelta(i);
-          h2 += delta(i) * gamma2(i);
+          gamma2[i] = thetaPowell*gamma2[i] + (1.0 - thetaPowell)*Bdelta(i);
+          h2 += delta[i] * gamma2[i];
         }
 
         // Also redefine deltaGamma for computation of sizing factor in the next iteration
@@ -1872,7 +1872,7 @@ namespace casadi {
       for (i=0; i<dim; i++)
         for (j=i; j<dim; j++)
           (*B)(i, j) = (*B)(i, j) - Bdelta(i) * Bdelta(j) / h1
-            + gamma2(i) * gamma2(j) / h2;
+            + gamma2[i] * gamma2[j] / h2;
 
       m->noUpdateCounter[iBlock] = 0;
     }

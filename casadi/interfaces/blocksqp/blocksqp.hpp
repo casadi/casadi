@@ -336,7 +336,7 @@ namespace casadi {
     void calcSR1(BlocksqpMemory* m, const blocksqp::Matrix &gamma, const blocksqp::Matrix &delta,
       int iBlock) const;
     // [blockwise] Compute new approximation for Hessian by BFGS update with Powell modification
-    void calcBFGS(BlocksqpMemory* m, const blocksqp::Matrix &gamma, const blocksqp::Matrix &delta,
+    void calcBFGS(BlocksqpMemory* m, const double* gamma, const double* delta,
       int iBlock) const;
     // Set pointer to correct step and Lagrange gradient difference in a limited memory context
     void updateDeltaGamma(BlocksqpMemory* m) const;
