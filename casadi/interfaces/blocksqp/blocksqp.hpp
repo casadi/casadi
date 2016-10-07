@@ -146,7 +146,7 @@ namespace casadi {
     double lambdaStepNorm;  // norm of step in dual variables
     double tol;  // current optimality tolerance
 
-    blocksqp::Matrix xi;// variable vector
+    double* xi;// variable vector
     blocksqp::Matrix lambda;  // dual variables
     blocksqp::Matrix constr;  // constraint vector
 
