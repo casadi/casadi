@@ -333,7 +333,7 @@ namespace casadi {
     // Compute limited memory Hessian approximations based on update formulas
     void calcHessianUpdateLimitedMemory(BlocksqpMemory* m, int updateType, int hessScaling) const;
     // [blockwise] Compute new approximation for Hessian by SR1 update
-    void calcSR1(BlocksqpMemory* m, const blocksqp::Matrix &gamma, const blocksqp::Matrix &delta,
+    void calcSR1(BlocksqpMemory* m, const double* gamma, const double* delta,
       int iBlock) const;
     // [blockwise] Compute new approximation for Hessian by BFGS update with Powell modification
     void calcBFGS(BlocksqpMemory* m, const double* gamma, const double* delta,

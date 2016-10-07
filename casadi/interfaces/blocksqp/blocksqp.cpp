@@ -1666,7 +1666,7 @@ namespace casadi {
 
       // Compute the new update
       if (updateType == 1) {
-        calcSR1(m, smallGamma, smallDelta, iBlock);
+        calcSR1(m, smallGamma.d, smallDelta.d, iBlock);
 
         // Prepare to compute fallback update as well
         m->hess = m->hess2;
@@ -1776,7 +1776,7 @@ namespace casadi {
 
         // Compute the new update
         if (updateType == 1) {
-          calcSR1(m, gammai, deltai, iBlock);
+          calcSR1(m, gammai.d, deltai.d, iBlock);
         } else if (updateType == 2) {
           calcBFGS(m, gammai.d, deltai.d, iBlock);
         }
@@ -1880,9 +1880,9 @@ namespace casadi {
 
 
   void Blocksqp::
-  calcSR1(BlocksqpMemory* m, const blocksqp::Matrix &gamma, const blocksqp::Matrix &delta,
+  calcSR1(BlocksqpMemory* m, const double* gamma, const double* delta,
     int iBlock) const {
-    int i, j, k, dim = gamma.m;
+    int i, j, k, dim = m->hess[iBlock].m;
     blocksqp::Matrix gmBdelta;
     blocksqp::SymMatrix *B;
     double myEps = 1.0e2 * eps_;
@@ -1895,15 +1895,15 @@ namespace casadi {
     // h = (gamma - B*delta)^T * delta
     gmBdelta.Dimension(dim);
     for (i=0; i<dim; i++) {
-      gmBdelta(i) = gamma(i);
+      gmBdelta(i) = gamma[i];
       for (k=0; k<dim; k++)
-        gmBdelta(i) -= ((*B)(i, k) * delta(k));
+        gmBdelta(i) -= ((*B)(i, k) * delta[k]);
 
-      h += (gmBdelta(i) * delta(i));
+      h += (gmBdelta(i) * delta[i]);
     }
 
     // B_k+1 = B_k + gmBdelta * gmBdelta^T / h
-    if (fabs(h) < r * casadi_norm_2(delta.m, delta.d)
+    if (fabs(h) < r * casadi_norm_2(dim, delta)
       *casadi_norm_2(gmBdelta.m, gmBdelta.d) || fabs(h) < myEps) {
       // Skip update if denominator is too small
       m->noUpdateCounter[iBlock]++;
