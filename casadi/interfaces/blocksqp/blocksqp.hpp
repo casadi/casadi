@@ -399,10 +399,6 @@ namespace casadi {
                   double *objval,
                   double *constr) const;
 
-    void reduceConstrVio(BlocksqpMemory* m, blocksqp::Matrix &xi, int *info) const {
-      *info = 1;
-    }
-
     //  Declaration of general purpose routines for matrix and vector computations
     double lInfConstraintNorm(const double* xi, const double* g,
       const double* bu, const double* bl) const;

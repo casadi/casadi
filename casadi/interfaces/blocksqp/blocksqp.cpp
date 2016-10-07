@@ -1329,62 +1329,14 @@ namespace casadi {
   int Blocksqp::feasibilityRestorationHeuristic(BlocksqpMemory* m) const {
     m->nRestHeurCalls++;
 
-    int info, k;
-    double cNormTrial;
-
-    info = 0;
-
     // Call problem specific heuristic to reduce constraint violation.
     // For shooting methods that means setting consistent values for
     // shooting nodes by one forward integration.
-    for (k=0; k<nx_; k++) // input: last successful step
+    for (int k=0; k<nx_; k++) // input: last successful step
       m->trialXi(k) = m->xi(k);
-    reduceConstrVio(m, m->trialXi, &info);
-    if (info) {
-      // If an error occured in restoration heuristics, abort
-      return -1;
-    }
 
-    // Compute objective and constraints at the new (hopefully feasible) point
-    info = evaluate(m, m->trialXi.d, &m->obj, m->constr.d);
-    m->nFunCalls++;
-    cNormTrial = lInfConstraintNorm(m->trialXi.d, m->constr.d,
-      m->bu.d, m->bl.d);
-    if (info != 0 || m->obj < obj_lo_ || m->obj > obj_up_
-      || !(m->obj == m->obj) || !(cNormTrial == cNormTrial))
-      return -1;
-
-    // Is the new point acceptable for the filter?
-    if (pairInFilter(m, cNormTrial, m->obj)) {
-      // point is in the taboo region, restoration heuristic not successful!
-      return -1;
-    }
-
-    // If no error occured in the integration all shooting variables now
-    // have the values obtained by a single shooting integration.
-    // This is done instead of a Newton-like step in the current SQP iteration
-
-    m->alpha = 1.0;
-    m->nSOCS = 0;
-
-    // reset reduced step counter
-    m->reducedStepCount = 0;
-
-    // Reset lambda
-    m->lambda.Initialize(0.0);
-    m->lambdaQP.Initialize(0.0);
-
-    // Compute the "step" taken by closing the continuity conditions
-    /// \note deltaXi is reset by resetHessian(), so this doesn't matter
-    for (k=0; k<nx_; k++) {
-      //m->deltaXi(k) = m->trialXi(k) - m->xi(k);
-      m->xi(k) = m->trialXi(k);
-    }
-
-    // reduce Hessian and limited memory information
-    resetHessian(m);
-
-    return 0;
+    // FIXME(@jaeandersson) Not implemented
+    return -1;
   }
 
 
