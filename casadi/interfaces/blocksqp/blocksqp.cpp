@@ -2631,21 +2631,12 @@ namespace blocksqp {
     return this->d[i];
   }
 
-  Matrix::Matrix(int M, int N, int LDIM) {
-    m = M;
-    n = N;
-    ldim = LDIM;
+  Matrix::Matrix() {
+    m = 0;
+    n = 0;
+    ldim = 0;
     tflag = 0;
     malloc();
-  }
-
-  Matrix::Matrix(int M, int N, double *ARRAY, int LDIM) {
-    m = M;
-    n = N;
-    this->d = ARRAY;
-    ldim = LDIM;
-    tflag = 0;
-    if (ldim < m) ldim = m;
   }
 
   Matrix::Matrix(const Matrix &A) {
@@ -2699,13 +2690,6 @@ namespace blocksqp {
         malloc();
       }
     }
-    return *this;
-  }
-
-  Matrix &Matrix::Initialize(double (*f)(int, int)) {
-    for (int i = 0; i < m; i++)
-      for (int j = 0; j < n; j++)
-        (*this)(i, j) = f(i, j);
     return *this;
   }
 
@@ -2801,13 +2785,6 @@ namespace blocksqp {
     n = M;
     ldim = M;
     malloc();
-    return *this;
-  }
-
-  SymMatrix &SymMatrix::Initialize(double (*f)(int, int)) {
-    for (int j=0; j<m; j++)
-      for (int i=j; i<n ; i++)
-        (*this)(i, j) = f(i, j);
     return *this;
   }
 

@@ -48,8 +48,7 @@ namespace blocksqp {
     int malloc();
     int free();
   public:
-    Matrix(int = 1, int = 1, int = -1);
-    Matrix(int, int, double*, int = -1);
+    Matrix();
     Matrix(const Matrix& A);
     virtual ~Matrix();
 
@@ -60,7 +59,6 @@ namespace blocksqp {
     virtual Matrix &operator=(const Matrix &A);
 
     Matrix &Dimension(int, int = 1, int = -1);
-    Matrix &Initialize(double (*)(int, int));
     Matrix &Initialize(double val);
 
     /// Returns just a pointer to the full matrix
@@ -89,7 +87,6 @@ namespace blocksqp {
 
     SymMatrix &Dimension(int M = 1);
     SymMatrix &Dimension(int M, int N, int LDIM);
-    SymMatrix &Initialize(double (*)(int, int));
     SymMatrix &Initialize(double val);
 
     SymMatrix& Submatrix(const Matrix &A, int M, int N, int i0=0, int j0=0);
