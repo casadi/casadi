@@ -257,18 +257,20 @@ namespace casadi {
     // Jacobian/Hessian sparsity
     Sparsity Asp_, Hsp_;
 
+    /// Compute gradient of Lagrangian function (sparse version)
+    void calcLagrangeGradient(BlocksqpMemory* m, const double* lambda,
+      const double* gradObj, double *jacNz, int *jacIndRow, int *jacIndCol,
+      double *gradLagrange, int flag) const;
+
+    /// Overloaded function for convenience, uses current variables of SQPiterate vars
+    void calcLagrangeGradient(BlocksqpMemory* m, double* gradLagrange, int flag) const;
+
     // TO BE REFACTORED
 
     /// Main Loop of SQP method
     int run(BlocksqpMemory* m, int maxIt, int warmStart = 0) const;
     /// Print information about the SQP method
     void printInfo(BlocksqpMemory* m) const;
-    /// Compute gradient of Lagrangian function (sparse version)
-    void calcLagrangeGradient(BlocksqpMemory* m, const blocksqp::Matrix &lambda,
-      const blocksqp::Matrix &gradObj, double *jacNz, int *jacIndRow, int *jacIndCol,
-      blocksqp::Matrix &gradLagrange, int flag) const;
-    /// Overloaded function for convenience, uses current variables of SQPiterate vars
-    void calcLagrangeGradient(BlocksqpMemory* m, blocksqp::Matrix &gradLagrange, int flag) const;
     /// Update optimization tolerance (similar to SNOPT) in current iterate
     bool calcOptTol(BlocksqpMemory* m) const;
 
