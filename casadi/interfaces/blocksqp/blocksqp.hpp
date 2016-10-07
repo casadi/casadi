@@ -62,7 +62,7 @@ namespace blocksqp {
     Matrix &Initialize(double val);
 
     /// Returns just a pointer to the full matrix
-    Matrix& Submatrix(const Matrix&, int, int, int = 0, int = 0);
+    Matrix& Submatrix(const Matrix&, int, int, int, int);
   };
 
   /**
@@ -88,8 +88,6 @@ namespace blocksqp {
     SymMatrix &Dimension(int M = 1);
     SymMatrix &Dimension(int M, int N, int LDIM);
     SymMatrix &Initialize(double val);
-
-    SymMatrix& Submatrix(const Matrix &A, int M, int N, int i0=0, int j0=0);
   };
 
 } // namespace blocksqp

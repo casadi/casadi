@@ -1529,14 +1529,14 @@ namespace casadi {
 
   void Blocksqp::resetHessian(BlocksqpMemory* m, int iBlock) const {
     blocksqp::Matrix smallDelta, smallGamma;
-    int nVarLocal = m->hess[iBlock].m;
+    int dim = m->hess[iBlock].m;
 
     // smallGamma and smallDelta are either subvectors of gamma and delta
     // or submatrices of gammaMat, deltaMat, i.e. subvectors of gamma and delta
     // from m prev. iterations (for L-BFGS)
-    smallGamma.Submatrix(m->gammaMat, nVarLocal, m->gammaMat.n,
+    smallGamma.Submatrix(m->gammaMat, dim, hess_memsize_,
       blocks_[iBlock], 0);
-    smallDelta.Submatrix(m->deltaMat, nVarLocal, m->deltaMat.n,
+    smallDelta.Submatrix(m->deltaMat, dim, hess_memsize_,
       blocks_[iBlock], 0);
 
     // Remove past information on Lagrangian gradient difference
@@ -1559,24 +1559,24 @@ namespace casadi {
   void Blocksqp::
   sizeInitialHessian(BlocksqpMemory* m, const double* gamma,
                      const double* delta, int iBlock, int option) const {
-    int nVarLocal = m->hess[iBlock].m;
+    int dim = m->hess[iBlock].m;
     int i, j;
     double scale;
     double myEps = 1.0e3 * eps_;
 
     if (option == 1) {
       // Shanno-Phua
-      scale = casadi_dot(nVarLocal, gamma, gamma)
-        / fmax(casadi_dot(nVarLocal, delta, gamma), myEps);
+      scale = casadi_dot(dim, gamma, gamma)
+        / fmax(casadi_dot(dim, delta, gamma), myEps);
     } else if (option == 2) {
       // Oren-Luenberger
-      scale = casadi_dot(nVarLocal, delta, gamma)
-        / fmax(casadi_dot(nVarLocal, delta, delta), myEps);
+      scale = casadi_dot(dim, delta, gamma)
+        / fmax(casadi_dot(dim, delta, delta), myEps);
       scale = fmin(scale, 1.0);
     } else if (option == 3) {
       // Geometric mean of 1 and 2
-      scale = sqrt(casadi_dot(nVarLocal, gamma, gamma)
-        / fmax(casadi_dot(nVarLocal, delta, delta), myEps));
+      scale = sqrt(casadi_dot(dim, gamma, gamma)
+        / fmax(casadi_dot(dim, delta, delta), myEps));
     } else {
       // Invalid option, ignore
       return;
@@ -1584,8 +1584,8 @@ namespace casadi {
 
     if (scale > 0.0) {
       scale = fmax(scale, myEps);
-      for (i=0; i<nVarLocal; i++)
-        for (j=i; j<nVarLocal; j++)
+      for (i=0; i<dim; i++)
+        for (j=i; j<dim; j++)
           m->hess[iBlock](i, j) *= scale;
     } else {
       scale = 1.0;
@@ -1599,7 +1599,7 @@ namespace casadi {
   void Blocksqp::
   sizeHessianCOL(BlocksqpMemory* m, const double* gamma,
                  const double* delta, int iBlock) const {
-    int nVarLocal = m->hess[iBlock].m;
+    int dim = m->hess[iBlock].m;
     int i, j;
     double theta, scale, myEps = 1.0e3 * eps_;
     double deltaNorm, deltaNormOld, deltaGamma, deltaGammaOld, deltaBdelta;
@@ -1610,8 +1610,8 @@ namespace casadi {
     deltaNormOld = m->delta_norm_old[iBlock];
     deltaGammaOld = m->delta_gamma_old[iBlock];
     deltaBdelta = 0.0;
-    for (i=0; i<nVarLocal; i++)
-      for (j=0; j<nVarLocal; j++)
+    for (i=0; i<dim; i++)
+      for (j=0; j<dim; j++)
         deltaBdelta += delta[i] * m->hess[iBlock](i, j) * delta[j];
 
     // Centered Oren-Luenberger factor
@@ -1633,8 +1633,8 @@ namespace casadi {
     if (scale < 1.0 && scale > 0.0) {
       scale = fmax(col_eps_, scale);
       //casadi_printf("Sizing value (COL) block %i = %g\n", iBlock, scale);
-      for (i=0; i<nVarLocal; i++)
-        for (j=i; j<nVarLocal; j++)
+      for (i=0; i<dim; i++)
+        for (j=i; j<dim; j++)
           m->hess[iBlock](i, j) *= scale;
 
       // statistics: average sizing factor
@@ -1650,7 +1650,7 @@ namespace casadi {
   void Blocksqp::
   calcHessianUpdate(BlocksqpMemory* m, int updateType, int hessScaling) const {
     int iBlock, nBlocks;
-    int nVarLocal;
+    int dim;
     blocksqp::Matrix smallGamma, smallDelta;
     bool firstIter;
 
@@ -1665,13 +1665,13 @@ namespace casadi {
     m->averageSizingFactor = 0.0;
 
     for (iBlock=0; iBlock<nBlocks; iBlock++) {
-      nVarLocal = m->hess[iBlock].m;
+      dim = m->hess[iBlock].m;
 
       // smallGamma and smallDelta are subvectors of gamma and delta,
       // corresponding to partially separability
-      smallGamma.Submatrix(m->gammaMat, nVarLocal, m->gammaMat.n,
+      smallGamma.Submatrix(m->gammaMat, dim, hess_memsize_,
         blocks_[iBlock], 0);
-      smallDelta.Submatrix(m->deltaMat, nVarLocal, m->deltaMat.n,
+      smallDelta.Submatrix(m->deltaMat, dim, hess_memsize_,
         blocks_[iBlock], 0);
 
       // Is this the first iteration or the first after a Hessian reset?
@@ -1727,7 +1727,7 @@ namespace casadi {
 
   void Blocksqp::
   calcHessianUpdateLimitedMemory(BlocksqpMemory* m, int updateType, int hessScaling) const {
-    int iBlock, nBlocks, nVarLocal;
+    int iBlock, nBlocks, dim;
     blocksqp::Matrix smallGamma, smallDelta;
     blocksqp::Matrix gammai, deltai;
     int i, m2, pos, posOldest, posNewest;
@@ -1747,13 +1747,13 @@ namespace casadi {
     m->averageSizingFactor = 0.0;
 
     for (iBlock=0; iBlock<nBlocks; iBlock++) {
-      nVarLocal = m->hess[iBlock].m;
+      dim = m->hess[iBlock].m;
 
       // smallGamma and smallDelta are submatrices of gammaMat, deltaMat,
       // i.e. subvectors of gamma and delta from m prev. iterations
-      smallGamma.Submatrix(m->gammaMat, nVarLocal, m->gammaMat.n,
+      smallGamma.Submatrix(m->gammaMat, dim, hess_memsize_,
         blocks_[iBlock], 0);
-      smallDelta.Submatrix(m->deltaMat, nVarLocal, m->deltaMat.n,
+      smallDelta.Submatrix(m->deltaMat, dim, hess_memsize_,
         blocks_[iBlock], 0);
 
       // Memory structure
@@ -1776,16 +1776,16 @@ namespace casadi {
       m->noUpdateCounter[iBlock] = -1;
 
       // Size the initial update, but with the most recent delta/gamma-pair
-      gammai.Submatrix(smallGamma, nVarLocal, 1, 0, posNewest);
-      deltai.Submatrix(smallDelta, nVarLocal, 1, 0, posNewest);
+      gammai.Submatrix(smallGamma, dim, 1, 0, posNewest);
+      deltai.Submatrix(smallDelta, dim, 1, 0, posNewest);
       sizeInitialHessian(m, gammai.d, deltai.d, iBlock, hessScaling);
 
       for (i=0; i<m2; i++) {
         pos = (posOldest+i) % m2;
 
         // Get new vector from list
-        gammai.Submatrix(smallGamma, nVarLocal, 1, 0, pos);
-        deltai.Submatrix(smallDelta, nVarLocal, 1, 0, pos);
+        gammai.Submatrix(smallGamma, dim, 1, 0, pos);
+        deltai.Submatrix(smallDelta, dim, 1, 0, pos);
 
         // Update sTs, sTs_ and sTy, sTy_
         m->delta_norm_old[iBlock] = m->delta_norm[iBlock];
@@ -2445,12 +2445,8 @@ namespace casadi {
    * needed by the algorithm
    */
   void Blocksqp::allocAlg(BlocksqpMemory* m) const {
-    int iBlock;
-    int nVar = nx_;
-    int nCon = ng_;
-
     // current step
-    m->deltaMat.Dimension(nVar, hess_memsize_, nVar).Initialize(0.0);
+    m->deltaMat.Dimension(nx_, hess_memsize_, nx_).Initialize(0.0);
     m->dxk = m->deltaMat.d;
 
     // trial step (temporary variable, for line search)
@@ -2480,7 +2476,7 @@ namespace casadi {
 
     // Scalars that are used in various Hessian update procedures
     m->noUpdateCounter = new int[nblocks_];
-    for (iBlock=0; iBlock<nblocks_; iBlock++)
+    for (int iBlock=0; iBlock<nblocks_; iBlock++)
       m->noUpdateCounter[iBlock] = -1;
 
     // For selective sizing: for each block save sTs, sTs_, sTy, sTy_
@@ -2489,7 +2485,6 @@ namespace casadi {
     casadi_fill(m->delta_gamma, nblocks_, 0.);
     casadi_fill(m->delta_gamma_old, nblocks_, 0.);
   }
-
 
   void Blocksqp::initIterate(BlocksqpMemory* m) const {
     m->alpha = 1.0;
@@ -2777,10 +2772,4 @@ namespace blocksqp {
 
     return *this;
   }
-
-  SymMatrix &SymMatrix::Submatrix(const Matrix &A, int M, int N, int i0, int j0) {
-    Error("SymMatrix doesn't support Submatrix");
-    return *this;
-  }
-
 } // namespace blocksqp
