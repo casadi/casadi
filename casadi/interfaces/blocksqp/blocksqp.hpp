@@ -374,8 +374,8 @@ namespace casadi {
 
     // Set initial values for xi (and possibly lambda) and parts of the
     // Jacobian that correspond to linear constraints (sparse version).
-    void initialize(BlocksqpMemory* m, blocksqp::Matrix &xi,
-                    blocksqp::Matrix &lambda,
+    void initialize(BlocksqpMemory* m, double* xi,
+                    double* lambda,
                     double *&jacNz,
                     int *&jacIndRow,
                     int *&jacIndCol) const;

@@ -585,7 +585,7 @@ namespace casadi {
     initializeFilter(m);
 
     // Set initial values for all xi and set the Jacobian for linear constraints
-    initialize(m, m->xi, m->lambda, m->jacNz, m->jacIndRow, m->jacIndCol);
+    initialize(m, m->xi.d, m->lambda.d, m->jacNz, m->jacIndRow, m->jacIndCol);
 
     m->fstats.at("mainloop").tic();
     ret = run(m, max_iter_, warmstart_);
@@ -2471,11 +2471,11 @@ namespace casadi {
   }
 
   void Blocksqp::
-  initialize(BlocksqpMemory* m, blocksqp::Matrix &xi, blocksqp::Matrix &lambda,
+  initialize(BlocksqpMemory* m, double* xi, double* lambda,
              double *&jacNz, int *&jacIndRow, int *&jacIndCol) const {
     // Primal-dual initial guess
-    double* x = xi.d;
-    double* lam_x = lambda.d;
+    double* x = xi;
+    double* lam_x = lambda;
     double* lam_g = lam_x + nx_;
     casadi_copy(m->x0, nx_, x);
     casadi_copy(m->lam_x0, nx_, lam_x);
