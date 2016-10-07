@@ -473,6 +473,7 @@ namespace casadi {
     alloc_w(ng_, true); // lam_gk
     alloc_w(ng_, true); // gk
     alloc_w(nx_, true); // grad_fk
+    alloc_w(nx_, true); // grad_lagk
   }
 
   void Blocksqp::init_memory(void* mem) const {
@@ -499,6 +500,7 @@ namespace casadi {
     m->lam_gk = w; w += ng_;
     m->gk = w; w += ng_;
     m->grad_fk = w; w += nx_;
+    m->grad_lagk = w; w += nx_;
   }
 
   void Blocksqp::solve(void* mem) const {
@@ -832,48 +834,48 @@ namespace casadi {
   calcLagrangeGradient(BlocksqpMemory* m,
     const double* lam_x, const double* lam_g,
     const double* grad_f, double *jacNz, int *jacIndRow,
-    int *jacIndCol, double* gradLagrange, int flag) const {
+    int *jacIndCol, double* grad_lag, int flag) const {
     int iVar, iCon;
 
     // Objective gradient
     if (flag == 0) {
-      casadi_copy(grad_f, nx_, gradLagrange);
+      casadi_copy(grad_f, nx_, grad_lag);
     } else if (flag == 1) {
-      casadi_scal(nx_, -1., gradLagrange);
-      casadi_axpy(nx_, 1., grad_f, gradLagrange);
+      casadi_scal(nx_, -1., grad_lag);
+      casadi_axpy(nx_, 1., grad_f, grad_lag);
     } else {
-      casadi_fill(gradLagrange, nx_, 0.);
+      casadi_fill(grad_lag, nx_, 0.);
     }
 
     // - lambdaT * constrJac
     for (iVar=0; iVar<nx_; iVar++)
       for (iCon=jacIndCol[iVar]; iCon<jacIndCol[iVar+1]; iCon++)
-        gradLagrange[iVar] -= lam_g[jacIndRow[iCon]] * jacNz[iCon];
+        grad_lag[iVar] -= lam_g[jacIndRow[iCon]] * jacNz[iCon];
 
     // - lambdaT * simpleBounds
-    casadi_axpy(nx_, -1., lam_x, gradLagrange);
+    casadi_axpy(nx_, -1., lam_x, grad_lag);
   }
 
   /**
    * Wrapper if called with standard arguments
    */
   void Blocksqp::
-  calcLagrangeGradient(BlocksqpMemory* m, double* gradLagrange, int flag) const {
+  calcLagrangeGradient(BlocksqpMemory* m, double* grad_lag, int flag) const {
     calcLagrangeGradient(m, m->lam_xk, m->lam_gk, m->grad_fk, m->jacNz,
-      m->jacIndRow, m->jacIndCol, gradLagrange, flag);
+      m->jacIndRow, m->jacIndCol, grad_lag, flag);
   }
 
 
   /**
    * Compute optimality conditions:
-   * ||gradLagrange(xk,lambda)||_infty / (1 + ||lambda||_infty) <= TOL
+   * ||grad_lag(xk,lambda)||_infty / (1 + ||lambda||_infty) <= TOL
    * and
    * ||constrViolation||_infty / (1 + ||xi||_infty) <= TOL
    */
   bool Blocksqp::calcOptTol(BlocksqpMemory* m) const {
     // scaled norm of Lagrangian gradient
-    calcLagrangeGradient(m, m->gradLagrange.d, 0);
-    m->gradNorm = casadi_norm_inf(m->gradLagrange.m, m->gradLagrange.d);
+    calcLagrangeGradient(m, m->grad_lagk, 0);
+    m->gradNorm = casadi_norm_inf(nx_, m->grad_lagk);
     m->tol = m->gradNorm/(1.0+fmax(casadi_norm_inf(nx_, m->lam_xk),
                                    casadi_norm_inf(ng_, m->lam_gk)));
 
@@ -2319,7 +2321,7 @@ namespace casadi {
     casadi_fill(m->grad_fk, nx_, 0.);
 
     // gradient of Lagrangian
-    m->gradLagrange.Dimension(nx_).Initialize(0.0);
+    casadi_fill(m->grad_lagk, nx_, 0.);
   }
 
 

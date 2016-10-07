@@ -158,7 +158,7 @@ namespace casadi {
     blocksqp::Matrix deltaMat;  // last m primal steps
     blocksqp::Matrix deltaXi;  // alias for current step
     double* grad_fk;  // gradient of objective
-    blocksqp::Matrix gradLagrange;  // gradient of Lagrangian
+    double* grad_lagk;  // gradient of Lagrangian
     blocksqp::Matrix gammaMat;  // Lagrangian gradient differences for last m steps
     blocksqp::Matrix gamma;  // alias for current Lagrangian gradient
 
@@ -260,10 +260,10 @@ namespace casadi {
     void calcLagrangeGradient(BlocksqpMemory* m,
       const double* lam_x, const double* lam_g,
       const double* grad_f, double *jacNz, int *jacIndRow, int *jacIndCol,
-      double *gradLagrange, int flag) const;
+      double *grad_lag, int flag) const;
 
     /// Overloaded function for convenience, uses current variables of SQPiterate vars
-    void calcLagrangeGradient(BlocksqpMemory* m, double* gradLagrange, int flag) const;
+    void calcLagrangeGradient(BlocksqpMemory* m, double* grad_lag, int flag) const;
     /// Print information about the SQP method
     void printInfo(BlocksqpMemory* m) const;
     /// Update optimization tolerance (similar to SNOPT) in current iterate
