@@ -597,17 +597,17 @@ namespace casadi {
     // Get optimal cost
     if (m->f) *m->f = m->obj;
     // Get constraints at solution
-    casadi_copy(m->constr.array, ng_, m->g);
+    casadi_copy(m->constr.d, ng_, m->g);
     // Get primal solution
-    casadi_copy(m->xi.array, nx_, m->x);
+    casadi_copy(m->xi.d, nx_, m->x);
     // Get dual solution (simple bounds)
     if (m->lam_x) {
-      casadi_copy(m->lambda.array, nx_, m->lam_x);
+      casadi_copy(m->lambda.d, nx_, m->lam_x);
       casadi_scal(nx_, -1., m->lam_x);
     }
     // Get dual solution (nonlinear bounds)
     if (m->lam_g) {
-      casadi_copy(m->lambda.array + nx_, ng_, m->lam_g);
+      casadi_copy(m->lambda.d + nx_, ng_, m->lam_g);
       casadi_scal(ng_, -1., m->lam_g);
     }
 
@@ -877,13 +877,13 @@ namespace casadi {
   bool Blocksqp::calcOptTol(BlocksqpMemory* m) const {
     // scaled norm of Lagrangian gradient
     calcLagrangeGradient(m, m->gradLagrange, 0);
-    m->gradNorm = casadi_norm_inf(m->gradLagrange.m, m->gradLagrange.array);
-    m->tol = m->gradNorm /(1.0 + casadi_norm_inf(m->lambda.m, m->lambda.array));
+    m->gradNorm = casadi_norm_inf(m->gradLagrange.m, m->gradLagrange.d);
+    m->tol = m->gradNorm /(1.0 + casadi_norm_inf(m->lambda.m, m->lambda.d));
 
     // norm of constraint violation
-    m->cNorm  = lInfConstraintNorm(m->xi.array, m->constr.array,
-      m->bu.array, m->bl.array);
-    m->cNormS = m->cNorm /(1.0 + casadi_norm_inf(m->xi.m, m->xi.array));
+    m->cNorm  = lInfConstraintNorm(m->xi.d, m->constr.d,
+      m->bu.d, m->bl.d);
+    m->cNormS = m->cNorm /(1.0 + casadi_norm_inf(m->xi.m, m->xi.d));
 
     if (m->tol <= opttol_ && m->cNormS <= nlinfeastol_)
       return true;
@@ -1067,8 +1067,8 @@ namespace casadi {
       // Compute problem functions at trial point
       info = evaluate(m, m->trialXi, &objTrial, m->constr);
       m->nFunCalls++;
-      cNormTrial = lInfConstraintNorm(m->trialXi.array, m->constr.array,
-        m->bu.array, m->bl.array);
+      cNormTrial = lInfConstraintNorm(m->trialXi.d, m->constr.d,
+        m->bu.d, m->bl.d);
       // Reduce step if evaluation fails, if lower bound is violated
       // or if objective or a constraint is NaN
       if (info != 0 || objTrial < obj_lo_ || objTrial > obj_up_
@@ -1100,8 +1100,8 @@ namespace casadi {
     int nVar = nx_;
 
     // Compute ||constr(xi)|| at old point
-    cNorm = lInfConstraintNorm(m->xi.array, m->constr.array,
-      m->bu.array, m->bl.array);
+    cNorm = lInfConstraintNorm(m->xi.d, m->constr.d,
+      m->bu.d, m->bl.d);
 
     // Backtracking line search
     for (k=0; k<max_line_search_; k++) {
@@ -1117,8 +1117,8 @@ namespace casadi {
       // Compute objective and at ||constr(trialXi)||_1 at trial point
       info = evaluate(m, m->trialXi, &objTrial, m->constr);
       m->nFunCalls++;
-      cNormTrial = lInfConstraintNorm(m->trialXi.array, m->constr.array,
-        m->bu.array, m->bl.array);
+      cNormTrial = lInfConstraintNorm(m->trialXi.d, m->constr.d,
+        m->bu.d, m->bl.d);
       // Reduce step if evaluation fails, if lower bound is violated or if objective is NaN
       if (info != 0 || objTrial < obj_lo_ || objTrial > obj_up_
         || !(objTrial == objTrial) || !(cNormTrial == cNormTrial)) {
@@ -1253,8 +1253,8 @@ namespace casadi {
       // Compute objective and ||constr(trialXiSOC)||_1 at SOC trial point
       info = evaluate(m, m->trialXi, &objTrialSOC, m->constr);
       m->nFunCalls++;
-      cNormTrialSOC = lInfConstraintNorm(m->trialXi.array, m->constr.array,
-        m->bu.array, m->bl.array);
+      cNormTrialSOC = lInfConstraintNorm(m->trialXi.d, m->constr.d,
+        m->bu.d, m->bl.d);
       if (info != 0 || objTrialSOC < obj_lo_ || objTrialSOC > obj_up_
         || !(objTrialSOC == objTrialSOC) || !(cNormTrialSOC == cNormTrialSOC)) {
         return false; // evaluation error, abort SOC
@@ -1351,8 +1351,8 @@ namespace casadi {
     // Compute objective and constraints at the new (hopefully feasible) point
     info = evaluate(m, m->trialXi, &m->obj, m->constr);
     m->nFunCalls++;
-    cNormTrial = lInfConstraintNorm(m->trialXi.array, m->constr.array,
-      m->bu.array, m->bl.array);
+    cNormTrial = lInfConstraintNorm(m->trialXi.d, m->constr.d,
+      m->bu.d, m->bl.d);
     if (info != 0 || m->obj < obj_lo_ || m->obj > obj_up_
       || !(m->obj == m->obj) || !(cNormTrial == cNormTrial))
       return -1;
@@ -1407,8 +1407,8 @@ namespace casadi {
     trialConstr.Dimension(ng_).Initialize(0.0);
     info = evaluate(m, m->trialXi, &objTrial, trialConstr);
     m->nFunCalls++;
-    cNormTrial = lInfConstraintNorm(m->trialXi.array, trialConstr.array,
-      m->bu.array, m->bl.array);
+    cNormTrial = lInfConstraintNorm(m->trialXi.d, trialConstr.d,
+      m->bu.d, m->bl.d);
     if (info != 0 || objTrial < obj_lo_ || objTrial > obj_up_
       || !(objTrial == objTrial) || !(cNormTrial == cNormTrial)) {
       // evaluation error
@@ -1422,8 +1422,8 @@ namespace casadi {
     calcLagrangeGradient(m, m->lambdaQP, m->gradObj, m->jacNz,
                          m->jacIndRow, m->jacIndCol, trialGradLagrange, 0);
 
-    trialGradNorm = casadi_norm_inf(trialGradLagrange.m, trialGradLagrange.array);
-    trialTol = trialGradNorm/(1.0+casadi_norm_inf(m->lambdaQP.m, m->lambdaQP.array));
+    trialGradNorm = casadi_norm_inf(trialGradLagrange.m, trialGradLagrange.d);
+    trialTol = trialGradNorm/(1.0+casadi_norm_inf(m->lambdaQP.m, m->lambdaQP.d));
 
     if (fmax(cNormTrial, trialTol) < kappa_f_ * fmax(m->cNorm, m->tol)) {
       acceptStep(m, 1.0);
@@ -1588,17 +1588,17 @@ namespace casadi {
 
     if (option == 1) {
       // Shanno-Phua
-      scale = casadi_dot(gamma.m, gamma.array, gamma.array)
-        / fmax(casadi_dot(delta.m, delta.array, gamma.array), myEps);
+      scale = casadi_dot(gamma.m, gamma.d, gamma.d)
+        / fmax(casadi_dot(delta.m, delta.d, gamma.d), myEps);
     } else if (option == 2) {
       // Oren-Luenberger
-      scale = casadi_dot(delta.m, delta.array, gamma.array)
-        / fmax(casadi_dot(delta.m, delta.array, delta.array), myEps);
+      scale = casadi_dot(delta.m, delta.d, gamma.d)
+        / fmax(casadi_dot(delta.m, delta.d, delta.d), myEps);
       scale = fmin(scale, 1.0);
     } else if (option == 3) {
       // Geometric mean of 1 and 2
-      scale = sqrt(casadi_dot(gamma.m, gamma.array, gamma.array)
-        / fmax(casadi_dot(delta.m, delta.array, delta.array), myEps));
+      scale = sqrt(casadi_dot(gamma.m, gamma.d, gamma.d)
+        / fmax(casadi_dot(delta.m, delta.d, delta.d), myEps));
     } else {
       // Invalid option, ignore
       return;
@@ -1700,10 +1700,10 @@ namespace casadi {
       // Update sTs, sTs_ and sTy, sTy_
       m->deltaNormOld(iBlock) = m->deltaNorm(iBlock);
       m->deltaGammaOld(iBlock) = m->deltaGamma(iBlock);
-      m->deltaNorm(iBlock) = casadi_dot(smallDelta.m, smallDelta.array,
-        smallDelta.array);
-      m->deltaGamma(iBlock) = casadi_dot(smallDelta.m, smallDelta.array,
-        smallGamma.array);
+      m->deltaNorm(iBlock) = casadi_dot(smallDelta.m, smallDelta.d,
+        smallDelta.d);
+      m->deltaGamma(iBlock) = casadi_dot(smallDelta.m, smallDelta.d,
+        smallGamma.d);
 
       // Sizing before the update
       if (hessScaling < 4 && firstIter)
@@ -1810,8 +1810,8 @@ namespace casadi {
         // Update sTs, sTs_ and sTy, sTy_
         m->deltaNormOld(iBlock) = m->deltaNorm(iBlock);
         m->deltaGammaOld(iBlock) = m->deltaGamma(iBlock);
-        m->deltaNorm(iBlock) = casadi_dot(deltai.m, deltai.array, deltai.array);
-        m->deltaGamma(iBlock) = casadi_dot(gammai.m, gammai.array, deltai.array);
+        m->deltaNorm(iBlock) = casadi_dot(deltai.m, deltai.d, deltai.d);
+        m->deltaGamma(iBlock) = casadi_dot(gammai.m, gammai.d, deltai.d);
 
         // Save statistics, we want to record them only for the most recent update
         averageSizingFactor = m->averageSizingFactor;
@@ -1950,8 +1950,8 @@ namespace casadi {
     }
 
     // B_k+1 = B_k + gmBdelta * gmBdelta^T / h
-    if (fabs(h) < r * casadi_norm_2(delta.m, delta.array)
-      *casadi_norm_2(gmBdelta.m, gmBdelta.array) || fabs(h) < myEps) {
+    if (fabs(h) < r * casadi_norm_2(delta.m, delta.d)
+      *casadi_norm_2(gmBdelta.m, gmBdelta.d) || fabs(h) < myEps) {
       // Skip update if denominator is too small
       m->noUpdateCounter[iBlock]++;
       m->hessSkipped++;
@@ -2053,11 +2053,11 @@ namespace casadi {
       A = new qpOASES::SparseMatrix(ng_, nx_,
                                     m->jacIndRow, m->jacIndCol, m->jacNz);
     }
-    double *g = m->gradObj.array;
-    double *lb = m->deltaBl.array;
-    double *lu = m->deltaBu.array;
-    double *lbA = m->deltaBl.array + nx_;
-    double *luA = m->deltaBu.array + nx_;
+    double *g = m->gradObj.d;
+    double *lb = m->deltaBl.d;
+    double *lu = m->deltaBu.d;
+    double *lbA = m->deltaBl.d + nx_;
+    double *luA = m->deltaBu.d + nx_;
 
     // qpOASES options
     qpOASES::Options opts;
@@ -2166,13 +2166,13 @@ namespace casadi {
      */
 
     // Get solution from qpOASES
-    m->qp->getPrimalSolution(deltaXi.array);
-    m->qp->getDualSolution(lambdaQP.array);
+    m->qp->getPrimalSolution(deltaXi.d);
+    m->qp->getDualSolution(lambdaQP.d);
     m->qpObj = m->qp->getObjVal();
 
     // Compute constrJac*deltaXi, need this for second order correction step
-    casadi_fill(m->AdeltaXi.array, m->AdeltaXi.m, 0.);
-    casadi_mv(m->jacNz, Asp_, deltaXi.array, m->AdeltaXi.array, 0);
+    casadi_fill(m->AdeltaXi.d, m->AdeltaXi.m, 0.);
+    casadi_mv(m->jacNz, Asp_, deltaXi.d, m->AdeltaXi.d, 0);
 
     // Print qpOASES error code, if any
     if (ret != qpOASES::SUCCESSFUL_RETURN && matricesChanged)
@@ -2305,13 +2305,13 @@ namespace casadi {
       casadi_printf("%-10.2e", m->cNormS);
       casadi_printf("%-10.2e", m->tol);
       casadi_printf("%-10.2e", m->gradNorm);
-      casadi_printf("%-10.2e", casadi_norm_inf(m->deltaXi.m, m->deltaXi.array));
+      casadi_printf("%-10.2e", casadi_norm_inf(m->deltaXi.m, m->deltaXi.d));
       casadi_printf("%-10.2e", m->lambdaStepNorm);
       casadi_printf("%-9.1e", m->alpha);
       casadi_printf("%5i", m->nSOCS);
       casadi_printf("%3i, %3i, %-9.1e", m->hessSkipped, m->hessDamped, m->averageSizingFactor);
       casadi_printf("%i, %-9.1e", m->qpResolve,
-        casadi_norm_1(m->deltaH.m, m->deltaH.array)/nblocks_);
+        casadi_norm_1(m->deltaH.m, m->deltaH.d)/nblocks_);
       casadi_printf("\n");
     }
   }
@@ -2521,8 +2521,8 @@ namespace casadi {
   initialize(BlocksqpMemory* m, blocksqp::Matrix &xi, blocksqp::Matrix &lambda,
              double *&jacNz, int *&jacIndRow, int *&jacIndCol) const {
     // Primal-dual initial guess
-    double* x = xi.array;
-    double* lam_x = lambda.array;
+    double* x = xi.d;
+    double* lam_x = lambda.d;
     double* lam_g = lam_x + nx_;
     casadi_copy(m->x0, nx_, x);
     casadi_copy(m->lam_x0, nx_, lam_x);
@@ -2542,11 +2542,11 @@ namespace casadi {
            blocksqp::Matrix &gradObj, double *&jacNz, int *&jacIndRow,
            int *&jacIndCol,
            blocksqp::SymMatrix *&hess) const {
-    m->arg[0] = xi.array; // x
+    m->arg[0] = xi.d; // x
     m->arg[1] = m->p; // p
     m->res[0] = objval; // f
-    m->res[1] = constr.array; // g
-    m->res[2] = gradObj.array; // grad:f:x
+    m->res[1] = constr.d; // g
+    m->res[2] = gradObj.d; // grad:f:x
     m->res[3] = jacNz; // jac:g:x
     calc_function(m, "nlp_gf_jg");
     return 0;
@@ -2555,10 +2555,10 @@ namespace casadi {
   int Blocksqp::
   evaluate(BlocksqpMemory* m, const blocksqp::Matrix &xi, double *objval,
            blocksqp::Matrix &constr) const {
-    m->arg[0] = xi.array; // x
+    m->arg[0] = xi.d; // x
     m->arg[1] = m->p; // p
     m->res[0] = objval; // f
-    m->res[1] = constr.array; // g
+    m->res[1] = constr.d; // g
     calc_function(m, "nlp_fg");
     return 0;
   }
@@ -2600,9 +2600,9 @@ namespace blocksqp {
     len = ldim*n;
 
     if (len == 0)
-      array = 0;
+      this->d = 0;
     else
-      if ((array = new double[len]) == 0)
+      if ((this->d = new double[len]) == 0)
         Error("'new' failed");
 
     return 0;
@@ -2611,24 +2611,24 @@ namespace blocksqp {
 
   int Matrix::free() {
     if (tflag) Error("free cannot be called with Submatrix");
-    if (array != 0) delete[] array;
+    if (this->d != 0) delete[] this->d;
     return 0;
   }
 
   double &Matrix::operator()(int i, int j) {
-    return array[i+j*ldim];
+    return this->d[i+j*ldim];
   }
 
   double &Matrix::operator()(int i, int j) const {
-    return array[i+j*ldim];
+    return this->d[i+j*ldim];
   }
 
   double &Matrix::operator()(int i) {
-    return array[i];
+    return this->d[i];
   }
 
   double &Matrix::operator()(int i) const {
-    return array[i];
+    return this->d[i];
   }
 
   Matrix::Matrix(int M, int N, int LDIM) {
@@ -2642,7 +2642,7 @@ namespace blocksqp {
   Matrix::Matrix(int M, int N, double *ARRAY, int LDIM) {
     m = M;
     n = N;
-    array = ARRAY;
+    this->d = ARRAY;
     ldim = LDIM;
     tflag = 0;
     if (ldim < m) ldim = m;
@@ -2722,7 +2722,7 @@ namespace blocksqp {
     tflag = 1;
     m = M;
     n = N;
-    array = &A.array[i0+j0*A.ldim];
+    this->d = &A.d[i0+j0*A.ldim];
     ldim = A.ldim;
     return *this;
   }
@@ -2730,15 +2730,15 @@ namespace blocksqp {
   int SymMatrix::malloc() {
     int len = m*(m+1)/2.0;
     if (len == 0) {
-      array = 0;
+      this->d = 0;
     } else {
-      if ((array = new double[len]) == 0) Error("'new' failed");
+      if ((this->d = new double[len]) == 0) Error("'new' failed");
     }
     return 0;
   }
 
   int SymMatrix::free() {
-    if (array != 0) delete[] array;
+    if (this->d != 0) delete[] this->d;
     return 0;
   }
 
@@ -2749,7 +2749,7 @@ namespace blocksqp {
     } else {
       pos = static_cast<int>((i + j*(m - (j+1.0)/2.0)));
     }
-    return array[pos];
+    return this->d[pos];
   }
 
 
@@ -2760,15 +2760,15 @@ namespace blocksqp {
     } else {
       pos = static_cast<int>((i + j*(m - (j+1.0)/2.0)));
     }
-    return array[pos];
+    return this->d[pos];
   }
 
   double &SymMatrix::operator()(int i) {
-    return array[i];
+    return this->d[i];
   }
 
   double &SymMatrix::operator()(int i) const {
-    return array[i];
+    return this->d[i];
   }
 
   SymMatrix::SymMatrix(int M) {
@@ -2785,7 +2785,7 @@ namespace blocksqp {
     ldim = M;
     tflag = 0;
     malloc();
-    array = ARRAY;
+    this->d = ARRAY;
   }
 
 
@@ -2804,7 +2804,7 @@ namespace blocksqp {
     ldim = M;
     tflag = 0;
     malloc();
-    array = ARRAY;
+    this->d = ARRAY;
   }
 
 

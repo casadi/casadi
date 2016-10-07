@@ -42,7 +42,7 @@ namespace blocksqp {
     int m;
     int n;
     int ldim;
-    double *array;
+    double *d;
     int tflag;
   private:
     int malloc();
