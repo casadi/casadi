@@ -943,34 +943,20 @@ namespace casadi {
     double pr_inf = 0;
 
     // Simple bounds
-    for (int i=0; i<nx_; ++i) {
-      double lbx = m->lbx ? m->lbx[i] : 0, ubx = m->ubx ? m->ubx[i] : 0;
-      pr_inf +=  std::max(m->xk[i]-ubx, 0.);
-      pr_inf +=  std::max(lbx-m->xk[i], 0.);
-    }
+    pr_inf += casadi_sum_viol(nx_, m->xk, m->lbx, m->ubx);
 
     // Lifted variables
     for (auto&& v : m->lifted_mem) pr_inf += casadi_norm_1(v.n, v.res);
 
     // Nonlinear bounds
-    for (int i=0; i<ng_; ++i) {
-      double lbg = m->lbg ? m->lbg[i] : 0, ubg = m->ubg ? m->ubg[i] : 0;
-      pr_inf += std::max(m->gk[i]-ubg, 0.);
-      pr_inf += std::max(lbg-m->gk[i], 0.);
-    }
+    pr_inf += casadi_sum_viol(ng_, m->gk, m->lbg, m->ubg);
 
     return pr_inf;
   }
 
   double Scpgen::dualInfeasibility(ScpgenMemory* m) const {
-
     // L1-norm of the dual infeasibility
-    double du_inf = 0;
-
-    // Lifted variables
-    for (int i=0; i<nx_; ++i) du_inf += ::fabs(m->gL[i]);
-
-    return du_inf;
+    return casadi_norm_1(nx_, m->gL);
   }
 
   void Scpgen::printIteration(ScpgenMemory* m, std::ostream &stream) const {

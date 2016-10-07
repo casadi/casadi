@@ -815,21 +815,8 @@ namespace casadi {
   primalInfeasibility(const double* x, const double* lbx, const double* ubx,
                       const double* g, const double* lbg, const double* ubg) const {
     // Linf-norm of the primal infeasibility
-    double pr_inf = 0;
-
-    // Bound constraints
-    for (int j=0; j<nx_; ++j) {
-      pr_inf = fmax(pr_inf, lbx[j] - x[j]);
-      pr_inf = fmax(pr_inf, x[j] - ubx[j]);
-    }
-
-    // Nonlinear constraints
-    for (int j=0; j<ng_; ++j) {
-      pr_inf = fmax(pr_inf, lbg[j] - g[j]);
-      pr_inf = fmax(pr_inf, g[j] - ubg[j]);
-    }
-
-    return pr_inf;
+    return fmax(casadi_max_viol(nx_, x, lbx, ubx),
+                casadi_max_viol(ng_, g, lbg, ubg));
   }
 
 } // namespace casadi

@@ -2572,28 +2572,11 @@ namespace casadi {
 namespace blocksqp {
   double lInfConstraintNorm(const Matrix &xi, const Matrix &constr,
                             const Matrix &bu, const Matrix &bl) {
-    double norm = 0.0;
-    int i;
     int nVar = xi.m;
     int nCon = constr.m;
-
-    // Violation of simple bounds
-    for (i=0; i<nVar; i++) {
-      if (xi(i) - bu(i) > norm)
-        norm = xi(i) - bu(i);
-      else if (bl(i) - xi(i) > norm)
-        norm = bl(i) - xi(i);
-    }
-
-    // Find out the largest constraint violation
-    for (i=0; i<nCon; i++) {
-      if (constr(i) - bu(nVar+i) > norm)
-        norm = constr(i) - bu(nVar+i);
-      if (bl(nVar+i) - constr(i) > norm)
-        norm = bl(nVar+i) - constr(i);
-    }
-
-    return norm;
+    return fmax(casadi::casadi_max_viol(nVar, xi.array, bl.array, bu.array),
+                casadi::casadi_max_viol(nCon, constr.array,
+                  bl.array+nVar, bu.array+nVar));
   }
 
   void Error(const char *F) {
