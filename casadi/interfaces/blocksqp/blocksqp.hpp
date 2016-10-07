@@ -120,9 +120,6 @@ namespace casadi {
     // [Workaround] qpOASES memory block
     QpoasesMemory* qpoases_mem;
 
-    blocksqp::Matrix      bl;     // lower bounds of variables and constraints
-    blocksqp::Matrix      bu;     // upper bounds of variables and constraints
-
     // Stats
     int itCount;  // iteration number
     int qpIterations;  // number of qp iterations in the current major iteration
@@ -397,8 +394,7 @@ namespace casadi {
                   double *constr) const;
 
     //  Declaration of general purpose routines for matrix and vector computations
-    double lInfConstraintNorm(const double* xi, const double* g,
-      const double* bu, const double* bl) const;
+    double lInfConstraintNorm(BlocksqpMemory* m, const double* xi, const double* g) const;
 
     /// QP solver for the subproblems
     //Function qpsol_;

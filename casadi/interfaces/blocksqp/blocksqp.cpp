@@ -499,18 +499,6 @@ namespace casadi {
     // Create problem evaluation object
     vector<int> blocks = blocks_;
 
-    // Bounds on variables and constraints
-    m->bl.Dimension(nx_ + ng_).Initialize(-inf);
-    m->bu.Dimension(nx_ + ng_).Initialize(inf);
-    for (int i=0; i<nx_; ++i) {
-      m->bl(i) = m->lbx ? m->lbx[i] : 0;
-      m->bu(i) = m->ubx ? m->ubx[i] : 0;
-    }
-    for (int i=0; i<ng_; ++i) {
-      m->bl(nx_ + i) = m->lbg ? m->lbg[i] : 0;
-      m->bu(nx_ + i) = m->ubg ? m->ubg[i] : 0;
-    }
-
     /*-------------------------------------------------*/
     /* Create blockSQP method object and run algorithm */
     /*-------------------------------------------------*/
@@ -878,8 +866,7 @@ namespace casadi {
     m->tol = m->gradNorm /(1.0 + casadi_norm_inf(m->lambda.m, m->lambda.d));
 
     // norm of constraint violation
-    m->cNorm  = lInfConstraintNorm(m->xi.d, m->constr.d,
-      m->bu.d, m->bl.d);
+    m->cNorm  = lInfConstraintNorm(m, m->xi.d, m->constr.d);
     m->cNormS = m->cNorm /(1.0 + casadi_norm_inf(m->xi.m, m->xi.d));
 
     if (m->tol <= opttol_ && m->cNormS <= nlinfeastol_)
@@ -1023,20 +1010,21 @@ namespace casadi {
   void Blocksqp::
   reduceSOCStepsize(BlocksqpMemory* m, double *alphaSOC) const {
     int i;
-    int nVar = nx_;
 
     // Update bounds on linearized constraints for the next SOC QP:
     // That is different from the update for the first SOC QP!
     for (i=0; i<ng_; i++) {
-      if (m->bl(nVar+i) != inf)
-        m->deltaBl(nVar+i) = (*alphaSOC)*m->deltaBl(nVar+i) - m->constr(i);
+      double lbg = m->lbg ? m->lbg[i] : 0;
+      double ubg = m->ubg ? m->ubg[i] : 0;
+      if (lbg != inf)
+        m->deltaBl(nx_+i) = (*alphaSOC)*m->deltaBl(nx_+i) - m->constr(i);
       else
-        m->deltaBl(nVar+i) = inf;
+        m->deltaBl(nx_+i) = inf;
 
-      if (m->bu(nVar+i) != inf)
-        m->deltaBu(nVar+i) = (*alphaSOC)*m->deltaBu(nVar+i) - m->constr(i);
+      if (ubg != inf)
+        m->deltaBu(nx_+i) = (*alphaSOC)*m->deltaBu(nx_+i) - m->constr(i);
       else
-        m->deltaBu(nVar+i) = inf;
+        m->deltaBu(nx_+i) = inf;
     }
 
     *alphaSOC = (*alphaSOC) * 0.5;
@@ -1064,8 +1052,7 @@ namespace casadi {
       // Compute problem functions at trial point
       info = evaluate(m, m->trialXi.d, &objTrial, m->constr.d);
       m->nFunCalls++;
-      cNormTrial = lInfConstraintNorm(m->trialXi.d, m->constr.d,
-        m->bu.d, m->bl.d);
+      cNormTrial = lInfConstraintNorm(m, m->trialXi.d, m->constr.d);
       // Reduce step if evaluation fails, if lower bound is violated
       // or if objective or a constraint is NaN
       if (info != 0 || objTrial < obj_lo_ || objTrial > obj_up_
@@ -1097,8 +1084,7 @@ namespace casadi {
     int nVar = nx_;
 
     // Compute ||constr(xi)|| at old point
-    cNorm = lInfConstraintNorm(m->xi.d, m->constr.d,
-      m->bu.d, m->bl.d);
+    cNorm = lInfConstraintNorm(m, m->xi.d, m->constr.d);
 
     // Backtracking line search
     for (k=0; k<max_line_search_; k++) {
@@ -1114,8 +1100,7 @@ namespace casadi {
       // Compute objective and at ||constr(trialXi)||_1 at trial point
       info = evaluate(m, m->trialXi.d, &objTrial, m->constr.d);
       m->nFunCalls++;
-      cNormTrial = lInfConstraintNorm(m->trialXi.d, m->constr.d,
-        m->bu.d, m->bl.d);
+      cNormTrial = lInfConstraintNorm(m, m->trialXi.d, m->constr.d);
       // Reduce step if evaluation fails, if lower bound is violated or if objective is NaN
       if (info != 0 || objTrial < obj_lo_ || objTrial > obj_up_
         || !(objTrial == objTrial) || !(cNormTrial == cNormTrial)) {
@@ -1250,8 +1235,7 @@ namespace casadi {
       // Compute objective and ||constr(trialXiSOC)||_1 at SOC trial point
       info = evaluate(m, m->trialXi.d, &objTrialSOC, m->constr.d);
       m->nFunCalls++;
-      cNormTrialSOC = lInfConstraintNorm(m->trialXi.d, m->constr.d,
-        m->bu.d, m->bl.d);
+      cNormTrialSOC = lInfConstraintNorm(m, m->trialXi.d, m->constr.d);
       if (info != 0 || objTrialSOC < obj_lo_ || objTrialSOC > obj_up_
         || !(objTrialSOC == objTrialSOC) || !(cNormTrialSOC == cNormTrialSOC)) {
         return false; // evaluation error, abort SOC
@@ -1356,8 +1340,7 @@ namespace casadi {
     trialConstr.Dimension(ng_).Initialize(0.0);
     info = evaluate(m, m->trialXi.d, &objTrial, trialConstr.d);
     m->nFunCalls++;
-    cNormTrial = lInfConstraintNorm(m->trialXi.d, trialConstr.d,
-      m->bu.d, m->bl.d);
+    cNormTrial = lInfConstraintNorm(m, m->trialXi.d, trialConstr.d);
     if (info != 0 || objTrial < obj_lo_ || objTrial > obj_up_
       || !(objTrial == objTrial) || !(cNormTrial == cNormTrial)) {
       // evaluation error
@@ -2181,36 +2164,40 @@ namespace casadi {
    */
   void Blocksqp::updateStepBounds(BlocksqpMemory* m, bool soc) const {
     int i;
-    int nVar = nx_;
-    int nCon = ng_;
 
     // Bounds on step
-    for (i=0; i<nVar; i++) {
-      if (m->bl(i) != inf)
-        m->deltaBl(i) = m->bl(i) - m->xi(i);
-      else
+    for (i=0; i<nx_; i++) {
+      double lbx = m->lbx ? m->lbx[i] : 0;
+      if (lbx != inf) {
+        m->deltaBl(i) = lbx - m->xi(i);
+      } else {
         m->deltaBl(i) = inf;
+      }
 
-      if (m->bu(i) != inf)
-        m->deltaBu(i) = m->bu(i) - m->xi(i);
-      else
+      double ubx = m->ubx ? m->ubx[i] : 0;
+      if (ubx != inf) {
+        m->deltaBu(i) = ubx - m->xi(i);
+      } else {
         m->deltaBu(i) = inf;
+      }
     }
 
     // Bounds on linearized constraints
-    for (i=0; i<nCon; i++) {
-      if (m->bl(nVar+i) != inf) {
-        m->deltaBl(nVar+i) = m->bl(nVar+i) - m->constr(i);
-        if (soc) m->deltaBl(nVar+i) += m->AdeltaXi(i);
+    for (i=0; i<ng_; i++) {
+      double lbg = m->lbg ? m->lbg[i] : 0;
+      if (lbg != inf) {
+        m->deltaBl(nx_+i) = lbg - m->constr(i);
+        if (soc) m->deltaBl(nx_+i) += m->AdeltaXi(i);
       } else {
-        m->deltaBl(nVar+i) = inf;
+        m->deltaBl(nx_+i) = inf;
       }
 
-      if (m->bu(nVar+i) != inf) {
-        m->deltaBu(nVar+i) = m->bu(nVar+i) - m->constr(i);
-        if (soc) m->deltaBu(nVar+i) += m->AdeltaXi(i);
+      double ubg = m->ubg ? m->ubg[i] : 0;
+      if (ubg != inf) {
+        m->deltaBu(nx_+i) = ubg - m->constr(i);
+        if (soc) m->deltaBu(nx_+i) += m->AdeltaXi(i);
       } else {
-        m->deltaBu(nVar+i) = inf;
+        m->deltaBu(nx_+i) = inf;
       }
     }
   }
@@ -2525,10 +2512,9 @@ namespace casadi {
   }
 
   double Blocksqp::
-  lInfConstraintNorm(const double* xi, const double* g,
-                     const double* bu, const double* bl) const {
-    return fmax(casadi_max_viol(nx_, xi, bl, bu),
-                casadi_max_viol(ng_, g, bl+nx_, bu+nx_));
+  lInfConstraintNorm(BlocksqpMemory* m, const double* xi, const double* g) const {
+    return fmax(casadi_max_viol(nx_, xi, m->lbx, m->ubx),
+                casadi_max_viol(ng_, g, m->lbg, m->ubg));
   }
 
 } // namespace casadi
