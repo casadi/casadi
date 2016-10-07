@@ -141,7 +141,6 @@ namespace casadi {
       AUX_NORM_INF,
       AUX_IAMAX,
       AUX_FILL,
-      AUX_ASUM,
       AUX_SQ,
       AUX_SIGN,
       AUX_MTIMES,

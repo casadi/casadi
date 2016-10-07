@@ -64,10 +64,6 @@ namespace casadi {
   template<typename real_t>
   real_t CASADI_PREFIX(dot)(int n, const real_t* x, const real_t* y);
 
-  /// ASUM: ||x||_1 -> return
-  template<typename real_t>
-  real_t CASADI_PREFIX(asum)(int n, const real_t* x);
-
   /// IAMAX: index corresponding to the entry with the largest absolute value
   template<typename real_t>
   int CASADI_PREFIX(iamax)(int n, const real_t* x, int inc_x);
@@ -281,16 +277,6 @@ namespace casadi {
   }
 
   template<typename real_t>
-  real_t CASADI_PREFIX(asum)(int n, const real_t* x) {
-    real_t r = 0;
-    int i;
-    if (x) {
-      for (i=0; i<n; ++i) r += fabs(*x++);
-    }
-    return r;
-  }
-
-  template<typename real_t>
   int CASADI_PREFIX(iamax)(int n, const real_t* x, int inc_x) {
     real_t t;
     real_t largest_value = -1.0;
@@ -408,7 +394,9 @@ namespace casadi {
   real_t CASADI_PREFIX(norm_1)(int n, const real_t* x) {
     real_t ret = 0;
     int i;
-    for (i=0; i<n; ++i) ret += fabs(*x++);
+    if (x) {
+      for (i=0; i<n; ++i) ret += fabs(*x++);
+    }
     return ret;
   }
 
