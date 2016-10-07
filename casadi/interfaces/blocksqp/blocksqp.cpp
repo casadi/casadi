@@ -474,6 +474,7 @@ namespace casadi {
     alloc_w(ng_, true); // gk
     alloc_w(nx_, true); // grad_fk
     alloc_w(nx_, true); // grad_lagk
+    alloc_w(nx_+ng_, true); // lam_qp
   }
 
   void Blocksqp::init_memory(void* mem) const {
@@ -501,6 +502,7 @@ namespace casadi {
     m->gk = w; w += ng_;
     m->grad_fk = w; w += nx_;
     m->grad_lagk = w; w += nx_;
+    m->lam_qp = w; w += nx_+ng_;
   }
 
   void Blocksqp::solve(void* mem) const {
@@ -658,7 +660,7 @@ namespace casadi {
     for (it=0; it<maxIt; it++) {
       /// Solve QP subproblem with qpOASES or QPOPT
       updateStepBounds(m, 0);
-      infoQP = solveQP(m, m->deltaXi.d, m->lambdaQP.d);
+      infoQP = solveQP(m, m->deltaXi.d, m->lam_qp);
 
       if (infoQP == 1) {
           // 1.) Maximum number of iterations reached
@@ -667,7 +669,7 @@ namespace casadi {
           // 2.) QP error (e.g., unbounded), solve again with pos.def. diagonal matrix (identity)
           casadi_eprintf("***QP error. Solve again with identity matrix.***\n");
           resetHessian(m);
-          infoQP = solveQP(m, m->deltaXi.d, m->lambdaQP.d);
+          infoQP = solveQP(m, m->deltaXi.d, m->lam_qp);
           if (infoQP) {
             // If there is still an error, terminate.
             casadi_eprintf("***QP error. Stop.***\n");
@@ -980,7 +982,7 @@ namespace casadi {
 
   void Blocksqp::
   acceptStep(BlocksqpMemory* m, double alpha) const {
-    acceptStep(m, m->deltaXi.d, m->lambdaQP.d, alpha, 0);
+    acceptStep(m, m->deltaXi.d, m->lam_qp, alpha, 0);
   }
 
   void Blocksqp::
@@ -1230,7 +1232,7 @@ namespace casadi {
 
     // First SOC step
     deltaXiSOC.Dimension(m->deltaXi.m).Initialize(0.0);
-    lambdaQPSOC.Dimension(m->lambdaQP.m).Initialize(0.0);
+    lambdaQPSOC.Dimension(nx_+ng_).Initialize(0.0);
 
     // Second order correction loop
     cNormOld = cNorm;
@@ -1370,12 +1372,12 @@ namespace casadi {
 
     // scaled norm of Lagrangian gradient
     trialGradLagrange.Dimension(nx_).Initialize(0.0);
-    calcLagrangeGradient(m, m->lambdaQP.d, m->lambdaQP.d+nx_, m->grad_fk,
+    calcLagrangeGradient(m, m->lam_qp, m->lam_qp+nx_, m->grad_fk,
                          m->jacNz, m->jacIndRow, m->jacIndCol,
                          trialGradLagrange.d, 0);
 
     trialGradNorm = casadi_norm_inf(trialGradLagrange.m, trialGradLagrange.d);
-    trialTol = trialGradNorm/(1.0+casadi_norm_inf(m->lambdaQP.m, m->lambdaQP.d));
+    trialTol = trialGradNorm/(1.0+casadi_norm_inf(nx_+ng_, m->lam_qp));
 
     if (fmax(cNormTrial, trialTol) < kappa_f_ * fmax(m->cNorm, m->tol)) {
       acceptStep(m, 1.0);
@@ -2440,7 +2442,7 @@ namespace casadi {
     m->AdeltaXi.Dimension(nCon).Initialize(0.0);
 
     // dual variables of QP (simple bounds and general constraints)
-    m->lambdaQP.Dimension(nVar+nCon).Initialize(0.0);
+    casadi_fill(m->lam_qp, nx_+ng_, 0.);
 
     // line search parameters
     m->deltaH.Dimension(nblocks_).Initialize(0.0);
