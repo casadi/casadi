@@ -183,8 +183,8 @@ namespace casadi {
      */
     double *delta_norm;  // sTs
     double* delta_norm_old;  // (from previous iteration)
-    blocksqp::Matrix deltaGamma;  // sTy
-    blocksqp::Matrix deltaGammaOld;  // (from previous iteration)
+    double* delta_gamma;  // sTy
+    double* delta_gamma_old;  // (from previous iteration)
     int *noUpdateCounter;  // count skipped updates for each block
 
     /*

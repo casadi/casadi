@@ -477,6 +477,8 @@ namespace casadi {
     alloc_w(nx_+ng_, true); // lam_qp
     alloc_w(nblocks_, true); // delta_norm
     alloc_w(nblocks_, true); // delta_norm_old
+    alloc_w(nblocks_, true); // delta_gamma
+    alloc_w(nblocks_, true); // delta_gamma_old
   }
 
   void Blocksqp::init_memory(void* mem) const {
@@ -507,6 +509,8 @@ namespace casadi {
     m->lam_qp = w; w += nx_+ng_;
     m->delta_norm = w; w += nblocks_;
     m->delta_norm_old = w; w += nblocks_;
+    m->delta_gamma = w; w += nblocks_;
+    m->delta_gamma_old = w; w += nblocks_;
   }
 
   void Blocksqp::solve(void* mem) const {
@@ -1529,9 +1533,9 @@ namespace casadi {
 
     // Remove information on old scalars (used for COL sizing)
     m->delta_norm[iBlock] = 1.0;
-    m->deltaGamma(iBlock) = 0.0;
+    m->delta_gamma[iBlock] = 0.0;
     m->delta_norm_old[iBlock] = 1.0;
-    m->deltaGammaOld(iBlock) = 0.0;
+    m->delta_gamma_old[iBlock] = 0.0;
 
     m->noUpdateCounter[iBlock] = -1;
 
@@ -1588,9 +1592,9 @@ namespace casadi {
 
     // Get sTs, sTs_, sTy, sTy_, sTBs
     deltaNorm = m->delta_norm[iBlock];
-    deltaGamma = m->deltaGamma(iBlock);
+    deltaGamma = m->delta_gamma[iBlock];
     deltaNormOld = m->delta_norm_old[iBlock];
-    deltaGammaOld = m->deltaGammaOld(iBlock);
+    deltaGammaOld = m->delta_gamma_old[iBlock];
     deltaBdelta = 0.0;
     for (i=0; i<nVarLocal; i++)
       for (j=0; j<nVarLocal; j++)
@@ -1661,10 +1665,10 @@ namespace casadi {
 
       // Update sTs, sTs_ and sTy, sTy_
       m->delta_norm_old[iBlock] = m->delta_norm[iBlock];
-      m->deltaGammaOld(iBlock) = m->deltaGamma(iBlock);
+      m->delta_gamma_old[iBlock] = m->delta_gamma[iBlock];
       m->delta_norm[iBlock] = casadi_dot(smallDelta.m, smallDelta.d,
         smallDelta.d);
-      m->deltaGamma(iBlock) = casadi_dot(smallDelta.m, smallDelta.d,
+      m->delta_gamma[iBlock] = casadi_dot(smallDelta.m, smallDelta.d,
         smallGamma.d);
 
       // Sizing before the update
@@ -1753,8 +1757,8 @@ namespace casadi {
       calcInitialHessian(m, iBlock);
       m->delta_norm[iBlock] = 1.0;
       m->delta_norm_old[iBlock] = 1.0;
-      m->deltaGamma(iBlock) = 0.0;
-      m->deltaGammaOld(iBlock) = 0.0;
+      m->delta_gamma[iBlock] = 0.0;
+      m->delta_gamma_old[iBlock] = 0.0;
       m->noUpdateCounter[iBlock] = -1;
 
       // Size the initial update, but with the most recent delta/gamma-pair
@@ -1771,9 +1775,9 @@ namespace casadi {
 
         // Update sTs, sTs_ and sTy, sTy_
         m->delta_norm_old[iBlock] = m->delta_norm[iBlock];
-        m->deltaGammaOld(iBlock) = m->deltaGamma(iBlock);
+        m->delta_gamma_old[iBlock] = m->delta_gamma[iBlock];
         m->delta_norm[iBlock] = casadi_dot(deltai.m, deltai.d, deltai.d);
-        m->deltaGamma(iBlock) = casadi_dot(gammai.m, gammai.d, deltai.d);
+        m->delta_gamma[iBlock] = casadi_dot(gammai.m, gammai.d, deltai.d);
 
         // Save statistics, we want to record them only for the most recent update
         averageSizingFactor = m->averageSizingFactor;
@@ -1842,7 +1846,7 @@ namespace casadi {
         h1 += delta[i] * Bdelta(i);
         //h2 += delta[i] * gamma[i];
       }
-    h2 = m->deltaGamma(iBlock);
+    h2 = m->delta_gamma[iBlock];
 
     /* Powell's damping strategy to maintain pos. def. (Nocedal/Wright p.537; SNOPT paper)
      * Interpolates between current approximation and unmodified BFGS */
@@ -1861,7 +1865,7 @@ namespace casadi {
         }
 
         // Also redefine deltaGamma for computation of sizing factor in the next iteration
-        m->deltaGamma(iBlock) = h2;
+        m->delta_gamma[iBlock] = h2;
 
         damped = 1;
       }
@@ -2466,8 +2470,8 @@ namespace casadi {
     // For selective sizing: for each block save sTs, sTs_, sTy, sTy_
     casadi_fill(m->delta_norm, nblocks_, 1.);
     casadi_fill(m->delta_norm_old, nblocks_, 1.);
-    m->deltaGamma.Dimension(nblocks_).Initialize(0.0);
-    m->deltaGammaOld.Dimension(nblocks_).Initialize(0.0);
+    casadi_fill(m->delta_gamma, nblocks_, 0.);
+    casadi_fill(m->delta_gamma_old, nblocks_, 0.);
   }
 
 
