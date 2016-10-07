@@ -8877,8 +8877,6 @@ Print a representation of the object.
 
 
 // File: namespaceblocksqp.xml
-%feature("docstring") blocksqp::lInfConstraintNorm "
-";
 
 
 // File: namespaceBonmin.xml
@@ -8996,6 +8994,11 @@ Check if the vector is strictly decreasing.
 %feature("docstring") casadi::load_integrator "
 
 Explicitly load a plugin dynamically.
+
+";
+
+%feature("docstring") casadi::casadi_sum_viol "[INTERNAL]  Sum of bound
+violations.
 
 ";
 
@@ -10619,6 +10622,11 @@ Check if the vector is monotone.
 
 %feature("docstring") casadi::zip "[INTERNAL] ";
 
+%feature("docstring") casadi::casadi_max_viol "[INTERNAL]  Largest bound
+violation.
+
+";
+
 %feature("docstring") casadi::replaceMat "[INTERNAL] ";
 
 %feature("docstring") casadi::collocationInterpolators "
@@ -10971,11 +10979,6 @@ Get output scheme name by index.
 %feature("docstring") casadi::has_linsol "
 
 [DEPRECATED] Legacy - alias for Linsol::has_plugin
-
-";
-
-%feature("docstring") casadi::casadi_asum "[INTERNAL]  ASUM: ||x||_1 ->
-return.
 
 ";
 

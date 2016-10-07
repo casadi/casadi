@@ -7850,19 +7850,11 @@ Returns just a pointer to the full matrix.
 
 ";
 
-%feature("docstring")  blocksqp::Matrix::Initialize(double(*)(int, int)) "
-
-";
-
 %feature("docstring")  blocksqp::Matrix::Initialize(double val) "
 
 ";
 
-%feature("docstring") blocksqp::Matrix::Matrix(int=1, int=1, int=-1) "
-
-";
-
-%feature("docstring") blocksqp::Matrix::Matrix(int, int, double *, int=-1) "
+%feature("docstring") blocksqp::Matrix::Matrix() "
 
 ";
 
@@ -11140,24 +11132,7 @@ Constructor.
 
 
 // File: classblocksqp_1_1SymMatrix.xml
-%feature("docstring") blocksqp::SymMatrix::SymMatrix(int=1) "
-
-";
-
-%feature("docstring") blocksqp::SymMatrix::SymMatrix(int, double *) "
-
-";
-
-%feature("docstring") blocksqp::SymMatrix::SymMatrix(int, int, int) "
-
-";
-
-%feature("docstring") blocksqp::SymMatrix::SymMatrix(int, int, double *,
-int=-1) "
-
-";
-
-%feature("docstring") blocksqp::SymMatrix::SymMatrix(const Matrix &A) "
+%feature("docstring") blocksqp::SymMatrix::SymMatrix() "
 
 ";
 
@@ -11494,11 +11469,6 @@ LDIM) "
 
 ";
 
-%feature("docstring")  blocksqp::SymMatrix::Initialize(double(*)(int, int))
-"
-
-";
-
 %feature("docstring")  blocksqp::SymMatrix::Initialize(double val) "
 
 ";
@@ -11685,8 +11655,6 @@ Print a representation of the object.
 
 
 // File: namespaceblocksqp.xml
-%feature("docstring")  blocksqp::lInfConstraintNorm(const Matrix &xi, const Matrix &constr, const Matrix &bu, const Matrix &bl) "
-";
 
 
 // File: namespaceBonmin.xml
@@ -11811,6 +11779,13 @@ Check if the vector is strictly decreasing.
 %feature("docstring")  casadi::load_integrator(const std::string &name) "
 
 Explicitly load a plugin dynamically.
+
+";
+
+%feature("docstring")  casadi::casadi_sum_viol(int n, const real_t *x, const
+real_t *lb, const real_t *ub) "
+
+[INTERNAL]  Sum of bound violations.
 
 ";
 
@@ -13519,6 +13494,13 @@ const std::vector< T > &mat) "
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::casadi_max_viol(int n, const real_t *x, const
+real_t *lb, const real_t *ub) "
+
+[INTERNAL]  Largest bound violation.
+
+";
+
 %feature("docstring")  casadi::replaceMat(const M &arg, const Sparsity &inp,
 bool hcat=false) "
 
@@ -13909,12 +13891,6 @@ Get output scheme name by index.
 %feature("docstring")  casadi::has_linsol(const std::string &name) "
 
 [DEPRECATED] Legacy - alias for Linsol::has_plugin
-
-";
-
-%feature("docstring")  casadi::casadi_asum(int n, const real_t *x) "
-
-[INTERNAL]  ASUM: ||x||_1 -> return.
 
 ";
 
