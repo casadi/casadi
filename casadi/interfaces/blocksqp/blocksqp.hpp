@@ -157,7 +157,7 @@ namespace casadi {
 
     blocksqp::Matrix deltaMat;  // last m primal steps
     blocksqp::Matrix deltaXi;  // alias for current step
-    blocksqp::Matrix gradObj;  // gradient of objective
+    double* grad_fk;  // gradient of objective
     blocksqp::Matrix gradLagrange;  // gradient of Lagrangian
     blocksqp::Matrix gammaMat;  // Lagrangian gradient differences for last m steps
     blocksqp::Matrix gamma;  // alias for current Lagrangian gradient
@@ -259,7 +259,7 @@ namespace casadi {
     /// Compute gradient of Lagrangian function (sparse version)
     void calcLagrangeGradient(BlocksqpMemory* m,
       const double* lam_x, const double* lam_g,
-      const double* gradObj, double *jacNz, int *jacIndRow, int *jacIndCol,
+      const double* grad_f, double *jacNz, int *jacIndRow, int *jacIndCol,
       double *gradLagrange, int flag) const;
 
     /// Overloaded function for convenience, uses current variables of SQPiterate vars
@@ -379,9 +379,9 @@ namespace casadi {
 
     /// Evaluate objective and constraints, including derivatives
     int evaluate(BlocksqpMemory* m,
-                  double *objval,
-                  double *constr,
-                  double *gradObj,
+                  double *f,
+                  double *g,
+                  double *grad_f,
                   double *&jacNz,
                   int *&jacIndRow,
                   int *&jacIndCol,
@@ -389,8 +389,8 @@ namespace casadi {
 
     /// Evaluate objective and constraints, no derivatives
     int evaluate(BlocksqpMemory* m, const double *xk,
-                  double *objval,
-                  double *constr) const;
+                  double *f,
+                  double *g) const;
 
     //  Declaration of general purpose routines for matrix and vector computations
     double lInfConstraintNorm(BlocksqpMemory* m, const double* xk, const double* g) const;
