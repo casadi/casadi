@@ -348,8 +348,8 @@ namespace casadi {
     void sizeInitialHessian(BlocksqpMemory* m, const double* gamma,
       const double* delta, int iBlock, int option) const;
     // [blockwise] Size Hessian using the COL scaling factor
-    void sizeHessianCOL(BlocksqpMemory* m, const blocksqp::Matrix &gamma,
-      const blocksqp::Matrix &delta, int iBlock) const;
+    void sizeHessianCOL(BlocksqpMemory* m, const double* gamma,
+      const double* delta, int iBlock) const;
 
     /*
     * STATS

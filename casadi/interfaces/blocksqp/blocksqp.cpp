@@ -1569,8 +1569,10 @@ namespace casadi {
   }
 
 
-  void Blocksqp::sizeHessianCOL(BlocksqpMemory* m, const blocksqp::Matrix &gamma,
-    const blocksqp::Matrix &delta, int iBlock) const {
+  void Blocksqp::
+  sizeHessianCOL(BlocksqpMemory* m, const double* gamma,
+                 const double* delta, int iBlock) const {
+    int nVarLocal = m->hess[iBlock].m;
     int i, j;
     double theta, scale, myEps = 1.0e3 * eps_;
     double deltaNorm, deltaNormOld, deltaGamma, deltaGammaOld, deltaBdelta;
@@ -1581,9 +1583,9 @@ namespace casadi {
     deltaNormOld = m->deltaNormOld(iBlock);
     deltaGammaOld = m->deltaGammaOld(iBlock);
     deltaBdelta = 0.0;
-    for (i=0; i<delta.m; i++)
-      for (j=0; j<delta.m; j++)
-        deltaBdelta += delta(i) * m->hess[iBlock](i, j) * delta(j);
+    for (i=0; i<nVarLocal; i++)
+      for (j=0; j<nVarLocal; j++)
+        deltaBdelta += delta[i] * m->hess[iBlock](i, j) * delta[j];
 
     // Centered Oren-Luenberger factor
     if (m->noUpdateCounter[iBlock] == -1) {
@@ -1604,8 +1606,8 @@ namespace casadi {
     if (scale < 1.0 && scale > 0.0) {
       scale = fmax(col_eps_, scale);
       //casadi_printf("Sizing value (COL) block %i = %g\n", iBlock, scale);
-      for (i=0; i<m->hess[iBlock].m; i++)
-        for (j=i; j<m->hess[iBlock].m; j++)
+      for (i=0; i<nVarLocal; i++)
+        for (j=i; j<nVarLocal; j++)
           m->hess[iBlock](i, j) *= scale;
 
       // statistics: average sizing factor
@@ -1660,7 +1662,7 @@ namespace casadi {
       if (hessScaling < 4 && firstIter)
         sizeInitialHessian(m, smallGamma.d, smallDelta.d, iBlock, hessScaling);
       else if (hessScaling == 4)
-        sizeHessianCOL(m, smallGamma, smallDelta, iBlock);
+        sizeHessianCOL(m, smallGamma.d, smallDelta.d, iBlock);
 
       // Compute the new update
       if (updateType == 1) {
@@ -1673,7 +1675,7 @@ namespace casadi {
         if (fallback_scaling_ < 4 && firstIter)
           sizeInitialHessian(m, smallGamma.d, smallDelta.d, iBlock, fallback_scaling_);
         else if (fallback_scaling_ == 4)
-          sizeHessianCOL(m, smallGamma, smallDelta, iBlock);
+          sizeHessianCOL(m, smallGamma.d, smallDelta.d, iBlock);
 
         // Compute fallback update
         if (fallback_update_ == 2)
@@ -1770,7 +1772,7 @@ namespace casadi {
         hessSkipped = m->hessSkipped;
 
         // Selective sizing before the update
-        if (hessScaling == 4) sizeHessianCOL(m, gammai, deltai, iBlock);
+        if (hessScaling == 4) sizeHessianCOL(m, gammai.d, deltai.d, iBlock);
 
         // Compute the new update
         if (updateType == 1) {
