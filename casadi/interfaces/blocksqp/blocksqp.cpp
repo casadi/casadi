@@ -681,7 +681,7 @@ namespace casadi {
     for (it=0; it<maxIt; it++) {
       /// Solve QP subproblem with qpOASES or QPOPT
       updateStepBounds(m, 0);
-      infoQP = solveQP(m, m->deltaXi.d, m->lam_qp);
+      infoQP = solveQP(m, m->dxk, m->lam_qp);
 
       if (infoQP == 1) {
           // 1.) Maximum number of iterations reached
@@ -690,7 +690,7 @@ namespace casadi {
           // 2.) QP error (e.g., unbounded), solve again with pos.def. diagonal matrix (identity)
           casadi_eprintf("***QP error. Solve again with identity matrix.***\n");
           resetHessian(m);
-          infoQP = solveQP(m, m->deltaXi.d, m->lam_qp);
+          infoQP = solveQP(m, m->dxk, m->lam_qp);
           if (infoQP) {
             // If there is still an error, terminate.
             casadi_eprintf("***QP error. Stop.***\n");
@@ -1003,7 +1003,7 @@ namespace casadi {
 
   void Blocksqp::
   acceptStep(BlocksqpMemory* m, double alpha) const {
-    acceptStep(m, m->deltaXi.d, m->lam_qp, alpha, 0);
+    acceptStep(m, m->dxk, m->lam_qp, alpha, 0);
   }
 
   void Blocksqp::
@@ -1019,7 +1019,7 @@ namespace casadi {
     // Set new xk by accepting the current trial step
     for (k=0; k<nx_; k++) {
       m->xk[k] = m->trial_xk[k];
-      m->deltaXi(k) = alpha * deltaXi[k];
+      m->dxk[k] = alpha * deltaXi[k];
     }
 
     // Store the infinity norm of the multiplier step
@@ -1090,7 +1090,7 @@ namespace casadi {
     for (k=0; k<10; k++) {
       // Compute new trial point
       for (i=0; i<nVar; i++)
-        m->trial_xk[i] = m->xk[i] + alpha * m->deltaXi(i);
+        m->trial_xk[i] = m->xk[i] + alpha * m->dxk[i];
 
       // Compute problem functions at trial point
       info = evaluate(m, m->trial_xk, &objTrial, m->gk);
@@ -1133,12 +1133,12 @@ namespace casadi {
     for (k=0; k<max_line_search_; k++) {
       // Compute new trial point
       for (i=0; i<nVar; i++)
-        m->trial_xk[i] = m->xk[i] + alpha * m->deltaXi(i);
+        m->trial_xk[i] = m->xk[i] + alpha * m->dxk[i];
 
       // Compute grad(f)^T * deltaXi
       dfTdeltaXi = 0.0;
       for (i=0; i<nVar; i++)
-        dfTdeltaXi += m->grad_fk[i] * m->deltaXi(i);
+        dfTdeltaXi += m->grad_fk[i] * m->dxk[i];
 
       // Compute objective and at ||constr(trial_xk)||_1 at trial point
       info = evaluate(m, m->trial_xk, &objTrial, m->gk);
@@ -1253,7 +1253,7 @@ namespace casadi {
     // m->jac_times_dxk and m->grad_fk are unchanged so far.
 
     // First SOC step
-    deltaXiSOC.Dimension(m->deltaXi.m).Initialize(0.0);
+    deltaXiSOC.Dimension(nx_).Initialize(0.0);
     lambdaQPSOC.Dimension(nx_+ng_).Initialize(0.0);
 
     // Second order correction loop
@@ -1377,7 +1377,7 @@ namespace casadi {
 
     // Compute new trial point
     for (i=0; i<nx_; i++)
-      m->trial_xk[i] = m->xk[i] + m->deltaXi(i);
+      m->trial_xk[i] = m->xk[i] + m->dxk[i];
 
     // Compute objective and ||constr(trial_xk)|| at trial point
     trialConstr.Dimension(ng_).Initialize(0.0);
@@ -1956,7 +1956,7 @@ namespace casadi {
     if (m2 == 1)
       return;
 
-    m->deltaXi.Submatrix(m->deltaMat, nVar, 1, 0, m->itCount % m2);
+    m->dxk = m->deltaMat.d + nx_*(m->itCount % m2);
     m->gamma.Submatrix(m->gammaMat, nVar, 1, 0, m->itCount % m2);
   }
 
@@ -2289,7 +2289,7 @@ namespace casadi {
       casadi_printf("%-10.2e", m->cNormS);
       casadi_printf("%-10.2e", m->tol);
       casadi_printf("%-10.2e", m->gradNorm);
-      casadi_printf("%-10.2e", casadi_norm_inf(m->deltaXi.m, m->deltaXi.d));
+      casadi_printf("%-10.2e", casadi_norm_inf(nx_, m->dxk));
       casadi_printf("%-10.2e", m->lambdaStepNorm);
       casadi_printf("%-9.1e", m->alpha);
       casadi_printf("%5i", m->nSOCS);
@@ -2451,7 +2451,8 @@ namespace casadi {
 
     // current step
     m->deltaMat.Dimension(nVar, hess_memsize_, nVar).Initialize(0.0);
-    m->deltaXi.Submatrix(m->deltaMat, nVar, 1, 0, 0);
+    m->dxk = m->deltaMat.d;
+
     // trial step (temporary variable, for line search)
     casadi_fill(m->trial_xk, nx_, 0.);
 

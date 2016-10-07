@@ -155,7 +155,7 @@ namespace casadi {
     int *jacIndCol;  // indices to first entry of columns (nCols+1)
 
     blocksqp::Matrix deltaMat;  // last m primal steps
-    blocksqp::Matrix deltaXi;  // alias for current step
+    double* dxk;  // alias for current step
     double* grad_fk;  // gradient of objective
     double* grad_lagk;  // gradient of Lagrangian
     blocksqp::Matrix gammaMat;  // Lagrangian gradient differences for last m steps
