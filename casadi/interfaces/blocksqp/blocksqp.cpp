@@ -468,7 +468,7 @@ namespace casadi {
 
     // Allocate memory
     alloc_w(Asp_.nnz(), true); // jac
-    alloc_w(nx_, true); // xi
+    alloc_w(nx_, true); // xk
   }
 
   void Blocksqp::init_memory(void* mem) const {
@@ -490,7 +490,7 @@ namespace casadi {
 
     // Temporary memory
     m->jac = w; w += Asp_.nnz();
-    m->xi = w; w += nx_;
+    m->xk = w; w += nx_;
   }
 
   void Blocksqp::solve(void* mem) const {
@@ -574,8 +574,8 @@ namespace casadi {
     // Initialize filter with pair (maxConstrViolation, objLowerBound)
     initializeFilter(m);
 
-    // Set initial values for all xi and set the Jacobian for linear constraints
-    initialize(m, m->xi, m->lambda.d, m->jacNz, m->jacIndRow, m->jacIndCol);
+    // Set initial values for all xk and set the Jacobian for linear constraints
+    initialize(m, m->xk, m->lambda.d, m->jacNz, m->jacIndRow, m->jacIndCol);
 
     m->fstats.at("mainloop").tic();
     ret = run(m, max_iter_, warmstart_);
@@ -589,7 +589,7 @@ namespace casadi {
     // Get constraints at solution
     casadi_copy(m->constr.d, ng_, m->g);
     // Get primal solution
-    casadi_copy(m->xi, nx_, m->x);
+    casadi_copy(m->xk, nx_, m->x);
     // Get dual solution (simple bounds)
     if (m->lam_x) {
       casadi_copy(m->lambda.d, nx_, m->lam_x);
@@ -622,8 +622,8 @@ namespace casadi {
       /// Set initial Hessian approximation
       calcInitialHessian(m);
 
-      /// Evaluate all functions and gradients for xi_0
-      infoEval = evaluate(m, m->xi, m->lambda.d, &m->obj,
+      /// Evaluate all functions and gradients for xk_0
+      infoEval = evaluate(m, m->xk, m->lambda.d, &m->obj,
                           m->constr.d, m->gradObj.d,
                           m->jacNz, m->jacIndRow, m->jacIndCol,
                           m->hess);
@@ -771,8 +771,8 @@ namespace casadi {
       /// Calculate "old" Lagrange gradient: gamma = dL(xi_k, lambda_k+1)
       calcLagrangeGradient(m, m->gamma.d, 0);
 
-      /// Evaluate functions and gradients at the new xi
-      infoEval = evaluate(m, m->xi, m->lambda.d, &m->obj, m->constr.d,
+      /// Evaluate functions and gradients at the new xk
+      infoEval = evaluate(m, m->xk, m->lambda.d, &m->obj, m->constr.d,
                           m->gradObj.d, m->jacNz, m->jacIndRow,
                           m->jacIndCol, m->hess);
       m->nDerCalls++;
@@ -816,7 +816,7 @@ namespace casadi {
   /**
    * Compute gradient of Lagrangian or difference of Lagrangian gradients (sparse version)
    *
-   * flag == 0: output dL(xi, lambda)
+   * flag == 0: output dL(xk, lambda)
    * flag == 1: output dL(xi_k+1, lambda_k+1) - L(xi_k, lambda_k+1)
    * flag == 2: output dL(xi_k+1, lambda_k+1) - df(xi)
    */
@@ -857,7 +857,7 @@ namespace casadi {
 
   /**
    * Compute optimality conditions:
-   * ||gradLagrange(xi,lambda)||_infty / (1 + ||lambda||_infty) <= TOL
+   * ||gradLagrange(xk,lambda)||_infty / (1 + ||lambda||_infty) <= TOL
    * and
    * ||constrViolation||_infty / (1 + ||xi||_infty) <= TOL
    */
@@ -868,8 +868,8 @@ namespace casadi {
     m->tol = m->gradNorm /(1.0 + casadi_norm_inf(m->lambda.m, m->lambda.d));
 
     // norm of constraint violation
-    m->cNorm  = lInfConstraintNorm(m, m->xi, m->constr.d);
-    m->cNormS = m->cNorm /(1.0 + casadi_norm_inf(nx_, m->xi));
+    m->cNorm  = lInfConstraintNorm(m, m->xk, m->constr.d);
+    m->cNormS = m->cNorm /(1.0 + casadi_norm_inf(nx_, m->xk));
 
     if (m->tol <= opttol_ && m->cNormS <= nlinfeastol_)
       return true;
@@ -981,9 +981,9 @@ namespace casadi {
     m->alpha = alpha;
     m->nSOCS = nSOCS;
 
-    // Set new xi by accepting the current trial step
+    // Set new xk by accepting the current trial step
     for (k=0; k<nx_; k++) {
-      m->xi[k] = m->trialXi(k);
+      m->xk[k] = m->trialXi(k);
       m->deltaXi(k) = alpha * deltaXi[k];
     }
 
@@ -1035,7 +1035,7 @@ namespace casadi {
 
   /**
    * Take a full Quasi-Newton step, except when integrator fails:
-   * xi = xi + deltaXi
+   * xk = xk + deltaXi
    * lambda = lambdaQP
    */
   int Blocksqp::fullstep(BlocksqpMemory* m) const {
@@ -1049,7 +1049,7 @@ namespace casadi {
     for (k=0; k<10; k++) {
       // Compute new trial point
       for (i=0; i<nVar; i++)
-        m->trialXi(i) = m->xi[i] + alpha * m->deltaXi(i);
+        m->trialXi(i) = m->xk[i] + alpha * m->deltaXi(i);
 
       // Compute problem functions at trial point
       info = evaluate(m, m->trialXi.d, &objTrial, m->constr.d);
@@ -1086,13 +1086,13 @@ namespace casadi {
     int nVar = nx_;
 
     // Compute ||constr(xi)|| at old point
-    cNorm = lInfConstraintNorm(m, m->xi, m->constr.d);
+    cNorm = lInfConstraintNorm(m, m->xk, m->constr.d);
 
     // Backtracking line search
     for (k=0; k<max_line_search_; k++) {
       // Compute new trial point
       for (i=0; i<nVar; i++)
-        m->trialXi(i) = m->xi[i] + alpha * m->deltaXi(i);
+        m->trialXi(i) = m->xk[i] + alpha * m->deltaXi(i);
 
       // Compute grad(f)^T * deltaXi
       dfTdeltaXi = 0.0;
@@ -1231,7 +1231,7 @@ namespace casadi {
 
       // Set new SOC trial point
       for (i=0; i<nVar; i++) {
-        m->trialXi(i) = m->xi[i] + deltaXiSOC(i);
+        m->trialXi(i) = m->xk[i] + deltaXiSOC(i);
       }
 
       // Compute objective and ||constr(trialXiSOC)||_1 at SOC trial point
@@ -1319,7 +1319,7 @@ namespace casadi {
     // For shooting methods that means setting consistent values for
     // shooting nodes by one forward integration.
     for (int k=0; k<nx_; k++) // input: last successful step
-      m->trialXi(k) = m->xi[k];
+      m->trialXi(k) = m->xk[k];
 
     // FIXME(@jaeandersson) Not implemented
     return -1;
@@ -1336,7 +1336,7 @@ namespace casadi {
 
     // Compute new trial point
     for (i=0; i<nx_; i++)
-      m->trialXi(i) = m->xi[i] + m->deltaXi(i);
+      m->trialXi(i) = m->xk[i] + m->deltaXi(i);
 
     // Compute objective and ||constr(trialXi)|| at trial point
     trialConstr.Dimension(ng_).Initialize(0.0);
@@ -2171,14 +2171,14 @@ namespace casadi {
     for (i=0; i<nx_; i++) {
       double lbx = m->lbx ? m->lbx[i] : 0;
       if (lbx != inf) {
-        m->deltaBl(i) = lbx - m->xi[i];
+        m->deltaBl(i) = lbx - m->xk[i];
       } else {
         m->deltaBl(i) = inf;
       }
 
       double ubx = m->ubx ? m->ubx[i] : 0;
       if (ubx != inf) {
-        m->deltaBu(i) = ubx - m->xi[i];
+        m->deltaBu(i) = ubx - m->xk[i];
       } else {
         m->deltaBu(i) = inf;
       }
@@ -2289,7 +2289,7 @@ namespace casadi {
    */
   void Blocksqp::allocMin(BlocksqpMemory* m) const {
     // current iterate
-    casadi_fill(m->xi, nx_, 0.);
+    casadi_fill(m->xk, nx_, 0.);
 
     // dual variables (for general constraints and variable bounds)
     m->lambda.Dimension(nx_ + ng_).Initialize(0.0);
@@ -2460,10 +2460,10 @@ namespace casadi {
   }
 
   void Blocksqp::
-  initialize(BlocksqpMemory* m, double* xi, double* lambda,
+  initialize(BlocksqpMemory* m, double* xk, double* lambda,
              double *&jacNz, int *&jacIndRow, int *&jacIndCol) const {
     // Primal-dual initial guess
-    double* x = xi;
+    double* x = xk;
     double* lam_x = lambda;
     double* lam_g = lam_x + nx_;
     casadi_copy(m->x0, nx_, x);
@@ -2478,13 +2478,13 @@ namespace casadi {
   }
 
   int Blocksqp::
-  evaluate(BlocksqpMemory* m, const double *xi,
+  evaluate(BlocksqpMemory* m, const double *xk,
            const double *lambda,
            double *objval, double *constr,
            double *gradObj, double *&jacNz, int *&jacIndRow,
            int *&jacIndCol,
            blocksqp::SymMatrix *&hess) const {
-    m->arg[0] = xi; // x
+    m->arg[0] = xk; // x
     m->arg[1] = m->p; // p
     m->res[0] = objval; // f
     m->res[1] = constr; // g
@@ -2495,9 +2495,9 @@ namespace casadi {
   }
 
   int Blocksqp::
-  evaluate(BlocksqpMemory* m, const double *xi, double *objval,
+  evaluate(BlocksqpMemory* m, const double *xk, double *objval,
            double *constr) const {
-    m->arg[0] = xi; // x
+    m->arg[0] = xk; // x
     m->arg[1] = m->p; // p
     m->res[0] = objval; // f
     m->res[1] = constr; // g
@@ -2514,8 +2514,8 @@ namespace casadi {
   }
 
   double Blocksqp::
-  lInfConstraintNorm(BlocksqpMemory* m, const double* xi, const double* g) const {
-    return fmax(casadi_max_viol(nx_, xi, m->lbx, m->ubx),
+  lInfConstraintNorm(BlocksqpMemory* m, const double* xk, const double* g) const {
+    return fmax(casadi_max_viol(nx_, xk, m->lbx, m->ubx),
                 casadi_max_viol(ng_, g, m->lbg, m->ubg));
   }
 

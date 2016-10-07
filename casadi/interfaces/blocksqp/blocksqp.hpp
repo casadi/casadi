@@ -146,7 +146,7 @@ namespace casadi {
     double lambdaStepNorm;  // norm of step in dual variables
     double tol;  // current optimality tolerance
 
-    double* xi;// variable vector
+    double* xk;// variable vector
     blocksqp::Matrix lambda;  // dual variables
     blocksqp::Matrix constr;  // constraint vector
 
@@ -369,16 +369,16 @@ namespace casadi {
     /// Set initial filter, objective function, tolerances etc.
     void initIterate(BlocksqpMemory* m) const;
 
-    // Set initial values for xi (and possibly lambda) and parts of the
+    // Set initial values for xk (and possibly lambda) and parts of the
     // Jacobian that correspond to linear constraints (sparse version).
-    void initialize(BlocksqpMemory* m, double* xi,
+    void initialize(BlocksqpMemory* m, double* xk,
                     double* lambda,
                     double *&jacNz,
                     int *&jacIndRow,
                     int *&jacIndCol) const;
 
     /// Evaluate objective and constraints, including derivatives
-    int evaluate(BlocksqpMemory* m, const double *xi,
+    int evaluate(BlocksqpMemory* m, const double *xk,
                   const double *lambda,
                   double *objval,
                   double *constr,
@@ -389,12 +389,12 @@ namespace casadi {
                   blocksqp::SymMatrix *&hess) const;
 
     /// Evaluate objective and constraints, no derivatives
-    int evaluate(BlocksqpMemory* m, const double *xi,
+    int evaluate(BlocksqpMemory* m, const double *xk,
                   double *objval,
                   double *constr) const;
 
     //  Declaration of general purpose routines for matrix and vector computations
-    double lInfConstraintNorm(BlocksqpMemory* m, const double* xi, const double* g) const;
+    double lInfConstraintNorm(BlocksqpMemory* m, const double* xk, const double* g) const;
 
     /// QP solver for the subproblems
     //Function qpsol_;
