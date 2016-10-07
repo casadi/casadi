@@ -471,6 +471,7 @@ namespace casadi {
     alloc_w(nx_, true); // xk
     alloc_w(nx_, true); // lam_xk
     alloc_w(ng_, true); // lam_gk
+    alloc_w(ng_, true); // gk
   }
 
   void Blocksqp::init_memory(void* mem) const {
@@ -495,6 +496,7 @@ namespace casadi {
     m->xk = w; w += nx_;
     m->lam_xk = w; w += nx_;
     m->lam_gk = w; w += ng_;
+    m->gk = w; w += ng_;
   }
 
   void Blocksqp::solve(void* mem) const {
@@ -591,7 +593,7 @@ namespace casadi {
     // Get optimal cost
     if (m->f) *m->f = m->obj;
     // Get constraints at solution
-    casadi_copy(m->constr.d, ng_, m->g);
+    casadi_copy(m->gk, ng_, m->g);
     // Get primal solution
     casadi_copy(m->xk, nx_, m->x);
     // Get dual solution (simple bounds)
@@ -628,7 +630,7 @@ namespace casadi {
 
       /// Evaluate all functions and gradients for xk_0
       infoEval = evaluate(m, &m->obj,
-                          m->constr.d, m->gradObj.d,
+                          m->gk, m->gradObj.d,
                           m->jacNz, m->jacIndRow, m->jacIndCol,
                           m->hess);
       m->nDerCalls++;
@@ -776,7 +778,7 @@ namespace casadi {
       calcLagrangeGradient(m, m->gamma.d, 0);
 
       /// Evaluate functions and gradients at the new xk
-      infoEval = evaluate(m, &m->obj, m->constr.d,
+      infoEval = evaluate(m, &m->obj, m->gk,
                           m->gradObj.d, m->jacNz, m->jacIndRow,
                           m->jacIndCol, m->hess);
       m->nDerCalls++;
@@ -874,7 +876,7 @@ namespace casadi {
                                    casadi_norm_inf(ng_, m->lam_gk)));
 
     // norm of constraint violation
-    m->cNorm  = lInfConstraintNorm(m, m->xk, m->constr.d);
+    m->cNorm  = lInfConstraintNorm(m, m->xk, m->gk);
     m->cNormS = m->cNorm /(1.0 + casadi_norm_inf(nx_, m->xk));
 
     if (m->tol <= opttol_ && m->cNormS <= nlinfeastol_)
@@ -1030,12 +1032,12 @@ namespace casadi {
       double lbg = m->lbg ? m->lbg[i] : 0;
       double ubg = m->ubg ? m->ubg[i] : 0;
       if (lbg != inf)
-        m->deltaBl(nx_+i) = (*alphaSOC)*m->deltaBl(nx_+i) - m->constr(i);
+        m->deltaBl(nx_+i) = (*alphaSOC)*m->deltaBl(nx_+i) - m->gk[i];
       else
         m->deltaBl(nx_+i) = inf;
 
       if (ubg != inf)
-        m->deltaBu(nx_+i) = (*alphaSOC)*m->deltaBu(nx_+i) - m->constr(i);
+        m->deltaBu(nx_+i) = (*alphaSOC)*m->deltaBu(nx_+i) - m->gk[i];
       else
         m->deltaBu(nx_+i) = inf;
     }
@@ -1063,9 +1065,9 @@ namespace casadi {
         m->trialXi(i) = m->xk[i] + alpha * m->deltaXi(i);
 
       // Compute problem functions at trial point
-      info = evaluate(m, m->trialXi.d, &objTrial, m->constr.d);
+      info = evaluate(m, m->trialXi.d, &objTrial, m->gk);
       m->nFunCalls++;
-      cNormTrial = lInfConstraintNorm(m, m->trialXi.d, m->constr.d);
+      cNormTrial = lInfConstraintNorm(m, m->trialXi.d, m->gk);
       // Reduce step if evaluation fails, if lower bound is violated
       // or if objective or a constraint is NaN
       if (info != 0 || objTrial < obj_lo_ || objTrial > obj_up_
@@ -1097,7 +1099,7 @@ namespace casadi {
     int nVar = nx_;
 
     // Compute ||constr(xi)|| at old point
-    cNorm = lInfConstraintNorm(m, m->xk, m->constr.d);
+    cNorm = lInfConstraintNorm(m, m->xk, m->gk);
 
     // Backtracking line search
     for (k=0; k<max_line_search_; k++) {
@@ -1111,9 +1113,9 @@ namespace casadi {
         dfTdeltaXi += m->gradObj(i) * m->deltaXi(i);
 
       // Compute objective and at ||constr(trialXi)||_1 at trial point
-      info = evaluate(m, m->trialXi.d, &objTrial, m->constr.d);
+      info = evaluate(m, m->trialXi.d, &objTrial, m->gk);
       m->nFunCalls++;
-      cNormTrial = lInfConstraintNorm(m, m->trialXi.d, m->constr.d);
+      cNormTrial = lInfConstraintNorm(m, m->trialXi.d, m->gk);
       // Reduce step if evaluation fails, if lower bound is violated or if objective is NaN
       if (info != 0 || objTrial < obj_lo_ || objTrial > obj_up_
         || !(objTrial == objTrial) || !(cNormTrial == cNormTrial)) {
@@ -1219,7 +1221,7 @@ namespace casadi {
     int nVar = nx_;
     blocksqp::Matrix deltaXiSOC, lambdaQPSOC;
 
-    // m->constr contains result at first trial point: c(xi+deltaXi)
+    // m->gk contains result at first trial point: c(xi+deltaXi)
     // m->constrJac, m->AdeltaXi and m->gradObj are unchanged so far.
 
     // First SOC step
@@ -1246,9 +1248,9 @@ namespace casadi {
       }
 
       // Compute objective and ||constr(trialXiSOC)||_1 at SOC trial point
-      info = evaluate(m, m->trialXi.d, &objTrialSOC, m->constr.d);
+      info = evaluate(m, m->trialXi.d, &objTrialSOC, m->gk);
       m->nFunCalls++;
-      cNormTrialSOC = lInfConstraintNorm(m, m->trialXi.d, m->constr.d);
+      cNormTrialSOC = lInfConstraintNorm(m, m->trialXi.d, m->gk);
       if (info != 0 || objTrialSOC < obj_lo_ || objTrialSOC > obj_up_
         || !(objTrialSOC == objTrialSOC) || !(cNormTrialSOC == cNormTrialSOC)) {
         return false; // evaluation error, abort SOC
@@ -2200,7 +2202,7 @@ namespace casadi {
     for (i=0; i<ng_; i++) {
       double lbg = m->lbg ? m->lbg[i] : 0;
       if (lbg != inf) {
-        m->deltaBl(nx_+i) = lbg - m->constr(i);
+        m->deltaBl(nx_+i) = lbg - m->gk[i];
         if (soc) m->deltaBl(nx_+i) += m->AdeltaXi(i);
       } else {
         m->deltaBl(nx_+i) = inf;
@@ -2208,7 +2210,7 @@ namespace casadi {
 
       double ubg = m->ubg ? m->ubg[i] : 0;
       if (ubg != inf) {
-        m->deltaBu(nx_+i) = ubg - m->constr(i);
+        m->deltaBu(nx_+i) = ubg - m->gk[i];
         if (soc) m->deltaBu(nx_+i) += m->AdeltaXi(i);
       } else {
         m->deltaBu(nx_+i) = inf;
@@ -2309,7 +2311,7 @@ namespace casadi {
 
     // constraint vector with lower and upper bounds
     // (Box constraints are not included in the constraint list)
-    m->constr.Dimension(ng_).Initialize(0.0);
+    casadi_fill(m->gk, ng_, 0.);
 
     // gradient of objective
     m->gradObj.Dimension(nx_).Initialize(0.0);
