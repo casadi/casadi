@@ -182,7 +182,7 @@ namespace casadi {
      * For modified BFGS updates
      */
     double *delta_norm;  // sTs
-    blocksqp::Matrix deltaNormOld;  // (from previous iteration)
+    double* delta_norm_old;  // (from previous iteration)
     blocksqp::Matrix deltaGamma;  // sTy
     blocksqp::Matrix deltaGammaOld;  // (from previous iteration)
     int *noUpdateCounter;  // count skipped updates for each block
