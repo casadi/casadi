@@ -479,6 +479,7 @@ namespace casadi {
     alloc_w(nblocks_, true); // delta_norm_old
     alloc_w(nblocks_, true); // delta_gamma
     alloc_w(nblocks_, true); // delta_gamma_old
+    alloc_w(nblocks_, true); // delta_h
   }
 
   void Blocksqp::init_memory(void* mem) const {
@@ -511,6 +512,7 @@ namespace casadi {
     m->delta_norm_old = w; w += nblocks_;
     m->delta_gamma = w; w += nblocks_;
     m->delta_gamma_old = w; w += nblocks_;
+    m->delta_h = w; w += nblocks_;
   }
 
   void Blocksqp::solve(void* mem) const {
@@ -2280,8 +2282,7 @@ namespace casadi {
       casadi_printf("%-9.1e", m->alpha);
       casadi_printf("%5i", m->nSOCS);
       casadi_printf("%3i, %3i, %-9.1e", m->hessSkipped, m->hessDamped, m->averageSizingFactor);
-      casadi_printf("%i, %-9.1e", m->qpResolve,
-        casadi_norm_1(m->deltaH.m, m->deltaH.d)/nblocks_);
+      casadi_printf("%i, %-9.1e", m->qpResolve, casadi_norm_1(nblocks_, m->delta_h)/nblocks_);
       casadi_printf("\n");
     }
   }
@@ -2453,7 +2454,7 @@ namespace casadi {
     casadi_fill(m->lam_qp, nx_+ng_, 0.);
 
     // line search parameters
-    m->deltaH.Dimension(nblocks_).Initialize(0.0);
+    casadi_fill(m->delta_h, nblocks_, 0.);
 
     // filter as a set of pairs
     m->filter = new std::set< std::pair<double, double> >;

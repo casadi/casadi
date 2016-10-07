@@ -194,7 +194,7 @@ namespace casadi {
     double alpha;  // stepsize for line search
     int nSOCS;  // number of second-order correction steps
     int reducedStepCount;  // count number of consecutive reduced steps,
-    blocksqp::Matrix deltaH; // inertia correction (filter line search w indef Hessian)
+    double* delta_h; // inertia correction (filter line search w indef Hessian)
     blocksqp::Matrix trialXi;  // new trial iterate (for line search)
     std::set< std::pair<double, double> > *filter; // Filter contains pairs (constrVio, objective)
 
