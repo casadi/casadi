@@ -78,12 +78,8 @@ namespace blocksqp {
     int free();
 
   public:
-    SymMatrix(int = 1);
-    SymMatrix(int, double*);
-    SymMatrix(int, int, int);
-    SymMatrix(int, int, double*, int = -1);
-    SymMatrix(const Matrix& A);
-    SymMatrix(const SymMatrix& A);
+    SymMatrix();
+    SymMatrix(const SymMatrix& A); // left unimplemented
     virtual ~SymMatrix();
 
     virtual double &operator()(int i, int j);

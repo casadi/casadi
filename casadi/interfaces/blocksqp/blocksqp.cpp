@@ -2771,63 +2771,12 @@ namespace blocksqp {
     return this->d[i];
   }
 
-  SymMatrix::SymMatrix(int M) {
-    m = M;
-    n = M;
-    ldim = M;
+  SymMatrix::SymMatrix() {
+    m = 0;
+    n = 0;
+    ldim = 0;
     tflag = 0;
     malloc();
-  }
-
-  SymMatrix::SymMatrix(int M, double *ARRAY) {
-    m = M;
-    n = M;
-    ldim = M;
-    tflag = 0;
-    malloc();
-    this->d = ARRAY;
-  }
-
-
-  SymMatrix::SymMatrix(int M, int N, int LDIM) {
-    m = M;
-    n = M;
-    ldim = M;
-    tflag = 0;
-    malloc();
-  }
-
-
-  SymMatrix::SymMatrix(int M, int N, double *ARRAY, int LDIM) {
-    m = M;
-    n = M;
-    ldim = M;
-    tflag = 0;
-    malloc();
-    this->d = ARRAY;
-  }
-
-
-  SymMatrix::SymMatrix(const Matrix &A) {
-    m = A.m;
-    n = A.m;
-    ldim = A.m;
-    tflag = 0;
-    malloc();
-    for (int j=0; j<m; j++)
-      for (int i=j; i<m; i++)
-        (*this)(i, j) = A(i, j);
-  }
-
-  SymMatrix::SymMatrix(const SymMatrix &A) {
-    m = A.m;
-    n = A.n;
-    ldim = A.ldim;
-    tflag = 0;
-    malloc();
-    for (int j=0; j<m; j++)
-      for (int i=j; i<m; i++)
-        (*this)(i, j) = A(i, j);
   }
 
   SymMatrix::~SymMatrix() {
