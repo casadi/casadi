@@ -173,8 +173,7 @@ namespace casadi {
     /*
      * Variables for QP solver
      */
-    blocksqp::Matrix deltaBl;  // lower bounds for current step
-    blocksqp::Matrix deltaBu;  // upper bounds for current step
+    double *lbx_qp, *ubx_qp, *lba_qp, *uba_qp;  // bounds for current step
     double* lam_qp;  // dual variables of QP
     blocksqp::Matrix AdeltaXi;  // product of constraint Jacobian with deltaXi
 

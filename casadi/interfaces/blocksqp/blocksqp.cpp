@@ -481,6 +481,10 @@ namespace casadi {
     alloc_w(nblocks_, true); // delta_gamma_old
     alloc_w(nblocks_, true); // delta_h
     alloc_w(nx_, true); // trial_xk
+    alloc_w(nx_, true); // lbx_qp
+    alloc_w(nx_, true); // ubx_qp
+    alloc_w(ng_, true); // lba_qp
+    alloc_w(ng_, true); // uba_qp
   }
 
   void Blocksqp::init_memory(void* mem) const {
@@ -515,6 +519,10 @@ namespace casadi {
     m->delta_gamma_old = w; w += nblocks_;
     m->delta_h = w; w += nblocks_;
     m->trial_xk = w; w += nx_;
+    m->lbx_qp = w; w += nx_;
+    m->ubx_qp = w; w += nx_;
+    m->lba_qp = w; w += ng_;
+    m->uba_qp = w; w += ng_;
   }
 
   void Blocksqp::solve(void* mem) const {
@@ -1049,20 +1057,21 @@ namespace casadi {
     for (i=0; i<ng_; i++) {
       double lbg = m->lbg ? m->lbg[i] : 0;
       double ubg = m->ubg ? m->ubg[i] : 0;
-      if (lbg != inf)
-        m->deltaBl(nx_+i) = (*alphaSOC)*m->deltaBl(nx_+i) - m->gk[i];
-      else
-        m->deltaBl(nx_+i) = inf;
+      if (lbg != inf) {
+        m->lba_qp[i] = *alphaSOC * m->lba_qp[i] - m->gk[i];
+      } else {
+        m->lba_qp[i] = inf;
+      }
 
-      if (ubg != inf)
-        m->deltaBu(nx_+i) = (*alphaSOC)*m->deltaBu(nx_+i) - m->gk[i];
-      else
-        m->deltaBu(nx_+i) = inf;
+      if (ubg != inf) {
+        m->uba_qp[i] = *alphaSOC * m->uba_qp[i] - m->gk[i];
+      } else {
+        m->uba_qp[i] = inf;
+      }
     }
 
-    *alphaSOC = (*alphaSOC) * 0.5;
+    *alphaSOC *= 0.5;
   }
-
 
   /**
    * Take a full Quasi-Newton step, except when integrator fails:
@@ -2024,10 +2033,10 @@ namespace casadi {
                                     m->jacIndRow, m->jacIndCol, m->jacNz);
     }
     double *g = m->grad_fk;
-    double *lb = m->deltaBl.d;
-    double *lu = m->deltaBu.d;
-    double *lbA = m->deltaBl.d + nx_;
-    double *luA = m->deltaBu.d + nx_;
+    double *lb = m->lbx_qp;
+    double *lu = m->ubx_qp;
+    double *lbA = m->lba_qp;
+    double *luA = m->uba_qp;
 
     // qpOASES options
     qpOASES::Options opts;
@@ -2203,16 +2212,16 @@ namespace casadi {
     for (i=0; i<nx_; i++) {
       double lbx = m->lbx ? m->lbx[i] : 0;
       if (lbx != inf) {
-        m->deltaBl(i) = lbx - m->xk[i];
+        m->lbx_qp[i] = lbx - m->xk[i];
       } else {
-        m->deltaBl(i) = inf;
+        m->lbx_qp[i] = inf;
       }
 
       double ubx = m->ubx ? m->ubx[i] : 0;
       if (ubx != inf) {
-        m->deltaBu(i) = ubx - m->xk[i];
+        m->ubx_qp[i] = ubx - m->xk[i];
       } else {
-        m->deltaBu(i) = inf;
+        m->ubx_qp[i] = inf;
       }
     }
 
@@ -2220,18 +2229,18 @@ namespace casadi {
     for (i=0; i<ng_; i++) {
       double lbg = m->lbg ? m->lbg[i] : 0;
       if (lbg != inf) {
-        m->deltaBl(nx_+i) = lbg - m->gk[i];
-        if (soc) m->deltaBl(nx_+i) += m->AdeltaXi(i);
+        m->lba_qp[i] = lbg - m->gk[i];
+        if (soc) m->lba_qp[i] += m->AdeltaXi(i);
       } else {
-        m->deltaBl(nx_+i) = inf;
+        m->lba_qp[i] = inf;
       }
 
       double ubg = m->ubg ? m->ubg[i] : 0;
       if (ubg != inf) {
-        m->deltaBu(nx_+i) = ubg - m->gk[i];
-        if (soc) m->deltaBu(nx_+i) += m->AdeltaXi(i);
+        m->uba_qp[i] = ubg - m->gk[i];
+        if (soc) m->uba_qp[i] += m->AdeltaXi(i);
       } else {
-        m->deltaBu(nx_+i) = inf;
+        m->uba_qp[i] = inf;
       }
     }
   }
@@ -2446,8 +2455,10 @@ namespace casadi {
     casadi_fill(m->trial_xk, nx_, 0.);
 
     // bounds for step (QP subproblem)
-    m->deltaBl.Dimension(nVar+nCon).Initialize(0.0);
-    m->deltaBu.Dimension(nVar+nCon).Initialize(0.0);
+    casadi_fill(m->lbx_qp, nx_, 0.);
+    casadi_fill(m->ubx_qp, nx_, 0.);
+    casadi_fill(m->lba_qp, ng_, 0.);
+    casadi_fill(m->uba_qp, ng_, 0.);
 
     // product of constraint Jacobian with step (deltaXi)
     m->AdeltaXi.Dimension(nCon).Initialize(0.0);
