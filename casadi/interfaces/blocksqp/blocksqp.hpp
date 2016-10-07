@@ -159,7 +159,7 @@ namespace casadi {
     double* grad_fk;  // gradient of objective
     double* grad_lagk;  // gradient of Lagrangian
     blocksqp::Matrix gammaMat;  // Lagrangian gradient differences for last m steps
-    blocksqp::Matrix gamma;  // alias for current Lagrangian gradient
+    double *gamma;  // alias for current Lagrangian gradient
 
     blocksqp::SymMatrix *hess;  // [blockwise] pointer to current Hessian of the Lagrangian
     blocksqp::SymMatrix *hess1;  // [blockwise] first Hessian approximation

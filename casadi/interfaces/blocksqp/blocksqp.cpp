@@ -802,7 +802,7 @@ namespace casadi {
       }
 
       /// Calculate "old" Lagrange gradient: gamma = dL(xi_k, lambda_k+1)
-      calcLagrangeGradient(m, m->gamma.d, 0);
+      calcLagrangeGradient(m, m->gamma, 0);
 
       /// Evaluate functions and gradients at the new xk
       infoEval = evaluate(m, &m->obj, m->gk,
@@ -824,7 +824,7 @@ namespace casadi {
 
       /// Calculate difference of old and new Lagrange gradient:
       // gamma = -gamma + dL(xi_k+1, lambda_k+1)
-      calcLagrangeGradient(m, m->gamma.d, 1);
+      calcLagrangeGradient(m, m->gamma, 1);
 
       /// Revise Hessian approximation
       if (hess_update_ < 4 && !hess_lim_mem_) {
@@ -1957,7 +1957,7 @@ namespace casadi {
       return;
 
     m->dxk = m->deltaMat.d + nx_*(m->itCount % m2);
-    m->gamma.Submatrix(m->gammaMat, nVar, 1, 0, m->itCount % m2);
+    m->gamma = m->gammaMat.d + nx_*(m->itCount % m2);
   }
 
   void Blocksqp::
@@ -2475,8 +2475,8 @@ namespace casadi {
     m->filter = new std::set< std::pair<double, double> >;
 
     // difference of Lagrangian gradients
-    m->gammaMat.Dimension(nVar, hess_memsize_, nVar).Initialize(0.0);
-    m->gamma.Submatrix(m->gammaMat, nVar, 1, 0, 0);
+    m->gammaMat.Dimension(nx_, hess_memsize_, nx_).Initialize(0.0);
+    m->gamma = m->gammaMat.d;
 
     // Scalars that are used in various Hessian update procedures
     m->noUpdateCounter = new int[nblocks_];
