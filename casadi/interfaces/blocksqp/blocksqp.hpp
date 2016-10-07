@@ -181,7 +181,7 @@ namespace casadi {
     /*
      * For modified BFGS updates
      */
-    blocksqp::Matrix deltaNorm;  // sTs
+    double *delta_norm;  // sTs
     blocksqp::Matrix deltaNormOld;  // (from previous iteration)
     blocksqp::Matrix deltaGamma;  // sTy
     blocksqp::Matrix deltaGammaOld;  // (from previous iteration)

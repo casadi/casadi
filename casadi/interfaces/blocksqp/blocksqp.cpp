@@ -475,6 +475,7 @@ namespace casadi {
     alloc_w(nx_, true); // grad_fk
     alloc_w(nx_, true); // grad_lagk
     alloc_w(nx_+ng_, true); // lam_qp
+    alloc_w(nblocks_, true); // delta_norm
   }
 
   void Blocksqp::init_memory(void* mem) const {
@@ -503,6 +504,7 @@ namespace casadi {
     m->grad_fk = w; w += nx_;
     m->grad_lagk = w; w += nx_;
     m->lam_qp = w; w += nx_+ng_;
+    m->delta_norm = w; w += nblocks_;
   }
 
   void Blocksqp::solve(void* mem) const {
@@ -1524,7 +1526,7 @@ namespace casadi {
     smallDelta.Initialize(0.0);
 
     // Remove information on old scalars (used for COL sizing)
-    m->deltaNorm(iBlock) = 1.0;
+    m->delta_norm[iBlock] = 1.0;
     m->deltaGamma(iBlock) = 0.0;
     m->deltaNormOld(iBlock) = 1.0;
     m->deltaGammaOld(iBlock) = 0.0;
@@ -1583,7 +1585,7 @@ namespace casadi {
     double deltaNorm, deltaNormOld, deltaGamma, deltaGammaOld, deltaBdelta;
 
     // Get sTs, sTs_, sTy, sTy_, sTBs
-    deltaNorm = m->deltaNorm(iBlock);
+    deltaNorm = m->delta_norm[iBlock];
     deltaGamma = m->deltaGamma(iBlock);
     deltaNormOld = m->deltaNormOld(iBlock);
     deltaGammaOld = m->deltaGammaOld(iBlock);
@@ -1656,9 +1658,9 @@ namespace casadi {
       firstIter = (m->noUpdateCounter[iBlock] == -1);
 
       // Update sTs, sTs_ and sTy, sTy_
-      m->deltaNormOld(iBlock) = m->deltaNorm(iBlock);
+      m->deltaNormOld(iBlock) = m->delta_norm[iBlock];
       m->deltaGammaOld(iBlock) = m->deltaGamma(iBlock);
-      m->deltaNorm(iBlock) = casadi_dot(smallDelta.m, smallDelta.d,
+      m->delta_norm[iBlock] = casadi_dot(smallDelta.m, smallDelta.d,
         smallDelta.d);
       m->deltaGamma(iBlock) = casadi_dot(smallDelta.m, smallDelta.d,
         smallGamma.d);
@@ -1747,7 +1749,7 @@ namespace casadi {
 
       // Set B_0 (pretend it's the first step)
       calcInitialHessian(m, iBlock);
-      m->deltaNorm(iBlock) = 1.0;
+      m->delta_norm[iBlock] = 1.0;
       m->deltaNormOld(iBlock) = 1.0;
       m->deltaGamma(iBlock) = 0.0;
       m->deltaGammaOld(iBlock) = 0.0;
@@ -1766,9 +1768,9 @@ namespace casadi {
         deltai.Submatrix(smallDelta, nVarLocal, 1, 0, pos);
 
         // Update sTs, sTs_ and sTy, sTy_
-        m->deltaNormOld(iBlock) = m->deltaNorm(iBlock);
+        m->deltaNormOld(iBlock) = m->delta_norm[iBlock];
         m->deltaGammaOld(iBlock) = m->deltaGamma(iBlock);
-        m->deltaNorm(iBlock) = casadi_dot(deltai.m, deltai.d, deltai.d);
+        m->delta_norm[iBlock] = casadi_dot(deltai.m, deltai.d, deltai.d);
         m->deltaGamma(iBlock) = casadi_dot(gammai.m, gammai.d, deltai.d);
 
         // Save statistics, we want to record them only for the most recent update
@@ -2460,7 +2462,7 @@ namespace casadi {
       m->noUpdateCounter[iBlock] = -1;
 
     // For selective sizing: for each block save sTs, sTs_, sTy, sTy_
-    m->deltaNorm.Dimension(nblocks_).Initialize(1.0);
+    casadi_fill(m->delta_norm, nblocks_, 1.);
     m->deltaNormOld.Dimension(nblocks_).Initialize(1.0);
     m->deltaGamma.Dimension(nblocks_).Initialize(0.0);
     m->deltaGammaOld.Dimension(nblocks_).Initialize(0.0);
