@@ -480,6 +480,7 @@ namespace casadi {
     alloc_w(nblocks_, true); // delta_gamma
     alloc_w(nblocks_, true); // delta_gamma_old
     alloc_w(nblocks_, true); // delta_h
+    alloc_w(nx_, true); // trial_xk
   }
 
   void Blocksqp::init_memory(void* mem) const {
@@ -513,6 +514,7 @@ namespace casadi {
     m->delta_gamma = w; w += nblocks_;
     m->delta_gamma_old = w; w += nblocks_;
     m->delta_h = w; w += nblocks_;
+    m->trial_xk = w; w += nx_;
   }
 
   void Blocksqp::solve(void* mem) const {
@@ -1007,7 +1009,7 @@ namespace casadi {
 
     // Set new xk by accepting the current trial step
     for (k=0; k<nx_; k++) {
-      m->xk[k] = m->trialXi(k);
+      m->xk[k] = m->trial_xk[k];
       m->deltaXi(k) = alpha * deltaXi[k];
     }
 
@@ -1078,12 +1080,12 @@ namespace casadi {
     for (k=0; k<10; k++) {
       // Compute new trial point
       for (i=0; i<nVar; i++)
-        m->trialXi(i) = m->xk[i] + alpha * m->deltaXi(i);
+        m->trial_xk[i] = m->xk[i] + alpha * m->deltaXi(i);
 
       // Compute problem functions at trial point
-      info = evaluate(m, m->trialXi.d, &objTrial, m->gk);
+      info = evaluate(m, m->trial_xk, &objTrial, m->gk);
       m->nFunCalls++;
-      cNormTrial = lInfConstraintNorm(m, m->trialXi.d, m->gk);
+      cNormTrial = lInfConstraintNorm(m, m->trial_xk, m->gk);
       // Reduce step if evaluation fails, if lower bound is violated
       // or if objective or a constraint is NaN
       if (info != 0 || objTrial < obj_lo_ || objTrial > obj_up_
@@ -1121,17 +1123,17 @@ namespace casadi {
     for (k=0; k<max_line_search_; k++) {
       // Compute new trial point
       for (i=0; i<nVar; i++)
-        m->trialXi(i) = m->xk[i] + alpha * m->deltaXi(i);
+        m->trial_xk[i] = m->xk[i] + alpha * m->deltaXi(i);
 
       // Compute grad(f)^T * deltaXi
       dfTdeltaXi = 0.0;
       for (i=0; i<nVar; i++)
         dfTdeltaXi += m->grad_fk[i] * m->deltaXi(i);
 
-      // Compute objective and at ||constr(trialXi)||_1 at trial point
-      info = evaluate(m, m->trialXi.d, &objTrial, m->gk);
+      // Compute objective and at ||constr(trial_xk)||_1 at trial point
+      info = evaluate(m, m->trial_xk, &objTrial, m->gk);
       m->nFunCalls++;
-      cNormTrial = lInfConstraintNorm(m, m->trialXi.d, m->gk);
+      cNormTrial = lInfConstraintNorm(m, m->trial_xk, m->gk);
       // Reduce step if evaluation fails, if lower bound is violated or if objective is NaN
       if (info != 0 || objTrial < obj_lo_ || objTrial > obj_up_
         || !(objTrial == objTrial) || !(cNormTrial == cNormTrial)) {
@@ -1260,13 +1262,13 @@ namespace casadi {
 
       // Set new SOC trial point
       for (i=0; i<nVar; i++) {
-        m->trialXi(i) = m->xk[i] + deltaXiSOC(i);
+        m->trial_xk[i] = m->xk[i] + deltaXiSOC(i);
       }
 
       // Compute objective and ||constr(trialXiSOC)||_1 at SOC trial point
-      info = evaluate(m, m->trialXi.d, &objTrialSOC, m->gk);
+      info = evaluate(m, m->trial_xk, &objTrialSOC, m->gk);
       m->nFunCalls++;
-      cNormTrialSOC = lInfConstraintNorm(m, m->trialXi.d, m->gk);
+      cNormTrialSOC = lInfConstraintNorm(m, m->trial_xk, m->gk);
       if (info != 0 || objTrialSOC < obj_lo_ || objTrialSOC > obj_up_
         || !(objTrialSOC == objTrialSOC) || !(cNormTrialSOC == cNormTrialSOC)) {
         return false; // evaluation error, abort SOC
@@ -1348,7 +1350,7 @@ namespace casadi {
     // For shooting methods that means setting consistent values for
     // shooting nodes by one forward integration.
     for (int k=0; k<nx_; k++) // input: last successful step
-      m->trialXi(k) = m->xk[k];
+      m->trial_xk[k] = m->xk[k];
 
     // FIXME(@jaeandersson) Not implemented
     return -1;
@@ -1365,13 +1367,13 @@ namespace casadi {
 
     // Compute new trial point
     for (i=0; i<nx_; i++)
-      m->trialXi(i) = m->xk[i] + m->deltaXi(i);
+      m->trial_xk[i] = m->xk[i] + m->deltaXi(i);
 
-    // Compute objective and ||constr(trialXi)|| at trial point
+    // Compute objective and ||constr(trial_xk)|| at trial point
     trialConstr.Dimension(ng_).Initialize(0.0);
-    info = evaluate(m, m->trialXi.d, &objTrial, trialConstr.d);
+    info = evaluate(m, m->trial_xk, &objTrial, trialConstr.d);
     m->nFunCalls++;
-    cNormTrial = lInfConstraintNorm(m, m->trialXi.d, trialConstr.d);
+    cNormTrial = lInfConstraintNorm(m, m->trial_xk, trialConstr.d);
     if (info != 0 || objTrial < obj_lo_ || objTrial > obj_up_
       || !(objTrial == objTrial) || !(cNormTrial == cNormTrial)) {
       // evaluation error
@@ -2441,7 +2443,7 @@ namespace casadi {
     m->deltaMat.Dimension(nVar, hess_memsize_, nVar).Initialize(0.0);
     m->deltaXi.Submatrix(m->deltaMat, nVar, 1, 0, 0);
     // trial step (temporary variable, for line search)
-    m->trialXi.Dimension(nVar, 1, nVar).Initialize(0.0);
+    casadi_fill(m->trial_xk, nx_, 0.);
 
     // bounds for step (QP subproblem)
     m->deltaBl.Dimension(nVar+nCon).Initialize(0.0);
