@@ -1831,7 +1831,6 @@ namespace casadi {
   calcBFGS(BlocksqpMemory* m, const double* gamma,
     const double* delta, int iBlock) const {
     int i, j, k, dim = m->hess[iBlock].m;
-    blocksqp::Matrix Bdelta;
     blocksqp::SymMatrix *B;
     double h1 = 0.0;
     double h2 = 0.0;
@@ -1850,12 +1849,12 @@ namespace casadi {
     // Bdelta = B*delta (if sizing is enabled, B is the sized B!)
     // h1 = delta^T * B * delta
     // h2 = delta^T * gamma
-    Bdelta.Dimension(dim).Initialize(0.0);
+    vector<double> Bdelta(dim, 0.0);
     for (i=0; i<dim; i++) {
         for (k=0; k<dim; k++)
-          Bdelta(i) += (*B)(i, k) * delta[k];
+          Bdelta[i] += (*B)(i, k) * delta[k];
 
-        h1 += delta[i] * Bdelta(i);
+        h1 += delta[i] * Bdelta[i];
         //h2 += delta[i] * gamma[i];
       }
     h2 = m->delta_gamma[iBlock];
@@ -1872,7 +1871,7 @@ namespace casadi {
         // Redefine gamma and h2 = delta^T * gamma
         h2 = 0.0;
         for (i=0; i<dim; i++) {
-          gamma2[i] = thetaPowell*gamma2[i] + (1.0 - thetaPowell)*Bdelta(i);
+          gamma2[i] = thetaPowell*gamma2[i] + (1.0 - thetaPowell)*Bdelta[i];
           h2 += delta[i] * gamma2[i];
         }
 
@@ -1896,7 +1895,7 @@ namespace casadi {
     } else {
       for (i=0; i<dim; i++)
         for (j=i; j<dim; j++)
-          (*B)(i, j) = (*B)(i, j) - Bdelta(i) * Bdelta(j) / h1
+          (*B)(i, j) = (*B)(i, j) - Bdelta[i] * Bdelta[j] / h1
             + gamma2[i] * gamma2[j] / h2;
 
       m->noUpdateCounter[iBlock] = 0;
