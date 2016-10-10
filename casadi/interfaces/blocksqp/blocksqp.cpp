@@ -1527,22 +1527,23 @@ namespace casadi {
 
 
   void Blocksqp::resetHessian(BlocksqpMemory* m, int iBlock) const {
-    blocksqp::Matrix smallDelta, smallGamma;
     int dim = blocks_[iBlock+1] - blocks_[iBlock];
 
     // smallGamma and smallDelta are either subvectors of gamma and delta
     // or submatrices of gammaMat, deltaMat, i.e. subvectors of gamma and delta
     // from m prev. iterations (for L-BFGS)
-    smallGamma.Submatrix(m->gammaMat, dim, hess_memsize_,
-      blocks_[iBlock], 0);
-    smallDelta.Submatrix(m->deltaMat, dim, hess_memsize_,
-      blocks_[iBlock], 0);
+    double *smallGamma = m->gammaMat.d + blocks_[iBlock];
+    double *smallDelta = m->deltaMat.d + blocks_[iBlock];
 
-    // Remove past information on Lagrangian gradient difference
-    smallGamma.Initialize(0.0);
+    for (int i=0; i<hess_memsize_; ++i) {
+      // Remove past information on Lagrangian gradient difference
+      casadi_fill(smallGamma, dim, 0.);
+      smallGamma += nx_;
 
-    // Remove past information on steps
-    smallDelta.Initialize(0.0);
+      // Remove past information on steps
+      smallDelta += nx_;
+      casadi_fill(smallDelta, dim, 0.);
+    }
 
     // Remove information on old scalars (used for COL sizing)
     m->delta_norm[iBlock] = 1.0;
@@ -1756,8 +1757,8 @@ namespace casadi {
         blocks_[iBlock], 0);
 
       // Memory structure
-      if (m->itCount > smallGamma.n) {
-        m2 = smallGamma.n;
+      if (m->itCount > hess_memsize_) {
+        m2 = hess_memsize_;
         posOldest = m->itCount % m2;
         posNewest = (m->itCount-1) % m2;
       } else {
