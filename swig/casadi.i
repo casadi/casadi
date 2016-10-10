@@ -2302,7 +2302,7 @@ if __name__ != "casadi.casadi":
 
 def swigtypeconvertor(*args):
   return swig_typename_convertor_python2cpp(args)
-  
+
 def swig_typename_convertor_python2cpp(a):
   try:
     import numpy as np
@@ -3643,14 +3643,14 @@ namespace casadi{
 %extend GenericMatrixCommon {
   %matlabcode %{
     function varargout = subsref(self,s)
-      if numel(s)==1 & s.type=='()'
+      if numel(s)==1 && s.type=='()'
         [varargout{1}] = paren(self, s.subs{:});
       else
         [varargout{1:nargout}] = builtin('subsref',self,s);
       end
     end
     function self = subsasgn(self,s,v)
-      if numel(s)==1 & s.type=='()'
+      if numel(s)==1 && s.type=='()'
         paren_asgn(self, v, s.subs{:});
       else
         self = builtin('subsasgn',self,s,v);
@@ -3719,7 +3719,7 @@ namespace casadi{
 %extend Function {
   %matlabcode %{
     function varargout = subsref(self,s)
-      if numel(s)==1 & s.type=='()'
+      if numel(s)==1 && s.type=='()'
         [varargout{1:nargout}]= paren(self, s.subs{:});
       else
         [varargout{1:nargout}] = builtin('subsref',self,s);
