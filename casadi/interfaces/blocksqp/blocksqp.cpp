@@ -1915,15 +1915,13 @@ namespace casadi {
     double r = 1.0e-8;
     double h = 0.0;
 
-    B = &m->hess[iBlock];
-
     // gmBdelta = gamma - B*delta
     // h = (gamma - B*delta)^T * delta
     vector<double> gmBdelta(dim);
     for (i=0; i<dim; i++) {
       gmBdelta[i] = gamma[i];
       for (k=0; k<dim; k++)
-        gmBdelta[i] -= ((*B)(i, k) * delta[k]);
+        gmBdelta[i] -= (m->hess[iBlock](i, k) * delta[k]);
 
       h += (gmBdelta[i] * delta[i]);
     }
@@ -1938,7 +1936,7 @@ namespace casadi {
     } else {
       for (i=0; i<dim; i++)
         for (j=i; j<dim; j++)
-          (*B)(i, j) = (*B)(i, j) + gmBdelta[i] * gmBdelta[j] / h;
+          m->hess[iBlock](i, j) += gmBdelta[i] * gmBdelta[j] / h;
       m->noUpdateCounter[iBlock] = 0;
     }
   }
@@ -2608,50 +2606,12 @@ namespace blocksqp {
     return this->d[i+j*ldim];
   }
 
-  double &Matrix::operator()(int i, int j) const {
-    return this->d[i+j*ldim];
-  }
-
   Matrix::Matrix() {
     m = 0;
     n = 0;
     ldim = 0;
     tflag = 0;
     malloc();
-  }
-
-  Matrix::Matrix(const Matrix &A) {
-    m = A.m;
-    n = A.n;
-    ldim = A.ldim;
-    tflag = 0;
-    malloc();
-    for (int i = 0; i < m; i++)
-      for (int j = 0; j < n ; j++)
-        (*this)(i, j) = A(i, j);
-  }
-
-  Matrix &Matrix::operator=(const Matrix &A) {
-    if (this != &A) {
-        if (!tflag) {
-            free();
-            m = A.m;
-            n = A.n;
-            ldim = A.ldim;
-            malloc();
-            for (int i = 0; i < m; i++)
-              for (int j = 0; j < n ; j++)
-                (*this)(i, j) = A(i, j);
-          } else {
-            if (m != A.m || n != A.n)
-              Error("= operation not allowed");
-
-            for (int i = 0; i < m; i++)
-              for (int j = 0; j < n ; j++)
-                (*this)(i, j) = A(i, j);
-          }
-      }
-    return *this;
   }
 
   Matrix::~Matrix() {
@@ -2708,17 +2668,6 @@ namespace blocksqp {
   }
 
   double &SymMatrix::operator()(int i, int j) {
-    int pos;
-    if (i < j) {
-      pos = static_cast<int>((j + i*(m - (i+1.0)/2.0)));
-    } else {
-      pos = static_cast<int>((i + j*(m - (j+1.0)/2.0)));
-    }
-    return this->d[pos];
-  }
-
-
-  double &SymMatrix::operator()(int i, int j) const {
     int pos;
     if (i < j) {
       pos = static_cast<int>((j + i*(m - (i+1.0)/2.0)));

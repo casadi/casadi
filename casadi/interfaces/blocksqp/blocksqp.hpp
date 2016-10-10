@@ -49,12 +49,11 @@ namespace blocksqp {
     int free();
   public:
     Matrix();
-    Matrix(const Matrix& A);
+    Matrix(const Matrix& A); // left unimplemented
     ~Matrix();
 
     double &operator()(int i, int j);
-    double &operator()(int i, int j) const;
-    Matrix &operator=(const Matrix &A);
+    Matrix &operator=(const Matrix &A); // left unimplemented
 
     Matrix &Dimension(int, int = 1, int = -1);
     Matrix &Initialize(double val);
@@ -79,7 +78,6 @@ namespace blocksqp {
     ~SymMatrix();
 
     double &operator()(int i, int j);
-    double &operator()(int i, int j) const;
 
     SymMatrix &Dimension(int M = 1);
     SymMatrix &Initialize(double val);
