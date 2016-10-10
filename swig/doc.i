@@ -7844,7 +7844,7 @@ Get the sparsity pattern. See the Sparsity class for details.
 
 // File: classblocksqp_1_1Matrix.xml
 %feature("docstring")  blocksqp::Matrix::Submatrix(const Matrix &, int, int,
-int=0, int=0) "
+int, int) "
 
 Returns just a pointer to the full matrix.
 
@@ -11132,16 +11132,7 @@ Constructor.
 
 
 // File: classblocksqp_1_1SymMatrix.xml
-%feature("docstring") blocksqp::SymMatrix::SymMatrix() "
-
-";
-
-%feature("docstring") blocksqp::SymMatrix::SymMatrix(const SymMatrix &A) "
-
-";
-
-%feature("docstring")  blocksqp::SymMatrix::Submatrix(const Matrix &A, int
-M, int N, int i0=0, int j0=0) "
+%feature("docstring")  blocksqp::SymMatrix::Dimension(int M=1) "
 
 ";
 
@@ -11460,12 +11451,11 @@ Diagrams
 
 C++ includes: blocksqp.hpp ";
 
-%feature("docstring")  blocksqp::SymMatrix::Dimension(int M=1) "
+%feature("docstring") blocksqp::SymMatrix::SymMatrix() "
 
 ";
 
-%feature("docstring")  blocksqp::SymMatrix::Dimension(int M, int N, int
-LDIM) "
+%feature("docstring") blocksqp::SymMatrix::SymMatrix(const SymMatrix &A) "
 
 ";
 

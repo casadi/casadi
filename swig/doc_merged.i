@@ -8402,9 +8402,7 @@ Constructor.
 
 
 // File: classblocksqp_1_1SymMatrix.xml
-%feature("docstring") blocksqp::SymMatrix::SymMatrix "";
-
-%feature("docstring") blocksqp::SymMatrix::Submatrix "";
+%feature("docstring") blocksqp::SymMatrix::Dimension "";
 
 %feature("docstring") blocksqp::SymMatrix "
 
@@ -8721,7 +8719,7 @@ Diagrams
 
 C++ includes: blocksqp.hpp ";
 
-%feature("docstring") blocksqp::SymMatrix::Dimension "";
+%feature("docstring") blocksqp::SymMatrix::SymMatrix "";
 
 %feature("docstring") blocksqp::SymMatrix::Initialize "";
 
