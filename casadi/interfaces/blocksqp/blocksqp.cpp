@@ -1723,8 +1723,6 @@ namespace casadi {
   void Blocksqp::
   calcHessianUpdateLimitedMemory(BlocksqpMemory* m, int updateType, int hessScaling) const {
     int iBlock, nBlocks;
-    blocksqp::Matrix smallGamma, smallDelta;
-    blocksqp::Matrix gammai, deltai;
     int i, m2, pos, posOldest, posNewest;
     int hessDamped, hessSkipped;
     double averageSizingFactor;
@@ -1746,10 +1744,8 @@ namespace casadi {
 
       // smallGamma and smallDelta are submatrices of gammaMat, deltaMat,
       // i.e. subvectors of gamma and delta from m prev. iterations
-      smallGamma.Submatrix(m->gammaMat, dim, hess_memsize_,
-        blocks_[iBlock], 0);
-      smallDelta.Submatrix(m->deltaMat, dim, hess_memsize_,
-        blocks_[iBlock], 0);
+      double *smallGamma = m->gammaMat.d + blocks_[iBlock];
+      double *smallDelta = m->deltaMat.d + blocks_[iBlock];
 
       // Memory structure
       if (m->itCount > hess_memsize_) {
@@ -1771,22 +1767,22 @@ namespace casadi {
       m->noUpdateCounter[iBlock] = -1;
 
       // Size the initial update, but with the most recent delta/gamma-pair
-      gammai.Submatrix(smallGamma, dim, 1, 0, posNewest);
-      deltai.Submatrix(smallDelta, dim, 1, 0, posNewest);
-      sizeInitialHessian(m, gammai.d, deltai.d, iBlock, hessScaling);
+      double *gammai = smallGamma + nx_*posNewest;
+      double *deltai = smallDelta + nx_*posNewest;
+      sizeInitialHessian(m, gammai, deltai, iBlock, hessScaling);
 
       for (i=0; i<m2; i++) {
         pos = (posOldest+i) % m2;
 
         // Get new vector from list
-        gammai.Submatrix(smallGamma, dim, 1, 0, pos);
-        deltai.Submatrix(smallDelta, dim, 1, 0, pos);
+        gammai = smallGamma + nx_*pos;
+        deltai = smallDelta + nx_*pos;
 
         // Update sTs, sTs_ and sTy, sTy_
         m->delta_norm_old[iBlock] = m->delta_norm[iBlock];
         m->delta_gamma_old[iBlock] = m->delta_gamma[iBlock];
-        m->delta_norm[iBlock] = casadi_dot(deltai.m, deltai.d, deltai.d);
-        m->delta_gamma[iBlock] = casadi_dot(gammai.m, gammai.d, deltai.d);
+        m->delta_norm[iBlock] = casadi_dot(dim, deltai, deltai);
+        m->delta_gamma[iBlock] = casadi_dot(dim, gammai, deltai);
 
         // Save statistics, we want to record them only for the most recent update
         averageSizingFactor = m->averageSizingFactor;
@@ -1794,13 +1790,13 @@ namespace casadi {
         hessSkipped = m->hessSkipped;
 
         // Selective sizing before the update
-        if (hessScaling == 4) sizeHessianCOL(m, gammai.d, deltai.d, iBlock);
+        if (hessScaling == 4) sizeHessianCOL(m, gammai, deltai, iBlock);
 
         // Compute the new update
         if (updateType == 1) {
-          calcSR1(m, gammai.d, deltai.d, iBlock);
+          calcSR1(m, gammai, deltai, iBlock);
         } else if (updateType == 2) {
-          calcBFGS(m, gammai.d, deltai.d, iBlock);
+          calcBFGS(m, gammai, deltai, iBlock);
         }
 
         m->nTotalUpdates++;
