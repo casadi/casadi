@@ -50,13 +50,11 @@ namespace blocksqp {
   public:
     Matrix();
     Matrix(const Matrix& A);
-    virtual ~Matrix();
+    ~Matrix();
 
-    virtual double &operator()(int i, int j);
-    virtual double &operator()(int i, int j) const;
-    virtual double &operator()(int i);
-    virtual double &operator()(int i) const;
-    virtual Matrix &operator=(const Matrix &A);
+    double &operator()(int i, int j);
+    double &operator()(int i, int j) const;
+    Matrix &operator=(const Matrix &A);
 
     Matrix &Dimension(int, int = 1, int = -1);
     Matrix &Initialize(double val);
@@ -70,7 +68,7 @@ namespace blocksqp {
    * \author Dennis Janka
    * \date 2012-2015
    */
-  class SymMatrix : public Matrix {
+  class SymMatrix : private Matrix {
   protected:
     int malloc();
     int free();
@@ -78,15 +76,12 @@ namespace blocksqp {
   public:
     SymMatrix();
     SymMatrix(const SymMatrix& A); // left unimplemented
-    virtual ~SymMatrix();
+    ~SymMatrix();
 
-    virtual double &operator()(int i, int j);
-    virtual double &operator()(int i, int j) const;
-    virtual double &operator()(int i);
-    virtual double &operator()(int i) const;
+    double &operator()(int i, int j);
+    double &operator()(int i, int j) const;
 
     SymMatrix &Dimension(int M = 1);
-    SymMatrix &Dimension(int M, int N, int LDIM);
     SymMatrix &Initialize(double val);
   };
 

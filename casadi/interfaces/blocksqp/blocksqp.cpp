@@ -1503,13 +1503,14 @@ namespace casadi {
     m->hess[iBlock].Initialize(0.0);
 
     // Each block is a diagonal matrix
-    for (int i=0; i<m->hess[iBlock].m; i++)
+    int dim = blocks_[iBlock+1] - blocks_[iBlock];
+    for (int i=0; i<dim; i++)
       m->hess[iBlock](i, i) = ini_hess_diag_;
 
     // If we maintain 2 Hessians, also reset the second one
     if (m->hess2 != 0) {
       m->hess2[iBlock].Initialize(0.0);
-      for (int i=0; i<m->hess2[iBlock].m; i++)
+      for (int i=0; i<dim; i++)
         m->hess2[iBlock](i, i) = ini_hess_diag_;
     }
   }
@@ -1527,7 +1528,7 @@ namespace casadi {
 
   void Blocksqp::resetHessian(BlocksqpMemory* m, int iBlock) const {
     blocksqp::Matrix smallDelta, smallGamma;
-    int dim = m->hess[iBlock].m;
+    int dim = blocks_[iBlock+1] - blocks_[iBlock];
 
     // smallGamma and smallDelta are either subvectors of gamma and delta
     // or submatrices of gammaMat, deltaMat, i.e. subvectors of gamma and delta
@@ -1557,7 +1558,7 @@ namespace casadi {
   void Blocksqp::
   sizeInitialHessian(BlocksqpMemory* m, const double* gamma,
                      const double* delta, int iBlock, int option) const {
-    int dim = m->hess[iBlock].m;
+    int dim = blocks_[iBlock+1] - blocks_[iBlock];
     int i, j;
     double scale;
     double myEps = 1.0e3 * eps_;
@@ -1597,7 +1598,7 @@ namespace casadi {
   void Blocksqp::
   sizeHessianCOL(BlocksqpMemory* m, const double* gamma,
                  const double* delta, int iBlock) const {
-    int dim = m->hess[iBlock].m;
+    int dim = blocks_[iBlock+1] - blocks_[iBlock];
     int i, j;
     double theta, scale, myEps = 1.0e3 * eps_;
     double deltaNorm, deltaNormOld, deltaGamma, deltaGammaOld, deltaBdelta;
@@ -1663,7 +1664,7 @@ namespace casadi {
     m->averageSizingFactor = 0.0;
 
     for (iBlock=0; iBlock<nBlocks; iBlock++) {
-      dim = m->hess[iBlock].m;
+      int dim = blocks_[iBlock+1] - blocks_[iBlock];
 
       // smallGamma and smallDelta are subvectors of gamma and delta,
       // corresponding to partially separability
@@ -1725,7 +1726,7 @@ namespace casadi {
 
   void Blocksqp::
   calcHessianUpdateLimitedMemory(BlocksqpMemory* m, int updateType, int hessScaling) const {
-    int iBlock, nBlocks, dim;
+    int iBlock, nBlocks;
     blocksqp::Matrix smallGamma, smallDelta;
     blocksqp::Matrix gammai, deltai;
     int i, m2, pos, posOldest, posNewest;
@@ -1745,7 +1746,7 @@ namespace casadi {
     m->averageSizingFactor = 0.0;
 
     for (iBlock=0; iBlock<nBlocks; iBlock++) {
-      dim = m->hess[iBlock].m;
+      int dim = blocks_[iBlock+1] - blocks_[iBlock];
 
       // smallGamma and smallDelta are submatrices of gammaMat, deltaMat,
       // i.e. subvectors of gamma and delta from m prev. iterations
@@ -1830,7 +1831,8 @@ namespace casadi {
   void Blocksqp::
   calcBFGS(BlocksqpMemory* m, const double* gamma,
     const double* delta, int iBlock) const {
-    int i, j, k, dim = m->hess[iBlock].m;
+    int i, j, k;
+    int dim = blocks_[iBlock+1] - blocks_[iBlock];
     blocksqp::SymMatrix *B;
     double h1 = 0.0;
     double h2 = 0.0;
@@ -1906,7 +1908,8 @@ namespace casadi {
   void Blocksqp::
   calcSR1(BlocksqpMemory* m, const double* gamma, const double* delta,
     int iBlock) const {
-    int i, j, k, dim = m->hess[iBlock].m;
+    int i, j, k;
+    int dim = blocks_[iBlock+1] - blocks_[iBlock];
     blocksqp::SymMatrix *B;
     double myEps = 1.0e2 * eps_;
     double r = 1.0e-8;
@@ -1964,10 +1967,14 @@ namespace casadi {
         m->hess = m->hess2;
 
         // If last block contains exact Hessian, we need to copy it
-        if (which_second_derv_ == 1)
-          for (int i=0; i<m->hess[nblocks_-1].m; i++)
-            for (int j=i; j<m->hess[nblocks_-1].n; j++)
+        if (which_second_derv_ == 1) {
+          int dim = blocks_[nblocks_] - blocks_[nblocks_-1];
+          for (int i=0; i<dim; i++) {
+            for (int j=i; j<dim; j++) {
               m->hess2[nblocks_-1](i, j) = m->hess1[nblocks_-1](i, j);
+            }
+          }
+        }
 
         // Limited memory: compute fallback update only when needed
         if (hess_lim_mem_) {
@@ -1990,13 +1997,16 @@ namespace casadi {
         double idxF = idx;
         double mu = (idx==1) ? 1.0 / (maxQP-1) : idxF / (idxF - 1.0);
         double mu1 = 1.0 - mu;
-        for (int iBlock=0; iBlock<nblocks_; iBlock++)
-          for (int i=0; i<m->hess[iBlock].m; i++)
-            for (int j=i; j<m->hess[iBlock].n; j++) {
-                m->hess2[iBlock](i, j) *= mu;
-                m->hess2[iBlock](i, j) += mu1 * m->hess1[iBlock](i, j);
-              }
-      }
+        for (int iBlock=0; iBlock<nblocks_; iBlock++) {
+          int dim = blocks_[iBlock+1] - blocks_[iBlock];
+          for (int i=0; i<dim; i++) {
+            for (int j=i; j<dim; j++) {
+              m->hess2[iBlock](i, j) *= mu;
+              m->hess2[iBlock](i, j) += mu1 * m->hess1[iBlock](i, j);
+            }
+          }
+        }
+    }
   }
 
 
@@ -2164,13 +2174,16 @@ namespace casadi {
         double mu = 1.0 / l;
         double mu1 = 1.0 - mu;
         int nBlocks = (which_second_derv_ == 1) ? nblocks_-1 : nblocks_;
-        for (int iBlock=0; iBlock<nBlocks; iBlock++)
-          for (int i=0; i<m->hess[iBlock].m; i++)
-            for (int j=i; j<m->hess[iBlock].n; j++) {
-                m->hess2[iBlock](i, j) *= mu;
-                m->hess2[iBlock](i, j) += mu1 * m->hess1[iBlock](i, j);
-              }
-      }
+        for (int iBlock=0; iBlock<nBlocks; iBlock++) {
+          int dim = blocks_[iBlock+1] - blocks_[iBlock];
+          for (int i=0; i<dim; i++) {
+            for (int j=i; j<dim; j++) {
+              m->hess2[iBlock](i, j) *= mu;
+              m->hess2[iBlock](i, j) += mu1 * m->hess1[iBlock](i, j);
+            }
+          }
+        }
+    }
 
     /* Return code depending on qpOASES returnvalue
      * 0: Success
@@ -2350,9 +2363,9 @@ namespace casadi {
     // Create one Matrix for one diagonal block in the Hessian
     m->hess1 = new blocksqp::SymMatrix[nblocks_];
     for (iBlock=0; iBlock<nblocks_; iBlock++) {
-        varDim = blocks_[iBlock+1] - blocks_[iBlock];
-        m->hess1[iBlock].Dimension(varDim).Initialize(0.0);
-      }
+      varDim = blocks_[iBlock+1] - blocks_[iBlock];
+      m->hess1[iBlock].Dimension(varDim).Initialize(0.0);
+    }
 
     // For SR1 or finite differences, maintain two Hessians
     if (hess_update_ == 1 || hess_update_ == 4) {
@@ -2376,13 +2389,14 @@ namespace casadi {
                  blocksqp::SymMatrix *&hess_, double *&hessNz_,
                  int *&hessIndRow_, int *&hessIndCol_, int *&hessIndLo_) const {
     int iBlock, count, colCountTotal, rowOffset, i, j;
-    int nnz, nCols, nRows;
+    int nnz;
 
     // 1) count nonzero elements
     nnz = 0;
-    for (iBlock=0; iBlock<nblocks_; iBlock++)
-      for (i=0; i<hess_[iBlock].n; i++)
-        for (j=i; j<hess_[iBlock].n; j++)
+    for (iBlock=0; iBlock<nblocks_; iBlock++) {
+      int dim = blocks_[iBlock+1] - blocks_[iBlock];
+      for (i=0; i<dim; i++) {
+        for (j=i; j<dim; j++) {
           if (fabs(hess_[iBlock](i, j)) > eps) {
             nnz++;
             if (i != j) {
@@ -2390,6 +2404,9 @@ namespace casadi {
               nnz++;
             }
           }
+        }
+      }
+    }
 
     if (hessNz_ != 0) delete[] hessNz_;
     if (hessIndRow_ != 0) delete[] hessIndRow_;
@@ -2404,14 +2421,13 @@ namespace casadi {
     colCountTotal = 0; // keep track of position in large matrix
     rowOffset = 0;
     for (iBlock=0; iBlock<nblocks_; iBlock++) {
-      nCols = hess_[iBlock].n;
-      nRows = hess_[iBlock].m;
+      int dim = blocks_[iBlock+1] - blocks_[iBlock];
 
-      for (i=0; i<nCols; i++) {
+      for (i=0; i<dim; i++) {
         // column 'colCountTotal' starts at element 'count'
         hessIndCol_[colCountTotal] = count;
 
-        for (j=0; j<nRows; j++)
+        for (j=0; j<dim; j++)
           if (fabs(hess_[iBlock](i, j)) > eps) {
               hessNz_[count] = hess_[iBlock](i, j);
               hessIndRow_[count] = j + rowOffset;
@@ -2420,7 +2436,7 @@ namespace casadi {
         colCountTotal++;
       }
 
-      rowOffset += nRows;
+      rowOffset += dim;
     }
     hessIndCol_[colCountTotal] = count;
 
@@ -2596,14 +2612,6 @@ namespace blocksqp {
     return this->d[i+j*ldim];
   }
 
-  double &Matrix::operator()(int i) {
-    return this->d[i];
-  }
-
-  double &Matrix::operator()(int i) const {
-    return this->d[i];
-  }
-
   Matrix::Matrix() {
     m = 0;
     n = 0;
@@ -2720,14 +2728,6 @@ namespace blocksqp {
     return this->d[pos];
   }
 
-  double &SymMatrix::operator()(int i) {
-    return this->d[i];
-  }
-
-  double &SymMatrix::operator()(int i) const {
-    return this->d[i];
-  }
-
   SymMatrix::SymMatrix() {
     m = 0;
     n = 0;
@@ -2749,15 +2749,6 @@ namespace blocksqp {
 
     malloc();
 
-    return *this;
-  }
-
-  SymMatrix &SymMatrix::Dimension(int M, int N, int LDIM) {
-    free();
-    m = M;
-    n = M;
-    ldim = M;
-    malloc();
     return *this;
   }
 
