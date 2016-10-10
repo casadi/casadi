@@ -1372,17 +1372,16 @@ namespace casadi {
   int Blocksqp::kktErrorReduction(BlocksqpMemory* m) const {
     int i, info = 0;
     double objTrial, cNormTrial, trialGradNorm, trialTol;
-    blocksqp::Matrix trialConstr, trialGradLagrange;
 
     // Compute new trial point
     for (i=0; i<nx_; i++)
       m->trial_xk[i] = m->xk[i] + m->dxk[i];
 
     // Compute objective and ||constr(trial_xk)|| at trial point
-    trialConstr.Dimension(ng_).Initialize(0.0);
-    info = evaluate(m, m->trial_xk, &objTrial, trialConstr.d);
+    std::vector<double> trialConstr(ng_, 0.);
+    info = evaluate(m, m->trial_xk, &objTrial, get_ptr(trialConstr));
     m->nFunCalls++;
-    cNormTrial = lInfConstraintNorm(m, m->trial_xk, trialConstr.d);
+    cNormTrial = lInfConstraintNorm(m, m->trial_xk, get_ptr(trialConstr));
     if (info != 0 || objTrial < obj_lo_ || objTrial > obj_up_
       || !(objTrial == objTrial) || !(cNormTrial == cNormTrial)) {
       // evaluation error
@@ -1392,12 +1391,12 @@ namespace casadi {
     // Compute KKT error of the new point
 
     // scaled norm of Lagrangian gradient
-    trialGradLagrange.Dimension(nx_).Initialize(0.0);
+    std::vector<double> trialGradLagrange(nx_, 0.);
     calcLagrangeGradient(m, m->lam_qp, m->lam_qp+nx_, m->grad_fk,
                          m->jacNz, m->jacIndRow, m->jacIndCol,
-                         trialGradLagrange.d, 0);
+                         get_ptr(trialGradLagrange), 0);
 
-    trialGradNorm = casadi_norm_inf(trialGradLagrange.m, trialGradLagrange.d);
+    trialGradNorm = casadi_norm_inf(nx_, get_ptr(trialGradLagrange));
     trialTol = trialGradNorm/(1.0+casadi_norm_inf(nx_+ng_, m->lam_qp));
 
     if (fmax(cNormTrial, trialTol) < kappa_f_ * fmax(m->cNorm, m->tol)) {
