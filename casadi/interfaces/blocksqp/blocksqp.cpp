@@ -1651,7 +1651,6 @@ namespace casadi {
   calcHessianUpdate(BlocksqpMemory* m, int updateType, int hessScaling) const {
     int iBlock, nBlocks;
     int dim;
-    blocksqp::Matrix smallGamma, smallDelta;
     bool firstIter;
 
     //if objective derv is computed exactly, don't set the last block!
@@ -1669,10 +1668,8 @@ namespace casadi {
 
       // smallGamma and smallDelta are subvectors of gamma and delta,
       // corresponding to partially separability
-      smallGamma.Submatrix(m->gammaMat, dim, hess_memsize_,
-        blocks_[iBlock], 0);
-      smallDelta.Submatrix(m->deltaMat, dim, hess_memsize_,
-        blocks_[iBlock], 0);
+      double* smallGamma = m->gammaMat.d + blocks_[iBlock];
+      double* smallDelta = m->deltaMat.d + blocks_[iBlock];
 
       // Is this the first iteration or the first after a Hessian reset?
       firstIter = (m->noUpdateCounter[iBlock] == -1);
@@ -1680,38 +1677,36 @@ namespace casadi {
       // Update sTs, sTs_ and sTy, sTy_
       m->delta_norm_old[iBlock] = m->delta_norm[iBlock];
       m->delta_gamma_old[iBlock] = m->delta_gamma[iBlock];
-      m->delta_norm[iBlock] = casadi_dot(smallDelta.m, smallDelta.d,
-        smallDelta.d);
-      m->delta_gamma[iBlock] = casadi_dot(smallDelta.m, smallDelta.d,
-        smallGamma.d);
+      m->delta_norm[iBlock] = casadi_dot(dim, smallDelta, smallDelta);
+      m->delta_gamma[iBlock] = casadi_dot(dim, smallDelta, smallGamma);
 
       // Sizing before the update
       if (hessScaling < 4 && firstIter)
-        sizeInitialHessian(m, smallGamma.d, smallDelta.d, iBlock, hessScaling);
+        sizeInitialHessian(m, smallGamma, smallDelta, iBlock, hessScaling);
       else if (hessScaling == 4)
-        sizeHessianCOL(m, smallGamma.d, smallDelta.d, iBlock);
+        sizeHessianCOL(m, smallGamma, smallDelta, iBlock);
 
       // Compute the new update
       if (updateType == 1) {
-        calcSR1(m, smallGamma.d, smallDelta.d, iBlock);
+        calcSR1(m, smallGamma, smallDelta, iBlock);
 
         // Prepare to compute fallback update as well
         m->hess = m->hess2;
 
         // Sizing the fallback update
         if (fallback_scaling_ < 4 && firstIter)
-          sizeInitialHessian(m, smallGamma.d, smallDelta.d, iBlock, fallback_scaling_);
+          sizeInitialHessian(m, smallGamma, smallDelta, iBlock, fallback_scaling_);
         else if (fallback_scaling_ == 4)
-          sizeHessianCOL(m, smallGamma.d, smallDelta.d, iBlock);
+          sizeHessianCOL(m, smallGamma, smallDelta, iBlock);
 
         // Compute fallback update
         if (fallback_update_ == 2)
-          calcBFGS(m, smallGamma.d, smallDelta.d, iBlock);
+          calcBFGS(m, smallGamma, smallDelta, iBlock);
 
         // Reset pointer
         m->hess = m->hess1;
       } else if (updateType == 2) {
-        calcBFGS(m, smallGamma.d, smallDelta.d, iBlock);
+        calcBFGS(m, smallGamma, smallDelta, iBlock);
       }
 
       // If an update is skipped to often, reset Hessian block
