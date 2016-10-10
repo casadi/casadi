@@ -1247,14 +1247,13 @@ namespace casadi {
     double cNormTrialSOC, cNormOld, objTrialSOC;
     int i, k, info;
     int nVar = nx_;
-    blocksqp::Matrix deltaXiSOC, lambdaQPSOC;
 
     // m->gk contains result at first trial point: c(xi+deltaXi)
     // m->jac_times_dxk and m->grad_fk are unchanged so far.
 
     // First SOC step
-    deltaXiSOC.Dimension(nx_).Initialize(0.0);
-    lambdaQPSOC.Dimension(nx_+ng_).Initialize(0.0);
+    std::vector<double> deltaXiSOC(nx_, 0.);
+    std::vector<double> lambdaQPSOC(nx_+ng_, 0.);
 
     // Second order correction loop
     cNormOld = cNorm;
@@ -1267,12 +1266,12 @@ namespace casadi {
       // Solve SOC QP to obtain new, corrected deltaXi
       // (store in separate vector to avoid conflict with original deltaXi
       // -> need it in linesearch!)
-      info = solveQP(m, deltaXiSOC.d, lambdaQPSOC.d, false);
+      info = solveQP(m, get_ptr(deltaXiSOC), get_ptr(lambdaQPSOC), false);
       if (info != 0) return false; // Could not solve QP, abort SOC
 
       // Set new SOC trial point
       for (i=0; i<nVar; i++) {
-        m->trial_xk[i] = m->xk[i] + deltaXiSOC(i);
+        m->trial_xk[i] = m->xk[i] + deltaXiSOC[i];
       }
 
       // Compute objective and ||constr(trialXiSOC)||_1 at SOC trial point
@@ -1305,7 +1304,7 @@ namespace casadi {
           continue;
         } else {
           // found suitable alpha during SOC, stop
-          acceptStep(m, deltaXiSOC.d, lambdaQPSOC.d, 1.0, nSOCS);
+          acceptStep(m, get_ptr(deltaXiSOC), get_ptr(lambdaQPSOC), 1.0, nSOCS);
           return true;
         }
       }
@@ -1315,7 +1314,7 @@ namespace casadi {
         if (cNormTrialSOC < (1.0 - gamma_theta_) * cNorm
         || objTrialSOC < m->obj - gamma_f_ * cNorm) {
           // found suitable alpha during SOC, stop
-          acceptStep(m, deltaXiSOC.d, lambdaQPSOC.d, 1.0, nSOCS);
+          acceptStep(m, get_ptr(deltaXiSOC), get_ptr(lambdaQPSOC), 1.0, nSOCS);
           return true;
         } else {
           // Trial point is dominated by current point, next SOC step
