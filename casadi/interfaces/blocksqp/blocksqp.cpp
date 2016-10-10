@@ -1907,7 +1907,6 @@ namespace casadi {
   calcSR1(BlocksqpMemory* m, const double* gamma, const double* delta,
     int iBlock) const {
     int i, j, k, dim = m->hess[iBlock].m;
-    blocksqp::Matrix gmBdelta;
     blocksqp::SymMatrix *B;
     double myEps = 1.0e2 * eps_;
     double r = 1.0e-8;
@@ -1917,18 +1916,18 @@ namespace casadi {
 
     // gmBdelta = gamma - B*delta
     // h = (gamma - B*delta)^T * delta
-    gmBdelta.Dimension(dim);
+    vector<double> gmBdelta(dim);
     for (i=0; i<dim; i++) {
-      gmBdelta(i) = gamma[i];
+      gmBdelta[i] = gamma[i];
       for (k=0; k<dim; k++)
-        gmBdelta(i) -= ((*B)(i, k) * delta[k]);
+        gmBdelta[i] -= ((*B)(i, k) * delta[k]);
 
-      h += (gmBdelta(i) * delta[i]);
+      h += (gmBdelta[i] * delta[i]);
     }
 
     // B_k+1 = B_k + gmBdelta * gmBdelta^T / h
     if (fabs(h) < r * casadi_norm_2(dim, delta)
-      *casadi_norm_2(gmBdelta.m, gmBdelta.d) || fabs(h) < myEps) {
+      *casadi_norm_2(dim, get_ptr(gmBdelta)) || fabs(h) < myEps) {
       // Skip update if denominator is too small
       m->noUpdateCounter[iBlock]++;
       m->hessSkipped++;
@@ -1936,7 +1935,7 @@ namespace casadi {
     } else {
       for (i=0; i<dim; i++)
         for (j=i; j<dim; j++)
-          (*B)(i, j) = (*B)(i, j) + gmBdelta(i) * gmBdelta(j) / h;
+          (*B)(i, j) = (*B)(i, j) + gmBdelta[i] * gmBdelta[j] / h;
       m->noUpdateCounter[iBlock] = 0;
     }
   }
