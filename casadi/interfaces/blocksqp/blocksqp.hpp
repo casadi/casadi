@@ -290,28 +290,20 @@ namespace casadi {
     void updateStats(BlocksqpMemory* m) const;
     /// Print one line of output to stdout about the current iteration
     void printProgress(BlocksqpMemory* m) const;
-    /// Allocate variables that any SQP code needs
-    void allocMin(BlocksqpMemory* m) const;
-    /// Allocate diagonal block Hessian
-    void allocHess(BlocksqpMemory* m) const;
+    /// Reset variables that any SQP code needs
+    void reset_sqp(BlocksqpMemory* m) const;
     /// Convert *hess to column compressed sparse format
-    void convertHessian(BlocksqpMemory* m, double eps) const;
-    /// Allocate variables specifically needed by vmused SQP method
-    void allocAlg(BlocksqpMemory* m) const;
+    void convertHessian(BlocksqpMemory* m) const;
     /// Set initial filter, objective function, tolerances etc.
     void initIterate(BlocksqpMemory* m) const;
 
     /// Evaluate objective and constraints, including derivatives
-    int evaluate(BlocksqpMemory* m,
-                  double *f,
-                  double *g,
-                  double *grad_f,
-                  double *jac_g) const;
+    int evaluate(BlocksqpMemory* m, double *f, double *g,
+                 double *grad_f, double *jac_g) const;
 
     /// Evaluate objective and constraints, no derivatives
     int evaluate(BlocksqpMemory* m, const double *xk,
-                  double *f,
-                  double *g) const;
+                 double *f, double *g) const;
 
     //  Declaration of general purpose routines for matrix and vector computations
     double lInfConstraintNorm(BlocksqpMemory* m, const double* xk, const double* g) const;

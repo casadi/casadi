@@ -607,12 +607,8 @@ namespace casadi {
     if (hess_lim_mem_ && hess_memsize_ == 0)
       const_cast<Blocksqp*>(this)->hess_memsize_ = maxblocksize;
 
-    allocMin(m);
-
-    m->hess = 0;
-
-    allocHess(m);
-    allocAlg(m);
+    // Reset the SQP metod
+    reset_sqp(m);
 
     if (schur_) {
       m->qp = new qpOASES::SQProblemSchur(nx_, ng_, qpOASES::HST_UNKNOWN, 50,
@@ -2085,7 +2081,7 @@ namespace casadi {
          */
         if (matricesChanged) {
           // Convert block-Hessian to sparse format
-          convertHessian(m, eps_);
+          convertHessian(m);
           H = new qpOASES::SymSparseMat(nx_, nx_,
                                          m->hessIndRow, m->hessIndCol,
                                          m->hess_lag);
@@ -2334,7 +2330,7 @@ namespace casadi {
    * required by all optimization
    * algorithms except for the Jacobian
    */
-  void Blocksqp::allocMin(BlocksqpMemory* m) const {
+  void Blocksqp::reset_sqp(BlocksqpMemory* m) const {
     // current iterate
     casadi_fill(m->xk, nx_, 0.);
 
@@ -2351,94 +2347,7 @@ namespace casadi {
 
     // gradient of Lagrangian
     casadi_fill(m->grad_lagk, nx_, 0.);
-  }
 
-
-  void Blocksqp::allocHess(BlocksqpMemory* m) const {
-    // Create one Matrix for one diagonal block in the Hessian
-    for (int b=0; b<nblocks_; b++) {
-      int dim = dim_[b];
-      casadi_fill(m->hess1[b], dim*dim, 0.);
-    }
-
-    // For SR1 or finite differences, maintain two Hessians
-    if (hess_update_ == 1 || hess_update_ == 4) {
-      for (int b=0; b<nblocks_; b++) {
-        int dim = dim_[b];
-        casadi_fill(m->hess2[b], dim*dim, 0.);
-      }
-    }
-
-    // Set Hessian pointer
-    m->hess = m->hess1;
-  }
-
-  /**
-   * Convert array *hess to a single symmetric sparse matrix in
-   * Harwell-Boeing format (as used by qpOASES)
-   */
-  void Blocksqp::
-  convertHessian(BlocksqpMemory* m, double eps) const {
-    int b, count, colCountTotal, rowOffset, i, j;
-    int nnz;
-
-    // 1) count nonzero elements
-    nnz = 0;
-    for (b=0; b<nblocks_; b++) {
-      int dim = dim_[b];
-      for (i=0; i<dim; i++) {
-        for (j=0; j<dim; j++) {
-          if (fabs(m->hess[b][i+j*dim]) > eps) {
-            nnz++;
-          }
-        }
-      }
-    }
-
-    m->hessIndCol = m->hessIndRow + nnz;
-    m->hessIndLo = m->hessIndCol + (nx_+1);
-
-    // 2) store matrix entries columnwise in hessNz
-    count = 0; // runs over all nonzero elements
-    colCountTotal = 0; // keep track of position in large matrix
-    rowOffset = 0;
-    for (b=0; b<nblocks_; b++) {
-      int dim = dim_[b];
-
-      for (i=0; i<dim; i++) {
-        // column 'colCountTotal' starts at element 'count'
-        m->hessIndCol[colCountTotal] = count;
-
-        for (j=0; j<dim; j++) {
-          if (fabs(m->hess[b][i+j*dim]) > eps) {
-              m->hess_lag[count] = m->hess[b][i+j*dim];
-              m->hessIndRow[count] = j + rowOffset;
-              count++;
-          }
-        }
-        colCountTotal++;
-      }
-      rowOffset += dim;
-    }
-    m->hessIndCol[colCountTotal] = count;
-
-    // 3) Set reference to lower triangular matrix
-    for (j=0; j<nx_; j++) {
-      for (i=m->hessIndCol[j]; i<m->hessIndCol[j+1] && m->hessIndRow[i]<j; i++) {}
-      m->hessIndLo[j] = i;
-    }
-
-    if (count != nnz)
-      casadi_eprintf("Error in convertHessian: %i elements processed, "
-            "should be %i elements!\n", count, nnz);
-  }
-
-
-  /**
-   * Allocate memory for additional variables
-   * needed by the algorithm
-   */
-  void Blocksqp::allocAlg(BlocksqpMemory* m) const {
     // current step
     casadi_fill(m->deltaMat, nx_*hess_memsize_, 0.);
     m->dxk = m->deltaMat;
@@ -2476,6 +2385,83 @@ namespace casadi {
     casadi_fill(m->delta_norm_old, nblocks_, 1.);
     casadi_fill(m->delta_gamma, nblocks_, 0.);
     casadi_fill(m->delta_gamma_old, nblocks_, 0.);
+
+    // Create one Matrix for one diagonal block in the Hessian
+    for (int b=0; b<nblocks_; b++) {
+      int dim = dim_[b];
+      casadi_fill(m->hess1[b], dim*dim, 0.);
+    }
+
+    // For SR1 or finite differences, maintain two Hessians
+    if (hess_update_ == 1 || hess_update_ == 4) {
+      for (int b=0; b<nblocks_; b++) {
+        int dim = dim_[b];
+        casadi_fill(m->hess2[b], dim*dim, 0.);
+      }
+    }
+
+    // Set Hessian pointer
+    m->hess = m->hess1;
+  }
+
+  /**
+   * Convert array *hess to a single symmetric sparse matrix in
+   * Harwell-Boeing format (as used by qpOASES)
+   */
+  void Blocksqp::
+  convertHessian(BlocksqpMemory* m) const {
+    int b, count, colCountTotal, rowOffset, i, j;
+    int nnz;
+
+    // 1) count nonzero elements
+    nnz = 0;
+    for (b=0; b<nblocks_; b++) {
+      int dim = dim_[b];
+      for (i=0; i<dim; i++) {
+        for (j=0; j<dim; j++) {
+          if (fabs(m->hess[b][i+j*dim]) > eps_) {
+            nnz++;
+          }
+        }
+      }
+    }
+
+    m->hessIndCol = m->hessIndRow + nnz;
+    m->hessIndLo = m->hessIndCol + (nx_+1);
+
+    // 2) store matrix entries columnwise in hessNz
+    count = 0; // runs over all nonzero elements
+    colCountTotal = 0; // keep track of position in large matrix
+    rowOffset = 0;
+    for (b=0; b<nblocks_; b++) {
+      int dim = dim_[b];
+
+      for (i=0; i<dim; i++) {
+        // column 'colCountTotal' starts at element 'count'
+        m->hessIndCol[colCountTotal] = count;
+
+        for (j=0; j<dim; j++) {
+          if (fabs(m->hess[b][i+j*dim]) > eps_) {
+              m->hess_lag[count] = m->hess[b][i+j*dim];
+              m->hessIndRow[count] = j + rowOffset;
+              count++;
+          }
+        }
+        colCountTotal++;
+      }
+      rowOffset += dim;
+    }
+    m->hessIndCol[colCountTotal] = count;
+
+    // 3) Set reference to lower triangular matrix
+    for (j=0; j<nx_; j++) {
+      for (i=m->hessIndCol[j]; i<m->hessIndCol[j+1] && m->hessIndRow[i]<j; i++) {}
+      m->hessIndLo[j] = i;
+    }
+
+    if (count != nnz)
+      casadi_eprintf("Error in convertHessian: %i elements processed, "
+            "should be %i elements!\n", count, nnz);
   }
 
   void Blocksqp::initIterate(BlocksqpMemory* m) const {
