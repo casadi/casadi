@@ -555,6 +555,8 @@ namespace casadi {
         int dim = dim_[iBlock];
         m->hess2[iBlock] = w; w += dim*dim;
       }
+    } else {
+      m->hess2 = 0;
     }
   }
 
