@@ -87,7 +87,7 @@ namespace casadi {
     double *lam_xk, *lam_gk; // dual variables
     double *gk;  // constraint vector
 
-    double *jacNz;  // nonzero elements of Jacobian (length)
+    double *jac_g;  // nonzero elements of Jacobian (length)
 
     double *deltaMat;  // last m primal steps
     double *dxk;  // alias for current step
@@ -99,7 +99,7 @@ namespace casadi {
     double **hess;  // [blockwise] pointer to current Hessian of the Lagrangian
     double **hess1;  // [blockwise] first Hessian approximation
     double **hess2;  // [blockwise] second Hessian approximation (convexified)
-    double *hessNz;  // nonzero elements of Hessian (length)
+    double *hess_lag;  // nonzero elements of Hessian (length)
     int *hessIndRow;  // row indices (length)
     int *hessIndCol;  // indices to first entry of columns (nCols+1)
     int *hessIndLo;  // Indices to first entry of lower triangle (including diagonal) (nCols)
@@ -296,17 +296,12 @@ namespace casadi {
     void allocHess(BlocksqpMemory* m) const;
     /// Convert *hess to column compressed sparse format
     void convertHessian(BlocksqpMemory* m, double eps,
-                         double *&hessNz_, int *&hessIndRow_, int *&hessIndCol_,
+                         int *&hessIndRow_, int *&hessIndCol_,
                          int *&hessIndLo_) const;
     /// Allocate variables specifically needed by vmused SQP method
     void allocAlg(BlocksqpMemory* m) const;
     /// Set initial filter, objective function, tolerances etc.
     void initIterate(BlocksqpMemory* m) const;
-
-    // Set initial values for xk (and possibly lambda) and parts of the
-    // Jacobian that correspond to linear constraints (sparse version).
-    void initialize(BlocksqpMemory* m,
-                    double *&jacNz) const;
 
     /// Evaluate objective and constraints, including derivatives
     int evaluate(BlocksqpMemory* m,

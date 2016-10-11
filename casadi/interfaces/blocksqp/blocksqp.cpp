@@ -492,6 +492,8 @@ namespace casadi {
     alloc_w(ng_, true); // jac_times_dxk
     alloc_w(nx_*hess_memsize_, true); // deltaMat
     alloc_w(nx_*hess_memsize_, true); // gammaMat
+    alloc_w(Asp_.nnz(), true); // jac_g
+    alloc_w(Hsp_.nnz(), true); // hess_lag
 
     // Allocate block diagonal Hessian(s)
     int n_hess = hess_update_==1 || hess_update_==4 ? 2 : 1;
@@ -540,6 +542,8 @@ namespace casadi {
     m->jac_times_dxk = w; w += ng_;
     m->deltaMat = w; w += nx_*hess_memsize_;
     m->gammaMat = w; w += nx_*hess_memsize_;
+    m->jac_g = w; w += Asp_.nnz();
+    m->hess_lag = w; w += Hsp_.nnz();
 
     // First Hessian
     m->hess1 = res; res += nblocks_;
@@ -601,10 +605,6 @@ namespace casadi {
 
     allocMin(m);
 
-    m->hessNz = new double[nx_ * nx_];
-
-    m->jacNz = 0;
-
     m->hessIndCol = 0;
     m->hessIndRow = 0;
     m->hessIndLo = 0;
@@ -636,8 +636,10 @@ namespace casadi {
     // Initialize filter with pair (maxConstrViolation, objLowerBound)
     initializeFilter(m);
 
-    // Set initial values for all xk and set the Jacobian for linear constraints
-    initialize(m, m->jacNz);
+    // Primal-dual initial guess
+    casadi_copy(m->x0, nx_, m->xk);
+    casadi_copy(m->lam_x0, nx_, m->lam_xk);
+    casadi_copy(m->lam_g0, ng_, m->lam_gk);
 
     m->fstats.at("mainloop").tic();
     ret = run(m, max_iter_, warmstart_);
@@ -666,8 +668,6 @@ namespace casadi {
     // Clean up
     delete m->qp;
     if (m->noUpdateCounter != 0) delete[] m->noUpdateCounter;
-    if (m->jacNz != 0) delete[] m->jacNz;
-    if (m->hessNz != 0) delete[] m->hessNz;
     if (m->hessIndRow != 0) delete[] m->hessIndRow;
   }
 
@@ -684,7 +684,7 @@ namespace casadi {
       calcInitialHessian(m);
 
       /// Evaluate all functions and gradients for xk_0
-      infoEval = evaluate(m, &m->obj, m->gk, m->grad_fk, m->jacNz);
+      infoEval = evaluate(m, &m->obj, m->gk, m->grad_fk, m->jac_g);
       m->nDerCalls++;
 
       /// Check if converged
@@ -830,7 +830,7 @@ namespace casadi {
       calcLagrangeGradient(m, m->gamma, 0);
 
       /// Evaluate functions and gradients at the new xk
-      infoEval = evaluate(m, &m->obj, m->gk, m->grad_fk, m->jacNz);
+      infoEval = evaluate(m, &m->obj, m->gk, m->grad_fk, m->jac_g);
       m->nDerCalls++;
 
       /// Check if converged
@@ -911,7 +911,7 @@ namespace casadi {
    */
   void Blocksqp::
   calcLagrangeGradient(BlocksqpMemory* m, double* grad_lag, int flag) const {
-    calcLagrangeGradient(m, m->lam_xk, m->lam_gk, m->grad_fk, m->jacNz,
+    calcLagrangeGradient(m, m->lam_xk, m->lam_gk, m->grad_fk, m->jac_g,
       grad_lag, flag);
   }
 
@@ -1420,7 +1420,7 @@ namespace casadi {
     // scaled norm of Lagrangian gradient
     std::vector<double> trialGradLagrange(nx_, 0.);
     calcLagrangeGradient(m, m->lam_qp, m->lam_qp+nx_, m->grad_fk,
-                         m->jacNz,
+                         m->jac_g,
                          get_ptr(trialGradLagrange), 0);
 
     trialGradNorm = casadi_norm_inf(nx_, get_ptr(trialGradLagrange));
@@ -2043,7 +2043,7 @@ namespace casadi {
       int* jacIndRow = const_cast<int*>(Asp_.row());
       int* jacIndCol = const_cast<int*>(Asp_.colind());
       A = new qpOASES::SparseMatrix(ng_, nx_,
-                                    jacIndRow, jacIndCol, m->jacNz);
+                                    jacIndRow, jacIndCol, m->jac_g);
     }
     double *g = m->grad_fk;
     double *lb = m->lbx_qp;
@@ -2094,11 +2094,10 @@ namespace casadi {
          */
         if (matricesChanged) {
           // Convert block-Hessian to sparse format
-          convertHessian(m, eps_, m->hessNz,
-                                m->hessIndRow, m->hessIndCol, m->hessIndLo);
+          convertHessian(m, eps_, m->hessIndRow, m->hessIndCol, m->hessIndLo);
           H = new qpOASES::SymSparseMat(nx_, nx_,
                                          m->hessIndRow, m->hessIndCol,
-                                         m->hessNz);
+                                         m->hess_lag);
           dynamic_cast<qpOASES::SymSparseMat*>(H)->createDiagInfo();
         }
 
@@ -2164,7 +2163,7 @@ namespace casadi {
 
     // Compute constrJac*deltaXi, need this for second order correction step
     casadi_fill(m->jac_times_dxk, ng_, 0.);
-    casadi_mv(m->jacNz, Asp_, deltaXi, m->jac_times_dxk, 0);
+    casadi_mv(m->jac_g, Asp_, deltaXi, m->jac_times_dxk, 0);
 
     // Print qpOASES error code, if any
     if (ret != qpOASES::SUCCESSFUL_RETURN && matricesChanged)
@@ -2389,7 +2388,6 @@ namespace casadi {
    */
   void Blocksqp::
   convertHessian(BlocksqpMemory* m, double eps,
-                 double *&hessNz_,
                  int *&hessIndRow_, int *&hessIndCol_, int *&hessIndLo_) const {
     int b, count, colCountTotal, rowOffset, i, j;
     int nnz;
@@ -2407,10 +2405,8 @@ namespace casadi {
       }
     }
 
-    if (hessNz_ != 0) delete[] hessNz_;
     if (hessIndRow_ != 0) delete[] hessIndRow_;
 
-    hessNz_ = new double[nnz];
     hessIndRow_ = new int[nnz + (nx_+1) + nx_];
     hessIndCol_ = hessIndRow_ + nnz;
     hessIndLo_ = hessIndCol_ + (nx_+1);
@@ -2426,15 +2422,15 @@ namespace casadi {
         // column 'colCountTotal' starts at element 'count'
         hessIndCol_[colCountTotal] = count;
 
-        for (j=0; j<dim; j++)
+        for (j=0; j<dim; j++) {
           if (fabs(m->hess[b][i+j*dim]) > eps) {
-              hessNz_[count] = m->hess[b][i+j*dim];
+              m->hess_lag[count] = m->hess[b][i+j*dim];
               hessIndRow_[count] = j + rowOffset;
               count++;
-            }
+          }
+        }
         colCountTotal++;
       }
-
       rowOffset += dim;
     }
     hessIndCol_[colCountTotal] = count;
@@ -2508,17 +2504,6 @@ namespace casadi {
     m->cNorm = theta_max_;
     m->gradNorm = inf;
     m->lambdaStepNorm = 0.0;
-  }
-
-  void Blocksqp::
-  initialize(BlocksqpMemory* m, double *&jacNz) const {
-    // Primal-dual initial guess
-    casadi_copy(m->x0, nx_, m->xk);
-    casadi_copy(m->lam_x0, nx_, m->lam_xk);
-    casadi_copy(m->lam_g0, ng_, m->lam_gk);
-
-    // Get Jacobian sparsity
-    jacNz = new double[Asp_.nnz()];
   }
 
   int Blocksqp::
