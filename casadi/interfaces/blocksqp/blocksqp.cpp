@@ -486,6 +486,8 @@ namespace casadi {
     alloc_w(ng_, true); // lba_qp
     alloc_w(ng_, true); // uba_qp
     alloc_w(ng_, true); // jac_times_dxk
+    alloc_w(nx_*hess_memsize_, true); // deltaMat
+    alloc_w(nx_*hess_memsize_, true); // gammaMat
   }
 
   void Blocksqp::init_memory(void* mem) const {
@@ -525,6 +527,8 @@ namespace casadi {
     m->lba_qp = w; w += ng_;
     m->uba_qp = w; w += ng_;
     m->jac_times_dxk = w; w += ng_;
+    m->deltaMat = w; w += nx_*hess_memsize_;
+    m->gammaMat = w; w += nx_*hess_memsize_;
   }
 
   void Blocksqp::solve(void* mem) const {
@@ -1532,8 +1536,8 @@ namespace casadi {
     // smallGamma and smallDelta are either subvectors of gamma and delta
     // or submatrices of gammaMat, deltaMat, i.e. subvectors of gamma and delta
     // from m prev. iterations (for L-BFGS)
-    double *smallGamma = m->gammaMat.d + blocks_[iBlock];
-    double *smallDelta = m->deltaMat.d + blocks_[iBlock];
+    double *smallGamma = m->gammaMat + blocks_[iBlock];
+    double *smallDelta = m->deltaMat + blocks_[iBlock];
 
     for (int i=0; i<hess_memsize_; ++i) {
       // Remove past information on Lagrangian gradient difference
@@ -1668,8 +1672,8 @@ namespace casadi {
 
       // smallGamma and smallDelta are subvectors of gamma and delta,
       // corresponding to partially separability
-      double* smallGamma = m->gammaMat.d + blocks_[iBlock];
-      double* smallDelta = m->deltaMat.d + blocks_[iBlock];
+      double* smallGamma = m->gammaMat + blocks_[iBlock];
+      double* smallDelta = m->deltaMat + blocks_[iBlock];
 
       // Is this the first iteration or the first after a Hessian reset?
       firstIter = (m->noUpdateCounter[iBlock] == -1);
@@ -1744,8 +1748,8 @@ namespace casadi {
 
       // smallGamma and smallDelta are submatrices of gammaMat, deltaMat,
       // i.e. subvectors of gamma and delta from m prev. iterations
-      double *smallGamma = m->gammaMat.d + blocks_[iBlock];
-      double *smallDelta = m->deltaMat.d + blocks_[iBlock];
+      double *smallGamma = m->gammaMat + blocks_[iBlock];
+      double *smallDelta = m->deltaMat + blocks_[iBlock];
 
       // Memory structure
       if (m->itCount > hess_memsize_) {
@@ -1939,14 +1943,10 @@ namespace casadi {
    * the m most recent delta and gamma
    */
   void Blocksqp::updateDeltaGamma(BlocksqpMemory* m) const {
-    int nVar = m->gammaMat.m;
-    int m2 = m->gammaMat.n;
+    if (hess_memsize_ == 1) return;
 
-    if (m2 == 1)
-      return;
-
-    m->dxk = m->deltaMat.d + nx_*(m->itCount % m2);
-    m->gamma = m->gammaMat.d + nx_*(m->itCount % m2);
+    m->dxk = m->deltaMat + nx_*(m->itCount % hess_memsize_);
+    m->gamma = m->gammaMat + nx_*(m->itCount % hess_memsize_);
   }
 
   void Blocksqp::
@@ -2007,7 +2007,6 @@ namespace casadi {
   int Blocksqp::
   solveQP(BlocksqpMemory* m, double* deltaXi, double* lambdaQP,
     bool matricesChanged) const {
-    blocksqp::Matrix jacT;
     int maxQP, l;
     if (globalization_ == 1 &&
         hess_update_ == 1 &&
@@ -2448,8 +2447,8 @@ namespace casadi {
    */
   void Blocksqp::allocAlg(BlocksqpMemory* m) const {
     // current step
-    m->deltaMat.Dimension(nx_, hess_memsize_).Initialize(0.0);
-    m->dxk = m->deltaMat.d;
+    casadi_fill(m->deltaMat, nx_*hess_memsize_, 0.);
+    m->dxk = m->deltaMat;
 
     // trial step (temporary variable, for line search)
     casadi_fill(m->trial_xk, nx_, 0.);
@@ -2473,8 +2472,8 @@ namespace casadi {
     m->filter = new std::set< std::pair<double, double> >;
 
     // difference of Lagrangian gradients
-    m->gammaMat.Dimension(nx_, hess_memsize_).Initialize(0.0);
-    m->gamma = m->gammaMat.d;
+    casadi_fill(m->gammaMat, nx_*hess_memsize_, 0.);
+    m->gamma = m->gammaMat;
 
     // Scalars that are used in various Hessian update procedures
     m->noUpdateCounter = new int[nblocks_];
@@ -2567,82 +2566,6 @@ namespace blocksqp {
     printf("Error: %s\n", F);
   }
 
-  int Matrix::malloc() {
-    int len;
-
-    if (tflag)
-      Error("malloc cannot be called with Submatrix");
-
-    len = m*n;
-
-    if (len == 0)
-      this->d = 0;
-    else
-      if ((this->d = new double[len]) == 0)
-        Error("'new' failed");
-
-    return 0;
-  }
-
-
-  int Matrix::free() {
-    if (tflag) Error("free cannot be called with Submatrix");
-    if (this->d != 0) delete[] this->d;
-    return 0;
-  }
-
-  double &Matrix::operator()(int i, int j) {
-    return this->d[i+j*m];
-  }
-
-  Matrix::Matrix() {
-    m = 0;
-    n = 0;
-    tflag = 0;
-    malloc();
-  }
-
-  Matrix::~Matrix() {
-    if (!tflag) free();
-  }
-
-  Matrix &Matrix::Dimension(int M, int N) {
-    if (M != m || N != n) {
-      if (tflag) {
-        Error("Cannot set new dimension for Submatrix");
-      } else {
-        free();
-        m = M;
-        n = N;
-
-        malloc();
-      }
-    }
-    return *this;
-  }
-
-  Matrix &Matrix::Initialize(double val) {
-    for (int i=0; i < m; i++)
-      for (int j=0; j < n; j++)
-        (*this)(i, j) = val;
-    return *this;
-  }
-
-  int SymMatrix::malloc() {
-    int len = m*(m+1)/2.0;
-    if (len == 0) {
-      this->d = 0;
-    } else {
-      if ((this->d = new double[len]) == 0) Error("'new' failed");
-    }
-    return 0;
-  }
-
-  int SymMatrix::free() {
-    if (this->d != 0) delete[] this->d;
-    return 0;
-  }
-
   double &SymMatrix::operator()(int i, int j) {
     int pos;
     if (i < j) {
@@ -2655,29 +2578,28 @@ namespace blocksqp {
 
   SymMatrix::SymMatrix() {
     m = 0;
-    n = 0;
-    tflag = 0;
-    malloc();
+    d = 0;
   }
 
   SymMatrix::~SymMatrix() {
-    if (!tflag)
-      free();
+    if (this->d != 0) delete[] this->d;
   }
 
   SymMatrix &SymMatrix::Dimension(int M) {
-    free();
+    if (this->d != 0) delete[] this->d;
     m = M;
-    n = M;
-
-    malloc();
-
+    int len = m*(m+1)/2.0;
+    if (len == 0) {
+      this->d = 0;
+    } else {
+      if ((this->d = new double[len]) == 0) Error("'new' failed");
+    }
     return *this;
   }
 
   SymMatrix &SymMatrix::Initialize(double val) {
     for (int j=0; j<m; j++)
-      for (int i=j; i<n; i++)
+      for (int i=j; i<m; i++)
         (*this)(i, j) = val;
 
     return *this;

@@ -33,49 +33,20 @@
 
 namespace blocksqp {
   /**
-   * \brief Class for easy access of elements of a dense matrix.
-   * \author Dennis Janka
-   * \date 2012-2015
-   */
-  class Matrix {
-  public:
-    int m;
-    int n;
-    double *d;
-    int tflag;
-  private:
-    int malloc();
-    int free();
-  public:
-    Matrix();
-    Matrix(const Matrix& A); // left unimplemented
-    ~Matrix();
-
-    double &operator()(int i, int j);
-    Matrix &operator=(const Matrix &A); // left unimplemented
-
-    Matrix &Dimension(int, int = 1);
-    Matrix &Initialize(double val);
-  };
-
-  /**
    * \brief Class for easy access of elements of a dense symmetric matrix.
    * \author Dennis Janka
    * \date 2012-2015
    */
-  class SymMatrix : private Matrix {
-  protected:
-    int malloc();
-    int free();
-
+  class SymMatrix {
+  private:
+    int m;
+    double *d;
   public:
     SymMatrix();
     SymMatrix(const SymMatrix& A); // left unimplemented
     ~SymMatrix();
-
     double &operator()(int i, int j);
-
-    SymMatrix &Dimension(int M = 1);
+    SymMatrix &Dimension(int M);
     SymMatrix &Initialize(double val);
   };
 
@@ -141,11 +112,11 @@ namespace casadi {
     int *jacIndRow;  // row indices (length)
     int *jacIndCol;  // indices to first entry of columns (nCols+1)
 
-    blocksqp::Matrix deltaMat;  // last m primal steps
-    double* dxk;  // alias for current step
-    double* grad_fk;  // gradient of objective
-    double* grad_lagk;  // gradient of Lagrangian
-    blocksqp::Matrix gammaMat;  // Lagrangian gradient differences for last m steps
+    double *deltaMat;  // last m primal steps
+    double *dxk;  // alias for current step
+    double *grad_fk;  // gradient of objective
+    double *grad_lagk;  // gradient of Lagrangian
+    double *gammaMat;  // Lagrangian gradient differences for last m steps
     double *gamma;  // alias for current Lagrangian gradient
 
     blocksqp::SymMatrix *hess;  // [blockwise] pointer to current Hessian of the Lagrangian
