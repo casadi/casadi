@@ -38,14 +38,11 @@ namespace blocksqp {
    * \date 2012-2015
    */
   class Matrix {
-  private:
-    int m;
   public:
     double *d;
     Matrix();
     Matrix(const Matrix& A); // left unimplemented
     ~Matrix();
-    double &operator()(int i, int j);
     Matrix &Dimension(int M);
   };
 
