@@ -1589,7 +1589,7 @@ namespace casadi {
     if (scale > 0.0) {
       scale = fmax(scale, myEps);
       for (i=0; i<dim; i++)
-        for (j=i; j<dim; j++)
+        for (j=0; j<dim; j++)
           m->hess[iBlock](i, j) *= scale;
     } else {
       scale = 1.0;
@@ -1638,7 +1638,7 @@ namespace casadi {
       scale = fmax(col_eps_, scale);
       //casadi_printf("Sizing value (COL) block %i = %g\n", iBlock, scale);
       for (i=0; i<dim; i++)
-        for (j=i; j<dim; j++)
+        for (j=0; j<dim; j++)
           m->hess[iBlock](i, j) *= scale;
 
       // statistics: average sizing factor
@@ -1829,7 +1829,7 @@ namespace casadi {
     const double* delta, int iBlock) const {
     int i, j, k;
     int dim = blocks_[iBlock+1] - blocks_[iBlock];
-    blocksqp::SymMatrix *B;
+    blocksqp::Matrix *B;
     double h1 = 0.0;
     double h2 = 0.0;
     double thetaPowell = 0.0;
@@ -1892,7 +1892,7 @@ namespace casadi {
       m->nTotalSkippedUpdates++;
     } else {
       for (i=0; i<dim; i++)
-        for (j=i; j<dim; j++)
+        for (j=0; j<dim; j++)
           (*B)(i, j) = (*B)(i, j) - Bdelta[i] * Bdelta[j] / h1
             + gamma2[i] * gamma2[j] / h2;
 
@@ -1906,7 +1906,7 @@ namespace casadi {
     int iBlock) const {
     int i, j, k;
     int dim = blocks_[iBlock+1] - blocks_[iBlock];
-    blocksqp::SymMatrix *B;
+    blocksqp::Matrix *B;
     double myEps = 1.0e2 * eps_;
     double r = 1.0e-8;
     double h = 0.0;
@@ -1931,7 +1931,7 @@ namespace casadi {
       m->nTotalSkippedUpdates++;
     } else {
       for (i=0; i<dim; i++)
-        for (j=i; j<dim; j++)
+        for (j=0; j<dim; j++)
           m->hess[iBlock](i, j) += gmBdelta[i] * gmBdelta[j] / h;
       m->noUpdateCounter[iBlock] = 0;
     }
@@ -1960,7 +1960,7 @@ namespace casadi {
         if (which_second_derv_ == 1) {
           int dim = blocks_[nblocks_] - blocks_[nblocks_-1];
           for (int i=0; i<dim; i++) {
-            for (int j=i; j<dim; j++) {
+            for (int j=0; j<dim; j++) {
               m->hess2[nblocks_-1](i, j) = m->hess1[nblocks_-1](i, j);
             }
           }
@@ -1990,7 +1990,7 @@ namespace casadi {
         for (int iBlock=0; iBlock<nblocks_; iBlock++) {
           int dim = blocks_[iBlock+1] - blocks_[iBlock];
           for (int i=0; i<dim; i++) {
-            for (int j=i; j<dim; j++) {
+            for (int j=0; j<dim; j++) {
               m->hess2[iBlock](i, j) *= mu;
               m->hess2[iBlock](i, j) += mu1 * m->hess1[iBlock](i, j);
             }
@@ -2166,7 +2166,7 @@ namespace casadi {
         for (int iBlock=0; iBlock<nBlocks; iBlock++) {
           int dim = blocks_[iBlock+1] - blocks_[iBlock];
           for (int i=0; i<dim; i++) {
-            for (int j=i; j<dim; j++) {
+            for (int j=0; j<dim; j++) {
               m->hess2[iBlock](i, j) *= mu;
               m->hess2[iBlock](i, j) += mu1 * m->hess1[iBlock](i, j);
             }
@@ -2350,7 +2350,7 @@ namespace casadi {
     int iBlock, varDim;
 
     // Create one Matrix for one diagonal block in the Hessian
-    m->hess1 = new blocksqp::SymMatrix[nblocks_];
+    m->hess1 = new blocksqp::Matrix[nblocks_];
     for (iBlock=0; iBlock<nblocks_; iBlock++) {
       varDim = blocks_[iBlock+1] - blocks_[iBlock];
       m->hess1[iBlock].Dimension(varDim).Initialize(0.0);
@@ -2358,7 +2358,7 @@ namespace casadi {
 
     // For SR1 or finite differences, maintain two Hessians
     if (hess_update_ == 1 || hess_update_ == 4) {
-      m->hess2 = new blocksqp::SymMatrix[nblocks_];
+      m->hess2 = new blocksqp::Matrix[nblocks_];
       for (iBlock=0; iBlock<nblocks_; iBlock++) {
         varDim = blocks_[iBlock+1] - blocks_[iBlock];
         m->hess2[iBlock].Dimension(varDim).Initialize(0.0);
@@ -2375,7 +2375,7 @@ namespace casadi {
    */
   void Blocksqp::
   convertHessian(BlocksqpMemory* m, double eps,
-                 blocksqp::SymMatrix *&hess_, double *&hessNz_,
+                 blocksqp::Matrix *&hess_, double *&hessNz_,
                  int *&hessIndRow_, int *&hessIndCol_, int *&hessIndLo_) const {
     int iBlock, count, colCountTotal, rowOffset, i, j;
     int nnz;
@@ -2385,13 +2385,9 @@ namespace casadi {
     for (iBlock=0; iBlock<nblocks_; iBlock++) {
       int dim = blocks_[iBlock+1] - blocks_[iBlock];
       for (i=0; i<dim; i++) {
-        for (j=i; j<dim; j++) {
+        for (j=0; j<dim; j++) {
           if (fabs(hess_[iBlock](i, j)) > eps) {
             nnz++;
-            if (i != j) {
-              // off-diagonal elements count twice
-              nnz++;
-            }
           }
         }
       }
@@ -2520,7 +2516,7 @@ namespace casadi {
            double *f, double *g,
            double *grad_f, double *&jacNz, int *&jacIndRow,
            int *&jacIndCol,
-           blocksqp::SymMatrix *&hess) const {
+           blocksqp::Matrix *&hess) const {
     m->arg[0] = m->xk; // x
     m->arg[1] = m->p; // p
     m->res[0] = f; // f
@@ -2566,40 +2562,31 @@ namespace blocksqp {
     printf("Error: %s\n", F);
   }
 
-  double &SymMatrix::operator()(int i, int j) {
-    int pos;
-    if (i < j) {
-      pos = static_cast<int>((j + i*(m - (i+1.0)/2.0)));
-    } else {
-      pos = static_cast<int>((i + j*(m - (j+1.0)/2.0)));
-    }
-    return this->d[pos];
+  double &Matrix::operator()(int i, int j) {
+    return this->d[i + j*m];
   }
 
-  SymMatrix::SymMatrix() {
-    m = 0;
-    d = 0;
+  Matrix::Matrix() : m(0), d(0) {
   }
 
-  SymMatrix::~SymMatrix() {
+  Matrix::~Matrix() {
     if (this->d != 0) delete[] this->d;
   }
 
-  SymMatrix &SymMatrix::Dimension(int M) {
+  Matrix &Matrix::Dimension(int M) {
     if (this->d != 0) delete[] this->d;
     m = M;
-    int len = m*(m+1)/2.0;
-    if (len == 0) {
+    if (m==0) {
       this->d = 0;
     } else {
-      if ((this->d = new double[len]) == 0) Error("'new' failed");
+      this->d = new double[m*m];
     }
     return *this;
   }
 
-  SymMatrix &SymMatrix::Initialize(double val) {
+  Matrix &Matrix::Initialize(double val) {
     for (int j=0; j<m; j++)
-      for (int i=j; i<m; i++)
+      for (int i=0; i<m; i++)
         (*this)(i, j) = val;
 
     return *this;
