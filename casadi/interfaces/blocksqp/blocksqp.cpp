@@ -1444,12 +1444,13 @@ namespace casadi {
      * as dominated
      */
 
-    for (auto iter=m->filter.begin(); iter!=m->filter.end(); iter++)
-      if ((cNorm >= (1.0 - gamma_theta_) * iter->first ||
-           (cNorm < 0.01 * nlinfeastol_ && iter->first < 0.01 * nlinfeastol_)) &&
-          obj >= iter->second - gamma_f_ * iter->first) {
+    for (auto&& f : m->filter) {
+      if ((cNorm >= (1.0 - gamma_theta_) * f.first ||
+           (cNorm < 0.01 * nlinfeastol_ && f.first < 0.01 * nlinfeastol_)) &&
+          obj >= f.second - gamma_f_ * f.first) {
         return 1;
       }
+    }
 
     return 0;
   }
@@ -1470,15 +1471,14 @@ namespace casadi {
     m->filter.insert(initPair);
   }
 
-
   /**
    * Augment the filter:
    * F_k+1 = F_k U { (c,f) | c > (1-gammaTheta)cNorm and f > obj-gammaF*c
    */
   void Blocksqp::
   augmentFilter(BlocksqpMemory* m, double cNorm, double obj) const {
-    std::pair<double, double> entry((1.0 - gamma_theta_)*cNorm, obj
-      - gamma_f_*cNorm);
+    std::pair<double, double> entry((1-gamma_theta_)*cNorm,
+                                    obj-gamma_f_*cNorm);
 
     // Augment filter by current element
     m->filter.insert(entry);
@@ -1487,7 +1487,7 @@ namespace casadi {
     auto iter=m->filter.begin();
     while (iter != m->filter.end()) {
       if (iter->first > entry.first && iter->second > entry.second) {
-        std::set< std::pair<double, double> >::iterator iterToRemove = iter;
+        auto iterToRemove = iter;
         iter++;
         m->filter.erase(iterToRemove);
       } else {
@@ -2024,8 +2024,7 @@ namespace casadi {
      */
 
     // Setup QProblem data
-    qpOASES::Matrix *A;
-    qpOASES::SymmetricMatrix *H;
+    qpOASES::Matrix *A = 0;
     if (matricesChanged) {
       int* jacIndRow = const_cast<int*>(Asp_.row());
       int* jacIndCol = const_cast<int*>(Asp_.colind());
@@ -2079,13 +2078,14 @@ namespace casadi {
         /*
          * Prepare the current Hessian for qpOASES
          */
+        qpOASES::SymSparseMat *H = 0;
         if (matricesChanged) {
           // Convert block-Hessian to sparse format
           convertHessian(m);
           H = new qpOASES::SymSparseMat(nx_, nx_,
                                          m->hessIndRow, m->hessIndCol,
                                          m->hess_lag);
-          dynamic_cast<qpOASES::SymSparseMat*>(H)->createDiagInfo();
+          H->createDiagInfo();
         }
 
         /*
@@ -2100,7 +2100,7 @@ namespace casadi {
               } else {
                 ret = m->qp->init(H, g, A, lb, lu, lbA, luA, maxIt, &cpuTime);
               }
-          } else if (!matricesChanged) {
+          } else {
             // Second order correction: H and A do not change
             maxIt = 0.1*max_it_qp_;
             cpuTime = 0.1*max_time_qp_;
