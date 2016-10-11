@@ -48,13 +48,13 @@ if has_nlpsol("ipopt") and has_nlpsol("sqpmethod"):
   qpsol_options = {"nlpsol": "ipopt", "nlpsol_options": {"ipopt.tol": 1e-12,"ipopt.fixed_variable_treatment":"make_constraint"} }
   solvers.append(("sqpmethod",{"qpsol": "nlpsol","qpsol_options": qpsol_options}))
   solvers.append(("sqpmethod",{"qpsol": "nlpsol","qpsol_options": qpsol_options,"hessian_approximation": "limited-memory","tol_du":1e-10,"tol_pr":1e-10}))
-
-# if has_nlpsol("blocksqp"):
-#   try:
-#     load_linsol("ma27")
-#     solvers.append(("blocksqp",{}))
-#   except:
-#     pass
+  
+if has_nlpsol("blocksqp"):
+  try:
+    load_linsol("ma27")
+    solvers.append(("blocksqp",{}))
+  except:
+    pass
 
 if has_nlpsol("bonmin"):
   solvers.append(("bonmin",{}))
@@ -79,14 +79,14 @@ class NLPtests(casadiTestCase):
     for Solver, solver_options in solvers:
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
       solver_in = {}
-
+ 
       solver_in["x0"]=[6*pi+0.01]
       solver_in["lbx"]=-inf
       solver_in["ubx"]=inf
       solver_out = solver(**solver_in)
-
+      
       self.assertAlmostEqual(solver_out["x"][0],6*pi,6,str(Solver))
-
+ 
   def testboundsviol(self):
     x=SX.sym("x")
     nlp={'x':x, 'f':(x-1)**2, 'g':x}
@@ -973,7 +973,7 @@ class NLPtests(casadiTestCase):
     solver = nlpsol('solver', 'ipopt', nlp, opts)
     sol = solver(lbx=-10, ubx=10, lbg=-10, ubg=10)
     self.assertEqual(len(mycallback.foo),solver.stats()["iter_count"]+1)
-
+    
     class MyCallback(Callback):
       def __init__(self,nx, ng, np):
         Callback.__init__(self)
@@ -1012,7 +1012,7 @@ class NLPtests(casadiTestCase):
       solver = nlpsol('solver', 'ipopt', nlp, opts)
     except Exception as e:
       self.assertTrue("Callback function input size mismatch" in str(e))
-
+    
   @requires_nlpsol("snopt")
   def test_permute(self):
     for Solver, solver_options in solvers:
