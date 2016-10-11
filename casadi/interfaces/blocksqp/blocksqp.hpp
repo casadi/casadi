@@ -88,8 +88,6 @@ namespace casadi {
     double *gk;  // constraint vector
 
     double *jacNz;  // nonzero elements of Jacobian (length)
-    int *jacIndRow;  // row indices (length)
-    int *jacIndCol;  // indices to first entry of columns (nCols+1)
 
     double *deltaMat;  // last m primal steps
     double *dxk;  // alias for current step
@@ -195,7 +193,7 @@ namespace casadi {
     /// Compute gradient of Lagrangian function (sparse version)
     void calcLagrangeGradient(BlocksqpMemory* m,
       const double* lam_x, const double* lam_g,
-      const double* grad_f, double *jacNz, int *jacIndRow, int *jacIndCol,
+      const double* grad_f, double *jacNz,
       double *grad_lag, int flag) const;
 
     /// Overloaded function for convenience, uses current variables of SQPiterate vars
@@ -308,9 +306,7 @@ namespace casadi {
     // Set initial values for xk (and possibly lambda) and parts of the
     // Jacobian that correspond to linear constraints (sparse version).
     void initialize(BlocksqpMemory* m,
-                    double *&jacNz,
-                    int *&jacIndRow,
-                    int *&jacIndCol) const;
+                    double *&jacNz) const;
 
     /// Evaluate objective and constraints, including derivatives
     int evaluate(BlocksqpMemory* m,

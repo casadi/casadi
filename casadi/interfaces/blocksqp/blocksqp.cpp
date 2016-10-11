@@ -604,8 +604,6 @@ namespace casadi {
     m->hessNz = new double[nx_ * nx_];
 
     m->jacNz = 0;
-    m->jacIndCol = 0;
-    m->jacIndRow = 0;
 
     m->hessIndCol = 0;
     m->hessIndRow = 0;
@@ -639,7 +637,7 @@ namespace casadi {
     initializeFilter(m);
 
     // Set initial values for all xk and set the Jacobian for linear constraints
-    initialize(m, m->jacNz, m->jacIndRow, m->jacIndCol);
+    initialize(m, m->jacNz);
 
     m->fstats.at("mainloop").tic();
     ret = run(m, max_iter_, warmstart_);
@@ -669,7 +667,6 @@ namespace casadi {
     delete m->qp;
     if (m->noUpdateCounter != 0) delete[] m->noUpdateCounter;
     if (m->jacNz != 0) delete[] m->jacNz;
-    if (m->jacIndRow != 0) delete[] m->jacIndRow;
     if (m->hessNz != 0) delete[] m->hessNz;
     if (m->hessIndRow != 0) delete[] m->hessIndRow;
   }
@@ -882,8 +879,8 @@ namespace casadi {
   void Blocksqp::
   calcLagrangeGradient(BlocksqpMemory* m,
     const double* lam_x, const double* lam_g,
-    const double* grad_f, double *jacNz, int *jacIndRow,
-    int *jacIndCol, double* grad_lag, int flag) const {
+    const double* grad_f, double *jacNz,
+    double* grad_lag, int flag) const {
     int iVar, iCon;
 
     // Objective gradient
@@ -897,9 +894,13 @@ namespace casadi {
     }
 
     // - lambdaT * constrJac
-    for (iVar=0; iVar<nx_; iVar++)
-      for (iCon=jacIndCol[iVar]; iCon<jacIndCol[iVar+1]; iCon++)
+    const int* jacIndRow = Asp_.row();
+    const int* jacIndCol = Asp_.colind();
+    for (iVar=0; iVar<nx_; iVar++) {
+      for (iCon=jacIndCol[iVar]; iCon<jacIndCol[iVar+1]; iCon++) {
         grad_lag[iVar] -= lam_g[jacIndRow[iCon]] * jacNz[iCon];
+      }
+    }
 
     // - lambdaT * simpleBounds
     casadi_axpy(nx_, -1., lam_x, grad_lag);
@@ -911,7 +912,7 @@ namespace casadi {
   void Blocksqp::
   calcLagrangeGradient(BlocksqpMemory* m, double* grad_lag, int flag) const {
     calcLagrangeGradient(m, m->lam_xk, m->lam_gk, m->grad_fk, m->jacNz,
-      m->jacIndRow, m->jacIndCol, grad_lag, flag);
+      grad_lag, flag);
   }
 
 
@@ -1419,7 +1420,7 @@ namespace casadi {
     // scaled norm of Lagrangian gradient
     std::vector<double> trialGradLagrange(nx_, 0.);
     calcLagrangeGradient(m, m->lam_qp, m->lam_qp+nx_, m->grad_fk,
-                         m->jacNz, m->jacIndRow, m->jacIndCol,
+                         m->jacNz,
                          get_ptr(trialGradLagrange), 0);
 
     trialGradNorm = casadi_norm_inf(nx_, get_ptr(trialGradLagrange));
@@ -2039,8 +2040,10 @@ namespace casadi {
     qpOASES::Matrix *A;
     qpOASES::SymmetricMatrix *H;
     if (matricesChanged) {
+      int* jacIndRow = const_cast<int*>(Asp_.row());
+      int* jacIndCol = const_cast<int*>(Asp_.colind());
       A = new qpOASES::SparseMatrix(ng_, nx_,
-                                    m->jacIndRow, m->jacIndCol, m->jacNz);
+                                    jacIndRow, jacIndCol, m->jacNz);
     }
     double *g = m->grad_fk;
     double *lb = m->lbx_qp;
@@ -2507,17 +2510,13 @@ namespace casadi {
   }
 
   void Blocksqp::
-  initialize(BlocksqpMemory* m, double *&jacNz,
-             int *&jacIndRow, int *&jacIndCol) const {
+  initialize(BlocksqpMemory* m, double *&jacNz) const {
     // Primal-dual initial guess
     casadi_copy(m->x0, nx_, m->xk);
     casadi_copy(m->lam_x0, nx_, m->lam_xk);
     casadi_copy(m->lam_g0, ng_, m->lam_gk);
 
     // Get Jacobian sparsity
-    jacIndRow = new int[Asp_.nnz()];
-    copy_n(Asp_.row(), Asp_.nnz(), jacIndRow);
-    jacIndCol = const_cast<int*>(Asp_.colind());
     jacNz = new double[Asp_.nnz()];
   }
 
