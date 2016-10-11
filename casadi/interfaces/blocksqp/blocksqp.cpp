@@ -495,6 +495,7 @@ namespace casadi {
     alloc_w(Asp_.nnz(), true); // jac_g
     alloc_w(Hsp_.nnz(), true); // hess_lag
     alloc_iw(Hsp_.nnz() + (nx_+1) + nx_, true); // hessIndRow
+    alloc_iw(nblocks_, true); // noUpdateCounter
 
     // Allocate block diagonal Hessian(s)
     int n_hess = hess_update_==1 || hess_update_==4 ? 2 : 1;
@@ -546,6 +547,7 @@ namespace casadi {
     m->jac_g = w; w += Asp_.nnz();
     m->hess_lag = w; w += Hsp_.nnz();
     m->hessIndRow = iw; iw += Hsp_.nnz() + (nx_+1) + nx_;
+    m->noUpdateCounter = iw; iw += nblocks_;
 
     // First Hessian
     m->hess1 = res; res += nblocks_;
@@ -609,8 +611,6 @@ namespace casadi {
 
     m->hess = 0;
 
-    m->noUpdateCounter = 0;
-
     allocHess(m);
     allocAlg(m);
 
@@ -666,7 +666,6 @@ namespace casadi {
 
     // Clean up
     delete m->qp;
-    if (m->noUpdateCounter != 0) delete[] m->noUpdateCounter;
   }
 
   int Blocksqp::run(BlocksqpMemory* m, int maxIt, int warmStart) const {
@@ -2476,9 +2475,7 @@ namespace casadi {
     m->gamma = m->gammaMat;
 
     // Scalars that are used in various Hessian update procedures
-    m->noUpdateCounter = new int[nblocks_];
-    for (int b=0; b<nblocks_; b++)
-      m->noUpdateCounter[b] = -1;
+    casadi_fill(m->noUpdateCounter, nblocks_, -1);
 
     // For selective sizing: for each block save sTs, sTs_, sTy, sTy_
     casadi_fill(m->delta_norm, nblocks_, 1.);
