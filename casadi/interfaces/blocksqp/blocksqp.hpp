@@ -256,22 +256,22 @@ namespace casadi {
     // Set initial Hessian: Identity matrix
     void calcInitialHessian(BlocksqpMemory* m) const;
     // [blockwise] Set initial Hessian: Identity matrix
-    void calcInitialHessian(BlocksqpMemory* m, int iBlock) const;
+    void calcInitialHessian(BlocksqpMemory* m, int b) const;
     // Reset Hessian to identity and remove past information on Lagrange gradient and steps
     void resetHessian(BlocksqpMemory* m) const;
     // [blockwise] Reset Hessian to identity and remove past information on
     // Lagrange gradient and steps
-    void resetHessian(BlocksqpMemory* m, int iBlock) const;
+    void resetHessian(BlocksqpMemory* m, int b) const;
     // Compute full memory Hessian approximations based on update formulas
     void calcHessianUpdate(BlocksqpMemory* m, int updateType, int hessScaling) const;
     // Compute limited memory Hessian approximations based on update formulas
     void calcHessianUpdateLimitedMemory(BlocksqpMemory* m, int updateType, int hessScaling) const;
     // [blockwise] Compute new approximation for Hessian by SR1 update
     void calcSR1(BlocksqpMemory* m, const double* gamma, const double* delta,
-      int iBlock) const;
+      int b) const;
     // [blockwise] Compute new approximation for Hessian by BFGS update with Powell modification
     void calcBFGS(BlocksqpMemory* m, const double* gamma, const double* delta,
-      int iBlock) const;
+      int b) const;
     // Set pointer to correct step and Lagrange gradient difference in a limited memory context
     void updateDeltaGamma(BlocksqpMemory* m) const;
 
@@ -280,10 +280,10 @@ namespace casadi {
      */
     // [blockwise] Size Hessian using SP, OL, or mean sizing factor
     void sizeInitialHessian(BlocksqpMemory* m, const double* gamma,
-      const double* delta, int iBlock, int option) const;
+      const double* delta, int b, int option) const;
     // [blockwise] Size Hessian using the COL scaling factor
     void sizeHessianCOL(BlocksqpMemory* m, const double* gamma,
-      const double* delta, int iBlock) const;
+      const double* delta, int b) const;
 
     /*
     * STATS
