@@ -1504,16 +1504,16 @@ namespace casadi {
    * Initial Hessian for one block: Identity matrix
    */
   void Blocksqp::calcInitialHessian(BlocksqpMemory* m, int iBlock) const {
-    m->hess[iBlock].Initialize(0.0);
+    int dim = blocks_[iBlock+1] - blocks_[iBlock];
+    casadi_fill(m->hess[iBlock].d, dim*dim, 0.);
 
     // Each block is a diagonal matrix
-    int dim = blocks_[iBlock+1] - blocks_[iBlock];
     for (int i=0; i<dim; i++)
       m->hess[iBlock](i, i) = ini_hess_diag_;
 
     // If we maintain 2 Hessians, also reset the second one
     if (m->hess2 != 0) {
-      m->hess2[iBlock].Initialize(0.0);
+      casadi_fill(m->hess2[iBlock].d, dim*dim, 0.);
       for (int i=0; i<dim; i++)
         m->hess2[iBlock](i, i) = ini_hess_diag_;
     }
@@ -2347,21 +2347,21 @@ namespace casadi {
 
 
   void Blocksqp::allocHess(BlocksqpMemory* m) const {
-    int iBlock, varDim;
-
     // Create one Matrix for one diagonal block in the Hessian
     m->hess1 = new blocksqp::Matrix[nblocks_];
-    for (iBlock=0; iBlock<nblocks_; iBlock++) {
-      varDim = blocks_[iBlock+1] - blocks_[iBlock];
-      m->hess1[iBlock].Dimension(varDim).Initialize(0.0);
+    for (int iBlock=0; iBlock<nblocks_; iBlock++) {
+      int dim = blocks_[iBlock+1] - blocks_[iBlock];
+      m->hess1[iBlock].Dimension(dim);
+      casadi_fill(m->hess1[iBlock].d, dim*dim, 0.);
     }
 
     // For SR1 or finite differences, maintain two Hessians
     if (hess_update_ == 1 || hess_update_ == 4) {
       m->hess2 = new blocksqp::Matrix[nblocks_];
-      for (iBlock=0; iBlock<nblocks_; iBlock++) {
-        varDim = blocks_[iBlock+1] - blocks_[iBlock];
-        m->hess2[iBlock].Dimension(varDim).Initialize(0.0);
+      for (int iBlock=0; iBlock<nblocks_; iBlock++) {
+        int dim = blocks_[iBlock+1] - blocks_[iBlock];
+        m->hess2[iBlock].Dimension(dim);
+        casadi_fill(m->hess2[iBlock].d, dim*dim, 0.);
       }
     }
 
@@ -2581,14 +2581,6 @@ namespace blocksqp {
     } else {
       this->d = new double[m*m];
     }
-    return *this;
-  }
-
-  Matrix &Matrix::Initialize(double val) {
-    for (int j=0; j<m; j++)
-      for (int i=0; i<m; i++)
-        (*this)(i, j) = val;
-
     return *this;
   }
 } // namespace blocksqp

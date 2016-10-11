@@ -40,14 +40,13 @@ namespace blocksqp {
   class Matrix {
   private:
     int m;
-    double *d;
   public:
+    double *d;
     Matrix();
     Matrix(const Matrix& A); // left unimplemented
     ~Matrix();
     double &operator()(int i, int j);
     Matrix &Dimension(int M);
-    Matrix &Initialize(double val);
   };
 
 } // namespace blocksqp
