@@ -2448,7 +2448,7 @@ namespace casadi {
    */
   void Blocksqp::allocAlg(BlocksqpMemory* m) const {
     // current step
-    m->deltaMat.Dimension(nx_, hess_memsize_, nx_).Initialize(0.0);
+    m->deltaMat.Dimension(nx_, hess_memsize_).Initialize(0.0);
     m->dxk = m->deltaMat.d;
 
     // trial step (temporary variable, for line search)
@@ -2473,7 +2473,7 @@ namespace casadi {
     m->filter = new std::set< std::pair<double, double> >;
 
     // difference of Lagrangian gradients
-    m->gammaMat.Dimension(nx_, hess_memsize_, nx_).Initialize(0.0);
+    m->gammaMat.Dimension(nx_, hess_memsize_).Initialize(0.0);
     m->gamma = m->gammaMat.d;
 
     // Scalars that are used in various Hessian update procedures
@@ -2573,10 +2573,7 @@ namespace blocksqp {
     if (tflag)
       Error("malloc cannot be called with Submatrix");
 
-    if (ldim < m)
-      ldim = m;
-
-    len = ldim*n;
+    len = m*n;
 
     if (len == 0)
       this->d = 0;
@@ -2595,13 +2592,12 @@ namespace blocksqp {
   }
 
   double &Matrix::operator()(int i, int j) {
-    return this->d[i+j*ldim];
+    return this->d[i+j*m];
   }
 
   Matrix::Matrix() {
     m = 0;
     n = 0;
-    ldim = 0;
     tflag = 0;
     malloc();
   }
@@ -2610,15 +2606,14 @@ namespace blocksqp {
     if (!tflag) free();
   }
 
-  Matrix &Matrix::Dimension(int M, int N, int LDIM) {
-    if (M != m || N != n || (LDIM != ldim && LDIM != -1)) {
+  Matrix &Matrix::Dimension(int M, int N) {
+    if (M != m || N != n) {
       if (tflag) {
         Error("Cannot set new dimension for Submatrix");
       } else {
         free();
         m = M;
         n = N;
-        ldim = LDIM;
 
         malloc();
       }
@@ -2630,17 +2625,6 @@ namespace blocksqp {
     for (int i=0; i < m; i++)
       for (int j=0; j < n; j++)
         (*this)(i, j) = val;
-    return *this;
-  }
-
-  Matrix &Matrix::Submatrix(const Matrix &A, int M, int N, int i0, int j0) {
-    if (i0 + M > A.m || j0 + N > A.n) Error("Cannot create Submatrix");
-    if (!tflag) free();
-    tflag = 1;
-    m = M;
-    n = N;
-    this->d = &A.d[i0+j0*A.ldim];
-    ldim = A.ldim;
     return *this;
   }
 
@@ -2672,7 +2656,6 @@ namespace blocksqp {
   SymMatrix::SymMatrix() {
     m = 0;
     n = 0;
-    ldim = 0;
     tflag = 0;
     malloc();
   }
@@ -2686,7 +2669,6 @@ namespace blocksqp {
     free();
     m = M;
     n = M;
-    ldim = M;
 
     malloc();
 

@@ -41,7 +41,6 @@ namespace blocksqp {
   public:
     int m;
     int n;
-    int ldim;
     double *d;
     int tflag;
   private:
@@ -55,11 +54,8 @@ namespace blocksqp {
     double &operator()(int i, int j);
     Matrix &operator=(const Matrix &A); // left unimplemented
 
-    Matrix &Dimension(int, int = 1, int = -1);
+    Matrix &Dimension(int, int = 1);
     Matrix &Initialize(double val);
-
-    /// Returns just a pointer to the full matrix
-    Matrix& Submatrix(const Matrix&, int, int, int, int);
   };
 
   /**
