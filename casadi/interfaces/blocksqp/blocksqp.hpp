@@ -129,7 +129,7 @@ namespace casadi {
     int reducedStepCount;  // count number of consecutive reduced steps,
     double* delta_h; // inertia correction (filter line search w indef Hessian)
     double* trial_xk;  // new trial iterate (for line search)
-    std::set< std::pair<double, double> > *filter; // Filter contains pairs (constrVio, objective)
+    std::set< std::pair<double, double> > filter; // Filter contains pairs (constrVio, objective)
 
     // Temporary memory
     double* jac;

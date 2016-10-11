@@ -1437,10 +1437,6 @@ namespace casadi {
    */
   bool Blocksqp::
   pairInFilter(BlocksqpMemory* m, double cNorm, double obj) const {
-    std::set< std::pair<double, double> >::iterator iter;
-    std::set< std::pair<double, double> > *filter;
-    filter = m->filter;
-
     /*
      * A pair is in the filter if:
      * - it increases the objective and
@@ -1452,7 +1448,7 @@ namespace casadi {
      * as dominated
      */
 
-    for (iter=filter->begin(); iter!=filter->end(); iter++)
+    for (auto iter=m->filter.begin(); iter!=m->filter.end(); iter++)
       if ((cNorm >= (1.0 - gamma_theta_) * iter->first ||
            (cNorm < 0.01 * nlinfeastol_ && iter->first < 0.01 * nlinfeastol_)) &&
           obj >= iter->second - gamma_f_ * iter->first) {
@@ -1464,19 +1460,18 @@ namespace casadi {
 
 
   void Blocksqp::initializeFilter(BlocksqpMemory* m) const {
-    std::set< std::pair<double, double> >::iterator iter;
     std::pair<double, double> initPair(theta_max_, obj_lo_);
 
     // Remove all elements
-    iter=m->filter->begin();
-    while (iter != m->filter->end()) {
+    auto iter=m->filter.begin();
+    while (iter != m->filter.end()) {
       std::set< std::pair<double, double> >::iterator iterToRemove = iter;
       iter++;
-      m->filter->erase(iterToRemove);
+      m->filter.erase(iterToRemove);
     }
 
     // Initialize with pair (maxConstrViolation, objLowerBound);
-    m->filter->insert(initPair);
+    m->filter.insert(initPair);
   }
 
 
@@ -1486,20 +1481,19 @@ namespace casadi {
    */
   void Blocksqp::
   augmentFilter(BlocksqpMemory* m, double cNorm, double obj) const {
-    std::set< std::pair<double, double> >::iterator iter;
     std::pair<double, double> entry((1.0 - gamma_theta_)*cNorm, obj
       - gamma_f_*cNorm);
 
     // Augment filter by current element
-    m->filter->insert(entry);
+    m->filter.insert(entry);
 
     // Remove dominated elements
-    iter=m->filter->begin();
-    while (iter != m->filter->end()) {
+    auto iter=m->filter.begin();
+    while (iter != m->filter.end()) {
       if (iter->first > entry.first && iter->second > entry.second) {
         std::set< std::pair<double, double> >::iterator iterToRemove = iter;
         iter++;
-        m->filter->erase(iterToRemove);
+        m->filter.erase(iterToRemove);
       } else {
         iter++;
       }
@@ -2468,7 +2462,7 @@ namespace casadi {
     casadi_fill(m->delta_h, nblocks_, 0.);
 
     // filter as a set of pairs
-    m->filter = new std::set< std::pair<double, double> >;
+    m->filter.clear();
 
     // difference of Lagrangian gradients
     casadi_fill(m->gammaMat, nx_*hess_memsize_, 0.);
