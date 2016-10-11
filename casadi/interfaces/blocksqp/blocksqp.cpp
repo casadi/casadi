@@ -494,6 +494,7 @@ namespace casadi {
     alloc_w(nx_*hess_memsize_, true); // gammaMat
     alloc_w(Asp_.nnz(), true); // jac_g
     alloc_w(Hsp_.nnz(), true); // hess_lag
+    alloc_iw(Hsp_.nnz() + (nx_+1) + nx_, true); // hessIndRow
 
     // Allocate block diagonal Hessian(s)
     int n_hess = hess_update_==1 || hess_update_==4 ? 2 : 1;
@@ -544,6 +545,7 @@ namespace casadi {
     m->gammaMat = w; w += nx_*hess_memsize_;
     m->jac_g = w; w += Asp_.nnz();
     m->hess_lag = w; w += Hsp_.nnz();
+    m->hessIndRow = iw; iw += Hsp_.nnz() + (nx_+1) + nx_;
 
     // First Hessian
     m->hess1 = res; res += nblocks_;
@@ -605,9 +607,6 @@ namespace casadi {
 
     allocMin(m);
 
-    m->hessIndCol = 0;
-    m->hessIndRow = 0;
-    m->hessIndLo = 0;
     m->hess = 0;
 
     m->noUpdateCounter = 0;
@@ -668,7 +667,6 @@ namespace casadi {
     // Clean up
     delete m->qp;
     if (m->noUpdateCounter != 0) delete[] m->noUpdateCounter;
-    if (m->hessIndRow != 0) delete[] m->hessIndRow;
   }
 
   int Blocksqp::run(BlocksqpMemory* m, int maxIt, int warmStart) const {
@@ -2094,7 +2092,7 @@ namespace casadi {
          */
         if (matricesChanged) {
           // Convert block-Hessian to sparse format
-          convertHessian(m, eps_, m->hessIndRow, m->hessIndCol, m->hessIndLo);
+          convertHessian(m, eps_);
           H = new qpOASES::SymSparseMat(nx_, nx_,
                                          m->hessIndRow, m->hessIndCol,
                                          m->hess_lag);
@@ -2387,8 +2385,7 @@ namespace casadi {
    * Harwell-Boeing format (as used by qpOASES)
    */
   void Blocksqp::
-  convertHessian(BlocksqpMemory* m, double eps,
-                 int *&hessIndRow_, int *&hessIndCol_, int *&hessIndLo_) const {
+  convertHessian(BlocksqpMemory* m, double eps) const {
     int b, count, colCountTotal, rowOffset, i, j;
     int nnz;
 
@@ -2405,11 +2402,8 @@ namespace casadi {
       }
     }
 
-    if (hessIndRow_ != 0) delete[] hessIndRow_;
-
-    hessIndRow_ = new int[nnz + (nx_+1) + nx_];
-    hessIndCol_ = hessIndRow_ + nnz;
-    hessIndLo_ = hessIndCol_ + (nx_+1);
+    m->hessIndCol = m->hessIndRow + nnz;
+    m->hessIndLo = m->hessIndCol + (nx_+1);
 
     // 2) store matrix entries columnwise in hessNz
     count = 0; // runs over all nonzero elements
@@ -2420,12 +2414,12 @@ namespace casadi {
 
       for (i=0; i<dim; i++) {
         // column 'colCountTotal' starts at element 'count'
-        hessIndCol_[colCountTotal] = count;
+        m->hessIndCol[colCountTotal] = count;
 
         for (j=0; j<dim; j++) {
           if (fabs(m->hess[b][i+j*dim]) > eps) {
               m->hess_lag[count] = m->hess[b][i+j*dim];
-              hessIndRow_[count] = j + rowOffset;
+              m->hessIndRow[count] = j + rowOffset;
               count++;
           }
         }
@@ -2433,12 +2427,12 @@ namespace casadi {
       }
       rowOffset += dim;
     }
-    hessIndCol_[colCountTotal] = count;
+    m->hessIndCol[colCountTotal] = count;
 
     // 3) Set reference to lower triangular matrix
     for (j=0; j<nx_; j++) {
-      for (i=hessIndCol_[j]; i<hessIndCol_[j+1] && hessIndRow_[i]<j; i++) {}
-      hessIndLo_[j] = i;
+      for (i=m->hessIndCol[j]; i<m->hessIndCol[j+1] && m->hessIndRow[i]<j; i++) {}
+      m->hessIndLo[j] = i;
     }
 
     if (count != nnz)

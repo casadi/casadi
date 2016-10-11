@@ -295,9 +295,7 @@ namespace casadi {
     /// Allocate diagonal block Hessian
     void allocHess(BlocksqpMemory* m) const;
     /// Convert *hess to column compressed sparse format
-    void convertHessian(BlocksqpMemory* m, double eps,
-                         int *&hessIndRow_, int *&hessIndCol_,
-                         int *&hessIndLo_) const;
+    void convertHessian(BlocksqpMemory* m, double eps) const;
     /// Allocate variables specifically needed by vmused SQP method
     void allocAlg(BlocksqpMemory* m) const;
     /// Set initial filter, objective function, tolerances etc.
