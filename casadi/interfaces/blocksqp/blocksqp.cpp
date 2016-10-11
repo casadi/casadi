@@ -448,9 +448,13 @@ namespace casadi {
     // Number of blocks
     nblocks_ = blocks_.size()-1;
 
-    // Largest blocksize
+    // Blocksizes
+    dim_.resize(nblocks_);
     int max_size = 0;
-    for (int i=0;i<blocks_.size()-1;++i) max_size = max(max_size, blocks_[i+1]-blocks_[i]);
+    for (int i=0; i<nblocks_; ++i) {
+      dim_[i] = blocks_[i+1]-blocks_[i];
+      max_size = max(max_size, dim_[i]);
+    }
 
     log(std::string("BlockSqp::init: working with ") + to_string(nblocks_) +
           " blocks of max size " + to_string(max_size) + ".");
@@ -492,8 +496,7 @@ namespace casadi {
     // Allocate block diagonal Hessian(s)
     int n_hess = hess_update_==1 || hess_update_==4 ? 2 : 1;
     alloc_res(nblocks_*n_hess, true);
-    for (int iBlock=0; iBlock<nblocks_; iBlock++) {
-      int dim = blocks_[iBlock+1] - blocks_[iBlock];
+    for (int dim : dim_) {
       alloc_w(n_hess*dim*dim, true);
     }
   }
@@ -541,7 +544,7 @@ namespace casadi {
     // First Hessian
     m->hess1 = res; res += nblocks_;
     for (int iBlock=0; iBlock<nblocks_; iBlock++) {
-      int dim = blocks_[iBlock+1] - blocks_[iBlock];
+      int dim = dim_[iBlock];
       m->hess1[iBlock] = w; w += dim*dim;
     }
 
@@ -549,7 +552,7 @@ namespace casadi {
     if (hess_update_ == 1 || hess_update_ == 4) {
       m->hess2 = res; res += nblocks_;
       for (int iBlock=0; iBlock<nblocks_; iBlock++) {
-        int dim = blocks_[iBlock+1] - blocks_[iBlock];
+        int dim = dim_[iBlock];
         m->hess2[iBlock] = w; w += dim*dim;
       }
     }
@@ -1521,7 +1524,7 @@ namespace casadi {
    * Initial Hessian for one block: Identity matrix
    */
   void Blocksqp::calcInitialHessian(BlocksqpMemory* m, int iBlock) const {
-    int dim = blocks_[iBlock+1] - blocks_[iBlock];
+    int dim = dim_[iBlock];
     casadi_fill(m->hess[iBlock], dim*dim, 0.);
 
     // Each block is a diagonal matrix
@@ -1548,7 +1551,7 @@ namespace casadi {
 
 
   void Blocksqp::resetHessian(BlocksqpMemory* m, int iBlock) const {
-    int dim = blocks_[iBlock+1] - blocks_[iBlock];
+    int dim = dim_[iBlock];
 
     // smallGamma and smallDelta are either subvectors of gamma and delta
     // or submatrices of gammaMat, deltaMat, i.e. subvectors of gamma and delta
@@ -1580,7 +1583,7 @@ namespace casadi {
   void Blocksqp::
   sizeInitialHessian(BlocksqpMemory* m, const double* gamma,
                      const double* delta, int iBlock, int option) const {
-    int dim = blocks_[iBlock+1] - blocks_[iBlock];
+    int dim = dim_[iBlock];
     int i, j;
     double scale;
     double myEps = 1.0e3 * eps_;
@@ -1620,7 +1623,7 @@ namespace casadi {
   void Blocksqp::
   sizeHessianCOL(BlocksqpMemory* m, const double* gamma,
                  const double* delta, int iBlock) const {
-    int dim = blocks_[iBlock+1] - blocks_[iBlock];
+    int dim = dim_[iBlock];
     int i, j;
     double theta, scale, myEps = 1.0e3 * eps_;
     double deltaNorm, deltaNormOld, deltaGamma, deltaGammaOld, deltaBdelta;
@@ -1685,7 +1688,7 @@ namespace casadi {
     m->averageSizingFactor = 0.0;
 
     for (iBlock=0; iBlock<nBlocks; iBlock++) {
-      int dim = blocks_[iBlock+1] - blocks_[iBlock];
+      int dim = dim_[iBlock];
 
       // smallGamma and smallDelta are subvectors of gamma and delta,
       // corresponding to partially separability
@@ -1761,7 +1764,7 @@ namespace casadi {
     m->averageSizingFactor = 0.0;
 
     for (iBlock=0; iBlock<nBlocks; iBlock++) {
-      int dim = blocks_[iBlock+1] - blocks_[iBlock];
+      int dim = dim_[iBlock];
 
       // smallGamma and smallDelta are submatrices of gammaMat, deltaMat,
       // i.e. subvectors of gamma and delta from m prev. iterations
@@ -1845,7 +1848,7 @@ namespace casadi {
   calcBFGS(BlocksqpMemory* m, const double* gamma,
     const double* delta, int iBlock) const {
     int i, j, k;
-    int dim = blocks_[iBlock+1] - blocks_[iBlock];
+    int dim = dim_[iBlock];
     double h1 = 0.0;
     double h2 = 0.0;
     double thetaPowell = 0.0;
@@ -1920,7 +1923,7 @@ namespace casadi {
   calcSR1(BlocksqpMemory* m, const double* gamma, const double* delta,
     int iBlock) const {
     int i, j, k;
-    int dim = blocks_[iBlock+1] - blocks_[iBlock];
+    int dim = dim_[iBlock];
     double *B = m->hess[iBlock];
     double myEps = 1.0e2 * eps_;
     double r = 1.0e-8;
@@ -1973,7 +1976,7 @@ namespace casadi {
 
         // If last block contains exact Hessian, we need to copy it
         if (which_second_derv_ == 1) {
-          int dim = blocks_[nblocks_] - blocks_[nblocks_-1];
+          int dim = dim_[nblocks_-1];
           casadi_copy(m->hess1[nblocks_-1], dim*dim, m->hess2[nblocks_-1]);
         }
 
@@ -1999,7 +2002,7 @@ namespace casadi {
         double mu = (idx==1) ? 1.0 / (maxQP-1) : idxF / (idxF - 1.0);
         double mu1 = 1.0 - mu;
         for (int iBlock=0; iBlock<nblocks_; iBlock++) {
-          int dim = blocks_[iBlock+1] - blocks_[iBlock];
+          int dim = dim_[iBlock];
           for (int i=0; i<dim; i++) {
             for (int j=0; j<dim; j++) {
               m->hess2[iBlock][i+j*dim] *= mu;
@@ -2175,7 +2178,7 @@ namespace casadi {
         double mu1 = 1.0 - mu;
         int nBlocks = (which_second_derv_ == 1) ? nblocks_-1 : nblocks_;
         for (int iBlock=0; iBlock<nBlocks; iBlock++) {
-          int dim = blocks_[iBlock+1] - blocks_[iBlock];
+          int dim = dim_[iBlock];
           for (int i=0; i<dim; i++) {
             for (int j=0; j<dim; j++) {
               m->hess2[iBlock][i+j*dim] *= mu;
@@ -2360,14 +2363,14 @@ namespace casadi {
   void Blocksqp::allocHess(BlocksqpMemory* m) const {
     // Create one Matrix for one diagonal block in the Hessian
     for (int iBlock=0; iBlock<nblocks_; iBlock++) {
-      int dim = blocks_[iBlock+1] - blocks_[iBlock];
+      int dim = dim_[iBlock];
       casadi_fill(m->hess1[iBlock], dim*dim, 0.);
     }
 
     // For SR1 or finite differences, maintain two Hessians
     if (hess_update_ == 1 || hess_update_ == 4) {
       for (int iBlock=0; iBlock<nblocks_; iBlock++) {
-        int dim = blocks_[iBlock+1] - blocks_[iBlock];
+        int dim = dim_[iBlock];
         casadi_fill(m->hess2[iBlock], dim*dim, 0.);
       }
     }
@@ -2390,7 +2393,7 @@ namespace casadi {
     // 1) count nonzero elements
     nnz = 0;
     for (iBlock=0; iBlock<nblocks_; iBlock++) {
-      int dim = blocks_[iBlock+1] - blocks_[iBlock];
+      int dim = dim_[iBlock];
       for (i=0; i<dim; i++) {
         for (j=0; j<dim; j++) {
           if (fabs(m->hess[iBlock][i+j*dim]) > eps) {
@@ -2413,7 +2416,7 @@ namespace casadi {
     colCountTotal = 0; // keep track of position in large matrix
     rowOffset = 0;
     for (iBlock=0; iBlock<nblocks_; iBlock++) {
-      int dim = blocks_[iBlock+1] - blocks_[iBlock];
+      int dim = dim_[iBlock];
 
       for (i=0; i<dim; i++) {
         // column 'colCountTotal' starts at element 'count'

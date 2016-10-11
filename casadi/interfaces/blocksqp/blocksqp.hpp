@@ -185,6 +185,7 @@ namespace casadi {
     // Block partitioning
     int nblocks_;
     std::vector<int> blocks_;
+    std::vector<int> dim_;
 
     // Jacobian/Hessian sparsity
     Sparsity Asp_, Hsp_;
