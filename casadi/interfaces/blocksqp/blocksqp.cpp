@@ -2197,24 +2197,25 @@ namespace casadi {
      * 2: Unbounded
      * 3: Infeasible
      * 4: Other error */
-    if (ret == qpOASES::SUCCESSFUL_RETURN)
-      return 0;
-    else if (ret == qpOASES::RET_MAX_NWSR_REACHED)
-      return 1;
-    else if (ret == qpOASES::RET_HESSIAN_NOT_SPD ||
-             ret == qpOASES::RET_HESSIAN_INDEFINITE ||
-             ret == qpOASES::RET_INIT_FAILED_UNBOUNDEDNESS ||
-             ret == qpOASES::RET_QP_UNBOUNDED ||
-             ret == qpOASES::RET_HOTSTART_STOPPED_UNBOUNDEDNESS)
-      return 2;
-    else if (ret == qpOASES::RET_INIT_FAILED_INFEASIBILITY ||
-             ret == qpOASES::RET_QP_INFEASIBLE ||
-             ret == qpOASES::RET_HOTSTART_STOPPED_INFEASIBILITY)
-      return 3;
-    else
-      return 4;
+     switch (ret) {
+        case qpOASES::SUCCESSFUL_RETURN:
+          return 0;
+        case qpOASES::RET_MAX_NWSR_REACHED:
+          return 1;
+        case qpOASES::RET_HESSIAN_NOT_SPD:
+        case qpOASES::RET_HESSIAN_INDEFINITE:
+        case qpOASES::RET_INIT_FAILED_UNBOUNDEDNESS:
+        case qpOASES::RET_QP_UNBOUNDED:
+        case qpOASES::RET_HOTSTART_STOPPED_UNBOUNDEDNESS:
+          return 2;
+        case qpOASES::RET_INIT_FAILED_INFEASIBILITY:
+        case qpOASES::RET_QP_INFEASIBLE:
+        case qpOASES::RET_HOTSTART_STOPPED_INFEASIBILITY:
+          return 3;
+        default:
+          return 4;
+     }
   }
-
 
   /**
    * Set bounds on the step (in the QP), either according
