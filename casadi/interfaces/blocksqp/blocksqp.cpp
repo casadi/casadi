@@ -488,6 +488,14 @@ namespace casadi {
     alloc_w(ng_, true); // jac_times_dxk
     alloc_w(nx_*hess_memsize_, true); // deltaMat
     alloc_w(nx_*hess_memsize_, true); // gammaMat
+
+    // Allocate block diagonal Hessian(s)
+    int n_hess = hess_update_==1 || hess_update_==4 ? 2 : 1;
+    alloc_res(nblocks_*n_hess, true);
+    for (int iBlock=0; iBlock<nblocks_; iBlock++) {
+      int dim = blocks_[iBlock+1] - blocks_[iBlock];
+      alloc_w(n_hess*dim*dim, true);
+    }
   }
 
   void Blocksqp::init_memory(void* mem) const {
@@ -529,6 +537,22 @@ namespace casadi {
     m->jac_times_dxk = w; w += ng_;
     m->deltaMat = w; w += nx_*hess_memsize_;
     m->gammaMat = w; w += nx_*hess_memsize_;
+
+    // First Hessian
+    m->hess1 = res; res += nblocks_;
+    for (int iBlock=0; iBlock<nblocks_; iBlock++) {
+      int dim = blocks_[iBlock+1] - blocks_[iBlock];
+      m->hess1[iBlock] = w; w += dim*dim;
+    }
+
+    // Second Hessian, for SR1 or finite differences
+    if (hess_update_ == 1 || hess_update_ == 4) {
+      m->hess2 = res; res += nblocks_;
+      for (int iBlock=0; iBlock<nblocks_; iBlock++) {
+        int dim = blocks_[iBlock+1] - blocks_[iBlock];
+        m->hess2[iBlock] = w; w += dim*dim;
+      }
+    }
   }
 
   void Blocksqp::solve(void* mem) const {
@@ -582,8 +606,6 @@ namespace casadi {
     m->hessIndRow = 0;
     m->hessIndLo = 0;
     m->hess = 0;
-    m->hess1 = 0;
-    m->hess2 = 0;
 
     m->noUpdateCounter = 0;
 
@@ -660,10 +682,7 @@ namespace casadi {
       calcInitialHessian(m);
 
       /// Evaluate all functions and gradients for xk_0
-      infoEval = evaluate(m, &m->obj,
-                          m->gk, m->grad_fk,
-                          m->jacNz, m->jacIndRow, m->jacIndCol,
-                          m->hess);
+      infoEval = evaluate(m, &m->obj, m->gk, m->grad_fk, m->jacNz);
       m->nDerCalls++;
 
       /// Check if converged
@@ -809,9 +828,7 @@ namespace casadi {
       calcLagrangeGradient(m, m->gamma, 0);
 
       /// Evaluate functions and gradients at the new xk
-      infoEval = evaluate(m, &m->obj, m->gk,
-                          m->grad_fk, m->jacNz, m->jacIndRow,
-                          m->jacIndCol, m->hess);
+      infoEval = evaluate(m, &m->obj, m->gk, m->grad_fk, m->jacNz);
       m->nDerCalls++;
 
       /// Check if converged
@@ -1505,17 +1522,17 @@ namespace casadi {
    */
   void Blocksqp::calcInitialHessian(BlocksqpMemory* m, int iBlock) const {
     int dim = blocks_[iBlock+1] - blocks_[iBlock];
-    casadi_fill(m->hess[iBlock].d, dim*dim, 0.);
+    casadi_fill(m->hess[iBlock], dim*dim, 0.);
 
     // Each block is a diagonal matrix
     for (int i=0; i<dim; i++)
-      m->hess[iBlock].d[i+i*dim] = ini_hess_diag_;
+      m->hess[iBlock][i+i*dim] = ini_hess_diag_;
 
     // If we maintain 2 Hessians, also reset the second one
     if (m->hess2 != 0) {
-      casadi_fill(m->hess2[iBlock].d, dim*dim, 0.);
+      casadi_fill(m->hess2[iBlock], dim*dim, 0.);
       for (int i=0; i<dim; i++)
-        m->hess2[iBlock].d[i+i*dim] = ini_hess_diag_;
+        m->hess2[iBlock][i+i*dim] = ini_hess_diag_;
     }
   }
 
@@ -1590,7 +1607,7 @@ namespace casadi {
       scale = fmax(scale, myEps);
       for (i=0; i<dim; i++)
         for (j=0; j<dim; j++)
-          m->hess[iBlock].d[i+j*dim] *= scale;
+          m->hess[iBlock][i+j*dim] *= scale;
     } else {
       scale = 1.0;
     }
@@ -1616,7 +1633,7 @@ namespace casadi {
     deltaBdelta = 0.0;
     for (i=0; i<dim; i++)
       for (j=0; j<dim; j++)
-        deltaBdelta += delta[i] * m->hess[iBlock].d[i+j*dim] * delta[j];
+        deltaBdelta += delta[i] * m->hess[iBlock][i+j*dim] * delta[j];
 
     // Centered Oren-Luenberger factor
     if (m->noUpdateCounter[iBlock] == -1) {
@@ -1639,7 +1656,7 @@ namespace casadi {
       //casadi_printf("Sizing value (COL) block %i = %g\n", iBlock, scale);
       for (i=0; i<dim; i++)
         for (j=0; j<dim; j++)
-          m->hess[iBlock].d[i+j*dim] *= scale;
+          m->hess[iBlock][i+j*dim] *= scale;
 
       // statistics: average sizing factor
       m->averageSizingFactor += scale;
@@ -1841,7 +1858,7 @@ namespace casadi {
      *  original gamma might lead to an undamped update with the new B_i-1! */
     std::vector<double> gamma2(gamma, gamma+dim);
 
-    double *B = m->hess[iBlock].d;
+    double *B = m->hess[iBlock];
 
     // Bdelta = B*delta (if sizing is enabled, B is the sized B!)
     // h1 = delta^T * B * delta
@@ -1904,7 +1921,7 @@ namespace casadi {
     int iBlock) const {
     int i, j, k;
     int dim = blocks_[iBlock+1] - blocks_[iBlock];
-    blocksqp::Matrix *B;
+    double *B = m->hess[iBlock];
     double myEps = 1.0e2 * eps_;
     double r = 1.0e-8;
     double h = 0.0;
@@ -1915,7 +1932,7 @@ namespace casadi {
     for (i=0; i<dim; i++) {
       gmBdelta[i] = gamma[i];
       for (k=0; k<dim; k++)
-        gmBdelta[i] -= (m->hess[iBlock].d[i+k*dim] * delta[k]);
+        gmBdelta[i] -= B[i+k*dim] * delta[k];
 
       h += (gmBdelta[i] * delta[i]);
     }
@@ -1930,7 +1947,7 @@ namespace casadi {
     } else {
       for (i=0; i<dim; i++)
         for (j=0; j<dim; j++)
-          m->hess[iBlock].d[i+j*dim] += gmBdelta[i]*gmBdelta[j]/h;
+          B[i+j*dim] += gmBdelta[i]*gmBdelta[j]/h;
       m->noUpdateCounter[iBlock] = 0;
     }
   }
@@ -1957,7 +1974,7 @@ namespace casadi {
         // If last block contains exact Hessian, we need to copy it
         if (which_second_derv_ == 1) {
           int dim = blocks_[nblocks_] - blocks_[nblocks_-1];
-          casadi_copy(m->hess1[nblocks_-1].d, dim*dim, m->hess2[nblocks_-1].d);
+          casadi_copy(m->hess1[nblocks_-1], dim*dim, m->hess2[nblocks_-1]);
         }
 
         // Limited memory: compute fallback update only when needed
@@ -1985,8 +2002,8 @@ namespace casadi {
           int dim = blocks_[iBlock+1] - blocks_[iBlock];
           for (int i=0; i<dim; i++) {
             for (int j=0; j<dim; j++) {
-              m->hess2[iBlock].d[i+j*dim] *= mu;
-              m->hess2[iBlock].d[i+j*dim] += mu1 * m->hess1[iBlock].d[i+j*dim];
+              m->hess2[iBlock][i+j*dim] *= mu;
+              m->hess2[iBlock][i+j*dim] += mu1 * m->hess1[iBlock][i+j*dim];
             }
           }
         }
@@ -2071,7 +2088,7 @@ namespace casadi {
          */
         if (matricesChanged) {
           // Convert block-Hessian to sparse format
-          convertHessian(m, eps_, m->hess, m->hessNz,
+          convertHessian(m, eps_, m->hessNz,
                                 m->hessIndRow, m->hessIndCol, m->hessIndLo);
           H = new qpOASES::SymSparseMat(nx_, nx_,
                                          m->hessIndRow, m->hessIndCol,
@@ -2161,8 +2178,8 @@ namespace casadi {
           int dim = blocks_[iBlock+1] - blocks_[iBlock];
           for (int i=0; i<dim; i++) {
             for (int j=0; j<dim; j++) {
-              m->hess2[iBlock].d[i+j*dim] *= mu;
-              m->hess2[iBlock].d[i+j*dim] += mu1 * m->hess1[iBlock].d[i+j*dim];
+              m->hess2[iBlock][i+j*dim] *= mu;
+              m->hess2[iBlock][i+j*dim] += mu1 * m->hess1[iBlock][i+j*dim];
             }
           }
         }
@@ -2342,20 +2359,16 @@ namespace casadi {
 
   void Blocksqp::allocHess(BlocksqpMemory* m) const {
     // Create one Matrix for one diagonal block in the Hessian
-    m->hess1 = new blocksqp::Matrix[nblocks_];
     for (int iBlock=0; iBlock<nblocks_; iBlock++) {
       int dim = blocks_[iBlock+1] - blocks_[iBlock];
-      m->hess1[iBlock].Dimension(dim);
-      casadi_fill(m->hess1[iBlock].d, dim*dim, 0.);
+      casadi_fill(m->hess1[iBlock], dim*dim, 0.);
     }
 
     // For SR1 or finite differences, maintain two Hessians
     if (hess_update_ == 1 || hess_update_ == 4) {
-      m->hess2 = new blocksqp::Matrix[nblocks_];
       for (int iBlock=0; iBlock<nblocks_; iBlock++) {
         int dim = blocks_[iBlock+1] - blocks_[iBlock];
-        m->hess2[iBlock].Dimension(dim);
-        casadi_fill(m->hess2[iBlock].d, dim*dim, 0.);
+        casadi_fill(m->hess2[iBlock], dim*dim, 0.);
       }
     }
 
@@ -2369,7 +2382,7 @@ namespace casadi {
    */
   void Blocksqp::
   convertHessian(BlocksqpMemory* m, double eps,
-                 blocksqp::Matrix *&hess_, double *&hessNz_,
+                 double *&hessNz_,
                  int *&hessIndRow_, int *&hessIndCol_, int *&hessIndLo_) const {
     int iBlock, count, colCountTotal, rowOffset, i, j;
     int nnz;
@@ -2380,7 +2393,7 @@ namespace casadi {
       int dim = blocks_[iBlock+1] - blocks_[iBlock];
       for (i=0; i<dim; i++) {
         for (j=0; j<dim; j++) {
-          if (fabs(hess_[iBlock].d[i+j*dim]) > eps) {
+          if (fabs(m->hess[iBlock][i+j*dim]) > eps) {
             nnz++;
           }
         }
@@ -2407,8 +2420,8 @@ namespace casadi {
         hessIndCol_[colCountTotal] = count;
 
         for (j=0; j<dim; j++)
-          if (fabs(hess_[iBlock].d[i+j*dim]) > eps) {
-              hessNz_[count] = hess_[iBlock].d[i+j*dim];
+          if (fabs(m->hess[iBlock][i+j*dim]) > eps) {
+              hessNz_[count] = m->hess[iBlock][i+j*dim];
               hessIndRow_[count] = j + rowOffset;
               count++;
             }
@@ -2508,15 +2521,13 @@ namespace casadi {
   int Blocksqp::
   evaluate(BlocksqpMemory* m,
            double *f, double *g,
-           double *grad_f, double *&jacNz, int *&jacIndRow,
-           int *&jacIndCol,
-           blocksqp::Matrix *&hess) const {
+           double *grad_f, double *jac_g) const {
     m->arg[0] = m->xk; // x
     m->arg[1] = m->p; // p
     m->res[0] = f; // f
     m->res[1] = g; // g
     m->res[2] = grad_f; // grad:f:x
-    m->res[3] = jacNz; // jac:g:x
+    m->res[3] = jac_g; // jac:g:x
     calc_function(m, "nlp_gf_jg");
     return 0;
   }
@@ -2547,29 +2558,3 @@ namespace casadi {
   }
 
 } // namespace casadi
-
-// Legacy:
-
-namespace blocksqp {
-
-  void Error(const char *F) {
-    printf("Error: %s\n", F);
-  }
-
-  Matrix::Matrix() : d(0) {
-  }
-
-  Matrix::~Matrix() {
-    if (this->d != 0) delete[] this->d;
-  }
-
-  Matrix &Matrix::Dimension(int M) {
-    if (this->d != 0) delete[] this->d;
-    if (M==0) {
-      this->d = 0;
-    } else {
-      this->d = new double[M*M];
-    }
-    return *this;
-  }
-} // namespace blocksqp

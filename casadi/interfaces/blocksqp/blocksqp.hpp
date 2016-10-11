@@ -31,23 +31,6 @@
 #include "casadi/core/function/nlpsol_impl.hpp"
 #include "../qpoases/qpoases_interface.hpp"
 
-namespace blocksqp {
-  /**
-   * \brief Class for easy access of elements of a dense symmetric matrix.
-   * \author Dennis Janka
-   * \date 2012-2015
-   */
-  class Matrix {
-  public:
-    double *d;
-    Matrix();
-    Matrix(const Matrix& A); // left unimplemented
-    ~Matrix();
-    Matrix &Dimension(int M);
-  };
-
-} // namespace blocksqp
-
 /** \defgroup plugin_Nlpsol_blocksqp
   * This is a modified version of blockSQP by Janka et al.
   *
@@ -115,9 +98,9 @@ namespace casadi {
     double *gammaMat;  // Lagrangian gradient differences for last m steps
     double *gamma;  // alias for current Lagrangian gradient
 
-    blocksqp::Matrix *hess;  // [blockwise] pointer to current Hessian of the Lagrangian
-    blocksqp::Matrix *hess1;  // [blockwise] first Hessian approximation
-    blocksqp::Matrix *hess2;  // [blockwise] second Hessian approximation (convexified)
+    double **hess;  // [blockwise] pointer to current Hessian of the Lagrangian
+    double **hess1;  // [blockwise] first Hessian approximation
+    double **hess2;  // [blockwise] second Hessian approximation (convexified)
     double *hessNz;  // nonzero elements of Hessian (length)
     int *hessIndRow;  // row indices (length)
     int *hessIndCol;  // indices to first entry of columns (nCols+1)
@@ -314,7 +297,6 @@ namespace casadi {
     void allocHess(BlocksqpMemory* m) const;
     /// Convert *hess to column compressed sparse format
     void convertHessian(BlocksqpMemory* m, double eps,
-                         blocksqp::Matrix *&hess_,
                          double *&hessNz_, int *&hessIndRow_, int *&hessIndCol_,
                          int *&hessIndLo_) const;
     /// Allocate variables specifically needed by vmused SQP method
@@ -334,10 +316,7 @@ namespace casadi {
                   double *f,
                   double *g,
                   double *grad_f,
-                  double *&jacNz,
-                  int *&jacIndRow,
-                  int *&jacIndCol,
-                  blocksqp::Matrix *&hess) const;
+                  double *jac_g) const;
 
     /// Evaluate objective and constraints, no derivatives
     int evaluate(BlocksqpMemory* m, const double *xk,
