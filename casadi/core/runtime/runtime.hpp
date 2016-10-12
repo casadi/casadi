@@ -288,7 +288,7 @@ namespace casadi {
   real_t CASADI_PREFIX(max_viol)(int n, const real_t* x, const real_t* lb, const real_t* ub) {
     real_t r = 0;
     int i;
-    for (int i=0; i<n; ++i) {
+    for (i=0; i<n; ++i) {
       real_t x_i = x ? *x++ : 0;
       real_t lb_i = lb ? *lb++ : 0;
       real_t ub_i = ub ? *ub++ : 0;
@@ -302,7 +302,7 @@ namespace casadi {
   real_t CASADI_PREFIX(sum_viol)(int n, const real_t* x, const real_t* lb, const real_t* ub) {
     real_t r = 0;
     int i;
-    for (int i=0; i<n; ++i) {
+    for (i=0; i<n; ++i) {
       real_t x_i = x ? *x++ : 0;
       real_t lb_i = lb ? *lb++ : 0;
       real_t ub_i = ub ? *ub++ : 0;

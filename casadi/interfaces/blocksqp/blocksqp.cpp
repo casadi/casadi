@@ -665,10 +665,9 @@ namespace casadi {
   }
 
   int Blocksqp::run(BlocksqpMemory* m, int maxIt, int warmStart) const {
-    int it, infoQP = 0, infoEval = 0;
+    int it, infoQP = 0;
     bool skipLineSearch = false;
     bool hasConverged = false;
-    int whichDerv = which_second_derv_;
 
     if (warmStart == 0 || m->itCount == 0) {
       // SQP iteration 0
@@ -677,7 +676,7 @@ namespace casadi {
       calcInitialHessian(m);
 
       /// Evaluate all functions and gradients for xk_0
-      infoEval = evaluate(m, &m->obj, m->gk, m->grad_fk, m->jac_g);
+      (void)evaluate(m, &m->obj, m->gk, m->grad_fk, m->jac_g);
       m->nDerCalls++;
 
       /// Check if converged
@@ -823,7 +822,7 @@ namespace casadi {
       calcLagrangeGradient(m, m->gamma, 0);
 
       /// Evaluate functions and gradients at the new xk
-      infoEval = evaluate(m, &m->obj, m->gk, m->grad_fk, m->jac_g);
+      (void)evaluate(m, &m->obj, m->gk, m->grad_fk, m->jac_g);
       m->nDerCalls++;
 
       /// Check if converged
@@ -1141,7 +1140,7 @@ namespace casadi {
    */
   int Blocksqp::filterLineSearch(BlocksqpMemory* m) const {
     double alpha = 1.0;
-    double cNorm, cNormTrial, objTrial, dfTdeltaXi;
+    double cNorm, cNormTrial=0, objTrial, dfTdeltaXi=0;
 
     int i, k, info;
     int nVar = nx_;
@@ -1662,7 +1661,6 @@ namespace casadi {
   void Blocksqp::
   calcHessianUpdate(BlocksqpMemory* m, int updateType, int hessScaling) const {
     int b, nBlocks;
-    int dim;
     bool firstIter;
 
     //if objective derv is computed exactly, don't set the last block!
