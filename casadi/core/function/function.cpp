@@ -54,7 +54,7 @@ namespace casadi {
     // Make sure that the file is ready for reading
     if (!file.good()) return false;
     // Have we already wrapped around once?
-    bool wrapped_around = false;
+    //bool wrapped_around = false;
     // Read line-by-line
     string tmp;
     while (true) {
