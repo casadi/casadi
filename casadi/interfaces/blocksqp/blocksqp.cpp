@@ -610,6 +610,9 @@ namespace casadi {
     // Reset the SQP metod
     reset_sqp(m);
 
+    // Free existing memory, if any
+    if (m->qp) delete m->qp;
+    m->qp = 0;
     if (schur_) {
       m->qp = new qpOASES::SQProblemSchur(nx_, ng_, qpOASES::HST_UNKNOWN, 50,
                                           m->qpoases_mem,
@@ -659,9 +662,6 @@ namespace casadi {
       casadi_copy(m->lam_gk, ng_, m->lam_g);
       casadi_scal(ng_, -1., m->lam_g);
     }
-
-    // Clean up
-    delete m->qp;
   }
 
   int Blocksqp::run(BlocksqpMemory* m, int maxIt, int warmStart) const {
@@ -2508,12 +2508,14 @@ namespace casadi {
     qpoases_mem = 0;
     H = 0;
     A = 0;
+    qp = 0;
   }
 
   BlocksqpMemory::~BlocksqpMemory() {
     if (qpoases_mem) delete qpoases_mem;
     if (H) delete H;
     if (A) delete A;
+    if (qp) delete qp;
   }
 
   double Blocksqp::
