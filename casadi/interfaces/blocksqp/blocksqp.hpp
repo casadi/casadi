@@ -52,6 +52,8 @@ namespace casadi {
     /// Destructor
     ~BlocksqpMemory();
 
+    qpOASES::SymSparseMat *H;
+    qpOASES::Matrix *A;
     qpOASES::SQProblem* qp;
 
     // [Workaround] qpOASES memory block

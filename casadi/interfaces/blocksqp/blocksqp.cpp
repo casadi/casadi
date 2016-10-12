@@ -2024,12 +2024,13 @@ namespace casadi {
      */
 
     // Setup QProblem data
-    qpOASES::Matrix *A = 0;
     if (matricesChanged) {
+      if (m->A) delete m->A;
+      m->A = 0;
       int* jacIndRow = const_cast<int*>(Asp_.row());
       int* jacIndCol = const_cast<int*>(Asp_.colind());
-      A = new qpOASES::SparseMatrix(ng_, nx_,
-                                    jacIndRow, jacIndCol, m->jac_g);
+      m->A = new qpOASES::SparseMatrix(ng_, nx_,
+                                       jacIndRow, jacIndCol, m->jac_g);
     }
     double *g = m->grad_fk;
     double *lb = m->lbx_qp;
@@ -2078,14 +2079,15 @@ namespace casadi {
         /*
          * Prepare the current Hessian for qpOASES
          */
-        qpOASES::SymSparseMat *H = 0;
         if (matricesChanged) {
           // Convert block-Hessian to sparse format
           convertHessian(m);
-          H = new qpOASES::SymSparseMat(nx_, nx_,
-                                         m->hessIndRow, m->hessIndCol,
-                                         m->hess_lag);
-          H->createDiagInfo();
+          if (m->H) delete m->H;
+          m->H = 0;
+          m->H = new qpOASES::SymSparseMat(nx_, nx_,
+                                           m->hessIndRow, m->hessIndCol,
+                                           m->hess_lag);
+          m->H->createDiagInfo();
         }
 
         /*
@@ -2096,9 +2098,9 @@ namespace casadi {
             cpuTime = max_time_qp_;
             if (m->qp->getStatus() == qpOASES::QPS_HOMOTOPYQPSOLVED ||
                 m->qp->getStatus() == qpOASES::QPS_SOLVED) {
-                ret = m->qp->hotstart(H, g, A, lb, lu, lbA, luA, maxIt, &cpuTime);
+                ret = m->qp->hotstart(m->H, g, m->A, lb, lu, lbA, luA, maxIt, &cpuTime);
               } else {
-                ret = m->qp->init(H, g, A, lb, lu, lbA, luA, maxIt, &cpuTime);
+                ret = m->qp->init(m->H, g, m->A, lb, lu, lbA, luA, maxIt, &cpuTime);
               }
           } else {
             // Second order correction: H and A do not change
@@ -2504,10 +2506,14 @@ namespace casadi {
 
   BlocksqpMemory::BlocksqpMemory() {
     qpoases_mem = 0;
+    H = 0;
+    A = 0;
   }
 
   BlocksqpMemory::~BlocksqpMemory() {
     if (qpoases_mem) delete qpoases_mem;
+    if (H) delete H;
+    if (A) delete A;
   }
 
   double Blocksqp::
