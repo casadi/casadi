@@ -451,9 +451,11 @@ namespace casadi {
     // Blocksizes
     dim_.resize(nblocks_);
     int max_size = 0;
+    nnz_H_ = 0;
     for (int i=0; i<nblocks_; ++i) {
       dim_[i] = blocks_[i+1]-blocks_[i];
       max_size = max(max_size, dim_[i]);
+      nnz_H_ += dim_[i]*dim_[i];
     }
 
     log(std::string("BlockSqp::init: working with ") + to_string(nblocks_) +
@@ -493,16 +495,14 @@ namespace casadi {
     alloc_w(nx_*hess_memsize_, true); // deltaMat
     alloc_w(nx_*hess_memsize_, true); // gammaMat
     alloc_w(Asp_.nnz(), true); // jac_g
-    alloc_w(Hsp_.nnz(), true); // hess_lag
-    alloc_iw(Hsp_.nnz() + (nx_+1) + nx_, true); // hessIndRow
+    alloc_w(nnz_H_, true); // hess_lag
     alloc_iw(nblocks_, true); // noUpdateCounter
 
     // Allocate block diagonal Hessian(s)
     int n_hess = hess_update_==1 || hess_update_==4 ? 2 : 1;
     alloc_res(nblocks_*n_hess, true);
-    for (int dim : dim_) {
-      alloc_w(n_hess*dim*dim, true);
-    }
+    alloc_w(n_hess*nnz_H_, true);
+    alloc_iw(nnz_H_ + (nx_+1) + nx_, true); // hessIndRow
   }
 
   void Blocksqp::init_memory(void* mem) const {
@@ -545,23 +545,21 @@ namespace casadi {
     m->deltaMat = w; w += nx_*hess_memsize_;
     m->gammaMat = w; w += nx_*hess_memsize_;
     m->jac_g = w; w += Asp_.nnz();
-    m->hess_lag = w; w += Hsp_.nnz();
-    m->hessIndRow = iw; iw += Hsp_.nnz() + (nx_+1) + nx_;
+    m->hess_lag = w; w += nnz_H_;
+    m->hessIndRow = iw; iw += nnz_H_ + (nx_+1) + nx_;
     m->noUpdateCounter = iw; iw += nblocks_;
 
     // First Hessian
     m->hess1 = res; res += nblocks_;
     for (int b=0; b<nblocks_; b++) {
-      int dim = dim_[b];
-      m->hess1[b] = w; w += dim*dim;
+      m->hess1[b] = w; w += dim_[b]*dim_[b];
     }
 
     // Second Hessian, for SR1 or finite differences
     if (hess_update_ == 1 || hess_update_ == 4) {
       m->hess2 = res; res += nblocks_;
       for (int b=0; b<nblocks_; b++) {
-        int dim = dim_[b];
-        m->hess2[b] = w; w += dim*dim;
+        m->hess2[b] = w; w += dim_[b]*dim_[b];
       }
     } else {
       m->hess2 = 0;
