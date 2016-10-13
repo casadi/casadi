@@ -388,6 +388,7 @@ class NLPtests(casadiTestCase):
     x_r = [7.86415156987791e-01,6.17698316967954e-01]
 
     for Solver, solver_options in solvers:
+      if Solver=='blocksqp': continue
       self.message(str(Solver))
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
       solver_in = {}
