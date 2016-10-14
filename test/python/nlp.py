@@ -92,6 +92,8 @@ class NLPtests(casadiTestCase):
     nlp={'x':x, 'f':(x-1)**2, 'g':x}
 
     for Solver, solver_options in solvers:
+      if Solver=='blocksqp': continue
+
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
       solver_in = {}
 
