@@ -107,4 +107,7 @@ endif()
 if(WITH_SUNDIALS AND IPOPT_FOUND)
   add_executable(blocksqp_multiple_shooting blocksqp_multiple_shooting.cpp)
   target_link_libraries(blocksqp_multiple_shooting casadi)
+
+  add_executable(blocksqp_test blocksqp_test.cpp)
+  target_link_libraries(blocksqp_test casadi)
 endif()
