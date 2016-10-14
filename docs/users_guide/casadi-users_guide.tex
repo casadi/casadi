@@ -2811,7 +2811,7 @@ but is also even sparser.
     Printing the \emph{description} (string representation intended to be \emph{readable}) & \verb|print A| & \verb|A.print();| or \verb|A.print(stream);|& \verb|A.print()| \\ \hline
     Calling a class function & \verb|SX.zeros(3,4)| & \verb|SX::zeros(3,4)| & \verb|SX.zeros(3,4)|\\ \hline
     Creating a dictionary (e.g. for options) & \verb|d = {'opt1':opt1}| or \verb|d = {}; a['opt1'] = opt1| & \verb|a = Dict();| \verb|a['opt1'] = opt1;| & \verb|a = struct;| \verb|a.opt1 = opt1;| \\ \hline
-    Creating a symbol & \verb|MX.sym("x",2,2)| & \verb|MX::sym("x",2,2)| & \verb|MX.sym("x",2,2)|\\ \hline
+    Creating a symbol & \verb|MX.sym("x",2,2)| & \verb|MX::sym("x",2,2)| & \verb|MX.sym('x',2,2)|\\ \hline
     Creating a function & \verb|Function("f",[x,y],[x+y])| & \verb|Function("f",{x,y},{x+y})| & \verb|Function('f',{x,y},{x+y})| \\ \hline
     Calling a function & \verb|z=f(x,y)| & \verb|z = f({x,y})| & \verb|z=f(x,y)| \\ \hline
     Create an NLP solver & \verb|nlp = {"x":x,"f":f}| \verb|nlpsol("S","ipopt",nlp)| & \verb|MXDict nlp = \|    \verb|{{"x",x},{"f",f}};|  \verb|nlpsol("S","ipopt",nlp);| & \verb|nlp=struct('x',x,'f',f);| \verb|nlpsol('S','ipopt',nlp);| \\ \hline
