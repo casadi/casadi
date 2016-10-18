@@ -188,12 +188,18 @@ namespace casadi {
     return Function("F", {x0, p, h}, {xf}, {"x0", "p", "h"}, {"xf"});
   }
 
+  void collocation_interpolators(const std::vector<double> & tau_root,
+                                std::vector< std::vector<double> > &C, std::vector< double > &D) {
+    std::vector<double> tau_root_new = tau_root;
+    tau_root_new.insert(tau_root_new.begin(), 0);
+    collocationInterpolators(tau_root_new, C, D);
+  }
+
   void collocationInterpolators(const std::vector<double> & tau_root,
                                 std::vector< std::vector<double> > &C, std::vector< double > &D) {
 
     // Find the degree of the interpolation
     int deg = tau_root.size()-1;
-
 
     // Allocate storage space for resulting coefficients
     C.resize(deg+1);
@@ -241,12 +247,11 @@ namespace casadi {
 
     // Obtain collocation points
     std::vector<double> tau_root = collocation_points(order, scheme);
-    tau_root.insert(tau_root.begin(), 0);
 
     // Retrieve collocation interpolating matrices
     std::vector < std::vector <double> > C;
     std::vector < double > D;
-    collocationInterpolators(tau_root, C, D);
+    collocation_interpolators(tau_root, C, D);
 
     // Inputs of constructed function
     MX x0 = MX::sym("x0", f.sparsity_in(0));
