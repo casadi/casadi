@@ -32,14 +32,15 @@ namespace casadi {
   class CallbackInternal;
 
   /** \brief Callback function functionality
-   * This class provides a public API to the FunctionInternal class that
-   * can be subclassed by the user, who is then able to implement the different
-   * virtual method.
-   * Note that the Function class also provides a public API to FunctionInternal,
-   * but only allows calling, not being called.
 
-   * The user is responsible for not deleting this class for the lifetime
-   * of the internal function object.
+   This class provides a public API to the FunctionInternal class that
+   can be subclassed by the user, who is then able to implement the different
+   virtual method.
+   Note that the Function class also provides a public API to FunctionInternal,
+   but only allows calling, not being called.
+
+   The user is responsible for not deleting this class for the lifetime
+   of the internal function object.
 
    \author Joris Gillis, Joel Andersson
    \date 2015
