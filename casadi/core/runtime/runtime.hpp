@@ -287,13 +287,14 @@ namespace casadi {
   template<typename real_t>
   real_t CASADI_PREFIX(max_viol)(int n, const real_t* x, const real_t* lb, const real_t* ub) {
     real_t r = 0;
+    const real_t zero = 0;
     int i;
     for (i=0; i<n; ++i) {
-      real_t x_i = x ? *x++ : 0;
-      real_t lb_i = lb ? *lb++ : 0;
-      real_t ub_i = ub ? *ub++ : 0;
-      r = fmax(r, fmax(x_i-ub_i, 0));
-      r = fmax(r, fmax(lb_i-x_i, 0));
+      real_t x_i = x ? *x++ : zero;
+      real_t lb_i = lb ? *lb++ : zero;
+      real_t ub_i = ub ? *ub++ : zero;
+      r = fmax(r, fmax(x_i-ub_i, zero));
+      r = fmax(r, fmax(lb_i-x_i, zero));
     }
     return r;
   }
@@ -301,13 +302,14 @@ namespace casadi {
   template<typename real_t>
   real_t CASADI_PREFIX(sum_viol)(int n, const real_t* x, const real_t* lb, const real_t* ub) {
     real_t r = 0;
+    const real_t zero = 0;
     int i;
     for (i=0; i<n; ++i) {
-      real_t x_i = x ? *x++ : 0;
-      real_t lb_i = lb ? *lb++ : 0;
-      real_t ub_i = ub ? *ub++ : 0;
-      r += fmax(x_i-ub_i, 0);
-      r += fmax(lb_i-x_i, 0);
+      real_t x_i = x ? *x++ : zero;
+      real_t lb_i = lb ? *lb++ : zero;
+      real_t ub_i = ub ? *ub++ : zero;
+      r += fmax(x_i-ub_i, zero);
+      r += fmax(lb_i-x_i, zero);
     }
     return r;
   }
