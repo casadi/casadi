@@ -333,7 +333,7 @@ namespace casadi {
     static Matrix<Scalar> trace(const Matrix<Scalar> &x);
     static Matrix<Scalar> norm_1(const Matrix<Scalar> &x);
     static Matrix<Scalar> norm_2(const Matrix<Scalar> &x);
-    static Matrix<Scalar> norm_F(const Matrix<Scalar> &x);
+    static Matrix<Scalar> norm_fro(const Matrix<Scalar> &x);
     static Matrix<Scalar> norm_inf(const Matrix<Scalar> &x);
     static Matrix<Scalar> sum2(const Matrix<Scalar> &x);
     static Matrix<Scalar> sum1(const Matrix<Scalar> &x);

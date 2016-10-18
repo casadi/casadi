@@ -415,7 +415,7 @@ namespace casadi {
     static MX mrdivide(const MX& a, const MX& b);
     static MX mldivide(const MX& a, const MX& b);
     static MX norm_2(const MX& x);
-    static MX norm_F(const MX& x);
+    static MX norm_fro(const MX& x);
     static MX norm_1(const MX& x);
     static MX norm_inf(const MX& x);
     static MX unite(const MX& A, const MX& B);

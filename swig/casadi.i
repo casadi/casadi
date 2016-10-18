@@ -2910,8 +2910,8 @@ DECL M casadi_triu2symm(const M& a) {
   return triu2symm(a);
 }
 
-DECL M casadi_norm_F(const M& x) {
-  return norm_F(x);
+DECL M casadi_norm_fro(const M& x) {
+  return norm_fro(x);
 }
 
 DECL M casadi_norm_2(const M& x) {
@@ -3704,7 +3704,7 @@ namespace casadi{
       else
         switch ind
           case 'fro'
-            out = norm_F(self);
+            out = norm_fro(self);
           case 'inf'
             out = norm_inf(self);
           otherwise

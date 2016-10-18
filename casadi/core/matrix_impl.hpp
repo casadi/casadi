@@ -1755,15 +1755,15 @@ namespace casadi {
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::norm_2(const Matrix<Scalar>& x) {
     if (x.is_vector()) {
-      return norm_F(x);
+      return norm_fro(x);
     } else {
       casadi_error("2-norms currently only supported for vectors. "
-                   "Did you intend to calculate a Frobenius norms (norm_F)?");
+                   "Did you intend to calculate a Frobenius norms (norm_fro)?");
     }
   }
 
   template<typename Scalar>
-  Matrix<Scalar> Matrix<Scalar>::norm_F(const Matrix<Scalar>& x) {
+  Matrix<Scalar> Matrix<Scalar>::norm_fro(const Matrix<Scalar>& x) {
     return casadi_norm_2(x.nnz(), x.ptr());
   }
 

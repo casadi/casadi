@@ -1026,13 +1026,13 @@ namespace casadi {
 
   MX MX::norm_2(const MX& x) {
     if (x.is_column()) {
-      return norm_F(x);
+      return norm_fro(x);
     } else {
       return x->getNorm2();
     }
   }
 
-  MX MX::norm_F(const MX& x) {
+  MX MX::norm_fro(const MX& x) {
     return x->getNormF();
   }
 
