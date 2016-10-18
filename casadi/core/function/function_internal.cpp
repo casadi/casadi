@@ -1914,11 +1914,7 @@ namespace casadi {
     }
 
     // Create a call-node
-    res = create_call(arg);
-  }
-
-  std::vector<MX> FunctionInternal::create_call(const std::vector<MX>& arg) {
-    return Call::create(self(), arg);
+    res = Call::create(self(), arg);
   }
 
   Function FunctionInternal::

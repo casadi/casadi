@@ -214,9 +214,6 @@ namespace casadi {
       std::vector<std::vector<M> >
       replaceAdjSeed(const std::vector<std::vector<M> >& aseed) const;
 
-    /** \brief Create call */
-    virtual std::vector<MX> create_call(const std::vector<MX>& arg);
-
     ///@{
     /** \brief Forward mode AD, virtual functions overloaded in derived classes */
     virtual void forward_mx(const std::vector<MX>& arg, const std::vector<MX>& res,

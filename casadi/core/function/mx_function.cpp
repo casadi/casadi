@@ -577,31 +577,23 @@ namespace casadi {
     }
   }
 
-  std::vector<MX> MXFunction::create_call(const std::vector<MX>& arg) {
-    if (isInput(arg)) {
-      return out_;
-    } else {
-      return FunctionInternal::create_call(arg);
-    }
-  }
-
   void MXFunction::eval_mx(const MXVector& arg, MXVector& res,
                            bool always_inline, bool never_inline) {
-    // The code below inlines the call, for creating a call, use the base class
-    if (!always_inline) {
-      return FunctionInternal::eval_mx(arg, res, false, true);
-    }
-
     log("MXFunction::eval_mx begin");
-    casadi_assert_message(arg.size()==n_in(), "Wrong number of input arguments");
 
     // Resize the number of outputs
+    casadi_assert_message(arg.size()==n_in(), "Wrong number of input arguments");
     res.resize(out_.size());
 
-    // Copy output if known
-    if (isInput(arg)) {
+    // Trivial inline by default if output known
+    if (!never_inline && isInput(arg)) {
       copy(out_.begin(), out_.end(), res.begin());
       return;
+    }
+
+    // Create call unless always_inline is true
+    if (never_inline || !always_inline) {
+      return FunctionInternal::eval_mx(arg, res, false, true);
     }
 
     // Symbolic work, non-differentiated
