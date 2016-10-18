@@ -3553,6 +3553,12 @@ Convert a lower triangular matrix to a symmetric one.
 
 ";
 
+%feature("docstring") friendwrap_norm_F "
+
+[DEPRECATED] Renamed norm_fro
+
+";
+
 %feature("docstring") friendwrap_repsum "
 
 Given a repeated matrix, computes the sum of repeated parts.

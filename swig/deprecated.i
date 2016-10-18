@@ -22,3 +22,6 @@
 %exception  casadi::load_linsol(const std::string &name) {
  CATCH_OR_NOT(DEPRECATED_MSG("") $action)
 }
+%exception  norm_F(const MatType &x) {
+ CATCH_OR_NOT(DEPRECATED_MSG("") $action)
+}

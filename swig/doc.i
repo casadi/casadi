@@ -5300,6 +5300,12 @@ Convert a lower triangular matrix to a symmetric one.
 
 ";
 
+%feature("docstring")  norm_F(const MatType &x) "
+
+[DEPRECATED] Renamed norm_fro
+
+";
+
 %feature("docstring")  casadi::GenericMatrix< MatType >::repsum(const
 MatType &A, int n, int m=1) "
 
