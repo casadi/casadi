@@ -92,8 +92,6 @@ class NLPtests(casadiTestCase):
     nlp={'x':x, 'f':(x-1)**2, 'g':x}
 
     for Solver, solver_options in solvers:
-      if Solver=='blocksqp': continue
-
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
       solver_in = {}
 
@@ -328,8 +326,6 @@ class NLPtests(casadiTestCase):
     lambd=SX.sym("lambd")
 
     for Solver, solver_options in solvers:
-      if Solver=='blocksqp': continue
-
       self.message(str(Solver))
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
       solver_in = {} #"toldx": 1e-15, "tolgl": 1e-15}).iteritems():
@@ -390,7 +386,6 @@ class NLPtests(casadiTestCase):
     x_r = [7.86415156987791e-01,6.17698316967954e-01]
 
     for Solver, solver_options in solvers:
-      if Solver=='blocksqp': continue
       self.message(str(Solver))
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
       solver_in = {}
@@ -647,7 +642,6 @@ class NLPtests(casadiTestCase):
 
     nlp={'x':vertcat(*[x,y]), 'f':(1-x)**2+100*(y-x**2)**2, 'g':x+y}
     for Solver, solver_options in solvers:
-      if Solver=='blocksqp': continue
       self.message(str(Solver))
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
       solver_in = {}
