@@ -228,6 +228,7 @@ matrix:
       env: TESTMODE=minimal SLURP_OS=osx
       compiler: clang
       before_install:
+        - shell_session_update() { :; } # Workaround for travis-ci/travis-ci#6522
         - brew update
         - brew tap homebrew/science
         - brew outdated swig ; brew install swig
