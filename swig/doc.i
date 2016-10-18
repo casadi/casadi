@@ -5300,12 +5300,6 @@ Convert a lower triangular matrix to a symmetric one.
 
 ";
 
-%feature("docstring")  norm_F(const MatType &x) "
-
-Frobenius norm.
-
-";
-
 %feature("docstring")  casadi::GenericMatrix< MatType >::repsum(const
 MatType &A, int n, int m=1) "
 
@@ -5336,6 +5330,12 @@ Get the sparsity pattern. See the Sparsity class for details.
 %feature("docstring")  casadi::GenericMatrix< MatType >::nnz_diag() const  "
 
 Get get the number of non-zeros on the diagonal.
+
+";
+
+%feature("docstring")  norm_fro(const MatType &x) "
+
+Frobenius norm.
 
 ";
 

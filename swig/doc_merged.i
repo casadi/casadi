@@ -3553,12 +3553,6 @@ Convert a lower triangular matrix to a symmetric one.
 
 ";
 
-%feature("docstring") friendwrap_norm_F "
-
-Frobenius norm.
-
-";
-
 %feature("docstring") friendwrap_repsum "
 
 Given a repeated matrix, computes the sum of repeated parts.
@@ -3586,6 +3580,12 @@ Get the sparsity pattern. See the Sparsity class for details.
 %feature("docstring") casadi::GenericMatrix::nnz_diag "
 
 Get get the number of non-zeros on the diagonal.
+
+";
+
+%feature("docstring") friendwrap_norm_fro "
+
+Frobenius norm.
 
 ";
 
