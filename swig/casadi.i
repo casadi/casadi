@@ -3643,14 +3643,14 @@ namespace casadi{
 %extend GenericMatrixCommon {
   %matlabcode %{
     function varargout = subsref(self,s)
-      if numel(s)==1 && s.type=='()'
+      if numel(s)==1 && strcmp(s.type,'()')
         [varargout{1}] = paren(self, s.subs{:});
       else
         [varargout{1:nargout}] = builtin('subsref',self,s);
       end
     end
     function self = subsasgn(self,s,v)
-      if numel(s)==1 && s.type=='()'
+      if numel(s)==1 && strcmp(s.type,'()')
         paren_asgn(self, v, s.subs{:});
       else
         self = builtin('subsasgn',self,s,v);
@@ -3681,25 +3681,35 @@ namespace casadi{
     end
     function out = norm(self,varargin)
       narginchk(1,2);
+      % 2-norm by default
       if nargin==1
-        out = norm_2(self);
+        ind = 2;
       else
-        i = varargin{1};
-        if i==1
-          out = norm_1(self);
-        elseif i==2
-          out = norm_2(self);
-        elseif i==inf | i=='inf'
-          out = norm_inf(self);
-        elseif i=='fro'
-          out = norm_F(self);
-          return
-        else
-          error('norm argument (if present) must be 1, 2 or inf or fro');
-        end
+        ind = varargin{1};
       end
-      if ~is_vector(self)
-        error('only norms of vectors defined for now. You may try norm_1 norm_2 norm_inf norm_F.');
+      % Typecheck
+      assert((isnumeric(ind) && isscalar(ind)) || ischar(ind))
+      % Pick the right norm
+      if isnumeric(ind)
+        switch ind
+          case 1
+            out = norm_1(self);
+          case 2
+            out = norm_2(self);
+          case inf
+            out = norm_inf(self);
+          otherwise
+            error(sprintf('Unknown norm argument: %g', ind))
+        end
+      else
+        switch ind
+          case 'fro'
+            out = norm_F(self);
+          case 'inf'
+            out = norm_inf(self);
+          otherwise
+            error(sprintf('Unknown norm argument: ''%s''', ind))
+        end
       end
     end
     function b = isrow(self)
@@ -3719,7 +3729,7 @@ namespace casadi{
 %extend Function {
   %matlabcode %{
     function varargout = subsref(self,s)
-      if numel(s)==1 && s.type=='()'
+      if numel(s)==1 && strcmp(s.type,'()')
         [varargout{1:nargout}]= paren(self, s.subs{:});
       else
         [varargout{1:nargout}] = builtin('subsref',self,s);
