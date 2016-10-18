@@ -9727,6 +9727,13 @@ format.
 
 ";
 
+%feature("docstring") casadi::Sparsity::Sparsity(const std::pair< int, int >
+&rc) "
+
+Create a sparse matrix with all structural zeros.
+
+";
+
 %feature("docstring")  casadi::Sparsity::colind(int cc) const  "
 
 Get a reference to the colindex of column cc (see class description)
@@ -12813,14 +12820,9 @@ real_t *lb, const real_t *ub) "
 
 ";
 
-%feature("docstring")  casadi::replaceMat(const M &arg, const Sparsity &inp,
-bool hcat=false) "
-
-[INTERNAL] ";
-
-%feature("docstring")  casadi::collocationInterpolators(const std::vector<
-double > &tau_root, std::vector< std::vector< double > > &OUTPUT,
-std::vector< double > &OUTPUT) "
+%feature("docstring")  casadi::collocation_interpolators(const std::vector<
+double > &tau_root, std::vector< std::vector< double > > &output_C,
+std::vector< double > &output_D) "
 
 Obtain collocation interpolating matrices.
 
@@ -12828,7 +12830,7 @@ Parameters:
 -----------
 
 tau_root:  location of collocation points, as obtained from
-collocationPoints
+collocation_points
 
 C:  interpolating coefficients to obtain derivatives Length: order+1, order
 + 1
@@ -12845,6 +12847,20 @@ Parameters:
 -----------
 
 D:  interpolating coefficients to obtain end state Length: order+1
+
+";
+
+%feature("docstring")  casadi::replaceMat(const M &arg, const Sparsity &inp,
+bool hcat=false) "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::collocationInterpolators(const std::vector<
+double > &tau_root, std::vector< std::vector< double > > &output_C,
+std::vector< double > &output_D) "
+
+[DEPRECATED] Use collocation_interpolators instead Note different definition
+of tau_root argument
 
 ";
 

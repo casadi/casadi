@@ -7086,6 +7086,11 @@ Pattern with all structural zeros.
 Construct from sparsity pattern vectors given in compressed column storage
 format.
 
+>  casadi::Sparsity::Sparsity(const std::pair< int, int > &rc)
+------------------------------------------------------------------------
+
+Create a sparse matrix with all structural zeros.
+
 ";
 
 %feature("docstring") casadi::Sparsity::colind "
@@ -9972,9 +9977,7 @@ violation.
 
 ";
 
-%feature("docstring") casadi::replaceMat "[INTERNAL] ";
-
-%feature("docstring") casadi::collocationInterpolators "
+%feature("docstring") casadi::collocation_interpolators "
 
 Obtain collocation interpolating matrices.
 
@@ -9982,7 +9985,7 @@ Parameters:
 -----------
 
 tau_root:  location of collocation points, as obtained from
-collocationPoints
+collocation_points
 
 C:  interpolating coefficients to obtain derivatives Length: order+1, order
 + 1
@@ -9999,6 +10002,15 @@ Parameters:
 -----------
 
 D:  interpolating coefficients to obtain end state Length: order+1
+
+";
+
+%feature("docstring") casadi::replaceMat "[INTERNAL] ";
+
+%feature("docstring") casadi::collocationInterpolators "
+
+[DEPRECATED] Use collocation_interpolators instead Note different definition
+of tau_root argument
 
 ";
 

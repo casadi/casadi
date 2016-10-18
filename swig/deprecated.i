@@ -10,6 +10,9 @@
 %exception  casadi::Function::printOptions(std::ostream &stream=casadi::userOut()) const  {
  CATCH_OR_NOT(DEPRECATED_MSG("") $action)
 }
+%exception  casadi::collocationInterpolators(const std::vector< double > &tau_root, std::vector< std::vector< double > > &output_C, std::vector< double > &output_D) {
+ CATCH_OR_NOT(DEPRECATED_MSG("") $action)
+}
 %exception  casadi::doc_linsol(const std::string &name) {
  CATCH_OR_NOT(DEPRECATED_MSG("") $action)
 }
