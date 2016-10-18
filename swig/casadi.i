@@ -2914,6 +2914,10 @@ DECL M casadi_norm_fro(const M& x) {
   return norm_fro(x);
 }
 
+DECL M casadi_norm_F(const M& x) {
+  return norm_F(x);
+}
+
 DECL M casadi_norm_2(const M& x) {
   return norm_2(x);
 }

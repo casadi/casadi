@@ -338,6 +338,9 @@ namespace casadi {
     /** \brief  Frobenius norm  */
     inline friend MatType norm_fro(const MatType &x) { return MatType::norm_fro(x);}
 
+    /** \brief  [DEPRECATED] Renamed norm_fro  */
+    inline friend MatType norm_F(const MatType &x) { return MatType::norm_fro(x);}
+
     /** \brief  2-norm  */
     inline friend MatType norm_2(const MatType &x) { return MatType::norm_2(x);}
 
