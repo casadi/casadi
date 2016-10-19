@@ -358,7 +358,7 @@ namespace casadi {
 
     // Assemble the sparsity pattern
     std::vector<Sparsity> sp;
-    for (auto&& i: x) sp.push_back(i.sparsity());
+    for (auto&& i : x) sp.push_back(i.sparsity());
     return MX(vertcat(sp), v_.value, false);
   }
 
