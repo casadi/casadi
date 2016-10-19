@@ -113,8 +113,8 @@ namespace casadi {
       // Check if all values are the same
       const vector<double> vdata = val.nonzeros();
       double v = vdata[0];
-      for (vector<double>::const_iterator i=vdata.begin(); i!=vdata.end(); ++i) {
-        if (*i!=v) {
+      for (auto&& i : vdata) {
+        if (i!=v) {
           // Values not all the same
           return new ConstantDM(val);
         }
@@ -212,4 +212,3 @@ namespace casadi {
   }
 
 } // namespace casadi
-

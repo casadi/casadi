@@ -834,16 +834,16 @@ namespace casadi {
 
   // Helper function
   bool has_empty(const vector<MX>& x, bool both=false) {
-    for (vector<MX>::const_iterator i=x.begin(); i!=x.end(); ++i) {
-      if (i->is_empty(both)) return true;
+    for (auto&& i : x) {
+      if (i.is_empty(both)) return true;
     }
     return false;
   }
 
   vector<MX> trim_empty(const vector<MX>& x, bool both=false) {
     vector<MX> ret;
-    for (vector<MX>::const_iterator i=x.begin(); i!=x.end(); ++i) {
-      if (!i->is_empty(both)) ret.push_back(*i);
+    for (auto&& i : x) {
+      if (!i.is_empty(both)) ret.push_back(i);
     }
     return ret;
   }
@@ -1009,8 +1009,8 @@ namespace casadi {
 
     // Make sure same number of block columns
     int ncols = v.front().size();
-    for (vector<vector<MX> >::const_iterator it=v.begin(); it!=v.end(); ++it) {
-      casadi_assert_message(it->size()==ncols, "blockcat: Inconsistent number of blocl columns");
+    for (auto&& e : v) {
+      casadi_assert_message(e.size()==ncols, "blockcat: Inconsistent number of blocl columns");
     }
 
     // Quick return if no block columns
@@ -1018,8 +1018,8 @@ namespace casadi {
 
     // Horizontally concatenate all columns for each row, then vertically concatenate rows
     std::vector<MX> rows;
-    for (vector<vector<MX> >::const_iterator it=v.begin(); it!=v.end(); ++it) {
-      rows.push_back(horzcat(*it));
+    for (auto&& e : v) {
+      rows.push_back(horzcat(e));
     }
     return vertcat(rows);
   }
@@ -1424,7 +1424,7 @@ namespace casadi {
 
     // Evaluate the algorithm to identify which evaluations to replace
     int k=0;
-    for (vector<MXAlgEl>::const_iterator it=algorithm.begin(); it<algorithm.end(); ++it, ++k) {
+    for (auto it=algorithm.begin(); it<algorithm.end(); ++it, ++k) {
       // Increase usage counters
       switch (it->op) {
       case OP_CONST:
@@ -1482,7 +1482,7 @@ namespace casadi {
 
     // Evaluate the algorithm
     k=0;
-    for (vector<MXAlgEl>::const_iterator it=algorithm.begin(); it<algorithm.end(); ++it, ++k) {
+    for (auto it=algorithm.begin(); it<algorithm.end(); ++it, ++k) {
       switch (it->op) {
       case OP_OUTPUT:     ex[it->res.front()] = work[it->arg.front()];      break;
       case OP_CONST:

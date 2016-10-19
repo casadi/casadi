@@ -30,7 +30,7 @@ import casadi.*
 x = SX.sym('x');
 y = SX.sym('y');
 z = SX.sym('z');
-v = [x;y;z]
+v = [x;y;z];
 f = x^2 + 100*z^2;
 g = z + (1-x)^2 - y;
 nlp = struct('x', v, 'f', f', 'g', g);

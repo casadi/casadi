@@ -50,8 +50,8 @@ namespace casadi {
   evalGen(const T* const* arg, T* const* res, int* iw, T* w) const {
     const T* idata = arg[0];
     T* odata = res[0];
-    for (vector<int>::const_iterator k=nz_.begin(); k!=nz_.end(); ++k) {
-      *odata++ = *k>=0 ? idata[*k] : 0;
+    for (auto&& k : nz_) {
+      *odata++ = k>=0 ? idata[k] : 0;
     }
   }
 
@@ -105,17 +105,15 @@ namespace casadi {
   sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     const bvec_t *a = arg[0];
     bvec_t *r = res[0];
-    for (vector<int>::const_iterator k=nz_.begin(); k!=nz_.end(); ++k) {
-      *r++ = *k>=0 ? a[*k] : 0;
-    }
+    for (auto&& k : nz_) *r++ = k>=0 ? a[k] : 0;
   }
 
   void GetNonzerosVector::
   sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     bvec_t *a = arg[0];
     bvec_t *r = res[0];
-    for (vector<int>::const_iterator k=nz_.begin(); k!=nz_.end(); ++k) {
-      if (*k>=0) a[*k] |= *r;
+    for (auto&& k : nz_) {
+      if (k>=0) a[k] |= *r;
       *r++ = 0;
     }
   }

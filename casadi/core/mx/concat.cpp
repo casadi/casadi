@@ -94,9 +94,9 @@ namespace casadi {
   MX Concat::getGetNonzeros(const Sparsity& sp, const std::vector<int>& nz) const {
     // Get the first nonnegative nz
     int nz_test = -1;
-    for (vector<int>::const_iterator i=nz.begin(); i!=nz.end(); ++i) {
-      if (*i>=0) {
-        nz_test = *i;
+    for (auto&& i : nz) {
+      if (i>=0) {
+        nz_test = i;
         break;
       }
     }
@@ -114,8 +114,8 @@ namespace casadi {
     }
 
     // Check if any nz refer to a different nonzero
-    for (vector<int>::const_iterator j=nz.begin(); j!=nz.end(); ++j) {
-      if (*j>=0 && (*j < begin || *j >= end)) {
+    for (auto&& j : nz) {
+      if (j>=0 && (j < begin || j >= end)) {
 
         // Fallback to the base class
         return MXNode::getGetNonzeros(sp, nz);
@@ -127,9 +127,7 @@ namespace casadi {
       return dep(i)->getGetNonzeros(sp, nz);
     } else {
       vector<int> nz_new(nz);
-      for (vector<int>::iterator j=nz_new.begin(); j!=nz_new.end(); ++j) {
-        if (*j>=0) *j -= begin;
-      }
+      for (auto&& j : nz_new) if (j>=0) j -= begin;
       return dep(i)->getGetNonzeros(sp, nz_new);
     }
   }
@@ -138,16 +136,14 @@ namespace casadi {
   Diagcat::Diagcat(const std::vector<MX>& x) : Concat(x) {
     casadi_assert(x.size()>1);
     std::vector<Sparsity> sp(x.size());
-    for (int i=0; i<x.size(); ++i)
-      sp[i] = x[i].sparsity();
+    for (int i=0; i<x.size(); ++i) sp[i] = x[i].sparsity();
     setSparsity(diagcat(sp));
   }
 
   std::string Diagcat::print(const std::vector<std::string>& arg) const {
     stringstream ss;
     ss << "diagcat(" << arg.at(0);
-    for (int i=1; i<ndep(); ++i)
-      ss << ", " << arg.at(i);
+    for (int i=1; i<ndep(); ++i) ss << ", " << arg.at(i);
     ss << ")";
     return ss.str();
   }
@@ -159,9 +155,7 @@ namespace casadi {
   void Diagcat::evalFwd(const std::vector<std::vector<MX> >& fseed,
                         std::vector<std::vector<MX> >& fsens) {
     int nfwd = fsens.size();
-    for (int d = 0; d<nfwd; ++d) {
-      fsens[d][0] = diagcat(fseed[d]);
-    }
+    for (int d = 0; d<nfwd; ++d) fsens[d][0] = diagcat(fseed[d]);
   }
 
   std::pair<std::vector<int>, std::vector<int> > Diagcat::offset() const {
@@ -179,7 +173,7 @@ namespace casadi {
   void Diagcat::evalAdj(const std::vector<std::vector<MX> >& aseed,
                         std::vector<std::vector<MX> >& asens) {
     // Get offsets for each row and column
-    std::pair<std::vector<int>, std::vector<int> > off = offset();
+    auto off = offset();
 
     // Adjoint sensitivities
     int nadj = aseed.size();
@@ -202,8 +196,7 @@ namespace casadi {
   std::string Horzcat::print(const std::vector<std::string>& arg) const {
     stringstream ss;
     ss << "horzcat(" << arg.at(0);
-    for (int i=1; i<ndep(); ++i)
-      ss << ", " << arg.at(i);
+    for (int i=1; i<ndep(); ++i) ss << ", " << arg.at(i);
     ss << ")";
     return ss.str();
   }
@@ -247,16 +240,14 @@ namespace casadi {
   Vertcat::Vertcat(const std::vector<MX>& x) : Concat(x) {
     casadi_assert(x.size()>1);
     std::vector<Sparsity> sp(x.size());
-    for (int i=0; i<x.size(); ++i)
-      sp[i] = x[i].sparsity();
+    for (int i=0; i<x.size(); ++i) sp[i] = x[i].sparsity();
     setSparsity(vertcat(sp));
   }
 
   std::string Vertcat::print(const std::vector<std::string>& arg) const {
     stringstream ss;
     ss << "vertcat(" << arg.at(0);
-    for (int i=1; i<ndep(); ++i)
-      ss << ", " << arg.at(i);
+    for (int i=1; i<ndep(); ++i) ss << ", " << arg.at(i);
     ss << ")";
     return ss.str();
   }
