@@ -84,8 +84,8 @@ namespace casadi {
        {OT_BOOL,
         "Use qpOASES Schur compliment approach"}},
       {"globalization",
-       {OT_INT,
-        "Globalization strategy"}},
+       {OT_BOOL,
+        "Enable globalization"}},
       {"restore_feas",
        {OT_INT,
         "Use feasibility restoration phase"}},
@@ -229,7 +229,7 @@ namespace casadi {
     opttol_ = 1.0e-6;
     nlinfeastol_ = 1.0e-6;
     schur_ = true;
-    globalization_ = 1;
+    globalization_ = true;
     restore_feas_ = 1;
     max_line_search_ = 20;
     max_consec_reduced_steps_ = 100;
@@ -746,7 +746,7 @@ namespace casadi {
       }
 
       /// Determine steplength alpha
-      if (globalization_ == 0 || (skip_first_globalization_ && m->itCount == 1)) {
+      if (!globalization_ || (skip_first_globalization_ && m->itCount == 1)) {
         // No globalization strategy, but reduce step if function cannot be evaluated
         if (fullstep(m)) {
           casadi_eprintf("***Constraint or objective could "
@@ -754,7 +754,7 @@ namespace casadi {
           return -1;
         }
         m->steptype = 0;
-      } else if (globalization_ == 1 && !skipLineSearch) {
+      } else if (globalization_ && !skipLineSearch) {
         // Filter line search based on Waechter et al., 2006 (Ipopt paper)
         if (filterLineSearch(m) || m->reducedStepCount > max_consec_reduced_steps_) {
           // Filter line search did not produce a step. Now there are a few things we can try ...
@@ -941,10 +941,11 @@ namespace casadi {
       strcpy(qpString, "sparse, reduced Hessian factorization");
 
     /* Globalization */
-    if (globalization_ == 0)
-      strcpy(globString, "none (full step)");
-    else if (globalization_ == 1)
+    if (globalization_) {
       strcpy(globString, "filter line search");
+    } else {
+      strcpy(globString, "none (full step)");
+    }
 
     /* Hessian approximation */
     if (block_hess_ && (hess_update_ == 1 || hess_update_ == 2))
@@ -1991,7 +1992,7 @@ namespace casadi {
   solveQP(BlocksqpMemory* m, double* deltaXi, double* lambdaQP,
     bool matricesChanged) const {
     int maxQP, l;
-    if (globalization_ == 1 &&
+    if (globalization_ &&
         hess_update_ == 1 &&
         matricesChanged &&
         m->itCount > 1) {

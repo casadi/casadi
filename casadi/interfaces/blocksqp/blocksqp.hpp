@@ -327,7 +327,7 @@ namespace casadi {
 
     // Algorithmic options
     bool schur_;  // Use qpOASES schur compliment approach
-    int globalization_; // Globalization strategy
+    bool globalization_; // Globalization strategy
     int restore_feas_;// Use feasibility restoration phase
     int max_line_search_;  // Maximum number of steps in line search
     int max_consec_reduced_steps_;// Maximum number of consecutive reduced steps
