@@ -87,7 +87,7 @@ namespace casadi {
        {OT_BOOL,
         "Enable globalization"}},
       {"restore_feas",
-       {OT_INT,
+       {OT_BOOL,
         "Use feasibility restoration phase"}},
       {"max_line_search",
        {OT_INT,
@@ -230,7 +230,7 @@ namespace casadi {
     nlinfeastol_ = 1.0e-6;
     schur_ = true;
     globalization_ = true;
-    restore_feas_ = 1;
+    restore_feas_ = true;
     max_line_search_ = 20;
     max_consec_reduced_steps_ = 100;
     max_consec_skipped_updates_ = 100;
@@ -1347,7 +1347,7 @@ namespace casadi {
    */
   int Blocksqp::feasibilityRestorationPhase(BlocksqpMemory* m) const {
     // No Feasibility restoration phase
-    if (restore_feas_ == 0) return -1;
+    if (!restore_feas_) return -1;
 
     casadi_error("not implemented");
     return 0;
