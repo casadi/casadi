@@ -237,7 +237,7 @@ namespace casadi {
     max_iter_ = 100;
     warmstart_ = false;
     max_it_qp_ = 5000;
-    block_hess_ = 1;
+    block_hess_ = true;
     hess_scaling_ = 2;
     fallback_scaling_ = 4;
     max_time_qp_ = 10000.0;
@@ -388,7 +388,7 @@ namespace casadi {
     // finite differences Hessian (convenience)
     if (which_second_derv_ == 2) {
       hess_update_ = 4;
-      block_hess_ = 1;
+      block_hess_ = true;
     }
 
     // If we don't use limited memory BFGS we need to store only one vector.
@@ -406,7 +406,7 @@ namespace casadi {
                                      {"f", "g", "grad:f:x", "jac:g:x"});
     Asp_ = gf_jg.sparsity_out("jac_g_x");
 
-    if (block_hess_ == 0) {
+    if (!block_hess_) {
       // No block-structured Hessian
       blocks_ = {0, nx_};
       which_second_derv_ = 0;
@@ -437,11 +437,6 @@ namespace casadi {
           ind++;
         }
         blocks_.push_back(next);
-      }
-
-      // hybrid strategy: 1 block for constraints, 1 for objective
-      if (block_hess_ == 2 && blocks_.size() > 3) {
-        blocks_ = {0, *(blocks_.rbegin()+1), blocks_.back()};
       }
     }
 
