@@ -13618,7 +13618,7 @@ Dennis Janka, Joel Andersson
 |                        |                        | parameter, cf. IPOPT   |
 |                        |                        | paper                  |
 +------------------------+------------------------+------------------------+
-| globalization          | OT_INT                 | Globalization strategy |
+| globalization          | OT_BOOL                | Enable globalization   |
 +------------------------+------------------------+------------------------+
 | hess_damp              | OT_INT                 | Activate Powell        |
 |                        |                        | damping for BFGS       |
@@ -13721,7 +13721,7 @@ Dennis Janka, Joel Andersson
 | qpsol_options          | OT_DICT                | Options to be passed   |
 |                        |                        | to the QP solver       |
 +------------------------+------------------------+------------------------+
-| restore_feas           | OT_INT                 | Use feasibility        |
+| restore_feas           | OT_BOOL                | Use feasibility        |
 |                        |                        | restoration phase      |
 +------------------------+------------------------+------------------------+
 | s_f                    | OT_DOUBLE              | Filter line search     |

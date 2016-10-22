@@ -21,7 +21,7 @@
 <tr><td>fallback_update</td><td>OT_INT</td><td>If indefinite update is used, the type of fallback strategy</td><td>casadi::Blocksqp</td></tr>
 <tr><td>gamma_f</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
 <tr><td>gamma_theta</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
-<tr><td>globalization</td><td>OT_INT</td><td>Globalization strategy</td><td>casadi::Blocksqp</td></tr>
+<tr><td>globalization</td><td>OT_BOOL</td><td>Enable globalization</td><td>casadi::Blocksqp</td></tr>
 <tr><td>hess_damp</td><td>OT_INT</td><td>Activate Powell damping for BFGS</td><td>casadi::Blocksqp</td></tr>
 <tr><td>hess_damp_fac</td><td>OT_DOUBLE</td><td>Damping factor for BFGS Powell modification</td><td>casadi::Blocksqp</td></tr>
 <tr><td>hess_lim_mem</td><td>OT_INT</td><td>Full or limited memory</td><td>casadi::Blocksqp</td></tr>
@@ -56,7 +56,7 @@
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time</td><td>casadi::Nlpsol</td></tr>
 <tr><td>qpsol</td><td>OT_STRING</td><td>The QP solver to be used by the SQP method</td><td>casadi::Blocksqp</td></tr>
 <tr><td>qpsol_options</td><td>OT_DICT</td><td>Options to be passed to the QP solver</td><td>casadi::Blocksqp</td></tr>
-<tr><td>restore_feas</td><td>OT_INT</td><td>Use feasibility restoration phase</td><td>casadi::Blocksqp</td></tr>
+<tr><td>restore_feas</td><td>OT_BOOL</td><td>Use feasibility restoration phase</td><td>casadi::Blocksqp</td></tr>
 <tr><td>s_f</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
 <tr><td>s_theta</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
 <tr><td>schur</td><td>OT_BOOL</td><td>Use qpOASES Schur compliment approach</td><td>casadi::Blocksqp</td></tr>
@@ -89,7 +89,7 @@
 <tr><td>fallback_update</td><td>OT_INT</td><td>If indefinite update is used, the type of fallback strategy</td></tr>
 <tr><td>gamma_f</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td></tr>
 <tr><td>gamma_theta</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td></tr>
-<tr><td>globalization</td><td>OT_INT</td><td>Globalization strategy</td></tr>
+<tr><td>globalization</td><td>OT_BOOL</td><td>Enable globalization</td></tr>
 <tr><td>hess_damp</td><td>OT_INT</td><td>Activate Powell damping for BFGS</td></tr>
 <tr><td>hess_damp_fac</td><td>OT_DOUBLE</td><td>Damping factor for BFGS Powell modification</td></tr>
 <tr><td>hess_lim_mem</td><td>OT_INT</td><td>Full or limited memory</td></tr>
@@ -119,7 +119,7 @@
 <tr><td>print_iteration</td><td>OT_BOOL</td><td>Print SQP iterations</td></tr>
 <tr><td>qpsol</td><td>OT_STRING</td><td>The QP solver to be used by the SQP method</td></tr>
 <tr><td>qpsol_options</td><td>OT_DICT</td><td>Options to be passed to the QP solver</td></tr>
-<tr><td>restore_feas</td><td>OT_INT</td><td>Use feasibility restoration phase</td></tr>
+<tr><td>restore_feas</td><td>OT_BOOL</td><td>Use feasibility restoration phase</td></tr>
 <tr><td>s_f</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td></tr>
 <tr><td>s_theta</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td></tr>
 <tr><td>schur</td><td>OT_BOOL</td><td>Use qpOASES Schur compliment approach</td></tr>
@@ -152,7 +152,7 @@
 <tr><td>fallback_update</td><td>OT_INT</td><td>If indefinite update is used, the type of fallback strategy</td><td>casadi::Blocksqp</td></tr>
 <tr><td>gamma_f</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
 <tr><td>gamma_theta</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
-<tr><td>globalization</td><td>OT_INT</td><td>Globalization strategy</td><td>casadi::Blocksqp</td></tr>
+<tr><td>globalization</td><td>OT_BOOL</td><td>Enable globalization</td><td>casadi::Blocksqp</td></tr>
 <tr><td>hess_damp</td><td>OT_INT</td><td>Activate Powell damping for BFGS</td><td>casadi::Blocksqp</td></tr>
 <tr><td>hess_damp_fac</td><td>OT_DOUBLE</td><td>Damping factor for BFGS Powell modification</td><td>casadi::Blocksqp</td></tr>
 <tr><td>hess_lim_mem</td><td>OT_INT</td><td>Full or limited memory</td><td>casadi::Blocksqp</td></tr>
@@ -187,7 +187,7 @@
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time</td><td>casadi::Nlpsol</td></tr>
 <tr><td>qpsol</td><td>OT_STRING</td><td>The QP solver to be used by the SQP method</td><td>casadi::Blocksqp</td></tr>
 <tr><td>qpsol_options</td><td>OT_DICT</td><td>Options to be passed to the QP solver</td><td>casadi::Blocksqp</td></tr>
-<tr><td>restore_feas</td><td>OT_INT</td><td>Use feasibility restoration phase</td><td>casadi::Blocksqp</td></tr>
+<tr><td>restore_feas</td><td>OT_BOOL</td><td>Use feasibility restoration phase</td><td>casadi::Blocksqp</td></tr>
 <tr><td>s_f</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
 <tr><td>s_theta</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
 <tr><td>schur</td><td>OT_BOOL</td><td>Use qpOASES Schur compliment approach</td><td>casadi::Blocksqp</td></tr>
