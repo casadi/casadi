@@ -319,6 +319,17 @@ namespace casadi {
     } else {
       log("Generating/retrieving Lagrangian gradient function");
       gradLag = nlp_.derivative(0, 1);
+
+      // Workaround/performance issue: Make sure SX stays SX
+      if (is_a<SXFunction>(nlp_)) {
+        MXFunction gradLag_mx = shared_cast<MXFunction>(gradLag);
+        if (!gradLag_mx.isNull()) {
+          gradLag = SXFunction(gradLag_mx);
+          gradLag.copyOptions(gradLag_mx, true);
+          gradLag.init();
+        }
+      }
+
       log("Gradient function generated");
     }
     gradLag.setOption("name", "grad_lag");
