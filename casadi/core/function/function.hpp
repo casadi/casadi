@@ -766,7 +766,7 @@ namespace casadi {
     Function forward_new(int nfwd);
 
     /** \brief [DEPRECATED] Use forward_new instead */
-    Function forward_old(int nfwd);
+    Function forward(int nfwd);
 
     /** \brief Get a function that calculates \a nadj adjoint derivatives
      *
@@ -788,14 +788,12 @@ namespace casadi {
     Function reverse_new(int nadj);
 
     /** \brief [DEPRECATED] Use reverse_new instead */
-    Function reverse_old(int nfwd);
+    Function reverse(int nfwd);
 
-    /** \brief Set a function that calculates \a nfwd forward derivatives
-        NOTE: Does _not_ take ownership, only weak references to the derivatives are kept internally */
+    /** \brief [DEPRECATED] Set a function that calculates \a nfwd forward derivatives */
     void set_forward(const Function& fcn, int nfwd);
 
-    /** \brief Set a function that calculates \a nadj adjoint derivatives
-        NOTE: Does _not_ take ownership, only weak references to the derivatives are kept internally */
+    /** \brief [DEPRECATED] Set a function that calculates \a nadj adjoint derivatives */
     void set_reverse(const Function& fcn, int nadj);
 
     ///@{

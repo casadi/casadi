@@ -223,7 +223,7 @@ namespace casadi {
     *     f_forward ( P_i, v_i, X, X_dot)
     *
     */
-    Function fd = f_.forward_old(nfwd);
+    Function fd = f_.forward(nfwd);
 
     vector<MX> f_inputs(f_.n_in());
     for (int i=0; i<f_inputs.size(); ++i) {
@@ -305,7 +305,7 @@ namespace casadi {
     *
     *
     */
-    Function fd = f_.reverse_old(nadj);
+    Function fd = f_.reverse(nadj);
 
     // NOTE(@jaeandersson): Flawed design
     std::vector<MX> f_inputs   = f_->FunctionInternal::mx_in();

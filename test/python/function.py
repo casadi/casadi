@@ -732,7 +732,7 @@ class Functiontests(casadiTestCase):
       for ad_weight_sp in range(2):
         F = fun.mapaccum("map",n,[0],[0],{"ad_weight_sp":ad_weight_sp,"ad_weight": ad_weight})
 
-        F.forward_old(2)
+        F.forward(2)
 
         XP = X
 
