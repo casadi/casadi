@@ -780,7 +780,6 @@ namespace casadi {
       dd[INTEGRATOR_RZF] = reshape(rzf_aug.at(dir+1), rz().size());
       ret_out.insert(ret_out.end(), dd.begin(), dd.end());
     }
-    log("Integrator::get_forward", "end");
 
     // Concatenate forward seeds
     vector<MX> v(nfwd);
@@ -799,11 +798,13 @@ namespace casadi {
     }
     ret_out.resize(n_out());
 
+    log("Integrator::get_forward", "end");
+
     // Create derivative function and return
     return Function(name, ret_in, ret_out, opts);
   }
 
-  Function Integrator::get_reverse_old(const std::string& name, int nadj, Dict& opts) {
+  Function Integrator::get_reverse(const std::string& name, int nadj, Dict& opts) {
     log("Integrator::get_reverse", "begin");
 
     // Integrator options
@@ -925,6 +926,24 @@ namespace casadi {
       dd[INTEGRATOR_RZ0] = reshape(zf_aug.at(dir+1), rz().size());
       ret_out.insert(ret_out.end(), dd.begin(), dd.end());
     }
+
+    // Concatenate forward seeds
+    vector<MX> v(nadj);
+    auto r_it = ret_in.begin() + n_in() + n_out();
+    for (int i=0; i<n_out(); ++i) {
+      for (int d=0; d<nadj; ++d) v[d] = *(r_it + d*n_out());
+      *r_it++ = horzcat(v);
+    }
+    ret_in.resize(n_in() + n_out() + n_out());
+
+    // Concatenate forward sensitivites
+    r_it = ret_out.begin();
+    for (int i=0; i<n_in(); ++i) {
+      for (int d=0; d<nadj; ++d) v[d] = *(r_it + d*n_in());
+      *r_it++ = horzcat(v);
+    }
+    ret_out.resize(n_in());
+
     log("Integrator::getDerivative", "end");
 
     // Create derivative function and return
