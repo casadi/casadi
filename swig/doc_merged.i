@@ -282,23 +282,6 @@ Method to return the gradient of the objective
 
 
 // File: classcasadi_1_1Callback.xml
-%feature("docstring") casadi::Callback::forward_old "
-
-Get a function that calculates nfwd forward derivatives.
-
-Returns a function with n_in + n_out +nfwd*n_in inputs and nfwd*n_out
-outputs. The first n_in inputs correspond to nondifferentiated inputs. The
-next n_out inputs correspond to nondifferentiated outputs. and the last
-nfwd*n_in inputs correspond to forward seeds, one direction at a time The
-nfwd*n_out outputs correspond to forward sensitivities, one direction at a
-time. * (n_in = n_in(), n_out = n_out())
-
-The functions returned are cached, meaning that if called multiple timed
-with the same value, then multiple references to the same function will be
-returned.
-
-";
-
 %feature("docstring") casadi::Callback::size2_in "
 
 Get input dimension.
@@ -426,7 +409,19 @@ For a particular input or for all of the inputs
 
 %feature("docstring") casadi::Callback::forward "
 
+>  void casadi::Function::forward(const std::vector< MX > &arg, const std::vector< MX > &res, const std::vector< std::vector< MX > > &fseed, std::vector< std::vector< MX > > &output_fsens, bool always_inline=false, bool never_inline=false)
+
+>  void casadi::Function::forward(const std::vector< SX > &arg, const std::vector< SX > &res, const std::vector< std::vector< SX > > &fseed, std::vector< std::vector< SX > > &output_fsens, bool always_inline=false, bool never_inline=false)
+
+>  void casadi::Function::forward(const std::vector< DM > &arg, const std::vector< DM > &res, const std::vector< std::vector< DM > > &fseed, std::vector< std::vector< DM > > &output_fsens, bool always_inline=false, bool never_inline=false)
+------------------------------------------------------------------------
+
 Create call to (cached) derivative function, forward mode.
+
+>  Function casadi::Function::forward(int nfwd)
+------------------------------------------------------------------------
+
+[DEPRECATED] Use forward_new instead
 
 ";
 
@@ -462,6 +457,25 @@ Print dimensions of inputs and outputs.
 %feature("docstring") casadi::Callback::generate "
 
 Export / Generate C code for the function.
+
+";
+
+%feature("docstring") casadi::Callback::reverse_new "
+
+Get a function that calculates nadj adjoint derivatives.
+
+Returns a function with n_in + n_out + n_out inputs and n_in outputs. The
+first n_in inputs correspond to nondifferentiated inputs. The next n_out
+inputs correspond to nondifferentiated outputs. and the last n_out inputs
+correspond to adjoint seeds, stacked horizontally The n_in outputs
+correspond to adjoint sensitivities, stacked horizontally. * (n_in = n_in(),
+n_out = n_out())
+
+(n_in = n_in(), n_out = n_out())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned.
 
 ";
 
@@ -537,8 +551,7 @@ length of iw field.
 
 %feature("docstring") casadi::Callback::set_reverse "
 
-Set a function that calculates nadj adjoint derivatives NOTE: Does not take
-ownership, only weak references to the derivatives are kept internally.
+[DEPRECATED] Set a function that calculates nadj adjoint derivatives
 
 ";
 
@@ -569,7 +582,19 @@ Checkout a memory object.
 
 %feature("docstring") casadi::Callback::reverse "
 
+>  void casadi::Function::reverse(const std::vector< MX > &arg, const std::vector< MX > &res, const std::vector< std::vector< MX > > &aseed, std::vector< std::vector< MX > > &output_asens, bool always_inline=false, bool never_inline=false)
+
+>  void casadi::Function::reverse(const std::vector< SX > &arg, const std::vector< SX > &res, const std::vector< std::vector< SX > > &aseed, std::vector< std::vector< SX > > &output_asens, bool always_inline=false, bool never_inline=false)
+
+>  void casadi::Function::reverse(const std::vector< DM > &arg, const std::vector< DM > &res, const std::vector< std::vector< DM > > &aseed, std::vector< std::vector< DM > > &output_asens, bool always_inline=false, bool never_inline=false)
+------------------------------------------------------------------------
+
 Create call to (cached) derivative function, reverse mode.
+
+>  Function casadi::Function::reverse(int nfwd)
+------------------------------------------------------------------------
+
+[DEPRECATED] Use reverse_new instead
 
 ";
 
@@ -671,6 +696,23 @@ no cached version is available.
 %feature("docstring") casadi::Callback::sparsity_jac "
 
 Get, if necessary generate, the sparsity of a Jacobian block
+
+";
+
+%feature("docstring") casadi::Callback::forward_new "
+
+Get a function that calculates nfwd forward derivatives.
+
+Returns a function with n_in + n_out + n_in inputs and nfwd outputs. The
+first n_in inputs correspond to nondifferentiated inputs. The next n_out
+inputs correspond to nondifferentiated outputs. and the last n_in inputs
+correspond to forward seeds, stacked horizontally The n_out outputs
+correspond to forward sensitivities, stacked horizontally. * (n_in = n_in(),
+n_out = n_out())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned.
 
 ";
 
@@ -1196,8 +1238,7 @@ the output elements).
 
 %feature("docstring") casadi::Callback::set_forward "
 
-Set a function that calculates nfwd forward derivatives NOTE: Does not take
-ownership, only weak references to the derivatives are kept internally.
+[DEPRECATED] Set a function that calculates nfwd forward derivatives
 
 ";
 
@@ -1213,25 +1254,6 @@ Get the sparsity of an output This function is called during construction.
 
 Get symbolic primitives equivalent to the output expressions There is no
 guarantee that subsequent calls return unique answers.
-
-";
-
-%feature("docstring") casadi::Callback::reverse_old "
-
-Get a function that calculates nadj adjoint derivatives.
-
-Returns a function with n_in + n_out +nadj*n_out inputs and nadj*n_in
-outputs. The first n_in inputs correspond to nondifferentiated inputs. The
-next n_out inputs correspond to nondifferentiated outputs. and the last
-nadj*n_out inputs correspond to adjoint seeds, one direction at a time The
-nadj*n_in outputs correspond to adjoint sensitivities, one direction at a
-time. * (n_in = n_in(), n_out = n_out())
-
-(n_in = n_in(), n_out = n_out())
-
-The functions returned are cached, meaning that if called multiple timed
-with the same value, then multiple references to the same function will be
-returned.
 
 ";
 
@@ -2034,25 +2056,6 @@ Name of the function.
 
 %feature("docstring") casadi::Function::has_function "";
 
-%feature("docstring") casadi::Function::reverse_old "
-
-Get a function that calculates nadj adjoint derivatives.
-
-Returns a function with n_in + n_out +nadj*n_out inputs and nadj*n_in
-outputs. The first n_in inputs correspond to nondifferentiated inputs. The
-next n_out inputs correspond to nondifferentiated outputs. and the last
-nadj*n_out inputs correspond to adjoint seeds, one direction at a time The
-nadj*n_in outputs correspond to adjoint sensitivities, one direction at a
-time. * (n_in = n_in(), n_out = n_out())
-
-(n_in = n_in(), n_out = n_out())
-
-The functions returned are cached, meaning that if called multiple timed
-with the same value, then multiple references to the same function will be
-returned.
-
-";
-
 %feature("docstring") casadi::Function::checkInputs "[INTERNAL]  Check if
 the numerical values of the supplied bounds make sense.
 
@@ -2139,8 +2142,7 @@ Get the number of atomic operations.
 
 %feature("docstring") casadi::Function::set_reverse "
 
-Set a function that calculates nadj adjoint derivatives NOTE: Does not take
-ownership, only weak references to the derivatives are kept internally.
+[DEPRECATED] Set a function that calculates nadj adjoint derivatives
 
 ";
 
@@ -2270,23 +2272,6 @@ The the mapaccumulated version has the signature:
 
 ";
 
-%feature("docstring") casadi::Function::forward_old "
-
-Get a function that calculates nfwd forward derivatives.
-
-Returns a function with n_in + n_out +nfwd*n_in inputs and nfwd*n_out
-outputs. The first n_in inputs correspond to nondifferentiated inputs. The
-next n_out inputs correspond to nondifferentiated outputs. and the last
-nfwd*n_in inputs correspond to forward seeds, one direction at a time The
-nfwd*n_out outputs correspond to forward sensitivities, one direction at a
-time. * (n_in = n_in(), n_out = n_out())
-
-The functions returned are cached, meaning that if called multiple timed
-with the same value, then multiple references to the same function will be
-returned.
-
-";
-
 %feature("docstring") casadi::Function::derivative "
 
 >  void casadi::Function::derivative(const DMVector &arg, DMVector &output_res, const DMVectorVector &fseed, DMVectorVector &output_fsens, const DMVectorVector &aseed, DMVectorVector &output_asens, bool always_inline=false, bool never_inline=false)
@@ -2386,14 +2371,25 @@ Is a null pointer?
 
 %feature("docstring") casadi::Function::set_forward "
 
-Set a function that calculates nfwd forward derivatives NOTE: Does not take
-ownership, only weak references to the derivatives are kept internally.
+[DEPRECATED] Set a function that calculates nfwd forward derivatives
 
 ";
 
 %feature("docstring") casadi::Function::forward "
 
+>  void casadi::Function::forward(const std::vector< MX > &arg, const std::vector< MX > &res, const std::vector< std::vector< MX > > &fseed, std::vector< std::vector< MX > > &output_fsens, bool always_inline=false, bool never_inline=false)
+
+>  void casadi::Function::forward(const std::vector< SX > &arg, const std::vector< SX > &res, const std::vector< std::vector< SX > > &fseed, std::vector< std::vector< SX > > &output_fsens, bool always_inline=false, bool never_inline=false)
+
+>  void casadi::Function::forward(const std::vector< DM > &arg, const std::vector< DM > &res, const std::vector< std::vector< DM > > &fseed, std::vector< std::vector< DM > > &output_fsens, bool always_inline=false, bool never_inline=false)
+------------------------------------------------------------------------
+
 Create call to (cached) derivative function, forward mode.
+
+>  Function casadi::Function::forward(int nfwd)
+------------------------------------------------------------------------
+
+[DEPRECATED] Use forward_new instead
 
 ";
 
@@ -2472,11 +2468,47 @@ parallelization:  Type of parallelization used: unroll|serial|openmp
 
 ";
 
+%feature("docstring") casadi::Function::forward_new "
+
+Get a function that calculates nfwd forward derivatives.
+
+Returns a function with n_in + n_out + n_in inputs and nfwd outputs. The
+first n_in inputs correspond to nondifferentiated inputs. The next n_out
+inputs correspond to nondifferentiated outputs. and the last n_in inputs
+correspond to forward seeds, stacked horizontally The n_out outputs
+correspond to forward sensitivities, stacked horizontally. * (n_in = n_in(),
+n_out = n_out())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned.
+
+";
+
 %feature("docstring") casadi::Function::nnz_out "
 
 Get number of output nonzeros.
 
 For a particular output or for all of the outputs
+
+";
+
+%feature("docstring") casadi::Function::reverse_new "
+
+Get a function that calculates nadj adjoint derivatives.
+
+Returns a function with n_in + n_out + n_out inputs and n_in outputs. The
+first n_in inputs correspond to nondifferentiated inputs. The next n_out
+inputs correspond to nondifferentiated outputs. and the last n_out inputs
+correspond to adjoint seeds, stacked horizontally The n_in outputs
+correspond to adjoint sensitivities, stacked horizontally. * (n_in = n_in(),
+n_out = n_out())
+
+(n_in = n_in(), n_out = n_out())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned.
 
 ";
 
@@ -2653,7 +2685,19 @@ guarantee that subsequent calls return unique answers.
 
 %feature("docstring") casadi::Function::reverse "
 
+>  void casadi::Function::reverse(const std::vector< MX > &arg, const std::vector< MX > &res, const std::vector< std::vector< MX > > &aseed, std::vector< std::vector< MX > > &output_asens, bool always_inline=false, bool never_inline=false)
+
+>  void casadi::Function::reverse(const std::vector< SX > &arg, const std::vector< SX > &res, const std::vector< std::vector< SX > > &aseed, std::vector< std::vector< SX > > &output_asens, bool always_inline=false, bool never_inline=false)
+
+>  void casadi::Function::reverse(const std::vector< DM > &arg, const std::vector< DM > &res, const std::vector< std::vector< DM > > &aseed, std::vector< std::vector< DM > > &output_asens, bool always_inline=false, bool never_inline=false)
+------------------------------------------------------------------------
+
 Create call to (cached) derivative function, reverse mode.
+
+>  Function casadi::Function::reverse(int nfwd)
+------------------------------------------------------------------------
+
+[DEPRECATED] Use reverse_new instead
 
 ";
 
