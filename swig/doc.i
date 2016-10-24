@@ -336,6 +336,23 @@ Ipopt::TNLP::LinearityType *var_types) "
 
 
 // File: classcasadi_1_1Callback.xml
+%feature("docstring")  casadi::Function::forward_old(int nfwd) "
+
+Get a function that calculates nfwd forward derivatives.
+
+Returns a function with n_in + n_out +nfwd*n_in inputs and nfwd*n_out
+outputs. The first n_in inputs correspond to nondifferentiated inputs. The
+next n_out inputs correspond to nondifferentiated outputs. and the last
+nfwd*n_in inputs correspond to forward seeds, one direction at a time The
+nfwd*n_out outputs correspond to forward sensitivities, one direction at a
+time. * (n_in = n_in(), n_out = n_out())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned.
+
+";
+
 %feature("docstring")  casadi::Function::size2_in(int ind) const  "
 
 Get input dimension.
@@ -580,23 +597,6 @@ Create call to (cached) derivative function, forward mode.
 always_inline=false, bool never_inline=false) "
 
 Create call to (cached) derivative function, forward mode.
-
-";
-
-%feature("docstring")  casadi::Function::forward(int nfwd) "
-
-Get a function that calculates nfwd forward derivatives.
-
-Returns a function with n_in + n_out +nfwd*n_in inputs and nfwd*n_out
-outputs. The first n_in inputs correspond to nondifferentiated inputs. The
-next n_out inputs correspond to nondifferentiated outputs. and the last
-nfwd*n_in inputs correspond to forward seeds, one direction at a time The
-nfwd*n_out outputs correspond to forward sensitivities, one direction at a
-time. * (n_in = n_in(), n_out = n_out())
-
-The functions returned are cached, meaning that if called multiple timed
-with the same value, then multiple references to the same function will be
-returned.
 
 ";
 
@@ -876,25 +876,6 @@ Create call to (cached) derivative function, reverse mode.
 always_inline=false, bool never_inline=false) "
 
 Create call to (cached) derivative function, reverse mode.
-
-";
-
-%feature("docstring")  casadi::Function::reverse(int nadj) "
-
-Get a function that calculates nadj adjoint derivatives.
-
-Returns a function with n_in + n_out +nadj*n_out inputs and nadj*n_in
-outputs. The first n_in inputs correspond to nondifferentiated inputs. The
-next n_out inputs correspond to nondifferentiated outputs. and the last
-nadj*n_out inputs correspond to adjoint seeds, one direction at a time The
-nadj*n_in outputs correspond to adjoint sensitivities, one direction at a
-time. * (n_in = n_in(), n_out = n_out())
-
-(n_in = n_in(), n_out = n_out())
-
-The functions returned are cached, meaning that if called multiple timed
-with the same value, then multiple references to the same function will be
-returned.
 
 ";
 
@@ -2084,6 +2065,25 @@ guarantee that subsequent calls return unique answers.
 
 ";
 
+%feature("docstring")  casadi::Function::reverse_old(int nadj) "
+
+Get a function that calculates nadj adjoint derivatives.
+
+Returns a function with n_in + n_out +nadj*n_out inputs and nadj*n_in
+outputs. The first n_in inputs correspond to nondifferentiated inputs. The
+next n_out inputs correspond to nondifferentiated outputs. and the last
+nadj*n_out inputs correspond to adjoint seeds, one direction at a time The
+nadj*n_in outputs correspond to adjoint sensitivities, one direction at a
+time. * (n_in = n_in(), n_out = n_out())
+
+(n_in = n_in(), n_out = n_out())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned.
+
+";
+
 
 // File: classcasadi_1_1casadi__limits.xml
 %feature("docstring") casadi::casadi_limits "
@@ -3031,6 +3031,30 @@ Name of the function.
 
 ";
 
+%feature("docstring")  casadi::Function::has_function(const std::string
+&fname) const  "
+
+";
+
+%feature("docstring")  casadi::Function::reverse_old(int nadj) "
+
+Get a function that calculates nadj adjoint derivatives.
+
+Returns a function with n_in + n_out +nadj*n_out inputs and nadj*n_in
+outputs. The first n_in inputs correspond to nondifferentiated inputs. The
+next n_out inputs correspond to nondifferentiated outputs. and the last
+nadj*n_out inputs correspond to adjoint seeds, one direction at a time The
+nadj*n_in outputs correspond to adjoint sensitivities, one direction at a
+time. * (n_in = n_in(), n_out = n_out())
+
+(n_in = n_in(), n_out = n_out())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned.
+
+";
+
 %feature("docstring")  casadi::Function::checkInputs() const  "
 
 [INTERNAL]  Check if the numerical values of the supplied bounds make sense.
@@ -3181,14 +3205,6 @@ legacy syntax: oracle().factory(\"f\", {\"x\", \"z\", \"p\", \"t\"},
 %feature("docstring")  casadi::Function::getAtomicOperation(int k) const  "
 
 Get an atomic operation operator index.
-
-";
-
-%feature("docstring")  casadi::Function::spCanEvaluate(bool fwd) "
-
-[INTERNAL]  Is the class able to propagate seeds through the algorithm?
-
-(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -3449,6 +3465,23 @@ The the mapaccumulated version has the signature:
 
 ";
 
+%feature("docstring")  casadi::Function::forward_old(int nfwd) "
+
+Get a function that calculates nfwd forward derivatives.
+
+Returns a function with n_in + n_out +nfwd*n_in inputs and nfwd*n_out
+outputs. The first n_in inputs correspond to nondifferentiated inputs. The
+next n_out inputs correspond to nondifferentiated outputs. and the last
+nfwd*n_in inputs correspond to forward seeds, one direction at a time The
+nfwd*n_out outputs correspond to forward sensitivities, one direction at a
+time. * (n_in = n_in(), n_out = n_out())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned.
+
+";
+
 %feature("docstring")  casadi::Function::derivative(const DMVector &arg,
 DMVector &output_res, const DMVectorVector &fseed, DMVectorVector
 &output_fsens, const DMVectorVector &aseed, DMVectorVector &output_asens,
@@ -3662,23 +3695,6 @@ Create call to (cached) derivative function, forward mode.
 always_inline=false, bool never_inline=false) "
 
 Create call to (cached) derivative function, forward mode.
-
-";
-
-%feature("docstring")  casadi::Function::forward(int nfwd) "
-
-Get a function that calculates nfwd forward derivatives.
-
-Returns a function with n_in + n_out +nfwd*n_in inputs and nfwd*n_out
-outputs. The first n_in inputs correspond to nondifferentiated inputs. The
-next n_out inputs correspond to nondifferentiated outputs. and the last
-nfwd*n_in inputs correspond to forward seeds, one direction at a time The
-nfwd*n_out outputs correspond to forward sensitivities, one direction at a
-time. * (n_in = n_in(), n_out = n_out())
-
-The functions returned are cached, meaning that if called multiple timed
-with the same value, then multiple references to the same function will be
-returned.
 
 ";
 
@@ -4188,25 +4204,6 @@ Create call to (cached) derivative function, reverse mode.
 always_inline=false, bool never_inline=false) "
 
 Create call to (cached) derivative function, reverse mode.
-
-";
-
-%feature("docstring")  casadi::Function::reverse(int nadj) "
-
-Get a function that calculates nadj adjoint derivatives.
-
-Returns a function with n_in + n_out +nadj*n_out inputs and nadj*n_in
-outputs. The first n_in inputs correspond to nondifferentiated inputs. The
-next n_out inputs correspond to nondifferentiated outputs. and the last
-nadj*n_out inputs correspond to adjoint seeds, one direction at a time The
-nadj*n_in outputs correspond to adjoint sensitivities, one direction at a
-time. * (n_in = n_in(), n_out = n_out())
-
-(n_in = n_in(), n_out = n_out())
-
-The functions returned are cached, meaning that if called multiple timed
-with the same value, then multiple references to the same function will be
-returned.
 
 ";
 
@@ -4752,8 +4749,11 @@ Get input dimension.
 
 ";
 
-%feature("docstring")  casadi::Function::has_function(const std::string
-&fname) const  "
+%feature("docstring")  casadi::Function::spCanEvaluate(bool fwd) "
+
+[INTERNAL]  Is the class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
