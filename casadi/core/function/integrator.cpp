@@ -683,7 +683,7 @@ namespace casadi {
     log("Integrator::sp_rev", "end");
   }
 
-  Function Integrator::get_forward_old(const std::string& name, int nfwd, Dict& opts) {
+  Function Integrator::get_forward(const std::string& name, int nfwd, Dict& opts) {
     log("Integrator::get_forward", "begin");
 
     // Integrator options
@@ -781,6 +781,23 @@ namespace casadi {
       ret_out.insert(ret_out.end(), dd.begin(), dd.end());
     }
     log("Integrator::get_forward", "end");
+
+    // Concatenate forward seeds
+    vector<MX> v(nfwd);
+    auto r_it = ret_in.begin() + n_in() + n_out();
+    for (int i=0; i<n_in(); ++i) {
+      for (int d=0; d<nfwd; ++d) v[d] = *(r_it + d*n_in());
+      *r_it++ = horzcat(v);
+    }
+    ret_in.resize(n_in() + n_out() + n_in());
+
+    // Concatenate forward sensitivites
+    r_it = ret_out.begin();
+    for (int i=0; i<n_out(); ++i) {
+      for (int d=0; d<nfwd; ++d) v[d] = *(r_it + d*n_out());
+      *r_it++ = horzcat(v);
+    }
+    ret_out.resize(n_out());
 
     // Create derivative function and return
     return Function(name, ret_in, ret_out, opts);
