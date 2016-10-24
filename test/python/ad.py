@@ -609,7 +609,7 @@ class ADtests(casadiTestCase):
       vf_mx = None
 
       for f in [fun, fun.expand('expand_'+fun.name())]:
-        d1 = f.forward(ndir)
+        d1 = f.forward_old(ndir)
         d2 = f.reverse(ndir)
 
         num_in = f.n_in()
@@ -765,4 +765,3 @@ class ADtests(casadiTestCase):
 
 if __name__ == '__main__':
     unittest.main()
-

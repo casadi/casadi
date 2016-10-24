@@ -222,7 +222,7 @@ namespace casadi {
   Function PureMap
   ::get_forward_old(const std::string& name, int nfwd, Dict& opts) {
     // Differentiate mapped function
-    Function df = f_.forward(nfwd);
+    Function df = f_.forward_old(nfwd);
 
     // Propagate options
     propagate_options(opts);
@@ -412,7 +412,7 @@ namespace casadi {
   ::get_forward_old(const std::string& name, int nfwd, Dict& opts) {
 
     // Differentiate mapped function
-    Function df = f_.forward(nfwd);
+    Function df = f_.forward_old(nfwd);
 
     // Propagate options
     propagate_options(opts);

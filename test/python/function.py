@@ -732,7 +732,7 @@ class Functiontests(casadiTestCase):
       for ad_weight_sp in range(2):
         F = fun.mapaccum("map",n,[0],[0],{"ad_weight_sp":ad_weight_sp,"ad_weight": ad_weight})
 
-        F.forward(2)
+        F.forward_old(2)
 
         XP = X
 
@@ -1064,7 +1064,7 @@ class Functiontests(casadiTestCase):
         def eval(self,arg):
           return [2, 1]
       f = Fun()
-      
+
       s = ""
       try:
         f(2)
@@ -1081,7 +1081,7 @@ class Functiontests(casadiTestCase):
         def eval(self,arg):
           return [2, 1]
       f = Fun()
-      
+
       s = ""
       try:
         f(2,3)
@@ -1247,7 +1247,7 @@ class Functiontests(casadiTestCase):
 
   @requires_nlpsol("ipopt")
   def test_common_specific_options(self):
-    
+
       x = SX.sym("x")
 
       nlp = {"x": x, "f": x**2}

@@ -223,7 +223,7 @@ namespace casadi {
     *     f_forward ( P_i, v_i, X, X_dot)
     *
     */
-    Function fd = f_.forward(nfwd);
+    Function fd = f_.forward_old(nfwd);
 
     vector<MX> f_inputs(f_.n_in());
     for (int i=0; i<f_inputs.size(); ++i) {

@@ -732,7 +732,7 @@ namespace casadi {
 
     // Forward sensitivities
     if (nfwd>0) {
-      Function dfcn = forward(nfwd);
+      Function dfcn = forward_old(nfwd);
       arg = dfcn.mx_in();
       copy(ret_in.begin(), ret_in.begin()+num_in, arg.begin());
       copy(ret_out.begin(), ret_out.begin()+num_out, arg.begin()+num_in);
@@ -868,7 +868,7 @@ namespace casadi {
     return ret;
   }
 
-  Function Function::forward(int nfwd) {
+  Function Function::forward_old(int nfwd) {
     return (*this)->forward_old(nfwd);
   }
 

@@ -763,7 +763,7 @@ namespace casadi {
      *        The functions returned are cached, meaning that if called multiple timed
      *        with the same value, then multiple references to the same function will be returned.
      */
-    Function forward(int nfwd);
+    Function forward_old(int nfwd);
 
     /** \brief Get a function that calculates \a nadj adjoint derivatives
      *

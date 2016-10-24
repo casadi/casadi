@@ -177,12 +177,12 @@ namespace casadi {
     // Derivative of each case
     vector<Function> der(f_.size());
     for (int k=0; k<f_.size(); ++k) {
-      if (!f_[k].is_null()) der[k] = f_[k].forward(nfwd);
+      if (!f_[k].is_null()) der[k] = f_[k].forward_old(nfwd);
     }
 
     // Default case
     Function der_def;
-    if (!f_def_.is_null()) der_def = f_def_.forward(nfwd);
+    if (!f_def_.is_null()) der_def = f_def_.forward_old(nfwd);
 
     // New Switch for derivatives
     stringstream ss;

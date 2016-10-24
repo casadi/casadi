@@ -335,7 +335,7 @@ namespace casadi {
 
     */
 
-    Function df = f_.forward(nfwd);
+    Function df = f_.forward_old(nfwd);
 
     /*
       Reverse mode of F looks like:
