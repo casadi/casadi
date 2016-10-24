@@ -750,31 +750,34 @@ namespace casadi {
 
     /** \brief Get a function that calculates \a nfwd forward derivatives
      *
-     *         Returns a function with <tt>n_in + n_out +nfwd*n_in</tt> inputs
-     *         and <tt>nfwd*n_out</tt> outputs.
+     *         Returns a function with <tt>n_in + n_out + n_in</tt> inputs
+     *         and <tt>nfwd</tt> outputs.
      *         The first <tt>n_in</tt> inputs correspond to nondifferentiated inputs.
      *         The next <tt>n_out</tt> inputs correspond to nondifferentiated outputs.
-     *         and the last <tt>nfwd*n_in</tt> inputs correspond to forward seeds,
-     *         one direction at a time
-     *         The  <tt>nfwd*n_out</tt> outputs correspond to forward sensitivities,
-     *         one direction at a time.     *
+     *         and the last <tt>n_in</tt> inputs correspond to forward seeds,
+     *         stacked horizontally
+     *         The  <tt>n_out</tt> outputs correspond to forward sensitivities,
+     *         stacked horizontally.     *
      *         <tt>(n_in = n_in(), n_out = n_out())</tt>
      *
      *        The functions returned are cached, meaning that if called multiple timed
      *        with the same value, then multiple references to the same function will be returned.
      */
+    Function forward_new(int nfwd);
+
+    /** \brief [DEPRECATED] Use forward_new instead */
     Function forward_old(int nfwd);
 
     /** \brief Get a function that calculates \a nadj adjoint derivatives
      *
-     *         Returns a function with <tt>n_in + n_out +nadj*n_out</tt> inputs
-     *         and <tt>nadj*n_in</tt> outputs.
+     *         Returns a function with <tt>n_in + n_out + n_out</tt> inputs
+     *         and <tt>n_in</tt> outputs.
      *         The first <tt>n_in</tt> inputs correspond to nondifferentiated inputs.
      *         The next <tt>n_out</tt> inputs correspond to nondifferentiated outputs.
-     *         and the last <tt>nadj*n_out</tt> inputs correspond to adjoint seeds,
-     *         one direction at a time
-     *         The  <tt>nadj*n_in</tt> outputs correspond to adjoint sensitivities,
-     *         one direction at a time.     *
+     *         and the last <tt>n_out</tt> inputs correspond to adjoint seeds,
+     *         stacked horizontally
+     *         The  <tt>n_in</tt> outputs correspond to adjoint sensitivities,
+     *         stacked horizontally.     *
      *         <tt>(n_in = n_in(), n_out = n_out())</tt>
      *
      *         <tt>(n_in = n_in(), n_out = n_out())</tt>
@@ -782,7 +785,10 @@ namespace casadi {
      *        The functions returned are cached, meaning that if called multiple timed
      *        with the same value, then multiple references to the same function will be returned.
      */
-    Function reverse_old(int nadj);
+    Function reverse_new(int nadj);
+
+    /** \brief [DEPRECATED] Use reverse_new instead */
+    Function reverse_old(int nfwd);
 
     /** \brief Set a function that calculates \a nfwd forward derivatives
         NOTE: Does _not_ take ownership, only weak references to the derivatives are kept internally */
