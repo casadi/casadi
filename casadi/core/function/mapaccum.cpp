@@ -456,7 +456,7 @@ namespace casadi {
         fb:    x, u, xp, y, xp_bar, y_bar -> x_bar, u_bar
 
     */
-    Function fb = f_.reverse(nadj);
+    Function fb = f_.reverse_old(nadj);
 
     /*
       Reverse mode of F looks like:

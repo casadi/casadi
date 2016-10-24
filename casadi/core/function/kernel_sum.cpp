@@ -305,7 +305,7 @@ namespace casadi {
     *
     *
     */
-    Function fd = f_.reverse(nadj);
+    Function fd = f_.reverse_old(nadj);
 
     // NOTE(@jaeandersson): Flawed design
     std::vector<MX> f_inputs   = f_->FunctionInternal::mx_in();

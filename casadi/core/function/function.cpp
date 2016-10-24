@@ -747,7 +747,7 @@ namespace casadi {
 
     // Adjoint sensitivities
     if (nadj>0) {
-      Function dfcn = reverse(nadj);
+      Function dfcn = reverse_old(nadj);
       arg = dfcn.mx_in();
       copy(ret_in.begin(), ret_in.begin()+num_in, arg.begin());
       copy(ret_out.begin(), ret_out.begin()+num_out, arg.begin()+num_in);
@@ -872,7 +872,7 @@ namespace casadi {
     return (*this)->forward_old(nfwd);
   }
 
-  Function Function::reverse(int nadj) {
+  Function Function::reverse_old(int nadj) {
     return (*this)->reverse_old(nadj);
   }
 

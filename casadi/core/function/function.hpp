@@ -782,7 +782,7 @@ namespace casadi {
      *        The functions returned are cached, meaning that if called multiple timed
      *        with the same value, then multiple references to the same function will be returned.
      */
-    Function reverse(int nadj);
+    Function reverse_old(int nadj);
 
     /** \brief Set a function that calculates \a nfwd forward derivatives
         NOTE: Does _not_ take ownership, only weak references to the derivatives are kept internally */

@@ -610,7 +610,7 @@ class ADtests(casadiTestCase):
 
       for f in [fun, fun.expand('expand_'+fun.name())]:
         d1 = f.forward_old(ndir)
-        d2 = f.reverse(ndir)
+        d2 = f.reverse_old(ndir)
 
         num_in = f.n_in()
         num_out = f.n_out()
