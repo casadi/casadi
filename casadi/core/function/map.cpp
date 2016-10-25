@@ -232,49 +232,15 @@ namespace casadi {
   }
 
   Function PureMap
-  ::get_reverse(const std::string& name, int nadj, Dict& opts) {
+  ::get_reverse_old(const std::string& name, int nadj, Dict& opts) {
     // Differentiate mapped function
-    Function df = f_.reverse_new(nadj);
+    Function df = f_.reverse(nadj);
+
+    // Propagate options
+    propagate_options(opts);
 
     // Construct and return
-    Dict popts = {{"n_threads", n_threads_}};
-    Function dm = df.map(name + "_map", parallelization(), n_, popts);
-
-    // Input expressions
-    vector<MX> arg = dm.mx_in();
-
-    // Need to reorder sensitivity inputs
-    vector<MX> parg = arg;
-    for (int i=0; i<n_out(); ++i) {
-      vector<MX> v = horzsplit(parg[n_in()+n_out()+i], f_.size2_out(i)), v2;
-      casadi_assert(v.size()==n_*nadj);
-      v2.reserve(v.size());
-      for (int k=0; k<n_; ++k) {
-        for (int d=0; d<nadj; ++d) {
-          v2.push_back(v[nadj*d + k]);
-        }
-      }
-      parg[n_in()+n_out()+i] = horzcat(v2);
-    }
-
-    // Get output expressions
-    vector<MX> res = dm(parg);
-
-    // Reorder sensitivity outputs
-    for (int i=0; i<n_in(); ++i) {
-      vector<MX> v = horzsplit(res[i], f_.size2_in(i)), v2;
-      casadi_assert(v.size()==n_*nadj);
-      v2.reserve(v.size());
-      for (int k=0; k<n_; ++k) {
-        for (int d=0; d<nadj; ++d) {
-          v2.push_back(v[nadj*d + k]);
-        }
-      }
-      res[i] = horzcat(v2);
-    }
-
-    // Construct return function
-    return Function(name, arg, res, opts);
+    return df.map(name, parallelization(), n_, opts);
   }
 
   MapSum::MapSum(const std::string& name, const Function& f, int n,
