@@ -443,6 +443,11 @@ namespace casadi {
   }
 
   Function MapSum
+  ::get_forward(const std::string& name, int nfwd, Dict& opts) {
+    return get_forward_new(name, nfwd, opts);
+  }
+
+  Function MapSum
   ::get_forward_old(const std::string& name, int nfwd, Dict& opts) {
 
     // Differentiate mapped function
@@ -474,6 +479,11 @@ namespace casadi {
 
     // Construct and return
     return df.map(name, parallelization(), n_, reduce_in, reduce_out, opts);
+  }
+
+  Function MapSum
+  ::get_reverse(const std::string& name, int nadj, Dict& opts) {
+    return get_reverse_new(name, nadj, opts);
   }
 
   Function MapSum

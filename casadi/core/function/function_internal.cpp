@@ -1865,7 +1865,9 @@ namespace casadi {
 
   Function FunctionInternal::get_forward(const std::string& name, int nfwd, Dict& opts) {
     casadi_error("'get_forward' not defined for " + type_name());
+  }
 
+  Function FunctionInternal::get_forward_new(const std::string& name, int nfwd, Dict& opts) {
     // Call old implementation
     Function d = forward_old(nfwd);
     // Get expressions for inputs and outputs
@@ -1939,7 +1941,9 @@ namespace casadi {
 
   Function FunctionInternal::get_reverse(const std::string& name, int nadj, Dict& opts) {
     casadi_error("'get_reverse' not defined for " + type_name());
+  }
 
+  Function FunctionInternal::get_reverse_new(const std::string& name, int nadj, Dict& opts) {
     // Call old implementation
     Function d = reverse_old(nadj);
     // Get expressions for inputs and outputs

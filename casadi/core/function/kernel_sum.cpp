@@ -200,6 +200,11 @@ namespace casadi {
   }
 
   Function KernelSum
+  ::get_forward(const std::string& name, int nfwd, Dict& opts) {
+    return get_forward_new(name, nfwd, opts);
+  }
+
+  Function KernelSum
   ::get_forward_old(const std::string& name, int nfwd, Dict& opts) {
 
     /* Write KernelSum2D in linear form:
@@ -276,6 +281,11 @@ namespace casadi {
     Function der("f", der_inputs, ret(ret_inputs), opts);
 
     return der;
+  }
+
+  Function KernelSum
+  ::get_reverse(const std::string& name, int nadj, Dict& opts) {
+    return get_reverse_new(name, nadj, opts);
   }
 
   Function KernelSum
