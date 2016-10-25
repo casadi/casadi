@@ -199,7 +199,7 @@ namespace casadi {
     // Get result expression
     vector<MX> res = sw(arg);
 
-    // Remove index seed from return function
+    // Remove index seed from return function input
     arg.erase(ind_seed);
 
     // Create wrapper
@@ -207,16 +207,16 @@ namespace casadi {
   }
 
   Function Switch
-  ::get_reverse_old(const std::string& name, int nadj, Dict& opts) {
+  ::get_reverse(const std::string& name, int nadj, Dict& opts) {
     // Derivative of each case
     vector<Function> der(f_.size());
     for (int k=0; k<f_.size(); ++k) {
-      if (!f_[k].is_null()) der[k] = f_[k].reverse(nadj);
+      if (!f_[k].is_null()) der[k] = f_[k].reverse_new(nadj);
     }
 
     // Default case
     Function der_def;
-    if (!f_def_.is_null()) der_def = f_def_.reverse(nadj);
+    if (!f_def_.is_null()) der_def = f_def_.reverse_new(nadj);
 
     // New Switch for derivatives
     stringstream ss;
@@ -224,38 +224,20 @@ namespace casadi {
     Function sw = Function::conditional(ss.str(), der, der_def);
 
     // Construct wrapper inputs and arguments for calling sw
-    vector<MX> arg = mx_in();
-    vector<MX> res = mx_out();
-    vector<vector<MX> > seed = symbolicAdjSeed(nadj, res);
-    vector<MX> w_in = arg;
-    w_in.insert(w_in.end(), res.begin(), res.end());
-    // Arguments for calling sw being constructed
-    vector<MX> v;
-    v.push_back(arg.at(0)); // index
-    for (int d=0; d<nadj; ++d) {
-      // Add to wrapper input
-      w_in.insert(w_in.end(), seed[d].begin(), seed[d].end());
-      // Add to sw argument vector
-      v.insert(v.end(), arg.begin()+1, arg.end());
-      v.insert(v.end(), res.begin(), res.end());
-      v.insert(v.end(), seed[d].begin(), seed[d].end());
-    }
+    vector<MX> arg = sw.mx_in();
 
-    // Construct wrapper outputs
-    casadi_assert(v.size()==sw.n_in());
-    v = sw(v);
-    vector<MX> w_out;
-    MX ind_sens = MX(1, 1); // no dependency on index
-    vector<MX>::const_iterator v_it = v.begin(), v_it_next;
-    for (int d=0; d<nadj; ++d) {
-      w_out.push_back(ind_sens);
-      v_it_next = v_it + (n_in()-1);
-      w_out.insert(w_out.end(), v_it, v_it_next);
-      v_it = v_it_next;
-    }
+    // ignore seed for ind
+    vector<MX>::iterator ind_seed = arg.begin() + n_in() + n_out();
+    *ind_seed = MX(ind_seed->size());
+
+    // Get result expression
+    vector<MX> res = sw(arg);
+
+    // Remove index seed from return function input
+    arg.erase(ind_seed);
 
     // Create wrapper
-    return Function(name, w_in, w_out, opts);
+    return Function(name, arg, res, opts);
   }
 
   void Switch::print(ostream &stream) const {
