@@ -173,16 +173,16 @@ namespace casadi {
   }
 
   Function Switch
-  ::get_forward_old(const std::string& name, int nfwd, Dict& opts) {
+  ::get_forward(const std::string& name, int nfwd, Dict& opts) {
     // Derivative of each case
     vector<Function> der(f_.size());
     for (int k=0; k<f_.size(); ++k) {
-      if (!f_[k].is_null()) der[k] = f_[k].forward(nfwd);
+      if (!f_[k].is_null()) der[k] = f_[k].forward_new(nfwd);
     }
 
     // Default case
     Function der_def;
-    if (!f_def_.is_null()) der_def = f_def_.forward(nfwd);
+    if (!f_def_.is_null()) der_def = f_def_.forward_new(nfwd);
 
     // New Switch for derivatives
     stringstream ss;
@@ -190,28 +190,20 @@ namespace casadi {
     Function sw = Function::conditional(ss.str(), der, der_def);
 
     // Construct wrapper inputs and arguments for calling sw
-    vector<MX> arg = mx_in();
-    vector<MX> res = mx_out();
-    vector<vector<MX> > seed = symbolicFwdSeed(nfwd, arg);
-    // Wrapper input being constructed
-    vector<MX> w_in = arg;
-    w_in.insert(w_in.end(), res.begin(), res.end());
-    // Arguments for calling sw being constructed
-    vector<MX> v;
-    v.insert(v.end(), arg.begin(), arg.end());
-    v.insert(v.end(), res.begin(), res.end());
-    for (int d=0; d<nfwd; ++d) {
-      // ignore seed for ind
-      seed[d][0] = MX::sym(seed[d][0].name(), Sparsity::scalar(false));
-      // Add to wrapper input
-      w_in.insert(w_in.end(), seed[d].begin(), seed[d].end());
-      // Add to sw argument vector
-      v.insert(v.end(), seed[d].begin()+1, seed[d].end());
-    }
+    vector<MX> arg = sw.mx_in();
+
+    // ignore seed for ind
+    vector<MX>::iterator ind_seed = arg.begin() + n_in() + n_out();
+    *ind_seed = MX(ind_seed->size());
+
+    // Get result expression
+    vector<MX> res = sw(arg);
+
+    // Remove index seed from return function
+    arg.erase(ind_seed);
 
     // Create wrapper
-    casadi_assert(v.size()==sw.n_in());
-    return Function(name, w_in, sw(v), opts);
+    return Function(name, arg, res, opts);
   }
 
   Function Switch
