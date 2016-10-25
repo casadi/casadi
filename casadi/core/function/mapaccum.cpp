@@ -391,7 +391,8 @@ namespace casadi {
     }
 
     // Construct the new MapAccum
-    Function ma = Mapaccum::create(name, df, n_, accum_in, accum_out, opts, reverse_);
+    Function ma = Mapaccum::create(name, df, n_, accum_in, accum_out,
+                                   derived_options(), reverse_);
 
     /*
 
@@ -444,7 +445,7 @@ namespace casadi {
     }
 
     // Construct the wrapper
-    return Function("df", der_ins, ma(f_der_ins));
+    return Function("df", der_ins, ma(f_der_ins), opts);
   }
 
   Function Mapaccum
@@ -590,11 +591,9 @@ namespace casadi {
       offset+= n_in();
     }
 
-    Dict opts2 = opts;
-    opts2.erase("input_scheme");
-    opts2.erase("output_scheme");
     // Create the new MapAccum
-    Function ma = Mapaccum::create(name, fbX, n_, accum_in, accum_out, opts2, !reverse_);
+    Function ma = Mapaccum::create(name, fbX, n_, accum_in, accum_out,
+      derived_options(), !reverse_);
     /*
 
       Recall, the function we need to return looks like:
@@ -705,7 +704,7 @@ namespace casadi {
     }
 
     // Construct the wrapper
-    return Function("df", der_ins, der_outs);
+    return Function("df", der_ins, der_outs, opts);
   }
 
   void Mapaccum::generateDeclarations(CodeGenerator& g) const {

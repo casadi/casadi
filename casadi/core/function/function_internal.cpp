@@ -391,14 +391,20 @@ namespace casadi {
     }
 
     // Generate gradient function
-    Dict opts = {{"input_scheme", ischeme_},
-                 {"output_scheme", ionames},
-                 {"jit", jit_},
-                 {"compiler", compilerplugin_},
-                 {"jit_options", jit_options_},
-                 {"max_num_dir", max_num_dir_},
-                 {"derivative_of", self()}};
+    Dict opts = derived_options();
+    opts["input_scheme"] = ischeme_;
+    opts["output_scheme"] = ionames;
+    opts["max_num_dir"] = max_num_dir_;
+    opts["derivative_of"] = self();
     return getGradient(ss.str(), iind, oind, opts);
+  }
+
+  Dict FunctionInternal::derived_options() const {
+    Dict opts;
+    opts["jit"] = jit_;
+    opts["compiler"] = compilerplugin_;
+    opts["jit_options"] = jit_options_;
+    return opts;
   }
 
   Function FunctionInternal::tangent(int iind, int oind) {
@@ -419,13 +425,11 @@ namespace casadi {
     }
 
     // Generate gradient function
-    Dict opts = {{"input_scheme", ischeme_},
-                 {"output_scheme", ionames},
-                 {"jit", jit_},
-                 {"compiler", compilerplugin_},
-                 {"jit_options", jit_options_},
-                 {"max_num_dir", max_num_dir_},
-                 {"derivative_of", self()}};
+    Dict opts = derived_options();
+    opts["input_scheme"] = ischeme_;
+    opts["output_scheme"] = ionames;
+    opts["max_num_dir"] = max_num_dir_;
+    opts["derivative_of"] = self();
     return getTangent(ss.str(), iind, oind, opts);
   }
 
@@ -454,7 +458,7 @@ namespace casadi {
 
   Function FunctionInternal::wrapMXFunction() const {
     // Construct options of the wrapping MXFunction
-    Dict opts;
+    Dict opts = derived_options();
 
     // Propagate naming of inputs and outputs
     opts["input_scheme"] = ischeme_;
@@ -468,11 +472,6 @@ namespace casadi {
 
     // Propagate information about AD
     opts["derivative_of"] = derivative_of_;
-
-    // Propagate JIT
-    opts["jit"] = jit_;
-    opts["compiler"] = compilerplugin_;
-    opts["jit_options"] = jit_options_;
 
     // Wrap the function
     vector<MX> arg = mx_in();
@@ -1400,14 +1399,12 @@ namespace casadi {
       }
 
       // Generate a Jacobian
-      Dict opts = {{"verbose", verbose_},
-                   {"input_scheme", ischeme_},
-                   {"output_scheme", ionames},
-                   {"jit", jit_},
-                   {"compiler", compilerplugin_},
-                   {"jit_options", jit_options_},
-                   {"max_num_dir", max_num_dir_},
-                   {"derivative_of", self()}};
+      Dict opts = derived_options();
+      opts["verbose"] = verbose_;
+      opts["input_scheme"] = ischeme_;
+      opts["output_scheme"] = ionames;
+      opts["max_num_dir"] = max_num_dir_;
+      opts["derivative_of"] = self();
       Function ret = getJacobian(ss.str(), iind, oind, compact, symmetric, opts);
 
       // Save in cache
@@ -1489,13 +1486,11 @@ namespace casadi {
     }
 
     // Options
-    Dict opts = {{"input_scheme", i_names},
-                 {"output_scheme", o_names},
-                 {"jit", jit_},
-                 {"compiler", compilerplugin_},
-                 {"jit_options", jit_options_},
-                 {"max_num_dir", max_num_dir_},
-                 {"derivative_of", self()}};
+    Dict opts = derived_options();
+    opts["input_scheme"] = i_names;
+    opts["output_scheme"] = o_names;
+    opts["max_num_dir"] = max_num_dir_;
+    opts["derivative_of"] = self();
 
     // Return value
     casadi_assert(get_n_forward()>0);
@@ -1583,13 +1578,11 @@ namespace casadi {
     }
 
     // Options
-    Dict opts = {{"input_scheme", i_names},
-                 {"output_scheme", o_names},
-                 {"jit", jit_},
-                 {"compiler", compilerplugin_},
-                 {"jit_options", jit_options_},
-                 {"max_num_dir", max_num_dir_},
-                 {"derivative_of", self()}};
+    Dict opts = derived_options();
+    opts["input_scheme"] = i_names;
+    opts["output_scheme"] = o_names;
+    opts["max_num_dir"] = max_num_dir_;
+    opts["derivative_of"] = self();
 
     // Return value
     casadi_assert(get_n_forward()>0);
@@ -1672,13 +1665,12 @@ namespace casadi {
     }
 
     // Options
-    Dict opts = {{"input_scheme", i_names},
-                 {"output_scheme", o_names},
-                 {"jit", jit_},
-                 {"compiler", compilerplugin_},
-                 {"jit_options", jit_options_},
-                 {"max_num_dir", max_num_dir_},
-                 {"derivative_of", self()}};
+    Dict opts = derived_options();
+    opts["verbose"] = verbose_;
+    opts["input_scheme"] = i_names;
+    opts["output_scheme"] = o_names;
+    opts["max_num_dir"] = max_num_dir_;
+    opts["derivative_of"] = self();
 
     // Return value
     casadi_assert(get_n_reverse()>0);
@@ -1766,13 +1758,11 @@ namespace casadi {
     }
 
     // Options
-    Dict opts = {{"input_scheme", i_names},
-                 {"output_scheme", o_names},
-                 {"jit", jit_},
-                 {"compiler", compilerplugin_},
-                 {"jit_options", jit_options_},
-                 {"max_num_dir", max_num_dir_},
-                 {"derivative_of", self()}};
+    Dict opts = derived_options();
+    opts["input_scheme"] = i_names;
+    opts["output_scheme"] = o_names;
+    opts["max_num_dir"] = max_num_dir_;
+    opts["derivative_of"] = self();
 
     // Return value
     casadi_assert(get_n_reverse()>0);
