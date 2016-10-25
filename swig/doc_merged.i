@@ -522,25 +522,11 @@ Get type name.
 
 ";
 
-%feature("docstring") casadi::Callback::jacobian "
+%feature("docstring") casadi::Callback::get_reverse_new "
 
-Generate a Jacobian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. If
-compact is set to true, only the nonzeros of the input and output
-expressions are considered. If symmetric is set to true, the Jacobian being
-calculated is known to be symmetric (usually a Hessian), which can be
-exploited by the algorithm.
-
-The generated Jacobian has one more output than the calling function
-corresponding to the Jacobian and the same number of inputs.
+Return function that calculates adjoint derivatives reverse(nadj) returns a
+cached instance if available, and calls  Function get_reverse(int nadj) if
+no cached version is available.
 
 ";
 
@@ -719,6 +705,28 @@ returned.
 %feature("docstring") casadi::Callback::rootfinder_fun "
 
 Access rhs function for a rootfinder.
+
+";
+
+%feature("docstring") casadi::Callback::jacobian "
+
+Generate a Jacobian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian and the same number of inputs.
 
 ";
 
@@ -998,6 +1006,14 @@ Return Jacobian of all input elements with respect to all output elements.
 %feature("docstring") casadi::Callback::oracle "
 
 Get oracle.
+
+";
+
+%feature("docstring") casadi::Callback::get_forward_new "
+
+Return function that calculates forward derivatives forward(nfwd) returns a
+cached instance if available, and calls  Function get_forward(int nfwd) if
+no cached version is available.
 
 ";
 
