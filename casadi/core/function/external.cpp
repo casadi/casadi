@@ -272,7 +272,7 @@ namespace casadi {
   }
 
   Function External
-  ::get_forward_old(const std::string& name, int nfwd, Dict& opts) {
+  ::get_forward(const std::string& name, int nfwd, Dict& opts) {
     // Consistency check
     int n=1;
     while (n<nfwd) n*=2;
@@ -293,7 +293,7 @@ namespace casadi {
   }
 
   Function External
-  ::get_reverse_old(const std::string& name, int nadj, Dict& opts) {
+  ::get_reverse(const std::string& name, int nadj, Dict& opts) {
     // Consistency check
     int n=1;
     while (n<nadj) n*=2;
