@@ -493,7 +493,7 @@ namespace casadi {
     }
 
     // Create Map object
-    return MapBase::create(name, parallelization, *this, n, opts);
+    return Map::create(name, parallelization, *this, n, opts);
   }
 
   Function Function::slice(const std::vector<int>& order_in, const std::vector<int>& order_out,

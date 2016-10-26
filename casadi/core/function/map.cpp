@@ -29,7 +29,7 @@ using namespace std;
 
 namespace casadi {
 
-  Function MapBase::create(const std::string& name,
+  Function Map::create(const std::string& name,
                           const std::string& parallelization, Function& f, int n,
                           const Dict& opts) {
     // Create instance of the right class
@@ -46,11 +46,8 @@ namespace casadi {
     return ret;
   }
 
-  MapBase::MapBase(const std::string& name, const Function& f, int n)
+  Map::Map(const std::string& name, const Function& f, int n)
     : FunctionInternal(name), f_(f), n_(n) {
-  }
-
-  MapBase::~MapBase() {
   }
 
   Map::~Map() {
@@ -58,7 +55,7 @@ namespace casadi {
 
   void Map::init(const Dict& opts) {
     // Call the initialization method of the base class
-    MapBase::init(opts);
+    FunctionInternal::init(opts);
 
     // Allocate sufficient memory for serial evaluation
     alloc_arg(f_.sz_arg());

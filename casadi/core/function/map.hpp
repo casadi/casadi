@@ -32,59 +32,16 @@
 
 namespace casadi {
 
-  /** A map Base class for different map operations
+  /** Evaluate in parallel
       \author Joel Andersson
       \date 2015
   */
-  class CASADI_EXPORT MapBase : public FunctionInternal {
+  class CASADI_EXPORT Map : public FunctionInternal {
   public:
     // Create function (use instead of constructor)
     static Function create(const std::string& name,
                           const std::string& parallelization, Function& f, int n,
                           const Dict& opts);
-
-    /** \brief Constructor */
-    MapBase(const std::string& name) : FunctionInternal(name) {}
-
-    /** \brief Destructor */
-    virtual ~MapBase();
-
-    ///@{
-    /** \brief Number of function inputs and outputs */
-    virtual size_t get_n_in() { return f_.n_in();}
-    virtual size_t get_n_out() { return f_.n_out();}
-    ///@}
-
-    ///@{
-    /** \brief Names of function input and outputs */
-    virtual std::string get_name_in(int i) { return f_.name_in(i);}
-    virtual std::string get_name_out(int i) { return f_.name_out(i);}
-    /// @}
-
-    /// Type of parallellization
-    virtual std::string parallelization() const=0;
-
-  protected:
-    // Constructor (protected, use create function above)
-    MapBase(const std::string& name, const Function& f, int n);
-
-    // The function which is to be evaluated in parallel
-    Function f_;
-
-    // Number of times to evaluate this function
-    int n_;
-  };
-
-  /** A map Base class for pure maps (no reduced in/out)
-      \author Joris Gillis
-      \date 2016
-  */
-  class CASADI_EXPORT Map : public MapBase {
-    friend class MapBase;
-  protected:
-    // Constructor (protected, use create function in MapBase)
-    Map(const std::string& name, const Function& f, int n)
-      : MapBase(name, f, n) {}
 
     /** \brief Destructor */
     virtual ~Map();
@@ -97,6 +54,18 @@ namespace casadi {
     virtual Sparsity get_sparsity_out(int i) {
       return repmat(f_.sparsity_out(i), 1, n_);
     }
+    /// @}
+
+    ///@{
+    /** \brief Number of function inputs and outputs */
+    virtual size_t get_n_in() { return f_.n_in();}
+    virtual size_t get_n_out() { return f_.n_out();}
+    ///@}
+
+    ///@{
+    /** \brief Names of function input and outputs */
+    virtual std::string get_name_in(int i) { return f_.name_in(i);}
+    virtual std::string get_name_out(int i) { return f_.name_out(i);}
     /// @}
 
     /** \brief  Evaluate or propagate sparsities */
@@ -148,6 +117,15 @@ namespace casadi {
     virtual int get_n_reverse() const { return 64;}
     ///@}
 
+  protected:
+    // Constructor (protected, use create function)
+    Map(const std::string& name, const Function& f, int n);
+
+    // The function which is to be evaluated in parallel
+    Function f_;
+
+    // Number of times to evaluate this function
+    int n_;
   };
 
   /** A map Evaluate in parallel using OpenMP
@@ -156,9 +134,8 @@ namespace casadi {
   */
   class CASADI_EXPORT MapOmp : public Map {
     friend class Map;
-    friend class MapBase;
   protected:
-    // Constructor (protected, use create function in MapBase)
+    // Constructor (protected, use create function in Map)
     MapOmp(const std::string& name, const Function& f, int n) : Map(name, f, n) {}
 
     /** \brief  Destructor */
