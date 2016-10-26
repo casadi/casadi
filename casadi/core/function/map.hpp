@@ -71,12 +71,6 @@ namespace casadi {
     // The function which is to be evaluated in parallel
     Function f_;
 
-    /// Number of Function inputs
-    int n_in_;
-
-    /// Number of Function outputs
-    int n_out_;
-
     // Number of times to evaluate this function
     int n_;
   };

@@ -47,7 +47,7 @@ namespace casadi {
   }
 
   MapBase::MapBase(const std::string& name, const Function& f, int n)
-    : FunctionInternal(name), f_(f), n_in_(f.n_in()), n_out_(f.n_out()), n_(n) {
+    : FunctionInternal(name), f_(f), n_(n) {
   }
 
   MapBase::~MapBase() {
@@ -69,9 +69,9 @@ namespace casadi {
 
   template<typename T>
   void Map::evalGen(const T** arg, T** res, int* iw, T* w) const {
-    int n_in = n_in_, n_out = n_out_;
-    const T** arg1 = arg+this->n_in();
-    T** res1 = res+this->n_out();
+    int n_in = this->n_in(), n_out = this->n_out();
+    const T** arg1 = arg+n_in;
+    T** res1 = res+n_out;
     for (int i=0; i<n_; ++i) {
       for (int j=0; j<n_in; ++j) {
         arg1[j] = arg[j] ? arg[j]+i*f_.nnz_in(j): 0;
@@ -92,9 +92,9 @@ namespace casadi {
   }
 
   void Map::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
-    int n_in = n_in_, n_out = n_out_;
-    bvec_t** arg1 = arg+this->n_in();
-    bvec_t** res1 = res+this->n_out();
+    int n_in = this->n_in(), n_out = this->n_out();
+    bvec_t** arg1 = arg+n_in;
+    bvec_t** res1 = res+n_out;
     for (int i=0; i<n_; ++i) {
       for (int j=0; j<n_in; ++j) {
         arg1[j] = arg[j] ? arg[j]+i*f_.nnz_in(j): 0;
@@ -111,17 +111,18 @@ namespace casadi {
   }
 
   void Map::generateBody(CodeGenerator& g) const {
+    int n_in = this->n_in(), n_out = this->n_out();
 
-    g.body << "  const real_t** arg1 = arg+" << n_in() << ";"<< endl;
-    g.body << "  real_t** res1 = res+" << n_out() << ";" << endl;
+    g.body << "  const real_t** arg1 = arg+" << n_in << ";"<< endl;
+    g.body << "  real_t** res1 = res+" << n_out << ";" << endl;
 
     g.body << "  int i;" << endl;
     g.body << "  for (i=0; i<" << n_ << "; ++i) {" << endl;
-    for (int j=0; j<n_in_; ++j) {
+    for (int j=0; j<n_in; ++j) {
       g.body << "    arg1[" << j << "] = arg[" << j << "]? " <<
         "arg[" << j << "]+i*" << f_.nnz_in(j) << " : 0;" << endl;
     }
-    for (int j=0; j<n_out_; ++j) {
+    for (int j=0; j<n_out; ++j) {
       g.body << "    res1[" << j << "] = res[" << j << "]? " <<
         "res[" << j << "]+i*" << f_.nnz_out(j) << " : 0;" << endl;
     }
@@ -158,16 +159,17 @@ namespace casadi {
 #ifdef WITH_OPENMP
     return Map::eval(mem, arg, res, iw, w);
 #else // WITH_OPENMP
+    int n_in = this->n_in(), n_out = this->n_out();
     size_t sz_arg, sz_res, sz_iw, sz_w;
     f_.sz_work(sz_arg, sz_res, sz_iw, sz_w);
 #pragma omp parallel for
     for (int i=0; i<n_; ++i) {
-      const double** arg_i = arg + n_in_ + sz_arg*i;
-      for (int j=0; j<n_in_; ++j) {
+      const double** arg_i = arg + n_in + sz_arg*i;
+      for (int j=0; j<n_in; ++j) {
         arg_i[j] = arg[j]+i*f_.nnz_in(j);
       }
-      double** res_i = res + n_out_ + sz_res*i;
-      for (int j=0; j<n_out_; ++j) {
+      double** res_i = res + n_out + sz_res*i;
+      for (int j=0; j<n_out; ++j) {
         res_i[j] = res[j]? res[j]+i*f_.nnz_out(j) : 0;
       }
       int* iw_i = iw + i*sz_iw;
@@ -182,18 +184,19 @@ namespace casadi {
   }
 
   void MapOmp::generateBody(CodeGenerator& g) const {
+    int n_in = this->n_in(), n_out = this->n_out();
     size_t sz_arg, sz_res, sz_iw, sz_w;
     f_.sz_work(sz_arg, sz_res, sz_iw, sz_w);
 
     g.body << "  int i;" << endl;
     g.body << "#pragma omp parallel for" << endl;
     g.body << "  for (i=0; i<" << n_ << "; ++i) {" << endl;
-    g.body << "    const double** arg_i = arg + " << n_in_ << "+" << sz_arg << "*i;" << endl;
-    for (int j=0; j<n_in_; ++j) {
+    g.body << "    const double** arg_i = arg + " << n_in << "+" << sz_arg << "*i;" << endl;
+    for (int j=0; j<n_in; ++j) {
       g.body << "    arg_i[" << j << "] = arg[" << j << "]+i*" << f_.nnz_in(j) << ";" << endl;
     }
-    g.body << "    double** res_i = res + " <<  n_out_ << "+" <<  sz_res << "*i;" << endl;
-    for (int j=0; j<n_out_; ++j) {
+    g.body << "    double** res_i = res + " <<  n_out << "+" <<  sz_res << "*i;" << endl;
+    for (int j=0; j<n_out; ++j) {
       g.body << "    res_i[" << j << "] = res[" << j << "] ?" <<
                 "res[" << j << "]+i*" << f_.nnz_out(j) << ": 0;" << endl;
     }
