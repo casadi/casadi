@@ -43,10 +43,6 @@ namespace casadi {
                           const std::string& parallelization, Function& f, int n,
                           const Dict& opts);
 
-    // Create function (use instead of constructor)
-    static MapBase* create(const std::string& name,
-                          const std::string& parallelization, const Function& f, int n);
-
     /** \brief Constructor */
     MapBase(const std::string& name) : FunctionInternal(name) {}
 

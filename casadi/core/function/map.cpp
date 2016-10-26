@@ -32,47 +32,18 @@ namespace casadi {
   Function MapBase::create(const std::string& name,
                           const std::string& parallelization, Function& f, int n,
                           const Dict& opts) {
-    // Sanity checks on arguments
-    casadi_assert(n>0);
-
-    if (parallelization=="unroll") {
-      // Construct symbolic inputs
-      std::vector<MX> arg(f.n_in());
-      std::vector<std::vector<MX>> v(n, arg);
-      std::vector<MX> tmp(n);
-      for (int i=0; i<arg.size(); ++i) {
-        for (int k=0; k<n; ++k) {
-          tmp[k] = v[k][i] = MX::sym(f.name_in(i)+"_"+to_string(k), f.sparsity_in(i));
-        }
-        arg[i] = horzcat(tmp);
-      }
-      // Evaluate
-      for (auto&& w : v) w = f(w);
-      // Gather outputs
-      std::vector<MX> res(f.n_out());
-      for (int i=0; i<res.size(); ++i) {
-        for (int k=0; k<n; ++k) tmp[k] = v[k][i];
-        res[i] = horzcat(tmp);
-      }
-      // Construct function
-      return Function(name, arg, res, f->derived_options());
-    } else {
-      Function ret;
-      ret.assignNode(MapBase::create(name, parallelization, f, n));
-      ret->construct(opts);
-      return ret;
-    }
-  }
-
-  MapBase* MapBase::create(const std::string& name,
-                          const std::string& parallelization, const Function& f, int n) {
+    // Create instance of the right class
+    Function ret;
     if (parallelization == "serial") {
-      return new Map(name, f, n);
+      ret.assignNode(new Map(name, f, n));
     } else if (parallelization== "openmp") {
-      return new MapOmp(name, f, n);
+      ret.assignNode(new MapOmp(name, f, n));
     } else {
       casadi_error("Unknown parallelization: " + parallelization);
     }
+    // Finalize creation
+    ret->construct(opts);
+    return ret;
   }
 
   MapBase::MapBase(const std::string& name, const Function& f, int n)

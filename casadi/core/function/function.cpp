@@ -468,6 +468,31 @@ namespace casadi {
     casadi_assert_message(n>0, "Degenerate map operation");
     // Quick return if possible
     if (n==1) return *this;
+    // Unroll?
+    if (parallelization=="unroll") {
+      // Construct symbolic inputs
+      std::vector<MX> arg(n_in());
+      std::vector<std::vector<MX>> v(n, arg);
+      std::vector<MX> tmp(n);
+      for (int i=0; i<arg.size(); ++i) {
+        for (int k=0; k<n; ++k) {
+          tmp[k] = v[k][i] = MX::sym(name_in(i)+"_"+to_string(k), sparsity_in(i));
+        }
+        arg[i] = horzcat(tmp);
+      }
+      // Evaluate
+      for (auto&& w : v) w = (*this)(w);
+      // Gather outputs
+      std::vector<MX> res(n_out());
+      for (int i=0; i<res.size(); ++i) {
+        for (int k=0; k<n; ++k) tmp[k] = v[k][i];
+        res[i] = horzcat(tmp);
+      }
+      // Construct function
+      return Function(name, arg, res, (*this)->derived_options());
+    }
+
+    // Create Map object
     return MapBase::create(name, parallelization, *this, n, opts);
   }
 
