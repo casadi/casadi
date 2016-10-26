@@ -85,28 +85,17 @@ namespace casadi {
     if (reduce_in.size()>0 || reduce_out.size()>0) {
       // Vector indicating which inputs/outputs are to be repeated
       std::vector<bool> repeat_in(f.n_in(), true), repeat_out(f.n_out(), true);
-
-      // Mark reduced inputs
       for (int i : reduce_in) repeat_in[i]= false;
       for (int i : reduce_out) repeat_out[i]= false;
-
-      if (parallelization == "serial") {
-        return new MapSumSerial(name, f, n, repeat_in, repeat_out);
-      } else {
-        if (parallelization == "openmp") {
-          casadi_warning("OpenMP not supported for reduced inputs/outputs. "
-                         "Falling back to serial mode.");
-        }
-        return new MapSumSerial(name, f, n, repeat_in, repeat_out);
-      }
-    }
-
-    if (parallelization == "serial") {
-      return new Map(name, f, n);
-    } else if (parallelization== "openmp") {
-      return new MapOmp(name, f, n);
+      return new MapSum(name, f, n, repeat_in, repeat_out);
     } else {
-      casadi_error("Unknown paralleliation: " + parallelization);
+      if (parallelization == "serial") {
+        return new Map(name, f, n);
+      } else if (parallelization== "openmp") {
+        return new MapOmp(name, f, n);
+      } else {
+        casadi_error("Unknown parallelization: " + parallelization);
+      }
     }
   }
 
@@ -529,14 +518,6 @@ namespace casadi {
 
   void Map::eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
     evalGen(arg, res, iw, w);
-  }
-
-  MapSumSerial::~MapSumSerial() {
-
-  }
-
-  void MapSumSerial::eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
-    evalGen<double>(arg, res, iw, w, std::plus<double>());
   }
 
   MapOmp::~MapOmp() {

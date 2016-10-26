@@ -200,6 +200,9 @@ namespace casadi {
     /** \brief  Evaluate numerically, work vectors given */
     virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
 
+    /// Type of parallellization
+    virtual std::string parallelization() const { return "serial"; }
+
     /** \brief Quickfix to avoid segfault, #1552 */
     virtual bool canEvalSX() const {return true;}
 
@@ -269,30 +272,6 @@ namespace casadi {
 
   };
 
-  /** A mapsum evaluation in serial
-      \author Joris Gillis
-      \date 2016
-  */
-  class CASADI_EXPORT MapSumSerial : public MapSum {
-    friend class MapSum;
-    friend class MapBase;
-  protected:
-    // Constructor (protected, use create function in MapBase)
-    MapSumSerial(const std::string& name, const Function& f, int n,
-      const std::vector<bool> &repeat_in, const std::vector<bool> &repeat_out)
-      : MapSum(name, f, n, repeat_in, repeat_out) {}
-
-    /// Evaluate the function numerically
-    virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
-
-    /** \brief  Destructor */
-    virtual ~MapSumSerial();
-
-    /// Type of parallellization
-    virtual std::string parallelization() const { return "serial"; }
-
-  };
-
   /** A map Evaluate in parallel using OpenMP
       \author Joel Andersson
       \date 2015
@@ -322,7 +301,6 @@ namespace casadi {
     /** \brief Generate code for the body of the C function */
     virtual void generateBody(CodeGenerator& g) const;
   };
-
 
 } // namespace casadi
 /// \endcond
