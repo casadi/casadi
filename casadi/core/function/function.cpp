@@ -432,28 +432,24 @@ namespace casadi {
   Function Function::map(const string& name, const std::string& parallelization, int n,
       const std::vector<int>& reduce_in, const std::vector<int>& reduce_out,
       const Dict& opts) {
-    if (!reduce_in.empty() || !reduce_out.empty()) {
-      // Wrap in an MXFunction
-      Function f = map(name, parallelization, n, opts);
-      // Start with the fully mapped inputs
-      vector<MX> arg = f.mx_in();
-      vector<MX> f_arg = arg;
-      // Replace reduced inputs
-      for (int i : reduce_in) {
-        arg[i] = mx_in(i);
-        f_arg[i] = repmat(arg[i], 1, n);
-      }
-      // Get fully mapped outputs
-      vector<MX> res = f(f_arg);
-      // Replace reduced outputs
-      for (int i : reduce_out) {
-        res[i] = repsum(res[i], 1, n);
-      }
-      // Construct return
-      return Function(name, arg, res, (*this)->derived_options());
+    // Wrap in an MXFunction
+    Function f = map(name, parallelization, n, opts);
+    // Start with the fully mapped inputs
+    vector<MX> arg = f.mx_in();
+    vector<MX> f_arg = arg;
+    // Replace reduced inputs
+    for (int i : reduce_in) {
+      arg[i] = mx_in(i);
+      f_arg[i] = repmat(arg[i], 1, n);
     }
-
-    return MapBase::create(name, parallelization, *this, n, reduce_in, reduce_out, opts);
+    // Get fully mapped outputs
+    vector<MX> res = f(f_arg);
+    // Replace reduced outputs
+    for (int i : reduce_out) {
+      res[i] = repsum(res[i], 1, n);
+    }
+    // Construct return
+    return Function(name, arg, res, (*this)->derived_options());
   }
 
   Function Function::map(const string& name, const std::string& parallelization, int n,
@@ -472,9 +468,7 @@ namespace casadi {
     casadi_assert_message(n>0, "Degenerate map operation");
     // Quick return if possible
     if (n==1) return *this;
-    std::vector<int> reduce_in;
-    std::vector<int> reduce_out;
-    return MapBase::create(name, parallelization, *this, n, reduce_in, reduce_out, opts);
+    return MapBase::create(name, parallelization, *this, n, opts);
   }
 
   Function Function::slice(const std::vector<int>& order_in, const std::vector<int>& order_out,

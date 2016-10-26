@@ -41,13 +41,11 @@ namespace casadi {
     // Create function (use instead of constructor)
     static Function create(const std::string& name,
                           const std::string& parallelization, Function& f, int n,
-                          const std::vector<int>& reduce_in, const std::vector<int>& reduce_out,
                           const Dict& opts);
 
     // Create function (use instead of constructor)
     static MapBase* create(const std::string& name,
-                          const std::string& parallelization, const Function& f, int n,
-                          const std::vector<int>& reduce_in, const std::vector<int>& reduce_out);
+                          const std::string& parallelization, const Function& f, int n);
 
     /** \brief Constructor */
     MapBase(const std::string& name) : FunctionInternal(name) {}
@@ -156,104 +154,6 @@ namespace casadi {
     virtual Function get_reverse_old(const std::string& name, int nadj, Dict& opts);
     virtual int get_n_reverse() const { return 64;}
     ///@}
-
-  };
-
-
-  /** A map operation that can also reduce certain arguments
-      \author Joris Gillis
-      \date 2015
-  */
-  class CASADI_EXPORT MapSum : public MapBase {
-    friend class MapBase;
-  public:
-
-    /** \brief Constructor (generic map) */
-    MapSum(const std::string& name, const Function& f, int n,
-      const std::vector<bool> &repeat_in, const std::vector<bool> &repeat_out);
-
-    /** \brief  Destructor */
-    virtual ~MapSum();
-
-    /** \brief  Initialize */
-    virtual void init(const Dict& opts);
-
-    /// Evaluate the function (template)
-    template<typename T, typename R>
-      void evalGen(const T** arg, T** res, int* iw, T* w, R reduction) const;
-
-    /** \brief  Evaluate numerically, work vectors given */
-    virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
-
-    /// Type of parallellization
-    virtual std::string parallelization() const { return "serial"; }
-
-    /** \brief Quickfix to avoid segfault, #1552 */
-    virtual bool canEvalSX() const {return true;}
-
-    /** \brief  Evaluate symbolically, SXElem type, possibly nonmatching sparsity patterns */
-    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem);
-
-    /** \brief  Propagate sparsity forward */
-    virtual void sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
-
-    /** \brief  Propagate sparsity backwards */
-    virtual void sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
-
-    ///@{
-    /// Is the class able to propagate seeds through the algorithm?
-    virtual bool has_spfwd() const { return true;}
-    virtual bool has_sprev() const { return true;}
-    ///@}
-
-    /// @{
-    /** \brief Sparsities of function inputs and outputs */
-    virtual Sparsity get_sparsity_in(int i) {
-      return repeat_in_.at(i) ? repmat(f_.sparsity_in(i), 1, n_)
-        : f_.sparsity_in(i);
-    }
-    virtual Sparsity get_sparsity_out(int i) {
-      return repeat_out_.at(i) ? repmat(f_.sparsity_out(i), 1, n_)
-        : f_.sparsity_out(i);
-    }
-    /// @}
-
-    ///@{
-    /** \brief Generate a function that calculates \a nfwd forward derivatives */
-    virtual Function get_forward(const std::string& name, int nfwd, Dict& opts);
-    virtual Function get_forward_old(const std::string& name, int nfwd, Dict& opts);
-    virtual int get_n_forward() const { return 64;}
-    ///@}
-
-    ///@{
-    /** \brief Generate a function that calculates \a nadj adjoint derivatives */
-    virtual Function get_reverse(const std::string& name, int nadj, Dict& opts);
-    virtual Function get_reverse_old(const std::string& name, int nadj, Dict& opts);
-    virtual int get_n_reverse() const { return 64;}
-    ///@}
-
-    /** \brief  Print description */
-    virtual void print(std::ostream &stream) const;
-
-    /** \brief Generate code for the declarations of the C function */
-    virtual void generateDeclarations(CodeGenerator& g) const;
-
-    /** \brief Generate code for the body of the C function */
-    virtual void generateBody(CodeGenerator& g) const;
-
-    /// Indicate which inputs are repeated
-    std::vector<bool> repeat_in_;
-
-    /// Indicate which outputs are repeated
-    std::vector<bool> repeat_out_;
-
-    int nnz_out_;
-
-    /// Nonzero step for inputs
-    std::vector<int> step_in_;
-
-    /// Nonzero step for outputs
-    std::vector<int> step_out_;
 
   };
 

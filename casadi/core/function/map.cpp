@@ -31,71 +31,47 @@ namespace casadi {
 
   Function MapBase::create(const std::string& name,
                           const std::string& parallelization, Function& f, int n,
-                          const std::vector<int>& reduce_in, const std::vector<int>& reduce_out,
                           const Dict& opts) {
     // Sanity checks on arguments
     casadi_assert(n>0);
-    casadi_assert(inBounds(reduce_in, f.n_in()) && isUnique(reduce_in));
-    casadi_assert(inBounds(reduce_out, f.n_out()) && isUnique(reduce_out));
 
     if (parallelization=="unroll") {
-      // Obtain lookup tables
-      std::vector<int> reduce_in_compl = complement(reduce_in, f.n_in());
-      std::vector<int> reduce_out_compl = complement(reduce_out, f.n_out());
-
       // Construct symbolic inputs
-      std::vector< std::vector<MX> > args(f.n_in());
-      std::vector< MX > args_local(f.n_in());
-      for (int k : reduce_in) args_local[k] = MX::sym("x", f.sparsity_in(k));
-      for (int k : reduce_in_compl) {
-        for (int i=0;i<n;++i) args[k].reserve(n);
-        for (int i=0;i<n;++i) args[k].push_back(MX::sym("x", f.sparsity_in(k)));
+      std::vector<MX> arg(f.n_in());
+      std::vector<std::vector<MX>> v(n, arg);
+      std::vector<MX> tmp(n);
+      for (int i=0; i<arg.size(); ++i) {
+        for (int k=0; k<n; ++k) {
+          tmp[k] = v[k][i] = MX::sym(f.name_in(i)+"_"+to_string(k), f.sparsity_in(i));
+        }
+        arg[i] = horzcat(tmp);
       }
-
-      // Collect results of symbolic calls to f
-      std::vector< std::vector<MX> > ret(f.n_out());
-      for (int k=0;k<f.n_out();++k) ret[k].reserve(n);
-      for (int i=0;i<n;++i) {
-        for (int k : reduce_in_compl) args_local[k] = args[k][i];
-        std::vector<MX> ret_local = f(args_local);
-        for (int k=0;k<f.n_out();++k) ret[k].push_back(ret_local[k]);
+      // Evaluate
+      for (auto&& w : v) w = f(w);
+      // Gather outputs
+      std::vector<MX> res(f.n_out());
+      for (int i=0; i<res.size(); ++i) {
+        for (int k=0; k<n; ++k) tmp[k] = v[k][i];
+        res[i] = horzcat(tmp);
       }
-
-      // Produce an MX function as a result
-      std::vector< MX > f_in(f.n_in());
-      for (int k : reduce_in) f_in[k] = args_local[k];
-      for (int k : reduce_in_compl) f_in[k] = horzcat(args[k]);
-      std::vector< MX > f_out(f.n_out());
-      for (int k : reduce_out) f_out[k] = repsum(horzcat(ret[k]), 1, n);
-      for (int k : reduce_out_compl) f_out[k] = horzcat(ret[k]);
-
-      return Function(name, f_in, f_out, opts);
+      // Construct function
+      return Function(name, arg, res, f->derived_options());
     } else {
       Function ret;
-      ret.assignNode(MapBase::create(name, parallelization, f, n, reduce_in, reduce_out));
+      ret.assignNode(MapBase::create(name, parallelization, f, n));
       ret->construct(opts);
       return ret;
     }
   }
 
   MapBase* MapBase::create(const std::string& name,
-                          const std::string& parallelization, const Function& f, int n,
-                          const std::vector<int>& reduce_in, const std::vector<int>& reduce_out) {
-
-    if (reduce_in.size()>0 || reduce_out.size()>0) {
-      // Vector indicating which inputs/outputs are to be repeated
-      std::vector<bool> repeat_in(f.n_in(), true), repeat_out(f.n_out(), true);
-      for (int i : reduce_in) repeat_in[i]= false;
-      for (int i : reduce_out) repeat_out[i]= false;
-      return new MapSum(name, f, n, repeat_in, repeat_out);
+                          const std::string& parallelization, const Function& f, int n) {
+    if (parallelization == "serial") {
+      return new Map(name, f, n);
+    } else if (parallelization== "openmp") {
+      return new MapOmp(name, f, n);
     } else {
-      if (parallelization == "serial") {
-        return new Map(name, f, n);
-      } else if (parallelization== "openmp") {
-        return new MapOmp(name, f, n);
-      } else {
-        casadi_error("Unknown parallelization: " + parallelization);
-      }
+      casadi_error("Unknown parallelization: " + parallelization);
     }
   }
 
@@ -195,285 +171,6 @@ namespace casadi {
 
     // Construct and return
     return df.map(name, parallelization(), n_, opts);
-  }
-
-  MapSum::MapSum(const std::string& name, const Function& f, int n,
-                       const std::vector<bool> &repeat_in,
-                       const std::vector<bool> &repeat_out)
-    : MapBase(name, f, n), repeat_in_(repeat_in), repeat_out_(repeat_out) {
-
-    casadi_assert_message(repeat_in_.size()==f.n_in(),
-                          "MapSum expected repeat_in of size " << f.n_in() <<
-                          ", but got " << repeat_in_.size() << " instead.");
-
-    casadi_assert_message(repeat_out_.size()==f.n_out(),
-                          "MapSum expected repeat_out of size " << f.n_out() <<
-                          ", but got " << repeat_out_.size() << " instead.");
-
-  }
-
-  MapSum::~MapSum() {
-
-  }
-
-  void MapSum::init(const Dict& opts) {
-
-    int num_in = f_.n_in(), num_out = f_.n_out();
-
-    // Initialize the functions, get input and output sparsities
-    // Input and output sparsities
-    step_in_.resize(num_in, 0);
-    step_out_.resize(num_out, 0);
-    for (int i=0; i<num_in;++i) {
-      if (repeat_in_[i]) step_in_[i] = f_.nnz_in(i);
-    }
-    for (int i=0; i<num_out; ++i) step_out_[i] = f_.nnz_out(i);
-
-    // Call the initialization method of the base class
-    MapBase::init(opts);
-
-    // Allocate some space to evaluate each function to.
-    nnz_out_ = 0;
-    for (int i=0; i<num_out; ++i) {
-      if (!repeat_out_[i]) nnz_out_+= step_out_[i];
-    }
-
-    alloc_w(f_.sz_w() + nnz_out_);
-    alloc_iw(f_.sz_iw());
-    alloc_arg(2*f_.sz_arg());
-    alloc_res(2*f_.sz_res());
-  }
-
-  template<typename T, typename R>
-  void MapSum::evalGen(const T** arg, T** res, int* iw, T* w, R reduction) const {
-    int num_in = f_.n_in(), num_out = f_.n_out();
-
-    const T** arg1 = arg+f_.sz_arg();
-
-    // Clear the accumulators
-    T** sum = res;
-    for (int k=0;k<num_out;++k) {
-      if (sum[k]!=0) std::fill(sum[k], sum[k]+step_out_[k], 0);
-    }
-
-    T** res1 = res+f_.sz_res();
-
-    for (int i=0; i<n_; ++i) {
-
-      T* temp_res = w+f_.sz_w();
-      // Clear the temp_res storage space
-      if (temp_res!=0) std::fill(temp_res, temp_res+nnz_out_, 0);
-
-      // Set the function inputs
-      for (int j=0; j<num_in; ++j) {
-        arg1[j] = arg[j] ? arg[j]+i*step_in_[j] : 0;
-      }
-
-      // Set the function outputs
-      for (int j=0; j<num_out; ++j) {
-        if (repeat_out_[j]) {
-          // Make the function outputs end up in our outputs
-          res1[j] = res[j] ? res[j]+i*step_out_[j]: 0;
-        } else {
-          // Make the function outputs end up in temp_res
-          res1[j] = res[j] ? temp_res : 0;
-          temp_res+= step_out_[j];
-        }
-      }
-
-      // Evaluate the function
-      f_(arg1, res1, iw, w, 0);
-
-      // Sum results from temporary storage to accumulator
-      for (int k=0;k<num_out;++k) {
-        if (res1[k] && sum[k] && !repeat_out_[k])
-          std::transform(res1[k], res1[k]+step_out_[k], sum[k], sum[k], reduction);
-      }
-    }
-  }
-
-  void MapSum::eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
-    evalGen<double>(arg, res, iw, w, std::plus<double>());
-  }
-
-  void MapSum::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) {
-    evalGen<SXElem>(arg, res, iw, w, std::plus<SXElem>());
-  }
-
-  static bvec_t Orring(bvec_t x, bvec_t y) { return x | y; }
-
-  void MapSum::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
-    evalGen<bvec_t>(arg, res, iw, w, &Orring);
-  }
-
-  void MapSum::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
-    int num_in = f_.n_in(), num_out = f_.n_out();
-
-    bvec_t** arg1 = arg+f_.sz_arg();
-    bvec_t** res1 = res+f_.sz_res();
-
-    for (int i=0; i<n_; ++i) {
-
-      bvec_t* temp_res = w+f_.sz_w();
-
-      // Set the function inputs
-      for (int j=0; j<num_in; ++j) {
-        arg1[j] = (arg[j]==0) ? 0: arg[j]+i*step_in_[j];
-      }
-
-      // Set the function outputs
-      for (int j=0; j<num_out; ++j) {
-        if (repeat_out_[j]) {
-          // Make the function outputs end up in our outputs
-          res1[j] = (res[j]==0)? 0: res[j]+i*step_out_[j];
-        } else {
-          // Make the function outputs end up in temp_res
-          res1[j] = (res[j]==0)? 0: temp_res;
-          if (res[j]!=0) {
-            copy(res[j], res[j]+step_out_[j], temp_res);
-          }
-          temp_res+= step_out_[j];
-        }
-      }
-
-      f_->sp_rev(arg1, res1, iw, w, 0);
-    }
-
-    // Reset all seeds
-    for (int j=0; j<num_out; ++j) {
-      if (res[j]!=0) {
-        fill(res[j], res[j]+f_.nnz_out(j), bvec_t(0));
-      }
-    }
-
-  }
-
-  Function MapSum
-  ::get_forward(const std::string& name, int nfwd, Dict& opts) {
-    return get_forward_new(name, nfwd, opts);
-  }
-
-  Function MapSum
-  ::get_forward_old(const std::string& name, int nfwd, Dict& opts) {
-
-    // Differentiate mapped function
-    Function df = f_.forward(nfwd);
-
-    std::vector<bool> repeat_in;
-    repeat_in.insert(repeat_in.end(), repeat_in_.begin(), repeat_in_.end());
-    repeat_in.insert(repeat_in.end(), repeat_out_.begin(), repeat_out_.end());
-    for (int i=0;i<nfwd;++i) {
-      repeat_in.insert(repeat_in.end(), repeat_in_.begin(), repeat_in_.end());
-    }
-
-    std::vector<bool> repeat_out;
-    for (int i=0;i<nfwd;++i) {
-      repeat_out.insert(repeat_out.end(), repeat_out_.begin(), repeat_out_.end());
-    }
-
-    std::vector<int> reduce_in;
-    for (int i=0;i<repeat_in.size();++i) {
-      if (!repeat_in[i]) reduce_in.push_back(i);
-    }
-    std::vector<int> reduce_out;
-    for (int i=0;i<repeat_out.size();++i) {
-      if (!repeat_out[i]) reduce_out.push_back(i);
-    }
-
-    // Construct and return
-    return df.map(name, parallelization(), n_, reduce_in, reduce_out, opts);
-  }
-
-  Function MapSum
-  ::get_reverse(const std::string& name, int nadj, Dict& opts) {
-    return get_reverse_new(name, nadj, opts);
-  }
-
-  Function MapSum
-  ::get_reverse_old(const std::string& name, int nadj, Dict& opts) {
-    // Differentiate mapped function
-    Function df = f_.reverse(nadj);
-
-    std::vector<bool> repeat_in;
-    repeat_in.insert(repeat_in.end(), repeat_in_.begin(), repeat_in_.end());
-    repeat_in.insert(repeat_in.end(), repeat_out_.begin(), repeat_out_.end());
-    for (int i=0; i<nadj; ++i) {
-      repeat_in.insert(repeat_in.end(), repeat_out_.begin(), repeat_out_.end());
-    }
-
-    std::vector<bool> repeat_out;
-    for (int i=0; i<nadj; ++i) {
-      repeat_out.insert(repeat_out.end(), repeat_in_.begin(), repeat_in_.end());
-    }
-
-    std::vector<int> reduce_in;
-    for (int i=0;i<repeat_in.size();++i) {
-      if (!repeat_in[i]) reduce_in.push_back(i);
-    }
-    std::vector<int> reduce_out;
-    for (int i=0;i<repeat_out.size();++i) {
-      if (!repeat_out[i]) reduce_out.push_back(i);
-    }
-
-    // Construct and return
-    return df.map(name, parallelization(), n_, reduce_in, reduce_out, opts);
-  }
-
-  void MapSum::generateDeclarations(CodeGenerator& g) const {
-    f_->addDependency(g);
-  }
-
-  void MapSum::generateBody(CodeGenerator& g) const {
-
-    int num_in = f_.n_in(), num_out = f_.n_out();
-
-    g.body << "  const real_t** arg1 = arg+" << f_.sz_arg() << ";" << endl
-           << "  real_t** sum = res;" << endl;
-
-    // Clear the accumulators
-    for (int k=0;k<num_out;++k) {
-      g.body << "  if (sum[" << k << "]!=0) " <<
-        g.fill(STRING("sum[" << k << "]"), step_out_[k], "0") << endl;
-    }
-
-    g.body << "  real_t** res1 = res+"  << f_.sz_res() <<  ";" << endl;
-
-    g.body << "  int i;" << endl;
-    g.body << "  for (i=0; i<" << n_ << "; ++i) {" << endl;
-
-    g.body << "    real_t* temp_res = w+"  << f_.sz_w() <<  ";" << endl
-           << "    if (temp_res!=0) " << g.fill("temp_res", nnz_out_, "0") << endl;
-
-    for (int j=0; j<num_in; ++j) {
-      g.body << "    arg1[" << j << "] = (arg[" << j << "]==0)? " <<
-        "0: arg[" << j << "]+i*" << step_in_[j] << ";" << endl;
-    }
-    for (int j=0; j<num_out; ++j) {
-      if (repeat_out_[j]) {
-        g.body << "    res1[" << j << "] = (res[" << j << "]==0)? " <<
-          "0: res[" << j << "]+i*" << step_out_[j] << ";" << endl;
-      } else {
-        g.body << "    res1[" << j << "] = (res[" << j << "]==0)? 0: temp_res;" << endl
-               << "    temp_res+= " << step_out_[j] << ";" << endl;
-      }
-    }
-
-    g.body << "    " << g(f_, "arg1", "res1", "iw", "w") << ";" << endl;
-
-    g.addAuxiliary(CodeGenerator::AUX_AXPY);
-    // Sum results
-    for (int k=0; k<num_out; ++k) {
-      if (!repeat_out_[k]) {
-        g.body << "    if (res1[" << k << "] && sum[" << k << "])" << endl
-               << "       axpy(" << step_out_[k] << ",1," <<
-          "res1["<< k << "],sum[" << k << "]);" << endl;
-      }
-    }
-    g.body << "  }" << std::endl;
-  }
-
-  void MapSum::print(ostream &stream) const {
-    stream << "Map(" << f_.name() << ", " << n_ << ")";
   }
 
   void Map::eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
