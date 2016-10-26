@@ -844,6 +844,9 @@ namespace casadi {
     /// Errors are thrown if numerical values of inputs look bad
     bool inputs_check_;
 
+    // Print timing statistics
+    bool print_time_;
+
     /** \brief Get type name */
     virtual std::string type_name() const;
 
@@ -862,6 +865,9 @@ namespace casadi {
     template<typename MatType>
     std::vector<std::vector<MatType> > symbolicAdjSeed(int nadj, const std::vector<MatType>& v);
 
+  protected:
+    static void print_stats_line(int maxNameLen, std::string label, double n_call,
+      double t_proc, double t_wall);
   private:
     /// Memory objects
     std::vector<void*> mem_;

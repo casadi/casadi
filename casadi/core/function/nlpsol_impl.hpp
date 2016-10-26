@@ -79,9 +79,6 @@ namespace casadi {
     // Ignore errors in the iteration callbacks
     bool iteration_callback_ignore_errors_;
 
-    // Print timing statistics
-    bool print_time_;
-
     /// Which variables are discrete?
     std::vector<bool> discrete_;
 

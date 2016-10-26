@@ -86,6 +86,9 @@ macro(casadi_library_or_plugin name is_plugin)
   set_property(GLOBAL APPEND PROPERTY CASADI_MODULES ${name})
 endmacro()
 
+add_definitions(-DSHARED_LIBRARY_PREFIX="\\"${CMAKE_SHARED_LIBRARY_PREFIX}\\"")
+add_definitions(-DSHARED_LIBRARY_SUFFIX="\\"${CMAKE_SHARED_LIBRARY_SUFFIX}\\"")
+
 add_subdirectory(core)        # needed by all except external_packages
 add_subdirectory(interfaces)  # needs external_packages
 add_subdirectory(solvers)     # needs interfaces

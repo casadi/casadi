@@ -240,7 +240,7 @@ matrix:
         - mkdir build
         - pushd build
         - cmake  -DOLD_LLVM=ON -DWITH_ECOS=ON -DWITH_MOSEK=ON -DWITH_WORHP=ON -DWITH_SLICOT=OFF -DWITH_PYTHON=ON -DWITH_JSON=ON ..
-        - make
+        - make VERBOSE=1
         - sudo make install
         - popd
         - python -c "from casadi.tools import *;loadAllCompiledPlugins()"

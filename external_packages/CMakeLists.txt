@@ -64,3 +64,11 @@ endif()
 if(WITH_BUILD_DSDP AND DSDP_FOUND)
   add_subdirectory(DSDP)
 endif()
+
+if(WITH_BUILD_HPMPC)
+  add_subdirectory(hpmpc)
+endif()
+
+if(WITH_BUILD_BLASFEO)
+  add_subdirectory(blasfeo)
+endif()

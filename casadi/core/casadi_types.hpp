@@ -388,6 +388,8 @@ namespace casadi {
     CONIC_X0,
     /// dense
     CONIC_LAM_X0,
+    /// dense
+    CONIC_LAM_A0,
     CONIC_NUM_IN};
 
   /// Output arguments of an QP Solver

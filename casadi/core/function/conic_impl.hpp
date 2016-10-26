@@ -29,9 +29,16 @@
 #include "conic.hpp"
 #include "function_internal.hpp"
 #include "plugin_interface.hpp"
+#include "../timing.hpp"
 
 /// \cond INTERNAL
 namespace casadi {
+
+  struct CASADI_EXPORT ConicMemory {
+    // Function specific statistics
+    std::map<std::string, FStats> fstats;
+  };
+
   /// Internal class
   class CASADI_EXPORT Conic : public FunctionInternal, public PluginInterface<Conic> {
   public:
@@ -97,6 +104,9 @@ namespace casadi {
 
     /// Can discrete variables be treated
     virtual bool integer_support() const { return false;}
+
+    /// Print statistics
+    void print_fstats(const ConicMemory* m) const;
 
   protected:
     /// Options

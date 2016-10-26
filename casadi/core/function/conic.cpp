@@ -86,6 +86,7 @@ namespace casadi {
     case CONIC_UBX:    return "ubx";
     case CONIC_X0:     return "x0";
     case CONIC_LAM_X0: return "lam_x0";
+    case CONIC_LAM_A0: return "lam_a0";
     case CONIC_NUM_IN: break;
     }
     return string();
@@ -183,6 +184,7 @@ namespace casadi {
     w[CONIC_UBA] = ret_in[NLPSOL_UBG] - v.at(3);
     w[CONIC_X0] = ret_in[NLPSOL_X0];
     w[CONIC_LAM_X0] = ret_in[NLPSOL_LAM_X0];
+    w[CONIC_LAM_A0] = ret_in[NLPSOL_LAM_G0];
     w = conic_f(w);
 
     // Get expressions for the solution
@@ -256,6 +258,7 @@ namespace casadi {
       return get_sparsity_out(CONIC_X);
     case CONIC_LBA:
     case CONIC_UBA:
+    case CONIC_LAM_A0:
       return get_sparsity_out(CONIC_LAM_A);
     case CONIC_A:
       return A_;
@@ -350,6 +353,45 @@ namespace casadi {
     default:
       return 0;
     }
+  }
+
+  void Conic::print_fstats(const ConicMemory* m) const {
+
+    size_t maxNameLen=0;
+
+    // Retrieve all qp keys
+    std::vector<std::string> keys;
+    for (auto &&s : m->fstats) {
+      maxNameLen = max(s.first.size(), maxNameLen);
+      keys.push_back(s.first);
+    }
+
+    // Print header
+    std::stringstream s;
+    std::string blankName(maxNameLen, ' ');
+    s
+      << blankName
+      << "      proc           wall      num           mean             mean"
+      << endl << blankName
+      << "      time           time     evals       proc time        wall time";
+    userOut() << s.str() << endl;
+
+    std::sort(keys.begin(), keys.end());
+    for (auto k : keys) {
+      const FStats& fs = m->fstats.at(k);
+      print_stats_line(maxNameLen, k, fs.n_call, fs.t_proc, fs.t_wall);
+    }
+
+    // Sum the previously printed stats
+    double t_wall_all_previous = 0;
+    double t_proc_all_previous = 0;
+    for (auto k : keys) {
+      const FStats& fs = m->fstats.at(k);
+      t_proc_all_previous += fs.t_proc;
+      t_wall_all_previous += fs.t_wall;
+    }
+    print_stats_line(maxNameLen, "all previous", -1, t_proc_all_previous, t_wall_all_previous);
+
   }
 
 } // namespace casadi
