@@ -92,6 +92,9 @@ namespace casadi {
     Map(const std::string& name, const Function& f, int n)
       : MapBase(name, f, n) {}
 
+    /** \brief Destructor */
+    virtual ~Map();
+
     /// @{
     /** \brief Sparsities of function inputs and outputs */
     virtual Sparsity get_sparsity_in(int i) {

@@ -53,6 +53,9 @@ namespace casadi {
   MapBase::~MapBase() {
   }
 
+  Map::~Map() {
+  }
+
   void Map::init(const Dict& opts) {
     // Call the initialization method of the base class
     MapBase::init(opts);
