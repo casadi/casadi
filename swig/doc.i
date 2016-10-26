@@ -6530,19 +6530,19 @@ Joel Andersson
 C++ includes: casadi_logger.hpp ";
 
 
+// File: classcasadi_1_1Map.xml
+
+
 // File: classcasadi_1_1Mapaccum.xml
 
 
 // File: classcasadi_1_1MapBase.xml
 
 
-// File: classcasadi_1_1MapSerial.xml
+// File: classcasadi_1_1MapOmp.xml
 
 
 // File: classcasadi_1_1MapSum.xml
-
-
-// File: classcasadi_1_1MapSumSerial.xml
 
 
 // File: classcasadi_1_1Matrix.xml
@@ -9232,9 +9232,6 @@ Return a string with a description (for SWIG)
 
 
 // File: classcasadi_1_1Project.xml
-
-
-// File: classcasadi_1_1PureMap.xml
 
 
 // File: classcasadi_1_1QpToNlp.xml
