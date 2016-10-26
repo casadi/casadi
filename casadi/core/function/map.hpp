@@ -67,24 +67,12 @@ namespace casadi {
     virtual std::string get_name_out(int i) { return f_.name_out(i);}
     /// @}
 
-    ///@{
-    /** \brief Options */
-    static Options options_;
-    virtual const Options& get_options() const { return options_;}
-    ///@}
-
-    /** \brief  Initialize */
-    virtual void init(const Dict& opts);
-
     /// Type of parallellization
     virtual std::string parallelization() const=0;
 
   protected:
     // Constructor (protected, use create function above)
     MapBase(const std::string& name, const Function& f, int n);
-
-    /// Propagate optiosn to derivatives
-    void propagate_options(Dict& opts);
 
     // The function which is to be evaluated in parallel
     Function f_;
@@ -97,9 +85,6 @@ namespace casadi {
 
     // Number of times to evaluate this function
     int n_;
-
-    // Number of threads
-    int n_threads_;
   };
 
   /** A map Base class for pure maps (no reduced in/out)

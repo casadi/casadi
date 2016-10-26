@@ -103,20 +103,6 @@ namespace casadi {
     : FunctionInternal(name), f_(f), n_in_(f.n_in()), n_out_(f.n_out()), n_(n) {
   }
 
-  Options MapBase::options_
-  = {{&FunctionInternal::options_},
-     {{"n_threads",
-       {OT_INT,
-        "Control the number of threads when executing in parallel. "
-        "The default setting (0) will pass the decision on to the parallelization library. "
-        "For openmp, this means that OMP_NUM_THREADS env. variable is observed."}}
-     }
-  };
-
-  void MapBase::propagate_options(Dict& opts) {
-    if (opts.find("n_threads")==opts.end()) opts["n_threads"] = n_threads_;
-  }
-
   MapBase::~MapBase() {
   }
 
@@ -198,9 +184,6 @@ namespace casadi {
     // Differentiate mapped function
     Function df = f_.forward(nfwd);
 
-    // Propagate options
-    propagate_options(opts);
-
     // Construct and return
     return df.map(name, parallelization(), n_, opts);
   }
@@ -209,9 +192,6 @@ namespace casadi {
   ::get_reverse_old(const std::string& name, int nadj, Dict& opts) {
     // Differentiate mapped function
     Function df = f_.reverse(nadj);
-
-    // Propagate options
-    propagate_options(opts);
 
     // Construct and return
     return df.map(name, parallelization(), n_, opts);
@@ -233,20 +213,6 @@ namespace casadi {
   }
 
   MapSum::~MapSum() {
-
-  }
-
-  void MapBase::init(const Dict& opts) {
-    // Call the initialization method of the base class
-    FunctionInternal::init(opts);
-
-    // Read the 'n_threads' option and do a sanity check
-    if (opts.find("n_threads")!=opts.end()) {
-      n_threads_ = opts.find("n_threads")->second;
-    } else {
-      n_threads_ = 0;
-    }
-    casadi_assert_message(n_threads_>=0, "'n_threads' option must be a positive integer.");
 
   }
 
@@ -393,9 +359,6 @@ namespace casadi {
     // Differentiate mapped function
     Function df = f_.forward(nfwd);
 
-    // Propagate options
-    propagate_options(opts);
-
     std::vector<bool> repeat_in;
     repeat_in.insert(repeat_in.end(), repeat_in_.begin(), repeat_in_.end());
     repeat_in.insert(repeat_in.end(), repeat_out_.begin(), repeat_out_.end());
@@ -430,9 +393,6 @@ namespace casadi {
   ::get_reverse_old(const std::string& name, int nadj, Dict& opts) {
     // Differentiate mapped function
     Function df = f_.reverse(nadj);
-
-    // Propagate options
-    propagate_options(opts);
 
     std::vector<bool> repeat_in;
     repeat_in.insert(repeat_in.end(), repeat_in_.begin(), repeat_in_.end());
@@ -529,39 +489,21 @@ namespace casadi {
 #else // WITH_OPENMP
     size_t sz_arg, sz_res, sz_iw, sz_w;
     f_.sz_work(sz_arg, sz_res, sz_iw, sz_w);
-
-    if (n_threads_==0) {
 #pragma omp parallel for
-      for (int i=0; i<n_; ++i) {
-        const double** arg_i = arg + n_in_ + sz_arg*i;
-        for (int j=0; j<n_in_; ++j) {
-          arg_i[j] = arg[j]+i*f_.nnz_in(j);
-        }
-        double** res_i = res + n_out_ + sz_res*i;
-        for (int j=0; j<n_out_; ++j) {
-          res_i[j] = res[j]? res[j]+i*f_.nnz_out(j) : 0;
-        }
-        int* iw_i = iw + i*sz_iw;
-        double* w_i = w + i*sz_w;
-        f_->eval(0, arg_i, res_i, iw_i, w_i);
+    for (int i=0; i<n_; ++i) {
+      const double** arg_i = arg + n_in_ + sz_arg*i;
+      for (int j=0; j<n_in_; ++j) {
+        arg_i[j] = arg[j]+i*f_.nnz_in(j);
       }
-    } else {
-#pragma omp parallel for num_threads(n_threads_)
-      for (int i=0; i<n_; ++i) {
-        const double** arg_i = arg + n_in_ + sz_arg*i;
-        for (int j=0; j<n_in_; ++j) {
-          arg_i[j] = arg[j]+i*f_.nnz_in(j);
-        }
-        double** res_i = res + n_out_ + sz_res*i;
-        for (int j=0; j<n_out_; ++j) {
-          res_i[j] = res[j]? res[j]+i*f_.nnz_out(j) : 0;
-        }
-        int* iw_i = iw + i*sz_iw;
-        double* w_i = w + i*sz_w;
-        f_->eval(0, arg_i, res_i, iw_i, w_i);
+      double** res_i = res + n_out_ + sz_res*i;
+      for (int j=0; j<n_out_; ++j) {
+        res_i[j] = res[j]? res[j]+i*f_.nnz_out(j) : 0;
       }
+      int* iw_i = iw + i*sz_iw;
+      double* w_i = w + i*sz_w;
+      f_->eval(0, arg_i, res_i, iw_i, w_i);
     }
-  #endif  // WITH_OPENMP
+#endif  // WITH_OPENMP
   }
 
   void MapOmp::generateDeclarations(CodeGenerator& g) const {
@@ -573,11 +515,7 @@ namespace casadi {
     f_.sz_work(sz_arg, sz_res, sz_iw, sz_w);
 
     g.body << "  int i;" << endl;
-    if (n_threads_==0) {
-      g.body << "#pragma omp parallel for" << endl;
-    } else {
-      g.body << "#pragma omp parallel for num_threads(" << n_threads_ << ")" << endl;
-    }
+    g.body << "#pragma omp parallel for" << endl;
     g.body << "  for (i=0; i<" << n_ << "; ++i) {" << endl;
     g.body << "    const double** arg_i = arg + " << n_in_ << "+" << sz_arg << "*i;" << endl;
     for (int j=0; j<n_in_; ++j) {
