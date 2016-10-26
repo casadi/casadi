@@ -106,11 +106,11 @@ namespace casadi {
       \author Joris Gillis
       \date 2016
   */
-  class CASADI_EXPORT PureMap : public MapBase {
+  class CASADI_EXPORT Map : public MapBase {
     friend class MapBase;
   protected:
     // Constructor (protected, use create function in MapBase)
-    PureMap(const std::string& name, const Function& f, int n)
+    Map(const std::string& name, const Function& f, int n)
       : MapBase(name, f, n) {}
 
     /// @{
@@ -126,6 +126,12 @@ namespace casadi {
     /** \brief  Evaluate or propagate sparsities */
     template<typename T>
     void evalGen(const T** arg, T** res, int* iw, T* w) const;
+
+    /// Evaluate the function numerically
+    virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
+
+    /// Type of parallellization
+    virtual std::string parallelization() const { return "serial"; }
 
     /** \brief  evaluate symbolically while also propagating directional derivatives */
     virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem);
@@ -263,29 +269,6 @@ namespace casadi {
 
   };
 
-  /** A map Map for evaluating a function serially
-      \author Joel Andersson
-      \date 2015
-  */
-  class CASADI_EXPORT MapSerial : public PureMap {
-    friend class MapBase;
-    friend class PureMap;
-  protected:
-    // Constructor (protected, use create function in MapBase)
-    MapSerial(const std::string& name, const Function& f, int n)
-      : PureMap(name, f, n) {}
-
-    /** \brief  Destructor */
-    virtual ~MapSerial();
-
-    /// Evaluate the function numerically
-    virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
-
-    /// Type of parallellization
-    virtual std::string parallelization() const { return "serial"; }
-
-  };
-
   /** A mapsum evaluation in serial
       \author Joris Gillis
       \date 2016
@@ -310,17 +293,16 @@ namespace casadi {
 
   };
 
-#ifdef WITH_OPENMP
   /** A map Evaluate in parallel using OpenMP
       \author Joel Andersson
       \date 2015
   */
-  class CASADI_EXPORT MapOmp : public PureMap {
-    friend class PureMap;
+  class CASADI_EXPORT MapOmp : public Map {
+    friend class Map;
     friend class MapBase;
   protected:
     // Constructor (protected, use create function in MapBase)
-    MapOmp(const std::string& name, const Function& f, int n) : PureMap(name, f, n) {}
+    MapOmp(const std::string& name, const Function& f, int n) : Map(name, f, n) {}
 
     /** \brief  Destructor */
     virtual ~MapOmp();
@@ -340,7 +322,6 @@ namespace casadi {
     /** \brief Generate code for the body of the C function */
     virtual void generateBody(CodeGenerator& g) const;
   };
-#endif // WITH_OPENMP
 
 
 } // namespace casadi

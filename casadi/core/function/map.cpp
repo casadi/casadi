@@ -102,17 +102,11 @@ namespace casadi {
     }
 
     if (parallelization == "serial") {
-      return new MapSerial(name, f, n);
+      return new Map(name, f, n);
+    } else if (parallelization== "openmp") {
+      return new MapOmp(name, f, n);
     } else {
-      if (parallelization== "openmp") {
-        #ifdef WITH_OPENMP
-        return new MapOmp(name, f, n);
-        #else // WITH_OPENMP
-        casadi_warning("CasADi was not compiled with OpenMP. "
-                       "Falling back to serial mode.");
-        #endif // WITH_OPENMP
-      }
-      return new MapSerial(name, f, n);
+      casadi_error("Unknown paralleliation: " + parallelization);
     }
   }
 
@@ -137,7 +131,7 @@ namespace casadi {
   MapBase::~MapBase() {
   }
 
-  void PureMap::init(const Dict& opts) {
+  void Map::init(const Dict& opts) {
     // Call the initialization method of the base class
     MapBase::init(opts);
 
@@ -149,7 +143,7 @@ namespace casadi {
   }
 
   template<typename T>
-  void PureMap::evalGen(const T** arg, T** res, int* iw, T* w) const {
+  void Map::evalGen(const T** arg, T** res, int* iw, T* w) const {
     int n_in = n_in_, n_out = n_out_;
     const T** arg1 = arg+this->n_in();
     T** res1 = res+this->n_out();
@@ -164,15 +158,15 @@ namespace casadi {
     }
   }
 
-  void PureMap::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) {
+  void Map::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) {
     evalGen(arg, res, iw, w);
   }
 
-  void PureMap::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+  void Map::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     evalGen(arg, res, iw, w);
   }
 
-  void PureMap::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+  void Map::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     int n_in = n_in_, n_out = n_out_;
     bvec_t** arg1 = arg+this->n_in();
     bvec_t** res1 = res+this->n_out();
@@ -187,11 +181,11 @@ namespace casadi {
     }
   }
 
-  void PureMap::generateDeclarations(CodeGenerator& g) const {
+  void Map::generateDeclarations(CodeGenerator& g) const {
     f_->addDependency(g);
   }
 
-  void PureMap::generateBody(CodeGenerator& g) const {
+  void Map::generateBody(CodeGenerator& g) const {
 
     g.body << "  const real_t** arg1 = arg+" << n_in() << ";"<< endl;
     g.body << "  real_t** res1 = res+" << n_out() << ";" << endl;
@@ -210,7 +204,7 @@ namespace casadi {
     g.body << "  }" << std::endl;
   }
 
-  Function PureMap
+  Function Map
   ::get_forward_old(const std::string& name, int nfwd, Dict& opts) {
     // Differentiate mapped function
     Function df = f_.forward(nfwd);
@@ -222,7 +216,7 @@ namespace casadi {
     return df.map(name, parallelization(), n_, opts);
   }
 
-  Function PureMap
+  Function Map
   ::get_reverse_old(const std::string& name, int nadj, Dict& opts) {
     // Differentiate mapped function
     Function df = f_.reverse(nadj);
@@ -533,10 +527,7 @@ namespace casadi {
     stream << "Map(" << f_.name() << ", " << n_ << ")";
   }
 
-  MapSerial::~MapSerial() {
-  }
-
-  void MapSerial::eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
+  void Map::eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
     evalGen(arg, res, iw, w);
   }
 
@@ -548,12 +539,13 @@ namespace casadi {
     evalGen<double>(arg, res, iw, w, std::plus<double>());
   }
 
-#ifdef WITH_OPENMP
-
   MapOmp::~MapOmp() {
   }
 
   void MapOmp::eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
+#ifdef WITH_OPENMP
+    return Map::eval(mem, arg, res, iw, w);
+#else // WITH_OPENMP
     size_t sz_arg, sz_res, sz_iw, sz_w;
     f_.sz_work(sz_arg, sz_res, sz_iw, sz_w);
 
@@ -588,6 +580,7 @@ namespace casadi {
         f_->eval(0, arg_i, res_i, iw_i, w_i);
       }
     }
+  #endif  // WITH_OPENMP
   }
 
   void MapOmp::generateDeclarations(CodeGenerator& g) const {
@@ -622,7 +615,7 @@ namespace casadi {
 
   void MapOmp::init(const Dict& opts) {
     // Call the initialization method of the base class
-    PureMap::init(opts);
+    Map::init(opts);
 
     // Allocate sufficient memory for parallel evaluation
     alloc_arg(f_.sz_arg() * n_);
@@ -630,6 +623,5 @@ namespace casadi {
     alloc_w(f_.sz_w() * n_);
     alloc_iw(f_.sz_iw() * n_);
   }
-#endif // WITH_OPENMP
 
 } // namespace casadi
