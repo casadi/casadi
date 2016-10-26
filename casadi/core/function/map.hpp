@@ -339,34 +339,6 @@ namespace casadi {
 
     /** \brief Generate code for the body of the C function */
     virtual void generateBody(CodeGenerator& g) const;
-
-  };
-
-  /** A mapsum Evaluate in parallel using OpenMP
-      \author Joris Gillis
-      \date 2016
-  */
-  class CASADI_EXPORT MapSumOmp : public MapSum {
-    friend class MapSum;
-    friend class MapBase;
-  protected:
-    // Constructor (protected, use create function in MapBase)
-    MapSumOmp(const std::string& name, const Function& f, int n,
-      const std::vector<bool> &repeat_in, const std::vector<bool> &repeat_out)
-      : MapSum(name, f, n, repeat_in, repeat_out) {}
-
-    /** \brief  Destructor */
-    virtual ~MapSumOmp();
-
-    /// Evaluate the function numerically
-    virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
-
-    /** \brief  Initialize */
-    virtual void init(const Dict& opts);
-
-    /// Type of parallellization
-    virtual std::string parallelization() const { return "openmp"; }
-
   };
 #endif // WITH_OPENMP
 

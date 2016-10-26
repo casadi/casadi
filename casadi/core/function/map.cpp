@@ -94,17 +94,8 @@ namespace casadi {
         return new MapSumSerial(name, f, n, repeat_in, repeat_out);
       } else {
         if (parallelization == "openmp") {
-          if (reduce_out.size()>0) {
-            casadi_warning("OpenMP not yet supported for reduced outputs. "
-                           "Falling back to serial mode.");
-          } else {
-            #ifdef WITH_OPENMP
-            return new MapSumOmp(name, f, n, repeat_in, repeat_out);
-            #else // WITH_OPENMP
-            casadi_warning("CasADi was not compiled with OpenMP. "
-                           "Falling back to serial mode.");
-            #endif // WITH_OPENMP
-          }
+          casadi_warning("OpenMP not supported for reduced inputs/outputs. "
+                         "Falling back to serial mode.");
         }
         return new MapSumSerial(name, f, n, repeat_in, repeat_out);
       }
@@ -639,60 +630,6 @@ namespace casadi {
     alloc_w(f_.sz_w() * n_);
     alloc_iw(f_.sz_iw() * n_);
   }
-
-  void MapSumOmp::eval(void* mem, const double** arg, double** res,
-                          int* iw, double* w) const {
-
-    int n_in_ = f_.n_in(), n_out_ = f_.n_out();
-    size_t sz_arg, sz_res, sz_iw, sz_w;
-    f_.sz_work(sz_arg, sz_res, sz_iw, sz_w);
-    if (n_threads_==0) {
-#pragma omp parallel for
-      for (int i=0; i<n_; ++i) {
-        const double** arg_i = arg + n_in_ + sz_arg*i;
-        for (int j=0; j<n_in_; ++j) {
-          arg_i[j] = arg[j]+i*step_in_[j];
-        }
-        double** res_i = res + n_out_ + sz_res*i;
-        for (int j=0; j<n_out_; ++j) {
-          res_i[j] = (res[j]==0)? 0: res[j]+i*step_out_[j];
-        }
-        int* iw_i = iw + i*sz_iw;
-        double* w_i = w + i*sz_w;
-        f_->eval(0, arg_i, res_i, iw_i, w_i);
-      }
-    } else {
-#pragma omp parallel for num_threads(n_threads_)
-      for (int i=0; i<n_; ++i) {
-        const double** arg_i = arg + n_in_ + sz_arg*i;
-        for (int j=0; j<n_in_; ++j) {
-          arg_i[j] = arg[j]+i*step_in_[j];
-        }
-        double** res_i = res + n_out_ + sz_res*i;
-        for (int j=0; j<n_out_; ++j) {
-          res_i[j] = (res[j]==0)? 0: res[j]+i*step_out_[j];
-        }
-        int* iw_i = iw + i*sz_iw;
-        double* w_i = w + i*sz_w;
-        f_->eval(0, arg_i, res_i, iw_i, w_i);
-      }
-    }
-  }
-
-  void MapSumOmp::init(const Dict& opts) {
-    // Call the initialization method of the base class
-    MapSum::init(opts);
-
-    // Allocate sufficient memory for parallel evaluation
-    alloc_arg(f_.sz_arg() * (n_+1));
-    alloc_res(f_.sz_res() * (n_+1));
-    alloc_w(f_.sz_w() * n_ + nnz_out_);
-    alloc_iw(f_.sz_iw() * n_);
-  }
-
-  MapSumOmp::~MapSumOmp() {
-  }
-
 #endif // WITH_OPENMP
 
 } // namespace casadi
