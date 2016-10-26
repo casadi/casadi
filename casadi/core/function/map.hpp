@@ -107,6 +107,7 @@ namespace casadi {
 
     ///@{
     /** \brief Generate a function that calculates \a nfwd forward derivatives */
+    virtual Function get_forward(const std::string& name, int nfwd, Dict& opts);
     virtual Function get_forward_old(const std::string& name, int nfwd, Dict& opts);
     virtual int get_n_forward() const { return 64;}
     ///@}

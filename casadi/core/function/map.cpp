@@ -137,6 +137,51 @@ namespace casadi {
   }
 
   Function Map
+  ::get_forward(const std::string& name, int nfwd, Dict& opts) {
+    // Differentiate mapped function
+    Function df = f_.forward_new(nfwd);
+
+    // Construct and return
+    Function dm = df.map(name + "_map", parallelization(), n_, derived_options());
+
+    // Input expressions
+    vector<MX> arg = dm.mx_in();
+
+    // Need to reorder sensitivity inputs
+    vector<MX> parg = arg;
+    for (int i=0; i<n_in(); ++i) {
+      vector<MX> v = horzsplit(parg[n_in()+n_out()+i], f_.size2_in(i)), v2;
+      casadi_assert(v.size()==n_*nfwd);
+      v2.reserve(v.size());
+      for (int k=0; k<n_; ++k) {
+        for (int d=0; d<nfwd; ++d) {
+          v2.push_back(v[nfwd*d + k]);
+        }
+      }
+      parg[n_in()+n_out()+i] = horzcat(v2);
+    }
+
+    // Get output expressions
+    vector<MX> res = dm(parg);
+
+    // Reorder sensitivity outputs
+    for (int i=0; i<n_out(); ++i) {
+      vector<MX> v = horzsplit(res[i], f_.size2_out(i)), v2;
+      casadi_assert(v.size()==n_*nfwd);
+      v2.reserve(v.size());
+      for (int k=0; k<n_; ++k) {
+        for (int d=0; d<nfwd; ++d) {
+          v2.push_back(v[nfwd*d + k]);
+        }
+      }
+      res[i] = horzcat(v2);
+    }
+
+    // Construct return function
+    return Function(name, arg, res, opts);
+  }
+
+  Function Map
   ::get_reverse_old(const std::string& name, int nadj, Dict& opts) {
     // Differentiate mapped function
     Function df = f_.reverse(nadj);
