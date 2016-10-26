@@ -468,6 +468,10 @@ namespace casadi {
 
   Function Function::map(const string& name, const std::string& parallelization, int n,
       const Dict& opts) {
+    // Make sure not degenerate
+    casadi_assert_message(n>0, "Degenerate map operation");
+    // Quick return if possible
+    if (n==1) return *this;
     std::vector<int> reduce_in;
     std::vector<int> reduce_out;
     return MapBase::create(name, parallelization, *this, n, reduce_in, reduce_out, opts);
