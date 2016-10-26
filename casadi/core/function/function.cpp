@@ -432,6 +432,27 @@ namespace casadi {
   Function Function::map(const string& name, const std::string& parallelization, int n,
       const std::vector<int>& reduce_in, const std::vector<int>& reduce_out,
       const Dict& opts) {
+    if (!reduce_in.empty() || !reduce_out.empty()) {
+      // Wrap in an MXFunction
+      Function f = map(name, parallelization, n, opts);
+      // Start with the fully mapped inputs
+      vector<MX> arg = f.mx_in();
+      vector<MX> f_arg = arg;
+      // Replace reduced inputs
+      for (int i : reduce_in) {
+        arg[i] = mx_in(i);
+        f_arg[i] = repmat(arg[i], 1, n);
+      }
+      // Get fully mapped outputs
+      vector<MX> res = f(f_arg);
+      // Replace reduced outputs
+      for (int i : reduce_out) {
+        res[i] = repsum(res[i], 1, n);
+      }
+      // Construct return
+      return Function(name, arg, res, (*this)->derived_options());
+    }
+
     return MapBase::create(name, parallelization, *this, n, reduce_in, reduce_out, opts);
   }
 
