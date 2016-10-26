@@ -176,10 +176,6 @@ namespace casadi {
 #endif  // WITH_OPENMP
   }
 
-  void MapOmp::generateDeclarations(CodeGenerator& g) const {
-    f_->addDependency(g);
-  }
-
   void MapOmp::generateBody(CodeGenerator& g) const {
     int n_in = this->n_in(), n_out = this->n_out();
     size_t sz_arg, sz_res, sz_iw, sz_w;
