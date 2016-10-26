@@ -142,7 +142,7 @@
 */
 /** \defgroup scheme_ConicInput
 <a name='schemes'></a><table>
-<caption>Input scheme: casadi::ConicInput  (CONIC_NUM_IN = 9) []</caption>
+<caption>Input scheme: casadi::ConicInput  (CONIC_NUM_IN = 10) []</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
 <tr><td>CONIC_H</td><td></td><td>The square matrix H: sparse, (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical.</td></tr>
 <tr><td>CONIC_G</td><td></td><td>The vector g: dense, (n x 1)</td></tr>
@@ -153,6 +153,7 @@
 <tr><td>CONIC_UBX</td><td></td><td>dense, (n x 1)</td></tr>
 <tr><td>CONIC_X0</td><td></td><td>dense, (n x 1)</td></tr>
 <tr><td>CONIC_LAM_X0</td><td></td><td>dense</td></tr>
+<tr><td>CONIC_LAM_A0</td><td></td><td>dense</td></tr>
 </table>
 */
 /** \defgroup scheme_JacGInput

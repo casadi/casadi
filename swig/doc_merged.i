@@ -140,11 +140,6 @@
 |                 |                 | nonlinearly to  |                 |
 |                 |                 | BONMIN          |                 |
 +-----------------+-----------------+-----------------+-----------------+
-| print_time      | OT_BOOL         | print           | casadi::Nlpsol  |
-|                 |                 | information     |                 |
-|                 |                 | about execution |                 |
-|                 |                 | time            |                 |
-+-----------------+-----------------+-----------------+-----------------+
 | var_integer_md  | OT_DICT         | Integer         | casadi::BonMinM |
 |                 |                 | metadata (a     | essageHandler   |
 |                 |                 | dictionary with |                 |
@@ -2899,6 +2894,11 @@ Joel Andersson >List of available options
 +-----------------+-----------------+-----------------+-----------------+
 | output_scheme   | OT_STRINGVECTOR | Custom output   | casadi::Functio |
 |                 |                 | scheme          | nInternal       |
++-----------------+-----------------+-----------------+-----------------+
+| print_time      | OT_BOOL         | print           | casadi::Functio |
+|                 |                 | information     | nInternal       |
+|                 |                 | about execution |                 |
+|                 |                 | time            |                 |
 +-----------------+-----------------+-----------------+-----------------+
 | regularity_chec | OT_BOOL         | Throw           | casadi::Functio |
 | k               |                 | exceptions when | nInternal       |
@@ -8332,9 +8332,8 @@ swap inner and outer indices of list of lists
 
 ";
 
-%feature("docstring") casadi::isNon_increasing "
-
-Check if the vector is non-increasing.
+%feature("docstring") casadi::casadi_mproject "[INTERNAL]  Sparse copy: y
+<- x, w work vector (length >= number of rows)
 
 ";
 
@@ -8349,6 +8348,11 @@ Check if the vector is non-increasing.
 %feature("docstring") casadi::integrator_n_out "
 
 Get the number of integrator outputs.
+
+";
+
+%feature("docstring") casadi::casadi_maddproject "[INTERNAL]  Sparse copy:
+y <- x, w work vector (length >= number of rows)
 
 ";
 
@@ -8419,9 +8423,9 @@ instead)
 
 %feature("docstring") casadi::casadi_interpn_grad "[INTERNAL] ";
 
-%feature("docstring") casadi::has_interpolant "
-
-Check if a particular plugin is available.
+%feature("docstring") casadi::casadi_dense_transfer "[INTERNAL]  Dense
+transfer: y(y_sp).nonzeros() <- x(x_sp).nonzeros() (length >= max(number of
+rows, nnz))
 
 ";
 
@@ -8446,6 +8450,12 @@ Check if the vector has negative entries.
 ";
 
 %feature("docstring") casadi::check_exposed "[INTERNAL] ";
+
+%feature("docstring") casadi::isNon_increasing "
+
+Check if the vector is non-increasing.
+
+";
 
 %feature("docstring") casadi::casadi_interpn "[INTERNAL] ";
 
@@ -8767,19 +8777,9 @@ Duplicates are treated by looking up last occurrence
 
 ";
 
-%feature("docstring") casadi::hash_combine "
+%feature("docstring") casadi::has_interpolant "
 
->  void casadi::hash_combine(std::size_t &seed, T v)
-
->  void casadi::hash_combine(std::size_t &seed, const std::vector< int > &v)
-------------------------------------------------------------------------
-
-Generate a hash value incrementally (function taken from boost)
-
->  void casadi::hash_combine(std::size_t &seed, const int *v, int sz)
-------------------------------------------------------------------------
-
-Generate a hash value incrementally, array.
+Check if a particular plugin is available.
 
 ";
 
@@ -9521,6 +9521,11 @@ General information
 | output_scheme   | OT_STRINGVECTOR | Custom output   | casadi::Functio |
 |                 |                 | scheme          | nInternal       |
 +-----------------+-----------------+-----------------+-----------------+
+| print_time      | OT_BOOL         | print           | casadi::Functio |
+|                 |                 | information     | nInternal       |
+|                 |                 | about execution |                 |
+|                 |                 | time            |                 |
++-----------------+-----------------+-----------------+-----------------+
 | regularity_chec | OT_BOOL         | Throw           | casadi::Functio |
 | k               |                 | exceptions when | nInternal       |
 |                 |                 | NaN or Inf      |                 |
@@ -9540,7 +9545,7 @@ General information
 |                 |                 | debugging       |                 |
 +-----------------+-----------------+-----------------+-----------------+
 
->Input scheme: casadi::ConicInput (CONIC_NUM_IN = 9) []
+>Input scheme: casadi::ConicInput (CONIC_NUM_IN = 10) []
 
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
@@ -9571,6 +9576,8 @@ General information
 +------------------------+------------------------+------------------------+
 | CONIC_LAM_X0           |                        | dense                  |
 +------------------------+------------------------+------------------------+
+| CONIC_LAM_A0           |                        | dense                  |
++------------------------+------------------------+------------------------+
 
 >Output scheme: casadi::ConicOutput (CONIC_NUM_OUT = 4) []
 
@@ -9596,6 +9603,8 @@ List of plugins
 - cplex
 
 - gurobi
+
+- hpmpc
 
 - ooqp
 
@@ -9685,6 +9694,69 @@ Interface to the GUROBI Solver for quadratic programming
 | vtype                  | OT_STRINGVECTOR        | Type of variables: [CO |
 |                        |                        | NTINUOUS|binary|intege |
 |                        |                        | r|semicont|semiint]    |
++------------------------+------------------------+------------------------+
+
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+
+hpmpc
+-----
+
+
+
+Interface to HMPC Solver
+
+In order to use this interface, you must:
+
+Decision variables must only by state and control, and the variable ordering
+must be [x0 u0 x1 u1 ...]
+
+The constraints must be in order: [ gap0 lincon0 gap1 lincon1 ]
+
+The gap constraints must be diagonal sparse
+
+Supply nx, ng, nu options
+
+>List of available options
+
++------------------------+------------------------+------------------------+
+|           Id           |          Type          |      Description       |
++========================+========================+========================+
+| N                      | OT_INT                 | OCP horizon            |
++------------------------+------------------------+------------------------+
+| blasfeo_target         | OT_STRING              | hpmpc target           |
++------------------------+------------------------+------------------------+
+| inf                    | OT_DOUBLE              | HPMPC cannot handle    |
+|                        |                        | infinities. Infinities |
+|                        |                        | will be replaced by    |
+|                        |                        | this option's value.   |
++------------------------+------------------------+------------------------+
+| max_iter               | OT_INT                 | Max number of          |
+|                        |                        | iterations             |
++------------------------+------------------------+------------------------+
+| mu0                    | OT_DOUBLE              | Max element in cost    |
+|                        |                        | function as estimate   |
+|                        |                        | of max multiplier      |
++------------------------+------------------------+------------------------+
+| ng                     | OT_INTVECTOR           | Number of non-dynamic  |
+|                        |                        | constraints, length    |
+|                        |                        | N+1                    |
++------------------------+------------------------+------------------------+
+| nu                     | OT_INTVECTOR           | Number of controls,    |
+|                        |                        | length N               |
++------------------------+------------------------+------------------------+
+| nx                     | OT_INTVECTOR           | Number of states,      |
+|                        |                        | length N+1             |
++------------------------+------------------------+------------------------+
+| target                 | OT_STRING              | hpmpc target           |
++------------------------+------------------------+------------------------+
+| tol                    | OT_DOUBLE              | Tolerance in the       |
+|                        |                        | duality measure        |
++------------------------+------------------------+------------------------+
+| warm_start             | OT_BOOL                | Use warm-starting      |
 +------------------------+------------------------+------------------------+
 
 --------------------------------------------------------------------------------
@@ -10156,6 +10228,22 @@ Get the number of QP solver outputs.
 
 ";
 
+%feature("docstring") casadi::hash_combine "
+
+>  void casadi::hash_combine(std::size_t &seed, T v)
+
+>  void casadi::hash_combine(std::size_t &seed, const std::vector< int > &v)
+------------------------------------------------------------------------
+
+Generate a hash value incrementally (function taken from boost)
+
+>  void casadi::hash_combine(std::size_t &seed, const int *v, int sz)
+------------------------------------------------------------------------
+
+Generate a hash value incrementally, array.
+
+";
+
 %feature("docstring") casadi::casadi_project "[INTERNAL]  Sparse copy: y <-
 x, w work vector (length >= number of rows)
 
@@ -10284,8 +10372,8 @@ dictionaries, giving priority to first one.
 
 %feature("docstring") casadi::casadi_low "[INTERNAL] ";
 
-%feature("docstring") casadi::casadi_trans "[INTERNAL]  TRANS: y <-
-trans(x)
+%feature("docstring") casadi::casadi_mv "[INTERNAL]  Sparse matrix-vector
+multiplication: z <- z + x*y.
 
 ";
 
@@ -10296,8 +10384,8 @@ mul(A, y))
 
 ";
 
-%feature("docstring") casadi::casadi_mv "[INTERNAL]  Sparse matrix-vector
-multiplication: z <- z + x*y.
+%feature("docstring") casadi::casadi_trans "[INTERNAL]  TRANS: y <-
+trans(x)
 
 ";
 
@@ -10586,11 +10674,6 @@ General information
 |                 |                 | problem         | unction         |
 |                 |                 | functions to be |                 |
 |                 |                 | monitored       |                 |
-+-----------------+-----------------+-----------------+-----------------+
-| print_time      | OT_BOOL         | print           | casadi::Nlpsol  |
-|                 |                 | information     |                 |
-|                 |                 | about execution |                 |
-|                 |                 | time            |                 |
 +-----------------+-----------------+-----------------+-----------------+
 | specific_option | OT_DICT         | Options for     | casadi::OracleF |
 | s               |                 | specific auto-  | unction         |
