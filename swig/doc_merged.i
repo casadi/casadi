@@ -4649,9 +4649,6 @@ C++ includes: casadi_logger.hpp ";
 // File: classcasadi_1_1MapOmp.xml
 
 
-// File: classcasadi_1_1MapSum.xml
-
-
 // File: classcasadi_1_1Matrix.xml
 
 
