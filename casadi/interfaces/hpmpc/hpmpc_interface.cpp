@@ -99,8 +99,8 @@ namespace casadi {
     tol_ = 1e-8;
     warm_start_ = false;
     inf_ = 1e6;
-    target_ = "X64_AVX";
-    blasfeo_target_ = "X64_INTEL_SANDY_BRIDGE";
+    target_ = "C99_4X4";
+    blasfeo_target_ = "GENERIC";
     int struct_cnt=0;
     // Read options
     for (auto&& op : opts) {
@@ -239,13 +239,8 @@ namespace casadi {
       std::accumulate(ng.begin(), ng.end(), 0),
       "sum(nx+1)+sum(ng) = must equal total size of constraints (" << na_ << "). "
       "Structure is: N " << N_ << ", nx " << nx << ", nu " << nu << ", ng " << ng << ".");
-    // Load libraries HPMPC and BLASFEO, when applicable
+    // Load library HPMPC when applicable
     std::string searchpath;
-
-#ifdef BLASFEO_DLOPEN
-    DL_HANDLE_TYPE handle_blasfeo = load_library("casadi_blasfeo_" + blasfeo_target_, searchpath,
-      true);
-#endif
 
 #ifdef HPMPC_DLOPEN
 

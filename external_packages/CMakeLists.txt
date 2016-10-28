@@ -65,10 +65,10 @@ if(WITH_BUILD_DSDP AND DSDP_FOUND)
   add_subdirectory(DSDP)
 endif()
 
-if(WITH_BUILD_HPMPC)
+if(WITH_BUILD_HPMPC AND HPMPC_FOUND)
   add_subdirectory(hpmpc)
 endif()
 
-if(WITH_BUILD_BLASFEO)
+if(WITH_BUILD_BLASFEO AND BLASFEO_FOUND)
   add_subdirectory(blasfeo)
 endif()

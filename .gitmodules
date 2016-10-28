@@ -3,4 +3,4 @@
 	url = https://github.com/jgillis/hpmpc.git
 [submodule "external_packages/blasfeo/src"]
 	path = external_packages/blasfeo/src
-	url = https://github.com/giaf/blasfeo.git
+	url = https://github.com/jgillis/blasfeo.git

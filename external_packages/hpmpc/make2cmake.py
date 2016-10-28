@@ -16,8 +16,8 @@ combinations = [
 ("X64_AVX","X64_INTEL_SANDY_BRIDGE"),
 ("X64_SSE3","X64_INTEL_CORE"),
 ("X64_SSE3","X64_AMD_BULLDOZER"),
-("C99_4X4","GENERIC"),
-("C99_4X4_PREFETCH","GENERIC")]
+("C99_4X4","GENERIC")]
+#("C99_4X4_PREFETCH","GENERIC")]
 
 #("CORTEX_A7","GENERIC"),
 #("CORTEX_A9","GENERIC"),
@@ -59,9 +59,8 @@ with file('CMakeLists.txt','w') as f:
     else()
      set(HPMPC_FLAGS -DOS_LINUX)
     endif()
-    if(BLASFEO_DLOPEN AND MINGW)
-    message("Cross compilation flags")
-    set(CMAKE_SHARED_LINKER_FLAGS ${CMAKE_SHARED_LINKER_FLAGS} -Wl,--unresolved-symbols=ignore-all)
+    if()
+    set(CMAKE_SHARED_LINKER_FLAGS ${CMAKE_SHARED_LINKER_FLAGS} -Wl,--unresolved-symbols=report-all)
     endif()
     """)
   f.write("include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../blasfeo/src/include)\n")
@@ -73,7 +72,12 @@ with file('CMakeLists.txt','w') as f:
     data = target_data[t]
     
     libname = "casadi_hpmpc_%s_%s" % (t,blasfeo_target)
-    
+    blasfeo_libname = "casadi_blasfeo_%s" % blasfeo_target
+    bitness64 = "-m64" in data[0][2]
+    if bitness64:
+      f.write("if( CMAKE_SIZEOF_VOID_P EQUAL 8 )\n")
     f.write("casadi_external_library(%s %s)\n" % (libname, "\n".join([ os.path.join(pwd,cfile) for cfile, pwd, _ in data])))
     f.write("SET_TARGET_PROPERTIES(%s PROPERTIES COMPILE_FLAGS \"-DLA_BLASFEO -DTARGET_%s -DTARGET_%s %s ${HPMPC_FLAGS}\")\n\n" % (libname, blasfeo_target,t , " ".join(data[0][2])))
-
+    f.write("target_link_libraries(%s %s m)\n" % (libname, blasfeo_libname))
+    if bitness64:
+      f.write("endif()\n")

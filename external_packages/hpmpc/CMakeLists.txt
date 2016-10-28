@@ -7,19 +7,10 @@ cmake_minimum_required(VERSION 2.8.6)
     else()
      set(HPMPC_FLAGS -DOS_LINUX)
     endif()
-    if(BLASFEO_DLOPEN)
-    message("Cross compilation flags")
-    if(MINGW)
-    set(CMAKE_SHARED_LINKER_FLAGS ${CMAKE_SHARED_LINKER_FLAGS} -Wl,--unresolved-symbols=ignore-all)
-    endif()
-    if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-    set(CMAKE_SHARED_LIBRARY_CREATE_C_FLAGS "${CMAKE_SHARED_LIBRARY_CREATE_C_FLAGS} -undefined dynamic_lookup")
-    endif()
-    endif()
-
     include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../blasfeo/src/include)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dummy_include)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dummy_include/foo/bar)
+if( CMAKE_SIZEOF_VOID_P EQUAL 8 )
 casadi_external_library(casadi_hpmpc_X64_AVX_GENERIC src/auxiliary/d_aux_lib4.c
 src/auxiliary/d_aux_extern_depend_lib4.c
 src/auxiliary/i_aux.c
@@ -52,6 +43,9 @@ src/interfaces/c/c_order_interface.c
 src/interfaces/c/fortran_order_interface.c)
 SET_TARGET_PROPERTIES(casadi_hpmpc_X64_AVX_GENERIC PROPERTIES COMPILE_FLAGS "-DLA_BLASFEO -DTARGET_GENERIC -DTARGET_X64_AVX -O2 -fPIC -DBLASFEO -m64 -mavx -DTARGET_X64_AVX ${HPMPC_FLAGS}")
 
+target_link_libraries(casadi_hpmpc_X64_AVX_GENERIC casadi_blasfeo_GENERIC m)
+endif()
+if( CMAKE_SIZEOF_VOID_P EQUAL 8 )
 casadi_external_library(casadi_hpmpc_X64_AVX2_X64_INTEL_HASWELL src/auxiliary/d_aux_lib4.c
 src/auxiliary/d_aux_extern_depend_lib4.c
 src/auxiliary/i_aux.c
@@ -84,6 +78,9 @@ src/interfaces/c/c_order_interface.c
 src/interfaces/c/fortran_order_interface.c)
 SET_TARGET_PROPERTIES(casadi_hpmpc_X64_AVX2_X64_INTEL_HASWELL PROPERTIES COMPILE_FLAGS "-DLA_BLASFEO -DTARGET_X64_INTEL_HASWELL -DTARGET_X64_AVX2 -O2 -fPIC -DBLASFEO -m64 -mavx2 -mfma -DTARGET_X64_AVX2 ${HPMPC_FLAGS}")
 
+target_link_libraries(casadi_hpmpc_X64_AVX2_X64_INTEL_HASWELL casadi_blasfeo_X64_INTEL_HASWELL m)
+endif()
+if( CMAKE_SIZEOF_VOID_P EQUAL 8 )
 casadi_external_library(casadi_hpmpc_X64_AVX_X64_INTEL_SANDY_BRIDGE src/auxiliary/d_aux_lib4.c
 src/auxiliary/d_aux_extern_depend_lib4.c
 src/auxiliary/i_aux.c
@@ -116,6 +113,9 @@ src/interfaces/c/c_order_interface.c
 src/interfaces/c/fortran_order_interface.c)
 SET_TARGET_PROPERTIES(casadi_hpmpc_X64_AVX_X64_INTEL_SANDY_BRIDGE PROPERTIES COMPILE_FLAGS "-DLA_BLASFEO -DTARGET_X64_INTEL_SANDY_BRIDGE -DTARGET_X64_AVX -O2 -fPIC -DBLASFEO -m64 -mavx -DTARGET_X64_AVX ${HPMPC_FLAGS}")
 
+target_link_libraries(casadi_hpmpc_X64_AVX_X64_INTEL_SANDY_BRIDGE casadi_blasfeo_X64_INTEL_SANDY_BRIDGE m)
+endif()
+if( CMAKE_SIZEOF_VOID_P EQUAL 8 )
 casadi_external_library(casadi_hpmpc_X64_SSE3_X64_INTEL_CORE src/auxiliary/d_aux_lib4.c
 src/auxiliary/d_aux_extern_depend_lib4.c
 src/auxiliary/i_aux.c
@@ -148,6 +148,9 @@ src/interfaces/c/c_order_interface.c
 src/interfaces/c/fortran_order_interface.c)
 SET_TARGET_PROPERTIES(casadi_hpmpc_X64_SSE3_X64_INTEL_CORE PROPERTIES COMPILE_FLAGS "-DLA_BLASFEO -DTARGET_X64_INTEL_CORE -DTARGET_X64_SSE3 -O2 -fPIC -DBLASFEO -m64 -msse3 -DTARGET_X64_SSE3 ${HPMPC_FLAGS}")
 
+target_link_libraries(casadi_hpmpc_X64_SSE3_X64_INTEL_CORE casadi_blasfeo_X64_INTEL_CORE m)
+endif()
+if( CMAKE_SIZEOF_VOID_P EQUAL 8 )
 casadi_external_library(casadi_hpmpc_X64_SSE3_X64_AMD_BULLDOZER src/auxiliary/d_aux_lib4.c
 src/auxiliary/d_aux_extern_depend_lib4.c
 src/auxiliary/i_aux.c
@@ -180,6 +183,8 @@ src/interfaces/c/c_order_interface.c
 src/interfaces/c/fortran_order_interface.c)
 SET_TARGET_PROPERTIES(casadi_hpmpc_X64_SSE3_X64_AMD_BULLDOZER PROPERTIES COMPILE_FLAGS "-DLA_BLASFEO -DTARGET_X64_AMD_BULLDOZER -DTARGET_X64_SSE3 -O2 -fPIC -DBLASFEO -m64 -msse3 -DTARGET_X64_SSE3 ${HPMPC_FLAGS}")
 
+target_link_libraries(casadi_hpmpc_X64_SSE3_X64_AMD_BULLDOZER casadi_blasfeo_X64_AMD_BULLDOZER m)
+endif()
 casadi_external_library(casadi_hpmpc_C99_4X4_GENERIC src/auxiliary/d_aux_lib4.c
 src/auxiliary/d_aux_extern_depend_lib4.c
 src/auxiliary/i_aux.c
@@ -212,35 +217,4 @@ src/interfaces/c/c_order_interface.c
 src/interfaces/c/fortran_order_interface.c)
 SET_TARGET_PROPERTIES(casadi_hpmpc_C99_4X4_GENERIC PROPERTIES COMPILE_FLAGS "-DLA_BLASFEO -DTARGET_GENERIC -DTARGET_C99_4X4 -O2 -fPIC -DBLASFEO -march=native -DTARGET_C99_4X4 ${HPMPC_FLAGS}")
 
-casadi_external_library(casadi_hpmpc_C99_4X4_PREFETCH_GENERIC src/auxiliary/d_aux_lib4.c
-src/auxiliary/d_aux_extern_depend_lib4.c
-src/auxiliary/i_aux.c
-src/kernel/c99/kernel_dgemm_c99_prefetch_lib4.c
-src/kernel/c99/kernel_dtrmm_c99_prefetch_lib4.c
-src/kernel/c99/kernel_dtrsm_c99_prefetch_lib4.c
-src/kernel/c99/kernel_dsyrk_c99_lib4.c
-src/kernel/c99/kernel_dpotrf_c99_prefetch_lib4.c
-src/kernel/c99/kernel_dgemv_c99_lib4.c
-src/kernel/c99/kernel_dtrmv_c99_lib4.c
-src/kernel/c99/kernel_dtrsv_c99_lib4.c
-src/kernel/c99/kernel_dsymv_c99_lib4.c
-src/kernel/c99/kernel_dtran_c99_lib4.c
-src/kernel/c99/kernel_dttmm_c99_lib4.c
-src/kernel/c99/kernel_dtrinv_c99_lib4.c
-src/kernel/c99/kernel_dcopy_c99_lib4.c
-src/kernel/c99/kernel_dgetrf_c99_lib4.c
-src/blas/blas_d_lib4.c
-src/lqcp_solvers/d_back_ric_rec.c
-src/lqcp_solvers/d_for_schur_rec.c
-src/lqcp_solvers/d_res.c
-src/lqcp_solvers/d_part_cond.c
-src/mpc_solvers/d_ip2_hard.c
-src/mpc_solvers/d_res_ip_hard.c
-src/mpc_solvers/d_ip2_res_hard.c
-src/mpc_solvers/c99/d_aux_ip_hard_lib4.c
-src/mpc_solvers/c99/d_res_ip_res_hard.c
-src/interfaces/c/c_interface_work_space.c
-src/interfaces/c/c_order_interface.c
-src/interfaces/c/fortran_order_interface.c)
-SET_TARGET_PROPERTIES(casadi_hpmpc_C99_4X4_PREFETCH_GENERIC PROPERTIES COMPILE_FLAGS "-DLA_BLASFEO -DTARGET_GENERIC -DTARGET_C99_4X4_PREFETCH -O2 -fPIC -DBLASFEO -march=native -DTARGET_C99_4X4_PREFETCH ${HPMPC_FLAGS}")
-
+target_link_libraries(casadi_hpmpc_C99_4X4_GENERIC casadi_blasfeo_GENERIC m)
