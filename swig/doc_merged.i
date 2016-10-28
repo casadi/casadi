@@ -8895,54 +8895,54 @@ General information
 |                 |                 | horizon         | tor             |
 +-----------------+-----------------+-----------------+-----------------+
 
->Input scheme: casadi::IntegratorInput (INTEGRATOR_NUM_IN = 6) []
+>Input scheme: casadi::IntegratorInput (INTEGRATOR_NUM_IN = 6)
 
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
-| INTEGRATOR_X0          |                        | Differential state at  |
+| INTEGRATOR_X0          | x0                     | Differential state at  |
 |                        |                        | the initial time.      |
 +------------------------+------------------------+------------------------+
-| INTEGRATOR_P           |                        | Parameters.            |
+| INTEGRATOR_P           | p                      | Parameters.            |
 +------------------------+------------------------+------------------------+
-| INTEGRATOR_Z0          |                        | Initial guess for the  |
+| INTEGRATOR_Z0          | z0                     | Initial guess for the  |
 |                        |                        | algebraic variable.    |
 +------------------------+------------------------+------------------------+
-| INTEGRATOR_RX0         |                        | Backward differential  |
+| INTEGRATOR_RX0         | rx0                    | Backward differential  |
 |                        |                        | state at the final     |
 |                        |                        | time.                  |
 +------------------------+------------------------+------------------------+
-| INTEGRATOR_RP          |                        | Backward parameter     |
+| INTEGRATOR_RP          | rp                     | Backward parameter     |
 |                        |                        | vector.                |
 +------------------------+------------------------+------------------------+
-| INTEGRATOR_RZ0         |                        | Initial guess for the  |
+| INTEGRATOR_RZ0         | rz0                    | Initial guess for the  |
 |                        |                        | backwards algebraic    |
 |                        |                        | variable.              |
 +------------------------+------------------------+------------------------+
 
->Output scheme: casadi::IntegratorOutput (INTEGRATOR_NUM_OUT = 6) []
+>Output scheme: casadi::IntegratorOutput (INTEGRATOR_NUM_OUT = 6)
 
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
-| INTEGRATOR_XF          |                        | Differential state at  |
+| INTEGRATOR_XF          | xf                     | Differential state at  |
 |                        |                        | the final time.        |
 +------------------------+------------------------+------------------------+
-| INTEGRATOR_QF          |                        | Quadrature state at    |
+| INTEGRATOR_QF          | qf                     | Quadrature state at    |
 |                        |                        | the final time.        |
 +------------------------+------------------------+------------------------+
-| INTEGRATOR_ZF          |                        | Algebraic variable at  |
+| INTEGRATOR_ZF          | zf                     | Algebraic variable at  |
 |                        |                        | the final time.        |
 +------------------------+------------------------+------------------------+
-| INTEGRATOR_RXF         |                        | Backward differential  |
+| INTEGRATOR_RXF         | rxf                    | Backward differential  |
 |                        |                        | state at the initial   |
 |                        |                        | time.                  |
 +------------------------+------------------------+------------------------+
-| INTEGRATOR_RQF         |                        | Backward quadrature    |
+| INTEGRATOR_RQF         | rqf                    | Backward quadrature    |
 |                        |                        | state at the initial   |
 |                        |                        | time.                  |
 +------------------------+------------------------+------------------------+
-| INTEGRATOR_RZF         |                        | Backward algebraic     |
+| INTEGRATOR_RZF         | rzf                    | Backward algebraic     |
 |                        |                        | variable at the        |
 |                        |                        | initial time.          |
 +------------------------+------------------------+------------------------+
@@ -9536,52 +9536,52 @@ General information
 |                 |                 | debugging       |                 |
 +-----------------+-----------------+-----------------+-----------------+
 
->Input scheme: casadi::ConicInput (CONIC_NUM_IN = 10) []
+>Input scheme: casadi::ConicInput (CONIC_NUM_IN = 10)
 
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
-| CONIC_H                |                        | The square matrix H:   |
+| CONIC_H                | h                      | The square matrix H:   |
 |                        |                        | sparse, (n x n). Only  |
 |                        |                        | the lower triangular   |
 |                        |                        | part is actually used. |
 |                        |                        | The matrix is assumed  |
 |                        |                        | to be symmetrical.     |
 +------------------------+------------------------+------------------------+
-| CONIC_G                |                        | The vector g: dense,   |
+| CONIC_G                | g                      | The vector g: dense,   |
 |                        |                        | (n x 1)                |
 +------------------------+------------------------+------------------------+
-| CONIC_A                |                        | The matrix A: sparse,  |
+| CONIC_A                | a                      | The matrix A: sparse,  |
 |                        |                        | (nc x n) - product     |
 |                        |                        | with x must be dense.  |
 +------------------------+------------------------+------------------------+
-| CONIC_LBA              |                        | dense, (nc x 1)        |
+| CONIC_LBA              | lba                    | dense, (nc x 1)        |
 +------------------------+------------------------+------------------------+
-| CONIC_UBA              |                        | dense, (nc x 1)        |
+| CONIC_UBA              | uba                    | dense, (nc x 1)        |
 +------------------------+------------------------+------------------------+
-| CONIC_LBX              |                        | dense, (n x 1)         |
+| CONIC_LBX              | lbx                    | dense, (n x 1)         |
 +------------------------+------------------------+------------------------+
-| CONIC_UBX              |                        | dense, (n x 1)         |
+| CONIC_UBX              | ubx                    | dense, (n x 1)         |
 +------------------------+------------------------+------------------------+
-| CONIC_X0               |                        | dense, (n x 1)         |
+| CONIC_X0               | x0                     | dense, (n x 1)         |
 +------------------------+------------------------+------------------------+
-| CONIC_LAM_X0           |                        | dense                  |
+| CONIC_LAM_X0           | lam_x0                 | dense                  |
 +------------------------+------------------------+------------------------+
-| CONIC_LAM_A0           |                        | dense                  |
+| CONIC_LAM_A0           | lam_a0                 | dense                  |
 +------------------------+------------------------+------------------------+
 
->Output scheme: casadi::ConicOutput (CONIC_NUM_OUT = 4) []
+>Output scheme: casadi::ConicOutput (CONIC_NUM_OUT = 4)
 
 +-------------+-------+---------------------------------------------------+
 |  Full name  | Short |                    Description                    |
 +=============+=======+===================================================+
-| CONIC_X     |       | The primal solution.                              |
+| CONIC_X     | x     | The primal solution.                              |
 +-------------+-------+---------------------------------------------------+
-| CONIC_COST  |       | The optimal cost.                                 |
+| CONIC_COST  | cost  | The optimal cost.                                 |
 +-------------+-------+---------------------------------------------------+
-| CONIC_LAM_A |       | The dual solution corresponding to linear bounds. |
+| CONIC_LAM_A | lam_a | The dual solution corresponding to linear bounds. |
 +-------------+-------+---------------------------------------------------+
-| CONIC_LAM_X |       | The dual solution corresponding to simple bounds. |
+| CONIC_LAM_X | lam_x | The dual solution corresponding to simple bounds. |
 +-------------+-------+---------------------------------------------------+
 
 List of plugins
@@ -10387,32 +10387,32 @@ trans(x)
 
 Get NLP solver output scheme of NLP solvers.
 
->Output scheme: casadi::NlpsolOutput (NLPSOL_NUM_OUT = 6) []
+>Output scheme: casadi::NlpsolOutput (NLPSOL_NUM_OUT = 6)
 
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
-| NLPSOL_X               |                        | Decision variables at  |
+| NLPSOL_X               | x                      | Decision variables at  |
 |                        |                        | the optimal solution   |
 |                        |                        | (nx x 1)               |
 +------------------------+------------------------+------------------------+
-| NLPSOL_F               |                        | Cost function value at |
+| NLPSOL_F               | f                      | Cost function value at |
 |                        |                        | the optimal solution   |
 |                        |                        | (1 x 1)                |
 +------------------------+------------------------+------------------------+
-| NLPSOL_G               |                        | Constraints function   |
+| NLPSOL_G               | g                      | Constraints function   |
 |                        |                        | at the optimal         |
 |                        |                        | solution (ng x 1)      |
 +------------------------+------------------------+------------------------+
-| NLPSOL_LAM_X           |                        | Lagrange multipliers   |
+| NLPSOL_LAM_X           | lam_x                  | Lagrange multipliers   |
 |                        |                        | for bounds on X at the |
 |                        |                        | solution (nx x 1)      |
 +------------------------+------------------------+------------------------+
-| NLPSOL_LAM_G           |                        | Lagrange multipliers   |
+| NLPSOL_LAM_G           | lam_g                  | Lagrange multipliers   |
 |                        |                        | for bounds on G at the |
 |                        |                        | solution (ng x 1)      |
 +------------------------+------------------------+------------------------+
-| NLPSOL_LAM_P           |                        | Lagrange multipliers   |
+| NLPSOL_LAM_P           | lam_p                  | Lagrange multipliers   |
 |                        |                        | for bounds on P at the |
 |                        |                        | solution (np x 1)      |
 +------------------------+------------------------+------------------------+
@@ -10422,32 +10422,32 @@ Get NLP solver output scheme of NLP solvers.
 
 Get output scheme name by index.
 
->Output scheme: casadi::NlpsolOutput (NLPSOL_NUM_OUT = 6) []
+>Output scheme: casadi::NlpsolOutput (NLPSOL_NUM_OUT = 6)
 
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
-| NLPSOL_X               |                        | Decision variables at  |
+| NLPSOL_X               | x                      | Decision variables at  |
 |                        |                        | the optimal solution   |
 |                        |                        | (nx x 1)               |
 +------------------------+------------------------+------------------------+
-| NLPSOL_F               |                        | Cost function value at |
+| NLPSOL_F               | f                      | Cost function value at |
 |                        |                        | the optimal solution   |
 |                        |                        | (1 x 1)                |
 +------------------------+------------------------+------------------------+
-| NLPSOL_G               |                        | Constraints function   |
+| NLPSOL_G               | g                      | Constraints function   |
 |                        |                        | at the optimal         |
 |                        |                        | solution (ng x 1)      |
 +------------------------+------------------------+------------------------+
-| NLPSOL_LAM_X           |                        | Lagrange multipliers   |
+| NLPSOL_LAM_X           | lam_x                  | Lagrange multipliers   |
 |                        |                        | for bounds on X at the |
 |                        |                        | solution (nx x 1)      |
 +------------------------+------------------------+------------------------+
-| NLPSOL_LAM_G           |                        | Lagrange multipliers   |
+| NLPSOL_LAM_G           | lam_g                  | Lagrange multipliers   |
 |                        |                        | for bounds on G at the |
 |                        |                        | solution (ng x 1)      |
 +------------------------+------------------------+------------------------+
-| NLPSOL_LAM_P           |                        | Lagrange multipliers   |
+| NLPSOL_LAM_P           | lam_p                  | Lagrange multipliers   |
 |                        |                        | for bounds on P at the |
 |                        |                        | solution (np x 1)      |
 +------------------------+------------------------+------------------------+
@@ -10484,38 +10484,38 @@ order:  Order of interpolating polynomials
 
 Get input scheme of NLP solvers.
 
->Input scheme: casadi::NlpsolInput (NLPSOL_NUM_IN = 8) []
+>Input scheme: casadi::NlpsolInput (NLPSOL_NUM_IN = 8)
 
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
-| NLPSOL_X0              |                        | Decision variables,    |
+| NLPSOL_X0              | x0                     | Decision variables,    |
 |                        |                        | initial guess (nx x 1) |
 +------------------------+------------------------+------------------------+
-| NLPSOL_P               |                        | Value of fixed         |
+| NLPSOL_P               | p                      | Value of fixed         |
 |                        |                        | parameters (np x 1)    |
 +------------------------+------------------------+------------------------+
-| NLPSOL_LBX             |                        | Decision variables     |
+| NLPSOL_LBX             | lbx                    | Decision variables     |
 |                        |                        | lower bound (nx x 1),  |
 |                        |                        | default -inf.          |
 +------------------------+------------------------+------------------------+
-| NLPSOL_UBX             |                        | Decision variables     |
+| NLPSOL_UBX             | ubx                    | Decision variables     |
 |                        |                        | upper bound (nx x 1),  |
 |                        |                        | default +inf.          |
 +------------------------+------------------------+------------------------+
-| NLPSOL_LBG             |                        | Constraints lower      |
+| NLPSOL_LBG             | lbg                    | Constraints lower      |
 |                        |                        | bound (ng x 1),        |
 |                        |                        | default -inf.          |
 +------------------------+------------------------+------------------------+
-| NLPSOL_UBG             |                        | Constraints upper      |
+| NLPSOL_UBG             | ubg                    | Constraints upper      |
 |                        |                        | bound (ng x 1),        |
 |                        |                        | default +inf.          |
 +------------------------+------------------------+------------------------+
-| NLPSOL_LAM_X0          |                        | Lagrange multipliers   |
+| NLPSOL_LAM_X0          | lam_x0                 | Lagrange multipliers   |
 |                        |                        | for bounds on X,       |
 |                        |                        | initial guess (nx x 1) |
 +------------------------+------------------------+------------------------+
-| NLPSOL_LAM_G0          |                        | Lagrange multipliers   |
+| NLPSOL_LAM_G0          | lam_g0                 | Lagrange multipliers   |
 |                        |                        | for bounds on G,       |
 |                        |                        | initial guess (ng x 1) |
 +------------------------+------------------------+------------------------+
@@ -10525,38 +10525,38 @@ Get input scheme of NLP solvers.
 
 Get NLP solver input scheme name by index.
 
->Input scheme: casadi::NlpsolInput (NLPSOL_NUM_IN = 8) []
+>Input scheme: casadi::NlpsolInput (NLPSOL_NUM_IN = 8)
 
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
-| NLPSOL_X0              |                        | Decision variables,    |
+| NLPSOL_X0              | x0                     | Decision variables,    |
 |                        |                        | initial guess (nx x 1) |
 +------------------------+------------------------+------------------------+
-| NLPSOL_P               |                        | Value of fixed         |
+| NLPSOL_P               | p                      | Value of fixed         |
 |                        |                        | parameters (np x 1)    |
 +------------------------+------------------------+------------------------+
-| NLPSOL_LBX             |                        | Decision variables     |
+| NLPSOL_LBX             | lbx                    | Decision variables     |
 |                        |                        | lower bound (nx x 1),  |
 |                        |                        | default -inf.          |
 +------------------------+------------------------+------------------------+
-| NLPSOL_UBX             |                        | Decision variables     |
+| NLPSOL_UBX             | ubx                    | Decision variables     |
 |                        |                        | upper bound (nx x 1),  |
 |                        |                        | default +inf.          |
 +------------------------+------------------------+------------------------+
-| NLPSOL_LBG             |                        | Constraints lower      |
+| NLPSOL_LBG             | lbg                    | Constraints lower      |
 |                        |                        | bound (ng x 1),        |
 |                        |                        | default -inf.          |
 +------------------------+------------------------+------------------------+
-| NLPSOL_UBG             |                        | Constraints upper      |
+| NLPSOL_UBG             | ubg                    | Constraints upper      |
 |                        |                        | bound (ng x 1),        |
 |                        |                        | default +inf.          |
 +------------------------+------------------------+------------------------+
-| NLPSOL_LAM_X0          |                        | Lagrange multipliers   |
+| NLPSOL_LAM_X0          | lam_x0                 | Lagrange multipliers   |
 |                        |                        | for bounds on X,       |
 |                        |                        | initial guess (nx x 1) |
 +------------------------+------------------------+------------------------+
-| NLPSOL_LAM_G0          |                        | Lagrange multipliers   |
+| NLPSOL_LAM_G0          | lam_g0                 | Lagrange multipliers   |
 |                        |                        | for bounds on G,       |
 |                        |                        | initial guess (ng x 1) |
 +------------------------+------------------------+------------------------+
@@ -10691,68 +10691,68 @@ General information
 |                 |                 | UBX             |                 |
 +-----------------+-----------------+-----------------+-----------------+
 
->Input scheme: casadi::NlpsolInput (NLPSOL_NUM_IN = 8) []
+>Input scheme: casadi::NlpsolInput (NLPSOL_NUM_IN = 8)
 
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
-| NLPSOL_X0              |                        | Decision variables,    |
+| NLPSOL_X0              | x0                     | Decision variables,    |
 |                        |                        | initial guess (nx x 1) |
 +------------------------+------------------------+------------------------+
-| NLPSOL_P               |                        | Value of fixed         |
+| NLPSOL_P               | p                      | Value of fixed         |
 |                        |                        | parameters (np x 1)    |
 +------------------------+------------------------+------------------------+
-| NLPSOL_LBX             |                        | Decision variables     |
+| NLPSOL_LBX             | lbx                    | Decision variables     |
 |                        |                        | lower bound (nx x 1),  |
 |                        |                        | default -inf.          |
 +------------------------+------------------------+------------------------+
-| NLPSOL_UBX             |                        | Decision variables     |
+| NLPSOL_UBX             | ubx                    | Decision variables     |
 |                        |                        | upper bound (nx x 1),  |
 |                        |                        | default +inf.          |
 +------------------------+------------------------+------------------------+
-| NLPSOL_LBG             |                        | Constraints lower      |
+| NLPSOL_LBG             | lbg                    | Constraints lower      |
 |                        |                        | bound (ng x 1),        |
 |                        |                        | default -inf.          |
 +------------------------+------------------------+------------------------+
-| NLPSOL_UBG             |                        | Constraints upper      |
+| NLPSOL_UBG             | ubg                    | Constraints upper      |
 |                        |                        | bound (ng x 1),        |
 |                        |                        | default +inf.          |
 +------------------------+------------------------+------------------------+
-| NLPSOL_LAM_X0          |                        | Lagrange multipliers   |
+| NLPSOL_LAM_X0          | lam_x0                 | Lagrange multipliers   |
 |                        |                        | for bounds on X,       |
 |                        |                        | initial guess (nx x 1) |
 +------------------------+------------------------+------------------------+
-| NLPSOL_LAM_G0          |                        | Lagrange multipliers   |
+| NLPSOL_LAM_G0          | lam_g0                 | Lagrange multipliers   |
 |                        |                        | for bounds on G,       |
 |                        |                        | initial guess (ng x 1) |
 +------------------------+------------------------+------------------------+
 
->Output scheme: casadi::NlpsolOutput (NLPSOL_NUM_OUT = 6) []
+>Output scheme: casadi::NlpsolOutput (NLPSOL_NUM_OUT = 6)
 
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
-| NLPSOL_X               |                        | Decision variables at  |
+| NLPSOL_X               | x                      | Decision variables at  |
 |                        |                        | the optimal solution   |
 |                        |                        | (nx x 1)               |
 +------------------------+------------------------+------------------------+
-| NLPSOL_F               |                        | Cost function value at |
+| NLPSOL_F               | f                      | Cost function value at |
 |                        |                        | the optimal solution   |
 |                        |                        | (1 x 1)                |
 +------------------------+------------------------+------------------------+
-| NLPSOL_G               |                        | Constraints function   |
+| NLPSOL_G               | g                      | Constraints function   |
 |                        |                        | at the optimal         |
 |                        |                        | solution (ng x 1)      |
 +------------------------+------------------------+------------------------+
-| NLPSOL_LAM_X           |                        | Lagrange multipliers   |
+| NLPSOL_LAM_X           | lam_x                  | Lagrange multipliers   |
 |                        |                        | for bounds on X at the |
 |                        |                        | solution (nx x 1)      |
 +------------------------+------------------------+------------------------+
-| NLPSOL_LAM_G           |                        | Lagrange multipliers   |
+| NLPSOL_LAM_G           | lam_g                  | Lagrange multipliers   |
 |                        |                        | for bounds on G at the |
 |                        |                        | solution (ng x 1)      |
 +------------------------+------------------------+------------------------+
-| NLPSOL_LAM_P           |                        | Lagrange multipliers   |
+| NLPSOL_LAM_P           | lam_p                  | Lagrange multipliers   |
 |                        |                        | for bounds on P at the |
 |                        |                        | solution (np x 1)      |
 +------------------------+------------------------+------------------------+
