@@ -1604,16 +1604,6 @@ namespace casadi {
   Function FunctionInternal::reverse_old(int nadj) {
     casadi_assert(nadj>=0);
 
-    // Check if there are enough adjoint directions allocated
-    if (nadj>=derivative_adj_.size()) {
-      derivative_adj_.resize(nadj+1);
-    }
-
-    // Quick return if already cached
-    if (derivative_adj_[nadj].alive()) {
-      return shared_cast<Function>(derivative_adj_[nadj].shared());
-    }
-
     // Give it a suitable name
     stringstream ss;
     ss << "adj" << nadj << "_" << name_;
@@ -1690,9 +1680,6 @@ namespace casadi {
                             << o_names.at(i) << "\". Expected " << sp.size()
                             << " but got " << ret.size_out(i));
     }
-
-    // Save to cache
-    derivative_adj_[nadj] = ret;
 
     // Return generated function
     return ret;
