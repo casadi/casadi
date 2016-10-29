@@ -802,7 +802,7 @@ namespace casadi {
     std::vector<WeakRef> forward_, reverse_;
 
     /// Cache for functions to evaluate directional derivatives
-    std::vector<WeakRef> derivative_fwd_, derivative_adj_;
+    std::vector<WeakRef> derivative_adj_;
 
     /// Cache for full Jacobian
     WeakRef full_jacobian_;

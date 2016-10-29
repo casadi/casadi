@@ -1438,16 +1438,6 @@ namespace casadi {
   Function FunctionInternal::forward_old(int nfwd) {
     casadi_assert(nfwd>=0);
 
-    // Check if there are enough forward directions allocated
-    if (nfwd>=derivative_fwd_.size()) {
-      derivative_fwd_.resize(nfwd+1);
-    }
-
-    // Quick return if already cached
-    if (derivative_fwd_[nfwd].alive()) {
-      return shared_cast<Function>(derivative_fwd_[nfwd].shared());
-    }
-
     // Give it a suitable name
     stringstream ss;
     ss << "fwd" << nfwd << "_" << name_;
@@ -1523,9 +1513,6 @@ namespace casadi {
                             << o_names.at(i) << "\". Expected " << sp.size()
                             << " but got " << ret.size_out(i));
     }
-
-    // Save to cache
-    derivative_fwd_[nfwd] = ret;
 
     // Return generated function
     return ret;
