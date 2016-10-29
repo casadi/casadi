@@ -177,43 +177,39 @@ int main(int argc, char *argv[]) {
 
   // Make sure that both integrators give consistent results
   for(int integ=0; integ<2; ++integ){
-    Function integrator = integ==0 ? Function(irk_integrator) : Function(ref_integrator);
+    Function F = integ==0 ? Function(irk_integrator) : Function(ref_integrator);
     cout << "-------" << endl;
-    cout << "Testing " << integrator.name() << endl;
+    cout << "Testing " << F.name() << endl;
     cout << "-------" << endl;
 
-    // Generate a new function that calculates two forward directions and one adjoint direction
-    Function dintegrator = integrator.derivative(2,1);
-
+    // Generate a new function that calculates forward and reverse directional derivatives
+    Function dF = F.factory("dF", {"x0", "p", "fwd:x0", "fwd:p", "adj:xf"},
+                                  {"xf", "fwd:xf", "adj:x0", "adj:p"});
+  
     // Arguments for evaluation
     map<string, DM> arg, res;
-    arg["der_x0"] = x0_val;
-    arg["der_p"] = p_val;
+    arg["x0"] = x0_val;
+    arg["p"] = p_val;
 
-    // Forward sensitivity analysis, first direction: seed p
-    arg["fwd0_x0"] = 0;
-    arg["fwd0_p"] = 1;
-
-    // Forward sensitivity analysis, second direction: seed x0[0]
-    arg["fwd1_x0"] = vector<double>{1, 0, 0};
-    arg["fwd1_p"] = 0;
+    // Forward sensitivity analysis, first direction: seed p and x0[0]
+    arg["fwd_x0"] = vector<double>{1, 0, 0};
+    arg["fwd_p"] = 1;
 
     // Adjoint sensitivity analysis, seed xf[2]
-    arg["adj0_xf"] = vector<double>{0, 0, 1};
+    arg["adj_xf"] = vector<double>{0, 0, 1};
 
     // Integrate
-    res = dintegrator(arg);
+    res = dF(arg);
 
     // Get the nondifferentiated results
-    cout << setw(15) << "xf = " << res.at("der_xf") << endl;
+    cout << setw(15) << "xf = " << res.at("xf") << endl;
 
     // Get the forward sensitivities
-    cout << setw(15) << "d(xf)/d(p) = " <<  res.at("fwd0_xf") << endl;
-    cout << setw(15) << "d(xf)/d(x0[0]) = " << res.at("fwd1_xf") << endl;
+    cout << setw(15) << "d(xf)/d(p)+d(xf)/d(x0[0]) = " <<  res.at("fwd_xf") << endl;
 
     // Get the adjoint sensitivities
-    cout << setw(15) << "d(xf[2])/d(x0) = " << res.at("adj0_x0") << endl;
-    cout << setw(15) << "d(xf[2])/d(p) = " << res.at("adj0_p") << endl;
+    cout << setw(15) << "d(xf[2])/d(x0) = " << res.at("adj_x0") << endl;
+    cout << setw(15) << "d(xf[2])/d(p) = " << res.at("adj_p") << endl;
   }
   return 0;
 }

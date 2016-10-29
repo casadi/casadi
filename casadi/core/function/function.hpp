@@ -702,8 +702,10 @@ namespace casadi {
                         double r, int n,
                         const Dict& opts=Dict()) const;
 
+#ifdef WITH_DEPRECATED_FEATURES
     /** \brief [DEPRECATED] Use forward_new and reverse_new instead. */
     Function derivative(int nfwd, int nadj);
+#endif // WITH_DEPRECATED_FEATURES
 
     /** \brief Get a function that calculates \a nfwd forward derivatives
      *

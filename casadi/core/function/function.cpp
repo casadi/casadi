@@ -761,6 +761,7 @@ namespace casadi {
     }
   }
 
+  #ifdef WITH_DEPRECATED_FEATURES
   Function Function::derivative(int nfwd, int nadj) {
     // Quick return
     if (nfwd==0 && nadj==0) return *this;
@@ -911,6 +912,7 @@ namespace casadi {
     }
     return ret;
   }
+#endif // WITH_DEPRECATED_FEATURES
 
   Function Function::forward(int nfwd) {
     return (*this)->forward_old(nfwd);
