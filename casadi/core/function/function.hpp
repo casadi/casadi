@@ -790,12 +790,6 @@ namespace casadi {
     /** \brief [DEPRECATED] Use reverse_new instead */
     Function reverse(int nfwd);
 
-    /** \brief [DEPRECATED] Set a function that calculates \a nfwd forward derivatives */
-    void set_forward(const Function& fcn, int nfwd);
-
-    /** \brief [DEPRECATED] Set a function that calculates \a nadj adjoint derivatives */
-    void set_reverse(const Function& fcn, int nadj);
-
     ///@{
     /// Get, if necessary generate, the sparsity of a Jacobian block
     const Sparsity sparsity_jac(int iind=0, int oind=0, bool compact=false, bool symmetric=false);

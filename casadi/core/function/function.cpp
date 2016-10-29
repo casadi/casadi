@@ -928,14 +928,6 @@ namespace casadi {
     return (*this)->reverse(nadj);
   }
 
-  void Function::set_forward(const Function& fcn, int nfwd) {
-    (*this)->set_forward(fcn, nfwd);
-  }
-
-  void Function::set_reverse(const Function& fcn, int nadj) {
-    (*this)->set_reverse(fcn, nadj);
-  }
-
   void Function::print_dimensions(ostream &stream) const {
     (*this)->print_dimensions(stream);
   }

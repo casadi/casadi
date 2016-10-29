@@ -364,7 +364,6 @@ namespace casadi {
     virtual Function get_forward_new(const std::string& name, int nfwd, Dict& opts);
     virtual Function get_forward(const std::string& name, int nfwd, Dict& opts);
     virtual int get_n_forward() const { return 0;}
-    void set_forward(const Function& fcn, int nfwd);
     ///@}
 
     ///@{
@@ -379,7 +378,6 @@ namespace casadi {
     virtual Function get_reverse_new(const std::string& name, int nadj, Dict& opts);
     virtual Function get_reverse(const std::string& name, int nadj, Dict& opts);
     virtual int get_n_reverse() const { return 0;}
-    void set_reverse(const Function& fcn, int nadj);
     ///@}
 
     /** \brief Get oracle */

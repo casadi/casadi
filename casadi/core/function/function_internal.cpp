@@ -1794,28 +1794,6 @@ namespace casadi {
     return ret;
   }
 
-  void FunctionInternal::set_forward(const Function& fcn, int nfwd) {
-
-    // Check if there are enough forward directions allocated
-    if (nfwd>=derivative_fwd_.size()) {
-      derivative_fwd_.resize(nfwd+1);
-    }
-
-    // Save to cache
-    derivative_fwd_[nfwd] = fcn;
-  }
-
-  void FunctionInternal::set_reverse(const Function& fcn, int nadj) {
-
-    // Check if there are enough adjoint directions allocated
-    if (nadj>=derivative_adj_.size()) {
-      derivative_adj_.resize(nadj+1);
-    }
-
-    // Save to cache
-    derivative_adj_[nadj] = fcn;
-  }
-
   Function FunctionInternal::get_forward_old(const std::string& name, int nfwd, Dict& opts) {
     // Call new implementation
     Function d = forward(nfwd);
