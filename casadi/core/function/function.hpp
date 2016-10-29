@@ -568,13 +568,7 @@ namespace casadi {
 
     /// \cond INTERNAL
     ///@{
-   /** \brief Evaluate the function symbolically or numerically with directional derivatives
-     * The first two arguments are the nondifferentiated inputs and results of the evaluation,
-     * the next two arguments are a set of forward directional seeds and the resulting forward
-     * directional derivatives, the length of the vector being the number of forward directions.
-     * The next two arguments are a set of adjoint directional seeds and the resulting adjoint
-     * directional derivatives, the length of the vector being the number of adjoint directions.
-     */
+    /** \brief [DEPRECATED] Use forward_new and reverse_new instead. */
     void derivative(const DMVector& arg, DMVector& SWIG_OUTPUT(res),
                     const DMVectorVector& fseed, DMVectorVector& SWIG_OUTPUT(fsens),
                     const DMVectorVector& aseed, DMVectorVector& SWIG_OUTPUT(asens),
@@ -728,24 +722,7 @@ namespace casadi {
                         double r, int n,
                         const Dict& opts=Dict()) const;
 
-    /** \brief Get a function that calculates \a nfwd forward derivatives and nadj adjoint derivatives
-     *         Legacy function: Use forward and reverse instead.
-     *
-     *         Returns a function with <tt>(1+nfwd)*n_in+nadj*n_out</tt> inputs
-     *         and <tt>(1+nfwd)*n_out + nadj*n_in</tt> outputs.
-     *         The first <tt>n_in</tt> inputs correspond to nondifferentiated inputs.
-     *         The next <tt>nfwd*n_in</tt> inputs correspond to forward seeds,
-     *         one direction at a time
-     *         and the last <tt>nadj*n_out</tt> inputs correspond to adjoint seeds,
-     *         one direction at a time.
-     *         The first n_out outputs correspond to nondifferentiated outputs.
-     *         The next <tt>nfwd*n_out</tt> outputs correspond to forward sensitivities,
-     *         one direction at a time and the last <tt>nadj*n_in</tt> outputs corresponds to
-     *         adjoint sensitivities, one direction at a time.
-     *
-     *         <tt>(n_in = n_in(), n_out = n_out())</tt>
-     *
-     */
+    /** \brief [DEPRECATED] Use forward_new and reverse_new instead. */
     Function derivative(int nfwd, int nadj);
 
     /** \brief Get a function that calculates \a nfwd forward derivatives
