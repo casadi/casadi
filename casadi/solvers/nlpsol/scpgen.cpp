@@ -267,13 +267,13 @@ namespace casadi {
 
       // Adjoint sweep to get the definitions of the lifted dual variables
       // (Equation 3.8 in Albersmeyer2010)
-      vector<vector<MX> > fseed, fsens, aseed(1), asens(1);
+      vector<vector<MX> > aseed(1), asens(1);
       aseed[0].push_back(1.0);
       aseed[0].push_back(g_lam);
       for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
         aseed[0].push_back(it->v_lam);
       }
-      vdef_fcn.derivative(vdef_in, vdef_out, fseed, fsens, aseed, asens, true);
+      vdef_fcn.reverse(vdef_in, vdef_out, aseed, asens, true);
       i=0;
 
       gL_defL = asens[0].at(i++);
@@ -454,7 +454,6 @@ namespace casadi {
 
     // Directional derivative of Z
     vector<vector<MX> > mfcn_fwdSeed(1, mfcn_in), mfcn_fwdSens(1, mfcn_out);
-    vector<vector<MX> > mfcn_adjSeed,            mfcn_adjSens;
 
     // Linearization in the d-direction (see Equation (2.12) in Alberspeyer2010)
     fill(mfcn_fwdSeed[0].begin(), mfcn_fwdSeed[0].end(), MX());
@@ -464,8 +463,7 @@ namespace casadi {
         mfcn_fwdSeed[0][it->mod_lam] = it->d_lam;
       }
     }
-    mfcn.derivative(mfcn_in, mfcn_out, mfcn_fwdSeed, mfcn_fwdSens,
-                        mfcn_adjSeed, mfcn_adjSens, true);
+    mfcn.forward(mfcn_in, mfcn_out, mfcn_fwdSeed, mfcn_fwdSens, true);
 
     // Vector(s) b in Lifted Newton
     MX b_gf = densify(mfcn_fwdSens[0][mod_gl_]);
@@ -503,9 +501,7 @@ namespace casadi {
         mfcn_fwdSeed[0][it->mod_lam] = -it->d_lam;
       }
     }
-
-    mfcn.derivative(mfcn_in, mfcn_out, mfcn_fwdSeed, mfcn_fwdSens,
-                        mfcn_adjSeed, mfcn_adjSens, true);
+    mfcn.forward(mfcn_in, mfcn_out, mfcn_fwdSeed, mfcn_fwdSens, true);
 
     // Step expansion function inputs
     n = mfcn_in.size();

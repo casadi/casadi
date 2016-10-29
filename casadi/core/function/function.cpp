@@ -962,33 +962,6 @@ namespace casadi {
     return (*this)->checkInputs();
   }
 
-  void Function::derivative(const DMVector& arg, DMVector& res,
-                          const DMVectorVector& fseed, DMVectorVector& fsens,
-                          const DMVectorVector& aseed, DMVectorVector& asens,
-                          bool always_inline, bool never_inline) {
-    call(arg, res, always_inline, never_inline);
-    forward(arg, res, fseed, fsens, always_inline, never_inline);
-    reverse(arg, res, aseed, asens, always_inline, never_inline);
-  }
-
-  void Function::derivative(const SXVector& arg, SXVector& res,
-                          const SXVectorVector& fseed, SXVectorVector& fsens,
-                          const SXVectorVector& aseed, SXVectorVector& asens,
-                          bool always_inline, bool never_inline) {
-    call(arg, res, always_inline, never_inline);
-    forward(arg, res, fseed, fsens, always_inline, never_inline);
-    reverse(arg, res, aseed, asens, always_inline, never_inline);
-  }
-
-  void Function::derivative(const MXVector& arg, MXVector& res,
-                          const MXVectorVector& fseed, MXVectorVector& fsens,
-                          const MXVectorVector& aseed, MXVectorVector& asens,
-                          bool always_inline, bool never_inline) {
-    call(arg, res, always_inline, never_inline);
-    forward(arg, res, fseed, fsens, always_inline, never_inline);
-    reverse(arg, res, aseed, asens, always_inline, never_inline);
-  }
-
   string Function::name() const {
     if (is_null()) {
       return "null";

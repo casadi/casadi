@@ -566,26 +566,6 @@ namespace casadi {
                  std::vector<std::vector<DM> >& SWIG_OUTPUT(asens),
                  bool always_inline=false, bool never_inline=false);
 
-    /// \cond INTERNAL
-    ///@{
-    /** \brief [DEPRECATED] Use forward_new and reverse_new instead. */
-    void derivative(const DMVector& arg, DMVector& SWIG_OUTPUT(res),
-                    const DMVectorVector& fseed, DMVectorVector& SWIG_OUTPUT(fsens),
-                    const DMVectorVector& aseed, DMVectorVector& SWIG_OUTPUT(asens),
-                    bool always_inline=false, bool never_inline=false);
-
-    void derivative(const SXVector& arg, SXVector& SWIG_OUTPUT(res),
-                    const SXVectorVector& fseed, SXVectorVector& SWIG_OUTPUT(fsens),
-                    const SXVectorVector& aseed, SXVectorVector& SWIG_OUTPUT(asens),
-                    bool always_inline=false, bool never_inline=false);
-
-    void derivative(const MXVector& arg, MXVector& SWIG_OUTPUT(res),
-                    const MXVectorVector& fseed, MXVectorVector& SWIG_OUTPUT(fsens),
-                    const MXVectorVector& aseed, MXVectorVector& SWIG_OUTPUT(asens),
-                    bool always_inline=false, bool never_inline=false);
-    ///@}
-    /// \endcond
-
     /** \brief  Evaluate symbolically in parallel (matrix graph)
         \param parallelization Type of parallelization used: unroll|serial|openmp
     */
