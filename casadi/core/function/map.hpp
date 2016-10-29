@@ -114,6 +114,7 @@ namespace casadi {
 
     ///@{
     /** \brief Generate a function that calculates \a nadj adjoint derivatives */
+    virtual Function get_reverse(const std::string& name, int nadj, Dict& opts);
     virtual Function get_reverse_old(const std::string& name, int nadj, Dict& opts);
     virtual int get_n_reverse() const { return 64;}
     ///@}
