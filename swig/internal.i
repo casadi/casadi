@@ -58,15 +58,6 @@
 %exception  casadi::Function::checkInputs() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Function::derivative(const DMVector &arg, DMVector &output_res, const DMVectorVector &fseed, DMVectorVector &output_fsens, const DMVectorVector &aseed, DMVectorVector &output_asens, bool always_inline=false, bool never_inline=false) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Function::derivative(const MXVector &arg, MXVector &output_res, const MXVectorVector &fseed, MXVectorVector &output_fsens, const MXVectorVector &aseed, MXVectorVector &output_asens, bool always_inline=false, bool never_inline=false) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Function::derivative(const SXVector &arg, SXVector &output_res, const SXVectorVector &fseed, SXVectorVector &output_fsens, const SXVectorVector &aseed, SXVectorVector &output_asens, bool always_inline=false, bool never_inline=false) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::Function::spCanEvaluate(bool fwd) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }

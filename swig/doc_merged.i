@@ -530,12 +530,6 @@ length of iw field.
 
 ";
 
-%feature("docstring") casadi::Callback::set_reverse "
-
-[DEPRECATED] Set a function that calculates nadj adjoint derivatives
-
-";
-
 %feature("docstring") casadi::Callback::n_nodes "
 
 Number of nodes in the algorithm.
@@ -860,38 +854,7 @@ that the input must be scalar. In other cases, use the Jacobian instead.
 
 %feature("docstring") casadi::Callback::derivative "
 
->  void casadi::Function::derivative(const DMVector &arg, DMVector &output_res, const DMVectorVector &fseed, DMVectorVector &output_fsens, const DMVectorVector &aseed, DMVectorVector &output_asens, bool always_inline=false, bool never_inline=false)
-
->  void casadi::Function::derivative(const SXVector &arg, SXVector &output_res, const SXVectorVector &fseed, SXVectorVector &output_fsens, const SXVectorVector &aseed, SXVectorVector &output_asens, bool always_inline=false, bool never_inline=false)
-
->  void casadi::Function::derivative(const MXVector &arg, MXVector &output_res, const MXVectorVector &fseed, MXVectorVector &output_fsens, const MXVectorVector &aseed, MXVectorVector &output_asens, bool always_inline=false, bool never_inline=false)
-------------------------------------------------------------------------
-[INTERNAL] 
-Evaluate the function symbolically or numerically with directional
-derivatives The first two arguments are the nondifferentiated inputs
-and results of the evaluation, the next two arguments are a set of
-forward directional seeds and the resulting forward directional
-derivatives, the length of the vector being the number of forward
-directions. The next two arguments are a set of adjoint directional
-seeds and the resulting adjoint directional derivatives, the length of
-the vector being the number of adjoint directions.
-
->  Function casadi::Function::derivative(int nfwd, int nadj)
-------------------------------------------------------------------------
-
-Get a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives Legacy function: Use forward and reverse instead.
-
-Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
-inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
-at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
-direction at a time. The first n_out outputs correspond to nondifferentiated
-outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
-one direction at a time and the last nadj*n_in outputs corresponds to
-adjoint sensitivities, one direction at a time.
-
-(n_in = n_in(), n_out = n_out())
+[DEPRECATED] Use forward_new and reverse_new instead.
 
 ";
 
@@ -1244,12 +1207,6 @@ Get output dimension.
 
 Generate a Jacobian function of all the inputs elements with respect to all
 the output elements).
-
-";
-
-%feature("docstring") casadi::Callback::set_forward "
-
-[DEPRECATED] Set a function that calculates nfwd forward derivatives
 
 ";
 
@@ -2065,8 +2022,6 @@ Name of the function.
 
 ";
 
-%feature("docstring") casadi::Function::has_function "";
-
 %feature("docstring") casadi::Function::checkInputs "[INTERNAL]  Check if
 the numerical values of the supplied bounds make sense.
 
@@ -2139,6 +2094,13 @@ Get an atomic operation operator index.
 
 ";
 
+%feature("docstring") casadi::Function::spCanEvaluate "[INTERNAL]  Is the
+class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
+
+";
+
 %feature("docstring") casadi::Function::printOptions "
 
 [DEPRECATED] printOptions has been renamed print_options
@@ -2148,12 +2110,6 @@ Get an atomic operation operator index.
 %feature("docstring") casadi::Function::getAlgorithmSize "
 
 Get the number of atomic operations.
-
-";
-
-%feature("docstring") casadi::Function::set_reverse "
-
-[DEPRECATED] Set a function that calculates nadj adjoint derivatives
 
 ";
 
@@ -2285,38 +2241,7 @@ The the mapaccumulated version has the signature:
 
 %feature("docstring") casadi::Function::derivative "
 
->  void casadi::Function::derivative(const DMVector &arg, DMVector &output_res, const DMVectorVector &fseed, DMVectorVector &output_fsens, const DMVectorVector &aseed, DMVectorVector &output_asens, bool always_inline=false, bool never_inline=false)
-
->  void casadi::Function::derivative(const SXVector &arg, SXVector &output_res, const SXVectorVector &fseed, SXVectorVector &output_fsens, const SXVectorVector &aseed, SXVectorVector &output_asens, bool always_inline=false, bool never_inline=false)
-
->  void casadi::Function::derivative(const MXVector &arg, MXVector &output_res, const MXVectorVector &fseed, MXVectorVector &output_fsens, const MXVectorVector &aseed, MXVectorVector &output_asens, bool always_inline=false, bool never_inline=false)
-------------------------------------------------------------------------
-[INTERNAL] 
-Evaluate the function symbolically or numerically with directional
-derivatives The first two arguments are the nondifferentiated inputs
-and results of the evaluation, the next two arguments are a set of
-forward directional seeds and the resulting forward directional
-derivatives, the length of the vector being the number of forward
-directions. The next two arguments are a set of adjoint directional
-seeds and the resulting adjoint directional derivatives, the length of
-the vector being the number of adjoint directions.
-
->  Function casadi::Function::derivative(int nfwd, int nadj)
-------------------------------------------------------------------------
-
-Get a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives Legacy function: Use forward and reverse instead.
-
-Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
-inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
-at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
-direction at a time. The first n_out outputs correspond to nondifferentiated
-outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
-one direction at a time and the last nadj*n_in outputs corresponds to
-adjoint sensitivities, one direction at a time.
-
-(n_in = n_in(), n_out = n_out())
+[DEPRECATED] Use forward_new and reverse_new instead.
 
 ";
 
@@ -2377,12 +2302,6 @@ Is a null pointer?
 %feature("docstring") casadi::Function::printOption "
 
 [DEPRECATED] printOption has been renamed print_option
-
-";
-
-%feature("docstring") casadi::Function::set_forward "
-
-[DEPRECATED] Set a function that calculates nfwd forward derivatives
 
 ";
 
@@ -3075,12 +2994,7 @@ length of w field.
 
 ";
 
-%feature("docstring") casadi::Function::spCanEvaluate "[INTERNAL]  Is the
-class able to propagate seeds through the algorithm?
-
-(for usage, see the example propagating_sparsity.cpp)
-
-";
+%feature("docstring") casadi::Function::has_function "";
 
 %feature("docstring") casadi::Function::sx_out "
 

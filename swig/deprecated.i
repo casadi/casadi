@@ -1,3 +1,6 @@
+%exception  casadi::Function::derivative(int nfwd, int nadj) {
+ CATCH_OR_NOT(DEPRECATED_MSG("") $action)
+}
 %exception  casadi::Function::forward(int nfwd) {
  CATCH_OR_NOT(DEPRECATED_MSG("") $action)
 }
@@ -14,12 +17,6 @@
  CATCH_OR_NOT(DEPRECATED_MSG("") $action)
 }
 %exception  casadi::Function::reverse(int nfwd) {
- CATCH_OR_NOT(DEPRECATED_MSG("") $action)
-}
-%exception  casadi::Function::set_forward(const Function &fcn, int nfwd) {
- CATCH_OR_NOT(DEPRECATED_MSG("") $action)
-}
-%exception  casadi::Function::set_reverse(const Function &fcn, int nadj) {
  CATCH_OR_NOT(DEPRECATED_MSG("") $action)
 }
 %exception  casadi::collocationInterpolators(const std::vector< double > &tau_root, std::vector< std::vector< double > > &output_C, std::vector< double > &output_D) {
