@@ -124,16 +124,15 @@ class LinearSolverTests(casadiTestCase):
         self.checkarray(Jf_out[0],Jb_out[0])
         self.checkarray(Jf_out[1],Jb_out[1])
 
-        d = solver.derivative(1,0)
+        d = solver.forward(1)
 
         r = numpy.random.rand(*A.shape)
 
-        d_in = [0]*d.n_in();d_in[0]=A.T
-        d_in[1]=r.T
+        d_in = [A.T, 5, r.T]
 
         d_out = d.call(d_in)
 
-        exact = d_out[1]
+        exact = d_out[0]
 
         solver_in = [0]*solver.n_in();solver_in[0]=A.T
         solver_out = solver(*solver_in)

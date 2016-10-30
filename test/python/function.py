@@ -639,7 +639,7 @@ class Functiontests(casadiTestCase):
 
     hs = []
     for n in [nlp, nlp.expand('nlp_expanded')]:
-        H = n.derivative(0,1).jacobian(0,2,False,True)
+        H = n.reverse(1).jacobian(0,0,False,True)
 
         h = H(der_x=1,adj0_f=1)[H.name_out(0)]
         hs.append(h)
@@ -1051,8 +1051,10 @@ class Functiontests(casadiTestCase):
         f.jacobian()
 
       with self.assertRaises(Exception):
-        f.derivative()
-
+        f.forward(1)
+      with self.assertRaises(Exception):
+        f.reverse(1)
+        
   def test_Callback_dimcheck(self):
       class Fun(Callback):
         def __init__(self):
