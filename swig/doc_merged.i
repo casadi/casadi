@@ -6997,6 +6997,14 @@ the spy command.
 
 %feature("docstring") casadi::Sparsity::repr "
 
+>  std::string casadi::Sparsity::repr(int k) const 
+------------------------------------------------------------------------
+
+Describe the nonzero location k as a string.
+
+>  void casadi::SharedObject::repr(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const 
+------------------------------------------------------------------------
+
 Print a representation of the object.
 
 ";
