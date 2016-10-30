@@ -289,4 +289,9 @@ end
 assert(all(size(DM([1 3]))==[1 2]))
 assert(all(size(DM([1;3]))==[2 1]))
 
+x=SX.sym('x');
+f= Function('f',{x},{x});
+
+f.map('mymap','serial',100,[0],[0])
+f.map('mymap','serial',100,{0},{0})
 
