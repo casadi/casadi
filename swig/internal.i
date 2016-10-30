@@ -520,6 +520,9 @@
 %exception casadi::Matrix< Scalar >::Matrix() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception casadi::Matrix< Scalar >::Matrix(const MX &x) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception casadi::Matrix< Scalar >::Matrix(const Matrix< Scalar > &m) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
