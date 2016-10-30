@@ -302,3 +302,41 @@ f= Function('f',{x},{x});
 f.map('mymap','serial',100,[0],[0])
 f.map('mymap','serial',100,{0},{0})
 
+x = SX.sym('x')
+y = SX.sym('y',2)
+z = SX.sym('z',2,2)
+a = SX.sym('a',Sparsity.upper(2))
+
+
+f = Function('f',{x,y,z,a},{x,y,z,a})
+F = returntypes('full',f);
+
+[a,b,c,d] = F(1,2,3,4);
+
+assert(~issparse(c));
+assert(~issparse(d));
+
+F = returntypes('sparse',f);
+
+[a,b,c,d] = F(1,2,3,4);
+
+assert(issparse(c));
+assert(issparse(d));
+
+F = returntypes('full|sparse',f);
+
+[a,b,c,d] = F(1,2,3,4);
+
+assert(~issparse(c));
+assert(issparse(d));
+
+F = returntypes({'sparse','full','sparse','full'},f);
+
+[a,b,c,d] = F(1,2,3,4);
+
+assert(issparse(a));
+assert(~issparse(b));
+assert(issparse(c));
+assert(~issparse(d));
+
+
