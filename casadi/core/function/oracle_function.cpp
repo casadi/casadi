@@ -218,9 +218,20 @@ namespace casadi {
     for (int i=0; i<n_out; ++i) {
       if (!m->res[i]) continue;
       if (!all_of(m->res[i], m->res[i]+f.nnz_out(i), [](double v) { return isfinite(v);})) {
-        userOut<true, PL_WARN>()
-          << name() << ":" << fcn << " failed: NaN or Inf detected for output "
-          << f.name_out(i) << endl;
+        std::stringstream ss;
+
+        auto it = find_if(m->res[i], m->res[i]+f.nnz_out(i), [](double v) { return !isfinite(v);});
+        int k = distance(m->res[i], it);
+        bool is_nan = isnan(m->res[i][k]);
+        ss << name() << ":" << fcn << " failed: " << (is_nan? "NaN" : "Inf") <<
+        " detected for output " << f.name_out(i) << ", at " << f.sparsity_out(i).repr(k) << ".";
+
+        if (regularity_check_) {
+          casadi_error(ss.str());
+        } else {
+          userOut<true, PL_WARN>() << ss.str() << endl;
+        }
+
         return -1;
       }
     }

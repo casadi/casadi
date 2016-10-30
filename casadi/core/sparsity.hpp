@@ -703,6 +703,9 @@ namespace casadi {
     /// Get the dimension as a string
     std::string dim() const;
 
+    /// Describe the nonzero location k as a string
+    std::string repr(int k) const;
+
     /** \brief Print a textual representation of sparsity
      */
     void spy(std::ostream &stream=casadi::userOut()) const;

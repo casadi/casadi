@@ -1919,6 +1919,18 @@ namespace casadi {
     return ss.str();
   }
 
+  std::string SparsityInternal::repr(int k) const {
+    std::stringstream ss;
+    if (numel()!=nnz()) {
+      ss << "nonzero index " << k << " ";
+    }
+    int r = row()[k];
+    int c = get_col()[k];
+    ss << "(row " << r << ", col " << c << ")";
+
+    return ss.str();
+  }
+
   Sparsity SparsityInternal::_mtimes(const Sparsity& y) const {
     // Dimensions of the result
     int d1 = size1();
