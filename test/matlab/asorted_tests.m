@@ -263,6 +263,13 @@ if has_nlpsol('bonmin')
   sol = solver('x0',[1 1]);
 
   assert(all(full(sol.x)==[3;4]))
+  
+  options = struct;
+  options.discrete = {true,true};
+  solver = nlpsol('solver', 'bonmin', nlp,options);
+  sol = solver('x0',[1 1]);
+
+  assert(all(full(sol.x)==[3;4]))
 end
 
 data = { [1 3;11 17] , [1 3] , [1;3] 3};

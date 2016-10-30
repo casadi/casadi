@@ -132,6 +132,7 @@ namespace casadi {
     bool is_int_vector() const;
     bool is_int_vector_vector() const;
     bool is_double_vector() const;
+    bool is_bool_vector() const;
     bool is_string_vector() const;
     bool is_dict() const;
     bool is_function() const;
@@ -145,6 +146,7 @@ namespace casadi {
     const double& as_double() const;
     const std::string& as_string() const;
     const std::vector<int>& as_int_vector() const;
+    const std::vector<int>& as_bool_vector() const;
     const std::vector<std::vector<int> >& as_int_vector_vector() const;
     const std::vector<double>& as_double_vector() const;
     const std::vector<std::string>& as_string_vector() const;

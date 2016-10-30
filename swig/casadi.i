@@ -701,6 +701,13 @@ import_array();
       // Standard typemaps
       if (SWIG_IsOK(SWIG_AsVal(bool)(p, m ? *m : 0))) return true;
 
+#ifdef SWIGMATLAB
+      if (mxIsLogicalScalar(p)) {
+        if (m) **m = mxIsLogicalScalarTrue(p);
+        return true;
+      }
+#endif
+      
       // No match
       return false;
     }
@@ -1143,6 +1150,7 @@ import_array();
           || to_generic<std::string>(p, m)
           || to_generic<std::vector<int> >(p, m)
           || to_generic<std::vector<double> >(p, m)
+          || to_generic<std::vector<bool> >(p, m)
           || to_generic<std::vector<std::string> >(p, m)
           || to_generic<std::vector<std::vector<int> > >(p, m)
           || to_generic<casadi::Function>(p, m)
@@ -1165,6 +1173,7 @@ import_array();
       case OT_STRING: return from_tmp(a->as_string());
       case OT_INTVECTOR: return from_tmp(a->as_int_vector());
       case OT_INTVECTORVECTOR: return from_tmp(a->as_int_vector_vector());
+      case OT_BOOLVECTOR: return from_tmp(a->as_bool_vector());
       case OT_DOUBLEVECTOR: return from_tmp(a->as_double_vector());
       case OT_STRINGVECTOR: return from_tmp(a->as_string_vector());
       case OT_DICT: return from_tmp(a->as_dict());
