@@ -43,6 +43,8 @@ namespace casadi {
   */
   struct CASADI_EXPORT MatrixCommon {};
 
+  class MX;
+
 /// \cond CLUTTER
   ///@{
   /** \brief Get typename */
@@ -148,6 +150,9 @@ namespace casadi {
       auto x_it = x->begin();
       for (auto&& d : nonzeros_) d = static_cast<Scalar>(*x_it++);
     }
+
+    /** \brief Create a matrix from a numeric MX */
+    explicit Matrix(const MX & x);
 
 #ifndef SWIG
     /// Construct from a vector

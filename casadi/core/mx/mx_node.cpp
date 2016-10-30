@@ -396,7 +396,7 @@ namespace casadi {
 
   Matrix<double> MXNode::getMatrixValue() const {
     casadi_error(string("MXNode::getMatrixValue not defined for class ")
-                 + typeid(*this).name());
+                 + typeid(*this).name() + ". Hint: Use Function to evaluate MX expression graphs.");
   }
 
   MX MXNode::getTranspose() const {

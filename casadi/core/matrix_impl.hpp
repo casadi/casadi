@@ -81,6 +81,13 @@ namespace casadi {
   }
 
   template<typename Scalar>
+  Matrix<Scalar>::Matrix(const MX & x) : sparsity_(x.sparsity()), nonzeros_(std::vector<Scalar>(x.nnz())) {
+    Matrix<double> y = x.operator Matrix<double>();
+    auto y_it = y->begin();
+    for (auto&& d : nonzeros_) d = static_cast<Scalar>(*y_it++);
+  }
+
+  template<typename Scalar>
   void Matrix<Scalar>::get(Matrix<Scalar>& m, bool ind1,
                              const Matrix<int>& rr, const Matrix<int>& cc) const {
     // Scalar
