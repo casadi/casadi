@@ -2862,6 +2862,11 @@ SPARSITY_INTERFACE_FUN(DECL, (FLAG | IS_SX), Matrix<SXElem>)
 #endif
 
 %define GENERIC_MATRIX_FUN(DECL, FLAG, M)
+#if defined(WITH_DEPRECATED_FEATURES) & FLAG & IS_MEMBER
+DECL std::vector<bool> casadi_nl_var(const M& expr, const M& var) {
+  return nl_var(expr, var);
+}
+#endif
 #if FLAG & IS_MEMBER
 DECL M casadi_mpower(const M& x, const M& n) {
   return mpower(x, n);
@@ -2997,14 +3002,6 @@ DECL bool casadi_depends_on(const M& f, const M& arg) {
   return depends_on(f, arg);
 }
 
-DECL std::vector<bool> casadi_vector_depends_on(const M& f, const M& arg) {
-  return vector_depends_on(f, arg);
-}
-
-DECL std::vector<bool> casadi_vector_linear_depends_on(const M& f, const M& arg) {
-  return vector_linear_depends_on(f, arg);
-}
-
 DECL M casadi_solve(const M& A, const M& b) {
   return solve(A, b);
 }
@@ -3032,8 +3029,9 @@ DECL M casadi_jtimes(const M& ex, const M& arg, const M& v, bool tr=false) {
   return jtimes(ex, arg, v, tr);
 }
 
-DECL std::vector<bool> casadi_nl_var(const M& expr, const M& var) {
-  return nl_var(expr, var);
+DECL std::vector<bool> casadi_which_depends(const M& expr, const M& var,
+                                            int order=1, bool tr=false) {
+  return which_depends(expr, var, order, tr);
 }
 
 DECL M casadi_gradient(const M &ex, const M &arg) {

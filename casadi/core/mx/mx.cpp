@@ -1560,8 +1560,14 @@ namespace casadi {
     return _jtimes(ex, arg, v, tr);
   }
 
+#ifdef WITH_DEPRECATED_FEATURES
   std::vector<bool> MX::nl_var(const MX &expr, const MX &var) {
     return _nl_var(expr, var);
+  }
+#endif
+
+  std::vector<bool> MX::which_depends(const MX &expr, const MX &var, int order, bool tr) {
+    return _which_depends(expr, var, order, tr);
   }
 
   MX MX::det(const MX& x) {
@@ -1672,66 +1678,6 @@ namespace casadi {
     }
 
     return false;
-  }
-
-
-  std::vector<bool> MX::vector_depends_on(const MX &x, const MX &arg) {
-    casadi_assert(x.is_vector());
-    casadi_assert(x.is_dense());
-
-    casadi_assert(arg.is_vector());
-    casadi_assert(arg.is_dense());
-
-    // Allocate return vector
-    std::vector<bool> ret(x.numel(), false);
-
-    // Construct a temporary algorithm
-    Function temp("temp", {arg}, {x});
-
-    // Perform a single dependency sweep
-    vector<bvec_t> t_in(arg.nnz(), 1), t_out(x.nnz());
-    temp({get_ptr(t_in)}, {get_ptr(t_out)});
-
-    // Harvest the results
-    for (int k = 0; k < x.numel(); ++k) {
-      if (t_out[k]) ret[k] = true;
-    }
-
-    return ret;
-  }
-
-  std::vector<bool> MX::vector_linear_depends_on(const MX &x, const MX &arg) {
-    casadi_assert(x.is_vector());
-    casadi_assert(x.is_dense());
-
-    casadi_assert(arg.is_vector());
-    casadi_assert(arg.is_dense());
-
-    // Allocate return vector
-    std::vector<bool> ret(x.numel(), true);
-
-    // Construct a temporary algorithm
-    Function temp("temp", {arg}, {jacobian(x, arg).T()});
-
-    // Perform a single dependency sweep
-    vector<bvec_t> t_in(arg.nnz(), 1), t_out(x.nnz());
-    temp({get_ptr(t_in)}, {get_ptr(t_out)});
-
-    const Sparsity& sp = temp.sparsity_out(0);
-
-    // Harvest the results
-    for (int j = 0; j < x.numel(); ++j) {
-      if (sp.colind(j) != sp.colind(j+1)) {
-        for (int k = sp.colind(j); k < sp.colind(j+1); ++k) {
-          if (t_out[k]) {
-            ret[j] = false;
-            break;
-          }
-        }
-      }
-    }
-
-    return ret;
   }
 
   MX MX::find(const MX& x) {

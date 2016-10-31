@@ -114,9 +114,24 @@ namespace casadi {
     // Check if a particular dependency exists
     virtual bool has_function(const std::string& fname) const {return false;}
 
-    /** \brief Which variables enter nonlinearly */
+#ifdef WITH_DEPRECATED_FEATURES
+    /** \brief [DEPRECATED] Which variables enter nonlinearly
+    *
+    * Use which_depends instead.
+    */
     virtual std::vector<bool> nl_var(const std::string& s_in,
-                                     const std::vector<std::string>& s_out) const;
+                             const std::vector<std::string>& s_out) const;
+#endif
+
+    /** \brief Which variables enter with some order
+    *
+    * \param[in] order Only 1 (linear) and 2 (nonlinear) allowed
+    * \param[in] tr   Flip the relationship. Return which expressions contain the variables
+    */
+    virtual std::vector<bool> which_depends(const std::string& s_in,
+                                           const std::vector<std::string>& s_out,
+                                           int order, bool tr=false) const;
+
 
     ///@{
     /** \brief Names of function input and outputs */

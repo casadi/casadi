@@ -1285,9 +1285,16 @@ namespace casadi {
      return (*this)->factory(name, s_in, s_out, aux, opts);
   }
 
+#ifdef WITH_DEPRECATED_FEATURES
   vector<bool> Function::nl_var(const string& s_in,
                                 const vector<string>& s_out) const {
     return (*this)->nl_var(s_in, s_out);
+  }
+#endif
+
+  vector<bool> Function::which_depends(const string& s_in,
+                                const vector<string>& s_out, int order, bool tr) const {
+    return (*this)->which_depends(s_in, s_out, order, tr);
   }
 
   std::vector<std::string> Function::get_function() const {

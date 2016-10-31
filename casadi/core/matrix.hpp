@@ -325,10 +325,6 @@ namespace casadi {
                                         const Matrix<Scalar> &x_default,
                                         bool short_circuit);
     static bool depends_on(const Matrix<Scalar> &x, const Matrix<Scalar> &arg);
-    static std::vector<bool> vector_depends_on(const Matrix<Scalar> &x,
-                                                 const Matrix<Scalar> &arg);
-    static std::vector<bool> vector_linear_depends_on(const Matrix<Scalar> &x,
-                                                        const Matrix<Scalar> &arg);
     static Matrix<Scalar> mpower(const Matrix<Scalar> &x, const Matrix<Scalar> &y);
     static Matrix<Scalar> mrdivide(const Matrix<Scalar> &x, const Matrix<Scalar> &y);
     static Matrix<Scalar> mldivide(const Matrix<Scalar> &x, const Matrix<Scalar> &y);
@@ -400,7 +396,11 @@ namespace casadi {
                                              const Matrix<Scalar>& w);
     static Matrix<Scalar> jtimes(const Matrix<Scalar> &ex, const Matrix<Scalar> &arg,
                                    const Matrix<Scalar> &v, bool tr=false);
+#ifdef WITH_DEPRECATED_FEATURES
     static std::vector<bool> nl_var(const Matrix<Scalar> &expr, const Matrix<Scalar> &var);
+#endif
+    static std::vector<bool> which_depends(const Matrix<Scalar> &expr, const Matrix<Scalar> &var,
+        int order=1, bool tr=false);
     static Matrix<Scalar> taylor(const Matrix<Scalar>& ex, const Matrix<Scalar>& x,
                                    const Matrix<Scalar>& a, int order);
     static Matrix<Scalar> mtaylor(const Matrix<Scalar>& ex, const Matrix<Scalar>& x,
