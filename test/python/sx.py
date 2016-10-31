@@ -1250,10 +1250,27 @@ class SXtests(casadiTestCase):
     e = vertcat(x*p,x+z*y)
     self.checkarray(which_depends(e, vertcat(x,y,p),2,False),[True, False, True])
     self.checkarray(which_depends(e, vertcat(x,y,p),1,False),[True, True, True])
+
+    e = vertcat(x*p,x+z*y)
+    self.checkarray(which_depends(e, vertcat(x,y,p,z),2,False),[True, True, True, True])
+    self.checkarray(which_depends(e, vertcat(x,y,p,z),1,False),[True, True, True, True])
     
     e = vertcat(sin(x+y)+p)
     self.checkarray(which_depends(e, vertcat(x,y,p,z),2,False),[True, True, False, False])
     self.checkarray(which_depends(e, vertcat(x,y,p,z),1,False),[True, True, True, False])
+    
+    e = vertcat(sin(x)*p**2,y**2)
+    #self.checkarray(which_depends(e, vertcat(x,y,p),3,True),[True, False])
+    #self.checkarray(which_depends(e, vertcat(x,y,p),3,False),[True, False, True])
+    self.checkarray(which_depends(e, vertcat(x,y,p),2,True),[True, True])
+    self.checkarray(which_depends(e, vertcat(x,y,p),2,False),[True, True, True])
+    
+    e = vertcat(x**2*p,y)
+    #self.checkarray(which_depends(e, vertcat(x,y,p),3,True),[True, False])
+    #self.checkarray(which_depends(e, vertcat(x,y,p),3,False),[True, False, False])
+    
+    self.checkarray(which_depends(e, vertcat(x,y,p),2,True),[True, False])
+    self.checkarray(which_depends(e, vertcat(x,y,p),2,False),[True, False, True])
     
   def test_if_else_zero_sens(self):
 

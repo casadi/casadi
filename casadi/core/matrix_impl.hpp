@@ -2718,17 +2718,18 @@ namespace casadi {
 
   template<typename MatType>
   std::vector<bool> _which_depends(const MatType &expr, const MatType &var, int order, bool tr) {
+    MatType e = expr;
+
     // Create a function for calculating a forward-mode derivative
-    Function f;
-    if (order==1) {
-      f = Function("tmp", {var}, {expr});
-    } else if (order==2) {
-      MatType v = MatType::sym("v", var.sparsity());
-      f = Function("tmp", {var}, {jtimes(expr, var, v)});
-    } else {
-      casadi_error("which_depends: order argument must be 1 or 2, got " << order << " instead.");
+    casadi_assert_message(order==1 || order==2,
+      "which_depends: order argument must be 1 or 2, got " << order << " instead.");
+
+    MatType v = MatType::sym("v", var.sparsity());
+    for (int i=1;i<order;++i) {
+      e = jtimes(e, var, v);
     }
-    f.printDimensions();
+
+    Function f = Function("tmp", {var}, {e});
     // Propagate sparsities backwards seeding all outputs
     std::vector<bvec_t> seed(tr? f.nnz_in(0) : f.nnz_out(0), 1);
     std::vector<bvec_t> sens(tr? f.nnz_out(0) : f.nnz_in(0), 0);
