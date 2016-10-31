@@ -164,12 +164,12 @@ int main(int argc, char *argv[]) {
   }
 
   // Fixed-step integrator
-  Function irk_integrator("irk_integrator", {{"x0", X0}, {"p", P}, {"xf", Xk}},
+  Function irk_integrator("irk_integrator", MXDict{{"x0", X0}, {"p", P}, {"xf", Xk}},
                           integrator_in(), integrator_out());
 
   // Create a convensional integrator for reference
   Function ref_integrator = integrator("ref_integrator",
-                                                 "cvodes", dae, {{"tf", tf}});
+                                       "cvodes", dae, {{"tf", tf}});
 
   // Test values
   vector<double> x0_val = {0, 1, 0};
@@ -177,7 +177,7 @@ int main(int argc, char *argv[]) {
 
   // Make sure that both integrators give consistent results
   for(int integ=0; integ<2; ++integ){
-    Function F = integ==0 ? Function(irk_integrator) : Function(ref_integrator);
+    Function F = integ==0 ? irk_integrator : ref_integrator;
     cout << "-------" << endl;
     cout << "Testing " << F.name() << endl;
     cout << "-------" << endl;
@@ -185,7 +185,7 @@ int main(int argc, char *argv[]) {
     // Generate a new function that calculates forward and reverse directional derivatives
     Function dF = F.factory("dF", {"x0", "p", "fwd:x0", "fwd:p", "adj:xf"},
                                   {"xf", "fwd:xf", "adj:x0", "adj:p"});
-  
+
     // Arguments for evaluation
     map<string, DM> arg, res;
     arg["x0"] = x0_val;
