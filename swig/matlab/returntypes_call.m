@@ -8,8 +8,10 @@ function varargout = returntypes_call(type,f, varargin)
   % Type may be a cell array, indicating a type for each individual output
   [varargout{1:nargout}] = f(varargin{:});
   if ~iscell(type)
-    typecell = cell(1,nargout);
-    typecell(:) = type;
+    typecell = cell(1,numel(varargout));
+    for i=1:numel(varargout)
+      typecell{i} = type;
+    end
     type = typecell;
   end
   for i=1:numel(varargout)
