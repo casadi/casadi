@@ -129,14 +129,12 @@ namespace casadi {
     ///@{
     /** \brief Generate a function that calculates \a nfwd forward derivatives */
     virtual Function get_forward(const std::string& name, int nfwd, Dict& opts);
-    virtual Function get_forward_old(const std::string& name, int nfwd, Dict& opts);
     virtual int get_n_forward() const { return 64;}
     ///@}
 
     ///@{
     /** \brief Generate a function that calculates \a nadj adjoint derivatives */
     virtual Function get_reverse(const std::string& name, int nadj, Dict& opts);
-    virtual Function get_reverse_old(const std::string& name, int nadj, Dict& opts);
     virtual int get_n_reverse() const { return 64;}
     ///@}
 
@@ -1025,43 +1023,6 @@ namespace casadi {
 
   template<typename DerivedType, typename MatType, typename NodeType>
   Function XFunction<DerivedType, MatType, NodeType>
-  ::get_forward_old(const std::string& name, int nfwd, Dict& opts) {
-    // Seeds
-    std::vector<std::vector<MatType> > fseed = symbolicFwdSeed(nfwd, in_), fsens;
-
-    // Evaluate symbolically
-    static_cast<DerivedType*>(this)->evalFwd(fseed, fsens);
-    casadi_assert(fsens.size()==fseed.size());
-
-    // Number inputs and outputs
-    int num_in = n_in();
-    int num_out = n_out();
-
-    // All inputs of the return function
-    std::vector<MatType> ret_in;
-    ret_in.reserve(num_in + num_out + nfwd*num_in);
-    ret_in.insert(ret_in.end(), in_.begin(), in_.end());
-    for (int i=0; i<num_out; ++i) {
-      std::stringstream ss;
-      ss << "dummy_output_" << i;
-      ret_in.push_back(MatType::sym(ss.str(), Sparsity(out_.at(i).size())));
-    }
-    for (int d=0; d<nfwd; ++d)
-      ret_in.insert(ret_in.end(), fseed[d].begin(), fseed[d].end());
-
-    // All outputs of the return function
-    std::vector<MatType> ret_out;
-    ret_out.reserve(num_out*nfwd);
-    for (int d=0; d<nfwd; ++d) {
-      ret_out.insert(ret_out.end(), fsens[d].begin(), fsens[d].end());
-    }
-
-    // Assemble function and return
-    return Function(name, ret_in, ret_out, opts);
-  }
-
-  template<typename DerivedType, typename MatType, typename NodeType>
-  Function XFunction<DerivedType, MatType, NodeType>
   ::get_forward(const std::string& name, int nfwd, Dict& opts) {
     // Seeds
     std::vector<std::vector<MatType> > fseed = symbolicFwdSeed(nfwd, in_), fsens;
@@ -1135,42 +1096,6 @@ namespace casadi {
     for (int i=0; i<num_in; ++i) {
       for (int d=0; d<nadj; ++d) v[d] = asens[d][i];
       ret_out.push_back(horzcat(v));
-    }
-
-    // Assemble function and return
-    return Function(name, ret_in, ret_out, opts);
-  }
-
-  template<typename DerivedType, typename MatType, typename NodeType>
-  Function XFunction<DerivedType, MatType, NodeType>
-  ::get_reverse_old(const std::string& name, int nadj, Dict& opts) {
-    // Seeds
-    std::vector<std::vector<MatType> > aseed = symbolicAdjSeed(nadj, out_), asens;
-
-    // Evaluate symbolically
-    static_cast<DerivedType*>(this)->evalAdj(aseed, asens);
-
-    // Number inputs and outputs
-    int num_in = n_in();
-    int num_out = n_out();
-
-    // All inputs of the return function
-    std::vector<MatType> ret_in;
-    ret_in.reserve(num_in + num_out + nadj*num_out);
-    ret_in.insert(ret_in.end(), in_.begin(), in_.end());
-    for (int i=0; i<num_out; ++i) {
-      std::stringstream ss;
-      ss << "dummy_output_" << i;
-      ret_in.push_back(MatType::sym(ss.str(), Sparsity(out_.at(i).size())));
-    }
-    for (int d=0; d<nadj; ++d)
-      ret_in.insert(ret_in.end(), aseed[d].begin(), aseed[d].end());
-
-    // All outputs of the return function
-    std::vector<MatType> ret_out;
-    ret_out.reserve(num_in*nadj);
-    for (int d=0; d<nadj; ++d) {
-      ret_out.insert(ret_out.end(), asens[d].begin(), asens[d].end());
     }
 
     // Assemble function and return

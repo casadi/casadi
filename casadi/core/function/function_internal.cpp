@@ -1802,8 +1802,12 @@ namespace casadi {
     // Expressions for outputs
     vector<MX> res(n_out()*nfwd);
     for (int i=0; i<n_out(); ++i) {
-      v = horzsplit(d_res[i], size2_out(i));
-      casadi_assert(v.size()==nfwd);
+      if (size2_out(i)>0) {
+        v = horzsplit(d_res[i], size2_out(i));
+        casadi_assert(v.size()==nfwd);
+      } else {
+        v = vector<MX>(nfwd, MX(size_out(i)));
+      }
       for (int d=0; d<nfwd; ++d) {
         res[d*n_out() + i] = v[d];
       }
@@ -1878,8 +1882,12 @@ namespace casadi {
     // Expressions for outputs
     vector<MX> res(n_in()*nadj);
     for (int i=0; i<n_in(); ++i) {
-      v = horzsplit(d_res[i], size2_in(i));
-      casadi_assert(v.size()==nadj);
+      if (size2_in(i)>0) {
+        v = horzsplit(d_res[i], size2_in(i));
+        casadi_assert(v.size()==nadj);
+      } else {
+        v = vector<MX>(nadj, MX(size_in(i)));
+      }
       for (int d=0; d<nadj; ++d) {
         res[d*n_in() + i] = v[d];
       }
