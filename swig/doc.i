@@ -897,6 +897,21 @@ Return a string with a description (for SWIG)
 
 ";
 
+%feature("docstring")  casadi::Function::which_depends(const std::string
+&s_in, const std::vector< std::string > &s_out, int order=1, bool tr=false)
+const  "
+
+Which variables enter with some order.
+
+Parameters:
+-----------
+
+order:  Only 1 (linear) and 2 (nonlinear) allowed
+
+tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
 %feature("docstring")  casadi::Function::setFullJacobian(const Function
 &jac) "
 
@@ -1248,7 +1263,9 @@ Does the function have free variables.
 %feature("docstring")  casadi::Function::nl_var(const std::string &s_in,
 const std::vector< std::string > &s_out) const  "
 
-Which variables enter nonlinearly.
+[DEPRECATED] Which variables enter nonlinearly
+
+Use which_depends instead.
 
 ";
 
@@ -2980,6 +2997,11 @@ Name of the function.
 
 ";
 
+%feature("docstring")  casadi::Function::has_function(const std::string
+&fname) const  "
+
+";
+
 %feature("docstring")  casadi::Function::checkInputs() const  "
 
 [INTERNAL]  Check if the numerical values of the supplied bounds make sense.
@@ -3130,14 +3152,6 @@ legacy syntax: oracle().factory(\"f\", {\"x\", \"z\", \"p\", \"t\"},
 %feature("docstring")  casadi::Function::getAtomicOperation(int k) const  "
 
 Get an atomic operation operator index.
-
-";
-
-%feature("docstring")  casadi::Function::spCanEvaluate(bool fwd) "
-
-[INTERNAL]  Is the class able to propagate seeds through the algorithm?
-
-(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -3670,6 +3684,34 @@ const  "
 Get number of output nonzeros.
 
 For a particular output or for all of the outputs
+
+";
+
+%feature("docstring")  casadi::Function::sparsity_jac(int iind=0, int
+oind=0, bool compact=false, bool symmetric=false) "
+
+Get, if necessary generate, the sparsity of a Jacobian block
+
+";
+
+%feature("docstring")  casadi::Function::sparsity_jac(const std::string
+&iind, int oind=0, bool compact=false, bool symmetric=false) "
+
+Get, if necessary generate, the sparsity of a Jacobian block
+
+";
+
+%feature("docstring")  casadi::Function::sparsity_jac(int iind, const
+std::string &oind, bool compact=false, bool symmetric=false) "
+
+Get, if necessary generate, the sparsity of a Jacobian block
+
+";
+
+%feature("docstring")  casadi::Function::sparsity_jac(const std::string
+&iind, const std::string &oind, bool compact=false, bool symmetric=false) "
+
+Get, if necessary generate, the sparsity of a Jacobian block
 
 ";
 
@@ -4409,7 +4451,9 @@ Print free variables.
 %feature("docstring")  casadi::Function::nl_var(const std::string &s_in,
 const std::vector< std::string > &s_out) const  "
 
-Which variables enter nonlinearly.
+[DEPRECATED] Which variables enter nonlinearly
+
+Use which_depends instead.
 
 ";
 
@@ -4576,31 +4620,18 @@ Get sparsity of a given input.
 
 ";
 
-%feature("docstring")  casadi::Function::sparsity_jac(int iind=0, int
-oind=0, bool compact=false, bool symmetric=false) "
+%feature("docstring")  casadi::Function::which_depends(const std::string
+&s_in, const std::vector< std::string > &s_out, int order=1, bool tr=false)
+const  "
 
-Get, if necessary generate, the sparsity of a Jacobian block
+Which variables enter with some order.
 
-";
+Parameters:
+-----------
 
-%feature("docstring")  casadi::Function::sparsity_jac(const std::string
-&iind, int oind=0, bool compact=false, bool symmetric=false) "
+order:  Only 1 (linear) and 2 (nonlinear) allowed
 
-Get, if necessary generate, the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::Function::sparsity_jac(int iind, const
-std::string &oind, bool compact=false, bool symmetric=false) "
-
-Get, if necessary generate, the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::Function::sparsity_jac(const std::string
-&iind, const std::string &oind, bool compact=false, bool symmetric=false) "
-
-Get, if necessary generate, the sparsity of a Jacobian block
+tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
@@ -4642,8 +4673,11 @@ Get input dimension.
 
 ";
 
-%feature("docstring")  casadi::Function::has_function(const std::string
-&fname) const  "
+%feature("docstring")  casadi::Function::spCanEvaluate(bool fwd) "
+
+[INTERNAL]  Is the class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -4939,25 +4973,8 @@ Arc sine.
 in the Symbolic Toolbox for Matlab but instead creating a CasADi symbolic
 primitive.
 
-*/ %feature("docstring")  vector_linear_depends_on(const MatType &f, const
-MatType &arg) "
-
-For each element of the first argument, checks linear dependency on a second
-argument.
-
-If the element depends linearly (or does not depend) on all of arg, the
-corresponding entry of the return vector is true.
-
-False negatives may occur: an expression may depend linearly on all of arg,
-even though this method does not recognise that fact. The opposite does not
-occur: if the method returns true, the dependency cannot be nonlinear.
-
-boolean vector
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< MatType >::nnz_upper() const
-"
+*/ %feature("docstring")  casadi::GenericMatrix< MatType >::nnz_upper()
+const  "
 
 Get the number of non-zeros in the upper triangular half.
 
@@ -5110,7 +5127,7 @@ Matrix determinant (experimental)
 
 %feature("docstring")  nl_var(const MatType &expr, const MatType &var) "
 
-Find out which variables enter nonlinearly.
+[DEPRECATED] Find out which variables enter nonlinearly
 
 ";
 
@@ -5370,19 +5387,6 @@ Calculate Jacobian.
 
 ";
 
-%feature("docstring")  vector_depends_on(const MatType &f, const MatType
-&arg) "
-
-For each element of the first argument, checks dependency on a second
-argument.
-
-If the element depends on any of arg, the corresponding entry of the return
-vector is true
-
-boolean vector
-
-";
-
 %feature("docstring")  print_operator(const MatType &xb, const std::vector<
 std::string > &args) "
 
@@ -5501,9 +5505,10 @@ Branching on MX nodes Ternary operator, \"cond ? if_true : if_false\".
 
 ";
 
-%feature("docstring")  simplify(const MatType &x) "
+%feature("docstring")  which_depends(const MatType &expr, const MatType
+&var, int order, bool tr) "
 
-Simplify an expression.
+Find out which variables enter with some order.
 
 ";
 
@@ -5680,6 +5685,12 @@ one.
 &A, const MatType &alpha, const MatType &x, const MatType &y) "
 
 Make a rank-1 update to a matrix A Calculates A + 1/2 * alpha * x*y'.
+
+";
+
+%feature("docstring")  simplify(const MatType &x) "
+
+Simplify an expression.
 
 ";
 
@@ -12870,11 +12881,9 @@ Checks if array does not contain NaN or Inf.
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::hash_value(T v) "
+%feature("docstring") casadi::_which_depends "
 
-Hash value of an integer.
-
-";
+[INTERNAL] ";
 
 %feature("docstring")  casadi::casadi_polyval(const real_t *p, int n, real_t
 x) "
@@ -13121,6 +13130,12 @@ const real_t *y, real_t *z, int tr) "
 %feature("docstring") casadi::_jtimes "
 
 [INTERNAL] ";
+
+%feature("docstring")  casadi::hash_value(T v) "
+
+Hash value of an integer.
+
+";
 
 %feature("docstring")  casadi::casadi_bilin(const real_t *A, const int
 *sp_A, const real_t *x, const real_t *y) "

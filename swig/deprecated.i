@@ -7,6 +7,9 @@
 %exception  casadi::Function::integrator_dae() {
  CATCH_OR_NOT(DEPRECATED_MSG("") $action)
 }
+%exception  casadi::Function::nl_var(const std::string &s_in, const std::vector< std::string > &s_out) const  {
+ CATCH_OR_NOT(DEPRECATED_MSG("") $action)
+}
 %exception  casadi::Function::printDimensions(std::ostream &stream=casadi::userOut()) const  {
  CATCH_OR_NOT(DEPRECATED_MSG("") $action)
 }
@@ -32,6 +35,9 @@
  CATCH_OR_NOT(DEPRECATED_MSG("") $action)
 }
 %exception  casadi::load_linsol(const std::string &name) {
+ CATCH_OR_NOT(DEPRECATED_MSG("") $action)
+}
+%exception  nl_var(const MatType &expr, const MatType &var) {
  CATCH_OR_NOT(DEPRECATED_MSG("") $action)
 }
 %exception  norm_F(const MatType &x) {

@@ -613,6 +613,19 @@ Return a string with a description (for SWIG)
 
 ";
 
+%feature("docstring") casadi::Callback::which_depends "
+
+Which variables enter with some order.
+
+Parameters:
+-----------
+
+order:  Only 1 (linear) and 2 (nonlinear) allowed
+
+tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
 %feature("docstring") casadi::Callback::setFullJacobian "
 
 Set the Jacobian of all the input nonzeros with respect to all output
@@ -820,7 +833,9 @@ Does the function have free variables.
 
 %feature("docstring") casadi::Callback::nl_var "
 
-Which variables enter nonlinearly.
+[DEPRECATED] Which variables enter nonlinearly
+
+Use which_depends instead.
 
 ";
 
@@ -2022,6 +2037,8 @@ Name of the function.
 
 ";
 
+%feature("docstring") casadi::Function::has_function "";
+
 %feature("docstring") casadi::Function::checkInputs "[INTERNAL]  Check if
 the numerical values of the supplied bounds make sense.
 
@@ -2091,13 +2108,6 @@ legacy syntax: oracle().factory(\"f\", {\"x\", \"z\", \"p\", \"t\"},
 %feature("docstring") casadi::Function::getAtomicOperation "
 
 Get an atomic operation operator index.
-
-";
-
-%feature("docstring") casadi::Function::spCanEvaluate "[INTERNAL]  Is the
-class able to propagate seeds through the algorithm?
-
-(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -2420,6 +2430,12 @@ returned.
 Get number of output nonzeros.
 
 For a particular output or for all of the outputs
+
+";
+
+%feature("docstring") casadi::Function::sparsity_jac "
+
+Get, if necessary generate, the sparsity of a Jacobian block
 
 ";
 
@@ -2870,7 +2886,9 @@ Print free variables.
 
 %feature("docstring") casadi::Function::nl_var "
 
-Which variables enter nonlinearly.
+[DEPRECATED] Which variables enter nonlinearly
+
+Use which_depends instead.
 
 ";
 
@@ -2960,9 +2978,16 @@ Get sparsity of a given input.
 
 ";
 
-%feature("docstring") casadi::Function::sparsity_jac "
+%feature("docstring") casadi::Function::which_depends "
 
-Get, if necessary generate, the sparsity of a Jacobian block
+Which variables enter with some order.
+
+Parameters:
+-----------
+
+order:  Only 1 (linear) and 2 (nonlinear) allowed
+
+tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
@@ -2994,7 +3019,12 @@ length of w field.
 
 ";
 
-%feature("docstring") casadi::Function::has_function "";
+%feature("docstring") casadi::Function::spCanEvaluate "[INTERNAL]  Is the
+class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
+
+";
 
 %feature("docstring") casadi::Function::sx_out "
 
@@ -3271,23 +3301,7 @@ Arc sine.
 in the Symbolic Toolbox for Matlab but instead creating a CasADi symbolic
 primitive.
 
-*/ %feature("docstring") friendwrap_vector_linear_depends_on "
-
-For each element of the first argument, checks linear dependency on a second
-argument.
-
-If the element depends linearly (or does not depend) on all of arg, the
-corresponding entry of the return vector is true.
-
-False negatives may occur: an expression may depend linearly on all of arg,
-even though this method does not recognise that fact. The opposite does not
-occur: if the method returns true, the dependency cannot be nonlinear.
-
-boolean vector
-
-";
-
-%feature("docstring") casadi::GenericMatrix::nnz_upper "
+*/ %feature("docstring") casadi::GenericMatrix::nnz_upper "
 
 Get the number of non-zeros in the upper triangular half.
 
@@ -3426,7 +3440,7 @@ Matrix determinant (experimental)
 
 %feature("docstring") friendwrap_nl_var "
 
-Find out which variables enter nonlinearly.
+[DEPRECATED] Find out which variables enter nonlinearly
 
 ";
 
@@ -3677,18 +3691,6 @@ Calculate Jacobian.
 
 ";
 
-%feature("docstring") friendwrap_vector_depends_on "
-
-For each element of the first argument, checks dependency on a second
-argument.
-
-If the element depends on any of arg, the corresponding entry of the return
-vector is true
-
-boolean vector
-
-";
-
 %feature("docstring") friendwrap_print_operator "
 
 Get a string representation for a binary MatType, using custom arguments.
@@ -3786,9 +3788,9 @@ Branching on MX nodes Ternary operator, \"cond ? if_true : if_false\".
 
 ";
 
-%feature("docstring") friendwrap_simplify "
+%feature("docstring") friendwrap_which_depends "
 
-Simplify an expression.
+Find out which variables enter with some order.
 
 ";
 
@@ -3919,6 +3921,12 @@ one.
 %feature("docstring") casadi::GenericMatrix::rank1 "
 
 Make a rank-1 update to a matrix A Calculates A + 1/2 * alpha * x*y'.
+
+";
+
+%feature("docstring") friendwrap_simplify "
+
+Simplify an expression.
 
 ";
 
@@ -10084,11 +10092,7 @@ Checks if array does not contain NaN or Inf.
 [INTERNAL] 
 ";
 
-%feature("docstring") casadi::hash_value "
-
-Hash value of an integer.
-
-";
+%feature("docstring") casadi::_which_depends "[INTERNAL] ";
 
 %feature("docstring") casadi::casadi_polyval "[INTERNAL]  Evaluate a
 polynomial.
@@ -10296,6 +10300,12 @@ multiplication: z <- z + x*y.
 ";
 
 %feature("docstring") casadi::_jtimes "[INTERNAL] ";
+
+%feature("docstring") casadi::hash_value "
+
+Hash value of an integer.
+
+";
 
 %feature("docstring") casadi::casadi_bilin "[INTERNAL]  Calculates dot(x,
 mul(A, y))
