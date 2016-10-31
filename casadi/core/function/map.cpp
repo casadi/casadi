@@ -150,15 +150,15 @@ namespace casadi {
     // Need to reorder sensitivity inputs
     vector<MX> parg = arg;
     for (int i=0; i<n_in(); ++i) {
-      vector<MX> v = horzsplit(parg[n_in()+n_out()+i], f_.size2_in(i)), v2;
+      vector<MX> v = horzsplit(arg[n_in()+n_out()+i], f_.size2_in(i));
       casadi_assert(v.size()==n_*nfwd);
-      v2.reserve(v.size());
+      vector<MX> w(v.size());
       for (int k=0; k<n_; ++k) {
         for (int d=0; d<nfwd; ++d) {
-          v2.push_back(v[nfwd*d + k]);
+          w[k*nfwd + d] = v[d*n_ + k];
         }
       }
-      parg[n_in()+n_out()+i] = horzcat(v2);
+      parg[n_in()+n_out()+i] = horzcat(w);
     }
 
     // Get output expressions
@@ -166,15 +166,15 @@ namespace casadi {
 
     // Reorder sensitivity outputs
     for (int i=0; i<n_out(); ++i) {
-      vector<MX> v = horzsplit(res[i], f_.size2_out(i)), v2;
+      vector<MX> v = horzsplit(res[i], f_.size2_out(i));
       casadi_assert(v.size()==n_*nfwd);
-      v2.reserve(v.size());
+      vector<MX> w(v.size());
       for (int k=0; k<n_; ++k) {
         for (int d=0; d<nfwd; ++d) {
-          v2.push_back(v[nfwd*d + k]);
+          w[d*n_ + k] = v[k*nfwd + d];
         }
       }
-      res[i] = horzcat(v2);
+      res[i] = horzcat(w);
     }
 
     // Construct return function
@@ -195,15 +195,15 @@ namespace casadi {
     // Need to reorder sensitivity inputs
     vector<MX> parg = arg;
     for (int i=0; i<n_out(); ++i) {
-      vector<MX> v = horzsplit(parg[n_in()+n_out()+i], f_.size2_out(i)), v2;
+      vector<MX> v = horzsplit(arg[n_in()+n_out()+i], f_.size2_out(i));
       casadi_assert(v.size()==n_*nadj);
-      v2.reserve(v.size());
+      vector<MX> w(v.size());
       for (int k=0; k<n_; ++k) {
         for (int d=0; d<nadj; ++d) {
-          v2.push_back(v[nadj*d + k]);
+          w[k*nadj + d] = v[d*n_ + k];
         }
       }
-      parg[n_in()+n_out()+i] = horzcat(v2);
+      parg[n_in()+n_out()+i] = horzcat(w);
     }
 
     // Get output expressions
@@ -211,15 +211,15 @@ namespace casadi {
 
     // Reorder sensitivity outputs
     for (int i=0; i<n_in(); ++i) {
-      vector<MX> v = horzsplit(res[i], f_.size2_in(i)), v2;
+      vector<MX> v = horzsplit(res[i], f_.size2_in(i));
       casadi_assert(v.size()==n_*nadj);
-      v2.reserve(v.size());
+      vector<MX> w(v.size());
       for (int k=0; k<n_; ++k) {
         for (int d=0; d<nadj; ++d) {
-          v2.push_back(v[nadj*d + k]);
+          w[d*n_ + k] = v[k*nadj + d];
         }
       }
-      res[i] = horzcat(v2);
+      res[i] = horzcat(w);
     }
 
     // Construct return function
