@@ -29,7 +29,6 @@
 #include "mx_function.hpp"
 #include "map.hpp"
 #include "switch.hpp"
-#include "kernel_sum.hpp"
 #include "nlpsol.hpp"
 #include "conic.hpp"
 #include "jit.hpp"
@@ -597,15 +596,15 @@ namespace casadi {
     return ret;
   }
 
+#ifdef WITH_DEPRECATED_FEATURES
   Function Function::kernel_sum(const string& name,
                                 const pair<int, int> & size,
                                 double r, int n,
                                 const Dict& opts) const {
-    Function ret;
-    ret.assignNode(new KernelSum(name, *this, size, r, n));
-    ret->construct(opts);
-    return ret;
+    casadi_error("kernel_sum: has been deprecated");
+    return Function();
   }
+#endif // WITH_DEPRECATED_FEATURES
 
   int Function::n_in() const {
     return (*this)->n_in();

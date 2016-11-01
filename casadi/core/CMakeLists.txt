@@ -103,7 +103,6 @@ set(CASADI_SRCS
   function/code_generator.hpp      function/code_generator.cpp
   function/switch.hpp              function/switch.cpp
   function/map.hpp                 function/map.cpp
-  function/kernel_sum.hpp          function/kernel_sum.cpp
   function/importer.hpp            function/importer.cpp            function/importer_internal.hpp function/importer_internal.cpp
 
   # MISC useful stuff
