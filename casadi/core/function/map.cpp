@@ -128,15 +128,6 @@ namespace casadi {
   }
 
   Function Map
-  ::get_forward_old(const std::string& name, int nfwd, Dict& opts) {
-    // Differentiate mapped function
-    Function df = f_.forward(nfwd);
-
-    // Construct and return
-    return df.map(name, parallelization(), n_, opts);
-  }
-
-  Function Map
   ::get_forward(const std::string& name, int nfwd, Dict& opts) {
     // Differentiate mapped function
     Function df = f_.forward_new(nfwd);
@@ -224,15 +215,6 @@ namespace casadi {
 
     // Construct return function
     return Function(name, arg, res, opts);
-  }
-
-  Function Map
-  ::get_reverse_old(const std::string& name, int nadj, Dict& opts) {
-    // Differentiate mapped function
-    Function df = f_.reverse(nadj);
-
-    // Construct and return
-    return df.map(name, parallelization(), n_, opts);
   }
 
   void Map::eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
