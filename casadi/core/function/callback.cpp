@@ -133,7 +133,7 @@ namespace casadi {
   }
 
   Function Callback::get_forward_new(const std::string& name, int nfwd, Dict& opts) {
-    return (*this)->FunctionInternal::get_forward_new(name, nfwd, opts);
+    return (*this)->FunctionInternal::get_forward(name, nfwd, opts);
   }
 
   int Callback::get_n_forward() const {
