@@ -28,7 +28,6 @@
 #include "sx_function.hpp"
 #include "mx_function.hpp"
 #include "map.hpp"
-#include "mapaccum.hpp"
 #include "switch.hpp"
 #include "kernel_sum.hpp"
 #include "nlpsol.hpp"
@@ -405,7 +404,7 @@ namespace casadi {
     int n_in = this->n_in(), n_out = this->n_out();
     // Consistency checks
     casadi_assert_message(n>0, "mapaccum: n must be positive");
-    casadi_assert_message(n_accum<=min(n_in,n_out), "mapaccum: too many accumulators");
+    casadi_assert_message(n_accum<=min(n_in, n_out), "mapaccum: too many accumulators");
     // Quick return?
     if (n==1) return *this;
     // Get symbolic expressions for inputs and outputs
@@ -440,34 +439,50 @@ namespace casadi {
     // Construct return
     for (int i=0; i<n_in; ++i) arg[i] = horzcat(varg[i]);
     for (int i=0; i<n_out; ++i) res[i] = horzcat(vres[i]);
-    return Function(name, arg, res, opts);
+    return Function(name, arg, res, name_in(), name_out(), opts);
   }
 
   Function Function::mapaccum(const string& name, int n,
                               const vector<int>& accum_in,
                               const vector<int>& accum_out,
                               const Dict& opts) {
-    // Inherit the scheme
-    Dict opts2 = opts;
-    if (opts.find("input_scheme")==opts.end()) opts2["input_scheme"] = name_in();
-    if (opts.find("output_scheme")==opts.end()) opts2["output_scheme"] = name_out();
+    // Shorthands
+    int n_in = this->n_in(), n_out = this->n_out();
+    // Consistency checks
+    casadi_assert(inBounds(accum_in, n_in) && isUnique(accum_in));
+    casadi_assert(inBounds(accum_out, n_out) && isUnique(accum_out));
+    casadi_assert(accum_in.size()==accum_out.size());
+    int n_accum=accum_in.size();
 
-    return Mapaccum::create(name, *this, n, accum_in, accum_out, false, opts2);
+    // Quick return if no need to reorder
+    if (accum_in==range(n_accum) && accum_out==range(n_accum)) {
+      return mapaccum(name, n, n_accum, opts);
+    }
+
+    // Need to do some reordering
+    vector<int> temp_in = complement(accum_in, n_in);
+    vector<int> order_in = accum_in;
+    order_in.insert(order_in.end(), temp_in.begin(), temp_in.end());
+    vector<int> temp_out = complement(accum_out, n_out);
+    vector<int> order_out = accum_out;
+    order_out.insert(order_out.end(), temp_out.begin(), temp_out.end());
+    Function ma = slice(order_in, order_out).mapaccum(name, n, n_accum, opts);
+    return ma.slice(lookupvector(order_in, n_in),
+                    lookupvector(order_out, n_out), opts);
   }
 
   Function Function::mapaccum(const string& name, int n,
-                              const vector<std::string>& accum_in,
-                              const vector<std::string>& accum_out,
+                              const vector<string>& accum_in,
+                              const vector<string>& accum_out,
                               const Dict& opts) {
-    std::vector<int> accum_in_num;
-    for (int i=0;i<accum_in.size();++i) accum_in_num.push_back(index_in(accum_in[i]));
-    std::vector<int> accum_out_num;
-    for (int i=0;i<accum_out.size();++i) accum_out_num.push_back(index_out(accum_out[i]));
+    vector<int> accum_in_num, accum_out_num;
+    for (const string& s : accum_in) accum_in_num.push_back(index_in(s));
+    for (const string& s : accum_out) accum_out_num.push_back(index_out(s));
     return mapaccum(name, n, accum_in_num, accum_out_num, opts);
   }
 
   Function Function::map(const string& name, const std::string& parallelization, int n,
-      const std::vector<int>& reduce_in, const std::vector<int>& reduce_out,
+      const vector<int>& reduce_in, const vector<int>& reduce_out,
       const Dict& opts) {
     // Wrap in an MXFunction
     Function f = map(name, parallelization, n, opts);
@@ -489,13 +504,12 @@ namespace casadi {
     return Function(name, arg, res, (*this)->derived_options());
   }
 
-  Function Function::map(const string& name, const std::string& parallelization, int n,
-      const std::vector<std::string>& reduce_in, const std::vector<std::string>& reduce_out,
+  Function Function::map(const string& name, const string& parallelization, int n,
+      const vector<string>& reduce_in, const vector<string>& reduce_out,
       const Dict& opts) {
-    std::vector<int> reduce_in_num;
-    for (int i=0;i<reduce_in.size();++i) reduce_in_num.push_back(index_in(reduce_in[i]));
-    std::vector<int> reduce_out_num;
-    for (int i=0;i<reduce_out.size();++i) reduce_out_num.push_back(index_out(reduce_out[i]));
+    vector<int> reduce_in_num, reduce_out_num;
+    for (const string& s : reduce_in) reduce_in_num.push_back(index_in(s));
+    for (const string& s : reduce_out) reduce_out_num.push_back(index_out(s));
     return map(name, parallelization, n, reduce_in_num, reduce_out_num, opts);
   }
 
