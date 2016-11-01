@@ -300,9 +300,8 @@ class Functiontests(casadiTestCase):
       test(d.sparsity())
 
   def test_customIO(self):
-
     x = SX.sym("x")
-    f = Function('f',[x],[x*x, x],{'output_scheme':["foo","bar"]})
+    f = Function('f',[x],[x*x, x],["i0"], ["foo","bar"])
 
     ret = f(i0=12)
 

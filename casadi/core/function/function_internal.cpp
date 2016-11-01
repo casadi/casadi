@@ -466,11 +466,6 @@ namespace casadi {
     // Construct options of the wrapping MXFunction
     Dict opts = derived_options();
 
-    // Propagate naming of inputs and outputs
-    opts["input_scheme"] = ischeme_;
-    opts["output_scheme"] = oscheme_;
-    opts["output_scheme"] = oscheme_;
-
     // Propagate AD parameters
     opts["ad_weight"] = ad_weight();
     opts["ad_weight_sp"] = sp_weight();
@@ -482,7 +477,7 @@ namespace casadi {
     // Wrap the function
     vector<MX> arg = mx_in();
     vector<MX> res = self()(arg);
-    return Function("wrap_" + name_, arg, res, opts);
+    return Function("wrap_" + name_, arg, res, ischeme_, oscheme_, opts);
   }
 
   Function FunctionInternal::getHessian(int iind, int oind) {
