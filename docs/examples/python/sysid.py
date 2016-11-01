@@ -13,7 +13,7 @@ from casadi import *
 # This form is well-suited for the Gauss-Newton Hessian approximation.
 
 ############ SETTINGS #####################
-N = 10000  # Number of samples
+N = 100  # Number of samples
 fs = 610.1 # Sampling frequency [hz]
 
 param_truth = DM([5.625e-6,2.3e-4,1,4.69])
@@ -67,9 +67,9 @@ one_sample = Function('one_sample',[states, controls, params], [X])
 one_sample = one_sample.expand('one_sample_sx')
 
 ############ Simulating the system ##########
-assert(N%100==0)
-all_samples1 = one_sample.mapaccum("all_samples1", N//100)
-all_samples = all_samples1.mapaccum("all_samples", 100)
+assert(N%10==0)
+all_samples1 = one_sample.mapaccum("all_samples1", N//10)
+all_samples = all_samples1.mapaccum("all_samples", 10)
 
 # Choose an excitation signal
 numpy.random.seed(0)
