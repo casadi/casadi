@@ -238,7 +238,7 @@ namespace casadi {
       flag = RTLD_LAZY | RTLD_LOCAL;
     }
 #ifdef WITH_DEEPBIND
-#ifdef __APPLE__
+#ifndef __APPLE__
     flag |= RTLD_DEEPBIND;
 #endif
 #endif
