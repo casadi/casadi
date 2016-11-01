@@ -1505,46 +1505,22 @@ namespace casadi {
       return shared_cast<Function>(reverse_[nadj].shared());
     }
 
-    // Give it a suitable name
-    stringstream ss;
-    ss << "adj" << nadj << "_" << name_;
-    string name = ss.str();
-
     // Get the number of inputs and outputs
     int n_in = this->n_in();
     int n_out = this->n_out();
 
+    // Give it a suitable name
+    string name = "adj" + to_string(nadj) + "_" + name_;
+
     // Names of inputs
     std::vector<std::string> i_names;
-    i_names.reserve(n_in + n_out + n_out);
-
-    // Nondifferentiated inputs
-    for (int i=0; i<n_in; ++i) {
-      i_names.push_back("der_" + ischeme_.at(i));
-    }
-
-    // Nondifferentiated outputs (given)
-    for (int i=0; i<n_out; ++i) {
-      i_names.push_back("der_" + oscheme_.at(i));
-    }
-
-    // Adjoint seeds
-    for (int i=0; i<n_out; ++i) {
-      ss.str(string());
-      ss << "adj" << "_" << oscheme_.at(i);
-      i_names.push_back(ss.str());
-    }
+    for (int i=0; i<n_in; ++i) i_names.push_back("der_" + name_in(i));
+    for (int i=0; i<n_out; ++i) i_names.push_back("der_" + name_out(i));
+    for (int i=0; i<n_out; ++i) i_names.push_back("adj_" + name_out(i));
 
     // Names of outputs
     std::vector<std::string> o_names;
-    o_names.reserve(n_in);
-
-    // Adjoint sensitivities
-    for (int i=0; i<n_in; ++i) {
-      ss.str(string());
-      ss << "adj" << "_" << ischeme_.at(i);
-      o_names.push_back(ss.str());
-    }
+    for (int i=0; i<n_in; ++i) o_names.push_back("adj_" + name_in(i));
 
     // Options
     Dict opts = derived_options();
