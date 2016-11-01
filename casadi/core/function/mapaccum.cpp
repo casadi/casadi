@@ -29,10 +29,13 @@ using namespace std;
 
 namespace casadi {
 
-  Function Mapaccum::create(const std::string& name,
-    Function& f, int n, int n_accum, bool reverse, const Dict& opts) {
-
-    // No need to reorder
+  Function
+  Mapaccum::create(const std::string& name,
+                   Function& f, int n, int n_accum, bool reverse, const Dict& opts) {
+    casadi_assert(n>0);
+    // Quick return?
+    if (n==1) return f;
+    // Construct accumulation
     Function ret;
     ret.assignNode(new Mapaccum(name, f, n, n_accum, reverse));
     ret->construct(opts);
