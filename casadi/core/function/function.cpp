@@ -466,9 +466,10 @@ namespace casadi {
     vector<int> temp_out = complement(accum_out, n_out);
     vector<int> order_out = accum_out;
     order_out.insert(order_out.end(), temp_out.begin(), temp_out.end());
-    Function ma = slice(order_in, order_out).mapaccum(name, n, n_accum, opts);
-    return ma.slice(lookupvector(order_in, n_in),
-                    lookupvector(order_out, n_out), opts);
+    Function ret = slice("slice_" + name, order_in, order_out);
+    ret = ret.mapaccum("mapacc_" + name, n, n_accum, opts);
+    return ret.slice(name, lookupvector(order_in, n_in),
+                     lookupvector(order_out, n_out), opts);
   }
 
   Function Function::mapaccum(const string& name, int n,
@@ -547,11 +548,11 @@ namespace casadi {
     return Map::create(name, parallelization, *this, n, opts);
   }
 
-  Function Function::slice(const std::vector<int>& order_in, const std::vector<int>& order_out,
-      const Dict& opts) {
+  Function Function::slice(const std::string& name, const std::vector<int>& order_in,
+                           const std::vector<int>& order_out, const Dict& opts) const {
     // Get symbolic inputs and outputs
     vector<MX> in = mx_in();
-    vector<MX> out = (*this)(in);
+    vector<MX> out = const_cast<Function&>(*this)(in);
 
     // Shuffle the inputs
     vector<MX> new_in;
@@ -570,7 +571,7 @@ namespace casadi {
     }
 
     // Return a wrapping function
-    return Function("slice_" + name(), new_in, new_out,
+    return Function(name, new_in, new_out,
                     new_name_in, new_name_out, opts);
   }
 
