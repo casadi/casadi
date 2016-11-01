@@ -400,10 +400,8 @@ namespace casadi {
     rev(get_ptr(arg), get_ptr(res), get_ptr(iw), get_ptr(w), 0);
   }
 
-  Function Function::mapaccum(const string& name, int n, const Dict& opts) {
-    std::vector<int> accum_in = std::vector<int>(1, 0);
-    std::vector<int> accum_out = std::vector<int>(1, 0);
-    return mapaccum(name, n, accum_in, accum_out, opts);
+  Function Function::mapaccum(const string& name, int n, int n_accum, const Dict& opts) {
+    return mapaccum(name, n, range(n_accum), range(n_accum), opts);
   }
 
   Function Function::mapaccum(const string& name, int n,
