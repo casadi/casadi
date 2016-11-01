@@ -401,7 +401,41 @@ namespace casadi {
   }
 
   Function Function::mapaccum(const string& name, int n, int n_accum, const Dict& opts) {
-    return mapaccum(name, n, range(n_accum), range(n_accum), opts);
+    // Shorthands
+    int n_in = this->n_in(), n_out = this->n_out();
+    // Get symbolic expressions for inputs and outputs
+    vector<MX> arg = mx_in();
+    vector<MX> res;
+    // Vectorized inputs and outputs
+    vector<vector<MX>> varg(n_in), vres(n_out);
+    for (int i=0; i<n_accum; ++i) varg[i].push_back(arg[i]);
+    // For each function call
+    for (int iter=0; iter<n; ++iter) {
+      // Stacked input expressions
+      for (int i=n_accum; i<n_in; ++i) {
+        arg[i] = MX::sym(name_in(i) + "_" + to_string(i), sparsity_in(i));
+        varg[i].push_back(arg[i]);
+      }
+      // Call f
+      res = (*this)(arg);
+      // Save output expressions
+      for (int i=0; i<n_out; ++i) vres[i].push_back(res[i]);
+      // Done?
+      if (iter==n-1) break;
+      // Copy function output to input
+      copy_n(res.begin(), n_accum, arg.begin());
+      for (int i=0; i<n_accum; ++i) {
+        // Ony get last component (allows nested calls)
+        int nrow_out=size2_out(i), nrow_in=size2_in(i);
+        if (nrow_out>nrow_in) {
+          arg[i] = horzsplit(arg[i], {0, nrow_out-nrow_in, nrow_out}).back();
+        }
+      }
+    }
+    // Construct return
+    for (int i=0; i<n_in; ++i) arg[i] = horzcat(varg[i]);
+    for (int i=0; i<n_out; ++i) res[i] = horzcat(vres[i]);
+    return Function(name, arg, res, opts);
   }
 
   Function Function::mapaccum(const string& name, int n,
