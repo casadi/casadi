@@ -813,17 +813,6 @@ class typemaptests(casadiTestCase):
       solver = nlpsol("mysolver", "ipopt", {"x":x,"f":x**2}, {"ipopt": {"acceptable_tol": SX.sym("x")}})
 
     nlpsol("mysolver", "ipopt", {"x":x,"f":x**2}, {"ipopt": {"acceptable_tol": 1}})
-    
-  def cross_conversions(self):
-    self.checkarray(DM(MX(5)), DM(5))
-    self.checkarray(MX(5).full(), DM(5))
-    self.checkarray(SX(5).full(), DM(5))
-    with self.assertRaises(RuntimeError):
-      MX.sym("x").full()
-    with self.assertRaises(RuntimeError):
-      DM(MX.sym("x"))
-    self.assertFalse(DM(SX.sym("x")).is_regular())
-    self.assertTrue(np.isnan(SX.sym("x").full()))
-    
+
 if __name__ == '__main__':
     unittest.main()

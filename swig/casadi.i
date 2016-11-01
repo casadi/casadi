@@ -3402,33 +3402,6 @@ namespace casadi{
     }
 #endif
   }
-  
-  %extend Matrix<SXElem> {
-    GUESTOBJECT* full() const {
-      casadi::Matrix<double> ret(*$self);
-      return casadi_Matrix_Sl_double_Sg__full(&ret);
-    }
-#ifdef SWIGMATLAB
-    GUESTOBJECT* sparse() const {
-      casadi::Matrix<double> ret = $self->operator casadi::Matrix<double>();
-      return casadi_Matrix_Sl_double_Sg__sparse(&ret);
-    }
-#endif
-  }
-  
-  %extend MX {
-    GUESTOBJECT* full() const {
-      casadi::Matrix<double> ret(*$self);
-      return casadi_Matrix_Sl_double_Sg__full(&ret);;
-    }
-#ifdef SWIGMATLAB
-    GUESTOBJECT* sparse() const {
-      casadi::Matrix<double> ret = $self->operator casadi::Matrix<double>();
-      return casadi_Matrix_Sl_double_Sg__sparse(&ret);
-    }
-#endif
-  }
-  
 } // namespace casadi
 
 
