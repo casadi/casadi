@@ -3410,7 +3410,7 @@ namespace casadi{
     }
 #ifdef SWIGMATLAB
     GUESTOBJECT* sparse() const {
-      casadi::Matrix<double> ret(*$self);
+      casadi::Matrix<double> ret = $self->operator casadi::Matrix<double>();
       return casadi_Matrix_Sl_double_Sg__sparse(&ret);
     }
 #endif
@@ -3423,7 +3423,7 @@ namespace casadi{
     }
 #ifdef SWIGMATLAB
     GUESTOBJECT* sparse() const {
-      casadi::Matrix<double> ret(*$self);
+      casadi::Matrix<double> ret = $self->operator casadi::Matrix<double>();
       return casadi_Matrix_Sl_double_Sg__sparse(&ret);
     }
 #endif
