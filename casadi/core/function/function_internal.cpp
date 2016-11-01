@@ -2692,37 +2692,43 @@ namespace casadi {
           }
         }
       }
-      return;
-    }
+    } else {
+      // All inputs and seeds
+      vector<MX> darg;
+      darg.reserve(n_in + n_out + n_out);
+      darg.insert(darg.end(), arg.begin(), arg.end());
+      darg.insert(darg.end(), res.begin(), res.end());
+      vector<MX> v(nadj);
+      for (int i=0; i<n_out; ++i) {
+        for (int d=0; d<nadj; ++d) v[d] = aseed[d][i];
+        darg.push_back(horzcat(v));
+      }
 
-    // All inputs and seeds
-    vector<MX> darg;
-    darg.reserve(n_in + n_out + n_out*nadj);
-    darg.insert(darg.end(), arg.begin(), arg.end());
-    darg.insert(darg.end(), res.begin(), res.end());
-    for (int d=0; d<nadj; ++d) {
-      darg.insert(darg.end(), aseed[d].begin(), aseed[d].end());
-    }
+      // Create derivative function
+      Function dfcn = reverse(nadj);
 
-    // Create derivative function
-    Function dfcn = reverse_old(nadj);
+      // Create the evaluation node
+      vector<MX> x = Call::create(dfcn, darg);
+      casadi_assert(x.size()==n_in);
 
-    // Create the evaluation node
-    vector<MX> x = Call::create(dfcn, darg);
-    vector<MX>::iterator x_it = x.begin();
-
-    // Retrieve sensitivities
-    for (int d=0; d<nadj; ++d) {
-      asens[d].resize(n_in);
+      // Retrieve sensitivities
+      for (int d=0; d<nadj; ++d) asens[d].resize(n_in);
       for (int i=0; i<n_in; ++i) {
-        if (asens[d][i].is_empty(true)) {
-          asens[d][i] = *x_it++;
+        if (size2_in(i)>0) {
+          v = horzsplit(x[i], size2_in(i));
+          casadi_assert(v.size()==nadj);
         } else {
-          asens[d][i] += *x_it++;
+          v = vector<MX>(nadj, MX(size_in(i)));
+        }
+        for (int d=0; d<nadj; ++d) {
+          if (asens[d][i].is_empty(true)) {
+            asens[d][i] = v[d];
+          } else {
+            asens[d][i] += v[d];
+          }
         }
       }
     }
-    casadi_assert(x_it==x.end());
   }
 
   void FunctionInternal::
