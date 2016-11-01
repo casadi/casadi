@@ -451,8 +451,9 @@ Get the length of the work vector.
 
 ";
 
-%feature("docstring")  casadi::Function::slice(const std::vector< int >
-&order_in, const std::vector< int > &order_out, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::Function::slice(const std::string &name,
+const std::vector< int > &order_in, const std::vector< int > &order_out,
+const Dict &opts=Dict()) const  "
 
 returns a new function with a selection of inputs/outputs of the original
 
@@ -3626,8 +3627,9 @@ Get output dimension.
 
 ";
 
-%feature("docstring")  casadi::Function::slice(const std::vector< int >
-&order_in, const std::vector< int > &order_out, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::Function::slice(const std::string &name,
+const std::vector< int > &order_in, const std::vector< int > &order_out,
+const Dict &opts=Dict()) const  "
 
 returns a new function with a selection of inputs/outputs of the original
 
