@@ -67,8 +67,9 @@ one_sample = Function('one_sample',[states, controls, params], [X])
 one_sample = one_sample.expand('one_sample_sx')
 
 ############ Simulating the system ##########
-
-all_samples = one_sample.mapaccum("all_samples", N)
+assert(N%100==0)
+all_samples1 = one_sample.mapaccum("all_samples1", N/100)
+all_samples = all_samples1.mapaccum("all_samples", 100)
 
 # Choose an excitation signal
 numpy.random.seed(0)
@@ -85,7 +86,7 @@ y_data = X_measured[0,:].T
 
 # Use just-in-time compilation to speed up the evaluation
 if Importer.has_plugin('clang'):
-  opts = {'jit':True, "jit_options":{"flags":['-O3']}}
+  opts = {'jit':True}
 else:
   print("WARNING; running without jit. This may result in very slow evaluation times")
   opts = {}
