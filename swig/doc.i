@@ -1758,7 +1758,7 @@ Print all information there is to know about a certain option.
 ";
 
 %feature("docstring")  casadi::Function::mapaccum(const std::string &name,
-int n, const Dict &opts=Dict()) "
+int n, int n_accum=1, const Dict &opts=Dict()) "
 
 Create a mapaccumulated version of this function.
 
@@ -3295,7 +3295,7 @@ Get all the free variables of the function.
 ";
 
 %feature("docstring")  casadi::Function::mapaccum(const std::string &name,
-int n, const Dict &opts=Dict()) "
+int n, int n_accum=1, const Dict &opts=Dict()) "
 
 Create a mapaccumulated version of this function.
 
