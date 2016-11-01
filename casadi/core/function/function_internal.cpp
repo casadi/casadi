@@ -2605,33 +2605,38 @@ namespace casadi {
           fsens[d][i] = reshape(fsens[d][i], size_out(i));
         }
       }
-      return;
-    }
 
-    // All inputs and seeds
-    vector<MX> darg;
-    darg.reserve(n_in + n_out + n_in*nfwd);
-    darg.insert(darg.end(), arg.begin(), arg.end());
-    darg.insert(darg.end(), res.begin(), res.end());
-    for (int d=0; d<nfwd; ++d) {
-      darg.insert(darg.end(), fseed[d].begin(), fseed[d].end());
-    }
+    } else {
+      // All inputs and seeds
+      vector<MX> darg;
+      darg.reserve(n_in + n_out + n_in);
+      darg.insert(darg.end(), arg.begin(), arg.end());
+      darg.insert(darg.end(), res.begin(), res.end());
+      vector<MX> v(nfwd);
+      for (int i=0; i<n_in; ++i) {
+        for (int d=0; d<nfwd; ++d) v[d] = fseed[d][i];
+        darg.push_back(horzcat(v));
+      }
 
-    // Create derivative function
-    Function dfcn = forward_old(nfwd);
+      // Create derivative function
+      Function dfcn = forward(nfwd);
 
-    // Create the evaluation node
-    vector<MX> x = Call::create(dfcn, darg);
-    vector<MX>::iterator x_it = x.begin();
+      // Create the evaluation node
+      vector<MX> x = Call::create(dfcn, darg);
+      casadi_assert(x.size()==n_out);
 
-    // Retrieve sensitivities
-    for (int d=0; d<nfwd; ++d) {
-      fsens[d].resize(n_out);
+      // Retrieve sensitivities
+      for (int d=0; d<nfwd; ++d) fsens[d].resize(n_out);
       for (int i=0; i<n_out; ++i) {
-        fsens[d][i] = *x_it++;
+        if (size2_out(i)>0) {
+          v = horzsplit(x[i], size2_out(i));
+          casadi_assert(v.size()==nfwd);
+        } else {
+          v = vector<MX>(nfwd, MX(size_out(i)));
+        }
+        for (int d=0; d<nfwd; ++d) fsens[d][i] = v[d];
       }
     }
-    casadi_assert(x_it==x.end());
   }
 
   void FunctionInternal::
