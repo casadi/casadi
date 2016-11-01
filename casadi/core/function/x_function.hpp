@@ -138,6 +138,10 @@ namespace casadi {
     virtual int get_n_reverse() const { return 64;}
     ///@}
 
+    /** \brief returns a new function with a selection of inputs/outputs of the original */
+    virtual Function slice(const std::string& name, const std::vector<int>& order_in,
+                           const std::vector<int>& order_out, const Dict& opts) const;
+
     /** \brief Generate code for the declarations of the C function */
     virtual void generateDeclarations(CodeGenerator& g) const = 0;
 
@@ -1100,6 +1104,31 @@ namespace casadi {
 
     // Assemble function and return
     return Function(name, ret_in, ret_out, opts);
+  }
+
+  template<typename DerivedType, typename MatType, typename NodeType>
+  Function XFunction<DerivedType, MatType, NodeType>
+  ::slice(const std::string& name, const std::vector<int>& order_in,
+          const std::vector<int>& order_out, const Dict& opts) const {
+    // Return expressions
+    std::vector<MatType> ret_in, ret_out;
+    std::vector<std::string> ret_in_name, ret_out_name;
+
+    // Reorder inputs
+    for (int k : order_in) {
+      ret_in.push_back(in_.at(k));
+      ret_in_name.push_back(name_in(k));
+    }
+
+    // Reorder outputs
+    for (int k : order_out) {
+      ret_out.push_back(out_.at(k));
+      ret_out_name.push_back(name_out(k));
+    }
+
+    // Assembe function
+    return Function(name, ret_in, ret_out,
+                    ret_in_name, ret_out_name, opts);
   }
 
   template<typename DerivedType, typename MatType, typename NodeType>

@@ -550,29 +550,7 @@ namespace casadi {
 
   Function Function::slice(const std::string& name, const std::vector<int>& order_in,
                            const std::vector<int>& order_out, const Dict& opts) const {
-    // Get symbolic inputs and outputs
-    vector<MX> in = mx_in();
-    vector<MX> out = const_cast<Function&>(*this)(in);
-
-    // Shuffle the inputs
-    vector<MX> new_in;
-    vector<string> new_name_in;
-    for (int k : order_in) {
-      new_in.push_back(in.at(k));
-      new_name_in.push_back(name_in(k));
-    }
-
-    // Shuffle the outputs
-    vector<MX> new_out;
-    vector<string> new_name_out;
-    for (int k : order_out) {
-      new_out.push_back(out.at(k));
-      new_name_out.push_back(name_out(k));
-    }
-
-    // Return a wrapping function
-    return Function(name, new_in, new_out,
-                    new_name_in, new_name_out, opts);
+    return (*this)->slice(name, order_in, order_out, opts);
   }
 
   vector<MX> Function::map(const vector< MX > &x,

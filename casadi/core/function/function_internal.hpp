@@ -395,6 +395,10 @@ namespace casadi {
     virtual int get_n_reverse() const { return 0;}
     ///@}
 
+    /** \brief returns a new function with a selection of inputs/outputs of the original */
+    virtual Function slice(const std::string& name, const std::vector<int>& order_in,
+                           const std::vector<int>& order_out, const Dict& opts) const;
+
     /** \brief Get oracle */
     virtual const Function& oracle() const;
 

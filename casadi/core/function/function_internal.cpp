@@ -3209,5 +3209,10 @@ namespace casadi {
     userOut() << s.str();
   }
 
+  Function FunctionInternal::slice(const std::string& name,
+        const std::vector<int>& order_in,
+        const std::vector<int>& order_out, const Dict& opts) const {
+    return wrapMXFunction().slice(name, order_in, order_out, opts);
+  }
 
 } // namespace casadi
