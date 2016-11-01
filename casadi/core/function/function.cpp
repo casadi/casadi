@@ -403,6 +403,11 @@ namespace casadi {
   Function Function::mapaccum(const string& name, int n, int n_accum, const Dict& opts) {
     // Shorthands
     int n_in = this->n_in(), n_out = this->n_out();
+    // Consistency checks
+    casadi_assert_message(n>0, "mapaccum: n must be positive");
+    casadi_assert_message(n_accum<=min(n_in,n_out), "mapaccum: too many accumulators");
+    // Quick return?
+    if (n==1) return *this;
     // Get symbolic expressions for inputs and outputs
     vector<MX> arg = mx_in();
     vector<MX> res;
