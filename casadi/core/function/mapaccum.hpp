@@ -42,9 +42,12 @@ namespace casadi {
 
     // Create function (use instead of constructor)
     static Function create(const std::string& name,
+                           Function& f, int n, int n_accum,
+                           bool reverse, const Dict& opts);
+    static Function create(const std::string& name,
                            Function& f, int n,
                            const std::vector<int>& accum_in, const std::vector<int>& accum_out,
-                           const Dict& opts, bool reverse=false);
+                           bool reverse, const Dict& opts);
 
     /** \brief  Destructor */
     virtual ~Mapaccum();

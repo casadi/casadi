@@ -415,7 +415,7 @@ namespace casadi {
     if (opts.find("input_scheme")==opts.end()) opts2["input_scheme"] = name_in();
     if (opts.find("output_scheme")==opts.end()) opts2["output_scheme"] = name_out();
 
-    return Mapaccum::create(name, *this, n, accum_in, accum_out, opts2);
+    return Mapaccum::create(name, *this, n, accum_in, accum_out, false, opts2);
   }
 
   Function Function::mapaccum(const string& name, int n,

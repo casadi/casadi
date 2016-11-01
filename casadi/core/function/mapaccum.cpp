@@ -29,9 +29,19 @@ using namespace std;
 
 namespace casadi {
 
-    Function Mapaccum::create(const std::string& name,
+  Function Mapaccum::create(const std::string& name,
+    Function& f, int n, int n_accum, bool reverse, const Dict& opts) {
+
+    // No need to reorder
+    Function ret;
+    ret.assignNode(new Mapaccum(name, f, n, n_accum, reverse));
+    ret->construct(opts);
+    return ret;
+  }
+
+  Function Mapaccum::create(const std::string& name,
       Function& f, int n, const vector<int>& accum_in, const vector<int>& accum_out,
-        const Dict& opts, bool reverse) {
+        bool reverse, const Dict& opts) {
 
       casadi_assert(inBounds(accum_in, f.n_in()) && isUnique(accum_in));
       casadi_assert(inBounds(accum_out, f.n_out()) && isUnique(accum_out));
@@ -48,34 +58,28 @@ namespace casadi {
                                 f.sparsity_out(accum_out[i]).dim() << ".");
       }
 
+      // Quick return if no need to reorder
       if (accum_in==range(n_accum) && accum_out==range(n_accum)) {
         // No need to reorder
-        Function ret;
-        ret.assignNode(new Mapaccum(name, f, n, n_accum, reverse));
-        ret->construct(opts);
-        return ret;
-      } else {
-        // Need to do some reordering
-        std::vector<int> temp_in = complement(accum_in, f.n_in());
-        std::vector<int> order_in = accum_in;
-        order_in.insert(order_in.end(), temp_in.begin(), temp_in.end());
-
-        std::vector<int> temp_out = complement(accum_out, f.n_out());
-        std::vector<int> order_out = accum_out;
-        order_out.insert(order_out.end(), temp_out.begin(), temp_out.end());
-
-        Function fr = f.slice(order_in, order_out);
-        Function ma;
-        ma.assignNode(new Mapaccum(name, fr, n, n_accum, reverse));
-        ma->construct(opts);
-
-        std::vector<int> order_in_inv = lookupvector(order_in, f.n_in());
-        std::vector<int> order_out_inv = lookupvector(order_out, f.n_out());
-
-        return ma.slice(order_in_inv, order_out_inv, opts);
+        return create(name, f, n, n_accum, reverse, opts);
       }
 
+      // Need to do some reordering
+      std::vector<int> temp_in = complement(accum_in, f.n_in());
+      std::vector<int> order_in = accum_in;
+      order_in.insert(order_in.end(), temp_in.begin(), temp_in.end());
 
+      std::vector<int> temp_out = complement(accum_out, f.n_out());
+      std::vector<int> order_out = accum_out;
+      order_out.insert(order_out.end(), temp_out.begin(), temp_out.end());
+
+      Function fr = f.slice(order_in, order_out);
+      Function ma = create(name, fr, n, n_accum, reverse, opts);
+
+      std::vector<int> order_in_inv = lookupvector(order_in, f.n_in());
+      std::vector<int> order_out_inv = lookupvector(order_out, f.n_out());
+
+      return ma.slice(order_in_inv, order_out_inv, opts);
   }
 
   Mapaccum::Mapaccum(const std::string& name, const Function& f, int n, int n_accum, bool reverse)
@@ -392,7 +396,7 @@ namespace casadi {
 
     // Construct the new MapAccum
     Function ma = Mapaccum::create(name, df, n_, accum_in, accum_out,
-                                   derived_options(), reverse_);
+                                   reverse_, derived_options());
 
     /*
 
@@ -593,7 +597,7 @@ namespace casadi {
 
     // Create the new MapAccum
     Function ma = Mapaccum::create(name, fbX, n_, accum_in, accum_out,
-      derived_options(), !reverse_);
+      !reverse_, derived_options());
     /*
 
       Recall, the function we need to return looks like:
