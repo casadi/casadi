@@ -454,17 +454,15 @@ namespace casadi {
 
   Function FunctionInternal::getGradient(const std::string& name, int iind, int oind,
                                          const Dict& opts) {
-    Function f = wrapMXFunction();
-    return f.gradient(iind, oind);
+    return wrap().gradient(iind, oind);
   }
 
   Function FunctionInternal::getTangent(const std::string& name, int iind, int oind,
                                         const Dict& opts) {
-    Function f = wrapMXFunction();
-    return f.tangent(iind, oind);
+    return wrap().tangent(iind, oind);
   }
 
-  Function FunctionInternal::wrapMXFunction() const {
+  Function FunctionInternal::wrap() const {
     // Construct options of the wrapping MXFunction
     Dict opts = derived_options();
 
@@ -1957,8 +1955,7 @@ namespace casadi {
     // The code below creates a call node, to inline, wrap in an MXFunction
     if (always_inline) {
       casadi_assert_message(!never_inline, "Inconsistent options");
-      Function f = wrapMXFunction();
-      return f.call(arg, res, true);
+      return wrap().call(arg, res, true);
     }
 
     // Create a call-node
@@ -1968,8 +1965,7 @@ namespace casadi {
   Function FunctionInternal::
   getNumericJacobian(const std::string& name, int iind, int oind, bool compact, bool symmetric,
                      const Dict& opts) {
-    Function f = wrapMXFunction();
-    return f->getNumericJacobian(name, iind, oind, compact, symmetric, opts);
+    return wrap()->getNumericJacobian(name, iind, oind, compact, symmetric, opts);
   }
 
   Function FunctionInternal::fullJacobian() {
@@ -3116,8 +3112,7 @@ namespace casadi {
           const std::vector<std::string>& s_out,
           const Function::AuxOut& aux,
           const Dict& opts) const {
-    Function f = wrapMXFunction();
-    return f.factory(name, s_in, s_out, aux, opts);
+    return wrap().factory(name, s_in, s_out, aux, opts);
   }
 
   std::vector<std::string> FunctionInternal::get_function() const {
@@ -3212,7 +3207,7 @@ namespace casadi {
   Function FunctionInternal::slice(const std::string& name,
         const std::vector<int>& order_in,
         const std::vector<int>& order_out, const Dict& opts) const {
-    return wrapMXFunction().slice(name, order_in, order_out, opts);
+    return wrap().slice(name, order_in, order_out, opts);
   }
 
 } // namespace casadi

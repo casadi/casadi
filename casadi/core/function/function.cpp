@@ -1349,4 +1349,8 @@ namespace casadi {
     return (*this)->oracle();
   }
 
+  Function Function::wrap() const {
+    return (*this)->wrap();
+  }
+
 } // namespace casadi

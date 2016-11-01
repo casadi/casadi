@@ -483,16 +483,8 @@ namespace casadi {
     /** \brief Number of nodes in the algorithm */
     virtual int n_nodes() const;
 
-    /** \brief Create a helper MXFunction with some properties copied
-    *
-    * Copied properties:
-    *
-    *    input/outputscheme
-    *    ad_mode
-    *
-    *  The function is not initialized
-    */
-    Function wrapMXFunction() const;
+    /** \brief Wrap in an Function instance consisting of only one MX call */
+    Function wrap() const;
 
     /** \brief Generate code the function */
     virtual void generateFunction(CodeGenerator& g, const std::string& fname,

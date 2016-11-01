@@ -300,6 +300,9 @@ namespace casadi {
     /** \brief Get oracle */
     Function oracle() const;
 
+    /** \brief Wrap in an Function instance consisting of only one MX call */
+    Function wrap() const;
+
 #ifdef WITH_DEPRECATED_FEATURES
     /** \brief [DEPRECATED] Which variables enter nonlinearly
     *
