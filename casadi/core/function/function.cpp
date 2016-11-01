@@ -1029,7 +1029,77 @@ namespace casadi {
   }
 
   Function Function::reverse(int nadj) {
-    return (*this)->reverse_old(nadj);
+    casadi_assert(nadj>=0);
+
+    // Give it a suitable name
+    string name = "adj" + to_string(nadj) + "_" + this->name();
+
+    // Get the number of inputs and outputs
+    int n_in = this->n_in();
+    int n_out = this->n_out();
+
+    // Names of inputs
+    std::vector<std::string> i_names;
+    for (int i=0; i<n_in; ++i) i_names.push_back("der_" + name_in(i));
+    for (int i=0; i<n_out; ++i) i_names.push_back("der_" + name_out(i));
+    for (int d=0; d<nadj; ++d) {
+      for (int i=0; i<n_out; ++i) {
+        i_names.push_back("adj" + to_string(d) + "_" + name_out(i));
+      }
+    }
+
+    // Names of outputs
+    std::vector<std::string> o_names;
+    for (int d=0; d<nadj; ++d) {
+      for (int i=0; i<n_in; ++i) {
+        o_names.push_back("adj" + to_string(d) + "_" + name_in(i));
+      }
+    }
+
+    // Call new implementation
+    Function d = reverse_new(nadj);
+
+    // Expressions for inputs
+    vector<MX> arg = MX::get_input(d);
+    arg.resize(n_in + n_out);
+    arg.reserve(n_in + n_out + nadj*n_out);
+    for (int d=0; d<nadj; ++d) {
+      for (int i=0; i<n_out; ++i) {
+        arg.push_back(MX::sym(i_names.at(arg.size()), sparsity_out(i)));
+      }
+    }
+
+    // Argument for calling d
+    vector<MX> d_arg(arg.begin(), arg.begin() + n_in + n_out);
+    vector<MX> v(nadj);
+    for (int i=0; i<n_out; ++i) {
+      for (int d=0; d<nadj; ++d) {
+        v[d] = arg.at(n_in + n_out + d*n_out + i);
+      }
+      d_arg.push_back(horzcat(v));
+    }
+
+    // Call d
+    vector<MX> d_res = d(d_arg);
+    casadi_assert(d_res.size()==n_in);
+
+    // Expressions for outputs
+    vector<MX> res(n_in*nadj);
+    for (int i=0; i<n_in; ++i) {
+      if (size2_in(i)>0) {
+        v = horzsplit(d_res[i], size2_in(i));
+        casadi_assert(v.size()==nadj);
+      } else {
+        v = vector<MX>(nadj, MX(size_in(i)));
+      }
+      for (int d=0; d<nadj; ++d) {
+        res[d*n_in + i] = v[d];
+      }
+    }
+
+    // Construct new function
+    Dict opts = (*this)->derived_options();
+    return Function(name, arg, res, i_names, o_names, opts);
   }
 
   Function Function::reverse_new(int nadj) {

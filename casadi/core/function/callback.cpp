@@ -145,7 +145,7 @@ namespace casadi {
   }
 
   Function Callback::get_reverse_new(const std::string& name, int nadj, Dict& opts) {
-    return (*this)->FunctionInternal::get_reverse_new(name, nadj, opts);
+    return (*this)->FunctionInternal::get_reverse(name, nadj, opts);
   }
 
   int Callback::get_n_reverse() const {

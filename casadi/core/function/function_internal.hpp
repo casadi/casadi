@@ -385,10 +385,8 @@ namespace casadi {
      *    and calls <tt>Function get_reverse(int nadj)</tt>
      *    if no cached version is available.
      */
-    Function reverse_old(int nadj);
     Function reverse(int nadj);
     virtual Function get_reverse_old(const std::string& name, int nadj, Dict& opts);
-    virtual Function get_reverse_new(const std::string& name, int nadj, Dict& opts);
     virtual Function get_reverse(const std::string& name, int nadj, Dict& opts);
     virtual int get_n_reverse() const { return 0;}
     ///@}

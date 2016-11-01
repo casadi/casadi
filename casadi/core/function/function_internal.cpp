@@ -1516,90 +1516,6 @@ namespace casadi {
     return ret;
   }
 
-  Function FunctionInternal::reverse_old(int nadj) {
-    casadi_assert(nadj>=0);
-
-    // Give it a suitable name
-    stringstream ss;
-    ss << "adj" << nadj << "_" << name_;
-    string name = ss.str();
-
-    // Get the number of inputs and outputs
-    int n_in = this->n_in();
-    int n_out = this->n_out();
-
-    // Names of inputs
-    std::vector<std::string> i_names;
-    i_names.reserve(n_in + n_out + n_out*nadj);
-
-    // Nondifferentiated inputs
-    for (int i=0; i<n_in; ++i) {
-      i_names.push_back("der_" + ischeme_.at(i));
-    }
-
-    // Nondifferentiated outputs (given)
-    for (int i=0; i<n_out; ++i) {
-      i_names.push_back("der_" + oscheme_.at(i));
-    }
-
-    // Adjoint seeds
-    for (int d=0; d<nadj; ++d) {
-      for (int i=0; i<n_out; ++i) {
-        ss.str(string());
-        ss << "adj" << d << "_" << oscheme_.at(i);
-        i_names.push_back(ss.str());
-      }
-    }
-
-    // Names of outputs
-    std::vector<std::string> o_names;
-    o_names.reserve(n_in*nadj);
-
-    // Adjoint sensitivities
-    for (int d=0; d<nadj; ++d) {
-      for (int i=0; i<n_in; ++i) {
-        ss.str(string());
-        ss << "adj" << d << "_" << ischeme_.at(i);
-        o_names.push_back(ss.str());
-      }
-    }
-
-    // Options
-    Dict opts = derived_options();
-    opts["verbose"] = verbose_;
-    opts["input_scheme"] = i_names;
-    opts["output_scheme"] = o_names;
-    opts["max_num_dir"] = max_num_dir_;
-    opts["derivative_of"] = self();
-
-    // Return value
-    casadi_assert(get_n_reverse()>0);
-    Function ret = get_reverse_old(name, nadj, opts);
-
-    // Consistency check for inputs
-    for (int i=0; i<ret.n_in(); ++i) {
-      const Sparsity& sp = i<n_in ? sparsity_in(i) :
-        i<n_in+n_out ? sparsity_out(i-n_in) :
-        sparsity_out((i-n_in-n_out) % n_out);
-      casadi_assert_message(ret.size_in(i)==sp.size(),
-                            "Incorrect shape for " << ret << " input " << i << " \""
-                            << i_names.at(i) << "\". Expected " << sp.size()
-                            << " but got " << ret.size_in(i));
-    }
-
-    // Consistency check for outputs
-    for (int i=0; i<ret.n_out(); ++i) {
-      const Sparsity& sp = sparsity_in(i % n_in);
-      casadi_assert_message(ret.size_out(i)==sp.size(),
-                            "Incorrect shape for " << ret << " output " << i << " \""
-                            << o_names.at(i) << "\". Expected " << sp.size()
-                            << " but got " << ret.size_out(i));
-    }
-
-    // Return generated function
-    return ret;
-  }
-
   Function FunctionInternal::reverse(int nadj) {
     casadi_assert(nadj>=0);
 
@@ -1716,61 +1632,13 @@ namespace casadi {
   }
 
   Function FunctionInternal::get_reverse_old(const std::string& name, int nadj, Dict& opts) {
-    // Call new implementation
-    Function d = reverse(nadj);
-
-    // Scheme
-    vector<string> ischeme = opts["input_scheme"];
-
-    // Expressions for inputs
-    vector<MX> arg = MX::get_input(d);
-    arg.resize(n_in() + n_out());
-    arg.reserve(n_in() + n_out() + nadj*n_out());
-    for (int d=0; d<nadj; ++d) {
-      for (int i=0; i<n_out(); ++i) {
-        arg.push_back(MX::sym(ischeme.at(arg.size()), sparsity_out(i)));
-      }
-    }
-
-    // Argument for calling d
-    vector<MX> d_arg(arg.begin(), arg.begin() + n_in() + n_out());
-    vector<MX> v(nadj);
-    for (int i=0; i<n_out(); ++i) {
-      for (int d=0; d<nadj; ++d) {
-        v[d] = arg.at(n_in() + n_out() + d*n_out() + i);
-      }
-      d_arg.push_back(horzcat(v));
-    }
-
-    // Call d
-    vector<MX> d_res = d(d_arg);
-    casadi_assert(d_res.size()==n_in());
-
-    // Expressions for outputs
-    vector<MX> res(n_in()*nadj);
-    for (int i=0; i<n_in(); ++i) {
-      if (size2_in(i)>0) {
-        v = horzsplit(d_res[i], size2_in(i));
-        casadi_assert(v.size()==nadj);
-      } else {
-        v = vector<MX>(nadj, MX(size_in(i)));
-      }
-      for (int d=0; d<nadj; ++d) {
-        res[d*n_in() + i] = v[d];
-      }
-    }
-
-    // Construct new function
-    return Function(name, arg, res, opts);
-  }
-
-  Function FunctionInternal::get_reverse(const std::string& name, int nadj, Dict& opts) {
     casadi_error("'get_reverse' not defined for " + type_name());
   }
 
-  Function FunctionInternal::get_reverse_new(const std::string& name, int nadj, Dict& opts) {
+  Function FunctionInternal::get_reverse(const std::string& name, int nadj, Dict& opts) {
     // Call old implementation
-    Function d = reverse_old(nadj);
+    Dict old_opts = derived_options();
+    Function d = get_reverse_old(name, nadj, old_opts);
     // Get expressions for inputs and outputs
     vector<MX> arg = MX::get_input(d);
     vector<MX> res = d(arg);
