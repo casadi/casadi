@@ -128,7 +128,10 @@ namespace casadi {
   }
 
   Function Map
-  ::get_forward(const std::string& name, int nfwd, Dict& opts) {
+  ::get_forward(const std::string& name, int nfwd,
+                const std::vector<std::string>& i_names,
+                const std::vector<std::string>& o_names,
+                const Dict& opts) {
     // Differentiate mapped function
     Function df = f_.forward_new(nfwd);
 
@@ -169,7 +172,7 @@ namespace casadi {
     }
 
     // Construct return function
-    return Function(name, arg, res, opts);
+    return Function(name, arg, res, i_names, o_names, opts);
   }
 
   Function Map

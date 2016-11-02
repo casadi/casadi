@@ -195,7 +195,9 @@ Function Function::rootfinder_fun() {
   }
 
   Function Rootfinder
-  ::get_forward(const std::string& name, int nfwd, Dict& opts) {
+  ::get_forward(const std::string& name, int nfwd,
+                const std::vector<std::string>& i_names,
+                const std::vector<std::string>& o_names, const Dict& opts) {
     // Symbolic expression for the input
     vector<MX> arg = mx_in();
     arg[iin_] = MX::sym(arg[iin_].name() + "_guess",
@@ -216,7 +218,7 @@ Function Function::rootfinder_fun() {
       for (int d=0; d<nfwd; ++d) v[d] = fsens[d][i];
       res.push_back(horzcat(v));
     }
-    return Function(name, arg, res, opts);
+    return Function(name, arg, res, i_names, o_names, opts);
   }
 
   Function Rootfinder

@@ -128,7 +128,10 @@ namespace casadi {
 
     ///@{
     /** \brief Generate a function that calculates \a nfwd forward derivatives */
-    virtual Function get_forward(const std::string& name, int nfwd, Dict& opts);
+    virtual Function get_forward(const std::string& name, int nfwd,
+                                 const std::vector<std::string>& i_names,
+                                 const std::vector<std::string>& o_names,
+                                 const Dict& opts);
     virtual int get_n_forward() const { return 64;}
     ///@}
 
@@ -1027,7 +1030,10 @@ namespace casadi {
 
   template<typename DerivedType, typename MatType, typename NodeType>
   Function XFunction<DerivedType, MatType, NodeType>
-  ::get_forward(const std::string& name, int nfwd, Dict& opts) {
+  ::get_forward(const std::string& name, int nfwd,
+                const std::vector<std::string>& i_names,
+                const std::vector<std::string>& o_names,
+                const Dict& opts) {
     // Seeds
     std::vector<std::vector<MatType> > fseed = symbolicFwdSeed(nfwd, in_), fsens;
 
@@ -1063,7 +1069,7 @@ namespace casadi {
     }
 
     // Assemble function and return
-    return Function(name, ret_in, ret_out, opts);
+    return Function(name, ret_in, ret_out, i_names, o_names, opts);
   }
 
   template<typename DerivedType, typename MatType, typename NodeType>

@@ -132,8 +132,12 @@ namespace casadi {
     return (*this)->FunctionInternal::get_forward_old(name, nfwd, opts);
   }
 
-  Function Callback::get_forward_new(const std::string& name, int nfwd, Dict& opts) {
-    return (*this)->FunctionInternal::get_forward(name, nfwd, opts);
+  Function Callback::
+  get_forward_new(const std::string& name, int nfwd,
+                  const std::vector<std::string>& i_names,
+                  const std::vector<std::string>& o_names,
+                  const Dict& opts) {
+    return (*this)->FunctionInternal::get_forward(name, nfwd, i_names, o_names, opts);
   }
 
   int Callback::get_n_forward() const {

@@ -1460,14 +1460,12 @@ namespace casadi {
 
     // Options
     Dict opts = derived_options();
-    opts["input_scheme"] = i_names;
-    opts["output_scheme"] = o_names;
     opts["max_num_dir"] = max_num_dir_;
     opts["derivative_of"] = self();
 
     // Return value
     casadi_assert(get_n_forward()>0);
-    Function ret = get_forward(name, nfwd, opts);
+    Function ret = get_forward(name, nfwd, i_names, o_names, opts);
 
     // Consistency check for inputs
     casadi_assert(ret.n_in()==n_in + n_out + n_in);
@@ -1550,7 +1548,10 @@ namespace casadi {
     casadi_error("'get_forward' not defined for " + type_name());
   }
 
-  Function FunctionInternal::get_forward(const std::string& name, int nfwd, Dict& opts) {
+  Function FunctionInternal::
+  get_forward(const std::string& name, int nfwd,
+              const std::vector<std::string>& i_names,
+              const std::vector<std::string>& o_names, const Dict& opts) {
     // Call old implementation
     Dict old_opts = derived_options();
     Function d = get_forward_old(name, nfwd, old_opts);
@@ -1575,7 +1576,7 @@ namespace casadi {
     }
     res.resize(n_out());
     // Construct new function
-    return Function(name, arg, res, opts);
+    return Function(name, arg, res, i_names, o_names, opts);
   }
 
   Function FunctionInternal::get_reverse_old(const std::string& name, int nadj, Dict& opts) {

@@ -1025,8 +1025,7 @@ namespace casadi {
     call(arg, res, true, false);
 
     // Create function
-    return Function("expand_" + name_, arg, res,
-                    Dict{{"input_scheme", ischeme_}, {"output_scheme", oscheme_}});
+    return Function("expand_" + name_, arg, res, ischeme_, oscheme_);
   }
 
   void MXFunction::generateDeclarations(CodeGenerator& g) const {

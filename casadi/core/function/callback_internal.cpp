@@ -107,9 +107,11 @@ namespace casadi {
   }
 
   Function CallbackInternal::
-  get_forward(const std::string& name, int nfwd, Dict& opts) {
+  get_forward(const std::string& name, int nfwd,
+              const std::vector<std::string>& i_names,
+              const std::vector<std::string>& o_names, const Dict& opts) {
     casadi_assert_message(self_!=0, "Callback object has been deleted");
-    casadi_try_return(get_forward_new, self_, name, nfwd, opts);
+    casadi_try_return(get_forward_new, self_, name, nfwd, i_names, o_names, opts);
   }
 
   Function CallbackInternal::
