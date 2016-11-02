@@ -675,9 +675,7 @@ guarantee that subsequent calls return unique answers.
 
 %feature("docstring") casadi::Callback::get_forward "
 
-Return function that calculates forward derivatives forward(nfwd) returns a
-cached instance if available, and calls  Function get_forward(int nfwd) if
-no cached version is available.
+[DEPRECATED] Overload get_forward_new instead
 
 ";
 
@@ -1118,9 +1116,7 @@ Get sparsity of a given input.
 
 %feature("docstring") casadi::Callback::get_reverse "
 
-Return function that calculates adjoint derivatives reverse(nadj) returns a
-cached instance if available, and calls  Function get_reverse(int nadj) if
-no cached version is available.
+[DEPRECATED] Overload get_reverse_new instead
 
 ";
 

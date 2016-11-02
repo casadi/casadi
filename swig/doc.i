@@ -710,7 +710,8 @@ Get type name.
 ";
 
 %feature("docstring")  casadi::Callback::get_reverse_new(const std::string
-&name, int nadj, Dict &opts) "
+&name, int nadj, const std::vector< std::string > &i_names, const
+std::vector< std::string > &o_names, const Dict &opts) "
 
 Return function that calculates adjoint derivatives reverse(nadj) returns a
 cached instance if available, and calls  Function get_reverse(int nadj) if
@@ -982,9 +983,7 @@ guarantee that subsequent calls return unique answers.
 %feature("docstring")  casadi::Callback::get_forward(const std::string
 &name, int nfwd, Dict &opts) "
 
-Return function that calculates forward derivatives forward(nfwd) returns a
-cached instance if available, and calls  Function get_forward(int nfwd) if
-no cached version is available.
+[DEPRECATED] Overload get_forward_new instead
 
 ";
 
@@ -1536,7 +1535,8 @@ Get oracle.
 ";
 
 %feature("docstring")  casadi::Callback::get_forward_new(const std::string
-&name, int nfwd, Dict &opts) "
+&name, int nfwd, const std::vector< std::string > &i_names, const
+std::vector< std::string > &o_names, const Dict &opts) "
 
 Return function that calculates forward derivatives forward(nfwd) returns a
 cached instance if available, and calls  Function get_forward(int nfwd) if
@@ -1884,9 +1884,7 @@ Get sparsity of a given input.
 %feature("docstring")  casadi::Callback::get_reverse(const std::string
 &name, int nadj, Dict &opts) "
 
-Return function that calculates adjoint derivatives reverse(nadj) returns a
-cached instance if available, and calls  Function get_reverse(int nadj) if
-no cached version is available.
+[DEPRECATED] Overload get_reverse_new instead
 
 ";
 

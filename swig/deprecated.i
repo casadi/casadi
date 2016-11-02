@@ -1,3 +1,9 @@
+%exception  casadi::Callback::get_forward(const std::string &name, int nfwd, Dict &opts) {
+ CATCH_OR_NOT(DEPRECATED_MSG("") $action)
+}
+%exception  casadi::Callback::get_reverse(const std::string &name, int nadj, Dict &opts) {
+ CATCH_OR_NOT(DEPRECATED_MSG("") $action)
+}
 %exception  casadi::Function::derivative(int nfwd, int nadj) {
  CATCH_OR_NOT(DEPRECATED_MSG("") $action)
 }
