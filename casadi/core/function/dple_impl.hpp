@@ -37,7 +37,7 @@ namespace casadi {
   public:
 
     // Constructor
-    Dple(const std::string& name, const std::map<std::string, Sparsity> &st, int nrhs, bool transp);
+    Dple(const std::string& name, const SpDict &st, int nrhs, bool transp);
 
     // Destructor
     virtual ~Dple() = 0;
@@ -101,10 +101,10 @@ namespace casadi {
   protected:
 
     /// List of sparsities of A_i
-    std::vector< Sparsity > A_;
+    Sparsity A_;
 
     /// List of sparsities of V_i
-    std::vector< Sparsity > V_;
+    Sparsity V_;
 
     /// Period
     int K_;

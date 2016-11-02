@@ -42,9 +42,9 @@ namespace casadi {
   }
 
   Function dple(const string& name, const string& solver,
-                const SpDict& qp, const Dict& opts) {
+                const SpDict& st, const Dict& opts) {
     Function ret;
-    ret.assignNode(Dple::instantiatePlugin(name, solver, qp));
+    ret.assignNode(Dple::instantiatePlugin(name, solver, st));
     ret->construct(opts);
     return ret;
   }
@@ -87,8 +87,8 @@ namespace casadi {
   }
 
   // Constructor
-  Dple::Dple(const std::string& name, const std::map<std::string, Sparsity> &st, int nrhs, bool transp)
-    : FunctionInternal(name), nrhs_(nrhs), trans_(transp) {
+  Dple::Dple(const std::string& name, const SpDict &st, int nrhs, bool transp)
+    : FunctionInternal(name), nrhs_(nrhs), transp_(transp) {
     for (auto i=st.begin(); i!=st.end(); ++i) {
       if (i->first=="a") {
         A_ = i->second;
@@ -103,34 +103,20 @@ namespace casadi {
 
   Sparsity Dple::get_sparsity_in(int i) {
     switch (static_cast<DpleInput>(i)) {
-    case CONIC_X0:
-    case CONIC_G:
-    case CONIC_LBX:
-    case CONIC_UBX:
-    case CONIC_LAM_X0:
-      return get_sparsity_out(CONIC_X);
-    case CONIC_LBA:
-    case CONIC_UBA:
-      return get_sparsity_out(CONIC_LAM_A);
-    case CONIC_A:
-      return A_;
-    case CONIC_H:
-      return H_;
-    case CONIC_NUM_IN: break;
+      case DPLE_A:
+        return A_;
+      case DPLE_V:
+        return V_;
+      case DPLE_NUM_IN: break;
     }
     return Sparsity();
   }
 
   Sparsity Dple::get_sparsity_out(int i) {
     switch (static_cast<DpleOutput>(i)) {
-    case CONIC_COST:
-      return Sparsity::scalar();
-    case CONIC_X:
-    case CONIC_LAM_X:
-      return Sparsity::dense(nx_, 1);
-    case CONIC_LAM_A:
-      return Sparsity::dense(na_, 1);
-    case CONIC_NUM_OUT: break;
+      case DPLE_P:
+        return V_;
+      case DPLE_NUM_OUT: break;
     }
     return Sparsity();
   }
@@ -138,17 +124,17 @@ namespace casadi {
   Options Dple::options_
   = {{&FunctionInternal::options_},
      {{"const_dim",
-       {OT_BOOLEAN,
+       {OT_BOOL,
         "Assume constant dimension of P"}},
       {"pos_def",
-        {OT_BOOLEAN,
+        {OT_BOOL,
          "Assume P positive definite"}},
       {"error_unstable",
-        {OT_BOOLEAN,
+        {OT_BOOL,
         "Throw an exception when it is detected that Product(A_i, i=N..1)"
         "has eigenvalues greater than 1-eps_unstable"}},
       {"eps_unstable",
-        {OT_REAL,
+        {OT_DOUBLE,
         "A margin for unstability detection"}}
      }
   };
@@ -161,7 +147,7 @@ namespace casadi {
     const_dim_ = true;
     pos_def_ = false;
     error_unstable_ = false;
-    eps_unstable = 1e-4;
+    eps_unstable_ = 1e-4;
 
     // Read options
     for (auto&& op : opts) {
@@ -176,28 +162,19 @@ namespace casadi {
       }
     }
 
+    casadi_assert_message(const_dim_, "Not implemented");
+    casadi_assert_message(V_.is_symmetric(), "V must be symmetric but got "
+                          << V_.dim() << ".");
 
-    // Dimension sanity checks
-    casadi_assert_message(A_.size()==V_.size(), "A and V arguments must be of same length, but got "
-                          << A_.size() << " and " << V_.size() << ".");
-    K_ = A_.size();
-    for (int k=0;k<K_;++k) {
-      casadi_assert_message(V_[k].issymmetric(), "V_i must be symmetric but got "
-                            << V_[k].dimString() << " for i = " << k << ".");
 
-      casadi_assert_message(A_[k].size1()==V_[k].size1(), "First dimension of A ("
-                            << A_[k].size1() << ") must match dimension of symmetric V_i ("
-                            << V_[k].size1() << ")" << " for i = " << k << ".");
-    }
 
-    if (const_dim_) {
-      int n = A_[0].size1();
-       for (int k=1;k<K_;++k) {
-         casadi_assert_message(A_[k].size1()==n, "You have set const_dim option, but found "
-                               "an A_i with dimension ( " << A_[k].dimString()
-                               << " ) deviating from n = " << n << " at i = " << k << ".");
-      }
-    }
+    int blocksize = V_.colind()[1];
+    int N = V_.size1()/blocksize;
+    Sparsity block = Sparsity::dense(blocksize, blocksize);
+
+    std::vector<Sparsity> blocks(N, block);
+    casadi_assert_message(V_==diagcat(blocks), "Structure not recognised.");
+    casadi_assert_message(A_==V_, "Structure not recognised.");
   }
 
   Dple::~Dple() {

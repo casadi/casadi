@@ -27,6 +27,7 @@
 #define CASADI_PSD_INDEF_DPLE_INTERNAL_HPP
 
 #include "../../core/function/dple_impl.hpp"
+#include "../../core/function/linsol.hpp"
 #include <casadi/interfaces/slicot/casadi_dple_slicot_export.h>
 
 /** \defgroup plugin_DpleSolver_slicot
@@ -49,6 +50,10 @@ namespace casadi {
 
   struct CASADI_DPLE_SLICOT_EXPORT SlicotDpleMemory {
 
+
+    /// Solvers for low-order Discrete Periodic Sylvester Equations
+    std::vector< std::vector< Linsol> > dpse_solvers_;
+
     /// Constructor
     SlicotDpleMemory();
 
@@ -67,7 +72,7 @@ namespace casadi {
       \date 2014
 
   */
-  class CASADI_DPLESOLVER_SLICOT_EXPORT SlicotDple : public Dple {
+  class CASADI_DPLE_SLICOT_EXPORT SlicotDple : public Dple {
   public:
     /** \brief  Constructor */
     explicit SlicotDple();
@@ -75,12 +80,11 @@ namespace casadi {
     /** \brief  Constructor
      * \param st \structargument{Dple}
      */
-    SlicotDple(const std::map<std::string, std::vector<Sparsity> > & st,
-                         int nrhs, bool transp);
+    SlicotDple(const std::string& name, const SpDict & st, int nrhs, bool transp);
 
     /** \brief  Create a new QP Solver */
     static Dple* creator(const std::string& name,
-                          const std::map<std::string, Sparsity>& st) {
+                          const SpDict& st) {
       return new SlicotDple(name, st, 1, false);
     }
 
@@ -114,11 +118,7 @@ namespace casadi {
     /// A documentation string
     static const std::string meta_doc;
 
-    SlicotDple(const std::map<std::string, std::vector<Sparsity> > & st,
-                         int nrhs=1, bool transp=false);
-
-    /** \brief  Destructor */
-    virtual ~SlicotDple();
+    SlicotDple(const SpDict & st, int nrhs=1, bool transp=false);
 
     /** \brief  Clone */
     virtual SlicotDple* clone() const;
@@ -166,8 +166,6 @@ namespace casadi {
     /// Imaginary parts of eigenvalues
     std::vector< double > eig_imag_;
 
-    /// Solvers for low-order Discrete Periodic Sylvester Equations
-    std::vector< std::vector< LinearSolver> > dpse_solvers_;
 
     std::vector<int> partition_;
 
@@ -184,6 +182,12 @@ namespace casadi {
 
     /// Numerical zero, used in periodic Schur form
     double psd_num_zero_;
+
+    /// Linear solver name
+    std::string linear_solver_;
+
+    /// Options to be passed to linear solver constructor
+    Dict linear_solver_options_;
 
   };
 

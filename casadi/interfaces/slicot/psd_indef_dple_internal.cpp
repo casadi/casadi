@@ -28,16 +28,10 @@
 #include "../../core/std_vector_tools.hpp"
 #include "../../core/function/mx_function.hpp"
 #include "../../core/function/sx_function.hpp"
-#include "../../core/function/linear_solver.hpp"
-#include "../../core/profiling.hpp"
-#include "../../core/casadi_options.hpp"
 
 #include <cassert>
 #include <ctime>
 #include <numeric>
-
-INPUTSCHEME(DPLEInput)
-OUTPUTSCHEME(DPLEOutput)
 
 // Need an 8-byte integer since libslicot0 is compiled with  fdefault-integer-8
 typedef long long int f_int;
@@ -56,55 +50,70 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_DPLESOLVER_SLICOT_EXPORT
-  casadi_register_dplesolver_slicot(DpleInternal::Plugin* plugin) {
-    plugin->creator = PsdIndefDpleInternal::creator;
+  int CASADI_DPLE_SLICOT_EXPORT
+  casadi_register_dple_slicot(Dple::Plugin* plugin) {
+    plugin->creator = SlicotDple::creator;
     plugin->name = "slicot";
-    plugin->doc = PsdIndefDpleInternal::meta_doc.c_str();
+    plugin->doc = SlicotDple::meta_doc.c_str();
     plugin->version = 23;
     plugin->exposed.periodic_shur = slicot_periodic_schur;
     return 0;
   }
 
   extern "C"
-  void CASADI_DPLESOLVER_SLICOT_EXPORT casadi_load_dplesolver_slicot() {
-    DpleInternal::registerPlugin(casadi_register_dplesolver_slicot);
+  void CASADI_DPLE_SLICOT_EXPORT casadi_load_dple_slicot() {
+    Dple::registerPlugin(casadi_register_dple_slicot);
   }
 
-  PsdIndefDpleInternal::
-  PsdIndefDpleInternal(const std::map<std::string, std::vector<Sparsity> > & st,
-                       int nrhs, bool transp) : DpleInternal(st, nrhs, transp) {
+  Options SlicotDple::options_
+  = {{&FunctionInternal::options_},
+     {{"linear_solver",
+       {OT_STRING,
+        "User-defined linear solver class. Needed for sensitivities."}},
+      {"linear_solver_options",
+        {OT_DICT,
+         "Options to be passed to the linear solver."}},
+      {"psd_num_zero",
+        {OT_DOUBLE,
+          "Numerical zero used in Periodic Schur decomposition with slicot."
+          "This option is needed when your systems has Floquet multipliers"
+          "zero or close to zero"}}
+     }
+  };
 
-    // set default options
-    setOption("name", "unnamed_psd_indef_dple_solver"); // name of the function
 
-    setOption("pos_def", false);
-    setOption("const_dim", true);
+  SlicotDple::
+  SlicotDple(const std::string& name, const SpDict & st,
+                       int nrhs, bool transp) : Dple(name, st, nrhs, transp) {
 
-    addOption("linear_solver",            OT_STRING, GenericType(),
-              "User-defined linear solver class. Needed for sensitivities.");
-    addOption("linear_solver_options",    OT_DICT,   GenericType(),
-              "Options to be passed to the linear solver.");
-    addOption("psd_num_zero",             OT_REAL,         1e-12,
-              "Numerical zero used in Periodic Schur decomposition with slicot."
-              "This option is needed when your systems has Floquet multipliers"
-              "zero or close to zero");
   }
 
-  PsdIndefDpleInternal::~PsdIndefDpleInternal() {
+  SlicotDple::~SlicotDple() {
 
   }
 
-  void PsdIndefDpleInternal::init() {
+  void SlicotDple::init(const Dict& opts) {
 
-    DpleInternal::init();
+    Dple::init(opts);
+
+    linear_solver_ = "lapacklu";
+    psd_num_zero_ = 1e-12;
+
+    // Read user options
+    for (auto&& op : opts) {
+      if (op.first=="linear_solver") {
+        linear_solver_ = op.second;
+      } else if (op.first=="linear_solver_options") {
+        linear_solver_options_ = op.second;
+      } else if (op.first=="psd_num_zero") {
+        psd_num_zero_ = op.second;
+      }
+    }
 
     casadi_assert_message(!pos_def_,
                           "pos_def option set to True: Solver only handles the indefinite case.");
     casadi_assert_message(const_dim_,
                           "const_dim option set to False: Solver only handles the True case.");
-
-    DenseIO::init();
 
     //for (int k=0;k<K_;k++) {
     //  casadi_assert_message(A_[k].isdense(), "Solver requires arguments to be dense.");
@@ -113,100 +122,85 @@ namespace casadi {
 
     n_ = A_[0].size1();
 
-    // Allocate data structures
-    VZ_.resize(n_*n_*K_);
-    T_.resize(n_*n_*K_);
-    Z_.resize(n_*n_*K_);
-    X_.resize(n_*n_*K_);
+    alloc_w(n_*n_*K_, true); // VZ_
+    alloc_w(n_*n_*K_, true); // T_
+    alloc_w(n_*n_*K_, true); // Z_
+    alloc_w(n_*n_*K_, true); // X_
 
-    Xbar_.resize(n_*n_*K_);
+    alloc_w(n_*n_*K_, true); // Xbar_
 
-    nnKa_.resize(K_, DMatrix::zeros(n_, n_));
-    nnKb_.resize(K_, DMatrix::zeros(n_, n_));
+    alloc_w(n_*n_*K_, true); // nnKa_
+    alloc_w(n_*n_*K_, true); // nnKb_
 
-    eig_real_.resize(n_);
-    eig_imag_.resize(n_);
+    alloc_w(n_, true); // eig_real_
+    alloc_w(n_, true); // eig_imag_
 
+    alloc_w(std::max(n_+K_-2, 4*n_)+(n_-1)*K_+2*n_, true); // dwork_
 
-    F_.resize(2*2*n_*K_);
-
-    FF_.resize(2*2*K_);
-
-    dwork_.resize(std::max(n_+K_-2, 4*n_)+(n_-1)*K_+2*n_);
+    alloc_w(2*2*n_*K_, true); // F_
+    alloc_w(2*2*K_, true); // FF_
 
     // There can be at most n partitions
-    partition_.reserve(n_);
-
-    if (hasSetOption("linear_solver")) {
-      std::string linear_solver_name = getOption("linear_solver");
-
-      // Construct linear solvers for low-order Discrete Periodic Sylvester Equations
-      // I00X
-      // XI00
-      // 0XI0
-      // 00XI
-      //  Special case K=1
-      // I+X
-      // Solver complexity:  K
-      dpse_solvers_.resize(3);
-      for (int i=0;i<3;++i) {
-        int np = std::pow(2, i);
-
-        Sparsity sp;
-        if (K_==1) {
-          sp = Sparsity::dense(np, np);
-        } else {
-          std::vector<int> row_ind = range(0, np*(np+1)*K_+np+1, np+1);
-          std::vector<int> col(np*(np+1)*K_);
-
-          int k = 0;
-          for (int l=0;l<np;++l) {
-            col[np*(np+1)*k+l*(np+1)] = l;
-            for (int m=0;m<np;++m) {
-              col[np*(np+1)*k+l*(np+1)+m+1] = (K_-1)*np+m;
-            }
-          }
-
-          for (k=1;k<K_;++k) {
-            for (int l=0;l<np;++l) {
-              for (int m=0;m<np;++m) {
-                col[np*(np+1)*k+l*(np+1)+m] = (k-1)*np+m;
-              }
-              col[np*(np+1)*k+l*(np+1)+np] = k*np +l;
-            }
-
-          }
-
-          sp = Sparsity(np*K_, np*K_, row_ind, col);
-        }
-        LinearSolver solver("solver", linear_solver_name, sp);
-
-        dpse_solvers_[i].resize(n_*(n_+1)/2, solver);
-        for (int k=0;k<n_*(n_+1)/2;++k) {
-          dpse_solvers_[i][k].makeUnique();
-          dpse_solvers_[i][k].setInput(1, LINSOL_A);
-        }
-
-      }
-
-    } else {
-      casadi_error("Must set linear_solver option.");
-    }
-
-    if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
-      profileWriteName(CasadiOptions::profilingLog, this, getOption("name"),
-                       ProfilingData_FunctionType_Other, 2);
-
-      profileWriteSourceLine(CasadiOptions::profilingLog, this, 0, "schur", -1);
-      profileWriteSourceLine(CasadiOptions::profilingLog, this, 1, "solve", -1);
-    }
-
-    psd_num_zero_ = getOption("psd_num_zero");
+    alloc_iw(n_, true); // partition_
 
   }
 
+  /** \brief Initalize memory block */
+  void init_memory(void* mem) const {
+    Dple::init_memory(mem);
+    auto m = static_cast<SlicotDpleMemory*>(mem);
+
+    // Construct linear solvers for low-order Discrete Periodic Sylvester Equations
+    // I00X
+    // XI00
+    // 0XI0
+    // 00XI
+    //  Special case K=1
+    // I+X
+    // Solver complexity:  K
+    m->dpse_solvers_.resize(3);
+    for (int i=0;i<3;++i) {
+      int np = std::pow(2, i);
+
+      Sparsity sp;
+      if (K_==1) {
+        sp = Sparsity::dense(np, np);
+      } else {
+        std::vector<int> row_ind = range(0, np*(np+1)*K_+np+1, np+1);
+        std::vector<int> col(np*(np+1)*K_);
+
+        int k = 0;
+        for (int l=0;l<np;++l) {
+          col[np*(np+1)*k+l*(np+1)] = l;
+          for (int m=0;m<np;++m) {
+            col[np*(np+1)*k+l*(np+1)+m+1] = (K_-1)*np+m;
+          }
+        }
+
+        for (k=1;k<K_;++k) {
+          for (int l=0;l<np;++l) {
+            for (int m=0;m<np;++m) {
+              col[np*(np+1)*k+l*(np+1)+m] = (k-1)*np+m;
+            }
+            col[np*(np+1)*k+l*(np+1)+np] = k*np +l;
+          }
+
+        }
+
+        sp = Sparsity(np*K_, np*K_, row_ind, col);
+      }
+      Linsol solver("solver", linear_solver_name, sp);
+
+      m->dpse_solvers_[i].resize(n_*(n_+1)/2, solver);
+      for (int k=0;k<n_*(n_+1)/2;++k) {
+        m->dpse_solvers_[i][k].makeUnique();
+        m->dpse_solvers_[i][k].setInput(1, LINSOL_A);
+      }
+    }
+  }
+
   /// \cond INTERNAL
-  inline int PsdIndefDpleInternal::partindex(int i, int j, int k, int r, int c) {
+  inline int SlicotDple::partindex(int i, int j, int k, int r, int c) {
     return k*n_*n_+(partition_[i]+r)*n_ + partition_[j]+c;
   }
 
@@ -249,7 +243,7 @@ namespace casadi {
   /// \endcond
 
 
-  void PsdIndefDpleInternal::evaluate() {
+  void SlicotDple::evaluate() {
     // Obtain a periodic Schur form
 
     DenseIO::readInputs();
@@ -286,7 +280,7 @@ namespace casadi {
       for (int i=0;i<n_;++i) {
         double modulus = sqrt(eig_real_[i]*eig_real_[i]+eig_imag_[i]*eig_imag_[i]);
         casadi_assert_message(modulus+eps_unstable_ <= 1,
-          "PsdIndefDpleInternal: system is unstable."
+          "SlicotDple: system is unstable."
           "Found an eigenvalue " << eig_real_[i] << " + " <<
           eig_imag_[i] << "j, with modulus " << modulus <<
           " (corresponding eps= " << 1-modulus << ")." <<
@@ -843,7 +837,7 @@ namespace casadi {
 
   }
 
-  Function PsdIndefDpleInternal
+  Function SlicotDple
   ::getDerForward(const std::string& name, int nfwd, Dict& opts) {
 
     // Base:
@@ -894,7 +888,7 @@ namespace casadi {
     std::map<std::string, std::vector<Sparsity> > tmp;
     tmp["a"] = st_[Dple_STRUCT_A];
     tmp["v"] = st_[Dple_STRUCT_V];
-    PsdIndefDpleInternal* node = new PsdIndefDpleInternal(tmp, nfwd, transp_);
+    SlicotDple* node = new SlicotDple(tmp, nfwd, transp_);
     node->setOption(dictionary());
 
     DpleSolver f;
@@ -948,7 +942,7 @@ namespace casadi {
     return MXFunction(name, ins_new, outs_new, opts);
   }
 
-  Function PsdIndefDpleInternal
+  Function SlicotDple
   ::getDerReverse(const std::string& name, int nadj, Dict& opts) {
 
     // Base:
@@ -998,7 +992,7 @@ namespace casadi {
     std::map<std::string, std::vector<Sparsity> > tmp;
     tmp["a"] = st_[Dple_STRUCT_A];
     tmp["v"] = st_[Dple_STRUCT_V];
-    PsdIndefDpleInternal* node2 = new PsdIndefDpleInternal(tmp, nadj, !transp_);
+    SlicotDple* node2 = new SlicotDple(tmp, nadj, !transp_);
     node2->setOption(dictionary());
 
     DpleSolver b;
@@ -1059,17 +1053,17 @@ namespace casadi {
     return MXFunction(name, ins_new, outs_new, opts);
   }
 
-  void PsdIndefDpleInternal::deepCopyMembers(
+  void SlicotDple::deepCopyMembers(
       std::map<SharedObjectNode*, SharedObject>& already_copied) {
-    DpleInternal::deepCopyMembers(already_copied);
+    Dple::deepCopyMembers(already_copied);
   }
 
-  PsdIndefDpleInternal* PsdIndefDpleInternal::clone() const {
+  SlicotDple* SlicotDple::clone() const {
     // Return a deep copy
     std::map<std::string, std::vector<Sparsity> > tmp;
     tmp["a"] = st_[Dple_STRUCT_A];
     tmp["v"] = st_[Dple_STRUCT_V];
-    PsdIndefDpleInternal* node = new PsdIndefDpleInternal(tmp, nrhs_, transp_);
+    SlicotDple* node = new SlicotDple(tmp, nrhs_, transp_);
     node->setOption(dictionary());
     return node;
   }
@@ -1131,7 +1125,7 @@ namespace casadi {
   void slicot_mb03wd(char job, char compz, int n, int p, int ilo, int ihi, int iloz, int ihiz,
                      double *h, int ldh1, int ldh2, double* z, int ldz1, int ldz2, double* wr,
                      double *wi, double * dwork, int ldwork) {
-if (dwork==0) {
+      if (dwork==0) {
        std::vector<double> work = std::vector<double>(ihi-ilo+p-1);
        slicot_mb03wd(job, compz, n, p, ilo, ihi, iloz, ihiz, h, ldh1, ldh2, z, ldz1, ldz2, wr, wi,
                      &work[0], ihi-ilo+p-1);
