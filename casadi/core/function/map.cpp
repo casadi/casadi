@@ -91,15 +91,17 @@ namespace casadi {
   void Map::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     int n_in = this->n_in(), n_out = this->n_out();
     bvec_t** arg1 = arg+n_in;
+    copy_n(arg, n_in, arg1);
     bvec_t** res1 = res+n_out;
+    copy_n(res, n_out, res1);
     for (int i=0; i<n_; ++i) {
+      f_->sp_rev(arg1, res1, iw, w, 0);
       for (int j=0; j<n_in; ++j) {
-        arg1[j] = arg[j] ? arg[j]+i*f_.nnz_in(j): 0;
+        if (arg1[j]) arg1[j] += f_.nnz_in(j);
       }
       for (int j=0; j<n_out; ++j) {
-        res1[j]= res[j] ? res[j]+i*f_.nnz_out(j): 0;
+        if (res1[j]) res1[j] += f_.nnz_out(j);
       }
-      f_->sp_rev(arg1, res1, iw, w, 0);
     }
   }
 
