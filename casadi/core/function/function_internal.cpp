@@ -91,8 +91,8 @@ namespace casadi {
   }
 
   FunctionInternal::~FunctionInternal() {
-    for (auto&& i : mem_) {
-      casadi_assert_warning(i==0, "Memory object has not been properly freed");
+    for (void* m : mem_) {
+      casadi_assert_warning(m==0, "Memory object has not been properly freed");
     }
     mem_.clear();
   }
@@ -2781,7 +2781,7 @@ namespace casadi {
     return mem_.at(ind);
   }
 
-  int FunctionInternal::checkout() {
+  int FunctionInternal::checkout() const {
     if (unused_.empty()) {
       // Allocate a new memory object
       int n_mem = this->n_mem();
@@ -2799,7 +2799,7 @@ namespace casadi {
     }
   }
 
-  void FunctionInternal::release(int mem) {
+  void FunctionInternal::release(int mem) const {
     unused_.push(mem);
   }
 

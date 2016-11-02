@@ -954,10 +954,10 @@ namespace casadi {
     void assert_size_out(int i, int nrow, int ncol) const;
 
     /// Checkout a memory object
-    int checkout();
+    int checkout() const;
 
     /// Release a memory object
-    void release(int mem);
+    void release(int mem) const;
 
 #ifndef SWIG
     /// Get memory object

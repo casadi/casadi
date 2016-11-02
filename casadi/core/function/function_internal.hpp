@@ -783,10 +783,10 @@ namespace casadi {
     ///@}
 
     /// Checkout a memory object
-    int checkout();
+    int checkout() const;
 
     /// Release a memory object
-    void release(int mem);
+    void release(int mem) const;
 
     /// Input and output sparsity
     std::vector<Sparsity> isp_, osp_;
@@ -877,10 +877,10 @@ namespace casadi {
       double t_proc, double t_wall);
   private:
     /// Memory objects
-    std::vector<void*> mem_;
+    mutable std::vector<void*> mem_;
 
     /// Unused memory objects
-    std::stack<int> unused_;
+    mutable std::stack<int> unused_;
 
     /** \brief Memory that is persistent during a call (but not between calls) */
     size_t sz_arg_per_, sz_res_per_, sz_iw_per_, sz_w_per_;

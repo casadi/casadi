@@ -257,21 +257,32 @@ namespace casadi {
     int n_in = this->n_in(), n_out = this->n_out();
     size_t sz_arg, sz_res, sz_iw, sz_w;
     f_.sz_work(sz_arg, sz_res, sz_iw, sz_w);
+    // Checkout memory objects
+    int* ind = iw; iw += n_;
+    for (int i=0; i<n_; ++i) ind[i] = f_.checkout();
+    // Input buffers
+    const double** arg1 = arg + n_in;
+    for (int i=0; i<n_; ++i) {
+      copy_n(arg, n_in, arg1 + i*sz_arg);
+      for (int j=0; j<n_in; ++j) {
+        if (arg[j]) arg[j] += f_.nnz_in(j);
+      }
+    }
+    // Output buffers
+    double** res1 = res + n_out;
+    for (int i=0; i<n_; ++i) {
+      copy_n(res, n_out, res1 + i*sz_res);
+      for (int j=0; j<n_out; ++j) {
+        if (res[j]) arg[j] += f_.nnz_out(j);
+      }
+    }
+    // Evaluate in parallel
 #pragma omp parallel for
     for (int i=0; i<n_; ++i) {
-      // Input buffers
-      const double** arg1 = arg + n_in + i*sz_arg;
-      for (int j=0; j<n_in; ++j) {
-        arg1[j] = arg[j] ? arg[j] + i*f_.nnz_in(j) : 0;
-      }
-      // Output buffers
-      double** res1 = res + n_out + i*sz_res;
-      for (int j=0; j<n_out; ++j) {
-        res1[j] = res[j] ? res[j] + i*f_.nnz_out(j) : 0;
-      }
-      // Evaluate in parallel
-      f_->eval(0, arg1, res1, iw + i*sz_iw, w + i*sz_w); // FIXME
+      f_(arg1 + i*sz_arg, res1 + i*sz_res, iw + i*sz_iw, w + i*sz_w, ind[i]);
     }
+    // Release memory objects
+    for (int i=0; i<n_; ++i) f_.release(ind[i]);
 #endif  // WITH_OPENMP
   }
 
@@ -301,6 +312,9 @@ namespace casadi {
   void MapOmp::init(const Dict& opts) {
     // Call the initialization method of the base class
     Map::init(opts);
+
+    // Allocate memory for holding memory object references
+    alloc_iw(n_, true);
 
     // Allocate sufficient memory for parallel evaluation
     alloc_arg(f_.sz_arg() * n_);

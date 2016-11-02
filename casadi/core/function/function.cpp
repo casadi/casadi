@@ -1425,11 +1425,11 @@ namespace casadi {
     return (*this)->n_nodes();
   }
 
-  int Function::checkout() {
+  int Function::checkout() const {
     return (*this)->checkout();
   }
 
-  void Function::release(int mem) {
+  void Function::release(int mem) const {
     (*this)->release(mem);
   }
 
