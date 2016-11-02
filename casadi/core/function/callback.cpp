@@ -148,8 +148,12 @@ namespace casadi {
     return (*this)->FunctionInternal::get_reverse_old(name, nadj, opts);
   }
 
-  Function Callback::get_reverse_new(const std::string& name, int nadj, Dict& opts) {
-    return (*this)->FunctionInternal::get_reverse(name, nadj, opts);
+  Function Callback::
+  get_reverse_new(const std::string& name, int nadj,
+                  const std::vector<std::string>& i_names,
+                  const std::vector<std::string>& o_names,
+                  const Dict& opts) {
+    return (*this)->FunctionInternal::get_reverse(name, nadj, i_names, o_names, opts);
   }
 
   int Callback::get_n_reverse() const {

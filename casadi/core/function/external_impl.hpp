@@ -123,7 +123,10 @@ namespace casadi {
 
     ///@{
     /** \brief Reverse mode derivatives */
-    virtual Function get_reverse(const std::string& name, int nadj, Dict& opts);
+    virtual Function get_reverse(const std::string& name, int nadj,
+                                 const std::vector<std::string>& i_names,
+                                 const std::vector<std::string>& o_names,
+                                 const Dict& opts);
     virtual int get_n_reverse() const;
     ///@}
 

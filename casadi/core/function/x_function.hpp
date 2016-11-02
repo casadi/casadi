@@ -137,7 +137,10 @@ namespace casadi {
 
     ///@{
     /** \brief Generate a function that calculates \a nadj adjoint derivatives */
-    virtual Function get_reverse(const std::string& name, int nadj, Dict& opts);
+    virtual Function get_reverse(const std::string& name, int nadj,
+                                 const std::vector<std::string>& i_names,
+                                 const std::vector<std::string>& o_names,
+                                 const Dict& opts);
     virtual int get_n_reverse() const { return 64;}
     ///@}
 
@@ -1074,7 +1077,10 @@ namespace casadi {
 
   template<typename DerivedType, typename MatType, typename NodeType>
   Function XFunction<DerivedType, MatType, NodeType>
-  ::get_reverse(const std::string& name, int nadj, Dict& opts) {
+  ::get_reverse(const std::string& name, int nadj,
+                const std::vector<std::string>& i_names,
+                const std::vector<std::string>& o_names,
+                const Dict& opts) {
     // Seeds
     std::vector<std::vector<MatType> > aseed = symbolicAdjSeed(nadj, out_), asens;
 
@@ -1109,7 +1115,7 @@ namespace casadi {
     }
 
     // Assemble function and return
-    return Function(name, ret_in, ret_out, opts);
+    return Function(name, ret_in, ret_out, i_names, o_names, opts);
   }
 
   template<typename DerivedType, typename MatType, typename NodeType>

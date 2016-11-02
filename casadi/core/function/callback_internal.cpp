@@ -126,9 +126,11 @@ namespace casadi {
   }
 
   Function CallbackInternal::
-  get_reverse(const std::string& name, int nadj, Dict& opts) {
+  get_reverse(const std::string& name, int nadj,
+              const std::vector<std::string>& i_names,
+              const std::vector<std::string>& o_names, const Dict& opts) {
     casadi_assert_message(self_!=0, "Callback object has been deleted");
-    casadi_try_return(get_reverse_new, self_, name, nadj, opts);
+    casadi_try_return(get_reverse_new, self_, name, nadj, i_names, o_names, opts);
   }
 
   Function CallbackInternal::

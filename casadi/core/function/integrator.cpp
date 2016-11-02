@@ -807,7 +807,11 @@ namespace casadi {
     return Function(name, ret_in, ret_out, i_names, o_names, opts);
   }
 
-  Function Integrator::get_reverse(const std::string& name, int nadj, Dict& opts) {
+  Function Integrator::
+  get_reverse(const std::string& name, int nadj,
+              const std::vector<std::string>& i_names,
+              const std::vector<std::string>& o_names,
+              const Dict& opts) {
     log("Integrator::get_reverse", "begin");
 
     // Integrator options
@@ -950,7 +954,7 @@ namespace casadi {
     log("Integrator::getDerivative", "end");
 
     // Create derivative function and return
-    return Function(name, ret_in, ret_out, opts);
+    return Function(name, ret_in, ret_out, i_names, o_names, opts);
   }
 
   Dict Integrator::getDerivativeOptions(bool fwd) {

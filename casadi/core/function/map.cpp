@@ -176,7 +176,9 @@ namespace casadi {
   }
 
   Function Map
-  ::get_reverse(const std::string& name, int nadj, Dict& opts) {
+  ::get_reverse(const std::string& name, int nadj,
+                const std::vector<std::string>& i_names,
+                const std::vector<std::string>& o_names, const Dict& opts) {
     // Differentiate mapped function
     Function df = f_.reverse_new(nadj);
 
@@ -217,7 +219,7 @@ namespace casadi {
     }
 
     // Construct return function
-    return Function(name, arg, res, opts);
+    return Function(name, arg, res, i_names, o_names, opts);
   }
 
   void Map::eval(void* mem, const double** arg, double** res, int* iw, double* w) const {

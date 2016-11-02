@@ -209,7 +209,9 @@ namespace casadi {
   }
 
   Function Switch
-  ::get_reverse(const std::string& name, int nadj, Dict& opts) {
+  ::get_reverse(const std::string& name, int nadj,
+                const std::vector<std::string>& i_names,
+                const std::vector<std::string>& o_names, const Dict& opts) {
     // Derivative of each case
     vector<Function> der(f_.size());
     for (int k=0; k<f_.size(); ++k) {
@@ -239,7 +241,7 @@ namespace casadi {
     arg.erase(ind_seed);
 
     // Create wrapper
-    return Function(name, arg, res, opts);
+    return Function(name, arg, res, i_names, o_names, opts);
   }
 
   void Switch::print(ostream &stream) const {

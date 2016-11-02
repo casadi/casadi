@@ -1517,14 +1517,12 @@ namespace casadi {
 
     // Options
     Dict opts = derived_options();
-    opts["input_scheme"] = i_names;
-    opts["output_scheme"] = o_names;
     opts["max_num_dir"] = max_num_dir_;
     opts["derivative_of"] = self();
 
     // Return value
     casadi_assert(get_n_reverse()>0);
-    Function ret = get_reverse(name, nadj, opts);
+    Function ret = get_reverse(name, nadj, i_names, o_names, opts);
 
     // Consistency check for inputs
     casadi_assert(ret.n_in()==n_in + n_out + n_out);
@@ -1583,7 +1581,10 @@ namespace casadi {
     casadi_error("'get_reverse' not defined for " + type_name());
   }
 
-  Function FunctionInternal::get_reverse(const std::string& name, int nadj, Dict& opts) {
+  Function FunctionInternal::
+  get_reverse(const std::string& name, int nadj,
+              const std::vector<std::string>& i_names,
+              const std::vector<std::string>& o_names, const Dict& opts) {
     // Call old implementation
     Dict old_opts = derived_options();
     Function d = get_reverse_old(name, nadj, old_opts);
@@ -1608,7 +1609,7 @@ namespace casadi {
     }
     res.resize(n_in());
     // Construct new function
-    return Function(name, arg, res, opts);
+    return Function(name, arg, res, i_names, o_names, opts);
   }
 
   int FunctionInternal::nnz_in() const {

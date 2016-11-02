@@ -296,7 +296,10 @@ namespace casadi {
   }
 
   Function External
-  ::get_reverse(const std::string& name, int nadj, Dict& opts) {
+  ::get_reverse(const std::string& name, int nadj,
+                const std::vector<std::string>& i_names,
+                const std::vector<std::string>& o_names,
+                const Dict& opts) {
     // Consistency check
     int n=1;
     while (n<nadj) n*=2;
