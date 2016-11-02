@@ -68,15 +68,17 @@ namespace casadi {
   void Map::evalGen(const T** arg, T** res, int* iw, T* w) const {
     int n_in = this->n_in(), n_out = this->n_out();
     const T** arg1 = arg+n_in;
+    copy_n(arg, n_in, arg1);
     T** res1 = res+n_out;
+    copy_n(res, n_out, res1);
     for (int i=0; i<n_; ++i) {
+      f_(arg1, res1, iw, w, 0);
       for (int j=0; j<n_in; ++j) {
-        arg1[j] = arg[j] ? arg[j]+i*f_.nnz_in(j): 0;
+        if (arg1[j]) arg1[j] += f_.nnz_in(j);
       }
       for (int j=0; j<n_out; ++j) {
-        res1[j]= res[j] ? res[j]+i*f_.nnz_out(j): 0;
+        if (res1[j]) res1[j] += f_.nnz_out(j);
       }
-      f_(arg1, res1, iw, w, 0);
     }
   }
 
@@ -111,21 +113,26 @@ namespace casadi {
 
   void Map::generateBody(CodeGenerator& g) const {
     int n_in = this->n_in(), n_out = this->n_out();
-
-    g.body << "  const real_t** arg1 = arg+" << n_in << ";"<< endl;
-    g.body << "  real_t** res1 = res+" << n_out << ";" << endl;
-
     g.body << "  int i;" << endl;
-    g.body << "  for (i=0; i<" << n_ << "; ++i) {" << endl;
-    for (int j=0; j<n_in; ++j) {
-      g.body << "    arg1[" << j << "] = arg[" << j << "]? " <<
-        "arg[" << j << "]+i*" << f_.nnz_in(j) << " : 0;" << endl;
-    }
-    for (int j=0; j<n_out; ++j) {
-      g.body << "    res1[" << j << "] = res[" << j << "]? " <<
-        "res[" << j << "]+i*" << f_.nnz_out(j) << " : 0;" << endl;
-    }
+    // Input buffer
+    g.body << "  const real_t** arg1 = arg+" << n_in << ";"<< endl
+           << "  for (i=0; i<" << n_in << "; ++i) arg1[i]=arg[i];" << endl;
+    // Output buffer
+    g.body << "  real_t** res1 = res+" << n_out << ";" << endl
+           << "  for (i=0; i<" << n_out << "; ++i) res1[i]=res[i];" << endl
+           << "  for (i=0; i<" << n_ << "; ++i) {" << endl;
+    // Evaluate
     g.body << "    if (" << g(f_, "arg1", "res1", "iw", "w") << ") return 1;" << endl;
+    // Update input buffers
+    for (int j=0; j<n_in; ++j) {
+      g.body << "    if (arg1[" << j << "]) arg1[" << j << "]+="
+             << f_.nnz_in(j) << ";" << endl;
+    }
+    // Update output buffers
+    for (int j=0; j<n_out; ++j) {
+      g.body << "    if (res1[" << j << "]) res1[" << j << "]+="
+             << f_.nnz_out(j) << ";" << endl;
+    }
     g.body << "  }" << std::endl;
   }
 
