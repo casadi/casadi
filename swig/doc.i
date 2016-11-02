@@ -7592,12 +7592,6 @@ the scalar conversion is valid.
 
 ";
 
-%feature("docstring") casadi::Matrix< Scalar >::Matrix(const MX &x) "
-
-[INTERNAL]  Create a matrix from a numeric MX.
-
-";
-
 %feature("docstring") casadi::Matrix< T >::Matrix(const std::vector< Scalar
 > &x) "
 

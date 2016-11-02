@@ -5353,11 +5353,6 @@ Create an expression from a vector.
 Create a matrix from another matrix with a different entry type Assumes that
 the scalar conversion is valid.
 
->  casadi::Matrix< Scalar >::Matrix(const MX &x)
-------------------------------------------------------------------------
-[INTERNAL] 
-Create a matrix from a numeric MX.
-
 >  casadi::Matrix< T >::Matrix(const std::vector< Scalar > &x)
 
 >  casadi::Matrix< T >::Matrix(const std::pair< int, int > &rc)
