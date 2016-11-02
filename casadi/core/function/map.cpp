@@ -251,7 +251,7 @@ namespace casadi {
   }
 
   void MapOmp::eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
-#ifdef WITH_OPENMP
+#ifndef WITH_OPENMP
     return Map::eval(mem, arg, res, iw, w);
 #else // WITH_OPENMP
     int n_in = this->n_in(), n_out = this->n_out();
