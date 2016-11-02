@@ -1230,6 +1230,12 @@ Return a string with a representation (for SWIG)
 
 ";
 
+%feature("docstring")  casadi::Function::wrap() const  "
+
+Wrap in an Function instance consisting of only one MX call.
+
+";
+
 %feature("docstring")  casadi::Callback::get_sparsity_out(int i) "
 
 Get the sparsity of an output This function is called during construction.
@@ -1446,26 +1452,7 @@ that the output must be scalar. In other cases, use the Jacobian instead.
 const std::pair< int, int > &size, double r, int n, const Dict &opts=Dict())
 const  "
 
-kernel_sum Consider a dense matrix V.
-
-KernelSum computes
-
-F(V,X) = sum_i sum_j f ( [i;j], V(i,j), X)
-
-with X: [x;y]
-
-where the summation is taken for all entries (i,j) that are a distance r
-away from X.
-
-This function assumes that V is fixed: sensitivities with respect to it are
-not computed.
-
-This allows for improved speed of evaluation.
-
-Having V fixed is a common use case: V may be a large bitmap (observation),
-onto which a kernel is fitted.
-
-Joris Gillis
+[DEPRECATED] kernel_sum is no longer available
 
 ";
 
@@ -3142,6 +3129,12 @@ Get oracle.
 
 ";
 
+%feature("docstring")  casadi::Function::wrap() const  "
+
+Wrap in an Function instance consisting of only one MX call.
+
+";
+
 %feature("docstring")  casadi::Function::integrator_dae() "
 
 [DEPRECATED] Get the DAE for an integrator To generate a function with the
@@ -3212,26 +3205,7 @@ Print dimensions of inputs and outputs.
 const std::pair< int, int > &size, double r, int n, const Dict &opts=Dict())
 const  "
 
-kernel_sum Consider a dense matrix V.
-
-KernelSum computes
-
-F(V,X) = sum_i sum_j f ( [i;j], V(i,j), X)
-
-with X: [x;y]
-
-where the summation is taken for all entries (i,j) that are a distance r
-away from X.
-
-This function assumes that V is fixed: sensitivities with respect to it are
-not computed.
-
-This allows for improved speed of evaluation.
-
-Having V fixed is a common use case: V may be a large bitmap (observation),
-onto which a kernel is fitted.
-
-Joris Gillis
+[DEPRECATED] kernel_sum is no longer available
 
 ";
 
@@ -6111,9 +6085,6 @@ IpoptInterface &ipoptInterface, IpoptMemory *mem) "
 
 
 // File: classcasadi_1_1Jit.xml
-
-
-// File: classcasadi_1_1KernelSum.xml
 
 
 // File: classcasadi_1_1LapackLu.xml

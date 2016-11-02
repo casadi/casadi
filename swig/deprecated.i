@@ -7,6 +7,9 @@
 %exception  casadi::Function::integrator_dae() {
  CATCH_OR_NOT(DEPRECATED_MSG("") $action)
 }
+%exception  casadi::Function::kernel_sum(const std::string &name, const std::pair< int, int > &size, double r, int n, const Dict &opts=Dict()) const  {
+ CATCH_OR_NOT(DEPRECATED_MSG("") $action)
+}
 %exception  casadi::Function::nl_var(const std::string &s_in, const std::vector< std::string > &s_out) const  {
  CATCH_OR_NOT(DEPRECATED_MSG("") $action)
 }
