@@ -185,43 +185,49 @@ namespace casadi {
   ::get_reverse(const std::string& name, int nadj,
                 const std::vector<std::string>& i_names,
                 const std::vector<std::string>& o_names, const Dict& opts) {
-    // Differentiate mapped function
-    Function df = f_.reverse_new(nadj);
+    // Shorthands
+    int n_in = this->n_in(), n_out = this->n_out();
 
-    // Construct and return
+    // Generate map of derivative
+    Function df = f_.reverse_new(nadj);
     Function dm = df.map(name + "_map", parallelization(), n_, derived_options());
 
     // Input expressions
     vector<MX> arg = dm.mx_in();
 
     // Need to reorder sensitivity inputs
-    vector<MX> parg = arg;
-    for (int i=0; i<n_out(); ++i) {
-      vector<MX> v = horzsplit(arg[n_in()+n_out()+i], f_.size2_out(i));
-      casadi_assert(v.size()==n_*nadj);
-      vector<MX> w(v.size());
+    vector<MX> res = arg;
+    vector<MX>::iterator it=res.begin()+n_in+n_out;
+    vector<int> ind;
+    for (int i=0; i<n_out; ++i, ++it) {
+      int sz = f_.size2_out(i);
+      ind.clear();
       for (int k=0; k<n_; ++k) {
         for (int d=0; d<nadj; ++d) {
-          w[k*nadj + d] = v[d*n_ + k];
+          for (int j=0; j<sz; ++j) {
+            ind.push_back((d*n_ + k)*sz + j);
+          }
         }
       }
-      parg[n_in()+n_out()+i] = horzcat(w);
+      *it = (*it)(Slice(), ind);
     }
 
     // Get output expressions
-    vector<MX> res = dm(parg);
+    res = dm(res);
 
     // Reorder sensitivity outputs
-    for (int i=0; i<n_in(); ++i) {
-      vector<MX> v = horzsplit(res[i], f_.size2_in(i));
-      casadi_assert(v.size()==n_*nadj);
-      vector<MX> w(v.size());
-      for (int k=0; k<n_; ++k) {
-        for (int d=0; d<nadj; ++d) {
-          w[d*n_ + k] = v[k*nadj + d];
+    it = res.begin();
+    for (int i=0; i<n_in; ++i, ++it) {
+      int sz = f_.size2_in(i);
+      ind.clear();
+      for (int d=0; d<nadj; ++d) {
+        for (int k=0; k<n_; ++k) {
+          for (int j=0; j<sz; ++j) {
+            ind.push_back((k*nadj + d)*sz + j);
+          }
         }
       }
-      res[i] = horzcat(w);
+      *it = (*it)(Slice(), ind);
     }
 
     // Construct return function
