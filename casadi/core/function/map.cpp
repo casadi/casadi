@@ -259,17 +259,18 @@ namespace casadi {
     f_.sz_work(sz_arg, sz_res, sz_iw, sz_w);
 #pragma omp parallel for
     for (int i=0; i<n_; ++i) {
-      const double** arg_i = arg + n_in + sz_arg*i;
+      // Input buffers
+      const double** arg1 = arg + n_in + i*sz_arg;
       for (int j=0; j<n_in; ++j) {
-        arg_i[j] = arg[j]+i*f_.nnz_in(j);
+        arg1[j] = arg[j] ? arg[j] + i*f_.nnz_in(j) : 0;
       }
-      double** res_i = res + n_out + sz_res*i;
+      // Output buffers
+      double** res1 = res + n_out + i*sz_res;
       for (int j=0; j<n_out; ++j) {
-        res_i[j] = res[j]? res[j]+i*f_.nnz_out(j) : 0;
+        res1[j] = res[j] ? res[j] + i*f_.nnz_out(j) : 0;
       }
-      int* iw_i = iw + i*sz_iw;
-      double* w_i = w + i*sz_w;
-      f_->eval(0, arg_i, res_i, iw_i, w_i);
+      // Evaluate in parallel
+      f_->eval(0, arg1, res1, iw + i*sz_iw, w + i*sz_w); // FIXME
     }
 #endif  // WITH_OPENMP
   }
