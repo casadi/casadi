@@ -257,29 +257,28 @@ namespace casadi {
     int n_in = this->n_in(), n_out = this->n_out();
     size_t sz_arg, sz_res, sz_iw, sz_w;
     f_.sz_work(sz_arg, sz_res, sz_iw, sz_w);
+
     // Checkout memory objects
     int* ind = iw; iw += n_;
     for (int i=0; i<n_; ++i) ind[i] = f_.checkout();
-    // Input buffers
-    const double** arg1 = arg + n_in;
-    for (int i=0; i<n_; ++i) {
-      copy_n(arg, n_in, arg1 + i*sz_arg);
-      for (int j=0; j<n_in; ++j) {
-        if (arg[j]) arg[j] += f_.nnz_in(j);
-      }
-    }
-    // Output buffers
-    double** res1 = res + n_out;
-    for (int i=0; i<n_; ++i) {
-      copy_n(res, n_out, res1 + i*sz_res);
-      for (int j=0; j<n_out; ++j) {
-        if (res[j]) arg[j] += f_.nnz_out(j);
-      }
-    }
+
     // Evaluate in parallel
 #pragma omp parallel for
     for (int i=0; i<n_; ++i) {
-      f_(arg1 + i*sz_arg, res1 + i*sz_res, iw + i*sz_iw, w + i*sz_w, ind[i]);
+      // Input buffers
+      const double** arg1 = arg + n_in + i*sz_arg;
+      for (int j=0; j<n_in; ++j) {
+        arg1[j] = arg[j] ? arg[j] + i*f_.nnz_in(j) : 0;
+      }
+
+      // Output buffers
+      double** res1 = res + n_out + i*sz_res;
+      for (int j=0; j<n_out; ++j) {
+        res1[j] = res[j] ? res[j] + i*f_.nnz_out(j) : 0;
+      }
+
+      // Evaluation
+      f_(arg1, res1, iw + i*sz_iw, w + i*sz_w, ind[i]);
     }
     // Release memory objects
     for (int i=0; i<n_; ++i) f_.release(ind[i]);
@@ -290,22 +289,24 @@ namespace casadi {
     int n_in = this->n_in(), n_out = this->n_out();
     size_t sz_arg, sz_res, sz_iw, sz_w;
     f_.sz_work(sz_arg, sz_res, sz_iw, sz_w);
-
     g.body << "  int i;" << endl;
-    g.body << "#pragma omp parallel for" << endl;
+    g.body << "  const double** arg1;" << endl;
+    g.body << "  double** res1;" << endl;
+    g.body << "#pragma omp parallel for private(i,arg1,res1)" << endl;
     g.body << "  for (i=0; i<" << n_ << "; ++i) {" << endl;
-    g.body << "    const double** arg_i = arg + " << n_in << "+" << sz_arg << "*i;" << endl;
+    g.body << "    arg1 = arg + " << n_in << "+i*" << sz_arg << ";" << endl;
     for (int j=0; j<n_in; ++j) {
-      g.body << "    arg_i[" << j << "] = arg[" << j << "]+i*" << f_.nnz_in(j) << ";" << endl;
+      g.body << "    arg1[" << j << "] = arg[" << j << "] ? "
+             << "arg[" << j << "]+i*" << f_.nnz_in(j) << ": 0;" << endl;
     }
-    g.body << "    double** res_i = res + " <<  n_out << "+" <<  sz_res << "*i;" << endl;
+    g.body << "    res1 = res + " <<  n_out << "+i*" <<  sz_res << ";" << endl;
     for (int j=0; j<n_out; ++j) {
-      g.body << "    res_i[" << j << "] = res[" << j << "] ?" <<
-                "res[" << j << "]+i*" << f_.nnz_out(j) << ": 0;" << endl;
+      g.body << "    res1[" << j << "] = res[" << j << "] ?"
+             << "res[" << j << "]+i*" << f_.nnz_out(j) << ": 0;" << endl;
     }
-    g.body << "    int* iw_i = iw + i*" << sz_iw << ";" << endl;
-    g.body << "    double* w_i = w + i*" << sz_w << ";" << endl;
-    g.body << "    " << g(f_, "arg_i", "res_i", "iw_i", "w_i") << ";" << endl;
+    g.body << "    " << g(f_, "arg1", "res1",
+                          "iw+i*" + to_string(sz_iw),
+                          "w+i*" + to_string(sz_w)) << ";" << endl;
     g.body << "  }" << std::endl;
   }
 
