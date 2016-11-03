@@ -1008,6 +1008,22 @@ Get an atomic operation operator index.
 >  Function casadi::Function::map(const std::string &name, const std::string &parallelization, int n, const std::vector< int > &reduce_in, const std::vector< int > &reduce_out, const Dict &opts=Dict())
 
 >  Function casadi::Function::map(const std::string &name, const std::string &parallelization, int n, const std::vector< std::string > &reduce_in, const std::vector< std::string > &reduce_out, const Dict &opts=Dict())
+------------------------------------------------------------------------
+
+Map with reduction A subset of the inputs are non-repeated and a subset of
+the outputs summed up.
+
+>  std::vector<MX> casadi::Function::map(const std::vector< MX > &arg, const std::string &parallelization=\"serial\")
+
+>  std::map<std::string, MX> casadi::Function::map(const std::map< std::string, MX > &arg, const std::string &parallelization=\"serial\")
+------------------------------------------------------------------------
+
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+parallelization:  Type of parallelization used: unroll|serial|openmp
 
 >  Function casadi::Function::map(const std::string &name, const std::string &parallelization, int n, const Dict &opts=Dict())
 ------------------------------------------------------------------------
@@ -1023,7 +1039,7 @@ Suppose the function has a signature of:
 
 
 
-The the mapaccumulated version has the signature:
+The the mapped version has the signature:
 
 ::
 
@@ -1047,17 +1063,10 @@ Parameters:
 
 parallelization:  Type of parallelization used: unroll|serial|openmp
 
->  std::vector<MX> casadi::Function::map(const std::vector< MX > &arg, const std::string &parallelization=\"serial\")
-
->  std::map<std::string, MX> casadi::Function::map(const std::map< std::string, MX > &arg, const std::string &parallelization=\"serial\")
+>  Function casadi::Function::map(int n)
 ------------------------------------------------------------------------
 
-Evaluate symbolically in parallel (matrix graph)
-
-Parameters:
------------
-
-parallelization:  Type of parallelization used: unroll|serial|openmp
+Shorthand for map(name_n, 'serial', n)
 
 ";
 
@@ -2482,6 +2491,22 @@ the output elements).
 >  Function casadi::Function::map(const std::string &name, const std::string &parallelization, int n, const std::vector< int > &reduce_in, const std::vector< int > &reduce_out, const Dict &opts=Dict())
 
 >  Function casadi::Function::map(const std::string &name, const std::string &parallelization, int n, const std::vector< std::string > &reduce_in, const std::vector< std::string > &reduce_out, const Dict &opts=Dict())
+------------------------------------------------------------------------
+
+Map with reduction A subset of the inputs are non-repeated and a subset of
+the outputs summed up.
+
+>  std::vector<MX> casadi::Function::map(const std::vector< MX > &arg, const std::string &parallelization=\"serial\")
+
+>  std::map<std::string, MX> casadi::Function::map(const std::map< std::string, MX > &arg, const std::string &parallelization=\"serial\")
+------------------------------------------------------------------------
+
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+parallelization:  Type of parallelization used: unroll|serial|openmp
 
 >  Function casadi::Function::map(const std::string &name, const std::string &parallelization, int n, const Dict &opts=Dict())
 ------------------------------------------------------------------------
@@ -2497,7 +2522,7 @@ Suppose the function has a signature of:
 
 
 
-The the mapaccumulated version has the signature:
+The the mapped version has the signature:
 
 ::
 
@@ -2521,17 +2546,10 @@ Parameters:
 
 parallelization:  Type of parallelization used: unroll|serial|openmp
 
->  std::vector<MX> casadi::Function::map(const std::vector< MX > &arg, const std::string &parallelization=\"serial\")
-
->  std::map<std::string, MX> casadi::Function::map(const std::map< std::string, MX > &arg, const std::string &parallelization=\"serial\")
+>  Function casadi::Function::map(int n)
 ------------------------------------------------------------------------
 
-Evaluate symbolically in parallel (matrix graph)
-
-Parameters:
------------
-
-parallelization:  Type of parallelization used: unroll|serial|openmp
+Shorthand for map(name_n, 'serial', n)
 
 ";
 

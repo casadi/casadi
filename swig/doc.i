@@ -1595,40 +1595,8 @@ Get an atomic operation operator index.
 std::string &parallelization, int n, const std::vector< int > &reduce_in,
 const std::vector< int > &reduce_out, const Dict &opts=Dict()) "
 
-Create a mapped version of this function.
-
-Suppose the function has a signature of:
-
-::
-
-     f: (a, p) -> ( s )
-  
-
-
-
-The the mapaccumulated version has the signature:
-
-::
-
-     F: (A, P) -> (S )
-  
-      with
-          A: horzcat([a0, a1, ..., a_(N-1)])
-          P: horzcat([p0, p1, ..., p_(N-1)])
-          S: horzcat([s0, s1, ..., s_(N-1)])
-      and
-          s0 <- f(a0, p0)
-          s1 <- f(a1, p1)
-          ...
-          s_(N-1) <- f(a_(N-1), p_(N-1))
-  
-
-
-
-Parameters:
------------
-
-parallelization:  Type of parallelization used: unroll|serial|openmp
+Map with reduction A subset of the inputs are non-repeated and a subset of
+the outputs summed up.
 
 ";
 
@@ -1637,80 +1605,8 @@ std::string &parallelization, int n, const std::vector< std::string >
 &reduce_in, const std::vector< std::string > &reduce_out, const Dict
 &opts=Dict()) "
 
-Create a mapped version of this function.
-
-Suppose the function has a signature of:
-
-::
-
-     f: (a, p) -> ( s )
-  
-
-
-
-The the mapaccumulated version has the signature:
-
-::
-
-     F: (A, P) -> (S )
-  
-      with
-          A: horzcat([a0, a1, ..., a_(N-1)])
-          P: horzcat([p0, p1, ..., p_(N-1)])
-          S: horzcat([s0, s1, ..., s_(N-1)])
-      and
-          s0 <- f(a0, p0)
-          s1 <- f(a1, p1)
-          ...
-          s_(N-1) <- f(a_(N-1), p_(N-1))
-  
-
-
-
-Parameters:
------------
-
-parallelization:  Type of parallelization used: unroll|serial|openmp
-
-";
-
-%feature("docstring")  casadi::Function::map(const std::string &name, const
-std::string &parallelization, int n, const Dict &opts=Dict()) "
-
-Create a mapped version of this function.
-
-Suppose the function has a signature of:
-
-::
-
-     f: (a, p) -> ( s )
-  
-
-
-
-The the mapaccumulated version has the signature:
-
-::
-
-     F: (A, P) -> (S )
-  
-      with
-          A: horzcat([a0, a1, ..., a_(N-1)])
-          P: horzcat([p0, p1, ..., p_(N-1)])
-          S: horzcat([s0, s1, ..., s_(N-1)])
-      and
-          s0 <- f(a0, p0)
-          s1 <- f(a1, p1)
-          ...
-          s_(N-1) <- f(a_(N-1), p_(N-1))
-  
-
-
-
-Parameters:
------------
-
-parallelization:  Type of parallelization used: unroll|serial|openmp
+Map with reduction A subset of the inputs are non-repeated and a subset of
+the outputs summed up.
 
 ";
 
@@ -1735,6 +1631,52 @@ Parameters:
 -----------
 
 parallelization:  Type of parallelization used: unroll|serial|openmp
+
+";
+
+%feature("docstring")  casadi::Function::map(const std::string &name, const
+std::string &parallelization, int n, const Dict &opts=Dict()) "
+
+Create a mapped version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (a, p) -> ( s )
+  
+
+
+
+The the mapped version has the signature:
+
+::
+
+     F: (A, P) -> (S )
+  
+      with
+          A: horzcat([a0, a1, ..., a_(N-1)])
+          P: horzcat([p0, p1, ..., p_(N-1)])
+          S: horzcat([s0, s1, ..., s_(N-1)])
+      and
+          s0 <- f(a0, p0)
+          s1 <- f(a1, p1)
+          ...
+          s_(N-1) <- f(a_(N-1), p_(N-1))
+  
+
+
+
+Parameters:
+-----------
+
+parallelization:  Type of parallelization used: unroll|serial|openmp
+
+";
+
+%feature("docstring")  casadi::Function::map(int n) "
+
+Shorthand for map(name_n, 'serial', n)
 
 ";
 
@@ -3825,40 +3767,8 @@ the output elements).
 std::string &parallelization, int n, const std::vector< int > &reduce_in,
 const std::vector< int > &reduce_out, const Dict &opts=Dict()) "
 
-Create a mapped version of this function.
-
-Suppose the function has a signature of:
-
-::
-
-     f: (a, p) -> ( s )
-  
-
-
-
-The the mapaccumulated version has the signature:
-
-::
-
-     F: (A, P) -> (S )
-  
-      with
-          A: horzcat([a0, a1, ..., a_(N-1)])
-          P: horzcat([p0, p1, ..., p_(N-1)])
-          S: horzcat([s0, s1, ..., s_(N-1)])
-      and
-          s0 <- f(a0, p0)
-          s1 <- f(a1, p1)
-          ...
-          s_(N-1) <- f(a_(N-1), p_(N-1))
-  
-
-
-
-Parameters:
------------
-
-parallelization:  Type of parallelization used: unroll|serial|openmp
+Map with reduction A subset of the inputs are non-repeated and a subset of
+the outputs summed up.
 
 ";
 
@@ -3867,80 +3777,8 @@ std::string &parallelization, int n, const std::vector< std::string >
 &reduce_in, const std::vector< std::string > &reduce_out, const Dict
 &opts=Dict()) "
 
-Create a mapped version of this function.
-
-Suppose the function has a signature of:
-
-::
-
-     f: (a, p) -> ( s )
-  
-
-
-
-The the mapaccumulated version has the signature:
-
-::
-
-     F: (A, P) -> (S )
-  
-      with
-          A: horzcat([a0, a1, ..., a_(N-1)])
-          P: horzcat([p0, p1, ..., p_(N-1)])
-          S: horzcat([s0, s1, ..., s_(N-1)])
-      and
-          s0 <- f(a0, p0)
-          s1 <- f(a1, p1)
-          ...
-          s_(N-1) <- f(a_(N-1), p_(N-1))
-  
-
-
-
-Parameters:
------------
-
-parallelization:  Type of parallelization used: unroll|serial|openmp
-
-";
-
-%feature("docstring")  casadi::Function::map(const std::string &name, const
-std::string &parallelization, int n, const Dict &opts=Dict()) "
-
-Create a mapped version of this function.
-
-Suppose the function has a signature of:
-
-::
-
-     f: (a, p) -> ( s )
-  
-
-
-
-The the mapaccumulated version has the signature:
-
-::
-
-     F: (A, P) -> (S )
-  
-      with
-          A: horzcat([a0, a1, ..., a_(N-1)])
-          P: horzcat([p0, p1, ..., p_(N-1)])
-          S: horzcat([s0, s1, ..., s_(N-1)])
-      and
-          s0 <- f(a0, p0)
-          s1 <- f(a1, p1)
-          ...
-          s_(N-1) <- f(a_(N-1), p_(N-1))
-  
-
-
-
-Parameters:
------------
-
-parallelization:  Type of parallelization used: unroll|serial|openmp
+Map with reduction A subset of the inputs are non-repeated and a subset of
+the outputs summed up.
 
 ";
 
@@ -3965,6 +3803,52 @@ Parameters:
 -----------
 
 parallelization:  Type of parallelization used: unroll|serial|openmp
+
+";
+
+%feature("docstring")  casadi::Function::map(const std::string &name, const
+std::string &parallelization, int n, const Dict &opts=Dict()) "
+
+Create a mapped version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (a, p) -> ( s )
+  
+
+
+
+The the mapped version has the signature:
+
+::
+
+     F: (A, P) -> (S )
+  
+      with
+          A: horzcat([a0, a1, ..., a_(N-1)])
+          P: horzcat([p0, p1, ..., p_(N-1)])
+          S: horzcat([s0, s1, ..., s_(N-1)])
+      and
+          s0 <- f(a0, p0)
+          s1 <- f(a1, p1)
+          ...
+          s_(N-1) <- f(a_(N-1), p_(N-1))
+  
+
+
+
+Parameters:
+-----------
+
+parallelization:  Type of parallelization used: unroll|serial|openmp
+
+";
+
+%feature("docstring")  casadi::Function::map(int n) "
+
+Shorthand for map(name_n, 'serial', n)
 
 ";
 
