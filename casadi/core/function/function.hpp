@@ -638,8 +638,6 @@ namespace casadi {
                       const Dict& opts=Dict());
     ///@}
 
-
-    ///@{
     /** \brief  Create a mapped version of this function
 
         Suppose the function has a signature of:
@@ -647,7 +645,7 @@ namespace casadi {
            f: (a, p) -> ( s )
         \endverbatim
 
-        The the mapaccumulated version has the signature:
+        The the mapped version has the signature:
         \verbatim
            F: (A, P) -> (S )
 
@@ -663,9 +661,18 @@ namespace casadi {
         \endverbatim
 
         \param parallelization Type of parallelization used: unroll|serial|openmp
-
     */
+    Function map(const std::string& name, const std::string& parallelization, int n,
+      const Dict& opts=Dict());
 
+    /** \brief Shorthand for map(name_n, 'serial', n) */
+    Function map(int n);
+
+    ///@{
+    /** \brief Map with reduction
+      A subset of the inputs are non-repeated and a subset of the outputs summed
+      up.
+    */
     Function map(const std::string& name, const std::string& parallelization, int n,
       const std::vector<int>& reduce_in,
       const std::vector<int>& reduce_out,
@@ -673,8 +680,6 @@ namespace casadi {
     Function map(const std::string& name, const std::string& parallelization, int n,
       const std::vector<std::string>& reduce_in,
       const std::vector<std::string>& reduce_out,
-      const Dict& opts=Dict());
-    Function map(const std::string& name, const std::string& parallelization, int n,
       const Dict& opts=Dict());
     ///@}
 

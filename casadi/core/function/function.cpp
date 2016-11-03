@@ -481,6 +481,10 @@ namespace casadi {
     return mapaccum(name, n, accum_in_num, accum_out_num, opts);
   }
 
+  Function Function::map(int n) {
+    return map(name() + "_" + to_string(n), "serial", n);
+  }
+
   Function Function::map(const string& name, const std::string& parallelization, int n,
       const vector<int>& reduce_in, const vector<int>& reduce_out,
       const Dict& opts) {
