@@ -760,7 +760,7 @@ Print options to a stream.
 
 ";
 
-%feature("docstring")  casadi::Function::checkout() "
+%feature("docstring")  casadi::Function::checkout() const  "
 
 Checkout a memory object.
 
@@ -1200,7 +1200,7 @@ guarantee that subsequent calls return unique answers.
 
 ";
 
-%feature("docstring")  casadi::Function::release(int mem) "
+%feature("docstring")  casadi::Function::release(int mem) const  "
 
 Release a memory object.
 
@@ -3801,7 +3801,7 @@ const std::vector< std::string > &s_in, const std::vector< std::string >
 
 ";
 
-%feature("docstring")  casadi::Function::checkout() "
+%feature("docstring")  casadi::Function::checkout() const  "
 
 Checkout a memory object.
 
@@ -4484,7 +4484,7 @@ Get the (integer) output argument of an atomic operation.
 
 ";
 
-%feature("docstring")  casadi::Function::release(int mem) "
+%feature("docstring")  casadi::Function::release(int mem) const  "
 
 Release a memory object.
 
