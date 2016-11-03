@@ -44,7 +44,7 @@ public:
 
   // Transscribe as an NLP
   void transcribe(bool single_shooting, bool gauss_newton, bool codegen, bool ipopt_as_qpsol, bool regularize, double reg_threshold);
-  
+
   // Solve the NLP
   void optimize(double drag_guess, double depth_guess, int& iter_count, double& sol_time, double& drag_est, double& depth_est);
 
@@ -61,7 +61,7 @@ public:
 
   // Discrete time dynamics
   Function f_;
-  
+
   // Generated measurements
   vector<DM> H_meas_;
 
@@ -82,7 +82,7 @@ void Tester::model(){
   double sprad = 0.03;
   spheight_ = 0.01;
   double endtime = 1.0;
-    
+
   // Discretization
   int ntimesteps = n_euler_*n_finite_elements_*n_meas_;
   double dt = endtime/ntimesteps;
@@ -115,12 +115,12 @@ void Tester::model(){
     int j_splash = std::min(int(0.04/dy),n_-1);
     h0_(i_splash,j_splash) = spheight_;
   }
-  
+
   // Free parameters (nominal values)
-  MX p = MX::sym("p",2);
-  MX drag_nom = p[0];
-  MX depth_nom = p[1];
-  
+  MX drag_nom = MX::sym("drag_nom");
+  MX depth_nom = MX::sym("depth_nom");
+  MX p = MX::vertcat({drag_nom, depth_nom});
+
   // Scaling factors for the parameters
   double drag_scale = 1;
   double depth_scale = 0.01;
@@ -136,26 +136,26 @@ void Tester::model(){
   MX uk = MX::sym("uk",n_+1, n_);
   MX vk = MX::sym("vk",n_  , n_+1);
   MX hk = MX::sym("hk",n_  , n_);
-  
+
   // Take one step of the integrator
   MX u = uk;
   MX v = vk;
   MX h = hk;
-  
+
   // Update u
   MX d1 = -dt*g/dx;
   MX d2 = dt*drag;
   u(Slice(1,n_),Slice()) += d1*(h(Slice(1,n_),Slice())-h(Slice(0,n_-1),Slice())) - d2*u(Slice(1,n_),Slice());
-  
+
   // Update v
   d1 = -dt*g/dy;
   v(Slice(),Slice(1,n_)) += d1*(h(Slice(),Slice(1,n_))-h(Slice(),Slice(0,n_-1))) - d2*v(Slice(),Slice(1,n_));
-  
+
   // Update h
   d1 = (-depth*dt)*(1.0/dx);
   d2 = (-depth*dt)*(1.0/dy);
   h += d1*(u(Slice(1,n_+1),Slice())-u(Slice(0,n_),Slice())) + d2*(v(Slice(),Slice(1,n_+1))-v(Slice(),Slice(0,n_)));
-  
+
   // Create an integrator function
   vector<MX> f_step_in(4);
   f_step_in[0] = p;
@@ -168,7 +168,7 @@ void Tester::model(){
   f_step_out[2] = h;
   Function f_step("f_step_mx", f_step_in, f_step_out);
   cout << "generated single step dynamics (" << f_step.n_nodes() << " nodes)" << endl;
-  
+
   // Expand the discrete dynamics?
   if(false){
     f_step = f_step.expand();
@@ -190,17 +190,17 @@ void Tester::model(){
   for(int j=0; j<n_euler_; ++j){
     // Create a call node
     f_out = f_step(f_inter);
-    
+
     // Save intermediate state
     f_inter[1] = f_out[0];
     f_inter[2] = f_out[1];
     f_inter[3] = f_out[2];
   }
-  
+
   // Create an integrator function
   f_ = Function("f_mx", f_in, f_out);
   cout << "generated discrete dynamics for one finite element (" << f_.n_nodes() << " MX nodes)" << endl;
-  
+
   // Integrate over the complete interval
   if(n_finite_elements_>1){
     f_in[0] = P;
@@ -211,18 +211,18 @@ void Tester::model(){
     for(int j=0; j<n_finite_elements_; ++j){
       // Create a call node
       f_out = f_(f_inter);
-      
+
       // Save intermediate state
       f_inter[1] = f_out[0];
       f_inter[2] = f_out[1];
       f_inter[3] = f_out[2];
     }
-    
+
     // Create an integrator function
     f_ = Function("f_mx", f_in, f_out);
-    cout << "generated discrete dynamics for complete interval (" << f_.n_nodes() << " MX nodes)" << endl;    
+    cout << "generated discrete dynamics for complete interval (" << f_.n_nodes() << " MX nodes)" << endl;
   }
-    
+
   // Expand the discrete dynamics
   if(false){
     f_ = f_.expand("f_sx");
@@ -231,10 +231,10 @@ void Tester::model(){
 }
 
 void Tester::simulate(double drag_true, double depth_true){
-  
+
   // Measurements
   H_meas_.reserve(n_meas_);
-  
+
   // Unscaled parameter values
   vector<double> p_true(2); p_true[0]=drag_true; p_true[1]=depth_true;
   for(int i=0; i<2; ++i){
@@ -252,7 +252,7 @@ void Tester::simulate(double drag_true, double depth_true){
     arg.at(1) = u;
     arg.at(2) = v;
     arg.at(3) = h;
-    
+
     // Save a copy of h
     H_meas_.push_back(h);
   }
@@ -263,20 +263,20 @@ void Tester::simulate(double drag_true, double depth_true){
 
 
 void Tester::transcribe(bool single_shooting, bool gauss_newton, bool codegen, bool ipopt_as_qpsol, bool regularize, double reg_threshold){
-  
+
   // NLP variables
   MX P = MX::sym("P",2);
 
   // Variables in the lifted NLP
   stringstream ss;
-  
+
   // Objective function terms
   vector<MX> nlp_fv;
   if(!gauss_newton) nlp_fv.push_back(0);
 
   // Constraint function terms
   vector<MX> nlp_gv;
-  
+
   // Generate full-space NLP
   MX U = u0_;
   MX V = v0_;
@@ -287,7 +287,7 @@ void Tester::transcribe(bool single_shooting, bool gauss_newton, bool codegen, b
     U = f_res[0];
     V = f_res[1];
     H = f_res[2];
-    
+
     if(!single_shooting){
       // Lift the heights, initialized with measurements
       H = lift(H, H_meas_[k]);
@@ -296,13 +296,13 @@ void Tester::transcribe(bool single_shooting, bool gauss_newton, bool codegen, b
       // U = lift(U, u0_);
       // V = lift(V, v0_);
       // H = lift(H, DM::zeros(n_  ,n_));
-      
+
       // Initialize through simulation
       // U = lift(U, U);
       // V = lift(V, V);
       // H = lift(H, H);
     }
-    
+
     // Objective function term
     MX H_dev = H-H_meas_[k];
     if(gauss_newton){
@@ -317,7 +317,7 @@ void Tester::transcribe(bool single_shooting, bool gauss_newton, bool codegen, b
 
   MXDict nlp = {{"x", P}, {"f", vertcat(nlp_fv)}, {"g", vertcat(nlp_gv)}};
   cout << "Generated single-shooting NLP" << endl;
-  
+
   // NLP Solver
   Dict opts;
   opts["verbose"] = true;
@@ -354,14 +354,14 @@ void Tester::transcribe(bool single_shooting, bool gauss_newton, bool codegen, b
 
 void Tester::optimize(double drag_guess, double depth_guess, int& iter_count, double& sol_time, double& drag_est, double& depth_est){
   cout << "Starting parameter estimation" << endl;
-    
+
   // Initial guess
   vector<double> p_init(2);
   p_init[0] = drag_guess/p_scale_[0];
   p_init[1] = depth_guess/p_scale_[1];
 
   // Bounds on the variables
-  vector<double> lbu(2), ubu(2);  
+  vector<double> lbu(2), ubu(2);
   lbu.at(0) = 1.0e-1 / p_scale_[0]; // drag positive
   lbu.at(1) = 5.0e-4 / p_scale_[1]; // depth positive
   ubu.at(0) = 100.0 / p_scale_[0]; // max drag
@@ -375,8 +375,8 @@ void Tester::optimize(double drag_guess, double depth_guess, int& iter_count, do
                        {"ubg",  spheight_}};
   w = nlpsol_(w);
   clock_t time2 = clock();
-  
-  // Solution statistics  
+
+  // Solution statistics
   sol_time = double(time2-time1)/CLOCKS_PER_SEC;
   const vector<double>& x_opt = w.at("x").nonzeros();
   drag_est = x_opt.at(0)*p_scale_[0];
@@ -388,7 +388,7 @@ int main(){
 
   // True parameter values
   double drag_true = 2.0, depth_true = 0.01;
-  
+
   // Use IPOPT as QP solver (can handle non-convex QPs)
   bool ipopt_as_qpsol = true;
 
@@ -424,40 +424,40 @@ int main(){
   drag_guess.push_back( 4.0); depth_guess.push_back(0.02);
   drag_guess.push_back( 1.0); depth_guess.push_back(0.02);
   drag_guess.push_back(20.0); depth_guess.push_back(0.001);
-  
+
   // Number of tests
   const int n_tests = drag_guess.size();
 
   // Number of iterations
   vector<int> iter_count_gn(n_tests,-1);
   vector<int> iter_count_eh(n_tests,-1);
-  
+
   // Solution time
   vector<double> sol_time_gn(n_tests,-1);
   vector<double> sol_time_eh(n_tests,-1);
-  
+
   // Estimated drag and depth
   vector<double> drag_est_gn(n_tests,-1);
   vector<double> depth_est_gn(n_tests,-1);
   vector<double> drag_est_eh(n_tests,-1);
   vector<double> depth_est_eh(n_tests,-1);
-  
+
   // Create a tester object
   Tester t(n,n_euler,n_finite_elements,n_meas);
-    
+
   // Perform the modelling
   t.model();
 
   // Optimization parameters
   t.simulate(drag_true, depth_true);
-  
+
   // For both single and multiple shooting
   for(int sol=0; sol<2; ++sol){
 
     // Transcribe as an NLP
     bool single_shooting = sol==0;
     t.transcribe(single_shooting, gauss_newton, codegen, ipopt_as_qpsol, regularize, reg_threshold);
-  
+
     // Run tests
     for(int test=0; test<n_tests; ++test){
       // Print progress
@@ -476,19 +476,19 @@ int main(){
     }
   }
 
-  // Tolerance 
+  // Tolerance
   double tol=1e-3;
-  
-  cout << 
+
+  cout <<
   setw(10) << "drag" <<  "  &" <<
-  setw(10) << "depth" << "  &" << 
-  setw(10) << "iter_ss" << "  &" << 
+  setw(10) << "depth" << "  &" <<
+  setw(10) << "iter_ss" << "  &" <<
   setw(10) << "time_ss" << "  &" <<
-  setw(10) << "iter_ms" << "  &" << 
+  setw(10) << "iter_ms" << "  &" <<
   setw(10) << "time_ms" << "  \\\\ \%" <<
-  setw(10) << "edrag_ss" << 
+  setw(10) << "edrag_ss" <<
   setw(10) << "edepth_ss" <<
-  setw(10) << "edrag_ms" << 
+  setw(10) << "edrag_ms" <<
   setw(10) << "edepth_ms" << endl;
   for(int test=0; test<n_tests; ++test){
     cout << setw(10) << drag_guess[test] << "  &";
@@ -512,7 +512,6 @@ int main(){
     cout << setw(10) << drag_est_eh[test];
     cout << setw(10) << depth_est_eh[test] << endl;
   }
-  
+
   return 0;
 }
-
