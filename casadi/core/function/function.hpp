@@ -582,17 +582,15 @@ namespace casadi {
                  std::vector<std::vector<DM> >& SWIG_OUTPUT(asens),
                  bool always_inline=false, bool never_inline=false);
 
-    /** \brief  Evaluate symbolically in parallel (matrix graph)
-        \param parallelization Type of parallelization used: unroll|serial|openmp
-    */
+#ifdef WITH_DEPRECATED_FEATURES
+    /** \brief [DEPRECATED] Use map(int) instead */
     std::vector<MX> map(const std::vector<MX > &arg,
                         const std::string& parallelization="serial");
 
-    /** \brief  Evaluate symbolically in parallel (matrix graph)
-        \param parallelization Type of parallelization used: unroll|serial|openmp
-    */
+    /** \brief [DEPRECATED] Use map(int) instead */
     std::map<std::string, MX> map(const std::map<std::string, MX> &arg,
                         const std::string& parallelization="serial");
+#endif // WITH_DEPRECATED_FEATURES
 
     /** \brief  Evaluate symbolically in parallel and sum (matrix graph)
         \param parallelization Type of parallelization used: unroll|serial|openmp
@@ -662,11 +660,11 @@ namespace casadi {
 
         \param parallelization Type of parallelization used: unroll|serial|openmp
     */
+    Function map(int n, const std::string& parallelization="serial");
+
+    /** \brief [DEPRECATED] Old syntax for map */
     Function map(const std::string& name, const std::string& parallelization, int n,
       const Dict& opts=Dict());
-
-    /** \brief Shorthand for map(name_n, 'serial', n) */
-    Function map(int n);
 
     ///@{
     /** \brief Map with reduction

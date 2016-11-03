@@ -454,9 +454,9 @@ class Functiontests(casadiTestCase):
     Z = [MX.sym("z",2,2) for i in range(n)]
     V = [MX.sym("z",Sparsity.upper(3)) for i in range(n)]
 
-    res = fun.map({"x":horzcat(*X),"y":horzcat(*Y),"z":horzcat(*Z),"v":horzcat(*V)})
+    res = fun.map(n).call({"x":horzcat(*X),"y":horzcat(*Y),"z":horzcat(*Z),"v":horzcat(*V)})
 
-    res2 = fun.map([horzcat(*X),horzcat(*Y),horzcat(*Z),horzcat(*V)])
+    res2 = fun.map(n).call([horzcat(*X),horzcat(*Y),horzcat(*Z),horzcat(*V)])
 
     F = Function("F",X+Y+Z+V,res2)
     F2 = Function("F",X+Y+Z+V,[res["I"],res["II"],res["III"]])
@@ -485,22 +485,15 @@ class Functiontests(casadiTestCase):
     Z = [MX.sym("z",2,2) for i in range(n)]
     V = [MX.sym("z",Sparsity.upper(3)) for i in range(n)]
 
-    for Z_alt,Z_alt2 in [
-          (Z,Z),
-          ([Z[0]],[Z[0]]*n),
-          ([MX()]*3,[MX()]*3),
-        ]:
-      print("args", Z_alt)
-
-      for parallelization in ["serial","openmp","unroll"] if args.run_slow else ["serial"]:
+    for parallelization in ["serial","openmp","unroll"] if args.run_slow else ["serial"]:
         print(parallelization)
-        res = fun.map([horzcat(*x) for x in [X,Y,Z_alt,V]],parallelization)
+        res = fun.map(n, parallelization).call([horzcat(*x) for x in [X,Y,Z,V]])
 
 
         F = Function("F",X+Y+Z+V,list(map(sin,res)))
 
         resref = [[] for i in range(fun.n_out())]
-        for r in zip(X,Y,Z_alt2,V):
+        for r in zip(X,Y,Z,V):
           for i,e in enumerate(map(sin,fun.call(r))):
             resref[i] = resref[i] + [e]
 

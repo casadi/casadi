@@ -481,8 +481,8 @@ namespace casadi {
     return mapaccum(name, n, accum_in_num, accum_out_num, opts);
   }
 
-  Function Function::map(int n) {
-    return map(name() + "_" + to_string(n), "serial", n);
+  Function Function::map(int n, const std::string& parallelization) {
+    return map(name() + "_" + to_string(n), parallelization, n);
   }
 
   Function Function::map(const string& name, const std::string& parallelization, int n,
@@ -545,10 +545,10 @@ namespace casadi {
       }
       // Construct function
       return Function(name, arg, res, (*this)->derived_options());
+    } else {
+      // Create Map object
+      return Map::create(name, parallelization, *this, n, opts);
     }
-
-    // Create Map object
-    return Map::create(name, parallelization, *this, n, opts);
   }
 
   Function Function::slice(const std::string& name, const std::vector<int>& order_in,
@@ -556,11 +556,11 @@ namespace casadi {
     return (*this)->slice(name, order_in, order_out, opts);
   }
 
+#ifdef WITH_DEPRECATED_FEATURES
   vector<MX> Function::map(const vector< MX > &x,
                            const string& parallelization) {
     return (*this)->map_mx(x, parallelization);
   }
-
 
   std::map<std::string, MX> Function::map(const std::map<std::string, MX> &arg,
                       const std::string& parallelization) {
@@ -578,6 +578,7 @@ namespace casadi {
 
     return ret;
   }
+  #endif // WITH_DEPRECATED_FEATURES
 
   vector<MX> Function::mapsum(const vector< MX > &x,
                               const string& parallelization) {

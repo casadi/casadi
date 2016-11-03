@@ -120,7 +120,7 @@ assert(norm_inf(sol["x"]*scale-param_truth)<1e-8)
 # All states become decision variables
 X = MX.sym("X", 2, N)
 
-[Xn] = one_sample.map([X, u_data.T, repmat(params*scale,1,N)], 'openmp')
+Xn = one_sample.map(N, 'openmp')(X, u_data.T, repmat(params*scale,1,N))
 
 gaps = Xn[:,:-1]-X[:,1:]
 
