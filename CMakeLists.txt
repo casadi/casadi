@@ -641,9 +641,7 @@ include(GenerateExportHeader)
 #####################################################
 add_subdirectory(external_packages)
 add_subdirectory(casadi)
-#add_subdirectory(experimental/greg EXCLUDE_FROM_ALL)
-add_subdirectory(experimental/joel EXCLUDE_FROM_ALL)
-#add_subdirectory(experimental/andrew EXCLUDE_FROM_ALL)
+add_subdirectory(experimental EXCLUDE_FROM_ALL)
 add_subdirectory(misc)
 
 if(WITH_EXAMPLES)
