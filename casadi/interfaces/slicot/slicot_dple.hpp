@@ -50,9 +50,25 @@ namespace casadi {
 
   struct CASADI_DPLE_SLICOT_EXPORT SlicotDpleMemory {
 
+    /// T Hessenberg-triangular data
+    /// Z Schur form multiplier data
+    /// X Schur form multiplier data
+    // Xbar Schur form multiplier data
+    /// VZ Transformed V data
+    /// nnKa Temp data  (n x n) x K
+    /// nnKb Temp data  (n x n) x K
+    /// eig_real Real parts of eigenvalues
+    /// eig_imag Imaginary parts of eigenvalues
+
+    /// Temp data  F
+    /// Temp data  FF
+    /// dwork Work vector for periodic Schur form
+
+    double *VZ, *T, *Z, *X, *Xbar, *nnKa, *nnKb, *eig_real, *eig_imag, *F, *FF, *A, *B, *dwork;
+    int* partition;
 
     /// Solvers for low-order Discrete Periodic Sylvester Equations
-    std::vector< std::vector< Linsol> > dpse_solvers_;
+    std::vector< std::vector< Linsol> > dpse_solvers;
 
     /// Constructor
     SlicotDpleMemory();
@@ -109,6 +125,10 @@ namespace casadi {
     /** \brief Free memory block */
     virtual void free_memory(void *mem) const { delete static_cast<SlicotDpleMemory*>(mem);}
 
+    /** \brief Set the (persistent) work vectors */
+    virtual void set_work(void* mem, const double**& arg, double**& res,
+                          int*& iw, double*& w) const;
+
     /** \brief Initalize memory block */
     virtual void init_memory(void* mem) const;
 
@@ -139,46 +159,9 @@ namespace casadi {
     /// Dimension of state-space
     int n_;
 
-    /// Hessenberg-triangular data
-    std::vector<double> T_;
+    int K_;
 
-    /// Schur form multiplier data
-    std::vector<double> Z_;
-
-    /// Schur form multiplier data
-    std::vector<double> X_;
-
-    // Schur form multiplier data
-    std::vector<double> Xbar_;
-
-    /// Transformed V data
-    std::vector<double> VZ_;
-
-    /// Temp data  (n x n) x K
-    std::vector< Matrix<double> > nnKa_;
-
-    /// Temp data  (n x n) x K
-    std::vector< Matrix<double> > nnKb_;
-
-    /// Real parts of eigenvalues
-    std::vector< double > eig_real_;
-
-    /// Imaginary parts of eigenvalues
-    std::vector< double > eig_imag_;
-
-
-    std::vector<int> partition_;
-
-    int partindex(int i, int j, int k, int r, int c);
-
-    /// Temp data  F
-    std::vector< double > F_;
-
-    /// Temp data  FF
-    std::vector< double > FF_;
-
-    /// Work vector for periodic Schur form
-    std::vector< double > dwork_;
+    int partindex(const SlicotDpleMemory* m, int i, int j, int k, int r, int c) const;
 
     /// Numerical zero, used in periodic Schur form
     double psd_num_zero_;
@@ -206,11 +189,10 @@ namespace casadi {
                              std::vector<double> &eig_real, std::vector<double> &eig_imag,
                              double num_zero=0);
 
-  void slicot_periodic_schur(int n, int K, const std::vector< double > & a,
-                             std::vector< double > & t,
-                             std::vector< double > & z, std::vector<double> &dwork,
-                             std::vector<double> &eig_real, std::vector<double> &eig_imag,
-                             double num_zero=0);
+  void slicot_periodic_schur(int n, int K, const double* a,
+                             double* t,  double * z,
+                             double* dwork, double* eig_real,
+                             double *eig_imag, double num_zero=0);
 
   void slicot_periodic_schur(const std::vector< Matrix<double> > & a,
                              std::vector< Matrix<double> > & t,

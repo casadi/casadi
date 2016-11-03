@@ -23,10 +23,10 @@
  */
 
 
-      #include "psd_indef_dple_internal.hpp"
+      #include "slicot_dple.hpp"
       #include <string>
 
-      const std::string casadi::PsdIndefDpleInternal::meta_doc=
+      const std::string casadi::SlicotDple::meta_doc=
       "\n"
 "An efficient solver for Discrete Periodic Lyapunov Equations using\n"
 "SLICOT\n"

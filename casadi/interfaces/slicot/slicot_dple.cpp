@@ -23,7 +23,7 @@
  */
 
 
-#include "psd_indef_dple_internal.hpp"
+#include "slicot_dple.hpp"
 
 #include "../../core/std_vector_tools.hpp"
 #include "../../core/function/mx_function.hpp"
@@ -102,7 +102,7 @@ namespace casadi {
     // Read user options
     for (auto&& op : opts) {
       if (op.first=="linear_solver") {
-        linear_solver_ = op.second;
+        linear_solver_ = op.second.as_string();
       } else if (op.first=="linear_solver_options") {
         linear_solver_options_ = op.second;
       } else if (op.first=="psd_num_zero") {
@@ -120,7 +120,9 @@ namespace casadi {
     //  casadi_assert_message(V_[k].isdense(), "Solver requires arguments to be dense.");
     //}
 
-    n_ = A_[0].size1();
+
+    n_ = V_.colind()[1];
+    K_ = V_.size1()/n_;
 
     alloc_w(n_*n_*K_, true); // VZ_
     alloc_w(n_*n_*K_, true); // T_
@@ -135,18 +137,50 @@ namespace casadi {
     alloc_w(n_, true); // eig_real_
     alloc_w(n_, true); // eig_imag_
 
-    alloc_w(std::max(n_+K_-2, 4*n_)+(n_-1)*K_+2*n_, true); // dwork_
-
     alloc_w(2*2*n_*K_, true); // F_
     alloc_w(2*2*K_, true); // FF_
+
 
     // There can be at most n partitions
     alloc_iw(n_, true); // partition_
 
+    alloc_w(std::max(n_+K_-2, 4*n_)+(n_-1)*K_+2*n_); // dwork_
+    alloc_w(4*K_*4*K_); // A_
   }
 
+
+  void SlicotDple::set_work(void* mem, const double**& arg, double**& res,
+                                int*& iw, double*& w) const {
+    auto m = static_cast<SlicotDpleMemory*>(mem);
+
+    // Set work in base classes
+    Dple::set_work(mem, arg, res, iw, w);
+
+    // Lagrange multipliers of the NLP
+    m->VZ = w; w += n_*n_*K_;
+    m->T = w; w += n_*n_*K_;
+    m->Z = w; w += n_*n_*K_;
+    m->X = w; w += n_*n_*K_;
+
+    m->Xbar = w; w += n_*n_*K_;
+    m->nnKa = w; w += n_*n_*K_;
+    m->nnKb = w; w += n_*n_*K_;
+
+    m->eig_real = w; w += n_;
+    m->eig_imag = w; w += n_;
+
+    m->F = w; w += 2*2*n_*K_;
+    m->FF = w; w += 2*2*K_;
+
+    m->A = w;
+    m->dwork = w;
+    m->partition = iw;
+
+  }
+
+
   /** \brief Initalize memory block */
-  void init_memory(void* mem) const {
+  void SlicotDple::init_memory(void* mem) const {
     Dple::init_memory(mem);
     auto m = static_cast<SlicotDpleMemory*>(mem);
 
@@ -158,7 +192,7 @@ namespace casadi {
     //  Special case K=1
     // I+X
     // Solver complexity:  K
-    m->dpse_solvers_.resize(3);
+    m->dpse_solvers.resize(3);
     for (int i=0;i<3;++i) {
       int np = std::pow(2, i);
 
@@ -189,19 +223,18 @@ namespace casadi {
 
         sp = Sparsity(np*K_, np*K_, row_ind, col);
       }
-      Linsol solver("solver", linear_solver_name, sp);
 
-      m->dpse_solvers_[i].resize(n_*(n_+1)/2, solver);
+      m->dpse_solvers[i].reserve(n_*(n_+1)/2);
       for (int k=0;k<n_*(n_+1)/2;++k) {
-        m->dpse_solvers_[i][k].makeUnique();
-        m->dpse_solvers_[i][k].setInput(1, LINSOL_A);
+        m->dpse_solvers[i].push_back(Linsol("solver", linear_solver_));
+        m->dpse_solvers[i][k].reset(sp);
       }
     }
   }
 
   /// \cond INTERNAL
-  inline int SlicotDple::partindex(int i, int j, int k, int r, int c) {
-    return k*n_*n_+(partition_[i]+r)*n_ + partition_[j]+c;
+  inline int SlicotDple::partindex(const SlicotDpleMemory* m, int i, int j, int k, int r, int c) const {
+    return k*n_*n_+(m->partition[i]+r)*n_ + m->partition[j]+c;
   }
 
   //  A : n-by-l   B: m-by-l
@@ -242,92 +275,73 @@ namespace casadi {
 
   /// \endcond
 
-
-  void SlicotDple::evaluate() {
-    // Obtain a periodic Schur form
-
-    DenseIO::readInputs();
-
-    double t_linear_solve_ = 0; // Time spent in linear solve
-    double t_psd_ = 0;          // Time spent in Periodic Schur decomposition
-    double t_total_ = 0;        // Time spent in total
-
-    double time_total_start = clock();
-
-    if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
-      profileWriteEntry(CasadiOptions::profilingLog, this);
-    }
+  void SlicotDple::eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
+    auto m = static_cast<SlicotDpleMemory*>(mem);
 
     // Transpose operation (after #554)
     for (int k=0;k<K_;++k) {
       for (int i=0;i<n_;++i) {
         for (int j=0;j<n_;++j) {
-          X_[k*n_*n_+i*n_+j] = inputD(DPLE_A).data()[k*n_*n_+n_*j+i];
+          m->X[k*n_*n_+i*n_+j] = arg[DPLE_A][k*n_*n_+n_*j+i];
         }
       }
     }
 
-    double time_psd_start = clock();
-    slicot_periodic_schur(n_, K_, X_, T_, Z_, dwork_, eig_real_, eig_imag_, psd_num_zero_);
-    double time_psd_delta = (clock()-time_psd_start)/CLOCKS_PER_SEC;
-    t_psd_+=time_psd_delta;
-
-    if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
-      profileWriteTime(CasadiOptions::profilingLog, this, 0, time_psd_delta , t_psd_);
-    }
+    slicot_periodic_schur(n_, K_, m->X, m->T, m->Z, m->dwork, m->eig_real, m->eig_imag, psd_num_zero_);
 
     if (error_unstable_) {
       for (int i=0;i<n_;++i) {
-        double modulus = sqrt(eig_real_[i]*eig_real_[i]+eig_imag_[i]*eig_imag_[i]);
+        double modulus = sqrt(m->eig_real[i]*m->eig_real[i]+m->eig_imag[i]*m->eig_imag[i]);
         casadi_assert_message(modulus+eps_unstable_ <= 1,
           "SlicotDple: system is unstable."
-          "Found an eigenvalue " << eig_real_[i] << " + " <<
-          eig_imag_[i] << "j, with modulus " << modulus <<
+          "Found an eigenvalue " << m->eig_real[i] << " + " <<
+          m->eig_imag[i] << "j, with modulus " << modulus <<
           " (corresponding eps= " << 1-modulus << ")." <<
           std::endl << "Use options and 'error_unstable'"
           "and 'eps_unstable' to influence this message.");
       }
     }
 
+    int* partition = m->partition;
+
     // Find a block partition of the T hessenberg form
-    partition_.resize(1, 0);
+    partition[0] = 0;int partition_i=1;
     int i = 0;
     int j = 0;
     while (j<n_) {
-      while (i<n_ && T_[i+n_*j]!=0) {
+      while (i<n_ && m->T[i+n_*j]!=0) {
         i+=1;
       }
       j = i;
-      partition_.push_back(i);
+      partition[partition_i++] = i;
       i += 1;
     }
 
     // Main loops to loop over blocks of the block-upper triangular A
     // Outer main loop
-    for (int l=0;l<partition_.size()-1;++l) {
+    for (int l=0;l<partition_i-1;++l) {
 
       // Inner main loop
       for (int r=0;r<l+1;++r) {
 
-        int n1 = partition_[r+1]-partition_[r];
-        int n2 = partition_[l+1]-partition_[l];
+        int n1 = partition[r+1]-partition[r];
+        int n2 = partition[l+1]-partition[l];
         int np = n1*n2;
 
         casadi_assert(n1-1+n2-1>=0);
 
-        LinearSolver & solver = dpse_solvers_[n1-1+n2-1][((l+1)*l)/2+r];
+        Linsol & solver = m->dpse_solvers[n1-1+n2-1][((l+1)*l)/2+r];
 
         // ********** START ***************
-        // Populate the appropriate solver with kron(Arr, All)
-        std::vector<double> &A = solver.input(LINSOL_A).data();
-
+        double * A = m->A;
+        double * T = m->T;
         // Special case if K==1
         if (K_==1) {
           for (int ll=0;ll<np;++ll) {
-            for (int m=0;m<np;++m) {
-              A[ll*np+m] = -T_[partindex(r, r, 0, ll/n2, m/n2)]*T_[partindex(l, l, 0, ll%n2, m%n2)];
-              if (ll==m) {
-                A[ll*np+m]+= 1;
+            for (int mm=0;mm<np;++mm) {
+              A[ll*np+mm] = -T[partindex(m, r, r, 0, ll/n2, mm/n2)]*T[partindex(m, l, l, 0, ll%n2, mm%n2)];
+              if (ll==mm) {
+                A[ll*np+mm]+= 1;
               }
             }
           }
@@ -336,32 +350,25 @@ namespace casadi {
           int k;
           for (k=0;k<K_-1;++k) {
             for (int ll=0;ll<np;++ll) {
-              for (int m=0;m<np;++m) {
-                A[np*(np+1)*((k+1)%K_)+ll*(np+1)+m] =
-                    -T_[partindex(r, r, k, ll/n2, m/n2)]*T_[partindex(l, l, k, ll%n2, m%n2)];
+              for (int mm=0;mm<np;++mm) {
+                A[np*(np+1)*((k+1)%K_)+ll*(np+1)+mm] =
+                    T[partindex(m, r, r, k, ll/n2, mm/n2)]*T[partindex(m, l, l, k, ll%n2, mm%n2)];
               }
             }
           }
 
           for (int ll=0;ll<np;++ll) {
-            for (int m=0;m<np;++m) {
-              A[np*(np+1)*((k+1)%K_)+ll*(np+1)+m+1] =
-                -T_[partindex(r, r, k, ll/n2, m/n2)]*T_[partindex(l, l, k, ll%n2, m%n2)];
+            for (int mm=0;mm<np;++mm) {
+              A[np*(np+1)*((k+1)%K_)+ll*(np+1)+mm+1] =
+                -T[partindex(m, r, r, k, ll/n2, mm/n2)]*T[partindex(m, l, l, k, ll%n2, mm%n2)];
             }
           }
         }
         // ********** STOP ***************
         // Solve Discrete Periodic Sylvester Equation Solver
 
-        double time_linear_solve_start = clock();
-        solver.prepare();
-        double time_linear_solve_delta = (clock()-time_linear_solve_start)/CLOCKS_PER_SEC;
-        t_linear_solve_ += time_linear_solve_delta;
-
-        if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
-          profileWriteTime(CasadiOptions::profilingLog, this, 1,
-            time_linear_solve_delta, t_linear_solve_);
-        }
+        solver.pivoting(m->A);
+        solver.factorize(m->A);
 
       }
     }
@@ -374,45 +381,46 @@ namespace casadi {
         // V = blocks([mul([sZ[k].T, V[k], sZ[k]]) for k in range(p)])
 
         for (int k=0;k<K_;++k) { // K
+          double * nnKa = m->nnKa+k*n_*n_*K_;
+          double * nnKb = m->nnKb+k*n_*n_*K_;
           // n^2 K
-          nnKa_[k].set(0.0);
+
+          std::fill(nnKa, nnKa+n_*n_*K_, 0);
           // nnKa[k] <- V[k]*Z[k+1]
           // n^3 K
-          dense_mul_nt(n_, n_, n_,
-            &inputD(1+d).data()[k*n_*n_], &Z_[((k+1) % K_)*n_*n_], &nnKa_[k].data()[0]);
-          nnKb_[k].set(0.0);
+          dense_mul_nt(n_, n_, n_, arg[DPLE_V]+d*n_*n_*K_ + k*n_*n_, m->Z+((k+1) % K_)*n_*n_, nnKa);
+          std::fill(nnKb, nnKb+n_*n_*K_, 0);
           // nnKb[k] <- Z[k+1]'*V[k]*Z[k+1]
-          dense_mul_nn(n_, n_, n_,
-            &Z_[((k+1) % K_)*n_*n_], &nnKa_[k].data()[0], &nnKb_[k].data()[0]);
+          dense_mul_nn(n_, n_, n_, m->Z + ((k+1) % K_)*n_*n_, nnKa, nnKb);
         }
 
         // ********** STOP ****************
 
-        std::fill(X_.begin(), X_.end(), 0);
+        std::fill(m->X, m->X+n_*n_*K_, 0);
 
         // Main loops to loop over blocks of the block-upper triangular A
         // Outer main loop
-        for (int l=0;l<partition_.size()-1;++l) { // n
+        for (int l=0;l<partition_i-1;++l) { // n
           // F serves an an accumulator for intermediate summation results
           // n^2 K
-          std::fill(F_.begin(), F_.end(), 0);
+          std::fill(m->F, m->F+2*2*n_*K_, 0);
 
           // ********** START ***************
           //for i in range(l):
           //  F[i] = [sum(mul(X[i][j][k], A[l][j][k].T) for j in range(l)) for k in range(p) ]
 
           for (int i=0;i<l;++i) { // n^2
-            int na1 = partition_[i+1]-partition_[i];
-            int nb2 = partition_[l+1]-partition_[l];
+            int na1 = partition[i+1]-partition[i];
+            int nb2 = partition[l+1]-partition[l];
             for (int j=0;j<l;++j) { // n^3
-              int na2 = partition_[j+1]-partition_[j];
+              int na2 = partition[j+1]-partition[j];
               for (int k=0;k<K_;++k) {
                 for (int ii=0;ii<na1;++ii) {
                   for (int jj=0;jj<nb2;++jj) {
                     for (int kk=0;kk<na2;++kk) {
                       // n^3 K
-                      F_[k*4*n_+4*i+2*ii+jj] +=
-                          X_[partindex(i, j, k, ii, kk)]*T_[partindex(l, j, k, jj, kk)];
+                      m->F[k*4*n_+4*i+2*ii+jj] +=
+                          m->X[partindex(m, i, j, k, ii, kk)]*m->T[partindex(m, l, j, k, jj, kk)];
                     }
                   }
                 }
@@ -426,18 +434,18 @@ namespace casadi {
 
             // ********** START ***************
             // F[r] = [sum(mul(X[r][j][k], A[l][j][k].T) for j in range(l)) for k in range(p) ]
-            int na1 = partition_[r+1]-partition_[r];
-            int nb2 = partition_[l+1]-partition_[l];
+            int na1 = partition[r+1]-partition[r];
+            int nb2 = partition[l+1]-partition[l];
 
             if (r==l) {
               for (int j=0;j<l;++j) { // n^3
-                int na2 = partition_[j+1]-partition_[j];
+                int na2 = partition[j+1]-partition[j];
                 for (int k=0;k<K_;++k) { // n^3 K
                   for (int ii=0;ii<na1;++ii) {
                     for (int jj=0;jj<nb2;++jj) {
                       for (int kk=0;kk<na2;++kk) {
-                        F_[k*4*n_+4*r+2*ii+jj] +=
-                            X_[partindex(r, j, k, ii, kk)]*T_[partindex(l, j, k, jj, kk)];
+                        m->F[k*4*n_+4*r+2*ii+jj] +=
+                          m->X[partindex(m, r, j, k, ii, kk)]*m->T[partindex(m, l, j, k, jj, kk)];
                       }
                     }
                   }
@@ -451,18 +459,18 @@ namespace casadi {
             // FF =   [sum(mul(A[r][i][k], X[i][l][k]) for i in range(r)) for k in range(p)]
             // Each entry of FF is na1-by-na2
             // n^2 K
-            std::fill(FF_.begin(), FF_.end(), 0);
+            std::fill(m->FF, m->FF+2*2*K_, 0);
             {
-              int na1 = partition_[r+1]-partition_[r];
+              int na1 = partition[r+1]-partition[r];
               for (int i=0;i<r;++i) { // n^3
-                int nb2 = partition_[l+1]-partition_[l];
-                int na2 = partition_[i+1]-partition_[i];
+                int nb2 = partition[l+1]-partition[l];
+                int na2 = partition[i+1]-partition[i];
                 for (int k=0;k<K_;++k) { // n^3 K
                   for (int ii=0;ii<na1;++ii) {
                     for (int jj=0;jj<nb2;++jj) {
                       for (int kk=0;kk<na2;++kk) {
-                        FF_[k*4+2*ii+jj] +=
-                            T_[partindex(r, i, k, ii, kk)]*X_[partindex(i, l, k, kk, jj)];
+                        m->FF[k*4+2*ii+jj] +=
+                            m->T[partindex(m, r, i, k, ii, kk)]*m->X[partindex(m, i, l, k, kk, jj)];
                       }
                     }
                   }
@@ -471,20 +479,19 @@ namespace casadi {
             }
             // ********** STOP ***************
 
-            int n1 = partition_[r+1]-partition_[r];
-            int n2 = partition_[l+1]-partition_[l];
+            int n1 = partition[r+1]-partition[r];
+            int n2 = partition[l+1]-partition[l];
             int np = n1*n2;
 
-            LinearSolver & solver = dpse_solvers_[n1-1+n2-1][((l+1)*l)/2+r];
+            Linsol & solver = m->dpse_solvers[n1-1+n2-1][((l+1)*l)/2+r];
 
             // M <- V
-            std::vector<double> &M = solver.input(LINSOL_B).data();
             for (int k=0;k<K_;++k) {
               for (int ll=0;ll<n1;++ll) {
-                for (int m=0;m<n2;++m) {
+                for (int mm=0;mm<n2;++mm) {
                   // n^2 K
-                  M[np*((k+1)%K_)+ll*n2+m] =
-                    nnKb_[k].data()[(partition_[r]+ll)*n_ + partition_[l]+m];
+                  m->B[np*((k+1)%K_)+ll*n2+mm] =
+                    m->nnKb[k*n_*n_+ (partition[r]+ll)*n_ + partition[l]+mm];
                 }
               }
             }
@@ -492,17 +499,17 @@ namespace casadi {
             // ********** START ***************
             // M+= [sum(mul(A[r][i][k], F[i][k])  for i in range(r+1)) for k in rang(p)]
             {
-              int na1 = partition_[r+1]-partition_[r];
-              int nb2 = partition_[l+1]-partition_[l];
+              int na1 = partition[r+1]-partition[r];
+              int nb2 = partition[l+1]-partition[l];
 
               for (int i=0;i<r+1;++i) { // n^3
-                int na2 = partition_[i+1]-partition_[i];
+                int na2 = partition[i+1]-partition[i];
                 for (int k=0;k<K_;++k) { // n^3 K
                   for (int ii=0;ii<na1;++ii) {
                     for (int jj=0;jj<nb2;++jj) {
                       for (int kk=0;kk<na2;++kk) {
-                        M[np*((k+1)%K_)+ii*n2+jj] +=
-                            T_[partindex(r, i, k, ii, kk)]*F_[k*4*n_+4*i+2*kk+jj];
+                        m->B[np*((k+1)%K_)+ii*n2+jj] +=
+                            m->T[partindex(m, r, i, k, ii, kk)]*m->F[k*4*n_+4*i+2*kk+jj];
                       }
                     }
                   }
@@ -514,14 +521,14 @@ namespace casadi {
             // ********** START ***************
             // M+= [mul(FF[k], A[l][l][k].T) for k in rang(p)]
             {
-              int na1 = partition_[r+1]-partition_[r];
-              int na2 = partition_[l+1]-partition_[l];
-              int nb2 = partition_[l+1]-partition_[l];
+              int na1 = partition[r+1]-partition[r];
+              int na2 = partition[l+1]-partition[l];
+              int nb2 = partition[l+1]-partition[l];
               for (int k=0;k<K_;++k) { // n^2 K
                 for (int ii=0;ii<na1;++ii) {
                   for (int jj=0;jj<nb2;++jj) {
                     for (int kk=0;kk<na2;++kk) {
-                      M[np*((k+1)%K_)+ii*n2+jj] += FF_[k*4+2*ii+kk]*T_[partindex(l, l, k, jj, kk)];
+                      m->B[np*((k+1)%K_)+ii*n2+jj] += m->FF[k*4+2*ii+kk]*m->T[partindex(m, l, l, k, jj, kk)];
                     }
                   }
                 }
@@ -530,33 +537,25 @@ namespace casadi {
             // ********** STOP ***************
 
             // Critical observation: Prepare step is not needed
-            double time_linear_solve_start = clock();
             // n^2 K
-            solver.solve(true);
-            double time_linear_solve_delta = (clock()-time_linear_solve_start)/CLOCKS_PER_SEC;
-            t_linear_solve_ += time_linear_solve_delta;
-
-            if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
-              profileWriteTime(CasadiOptions::profilingLog, this, 1,
-                time_linear_solve_delta, t_linear_solve_);
-            }
+            solver.solve(m->B, 1, true);
 
             // Extract solution and store it in X
-            std::vector<double> & sol = solver.output().data();
+            double * sol = m->B;
 
             // ********** START ***************
-            for (int ii=0;ii<partition_[r+1]-partition_[r];++ii) {
-              for (int jj=0;jj<partition_[l+1]-partition_[l];++jj) {
+            for (int ii=0;ii<partition[r+1]-partition[r];++ii) {
+              for (int jj=0;jj<partition[l+1]-partition[l];++jj) {
                 for (int k=0;k<K_;++k) { // n^2 K
-                  X_[partindex(r, l, k, ii, jj)] = sol[n1*n2*k+n2*ii+jj];
+                  m->X[partindex(m, r, l, k, ii, jj)] = sol[n1*n2*k+n2*ii+jj];
                 }
               }
             }
 
-            for (int ii=0;ii<partition_[r+1]-partition_[r];++ii) {
-              for (int jj=0;jj<partition_[l+1]-partition_[l];++jj) {
+            for (int ii=0;ii<partition[r+1]-partition[r];++ii) {
+              for (int jj=0;jj<partition[l+1]-partition[l];++jj) {
                 for (int k=0;k<K_;++k) { // n^2 K
-                  X_[partindex(l, r, k, jj, ii)] = sol[n1*n2*k+n2*ii+jj];
+                  m->X[partindex(m, l, r, k, jj, ii)] = sol[n1*n2*k+n2*ii+jj];
                 }
               }
             }
@@ -565,18 +564,17 @@ namespace casadi {
           }
 
           // n^3 K
-          outputD(d).set(0.0);
+          std::fill(res[DPLE_P]+d*n_*n_*K_, res[DPLE_P]+(d+1)*n_*n_*K_, 0);
         }
 
+        std::fill(m->nnKa, m->nnKa+n_*n_*K_, 0);
         for (int k=0;k<K_;++k) {
-          nnKa_[k].set(0.0);
-
           // nnKa[k] <- V[k]*Z[k]'
           // n^3 K
-          dense_mul_nn(n_, n_, n_, &X_[k*n_*n_], &Z_[k*n_*n_], &nnKa_[k].data()[0]);
+          dense_mul_nn(n_, n_, n_, m->X + k*n_*n_, m->Z+ k*n_*n_, m->nnKa+ k*n_*n_);
           // output <- Z[k]*V[k]*Z[k]'
-          dense_mul_tn(n_, n_, n_, &Z_[k*n_*n_], &nnKa_[k].data()[0],
-                       &outputD(d).data()[k*n_*n_]);
+          dense_mul_tn(n_, n_, n_, m->Z + k*n_*n_, m->nnKa+ k*n_*n_,
+                       res[DPLE_P]+d*n_*n_*K_+ k*n_*n_);
         }
 
       }
@@ -585,82 +583,70 @@ namespace casadi {
       for (int d=0;d<nrhs_;++d) {
 
 
-        DMatrix &P_bar = inputD(1+d);
-        std::vector<double> &Vbar = outputD(d).data();
-        std::fill(Vbar.begin(), Vbar.end(), 0);
-        std::fill(Xbar_.begin(), Xbar_.end(), 0);
+        const double *P_bar = arg[DPLE_V]+d*n_*n_*K_;
+        double *Vbar = res[DPLE_P]+d*n_*n_*K_;
+        std::fill(Vbar, Vbar+n_*n_*K_, 0);
+        std::fill(m->Xbar, m->Xbar+n_*n_*K_, 0);
 
         // X_bar = [mul([Z[k].T, X_bar[k] , Z[k]]) for k in range(p)]
         for (int k=0;k<K_;++k) {
-          nnKa_[k].set(0.0);
+          double* nnKa = m->nnKa + k*n_*n_;
+          std::fill(nnKa, nnKa + n_*n_, 0);
 
           // n^3 K
           // nnKa[k] <- nnKb*Z[k]
-          dense_mul_nt(n_, n_, n_, &P_bar.data()[n_*n_*k], &Z_[k*n_*n_], &nnKa_[k].data()[0]);
+          dense_mul_nt(n_, n_, n_, P_bar+n_*n_*k, m->Z+k*n_*n_, nnKa);
           // Xbar <- Z[k]*V[k]*Z[k]'
-          dense_mul_nn(n_, n_, n_, &Z_[k*n_*n_], &nnKa_[k].data()[0], &Xbar_[k*n_*n_]);
+          dense_mul_nn(n_, n_, n_, m->Z+k*n_*n_, nnKa, m->Xbar+k*n_*n_);
         }
-
-
-
 
         // Main loops to loop over blocks of the block-upper triangular A
         // Outer main loop
-        for (int l=partition_.size()-2;l>=0;--l) { // n
+        for (int l=partition_i-2;l>=0;--l) { // n
 
-          std::fill(F_.begin(), F_.end(), 0);
+          std::fill(m->F, m->F+n_*n_*K_, 0);
 
           // Inner main loop
           for (int r=l;r>=0;--r) { // n^2
 
-            int n1 = partition_[r+1]-partition_[r];
-            int n2 = partition_[l+1]-partition_[l];
+            int n1 = partition[r+1]-partition[r];
+            int n2 = partition[l+1]-partition[l];
             int np = n1*n2;
 
-            LinearSolver & solver = dpse_solvers_[n1-1+n2-1][((l+1)*l)/2+r];
-
-            std::vector<double> & B = solver.input(LINSOL_B).data();
+            Linsol & solver = m->dpse_solvers[n1-1+n2-1][((l+1)*l)/2+r];
 
 
             // ********** START ***************
-            for (int ii=0;ii<partition_[r+1]-partition_[r];++ii) {
-              for (int jj=0;jj<partition_[l+1]-partition_[l];++jj) {
+            for (int ii=0;ii<partition[r+1]-partition[r];++ii) {
+              for (int jj=0;jj<partition[l+1]-partition[l];++jj) {
                 for (int k=0;k<K_;++k) {
                   // n^2 K
-                  B[n1*n2*k+n2*ii+jj] = Xbar_[partindex(r, l, k, ii, jj)];
+                  m->B[n1*n2*k+n2*ii+jj] = m->Xbar[partindex(m, r, l, k, ii, jj)];
                 }
               }
             }
             if (r!=l) {
-              for (int ii=0;ii<partition_[r+1]-partition_[r];++ii) {
-                for (int jj=0;jj<partition_[l+1]-partition_[l];++jj) {
+              for (int ii=0;ii<partition[r+1]-partition[r];++ii) {
+                for (int jj=0;jj<partition[l+1]-partition[l];++jj) {
                   for (int k=0;k<K_;++k) {
-                    B[n1*n2*k+n2*ii+jj]+=Xbar_[partindex(l, r, k, jj, ii)];
+                    m->B[n1*n2*k+n2*ii+jj]+= m->Xbar[partindex(m, l, r, k, jj, ii)];
                   }
                 }
               }
             }
             // ********** STOP ***************
 
-            double time_linear_solve_start = clock();
             // n^2 K
-            solver.solve(false);
-            double time_linear_solve_delta = (clock()-time_linear_solve_start)/CLOCKS_PER_SEC;
-            t_linear_solve_ += time_linear_solve_delta;
-
-            if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
-              profileWriteTime(CasadiOptions::profilingLog, this, 1,
-                time_linear_solve_delta, t_linear_solve_);
-            }
+            solver.solve(m->B, 1, false);
 
             // for k in range(p): V_bar[r][l][k]+=M_bar[k]
-            std::vector<double> &Mbar = solver.output().data();
+            double *Mbar = m->B;
 
             for (int k=0;k<K_;++k) {
               for (int ll=0;ll<n1;++ll) {
-                for (int m=0;m<n2;++m) {
+                for (int mm=0;mm<n2;++mm) {
                    // n^2 K
-                   Vbar[partindex(r, l, k, ll, m)]+= Mbar[np*((k+1)%K_)+ll*n2+m];
+                   Vbar[partindex(m, r, l, k, ll, mm)]+= Mbar[np*((k+1)%K_)+ll*n2+mm];
                 }
               }
             }
@@ -669,18 +655,18 @@ namespace casadi {
             //     for k in range(p):
             //       FF_bar[k] += mul(M_bar[k], A[l][l][k])
             // n^2 K
-            std::fill(FF_.begin(), FF_.end(), 0);
+            std::fill(m->FF, m->FF+n_*n_*K_, 0);
             {
-              int na1 = partition_[r+1]-partition_[r];
-              int na2 = partition_[l+1]-partition_[l];
-              int nb2 = partition_[l+1]-partition_[l];
+              int na1 = partition[r+1]-partition[r];
+              int na2 = partition[l+1]-partition[l];
+              int nb2 = partition[l+1]-partition[l];
               for (int k=0;k<K_;++k) {
                 for (int ii=0;ii<na1;++ii) {
                   for (int jj=0;jj<nb2;++jj) {
                     for (int kk=0;kk<na2;++kk) {
                       // n^2 K
-                      FF_[k*4+2*ii+kk] +=
-                        Mbar[np*((k+1)%K_)+ii*n2+jj]*T_[partindex(l, l, k, jj, kk)];
+                      m->FF[k*4+2*ii+kk] +=
+                        Mbar[np*((k+1)%K_)+ii*n2+jj]*m->T[partindex(m, l, l, k, jj, kk)];
                     }
                   }
                 }
@@ -695,17 +681,17 @@ namespace casadi {
             //    X_bar[i][l][k] +=mul(A[r][i][k].T, FF_bar[k])
             // ********** START ***************
             {
-              int na1 = partition_[r+1]-partition_[r];
+              int na1 = partition[r+1]-partition[r];
               for (int i=0;i<r;++i) { // n^3
-                int nb2 = partition_[l+1]-partition_[l];
-                int na2 = partition_[i+1]-partition_[i];
+                int nb2 = partition[l+1]-partition[l];
+                int na2 = partition[i+1]-partition[i];
                 for (int k=0;k<K_;++k) {
                   for (int ii=0;ii<na1;++ii) {
                     for (int jj=0;jj<nb2;++jj) {
                       for (int kk=0;kk<na2;++kk) {
                         // n^3 K
-                        Xbar_[partindex(i, l, k, kk, jj)] +=
-                            T_[partindex(r, i, k, ii, kk)]*FF_[k*4+2*ii+jj];
+                        m->Xbar[partindex(m, i, l, k, kk, jj)] +=
+                            m->T[partindex(m, r, i, k, ii, kk)]*m->FF[k*4+2*ii+jj];
                       }
                     }
                   }
@@ -719,18 +705,18 @@ namespace casadi {
             //    F_bar[i][k]+= mul(A[r][i][k].T, M_bar[k])
             // ********** START ***************
             {
-              int na1 = partition_[r+1]-partition_[r];
-              int nb2 = partition_[l+1]-partition_[l];
+              int na1 = partition[r+1]-partition[r];
+              int nb2 = partition[l+1]-partition[l];
 
               for (int i=0;i<r+1;++i) { // n^3
-                int na2 = partition_[i+1]-partition_[i];
+                int na2 = partition[i+1]-partition[i];
                 for (int k=0;k<K_;++k) {
                   for (int ii=0;ii<na1;++ii) {
                     for (int jj=0;jj<nb2;++jj) {
                       for (int kk=0;kk<na2;++kk) {
                         // n^3 K
-                        F_[k*4*n_+4*i+2*kk+jj] +=
-                            T_[partindex(r, i, k, ii, kk)]*Mbar[np*((k+1)%K_)+ii*n2+jj];
+                        m->F[k*4*n_+4*i+2*kk+jj] +=
+                            m->T[partindex(m, r, i, k, ii, kk)]*Mbar[np*((k+1)%K_)+ii*n2+jj];
                       }
                     }
                   }
@@ -745,18 +731,18 @@ namespace casadi {
             //       X_bar[r][j][k] +=mul(F_bar[r][k], A[l][j][k])
             // ********** START ***************
             if (r>=l) {
-              int na1 = partition_[r+1]-partition_[r];
-              int nb2 = partition_[l+1]-partition_[l];
+              int na1 = partition[r+1]-partition[r];
+              int nb2 = partition[l+1]-partition[l];
 
               for (int j=0;j<l;++j) { // n^3
-                int na2 = partition_[j+1]-partition_[j];
+                int na2 = partition[j+1]-partition[j];
                 for (int k=0;k<K_;++k) {
                   for (int ii=0;ii<na1;++ii) {
                     for (int jj=0;jj<nb2;++jj) {
                       for (int kk=0;kk<na2;++kk) {
                         // n^3 K
-                        Xbar_[partindex(r, j, k, ii, kk)] +=
-                            F_[k*4*n_+4*r+2*ii+jj]*T_[partindex(l, j, k, jj, kk)];
+                        m->Xbar[partindex(m, r, j, k, ii, kk)] +=
+                            m->F[k*4*n_+4*r+2*ii+jj]*m->T[partindex(m, l, j, k, jj, kk)];
                       }
                     }
                   }
@@ -774,17 +760,17 @@ namespace casadi {
           // ********** START ***************
 
           for (int i=0;i<l;++i) { // n^2
-            int na1 = partition_[i+1]-partition_[i];
-            int nb2 = partition_[l+1]-partition_[l];
+            int na1 = partition[i+1]-partition[i];
+            int nb2 = partition[l+1]-partition[l];
             for (int j=0;j<l;++j) { // n^3
-              int na2 = partition_[j+1]-partition_[j];
+              int na2 = partition[j+1]-partition[j];
               for (int k=0;k<K_;++k) {
                 for (int ii=0;ii<na1;++ii) {
                   for (int jj=0;jj<nb2;++jj) {
                     for (int kk=0;kk<na2;++kk) {
                       // n^3 K
-                      Xbar_[partindex(i, j, k, ii, kk)] +=
-                          F_[k*4*n_+4*i+2*ii+jj]*T_[partindex(l, j, k, jj, kk)];
+                      m->Xbar[partindex(m, i, j, k, ii, kk)] +=
+                          m->F[k*4*n_+4*i+2*ii+jj]*m->T[partindex(m, l, j, k, jj, kk)];
                     }
                   }
                 }
@@ -798,11 +784,12 @@ namespace casadi {
 
         // V_bar = [mul([sZ[k], V_bar[k] , sZ[k].T]) for k in range(p)]
         for (int k=0;k<K_;++k) {
-          nnKa_[k].set(0.0);
+          double* nnKa = m->nnKa+k*n_*n_;
+          std::fill(nnKa, nnKa+n_*n_, 0);
           // n^3 K
-          dense_mul_nn(n_, n_, n_, &Vbar[n_*n_*k], &Z_[((k+1)%K_)*n_*n_], &nnKa_[k].data()[0]);
-          std::fill(&Vbar[n_*n_*k], &Vbar[n_*n_*(k+1)], 0);
-          dense_mul_tn(n_, n_, n_, &Z_[((k+1)%K_)*n_*n_], &nnKa_[k].data()[0], &Vbar[n_*n_*k]);
+          dense_mul_nn(n_, n_, n_, Vbar + n_*n_*k, m->Z + ((k+1)%K_)*n_*n_, nnKa);
+          std::fill(Vbar + n_*n_*k, Vbar + n_*n_*(k+1), 0);
+          dense_mul_tn(n_, n_, n_, m->Z + ((k+1)%K_)*n_*n_, nnKa, Vbar+n_*n_*k);
         }
 
         // Force symmetry
@@ -821,251 +808,6 @@ namespace casadi {
       }
     }
 
-    t_total_ += (clock()-time_total_start)/CLOCKS_PER_SEC;
-
-    if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
-      profileWriteExit(CasadiOptions::profilingLog, this, t_total_);
-    }
-
-    if (gather_stats_) {
-      stats_["t_psd"] = t_psd_;
-      stats_["t_total"] = t_total_;
-      stats_["t_linear_solve"] = t_linear_solve_;
-    }
-
-    DenseIO::writeOutputs();
-
-  }
-
-  Function SlicotDple
-  ::getDerForward(const std::string& name, int nfwd, Dict& opts) {
-
-    // Base:
-    // P_0 P_1 P_2 .. P_{nrhs-1} = f( A Q_0 Q_1 Q_2 .. Q_{nrhs-1})
-
-    /* Allocate output list for derivative
-    *
-    * Structute:
-    *    [P_0^f0 .. P_{nrhs-1}^f0] ...
-    *       [P_0^f{nfwd-1} .. P_{nrhs-1}^f{nfwd-1}]
-    */
-
-    std::vector<MX> outs_new(nrhs_*nfwd, 0);
-
-    /* Allocate input list for derivative and populate with symbolics
-    * Three parts:
-    *
-    * 1)  [A Q_0 .. Q_{nrhs-1}]
-    * 2)  [P P_0 .. P_{nrhs-1}]
-    * 3)  [A^f0 Q_0^f0 .. Q_{nrhs-1}^f0] ...
-    *       [A^f{nfwd-1} Q_0^f{nfwd-1} .. Q_{nrhs-1}^f{nfwd-1}]
-    */
-    std::vector<MX> ins_new(2*nrhs_+1 + (nrhs_+1)*nfwd, 0);
-
-    // Part 1
-    ins_new[0] = MX::sym("A", input(DPLE_A).sparsity());
-    for (int i=0; i<nrhs_; ++i) {
-      ins_new[i+1] = MX::sym("Q", input(DPLE_V).sparsity());
-    }
-
-    // Part 2
-    for (int i=0; i<nrhs_; ++i) {
-      ins_new[nrhs_+i+1] = MX::sym("P", output(DPLE_P).sparsity());
-    }
-
-    // Part 3
-    for (int q=0; q<nrhs_; ++q) {
-      for (int k=0;k<nfwd;++k) {
-        MX& Qf  = ins_new.at(2*nrhs_+1 + (nrhs_+1)*k+q+1);
-        MX& Af  = ins_new.at(2*nrhs_+1 + (nrhs_+1)*k);
-
-        Qf = MX::sym("Qf", input(DPLE_V).sparsity());
-        Af = MX::sym("Af", input(DPLE_A).sparsity());
-      }
-    }
-
-    // Prepare a solver for forward seeds
-    std::map<std::string, std::vector<Sparsity> > tmp;
-    tmp["a"] = st_[Dple_STRUCT_A];
-    tmp["v"] = st_[Dple_STRUCT_V];
-    SlicotDple* node = new SlicotDple(tmp, nfwd, transp_);
-    node->setOption(dictionary());
-
-    DpleSolver f;
-    f.assignNode(node);
-    f.init();
-
-    for (int q=0; q<nrhs_; ++q) {
-
-      // Forward
-      /* P_q^f0 .. P_q^f{nfwd-1} = f(A,
-      *          Q_q^f0 + A P_q (A^f0)^T + A^f0 P_q A^T,
-      *          ...
-      *          Q_q^f{nfwd-1} + A P_q (A^f{nfwd-1})^T + A^f{nfwd-1} P_q A^T)
-      */
-      std::vector<MX> ins_f;
-      const MX& A  = ins_new[0];
-      std::vector<MX> As = horzsplit(A, n_);
-      const MX& P  = ins_new[nrhs_+1+q];
-      std::vector<MX> Ps_ = horzsplit(P, n_);
-
-      ins_f.push_back(A);
-      for (int k=0;k<nfwd;++k) {
-        const MX& Qf  = ins_new.at(2*nrhs_+1+(nrhs_+1)*k+q+1);
-        const MX& Af  = ins_new.at(2*nrhs_+1+(nrhs_+1)*k);
-
-        std::vector<MX> Qfs = horzsplit(Qf, n_);
-        std::vector<MX> Afs = horzsplit(Af, n_);
-
-        std::vector<MX> sum(K_, 0);
-        for (int i=0;i<K_;++i) {
-          // Note: Qf is symmetrised here
-          MX temp;
-          if (transp_) {
-            temp = mul(As[i].T(), mul(Ps_[i], Afs[i])) + Qfs[i]/2;
-          } else {
-            temp = mul(As[i], mul(Ps_[i], Afs[i].T())) + Qfs[i]/2;
-          }
-          sum[i] = temp + temp.T();
-        }
-        ins_f.push_back(horzcat(sum));
-      }
-
-      std::vector<MX> outs = f(ins_f);
-      for (int i=0;i<nfwd;++i) {
-        outs_new.at(q+nrhs_*i) = outs[i];
-      }
-
-
-    }
-
-    return MXFunction(name, ins_new, outs_new, opts);
-  }
-
-  Function SlicotDple
-  ::getDerReverse(const std::string& name, int nadj, Dict& opts) {
-
-    // Base:
-    // P_0 P_1 P_2 .. P_{nrhs-1} = f( A Q_0 Q_1 Q_2 .. Q_{nrhs-1})
-
-    /* Allocate output list for derivative
-    *
-    * Structure:
-    *
-    * [A^b0 Q_0^b0 .. Q_{nrhs-1}^b0] ...
-    *       [A^b{nadj-1} Q_0^b{nadj-1} .. Q_{nrhs-1}^b{nadj-1}]
-    */
-
-    std::vector<MX> outs_new((nrhs_+1)*nadj, 0);
-
-    /* Allocate input list for derivative and populate with symbolics
-    * Three parts:
-    *
-    * 1)  [A Q_0 .. Q_{nrhs-1}]
-    * 2)  [P P_0 .. P_{nrhs-1}]
-    * 3)  [P_0^b0 .. P_{nrhs-1}^b0] ...
-    *       [P_0^b{nadj-1} .. P_{nrhs-1}^b{nadj-1}]
-    */
-    std::vector<MX> ins_new(2*nrhs_+1 + nrhs_*nadj, 0);
-
-    // Part 1
-    ins_new[0] = MX::sym("A", input(DPLE_A).sparsity());
-    for (int i=0; i<nrhs_; ++i) {
-      ins_new[i+1] = MX::sym("Q", input(DPLE_V).sparsity());
-    }
-
-    // Part 2
-    for (int i=0; i<nrhs_; ++i) {
-      ins_new[nrhs_+i+1] = MX::sym("P", output(DPLE_P).sparsity());
-    }
-
-    // Part 3
-    for (int q=0; q<nrhs_; ++q) {
-      for (int k=0;k<nadj;++k) {
-          MX& Pb  = ins_new.at(2*nrhs_+1+nrhs_*k+q);
-
-          Pb = MX::sym("Pb", output(DPLE_P).sparsity());
-      }
-    }
-
-    // Prepare a solver for adjoint seeds
-    std::map<std::string, std::vector<Sparsity> > tmp;
-    tmp["a"] = st_[Dple_STRUCT_A];
-    tmp["v"] = st_[Dple_STRUCT_V];
-    SlicotDple* node2 = new SlicotDple(tmp, nadj, !transp_);
-    node2->setOption(dictionary());
-
-    DpleSolver b;
-    b.assignNode(node2);
-    b.init();
-
-    for (int q=0; q<nrhs_; ++q) {
-
-      std::vector<MX> ins_f;
-      const MX& A  = ins_new[0];
-      std::vector<MX> As = horzsplit(A, n_);
-      const MX& P  = ins_new[nrhs_+1+q];
-      std::vector<MX> Ps_ = horzsplit(P, n_);
-
-      // Adjoint
-      /* rev(Q_b^b0) .. rev(Q_b^b{nadj-1}) += f(rev(A),
-      *          rev(P_q^b0) ... rev(P_q^b{nadj-1})
-      *         )
-      *
-      *  A^b0 += 2 Q_q^b0 A P_q
-      *   ....
-      *  A^b{nadj-1} += 2 Q_q^b{nadj-1} A P_q
-      */
-      std::vector<MX> ins_b;
-      ins_b.push_back(A);
-      for (int k=0;k<nadj;++k) {
-        const MX& Pb  = ins_new.at(2*nrhs_+1+nrhs_*k+q);
-        // Symmetrise P_q^bk
-        std::vector<MX> Pbs = horzsplit(Pb, n_);
-        for (int i=0;i<K_;++i) {
-          Pbs[i]+= Pbs[i].T();
-        }
-
-        ins_b.push_back(horzcat(Pbs)/2);
-      }
-
-      std::vector<MX> outs = b(ins_b);
-      for (int i=0;i<nadj;++i) {
-        MX& Qb = outs_new.at((nrhs_+1)*i+q+1);
-
-        Qb += outs[i];
-        std::vector<MX> Qbs = horzsplit(Qb, n_);
-        MX& Ab = outs_new.at((nrhs_+1)*i);
-
-        std::vector<MX> sum(K_, 0);
-        for (int j=0;j<K_;++j) {
-          if (transp_) {
-            sum[j]+= (2*mul(Ps_[j], mul(As[j], Qbs[j])));
-          } else {
-            sum[j]+= 2*mul(Qbs[j], mul(As[j], Ps_[j]));
-          }
-        }
-        Ab += horzcat(sum);
-      }
-
-    }
-
-    return MXFunction(name, ins_new, outs_new, opts);
-  }
-
-  void SlicotDple::deepCopyMembers(
-      std::map<SharedObjectNode*, SharedObject>& already_copied) {
-    Dple::deepCopyMembers(already_copied);
-  }
-
-  SlicotDple* SlicotDple::clone() const {
-    // Return a deep copy
-    std::map<std::string, std::vector<Sparsity> > tmp;
-    tmp["a"] = st_[Dple_STRUCT_A];
-    tmp["v"] = st_[Dple_STRUCT_V];
-    SlicotDple* node = new SlicotDple(tmp, nrhs_, transp_);
-    node->setOption(dictionary());
-    return node;
   }
 
   void slicot_mb03vd(int n, int p, int ilo, int ihi, double * a, int lda1, int lda2, double * tau,
@@ -1157,17 +899,8 @@ namespace casadi {
                              std::vector< double > & t,  std::vector< double > & z,
                              std::vector<double> &eig_real, std::vector<double> &eig_imag,
                              double num_zero) {
+    t.resize(n*n*K);
     std::vector<double> dwork(std::max(n+K-2, 4*n)+(n-1)*K);
-    slicot_periodic_schur(n, K, a, t, z, dwork, eig_real, eig_imag, num_zero);
-  }
-
-  void slicot_periodic_schur(int n, int K, const std::vector< double > & a,
-                             std::vector< double > & t,  std::vector< double > & z,
-                             std::vector<double> &dwork, std::vector<double> &eig_real,
-                             std::vector<double> &eig_imag, double num_zero) {
-    int mem_base = std::max(n+K-2, 4*n);
-    int mem_needed = mem_base+(n-1)*K;
-
     if (eig_real.size()!=n) {
       eig_real.resize(n);
     }
@@ -1175,38 +908,35 @@ namespace casadi {
     if (eig_imag.size()!=n) {
       eig_imag.resize(n);
     }
+    slicot_periodic_schur(n, K, get_ptr(a), get_ptr(t), get_ptr(z), get_ptr(dwork), get_ptr(eig_real), get_ptr(eig_imag), num_zero);
+  }
 
-    if (dwork.size()==0) {
-      dwork.resize(mem_needed);
-    } else if (dwork.size()<mem_needed) {
-      casadi_warning("You provided working memory for slicot_periodic_schur, but it is "
-                     "insufficient. We need size " << mem_needed
-                     << " but supplied size is " << dwork.size() <<".");
-      dwork.resize(mem_needed);
-    } else {
-      mem_needed = dwork.size();
-    }
 
-    t.resize(n*n*K);
+  void slicot_periodic_schur(int n, int K, const double* a,
+                             double* t,  double * z,
+                             double* dwork, double* eig_real,
+                             double *eig_imag, double num_zero) {
+    int mem_base = std::max(n+K-2, 4*n);
+    int mem_needed = mem_base+(n-1)*K;
 
     // a is immutable, we need a mutable pointer, so we use available buffer
-    z = a;
+    std::copy(a, a+n*n*K, z);
 
-    slicot_mb03vd(n, K, 1, n, &z[0], n, n, &dwork[mem_base], n-1, &dwork[0]);
-    t = z;
+    slicot_mb03vd(n, K, 1, n, z, n, n, dwork+mem_base, n-1, dwork);
+    std::copy(z, z+n*n*K, t);
 
-    slicot_mb03vy(n, K, 1, n, &z[0], n, n, &dwork[mem_base], n-1, &dwork[0], mem_needed);
+    slicot_mb03vy(n, K, 1, n, z, n, n, dwork+mem_base, n-1, dwork, mem_needed);
 
     // Set numerical zeros to zero
     if (num_zero>0) {
-      for (int k = 0;k<t.size();++k) {
+      for (int k = 0;k<n*n*K;++k) {
         double &r = t[k];
         if (fabs(r)<num_zero) r = 0.0;
       }
     }
 
-    slicot_mb03wd('S', 'V', n, K, 1, n, 1, n, &t[0], n, n, &z[0], n, n,
-                  &eig_real[0], &eig_imag[0], &dwork[0], mem_needed);
+    slicot_mb03wd('S', 'V', n, K, 1, n, 1, n, t, n, n, z, n, n,
+                  eig_real, eig_imag, dwork, mem_needed);
   }
 
   void slicot_periodic_schur(const std::vector< Matrix<double> > & a,
@@ -1216,16 +946,16 @@ namespace casadi {
     int K = a.size();
     int n = a[0].size1();
     for (int k=0;k<K;++k) {
-      casadi_assert_message(a[k].issquare(), "a must be square");
+      casadi_assert_message(a[k].is_square(), "a must be square");
       casadi_assert_message(a[k].size1()==n, "a must be n-by-n");
-      casadi_assert_message(a[k].isdense(), "a must be dense");
+      casadi_assert_message(a[k].is_dense(), "a must be dense");
     }
 
 
     std::vector<double> a_data(n*n*K);
     // Copy data into consecutive structure
     for (int k=0;k<K;++k) {
-      std::copy(a[k].begin(), a[k].end(), a_data.begin()+k*n*n);
+      std::copy(a[k].nonzeros().begin(), a[k].nonzeros().end(), a_data.begin()+k*n*n);
     }
 
     std::vector<double> t_data(n*n*K);
@@ -1236,10 +966,10 @@ namespace casadi {
     t.resize(K);
     z.resize(K);
     for (int k=0;k<K;++k) {
-      t[k] = DMatrix::zeros(n, n);
-      std::copy(t_data.begin()+k*n*n, t_data.begin()+(k+1)*n*n, t[k].begin());
-      z[k] = DMatrix::zeros(n, n);
-      std::copy(z_data.begin()+k*n*n, z_data.begin()+(k+1)*n*n, z[k].begin());
+      t[k] = DM::zeros(n, n);
+      std::copy(t_data.begin()+k*n*n, t_data.begin()+(k+1)*n*n, t[k].nonzeros().begin());
+      z[k] = DM::zeros(n, n);
+      std::copy(z_data.begin()+k*n*n, z_data.begin()+(k+1)*n*n, z[k].nonzeros().begin());
     }
   }
 
