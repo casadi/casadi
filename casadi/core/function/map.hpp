@@ -135,6 +135,9 @@ namespace casadi {
   };
 
   /** A map Evaluate in parallel using OpenMP
+      Note: Do not use this class with much more than the intended number of
+      threads for the parallel evaluation as it will cause excessive memory use.
+
       \author Joel Andersson
       \date 2015
   */
