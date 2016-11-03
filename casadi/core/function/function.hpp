@@ -546,37 +546,37 @@ namespace casadi {
 
 #endif // SWIG
 
-    /** \brief Create call to (cached) derivative function, forward mode  */
+    /** \brief [DEPRECATED] Use Function::factory or jtimes  */
     void forward(const std::vector<MX>& arg, const std::vector<MX>& res,
                  const std::vector<std::vector<MX> >& fseed,
                  std::vector<std::vector<MX> >& SWIG_OUTPUT(fsens),
                  bool always_inline=false, bool never_inline=false);
 
-    /** \brief Create call to (cached) derivative function, reverse mode  */
+    /** \brief [DEPRECATED] Use Function::factory or jtimes  */
     void reverse(const std::vector<MX>& arg, const std::vector<MX>& res,
                  const std::vector<std::vector<MX> >& aseed,
                  std::vector<std::vector<MX> >& SWIG_OUTPUT(asens),
                  bool always_inline=false, bool never_inline=false);
 
-    /** \brief Create call to (cached) derivative function, forward mode  */
+    /** \brief [DEPRECATED] Use Function::factory or jtimes  */
     void forward(const std::vector<SX>& arg, const std::vector<SX>& res,
                  const std::vector<std::vector<SX> >& fseed,
                  std::vector<std::vector<SX> >& SWIG_OUTPUT(fsens),
                  bool always_inline=false, bool never_inline=false);
 
-    /** \brief Create call to (cached) derivative function, reverse mode  */
+    /** \brief [DEPRECATED] Use Function::factory or jtimes  */
     void reverse(const std::vector<SX>& arg, const std::vector<SX>& res,
                  const std::vector<std::vector<SX> >& aseed,
                  std::vector<std::vector<SX> >& SWIG_OUTPUT(asens),
                  bool always_inline=false, bool never_inline=false);
 
-    /** \brief Create call to (cached) derivative function, forward mode  */
+    /** \brief [DEPRECATED] Use Function::factory or jtimes  */
     void forward(const std::vector<DM>& arg, const std::vector<DM>& res,
                  const std::vector<std::vector<DM> >& fseed,
                  std::vector<std::vector<DM> >& SWIG_OUTPUT(fsens),
                  bool always_inline=false, bool never_inline=false);
 
-    /** \brief Create call to (cached) derivative function, reverse mode  */
+    /** \brief [DEPRECATED] Use Function::factory or jtimes  */
     void reverse(const std::vector<DM>& arg, const std::vector<DM>& res,
                  const std::vector<std::vector<DM> >& aseed,
                  std::vector<std::vector<DM> >& SWIG_OUTPUT(asens),
