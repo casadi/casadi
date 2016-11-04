@@ -187,22 +187,14 @@ namespace casadi {
     if (!f_def_.is_null()) der_def = f_def_.forward_new(nfwd);
 
     // New Switch for derivatives
-    stringstream ss;
-    ss << "fwd" << nfwd << "_" << name_;
-    Function sw = Function::conditional(ss.str(), der, der_def);
+    Function sw = Function::conditional("switch_" + name, der, der_def);
 
-    // Construct wrapper inputs and arguments for calling sw
+    // Get expressions for the derivative switch
     vector<MX> arg = sw.mx_in();
-
-    // ignore seed for ind
-    vector<MX>::iterator ind_seed = arg.begin() + n_in() + n_out();
-    *ind_seed = MX(ind_seed->size());
-
-    // Get result expression
     vector<MX> res = sw(arg);
 
-    // Remove index seed from return function input
-    arg.erase(ind_seed);
+    // Ignore seed for ind
+    arg.insert(arg.begin() + n_in() + n_out(), MX(1, nfwd));
 
     // Create wrapper
     return Function(name, arg, res, i_names, o_names, opts);
@@ -223,22 +215,14 @@ namespace casadi {
     if (!f_def_.is_null()) der_def = f_def_.reverse_new(nadj);
 
     // New Switch for derivatives
-    stringstream ss;
-    ss << "adj" << nadj << "_" << name_;
-    Function sw = Function::conditional(ss.str(), der, der_def);
+    Function sw = Function::conditional("switch_" + name, der, der_def);
 
-    // Construct wrapper inputs and arguments for calling sw
+    // Get expressions for the derivative switch
     vector<MX> arg = sw.mx_in();
-
-    // ignore seed for ind
-    vector<MX>::iterator ind_seed = arg.begin() + n_in() + n_out();
-    *ind_seed = MX(ind_seed->size());
-
-    // Get result expression
     vector<MX> res = sw(arg);
 
-    // Remove index seed from return function input
-    arg.erase(ind_seed);
+    // No derivatives with respect to index
+    res.insert(res.begin(), MX(1, nadj));
 
     // Create wrapper
     return Function(name, arg, res, i_names, o_names, opts);
