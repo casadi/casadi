@@ -85,43 +85,22 @@ namespace casadi {
   }
 
   void Switch::init(const Dict& opts) {
-    // Initialize the functions, get input and output sparsities
-    // Input and output sparsities
-    std::vector<Sparsity> sp_in, sp_out;
-    int num_in = -1, num_out=-1;
-    for (int k=0; k<=f_.size(); ++k) {
-      Function& fk = k<f_.size() ? f_[k] : f_def_;
-      if (fk.is_null()) continue;
-      if (num_in<0) {
-        // Number of inputs and outputs
-        num_in=fk.n_in();
-        num_out=fk.n_out();
-        // Output sparsity
-        sp_out.resize(num_out);
-        for (int i=0; i<num_out; ++i) sp_out[i] = fk.sparsity_out(i);
-        // Input sparsity
-        sp_in.resize(num_in);
-        for (int i=0; i<num_in; ++i) sp_in[i] = fk.sparsity_in(i);
-      } else {
-        // Assert matching number of inputs and outputs
-        casadi_assert(num_in==fk.n_in());
-        casadi_assert(num_out==fk.n_out());
-        // Intersect with output sparsity
-        for (int i=0; i<num_out; ++i) {
-          sp_out[i] = sp_out[i].intersect(fk.sparsity_out(i));
-        }
-        // Intersect with input sparsity
-        for (int i=0; i<num_in; ++i) {
-          sp_in[i] = sp_in[i].intersect(fk.sparsity_in(i));
-        }
-      }
-    }
-
-    // Illegal to pass only "null" functions
-    casadi_assert_message(num_in>=0, "All functions are null");
-
     // Call the initialization method of the base class
     FunctionInternal::init(opts);
+
+    // Function is only implemented for matching sparsity patterns
+    for (int k=0; k<=f_.size(); ++k) {
+      const Function& fk = k<f_.size() ? f_[k] : f_def_;
+      if (fk.is_null()) continue;
+      for (int i=1; i<n_in(); ++i) {
+        const Sparsity& s = fk.sparsity_in(i-1);
+        casadi_assert_message(s==sparsity_in(i), "Not implemented");
+      }
+      for (int i=0; i<n_out(); ++i) {
+        const Sparsity& s = fk.sparsity_out(i);
+        casadi_assert_message(s==sparsity_out(i), "Not implemented");
+      }
+    }
 
     // Get required work
     for (int k=0; k<=f_.size(); ++k) {
