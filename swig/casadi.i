@@ -3779,6 +3779,7 @@ namespace casadi{
 %include <casadi/core/function/nlpsol.hpp>
 %include <casadi/core/function/rootfinder.hpp>
 %include <casadi/core/function/linsol.hpp>
+%include <casadi/core/function/dple.hpp>
 %include <casadi/core/function/interpolant.hpp>
 
 %feature("copyctor", "0") casadi::CodeGenerator;

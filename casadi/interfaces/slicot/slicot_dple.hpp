@@ -23,8 +23,8 @@
  */
 
 
-#ifndef CASADI_PSD_INDEF_DPLE_INTERNAL_HPP
-#define CASADI_PSD_INDEF_DPLE_INTERNAL_HPP
+#ifndef CASADI_SLICOT_DPLE_HPP
+#define CASADI_SLICOT_DPLEL_HPP
 
 #include "../../core/function/dple_impl.hpp"
 #include "../../core/function/linsol.hpp"
@@ -71,7 +71,7 @@ namespace casadi {
     std::vector< std::vector< Linsol> > dpse_solvers;
 
     /// Constructor
-    SlicotDpleMemory();
+    SlicotDpleMemory() {};
 
     /// Destructor
     ~SlicotDpleMemory();
@@ -140,21 +140,6 @@ namespace casadi {
 
     SlicotDple(const SpDict & st, int nrhs=1, bool transp=false);
 
-    /** \brief  Clone */
-    virtual SlicotDple* clone() const;
-
-    ///@{
-    /** \brief Generate a function that calculates \a nfwd forward derivatives */
-    virtual Function getDerForward(const std::string& name, int nfwd, Dict& opts);
-    virtual int numDerForward() const { return 64;}
-    ///@}
-
-    ///@{
-    /** \brief Generate a function that calculates \a nadj adjoint derivatives */
-    virtual Function getDerReverse(const std::string& name, int nadj, Dict& opts);
-    virtual int numDerReverse() const { return 64;}
-    ///@}
-
   private:
     /// Dimension of state-space
     int n_;
@@ -204,4 +189,4 @@ namespace casadi {
 } // namespace casadi
 
 /// \endcond
-#endif // CASADI_PSD_INDEF_DPLE_INTERNAL_HPP
+#endif // CASADI_SLICOT_DPLE_HPP

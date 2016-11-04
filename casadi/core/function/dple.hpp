@@ -61,7 +61,7 @@ namespace casadi {
   * \endif
   */
   ///@{
-  CASADI_EXPORT Function dple(const std::string& name, const std::string& solver,
+  CASADI_EXPORT Function dplesol(const std::string& name, const std::string& solver,
                                const SpDict& qp, const Dict& opts=Dict());
   ///@}
 

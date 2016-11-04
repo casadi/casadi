@@ -50,6 +50,7 @@
 #include "function/nlpsol.hpp"
 #include "function/rootfinder.hpp"
 #include "function/linsol.hpp"
+#include "function/dple.hpp"
 #include "function/interpolant.hpp"
 #include "function/jit.hpp"
 #include "function/external.hpp"

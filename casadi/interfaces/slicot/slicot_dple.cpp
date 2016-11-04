@@ -142,10 +142,11 @@ namespace casadi {
 
 
     // There can be at most n partitions
-    alloc_iw(n_, true); // partition_
+    alloc_iw(n_+1, true); // partition_
 
     alloc_w(std::max(n_+K_-2, 4*n_)+(n_-1)*K_+2*n_); // dwork_
-    alloc_w(4*K_*4*K_); // A_
+    alloc_w(4*K_*4, true); // A_
+    alloc_w(4*K_, true); // B_
   }
 
 
@@ -172,7 +173,8 @@ namespace casadi {
     m->F = w; w += 2*2*n_*K_;
     m->FF = w; w += 2*2*K_;
 
-    m->A = w;
+    m->A = w; w += 4*K_*4;
+    m->B = w; w += 4*K_;
     m->dwork = w;
     m->partition = iw;
 
@@ -278,6 +280,9 @@ namespace casadi {
   void SlicotDple::eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
     auto m = static_cast<SlicotDpleMemory*>(mem);
 
+    setup(mem, arg, res, iw, w);
+
+    std::cout << n_ << ":" << K_ << std::endl;
     // Transpose operation (after #554)
     for (int k=0;k<K_;++k) {
       for (int i=0;i<n_;++i) {
@@ -288,6 +293,8 @@ namespace casadi {
     }
 
     slicot_periodic_schur(n_, K_, m->X, m->T, m->Z, m->dwork, m->eig_real, m->eig_imag, psd_num_zero_);
+
+    std::cout << std::vector<double>(m->T, m->T+n_*n_*K_) << std::endl;
 
     if (error_unstable_) {
       for (int i=0;i<n_;++i) {
@@ -301,6 +308,8 @@ namespace casadi {
           "and 'eps_unstable' to influence this message.");
       }
     }
+
+    std::fill(m->A, m->A+4*K_*4, 1);
 
     int* partition = m->partition;
 
@@ -346,16 +355,18 @@ namespace casadi {
             }
           }
         } else {
+          std::cout << K_ << np << n1 << n2 << std::endl;
           // Other cases
           int k;
           for (k=0;k<K_-1;++k) {
             for (int ll=0;ll<np;++ll) {
               for (int mm=0;mm<np;++mm) {
                 A[np*(np+1)*((k+1)%K_)+ll*(np+1)+mm] =
-                    T[partindex(m, r, r, k, ll/n2, mm/n2)]*T[partindex(m, l, l, k, ll%n2, mm%n2)];
+                    -T[partindex(m, r, r, k, ll/n2, mm/n2)]*T[partindex(m, l, l, k, ll%n2, mm%n2)];
               }
             }
           }
+          std::cout << "Apart" << std::vector<double>(A, A+4*4) << std::endl;
 
           for (int ll=0;ll<np;++ll) {
             for (int mm=0;mm<np;++mm) {
@@ -367,6 +378,8 @@ namespace casadi {
         // ********** STOP ***************
         // Solve Discrete Periodic Sylvester Equation Solver
 
+        std::cout << "A" << std::vector<double>(A, A+4*4) << std::endl;
+
         solver.pivoting(m->A);
         solver.factorize(m->A);
 
@@ -376,20 +389,21 @@ namespace casadi {
 
     if (!transp_) {
       for (int d=0;d<nrhs_;++d) {
+        std::cout << "nrhs" << nrhs_ << std::endl;
 
         // ********** START ***************
         // V = blocks([mul([sZ[k].T, V[k], sZ[k]]) for k in range(p)])
 
         for (int k=0;k<K_;++k) { // K
-          double * nnKa = m->nnKa+k*n_*n_*K_;
-          double * nnKb = m->nnKb+k*n_*n_*K_;
+          double * nnKa = m->nnKa+k*n_*n_;
+          double * nnKb = m->nnKb+k*n_*n_;
           // n^2 K
 
-          std::fill(nnKa, nnKa+n_*n_*K_, 0);
+          std::fill(nnKa, nnKa+n_*n_, 0);
           // nnKa[k] <- V[k]*Z[k+1]
           // n^3 K
           dense_mul_nt(n_, n_, n_, arg[DPLE_V]+d*n_*n_*K_ + k*n_*n_, m->Z+((k+1) % K_)*n_*n_, nnKa);
-          std::fill(nnKb, nnKb+n_*n_*K_, 0);
+          std::fill(nnKb, nnKb+n_*n_, 0);
           // nnKb[k] <- Z[k+1]'*V[k]*Z[k+1]
           dense_mul_nn(n_, n_, n_, m->Z + ((k+1) % K_)*n_*n_, nnKa, nnKb);
         }
@@ -428,6 +442,9 @@ namespace casadi {
             }
           }
           // ********** STOP ***************
+
+
+
 
           // Inner main loop
           for (int r=0;r<l+1;++r) { // n^2
@@ -477,6 +494,8 @@ namespace casadi {
                 }
               }
             }
+
+
             // ********** STOP ***************
 
             int n1 = partition[r+1]-partition[r];
@@ -495,6 +514,8 @@ namespace casadi {
                 }
               }
             }
+
+
 
             // ********** START ***************
             // M+= [sum(mul(A[r][i][k], F[i][k])  for i in range(r+1)) for k in rang(p)]
@@ -535,14 +556,14 @@ namespace casadi {
               }
             }
             // ********** STOP ***************
-
+            std::cout << "B" << std::vector<double>(m->B, m->B+4) << std::endl;
             // Critical observation: Prepare step is not needed
             // n^2 K
             solver.solve(m->B, 1, true);
 
             // Extract solution and store it in X
             double * sol = m->B;
-
+            std::cout << std::vector<double>(sol, sol+4) << std::endl;
             // ********** START ***************
             for (int ii=0;ii<partition[r+1]-partition[r];++ii) {
               for (int jj=0;jj<partition[l+1]-partition[l];++jj) {
@@ -567,7 +588,7 @@ namespace casadi {
           std::fill(res[DPLE_P]+d*n_*n_*K_, res[DPLE_P]+(d+1)*n_*n_*K_, 0);
         }
 
-        std::fill(m->nnKa, m->nnKa+n_*n_*K_, 0);
+        std::fill(m->nnKa, m->nnKa+n_*n_, 0);
         for (int k=0;k<K_;++k) {
           // nnKa[k] <- V[k]*Z[k]'
           // n^3 K

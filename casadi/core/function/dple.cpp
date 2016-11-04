@@ -41,7 +41,7 @@ namespace casadi {
     return Dple::getPlugin(name).doc;
   }
 
-  Function dple(const string& name, const string& solver,
+  Function dplesol(const string& name, const string& solver,
                 const SpDict& st, const Dict& opts) {
     Function ret;
     ret.assignNode(Dple::instantiatePlugin(name, solver, st));
