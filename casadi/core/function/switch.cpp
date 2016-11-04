@@ -88,22 +88,6 @@ namespace casadi {
     // Call the initialization method of the base class
     FunctionInternal::init(opts);
 
-    // Function is only implemented for matching sparsity patterns
-    for (int k=0; k<=f_.size(); ++k) {
-      const Function& fk = k<f_.size() ? f_[k] : f_def_;
-      if (fk.is_null()) continue;
-      for (int i=1; i<n_in(); ++i) {
-        const Sparsity& s = fk.sparsity_in(i-1);
-        casadi_assert_warning(s==sparsity_in(i),
-                              "Different input sparsity patterns");
-      }
-      for (int i=0; i<n_out(); ++i) {
-        const Sparsity& s = fk.sparsity_out(i);
-        casadi_assert_warning(s==sparsity_out(i),
-                              "Different output sparsity patterns");
-      }
-    }
-
     // Buffer for mismatching sparsities
     size_t sz_buf=0;
 
