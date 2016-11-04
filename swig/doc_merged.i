@@ -411,7 +411,7 @@ For a particular input or for all of the inputs
 >  void casadi::Function::forward(const std::vector< DM > &arg, const std::vector< DM > &res, const std::vector< std::vector< DM > > &fseed, std::vector< std::vector< DM > > &output_fsens, bool always_inline=false, bool never_inline=false)
 ------------------------------------------------------------------------
 
-Create call to (cached) derivative function, forward mode.
+[DEPRECATED] Use Function::factory or jtimes
 
 >  Function casadi::Function::forward(int nfwd)
 ------------------------------------------------------------------------
@@ -564,7 +564,7 @@ Checkout a memory object.
 >  void casadi::Function::reverse(const std::vector< DM > &arg, const std::vector< DM > &res, const std::vector< std::vector< DM > > &aseed, std::vector< std::vector< DM > > &output_asens, bool always_inline=false, bool never_inline=false)
 ------------------------------------------------------------------------
 
-Create call to (cached) derivative function, reverse mode.
+[DEPRECATED] Use Function::factory or jtimes
 
 >  Function casadi::Function::reverse(int nfwd)
 ------------------------------------------------------------------------
@@ -1018,14 +1018,9 @@ the outputs summed up.
 >  std::map<std::string, MX> casadi::Function::map(const std::map< std::string, MX > &arg, const std::string &parallelization=\"serial\")
 ------------------------------------------------------------------------
 
-Evaluate symbolically in parallel (matrix graph)
+[DEPRECATED] Use map(int) instead
 
-Parameters:
------------
-
-parallelization:  Type of parallelization used: unroll|serial|openmp
-
->  Function casadi::Function::map(const std::string &name, const std::string &parallelization, int n, const Dict &opts=Dict())
+>  Function casadi::Function::map(int n, const std::string &parallelization=\"serial\")
 ------------------------------------------------------------------------
 
 Create a mapped version of this function.
@@ -1063,10 +1058,10 @@ Parameters:
 
 parallelization:  Type of parallelization used: unroll|serial|openmp
 
->  Function casadi::Function::map(int n)
+>  Function casadi::Function::map(const std::string &name, const std::string &parallelization, int n, const Dict &opts=Dict())
 ------------------------------------------------------------------------
 
-Shorthand for map(name_n, 'serial', n)
+[DEPRECATED] Old syntax for map
 
 ";
 
@@ -2303,7 +2298,7 @@ Is a null pointer?
 >  void casadi::Function::forward(const std::vector< DM > &arg, const std::vector< DM > &res, const std::vector< std::vector< DM > > &fseed, std::vector< std::vector< DM > > &output_fsens, bool always_inline=false, bool never_inline=false)
 ------------------------------------------------------------------------
 
-Create call to (cached) derivative function, forward mode.
+[DEPRECATED] Use Function::factory or jtimes
 
 >  Function casadi::Function::forward(int nfwd)
 ------------------------------------------------------------------------
@@ -2501,14 +2496,9 @@ the outputs summed up.
 >  std::map<std::string, MX> casadi::Function::map(const std::map< std::string, MX > &arg, const std::string &parallelization=\"serial\")
 ------------------------------------------------------------------------
 
-Evaluate symbolically in parallel (matrix graph)
+[DEPRECATED] Use map(int) instead
 
-Parameters:
------------
-
-parallelization:  Type of parallelization used: unroll|serial|openmp
-
->  Function casadi::Function::map(const std::string &name, const std::string &parallelization, int n, const Dict &opts=Dict())
+>  Function casadi::Function::map(int n, const std::string &parallelization=\"serial\")
 ------------------------------------------------------------------------
 
 Create a mapped version of this function.
@@ -2546,10 +2536,10 @@ Parameters:
 
 parallelization:  Type of parallelization used: unroll|serial|openmp
 
->  Function casadi::Function::map(int n)
+>  Function casadi::Function::map(const std::string &name, const std::string &parallelization, int n, const Dict &opts=Dict())
 ------------------------------------------------------------------------
 
-Shorthand for map(name_n, 'serial', n)
+[DEPRECATED] Old syntax for map
 
 ";
 
@@ -2626,7 +2616,7 @@ guarantee that subsequent calls return unique answers.
 >  void casadi::Function::reverse(const std::vector< DM > &arg, const std::vector< DM > &res, const std::vector< std::vector< DM > > &aseed, std::vector< std::vector< DM > > &output_asens, bool always_inline=false, bool never_inline=false)
 ------------------------------------------------------------------------
 
-Create call to (cached) derivative function, reverse mode.
+[DEPRECATED] Use Function::factory or jtimes
 
 >  Function casadi::Function::reverse(int nfwd)
 ------------------------------------------------------------------------

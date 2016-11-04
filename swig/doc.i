@@ -557,7 +557,7 @@ For a particular input or for all of the inputs
 &fseed, std::vector< std::vector< MX > > &output_fsens, bool
 always_inline=false, bool never_inline=false) "
 
-Create call to (cached) derivative function, forward mode.
+[DEPRECATED] Use Function::factory or jtimes
 
 ";
 
@@ -566,7 +566,7 @@ Create call to (cached) derivative function, forward mode.
 &fseed, std::vector< std::vector< SX > > &output_fsens, bool
 always_inline=false, bool never_inline=false) "
 
-Create call to (cached) derivative function, forward mode.
+[DEPRECATED] Use Function::factory or jtimes
 
 ";
 
@@ -575,7 +575,7 @@ Create call to (cached) derivative function, forward mode.
 &fseed, std::vector< std::vector< DM > > &output_fsens, bool
 always_inline=false, bool never_inline=false) "
 
-Create call to (cached) derivative function, forward mode.
+[DEPRECATED] Use Function::factory or jtimes
 
 ";
 
@@ -771,7 +771,7 @@ Checkout a memory object.
 &aseed, std::vector< std::vector< MX > > &output_asens, bool
 always_inline=false, bool never_inline=false) "
 
-Create call to (cached) derivative function, reverse mode.
+[DEPRECATED] Use Function::factory or jtimes
 
 ";
 
@@ -780,7 +780,7 @@ Create call to (cached) derivative function, reverse mode.
 &aseed, std::vector< std::vector< SX > > &output_asens, bool
 always_inline=false, bool never_inline=false) "
 
-Create call to (cached) derivative function, reverse mode.
+[DEPRECATED] Use Function::factory or jtimes
 
 ";
 
@@ -789,7 +789,7 @@ Create call to (cached) derivative function, reverse mode.
 &aseed, std::vector< std::vector< DM > > &output_asens, bool
 always_inline=false, bool never_inline=false) "
 
-Create call to (cached) derivative function, reverse mode.
+[DEPRECATED] Use Function::factory or jtimes
 
 ";
 
@@ -1613,29 +1613,19 @@ the outputs summed up.
 %feature("docstring")  casadi::Function::map(const std::vector< MX > &arg,
 const std::string &parallelization="serial") "
 
-Evaluate symbolically in parallel (matrix graph)
-
-Parameters:
------------
-
-parallelization:  Type of parallelization used: unroll|serial|openmp
+[DEPRECATED] Use map(int) instead
 
 ";
 
 %feature("docstring")  casadi::Function::map(const std::map< std::string, MX
 > &arg, const std::string &parallelization="serial") "
 
-Evaluate symbolically in parallel (matrix graph)
-
-Parameters:
------------
-
-parallelization:  Type of parallelization used: unroll|serial|openmp
+[DEPRECATED] Use map(int) instead
 
 ";
 
-%feature("docstring")  casadi::Function::map(const std::string &name, const
-std::string &parallelization, int n, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::Function::map(int n, const std::string
+&parallelization="serial") "
 
 Create a mapped version of this function.
 
@@ -1674,9 +1664,10 @@ parallelization:  Type of parallelization used: unroll|serial|openmp
 
 ";
 
-%feature("docstring")  casadi::Function::map(int n) "
+%feature("docstring")  casadi::Function::map(const std::string &name, const
+std::string &parallelization, int n, const Dict &opts=Dict()) "
 
-Shorthand for map(name_n, 'serial', n)
+[DEPRECATED] Old syntax for map
 
 ";
 
@@ -3445,7 +3436,7 @@ Is a null pointer?
 &fseed, std::vector< std::vector< MX > > &output_fsens, bool
 always_inline=false, bool never_inline=false) "
 
-Create call to (cached) derivative function, forward mode.
+[DEPRECATED] Use Function::factory or jtimes
 
 ";
 
@@ -3454,7 +3445,7 @@ Create call to (cached) derivative function, forward mode.
 &fseed, std::vector< std::vector< SX > > &output_fsens, bool
 always_inline=false, bool never_inline=false) "
 
-Create call to (cached) derivative function, forward mode.
+[DEPRECATED] Use Function::factory or jtimes
 
 ";
 
@@ -3463,7 +3454,7 @@ Create call to (cached) derivative function, forward mode.
 &fseed, std::vector< std::vector< DM > > &output_fsens, bool
 always_inline=false, bool never_inline=false) "
 
-Create call to (cached) derivative function, forward mode.
+[DEPRECATED] Use Function::factory or jtimes
 
 ";
 
@@ -3785,29 +3776,19 @@ the outputs summed up.
 %feature("docstring")  casadi::Function::map(const std::vector< MX > &arg,
 const std::string &parallelization="serial") "
 
-Evaluate symbolically in parallel (matrix graph)
-
-Parameters:
------------
-
-parallelization:  Type of parallelization used: unroll|serial|openmp
+[DEPRECATED] Use map(int) instead
 
 ";
 
 %feature("docstring")  casadi::Function::map(const std::map< std::string, MX
 > &arg, const std::string &parallelization="serial") "
 
-Evaluate symbolically in parallel (matrix graph)
-
-Parameters:
------------
-
-parallelization:  Type of parallelization used: unroll|serial|openmp
+[DEPRECATED] Use map(int) instead
 
 ";
 
-%feature("docstring")  casadi::Function::map(const std::string &name, const
-std::string &parallelization, int n, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::Function::map(int n, const std::string
+&parallelization="serial") "
 
 Create a mapped version of this function.
 
@@ -3846,9 +3827,10 @@ parallelization:  Type of parallelization used: unroll|serial|openmp
 
 ";
 
-%feature("docstring")  casadi::Function::map(int n) "
+%feature("docstring")  casadi::Function::map(const std::string &name, const
+std::string &parallelization, int n, const Dict &opts=Dict()) "
 
-Shorthand for map(name_n, 'serial', n)
+[DEPRECATED] Old syntax for map
 
 ";
 
@@ -3967,7 +3949,7 @@ guarantee that subsequent calls return unique answers.
 &aseed, std::vector< std::vector< MX > > &output_asens, bool
 always_inline=false, bool never_inline=false) "
 
-Create call to (cached) derivative function, reverse mode.
+[DEPRECATED] Use Function::factory or jtimes
 
 ";
 
@@ -3976,7 +3958,7 @@ Create call to (cached) derivative function, reverse mode.
 &aseed, std::vector< std::vector< SX > > &output_asens, bool
 always_inline=false, bool never_inline=false) "
 
-Create call to (cached) derivative function, reverse mode.
+[DEPRECATED] Use Function::factory or jtimes
 
 ";
 
@@ -3985,7 +3967,7 @@ Create call to (cached) derivative function, reverse mode.
 &aseed, std::vector< std::vector< DM > > &output_asens, bool
 always_inline=false, bool never_inline=false) "
 
-Create call to (cached) derivative function, reverse mode.
+[DEPRECATED] Use Function::factory or jtimes
 
 ";
 
