@@ -2224,20 +2224,6 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  std::vector<bool> Matrix<Scalar>::vector_depends_on(const Matrix<Scalar> &x,
-      const Matrix<Scalar> &arg) {
-    casadi_error("\"vector_depends_on\" not defined for instantiation");
-    return std::vector<bool>();
-  }
-
-  template<typename Scalar>
-  std::vector<bool> Matrix<Scalar>::vector_linear_depends_on(const Matrix<Scalar> &x,
-      const Matrix<Scalar> &arg) {
-    casadi_error("\"vector_linear_depends_on\" not defined for instantiation");
-    return std::vector<bool>();
-  }
-
-  template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::jacobian(const Matrix<Scalar> &f,
                                               const Matrix<Scalar> &x,
                                               bool symmetric) {
@@ -2283,10 +2269,20 @@ namespace casadi {
     return Matrix<Scalar>();
   }
 
+#ifdef WITH_DEPRECATED_FEATURES
   template<typename Scalar>
   std::vector<bool>
   Matrix<Scalar>::nl_var(const Matrix<Scalar> &expr, const Matrix<Scalar> &var) {
     casadi_error("\"nl_var\" not defined for " + type_name());
+    return std::vector<bool>();
+  }
+#endif
+
+  template<typename Scalar>
+  std::vector<bool>
+  Matrix<Scalar>::which_depends(const Matrix<Scalar> &expr, const Matrix<Scalar> &var,
+      int order, bool tr) {
+    casadi_error("\"which_depends\" not defined for " + type_name());
     return std::vector<bool>();
   }
 
@@ -2592,8 +2588,6 @@ namespace casadi {
                                         std::vector<SX >& ex,
                                         bool reverse);
   template<> bool SX::depends_on(const SX &x, const SX &arg);
-  template<> std::vector<bool> SX::vector_depends_on(const SX &x, const SX &arg);
-  template<> std::vector<bool> SX::vector_linear_depends_on(const SX &x, const SX &arg);
   template<> std::vector<SX > SX::symvar(const SX &x);
   template<> SX SX::jacobian(const SX &f, const SX &x, bool symmetric);
   template<> SX SX::gradient(const SX &f, const SX &x);
@@ -2601,7 +2595,10 @@ namespace casadi {
   template<> SX SX::hessian(const SX &f, const SX &x);
   template<> SX SX::hessian(const SX &f, const SX &x, SX &g);
   template<> SX SX::jtimes(const SX &ex, const SX &arg, const SX &v, bool tr);
+#ifdef WITH_DEPRECATED_FEATURES
   template<> std::vector<bool> SX::nl_var(const SX &expr, const SX &var);
+#endif
+  template<> std::vector<bool> SX::which_depends(const SX &expr, const SX &var, int order, bool tr);
   template<> SX SX::taylor(const SX& f, const SX& x, const SX& a, int order);
   template<> SX SX::mtaylor(const SX& f, const SX& x, const SX& a, int order);
   template<> SX SX::mtaylor(const SX& f, const SX& x, const SX& a, int order,
@@ -2693,6 +2690,7 @@ namespace casadi {
     return horzcat(vv);
   }
 
+#ifdef WITH_DEPRECATED_FEATURES
   template<typename MatType>
   std::vector<bool> _nl_var(const MatType &expr, const MatType &var) {
     // Create a function for calculating a forward-mode derivative
@@ -2704,6 +2702,35 @@ namespace casadi {
     std::vector<bvec_t> sens(f.nnz_in(0), 0);
     f.rev({get_ptr(sens)}, {get_ptr(seed)});
 
+    // Temporaries for evaluation
+    std::vector<bool> ret(sens.size());
+    std::copy(sens.begin(), sens.end(), ret.begin());
+    return ret;
+  }
+#endif
+
+  template<typename MatType>
+  std::vector<bool> _which_depends(const MatType &expr, const MatType &var, int order, bool tr) {
+    MatType e = expr;
+
+    // Create a function for calculating a forward-mode derivative
+    casadi_assert_message(order==1 || order==2,
+      "which_depends: order argument must be 1 or 2, got " << order << " instead.");
+
+    MatType v = MatType::sym("v", var.sparsity());
+    for (int i=1;i<order;++i) {
+      e = jtimes(e, var, v);
+    }
+
+    Function f = Function("tmp", {var}, {e});
+    // Propagate sparsities backwards seeding all outputs
+    std::vector<bvec_t> seed(tr? f.nnz_in(0) : f.nnz_out(0), 1);
+    std::vector<bvec_t> sens(tr? f.nnz_out(0) : f.nnz_in(0), 0);
+
+    if (tr)
+      f({get_ptr(seed)}, {get_ptr(sens)});
+    else
+      f.rev({get_ptr(sens)}, {get_ptr(seed)});
     // Temporaries for evaluation
     std::vector<bool> ret(sens.size());
     std::copy(sens.begin(), sens.end(), ret.begin());

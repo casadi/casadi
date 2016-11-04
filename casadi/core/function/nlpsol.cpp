@@ -228,9 +228,6 @@ namespace casadi {
        {OT_BOOL,
         "When errors occur during evaluation of f,g,...,"
         "stop the iterations"}},
-      {"print_time",
-         {OT_BOOL,
-          "print information about execution time"}},
       {"verbose_init",
        {OT_BOOL,
         "Print out timing information about "
@@ -262,8 +259,6 @@ namespace casadi {
         warn_initial_bounds_ = op.second;
       } else if (op.first=="iteration_callback_ignore_errors") {
         iteration_callback_ignore_errors_ = op.second;
-      } else if (op.first=="print_time") {
-        print_time_ = op.second;
       } else if (op.first=="discrete") {
         discrete_ = op.second;
       }

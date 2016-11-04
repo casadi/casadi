@@ -2256,7 +2256,7 @@ class MXtests(casadiTestCase):
 
     f = Function("f", [m],[vertsplit(m)[0]])
 
-    f.derivative(0,1)
+    f.reverse(1)
 
   def test_MX_const_sp(self):
     x = MX.sym("x",4,1)
@@ -2301,14 +2301,11 @@ class MXtests(casadiTestCase):
 
     mfunction = mf.expand('expand_'+mf.name())
 
-    mfg = mf.derivative(0,1)
+    mfg = mf.reverse(1)
 
-    mfunctiong = mfunction.derivative(0,1)
-
-
-    f_in = [0]*mfg.n_in();f_in[0]=DM([1,2])
-
-    f_in[1]=DM([4,5])
+    mfunctiong = mfunction.reverse(1)
+    
+    f_in = [0, 5, DM([1,2])]
 
     self.checkfunction(mfg,mfunctiong,inputs=f_in)
 
@@ -2428,16 +2425,5 @@ class MXtests(casadiTestCase):
 
         self.checkfunction(f,fr,inputs=[0])
 
-  def test_classify_linear(self):
-    x =MX.sym("x")
-    y =MX.sym("y")
-
-    p =MX.sym("p")
-
-    e = vertcat(0,x,y,p,2*p**3,x*y,x*p,sin(x),cos(y),sqrt(x+y),p*p*x,x*y*p)
-
-    self.checkarray(vector_linear_depends_on(e,vertcat(x,y)),[1, 1, 1, 1,1, 0, 1, 0, 0, 0, 1, 0])
-    self.checkarray(vector_depends_on(e,vertcat(x,y)),[0, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1])
-    
 if __name__ == '__main__':
     unittest.main()

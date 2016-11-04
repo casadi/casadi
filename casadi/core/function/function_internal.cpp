@@ -35,6 +35,7 @@
 #include <cstdlib>
 #include <ctime>
 #endif // WITH_DL
+#include <iomanip>
 
 using namespace std;
 
@@ -90,8 +91,8 @@ namespace casadi {
   }
 
   FunctionInternal::~FunctionInternal() {
-    for (auto&& i : mem_) {
-      casadi_assert_warning(i==0, "Memory object has not been properly freed");
+    for (void* m : mem_) {
+      casadi_assert_warning(m==0, "Memory object has not been properly freed");
     }
     mem_.clear();
   }
@@ -179,11 +180,16 @@ namespace casadi {
       {"max_num_dir",
        {OT_INT,
         "Specify the maximum number of directions for derivative functions."
-        " Overrules the builtin optimized_num_dir."}}
+        " Overrules the builtin optimized_num_dir."}},
+      {"print_time",
+       {OT_BOOL,
+        "print information about execution time"}}
      }
   };
 
   void FunctionInternal::init(const Dict& opts) {
+
+    print_time_ = true;
     // Read options
     for (auto&& op : opts) {
       if (op.first=="verbose") {
@@ -216,6 +222,8 @@ namespace casadi {
         ad_weight_sp_ = op.second;
       } else if (op.first=="max_num_dir") {
         max_num_dir_ = op.second;
+      } else if (op.first=="print_time") {
+        print_time_ = op.second;
       }
     }
 
@@ -391,14 +399,20 @@ namespace casadi {
     }
 
     // Generate gradient function
-    Dict opts = {{"input_scheme", ischeme_},
-                 {"output_scheme", ionames},
-                 {"jit", jit_},
-                 {"compiler", compilerplugin_},
-                 {"jit_options", jit_options_},
-                 {"max_num_dir", max_num_dir_},
-                 {"derivative_of", self()}};
+    Dict opts = derived_options();
+    opts["input_scheme"] = ischeme_;
+    opts["output_scheme"] = ionames;
+    opts["max_num_dir"] = max_num_dir_;
+    opts["derivative_of"] = self();
     return getGradient(ss.str(), iind, oind, opts);
+  }
+
+  Dict FunctionInternal::derived_options() const {
+    Dict opts;
+    opts["jit"] = jit_;
+    opts["compiler"] = compilerplugin_;
+    opts["jit_options"] = jit_options_;
+    return opts;
   }
 
   Function FunctionInternal::tangent(int iind, int oind) {
@@ -419,13 +433,11 @@ namespace casadi {
     }
 
     // Generate gradient function
-    Dict opts = {{"input_scheme", ischeme_},
-                 {"output_scheme", ionames},
-                 {"jit", jit_},
-                 {"compiler", compilerplugin_},
-                 {"jit_options", jit_options_},
-                 {"max_num_dir", max_num_dir_},
-                 {"derivative_of", self()}};
+    Dict opts = derived_options();
+    opts["input_scheme"] = ischeme_;
+    opts["output_scheme"] = ionames;
+    opts["max_num_dir"] = max_num_dir_;
+    opts["derivative_of"] = self();
     return getTangent(ss.str(), iind, oind, opts);
   }
 
@@ -442,24 +454,17 @@ namespace casadi {
 
   Function FunctionInternal::getGradient(const std::string& name, int iind, int oind,
                                          const Dict& opts) {
-    Function f = wrapMXFunction();
-    return f.gradient(iind, oind);
+    return wrap().gradient(iind, oind);
   }
 
   Function FunctionInternal::getTangent(const std::string& name, int iind, int oind,
                                         const Dict& opts) {
-    Function f = wrapMXFunction();
-    return f.tangent(iind, oind);
+    return wrap().tangent(iind, oind);
   }
 
-  Function FunctionInternal::wrapMXFunction() const {
+  Function FunctionInternal::wrap() const {
     // Construct options of the wrapping MXFunction
-    Dict opts;
-
-    // Propagate naming of inputs and outputs
-    opts["input_scheme"] = ischeme_;
-    opts["output_scheme"] = oscheme_;
-    opts["output_scheme"] = oscheme_;
+    Dict opts = derived_options();
 
     // Propagate AD parameters
     opts["ad_weight"] = ad_weight();
@@ -469,15 +474,10 @@ namespace casadi {
     // Propagate information about AD
     opts["derivative_of"] = derivative_of_;
 
-    // Propagate JIT
-    opts["jit"] = jit_;
-    opts["compiler"] = compilerplugin_;
-    opts["jit_options"] = jit_options_;
-
     // Wrap the function
     vector<MX> arg = mx_in();
     vector<MX> res = self()(arg);
-    return Function("wrap_" + name_, arg, res, opts);
+    return Function("wrap_" + name_, arg, res, ischeme_, oscheme_, opts);
   }
 
   Function FunctionInternal::getHessian(int iind, int oind) {
@@ -1400,14 +1400,12 @@ namespace casadi {
       }
 
       // Generate a Jacobian
-      Dict opts = {{"verbose", verbose_},
-                   {"input_scheme", ischeme_},
-                   {"output_scheme", ionames},
-                   {"jit", jit_},
-                   {"compiler", compilerplugin_},
-                   {"jit_options", jit_options_},
-                   {"max_num_dir", max_num_dir_},
-                   {"derivative_of", self()}};
+      Dict opts = derived_options();
+      opts["verbose"] = verbose_;
+      opts["input_scheme"] = ischeme_;
+      opts["output_scheme"] = ionames;
+      opts["max_num_dir"] = max_num_dir_;
+      opts["derivative_of"] = self();
       Function ret = getJacobian(ss.str(), iind, oind, compact, symmetric, opts);
 
       // Save in cache
@@ -1430,104 +1428,6 @@ namespace casadi {
     return getNumericJacobian(name, iind, oind, compact, symmetric, opts);
   }
 
-  Function FunctionInternal::forward_old(int nfwd) {
-    casadi_assert(nfwd>=0);
-
-    // Check if there are enough forward directions allocated
-    if (nfwd>=derivative_fwd_.size()) {
-      derivative_fwd_.resize(nfwd+1);
-    }
-
-    // Quick return if already cached
-    if (derivative_fwd_[nfwd].alive()) {
-      return shared_cast<Function>(derivative_fwd_[nfwd].shared());
-    }
-
-    // Give it a suitable name
-    stringstream ss;
-    ss << "fwd" << nfwd << "_" << name_;
-    string name = ss.str();
-
-    // Get the number of inputs and outputs
-    int n_in = this->n_in();
-    int n_out = this->n_out();
-
-    // Names of inputs
-    std::vector<std::string> i_names;
-    i_names.reserve(n_in + n_out + n_in*nfwd);
-
-    // Nondifferentiated inputs
-    for (int i=0; i<n_in; ++i) {
-      i_names.push_back("der_" + ischeme_.at(i));
-    }
-
-    // Nondifferentiated outputs (given)
-    for (int i=0; i<n_out; ++i) {
-      i_names.push_back("der_" + oscheme_.at(i));
-    }
-
-    // Forward seeds
-    for (int d=0; d<nfwd; ++d) {
-      for (int i=0; i<n_in; ++i) {
-        ss.str(string());
-        ss << "fwd" << d << "_" << ischeme_.at(i);
-        i_names.push_back(ss.str());
-      }
-    }
-
-    // Names of outputs
-    std::vector<std::string> o_names;
-    o_names.reserve(n_out*nfwd);
-
-    // Forward sensitivities
-    for (int d=0; d<nfwd; ++d) {
-      for (int i=0; i<n_out; ++i) {
-        ss.str(string());
-        ss << "fwd" << d << "_" << oscheme_.at(i);
-        o_names.push_back(ss.str());
-      }
-    }
-
-    // Options
-    Dict opts = {{"input_scheme", i_names},
-                 {"output_scheme", o_names},
-                 {"jit", jit_},
-                 {"compiler", compilerplugin_},
-                 {"jit_options", jit_options_},
-                 {"max_num_dir", max_num_dir_},
-                 {"derivative_of", self()}};
-
-    // Return value
-    casadi_assert(get_n_forward()>0);
-    Function ret = get_forward_old(name, nfwd, opts);
-
-    // Consistency check for inputs
-    for (int i=0; i<ret.n_in(); ++i) {
-      const Sparsity& sp = i<n_in ? sparsity_in(i) :
-        i<n_in+n_out ? sparsity_out(i-n_in) :
-        sparsity_in((i-n_in-n_out) % n_in);
-      casadi_assert_message(ret.size_in(i)==sp.size(),
-                            "Incorrect shape for " << ret << " input " << i << " \""
-                            << i_names.at(i) << "\". Expected " << sp.size()
-                            << " but got " << ret.size_in(i));
-    }
-
-    // Consistency check for outputs
-    for (int i=0; i<ret.n_out(); ++i) {
-      const Sparsity& sp = sparsity_out(i % n_out);
-      casadi_assert_message(ret.size_out(i)==sp.size(),
-                            "Incorrect shape for " << ret << " output " << i << " \""
-                            << o_names.at(i) << "\". Expected " << sp.size()
-                            << " but got " << ret.size_out(i));
-    }
-
-    // Save to cache
-    derivative_fwd_[nfwd] = ret;
-
-    // Return generated function
-    return ret;
-  }
-
   Function FunctionInternal::forward(int nfwd) {
     casadi_assert(nfwd>=0);
 
@@ -1541,59 +1441,31 @@ namespace casadi {
       return shared_cast<Function>(forward_[nfwd].shared());
     }
 
-    // Give it a suitable name
-    stringstream ss;
-    ss << "fwd" << nfwd << "_" << name_;
-    string name = ss.str();
-
     // Get the number of inputs and outputs
     int n_in = this->n_in();
     int n_out = this->n_out();
 
+    // Give it a suitable name
+    string name = "fwd" + to_string(nfwd) + "_" + name_;
+
     // Names of inputs
     std::vector<std::string> i_names;
-    i_names.reserve(n_in + n_out + n_in);
-
-    // Nondifferentiated inputs
-    for (int i=0; i<n_in; ++i) {
-      i_names.push_back("der_" + ischeme_.at(i));
-    }
-
-    // Nondifferentiated outputs (given)
-    for (int i=0; i<n_out; ++i) {
-      i_names.push_back("der_" + oscheme_.at(i));
-    }
-
-    // Forward seeds
-    for (int i=0; i<n_in; ++i) {
-      ss.str(string());
-      ss << "fwd" << "_" << ischeme_.at(i);
-      i_names.push_back(ss.str());
-    }
+    for (int i=0; i<n_in; ++i) i_names.push_back("der_" + name_in(i));
+    for (int i=0; i<n_out; ++i) i_names.push_back("der_" + name_out(i));
+    for (int i=0; i<n_in; ++i) i_names.push_back("fwd_" + name_in(i));
 
     // Names of outputs
     std::vector<std::string> o_names;
-    o_names.reserve(n_out*nfwd);
-
-    // Forward sensitivities
-    for (int i=0; i<n_out; ++i) {
-      ss.str(string());
-      ss << "fwd" << "_" << oscheme_.at(i);
-      o_names.push_back(ss.str());
-    }
+    for (int i=0; i<n_out; ++i) o_names.push_back("fwd_" + name_out(i));
 
     // Options
-    Dict opts = {{"input_scheme", i_names},
-                 {"output_scheme", o_names},
-                 {"jit", jit_},
-                 {"compiler", compilerplugin_},
-                 {"jit_options", jit_options_},
-                 {"max_num_dir", max_num_dir_},
-                 {"derivative_of", self()}};
+    Dict opts = derived_options();
+    opts["max_num_dir"] = max_num_dir_;
+    opts["derivative_of"] = self();
 
     // Return value
     casadi_assert(get_n_forward()>0);
-    Function ret = get_forward(name, nfwd, opts);
+    Function ret = get_forward(name, nfwd, i_names, o_names, opts);
 
     // Consistency check for inputs
     casadi_assert(ret.n_in()==n_in + n_out + n_in);
@@ -1613,104 +1485,6 @@ namespace casadi {
     return ret;
   }
 
-  Function FunctionInternal::reverse_old(int nadj) {
-    casadi_assert(nadj>=0);
-
-    // Check if there are enough adjoint directions allocated
-    if (nadj>=derivative_adj_.size()) {
-      derivative_adj_.resize(nadj+1);
-    }
-
-    // Quick return if already cached
-    if (derivative_adj_[nadj].alive()) {
-      return shared_cast<Function>(derivative_adj_[nadj].shared());
-    }
-
-    // Give it a suitable name
-    stringstream ss;
-    ss << "adj" << nadj << "_" << name_;
-    string name = ss.str();
-
-    // Get the number of inputs and outputs
-    int n_in = this->n_in();
-    int n_out = this->n_out();
-
-    // Names of inputs
-    std::vector<std::string> i_names;
-    i_names.reserve(n_in + n_out + n_out*nadj);
-
-    // Nondifferentiated inputs
-    for (int i=0; i<n_in; ++i) {
-      i_names.push_back("der_" + ischeme_.at(i));
-    }
-
-    // Nondifferentiated outputs (given)
-    for (int i=0; i<n_out; ++i) {
-      i_names.push_back("der_" + oscheme_.at(i));
-    }
-
-    // Adjoint seeds
-    for (int d=0; d<nadj; ++d) {
-      for (int i=0; i<n_out; ++i) {
-        ss.str(string());
-        ss << "adj" << d << "_" << oscheme_.at(i);
-        i_names.push_back(ss.str());
-      }
-    }
-
-    // Names of outputs
-    std::vector<std::string> o_names;
-    o_names.reserve(n_in*nadj);
-
-    // Adjoint sensitivities
-    for (int d=0; d<nadj; ++d) {
-      for (int i=0; i<n_in; ++i) {
-        ss.str(string());
-        ss << "adj" << d << "_" << ischeme_.at(i);
-        o_names.push_back(ss.str());
-      }
-    }
-
-    // Options
-    Dict opts = {{"input_scheme", i_names},
-                 {"output_scheme", o_names},
-                 {"jit", jit_},
-                 {"compiler", compilerplugin_},
-                 {"jit_options", jit_options_},
-                 {"max_num_dir", max_num_dir_},
-                 {"derivative_of", self()}};
-
-    // Return value
-    casadi_assert(get_n_reverse()>0);
-    Function ret = get_reverse_old(name, nadj, opts);
-
-    // Consistency check for inputs
-    for (int i=0; i<ret.n_in(); ++i) {
-      const Sparsity& sp = i<n_in ? sparsity_in(i) :
-        i<n_in+n_out ? sparsity_out(i-n_in) :
-        sparsity_out((i-n_in-n_out) % n_out);
-      casadi_assert_message(ret.size_in(i)==sp.size(),
-                            "Incorrect shape for " << ret << " input " << i << " \""
-                            << i_names.at(i) << "\". Expected " << sp.size()
-                            << " but got " << ret.size_in(i));
-    }
-
-    // Consistency check for outputs
-    for (int i=0; i<ret.n_out(); ++i) {
-      const Sparsity& sp = sparsity_in(i % n_in);
-      casadi_assert_message(ret.size_out(i)==sp.size(),
-                            "Incorrect shape for " << ret << " output " << i << " \""
-                            << o_names.at(i) << "\". Expected " << sp.size()
-                            << " but got " << ret.size_out(i));
-    }
-
-    // Save to cache
-    derivative_adj_[nadj] = ret;
-
-    // Return generated function
-    return ret;
-  }
-
   Function FunctionInternal::reverse(int nadj) {
     casadi_assert(nadj>=0);
 
@@ -1724,59 +1498,31 @@ namespace casadi {
       return shared_cast<Function>(reverse_[nadj].shared());
     }
 
-    // Give it a suitable name
-    stringstream ss;
-    ss << "adj" << nadj << "_" << name_;
-    string name = ss.str();
-
     // Get the number of inputs and outputs
     int n_in = this->n_in();
     int n_out = this->n_out();
 
+    // Give it a suitable name
+    string name = "adj" + to_string(nadj) + "_" + name_;
+
     // Names of inputs
     std::vector<std::string> i_names;
-    i_names.reserve(n_in + n_out + n_out);
-
-    // Nondifferentiated inputs
-    for (int i=0; i<n_in; ++i) {
-      i_names.push_back("der_" + ischeme_.at(i));
-    }
-
-    // Nondifferentiated outputs (given)
-    for (int i=0; i<n_out; ++i) {
-      i_names.push_back("der_" + oscheme_.at(i));
-    }
-
-    // Adjoint seeds
-    for (int i=0; i<n_out; ++i) {
-      ss.str(string());
-      ss << "adj" << "_" << oscheme_.at(i);
-      i_names.push_back(ss.str());
-    }
+    for (int i=0; i<n_in; ++i) i_names.push_back("der_" + name_in(i));
+    for (int i=0; i<n_out; ++i) i_names.push_back("der_" + name_out(i));
+    for (int i=0; i<n_out; ++i) i_names.push_back("adj_" + name_out(i));
 
     // Names of outputs
     std::vector<std::string> o_names;
-    o_names.reserve(n_in);
-
-    // Adjoint sensitivities
-    for (int i=0; i<n_in; ++i) {
-      ss.str(string());
-      ss << "adj" << "_" << ischeme_.at(i);
-      o_names.push_back(ss.str());
-    }
+    for (int i=0; i<n_in; ++i) o_names.push_back("adj_" + name_in(i));
 
     // Options
-    Dict opts = {{"input_scheme", i_names},
-                 {"output_scheme", o_names},
-                 {"jit", jit_},
-                 {"compiler", compilerplugin_},
-                 {"jit_options", jit_options_},
-                 {"max_num_dir", max_num_dir_},
-                 {"derivative_of", self()}};
+    Dict opts = derived_options();
+    opts["max_num_dir"] = max_num_dir_;
+    opts["derivative_of"] = self();
 
     // Return value
     casadi_assert(get_n_reverse()>0);
-    Function ret = get_reverse(name, nadj, opts);
+    Function ret = get_reverse(name, nadj, i_names, o_names, opts);
 
     // Consistency check for inputs
     casadi_assert(ret.n_in()==n_in + n_out + n_out);
@@ -1796,35 +1542,17 @@ namespace casadi {
     return ret;
   }
 
-  void FunctionInternal::set_forward(const Function& fcn, int nfwd) {
-
-    // Check if there are enough forward directions allocated
-    if (nfwd>=derivative_fwd_.size()) {
-      derivative_fwd_.resize(nfwd+1);
-    }
-
-    // Save to cache
-    derivative_fwd_[nfwd] = fcn;
-  }
-
-  void FunctionInternal::set_reverse(const Function& fcn, int nadj) {
-
-    // Check if there are enough adjoint directions allocated
-    if (nadj>=derivative_adj_.size()) {
-      derivative_adj_.resize(nadj+1);
-    }
-
-    // Save to cache
-    derivative_adj_[nadj] = fcn;
-  }
-
   Function FunctionInternal::get_forward_old(const std::string& name, int nfwd, Dict& opts) {
     casadi_error("'get_forward' not defined for " + type_name());
   }
 
-  Function FunctionInternal::get_forward(const std::string& name, int nfwd, Dict& opts) {
+  Function FunctionInternal::
+  get_forward(const std::string& name, int nfwd,
+              const std::vector<std::string>& i_names,
+              const std::vector<std::string>& o_names, const Dict& opts) {
     // Call old implementation
-    Function d = forward_old(nfwd);
+    Dict old_opts = derived_options();
+    Function d = get_forward_old(name, nfwd, old_opts);
     // Get expressions for inputs and outputs
     vector<MX> arg = MX::get_input(d);
     vector<MX> res = d(arg);
@@ -1846,16 +1574,20 @@ namespace casadi {
     }
     res.resize(n_out());
     // Construct new function
-    return Function(name, arg, res, opts);
+    return Function(name, arg, res, i_names, o_names, opts);
   }
 
   Function FunctionInternal::get_reverse_old(const std::string& name, int nadj, Dict& opts) {
     casadi_error("'get_reverse' not defined for " + type_name());
   }
 
-  Function FunctionInternal::get_reverse(const std::string& name, int nadj, Dict& opts) {
+  Function FunctionInternal::
+  get_reverse(const std::string& name, int nadj,
+              const std::vector<std::string>& i_names,
+              const std::vector<std::string>& o_names, const Dict& opts) {
     // Call old implementation
-    Function d = reverse_old(nadj);
+    Dict old_opts = derived_options();
+    Function d = get_reverse_old(name, nadj, old_opts);
     // Get expressions for inputs and outputs
     vector<MX> arg = MX::get_input(d);
     vector<MX> res = d(arg);
@@ -1877,7 +1609,7 @@ namespace casadi {
     }
     res.resize(n_in());
     // Construct new function
-    return Function(name, arg, res, opts);
+    return Function(name, arg, res, i_names, o_names, opts);
   }
 
   int FunctionInternal::nnz_in() const {
@@ -1909,8 +1641,7 @@ namespace casadi {
     // The code below creates a call node, to inline, wrap in an MXFunction
     if (always_inline) {
       casadi_assert_message(!never_inline, "Inconsistent options");
-      Function f = wrapMXFunction();
-      return f.call(arg, res, true);
+      return wrap().call(arg, res, true);
     }
 
     // Create a call-node
@@ -1920,8 +1651,7 @@ namespace casadi {
   Function FunctionInternal::
   getNumericJacobian(const std::string& name, int iind, int oind, bool compact, bool symmetric,
                      const Dict& opts) {
-    Function f = wrapMXFunction();
-    return f->getNumericJacobian(name, iind, oind, compact, symmetric, opts);
+    return wrap()->getNumericJacobian(name, iind, oind, compact, symmetric, opts);
   }
 
   Function FunctionInternal::fullJacobian() {
@@ -2561,33 +2291,38 @@ namespace casadi {
           fsens[d][i] = reshape(fsens[d][i], size_out(i));
         }
       }
-      return;
-    }
 
-    // All inputs and seeds
-    vector<MX> darg;
-    darg.reserve(n_in + n_out + n_in*nfwd);
-    darg.insert(darg.end(), arg.begin(), arg.end());
-    darg.insert(darg.end(), res.begin(), res.end());
-    for (int d=0; d<nfwd; ++d) {
-      darg.insert(darg.end(), fseed[d].begin(), fseed[d].end());
-    }
+    } else {
+      // All inputs and seeds
+      vector<MX> darg;
+      darg.reserve(n_in + n_out + n_in);
+      darg.insert(darg.end(), arg.begin(), arg.end());
+      darg.insert(darg.end(), res.begin(), res.end());
+      vector<MX> v(nfwd);
+      for (int i=0; i<n_in; ++i) {
+        for (int d=0; d<nfwd; ++d) v[d] = fseed[d][i];
+        darg.push_back(horzcat(v));
+      }
 
-    // Create derivative function
-    Function dfcn = forward_old(nfwd);
+      // Create derivative function
+      Function dfcn = forward(nfwd);
 
-    // Create the evaluation node
-    vector<MX> x = Call::create(dfcn, darg);
-    vector<MX>::iterator x_it = x.begin();
+      // Create the evaluation node
+      vector<MX> x = Call::create(dfcn, darg);
+      casadi_assert(x.size()==n_out);
 
-    // Retrieve sensitivities
-    for (int d=0; d<nfwd; ++d) {
-      fsens[d].resize(n_out);
+      // Retrieve sensitivities
+      for (int d=0; d<nfwd; ++d) fsens[d].resize(n_out);
       for (int i=0; i<n_out; ++i) {
-        fsens[d][i] = *x_it++;
+        if (size2_out(i)>0) {
+          v = horzsplit(x[i], size2_out(i));
+          casadi_assert(v.size()==nfwd);
+        } else {
+          v = vector<MX>(nfwd, MX(size_out(i)));
+        }
+        for (int d=0; d<nfwd; ++d) fsens[d][i] = v[d];
       }
     }
-    casadi_assert(x_it==x.end());
   }
 
   void FunctionInternal::
@@ -2643,37 +2378,43 @@ namespace casadi {
           }
         }
       }
-      return;
-    }
+    } else {
+      // All inputs and seeds
+      vector<MX> darg;
+      darg.reserve(n_in + n_out + n_out);
+      darg.insert(darg.end(), arg.begin(), arg.end());
+      darg.insert(darg.end(), res.begin(), res.end());
+      vector<MX> v(nadj);
+      for (int i=0; i<n_out; ++i) {
+        for (int d=0; d<nadj; ++d) v[d] = aseed[d][i];
+        darg.push_back(horzcat(v));
+      }
 
-    // All inputs and seeds
-    vector<MX> darg;
-    darg.reserve(n_in + n_out + n_out*nadj);
-    darg.insert(darg.end(), arg.begin(), arg.end());
-    darg.insert(darg.end(), res.begin(), res.end());
-    for (int d=0; d<nadj; ++d) {
-      darg.insert(darg.end(), aseed[d].begin(), aseed[d].end());
-    }
+      // Create derivative function
+      Function dfcn = reverse(nadj);
 
-    // Create derivative function
-    Function dfcn = reverse_old(nadj);
+      // Create the evaluation node
+      vector<MX> x = Call::create(dfcn, darg);
+      casadi_assert(x.size()==n_in);
 
-    // Create the evaluation node
-    vector<MX> x = Call::create(dfcn, darg);
-    vector<MX>::iterator x_it = x.begin();
-
-    // Retrieve sensitivities
-    for (int d=0; d<nadj; ++d) {
-      asens[d].resize(n_in);
+      // Retrieve sensitivities
+      for (int d=0; d<nadj; ++d) asens[d].resize(n_in);
       for (int i=0; i<n_in; ++i) {
-        if (asens[d][i].is_empty(true)) {
-          asens[d][i] = *x_it++;
+        if (size2_in(i)>0) {
+          v = horzsplit(x[i], size2_in(i));
+          casadi_assert(v.size()==nadj);
         } else {
-          asens[d][i] += *x_it++;
+          v = vector<MX>(nadj, MX(size_in(i)));
+        }
+        for (int d=0; d<nadj; ++d) {
+          if (asens[d][i].is_empty(true)) {
+            asens[d][i] = v[d];
+          } else {
+            asens[d][i] += v[d];
+          }
         }
       }
     }
-    casadi_assert(x_it==x.end());
   }
 
   void FunctionInternal::
@@ -3040,7 +2781,7 @@ namespace casadi {
     return mem_.at(ind);
   }
 
-  int FunctionInternal::checkout() {
+  int FunctionInternal::checkout() const {
     if (unused_.empty()) {
       // Allocate a new memory object
       int n_mem = this->n_mem();
@@ -3058,7 +2799,7 @@ namespace casadi {
     }
   }
 
-  void FunctionInternal::release(int mem) {
+  void FunctionInternal::release(int mem) const {
     unused_.push(mem);
   }
 
@@ -3068,8 +2809,7 @@ namespace casadi {
           const std::vector<std::string>& s_out,
           const Function::AuxOut& aux,
           const Dict& opts) const {
-    Function f = wrapMXFunction();
-    return f.factory(name, s_in, s_out, aux, opts);
+    return wrap().factory(name, s_in, s_out, aux, opts);
   }
 
   std::vector<std::string> FunctionInternal::get_function() const {
@@ -3083,9 +2823,17 @@ namespace casadi {
     return singleton;
   }
 
+#ifdef WITH_DEPRECATED_FEATURES
   vector<bool> FunctionInternal::
   nl_var(const string& s_in, const vector<string>& s_out) const {
     casadi_error("'nl_var' not defined for " + type_name());
+    return vector<bool>();
+  }
+#endif
+
+  vector<bool> FunctionInternal::
+  which_depends(const string& s_in, const vector<string>& s_out, int order, bool tr) const {
+    casadi_error("'which_depends' not defined for " + type_name());
     return vector<bool>();
   }
 
@@ -3093,6 +2841,70 @@ namespace casadi {
     casadi_error("'oracle' not defined for " + type_name());
     static Function singleton;
     return singleton;
+  }
+
+  // Convert a float to a string of an exact length.
+  // First it tries fixed precision, then falls back to exponential notation.
+  //
+  // todo(jaeandersson,jgillis): needs either review or unit tests
+  // because it throws exceptions if it fail.
+  std::string formatFloat(double x, int totalWidth, int maxPrecision, int fallbackPrecision) {
+    std::ostringstream out0;
+    out0 << fixed << setw(totalWidth) << setprecision(maxPrecision) << x;
+    std::string ret0 = out0.str();
+    if (ret0.length() == totalWidth) {
+      return ret0;
+    } else if (ret0.length() > totalWidth) {
+      std::ostringstream out1;
+      out1 << setw(totalWidth) << setprecision(fallbackPrecision) << x;
+      std::string ret1 = out1.str();
+      if (ret1.length() != totalWidth)
+        casadi_error(
+          "ipopt timing formatting fallback is bugged, sorry about that."
+          << "expected " << totalWidth <<  " digits, but got " << ret1.length()
+          << ", string: \"" << ret1 << "\", number: " << x);
+      return ret1;
+    } else {
+      casadi_error("ipopt timing formatting is bugged, sorry about that.");
+    }
+  }
+
+  void FunctionInternal::print_stats_line(int maxNameLen, std::string label,
+    double n_call, double t_proc, double t_wall) {
+    // Skip when not called
+    if (n_call == 0) return;
+
+    std::stringstream s;
+
+    s
+      << setw(maxNameLen) << label << " "
+      << formatFloat(t_proc, 9, 3, 3) << " [s]  "
+      << formatFloat(t_wall, 9, 3, 3) << " [s]";
+    if (n_call == -1) {
+      // things like main loop don't have # evals
+      s << endl;
+    } else {
+      s
+        << " "
+        << setw(5) << n_call;
+      if (n_call < 2) {
+        s << endl;
+      } else {
+        // only print averages if there is more than 1 eval
+        s
+          << " "
+          << formatFloat(1000.0*t_proc/n_call, 10, 2, 3) << " [ms]  "
+          << formatFloat(1000.0*t_wall/n_call, 10, 2, 3) << " [ms]"
+          << endl;
+      }
+    }
+    userOut() << s.str();
+  }
+
+  Function FunctionInternal::slice(const std::string& name,
+        const std::vector<int>& order_in,
+        const std::vector<int>& order_out, const Dict& opts) const {
+    return wrap().slice(name, order_in, order_out, opts);
   }
 
 } // namespace casadi

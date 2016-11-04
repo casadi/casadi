@@ -84,10 +84,10 @@ namespace casadi {
        {OT_BOOL,
         "Use qpOASES Schur compliment approach"}},
       {"globalization",
-       {OT_INT,
-        "Globalization strategy"}},
+       {OT_BOOL,
+        "Enable globalization"}},
       {"restore_feas",
-       {OT_INT,
+       {OT_BOOL,
         "Use feasibility restoration phase"}},
       {"max_line_search",
        {OT_INT,
@@ -229,15 +229,15 @@ namespace casadi {
     opttol_ = 1.0e-6;
     nlinfeastol_ = 1.0e-6;
     schur_ = true;
-    globalization_ = 1;
-    restore_feas_ = 1;
+    globalization_ = true;
+    restore_feas_ = true;
     max_line_search_ = 20;
     max_consec_reduced_steps_ = 100;
     max_consec_skipped_updates_ = 100;
     max_iter_ = 100;
     warmstart_ = false;
     max_it_qp_ = 5000;
-    block_hess_ = 1;
+    block_hess_ = true;
     hess_scaling_ = 2;
     fallback_scaling_ = 4;
     max_time_qp_ = 10000.0;
@@ -388,7 +388,7 @@ namespace casadi {
     // finite differences Hessian (convenience)
     if (which_second_derv_ == 2) {
       hess_update_ = 4;
-      block_hess_ = 1;
+      block_hess_ = true;
     }
 
     // If we don't use limited memory BFGS we need to store only one vector.
@@ -406,7 +406,7 @@ namespace casadi {
                                      {"f", "g", "grad:f:x", "jac:g:x"});
     Asp_ = gf_jg.sparsity_out("jac_g_x");
 
-    if (block_hess_ == 0) {
+    if (!block_hess_) {
       // No block-structured Hessian
       blocks_ = {0, nx_};
       which_second_derv_ = 0;
@@ -437,11 +437,6 @@ namespace casadi {
           ind++;
         }
         blocks_.push_back(next);
-      }
-
-      // hybrid strategy: 1 block for constraints, 1 for objective
-      if (block_hess_ == 2 && blocks_.size() > 3) {
-        blocks_ = {0, *(blocks_.rbegin()+1), blocks_.back()};
       }
     }
 
@@ -746,7 +741,7 @@ namespace casadi {
       }
 
       /// Determine steplength alpha
-      if (globalization_ == 0 || (skip_first_globalization_ && m->itCount == 1)) {
+      if (!globalization_ || (skip_first_globalization_ && m->itCount == 1)) {
         // No globalization strategy, but reduce step if function cannot be evaluated
         if (fullstep(m)) {
           casadi_eprintf("***Constraint or objective could "
@@ -754,7 +749,7 @@ namespace casadi {
           return -1;
         }
         m->steptype = 0;
-      } else if (globalization_ == 1 && !skipLineSearch) {
+      } else if (globalization_ && !skipLineSearch) {
         // Filter line search based on Waechter et al., 2006 (Ipopt paper)
         if (filterLineSearch(m) || m->reducedStepCount > max_consec_reduced_steps_) {
           // Filter line search did not produce a step. Now there are a few things we can try ...
@@ -941,10 +936,11 @@ namespace casadi {
       strcpy(qpString, "sparse, reduced Hessian factorization");
 
     /* Globalization */
-    if (globalization_ == 0)
-      strcpy(globString, "none (full step)");
-    else if (globalization_ == 1)
+    if (globalization_) {
       strcpy(globString, "filter line search");
+    } else {
+      strcpy(globString, "none (full step)");
+    }
 
     /* Hessian approximation */
     if (block_hess_ && (hess_update_ == 1 || hess_update_ == 2))
@@ -1346,7 +1342,7 @@ namespace casadi {
    */
   int Blocksqp::feasibilityRestorationPhase(BlocksqpMemory* m) const {
     // No Feasibility restoration phase
-    if (restore_feas_ == 0) return -1;
+    if (!restore_feas_) return -1;
 
     casadi_error("not implemented");
     return 0;
@@ -1991,7 +1987,7 @@ namespace casadi {
   solveQP(BlocksqpMemory* m, double* deltaXi, double* lambdaQP,
     bool matricesChanged) const {
     int maxQP, l;
-    if (globalization_ == 1 &&
+    if (globalization_ &&
         hess_update_ == 1 &&
         matricesChanged &&
         m->itCount > 1) {

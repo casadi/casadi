@@ -701,6 +701,13 @@ import_array();
       // Standard typemaps
       if (SWIG_IsOK(SWIG_AsVal(bool)(p, m ? *m : 0))) return true;
 
+#ifdef SWIGMATLAB
+      if (mxIsLogicalScalar(p)) {
+        if (m) **m = mxIsLogicalScalarTrue(p);
+        return true;
+      }
+#endif
+      
       // No match
       return false;
     }
@@ -796,6 +803,41 @@ import_array();
   namespace casadi {
 
 #ifdef SWIGMATLAB
+
+    // Cell array
+    template<typename M> bool to_ptr_cell(GUESTOBJECT *p, std::vector<M>** m) {
+      // Cell arrays (only row vectors)
+      if (mxGetClassID(p)==mxCELL_CLASS) {
+        int nrow = mxGetM(p), ncol = mxGetN(p);
+        if (nrow==1 || (nrow==0 && ncol==0)) {
+          // Allocate elements
+          if (m) {
+            (**m).clear();
+            (**m).reserve(ncol);
+          }
+
+          // Temporary
+          M tmp;
+
+          // Loop over elements
+          for (int i=0; i<ncol; ++i) {
+            // Get element
+            mxArray* pe = mxGetCell(p, i);
+            if (pe==0) return false;
+
+            // Convert element
+            M *m_i = m ? &tmp : 0;
+            if (!to_ptr(pe, m_i ? &m_i : 0)) {
+              return false;
+            }
+            if (m) (**m).push_back(*m_i);
+          }
+          return true;
+        }
+      }
+      return false;
+    }
+
     // MATLAB row/column vector maps to std::vector<double>
     bool to_ptr(GUESTOBJECT *p, std::vector<double> **m) {
       // Treat Null
@@ -811,6 +853,9 @@ import_array();
         }
         return true;
       }
+
+      // Cell array
+      if (to_ptr_cell(p, m)) return true;
 
       // No match
       return false;
@@ -852,42 +897,12 @@ import_array();
         return true;
       }
 
+      // Cell array
+      if (to_ptr_cell(p, m)) return true;
+
       return false;
     }
 
-    // Cell array
-    template<typename M> bool to_ptr_cell(GUESTOBJECT *p, std::vector<M>** m) {
-      // Cell arrays (only row vectors)
-      if (mxGetClassID(p)==mxCELL_CLASS) {
-        int nrow = mxGetM(p), ncol = mxGetN(p);
-        if (nrow==1 || (nrow==0 && ncol==0)) {
-          // Allocate elements
-          if (m) {
-            (**m).clear();
-            (**m).reserve(ncol);
-          }
-
-          // Temporary
-          M tmp;
-
-          // Loop over elements
-          for (int i=0; i<ncol; ++i) {
-            // Get element
-            mxArray* pe = mxGetCell(p, i);
-            if (pe==0) return false;
-
-            // Convert element
-            M *m_i = m ? &tmp : 0;
-            if (!to_ptr(pe, m_i ? &m_i : 0)) {
-              return false;
-            }
-            if (m) (**m).push_back(*m_i);
-          }
-          return true;
-        }
-      }
-      return false;
-    }
 
     // MATLAB n-by-m char array mapped to vector of length m
     bool to_ptr(GUESTOBJECT *p, std::vector<std::string>** m) {
@@ -1135,6 +1150,7 @@ import_array();
           || to_generic<std::string>(p, m)
           || to_generic<std::vector<int> >(p, m)
           || to_generic<std::vector<double> >(p, m)
+          || to_generic<std::vector<bool> >(p, m)
           || to_generic<std::vector<std::string> >(p, m)
           || to_generic<std::vector<std::vector<int> > >(p, m)
           || to_generic<casadi::Function>(p, m)
@@ -1157,6 +1173,7 @@ import_array();
       case OT_STRING: return from_tmp(a->as_string());
       case OT_INTVECTOR: return from_tmp(a->as_int_vector());
       case OT_INTVECTORVECTOR: return from_tmp(a->as_int_vector_vector());
+      case OT_BOOLVECTOR: return from_tmp(a->as_bool_vector());
       case OT_DOUBLEVECTOR: return from_tmp(a->as_double_vector());
       case OT_STRINGVECTOR: return from_tmp(a->as_string_vector());
       case OT_DICT: return from_tmp(a->as_dict());
@@ -2845,6 +2862,11 @@ SPARSITY_INTERFACE_FUN(DECL, (FLAG | IS_SX), Matrix<SXElem>)
 #endif
 
 %define GENERIC_MATRIX_FUN(DECL, FLAG, M)
+#if defined(WITH_DEPRECATED_FEATURES) & FLAG & IS_MEMBER
+DECL std::vector<bool> casadi_nl_var(const M& expr, const M& var) {
+  return nl_var(expr, var);
+}
+#endif
 #if FLAG & IS_MEMBER
 DECL M casadi_mpower(const M& x, const M& n) {
   return mpower(x, n);
@@ -2980,14 +3002,6 @@ DECL bool casadi_depends_on(const M& f, const M& arg) {
   return depends_on(f, arg);
 }
 
-DECL std::vector<bool> casadi_vector_depends_on(const M& f, const M& arg) {
-  return vector_depends_on(f, arg);
-}
-
-DECL std::vector<bool> casadi_vector_linear_depends_on(const M& f, const M& arg) {
-  return vector_linear_depends_on(f, arg);
-}
-
 DECL M casadi_solve(const M& A, const M& b) {
   return solve(A, b);
 }
@@ -3015,8 +3029,9 @@ DECL M casadi_jtimes(const M& ex, const M& arg, const M& v, bool tr=false) {
   return jtimes(ex, arg, v, tr);
 }
 
-DECL std::vector<bool> casadi_nl_var(const M& expr, const M& var) {
-  return nl_var(expr, var);
+DECL std::vector<bool> casadi_which_depends(const M& expr, const M& var,
+                                            int order=1, bool tr=false) {
+  return which_depends(expr, var, order, tr);
 }
 
 DECL M casadi_gradient(const M &ex, const M &arg) {
@@ -3759,14 +3774,6 @@ namespace casadi{
           varargout{i} = res{i};
         end
       end
-    end
-    function out = full(self)
-      % Wrap this function in a Matlab function that applies 'full' on each output
-      out = @(varargin) subsref(cellfun(@(m) full(m),self.call([varargin num2cell(zeros(1,self.n_in()-length(varargin)))]),'UniformOutput',false),struct('type','{}','subs',{{':'}}));
-    end
-    function out = sparse(self)
-      % Wrap this function in a Matlab function that applies 'sparse' on each output
-      out = @(varargin) subsref(cellfun(@(m) sparse(m),self.call([varargin num2cell(zeros(1,self.n_in()-length(varargin)))]),'UniformOutput',false),struct('type','{}','subs',{{':'}}));
     end
   %}
  }

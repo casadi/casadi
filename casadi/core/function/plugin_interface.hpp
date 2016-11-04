@@ -54,6 +54,12 @@
 #define SHARED_LIBRARY_SUFFIX ".so"
 #endif // SHARED_LIBRARY_SUFFIX
 
+#ifdef _WIN32
+    #define DL_HANDLE_TYPE HINSTANCE
+#else // _WIN32
+    #define DL_HANDLE_TYPE void *
+#endif
+
 #endif // WITH_DL
 
 namespace casadi {
@@ -92,6 +98,10 @@ namespace casadi {
 
     /// Load a plugin dynamically
     static Plugin load_plugin(const std::string& pname, bool register_plugin=true);
+
+    /// Load a library dynamically
+    static DL_HANDLE_TYPE load_library(const std::string& libname, std::string& resultpath,
+      bool global);
 
     /// Register an integrator in the factory
     static void registerPlugin(const Plugin& plugin);
@@ -143,28 +153,17 @@ namespace casadi {
     return plugin;
   }
 
-  template<class Derived>
-  typename PluginInterface<Derived>::Plugin
-      PluginInterface<Derived>::load_plugin(const std::string& pname, bool register_plugin) {
-    // Issue warning and quick return if already loaded
-    if (Derived::solvers_.find(pname) != Derived::solvers_.end()) {
-      casadi_warning("PluginInterface: Solver " + pname + " is already in use. Ignored.");
-      return Plugin();
-    }
 
+  template<class Derived>
+  DL_HANDLE_TYPE PluginInterface<Derived>::load_library(const std::string& libname,
+    std::string& resultpath, bool global) {
 
 #ifndef WITH_DL
     casadi_error("WITH_DL option needed for dynamic loading");
 #else // WITH_DL
-    // Retrieve the registration function
-    RegFcn reg;
 
     // Get the name of the shared library
-    std::string lib = SHARED_LIBRARY_PREFIX "casadi_"
-      + Derived::infix_ + "_" + pname + SHARED_LIBRARY_SUFFIX;
-
-    // Load the dll
-    std::string regName = "casadi_register_" + Derived::infix_ + "_" + pname;
+    std::string lib = SHARED_LIBRARY_PREFIX + libname + SHARED_LIBRARY_SUFFIX;
 
     // Build up search paths;
     std::vector<std::string> search_paths;
@@ -232,9 +231,16 @@ namespace casadi {
 
     // Alocate a handle pointer
 #ifndef _WIN32
-    int flag = RTLD_LAZY | RTLD_LOCAL;
+    int flag;
+    if (global) {
+      flag = RTLD_NOW | RTLD_GLOBAL;
+    } else {
+      flag = RTLD_LAZY | RTLD_LOCAL;
+    }
 #ifdef WITH_DEEPBIND
+#ifndef __APPLE__
     flag |= RTLD_DEEPBIND;
+#endif
 #endif
 #endif
 
@@ -248,8 +254,8 @@ namespace casadi {
       handle = LoadLibrary(TEXT(lib.c_str()));
       SetDllDirectory(NULL);
 #else // _WIN32
-      std::string pname = searchpath.size()==0 ? lib : searchpath + filesep + lib;
-      handle = dlopen(pname.c_str(), flag);
+      std::string libname = searchpath.size()==0 ? lib : searchpath + filesep + lib;
+      handle = dlopen(libname.c_str(), flag);
 #endif // _WIN32
       if (handle) {
         break;
@@ -263,7 +269,37 @@ namespace casadi {
       }
     }
 
+    resultpath = searchpath;
+
     casadi_assert_message(handle!=0, errors.str());
+
+    return handle;
+
+#endif // WITH_DL
+  }
+
+  template<class Derived>
+  typename PluginInterface<Derived>::Plugin
+      PluginInterface<Derived>::load_plugin(const std::string& pname, bool register_plugin) {
+    // Issue warning and quick return if already loaded
+    if (Derived::solvers_.find(pname) != Derived::solvers_.end()) {
+      casadi_warning("PluginInterface: Solver " + pname + " is already in use. Ignored.");
+      return Plugin();
+    }
+
+
+#ifndef WITH_DL
+    casadi_error("WITH_DL option needed for dynamic loading");
+#else // WITH_DL
+    // Retrieve the registration function
+    RegFcn reg;
+
+    // Load the dll
+    std::string regName = "casadi_register_" + Derived::infix_ + "_" + pname;
+
+    std::string searchpath;
+    DL_HANDLE_TYPE handle = load_library("casadi_" + Derived::infix_ + "_" + pname, searchpath,
+      false);
 
 #ifdef _WIN32
     reg = (RegFcn)GetProcAddress(handle, TEXT(regName.c_str()));

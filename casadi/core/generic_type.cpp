@@ -138,11 +138,16 @@ namespace casadi {
     return (is_int_vector() && to_int_vector().size()==0) ||
       (is_int_vector_vector() && to_int_vector_vector().size()==0) ||
       (is_double_vector() && to_double_vector().size()==0) ||
-      (is_string_vector() && to_string_vector().size()==0);
+      (is_string_vector() && to_string_vector().size()==0) ||
+      (is_bool_vector() && to_bool_vector().size()==0);
   }
 
   bool GenericType::is_int_vector() const {
     return getType()==OT_INTVECTOR;
+  }
+
+  bool GenericType::is_bool_vector() const {
+    return getType()==OT_BOOLVECTOR;
   }
 
   bool GenericType::is_int_vector_vector() const {
@@ -249,6 +254,11 @@ namespace casadi {
 
   const std::vector<int>& GenericType::as_int_vector() const {
     casadi_assert(is_int_vector());
+    return static_cast<const IntVectorType*>(get())->d_;
+  }
+
+  const std::vector<int>& GenericType::as_bool_vector() const {
+    casadi_assert(is_bool_vector());
     return static_cast<const IntVectorType*>(get())->d_;
   }
 

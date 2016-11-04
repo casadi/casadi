@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 2.8.6)
 
 # Make the shared library prefix and suffix available in C++
-add_definitions(-DSHARED_LIBRARY_PREFIX="${CMAKE_SHARED_LIBRARY_PREFIX}")
-add_definitions(-DSHARED_LIBRARY_SUFFIX="${CMAKE_SHARED_LIBRARY_SUFFIX}")
 
 add_subdirectory(runtime)
 
@@ -106,8 +104,6 @@ set(CASADI_SRCS
   function/code_generator.hpp      function/code_generator.cpp
   function/switch.hpp              function/switch.cpp
   function/map.hpp                 function/map.cpp
-  function/mapaccum.hpp            function/mapaccum.cpp
-  function/kernel_sum.hpp          function/kernel_sum.cpp
   function/importer.hpp            function/importer.cpp            function/importer_internal.hpp function/importer_internal.cpp
 
   # MISC useful stuff

@@ -142,11 +142,6 @@
 |                 |                 | nonlinearly to  |                 |
 |                 |                 | BONMIN          |                 |
 +-----------------+-----------------+-----------------+-----------------+
-| print_time      | OT_BOOL         | print           | casadi::Nlpsol  |
-|                 |                 | information     |                 |
-|                 |                 | about execution |                 |
-|                 |                 | time            |                 |
-+-----------------+-----------------+-----------------+-----------------+
 | var_integer_md  | OT_DICT         | Integer         | casadi::BonMinM |
 |                 |                 | metadata (a     | essageHandler   |
 |                 |                 | dictionary with |                 |
@@ -456,8 +451,9 @@ Get the length of the work vector.
 
 ";
 
-%feature("docstring")  casadi::Function::slice(const std::vector< int >
-&order_in, const std::vector< int > &order_out, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::Function::slice(const std::string &name,
+const std::vector< int > &order_in, const std::vector< int > &order_out,
+const Dict &opts=Dict()) const  "
 
 returns a new function with a selection of inputs/outputs of the original
 
@@ -585,18 +581,7 @@ Create call to (cached) derivative function, forward mode.
 
 %feature("docstring")  casadi::Function::forward(int nfwd) "
 
-Get a function that calculates nfwd forward derivatives.
-
-Returns a function with n_in + n_out +nfwd*n_in inputs and nfwd*n_out
-outputs. The first n_in inputs correspond to nondifferentiated inputs. The
-next n_out inputs correspond to nondifferentiated outputs. and the last
-nfwd*n_in inputs correspond to forward seeds, one direction at a time The
-nfwd*n_out outputs correspond to forward sensitivities, one direction at a
-time. * (n_in = n_in(), n_out = n_out())
-
-The functions returned are cached, meaning that if called multiple timed
-with the same value, then multiple references to the same function will be
-returned.
+[DEPRECATED] Use forward_new instead
 
 ";
 
@@ -660,6 +645,25 @@ Export / Generate C code for the function.
 
 ";
 
+%feature("docstring")  casadi::Function::reverse_new(int nadj) "
+
+Get a function that calculates nadj adjoint derivatives.
+
+Returns a function with n_in + n_out + n_out inputs and n_in outputs. The
+first n_in inputs correspond to nondifferentiated inputs. The next n_out
+inputs correspond to nondifferentiated outputs. and the last n_out inputs
+correspond to adjoint seeds, stacked horizontally The n_in outputs
+correspond to adjoint sensitivities, stacked horizontally. * (n_in = n_in(),
+n_out = n_out())
+
+(n_in = n_in(), n_out = n_out())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned.
+
+";
+
 %feature("docstring")  casadi::Function::getAtomicInput(int k) const  "
 
 Get the (integer) input arguments of an atomic operation.
@@ -705,109 +709,19 @@ Get type name.
 
 ";
 
-%feature("docstring")  casadi::Function::jacobian(int iind=0, int oind=0,
-bool compact=false, bool symmetric=false) "
+%feature("docstring")  casadi::Callback::get_reverse_new(const std::string
+&name, int nadj, const std::vector< std::string > &i_names, const
+std::vector< std::string > &o_names, const Dict &opts) "
 
-Generate a Jacobian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. If
-compact is set to true, only the nonzeros of the input and output
-expressions are considered. If symmetric is set to true, the Jacobian being
-calculated is known to be symmetric (usually a Hessian), which can be
-exploited by the algorithm.
-
-The generated Jacobian has one more output than the calling function
-corresponding to the Jacobian and the same number of inputs.
-
-";
-
-%feature("docstring")  casadi::Function::jacobian(const std::string &iind,
-int oind=0, bool compact=false, bool symmetric=false) "
-
-Generate a Jacobian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. If
-compact is set to true, only the nonzeros of the input and output
-expressions are considered. If symmetric is set to true, the Jacobian being
-calculated is known to be symmetric (usually a Hessian), which can be
-exploited by the algorithm.
-
-The generated Jacobian has one more output than the calling function
-corresponding to the Jacobian and the same number of inputs.
-
-";
-
-%feature("docstring")  casadi::Function::jacobian(int iind, const
-std::string &oind, bool compact=false, bool symmetric=false) "
-
-Generate a Jacobian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. If
-compact is set to true, only the nonzeros of the input and output
-expressions are considered. If symmetric is set to true, the Jacobian being
-calculated is known to be symmetric (usually a Hessian), which can be
-exploited by the algorithm.
-
-The generated Jacobian has one more output than the calling function
-corresponding to the Jacobian and the same number of inputs.
-
-";
-
-%feature("docstring")  casadi::Function::jacobian(const std::string &iind,
-const std::string &oind, bool compact=false, bool symmetric=false) "
-
-Generate a Jacobian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. If
-compact is set to true, only the nonzeros of the input and output
-expressions are considered. If symmetric is set to true, the Jacobian being
-calculated is known to be symmetric (usually a Hessian), which can be
-exploited by the algorithm.
-
-The generated Jacobian has one more output than the calling function
-corresponding to the Jacobian and the same number of inputs.
+Return function that calculates adjoint derivatives reverse(nadj) returns a
+cached instance if available, and calls  Function get_reverse(int nadj) if
+no cached version is available.
 
 ";
 
 %feature("docstring")  casadi::Function::sz_iw() const  "
 
 [INTERNAL]  Get required length of iw field.
-
-";
-
-%feature("docstring")  casadi::Function::set_reverse(const Function &fcn,
-int nadj) "
-
-Set a function that calculates nadj adjoint derivatives NOTE: Does not take
-ownership, only weak references to the derivatives are kept internally.
 
 ";
 
@@ -846,7 +760,7 @@ Print options to a stream.
 
 ";
 
-%feature("docstring")  casadi::Function::checkout() "
+%feature("docstring")  casadi::Function::checkout() const  "
 
 Checkout a memory object.
 
@@ -879,22 +793,9 @@ Create call to (cached) derivative function, reverse mode.
 
 ";
 
-%feature("docstring")  casadi::Function::reverse(int nadj) "
+%feature("docstring")  casadi::Function::reverse(int nfwd) "
 
-Get a function that calculates nadj adjoint derivatives.
-
-Returns a function with n_in + n_out +nadj*n_out inputs and nadj*n_in
-outputs. The first n_in inputs correspond to nondifferentiated inputs. The
-next n_out inputs correspond to nondifferentiated outputs. and the last
-nadj*n_out inputs correspond to adjoint seeds, one direction at a time The
-nadj*n_in outputs correspond to adjoint sensitivities, one direction at a
-time. * (n_in = n_in(), n_out = n_out())
-
-(n_in = n_in(), n_out = n_out())
-
-The functions returned are cached, meaning that if called multiple timed
-with the same value, then multiple references to the same function will be
-returned.
+[DEPRECATED] Use reverse_new instead
 
 ";
 
@@ -998,6 +899,21 @@ Return a string with a description (for SWIG)
 
 ";
 
+%feature("docstring")  casadi::Function::which_depends(const std::string
+&s_in, const std::vector< std::string > &s_out, int order=1, bool tr=false)
+const  "
+
+Which variables enter with some order.
+
+Parameters:
+-----------
+
+order:  Only 1 (linear) and 2 (nonlinear) allowed
+
+tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
 %feature("docstring")  casadi::Function::setFullJacobian(const Function
 &jac) "
 
@@ -1067,9 +983,7 @@ guarantee that subsequent calls return unique answers.
 %feature("docstring")  casadi::Callback::get_forward(const std::string
 &name, int nfwd, Dict &opts) "
 
-Return function that calculates forward derivatives forward(nfwd) returns a
-cached instance if available, and calls  Function get_forward(int nfwd) if
-no cached version is available.
+[DEPRECATED] Overload get_forward_new instead
 
 ";
 
@@ -1101,9 +1015,118 @@ Get, if necessary generate, the sparsity of a Jacobian block
 
 ";
 
+%feature("docstring")  casadi::Function::forward_new(int nfwd) "
+
+Get a function that calculates nfwd forward derivatives.
+
+Returns a function with n_in + n_out + n_in inputs and nfwd outputs. The
+first n_in inputs correspond to nondifferentiated inputs. The next n_out
+inputs correspond to nondifferentiated outputs. and the last n_in inputs
+correspond to forward seeds, stacked horizontally The n_out outputs
+correspond to forward sensitivities, stacked horizontally. * (n_in = n_in(),
+n_out = n_out())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned.
+
+";
+
 %feature("docstring")  casadi::Function::rootfinder_fun() "
 
 Access rhs function for a rootfinder.
+
+";
+
+%feature("docstring")  casadi::Function::jacobian(int iind=0, int oind=0,
+bool compact=false, bool symmetric=false) "
+
+Generate a Jacobian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian and the same number of inputs.
+
+";
+
+%feature("docstring")  casadi::Function::jacobian(const std::string &iind,
+int oind=0, bool compact=false, bool symmetric=false) "
+
+Generate a Jacobian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian and the same number of inputs.
+
+";
+
+%feature("docstring")  casadi::Function::jacobian(int iind, const
+std::string &oind, bool compact=false, bool symmetric=false) "
+
+Generate a Jacobian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian and the same number of inputs.
+
+";
+
+%feature("docstring")  casadi::Function::jacobian(const std::string &iind,
+const std::string &oind, bool compact=false, bool symmetric=false) "
+
+Generate a Jacobian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian and the same number of inputs.
 
 ";
 
@@ -1177,7 +1200,7 @@ guarantee that subsequent calls return unique answers.
 
 ";
 
-%feature("docstring")  casadi::Function::release(int mem) "
+%feature("docstring")  casadi::Function::release(int mem) const  "
 
 Release a memory object.
 
@@ -1203,6 +1226,12 @@ legacy syntax: oracle().factory(\"f\", {\"x\", \"z\", \"p\", \"t\"},
 >::getRepresentation() const "
 
 Return a string with a representation (for SWIG)
+
+";
+
+%feature("docstring")  casadi::Function::wrap() const  "
+
+Wrap in an Function instance consisting of only one MX call.
 
 ";
 
@@ -1240,7 +1269,9 @@ Does the function have free variables.
 %feature("docstring")  casadi::Function::nl_var(const std::string &s_in,
 const std::vector< std::string > &s_out) const  "
 
-Which variables enter nonlinearly.
+[DEPRECATED] Which variables enter nonlinearly
+
+Use which_depends instead.
 
 ";
 
@@ -1324,69 +1355,9 @@ that the input must be scalar. In other cases, use the Jacobian instead.
 
 ";
 
-%feature("docstring")  casadi::Function::derivative(const DMVector &arg,
-DMVector &output_res, const DMVectorVector &fseed, DMVectorVector
-&output_fsens, const DMVectorVector &aseed, DMVectorVector &output_asens,
-bool always_inline=false, bool never_inline=false) "
-
-[INTERNAL]  Evaluate the function symbolically or numerically with
-directional derivatives The first two arguments are the nondifferentiated
-inputs and results of the evaluation, the next two arguments are a set of
-forward directional seeds and the resulting forward directional derivatives,
-the length of the vector being the number of forward directions. The next
-two arguments are a set of adjoint directional seeds and the resulting
-adjoint directional derivatives, the length of the vector being the number
-of adjoint directions.
-
-";
-
-%feature("docstring")  casadi::Function::derivative(const SXVector &arg,
-SXVector &output_res, const SXVectorVector &fseed, SXVectorVector
-&output_fsens, const SXVectorVector &aseed, SXVectorVector &output_asens,
-bool always_inline=false, bool never_inline=false) "
-
-[INTERNAL]  Evaluate the function symbolically or numerically with
-directional derivatives The first two arguments are the nondifferentiated
-inputs and results of the evaluation, the next two arguments are a set of
-forward directional seeds and the resulting forward directional derivatives,
-the length of the vector being the number of forward directions. The next
-two arguments are a set of adjoint directional seeds and the resulting
-adjoint directional derivatives, the length of the vector being the number
-of adjoint directions.
-
-";
-
-%feature("docstring")  casadi::Function::derivative(const MXVector &arg,
-MXVector &output_res, const MXVectorVector &fseed, MXVectorVector
-&output_fsens, const MXVectorVector &aseed, MXVectorVector &output_asens,
-bool always_inline=false, bool never_inline=false) "
-
-[INTERNAL]  Evaluate the function symbolically or numerically with
-directional derivatives The first two arguments are the nondifferentiated
-inputs and results of the evaluation, the next two arguments are a set of
-forward directional seeds and the resulting forward directional derivatives,
-the length of the vector being the number of forward directions. The next
-two arguments are a set of adjoint directional seeds and the resulting
-adjoint directional derivatives, the length of the vector being the number
-of adjoint directions.
-
-";
-
 %feature("docstring")  casadi::Function::derivative(int nfwd, int nadj) "
 
-Get a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives Legacy function: Use forward and reverse instead.
-
-Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
-inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
-at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
-direction at a time. The first n_out outputs correspond to nondifferentiated
-outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
-one direction at a time and the last nadj*n_in outputs corresponds to
-adjoint sensitivities, one direction at a time.
-
-(n_in = n_in(), n_out = n_out())
+[DEPRECATED] Use forward_new and reverse_new instead.
 
 ";
 
@@ -1480,26 +1451,7 @@ that the output must be scalar. In other cases, use the Jacobian instead.
 const std::pair< int, int > &size, double r, int n, const Dict &opts=Dict())
 const  "
 
-kernel_sum Consider a dense matrix V.
-
-KernelSum computes
-
-F(V,X) = sum_i sum_j f ( [i;j], V(i,j), X)
-
-with X: [x;y]
-
-where the summation is taken for all entries (i,j) that are a distance r
-away from X.
-
-This function assumes that V is fixed: sensitivities with respect to it are
-not computed.
-
-This allows for improved speed of evaluation.
-
-Having V fixed is a common use case: V may be a large bitmap (observation),
-onto which a kernel is fitted.
-
-Joris Gillis
+[DEPRECATED] kernel_sum is no longer available
 
 ";
 
@@ -1579,6 +1531,16 @@ Return Jacobian of all input elements with respect to all output elements.
 %feature("docstring")  casadi::Function::oracle() const  "
 
 Get oracle.
+
+";
+
+%feature("docstring")  casadi::Callback::get_forward_new(const std::string
+&name, int nfwd, const std::vector< std::string > &i_names, const
+std::vector< std::string > &o_names, const Dict &opts) "
+
+Return function that calculates forward derivatives forward(nfwd) returns a
+cached instance if available, and calls  Function get_forward(int nfwd) if
+no cached version is available.
 
 ";
 
@@ -1784,7 +1746,7 @@ Print all information there is to know about a certain option.
 ";
 
 %feature("docstring")  casadi::Function::mapaccum(const std::string &name,
-int n, const Dict &opts=Dict()) "
+int n, int n_accum=1, const Dict &opts=Dict()) "
 
 Create a mapaccumulated version of this function.
 
@@ -1922,9 +1884,7 @@ Get sparsity of a given input.
 %feature("docstring")  casadi::Callback::get_reverse(const std::string
 &name, int nadj, Dict &opts) "
 
-Return function that calculates adjoint derivatives reverse(nadj) returns a
-cached instance if available, and calls  Function get_reverse(int nadj) if
-no cached version is available.
+[DEPRECATED] Overload get_reverse_new instead
 
 ";
 
@@ -2036,14 +1996,6 @@ Get output dimension.
 
 Generate a Jacobian function of all the inputs elements with respect to all
 the output elements).
-
-";
-
-%feature("docstring")  casadi::Function::set_forward(const Function &fcn,
-int nfwd) "
-
-Set a function that calculates nfwd forward derivatives NOTE: Does not take
-ownership, only weak references to the derivatives are kept internally.
 
 ";
 
@@ -3031,6 +2983,11 @@ Name of the function.
 
 ";
 
+%feature("docstring")  casadi::Function::has_function(const std::string
+&fname) const  "
+
+";
+
 %feature("docstring")  casadi::Function::checkInputs() const  "
 
 [INTERNAL]  Check if the numerical values of the supplied bounds make sense.
@@ -3170,6 +3127,12 @@ Get oracle.
 
 ";
 
+%feature("docstring")  casadi::Function::wrap() const  "
+
+Wrap in an Function instance consisting of only one MX call.
+
+";
+
 %feature("docstring")  casadi::Function::integrator_dae() "
 
 [DEPRECATED] Get the DAE for an integrator To generate a function with the
@@ -3184,14 +3147,6 @@ Get an atomic operation operator index.
 
 ";
 
-%feature("docstring")  casadi::Function::spCanEvaluate(bool fwd) "
-
-[INTERNAL]  Is the class able to propagate seeds through the algorithm?
-
-(for usage, see the example propagating_sparsity.cpp)
-
-";
-
 %feature("docstring")  casadi::Function::printOptions(std::ostream
 &stream=casadi::userOut()) const  "
 
@@ -3202,14 +3157,6 @@ Get an atomic operation operator index.
 %feature("docstring")  casadi::Function::getAlgorithmSize() const  "
 
 Get the number of atomic operations.
-
-";
-
-%feature("docstring")  casadi::Function::set_reverse(const Function &fcn,
-int nadj) "
-
-Set a function that calculates nadj adjoint derivatives NOTE: Does not take
-ownership, only weak references to the derivatives are kept internally.
 
 ";
 
@@ -3256,26 +3203,7 @@ Print dimensions of inputs and outputs.
 const std::pair< int, int > &size, double r, int n, const Dict &opts=Dict())
 const  "
 
-kernel_sum Consider a dense matrix V.
-
-KernelSum computes
-
-F(V,X) = sum_i sum_j f ( [i;j], V(i,j), X)
-
-with X: [x;y]
-
-where the summation is taken for all entries (i,j) that are a distance r
-away from X.
-
-This function assumes that V is fixed: sensitivities with respect to it are
-not computed.
-
-This allows for improved speed of evaluation.
-
-Having V fixed is a common use case: V may be a large bitmap (observation),
-onto which a kernel is fitted.
-
-Joris Gillis
+[DEPRECATED] kernel_sum is no longer available
 
 ";
 
@@ -3340,7 +3268,7 @@ Get all the free variables of the function.
 ";
 
 %feature("docstring")  casadi::Function::mapaccum(const std::string &name,
-int n, const Dict &opts=Dict()) "
+int n, int n_accum=1, const Dict &opts=Dict()) "
 
 Create a mapaccumulated version of this function.
 
@@ -3449,69 +3377,9 @@ The the mapaccumulated version has the signature:
 
 ";
 
-%feature("docstring")  casadi::Function::derivative(const DMVector &arg,
-DMVector &output_res, const DMVectorVector &fseed, DMVectorVector
-&output_fsens, const DMVectorVector &aseed, DMVectorVector &output_asens,
-bool always_inline=false, bool never_inline=false) "
-
-[INTERNAL]  Evaluate the function symbolically or numerically with
-directional derivatives The first two arguments are the nondifferentiated
-inputs and results of the evaluation, the next two arguments are a set of
-forward directional seeds and the resulting forward directional derivatives,
-the length of the vector being the number of forward directions. The next
-two arguments are a set of adjoint directional seeds and the resulting
-adjoint directional derivatives, the length of the vector being the number
-of adjoint directions.
-
-";
-
-%feature("docstring")  casadi::Function::derivative(const SXVector &arg,
-SXVector &output_res, const SXVectorVector &fseed, SXVectorVector
-&output_fsens, const SXVectorVector &aseed, SXVectorVector &output_asens,
-bool always_inline=false, bool never_inline=false) "
-
-[INTERNAL]  Evaluate the function symbolically or numerically with
-directional derivatives The first two arguments are the nondifferentiated
-inputs and results of the evaluation, the next two arguments are a set of
-forward directional seeds and the resulting forward directional derivatives,
-the length of the vector being the number of forward directions. The next
-two arguments are a set of adjoint directional seeds and the resulting
-adjoint directional derivatives, the length of the vector being the number
-of adjoint directions.
-
-";
-
-%feature("docstring")  casadi::Function::derivative(const MXVector &arg,
-MXVector &output_res, const MXVectorVector &fseed, MXVectorVector
-&output_fsens, const MXVectorVector &aseed, MXVectorVector &output_asens,
-bool always_inline=false, bool never_inline=false) "
-
-[INTERNAL]  Evaluate the function symbolically or numerically with
-directional derivatives The first two arguments are the nondifferentiated
-inputs and results of the evaluation, the next two arguments are a set of
-forward directional seeds and the resulting forward directional derivatives,
-the length of the vector being the number of forward directions. The next
-two arguments are a set of adjoint directional seeds and the resulting
-adjoint directional derivatives, the length of the vector being the number
-of adjoint directions.
-
-";
-
 %feature("docstring")  casadi::Function::derivative(int nfwd, int nadj) "
 
-Get a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives Legacy function: Use forward and reverse instead.
-
-Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
-inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
-at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
-direction at a time. The first n_out outputs correspond to nondifferentiated
-outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
-one direction at a time and the last nadj*n_in outputs corresponds to
-adjoint sensitivities, one direction at a time.
-
-(n_in = n_in(), n_out = n_out())
+[DEPRECATED] Use forward_new and reverse_new instead.
 
 ";
 
@@ -3630,14 +3498,6 @@ Is a null pointer?
 
 ";
 
-%feature("docstring")  casadi::Function::set_forward(const Function &fcn,
-int nfwd) "
-
-Set a function that calculates nfwd forward derivatives NOTE: Does not take
-ownership, only weak references to the derivatives are kept internally.
-
-";
-
 %feature("docstring")  casadi::Function::forward(const std::vector< MX >
 &arg, const std::vector< MX > &res, const std::vector< std::vector< MX > >
 &fseed, std::vector< std::vector< MX > > &output_fsens, bool
@@ -3667,18 +3527,7 @@ Create call to (cached) derivative function, forward mode.
 
 %feature("docstring")  casadi::Function::forward(int nfwd) "
 
-Get a function that calculates nfwd forward derivatives.
-
-Returns a function with n_in + n_out +nfwd*n_in inputs and nfwd*n_out
-outputs. The first n_in inputs correspond to nondifferentiated inputs. The
-next n_out inputs correspond to nondifferentiated outputs. and the last
-nfwd*n_in inputs correspond to forward seeds, one direction at a time The
-nfwd*n_out outputs correspond to forward sensitivities, one direction at a
-time. * (n_in = n_in(), n_out = n_out())
-
-The functions returned are cached, meaning that if called multiple timed
-with the same value, then multiple references to the same function will be
-returned.
+[DEPRECATED] Use forward_new instead
 
 ";
 
@@ -3750,8 +3599,9 @@ Get output dimension.
 
 ";
 
-%feature("docstring")  casadi::Function::slice(const std::vector< int >
-&order_in, const std::vector< int > &order_out, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::Function::slice(const std::string &name,
+const std::vector< int > &order_in, const std::vector< int > &order_out,
+const Dict &opts=Dict()) const  "
 
 returns a new function with a selection of inputs/outputs of the original
 
@@ -3766,6 +3616,23 @@ Parameters:
 -----------
 
 parallelization:  Type of parallelization used: unroll|serial|openmp
+
+";
+
+%feature("docstring")  casadi::Function::forward_new(int nfwd) "
+
+Get a function that calculates nfwd forward derivatives.
+
+Returns a function with n_in + n_out + n_in inputs and nfwd outputs. The
+first n_in inputs correspond to nondifferentiated inputs. The next n_out
+inputs correspond to nondifferentiated outputs. and the last n_in inputs
+correspond to forward seeds, stacked horizontally The n_out outputs
+correspond to forward sensitivities, stacked horizontally. * (n_in = n_in(),
+n_out = n_out())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned.
 
 ";
 
@@ -3791,6 +3658,53 @@ const  "
 Get number of output nonzeros.
 
 For a particular output or for all of the outputs
+
+";
+
+%feature("docstring")  casadi::Function::sparsity_jac(int iind=0, int
+oind=0, bool compact=false, bool symmetric=false) "
+
+Get, if necessary generate, the sparsity of a Jacobian block
+
+";
+
+%feature("docstring")  casadi::Function::sparsity_jac(const std::string
+&iind, int oind=0, bool compact=false, bool symmetric=false) "
+
+Get, if necessary generate, the sparsity of a Jacobian block
+
+";
+
+%feature("docstring")  casadi::Function::sparsity_jac(int iind, const
+std::string &oind, bool compact=false, bool symmetric=false) "
+
+Get, if necessary generate, the sparsity of a Jacobian block
+
+";
+
+%feature("docstring")  casadi::Function::sparsity_jac(const std::string
+&iind, const std::string &oind, bool compact=false, bool symmetric=false) "
+
+Get, if necessary generate, the sparsity of a Jacobian block
+
+";
+
+%feature("docstring")  casadi::Function::reverse_new(int nadj) "
+
+Get a function that calculates nadj adjoint derivatives.
+
+Returns a function with n_in + n_out + n_out inputs and n_in outputs. The
+first n_in inputs correspond to nondifferentiated inputs. The next n_out
+inputs correspond to nondifferentiated outputs. and the last n_out inputs
+correspond to adjoint seeds, stacked horizontally The n_in outputs
+correspond to adjoint sensitivities, stacked horizontally. * (n_in = n_in(),
+n_out = n_out())
+
+(n_in = n_in(), n_out = n_out())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned.
 
 ";
 
@@ -3887,7 +3801,7 @@ const std::vector< std::string > &s_in, const std::vector< std::string >
 
 ";
 
-%feature("docstring")  casadi::Function::checkout() "
+%feature("docstring")  casadi::Function::checkout() const  "
 
 Checkout a memory object.
 
@@ -4191,22 +4105,9 @@ Create call to (cached) derivative function, reverse mode.
 
 ";
 
-%feature("docstring")  casadi::Function::reverse(int nadj) "
+%feature("docstring")  casadi::Function::reverse(int nfwd) "
 
-Get a function that calculates nadj adjoint derivatives.
-
-Returns a function with n_in + n_out +nadj*n_out inputs and nadj*n_in
-outputs. The first n_in inputs correspond to nondifferentiated inputs. The
-next n_out inputs correspond to nondifferentiated outputs. and the last
-nadj*n_out inputs correspond to adjoint seeds, one direction at a time The
-nadj*n_in outputs correspond to adjoint sensitivities, one direction at a
-time. * (n_in = n_in(), n_out = n_out())
-
-(n_in = n_in(), n_out = n_out())
-
-The functions returned are cached, meaning that if called multiple timed
-with the same value, then multiple references to the same function will be
-returned.
+[DEPRECATED] Use reverse_new instead
 
 ";
 
@@ -4393,6 +4294,11 @@ Joel Andersson >List of available options
 | output_scheme   | OT_STRINGVECTOR | Custom output   | casadi::Functio |
 |                 |                 | scheme          | nInternal       |
 +-----------------+-----------------+-----------------+-----------------+
+| print_time      | OT_BOOL         | print           | casadi::Functio |
+|                 |                 | information     | nInternal       |
+|                 |                 | about execution |                 |
+|                 |                 | time            |                 |
++-----------------+-----------------+-----------------+-----------------+
 | regularity_chec | OT_BOOL         | Throw           | casadi::Functio |
 | k               |                 | exceptions when | nInternal       |
 |                 |                 | NaN or Inf      |                 |
@@ -4519,7 +4425,9 @@ Print free variables.
 %feature("docstring")  casadi::Function::nl_var(const std::string &s_in,
 const std::vector< std::string > &s_out) const  "
 
-Which variables enter nonlinearly.
+[DEPRECATED] Which variables enter nonlinearly
+
+Use which_depends instead.
 
 ";
 
@@ -4576,7 +4484,7 @@ Get the (integer) output argument of an atomic operation.
 
 ";
 
-%feature("docstring")  casadi::Function::release(int mem) "
+%feature("docstring")  casadi::Function::release(int mem) const  "
 
 Release a memory object.
 
@@ -4686,31 +4594,18 @@ Get sparsity of a given input.
 
 ";
 
-%feature("docstring")  casadi::Function::sparsity_jac(int iind=0, int
-oind=0, bool compact=false, bool symmetric=false) "
+%feature("docstring")  casadi::Function::which_depends(const std::string
+&s_in, const std::vector< std::string > &s_out, int order=1, bool tr=false)
+const  "
 
-Get, if necessary generate, the sparsity of a Jacobian block
+Which variables enter with some order.
 
-";
+Parameters:
+-----------
 
-%feature("docstring")  casadi::Function::sparsity_jac(const std::string
-&iind, int oind=0, bool compact=false, bool symmetric=false) "
+order:  Only 1 (linear) and 2 (nonlinear) allowed
 
-Get, if necessary generate, the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::Function::sparsity_jac(int iind, const
-std::string &oind, bool compact=false, bool symmetric=false) "
-
-Get, if necessary generate, the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::Function::sparsity_jac(const std::string
-&iind, const std::string &oind, bool compact=false, bool symmetric=false) "
-
-Get, if necessary generate, the sparsity of a Jacobian block
+tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
@@ -4752,8 +4647,11 @@ Get input dimension.
 
 ";
 
-%feature("docstring")  casadi::Function::has_function(const std::string
-&fname) const  "
+%feature("docstring")  casadi::Function::spCanEvaluate(bool fwd) "
+
+[INTERNAL]  Is the class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -5049,25 +4947,8 @@ Arc sine.
 in the Symbolic Toolbox for Matlab but instead creating a CasADi symbolic
 primitive.
 
-*/ %feature("docstring")  vector_linear_depends_on(const MatType &f, const
-MatType &arg) "
-
-For each element of the first argument, checks linear dependency on a second
-argument.
-
-If the element depends linearly (or does not depend) on all of arg, the
-corresponding entry of the return vector is true.
-
-False negatives may occur: an expression may depend linearly on all of arg,
-even though this method does not recognise that fact. The opposite does not
-occur: if the method returns true, the dependency cannot be nonlinear.
-
-boolean vector
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< MatType >::nnz_upper() const
-"
+*/ %feature("docstring")  casadi::GenericMatrix< MatType >::nnz_upper()
+const  "
 
 Get the number of non-zeros in the upper triangular half.
 
@@ -5220,7 +5101,7 @@ Matrix determinant (experimental)
 
 %feature("docstring")  nl_var(const MatType &expr, const MatType &var) "
 
-Find out which variables enter nonlinearly.
+[DEPRECATED] Find out which variables enter nonlinearly
 
 ";
 
@@ -5480,19 +5361,6 @@ Calculate Jacobian.
 
 ";
 
-%feature("docstring")  vector_depends_on(const MatType &f, const MatType
-&arg) "
-
-For each element of the first argument, checks dependency on a second
-argument.
-
-If the element depends on any of arg, the corresponding entry of the return
-vector is true
-
-boolean vector
-
-";
-
 %feature("docstring")  print_operator(const MatType &xb, const std::vector<
 std::string > &args) "
 
@@ -5611,9 +5479,10 @@ Branching on MX nodes Ternary operator, \"cond ? if_true : if_false\".
 
 ";
 
-%feature("docstring")  simplify(const MatType &x) "
+%feature("docstring")  which_depends(const MatType &expr, const MatType
+&var, int order, bool tr) "
 
-Simplify an expression.
+Find out which variables enter with some order.
 
 ";
 
@@ -5790,6 +5659,12 @@ one.
 &A, const MatType &alpha, const MatType &x, const MatType &y) "
 
 Make a rank-1 update to a matrix A Calculates A + 1/2 * alpha * x*y'.
+
+";
+
+%feature("docstring")  simplify(const MatType &x) "
+
+Simplify an expression.
 
 ";
 
@@ -6210,9 +6085,6 @@ IpoptInterface &ipoptInterface, IpoptMemory *mem) "
 // File: classcasadi_1_1Jit.xml
 
 
-// File: classcasadi_1_1KernelSum.xml
-
-
 // File: classcasadi_1_1LapackLu.xml
 
 
@@ -6492,19 +6364,10 @@ Joel Andersson
 C++ includes: casadi_logger.hpp ";
 
 
-// File: classcasadi_1_1Mapaccum.xml
+// File: classcasadi_1_1Map.xml
 
 
-// File: classcasadi_1_1MapBase.xml
-
-
-// File: classcasadi_1_1MapSerial.xml
-
-
-// File: classcasadi_1_1MapSum.xml
-
-
-// File: classcasadi_1_1MapSumSerial.xml
+// File: classcasadi_1_1MapOmp.xml
 
 
 // File: classcasadi_1_1Matrix.xml
@@ -9196,9 +9059,6 @@ Return a string with a description (for SWIG)
 // File: classcasadi_1_1Project.xml
 
 
-// File: classcasadi_1_1PureMap.xml
-
-
 // File: classcasadi_1_1QpToNlp.xml
 
 
@@ -9683,6 +9543,12 @@ k = A.find() A[k] will contain the elements of A that are non-zero in B
 
 Generate a script for Matlab or Octave which visualizes the sparsity using
 the spy command.
+
+";
+
+%feature("docstring")  casadi::Sparsity::repr(int k) const  "
+
+Describe the nonzero location k as a string.
 
 ";
 
@@ -11045,9 +10911,10 @@ swap inner and outer indices of list of lists
 
 ";
 
-%feature("docstring")  casadi::isNon_increasing(const std::vector< T > &v) "
+%feature("docstring")  casadi::casadi_mproject(real_t factor, const real_t
+*x, const int *sp_x, real_t *y, const int *sp_y, real_t *w) "
 
-Check if the vector is non-increasing.
+[INTERNAL]  Sparse copy: y <- x, w work vector (length >= number of rows)
 
 ";
 
@@ -11064,6 +10931,13 @@ Check if the vector is non-increasing.
 %feature("docstring")  casadi::integrator_n_out() "
 
 Get the number of integrator outputs.
+
+";
+
+%feature("docstring")  casadi::casadi_maddproject(real_t factor, const
+real_t *x, const int *sp_x, real_t *y, const int *sp_y, real_t *w) "
+
+[INTERNAL]  Sparse copy: y <- x, w work vector (length >= number of rows)
 
 ";
 
@@ -11146,9 +11020,11 @@ const real_t *grid, const int *offset, const real_t *values, const real_t
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::has_interpolant(const std::string &name) "
+%feature("docstring")  casadi::casadi_dense_transfer(real_t factor, const
+real_t *x, const int *sp_x, real_t *y, const int *sp_y, real_t *w) "
 
-Check if a particular plugin is available.
+[INTERNAL]  Dense transfer: y(y_sp).nonzeros() <- x(x_sp).nonzeros() (length
+>= max(number of rows, nnz))
 
 ";
 
@@ -11182,6 +11058,12 @@ Check if the vector has negative entries.
 %feature("docstring")  casadi::check_exposed(T t) "
 
 [INTERNAL] ";
+
+%feature("docstring")  casadi::isNon_increasing(const std::vector< T > &v) "
+
+Check if the vector is non-increasing.
+
+";
 
 %feature("docstring")  casadi::casadi_interpn(int ndim, const real_t *grid,
 const int *offset, const real_t *values, const real_t *x, int *iw, real_t
@@ -11521,23 +11403,9 @@ Duplicates are treated by looking up last occurrence
 
 ";
 
-%feature("docstring")  casadi::hash_combine(std::size_t &seed, T v) "
+%feature("docstring")  casadi::has_interpolant(const std::string &name) "
 
-Generate a hash value incrementally (function taken from boost)
-
-";
-
-%feature("docstring")  casadi::hash_combine(std::size_t &seed, const int *v,
-int sz) "
-
-Generate a hash value incrementally, array.
-
-";
-
-%feature("docstring")  casadi::hash_combine(std::size_t &seed, const
-std::vector< int > &v) "
-
-Generate a hash value incrementally (function taken from boost)
+Check if a particular plugin is available.
 
 ";
 
@@ -11660,54 +11528,54 @@ General information
 |                 |                 | horizon         | tor             |
 +-----------------+-----------------+-----------------+-----------------+
 
->Input scheme: casadi::IntegratorInput (INTEGRATOR_NUM_IN = 6) []
+>Input scheme: casadi::IntegratorInput (INTEGRATOR_NUM_IN = 6)
 
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
-| INTEGRATOR_X0          |                        | Differential state at  |
+| INTEGRATOR_X0          | x0                     | Differential state at  |
 |                        |                        | the initial time.      |
 +------------------------+------------------------+------------------------+
-| INTEGRATOR_P           |                        | Parameters.            |
+| INTEGRATOR_P           | p                      | Parameters.            |
 +------------------------+------------------------+------------------------+
-| INTEGRATOR_Z0          |                        | Initial guess for the  |
+| INTEGRATOR_Z0          | z0                     | Initial guess for the  |
 |                        |                        | algebraic variable.    |
 +------------------------+------------------------+------------------------+
-| INTEGRATOR_RX0         |                        | Backward differential  |
+| INTEGRATOR_RX0         | rx0                    | Backward differential  |
 |                        |                        | state at the final     |
 |                        |                        | time.                  |
 +------------------------+------------------------+------------------------+
-| INTEGRATOR_RP          |                        | Backward parameter     |
+| INTEGRATOR_RP          | rp                     | Backward parameter     |
 |                        |                        | vector.                |
 +------------------------+------------------------+------------------------+
-| INTEGRATOR_RZ0         |                        | Initial guess for the  |
+| INTEGRATOR_RZ0         | rz0                    | Initial guess for the  |
 |                        |                        | backwards algebraic    |
 |                        |                        | variable.              |
 +------------------------+------------------------+------------------------+
 
->Output scheme: casadi::IntegratorOutput (INTEGRATOR_NUM_OUT = 6) []
+>Output scheme: casadi::IntegratorOutput (INTEGRATOR_NUM_OUT = 6)
 
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
-| INTEGRATOR_XF          |                        | Differential state at  |
+| INTEGRATOR_XF          | xf                     | Differential state at  |
 |                        |                        | the final time.        |
 +------------------------+------------------------+------------------------+
-| INTEGRATOR_QF          |                        | Quadrature state at    |
+| INTEGRATOR_QF          | qf                     | Quadrature state at    |
 |                        |                        | the final time.        |
 +------------------------+------------------------+------------------------+
-| INTEGRATOR_ZF          |                        | Algebraic variable at  |
+| INTEGRATOR_ZF          | zf                     | Algebraic variable at  |
 |                        |                        | the final time.        |
 +------------------------+------------------------+------------------------+
-| INTEGRATOR_RXF         |                        | Backward differential  |
+| INTEGRATOR_RXF         | rxf                    | Backward differential  |
 |                        |                        | state at the initial   |
 |                        |                        | time.                  |
 +------------------------+------------------------+------------------------+
-| INTEGRATOR_RQF         |                        | Backward quadrature    |
+| INTEGRATOR_RQF         | rqf                    | Backward quadrature    |
 |                        |                        | state at the initial   |
 |                        |                        | time.                  |
 +------------------------+------------------------+------------------------+
-| INTEGRATOR_RZF         |                        | Backward algebraic     |
+| INTEGRATOR_RZF         | rzf                    | Backward algebraic     |
 |                        |                        | variable at the        |
 |                        |                        | initial time.          |
 +------------------------+------------------------+------------------------+
@@ -12287,6 +12155,11 @@ General information
 | output_scheme   | OT_STRINGVECTOR | Custom output   | casadi::Functio |
 |                 |                 | scheme          | nInternal       |
 +-----------------+-----------------+-----------------+-----------------+
+| print_time      | OT_BOOL         | print           | casadi::Functio |
+|                 |                 | information     | nInternal       |
+|                 |                 | about execution |                 |
+|                 |                 | time            |                 |
++-----------------+-----------------+-----------------+-----------------+
 | regularity_chec | OT_BOOL         | Throw           | casadi::Functio |
 | k               |                 | exceptions when | nInternal       |
 |                 |                 | NaN or Inf      |                 |
@@ -12306,50 +12179,52 @@ General information
 |                 |                 | debugging       |                 |
 +-----------------+-----------------+-----------------+-----------------+
 
->Input scheme: casadi::ConicInput (CONIC_NUM_IN = 9) []
+>Input scheme: casadi::ConicInput (CONIC_NUM_IN = 10)
 
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
-| CONIC_H                |                        | The square matrix H:   |
+| CONIC_H                | h                      | The square matrix H:   |
 |                        |                        | sparse, (n x n). Only  |
 |                        |                        | the lower triangular   |
 |                        |                        | part is actually used. |
 |                        |                        | The matrix is assumed  |
 |                        |                        | to be symmetrical.     |
 +------------------------+------------------------+------------------------+
-| CONIC_G                |                        | The vector g: dense,   |
+| CONIC_G                | g                      | The vector g: dense,   |
 |                        |                        | (n x 1)                |
 +------------------------+------------------------+------------------------+
-| CONIC_A                |                        | The matrix A: sparse,  |
+| CONIC_A                | a                      | The matrix A: sparse,  |
 |                        |                        | (nc x n) - product     |
 |                        |                        | with x must be dense.  |
 +------------------------+------------------------+------------------------+
-| CONIC_LBA              |                        | dense, (nc x 1)        |
+| CONIC_LBA              | lba                    | dense, (nc x 1)        |
 +------------------------+------------------------+------------------------+
-| CONIC_UBA              |                        | dense, (nc x 1)        |
+| CONIC_UBA              | uba                    | dense, (nc x 1)        |
 +------------------------+------------------------+------------------------+
-| CONIC_LBX              |                        | dense, (n x 1)         |
+| CONIC_LBX              | lbx                    | dense, (n x 1)         |
 +------------------------+------------------------+------------------------+
-| CONIC_UBX              |                        | dense, (n x 1)         |
+| CONIC_UBX              | ubx                    | dense, (n x 1)         |
 +------------------------+------------------------+------------------------+
-| CONIC_X0               |                        | dense, (n x 1)         |
+| CONIC_X0               | x0                     | dense, (n x 1)         |
 +------------------------+------------------------+------------------------+
-| CONIC_LAM_X0           |                        | dense                  |
+| CONIC_LAM_X0           | lam_x0                 | dense                  |
++------------------------+------------------------+------------------------+
+| CONIC_LAM_A0           | lam_a0                 | dense                  |
 +------------------------+------------------------+------------------------+
 
->Output scheme: casadi::ConicOutput (CONIC_NUM_OUT = 4) []
+>Output scheme: casadi::ConicOutput (CONIC_NUM_OUT = 4)
 
 +-------------+-------+---------------------------------------------------+
 |  Full name  | Short |                    Description                    |
 +=============+=======+===================================================+
-| CONIC_X     |       | The primal solution.                              |
+| CONIC_X     | x     | The primal solution.                              |
 +-------------+-------+---------------------------------------------------+
-| CONIC_COST  |       | The optimal cost.                                 |
+| CONIC_COST  | cost  | The optimal cost.                                 |
 +-------------+-------+---------------------------------------------------+
-| CONIC_LAM_A |       | The dual solution corresponding to linear bounds. |
+| CONIC_LAM_A | lam_a | The dual solution corresponding to linear bounds. |
 +-------------+-------+---------------------------------------------------+
-| CONIC_LAM_X |       | The dual solution corresponding to simple bounds. |
+| CONIC_LAM_X | lam_x | The dual solution corresponding to simple bounds. |
 +-------------+-------+---------------------------------------------------+
 
 List of plugins
@@ -12362,6 +12237,8 @@ List of plugins
 - cplex
 
 - gurobi
+
+- hpmpc
 
 - ooqp
 
@@ -12451,6 +12328,69 @@ Interface to the GUROBI Solver for quadratic programming
 | vtype                  | OT_STRINGVECTOR        | Type of variables: [CO |
 |                        |                        | NTINUOUS|binary|intege |
 |                        |                        | r|semicont|semiint]    |
++------------------------+------------------------+------------------------+
+
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+
+hpmpc
+-----
+
+
+
+Interface to HMPC Solver
+
+In order to use this interface, you must:
+
+Decision variables must only by state and control, and the variable ordering
+must be [x0 u0 x1 u1 ...]
+
+The constraints must be in order: [ gap0 lincon0 gap1 lincon1 ]
+
+The gap constraints must be diagonal sparse
+
+Supply nx, ng, nu options
+
+>List of available options
+
++------------------------+------------------------+------------------------+
+|           Id           |          Type          |      Description       |
++========================+========================+========================+
+| N                      | OT_INT                 | OCP horizon            |
++------------------------+------------------------+------------------------+
+| blasfeo_target         | OT_STRING              | hpmpc target           |
++------------------------+------------------------+------------------------+
+| inf                    | OT_DOUBLE              | HPMPC cannot handle    |
+|                        |                        | infinities. Infinities |
+|                        |                        | will be replaced by    |
+|                        |                        | this option's value.   |
++------------------------+------------------------+------------------------+
+| max_iter               | OT_INT                 | Max number of          |
+|                        |                        | iterations             |
++------------------------+------------------------+------------------------+
+| mu0                    | OT_DOUBLE              | Max element in cost    |
+|                        |                        | function as estimate   |
+|                        |                        | of max multiplier      |
++------------------------+------------------------+------------------------+
+| ng                     | OT_INTVECTOR           | Number of non-dynamic  |
+|                        |                        | constraints, length    |
+|                        |                        | N+1                    |
++------------------------+------------------------+------------------------+
+| nu                     | OT_INTVECTOR           | Number of controls,    |
+|                        |                        | length N               |
++------------------------+------------------------+------------------------+
+| nx                     | OT_INTVECTOR           | Number of states,      |
+|                        |                        | length N+1             |
++------------------------+------------------------+------------------------+
+| target                 | OT_STRING              | hpmpc target           |
++------------------------+------------------------+------------------------+
+| tol                    | OT_DOUBLE              | Tolerance in the       |
+|                        |                        | duality measure        |
++------------------------+------------------------+------------------------+
+| warm_start             | OT_BOOL                | Use warm-starting      |
 +------------------------+------------------------+------------------------+
 
 --------------------------------------------------------------------------------
@@ -12903,11 +12843,9 @@ Checks if array does not contain NaN or Inf.
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::hash_value(T v) "
+%feature("docstring") casadi::_which_depends "
 
-Hash value of an integer.
-
-";
+[INTERNAL] ";
 
 %feature("docstring")  casadi::casadi_polyval(const real_t *p, int n, real_t
 x) "
@@ -12984,6 +12922,26 @@ Check if a particular plugin is available.
 %feature("docstring")  casadi::conic_n_out() "
 
 Get the number of QP solver outputs.
+
+";
+
+%feature("docstring")  casadi::hash_combine(std::size_t &seed, T v) "
+
+Generate a hash value incrementally (function taken from boost)
+
+";
+
+%feature("docstring")  casadi::hash_combine(std::size_t &seed, const int *v,
+int sz) "
+
+Generate a hash value incrementally, array.
+
+";
+
+%feature("docstring")  casadi::hash_combine(std::size_t &seed, const
+std::vector< int > &v) "
+
+Generate a hash value incrementally (function taken from boost)
 
 ";
 
@@ -13124,16 +13082,22 @@ ng) "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::casadi_trans(const real_t *x, const int
-*sp_x, real_t *y, const int *sp_y, int *tmp) "
+%feature("docstring")  casadi::casadi_mv(const real_t *x, const int *sp_x,
+const real_t *y, real_t *z, int tr) "
 
-[INTERNAL]  TRANS: y <- trans(x)
+[INTERNAL]  Sparse matrix-vector multiplication: z <- z + x*y.
 
 ";
 
 %feature("docstring") casadi::_jtimes "
 
 [INTERNAL] ";
+
+%feature("docstring")  casadi::hash_value(T v) "
+
+Hash value of an integer.
+
+";
 
 %feature("docstring")  casadi::casadi_bilin(const real_t *A, const int
 *sp_A, const real_t *x, const real_t *y) "
@@ -13142,10 +13106,10 @@ ng) "
 
 ";
 
-%feature("docstring")  casadi::casadi_mv(const real_t *x, const int *sp_x,
-const real_t *y, real_t *z, int tr) "
+%feature("docstring")  casadi::casadi_trans(const real_t *x, const int
+*sp_x, real_t *y, const int *sp_y, int *tmp) "
 
-[INTERNAL]  Sparse matrix-vector multiplication: z <- z + x*y.
+[INTERNAL]  TRANS: y <- trans(x)
 
 ";
 
@@ -13153,32 +13117,32 @@ const real_t *y, real_t *z, int tr) "
 
 Get NLP solver output scheme of NLP solvers.
 
->Output scheme: casadi::NlpsolOutput (NLPSOL_NUM_OUT = 6) []
+>Output scheme: casadi::NlpsolOutput (NLPSOL_NUM_OUT = 6)
 
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
-| NLPSOL_X               |                        | Decision variables at  |
+| NLPSOL_X               | x                      | Decision variables at  |
 |                        |                        | the optimal solution   |
 |                        |                        | (nx x 1)               |
 +------------------------+------------------------+------------------------+
-| NLPSOL_F               |                        | Cost function value at |
+| NLPSOL_F               | f                      | Cost function value at |
 |                        |                        | the optimal solution   |
 |                        |                        | (1 x 1)                |
 +------------------------+------------------------+------------------------+
-| NLPSOL_G               |                        | Constraints function   |
+| NLPSOL_G               | g                      | Constraints function   |
 |                        |                        | at the optimal         |
 |                        |                        | solution (ng x 1)      |
 +------------------------+------------------------+------------------------+
-| NLPSOL_LAM_X           |                        | Lagrange multipliers   |
+| NLPSOL_LAM_X           | lam_x                  | Lagrange multipliers   |
 |                        |                        | for bounds on X at the |
 |                        |                        | solution (nx x 1)      |
 +------------------------+------------------------+------------------------+
-| NLPSOL_LAM_G           |                        | Lagrange multipliers   |
+| NLPSOL_LAM_G           | lam_g                  | Lagrange multipliers   |
 |                        |                        | for bounds on G at the |
 |                        |                        | solution (ng x 1)      |
 +------------------------+------------------------+------------------------+
-| NLPSOL_LAM_P           |                        | Lagrange multipliers   |
+| NLPSOL_LAM_P           | lam_p                  | Lagrange multipliers   |
 |                        |                        | for bounds on P at the |
 |                        |                        | solution (np x 1)      |
 +------------------------+------------------------+------------------------+
@@ -13189,32 +13153,32 @@ Get NLP solver output scheme of NLP solvers.
 
 Get output scheme name by index.
 
->Output scheme: casadi::NlpsolOutput (NLPSOL_NUM_OUT = 6) []
+>Output scheme: casadi::NlpsolOutput (NLPSOL_NUM_OUT = 6)
 
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
-| NLPSOL_X               |                        | Decision variables at  |
+| NLPSOL_X               | x                      | Decision variables at  |
 |                        |                        | the optimal solution   |
 |                        |                        | (nx x 1)               |
 +------------------------+------------------------+------------------------+
-| NLPSOL_F               |                        | Cost function value at |
+| NLPSOL_F               | f                      | Cost function value at |
 |                        |                        | the optimal solution   |
 |                        |                        | (1 x 1)                |
 +------------------------+------------------------+------------------------+
-| NLPSOL_G               |                        | Constraints function   |
+| NLPSOL_G               | g                      | Constraints function   |
 |                        |                        | at the optimal         |
 |                        |                        | solution (ng x 1)      |
 +------------------------+------------------------+------------------------+
-| NLPSOL_LAM_X           |                        | Lagrange multipliers   |
+| NLPSOL_LAM_X           | lam_x                  | Lagrange multipliers   |
 |                        |                        | for bounds on X at the |
 |                        |                        | solution (nx x 1)      |
 +------------------------+------------------------+------------------------+
-| NLPSOL_LAM_G           |                        | Lagrange multipliers   |
+| NLPSOL_LAM_G           | lam_g                  | Lagrange multipliers   |
 |                        |                        | for bounds on G at the |
 |                        |                        | solution (ng x 1)      |
 +------------------------+------------------------+------------------------+
-| NLPSOL_LAM_P           |                        | Lagrange multipliers   |
+| NLPSOL_LAM_P           | lam_p                  | Lagrange multipliers   |
 |                        |                        | for bounds on P at the |
 |                        |                        | solution (np x 1)      |
 +------------------------+------------------------+------------------------+
@@ -13248,38 +13212,38 @@ order:  Order of interpolating polynomials
 
 Get input scheme of NLP solvers.
 
->Input scheme: casadi::NlpsolInput (NLPSOL_NUM_IN = 8) []
+>Input scheme: casadi::NlpsolInput (NLPSOL_NUM_IN = 8)
 
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
-| NLPSOL_X0              |                        | Decision variables,    |
+| NLPSOL_X0              | x0                     | Decision variables,    |
 |                        |                        | initial guess (nx x 1) |
 +------------------------+------------------------+------------------------+
-| NLPSOL_P               |                        | Value of fixed         |
+| NLPSOL_P               | p                      | Value of fixed         |
 |                        |                        | parameters (np x 1)    |
 +------------------------+------------------------+------------------------+
-| NLPSOL_LBX             |                        | Decision variables     |
+| NLPSOL_LBX             | lbx                    | Decision variables     |
 |                        |                        | lower bound (nx x 1),  |
 |                        |                        | default -inf.          |
 +------------------------+------------------------+------------------------+
-| NLPSOL_UBX             |                        | Decision variables     |
+| NLPSOL_UBX             | ubx                    | Decision variables     |
 |                        |                        | upper bound (nx x 1),  |
 |                        |                        | default +inf.          |
 +------------------------+------------------------+------------------------+
-| NLPSOL_LBG             |                        | Constraints lower      |
+| NLPSOL_LBG             | lbg                    | Constraints lower      |
 |                        |                        | bound (ng x 1),        |
 |                        |                        | default -inf.          |
 +------------------------+------------------------+------------------------+
-| NLPSOL_UBG             |                        | Constraints upper      |
+| NLPSOL_UBG             | ubg                    | Constraints upper      |
 |                        |                        | bound (ng x 1),        |
 |                        |                        | default +inf.          |
 +------------------------+------------------------+------------------------+
-| NLPSOL_LAM_X0          |                        | Lagrange multipliers   |
+| NLPSOL_LAM_X0          | lam_x0                 | Lagrange multipliers   |
 |                        |                        | for bounds on X,       |
 |                        |                        | initial guess (nx x 1) |
 +------------------------+------------------------+------------------------+
-| NLPSOL_LAM_G0          |                        | Lagrange multipliers   |
+| NLPSOL_LAM_G0          | lam_g0                 | Lagrange multipliers   |
 |                        |                        | for bounds on G,       |
 |                        |                        | initial guess (ng x 1) |
 +------------------------+------------------------+------------------------+
@@ -13290,38 +13254,38 @@ Get input scheme of NLP solvers.
 
 Get NLP solver input scheme name by index.
 
->Input scheme: casadi::NlpsolInput (NLPSOL_NUM_IN = 8) []
+>Input scheme: casadi::NlpsolInput (NLPSOL_NUM_IN = 8)
 
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
-| NLPSOL_X0              |                        | Decision variables,    |
+| NLPSOL_X0              | x0                     | Decision variables,    |
 |                        |                        | initial guess (nx x 1) |
 +------------------------+------------------------+------------------------+
-| NLPSOL_P               |                        | Value of fixed         |
+| NLPSOL_P               | p                      | Value of fixed         |
 |                        |                        | parameters (np x 1)    |
 +------------------------+------------------------+------------------------+
-| NLPSOL_LBX             |                        | Decision variables     |
+| NLPSOL_LBX             | lbx                    | Decision variables     |
 |                        |                        | lower bound (nx x 1),  |
 |                        |                        | default -inf.          |
 +------------------------+------------------------+------------------------+
-| NLPSOL_UBX             |                        | Decision variables     |
+| NLPSOL_UBX             | ubx                    | Decision variables     |
 |                        |                        | upper bound (nx x 1),  |
 |                        |                        | default +inf.          |
 +------------------------+------------------------+------------------------+
-| NLPSOL_LBG             |                        | Constraints lower      |
+| NLPSOL_LBG             | lbg                    | Constraints lower      |
 |                        |                        | bound (ng x 1),        |
 |                        |                        | default -inf.          |
 +------------------------+------------------------+------------------------+
-| NLPSOL_UBG             |                        | Constraints upper      |
+| NLPSOL_UBG             | ubg                    | Constraints upper      |
 |                        |                        | bound (ng x 1),        |
 |                        |                        | default +inf.          |
 +------------------------+------------------------+------------------------+
-| NLPSOL_LAM_X0          |                        | Lagrange multipliers   |
+| NLPSOL_LAM_X0          | lam_x0                 | Lagrange multipliers   |
 |                        |                        | for bounds on X,       |
 |                        |                        | initial guess (nx x 1) |
 +------------------------+------------------------+------------------------+
-| NLPSOL_LAM_G0          |                        | Lagrange multipliers   |
+| NLPSOL_LAM_G0          | lam_g0                 | Lagrange multipliers   |
 |                        |                        | for bounds on G,       |
 |                        |                        | initial guess (ng x 1) |
 +------------------------+------------------------+------------------------+
@@ -13431,11 +13395,6 @@ General information
 |                 |                 | functions to be |                 |
 |                 |                 | monitored       |                 |
 +-----------------+-----------------+-----------------+-----------------+
-| print_time      | OT_BOOL         | print           | casadi::Nlpsol  |
-|                 |                 | information     |                 |
-|                 |                 | about execution |                 |
-|                 |                 | time            |                 |
-+-----------------+-----------------+-----------------+-----------------+
 | specific_option | OT_DICT         | Options for     | casadi::OracleF |
 | s               |                 | specific auto-  | unction         |
 |                 |                 | generated       |                 |
@@ -13461,68 +13420,68 @@ General information
 |                 |                 | UBX             |                 |
 +-----------------+-----------------+-----------------+-----------------+
 
->Input scheme: casadi::NlpsolInput (NLPSOL_NUM_IN = 8) []
+>Input scheme: casadi::NlpsolInput (NLPSOL_NUM_IN = 8)
 
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
-| NLPSOL_X0              |                        | Decision variables,    |
+| NLPSOL_X0              | x0                     | Decision variables,    |
 |                        |                        | initial guess (nx x 1) |
 +------------------------+------------------------+------------------------+
-| NLPSOL_P               |                        | Value of fixed         |
+| NLPSOL_P               | p                      | Value of fixed         |
 |                        |                        | parameters (np x 1)    |
 +------------------------+------------------------+------------------------+
-| NLPSOL_LBX             |                        | Decision variables     |
+| NLPSOL_LBX             | lbx                    | Decision variables     |
 |                        |                        | lower bound (nx x 1),  |
 |                        |                        | default -inf.          |
 +------------------------+------------------------+------------------------+
-| NLPSOL_UBX             |                        | Decision variables     |
+| NLPSOL_UBX             | ubx                    | Decision variables     |
 |                        |                        | upper bound (nx x 1),  |
 |                        |                        | default +inf.          |
 +------------------------+------------------------+------------------------+
-| NLPSOL_LBG             |                        | Constraints lower      |
+| NLPSOL_LBG             | lbg                    | Constraints lower      |
 |                        |                        | bound (ng x 1),        |
 |                        |                        | default -inf.          |
 +------------------------+------------------------+------------------------+
-| NLPSOL_UBG             |                        | Constraints upper      |
+| NLPSOL_UBG             | ubg                    | Constraints upper      |
 |                        |                        | bound (ng x 1),        |
 |                        |                        | default +inf.          |
 +------------------------+------------------------+------------------------+
-| NLPSOL_LAM_X0          |                        | Lagrange multipliers   |
+| NLPSOL_LAM_X0          | lam_x0                 | Lagrange multipliers   |
 |                        |                        | for bounds on X,       |
 |                        |                        | initial guess (nx x 1) |
 +------------------------+------------------------+------------------------+
-| NLPSOL_LAM_G0          |                        | Lagrange multipliers   |
+| NLPSOL_LAM_G0          | lam_g0                 | Lagrange multipliers   |
 |                        |                        | for bounds on G,       |
 |                        |                        | initial guess (ng x 1) |
 +------------------------+------------------------+------------------------+
 
->Output scheme: casadi::NlpsolOutput (NLPSOL_NUM_OUT = 6) []
+>Output scheme: casadi::NlpsolOutput (NLPSOL_NUM_OUT = 6)
 
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
-| NLPSOL_X               |                        | Decision variables at  |
+| NLPSOL_X               | x                      | Decision variables at  |
 |                        |                        | the optimal solution   |
 |                        |                        | (nx x 1)               |
 +------------------------+------------------------+------------------------+
-| NLPSOL_F               |                        | Cost function value at |
+| NLPSOL_F               | f                      | Cost function value at |
 |                        |                        | the optimal solution   |
 |                        |                        | (1 x 1)                |
 +------------------------+------------------------+------------------------+
-| NLPSOL_G               |                        | Constraints function   |
+| NLPSOL_G               | g                      | Constraints function   |
 |                        |                        | at the optimal         |
 |                        |                        | solution (ng x 1)      |
 +------------------------+------------------------+------------------------+
-| NLPSOL_LAM_X           |                        | Lagrange multipliers   |
+| NLPSOL_LAM_X           | lam_x                  | Lagrange multipliers   |
 |                        |                        | for bounds on X at the |
 |                        |                        | solution (nx x 1)      |
 +------------------------+------------------------+------------------------+
-| NLPSOL_LAM_G           |                        | Lagrange multipliers   |
+| NLPSOL_LAM_G           | lam_g                  | Lagrange multipliers   |
 |                        |                        | for bounds on G at the |
 |                        |                        | solution (ng x 1)      |
 +------------------------+------------------------+------------------------+
-| NLPSOL_LAM_P           |                        | Lagrange multipliers   |
+| NLPSOL_LAM_P           | lam_p                  | Lagrange multipliers   |
 |                        |                        | for bounds on P at the |
 |                        |                        | solution (np x 1)      |
 +------------------------+------------------------+------------------------+
@@ -13618,7 +13577,7 @@ Dennis Janka, Joel Andersson
 |                        |                        | parameter, cf. IPOPT   |
 |                        |                        | paper                  |
 +------------------------+------------------------+------------------------+
-| globalization          | OT_INT                 | Globalization strategy |
+| globalization          | OT_BOOL                | Enable globalization   |
 +------------------------+------------------------+------------------------+
 | hess_damp              | OT_INT                 | Activate Powell        |
 |                        |                        | damping for BFGS       |
@@ -13721,7 +13680,7 @@ Dennis Janka, Joel Andersson
 | qpsol_options          | OT_DICT                | Options to be passed   |
 |                        |                        | to the QP solver       |
 +------------------------+------------------------+------------------------+
-| restore_feas           | OT_INT                 | Use feasibility        |
+| restore_feas           | OT_BOOL                | Use feasibility        |
 |                        |                        | restoration phase      |
 +------------------------+------------------------+------------------------+
 | s_f                    | OT_DOUBLE              | Filter line search     |

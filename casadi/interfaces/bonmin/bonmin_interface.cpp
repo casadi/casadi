@@ -193,7 +193,7 @@ namespace casadi {
       }
       hesslag_sp_ = get_function("nlp_hess_l").sparsity_out(0);
     } else if (pass_nonlinear_variables_) {
-      nl_ex_ = oracle_.nl_var("x", {"f", "g"});
+      nl_ex_ = oracle_.which_depends("x", {"f", "g"}, 2, false);
     }
 
     // Allocate work vectors

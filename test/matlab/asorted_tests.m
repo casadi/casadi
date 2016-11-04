@@ -219,13 +219,13 @@ rhs = [x(2);1000*(1 - x(1)^2)*x(2) - x(1)];
 ode = Function('ode',{t,x},{rhs});
 
 if ~is_octave
-  [T,X] = ode15s(full(ode),[0 300],[2 0]);
+  [T,X] = ode15s(returntypes('full',ode),[0 300],[2 0]);
 
-  [T,X] = ode15s(sparse(ode),[0 300],[2 0]);
+  [T,X] = ode15s(returntypes('full',ode),[0 300],[2 0]);
 
   Jode = Function('ode',{t,x},{jacobian(rhs,x)});
-  options = odeset('Jacobian',full(Jode));
-  [T,X] = ode15s(full(ode),[0 300],[2 0],options);
+  options = odeset('Jacobian',returntypes('full',Jode));
+  [T,X] = ode15s(returntypes('full',ode),[0 300],[2 0],options);
 end
 
 
@@ -263,6 +263,13 @@ if has_nlpsol('bonmin')
   sol = solver('x0',[1 1]);
 
   assert(all(full(sol.x)==[3;4]))
+  
+  options = struct;
+  options.discrete = {true,true};
+  solver = nlpsol('solver', 'bonmin', nlp,options);
+  sol = solver('x0',[1 1]);
+
+  assert(all(full(sol.x)==[3;4]))
 end
 
 data = { [1 3;11 17] , [1 3] , [1;3] 3};
@@ -288,5 +295,48 @@ end
 
 assert(all(size(DM([1 3]))==[1 2]))
 assert(all(size(DM([1;3]))==[2 1]))
+
+x=SX.sym('x');
+f= Function('f',{x},{x});
+
+f.map('mymap','serial',100,[0],[0])
+f.map('mymap','serial',100,{0},{0})
+
+x = SX.sym('x')
+y = SX.sym('y',2)
+z = SX.sym('z',2,2)
+a = SX.sym('a',Sparsity.upper(2))
+
+
+f = Function('f',{x,y,z,a},{x,y,z,a})
+F = returntypes('full',f);
+
+[a,b,c,d] = F(1,2,3,4);
+
+assert(~issparse(c));
+assert(~issparse(d));
+
+F = returntypes('sparse',f);
+
+[a,b,c,d] = F(1,2,3,4);
+
+assert(issparse(c));
+assert(issparse(d));
+
+F = returntypes('full|sparse',f);
+
+[a,b,c,d] = F(1,2,3,4);
+
+assert(~issparse(c));
+assert(issparse(d));
+
+F = returntypes({'sparse','full','sparse','full'},f);
+
+[a,b,c,d] = F(1,2,3,4);
+
+assert(issparse(a));
+assert(~issparse(b));
+assert(issparse(c));
+assert(~issparse(d));
 
 

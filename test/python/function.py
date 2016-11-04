@@ -300,9 +300,8 @@ class Functiontests(casadiTestCase):
       test(d.sparsity())
 
   def test_customIO(self):
-
     x = SX.sym("x")
-    f = Function('f',[x],[x*x, x],{'output_scheme':["foo","bar"]})
+    f = Function('f',[x],[x*x, x],["i0"], ["foo","bar"])
 
     ret = f(i0=12)
 
@@ -639,7 +638,7 @@ class Functiontests(casadiTestCase):
 
     hs = []
     for n in [nlp, nlp.expand('nlp_expanded')]:
-        H = n.derivative(0,1).jacobian(0,2,False,True)
+        H = n.reverse(1).jacobian(0,0,False,True)
 
         h = H(der_x=1,adj0_f=1)[H.name_out(0)]
         hs.append(h)
@@ -856,43 +855,6 @@ class Functiontests(casadiTestCase):
   #   [v] = f([])
   #   self.checkarray(2.37683, v, digits=4)
 
-  @memory_heavy()
-  def test_kernel_sum(self):
-    n = 20
-    m = 40
-
-    try:
-      xx, yy = np.meshgrid(list(range(n)), list(range(m)),indexing="ij")
-    except:
-      yy, xx = np.meshgrid(list(range(m)), list(range(n)))
-
-    z = np.cos(xx/4.0+yy/3.0)
-
-    p = SX.sym("p",2)
-    x = SX.sym("x",2)
-
-    v = SX.sym("v")
-
-    r = sqrt(sum1((p-x)**2))
-
-    f = Function("f",[p,v,x],[v**2*exp(-r**2)/pi])
-
-    F = f.kernel_sum("test",(n,m),4,1,{"ad_weight": 1})
-
-    x0 = DM([n/2,m/2])
-
-    Fref = f.map("f","serial",n*m,[2],[0])
-
-    print(Fref(horzcat(*[vec(xx),vec(yy)]).T,vec(z),x0))
-    print(F(z,x0))
-
-    zs = MX.sym("z", z.shape)
-    xs = MX.sym("x",2)
-    Fref = Function("Fref",[zs,xs],[Fref(horzcat(*[vec(xx),vec(yy)]).T,vec(zs),xs)])
-
-    self.checkfunction(F,Fref,inputs=[z,x0],digits=5,allow_nondiff=True,evals=False)
-    self.check_codegen(F,inputs=[z,x0])
-
   def test_depends_on(self):
     x = SX.sym("x")
     y = x**2
@@ -1051,7 +1013,9 @@ class Functiontests(casadiTestCase):
         f.jacobian()
 
       with self.assertRaises(Exception):
-        f.derivative()
+        f.forward(1)
+      with self.assertRaises(Exception):
+        f.reverse(1)
 
   def test_Callback_dimcheck(self):
       class Fun(Callback):
@@ -1064,7 +1028,7 @@ class Functiontests(casadiTestCase):
         def eval(self,arg):
           return [2, 1]
       f = Fun()
-      
+
       s = ""
       try:
         f(2)
@@ -1081,7 +1045,7 @@ class Functiontests(casadiTestCase):
         def eval(self,arg):
           return [2, 1]
       f = Fun()
-      
+
       s = ""
       try:
         f(2,3)
@@ -1247,7 +1211,7 @@ class Functiontests(casadiTestCase):
 
   @requires_nlpsol("ipopt")
   def test_common_specific_options(self):
-    
+
       x = SX.sym("x")
 
       nlp = {"x": x, "f": x**2}

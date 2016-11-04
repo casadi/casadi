@@ -327,15 +327,15 @@ namespace casadi {
 
     // Algorithmic options
     bool schur_;  // Use qpOASES schur compliment approach
-    int globalization_; // Globalization strategy
-    int restore_feas_;// Use feasibility restoration phase
+    bool globalization_; // Globalization strategy
+    bool restore_feas_;// Use feasibility restoration phase
     int max_line_search_;  // Maximum number of steps in line search
     int max_consec_reduced_steps_;// Maximum number of consecutive reduced steps
     int max_consec_skipped_updates_; // Maximum number of consecutive skipped updates
     int max_it_qp_;  // Maximum number of QP iterations per SQP iteration
     int max_iter_; // Maximum number of SQP steps
     bool warmstart_; // Use warmstarting
-    int block_hess_;  // Blockwise Hessian approximation?
+    bool block_hess_;  // Blockwise Hessian approximation?
     int hess_scaling_;// Scaling strategy for Hessian approximation
     int fallback_scaling_;  // If indefinite update is used, the type of fallback strategy
     double max_time_qp_;  // Maximum number of time in seconds per QP solve per SQP iteration

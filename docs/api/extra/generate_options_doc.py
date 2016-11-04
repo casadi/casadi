@@ -545,14 +545,6 @@ f.close()
 
 f = file(out+'a0_schemes.hpp','w')
 
-def extract_shorthand(d):
-  m = re.search('\[(\w+)\]',d)
-  if not(m):
-    #raise Exception("No shorthand found in '%s'" % d)
-    return "", d
-  short = m.group(1)
-  return short, d.replace("[%s]" % short,"")
-
 def enumsashtml(n,title):
   s=""
   if (n in enums):
@@ -566,7 +558,7 @@ def enumsashtml(n,title):
         num = m['name']
       if re.search(r'_NUM_OUT$',m['name']):
         num = m['name']
-    s+= "<caption>%s  (%s = %d) [%s]</caption>\n" % (title,num,len(enums[n])-2,extract_shorthand(enums[n][0])[0])
+    s+= "<caption>%s  (%s = %d)</caption>\n" % (title,num,len(enums[n])-2)
     s+= "<tr><th>Full name</th><th>Short</th><th>Description</th></tr>\n"
     for i in range(len(enums[n])-1):
       m = enums[n][1+i]
@@ -575,8 +567,8 @@ def enumsashtml(n,title):
       if re.search(r'_NUM_OUT$',m['name']):
         continue
       if m['description']=='': continue
-      shorthand, description = extract_shorthand(m['description'])
-      s+="<tr><td>%s</td><td>%s</td><td>%s</td></tr>\n" % (m['name'],shorthand,description)
+      shorthand = "_".join(m['name'].split("_")[1:]).lower()
+      s+="<tr><td>%s</td><td>%s</td><td>%s</td></tr>\n" % (m['name'],shorthand,m['description'])
     s+="</table>\n"
   return s
 

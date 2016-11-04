@@ -382,7 +382,11 @@ namespace casadi {
     static MX hessian(const MX& f, const MX& x);
     static MX hessian(const MX& f, const MX& x, MX& g);
     static MX jtimes(const MX &ex, const MX &arg, const MX &v, bool tr=false);
+#ifdef WITH_DEPRECATED_FEATURES
     static std::vector<bool> nl_var(const MX &expr, const MX &var);
+#endif
+    static std::vector<bool> which_depends(const MX &expr, const MX &var,
+        int order=1, bool tr=false);
     static MX substitute(const MX& ex, const MX& v, const MX& vdef);
     static std::vector<MX> substitute(const std::vector<MX> &ex,
                                          const std::vector<MX> &v,
@@ -404,10 +408,6 @@ namespace casadi {
     static MX conditional(const MX& ind, const std::vector<MX> &x, const MX& x_default,
                           bool short_circuit=true);
     static bool depends_on(const MX& x, const MX& arg);
-    static std::vector<bool> vector_depends_on(const MX &x,
-                                                 const MX &arg);
-    static std::vector<bool> vector_linear_depends_on(const MX &x,
-                                                        const MX &arg);
     static MX logic_not(const MX& x);
     static MX simplify(const MX& x);
     static MX mpower(const MX& a, const MX& b);

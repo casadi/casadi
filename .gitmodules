@@ -1,0 +1,6 @@
+[submodule "external_packages/hpmpc/src"]
+	path = external_packages/hpmpc/src
+	url = https://github.com/jgillis/hpmpc.git
+[submodule "external_packages/blasfeo/src"]
+	path = external_packages/blasfeo/src
+	url = https://github.com/jgillis/blasfeo.git

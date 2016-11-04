@@ -834,16 +834,16 @@ namespace casadi {
 
   // Helper function
   bool has_empty(const vector<MX>& x, bool both=false) {
-    for (vector<MX>::const_iterator i=x.begin(); i!=x.end(); ++i) {
-      if (i->is_empty(both)) return true;
+    for (auto&& i : x) {
+      if (i.is_empty(both)) return true;
     }
     return false;
   }
 
   vector<MX> trim_empty(const vector<MX>& x, bool both=false) {
     vector<MX> ret;
-    for (vector<MX>::const_iterator i=x.begin(); i!=x.end(); ++i) {
-      if (!i->is_empty(both)) ret.push_back(*i);
+    for (auto&& i : x) {
+      if (!i.is_empty(both)) ret.push_back(i);
     }
     return ret;
   }
@@ -1009,8 +1009,8 @@ namespace casadi {
 
     // Make sure same number of block columns
     int ncols = v.front().size();
-    for (vector<vector<MX> >::const_iterator it=v.begin(); it!=v.end(); ++it) {
-      casadi_assert_message(it->size()==ncols, "blockcat: Inconsistent number of blocl columns");
+    for (auto&& e : v) {
+      casadi_assert_message(e.size()==ncols, "blockcat: Inconsistent number of blocl columns");
     }
 
     // Quick return if no block columns
@@ -1018,8 +1018,8 @@ namespace casadi {
 
     // Horizontally concatenate all columns for each row, then vertically concatenate rows
     std::vector<MX> rows;
-    for (vector<vector<MX> >::const_iterator it=v.begin(); it!=v.end(); ++it) {
-      rows.push_back(horzcat(*it));
+    for (auto&& e : v) {
+      rows.push_back(horzcat(e));
     }
     return vertcat(rows);
   }
@@ -1424,7 +1424,7 @@ namespace casadi {
 
     // Evaluate the algorithm to identify which evaluations to replace
     int k=0;
-    for (vector<MXAlgEl>::const_iterator it=algorithm.begin(); it<algorithm.end(); ++it, ++k) {
+    for (auto it=algorithm.begin(); it<algorithm.end(); ++it, ++k) {
       // Increase usage counters
       switch (it->op) {
       case OP_CONST:
@@ -1482,7 +1482,7 @@ namespace casadi {
 
     // Evaluate the algorithm
     k=0;
-    for (vector<MXAlgEl>::const_iterator it=algorithm.begin(); it<algorithm.end(); ++it, ++k) {
+    for (auto it=algorithm.begin(); it<algorithm.end(); ++it, ++k) {
       switch (it->op) {
       case OP_OUTPUT:     ex[it->res.front()] = work[it->arg.front()];      break;
       case OP_CONST:
@@ -1560,8 +1560,14 @@ namespace casadi {
     return _jtimes(ex, arg, v, tr);
   }
 
+#ifdef WITH_DEPRECATED_FEATURES
   std::vector<bool> MX::nl_var(const MX &expr, const MX &var) {
     return _nl_var(expr, var);
+  }
+#endif
+
+  std::vector<bool> MX::which_depends(const MX &expr, const MX &var, int order, bool tr) {
+    return _which_depends(expr, var, order, tr);
   }
 
   MX MX::det(const MX& x) {
@@ -1672,66 +1678,6 @@ namespace casadi {
     }
 
     return false;
-  }
-
-
-  std::vector<bool> MX::vector_depends_on(const MX &x, const MX &arg) {
-    casadi_assert(x.is_vector());
-    casadi_assert(x.is_dense());
-
-    casadi_assert(arg.is_vector());
-    casadi_assert(arg.is_dense());
-
-    // Allocate return vector
-    std::vector<bool> ret(x.numel(), false);
-
-    // Construct a temporary algorithm
-    Function temp("temp", {arg}, {x});
-
-    // Perform a single dependency sweep
-    vector<bvec_t> t_in(arg.nnz(), 1), t_out(x.nnz());
-    temp({get_ptr(t_in)}, {get_ptr(t_out)});
-
-    // Harvest the results
-    for (int k = 0; k < x.numel(); ++k) {
-      if (t_out[k]) ret[k] = true;
-    }
-
-    return ret;
-  }
-
-  std::vector<bool> MX::vector_linear_depends_on(const MX &x, const MX &arg) {
-    casadi_assert(x.is_vector());
-    casadi_assert(x.is_dense());
-
-    casadi_assert(arg.is_vector());
-    casadi_assert(arg.is_dense());
-
-    // Allocate return vector
-    std::vector<bool> ret(x.numel(), true);
-
-    // Construct a temporary algorithm
-    Function temp("temp", {arg}, {jacobian(x, arg).T()});
-
-    // Perform a single dependency sweep
-    vector<bvec_t> t_in(arg.nnz(), 1), t_out(x.nnz());
-    temp({get_ptr(t_in)}, {get_ptr(t_out)});
-
-    const Sparsity& sp = temp.sparsity_out(0);
-
-    // Harvest the results
-    for (int j = 0; j < x.numel(); ++j) {
-      if (sp.colind(j) != sp.colind(j+1)) {
-        for (int k = sp.colind(j); k < sp.colind(j+1); ++k) {
-          if (t_out[k]) {
-            ret[j] = false;
-            break;
-          }
-        }
-      }
-    }
-
-    return ret;
   }
 
   MX MX::find(const MX& x) {

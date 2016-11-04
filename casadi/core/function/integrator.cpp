@@ -683,7 +683,10 @@ namespace casadi {
     log("Integrator::sp_rev", "end");
   }
 
-  Function Integrator::get_forward_old(const std::string& name, int nfwd, Dict& opts) {
+  Function Integrator::
+  get_forward(const std::string& name, int nfwd,
+              const std::vector<std::string>& i_names,
+              const std::vector<std::string>& o_names, const Dict& opts) {
     log("Integrator::get_forward", "begin");
 
     // Integrator options
@@ -780,13 +783,35 @@ namespace casadi {
       dd[INTEGRATOR_RZF] = reshape(rzf_aug.at(dir+1), rz().size());
       ret_out.insert(ret_out.end(), dd.begin(), dd.end());
     }
+
+    // Concatenate forward seeds
+    vector<MX> v(nfwd);
+    auto r_it = ret_in.begin() + n_in() + n_out();
+    for (int i=0; i<n_in(); ++i) {
+      for (int d=0; d<nfwd; ++d) v[d] = *(r_it + d*n_in());
+      *r_it++ = horzcat(v);
+    }
+    ret_in.resize(n_in() + n_out() + n_in());
+
+    // Concatenate forward sensitivites
+    r_it = ret_out.begin();
+    for (int i=0; i<n_out(); ++i) {
+      for (int d=0; d<nfwd; ++d) v[d] = *(r_it + d*n_out());
+      *r_it++ = horzcat(v);
+    }
+    ret_out.resize(n_out());
+
     log("Integrator::get_forward", "end");
 
     // Create derivative function and return
-    return Function(name, ret_in, ret_out, opts);
+    return Function(name, ret_in, ret_out, i_names, o_names, opts);
   }
 
-  Function Integrator::get_reverse_old(const std::string& name, int nadj, Dict& opts) {
+  Function Integrator::
+  get_reverse(const std::string& name, int nadj,
+              const std::vector<std::string>& i_names,
+              const std::vector<std::string>& o_names,
+              const Dict& opts) {
     log("Integrator::get_reverse", "begin");
 
     // Integrator options
@@ -908,10 +933,28 @@ namespace casadi {
       dd[INTEGRATOR_RZ0] = reshape(zf_aug.at(dir+1), rz().size());
       ret_out.insert(ret_out.end(), dd.begin(), dd.end());
     }
+
+    // Concatenate forward seeds
+    vector<MX> v(nadj);
+    auto r_it = ret_in.begin() + n_in() + n_out();
+    for (int i=0; i<n_out(); ++i) {
+      for (int d=0; d<nadj; ++d) v[d] = *(r_it + d*n_out());
+      *r_it++ = horzcat(v);
+    }
+    ret_in.resize(n_in() + n_out() + n_out());
+
+    // Concatenate forward sensitivites
+    r_it = ret_out.begin();
+    for (int i=0; i<n_in(); ++i) {
+      for (int d=0; d<nadj; ++d) v[d] = *(r_it + d*n_in());
+      *r_it++ = horzcat(v);
+    }
+    ret_out.resize(n_in());
+
     log("Integrator::getDerivative", "end");
 
     // Create derivative function and return
-    return Function(name, ret_in, ret_out, opts);
+    return Function(name, ret_in, ret_out, i_names, o_names, opts);
   }
 
   Dict Integrator::getDerivativeOptions(bool fwd) {

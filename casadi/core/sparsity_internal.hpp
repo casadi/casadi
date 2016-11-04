@@ -313,6 +313,9 @@ namespace casadi {
     /// Get the dimension as a string
     std::string dim() const;
 
+    /// Describe the nonzero location k as a string
+    std::string repr(int k) const;
+
     /// Sparsity pattern for a matrix-matrix product (details in public class)
     Sparsity _mtimes(const Sparsity& y) const;
 

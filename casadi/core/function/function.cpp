@@ -28,9 +28,7 @@
 #include "sx_function.hpp"
 #include "mx_function.hpp"
 #include "map.hpp"
-#include "mapaccum.hpp"
 #include "switch.hpp"
-#include "kernel_sum.hpp"
 #include "nlpsol.hpp"
 #include "conic.hpp"
 #include "jit.hpp"
@@ -400,76 +398,158 @@ namespace casadi {
     rev(get_ptr(arg), get_ptr(res), get_ptr(iw), get_ptr(w), 0);
   }
 
-  Function Function::mapaccum(const string& name, int n, const Dict& opts) {
-    std::vector<int> accum_in = std::vector<int>(1, 0);
-    std::vector<int> accum_out = std::vector<int>(1, 0);
-    return mapaccum(name, n, accum_in, accum_out, opts);
+  Function Function::mapaccum(const string& name, int n, int n_accum, const Dict& opts) {
+    // Shorthands
+    int n_in = this->n_in(), n_out = this->n_out();
+    // Consistency checks
+    casadi_assert_message(n>0, "mapaccum: n must be positive");
+    casadi_assert_message(n_accum<=min(n_in, n_out), "mapaccum: too many accumulators");
+    // Quick return?
+    if (n==1) return *this;
+    // Get symbolic expressions for inputs and outputs
+    vector<MX> arg = mx_in();
+    vector<MX> res;
+    // Vectorized inputs and outputs
+    vector<vector<MX>> varg(n_in), vres(n_out);
+    for (int i=0; i<n_accum; ++i) varg[i].push_back(arg[i]);
+    // For each function call
+    for (int iter=0; iter<n; ++iter) {
+      // Stacked input expressions
+      for (int i=n_accum; i<n_in; ++i) {
+        arg[i] = MX::sym(name_in(i) + "_" + to_string(i), sparsity_in(i));
+        varg[i].push_back(arg[i]);
+      }
+      // Call f
+      res = (*this)(arg);
+      // Save output expressions
+      for (int i=0; i<n_out; ++i) vres[i].push_back(res[i]);
+      // Done?
+      if (iter==n-1) break;
+      // Copy function output to input
+      copy_n(res.begin(), n_accum, arg.begin());
+      for (int i=0; i<n_accum; ++i) {
+        // Ony get last component (allows nested calls)
+        int nrow_out=size2_out(i), nrow_in=size2_in(i);
+        if (nrow_out>nrow_in) {
+          arg[i] = horzsplit(arg[i], {0, nrow_out-nrow_in, nrow_out}).back();
+        }
+      }
+    }
+    // Construct return
+    for (int i=0; i<n_in; ++i) arg[i] = horzcat(varg[i]);
+    for (int i=0; i<n_out; ++i) res[i] = horzcat(vres[i]);
+    return Function(name, arg, res, name_in(), name_out(), opts);
   }
 
   Function Function::mapaccum(const string& name, int n,
                               const vector<int>& accum_in,
                               const vector<int>& accum_out,
                               const Dict& opts) {
-    // Inherit the scheme
-    Dict opts2 = opts;
-    if (opts.find("input_scheme")==opts.end()) opts2["input_scheme"] = name_in();
-    if (opts.find("output_scheme")==opts.end()) opts2["output_scheme"] = name_out();
+    // Shorthands
+    int n_in = this->n_in(), n_out = this->n_out();
+    // Consistency checks
+    casadi_assert(inBounds(accum_in, n_in) && isUnique(accum_in));
+    casadi_assert(inBounds(accum_out, n_out) && isUnique(accum_out));
+    casadi_assert(accum_in.size()==accum_out.size());
+    int n_accum=accum_in.size();
 
-    return Mapaccum::create(name, *this, n, accum_in, accum_out, opts2);
+    // Quick return if no need to reorder
+    if (accum_in==range(n_accum) && accum_out==range(n_accum)) {
+      return mapaccum(name, n, n_accum, opts);
+    }
+
+    // Need to do some reordering
+    vector<int> temp_in = complement(accum_in, n_in);
+    vector<int> order_in = accum_in;
+    order_in.insert(order_in.end(), temp_in.begin(), temp_in.end());
+    vector<int> temp_out = complement(accum_out, n_out);
+    vector<int> order_out = accum_out;
+    order_out.insert(order_out.end(), temp_out.begin(), temp_out.end());
+    Function ret = slice("slice_" + name, order_in, order_out);
+    ret = ret.mapaccum("mapacc_" + name, n, n_accum, opts);
+    return ret.slice(name, lookupvector(order_in, n_in),
+                     lookupvector(order_out, n_out), opts);
   }
 
   Function Function::mapaccum(const string& name, int n,
-                              const vector<std::string>& accum_in,
-                              const vector<std::string>& accum_out,
+                              const vector<string>& accum_in,
+                              const vector<string>& accum_out,
                               const Dict& opts) {
-    std::vector<int> accum_in_num;
-    for (int i=0;i<accum_in.size();++i) accum_in_num.push_back(index_in(accum_in[i]));
-    std::vector<int> accum_out_num;
-    for (int i=0;i<accum_out.size();++i) accum_out_num.push_back(index_out(accum_out[i]));
+    vector<int> accum_in_num, accum_out_num;
+    for (const string& s : accum_in) accum_in_num.push_back(index_in(s));
+    for (const string& s : accum_out) accum_out_num.push_back(index_out(s));
     return mapaccum(name, n, accum_in_num, accum_out_num, opts);
   }
 
   Function Function::map(const string& name, const std::string& parallelization, int n,
-      const std::vector<int>& reduce_in, const std::vector<int>& reduce_out,
+      const vector<int>& reduce_in, const vector<int>& reduce_out,
       const Dict& opts) {
-    return MapBase::create(name, parallelization, *this, n, reduce_in, reduce_out, opts);
+    // Wrap in an MXFunction
+    Function f = map(name, parallelization, n, opts);
+    // Start with the fully mapped inputs
+    vector<MX> arg = f.mx_in();
+    vector<MX> f_arg = arg;
+    // Replace reduced inputs
+    for (int i : reduce_in) {
+      arg[i] = mx_in(i);
+      f_arg[i] = repmat(arg[i], 1, n);
+    }
+    // Get fully mapped outputs
+    vector<MX> res = f(f_arg);
+    // Replace reduced outputs
+    for (int i : reduce_out) {
+      res[i] = repsum(res[i], 1, n);
+    }
+    // Construct return
+    return Function(name, arg, res, (*this)->derived_options());
   }
 
-  Function Function::map(const string& name, const std::string& parallelization, int n,
-      const std::vector<std::string>& reduce_in, const std::vector<std::string>& reduce_out,
+  Function Function::map(const string& name, const string& parallelization, int n,
+      const vector<string>& reduce_in, const vector<string>& reduce_out,
       const Dict& opts) {
-    std::vector<int> reduce_in_num;
-    for (int i=0;i<reduce_in.size();++i) reduce_in_num.push_back(index_in(reduce_in[i]));
-    std::vector<int> reduce_out_num;
-    for (int i=0;i<reduce_out.size();++i) reduce_out_num.push_back(index_out(reduce_out[i]));
+    vector<int> reduce_in_num, reduce_out_num;
+    for (const string& s : reduce_in) reduce_in_num.push_back(index_in(s));
+    for (const string& s : reduce_out) reduce_out_num.push_back(index_out(s));
     return map(name, parallelization, n, reduce_in_num, reduce_out_num, opts);
   }
 
   Function Function::map(const string& name, const std::string& parallelization, int n,
       const Dict& opts) {
-    std::vector<int> reduce_in;
-    std::vector<int> reduce_out;
-    return MapBase::create(name, parallelization, *this, n, reduce_in, reduce_out, opts);
+    // Make sure not degenerate
+    casadi_assert_message(n>0, "Degenerate map operation");
+    // Quick return if possible
+    if (n==1) return *this;
+    // Unroll?
+    if (parallelization=="unroll") {
+      // Construct symbolic inputs
+      std::vector<MX> arg(n_in());
+      std::vector<std::vector<MX>> v(n, arg);
+      std::vector<MX> tmp(n);
+      for (int i=0; i<arg.size(); ++i) {
+        for (int k=0; k<n; ++k) {
+          tmp[k] = v[k][i] = MX::sym(name_in(i)+"_"+to_string(k), sparsity_in(i));
+        }
+        arg[i] = horzcat(tmp);
+      }
+      // Evaluate
+      for (auto&& w : v) w = (*this)(w);
+      // Gather outputs
+      std::vector<MX> res(n_out());
+      for (int i=0; i<res.size(); ++i) {
+        for (int k=0; k<n; ++k) tmp[k] = v[k][i];
+        res[i] = horzcat(tmp);
+      }
+      // Construct function
+      return Function(name, arg, res, (*this)->derived_options());
+    }
+
+    // Create Map object
+    return Map::create(name, parallelization, *this, n, opts);
   }
 
-  Function Function::slice(const std::vector<int>& order_in, const std::vector<int>& order_out,
-      const Dict& opts) {
-    // Get symbolic inputs
-    std::vector<MX> in = mx_in();
-
-    // Get symbolic outputs
-    std::vector<MX> out = (*this)(in);
-
-    // Shuffle the inputs
-    std::vector<MX> new_in;
-    for (int k : order_in) new_in.push_back(in.at(k));
-
-    // Shuffle the outputs
-    std::vector<MX> new_out;
-    for (int k : order_out) new_out.push_back(out.at(k));
-
-    // Return a wrapping function
-    return Function(std::string("slice_") + name(), new_in, new_out, opts);
+  Function Function::slice(const std::string& name, const std::vector<int>& order_in,
+                           const std::vector<int>& order_out, const Dict& opts) const {
+    return (*this)->slice(name, order_in, order_out, opts);
   }
 
   vector<MX> Function::map(const vector< MX > &x,
@@ -516,15 +596,15 @@ namespace casadi {
     return ret;
   }
 
+#ifdef WITH_DEPRECATED_FEATURES
   Function Function::kernel_sum(const string& name,
                                 const pair<int, int> & size,
                                 double r, int n,
                                 const Dict& opts) const {
-    Function ret;
-    ret.assignNode(new KernelSum(name, *this, size, r, n));
-    ret->construct(opts);
-    return ret;
+    casadi_error("kernel_sum: has been deprecated");
+    return Function();
   }
+#endif // WITH_DEPRECATED_FEATURES
 
   int Function::n_in() const {
     return (*this)->n_in();
@@ -717,6 +797,7 @@ namespace casadi {
     }
   }
 
+  #ifdef WITH_DEPRECATED_FEATURES
   Function Function::derivative(int nfwd, int nadj) {
     // Quick return
     if (nfwd==0 && nadj==0) return *this;
@@ -867,21 +948,162 @@ namespace casadi {
     }
     return ret;
   }
+#endif // WITH_DEPRECATED_FEATURES
 
   Function Function::forward(int nfwd) {
-    return (*this)->forward_old(nfwd);
+    casadi_assert(nfwd>=0);
+
+    // Give it a suitable name
+    string name = "fwd" + to_string(nfwd) + "_" + this->name();
+
+    // Get the number of inputs and outputs
+    int n_in = this->n_in();
+    int n_out = this->n_out();
+
+    // Names of inputs
+    std::vector<std::string> i_names;
+    for (int i=0; i<n_in; ++i) i_names.push_back("der_" + name_in(i));
+    for (int i=0; i<n_out; ++i) i_names.push_back("der_" + name_out(i));
+    for (int d=0; d<nfwd; ++d) {
+      for (int i=0; i<n_in; ++i) {
+        i_names.push_back("fwd" + to_string(d) + "_" + name_in(i));
+      }
+    }
+
+    // Names of outputs
+    std::vector<std::string> o_names;
+    for (int d=0; d<nfwd; ++d) {
+      for (int i=0; i<n_out; ++i) {
+        o_names.push_back("fwd" + to_string(d) + "_" + name_out(i));
+      }
+    }
+
+    // Call new implementation
+    Function d = forward_new(nfwd);
+
+    // Expressions for inputs
+    vector<MX> arg = MX::get_input(d);
+    arg.resize(n_in + n_out);
+    arg.reserve(n_in + n_out + nfwd*n_in);
+    for (int d=0; d<nfwd; ++d) {
+      for (int i=0; i<n_in; ++i) {
+        arg.push_back(MX::sym(i_names.at(arg.size()), sparsity_in(i)));
+      }
+    }
+
+    // Argument for calling d
+    vector<MX> d_arg(arg.begin(), arg.begin() + n_in + n_out);
+    vector<MX> v(nfwd);
+    for (int i=0; i<n_in; ++i) {
+      for (int d=0; d<nfwd; ++d) {
+        v[d] = arg.at(n_in + n_out + d*n_in + i);
+      }
+      d_arg.push_back(horzcat(v));
+    }
+
+    // Call d
+    vector<MX> d_res = d(d_arg);
+    casadi_assert(d_res.size()==n_out);
+
+    // Expressions for outputs
+    vector<MX> res(n_out*nfwd);
+    for (int i=0; i<n_out; ++i) {
+      if (size2_out(i)>0) {
+        v = horzsplit(d_res[i], size2_out(i));
+        casadi_assert(v.size()==nfwd);
+      } else {
+        v = vector<MX>(nfwd, MX(size_out(i)));
+      }
+      for (int d=0; d<nfwd; ++d) {
+        res[d*n_out + i] = v[d];
+      }
+    }
+
+    // Construct new function
+    Dict opts = (*this)->derived_options();
+    return Function(name, arg, res, i_names, o_names, opts);
+  }
+
+  Function Function::forward_new(int nfwd) {
+    return (*this)->forward(nfwd);
   }
 
   Function Function::reverse(int nadj) {
-    return (*this)->reverse_old(nadj);
+    casadi_assert(nadj>=0);
+
+    // Give it a suitable name
+    string name = "adj" + to_string(nadj) + "_" + this->name();
+
+    // Get the number of inputs and outputs
+    int n_in = this->n_in();
+    int n_out = this->n_out();
+
+    // Names of inputs
+    std::vector<std::string> i_names;
+    for (int i=0; i<n_in; ++i) i_names.push_back("der_" + name_in(i));
+    for (int i=0; i<n_out; ++i) i_names.push_back("der_" + name_out(i));
+    for (int d=0; d<nadj; ++d) {
+      for (int i=0; i<n_out; ++i) {
+        i_names.push_back("adj" + to_string(d) + "_" + name_out(i));
+      }
+    }
+
+    // Names of outputs
+    std::vector<std::string> o_names;
+    for (int d=0; d<nadj; ++d) {
+      for (int i=0; i<n_in; ++i) {
+        o_names.push_back("adj" + to_string(d) + "_" + name_in(i));
+      }
+    }
+
+    // Call new implementation
+    Function d = reverse_new(nadj);
+
+    // Expressions for inputs
+    vector<MX> arg = MX::get_input(d);
+    arg.resize(n_in + n_out);
+    arg.reserve(n_in + n_out + nadj*n_out);
+    for (int d=0; d<nadj; ++d) {
+      for (int i=0; i<n_out; ++i) {
+        arg.push_back(MX::sym(i_names.at(arg.size()), sparsity_out(i)));
+      }
+    }
+
+    // Argument for calling d
+    vector<MX> d_arg(arg.begin(), arg.begin() + n_in + n_out);
+    vector<MX> v(nadj);
+    for (int i=0; i<n_out; ++i) {
+      for (int d=0; d<nadj; ++d) {
+        v[d] = arg.at(n_in + n_out + d*n_out + i);
+      }
+      d_arg.push_back(horzcat(v));
+    }
+
+    // Call d
+    vector<MX> d_res = d(d_arg);
+    casadi_assert(d_res.size()==n_in);
+
+    // Expressions for outputs
+    vector<MX> res(n_in*nadj);
+    for (int i=0; i<n_in; ++i) {
+      if (size2_in(i)>0) {
+        v = horzsplit(d_res[i], size2_in(i));
+        casadi_assert(v.size()==nadj);
+      } else {
+        v = vector<MX>(nadj, MX(size_in(i)));
+      }
+      for (int d=0; d<nadj; ++d) {
+        res[d*n_in + i] = v[d];
+      }
+    }
+
+    // Construct new function
+    Dict opts = (*this)->derived_options();
+    return Function(name, arg, res, i_names, o_names, opts);
   }
 
-  void Function::set_forward(const Function& fcn, int nfwd) {
-    (*this)->set_forward(fcn, nfwd);
-  }
-
-  void Function::set_reverse(const Function& fcn, int nadj) {
-    (*this)->set_reverse(fcn, nadj);
+  Function Function::reverse_new(int nadj) {
+    return (*this)->reverse(nadj);
   }
 
   void Function::print_dimensions(ostream &stream) const {
@@ -916,33 +1138,6 @@ namespace casadi {
 
   void Function::checkInputs() const {
     return (*this)->checkInputs();
-  }
-
-  void Function::derivative(const DMVector& arg, DMVector& res,
-                          const DMVectorVector& fseed, DMVectorVector& fsens,
-                          const DMVectorVector& aseed, DMVectorVector& asens,
-                          bool always_inline, bool never_inline) {
-    call(arg, res, always_inline, never_inline);
-    forward(arg, res, fseed, fsens, always_inline, never_inline);
-    reverse(arg, res, aseed, asens, always_inline, never_inline);
-  }
-
-  void Function::derivative(const SXVector& arg, SXVector& res,
-                          const SXVectorVector& fseed, SXVectorVector& fsens,
-                          const SXVectorVector& aseed, SXVectorVector& asens,
-                          bool always_inline, bool never_inline) {
-    call(arg, res, always_inline, never_inline);
-    forward(arg, res, fseed, fsens, always_inline, never_inline);
-    reverse(arg, res, aseed, asens, always_inline, never_inline);
-  }
-
-  void Function::derivative(const MXVector& arg, MXVector& res,
-                          const MXVectorVector& fseed, MXVectorVector& fsens,
-                          const MXVectorVector& aseed, MXVectorVector& asens,
-                          bool always_inline, bool never_inline) {
-    call(arg, res, always_inline, never_inline);
-    forward(arg, res, fseed, fsens, always_inline, never_inline);
-    reverse(arg, res, aseed, asens, always_inline, never_inline);
   }
 
   string Function::name() const {
@@ -1230,11 +1425,11 @@ namespace casadi {
     return (*this)->n_nodes();
   }
 
-  int Function::checkout() {
+  int Function::checkout() const {
     return (*this)->checkout();
   }
 
-  void Function::release(int mem) {
+  void Function::release(int mem) const {
     (*this)->release(mem);
   }
 
@@ -1266,9 +1461,16 @@ namespace casadi {
      return (*this)->factory(name, s_in, s_out, aux, opts);
   }
 
+#ifdef WITH_DEPRECATED_FEATURES
   vector<bool> Function::nl_var(const string& s_in,
                                 const vector<string>& s_out) const {
     return (*this)->nl_var(s_in, s_out);
+  }
+#endif
+
+  vector<bool> Function::which_depends(const string& s_in,
+                                const vector<string>& s_out, int order, bool tr) const {
+    return (*this)->which_depends(s_in, s_out, order, tr);
   }
 
   std::vector<std::string> Function::get_function() const {
@@ -1285,6 +1487,10 @@ namespace casadi {
 
   Function Function::oracle() const {
     return (*this)->oracle();
+  }
+
+  Function Function::wrap() const {
+    return (*this)->wrap();
   }
 
 } // namespace casadi

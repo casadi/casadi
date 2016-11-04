@@ -595,67 +595,6 @@ namespace casadi {
   }
 
   template<>
-  std::vector<bool> SX::vector_depends_on(const SX &x, const SX &arg) {
-    casadi_assert(x.is_vector());
-    casadi_assert(x.is_dense());
-
-    casadi_assert(arg.is_vector());
-    casadi_assert(arg.is_dense());
-
-    // Allocate return vector
-    std::vector<bool> ret(x.numel(), false);
-
-    // Construct a temporary algorithm
-    Function temp("temp", {arg}, {x});
-
-    // Perform a single dependency sweep
-    vector<bvec_t> t_in(arg.nnz(), 1), t_out(x.nnz());
-    temp({get_ptr(t_in)}, {get_ptr(t_out)});
-
-    // Harvest the results
-    for (int k = 0; k < x.numel(); ++k) {
-      if (t_out[k]) ret[k] = true;
-    }
-
-    return ret;
-  }
-
-  template<>
-  std::vector<bool> SX::vector_linear_depends_on(const SX &x, const SX &arg) {
-    casadi_assert(x.is_vector());
-    casadi_assert(x.is_dense());
-
-    casadi_assert(arg.is_vector());
-    casadi_assert(arg.is_dense());
-
-    // Allocate return vector
-    std::vector<bool> ret(x.numel(), true);
-
-    // Construct a temporary algorithm
-    Function temp("temp", {arg}, {jacobian(x, arg).T()});
-
-    // Perform a single dependency sweep
-    vector<bvec_t> t_in(arg.nnz(), 1), t_out(x.nnz());
-    temp({get_ptr(t_in)}, {get_ptr(t_out)});
-
-    const Sparsity& sp = temp.sparsity_out(0);
-
-    // Harvest the results
-    for (int j = 0; j < x.numel(); ++j) {
-      if (sp.colind(j) != sp.colind(j+1)) {
-        for (int k = sp.colind(j); k < sp.colind(j+1); ++k) {
-          if (t_out[k]) {
-            ret[j] = false;
-            break;
-          }
-        }
-      }
-    }
-
-    return ret;
-  }
-
-  template<>
   SX SX::jacobian(const SX &ex, const SX &arg, bool symmetric) {
     Function temp("temp", {arg}, {ex});
     return SX::jac(temp, 0, 0, false, symmetric);
@@ -691,9 +630,16 @@ namespace casadi {
     return _jtimes(ex, arg, v, tr);
   }
 
+#ifdef WITH_DEPRECATED_FEATURES
   template<>
   std::vector<bool> SX::nl_var(const SX &expr, const SX &var) {
     return _nl_var(expr, var);
+  }
+#endif
+
+  template<>
+  std::vector<bool> SX::which_depends(const SX &expr, const SX &var, int order, bool tr) {
+    return _which_depends(expr, var, order, tr);
   }
 
   template<>

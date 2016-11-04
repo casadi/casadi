@@ -44,7 +44,7 @@ namespace casadi {
 
   CodeGenerator::CodeGenerator(const std::string& name, const Dict& opts) {
     // Default options
-    this->verbose = false;
+    this->verbose = true;
     this->mex = false;
     this->cpp = false;
     this->main = false;
