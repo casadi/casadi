@@ -25,10 +25,6 @@ OUTPUT_STRIP_TRAILING_WHITESPACE
 ERROR_QUIET
 )
 
-# special version number for pkg-config, use n.n.n.n where n are all numbers
-string(REGEX REPLACE "-g.*" "" PACKAGE_VERSION_PKGCONFIG "${git_describe}")
-string(REPLACE "+-" "." PACKAGE_VERSION_PKGCONFIG "${PACKAGE_VERSION_PKGCONFIG}")
-
 string(REPLACE "+-" "+" git_describe "${git_describe}")
 string(REPLACE "-g" "." git_describe "${git_describe}")
 
@@ -36,7 +32,6 @@ set(PACKAGE_VERSION_FULL "${git_describe}")
 
 # overwrite version numbers for official release
 if((PACKAGE_VERSION_FULL STREQUAL "") OR (NOT PACKAGE_VERSION MATCHES "\\+"))
-  set(PACKAGE_VERSION_PKGCONFIG "${PACKAGE_VERSION}")
   set(PACKAGE_VERSION_FULL "${PACKAGE_VERSION}")
 endif()
 
