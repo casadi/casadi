@@ -145,7 +145,7 @@ namespace casadi {
     alloc_iw(n_+1, true); // partition_
 
     alloc_w(std::max(n_+K_-2, 4*n_)+(n_-1)*K_+2*n_); // dwork_
-    alloc_w(4*K_*4, true); // A_
+    alloc_w(4*K_*4+4*K_, true); // A_
     alloc_w(4*K_, true); // B_
   }
 
@@ -173,7 +173,7 @@ namespace casadi {
     m->F = w; w += 2*2*n_*K_;
     m->FF = w; w += 2*2*K_;
 
-    m->A = w; w += 4*K_*4;
+    m->A = w; w += 4*K_*4+4*K_;
     m->B = w; w += 4*K_;
     m->dwork = w;
     m->partition = iw;
@@ -309,8 +309,6 @@ namespace casadi {
       }
     }
 
-    std::fill(m->A, m->A+4*K_*4, 1);
-
     int* partition = m->partition;
 
     // Find a block partition of the T hessenberg form
@@ -343,6 +341,7 @@ namespace casadi {
 
         // ********** START ***************
         double * A = m->A;
+        std::fill(m->A, m->A+4*K_*4+4*K_, 1);
         double * T = m->T;
         // Special case if K==1
         if (K_==1) {
@@ -366,7 +365,7 @@ namespace casadi {
               }
             }
           }
-          std::cout << "Apart" << std::vector<double>(A, A+4*4) << std::endl;
+          std::cout << "Apart" << std::vector<double>(A, A+4*4*K_+4*K_) << std::endl;
 
           for (int ll=0;ll<np;++ll) {
             for (int mm=0;mm<np;++mm) {
@@ -378,7 +377,7 @@ namespace casadi {
         // ********** STOP ***************
         // Solve Discrete Periodic Sylvester Equation Solver
 
-        std::cout << "A" << std::vector<double>(A, A+4*4) << std::endl;
+        std::cout << "A" << std::vector<double>(A, A+4*4*K_+4*K_) << std::endl;
 
         solver.pivoting(m->A);
         solver.factorize(m->A);
@@ -581,15 +580,17 @@ namespace casadi {
               }
             }
             // ********** STOP ***************
-
+            std::cout << "X" << std::vector<double>(m->X, m->X+n_*n_*K_) << std::endl;
           }
 
           // n^3 K
           std::fill(res[DPLE_P]+d*n_*n_*K_, res[DPLE_P]+(d+1)*n_*n_*K_, 0);
         }
 
-        std::fill(m->nnKa, m->nnKa+n_*n_, 0);
+        std::cout << "Xafter" << std::vector<double>(m->X, m->X+n_*n_*K_) << std::endl;
+
         for (int k=0;k<K_;++k) {
+          std::fill(m->nnKa+k*n_*n_, m->nnKa+(k+1)*n_*n_, 0);
           // nnKa[k] <- V[k]*Z[k]'
           // n^3 K
           dense_mul_nn(n_, n_, n_, m->X + k*n_*n_, m->Z+ k*n_*n_, m->nnKa+ k*n_*n_);
