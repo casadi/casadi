@@ -87,8 +87,8 @@ namespace casadi {
   }
 
   // Constructor
-  Dple::Dple(const std::string& name, const SpDict &st, int nrhs, bool transp)
-    : FunctionInternal(name), nrhs_(nrhs), transp_(transp) {
+  Dple::Dple(const std::string& name, const SpDict &st)
+    : FunctionInternal(name) {
     for (auto i=st.begin(); i!=st.end(); ++i) {
       if (i->first=="a") {
         A_ = i->second;
@@ -162,19 +162,28 @@ namespace casadi {
       }
     }
 
+    casadi_assert(V_.size2() % V_.size1() == 0);
+    nrhs_ = V_.size2() / V_.size1();
+    casadi_assert(nrhs_>=1);
+
+    std::vector<Sparsity> Vs = horzsplit(V_, V_.size1());
+    Sparsity Vref = Vs[0];
+    casadi_assert_message(Vref.is_symmetric(), "V must be symmetric but got " << Vref.dim() << ".");
+
+    for (auto&& s : Vs)
+      casadi_assert(s==Vref);
+
     casadi_assert_message(const_dim_, "Not implemented");
-    casadi_assert_message(V_.is_symmetric(), "V must be symmetric but got "
-                          << V_.dim() << ".");
 
-
-
-    int blocksize = V_.colind()[1];
-    int N = V_.size1()/blocksize;
+    int blocksize = Vref.colind()[1];
+    int N = Vref.size1()/blocksize;
     Sparsity block = Sparsity::dense(blocksize, blocksize);
 
     std::vector<Sparsity> blocks(N, block);
-    casadi_assert_message(V_==diagcat(blocks), "Structure not recognised.");
-    casadi_assert_message(A_==V_, "Structure not recognised.");
+    casadi_assert_message(Vref==diagcat(blocks), "Structure not recognised.");
+    casadi_assert_message(A_==Vref, "Structure not recognised.");
+
+
   }
 
   Dple::~Dple() {

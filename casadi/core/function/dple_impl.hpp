@@ -37,7 +37,7 @@ namespace casadi {
   public:
 
     // Constructor
-    Dple(const std::string& name, const SpDict &st, int nrhs, bool transp);
+    Dple(const std::string& name, const SpDict &st);
 
     // Destructor
     virtual ~Dple() = 0;
@@ -124,8 +124,6 @@ namespace casadi {
     /// Number of right hand sides
     int nrhs_;
 
-    /// Tranpose the system?
-    bool transp_;
   };
 
 
