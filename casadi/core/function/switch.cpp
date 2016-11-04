@@ -165,8 +165,8 @@ namespace casadi {
         const Sparsity& sp = sparsity_in(i+1);
         if (f_sp!=sp) {
           double *t = w; w += f_sp.nnz(); // t is non-const
+          casadi_project(arg1[i], sp, t, f_sp, w);
           arg1[i] = t;
-          casadi_project(arg[1+i], sp, t, f_sp, w);
         }
       }
     }
@@ -272,10 +272,19 @@ namespace casadi {
   }
 
   void Switch::generateBody(CodeGenerator& g) const {
-    // Codegen as if-else
-    bool if_else = f_.size()==1;
+    // Shorthands
+    int n_in=this->n_in()-1, n_out=this->n_out();
+
+    // Input and output buffers
+    g.body << "  int i;" << endl
+           << "  double* t;" << endl
+           << "  const double** arg1 = arg + " << (1 + n_in) << ";" << endl
+           << "  for (i=0; i<" << n_in << "; ++i) arg1[i] = arg[1+i];" << endl
+           << "  double** res1 = res + " << n_out << ";" << endl
+           << "  for (i=0; i<" << n_out << "; ++i) res1[i] = res[i];" << endl;
 
     // Codegen condition
+    bool if_else = f_.size()==1;
     g.body << "  " << (if_else ? "if" : "switch")  << " (to_int(arg[0][0])) {" << endl;
 
     // Loop over cases/functions
@@ -300,16 +309,50 @@ namespace casadi {
       const Function& fk = k1<f_.size() ? f_[k1] : f_def_;
       if (fk.is_null()) {
         g.body << "    return 1;" << endl;
+      } else if (g.simplifiedCall(fk)) {
+        casadi_error("Not implemented.");
       } else {
-        // Call function
-        if (g.simplifiedCall(fk)) {
-          casadi_error("Not implemented.");
-        } else {
-          g.body << "    if (" << g(fk, "arg+1", "res", "iw", "w") << ") return 1;" << endl;
-          if (!if_else)
-            g.body << "    break;" << endl;
-        }
-      }
+        // Project arguments with different sparsity
+        for (int i=0; i<n_in; ++i) {
+          const Sparsity& f_sp = fk.sparsity_in(i);
+          const Sparsity& sp = sparsity_in(i+1);
+          if (f_sp!=sp) {
+            g.body << "    if (arg1[" << i << "]) {" << endl
+                   << "      t = w, w += " << f_sp.nnz() << ";" << endl
+                   << "      " << g.project("arg1[" + to_string(i) + "]", sp,
+                                            "t", f_sp, "w") << endl
+                   << "      arg1[" << i << "] = t;" << endl
+                   << "    }" << endl;
+            }
+          }
+
+          // Temporary memory for results with different sparsity
+          for (int i=0; i<n_out; ++i) {
+            const Sparsity& f_sp = fk.sparsity_out(i);
+            const Sparsity& sp = sparsity_out(i);
+            if (f_sp!=sp) {
+              g.body << "    if (res1[" << i << "]) "
+                     << "res1[" << i << "] = w, w += " << f_sp.nnz() << ";" << endl;
+            }
+          }
+
+          // Function call
+          g.body << "    if (" << g(fk, "arg1", "res1", "iw", "w") << ") return 1;" << endl;
+
+          // Project results with different sparsity
+          for (int i=0; i<n_out; ++i) {
+            const Sparsity& f_sp = fk.sparsity_out(i);
+            const Sparsity& sp = sparsity_out(i);
+            if (f_sp!=sp) {
+              g.body << "    if (res[" << i << "]) "
+                     << g.project("res1[" + to_string(i) + "]", f_sp,
+                                  "res[" + to_string(i) + "]", sp, "w") << endl;
+            }
+          }
+
+          // Break (if switch)
+          if (!if_else) g.body << "    break;" << endl;
+       }
     }
 
     // End switch/else
