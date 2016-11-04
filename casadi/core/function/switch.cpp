@@ -94,61 +94,103 @@ namespace casadi {
       if (fk.is_null()) continue;
       for (int i=1; i<n_in(); ++i) {
         const Sparsity& s = fk.sparsity_in(i-1);
-        casadi_assert_message(s==sparsity_in(i), "Not implemented");
+        casadi_assert_warning(s==sparsity_in(i),
+                              "Different input sparsity patterns");
       }
       for (int i=0; i<n_out(); ++i) {
         const Sparsity& s = fk.sparsity_out(i);
-        casadi_assert_message(s==sparsity_out(i), "Not implemented");
+        casadi_assert_warning(s==sparsity_out(i),
+                              "Different output sparsity patterns");
       }
     }
+
+    // Buffer for mismatching sparsities
+    size_t sz_buf=0;
 
     // Get required work
     for (int k=0; k<=f_.size(); ++k) {
       const Function& fk = k<f_.size() ? f_[k] : f_def_;
       if (fk.is_null()) continue;
 
-      // Get local work vector sizes
+      // Memory for evaluation
       alloc(fk);
-      size_t sz_w = fk.sz_w();
+
+      // Required work vectors
+      size_t sz_buf_k=0;
 
       // Add size for input buffers
       for (int i=1; i<n_in(); ++i) {
         const Sparsity& s = fk.sparsity_in(i-1);
-        if (s!=sparsity_in(i)) sz_w += s.nnz();
+        if (s!=sparsity_in(i)) {
+          alloc_w(s.size1()); // for casadi_project
+          sz_buf_k += s.nnz();
+        }
       }
 
       // Add size for output buffers
       for (int i=0; i<n_out(); ++i) {
         const Sparsity& s = fk.sparsity_out(i);
-        if (s!=sparsity_out(i)) sz_w += s.nnz();
+        if (s!=sparsity_out(i)) {
+          alloc_w(s.size1()); // for casadi_project
+          sz_buf_k += s.nnz();
+        }
       }
 
-      // Make sure enough work for this
-      alloc_w(sz_w);
+      // Only need the largest of these work vectors
+      sz_buf = max(sz_buf, sz_buf_k);
     }
+
+    // Memory for the work vectors
+    alloc_w(sz_buf, true);
   }
 
   void Switch::eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
-    // Get conditional
-    int k = static_cast<int>(*arg[0]);
+    // Shorthands
+    int n_in=this->n_in()-1, n_out=this->n_out();
 
     // Get the function to be evaluated
+    int k = static_cast<int>(*arg[0]);
     const Function& fk = k<f_.size() ? f_[k] : f_def_;
 
-    // Input buffers
-    for (int i=1; i<n_in(); ++i) {
-      const Sparsity& s = fk.sparsity_in(i-1);
-      casadi_assert_message(s==sparsity_in(i), "Not implemented");
+    // Input and output buffers
+    const double** arg1 = arg + 1 + n_in;
+    copy_n(arg+1, n_in, arg1);
+    double** res1 = res + n_out;
+    copy_n(res, n_out, res1);
+
+    // Project arguments with different sparsity
+    for (int i=0; i<n_in; ++i) {
+      if (arg1[i]) {
+        const Sparsity& f_sp = fk.sparsity_in(i);
+        const Sparsity& sp = sparsity_in(i+1);
+        if (f_sp!=sp) {
+          double *t = w; w += f_sp.nnz(); // t is non-const
+          arg1[i] = t;
+          casadi_project(arg[1+i], sp, t, f_sp, w);
+        }
+      }
     }
 
-    // Output buffers
-    for (int i=0; i<n_out(); ++i) {
-      const Sparsity& s = fk.sparsity_out(i);
-      casadi_assert_message(s==sparsity_out(i), "Not implemented");
+    // Temporary memory for results with different sparsity
+    for (int i=0; i<n_out; ++i) {
+      if (res1[i]) {
+        const Sparsity& f_sp = fk.sparsity_out(i);
+        const Sparsity& sp = sparsity_out(i);
+        if (f_sp!=sp) res1[i] = w; w += f_sp.nnz();
+      }
     }
 
     // Evaluate the corresponding function
-    fk(arg+1, res, iw, w, 0);
+    fk(arg1, res1, iw, w, 0);
+
+    // Project results with different sparsity
+    for (int i=0; i<n_out; ++i) {
+      if (res1[i]) {
+        const Sparsity& f_sp = fk.sparsity_out(i);
+        const Sparsity& sp = sparsity_out(i);
+        if (f_sp!=sp) casadi_project(res1[i], f_sp, res[i], sp, w);
+      }
+    }
   }
 
   Function Switch
