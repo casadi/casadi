@@ -72,7 +72,7 @@ class Controltests(casadiTestCase):
     for Solver, options in dplesolvers:
       for K in ([3,4] if args.run_slow else [2,3]):
         for n in [2,3,4]:
-          print Solver, options
+          print (Solver, options)
           numpy.random.seed(1)
           print (n,K)
           A_ = [randstable(n) for i in range(K)]
@@ -116,7 +116,7 @@ class Controltests(casadiTestCase):
     for Solver, options in dplesolvers:
       for K in ([3,4] if args.run_slow else [2,3]):
         for n in [2,3,4]:
-          print Solver, options
+          print (Solver, options)
           numpy.random.seed(1)
           print (n,K)
           A_ = [randstable(n) for i in range(K)]          
