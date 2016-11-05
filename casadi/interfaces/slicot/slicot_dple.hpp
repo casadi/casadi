@@ -140,24 +140,6 @@ namespace casadi {
     /** \brief  Evaluate numerically */
     virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
 
-    ///@{
-    /** \brief Generate a function that calculates \a nfwd forward derivatives */
-    virtual Function get_forward(const std::string& name, int nfwd,
-                                 const std::vector<std::string>& i_names,
-                                 const std::vector<std::string>& o_names,
-                                 const Dict& opts);
-    virtual int get_n_forward() const { return 64;}
-    ///@}
-
-    ///@{
-    /** \brief Generate a function that calculates \a nadj adjoint derivatives */
-    virtual Function get_reverse(const std::string& name, int nadj,
-                                 const std::vector<std::string>& i_names,
-                                 const std::vector<std::string>& o_names,
-                                 const Dict& opts);
-    virtual int get_n_reverse() const { return 64;}
-    ///@}
-
     /// A documentation string
     static const std::string meta_doc;
 
@@ -166,8 +148,6 @@ namespace casadi {
   private:
     /// Dimension of state-space
     int n_;
-
-    int K_;
 
     int partindex(const SlicotDpleMemory* m, int i, int j, int k, int r, int c) const;
 

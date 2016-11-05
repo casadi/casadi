@@ -69,22 +69,30 @@ namespace casadi {
     // Initialize
     virtual void init(const Dict& opts);
 
+    ///@{
+    /** \brief Generate a function that calculates \a nfwd forward derivatives */
+    virtual Function get_forward(const std::string& name, int nfwd,
+                                 const std::vector<std::string>& i_names,
+                                 const std::vector<std::string>& o_names,
+                                 const Dict& opts);
+    virtual int get_n_forward() const { return 64;}
+    ///@}
+
+    ///@{
+    /** \brief Generate a function that calculates \a nadj adjoint derivatives */
+    virtual Function get_reverse(const std::string& name, int nadj,
+                                 const std::vector<std::string>& i_names,
+                                 const std::vector<std::string>& o_names,
+                                 const Dict& opts);
+    virtual int get_n_reverse() const { return 64;}
+    ///@}
+
     // Creator function for internal class
     typedef Dple* (*Creator)(const std::string& name,
                               const std::map<std::string, Sparsity>& st);
 
     // No static functions exposed
-    struct Exposed{
-      void (*periodic_shur)(const std::vector< Matrix<double> > & A,
-                            std::vector< Matrix<double> > & T,
-                            std::vector< Matrix<double> > & Z,
-                            std::vector<double> &eig_real,
-                            std::vector<double> &eig_imag,
-                            double num_zero);
-
-      // Constructor
-      Exposed() { periodic_shur = 0; }
-    };
+    struct Exposed{   };
 
     /// Collection of solvers
     static std::map<std::string, Plugin> solvers_;

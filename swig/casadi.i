@@ -308,11 +308,11 @@ namespace std {
 // Exceptions handling
 %include "exception.i"
 %exception {
-  try {
+  //try {
     $action
-   } catch(const std::exception& e) {
-    SWIG_exception(SWIG_RuntimeError, e.what());
-   }
+   //} catch(const std::exception& e) {
+   // SWIG_exception(SWIG_RuntimeError, e.what());
+   //}
 }
 
 // Python sometimes takes an approach to not check, but just try.

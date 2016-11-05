@@ -109,5 +109,44 @@ class Controltests(casadiTestCase):
 
           self.checkfunction(solver,refsol,inputs=inputs,failmessage=str(Solver))
     
+  @skip(not scipy_available)
+  @memory_heavy()
+  def test_dple_alt_small(self):
+    
+    for Solver, options in dplesolvers:
+      for K in ([3,4] if args.run_slow else [2,3]):
+        for n in [2,3,4]:
+          print Solver, options
+          numpy.random.seed(1)
+          print (n,K)
+          A_ = [randstable(n) for i in range(K)]          
+          V_ = [mtimes(v,v.T) for v in [DM(numpy.random.random((n,n))) for i in range(K)]]
+        
+          inputs = {"a":hcat(A_), "v": hcat(V_)}
+          
+          As = MX.sym("A",n,n*K)
+          Vs = MX.sym("V",n,n*K)
+                    
+          def sigma(a):
+            return a[1:] + [a[0]]
+            
+          def isigma(a):
+            return [a[-1]] + a[:-1]
+          
+          Vss = hcat([(i+i.T)/2 for i in isigma(list(horzsplit(Vs,n))) ])
+          
+          
+          AA = dcat([c.kron(i,i) for i in horzsplit(As,n)])
+
+          A_total = DM.eye(n*n*K) - vcat([AA[-n*n:,:],AA[:-n*n,:]])
+          
+          Pf = solve(A_total,vec(Vss),"csparse")
+          P = Pf.reshape((n,K*n))
+
+          solver = Function("solver", {"a": As,"v":Vs,"p":hcat(dplesol(horzsplit(As,n),horzsplit(Vs,n),Solver,options))},dple_in(),dple_out())          
+          refsol = Function("refsol", {"a": As,"v":Vs,"p":P},dple_in(),dple_out())
+
+          self.checkfunction(solver,refsol,inputs=inputs,failmessage=str(Solver))
+    
 if __name__ == '__main__':
     unittest.main()
