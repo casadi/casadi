@@ -76,10 +76,10 @@ namespace casadi {
     std::vector< std::vector< Linsol> > dpse_solvers;
 
     /// Constructor
-    SlicotDpleMemory() {};
+    SlicotDpleMemory() {}
 
     /// Destructor
-    ~SlicotDpleMemory() {};
+    ~SlicotDpleMemory() {}
   };
 
   /** \brief \pluginbrief{Dple,slicot}

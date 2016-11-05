@@ -403,7 +403,7 @@ namespace casadi {
     /// The dual solution corresponding to simple bounds
     CONIC_LAM_X,
     CONIC_NUM_OUT};
-    
+
   /// Input arguments of a \e dple solver [dpleIn]
   enum DpleInput {
     /// A matrices (horzcat when const_dim, diagcat otherwise) [a]
@@ -412,7 +412,7 @@ namespace casadi {
     DPLE_V,
     DPLE_NUM_IN
   };
-  
+
   /// Output arguments of a \e dple solver [dpleOut]
   enum DpleOutput {
     /// Lyapunov matrix (horzcat when const_dim, diagcat otherwise) (Cholesky of P if pos_def) [p]
