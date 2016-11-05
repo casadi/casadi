@@ -30,13 +30,18 @@
 #include "../../core/function/linsol.hpp"
 #include <casadi/interfaces/slicot/casadi_dple_slicot_export.h>
 
-/** \defgroup plugin_DpleSolver_slicot
+/** \defgroup plugin_Dple_slicot
  *
  * An efficient solver for Discrete Periodic Lyapunov Equations using SLICOT
 
  * Uses Periodic Schur Decomposition ('psd') and does not assume positive definiteness.
  * Based on Periodic Lyapunov equations: some applications and new algorithms.
  * Int. J. Control, vol. 67, pp. 69-87, 1997.
+ *
+ * Overview of the method:
+ *   J. Gillis
+ *   Practical Methods for Approximate Robust Periodic Optimal Control ofNonlinear Mechanical Systems,
+ *   PhD Thesis, KULeuven, 2015
 */
 
 /** \pluginsection{Dple,slicot} */
@@ -74,7 +79,7 @@ namespace casadi {
     SlicotDpleMemory() {};
 
     /// Destructor
-    ~SlicotDpleMemory();
+    ~SlicotDpleMemory() {};
   };
 
   /** \brief \pluginbrief{Dple,slicot}
@@ -187,22 +192,11 @@ namespace casadi {
                      double *h, int ldh1, int ldh2, double* z, int ldz1, int ldz2, double* wr,
                      double *wi, double * dwork=0, int ldwork=0);
 
-  void slicot_periodic_schur(int n, int K, const std::vector< double > & a,
-                             std::vector< double > & t, std::vector< double > & z,
-                             std::vector<double> &eig_real, std::vector<double> &eig_imag,
-                             double num_zero=0);
-
   void slicot_periodic_schur(int n, int K, const double* a,
                              double* t,  double * z,
                              double* dwork, double* eig_real,
                              double *eig_imag, double num_zero=0);
 
-  void slicot_periodic_schur(const std::vector< Matrix<double> > & a,
-                             std::vector< Matrix<double> > & t,
-                             std::vector< Matrix<double> > & z,
-                             std::vector< double > & eig_real,
-                             std::vector< double > & eig_imag,
-                             double num_zero);
 
 } // namespace casadi
 

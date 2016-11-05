@@ -87,7 +87,7 @@ namespace casadi {
   }
 
   SlicotDple::~SlicotDple() {
-
+    clear_memory();
   }
 
   void SlicotDple::init(const Dict& opts) {
