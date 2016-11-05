@@ -41,6 +41,17 @@ namespace casadi {
     return Dple::getPlugin(name).doc;
   }
 
+  MX dplesol(const MX& A, const MX& V, const std::string& solver, const Dict& opts) {
+    SpDict sp;
+    sp["a"] = A.sparsity();
+    sp["v"] = V.sparsity();
+    Function f = dplesol("dplesol", solver, sp, opts);
+    MXDict f_in;
+    f_in["a"] = A;
+    f_in["v"] = V;
+    MXDict f_out = f(f_in);
+    return f_out["p"];
+  }
   Function dplesol(const string& name, const string& solver,
                 const SpDict& st, const Dict& opts) {
     Function ret;
