@@ -94,7 +94,7 @@ namespace casadi {
 
     Dple::init(opts);
 
-    linear_solver_ = "lapacklu";
+    linear_solver_ = "csparse";
     psd_num_zero_ = 1e-12;
 
     // Read user options
@@ -233,7 +233,8 @@ namespace casadi {
   }
 
   /// \cond INTERNAL
-  inline int SlicotDple::partindex(const SlicotDpleMemory* m, int i, int j, int k, int r, int c) const {
+  inline int SlicotDple::partindex(const SlicotDpleMemory* m,
+      int i, int j, int k, int r, int c) const {
     return k*n_*n_+(m->partition[i]+r)*n_ + m->partition[j]+c;
   }
 
@@ -289,7 +290,8 @@ namespace casadi {
       }
     }
 
-    slicot_periodic_schur(n_, K_, m->X, m->T, m->Z, m->dwork, m->eig_real, m->eig_imag, psd_num_zero_);
+    slicot_periodic_schur(n_, K_, m->X, m->T, m->Z,
+      m->dwork, m->eig_real, m->eig_imag, psd_num_zero_);
 
     if (error_unstable_) {
       for (int i=0;i<n_;++i) {
@@ -342,7 +344,8 @@ namespace casadi {
         if (K_==1) {
           for (int ll=0;ll<np;++ll) {
             for (int mm=0;mm<np;++mm) {
-              A[ll*np+mm] = -T[partindex(m, r, r, 0, ll/n2, mm/n2)]*T[partindex(m, l, l, 0, ll%n2, mm%n2)];
+              A[ll*np+mm] = -T[partindex(m, r, r, 0, ll/n2, mm/n2)]*
+                             T[partindex(m, l, l, 0, ll%n2, mm%n2)];
               if (ll==mm) {
                 A[ll*np+mm]+= 1;
               }
@@ -536,7 +539,8 @@ namespace casadi {
               for (int ii=0;ii<na1;++ii) {
                 for (int jj=0;jj<nb2;++jj) {
                   for (int kk=0;kk<na2;++kk) {
-                    m->B[np*((k+1)%K_)+ii*n2+jj] += m->FF[k*4+2*ii+kk]*m->T[partindex(m, l, l, k, jj, kk)];
+                    m->B[np*((k+1)%K_)+ii*n2+jj] += m->FF[k*4+2*ii+kk]*
+                      m->T[partindex(m, l, l, k, jj, kk)];
                   }
                 }
               }

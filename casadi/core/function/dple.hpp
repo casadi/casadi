@@ -63,7 +63,8 @@ namespace casadi {
   ///@{
   CASADI_EXPORT Function dplesol(const std::string& name, const std::string& solver,
                            const SpDict& qp, const Dict& opts=Dict());
-  CASADI_EXPORT MX dplesol(const MX& A, const MX& V, const std::string& solver, const Dict& opts=Dict());
+  CASADI_EXPORT MX dplesol(const MX& A, const MX& V, const std::string& solver,
+    const Dict& opts=Dict());
   ///@}
 
   /** \brief Get input scheme of DPLE solvers */
