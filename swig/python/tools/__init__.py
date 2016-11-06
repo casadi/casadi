@@ -43,6 +43,6 @@ def loadAllCompiledPlugins():
     cls, name = k.split("::")
     print("Testing: ", cls, name)
     if cls in ("Importer",):
-      getattr(casadi,'load_'+cls.lower())(name)
-    else:
       getattr(casadi,cls).load_plugin(name)
+    else:
+      getattr(casadi,'load_'+cls.lower())(name)
