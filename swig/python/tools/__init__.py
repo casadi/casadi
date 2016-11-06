@@ -42,4 +42,7 @@ def loadAllCompiledPlugins():
   for k in CasadiMeta.getPlugins().split(";"):
     cls, name = k.split("::")
     print("Testing: ", cls, name)
-    getattr(casadi,'load_'+cls.lower())(name)
+    if cls in ("Importer",):
+      getattr(casadi,'load_'+cls.lower())(name)
+    else:
+      getattr(casadi,cls).load_plugin(name)
