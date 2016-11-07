@@ -404,6 +404,23 @@ namespace casadi {
     CONIC_LAM_X,
     CONIC_NUM_OUT};
 
+  /// Input arguments of a \e dple solver [dpleIn]
+  enum DpleInput {
+    /// A matrices (horzcat when const_dim, diagcat otherwise) [a]
+    DPLE_A,
+    /// V matrices (horzcat when const_dim, diagcat otherwise) [v]
+    DPLE_V,
+    DPLE_NUM_IN
+  };
+
+  /// Output arguments of a \e dple solver [dpleOut]
+  enum DpleOutput {
+    /// Lyapunov matrix (horzcat when const_dim, diagcat otherwise) (Cholesky of P if pos_def) [p]
+    DPLE_P,
+    /// Number of arguments.
+    DPLE_NUM_OUT
+  };
+
 #endif // SWIG
 
 } // namespace casadi

@@ -501,7 +501,7 @@ namespace casadi {
       res[i] = repsum(res[i], 1, n);
     }
     // Construct return
-    return Function(name, arg, res, (*this)->derived_options());
+    return Function(name, arg, res, name_in(), name_out(), (*this)->derived_options());
   }
 
   Function Function::map(const string& name, const string& parallelization, int n,
@@ -540,7 +540,7 @@ namespace casadi {
         res[i] = horzcat(tmp);
       }
       // Construct function
-      return Function(name, arg, res, (*this)->derived_options());
+      return Function(name, arg, res, name_in(), name_out(), (*this)->derived_options());
     }
 
     // Create Map object
