@@ -24,6 +24,7 @@
 
 
 #include "slicot_dple.hpp"
+#include "slicot_layer.hpp"
 
 #include "../../core/std_vector_tools.hpp"
 #include "../../core/function/mx_function.hpp"
@@ -32,19 +33,6 @@
 #include <cassert>
 #include <ctime>
 #include <numeric>
-
-// Need an 8-byte integer since libslicot0 is compiled with  fdefault-integer-8
-typedef long long int f_int;
-
-extern "C" {
-  int mb03vd_(f_int* n, f_int* p, f_int* ilo, f_int* ihi, double *a, f_int* lda1, f_int* lda2,
-              double* tau, f_int* ldtau, double* dwork, f_int *info);
-  int mb03vy_(f_int* n, f_int* p, f_int* ilo, f_int* ihi, double *a, f_int* lda1, f_int* lda2,
-              const double* tau, f_int* ldtau, double* dwork, f_int *ld_work, f_int *info);
-  int mb03wd_(char* job, char* compz, f_int* n, f_int* p, f_int* ilo, f_int* ihi, f_int* iloz,
-              f_int* ihiz, double *h, f_int* ldh1, f_int* ldh2, double* z, f_int* ldz1,
-              f_int* ldz2, double* wr, double *wi, double* dwork, f_int *ld_work, f_int *info);
-}
 
 using namespace std;
 namespace casadi {
@@ -81,8 +69,7 @@ namespace casadi {
   };
 
 
-  SlicotDple::
-  SlicotDple(const std::string& name, const SpDict & st) : Dple(name, st) {
+  SlicotDple::SlicotDple(const std::string& name, const SpDict & st) : Dple(name, st) {
 
   }
 
@@ -142,6 +129,8 @@ namespace casadi {
     alloc_iw(n_+1, true); // partition_
 
     alloc_w(std::max(n_+K_-2, 4*n_)+(n_-1)*K_+2*n_); // dwork_
+    alloc_w(n_*K_);
+    alloc_iw(n_*K_);
     alloc_w(4*K_*4+4*K_, true); // A_
     alloc_w(4*K_, true); // B_
   }
@@ -173,8 +162,9 @@ namespace casadi {
     m->A = w; w += 4*K_*4+4*K_;
     m->B = w; w += 4*K_;
     m->dwork = w;
-    m->partition = iw;
-
+    m->wruntime = w;
+    m->partition = iw; iw+= n_+1;
+    m->iwruntime = iw;
   }
 
 
@@ -249,6 +239,30 @@ namespace casadi {
     }
   }
 
+  //  A : n-by-l   B: m-by-l
+  //  C = A*B'
+  void dense_mul_nt_stride(int n, int m, int l, const double *A, const double *B, double *C, int strideA, int strideB, int strideC) {
+    for (int i=0;i<n;++i) {
+      for (int j=0;j<m;++j) {
+        for (int k=0;k<l;++k) {
+          C[strideC*i + j] += A[strideA*i + k]*B[strideB*j + k];
+        }
+      }
+    }
+  }
+
+  //  A : n-by-l   B: l-by-m
+  //  C = A*B
+  void dense_mul_nn_stride(int n, int m, int l, const double *A, const double *B, double *C, int strideA, int strideB, int strideC) {
+    for (int i=0;i<n;++i) {
+      for (int j=0;j<m;++j) {
+        for (int k=0;k<l;++k) {
+          C[strideC*i + j] += A[strideA*i + k]*B[strideB*k + j];
+        }
+      }
+    }
+  }
+
   //  A : n-by-l   B: l-by-m
   //  C = A*B
   void dense_mul_nn(int n, int m, int l, const double *A, const double *B, double *C) {
@@ -281,13 +295,7 @@ namespace casadi {
     setup(mem, arg, res, iw, w);
 
     // Transpose operation (after #554)
-    for (int k=0;k<K_;++k) {
-      for (int i=0;i<n_;++i) {
-        for (int j=0;j<n_;++j) {
-          m->X[k*n_*n_+i*n_+j] = arg[DPLE_A][k*n_*n_+n_*j+i];
-        }
-      }
-    }
+    casadi_trans(arg[DPLE_A], sparsity_in(DPLE_A), m->X, sparsity_in(DPLE_A), m->iwruntime);
 
     slicot_periodic_schur(n_, K_, m->X, m->T, m->Z,
       m->dwork, m->eig_real, m->eig_imag, psd_num_zero_);
@@ -418,15 +426,7 @@ namespace casadi {
           for (int j=0;j<l;++j) { // n^3
             int na2 = partition[j+1]-partition[j];
             for (int k=0;k<K_;++k) {
-              for (int ii=0;ii<na1;++ii) {
-                for (int jj=0;jj<nb2;++jj) {
-                  for (int kk=0;kk<na2;++kk) {
-                    // n^3 K
-                    m->F[k*4*n_+4*i+2*ii+jj] +=
-                        m->X[partindex(m, i, j, k, ii, kk)]*m->T[partindex(m, l, j, k, jj, kk)];
-                  }
-                }
-              }
+            dense_mul_nt_stride(na1, nb2, na2, m->X+k*n_*n_+ m->partition[i]*n_+ m->partition[j], m->T+ k*n_*n_+m->partition[l]*n_+ m->partition[j], m->F + k*4*n_+4*i, n_, n_, 2);
             }
           }
         }
@@ -447,14 +447,7 @@ namespace casadi {
             for (int j=0;j<l;++j) { // n^3
               int na2 = partition[j+1]-partition[j];
               for (int k=0;k<K_;++k) { // n^3 K
-                for (int ii=0;ii<na1;++ii) {
-                  for (int jj=0;jj<nb2;++jj) {
-                    for (int kk=0;kk<na2;++kk) {
-                      m->F[k*4*n_+4*r+2*ii+jj] +=
-                        m->X[partindex(m, r, j, k, ii, kk)]*m->T[partindex(m, l, j, k, jj, kk)];
-                    }
-                  }
-                }
+                dense_mul_nt_stride(na1, nb2, na2, m->X+k*n_*n_+ m->partition[r]*n_+ m->partition[j], m->T+ k*n_*n_+m->partition[l]*n_+ m->partition[j], m->F + k*4*n_+4*r, n_, n_, 2);
               }
             }
           }
@@ -472,14 +465,7 @@ namespace casadi {
               int nb2 = partition[l+1]-partition[l];
               int na2 = partition[i+1]-partition[i];
               for (int k=0;k<K_;++k) { // n^3 K
-                for (int ii=0;ii<na1;++ii) {
-                  for (int jj=0;jj<nb2;++jj) {
-                    for (int kk=0;kk<na2;++kk) {
-                      m->FF[k*4+2*ii+jj] +=
-                          m->T[partindex(m, r, i, k, ii, kk)]*m->X[partindex(m, i, l, k, kk, jj)];
-                    }
-                  }
-                }
+                dense_mul_nn_stride(na1, nb2, na2, m->T+ k*n_*n_+m->partition[r]*n_ + m->partition[i], m->X+k*n_*n_+m->partition[i]*n_ + m->partition[l], m->FF+k*4, n_, n_, 2);
               }
             }
           }
@@ -592,90 +578,6 @@ namespace casadi {
 
   }
 
-  void slicot_mb03vd(int n, int p, int ilo, int ihi, double * a, int lda1, int lda2, double * tau,
-                     int ldtau, double * dwork) {
-     if (dwork==0) {
-       std::vector<double> work = std::vector<double>(n);
-       slicot_mb03vd(n, p, ilo, ihi, a, lda1, lda2, tau, ldtau, &work[0]);
-       return;
-     }
-     f_int n_ = n;
-     f_int p_ = p;
-     f_int ilo_ = ilo;
-     f_int ihi_ = ihi;
-     f_int lda1_ = lda1;
-     f_int lda2_ = lda2;
-     f_int ldtau_ = ldtau;
-     f_int ret_ = 0;
-
-     mb03vd_(&n_, &p_, &ilo_, &ihi_, a, &lda1_, &lda2_, tau, &ldtau_, dwork, &ret_);
-
-     if (ret_<0) {
-       casadi_error("mb03vd wrong arguments:" << ret_);
-     } else if (ret_>0) {
-       casadi_error("mb03vd error code:" << ret_);
-     }
-
-
-  }
-
-  void slicot_mb03vy(int n, int p, int ilo, int ihi, double * a, int lda1, int lda2,
-                     const double * tau, int ldtau, double * dwork, int ldwork) {
-     if (dwork==0) {
-       std::vector<double> work = std::vector<double>(4*n);
-       slicot_mb03vy(n, p, ilo, ihi, a, lda1, lda2, tau, ldtau, &work[0], 4*n);
-       return;
-     }
-     f_int n_ = n;
-     f_int p_ = p;
-     f_int ilo_ = ilo;
-     f_int ihi_ = ihi;
-     f_int lda1_ = lda1;
-     f_int lda2_ = lda2;
-     f_int ldtau_ = ldtau;
-     f_int ldwork_ = ldwork;
-     f_int ret_=0;
-     mb03vy_(&n_, &p_, &ilo_, &ihi_, a, &lda1_, &lda2_, tau, &ldtau_, dwork, &ldwork_, &ret_);
-
-     if (ret_ < 0) {
-       casadi_error("mb03vy wrong arguments:" << ret_);
-     } else if (ret_>0) {
-       casadi_error("mb03vy error code:" << ret_);
-     }
-
-
-  }
-
-  void slicot_mb03wd(char job, char compz, int n, int p, int ilo, int ihi, int iloz, int ihiz,
-                     double *h, int ldh1, int ldh2, double* z, int ldz1, int ldz2, double* wr,
-                     double *wi, double * dwork, int ldwork) {
-      if (dwork==0) {
-       std::vector<double> work = std::vector<double>(ihi-ilo+p-1);
-       slicot_mb03wd(job, compz, n, p, ilo, ihi, iloz, ihiz, h, ldh1, ldh2, z, ldz1, ldz2, wr, wi,
-                     &work[0], ihi-ilo+p-1);
-       return;
-     }
-     f_int n_ = n;
-     f_int p_ = p;
-     f_int ilo_ = ilo;
-     f_int ihi_ = ihi;
-     f_int iloz_ = ilo;
-     f_int ihiz_ = ihi;
-     f_int ldh1_ = ldh1;
-     f_int ldh2_ = ldh2;
-     f_int ldz1_ = ldz1;
-     f_int ldz2_ = ldz2;
-     f_int ldwork_ = ldwork;
-     f_int ret_ = 0;
-     mb03wd_(&job, &compz, &n_, &p_, &ilo_, &ihi_, &iloz_, &ihiz_, h, &ldh1_, &ldh2_,
-             z, &ldz1_, &ldz2_, wr, wi, dwork, &ldwork_, &ret_);
-
-     if (ret_<0) {
-       casadi_error("mb03wd wrong arguments:" << ret_);
-     } else if (ret_>0) {
-       casadi_error("mb03wd error code:" << ret_);
-     }
-  }
 
   void slicot_periodic_schur(int n, int K, const double* a,
                              double* t,  double * z,
@@ -687,11 +589,14 @@ namespace casadi {
     // a is immutable, we need a mutable pointer, so we use available buffer
     std::copy(a, a+n*n*K, z);
 
-    slicot_mb03vd(n, K, 1, n, z, n, n, dwork+mem_base, n-1, dwork);
+    int ret;
+
+    ret = slicot_mb03vd(n, K, 1, n, z, n, n, dwork+mem_base, n-1, dwork);
+    casadi_assert_message(ret==0, "mb03vd return code "<< ret);
     std::copy(z, z+n*n*K, t);
 
-    slicot_mb03vy(n, K, 1, n, z, n, n, dwork+mem_base, n-1, dwork, mem_needed);
-
+    ret = slicot_mb03vy(n, K, 1, n, z, n, n, dwork+mem_base, n-1, dwork, mem_needed);
+    casadi_assert_message(ret==0, "mb03vy return code "<< ret);
     // Set numerical zeros to zero
     if (num_zero>0) {
       for (int k = 0;k<n*n*K;++k) {
@@ -700,8 +605,9 @@ namespace casadi {
       }
     }
 
-    slicot_mb03wd('S', 'V', n, K, 1, n, 1, n, t, n, n, z, n, n,
+    ret = slicot_mb03wd('S', 'V', n, K, 1, n, 1, n, t, n, n, z, n, n,
                   eig_real, eig_imag, dwork, mem_needed);
+    casadi_assert_message(ret==0, "mb03wd return code "<< ret);
   }
 
 } // namespace casadi

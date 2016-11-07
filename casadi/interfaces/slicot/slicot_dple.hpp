@@ -24,7 +24,7 @@
 
 
 #ifndef CASADI_SLICOT_DPLE_HPP
-#define CASADI_SLICOT_DPLEL_HPP
+#define CASADI_SLICOT_DPLE_HPP
 
 #include "../../core/function/dple_impl.hpp"
 #include "../../core/function/linsol.hpp"
@@ -69,8 +69,9 @@ namespace casadi {
     /// Temp data  FF
     /// dwork Work vector for periodic Schur form
 
-    double *VZ, *T, *Z, *X, *Xbar, *nnKa, *nnKb, *eig_real, *eig_imag, *F, *FF, *A, *B, *dwork;
-    int* partition;
+    double *VZ, *T, *Z, *X, *Xbar, *nnKa, *nnKb, *eig_real, *eig_imag, *F, *FF, *A, *B;
+    double *dwork, *wruntime;
+    int* partition, *iwruntime;
 
     /// Solvers for low-order Discrete Periodic Sylvester Equations
     std::vector< std::vector< Linsol> > dpse_solvers;
@@ -149,7 +150,7 @@ namespace casadi {
     /// Dimension of state-space
     int n_;
 
-    int partindex(const SlicotDpleMemory* m, int i, int j, int k, int r, int c) const;
+    inline int partindex(const SlicotDpleMemory* m, int i, int j, int k, int r, int c) const;
 
     /// Numerical zero, used in periodic Schur form
     double psd_num_zero_;
@@ -162,22 +163,11 @@ namespace casadi {
 
   };
 
-  void slicot_mb03vd(int n, int p, int ilo, int ihi, double * a, int lda1, int lda2, double * tau,
-                     int ldtau, double * dwork=0);
-
-  void slicot_mb03vy(int n, int p, int ilo, int ihi, double * a, int lda1, int lda2,
-                     const double * tau, int ldtau, double * dwork=0, int ldwork=0);
-
-  void slicot_mb03wd(char job, char compz, int n, int p, int ilo, int ihi, int iloz, int ihiz,
-                     double *h, int ldh1, int ldh2, double* z, int ldz1, int ldz2, double* wr,
-                     double *wi, double * dwork=0, int ldwork=0);
 
   void slicot_periodic_schur(int n, int K, const double* a,
                              double* t,  double * z,
                              double* dwork, double* eig_real,
                              double *eig_imag, double num_zero=0);
-
-
 } // namespace casadi
 
 /// \endcond
