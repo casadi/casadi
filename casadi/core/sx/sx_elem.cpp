@@ -362,36 +362,6 @@ namespace casadi {
         if (is_equal(x, y))
           return 0;
         break;
-      case OP_SINH:
-      case OP_TANH:
-      case OP_ATANH:
-      case OP_ACOSH:
-      case OP_ASINH:
-        if (x.is_zero())
-          return 0;
-        break;
-      case OP_COSH:
-        if (x.is_zero())
-          return 1;
-        break;
-      case OP_SQRT:
-        if (x.is_op(OP_SQ))
-          return fabs(x.dep());
-        break;
-      case OP_SQ:
-        if (x.is_op(OP_SQRT))
-          return x.dep();
-        else if (x.is_op(OP_NEG))
-          return sq(x.dep());
-        break;
-      case OP_FABS:
-        if (x.is_op(OP_FABS) || x.is_op(OP_SQ))
-          return x;
-        break;
-      case OP_NOT:
-        if (x.is_op(OP_NOT))
-          return x.dep();
-        break;
       case OP_IF_ELSE_ZERO:
         if (y->is_zero()) {
           return y;
@@ -408,6 +378,41 @@ namespace casadi {
   }
 
   SXElem SXElem::unary(int op, const SXElem& x) {
+    // Simplifications
+    if (GlobalOptions::simplification_on_the_fly) {
+      switch (op) {
+        case OP_SQ:
+          if (x.is_op(OP_SQRT))
+            return x.dep();
+          else if (x.is_op(OP_NEG))
+            return sq(x.dep());
+          break;
+        case OP_FABS:
+          if (x.is_op(OP_FABS) || x.is_op(OP_SQ))
+            return x;
+          break;
+        case OP_NOT:
+          if (x.is_op(OP_NOT))
+            return x.dep();
+          break;
+        case OP_SINH:
+        case OP_TANH:
+        case OP_ATANH:
+        case OP_ACOSH:
+        case OP_ASINH:
+          if (x.is_zero())
+            return 0;
+          break;
+        case OP_COSH:
+          if (x.is_zero())
+            return 1;
+          break;
+        case OP_SQRT:
+          if (x.is_op(OP_SQ))
+            return fabs(x.dep());
+          break;
+      }
+    }
     return UnarySX::create(Operation(op), x);
   }
 
@@ -655,4 +660,3 @@ namespace std {
   }
 
 } // namespace std
-
