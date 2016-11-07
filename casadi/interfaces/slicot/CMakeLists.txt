@@ -5,5 +5,6 @@ casadi_plugin(Dple slicot
   slicot_dple.cpp
   slicot_layer.cpp
   slicot_layer.hpp
+  slicot_la.hpp
   slicot_dple_meta.cpp)
 casadi_plugin_link_libraries(Dple slicot ${SLICOT_LIBRARIES})

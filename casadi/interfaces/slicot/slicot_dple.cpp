@@ -25,6 +25,7 @@
 
 #include "slicot_dple.hpp"
 #include "slicot_layer.hpp"
+#include "slicot_la.hpp"
 
 #include "../../core/std_vector_tools.hpp"
 #include "../../core/function/mx_function.hpp"
@@ -124,7 +125,6 @@ namespace casadi {
     alloc_w(2*2*n_*K_, true); // F_
     alloc_w(2*2*K_, true); // FF_
 
-
     // There can be at most n partitions
     alloc_iw(n_+1, true); // partition_
 
@@ -174,10 +174,10 @@ namespace casadi {
     auto m = static_cast<SlicotDpleMemory*>(mem);
 
     // Construct linear solvers for low-order Discrete Periodic Sylvester Equations
-    // I00X
-    // XI00
-    // 0XI0
-    // 00XI
+    // IX00
+    // 0IX0
+    // 00IX
+    // X00I
     //  Special case K=1
     // I+X
     // Solver complexity:  K
@@ -185,33 +185,9 @@ namespace casadi {
     for (int i=0;i<3;++i) {
       int np = std::pow(2, i);
 
-      Sparsity sp;
-      if (K_==1) {
-        sp = Sparsity::dense(np, np);
-      } else {
-        std::vector<int> row_ind = range(0, np*(np+1)*K_+np+1, np+1);
-        std::vector<int> col(np*(np+1)*K_);
-
-        int k = 0;
-        for (int l=0;l<np;++l) {
-          col[np*(np+1)*k+l*(np+1)] = l;
-          for (int m=0;m<np;++m) {
-            col[np*(np+1)*k+l*(np+1)+m+1] = (K_-1)*np+m;
-          }
-        }
-
-        for (k=1;k<K_;++k) {
-          for (int l=0;l<np;++l) {
-            for (int m=0;m<np;++m) {
-              col[np*(np+1)*k+l*(np+1)+m] = (k-1)*np+m;
-            }
-            col[np*(np+1)*k+l*(np+1)+np] = k*np +l;
-          }
-
-        }
-
-        sp = Sparsity(np*K_, np*K_, row_ind, col);
-      }
+      Sparsity sp = Sparsity::dense(np, np);
+      if (K_>1)
+        sp = kron(Sparsity::band(K_, -1)+Sparsity::band(K_, K_-1), sp) + Sparsity::diag(np*K_);
 
       m->dpse_solvers[i].reserve(n_*(n_+1)/2);
       for (int k=0;k<n_*(n_+1)/2;++k) {
@@ -226,67 +202,6 @@ namespace casadi {
       int i, int j, int k, int r, int c) const {
     return k*n_*n_+(m->partition[i]+r)*n_ + m->partition[j]+c;
   }
-
-  //  A : n-by-l   B: m-by-l
-  //  C = A*B'
-  void dense_mul_nt(int n, int m, int l, const double *A, const double *B, double *C) {
-    for (int i=0;i<n;++i) {
-      for (int j=0;j<m;++j) {
-        for (int k=0;k<l;++k) {
-          C[n*i + j] += A[n*i + k]*B[m*j + k];
-        }
-      }
-    }
-  }
-
-  //  A : n-by-l   B: m-by-l
-  //  C = A*B'
-  void dense_mul_nt_stride(int n, int m, int l, const double *A, const double *B, double *C, int strideA, int strideB, int strideC) {
-    for (int i=0;i<n;++i) {
-      for (int j=0;j<m;++j) {
-        for (int k=0;k<l;++k) {
-          C[strideC*i + j] += A[strideA*i + k]*B[strideB*j + k];
-        }
-      }
-    }
-  }
-
-  //  A : n-by-l   B: l-by-m
-  //  C = A*B
-  void dense_mul_nn_stride(int n, int m, int l, const double *A, const double *B, double *C, int strideA, int strideB, int strideC) {
-    for (int i=0;i<n;++i) {
-      for (int j=0;j<m;++j) {
-        for (int k=0;k<l;++k) {
-          C[strideC*i + j] += A[strideA*i + k]*B[strideB*k + j];
-        }
-      }
-    }
-  }
-
-  //  A : n-by-l   B: l-by-m
-  //  C = A*B
-  void dense_mul_nn(int n, int m, int l, const double *A, const double *B, double *C) {
-    for (int i=0;i<n;++i) {
-      for (int j=0;j<m;++j) {
-        for (int k=0;k<l;++k) {
-          C[n*i + j] += A[n*i + k]*B[l*k + j];
-        }
-      }
-    }
-  }
-
-  //  A : l-by-n   B: l-by-m
-  //  C = A'*B
-  void dense_mul_tn(int n, int m, int l, const double *A, const double *B, double *C) {
-    for (int i=0;i<n;++i) {
-      for (int j=0;j<m;++j) {
-        for (int k=0;k<l;++k) {
-          C[n*i + j] += A[l*k + i]*B[l*k + j];
-        }
-      }
-    }
-  }
-
   /// \endcond
 
   void SlicotDple::eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
@@ -313,30 +228,27 @@ namespace casadi {
       }
     }
 
-    int* partition = m->partition;
-
     // Find a block partition of the T hessenberg form
-    partition[0] = 0;int partition_i=1;
-    int i = 0;
-    int j = 0;
+    int* p = m->partition;
+    p[0] = 0;
+    int p_i = 1;
+    int i = 0, j = 0;
     while (j<n_) {
-      while (i<n_ && m->T[i+n_*j]!=0) {
-        i+=1;
-      }
+      while (i<n_ && m->T[i+n_*j]!=0) i+=1;
       j = i;
-      partition[partition_i++] = i;
+      p[p_i++] = i;
       i += 1;
     }
 
     // Main loops to loop over blocks of the block-upper triangular A
     // Outer main loop
-    for (int l=0;l<partition_i-1;++l) {
+    for (int l=0;l<p_i-1;++l) {
 
       // Inner main loop
       for (int r=0;r<l+1;++r) {
 
-        int n1 = partition[r+1]-partition[r];
-        int n2 = partition[l+1]-partition[l];
+        int n1 = p[r+1]-p[r];
+        int n2 = p[l+1]-p[l];
         int np = n1*n2;
 
         casadi_assert(n1-1+n2-1>=0);
@@ -388,12 +300,9 @@ namespace casadi {
 
     for (int d=0;d<nrhs_;++d) {
 
-      // ********** START ***************
       // V = blocks([mul([sZ[k].T, V[k], sZ[k]]) for k in range(p)])
-
       for (int k=0;k<K_;++k) { // K
-        double * nnKa = m->nnKa+k*n_*n_;
-        double * nnKb = m->nnKb+k*n_*n_;
+        double * nnKa = m->nnKa+k*n_*n_, * nnKb = m->nnKb+k*n_*n_;
         // n^2 K
 
         std::fill(nnKa, nnKa+n_*n_, 0);
@@ -405,133 +314,71 @@ namespace casadi {
         dense_mul_nn(n_, n_, n_, m->Z + ((k+1) % K_)*n_*n_, nnKa, nnKb);
       }
 
-      // ********** STOP ****************
-
       std::fill(m->X, m->X+n_*n_*K_, 0);
 
       // Main loops to loop over blocks of the block-upper triangular A
       // Outer main loop
-      for (int l=0;l<partition_i-1;++l) { // n
+      for (int l=0;l<p_i-1;++l) { // n
+        int n2 = p[l+1]-p[l];
+
         // F serves an an accumulator for intermediate summation results
         // n^2 K
         std::fill(m->F, m->F+2*2*n_*K_, 0);
 
-        // ********** START ***************
         //for i in range(l):
         //  F[i] = [sum(mul(X[i][j][k], A[l][j][k].T) for j in range(l)) for k in range(p) ]
-
-        for (int i=0;i<l;++i) { // n^2
-          int na1 = partition[i+1]-partition[i];
-          int nb2 = partition[l+1]-partition[l];
-          for (int j=0;j<l;++j) { // n^3
-            int na2 = partition[j+1]-partition[j];
-            for (int k=0;k<K_;++k) {
-            dense_mul_nt_stride(na1, nb2, na2, m->X+k*n_*n_+ m->partition[i]*n_+ m->partition[j], m->T+ k*n_*n_+m->partition[l]*n_+ m->partition[j], m->F + k*4*n_+4*i, n_, n_, 2);
-            }
-          }
+        for (int k=0;k<K_;++k) {
+          double *X = m->X+k*n_*n_, *T = m->T+ k*n_*n_;
+          for (int i=0;i<l;++i) // n^2
+            for (int j=0;j<l;++j) // n^3
+              dense_mul_nt_stride(p[i+1]-p[i], n2, p[j+1]-p[j],
+                X+ p[i]*n_+ p[j], T+p[l]*n_+ p[j], m->F + k*4*n_+4*i, n_, n_, 2);
         }
-        // ********** STOP ***************
-
-
-
 
         // Inner main loop
         for (int r=0;r<l+1;++r) { // n^2
+          int n1 = p[r+1]-p[r];
+          int np = n1*n2;
 
-          // ********** START ***************
           // F[r] = [sum(mul(X[r][j][k], A[l][j][k].T) for j in range(l)) for k in range(p) ]
-          int na1 = partition[r+1]-partition[r];
-          int nb2 = partition[l+1]-partition[l];
-
           if (r==l) {
-            for (int j=0;j<l;++j) { // n^3
-              int na2 = partition[j+1]-partition[j];
-              for (int k=0;k<K_;++k) { // n^3 K
-                dense_mul_nt_stride(na1, nb2, na2, m->X+k*n_*n_+ m->partition[r]*n_+ m->partition[j], m->T+ k*n_*n_+m->partition[l]*n_+ m->partition[j], m->F + k*4*n_+4*r, n_, n_, 2);
-              }
+            for (int k=0;k<K_;++k) { // n^3 K
+              double *X = m->X+k*n_*n_, *T = m->T+ k*n_*n_;
+              for (int j=0;j<l;++j) // n^3
+                dense_mul_nt_stride(n1, n2, p[j+1]-p[j],
+                  X+ p[r]*n_+ p[j], T+p[l]*n_+ p[j], m->F + k*4*n_+4*r, n_, n_, 2);
             }
           }
-          // ********** STOP ***************
 
-
-          // ********** START ***************
           // FF =   [sum(mul(A[r][i][k], X[i][l][k]) for i in range(r)) for k in range(p)]
           // Each entry of FF is na1-by-na2
           // n^2 K
           std::fill(m->FF, m->FF+2*2*K_, 0);
-          {
-            int na1 = partition[r+1]-partition[r];
-            for (int i=0;i<r;++i) { // n^3
-              int nb2 = partition[l+1]-partition[l];
-              int na2 = partition[i+1]-partition[i];
-              for (int k=0;k<K_;++k) { // n^3 K
-                dense_mul_nn_stride(na1, nb2, na2, m->T+ k*n_*n_+m->partition[r]*n_ + m->partition[i], m->X+k*n_*n_+m->partition[i]*n_ + m->partition[l], m->FF+k*4, n_, n_, 2);
-              }
-            }
+          for (int k=0;k<K_;++k) { // n^3 K
+            double *X = m->X+k*n_*n_, *T = m->T+ k*n_*n_;
+            for (int i=0;i<r;++i) // n^3
+              dense_mul_nn_stride(n1, n2, p[i+1]-p[i],
+                T+p[r]*n_ + p[i], X+p[i]*n_ + p[l], m->FF+k*4, n_, n_, 2);
           }
-
-
-          // ********** STOP ***************
-
-          int n1 = partition[r+1]-partition[r];
-          int n2 = partition[l+1]-partition[l];
-          int np = n1*n2;
 
           Linsol & solver = m->dpse_solvers[n1-1+n2-1][((l+1)*l)/2+r];
 
           // M <- V
-          for (int k=0;k<K_;++k) {
-            for (int ll=0;ll<n1;++ll) {
-              for (int mm=0;mm<n2;++mm) {
-                // n^2 K
-                m->B[np*((k+1)%K_)+ll*n2+mm] =
-                  m->nnKb[k*n_*n_+ (partition[r]+ll)*n_ + partition[l]+mm];
-              }
-            }
-          }
+          for (int k=0;k<K_;++k)
+            dense_copy_stride(n1, n2, m->nnKb+ k*n_*n_+ p[r]*n_ + p[l], m->B+np*((k+1)%K_), n_, n2);
 
-
-
-          // ********** START ***************
           // M+= [sum(mul(A[r][i][k], F[i][k])  for i in range(r+1)) for k in rang(p)]
-          {
-            int na1 = partition[r+1]-partition[r];
-            int nb2 = partition[l+1]-partition[l];
-
-            for (int i=0;i<r+1;++i) { // n^3
-              int na2 = partition[i+1]-partition[i];
-              for (int k=0;k<K_;++k) { // n^3 K
-                for (int ii=0;ii<na1;++ii) {
-                  for (int jj=0;jj<nb2;++jj) {
-                    for (int kk=0;kk<na2;++kk) {
-                      m->B[np*((k+1)%K_)+ii*n2+jj] +=
-                          m->T[partindex(m, r, i, k, ii, kk)]*m->F[k*4*n_+4*i+2*kk+jj];
-                    }
-                  }
-                }
-              }
-            }
+          for (int k=0;k<K_;++k) { // n^3 K
+            double *B = m->B + np*((k+1)%K_), *T = m->T+ k*n_*n_;
+            for (int i=0;i<r+1;++i) // n^3
+              dense_mul_nn_stride(n1, n2, p[i+1]-p[i],
+                T+p[r]*n_+ p[i], m->F+k*4*n_+4*i, B, n_, 2, n2);
           }
-          // ********** STOP ***************
 
-          // ********** START ***************
           // M+= [mul(FF[k], A[l][l][k].T) for k in rang(p)]
-          {
-            int na1 = partition[r+1]-partition[r];
-            int na2 = partition[l+1]-partition[l];
-            int nb2 = partition[l+1]-partition[l];
-            for (int k=0;k<K_;++k) { // n^2 K
-              for (int ii=0;ii<na1;++ii) {
-                for (int jj=0;jj<nb2;++jj) {
-                  for (int kk=0;kk<na2;++kk) {
-                    m->B[np*((k+1)%K_)+ii*n2+jj] += m->FF[k*4+2*ii+kk]*
-                      m->T[partindex(m, l, l, k, jj, kk)];
-                  }
-                }
-              }
-            }
-          }
-          // ********** STOP ***************
+          for (int k=0;k<K_;++k) // n^2 K
+            dense_mul_nt_stride(n1, n2, n2,
+              m->FF+k*4, m->T + k*n_*n_+p[l]*n_+ p[l], m->B+np*((k+1)%K_),  2, n_, n2);
 
           // Critical observation: Prepare step is not needed
           // n^2 K
@@ -539,23 +386,12 @@ namespace casadi {
 
           // Extract solution and store it in X
           double * sol = m->B;
-          // ********** START ***************
-          for (int ii=0;ii<partition[r+1]-partition[r];++ii) {
-            for (int jj=0;jj<partition[l+1]-partition[l];++jj) {
-              for (int k=0;k<K_;++k) { // n^2 K
-                m->X[partindex(m, r, l, k, ii, jj)] = sol[n1*n2*k+n2*ii+jj];
-              }
-            }
-          }
 
-          for (int ii=0;ii<partition[r+1]-partition[r];++ii) {
-            for (int jj=0;jj<partition[l+1]-partition[l];++jj) {
-              for (int k=0;k<K_;++k) { // n^2 K
-                m->X[partindex(m, l, r, k, jj, ii)] = sol[n1*n2*k+n2*ii+jj];
-              }
-            }
+          for (int k=0;k<K_;++k) {
+            double *X = m->X+ k*n_*n_, *S = sol+ n1*n2*k;
+            dense_copy_stride(p[r+1]-p[r],   p[l+1]-p[l], S, X+ p[r]*n_ + p[l],  n2, n_);
+            dense_copy_t_stride(p[r+1]-p[r], p[l+1]-p[l], S, X+ p[l]*n_ + p[r],  n2, n_);
           }
-          // ********** STOP ***************
 
         }
 
