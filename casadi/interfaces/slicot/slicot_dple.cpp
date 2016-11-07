@@ -257,37 +257,21 @@ namespace casadi {
 
         // ********** START ***************
         double * A = m->A;
-        std::fill(m->A, m->A+4*K_*4+4*K_, 1);
+        std::fill(A, A+4*K_*4+4*K_, 1);
         double * T = m->T;
-        // Special case if K==1
-        if (K_==1) {
-          for (int ll=0;ll<np;++ll) {
-            for (int mm=0;mm<np;++mm) {
-              A[ll*np+mm] = -T[partindex(m, r, r, 0, ll/n2, mm/n2)]*
-                             T[partindex(m, l, l, 0, ll%n2, mm%n2)];
-              if (ll==mm) {
-                A[ll*np+mm]+= 1;
-              }
-            }
-          }
-        } else {
-          // Other cases
-          int k;
-          for (k=0;k<K_-1;++k) {
-            for (int ll=0;ll<np;++ll) {
-              for (int mm=0;mm<np;++mm) {
-                A[np*(np+1)*((k+1)%K_)+ll*(np+1)+mm] =
-                    -T[partindex(m, r, r, k, ll/n2, mm/n2)]*T[partindex(m, l, l, k, ll%n2, mm%n2)];
-              }
-            }
+
+        if (K_==1) { // Special case if K==1
+          dense_kron_stride(np, n2, T+p[r]*n_ + p[r], T+p[l]*n_ + p[l], A, n_, n_, np);
+          for (int ll=0;ll<np;++ll)
+            A[ll*np+ll]+= 1;
+        } else { // Other cases
+          for (int k=0;k<K_-1;++k) {
+            dense_kron_stride(np, n2,
+              T+p[r]*n_ + p[r], T+p[l]*n_ + p[l], A+np*(np+1)*((k+1)%K_), n_, n_, np+1);
+            T+= n_*n_;
           }
 
-          for (int ll=0;ll<np;++ll) {
-            for (int mm=0;mm<np;++mm) {
-              A[np*(np+1)*((k+1)%K_)+ll*(np+1)+mm+1] =
-                -T[partindex(m, r, r, k, ll/n2, mm/n2)]*T[partindex(m, l, l, k, ll%n2, mm%n2)];
-            }
-          }
+          dense_kron_stride(np, n2, T+p[r]*n_ + p[r], T+p[l]*n_ + p[l], A+1, n_, n_, np+1);
         }
         // ********** STOP ***************
         // Solve Discrete Periodic Sylvester Equation Solver
