@@ -499,7 +499,15 @@ namespace casadi {
       // Solve the (possibly factorized) system
       const Function& linsol = s.get_function("linsolF");
       casadi_assert(linsol.size1_out(0)*(1+s.ns_) == NV_LENGTH_S(z));
-      linsol.linsol_solve(NV_DATA_S(z), 1 + s.ns_);
+      double* v = NV_DATA_S(z);
+
+      // Solve for undifferentiated right-hand-side
+      linsol.linsol_solve(v, 1);
+
+      // Solve for sensitivity right-hand-sides
+      if (s.ns_>0) {
+        linsol.linsol_solve(v+s.nx1_, s.ns_);
+      }
 
       return 0;
     } catch(exception& e) {
@@ -522,7 +530,15 @@ namespace casadi {
       // Solve the (possibly factorized) system
       const Function& linsolB = s.get_function("linsolB");
       casadi_assert(linsolB.size1_out(0)*(1+s.ns_) == NV_LENGTH_S(zvecB));
-      linsolB.linsol_solve(NV_DATA_S(zvecB), 1+s.ns_);
+      double* v = NV_DATA_S(zvecB);
+
+      // Solve for undifferentiated right-hand-side
+      linsolB.linsol_solve(v, 1);
+
+      // Solve for sensitivity right-hand-sides
+      if (s.ns_>0) {
+        linsolB.linsol_solve(v+s.nrx1_, s.ns_);
+      }
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "psolveB failed: " << e.what() << endl;;

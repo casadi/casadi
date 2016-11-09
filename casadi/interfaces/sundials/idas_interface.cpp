@@ -653,8 +653,13 @@ namespace casadi {
         }
       }
 
-      // Solve with multiple right-hand-sides
-      linsol.linsol_solve(v, 1 + s.ns_);
+      // Solve for undifferentiated right-hand-side
+      linsol.linsol_solve(v, 1);
+
+      // Solve for sensitivity right-hand-sides
+      if (s.ns_>0) {
+        linsol.linsol_solve(v+s.nx1_+s.nz1_, s.ns_);
+      }
 
       // Return to the original ordering
       if (s.ns_>0 && s.nz_>0) {
@@ -701,8 +706,13 @@ namespace casadi {
         }
       }
 
-      // Solve with multiple right-hand-sides
-      linsolB.linsol_solve(v, 1 + s.ns_);
+      // Solve for undifferentiated right-hand-side
+      linsolB.linsol_solve(v, 1);
+
+      // Solve for sensitivity right-hand-sides
+      if (s.ns_>0) {
+        linsolB.linsol_solve(v+s.nrx1_+s.nrz1_, s.ns_);
+      }
 
       // Return to the original ordering
       if (s.ns_>0 && s.nrz_>0) {
