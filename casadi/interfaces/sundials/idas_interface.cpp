@@ -155,15 +155,13 @@ namespace casadi {
     }
 
     // Attach functions for jacobian information
-    if (use_iterative_solver_) {
-      create_function("jtimesF",
-        {"t", "x", "z", "p", "fwd:x", "fwd:z"},
-        {"fwd:ode", "fwd:alg"});
-      if (nrx_>0) {
-        create_function("jtimesB",
-          {"t", "x", "z", "p", "rx", "rz", "rp", "fwd:rx", "fwd:rz"},
-          {"fwd:rode", "fwd:ralg"});
-      }
+    create_function("jtimesF",
+      {"t", "x", "z", "p", "fwd:x", "fwd:z"},
+      {"fwd:ode", "fwd:alg"});
+    if (nrx_>0) {
+      create_function("jtimesB",
+        {"t", "x", "z", "p", "rx", "rz", "rp", "fwd:rx", "fwd:rz"},
+        {"fwd:rode", "fwd:ralg"});
     }
 
     log("IdasInterface::init", "end");
