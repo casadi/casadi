@@ -29,7 +29,8 @@
 namespace casadi {
 
 
-  inline void dense_kron_stride(int n, int m, const double *A, const double *B, double *C, int strideA, int strideB, int strideC) {
+  inline void dense_kron_stride(int n, int m, const double *A, const double *B, double *C,
+      int strideA, int strideB, int strideC) {
     for (int i=0;i<n;++i) {
       for (int j=0;j<n;++j) {
         C[strideC*i + j] = -A[strideA*(i/m) + (j/m)]*B[strideB*(i%m) + (j%m)];
@@ -37,19 +38,8 @@ namespace casadi {
     }
   }
 
-
-  /**for (int ll=0;ll<np;++ll) {
-    for (int mm=0;mm<np;++mm) {
-      A[np*(np+1)*((k+1)%K_)+ll*(np+1)+mm] =
-          -T[partindex(m, r, r, k, ll/n2, mm/n2)]*T[partindex(m, l, l, k, ll%n2, mm%n2)];
-    }
-  }*/
-
-  //dense_kron_stride(np, n2, T+k*n_*n_+p[r]*n_ + p[r], T+k*n_*n_+p[l]*n_ + p[l], A+np*(np+1)*((k+1)%K_), n_, n_, np+1);
-
-
-
-  inline void dense_mul_nt_stride(int n, int m, int l, const double *A, const double *B, double *C, int strideA, int strideB, int strideC) {
+  inline void dense_mul_nt_stride(int n, int m, int l, const double *A, const double *B, double *C,
+      int strideA, int strideB, int strideC) {
     for (int i=0;i<n;++i) {
       for (int j=0;j<m;++j) {
         for (int k=0;k<l;++k) {
@@ -65,7 +55,8 @@ namespace casadi {
     dense_mul_nt_stride(n, m, l, A, B, C, n, m, n);
   }
 
-  inline void dense_mul_nn_stride(int n, int m, int l, const double *A, const double *B, double *C, int strideA, int strideB, int strideC) {
+  inline void dense_mul_nn_stride(int n, int m, int l, const double *A, const double *B, double *C,
+      int strideA, int strideB, int strideC) {
     for (int i=0;i<n;++i) {
       for (int j=0;j<m;++j) {
         for (int k=0;k<l;++k) {
@@ -75,7 +66,8 @@ namespace casadi {
     }
   }
 
-  inline void dense_copy_stride(int n, int m, const double *A, double *B, int strideA, int strideB) {
+  inline void dense_copy_stride(int n, int m, const double *A, double *B,
+      int strideA, int strideB) {
     for (int i=0;i<n;++i) {
       for (int j=0;j<m;++j) {
         B[strideB*i + j] = A[strideA*i+j];
@@ -83,7 +75,8 @@ namespace casadi {
     }
   }
 
-  inline void dense_copy_t_stride(int n, int m, const double *A, double *B, int strideA, int strideB) {
+  inline void dense_copy_t_stride(int n, int m, const double *A, double *B,
+      int strideA, int strideB) {
     for (int i=0;i<n;++i) {
       for (int j=0;j<m;++j) {
         B[strideB*j + i] = A[strideA*i+j];
