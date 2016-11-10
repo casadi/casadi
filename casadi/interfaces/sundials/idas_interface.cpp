@@ -644,12 +644,12 @@ namespace casadi {
 
       // Reorder by nondifferentiated x and z
       if (s.ns_>0 && s.nz_>0) {
-        casadi_copy(v+s.nx_, s.nz_, m->ztmp);
+        casadi_copy(v+s.nx_, s.nz_, m->v);
         for (int d=s.ns_; d>0; --d) {
           casadi_copy(v+d*s.nx1_, s.nx1_, v+d*(s.nx1_+s.nz1_));
         }
         for (int d=0; d<=s.ns_; ++d) {
-          casadi_copy(m->ztmp+d*s.nz1_, s.nz1_, v+d*(s.nx1_+s.nz1_)+s.nx1_);
+          casadi_copy(m->v+d*s.nz1_, s.nz1_, v+d*(s.nx1_+s.nz1_)+s.nx1_);
         }
       }
 
@@ -664,12 +664,12 @@ namespace casadi {
       // Return to the original ordering
       if (s.ns_>0 && s.nz_>0) {
         for (int d=0; d<=s.ns_; ++d) {
-          casadi_copy(v+d*(s.nx1_+s.nz1_)+s.nx1_, s.nz1_, m->ztmp+d*s.nz1_);
+          casadi_copy(v+d*(s.nx1_+s.nz1_)+s.nx1_, s.nz1_, m->v+d*s.nz1_);
         }
         for (int d=1; d<=s.ns_; ++d) {
           casadi_copy(v+d*(s.nx1_+s.nz1_), s.nx1_, v+d*s.nx1_);
         }
-        casadi_copy(m->ztmp, s.nz_, v+s.nx_);
+        casadi_copy(m->v, s.nz_, v+s.nx_);
       }
 
       return 0;
@@ -697,12 +697,12 @@ namespace casadi {
 
       // Reorder, grouping x and z for each sensitivity direction
       if (s.ns_>0 && s.nrz_>0) {
-        casadi_copy(v+s.nrx_, s.nrz_, m->ztmp);
+        casadi_copy(v+s.nrx_, s.nrz_, m->v);
         for (int d=s.ns_; d>0; --d) {
           casadi_copy(v+d*s.nrx1_, s.nrx1_, v+d*(s.nrx1_+s.nrz1_));
         }
         for (int d=0; d<=s.ns_; ++d) {
-          casadi_copy(m->ztmp+d*s.nrz1_, s.nrz1_, v+d*(s.nrx1_+s.nrz1_)+s.nrx1_);
+          casadi_copy(m->v+d*s.nrz1_, s.nrz1_, v+d*(s.nrx1_+s.nrz1_)+s.nrx1_);
         }
       }
 
@@ -717,12 +717,12 @@ namespace casadi {
       // Return to the original ordering
       if (s.ns_>0 && s.nrz_>0) {
         for (int d=0; d<=s.ns_; ++d) {
-          casadi_copy(v+d*(s.nrx1_+s.nrz1_)+s.nrx1_, s.nrz1_, m->ztmp+d*s.nrz1_);
+          casadi_copy(v+d*(s.nrx1_+s.nrz1_)+s.nrx1_, s.nrz1_, m->v+d*s.nrz1_);
         }
         for (int d=1; d<=s.ns_; ++d) {
           casadi_copy(v+d*(s.nrx1_+s.nrz1_), s.nrx1_, v+d*s.nrx1_);
         }
-        casadi_copy(m->ztmp, s.nrz_, v+s.nrx_);
+        casadi_copy(m->v, s.nrz_, v+s.nrx_);
       }
 
       return 0;
