@@ -197,7 +197,7 @@ namespace casadi {
         }
         // Augmented Jacobian-times-vector function
         Function jtimes = d->get_function(backward ? "jtimesB" : "jtimesF");
-        set_function(jtimes.forward(ns_), backward ? "jacBv" : "jacFv");
+        set_function(jtimes.forward(1), backward ? "jacBv" : "jacFv");
       }
       set_function(J);
       alloc_w(J.nnz_out(0), true);
