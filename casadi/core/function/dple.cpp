@@ -69,6 +69,32 @@ namespace casadi {
       return diagsplit(ret, ret.size1()/A.size());
   }
 
+  CASADI_EXPORT DMVector dplesol(const DMVector& A, const DMVector& V, const std::string& solver,
+    const Dict& opts) {
+      casadi_assert_message(A.size()==V.size(),
+        "dplesol: sizes of A vector (" << A.size() <<
+        ") and V vector (" << V.size() << ") must match.");
+      std::vector<DM> Adense, Vdense;
+
+      for (int i=0;i<A.size();++i) {
+        Adense.push_back(densify(A[i]));
+        Vdense.push_back(densify(V[i]));
+      }
+
+      DM Afull = diagcat(Adense);
+      DM Vfull = diagcat(Vdense);
+
+      SpDict sp;
+      sp["a"] = Afull.sparsity();
+      sp["v"] = Vfull.sparsity();
+      Function f = dplesol("dplesol", solver, sp, opts);
+      DMDict f_in;
+      f_in["a"] = Afull;
+      f_in["v"] = Vfull;
+      DMDict f_out = f(f_in);
+      return diagsplit(f_out["p"], f_out["p"].size1()/A.size());
+  }
+
   Function dplesol(const string& name, const string& solver,
                 const SpDict& st, const Dict& opts) {
     Function ret;
