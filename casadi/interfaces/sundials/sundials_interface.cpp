@@ -213,9 +213,8 @@ namespace casadi {
     // Allocate work vectors
     alloc_w(np_, true); // p
     alloc_w(nrp_, true); // rp
-    if (ns_>0) {
-      alloc_w(max(nz_, nrz_), true); // ztmp
-    }
+    alloc_w(max(nx_, nrx_), true); // xtmp
+    alloc_w(max(nz_, nrz_), true); // ztmp
   }
 
   void SundialsInterface::init_memory(void* mem) const {
@@ -351,9 +350,8 @@ namespace casadi {
     // Work vectors
     m->p = w; w += np_;
     m->rp = w; w += nrp_;
-    if (ns_>0) {
-      m->ztmp = w; w += max(nz_, nrz_);
-    }
+    m->xtmp = w; w += max(nx_, nrx_);
+    m->ztmp = w; w += max(nz_, nrz_);
     m->jac = w; w += get_function("jacF").nnz_out(0);
     if (nrx_>0) {
       m->jacB = w; w += get_function("jacB").nnz_out(0);

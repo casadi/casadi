@@ -68,6 +68,9 @@ namespace casadi {
     int qlastB, qcurB;
     double hinusedB, hlastB, hcurB, tcurB;
 
+    // Temporary for max(x,rx)
+    double *xtmp;
+
     // Temporary for max(z,rz)
     double *ztmp;
 
