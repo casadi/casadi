@@ -115,10 +115,12 @@ namespace casadi {
     }
 
     // Attach functions for jacobian information
-    create_function("jtimesF", {"t", "x", "p", "fwd:x"}, {"fwd:ode"});
-    if (nrx_>0) {
-      create_function("jtimesB",
-                      {"t", "x", "p", "rx", "rp", "fwd:rx"}, {"fwd:rode"});
+    if (newton_scheme_!=SD_DIRECT || (ns_>0 && second_order_correction_)) {
+      create_function("jtimesF", {"t", "x", "p", "fwd:x"}, {"fwd:ode"});
+      if (nrx_>0) {
+        create_function("jtimesB",
+                        {"t", "x", "p", "rx", "rp", "fwd:rx"}, {"fwd:rode"});
+      }
     }
   }
 

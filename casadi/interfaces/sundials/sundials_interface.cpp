@@ -89,7 +89,10 @@ namespace casadi {
         "A custom linear solver creator function [default: csparse]"}},
       {"linear_solver_options",
        {OT_DICT,
-        "Options to be passed to the linear solver"}}
+        "Options to be passed to the linear solver"}},
+      {"second_order_correction",
+       {OT_BOOL,
+        "Second order correction in the augmented system Jacobian [true]"}}
      }
   };
 
@@ -115,6 +118,7 @@ namespace casadi {
     steps_per_checkpoint_ = 20;
     disable_internal_warnings_ = false;
     max_multistep_order_ = 5;
+    second_order_correction_ = true;
 
     // Read options
     for (auto&& op : opts) {
@@ -146,6 +150,8 @@ namespace casadi {
         disable_internal_warnings_ = op.second;
       } else if (op.first=="max_multistep_order") {
         max_multistep_order_ = op.second;
+      } else if (op.first=="second_order_correction") {
+        second_order_correction_ = op.second;
       }
     }
 
@@ -188,9 +194,6 @@ namespace casadi {
         } else {
           J = d->getJ(backward);
         }
-        // Augmented Jacobian-times-vector function
-        Function jtimes = d->get_function(backward ? "jtimesB" : "jtimesF");
-        set_function(jtimes.forward(1), backward ? "jacBv" : "jacFv");
       }
       set_function(J);
       alloc_w(J.nnz_out(0), true);
