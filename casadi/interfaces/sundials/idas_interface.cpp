@@ -93,7 +93,7 @@ namespace casadi {
     SundialsInterface::init(opts);
 
     // Default options
-    cj_scaling_ = false;
+    cj_scaling_ = true;
     calc_ic_ = true;
     suppress_algebraic_ = false;
     max_step_size_ = 0;
