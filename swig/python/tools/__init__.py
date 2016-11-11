@@ -42,17 +42,7 @@ def loadAllCompiledPlugins():
   for k in CasadiMeta.getPlugins().split(";"):
     cls, name = k.split("::")
     print("Testing: ", cls, name)
-    if cls=='Integrator':
-      casadi.load_integrator(name)
-    elif cls=='Nlpsol':
-      casadi.load_nlpsol(name)
-    elif cls=='Conic':
-      casadi.load_conic(name)
-    elif cls=='Rootfinder':
-      casadi.load_rootfinder(name)
-    elif cls=='Linsol':
-      casadi.load_linsol(name)
-    elif cls=='Interpolant':
-      casadi.load_interpolant(name)
-    else:
+    if cls in ("Importer","XmlFile"):
       getattr(casadi,cls).load_plugin(name)
+    else:
+      getattr(casadi,'load_'+cls.lower())(name)
