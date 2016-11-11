@@ -25,7 +25,7 @@ macro(casadi_external_library name)
         RUNTIME DESTINATION casadi
       )
     endif()
-    if (WITH_MATLAB)
+    if (WITH_MATLAB OR WITH_OCTAVE)
       install(TARGETS ${name}
         LIBRARY DESTINATION .
         ARCHIVE DESTINATION .
@@ -63,4 +63,12 @@ endif()
 
 if(WITH_BUILD_DSDP AND DSDP_FOUND)
   add_subdirectory(DSDP)
+endif()
+
+if(WITH_BUILD_HPMPC AND HPMPC_FOUND)
+  add_subdirectory(hpmpc)
+endif()
+
+if(WITH_BUILD_BLASFEO AND BLASFEO_FOUND)
+  add_subdirectory(blasfeo)
 endif()

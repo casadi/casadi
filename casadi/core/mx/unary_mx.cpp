@@ -171,6 +171,9 @@ namespace casadi {
       else if (op==OP_MUL) return -dep()->getBinary(OP_MUL, y, scX, scY);
       else if (op==OP_DIV) return -dep()->getBinary(OP_DIV, y, scX, scY);
       break;
+    case OP_INV:
+      if (op==OP_MUL) return y->getBinary(OP_DIV, dep(), scY, scX);
+      break;
     case OP_TWICE:
       if (op==OP_SUB && MX::is_equal(y, dep(), maxDepth())) return dep();
       break;

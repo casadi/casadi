@@ -43,28 +43,29 @@ namespace casadi {
   ///@}
 
   /** \brief Obtain collocation interpolating matrices
-  \param tau_root  location of collocation points, as obtained from collocationPoints
+  \param tau_root  location of collocation points, as obtained from collocation_points
   \param[out] C interpolating coefficients to obtain derivatives
       Length: order+1, order + 1
 
     \verbatim
       dX/dt @collPoint(j) ~ Sum_i C[j][i]*X@collPoint(i)
     \endverbatim
-    
+
   \param[out] D interpolating coefficients to obtain end state
       Length: order+1
   */
-#ifndef SWIG
-  CASADI_EXPORT
-    void collocationInterpolators(const std::vector<double> & tau_root,
-                                  std::vector< std::vector<double> > &C,
-                                  std::vector< double > &D);
-#else // SWIG
-  CASADI_EXPORT
-    void collocationInterpolators(const std::vector<double> & tau_root,
-                                  std::vector< std::vector<double> > &OUTPUT,
-                                  std::vector< double > &OUTPUT);
-#endif // SWIG
+  CASADI_EXPORT void
+  collocation_interpolators(const std::vector<double> & tau_root,
+                            std::vector< std::vector<double> > &SWIG_OUTPUT(C),
+                            std::vector< double > &SWIG_OUTPUT(D));
+
+  /** [DEPRECATED] Use collocation_interpolators instead
+    * Note different definition of tau_root argument
+  */
+  CASADI_EXPORT void
+  collocationInterpolators(const std::vector<double> & tau_root,
+                            std::vector< std::vector<double> > &SWIG_OUTPUT(C),
+                            std::vector< double > &SWIG_OUTPUT(D));
 
   // Type of collocation points
   enum CollocationPoints {LEGENDRE, RADAU};

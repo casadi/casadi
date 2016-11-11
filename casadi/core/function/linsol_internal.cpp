@@ -50,7 +50,7 @@ namespace casadi {
   }
 
   void LinsolInternal::init_memory(void* mem) const {
-    auto m = static_cast<LinsolMemory*>(mem);
+    //auto m = static_cast<LinsolMemory*>(mem);
   }
 
   void LinsolInternal::linsol_eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem,

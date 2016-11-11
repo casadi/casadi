@@ -39,7 +39,7 @@ namespace casadi {
     plugin->creator = WorhpInterface::creator;
     plugin->name = "worhp";
     plugin->doc = WorhpInterface::meta_doc.c_str();
-    plugin->version = 30;
+    plugin->version = 31;
     return 0;
   }
 
@@ -431,9 +431,6 @@ namespace casadi {
     casadi_copy(m->worhp_o.Mu, ng_, m->lam_g);
 
     StatusMsg(&m->worhp_o, &m->worhp_w, &m->worhp_p, &m->worhp_c);
-
-    // Show statistics
-    if (print_time_)  print_fstats(m);
 
     m->return_code = m->worhp_c.status;
     m->return_status = return_codes(m->worhp_c.status);

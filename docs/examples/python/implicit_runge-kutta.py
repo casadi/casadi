@@ -26,21 +26,21 @@ from casadi import *
 import numpy as N
 import matplotlib.pyplot as plt
 
-"""
+'''
 Demonstration on how to construct a fixed-step implicit Runge-Kutta integrator
 @author: Joel Andersson, K.U. Leuven 2013
-"""
+'''
 
 # End time
-tf = 10.0  
+tf = 10.0
 
 # Dimensions
 nx = 3
 np = 1
 
 # Declare variables
-x  = SX.sym("x", nx)  # state
-p  = SX.sym("u", np)  # control
+x  = SX.sym('x', nx)  # state
+p  = SX.sym('u', np)  # control
 
 # ODE right hand side function
 ode = vertcat((1 - x[1]*x[1])*x[0] - x[1] + p, \
@@ -50,7 +50,7 @@ dae = {'x':x, 'p':p, 'ode':ode}
 f = Function('f', [x, p], [ode])
 
 # Number of finite elements
-n = 100     
+n = 100
 
 # Size of the finite elements
 h = tf/n
@@ -59,7 +59,7 @@ h = tf/n
 d = 4
 
 # Choose collocation points
-tau_root = [0] + collocation_points(d, "legendre")
+tau_root = [0] + collocation_points(d, 'legendre')
 
 # Coefficients of the collocation equation
 C = N.zeros((d+1,d+1))
@@ -68,8 +68,8 @@ C = N.zeros((d+1,d+1))
 D = N.zeros(d+1)
 
 # Dimensionless time inside one control interval
-tau = SX.sym("tau")
-  
+tau = SX.sym('tau')
+
 # For all collocation points
 for j in range(d+1):
   # Construct Lagrange polynomials to get the polynomial basis at the collocation point
@@ -78,7 +78,7 @@ for j in range(d+1):
     if r != j:
       L *= (tau-tau_root[r])/(tau_root[j]-tau_root[r])
   lfcn = Function('lfcn', [tau], [L])
-  
+
   # Evaluate the polynomial at the final time to get the coefficients of the continuity equation
   D[j] = lfcn(1.0)
 
@@ -88,9 +88,9 @@ for j in range(d+1):
     C[j,r], _ = tfcn(tau_root[r])
 
 # Total number of variables for one finite element
-X0 = MX.sym("X0",nx)
-P  = MX.sym("P",np)
-V = MX.sym("V",d*nx)
+X0 = MX.sym('X0',nx)
+P  = MX.sym('P',np)
+V = MX.sym('V',d*nx)
 
 # Get the state at each collocation point
 X = [X0] + vertsplit(V,[r*nx for r in range(d+1)])
@@ -102,7 +102,7 @@ for j in range(1,d+1):
   xp_j = 0
   for r in range (d+1):
     xp_j += C[r,j]*X[r]
-      
+
   # Append collocation equations
   f_j = f(X[j],P)
   V_eq.append(h*f_j - xp_j)
@@ -117,7 +117,7 @@ vfcn = Function('vfcn', [V, X0, P], [V_eq])
 vfcn_sx = vfcn.expand()
 
 # Create a implicit function instance to solve the system of equations
-ifcn = rootfinder("ifcn", "newton", vfcn_sx, {"linear_solver":"csparse"})
+ifcn = rootfinder('ifcn', 'newton', vfcn_sx, {'linear_solver':'csparse'})
 V = ifcn(MX(),X0,P)
 X = [X0 if r==0 else V[(r-1)*nx:r*nx] for r in range(d+1)]
 
@@ -125,7 +125,7 @@ X = [X0 if r==0 else V[(r-1)*nx:r*nx] for r in range(d+1)]
 XF = 0
 for r in range(d+1):
   XF += D[r]*X[r]
-  
+
 # Get the discrete time dynamics
 F = Function('F', [X0,P],[XF])
 
@@ -135,52 +135,47 @@ for i in range(n):
   X = F(X,P)
 
 # Fixed-step integrator
-irk_integrator = Function("irk_integrator", {"x0":X0, "p":P, "xf":X},
+irk_integrator = Function('irk_integrator', {'x0':X0, 'p':P, 'xf':X},
                           integrator_in(), integrator_out())
 
 # Create a convensional integrator for reference
-ref_integrator = integrator("ref_integrator", "cvodes", dae, {"tf":tf})
+ref_integrator = integrator('ref_integrator', 'cvodes', dae, {'tf':tf})
 
 # Test values
 x0_val  = N.array([0,1,0])
 p_val = 0.2
 
 # Make sure that both integrators give consistent results
-for integrator in (irk_integrator,ref_integrator):
-  print("-------")
-  print("Testing ", integrator.name())
-  print("-------")
+for F in (irk_integrator,ref_integrator):
+  print('-------')
+  print('Testing ' + F.name())
+  print('-------')
 
-  # Generate a new function that calculates two forward directions and one adjoint direction
-  dintegrator = integrator.derivative(2,1)
+  # Generate a new function that calculates forward and reverse directional derivatives
+  dF = F.factory('dF', ['x0', 'p', 'fwd:x0', 'fwd:p', 'adj:xf'],
+                       ['xf', 'fwd:xf', 'adj:x0', 'adj:p']);
   arg = {}
 
   # Pass arguments
-  arg["der_x0"] = x0_val
-  arg["der_p"] = p_val
-  
-  # Forward sensitivity analysis, first direction: seed p
-  arg["fwd0_x0"] = 0
-  arg["fwd0_p"] = 1
-  
-  # Forward sensitivity analysis, second direction: seed x0[0]
-  arg["fwd1_x0"] = [1,0,0]
-  arg["fwd1_p"] = 0
-  
+  arg['x0'] = x0_val
+  arg['p'] = p_val
+
+  # Forward sensitivity analysis, first direction: seed p and x0[0]
+  arg['fwd_x0'] = [1,0,0]
+  arg['fwd_p'] = 1
+
   # Adjoint sensitivity analysis, seed xf[2]
-  arg["adj0_xf"] = [0,0,1]
+  arg['adj_xf'] = [0,0,1]
 
   # Integrate
-  res = dintegrator(**arg)
+  res = dF(**arg)
 
   # Get the nondifferentiated results
-  print("%15s = " % "xf", res["der_xf"])
+  print('%30s = %s' % ('xf', res['xf']))
 
   # Get the forward sensitivities
-  print("%15s = " % "d(xf)/d(p)", res["fwd0_xf"])
-  print("%15s = " % "d(xf)/d(x0[0])", res["fwd1_xf"])
+  print('%30s = %s' % ('d(xf)/d(p)+d(xf)/d(x0[0])', res['fwd_xf']))
 
   # Get the adjoint sensitivities
-  print("%15s = " % "d(xf[2])/d(x0)", res["adj0_x0"])
-  print("%15s = " % "d(xf[2])/d(p)", res["adj0_p"])
-
+  print('%30s = %s' % ('d(xf[2])/d(x0)', res['adj_x0']))
+  print('%30s = %s' % ('d(xf[2])/d(p)', res['adj_p']))

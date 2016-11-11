@@ -139,3 +139,8 @@ if (QPOASES_FOUND)
   add_executable(lowlevel_qp lowlevel_qp.cpp)
   target_link_libraries(lowlevel_qp casadi)
 endif()
+
+if(BLOCKSQP_FOUND)
+  add_executable(test_blocksqp test_blocksqp.cpp)
+  target_link_libraries(test_blocksqp casadi)
+endif()

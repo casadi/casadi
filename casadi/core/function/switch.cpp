@@ -85,185 +85,152 @@ namespace casadi {
   }
 
   void Switch::init(const Dict& opts) {
-    // Initialize the functions, get input and output sparsities
-    // Input and output sparsities
-    std::vector<Sparsity> sp_in, sp_out;
-    int num_in = -1, num_out=-1;
-    for (int k=0; k<=f_.size(); ++k) {
-      Function& fk = k<f_.size() ? f_[k] : f_def_;
-      if (fk.is_null()) continue;
-      if (num_in<0) {
-        // Number of inputs and outputs
-        num_in=fk.n_in();
-        num_out=fk.n_out();
-        // Output sparsity
-        sp_out.resize(num_out);
-        for (int i=0; i<num_out; ++i) sp_out[i] = fk.sparsity_out(i);
-        // Input sparsity
-        sp_in.resize(num_in);
-        for (int i=0; i<num_in; ++i) sp_in[i] = fk.sparsity_in(i);
-      } else {
-        // Assert matching number of inputs and outputs
-        casadi_assert(num_in==fk.n_in());
-        casadi_assert(num_out==fk.n_out());
-        // Intersect with output sparsity
-        for (int i=0; i<num_out; ++i) {
-          sp_out[i] = sp_out[i].intersect(fk.sparsity_out(i));
-        }
-        // Intersect with input sparsity
-        for (int i=0; i<num_in; ++i) {
-          sp_in[i] = sp_in[i].intersect(fk.sparsity_in(i));
-        }
-      }
-    }
-
-    // Illegal to pass only "null" functions
-    casadi_assert_message(num_in>=0, "All functions are null");
-
     // Call the initialization method of the base class
     FunctionInternal::init(opts);
+
+    // Buffer for mismatching sparsities
+    size_t sz_buf=0;
 
     // Get required work
     for (int k=0; k<=f_.size(); ++k) {
       const Function& fk = k<f_.size() ? f_[k] : f_def_;
       if (fk.is_null()) continue;
 
-      // Get local work vector sizes
+      // Memory for evaluation
       alloc(fk);
-      size_t sz_w = fk.sz_w();
+
+      // Required work vectors
+      size_t sz_buf_k=0;
 
       // Add size for input buffers
       for (int i=1; i<n_in(); ++i) {
         const Sparsity& s = fk.sparsity_in(i-1);
-        if (s!=sparsity_in(i)) sz_w += s.nnz();
+        if (s!=sparsity_in(i)) {
+          alloc_w(s.size1()); // for casadi_project
+          sz_buf_k += s.nnz();
+        }
       }
 
       // Add size for output buffers
       for (int i=0; i<n_out(); ++i) {
         const Sparsity& s = fk.sparsity_out(i);
-        if (s!=sparsity_out(i)) sz_w += s.nnz();
+        if (s!=sparsity_out(i)) {
+          alloc_w(s.size1()); // for casadi_project
+          sz_buf_k += s.nnz();
+        }
       }
 
-      // Make sure enough work for this
-      alloc_w(sz_w);
+      // Only need the largest of these work vectors
+      sz_buf = max(sz_buf, sz_buf_k);
     }
+
+    // Memory for the work vectors
+    alloc_w(sz_buf, true);
   }
 
   void Switch::eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
-    // Get conditional
-    int k = static_cast<int>(*arg[0]);
+    // Shorthands
+    int n_in=this->n_in()-1, n_out=this->n_out();
 
     // Get the function to be evaluated
+    int k = static_cast<int>(*arg[0]);
     const Function& fk = k<f_.size() ? f_[k] : f_def_;
 
-    // Input buffers
-    for (int i=1; i<n_in(); ++i) {
-      const Sparsity& s = fk.sparsity_in(i-1);
-      casadi_assert_message(s==sparsity_in(i), "Not implemented");
+    // Input and output buffers
+    const double** arg1 = arg + 1 + n_in;
+    copy_n(arg+1, n_in, arg1);
+    double** res1 = res + n_out;
+    copy_n(res, n_out, res1);
+
+    // Project arguments with different sparsity
+    for (int i=0; i<n_in; ++i) {
+      if (arg1[i]) {
+        const Sparsity& f_sp = fk.sparsity_in(i);
+        const Sparsity& sp = sparsity_in(i+1);
+        if (f_sp!=sp) {
+          double *t = w; w += f_sp.nnz(); // t is non-const
+          casadi_project(arg1[i], sp, t, f_sp, w);
+          arg1[i] = t;
+        }
+      }
     }
 
-    // Output buffers
-    for (int i=0; i<n_out(); ++i) {
-      const Sparsity& s = fk.sparsity_out(i);
-      casadi_assert_message(s==sparsity_out(i), "Not implemented");
+    // Temporary memory for results with different sparsity
+    for (int i=0; i<n_out; ++i) {
+      if (res1[i]) {
+        const Sparsity& f_sp = fk.sparsity_out(i);
+        const Sparsity& sp = sparsity_out(i);
+        if (f_sp!=sp) res1[i] = w; w += f_sp.nnz();
+      }
     }
 
     // Evaluate the corresponding function
-    fk(arg+1, res, iw, w, 0);
+    fk(arg1, res1, iw, w, 0);
+
+    // Project results with different sparsity
+    for (int i=0; i<n_out; ++i) {
+      if (res1[i]) {
+        const Sparsity& f_sp = fk.sparsity_out(i);
+        const Sparsity& sp = sparsity_out(i);
+        if (f_sp!=sp) casadi_project(res1[i], f_sp, res[i], sp, w);
+      }
+    }
   }
 
   Function Switch
-  ::get_forward_old(const std::string& name, int nfwd, Dict& opts) {
+  ::get_forward(const std::string& name, int nfwd,
+                const std::vector<std::string>& i_names,
+                const std::vector<std::string>& o_names, const Dict& opts) {
     // Derivative of each case
     vector<Function> der(f_.size());
     for (int k=0; k<f_.size(); ++k) {
-      if (!f_[k].is_null()) der[k] = f_[k].forward(nfwd);
+      if (!f_[k].is_null()) der[k] = f_[k].forward_new(nfwd);
     }
 
     // Default case
     Function der_def;
-    if (!f_def_.is_null()) der_def = f_def_.forward(nfwd);
+    if (!f_def_.is_null()) der_def = f_def_.forward_new(nfwd);
 
     // New Switch for derivatives
-    stringstream ss;
-    ss << "fwd" << nfwd << "_" << name_;
-    Function sw = Function::conditional(ss.str(), der, der_def);
+    Function sw = Function::conditional("switch_" + name, der, der_def);
 
-    // Construct wrapper inputs and arguments for calling sw
-    vector<MX> arg = mx_in();
-    vector<MX> res = mx_out();
-    vector<vector<MX> > seed = symbolicFwdSeed(nfwd, arg);
-    // Wrapper input being constructed
-    vector<MX> w_in = arg;
-    w_in.insert(w_in.end(), res.begin(), res.end());
-    // Arguments for calling sw being constructed
-    vector<MX> v;
-    v.insert(v.end(), arg.begin(), arg.end());
-    v.insert(v.end(), res.begin(), res.end());
-    for (int d=0; d<nfwd; ++d) {
-      // ignore seed for ind
-      seed[d][0] = MX::sym(seed[d][0].name(), Sparsity::scalar(false));
-      // Add to wrapper input
-      w_in.insert(w_in.end(), seed[d].begin(), seed[d].end());
-      // Add to sw argument vector
-      v.insert(v.end(), seed[d].begin()+1, seed[d].end());
-    }
+    // Get expressions for the derivative switch
+    vector<MX> arg = sw.mx_in();
+    vector<MX> res = sw(arg);
+
+    // Ignore seed for ind
+    arg.insert(arg.begin() + n_in() + n_out(), MX(1, nfwd));
 
     // Create wrapper
-    casadi_assert(v.size()==sw.n_in());
-    return Function(name, w_in, sw(v), opts);
+    return Function(name, arg, res, i_names, o_names, opts);
   }
 
   Function Switch
-  ::get_reverse_old(const std::string& name, int nadj, Dict& opts) {
+  ::get_reverse(const std::string& name, int nadj,
+                const std::vector<std::string>& i_names,
+                const std::vector<std::string>& o_names, const Dict& opts) {
     // Derivative of each case
     vector<Function> der(f_.size());
     for (int k=0; k<f_.size(); ++k) {
-      if (!f_[k].is_null()) der[k] = f_[k].reverse(nadj);
+      if (!f_[k].is_null()) der[k] = f_[k].reverse_new(nadj);
     }
 
     // Default case
     Function der_def;
-    if (!f_def_.is_null()) der_def = f_def_.reverse(nadj);
+    if (!f_def_.is_null()) der_def = f_def_.reverse_new(nadj);
 
     // New Switch for derivatives
-    stringstream ss;
-    ss << "adj" << nadj << "_" << name_;
-    Function sw = Function::conditional(ss.str(), der, der_def);
+    Function sw = Function::conditional("switch_" + name, der, der_def);
 
-    // Construct wrapper inputs and arguments for calling sw
-    vector<MX> arg = mx_in();
-    vector<MX> res = mx_out();
-    vector<vector<MX> > seed = symbolicAdjSeed(nadj, res);
-    vector<MX> w_in = arg;
-    w_in.insert(w_in.end(), res.begin(), res.end());
-    // Arguments for calling sw being constructed
-    vector<MX> v;
-    v.push_back(arg.at(0)); // index
-    for (int d=0; d<nadj; ++d) {
-      // Add to wrapper input
-      w_in.insert(w_in.end(), seed[d].begin(), seed[d].end());
-      // Add to sw argument vector
-      v.insert(v.end(), arg.begin()+1, arg.end());
-      v.insert(v.end(), res.begin(), res.end());
-      v.insert(v.end(), seed[d].begin(), seed[d].end());
-    }
+    // Get expressions for the derivative switch
+    vector<MX> arg = sw.mx_in();
+    vector<MX> res = sw(arg);
 
-    // Construct wrapper outputs
-    casadi_assert(v.size()==sw.n_in());
-    v = sw(v);
-    vector<MX> w_out;
-    MX ind_sens = MX(1, 1); // no dependency on index
-    vector<MX>::const_iterator v_it = v.begin(), v_it_next;
-    for (int d=0; d<nadj; ++d) {
-      w_out.push_back(ind_sens);
-      v_it_next = v_it + (n_in()-1);
-      w_out.insert(w_out.end(), v_it, v_it_next);
-      v_it = v_it_next;
-    }
+    // No derivatives with respect to index
+    res.insert(res.begin(), MX(1, nadj));
 
     // Create wrapper
-    return Function(name, w_in, w_out, opts);
+    return Function(name, arg, res, i_names, o_names, opts);
   }
 
   void Switch::print(ostream &stream) const {
@@ -289,10 +256,19 @@ namespace casadi {
   }
 
   void Switch::generateBody(CodeGenerator& g) const {
-    // Codegen as if-else
-    bool if_else = f_.size()==1;
+    // Shorthands
+    int n_in=this->n_in()-1, n_out=this->n_out();
+
+    // Input and output buffers
+    g.body << "  int i;" << endl
+           << "  double* t;" << endl
+           << "  const double** arg1 = arg + " << (1 + n_in) << ";" << endl
+           << "  for (i=0; i<" << n_in << "; ++i) arg1[i] = arg[1+i];" << endl
+           << "  double** res1 = res + " << n_out << ";" << endl
+           << "  for (i=0; i<" << n_out << "; ++i) res1[i] = res[i];" << endl;
 
     // Codegen condition
+    bool if_else = f_.size()==1;
     g.body << "  " << (if_else ? "if" : "switch")  << " (to_int(arg[0][0])) {" << endl;
 
     // Loop over cases/functions
@@ -317,16 +293,50 @@ namespace casadi {
       const Function& fk = k1<f_.size() ? f_[k1] : f_def_;
       if (fk.is_null()) {
         g.body << "    return 1;" << endl;
+      } else if (g.simplifiedCall(fk)) {
+        casadi_error("Not implemented.");
       } else {
-        // Call function
-        if (g.simplifiedCall(fk)) {
-          casadi_error("Not implemented.");
-        } else {
-          g.body << "    if (" << g(fk, "arg+1", "res", "iw", "w") << ") return 1;" << endl;
-          if (!if_else)
-            g.body << "    break;" << endl;
-        }
-      }
+        // Project arguments with different sparsity
+        for (int i=0; i<n_in; ++i) {
+          const Sparsity& f_sp = fk.sparsity_in(i);
+          const Sparsity& sp = sparsity_in(i+1);
+          if (f_sp!=sp) {
+            g.body << "    if (arg1[" << i << "]) {" << endl
+                   << "      t = w, w += " << f_sp.nnz() << ";" << endl
+                   << "      " << g.project("arg1[" + to_string(i) + "]", sp,
+                                            "t", f_sp, "w") << endl
+                   << "      arg1[" << i << "] = t;" << endl
+                   << "    }" << endl;
+            }
+          }
+
+          // Temporary memory for results with different sparsity
+          for (int i=0; i<n_out; ++i) {
+            const Sparsity& f_sp = fk.sparsity_out(i);
+            const Sparsity& sp = sparsity_out(i);
+            if (f_sp!=sp) {
+              g.body << "    if (res1[" << i << "]) "
+                     << "res1[" << i << "] = w, w += " << f_sp.nnz() << ";" << endl;
+            }
+          }
+
+          // Function call
+          g.body << "    if (" << g(fk, "arg1", "res1", "iw", "w") << ") return 1;" << endl;
+
+          // Project results with different sparsity
+          for (int i=0; i<n_out; ++i) {
+            const Sparsity& f_sp = fk.sparsity_out(i);
+            const Sparsity& sp = sparsity_out(i);
+            if (f_sp!=sp) {
+              g.body << "    if (res[" << i << "]) "
+                     << g.project("res1[" + to_string(i) + "]", f_sp,
+                                  "res[" + to_string(i) + "]", sp, "w") << endl;
+            }
+          }
+
+          // Break (if switch)
+          if (!if_else) g.body << "    break;" << endl;
+       }
     }
 
     // End switch/else

@@ -67,6 +67,10 @@ namespace casadi {
   }
 
   DM Linsol::solve(const DM& A, const DM& B, bool tr) {
+    casadi_assert_message(A.size1()==B.size1(),
+      "Linsol::solve: Dimension mismatch. A and b must have matching row count." <<
+      " Got " << A.dim() << " and " << B.dim() << ".");
+
     // Set sparsity
     reset(A.sparsity());
 

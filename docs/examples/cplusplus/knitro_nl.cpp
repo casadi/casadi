@@ -29,13 +29,13 @@
  * This example demonstrates how NL-files, which can be generated
  * by AMPl or Pyomo, can be imported in CasADi and solved using
  * e.g. the interface to AMPL
- 
+
  \author Joel Andersson, Vyacheslav Kungurtsev
  \date 2013
 */
-  
+
 using namespace casadi;
- 
+
 int main(int argc, char **argv){
 
   // Get the problem
@@ -43,17 +43,15 @@ int main(int argc, char **argv){
 
   // Parse an NL-file
   NlpBuilder nl;
-  nl.parse_nl(problem);
-
-  // NLP
-  SXDict nlp = {{"x", nl.x}, {"f", nl.f}, {"g", nl.g}};
+  nl.import_nl(problem);
 
   // Set options
   Dict opts;
+  opts["expand"] = true;
   // opts["verbose"] = true;
 
   // Allocate NLP solver and buffers
-  Function solver = nlpsol("nlpsol", "knitro", nlp, opts);
+  Function solver = nlpsol("nlpsol", "knitro", nl, opts);
   std::map<std::string, DM> arg, res;
 
   // Structure with bounds and initial guess

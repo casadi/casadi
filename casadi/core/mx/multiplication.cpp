@@ -46,7 +46,7 @@ namespace casadi {
   }
 
   std::string Multiplication::print(const std::vector<std::string>& arg) const {
-    return "(" + arg.at(0) + "+mtimes(" + arg.at(1) + ", " + arg.at(2) + "))";
+    return "mac(" + arg.at(1) + "," + arg.at(2) + "," + arg.at(0) + ")";
   }
 
   void Multiplication::eval(const double** arg, double** res, int* iw, double* w, int mem) const {

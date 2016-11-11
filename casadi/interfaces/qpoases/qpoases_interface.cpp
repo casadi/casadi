@@ -38,7 +38,7 @@ namespace casadi {
     plugin->creator = QpoasesInterface::creator;
     plugin->name = "qpoases";
     plugin->doc = QpoasesInterface::meta_doc.c_str();
-    plugin->version = 30;
+    plugin->version = 31;
     return 0;
   }
 
@@ -61,14 +61,14 @@ namespace casadi {
      {{"sparse",
        {OT_BOOL,
         "Formulate the QP using sparse matrices. [false]"}},
-      {"shur",
+      {"schur",
        {OT_BOOL,
         "Use Schur Complement Approach [false]"}},
       {"hessian_type",
        {OT_STRING,
         "Type of Hessian - see qpOASES documentation "
         "[UNKNOWN|posdef|semidef|indef|zero|identity]]"}},
-      {"max_shur",
+      {"max_schur",
        {OT_INT,
         "Maximal number of Schur updates [75]"}},
       {"linsol_plugin",
@@ -171,7 +171,10 @@ namespace casadi {
         "Tolerance for linear independence tests."}},
       {"epsNZCTests",
        {OT_DOUBLE,
-        "Tolerance for nonzero curvature tests."}}
+        "Tolerance for nonzero curvature tests."}},
+      {"enableInertiaCorrection",
+       {OT_BOOL,
+        "Should working set be repaired when negative curvature is discovered during hotstart."}}
      }
   };
 
@@ -180,9 +183,9 @@ namespace casadi {
 
     // Default options
     sparse_ = false;
-    shur_ = false;
+    schur_ = false;
     hess_ = qpOASES::HessianType::HST_UNKNOWN;
-    max_shur_ = 75;
+    max_schur_ = 75;
     max_nWSR_ = 5 *(nx_ + na_);
     max_cputime_ = -1;
     ops_.setToDefault();
@@ -192,8 +195,8 @@ namespace casadi {
     for (auto&& op : opts) {
       if (op.first=="sparse") {
         sparse_ = op.second;
-      } else if (op.first=="shur") {
-        shur_=  op.second;
+      } else if (op.first=="schur") {
+        schur_=  op.second;
       } else if (op.first=="hessian_type") {
         string h = op.second;
         if (h=="unknown") {
@@ -211,8 +214,8 @@ namespace casadi {
         } else {
           casadi_error("Unknown Hessian type \"" + h + "\"");
         }
-      } else if (op.first=="max_shur") {
-        max_shur_ = op.second;
+      } else if (op.first=="max_schur") {
+        max_schur_ = op.second;
       } else if (op.first=="linsol_plugin") {
         linsol_plugin_ = string(op.second);
       } else if (op.first=="nWSR") {
@@ -275,11 +278,13 @@ namespace casadi {
         ops_.epsLITests = op.second;
       } else if (op.first=="epsNZCTests") {
         ops_.epsNZCTests = op.second;
+      } else if (op.first=="enableInertiaCorrection") {
+        ops_.enableInertiaCorrection = to_BooleanType(op.second);
       }
     }
 
     // Create linear solver
-    if (shur_) {
+    if (schur_) {
       linsol_ = Linsol("linsol", linsol_plugin_);
     }
 
@@ -305,8 +310,8 @@ namespace casadi {
 
     // Create qpOASES instance
     if (m->qp) delete m->qp;
-    if (shur_) {
-      m->sqp = new qpOASES::SQProblemSchur(nx_, na_, hess_, max_shur_,
+    if (schur_) {
+      m->sqp = new qpOASES::SQProblemSchur(nx_, na_, hess_, max_schur_,
         mem, qpoases_init, qpoases_sfact, qpoases_nfact, qpoases_solve);
     } else if (na_==0) {
       m->qp = new qpOASES::QProblemB(nx_, hess_);
@@ -778,7 +783,7 @@ namespace casadi {
     }
   }
 
-  QpoasesMemory::QpoasesMemory(const QpoasesInterface& self) : self(self) {
+  QpoasesMemory::QpoasesMemory(const Linsol& linsol) : linsol(linsol) {
     this->qp = 0;
     this->h = 0;
     this->a = 0;
@@ -812,15 +817,15 @@ namespace casadi {
       }
     }
 
-    // Allocate memory for nonzeros
-    m->nz.resize(m->nz_map.size());
-
     // Create sparsity pattern: TODO(@jaeandersson) No memory allocation
-    Sparsity sp = Sparsity::triplet(dim, dim, m->row, m->col, m->lin_map);
+    Sparsity sp = Sparsity::triplet(dim, dim, m->row, m->col, m->lin_map, false);
     for (int& e : m->lin_map) e = m->nz_map[e];
 
+    // Allocate memory for nonzeros
+    m->nz.resize(sp.nnz());
+
     // Pass to linear solver
-    m->self.linsol_.reset(sp);
+    m->linsol.reset(sp);
 
     return 0;
   }
@@ -833,7 +838,7 @@ namespace casadi {
     for (int i=0; i<m->nz.size(); ++i) m->nz[i] = vals[m->lin_map[i]];
 
     // Pass to linear solver
-    m->self.linsol_.pivoting(get_ptr(m->nz));
+    m->linsol.pivoting(get_ptr(m->nz));
 
     return 0;
   }
@@ -847,13 +852,13 @@ namespace casadi {
     for (int i=0; i<m->nz.size(); ++i) m->nz[i] = vals[m->lin_map[i]];
 
     // Pass to linear solver
-    m->self.linsol_.factorize(get_ptr(m->nz));
+    m->linsol.factorize(get_ptr(m->nz));
 
     // Number of negative eigenvalues
-    if (neig) *neig = m->self.linsol_.neig();
+    if (neig) *neig = m->linsol.neig();
 
     // Rank of the matrix
-    if (rank) *rank = m->self.linsol_.rank();
+    if (rank) *rank = m->linsol.rank();
 
     return 0;
   }
@@ -863,7 +868,7 @@ namespace casadi {
     QpoasesMemory* m = static_cast<QpoasesMemory*>(mem);
 
     // Pass to linear solver
-    m->self.linsol_.solve(rhs, nrhs);
+    m->linsol.solve(rhs, nrhs);
 
     return 0;
   }

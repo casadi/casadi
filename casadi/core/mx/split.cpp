@@ -125,10 +125,8 @@ namespace casadi {
 
     // Have offset_ refer to the nonzero offsets instead of column offsets
     offset_.resize(1);
-    for (std::vector<Sparsity>::const_iterator it=output_sparsity_.begin();
-        it!=output_sparsity_.end();
-        ++it) {
-      offset_.push_back(offset_.back() + it->nnz());
+    for (auto&& s : output_sparsity_) {
+      offset_.push_back(offset_.back() + s.nnz());
     }
   }
 
@@ -141,10 +139,8 @@ namespace casadi {
     vector<int> col_offset;
     col_offset.reserve(offset_.size());
     col_offset.push_back(0);
-    for (std::vector<Sparsity>::const_iterator it=output_sparsity_.begin();
-        it!=output_sparsity_.end();
-        ++it) {
-      col_offset.push_back(col_offset.back() + it->size2());
+    for (auto&& s : output_sparsity_) {
+      col_offset.push_back(col_offset.back() + s.size2());
     }
 
     res = horzsplit(arg[0], col_offset);
@@ -158,10 +154,8 @@ namespace casadi {
     vector<int> col_offset;
     col_offset.reserve(offset_.size());
     col_offset.push_back(0);
-    for (std::vector<Sparsity>::const_iterator it=output_sparsity_.begin();
-        it!=output_sparsity_.end();
-        ++it) {
-      col_offset.push_back(col_offset.back() + it->size2());
+    for (auto&& s : output_sparsity_) {
+      col_offset.push_back(col_offset.back() + s.size2());
     }
 
     // Non-differentiated output and forward sensitivities
@@ -178,9 +172,8 @@ namespace casadi {
     vector<int> col_offset;
     col_offset.reserve(offset_.size());
     col_offset.push_back(0);
-    for (std::vector<Sparsity>::const_iterator it=output_sparsity_.begin();
-         it!=output_sparsity_.end(); ++it) {
-      col_offset.push_back(col_offset.back() + it->size2());
+    for (auto&& s : output_sparsity_) {
+      col_offset.push_back(col_offset.back() + s.size2());
     }
 
     for (int d=0; d<nadj; ++d) {
@@ -197,10 +190,8 @@ namespace casadi {
 
     // Have offset_ refer to the nonzero offsets instead of column offsets
     offset_.resize(1);
-    for (std::vector<Sparsity>::const_iterator it=output_sparsity_.begin();
-        it!=output_sparsity_.end();
-        ++it) {
-      offset_.push_back(offset_.back() + it->nnz());
+    for (auto&& s : output_sparsity_) {
+      offset_.push_back(offset_.back() + s.nnz());
     }
 
     casadi_assert_message(offset_.back()==x.nnz(),
@@ -219,11 +210,9 @@ namespace casadi {
     vector<int> offset2;
     offset2.reserve(offset_.size());
     offset2.push_back(0);
-    for (std::vector<Sparsity>::const_iterator it=output_sparsity_.begin();
-        it!=output_sparsity_.end();
-        ++it) {
-      offset1.push_back(offset1.back() + it->size1());
-      offset2.push_back(offset2.back() + it->size2());
+    for (auto&& s : output_sparsity_) {
+      offset1.push_back(offset1.back() + s.size1());
+      offset2.push_back(offset2.back() + s.size2());
     }
 
     res = diagsplit(arg[0], offset1, offset2);
@@ -239,11 +228,9 @@ namespace casadi {
     vector<int> offset2;
     offset2.reserve(offset_.size());
     offset2.push_back(0);
-    for (std::vector<Sparsity>::const_iterator it=output_sparsity_.begin();
-        it!=output_sparsity_.end();
-        ++it) {
-      offset1.push_back(offset1.back() + it->size1());
-      offset2.push_back(offset2.back() + it->size2());
+    for (auto&& s : output_sparsity_) {
+      offset1.push_back(offset1.back() + s.size1());
+      offset2.push_back(offset2.back() + s.size2());
     }
 
     // Non-differentiated output and forward sensitivities
@@ -263,11 +250,9 @@ namespace casadi {
     vector<int> offset2;
     offset2.reserve(offset_.size());
     offset2.push_back(0);
-    for (std::vector<Sparsity>::const_iterator it=output_sparsity_.begin();
-        it!=output_sparsity_.end();
-        ++it) {
-      offset1.push_back(offset1.back() + it->size1());
-      offset2.push_back(offset2.back() + it->size2());
+    for (auto&& s : output_sparsity_) {
+      offset1.push_back(offset1.back() + s.size1());
+      offset2.push_back(offset2.back() + s.size2());
     }
 
     for (int d=0; d<nadj; ++d) {
@@ -282,10 +267,8 @@ namespace casadi {
 
     // Have offset_ refer to the nonzero offsets instead of column offsets
     offset_.resize(1);
-    for (std::vector<Sparsity>::const_iterator it=output_sparsity_.begin();
-        it!=output_sparsity_.end();
-        ++it) {
-      offset_.push_back(offset_.back() + it->nnz());
+    for (auto&& s : output_sparsity_) {
+      offset_.push_back(offset_.back() + s.nnz());
     }
   }
 
@@ -298,9 +281,8 @@ namespace casadi {
     vector<int> row_offset;
     row_offset.reserve(offset_.size());
     row_offset.push_back(0);
-    for (std::vector<Sparsity>::const_iterator it=output_sparsity_.begin();
-        it!=output_sparsity_.end(); ++it) {
-      row_offset.push_back(row_offset.back() + it->size1());
+    for (auto&& s : output_sparsity_) {
+      row_offset.push_back(row_offset.back() + s.size1());
     }
 
     res = vertsplit(arg[0], row_offset);
@@ -314,9 +296,8 @@ namespace casadi {
     vector<int> row_offset;
     row_offset.reserve(offset_.size());
     row_offset.push_back(0);
-    for (std::vector<Sparsity>::const_iterator it=output_sparsity_.begin();
-        it!=output_sparsity_.end(); ++it) {
-      row_offset.push_back(row_offset.back() + it->size1());
+    for (auto&& s : output_sparsity_) {
+      row_offset.push_back(row_offset.back() + s.size1());
     }
 
     for (int d=0; d<nfwd; ++d) {
@@ -332,9 +313,8 @@ namespace casadi {
     vector<int> row_offset;
     row_offset.reserve(offset_.size());
     row_offset.push_back(0);
-    for (std::vector<Sparsity>::const_iterator it=output_sparsity_.begin();
-        it!=output_sparsity_.end(); ++it) {
-      row_offset.push_back(row_offset.back() + it->size1());
+    for (auto&& s : output_sparsity_) {
+      row_offset.push_back(row_offset.back() + s.size1());
     }
 
     for (int d=0; d<nadj; ++d) {

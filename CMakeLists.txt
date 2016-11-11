@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 2.8.6)
 project(casadi C CXX)
 set(PACKAGE_NAME "CasADi")
-set(PACKAGE_VERSION "3.0.0")
-set(PACKAGE_SO_VERSION "3.0")
+set(PACKAGE_VERSION "3.1.0")
+set(PACKAGE_SO_VERSION "3.1")
 set(PACKAGE_DESCRIPTION "CasADi is a symbolic framework for automatic differentation and numeric optimization")
 set(PACKAGE_AUTHOR "Joel Andersson and Joris Gillis")
 set(PACKAGE_MAINTAINER "Joel Andersson and Joris Gillis")
@@ -25,10 +25,6 @@ OUTPUT_STRIP_TRAILING_WHITESPACE
 ERROR_QUIET
 )
 
-# special version number for pkg-config, use n.n.n.n where n are all numbers
-string(REGEX REPLACE "-g.*" "" PACKAGE_VERSION_PKGCONFIG "${git_describe}")
-string(REPLACE "+-" "." PACKAGE_VERSION_PKGCONFIG "${PACKAGE_VERSION_PKGCONFIG}")
-
 string(REPLACE "+-" "+" git_describe "${git_describe}")
 string(REPLACE "-g" "." git_describe "${git_describe}")
 
@@ -36,7 +32,6 @@ set(PACKAGE_VERSION_FULL "${git_describe}")
 
 # overwrite version numbers for official release
 if((PACKAGE_VERSION_FULL STREQUAL "") OR (NOT PACKAGE_VERSION MATCHES "\\+"))
-  set(PACKAGE_VERSION_PKGCONFIG "${PACKAGE_VERSION}")
   set(PACKAGE_VERSION_FULL "${PACKAGE_VERSION}")
 endif()
 
@@ -62,9 +57,15 @@ option(WITH_ACADO "Compile the interfaces to ACADO and qpOASES, if it can be fou
 option(WITH_EIGEN3 "Use Eigen3 backend for matrix operations" OFF)
 option(WITH_BUILD_SUNDIALS "Compile the included source code for Sundials 2.6.1" ON)
 option(WITH_SUNDIALS "Compile the interface to Sundials" ON)
-option(WITH_QPOASES "Compile the interface to qpOASES (the source code for qpOASES 3.0beta is included)" ON)
+option(WITH_QPOASES "Compile the interface to qpOASES (the source code for qpOASES is included)" ON)
+option(WITH_NO_QPOASES_BANNER "Add -D__NO_COPYRIGHT__ to qpOASES definitions" OFF)
+option(WITH_BLOCKSQP "Compile the interface to blockSQP (the source code for blockSQP is included)" ON)
 option(WITH_BUILD_DSDP "Compile the the included source code for DSDP" ON)
 option(WITH_DSDP "Compile the interface to DSDP" ON)
+option(WITH_BUILD_HPMPC "Compile the the included source code for HPMPC" ON)
+option(WITH_HPMPC "Compile the interface to HPMPC" ON)
+option(WITH_BUILD_BLASFEO "Compile the the included source code for BLASFEO" ON)
+option(WITH_BLASFEO "Compile the interface to BLASFEO" ON)
 option(WITH_MOSEK "Compile the interface to MOSEK" OFF)
 option(WITH_ECOS "Compile the interface to ECOS" OFF)
 option(WITH_BUILD_CSPARSE "Compile the included source code for CSparse" ON)
@@ -85,10 +86,11 @@ option(WITH_CLANG "Compile the interface to clang JIT" OFF)
 option(WITH_PYTHON "Compile the Python front-end" OFF)
 option(WITH_MATLAB "Compile the MATLAB front-end" OFF)
 option(WITH_OCTAVE "Compile the Octave front-end (experimental)" OFF)
+option(WITH_OCTAVE_IMPORT "Export import.m routine for octave" OFF)
 option(WITH_PYTHON3 "Use Python 3.*" OFF)
 option(WITH_JSON "Compile the JSON front-end" OFF)
 option(WITH_DEBIAN_BUILD "Add -DWITH_DEBIAN_BUILD (used for debian-specific warnings)" OFF)
-option(WITH_DEEPBIND "Load plugins with RTLD_DEEPBIND (can be used to resolve conflicting libraries in e.g. MATLAB)" OFF)
+option(WITH_DEEPBIND "Load plugins with RTLD_DEEPBIND (can be used to resolve conflicting libraries in e.g. MATLAB)" ON)
 option(WITH_SELFCONTAINED "Make the install directory self-contained" OFF)
 option(WITH_DEPRECATED_FEATURES "Compile with syntax that is scheduled to be deprecated" ON)
 option(WITH_EXTENDING_CASADI "Compile a demonstration that shows how a project that depends on CasADi can be implemented." OFF)
@@ -377,6 +379,7 @@ include_directories(${CMAKE_BINARY_DIR})
 # Optional auxillary dependencies
 find_package(BLAS QUIET)
 find_package(HSL QUIET)
+add_feature_info(hsl-interface HSL_FOUND "Interface to HSL.")
 find_package(WSMP QUIET)
 find_package(METIS QUIET)
 find_package(LibXml2 QUIET)
@@ -416,6 +419,43 @@ if(WITH_CSPARSE)
   endif()
 endif()
 add_feature_info(csparse-interface CSPARSE_FOUND "Interface to the sparse direct linear solver CSparse.")
+
+# BLASFEO
+if(WITH_BLASFEO)
+  if(WITH_BUILD_BLASFEO)
+    if(EXISTS ${CMAKE_SOURCE_DIR}/external_packages/blasfeo/src/include)
+      set(BLASFEO_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_packages/blasfeo/src/include)
+      set(BLASFEO_LIBRARIES)
+      set(BLASFEO_FOUND ON)
+    else()
+      message(WARNING "Blasfeo directory not found. If you want blasfeo, do git submodule init; git submodule update.")
+    endif()
+  else()
+    # try to find system blasfeo
+    find_package(BLASFEO)
+    set(BLASFEO_DLOPEN OFF)
+  endif()
+endif()
+add_feature_info(blasfeo-interface BLASFEO_FOUND "Interface to blasfeo.")
+
+# HPMPC
+if(WITH_HPMPC AND BLASFEO_FOUND)
+  if(WITH_BUILD_HPMPC)
+    if(EXISTS ${CMAKE_SOURCE_DIR}/external_packages/hpmpc/src/include)
+      set(HPMPC_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_packages/hpmpc/src/include)
+      set(HPMPC_LIBRARIES)
+      set(HPMPC_DLOPEN ON)
+      set(HPMPC_FOUND ON)
+    else()
+      message(WARNING "Hpmpc directory not found. If you want hpmpc, do git submodule init; git submodule update.")
+    endif()
+  else()
+    # try to find system hpmpc
+    find_package(HPMPC)
+    set(HPMPC_DLOPEN OFF)
+  endif()
+endif()
+add_feature_info(hpmpc-interface HPMPC_FOUND "Interface to hpmpc.")
 
 # TinyXML
 if(WITH_TINYXML)
@@ -473,6 +513,12 @@ if(WITH_QPOASES AND BLAS_FOUND AND LAPACK_FOUND)
   set(QPOASES_FOUND true)
 endif()
 add_feature_info(qpoases-interface QPOASES_FOUND "Interface to the active-set QP solver qpOASES.")
+
+# Use the included blockSQP
+if(WITH_BLOCKSQP AND QPOASES_FOUND)
+  set(BLOCKSQP_FOUND true)
+endif()
+add_feature_info(blocksqp-interface BLOCKSQP_FOUND "Interface to the NLP solver blockSQP.")
 
 #######################################################################
 ############### third-party libraries we don't build ##################
@@ -590,9 +636,7 @@ include(GenerateExportHeader)
 #####################################################
 add_subdirectory(external_packages)
 add_subdirectory(casadi)
-#add_subdirectory(experimental/greg EXCLUDE_FROM_ALL)
-add_subdirectory(experimental/joel EXCLUDE_FROM_ALL)
-#add_subdirectory(experimental/andrew EXCLUDE_FROM_ALL)
+add_subdirectory(experimental EXCLUDE_FROM_ALL)
 add_subdirectory(misc)
 
 if(WITH_EXAMPLES)

@@ -45,7 +45,7 @@ namespace casadi {
     plugin->creator = BonminInterface::creator;
     plugin->name = "bonmin";
     plugin->doc = BonminInterface::meta_doc.c_str();
-    plugin->version = 30;
+    plugin->version = 31;
     return 0;
   }
 
@@ -193,7 +193,7 @@ namespace casadi {
       }
       hesslag_sp_ = get_function("nlp_hess_l").sparsity_out(0);
     } else if (pass_nonlinear_variables_) {
-      nl_ex_ = oracle_.nl_var("x", {"f", "g"});
+      nl_ex_ = oracle_.which_depends("x", {"f", "g"}, 2, false);
     }
 
     // Allocate work vectors
@@ -210,7 +210,7 @@ namespace casadi {
 
   void BonminInterface::init_memory(void* mem) const {
     Nlpsol::init_memory(mem);
-    auto m = static_cast<BonminMemory*>(mem);
+    //auto m = static_cast<BonminMemory*>(mem);
   }
 
   void BonminInterface::set_work(void* mem, const double**& arg, double**& res,
@@ -276,6 +276,32 @@ namespace casadi {
     return "Unknown";
   }
 
+
+  /** \brief Helper class to direct messages to userOut()
+  *
+  * IPOPT has the concept of a Jorunal/Journalist
+  * BOONMIN and CBC do not.
+  */
+  class BonMinMessageHandler : public CoinMessageHandler {
+  public:
+    BonMinMessageHandler(): CoinMessageHandler() { }
+    /// Core of the class: the method that directs the messages
+    virtual int print() {
+      userOut() << messageBuffer_ << std::endl;
+      return 0;
+    }
+    virtual ~BonMinMessageHandler() { }
+    BonMinMessageHandler(const BonMinMessageHandler &other): CoinMessageHandler(other) {}
+    BonMinMessageHandler(const CoinMessageHandler &other): CoinMessageHandler(other) {}
+    BonMinMessageHandler & operator=(const BonMinMessageHandler &rhs) {
+      BonMinMessageHandler::operator=(rhs);
+      return *this;
+    }
+    virtual CoinMessageHandler* clone() const {
+      return new BonMinMessageHandler(*this);
+    }
+  };
+
   void BonminInterface::solve(void* mem) const {
     auto m = static_cast<BonminMemory*>(mem);
 
@@ -302,8 +328,28 @@ namespace casadi {
     // MINLP instance
     SmartPtr<BonminUserClass> tminlp = new BonminUserClass(*this, m);
 
+    BonMinMessageHandler mh;
+
     // Start an BONMIN application
-    BonminSetup bonmin;
+    BonminSetup bonmin(&mh);
+
+    SmartPtr<OptionsList> options = new OptionsList();
+    SmartPtr<Journalist> journalist= new Journalist();
+    SmartPtr<Bonmin::RegisteredOptions> roptions = new Bonmin::RegisteredOptions();
+
+    {
+      // Direct output through casadi::userOut()
+      StreamJournal* jrnl_raw = new StreamJournal("console", J_ITERSUMMARY);
+      jrnl_raw->SetOutputStream(&casadi::userOut());
+      jrnl_raw->SetPrintLevel(J_DBG, J_NONE);
+      SmartPtr<Journal> jrnl = jrnl_raw;
+      journalist->AddJournal(jrnl);
+    }
+
+    options->SetJournalist(journalist);
+    options->SetRegisteredOptions(roptions);
+    bonmin.setOptionsAndJournalist(roptions, options, journalist);
+    bonmin.registerOptions();
 
     // Initialize
     bonmin.initialize(GetRawPtr(tminlp));
@@ -326,8 +372,6 @@ namespace casadi {
     casadi_copy(m->lam_xk, nx_, m->lam_x);
     casadi_copy(m->gk, ng_, m->g);
 
-    // Show statistics
-    if (print_time_)  print_fstats(m);
   }
 
   bool BonminInterface::

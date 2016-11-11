@@ -30,7 +30,7 @@ from casadi import *
 #             x -  y <= 2
 
 
-# Objective
+# Sparsity of the LP linear term
 A = Sparsity.dense(3, 2)
 
 # Create solver

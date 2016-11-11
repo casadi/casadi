@@ -205,7 +205,7 @@ namespace casadi {
      *
      *   vertcat(vertsplit(x, ...)) = x
      */
-    friend MatType vertcat(const std::vector<MatType> &v) {
+    inline friend MatType vertcat(const std::vector<MatType> &v) {
       return MatType::vertcat(v);
     }
 
@@ -235,7 +235,7 @@ namespace casadi {
      *
      *   vertcat(vertsplit(x, ...)) = x
      */
-    friend std::vector<MatType >
+    inline friend std::vector<MatType >
       vertsplit(const MatType& x, const std::vector<int>& offset) {
       return MatType::vertsplit(x, offset);
     }
@@ -250,22 +250,22 @@ namespace casadi {
      * \param incr Size of each group of rows
      *
      *   vertcat(vertsplit(x, ...)) = x
-     
+
      \doctest
      print vertsplit(SX.sym("a",4))
      \doctestout
      [SX(a_0), SX(a_1), SX(a_2), SX(a_3)]
      \enddoctest
-     
+
      \doctest
      print vertsplit(SX.sym("a",4),2)
      \doctestout
      [SX([a_0, a_1]), SX([a_2, a_3])]
      \enddoctest
-     
+
      If the number of rows is not a multiple of \p incr,
      the last entry returned will have a size smaller than \p incr.
-     
+
      \doctest
      print vertsplit(DM([0,1,2,3,4]),2)
      \doctestout
@@ -406,12 +406,12 @@ namespace casadi {
         Reshapes/vectorizes the matrix such that the shape becomes (expr.numel(), 1).
         Columns are stacked on top of each other.
         Same as reshape(expr, expr.numel(), 1)
-        
+
         a c \n
         b d \n
-        
+
         turns into
-        
+
         a \n
         b \n
         c \n

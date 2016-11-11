@@ -44,7 +44,7 @@ namespace casadi {
 
   CodeGenerator::CodeGenerator(const std::string& name, const Dict& opts) {
     // Default options
-    this->verbose = false;
+    this->verbose = true;
     this->mex = false;
     this->cpp = false;
     this->main = false;
@@ -580,19 +580,24 @@ namespace casadi {
         << codegen_str_rank1_define << endl
         << endl;
       break;
-    case AUX_ASUM:
-      this->auxiliaries << codegen_str_asum
-        << codegen_str_asum_define
-        << endl;
-      break;
     case AUX_IAMAX:
       this->auxiliaries << codegen_str_iamax
         << codegen_str_iamax_define
         << endl;
       break;
-    case AUX_NRM2:
-      this->auxiliaries << codegen_str_nrm2
-        << codegen_str_nrm2_define
+    case AUX_NORM_1:
+      this->auxiliaries << codegen_str_norm_1
+        << codegen_str_norm_1_define
+        << endl;
+      break;
+    case AUX_NORM_2:
+      this->auxiliaries << codegen_str_norm_2
+        << codegen_str_norm_2_define
+        << endl;
+      break;
+    case AUX_NORM_INF:
+      this->auxiliaries << codegen_str_norm_inf
+        << codegen_str_norm_inf_define
         << endl;
       break;
     case AUX_FILL:

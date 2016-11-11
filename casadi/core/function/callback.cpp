@@ -71,6 +71,16 @@ namespace casadi {
     // Evaluate
     std::vector<DM> resv = eval(argv);
 
+    casadi_assert_message(resv.size()==n_out(),
+      "Callback::eval: expected " + to_string(n_out()) + " outputs, got "
+      + to_string(resv.size()) +".");
+
+    for (int i=0; i<n_out(); ++i) {
+      casadi_assert_message(resv[i].sparsity()==sparsity_out(i),
+        "Callback::eval: Shape mismatch for output " << i << ": got " + resv[i].dim() +
+        ", expected " + sparsity_out(i).dim() + ".");
+    }
+
     // Get the outputs
     int n_out = this->n_out();
     for (int i=0; i<n_out; ++i) {
@@ -122,12 +132,28 @@ namespace casadi {
     return (*this)->FunctionInternal::get_forward_old(name, nfwd, opts);
   }
 
+  Function Callback::
+  get_forward_new(const std::string& name, int nfwd,
+                  const std::vector<std::string>& i_names,
+                  const std::vector<std::string>& o_names,
+                  const Dict& opts) {
+    return (*this)->FunctionInternal::get_forward(name, nfwd, i_names, o_names, opts);
+  }
+
   int Callback::get_n_forward() const {
     return (*this)->FunctionInternal::get_n_forward();
   }
 
   Function Callback::get_reverse(const std::string& name, int nadj, Dict& opts) {
     return (*this)->FunctionInternal::get_reverse_old(name, nadj, opts);
+  }
+
+  Function Callback::
+  get_reverse_new(const std::string& name, int nadj,
+                  const std::vector<std::string>& i_names,
+                  const std::vector<std::string>& o_names,
+                  const Dict& opts) {
+    return (*this)->FunctionInternal::get_reverse(name, nadj, i_names, o_names, opts);
   }
 
   int Callback::get_n_reverse() const {

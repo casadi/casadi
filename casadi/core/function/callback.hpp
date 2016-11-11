@@ -32,14 +32,15 @@ namespace casadi {
   class CallbackInternal;
 
   /** \brief Callback function functionality
-   * This class provides a public API to the FunctionInternal class that
-   * can be subclassed by the user, who is then able to implement the different
-   * virtual method.
-   * Note that the Function class also provides a public API to FunctionInternal,
-   * but only allows calling, not being called.
 
-   * The user is responsible for not deleting this class for the lifetime
-   * of the internal function object.
+   This class provides a public API to the FunctionInternal class that
+   can be subclassed by the user, who is then able to implement the different
+   virtual method.
+   Note that the Function class also provides a public API to FunctionInternal,
+   but only allows calling, not being called.
+
+   The user is responsible for not deleting this class for the lifetime
+   of the internal function object.
 
    \author Joris Gillis, Joel Andersson
    \date 2015
@@ -137,15 +138,24 @@ namespace casadi {
     virtual Function get_jacobian(const std::string& name, const Dict& opts);
     ///@}
 
+    /** \brief [DEPRECATED] Overload get_forward_new instead */
+    virtual Function get_forward(const std::string& name, int nfwd, Dict& opts);
+
     ///@{
     /** \brief Return function that calculates forward derivatives
      *    forward(nfwd) returns a cached instance if available,
      *    and calls <tt>Function get_forward(int nfwd)</tt>
      *    if no cached version is available.
      */
-    virtual Function get_forward(const std::string& name, int nfwd, Dict& opts);
+    virtual Function get_forward_new(const std::string& name, int nfwd,
+                                     const std::vector<std::string>& i_names,
+                                     const std::vector<std::string>& o_names,
+                                     const Dict& opts);
     virtual int get_n_forward() const;
     ///@}
+
+    /** \brief [DEPRECATED] Overload get_reverse_new instead */
+    virtual Function get_reverse(const std::string& name, int nadj, Dict& opts);
 
     ///@{
     /** \brief Return function that calculates adjoint derivatives
@@ -153,7 +163,10 @@ namespace casadi {
      *    and calls <tt>Function get_reverse(int nadj)</tt>
      *    if no cached version is available.
      */
-    virtual Function get_reverse(const std::string& name, int nadj, Dict& opts);
+    virtual Function get_reverse_new(const std::string& name, int nadj,
+                                     const std::vector<std::string>& i_names,
+                                     const std::vector<std::string>& o_names,
+                                     const Dict& opts);
     virtual int get_n_reverse() const;
     ///@}
 

@@ -63,12 +63,10 @@ for i in range(N_steps_per_sample):
 # Create a function that simulates all step propagation on a sample
 one_sample = Function('one_sample',[states, controls, params], [X])
 
-# speedup trick: expand into scalar operations
-one_sample = one_sample.expand('one_sample_sx')
-
 ############ Simulating the system ##########
-
-all_samples = one_sample.mapaccum("all_samples", N)
+assert(N%100==0)
+all_samples1 = one_sample.mapaccum("all_samples1", N//100)
+all_samples = all_samples1.mapaccum("all_samples", 100)
 
 # Choose an excitation signal
 numpy.random.seed(0)
@@ -85,10 +83,10 @@ y_data = X_measured[0,:].T
 
 # Use just-in-time compilation to speed up the evaluation
 if Importer.has_plugin('clang'):
-  opts = {'jit':True, "jit_options":{"flags":['-O3']}}
+  with_jit = True
 else:
   print("WARNING; running without jit. This may result in very slow evaluation times")
-  opts = {}
+  with_jit = False
 
 ############ Create a Gauss-Newton solver ##########
 def gauss_newton(e,nlp,V):
@@ -96,8 +94,8 @@ def gauss_newton(e,nlp,V):
   H = triu(mtimes(J.T, J))
   sigma = MX.sym("sigma")
   hessLag = Function('nlp_hess_l',{'x':V,'lam_f':sigma, 'hess_gamma_x_x':sigma*H},
-                     ['x','p','lam_f','lam_g'], ['hess_gamma_x_x'], opts)
-  return nlpsol("solver","ipopt", nlp, {"hess_lag":hessLag})
+                     ['x','p','lam_f','lam_g'], ['hess_gamma_x_x'])
+  return nlpsol("solver","ipopt", nlp, {"hess_lag":hessLag, "jit":with_jit})
 
 
 ############ Identifying the simulated system: single shooting strategy ##########
@@ -122,7 +120,7 @@ assert(norm_inf(sol["x"]*scale-param_truth)<1e-8)
 # All states become decision variables
 X = MX.sym("X", 2, N)
 
-[Xn] = one_sample.map([X, u_data.T, repmat(params*scale,1,N)], 'openmp')
+Xn = one_sample.map(N, 'openmp')(X, u_data.T, repmat(params*scale,1,N))
 
 gaps = Xn[:,:-1]-X[:,1:]
 

@@ -16,7 +16,9 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/SwigMem.m DESTINATION ${CMAKE_INSTALL_
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/SwigGet.m DESTINATION ${CMAKE_INSTALL_PREFIX})
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/SwigStorage.m DESTINATION ${CMAKE_INSTALL_PREFIX})
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/swig_typename_convertor_matlab2cpp.m
-              ${CMAKE_CURRENT_SOURCE_DIR}/swig_typename_convertor_cpp2matlab.m
+              ${CMAKE_CURRENT_SOURCE_DIR}/SwigType.m
+              ${CMAKE_CURRENT_SOURCE_DIR}/returntypes_call.m
+              ${CMAKE_CURRENT_SOURCE_DIR}/returntypes.m
   DESTINATION ${CMAKE_INSTALL_PREFIX})
 
 # MATLAB specific stuff
@@ -44,7 +46,9 @@ if (WITH_OCTAVE)
   add_custom_target(octave DEPENDS casadiOCTAVE)
 
   # Find Octave
+  if (NOT OCTAVE_LIBRARIES)
   find_package(OCTAVE REQUIRED)
+  endif()
 
   # Compile MEX file
   add_library(casadiOCTAVE MODULE ${MEX_FILE})
@@ -55,6 +59,9 @@ if (WITH_OCTAVE)
                PREFIX ""
                SUFFIX .mex)
   install(TARGETS casadiOCTAVE DESTINATION ${CMAKE_INSTALL_PREFIX})
+  if (WITH_OCTAVE_IMPORT)
+    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../octave/import.m DESTINATION ${CMAKE_INSTALL_PREFIX})
+  endif()
 endif (WITH_OCTAVE)
 
 # Example of how to extend CasADi with additional features

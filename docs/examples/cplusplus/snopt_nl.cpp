@@ -40,22 +40,20 @@ using namespace casadi;
 int main(int argc, char **argv){
   // Get the problem
   std::string problem = (argc==2) ? argv[1] : "../docs/examples/nl_files/hs107.nl";
-  
+
   // Parse an NL-file
   NlpBuilder nl;
-  nl.parse_nl(problem);
-  
-  // NLP
-  SXDict nlp = {{"x", nl.x}, {"f", nl.f}, {"g", nl.g}};
+  nl.import_nl(problem);
 
   // Set options
   Dict opts;
+  opts["expand"] = true;
   // opts["detect_linear"] = true;
 
   // Allocate NLP solver and buffers
-  Function solver = nlpsol("nlpsol", "snopt", nlp, opts);
+  Function solver = nlpsol("nlpsol", "snopt", nl, opts);
   std::map<std::string, DM> arg, res;
-    
+
   // Solve NLP
   arg["lbx"] = nl.x_lb;
   arg["ubx"] = nl.x_ub;

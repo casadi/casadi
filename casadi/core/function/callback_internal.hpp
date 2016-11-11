@@ -62,7 +62,7 @@ namespace casadi {
     virtual void init(const Dict& opts);
 
     /** \brief Finalize the object creation */
-    virtual void finalize();
+    virtual void finalize(const Dict& opts);
 
     /** \brief  Evaluate numerically, work vectors given */
     virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
@@ -75,12 +75,20 @@ namespace casadi {
 
     ///@{
     /** \brief Return function that calculates forward derivatives */
+    virtual Function get_forward(const std::string& name, int nfwd,
+                                 const std::vector<std::string>& i_names,
+                                 const std::vector<std::string>& o_names,
+                                 const Dict& opts);
     virtual Function get_forward_old(const std::string& name, int nfwd, Dict& opts);
     virtual int get_n_forward() const;
     ///@}
 
     ///@{
     /** \brief Return function that calculates adjoint derivatives */
+    virtual Function get_reverse(const std::string& name, int nadj,
+                                 const std::vector<std::string>& i_names,
+                                 const std::vector<std::string>& o_names,
+                                 const Dict& opts);
     virtual Function get_reverse_old(const std::string& name, int nadj, Dict& opts);
     virtual int get_n_reverse() const;
     ///@}

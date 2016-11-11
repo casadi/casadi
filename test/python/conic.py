@@ -85,7 +85,7 @@ class ConicTests(casadiTestCase):
       solver_in["uba"]=UBA
 
       with self.assertRaises(Exception):
-        solver_out = solver(solver_in)
+        solver_out = solver(**solver_in)
 
     H = DM([[1,-1],[-1,2]])
     G = DM([-2,-6])
@@ -118,7 +118,7 @@ class ConicTests(casadiTestCase):
       solver_in["uba"]=UBA
 
       with self.assertRaises(Exception):
-        solver_out = solver(solver_in)
+        solver_out = solver(**solver_in)
 
   def test_scalar(self):
     # 1/2 x H x + G' x
@@ -749,5 +749,225 @@ class ConicTests(casadiTestCase):
 
       self.assertAlmostEqual(solver_out["cost"][0],7,max(1,5-less_digits),str(conic))
 
+  @requires_conic("hpmpc")
+  @requires_conic("qpoases")
+  def test_hpmc(self):
+
+    inf = 100
+    T = 10. # Time horizon
+    N = 4 # number of control intervals
+
+    # Declare model variables
+    x1 = MX.sym('x1')
+    x2 = MX.sym('x2')
+    x = vertcat(x1, x2)
+    u = MX.sym('u')
+
+    # Model equations
+    xdot = vertcat(0.6*x1 - 1.11*x2 + 0.3*u-0.03, 0.7*x1+0.01)
+
+    # Objective term
+    L = x1**2 + 3*x2**2 + 7*u**2 -0.4*x1*x2-0.3*x1*u+u -x1-2*x2
+
+    # Fixed step Runge-Kutta 4 integrator
+    F = Function('F', [x, u], [x+xdot, L])
+
+    J = F.jacobian()
+    # Start with an empty NLP
+    w=[]
+    w0 = []
+    lbw = []
+    ubw = []
+    J = 0
+    g=[]
+    lbg = []
+    ubg = []
+
+    Xs = SX.sym('X', 2, 1, N+1)
+    Us = SX.sym('U', 1, 1, N+1)
+
+    for k in range(N):
+
+        w += [Xs[k]]
+          
+        if k==0:
+          lbw += [-inf, 1]
+          ubw += [inf, 1]
+          w0 += [0.3, 0.7]
+        elif k==2:
+          lbw += [0, -inf]
+          ubw += [0, inf]
+          w0 += [0, 0.3]
+        else:
+          lbw += [-inf, -inf]
+          ubw += [  inf,  inf]
+          w0  += [0, 1]
+
+        w += [Us[k]]
+        lbw += [-inf]
+        ubw += [inf]
+        w0  += [0]
+        
+        xplus, l = F(Xs[k],Us[k])
+        J+= l
+        # Add equality constraint
+        g   += [+3*(xplus-Xs[k+1])]
+        lbg += [0, 0]
+        ubg += [0, 0]
+        g   += [0.1*Xs[k][1]-0.05*Us[k]]
+        lbg += [-0.5*k-0.1]
+        ubg += [2]
+    g   += [0.1*Xs[-1][1]]
+    lbg += [0.1]
+    ubg += [2]
+          
+    J+= mtimes(Xs[-1].T,Xs[-1])
+
+    w += [Xs[-1]]
+    lbw += [-inf, -inf]
+    ubw += [  inf,  inf]
+    w0  += [0, 1]
+          
+    # Create an NLP solver
+    prob = {'f': J, 'x': vertcat(*w), 'g': vertcat(*g)}
+
+
+    J = Function("J",[prob["x"]],[jacobian(prob["g"],prob["x"])])
+    J(w0).print_dense()
+    
+        
+    solver_ref = qpsol('solver', 'qpoases', prob)
+    solver = qpsol('solver', 'hpmpc', prob,{"tol":1e-12,"mu0":2,"max_iter":20})
+    #solver = qpsol('solver', 'hpmpc', prob,{"N":N,"nx":[2]*(N+1),"nu":[1]*N,"ng":[1]*(N+1),"tol":1e-12,"mu0":2,"max_iter":20})
+
+    sol_ref = solver_ref(x0=w0, lbx=lbw, ubx=ubw, lbg=lbg, ubg=ubg)
+    sol = solver(x0=w0, lbx=lbw, ubx=ubw, lbg=lbg, ubg=ubg)
+
+    self.checkarray(sol_ref["x"], sol["x"])
+    self.checkarray(sol_ref["lam_g"], sol["lam_g"],digits=8)
+    self.checkarray(sol_ref["lam_x"], sol["lam_x"],digits=8)
+    self.checkarray(sol_ref["f"], sol["f"])
+    
+  @requires_conic("hpmpc")
+  @requires_conic("qpoases")
+  def test_hpmc_timevarying(self):
+  
+    def mat(a):
+      def fl(a):
+        return float(a) if len(a)>0 else 0
+      return sparsify(DM([list(map(fl,i.split("\t"))) for i in a.split("\n") if len(i)>0]))
+    def vec(a):
+      return DM(list(map(float,a.split("\n"))))
+    N = 2
+    A = """1	0.2	1	-1								
+-0.1	0.4			-1							
+0.3	0.2				-1						
+2		0.3									
+1	1	0.4									
+			1	4	2	1	0.3	-1			
+			3	1		1	0.2		-1		
+			1	1	1	1	1				
+								2	4		-1
+								2	3	1	
+											3"""
+    A = mat(A)
+    nx = [2,3,2,1]
+    nu = [1, 2,1]
+    ng = [2, 1, 1, 1]
+    N = 3
+    H = """7		0.2									
+	7	0.3									
+0.2	0.3	1									
+			3				1				
+				2	0.1		0.7				
+				0.1	1		1				
+						1	0.1				
+			1	0.7	1	0.1	2				
+								6		1	
+									6		
+								1		4	
+											9
+"""
+
+    H = mat(H)
+    #solver = conic('solver', 'hpmpc', {"a": A.sparsity(), "h": H.sparsity()},{"N":N,"nx":nx,"nu":nu,"ng":ng,"tol":1e-12,"mu0":2,"max_iter":20})
+    solver = conic('solver', 'hpmpc', {"a": A.sparsity(), "h": H.sparsity()},{"tol":1e-12,"mu0":2,"max_iter":20})
+    solver_ref = conic('solver', 'qpoases', {"a": A.sparsity(), "h": H.sparsity()})
+    
+    g = vec("""1
+1
+0.2
+0.4
+1
+0.5
+0.3
+1
+0.6
+1
+1
+0.7""")
+    lbg = vec("""0
+    0
+    0
+    -2
+    -2
+    0
+    0
+    -2
+    0
+    -2
+    -2""")
+
+    ubg = vec("""0
+    0
+    0
+    2
+    2
+    0
+    0
+    2
+    0
+    2
+    2""")
+
+    lbx = vec("""0.5
+    0.2
+    -1
+    -1
+    -1
+    -1
+    -1
+    -1
+    -1
+    -1
+    -1
+    -1""")
+    ubx = vec("""0.5
+    0.2
+    1
+    1
+    1
+    1
+    1
+    1
+    1
+    1
+    1
+    1""")
+    
+    sol = solver(a=A,h=H,lba=lbg,uba=ubg,g=g,lbx=lbx,ubx=ubx)
+    sol_ref = solver_ref(a=A,h=H,lba=lbg,uba=ubg,g=g,lbx=lbx,ubx=ubx)
+
+    self.checkarray(sol_ref["x"], sol["x"],digits=7)
+    self.checkarray(sol_ref["lam_a"], sol["lam_a"],digits=8)
+    self.checkarray(sol_ref["lam_x"], sol["lam_x"],digits=8)
+    
+    solver = conic('solver', 'hpmpc', {"a": A.sparsity(), "h": H.sparsity()},{"tol":1e-12,"mu0":2,"max_iter":20,"warm_start":True})
+    sol = solver(a=A,h=H,lba=lbg,uba=ubg,g=g,lbx=lbx,ubx=ubx,x0=sol["x"],lam_a0=sol["lam_a"],lam_x0=sol["lam_x"])
+    
+    self.checkarray(sol_ref["x"], sol["x"],digits=7)
+    self.checkarray(sol_ref["lam_a"], sol["lam_a"],digits=8)
+    self.checkarray(sol_ref["lam_x"], sol["lam_x"],digits=8)
+    
 if __name__ == '__main__':
     unittest.main()

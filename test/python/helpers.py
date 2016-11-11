@@ -104,6 +104,23 @@ class Stderr():
     def __exit__(self, type, value, traceback):
         sys.stderr = self.stream.stream
 
+import contextlib
+@contextlib.contextmanager
+def capture():
+    import sys
+    try:
+      from cStringIO import StringIO
+    except:
+      from io import StringIO
+    oldout,olderr = sys.stdout, sys.stderr
+    try:
+        out=[StringIO(), StringIO()]
+        sys.stdout,sys.stderr = out
+        yield out
+    finally:
+        sys.stdout,sys.stderr = oldout, olderr
+        out[0] = out[0].getvalue()
+        out[1] = out[1].getvalue()
 
 class FunctionPool:
   def __init__(self):
@@ -186,7 +203,7 @@ class casadiTestCase(unittest.TestCase):
       else:
         return ret
     else:
-      ret = casadi.reshape(DM([valuegenerator() for i in range(n*m)]),n,m)
+      ret = DM([valuegenerator() for i in range(n*m)]).reshape((n,m))
       if symm:
         return (ret + ret.T)/2
       else:

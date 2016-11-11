@@ -68,15 +68,8 @@ namespace casadi {
     /// Variable
     N_Vector u;
 
-    /// For timings
-    clock_t time1, time2;
-
-    /// Accumulated time since last reset:
-    double t_func; // time spent in the residual function
-    double t_jac; // time spent in the Jacobian function
-    double t_lsolve; // preconditioner/linear solver solve function
-    double t_lsetup_jac; // preconditioner/linear solver setup function, generate Jacobian
-    double t_lsetup_fac; // preconditioner setup function, factorize Jacobian
+    // Current Jacobian
+    double* jac;
   };
 
   /** \brief \pluginbrief{Rootfinder,kinsol}
@@ -107,7 +100,7 @@ namespace casadi {
     virtual void init(const Dict& opts);
 
     /// Solve the system of equations and calculate derivatives
-    virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
+    virtual void solve(void* mem) const;
 
     // Get name of the plugin
     virtual const char* plugin_name() const { return "kinsol";}
@@ -167,6 +160,10 @@ namespace casadi {
 
     /** \brief Initalize memory block */
     virtual void init_memory(void* mem) const;
+
+    /** \brief Set the (persistent) work vectors */
+    virtual void set_work(void* mem, const double**& arg, double**& res,
+                          int*& iw, double*& w) const;
 
     /** \brief Cast to memory object */
     static KinsolMemory* to_mem(void *mem) {

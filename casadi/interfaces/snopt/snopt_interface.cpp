@@ -40,7 +40,7 @@ namespace casadi {
     plugin->creator = SnoptInterface::creator;
     plugin->name = "snopt";
     plugin->doc = SnoptInterface::meta_doc.c_str();
-    plugin->version = 30;
+    plugin->version = 31;
     return 0;
   }
 
@@ -256,7 +256,7 @@ namespace casadi {
     casadi_assert_message(!jac_f_fcn_.is_null(), "blaasssshc");
 
     // Outputs
-    double Obj = 0; // TODO(Greg): get this from snopt
+    //double Obj = 0; // TODO(Greg): get this from snopt
 
     // snInit must be called first.
     //   9, 6 are print and summary unit numbers (for Fortran).
@@ -350,9 +350,6 @@ namespace casadi {
 
     // Copy optimal constraint values to output
     casadi_copy(m->gk, ng_, m->g);
-
-    // Show statistics
-    if (print_time_)  print_fstats(m);
 
     // Free memory
     deleteSNOPT(&prob);

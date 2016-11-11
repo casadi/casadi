@@ -53,6 +53,9 @@ namespace casadi {
     return r;
   }
 
+  /// Combine two dictionaries, giving priority to first one
+  Dict CASADI_EXPORT combine(const Dict& first, const Dict& second);
+
   /** \brief Internal class for Function
       \author Joel Andersson
       \date 2010-2015
@@ -90,7 +93,7 @@ namespace casadi {
         This function, which visits the class hierarchy in reverse order is run after
         init() has been completed.
     */
-    virtual void finalize();
+    virtual void finalize(const Dict& opts);
 
     /** \brief Get a public class instance */
     Function self() const { return shared_from_this<Function>();}
@@ -111,9 +114,24 @@ namespace casadi {
     // Check if a particular dependency exists
     virtual bool has_function(const std::string& fname) const {return false;}
 
-    /** \brief Which variables enter nonlinearly */
+#ifdef WITH_DEPRECATED_FEATURES
+    /** \brief [DEPRECATED] Which variables enter nonlinearly
+    *
+    * Use which_depends instead.
+    */
     virtual std::vector<bool> nl_var(const std::string& s_in,
-                                     const std::vector<std::string>& s_out) const;
+                             const std::vector<std::string>& s_out) const;
+#endif
+
+    /** \brief Which variables enter with some order
+    *
+    * \param[in] order Only 1 (linear) and 2 (nonlinear) allowed
+    * \param[in] tr   Flip the relationship. Return which expressions contain the variables
+    */
+    virtual std::vector<bool> which_depends(const std::string& s_in,
+                                           const std::vector<std::string>& s_out,
+                                           int order, bool tr=false) const;
+
 
     ///@{
     /** \brief Names of function input and outputs */
@@ -210,9 +228,6 @@ namespace casadi {
     template<typename M>
       std::vector<std::vector<M> >
       replaceAdjSeed(const std::vector<std::vector<M> >& aseed) const;
-
-    /** \brief Create call */
-    virtual std::vector<MX> create_call(const std::vector<MX>& arg);
 
     ///@{
     /** \brief Forward mode AD, virtual functions overloaded in derived classes */
@@ -358,12 +373,13 @@ namespace casadi {
      *    and calls <tt>Function get_forward(int nfwd)</tt>
      *    if no cached version is available.
      */
-    Function forward_old(int nfwd);
     Function forward(int nfwd);
     virtual Function get_forward_old(const std::string& name, int nfwd, Dict& opts);
-    virtual Function get_forward(const std::string& name, int nfwd, Dict& opts);
+    virtual Function get_forward(const std::string& name, int nfwd,
+                                 const std::vector<std::string>& i_names,
+                                 const std::vector<std::string>& o_names,
+                                 const Dict& opts);
     virtual int get_n_forward() const { return 0;}
-    void set_forward(const Function& fcn, int nfwd);
     ///@}
 
     ///@{
@@ -372,16 +388,23 @@ namespace casadi {
      *    and calls <tt>Function get_reverse(int nadj)</tt>
      *    if no cached version is available.
      */
-    Function reverse_old(int nadj);
     Function reverse(int nadj);
     virtual Function get_reverse_old(const std::string& name, int nadj, Dict& opts);
-    virtual Function get_reverse(const std::string& name, int nadj, Dict& opts);
+    virtual Function get_reverse(const std::string& name, int nadj,
+                                 const std::vector<std::string>& i_names,
+                                 const std::vector<std::string>& o_names, const Dict& opts);
     virtual int get_n_reverse() const { return 0;}
-    void set_reverse(const Function& fcn, int nadj);
     ///@}
+
+    /** \brief returns a new function with a selection of inputs/outputs of the original */
+    virtual Function slice(const std::string& name, const std::vector<int>& order_in,
+                           const std::vector<int>& order_out, const Dict& opts) const;
 
     /** \brief Get oracle */
     virtual const Function& oracle() const;
+
+    /** \brief Propagate options */
+    virtual Dict derived_options() const;
 
     /** \brief Can derivatives be calculated in any way? */
     bool hasDerivative() const;
@@ -461,16 +484,8 @@ namespace casadi {
     /** \brief Number of nodes in the algorithm */
     virtual int n_nodes() const;
 
-    /** \brief Create a helper MXFunction with some properties copied
-    *
-    * Copied properties:
-    *
-    *    input/outputscheme
-    *    ad_mode
-    *
-    *  The function is not initialized
-    */
-    Function wrapMXFunction() const;
+    /** \brief Wrap in an Function instance consisting of only one MX call */
+    Function wrap() const;
 
     /** \brief Generate code the function */
     virtual void generateFunction(CodeGenerator& g, const std::string& fname,
@@ -510,7 +525,13 @@ namespace casadi {
     virtual void generateBody(CodeGenerator& g) const;
 
     /** \brief Export / Generate C code for the dependency function */
-    virtual void generate_dependencies(const std::string& fname, const Dict& opts);
+    virtual std::string generate_dependencies(const std::string& fname, const Dict& opts);
+
+    /** \brief Is codegen supported? */
+    virtual bool has_codegen() const { return false;}
+
+    /** \brief Jit dependencies */
+    virtual void jit_dependencies(const std::string& fname) {}
 
     /** \brief  Print */
     virtual void print(std::ostream &stream) const;
@@ -538,9 +559,6 @@ namespace casadi {
 
     /// Verbose mode?
     bool verbose() const;
-
-    /// Is function fcn being monitored
-    bool monitored(const std::string& mod) const;
 
     ///@{
     /** \brief Number of function inputs and outputs */
@@ -765,10 +783,10 @@ namespace casadi {
     ///@}
 
     /// Checkout a memory object
-    int checkout();
+    int checkout() const;
 
     /// Release a memory object
-    void release(int mem);
+    void release(int mem) const;
 
     /// Input and output sparsity
     std::vector<Sparsity> isp_, osp_;
@@ -786,9 +804,6 @@ namespace casadi {
     eval_t eval_;
     simple_t simple_;
 
-    /// Set of module names which are extra monitored
-    std::set<std::string> monitors_;
-
     /** \brief Dict of statistics (resulting from evaluate) */
     Dict stats_;
 
@@ -797,9 +812,6 @@ namespace casadi {
 
     /// Cache for functions to evaluate directional derivatives
     std::vector<WeakRef> forward_, reverse_;
-
-    /// Cache for functions to evaluate directional derivatives
-    std::vector<WeakRef> derivative_fwd_, derivative_adj_;
 
     /// Cache for full Jacobian
     WeakRef full_jacobian_;
@@ -824,19 +836,23 @@ namespace casadi {
     Importer compiler_;
     Dict jit_options_;
 
-    // Penalty factor for using a complete Jacobian to calculate directional derivatives
+    /// Penalty factor for using a complete Jacobian to calculate directional derivatives
     double jac_penalty_;
 
-    // Weighting factor for derivative calculation and sparsity pattern calculation
+    /// Weighting factor for derivative calculation and sparsity pattern calculation
     double ad_weight_, ad_weight_sp_;
 
-    bool monitor_inputs_, monitor_outputs_;
+    /// Maximum number of sensitivity directions
+    int max_num_dir_;
 
     /// Errors are thrown when NaN is produced
     bool regularity_check_;
 
     /// Errors are thrown if numerical values of inputs look bad
     bool inputs_check_;
+
+    // Print timing statistics
+    bool print_time_;
 
     /** \brief Get type name */
     virtual std::string type_name() const;
@@ -856,12 +872,15 @@ namespace casadi {
     template<typename MatType>
     std::vector<std::vector<MatType> > symbolicAdjSeed(int nadj, const std::vector<MatType>& v);
 
+  protected:
+    static void print_stats_line(int maxNameLen, std::string label, double n_call,
+      double t_proc, double t_wall);
   private:
     /// Memory objects
-    std::vector<void*> mem_;
+    mutable std::vector<void*> mem_;
 
     /// Unused memory objects
-    std::stack<int> unused_;
+    mutable std::stack<int> unused_;
 
     /** \brief Memory that is persistent during a call (but not between calls) */
     size_t sz_arg_per_, sz_res_per_, sz_iw_per_, sz_w_per_;

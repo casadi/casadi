@@ -37,25 +37,22 @@ Joel Andersson
 nl = NlpBuilder()
 
 # Parse an NL-file
-nl.parse_nl("../nl_files/hs107.nl",{"verbose":False})
-
-# NLP function
-nlp = {'x':nl.x, 'f':nl.f, 'g':nl.g}
+nl.import_nl("../nl_files/hs107.nl",{"verbose":False})
 
 # NLP solver options
 opts = {}
+opts["expand"] = True
 # opts["max_iter"] = 10
 # opts["verbose"] = True
 # opts["linear_solver"] = "ma57"
 # opts["hessian_approximation"] = "limited-memory"
 
 # Create an NLP solver
-nlpsol = nlpsol("nlpsol", "ipopt", nlp, opts)
-  
+nlpsol = nlpsol("nlpsol", "ipopt", nl, opts)
+
 # Solve NLP
 res = nlpsol(lbx=nl.x_lb,
              ubx=nl.x_ub,
              lbg=nl.g_lb,
              ubg=nl.g_ub,
              x0=nl.x_init)
-

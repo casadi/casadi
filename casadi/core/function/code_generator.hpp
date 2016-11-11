@@ -33,6 +33,10 @@
 
 namespace casadi {
 
+  /** \brief Helper class for C code generation
+      \author Joel Andersson
+      \date 2016
+  */
   class CASADI_EXPORT CodeGenerator {
   public:
 #ifdef WITH_DEPRECATED_FEATURES
@@ -136,10 +140,11 @@ namespace casadi {
       AUX_DOT,
       AUX_BILIN,
       AUX_RANK1,
-      AUX_NRM2,
+      AUX_NORM_1,
+      AUX_NORM_2,
+      AUX_NORM_INF,
       AUX_IAMAX,
       AUX_FILL,
-      AUX_ASUM,
       AUX_SQ,
       AUX_SIGN,
       AUX_MTIMES,

@@ -323,6 +323,9 @@ namespace casadi {
     /// Create a vertical concatenation node (vectors only)
     virtual MX getVertcat(const std::vector<MX>& x) const;
 
+    /** \brief Check if two nodes are equivalent up to a given depth */
+    virtual bool is_equal(const MXNode* node, int depth) const;
+
     /** \brief The actual numerical value */
     Value v_;
   };
@@ -330,37 +333,33 @@ namespace casadi {
   template<typename Value>
   MX Constant<Value>::getHorzcat(const std::vector<MX>& x) const {
     // Check if all arguments have the same constant value
-    for (std::vector<MX>::const_iterator i=x.begin()+1; i!=x.end(); ++i) {
-      if (!(*i)->isValue(v_.value)) {
+    for (auto&& i : x) {
+      if (!i->isValue(v_.value)) {
         // Not all the same value, fall back to base class
         return ConstantMX::getHorzcat(x);
       }
     }
 
     // Assemble the sparsity pattern
-    Sparsity sp = sparsity();
-    for (std::vector<MX>::const_iterator i=x.begin()+1; i!=x.end(); ++i) {
-      sp.appendColumns(i->sparsity());
-    }
-    return MX(sp, v_.value, false);
+    std::vector<Sparsity> sp;
+    for (auto&& i : x) sp.push_back(i.sparsity());
+    return MX(horzcat(sp), v_.value, false);
   }
 
   template<typename Value>
   MX Constant<Value>::getVertcat(const std::vector<MX>& x) const {
     // Check if all arguments have the same constant value
-    for (std::vector<MX>::const_iterator i=x.begin()+1; i!=x.end(); ++i) {
-      if (!(*i)->isValue(v_.value)) {
+    for (auto&& i : x) {
+      if (!i->isValue(v_.value)) {
         // Not all the same value, fall back to base class
         return ConstantMX::getVertcat(x);
       }
     }
 
     // Assemble the sparsity pattern
-    Sparsity sp = sparsity();
-    for (std::vector<MX>::const_iterator i=x.begin()+1; i!=x.end(); ++i) {
-      sp.append(i->sparsity());
-    }
-    return MX(sp, v_.value, false);
+    std::vector<Sparsity> sp;
+    for (auto&& i : x) sp.push_back(i.sparsity());
+    return MX(vertcat(sp), v_.value, false);
   }
 
   template<typename Value>
@@ -553,6 +552,11 @@ namespace casadi {
       ss << ")";
     }
     return ss.str();
+  }
+
+  template<typename Value>
+  bool Constant<Value>::is_equal(const MXNode* node, int depth) const {
+    return node->isValue(v_.value) && sparsity()==node->sparsity();
   }
 
 } // namespace casadi

@@ -74,6 +74,8 @@ namespace casadi {
                                 const std::string& fname, const Dict& opts=Dict());
   CASADI_EXPORT Function nlpsol(const std::string& name, const std::string& solver,
                                 const Importer& compiler, const Dict& opts=Dict());
+  CASADI_EXPORT Function nlpsol(const std::string& name, const std::string& solver,
+                                const NlpBuilder& nl, const Dict& opts=Dict());
 #ifndef SWIG
   CASADI_EXPORT Function nlpsol(const std::string& name, const std::string& solver,
                                 const Function& nlp, const Dict& opts=Dict());

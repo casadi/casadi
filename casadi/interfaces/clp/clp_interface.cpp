@@ -34,7 +34,7 @@ namespace casadi {
     plugin->creator = ClpInterface::creator;
     plugin->name = "clp";
     plugin->doc = ClpInterface::meta_doc.c_str();
-    plugin->version = 30;
+    plugin->version = 31;
     return 0;
   }
 
@@ -56,8 +56,8 @@ namespace casadi {
     casadi_assert_message(H_.nnz()==0, "Not an LP");
 
     // Read options
-    for (auto&& op : opts) {
-    }
+    //for (auto&& op : opts) {
+    //}
 
     // Allocate work vectors
     alloc_w(nx_, true); // g
@@ -70,12 +70,12 @@ namespace casadi {
   }
 
   void ClpInterface::init_memory(void* mem) const {
-    auto m = static_cast<ClpMemory*>(mem);
+    //auto m = static_cast<ClpMemory*>(mem);
   }
 
   void ClpInterface::
   eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
-    auto m = static_cast<ClpMemory*>(mem);
+    //auto m = static_cast<ClpMemory*>(mem);
 
     if (inputs_check_) {
       checkInputs(arg[CONIC_LBX], arg[CONIC_UBX], arg[CONIC_LBA], arg[CONIC_UBA]);

@@ -6,6 +6,10 @@ cmake_minimum_required(VERSION 2.8.6)
 
 project(qpOASES CXX)
 
+if(WITH_NO_QPOASES_BANNER)
+  add_definitions(-D__NO_COPYRIGHT__)
+endif()
+
 # Uncomment to bypass user-defined linear solver (requires HSL)
 #add_definitions(-DSOLVER_MA27)
 
@@ -26,8 +30,3 @@ target_link_libraries(casadi_qpoases ${LAPACK_LIBRARIES} ${BLAS_LIBRARIES})
 
 # Uncomment to bypass user-defined linear solver (requires HSL)
 #target_link_libraries(casadi_qpoases ${HSL_LIBRARIES})
-
-install(DIRECTORY include
-  DESTINATION include/casadi/external_packages/qpOASES
-  FILES_MATCHING PATTERN "*.h"
-  PATTERN ".svn" EXCLUDE)

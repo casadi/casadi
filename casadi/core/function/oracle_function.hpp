@@ -53,14 +53,37 @@ namespace casadi {
     /// Oracle: Used to generate other functions
     Function oracle_;
 
+    /// Options for creating functions
+    Dict common_options_;
+    Dict specific_options_;
+
+    // Information about one function
+    struct RegFun {
+      Function f;
+      bool jit;
+      bool monitored = false;
+    };
+
     // All NLP functions
-    std::map<std::string, Function> all_functions_;
+    std::map<std::string, RegFun> all_functions_;
   public:
     /** \brief  Constructor */
     OracleFunction(const std::string& name, const Function& oracle);
 
     /** \brief  Destructor */
     virtual ~OracleFunction() = 0;
+
+    ///@{
+    /** \brief Options */
+    static Options options_;
+    virtual const Options& get_options() const { return options_;}
+    ///@}
+
+    /** Initialize  */
+    virtual void init(const Dict& opts);
+
+    /// Finalize initialization
+    virtual void finalize(const Dict& opts);
 
     /** \brief Get oracle */
     virtual const Function& oracle() const { return oracle_;}
@@ -73,11 +96,10 @@ namespace casadi {
     create_function(const std::string& fname,
                     const std::vector<std::string>& s_in,
                     const std::vector<std::string>& s_out,
-                    const Function::AuxOut& aux=Function::AuxOut(),
-                    const Dict& opts=Dict());
+                    const Function::AuxOut& aux=Function::AuxOut());
 
     /** Register the function for evaluation and statistics gathering */
-    void set_function(const Function& fcn, const std::string& fname);
+    void set_function(const Function& fcn, const std::string& fname, bool jit=false);
 
     /** Register the function for evaluation and statistics gathering */
     void set_function(const Function& fcn) { set_function(fcn, fcn.name()); }
@@ -92,14 +114,30 @@ namespace casadi {
     // Get a dependency function
     virtual const Function& get_function(const std::string &name) const;
 
+    // Is a function monitored?
+    virtual bool monitored(const std::string &name) const;
+
     // Check if a particular dependency exists
     virtual bool has_function(const std::string& fname) const;
 
     /** \brief Export / Generate C code for the generated functions */
-    virtual void generate_dependencies(const std::string& fname, const Dict& opts);
+    virtual std::string generate_dependencies(const std::string& fname, const Dict& opts);
+
+    /** \brief JIT for dependencies */
+    virtual void jit_dependencies(const std::string& fname);
+
+    /** \brief Create memory block */
+    virtual void* alloc_memory() const { return new OracleMemory();}
+
+    /** \brief Free memory block */
+    virtual void free_memory(void *mem) const { delete static_cast<OracleMemory*>(mem);}
 
     /** \brief Initalize memory block */
     virtual void init_memory(void* mem) const;
+
+    /** \brief Set the work vectors */
+    virtual void set_temp(void* mem, const double** arg, double** res,
+                          int* iw, double* w) const;
 
     /// Print statistics
     void print_fstats(const OracleMemory* m) const;

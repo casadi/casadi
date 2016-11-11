@@ -36,7 +36,6 @@ namespace casadi {
   class MXNode;
   class Function;
 
-
   /** \brief MX - Matrix expression
 
       The MX class is used to build up trees made up from MXNodes. It is a more general
@@ -223,7 +222,7 @@ namespace casadi {
     std::vector<MX> split_primitives(const MX& x) const;
 
     /** \brief Join an expression along symbolic primitives */
-    MX join_primitives(std::vector<MX>& v) const;
+    MX join_primitives(const std::vector<MX>& v) const;
 
     /// \cond INTERNAL
     /** \brief Detect duplicate symbolic expressions
@@ -383,7 +382,11 @@ namespace casadi {
     static MX hessian(const MX& f, const MX& x);
     static MX hessian(const MX& f, const MX& x, MX& g);
     static MX jtimes(const MX &ex, const MX &arg, const MX &v, bool tr=false);
+#ifdef WITH_DEPRECATED_FEATURES
     static std::vector<bool> nl_var(const MX &expr, const MX &var);
+#endif
+    static std::vector<bool> which_depends(const MX &expr, const MX &var,
+        int order=1, bool tr=false);
     static MX substitute(const MX& ex, const MX& v, const MX& vdef);
     static std::vector<MX> substitute(const std::vector<MX> &ex,
                                          const std::vector<MX> &v,
@@ -412,7 +415,7 @@ namespace casadi {
     static MX mrdivide(const MX& a, const MX& b);
     static MX mldivide(const MX& a, const MX& b);
     static MX norm_2(const MX& x);
-    static MX norm_F(const MX& x);
+    static MX norm_fro(const MX& x);
     static MX norm_1(const MX& x);
     static MX norm_inf(const MX& x);
     static MX unite(const MX& A, const MX& B);

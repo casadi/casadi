@@ -49,6 +49,16 @@ if has_nlpsol("ipopt") and has_nlpsol("sqpmethod"):
   solvers.append(("sqpmethod",{"qpsol": "nlpsol","qpsol_options": qpsol_options}))
   solvers.append(("sqpmethod",{"qpsol": "nlpsol","qpsol_options": qpsol_options,"hessian_approximation": "limited-memory","tol_du":1e-10,"tol_pr":1e-10}))
 
+if has_nlpsol("blocksqp"):
+  try:
+    load_linsol("ma27")
+    solvers.append(("blocksqp",{}))
+  except:
+    pass
+
+if has_nlpsol("bonmin"):
+  solvers.append(("bonmin",{}))
+
 print(solvers)
 """
 try:
@@ -60,6 +70,20 @@ except:
 """
 
 class NLPtests(casadiTestCase):
+
+
+  def test_initialcond(self):
+    x=SX.sym("x")
+    nlp={'x':x, 'f':-cos(x)}
+
+    for Solver, solver_options in solvers:
+      solver = nlpsol("mysolver", Solver, nlp, solver_options)
+      solver_in = {}
+      solver_in["x0"]=[6*pi+0.01]
+      solver_in["lbx"]=-inf
+      solver_in["ubx"]=inf
+      solver_out = solver(**solver_in)
+      self.assertAlmostEqual(solver_out["x"][0],6*pi,6,str(Solver))
 
   def testboundsviol(self):
     x=SX.sym("x")
@@ -74,7 +98,7 @@ class NLPtests(casadiTestCase):
       solver_in["lbg"]=[-10]
       solver_in["ubg"]=[10]
       with self.assertRaises(Exception):
-        solver_out = solver(solver_in)
+        solver_out = solver(**solver_in)
 
     for Solver, solver_options in solvers:
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
@@ -85,7 +109,7 @@ class NLPtests(casadiTestCase):
       solver_in["lbg"]=[-10]
       solver_in["ubg"]=[-20]
       with self.assertRaises(Exception):
-        solver_out = solver(solver_in)
+        solver_out = solver(**solver_in)
 
   def testIPOPT(self):
     x=SX.sym("x")
@@ -103,9 +127,9 @@ class NLPtests(casadiTestCase):
       solver_out = solver(**solver_in)
       self.assertAlmostEqual(solver_out["f"][0],0,10,str(Solver))
       self.assertAlmostEqual(solver_out["x"][0],1,9,str(Solver))
-      self.assertAlmostEqual(solver_out["g"][0],1,9,str(Solver))
-      self.assertAlmostEqual(solver_out["lam_x"][0],0,9,str(Solver))
-      self.assertAlmostEqual(solver_out["lam_g"][0],0,9,str(Solver))
+      if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["g"][0],1,9,str(Solver))
+      if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_x"][0],0,9,str(Solver))
+      if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_g"][0],0,9,str(Solver))
 
   def testIPOPT_par(self):
     x=SX.sym("x")
@@ -125,8 +149,8 @@ class NLPtests(casadiTestCase):
       solver_out = solver(**solver_in)
       self.assertAlmostEqual(solver_out["f"][0],0,10,str(Solver))
       self.assertAlmostEqual(solver_out["x"][0],1,9,str(Solver))
-      self.assertAlmostEqual(solver_out["lam_x"][0],0,9,str(Solver))
-      self.assertAlmostEqual(solver_out["lam_g"][0],0,9,str(Solver))
+      if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_x"][0],0,9,str(Solver))
+      if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_g"][0],0,9,str(Solver))
 
   def testIPOPTinf(self):
     self.message("trivial IPOPT, infinity bounds")
@@ -144,7 +168,7 @@ class NLPtests(casadiTestCase):
 
       if Solver in ("worhp","knitro"):
         with self.assertRaises(Exception):
-          solver_out = solver(solver_in)
+          solver_out = solver(**solver_in)
         return
 
 
@@ -153,8 +177,8 @@ class NLPtests(casadiTestCase):
       solver_out = solver(**solver_in)
       self.assertAlmostEqual(solver_out["f"][0],0,10,str(Solver))
       self.assertAlmostEqual(solver_out["x"][0],1,7,str(Solver) + str(solver_out["x"][0]-1))
-      self.assertAlmostEqual(solver_out["lam_x"][0],0,9,str(Solver))
-      self.assertAlmostEqual(solver_out["lam_g"][0],0,9,str(Solver))
+      if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_x"][0],0,9,str(Solver))
+      if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_g"][0],0,9,str(Solver))
 
   def testIPOPTrb(self):
     self.message("rosenbrock, limited-memory hessian approx")
@@ -173,8 +197,8 @@ class NLPtests(casadiTestCase):
       self.assertAlmostEqual(solver_out["f"][0],0,10,str(Solver))
       self.assertAlmostEqual(solver_out["x"][0],1,6,str(Solver))
       self.assertAlmostEqual(solver_out["x"][1],1,6,str(Solver))
-      self.assertAlmostEqual(solver_out["lam_x"][0],0,5,str(Solver))
-      self.assertAlmostEqual(solver_out["lam_x"][1],0,5,str(Solver))
+      if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_x"][0],0,5,str(Solver))
+      if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_x"][1],0,5,str(Solver))
 
   def testIPOPTrb2(self):
     self.message("rosenbrock, limited-memory hessian approx")
@@ -197,9 +221,9 @@ class NLPtests(casadiTestCase):
       self.assertAlmostEqual(solver_out["f"][0],0,digits,str(Solver))
       self.assertAlmostEqual(solver_out["x"][0],1,digits,str(Solver))
       self.assertAlmostEqual(solver_out["x"][1],1,digits,str(Solver))
-      self.assertAlmostEqual(solver_out["lam_x"][0],0,5,str(Solver))
-      self.assertAlmostEqual(solver_out["lam_x"][1],0,5,str(Solver))
-      self.assertAlmostEqual(solver_out["lam_g"][0],0,5,str(Solver))
+      if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_x"][0],0,5,str(Solver))
+      if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_x"][1],0,5,str(Solver))
+      if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_g"][0],0,5,str(Solver))
 
   def testIPOPTrbf(self):
     self.message("rosenbrock fixed, limited-memory hessian approx")
@@ -219,7 +243,7 @@ class NLPtests(casadiTestCase):
 
       if 'worhp' in str(Solver):
         with self.assertRaises(Exception):
-          solver_out = solver(solver_in)
+          solver_out = solver(**solver_in)
         return
 
       solver_out = solver(**solver_in)
@@ -227,9 +251,9 @@ class NLPtests(casadiTestCase):
       self.assertAlmostEqual(solver_out["x"][0],1,7,str(Solver))
       self.assertAlmostEqual(solver_out["x"][1],1,7,str(Solver))
       if "stabilizedsqp" not in str(Solver):
-        self.assertAlmostEqual(solver_out["lam_x"][0],0,6,str(Solver))
-        self.assertAlmostEqual(solver_out["lam_x"][1],0,6,str(Solver))
-        self.assertAlmostEqual(solver_out["lam_g"][0],0,6,str(Solver))
+        if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_x"][0],0,6,str(Solver))
+        if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_x"][1],0,6,str(Solver))
+        if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_g"][0],0,6,str(Solver))
 
   def test_warmstart(self):
 
@@ -259,9 +283,9 @@ class NLPtests(casadiTestCase):
       self.assertAlmostEqual(solver_out["f"][0],c_r,digits,str(Solver))
       self.assertAlmostEqual(solver_out["x"][0],x_r[0],digits,str(Solver))
       self.assertAlmostEqual(solver_out["x"][1],x_r[1],digits,str(Solver))
-      self.assertAlmostEqual(solver_out["lam_x"][0],0,8,str(Solver))
-      self.assertAlmostEqual(solver_out["lam_x"][1],0,8,str(Solver))
-      self.assertAlmostEqual(solver_out["lam_g"][0],0.12149655447670,6,str(Solver))
+      if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_x"][0],0,8,str(Solver))
+      if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_x"][1],0,8,str(Solver))
+      if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_g"][0],0.12149655447670,6,str(Solver))
 
       self.message(":warmstart")
       if "ipopt" in str(Solver):
@@ -280,7 +304,7 @@ class NLPtests(casadiTestCase):
         solver_in["ubg"]=[1]
         solver_in["x0"]=oldsolver_out["x"]
         solver_in["lam_g0"]=oldsolver_out["lam_g"]
-        solver_in["lam_x0"] =oldsolver_out["lam_x"]
+        if "bonmin" not in str(Solver): solver_in["lam_x0"] =oldsolver_out["lam_x"]
 
 
         solver_out = solver(**solver_in)
@@ -315,9 +339,9 @@ class NLPtests(casadiTestCase):
       self.assertAlmostEqual(solver_out["f"][0],c_r,digits,str(Solver) + str(solver_out["f"][0]) + ":" + str(c_r))
       self.assertAlmostEqual(solver_out["x"][0],x_r[0],digits,str(Solver))
       self.assertAlmostEqual(solver_out["x"][1],x_r[1],digits,str(Solver))
-      self.assertAlmostEqual(solver_out["lam_x"][0],0,8,str(Solver))
-      self.assertAlmostEqual(solver_out["lam_x"][1],0,8,str(Solver))
-      self.assertAlmostEqual(solver_out["lam_g"][0],0.12149655447670,6,str(Solver))
+      if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_x"][0],0,8,str(Solver))
+      if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_x"][1],0,8,str(Solver))
+      if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_g"][0],0.12149655447670,6,str(Solver))
 
 
   def test_jacG_empty(self):
@@ -344,8 +368,8 @@ class NLPtests(casadiTestCase):
 
       self.checkarray(solver_out["f"],DM([0]),str(Solver),digits=digits)
       self.checkarray(solver_out["x"],DM([1,1]),str(Solver),digits=digits)
-      self.checkarray(solver_out["lam_x"],DM([0,0]),str(Solver),digits=digits)
-      self.checkarray(solver_out["lam_g"],DM([0]),str(Solver),digits=digits)
+      if "bonmin" not in str(Solver): self.checkarray(solver_out["lam_x"],DM([0,0]),str(Solver),digits=digits)
+      if "bonmin" not in str(Solver): self.checkarray(solver_out["lam_g"],DM([0]),str(Solver),digits=digits)
 
   def testIPOPTrhb2_gen_par(self):
     self.message("rosenbrock, exact hessian generated, constrained, parametric")
@@ -377,9 +401,9 @@ class NLPtests(casadiTestCase):
       self.assertAlmostEqual(solver_out["f"][0],c_r,digits,str(Solver))
       self.assertAlmostEqual(solver_out["x"][0],x_r[0],digits,str(Solver))
       self.assertAlmostEqual(solver_out["x"][1],x_r[1],digits,str(Solver))
-      self.assertAlmostEqual(solver_out["lam_x"][0],0,8,str(Solver))
-      self.assertAlmostEqual(solver_out["lam_x"][1],0,8,str(Solver))
-      self.assertAlmostEqual(solver_out["lam_g"][0],0.12149655447670,6,str(Solver))
+      if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_x"][0],0,8,str(Solver))
+      if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_x"][1],0,8,str(Solver))
+      if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_g"][0],0.12149655447670,6,str(Solver))
 
   def testIPOPTrhb_gen(self):
     self.message("rosenbrock, exact hessian generated")
@@ -401,8 +425,8 @@ class NLPtests(casadiTestCase):
       self.assertAlmostEqual(solver_out["f"][0],0,10,str(Solver))
       self.assertAlmostEqual(solver_out["x"][0],1,9,str(Solver))
       self.assertAlmostEqual(solver_out["x"][1],1,9,str(Solver))
-      self.assertAlmostEqual(solver_out["lam_x"][0],0,8,str(Solver))
-      self.assertAlmostEqual(solver_out["lam_x"][1],0,8,str(Solver))
+      if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_x"][0],0,8,str(Solver))
+      if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_x"][1],0,8,str(Solver))
 
   def testIPOPTrhb_gen_xnonfree(self):
     self.message("rosenbrock, exact hessian generated, non-free x")
@@ -423,7 +447,7 @@ class NLPtests(casadiTestCase):
 
       if 'worhp' in str(Solver):
         with self.assertRaises(Exception):
-          solver_out = solver(solver_in)
+          solver_out = solver(**solver_in)
         return
 
 
@@ -432,8 +456,8 @@ class NLPtests(casadiTestCase):
       self.assertAlmostEqual(solver_out["f"][0],0,10,str(Solver))
       self.assertAlmostEqual(solver_out["x"][0],1,9,str(Solver))
       self.assertAlmostEqual(solver_out["x"][1],1,6,str(Solver))
-      self.assertAlmostEqual(solver_out["lam_x"][0],0,6,str(Solver))
-      self.assertAlmostEqual(solver_out["lam_x"][1],0,6,str(Solver))
+      if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_x"][0],0,6,str(Solver))
+      if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_x"][1],0,6,str(Solver))
 
   def testIPOPTrhb_gen_par(self):
     self.message("rosenbrock, exact hessian generated, parametric")
@@ -484,8 +508,8 @@ class NLPtests(casadiTestCase):
       print("bazmeg", solver_out["f"])
       self.assertAlmostEqual(solver_out["f"][0],0,10,str(Solver))
       self.checkarray(array(solver_out["x"]).squeeze(),x0,str(Solver),digits=8)
-      self.checkarray(solver_out["lam_x"],DM([0]*10),8,str(Solver),digits=8)
-      self.assertAlmostEqual(solver_out["lam_g"][1],0,8,str(Solver))
+      if "bonmin" not in str(Solver): self.checkarray(solver_out["lam_x"],DM([0]*10),8,str(Solver),digits=8)
+      if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_g"][1],0,8,str(Solver))
 
   def testIPOPTnoc(self):
     self.message("trivial IPOPT, no constraints")
@@ -632,7 +656,7 @@ class NLPtests(casadiTestCase):
 
       if 'worhp' in str(Solver):
         with self.assertRaises(Exception):
-          solver_out = solver(solver_in)
+          solver_out = solver(**solver_in)
         return
 
 
@@ -662,16 +686,16 @@ class NLPtests(casadiTestCase):
         self.assertAlmostEqual(solver_out["f"][0],4.3817250416084308,str(Solver))
         self.assertAlmostEqual(solver_out["x"][0],-1.0910624688699295,6,str(Solver))
         self.assertAlmostEqual(solver_out["x"][1],1.2,5,str(Solver))
-        self.assertAlmostEqual(solver_out["lam_x"][0],0,5 if "stabilizedsqp"==Solver else 8,str(Solver)+str(solver_options))
-        self.assertAlmostEqual(solver_out["lam_x"][1],-1.9165378046901287,4,str(Solver))
-        self.assertAlmostEqual(solver_out["lam_g"][0],0,8,str(Solver))
+        if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_x"][0],0,5 if "stabilizedsqp"==Solver else 8,str(Solver)+str(solver_options))
+        if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_x"][1],-1.9165378046901287,4,str(Solver))
+        if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_g"][0],0,8,str(Solver))
       else:
         self.assertAlmostEqual(solver_out["f"][0],9.0908263002590e-3,6,str(Solver))
         self.assertAlmostEqual(solver_out["x"][0],1.0952466252248,6,str(Solver))
         self.assertAlmostEqual(solver_out["x"][1],1.2,5,str(Solver))
-        self.assertAlmostEqual(solver_out["lam_x"][0],0,5 if "stabilizedsqp"==Solver else 8,str(Solver)+str(solver_options))
-        self.assertAlmostEqual(solver_out["lam_x"][1],-8.6963632695079e-2,4,str(Solver))
-        self.assertAlmostEqual(solver_out["lam_g"][0],0,8,str(Solver))
+        if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_x"][0],0,5 if "stabilizedsqp"==Solver else 8,str(Solver)+str(solver_options))
+        if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_x"][1],-8.6963632695079e-2,4,str(Solver))
+        if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_g"][0],0,8,str(Solver))
 
   def testactiveLBG(self):
     self.message("active LBG")
@@ -692,9 +716,9 @@ class NLPtests(casadiTestCase):
       self.assertAlmostEqual(solver_out["f"][0],4.252906468284e-3,6,str(Solver))
       self.assertAlmostEqual(solver_out["x"][0],1.065181061847138,6,str(Solver))
       self.assertAlmostEqual(solver_out["x"][1],1.1348189166291160,6,str(Solver))
-      self.assertAlmostEqual(solver_out["lam_x"][0],0,8,str(Solver))
-      self.assertAlmostEqual(solver_out["lam_x"][1],0,4,str(Solver))
-      self.assertAlmostEqual(solver_out["lam_g"][0],-4.1644422845712e-2,3,str(Solver))
+      if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_x"][0],0,8,str(Solver))
+      if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_x"][1],0,4,str(Solver))
+      if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_g"][0],-4.1644422845712e-2,3,str(Solver))
 
   def testactiveUBG(self):
     self.message("active UBG")
@@ -715,9 +739,9 @@ class NLPtests(casadiTestCase):
       self.assertAlmostEqual(solver_out["f"][0],4.64801220074552e-3,6,str(Solver))
       self.assertAlmostEqual(solver_out["x"][0],9.318651964592811e-1,5,str(Solver))
       self.assertAlmostEqual(solver_out["x"][1],8.68134821123689e-1,5,str(Solver))
-      self.assertAlmostEqual(solver_out["lam_x"][0],0,8,str(Solver))
-      self.assertAlmostEqual(solver_out["lam_x"][1],0,4,str(Solver))
-      self.assertAlmostEqual(solver_out["lam_g"][0],4.75846495145007e-2,5,str(Solver))
+      if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_x"][0],0,8,str(Solver))
+      if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_x"][1],0,4,str(Solver))
+      if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_g"][0],4.75846495145007e-2,5,str(Solver))
 
   def testactiveUBX(self):
     self.message("active UBX")
@@ -738,9 +762,9 @@ class NLPtests(casadiTestCase):
       self.assertAlmostEqual(solver_out["f"][0],2.626109721583e-3,6,str(Solver))
       self.assertAlmostEqual(solver_out["x"][0],9.4882542279172277e-01,6,str(Solver))
       self.assertAlmostEqual(solver_out["x"][1],0.9,6,str(Solver))
-      self.assertAlmostEqual(solver_out["lam_x"][0],0,8,str(Solver))
-      self.assertAlmostEqual(solver_out["lam_x"][1],5.39346608659e-2,4,str(Solver))
-      self.assertAlmostEqual(solver_out["lam_g"][0],0,8,str(Solver))
+      if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_x"][0],0,8,str(Solver))
+      if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_x"][1],5.39346608659e-2,4,str(Solver))
+      if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_g"][0],0,8,str(Solver))
 
   @memory_heavy()
   def test_QP(self):
@@ -764,7 +788,7 @@ class NLPtests(casadiTestCase):
       solver_out = solver(**solver_in)
       self.checkarray(solver_out["x"],x0,str(Solver),digits=2)
       self.assertAlmostEqual(solver_out["f"][0],0,3,str(Solver))
-      self.checkarray(solver_out["lam_x"],DM.zeros(N,1),str(Solver),digits=4)
+      if "bonmin" not in str(Solver): self.checkarray(solver_out["lam_x"],DM.zeros(N,1),str(Solver),digits=4)
 
   def test_QP2(self):
     H = DM([[1,-1],[-1,2]])
@@ -797,7 +821,7 @@ class NLPtests(casadiTestCase):
         continue
       if Solver=='worhp':
         with self.assertRaises(Exception):
-          solver_out = solver(solver_in)
+          solver_out = solver(**solver_in)
         return
 
       solver_out = solver(**solver_in)
@@ -805,10 +829,10 @@ class NLPtests(casadiTestCase):
       self.assertAlmostEqual(solver_out["x"][0],0.5,6,str(Solver))
       self.assertAlmostEqual(solver_out["x"][1],1.25,6,str(Solver))
 
-      self.assertAlmostEqual(solver_out["lam_x"][0],4.75,6,str(Solver))
-      self.assertAlmostEqual(solver_out["lam_x"][1],0,6,str(Solver))
+      if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_x"][0],4.75,6,str(Solver))
+      if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_x"][1],0,6,str(Solver))
 
-      self.checkarray(solver_out["lam_g"],DM([0,2,0]),str(Solver),digits=6)
+      if "bonmin" not in str(Solver): self.checkarray(solver_out["lam_g"],DM([0,2,0]),str(Solver),digits=6)
 
       self.assertAlmostEqual(solver_out["f"][0],-7.4375,6,str(Solver))
 
@@ -823,10 +847,10 @@ class NLPtests(casadiTestCase):
       self.assertAlmostEqual(solver_out["x"][0],0.5,6,str(Solver))
       self.assertAlmostEqual(solver_out["x"][1],1.25,6,str(Solver))
 
-      self.assertAlmostEqual(solver_out["lam_x"][0],4.75,6,str(Solver))
-      self.assertAlmostEqual(solver_out["lam_x"][1],0,6,str(Solver))
+      if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_x"][0],4.75,6,str(Solver))
+      if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_x"][1],0,6,str(Solver))
 
-      self.checkarray(solver_out["lam_g"],DM([0,2,0]),str(Solver),digits=6)
+      if "bonmin" not in str(Solver): self.checkarray(solver_out["lam_g"],DM([0,2,0]),str(Solver),digits=6)
 
       self.assertAlmostEqual(solver_out["f"][0],-7.4375,6,str(Solver))
 
@@ -861,10 +885,10 @@ class NLPtests(casadiTestCase):
       self.assertAlmostEqual(solver_out["x"][0],2.0/3,6,str(solver))
       self.assertAlmostEqual(solver_out["x"][1],4.0/3,6,str(solver))
 
-      self.assertAlmostEqual(solver_out["lam_x"][0],0,6,str(solver))
-      self.assertAlmostEqual(solver_out["lam_x"][1],0,6,str(solver))
+      if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_x"][0],0,6,str(solver))
+      if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_x"][1],0,6,str(solver))
 
-      self.checkarray(solver_out["lam_g"],DM([4+8.0/9,20.0/9,0]),str(solver),digits=6)
+      if "bonmin" not in str(Solver): self.checkarray(solver_out["lam_g"],DM([4+8.0/9,20.0/9,0]),str(solver),digits=6)
 
       self.assertAlmostEqual(solver_out["f"][0],-10-16.0/9,6,str(solver))
 
@@ -880,10 +904,10 @@ class NLPtests(casadiTestCase):
       self.assertAlmostEqual(solver_out["x"][0],2.0/3,6,str(solver))
       self.assertAlmostEqual(solver_out["x"][1],4.0/3,6,str(solver))
 
-      self.assertAlmostEqual(solver_out["lam_x"][0],0,6,str(solver))
-      self.assertAlmostEqual(solver_out["lam_x"][1],0,6,str(solver))
+      if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_x"][0],0,6,str(solver))
+      if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_x"][1],0,6,str(solver))
 
-      self.checkarray(solver_out["lam_g"],DM([4+8.0/9,20.0/9,0]),str(solver),digits=6)
+      if "bonmin" not in str(Solver): self.checkarray(solver_out["lam_g"],DM([4+8.0/9,20.0/9,0]),str(solver),digits=6)
 
       self.assertAlmostEqual(solver_out["f"][0],-10-16.0/9,6,str(solver))
 
@@ -919,7 +943,7 @@ class NLPtests(casadiTestCase):
         self.nx = nx
         self.ng = ng
         self.np = np
-        self.construct(name, {})
+        self.construct("mycallback", {})
 
       def get_n_in(self): return nlpsol_n_out()
       def get_n_out(self): return 1
@@ -947,7 +971,7 @@ class NLPtests(casadiTestCase):
     solver = nlpsol('solver', 'ipopt', nlp, opts)
     sol = solver(lbx=-10, ubx=10, lbg=-10, ubg=10)
     self.assertEqual(len(mycallback.foo),solver.stats()["iter_count"]+1)
-    
+
     class MyCallback(Callback):
       def __init__(self,nx, ng, np):
         Callback.__init__(self)
@@ -956,7 +980,7 @@ class NLPtests(casadiTestCase):
         self.nx = nx
         self.ng = ng
         self.np = np
-        self.construct(name, {})
+        self.construct("mycallback", {})
 
       def get_n_in(self): return nlpsol_n_out()
       def get_n_out(self): return 1
@@ -986,7 +1010,7 @@ class NLPtests(casadiTestCase):
       solver = nlpsol('solver', 'ipopt', nlp, opts)
     except Exception as e:
       self.assertTrue("Callback function input size mismatch" in str(e))
-    
+
   @requires_nlpsol("snopt")
   def test_permute(self):
     for Solver, solver_options in solvers:
@@ -1023,8 +1047,8 @@ class NLPtests(casadiTestCase):
 
           self.checkarray(solver_out["f"],DM([1.9001249992187681e+00]),digits=7)
           self.checkarray(solver_out["x"][permute_x],DM([-7.0622015054877127e-02,1.4124491251068008e+00,0,1.9925001159906402e-02]),failmessage=str(permute_x)+str(permute_g),digits=7)
-          self.checkarray(solver_out["lam_x"][permute_x],DM([0,0,-2.4683779218120115e+01,0]),digits=7)
-          self.checkarray(solver_out["lam_g"],DM([1.9000124997534527e+01,-5,0])[permute_g],digits=7)
+          if "bonmin" not in str(Solver): self.checkarray(solver_out["lam_x"][permute_x],DM([0,0,-2.4683779218120115e+01,0]),digits=7)
+          if "bonmin" not in str(Solver): self.checkarray(solver_out["lam_g"],DM([1.9000124997534527e+01,-5,0])[permute_g],digits=7)
           self.checkarray(solver_out["g"],DM([2,4,5.5085524702939])[permute_g],digits=7)
 
   @requires_nlpsol("snopt")
@@ -1063,8 +1087,8 @@ class NLPtests(casadiTestCase):
 
           self.checkarray(solver_out["f"],DM([0]),digits=8)
           self.checkarray(solver_out["x"][permute_x],DM([0,2,0,4]),digits=4,failmessage=str(permute_x)+str(permute_g))
-          self.checkarray(solver_out["lam_x"][permute_x],DM([0,0,0,0]),digits=3)
-          self.checkarray(solver_out["lam_g"],DM([0,0,0])[permute_g],digits=3)
+          if "bonmin" not in str(Solver): self.checkarray(solver_out["lam_x"][permute_x],DM([0,0,0,0]),digits=3)
+          if "bonmin" not in str(Solver): self.checkarray(solver_out["lam_g"],DM([0,0,0])[permute_g],digits=3)
           #self.checkarray(solver_out["g"],DM([2,4,5.50855])[permute_g])
 
   @requires_nlpsol("snopt")
@@ -1102,8 +1126,8 @@ class NLPtests(casadiTestCase):
 
           self.checkarray(solver_out["f"],DM([9.9030108869944522e-01]),failmessage=str(permute_x)+str(permute_g))
           self.checkarray(solver_out["x"][permute_x],DM([1.53822842722,-0.76911421361,0.402967519303,3.83761717839]),digits=6)
-          self.checkarray(solver_out["lam_x"][permute_x],DM([0,0,0,0]),digits=7)
-          self.checkarray(solver_out["lam_g"],DM([-8.0593503860219973e-01,6.52750754744e-10,-0.298516240384])[permute_g],failmessage=str(permute_x)+str(permute_g),digits=8)
+          if "bonmin" not in str(Solver): self.checkarray(solver_out["lam_x"][permute_x],DM([0,0,0,0]),digits=7)
+          if "bonmin" not in str(Solver): self.checkarray(solver_out["lam_g"],DM([-8.0593503860219973e-01,6.52750754744e-10,-0.298516240384])[permute_g],failmessage=str(permute_x)+str(permute_g),digits=8)
           #self.checkarray(solver_out["g"],DM([2,4,5.50855])[permute_g])
 
   @requires_nlpsol("snopt")
@@ -1147,7 +1171,7 @@ class NLPtests(casadiTestCase):
 
       self.checkarray(solver_out["f"],DM([0]),digits=7)
       self.checkarray(solver_out["x"],DM([1,0]),digits=7,failmessage=str(Solver))
-      self.checkarray(solver_out["lam_x"],DM([0,-0]),digits=7,failmessage=str(Solver))
+      if "bonmin" not in str(Solver): self.checkarray(solver_out["lam_x"],DM([0,-0]),digits=7,failmessage=str(Solver))
 
   def test_pathological2(self):
     x=SX.sym("x")
@@ -1167,7 +1191,7 @@ class NLPtests(casadiTestCase):
 
       self.checkarray(solver_out["f"],DM([0]),digits=7)
       self.checkarray(solver_out["x"],DM([1,0]),digits=7)
-      self.checkarray(solver_out["lam_x"],DM([0,-1]),digits=7)
+      if "bonmin" not in str(Solver): self.checkarray(solver_out["lam_x"],DM([0,-1]),digits=7)
 
   def test_pathological3(self):
     x=SX.sym("x")
@@ -1190,7 +1214,7 @@ class NLPtests(casadiTestCase):
 
       self.checkarray(solver_out["f"],DM([0]),digits=7)
       self.checkarray(solver_out["x"],DM([1,1]),digits=7)
-      self.checkarray(solver_out["lam_x"],DM([0,0]),digits=7)
+      if "bonmin" not in str(Solver): self.checkarray(solver_out["lam_x"],DM([0,0]),digits=7)
 
   def test_pathological4(self):
     x=SX.sym("x")
@@ -1210,7 +1234,7 @@ class NLPtests(casadiTestCase):
 
       self.checkarray(solver_out["f"],DM([0]),digits=7)
       self.checkarray(solver_out["x"],DM([0]),digits=7)
-      self.checkarray(solver_out["lam_x"],DM([0]),digits=7)
+      if "bonmin" not in str(Solver): self.checkarray(solver_out["lam_x"],DM([0]),digits=7)
 
 if __name__ == '__main__':
     unittest.main()

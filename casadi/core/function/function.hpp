@@ -207,8 +207,9 @@ namespace casadi {
     ///@}
 
     ///@{
-    /** \brief  Get of number of input nonzeros
-     * For a particular input or for all for all of the inputs
+    /** \brief  Get number of input nonzeros
+     *
+     * For a particular input or for all of the inputs
      */
     int nnz_in() const;
     int nnz_in(int ind) const;
@@ -216,8 +217,9 @@ namespace casadi {
     ///@}
 
     ///@{
-    /** \brief  Get of number of output nonzeros
-     * For a particular output or for all for all of the outputs
+    /** \brief  Get number of output nonzeros
+     *
+     * For a particular output or for all of the outputs
      */
     int nnz_out() const;
     int nnz_out(int ind) const;
@@ -225,8 +227,9 @@ namespace casadi {
     ///@}
 
     ///@{
-    /** \brief  Get of number of input elements
-     * For a particular input or for all for all of the inputs
+    /** \brief  Get number of input elements
+     *
+     * For a particular input or for all of the inputs
      */
     int numel_in() const;
     int numel_in(int ind) const;
@@ -234,8 +237,9 @@ namespace casadi {
     ///@}
 
     ///@{
-    /** \brief  Get of number of output elements
-     * For a particular output or for all for all of the outputs
+    /** \brief  Get number of output elements
+     *
+     * For a particular output or for all of the outputs
      */
     int numel_out() const;
     int numel_out(int ind) const;
@@ -294,11 +298,27 @@ namespace casadi {
                      const Dict& opts=Dict()) const;
 
     /** \brief Get oracle */
-    virtual Function oracle() const;
+    Function oracle() const;
 
-    /** \brief Which variables enter nonlinearly */
+    /** \brief Wrap in an Function instance consisting of only one MX call */
+    Function wrap() const;
+
+#ifdef WITH_DEPRECATED_FEATURES
+    /** \brief [DEPRECATED] Which variables enter nonlinearly
+    *
+    * Use which_depends instead.
+    */
     std::vector<bool> nl_var(const std::string& s_in,
                              const std::vector<std::string>& s_out) const;
+#endif
+    /** \brief Which variables enter with some order
+    *
+    * \param[in] order Only 1 (linear) and 2 (nonlinear) allowed
+    * \param[in] tr   Flip the relationship. Return which expressions contain the variables
+    */
+    std::vector<bool> which_depends(const std::string& s_in,
+                                           const std::vector<std::string>& s_out,
+                                           int order=1, bool tr=false) const;
 
     /** \brief Print dimensions of inputs and outputs */
     void print_dimensions(std::ostream &stream=casadi::userOut()) const;
@@ -526,79 +546,51 @@ namespace casadi {
 
 #endif // SWIG
 
-    /** \brief Create call to (cached) derivative function, forward mode  */
+    /** \brief [DEPRECATED] Use Function::factory or jtimes  */
     void forward(const std::vector<MX>& arg, const std::vector<MX>& res,
                  const std::vector<std::vector<MX> >& fseed,
                  std::vector<std::vector<MX> >& SWIG_OUTPUT(fsens),
                  bool always_inline=false, bool never_inline=false);
 
-    /** \brief Create call to (cached) derivative function, reverse mode  */
+    /** \brief [DEPRECATED] Use Function::factory or jtimes  */
     void reverse(const std::vector<MX>& arg, const std::vector<MX>& res,
                  const std::vector<std::vector<MX> >& aseed,
                  std::vector<std::vector<MX> >& SWIG_OUTPUT(asens),
                  bool always_inline=false, bool never_inline=false);
 
-    /** \brief Create call to (cached) derivative function, forward mode  */
+    /** \brief [DEPRECATED] Use Function::factory or jtimes  */
     void forward(const std::vector<SX>& arg, const std::vector<SX>& res,
                  const std::vector<std::vector<SX> >& fseed,
                  std::vector<std::vector<SX> >& SWIG_OUTPUT(fsens),
                  bool always_inline=false, bool never_inline=false);
 
-    /** \brief Create call to (cached) derivative function, reverse mode  */
+    /** \brief [DEPRECATED] Use Function::factory or jtimes  */
     void reverse(const std::vector<SX>& arg, const std::vector<SX>& res,
                  const std::vector<std::vector<SX> >& aseed,
                  std::vector<std::vector<SX> >& SWIG_OUTPUT(asens),
                  bool always_inline=false, bool never_inline=false);
 
-    /** \brief Create call to (cached) derivative function, forward mode  */
+    /** \brief [DEPRECATED] Use Function::factory or jtimes  */
     void forward(const std::vector<DM>& arg, const std::vector<DM>& res,
                  const std::vector<std::vector<DM> >& fseed,
                  std::vector<std::vector<DM> >& SWIG_OUTPUT(fsens),
                  bool always_inline=false, bool never_inline=false);
 
-    /** \brief Create call to (cached) derivative function, reverse mode  */
+    /** \brief [DEPRECATED] Use Function::factory or jtimes  */
     void reverse(const std::vector<DM>& arg, const std::vector<DM>& res,
                  const std::vector<std::vector<DM> >& aseed,
                  std::vector<std::vector<DM> >& SWIG_OUTPUT(asens),
                  bool always_inline=false, bool never_inline=false);
 
-    /// \cond INTERNAL
-    ///@{
-   /** \brief Evaluate the function symbolically or numerically with directional derivatives
-     * The first two arguments are the nondifferentiated inputs and results of the evaluation,
-     * the next two arguments are a set of forward directional seeds and the resulting forward
-     * directional derivatives, the length of the vector being the number of forward directions.
-     * The next two arguments are a set of adjoint directional seeds and the resulting adjoint
-     * directional derivatives, the length of the vector being the number of adjoint directions.
-     */
-    void derivative(const DMVector& arg, DMVector& SWIG_OUTPUT(res),
-                    const DMVectorVector& fseed, DMVectorVector& SWIG_OUTPUT(fsens),
-                    const DMVectorVector& aseed, DMVectorVector& SWIG_OUTPUT(asens),
-                    bool always_inline=false, bool never_inline=false);
-
-    void derivative(const SXVector& arg, SXVector& SWIG_OUTPUT(res),
-                    const SXVectorVector& fseed, SXVectorVector& SWIG_OUTPUT(fsens),
-                    const SXVectorVector& aseed, SXVectorVector& SWIG_OUTPUT(asens),
-                    bool always_inline=false, bool never_inline=false);
-
-    void derivative(const MXVector& arg, MXVector& SWIG_OUTPUT(res),
-                    const MXVectorVector& fseed, MXVectorVector& SWIG_OUTPUT(fsens),
-                    const MXVectorVector& aseed, MXVectorVector& SWIG_OUTPUT(asens),
-                    bool always_inline=false, bool never_inline=false);
-    ///@}
-    /// \endcond
-
-    /** \brief  Evaluate symbolically in parallel (matrix graph)
-        \param parallelization Type of parallelization used: unroll|serial|openmp
-    */
+#ifdef WITH_DEPRECATED_FEATURES
+    /** \brief [DEPRECATED] Use map(int) instead */
     std::vector<MX> map(const std::vector<MX > &arg,
                         const std::string& parallelization="serial");
 
-    /** \brief  Evaluate symbolically in parallel (matrix graph)
-        \param parallelization Type of parallelization used: unroll|serial|openmp
-    */
+    /** \brief [DEPRECATED] Use map(int) instead */
     std::map<std::string, MX> map(const std::map<std::string, MX> &arg,
                         const std::string& parallelization="serial");
+#endif // WITH_DEPRECATED_FEATURES
 
     /** \brief  Evaluate symbolically in parallel and sum (matrix graph)
         \param parallelization Type of parallelization used: unroll|serial|openmp
@@ -632,7 +624,8 @@ namespace casadi {
 
 
     */
-    Function mapaccum(const std::string& name, int n, const Dict& opts = Dict());
+    Function mapaccum(const std::string& name, int n, int n_accum=1,
+                      const Dict& opts = Dict());
     Function mapaccum(const std::string& name, int n,
                       const std::vector<int>& accum_in,
                       const std::vector<int>& accum_out,
@@ -643,8 +636,6 @@ namespace casadi {
                       const Dict& opts=Dict());
     ///@}
 
-
-    ///@{
     /** \brief  Create a mapped version of this function
 
         Suppose the function has a signature of:
@@ -652,7 +643,7 @@ namespace casadi {
            f: (a, p) -> ( s )
         \endverbatim
 
-        The the mapaccumulated version has the signature:
+        The the mapped version has the signature:
         \verbatim
            F: (A, P) -> (S )
 
@@ -668,9 +659,18 @@ namespace casadi {
         \endverbatim
 
         \param parallelization Type of parallelization used: unroll|serial|openmp
-
     */
+    Function map(int n, const std::string& parallelization="serial");
 
+    /** \brief [DEPRECATED] Old syntax for map */
+    Function map(const std::string& name, const std::string& parallelization, int n,
+      const Dict& opts=Dict());
+
+    ///@{
+    /** \brief Map with reduction
+      A subset of the inputs are non-repeated and a subset of the outputs summed
+      up.
+    */
     Function map(const std::string& name, const std::string& parallelization, int n,
       const std::vector<int>& reduce_in,
       const std::vector<int>& reduce_out,
@@ -679,13 +679,11 @@ namespace casadi {
       const std::vector<std::string>& reduce_in,
       const std::vector<std::string>& reduce_out,
       const Dict& opts=Dict());
-    Function map(const std::string& name, const std::string& parallelization, int n,
-      const Dict& opts=Dict());
     ///@}
 
     /** \brief returns a new function with a selection of inputs/outputs of the original */
-    Function slice(const std::vector<int>& order_in, const std::vector<int>& order_out,
-                   const Dict& opts=Dict());
+    Function slice(const std::string& name, const std::vector<int>& order_in,
+                   const std::vector<int>& order_out, const Dict& opts=Dict()) const;
 
     /** \brief Constuct a switch function */
     static Function conditional(const std::string& name, const std::vector<Function>& f,
@@ -695,82 +693,47 @@ namespace casadi {
     static Function if_else(const std::string& name, const Function& f_true,
                             const Function& f_false, const Dict& opts=Dict());
 
-    /** kernel_sum
-        Consider a dense matrix V.
-
-        KernelSum computes
-
-        F(V,X)  = sum_i sum_j  f ( [i;j], V(i,j), X)
-
-        with X: [x;y]
-
-        where the summation is taken for all entries (i,j)
-        that are a distance r away from X.
-
-        This function assumes that V is fixed:
-        sensitivities with respect to it are not computed.
-
-        This allows for improved speed of evaluation.
-
-        Having V fixed is a common use case:
-        V may be a large bitmap (observation),
-        onto which a kernel is fitted.
-
-        \author Joris Gillis
-        \date 2015
-    */
+#ifdef WITH_DEPRECATED_FEATURES
+    /** \brief [DEPRECATED] kernel_sum is no longer available */
     Function kernel_sum(const std::string& name,
                         const std::pair<int, int> & size,
                         double r, int n,
                         const Dict& opts=Dict()) const;
 
-    /** \brief Get a function that calculates \a nfwd forward derivatives and nadj adjoint derivatives
-     *         Legacy function: Use forward and reverse instead.
-     *
-     *         Returns a function with <tt>(1+nfwd)*n_in+nadj*n_out</tt> inputs
-     *         and <tt>(1+nfwd)*n_out + nadj*n_in</tt> outputs.
-     *         The first <tt>n_in</tt> inputs correspond to nondifferentiated inputs.
-     *         The next <tt>nfwd*n_in</tt> inputs correspond to forward seeds,
-     *         one direction at a time
-     *         and the last <tt>nadj*n_out</tt> inputs correspond to adjoint seeds,
-     *         one direction at a time.
-     *         The first n_out outputs correspond to nondifferentiated outputs.
-     *         The next <tt>nfwd*n_out</tt> outputs correspond to forward sensitivities,
-     *         one direction at a time and the last <tt>nadj*n_in</tt> outputs corresponds to
-     *         adjoint sensitivities, one direction at a time.
-     *
-     *         <tt>(n_in = n_in(), n_out = n_out())</tt>
-     *
-     */
+    /** \brief [DEPRECATED] Use forward_new and reverse_new instead. */
     Function derivative(int nfwd, int nadj);
+#endif // WITH_DEPRECATED_FEATURES
 
     /** \brief Get a function that calculates \a nfwd forward derivatives
      *
-     *         Returns a function with <tt>n_in + n_out +nfwd*n_in</tt> inputs
-     *         and <tt>nfwd*n_out</tt> outputs.
+     *         Returns a function with <tt>n_in + n_out + n_in</tt> inputs
+     *         and <tt>nfwd</tt> outputs.
      *         The first <tt>n_in</tt> inputs correspond to nondifferentiated inputs.
      *         The next <tt>n_out</tt> inputs correspond to nondifferentiated outputs.
-     *         and the last <tt>nfwd*n_in</tt> inputs correspond to forward seeds,
-     *         one direction at a time
-     *         The  <tt>nfwd*n_out</tt> outputs correspond to forward sensitivities,
-     *         one direction at a time.     *
+     *         and the last <tt>n_in</tt> inputs correspond to forward seeds,
+     *         stacked horizontally
+     *         The  <tt>n_out</tt> outputs correspond to forward sensitivities,
+     *         stacked horizontally.     *
      *         <tt>(n_in = n_in(), n_out = n_out())</tt>
      *
      *        The functions returned are cached, meaning that if called multiple timed
      *        with the same value, then multiple references to the same function will be returned.
      */
+    Function forward_new(int nfwd);
+
+    /** \brief [DEPRECATED] Use forward_new instead */
     Function forward(int nfwd);
 
     /** \brief Get a function that calculates \a nadj adjoint derivatives
      *
-     *         Returns a function with <tt>n_in + n_out +nadj*n_out</tt> inputs
-     *         and <tt>nadj*n_in</tt> outputs.
+     *         Returns a function with <tt>n_in + n_out + n_out</tt> inputs
+     *         and <tt>n_in</tt> outputs.
      *         The first <tt>n_in</tt> inputs correspond to nondifferentiated inputs.
      *         The next <tt>n_out</tt> inputs correspond to nondifferentiated outputs.
-     *         and the last <tt>nadj*n_out</tt> inputs correspond to adjoint seeds,
-     *         one direction at a time
-     *         The  <tt>nadj*n_in</tt> outputs correspond to adjoint sensitivities,
-     *         one direction at a time.     *
+     *         and the last <tt>n_out</tt> inputs correspond to adjoint seeds,
+     *         stacked horizontally
+     *         The  <tt>n_in</tt> outputs correspond to adjoint sensitivities,
+     *         stacked horizontally.     *
      *         <tt>(n_in = n_in(), n_out = n_out())</tt>
      *
      *         <tt>(n_in = n_in(), n_out = n_out())</tt>
@@ -778,15 +741,10 @@ namespace casadi {
      *        The functions returned are cached, meaning that if called multiple timed
      *        with the same value, then multiple references to the same function will be returned.
      */
-    Function reverse(int nadj);
+    Function reverse_new(int nadj);
 
-    /** \brief Set a function that calculates \a nfwd forward derivatives
-        NOTE: Does _not_ take ownership, only weak references to the derivatives are kept internally */
-    void set_forward(const Function& fcn, int nfwd);
-
-    /** \brief Set a function that calculates \a nadj adjoint derivatives
-        NOTE: Does _not_ take ownership, only weak references to the derivatives are kept internally */
-    void set_reverse(const Function& fcn, int nadj);
+    /** \brief [DEPRECATED] Use reverse_new instead */
+    Function reverse(int nfwd);
 
     ///@{
     /// Get, if necessary generate, the sparsity of a Jacobian block
@@ -823,13 +781,13 @@ namespace casadi {
     ///@}
 
     /** \brief Export / Generate C code for the function */
-    void generate(const std::string& fname, const Dict& opts=Dict());
+    std::string generate(const std::string& fname, const Dict& opts=Dict());
 
     /** \brief Export / Generate C code for the function */
-    void generate(const Dict& opts=Dict());
+    std::string generate(const Dict& opts=Dict());
 
     /** \brief Export / Generate C code for the dependency function */
-    void generate_dependencies(const std::string& fname, const Dict& opts=Dict());
+    std::string generate_dependencies(const std::string& fname, const Dict& opts=Dict());
 
 #ifndef SWIG
     /// \cond INTERNAL
@@ -953,15 +911,6 @@ namespace casadi {
     void setup(const double** arg, double** res, int* iw, double* w, int mem=0) const;
 #endif // SWIG
 
-    /// \endcond
-
-    /** \brief Add modules to be monitored */
-    void addMonitor(const std::string& mon);
-
-    /** \brief Remove modules to be monitored */
-    void removeMonitor(const std::string& mon);
-
-    /// \cond INTERNAL
     /** \brief Check if the numerical values of the supplied bounds make sense */
     void checkInputs() const;
 #ifndef SWIG
@@ -1008,10 +957,10 @@ namespace casadi {
     void assert_size_out(int i, int nrow, int ncol) const;
 
     /// Checkout a memory object
-    int checkout();
+    int checkout() const;
 
     /// Release a memory object
-    void release(int mem);
+    void release(int mem) const;
 
 #ifndef SWIG
     /// Get memory object
@@ -1029,9 +978,6 @@ namespace casadi {
 
     /// Access rhs function for a rootfinder
     Function rootfinder_fun();
-
-    /// Access Jacobian of the ths function for a rootfinder
-    Function rootfinder_jac();
 
 #ifdef WITH_DEPRECATED_FEATURES
     /** \brief [DEPRECATED] Get the DAE for an integrator

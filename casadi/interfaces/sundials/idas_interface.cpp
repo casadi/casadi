@@ -39,7 +39,7 @@ namespace casadi {
     plugin->creator = IdasInterface::creator;
     plugin->name = "idas";
     plugin->doc = IdasInterface::meta_doc.c_str();
-    plugin->version = 30;
+    plugin->version = 31;
     return 0;
   }
 
@@ -93,7 +93,7 @@ namespace casadi {
     SundialsInterface::init(opts);
 
     // Default options
-    cj_scaling_ = false;
+    cj_scaling_ = true;
     calc_ic_ = true;
     suppress_algebraic_ = false;
     max_step_size_ = 0;
@@ -147,7 +147,7 @@ namespace casadi {
     }
 
     // Attach functions for jacobian information
-    if (newton_scheme_!=SD_DIRECT) {
+    if (newton_scheme_!=SD_DIRECT || (ns_>0 && second_order_correction_)) {
       create_function("jtimesF",
         {"t", "x", "z", "p", "fwd:x", "fwd:z"},
         {"fwd:ode", "fwd:alg"});
@@ -622,7 +622,7 @@ namespace casadi {
   void IdasInterface::setStopTime(IntegratorMemory* mem, double tf) const {
     // Set the stop time of the integration -- don't integrate past this point
     auto m = to_mem(mem);
-    auto& s = m->self;
+    //auto& s = m->self;
     THROWING(IDASetStopTime, m->mem, tf);
   }
 
@@ -632,37 +632,63 @@ namespace casadi {
     try {
       auto m = to_mem(user_data);
       auto& s = m->self;
-      // Copy input to output, if necessary
-      if (rvec!=zvec) {
-        N_VScale(1.0, rvec, zvec);
+
+      // Get right-hand sides in m->v1, ordered by sensitivity directions
+      double* vx = NV_DATA_S(rvec);
+      double* vz = vx + s.nx_;
+      double* v_it = m->v1;
+      for (int d=0; d<=s.ns_; ++d) {
+        casadi_copy(vx + d*s.nx1_, s.nx1_, v_it);
+        v_it += s.nx1_;
+        casadi_copy(vz + d*s.nz1_, s.nz1_, v_it);
+        v_it += s.nz1_;
       }
 
-      // Solve the factorized system
-      double* v = NV_DATA_S(zvec);
+      // Solve for undifferentiated right-hand-side, save to output
+      s.linsolF_.solve(m->v1, 1);
+      vx = NV_DATA_S(zvec); // possibly different from rvec
+      vz = vx + s.nx_;
+      casadi_copy(m->v1, s.nx1_, vx);
+      casadi_copy(m->v1 + s.nx1_, s.nz1_, vz);
 
-      // Reorder by nondifferentiated x and z
-      if (s.ns_>0 && s.nz_>0) {
-        casadi_copy(v+s.nx_, s.nz_, m->ztmp);
-        for (int d=s.ns_; d>0; --d) {
-          casadi_copy(v+d*s.nx1_, s.nx1_, v+d*(s.nx1_+s.nz1_));
-        }
-        for (int d=0; d<=s.ns_; ++d) {
-          casadi_copy(m->ztmp+d*s.nz1_, s.nz1_, v+d*(s.nx1_+s.nz1_)+s.nx1_);
-        }
-      }
+      // Sensitivity equations
+      if (s.ns_>0) {
+        // Second order correction
+        if (true) {
+          // The outputs will double as seeds for jtimesF
+          casadi_fill(vx + s.nx1_, s.nx_ - s.nx1_, 0.);
+          casadi_fill(vz + s.nz1_, s.nz_ - s.nz1_, 0.);
+          m->arg[0] = &t; // t
+          m->arg[1] = NV_DATA_S(xz); // x
+          m->arg[2] = NV_DATA_S(xz)+s.nx_; // z
+          m->arg[3] = m->p; // p
+          m->arg[4] = vx; // fwd:x
+          m->arg[5] = vz; // fwd:z
+          m->res[0] = m->v2; // fwd:ode
+          m->res[1] = m->v2 + s.nx_; // fwd:alg
+          s.calc_function(m, "jtimesF");
 
-      // Solve with multiple right-hand-sides
-      s.linsolF_.solve(v, 1 + s.ns_);
-
-      // Return to the original ordering
-      if (s.ns_>0 && s.nz_>0) {
-        for (int d=0; d<=s.ns_; ++d) {
-          casadi_copy(v+d*(s.nx1_+s.nz1_)+s.nx1_, s.nz1_, m->ztmp+d*s.nz1_);
+          // Subtract m->v2 (reordered) from m->v1
+          v_it = m->v1 + s.nx1_ + s.nz1_;
+          for (int d=1; d<=s.ns_; ++d) {
+            casadi_axpy(s.nx1_, -1., m->v2 + d*s.nx1_, v_it);
+            v_it += s.nx1_;
+            casadi_axpy(s.nz1_, -1., m->v2 + s.nx_ + d*s.nz1_, v_it);
+            v_it += s.nz1_;
+          }
         }
+
+        // Solve for sensitivity right-hand-sides
+        s.linsolF_.solve(m->v1 + s.nx1_ + s.nz1_, s.ns_);
+
+        // Save to output, reordered
+        v_it = m->v1 + s.nx1_ + s.nz1_;
         for (int d=1; d<=s.ns_; ++d) {
-          casadi_copy(v+d*(s.nx1_+s.nz1_), s.nx1_, v+d*s.nx1_);
+          casadi_copy(v_it, s.nx1_, vx + d*s.nx1_);
+          v_it += s.nx1_;
+          casadi_copy(v_it, s.nz1_, vz + d*s.nz1_);
+          v_it += s.nz1_;
         }
-        casadi_copy(m->ztmp, s.nz_, v+s.nx_);
       }
 
       return 0;
@@ -679,36 +705,68 @@ namespace casadi {
     try {
       auto m = to_mem(user_data);
       auto& s = m->self;
-      // Copy input to output, if necessary
-      if (rvecB!=zvecB) {
-        N_VScale(1.0, rvecB, zvecB);
+
+      // Get right-hand sides in m->v1, ordered by sensitivity directions
+      double* vx = NV_DATA_S(rvecB);
+      double* vz = vx + s.nrx_;
+      double* v_it = m->v1;
+      for (int d=0; d<=s.ns_; ++d) {
+        casadi_copy(vx + d*s.nrx1_, s.nrx1_, v_it);
+        v_it += s.nrx1_;
+        casadi_copy(vz + d*s.nrz1_, s.nrz1_, v_it);
+        v_it += s.nrz1_;
       }
 
-      double* v = NV_DATA_S(zvecB);
+      // Solve for undifferentiated right-hand-side, save to output
+      s.linsolB_.solve(m->v1, 1);
+      vx = NV_DATA_S(zvecB); // possibly different from rvecB
+      vz = vx + s.nrx_;
+      casadi_copy(m->v1, s.nrx1_, vx);
+      casadi_copy(m->v1 + s.nrx1_, s.nrz1_, vz);
 
-      // Reorder, grouping x and z for each sensitivity direction
-      if (s.ns_>0 && s.nrz_>0) {
-        casadi_copy(v+s.nrx_, s.nrz_, m->ztmp);
-        for (int d=s.ns_; d>0; --d) {
-          casadi_copy(v+d*s.nrx1_, s.nrx1_, v+d*(s.nrx1_+s.nrz1_));
-        }
-        for (int d=0; d<=s.ns_; ++d) {
-          casadi_copy(m->ztmp+d*s.nrz1_, s.nrz1_, v+d*(s.nrx1_+s.nrz1_)+s.nrx1_);
-        }
-      }
+      // Sensitivity equations
+      if (s.ns_>0) {
+        // Second order correction
+        if (true) {
+          // The outputs will double as seeds for jtimesB
+          casadi_fill(vx + s.nrx1_, s.nrx_ - s.nrx1_, 0.);
+          casadi_fill(vz + s.nrz1_, s.nrz_ - s.nrz1_, 0.);
 
-      // Solve with multiple right-hand-sides
-      s.linsolB_.solve(v, 1 + s.ns_);
+          // Get second-order-correction, save to m->v2
+          m->arg[0] = &t; // t
+          m->arg[1] = NV_DATA_S(xz); // x
+          m->arg[2] = NV_DATA_S(xz)+s.nx_; // z
+          m->arg[3] = m->p; // p
+          m->arg[4] = NV_DATA_S(xzB); // rx
+          m->arg[5] = NV_DATA_S(xzB)+s.nrx_; // rz
+          m->arg[6] = m->rp; // rp
+          m->arg[7] = vx; // fwd:rx
+          m->arg[8] = vz; // fwd:rz
+          m->res[0] = m->v2; // fwd:rode
+          m->res[1] = m->v2 + s.nrx_; // fwd:ralg
+          s.calc_function(m, "jtimesB");
 
-      // Return to the original ordering
-      if (s.ns_>0 && s.nrz_>0) {
-        for (int d=0; d<=s.ns_; ++d) {
-          casadi_copy(v+d*(s.nrx1_+s.nrz1_)+s.nrx1_, s.nrz1_, m->ztmp+d*s.nrz1_);
+          // Subtract m->v2 (reordered) from m->v1
+          v_it = m->v1 + s.nrx1_ + s.nrz1_;
+          for (int d=1; d<=s.ns_; ++d) {
+            casadi_axpy(s.nrx1_, -1., m->v2 + d*s.nrx1_, v_it);
+            v_it += s.nrx1_;
+            casadi_axpy(s.nrz1_, -1., m->v2 + s.nrx_ + d*s.nrz1_, v_it);
+            v_it += s.nrz1_;
+          }
         }
+
+        // Solve for sensitivity right-hand-sides
+        s.linsolB_.solve(m->v1 + s.nrx1_ + s.nrz1_, s.ns_);
+
+        // Save to output, reordered
+        v_it = m->v1 + s.nrx1_ + s.nrz1_;
         for (int d=1; d<=s.ns_; ++d) {
-          casadi_copy(v+d*(s.nrx1_+s.nrz1_), s.nrx1_, v+d*s.nrx1_);
+          casadi_copy(v_it, s.nrx1_, vx + d*s.nrx1_);
+          v_it += s.nrx1_;
+          casadi_copy(v_it, s.nrz1_, vz + d*s.nrz1_);
+          v_it += s.nrz1_;
         }
-        casadi_copy(m->ztmp, s.nrz_, v+s.nrx_);
       }
 
       return 0;

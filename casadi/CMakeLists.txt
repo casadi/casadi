@@ -1,10 +1,3 @@
-
-#define_property(TARGET PROPERTY PKG_CONFIG_REQUIRES
-#  BRIEF_DOCS "add requires info for target"
-#  FULL_DOCS "add requires info for target"
-#)
-
-
 macro(casadi_plugin_link_libraries Type name)
   string(TOLOWER ${Type} type)
   target_link_libraries(casadi_${type}_${name} ${ARGN})
@@ -38,13 +31,13 @@ macro(casadi_library_or_plugin name is_plugin)
     add_library(${name} SHARED ${ARGN})
   endif()
   generate_export_header(${name})
-  
+
   # Make sure the exported header is installed
   file(RELATIVE_PATH RELPATH "${CMAKE_BINARY_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/${name}_export.h")
   get_filename_component(RELPATH ${RELPATH} PATH)
   install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${name}_export.h
   DESTINATION include/${RELPATH})
-  
+
   if(NOT "${name}" STREQUAL "casadi")
     target_link_libraries(${name} casadi)
   endif()
@@ -57,7 +50,7 @@ macro(casadi_library_or_plugin name is_plugin)
         RUNTIME DESTINATION casadi
       )
     endif()
-    if (WITH_MATLAB)
+    if (WITH_MATLAB OR WITH_OCTAVE)
       install(TARGETS ${name}
         LIBRARY DESTINATION .
         ARCHIVE DESTINATION .
@@ -86,6 +79,9 @@ macro(casadi_library_or_plugin name is_plugin)
   set_property(GLOBAL APPEND PROPERTY CASADI_MODULES ${name})
 endmacro()
 
+add_definitions(-DSHARED_LIBRARY_PREFIX="\\"${CMAKE_SHARED_LIBRARY_PREFIX}\\"")
+add_definitions(-DSHARED_LIBRARY_SUFFIX="\\"${CMAKE_SHARED_LIBRARY_SUFFIX}\\"")
+
 add_subdirectory(core)        # needed by all except external_packages
 add_subdirectory(interfaces)  # needs external_packages
 add_subdirectory(solvers)     # needs interfaces
@@ -98,7 +94,7 @@ get_property(SPELL_TARGETS GLOBAL PROPERTY SPELL_TARGETS)
 add_custom_target(lint
   DEPENDS ${LINT_TARGETS}
   VERBATIM)
-  
+
 add_custom_target(spell
   DEPENDS ${SPELL_TARGETS}
   VERBATIM)
@@ -110,70 +106,5 @@ set(CASADI_MODULES ${CASADI_MODULES} PARENT_SCOPE)
 set(CASADI_PLUGINS ${CASADI_PLUGINS} PARENT_SCOPE)
 
 add_custom_target(libs ALL DEPENDS ${CASADI_MODULES})
-
-foreach(name ${CASADI_MODULES})
-  set(PC_NAME "${name}")
-  #set(PC_CXX_FLAGS "{CXX_FLAGS}")
-  
-  function(join VALUES GLUE OUTPUT)
-    string (REPLACE ";" "${GLUE}" _TMP_STR "${VALUES}")
-    set (${OUTPUT} "${_TMP_STR}" PARENT_SCOPE)
-  endfunction()
-  
-  function(obtain_interface_link_libraries TARGET OUTPUT)
-    set(LIBLIST)
-    get_target_property(TEMP_INTERFACE_LINK_LIBRARIES ${TARGET} "INTERFACE_LINK_LIBRARIES")
-    if(TEMP_INTERFACE_LINK_LIBRARIES)
-    foreach(LIB ${TEMP_INTERFACE_LINK_LIBRARIES})
-      list(APPEND LIBLIST ${LIB})
-      #if(TARGET ${LIB})
-      #  obtain_interface_link_libraries(${LIB} OUTPUT2)
-      #  if(OUTPUT2)
-      #    list(APPEND LIBLIST ${OUTPUT2})
-      #  endif()
-      #endif()
-    endforeach()
-    endif()
-    set(${OUTPUT} ${LIBLIST} PARENT_SCOPE)
-  endfunction()
-  
-  obtain_interface_link_libraries(${name} OUTPUT)
-  set(PC_REQUIRES)
-  set(PC_LIBRARIES)
-  
-  foreach(LIB ${OUTPUT})
-    if(TARGET ${LIB})
-      list(FIND CASADI_MODULES ${LIB} FOUND)
-      if (FOUND EQUAL -1 )
-        list(APPEND PC_LIBRARIES ${LIB})
-      else()
-        list(APPEND PC_REQUIRES "${LIB}")
-      endif()
-    else()
-      list(APPEND PC_LIBRARIES ${LIB})
-    endif()
-  endforeach()
-  join("${PC_REQUIRES}" "," PC_REQUIRES)
-
-  set(PC_LIBRARIES_LIST "-l${name}")
-  foreach(LIB ${PC_LIBRARIES})
-    string(REGEX MATCH "[\\/](lib)?([a-zA-Z0-9_]+)\\.[a-zA-Z0-9_]+$" LIBMATCH ${LIB})
-    if(LIBMATCH)
-      set(PC_LIBRARIES_LIST "${PC_LIBRARIES_LIST} -l${CMAKE_MATCH_2}")
-    else()
-      set(PC_LIBRARIES_LIST "${PC_LIBRARIES_LIST} -l${LIB}")
-    endif()
-  endforeach()
-  get_target_property(PC_LINK_LIBRARIES ${name} "LINK_LIBRARIES")
-  get_target_property(PC_PKG_CONFIG_REQUIRES ${name} "PKG_CONFIG_REQUIRES")
-  configure_file(
-    ${CMAKE_SOURCE_DIR}/cmake/pkgconfig.pc.in
-    ${CMAKE_BINARY_DIR}/lib/pkgconfig/${name}.pc
-    ESCAPE_QUOTES
-    @ONLY)
-  install(FILES ${CMAKE_BINARY_DIR}/lib/pkgconfig/${name}.pc
-    DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/pkgconfig
-  )
-endforeach()
 
 install(FILES casadi.hpp DESTINATION include/casadi)

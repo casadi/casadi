@@ -30,6 +30,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <cstdarg>
 
 namespace casadi {
 
@@ -171,6 +172,26 @@ namespace casadi {
     // Singleton pattern
     static Logger::Stream<Err, PL> instance;
     return instance;
+  }
+
+  // C-style printing to std::cout
+  inline void casadi_printf(const char* fmt, ...) {
+    char buf[256];
+    va_list args;
+    va_start(args, fmt);
+    vsnprintf(buf, 256, fmt, args);
+    userOut() << buf;
+    va_end(args);
+  }
+
+  // C-style printing to std::cerr
+  inline void casadi_eprintf(const char* fmt, ...) {
+    char buf[256];
+    va_list args;
+    va_start(args, fmt);
+    vsnprintf(buf, 256, fmt, args);
+    userOut<true, PL_WARN>() << buf;
+    va_end(args);
   }
 
 } // namespace casadi

@@ -336,7 +336,10 @@ namespace casadi {
     inline friend MatType triu2symm(const MatType &a) { return MatType::triu2symm(a);}
 
     /** \brief  Frobenius norm  */
-    inline friend MatType norm_F(const MatType &x) { return MatType::norm_F(x);}
+    inline friend MatType norm_fro(const MatType &x) { return MatType::norm_fro(x);}
+
+    /** \brief  [DEPRECATED] Renamed norm_fro  */
+    inline friend MatType norm_F(const MatType &x) { return MatType::norm_fro(x);}
 
     /** \brief  2-norm  */
     inline friend MatType norm_2(const MatType &x) { return MatType::norm_2(x);}
@@ -552,11 +555,19 @@ namespace casadi {
     ///@}
 
     ///@{
-    /** \brief Find out which variables enter nonlinearly */
+#ifdef WITH_DEPRECATED_FEATURES
+    /** \brief [DEPRECATED] Find out which variables enter nonlinearly */
     inline friend std::vector<bool> nl_var(const MatType &expr, const MatType &var) {
       return MatType::nl_var(expr, var);
     }
+#endif
     ///@}
+
+    /** \brief Find out which variables enter with some order */
+    inline friend std::vector<bool> which_depends(const MatType &expr, const MatType &var,
+        int order, bool tr) {
+      return MatType::which_depends(expr, var, order, tr);
+    }
 
     /** Count number of nodes */
     inline friend int n_nodes(const MatType& A) {

@@ -329,7 +329,7 @@ namespace casadi {
     static Matrix<Scalar> trace(const Matrix<Scalar> &x);
     static Matrix<Scalar> norm_1(const Matrix<Scalar> &x);
     static Matrix<Scalar> norm_2(const Matrix<Scalar> &x);
-    static Matrix<Scalar> norm_F(const Matrix<Scalar> &x);
+    static Matrix<Scalar> norm_fro(const Matrix<Scalar> &x);
     static Matrix<Scalar> norm_inf(const Matrix<Scalar> &x);
     static Matrix<Scalar> sum2(const Matrix<Scalar> &x);
     static Matrix<Scalar> sum1(const Matrix<Scalar> &x);
@@ -391,7 +391,11 @@ namespace casadi {
                                              const Matrix<Scalar>& w);
     static Matrix<Scalar> jtimes(const Matrix<Scalar> &ex, const Matrix<Scalar> &arg,
                                    const Matrix<Scalar> &v, bool tr=false);
+#ifdef WITH_DEPRECATED_FEATURES
     static std::vector<bool> nl_var(const Matrix<Scalar> &expr, const Matrix<Scalar> &var);
+#endif
+    static std::vector<bool> which_depends(const Matrix<Scalar> &expr, const Matrix<Scalar> &var,
+        int order=1, bool tr=false);
     static Matrix<Scalar> taylor(const Matrix<Scalar>& ex, const Matrix<Scalar>& x,
                                    const Matrix<Scalar>& a, int order);
     static Matrix<Scalar> mtaylor(const Matrix<Scalar>& ex, const Matrix<Scalar>& x,

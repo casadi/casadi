@@ -26,6 +26,7 @@
 #include "nlpsol_impl.hpp"
 #include "external.hpp"
 #include "casadi/core/timing.hpp"
+#include "../misc/nlp_builder.hpp"
 
 using namespace std;
 namespace casadi {
@@ -50,6 +51,15 @@ namespace casadi {
   Function nlpsol(const string& name, const string& solver,
                   const MXDict& nlp, const Dict& opts) {
     return nlpsol(name, solver, Nlpsol::map2problem(nlp), opts);
+  }
+
+  Function nlpsol(const std::string& name, const std::string& solver,
+                  const NlpBuilder& nl, const Dict& opts) {
+     MXDict nlp;
+     nlp["x"] = vertcat(nl.x);
+     nlp["f"] = nl.f;
+     nlp["g"] = vertcat(nl.g);
+     return nlpsol(name, solver, nlp, opts);
   }
 
   Function nlpsol(const std::string& name, const std::string& solver,
@@ -194,7 +204,7 @@ namespace casadi {
   }
 
   Options Nlpsol::options_
-  = {{&FunctionInternal::options_},
+  = {{&OracleFunction::options_},
      {{"expand",
        {OT_BOOL,
         "Replace MX with SX expressions in problem formulation [false]"}},
@@ -218,9 +228,6 @@ namespace casadi {
        {OT_BOOL,
         "When errors occur during evaluation of f,g,...,"
         "stop the iterations"}},
-      {"print_time",
-         {OT_BOOL,
-          "print information about execution time"}},
       {"verbose_init",
        {OT_BOOL,
         "Print out timing information about "
@@ -233,7 +240,7 @@ namespace casadi {
 
   void Nlpsol::init(const Dict& opts) {
     // Call the initialization method of the base class
-    FunctionInternal::init(opts);
+    OracleFunction::init(opts);
 
     // Default options
     bool expand = false;
@@ -252,8 +259,6 @@ namespace casadi {
         warn_initial_bounds_ = op.second;
       } else if (op.first=="iteration_callback_ignore_errors") {
         iteration_callback_ignore_errors_ = op.second;
-      } else if (op.first=="print_time") {
-        print_time_ = op.second;
       } else if (op.first=="discrete") {
         discrete_ = op.second;
       }
@@ -375,6 +380,9 @@ namespace casadi {
 
     // Solve the NLP
     solve(mem);
+
+    // Show statistics
+    if (print_time_)  print_fstats(static_cast<OracleMemory*>(mem));
   }
 
   void Nlpsol::set_work(void* mem, const double**& arg, double**& res,
@@ -400,15 +408,6 @@ namespace casadi {
     m->lam_g = res[NLPSOL_LAM_G];
     m->lam_p = res[NLPSOL_LAM_P];
     res += NLPSOL_NUM_OUT;
-  }
-
-  void Nlpsol::set_temp(void* mem, const double** arg, double** res,
-                        int* iw, double* w) const {
-    auto m = static_cast<NlpsolMemory*>(mem);
-    m->arg = arg;
-    m->res = res;
-    m->iw = iw;
-    m->w = w;
   }
 
 } // namespace casadi

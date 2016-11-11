@@ -157,6 +157,10 @@ namespace casadi {
                           + typeid(*this).name());
   }
 
+  std::string MXNode::type_name() const {
+    return typeid(*this).name();
+  }
+
   bool MXNode::__nonzero__() const {
     casadi_error("Can only determine truth value of a numeric MX.");
 
@@ -380,7 +384,10 @@ namespace casadi {
 
   void MXNode::generate(CodeGenerator& g, const std::string& mem,
                         const vector<int>& arg, const vector<int>& res) const {
-    g.body << "#error " <<  typeid(*this).name() << ": " << arg << " => " << res << endl;
+    casadi_warning("Cannot code generate MX nodes of type " + type_name() +
+                   "The generation will proceed, but compilation of the code will "
+                   "not be possible.");
+    g.body << "#error " <<  type_name() << ": " << arg << " => " << res << endl;
   }
 
   double MXNode::to_double() const {
@@ -467,7 +474,7 @@ namespace casadi {
   MX MXNode::getSetNonzeros(const MX& y, const vector<int>& nz) const {
     // Check if any element needs to be set at all
     bool set_any = false;
-    for (vector<int>::const_iterator i=nz.begin(); i!=nz.end() && !set_any; ++i) {
+    for (auto i=nz.begin(); i!=nz.end() && !set_any; ++i) {
       set_any = *i >= 0;
     }
 
@@ -780,7 +787,7 @@ namespace casadi {
 
   MX MXNode::getHorzcat(const vector<MX>& x) const {
     // Check if there is any existing horzcat operation
-    for (vector<MX>::const_iterator i=x.begin(); i!=x.end(); ++i) {
+    for (auto i=x.begin(); i!=x.end(); ++i) {
       if (i->op()==OP_HORZCAT) {
         // Split up
         vector<MX> x_split(x.begin(), i);
@@ -806,7 +813,7 @@ namespace casadi {
 
   MX MXNode::getVertcat(const vector<MX>& x) const {
     // Check if there is any existing vertcat operation
-    for (vector<MX>::const_iterator i=x.begin(); i!=x.end(); ++i) {
+    for (auto i=x.begin(); i!=x.end(); ++i) {
       if (i->op()==OP_VERTCAT) {
         // Split up
         vector<MX> x_split(x.begin(), i);

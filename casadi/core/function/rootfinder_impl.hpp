@@ -35,6 +35,11 @@ namespace casadi {
 
   /** \brief Integrator memory */
   struct CASADI_EXPORT RootfinderMemory : public OracleMemory {
+    // Inputs
+    const double** iarg;
+
+    // Outputs
+    double** ires;
   };
 
   /// Internal class
@@ -79,6 +84,16 @@ namespace casadi {
     /** \brief Initalize memory block */
     virtual void init_memory(void* mem) const;
 
+    /** \brief Set the (persistent) work vectors */
+    virtual void set_work(void* mem, const double**& arg, double**& res,
+                          int*& iw, double*& w) const;
+
+    // Evaluate numerically
+    virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
+
+    // Solve the NLP
+    virtual void solve(void* mem) const = 0;
+
     /** \brief  Propagate sparsity forward */
     virtual void sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
 
@@ -93,13 +108,19 @@ namespace casadi {
 
     ///@{
     /** \brief Generate a function that calculates \a nfwd forward derivatives */
-    virtual Function get_forward_old(const std::string& name, int nfwd, Dict& opts);
+    virtual Function get_forward(const std::string& name, int nfwd,
+                                 const std::vector<std::string>& i_names,
+                                 const std::vector<std::string>& o_names,
+                                 const Dict& opts);
     virtual int get_n_forward() const { return 64;}
     ///@}
 
     ///@{
     /** \brief Generate a function that calculates \a nadj adjoint derivatives */
-    virtual Function get_reverse_old(const std::string& name, int nadj, Dict& opts);
+    virtual Function get_reverse(const std::string& name, int nadj,
+                                 const std::vector<std::string>& i_names,
+                                 const std::vector<std::string>& o_names,
+                                 const Dict& opts);
     virtual int get_n_reverse() const { return 64;}
     ///@}
 
@@ -117,9 +138,6 @@ namespace casadi {
 
     /// Number of equations
     int n_;
-
-    /// Jacobian of f with respect to z
-    Function jac_;
 
     /// Linear solver
     Linsol linsol_;

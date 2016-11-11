@@ -300,9 +300,8 @@ class Functiontests(casadiTestCase):
       test(d.sparsity())
 
   def test_customIO(self):
-
     x = SX.sym("x")
-    f = Function('f',[x],[x*x, x],{'output_scheme':["foo","bar"]})
+    f = Function('f',[x],[x*x, x],["i0"], ["foo","bar"])
 
     ret = f(i0=12)
 
@@ -455,9 +454,9 @@ class Functiontests(casadiTestCase):
     Z = [MX.sym("z",2,2) for i in range(n)]
     V = [MX.sym("z",Sparsity.upper(3)) for i in range(n)]
 
-    res = fun.map({"x":horzcat(*X),"y":horzcat(*Y),"z":horzcat(*Z),"v":horzcat(*V)})
+    res = fun.map(n).call({"x":horzcat(*X),"y":horzcat(*Y),"z":horzcat(*Z),"v":horzcat(*V)})
 
-    res2 = fun.map([horzcat(*X),horzcat(*Y),horzcat(*Z),horzcat(*V)])
+    res2 = fun.map(n).call([horzcat(*X),horzcat(*Y),horzcat(*Z),horzcat(*V)])
 
     F = Function("F",X+Y+Z+V,res2)
     F2 = Function("F",X+Y+Z+V,[res["I"],res["II"],res["III"]])
@@ -486,22 +485,15 @@ class Functiontests(casadiTestCase):
     Z = [MX.sym("z",2,2) for i in range(n)]
     V = [MX.sym("z",Sparsity.upper(3)) for i in range(n)]
 
-    for Z_alt,Z_alt2 in [
-          (Z,Z),
-          ([Z[0]],[Z[0]]*n),
-          ([MX()]*3,[MX()]*3),
-        ]:
-      print("args", Z_alt)
-
-      for parallelization in ["serial","openmp","unroll"] if args.run_slow else ["serial"]:
+    for parallelization in ["serial","openmp","unroll"] if args.run_slow else ["serial"]:
         print(parallelization)
-        res = fun.map([horzcat(*x) for x in [X,Y,Z_alt,V]],parallelization)
+        res = fun.map(n, parallelization).call([horzcat(*x) for x in [X,Y,Z,V]])
 
 
         F = Function("F",X+Y+Z+V,list(map(sin,res)))
 
         resref = [[] for i in range(fun.n_out())]
-        for r in zip(X,Y,Z_alt2,V):
+        for r in zip(X,Y,Z,V):
           for i,e in enumerate(map(sin,fun.call(r))):
             resref[i] = resref[i] + [e]
 
@@ -639,7 +631,7 @@ class Functiontests(casadiTestCase):
 
     hs = []
     for n in [nlp, nlp.expand('nlp_expanded')]:
-        H = n.derivative(0,1).jacobian(0,2,False,True)
+        H = n.reverse(1).jacobian(0,0,False,True)
 
         h = H(der_x=1,adj0_f=1)[H.name_out(0)]
         hs.append(h)
@@ -856,43 +848,6 @@ class Functiontests(casadiTestCase):
   #   [v] = f([])
   #   self.checkarray(2.37683, v, digits=4)
 
-  @memory_heavy()
-  def test_kernel_sum(self):
-    n = 20
-    m = 40
-
-    try:
-      xx, yy = np.meshgrid(list(range(n)), list(range(m)),indexing="ij")
-    except:
-      yy, xx = np.meshgrid(list(range(m)), list(range(n)))
-
-    z = np.cos(xx/4.0+yy/3.0)
-
-    p = SX.sym("p",2)
-    x = SX.sym("x",2)
-
-    v = SX.sym("v")
-
-    r = sqrt(sum1((p-x)**2))
-
-    f = Function("f",[p,v,x],[v**2*exp(-r**2)/pi])
-
-    F = f.kernel_sum("test",(n,m),4,1,{"ad_weight": 1})
-
-    x0 = DM([n/2,m/2])
-
-    Fref = f.map("f","serial",n*m,[2],[0])
-
-    print(Fref(horzcat(*[vec(xx),vec(yy)]).T,vec(z),x0))
-    print(F(z,x0))
-
-    zs = MX.sym("z", z.shape)
-    xs = MX.sym("x",2)
-    Fref = Function("Fref",[zs,xs],[Fref(horzcat(*[vec(xx),vec(yy)]).T,vec(zs),xs)])
-
-    self.checkfunction(F,Fref,inputs=[z,x0],digits=5,allow_nondiff=True,evals=False)
-    self.check_codegen(F,inputs=[z,x0])
-
   def test_depends_on(self):
     x = SX.sym("x")
     y = x**2
@@ -1051,7 +1006,61 @@ class Functiontests(casadiTestCase):
         f.jacobian()
 
       with self.assertRaises(Exception):
-        f.derivative()
+        f.forward(1)
+      with self.assertRaises(Exception):
+        f.reverse(1)
+
+  def test_Callback_dimcheck(self):
+      class Fun(Callback):
+        def __init__(self):
+          Callback.__init__(self)
+          self.construct("Fun")
+        def get_n_in(self): return 2
+        def get_n_out(self): return 1
+
+        def eval(self,arg):
+          return [2, 1]
+      f = Fun()
+
+      s = ""
+      try:
+        f(2)
+      except Exception as e:
+        s = str(e)
+      self.assertTrue("Incorrect number of inputs" in s)
+      class Fun(Callback):
+        def __init__(self):
+          Callback.__init__(self)
+          self.construct("Fun")
+        def get_n_in(self): return 2
+        def get_n_out(self): return 1
+
+        def eval(self,arg):
+          return [2, 1]
+      f = Fun()
+
+      s = ""
+      try:
+        f(2,3)
+      except Exception as e:
+        s = str(e)
+      self.assertTrue("Callback::eval" in s)
+      s = ""
+      class Fun(Callback):
+        def __init__(self):
+          Callback.__init__(self)
+          self.construct("Fun")
+        def get_n_in(self): return 2
+        def get_n_out(self): return 1
+
+        def eval(self,arg):
+          return [DM.zeros(2,2)]
+      f = Fun()
+      try:
+        f(2,3)
+      except Exception as e:
+        s = str(e)
+      self.assertTrue("Callback::eval" in s)
 
   def test_Callback_sens(self):
     x = MX.sym("x")
@@ -1192,6 +1201,39 @@ class Functiontests(casadiTestCase):
       f = getP(max_fwd=0,max_adj=1,has_fwd=False,has_adj=True,indirect=indirect)
 
       self.checkfunction(f,g,inputs=num_inputs,sens_der=False,hessian=False,fwd=False,evals=1)
+
+  @requires_nlpsol("ipopt")
+  def test_common_specific_options(self):
+
+      x = SX.sym("x")
+
+      nlp = {"x": x, "f": x**2}
+
+      with capture() as out:
+        solver = nlpsol("solver","ipopt",nlp)
+      self.assertTrue("nlp_f" not in out[0])
+      with capture() as out:
+        solver = nlpsol("solver","ipopt",nlp,{"common_options":{"verbose":True}})
+      self.assertTrue("nlp_f" in out[0])
+      with capture() as out:
+        solver = nlpsol("solver","ipopt",nlp,{"specific_options":{ "nlp_f" : {"verbose":True}}})
+      self.assertTrue("nlp_f" in out[0])
+      with capture() as out:
+        solver = nlpsol("solver","ipopt",nlp,{"common_options":{"verbose":True},"specific_options":{ "nlp_f" : {"verbose":False}}})
+      self.assertTrue("nlp_f" not in out[0])
+      with capture() as out:
+        solver = nlpsol("solver","ipopt",nlp,{"common_options":{"verbose":False},"specific_options":{ "nlp_f" : {"verbose":True}}})
+      self.assertTrue("nlp_f" in out[0])
+
+      with capture() as out:
+        solver = nlpsol("solver","ipopt",nlp)
+      self.assertTrue(len(out[1])==0)
+      with capture() as out:
+        solver = nlpsol("solver","ipopt",nlp,{"specific_options":{ "nlp_foo" : {"verbose":True}}})
+      self.assertTrue("Ignoring" + out[1])
+      self.assertTrue("nlp_g" in out[1])
+      with self.assertRaises(Exception):
+        solver = nlpsol("solver","ipopt",nlp,{"specific_options":{ "nlp_foo" : 3}})
 
 if __name__ == '__main__':
     unittest.main()

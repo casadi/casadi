@@ -157,9 +157,6 @@ namespace casadi {
     /// Get a vector of symbolic variables corresponding to the outputs
     virtual std::vector<MX> symbolicOutput(const std::vector<MX>& arg);
 
-    /** \brief Create call */
-    virtual std::vector<MX> create_call(const std::vector<MX>& arg);
-
     /** \brief  Propagate sparsity forward */
     virtual void sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
 

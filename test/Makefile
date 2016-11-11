@@ -28,6 +28,7 @@ benchmarks:
 python: unittests_py examples_indoc_py examples_code_py user_guide_snippets_py tutorials
 
 matlab: unittests_matlab examples_matlab
+octave: unittests_octave
 
 python_knownbugs: unittests_py_knownbugs examples_indoc_py examples_code_py user_guide_snippets_py tutorials
 
@@ -63,6 +64,10 @@ examples_code: examples_code_py examples_code_cpp
 unittests_matlab:
 	python internal/test_matlab.py matlab
 
+unittests_octave:
+	python internal/test_octave.py octave
+	python internal/test_octave.py matlab -skipfiles="callback.m"
+  
 examples_matlab:
 	python internal/test_matlab.py '../examples/matlab'
 
@@ -82,7 +87,7 @@ doxygen:
 
 # No memchecks because it's slow
 examples_code_cpp:
-	python internal/test_cppcmake.py '../docs/examples/cplusplus' -skipfiles="test_liftopt.cpp casadi_error_handling.cpp parametric_sensitivities.cpp reduced_hessian.cpp test_opencl.cpp nlp_codegen.cpp codegen_usage.cpp stabilized_sqpmethod_nl.cpp knitro_nl.cpp worhp_nl.cpp snopt_nl.cpp rocket_snopt.cpp"
+	python internal/test_cppcmake.py '../docs/examples/cplusplus' -skipfiles="test_liftopt.cpp casadi_error_handling.cpp parametric_sensitivities.cpp reduced_hessian.cpp test_opencl.cpp nlp_codegen.cpp codegen_usage.cpp stabilized_sqpmethod_nl.cpp knitro_nl.cpp worhp_nl.cpp snopt_nl.cpp rocket_snopt.cpp test_blocksqp.cpp"
 
 tutorials:
 	python internal/test_py.py '../docs/tutorials/python/src' $(MEMCHECK)

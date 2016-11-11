@@ -22,7 +22,6 @@
 #
 #
 from doxy2swig import *
-from casadi import swig_typename_convertor_cpp2python
 
 import sys
 
@@ -460,7 +459,7 @@ class Doxy2SWIG_X(Doxy2SWIG):
              grouped_dict[total] = ([origin],pieces)
              grouped_list.append(grouped_dict[total])
           if not self.merge:
-            self.add_text_original(["%feature(\"docstring\") ", swigname if len(swigname)>0 else k, " \"\n"]+pieces+["\";\n","\n"])
+            self.add_text_original(["%feature(\"docstring\") ", swigname if len(swigname)>0 else k, " \"\n\n"]+pieces+["\";\n","\n"])
             
         if self.merge:
           if len(grouped_list)==1:
@@ -469,7 +468,7 @@ class Doxy2SWIG_X(Doxy2SWIG):
             self.add_text_original(["%feature(\"docstring\") ",k , " \"\n"])
             for (origin,pieces) in grouped_list:
               if len(u"".join(pieces).rstrip())>0:
-                self.add_text_original(["\n"]+["\n>  " + swig_typename_convertor_cpp2python(o.replace('"',r'\"')) + '\n'  for o in origin] + ["-"*(80-8) + "\n"] + pieces + ["\n"])
+                self.add_text_original(["\n"]+["\n>  " + o.replace('"',r'\"') + '\n'  for o in origin] + ["-"*(80-8) + "\n"] + pieces + ["\n"])
             self.add_text_original(["\";\n","\n"])
   
 

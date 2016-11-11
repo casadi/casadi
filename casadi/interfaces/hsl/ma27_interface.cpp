@@ -36,7 +36,7 @@ namespace casadi {
     plugin->creator = Ma27Interface::creator;
     plugin->name = "ma27";
     plugin->doc = Ma27Interface::meta_doc.c_str();
-    plugin->version = 30;
+    plugin->version = 31;
     return 0;
   }
 
@@ -61,7 +61,7 @@ namespace casadi {
 
   void Ma27Interface::set_work(void* mem, const double**& arg, double**& res,
                                 int*& iw, double*& w) const {
-    auto m = static_cast<Ma27Memory*>(mem);
+    //auto m = static_cast<Ma27Memory*>(mem);
 
     // Set work in base classes
     LinsolInternal::set_work(mem, arg, res, iw, w);
@@ -133,7 +133,7 @@ namespace casadi {
             info, &ops);
     iflag = info[0];   // Information flag
     int ierror = info[1];  // Error flag
-    int nrlnec = info[4];  // recommended value for la
+    //int nrlnec = info[4];  // recommended value for la
     int nirnec = info[5];  // recommended value for liw
     casadi_assert_message(iflag==0, "ma27ad_ returns iflag = " <<
                           iflag << " with ierror = " << ierror);
@@ -168,7 +168,7 @@ namespace casadi {
     }
 
     // Real work array
-    if (m->iw.size() < m->maxfrt) m->iw.resize(m->maxfrt);
+    if (m->w.size() < m->maxfrt) m->w.resize(m->maxfrt);
   }
 
   int Ma27Interface::neig(void* mem) const {

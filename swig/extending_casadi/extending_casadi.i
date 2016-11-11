@@ -4,8 +4,7 @@
 #ifdef SWIGPYTHON
 %{
 #define SWIG_FILE_WITH_INIT
-#include "numpy.hpp"
-#define SWIG_PYTHON_CAST_MODE 1
+#include "casadi_numpy.hpp"
 %}
 
 %init %{
