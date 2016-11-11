@@ -712,7 +712,7 @@ namespace casadi {
       // Sensitivity equations
       if (s.ns_>0) {
         // Second order correction
-        if (false) {
+        if (true) {
           // The outputs will double as seeds for jtimesB
           casadi_fill(vx + s.nrx1_, s.nrx_ - s.nrx1_, 0.);
           casadi_fill(vz + s.nrz1_, s.nrz_ - s.nrz1_, 0.);
