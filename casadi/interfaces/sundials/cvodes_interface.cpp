@@ -518,12 +518,12 @@ namespace casadi {
           m->res[0] = m->v2; // fwd:ode
           s.calc_function(m, "jtimesF");
 
-          // Subtract m->v2 from m->v1, scaled with -(-gamma)
+          // Subtract m->v2 from m->v1, scaled with -gamma
           casadi_axpy(s.nx_-s.nx1_, gamma, m->v2, m->v1 + s.nx1_);
         }
 
         // Solve for sensitivity right-hand-sides
-        linsol.linsol_solve(m->v1 + s.nx1_ + s.nz1_, s.ns_);
+        linsol.linsol_solve(m->v1 + s.nx1_, s.ns_);
 
         // Save to output, reordered
         casadi_copy(m->v1 + s.nx1_, s.nx_-s.nx1_, v+s.nx1_);
@@ -542,23 +542,46 @@ namespace casadi {
     try {
       auto m = to_mem(user_data);
       auto& s = m->self;
-      // Copy input to output, if necessary
-      if (rvecB!=zvecB) {
-        N_VScale(1.0, rvecB, zvecB);
-      }
 
-      // Solve the (possibly factorized) system
+      // Linear solver function
       const Function& linsolB = s.get_function("linsolB");
       casadi_assert(linsolB.size1_out(0)*(1+s.ns_) == NV_LENGTH_S(zvecB));
-      double* v = NV_DATA_S(zvecB);
 
-      // Solve for undifferentiated right-hand-side
-      linsolB.linsol_solve(v, 1);
+      // Get right-hand sides in m->v1
+      double* v = NV_DATA_S(rvecB);
+      casadi_copy(v, s.nrx_, m->v1);
 
-      // Solve for sensitivity right-hand-sides
+      // Solve for undifferentiated right-hand-side, save to output
+      linsolB.linsol_solve(m->v1, 1);
+      v = NV_DATA_S(zvecB); // possibly different from rvecB
+      casadi_copy(m->v1, s.nrx1_, v);
+
+      // Sensitivity equations
       if (s.ns_>0) {
-        linsolB.linsol_solve(v+s.nrx1_, s.ns_);
+        // Second order correction
+        if (true) {
+          // The outputs will double as seeds for jtimesF
+          casadi_fill(v + s.nrx1_, s.nrx_ - s.nrx1_, 0.);
+          m->arg[0] = &t; // t
+          m->arg[1] = NV_DATA_S(x); // x
+          m->arg[2] = m->p; // p
+          m->arg[3] = NV_DATA_S(xB); // rx
+          m->arg[4] = m->rp; // rp
+          m->arg[5] = v; // fwd:rx
+          m->res[0] = m->v2; // fwd:rode
+          s.calc_function(m, "jtimesB");
+
+          // Subtract m->v2 from m->v1, scaled with gammaB
+          casadi_axpy(s.nrx_-s.nrx1_, -gammaB, m->v2, m->v1 + s.nrx1_);
+        }
+
+        // Solve for sensitivity right-hand-sides
+        linsolB.linsol_solve(m->v1 + s.nx1_, s.ns_);
+
+        // Save to output, reordered
+        casadi_copy(m->v1 + s.nx1_, s.nx_-s.nx1_, v+s.nx1_);
       }
+
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "psolveB failed: " << e.what() << endl;;

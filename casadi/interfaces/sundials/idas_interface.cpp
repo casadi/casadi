@@ -750,8 +750,8 @@ namespace casadi {
           m->arg[6] = m->rp; // rp
           m->arg[7] = vx; // fwd:rx
           m->arg[8] = vz; // fwd:rz
-          m->res[0] = m->v2; // fwd:ode
-          m->res[1] = m->v2 + s.nrx_; // fwd:alg
+          m->res[0] = m->v2; // fwd:rode
+          m->res[1] = m->v2 + s.nrx_; // fwd:ralg
           s.calc_function(m, "jtimesB");
 
           // Subtract m->v2 (reordered) from m->v1
