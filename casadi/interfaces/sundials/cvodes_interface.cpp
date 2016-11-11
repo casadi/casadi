@@ -115,12 +115,10 @@ namespace casadi {
     }
 
     // Attach functions for jacobian information
-    if (newton_scheme_!=SD_DIRECT) {
-      create_function("jtimesF", {"t", "x", "p", "fwd:x"}, {"fwd:ode"});
-      if (nrx_>0) {
-        create_function("jtimesB",
-                        {"t", "x", "p", "rx", "rp", "fwd:rx"}, {"fwd:rode"});
-      }
+    create_function("jtimesF", {"t", "x", "p", "fwd:x"}, {"fwd:ode"});
+    if (nrx_>0) {
+      create_function("jtimesB",
+                      {"t", "x", "p", "rx", "rp", "fwd:rx"}, {"fwd:rode"});
     }
   }
 
@@ -499,13 +497,39 @@ namespace casadi {
     try {
       auto m = to_mem(user_data);
       auto& s = m->self;
-      // Copy input to output, if necessary
-      if (r!=z) {
-        N_VScale(1.0, r, z);
-      }
 
-      // Solve the factorized system
-      s.linsolF_.solve(NV_DATA_S(z), 1 + s.ns_);
+      // Get right-hand sides in m->v1
+      double* v = NV_DATA_S(r);
+      casadi_copy(v, s.nx_, m->v1);
+
+      // Solve for undifferentiated right-hand-side, save to output
+      s.linsolF_.solve(m->v1, 1);
+      v = NV_DATA_S(z); // possibly different from r
+      casadi_copy(m->v1, s.nx1_, v);
+
+      // Sensitivity equations
+      if (s.ns_>0) {
+        // Second order correction
+        if (true) {
+          // The outputs will double as seeds for jtimesF
+          casadi_fill(v + s.nx1_, s.nx_ - s.nx1_, 0.);
+          m->arg[0] = &t; // t
+          m->arg[1] = NV_DATA_S(x); // x
+          m->arg[2] = m->p; // p
+          m->arg[3] = v; // fwd:x
+          m->res[0] = m->v2; // fwd:ode
+          s.calc_function(m, "jtimesF");
+
+          // Subtract m->v2 from m->v1, scaled with -gamma
+          casadi_axpy(s.nx_-s.nx1_, gamma, m->v2, m->v1 + s.nx1_);
+        }
+
+        // Solve for sensitivity right-hand-sides
+        s.linsolF_.solve(m->v1 + s.nx1_, s.ns_);
+
+        // Save to output, reordered
+        casadi_copy(m->v1 + s.nx1_, s.nx_-s.nx1_, v+s.nx1_);
+      }
 
       return 0;
     } catch(exception& e) {
@@ -520,13 +544,42 @@ namespace casadi {
     try {
       auto m = to_mem(user_data);
       auto& s = m->self;
-      // Copy input to output, if necessary
-      if (rvecB!=zvecB) {
-        N_VScale(1.0, rvecB, zvecB);
+
+      // Get right-hand sides in m->v1
+      double* v = NV_DATA_S(rvecB);
+      casadi_copy(v, s.nrx_, m->v1);
+
+      // Solve for undifferentiated right-hand-side, save to output
+      s.linsolB_.solve(m->v1, 1);
+      v = NV_DATA_S(zvecB); // possibly different from rvecB
+      casadi_copy(m->v1, s.nrx1_, v);
+
+      // Sensitivity equations
+      if (s.ns_>0) {
+        // Second order correction
+        if (true) {
+          // The outputs will double as seeds for jtimesF
+          casadi_fill(v + s.nrx1_, s.nrx_ - s.nrx1_, 0.);
+          m->arg[0] = &t; // t
+          m->arg[1] = NV_DATA_S(x); // x
+          m->arg[2] = m->p; // p
+          m->arg[3] = NV_DATA_S(xB); // rx
+          m->arg[4] = m->rp; // rp
+          m->arg[5] = v; // fwd:rx
+          m->res[0] = m->v2; // fwd:rode
+          s.calc_function(m, "jtimesB");
+
+          // Subtract m->v2 from m->v1, scaled with gammaB
+          casadi_axpy(s.nrx_-s.nrx1_, -gammaB, m->v2, m->v1 + s.nrx1_);
+        }
+
+        // Solve for sensitivity right-hand-sides
+        s.linsolB_.solve(m->v1 + s.nx1_, s.ns_);
+
+        // Save to output, reordered
+        casadi_copy(m->v1 + s.nx1_, s.nx_-s.nx1_, v+s.nx1_);
       }
 
-      // Solve the factorized system
-      s.linsolB_.solve(NV_DATA_S(zvecB), 1+s.ns_);
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "psolveB failed: " << e.what() << endl;;

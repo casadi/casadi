@@ -188,6 +188,9 @@ namespace casadi {
         } else {
           J = d->getJ(backward);
         }
+        // Augmented Jacobian-times-vector function
+        Function jtimes = d->get_function(backward ? "jtimesB" : "jtimesF");
+        set_function(jtimes.forward(1), backward ? "jacBv" : "jacFv");
       }
       set_function(J);
       alloc_w(J.nnz_out(0), true);
@@ -196,9 +199,7 @@ namespace casadi {
     // Allocate work vectors
     alloc_w(np_, true); // p
     alloc_w(nrp_, true); // rp
-    if (ns_>0) {
-      alloc_w(max(nz_, nrz_), true); // ztmp
-    }
+    alloc_w(2*max(nx_+nz_, nrx_+nrz_), true); // v1, v2
 
     // Allocate linear solvers
     linsolF_ = Linsol("linsolF", linear_solver_, linear_solver_options_);
@@ -346,9 +347,8 @@ namespace casadi {
     // Work vectors
     m->p = w; w += np_;
     m->rp = w; w += nrp_;
-    if (ns_>0) {
-      m->ztmp = w; w += max(nz_, nrz_);
-    }
+    m->v1 = w; w += max(nx_+nz_, nrx_+nrz_);
+    m->v2 = w; w += max(nx_+nz_, nrx_+nrz_);
     m->jac = w; w += get_function("jacF").nnz_out(0);
     if (nrx_>0) {
       m->jacB = w; w += get_function("jacB").nnz_out(0);
