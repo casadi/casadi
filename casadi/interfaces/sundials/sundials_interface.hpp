@@ -68,8 +68,8 @@ namespace casadi {
     int qlastB, qcurB;
     double hinusedB, hlastB, hcurB, tcurB;
 
-    // Temporary for [x;z] or [rx;rz]
-    double *v;
+    // Temporaries for [x;z] or [rx;rz]
+    double *v1, *v2;
 
     /// number of checkpoints stored so far
     int ncheck;
