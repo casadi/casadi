@@ -45,7 +45,7 @@ namespace casadi {
     plugin->creator = BonminInterface::creator;
     plugin->name = "bonmin";
     plugin->doc = BonminInterface::meta_doc.c_str();
-    plugin->version = 30;
+    plugin->version = 31;
     return 0;
   }
 

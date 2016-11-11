@@ -36,7 +36,7 @@ namespace casadi {
     plugin->creator = Collocation::creator;
     plugin->name = "collocation";
     plugin->doc = Collocation::meta_doc.c_str();
-    plugin->version = 30;
+    plugin->version = 31;
     return 0;
   }
 

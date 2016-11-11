@@ -79,12 +79,10 @@ class NLPtests(casadiTestCase):
     for Solver, solver_options in solvers:
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
       solver_in = {}
-
       solver_in["x0"]=[6*pi+0.01]
       solver_in["lbx"]=-inf
       solver_in["ubx"]=inf
       solver_out = solver(**solver_in)
-
       self.assertAlmostEqual(solver_out["x"][0],6*pi,6,str(Solver))
 
   def testboundsviol(self):
