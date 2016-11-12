@@ -45,6 +45,13 @@
 <tr><td>NLPSOL_LAM_G0</td><td>lam_g0</td><td>Lagrange multipliers for bounds on G, initial guess (ng x 1)</td></tr>
 </table>
 */
+/** \defgroup scheme_DpleOutput
+<a name='schemes'></a><table>
+<caption>Output scheme: casadi::DpleOutput  (DPLE_NUM_OUT = 1)</caption>
+<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
+<tr><td>DPLE_P</td><td>p</td><td>Lyapunov matrix (horzcat when const_dim, diagcat otherwise) (Cholesky of P if pos_def) [p].</td></tr>
+</table>
+*/
 /** \defgroup scheme_RDAEInput
 <a name='schemes'></a><table>
 <caption>Input scheme: casadi::RDAEInput  (RDAE_NUM_IN = 7)</caption>
@@ -112,6 +119,14 @@
 <tr><td>INTEGRATOR_RX0</td><td>rx0</td><td>Backward differential state at the final time.</td></tr>
 <tr><td>INTEGRATOR_RP</td><td>rp</td><td>Backward parameter vector.</td></tr>
 <tr><td>INTEGRATOR_RZ0</td><td>rz0</td><td>Initial guess for the backwards algebraic variable.</td></tr>
+</table>
+*/
+/** \defgroup scheme_DpleInput
+<a name='schemes'></a><table>
+<caption>Input scheme: casadi::DpleInput  (DPLE_NUM_IN = 2)</caption>
+<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
+<tr><td>DPLE_A</td><td>a</td><td>A matrices (horzcat when const_dim, diagcat otherwise) [a].</td></tr>
+<tr><td>DPLE_V</td><td>v</td><td>V matrices (horzcat when const_dim, diagcat otherwise) [v].</td></tr>
 </table>
 */
 /** \defgroup scheme_NLPInput

@@ -2698,6 +2698,9 @@ Add an ordinary differential equation.
 // File: classcasadi_1_1Dot.xml
 
 
+// File: classcasadi_1_1Dple.xml
+
+
 // File: classcasadi_1_1External.xml
 
 
@@ -9136,6 +9139,9 @@ Return a string with a representation (for SWIG)
 ";
 
 
+// File: classcasadi_1_1SlicotDple.xml
+
+
 // File: classcasadi_1_1Solve.xml
 
 
@@ -10733,6 +10739,18 @@ to be monotonously increasing
 
 ";
 
+%feature("docstring")  casadi::dple_out() "
+
+Get output scheme of DPLE solvers.
+
+";
+
+%feature("docstring")  casadi::dple_out(int ind) "
+
+Get DPLE output scheme name by index.
+
+";
+
 %feature("docstring")  casadi::inBounds(const std::vector< T > &v, int
 upper) "
 
@@ -10777,12 +10795,29 @@ swap inner and outer indices of list of lists
 
 ";
 
+%feature("docstring")  casadi::dense_mul_nt_stride(int n, int m, int l,
+const double *A, const double *B, double *C, int strideA, int strideB, int
+strideC) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::casadi_mproject(real_t factor, const real_t
 *x, const int *sp_x, real_t *y, const int *sp_y, real_t *w) "
 
 [INTERNAL]  Sparse copy: y <- x, w work vector (length >= number of rows)
 
 ";
+
+%feature("docstring")  casadi::dense_mul_tn(int n, int m, int l, const
+double *A, const double *B, double *C) "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::dense_mul_nn_stride(int n, int m, int l,
+const double *A, const double *B, double *C, int strideA, int strideB, int
+strideC) "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::is_zero(const T &x) "
 
@@ -10791,6 +10826,14 @@ swap inner and outer indices of list of lists
 %feature("docstring")  casadi::doc_linsol(const std::string &name) "
 
 [DEPRECATED] Legacy - alias for Linsol::doc
+
+";
+
+%feature("docstring")  casadi::casadi_mtimes(const real_t *x, const int
+*sp_x, const real_t *y, const int *sp_y, real_t *z, const int *sp_z, real_t
+*w, int tr) "
+
+[INTERNAL]  Sparse matrix-matrix multiplication: z <- z + x*y.
 
 ";
 
@@ -10806,6 +10849,12 @@ real_t *x, const int *sp_x, real_t *y, const int *sp_y, real_t *w) "
 [INTERNAL]  Sparse copy: y <- x, w work vector (length >= number of rows)
 
 ";
+
+%feature("docstring")  casadi::slicot_periodic_schur(int n, int K, const
+double *a, double *t, double *z, double *dwork, double *eig_real, double
+*eig_imag, double num_zero=0) "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::external(const std::string &name, const Dict
 &opts=Dict()) "
@@ -10901,17 +10950,521 @@ real_t *y, int inc_y) "
 
 ";
 
-%feature("docstring")  casadi::casadi_norm_2(int n, const real_t *x) "
+%feature("docstring")  casadi::integrator(const std::string &name, const
+std::string &solver, const SXDict &dae, const Dict &opts=Dict()) "
 
-[INTERNAL]  NORM_2: ||x||_2 -> return.
+Create an ODE/DAE integrator Solves an initial value problem (IVP) coupled
+to a terminal value problem with differential equation given as an implicit
+ODE coupled to an algebraic equation and a set of quadratures:
+
+
+
+::
+
+  Initial conditions at t=t0
+  x(t0)  = x0
+  q(t0)  = 0
+  
+  Forward integration from t=t0 to t=tf
+  der(x) = function(x, z, p, t)                  Forward ODE
+  0 = fz(x, z, p, t)                  Forward algebraic equations
+  der(q) = fq(x, z, p, t)                  Forward quadratures
+  
+  Terminal conditions at t=tf
+  rx(tf)  = rx0
+  rq(tf)  = 0
+  
+  Backward integration from t=tf to t=t0
+  der(rx) = gx(rx, rz, rp, x, z, p, t)        Backward ODE
+  0 = gz(rx, rz, rp, x, z, p, t)        Backward algebraic equations
+  der(rq) = gq(rx, rz, rp, x, z, p, t)        Backward quadratures
+  
+  where we assume that both the forward and backwards integrations are index-1
+  (i.e. dfz/dz, dgz/drz are invertible) and furthermore that
+  gx, gz and gq have a linear dependency on rx, rz and rp.
+
+
+
+General information
+===================
+
+
+
+>List of available options
+
++-----------------+-----------------+-----------------+-----------------+
+|       Id        |      Type       |   Description   |     Used in     |
++=================+=================+=================+=================+
+| augmented_optio | OT_DICT         | Options to be   | casadi::Integra |
+| ns              |                 | passed down to  | tor             |
+|                 |                 | the augmented   |                 |
+|                 |                 | integrator, if  |                 |
+|                 |                 | one is          |                 |
+|                 |                 | constructed.    |                 |
++-----------------+-----------------+-----------------+-----------------+
+| common_options  | OT_DICT         | Options for     | casadi::OracleF |
+|                 |                 | auto-generated  | unction         |
+|                 |                 | functions       |                 |
++-----------------+-----------------+-----------------+-----------------+
+| expand          | OT_BOOL         | Replace MX with | casadi::Integra |
+|                 |                 | SX expressions  | tor             |
+|                 |                 | in problem      |                 |
+|                 |                 | formulation     |                 |
+|                 |                 | [false]         |                 |
++-----------------+-----------------+-----------------+-----------------+
+| grid            | OT_DOUBLEVECTOR | Time grid       | casadi::Integra |
+|                 |                 |                 | tor             |
++-----------------+-----------------+-----------------+-----------------+
+| monitor         | OT_STRINGVECTOR | Set of user     | casadi::OracleF |
+|                 |                 | problem         | unction         |
+|                 |                 | functions to be |                 |
+|                 |                 | monitored       |                 |
++-----------------+-----------------+-----------------+-----------------+
+| number_of_finit | OT_INT          | Number of       | casadi::Integra |
+| e_elements      |                 | finite elements | tor             |
++-----------------+-----------------+-----------------+-----------------+
+| output_t0       | OT_BOOL         | Output the      | casadi::Integra |
+|                 |                 | state at the    | tor             |
+|                 |                 | initial time    |                 |
++-----------------+-----------------+-----------------+-----------------+
+| print_stats     | OT_BOOL         | Print out       | casadi::Integra |
+|                 |                 | statistics      | tor             |
+|                 |                 | after           |                 |
+|                 |                 | integration     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| rootfinder      | OT_STRING       | An implicit     | casadi::Integra |
+|                 |                 | function solver | tor             |
++-----------------+-----------------+-----------------+-----------------+
+| rootfinder_opti | OT_DICT         | Options to be   | casadi::Integra |
+| ons             |                 | passed to the   | tor             |
+|                 |                 | NLP Solver      |                 |
++-----------------+-----------------+-----------------+-----------------+
+| specific_option | OT_DICT         | Options for     | casadi::OracleF |
+| s               |                 | specific auto-  | unction         |
+|                 |                 | generated       |                 |
+|                 |                 | functions,      |                 |
+|                 |                 | overwriting the |                 |
+|                 |                 | defaults from   |                 |
+|                 |                 | common_options. |                 |
+|                 |                 | Nested          |                 |
+|                 |                 | dictionary.     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| t0              | OT_DOUBLE       | Beginning of    | casadi::Integra |
+|                 |                 | the time        | tor             |
+|                 |                 | horizon         |                 |
++-----------------+-----------------+-----------------+-----------------+
+| tf              | OT_DOUBLE       | End of the time | casadi::Integra |
+|                 |                 | horizon         | tor             |
++-----------------+-----------------+-----------------+-----------------+
+
+>Input scheme: casadi::IntegratorInput (INTEGRATOR_NUM_IN = 6)
+
++------------------------+------------------------+------------------------+
+|       Full name        |         Short          |      Description       |
++========================+========================+========================+
+| INTEGRATOR_X0          | x0                     | Differential state at  |
+|                        |                        | the initial time.      |
++------------------------+------------------------+------------------------+
+| INTEGRATOR_P           | p                      | Parameters.            |
++------------------------+------------------------+------------------------+
+| INTEGRATOR_Z0          | z0                     | Initial guess for the  |
+|                        |                        | algebraic variable.    |
++------------------------+------------------------+------------------------+
+| INTEGRATOR_RX0         | rx0                    | Backward differential  |
+|                        |                        | state at the final     |
+|                        |                        | time.                  |
++------------------------+------------------------+------------------------+
+| INTEGRATOR_RP          | rp                     | Backward parameter     |
+|                        |                        | vector.                |
++------------------------+------------------------+------------------------+
+| INTEGRATOR_RZ0         | rz0                    | Initial guess for the  |
+|                        |                        | backwards algebraic    |
+|                        |                        | variable.              |
++------------------------+------------------------+------------------------+
+
+>Output scheme: casadi::IntegratorOutput (INTEGRATOR_NUM_OUT = 6)
+
++------------------------+------------------------+------------------------+
+|       Full name        |         Short          |      Description       |
++========================+========================+========================+
+| INTEGRATOR_XF          | xf                     | Differential state at  |
+|                        |                        | the final time.        |
++------------------------+------------------------+------------------------+
+| INTEGRATOR_QF          | qf                     | Quadrature state at    |
+|                        |                        | the final time.        |
++------------------------+------------------------+------------------------+
+| INTEGRATOR_ZF          | zf                     | Algebraic variable at  |
+|                        |                        | the final time.        |
++------------------------+------------------------+------------------------+
+| INTEGRATOR_RXF         | rxf                    | Backward differential  |
+|                        |                        | state at the initial   |
+|                        |                        | time.                  |
++------------------------+------------------------+------------------------+
+| INTEGRATOR_RQF         | rqf                    | Backward quadrature    |
+|                        |                        | state at the initial   |
+|                        |                        | time.                  |
++------------------------+------------------------+------------------------+
+| INTEGRATOR_RZF         | rzf                    | Backward algebraic     |
+|                        |                        | variable at the        |
+|                        |                        | initial time.          |
++------------------------+------------------------+------------------------+
+
+List of plugins
+===============
+
+
+
+- cvodes
+
+- idas
+
+- collocation
+
+- rk
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+Integrator.doc(\"myextraplugin\")
+
+
+
+--------------------------------------------------------------------------------
+
+cvodes
+------
+
+
+
+Interface to CVodes from the Sundials suite.
+
+A call to evaluate will integrate to the end.
+
+You can retrieve the entire state trajectory as follows, after the evaluate
+call: Call reset. Then call integrate(t_i) and getOuput for a series of
+times t_i.
+
+Note: depending on the dimension and structure of your problem, you may
+experience a dramatic speed-up by using a sparse linear solver:
+
+
+
+::
+
+     intg.setOption(\"linear_solver\",\"csparse\")
+     intg.setOption(\"linear_solver_type\",\"user_defined\")
+
+
+
+>List of available options
+
++------------------------+------------------------+------------------------+
+|           Id           |          Type          |      Description       |
++========================+========================+========================+
+| abstol                 | OT_DOUBLE              | Absolute tolerence for |
+|                        |                        | the IVP solution       |
++------------------------+------------------------+------------------------+
+| disable_internal_warni | OT_BOOL                | Disable SUNDIALS       |
+| ngs                    |                        | internal warning       |
+|                        |                        | messages               |
++------------------------+------------------------+------------------------+
+| fsens_all_at_once      | OT_BOOL                | Calculate all right    |
+|                        |                        | hand sides of the      |
+|                        |                        | sensitivity equations  |
+|                        |                        | at once                |
++------------------------+------------------------+------------------------+
+| fsens_err_con          | OT_BOOL                | include the forward    |
+|                        |                        | sensitivities in all   |
+|                        |                        | error controls         |
++------------------------+------------------------+------------------------+
+| interpolation_type     | OT_STRING              | Type of interpolation  |
+|                        |                        | for the adjoint        |
+|                        |                        | sensitivities          |
++------------------------+------------------------+------------------------+
+| linear_multistep_metho | OT_STRING              | Integrator scheme:     |
+| d                      |                        | BDF|adams              |
++------------------------+------------------------+------------------------+
+| linear_solver          | OT_STRING              | A custom linear solver |
+|                        |                        | creator function       |
+|                        |                        | [default: csparse]     |
++------------------------+------------------------+------------------------+
+| linear_solver_options  | OT_DICT                | Options to be passed   |
+|                        |                        | to the linear solver   |
++------------------------+------------------------+------------------------+
+| max_krylov             | OT_INT                 | Maximum Krylov         |
+|                        |                        | subspace size          |
++------------------------+------------------------+------------------------+
+| max_multistep_order    | OT_INT                 | Maximum order for the  |
+|                        |                        | (variable-order)       |
+|                        |                        | multistep method       |
++------------------------+------------------------+------------------------+
+| max_num_steps          | OT_INT                 | Maximum number of      |
+|                        |                        | integrator steps       |
++------------------------+------------------------+------------------------+
+| newton_scheme          | OT_STRING              | Linear solver scheme   |
+|                        |                        | in the Newton method:  |
+|                        |                        | DIRECT|gmres|bcgstab|t |
+|                        |                        | fqmr                   |
++------------------------+------------------------+------------------------+
+| nonlinear_solver_itera | OT_STRING              | Nonlinear solver type: |
+| tion                   |                        | NEWTON|functional      |
++------------------------+------------------------+------------------------+
+| quad_err_con           | OT_BOOL                | Should the quadratures |
+|                        |                        | affect the step size   |
+|                        |                        | control                |
++------------------------+------------------------+------------------------+
+| reltol                 | OT_DOUBLE              | Relative tolerence for |
+|                        |                        | the IVP solution       |
++------------------------+------------------------+------------------------+
+| second_order_correctio | OT_BOOL                | Second order           |
+| n                      |                        | correction in the      |
+|                        |                        | augmented system       |
+|                        |                        | Jacobian [true]        |
++------------------------+------------------------+------------------------+
+| sensitivity_method     | OT_STRING              | Sensitivity method:    |
+|                        |                        | SIMULTANEOUS|staggered |
++------------------------+------------------------+------------------------+
+| steps_per_checkpoint   | OT_INT                 | Number of steps        |
+|                        |                        | between two            |
+|                        |                        | consecutive            |
+|                        |                        | checkpoints            |
++------------------------+------------------------+------------------------+
+| stop_at_end            | OT_BOOL                | Stop the integrator at |
+|                        |                        | the end of the         |
+|                        |                        | interval               |
++------------------------+------------------------+------------------------+
+| use_preconditioner     | OT_BOOL                | Precondition the       |
+|                        |                        | iterative solver       |
+|                        |                        | [default: true]        |
++------------------------+------------------------+------------------------+
+
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+
+idas
+----
+
+
+
+Interface to IDAS from the Sundials suite.
+
+Note: depending on the dimension and structure of your problem, you may
+experience a dramatic speed-up by using a sparse linear solver:
+
+
+
+::
+
+     intg.setOption(\"linear_solver\",\"csparse\")
+     intg.setOption(\"linear_solver_type\",\"user_defined\")
+
+
+
+>List of available options
+
++------------------------+------------------------+------------------------+
+|           Id           |          Type          |      Description       |
++========================+========================+========================+
+| abstol                 | OT_DOUBLE              | Absolute tolerence for |
+|                        |                        | the IVP solution       |
++------------------------+------------------------+------------------------+
+| abstolv                | OT_DOUBLEVECTOR        | Absolute tolerarance   |
+|                        |                        | for each component     |
++------------------------+------------------------+------------------------+
+| calc_ic                | OT_BOOL                | Use IDACalcIC to get   |
+|                        |                        | consistent initial     |
+|                        |                        | conditions.            |
++------------------------+------------------------+------------------------+
+| calc_icB               | OT_BOOL                | Use IDACalcIC to get   |
+|                        |                        | consistent initial     |
+|                        |                        | conditions for         |
+|                        |                        | backwards system       |
+|                        |                        | [default: equal to     |
+|                        |                        | calc_ic].              |
++------------------------+------------------------+------------------------+
+| cj_scaling             | OT_BOOL                | IDAS scaling on cj for |
+|                        |                        | the user-defined       |
+|                        |                        | linear solver module   |
++------------------------+------------------------+------------------------+
+| disable_internal_warni | OT_BOOL                | Disable SUNDIALS       |
+| ngs                    |                        | internal warning       |
+|                        |                        | messages               |
++------------------------+------------------------+------------------------+
+| first_time             | OT_DOUBLE              | First requested time   |
+|                        |                        | as a fraction of the   |
+|                        |                        | time interval          |
++------------------------+------------------------+------------------------+
+| fsens_err_con          | OT_BOOL                | include the forward    |
+|                        |                        | sensitivities in all   |
+|                        |                        | error controls         |
++------------------------+------------------------+------------------------+
+| init_xdot              | OT_DOUBLEVECTOR        | Initial values for the |
+|                        |                        | state derivatives      |
++------------------------+------------------------+------------------------+
+| interpolation_type     | OT_STRING              | Type of interpolation  |
+|                        |                        | for the adjoint        |
+|                        |                        | sensitivities          |
++------------------------+------------------------+------------------------+
+| linear_solver          | OT_STRING              | A custom linear solver |
+|                        |                        | creator function       |
+|                        |                        | [default: csparse]     |
++------------------------+------------------------+------------------------+
+| linear_solver_options  | OT_DICT                | Options to be passed   |
+|                        |                        | to the linear solver   |
++------------------------+------------------------+------------------------+
+| max_krylov             | OT_INT                 | Maximum Krylov         |
+|                        |                        | subspace size          |
++------------------------+------------------------+------------------------+
+| max_multistep_order    | OT_INT                 | Maximum order for the  |
+|                        |                        | (variable-order)       |
+|                        |                        | multistep method       |
++------------------------+------------------------+------------------------+
+| max_num_steps          | OT_INT                 | Maximum number of      |
+|                        |                        | integrator steps       |
++------------------------+------------------------+------------------------+
+| max_step_size          | OT_DOUBLE              | Maximim step size      |
++------------------------+------------------------+------------------------+
+| newton_scheme          | OT_STRING              | Linear solver scheme   |
+|                        |                        | in the Newton method:  |
+|                        |                        | DIRECT|gmres|bcgstab|t |
+|                        |                        | fqmr                   |
++------------------------+------------------------+------------------------+
+| quad_err_con           | OT_BOOL                | Should the quadratures |
+|                        |                        | affect the step size   |
+|                        |                        | control                |
++------------------------+------------------------+------------------------+
+| reltol                 | OT_DOUBLE              | Relative tolerence for |
+|                        |                        | the IVP solution       |
++------------------------+------------------------+------------------------+
+| second_order_correctio | OT_BOOL                | Second order           |
+| n                      |                        | correction in the      |
+|                        |                        | augmented system       |
+|                        |                        | Jacobian [true]        |
++------------------------+------------------------+------------------------+
+| sensitivity_method     | OT_STRING              | Sensitivity method:    |
+|                        |                        | SIMULTANEOUS|staggered |
++------------------------+------------------------+------------------------+
+| steps_per_checkpoint   | OT_INT                 | Number of steps        |
+|                        |                        | between two            |
+|                        |                        | consecutive            |
+|                        |                        | checkpoints            |
++------------------------+------------------------+------------------------+
+| stop_at_end            | OT_BOOL                | Stop the integrator at |
+|                        |                        | the end of the         |
+|                        |                        | interval               |
++------------------------+------------------------+------------------------+
+| suppress_algebraic     | OT_BOOL                | Suppress algebraic     |
+|                        |                        | variables in the error |
+|                        |                        | testing                |
++------------------------+------------------------+------------------------+
+| use_preconditioner     | OT_BOOL                | Precondition the       |
+|                        |                        | iterative solver       |
+|                        |                        | [default: true]        |
++------------------------+------------------------+------------------------+
+
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+
+collocation
+-----------
+
+
+
+Fixed-step implicit Runge-Kutta integrator ODE/DAE integrator based on
+collocation schemes
+
+The method is still under development
+
+>List of available options
+
++------------------------+------------------------+------------------------+
+|           Id           |          Type          |      Description       |
++========================+========================+========================+
+| augmented_options      | OT_DICT                | Options to be passed   |
+|                        |                        | down to the augmented  |
+|                        |                        | integrator, if one is  |
+|                        |                        | constructed.           |
++------------------------+------------------------+------------------------+
+| collocation_scheme     | OT_STRING              | Collocation scheme:    |
+|                        |                        | radau|legendre         |
++------------------------+------------------------+------------------------+
+| expand                 | OT_BOOL                | Replace MX with SX     |
+|                        |                        | expressions in problem |
+|                        |                        | formulation [false]    |
++------------------------+------------------------+------------------------+
+| grid                   | OT_DOUBLEVECTOR        | Time grid              |
++------------------------+------------------------+------------------------+
+| interpolation_order    | OT_INT                 | Order of the           |
+|                        |                        | interpolating          |
+|                        |                        | polynomials            |
++------------------------+------------------------+------------------------+
+| number_of_finite_eleme | OT_INT                 | Number of finite       |
+| nts                    |                        | elements               |
++------------------------+------------------------+------------------------+
+| output_t0              | OT_BOOL                | Output the state at    |
+|                        |                        | the initial time       |
++------------------------+------------------------+------------------------+
+| print_stats            | OT_BOOL                | Print out statistics   |
+|                        |                        | after integration      |
++------------------------+------------------------+------------------------+
+| rootfinder             | OT_STRING              | An implicit function   |
+|                        |                        | solver                 |
++------------------------+------------------------+------------------------+
+| rootfinder_options     | OT_DICT                | Options to be passed   |
+|                        |                        | to the NLP Solver      |
++------------------------+------------------------+------------------------+
+| t0                     | OT_DOUBLE              | Beginning of the time  |
+|                        |                        | horizon                |
++------------------------+------------------------+------------------------+
+| tf                     | OT_DOUBLE              | End of the time        |
+|                        |                        | horizon                |
++------------------------+------------------------+------------------------+
+
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+
+rk --
+
+
+
+Fixed-step explicit Runge-Kutta integrator for ODEs Currently implements
+RK4.
+
+The method is still under development
+
+--------------------------------------------------------------------------------
+
+
+
+Joel Andersson
 
 ";
 
-%feature("docstring")  casadi::casadi_iamax(int n, const real_t *x, int
-inc_x) "
+%feature("docstring")  casadi::integrator(const std::string &name, const
+std::string &solver, const MXDict &dae, const Dict &opts=Dict()) "
 
-[INTERNAL]  IAMAX: index corresponding to the entry with the largest
-absolute value.
+";
+
+%feature("docstring")  casadi::read_matlab(std::istream &stream,
+std::vector< T > &v) "
+
+Read vector, matlab style.
+
+";
+
+%feature("docstring")  casadi::read_matlab(std::ifstream &file, std::vector<
+std::vector< T > > &v) "
+
+Read matrix, matlab style.
 
 ";
 
@@ -10943,11 +11496,11 @@ const int *offset, const real_t *values, const real_t *x, int *iw, real_t
 
 ";
 
-%feature("docstring")  casadi::casadi_mtimes(const real_t *x, const int
-*sp_x, const real_t *y, const int *sp_y, real_t *z, const int *sp_z, real_t
-*w, int tr) "
+%feature("docstring")  casadi::casadi_iamax(int n, const real_t *x, int
+inc_x) "
 
-[INTERNAL]  Sparse matrix-matrix multiplication: z <- z + x*y.
+[INTERNAL]  IAMAX: index corresponding to the entry with the largest
+absolute value.
 
 ";
 
@@ -11221,7 +11774,19 @@ Check if the vector is strictly monotone.
 
 ";
 
+%feature("docstring")  casadi::dple_n_in() "
+
+Get the number of QP solver inputs.
+
+";
+
 %feature("docstring")  casadi::casadi_eprintf(const char *fmt,...) "
+
+";
+
+%feature("docstring")  casadi::casadi_norm_2(int n, const real_t *x) "
+
+[INTERNAL]  NORM_2: ||x||_2 -> return.
 
 ";
 
@@ -11237,6 +11802,11 @@ ind1=false) "
 Construct from an index vector (requires is_slice(v) to be true)
 
 ";
+
+%feature("docstring")  casadi::dense_copy_stride(int n, int m, const double
+*A, double *B, int strideA, int strideB) "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::casadi_copy(const real_t *x, int n, real_t
 *y) "
@@ -11269,6 +11839,12 @@ Duplicates are treated by looking up last occurrence
 
 ";
 
+%feature("docstring")  casadi::doc_dple(const std::string &name) "
+
+Get the documentation string for a plugin.
+
+";
+
 %feature("docstring")  casadi::has_interpolant(const std::string &name) "
 
 Check if a particular plugin is available.
@@ -11284,500 +11860,6 @@ Check if a particular plugin is available.
 %feature("docstring")  casadi::isNonDecreasing(const std::vector< T > &v) "
 
 Check if the vector is non-decreasing.
-
-";
-
-%feature("docstring")  casadi::integrator(const std::string &name, const
-std::string &solver, const SXDict &dae, const Dict &opts=Dict()) "
-
-Create an ODE/DAE integrator Solves an initial value problem (IVP) coupled
-to a terminal value problem with differential equation given as an implicit
-ODE coupled to an algebraic equation and a set of quadratures:
-
-
-
-::
-
-  Initial conditions at t=t0
-  x(t0)  = x0
-  q(t0)  = 0
-  
-  Forward integration from t=t0 to t=tf
-  der(x) = function(x, z, p, t)                  Forward ODE
-  0 = fz(x, z, p, t)                  Forward algebraic equations
-  der(q) = fq(x, z, p, t)                  Forward quadratures
-  
-  Terminal conditions at t=tf
-  rx(tf)  = rx0
-  rq(tf)  = 0
-  
-  Backward integration from t=tf to t=t0
-  der(rx) = gx(rx, rz, rp, x, z, p, t)        Backward ODE
-  0 = gz(rx, rz, rp, x, z, p, t)        Backward algebraic equations
-  der(rq) = gq(rx, rz, rp, x, z, p, t)        Backward quadratures
-  
-  where we assume that both the forward and backwards integrations are index-1
-  (i.e. dfz/dz, dgz/drz are invertible) and furthermore that
-  gx, gz and gq have a linear dependency on rx, rz and rp.
-
-
-
-General information
-===================
-
-
-
->List of available options
-
-+-----------------+-----------------+-----------------+-----------------+
-|       Id        |      Type       |   Description   |     Used in     |
-+=================+=================+=================+=================+
-| augmented_optio | OT_DICT         | Options to be   | casadi::Integra |
-| ns              |                 | passed down to  | tor             |
-|                 |                 | the augmented   |                 |
-|                 |                 | integrator, if  |                 |
-|                 |                 | one is          |                 |
-|                 |                 | constructed.    |                 |
-+-----------------+-----------------+-----------------+-----------------+
-| common_options  | OT_DICT         | Options for     | casadi::OracleF |
-|                 |                 | auto-generated  | unction         |
-|                 |                 | functions       |                 |
-+-----------------+-----------------+-----------------+-----------------+
-| expand          | OT_BOOL         | Replace MX with | casadi::Integra |
-|                 |                 | SX expressions  | tor             |
-|                 |                 | in problem      |                 |
-|                 |                 | formulation     |                 |
-|                 |                 | [false]         |                 |
-+-----------------+-----------------+-----------------+-----------------+
-| grid            | OT_DOUBLEVECTOR | Time grid       | casadi::Integra |
-|                 |                 |                 | tor             |
-+-----------------+-----------------+-----------------+-----------------+
-| monitor         | OT_STRINGVECTOR | Set of user     | casadi::OracleF |
-|                 |                 | problem         | unction         |
-|                 |                 | functions to be |                 |
-|                 |                 | monitored       |                 |
-+-----------------+-----------------+-----------------+-----------------+
-| number_of_finit | OT_INT          | Number of       | casadi::Integra |
-| e_elements      |                 | finite elements | tor             |
-+-----------------+-----------------+-----------------+-----------------+
-| output_t0       | OT_BOOL         | Output the      | casadi::Integra |
-|                 |                 | state at the    | tor             |
-|                 |                 | initial time    |                 |
-+-----------------+-----------------+-----------------+-----------------+
-| print_stats     | OT_BOOL         | Print out       | casadi::Integra |
-|                 |                 | statistics      | tor             |
-|                 |                 | after           |                 |
-|                 |                 | integration     |                 |
-+-----------------+-----------------+-----------------+-----------------+
-| rootfinder      | OT_STRING       | An implicit     | casadi::Integra |
-|                 |                 | function solver | tor             |
-+-----------------+-----------------+-----------------+-----------------+
-| rootfinder_opti | OT_DICT         | Options to be   | casadi::Integra |
-| ons             |                 | passed to the   | tor             |
-|                 |                 | NLP Solver      |                 |
-+-----------------+-----------------+-----------------+-----------------+
-| specific_option | OT_DICT         | Options for     | casadi::OracleF |
-| s               |                 | specific auto-  | unction         |
-|                 |                 | generated       |                 |
-|                 |                 | functions,      |                 |
-|                 |                 | overwriting the |                 |
-|                 |                 | defaults from   |                 |
-|                 |                 | common_options. |                 |
-|                 |                 | Nested          |                 |
-|                 |                 | dictionary.     |                 |
-+-----------------+-----------------+-----------------+-----------------+
-| t0              | OT_DOUBLE       | Beginning of    | casadi::Integra |
-|                 |                 | the time        | tor             |
-|                 |                 | horizon         |                 |
-+-----------------+-----------------+-----------------+-----------------+
-| tf              | OT_DOUBLE       | End of the time | casadi::Integra |
-|                 |                 | horizon         | tor             |
-+-----------------+-----------------+-----------------+-----------------+
-
->Input scheme: casadi::IntegratorInput (INTEGRATOR_NUM_IN = 6)
-
-+------------------------+------------------------+------------------------+
-|       Full name        |         Short          |      Description       |
-+========================+========================+========================+
-| INTEGRATOR_X0          | x0                     | Differential state at  |
-|                        |                        | the initial time.      |
-+------------------------+------------------------+------------------------+
-| INTEGRATOR_P           | p                      | Parameters.            |
-+------------------------+------------------------+------------------------+
-| INTEGRATOR_Z0          | z0                     | Initial guess for the  |
-|                        |                        | algebraic variable.    |
-+------------------------+------------------------+------------------------+
-| INTEGRATOR_RX0         | rx0                    | Backward differential  |
-|                        |                        | state at the final     |
-|                        |                        | time.                  |
-+------------------------+------------------------+------------------------+
-| INTEGRATOR_RP          | rp                     | Backward parameter     |
-|                        |                        | vector.                |
-+------------------------+------------------------+------------------------+
-| INTEGRATOR_RZ0         | rz0                    | Initial guess for the  |
-|                        |                        | backwards algebraic    |
-|                        |                        | variable.              |
-+------------------------+------------------------+------------------------+
-
->Output scheme: casadi::IntegratorOutput (INTEGRATOR_NUM_OUT = 6)
-
-+------------------------+------------------------+------------------------+
-|       Full name        |         Short          |      Description       |
-+========================+========================+========================+
-| INTEGRATOR_XF          | xf                     | Differential state at  |
-|                        |                        | the final time.        |
-+------------------------+------------------------+------------------------+
-| INTEGRATOR_QF          | qf                     | Quadrature state at    |
-|                        |                        | the final time.        |
-+------------------------+------------------------+------------------------+
-| INTEGRATOR_ZF          | zf                     | Algebraic variable at  |
-|                        |                        | the final time.        |
-+------------------------+------------------------+------------------------+
-| INTEGRATOR_RXF         | rxf                    | Backward differential  |
-|                        |                        | state at the initial   |
-|                        |                        | time.                  |
-+------------------------+------------------------+------------------------+
-| INTEGRATOR_RQF         | rqf                    | Backward quadrature    |
-|                        |                        | state at the initial   |
-|                        |                        | time.                  |
-+------------------------+------------------------+------------------------+
-| INTEGRATOR_RZF         | rzf                    | Backward algebraic     |
-|                        |                        | variable at the        |
-|                        |                        | initial time.          |
-+------------------------+------------------------+------------------------+
-
-List of plugins
-===============
-
-
-
-- cvodes
-
-- idas
-
-- collocation
-
-- rk
-
-Note: some of the plugins in this list might not be available on your
-system. Also, there might be extra plugins available to you that are not
-listed here. You can obtain their documentation with
-Integrator.doc(\"myextraplugin\")
-
-
-
---------------------------------------------------------------------------------
-
-cvodes
-------
-
-
-
-Interface to CVodes from the Sundials suite.
-
-A call to evaluate will integrate to the end.
-
-You can retrieve the entire state trajectory as follows, after the evaluate
-call: Call reset. Then call integrate(t_i) and getOuput for a series of
-times t_i.
-
-Note: depending on the dimension and structure of your problem, you may
-experience a dramatic speed-up by using a sparse linear solver:
-
-
-
-::
-
-     intg.setOption(\"linear_solver\",\"csparse\")
-     intg.setOption(\"linear_solver_type\",\"user_defined\")
-
-
-
->List of available options
-
-+------------------------+------------------------+------------------------+
-|           Id           |          Type          |      Description       |
-+========================+========================+========================+
-| abstol                 | OT_DOUBLE              | Absolute tolerence for |
-|                        |                        | the IVP solution       |
-+------------------------+------------------------+------------------------+
-| disable_internal_warni | OT_BOOL                | Disable SUNDIALS       |
-| ngs                    |                        | internal warning       |
-|                        |                        | messages               |
-+------------------------+------------------------+------------------------+
-| fsens_all_at_once      | OT_BOOL                | Calculate all right    |
-|                        |                        | hand sides of the      |
-|                        |                        | sensitivity equations  |
-|                        |                        | at once                |
-+------------------------+------------------------+------------------------+
-| fsens_err_con          | OT_BOOL                | include the forward    |
-|                        |                        | sensitivities in all   |
-|                        |                        | error controls         |
-+------------------------+------------------------+------------------------+
-| interpolation_type     | OT_STRING              | Type of interpolation  |
-|                        |                        | for the adjoint        |
-|                        |                        | sensitivities          |
-+------------------------+------------------------+------------------------+
-| linear_multistep_metho | OT_STRING              | Integrator scheme:     |
-| d                      |                        | BDF|adams              |
-+------------------------+------------------------+------------------------+
-| linear_solver          | OT_STRING              | A custom linear solver |
-|                        |                        | creator function       |
-|                        |                        | [default: csparse]     |
-+------------------------+------------------------+------------------------+
-| linear_solver_options  | OT_DICT                | Options to be passed   |
-|                        |                        | to the linear solver   |
-+------------------------+------------------------+------------------------+
-| max_krylov             | OT_INT                 | Maximum Krylov         |
-|                        |                        | subspace size          |
-+------------------------+------------------------+------------------------+
-| max_multistep_order    | OT_INT                 | Maximum order for the  |
-|                        |                        | (variable-order)       |
-|                        |                        | multistep method       |
-+------------------------+------------------------+------------------------+
-| max_num_steps          | OT_INT                 | Maximum number of      |
-|                        |                        | integrator steps       |
-+------------------------+------------------------+------------------------+
-| newton_scheme          | OT_STRING              | Linear solver scheme   |
-|                        |                        | in the Newton method:  |
-|                        |                        | DIRECT|gmres|bcgstab|t |
-|                        |                        | fqmr                   |
-+------------------------+------------------------+------------------------+
-| nonlinear_solver_itera | OT_STRING              | Nonlinear solver type: |
-| tion                   |                        | NEWTON|functional      |
-+------------------------+------------------------+------------------------+
-| quad_err_con           | OT_BOOL                | Should the quadratures |
-|                        |                        | affect the step size   |
-|                        |                        | control                |
-+------------------------+------------------------+------------------------+
-| reltol                 | OT_DOUBLE              | Relative tolerence for |
-|                        |                        | the IVP solution       |
-+------------------------+------------------------+------------------------+
-| sensitivity_method     | OT_STRING              | Sensitivity method:    |
-|                        |                        | SIMULTANEOUS|staggered |
-+------------------------+------------------------+------------------------+
-| steps_per_checkpoint   | OT_INT                 | Number of steps        |
-|                        |                        | between two            |
-|                        |                        | consecutive            |
-|                        |                        | checkpoints            |
-+------------------------+------------------------+------------------------+
-| stop_at_end            | OT_BOOL                | Stop the integrator at |
-|                        |                        | the end of the         |
-|                        |                        | interval               |
-+------------------------+------------------------+------------------------+
-| use_preconditioner     | OT_BOOL                | Precondition the       |
-|                        |                        | iterative solver       |
-|                        |                        | [default: true]        |
-+------------------------+------------------------+------------------------+
-
---------------------------------------------------------------------------------
-
-
-
---------------------------------------------------------------------------------
-
-idas
-----
-
-
-
-Interface to IDAS from the Sundials suite.
-
-Note: depending on the dimension and structure of your problem, you may
-experience a dramatic speed-up by using a sparse linear solver:
-
-
-
-::
-
-     intg.setOption(\"linear_solver\",\"csparse\")
-     intg.setOption(\"linear_solver_type\",\"user_defined\")
-
-
-
->List of available options
-
-+------------------------+------------------------+------------------------+
-|           Id           |          Type          |      Description       |
-+========================+========================+========================+
-| abstol                 | OT_DOUBLE              | Absolute tolerence for |
-|                        |                        | the IVP solution       |
-+------------------------+------------------------+------------------------+
-| abstolv                | OT_DOUBLEVECTOR        | Absolute tolerarance   |
-|                        |                        | for each component     |
-+------------------------+------------------------+------------------------+
-| calc_ic                | OT_BOOL                | Use IDACalcIC to get   |
-|                        |                        | consistent initial     |
-|                        |                        | conditions.            |
-+------------------------+------------------------+------------------------+
-| calc_icB               | OT_BOOL                | Use IDACalcIC to get   |
-|                        |                        | consistent initial     |
-|                        |                        | conditions for         |
-|                        |                        | backwards system       |
-|                        |                        | [default: equal to     |
-|                        |                        | calc_ic].              |
-+------------------------+------------------------+------------------------+
-| cj_scaling             | OT_BOOL                | IDAS scaling on cj for |
-|                        |                        | the user-defined       |
-|                        |                        | linear solver module   |
-+------------------------+------------------------+------------------------+
-| disable_internal_warni | OT_BOOL                | Disable SUNDIALS       |
-| ngs                    |                        | internal warning       |
-|                        |                        | messages               |
-+------------------------+------------------------+------------------------+
-| first_time             | OT_DOUBLE              | First requested time   |
-|                        |                        | as a fraction of the   |
-|                        |                        | time interval          |
-+------------------------+------------------------+------------------------+
-| fsens_err_con          | OT_BOOL                | include the forward    |
-|                        |                        | sensitivities in all   |
-|                        |                        | error controls         |
-+------------------------+------------------------+------------------------+
-| init_xdot              | OT_DOUBLEVECTOR        | Initial values for the |
-|                        |                        | state derivatives      |
-+------------------------+------------------------+------------------------+
-| interpolation_type     | OT_STRING              | Type of interpolation  |
-|                        |                        | for the adjoint        |
-|                        |                        | sensitivities          |
-+------------------------+------------------------+------------------------+
-| linear_solver          | OT_STRING              | A custom linear solver |
-|                        |                        | creator function       |
-|                        |                        | [default: csparse]     |
-+------------------------+------------------------+------------------------+
-| linear_solver_options  | OT_DICT                | Options to be passed   |
-|                        |                        | to the linear solver   |
-+------------------------+------------------------+------------------------+
-| max_krylov             | OT_INT                 | Maximum Krylov         |
-|                        |                        | subspace size          |
-+------------------------+------------------------+------------------------+
-| max_multistep_order    | OT_INT                 | Maximum order for the  |
-|                        |                        | (variable-order)       |
-|                        |                        | multistep method       |
-+------------------------+------------------------+------------------------+
-| max_num_steps          | OT_INT                 | Maximum number of      |
-|                        |                        | integrator steps       |
-+------------------------+------------------------+------------------------+
-| max_step_size          | OT_DOUBLE              | Maximim step size      |
-+------------------------+------------------------+------------------------+
-| newton_scheme          | OT_STRING              | Linear solver scheme   |
-|                        |                        | in the Newton method:  |
-|                        |                        | DIRECT|gmres|bcgstab|t |
-|                        |                        | fqmr                   |
-+------------------------+------------------------+------------------------+
-| quad_err_con           | OT_BOOL                | Should the quadratures |
-|                        |                        | affect the step size   |
-|                        |                        | control                |
-+------------------------+------------------------+------------------------+
-| reltol                 | OT_DOUBLE              | Relative tolerence for |
-|                        |                        | the IVP solution       |
-+------------------------+------------------------+------------------------+
-| sensitivity_method     | OT_STRING              | Sensitivity method:    |
-|                        |                        | SIMULTANEOUS|staggered |
-+------------------------+------------------------+------------------------+
-| steps_per_checkpoint   | OT_INT                 | Number of steps        |
-|                        |                        | between two            |
-|                        |                        | consecutive            |
-|                        |                        | checkpoints            |
-+------------------------+------------------------+------------------------+
-| stop_at_end            | OT_BOOL                | Stop the integrator at |
-|                        |                        | the end of the         |
-|                        |                        | interval               |
-+------------------------+------------------------+------------------------+
-| suppress_algebraic     | OT_BOOL                | Suppress algebraic     |
-|                        |                        | variables in the error |
-|                        |                        | testing                |
-+------------------------+------------------------+------------------------+
-| use_preconditioner     | OT_BOOL                | Precondition the       |
-|                        |                        | iterative solver       |
-|                        |                        | [default: true]        |
-+------------------------+------------------------+------------------------+
-
---------------------------------------------------------------------------------
-
-
-
---------------------------------------------------------------------------------
-
-collocation
------------
-
-
-
-Fixed-step implicit Runge-Kutta integrator ODE/DAE integrator based on
-collocation schemes
-
-The method is still under development
-
->List of available options
-
-+------------------------+------------------------+------------------------+
-|           Id           |          Type          |      Description       |
-+========================+========================+========================+
-| augmented_options      | OT_DICT                | Options to be passed   |
-|                        |                        | down to the augmented  |
-|                        |                        | integrator, if one is  |
-|                        |                        | constructed.           |
-+------------------------+------------------------+------------------------+
-| collocation_scheme     | OT_STRING              | Collocation scheme:    |
-|                        |                        | radau|legendre         |
-+------------------------+------------------------+------------------------+
-| expand                 | OT_BOOL                | Replace MX with SX     |
-|                        |                        | expressions in problem |
-|                        |                        | formulation [false]    |
-+------------------------+------------------------+------------------------+
-| grid                   | OT_DOUBLEVECTOR        | Time grid              |
-+------------------------+------------------------+------------------------+
-| interpolation_order    | OT_INT                 | Order of the           |
-|                        |                        | interpolating          |
-|                        |                        | polynomials            |
-+------------------------+------------------------+------------------------+
-| number_of_finite_eleme | OT_INT                 | Number of finite       |
-| nts                    |                        | elements               |
-+------------------------+------------------------+------------------------+
-| output_t0              | OT_BOOL                | Output the state at    |
-|                        |                        | the initial time       |
-+------------------------+------------------------+------------------------+
-| print_stats            | OT_BOOL                | Print out statistics   |
-|                        |                        | after integration      |
-+------------------------+------------------------+------------------------+
-| rootfinder             | OT_STRING              | An implicit function   |
-|                        |                        | solver                 |
-+------------------------+------------------------+------------------------+
-| rootfinder_options     | OT_DICT                | Options to be passed   |
-|                        |                        | to the NLP Solver      |
-+------------------------+------------------------+------------------------+
-| t0                     | OT_DOUBLE              | Beginning of the time  |
-|                        |                        | horizon                |
-+------------------------+------------------------+------------------------+
-| tf                     | OT_DOUBLE              | End of the time        |
-|                        |                        | horizon                |
-+------------------------+------------------------+------------------------+
-
---------------------------------------------------------------------------------
-
-
-
---------------------------------------------------------------------------------
-
-rk --
-
-
-
-Fixed-step explicit Runge-Kutta integrator for ODEs Currently implements
-RK4.
-
-The method is still under development
-
---------------------------------------------------------------------------------
-
-
-
-Joel Andersson
-
-";
-
-%feature("docstring")  casadi::integrator(const std::string &name, const
-std::string &solver, const MXDict &dae, const Dict &opts=Dict()) "
 
 ";
 
@@ -11797,11 +11879,16 @@ void fname(const real_t* arg, real_t* res) { <FUNCTION_BODY> }
 
 ";
 
-%feature("docstring")  casadi::load_rootfinder(const std::string &name) "
+%feature("docstring")  casadi::has_dple(const std::string &name) "
 
-Explicitly load a plugin dynamically.
+Check if a particular plugin is available.
 
 ";
+
+%feature("docstring")  casadi::dense_mul_nn(int n, int m, int l, const
+double *A, const double *B, double *C) "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::load_interpolant(const std::string &name) "
 
@@ -12624,6 +12711,13 @@ const std::vector< T > &mat) "
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::slicot_mb03wd(char job, char compz, int n,
+int p, int ilo, int ihi, int iloz, int ihiz, double *h, int ldh1, int ldh2,
+double *z, int ldz1, int ldz2, double *wr, double *wi, double *dwork=0, int
+ldwork=0) "
+
+";
+
 %feature("docstring")  casadi::casadi_max_viol(int n, const real_t *x, const
 real_t *lb, const real_t *ub) "
 
@@ -12687,6 +12781,12 @@ Get typename.
 
 ";
 
+%feature("docstring")  casadi::load_dple(const std::string &name) "
+
+Explicitly load a plugin dynamically.
+
+";
+
 %feature("docstring")  casadi::integrator_in() "
 
 Get input scheme of integrators.
@@ -12709,6 +12809,12 @@ Checks if array does not contain NaN or Inf.
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::slicot_mb03vy(int n, int p, int ilo, int ihi,
+double *a, int lda1, int lda2, const double *tau, int ldtau, double
+*dwork=0, int ldwork=0) "
+
+";
+
 %feature("docstring") casadi::_which_depends "
 
 [INTERNAL] ";
@@ -12719,6 +12825,11 @@ x) "
 [INTERNAL]  Evaluate a polynomial.
 
 ";
+
+%feature("docstring")  casadi::dense_mul_nt(int n, int m, int l, const
+double *A, const double *B, double *C) "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::casadi_flip(int *corner, int ndim) "
 
@@ -12750,6 +12861,11 @@ int *offset, const real_t *values, const real_t *alpha, const int *index,
 const int *corner, real_t *coeff) "
 
 [INTERNAL] ";
+
+%feature("docstring")  casadi::slicot_mb03vd(int n, int p, int ilo, int ihi,
+double *a, int lda1, int lda2, double *tau, int ldtau, double *dwork=0) "
+
+";
 
 %feature("docstring")  casadi::nlpsol_default_in(int ind) "
 
@@ -12866,17 +12982,331 @@ Joel Andersson
 
 ";
 
-%feature("docstring")  casadi::read_matlab(std::istream &stream,
-std::vector< T > &v) "
+%feature("docstring")  casadi::dplesol(const std::string &name, const
+std::string &solver, const SpDict &qp, const Dict &opts=Dict()) "
 
-Read vector, matlab style.
+Discrete periodic Lyapunov Equation solver Given matrices $A_k$ and
+symmetric $V_k, k = 0..K-1$
+
+::
+
+  A_k in R^(n x n)
+  V_k in R^n
+  
+
+provides all of $P_k$ that satisfy:
+
+::
+
+  P_0 = A_(K-1)*P_(K-1)*A_(K-1)' + V_k
+  P_k+1 = A_k*P_k*A_k' + V_k  for k = 1..K-1
+  
+
+
+
+General information
+===================
+
+
+
+>List of available options
+
++-----------------+-----------------+-----------------+-----------------+
+|       Id        |      Type       |   Description   |     Used in     |
++=================+=================+=================+=================+
+| ad_weight       | OT_DOUBLE       | Weighting       | casadi::Functio |
+|                 |                 | factor for      | nInternal       |
+|                 |                 | derivative calc |                 |
+|                 |                 | ulation.When    |                 |
+|                 |                 | there is an     |                 |
+|                 |                 | option of       |                 |
+|                 |                 | either using    |                 |
+|                 |                 | forward or      |                 |
+|                 |                 | reverse mode    |                 |
+|                 |                 | directional     |                 |
+|                 |                 | derivatives,    |                 |
+|                 |                 | the condition a |                 |
+|                 |                 | d_weight*nf<=(1 |                 |
+|                 |                 | -ad_weight)*na  |                 |
+|                 |                 | is used where   |                 |
+|                 |                 | nf and na are   |                 |
+|                 |                 | estimates of    |                 |
+|                 |                 | the number of   |                 |
+|                 |                 | forward/reverse |                 |
+|                 |                 | mode            |                 |
+|                 |                 | directional     |                 |
+|                 |                 | derivatives     |                 |
+|                 |                 | needed. By      |                 |
+|                 |                 | default,        |                 |
+|                 |                 | ad_weight is    |                 |
+|                 |                 | calculated      |                 |
+|                 |                 | automatically,  |                 |
+|                 |                 | but this can be |                 |
+|                 |                 | overridden by   |                 |
+|                 |                 | setting this    |                 |
+|                 |                 | option. In      |                 |
+|                 |                 | particular, 0   |                 |
+|                 |                 | means forcing   |                 |
+|                 |                 | forward mode    |                 |
+|                 |                 | and 1 forcing   |                 |
+|                 |                 | reverse mode.   |                 |
+|                 |                 | Leave unset for |                 |
+|                 |                 | (class          |                 |
+|                 |                 | specific)       |                 |
+|                 |                 | heuristics.     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| ad_weight_sp    | OT_DOUBLE       | Weighting       | casadi::Functio |
+|                 |                 | factor for      | nInternal       |
+|                 |                 | sparsity        |                 |
+|                 |                 | pattern         |                 |
+|                 |                 | calculation cal |                 |
+|                 |                 | culation.Overri |                 |
+|                 |                 | des default     |                 |
+|                 |                 | behavior. Set   |                 |
+|                 |                 | to 0 and 1 to   |                 |
+|                 |                 | force forward   |                 |
+|                 |                 | and reverse     |                 |
+|                 |                 | mode            |                 |
+|                 |                 | respectively.   |                 |
+|                 |                 | Cf. option      |                 |
+|                 |                 | \"ad_weight\".    |                 |
++-----------------+-----------------+-----------------+-----------------+
+| compiler        | OT_STRING       | Just-in-time    | casadi::Functio |
+|                 |                 | compiler plugin | nInternal       |
+|                 |                 | to be used.     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| const_dim       | OT_BOOL         | Assume constant | casadi::Dple    |
+|                 |                 | dimension of P  |                 |
++-----------------+-----------------+-----------------+-----------------+
+| derivative_of   | OT_FUNCTION     | The function is | casadi::Functio |
+|                 |                 | a derivative of | nInternal       |
+|                 |                 | another         |                 |
+|                 |                 | function. The   |                 |
+|                 |                 | type of         |                 |
+|                 |                 | derivative      |                 |
+|                 |                 | (directional    |                 |
+|                 |                 | derivative,     |                 |
+|                 |                 | Jacobian) is    |                 |
+|                 |                 | inferred from   |                 |
+|                 |                 | the function    |                 |
+|                 |                 | name.           |                 |
++-----------------+-----------------+-----------------+-----------------+
+| eps_unstable    | OT_DOUBLE       | A margin for    | casadi::Dple    |
+|                 |                 | unstability     |                 |
+|                 |                 | detection       |                 |
++-----------------+-----------------+-----------------+-----------------+
+| error_unstable  | OT_BOOL         | Throw an        | casadi::Dple    |
+|                 |                 | exception when  |                 |
+|                 |                 | it is detected  |                 |
+|                 |                 | that            |                 |
+|                 |                 | Product(A_i,    |                 |
+|                 |                 | i=N..1)has      |                 |
+|                 |                 | eigenvalues     |                 |
+|                 |                 | greater than    |                 |
+|                 |                 | 1-eps_unstable  |                 |
++-----------------+-----------------+-----------------+-----------------+
+| gather_stats    | OT_BOOL         | Deprecated      | casadi::Functio |
+|                 |                 | option          | nInternal       |
+|                 |                 | (ignored):      |                 |
+|                 |                 | Statistics are  |                 |
+|                 |                 | now always      |                 |
+|                 |                 | collected.      |                 |
++-----------------+-----------------+-----------------+-----------------+
+| input_scheme    | OT_STRINGVECTOR | Custom input    | casadi::Functio |
+|                 |                 | scheme          | nInternal       |
++-----------------+-----------------+-----------------+-----------------+
+| inputs_check    | OT_BOOL         | Throw           | casadi::Functio |
+|                 |                 | exceptions when | nInternal       |
+|                 |                 | the numerical   |                 |
+|                 |                 | values of the   |                 |
+|                 |                 | inputs don't    |                 |
+|                 |                 | make sense      |                 |
++-----------------+-----------------+-----------------+-----------------+
+| jac_penalty     | OT_DOUBLE       | When requested  | casadi::Functio |
+|                 |                 | for a number of | nInternal       |
+|                 |                 | forward/reverse |                 |
+|                 |                 | directions, it  |                 |
+|                 |                 | may be cheaper  |                 |
+|                 |                 | to compute      |                 |
+|                 |                 | first the full  |                 |
+|                 |                 | jacobian and    |                 |
+|                 |                 | then multiply   |                 |
+|                 |                 | with seeds,     |                 |
+|                 |                 | rather than     |                 |
+|                 |                 | obtain the      |                 |
+|                 |                 | requested       |                 |
+|                 |                 | directions in a |                 |
+|                 |                 | straightforward |                 |
+|                 |                 | manner. Casadi  |                 |
+|                 |                 | uses a          |                 |
+|                 |                 | heuristic to    |                 |
+|                 |                 | decide which is |                 |
+|                 |                 | cheaper. A high |                 |
+|                 |                 | value of        |                 |
+|                 |                 | 'jac_penalty'   |                 |
+|                 |                 | makes it less   |                 |
+|                 |                 | likely for the  |                 |
+|                 |                 | heurstic to     |                 |
+|                 |                 | chose the full  |                 |
+|                 |                 | Jacobian        |                 |
+|                 |                 | strategy. The   |                 |
+|                 |                 | special value   |                 |
+|                 |                 | -1 indicates    |                 |
+|                 |                 | never to use    |                 |
+|                 |                 | the full        |                 |
+|                 |                 | Jacobian        |                 |
+|                 |                 | strategy        |                 |
++-----------------+-----------------+-----------------+-----------------+
+| jit             | OT_BOOL         | Use just-in-    | casadi::Functio |
+|                 |                 | time compiler   | nInternal       |
+|                 |                 | to speed up the |                 |
+|                 |                 | evaluation      |                 |
++-----------------+-----------------+-----------------+-----------------+
+| jit_options     | OT_DICT         | Options to be   | casadi::Functio |
+|                 |                 | passed to the   | nInternal       |
+|                 |                 | jit compiler.   |                 |
++-----------------+-----------------+-----------------+-----------------+
+| max_num_dir     | OT_INT          | Specify the     | casadi::Functio |
+|                 |                 | maximum number  | nInternal       |
+|                 |                 | of directions   |                 |
+|                 |                 | for derivative  |                 |
+|                 |                 | functions.      |                 |
+|                 |                 | Overrules the   |                 |
+|                 |                 | builtin optimiz |                 |
+|                 |                 | ed_num_dir.     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| output_scheme   | OT_STRINGVECTOR | Custom output   | casadi::Functio |
+|                 |                 | scheme          | nInternal       |
++-----------------+-----------------+-----------------+-----------------+
+| pos_def         | OT_BOOL         | Assume P        | casadi::Dple    |
+|                 |                 | positive        |                 |
+|                 |                 | definite        |                 |
++-----------------+-----------------+-----------------+-----------------+
+| print_time      | OT_BOOL         | print           | casadi::Functio |
+|                 |                 | information     | nInternal       |
+|                 |                 | about execution |                 |
+|                 |                 | time            |                 |
++-----------------+-----------------+-----------------+-----------------+
+| regularity_chec | OT_BOOL         | Throw           | casadi::Functio |
+| k               |                 | exceptions when | nInternal       |
+|                 |                 | NaN or Inf      |                 |
+|                 |                 | appears during  |                 |
+|                 |                 | evaluation      |                 |
++-----------------+-----------------+-----------------+-----------------+
+| user_data       | OT_VOIDPTR      | A user-defined  | casadi::Functio |
+|                 |                 | field that can  | nInternal       |
+|                 |                 | be used to      |                 |
+|                 |                 | identify the    |                 |
+|                 |                 | function or     |                 |
+|                 |                 | pass additional |                 |
+|                 |                 | information     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| verbose         | OT_BOOL         | Verbose         | casadi::Functio |
+|                 |                 | evaluation  for | nInternal       |
+|                 |                 | debugging       |                 |
++-----------------+-----------------+-----------------+-----------------+
+
+>Input scheme: casadi::DpleInput (DPLE_NUM_IN = 2)
+
++------------------------+------------------------+------------------------+
+|       Full name        |         Short          |      Description       |
++========================+========================+========================+
+| DPLE_A                 | a                      | A matrices (horzcat    |
+|                        |                        | when const_dim,        |
+|                        |                        | diagcat otherwise)     |
+|                        |                        | [a].                   |
++------------------------+------------------------+------------------------+
+| DPLE_V                 | v                      | V matrices (horzcat    |
+|                        |                        | when const_dim,        |
+|                        |                        | diagcat otherwise)     |
+|                        |                        | [v].                   |
++------------------------+------------------------+------------------------+
+
+>Output scheme: casadi::DpleOutput (DPLE_NUM_OUT = 1)
+
++------------------------+------------------------+------------------------+
+|       Full name        |         Short          |      Description       |
++========================+========================+========================+
+| DPLE_P                 | p                      | Lyapunov matrix        |
+|                        |                        | (horzcat when          |
+|                        |                        | const_dim, diagcat     |
+|                        |                        | otherwise) (Cholesky   |
+|                        |                        | of P if pos_def) [p].  |
++------------------------+------------------------+------------------------+
+
+List of plugins
+===============
+
+
+
+- slicot
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+Dple.doc(\"myextraplugin\")
+
+
+
+--------------------------------------------------------------------------------
+
+slicot
+------
+
+
+
+An efficient solver for Discrete Periodic Lyapunov Equations using SLICOT
+
+Uses Periodic Schur Decomposition ('psd') and does not assume positive
+definiteness. Based on Periodic Lyapunov equations: some applications and
+new algorithms. Int. J. Control, vol. 67, pp. 69-87, 1997.
+
+Overview of the method: J. Gillis Practical Methods for Approximate Robust
+Periodic Optimal Control ofNonlinear Mechanical Systems, PhD Thesis,
+KULeuven, 2015
+
+>List of available options
+
++------------------------+------------------------+------------------------+
+|           Id           |          Type          |      Description       |
++========================+========================+========================+
+| linear_solver          | OT_STRING              | User-defined linear    |
+|                        |                        | solver class. Needed   |
+|                        |                        | for sensitivities.     |
++------------------------+------------------------+------------------------+
+| linear_solver_options  | OT_DICT                | Options to be passed   |
+|                        |                        | to the linear solver.  |
++------------------------+------------------------+------------------------+
+| psd_num_zero           | OT_DOUBLE              | Numerical zero used in |
+|                        |                        | Periodic Schur         |
+|                        |                        | decomposition with     |
+|                        |                        | slicot.This option is  |
+|                        |                        | needed when your       |
+|                        |                        | systems has Floquet    |
+|                        |                        | multiplierszero or     |
+|                        |                        | close to zero          |
++------------------------+------------------------+------------------------+
+
+--------------------------------------------------------------------------------
+
+
+
+Joris Gillis
 
 ";
 
-%feature("docstring")  casadi::read_matlab(std::ifstream &file, std::vector<
-std::vector< T > > &v) "
+%feature("docstring")  casadi::dplesol(const MX &A, const MX &V, const
+std::string &solver, const Dict &opts=Dict()) "
 
-Read matrix, matlab style.
+";
+
+%feature("docstring")  casadi::dplesol(const MXVector &A, const MXVector &V,
+const std::string &solver, const Dict &opts=Dict()) "
+
+";
+
+%feature("docstring")  casadi::dplesol(const DMVector &A, const DMVector &V,
+const std::string &solver, const Dict &opts=Dict()) "
 
 ";
 
@@ -12943,10 +13373,22 @@ Get output scheme name by index.
 
 ";
 
+%feature("docstring")  casadi::dple_n_out() "
+
+Get the number of QP solver outputs.
+
+";
+
 %feature("docstring")  casadi::casadi_low(real_t x, const double *grid, int
 ng) "
 
 [INTERNAL] ";
+
+%feature("docstring")  casadi::load_rootfinder(const std::string &name) "
+
+Explicitly load a plugin dynamically.
+
+";
 
 %feature("docstring")  casadi::casadi_mv(const real_t *x, const int *sp_x,
 const real_t *y, real_t *z, int tr) "
@@ -12956,6 +13398,11 @@ const real_t *y, real_t *z, int tr) "
 ";
 
 %feature("docstring") casadi::_jtimes "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::dense_kron_stride(int n, int m, const double
+*A, const double *B, double *C, int strideA, int strideB, int strideC) "
 
 [INTERNAL] ";
 
@@ -12975,7 +13422,7 @@ Hash value of an integer.
 %feature("docstring")  casadi::casadi_trans(const real_t *x, const int
 *sp_x, real_t *y, const int *sp_y, int *tmp) "
 
-[INTERNAL]  TRANS: y <- trans(x)
+[INTERNAL]  TRANS: y <- trans(x) , w work vector (length >= rows x)
 
 ";
 
@@ -13176,6 +13623,23 @@ Get the number of QP solver inputs.
 Get the documentation string for a plugin.
 
 ";
+
+%feature("docstring")  casadi::dple_in() "
+
+Get input scheme of DPLE solvers.
+
+";
+
+%feature("docstring")  casadi::dple_in(int ind) "
+
+Get DPLE input scheme name by index.
+
+";
+
+%feature("docstring")  casadi::dense_copy_t_stride(int n, int m, const
+double *A, double *B, int strideA, int strideB) "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::nlpsol(const std::string &name, const
 std::string &solver, const SXDict &nlp, const Dict &opts=Dict()) "
