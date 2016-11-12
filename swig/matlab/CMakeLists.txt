@@ -30,7 +30,11 @@ if (WITH_MATLAB)
   find_package(MATLAB REQUIRED)
 
   # Compile MEX file
-  add_library(casadiMATLAB MODULE ${MEX_FILE})
+  if (EXISTS ${MATLAB_INCLUDE_DIR}/../version/cpp_mexapi_version.cpp)
+    add_library(casadiMATLAB MODULE ${MEX_FILE} ${MATLAB_INCLUDE_DIR}/../version/cpp_mexapi_version.cpp)
+  else()
+    add_library(casadiMATLAB MODULE ${MEX_FILE})
+  endif()
   target_include_directories(casadiMATLAB PUBLIC ${MATLAB_INCLUDE_DIR})
   target_link_libraries(casadiMATLAB ${MATLAB_LIBRARIES} casadi)
   set_target_properties(casadiMATLAB
