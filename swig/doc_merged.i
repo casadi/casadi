@@ -8956,6 +8956,11 @@ experience a dramatic speed-up by using a sparse linear solver:
 | reltol                 | OT_DOUBLE              | Relative tolerence for |
 |                        |                        | the IVP solution       |
 +------------------------+------------------------+------------------------+
+| second_order_correctio | OT_BOOL                | Second order           |
+| n                      |                        | correction in the      |
+|                        |                        | augmented system       |
+|                        |                        | Jacobian [true]        |
++------------------------+------------------------+------------------------+
 | sensitivity_method     | OT_STRING              | Sensitivity method:    |
 |                        |                        | SIMULTANEOUS|staggered |
 +------------------------+------------------------+------------------------+
@@ -9073,6 +9078,11 @@ experience a dramatic speed-up by using a sparse linear solver:
 +------------------------+------------------------+------------------------+
 | reltol                 | OT_DOUBLE              | Relative tolerence for |
 |                        |                        | the IVP solution       |
++------------------------+------------------------+------------------------+
+| second_order_correctio | OT_BOOL                | Second order           |
+| n                      |                        | correction in the      |
+|                        |                        | augmented system       |
+|                        |                        | Jacobian [true]        |
 +------------------------+------------------------+------------------------+
 | sensitivity_method     | OT_STRING              | Sensitivity method:    |
 |                        |                        | SIMULTANEOUS|staggered |
