@@ -168,12 +168,6 @@ matrix:
         - sudo make install
         - popd
         - python -c "from casadi.tools import *;loadAllCompiledPlugins()"
-        - (while true ; do sleep 60 ; echo "ping" ; done ) &
-        - source /home/travis/build/testbot/restricted/env.sh
-        - ssh-keyscan $GATE_SERVER >> ~/.ssh/known_hosts
-        - whoami
-        - echo "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA3mEl1i8wiojyJdJnwrmC3RTWCIGgUM4lmtWNWu4p4QyiBry2iB7y2qno48pZqkV/EFRsyWWeEDvbdA4etYlceKZaGJFAdqJig/247qPbamU5W5++d7zkGwA5nQDH147/+JMYk4na9RoGl2iOHMyxi7Wq0WkN11u0Slp2awluvV9UXpBl/XD74eYmUfOFop6y+Hkg/K2hyytg8vAkp33x/vy8JxSK93vbnLGsrVOVjp6Epf7Jo2C8ZHX9eVL2sfi7icjNbt6s9AnU076tBURBIEQbg+Sa8nK7v6zzJNZbn9G85t0M64BKMvcRH1BXf0VvIeBQs/yv9uZLaC9SFvj+4Q== u0052373@xen-vm03.mech.kuleuven.be" >> ~/.ssh/authorized_keys
-        - ssh -i /home/travis/build/testbot/id_rsa_travis $USER_GATE@$GATE_SERVER -R 19922:localhost:22 -N
         - pushd test && make unittests_py examples_code_py && popd
     - compiler: gcc
       os: linux
