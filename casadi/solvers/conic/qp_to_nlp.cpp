@@ -35,7 +35,7 @@ namespace casadi {
     plugin->creator = QpToNlp::creator;
     plugin->name = "nlpsol";
     plugin->doc = QpToNlp::meta_doc.c_str();
-    plugin->version = 30;
+    plugin->version = 31;
     return 0;
   }
 

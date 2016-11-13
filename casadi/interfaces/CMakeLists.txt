@@ -70,8 +70,13 @@ if(BLOCKSQP_FOUND)
   add_subdirectory(blocksqp)
 endif()
 
+
 if(HPMPC_FOUND)
   add_subdirectory(hpmpc)
+endif()
+
+if(SLICOT_FOUND)
+  add_subdirectory(slicot)
 endif()
 
 set(LINT_TARGETS ${LINT_TARGETS} PARENT_SCOPE)

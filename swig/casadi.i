@@ -310,9 +310,9 @@ namespace std {
 %exception {
   try {
     $action
-   } catch(const std::exception& e) {
+  } catch(const std::exception& e) {
     SWIG_exception(SWIG_RuntimeError, e.what());
-   }
+  }
 }
 
 // Python sometimes takes an approach to not check, but just try.
@@ -3786,6 +3786,7 @@ namespace casadi{
 %include <casadi/core/function/nlpsol.hpp>
 %include <casadi/core/function/rootfinder.hpp>
 %include <casadi/core/function/linsol.hpp>
+%include <casadi/core/function/dple.hpp>
 %include <casadi/core/function/interpolant.hpp>
 
 %feature("copyctor", "0") casadi::CodeGenerator;

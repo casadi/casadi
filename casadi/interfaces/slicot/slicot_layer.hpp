@@ -23,43 +23,21 @@
  */
 
 
-#ifndef CASADI_CORE_HPP
-#define CASADI_CORE_HPP
+#ifndef CASADI_SLICOT_LAYER_HPP
+#define CASADI_SLICOT_LAYER_HPP
 
-// Scalar expressions (why do I need to put it up here?)
-#include "sx/sx_elem.hpp"
+namespace casadi {
+  int slicot_mb03vd(int n, int p, int ilo, int ihi, double * a, int lda1, int lda2, double * tau,
+                     int ldtau, double * dwork=0);
 
-// Generic tools
-#include "polynomial.hpp"
-#include "std_vector_tools.hpp"
-#include "global_options.hpp"
-#include "casadi_meta.hpp"
+  int slicot_mb03vy(int n, int p, int ilo, int ihi, double * a, int lda1, int lda2,
+                     const double * tau, int ldtau, double * dwork=0, int ldwork=0);
 
-// Matrices
-#include "matrix.hpp"
+  int slicot_mb03wd(char job, char compz, int n, int p, int ilo, int ihi, int iloz, int ihiz,
+                     double *h, int ldh1, int ldh2, double* z, int ldz1, int ldz2, double* wr,
+                     double *wi, double * dwork=0, int ldwork=0);
 
-// Matrix expressions
-#include "mx/mx.hpp"
+} // namespace casadi
 
-// Functions
-#include "function/code_generator.hpp"
-#include "function/importer.hpp"
-#include "function/callback.hpp"
-#include "function/integrator.hpp"
-#include "function/conic.hpp"
-#include "function/nlpsol.hpp"
-#include "function/rootfinder.hpp"
-#include "function/linsol.hpp"
-#include "function/dple.hpp"
-#include "function/interpolant.hpp"
-#include "function/jit.hpp"
-#include "function/external.hpp"
-
-// Misc
-#include "misc/integration_tools.hpp"
-#include "misc/nlp_builder.hpp"
-#include "misc/variable.hpp"
-#include "misc/dae_builder.hpp"
-#include "misc/xml_file.hpp"
-
-#endif // CASADI_CORE_HPP
+/// \endcond
+#endif // CASADI_SLICOT_LAYER_HPP

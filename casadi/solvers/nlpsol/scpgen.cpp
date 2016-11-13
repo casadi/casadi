@@ -44,7 +44,7 @@ namespace casadi {
     plugin->creator = Scpgen::creator;
     plugin->name = "scpgen";
     plugin->doc = Scpgen::meta_doc.c_str();
-    plugin->version = 30;
+    plugin->version = 31;
     return 0;
   }
 
