@@ -10,9 +10,6 @@
 %exception  casadi::BonminUserClass::sosConstraints() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::CodeGenerator::compile(const std::string &compiler="gcc -fPIC -O2") {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::FStats::reset() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -506,9 +503,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::zip(const std::vector< std::string > &id, const std::vector< T > &mat) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception casadi::CodeGenerator::CodeGenerator(const Dict &opts=Dict()) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::FStats::FStats() {

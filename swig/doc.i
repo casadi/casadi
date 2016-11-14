@@ -670,13 +670,6 @@ Get the (integer) input arguments of an atomic operation.
 
 ";
 
-%feature("docstring")  casadi::Function::printOption(const std::string
-&name, std::ostream &stream=casadi::userOut()) const  "
-
-[DEPRECATED] printOption has been renamed print_option
-
-";
-
 %feature("docstring")  casadi::Function::getAtomicInputReal(int k) const  "
 
 Get the floating point output argument of an atomic operation.
@@ -1214,14 +1207,6 @@ matches one of the base classes (default true)
 
 ";
 
-%feature("docstring")  casadi::Function::integrator_dae() "
-
-[DEPRECATED] Get the DAE for an integrator To generate a function with the
-legacy syntax: oracle().factory(\"f\", {\"x\", \"z\", \"p\", \"t\"},
-{\"ode\", \"alg\", \"quad\"})
-
-";
-
 %feature("docstring")  casadi::PrintableObject< SharedObject
 >::getRepresentation() const "
 
@@ -1263,15 +1248,6 @@ Get input scheme name by index.
 %feature("docstring")  casadi::Function::has_free() const  "
 
 Does the function have free variables.
-
-";
-
-%feature("docstring")  casadi::Function::nl_var(const std::string &s_in,
-const std::vector< std::string > &s_out) const  "
-
-[DEPRECATED] Which variables enter nonlinearly
-
-Use which_depends instead.
 
 ";
 
@@ -1352,12 +1328,6 @@ oind:  The index of the output
 
 The default behavior of this class is defined by the derived class. Note
 that the input must be scalar. In other cases, use the Jacobian instead.
-
-";
-
-%feature("docstring")  casadi::Function::derivative(int nfwd, int nadj) "
-
-[DEPRECATED] Use forward_new and reverse_new instead.
 
 ";
 
@@ -1447,14 +1417,6 @@ that the output must be scalar. In other cases, use the Jacobian instead.
 
 ";
 
-%feature("docstring")  casadi::Function::kernel_sum(const std::string &name,
-const std::pair< int, int > &size, double r, int n, const Dict &opts=Dict())
-const  "
-
-[DEPRECATED] kernel_sum is no longer available
-
-";
-
 %feature("docstring")  casadi::Function::set_jac_sparsity(const Sparsity
 &sp, int iind, int oind, bool compact=false) "
 
@@ -1507,24 +1469,10 @@ Get the number of atomic operations.
 
 ";
 
-%feature("docstring")  casadi::Function::printOptions(std::ostream
-&stream=casadi::userOut()) const  "
-
-[DEPRECATED] printOptions has been renamed print_options
-
-";
-
 %feature("docstring")  casadi::Callback::get_jacobian(const std::string
 &name, const Dict &opts) "
 
 Return Jacobian of all input elements with respect to all output elements.
-
-";
-
-%feature("docstring")  casadi::Function::printDimensions(std::ostream
-&stream=casadi::userOut()) const  "
-
-[DEPRECATED] printDimensions has been renamed print_dimensions
 
 ";
 
@@ -1607,20 +1555,6 @@ std::string &parallelization, int n, const std::vector< std::string >
 
 Map with reduction A subset of the inputs are non-repeated and a subset of
 the outputs summed up.
-
-";
-
-%feature("docstring")  casadi::Function::map(const std::vector< MX > &arg,
-const std::string &parallelization="serial") "
-
-[DEPRECATED] Use map(int) instead
-
-";
-
-%feature("docstring")  casadi::Function::map(const std::map< std::string, MX
-> &arg, const std::string &parallelization="serial") "
-
-[DEPRECATED] Use map(int) instead
 
 ";
 
@@ -2055,23 +1989,9 @@ Generate a file, return code as string.
 
 ";
 
-%feature("docstring")  casadi::CodeGenerator::compile(const std::string
-&compiler="gcc -fPIC -O2") "
-
-[INTERNAL]  Compile and load function.
-
-";
-
 %feature("docstring")  casadi::CodeGenerator::add(const Function &f) "
 
 Add a function (name generated)
-
-";
-
-%feature("docstring") casadi::CodeGenerator::CodeGenerator(const Dict
-&opts=Dict()) "
-
-[INTERNAL]  Constructor.
 
 ";
 
@@ -2919,11 +2839,6 @@ Name of the function.
 
 ";
 
-%feature("docstring")  casadi::Function::has_function(const std::string
-&fname) const  "
-
-";
-
 %feature("docstring")  casadi::Function::checkInputs() const  "
 
 [INTERNAL]  Check if the numerical values of the supplied bounds make sense.
@@ -3069,24 +2984,17 @@ Wrap in an Function instance consisting of only one MX call.
 
 ";
 
-%feature("docstring")  casadi::Function::integrator_dae() "
-
-[DEPRECATED] Get the DAE for an integrator To generate a function with the
-legacy syntax: oracle().factory(\"f\", {\"x\", \"z\", \"p\", \"t\"},
-{\"ode\", \"alg\", \"quad\"})
-
-";
-
 %feature("docstring")  casadi::Function::getAtomicOperation(int k) const  "
 
 Get an atomic operation operator index.
 
 ";
 
-%feature("docstring")  casadi::Function::printOptions(std::ostream
-&stream=casadi::userOut()) const  "
+%feature("docstring")  casadi::Function::spCanEvaluate(bool fwd) "
 
-[DEPRECATED] printOptions has been renamed print_options
+[INTERNAL]  Is the class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -3125,21 +3033,6 @@ For a particular output or for all of the outputs
 &stream=casadi::userOut()) const  "
 
 Print dimensions of inputs and outputs.
-
-";
-
-%feature("docstring")  casadi::Function::printDimensions(std::ostream
-&stream=casadi::userOut()) const  "
-
-[DEPRECATED] printDimensions has been renamed print_dimensions
-
-";
-
-%feature("docstring")  casadi::Function::kernel_sum(const std::string &name,
-const std::pair< int, int > &size, double r, int n, const Dict &opts=Dict())
-const  "
-
-[DEPRECATED] kernel_sum is no longer available
 
 ";
 
@@ -3313,12 +3206,6 @@ The the mapaccumulated version has the signature:
 
 ";
 
-%feature("docstring")  casadi::Function::derivative(int nfwd, int nadj) "
-
-[DEPRECATED] Use forward_new and reverse_new instead.
-
-";
-
 %feature("docstring") casadi::Function::Function(const std::string &name,
 const std::vector< SX > &arg, const std::vector< SX > &res, const Dict
 &opts=Dict()) "
@@ -3424,13 +3311,6 @@ For a particular input or for all of the inputs
 %feature("docstring")  casadi::SharedObject::is_null() const  "
 
 Is a null pointer?
-
-";
-
-%feature("docstring")  casadi::Function::printOption(const std::string
-&name, std::ostream &stream=casadi::userOut()) const  "
-
-[DEPRECATED] printOption has been renamed print_option
 
 ";
 
@@ -3773,20 +3653,6 @@ std::string &parallelization, int n, const std::vector< std::string >
 
 Map with reduction A subset of the inputs are non-repeated and a subset of
 the outputs summed up.
-
-";
-
-%feature("docstring")  casadi::Function::map(const std::vector< MX > &arg,
-const std::string &parallelization="serial") "
-
-[DEPRECATED] Use map(int) instead
-
-";
-
-%feature("docstring")  casadi::Function::map(const std::map< std::string, MX
-> &arg, const std::string &parallelization="serial") "
-
-[DEPRECATED] Use map(int) instead
 
 ";
 
@@ -4291,15 +4157,6 @@ Print free variables.
 
 ";
 
-%feature("docstring")  casadi::Function::nl_var(const std::string &s_in,
-const std::vector< std::string > &s_out) const  "
-
-[DEPRECATED] Which variables enter nonlinearly
-
-Use which_depends instead.
-
-";
-
 %feature("docstring")  casadi::Function::getAtomicInputReal(int k) const  "
 
 Get the floating point output argument of an atomic operation.
@@ -4516,11 +4373,8 @@ Get input dimension.
 
 ";
 
-%feature("docstring")  casadi::Function::spCanEvaluate(bool fwd) "
-
-[INTERNAL]  Is the class able to propagate seeds through the algorithm?
-
-(for usage, see the example propagating_sparsity.cpp)
+%feature("docstring")  casadi::Function::has_function(const std::string
+&fname) const  "
 
 ";
 
@@ -4965,12 +4819,6 @@ Solve a system of equations: A*x = b.
 %feature("docstring")  det(const MatType &A) "
 
 Matrix determinant (experimental)
-
-";
-
-%feature("docstring")  nl_var(const MatType &expr, const MatType &var) "
-
-[DEPRECATED] Find out which variables enter nonlinearly
 
 ";
 
@@ -12878,10 +12726,6 @@ Default input for an NLP solver.
 Default input for an NLP solver.
 
 ";
-
-%feature("docstring") casadi::_nl_var "
-
-[INTERNAL] ";
 
 %feature("docstring")  casadi::casadi_interpn_weights(int ndim, const real_t
 *grid, const int *offset, const real_t *x, real_t *alpha, int *index) "

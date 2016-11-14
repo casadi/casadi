@@ -480,12 +480,6 @@ Get the (integer) input arguments of an atomic operation.
 
 ";
 
-%feature("docstring") casadi::Callback::printOption "
-
-[DEPRECATED] printOption has been renamed print_option
-
-";
-
 %feature("docstring") casadi::Callback::getAtomicInputReal "
 
 Get the floating point output argument of an atomic operation.
@@ -783,14 +777,6 @@ matches one of the base classes (default true)
 
 ";
 
-%feature("docstring") casadi::Callback::integrator_dae "
-
-[DEPRECATED] Get the DAE for an integrator To generate a function with the
-legacy syntax: oracle().factory(\"f\", {\"x\", \"z\", \"p\", \"t\"},
-{\"ode\", \"alg\", \"quad\"})
-
-";
-
 %feature("docstring") casadi::Callback::getRepresentation "
 
 Return a string with a representation (for SWIG)
@@ -835,14 +821,6 @@ Does the function have free variables.
 
 ";
 
-%feature("docstring") casadi::Callback::nl_var "
-
-[DEPRECATED] Which variables enter nonlinearly
-
-Use which_depends instead.
-
-";
-
 %feature("docstring") casadi::Callback::assert_size_in "
 
 Assert that an input dimension is equal so some given value.
@@ -868,12 +846,6 @@ oind:  The index of the output
 
 The default behavior of this class is defined by the derived class. Note
 that the input must be scalar. In other cases, use the Jacobian instead.
-
-";
-
-%feature("docstring") casadi::Callback::derivative "
-
-[DEPRECATED] Use forward_new and reverse_new instead.
 
 ";
 
@@ -909,12 +881,6 @@ pointer to the internal class
 
 ";
 
-%feature("docstring") casadi::Callback::kernel_sum "
-
-[DEPRECATED] kernel_sum is no longer available
-
-";
-
 %feature("docstring") casadi::Callback::set_jac_sparsity "
 
 Generate the sparsity of a Jacobian block
@@ -943,21 +909,9 @@ length of res field.
 
 ";
 
-%feature("docstring") casadi::Callback::printOptions "
-
-[DEPRECATED] printOptions has been renamed print_options
-
-";
-
 %feature("docstring") casadi::Callback::get_jacobian "
 
 Return Jacobian of all input elements with respect to all output elements.
-
-";
-
-%feature("docstring") casadi::Callback::printDimensions "
-
-[DEPRECATED] printDimensions has been renamed print_dimensions
 
 ";
 
@@ -1012,13 +966,6 @@ Get an atomic operation operator index.
 
 Map with reduction A subset of the inputs are non-repeated and a subset of
 the outputs summed up.
-
->  std::vector<MX> casadi::Function::map(const std::vector< MX > &arg, const std::string &parallelization=\"serial\")
-
->  std::map<std::string, MX> casadi::Function::map(const std::map< std::string, MX > &arg, const std::string &parallelization=\"serial\")
-------------------------------------------------------------------------
-
-[DEPRECATED] Use map(int) instead
 
 >  Function casadi::Function::map(int n, const std::string &parallelization=\"serial\")
 ------------------------------------------------------------------------
@@ -1310,11 +1257,6 @@ Generate a file, return code as string.
 
 ";
 
-%feature("docstring") casadi::CodeGenerator::compile "[INTERNAL]  Compile
-and load function.
-
-";
-
 %feature("docstring") casadi::CodeGenerator::add "
 
 Add a function (name generated)
@@ -1322,14 +1264,6 @@ Add a function (name generated)
 ";
 
 %feature("docstring") casadi::CodeGenerator::CodeGenerator "
-
->  casadi::CodeGenerator::CodeGenerator(const Dict &opts=Dict())
-------------------------------------------------------------------------
-[INTERNAL] 
-Constructor.
-
->  casadi::CodeGenerator::CodeGenerator(const std::string &name, const Dict &opts=Dict())
-------------------------------------------------------------------------
 
 Constructor.
 
@@ -2027,8 +1961,6 @@ Name of the function.
 
 ";
 
-%feature("docstring") casadi::Function::has_function "";
-
 %feature("docstring") casadi::Function::checkInputs "[INTERNAL]  Check if
 the numerical values of the supplied bounds make sense.
 
@@ -2093,23 +2025,16 @@ Wrap in an Function instance consisting of only one MX call.
 
 ";
 
-%feature("docstring") casadi::Function::integrator_dae "
-
-[DEPRECATED] Get the DAE for an integrator To generate a function with the
-legacy syntax: oracle().factory(\"f\", {\"x\", \"z\", \"p\", \"t\"},
-{\"ode\", \"alg\", \"quad\"})
-
-";
-
 %feature("docstring") casadi::Function::getAtomicOperation "
 
 Get an atomic operation operator index.
 
 ";
 
-%feature("docstring") casadi::Function::printOptions "
+%feature("docstring") casadi::Function::spCanEvaluate "[INTERNAL]  Is the
+class able to propagate seeds through the algorithm?
 
-[DEPRECATED] printOptions has been renamed print_options
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -2130,18 +2055,6 @@ For a particular output or for all of the outputs
 %feature("docstring") casadi::Function::print_dimensions "
 
 Print dimensions of inputs and outputs.
-
-";
-
-%feature("docstring") casadi::Function::printDimensions "
-
-[DEPRECATED] printDimensions has been renamed print_dimensions
-
-";
-
-%feature("docstring") casadi::Function::kernel_sum "
-
-[DEPRECATED] kernel_sum is no longer available
 
 ";
 
@@ -2226,12 +2139,6 @@ The the mapaccumulated version has the signature:
 
 ";
 
-%feature("docstring") casadi::Function::derivative "
-
-[DEPRECATED] Use forward_new and reverse_new instead.
-
-";
-
 %feature("docstring") casadi::Function::Function "
 
 >  casadi::Function::Function(const std::string &name, const std::vector< SX > &arg, const std::vector< SX > &res, const Dict &opts=Dict())
@@ -2283,12 +2190,6 @@ For a particular input or for all of the inputs
 %feature("docstring") casadi::Function::is_null "
 
 Is a null pointer?
-
-";
-
-%feature("docstring") casadi::Function::printOption "
-
-[DEPRECATED] printOption has been renamed print_option
 
 ";
 
@@ -2493,13 +2394,6 @@ the output elements).
 
 Map with reduction A subset of the inputs are non-repeated and a subset of
 the outputs summed up.
-
->  std::vector<MX> casadi::Function::map(const std::vector< MX > &arg, const std::string &parallelization=\"serial\")
-
->  std::map<std::string, MX> casadi::Function::map(const std::map< std::string, MX > &arg, const std::string &parallelization=\"serial\")
-------------------------------------------------------------------------
-
-[DEPRECATED] Use map(int) instead
 
 >  Function casadi::Function::map(int n, const std::string &parallelization=\"serial\")
 ------------------------------------------------------------------------
@@ -2865,14 +2759,6 @@ Print free variables.
 
 ";
 
-%feature("docstring") casadi::Function::nl_var "
-
-[DEPRECATED] Which variables enter nonlinearly
-
-Use which_depends instead.
-
-";
-
 %feature("docstring") casadi::Function::getAtomicInputReal "
 
 Get the floating point output argument of an atomic operation.
@@ -3000,12 +2886,7 @@ length of w field.
 
 ";
 
-%feature("docstring") casadi::Function::spCanEvaluate "[INTERNAL]  Is the
-class able to propagate seeds through the algorithm?
-
-(for usage, see the example propagating_sparsity.cpp)
-
-";
+%feature("docstring") casadi::Function::has_function "";
 
 %feature("docstring") casadi::Function::sx_out "
 
@@ -3416,12 +3297,6 @@ Solve a system of equations: A*x = b.
 %feature("docstring") friendwrap_det "
 
 Matrix determinant (experimental)
-
-";
-
-%feature("docstring") friendwrap_nl_var "
-
-[DEPRECATED] Find out which variables enter nonlinearly
 
 ";
 
@@ -10177,8 +10052,6 @@ scheme:   Collocation scheme, as excepted by collocationPoints function.
 Default input for an NLP solver.
 
 ";
-
-%feature("docstring") casadi::_nl_var "[INTERNAL] ";
 
 %feature("docstring") casadi::casadi_interpn_weights "[INTERNAL] ";
 
