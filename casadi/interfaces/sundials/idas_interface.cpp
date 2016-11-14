@@ -39,7 +39,7 @@ namespace casadi {
     plugin->creator = IdasInterface::creator;
     plugin->name = "idas";
     plugin->doc = IdasInterface::meta_doc.c_str();
-    plugin->version = 31;
+    plugin->version = CASADI_VERSION;
     return 0;
   }
 

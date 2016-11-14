@@ -348,6 +348,9 @@ if(MINGW OR ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU") OR ("${CMAKE_CXX_COMPILE
   #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fkeep-inline-functions")
 endif()
 
+# Plugin version
+add_definitions(-DCASADI_VERSION=31)
+
 # Necessary for Visual C++
 add_definitions(-D_USE_MATH_DEFINES)
 add_definitions(-D_SCL_SECURE_NO_WARNINGS)

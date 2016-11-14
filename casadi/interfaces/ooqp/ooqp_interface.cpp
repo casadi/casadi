@@ -44,7 +44,7 @@ namespace casadi {
     plugin->creator = OoqpInterface::creator;
     plugin->name = "ooqp";
     plugin->doc = OoqpInterface::meta_doc.c_str();
-    plugin->version = 31;
+    plugin->version = CASADI_VERSION;
     return 0;
   }
 

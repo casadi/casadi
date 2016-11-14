@@ -35,7 +35,7 @@ namespace casadi {
     plugin->creator = LapackLu::creator;
     plugin->name = "lapacklu";
     plugin->doc = LapackLu::meta_doc.c_str();
-    plugin->version = 31;
+    plugin->version = CASADI_VERSION;
     return 0;
   }
 

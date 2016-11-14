@@ -40,7 +40,7 @@ namespace casadi {
     plugin->creator = ShellCompiler::creator;
     plugin->name = "shell";
     plugin->doc = ShellCompiler::meta_doc.c_str();
-    plugin->version = 31;
+    plugin->version = CASADI_VERSION;
     return 0;
   }
 

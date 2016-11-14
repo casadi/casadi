@@ -35,7 +35,7 @@ namespace casadi {
     plugin->creator = LapackQr::creator;
     plugin->name = "lapackqr";
     plugin->doc = LapackQr::meta_doc.c_str();;
-    plugin->version = 31;
+    plugin->version = CASADI_VERSION;
     return 0;
   }
 

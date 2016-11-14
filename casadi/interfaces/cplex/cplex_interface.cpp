@@ -42,7 +42,7 @@ namespace casadi {
     plugin->creator = CplexInterface::creator;
     plugin->name = "cplex";
     plugin->doc = CplexInterface::meta_doc.c_str();
-    plugin->version = 31;
+    plugin->version = CASADI_VERSION;
     return 0;
   }
 
