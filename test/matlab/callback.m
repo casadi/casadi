@@ -29,6 +29,6 @@ Y = foo(X);
 A = rand(5);
 
 foo = Convolution(A, false);
-foo.forward(1);
+foo.forward_new(1);
 foo.get_jacobian('J',struct);
 foo.fullJacobian();
