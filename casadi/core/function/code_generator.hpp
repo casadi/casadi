@@ -39,11 +39,6 @@ namespace casadi {
   */
   class CASADI_EXPORT CodeGenerator {
   public:
-#ifdef WITH_DEPRECATED_FEATURES
-    /// Constructor
-    CodeGenerator(const Dict& opts = Dict());
-#endif // WITH_DEPRECATED_FEATURES
-
     /// Constructor
     CodeGenerator(const std::string& name, const Dict& opts = Dict());
 
@@ -64,11 +59,6 @@ namespace casadi {
       returns the filename
     */
     std::string generate(const std::string& prefix="") const;
-
-#ifdef WITH_DEPRECATED_FEATURES
-    /// Compile and load function
-    std::string compile(const std::string& compiler="gcc -fPIC -O2");
-#endif // WITH_DEPRECATED_FEATURES
 
     /// Add an include file optionally using a relative path "..." instead of an absolute path <...>
     void addInclude(const std::string& new_include, bool relative_path=false,

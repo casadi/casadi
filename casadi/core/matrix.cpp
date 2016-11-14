@@ -630,13 +630,6 @@ namespace casadi {
     return _jtimes(ex, arg, v, tr);
   }
 
-#ifdef WITH_DEPRECATED_FEATURES
-  template<>
-  std::vector<bool> SX::nl_var(const SX &expr, const SX &var) {
-    return _nl_var(expr, var);
-  }
-#endif
-
   template<>
   std::vector<bool> SX::which_depends(const SX &expr, const SX &var, int order, bool tr) {
     return _which_depends(expr, var, order, tr);

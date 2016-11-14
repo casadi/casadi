@@ -556,30 +556,6 @@ namespace casadi {
     return (*this)->slice(name, order_in, order_out, opts);
   }
 
-#ifdef WITH_DEPRECATED_FEATURES
-  vector<MX> Function::map(const vector< MX > &x,
-                           const string& parallelization) {
-    return (*this)->map_mx(x, parallelization);
-  }
-
-  std::map<std::string, MX> Function::map(const std::map<std::string, MX> &arg,
-                      const std::string& parallelization) {
-
-    // Convert inputs map to vector
-    std::vector<MX> args(n_in());
-    for (auto& e : arg) args[index_in(e.first)] = e.second;
-
-    // Delegate the actual map call
-    std::vector<MX> res = map(args, parallelization);
-
-    // Result vector to map
-    std::map<std::string, MX> ret;
-    for (int i=0;i<res.size();++i) ret[name_out(i)] = res[i];
-
-    return ret;
-  }
-  #endif // WITH_DEPRECATED_FEATURES
-
   vector<MX> Function::mapsum(const vector< MX > &x,
                               const string& parallelization) {
     return (*this)->mapsum_mx(x, parallelization);
@@ -600,16 +576,6 @@ namespace casadi {
     ret->construct(opts);
     return ret;
   }
-
-#ifdef WITH_DEPRECATED_FEATURES
-  Function Function::kernel_sum(const string& name,
-                                const pair<int, int> & size,
-                                double r, int n,
-                                const Dict& opts) const {
-    casadi_error("kernel_sum: has been deprecated");
-    return Function();
-  }
-#endif // WITH_DEPRECATED_FEATURES
 
   int Function::n_in() const {
     return (*this)->n_in();
@@ -801,159 +767,6 @@ namespace casadi {
       return (*this)->has_sprev();
     }
   }
-
-  #ifdef WITH_DEPRECATED_FEATURES
-  Function Function::derivative(int nfwd, int nadj) {
-    // Quick return
-    if (nfwd==0 && nadj==0) return *this;
-
-    // Call self
-    vector<MX> arg = mx_in();
-    vector<MX> res = (*this)(arg);
-    vector<MX> ret_in(arg), ret_out(res);
-
-    // Number inputs and outputs
-    int num_in = n_in();
-    int num_out = n_out();
-
-    // Forward sensitivities
-    if (nfwd>0) {
-      Function dfcn = forward(nfwd);
-      arg = dfcn.mx_in();
-      copy(ret_in.begin(), ret_in.begin()+num_in, arg.begin());
-      copy(ret_out.begin(), ret_out.begin()+num_out, arg.begin()+num_in);
-      ret_in.insert(ret_in.end(), arg.begin()+num_in+num_out, arg.end());
-      res = dfcn(arg);
-      vector<MX>::iterator it=res.begin();
-      for (int d=0; d<nfwd; ++d)
-        for (int i=0; i<num_out; ++i, ++it)
-          *it = project(*it, sparsity_out(i));
-      ret_out.insert(ret_out.end(), res.begin(), res.end());
-    }
-
-    // Adjoint sensitivities
-    if (nadj>0) {
-      Function dfcn = reverse(nadj);
-      arg = dfcn.mx_in();
-      copy(ret_in.begin(), ret_in.begin()+num_in, arg.begin());
-      copy(ret_out.begin(), ret_out.begin()+num_out, arg.begin()+num_in);
-      ret_in.insert(ret_in.end(), arg.begin()+num_in+num_out, arg.end());
-      res = dfcn(arg);
-      vector<MX>::iterator it=res.begin();
-      for (int d=0; d<nadj; ++d)
-        for (int i=0; i<num_in; ++i, ++it)
-          *it = project(*it, sparsity_in(i));
-      ret_out.insert(ret_out.end(), res.begin(), res.end());
-    }
-
-    // Name of return function
-    stringstream ss;
-    ss << "derivative_" << name() << "_" << nfwd << "_" << nadj;
-
-    // Names of inputs
-    vector<string> i_names;
-    i_names.reserve(n_in()*(1+nfwd)+n_out()*nadj);
-    const vector<string>& ischeme=(*this)->ischeme_;
-    const vector<string>& oscheme=(*this)->oscheme_;
-
-    // Nondifferentiated inputs
-    for (int i=0; i<n_in(); ++i) {
-      i_names.push_back("der_" + ischeme.at(i));
-    }
-
-    // Forward seeds
-    for (int d=0; d<nfwd; ++d) {
-      for (int i=0; i<n_in(); ++i) {
-        ss.str(string());
-        ss << "fwd" << d << "_" << ischeme.at(i);
-        i_names.push_back(ss.str());
-      }
-    }
-
-    // Adjoint seeds
-    for (int d=0; d<nadj; ++d) {
-      for (int i=0; i<n_out(); ++i) {
-        ss.str(string());
-        ss << "adj" << d << "_" << oscheme.at(i);
-        i_names.push_back(ss.str());
-      }
-    }
-
-    // Names of outputs
-    vector<string> o_names;
-    o_names.reserve(n_out()*(1+nfwd)+n_in()*nadj);
-
-    // Nondifferentiated inputs
-    for (int i=0; i<n_out(); ++i) {
-      o_names.push_back("der_" + oscheme.at(i));
-    }
-
-    // Forward sensitivities
-    for (int d=0; d<nfwd; ++d) {
-      for (int i=0; i<n_out(); ++i) {
-        ss.str(string());
-        ss << "fwd" << d << "_" << oscheme.at(i);
-        o_names.push_back(ss.str());
-      }
-    }
-
-    // Adjoint sensitivities
-    for (int d=0; d<nadj; ++d) {
-      for (int i=0; i<n_in(); ++i) {
-        ss.str(string());
-        ss << "adj" << d << "_" << ischeme.at(i);
-        o_names.push_back(ss.str());
-      }
-    }
-
-    // Construct return function
-    Function ret(ss.str(), ret_in, ret_out,
-                 {{"input_scheme", i_names}, {"output_scheme", o_names}});
-
-    // Consistency check for inputs
-    int ind=0;
-    for (int d=-1; d<nfwd; ++d) {
-      for (int i=0; i<n_in(); ++i, ++ind) {
-        if (ret.nnz_in(ind)!=0 && ret.sparsity_in(ind)!=sparsity_in(i)) {
-          casadi_error("Incorrect sparsity for " << ret << " input " << ind << " \""
-                       << i_names.at(ind) << "\". Expected " << size_in(i)
-                       << " but got " << ret.size_in(ind));
-        }
-      }
-    }
-    for (int d=0; d<nadj; ++d) {
-      for (int i=0; i<n_out(); ++i, ++ind) {
-        if (ret.nnz_in(ind)!=0 && ret.sparsity_in(ind)!=sparsity_out(i)) {
-          casadi_error("Incorrect sparsity for " << ret << " input " << ind <<
-                       " \"" << i_names.at(ind) << "\". Expected " << size_out(i)
-                       << " but got " << ret.size_in(ind));
-        }
-      }
-    }
-
-    // Consistency check for outputs
-    ind=0;
-    for (int d=-1; d<nfwd; ++d) {
-      for (int i=0; i<n_out(); ++i, ++ind) {
-        if (ret.nnz_out(ind)!=0 && ret.sparsity_out(ind)!=sparsity_out(i)) {
-          casadi_error("Incorrect sparsity for " << ret << " output " << ind <<
-                       " \"" <<  o_names.at(ind) << "\". Expected " << size_out(i)
-                       << " but got " << ret.size_out(ind));
-        }
-      }
-    }
-    for (int d=0; d<nadj; ++d) {
-      for (int i=0; i<n_in(); ++i, ++ind) {
-        if (ret.nnz_out(ind)!=0 && ret.sparsity_out(ind)!=sparsity_in(i)) {
-          casadi_error("Incorrect sparsity for " << ret << " output " << ind << " \""
-                       << o_names.at(ind) << "\". Expected " << size_in(i)
-                       << " but got " << ret.size_out(ind));
-        }
-      }
-    }
-    return ret;
-  }
-#endif // WITH_DEPRECATED_FEATURES
 
   Function Function::forward(int nfwd) {
     casadi_assert(nfwd>=0);
@@ -1465,13 +1278,6 @@ namespace casadi {
           const Dict& opts) const {
      return (*this)->factory(name, s_in, s_out, aux, opts);
   }
-
-#ifdef WITH_DEPRECATED_FEATURES
-  vector<bool> Function::nl_var(const string& s_in,
-                                const vector<string>& s_out) const {
-    return (*this)->nl_var(s_in, s_out);
-  }
-#endif
 
   vector<bool> Function::which_depends(const string& s_in,
                                 const vector<string>& s_out, int order, bool tr) const {

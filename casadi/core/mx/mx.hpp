@@ -382,9 +382,6 @@ namespace casadi {
     static MX hessian(const MX& f, const MX& x);
     static MX hessian(const MX& f, const MX& x, MX& g);
     static MX jtimes(const MX &ex, const MX &arg, const MX &v, bool tr=false);
-#ifdef WITH_DEPRECATED_FEATURES
-    static std::vector<bool> nl_var(const MX &expr, const MX &var);
-#endif
     static std::vector<bool> which_depends(const MX &expr, const MX &var,
         int order=1, bool tr=false);
     static MX substitute(const MX& ex, const MX& v, const MX& vdef);

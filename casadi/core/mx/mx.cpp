@@ -1560,12 +1560,6 @@ namespace casadi {
     return _jtimes(ex, arg, v, tr);
   }
 
-#ifdef WITH_DEPRECATED_FEATURES
-  std::vector<bool> MX::nl_var(const MX &expr, const MX &var) {
-    return _nl_var(expr, var);
-  }
-#endif
-
   std::vector<bool> MX::which_depends(const MX &expr, const MX &var, int order, bool tr) {
     return _which_depends(expr, var, order, tr);
   }

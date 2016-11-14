@@ -32,16 +32,6 @@
 using namespace std;
 namespace casadi {
 
-#ifdef WITH_DEPRECATED_FEATURES
-  CodeGenerator::CodeGenerator(const Dict& opts) {
-    casadi_error("The constructor of CodeGenerator has changed. "
-                 "Please provide the file name as the first argument to the "
-                 "constructor, i.e. CodeGenerator(name, [options]). "
-                 "Also note that CodeGenerator::generate now takes a prefix "
-                 "(e.g. a directory) instead of the filename");
-  }
-#endif // DWITH_DEPRECATED_FEATURES
-
   CodeGenerator::CodeGenerator(const std::string& name, const Dict& opts) {
     // Default options
     this->verbose = true;
@@ -887,39 +877,6 @@ namespace casadi {
     arg.push_back(arg3);
     return printf(str, arg);
   }
-
-#ifdef WITH_DEPRECATED_FEATURES
-  std::string CodeGenerator::compile(const std::string& compiler) {
-    casadi_warning("CodeGenerator::compile has been deprecated. "
-                   "Create an Importer instance instead, e.g. "
-                   "Importer(cg.generate(), ...)");
-    // Flag to get a DLL
-#ifdef __APPLE__
-    string dlflag = " -dynamiclib";
-#else // __APPLE__
-    string dlflag = " -shared";
-#endif // __APPLE__
-
-    // File names
-    string cname = name + this->suffix, dlname = "./" + name + ".so";
-
-    // Remove existing files, if any
-    string rm_command = "rm -rf " + cname + " " + dlname;
-    int flag = system(rm_command.c_str());
-    casadi_assert_message(flag==0, "Failed to remove old source");
-
-    // Codegen it
-    generate();
-
-    // Compile it
-    string compile_command = compiler + " " + dlflag + " " + cname + " -o " + dlname;
-    flag = system(compile_command.c_str());
-    casadi_assert_message(flag==0, "Compilation failed");
-
-    // Return name of compiled function
-    return dlname;
-  }
-#endif // WITH_DEPRECATED_FEATURES
 
   std::string CodeGenerator::mtimes(const std::string& x, const Sparsity& sp_x,
                                     const std::string& y, const Sparsity& sp_y,

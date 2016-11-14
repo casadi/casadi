@@ -2823,14 +2823,6 @@ namespace casadi {
     return singleton;
   }
 
-#ifdef WITH_DEPRECATED_FEATURES
-  vector<bool> FunctionInternal::
-  nl_var(const string& s_in, const vector<string>& s_out) const {
-    casadi_error("'nl_var' not defined for " + type_name());
-    return vector<bool>();
-  }
-#endif
-
   vector<bool> FunctionInternal::
   which_depends(const string& s_in, const vector<string>& s_out, int order, bool tr) const {
     casadi_error("'which_depends' not defined for " + type_name());

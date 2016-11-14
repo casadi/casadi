@@ -98,15 +98,6 @@ namespace casadi {
                              const Function::AuxOut& aux,
                              const Dict& opts) const;
 
-#ifdef WITH_DEPRECATED_FEATURES
-    /** \brief [DEPRECATED] Which variables enter nonlinearly
-    *
-    * Use which_depends instead.
-    */
-    virtual std::vector<bool> nl_var(const std::string& s_in,
-                                    const std::vector<std::string>& s_out) const;
-#endif
-
     /** \brief Which variables enter with some order
     *
     * \param[in] order Only 1 (linear) and 2 (nonlinear) allowed
@@ -1259,30 +1250,6 @@ namespace casadi {
     }
     return ret;
   }
-
-#ifdef WITH_DEPRECATED_FEATURES
-  template<typename DerivedType, typename MatType, typename NodeType>
-  std::vector<bool> XFunction<DerivedType, MatType, NodeType>::
-  nl_var(const std::string& s_in, const std::vector<std::string>& s_out) const {
-    using namespace std;
-
-    // Input arguments
-    auto it = find(ischeme_.begin(), ischeme_.end(), s_in);
-    casadi_assert(it!=ischeme_.end());
-    MatType arg = in_.at(it-ischeme_.begin());
-
-    // Output arguments
-    vector<MatType> res;
-    for (auto&& s : s_out) {
-      it = find(oscheme_.begin(), oscheme_.end(), s);
-      casadi_assert(it!=oscheme_.end());
-      res.push_back(out_.at(it-oscheme_.begin()));
-    }
-
-    // Extract variables entering nonlinearly
-    return MatType::nl_var(veccat(res), arg);
-  }
-#endif
 
   template<typename DerivedType, typename MatType, typename NodeType>
   std::vector<bool> XFunction<DerivedType, MatType, NodeType>::

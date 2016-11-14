@@ -303,22 +303,14 @@ namespace casadi {
     /** \brief Wrap in an Function instance consisting of only one MX call */
     Function wrap() const;
 
-#ifdef WITH_DEPRECATED_FEATURES
-    /** \brief [DEPRECATED] Which variables enter nonlinearly
-    *
-    * Use which_depends instead.
-    */
-    std::vector<bool> nl_var(const std::string& s_in,
-                             const std::vector<std::string>& s_out) const;
-#endif
     /** \brief Which variables enter with some order
     *
     * \param[in] order Only 1 (linear) and 2 (nonlinear) allowed
     * \param[in] tr   Flip the relationship. Return which expressions contain the variables
     */
     std::vector<bool> which_depends(const std::string& s_in,
-                                           const std::vector<std::string>& s_out,
-                                           int order=1, bool tr=false) const;
+                                    const std::vector<std::string>& s_out,
+                                    int order=1, bool tr=false) const;
 
     /** \brief Print dimensions of inputs and outputs */
     void print_dimensions(std::ostream &stream=casadi::userOut()) const;
@@ -328,23 +320,6 @@ namespace casadi {
 
     /** \brief Print all information there is to know about a certain option */
     void print_option(const std::string &name, std::ostream &stream = casadi::userOut()) const;
-
-    #ifdef WITH_DEPRECATED_FEATURES
-    /// [DEPRECATED] printDimensions has been renamed print_dimensions
-    void printDimensions(std::ostream &stream=casadi::userOut()) const {
-      print_dimensions(stream);
-    }
-
-    /// [DEPRECATED] printOptions has been renamed print_options
-    void printOptions(std::ostream &stream=casadi::userOut()) const {
-      print_options(stream);
-    }
-
-    /// [DEPRECATED] printOption has been renamed print_option
-    void printOption(const std::string &name, std::ostream &stream = casadi::userOut()) const {
-      print_option(name, stream);
-    }
-    #endif // WITH_DEPRECATED_FEATURES
 
     /** \brief Print free variables */
     void print_free(std::ostream &stream=casadi::userOut()) const;
@@ -582,16 +557,6 @@ namespace casadi {
                  std::vector<std::vector<DM> >& SWIG_OUTPUT(asens),
                  bool always_inline=false, bool never_inline=false);
 
-#ifdef WITH_DEPRECATED_FEATURES
-    /** \brief [DEPRECATED] Use map(int) instead */
-    std::vector<MX> map(const std::vector<MX > &arg,
-                        const std::string& parallelization="serial");
-
-    /** \brief [DEPRECATED] Use map(int) instead */
-    std::map<std::string, MX> map(const std::map<std::string, MX> &arg,
-                        const std::string& parallelization="serial");
-#endif // WITH_DEPRECATED_FEATURES
-
     /** \brief  Evaluate symbolically in parallel and sum (matrix graph)
         \param parallelization Type of parallelization used: unroll|serial|openmp
     */
@@ -692,17 +657,6 @@ namespace casadi {
     /** \brief Constructor (if-else) */
     static Function if_else(const std::string& name, const Function& f_true,
                             const Function& f_false, const Dict& opts=Dict());
-
-#ifdef WITH_DEPRECATED_FEATURES
-    /** \brief [DEPRECATED] kernel_sum is no longer available */
-    Function kernel_sum(const std::string& name,
-                        const std::pair<int, int> & size,
-                        double r, int n,
-                        const Dict& opts=Dict()) const;
-
-    /** \brief [DEPRECATED] Use forward_new and reverse_new instead. */
-    Function derivative(int nfwd, int nadj);
-#endif // WITH_DEPRECATED_FEATURES
 
     /** \brief Get a function that calculates \a nfwd forward derivatives
      *
@@ -978,16 +932,6 @@ namespace casadi {
 
     /// Access rhs function for a rootfinder
     Function rootfinder_fun();
-
-#ifdef WITH_DEPRECATED_FEATURES
-    /** \brief [DEPRECATED] Get the DAE for an integrator
-      To generate a function with the legacy syntax:
-      oracle().factory("f", {"x", "z", "p", "t"}, {"ode", "alg", "quad"})
-    */
-    Function integrator_dae() {
-      return oracle().factory("f", {"x", "z", "p", "t"}, {"ode", "alg", "quad"});
-    }
-#endif // WITH_DEPRECATED_FEATURES
 
     /** Generate native code in the interfaced language for debugging */
     void conic_debug(const std::string &filename) const;
