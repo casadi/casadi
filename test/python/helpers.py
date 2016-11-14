@@ -453,8 +453,6 @@ class casadiTestCase(unittest.TestCase):
       storage2 = {}
       storage = {}
 
-      ndir = 2
-
       def vec(l):
         ret = []
         for i in l:
@@ -467,14 +465,14 @@ class casadiTestCase(unittest.TestCase):
 
         # dense
         for spmod,spmod2 in itertools.product(spmods,repeat=2):
-          fseeds = [[sym("f",spmod(f.sparsity_in(i))) for i in range(f.n_in())]  for d in range(ndir)]
-          aseeds = [[sym("a",spmod2(f.sparsity_out(i)))  for i in range(f.n_out())] for d in range(ndir)]
+          fseeds = [sym("f",spmod(f.sparsity_in(i))) for i in range(f.n_in())]
+          aseeds = [sym("a",spmod2(f.sparsity_out(i)))  for i in range(f.n_out())]
           inputss = [sym("i",f.sparsity_in(i)) for i in range(f.n_in())]
           res = f.call(inputss)
-          fwdsens = f.forward(inputss, res, fseeds)
-          adjsens = f.reverse(inputss, res, aseeds)
+          [fwdsens] = f.forward(inputss, res, [fseeds])
+          [adjsens] = f.reverse(inputss, res, [aseeds])
 
-          vf = Function("vf", inputss+vec([fseeds[i]+aseeds[i] for i in range(ndir)]),list(res) + vec([list(fwdsens[i])+list(adjsens[i]) for i in range(ndir)]))
+          vf = Function("vf", inputss+vec([fseeds+aseeds]),list(res) + vec([list(fwdsens)+list(adjsens)]))
 
           vf_in = list(inputs)
           # Complete random seeding
@@ -495,15 +493,15 @@ class casadiTestCase(unittest.TestCase):
 
             # Second order sensitivities
             for spmod_2,spmod2_2 in itertools.product(spmods,repeat=2):
-              fseeds2 = [[sym("f",vf_reference.sparsity_in(i)) for i in range(vf.n_in())] for d in range(ndir)]
-              aseeds2 = [[sym("a",vf_reference.sparsity_out(i))  for i in range(vf.n_out()) ] for d in range(ndir)]
+              fseeds2 = [sym("f",vf_reference.sparsity_in(i)) for i in range(vf.n_in())]
+              aseeds2 = [sym("a",vf_reference.sparsity_out(i))  for i in range(vf.n_out()) ]
               inputss2 = [sym("i",vf_reference.sparsity_in(i)) for i in range(vf.n_in())]
 
               res2 = vf.call(inputss2)
-              fwdsens2 = vf.forward(inputss2, res2, fseeds2)
-              adjsens2 = vf.reverse(inputss2, res2, aseeds2)
+              [fwdsens2] = vf.forward(inputss2, res2, [fseeds2])
+              [adjsens2] = vf.reverse(inputss2, res2, [aseeds2])
 
-              vf2 = Function("vf2", inputss2+vec([fseeds2[i]+aseeds2[i] for i in range(ndir)]),list(res2) + vec([list(fwdsens2[i])+list(adjsens2[i]) for i in range(ndir)]))
+              vf2 = Function("vf2", inputss2+vec([fseeds2+aseeds2]),list(res2) + vec([list(fwdsens2)+list(adjsens2)]))
 
               vf2_in = list(inputs)
 
