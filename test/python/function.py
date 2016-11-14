@@ -1066,7 +1066,7 @@ class Functiontests(casadiTestCase):
 
     g = Function("g", [x,y],[sin(x+3*y)])
 
-    def getP(max_fwd=1,max_adj=1,has_fwd=True,has_adj=True,indirect=True):
+    def getP(has_fwd=True,has_adj=True,indirect=True):
 
       class Fun(Callback):
         # sin(x+3*y)
@@ -1085,8 +1085,8 @@ class Functiontests(casadiTestCase):
           z2 = sin(z1)
           return [z2]
 
-        def get_n_forward(self): return max_fwd
         if has_fwd:
+          def get_n_forward(self): return 1
           def get_forward(self,name,nfwd,opts):
             class ForwardFun(Callback):
               # sin(x+3*y)
@@ -1098,7 +1098,6 @@ class Functiontests(casadiTestCase):
               def get_n_out(self): return nfwd
 
               def eval(self,arg):
-                assert(max_fwd)
                 x,y = arg[0],arg[1]
                 z = arg[2]
                 seeds = arg[3:]
@@ -1122,8 +1121,8 @@ class Functiontests(casadiTestCase):
             ffun.__disown__()
             return ffun
 
-        def get_n_reverse(self): return max_adj
         if has_adj:
+          def get_n_reverse(self): return 1
           def get_reverse(self,name,nadj,opts):
             class BackwardFun(Callback):
               # sin(x+3*y)
@@ -1135,7 +1134,6 @@ class Functiontests(casadiTestCase):
               def get_n_out(self): return nadj*2
 
               def eval(self,arg):
-                assert(max_adj)
                 x,y = arg[0],arg[1]
                 z = arg[2]
                 seeds = arg[3:]
@@ -1177,24 +1175,23 @@ class Functiontests(casadiTestCase):
       return f
 
     for indirect in [True,False]:
-      f = getP(max_fwd=1,max_adj=1,indirect=indirect)
+      f = getP(has_fwd=True,has_adj=True,indirect=indirect)
 
       self.checkfunction(f,g,inputs=num_inputs,sens_der=False,hessian=False,evals=1)
 
-      f = getP(max_fwd=1,max_adj=0,indirect=indirect)
+      f = getP(has_fwd=True,has_adj=False,indirect=indirect)
 
       self.checkfunction(f,g,inputs=num_inputs,sens_der=False,hessian=False,adj=False,evals=1)
 
-      f = getP(max_fwd=0,max_adj=1,indirect=indirect)
+      f = getP(has_fwd=False,has_adj=True,indirect=indirect)
 
       self.checkfunction(f,g,inputs=num_inputs,sens_der=False,hessian=False,fwd=False,evals=1)
 
-
-      f = getP(max_fwd=1,max_adj=0,has_fwd=True,has_adj=False,indirect=indirect)
+      f = getP(has_fwd=True,has_adj=False,indirect=indirect)
 
       self.checkfunction(f,g,inputs=num_inputs,sens_der=False,hessian=False,adj=False,evals=1)
 
-      f = getP(max_fwd=0,max_adj=1,has_fwd=False,has_adj=True,indirect=indirect)
+      f = getP(has_fwd=False,has_adj=True,indirect=indirect)
 
       self.checkfunction(f,g,inputs=num_inputs,sens_der=False,hessian=False,fwd=False,evals=1)
 
