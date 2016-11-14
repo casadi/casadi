@@ -28,6 +28,15 @@ using namespace std;
 
 namespace casadi {
 
+  #define TRY_CALL(FCN, OBJ, ...) \
+  try { \
+    casadi_assert_message((OBJ)!=0, "Callback object has been deleted"); \
+    return (OBJ)->FCN(__VA_ARGS__);\
+  } catch (std::exception& ex) { \
+    casadi_error("Error calling \"" CASADI_ASSERT_STR(FCN) "\" for object " \
+                 + name_ + ":\n" + std::string(ex.what())); \
+  }
+
   CallbackInternal::
   CallbackInternal(const std::string& name, Callback *self)
     : FunctionInternal(name), self_(self), own_(false) {
@@ -43,33 +52,27 @@ namespace casadi {
   }
 
   size_t CallbackInternal::get_n_in() {
-    casadi_assert_message(self_!=0, "Callback object has been deleted");
-    casadi_try_return(get_n_in, self_);
+    TRY_CALL(get_n_in, self_);
   }
 
   size_t CallbackInternal::get_n_out() {
-    casadi_assert_message(self_!=0, "Callback object has been deleted");
-    casadi_try_return(get_n_out, self_);
+    TRY_CALL(get_n_out, self_);
   }
 
   Sparsity CallbackInternal::get_sparsity_in(int i) {
-    casadi_assert_message(self_!=0, "Callback object has been deleted");
-    casadi_try_return(get_sparsity_in, self_, i);
+    TRY_CALL(get_sparsity_in, self_, i);
   }
 
   Sparsity CallbackInternal::get_sparsity_out(int i) {
-    casadi_assert_message(self_!=0, "Callback object has been deleted");
-    casadi_try_return(get_sparsity_out, self_, i);
+    TRY_CALL(get_sparsity_out, self_, i);
   }
 
   std::string CallbackInternal::get_name_in(int i) {
-    casadi_assert_message(self_!=0, "Callback object has been deleted");
-    casadi_try_return(get_name_in, self_, i);
+    TRY_CALL(get_name_in, self_, i);
   }
 
   std::string CallbackInternal::get_name_out(int i) {
-    casadi_assert_message(self_!=0, "Callback object has been deleted");
-    casadi_try_return(get_name_out, self_, i);
+    TRY_CALL(get_name_out, self_, i);
   }
 
   void CallbackInternal::init(const Dict& opts) {
@@ -92,55 +95,46 @@ namespace casadi {
 
   void CallbackInternal::
   eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
-    casadi_assert_message(self_!=0, "Callback object has been deleted");
-    casadi_try_return(eval, self_, arg, res, iw, w, 0);
+    TRY_CALL(eval, self_, arg, res, iw, w, 0);
   }
 
   bool CallbackInternal::hasFullJacobian() const {
-    casadi_assert_message(self_!=0, "Callback object has been deleted");
-    casadi_try_return(has_jacobian, self_);
+    TRY_CALL(has_jacobian, self_);
   }
 
   Function CallbackInternal::getFullJacobian(const std::string& name, const Dict& opts) {
-    casadi_assert_message(self_!=0, "Callback object has been deleted");
-    casadi_try_return(get_jacobian, self_, name, opts);
+    TRY_CALL(get_jacobian, self_, name, opts);
   }
 
   Function CallbackInternal::
   get_forward(const std::string& name, int nfwd,
               const std::vector<std::string>& i_names,
               const std::vector<std::string>& o_names, const Dict& opts) {
-    casadi_assert_message(self_!=0, "Callback object has been deleted");
-    casadi_try_return(get_forward_new, self_, name, nfwd, i_names, o_names, opts);
+    TRY_CALL(get_forward_new, self_, name, nfwd, i_names, o_names, opts);
   }
 
   Function CallbackInternal::
   get_forward_old(const std::string& name, int nfwd, Dict& opts) {
-    casadi_assert_message(self_!=0, "Callback object has been deleted");
-    casadi_try_return(get_forward, self_, name, nfwd, opts);
+    TRY_CALL(get_forward, self_, name, nfwd, opts);
   }
 
   int CallbackInternal::get_n_forward() const {
-    casadi_assert_message(self_!=0, "Callback object has been deleted");
-    casadi_try_return(get_n_forward, self_);
+    TRY_CALL(get_n_forward, self_);
   }
 
   Function CallbackInternal::
   get_reverse(const std::string& name, int nadj,
               const std::vector<std::string>& i_names,
               const std::vector<std::string>& o_names, const Dict& opts) {
-    casadi_assert_message(self_!=0, "Callback object has been deleted");
-    casadi_try_return(get_reverse_new, self_, name, nadj, i_names, o_names, opts);
+    TRY_CALL(get_reverse_new, self_, name, nadj, i_names, o_names, opts);
   }
 
   Function CallbackInternal::
   get_reverse_old(const std::string& name, int nadj, Dict& opts) {
-    casadi_assert_message(self_!=0, "Callback object has been deleted");
-    casadi_try_return(get_reverse, self_, name, nadj, opts);
+    TRY_CALL(get_reverse, self_, name, nadj, opts);
   }
 
   int CallbackInternal::get_n_reverse() const {
-    casadi_assert_message(self_!=0, "Callback object has been deleted");
-    casadi_try_return(get_n_reverse, self_);
+    TRY_CALL(get_n_reverse, self_);
   }
 } // namespace casadi
