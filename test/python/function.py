@@ -937,6 +937,9 @@ class Functiontests(casadiTestCase):
         def get_n_in(self): return 2
         def get_n_out(self): return 1
 
+        def get_sparsity_in(i):
+          return 4
+
         def eval(self,arg):
           x = arg[0]
           y = arg[1]
@@ -951,6 +954,7 @@ class Functiontests(casadiTestCase):
     except Exception as e:
       s = str(e)
       print(s)
+    self.assertTrue("get_sparsity_in" in s)
 
   def test_Callback(self):
 
