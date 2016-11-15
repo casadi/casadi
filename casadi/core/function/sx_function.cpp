@@ -826,9 +826,9 @@ namespace casadi {
     }
   }
 
-  Function SXFunction::getFullJacobian() {
+  Function SXFunction::getFullJacobian(const std::string& name, const Dict& opts) {
     SX J = SX::jacobian(veccat(out_), veccat(in_));
-    return Function(name_ + "_jac", in_, {J});
+    return Function(name, in_, {J}, opts);
   }
 
 

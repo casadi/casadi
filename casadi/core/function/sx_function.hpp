@@ -244,7 +244,7 @@ class CASADI_EXPORT SXFunction :
   virtual void sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
 
   /** \brief Return Jacobian of all input elements with respect to all output elements */
-  virtual Function getFullJacobian();
+  virtual Function getFullJacobian(const std::string& name, const Dict& opts);
 
   /** \brief Get default input value */
   virtual double default_in(int ind) const { return default_in_.at(ind);}
