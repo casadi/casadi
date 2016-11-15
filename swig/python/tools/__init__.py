@@ -30,7 +30,7 @@ import sys
 if sys.version_info >= (3,0):
   from .structure3 import repeated, entry, struct_symSX, struct_symMX, struct_SX, struct_MX, struct_MX_mutable, nesteddict, index, indexf, struct, struct_load
 else:
-  from .structure import repeated, entry, struct_symSX, struct_symMX, struct_SX, struct_MX, struct_MX_mutable, nesteddict, index, indexf, struct, struct_load  
+  from .structure import repeated, entry, struct_symSX, struct_symMX, struct_SX, struct_MX, struct_MX_mutable, nesteddict, index, indexf, struct, struct_load
 from .io import nice_stdout, capture_stdout
 
 def print_subclasses(myclass, depth=0):
@@ -42,7 +42,7 @@ def loadAllCompiledPlugins():
   for k in CasadiMeta.getPlugins().split(";"):
     cls, name = k.split("::")
     print("Testing: ", cls, name)
-    if cls in ("Importer","XmlFile"):
+    if cls in ("Importer","XmlFile","Linsol"):
       getattr(casadi,cls).load_plugin(name)
     else:
       getattr(casadi,'load_'+cls.lower())(name)
