@@ -707,7 +707,7 @@ import_array();
         return true;
       }
 #endif
-      
+
       // No match
       return false;
     }
@@ -2934,10 +2934,6 @@ DECL M casadi_triu2symm(const M& a) {
 
 DECL M casadi_norm_fro(const M& x) {
   return norm_fro(x);
-}
-
-DECL M casadi_norm_F(const M& x) {
-  return norm_F(x);
 }
 
 DECL M casadi_norm_2(const M& x) {
