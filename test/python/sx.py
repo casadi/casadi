@@ -145,9 +145,9 @@ class SXtests(casadiTestCase):
       x0=array([[0.738]])
 
       def fmod(f,x):
-        j=SX.jac(f,0,0)
-        J=Function("J", x,[j])
-        return J
+          y = f.call(x)
+          J = Function('J', x, [jacobian(y[0],x[0])])
+          return J
 
       self.numpyEvaluationCheckPool(self.Jpool,[x],x0,name="SX unary operations, jac",fmod=fmod)
 

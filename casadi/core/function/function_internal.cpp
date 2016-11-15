@@ -1670,7 +1670,7 @@ namespace casadi {
     {
       Function tmp("tmp", {arg}, {res}, {{"ad_weight", ad_weight()},
                                          {"ad_weight_sp", sp_weight()}});
-      J = MX::jac(tmp, 0, 0);
+      J = tmp->jac_mx(0, 0, false, false);
     }
 
     // Make sure argv is the input of J

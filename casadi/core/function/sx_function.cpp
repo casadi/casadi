@@ -116,7 +116,7 @@ namespace casadi {
     if (verbose()) {
       userOut() << "SXFunction::hess: calculating Jacobian " << endl;
     }
-    SX ret = SX::jac(gfcn, 0, 0, false, true);
+    SX ret = gfcn->jac_sx(0, 0, false, true);
     if (verbose()) {
       userOut() << "SXFunction::hess: calculating Jacobian done" << endl;
     }

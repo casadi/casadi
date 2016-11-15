@@ -559,10 +559,6 @@ namespace casadi {
     typedef std::map<std::string, MX> MXDict;
     ///@}
 
-    /** \brief Jacobian expression */
-    static MX jac(const Function& f, int iind, int oind,
-                  bool compact=false, bool symmetric=false);
-
 #ifndef SWIG
     /// Construct constant matrix with a given sparsity and values
     MX(const Sparsity& sp, int val, bool dummy);

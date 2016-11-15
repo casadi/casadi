@@ -714,10 +714,6 @@ namespace casadi {
     /** \brief Get free */
     static std::vector<Matrix<Scalar> > get_free(const Function& f);
 
-    /** \brief Jacobian expression */
-    static Matrix<Scalar> jac(const Function& f, int iind, int oind,
-                              bool compact=false, bool symmetric=false);
-
     /// Get name of the class
     static std::string type_name();
 

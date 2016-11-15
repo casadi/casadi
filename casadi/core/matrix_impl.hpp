@@ -2402,12 +2402,6 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  Matrix<Scalar> Matrix<Scalar>::jac(const Function& f, int iind, int oind,
-                                     bool compact, bool symmetric) {
-    casadi_error("\"jac\" not defined for " + type_name());
-  }
-
-  template<typename Scalar>
   Matrix<Scalar>::operator double() const {
     casadi_assert(is_scalar());
     return static_cast<double>(scalar());
@@ -2521,9 +2515,6 @@ namespace casadi {
 
   template<> std::vector<SX> SX::get_input(const Function& f);
   template<> std::vector<SX> SX::get_free(const Function& f);
-
-  template<> SX SX::jac(const Function& f, int iind, int oind,
-                        bool compact, bool symmetric);
 
 #ifndef CASADI_MATRIX_CPP
   // Templates instantiated in matrix.cpp

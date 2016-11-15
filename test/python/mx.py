@@ -1289,7 +1289,8 @@ class MXtests(casadiTestCase):
 
     T = X.nz[i]
 
-    f = Function("f", [X], [T.T.nz[:]**2])
+    q = T.T.nz[:]**2
+    f = Function("f", [X], [q])
     f_out = f(list(range(10)))
 
     self.checkarray(IM([0,1,9,4,16,25]),f_out)
@@ -1301,7 +1302,7 @@ class MXtests(casadiTestCase):
 
     self.checkarray(IM([0,1,9,4,16,25]),ff_out)
 
-    J = Function("J", [X],[MX.jac(f,0,0)])
+    J = Function("J", [X],[jacobian(q, X)])
     J_out = J(list(range(10)))
 
     i = horzcat(*[diag([0,2,4,6,8,10]),IM.zeros(6,4)])
@@ -1309,9 +1310,8 @@ class MXtests(casadiTestCase):
 
     self.checkarray(i,J_out)
 
-    f = Function("f", [X],[(T.T).nz[:]**2], {"ad_weight":1, "ad_weight_sp":1})
-
-    J = Function("J", [X],[MX.jac(f,0,0)])
+    q = (T.T).nz[:]**2
+    J = Function("J", [X],[jacobian(q,X)])
     J_in = [0]*J.n_in();J_in[0]=list(range(10))
     J_out = J(*J_in)
 
@@ -1325,8 +1325,8 @@ class MXtests(casadiTestCase):
     X = MX.sym("X",10)
 
     T = vertcat(*[X[4],X[2]])
-
-    f = Function("f", [X],[T**2])
+    q = T**2
+    f = Function("f", [X],[q])
     f_in = [0]*f.n_in();f_in[0]=list(range(10))
     f_out = f.call(f_in)
 
@@ -1339,8 +1339,7 @@ class MXtests(casadiTestCase):
     ff_out = ff(*ff_in)
 
     self.checkarray(IM([16,4]),ff_out)
-
-    J = Function("J", [X],[MX.jac(f,0,0)])
+    J = Function("J", [X],[jacobian(q,X)])
     J_in = [0]*J.n_in();J_in[0]=list(range(10))
     J_out = J(*J_in)
 
@@ -1349,10 +1348,8 @@ class MXtests(casadiTestCase):
     i[1,2] = 4
 
     self.checkarray(i,J_out)
-
-    f = Function("f", [X],[T**2], {"ad_weight":1, "ad_weight_sp":1})
-
-    J = Function("J", [X],[MX.jac(f,0,0)])
+    q = T**2
+    J = Function("J", [X],[jacobian(q, X)])
     J_in = [0]*J.n_in();J_in[0]=list(range(10))
     J_out = J(*J_in)
 

@@ -597,7 +597,7 @@ namespace casadi {
   template<>
   SX SX::jacobian(const SX &ex, const SX &arg, bool symmetric) {
     Function temp("temp", {arg}, {ex});
-    return SX::jac(temp, 0, 0, false, symmetric);
+    return temp->jac_sx(0, 0, false, symmetric);
   }
 
   template<>
@@ -621,8 +621,7 @@ namespace casadi {
   template<>
   SX SX::hessian(const SX &ex, const SX &arg, SX &g) {
     g = gradient(ex, arg);
-    Function gfcn("gfcn", {arg}, {g});
-    return SX::jac(gfcn, 0, 0, false, true);
+    return jacobian(g, arg, true);
   }
 
   template<>
@@ -852,17 +851,16 @@ namespace casadi {
 
     vector<SXElem> r;
 
-    Function f("tmp", {x}, {ex});
+    SX j = ex;
     int mult = 1;
     bool success = false;
     for (int i=0; i<1000; ++i) {
-      r.push_back((f(SX(0)).at(0)/mult).scalar());;
-      SX j = SX::jac(f, 0, 0);
+      r.push_back((substitute(j, x, 0)/mult).scalar());
+      j = jacobian(j, x);
       if (j.nnz()==0) {
         success = true;
         break;
       }
-      f = Function("tmp", {x}, {j});
       mult*=i+1;
     }
 
@@ -998,10 +996,6 @@ namespace casadi {
 
   template<> vector<SX> SX::get_free(const Function& f) {
     return f.free_sx();
-  }
-
-  template<> SX SX::jac(const Function& f, int iind, int oind, bool compact, bool symmetric) {
-    return Function(f)->jac_sx(iind, oind, compact, symmetric);
   }
 
 } // namespace casadi

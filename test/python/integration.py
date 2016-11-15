@@ -706,9 +706,7 @@ class Integrationtests(casadiTestCase):
     sol = self.integrator(x0=q0,p=p)
     sol["q0"] = q0
     sol["p"] = p
-    qe = Function("qe", sol, ["q0", "p"], casadi.integrator_out())
-
-    JT = Function("JT", [q0,p],[MX.jac(qe, 1,0)[0].T])
+    JT = Function("JT", [q0,p],[jacobian(sol['xf'], sol['p']).T])
     JT_out = JT([num['q0']], [num['p']])
     print(JT_out)
 
@@ -956,21 +954,12 @@ class Integrationtests(casadiTestCase):
     sol["p"] = p
     qe = Function("qe", sol, ["q0", "p"], casadi.integrator_out())
 
-    JT = Function("JT", [q0,p],[MX.jac(qe, 1,0).T])
+    JT = Function("JT", [q0,p],[jacobian(sol['xf'], sol['p']).T])
 
     H  = JT.jacobian(1)
     H_out = H(x0_, vec(A_))
 
     H1 = H_out[0]
-
-    ## Joel: Only Hessians of scalar functions allowed
-    #H = qe.hessian(1)
-    #H_in = [0]*H.n_in();H_in[0]=x0_
-    #H_in[1]=vec(A_)
-    #H_out = H(H_in)
-    #H2 = H_out[0]
-
-    #self.checkarray(H1,H2,"hessian")
 
   def test_issue535(self):
     self.message("regression test for #535")
