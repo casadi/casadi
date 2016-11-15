@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
     }
     for (auto t : tests) {
       if (t.type > s) continue; // Cannot be solved
-      if (!has_linsol(t.solver)) {
+      if (!Linsol::has_plugin(t.solver)) {
         cout << t.solver << " not available" << endl;
         continue;
       }

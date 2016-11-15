@@ -122,20 +122,6 @@ namespace casadi {
     int rank() const;
   };
 
-
-  /// [DEPRECATED] Create a linear solver (legacy syntax, use Linsol constructor instead)
-  CASADI_EXPORT Function linsol_new(const std::string& name, const std::string& solver,
-                                const Sparsity& sp, int nrhs, const Dict& opts=Dict());
-
-  /// [DEPRECATED] Legacy - alias for Linsol::has_plugin
-  inline bool has_linsol(const std::string& name) { return Linsol::has_plugin(name);}
-
-  /// [DEPRECATED] Legacy - alias for Linsol::load_plugin
-  inline void load_linsol(const std::string& name) { Linsol::load_plugin(name);}
-
-  /// [DEPRECATED] Legacy - alias for Linsol::doc
-  inline std::string doc_linsol(const std::string& name) { return Linsol::doc(name);}
-
 } // namespace casadi
 
 #endif // CASADI_LINSOL_HPP

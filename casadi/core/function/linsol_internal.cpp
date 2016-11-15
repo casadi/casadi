@@ -28,15 +28,6 @@
 using namespace std;
 namespace casadi {
 
-  Function linsol_new(const std::string& name, const std::string& solver,
-                  const Sparsity& sp, int nrhs, const Dict& opts) {
-    Linsol F(name + "_linsol", solver, opts);
-    MX A = MX::sym("A", sp);
-    MX b = MX::sym("b", sp.size2(), nrhs);
-    MX x = F.solve(A, b);
-    return Function(name, {A, b}, {x}, {"A", "B"}, {"X"});
-  }
-
   LinsolInternal::LinsolInternal(const std::string& name) : FunctionInternal(name) {
   }
 
