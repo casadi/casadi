@@ -1004,8 +1004,4 @@ namespace casadi {
     return Function(f)->jac_sx(iind, oind, compact, symmetric);
   }
 
-  template<> SX SX::hess(const Function& f, int iind, int oind) {
-    return Function(f)->hess_sx(iind, oind);
-  }
-
 } // namespace casadi

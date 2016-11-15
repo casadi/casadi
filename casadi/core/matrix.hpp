@@ -718,9 +718,6 @@ namespace casadi {
     static Matrix<Scalar> jac(const Function& f, int iind, int oind,
                               bool compact=false, bool symmetric=false);
 
-    /** \bried Hessian expression */
-    static Matrix<Scalar> hess(const Function& f, int iind, int oind);
-
     /// Get name of the class
     static std::string type_name();
 
