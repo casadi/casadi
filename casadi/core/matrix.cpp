@@ -1031,16 +1031,4 @@ namespace casadi {
     return Function(f)->hess_sx(iind, oind);
   }
 
-  template<> SX SX::hess(const Function& f, const string& iname, int oind) {
-    return hess(f, f.index_in(iname), oind);
-  }
-
-  template<> SX SX::hess(const Function& f, int iind, const string& oname) {
-    return hess(f, iind, f.index_out(oname));
-  }
-
-  template<> SX SX::hess(const Function& f, const string& iname, const string& oname) {
-    return hess(f, f.index_in(iname), f.index_out(oname));
-  }
-
 } // namespace casadi

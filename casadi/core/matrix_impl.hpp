@@ -2438,27 +2438,8 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  Matrix<Scalar> Matrix<Scalar>::hess(const Function& f,
-                                          int iind, int oind) {
-    throw CasadiException("'hess' not defined for " + type_name());
-  }
-
-  template<typename Scalar>
-  Matrix<Scalar> Matrix<Scalar>::hess(const Function& f,
-                                          const std::string& iname, int oind) {
-    throw CasadiException("'hess' not defined for " + type_name());
-  }
-
-  template<typename Scalar>
-  Matrix<Scalar> Matrix<Scalar>::hess(const Function& f, int iind,
-                                          const std::string& oname) {
-    throw CasadiException("'hess' not defined for " + type_name());
-  }
-
-  template<typename Scalar>
-  Matrix<Scalar> Matrix<Scalar>::hess(const Function& f, const std::string& iname,
-                                          const std::string& oname) {
-    throw CasadiException("'hess' not defined for " + type_name());
+  Matrix<Scalar> Matrix<Scalar>::hess(const Function& f, int iind, int oind) {
+    casadi_error("'hess' not defined for " + type_name());
   }
 
   template<typename Scalar>
@@ -2587,11 +2568,7 @@ namespace casadi {
 
   template<> SX SX::grad(const Function& f, int iind, int oind);
   template<> SX SX::tang(const Function& f, int iind, int oind);
-
   template<> SX SX::hess(const Function& f, int iind, int oind);
-  template<> SX SX::hess(const Function& f, const std::string& iname, int oind);
-  template<> SX SX::hess(const Function& f, int iind, const std::string& oname);
-  template<> SX SX::hess(const Function& f, const std::string& iname, const std::string& oname);
 
 #ifndef CASADI_MATRIX_CPP
   // Templates instantiated in matrix.cpp
