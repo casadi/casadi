@@ -117,11 +117,6 @@ namespace casadi {
     TRY_CALL(get_forward_new, self_, name, nfwd, i_names, o_names, opts);
   }
 
-  Function CallbackInternal::
-  get_forward_old(const std::string& name, int nfwd, Dict& opts) {
-    TRY_CALL(get_forward, self_, name, nfwd, opts);
-  }
-
   int CallbackInternal::get_n_forward() const {
     TRY_CALL(get_n_forward, self_);
   }
@@ -131,11 +126,6 @@ namespace casadi {
               const std::vector<std::string>& i_names,
               const std::vector<std::string>& o_names, const Dict& opts) {
     TRY_CALL(get_reverse_new, self_, name, nadj, i_names, o_names, opts);
-  }
-
-  Function CallbackInternal::
-  get_reverse_old(const std::string& name, int nadj, Dict& opts) {
-    TRY_CALL(get_reverse, self_, name, nadj, opts);
   }
 
   int CallbackInternal::get_n_reverse() const {

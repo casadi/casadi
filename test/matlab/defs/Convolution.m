@@ -34,13 +34,13 @@ classdef Convolution < casadi.Callback
         function out = eval(self, ins)
             x = ins{1};
             % Fill in smarter numerical code
-            
+
             if self.flag_transp
                 y = self.A'*x;
             else
                 y = self.A*x;
             end
-            
+
             out = {y};
         end
         function out = get_n_in(self)
@@ -55,25 +55,23 @@ classdef Convolution < casadi.Callback
         function out = get_n_reverse(self)
             out = 64;
         end
-        function out = get_forward(self,name,nfwd,opts)
-            fwd_ins = {};
-            for i=1:nfwd
-                fwd_ins  = {fwd_ins{:} casadi.MX.sym('x',self.m,1)};
-            end
-            fwd_outs = self.map({[fwd_ins{:}]},'serial');
+        function out = get_forward_new(self,name,nfwd,inames,onames,opts)
+            mf = self.map(nfwd, 'serial');
+            fwd_in = casadi.MX.sym('x',self.m,nfwd);
+            fwd_out = mf(fwd_in);
             arg = casadi.MX.sym('x',self.m,1);
             dummy = casadi.MX.sym('x',casadi.Sparsity(self.n,1));
-            out = casadi.Function(name,{arg, dummy, fwd_ins{:}},horzsplit(fwd_outs{1}));
+            out = casadi.Function(name, {arg, dummy, fwd_in}, {fwd_out},...
+                                  inames, onames, opts);
         end
-        function out = get_reverse(self,name,nadj,opts)
-            adj_ins = {};
-            for i=1:nadj
-                adj_ins  = {adj_ins{:} casadi.MX.sym('x',self.n,1)};
-            end
+        function out = get_reverse_new(self,name,nadj,inames,onames,opts)
+            mf = self.get_transpose().map(nadj, 'serial');
+            adj_in = casadi.MX.sym('x',self.n,nadj);
+            adj_out = mf(adj_in);
             arg = casadi.MX.sym('x',self.m,1);
             dummy = casadi.MX(self.n,1);
-            adj_outs = self.get_transpose().map({[adj_ins{:}]},'serial');
-            out = casadi.Function(name,{arg, dummy, adj_ins{:}},horzsplit(adj_outs{1}));
+            out = casadi.Function(name, {arg, dummy, adj_in}, {adj_out},...
+                                  inames, onames, opts);
         end
         function out = has_jacobian(self)
           out = false;

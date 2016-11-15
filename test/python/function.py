@@ -1091,7 +1091,7 @@ class Functiontests(casadiTestCase):
 
         if has_fwd:
           def get_n_forward(self): return 1
-          def get_forward(self,name,nfwd,opts):
+          def get_forward_new(self,name,nfwd,inames,onames,opts):
             assert(nfwd==1)
             class ForwardFun(Callback):
               # sin(x+3*y)
@@ -1099,8 +1099,8 @@ class Functiontests(casadiTestCase):
               def __init__(self):
                 Callback.__init__(self)
                 self.construct(name, {"verbose":True})
-              def get_n_in(self): return 2+1+nfwd*2
-              def get_n_out(self): return nfwd
+              def get_n_in(self): return 2+1+2
+              def get_n_out(self): return 1
 
               def eval(self,arg):
                 x,y = arg[0],arg[1]
@@ -1128,7 +1128,7 @@ class Functiontests(casadiTestCase):
 
         if has_adj:
           def get_n_reverse(self): return 1
-          def get_reverse(self,name,nadj,opts):
+          def get_reverse_new(self,name,nadj,inames,onames,opts):
             assert(nadj==1)
             class BackwardFun(Callback):
               # sin(x+3*y)
@@ -1136,8 +1136,8 @@ class Functiontests(casadiTestCase):
               def __init__(self):
                 Callback.__init__(self)
                 self.construct(name, {"verbose":True})
-              def get_n_in(self): return 2+1+nadj
-              def get_n_out(self): return nadj*2
+              def get_n_in(self): return 2+1+1
+              def get_n_out(self): return 2
 
               def eval(self,arg):
                 x,y = arg[0],arg[1]

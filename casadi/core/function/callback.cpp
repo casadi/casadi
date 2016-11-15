@@ -129,10 +129,6 @@ namespace casadi {
     FunctionInternal::getFullJacobian(name, name_in(), {"jac"}, opts);
   }
 
-  Function Callback::get_forward(const std::string& name, int nfwd, Dict& opts) {
-    return (*this)->FunctionInternal::get_forward_old(name, nfwd, opts);
-  }
-
   Function Callback::
   get_forward_new(const std::string& name, int nfwd,
                   const std::vector<std::string>& i_names,
@@ -143,10 +139,6 @@ namespace casadi {
 
   int Callback::get_n_forward() const {
     return (*this)->FunctionInternal::get_n_forward();
-  }
-
-  Function Callback::get_reverse(const std::string& name, int nadj, Dict& opts) {
-    return (*this)->FunctionInternal::get_reverse_old(name, nadj, opts);
   }
 
   Function Callback::

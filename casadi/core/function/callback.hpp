@@ -138,9 +138,6 @@ namespace casadi {
     virtual Function get_jacobian(const std::string& name, const Dict& opts);
     ///@}
 
-    /** \brief [DEPRECATED] Overload get_forward_new instead */
-    virtual Function get_forward(const std::string& name, int nfwd, Dict& opts);
-
     ///@{
     /** \brief Return function that calculates forward derivatives
      *    forward(nfwd) returns a cached instance if available,
@@ -153,9 +150,6 @@ namespace casadi {
                                      const Dict& opts);
     virtual int get_n_forward() const;
     ///@}
-
-    /** \brief [DEPRECATED] Overload get_reverse_new instead */
-    virtual Function get_reverse(const std::string& name, int nadj, Dict& opts);
 
     ///@{
     /** \brief Return function that calculates adjoint derivatives
