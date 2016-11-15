@@ -144,7 +144,7 @@ simulator = integrator('simulator', 'cvodes', dae, {'grid':tgrid,'output_t0':Tru
 sol = simulator(x0 = V_sol[0:4])["xf"]
 
 # Calculate the optimal control
-ufcn_all = u_fcn.map("ufcn_all", "serial", len(tgrid))
+ufcn_all = u_fcn.map(len(tgrid))
 u_opt = ufcn_all(sol)
 
 # Plot the results
@@ -158,4 +158,3 @@ plt.xlabel('time')
 plt.legend(['x trajectory','y trajectory','u trajectory'])
 plt.grid()
 plt.show()
-

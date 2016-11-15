@@ -34,7 +34,7 @@ print("evaluated naive parallel function in %.3f seconds" % (t1 - t0))
 
 
 # evaluate it using new serial map construct
-fMap = f0.map("fMap", "serial", N)
+fMap = f0.map(N)
 
 print("evaluating serial map function...")
 t0 = time.time()
@@ -46,7 +46,7 @@ print("evaluated serial map function in %.3f seconds" % (t1 - t0))
 
 
 # evaluate it using new parallel map construct
-fMap = f0.map("fMap", "openmp", N)
+fMap = f0.map(N, "openmp")
 
 print("evaluating parallel map function...")
 t0 = time.time()
