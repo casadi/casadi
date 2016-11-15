@@ -2256,7 +2256,7 @@ class MXtests(casadiTestCase):
 
     f = Function("f", [m],[vertsplit(m)[0]])
 
-    f.reverse(1)
+    f.reverse_new(1)
 
   def test_MX_const_sp(self):
     x = MX.sym("x",4,1)
@@ -2301,9 +2301,9 @@ class MXtests(casadiTestCase):
 
     mfunction = mf.expand('expand_'+mf.name())
 
-    mfg = mf.reverse(1)
+    mfg = mf.reverse_new(1)
 
-    mfunctiong = mfunction.reverse(1)
+    mfunctiong = mfunction.reverse_new(1)
     
     f_in = [0, 5, DM([1,2])]
 

@@ -631,9 +631,9 @@ class Functiontests(casadiTestCase):
 
     hs = []
     for n in [nlp, nlp.expand('nlp_expanded')]:
-        H = n.reverse(1).jacobian(0,0,False,True)
+        H = n.reverse_new(1).jacobian(0,0,False,True)
 
-        h = H(der_x=1,adj0_f=1)[H.name_out(0)]
+        h = H(der_x=1,adj_f=1)[H.name_out(0)]
         hs.append(h)
     self.checkarray(*hs)
 
@@ -724,7 +724,7 @@ class Functiontests(casadiTestCase):
       for ad_weight_sp in range(2):
         F = fun.mapaccum("map",n,[0],[0],{"ad_weight_sp":ad_weight_sp,"ad_weight": ad_weight})
 
-        F.forward(2)
+        F.forward_new(2)
 
         XP = X
 
@@ -1006,9 +1006,9 @@ class Functiontests(casadiTestCase):
         f.jacobian()
 
       with self.assertRaises(Exception):
-        f.forward(1)
+        f.forward_new(1)
       with self.assertRaises(Exception):
-        f.reverse(1)
+        f.reverse_new(1)
 
   def test_Callback_dimcheck(self):
       class Fun(Callback):

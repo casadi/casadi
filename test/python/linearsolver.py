@@ -62,7 +62,7 @@ try:
   lsolvers.append(("symbolicqr",{},set()))
 except:
   pass
-  
+
 try:
   load_linsol("ma27")
   lsolvers.append(("ma27",{},{"symmetry"}))
@@ -124,7 +124,7 @@ class LinearSolverTests(casadiTestCase):
         self.checkarray(Jf_out[0],Jb_out[0])
         self.checkarray(Jf_out[1],Jb_out[1])
 
-        d = solver.forward(1)
+        d = solver.forward_new(1)
 
         r = numpy.random.rand(*A.shape)
 
@@ -345,14 +345,14 @@ class LinearSolverTests(casadiTestCase):
   def test_simple_solve_node(self):
 
     for Solver, options, req in lsolvers:
-    
+
       for A_,b_ in [
                        (DM([[3,1],[7,2]]),DM([[1,0.3],[0.5,0.7]])),
                        (sparsify(DM([[3,0],[7,2]])),DM([[1,0.3],[0.5,0.7]])),
                        (DM([[3,1],[7,2]]),sparsify(DM([[1,0],[0,0.7]])))
                    ]:
         if "symmetry" in req: A_ = A_.T+A_
-        
+
         A = MX.sym("A",A_.sparsity())
         b = MX.sym("b",b_.sparsity())
         print(Solver)
@@ -443,7 +443,7 @@ class LinearSolverTests(casadiTestCase):
     self.checkarray(mtimes(C,C.T),M)
 
   def test_large_sparse(self):
-    
+
     n = 10
 
     for Solver, options,req in lsolvers:
@@ -466,16 +466,16 @@ class LinearSolverTests(casadiTestCase):
 
   def test_ma27(self):
       n = np.nan
-  
+
       A = DM([[2, 3, n, n, n],
              [3, 0, 4, n, 6],
              [n, 4, 1, 5, n],
              [n, n, 5, 0, n],
              [n, 6, n, n, 1]])
       A = A[sparsify(A==A).sparsity()]
-      
+
       b = DM([8,45,31,15,17])
-      
+
       ref = np.linalg.solve(A,b)
       for Solver, options, req in lsolvers:
         As = MX.sym("A",A.sparsity())
@@ -489,7 +489,7 @@ class LinearSolverTests(casadiTestCase):
     n = 10
 
     for Solver, options, req in lsolvers:
-      
+
       print(Solver)
       A = self.randDM(n,n,sparsity=0.5)
       b = self.randDM(n,3)
@@ -515,13 +515,13 @@ class LinearSolverTests(casadiTestCase):
     b = DM.ones((4,1))
     As = MX.sym("A",A.sparsity())
     bs = MX.sym("b",b.sparsity())
-    
+
     for Solver, options, req in lsolvers:
       with self.assertRaises(Exception):
         solve(A,b,Solver,options)
-        
+
       with self.assertRaises(Exception):
         solve(As,bs,Solver,options)
-        
+
 if __name__ == '__main__':
     unittest.main()

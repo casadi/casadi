@@ -675,9 +675,6 @@ namespace casadi {
      */
     Function forward_new(int nfwd);
 
-    /** \brief [DEPRECATED] Use forward_new instead */
-    Function forward(int nfwd);
-
     /** \brief Get a function that calculates \a nadj adjoint derivatives
      *
      *         Returns a function with <tt>n_in + n_out + n_out</tt> inputs
@@ -696,9 +693,6 @@ namespace casadi {
      *        with the same value, then multiple references to the same function will be returned.
      */
     Function reverse_new(int nadj);
-
-    /** \brief [DEPRECATED] Use reverse_new instead */
-    Function reverse(int nfwd);
 
     ///@{
     /// Get, if necessary generate, the sparsity of a Jacobian block
