@@ -307,7 +307,7 @@ namespace casadi {
     // Symbolic reverse seed for P
     MX Pbar = MX::sym("Pbar", repmat(sparsity_out(DPLE_P), 1, nadj));
     // Symmetrize the seed
-    MX Pbar_rev = revS.map("map", "serial", nrhs_).map("map", "serial", nadj)(Pbar)[0];
+    MX Pbar_rev = revS.map(nrhs_).map(nadj)(Pbar)[0];
 
     // Reverse A for new dple
     MX A_rev = revT(A)[0];
@@ -316,7 +316,7 @@ namespace casadi {
     MX Vbar_rev = dplesol(A_rev, Pbar_rev, plugin_name(), opts);
 
     // Undo the reversal for Vbar
-    MX Vbar = rev.map("map", "serial", nrhs_).map("map", "serial", nadj)(Vbar_rev)[0];
+    MX Vbar = rev.map(nrhs_).map(nadj)(Vbar_rev)[0];
 
     MX Abar = Abarf.map("map", "serial", nrhs_, std::vector<int>{1}, {0}).
                     map("map", "serial", nadj, {0, 1}, std::vector<int>{})({P, A_rev, Vbar_rev})[0];

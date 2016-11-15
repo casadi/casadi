@@ -29,10 +29,9 @@ using namespace std;
 
 namespace casadi {
 
-  Function Map::create(const std::string& name,
-                          const std::string& parallelization, Function& f, int n,
-                          const Dict& opts) {
+  Function Map::create(const std::string& parallelization, const Function& f, int n) {
     // Create instance of the right class
+    string name = f.name() + "_" + to_string(n);
     Function ret;
     if (parallelization == "serial") {
       ret.assignNode(new Map(name, f, n));
@@ -42,7 +41,7 @@ namespace casadi {
       casadi_error("Unknown parallelization: " + parallelization);
     }
     // Finalize creation
-    ret->construct(opts);
+    ret->construct(Dict());
     return ret;
   }
 
@@ -146,7 +145,7 @@ namespace casadi {
 
     // Generate map of derivative
     Function df = f_.forward_new(nfwd);
-    Function dm = df.map(name + "_map", parallelization(), n_, derived_options());
+    Function dm = df.map(n_, parallelization());
 
     // Input expressions
     vector<MX> arg = dm.mx_in();
@@ -199,7 +198,7 @@ namespace casadi {
 
     // Generate map of derivative
     Function df = f_.reverse_new(nadj);
-    Function dm = df.map(name + "_map", parallelization(), n_, derived_options());
+    Function dm = df.map(n_, parallelization());
 
     // Input expressions
     vector<MX> arg = dm.mx_in();

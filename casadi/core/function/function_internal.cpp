@@ -2633,7 +2633,7 @@ namespace casadi {
       ms = self().
         map("mapsum", parallelization, n, reduce_in, std::vector<int>());
     } else {
-      ms = self().map("map", parallelization, n);
+      ms = self().map(n, parallelization);
     }
     // Call the internal function
     return ms(x);

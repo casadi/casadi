@@ -481,15 +481,10 @@ namespace casadi {
     return mapaccum(name, n, accum_in_num, accum_out_num, opts);
   }
 
-  Function Function::map(int n, const std::string& parallelization) {
-    return map(name() + "_" + to_string(n), parallelization, n);
-  }
-
   Function Function::map(const string& name, const std::string& parallelization, int n,
-      const vector<int>& reduce_in, const vector<int>& reduce_out,
-      const Dict& opts) {
+      const vector<int>& reduce_in, const vector<int>& reduce_out, const Dict& opts) {
     // Wrap in an MXFunction
-    Function f = map(name, parallelization, n, opts);
+    Function f = map(n, parallelization);
     // Start with the fully mapped inputs
     vector<MX> arg = f.mx_in();
     vector<MX> f_arg = arg;
@@ -517,8 +512,8 @@ namespace casadi {
     return map(name, parallelization, n, reduce_in_num, reduce_out_num, opts);
   }
 
-  Function Function::map(const string& name, const std::string& parallelization, int n,
-      const Dict& opts) {
+  Function
+  Function::map(int n, const std::string& parallelization) {
     // Make sure not degenerate
     casadi_assert_message(n>0, "Degenerate map operation");
     // Quick return if possible
@@ -544,10 +539,11 @@ namespace casadi {
         res[i] = horzcat(tmp);
       }
       // Construct function
-      return Function(name, arg, res, name_in(), name_out(), (*this)->derived_options());
+      return Function(name() + "_" + to_string(n), arg, res,
+                      name_in(), name_out(), (*this)->derived_options());
     } else {
       // Create Map object
-      return Map::create(name, parallelization, *this, n, opts);
+      return Map::create(parallelization, *this, n);
     }
   }
 

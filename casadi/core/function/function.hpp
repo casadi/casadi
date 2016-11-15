@@ -627,10 +627,6 @@ namespace casadi {
     */
     Function map(int n, const std::string& parallelization="serial");
 
-    /** \brief [DEPRECATED] Old syntax for map */
-    Function map(const std::string& name, const std::string& parallelization, int n,
-      const Dict& opts=Dict());
-
     ///@{
     /** \brief Map with reduction
       A subset of the inputs are non-repeated and a subset of the outputs summed
