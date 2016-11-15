@@ -83,7 +83,7 @@ res = F(x0=x0)
 output_fcn_out = substitute([ivp("m"),ivp("P")], ivp.d, ivp.ddef)
 output_fcn_in = [ivp.t, vertcat(*ivp.x), vertcat(*ivp.z)]
 output_fcn = Function("output", output_fcn_in, output_fcn_out)
-output_fcn = output_fcn.map("output_fcn_map", "serial", len(grid))
+output_fcn = output_fcn.map(len(grid))
 m_out, P_out = output_fcn(grid, res["xf"], res["zf"])
 
 # Plot
@@ -124,7 +124,7 @@ res = F(x0=x0)
 output_fcn_out = substitute([ivp("T")], ivp.d, ivp.ddef)
 output_fcn_in = [ivp.t, vertcat(*ivp.x), vertcat(*ivp.z)]
 output_fcn = Function("output", output_fcn_in, output_fcn_out)
-output_fcn = output_fcn.map("output_fcn_map", "serial", len(grid))
+output_fcn = output_fcn.map(len(grid))
 T_out = output_fcn(grid, res["xf"], res["zf"])
 
 # Plot
@@ -158,7 +158,7 @@ res = F(x0=x0)
 output_fcn_out = substitute([ivp("T"),ivp("U"),ivp("V")], ivp.d, ivp.ddef)
 output_fcn_in = [ivp.t, vertcat(*ivp.x), vertcat(*ivp.z)]
 output_fcn = Function("output", output_fcn_in, output_fcn_out)
-output_fcn = output_fcn.map("output_fcn_map", "serial", len(grid))
+output_fcn = output_fcn.map(len(grid))
 T_out, U_out, V_out = output_fcn(grid, res["xf"], res["zf"])
 
 # Plot
