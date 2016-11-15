@@ -243,12 +243,6 @@ class CASADI_EXPORT SXFunction :
   /** \brief  Propagate sparsity backwards */
   virtual void sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
 
-  /** \brief Return Jacobian of all input elements with respect to all output elements */
-  virtual Function getFullJacobian(const std::string& name,
-                                   const std::vector<std::string>& i_names,
-                                   const std::vector<std::string>& o_names,
-                                   const Dict& opts);
-
   /** \brief Get default input value */
   virtual double default_in(int ind) const { return default_in_.at(ind);}
 

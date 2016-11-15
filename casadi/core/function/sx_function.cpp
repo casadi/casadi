@@ -826,15 +826,6 @@ namespace casadi {
     }
   }
 
-  Function SXFunction::getFullJacobian(const std::string& name,
-                                       const std::vector<std::string>& i_names,
-                                       const std::vector<std::string>& o_names,
-                                       const Dict& opts) {
-    SX J = SX::jacobian(veccat(out_), veccat(in_));
-    return Function(name, in_, {J}, i_names, o_names, opts);
-  }
-
-
 #ifdef WITH_OPENCL
 
   SparsityPropagationKernel::SparsityPropagationKernel() {
