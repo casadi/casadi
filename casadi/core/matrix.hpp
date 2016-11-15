@@ -718,12 +718,6 @@ namespace casadi {
     static Matrix<Scalar> jac(const Function& f, int iind, int oind,
                               bool compact=false, bool symmetric=false);
 
-    /** \brief Gradient expression */
-    static Matrix<Scalar> grad(const Function& f, int iind, int oind);
-
-    /** \brief Tangent expression */
-    static Matrix<Scalar> tang(const Function& f, int iind, int oind);
-
     /** \bried Hessian expression */
     static Matrix<Scalar> hess(const Function& f, int iind, int oind);
 

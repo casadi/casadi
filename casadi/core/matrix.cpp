@@ -603,13 +603,13 @@ namespace casadi {
   template<>
   SX SX::gradient(const SX &ex, const SX &arg) {
     Function temp("temp", {arg}, {ex});
-    return SX::grad(temp, 0, 0);
+    return temp->grad_sx(0, 0);
   }
 
   template<>
   SX SX::tangent(const SX &ex, const SX &arg) {
     Function temp("temp", {arg}, {ex});
-    return SX::tang(temp, 0, 0);
+    return temp->tang_sx(0, 0);
   }
 
   template<>
@@ -1002,14 +1002,6 @@ namespace casadi {
 
   template<> SX SX::jac(const Function& f, int iind, int oind, bool compact, bool symmetric) {
     return Function(f)->jac_sx(iind, oind, compact, symmetric);
-  }
-
-  template<> SX SX::grad(const Function& f, int iind, int oind) {
-    return Function(f)->grad_sx(iind, oind);
-  }
-
-  template<> SX SX::tang(const Function& f, int iind, int oind) {
-    return Function(f)->tang_sx(iind, oind);
   }
 
   template<> SX SX::hess(const Function& f, int iind, int oind) {

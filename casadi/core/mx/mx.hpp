@@ -563,12 +563,6 @@ namespace casadi {
     static MX jac(const Function& f, int iind, int oind,
                   bool compact=false, bool symmetric=false);
 
-    /** \brief Gradient expression */
-    static MX grad(const Function& f, int iind, int oind);
-
-    /** \brief Tangent expression */
-    static MX tang(const Function& f, int iind, int oind);
-
 #ifndef SWIG
     /// Construct constant matrix with a given sparsity and values
     MX(const Sparsity& sp, int val, bool dummy);

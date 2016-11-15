@@ -1537,12 +1537,12 @@ namespace casadi {
 
   MX MX::gradient(const MX& f, const MX& x) {
     Function temp("helper_gradient_MX", {x}, {f});
-    return MX::grad(temp, 0, 0);
+    return temp->grad_mx(0, 0);
   }
 
   MX MX::tangent(const MX& f, const MX& x) {
     Function temp("helper_tangent_MX", {x}, {f});
-    return MX::tang(temp, 0, 0);
+    return temp->tang_mx(0, 0);
   }
 
   MX MX::hessian(const MX& f, const MX& x) {
@@ -1692,14 +1692,6 @@ namespace casadi {
 
   MX MX::jac(const Function& f, int iind, int oind, bool compact, bool symmetric) {
     return Function(f)->jac_mx(iind, oind, compact, symmetric);
-  }
-
-  MX MX::grad(const Function& f, int iind, int oind) {
-    return Function(f)->grad_mx(iind, oind);
-  }
-
-  MX MX::tang(const Function& f, int iind, int oind) {
-    return Function(f)->tang_mx(iind, oind);
   }
 
   MX MX::_bilin(const MX& A, const MX& x, const MX& y) {
