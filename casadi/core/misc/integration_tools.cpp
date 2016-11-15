@@ -190,16 +190,12 @@ namespace casadi {
 
   void collocation_interpolators(const std::vector<double> & tau_root,
                                 std::vector< std::vector<double> > &C, std::vector< double > &D) {
-    std::vector<double> tau_root_new = tau_root;
-    tau_root_new.insert(tau_root_new.begin(), 0);
-    collocationInterpolators(tau_root_new, C, D);
-  }
-
-  void collocationInterpolators(const std::vector<double> & tau_root,
-                                std::vector< std::vector<double> > &C, std::vector< double > &D) {
-
     // Find the degree of the interpolation
-    int deg = tau_root.size()-1;
+    int deg = tau_root.size();
+
+    // Include zero
+    std::vector<double> etau_root = tau_root;
+    etau_root.insert(etau_root.begin(), 0);
 
     // Allocate storage space for resulting coefficients
     C.resize(deg+1);
@@ -217,7 +213,7 @@ namespace casadi {
       SX L = 1;
       for (int j2=0; j2<deg+1; ++j2) {
         if (j2 != j) {
-          L *= (tau-tau_root[j2])/(tau_root[j]-tau_root[j2]);
+          L *= (tau-etau_root[j2])/(etau_root[j]-etau_root[j2]);
         }
       }
 
@@ -231,7 +227,7 @@ namespace casadi {
       // get the coefficients of the continuity equation
       Function tfcn = lfcn.tangent();
       for (int j2=0; j2<deg+1; ++j2) {
-        C[j2][j] =  tfcn(vector<DM>{tau_root[j2]}).at(0)->front();
+        C[j2][j] =  tfcn(vector<DM>{etau_root[j2]}).at(0)->front();
       }
     }
   }

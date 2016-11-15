@@ -59,14 +59,6 @@ namespace casadi {
                             std::vector< std::vector<double> > &SWIG_OUTPUT(C),
                             std::vector< double > &SWIG_OUTPUT(D));
 
-  /** [DEPRECATED] Use collocation_interpolators instead
-    * Note different definition of tau_root argument
-  */
-  CASADI_EXPORT void
-  collocationInterpolators(const std::vector<double> & tau_root,
-                            std::vector< std::vector<double> > &SWIG_OUTPUT(C),
-                            std::vector< double > &SWIG_OUTPUT(D));
-
   // Type of collocation points
   enum CollocationPoints {LEGENDRE, RADAU};
 
