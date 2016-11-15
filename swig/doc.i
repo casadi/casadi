@@ -579,12 +579,6 @@ always_inline=false, bool never_inline=false) "
 
 ";
 
-%feature("docstring")  casadi::Function::forward(int nfwd) "
-
-[DEPRECATED] Use forward_new instead
-
-";
-
 %feature("docstring")  casadi::Function::default_in(int ind) const  "
 
 Get default input value (NOTE: constant reference)
@@ -786,12 +780,6 @@ always_inline=false, bool never_inline=false) "
 
 ";
 
-%feature("docstring")  casadi::Function::reverse(int nfwd) "
-
-[DEPRECATED] Use reverse_new instead
-
-";
-
 %feature("docstring") casadi::Callback::~Callback "
 
 Destructor.
@@ -970,13 +958,6 @@ guarantee that subsequent calls return unique answers.
 
 Get symbolic primitives equivalent to the input expressions There is no
 guarantee that subsequent calls return unique answers.
-
-";
-
-%feature("docstring")  casadi::Callback::get_forward(const std::string
-&name, int nfwd, Dict &opts) "
-
-[DEPRECATED] Overload get_forward_new instead
 
 ";
 
@@ -1745,13 +1726,6 @@ Get sparsity of a given input.
 &iname) const  "
 
 Get sparsity of a given input.
-
-";
-
-%feature("docstring")  casadi::Callback::get_reverse(const std::string
-&name, int nadj, Dict &opts) "
-
-[DEPRECATED] Overload get_reverse_new instead
 
 ";
 
@@ -3341,12 +3315,6 @@ always_inline=false, bool never_inline=false) "
 
 ";
 
-%feature("docstring")  casadi::Function::forward(int nfwd) "
-
-[DEPRECATED] Use forward_new instead
-
-";
-
 %feature("docstring")  casadi::Function::n_out() const  "
 
 Get the number of function outputs.
@@ -3837,12 +3805,6 @@ always_inline=false, bool never_inline=false) "
 always_inline=false, bool never_inline=false) "
 
 [DEPRECATED] Use Function::factory or jtimes
-
-";
-
-%feature("docstring")  casadi::Function::reverse(int nfwd) "
-
-[DEPRECATED] Use reverse_new instead
 
 ";
 

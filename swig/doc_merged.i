@@ -404,19 +404,7 @@ For a particular input or for all of the inputs
 
 %feature("docstring") casadi::Callback::forward "
 
->  void casadi::Function::forward(const std::vector< MX > &arg, const std::vector< MX > &res, const std::vector< std::vector< MX > > &fseed, std::vector< std::vector< MX > > &output_fsens, bool always_inline=false, bool never_inline=false)
-
->  void casadi::Function::forward(const std::vector< SX > &arg, const std::vector< SX > &res, const std::vector< std::vector< SX > > &fseed, std::vector< std::vector< SX > > &output_fsens, bool always_inline=false, bool never_inline=false)
-
->  void casadi::Function::forward(const std::vector< DM > &arg, const std::vector< DM > &res, const std::vector< std::vector< DM > > &fseed, std::vector< std::vector< DM > > &output_fsens, bool always_inline=false, bool never_inline=false)
-------------------------------------------------------------------------
-
 [DEPRECATED] Use Function::factory or jtimes
-
->  Function casadi::Function::forward(int nfwd)
-------------------------------------------------------------------------
-
-[DEPRECATED] Use forward_new instead
 
 ";
 
@@ -551,19 +539,7 @@ Checkout a memory object.
 
 %feature("docstring") casadi::Callback::reverse "
 
->  void casadi::Function::reverse(const std::vector< MX > &arg, const std::vector< MX > &res, const std::vector< std::vector< MX > > &aseed, std::vector< std::vector< MX > > &output_asens, bool always_inline=false, bool never_inline=false)
-
->  void casadi::Function::reverse(const std::vector< SX > &arg, const std::vector< SX > &res, const std::vector< std::vector< SX > > &aseed, std::vector< std::vector< SX > > &output_asens, bool always_inline=false, bool never_inline=false)
-
->  void casadi::Function::reverse(const std::vector< DM > &arg, const std::vector< DM > &res, const std::vector< std::vector< DM > > &aseed, std::vector< std::vector< DM > > &output_asens, bool always_inline=false, bool never_inline=false)
-------------------------------------------------------------------------
-
 [DEPRECATED] Use Function::factory or jtimes
-
->  Function casadi::Function::reverse(int nfwd)
-------------------------------------------------------------------------
-
-[DEPRECATED] Use reverse_new instead
 
 ";
 
@@ -664,12 +640,6 @@ no cached version is available.
 
 Get symbolic primitives equivalent to the input expressions There is no
 guarantee that subsequent calls return unique answers.
-
-";
-
-%feature("docstring") casadi::Callback::get_forward "
-
-[DEPRECATED] Overload get_forward_new instead
 
 ";
 
@@ -1062,12 +1032,6 @@ Get input dimension.
 %feature("docstring") casadi::Callback::sparsity_in "
 
 Get sparsity of a given input.
-
-";
-
-%feature("docstring") casadi::Callback::get_reverse "
-
-[DEPRECATED] Overload get_reverse_new instead
 
 ";
 
@@ -2195,19 +2159,7 @@ Is a null pointer?
 
 %feature("docstring") casadi::Function::forward "
 
->  void casadi::Function::forward(const std::vector< MX > &arg, const std::vector< MX > &res, const std::vector< std::vector< MX > > &fseed, std::vector< std::vector< MX > > &output_fsens, bool always_inline=false, bool never_inline=false)
-
->  void casadi::Function::forward(const std::vector< SX > &arg, const std::vector< SX > &res, const std::vector< std::vector< SX > > &fseed, std::vector< std::vector< SX > > &output_fsens, bool always_inline=false, bool never_inline=false)
-
->  void casadi::Function::forward(const std::vector< DM > &arg, const std::vector< DM > &res, const std::vector< std::vector< DM > > &fseed, std::vector< std::vector< DM > > &output_fsens, bool always_inline=false, bool never_inline=false)
-------------------------------------------------------------------------
-
 [DEPRECATED] Use Function::factory or jtimes
-
->  Function casadi::Function::forward(int nfwd)
-------------------------------------------------------------------------
-
-[DEPRECATED] Use forward_new instead
 
 ";
 
@@ -2506,19 +2458,7 @@ guarantee that subsequent calls return unique answers.
 
 %feature("docstring") casadi::Function::reverse "
 
->  void casadi::Function::reverse(const std::vector< MX > &arg, const std::vector< MX > &res, const std::vector< std::vector< MX > > &aseed, std::vector< std::vector< MX > > &output_asens, bool always_inline=false, bool never_inline=false)
-
->  void casadi::Function::reverse(const std::vector< SX > &arg, const std::vector< SX > &res, const std::vector< std::vector< SX > > &aseed, std::vector< std::vector< SX > > &output_asens, bool always_inline=false, bool never_inline=false)
-
->  void casadi::Function::reverse(const std::vector< DM > &arg, const std::vector< DM > &res, const std::vector< std::vector< DM > > &aseed, std::vector< std::vector< DM > > &output_asens, bool always_inline=false, bool never_inline=false)
-------------------------------------------------------------------------
-
 [DEPRECATED] Use Function::factory or jtimes
-
->  Function casadi::Function::reverse(int nfwd)
-------------------------------------------------------------------------
-
-[DEPRECATED] Use reverse_new instead
 
 ";
 
