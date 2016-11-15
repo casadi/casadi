@@ -117,12 +117,6 @@ namespace casadi {
     virtual Function getJacobian(const std::string& name, int iind, int oind,
                                  bool compact, bool symmetric, const Dict& opts);
 
-    /** \brief Return Jacobian of all input elements with respect to all output elements */
-    virtual Function getFullJacobian(const std::string& name,
-                                     const std::vector<std::string>& i_names,
-                                     const std::vector<std::string>& o_names,
-                                     const Dict& opts);
-
     ///@{
     /** \brief Generate a function that calculates \a nfwd forward derivatives */
     virtual Function get_forward(const std::string& name, int nfwd,
@@ -1026,21 +1020,6 @@ namespace casadi {
 
     // Return function
     return Function(name, in_, ret_out, opts);
-  }
-
-  template<typename DerivedType, typename MatType, typename NodeType>
-  Function XFunction<DerivedType, MatType, NodeType>
-  ::getFullJacobian(const std::string& name,
-                    const std::vector<std::string>& i_names,
-                    const std::vector<std::string>& o_names,
-                    const Dict& opts) {
-    MatType J;
-    if (n_in()<=1 && n_out()<=1) {
-      J = jac();
-    } else {
-      J = MatType::jacobian(veccat(out_), veccat(in_));
-    }
-    return Function(name, in_, {J}, i_names, o_names, opts);
   }
 
   template<typename DerivedType, typename MatType, typename NodeType>
