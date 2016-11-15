@@ -368,7 +368,6 @@ namespace casadi {
      *    if no cached version is available.
      */
     Function forward(int nfwd);
-    virtual Function get_forward_old(const std::string& name, int nfwd, Dict& opts);
     virtual Function get_forward(const std::string& name, int nfwd,
                                  const std::vector<std::string>& i_names,
                                  const std::vector<std::string>& o_names,
@@ -383,7 +382,6 @@ namespace casadi {
      *    if no cached version is available.
      */
     Function reverse(int nadj);
-    virtual Function get_reverse_old(const std::string& name, int nadj, Dict& opts);
     virtual Function get_reverse(const std::string& name, int nadj,
                                  const std::vector<std::string>& i_names,
                                  const std::vector<std::string>& o_names, const Dict& opts);

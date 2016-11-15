@@ -1542,74 +1542,18 @@ namespace casadi {
     return ret;
   }
 
-  Function FunctionInternal::get_forward_old(const std::string& name, int nfwd, Dict& opts) {
-    casadi_error("'get_forward' not defined for " + type_name());
-  }
-
   Function FunctionInternal::
   get_forward(const std::string& name, int nfwd,
               const std::vector<std::string>& i_names,
               const std::vector<std::string>& o_names, const Dict& opts) {
-    // Call old implementation
-    Dict old_opts = derived_options();
-    Function d = get_forward_old(name, nfwd, old_opts);
-    // Get expressions for inputs and outputs
-    vector<MX> arg = MX::get_input(d);
-    vector<MX> res = d(arg);
-    // Concatenate inputs
-    vector<MX> v(nfwd);
-    for (int i=0; i<n_in(); ++i) {
-      for (int d=0; d<nfwd; ++d) {
-        v[d] = arg.at((d+1)*n_in()+n_out()+i);
-      }
-      arg.at(n_in()+n_out()+i) = horzcat(v);
-    }
-    arg.resize(n_in()+n_out()+n_in());
-    // Concatenate outputs
-    for (int i=0; i<n_out(); ++i) {
-      for (int d=0; d<nfwd; ++d) {
-        v[d] = res.at(d*n_out()+i);
-      }
-      res.at(i) = horzcat(v);
-    }
-    res.resize(n_out());
-    // Construct new function
-    return Function(name, arg, res, i_names, o_names, opts);
-  }
-
-  Function FunctionInternal::get_reverse_old(const std::string& name, int nadj, Dict& opts) {
-    casadi_error("'get_reverse' not defined for " + type_name());
+    casadi_error("'get_forward' not defined for " + type_name());
   }
 
   Function FunctionInternal::
   get_reverse(const std::string& name, int nadj,
               const std::vector<std::string>& i_names,
               const std::vector<std::string>& o_names, const Dict& opts) {
-    // Call old implementation
-    Dict old_opts = derived_options();
-    Function d = get_reverse_old(name, nadj, old_opts);
-    // Get expressions for inputs and outputs
-    vector<MX> arg = MX::get_input(d);
-    vector<MX> res = d(arg);
-    // Concatenate inputs
-    vector<MX> v(nadj);
-    for (int i=0; i<n_out(); ++i) {
-      for (int d=0; d<nadj; ++d) {
-        v[d] = arg.at(n_in()+(d+1)*n_out()+i);
-      }
-      arg.at(n_in()+n_out()+i) = horzcat(v);
-    }
-    arg.resize(n_in()+n_out()+n_out());
-    // Concatenate outputs
-    for (int i=0; i<n_in(); ++i) {
-      for (int d=0; d<nadj; ++d) {
-        v[d] = res.at(d*n_in()+i);
-      }
-      res.at(i) = horzcat(v);
-    }
-    res.resize(n_in());
-    // Construct new function
-    return Function(name, arg, res, i_names, o_names, opts);
+    casadi_error("'get_reverse' not defined for " + type_name());
   }
 
   int FunctionInternal::nnz_in() const {
