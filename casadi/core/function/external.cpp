@@ -263,11 +263,14 @@ namespace casadi {
   }
 
   Function External
-  ::getFullJacobian(const std::string& name, const Dict& opts) {
+  ::getFullJacobian(const std::string& name,
+                    const std::vector<std::string>& i_names,
+                    const std::vector<std::string>& o_names,
+                    const Dict& opts) {
     if (hasFullJacobian()) {
       return external(name, li_, opts);
     } else {
-      return FunctionInternal::getFullJacobian(name, opts);
+      return FunctionInternal::getFullJacobian(name, i_names, o_names, opts);
     }
   }
 

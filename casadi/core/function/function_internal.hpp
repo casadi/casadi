@@ -355,7 +355,10 @@ namespace casadi {
     /** \brief Return Jacobian of all input elements with respect to all output elements */
     Function fullJacobian();
     virtual bool hasFullJacobian() const;
-    virtual Function getFullJacobian(const std::string& name, const Dict& opts);
+    virtual Function getFullJacobian(const std::string& name,
+                                     const std::vector<std::string>& i_names,
+                                     const std::vector<std::string>& o_names,
+                                     const Dict& opts);
     ///@}
 
     ///@{

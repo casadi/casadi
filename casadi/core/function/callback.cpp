@@ -125,7 +125,8 @@ namespace casadi {
   }
 
   Function Callback::get_jacobian(const std::string& name, const Dict& opts) {
-    return (*this)->FunctionInternal::getFullJacobian(name, opts);
+    return (*this)->
+    FunctionInternal::getFullJacobian(name, name_in(), {"jac"}, opts);
   }
 
   Function Callback::get_forward(const std::string& name, int nfwd, Dict& opts) {

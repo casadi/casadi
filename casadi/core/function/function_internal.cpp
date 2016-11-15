@@ -1662,11 +1662,8 @@ namespace casadi {
       // Options
       string name = name_ + "_jac";
       Dict opts;
-      opts["input_scheme"] = ischeme_;
-      opts["output_scheme"] = std::vector<std::string>(1, "jac");
       opts["derivative_of"] = self();
-
-      Function ret = getFullJacobian(name, opts);
+      Function ret = getFullJacobian(name, ischeme_, {"jac"}, opts);
 
       // Consistency check
       casadi_assert(ret.n_in()==n_in());
@@ -1678,7 +1675,11 @@ namespace casadi {
     }
   }
 
-  Function FunctionInternal::getFullJacobian(const std::string& name, const Dict& opts) {
+  Function FunctionInternal::
+  getFullJacobian(const std::string& name,
+                  const std::vector<std::string>& i_names,
+                  const std::vector<std::string>& o_names,
+                  const Dict& opts) {
     casadi_assert(get_n_forward()>0 || get_n_reverse()>0);
 
     // Number inputs and outputs
@@ -1736,7 +1737,7 @@ namespace casadi {
     }
 
     // Form an expression for the full Jacobian
-    return Function(name, ret_argv, {J}, opts);
+    return Function(name, ret_argv, {J}, i_names, o_names, opts);
   }
 
   void FunctionInternal::generateFunction(CodeGenerator& g,
