@@ -857,7 +857,7 @@ namespace casadi {
     bool success = false;
     for (int i=0; i<1000; ++i) {
       r.push_back((f(SX(0)).at(0)/mult).scalar());;
-      SX j = SX::jac(f);
+      SX j = SX::jac(f, 0, 0);
       if (j.nnz()==0) {
         success = true;
         break;
@@ -1002,21 +1002,6 @@ namespace casadi {
 
   template<> SX SX::jac(const Function& f, int iind, int oind, bool compact, bool symmetric) {
     return Function(f)->jac_sx(iind, oind, compact, symmetric);
-  }
-
-  template<> SX SX::jac(const Function& f, const string & iname, int oind,
-         bool compact, bool symmetric) {
-    return jac(f, f.index_in(iname), oind, compact, symmetric);
-  }
-
-  template<> SX SX::jac(const Function& f, int iind, const string& oname,
-         bool compact, bool symmetric) {
-    return jac(f, iind, f.index_out(oname), compact, symmetric);
-  }
-
-  template<> SX SX::jac(const Function& f, const string& iname, const string& oname,
-         bool compact, bool symmetric) {
-    return jac(f, f.index_in(iname), f.index_out(oname), compact, symmetric);
   }
 
   template<> SX SX::grad(const Function& f, int iind, int oind) {

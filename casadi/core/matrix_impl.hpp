@@ -2403,8 +2403,8 @@ namespace casadi {
 
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::jac(const Function& f, int iind, int oind,
-                                         bool compact, bool symmetric) {
-    throw CasadiException("\"jac\" not defined for " + type_name());
+                                     bool compact, bool symmetric) {
+    casadi_error("\"jac\" not defined for " + type_name());
   }
 
   template<typename Scalar>
@@ -2415,26 +2415,6 @@ namespace casadi {
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::tang(const Function& f, int iind, int oind) {
     casadi_error("\"tang\" not defined for " + type_name());
-  }
-
-  template<typename Scalar>
-  Matrix<Scalar> Matrix<Scalar>::jac(const Function& f, const std::string& iname, int oind,
-                                         bool compact, bool symmetric) {
-    throw CasadiException("\"jac\" not defined for " + type_name());
-  }
-
-  template<typename Scalar>
-  Matrix<Scalar> Matrix<Scalar>::jac(const Function& f, int iind,
-                                         const std::string& oname,
-                                         bool compact, bool symmetric) {
-    throw CasadiException("\"jac\" not defined for " + type_name());
-  }
-
-  template<typename Scalar>
-  Matrix<Scalar> Matrix<Scalar>::jac(const Function& f, const std::string& iname,
-                                         const std::string& oname,
-         bool compact, bool symmetric) {
-    throw CasadiException("\"jac\" not defined for " + type_name());
   }
 
   template<typename Scalar>
@@ -2559,13 +2539,6 @@ namespace casadi {
 
   template<> SX SX::jac(const Function& f, int iind, int oind,
                         bool compact, bool symmetric);
-  template<> SX SX::jac(const Function& f, const std::string& iname, int oind,
-                        bool compact, bool symmetric);
-  template<> SX SX::jac(const Function& f, int iind, const std::string& oname,
-                        bool compact, bool symmetric);
-  template<> SX SX::jac(const Function& f, const std::string& iname, const std::string& oname,
-                        bool compact, bool symmetric);
-
   template<> SX SX::grad(const Function& f, int iind, int oind);
   template<> SX SX::tang(const Function& f, int iind, int oind);
   template<> SX SX::hess(const Function& f, int iind, int oind);

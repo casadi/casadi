@@ -763,11 +763,8 @@ namespace casadi {
     this->s = snew;
     this->sdot = sdotnew;
 
-    // Now write the sorted ODE as a function of the state derivatives
-    f = Function("tmp", {vertcat(this->sdot)}, {vertcat(this->dae)});
-
-    // Get the Jacobian
-    MX J = MX::jac(f);
+    // Differentiate to write the sorted ODE as a function of state derivatives
+    MX J = jacobian(vertcat(this->dae), vertcat(this->sdot));
 
     // Explicit ODE
     vector<MX> new_ode;

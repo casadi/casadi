@@ -934,65 +934,54 @@ class MXtests(casadiTestCase):
     self.message("symbolic variables and constants jac")
     X =  MX.sym("X",10)
     V =  MX.sym("V")
-    f =  Function("f", [X,V],[X,MX.eye(3)])
-    self.assertTrue(isinstance(MX.jac(f, 0,0),MX))
-    self.assertEqual(MX.jac(f, 0,0).nnz(),10)
-    self.assertEqual(MX.jac(f, 0,0).size1(),10)
-    self.assertEqual(MX.jac(f, 0,0).size2(),10)
+    J = jacobian(X,X)
+    self.assertTrue(isinstance(J,MX))
+    self.assertEqual(J.nnz(),10)
+    self.assertEqual(J.size1(),10)
+    self.assertEqual(J.size2(),10)
 
-    g_in = []
+    g = Function("g", [],[J])
+    [g_out] = g.call([])
+    self.checkarray(g_out,eye(10),"unit matrix")
+    g = Function("g", [],[jacobian(MX.eye(3),X)])
+    [g_out] = g.call([])
+    self.checkarray(g_out,zeros((9,10)),"zero matrix")
+    g = Function("g", [],[jacobian(X,V)])
+    [g_out] = g.call([])
+    self.checkarray(g_out,zeros((10,1)),"zero matrix")
 
-    g = Function("g", [],[MX.jac(f, 0,0)])
-    g_out = g.call(g_in)
-    self.checkarray(g_out[0],eye(10),"unit matrix")
-
-    g = Function("g", [],[MX.jac(f, 0,1)])
-    g_out = g.call(g_in)
-    self.checkarray(g_out[0],zeros((9,10)),"zero matrix")
-
-    g = Function("g", [],[MX.jac(f, 1,0)])
-    g_out = g.call(g_in)
-    self.checkarray(g_out[0],zeros((10,1)),"zero matrix")
-
-    g = Function("g", [],[MX.jac(f, 1,1)])
-    g_out = g.call(g_in)
-    self.checkarray(g_out[0],zeros((9,1)),"zero matrix")
+    g = Function("g", [],[jacobian(MX.eye(3),V)])
+    [g_out] = g.call([])
+    self.checkarray(g_out,zeros((9,1)),"zero matrix")
 
   def test_MXd_substractionl(self):
     self.message("substraction jac")
     V =  MX.sym("V")
     X =  MX.sym("X")
-    f =  Function("f", [X,V],[X-V])
+    g = Function("g", [],[jacobian(X-V, X)])
+    [g_out] = g.call([])
+    self.checkarray(g_out,ones((1,1)), "one")
 
-    g_in = []
+    g = Function("g", [],[jacobian(X-V, V)])
+    [g_out] = g.call([])
+    self.checkarray(g_out,-ones((1,1)), "one")
 
-    g = Function("g", [],[MX.jac(f, 0,0)])
-    g_out = g.call(g_in)
-    self.checkarray(g_out[0],ones((1,1)), "one")
+    g = Function("g", [],[jacobian(V-X, X)])
+    [g_out] = g.call([])
+    self.checkarray(g_out,-ones((1,1)), "one")
 
-    g = Function("g", [],[MX.jac(f, 1,0)])
-    g_out = g.call(g_in)
-    self.checkarray(g_out[0],-ones((1,1)), "one")
-
-    f =  Function("f", [X,V],[V-X])
-
-    g = Function("g", [],[MX.jac(f, 0,0)])
-    g_out = g.call(g_in)
-    self.checkarray(g_out[0],-ones((1,1)), "one")
-
-    g = Function("g", [],[MX.jac(f, 1,0)])
-    g_out = g.call(g_in)
-    self.checkarray(g_out[0],ones((1,1)),"one")
+    g = Function("g", [],[jacobian(V-X, V)])
+    [g_out] = g.call([])
+    self.checkarray(g_out,ones((1,1)),"one")
 
   def test_MXd_mapping(self):
     self.message("mapping jac")
     X = MX.sym("X",3)
     Y = MX.sym("Y",2)
-    f = Function("f", [X,Y],[vertcat(*[X,Y])])
-    J = MX.jac(f, 0,0)
+    J = jacobian(vertcat(X,Y),X)
     JJ = DM.ones(J.sparsity())
     self.checkarray(JJ,numpy.vstack((eye(3),zeros((2,3)))),"diag")
-    J = MX.jac(f, 1,0)
+    J = jacobian(vertcat(X,Y),Y)
     JJ = DM.ones(J.sparsity())
     self.checkarray(JJ,numpy.vstack((zeros((3,2)),eye(2))),"diag")
 
@@ -1312,7 +1301,7 @@ class MXtests(casadiTestCase):
 
     self.checkarray(IM([0,1,9,4,16,25]),ff_out)
 
-    J = Function("J", [X],[MX.jac(f)])
+    J = Function("J", [X],[MX.jac(f,0,0)])
     J_out = J(list(range(10)))
 
     i = horzcat(*[diag([0,2,4,6,8,10]),IM.zeros(6,4)])
@@ -1322,7 +1311,7 @@ class MXtests(casadiTestCase):
 
     f = Function("f", [X],[(T.T).nz[:]**2], {"ad_weight":1, "ad_weight_sp":1})
 
-    J = Function("J", [X],[MX.jac(f)])
+    J = Function("J", [X],[MX.jac(f,0,0)])
     J_in = [0]*J.n_in();J_in[0]=list(range(10))
     J_out = J(*J_in)
 
@@ -1351,7 +1340,7 @@ class MXtests(casadiTestCase):
 
     self.checkarray(IM([16,4]),ff_out)
 
-    J = Function("J", [X],[MX.jac(f)])
+    J = Function("J", [X],[MX.jac(f,0,0)])
     J_in = [0]*J.n_in();J_in[0]=list(range(10))
     J_out = J(*J_in)
 
@@ -1363,7 +1352,7 @@ class MXtests(casadiTestCase):
 
     f = Function("f", [X],[T**2], {"ad_weight":1, "ad_weight_sp":1})
 
-    J = Function("J", [X],[MX.jac(f)])
+    J = Function("J", [X],[MX.jac(f,0,0)])
     J_in = [0]*J.n_in();J_in[0]=list(range(10))
     J_out = J(*J_in)
 

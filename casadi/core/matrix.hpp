@@ -714,18 +714,9 @@ namespace casadi {
     /** \brief Get free */
     static std::vector<Matrix<Scalar> > get_free(const Function& f);
 
-    ///@{
     /** \brief Jacobian expression */
-    static Matrix<Scalar> jac(const Function& f, int iind=0, int oind=0,
-                  bool compact=false, bool symmetric=false);
-    static Matrix<Scalar> jac(const Function& f, const std::string & iname, int oind=0,
-                  bool compact=false, bool symmetric=false);
-    static Matrix<Scalar> jac(const Function& f, int iind, const std::string& oname,
-                  bool compact=false, bool symmetric=false);
-    static Matrix<Scalar> jac(const Function& f, const std::string& iname,
-                                const std::string& oname,
-                                bool compact=false, bool symmetric=false);
-    ///@}
+    static Matrix<Scalar> jac(const Function& f, int iind, int oind,
+                              bool compact=false, bool symmetric=false);
 
     /** \brief Gradient expression */
     static Matrix<Scalar> grad(const Function& f, int iind, int oind);

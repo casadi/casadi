@@ -559,17 +559,9 @@ namespace casadi {
     typedef std::map<std::string, MX> MXDict;
     ///@}
 
-    ///@{
     /** \brief Jacobian expression */
-    static MX jac(const Function& f, int iind=0, int oind=0,
+    static MX jac(const Function& f, int iind, int oind,
                   bool compact=false, bool symmetric=false);
-    static MX jac(const Function& f, const std::string & iname, int oind=0,
-                  bool compact=false, bool symmetric=false);
-    static MX jac(const Function& f, int iind, const std::string& oname,
-                  bool compact=false, bool symmetric=false);
-    static MX jac(const Function& f, const std::string& iname, const std::string& oname,
-                  bool compact=false, bool symmetric=false);
-    ///@}
 
     /** \brief Gradient expression */
     static MX grad(const Function& f, int iind, int oind);

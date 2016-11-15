@@ -1702,21 +1702,6 @@ namespace casadi {
     return Function(f)->tang_mx(iind, oind);
   }
 
-  MX MX::jac(const Function& f, const std::string & iname, int oind,
-         bool compact, bool symmetric) {
-    return jac(f, f.index_in(iname), oind, compact, symmetric);
-  }
-
-  MX MX::jac(const Function& f, int iind, const std::string& oname,
-         bool compact, bool symmetric) {
-    return jac(f, iind, f.index_out(oname), compact, symmetric);
-  }
-
-  MX MX::jac(const Function& f, const std::string& iname, const std::string& oname,
-         bool compact, bool symmetric) {
-    return jac(f, f.index_in(iname), f.index_out(oname), compact, symmetric);
-  }
-
   MX MX::_bilin(const MX& A, const MX& x, const MX& y) {
    return A->getBilin(x, y);
  }
