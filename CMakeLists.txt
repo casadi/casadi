@@ -656,7 +656,6 @@ if(WITH_DOC)
   set(DOXYFILE_OUTPUT_DIR  ${CMAKE_SOURCE_DIR}/docs/api)
   set(DOXYFILE_SOURCE_DIR ${CMAKE_SOURCE_DIR}/casadi)
   include(UseDoxygen OPTIONAL)
-  add_subdirectory(docs/tutorials EXCLUDE_FROM_ALL)
   add_custom_target(tutor)
 endif()
 
