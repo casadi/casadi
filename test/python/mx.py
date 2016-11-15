@@ -1932,7 +1932,7 @@ class MXtests(casadiTestCase):
     self.checkarray(f_out[3],A)
     self.checkarray(f_out[4],A)
 
-  @requires_linsol("csparse")
+  @requiresPlugin(Linsol,"csparse")
   def test_bizarre_bug(self):
 
     A = [[-26.9091,00,00,1,00,00,00,00,00,00,00,00,00,00,00],
@@ -2304,7 +2304,7 @@ class MXtests(casadiTestCase):
     mfg = mf.reverse_new(1)
 
     mfunctiong = mfunction.reverse_new(1)
-    
+
     f_in = [0, 5, DM([1,2])]
 
     self.checkfunction(mfg,mfunctiong,inputs=f_in)

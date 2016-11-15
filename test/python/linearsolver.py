@@ -394,7 +394,7 @@ class LinearSolverTests(casadiTestCase):
           self.checkfunction(solversx,solution,digits_sens = 7)
 
   @known_bug()
-  @requires_linsol("csparsecholesky")
+  @requiresPlugin(Linsol,"csparsecholesky")
   def test_cholesky(self):
     numpy.random.seed(0)
     n = 10
@@ -425,7 +425,7 @@ class LinearSolverTests(casadiTestCase):
 
 
   @known_bug()
-  @requires_linsol("csparsecholesky")
+  @requiresPlugin(Linsol,"csparsecholesky")
   def test_cholesky2(self):
     numpy.random.seed(0)
     n = 10
