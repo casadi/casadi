@@ -609,7 +609,7 @@ namespace casadi {
   template<>
   SX SX::tangent(const SX &ex, const SX &arg) {
     Function temp("temp", {arg}, {ex});
-    return SX::tang(temp);
+    return SX::tang(temp, 0, 0);
   }
 
   template<>
@@ -1037,18 +1037,6 @@ namespace casadi {
 
   template<> SX SX::grad(const Function& f, const string& iname, const string& oname) {
     return grad(f, f.index_in(iname), f.index_out(oname));
-  }
-
-  template<> SX SX::tang(const Function& f, const string& iname, int oind) {
-    return tang(f, f.index_in(iname), oind);
-  }
-
-  template<> SX SX::tang(const Function& f, int iind, const string& oname) {
-    return tang(f, iind, f.index_out(oname));
-  }
-
-  template<> SX SX::tang(const Function& f, const string& iname, const string& oname) {
-    return tang(f, f.index_in(iname), f.index_out(oname));
   }
 
   template<> SX SX::hess(const Function& f, int iind, int oind) {

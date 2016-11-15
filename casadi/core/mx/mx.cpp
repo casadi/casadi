@@ -1542,7 +1542,7 @@ namespace casadi {
 
   MX MX::tangent(const MX& f, const MX& x) {
     Function temp("helper_tangent_MX", {x}, {f});
-    return MX::tang(temp);
+    return MX::tang(temp, 0, 0);
   }
 
   MX MX::hessian(const MX& f, const MX& x) {
@@ -1727,18 +1727,6 @@ namespace casadi {
 
   MX MX::grad(const Function& f, const std::string& iname, const std::string& oname) {
     return grad(f, f.index_in(iname), f.index_out(oname));
-  }
-
-  MX MX::tang(const Function& f, const std::string& iname, int oind) {
-    return tang(f, f.index_in(iname), oind);
-  }
-
-  MX MX::tang(const Function& f, int iind, const std::string& oname) {
-    return tang(f, iind, f.index_out(oname));
-  }
-
-  MX MX::tang(const Function& f, const std::string& iname, const std::string& oname) {
-    return tang(f, f.index_in(iname), f.index_out(oname));
   }
 
  MX MX::_bilin(const MX& A, const MX& x, const MX& y) {

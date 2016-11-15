@@ -2414,7 +2414,7 @@ namespace casadi {
 
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::tang(const Function& f, int iind, int oind) {
-    throw CasadiException("\"tang\" not defined for " + type_name());
+    casadi_error("\"tang\" not defined for " + type_name());
   }
 
   template<typename Scalar>
@@ -2451,22 +2451,6 @@ namespace casadi {
   Matrix<Scalar> Matrix<Scalar>::grad(const Function& f, const std::string& iname,
                                           const std::string& oname) {
     throw CasadiException("\"grad\" not defined for " + type_name());
-  }
-
-  template<typename Scalar>
-  Matrix<Scalar> Matrix<Scalar>::tang(const Function& f, const std::string& iname, int oind) {
-    throw CasadiException("\"tang\" not defined for " + type_name());
-  }
-
-  template<typename Scalar>
-  Matrix<Scalar> Matrix<Scalar>::tang(const Function& f, int iind, const std::string& oname) {
-    throw CasadiException("'tang' not defined for " + type_name());
-  }
-
-  template<typename Scalar>
-  Matrix<Scalar> Matrix<Scalar>::tang(const Function& f, const std::string& iname,
-                                          const std::string& oname) {
-    throw CasadiException("'tang' not defined for " + type_name());
   }
 
   template<typename Scalar>
@@ -2623,9 +2607,6 @@ namespace casadi {
   template<> SX SX::grad(const Function& f, const std::string& iname, const std::string& oname);
 
   template<> SX SX::tang(const Function& f, int iind, int oind);
-  template<> SX SX::tang(const Function& f, const std::string& iname, int oind);
-  template<> SX SX::tang(const Function& f, int iind, const std::string& oname);
-  template<> SX SX::tang(const Function& f, const std::string& iname, const std::string& oname);
 
   template<> SX SX::hess(const Function& f, int iind, int oind);
   template<> SX SX::hess(const Function& f, const std::string& iname, int oind);

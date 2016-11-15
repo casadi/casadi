@@ -579,13 +579,8 @@ namespace casadi {
     static MX grad(const Function& f, const std::string& iname, const std::string& oname);
     ///@}
 
-    ///@{
     /** \brief Tangent expression */
-    static MX tang(const Function& f, int iind=0, int oind=0);
-    static MX tang(const Function& f, const std::string& iname, int oind=0);
-    static MX tang(const Function& f, int iind, const std::string& oname);
-    static MX tang(const Function& f, const std::string& iname, const std::string& oname);
-    ///@}
+    static MX tang(const Function& f, int iind, int oind);
 
 #ifndef SWIG
     /// Construct constant matrix with a given sparsity and values

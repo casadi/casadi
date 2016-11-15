@@ -736,14 +736,8 @@ namespace casadi {
                                  const std::string& oname);
     ///@}
 
-    ///@{
     /** \brief Tangent expression */
-    static Matrix<Scalar> tang(const Function& f, int iind=0, int oind=0);
-    static Matrix<Scalar> tang(const Function& f, const std::string& iname, int oind=0);
-    static Matrix<Scalar> tang(const Function& f, int iind, const std::string& oname);
-    static Matrix<Scalar> tang(const Function& f, const std::string& iname,
-                                 const std::string& oname);
-    ///@}
+    static Matrix<Scalar> tang(const Function& f, int iind, int oind);
 
     ///@{
     /** \bried Hessian expression */
