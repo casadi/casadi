@@ -1092,6 +1092,7 @@ class Functiontests(casadiTestCase):
         if has_fwd:
           def get_n_forward(self): return 1
           def get_forward(self,name,nfwd,opts):
+            assert(nfwd==1)
             class ForwardFun(Callback):
               # sin(x+3*y)
 
@@ -1128,6 +1129,7 @@ class Functiontests(casadiTestCase):
         if has_adj:
           def get_n_reverse(self): return 1
           def get_reverse(self,name,nadj,opts):
+            assert(nadj==1)
             class BackwardFun(Callback):
               # sin(x+3*y)
 

@@ -1660,10 +1660,9 @@ namespace casadi {
       return shared_cast<Function>(full_jacobian_.shared());
     } else {
       // Options
-      string name = name_ + "_jac";
       Dict opts;
       opts["derivative_of"] = self();
-      Function ret = getFullJacobian(name, ischeme_, {"jac"}, opts);
+      Function ret = getFullJacobian(name_ + "_jac", ischeme_, {"jac"}, opts);
 
       // Consistency check
       casadi_assert(ret.n_in()==n_in());
@@ -1681,7 +1680,6 @@ namespace casadi {
                   const std::vector<std::string>& o_names,
                   const Dict& opts) {
     casadi_assert(get_n_forward()>0 || get_n_reverse()>0);
-
     // Number inputs and outputs
     int n_in = this->n_in();
     int n_out = this->n_out();
@@ -2294,34 +2292,44 @@ namespace casadi {
       }
 
     } else {
-      // All inputs and seeds
-      vector<MX> darg;
-      darg.reserve(n_in + n_out + n_in);
-      darg.insert(darg.end(), arg.begin(), arg.end());
-      darg.insert(darg.end(), res.begin(), res.end());
-      vector<MX> v(nfwd);
-      for (int i=0; i<n_in; ++i) {
-        for (int d=0; d<nfwd; ++d) v[d] = fseed[d][i];
-        darg.push_back(horzcat(v));
-      }
+      // Evaluate in batches
+      int offset = 0;
+      int max_nfwd = get_n_forward();
+      while (offset<nfwd) {
+        // Number of derivatives, in this batch
+        int nfwd_batch = min(nfwd-offset, max_nfwd);
 
-      // Create derivative function
-      Function dfcn = forward(nfwd);
-
-      // Create the evaluation node
-      vector<MX> x = Call::create(dfcn, darg);
-      casadi_assert(x.size()==n_out);
-
-      // Retrieve sensitivities
-      for (int d=0; d<nfwd; ++d) fsens[d].resize(n_out);
-      for (int i=0; i<n_out; ++i) {
-        if (size2_out(i)>0) {
-          v = horzsplit(x[i], size2_out(i));
-          casadi_assert(v.size()==nfwd);
-        } else {
-          v = vector<MX>(nfwd, MX(size_out(i)));
+        // All inputs and seeds
+        vector<MX> darg;
+        darg.reserve(n_in + n_out + n_in);
+        darg.insert(darg.end(), arg.begin(), arg.end());
+        darg.insert(darg.end(), res.begin(), res.end());
+        vector<MX> v(nfwd_batch);
+        for (int i=0; i<n_in; ++i) {
+          for (int d=0; d<nfwd_batch; ++d) v[d] = fseed[offset+d][i];
+          darg.push_back(horzcat(v));
         }
-        for (int d=0; d<nfwd; ++d) fsens[d][i] = v[d];
+
+        // Create the evaluation node
+        Function dfcn = forward(nfwd_batch);
+        vector<MX> x = Call::create(dfcn, darg);
+
+        casadi_assert(x.size()==n_out);
+
+        // Retrieve sensitivities
+        for (int d=0; d<nfwd_batch; ++d) fsens[offset+d].resize(n_out);
+        for (int i=0; i<n_out; ++i) {
+          if (size2_out(i)>0) {
+            v = horzsplit(x[i], size2_out(i));
+            casadi_assert(v.size()==nfwd_batch);
+          } else {
+            v = vector<MX>(nfwd_batch, MX(size_out(i)));
+          }
+          for (int d=0; d<nfwd_batch; ++d) fsens[offset+d][i] = v[d];
+        }
+
+        // Update offset
+        offset += nfwd_batch;
       }
     }
   }
@@ -2380,40 +2388,48 @@ namespace casadi {
         }
       }
     } else {
-      // All inputs and seeds
-      vector<MX> darg;
-      darg.reserve(n_in + n_out + n_out);
-      darg.insert(darg.end(), arg.begin(), arg.end());
-      darg.insert(darg.end(), res.begin(), res.end());
-      vector<MX> v(nadj);
-      for (int i=0; i<n_out; ++i) {
-        for (int d=0; d<nadj; ++d) v[d] = aseed[d][i];
-        darg.push_back(horzcat(v));
-      }
+      // Evaluate in batches
+      int offset = 0;
+      int max_nadj = get_n_reverse();
+      while (offset<nadj) {
+        // Number of derivatives, in this batch
+        int nadj_batch = min(nadj-offset, max_nadj);
 
-      // Create derivative function
-      Function dfcn = reverse(nadj);
-
-      // Create the evaluation node
-      vector<MX> x = Call::create(dfcn, darg);
-      casadi_assert(x.size()==n_in);
-
-      // Retrieve sensitivities
-      for (int d=0; d<nadj; ++d) asens[d].resize(n_in);
-      for (int i=0; i<n_in; ++i) {
-        if (size2_in(i)>0) {
-          v = horzsplit(x[i], size2_in(i));
-          casadi_assert(v.size()==nadj);
-        } else {
-          v = vector<MX>(nadj, MX(size_in(i)));
+        // All inputs and seeds
+        vector<MX> darg;
+        darg.reserve(n_in + n_out + n_out);
+        darg.insert(darg.end(), arg.begin(), arg.end());
+        darg.insert(darg.end(), res.begin(), res.end());
+        vector<MX> v(nadj_batch);
+        for (int i=0; i<n_out; ++i) {
+          for (int d=0; d<nadj_batch; ++d) v[d] = aseed[offset+d][i];
+          darg.push_back(horzcat(v));
         }
-        for (int d=0; d<nadj; ++d) {
-          if (asens[d][i].is_empty(true)) {
-            asens[d][i] = v[d];
+
+        // Create the evaluation node
+        Function dfcn = reverse(nadj_batch);
+        vector<MX> x = Call::create(dfcn, darg);
+        casadi_assert(x.size()==n_in);
+
+        // Retrieve sensitivities
+        for (int d=0; d<nadj_batch; ++d) asens[offset+d].resize(n_in);
+        for (int i=0; i<n_in; ++i) {
+          if (size2_in(i)>0) {
+            v = horzsplit(x[i], size2_in(i));
+            casadi_assert(v.size()==nadj_batch);
           } else {
-            asens[d][i] += v[d];
+            v = vector<MX>(nadj_batch, MX(size_in(i)));
+          }
+          for (int d=0; d<nadj_batch; ++d) {
+            if (asens[offset+d][i].is_empty(true)) {
+              asens[offset+d][i] = v[d];
+            } else {
+              asens[offset+d][i] += v[d];
+            }
           }
         }
+        // Update offset
+        offset += nadj_batch;
       }
     }
   }
