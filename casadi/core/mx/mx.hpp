@@ -571,13 +571,8 @@ namespace casadi {
                   bool compact=false, bool symmetric=false);
     ///@}
 
-    ///@{
     /** \brief Gradient expression */
-    static MX grad(const Function& f, int iind=0, int oind=0);
-    static MX grad(const Function& f, const std::string& iname, int oind=0);
-    static MX grad(const Function& f, int iind, const std::string& oname);
-    static MX grad(const Function& f, const std::string& iname, const std::string& oname);
-    ///@}
+    static MX grad(const Function& f, int iind, int oind);
 
     /** \brief Tangent expression */
     static MX tang(const Function& f, int iind, int oind);

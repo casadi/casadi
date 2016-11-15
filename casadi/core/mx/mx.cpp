@@ -1537,7 +1537,7 @@ namespace casadi {
 
   MX MX::gradient(const MX& f, const MX& x) {
     Function temp("helper_gradient_MX", {x}, {f});
-    return MX::grad(temp);
+    return MX::grad(temp, 0, 0);
   }
 
   MX MX::tangent(const MX& f, const MX& x) {
@@ -1717,19 +1717,7 @@ namespace casadi {
     return jac(f, f.index_in(iname), f.index_out(oname), compact, symmetric);
   }
 
-  MX MX::grad(const Function& f, const std::string& iname, int oind) {
-    return grad(f, f.index_in(iname), oind);
-  }
-
-  MX MX::grad(const Function& f, int iind, const std::string& oname) {
-    return grad(f, iind, f.index_out(oname));
-  }
-
-  MX MX::grad(const Function& f, const std::string& iname, const std::string& oname) {
-    return grad(f, f.index_in(iname), f.index_out(oname));
-  }
-
- MX MX::_bilin(const MX& A, const MX& x, const MX& y) {
+  MX MX::_bilin(const MX& A, const MX& x, const MX& y) {
    return A->getBilin(x, y);
  }
 
