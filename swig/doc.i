@@ -421,18 +421,6 @@ Get input dimension.
 
 ";
 
-%feature("docstring") casadi::Callback::Callback() "
-
-Default constructor.
-
-";
-
-%feature("docstring") casadi::Callback::Callback(const Callback &obj) "
-
-Copy constructor (throws an error)
-
-";
-
 %feature("docstring")  casadi::Callback::get_name_in(int i) "
 
 Get the sparsity of an input This function is called during construction.
@@ -549,33 +537,6 @@ const  "
 Get number of input nonzeros.
 
 For a particular input or for all of the inputs
-
-";
-
-%feature("docstring")  casadi::Function::forward(const std::vector< MX >
-&arg, const std::vector< MX > &res, const std::vector< std::vector< MX > >
-&fseed, std::vector< std::vector< MX > > &output_fsens, bool
-always_inline=false, bool never_inline=false) "
-
-[DEPRECATED] Use Function::factory or jtimes
-
-";
-
-%feature("docstring")  casadi::Function::forward(const std::vector< SX >
-&arg, const std::vector< SX > &res, const std::vector< std::vector< SX > >
-&fseed, std::vector< std::vector< SX > > &output_fsens, bool
-always_inline=false, bool never_inline=false) "
-
-[DEPRECATED] Use Function::factory or jtimes
-
-";
-
-%feature("docstring")  casadi::Function::forward(const std::vector< DM >
-&arg, const std::vector< DM > &res, const std::vector< std::vector< DM > >
-&fseed, std::vector< std::vector< DM > > &output_fsens, bool
-always_inline=false, bool never_inline=false) "
-
-[DEPRECATED] Use Function::factory or jtimes
 
 ";
 
@@ -753,30 +714,15 @@ Checkout a memory object.
 
 ";
 
-%feature("docstring")  casadi::Function::reverse(const std::vector< MX >
-&arg, const std::vector< MX > &res, const std::vector< std::vector< MX > >
-&aseed, std::vector< std::vector< MX > > &output_asens, bool
-always_inline=false, bool never_inline=false) "
+%feature("docstring") casadi::Callback::Callback() "
 
-[DEPRECATED] Use Function::factory or jtimes
+Default constructor.
 
 ";
 
-%feature("docstring")  casadi::Function::reverse(const std::vector< SX >
-&arg, const std::vector< SX > &res, const std::vector< std::vector< SX > >
-&aseed, std::vector< std::vector< SX > > &output_asens, bool
-always_inline=false, bool never_inline=false) "
+%feature("docstring") casadi::Callback::Callback(const Callback &obj) "
 
-[DEPRECATED] Use Function::factory or jtimes
-
-";
-
-%feature("docstring")  casadi::Function::reverse(const std::vector< DM >
-&arg, const std::vector< DM > &res, const std::vector< std::vector< DM > >
-&aseed, std::vector< std::vector< DM > > &output_asens, bool
-always_inline=false, bool never_inline=false) "
-
-[DEPRECATED] Use Function::factory or jtimes
+Copy constructor (throws an error)
 
 ";
 
@@ -3281,33 +3227,6 @@ Is a null pointer?
 
 ";
 
-%feature("docstring")  casadi::Function::forward(const std::vector< MX >
-&arg, const std::vector< MX > &res, const std::vector< std::vector< MX > >
-&fseed, std::vector< std::vector< MX > > &output_fsens, bool
-always_inline=false, bool never_inline=false) "
-
-[DEPRECATED] Use Function::factory or jtimes
-
-";
-
-%feature("docstring")  casadi::Function::forward(const std::vector< SX >
-&arg, const std::vector< SX > &res, const std::vector< std::vector< SX > >
-&fseed, std::vector< std::vector< SX > > &output_fsens, bool
-always_inline=false, bool never_inline=false) "
-
-[DEPRECATED] Use Function::factory or jtimes
-
-";
-
-%feature("docstring")  casadi::Function::forward(const std::vector< DM >
-&arg, const std::vector< DM > &res, const std::vector< std::vector< DM > >
-&fseed, std::vector< std::vector< DM > > &output_fsens, bool
-always_inline=false, bool never_inline=false) "
-
-[DEPRECATED] Use Function::factory or jtimes
-
-";
-
 %feature("docstring")  casadi::Function::n_out() const  "
 
 Get the number of function outputs.
@@ -3764,33 +3683,6 @@ guarantee that subsequent calls return unique answers.
 
 Get symbolic primitives equivalent to the input expressions There is no
 guarantee that subsequent calls return unique answers.
-
-";
-
-%feature("docstring")  casadi::Function::reverse(const std::vector< MX >
-&arg, const std::vector< MX > &res, const std::vector< std::vector< MX > >
-&aseed, std::vector< std::vector< MX > > &output_asens, bool
-always_inline=false, bool never_inline=false) "
-
-[DEPRECATED] Use Function::factory or jtimes
-
-";
-
-%feature("docstring")  casadi::Function::reverse(const std::vector< SX >
-&arg, const std::vector< SX > &res, const std::vector< std::vector< SX > >
-&aseed, std::vector< std::vector< SX > > &output_asens, bool
-always_inline=false, bool never_inline=false) "
-
-[DEPRECATED] Use Function::factory or jtimes
-
-";
-
-%feature("docstring")  casadi::Function::reverse(const std::vector< DM >
-&arg, const std::vector< DM > &res, const std::vector< std::vector< DM > >
-&aseed, std::vector< std::vector< DM > > &output_asens, bool
-always_inline=false, bool never_inline=false) "
-
-[DEPRECATED] Use Function::factory or jtimes
 
 ";
 
@@ -5086,6 +4978,14 @@ zero.
 
 ";
 
+%feature("docstring")  reverse(const std::vector< MatType > &ex, const
+std::vector< MatType > &arg, const std::vector< std::vector< MatType > > &v,
+const Dict &opts=Dict()) "
+
+Reverse directional derivative.
+
+";
+
 %feature("docstring")  substitute(const MatType &ex, const MatType &v, const
 MatType &vdef) "
 
@@ -5128,6 +5028,14 @@ Inspired by Numerical Methods in Scientific Computing by Ake Bjorck
 %feature("docstring")  norm_2(const MatType &x) "
 
 2-norm
+
+";
+
+%feature("docstring")  forward(const std::vector< MatType > &ex, const
+std::vector< MatType > &arg, const std::vector< std::vector< MatType > > &v,
+const Dict &opts=Dict()) "
+
+Forward directional derivative.
 
 ";
 

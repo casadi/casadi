@@ -313,20 +313,6 @@ Get input dimension.
 
 ";
 
-%feature("docstring") casadi::Callback::Callback "
-
->  casadi::Callback::Callback()
-------------------------------------------------------------------------
-
-Default constructor.
-
->  casadi::Callback::Callback(const Callback &obj)
-------------------------------------------------------------------------
-
-Copy constructor (throws an error)
-
-";
-
 %feature("docstring") casadi::Callback::get_name_in "
 
 Get the sparsity of an input This function is called during construction.
@@ -399,12 +385,6 @@ Get output scheme name by index.
 Get number of input nonzeros.
 
 For a particular input or for all of the inputs
-
-";
-
-%feature("docstring") casadi::Callback::forward "
-
-[DEPRECATED] Use Function::factory or jtimes
 
 ";
 
@@ -537,9 +517,17 @@ Checkout a memory object.
 
 ";
 
-%feature("docstring") casadi::Callback::reverse "
+%feature("docstring") casadi::Callback::Callback "
 
-[DEPRECATED] Use Function::factory or jtimes
+>  casadi::Callback::Callback()
+------------------------------------------------------------------------
+
+Default constructor.
+
+>  casadi::Callback::Callback(const Callback &obj)
+------------------------------------------------------------------------
+
+Copy constructor (throws an error)
 
 ";
 
@@ -2152,12 +2140,6 @@ Is a null pointer?
 
 ";
 
-%feature("docstring") casadi::Function::forward "
-
-[DEPRECATED] Use Function::factory or jtimes
-
-";
-
 %feature("docstring") casadi::Function::n_out "
 
 Get the number of function outputs.
@@ -2443,12 +2425,6 @@ Get input scheme name by index.
 
 Get symbolic primitives equivalent to the input expressions There is no
 guarantee that subsequent calls return unique answers.
-
-";
-
-%feature("docstring") casadi::Function::reverse "
-
-[DEPRECATED] Use Function::factory or jtimes
 
 ";
 
@@ -3518,6 +3494,12 @@ zero.
 
 ";
 
+%feature("docstring") friendwrap_reverse "
+
+Reverse directional derivative.
+
+";
+
 %feature("docstring") friendwrap_substitute "
 
 >  MatType substitute(const MatType &ex, const MatType &v, const MatType &vdef)
@@ -3559,6 +3541,12 @@ Inspired by Numerical Methods in Scientific Computing by Ake Bjorck
 %feature("docstring") friendwrap_norm_2 "
 
 2-norm
+
+";
+
+%feature("docstring") friendwrap_forward "
+
+Forward directional derivative.
 
 ";
 
