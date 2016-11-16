@@ -630,6 +630,52 @@ namespace casadi {
   }
 
   template<>
+  std::vector<std::vector<SX> >
+  SX::forward(const std::vector<SX> &ex, const std::vector<SX> &arg,
+          const std::vector<std::vector<SX> > &v, const Dict& opts) {
+    // Read options
+    bool always_inline = false;
+    bool never_inline = false;
+    for (auto&& op : opts) {
+      if (op.first=="always_inline") {
+        always_inline = op.second;
+      } else if (op.first=="never_inline") {
+        never_inline = op.second;
+      } else {
+        casadi_error("No such option: " + string(op.second));
+      }
+    }
+    // Call internal function on a temporary object
+    Function temp("forward_temp", arg, ex);
+    std::vector<std::vector<SX> > ret;
+    temp.forward(arg, ex, v, ret, always_inline, never_inline);
+    return ret;
+  }
+
+  template<>
+  std::vector<std::vector<SX> >
+  SX::reverse(const std::vector<SX> &ex, const std::vector<SX> &arg,
+          const std::vector<std::vector<SX> > &v, const Dict& opts) {
+    // Read options
+    bool always_inline = false;
+    bool never_inline = false;
+    for (auto&& op : opts) {
+      if (op.first=="always_inline") {
+        always_inline = op.second;
+      } else if (op.first=="never_inline") {
+        never_inline = op.second;
+      } else {
+        casadi_error("No such option: " + string(op.second));
+      }
+    }
+    // Call internal function on a temporary object
+    Function temp("reverse_temp", arg, ex);
+    std::vector<std::vector<SX> > ret;
+    temp.reverse(arg, ex, v, ret, always_inline, never_inline);
+    return ret;
+  }
+
+  template<>
   std::vector<bool> SX::which_depends(const SX &expr, const SX &var, int order, bool tr) {
     return _which_depends(expr, var, order, tr);
   }
@@ -866,7 +912,7 @@ namespace casadi {
 
     if (!success) casadi_error("poly: supplied expression does not appear to be polynomial.");
 
-    reverse(r.begin(), r.end());
+    std::reverse(r.begin(), r.end());
 
     return r;
   }

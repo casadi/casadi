@@ -1559,6 +1559,52 @@ namespace casadi {
     return _jtimes(ex, arg, v, tr);
   }
 
+  std::vector<std::vector<MX> >
+  MX::forward(const std::vector<MX> &ex,
+              const std::vector<MX> &arg,
+              const std::vector<std::vector<MX> > &v, const Dict& opts) {
+    // Read options
+    bool always_inline = false;
+    bool never_inline = false;
+    for (auto&& op : opts) {
+      if (op.first=="always_inline") {
+        always_inline = op.second;
+      } else if (op.first=="never_inline") {
+        never_inline = op.second;
+      } else {
+        casadi_error("No such option: " + string(op.second));
+      }
+    }
+    // Call internal function on a temporary object
+    Function temp("forward_temp", arg, ex);
+    std::vector<std::vector<MX> > ret;
+    temp.forward(arg, ex, v, ret, always_inline, never_inline);
+    return ret;
+  }
+
+  std::vector<std::vector<MX> >
+  MX::reverse(const std::vector<MX> &ex,
+              const std::vector<MX> &arg,
+              const std::vector<std::vector<MX> > &v, const Dict& opts) {
+    // Read options
+    bool always_inline = false;
+    bool never_inline = false;
+    for (auto&& op : opts) {
+      if (op.first=="always_inline") {
+        always_inline = op.second;
+      } else if (op.first=="never_inline") {
+        never_inline = op.second;
+      } else {
+        casadi_error("No such option: " + string(op.second));
+      }
+    }
+    // Call internal function on a temporary object
+    Function temp("reverse_temp", arg, ex);
+    std::vector<std::vector<MX> > ret;
+    temp.reverse(arg, ex, v, ret, always_inline, never_inline);
+    return ret;
+  }
+
   std::vector<bool> MX::which_depends(const MX &expr, const MX &var, int order, bool tr) {
     return _which_depends(expr, var, order, tr);
   }
