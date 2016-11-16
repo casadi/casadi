@@ -6105,34 +6105,6 @@ x+y^3)/6 $ $ (-3 x^2 y-x^3)/6+y+x $
 
 ";
 
-%feature("docstring")  casadi::SX::grad(const Function &f, int iind=0, int
-oind=0) "
-
-[INTERNAL]  Gradient expression.
-
-";
-
-%feature("docstring")  casadi::SX::grad(const Function &f, const std::string
-&iname, int oind=0) "
-
-[INTERNAL]  Gradient expression.
-
-";
-
-%feature("docstring")  casadi::SX::grad(const Function &f, int iind, const
-std::string &oname) "
-
-[INTERNAL]  Gradient expression.
-
-";
-
-%feature("docstring")  casadi::SX::grad(const Function &f, const std::string
-&iname, const std::string &oname) "
-
-[INTERNAL]  Gradient expression.
-
-";
-
 %feature("docstring")  casadi::Matrix< Scalar >::set(const Matrix< Scalar >
 &m, bool ind1, const Slice &rr) "
 
@@ -6316,10 +6288,19 @@ Scalar > &x) "
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< Matrix< Scalar >  >::is_tril()
-const "
+%feature("docstring")  casadi::Matrix< Scalar >::erase(const std::vector<
+int > &rr, const std::vector< int > &cc, bool ind1=false) "
 
-Check if the matrix is lower triangular.
+[INTERNAL]  Erase a submatrix (leaving structural zeros in its place) Erase
+rows and/or columns of a matrix.
+
+";
+
+%feature("docstring")  casadi::Matrix< Scalar >::erase(const std::vector<
+int > &rr, bool ind1=false) "
+
+[INTERNAL]  Erase a submatrix (leaving structural zeros in its place) Erase
+elements of a matrix.
 
 ";
 
@@ -6482,41 +6463,6 @@ streams.
 
 ";
 
-%feature("docstring")  casadi::SX::n_dep() const  "
-
-[INTERNAL]  Get the number of dependencies of a binary SXElem Only defined
-if symbolic scalar.
-
-";
-
-%feature("docstring")  casadi::SX::hess(const Function &f, int iind=0, int
-oind=0) "
-
-[INTERNAL]  Hessian expression
-
-";
-
-%feature("docstring")  casadi::SX::hess(const Function &f, const std::string
-&iname, int oind=0) "
-
-[INTERNAL]  Hessian expression
-
-";
-
-%feature("docstring")  casadi::SX::hess(const Function &f, int iind, const
-std::string &oname) "
-
-[INTERNAL]  Hessian expression
-
-";
-
-%feature("docstring")  casadi::SX::hess(const Function &f, const std::string
-&iname, const std::string &oname) "
-
-[INTERNAL]  Hessian expression
-
-";
-
 %feature("docstring")  casadi::GenericMatrix< Matrix< Scalar >
 >::is_dense() const "
 
@@ -6546,34 +6492,6 @@ Get the number of non-zeros in the lower triangular half.
 "
 
 [INTERNAL] ";
-
-%feature("docstring")  casadi::SX::tang(const Function &f, int iind=0, int
-oind=0) "
-
-[INTERNAL]  Tangent expression.
-
-";
-
-%feature("docstring")  casadi::SX::tang(const Function &f, const std::string
-&iname, int oind=0) "
-
-[INTERNAL]  Tangent expression.
-
-";
-
-%feature("docstring")  casadi::SX::tang(const Function &f, int iind, const
-std::string &oname) "
-
-[INTERNAL]  Tangent expression.
-
-";
-
-%feature("docstring")  casadi::SX::tang(const Function &f, const std::string
-&iname, const std::string &oname) "
-
-[INTERNAL]  Tangent expression.
-
-";
 
 %feature("docstring")  casadi::Matrix< Scalar >::is_one() const  "
 
@@ -6805,35 +6723,6 @@ Only defined if symbolic scalar.
 
 ";
 
-%feature("docstring")  casadi::SX::jac(const Function &f, int iind=0, int
-oind=0, bool compact=false, bool symmetric=false) "
-
-[INTERNAL]  Jacobian expression.
-
-";
-
-%feature("docstring")  casadi::SX::jac(const Function &f, const std::string
-&iname, int oind=0, bool compact=false, bool symmetric=false) "
-
-[INTERNAL]  Jacobian expression.
-
-";
-
-%feature("docstring")  casadi::SX::jac(const Function &f, int iind, const
-std::string &oname, bool compact=false, bool symmetric=false) "
-
-[INTERNAL]  Jacobian expression.
-
-";
-
-%feature("docstring")  casadi::SX::jac(const Function &f, const std::string
-&iname, const std::string &oname, bool compact=false, bool symmetric=false)
-"
-
-[INTERNAL]  Jacobian expression.
-
-";
-
 %feature("docstring")  casadi::Matrix< Scalar >::sparsify(const Matrix<
 Scalar > &A, double tol=0) "
 
@@ -6955,19 +6844,10 @@ Get the size along a particular dimensions.
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::erase(const std::vector<
-int > &rr, const std::vector< int > &cc, bool ind1=false) "
+%feature("docstring")  casadi::SX::n_dep() const  "
 
-[INTERNAL]  Erase a submatrix (leaving structural zeros in its place) Erase
-rows and/or columns of a matrix.
-
-";
-
-%feature("docstring")  casadi::Matrix< Scalar >::erase(const std::vector<
-int > &rr, bool ind1=false) "
-
-[INTERNAL]  Erase a submatrix (leaving structural zeros in its place) Erase
-elements of a matrix.
+[INTERNAL]  Get the number of dependencies of a binary SXElem Only defined
+if symbolic scalar.
 
 ";
 
@@ -7127,6 +7007,13 @@ const Matrix< Scalar > &b, int order, const Matrix< Scalar > &w) "
 const "
 
 Get the sparsity pattern. See the Sparsity class for details.
+
+";
+
+%feature("docstring")  casadi::GenericMatrix< Matrix< Scalar >  >::is_tril()
+const "
+
+Check if the matrix is lower triangular.
 
 ";
 
@@ -7439,34 +7326,6 @@ Joel Andersson
 
 C++ includes: mx.hpp ";
 
-%feature("docstring")  casadi::MX::grad(const Function &f, int iind=0, int
-oind=0) "
-
-Gradient expression.
-
-";
-
-%feature("docstring")  casadi::MX::grad(const Function &f, const std::string
-&iname, int oind=0) "
-
-Gradient expression.
-
-";
-
-%feature("docstring")  casadi::MX::grad(const Function &f, int iind, const
-std::string &oname) "
-
-Gradient expression.
-
-";
-
-%feature("docstring")  casadi::MX::grad(const Function &f, const std::string
-&iname, const std::string &oname) "
-
-Gradient expression.
-
-";
-
 %feature("docstring")  casadi::GenericMatrix< MX  >::is_scalar(bool
 scalar_and_dense=false) const "
 
@@ -7590,15 +7449,15 @@ Check if commutative operation.
 
 ";
 
-%feature("docstring")  lift(const MX &x, const MX &x_guess) "
-
-Lift the expression Experimental feature.
-
-";
-
 %feature("docstring")  casadi::GenericMatrix< MX  >::is_tril() const "
 
 Check if the matrix is lower triangular.
+
+";
+
+%feature("docstring")  lift(const MX &x, const MX &x_guess) "
+
+Lift the expression Experimental feature.
 
 ";
 
@@ -7866,12 +7725,6 @@ Get the sparsity pattern. See the Sparsity class for details.
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< MX  >::sparsity() const "
-
-Get the sparsity pattern.
-
-";
-
 %feature("docstring")  casadi::MX::is_call() const  "
 
 Check if evaluation.
@@ -7888,35 +7741,6 @@ Get the number of non-zeros in the upper triangular half.
 
 Returns a number that is unique for a given Node. If the Object does not
 point to any node, \"0\" is returned.
-
-";
-
-%feature("docstring")  casadi::MX::jac(const Function &f, int iind=0, int
-oind=0, bool compact=false, bool symmetric=false) "
-
-Jacobian expression.
-
-";
-
-%feature("docstring")  casadi::MX::jac(const Function &f, const std::string
-&iname, int oind=0, bool compact=false, bool symmetric=false) "
-
-Jacobian expression.
-
-";
-
-%feature("docstring")  casadi::MX::jac(const Function &f, int iind, const
-std::string &oname, bool compact=false, bool symmetric=false) "
-
-Jacobian expression.
-
-";
-
-%feature("docstring")  casadi::MX::jac(const Function &f, const std::string
-&iname, const std::string &oname, bool compact=false, bool symmetric=false)
-"
-
-Jacobian expression.
 
 ";
 
@@ -8102,6 +7926,12 @@ symbolic primitives.
 
 ";
 
+%feature("docstring")  casadi::MX::setTemp(int t) "
+
+[INTERNAL]  Set the temporary variable.
+
+";
+
 %feature("docstring")  casadi::GenericMatrix< MX  >::is_square() const "
 
 Check if the matrix expression is square.
@@ -8194,34 +8024,6 @@ Returns the truth value of an MX expression.
 
 ";
 
-%feature("docstring")  casadi::MX::tang(const Function &f, int iind=0, int
-oind=0) "
-
-Tangent expression.
-
-";
-
-%feature("docstring")  casadi::MX::tang(const Function &f, const std::string
-&iname, int oind=0) "
-
-Tangent expression.
-
-";
-
-%feature("docstring")  casadi::MX::tang(const Function &f, int iind, const
-std::string &oname) "
-
-Tangent expression.
-
-";
-
-%feature("docstring")  casadi::MX::tang(const Function &f, const std::string
-&iname, const std::string &oname) "
-
-Tangent expression.
-
-";
-
 %feature("docstring")  casadi::MX::name() const  "
 
 Get the name.
@@ -8302,9 +8104,9 @@ Is unary operation.
 
 ";
 
-%feature("docstring")  casadi::MX::setTemp(int t) "
+%feature("docstring")  casadi::GenericMatrix< MX  >::sparsity() const "
 
-[INTERNAL]  Set the temporary variable.
+Get the sparsity pattern.
 
 ";
 

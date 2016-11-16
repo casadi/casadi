@@ -4406,11 +4406,6 @@ x+y^3)/6 $ $ (-3 x^2 y-x^3)/6+y+x $
 
 ";
 
-%feature("docstring") casadi::Matrix::grad "[INTERNAL]  Gradient
-expression.
-
-";
-
 %feature("docstring") casadi::Matrix::set "
 
 >  void casadi::Matrix< Scalar >::set(const Matrix< Scalar > &m, bool ind1, const Slice &rr)
@@ -4510,9 +4505,19 @@ their ID.
 
 ";
 
-%feature("docstring") casadi::Matrix::is_tril "
+%feature("docstring") casadi::Matrix::erase "
 
-Check if the matrix is lower triangular.
+>  void casadi::Matrix< Scalar >::erase(const std::vector< int > &rr, const std::vector< int > &cc, bool ind1=false)
+------------------------------------------------------------------------
+[INTERNAL] 
+Erase a submatrix (leaving structural zeros in its place) Erase rows
+and/or columns of a matrix.
+
+>  void casadi::Matrix< Scalar >::erase(const std::vector< int > &rr, bool ind1=false)
+------------------------------------------------------------------------
+[INTERNAL] 
+Erase a submatrix (leaving structural zeros in its place) Erase
+elements of a matrix.
 
 ";
 
@@ -4633,15 +4638,6 @@ streams.
 
 ";
 
-%feature("docstring") casadi::Matrix::n_dep "[INTERNAL]  Get the number of
-dependencies of a binary SXElem Only defined if symbolic scalar.
-
-";
-
-%feature("docstring") casadi::Matrix::hess "[INTERNAL]  Hessian expression
-
-";
-
 %feature("docstring") casadi::Matrix::is_dense "
 
 Check if the matrix expression is dense.
@@ -4660,10 +4656,6 @@ Get the number of non-zeros in the lower triangular half.
 ";
 
 %feature("docstring") casadi::Matrix::reserve "[INTERNAL] ";
-
-%feature("docstring") casadi::Matrix::tang "[INTERNAL]  Tangent expression.
-
-";
 
 %feature("docstring") casadi::Matrix::is_one "[INTERNAL]  check if the
 matrix is 1 (note that false negative answers are possible)
@@ -4815,10 +4807,6 @@ Only defined if symbolic scalar.
 
 ";
 
-%feature("docstring") casadi::Matrix::jac "[INTERNAL]  Jacobian expression.
-
-";
-
 %feature("docstring") friendwrap_sparsify "[INTERNAL]  Make a matrix sparse
 by removing numerical zeros.
 
@@ -4908,19 +4896,8 @@ Get the size along a particular dimensions.
 
 ";
 
-%feature("docstring") casadi::Matrix::erase "
-
->  void casadi::Matrix< Scalar >::erase(const std::vector< int > &rr, const std::vector< int > &cc, bool ind1=false)
-------------------------------------------------------------------------
-[INTERNAL] 
-Erase a submatrix (leaving structural zeros in its place) Erase rows
-and/or columns of a matrix.
-
->  void casadi::Matrix< Scalar >::erase(const std::vector< int > &rr, bool ind1=false)
-------------------------------------------------------------------------
-[INTERNAL] 
-Erase a submatrix (leaving structural zeros in its place) Erase
-elements of a matrix.
+%feature("docstring") casadi::Matrix::n_dep "[INTERNAL]  Get the number of
+dependencies of a binary SXElem Only defined if symbolic scalar.
 
 ";
 
@@ -5058,6 +5035,12 @@ Integrate f from a to b using Gaussian quadrature with n points.
 %feature("docstring") casadi::Matrix::get_row "
 
 Get the sparsity pattern. See the Sparsity class for details.
+
+";
+
+%feature("docstring") casadi::Matrix::is_tril "
+
+Check if the matrix is lower triangular.
 
 ";
 
@@ -5316,12 +5299,6 @@ Joel Andersson
 
 C++ includes: mx.hpp ";
 
-%feature("docstring") casadi::MX::grad "
-
-Gradient expression.
-
-";
-
 %feature("docstring") casadi::MX::is_scalar "
 
 Check if the matrix expression is scalar.
@@ -5412,15 +5389,15 @@ Check if commutative operation.
 
 ";
 
-%feature("docstring") friendwrap_lift "
-
-Lift the expression Experimental feature.
-
-";
-
 %feature("docstring") casadi::MX::is_tril "
 
 Check if the matrix is lower triangular.
+
+";
+
+%feature("docstring") friendwrap_lift "
+
+Lift the expression Experimental feature.
 
 ";
 
@@ -5623,12 +5600,6 @@ Get the sparsity pattern. See the Sparsity class for details.
 
 ";
 
-%feature("docstring") casadi::MX::sparsity "
-
-Get the sparsity pattern.
-
-";
-
 %feature("docstring") casadi::MX::is_call "
 
 Check if evaluation.
@@ -5645,12 +5616,6 @@ Get the number of non-zeros in the upper triangular half.
 
 Returns a number that is unique for a given Node. If the Object does not
 point to any node, \"0\" is returned.
-
-";
-
-%feature("docstring") casadi::MX::jac "
-
-Jacobian expression.
 
 ";
 
@@ -5796,6 +5761,11 @@ symbolic primitives.
 
 ";
 
+%feature("docstring") casadi::MX::setTemp "[INTERNAL]  Set the temporary
+variable.
+
+";
+
 %feature("docstring") casadi::MX::is_square "
 
 Check if the matrix expression is square.
@@ -5858,12 +5828,6 @@ Returns the truth value of an MX expression.
 
 %feature("docstring") casadi::MX::resetInput "[INTERNAL]  Reset the marker
 for an input expression.
-
-";
-
-%feature("docstring") casadi::MX::tang "
-
-Tangent expression.
 
 ";
 
@@ -5941,8 +5905,9 @@ Is unary operation.
 
 ";
 
-%feature("docstring") casadi::MX::setTemp "[INTERNAL]  Set the temporary
-variable.
+%feature("docstring") casadi::MX::sparsity "
+
+Get the sparsity pattern.
 
 ";
 

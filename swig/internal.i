@@ -352,31 +352,7 @@
 %exception  casadi::SX::element_hash() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::SX::grad(const Function &f, const std::string &iname, const std::string &oname) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::SX::grad(const Function &f, const std::string &iname, int oind=0) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::SX::grad(const Function &f, int iind, const std::string &oname) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::SX::grad(const Function &f, int iind=0, int oind=0) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::SX::has_duplicates() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::SX::hess(const Function &f, const std::string &iname, const std::string &oname) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::SX::hess(const Function &f, const std::string &iname, int oind=0) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::SX::hess(const Function &f, int iind, const std::string &oname) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::SX::hess(const Function &f, int iind=0, int oind=0) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::SX::is_commutative() const  {
@@ -397,18 +373,6 @@
 %exception  casadi::SX::is_valid_input() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::SX::jac(const Function &f, const std::string &iname, const std::string &oname, bool compact=false, bool symmetric=false) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::SX::jac(const Function &f, const std::string &iname, int oind=0, bool compact=false, bool symmetric=false) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::SX::jac(const Function &f, int iind, const std::string &oname, bool compact=false, bool symmetric=false) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::SX::jac(const Function &f, int iind=0, int oind=0, bool compact=false, bool symmetric=false) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::SX::n_dep() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -419,18 +383,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::SX::resetInput() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::SX::tang(const Function &f, const std::string &iname, const std::string &oname) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::SX::tang(const Function &f, const std::string &iname, int oind=0) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::SX::tang(const Function &f, int iind, const std::string &oname) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::SX::tang(const Function &f, int iind=0, int oind=0) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::SharedObject::printPtr(std::ostream &stream=casadi::userOut()) const  {
