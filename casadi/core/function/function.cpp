@@ -905,20 +905,6 @@ namespace casadi {
     (*this)->reverse(arg, res, aseed, asens, always_inline, never_inline);
   }
 
-  void Function::forward(const vector<DM>& arg, const vector<DM>& res,
-                         const vector<vector<DM> >& fseed,
-                         vector<vector<DM> >& fsens,
-                         bool always_inline, bool never_inline) {
-    (*this)->forward(arg, res, fseed, fsens, always_inline, never_inline);
-  }
-
-  void Function::reverse(const vector<DM>& arg, const vector<DM>& res,
-                         const vector<vector<DM> >& aseed,
-                         vector<vector<DM> >& asens,
-                         bool always_inline, bool never_inline) {
-    (*this)->reverse(arg, res, aseed, asens, always_inline, never_inline);
-  }
-
   vector<DM> Function::operator()(const vector<DM>& arg) {
     vector<DM> res;
     call(arg, res);

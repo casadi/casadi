@@ -2404,22 +2404,6 @@ namespace casadi {
     casadi_error("'reverse' (SX) not defined for " + type_name());
   }
 
-  void FunctionInternal::
-  forward_dm(const std::vector<DM>& arg, const std::vector<DM>& res,
-          const std::vector<std::vector<DM> >& fseed,
-          std::vector<std::vector<DM> >& fsens,
-          bool always_inline, bool never_inline) {
-    casadi_error("Not implemented");
-  }
-
-  void FunctionInternal::
-  reverse_dm(const std::vector<DM>& arg, const std::vector<DM>& res,
-          const std::vector<std::vector<DM> >& aseed,
-          std::vector<std::vector<DM> >& asens,
-          bool always_inline, bool never_inline) {
-    casadi_error("Not implemented");
-  }
-
   double FunctionInternal::ad_weight() const {
     // If reverse mode derivatives unavailable, use forward
     if (get_n_reverse()==0) return 0;

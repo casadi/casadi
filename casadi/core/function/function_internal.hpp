@@ -230,10 +230,6 @@ namespace casadi {
                             const std::vector<std::vector<SX> >& fseed,
                             std::vector<std::vector<SX> >& fsens,
                             bool always_inline, bool never_inline);
-    virtual void forward_dm(const std::vector<DM>& arg, const std::vector<DM>& res,
-                            const std::vector<std::vector<DM> >& fseed,
-                            std::vector<std::vector<DM> >& fsens,
-                            bool always_inline, bool never_inline);
     ///@}
 
     ///@{
@@ -250,13 +246,6 @@ namespace casadi {
                   std::vector<std::vector<SX> >& fsens,
                   bool always_inline, bool never_inline) {
       forward_sx(arg, res, fseed, fsens, always_inline, never_inline);
-    }
-
-    void _forward(const std::vector<DM>& arg, const std::vector<DM>& res,
-                  const std::vector<std::vector<DM> >& fseed,
-                  std::vector<std::vector<DM> >& fsens,
-                  bool always_inline, bool never_inline) {
-      forward_dm(arg, res, fseed, fsens, always_inline, never_inline);
     }
 
     ///@}
@@ -278,10 +267,6 @@ namespace casadi {
                             const std::vector<std::vector<SX> >& aseed,
                             std::vector<std::vector<SX> >& asens,
                             bool always_inline, bool never_inline);
-    virtual void reverse_dm(const std::vector<DM>& arg, const std::vector<DM>& res,
-                            const std::vector<std::vector<DM> >& aseed,
-                            std::vector<std::vector<DM> >& asens,
-                            bool always_inline, bool never_inline);
     ///@}
 
     ///@{
@@ -300,12 +285,6 @@ namespace casadi {
       reverse_sx(arg, res, aseed, asens, always_inline, never_inline);
     }
 
-    void _reverse(const std::vector<DM>& arg, const std::vector<DM>& res,
-                  const std::vector<std::vector<DM> >& aseed,
-                  std::vector<std::vector<DM> >& asens,
-                  bool always_inline, bool never_inline) {
-      reverse_dm(arg, res, aseed, asens, always_inline, never_inline);
-    }
     ///@}
 
     /** \brief Reverse mode AD, templated */

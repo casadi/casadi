@@ -545,18 +545,6 @@ namespace casadi {
                  std::vector<std::vector<SX> >& SWIG_OUTPUT(asens),
                  bool always_inline=false, bool never_inline=false);
 
-    /** \brief [DEPRECATED] Use Function::factory or jtimes  */
-    void forward(const std::vector<DM>& arg, const std::vector<DM>& res,
-                 const std::vector<std::vector<DM> >& fseed,
-                 std::vector<std::vector<DM> >& SWIG_OUTPUT(fsens),
-                 bool always_inline=false, bool never_inline=false);
-
-    /** \brief [DEPRECATED] Use Function::factory or jtimes  */
-    void reverse(const std::vector<DM>& arg, const std::vector<DM>& res,
-                 const std::vector<std::vector<DM> >& aseed,
-                 std::vector<std::vector<DM> >& SWIG_OUTPUT(asens),
-                 bool always_inline=false, bool never_inline=false);
-
     /** \brief  Evaluate symbolically in parallel and sum (matrix graph)
         \param parallelization Type of parallelization used: unroll|serial|openmp
     */
