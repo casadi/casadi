@@ -161,8 +161,8 @@ class ADtests(casadiTestCase):
             fseeds = [DM(f.sparsity_in(0),x) for x in seeds]
             aseeds = [DM(f.sparsity_out(0),x) for x in seeds]
             res = f(y)
-            fwdsens = f.forward([y], [res], [[x] for x in fseeds])
-            adjsens = f.reverse([y], [res], [[x] for x in aseeds])
+            fwdsens = forward([res], [y], [[x] for x in fseeds])
+            adjsens = reverse([res], [y], [[x] for x in aseeds])
             fwdsens = [x[0] for x in fwdsens]
             adjsens = [x[0] for x in adjsens]
 
@@ -201,8 +201,8 @@ class ADtests(casadiTestCase):
             fseeds = [DM(f.sparsity_in(0),x) for x in seeds]
             aseeds = [DM(f.sparsity_out(0),x) for x in seeds]
             res = f(y)
-            fwdsens = f.forward([y],[res],[[x] for x in fseeds])
-            adjsens = f.reverse([y],[res],[[x] for x in aseeds])
+            fwdsens = forward([res],[y], [[x] for x in fseeds])
+            adjsens = reverse([res],[y], [[x] for x in aseeds])
             fwdsens = [x[0] for x in fwdsens]
             adjsens = [x[0] for x in adjsens]
 
@@ -243,8 +243,8 @@ class ADtests(casadiTestCase):
             fseeds = [DM(f.sparsity_in(0),x) for x in seeds]
             aseeds = [DM(f.sparsity_out(0),x) for x in seeds]
             res = f(y)
-            fwdsens = f.forward([y],[res],[[x] for x in fseeds])
-            adjsens = f.reverse([y],[res],[[x] for x in aseeds])
+            fwdsens = forward([res],[y],[[x] for x in fseeds])
+            adjsens = reverse([res],[y],[[x] for x in aseeds])
             fwdsens = [x[0] for x in fwdsens]
             adjsens = [x[0] for x in adjsens]
 
@@ -281,8 +281,8 @@ class ADtests(casadiTestCase):
             y = SX.sym("y",f.sparsity_in(0))
 
             res = f(y)
-            fwdsens = f.forward([y],[res],[])
-            adjsens = f.reverse([y],[res],[])
+            fwdsens = forward([res],[y],[])
+            adjsens = reverse([res],[y],[])
 
             fe = Function("fe", [y],[res])
 
@@ -627,8 +627,8 @@ class ADtests(casadiTestCase):
             inputss = [sym("i",f.sparsity_in(i)) for i in range(f.n_in())]
 
             res = f.call(inputss,True)
-            fwdsens = f.forward(inputss,res,fseeds,True)
-            adjsens = f.reverse(inputss,res,aseeds,True)
+            fwdsens = forward(res,inputss,fseeds,dict(always_inline=True))
+            adjsens = reverse(res,inputss,aseeds,dict(always_inline=True))
 
             fseed = [DM(fseeds[d][0].sparsity(),random.random(fseeds[d][0].nnz())) for d in range(ndir) ]
             aseed = [DM(aseeds[d][0].sparsity(),random.random(aseeds[d][0].nnz())) for d in range(ndir) ]
@@ -693,8 +693,8 @@ class ADtests(casadiTestCase):
               inputss2 = [sym2("i",vf_mx.sparsity_in(i)) for i in range(vf.n_in())]
 
               res2 = vf.call(inputss2,True)
-              fwdsens2 = vf.forward(inputss2,res2,fseeds2,True)
-              adjsens2 = vf.reverse(inputss2,res2,aseeds2,True)
+              fwdsens2 = forward(res2,inputss2,fseeds2,dict(always_inline=True))
+              adjsens2 = reverse(res2,inputss2,aseeds2,dict(always_inline=True))
 
               vf2 = Function("vf2", inputss2+vec([fseeds2[i]+aseeds2[i] for i in range(ndir)]),list(res2) + vec([list(fwdsens2[i])+list(adjsens2[i]) for i in range(ndir)]))
 

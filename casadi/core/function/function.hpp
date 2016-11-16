@@ -521,30 +521,6 @@ namespace casadi {
 
 #endif // SWIG
 
-    /** \brief [DEPRECATED] Use Function::factory or jtimes  */
-    void forward(const std::vector<MX>& arg, const std::vector<MX>& res,
-                 const std::vector<std::vector<MX> >& fseed,
-                 std::vector<std::vector<MX> >& SWIG_OUTPUT(fsens),
-                 bool always_inline=false, bool never_inline=false);
-
-    /** \brief [DEPRECATED] Use Function::factory or jtimes  */
-    void reverse(const std::vector<MX>& arg, const std::vector<MX>& res,
-                 const std::vector<std::vector<MX> >& aseed,
-                 std::vector<std::vector<MX> >& SWIG_OUTPUT(asens),
-                 bool always_inline=false, bool never_inline=false);
-
-    /** \brief [DEPRECATED] Use Function::factory or jtimes  */
-    void forward(const std::vector<SX>& arg, const std::vector<SX>& res,
-                 const std::vector<std::vector<SX> >& fseed,
-                 std::vector<std::vector<SX> >& SWIG_OUTPUT(fsens),
-                 bool always_inline=false, bool never_inline=false);
-
-    /** \brief [DEPRECATED] Use Function::factory or jtimes  */
-    void reverse(const std::vector<SX>& arg, const std::vector<SX>& res,
-                 const std::vector<std::vector<SX> >& aseed,
-                 std::vector<std::vector<SX> >& SWIG_OUTPUT(asens),
-                 bool always_inline=false, bool never_inline=false);
-
     /** \brief  Evaluate symbolically in parallel and sum (matrix graph)
         \param parallelization Type of parallelization used: unroll|serial|openmp
     */

@@ -338,7 +338,7 @@ Function Function::rootfinder_fun() {
     for (int d=0; d<nfwd; ++d) {
       f_fseed[d].at(iin_) = MX(size_in(iin_)); // ignore seeds for guess
     }
-    oracle_.forward(f_arg, f_res, f_fseed, fsens, always_inline, never_inline);
+    oracle_->forward(f_arg, f_res, f_fseed, fsens, always_inline, never_inline);
 
     // Get expression of Jacobian
     Function jac = get_function("jac_f_z");
@@ -354,7 +354,7 @@ Function Function::rootfinder_fun() {
     int num_out = n_out();
     if (num_out>1) {
       for (int d=0; d<nfwd; ++d) f_fseed[d][iin_] = fsens[d][iout_];
-      oracle_.forward(f_arg, f_res, f_fseed, fsens, always_inline, never_inline);
+      oracle_->forward(f_arg, f_res, f_fseed, fsens, always_inline, never_inline);
       for (int d=0; d<nfwd; ++d) fsens[d][iout_] = f_fseed[d][iin_]; // Otherwise overwritten
     }
   }
@@ -393,7 +393,7 @@ Function Function::rootfinder_fun() {
     vector<MX> rhs(nadj);
     vector<vector<MX> > asens_aux;
     if (num_out>1) {
-      oracle_.reverse(f_arg, f_res, f_aseed, asens_aux, always_inline, never_inline);
+      oracle_->reverse(f_arg, f_res, f_aseed, asens_aux, always_inline, never_inline);
       for (int d=0; d<nadj; ++d) rhs[d] = vec(asens_aux[d][iin_] + aseed[d][iout_]);
     } else {
       for (int d=0; d<nadj; ++d) rhs[d] = vec(aseed[d][iout_]);
@@ -420,7 +420,7 @@ Function Function::rootfinder_fun() {
     }
 
     // Propagate through f_
-    oracle_.reverse(f_arg, f_res, f_aseed, asens, always_inline, never_inline);
+    oracle_->reverse(f_arg, f_res, f_aseed, asens, always_inline, never_inline);
 
     // No dependency on guess (2)
     for (int d=0; d<nadj; ++d) {

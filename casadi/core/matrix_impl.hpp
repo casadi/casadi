@@ -2550,41 +2550,23 @@ namespace casadi {
 
   template<typename MatType>
   MatType _jtimes(const MatType &ex, const MatType &arg, const MatType &v, bool tr) {
-    Function f("tmp", {arg}, {ex});
-
-    // Split up v
-    std::vector<MatType> vv = horzsplit(v);
-
-    // Make sure well-posed
-    casadi_assert(vv.size() >= 1);
-    casadi_assert(ex.is_column());
-    casadi_assert(arg.is_column());
-    if (tr) {
-      casadi_assert(v.size1()==ex.size1());
-    } else {
-      casadi_assert(v.size1()==arg.size1());
-    }
-
-    // Assemble arguments and directional derivatives
-    std::vector<MatType> argv = MatType::get_input(f);
-    std::vector<MatType> resv = f(argv);
-    std::vector<std::vector<MatType> > seed(vv.size()), sens;
-    for (int dir=0; dir<vv.size(); ++dir) {
-      seed[dir] = { vv[dir]};
-    }
+    // Seeds as a vector of vectors
+    int seed_dim = tr ? ex.size2() : arg.size2();
+    casadi_assert(v.size2() % seed_dim == 0);
+    std::vector<MatType> w = horzsplit(v, seed_dim);
+    std::vector<std::vector<MatType> > ww(w.size(), std::vector<MatType>(1));
+    for (int i=0; i<w.size(); ++i) ww[i][0] = w[i];
 
     // Calculate directional derivatives
     if (tr) {
-      f.reverse(argv, resv, seed, sens);
+      ww = reverse({ex}, {arg}, ww);
     } else {
-      f.forward(argv, resv, seed, sens);
+      ww = forward({ex}, {arg}, ww);
     }
 
-    // Get the results
-    for (int dir=0; dir<vv.size(); ++dir) {
-      vv[dir] = sens[dir].at(0);
-    }
-    return horzcat(vv);
+    // Get results
+    for (int i=0; i<w.size(); ++i) w[i] = ww[i][0];
+    return horzcat(w);
   }
 
   template<typename MatType>

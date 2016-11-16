@@ -1578,7 +1578,7 @@ namespace casadi {
     // Call internal function on a temporary object
     Function temp("forward_temp", arg, ex);
     std::vector<std::vector<MX> > ret;
-    temp.forward(arg, ex, v, ret, always_inline, never_inline);
+    temp->forward(arg, ex, v, ret, always_inline, never_inline);
     return ret;
   }
 
@@ -1601,7 +1601,7 @@ namespace casadi {
     // Call internal function on a temporary object
     Function temp("reverse_temp", arg, ex);
     std::vector<std::vector<MX> > ret;
-    temp.reverse(arg, ex, v, ret, always_inline, never_inline);
+    temp->reverse(arg, ex, v, ret, always_inline, never_inline);
     return ret;
   }
 

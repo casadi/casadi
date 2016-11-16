@@ -270,8 +270,8 @@ namespace casadi {
         res.push_back(out_[s]);
       }
       // Calculate directional derivatives
-      Function df("df", arg, res, fwd_in_, fwd_out_);
-      df.forward(arg, res, seed, sens, true, false);
+      Dict opts = {{"always_inline", true}};
+      sens = forward(res, arg, seed, opts);
 
       // Get directional derivatives
       for (int i=0; i<fwd_out_.size(); ++i) {
@@ -295,8 +295,8 @@ namespace casadi {
         in_["adj:" + s] = seed[0].back();
       }
       // Calculate directional derivatives
-      Function df("df", arg, res, adj_in_, adj_out_);
-      df.reverse(arg, res, seed, sens, true, false);
+      Dict opts = {{"always_inline", true}};
+      sens = reverse(res, arg, seed, opts);
 
       // Get directional derivatives
       for (int i=0; i<adj_out_.size(); ++i) {

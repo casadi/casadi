@@ -368,7 +368,7 @@ namespace casadi {
 
     // Calculate directional derivatives
     vector<vector<MatType>> sens;
-    oracle_.forward(arg, res, seed, sens, true);
+    oracle_->forward(arg, res, seed, sens, true, false);
 
     // Collect sensitivity equations
     casadi_assert(sens.size()==nfwd);
@@ -441,7 +441,7 @@ namespace casadi {
 
     // Calculate directional derivatives
     vector<vector<MatType>> sens;
-    oracle_.reverse(arg, res, seed, sens, true);
+    oracle_->reverse(arg, res, seed, sens, true, false);
 
     // Collect sensitivity equations
     casadi_assert(sens.size()==nadj);
