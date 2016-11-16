@@ -544,6 +544,22 @@ namespace casadi {
       return MatType::jtimes(ex, arg, v, tr);
     }
 
+    /** \brief Forward directional derivative */
+    friend inline std::vector<std::vector<MatType> >
+    forward(const std::vector<MatType> &ex, const std::vector<MatType> &arg,
+            const std::vector<std::vector<MatType> > &v,
+            const Dict& opts = Dict()) {
+      return MatType::forward(ex, arg, v, opts);
+    }
+
+    /** \brief Reverse directional derivative */
+    friend inline std::vector<std::vector<MatType> >
+    reverse(const std::vector<MatType> &ex, const std::vector<MatType> &arg,
+            const std::vector<std::vector<MatType> > &v,
+            const Dict& opts = Dict()) {
+      return MatType::reverse(ex, arg, v, opts);
+    }
+
     ///@{
     // Hessian and (optionally) gradient
     inline friend MatType hessian(const MatType &ex, const MatType &arg) {
