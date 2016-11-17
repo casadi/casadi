@@ -248,7 +248,7 @@ Function Function::rootfinder_fun() {
     return Function(name, arg, res, i_names, o_names, opts);
   }
 
-  void Rootfinder::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+  void Rootfinder::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     int num_out = n_out();
     int num_in = n_in();
     bvec_t* tmp1 = w; w += n_;
@@ -277,7 +277,7 @@ Function Function::rootfinder_fun() {
     }
   }
 
-  void Rootfinder::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+  void Rootfinder::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     int num_out = n_out();
     int num_in = n_in();
     bvec_t* tmp1 = w; w += n_;

@@ -201,12 +201,12 @@ namespace casadi {
     int worksize = 0;
 
     // Find a place in the work vector for the operation
-    for (auto it=algorithm_.begin(); it!=algorithm_.end(); ++it) {
+    for (auto&& e : algorithm_) {
 
       // There are two tasks, allocate memory of the result and free the
       // memory off the arguments, order depends on whether inplace is possible
       int first_to_free = 0;
-      int last_to_free = it->op==OP_OUTPUT ? 1 : it->data->numInplace();
+      int last_to_free = e.op==OP_OUTPUT ? 1 : e.data->numInplace();
       for (int task=0; task<2; ++task) {
 
         // Dereference or free the memory of the arguments
@@ -215,7 +215,7 @@ namespace casadi {
                                                           // at the top of the stack
 
           // Index of the argument
-          int& ch_ind = it->arg[c];
+          int& ch_ind = e.arg[c];
           if (ch_ind>=0) {
 
             // Decrease reference count and add to the stack of
@@ -238,34 +238,34 @@ namespace casadi {
         }
 
         // Nothing more to allocate
-        if (it->op==OP_OUTPUT || task==1) break;
+        if (e.op==OP_OUTPUT || task==1) break;
 
         // Free the rest in the next iteration
         first_to_free = last_to_free;
-        last_to_free = it->arg.size();
+        last_to_free = e.arg.size();
 
         // Allocate/reuse memory for the results of the operation
-        for (int c=0; c<it->res.size(); ++c) {
-          if (it->res[c]>=0) {
+        for (int c=0; c<e.res.size(); ++c) {
+          if (e.res[c]>=0) {
 
             // Are reuse of variables (live variables) enabled?
             if (live_variables) {
               // Get a pointer to the sparsity pattern node
-              int nnz = it->data->sparsity(c).nnz();
+              int nnz = e.data->sparsity(c).nnz();
 
               // Get a reference to the stack for the current sparsity
               stack<int>& unused = unused_all[nnz];
 
               // Try to reuse a variable from the stack if possible (last in, first out)
               if (!unused.empty()) {
-                it->res[c] = place[it->res[c]] = unused.top();
+                e.res[c] = place[e.res[c]] = unused.top();
                 unused.pop();
                 continue; // Success, no new element needed in the work vector
               }
             }
 
             // Allocate a new element in the work vector
-            it->res[c] = place[it->res[c]] = worksize++;
+            e.res[c] = place[e.res[c]] = worksize++;
           }
         }
       }
@@ -285,17 +285,17 @@ namespace casadi {
     workloc_.resize(worksize+1);
     fill(workloc_.begin(), workloc_.end(), -1);
     size_t wind=0, sz_w=0;
-    for (auto it=algorithm_.begin(); it!=algorithm_.end(); ++it) {
-      if (it->op!=OP_OUTPUT) {
-        for (int c=0; c<it->res.size(); ++c) {
-          if (it->res[c]>=0) {
-            alloc_arg(it->data->sz_arg());
-            alloc_res(it->data->sz_res());
-            alloc_iw(it->data->sz_iw());
-            sz_w = max(sz_w, it->data->sz_w());
-            if (workloc_[it->res[c]] < 0) {
-              workloc_[it->res[c]] = wind;
-              wind += it->data->sparsity(c).nnz();
+    for (auto&& e : algorithm_) {
+      if (e.op!=OP_OUTPUT) {
+        for (int c=0; c<e.res.size(); ++c) {
+          if (e.res[c]>=0) {
+            alloc_arg(e.data->sz_arg());
+            alloc_res(e.data->sz_res());
+            alloc_iw(e.data->sz_iw());
+            sz_w = max(sz_w, e.data->sz_w());
+            if (workloc_[e.res[c]] < 0) {
+              workloc_[e.res[c]] = wind;
+              wind += e.data->sparsity(c).nnz();
             }
           }
         }
@@ -461,53 +461,53 @@ namespace casadi {
 
   void MXFunction::print(ostream &stream) const {
     FunctionInternal::print(stream);
-    for (vector<AlgEl>::const_iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it) {
+    for (auto&& e : algorithm_) {
       InterruptHandler::check();
-      print(stream, *it);
+      print(stream, e);
       stream << endl;
     }
   }
 
-  void MXFunction::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+  void MXFunction::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     // Temporaries to hold pointers to operation input and outputs
     const bvec_t** arg1=arg+n_in();
     bvec_t** res1=res+n_out();
 
     // Propagate sparsity forward
-    for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); it++) {
-      if (it->op==OP_INPUT) {
+    for (auto&& e : algorithm_) {
+      if (e.op==OP_INPUT) {
         // Pass input seeds
-        int nnz=it->data.nnz();
-        int i=it->arg.at(0);
-        int nz_offset=it->arg.at(2);
+        int nnz=e.data.nnz();
+        int i=e.arg.at(0);
+        int nz_offset=e.arg.at(2);
         const bvec_t* argi = arg[i];
-        bvec_t* w1 = w + workloc_[it->res.front()];
+        bvec_t* w1 = w + workloc_[e.res.front()];
         if (argi!=0) {
           copy(argi+nz_offset, argi+nz_offset+nnz, w1);
         } else {
           fill_n(w1, nnz, 0);
         }
-      } else if (it->op==OP_OUTPUT) {
+      } else if (e.op==OP_OUTPUT) {
         // Get the output sensitivities
-        int i=it->res.front();
+        int i=e.res.front();
         int nnz=nnz_out(i);
         bvec_t* resi = res[i];
-        bvec_t* w1 = w + workloc_[it->arg.front()];
+        bvec_t* w1 = w + workloc_[e.arg.front()];
         if (resi!=0) copy(w1, w1+nnz, resi);
       } else {
         // Point pointers to the data corresponding to the element
-        for (int i=0; i<it->arg.size(); ++i)
-          arg1[i] = it->arg[i]>=0 ? w+workloc_[it->arg[i]] : 0;
-        for (int i=0; i<it->res.size(); ++i)
-          res1[i] = it->res[i]>=0 ? w+workloc_[it->res[i]] : 0;
+        for (int i=0; i<e.arg.size(); ++i)
+          arg1[i] = e.arg[i]>=0 ? w+workloc_[e.arg[i]] : 0;
+        for (int i=0; i<e.res.size(); ++i)
+          res1[i] = e.res[i]>=0 ? w+workloc_[e.res[i]] : 0;
 
         // Propagate sparsity forwards
-        it->data->sp_fwd(arg1, res1, iw, w, 0);
+        e.data->sp_fwd(arg1, res1, iw, w, 0);
       }
     }
   }
 
-  void MXFunction::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+  void MXFunction::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     // Temporaries to hold pointers to operation input and outputs
     bvec_t** arg1=arg+n_in();
     bvec_t** res1=res+n_out();
@@ -515,7 +515,7 @@ namespace casadi {
     fill_n(w, sz_w(), 0);
 
     // Propagate sparsity backwards
-    for (vector<AlgEl>::reverse_iterator it=algorithm_.rbegin(); it!=algorithm_.rend(); it++) {
+    for (auto it=algorithm_.rbegin(); it!=algorithm_.rend(); it++) {
       if (it->op==OP_INPUT) {
         // Get the input sensitivities and clear it from the work vector
         int nnz=it->data.nnz();
@@ -609,7 +609,7 @@ namespace casadi {
 
     // Loop over computational nodes in forward order
     int alg_counter = 0;
-    for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it, ++alg_counter) {
+    for (auto it=algorithm_.begin(); it!=algorithm_.end(); ++it, ++alg_counter) {
       if (it->op == OP_INPUT) {
         swork[it->res.front()] = project(arg_split.at(it->arg.at(0)).at(it->arg.at(1)),
                                          it->data.sparsity(), true);
@@ -711,34 +711,34 @@ namespace casadi {
     vector<bool> skip(nfwd, false);
 
     // Loop over computational nodes in forward order
-    for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it) {
-      if (it->op == OP_INPUT) {
+    for (auto&& e : algorithm_) {
+      if (e.op == OP_INPUT) {
         // Fetch forward seed
         for (int d=0; d<nfwd; ++d) {
-          dwork[it->res.front()][d] = project(fseed_split[d].at(it->arg.at(0)).at(it->arg.at(1)),
-                                              it->data.sparsity(), true);
+          dwork[e.res.front()][d] = project(fseed_split[d].at(e.arg.at(0)).at(e.arg.at(1)),
+                                              e.data.sparsity(), true);
         }
-      } else if (it->op==OP_OUTPUT) {
+      } else if (e.op==OP_OUTPUT) {
         // Collect forward sensitivity
         for (int d=0; d<nfwd; ++d) {
-          fsens[d][it->res.front()] = dwork[it->arg.front()][d];
+          fsens[d][e.res.front()] = dwork[e.arg.front()][d];
         }
-      } else if (it->op==OP_PARAMETER) {
+      } else if (e.op==OP_PARAMETER) {
         // Fetch parameter
         for (int d=0; d<nfwd; ++d) {
-          dwork[it->res.front()][d] = MX();
+          dwork[e.res.front()][d] = MX();
         }
       } else {
         // Get seeds, ignoring all-zero directions
         oseed.clear();
         for (int d=0; d<nfwd; ++d) {
           // Collect seeds, skipping directions with only zeros
-          vector<MX> seed(it->arg.size());
+          vector<MX> seed(e.arg.size());
           skip[d] = true; // All seeds are zero?
-          for (int i=0; i<it->arg.size(); ++i) {
-            int el = it->arg[i];
+          for (int i=0; i<e.arg.size(); ++i) {
+            int el = e.arg[i];
             if (el<0 || dwork[el][d].is_empty(true)) {
-              seed[i] = MX(it->data->dep(i).size());
+              seed[i] = MX(e.data->dep(i).size());
             } else {
               seed[i] = dwork[el][d];
             }
@@ -750,17 +750,17 @@ namespace casadi {
         // Perform the operation
         osens.resize(oseed.size());
         if (!osens.empty()) {
-          fill(osens.begin(), osens.end(), vector<MX>(it->res.size()));
-          it->data->evalFwd(oseed, osens);
+          fill(osens.begin(), osens.end(), vector<MX>(e.res.size()));
+          e.data->evalFwd(oseed, osens);
         }
 
         // Store sensitivities
         int d1=0;
         for (int d=0; d<nfwd; ++d) {
-          for (int i=0; i<it->res.size(); ++i) {
-            int el = it->res[i];
+          for (int i=0; i<e.res.size(); ++i) {
+            int el = e.res[i];
             if (el>=0) {
-              dwork[el][d] = skip[d] ? MX(it->data->sparsity(i).size()) : osens[d1][i];
+              dwork[el][d] = skip[d] ? MX(e.data->sparsity(i).size()) : osens[d1][i];
             }
           }
           if (!skip[d]) d1++;
@@ -835,7 +835,7 @@ namespace casadi {
     log("MXFunction::evalAdj allocated derivative work vector (adjoint mode)");
 
     // Loop over computational nodes in reverse order
-    for (vector<AlgEl>::reverse_iterator it=algorithm_.rbegin(); it!=algorithm_.rend(); ++it) {
+    for (auto it=algorithm_.rbegin(); it!=algorithm_.rend(); ++it) {
       if (it->op == OP_INPUT) {
         // Get the adjoint sensitivities
         for (int d=0; d<nadj; ++d) {
@@ -1107,18 +1107,18 @@ namespace casadi {
     vector<int> arg, res;
 
     // Codegen the algorithm
-    for (vector<AlgEl>::const_iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it) {
-      if (it->op==OP_OUTPUT) {
-        int n = nnz_out(it->res.front());
+    for (auto&& e : algorithm_) {
+      if (e.op==OP_OUTPUT) {
+        int n = nnz_out(e.res.front());
         if (n!=0) {
-          int oind = it->res.front();
+          int oind = e.res.front();
           if (g.verbose) {
             s << "  /* #" << k++ << ": Output " << oind;
             s << " (" << oscheme_.at(oind) << ")";
             s << " */" << endl;
           }
           string r = "res[" + g.to_string(oind) + "]";
-          int i = it->arg.front();
+          int i = e.arg.front();
           s << "  if (" << r << ") ";
           if (n==1) {
             s << "*" << r << " = " << g.workel(i) << ";" << endl;
@@ -1126,18 +1126,18 @@ namespace casadi {
             s << g.copy(g.work(i, n), n, r) << endl;
           }
         }
-      } else if (it->op==OP_INPUT) {
-        int n = it->data.nnz();
+      } else if (e.op==OP_INPUT) {
+        int n = e.data.nnz();
         if (n!=0) {
-          int iind = it->arg.at(0), ip = it->arg.at(1), ic = it->arg.at(2);
+          int iind = e.arg.at(0), ip = e.arg.at(1), ic = e.arg.at(2);
           std::string arg = "arg[" + g.to_string(iind) + "]";
           std::string arg_nz = arg;
           if (ic!=0) arg_nz += "+" + g.to_string(ic);
-          int i = it->res.front();
+          int i = e.res.front();
           if (g.verbose) {
             s << "  /* #" << k++ << ": Input " << iind;
             s << " (" << ischeme_.at(iind) << ")";
-            s << ", part " << ip << " (" << it->data.name() << ") */" << endl;
+            s << ", part " << ip << " (" << e.data.name() << ") */" << endl;
           }
           if (n==1) {
             s << "  " << g.workel(i) << " = " << arg << " ? "
@@ -1153,14 +1153,14 @@ namespace casadi {
         // Generate comment
         if (g.verbose) {
           s << "  /* #" << k++ << ": ";
-          print(s, *it);
+          print(s, e);
           s << " */" << endl;
         }
 
         // Get the names of the operation arguments
-        arg.resize(it->arg.size());
-        for (int i=0; i<it->arg.size(); ++i) {
-          int j=it->arg.at(i);
+        arg.resize(e.arg.size());
+        for (int i=0; i<e.arg.size(); ++i) {
+          int j=e.arg.at(i);
           if (j>=0 && workloc_.at(j)!=workloc_.at(j+1)) {
             arg.at(i) = j;
           } else {
@@ -1169,9 +1169,9 @@ namespace casadi {
         }
 
         // Get the names of the operation results
-        res.resize(it->res.size());
-        for (int i=0; i<it->res.size(); ++i) {
-          int j=it->res.at(i);
+        res.resize(e.res.size());
+        for (int i=0; i<e.res.size(); ++i) {
+          int j=e.res.at(i);
           if (j>=0 && workloc_.at(j)!=workloc_.at(j+1)) {
             res.at(i) = j;
           } else {
@@ -1180,7 +1180,7 @@ namespace casadi {
         }
 
         // Generate operation
-        it->data->generate(g, "0", arg, res);
+        e.data->generate(g, "0", arg, res);
       }
     }
   }
@@ -1202,13 +1202,13 @@ namespace casadi {
     stringstream ss;
 
     for (int algNo=0; algNo<2; ++algNo) {
-      for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it) {
-        switch (it->op) {
+      for (auto&& e : algorithm_) {
+        switch (e.op) {
         case OP_LIFT:
           {
-            MX& arg = swork[it->arg.at(0)];
-            MX& arg_init = swork[it->arg.at(1)];
-            MX& res = swork[it->res.front()];
+            MX& arg = swork[e.arg.at(0)];
+            MX& arg_init = swork[e.arg.at(1)];
+            MX& res = swork[e.res.front()];
             switch (algNo) {
             case 0:
               ss.str(string());
@@ -1226,29 +1226,29 @@ namespace casadi {
           }
         case OP_INPUT:
         case OP_PARAMETER:
-          swork[it->res.front()] = it->data;
+          swork[e.res.front()] = e.data;
           break;
         case OP_OUTPUT:
           if (algNo==0) {
-            f_G[it->res.front()] = swork[it->arg.front()];
+            f_G[e.res.front()] = swork[e.arg.front()];
           }
           break;
         default:
           {
             // Arguments of the operation
-            arg1.resize(it->arg.size());
+            arg1.resize(e.arg.size());
             for (int i=0; i<arg1.size(); ++i) {
-              int el = it->arg[i]; // index of the argument
-              arg1[i] = el<0 ? MX(it->data->dep(i).size()) : swork[el];
+              int el = e.arg[i]; // index of the argument
+              arg1[i] = el<0 ? MX(e.data->dep(i).size()) : swork[el];
             }
 
             // Perform the operation
-            res1.resize(it->res.size());
-            it->data->eval_mx(arg1, res1);
+            res1.resize(e.res.size());
+            e.data->eval_mx(arg1, res1);
 
             // Get the result
             for (int i=0; i<res1.size(); ++i) {
-              int el = it->res[i]; // index of the output
+              int el = e.res[i]; // index of the output
               if (el>=0) swork[el] = res1[i];
             }
           }

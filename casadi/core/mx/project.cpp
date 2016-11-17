@@ -78,11 +78,11 @@ namespace casadi {
     }
   }
 
-  void Project::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+  void Project::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     sparsity().set(res[0], arg[0], dep().sparsity());
   }
 
-  void Project::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+  void Project::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     dep().sparsity().bor(arg[0], res[0], sparsity());
     fill(res[0], res[0]+nnz(), 0);
   }

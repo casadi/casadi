@@ -62,11 +62,11 @@ namespace casadi {
                      std::vector<std::vector<MX> >& asens) {
   }
 
-  void Find::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+  void Find::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     res[0][0] = 0; // pw constant
   }
 
-  void Find::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+  void Find::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     res[0][0] = 0; // pw constant
   }
 

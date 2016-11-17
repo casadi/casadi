@@ -88,7 +88,7 @@ namespace casadi {
     }
   }
 
-  void Transpose::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+  void Transpose::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     // Shortands
     const bvec_t *x = arg[0];
     bvec_t *xT = res[0];
@@ -106,7 +106,7 @@ namespace casadi {
     }
   }
 
-  void Transpose::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+  void Transpose::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     // Shortands
     bvec_t *x = arg[0];
     bvec_t *xT = res[0];
@@ -126,7 +126,7 @@ namespace casadi {
     }
   }
 
-  void DenseTranspose::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+  void DenseTranspose::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     // Shorthands
     const bvec_t *x = arg[0];
     bvec_t *xT = res[0];
@@ -141,7 +141,7 @@ namespace casadi {
     }
   }
 
-  void DenseTranspose::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+  void DenseTranspose::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     // Shorthands
     bvec_t *x = arg[0];
     bvec_t *xT = res[0];

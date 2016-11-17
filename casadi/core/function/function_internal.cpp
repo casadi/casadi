@@ -311,7 +311,7 @@ namespace casadi {
   }
 
   void FunctionInternal::
-  _eval(const double** arg, double** res, int* iw, double* w, int mem) {
+  _eval(const double** arg, double** res, int* iw, double* w, int mem) const {
     if (simplifiedCall()) {
       // Copy arguments to input buffers
       const double* arg1=w;
@@ -340,11 +340,13 @@ namespace casadi {
     }
   }
 
-  void FunctionInternal::_eval(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) {
+  void FunctionInternal::
+  _eval(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
     eval_sx(arg, res, iw, w, mem);
   }
 
-  void FunctionInternal::_eval(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+  void FunctionInternal::
+  _eval(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     sp_fwd(arg, res, iw, w, mem);
   }
 
@@ -537,14 +539,16 @@ namespace casadi {
   template<bool fwd> struct JacSparsityTraits {};
   template<> struct JacSparsityTraits<true> {
     typedef const bvec_t* arg_t;
-    static inline void sp(FunctionInternal *f, const bvec_t** arg, bvec_t** res,
+    static inline void sp(const FunctionInternal *f,
+                          const bvec_t** arg, bvec_t** res,
                           int* iw, bvec_t* w, int mem) {
       f->sp_fwd(arg, res, iw, w, mem);
     }
   };
   template<> struct JacSparsityTraits<false> {
     typedef bvec_t* arg_t;
-    static inline void sp(FunctionInternal *f, bvec_t** arg, bvec_t** res,
+    static inline void sp(const FunctionInternal *f,
+                          bvec_t** arg, bvec_t** res,
                           int* iw, bvec_t* w, int mem) {
       f->sp_rev(arg, res, iw, w, mem);
     }
@@ -1368,7 +1372,7 @@ namespace casadi {
     casadi_error("'eval' not defined for " + type_name());
   }
 
-  void FunctionInternal::simple(const double* arg, double* res) {
+  void FunctionInternal::simple(const double* arg, double* res) const {
     casadi_error("'simple' not defined for " + type_name());
   }
 
@@ -2031,7 +2035,8 @@ namespace casadi {
     casadi_error("'generate_dependencies' not defined for " + type_name());
   }
 
-  void FunctionInternal::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+  void FunctionInternal::
+  sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     // Get the number of inputs and outputs
     int n_in = this->n_in();
     int n_out = this->n_out();
@@ -2050,7 +2055,8 @@ namespace casadi {
         if (arg[iind]==0 || nnz_in(iind)==0) continue;
 
         // Get the sparsity of the Jacobian block
-        Sparsity sp = sparsity_jac(iind, oind, true, false);
+        Sparsity sp = const_cast<FunctionInternal*>(this)->
+                      sparsity_jac(iind, oind, true, false);
         if (sp.is_null() || sp.nnz() == 0) continue; // Skip if zero
 
         // Carry out the sparse matrix-vector multiplication
@@ -2065,7 +2071,8 @@ namespace casadi {
     }
   }
 
-  void FunctionInternal::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+  void FunctionInternal::
+  sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     // Get the number of inputs and outputs
     int n_in = this->n_in();
     int n_out = this->n_out();
@@ -2081,7 +2088,8 @@ namespace casadi {
         if (arg[iind]==0 || nnz_in(iind)==0) continue;
 
         // Get the sparsity of the Jacobian block
-        Sparsity sp = sparsity_jac(iind, oind, true, false);
+        Sparsity sp = const_cast<FunctionInternal*>(this)->
+                      sparsity_jac(iind, oind, true, false);
         if (sp.is_null() || sp.nnz() == 0) continue; // Skip if zero
 
         // Carry out the sparse matrix-vector multiplication

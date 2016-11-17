@@ -537,7 +537,7 @@ namespace casadi {
 
   template<bool Add>
   void SetNonzerosVector<Add>::
-  sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+  sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     const bvec_t *a0 = arg[0];
     const bvec_t *a = arg[1];
     bvec_t *r = res[0];
@@ -556,7 +556,7 @@ namespace casadi {
 
   template<bool Add>
   void SetNonzerosVector<Add>::
-  sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+  sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     bvec_t *a = arg[1];
     bvec_t *r = res[0];
     for (vector<int>::const_iterator k=this->nz_.begin(); k!=this->nz_.end(); ++k, ++a) {
@@ -572,7 +572,7 @@ namespace casadi {
 
   template<bool Add>
   void SetNonzerosSlice<Add>::
-  sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+  sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     const bvec_t *a0 = arg[0];
     const bvec_t *a = arg[1];
     bvec_t *r = res[0];
@@ -591,7 +591,7 @@ namespace casadi {
 
   template<bool Add>
   void SetNonzerosSlice<Add>::
-  sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+  sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     bvec_t *a = arg[1];
     bvec_t *r = res[0];
     for (int k=s_.start; k!=s_.stop; k+=s_.step) {
@@ -605,7 +605,7 @@ namespace casadi {
 
   template<bool Add>
   void SetNonzerosSlice2<Add>::
-  sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+  sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     const bvec_t *a0 = arg[0];
     const bvec_t *a = arg[1];
     bvec_t *r = res[0];
@@ -626,7 +626,7 @@ namespace casadi {
 
   template<bool Add>
   void SetNonzerosSlice2<Add>::
-  sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+  sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     bvec_t *a = arg[1];
     bvec_t *r = res[0];
     for (int k1=outer_.start; k1!=outer_.stop; k1+=outer_.step) {

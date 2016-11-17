@@ -49,11 +49,11 @@ namespace casadi {
     if (arg[0]!=res[0]) copy(arg[0], arg[0]+nnz(), res[0]);
   }
 
-  void Reshape::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+  void Reshape::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     copyFwd(arg[0], res[0], nnz());
   }
 
-  void Reshape::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+  void Reshape::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     copyAdj(arg[0], res[0], nnz());
   }
 

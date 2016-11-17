@@ -334,7 +334,7 @@ namespace casadi {
                           + typeid(*this).name());
   }
 
-  void MXNode::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+  void MXNode::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     // By default, everything depends on everything
     bvec_t all_depend(0);
 
@@ -355,7 +355,7 @@ namespace casadi {
     }
   }
 
-  void MXNode::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+  void MXNode::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     // By default, everything depends on everything
     bvec_t all_depend(0);
 

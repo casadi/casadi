@@ -158,7 +158,7 @@ namespace casadi {
   }
 
   template<bool Tr>
-  void Solve<Tr>::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+  void Solve<Tr>::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     // Number of right-hand-sides
     int nrhs = dep(0).size2();
 
@@ -197,7 +197,7 @@ namespace casadi {
   }
 
   template<bool Tr>
-  void Solve<Tr>::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+  void Solve<Tr>::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     // Number of right-hand-sides
     int nrhs = dep(0).size2();
 

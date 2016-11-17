@@ -92,11 +92,11 @@ namespace casadi {
     }
   }
 
-  void UnaryMX::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+  void UnaryMX::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     copyFwd(arg[0], res[0], nnz());
   }
 
-  void UnaryMX::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+  void UnaryMX::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     copyAdj(arg[0], res[0], nnz());
   }
 

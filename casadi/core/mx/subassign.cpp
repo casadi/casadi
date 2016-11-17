@@ -47,11 +47,11 @@ namespace casadi {
     casadi_error("not ready");
   }
 
-  void SubAssign::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+  void SubAssign::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     casadi_error("not ready");
   }
 
-  void SubAssign::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+  void SubAssign::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     casadi_error("not ready");
   }
 

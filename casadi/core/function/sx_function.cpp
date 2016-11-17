@@ -776,7 +776,7 @@ namespace casadi {
     if (verbose()) userOut() << "SXFunction::evalAdj end" << endl;
   }
 
-  void SXFunction::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+  void SXFunction::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     // Propagate sparsity forward
     for (auto&& e : algorithm_) {
       switch (e.op) {
@@ -793,7 +793,7 @@ namespace casadi {
     }
   }
 
-  void SXFunction::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+  void SXFunction::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     fill_n(w, sz_w(), 0);
 
     // Propagate sparsity backward

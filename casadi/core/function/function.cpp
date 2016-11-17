@@ -737,7 +737,7 @@ namespace casadi {
     (*const_cast<Function*>(this))->sp_fwd(arg, res, iw, w, mem);
   }
 
-  void Function::rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+  void Function::rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     (*this)->sp_rev(arg, res, iw, w, mem);
   }
 

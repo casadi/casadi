@@ -489,7 +489,7 @@ namespace casadi {
     return ret;
   }
 
-  void Integrator::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+  void Integrator::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     log("Integrator::sp_fwd", "begin");
 
     // Work vectors
@@ -570,7 +570,7 @@ namespace casadi {
     log("Integrator::sp_fwd", "end");
   }
 
-  void Integrator::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+  void Integrator::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     log("Integrator::sp_rev", "begin");
 
     // Work vectors
