@@ -35,9 +35,9 @@ for ode=0:1
     disp 'Testing ODE example'
     Integrators = ODE_integrators;
 
-    % Time 
+    % Time
     t = SX.sym('t');
-      
+
     % Parameter
     u = SX.sym('u');
 
@@ -48,12 +48,12 @@ for ode=0:1
     % Constants
     alpha = 0.05; % friction
     beta = 0.1;   % fuel consumption rate
-      
+
     % Differential equation
     ode = [v;
            (u-alpha*v*v)/m;
            -beta*u*u];
-      
+
     % Quadrature
     quad = v^3 + ((3-sin(t)) - u)^2;
 
@@ -71,33 +71,33 @@ for ode=0:1
 
   else
     disp '******'
-    disp 'Testing DAE example'    
+    disp 'Testing DAE example'
     Integrators = DAE_integrators;
 
     % Differential state
     x = SX.sym('x');
-    
+
     % Algebraic variable
     z = SX.sym('z');
-    
+
     % Parameter
     u = SX.sym('u');
-    
+
     % Differential equation
     ode = -x + 0.5*x*x + u + 0.5*z;
-    
+
     % Algebraic constraint
     alg = z + exp(z) - 1.0 + x;
-    
+
     % Quadrature
     quad = x*x + 3.0*u*u;
 
     % DAE
     dae = struct('x', x, 'z', z, 'p', u, 'ode', ode, 'alg', alg, 'quad', quad);
-    
+
     % End time
     tf = 5;
-    
+
     % Initial position
     x0 = 1;
 
@@ -114,92 +114,74 @@ for ode=0:1
     disp(sprintf('========'));
 
     % Integrator options
-    opts = struct;
-    opts.tf = tf;
+    opts = struct('tf', tf);
     if strcmp(MyIntegrator,'collocation')
       opts.rootfinder = 'kinsol';
       opts.rootfinder_options = struct('linear_solver', 'csparse');
     end
 
     % Integrator
-    I = casadi.integrator('myintegrator', MyIntegrator, dae, opts);
+    I = casadi.integrator('I', MyIntegrator, dae, opts);
 
     % Integrate to get results
-    arg = struct;
-    arg.x0 = x0;
-    arg.p = u0;
-    res = I.call(arg);
+    res = I('x0', x0, 'p', u0);
     xf = full(res.xf);
     qf = full(res.qf);
-    fprintf('Unperturbed solution: xf=%d, qf=%d\n', xf, qf);
+    fprintf('%50s: xf=%s, qf=%s\n', 'Unperturbed solution', ...
+            sprintf('%d ', xf), sprintf('%d ', qf));
 
     % Perturb solution to get a finite difference approximation
     h = 0.001;
-    arg.p = u0+h;
-    res = I.call(arg);
-    xf_pert = full(res.xf);
-    qf_pert = full(res.qf);
-    fprintf('Finite differences: d(xf)/d(p)=%d, d(qf)/d(p)=%d\n',...
-        (xf_pert-xf)/h, (qf_pert-qf)/h);
+    res = I('x0', x0, 'p', u0+h);
+    fd_xf = (full(res.xf)-xf)/h;
+    fd_qf = (full(res.qf)-qf)/h;
+    fprintf('%50s: d(xf)/d(p)=%s, d(qf)/d(p)=%s\n', 'Finite differences', ...
+            sprintf('%d ', fd_xf), sprintf('%d ', fd_qf));
 
-    % Calculate once directional derivative, forward mode
-    I_fwd = I.forward(1);
-    arg = struct('der_x0',x0,'der_p',u0,'der_xf',xf,'der_qf',qf);
-    arg.fwd0_x0 = 0;
-    arg.fwd0_p = 1;
-    res = I_fwd.call(arg);
-    fwd_xf = full(res.fwd0_xf);
-    fwd_qf = full(res.fwd0_qf);
-    fprintf('Forward sensitivities: d(xf)/d(p)=%d, d(qf)/d(p)=%d\n', ...
-        fwd_xf, fwd_qf);
+    % Calculate one directional derivative, forward mode
+    I_fwd = I.factory('I_fwd', {'x0', 'z0', 'p', 'fwd:p'}, {'fwd:xf', 'fwd:qf'});
+    res = I_fwd('x0', x0, 'p', u0, 'fwd_p', 1);
+    fwd_xf = full(res.fwd_xf);
+    fwd_qf = full(res.fwd_qf);
+    fprintf('%50s: d(xf)/d(p)=%s, d(qf)/d(p)=%s\n', 'Forward sensitivities', ...
+            sprintf('%d ', fwd_xf), sprintf('%d ', fwd_qf));
 
     % Calculate one directional derivative, reverse mode
-    I_adj = I.reverse(1);
+    I_adj = I.factory('I_adj', {'x0', 'z0', 'p', 'adj:qf'}, {'adj:x0', 'adj:p'});
     arg = struct('der_x0',x0,'der_p',u0,'der_xf',xf,'der_qf',qf);
-    arg.adj0_xf = 0;
-    arg.adj0_qf = 1;
-    res = I_adj.call(arg);
-    adj_x0 = full(res.adj0_x0);
-    adj_p = full(res.adj0_p);
-    fprintf('Adjoint sensitivities: d(qf)/d(x0)=%d, d(qf)/d(p)=%d\n', ...
-        adj_x0, adj_p);
+    res = I_adj('x0', x0, 'p', u0, 'adj_qf', 1);
+    adj_x0 = full(res.adj_x0);
+    adj_p = full(res.adj_p);
+    fprintf('%50s: d(qf)/d(x0)=%s, d(qf)/d(p)=%s\n', 'Adjoint sensitivities', ...
+            sprintf('%d ', adj_x0), sprintf('%d ', adj_p));
 
     % Perturb adjoint solution to get a finite difference approximation of
     % the second order sensitivities
-    arg.der_p = u0+h;
-    res = I_adj.call(arg);
-    adj_x0_pert = full(res.adj0_x0);
-    adj_p_pert = full(res.adj0_p);
-    fprintf('FD of adjoint sensitivities: d2(qf)/d(x0)d(p)=%d, d2(qf)/d(p)d(p)=%d\n', ...
-        (adj_x0_pert-adj_x0)/h, (adj_p_pert-adj_p)/h);
+    res = I_adj('x0', x0, 'p', u0+h, 'adj_qf', 1);
+    fd_adj_x0 = (full(res.adj_x0)-adj_x0)/h;
+    fd_adj_p = (full(res.adj_p)-adj_p)/h;
+    fprintf('%50s: d2(qf)/d(x0)d(p)=%s, d2(qf)/d(p)d(p)=%s\n', ...
+            'FD of adjoint sensitivities', ...
+            sprintf('%d ', fd_adj_x0), sprintf('%d ', fd_adj_p));
 
     % Forward over adjoint to get the second order sensitivities
-    I_foa = I_adj.forward(1);
-    arg = struct('der_der_x0',x0,'der_der_p',u0,'der_der_xf',xf,'der_der_qf',qf);
-    arg.der_adj0_x0 = adj_x0;
-    arg.der_adj0_p = adj_p;
-    arg.der_adj0_xf = 0;
-    arg.der_adj0_qf = 1;
-    arg.fwd0_der_p = 1.0;
-    res = I_foa.call(arg);
-    fwd_adj_x0 = full(res.fwd0_adj0_x0);
-    fwd_adj_p = full(res.fwd0_adj0_p);
-    fprintf('Forward over adjoint sensitivities: d2(qf)/d(x0)d(p)=%d, d2(qf)/d(p)d(p)=%d\n', ...
-        fwd_adj_x0, fwd_adj_p);
+    I_foa = I_adj.factory('I_foa', {'x0', 'z0', 'p', 'adj_qf', 'fwd:p'}, ...
+                          {'fwd:adj_x0', 'fwd:adj_p'});
+    res = I_foa('x0', x0, 'p', u0, 'adj_qf', 1, 'fwd_p', 1);
+    fwd_adj_x0 = full(res.fwd_adj_x0);
+    fwd_adj_p = full(res.fwd_adj_p);
+    fprintf('%50s: d2(qf)/d(x0)d(p)=%s, d2(qf)/d(p)d(p)=%s\n', ...
+            'Forward over adjoint sensitivities', ...
+            sprintf('%d ', fd_adj_x0), sprintf('%d ', fd_adj_p));
 
     % Adjoint over adjoint to get the second order sensitivities
-    I_aoa = I_adj.reverse(1);
-    arg = struct('der_der_x0',x0,'der_der_p',u0,'der_der_xf',xf,'der_der_qf',qf);
-    arg.der_adj0_x0 = adj_x0;
-    arg.der_adj0_p = adj_p;
-    arg.der_adj0_xf = 0;
-    arg.der_adj0_qf = 1;
-    arg.adj0_adj0_p = 1;
-    res = I_aoa.call(arg);
-    adj_adj_x0 = full(res.adj0_der_x0);
-    adj_adj_p = full(res.adj0_der_p);
-    fprintf('Adjoint over adjoint sensitivities: d2(qf)/d(x0)d(p)=%d, d2(qf)/d(p)d(p)=%d\n', ...
-        adj_adj_x0, adj_adj_p);
+    I_aoa = I_adj.factory('I_aoa', {'x0', 'z0', 'p', 'adj_qf', 'adj:adj_p'}, ...
+                         {'adj:x0', 'adj:p'});
+    res = I_aoa('x0', x0, 'p', u0, 'adj_qf', 1, 'adj_adj_p', 1);
+    adj_adj_x0 = full(res.adj_x0);
+    adj_adj_p = full(res.adj_p);
+    fprintf('%50s: d2(qf)/d(x0)d(p)=%s, d2(qf)/d(p)d(p)=%s\n', ...
+            'Adjoint over adjoint sensitivities', ...
+            sprintf('%d ', adj_adj_x0), sprintf('%d ', adj_adj_p));
   end
 end
-
