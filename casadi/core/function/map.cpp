@@ -144,7 +144,7 @@ namespace casadi {
     int n_in = this->n_in(), n_out = this->n_out();
 
     // Generate map of derivative
-    Function df = f_.forward_new(nfwd);
+    Function df = f_.forward(nfwd);
     Function dm = df.map(n_, parallelization());
 
     // Input expressions
@@ -197,7 +197,7 @@ namespace casadi {
     int n_in = this->n_in(), n_out = this->n_out();
 
     // Generate map of derivative
-    Function df = f_.reverse_new(nadj);
+    Function df = f_.reverse(nadj);
     Function dm = df.map(n_, parallelization());
 
     // Input expressions

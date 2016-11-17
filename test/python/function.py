@@ -631,7 +631,7 @@ class Functiontests(casadiTestCase):
 
     hs = []
     for n in [nlp, nlp.expand('nlp_expanded')]:
-        H = n.reverse_new(1).jacobian(0,0,False,True)
+        H = n.reverse(1).jacobian(0,0,False,True)
 
         h = H(der_x=1,adj_f=1)[H.name_out(0)]
         hs.append(h)
@@ -724,7 +724,7 @@ class Functiontests(casadiTestCase):
       for ad_weight_sp in range(2):
         F = fun.mapaccum("map",n,[0],[0],{"ad_weight_sp":ad_weight_sp,"ad_weight": ad_weight})
 
-        F.forward_new(2)
+        F.forward(2)
 
         XP = X
 
@@ -1006,9 +1006,9 @@ class Functiontests(casadiTestCase):
         f.jacobian()
 
       with self.assertRaises(Exception):
-        f.forward_new(1)
+        f.forward(1)
       with self.assertRaises(Exception):
-        f.reverse_new(1)
+        f.reverse(1)
 
   def test_Callback_dimcheck(self):
       class Fun(Callback):
@@ -1091,7 +1091,7 @@ class Functiontests(casadiTestCase):
 
         if has_fwd:
           def get_n_forward(self): return 1
-          def get_forward_new(self,name,nfwd,inames,onames,opts):
+          def get_forward(self,name,nfwd,inames,onames,opts):
             assert(nfwd==1)
             class ForwardFun(Callback):
               # sin(x+3*y)
@@ -1128,7 +1128,7 @@ class Functiontests(casadiTestCase):
 
         if has_adj:
           def get_n_reverse(self): return 1
-          def get_reverse_new(self,name,nadj,inames,onames,opts):
+          def get_reverse(self,name,nadj,inames,onames,opts):
             assert(nadj==1)
             class BackwardFun(Callback):
               # sin(x+3*y)

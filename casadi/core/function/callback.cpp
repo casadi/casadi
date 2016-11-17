@@ -130,7 +130,7 @@ namespace casadi {
   }
 
   Function Callback::
-  get_forward_new(const std::string& name, int nfwd,
+  get_forward(const std::string& name, int nfwd,
                   const std::vector<std::string>& i_names,
                   const std::vector<std::string>& o_names,
                   const Dict& opts) {
@@ -142,7 +142,7 @@ namespace casadi {
   }
 
   Function Callback::
-  get_reverse_new(const std::string& name, int nadj,
+  get_reverse(const std::string& name, int nadj,
                   const std::vector<std::string>& i_names,
                   const std::vector<std::string>& o_names,
                   const Dict& opts) {

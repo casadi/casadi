@@ -633,7 +633,7 @@ namespace casadi {
      *        The functions returned are cached, meaning that if called multiple timed
      *        with the same value, then multiple references to the same function will be returned.
      */
-    Function forward_new(int nfwd);
+    Function forward(int nfwd);
 
     /** \brief Get a function that calculates \a nadj adjoint derivatives
      *
@@ -652,7 +652,7 @@ namespace casadi {
      *        The functions returned are cached, meaning that if called multiple timed
      *        with the same value, then multiple references to the same function will be returned.
      */
-    Function reverse_new(int nadj);
+    Function reverse(int nadj);
 
     ///@{
     /// Get, if necessary generate, the sparsity of a Jacobian block

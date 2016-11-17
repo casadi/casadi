@@ -124,7 +124,7 @@ class LinearSolverTests(casadiTestCase):
         self.checkarray(Jf_out[0],Jb_out[0])
         self.checkarray(Jf_out[1],Jb_out[1])
 
-        d = solver.forward_new(1)
+        d = solver.forward(1)
 
         r = numpy.random.rand(*A.shape)
 

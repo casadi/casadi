@@ -764,11 +764,11 @@ namespace casadi {
     }
   }
 
-  Function Function::forward_new(int nfwd) {
+  Function Function::forward(int nfwd) {
     return (*this)->forward(nfwd);
   }
 
-  Function Function::reverse_new(int nadj) {
+  Function Function::reverse(int nadj) {
     return (*this)->reverse(nadj);
   }
 
