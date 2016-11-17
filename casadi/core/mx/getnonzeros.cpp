@@ -41,7 +41,7 @@ namespace casadi {
   }
 
   void GetNonzerosVector::
-  eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) {
+  eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
     evalGen<SXElem>(arg, res, iw, w);
   }
 
@@ -61,7 +61,7 @@ namespace casadi {
   }
 
   void GetNonzerosSlice::
-  eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) {
+  eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
     evalGen<SXElem>(arg, res, iw, w);
   }
 
@@ -82,7 +82,7 @@ namespace casadi {
   }
 
   void GetNonzerosSlice2::
-  eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) {
+  eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
     evalGen<SXElem>(arg, res, iw, w);
   }
 

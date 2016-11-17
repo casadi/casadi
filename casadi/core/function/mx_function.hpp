@@ -126,7 +126,7 @@ namespace casadi {
                                         bool compact, bool symmetric, const Dict& opts);
 
     /** \brief Evaluate symbolically, SX type*/
-    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem);
+    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const;
 
     /** \brief Evaluate symbolically, MX type */
     virtual void eval_mx(const MXVector& arg, MXVector& res, bool always_inline, bool never_inline);

@@ -84,7 +84,7 @@ namespace casadi {
 
     /// Evaluate SX, possibly transposed
     virtual void linsol_eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem,
-                               bool tr, int nrhs);
+                               bool tr, int nrhs) const;
 
     /// Solve Cholesky
     virtual void solve_cholesky(void* mem, double* x, int nrhs, bool tr) const;

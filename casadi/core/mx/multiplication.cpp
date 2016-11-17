@@ -53,7 +53,8 @@ namespace casadi {
     evalGen<double>(arg, res, iw, w, mem);
   }
 
-  void Multiplication::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) {
+  void Multiplication::
+  eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
     evalGen<SXElem>(arg, res, iw, w, mem);
   }
 

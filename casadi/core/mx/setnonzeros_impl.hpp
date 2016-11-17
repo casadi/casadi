@@ -443,7 +443,7 @@ namespace casadi {
 
   template<bool Add>
   void SetNonzerosVector<Add>::
-  eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) {
+  eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
     evalGen<SXElem>(arg, res, iw, w, mem);
   }
 
@@ -474,7 +474,7 @@ namespace casadi {
 
   template<bool Add>
   void SetNonzerosSlice<Add>::
-  eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) {
+  eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
     evalGen<SXElem>(arg, res, iw, w, mem);
   }
 
@@ -506,7 +506,7 @@ namespace casadi {
 
   template<bool Add>
   void SetNonzerosSlice2<Add>::
-  eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) {
+  eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
     evalGen<SXElem>(arg, res, iw, w, mem);
   }
 

@@ -146,7 +146,7 @@ namespace casadi {
     virtual void simple(const double* arg, double* res);
 
     /** \brief  Evaluate with symbolic scalars */
-    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem);
+    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const;
 
     ///@{
     /** \brief  Evaluate with symbolic matrices */

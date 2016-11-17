@@ -113,7 +113,7 @@ namespace casadi {
 
     /** \brief Evaluate symbolically (SX) */
     virtual void linsol_eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem,
-                               bool tr, int nrhs);
+                               bool tr, int nrhs) const;
 
     /// A documentation string
     static const std::string meta_doc;

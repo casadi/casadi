@@ -95,7 +95,7 @@ namespace casadi {
     return fcn_.sparsity_out(oind);
   }
 
-  void Call::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) {
+  void Call::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
     fcn_(arg, res, iw, w, mem);
   }
 

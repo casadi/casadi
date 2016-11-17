@@ -1372,7 +1372,8 @@ namespace casadi {
     casadi_error("'simple' not defined for " + type_name());
   }
 
-  void FunctionInternal::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) {
+  void FunctionInternal::
+  eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
     casadi_error("'eval_sx' not defined for " + type_name());
   }
 

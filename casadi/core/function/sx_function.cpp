@@ -127,8 +127,8 @@ namespace casadi {
 
   bool SXFunction::is_smooth() const {
     // Go through all nodes and check if any node is non-smooth
-    for (vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it) {
-      if (!operation_checker<SmoothChecker>(it->op)) {
+    for (auto&& a : algorithm_) {
+      if (!operation_checker<SmoothChecker>(a.op)) {
         return false;
       }
     }
@@ -142,32 +142,32 @@ namespace casadi {
     vector<SXElem>::const_iterator p_it = free_vars_.begin();
 
     // Normal, interpreted output
-    for (vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it) {
+    for (auto&& a : algorithm_) {
       InterruptHandler::check();
-      if (it->op==OP_OUTPUT) {
-        stream << "output[" << it->i0 << "][" << it->i2 << "] = @" << it->i1;
+      if (a.op==OP_OUTPUT) {
+        stream << "output[" << a.i0 << "][" << a.i2 << "] = @" << a.i1;
       } else {
-        stream << "@" << it->i0 << " = ";
-        if (it->op==OP_INPUT) {
-          stream << "input[" << it->i1 << "][" << it->i2 << "]";
+        stream << "@" << a.i0 << " = ";
+        if (a.op==OP_INPUT) {
+          stream << "input[" << a.i1 << "][" << a.i2 << "]";
         } else {
-          if (it->op==OP_CONST) {
-            stream << it->d;
-          } else if (it->op==OP_PARAMETER) {
+          if (a.op==OP_CONST) {
+            stream << a.d;
+          } else if (a.op==OP_PARAMETER) {
             stream << *p_it++;
           } else {
-            int ndep = casadi_math<double>::ndeps(it->op);
-            casadi_math<double>::printPre(it->op, stream);
+            int ndep = casadi_math<double>::ndeps(a.op);
+            casadi_math<double>::printPre(a.op, stream);
             for (int c=0; c<ndep; ++c) {
               if (c==0) {
-                stream << "@" << it->i1;
+                stream << "@" << a.i1;
               } else {
-                casadi_math<double>::printSep(it->op, stream);
-                stream << "@" << it->i2;
+                casadi_math<double>::printSep(a.op, stream);
+                stream << "@" << a.i2;
               }
 
             }
-            casadi_math<double>::printPost(it->op, stream);
+            casadi_math<double>::printPost(a.op, stream);
           }
         }
       }
@@ -190,40 +190,40 @@ namespace casadi {
     vector<bool> declared(sz_w(), false);
 
     // Run the algorithm
-    for (vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it) {
+    for (auto&& a : algorithm_) {
       // Indent
       g.body << "  ";
 
-      if (it->op==OP_OUTPUT) {
-        g.body << "if (res[" << it->i0 << "]!=0) "
-                      << "res["<< it->i0 << "][" << it->i2 << "]=" << "a" << it->i1;
+      if (a.op==OP_OUTPUT) {
+        g.body << "if (res[" << a.i0 << "]!=0) "
+                      << "res["<< a.i0 << "][" << a.i2 << "]=" << "a" << a.i1;
       } else {
         // Declare result if not already declared
-        if (!declared[it->i0]) {
+        if (!declared[a.i0]) {
           g.body << "real_t ";
-          declared[it->i0]=true;
+          declared[a.i0]=true;
         }
 
         // Where to store the result
-        g.body << "a" << it->i0 << "=";
+        g.body << "a" << a.i0 << "=";
 
         // What to store
-        if (it->op==OP_CONST) {
-          g.body << g.constant(it->d);
-        } else if (it->op==OP_INPUT) {
-          g.body << "arg[" << it->i1 << "] ? arg[" << it->i1 << "][" << it->i2 << "] : 0";
+        if (a.op==OP_CONST) {
+          g.body << g.constant(a.d);
+        } else if (a.op==OP_INPUT) {
+          g.body << "arg[" << a.i1 << "] ? arg[" << a.i1 << "][" << a.i2 << "] : 0";
         } else {
-          int ndep = casadi_math<double>::ndeps(it->op);
-          casadi_math<double>::printPre(it->op, g.body);
+          int ndep = casadi_math<double>::ndeps(a.op);
+          casadi_math<double>::printPre(a.op, g.body);
           for (int c=0; c<ndep; ++c) {
             if (c==0) {
-              g.body << "a" << it->i1;
+              g.body << "a" << a.i1;
             } else {
-              casadi_math<double>::printSep(it->op, g.body);
-              g.body << "a" << it->i2;
+              casadi_math<double>::printSep(a.op, g.body);
+              g.body << "a" << a.i2;
             }
           }
-          casadi_math<double>::printPost(it->op, g.body);
+          casadi_math<double>::printPost(a.op, g.body);
         }
       }
       g.body  << ";" << endl;
@@ -398,44 +398,44 @@ namespace casadi {
     size_t worksize = 0;
 
     // Find a place in the work vector for the operation
-    for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it) {
+    for (auto&& a : algorithm_) {
 
       // Number of dependencies
-      int ndeps = casadi_math<double>::ndeps(it->op);
+      int ndeps = casadi_math<double>::ndeps(a.op);
 
       // decrease reference count of children
       // reverse order so that the first argument will end up at the top of the stack
       for (int c=ndeps-1; c>=0; --c) {
-        int ch_ind = c==0 ? it->i1 : it->i2;
+        int ch_ind = c==0 ? a.i1 : a.i2;
         int remaining = --refcount.at(ch_ind);
         if (remaining==0) unused.push(place[ch_ind]);
       }
 
       // Find a place to store the variable
-      if (it->op!=OP_OUTPUT) {
+      if (a.op!=OP_OUTPUT) {
         if (live_variables && !unused.empty()) {
           // Try to reuse a variable from the stack if possible (last in, first out)
-          it->i0 = place[it->i0] = unused.top();
+          a.i0 = place[a.i0] = unused.top();
           unused.pop();
         } else {
           // Allocate a new variable
-          it->i0 = place[it->i0] = worksize++;
+          a.i0 = place[a.i0] = worksize++;
         }
       }
 
       // Save the location of the children
       for (int c=0; c<ndeps; ++c) {
         if (c==0) {
-          it->i1 = place[it->i1];
+          a.i1 = place[a.i1];
         } else {
-          it->i2 = place[it->i2];
+          a.i2 = place[a.i2];
         }
       }
 
       // If binary, make sure that the second argument is the same as the first one
       // (in order to treat all operations as binary) NOTE: ugly
-      if (ndeps==1 && it->op!=OP_OUTPUT) {
-        it->i2 = it->i1;
+      if (ndeps==1 && a.op!=OP_OUTPUT) {
+        a.i2 = a.i1;
       }
     }
 
@@ -525,7 +525,8 @@ namespace casadi {
     }
   }
 
-  void SXFunction::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) {
+  void SXFunction::
+  eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
     if (verbose()) userOut() << "SXFunction::eval_sxsparse begin" << endl;
 
     // Iterator to the binary operations
@@ -541,26 +542,26 @@ namespace casadi {
     if (verbose()) {
       userOut() << "SXFunction::eval_sxsparse evaluating algorithm forward" << endl;
     }
-    for (vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it) {
-      switch (it->op) {
+    for (auto&& a : algorithm_) {
+      switch (a.op) {
       case OP_INPUT:
-        w[it->i0] = arg[it->i1]==0 ? 0 : arg[it->i1][it->i2];
+        w[a.i0] = arg[a.i1]==0 ? 0 : arg[a.i1][a.i2];
         break;
       case OP_OUTPUT:
-        if (res[it->i0]!=0) res[it->i0][it->i2] = w[it->i1];
+        if (res[a.i0]!=0) res[a.i0][a.i2] = w[a.i1];
         break;
       case OP_CONST:
-        w[it->i0] = *c_it++;
+        w[a.i0] = *c_it++;
         break;
       case OP_PARAMETER:
-        w[it->i0] = *p_it++; break;
+        w[a.i0] = *p_it++; break;
       default:
         {
           // Evaluate the function to a temporary value
           // (as it might overwrite the children in the work vector)
           SXElem f;
-          switch (it->op) {
-            CASADI_MATH_FUN_BUILTIN(w[it->i1], w[it->i2], f)
+          switch (a.op) {
+            CASADI_MATH_FUN_BUILTIN(w[a.i1], w[a.i2], f)
           }
 
           // If this new expression is identical to the expression used
@@ -569,7 +570,7 @@ namespace casadi {
           f.assignIfDuplicate(*b_it++, depth);
 
           // Finally save the function value
-          w[it->i0] = f;
+          w[a.i0] = f;
         }
       }
     }
@@ -625,8 +626,8 @@ namespace casadi {
 
     // Evaluate algorithm
     if (verbose()) userOut() << "SXFunction::evalFwd evaluating algorithm forward" << endl;
-    for (vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it) {
-      switch (it->op) {
+    for (auto&& e : algorithm_) {
+      switch (e.op) {
       case OP_INPUT:
       case OP_OUTPUT:
       case OP_CONST:
@@ -635,7 +636,7 @@ namespace casadi {
       default:
         {
           const SXElem& f=*b_it++;
-          switch (it->op) {
+          switch (e.op) {
             CASADI_MATH_DER_BUILTIN(f->dep(0), f->dep(1), f, it1++->d)
           }
         }
@@ -647,20 +648,20 @@ namespace casadi {
       userOut() << "SXFunction::evalFwd calculating forward derivatives" << endl;
     for (int dir=0; dir<nfwd; ++dir) {
       vector<TapeEl<SXElem> >::const_iterator it2 = s_pdwork.begin();
-      for (vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it) {
-        switch (it->op) {
+      for (auto&& a : algorithm_) {
+        switch (a.op) {
         case OP_INPUT:
-          s_work_[it->i0] = fseed[dir][it->i1].nonzeros()[it->i2]; break;
+          s_work_[a.i0] = fseed[dir][a.i1].nonzeros()[a.i2]; break;
         case OP_OUTPUT:
-          fsens[dir][it->i0].nonzeros()[it->i2] = s_work_[it->i1]; break;
+          fsens[dir][a.i0].nonzeros()[a.i2] = s_work_[a.i1]; break;
         case OP_CONST:
         case OP_PARAMETER:
-          s_work_[it->i0] = 0;
+          s_work_[a.i0] = 0;
           break;
           CASADI_MATH_BINARY_BUILTIN // Binary operation
-            s_work_[it->i0] = it2->d[0] * s_work_[it->i1] + it2->d[1] * s_work_[it->i2];it2++;break;
+            s_work_[a.i0] = it2->d[0] * s_work_[a.i1] + it2->d[1] * s_work_[a.i2];it2++;break;
         default: // Unary operation
-          s_work_[it->i0] = it2->d[0] * s_work_[it->i1]; it2++;
+          s_work_[a.i0] = it2->d[0] * s_work_[a.i1]; it2++;
         }
       }
     }
@@ -720,8 +721,8 @@ namespace casadi {
 
     // Evaluate algorithm
     if (verbose()) userOut() << "SXFunction::evalFwd evaluating algorithm forward" << endl;
-    for (vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it) {
-      switch (it->op) {
+    for (auto&& a : algorithm_) {
+      switch (a.op) {
       case OP_INPUT:
       case OP_OUTPUT:
       case OP_CONST:
@@ -730,7 +731,7 @@ namespace casadi {
       default:
         {
           const SXElem& f=*b_it++;
-          switch (it->op) {
+          switch (a.op) {
             CASADI_MATH_DER_BUILTIN(f->dep(0), f->dep(1), f, it1++->d)
           }
         }
@@ -742,9 +743,8 @@ namespace casadi {
                        << endl;
     fill(s_work_.begin(), s_work_.end(), 0);
     for (int dir=0; dir<nadj; ++dir) {
-      vector<TapeEl<SXElem> >::const_reverse_iterator it2 = s_pdwork.rbegin();
-      for (vector<AlgEl>::const_reverse_iterator it = algorithm_.rbegin();
-           it!=algorithm_.rend(); ++it) {
+      auto it2 = s_pdwork.rbegin();
+      for (auto it = algorithm_.rbegin(); it!=algorithm_.rend(); ++it) {
         SXElem seed;
         switch (it->op) {
         case OP_INPUT:
@@ -778,17 +778,17 @@ namespace casadi {
 
   void SXFunction::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     // Propagate sparsity forward
-    for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it) {
-      switch (it->op) {
+    for (auto&& e : algorithm_) {
+      switch (e.op) {
       case OP_CONST:
       case OP_PARAMETER:
-        w[it->i0] = 0; break;
+        w[e.i0] = 0; break;
       case OP_INPUT:
-        w[it->i0] = arg[it->i1]==0 ? 0 : arg[it->i1][it->i2]; break;
+        w[e.i0] = arg[e.i1]==0 ? 0 : arg[e.i1][e.i2]; break;
       case OP_OUTPUT:
-        if (res[it->i0]!=0) res[it->i0][it->i2] = w[it->i1]; break;
+        if (res[e.i0]!=0) res[e.i0][e.i2] = w[e.i1]; break;
       default: // Unary or binary operation
-        w[it->i0] = w[it->i1] | w[it->i2]; break;
+        w[e.i0] = w[e.i1] | w[e.i2]; break;
       }
     }
   }
@@ -797,7 +797,7 @@ namespace casadi {
     fill_n(w, sz_w(), 0);
 
     // Propagate sparsity backward
-    for (vector<AlgEl>::reverse_iterator it=algorithm_.rbegin(); it!=algorithm_.rend(); ++it) {
+    for (auto it=algorithm_.rbegin(); it!=algorithm_.rend(); ++it) {
       // Temp seed
       bvec_t seed;
 
@@ -900,32 +900,32 @@ namespace casadi {
         vector<bool> declared(n_w_, false);
 
         // Propagate sparsity forward
-        for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it) {
-          if (it->op==OP_OUTPUT) {
-            ss << "if (r" << it->i0 << "!=0) r" << it->i0 << "[" << it->i2 << "]=" << "a" << it->i1;
+        for (auto&& e : algorithm_) {
+          if (e.op==OP_OUTPUT) {
+            ss << "if (r" << e.i0 << "!=0) r" << e.i0 << "[" << e.i2 << "]=" << "a" << e.i1;
           } else {
             // Declare result if not already declared
-            if (!declared[it->i0]) {
+            if (!declared[e.i0]) {
               ss << "ulong ";
-              declared[it->i0]=true;
+              declared[e.i0]=true;
             }
 
             // Where to store the result
-            ss << "a" << it->i0 << "=";
+            ss << "a" << e.i0 << "=";
 
             // What to store
-            if (it->op==OP_CONST || it->op==OP_PARAMETER) {
+            if (e.op==OP_CONST || e.op==OP_PARAMETER) {
               ss << "0";
-            } else if (it->op==OP_INPUT) {
-              ss << "x" << it->i1 << "[" << it->i2 << "]";
+            } else if (e.op==OP_INPUT) {
+              ss << "x" << e.i1 << "[" << e.i2 << "]";
             } else {
-              int ndep = casadi_math<double>::ndeps(it->op);
+              int ndep = casadi_math<double>::ndeps(e.op);
               for (int c=0; c<ndep; ++c) {
                 if (c==0) {
-                  ss << "a" << it->i1;
+                  ss << "a" << e.i1;
                 } else {
                   ss << "|";
-                  ss << "a" << it->i2;
+                  ss << "a" << e.i2;
                 }
               }
             }
@@ -943,7 +943,7 @@ namespace casadi {
         }
 
         // Propagate sparsity backward
-        for (vector<AlgEl>::reverse_iterator it=algorithm_.rbegin(); it!=algorithm_.rend(); ++it) {
+        for (auto it=algorithm_.rbegin(); it!=algorithm_.rend(); ++it) {
           if (it->op==OP_OUTPUT) {
             ss << "if (r" << it->i0 << "!=0) a" << it->i1
                << "|=r" << it->i0 << "[" << it->i2 << "];" << endl;

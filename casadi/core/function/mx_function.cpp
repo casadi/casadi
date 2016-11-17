@@ -943,42 +943,42 @@ namespace casadi {
     log("MXFunction::evalAdj end");
   }
 
-  void MXFunction::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) {
+  void MXFunction::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
     // Work vector and temporaries to hold pointers to operation input and outputs
     vector<const SXElem*> argp(sz_arg());
     vector<SXElem*> resp(sz_res());
 
     // Evaluate all of the nodes of the algorithm:
     // should only evaluate nodes that have not yet been calculated!
-    for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); it++) {
-      if (it->op==OP_INPUT) {
+    for (auto&& a : algorithm_) {
+      if (a.op==OP_INPUT) {
         // Pass an input
-        SXElem *w1 = w+workloc_[it->res.front()];
-        int nnz=it->data.nnz();
-        int i=it->arg.at(0);
-        int nz_offset=it->arg.at(2);
+        SXElem *w1 = w+workloc_[a.res.front()];
+        int nnz=a.data.nnz();
+        int i=a.arg.at(0);
+        int nz_offset=a.arg.at(2);
         if (arg[i]==0) {
           std::fill(w1, w1+nnz, 0);
         } else {
           std::copy(arg[i]+nz_offset, arg[i]+nz_offset+nnz, w1);
         }
-      } else if (it->op==OP_OUTPUT) {
+      } else if (a.op==OP_OUTPUT) {
         // Get the outputs
-        SXElem *w1 = w+workloc_[it->arg.front()];
-        int i=it->res.front();
+        SXElem *w1 = w+workloc_[a.arg.front()];
+        int i=a.res.front();
         if (res[i]!=0)
           std::copy(w1, w1+nnz_out(i), res[i]);
-      } else if (it->op==OP_PARAMETER) {
+      } else if (a.op==OP_PARAMETER) {
         continue; // FIXME
       } else {
         // Point pointers to the data corresponding to the element
-        for (int i=0; i<it->arg.size(); ++i)
-          argp[i] = it->arg[i]>=0 ? w+workloc_[it->arg[i]] : 0;
-        for (int i=0; i<it->res.size(); ++i)
-          resp[i] = it->res[i]>=0 ? w+workloc_[it->res[i]] : 0;
+        for (int i=0; i<a.arg.size(); ++i)
+          argp[i] = a.arg[i]>=0 ? w+workloc_[a.arg[i]] : 0;
+        for (int i=0; i<a.res.size(); ++i)
+          resp[i] = a.res[i]>=0 ? w+workloc_[a.res[i]] : 0;
 
         // Evaluate
-        it->data->eval_sx(get_ptr(argp), get_ptr(resp), iw, w, 0);
+        a.data->eval_sx(get_ptr(argp), get_ptr(resp), iw, w, 0);
       }
     }
   }

@@ -45,7 +45,7 @@ namespace casadi {
   }
 
   void LinsolInternal::linsol_eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem,
-                             bool tr, int nrhs) {
+                             bool tr, int nrhs) const {
     casadi_error("eval_sx not defined for " + type_name());
   }
 

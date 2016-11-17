@@ -98,7 +98,7 @@ class CASADI_EXPORT SXFunction :
   virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
 
   /** \brief  evaluate symbolically while also propagating directional derivatives */
-  virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem);
+  virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const;
 
   /** \brief Calculate forward mode directional derivatives */
   virtual void evalFwd(const std::vector<std::vector<SX> >& fseed,

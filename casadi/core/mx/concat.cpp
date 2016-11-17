@@ -41,7 +41,7 @@ namespace casadi {
     evalGen<double>(arg, res, iw, w);
   }
 
-  void Concat::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) {
+  void Concat::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
     evalGen<SXElem>(arg, res, iw, w);
   }
 

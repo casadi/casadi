@@ -56,7 +56,7 @@ namespace casadi {
     casadi_math<double>::fun(op_, arg[0], dummy, res[0], nnz());
   }
 
-  void UnaryMX::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) {
+  void UnaryMX::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
     SXElem dummy = 0;
     casadi_math<SXElem>::fun(op_, arg[0], dummy, res[0], nnz());
   }

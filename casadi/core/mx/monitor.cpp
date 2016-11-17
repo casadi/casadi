@@ -61,7 +61,7 @@ namespace casadi {
     }
   }
 
-  void Monitor::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) {
+  void Monitor::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
     if (arg[0]!=res[0]) {
       copy(arg[0], arg[0]+nnz(), res[0]);
     }

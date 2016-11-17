@@ -53,7 +53,7 @@ namespace casadi {
     evalGen<double>(arg, res, iw, w, mem);
   }
 
-  void HorzRepmat::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) {
+  void HorzRepmat::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
     evalGen<SXElem>(arg, res, iw, w, mem);
   }
 
@@ -133,7 +133,7 @@ namespace casadi {
     evalGen<double>(arg, res, iw, w, mem, std::plus<double>());
   }
 
-  void HorzRepsum::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) {
+  void HorzRepsum::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
     evalGen<SXElem>(arg, res, iw, w, mem, std::plus<SXElem>());
   }
 

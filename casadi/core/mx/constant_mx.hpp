@@ -63,7 +63,8 @@ namespace casadi {
     virtual void eval(const double** arg, double** res, int* iw, double* w, int mem) const = 0;
 
     /// Evaluate the function symbolically (SX)
-    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) = 0;
+    virtual void eval_sx(const SXElem** arg, SXElem** res,
+                         int* iw, SXElem* w, int mem) const = 0;
 
     /** \brief  Evaluate symbolically (MX) */
     virtual void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res);
@@ -143,7 +144,8 @@ namespace casadi {
     }
 
     /** \brief  Evaluate the function symbolically (SX) */
-    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) {
+    virtual void eval_sx(const SXElem** arg, SXElem** res,
+                         int* iw, SXElem* w, int mem) const {
       std::copy(x_->begin(), x_->end(), res[0]);
     }
 
@@ -198,7 +200,8 @@ namespace casadi {
     virtual void eval(const double** arg, double** res, int* iw, double* w, int mem) const {}
 
     /// Evaluate the function symbolically (SX)
-    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) {}
+    virtual void eval_sx(const SXElem** arg, SXElem** res,
+                         int* iw, SXElem* w, int mem) const {}
 
     /** \brief Generate code for the operation */
     virtual void generate(CodeGenerator& g, const std::string& mem,
@@ -274,7 +277,7 @@ namespace casadi {
     virtual void eval(const double** arg, double** res, int* iw, double* w, int mem) const;
 
     /// Evaluate the function symbolically (SX)
-    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem);
+    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const;
 
     /** \brief Generate code for the operation */
     virtual void generate(CodeGenerator& g, const std::string& mem,
@@ -465,7 +468,8 @@ namespace casadi {
   }
 
   template<typename Value>
-  void Constant<Value>::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) {
+  void Constant<Value>::
+  eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
     std::fill(res[0], res[0]+nnz(), SXElem(v_.value));
   }
 

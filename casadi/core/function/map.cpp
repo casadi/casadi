@@ -81,7 +81,7 @@ namespace casadi {
     }
   }
 
-  void Map::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) {
+  void Map::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
     evalGen(arg, res, iw, w);
   }
 
