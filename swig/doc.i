@@ -421,6 +421,18 @@ Get input dimension.
 
 ";
 
+%feature("docstring") casadi::Callback::Callback() "
+
+Default constructor.
+
+";
+
+%feature("docstring") casadi::Callback::Callback(const Callback &obj) "
+
+Copy constructor (throws an error)
+
+";
+
 %feature("docstring")  casadi::Callback::get_name_in(int i) "
 
 Get the sparsity of an input This function is called during construction.
@@ -540,6 +552,23 @@ For a particular input or for all of the inputs
 
 ";
 
+%feature("docstring")  casadi::Function::forward(int nfwd) "
+
+Get a function that calculates nfwd forward derivatives.
+
+Returns a function with n_in + n_out + n_in inputs and nfwd outputs. The
+first n_in inputs correspond to nondifferentiated inputs. The next n_out
+inputs correspond to nondifferentiated outputs. and the last n_in inputs
+correspond to forward seeds, stacked horizontally The n_out outputs
+correspond to forward sensitivities, stacked horizontally. * (n_in = n_in(),
+n_out = n_out())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned.
+
+";
+
 %feature("docstring")  casadi::Function::default_in(int ind) const  "
 
 Get default input value (NOTE: constant reference)
@@ -600,25 +629,6 @@ Export / Generate C code for the function.
 
 ";
 
-%feature("docstring")  casadi::Function::reverse_new(int nadj) "
-
-Get a function that calculates nadj adjoint derivatives.
-
-Returns a function with n_in + n_out + n_out inputs and n_in outputs. The
-first n_in inputs correspond to nondifferentiated inputs. The next n_out
-inputs correspond to nondifferentiated outputs. and the last n_out inputs
-correspond to adjoint seeds, stacked horizontally The n_in outputs
-correspond to adjoint sensitivities, stacked horizontally. * (n_in = n_in(),
-n_out = n_out())
-
-(n_in = n_in(), n_out = n_out())
-
-The functions returned are cached, meaning that if called multiple timed
-with the same value, then multiple references to the same function will be
-returned.
-
-";
-
 %feature("docstring")  casadi::Function::getAtomicInput(int k) const  "
 
 Get the (integer) input arguments of an atomic operation.
@@ -657,13 +667,95 @@ Get type name.
 
 ";
 
-%feature("docstring")  casadi::Callback::get_reverse_new(const std::string
-&name, int nadj, const std::vector< std::string > &i_names, const
-std::vector< std::string > &o_names, const Dict &opts) "
+%feature("docstring")  casadi::Function::jacobian(int iind=0, int oind=0,
+bool compact=false, bool symmetric=false) "
 
-Return function that calculates adjoint derivatives reverse(nadj) returns a
-cached instance if available, and calls  Function get_reverse(int nadj) if
-no cached version is available.
+Generate a Jacobian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian and the same number of inputs.
+
+";
+
+%feature("docstring")  casadi::Function::jacobian(const std::string &iind,
+int oind=0, bool compact=false, bool symmetric=false) "
+
+Generate a Jacobian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian and the same number of inputs.
+
+";
+
+%feature("docstring")  casadi::Function::jacobian(int iind, const
+std::string &oind, bool compact=false, bool symmetric=false) "
+
+Generate a Jacobian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian and the same number of inputs.
+
+";
+
+%feature("docstring")  casadi::Function::jacobian(const std::string &iind,
+const std::string &oind, bool compact=false, bool symmetric=false) "
+
+Generate a Jacobian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian and the same number of inputs.
 
 ";
 
@@ -714,15 +806,22 @@ Checkout a memory object.
 
 ";
 
-%feature("docstring") casadi::Callback::Callback() "
+%feature("docstring")  casadi::Function::reverse(int nadj) "
 
-Default constructor.
+Get a function that calculates nadj adjoint derivatives.
 
-";
+Returns a function with n_in + n_out + n_out inputs and n_in outputs. The
+first n_in inputs correspond to nondifferentiated inputs. The next n_out
+inputs correspond to nondifferentiated outputs. and the last n_out inputs
+correspond to adjoint seeds, stacked horizontally The n_in outputs
+correspond to adjoint sensitivities, stacked horizontally. * (n_in = n_in(),
+n_out = n_out())
 
-%feature("docstring") casadi::Callback::Callback(const Callback &obj) "
+(n_in = n_in(), n_out = n_out())
 
-Copy constructor (throws an error)
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned.
 
 ";
 
@@ -907,6 +1006,16 @@ guarantee that subsequent calls return unique answers.
 
 ";
 
+%feature("docstring")  casadi::Callback::get_forward(const std::string
+&name, int nfwd, const std::vector< std::string > &i_names, const
+std::vector< std::string > &o_names, const Dict &opts) "
+
+Return function that calculates forward derivatives forward(nfwd) returns a
+cached instance if available, and calls  Function get_forward(int nfwd) if
+no cached version is available.
+
+";
+
 %feature("docstring")  casadi::Function::sparsity_jac(int iind=0, int
 oind=0, bool compact=false, bool symmetric=false) "
 
@@ -935,118 +1044,9 @@ Get, if necessary generate, the sparsity of a Jacobian block
 
 ";
 
-%feature("docstring")  casadi::Function::forward_new(int nfwd) "
-
-Get a function that calculates nfwd forward derivatives.
-
-Returns a function with n_in + n_out + n_in inputs and nfwd outputs. The
-first n_in inputs correspond to nondifferentiated inputs. The next n_out
-inputs correspond to nondifferentiated outputs. and the last n_in inputs
-correspond to forward seeds, stacked horizontally The n_out outputs
-correspond to forward sensitivities, stacked horizontally. * (n_in = n_in(),
-n_out = n_out())
-
-The functions returned are cached, meaning that if called multiple timed
-with the same value, then multiple references to the same function will be
-returned.
-
-";
-
 %feature("docstring")  casadi::Function::rootfinder_fun() "
 
 Access rhs function for a rootfinder.
-
-";
-
-%feature("docstring")  casadi::Function::jacobian(int iind=0, int oind=0,
-bool compact=false, bool symmetric=false) "
-
-Generate a Jacobian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. If
-compact is set to true, only the nonzeros of the input and output
-expressions are considered. If symmetric is set to true, the Jacobian being
-calculated is known to be symmetric (usually a Hessian), which can be
-exploited by the algorithm.
-
-The generated Jacobian has one more output than the calling function
-corresponding to the Jacobian and the same number of inputs.
-
-";
-
-%feature("docstring")  casadi::Function::jacobian(const std::string &iind,
-int oind=0, bool compact=false, bool symmetric=false) "
-
-Generate a Jacobian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. If
-compact is set to true, only the nonzeros of the input and output
-expressions are considered. If symmetric is set to true, the Jacobian being
-calculated is known to be symmetric (usually a Hessian), which can be
-exploited by the algorithm.
-
-The generated Jacobian has one more output than the calling function
-corresponding to the Jacobian and the same number of inputs.
-
-";
-
-%feature("docstring")  casadi::Function::jacobian(int iind, const
-std::string &oind, bool compact=false, bool symmetric=false) "
-
-Generate a Jacobian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. If
-compact is set to true, only the nonzeros of the input and output
-expressions are considered. If symmetric is set to true, the Jacobian being
-calculated is known to be symmetric (usually a Hessian), which can be
-exploited by the algorithm.
-
-The generated Jacobian has one more output than the calling function
-corresponding to the Jacobian and the same number of inputs.
-
-";
-
-%feature("docstring")  casadi::Function::jacobian(const std::string &iind,
-const std::string &oind, bool compact=false, bool symmetric=false) "
-
-Generate a Jacobian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. If
-compact is set to true, only the nonzeros of the input and output
-expressions are considered. If symmetric is set to true, the Jacobian being
-calculated is known to be symmetric (usually a Hessian), which can be
-exploited by the algorithm.
-
-The generated Jacobian has one more output than the calling function
-corresponding to the Jacobian and the same number of inputs.
 
 ";
 
@@ -1409,16 +1409,6 @@ Get oracle.
 
 ";
 
-%feature("docstring")  casadi::Callback::get_forward_new(const std::string
-&name, int nfwd, const std::vector< std::string > &i_names, const
-std::vector< std::string > &o_names, const Dict &opts) "
-
-Return function that calculates forward derivatives forward(nfwd) returns a
-cached instance if available, and calls  Function get_forward(int nfwd) if
-no cached version is available.
-
-";
-
 %feature("docstring")  casadi::Function::setJacobian(const Function &jac,
 int iind=0, int oind=0, bool compact=false) "
 
@@ -1665,6 +1655,16 @@ Get sparsity of a given input.
 &iname) const  "
 
 Get sparsity of a given input.
+
+";
+
+%feature("docstring")  casadi::Callback::get_reverse(const std::string
+&name, int nadj, const std::vector< std::string > &i_names, const
+std::vector< std::string > &o_names, const Dict &opts) "
+
+Return function that calculates adjoint derivatives reverse(nadj) returns a
+cached instance if available, and calls  Function get_reverse(int nadj) if
+no cached version is available.
 
 ";
 
@@ -3227,6 +3227,23 @@ Is a null pointer?
 
 ";
 
+%feature("docstring")  casadi::Function::forward(int nfwd) "
+
+Get a function that calculates nfwd forward derivatives.
+
+Returns a function with n_in + n_out + n_in inputs and nfwd outputs. The
+first n_in inputs correspond to nondifferentiated inputs. The next n_out
+inputs correspond to nondifferentiated outputs. and the last n_in inputs
+correspond to forward seeds, stacked horizontally The n_out outputs
+correspond to forward sensitivities, stacked horizontally. * (n_in = n_in(),
+n_out = n_out())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned.
+
+";
+
 %feature("docstring")  casadi::Function::n_out() const  "
 
 Get the number of function outputs.
@@ -3315,23 +3332,6 @@ parallelization:  Type of parallelization used: unroll|serial|openmp
 
 ";
 
-%feature("docstring")  casadi::Function::forward_new(int nfwd) "
-
-Get a function that calculates nfwd forward derivatives.
-
-Returns a function with n_in + n_out + n_in inputs and nfwd outputs. The
-first n_in inputs correspond to nondifferentiated inputs. The next n_out
-inputs correspond to nondifferentiated outputs. and the last n_in inputs
-correspond to forward seeds, stacked horizontally The n_out outputs
-correspond to forward sensitivities, stacked horizontally. * (n_in = n_in(),
-n_out = n_out())
-
-The functions returned are cached, meaning that if called multiple timed
-with the same value, then multiple references to the same function will be
-returned.
-
-";
-
 %feature("docstring")  casadi::Function::nnz_out() const  "
 
 Get number of output nonzeros.
@@ -3382,25 +3382,6 @@ Get, if necessary generate, the sparsity of a Jacobian block
 &iind, const std::string &oind, bool compact=false, bool symmetric=false) "
 
 Get, if necessary generate, the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::Function::reverse_new(int nadj) "
-
-Get a function that calculates nadj adjoint derivatives.
-
-Returns a function with n_in + n_out + n_out inputs and n_in outputs. The
-first n_in inputs correspond to nondifferentiated inputs. The next n_out
-inputs correspond to nondifferentiated outputs. and the last n_out inputs
-correspond to adjoint seeds, stacked horizontally The n_in outputs
-correspond to adjoint sensitivities, stacked horizontally. * (n_in = n_in(),
-n_out = n_out())
-
-(n_in = n_in(), n_out = n_out())
-
-The functions returned are cached, meaning that if called multiple timed
-with the same value, then multiple references to the same function will be
-returned.
 
 ";
 
@@ -3683,6 +3664,25 @@ guarantee that subsequent calls return unique answers.
 
 Get symbolic primitives equivalent to the input expressions There is no
 guarantee that subsequent calls return unique answers.
+
+";
+
+%feature("docstring")  casadi::Function::reverse(int nadj) "
+
+Get a function that calculates nadj adjoint derivatives.
+
+Returns a function with n_in + n_out + n_out inputs and n_in outputs. The
+first n_in inputs correspond to nondifferentiated inputs. The next n_out
+inputs correspond to nondifferentiated outputs. and the last n_out inputs
+correspond to adjoint seeds, stacked horizontally The n_in outputs
+correspond to adjoint sensitivities, stacked horizontally. * (n_in = n_in(),
+n_out = n_out())
+
+(n_in = n_in(), n_out = n_out())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned.
 
 ";
 

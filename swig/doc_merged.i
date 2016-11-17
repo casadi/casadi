@@ -313,6 +313,20 @@ Get input dimension.
 
 ";
 
+%feature("docstring") casadi::Callback::Callback "
+
+>  casadi::Callback::Callback()
+------------------------------------------------------------------------
+
+Default constructor.
+
+>  casadi::Callback::Callback(const Callback &obj)
+------------------------------------------------------------------------
+
+Copy constructor (throws an error)
+
+";
+
 %feature("docstring") casadi::Callback::get_name_in "
 
 Get the sparsity of an input This function is called during construction.
@@ -388,6 +402,23 @@ For a particular input or for all of the inputs
 
 ";
 
+%feature("docstring") casadi::Callback::forward "
+
+Get a function that calculates nfwd forward derivatives.
+
+Returns a function with n_in + n_out + n_in inputs and nfwd outputs. The
+first n_in inputs correspond to nondifferentiated inputs. The next n_out
+inputs correspond to nondifferentiated outputs. and the last n_in inputs
+correspond to forward seeds, stacked horizontally The n_out outputs
+correspond to forward sensitivities, stacked horizontally. * (n_in = n_in(),
+n_out = n_out())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned.
+
+";
+
 %feature("docstring") casadi::Callback::default_in "
 
 Get default input value (NOTE: constant reference)
@@ -420,25 +451,6 @@ Print dimensions of inputs and outputs.
 %feature("docstring") casadi::Callback::generate "
 
 Export / Generate C code for the function.
-
-";
-
-%feature("docstring") casadi::Callback::reverse_new "
-
-Get a function that calculates nadj adjoint derivatives.
-
-Returns a function with n_in + n_out + n_out inputs and n_in outputs. The
-first n_in inputs correspond to nondifferentiated inputs. The next n_out
-inputs correspond to nondifferentiated outputs. and the last n_out inputs
-correspond to adjoint seeds, stacked horizontally The n_in outputs
-correspond to adjoint sensitivities, stacked horizontally. * (n_in = n_in(),
-n_out = n_out())
-
-(n_in = n_in(), n_out = n_out())
-
-The functions returned are cached, meaning that if called multiple timed
-with the same value, then multiple references to the same function will be
-returned.
 
 ";
 
@@ -479,11 +491,25 @@ Get type name.
 
 ";
 
-%feature("docstring") casadi::Callback::get_reverse_new "
+%feature("docstring") casadi::Callback::jacobian "
 
-Return function that calculates adjoint derivatives reverse(nadj) returns a
-cached instance if available, and calls  Function get_reverse(int nadj) if
-no cached version is available.
+Generate a Jacobian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian and the same number of inputs.
 
 ";
 
@@ -517,17 +543,22 @@ Checkout a memory object.
 
 ";
 
-%feature("docstring") casadi::Callback::Callback "
+%feature("docstring") casadi::Callback::reverse "
 
->  casadi::Callback::Callback()
-------------------------------------------------------------------------
+Get a function that calculates nadj adjoint derivatives.
 
-Default constructor.
+Returns a function with n_in + n_out + n_out inputs and n_in outputs. The
+first n_in inputs correspond to nondifferentiated inputs. The next n_out
+inputs correspond to nondifferentiated outputs. and the last n_out inputs
+correspond to adjoint seeds, stacked horizontally The n_in outputs
+correspond to adjoint sensitivities, stacked horizontally. * (n_in = n_in(),
+n_out = n_out())
 
->  casadi::Callback::Callback(const Callback &obj)
-------------------------------------------------------------------------
+(n_in = n_in(), n_out = n_out())
 
-Copy constructor (throws an error)
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned.
 
 ";
 
@@ -631,54 +662,23 @@ guarantee that subsequent calls return unique answers.
 
 ";
 
+%feature("docstring") casadi::Callback::get_forward "
+
+Return function that calculates forward derivatives forward(nfwd) returns a
+cached instance if available, and calls  Function get_forward(int nfwd) if
+no cached version is available.
+
+";
+
 %feature("docstring") casadi::Callback::sparsity_jac "
 
 Get, if necessary generate, the sparsity of a Jacobian block
 
 ";
 
-%feature("docstring") casadi::Callback::forward_new "
-
-Get a function that calculates nfwd forward derivatives.
-
-Returns a function with n_in + n_out + n_in inputs and nfwd outputs. The
-first n_in inputs correspond to nondifferentiated inputs. The next n_out
-inputs correspond to nondifferentiated outputs. and the last n_in inputs
-correspond to forward seeds, stacked horizontally The n_out outputs
-correspond to forward sensitivities, stacked horizontally. * (n_in = n_in(),
-n_out = n_out())
-
-The functions returned are cached, meaning that if called multiple timed
-with the same value, then multiple references to the same function will be
-returned.
-
-";
-
 %feature("docstring") casadi::Callback::rootfinder_fun "
 
 Access rhs function for a rootfinder.
-
-";
-
-%feature("docstring") casadi::Callback::jacobian "
-
-Generate a Jacobian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. If
-compact is set to true, only the nonzeros of the input and output
-expressions are considered. If symmetric is set to true, the Jacobian being
-calculated is known to be symmetric (usually a Hessian), which can be
-exploited by the algorithm.
-
-The generated Jacobian has one more output than the calling function
-corresponding to the Jacobian and the same number of inputs.
 
 ";
 
@@ -879,14 +879,6 @@ Get oracle.
 
 ";
 
-%feature("docstring") casadi::Callback::get_forward_new "
-
-Return function that calculates forward derivatives forward(nfwd) returns a
-cached instance if available, and calls  Function get_forward(int nfwd) if
-no cached version is available.
-
-";
-
 %feature("docstring") casadi::Callback::setJacobian "
 
 Set the Jacobian function of output oind with respect to input iind NOTE:
@@ -1015,6 +1007,14 @@ Get input dimension.
 %feature("docstring") casadi::Callback::sparsity_in "
 
 Get sparsity of a given input.
+
+";
+
+%feature("docstring") casadi::Callback::get_reverse "
+
+Return function that calculates adjoint derivatives reverse(nadj) returns a
+cached instance if available, and calls  Function get_reverse(int nadj) if
+no cached version is available.
 
 ";
 
@@ -2140,6 +2140,23 @@ Is a null pointer?
 
 ";
 
+%feature("docstring") casadi::Function::forward "
+
+Get a function that calculates nfwd forward derivatives.
+
+Returns a function with n_in + n_out + n_in inputs and nfwd outputs. The
+first n_in inputs correspond to nondifferentiated inputs. The next n_out
+inputs correspond to nondifferentiated outputs. and the last n_in inputs
+correspond to forward seeds, stacked horizontally The n_out outputs
+correspond to forward sensitivities, stacked horizontally. * (n_in = n_in(),
+n_out = n_out())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned.
+
+";
+
 %feature("docstring") casadi::Function::n_out "
 
 Get the number of function outputs.
@@ -2215,23 +2232,6 @@ parallelization:  Type of parallelization used: unroll|serial|openmp
 
 ";
 
-%feature("docstring") casadi::Function::forward_new "
-
-Get a function that calculates nfwd forward derivatives.
-
-Returns a function with n_in + n_out + n_in inputs and nfwd outputs. The
-first n_in inputs correspond to nondifferentiated inputs. The next n_out
-inputs correspond to nondifferentiated outputs. and the last n_in inputs
-correspond to forward seeds, stacked horizontally The n_out outputs
-correspond to forward sensitivities, stacked horizontally. * (n_in = n_in(),
-n_out = n_out())
-
-The functions returned are cached, meaning that if called multiple timed
-with the same value, then multiple references to the same function will be
-returned.
-
-";
-
 %feature("docstring") casadi::Function::nnz_out "
 
 Get number of output nonzeros.
@@ -2243,25 +2243,6 @@ For a particular output or for all of the outputs
 %feature("docstring") casadi::Function::sparsity_jac "
 
 Get, if necessary generate, the sparsity of a Jacobian block
-
-";
-
-%feature("docstring") casadi::Function::reverse_new "
-
-Get a function that calculates nadj adjoint derivatives.
-
-Returns a function with n_in + n_out + n_out inputs and n_in outputs. The
-first n_in inputs correspond to nondifferentiated inputs. The next n_out
-inputs correspond to nondifferentiated outputs. and the last n_out inputs
-correspond to adjoint seeds, stacked horizontally The n_in outputs
-correspond to adjoint sensitivities, stacked horizontally. * (n_in = n_in(),
-n_out = n_out())
-
-(n_in = n_in(), n_out = n_out())
-
-The functions returned are cached, meaning that if called multiple timed
-with the same value, then multiple references to the same function will be
-returned.
 
 ";
 
@@ -2425,6 +2406,25 @@ Get input scheme name by index.
 
 Get symbolic primitives equivalent to the input expressions There is no
 guarantee that subsequent calls return unique answers.
+
+";
+
+%feature("docstring") casadi::Function::reverse "
+
+Get a function that calculates nadj adjoint derivatives.
+
+Returns a function with n_in + n_out + n_out inputs and n_in outputs. The
+first n_in inputs correspond to nondifferentiated inputs. The next n_out
+inputs correspond to nondifferentiated outputs. and the last n_out inputs
+correspond to adjoint seeds, stacked horizontally The n_in outputs
+correspond to adjoint sensitivities, stacked horizontally. * (n_in = n_in(),
+n_out = n_out())
+
+(n_in = n_in(), n_out = n_out())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned.
 
 ";
 
