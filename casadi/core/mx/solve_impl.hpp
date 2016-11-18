@@ -66,7 +66,7 @@ namespace casadi {
   }
 
   template<bool Tr>
-  void Solve<Tr>::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) {
+  void Solve<Tr>::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
     if (arg[0].is_zero()) {
       res[0] = MX(arg[0].size());
     } else {

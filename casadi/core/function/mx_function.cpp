@@ -578,7 +578,7 @@ namespace casadi {
   }
 
   void MXFunction::eval_mx(const MXVector& arg, MXVector& res,
-                           bool always_inline, bool never_inline) {
+                           bool always_inline, bool never_inline) const {
     log("MXFunction::eval_mx begin");
 
     // Resize the number of outputs

@@ -1586,7 +1586,7 @@ namespace casadi {
   }
 
   void FunctionInternal::eval_mx(const MXVector& arg, MXVector& res,
-                                 bool always_inline, bool never_inline) {
+                                 bool always_inline, bool never_inline) const {
     // The code below creates a call node, to inline, wrap in an MXFunction
     if (always_inline) {
       casadi_assert_message(!never_inline, "Inconsistent options");

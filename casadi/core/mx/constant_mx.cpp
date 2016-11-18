@@ -39,7 +39,7 @@ namespace casadi {
   ConstantMX::~ConstantMX() {
   }
 
-  void ConstantMX::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) {
+  void ConstantMX::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
     res[0] = shared_from_this<MX>();
   }
 

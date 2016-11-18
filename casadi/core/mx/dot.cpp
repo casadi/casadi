@@ -40,7 +40,7 @@ namespace casadi {
     return "dot(" + arg.at(0) + ", " + arg.at(1) + ")";
   }
 
-  void Dot::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) {
+  void Dot::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
     res[0] = arg[0]->getDot(arg[1]);
   }
 

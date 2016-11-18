@@ -60,7 +60,7 @@ namespace casadi {
     return ss.str();
   }
 
-  void SubRef::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) {
+  void SubRef::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
     casadi_error("not ready");
   }
 

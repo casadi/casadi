@@ -99,7 +99,7 @@ namespace casadi {
     fcn_(arg, res, iw, w, mem);
   }
 
-  void Call::eval_mx(const vector<MX>& arg, vector<MX>& res) {
+  void Call::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
     res = create(fcn_, arg);
   }
 

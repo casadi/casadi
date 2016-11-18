@@ -48,7 +48,7 @@ namespace casadi {
   void SymbolicMX::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
   }
 
-  void SymbolicMX::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) {
+  void SymbolicMX::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
   }
 
   void SymbolicMX::evalFwd(const std::vector<std::vector<MX> >& fseed,

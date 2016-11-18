@@ -64,7 +64,7 @@ namespace casadi {
   }
 
   template<bool Add>
-  void SetNonzeros<Add>::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) {
+  void SetNonzeros<Add>::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
     // Get all the nonzeros
     vector<int> nz = all();
 

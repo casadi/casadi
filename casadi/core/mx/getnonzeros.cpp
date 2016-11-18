@@ -178,7 +178,7 @@ namespace casadi {
     return ss.str();
   }
 
-  void GetNonzeros::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) {
+  void GetNonzeros::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
     // Get all the nonzeros
     vector<int> nz = all();
 

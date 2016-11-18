@@ -161,7 +161,7 @@ namespace casadi {
     return arg.at(0) + "'";
   }
 
-  void Transpose::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) {
+  void Transpose::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
     res[0] = arg[0].T();
   }
 

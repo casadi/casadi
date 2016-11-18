@@ -150,7 +150,8 @@ namespace casadi {
 
     ///@{
     /** \brief  Evaluate with symbolic matrices */
-    virtual void eval_mx(const MXVector& arg, MXVector& res, bool always_inline, bool never_inline);
+    virtual void eval_mx(const MXVector& arg, MXVector& res,
+                         bool always_inline, bool never_inline) const;
     ///@}
 
     ///@{
@@ -161,18 +162,19 @@ namespace casadi {
 
     ///@{
     /** \brief Call a function, overloaded */
-    void _call(const MXVector& arg, MXVector& res, bool always_inline, bool never_inline) {
+    void _call(const MXVector& arg, MXVector& res,
+               bool always_inline, bool never_inline) const {
       eval_mx(arg, res, always_inline, never_inline);
     }
     template<typename D>
     void _call(const std::vector<Matrix<D> >& arg, std::vector<Matrix<D> >& res,
-               bool always_inline, bool never_inline);
+               bool always_inline, bool never_inline) const;
     ///@}
 
     /** \brief Call a function, templated */
     template<typename M>
       void call(const std::vector<M>& arg, std::vector<M>& res,
-               bool always_inline, bool never_inline);
+               bool always_inline, bool never_inline) const;
 
     /** Helper function */
     static bool checkMat(const Sparsity& arg, const Sparsity& inp, bool hcat=false);
@@ -918,7 +920,7 @@ namespace casadi {
 
   template<typename M>
   void FunctionInternal::call(const std::vector<M>& arg, std::vector<M>& res,
-                              bool always_inline, bool never_inline) {
+                              bool always_inline, bool never_inline) const {
     // Check if inputs need to be replaced
     if (!matchingArg(arg)) {
       return call(replaceArg(arg), res, always_inline, never_inline);
@@ -930,7 +932,7 @@ namespace casadi {
 
   template<typename D>
   void FunctionInternal::_call(const std::vector<Matrix<D> >& arg, std::vector<Matrix<D> >& res,
-                               bool always_inline, bool never_inline) {
+                               bool always_inline, bool never_inline) const {
     casadi_assert_message(!never_inline, "Call-nodes only possible in MX expressions");
 
     // Get the number of inputs and outputs

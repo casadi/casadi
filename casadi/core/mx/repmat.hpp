@@ -61,7 +61,7 @@ namespace casadi {
     virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const;
 
     /** \brief  Evaluate symbolically (MX) */
-    virtual void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res);
+    virtual void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const;
 
     /** \brief  Propagate sparsity forward */
     virtual void sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const;
@@ -114,7 +114,7 @@ namespace casadi {
     virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const;
 
     /** \brief  Evaluate symbolically (MX) */
-    virtual void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res);
+    virtual void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const;
 
     /** \brief  Propagate sparsity forward */
     virtual void sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const;

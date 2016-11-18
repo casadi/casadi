@@ -49,7 +49,7 @@ namespace casadi {
     virtual void eval(const double** arg, double** res, int* iw, double* w, int mem) const;
 
     /** \brief  Evaluate symbolically (MX) */
-    virtual void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res);
+    virtual void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const;
 
     /** \brief Calculate forward mode directional derivatives */
     virtual void evalFwd(const std::vector<std::vector<MX> >& fseed,

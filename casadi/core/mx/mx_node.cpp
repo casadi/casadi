@@ -317,7 +317,7 @@ namespace casadi {
                           + typeid(*this).name());
   }
 
-  void MXNode::eval_mx(const vector<MX>& arg, vector<MX>& res) {
+  void MXNode::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
     throw CasadiException(string("MXNode::eval_mx not defined for class ")
                           + typeid(*this).name());
   }

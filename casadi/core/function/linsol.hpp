@@ -77,10 +77,10 @@ namespace casadi {
     std::string plugin_name() const;
 
     /// Solve numerically
-    DM solve(const DM& A, const DM& B, bool tr=false);
+    DM solve(const DM& A, const DM& B, bool tr=false) const;
 
     /// Create a solve node
-    MX solve(const MX& A, const MX& B, bool tr=false);
+    MX solve(const MX& A, const MX& B, bool tr=false) const;
 
 #ifndef SWIG
     // Set sparsity pattern

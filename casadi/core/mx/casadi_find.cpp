@@ -47,7 +47,7 @@ namespace casadi {
     res[0][0] = k<nnz ? dep(0).row(k) : dep(0).size1();
   }
 
-  void Find::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) {
+  void Find::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
     res[0] = find(arg[0]);
   }
 

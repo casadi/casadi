@@ -66,7 +66,7 @@ namespace casadi {
     return (*this)->plugin_name();
   }
 
-  DM Linsol::solve(const DM& A, const DM& B, bool tr) {
+  DM Linsol::solve(const DM& A, const DM& B, bool tr) const {
     casadi_assert_message(A.size1()==B.size1(),
       "Linsol::solve: Dimension mismatch. A and b must have matching row count." <<
       " Got " << A.dim() << " and " << B.dim() << ".");
@@ -86,7 +86,7 @@ namespace casadi {
     return x;
   }
 
-  MX Linsol::solve(const MX& A, const MX& B, bool tr) {
+  MX Linsol::solve(const MX& A, const MX& B, bool tr) const {
     return A->getSolve(B, tr, *this);
   }
 
