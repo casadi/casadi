@@ -4089,12 +4089,12 @@ Obtain a symbolic Cholesky factorization Only for Cholesky solvers.
 
 %feature("docstring") casadi::Linsol::solve "
 
->  DM casadi::Linsol::solve(const DM &A, const DM &B, bool tr=false)
+>  DM casadi::Linsol::solve(const DM &A, const DM &B, bool tr=false) const 
 ------------------------------------------------------------------------
 
 Solve numerically.
 
->  MX casadi::Linsol::solve(const MX &A, const MX &B, bool tr=false)
+>  MX casadi::Linsol::solve(const MX &A, const MX &B, bool tr=false) const 
 ------------------------------------------------------------------------
 
 Create a solve node.
