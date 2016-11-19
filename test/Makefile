@@ -28,7 +28,7 @@ benchmarks:
 python: unittests_py examples_indoc_py examples_code_py user_guide_snippets_py
 
 matlab: unittests_matlab examples_matlab
-octave: unittests_octave
+octave: unittests_octave examples_octave
 
 python_knownbugs: unittests_py_knownbugs examples_indoc_py examples_code_py user_guide_snippets_py
 
@@ -69,7 +69,10 @@ unittests_octave:
 	python internal/test_octave.py matlab -skipfiles="callback.m"
 
 examples_matlab:
-	python internal/test_matlab.py '../docs/examples/matlab'
+	python internal/test_matlab.py '../docs/examples/matlab' -skipfiles="MyCallback.m"
+
+examples_octave:
+	python internal/test_octave.py '../docs/examples/matlab' -skipfiles="MyCallback.m,callback.m"
 
 # No memchecks because there is a memory leak in SuperLU
 examples_indoc_py:
