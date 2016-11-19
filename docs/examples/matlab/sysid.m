@@ -68,7 +68,9 @@ one_sample = one_sample.expand();
 
 %%%%%%%%%%%% Simulating the system %%%%%%%%%%
 
-all_samples = one_sample.mapaccum('all_samples', N);
+assert(mod(N,100)==0);
+all_samples1 = one_sample.mapaccum('all_samples', N/100);
+all_samples = all_samples1.mapaccum('all_samples', 100);
 
 % Choose an excitation signal
 u_data = 0.1*rand(N,1);
