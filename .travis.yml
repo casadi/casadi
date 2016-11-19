@@ -322,6 +322,7 @@ before_install:
   - pushd testbot/restricted/cplex && mkdir cplex && tar -xf cplex12.4.tar.gz -C cplex && mkdir concert && tar -xf cplex12.4-concert.tar.gz -C concert && rm cplex12.4-concert.tar.gz && popd
   - pushd testbot/restricted && mkdir -p worhp && cd  worhp && 7za e ../libworhp_debian7_amd64_gcc47_1.7-12970f3.7z -y && popd
   - slurp bonmin
+  - slurp ipopt
   - popd
   - sudo apt-get update -qq
   - sudo apt-get install -q -y binutils gcc g++ gfortran git cmake liblapack-dev liblapack3 libblas3 ipython python-dev python-numpy python-scipy python-matplotlib coinor-libipopt-dev libmumps-seq-dev libxml2-dev
