@@ -12,7 +12,7 @@ env:
     - SNOPT=/home/travis/build/snopt75
     - MATLABPATH=/home/travis/build/matlab-install
     - MATLAB_ROOT=/home/travis/build/matlab
-    - MATLABRELEASE=R2014b
+    - MATLABRELEASE=R2014a
     - SLURP_OS=trusty
 
 before_script:
