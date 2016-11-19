@@ -44,7 +44,7 @@ if iswindows:
 else:
   t = TestSuite(dirname=src,
     suffix="m",
-    command = lambda dir,fn, opt:  ["matlab","-nodisplay","-nosplash","-nodesktop","-nojvm","-r",fn[:-2]+";clear"] + opt,
+    command = lambda dir,fn, opt:  ["matlab","-nodisplay","-nosplash","-nodesktop","-r",fn[:-2]+";clear"] + opt,
     skipdirs=[".svn","ctemplate","defs"],
      #inputs = lambda dir,fn : {fn: file(dir + "/" + fn,"r").read()},
       args=sys.argv[2:],
