@@ -252,9 +252,9 @@ matrix:
       language: generic
       env: NEEDMATLAB=1
       script:
-        - sudo apt-get install -y gcc-4.6 g++-4.6 gfortran-4.6
-        - export CC=gcc-4.6
-        - export CXX=g++-4.6
+        - sudo apt-get install -y gcc-4.7 g++-4.7 gfortran-4.7
+        - export CC=gcc-4.7
+        - export CXX=g++-4.7
 
         # travis-wait seems to stop at 20 mins, regardless if output is being generated
         - (while true ; do sleep 60 ; echo "ping" ; done ) &
@@ -308,7 +308,7 @@ before_install:
   - |
     if [ $NEEDMATLAB ]
     then
-      export SLURP_GCC=4.6
+      export SLURP_GCC=4.7
       slurp swig_matlab
     else
       slurp swig
