@@ -576,7 +576,8 @@ namespace casadi {
     if (verbose()) userOut() << "SXFunction::eval_sx end" << endl;
   }
 
-  void SXFunction::eval_forward(const vector<vector<SX> >& fseed, vector<vector<SX> >& fsens) {
+  void SXFunction::eval_forward(const vector<vector<SX> >& fseed,
+                                vector<vector<SX> >& fsens) const {
     if (verbose()) userOut() << "SXFunction::eval_forward begin" << endl;
 
     // Number of forward seeds
@@ -674,7 +675,8 @@ namespace casadi {
     if (verbose()) userOut() << "SXFunction::eval_forward end" << endl;
   }
 
-  void SXFunction::eval_reverse(const vector<vector<SX> >& aseed, vector<vector<SX> >& asens) {
+  void SXFunction::eval_reverse(const vector<vector<SX> >& aseed,
+                                vector<vector<SX> >& asens) const {
     if (verbose()) userOut() << "SXFunction::eval_reverse begin" << endl;
 
     // number of adjoint seeds

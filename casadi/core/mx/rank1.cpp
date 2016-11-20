@@ -45,7 +45,7 @@ namespace casadi {
   }
 
   void Rank1::eval_forward(const std::vector<std::vector<MX> >& fseed,
-                      std::vector<std::vector<MX> >& fsens) {
+                      std::vector<std::vector<MX> >& fsens) const {
     for (int d=0; d<fsens.size(); ++d) {
       MX v = project(fseed[d][0], sparsity());
       v = rank1(v, fseed[d][1], dep(2), dep(3));
@@ -56,7 +56,7 @@ namespace casadi {
   }
 
   void Rank1::eval_reverse(const std::vector<std::vector<MX> >& aseed,
-                      std::vector<std::vector<MX> >& asens) {
+                      std::vector<std::vector<MX> >& asens) const {
     for (int d=0; d<aseed.size(); ++d) {
       asens[d][1] += bilin(aseed[d][0], dep(2), dep(3));
       asens[d][2] += dep(1) * mtimes(aseed[d][0], dep(3));

@@ -147,7 +147,7 @@ namespace casadi {
   }
 
   void Horzsplit::eval_forward(const std::vector<std::vector<MX> >& fseed,
-                          std::vector<std::vector<MX> >& fsens) {
+                          std::vector<std::vector<MX> >& fsens) const {
     int nfwd = fsens.size();
 
     // Get column offsets
@@ -165,7 +165,7 @@ namespace casadi {
   }
 
   void Horzsplit::eval_reverse(const std::vector<std::vector<MX> >& aseed,
-                          std::vector<std::vector<MX> >& asens) {
+                          std::vector<std::vector<MX> >& asens) const {
     int nadj = aseed.size();
 
     // Get column offsets
@@ -219,7 +219,7 @@ namespace casadi {
   }
 
   void Diagsplit::eval_forward(const std::vector<std::vector<MX> >& fseed,
-                          std::vector<std::vector<MX> >& fsens) {
+                          std::vector<std::vector<MX> >& fsens) const {
     int nfwd = fsens.size();
     // Get offsets
     vector<int> offset1;
@@ -240,7 +240,7 @@ namespace casadi {
   }
 
   void Diagsplit::eval_reverse(const std::vector<std::vector<MX> >& aseed,
-                          std::vector<std::vector<MX> >& asens) {
+                          std::vector<std::vector<MX> >& asens) const {
     int nadj = asens.size();
 
     // Get offsets
@@ -289,7 +289,7 @@ namespace casadi {
   }
 
   void Vertsplit::eval_forward(const std::vector<std::vector<MX> >& fseed,
-                          std::vector<std::vector<MX> >& fsens) {
+                          std::vector<std::vector<MX> >& fsens) const {
     int nfwd = fsens.size();
 
     // Get row offsets
@@ -306,7 +306,7 @@ namespace casadi {
   }
 
   void Vertsplit::eval_reverse(const std::vector<std::vector<MX> >& aseed,
-                          std::vector<std::vector<MX> >& asens) {
+                          std::vector<std::vector<MX> >& asens) const {
     int nadj = aseed.size();
 
     // Get row offsets

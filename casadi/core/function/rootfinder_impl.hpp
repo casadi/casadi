@@ -128,13 +128,13 @@ namespace casadi {
     virtual void eval_forward(const std::vector<MX>& arg, const std::vector<MX>& res,
                          const std::vector<std::vector<MX> >& fseed,
                          std::vector<std::vector<MX> >& fsens,
-                         bool always_inline, bool never_inline);
+                         bool always_inline, bool never_inline) const;
 
     /** \brief Create call to (cached) derivative function, reverse mode  */
     virtual void eval_reverse(const std::vector<MX>& arg, const std::vector<MX>& res,
                          const std::vector<std::vector<MX> >& aseed,
                          std::vector<std::vector<MX> >& asens,
-                         bool always_inline, bool never_inline);
+                         bool always_inline, bool never_inline) const;
 
     /// Number of equations
     int n_;

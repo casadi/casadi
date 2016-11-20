@@ -63,7 +63,7 @@ namespace casadi {
   }
 
   void Project::eval_forward(const std::vector<std::vector<MX> >& fseed,
-                          std::vector<std::vector<MX> >& fsens) {
+                          std::vector<std::vector<MX> >& fsens) const {
     int nfwd = fsens.size();
     for (int d=0; d<nfwd; ++d) {
       fsens[d][0] = project(fseed[d][0], sparsity(), true);
@@ -71,7 +71,7 @@ namespace casadi {
   }
 
   void Project::eval_reverse(const std::vector<std::vector<MX> >& aseed,
-                          std::vector<std::vector<MX> >& asens) {
+                          std::vector<std::vector<MX> >& asens) const {
     int nadj = aseed.size();
     for (int d=0; d<nadj; ++d) {
       asens[d][0] += project(aseed[d][0], dep().sparsity(), true);

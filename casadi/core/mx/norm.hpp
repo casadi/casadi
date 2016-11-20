@@ -74,11 +74,11 @@ namespace casadi {
 
     /** \brief Calculate forward mode directional derivatives */
     virtual void eval_forward(const std::vector<std::vector<MX> >& fseed,
-                         std::vector<std::vector<MX> >& fsens);
+                         std::vector<std::vector<MX> >& fsens) const;
 
     /** \brief Calculate reverse mode directional derivatives */
     virtual void eval_reverse(const std::vector<std::vector<MX> >& aseed,
-                         std::vector<std::vector<MX> >& asens);
+                         std::vector<std::vector<MX> >& asens) const;
 
     /** \brief Generate code for the operation */
     void generate(CodeGenerator& g, const std::string& mem,

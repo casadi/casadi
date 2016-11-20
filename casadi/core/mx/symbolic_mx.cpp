@@ -52,11 +52,11 @@ namespace casadi {
   }
 
   void SymbolicMX::eval_forward(const std::vector<std::vector<MX> >& fseed,
-                           std::vector<std::vector<MX> >& fsens) {
+                           std::vector<std::vector<MX> >& fsens) const {
   }
 
   void SymbolicMX::eval_reverse(const std::vector<std::vector<MX> >& aseed,
-                           std::vector<std::vector<MX> >& asens) {
+                           std::vector<std::vector<MX> >& asens) const {
   }
 
   const std::string& SymbolicMX::name() const {

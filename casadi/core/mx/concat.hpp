@@ -112,11 +112,11 @@ namespace casadi {
 
     /** \brief Calculate forward mode directional derivatives */
     virtual void eval_forward(const std::vector<std::vector<MX> >& fseed,
-                         std::vector<std::vector<MX> >& fsens);
+                         std::vector<std::vector<MX> >& fsens) const;
 
     /** \brief Calculate reverse mode directional derivatives */
     virtual void eval_reverse(const std::vector<std::vector<MX> >& aseed,
-                         std::vector<std::vector<MX> >& asens);
+                         std::vector<std::vector<MX> >& asens) const;
 
     /** \brief Get the operation */
     virtual int op() const { return OP_HORZCAT;}
@@ -152,11 +152,11 @@ namespace casadi {
 
     /** \brief Calculate forward mode directional derivatives */
     virtual void eval_forward(const std::vector<std::vector<MX> >& fseed,
-                         std::vector<std::vector<MX> >& fsens);
+                         std::vector<std::vector<MX> >& fsens) const;
 
     /** \brief Calculate reverse mode directional derivatives */
     virtual void eval_reverse(const std::vector<std::vector<MX> >& aseed,
-                         std::vector<std::vector<MX> >& asens);
+                         std::vector<std::vector<MX> >& asens) const;
 
     /** \brief Get the operation */
     virtual int op() const { return OP_VERTCAT;}
@@ -192,11 +192,11 @@ namespace casadi {
 
     /** \brief Calculate forward mode directional derivatives */
     virtual void eval_forward(const std::vector<std::vector<MX> >& fseed,
-                         std::vector<std::vector<MX> >& fsens);
+                         std::vector<std::vector<MX> >& fsens) const;
 
     /** \brief Calculate reverse mode directional derivatives */
     virtual void eval_reverse(const std::vector<std::vector<MX> >& aseed,
-                         std::vector<std::vector<MX> >& asens);
+                         std::vector<std::vector<MX> >& asens) const;
 
     /** \brief Get the operation */
     virtual int op() const { return OP_DIAGCAT;}

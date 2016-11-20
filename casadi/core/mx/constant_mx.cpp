@@ -44,7 +44,7 @@ namespace casadi {
   }
 
  void ConstantMX::eval_forward(const std::vector<std::vector<MX> >& fseed,
-                          std::vector<std::vector<MX> >& fsens) {
+                          std::vector<std::vector<MX> >& fsens) const {
    MX zero_sens(size1(), size2());
    for (int d=0; d<fsens.size(); ++d) {
      fsens[d][0] = zero_sens;
@@ -52,7 +52,7 @@ namespace casadi {
  }
 
   void ConstantMX::eval_reverse(const std::vector<std::vector<MX> >& aseed,
-                           std::vector<std::vector<MX> >& asens) {
+                           std::vector<std::vector<MX> >& asens) const {
   }
 
   void ConstantMX::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {

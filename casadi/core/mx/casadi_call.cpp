@@ -104,7 +104,7 @@ namespace casadi {
   }
 
   void Call::eval_forward(const vector<vector<MX> >& fseed,
-                     vector<vector<MX> >& fsens) {
+                     vector<vector<MX> >& fsens) const {
     // Nondifferentiated inputs and outputs
     vector<MX> arg(ndep());
     for (int i=0; i<arg.size(); ++i) arg[i] = dep(i);
@@ -116,7 +116,7 @@ namespace casadi {
   }
 
   void Call::eval_reverse(const vector<vector<MX> >& aseed,
-                     vector<vector<MX> >& asens) {
+                     vector<vector<MX> >& asens) const {
     // Nondifferentiated inputs and outputs
     vector<MX> arg(ndep());
     for (int i=0; i<arg.size(); ++i) arg[i] = dep(i);

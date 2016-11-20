@@ -44,7 +44,7 @@ namespace casadi {
   }
 
   void Bilin::eval_forward(const std::vector<std::vector<MX> >& fseed,
-                      std::vector<std::vector<MX> >& fsens) {
+                      std::vector<std::vector<MX> >& fsens) const {
     for (int d=0; d<fsens.size(); ++d) {
       fsens[d][0]
         = bilin(fseed[d][0], dep(1), dep(2))
@@ -54,7 +54,7 @@ namespace casadi {
   }
 
   void Bilin::eval_reverse(const std::vector<std::vector<MX> >& aseed,
-                      std::vector<std::vector<MX> >& asens) {
+                      std::vector<std::vector<MX> >& asens) const {
     for (int d=0; d<aseed.size(); ++d) {
       asens[d][0] = rank1(project(asens[d][0], sparsity()),
                           aseed[d][0], dep(1), dep(2));

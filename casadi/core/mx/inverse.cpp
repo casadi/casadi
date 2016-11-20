@@ -45,7 +45,7 @@ namespace casadi {
   }
 
   void Inverse::eval_forward(const std::vector<std::vector<MX> >& fseed,
-                        std::vector<std::vector<MX> >& fsens) {
+                        std::vector<std::vector<MX> >& fsens) const {
     MX inv_X = shared_from_this<MX>();
     for (int d=0; d<fsens.size(); ++d) {
       fsens[d][0] = -mtimes(inv_X, mtimes(fseed[d][0], inv_X));
@@ -53,7 +53,7 @@ namespace casadi {
   }
 
   void Inverse::eval_reverse(const std::vector<std::vector<MX> >& aseed,
-                        std::vector<std::vector<MX> >& asens) {
+                        std::vector<std::vector<MX> >& asens) const {
     MX inv_X = shared_from_this<MX>();
     MX trans_inv_X = inv_X.T();
     for (int d=0; d<aseed.size(); ++d) {

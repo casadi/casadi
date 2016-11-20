@@ -56,7 +56,7 @@ namespace casadi {
   }
 
   void NormF::eval_forward(const std::vector<std::vector<MX> >& fseed,
-                      std::vector<std::vector<MX> >& fsens) {
+                      std::vector<std::vector<MX> >& fsens) const {
     MX self = shared_from_this<MX>();
     for (int d=0; d<fsens.size(); ++d) {
       fsens[d][0] = dep(0)->getDot(fseed[d][0]) / self;
@@ -64,7 +64,7 @@ namespace casadi {
   }
 
   void NormF::eval_reverse(const std::vector<std::vector<MX> >& aseed,
-                      std::vector<std::vector<MX> >& asens) {
+                      std::vector<std::vector<MX> >& asens) const {
     MX self = shared_from_this<MX>();
     for (int d=0; d<aseed.size(); ++d) {
       asens[d][0] += (aseed[d][0]/self) * dep(0);

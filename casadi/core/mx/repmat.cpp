@@ -78,14 +78,14 @@ namespace casadi {
   }
 
   void HorzRepmat::eval_forward(const std::vector<std::vector<MX> >& fseed,
-                          std::vector<std::vector<MX> >& fsens) {
+                          std::vector<std::vector<MX> >& fsens) const {
     for (int d=0; d<fsens.size(); ++d) {
       fsens[d][0] = fseed[d][0]->getRepmat(1, n_);
     }
   }
 
   void HorzRepmat::eval_reverse(const std::vector<std::vector<MX> >& aseed,
-                          std::vector<std::vector<MX> >& asens) {
+                          std::vector<std::vector<MX> >& asens) const {
     for (int d=0; d<asens.size(); ++d) {
       asens[d][0] += aseed[d][0]->getRepsum(1, n_);
     }
@@ -156,14 +156,14 @@ namespace casadi {
   }
 
   void HorzRepsum::eval_forward(const std::vector<std::vector<MX> >& fseed,
-                          std::vector<std::vector<MX> >& fsens) {
+                          std::vector<std::vector<MX> >& fsens) const {
     for (int d=0; d<fsens.size(); ++d) {
       fsens[d][0] = fseed[d][0]->getRepsum(1, n_);
     }
   }
 
   void HorzRepsum::eval_reverse(const std::vector<std::vector<MX> >& aseed,
-                          std::vector<std::vector<MX> >& asens) {
+                          std::vector<std::vector<MX> >& asens) const {
     for (int d=0; d<asens.size(); ++d) {
       asens[d][0] += aseed[d][0]->getRepmat(1, n_);
     }

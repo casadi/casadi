@@ -47,14 +47,14 @@ namespace casadi {
   }
 
   void Assertion::eval_forward(const std::vector<std::vector<MX> >& fseed,
-                     std::vector<std::vector<MX> >& fsens) {
+                     std::vector<std::vector<MX> >& fsens) const {
     for (int d=0; d<fsens.size(); ++d) {
       fsens[d][0] = fseed[d][0];
     }
   }
 
   void Assertion::eval_reverse(const std::vector<std::vector<MX> >& aseed,
-                     std::vector<std::vector<MX> >& asens) {
+                     std::vector<std::vector<MX> >& asens) const {
     for (int d=0; d<aseed.size(); ++d) {
       asens[d][0] += aseed[d][0];
     }

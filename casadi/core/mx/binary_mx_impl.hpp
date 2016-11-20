@@ -68,7 +68,7 @@ namespace casadi {
 
   template<bool ScX, bool ScY>
   void BinaryMX<ScX, ScY>::eval_forward(const std::vector<std::vector<MX> >& fseed,
-                                   std::vector<std::vector<MX> >& fsens) {
+                                   std::vector<std::vector<MX> >& fsens) const {
     // Get partial derivatives
     MX pd[2];
     casadi_math<MX>::der(op_, dep(0), dep(1), shared_from_this<MX>(), pd);
@@ -81,7 +81,7 @@ namespace casadi {
 
   template<bool ScX, bool ScY>
   void BinaryMX<ScX, ScY>::eval_reverse(const std::vector<std::vector<MX> >& aseed,
-                                   std::vector<std::vector<MX> >& asens) {
+                                   std::vector<std::vector<MX> >& asens) const {
     // Get partial derivatives
     MX pd[2];
     casadi_math<MX>::der(op_, dep(0), dep(1), shared_from_this<MX>(), pd);

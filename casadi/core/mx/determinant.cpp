@@ -43,7 +43,7 @@ namespace casadi {
   }
 
   void Determinant::eval_forward(const std::vector<std::vector<MX> >& fseed,
-                            std::vector<std::vector<MX> >& fsens) {
+                            std::vector<std::vector<MX> >& fsens) const {
     const MX& X = dep();
     MX det_X = shared_from_this<MX>();
     MX trans_inv_X = inv(X).T();
@@ -53,7 +53,7 @@ namespace casadi {
   }
 
   void Determinant::eval_reverse(const std::vector<std::vector<MX> >& aseed,
-                            std::vector<std::vector<MX> >& asens) {
+                            std::vector<std::vector<MX> >& asens) const {
     const MX& X = dep();
     MX det_X = shared_from_this<MX>();
     MX trans_inv_X = inv(X).T();

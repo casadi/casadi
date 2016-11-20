@@ -65,12 +65,12 @@ namespace casadi {
   }
 
   void SubRef::eval_forward(const std::vector<std::vector<MX> >& fseed,
-                       std::vector<std::vector<MX> >& fsens) {
+                       std::vector<std::vector<MX> >& fsens) const {
     casadi_error("not ready");
   }
 
   void SubRef::eval_reverse(const std::vector<std::vector<MX> >& aseed,
-                       std::vector<std::vector<MX> >& asens) {
+                       std::vector<std::vector<MX> >& asens) const {
     casadi_error("not ready");
   }
 

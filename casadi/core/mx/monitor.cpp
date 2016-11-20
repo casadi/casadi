@@ -44,7 +44,7 @@ namespace casadi {
   }
 
   void Monitor::eval_forward(const std::vector<std::vector<MX> >& fseed,
-                        std::vector<std::vector<MX> >& fsens) {
+                        std::vector<std::vector<MX> >& fsens) const {
     for (int d=0; d<fsens.size(); ++d) {
       stringstream ss;
       ss << "fwd(" << d << ") of " << comment_;
@@ -53,7 +53,7 @@ namespace casadi {
   }
 
   void Monitor::eval_reverse(const std::vector<std::vector<MX> >& aseed,
-                        std::vector<std::vector<MX> >& asens) {
+                        std::vector<std::vector<MX> >& asens) const {
     for (int d=0; d<aseed.size(); ++d) {
       stringstream ss;
       ss << "adj(" << d << ") of " << comment_;

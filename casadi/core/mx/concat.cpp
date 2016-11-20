@@ -153,7 +153,7 @@ namespace casadi {
   }
 
   void Diagcat::eval_forward(const std::vector<std::vector<MX> >& fseed,
-                        std::vector<std::vector<MX> >& fsens) {
+                        std::vector<std::vector<MX> >& fsens) const {
     int nfwd = fsens.size();
     for (int d = 0; d<nfwd; ++d) fsens[d][0] = diagcat(fseed[d]);
   }
@@ -171,7 +171,7 @@ namespace casadi {
   }
 
   void Diagcat::eval_reverse(const std::vector<std::vector<MX> >& aseed,
-                        std::vector<std::vector<MX> >& asens) {
+                        std::vector<std::vector<MX> >& asens) const {
     // Get offsets for each row and column
     auto off = offset();
 
@@ -206,7 +206,7 @@ namespace casadi {
   }
 
   void Horzcat::eval_forward(const std::vector<std::vector<MX> >& fseed,
-                        std::vector<std::vector<MX> >& fsens) {
+                        std::vector<std::vector<MX> >& fsens) const {
     int nfwd = fsens.size();
     for (int d = 0; d<nfwd; ++d) {
       fsens[d][0] = horzcat(fseed[d]);
@@ -223,7 +223,7 @@ namespace casadi {
   }
 
   void Horzcat::eval_reverse(const std::vector<std::vector<MX> >& aseed,
-                        std::vector<std::vector<MX> >& asens) {
+                        std::vector<std::vector<MX> >& asens) const {
     // Get offsets for each column
     vector<int> col_offset = offset();
 
@@ -257,7 +257,7 @@ namespace casadi {
   }
 
   void Vertcat::eval_forward(const std::vector<std::vector<MX> >& fseed,
-                        std::vector<std::vector<MX> >& fsens) {
+                        std::vector<std::vector<MX> >& fsens) const {
     int nfwd = fsens.size();
     for (int d = 0; d<nfwd; ++d) {
       fsens[d][0] = vertcat(fseed[d]);
@@ -274,7 +274,7 @@ namespace casadi {
   }
 
   void Vertcat::eval_reverse(const std::vector<std::vector<MX> >& aseed,
-                        std::vector<std::vector<MX> >& asens) {
+                        std::vector<std::vector<MX> >& asens) const {
     // Get offsets for each row
     vector<int> row_offset = offset();
 

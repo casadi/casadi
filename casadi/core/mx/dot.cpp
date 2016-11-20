@@ -45,7 +45,7 @@ namespace casadi {
   }
 
   void Dot::eval_forward(const std::vector<std::vector<MX> >& fseed,
-                          std::vector<std::vector<MX> >& fsens) {
+                          std::vector<std::vector<MX> >& fsens) const {
     for (int d=0; d<fsens.size(); ++d) {
       fsens[d][0] = dep(0)->getDot(fseed[d][1])
         + fseed[d][0]->getDot(dep(1));
@@ -53,7 +53,7 @@ namespace casadi {
   }
 
   void Dot::eval_reverse(const std::vector<std::vector<MX> >& aseed,
-                          std::vector<std::vector<MX> >& asens) {
+                          std::vector<std::vector<MX> >& asens) const {
     for (int d=0; d<aseed.size(); ++d) {
       asens[d][0] += aseed[d][0] * dep(1);
       asens[d][1] += aseed[d][0] * dep(0);

@@ -139,11 +139,11 @@ namespace casadi {
 
     /** \brief Calculate forward mode directional derivatives */
     virtual void eval_forward(const std::vector<std::vector<MX> >& fwdSeed,
-                        std::vector<std::vector<MX> >& fwdSens);
+                        std::vector<std::vector<MX> >& fwdSens) const;
 
     /** \brief Calculate reverse mode directional derivatives */
     virtual void eval_reverse(const std::vector<std::vector<MX> >& adjSeed,
-                        std::vector<std::vector<MX> >& adjSens);
+                        std::vector<std::vector<MX> >& adjSens) const;
 
     /** \brief Expand the matrix valued graph into a scalar valued graph */
     Function expand(const std::vector<SX>& inputv);

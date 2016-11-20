@@ -321,7 +321,7 @@ Function Function::rootfinder_fun() {
   eval_forward(const std::vector<MX>& arg, const std::vector<MX>& res,
           const std::vector<std::vector<MX> >& fseed,
           std::vector<std::vector<MX> >& fsens,
-          bool always_inline, bool never_inline) {
+          bool always_inline, bool never_inline) const {
     // Number of directional derivatives
     int nfwd = fseed.size();
     fsens.resize(nfwd);
@@ -365,7 +365,7 @@ Function Function::rootfinder_fun() {
   eval_reverse(const std::vector<MX>& arg, const std::vector<MX>& res,
           const std::vector<std::vector<MX> >& aseed,
           std::vector<std::vector<MX> >& asens,
-          bool always_inline, bool never_inline) {
+          bool always_inline, bool never_inline) const {
 
     // Number of directional derivatives
     int nadj = aseed.size();
