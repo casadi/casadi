@@ -189,16 +189,16 @@ namespace casadi {
 
     /// \cond INTERNAL
     /// Get the temporary variable
-    int getTemp() const;
+    int get_temp() const;
 
     /// Set the temporary variable
-    void setTemp(int t);
+    void set_temp(int t) const;
 
     /// Check if marked (i.e. temporary is negative)
     bool marked() const;
 
     /// Mark by flipping the sign of the temporary and decreasing by one
-    void mark();
+    void mark() const;
 
     /** \brief Assign to another expression, if a duplicate.
      * Check for equality up to a given depth */

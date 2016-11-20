@@ -1310,13 +1310,13 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  bool Matrix<Scalar>::has_duplicates() {
+  bool Matrix<Scalar>::has_duplicates() const {
     throw CasadiException("\"has_duplicates\" not defined for instantiation");
   }
 
   template<typename Scalar>
-  void Matrix<Scalar>::resetInput() {
-    throw CasadiException("\"resetInput\" not defined for instantiation");
+  void Matrix<Scalar>::reset_input() const {
+    throw CasadiException("\"reset_input\" not defined for instantiation");
   }
 
   template<typename Scalar>
@@ -2480,8 +2480,8 @@ namespace casadi {
   template<> bool SX::is_commutative() const;
   template<> bool SX::is_symbolic() const;
   template<> bool SX::is_valid_input() const;
-  template<> bool SX::has_duplicates();
-  template<> void SX::resetInput();
+  template<> bool SX::has_duplicates() const;
+  template<> void SX::reset_input() const;
   template<> SX SX::dep(int ch) const;
   template<> int SX::n_dep() const;
   template<> std::string SX::name() const;

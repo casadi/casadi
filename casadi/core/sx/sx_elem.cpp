@@ -580,11 +580,11 @@ namespace casadi {
     return SX(Sparsity::scalar(), *this, false);
   }
 
-  int SXElem::getTemp() const {
+  int SXElem::get_temp() const {
     return (*this)->temp;
   }
 
-  void SXElem::setTemp(int t) {
+  void SXElem::set_temp(int t) const {
     (*this)->temp = t;
   }
 
@@ -592,7 +592,7 @@ namespace casadi {
     return (*this)->marked();
   }
 
-  void SXElem::mark() {
+  void SXElem::mark() const {
     (*this)->mark();
   }
 

@@ -117,10 +117,10 @@ namespace casadi {
     virtual MX join_primitives(std::vector<MX>::const_iterator& it) const { return MX(sparsity());}
 
     /** \brief Detect duplicate symbolic expressions */
-    virtual bool has_duplicates() { return false;}
+    virtual bool has_duplicates() const { return false;}
 
     /** \brief Reset the marker for an input expression */
-    virtual void resetInput() {}
+    virtual void reset_input() const {}
   };
 
   /// A constant given as a DM

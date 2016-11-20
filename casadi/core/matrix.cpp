@@ -188,22 +188,22 @@ namespace casadi {
     return true;
   }
 
-  template<> bool SX::has_duplicates() {
+  template<> bool SX::has_duplicates() const {
     bool has_duplicates = false;
     for (auto&& i : nonzeros_) {
-      bool is_duplicate = i.getTemp()!=0;
+      bool is_duplicate = i.get_temp()!=0;
       if (is_duplicate) {
         userOut<true, PL_WARN>() << "Duplicate expression: " << i << endl;
       }
       has_duplicates = has_duplicates || is_duplicate;
-      i.setTemp(1);
+      i.set_temp(1);
     }
     return has_duplicates;
   }
 
-  template<> void SX::resetInput() {
+  template<> void SX::reset_input() const {
     for (auto&& i : nonzeros_) {
-      i.setTemp(0);
+      i.set_temp(0);
     }
   }
 
@@ -845,7 +845,7 @@ namespace casadi {
 
     // Mark the above expressions
     for (int i=0; i<vdef.size(); ++i) {
-      vdef[i].setTemp(i+1);
+      vdef[i].set_temp(i+1);
     }
 
     // Save the marked nodes for later cleanup
@@ -868,7 +868,7 @@ namespace casadi {
           work2[it->i0] = *b_it++;
 
           // Replace with intermediate variables
-          int ind = work2[it->i0].getTemp()-1;
+          int ind = work2[it->i0].get_temp()-1;
           if (ind>=0) {
             vdef.at(ind) = work[it->i0];
             work[it->i0] = v.at(ind);
@@ -879,7 +879,7 @@ namespace casadi {
 
     // Unmark the expressions
     for (vector<SXElem>::iterator it=marked.begin(); it!=marked.end(); ++it) {
-      it->setTemp(0);
+      it->set_temp(0);
     }
 
     // Save v, vdef

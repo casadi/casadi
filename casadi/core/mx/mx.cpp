@@ -691,11 +691,11 @@ namespace casadi {
     return (*this)->mapping();
   }
 
-  int MX::getTemp() const {
+  int MX::get_temp() const {
     return (*this)->temp;
   }
 
-  void MX::setTemp(int t) {
+  void MX::set_temp(int t) const {
     (*this)->temp = t;
   }
 
@@ -784,12 +784,12 @@ namespace casadi {
     return ret;
   }
 
-  bool MX::has_duplicates() {
+  bool MX::has_duplicates() const {
     return (*this)->has_duplicates();
   }
 
-  void MX::resetInput() {
-    (*this)->resetInput();
+  void MX::reset_input() const {
+    (*this)->reset_input();
   }
 
   bool MX::is_identity() const {

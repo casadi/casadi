@@ -112,7 +112,7 @@ namespace casadi {
     bool marked() const;
 
     // Mark by flipping the sign of the temporary and decreasing by one
-    void mark();
+    void mark() const;
 
     // Depth when checking equalities
     static int eq_depth_;
@@ -121,7 +121,7 @@ namespace casadi {
         the user is responsible of making sure that use is thread-safe
         The variable is initialized to zero
     */
-    int temp;
+    mutable int temp;
 
     // Reference counter -- counts the number of parents of the node
     unsigned int count;

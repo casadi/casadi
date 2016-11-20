@@ -126,12 +126,12 @@ namespace casadi {
     casadi_error("'n_primitives' not defined for class " + type_name());
   }
 
-  bool MXNode::has_duplicates() {
+  bool MXNode::has_duplicates() const {
     casadi_error("'has_duplicates' not defined for class " + type_name());
   }
 
-  void MXNode::resetInput() {
-    casadi_error("'resetInput' not defined for class " + type_name());
+  void MXNode::reset_input() const {
+    casadi_error("'reset_input' not defined for class " + type_name());
   }
 
   void MXNode::primitives(vector<MX>::iterator& it) const {

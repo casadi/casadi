@@ -862,13 +862,13 @@ namespace casadi {
     /** \brief Detect duplicate symbolic expressions
         If there are symbolic primitives appearing more than once, the function will return
         true and the names of the duplicate expressions will be printed to userOut<true, PL_WARN>().
-        Note: Will mark the node using SXElem::setTemp.
-        Make sure to call resetInput() after usage.
+        Note: Will mark the node using SXElem::set_temp.
+        Make sure to call reset_input() after usage.
     */
-    bool has_duplicates();
+    bool has_duplicates() const;
 
     /** \brief Reset the marker for an input expression */
-    void resetInput();
+    void reset_input() const;
   /// \endcond
 
     /** \brief Check if the matrix is constant (note that false negative answers are possible)*/

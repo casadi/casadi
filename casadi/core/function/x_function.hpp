@@ -223,7 +223,7 @@ namespace casadi {
     }
 
     // Reset temporaries
-    for (auto&& i : in_) i.resetInput();
+    for (auto&& i : in_) i.reset_input();
 
     if (has_duplicates) {
       userOut<true, PL_WARN>() << "Input expressions:" << std::endl;

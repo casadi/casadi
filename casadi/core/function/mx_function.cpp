@@ -327,7 +327,7 @@ namespace casadi {
       vector<MX> prim = in_[ind].primitives();
       int nz_offset=0;
       for (int p=0; p<prim.size(); ++p) {
-        int i = prim[p].getTemp()-1;
+        int i = prim[p].get_temp()-1;
         if (i>=0) {
           // Mark as input
           algorithm_[i].op = OP_INPUT;
@@ -339,7 +339,7 @@ namespace casadi {
           algorithm_[i].arg[2] = nz_offset;
 
           // Mark input as read
-          prim[p].setTemp(0);
+          prim[p].set_temp(0);
         }
         nz_offset += prim[p]->nnz();
       }

@@ -84,10 +84,10 @@ namespace casadi {
     virtual void primitives(std::vector<MX>::iterator& it) const;
 
     /** \brief Detect duplicate symbolic expressions */
-    virtual bool has_duplicates();
+    virtual bool has_duplicates() const;
 
     /** \brief Reset the marker for an input expression */
-    virtual void resetInput();
+    virtual void reset_input() const;
   };
 
 

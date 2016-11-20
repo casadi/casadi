@@ -130,12 +130,12 @@ namespace casadi {
     return reshape(dep()->join_primitives(it), size());
   }
 
-  bool Reshape::has_duplicates() {
+  bool Reshape::has_duplicates() const {
     return dep()->has_duplicates();
   }
 
-  void Reshape::resetInput() {
-    dep()->resetInput();
+  void Reshape::reset_input() const {
+    dep()->reset_input();
   }
 
 } // namespace casadi

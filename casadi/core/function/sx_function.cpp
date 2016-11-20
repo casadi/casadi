@@ -467,7 +467,7 @@ namespace casadi {
     for (int ind=0; ind<in_.size(); ++ind) {
       int nz=0;
       for (auto itc = in_[ind]->begin(); itc != in_[ind]->end(); ++itc, ++nz) {
-        int i = itc->getTemp()-1;
+        int i = itc->get_temp()-1;
         if (i>=0) {
           // Mark as input
           algorithm_[i].op = OP_INPUT;
@@ -477,7 +477,7 @@ namespace casadi {
           algorithm_[i].i2 = nz;
 
           // Mark input as read
-          itc->setTemp(0);
+          itc->set_temp(0);
         }
       }
     }

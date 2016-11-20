@@ -349,7 +349,7 @@ namespace casadi {
     return diagcat(s);
   }
 
-  bool Concat::has_duplicates() {
+  bool Concat::has_duplicates() const {
     bool has_duplicates = false;
     for (int i=0; i<ndep(); ++i) {
       has_duplicates = dep(i)->has_duplicates() || has_duplicates;
@@ -357,9 +357,9 @@ namespace casadi {
     return has_duplicates;
   }
 
-  void Concat::resetInput() {
+  void Concat::reset_input() const {
     for (int i=0; i<ndep(); ++i) {
-      dep(i)->resetInput();
+      dep(i)->reset_input();
     }
   }
 

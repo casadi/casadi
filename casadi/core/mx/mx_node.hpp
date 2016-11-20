@@ -185,10 +185,10 @@ namespace casadi {
     virtual MX join_primitives(std::vector<MX>::const_iterator& it) const;
 
     /** \brief Detect duplicate symbolic expressions */
-    virtual bool has_duplicates();
+    virtual bool has_duplicates() const;
 
     /** \brief Reset the marker for an input expression */
-    virtual void resetInput();
+    virtual void reset_input() const;
 
     /** \brief  Check if evaluation output */
     virtual bool isOutputNode() const {return false;}
@@ -224,7 +224,6 @@ namespace casadi {
 
     /** \brief  dependencies - functions that have to be evaluated before this one */
     const MX& dep(int ind=0) const { return dep_.at(ind);}
-    MX& dep(int ind=0) { return dep_.at(ind);}
 
     /** \brief  Number of dependencies */
     int ndep() const;
@@ -425,7 +424,7 @@ namespace casadi {
         the user is responsible of making sure that use is thread-safe
         The variable is initialized to zero
     */
-    int temp;
+    mutable int temp;
 
     /** \brief  dependencies - functions that have to be evaluated before this one */
     std::vector<MX> dep_;

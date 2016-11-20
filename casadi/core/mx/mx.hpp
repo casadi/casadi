@@ -228,13 +228,13 @@ namespace casadi {
     /** \brief Detect duplicate symbolic expressions
         If there are symbolic primitives appearing more than once, the function will return
         true and the names of the duplicate expressions will be printed to userOut<true, PL_WARN>().
-        Note: Will mark the node using MX::setTemp.
-        Make sure to call resetInput() after usage.
+        Note: Will mark the node using MX::set_temp.
+        Make sure to call reset_input() after usage.
     */
-    bool has_duplicates();
+    bool has_duplicates() const;
 
     /** \brief Reset the marker for an input expression */
-    void resetInput();
+    void reset_input() const;
   /// \endcond
 
     /** \brief  check if identity */
@@ -272,10 +272,10 @@ namespace casadi {
 
     /// \cond INTERNAL
     /// Get the temporary variable
-    int getTemp() const;
+    int get_temp() const;
 
     /// Set the temporary variable
-    void setTemp(int t);
+    void set_temp(int t) const;
     /// \endcond
 
     ///@{

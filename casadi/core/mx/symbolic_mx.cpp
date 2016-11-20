@@ -89,7 +89,7 @@ namespace casadi {
     }
   }
 
-  bool SymbolicMX::has_duplicates() {
+  bool SymbolicMX::has_duplicates() const {
     if (this->temp!=0) {
       userOut<true, PL_WARN>() << "Duplicate expression: " << name() << endl;
       return true;
@@ -99,7 +99,7 @@ namespace casadi {
     }
   }
 
-  void SymbolicMX::resetInput() {
+  void SymbolicMX::reset_input() const {
     this->temp = 0;
   }
 
