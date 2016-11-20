@@ -202,8 +202,10 @@ class CASADI_EXPORT SXFunction :
   /** \brief  all binary nodes of the tree in the order of execution */
   std::vector<AlgEl> algorithm_;
 
-  /// work vector for symbolic calculations (allocated first time)
-  std::vector<SXElem> s_work_;
+  // Work vector size
+  size_t worksize_;
+
+  /// Free variables
   std::vector<SXElem> free_vars_;
 
   /// The expressions corresponding to each binary operation

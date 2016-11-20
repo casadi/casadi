@@ -395,7 +395,7 @@ namespace casadi {
     stack<int> unused;
 
     // Work vector size
-    size_t worksize = 0;
+    worksize_ = 0;
 
     // Find a place in the work vector for the operation
     for (auto&& a : algorithm_) {
@@ -419,7 +419,7 @@ namespace casadi {
           unused.pop();
         } else {
           // Allocate a new variable
-          a.i0 = place[a.i0] = worksize++;
+          a.i0 = place[a.i0] = worksize_++;
         }
       }
 
@@ -442,15 +442,14 @@ namespace casadi {
     if (verbose()) {
       if (live_variables) {
         userOut() << "Using live variables: work array is "
-             <<  worksize << " instead of " << nodes.size() << endl;
+             <<  worksize_ << " instead of " << nodes.size() << endl;
       } else {
         userOut() << "Live variables disabled." << endl;
       }
     }
 
     // Allocate work vectors (symbolic/numeric)
-    alloc_w(worksize);
-    s_work_.resize(worksize);
+    alloc_w(worksize_);
 
     // Reset the temporary variables
     for (int i=0; i<nodes.size(); ++i) {
@@ -647,6 +646,9 @@ namespace casadi {
       }
     }
 
+    // Work vector
+    vector<SXElem> w(worksize_);
+
     // Calculate forward sensitivities
     if (verbose())
       userOut() << "SXFunction::eval_forward calculating forward derivatives" << endl;
@@ -655,17 +657,17 @@ namespace casadi {
       for (auto&& a : algorithm_) {
         switch (a.op) {
         case OP_INPUT:
-          s_work_[a.i0] = fseed[dir][a.i1].nonzeros()[a.i2]; break;
+          w[a.i0] = fseed[dir][a.i1].nonzeros()[a.i2]; break;
         case OP_OUTPUT:
-          fsens[dir][a.i0].nonzeros()[a.i2] = s_work_[a.i1]; break;
+          fsens[dir][a.i0].nonzeros()[a.i2] = w[a.i1]; break;
         case OP_CONST:
         case OP_PARAMETER:
-          s_work_[a.i0] = 0;
+          w[a.i0] = 0;
           break;
           CASADI_MATH_BINARY_BUILTIN // Binary operation
-            s_work_[a.i0] = it2->d[0] * s_work_[a.i1] + it2->d[1] * s_work_[a.i2];it2++;break;
+            w[a.i0] = it2->d[0] * w[a.i1] + it2->d[1] * w[a.i2];it2++;break;
         default: // Unary operation
-          s_work_[a.i0] = it2->d[0] * s_work_[a.i1]; it2++;
+          w[a.i0] = it2->d[0] * w[a.i1]; it2++;
         }
       }
     }
@@ -752,34 +754,37 @@ namespace casadi {
     // Calculate adjoint sensitivities
     if (verbose()) userOut() << "SXFunction::eval_reverse calculating adjoint derivatives"
                        << endl;
-    fill(s_work_.begin(), s_work_.end(), 0);
+
+    // Work vector
+    vector<SXElem> w(worksize_, 0);
+
     for (int dir=0; dir<nadj; ++dir) {
       auto it2 = s_pdwork.rbegin();
       for (auto it = algorithm_.rbegin(); it!=algorithm_.rend(); ++it) {
         SXElem seed;
         switch (it->op) {
         case OP_INPUT:
-          asens[dir][it->i1].nonzeros()[it->i2] = s_work_[it->i0];
-          s_work_[it->i0] = 0;
+          asens[dir][it->i1].nonzeros()[it->i2] = w[it->i0];
+          w[it->i0] = 0;
           break;
         case OP_OUTPUT:
-          s_work_[it->i1] += aseed[dir][it->i0].nonzeros()[it->i2];
+          w[it->i1] += aseed[dir][it->i0].nonzeros()[it->i2];
           break;
         case OP_CONST:
         case OP_PARAMETER:
-          s_work_[it->i0] = 0;
+          w[it->i0] = 0;
           break;
           CASADI_MATH_BINARY_BUILTIN // Binary operation
-            seed = s_work_[it->i0];
-          s_work_[it->i0] = 0;
-          s_work_[it->i1] += it2->d[0] * seed;
-          s_work_[it->i2] += it2->d[1] * seed;
+            seed = w[it->i0];
+          w[it->i0] = 0;
+          w[it->i1] += it2->d[0] * seed;
+          w[it->i2] += it2->d[1] * seed;
           it2++;
           break;
         default: // Unary operation
-          seed = s_work_[it->i0];
-          s_work_[it->i0] = 0;
-          s_work_[it->i1] += it2->d[0] * seed;
+          seed = w[it->i0];
+          w[it->i0] = 0;
+          w[it->i1] += it2->d[0] * seed;
           it2++;
         }
       }
