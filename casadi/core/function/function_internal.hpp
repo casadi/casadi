@@ -266,14 +266,14 @@ namespace casadi {
 
     ///@{
     /** \brief Reverse mode AD, overloaded */
-    void _reverse(const std::vector<MX>& arg, const std::vector<MX>& res,
+    void call_reverse(const std::vector<MX>& arg, const std::vector<MX>& res,
                   const std::vector<std::vector<MX> >& aseed,
                   std::vector<std::vector<MX> >& asens,
                   bool always_inline, bool never_inline) {
       reverse_mx(arg, res, aseed, asens, always_inline, never_inline);
     }
 
-    void _reverse(const std::vector<SX>& arg, const std::vector<SX>& res,
+    void call_reverse(const std::vector<SX>& arg, const std::vector<SX>& res,
                   const std::vector<std::vector<SX> >& aseed,
                   std::vector<std::vector<SX> >& asens,
                   bool always_inline, bool never_inline) {
@@ -281,13 +281,6 @@ namespace casadi {
     }
 
     ///@}
-
-    /** \brief Reverse mode AD, templated */
-    template<typename M>
-      void call_reverse(const std::vector<M>& arg, const std::vector<M>& res,
-                        const std::vector<std::vector<M> >& aseed,
-                        std::vector<std::vector<M> >& asens,
-                        bool always_inline, bool never_inline);
 
     ///@{
     /** \brief Parallel evaluation */
@@ -969,42 +962,6 @@ namespace casadi {
 
     // Call memory-less
     _eval(get_ptr(argp), get_ptr(resp), get_ptr(iw_tmp), get_ptr(w_tmp), 0);
-  }
-
-  template<typename M>
-  void FunctionInternal::
-  call_reverse(const std::vector<M>& arg, const std::vector<M>& res,
-               const std::vector<std::vector<M> >& aseed,
-               std::vector<std::vector<M> >& asens,
-               bool always_inline, bool never_inline) {
-    // Check inputs
-    checkArg(arg);
-    checkRes(res);
-
-    // Check reverse mode seeds dimensions
-    int n_out = this->n_out();
-    for (int d=0; d<aseed.size(); ++d) {
-      casadi_assert_message(aseed[d].size()==n_out,
-                            "Incorrect number of adjoint seeds for direction " << d
-                            << ": Expected " << n_out << ", got " << aseed[d].size());
-      for (int i=0; i<n_out; ++i) {
-        casadi_assert_message(checkMat(aseed[d][i].sparsity(), sparsity_out(i)),
-                              "Adjoint seed " << i << " (" << name_out(i) << ") for direction " << d
-                              << " has mismatching shape. Expected " << size_out(i)
-                              << ", got " << aseed[d][i].size());
-      }
-    }
-
-    // Check if reverse mode seeds need to be replaced
-    for (int d=0; d<aseed.size(); ++d) {
-      if (!matchingRes(aseed[d])) {
-        return call_reverse(arg, res, replaceAdjSeed(aseed), asens,
-                       always_inline, never_inline);
-      }
-    }
-
-    // Call the type-specific method
-    _reverse(arg, res, aseed, asens, always_inline, never_inline);
   }
 
   template<typename M>

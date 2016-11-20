@@ -655,7 +655,7 @@ namespace casadi {
     // Quick return if no directions
     if (nfwd==0) return;
 
-    // Check if forward mode seeds need to have dimensions corrected
+    // Check if seeds need to have dimensions corrected
     for (auto&& r : fseed) {
       if (!matchingArg(r)) {
         return evalFwd(replaceFwdSeed(fseed), fsens);
@@ -790,10 +790,17 @@ namespace casadi {
     // Quick return if no directions
     if (nadj==0) return;
 
+    // Check if seeds need to have dimensions corrected
+    for (auto&& r : aseed) {
+      if (!matchingRes(r)) {
+        return evalAdj(replaceAdjSeed(aseed), asens);
+      }
+    }
+
     // Check if there are any zero seeds
-    for (vector<vector<MX> >::const_iterator i=aseed.begin(); i!=aseed.end(); ++i) {
+    for (auto&& r : aseed) {
       // If any direction can be skipped
-      if (purgable(*i)) {
+      if (purgable(r)) {
         // New argument without all-zero directions
         std::vector<std::vector<MX> > aseed_purged, asens_purged;
         aseed_purged.reserve(nadj);

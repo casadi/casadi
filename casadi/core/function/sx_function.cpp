@@ -591,7 +591,7 @@ namespace casadi {
     int n_in = this->n_in();
     int n_out = this->n_out();
 
-    // Check if forward mode seeds need to have dimensions corrected
+    // Check if seeds need to have dimensions corrected
     for (auto&& r : fseed) {
       if (!matchingArg(r)) {
         return evalFwd(replaceFwdSeed(fseed), fsens);
@@ -682,9 +682,16 @@ namespace casadi {
     // Quick return if possible
     if (nadj==0) return;
 
-    // Get the number of inputs and outputs
+    // Shorthands
     int n_in = this->n_in();
     int n_out = this->n_out();
+
+    // Check if seeds need to have dimensions corrected
+    for (auto&& r : aseed) {
+      if (!matchingRes(r)) {
+        return evalAdj(replaceAdjSeed(aseed), asens);
+      }
+    }
 
     // Make sure matching sparsity of fseed
     bool matching_sparsity = true;
