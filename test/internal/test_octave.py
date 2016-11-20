@@ -33,7 +33,7 @@ t = TestSuite(dirname=src,
   suffix="m",
   command = lambda dir,fn, opt:  ["octave","--no-gui","--no-window-system"] + opt,
   skipdirs=[".svn","ctemplate","defs"],
-   inputs = lambda dir,fn : {fn: file(dir + "/" + fn,"r").read()},
+   inputs = lambda dir,fn : {fn: "graphics_toolkit('gnuplot');"+file(dir + "/" + fn,"r").read()},
     args=sys.argv[2:],
    stderr_trigger=["^(?!(Reference counting|warning|$))"],
    check_depreciation=True
