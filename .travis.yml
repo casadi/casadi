@@ -282,7 +282,7 @@ matrix:
         - sudo apt-get update -qq
         - sudo apt-get install octave liboctave-dev -y
         - sudo apt-get install -y xvfb
-        - sudo apt-get install -y libqt-opengl-dev
+        - sudo apt-get install -y libgl1-mesa-dri
         
         # travis-wait seems to stop at 20 mins, regardless if output is being generated
         - (while true ; do sleep 60 ; echo "ping" ; done ) &
