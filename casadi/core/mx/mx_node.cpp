@@ -123,38 +123,31 @@ namespace casadi {
   }
 
   int MXNode::n_primitives() const {
-    throw CasadiException(string("MXNode::n_primitives() not defined for class ")
-                          + typeid(*this).name());
+    casadi_error("'n_primitives' not defined for class " + type_name());
   }
 
   bool MXNode::has_duplicates() {
-    throw CasadiException(string("MXNode::has_duplicates() not defined for class ")
-                          + typeid(*this).name());
+    casadi_error("'has_duplicates' not defined for class " + type_name());
   }
 
   void MXNode::resetInput() {
-    throw CasadiException(string("MXNode::resetInput() not defined for class ")
-                          + typeid(*this).name());
+    casadi_error("'resetInput' not defined for class " + type_name());
   }
 
   void MXNode::primitives(vector<MX>::iterator& it) const {
-    throw CasadiException(string("MXNode::primitives() not defined for class ")
-                          + typeid(*this).name());
+    casadi_error("'primitives' not defined for class " + type_name());
   }
 
   void MXNode::split_primitives(const MX& x, vector<MX>::iterator& it) const {
-    throw CasadiException(string("MXNode::split_primitives() not defined for class ")
-                          + typeid(*this).name());
+    casadi_error("'split_primitives' not defined for class " + type_name());
   }
 
   MX MXNode::join_primitives(vector<MX>::const_iterator& it) const {
-    throw CasadiException(string("MXNode::join_primitives() not defined for class ")
-                          + typeid(*this).name());
+    casadi_error("'join_primitives' not defined for class " + type_name());
   }
 
   const string& MXNode::name() const {
-    throw CasadiException(string("MXNode::name() not defined for class ")
-                          + typeid(*this).name());
+    casadi_error("'name' not defined for class " + type_name());
   }
 
   std::string MXNode::type_name() const {
@@ -164,14 +157,6 @@ namespace casadi {
   bool MXNode::__nonzero__() const {
     casadi_error("Can only determine truth value of a numeric MX.");
 
-  }
-
-  const MX& MXNode::dep(int ind) const {
-    return dep_.at(ind);
-  }
-
-  MX& MXNode::dep(int ind) {
-    return dep_.at(ind);
   }
 
   int MXNode::ndep() const {
@@ -293,45 +278,37 @@ namespace casadi {
   }
 
   const Function& MXNode::getFunction(int i) const {
-    throw CasadiException(string("MXNode::getFunction() not defined for class ") +
-                          typeid(*this).name());
+    casadi_error("'getFunction' not defined for class " + type_name());
   }
 
   int MXNode::getFunctionOutput() const {
-    throw CasadiException(string("MXNode::getFunctionOutput() not defined for class ") +
-                          typeid(*this).name());
+    casadi_error("'getFunctionOutput' not defined for class " + type_name());
   }
 
   int MXNode::getFunction_input() const {
-    throw CasadiException(string("MXNode::getFunctionOutput() not defined for class ") +
-                          typeid(*this).name());
+    casadi_error("'getFunctionOutput' not defined for class " + type_name());
   }
 
   void MXNode::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
-    throw CasadiException(string("MXNode::eval not defined for class ")
-                          + typeid(*this).name());
+    casadi_error("'eval' not defined for class " + type_name());
   }
 
   void MXNode::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
-    throw CasadiException(string("MXNode::eval_sx not defined for class ")
-                          + typeid(*this).name());
+    casadi_error("'eval_sx' not defined for class " + type_name());
   }
 
   void MXNode::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
-    throw CasadiException(string("MXNode::eval_mx not defined for class ")
-                          + typeid(*this).name());
+    casadi_error("'eval_mx' not defined for class " + type_name());
   }
 
   void MXNode::eval_forward(const vector<vector<MX> >& fseed,
                        vector<vector<MX> >& fsens) const {
-    throw CasadiException(string("MXNode::eval_forward not defined for class ")
-                          + typeid(*this).name());
+    casadi_error("'eval_forward' not defined for class " + type_name());
   }
 
   void MXNode::eval_reverse(const vector<vector<MX> >& aseed,
                        vector<vector<MX> >& asens) const {
-    throw CasadiException(string("MXNode::eval_reverse not defined for class ")
-                          + typeid(*this).name());
+    casadi_error("'eval_reverse' not defined for class " + type_name());
   }
 
   void MXNode::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
@@ -391,12 +368,11 @@ namespace casadi {
   }
 
   double MXNode::to_double() const {
-    casadi_error(string("MXNode::to_double not defined for class ") + typeid(*this).name());
+    casadi_error("'to_double' not defined for class " + type_name());
   }
 
   Matrix<double> MXNode::getMatrixValue() const {
-    casadi_error(string("MXNode::getMatrixValue not defined for class ")
-                 + typeid(*this).name());
+    casadi_error("'getMatrixValue' not defined for class " + type_name());
   }
 
   MX MXNode::getTranspose() const {
@@ -707,7 +683,7 @@ namespace casadi {
   }
 
   Matrix<int> MXNode::mapping() const {
-    throw CasadiException(string("MXNode::mapping not defined for class ") + typeid(*this).name());
+    casadi_error("'mapping' not defined for class " + type_name());
   }
 
   bool MXNode::sameOpAndDeps(const MXNode* node, int depth) const {

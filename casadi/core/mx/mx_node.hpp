@@ -223,8 +223,8 @@ namespace casadi {
     bool sameOpAndDeps(const MXNode* node, int depth) const;
 
     /** \brief  dependencies - functions that have to be evaluated before this one */
-    const MX& dep(int ind=0) const;
-    MX& dep(int ind=0);
+    const MX& dep(int ind=0) const { return dep_.at(ind);}
+    MX& dep(int ind=0) { return dep_.at(ind);}
 
     /** \brief  Number of dependencies */
     int ndep() const;
