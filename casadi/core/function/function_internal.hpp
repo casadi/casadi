@@ -254,10 +254,10 @@ namespace casadi {
 
     /** \brief Forward mode AD, templated */
     template<typename M>
-      void forward(const std::vector<M>& arg, const std::vector<M>& res,
-                   const std::vector<std::vector<M> >& fseed,
-                   std::vector<std::vector<M> >& fsens,
-                   bool always_inline, bool never_inline);
+      void call_forward(const std::vector<M>& arg, const std::vector<M>& res,
+                      const std::vector<std::vector<M> >& fseed,
+                      std::vector<std::vector<M> >& fsens,
+                      bool always_inline, bool never_inline);
 
     ///@{
     /** \brief Reverse mode, virtual functions overloaded in derived classes */
@@ -291,10 +291,10 @@ namespace casadi {
 
     /** \brief Reverse mode AD, templated */
     template<typename M>
-      void reverse(const std::vector<M>& arg, const std::vector<M>& res,
-                   const std::vector<std::vector<M> >& aseed,
-                   std::vector<std::vector<M> >& asens,
-                   bool always_inline, bool never_inline);
+      void call_reverse(const std::vector<M>& arg, const std::vector<M>& res,
+                        const std::vector<std::vector<M> >& aseed,
+                        std::vector<std::vector<M> >& asens,
+                        bool always_inline, bool never_inline);
 
     ///@{
     /** \brief Parallel evaluation */
@@ -980,10 +980,10 @@ namespace casadi {
 
   template<typename M>
   void FunctionInternal::
-  forward(const std::vector<M>& arg, const std::vector<M>& res,
-          const std::vector<std::vector<M> >& fseed,
-          std::vector<std::vector<M> >& fsens,
-          bool always_inline, bool never_inline) {
+  call_forward(const std::vector<M>& arg, const std::vector<M>& res,
+               const std::vector<std::vector<M> >& fseed,
+               std::vector<std::vector<M> >& fsens,
+               bool always_inline, bool never_inline) {
     // Check inputs
     checkArg(arg);
     checkRes(res);
@@ -1005,8 +1005,8 @@ namespace casadi {
     // Check if forward mode seeds need to be replaced
     for (int d=0; d<fseed.size(); ++d) {
       if (!matchingArg(fseed[d])) {
-        return forward(arg, res, replaceFwdSeed(fseed), fsens,
-                       always_inline, never_inline);
+        return call_forward(arg, res, replaceFwdSeed(fseed), fsens,
+                            always_inline, never_inline);
       }
     }
 
@@ -1016,10 +1016,10 @@ namespace casadi {
 
   template<typename M>
   void FunctionInternal::
-  reverse(const std::vector<M>& arg, const std::vector<M>& res,
-          const std::vector<std::vector<M> >& aseed,
-          std::vector<std::vector<M> >& asens,
-          bool always_inline, bool never_inline) {
+  call_reverse(const std::vector<M>& arg, const std::vector<M>& res,
+               const std::vector<std::vector<M> >& aseed,
+               std::vector<std::vector<M> >& asens,
+               bool always_inline, bool never_inline) {
     // Check inputs
     checkArg(arg);
     checkRes(res);
@@ -1041,7 +1041,7 @@ namespace casadi {
     // Check if reverse mode seeds need to be replaced
     for (int d=0; d<aseed.size(); ++d) {
       if (!matchingRes(aseed[d])) {
-        return reverse(arg, res, replaceAdjSeed(aseed), asens,
+        return call_reverse(arg, res, replaceAdjSeed(aseed), asens,
                        always_inline, never_inline);
       }
     }

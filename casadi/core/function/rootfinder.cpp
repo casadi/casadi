@@ -204,7 +204,7 @@ Function Function::rootfinder_fun() {
                         Sparsity(arg[iin_].size()));
     vector<MX> res = mx_out();
     vector<vector<MX> > fseed = symbolicFwdSeed(nfwd, arg), fsens;
-    forward(arg, res, fseed, fsens, false, false);
+    call_forward(arg, res, fseed, fsens, false, false);
 
     // Construct return function
     arg.insert(arg.end(), res.begin(), res.end());
@@ -231,7 +231,7 @@ Function Function::rootfinder_fun() {
                         Sparsity(arg[iin_].size()));
     vector<MX> res = mx_out();
     vector<vector<MX> > aseed = symbolicAdjSeed(nadj, res), asens;
-    reverse(arg, res, aseed, asens, false, false);
+    call_reverse(arg, res, aseed, asens, false, false);
 
     // Construct return function
     arg.insert(arg.end(), res.begin(), res.end());
@@ -318,7 +318,7 @@ Function Function::rootfinder_fun() {
   const std::string Rootfinder::infix_ = "rootfinder";
 
   void Rootfinder::
-  forward(const std::vector<MX>& arg, const std::vector<MX>& res,
+  call_forward(const std::vector<MX>& arg, const std::vector<MX>& res,
           const std::vector<std::vector<MX> >& fseed,
           std::vector<std::vector<MX> >& fsens,
           bool always_inline, bool never_inline) {
@@ -338,7 +338,8 @@ Function Function::rootfinder_fun() {
     for (int d=0; d<nfwd; ++d) {
       f_fseed[d].at(iin_) = MX(size_in(iin_)); // ignore seeds for guess
     }
-    oracle_->forward(f_arg, f_res, f_fseed, fsens, always_inline, never_inline);
+    oracle_->call_forward(f_arg, f_res, f_fseed, fsens,
+                          always_inline, never_inline);
 
     // Get expression of Jacobian
     Function jac = get_function("jac_f_z");
@@ -354,13 +355,14 @@ Function Function::rootfinder_fun() {
     int num_out = n_out();
     if (num_out>1) {
       for (int d=0; d<nfwd; ++d) f_fseed[d][iin_] = fsens[d][iout_];
-      oracle_->forward(f_arg, f_res, f_fseed, fsens, always_inline, never_inline);
+      oracle_->call_forward(f_arg, f_res, f_fseed, fsens,
+                            always_inline, never_inline);
       for (int d=0; d<nfwd; ++d) fsens[d][iout_] = f_fseed[d][iin_]; // Otherwise overwritten
     }
   }
 
   void Rootfinder::
-  reverse(const std::vector<MX>& arg, const std::vector<MX>& res,
+  call_reverse(const std::vector<MX>& arg, const std::vector<MX>& res,
           const std::vector<std::vector<MX> >& aseed,
           std::vector<std::vector<MX> >& asens,
           bool always_inline, bool never_inline) {
@@ -393,7 +395,7 @@ Function Function::rootfinder_fun() {
     vector<MX> rhs(nadj);
     vector<vector<MX> > asens_aux;
     if (num_out>1) {
-      oracle_->reverse(f_arg, f_res, f_aseed, asens_aux, always_inline, never_inline);
+      oracle_->call_reverse(f_arg, f_res, f_aseed, asens_aux, always_inline, never_inline);
       for (int d=0; d<nadj; ++d) rhs[d] = vec(asens_aux[d][iin_] + aseed[d][iout_]);
     } else {
       for (int d=0; d<nadj; ++d) rhs[d] = vec(aseed[d][iout_]);
@@ -420,7 +422,7 @@ Function Function::rootfinder_fun() {
     }
 
     // Propagate through f_
-    oracle_->reverse(f_arg, f_res, f_aseed, asens, always_inline, never_inline);
+    oracle_->call_reverse(f_arg, f_res, f_aseed, asens, always_inline, never_inline);
 
     // No dependency on guess (2)
     for (int d=0; d<nadj; ++d) {

@@ -629,7 +629,7 @@ namespace casadi {
     }
 
     // Calculate with forward mode AD
-    forward(in_, out_, fseed, fsens, true, false);
+    call_forward(in_, out_, fseed, fsens, true, false);
 
     // Return adjoint directional derivative
     return fsens[0].at(oind);
@@ -830,10 +830,10 @@ namespace casadi {
       if (verbose()) userOut() << "XFunction::jac making function call" << std::endl;
       if (fseed.size()>0) {
         casadi_assert(aseed.size()==0);
-        forward(in_, out_, fseed, fsens, always_inline, never_inline);
+        call_forward(in_, out_, fseed, fsens, always_inline, never_inline);
       } else if (aseed.size()>0) {
         casadi_assert(fseed.size()==0);
-        reverse(in_, out_, aseed, asens, always_inline, never_inline);
+        call_reverse(in_, out_, aseed, asens, always_inline, never_inline);
       }
 
       // Carry out the forward sweeps
