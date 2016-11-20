@@ -4990,6 +4990,11 @@ open ticket #1212 to make it sparse.
 
 ";
 
+%feature("docstring") casadi::Matrix::reset_input "[INTERNAL]  Reset the
+marker for an input expression.
+
+";
+
 %feature("docstring") friendwrap_poly_coeff "[INTERNAL]  extracts
 polynomial coefficients from an expression
 
@@ -5187,7 +5192,7 @@ nonzeros.
 duplicate symbolic expressions If there are symbolic primitives appearing
 more than once, the function will return true and the names of the duplicate
 expressions will be printed to userOut<true, PL_WARN>(). Note: Will mark the
-node using SXElem::setTemp. Make sure to call resetInput() after usage.
+node using SXElem::set_temp. Make sure to call reset_input() after usage.
 
 ";
 
@@ -5215,11 +5220,6 @@ Get the sparsity pattern. See the Sparsity class for details.
 
 %feature("docstring") casadi::Matrix::print "[INTERNAL]  Print a
 description of the object.
-
-";
-
-%feature("docstring") casadi::Matrix::resetInput "[INTERNAL]  Reset the
-marker for an input expression.
 
 ";
 
@@ -5360,11 +5360,6 @@ MXFunctions are combinations of Reshape, concatenations and SymbolicMX.
 
 ";
 
-%feature("docstring") casadi::MX::getTemp "[INTERNAL]  Get the temporary
-variable
-
-";
-
 %feature("docstring") casadi::MX::binary "
 
 Create nodes by their ID.
@@ -5377,15 +5372,15 @@ Check if commutative operation.
 
 ";
 
-%feature("docstring") casadi::MX::is_tril "
-
-Check if the matrix is lower triangular.
-
-";
-
 %feature("docstring") friendwrap_lift "
 
 Lift the expression Experimental feature.
+
+";
+
+%feature("docstring") casadi::MX::is_tril "
+
+Check if the matrix is lower triangular.
 
 ";
 
@@ -5432,6 +5427,11 @@ Return a string with a representation (for SWIG)
 %feature("docstring") casadi::MX::n_out "
 
 Number of outputs.
+
+";
+
+%feature("docstring") casadi::MX::set_temp "[INTERNAL]  Set the temporary
+variable.
 
 ";
 
@@ -5512,15 +5512,20 @@ Join an expression along symbolic primitives.
 
 ";
 
-%feature("docstring") casadi::MX::is_null "
-
-Is a null pointer?
+%feature("docstring") casadi::MX::reset_input "[INTERNAL]  Reset the marker
+for an input expression.
 
 ";
 
 %feature("docstring") casadi::MX::get_colind "
 
 Get the sparsity pattern. See the Sparsity class for details.
+
+";
+
+%feature("docstring") casadi::MX::is_null "
+
+Is a null pointer?
 
 ";
 
@@ -5600,6 +5605,11 @@ Get the number of non-zeros in the upper triangular half.
 
 ";
 
+%feature("docstring") casadi::MX::get_temp "[INTERNAL]  Get the temporary
+variable
+
+";
+
 %feature("docstring") casadi::MX::__hash__ "
 
 Returns a number that is unique for a given Node. If the Object does not
@@ -5676,7 +5686,7 @@ Get the number of dependencies of a binary SXElem.
 duplicate symbolic expressions If there are symbolic primitives appearing
 more than once, the function will return true and the names of the duplicate
 expressions will be printed to userOut<true, PL_WARN>(). Note: Will mark the
-node using MX::setTemp. Make sure to call resetInput() after usage.
+node using MX::set_temp. Make sure to call reset_input() after usage.
 
 ";
 
@@ -5749,11 +5759,6 @@ symbolic primitives.
 
 ";
 
-%feature("docstring") casadi::MX::setTemp "[INTERNAL]  Set the temporary
-variable.
-
-";
-
 %feature("docstring") casadi::MX::is_square "
 
 Check if the matrix expression is square.
@@ -5811,11 +5816,6 @@ Check if the matrix is a column vector (i.e. size2()==1)
 %feature("docstring") casadi::MX::__nonzero__ "
 
 Returns the truth value of an MX expression.
-
-";
-
-%feature("docstring") casadi::MX::resetInput "[INTERNAL]  Reset the marker
-for an input expression.
 
 ";
 

@@ -6871,6 +6871,12 @@ open ticket #1212 to make it sparse.
 
 ";
 
+%feature("docstring")  casadi::SX::reset_input() const  "
+
+[INTERNAL]  Reset the marker for an input expression.
+
+";
+
 %feature("docstring")  casadi::Matrix< Scalar >::poly_coeff(const Matrix<
 Scalar > &f, const Matrix< Scalar > &x) "
 
@@ -7119,13 +7125,13 @@ Matrix< Scalar > &x, const Matrix< Scalar > &y) "
 
 ";
 
-%feature("docstring")  casadi::SX::has_duplicates() "
+%feature("docstring")  casadi::SX::has_duplicates() const  "
 
 [INTERNAL]  Detect duplicate symbolic expressions If there are symbolic
 primitives appearing more than once, the function will return true and the
 names of the duplicate expressions will be printed to userOut<true,
-PL_WARN>(). Note: Will mark the node using SXElem::setTemp. Make sure to
-call resetInput() after usage.
+PL_WARN>(). Note: Will mark the node using SXElem::set_temp. Make sure to
+call reset_input() after usage.
 
 ";
 
@@ -7160,12 +7166,6 @@ Get the sparsity pattern. See the Sparsity class for details.
 &stream=casadi::userOut(), bool trailing_newline=true) const  "
 
 [INTERNAL]  Print a description of the object.
-
-";
-
-%feature("docstring")  casadi::SX::resetInput() "
-
-[INTERNAL]  Reset the marker for an input expression.
 
 ";
 
@@ -7338,12 +7338,6 @@ MXFunctions are combinations of Reshape, concatenations and SymbolicMX.
 
 ";
 
-%feature("docstring")  casadi::MX::getTemp() const  "
-
-[INTERNAL]  Get the temporary variable
-
-";
-
 %feature("docstring")  casadi::MX::binary(int op, const MX &x, const MX &y)
 "
 
@@ -7357,15 +7351,15 @@ Check if commutative operation.
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< MX  >::is_tril() const "
-
-Check if the matrix is lower triangular.
-
-";
-
 %feature("docstring")  lift(const MX &x, const MX &x_guess) "
 
 Lift the expression Experimental feature.
+
+";
+
+%feature("docstring")  casadi::GenericMatrix< MX  >::is_tril() const "
+
+Check if the matrix is lower triangular.
 
 ";
 
@@ -7423,6 +7417,12 @@ Return a string with a representation (for SWIG)
 %feature("docstring")  casadi::MX::n_out() const  "
 
 Number of outputs.
+
+";
+
+%feature("docstring")  casadi::MX::set_temp(int t) const  "
+
+[INTERNAL]  Set the temporary variable.
 
 ";
 
@@ -7555,15 +7555,21 @@ Join an expression along symbolic primitives.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::is_null() const  "
+%feature("docstring")  casadi::MX::reset_input() const  "
 
-Is a null pointer?
+[INTERNAL]  Reset the marker for an input expression.
 
 ";
 
 %feature("docstring")  casadi::GenericMatrix< MX  >::get_colind() const "
 
 Get the sparsity pattern. See the Sparsity class for details.
+
+";
+
+%feature("docstring")  casadi::SharedObject::is_null() const  "
+
+Is a null pointer?
 
 ";
 
@@ -7642,6 +7648,12 @@ Check if evaluation.
 %feature("docstring")  casadi::GenericMatrix< MX  >::nnz_upper() const "
 
 Get the number of non-zeros in the upper triangular half.
+
+";
+
+%feature("docstring")  casadi::MX::get_temp() const  "
+
+[INTERNAL]  Get the temporary variable
 
 ";
 
@@ -7746,13 +7758,13 @@ Get the number of dependencies of a binary SXElem.
 
 ";
 
-%feature("docstring")  casadi::MX::has_duplicates() "
+%feature("docstring")  casadi::MX::has_duplicates() const  "
 
 [INTERNAL]  Detect duplicate symbolic expressions If there are symbolic
 primitives appearing more than once, the function will return true and the
 names of the duplicate expressions will be printed to userOut<true,
-PL_WARN>(). Note: Will mark the node using MX::setTemp. Make sure to call
-resetInput() after usage.
+PL_WARN>(). Note: Will mark the node using MX::set_temp. Make sure to call
+reset_input() after usage.
 
 ";
 
@@ -7831,12 +7843,6 @@ with given sparsity.
 
 Create a vector of length r of vectors of length p with nrow-by-ncol
 symbolic primitives.
-
-";
-
-%feature("docstring")  casadi::MX::setTemp(int t) "
-
-[INTERNAL]  Set the temporary variable.
 
 ";
 
@@ -7923,12 +7929,6 @@ Check if the matrix is a column vector (i.e. size2()==1)
 %feature("docstring") casadi::MX::__nonzero__ "
 
 Returns the truth value of an MX expression.
-
-";
-
-%feature("docstring")  casadi::MX::resetInput() "
-
-[INTERNAL]  Reset the marker for an input expression.
 
 ";
 
