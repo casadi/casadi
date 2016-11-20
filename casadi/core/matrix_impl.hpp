@@ -1286,17 +1286,17 @@ namespace casadi {
 
   template<typename Scalar>
   size_t Matrix<Scalar>::element_hash() const {
-    throw CasadiException("\"element_hash\" not defined for instantiation");
+    casadi_error("'element_hash' not defined for " + type_name());
   }
 
   template<typename Scalar>
   bool Matrix<Scalar>::is_leaf() const {
-    throw CasadiException("\"is_leaf\" not defined for instantiation");
+    casadi_error("'is_leaf' not defined for " + type_name());
   }
 
   template<typename Scalar>
   bool Matrix<Scalar>::is_commutative() const {
-    throw CasadiException("\"is_commutative\" not defined for instantiation");
+    casadi_error("'is_commutative' not defined for " + type_name());
   }
 
   template<typename Scalar>
@@ -1311,12 +1311,12 @@ namespace casadi {
 
   template<typename Scalar>
   bool Matrix<Scalar>::has_duplicates() const {
-    throw CasadiException("\"has_duplicates\" not defined for instantiation");
+    casadi_error("'has_duplicates' not defined for " + type_name());
   }
 
   template<typename Scalar>
   void Matrix<Scalar>::reset_input() const {
-    throw CasadiException("\"reset_input\" not defined for instantiation");
+    casadi_error("'reset_input' not defined for " + type_name());
   }
 
   template<typename Scalar>
@@ -1410,17 +1410,17 @@ namespace casadi {
 
   template<typename Scalar>
   std::string Matrix<Scalar>::name() const {
-    throw CasadiException("\"name\" not defined for instantiation");
+    casadi_error("'name' not defined for " + type_name());
   }
 
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::dep(int ch) const {
-    throw CasadiException("\"dep\" not defined for instantiation");
+    casadi_error("'dep' not defined for " + type_name());
   }
 
   template<typename Scalar>
   int Matrix<Scalar>::n_dep() const {
-    throw CasadiException("\"n_dep\" not defined for instantiation");
+    casadi_error("'n_dep' not defined for " + type_name());
   }
 
   template<typename Scalar>
@@ -1438,12 +1438,12 @@ namespace casadi {
 
   template<typename Scalar>
   void Matrix<Scalar>::setEqualityCheckingDepth(int eq_depth) {
-    throw CasadiException("\"setEqualityCheckingDepth\" not defined for instantiation");
+    casadi_error("'setEqualityCheckingDepth' not defined for " + type_name());
   }
 
   template<typename Scalar>
   int Matrix<Scalar>::getEqualityCheckingDepth() {
-    throw CasadiException("\"getEqualityCheckingDepth\" not defined for instantiation");
+    casadi_error("'getEqualityCheckingDepth' not defined for " + type_name());
   }
 
   template<typename Scalar>
@@ -1990,7 +1990,7 @@ namespace casadi {
   Matrix<Scalar> Matrix<Scalar>::
   solve(const Matrix<Scalar>& a, const Matrix<Scalar>& b,
            const std::string& lsolver, const Dict& dict) {
-    throw CasadiException("\"solve\" not defined for instantiation");
+    casadi_error("'solve' not defined for " + type_name());
     return Matrix<Scalar>();
   }
 
@@ -2006,7 +2006,7 @@ namespace casadi {
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::
   pinv(const Matrix<Scalar>& A, const std::string& lsolver, const Dict& dict) {
-    throw CasadiException("\"solve\" not defined for instantiation");
+    casadi_error("'solve' not defined for " + type_name());
     return Matrix<Scalar>();
   }
 
@@ -2071,7 +2071,7 @@ namespace casadi {
       } else if (mapping[k]==2) {
         ret.nonzeros()[k] = B.nonzeros()[elB++];
       } else {
-        throw CasadiException("Pattern intersection not empty");
+        casadi_error("Pattern intersection not empty");
       }
     }
 
@@ -2110,14 +2110,14 @@ namespace casadi {
   template<typename Scalar>
   void Matrix<Scalar>::expand(const Matrix<Scalar>& ex,
                                 Matrix<Scalar> &weights, Matrix<Scalar>& terms) {
-    throw CasadiException("\"expand\" not defined for instantiation");
+    casadi_error("'expand' not defined for " + type_name());
   }
 
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::pw_const(const Matrix<Scalar>& ex,
                                               const Matrix<Scalar>& tval,
                                               const Matrix<Scalar>& val) {
-    throw CasadiException("\"pw_const\" not defined for instantiation");
+    casadi_error("'pw_const' not defined for " + type_name());
     return Matrix<Scalar>();
   }
 
@@ -2125,7 +2125,7 @@ namespace casadi {
   Matrix<Scalar> Matrix<Scalar>::pw_lin(const Matrix<Scalar>& ex,
                                             const Matrix<Scalar>& tval,
                                             const Matrix<Scalar>& val) {
-    throw CasadiException("\"pw_lin\" not defined for instantiation");
+    casadi_error("'pw_lin' not defined for " + type_name());
     return Matrix<Scalar>();
   }
 
@@ -2183,7 +2183,7 @@ namespace casadi {
                                                       const Matrix<Scalar>& a,
                                                       const Matrix<Scalar>& b, int order,
                                                       const Matrix<Scalar>& w) {
-    throw CasadiException("\"gauss_quadrature\" not defined for instantiation");
+    casadi_error("'gauss_quadrature' not defined for " + type_name());
     return Matrix<Scalar>();
   }
 
@@ -2196,7 +2196,7 @@ namespace casadi {
   Matrix<Scalar> Matrix<Scalar>::substitute(const Matrix<Scalar>& ex,
                                                 const Matrix<Scalar>& v,
                                                 const Matrix<Scalar>& vdef) {
-    throw CasadiException("\"substitute\" not defined for instantiation");
+    casadi_error("'substitute' not defined for " + type_name());
     return Matrix<Scalar>();
   }
 
@@ -2205,7 +2205,7 @@ namespace casadi {
   Matrix<Scalar>::substitute(const std::vector<Matrix<Scalar> >& ex,
                                const std::vector<Matrix<Scalar> >& v,
                                const std::vector<Matrix<Scalar> >& vdef) {
-    throw CasadiException("\"substitute\" not defined for instantiation");
+    casadi_error("'substitute' not defined for " + type_name());
     return std::vector<Matrix<Scalar> >();
   }
 
@@ -2214,12 +2214,12 @@ namespace casadi {
                                            std::vector<Matrix<Scalar> >& vdef,
                                            std::vector<Matrix<Scalar> >& ex,
                                            bool reverse) {
-    throw CasadiException("\"substitute_inplace\" not defined for instantiation");
+    casadi_error("'substitute_inplace' not defined for " + type_name());
   }
 
   template<typename Scalar>
   bool Matrix<Scalar>::depends_on(const Matrix<Scalar> &x, const Matrix<Scalar> &arg) {
-    throw CasadiException("\"depends_on\" not defined for instantiation");
+    casadi_error("'depends_on' not defined for " + type_name());
     return false;
   }
 
@@ -2227,28 +2227,28 @@ namespace casadi {
   Matrix<Scalar> Matrix<Scalar>::jacobian(const Matrix<Scalar> &f,
                                               const Matrix<Scalar> &x,
                                               bool symmetric) {
-    casadi_error("\"jacobian\" not defined for " + type_name());
+    casadi_error("'jacobian' not defined for " + type_name());
     return Matrix<Scalar>();
   }
 
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::gradient(const Matrix<Scalar> &f,
                                               const Matrix<Scalar> &x) {
-    casadi_error("\"gradient\" not defined for " + type_name());
+    casadi_error("'gradient' not defined for " + type_name());
     return Matrix<Scalar>();
   }
 
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::tangent(const Matrix<Scalar> &f,
                                                 const Matrix<Scalar> &x) {
-    casadi_error("\"tangent\" not defined for " + type_name());
+    casadi_error("'tangent' not defined for " + type_name());
     return Matrix<Scalar>();
   }
 
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::hessian(const Matrix<Scalar> &f,
                                              const Matrix<Scalar> &x) {
-    casadi_error("\"hessian\" not defined for " + type_name());
+    casadi_error("'hessian' not defined for " + type_name());
     return Matrix<Scalar>();
   }
 
@@ -2256,7 +2256,7 @@ namespace casadi {
   Matrix<Scalar> Matrix<Scalar>::hessian(const Matrix<Scalar> &f,
                                              const Matrix<Scalar> &x,
                                              Matrix<Scalar> &g) {
-    casadi_error("\"hessian\" not defined for " + type_name());
+    casadi_error("'hessian' not defined for " + type_name());
     return Matrix<Scalar>();
   }
 
@@ -2265,7 +2265,7 @@ namespace casadi {
                                             const Matrix<Scalar> &arg,
                                             const Matrix<Scalar> &v,
                                             bool tr) {
-    casadi_error("\"jtimes\" not defined for " + type_name());
+    casadi_error("'jtimes' not defined for " + type_name());
   }
 
   template<typename Scalar>
@@ -2275,7 +2275,7 @@ namespace casadi {
           const std::vector<Matrix<Scalar> > &arg,
           const std::vector<std::vector<Matrix<Scalar> > > &v,
           const Dict& opts) {
-    casadi_error("\"forward\" not defined for " + type_name());
+    casadi_error("'forward' not defined for " + type_name());
   }
 
   template<typename Scalar>
@@ -2285,14 +2285,14 @@ namespace casadi {
           const std::vector<Matrix<Scalar> > &arg,
           const std::vector<std::vector<Matrix<Scalar> > > &v,
           const Dict& opts) {
-    casadi_error("\"reverse\" not defined for " + type_name());
+    casadi_error("'reverse' not defined for " + type_name());
   }
 
   template<typename Scalar>
   std::vector<bool>
   Matrix<Scalar>::which_depends(const Matrix<Scalar> &expr, const Matrix<Scalar> &var,
       int order, bool tr) {
-    casadi_error("\"which_depends\" not defined for " + type_name());
+    casadi_error("'which_depends' not defined for " + type_name());
     return std::vector<bool>();
   }
 
@@ -2300,7 +2300,7 @@ namespace casadi {
   Matrix<Scalar> Matrix<Scalar>::taylor(const Matrix<Scalar>& f,
                                             const Matrix<Scalar>& x,
                                             const Matrix<Scalar>& a, int order) {
-    casadi_error("\"taylor\" not defined for " + type_name());
+    casadi_error("'taylor' not defined for " + type_name());
     return Matrix<Scalar>();
   }
 
@@ -2308,7 +2308,7 @@ namespace casadi {
   Matrix<Scalar> Matrix<Scalar>::mtaylor(const Matrix<Scalar>& f,
                                              const Matrix<Scalar>& x,
                                              const Matrix<Scalar>& a, int order) {
-    casadi_error("\"mtaylor\" not defined for " + type_name());
+    casadi_error("'mtaylor' not defined for " + type_name());
     return Matrix<Scalar>();
   }
 
@@ -2317,13 +2317,13 @@ namespace casadi {
                                              const Matrix<Scalar>& x,
                                              const Matrix<Scalar>& a, int order,
                                              const std::vector<int>&order_contributions) {
-    casadi_error("\"mtaylor\" not defined for " + type_name());
+    casadi_error("'mtaylor' not defined for " + type_name());
     return Matrix<Scalar>();
   }
 
   template<typename Scalar>
   int Matrix<Scalar>::n_nodes(const Matrix<Scalar>& x) {
-    casadi_error("\"n_nodes\" not defined for " + type_name());
+    casadi_error("'n_nodes' not defined for " + type_name());
     return 0;
   }
 
@@ -2331,13 +2331,13 @@ namespace casadi {
   std::string
   Matrix<Scalar>::print_operator(const Matrix<Scalar>& x,
                                    const std::vector<std::string>& args) {
-    casadi_error("\"print_operator\" not defined for " + type_name());
+    casadi_error("'print_operator' not defined for " + type_name());
     return std::string();
   }
 
   template<typename Scalar>
   std::vector<Matrix<Scalar> > Matrix<Scalar>::symvar(const Matrix<Scalar>& x) {
-    casadi_error("\"symvar\" not defined for " + type_name());
+    casadi_error("'symvar' not defined for " + type_name());
     return std::vector<Matrix<Scalar> >();
   }
 
@@ -2347,23 +2347,23 @@ namespace casadi {
                                        std::vector<Matrix<Scalar> >& vdef,
                                        const std::string& v_prefix,
                                        const std::string& v_suffix) {
-    casadi_error("\"shared\" not defined for " + type_name());
+    casadi_error("'shared' not defined for " + type_name());
   }
 
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::poly_coeff(const Matrix<Scalar>& f,
                                                 const Matrix<Scalar>&x) {
-    casadi_error("\"poly_coeff\" not defined for " + type_name());
+    casadi_error("'poly_coeff' not defined for " + type_name());
   }
 
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::poly_roots(const Matrix<Scalar>& p) {
-    casadi_error("\"poly_roots\" not defined for " + type_name());
+    casadi_error("'poly_roots' not defined for " + type_name());
   }
 
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::eig_symbolic(const Matrix<Scalar>& m) {
-    casadi_error("\"eig_symbolic\" not defined for " + type_name());
+    casadi_error("'eig_symbolic' not defined for " + type_name());
   }
 
   template<typename Scalar>
@@ -2412,12 +2412,12 @@ namespace casadi {
 
   template<typename Scalar>
   std::vector<Matrix<Scalar> > Matrix<Scalar>::get_input(const Function& f) {
-    casadi_error("\"get_input\" not defined for " + type_name());
+    casadi_error("'get_input' not defined for " + type_name());
   }
 
   template<typename Scalar>
   std::vector<Matrix<Scalar> > Matrix<Scalar>::get_free(const Function& f) {
-    casadi_error("\"get_free\" not defined for " + type_name());
+    casadi_error("'get_free' not defined for " + type_name());
   }
 
   template<typename Scalar>
