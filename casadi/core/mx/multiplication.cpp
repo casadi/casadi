@@ -66,7 +66,7 @@ namespace casadi {
                res[0], sparsity(), w, false);
   }
 
-  void Multiplication::evalFwd(const std::vector<std::vector<MX> >& fseed,
+  void Multiplication::eval_forward(const std::vector<std::vector<MX> >& fseed,
                                std::vector<std::vector<MX> >& fsens) {
     for (int d=0; d<fsens.size(); ++d) {
       fsens[d][0] = fseed[d][0]
@@ -75,7 +75,7 @@ namespace casadi {
     }
   }
 
-  void Multiplication::evalAdj(const std::vector<std::vector<MX> >& aseed,
+  void Multiplication::eval_reverse(const std::vector<std::vector<MX> >& aseed,
                                std::vector<std::vector<MX> >& asens) {
     for (int d=0; d<aseed.size(); ++d) {
       asens[d][1] += mac(aseed[d][0], dep(2).T(), MX::zeros(dep(1).sparsity()));

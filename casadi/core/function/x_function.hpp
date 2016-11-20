@@ -1040,7 +1040,7 @@ namespace casadi {
     std::vector<std::vector<MatType> > fseed = symbolicFwdSeed(nfwd, in_), fsens;
 
     // Evaluate symbolically
-    static_cast<DerivedType*>(this)->evalFwd(fseed, fsens);
+    static_cast<DerivedType*>(this)->eval_forward(fseed, fsens);
     casadi_assert(fsens.size()==fseed.size());
 
     // Number inputs and outputs
@@ -1084,7 +1084,7 @@ namespace casadi {
     std::vector<std::vector<MatType> > aseed = symbolicAdjSeed(nadj, out_), asens;
 
     // Evaluate symbolically
-    static_cast<DerivedType*>(this)->evalAdj(aseed, asens);
+    static_cast<DerivedType*>(this)->eval_reverse(aseed, asens);
 
     // Number inputs and outputs
     int num_in = n_in();
@@ -1178,12 +1178,12 @@ namespace casadi {
 
     // Call inlining
     if (isInput(arg)) {
-      // Argument agrees with in_, call evalFwd directly
-      static_cast<DerivedType*>(this)->evalFwd(fseed, fsens);
+      // Argument agrees with in_, call eval_forward directly
+      static_cast<DerivedType*>(this)->eval_forward(fseed, fsens);
     } else {
       // Need to create a temporary function
       Function f("tmp", arg, res);
-      static_cast<DerivedType *>(f.get())->evalFwd(fseed, fsens);
+      static_cast<DerivedType *>(f.get())->eval_forward(fseed, fsens);
     }
   }
 
@@ -1209,12 +1209,12 @@ namespace casadi {
 
     // Call inlining
     if (isInput(arg)) {
-      // Argument agrees with in_, call evalAdj directly
-      static_cast<DerivedType*>(this)->evalAdj(aseed, asens);
+      // Argument agrees with in_, call eval_reverse directly
+      static_cast<DerivedType*>(this)->eval_reverse(aseed, asens);
     } else {
       // Need to create a temporary function
       Function f("tmp", arg, res);
-      static_cast<DerivedType *>(f.get())->evalAdj(aseed, asens);
+      static_cast<DerivedType *>(f.get())->eval_reverse(aseed, asens);
     }
   }
 

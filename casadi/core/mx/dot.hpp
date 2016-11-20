@@ -66,11 +66,11 @@ namespace casadi {
     virtual void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const;
 
     /** \brief Calculate forward mode directional derivatives */
-    virtual void evalFwd(const std::vector<std::vector<MX> >& fseed,
+    virtual void eval_forward(const std::vector<std::vector<MX> >& fseed,
                          std::vector<std::vector<MX> >& fsens);
 
     /** \brief Calculate reverse mode directional derivatives */
-    virtual void evalAdj(const std::vector<std::vector<MX> >& aseed,
+    virtual void eval_reverse(const std::vector<std::vector<MX> >& aseed,
                          std::vector<std::vector<MX> >& asens);
 
     /** \brief Generate code for the operation */

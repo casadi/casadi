@@ -165,14 +165,14 @@ namespace casadi {
     res[0] = arg[0].T();
   }
 
-  void Transpose::evalFwd(const std::vector<std::vector<MX> >& fseed,
+  void Transpose::eval_forward(const std::vector<std::vector<MX> >& fseed,
                           std::vector<std::vector<MX> >& fsens) {
     for (int d=0; d<fsens.size(); ++d) {
       fsens[d][0] = fseed[d][0].T();
     }
   }
 
-  void Transpose::evalAdj(const std::vector<std::vector<MX> >& aseed,
+  void Transpose::eval_reverse(const std::vector<std::vector<MX> >& aseed,
                           std::vector<std::vector<MX> >& asens) {
     for (int d=0; d<aseed.size(); ++d) {
       asens[d][0] += aseed[d][0].T();

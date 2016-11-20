@@ -204,7 +204,7 @@ Function Function::rootfinder_fun() {
                         Sparsity(arg[iin_].size()));
     vector<MX> res = mx_out();
     vector<vector<MX> > fseed = symbolicFwdSeed(nfwd, arg), fsens;
-    evalFwd(arg, res, fseed, fsens, false, false);
+    eval_forward(arg, res, fseed, fsens, false, false);
 
     // Construct return function
     arg.insert(arg.end(), res.begin(), res.end());
@@ -231,7 +231,7 @@ Function Function::rootfinder_fun() {
                         Sparsity(arg[iin_].size()));
     vector<MX> res = mx_out();
     vector<vector<MX> > aseed = symbolicAdjSeed(nadj, res), asens;
-    evalAdj(arg, res, aseed, asens, false, false);
+    eval_reverse(arg, res, aseed, asens, false, false);
 
     // Construct return function
     arg.insert(arg.end(), res.begin(), res.end());
@@ -318,7 +318,7 @@ Function Function::rootfinder_fun() {
   const std::string Rootfinder::infix_ = "rootfinder";
 
   void Rootfinder::
-  evalFwd(const std::vector<MX>& arg, const std::vector<MX>& res,
+  eval_forward(const std::vector<MX>& arg, const std::vector<MX>& res,
           const std::vector<std::vector<MX> >& fseed,
           std::vector<std::vector<MX> >& fsens,
           bool always_inline, bool never_inline) {
@@ -362,7 +362,7 @@ Function Function::rootfinder_fun() {
   }
 
   void Rootfinder::
-  evalAdj(const std::vector<MX>& arg, const std::vector<MX>& res,
+  eval_reverse(const std::vector<MX>& arg, const std::vector<MX>& res,
           const std::vector<std::vector<MX> >& aseed,
           std::vector<std::vector<MX> >& asens,
           bool always_inline, bool never_inline) {

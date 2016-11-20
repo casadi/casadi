@@ -55,7 +55,7 @@ namespace casadi {
     res[0] = arg[0]->getNormF();
   }
 
-  void NormF::evalFwd(const std::vector<std::vector<MX> >& fseed,
+  void NormF::eval_forward(const std::vector<std::vector<MX> >& fseed,
                       std::vector<std::vector<MX> >& fsens) {
     MX self = shared_from_this<MX>();
     for (int d=0; d<fsens.size(); ++d) {
@@ -63,7 +63,7 @@ namespace casadi {
     }
   }
 
-  void NormF::evalAdj(const std::vector<std::vector<MX> >& aseed,
+  void NormF::eval_reverse(const std::vector<std::vector<MX> >& aseed,
                       std::vector<std::vector<MX> >& asens) {
     MX self = shared_from_this<MX>();
     for (int d=0; d<aseed.size(); ++d) {

@@ -248,7 +248,7 @@ namespace casadi {
     }
   }
 
-  void GetNonzeros::evalFwd(const std::vector<std::vector<MX> >& fseed,
+  void GetNonzeros::eval_forward(const std::vector<std::vector<MX> >& fseed,
                             std::vector<std::vector<MX> >& fsens) {
     // Get all the nonzeros
     vector<int> nz = all();
@@ -330,7 +330,7 @@ namespace casadi {
     }
   }
 
-  void GetNonzeros::evalAdj(const std::vector<std::vector<MX> >& aseed,
+  void GetNonzeros::eval_reverse(const std::vector<std::vector<MX> >& aseed,
                             std::vector<std::vector<MX> >& asens) {
     // Get all the nonzeros
     vector<int> nz = all();

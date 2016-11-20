@@ -577,8 +577,8 @@ namespace casadi {
     if (verbose()) userOut() << "SXFunction::eval_sx end" << endl;
   }
 
-  void SXFunction::evalFwd(const vector<vector<SX> >& fseed, vector<vector<SX> >& fsens) {
-    if (verbose()) userOut() << "SXFunction::evalFwd begin" << endl;
+  void SXFunction::eval_forward(const vector<vector<SX> >& fseed, vector<vector<SX> >& fsens) {
+    if (verbose()) userOut() << "SXFunction::eval_forward begin" << endl;
 
     // Number of forward seeds
     int nfwd = fseed.size();
@@ -594,7 +594,7 @@ namespace casadi {
     // Check if seeds need to have dimensions corrected
     for (auto&& r : fseed) {
       if (!matchingArg(r)) {
-        return evalFwd(replaceFwdSeed(fseed), fsens);
+        return eval_forward(replaceFwdSeed(fseed), fsens);
       }
     }
 
@@ -608,7 +608,7 @@ namespace casadi {
           for (auto&& r : fseed2) {
             for (int i=0; i<n_in; ++i) r[i] = project(r[i], sparsity_in(i));
           }
-          return evalFwd(fseed2, fsens);
+          return eval_forward(fseed2, fsens);
         }
       }
     }
@@ -629,7 +629,7 @@ namespace casadi {
     vector<TapeEl<SXElem> >::iterator it1 = s_pdwork.begin();
 
     // Evaluate algorithm
-    if (verbose()) userOut() << "SXFunction::evalFwd evaluating algorithm forward" << endl;
+    if (verbose()) userOut() << "SXFunction::eval_forward evaluating algorithm forward" << endl;
     for (auto&& e : algorithm_) {
       switch (e.op) {
       case OP_INPUT:
@@ -649,7 +649,7 @@ namespace casadi {
 
     // Calculate forward sensitivities
     if (verbose())
-      userOut() << "SXFunction::evalFwd calculating forward derivatives" << endl;
+      userOut() << "SXFunction::eval_forward calculating forward derivatives" << endl;
     for (int dir=0; dir<nfwd; ++dir) {
       vector<TapeEl<SXElem> >::const_iterator it2 = s_pdwork.begin();
       for (auto&& a : algorithm_) {
@@ -669,11 +669,11 @@ namespace casadi {
         }
       }
     }
-    if (verbose()) userOut() << "SXFunction::evalFwd end" << endl;
+    if (verbose()) userOut() << "SXFunction::eval_forward end" << endl;
   }
 
-  void SXFunction::evalAdj(const vector<vector<SX> >& aseed, vector<vector<SX> >& asens) {
-    if (verbose()) userOut() << "SXFunction::evalAdj begin" << endl;
+  void SXFunction::eval_reverse(const vector<vector<SX> >& aseed, vector<vector<SX> >& asens) {
+    if (verbose()) userOut() << "SXFunction::eval_reverse begin" << endl;
 
     // number of adjoint seeds
     int nadj = aseed.size();
@@ -689,7 +689,7 @@ namespace casadi {
     // Check if seeds need to have dimensions corrected
     for (auto&& r : aseed) {
       if (!matchingRes(r)) {
-        return evalAdj(replaceAdjSeed(aseed), asens);
+        return eval_reverse(replaceAdjSeed(aseed), asens);
       }
     }
 
@@ -708,7 +708,7 @@ namespace casadi {
         for (int i=0; i<n_out; ++i)
           if (aseed2[d][i].sparsity()!=sparsity_out(i))
             aseed2[d][i] = project(aseed2[d][i], sparsity_out(i));
-      return evalAdj(aseed2, asens);
+      return eval_reverse(aseed2, asens);
     }
 
     // Allocate results if needed
@@ -731,7 +731,7 @@ namespace casadi {
     vector<TapeEl<SXElem> >::iterator it1 = s_pdwork.begin();
 
     // Evaluate algorithm
-    if (verbose()) userOut() << "SXFunction::evalFwd evaluating algorithm forward" << endl;
+    if (verbose()) userOut() << "SXFunction::eval_forward evaluating algorithm forward" << endl;
     for (auto&& a : algorithm_) {
       switch (a.op) {
       case OP_INPUT:
@@ -750,7 +750,7 @@ namespace casadi {
     }
 
     // Calculate adjoint sensitivities
-    if (verbose()) userOut() << "SXFunction::evalAdj calculating adjoint derivatives"
+    if (verbose()) userOut() << "SXFunction::eval_reverse calculating adjoint derivatives"
                        << endl;
     fill(s_work_.begin(), s_work_.end(), 0);
     for (int dir=0; dir<nadj; ++dir) {
@@ -784,7 +784,7 @@ namespace casadi {
         }
       }
     }
-    if (verbose()) userOut() << "SXFunction::evalAdj end" << endl;
+    if (verbose()) userOut() << "SXFunction::eval_reverse end" << endl;
   }
 
   void SXFunction::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {

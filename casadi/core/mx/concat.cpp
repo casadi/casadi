@@ -152,7 +152,7 @@ namespace casadi {
     res[0] = diagcat(arg);
   }
 
-  void Diagcat::evalFwd(const std::vector<std::vector<MX> >& fseed,
+  void Diagcat::eval_forward(const std::vector<std::vector<MX> >& fseed,
                         std::vector<std::vector<MX> >& fsens) {
     int nfwd = fsens.size();
     for (int d = 0; d<nfwd; ++d) fsens[d][0] = diagcat(fseed[d]);
@@ -170,7 +170,7 @@ namespace casadi {
     return make_pair(offset1, offset2);
   }
 
-  void Diagcat::evalAdj(const std::vector<std::vector<MX> >& aseed,
+  void Diagcat::eval_reverse(const std::vector<std::vector<MX> >& aseed,
                         std::vector<std::vector<MX> >& asens) {
     // Get offsets for each row and column
     auto off = offset();
@@ -205,7 +205,7 @@ namespace casadi {
     res[0] = horzcat(arg);
   }
 
-  void Horzcat::evalFwd(const std::vector<std::vector<MX> >& fseed,
+  void Horzcat::eval_forward(const std::vector<std::vector<MX> >& fseed,
                         std::vector<std::vector<MX> >& fsens) {
     int nfwd = fsens.size();
     for (int d = 0; d<nfwd; ++d) {
@@ -222,7 +222,7 @@ namespace casadi {
     return col_offset;
   }
 
-  void Horzcat::evalAdj(const std::vector<std::vector<MX> >& aseed,
+  void Horzcat::eval_reverse(const std::vector<std::vector<MX> >& aseed,
                         std::vector<std::vector<MX> >& asens) {
     // Get offsets for each column
     vector<int> col_offset = offset();
@@ -256,7 +256,7 @@ namespace casadi {
     res[0] = vertcat(arg);
   }
 
-  void Vertcat::evalFwd(const std::vector<std::vector<MX> >& fseed,
+  void Vertcat::eval_forward(const std::vector<std::vector<MX> >& fseed,
                         std::vector<std::vector<MX> >& fsens) {
     int nfwd = fsens.size();
     for (int d = 0; d<nfwd; ++d) {
@@ -273,7 +273,7 @@ namespace casadi {
     return row_offset;
   }
 
-  void Vertcat::evalAdj(const std::vector<std::vector<MX> >& aseed,
+  void Vertcat::eval_reverse(const std::vector<std::vector<MX> >& aseed,
                         std::vector<std::vector<MX> >& asens) {
     // Get offsets for each row
     vector<int> row_offset = offset();

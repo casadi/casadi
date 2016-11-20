@@ -103,7 +103,7 @@ namespace casadi {
     res = create(fcn_, arg);
   }
 
-  void Call::evalFwd(const vector<vector<MX> >& fseed,
+  void Call::eval_forward(const vector<vector<MX> >& fseed,
                      vector<vector<MX> >& fsens) {
     // Nondifferentiated inputs and outputs
     vector<MX> arg(ndep());
@@ -115,7 +115,7 @@ namespace casadi {
     fcn_->call_forward(arg, res, fseed, fsens, false, false);
   }
 
-  void Call::evalAdj(const vector<vector<MX> >& aseed,
+  void Call::eval_reverse(const vector<vector<MX> >& aseed,
                      vector<vector<MX> >& asens) {
     // Nondifferentiated inputs and outputs
     vector<MX> arg(ndep());

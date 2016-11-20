@@ -75,7 +75,7 @@ namespace casadi {
   }
 
   template<bool Tr>
-  void Solve<Tr>::evalFwd(const std::vector<std::vector<MX> >& fseed,
+  void Solve<Tr>::eval_forward(const std::vector<std::vector<MX> >& fseed,
                           std::vector<std::vector<MX> >& fsens) {
     // Nondifferentiated inputs and outputs
     vector<MX> arg(ndep());
@@ -108,7 +108,7 @@ namespace casadi {
   }
 
   template<bool Tr>
-  void Solve<Tr>::evalAdj(const std::vector<std::vector<MX> >& aseed,
+  void Solve<Tr>::eval_reverse(const std::vector<std::vector<MX> >& aseed,
                           std::vector<std::vector<MX> >& asens) {
     // Nondifferentiated inputs and outputs
     vector<MX> arg(ndep());

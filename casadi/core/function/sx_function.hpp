@@ -106,11 +106,11 @@ class CASADI_EXPORT SXFunction :
   }
 
   /** \brief Calculate forward mode directional derivatives */
-  virtual void evalFwd(const std::vector<std::vector<SX> >& fseed,
+  virtual void eval_forward(const std::vector<std::vector<SX> >& fseed,
                        std::vector<std::vector<SX> >& fsens);
 
   /** \brief Calculate reverse mode directional derivatives */
-  virtual void evalAdj(const std::vector<std::vector<SX> >& aseed,
+  virtual void eval_reverse(const std::vector<std::vector<SX> >& aseed,
                        std::vector<std::vector<SX> >& asens);
 
   /** \brief  Check if smooth */

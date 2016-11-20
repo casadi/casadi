@@ -322,15 +322,15 @@ namespace casadi {
                           + typeid(*this).name());
   }
 
-  void MXNode::evalFwd(const vector<vector<MX> >& fseed,
+  void MXNode::eval_forward(const vector<vector<MX> >& fseed,
                        vector<vector<MX> >& fsens) {
-    throw CasadiException(string("MXNode::evalFwd not defined for class ")
+    throw CasadiException(string("MXNode::eval_forward not defined for class ")
                           + typeid(*this).name());
   }
 
-  void MXNode::evalAdj(const vector<vector<MX> >& aseed,
+  void MXNode::eval_reverse(const vector<vector<MX> >& aseed,
                        vector<vector<MX> >& asens) {
-    throw CasadiException(string("MXNode::evalAdj not defined for class ")
+    throw CasadiException(string("MXNode::eval_reverse not defined for class ")
                           + typeid(*this).name());
   }
 

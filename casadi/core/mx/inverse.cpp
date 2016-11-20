@@ -44,7 +44,7 @@ namespace casadi {
     res[0] = inv(arg[0]);
   }
 
-  void Inverse::evalFwd(const std::vector<std::vector<MX> >& fseed,
+  void Inverse::eval_forward(const std::vector<std::vector<MX> >& fseed,
                         std::vector<std::vector<MX> >& fsens) {
     MX inv_X = shared_from_this<MX>();
     for (int d=0; d<fsens.size(); ++d) {
@@ -52,7 +52,7 @@ namespace casadi {
     }
   }
 
-  void Inverse::evalAdj(const std::vector<std::vector<MX> >& aseed,
+  void Inverse::eval_reverse(const std::vector<std::vector<MX> >& aseed,
                         std::vector<std::vector<MX> >& asens) {
     MX inv_X = shared_from_this<MX>();
     MX trans_inv_X = inv_X.T();

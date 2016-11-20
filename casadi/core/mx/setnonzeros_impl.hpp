@@ -186,7 +186,7 @@ namespace casadi {
   }
 
   template<bool Add>
-  void SetNonzeros<Add>::evalFwd(const std::vector<std::vector<MX> >& fseed,
+  void SetNonzeros<Add>::eval_forward(const std::vector<std::vector<MX> >& fseed,
                                  std::vector<std::vector<MX> >& fsens) {
     // Get all the nonzeros
     vector<int> nz = all();
@@ -319,7 +319,7 @@ namespace casadi {
   }
 
   template<bool Add>
-  void SetNonzeros<Add>::evalAdj(const std::vector<std::vector<MX> >& aseed,
+  void SetNonzeros<Add>::eval_reverse(const std::vector<std::vector<MX> >& aseed,
                                  std::vector<std::vector<MX> >& asens) {
     // Get all the nonzeros
     vector<int> nz = all();

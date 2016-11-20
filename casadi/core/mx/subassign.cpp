@@ -65,12 +65,12 @@ namespace casadi {
     casadi_error("not ready");
   }
 
-  void SubAssign::evalFwd(const std::vector<std::vector<MX> >& fseed,
+  void SubAssign::eval_forward(const std::vector<std::vector<MX> >& fseed,
                           std::vector<std::vector<MX> >& fsens) {
     casadi_error("not ready");
   }
 
-  void SubAssign::evalAdj(const std::vector<std::vector<MX> >& aseed,
+  void SubAssign::eval_reverse(const std::vector<std::vector<MX> >& aseed,
                           std::vector<std::vector<MX> >& asens) {
     casadi_error("not ready");
   }

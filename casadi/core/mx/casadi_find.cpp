@@ -51,14 +51,14 @@ namespace casadi {
     res[0] = find(arg[0]);
   }
 
-  void Find::evalFwd(const std::vector<std::vector<MX> >& fseed,
+  void Find::eval_forward(const std::vector<std::vector<MX> >& fseed,
                      std::vector<std::vector<MX> >& fsens) {
     for (int d=0; d<fsens.size(); ++d) {
       fsens[d][0] = 0;
     }
   }
 
-  void Find::evalAdj(const std::vector<std::vector<MX> >& aseed,
+  void Find::eval_reverse(const std::vector<std::vector<MX> >& aseed,
                      std::vector<std::vector<MX> >& asens) {
   }
 

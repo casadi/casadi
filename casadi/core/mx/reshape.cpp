@@ -76,14 +76,14 @@ namespace casadi {
     res[0] = reshape(arg[0], size());
   }
 
-  void Reshape::evalFwd(const std::vector<std::vector<MX> >& fseed,
+  void Reshape::eval_forward(const std::vector<std::vector<MX> >& fseed,
                         std::vector<std::vector<MX> >& fsens) {
     for (int d = 0; d<fsens.size(); ++d) {
       fsens[d][0] = reshape(fseed[d][0], size());
     }
   }
 
-  void Reshape::evalAdj(const std::vector<std::vector<MX> >& aseed,
+  void Reshape::eval_reverse(const std::vector<std::vector<MX> >& aseed,
                         std::vector<std::vector<MX> >& asens) {
     for (int d=0; d<aseed.size(); ++d) {
       asens[d][0] += reshape(aseed[d][0], dep().size());

@@ -70,11 +70,11 @@ namespace casadi {
     virtual void sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const;
 
     /** \brief Calculate forward mode directional derivatives */
-    virtual void evalFwd(const std::vector<std::vector<MX> >& fseed,
+    virtual void eval_forward(const std::vector<std::vector<MX> >& fseed,
                          std::vector<std::vector<MX> >& fsens);
 
     /** \brief Calculate reverse mode directional derivatives */
-    virtual void evalAdj(const std::vector<std::vector<MX> >& aseed,
+    virtual void eval_reverse(const std::vector<std::vector<MX> >& aseed,
                          std::vector<std::vector<MX> >& asens);
 
     /** \brief Generate code for the operation */
@@ -123,11 +123,11 @@ namespace casadi {
     virtual void sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const;
 
     /** \brief Calculate forward mode directional derivatives */
-    virtual void evalFwd(const std::vector<std::vector<MX> >& fseed,
+    virtual void eval_forward(const std::vector<std::vector<MX> >& fseed,
                          std::vector<std::vector<MX> >& fsens);
 
     /** \brief Calculate reverse mode directional derivatives */
-    virtual void evalAdj(const std::vector<std::vector<MX> >& aseed,
+    virtual void eval_reverse(const std::vector<std::vector<MX> >& aseed,
                          std::vector<std::vector<MX> >& asens);
 
     /** \brief Generate code for the operation */

@@ -66,7 +66,7 @@ namespace casadi {
     casadi_math<MX>::fun(op_, arg[0], dummy, res[0]);
   }
 
-  void UnaryMX::evalFwd(const std::vector<std::vector<MX> >& fseed,
+  void UnaryMX::eval_forward(const std::vector<std::vector<MX> >& fseed,
                      std::vector<std::vector<MX> >& fsens) {
     // Get partial derivatives
     MX pd[2];
@@ -79,7 +79,7 @@ namespace casadi {
     }
   }
 
-  void UnaryMX::evalAdj(const std::vector<std::vector<MX> >& aseed,
+  void UnaryMX::eval_reverse(const std::vector<std::vector<MX> >& aseed,
                      std::vector<std::vector<MX> >& asens) {
     // Get partial derivatives
     MX pd[2];
