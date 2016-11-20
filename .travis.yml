@@ -282,6 +282,7 @@ matrix:
         - sudo apt-get update -qq
         - sudo apt-get install octave liboctave-dev -y
         - sudo apt-get install -y xvfb
+        - sudo apt-get install -y libqt-opengl-dev
         
         # travis-wait seems to stop at 20 mins, regardless if output is being generated
         - (while true ; do sleep 60 ; echo "ping" ; done ) &
@@ -295,7 +296,6 @@ matrix:
         - Xvfb :1 &
         - export DISPLAY=:1
         - octave --no-gui --no-window-system --eval "addpath('/home/travis/build/octave-install');savepath;"
-        - octave --no-gui --eval "addpath('/home/travis/build/octave-install');savepath;"
         - pushd test && make octave && popd
 branches:
   except:
