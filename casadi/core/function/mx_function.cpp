@@ -1282,7 +1282,7 @@ namespace casadi {
     vinit_fcn = Function("lifting_variable_guess", f_in, f_out);
   }
 
-  void MXFunction::forward_mx(const std::vector<MX>& arg, const std::vector<MX>& res,
+  void MXFunction::call_forward(const std::vector<MX>& arg, const std::vector<MX>& res,
                                    const std::vector<std::vector<MX> >& fseed,
                                    std::vector<std::vector<MX> >& fsens,
                                    bool always_inline, bool never_inline) {
@@ -1294,11 +1294,11 @@ namespace casadi {
       forward_x(arg, res, fseed, fsens);
     } else {
       // The non-inlining version is implemented in the base class
-      FunctionInternal::forward_mx(arg, res, fseed, fsens, always_inline, never_inline);
+      FunctionInternal::call_forward(arg, res, fseed, fsens, always_inline, never_inline);
     }
   }
 
-  void MXFunction::reverse_mx(const std::vector<MX>& arg, const std::vector<MX>& res,
+  void MXFunction::call_reverse(const std::vector<MX>& arg, const std::vector<MX>& res,
                                  const std::vector<std::vector<MX> >& aseed,
                                  std::vector<std::vector<MX> >& asens,
                                  bool always_inline, bool never_inline) {
@@ -1310,7 +1310,7 @@ namespace casadi {
       reverse_x(arg, res, aseed, asens);
     } else {
       // The non-inlining version is implemented in the base class
-      FunctionInternal::reverse_mx(arg, res, aseed, asens, always_inline, never_inline);
+      FunctionInternal::call_reverse(arg, res, aseed, asens, always_inline, never_inline);
     }
   }
 

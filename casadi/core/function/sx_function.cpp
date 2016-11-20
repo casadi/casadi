@@ -1373,7 +1373,7 @@ namespace casadi {
 
 #endif // WITH_OPENCL
 
-  void SXFunction::forward_sx(const std::vector<SX>& arg, const std::vector<SX>& res,
+  void SXFunction::call_forward(const std::vector<SX>& arg, const std::vector<SX>& res,
                                    const std::vector<std::vector<SX> >& fseed,
                                    std::vector<std::vector<SX> >& fsens,
                                    bool always_inline, bool never_inline) {
@@ -1384,7 +1384,7 @@ namespace casadi {
     forward_x(arg, res, fseed, fsens);
   }
 
-  void SXFunction::reverse_sx(const std::vector<SX>& arg, const std::vector<SX>& res,
+  void SXFunction::call_reverse(const std::vector<SX>& arg, const std::vector<SX>& res,
                                  const std::vector<std::vector<SX> >& aseed,
                                  std::vector<std::vector<SX> >& asens,
                                  bool always_inline, bool never_inline) {

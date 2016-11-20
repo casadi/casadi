@@ -2196,7 +2196,7 @@ namespace casadi {
   }
 
   void FunctionInternal::
-  forward_mx(const std::vector<MX>& arg, const std::vector<MX>& res,
+  call_forward(const std::vector<MX>& arg, const std::vector<MX>& res,
              const std::vector<std::vector<MX> >& fseed,
              std::vector<std::vector<MX> >& fsens,
              bool always_inline, bool never_inline) {
@@ -2217,7 +2217,7 @@ namespace casadi {
     // Check if seeds need to have dimensions corrected
     for (auto&& r : fseed) {
       if (!matchingArg(r)) {
-        return FunctionInternal::forward_mx(arg, res, replaceFwdSeed(fseed),
+        return FunctionInternal::call_forward(arg, res, replaceFwdSeed(fseed),
                                             fsens, always_inline, never_inline);
       }
     }
@@ -2296,7 +2296,7 @@ namespace casadi {
   }
 
   void FunctionInternal::
-  reverse_mx(const std::vector<MX>& arg, const std::vector<MX>& res,
+  call_reverse(const std::vector<MX>& arg, const std::vector<MX>& res,
              const std::vector<std::vector<MX> >& aseed,
              std::vector<std::vector<MX> >& asens,
              bool always_inline, bool never_inline) {
@@ -2317,7 +2317,7 @@ namespace casadi {
     // Check if seeds need to have dimensions corrected
     for (auto&& r : aseed) {
       if (!matchingRes(r)) {
-        return FunctionInternal::reverse_mx(arg, res, replaceAdjSeed(aseed),
+        return FunctionInternal::call_reverse(arg, res, replaceAdjSeed(aseed),
                                             asens, always_inline, never_inline);
       }
     }
@@ -2404,7 +2404,7 @@ namespace casadi {
   }
 
   void FunctionInternal::
-  forward_sx(const std::vector<SX>& arg, const std::vector<SX>& res,
+  call_forward(const std::vector<SX>& arg, const std::vector<SX>& res,
              const std::vector<std::vector<SX> >& fseed,
              std::vector<std::vector<SX> >& fsens,
              bool always_inline, bool never_inline) {
@@ -2417,7 +2417,7 @@ namespace casadi {
   }
 
   void FunctionInternal::
-  reverse_sx(const std::vector<SX>& arg, const std::vector<SX>& res,
+  call_reverse(const std::vector<SX>& arg, const std::vector<SX>& res,
              const std::vector<std::vector<SX> >& aseed,
              std::vector<std::vector<SX> >& asens,
              bool always_inline, bool never_inline) {

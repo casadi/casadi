@@ -224,62 +224,26 @@ namespace casadi {
 
     ///@{
     /** \brief Forward mode AD, virtual functions overloaded in derived classes */
-    virtual void forward_mx(const std::vector<MX>& arg, const std::vector<MX>& res,
+    virtual void call_forward(const std::vector<MX>& arg, const std::vector<MX>& res,
                             const std::vector<std::vector<MX> >& fseed,
                             std::vector<std::vector<MX> >& fsens,
                             bool always_inline, bool never_inline);
-    virtual void forward_sx(const std::vector<SX>& arg, const std::vector<SX>& res,
+    virtual void call_forward(const std::vector<SX>& arg, const std::vector<SX>& res,
                             const std::vector<std::vector<SX> >& fseed,
                             std::vector<std::vector<SX> >& fsens,
                             bool always_inline, bool never_inline);
     ///@}
 
     ///@{
-    /** \brief Forward mode AD, overloaded */
-    void call_forward(const std::vector<MX>& arg, const std::vector<MX>& res,
-                  const std::vector<std::vector<MX> >& fseed,
-                  std::vector<std::vector<MX> >& fsens,
-                  bool always_inline, bool never_inline) {
-      forward_mx(arg, res, fseed, fsens, always_inline, never_inline);
-    }
-
-    void call_forward(const std::vector<SX>& arg, const std::vector<SX>& res,
-                  const std::vector<std::vector<SX> >& fseed,
-                  std::vector<std::vector<SX> >& fsens,
-                  bool always_inline, bool never_inline) {
-      forward_sx(arg, res, fseed, fsens, always_inline, never_inline);
-    }
-
-    ///@}
-
-    ///@{
     /** \brief Reverse mode, virtual functions overloaded in derived classes */
-    virtual void reverse_mx(const std::vector<MX>& arg, const std::vector<MX>& res,
+    virtual void call_reverse(const std::vector<MX>& arg, const std::vector<MX>& res,
                             const std::vector<std::vector<MX> >& aseed,
                             std::vector<std::vector<MX> >& asens,
                             bool always_inline, bool never_inline);
-    virtual void reverse_sx(const std::vector<SX>& arg, const std::vector<SX>& res,
+    virtual void call_reverse(const std::vector<SX>& arg, const std::vector<SX>& res,
                             const std::vector<std::vector<SX> >& aseed,
                             std::vector<std::vector<SX> >& asens,
                             bool always_inline, bool never_inline);
-    ///@}
-
-    ///@{
-    /** \brief Reverse mode AD, overloaded */
-    void call_reverse(const std::vector<MX>& arg, const std::vector<MX>& res,
-                  const std::vector<std::vector<MX> >& aseed,
-                  std::vector<std::vector<MX> >& asens,
-                  bool always_inline, bool never_inline) {
-      reverse_mx(arg, res, aseed, asens, always_inline, never_inline);
-    }
-
-    void call_reverse(const std::vector<SX>& arg, const std::vector<SX>& res,
-                  const std::vector<std::vector<SX> >& aseed,
-                  std::vector<std::vector<SX> >& asens,
-                  bool always_inline, bool never_inline) {
-      reverse_sx(arg, res, aseed, asens, always_inline, never_inline);
-    }
-
     ///@}
 
     ///@{
