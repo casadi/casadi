@@ -236,14 +236,14 @@ namespace casadi {
 
     ///@{
     /** \brief Forward mode AD, overloaded */
-    void _forward(const std::vector<MX>& arg, const std::vector<MX>& res,
+    void call_forward(const std::vector<MX>& arg, const std::vector<MX>& res,
                   const std::vector<std::vector<MX> >& fseed,
                   std::vector<std::vector<MX> >& fsens,
                   bool always_inline, bool never_inline) {
       forward_mx(arg, res, fseed, fsens, always_inline, never_inline);
     }
 
-    void _forward(const std::vector<SX>& arg, const std::vector<SX>& res,
+    void call_forward(const std::vector<SX>& arg, const std::vector<SX>& res,
                   const std::vector<std::vector<SX> >& fseed,
                   std::vector<std::vector<SX> >& fsens,
                   bool always_inline, bool never_inline) {
@@ -251,13 +251,6 @@ namespace casadi {
     }
 
     ///@}
-
-    /** \brief Forward mode AD, templated */
-    template<typename M>
-      void call_forward(const std::vector<M>& arg, const std::vector<M>& res,
-                      const std::vector<std::vector<M> >& fseed,
-                      std::vector<std::vector<M> >& fsens,
-                      bool always_inline, bool never_inline);
 
     ///@{
     /** \brief Reverse mode, virtual functions overloaded in derived classes */
@@ -976,42 +969,6 @@ namespace casadi {
 
     // Call memory-less
     _eval(get_ptr(argp), get_ptr(resp), get_ptr(iw_tmp), get_ptr(w_tmp), 0);
-  }
-
-  template<typename M>
-  void FunctionInternal::
-  call_forward(const std::vector<M>& arg, const std::vector<M>& res,
-               const std::vector<std::vector<M> >& fseed,
-               std::vector<std::vector<M> >& fsens,
-               bool always_inline, bool never_inline) {
-    // Check inputs
-    checkArg(arg);
-    checkRes(res);
-
-    // Check forward mode seeds dimensions
-    int n_in = this->n_in();
-    for (int d=0; d<fseed.size(); ++d) {
-      casadi_assert_message(fseed[d].size()==n_in,
-                            "Incorrect number of forward seeds for direction " << d
-                            << ": Expected " << n_in << ", got " << fseed[d].size());
-      for (int i=0; i<n_in; ++i) {
-        casadi_assert_message(checkMat(fseed[d][i].sparsity(), sparsity_in(i)),
-                              "Forward seed " << i << "(" << name_in(i) << ") for direction " << d
-                              << " has mismatching shape. Expected " << size_in(i)
-                              << ", got " << fseed[d][i].size());
-      }
-    }
-
-    // Check if forward mode seeds need to be replaced
-    for (int d=0; d<fseed.size(); ++d) {
-      if (!matchingArg(fseed[d])) {
-        return call_forward(arg, res, replaceFwdSeed(fseed), fsens,
-                            always_inline, never_inline);
-      }
-    }
-
-    // Call the type-specific method
-    _forward(arg, res, fseed, fsens, always_inline, never_inline);
   }
 
   template<typename M>

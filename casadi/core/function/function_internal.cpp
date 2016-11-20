@@ -2214,7 +2214,15 @@ namespace casadi {
     // Quick return if no seeds
     if (nfwd==0) return;
 
-    // Number inputs and outputs
+    // Check if forward mode seeds need to have dimensions corrected
+    for (auto&& r : fseed) {
+      if (!matchingArg(r)) {
+        return FunctionInternal::forward_mx(arg, res, replaceFwdSeed(fseed),
+                                            fsens, always_inline, never_inline);
+      }
+    }
+
+    // Shorthands
     int n_in = this->n_in();
     int n_out = this->n_out();
 

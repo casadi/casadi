@@ -587,31 +587,35 @@ namespace casadi {
     // Quick return if possible
     if (nfwd==0) return;
 
-    // Get the number of inputs and outputs
-    int num_in = n_in();
-    int num_out = n_out();
+    // Shorthands
+    int n_in = this->n_in();
+    int n_out = this->n_out();
 
-    // Make sure matching sparsity of fseed
-    bool matching_sparsity = true;
-    for (int d=0; d<nfwd; ++d) {
-      casadi_assert(fseed[d].size()==num_in);
-      for (int i=0; matching_sparsity && i<num_in; ++i)
-        matching_sparsity = fseed[d][i].sparsity()==sparsity_in(i);
+    // Check if forward mode seeds need to have dimensions corrected
+    for (auto&& r : fseed) {
+      if (!matchingArg(r)) {
+        return evalFwd(replaceFwdSeed(fseed), fsens);
+      }
     }
 
-    // Correct sparsity if needed
-    if (!matching_sparsity) {
-      vector<vector<SX> > fseed2(fseed);
-      for (int d=0; d<nfwd; ++d)
-        for (int i=0; i<num_in; ++i)
-          if (fseed2[d][i].sparsity()!=sparsity_in(i))
-            fseed2[d][i] = project(fseed2[d][i], sparsity_in(i));
-      return evalFwd(fseed2, fsens);
+    // Make sure seeds have matching sparsity patterns
+    for (auto it=fseed.begin(); it!=fseed.end(); ++it) {
+      casadi_assert(it->size()==n_in);
+      for (int i=0; i<n_in; ++i) {
+        if (it->at(i).sparsity()!=sparsity_in(i)) {
+          // Correct sparsity
+          vector<vector<SX> > fseed2(fseed);
+          for (auto&& r : fseed2) {
+            for (int i=0; i<n_in; ++i) r[i] = project(r[i], sparsity_in(i));
+          }
+          return evalFwd(fseed2, fsens);
+        }
+      }
     }
 
     // Allocate results
     for (int d=0; d<nfwd; ++d) {
-      fsens[d].resize(num_out);
+      fsens[d].resize(n_out);
       for (int i=0; i<fsens[d].size(); ++i)
         if (fsens[d][i].sparsity()!=sparsity_out(i))
           fsens[d][i] = SX::zeros(sparsity_out(i));
@@ -679,14 +683,14 @@ namespace casadi {
     if (nadj==0) return;
 
     // Get the number of inputs and outputs
-    int num_in = n_in();
-    int num_out = n_out();
+    int n_in = this->n_in();
+    int n_out = this->n_out();
 
     // Make sure matching sparsity of fseed
     bool matching_sparsity = true;
     for (int d=0; d<nadj; ++d) {
-      casadi_assert(aseed[d].size()==num_out);
-      for (int i=0; matching_sparsity && i<num_out; ++i)
+      casadi_assert(aseed[d].size()==n_out);
+      for (int i=0; matching_sparsity && i<n_out; ++i)
         matching_sparsity = aseed[d][i].sparsity()==sparsity_out(i);
     }
 
@@ -694,7 +698,7 @@ namespace casadi {
     if (!matching_sparsity) {
       vector<vector<SX> > aseed2(aseed);
       for (int d=0; d<nadj; ++d)
-        for (int i=0; i<num_out; ++i)
+        for (int i=0; i<n_out; ++i)
           if (aseed2[d][i].sparsity()!=sparsity_out(i))
             aseed2[d][i] = project(aseed2[d][i], sparsity_out(i));
       return evalAdj(aseed2, asens);
@@ -702,7 +706,7 @@ namespace casadi {
 
     // Allocate results if needed
     for (int d=0; d<nadj; ++d) {
-      asens[d].resize(num_in);
+      asens[d].resize(n_in);
       for (int i=0; i<asens[d].size(); ++i) {
         if (asens[d][i].sparsity()!=sparsity_in(i)) {
           asens[d][i] = SX::zeros(sparsity_in(i));

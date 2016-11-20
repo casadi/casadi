@@ -553,7 +553,7 @@ namespace casadi {
     // Create expressions for the Jacobian
     vector<MX> ret_out;
     ret_out.reserve(1+out_.size());
-    ret_out.push_back(jac(iind, oind, compact, symmetric, false, true));
+    ret_out.push_back(jac(iind, oind, compact, symmetric, false, false));
     ret_out.insert(ret_out.end(), out_.begin(), out_.end());
 
     return Function(name, in_, ret_out, opts);
@@ -655,10 +655,16 @@ namespace casadi {
     // Quick return if no directions
     if (nfwd==0) return;
 
+    // Check if forward mode seeds need to have dimensions corrected
+    for (auto&& r : fseed) {
+      if (!matchingArg(r)) {
+        return evalFwd(replaceFwdSeed(fseed), fsens);
+      }
+    }
+
     // Check if there are any zero seeds
-    for (vector<vector<MX> >::const_iterator i=fseed.begin(); i!=fseed.end(); ++i) {
-      // If any direction can be skipped
-      if (purgable(*i)) {
+    for (auto&& r : fseed) {
+      if (purgable(r)) {
         // New argument without all-zero directions
         std::vector<std::vector<MX> > fseed_purged, fsens_purged;
         fseed_purged.reserve(nfwd);
