@@ -151,15 +151,23 @@ namespace casadi {
     /** \brief Helper function: Check if a vector equals inputv */
     virtual bool isInput(const std::vector<MatType>& arg) const;
 
+    /** Inline calls? */
+    virtual bool should_inline(bool always_inline, bool never_inline) const = 0;
+
     /** \brief Create call to (cached) derivative function, forward mode  */
-    void forward_x(const std::vector<MatType>& arg, const std::vector<MatType>& res,
-                   const std::vector<std::vector<MatType> >& fseed,
-                   std::vector<std::vector<MatType> >& fsens);
+    virtual void call_forward(const std::vector<MatType>& arg,
+                              const std::vector<MatType>& res,
+                              const std::vector<std::vector<MatType> >& fseed,
+                              std::vector<std::vector<MatType> >& fsens,
+                              bool always_inline, bool never_inline);
 
     /** \brief Create call to (cached) derivative function, reverse mode  */
-    void reverse_x(const std::vector<MatType>& arg, const std::vector<MatType>& res,
-                   const std::vector<std::vector<MatType> >& aseed,
-                   std::vector<std::vector<MatType> >& asens);
+    virtual void call_reverse(const std::vector<MatType>& arg,
+                              const std::vector<MatType>& res,
+                              const std::vector<std::vector<MatType> >& aseed,
+                              std::vector<std::vector<MatType> >& asens,
+                              bool always_inline, bool never_inline);
+
     ///@{
     /** \brief Number of function inputs and outputs */
     virtual size_t get_n_in() { return in_.size(); }
@@ -594,7 +602,7 @@ namespace casadi {
     }
 
     // Calculate with adjoint mode AD
-    reverse_x(in_, out_, aseed, asens);
+    call_reverse(in_, out_, aseed, asens, true, false);
 
     int dir = 0;
     for (int i=0; i<n_in(); ++i) { // Correct sparsities #1025
@@ -1150,15 +1158,25 @@ namespace casadi {
 
   template<typename DerivedType, typename MatType, typename NodeType>
   void XFunction<DerivedType, MatType, NodeType>::
-  forward_x(const std::vector<MatType>& arg, const std::vector<MatType>& res,
-            const std::vector<std::vector<MatType> >& fseed,
-            std::vector<std::vector<MatType> >& fsens) {
+  call_forward(const std::vector<MatType>& arg,
+               const std::vector<MatType>& res,
+               const std::vector<std::vector<MatType> >& fseed,
+               std::vector<std::vector<MatType> >& fsens,
+               bool always_inline, bool never_inline) {
+    casadi_assert_message(!(always_inline && never_inline), "Inconsistent options");
+    if (!should_inline(always_inline, never_inline)) {
+      // The non-inlining version is implemented in the base class
+      return FunctionInternal::call_forward(arg, res, fseed, fsens,
+                                            always_inline, never_inline);
+    }
+
     // Quick return if no seeds
     if (fseed.empty()) {
       fsens.clear();
       return;
     }
 
+    // Call inlining
     if (isInput(arg)) {
       // Argument agrees with in_, call evalFwd directly
       static_cast<DerivedType*>(this)->evalFwd(fseed, fsens);
@@ -1171,15 +1189,25 @@ namespace casadi {
 
   template<typename DerivedType, typename MatType, typename NodeType>
   void XFunction<DerivedType, MatType, NodeType>::
-  reverse_x(const std::vector<MatType>& arg, const std::vector<MatType>& res,
-            const std::vector<std::vector<MatType> >& aseed,
-            std::vector<std::vector<MatType> >& asens) {
+  call_reverse(const std::vector<MatType>& arg,
+               const std::vector<MatType>& res,
+               const std::vector<std::vector<MatType> >& aseed,
+               std::vector<std::vector<MatType> >& asens,
+               bool always_inline, bool never_inline) {
+    casadi_assert_message(!(always_inline && never_inline), "Inconsistent options");
+    if (!should_inline(always_inline, never_inline)) {
+      // The non-inlining version is implemented in the base class
+      return FunctionInternal::call_reverse(arg, res, aseed, asens,
+                                            always_inline, never_inline);
+    }
+
     // Quick return if no seeds
     if (aseed.empty()) {
       asens.clear();
       return;
     }
 
+    // Call inlining
     if (isInput(arg)) {
       // Argument agrees with in_, call evalAdj directly
       static_cast<DerivedType*>(this)->evalAdj(aseed, asens);

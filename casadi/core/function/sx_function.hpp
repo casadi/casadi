@@ -100,6 +100,11 @@ class CASADI_EXPORT SXFunction :
   /** \brief  evaluate symbolically while also propagating directional derivatives */
   virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const;
 
+  /** Inline calls? */
+  virtual bool should_inline(bool always_inline, bool never_inline) const {
+    return true;
+  }
+
   /** \brief Calculate forward mode directional derivatives */
   virtual void evalFwd(const std::vector<std::vector<SX> >& fseed,
                        std::vector<std::vector<SX> >& fsens);
@@ -107,18 +112,6 @@ class CASADI_EXPORT SXFunction :
   /** \brief Calculate reverse mode directional derivatives */
   virtual void evalAdj(const std::vector<std::vector<SX> >& aseed,
                        std::vector<std::vector<SX> >& asens);
-
-  /** \brief Create call to (cached) derivative function, forward mode  */
-  virtual void call_forward(const std::vector<SX>& arg, const std::vector<SX>& res,
-                          const std::vector<std::vector<SX> >& fseed,
-                          std::vector<std::vector<SX> >& fsens,
-                          bool always_inline, bool never_inline);
-
-  /** \brief Create call to (cached) derivative function, reverse mode  */
-  virtual void call_reverse(const std::vector<SX>& arg, const std::vector<SX>& res,
-                          const std::vector<std::vector<SX> >& aseed,
-                          std::vector<std::vector<SX> >& asens,
-                          bool always_inline, bool never_inline);
 
   /** \brief  Check if smooth */
   bool is_smooth() const;

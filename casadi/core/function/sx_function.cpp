@@ -1373,28 +1373,6 @@ namespace casadi {
 
 #endif // WITH_OPENCL
 
-  void SXFunction::call_forward(const std::vector<SX>& arg, const std::vector<SX>& res,
-                                   const std::vector<std::vector<SX> >& fseed,
-                                   std::vector<std::vector<SX> >& fsens,
-                                   bool always_inline, bool never_inline) {
-    // Consistency check
-    casadi_assert_message(!never_inline, "SX expressions do not have call nodes");
-
-    // Call inlining
-    forward_x(arg, res, fseed, fsens);
-  }
-
-  void SXFunction::call_reverse(const std::vector<SX>& arg, const std::vector<SX>& res,
-                                 const std::vector<std::vector<SX> >& aseed,
-                                 std::vector<std::vector<SX> >& asens,
-                                 bool always_inline, bool never_inline) {
-    // Consistency check
-    casadi_assert_message(!never_inline, "SX expressions do not have call nodes");
-
-    // Call inlining
-    reverse_x(arg, res, aseed, asens);
-  }
-
   SX SXFunction::grad_sx(int iind, int oind) {
     return grad(iind, oind);
   }

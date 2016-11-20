@@ -125,6 +125,11 @@ namespace casadi {
     virtual Function getNumericJacobian(const std::string& name, int iind, int oind,
                                         bool compact, bool symmetric, const Dict& opts);
 
+    /** Inline calls? */
+    virtual bool should_inline(bool always_inline, bool never_inline) const {
+      return always_inline;
+    }
+
     /** \brief Evaluate symbolically, SX type*/
     virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const;
 
@@ -139,18 +144,6 @@ namespace casadi {
     /** \brief Calculate reverse mode directional derivatives */
     virtual void evalAdj(const std::vector<std::vector<MX> >& adjSeed,
                         std::vector<std::vector<MX> >& adjSens);
-
-    /** \brief Create call to (cached) derivative function, forward mode  */
-    virtual void call_forward(const std::vector<MX>& arg, const std::vector<MX>& res,
-                            const std::vector<std::vector<MX> >& fseed,
-                            std::vector<std::vector<MX> >& fsens,
-                            bool always_inline, bool never_inline);
-
-    /** \brief Create call to (cached) derivative function, reverse mode  */
-    virtual void call_reverse(const std::vector<MX>& arg, const std::vector<MX>& res,
-                            const std::vector<std::vector<MX> >& aseed,
-                            std::vector<std::vector<MX> >& asens,
-                            bool always_inline, bool never_inline);
 
     /** \brief Expand the matrix valued graph into a scalar valued graph */
     Function expand(const std::vector<SX>& inputv);
