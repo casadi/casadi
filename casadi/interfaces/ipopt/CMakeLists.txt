@@ -8,7 +8,7 @@ set(NLPSOL_IPOPT_SRCS
   ipopt_nlp.hpp
   ipopt_nlp.cpp
   ipopt_interface_meta.cpp)
-  
+
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
 else()
   add_definitions(-DHAVE_CSTDDEF)
@@ -20,10 +20,6 @@ endif()
 
 if(IPOPT_FOUND)
   add_definitions(${IPOPT_CFLAGS_OTHER})
-endif()
-
-if(WITH_SIPOPT)
-  add_definitions(-DWITH_SIPOPT)
 endif()
 
 casadi_plugin(Nlpsol ipopt ${NLPSOL_IPOPT_SRCS})

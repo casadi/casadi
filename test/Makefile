@@ -80,7 +80,7 @@ examples_indoc_py:
 
 # No memchecks because it leaks like hell, and is slow
 examples_code_py:
-	python internal/test_py.py '../docs/examples/python' -skipfiles="c_code_generation.py parametric_sensitivities.py reduced_hessian.py"
+	python internal/test_py.py '../docs/examples/python' -skipfiles="c_code_generation.py"
 
 examples_indoc_cpp:
 	python internal/test_cpp.py '../docs/api/examples' $(MEMCHECK)
@@ -90,7 +90,7 @@ doxygen:
 
 # No memchecks because it's slow
 examples_code_cpp:
-	python internal/test_cppcmake.py '../docs/examples/cplusplus' -skipfiles="test_liftopt.cpp casadi_error_handling.cpp parametric_sensitivities.cpp reduced_hessian.cpp test_opencl.cpp nlp_codegen.cpp codegen_usage.cpp stabilized_sqpmethod_nl.cpp knitro_nl.cpp worhp_nl.cpp snopt_nl.cpp rocket_snopt.cpp test_blocksqp.cpp"
+	python internal/test_cppcmake.py '../docs/examples/cplusplus' -skipfiles="test_liftopt.cpp casadi_error_handling.cpp test_opencl.cpp nlp_codegen.cpp codegen_usage.cpp stabilized_sqpmethod_nl.cpp knitro_nl.cpp worhp_nl.cpp snopt_nl.cpp rocket_snopt.cpp test_blocksqp.cpp"
 
 users_guide:
 	cd '../docs/users_guide/' && make snippets && cd ..

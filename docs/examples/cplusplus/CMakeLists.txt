@@ -92,18 +92,6 @@ if(WITH_SUNDIALS AND WITH_CSPARSE)
   target_link_libraries(sensitivity_analysis casadi)
 endif()
 
-# Parametric sensitivities with sIPOPT
-if(IPOPT_FOUND AND WITH_SIPOPT)
-  add_executable(parametric_sensitivities parametric_sensitivities.cpp)
-  target_link_libraries(parametric_sensitivities casadi)
-endif()
-
-# Reduced hessian calculations with sIPOPT
-if(IPOPT_FOUND AND WITH_SIPOPT)
-  add_executable(reduced_hessian reduced_hessian.cpp)
-  target_link_libraries(reduced_hessian casadi)
-endif()
-
 # Parametric NLP
 if(IPOPT_FOUND)
   add_executable(parametric_nlp parametric_nlp.cpp)

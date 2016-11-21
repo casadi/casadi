@@ -30,21 +30,6 @@ if(IPOPT_INCLUDEDIR)
   endif()
 endif(IPOPT_INCLUDEDIR)
 
-# Find sIPOPT library and add this to the list of libraries
-if(IPOPT_LIBRARIES)
-  if(EXISTS ${IPOPT_INCLUDEDIR}/SensApplication.hpp AND EXISTS ${IPOPT_INCLUDEDIR}/IpPDSearchDirCalc.hpp AND EXISTS ${IPOPT_INCLUDEDIR}/IpIpoptAlg.hpp AND EXISTS ${IPOPT_INCLUDEDIR}/SensRegOp.hpp)
-    find_library(SIPOPT_LIBRARY sipopt HINTS ${IPOPT_LIBDIR})
-    if(SIPOPT_LIBRARY)
-      set(IPOPT_LIBRARIES ${SIPOPT_LIBRARY} ${IPOPT_LIBRARIES})
-      set(WITH_SIPOPT TRUE)
-    else()
-      message(STATUS "Detected an IPOPT configuration without sIPOPT library. Build will proceed, but without sIPOPT functionality.")
-    endif()
-  else()
-    message(STATUS "Detected an IPOPT configuration without sIPOPT headers. Build will proceed, but without sIPOPT functionality.")
-  endif()
-endif(IPOPT_LIBRARIES)
-
 # Set standard flags
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(IPOPT DEFAULT_MSG IPOPT_LIBRARIES IPOPT_INCLUDE_DIRS)
