@@ -5296,6 +5296,14 @@ zero.
 
 ";
 
+%feature("docstring")  reverse(const std::vector< MatType > &ex, const
+std::vector< MatType > &arg, const std::vector< std::vector< MatType > > &v,
+const Dict &opts=Dict()) "
+
+Reverse directional derivative.
+
+";
+
 %feature("docstring")  substitute(const MatType &ex, const MatType &v, const
 MatType &vdef) "
 
@@ -5338,6 +5346,14 @@ Inspired by Numerical Methods in Scientific Computing by Ake Bjorck
 %feature("docstring")  norm_2(const MatType &x) "
 
 2-norm
+
+";
+
+%feature("docstring")  forward(const std::vector< MatType > &ex, const
+std::vector< MatType > &arg, const std::vector< std::vector< MatType > > &v,
+const Dict &opts=Dict()) "
+
+Forward directional derivative.
 
 ";
 

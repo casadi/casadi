@@ -13,7 +13,7 @@
       <tab type="user" url="@ref nlpsol" title="nlpsol"/>
       <tab type="user" url="@ref integrator" title="integrator"/>
       <tab type="user" url="@ref conic" title="conic"/>
-      <tab type="user" url="@ref Linsol" title="linsol"/>
+      <tab type="user" url="@ref casadi::Linsol" title="linsol"/>
       <tab type="user" url="@ref rootfinder" title="rootfinder"/>
     </tab>
     <tab type="pages" visible="no" title="" intro=""/>

@@ -3719,6 +3719,12 @@ zero.
 
 ";
 
+%feature("docstring") friendwrap_reverse "
+
+Reverse directional derivative.
+
+";
+
 %feature("docstring") friendwrap_substitute "
 
 >  MatType substitute(const MatType &ex, const MatType &v, const MatType &vdef)
@@ -3760,6 +3766,12 @@ Inspired by Numerical Methods in Scientific Computing by Ake Bjorck
 %feature("docstring") friendwrap_norm_2 "
 
 2-norm
+
+";
+
+%feature("docstring") friendwrap_forward "
+
+Forward directional derivative.
 
 ";
 

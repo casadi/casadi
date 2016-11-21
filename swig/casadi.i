@@ -3061,6 +3061,20 @@ DECL M casadi_repsum(const M& A, int n, int m=1) {
 #endif // FLAG & IS_MEMBER
 
 #if FLAG & IS_GLOBAL
+DECL std::vector<std::vector< M > >
+casadi_forward(const std::vector< M > &ex, const std::vector< M > &arg,
+               const std::vector<std::vector< M > > &v,
+               const Dict& opts = Dict()) {
+  return forward(ex, arg, v, opts);
+}
+
+DECL std::vector<std::vector< M > >
+casadi_reverse(const std::vector< M > &ex, const std::vector< M > &arg,
+               const std::vector<std::vector< M > > &v,
+               const Dict& opts = Dict()) {
+  return reverse(ex, arg, v, opts);
+}
+
 DECL M casadi_substitute(const M& ex, const M& v, const M& vdef) {
   return substitute(ex, v, vdef);
 }

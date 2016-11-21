@@ -391,9 +391,22 @@ namespace casadi {
                                              const Matrix<Scalar>& w);
     static Matrix<Scalar> jtimes(const Matrix<Scalar> &ex, const Matrix<Scalar> &arg,
                                    const Matrix<Scalar> &v, bool tr=false);
+
 #ifdef WITH_DEPRECATED_FEATURES
     static std::vector<bool> nl_var(const Matrix<Scalar> &expr, const Matrix<Scalar> &var);
 #endif
+
+    static std::vector<std::vector<Matrix<Scalar> > >
+    forward(const std::vector<Matrix<Scalar> > &ex,
+            const std::vector<Matrix<Scalar> > &arg,
+            const std::vector<std::vector<Matrix<Scalar> > > &v,
+            const Dict& opts = Dict());
+    static std::vector<std::vector<Matrix<Scalar> > >
+    reverse(const std::vector<Matrix<Scalar> > &ex,
+            const std::vector<Matrix<Scalar> > &arg,
+            const std::vector<std::vector<Matrix<Scalar> > > &v,
+            const Dict& opts = Dict());
+
     static std::vector<bool> which_depends(const Matrix<Scalar> &expr, const Matrix<Scalar> &var,
         int order=1, bool tr=false);
     static Matrix<Scalar> taylor(const Matrix<Scalar>& ex, const Matrix<Scalar>& x,

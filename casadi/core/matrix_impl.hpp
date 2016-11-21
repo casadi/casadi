@@ -2266,7 +2266,26 @@ namespace casadi {
                                             const Matrix<Scalar> &v,
                                             bool tr) {
     casadi_error("\"jtimes\" not defined for " + type_name());
-    return Matrix<Scalar>();
+  }
+
+  template<typename Scalar>
+  std::vector<std::vector<Matrix<Scalar> > >
+  Matrix<Scalar>::
+  forward(const std::vector<Matrix<Scalar> > &ex,
+          const std::vector<Matrix<Scalar> > &arg,
+          const std::vector<std::vector<Matrix<Scalar> > > &v,
+          const Dict& opts) {
+    casadi_error("\"forward\" not defined for " + type_name());
+  }
+
+  template<typename Scalar>
+  std::vector<std::vector<Matrix<Scalar> > >
+  Matrix<Scalar>::
+  reverse(const std::vector<Matrix<Scalar> > &ex,
+          const std::vector<Matrix<Scalar> > &arg,
+          const std::vector<std::vector<Matrix<Scalar> > > &v,
+          const Dict& opts) {
+    casadi_error("\"reverse\" not defined for " + type_name());
   }
 
 #ifdef WITH_DEPRECATED_FEATURES
@@ -2595,9 +2614,18 @@ namespace casadi {
   template<> SX SX::hessian(const SX &f, const SX &x);
   template<> SX SX::hessian(const SX &f, const SX &x, SX &g);
   template<> SX SX::jtimes(const SX &ex, const SX &arg, const SX &v, bool tr);
+
 #ifdef WITH_DEPRECATED_FEATURES
   template<> std::vector<bool> SX::nl_var(const SX &expr, const SX &var);
 #endif
+
+  template<> std::vector<std::vector<SX> >
+  SX::forward(const std::vector<SX> &ex, const std::vector<SX> &arg,
+          const std::vector<std::vector<SX> > &v, const Dict& opts);
+  template<> std::vector<std::vector<SX> >
+  SX::reverse(const std::vector<SX> &ex, const std::vector<SX> &arg,
+          const std::vector<std::vector<SX> > &v, const Dict& opts);
+
   template<> std::vector<bool> SX::which_depends(const SX &expr, const SX &var, int order, bool tr);
   template<> SX SX::taylor(const SX& f, const SX& x, const SX& a, int order);
   template<> SX SX::mtaylor(const SX& f, const SX& x, const SX& a, int order);
