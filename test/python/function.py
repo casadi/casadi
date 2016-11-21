@@ -318,26 +318,6 @@ class Functiontests(casadiTestCase):
     with self.assertRaises(Exception):
       self.checkarray(ret["baz"],DM([12]))
 
-  def test_setjacsparsity(self):
-    x = MX.sym("x",4)
-
-    f = Function("f", [x],[x])
-    x0 = DM([1,2,3,4])
-    J = f.jacobian()
-    out,_ = J(x0)
-
-    self.assertEqual(out.nnz(),4)
-
-    f = Function("f", [x],[x])
-    f.set_jac_sparsity(Sparsity.dense(4,4),0,0,True)
-
-    J2 = f.jacobian()
-    out2,_ = J2(x0)
-
-    self.assertEqual(out2.nnz(),16)
-    self.checkfunction(J,J2,inputs=[x0])
-
-
   def test_derivative_simplifications(self):
 
     n = 1

@@ -659,8 +659,9 @@ namespace casadi {
     }
     ///@}
 
+#ifdef WITH_DEPRECATED_FEATURES
     ///@{
-    /// Generate the sparsity of a Jacobian block
+    /// [DEPRECATED] Generate the sparsity of a Jacobian block
     void set_jac_sparsity(const Sparsity& sp, int iind, int oind, bool compact=false);
     void set_jac_sparsity(const Sparsity& sp, const std::string &iind, int oind,
                           bool compact=false) {
@@ -675,6 +676,7 @@ namespace casadi {
       set_jac_sparsity(sp, index_in(iind), index_out(oind), compact);
     }
     ///@}
+#endif // WITH_DEPRECATED_FEATURES
 
     /** \brief Export / Generate C code for the function */
     std::string generate(const std::string& fname, const Dict& opts=Dict());

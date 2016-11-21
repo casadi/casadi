@@ -679,9 +679,11 @@ namespace casadi {
     return (*this)->sparsity_jac(iind, oind, compact, symmetric);
   }
 
+#ifdef WITH_DEPRECATED_FEATURES
   void Function::set_jac_sparsity(const Sparsity& sp, int iind, int oind, bool compact) {
     (*this)->set_jac_sparsity(sp, iind, oind, compact);
   }
+#endif // WITH_DEPRECATED_FEATURES
 
   vector<string> Function::name_in() const {
     return (*this)->ischeme_;
