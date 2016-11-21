@@ -278,8 +278,6 @@ namespace casadi {
     void setJacobian(const Function& jac, int iind, int oind, bool compact);
     virtual Function getJacobian(const std::string& name, int iind, int oind,
                                  bool compact, bool symmetric, const Dict& opts);
-    virtual Function getNumericJacobian(const std::string& name, int iind, int oind,
-                                        bool compact, bool symmetric, const Dict& opts);
     ///@}
 
     ///@{
@@ -346,8 +344,7 @@ namespace casadi {
     virtual MX tang_mx(int iind=0, int oind=0);
 
     /** \brief Jacobian expression */
-    virtual MX jac_mx(int iind=0, int oind=0, bool compact=false, bool symmetric=false,
-                      bool always_inline=true, bool never_inline=false);
+    virtual MX jac_mx(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
 
     /** \brief Gradient expression */
     virtual SX grad_sx(int iind=0, int oind=0);
@@ -356,8 +353,7 @@ namespace casadi {
     virtual SX tang_sx(int iind=0, int oind=0);
 
     /** \brief Jacobian expression */
-    virtual SX jac_sx(int iind=0, int oind=0, bool compact=false, bool symmetric=false,
-                      bool always_inline=true, bool never_inline=false);
+    virtual SX jac_sx(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
 
     /** \brief Hessian expression */
     virtual SX hess_sx(int iind=0, int oind=0);

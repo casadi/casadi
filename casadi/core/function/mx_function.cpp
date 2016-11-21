@@ -548,17 +548,6 @@ namespace casadi {
     }
   }
 
-  Function MXFunction::getNumericJacobian(const std::string& name, int iind, int oind,
-                                                  bool compact, bool symmetric, const Dict& opts) {
-    // Create expressions for the Jacobian
-    vector<MX> ret_out;
-    ret_out.reserve(1+out_.size());
-    ret_out.push_back(jac(iind, oind, compact, symmetric, false, false));
-    ret_out.insert(ret_out.end(), out_.begin(), out_.end());
-
-    return Function(name, in_, ret_out, opts);
-  }
-
   std::vector<MX> MXFunction::symbolicOutput(const std::vector<MX>& arg) {
     // Check if input is given
     const int checking_depth = 2;
@@ -1290,9 +1279,8 @@ namespace casadi {
     return tang(iind, oind);
   }
 
-  MX MXFunction::jac_mx(int iind, int oind, bool compact, bool symmetric,
-                              bool always_inline, bool never_inline) {
-    return jac(iind, oind, compact, symmetric, always_inline, never_inline);
+  MX MXFunction::jac_mx(int iind, int oind, bool compact, bool symmetric) {
+    return jac(iind, oind, compact, symmetric);
   }
 
   const MX MXFunction::mx_in(int ind) const {

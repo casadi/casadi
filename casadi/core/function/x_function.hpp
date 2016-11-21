@@ -83,8 +83,7 @@ namespace casadi {
     MatType tang(int iind=0, int oind=0);
 
     /** \brief  Construct a complete Jacobian by compression */
-    MatType jac(int iind=0, int oind=0, bool compact=false, bool symmetric=false,
-                bool always_inline=true, bool never_inline=false);
+    MatType jac(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
 
     /** \brief Check if the function is of a particular type */
     virtual bool is_a(const std::string& type, bool recursive) const {
@@ -637,7 +636,7 @@ namespace casadi {
     }
 
     // Calculate with forward mode AD
-    call_forward(in_, out_, fseed, fsens, true, false);
+    static_cast<DerivedType*>(this)->eval_forward(fseed, fsens);
 
     // Return adjoint directional derivative
     return fsens[0].at(oind);
@@ -645,7 +644,7 @@ namespace casadi {
 
   template<typename DerivedType, typename MatType, typename NodeType>
   MatType XFunction<DerivedType, MatType, NodeType>
-  ::jac(int iind, int oind, bool compact, bool symmetric, bool always_inline, bool never_inline) {
+  ::jac(int iind, int oind, bool compact, bool symmetric) {
     using namespace std;
     if (verbose()) userOut() << "XFunction::jac begin" << std::endl;
 
@@ -838,10 +837,10 @@ namespace casadi {
       if (verbose()) userOut() << "XFunction::jac making function call" << std::endl;
       if (fseed.size()>0) {
         casadi_assert(aseed.size()==0);
-        call_forward(in_, out_, fseed, fsens, always_inline, never_inline);
+        static_cast<DerivedType*>(this)->eval_forward(fseed, fsens);
       } else if (aseed.size()>0) {
         casadi_assert(fseed.size()==0);
-        call_reverse(in_, out_, aseed, asens, always_inline, never_inline);
+        static_cast<DerivedType*>(this)->eval_reverse(aseed, asens);
       }
 
       // Carry out the forward sweeps

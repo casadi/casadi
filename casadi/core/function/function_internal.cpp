@@ -1430,7 +1430,7 @@ namespace casadi {
   Function FunctionInternal::
   getJacobian(const std::string& name, int iind, int oind, bool compact, bool symmetric,
               const Dict& opts) {
-    return getNumericJacobian(name, iind, oind, compact, symmetric, opts);
+    return wrap().jacobian(iind, oind, compact, symmetric);
   }
 
   Function FunctionInternal::forward(int nfwd) {
@@ -1595,12 +1595,6 @@ namespace casadi {
 
     // Create a call-node
     res = Call::create(self(), arg);
-  }
-
-  Function FunctionInternal::
-  getNumericJacobian(const std::string& name, int iind, int oind, bool compact, bool symmetric,
-                     const Dict& opts) {
-    return wrap()->getNumericJacobian(name, iind, oind, compact, symmetric, opts);
   }
 
   Function FunctionInternal::fullJacobian() {
@@ -2459,8 +2453,7 @@ namespace casadi {
     casadi_error("'tang_mx' not defined for " + type_name());
   }
 
-  MX FunctionInternal::jac_mx(int iind, int oind, bool compact, bool symmetric,
-                              bool always_inline, bool never_inline) {
+  MX FunctionInternal::jac_mx(int iind, int oind, bool compact, bool symmetric) {
     casadi_error("'jac_mx' not defined for " + type_name());
   }
 
@@ -2472,8 +2465,7 @@ namespace casadi {
     casadi_error("'tang_sx' not defined for " + type_name());
   }
 
-  SX FunctionInternal::jac_sx(int iind, int oind, bool compact, bool symmetric,
-                              bool always_inline, bool never_inline) {
+  SX FunctionInternal::jac_sx(int iind, int oind, bool compact, bool symmetric) {
     casadi_error("'jac_sx' not defined for " + type_name());
   }
 

@@ -121,10 +121,6 @@ namespace casadi {
      * (see Albersmeyer2010 paper) */
     void generate_lifted(Function& vdef_fcn, Function& vinit_fcn);
 
-    /** \brief Generate a function that calculates a Jacobian function by operator overloading */
-    virtual Function getNumericJacobian(const std::string& name, int iind, int oind,
-                                        bool compact, bool symmetric, const Dict& opts);
-
     /** Inline calls? */
     virtual bool should_inline(bool always_inline, bool never_inline) const {
       return always_inline;
@@ -167,8 +163,7 @@ namespace casadi {
     virtual MX tang_mx(int iind=0, int oind=0);
 
     /** \brief Jacobian expression */
-    virtual MX jac_mx(int iind=0, int oind=0, bool compact=false, bool symmetric=false,
-                      bool always_inline=true, bool never_inline=false);
+    virtual MX jac_mx(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
 
     ///@{
     /** \brief Get function input(s) and output(s)  */

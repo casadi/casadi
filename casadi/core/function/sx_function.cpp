@@ -1388,9 +1388,8 @@ namespace casadi {
     return tang(iind, oind);
   }
 
-  SX SXFunction::jac_sx(int iind, int oind, bool compact, bool symmetric,
-                              bool always_inline, bool never_inline) {
-    return jac(iind, oind, compact, symmetric, always_inline, never_inline);
+  SX SXFunction::jac_sx(int iind, int oind, bool compact, bool symmetric) {
+    return jac(iind, oind, compact, symmetric);
   }
 
   SX SXFunction::hess_sx(int iind, int oind) {
