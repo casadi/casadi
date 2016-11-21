@@ -354,11 +354,11 @@ namespace casadi {
     }
     ///@}
 
+    #ifdef WITH_DEPRECATED_FEATURES
     /** [DEPRECATED] Set the Jacobian function of output \a oind with respect to input \a iind
      NOTE: Does _not_ take ownership, only weak references to the Jacobians are kept internally */
     void setJacobian(const Function& jac, int iind=0, int oind=0, bool compact=false);
 
-#ifdef WITH_DEPRECATED_FEATURES
     ///@{
     /** \brief [DEPRECATED] Use Function::factory instead */
     Function gradient(int iind=0, int oind=0);

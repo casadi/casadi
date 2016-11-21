@@ -641,11 +641,11 @@ namespace casadi {
     return (*this)->jacobian(iind, oind, compact, symmetric);
   }
 
+  #ifdef WITH_DEPRECATED_FEATURES
   void Function::setJacobian(const Function& jac, int iind, int oind, bool compact) {
     (*this)->setJacobian(jac, iind, oind, compact);
   }
 
-#ifdef WITH_DEPRECATED_FEATURES
   Function Function::gradient(int iind, int oind) {
     return (*this)->gradient(iind, oind);
   }
