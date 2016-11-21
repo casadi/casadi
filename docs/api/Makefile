@@ -80,8 +80,6 @@ doxexport:
 full: 
 	cd examples && make
 	cd ../documents && make
-	cd ../tutorials/python && python make_tutorials.py
-	#cd ../tutorials/cpp && make
 	cd ../users_guide && make
 	cd ../cheatsheet && make
 	patch -u Doxyfile.in publish.patch -o - |  sed 's/ENABLED_SECTIONS       = /ENABLED_SECTIONS       = INTERNAL DEPRECATED CLUTTER UNSAFE SWIGINTERNAL/' |   sed 's/GENERATE_HTML          = YES/GENERATE_HTML          = NO/' | sed 's/                         \*\.dox/                         *.dox *.cpp/' | sed 's/XML_OUTPUT             = XML/XML_OUTPUT             = XML_internal/' | sed 's/PREDEFINED+=             SWIG//' | doxygen -
@@ -92,8 +90,6 @@ full:
 fulllocal: 
 	cd examples && make
 	cd ../documents && make
-	cd ../tutorials/python && python make_tutorials.py
-	#cd ../tutorials/cpp && make
 	cd ../users_guide && make
 	cd ../cheatsheet && make
 	patch -u Doxyfile.in publish.patch -o - |  sed 's/ENABLED_SECTIONS       = /ENABLED_SECTIONS       = INTERNAL DEPRECATED CLUTTER UNSAFE SWIGINTERNAL/' |   sed 's/GENERATE_HTML          = YES/GENERATE_HTML          = NO/' | sed 's/                         \*\.dox/                         *.dox *.cpp/' | sed 's/XML_OUTPUT             = XML/XML_OUTPUT             = XML_internal/' | sed 's/PREDEFINED+=             SWIG//' | doxygen -
@@ -105,7 +101,6 @@ export:
 	mkdir -p export/api export/users_guide export/cheatsheets/ export/documents/
 	cp -r html/ export/api/
 	cp -r internal/ export/api/
-	cp -r ../tutorials/python/pdf export/tutorials/
 	cp  ../users_guide/*.pdf export/users_guide/
 	cp -r ../users_guide/casadi-users_guide export/users_guide/html/
 	cp  ../cheatsheet/*.pdf export/cheatsheets/
