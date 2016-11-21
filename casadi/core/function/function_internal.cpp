@@ -456,12 +456,12 @@ namespace casadi {
 
   Function FunctionInternal::getGradient(const std::string& name, int iind, int oind,
                                          const Dict& opts) {
-    return wrap().gradient(iind, oind);
+    return wrap()->gradient(iind, oind);
   }
 
   Function FunctionInternal::getTangent(const std::string& name, int iind, int oind,
                                         const Dict& opts) {
-    return wrap().tangent(iind, oind);
+    return wrap()->tangent(iind, oind);
   }
 
   Function FunctionInternal::wrap() const {

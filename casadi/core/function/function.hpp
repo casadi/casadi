@@ -354,19 +354,13 @@ namespace casadi {
     }
     ///@}
 
-    /** Set the Jacobian function of output \a oind with respect to input \a iind
+    /** [DEPRECATED] Set the Jacobian function of output \a oind with respect to input \a iind
      NOTE: Does _not_ take ownership, only weak references to the Jacobians are kept internally */
     void setJacobian(const Function& jac, int iind=0, int oind=0, bool compact=false);
 
+#ifdef WITH_DEPRECATED_FEATURES
     ///@{
-    /** \brief Generate a gradient function of output \a oind with respect to input \a iind
-     * \param iind The index of the input
-     * \param oind The index of the output
-     *
-     * The default behavior of this class is defined by the derived class.
-     * Note that the output must be scalar. In other cases, use the Jacobian instead.
-     *
-     */
+    /** \brief [DEPRECATED] Use Function::factory instead */
     Function gradient(int iind=0, int oind=0);
     Function gradient(const std::string& iind, int oind=0) {
         return gradient(index_in(iind), oind);
@@ -380,14 +374,7 @@ namespace casadi {
     ///@}
 
     ///@{
-    /** \brief Generate a tangent function of output \a oind with respect to input \a iind
-     * \param iind The index of the input
-     * \param oind The index of the output
-     *
-     * The default behavior of this class is defined by the derived class.
-     * Note that the input must be scalar. In other cases, use the Jacobian instead.
-     *
-     */
+    /** \brief [DEPRECATED] Use Function::factory instead */
     Function tangent(int iind=0, int oind=0);
     Function tangent(const std::string& iind, int oind=0)
     { return tangent(index_in(iind), oind); }
@@ -396,6 +383,7 @@ namespace casadi {
     Function tangent(const std::string& iind, const std::string& oind)
     { return tangent(index_in(iind), index_out(oind)); }
     ///@}
+#endif // WITH_DEPRECATED_FEATURES
 
     ///@{
     /** \brief Generate a Hessian function of output \a oind with respect to input \a iind

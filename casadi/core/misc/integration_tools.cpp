@@ -225,7 +225,7 @@ namespace casadi {
 
       // Evaluate the time derivative of the polynomial at all collocation points to
       // get the coefficients of the continuity equation
-      Function tfcn = lfcn.tangent();
+      Function tfcn("tfcn", {tau}, {tangent(L, tau)});
       for (int j2=0; j2<deg+1; ++j2) {
         C[j2][j] =  tfcn(vector<DM>{etau_root[j2]}).at(0)->front();
       }

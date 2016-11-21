@@ -397,19 +397,6 @@ class casadiTestCase(unittest.TestCase):
 
           self.checkfunction(trialjac,solutionjac,inputs=inputs,fwd=fwd if sens_der else False,adj=adj if sens_der else False,jacobian=False,gradient=False,hessian=False,evals=False,digits=digits_sens,failmessage="(%s).jacobian(%d,%d)" % (failmessage,i,j),allow_empty=allow_empty,verbose=verbose,allow_nondiff=allow_nondiff)
 
-    if gradient:
-      for i in range(trial.n_in()):
-        if (allow_empty and (trial.sparsity_in(i).is_empty() or solution.sparsity_in(i).is_empty() )): continue
-        for j in range(trial.n_out()):
-          if trial.sparsity_out(j).is_scalar() and solution.sparsity_out(j).is_scalar():
-            trialgrad = trial.gradient(i,j)
-            self.assertEqual(trialgrad.n_in(),trial.n_in())
-            self.assertEqual(trialgrad.n_out(),trial.n_out()+1)
-            solutiongrad = solution.gradient(i,j)
-            self.assertEqual(solutiongrad.n_in(),solution.n_in())
-            self.assertEqual(solutiongrad.n_out(),solution.n_out()+1)
-            self.checkfunction(trialgrad,solutiongrad,inputs=inputs,fwd=fwd  if sens_der else False,adj=adj if sens_der else False,jacobian=False,gradient=False,hessian=False,evals=False,digits=digits_sens,failmessage="(%s).gradient(%d,%d)" % (failmessage,i,j),allow_empty=allow_empty,verbose=verbose,allow_nondiff=allow_nondiff)
-
     if hessian:
       for i in range(trial.n_in()):
         if (allow_empty and (trial.sparsity_in(i).is_empty() or solution.sparsity_in(i).is_empty() )): continue

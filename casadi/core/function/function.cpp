@@ -645,6 +645,7 @@ namespace casadi {
     (*this)->setJacobian(jac, iind, oind, compact);
   }
 
+#ifdef WITH_DEPRECATED_FEATURES
   Function Function::gradient(int iind, int oind) {
     return (*this)->gradient(iind, oind);
   }
@@ -652,6 +653,7 @@ namespace casadi {
   Function Function::tangent(int iind, int oind) {
     return (*this)->tangent(iind, oind);
   }
+#endif // WITH_DEPRECATED_FEATURES
 
   Function Function::hessian(int iind, int oind) {
     return (*this)->hessian(iind, oind);

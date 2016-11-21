@@ -251,17 +251,11 @@ class ImplicitFunctiontests(casadiTestCase):
     # Test values
     x0_val  = 1
 
-    G = F.gradient(0,0)
-    G_out = G(x0_val)
-    print(G_out[0])
-    print(G)
-
     J = F.jacobian(0,0)
     J_out = J(x0_val)
     print(J_out[0])
     print(J)
 
-    self.checkarray(G_out[0],DM([2]))
     self.checkarray(J_out[0],DM([2]))
 
   def test_extra_outputs(self):
@@ -283,4 +277,3 @@ class ImplicitFunctiontests(casadiTestCase):
 
 if __name__ == '__main__':
     unittest.main()
-

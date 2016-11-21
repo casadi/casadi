@@ -748,20 +748,12 @@ class ADtests(casadiTestCase):
           f_out = f.call(values)
           J_ = f_out[1]
 
-          Gf=f.gradient(0,0)
-          Gf_out = Gf.call(values)
-          self.check_codegen(Gf,inputs=values)
-
-          self.checkarray(Gf_out[0],J_,failmessage=("mode: %s" % mode))
-          #self.checkarray(DM(Gf.sparsity_out(0),1),DM(J_.sparsity(),1),str(mode)+str(out)+str(type(fun)))
-
           Hf=f.hessian(0,0)
           Hf_out = Hf.call(values)
           self.check_codegen(Hf,inputs=values)
           if H_ is None:
             H_ = Hf_out[0]
           self.checkarray(Hf_out[0],H_,failmessage=("mode: %s" % mode))
-          #self.checkarray(DM(Gf.sparsity_out(0),1),DM(J_.sparsity(),1),str(mode)+str(out)+str(type(fun)))
 
 if __name__ == '__main__':
     unittest.main()
