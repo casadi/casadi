@@ -793,17 +793,7 @@ Get the sparsity of an input This function is called during construction.
 
 %feature("docstring") casadi::Callback::tangent "
 
-Generate a tangent function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. Note
-that the input must be scalar. In other cases, use the Jacobian instead.
+[DEPRECATED] Use Function::factory instead
 
 ";
 
@@ -820,17 +810,7 @@ length of w field.
 
 %feature("docstring") casadi::Callback::gradient "
 
-Generate a gradient function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. Note
-that the output must be scalar. In other cases, use the Jacobian instead.
+[DEPRECATED] Use Function::factory instead
 
 ";
 
@@ -881,9 +861,9 @@ Get oracle.
 
 %feature("docstring") casadi::Callback::setJacobian "
 
-Set the Jacobian function of output oind with respect to input iind NOTE:
-Does not take ownership, only weak references to the Jacobians are kept
-internally
+[DEPRECATED] Set the Jacobian function of output oind with respect to input
+iind NOTE: Does not take ownership, only weak references to the Jacobians
+are kept internally
 
 ";
 
@@ -1875,17 +1855,7 @@ Print a representation of the object.
 
 %feature("docstring") casadi::Function::gradient "
 
-Generate a gradient function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. Note
-that the output must be scalar. In other cases, use the Jacobian instead.
+[DEPRECATED] Use Function::factory instead
 
 ";
 
@@ -2645,17 +2615,7 @@ Generate the sparsity of a Jacobian block
 
 %feature("docstring") casadi::Function::tangent "
 
-Generate a tangent function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. Note
-that the input must be scalar. In other cases, use the Jacobian instead.
+[DEPRECATED] Use Function::factory instead
 
 ";
 
@@ -2673,9 +2633,9 @@ Get the floating point output argument of an atomic operation.
 
 %feature("docstring") casadi::Function::setJacobian "
 
-Set the Jacobian function of output oind with respect to input iind NOTE:
-Does not take ownership, only weak references to the Jacobians are kept
-internally
+[DEPRECATED] Set the Jacobian function of output oind with respect to input
+iind NOTE: Does not take ownership, only weak references to the Jacobians
+are kept internally
 
 ";
 
