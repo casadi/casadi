@@ -657,7 +657,6 @@ namespace casadi {
   Function Function::hessian(int iind, int oind) {
     return (*this)->hessian(iind, oind);
   }
-#endif // WITH_DEPRECATED_FEATURES
 
   Function Function::fullJacobian() {
     return (*this)->fullJacobian();
@@ -666,6 +665,7 @@ namespace casadi {
   void Function::setFullJacobian(const Function& jac) {
     (*this)->full_jacobian_ = jac;
   }
+#endif // WITH_DEPRECATED_FEATURES
 
   bool Function::test_cast(const SharedObjectNode* ptr) {
     return dynamic_cast<const FunctionInternal*>(ptr)!=0;

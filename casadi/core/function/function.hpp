@@ -380,16 +380,14 @@ namespace casadi {
     Function hessian(const std::string& iind, const std::string& oind)
     { return hessian(index_in(iind), index_out(oind)); }
     ///@}
-#endif // WITH_DEPRECATED_FEATURES
 
-    /** \brief Generate a Jacobian function of all the inputs elements with respect to all
-     * the output elements).
-     */
+    /** \brief [DEPRECATED] Use GenericMatrix::jacobian instead */
     Function fullJacobian();
 
-    /** Set the Jacobian of all the input nonzeros with respect to all output nonzeros
+    /** \brief [DEPRECATED] Set the Jacobian of all the input nonzeros with respect to all output nonzeros
      NOTE: Does _not_ take ownership, only weak references to the Jacobian are kept internally */
     void setFullJacobian(const Function& jac);
+#endif // WITH_DEPRECATED_FEATURES
 
     ///@{
     /** \brief Evaluate the function symbolically or numerically  */
