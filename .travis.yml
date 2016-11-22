@@ -222,7 +222,10 @@ matrix:
         - |
           if ! [[ $TRAVIS_BRANCH == *test* ]]
           then
+          if ! [[ $TRAVIS_BRANCH == develop ]]
+          then
           pushd binaries && git commit -a -m "automatic runner commit $TRAVIS_COMMIT" && git push origin run && popd
+          fi
           fi
     - os: osx
       env: TESTMODE=minimal SLURP_OS=osx
