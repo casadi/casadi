@@ -595,9 +595,9 @@ namespace casadi {
   }
 
   template<>
-  SX SX::jacobian(const SX &ex, const SX &arg, bool symmetric) {
+  SX SX::jacobian(const SX &ex, const SX &arg, const Dict& opts) {
     Function temp("temp", {arg}, {ex});
-    return temp->jac_sx(0, 0, false, symmetric);
+    return temp->jac_sx(0, 0, opts);
   }
 
   template<>
@@ -621,7 +621,7 @@ namespace casadi {
   template<>
   SX SX::hessian(const SX &ex, const SX &arg, SX &g) {
     g = gradient(ex, arg);
-    return jacobian(g, arg, true);
+    return jacobian(g, arg, {{"symmetric", true}});
   }
 
   template<>

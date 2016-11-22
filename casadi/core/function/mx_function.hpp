@@ -163,7 +163,7 @@ namespace casadi {
     virtual MX tang_mx(int iind=0, int oind=0);
 
     /** \brief Jacobian expression */
-    virtual MX jac_mx(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
+    virtual MX jac_mx(int iind=0, int oind=0, const Dict& opts = Dict());
 
     ///@{
     /** \brief Get function input(s) and output(s)  */

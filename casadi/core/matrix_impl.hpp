@@ -2224,9 +2224,8 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  Matrix<Scalar> Matrix<Scalar>::jacobian(const Matrix<Scalar> &f,
-                                              const Matrix<Scalar> &x,
-                                              bool symmetric) {
+  Matrix<Scalar> Matrix<Scalar>::
+  jacobian(const Matrix<Scalar> &f, const Matrix<Scalar> &x, const Dict& opts) {
     casadi_error("'jacobian' not defined for " + type_name());
     return Matrix<Scalar>();
   }
@@ -2507,7 +2506,7 @@ namespace casadi {
                                         bool reverse);
   template<> bool SX::depends_on(const SX &x, const SX &arg);
   template<> std::vector<SX > SX::symvar(const SX &x);
-  template<> SX SX::jacobian(const SX &f, const SX &x, bool symmetric);
+  template<> SX SX::jacobian(const SX &f, const SX &x, const Dict& opts);
   template<> SX SX::gradient(const SX &f, const SX &x);
   template<> SX SX::tangent(const SX &f, const SX &x);
   template<> SX SX::hessian(const SX &f, const SX &x);

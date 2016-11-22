@@ -116,7 +116,7 @@ namespace casadi {
     if (verbose()) {
       userOut() << "SXFunction::hess: calculating Jacobian " << endl;
     }
-    SX ret = gfcn->jac_sx(0, 0, false, true);
+    SX ret = gfcn->jac_sx(0, 0, {{"symmetric", true}});
     if (verbose()) {
       userOut() << "SXFunction::hess: calculating Jacobian done" << endl;
     }
@@ -1388,8 +1388,8 @@ namespace casadi {
     return tang(iind, oind);
   }
 
-  SX SXFunction::jac_sx(int iind, int oind, bool compact, bool symmetric) {
-    return jac(iind, oind, compact, symmetric);
+  SX SXFunction::jac_sx(int iind, int oind, const Dict& opts) {
+    return jac(iind, oind, opts);
   }
 
   SX SXFunction::hess_sx(int iind, int oind) {

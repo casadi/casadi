@@ -426,7 +426,7 @@ namespace casadi {
     log("Formed Jacobian of the constraints.");
 
     // Hessian of the Lagrangian
-    MX hes = lgrad->jac_mx(mod_x_, mod_gl_, false, !gauss_newton_);
+    MX hes = lgrad->jac_mx(mod_x_, mod_gl_, {{"symmetric", !gauss_newton_}});
     if (gauss_newton_) {
       log("Formed square root of Gauss-Newton Hessian.");
     } else {

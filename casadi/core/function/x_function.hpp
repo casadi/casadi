@@ -83,7 +83,7 @@ namespace casadi {
     MatType tang(int iind=0, int oind=0);
 
     /** \brief  Construct a complete Jacobian by compression */
-    MatType jac(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
+    MatType jac(int iind=0, int oind=0, const Dict& opts = Dict());
 
     /** \brief Check if the function is of a particular type */
     virtual bool is_a(const std::string& type, bool recursive) const {
@@ -644,9 +644,22 @@ namespace casadi {
 
   template<typename DerivedType, typename MatType, typename NodeType>
   MatType XFunction<DerivedType, MatType, NodeType>
-  ::jac(int iind, int oind, bool compact, bool symmetric) {
+  ::jac(int iind, int oind, const Dict& opts) {
     using namespace std;
     if (verbose()) userOut() << "XFunction::jac begin" << std::endl;
+
+    // Read options
+    bool compact = false;
+    bool symmetric = false;
+    for (auto&& op : opts) {
+      if (op.first=="compact") {
+        compact = op.second;
+      } else if (op.first=="symmetric") {
+        symmetric = op.second;
+      } else {
+        casadi_error("No such Jacobian option: " + string(op.second));
+      }
+    }
 
     // Quick return if trivially empty
     if (nnz_in(iind)==0 || nnz_out(oind)==0) {
@@ -1022,7 +1035,8 @@ namespace casadi {
     // Return function expression
     std::vector<MatType> ret_out;
     ret_out.reserve(1+out_.size());
-    ret_out.push_back(jac(iind, oind, compact, symmetric));
+    Dict jopts = {{"compact", compact}, {"symmetric", symmetric}};
+    ret_out.push_back(jac(iind, oind, jopts));
     ret_out.insert(ret_out.end(), out_.begin(), out_.end());
 
     // Return function

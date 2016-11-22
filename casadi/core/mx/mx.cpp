@@ -1530,9 +1530,9 @@ namespace casadi {
     }
   }
 
-  MX MX::jacobian(const MX &f, const MX &x, bool symmetric) {
+  MX MX::jacobian(const MX &f, const MX &x, const Dict& opts) {
     Function temp("helper_jacobian_MX", {x}, {f});
-    return temp->jac_mx(0, 0, false, symmetric);
+    return temp->jac_mx(0, 0, opts);
   }
 
   MX MX::gradient(const MX& f, const MX& x) {
@@ -1552,7 +1552,7 @@ namespace casadi {
 
   MX MX::hessian(const MX& f, const MX& x, MX &g) {
     g = gradient(f, x);
-    return jacobian(g, x, true);
+    return jacobian(g, x, {{"symmetric", true}});
   }
 
   MX MX::jtimes(const MX &ex, const MX &arg, const MX &v, bool tr) {

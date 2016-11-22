@@ -272,7 +272,7 @@ namespace casadi {
     /// Functions called by friend functions defined for GenericMatrix
     static Matrix<Scalar> simplify(const Matrix<Scalar> &x);
     static Matrix<Scalar> jacobian(const Matrix<Scalar> &f, const Matrix<Scalar> &x,
-                                     bool symmetric=false);
+                                   const Dict& opts = Dict());
     static Matrix<Scalar> gradient(const Matrix<Scalar> &f, const Matrix<Scalar> &x);
     static Matrix<Scalar> tangent(const Matrix<Scalar> &f, const Matrix<Scalar> &x);
     static Matrix<Scalar> hessian(const Matrix<Scalar> &f, const Matrix<Scalar> &x);

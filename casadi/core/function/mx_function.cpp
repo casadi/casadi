@@ -1279,8 +1279,8 @@ namespace casadi {
     return tang(iind, oind);
   }
 
-  MX MXFunction::jac_mx(int iind, int oind, bool compact, bool symmetric) {
-    return jac(iind, oind, compact, symmetric);
+  MX MXFunction::jac_mx(int iind, int oind, const Dict& opts) {
+    return jac(iind, oind, opts);
   }
 
   const MX MXFunction::mx_in(int ind) const {

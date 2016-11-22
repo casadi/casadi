@@ -508,8 +508,8 @@ namespace casadi {
     ///@{
     /** \brief Calculate Jacobian
     */
-    inline friend MatType jacobian(const MatType &ex, const MatType &arg, bool symmetric=false) {
-      return MatType::jacobian(ex, arg, symmetric);
+    inline friend MatType jacobian(const MatType &ex, const MatType &arg, const Dict& opts = Dict()) {
+      return MatType::jacobian(ex, arg, opts);
     }
     inline friend MatType gradient(const MatType &ex, const MatType &arg) {
       return MatType::gradient(ex, arg);

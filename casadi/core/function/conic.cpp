@@ -140,7 +140,7 @@ namespace casadi {
     M c = substitute(gf, x, M::zeros(x.sparsity()));
 
     // Identify the quadratic term in the objective
-    M H = M::jacobian(gf, x, true);
+    M H = M::jacobian(gf, x, {{"symmetric", true}});
 
     // Identify the constant term in the constraints
     M b = substitute(g, x, M::zeros(x.sparsity()));
