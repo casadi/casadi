@@ -500,7 +500,7 @@ namespace casadi {
       res[i] = repsum(res[i], 1, n);
     }
     // Construct return
-    return Function(name, arg, res, name_in(), name_out(), (*this)->derived_options());
+    return Function(name, arg, res, name_in(), name_out());
   }
 
   Function Function::map(const string& name, const string& parallelization, int n,
@@ -540,7 +540,7 @@ namespace casadi {
       }
       // Construct function
       return Function(name() + "_" + to_string(n), arg, res,
-                      name_in(), name_out(), (*this)->derived_options());
+                      name_in(), name_out());
     } else {
       // Create Map object
       return Map::create(parallelization, *this, n);

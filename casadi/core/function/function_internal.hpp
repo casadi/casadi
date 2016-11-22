@@ -324,9 +324,6 @@ namespace casadi {
     /** \brief Get oracle */
     virtual const Function& oracle() const;
 
-    /** \brief Propagate options */
-    virtual Dict derived_options() const;
-
     /** \brief Can derivatives be calculated in any way? */
     bool hasDerivative() const;
 

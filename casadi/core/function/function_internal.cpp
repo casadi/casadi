@@ -401,20 +401,12 @@ namespace casadi {
     }
 
     // Generate gradient function
-    Dict opts = derived_options();
+    Dict opts;
     opts["input_scheme"] = ischeme_;
     opts["output_scheme"] = ionames;
     opts["max_num_dir"] = max_num_dir_;
     opts["derivative_of"] = self();
     return getGradient(ss.str(), iind, oind, opts);
-  }
-
-  Dict FunctionInternal::derived_options() const {
-    Dict opts;
-    opts["jit"] = jit_;
-    opts["compiler"] = compilerplugin_;
-    opts["jit_options"] = jit_options_;
-    return opts;
   }
 
   Function FunctionInternal::tangent(int iind, int oind) {
@@ -435,7 +427,7 @@ namespace casadi {
     }
 
     // Generate gradient function
-    Dict opts = derived_options();
+    Dict opts;
     opts["input_scheme"] = ischeme_;
     opts["output_scheme"] = ionames;
     opts["max_num_dir"] = max_num_dir_;
@@ -466,7 +458,7 @@ namespace casadi {
 
   Function FunctionInternal::wrap() const {
     // Construct options of the wrapping MXFunction
-    Dict opts = derived_options();
+    Dict opts;
 
     // Propagate AD parameters
     opts["ad_weight"] = ad_weight();
@@ -1410,7 +1402,7 @@ namespace casadi {
       }
 
       // Generate a Jacobian
-      Dict opts = derived_options();
+      Dict opts;
       opts["verbose"] = verbose_;
       opts["input_scheme"] = ischeme_;
       opts["output_scheme"] = ionames;
@@ -1469,7 +1461,7 @@ namespace casadi {
     for (int i=0; i<n_out; ++i) o_names.push_back("fwd_" + name_out(i));
 
     // Options
-    Dict opts = derived_options();
+    Dict opts;;
     opts["max_num_dir"] = max_num_dir_;
     opts["derivative_of"] = self();
 
@@ -1526,7 +1518,7 @@ namespace casadi {
     for (int i=0; i<n_in; ++i) o_names.push_back("adj_" + name_in(i));
 
     // Options
-    Dict opts = derived_options();
+    Dict opts;
     opts["max_num_dir"] = max_num_dir_;
     opts["derivative_of"] = self();
 
