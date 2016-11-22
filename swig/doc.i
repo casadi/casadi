@@ -4840,8 +4840,8 @@ Substitute variable var with expression expr in multiple expressions.
 
 ";
 
-%feature("docstring")  jacobian(const MatType &ex, const MatType &arg, bool
-symmetric=false) "
+%feature("docstring")  jacobian(const MatType &ex, const MatType &arg, const
+Dict &opts=Dict()) "
 
 Calculate Jacobian.
 
