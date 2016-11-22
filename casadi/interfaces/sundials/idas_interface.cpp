@@ -216,9 +216,11 @@ namespace casadi {
       casadi_axpy(s.nx_, -cj, NV_DATA_S(v), NV_DATA_S(Jv));
 
       return 0;
-    } catch(exception& e) {
+    } catch(int flag) { // recoverable error
+      return flag;
+    } catch(exception& e) { // non-recoverable error
       userOut<true, PL_WARN>() << "jtimes failed: " << e.what() << endl;
-      return 1;
+      return -1;
     }
   }
 
@@ -246,9 +248,11 @@ namespace casadi {
       casadi_axpy(s.nrx_, cjB, NV_DATA_S(vB), NV_DATA_S(JvB));
 
       return 0;
-    } catch(exception& e) {
+    } catch(int flag) { // recoverable error
+      return flag;
+    } catch(exception& e) { // non-recoverable error
       userOut<true, PL_WARN>() << "jtimesB failed: " << e.what() << endl;
-      return 1;
+      return -1;
     }
   }
 
@@ -562,9 +566,11 @@ namespace casadi {
       s.calc_function(m, "quadF");
 
       return 0;
-    } catch(exception& e) {
+    } catch(int flag) { // recoverable error
+      return flag;
+    } catch(exception& e) { // non-recoverable error
       userOut<true, PL_WARN>() << "rhsQ failed: " << e.what() << endl;
-      return 1;
+      return -1;
     }
   }
 
@@ -588,9 +594,11 @@ namespace casadi {
       casadi_axpy(s.nrx_, 1., NV_DATA_S(rxzdot), NV_DATA_S(rr));
 
       return 0;
-    } catch(exception& e) {
+    } catch(int flag) { // recoverable error
+      return flag;
+    } catch(exception& e) { // non-recoverable error
       userOut<true, PL_WARN>() << "resB failed: " << e.what() << endl;
-      return 1;
+      return -1;
     }
   }
 
@@ -613,9 +621,11 @@ namespace casadi {
       casadi_scal(s.nrq_, -1., NV_DATA_S(rqdot));
 
       return 0;
-    } catch(exception& e) {
-      userOut<true, PL_WARN>() << "rhsQB failed: " << e.what() << endl;
-      return 1;
+    } catch(int flag) { // recoverable error
+      return flag;
+    } catch(exception& e) { // non-recoverable error
+      userOut<true, PL_WARN>() << "resQB failed: " << e.what() << endl;
+      return -1;
     }
   }
 
@@ -692,9 +702,11 @@ namespace casadi {
       }
 
       return 0;
-    } catch(exception& e) {
+    } catch(int flag) { // recoverable error
+      return flag;
+    } catch(exception& e) { // non-recoverable error
       userOut<true, PL_WARN>() << "psolve failed: " << e.what() << endl;
-      return 1;
+      return -1;
     }
   }
 
@@ -770,9 +782,11 @@ namespace casadi {
       }
 
       return 0;
-    } catch(exception& e) {
+    } catch(int flag) { // recoverable error
+      return flag;
+    } catch(exception& e) { // non-recoverable error
       userOut<true, PL_WARN>() << "psolveB failed: " << e.what() << endl;
-      return 1;
+      return -1;
     }
   }
 
@@ -794,9 +808,11 @@ namespace casadi {
       s.linsolF_.factorize(m->jac);
 
       return 0;
-    } catch(exception& e) {
+    } catch(int flag) { // recoverable error
+      return flag;
+    } catch(exception& e) { // non-recoverable error
       userOut<true, PL_WARN>() << "psetup failed: " << e.what() << endl;
-      return 1;
+      return -1;
     }
   }
 
@@ -822,9 +838,11 @@ namespace casadi {
       s.linsolB_.factorize(m->jacB);
 
       return 0;
-    } catch(exception& e) {
+    } catch(int flag) { // recoverable error
+      return flag;
+    } catch(exception& e) { // non-recoverable error
       userOut<true, PL_WARN>() << "psetupB failed: " << e.what() << endl;
-      return 1;
+      return -1;
     }
   }
 
@@ -872,7 +890,9 @@ namespace casadi {
         xzB, xzdotB, 0, cj, static_cast<void*>(m), vtemp1B, vtemp1B, vtemp3B)) return 1;
 
       return 0;
-    } catch(exception& e) {
+    } catch(int flag) { // recoverable error
+      return flag;
+    } catch(exception& e) { // non-recoverable error
       userOut<true, PL_WARN>() << "lsetupB failed: " << e.what() << endl;
       return -1;
     }
@@ -904,10 +924,9 @@ namespace casadi {
       }
 
       return 0;
-    } catch(int wrn) {
-      /*    userOut<true, PL_WARN>() << "warning: " << wrn << endl;*/
-      return wrn;
-    } catch(exception& e) {
+    } catch(int flag) { // recoverable error
+      return flag;
+    } catch(exception& e) { // non-recoverable error
       userOut<true, PL_WARN>() << "lsolve failed: " << e.what() << endl;
       return -1;
     }
@@ -952,10 +971,9 @@ namespace casadi {
         if (cjratio != 1.0) N_VScale(2.0/(1.0 + cjratio), b, b);
       }
       return 0;
-    } catch(int wrn) {
-      /*    userOut<true, PL_WARN>() << "warning: " << wrn << endl;*/
-      return wrn;
-    } catch(exception& e) {
+    } catch(int flag) { // recoverable error
+      return flag;
+    } catch(exception& e) { // non-recoverable error
       userOut<true, PL_WARN>() << "lsolveB failed: " << e.what() << endl;
       return -1;
     }
