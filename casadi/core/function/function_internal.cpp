@@ -1287,8 +1287,10 @@ namespace casadi {
   }
 
   void FunctionInternal::getPartition(int iind, int oind, Sparsity& D1, Sparsity& D2,
-                                      bool compact, bool symmetric) {
+                                      bool compact, bool symmetric,
+                                      bool allow_forward, bool allow_reverse) {
     log("FunctionInternal::getPartition begin");
+    casadi_assert_message(allow_forward || allow_reverse, "Inconsistent options");
 
     // Sparsity pattern with transpose
     Sparsity &AT = sparsity_jac(iind, oind, compact, symmetric);
@@ -1297,6 +1299,7 @@ namespace casadi {
     // Get seed matrices by graph coloring
     if (symmetric) {
       casadi_assert(get_n_forward()>0);
+      casadi_assert(allow_forward);
 
       // Star coloring if symmetric
       log("FunctionInternal::getPartition star_coloring");
@@ -1310,13 +1313,15 @@ namespace casadi {
       double w = ad_weight();
 
       // Which AD mode?
-      bool test_ad_fwd=w<1, test_ad_adj=w>0;
+      if (w==1) allow_forward = false;
+      if (w==0) allow_reverse = false;
+      casadi_assert_message(allow_forward || allow_reverse, "Conflicting ad weights");
 
       // Best coloring encountered so far (relatively tight upper bound)
       double best_coloring = numeric_limits<double>::infinity();
 
       // Test forward mode first?
-      bool test_fwd_first = test_ad_fwd && w*A.size1() <= (1-w)*A.size2();
+      bool test_fwd_first = allow_forward && w*A.size1() <= (1-w)*A.size2();
       int mode_fwd = test_fwd_first ? 0 : 1;
 
       // Test both coloring modes
@@ -1325,8 +1330,8 @@ namespace casadi {
         bool fwd = mode==mode_fwd;
 
         // Skip?
-        if (!test_ad_fwd && fwd) continue;
-        if (!test_ad_adj && !fwd) continue;
+        if (!allow_forward && fwd) continue;
+        if (!allow_reverse && !fwd) continue;
 
         // Perform the coloring
         if (fwd) {

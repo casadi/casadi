@@ -651,11 +651,17 @@ namespace casadi {
     // Read options
     bool compact = false;
     bool symmetric = false;
+    bool allow_forward = true;
+    bool allow_reverse = true;
     for (auto&& op : opts) {
       if (op.first=="compact") {
         compact = op.second;
       } else if (op.first=="symmetric") {
         symmetric = op.second;
+      } else if (op.first=="allow_forward") {
+        allow_forward = op.second;
+      } else if (op.first=="allow_reverse") {
+        allow_reverse = op.second;
       } else {
         casadi_error("No such Jacobian option: " + string(op.second));
       }
@@ -684,7 +690,7 @@ namespace casadi {
 
     // Get a bidirectional partition
     Sparsity D1, D2;
-    getPartition(iind, oind, D1, D2, true, symmetric);
+    getPartition(iind, oind, D1, D2, true, symmetric, allow_forward, allow_reverse);
     if (verbose()) userOut() << "XFunction::jac graph coloring completed" << std::endl;
 
     // Get the number of forward and adjoint sweeps
