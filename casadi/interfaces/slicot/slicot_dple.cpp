@@ -54,7 +54,7 @@ namespace casadi {
   }
 
   Options SlicotDple::options_
-  = {{&FunctionInternal::options_},
+  = {{&Dple::options_},
      {{"linear_solver",
        {OT_STRING,
         "User-defined linear solver class. Needed for sensitivities."}},
