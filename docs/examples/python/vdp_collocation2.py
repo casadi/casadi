@@ -39,7 +39,7 @@ states = struct_symSX([
             entry('x',shape=2),    #  vdp oscillator states
             entry('L')             #  helper state: Langrange integrand
          ])
-         
+
 # Create a structure for the right hand side
 rhs = struct_SX(states)
 x = states['x']
@@ -91,7 +91,7 @@ D = NP.zeros(d+1)
 
 # Dimensionless time inside one control interval
 tau = SX.sym("tau")
-  
+
 # All collocation time points
 T = NP.zeros((nk,d+1))
 for k in range(nk):
@@ -105,15 +105,15 @@ for j in range(d+1):
   for r in range(d+1):
     if r != j:
       L *= (tau-tau_root[r])/(tau_root[j]-tau_root[r])
-  lfcn = Function('lfcn', [tau],[L])
-  
+
   # Evaluate the polynomial at the final time to get the coefficients of the continuity equation
+  lfcn = Function('lfcn', [tau],[L])
   D[j] = lfcn(1.0)
 
   # Evaluate the time derivative of the polynomial at all collocation points to get the coefficients of the continuity equation
-  tfcn = lfcn.tangent()
+  tfcn = Function('tfcn', [tau],[tangent(L,tau)])
   for r in range(d+1):
-    C[j,r], _ = tfcn(tau_root[r])
+    C[j,r] = tfcn(tau_root[r])
 
 # Structure holding NLP variables
 V = struct_symMX([
@@ -152,15 +152,15 @@ ubg = []
 
 # For all finite elements
 for k in range(nk):
-  
+
   # For all collocation points
   for j in range(1,d+1):
-        
+
     # Get an expression for the state derivative at the collocation point
     xp_jk = 0
     for r in range (d+1):
       xp_jk += C[r,j]*V["X",k,r]
-      
+
     # Add collocation equations to the NLP
     fk = f(T[k][j], V["X",k,j], V["U",k])
     g.append(h*fk - xp_jk)
@@ -176,16 +176,16 @@ for k in range(nk):
   g.append(V["X",k+1,0] - xf_k)
   lbg.append(NP.zeros(nx))
   ubg.append(NP.zeros(nx))
-  
+
 # Concatenate constraints
 g = vertcat(*g)
 
 # Objective function
 f = m(T[nk-1][d],V["X",nk,0],V["U",nk-1])
-  
+
 # NLP
 nlp = {'x':V, 'f':f, 'g':g}
-  
+
 ## ----
 ## SOLVE THE NLP
 ## ----
@@ -241,4 +241,3 @@ plt.xlabel('time')
 plt.legend(['x[0] trajectory','x[1] trajectory','u trajectory'])
 plt.grid()
 plt.show()
-

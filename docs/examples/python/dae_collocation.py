@@ -53,7 +53,7 @@ deg = 4
 cp = "radau"
 # Size of the finite elements
 h = tf/nk/nicp
- 
+
 # Coefficients of the collocation equation
 C = np.zeros((deg+1,deg+1))
 # Coefficients of the continuity equation
@@ -61,7 +61,7 @@ D = np.zeros(deg+1)
 
 # Collocation point
 tau = SX.sym("tau")
-  
+
 # All collocation time points
 tau_root = [0] + collocation_points(deg, cp)
 
@@ -78,16 +78,14 @@ for j in range(deg+1):
         if j2 != j:
             L *= (tau-tau_root[j2])/(tau_root[j]-tau_root[j2])
 
-    lfcn = Function('lfcn', [tau],[L])
     # Evaluate the polynomial at the final time to get the coefficients of the continuity equation
+    lfcn = Function('lfcn', [tau],[L])
     D[j] = lfcn(1.0)
 
     # Evaluate the time derivative of the polynomial at all collocation points to get the coefficients of the continuity equation
-    tfcn = lfcn.tangent()
+    tfcn = Function('tfcn', [tau],[tangent(L,tau)])
     for j2 in range(deg+1):
-        C[j][j2], _ = tfcn(tau_root[j2])
-
-
+        C[j][j2] = tfcn(tau_root[j2])
 
 # -----------------------------------------------------------------------------
 # Model setup
@@ -99,7 +97,7 @@ xd  = SX.sym("xd",ndstate)      # differential state
 xa  = SX.sym("xa",nastate)    # algebraic state
 xddot  = SX.sym("xdot",ndstate) # differential state time derivative
 p = SX.sym("p",0,1)      # parameters
- 
+
 x = SX.sym("x")
 y = SX.sym("y")
 w = SX.sym("w")
@@ -108,7 +106,7 @@ dx = SX.sym("dx")
 dy = SX.sym("dy")
 dw = SX.sym("dw")
 
-      
+
 res = vertcat(xddot[0] - dx,\
        xddot[1] - dy,\
        xddot[2] - dw,\
@@ -117,19 +115,19 @@ res = vertcat(xddot[0] - dx,\
        M*xddot[5] + (w-x)*xa +   u,\
        (x-w)*(xddot[3] - xddot[5]) + y*xddot[4] + dy*dy + (dx-dw)*(dx-dw))
 
-     
+
 xd[0] = x
 xd[1] = y
 xd[2] = w
 xd[3] = dx
 xd[4] = dy
 xd[5] = dw
-                   
+
 
 # System dynamics (implicit formulation)
 ffcn = Function('ffcn', [t,xddot,xd,xa,u,p],[res])
 
-# Objective function 
+# Objective function
 MayerTerm = Function('mayer', [t,xd,xa,u,p],[(x-xref)*(x-xref) + (w-xref)*(w-xref) + dx*dx + dy*dy])
 LagrangeTerm = Function('lagrange', [t,xd,xa,u,p],[(x-xref)*(x-xref) + (w-xref)*(w-xref)])
 
@@ -140,7 +138,7 @@ u_init = np.array((nk*nicp*(deg+1))*[[0.0]]) # needs to be specified for every t
 
 # Differential state bounds
 #Path bounds
-xD_min =  np.array([-inf, -inf, -inf, -inf, -inf, -inf]) 
+xD_min =  np.array([-inf, -inf, -inf, -inf, -inf, -inf])
 xD_max =  np.array([ inf,  inf,  inf,  inf,  inf,  inf])
 #Initial bounds
 xDi_min = np.array([ 0.0,  l,  0.0,  0.0,  0.0,  0.0])
@@ -210,7 +208,7 @@ NV = NXD+NXA+NU+NXF+NP
 
 # NLP variable vector
 V = MX.sym("V",NV)
-  
+
 # All variables with bounds and initial guess
 vars_lb = np.zeros(NV)
 vars_ub = np.zeros(NV)
@@ -228,12 +226,12 @@ offset += NP
 XD = np.resize(np.array([],dtype=MX),(nk+1,nicp,deg+1)) # NB: same name as above
 XA = np.resize(np.array([],dtype=MX),(nk,nicp,deg)) # NB: same name as above
 U = np.resize(np.array([],dtype=MX),nk)
-for k in range(nk):  
+for k in range(nk):
     # Collocated states
     for i in range(nicp):
         #
         for j in range(deg+1):
-                      
+
             # Get the expression for the state vector
             XD[k][i][j] = V[offset:offset+ndiff]
             if j !=0:
@@ -242,24 +240,24 @@ for k in range(nk):
             index = (deg+1)*(nicp*k+i) + j
             if k==0 and j==0 and i==0:
                 vars_init[offset:offset+ndiff] = xD_init[index,:]
-                
+
                 vars_lb[offset:offset+ndiff] = xDi_min
-                vars_ub[offset:offset+ndiff] = xDi_max                    
+                vars_ub[offset:offset+ndiff] = xDi_max
                 offset += ndiff
             else:
                 if j!=0:
-                    vars_init[offset:offset+nx] = np.append(xD_init[index,:],xA_init[index,:]) 
-                    
+                    vars_init[offset:offset+nx] = np.append(xD_init[index,:],xA_init[index,:])
+
                     vars_lb[offset:offset+nx] = np.append(xD_min,xA_min)
                     vars_ub[offset:offset+nx] = np.append(xD_max,xA_max)
                     offset += nx
                 else:
                     vars_init[offset:offset+ndiff] = xD_init[index,:]
-                    
+
                     vars_lb[offset:offset+ndiff] = xD_min
                     vars_ub[offset:offset+ndiff] = xD_max
                     offset += ndiff
-    
+
     # Parametrized controls
     U[k] = V[offset:offset+nu]
     vars_lb[offset:offset+nu] = u_min
@@ -290,12 +288,12 @@ ubg.append(ic_max)
 for k in range(nk):
     for i in range(nicp):
         # For all collocation points
-        for j in range(1,deg+1):                
+        for j in range(1,deg+1):
             # Get an expression for the state derivative at the collocation point
             xp_jk = 0
             for j2 in range (deg+1):
                 xp_jk += C[j2][j]*XD[k][i][j2]       # get the time derivative of the differential states (eq 10.19b)
-            
+
             # Add collocation equations to the NLP
             fk = ffcn(0., xp_jk/h, XD[k][i][j], XA[k][i][j-1], U[k], P)
             g += [fk[:ndiff]]                     # impose system dynamics (for the differential states (eq 10.19b))
@@ -304,19 +302,19 @@ for k in range(nk):
             g += [fk[ndiff:]]                               # impose system dynamics (for the algebraic states (eq 10.19b))
             lbg.append(np.zeros(nalg)) # equality constraints
             ubg.append(np.zeros(nalg)) # equality constraints
-            
+
             #  Evaluate the path constraint function
             pck = pcfcn(0., XD[k][i][j], XA[k][i][j-1], U[k], P)
-            
+
             g += [pck]
             lbg.append(pc_min)
             ubg.append(pc_max)
-        
+
         # Get an expression for the state at the end of the finite element
         xf_k = 0
         for j in range(deg+1):
             xf_k += D[j]*XD[k][i][j]
-            
+
         # Add continuity equation to NLP
         if i==nicp-1:
 #            print "a ", k, i
@@ -324,11 +322,11 @@ for k in range(nk):
         else:
 #            print "b ", k, i
             g += [XD[k][i+1][0] - xf_k]
-        
+
         lbg.append(np.zeros(ndiff))
         ubg.append(np.zeros(ndiff))
 
-# Periodicity constraints 
+# Periodicity constraints
 #   none
 
 # Final constraints (Const, dConst, ConstQ)
@@ -358,7 +356,7 @@ for k in range(nk):
         m = mtimes( Qs.T, lAtOne[1:])
         lagrangeTerm += m
 
-Obj += lagrangeTerm        
+Obj += lagrangeTerm
 
 # NLP
 nlp = {'x':V, 'f':Obj, 'g':vertcat(*g)}
@@ -397,11 +395,11 @@ print("optimal cost: ", float(res["f"]))
 
 # Retrieve the solution
 v_opt = np.array(res["x"])
-    
+
 
 ## ----
 ## RETRIEVE THE SOLUTION
-## ---- 
+## ----
 xD_opt = np.resize(np.array([],dtype=MX),(ndiff,(deg+1)*nicp*(nk)+1))
 xA_opt = np.resize(np.array([],dtype=MX),(nalg,(deg)*nicp*(nk)))
 u_opt = np.resize(np.array([],dtype=MX),(nu,(deg+1)*nicp*(nk)+1))
@@ -410,7 +408,7 @@ offset2 = 0
 offset3 = 0
 offset4 = 0
 
-for k in range(nk):  
+for k in range(nk):
     for i in range(nicp):
         for j in range(deg+1):
             xD_opt[:,offset2] = v_opt[offset:offset+ndiff][:,0]
@@ -427,11 +425,11 @@ for k in range(nk):
             offset3 += 1
     #    u_opt += v_opt[offset:offset+nu]
     offset += nu
-    
-xD_opt[:,-1] = v_opt[offset:offset+ndiff][:,0]    
-    
-    
-    
+
+xD_opt[:,-1] = v_opt[offset:offset+ndiff][:,0]
+
+
+
 # The algebraic states are not defined at the first collocation point of the finite elements:
 # with the polynomials we compute them at that point
 Da = np.zeros(deg)
@@ -447,10 +445,10 @@ for j in range(1,deg+1):
 xA_plt = np.resize(np.array([],dtype=MX),(nalg,(deg+1)*nicp*(nk)+1))
 offset4=0
 offset5=0
-for k in range(nk):  
+for k in range(nk):
     for i in range(nicp):
         for j in range(deg+1):
-            if j!=0:         
+            if j!=0:
                 xA_plt[:,offset5] = xA_opt[:,offset4]
                 offset4 += 1
                 offset5 += 1
@@ -462,11 +460,11 @@ for k in range(nk):
                 #xA_plt[:,offset5] = xA_opt[:,offset4]
                 offset5 += 1
 
-xA_plt[:,-1] = xA_plt[:,-2]    
-    
-    
-    
-    
+xA_plt[:,-1] = xA_plt[:,-2]
+
+
+
+
 tg = np.array(tau_root)*h
 for k in range(nk*nicp):
     if k == 0:
@@ -504,4 +502,3 @@ plt.title("Crane, lambda")
 plt.xlabel('time')
 plt.grid()
 plt.show()
-

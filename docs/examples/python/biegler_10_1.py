@@ -32,10 +32,10 @@ print("program started")
 # Test with different number of elements
 for N in range(1,11):
   print("N = ", N)
-  
+
   # Degree of interpolating polynomial
   K = 2
-  
+
   # Legrandre roots
   tau_root = [0., 0.211325, 0.788675]
 
@@ -44,54 +44,45 @@ for N in range(1,11):
 
   # Time
   t = SX.sym("t")
-  
+
   # Differential equation
   z = SX.sym("z")
   F = Function("dz_dt", [z],[z*z - 2*z + 1])
-  
+
   z0 = -3
-  
+
   # Analytic solution
   z_analytic = Function("z_analytic", [t], [(4*t-3)/(3*t+1)])
-  
+
   # Collocation point
   tau = SX.sym("tau")
 
   # Step size
   h = 1.0/N
-  
-  # Lagrange polynomials
-  l = []
+
+  # Get the coefficients of the continuity and collocation equations
+  D = DM.zeros(K+1)
+  C = DM.zeros(K+1,K+1)
   for j in range(K+1):
+    # Lagrange polynomial
     L = 1
     for k in range(K+1):
       if(k != j):
         L *= (tau-tau_root[k])/(tau_root[j]-tau_root[k])
 
-    print("l(", j, ") = ", L)
+    # Evaluate at end for coefficients of continuity equation
+    lfcn = Function("lfcn", [tau],[L])
+    D[j] = lfcn(1.)
 
-    f = Function("l_" + str(j), [tau],[L])
-    
-    # initialize
-    l.append(f)
-  
-  # Get the coefficients of the continuity equation
-  D = DM.zeros(K+1)
-  for j in range(K+1):
-    D[j] = l[j](1.)
+    # Differentiate and evaluate at collocation points
+    tfcn = Function("tfcn", [tau],[tangent(L,tau)])
+    for k in range(K+1): C[j,k] = tfcn(tau_root[k])
+  print("C = ", C)
   print("D = ", D)
 
-  # Get the coefficients of the collocation equation using AD
-  C = DM.zeros(K+1,K+1)
-  for j in range(K+1):
-    tfcn = l[j].tangent()
-    for k in range(K+1):
-      C[j,k], _ = tfcn(tau_root[k])
-  print("C = ", C)
-  
   # Collocated states
   Z = SX.sym("Z",N,K+1)
-    
+
   # Construct the NLP
   x = vec(Z.T)
   g = []
@@ -122,7 +113,7 @@ for N in range(1,11):
   ## ----
   ## SOLVE THE NLP
   ## ----
-  
+
   # NLP solver options
   opts = {"ipopt.tol" : 1e-10}
 
@@ -139,20 +130,20 @@ for N in range(1,11):
   lbx[0] = ubx[0] = z0
   arg["lbx"] = lbx
   arg["ubx"] = ubx
-  
+
   # Bounds on the constraints
   arg["lbg"] = 0
   arg["ubg"] = 0
-  
+
   # Solve the problem
   res = solver(**arg)
-  
+
   ## Print the time points
   t_opt = N*(K+1) * [0]
   for i in range(N):
     for j in range(K+1):
       t_opt[j + (K+1)*i] = h*(i + tau_root[j])
-  
+
   print("time points: ", t_opt)
 
   # Print the optimal cost
@@ -161,10 +152,9 @@ for N in range(1,11):
   # Print the optimal solution
   xopt = res["x"].nonzeros()
   print("optimal solution: ", xopt)
- 
+
   # plot to screen
   plt.plot(t_opt,xopt)
 
 # show the plots
 plt.show()
-  
