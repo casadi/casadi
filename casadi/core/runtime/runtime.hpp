@@ -678,7 +678,7 @@ namespace casadi {
   int CASADI_PREFIX(low)(real_t x, const double* grid, int ng) {
     int i;
     for (i=0; i<ng-2; ++i) {
-      if (x < grid[i]) break;
+      if (x < grid[i+1]) break;
     }
     return i;
   }
