@@ -653,11 +653,11 @@ namespace casadi {
   Function Function::tangent(int iind, int oind) {
     return (*this)->tangent(iind, oind);
   }
-#endif // WITH_DEPRECATED_FEATURES
 
   Function Function::hessian(int iind, int oind) {
     return (*this)->hessian(iind, oind);
   }
+#endif // WITH_DEPRECATED_FEATURES
 
   Function Function::fullJacobian() {
     return (*this)->fullJacobian();

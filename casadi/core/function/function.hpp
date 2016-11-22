@@ -369,17 +369,9 @@ namespace casadi {
     Function tangent(const std::string& iind, const std::string& oind)
     { return tangent(index_in(iind), index_out(oind)); }
     ///@}
-#endif // WITH_DEPRECATED_FEATURES
 
     ///@{
-    /** \brief Generate a Hessian function of output \a oind with respect to input \a iind
-     * \param iind The index of the input
-     * \param oind The index of the output
-     *
-     * The generated Hessian has two more outputs than the calling function corresponding
-     * to the Hessian and the gradients.
-     *
-     */
+    /** \brief [DEPRECATED] Use Function::factory instead */
     Function hessian(int iind=0, int oind=0);
     Function hessian(const std::string& iind, int oind=0)
     { return hessian(index_in(iind), oind); }
@@ -388,6 +380,7 @@ namespace casadi {
     Function hessian(const std::string& iind, const std::string& oind)
     { return hessian(index_in(iind), index_out(oind)); }
     ///@}
+#endif // WITH_DEPRECATED_FEATURES
 
     /** \brief Generate a Jacobian function of all the inputs elements with respect to all
      * the output elements).
