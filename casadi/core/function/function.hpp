@@ -324,22 +324,9 @@ namespace casadi {
     /** \brief Print free variables */
     void print_free(std::ostream &stream=casadi::userOut()) const;
 
+#ifdef WITH_DEPRECATED_FEATURES
     ///@{
-    /** \brief Generate a Jacobian function of output \a oind with respect to input \a iind
-     * \param iind The index of the input
-     * \param oind The index of the output
-     *
-     * The default behavior of this class is defined by the derived class.
-     * If compact is set to true, only the nonzeros of the input and output expressions are
-     * considered.
-     * If symmetric is set to true, the Jacobian being calculated is known to be symmetric
-     * (usually a Hessian),
-     * which can be exploited by the algorithm.
-     *
-     * The generated Jacobian has one more output than the calling function corresponding
-     * to the Jacobian and the same number of inputs.
-     *
-     */
+    /** \brief [DEPRECATED] Use Function::factory instead */
     Function jacobian(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
     Function jacobian(const std::string& iind,  int oind=0, bool compact=false,
                       bool symmetric=false) {
@@ -354,7 +341,6 @@ namespace casadi {
     }
     ///@}
 
-    #ifdef WITH_DEPRECATED_FEATURES
     /** [DEPRECATED] Set the Jacobian function of output \a oind with respect to input \a iind
      NOTE: Does _not_ take ownership, only weak references to the Jacobians are kept internally */
     void setJacobian(const Function& jac, int iind=0, int oind=0, bool compact=false);

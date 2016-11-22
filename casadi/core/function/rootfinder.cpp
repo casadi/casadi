@@ -141,7 +141,7 @@ Function Function::rootfinder_fun() {
     OracleFunction::init(opts);
 
     // Generate Jacobian if not provided
-    if (jac.is_null()) jac = oracle_.jacobian(iin_, iout_);
+    if (jac.is_null()) jac = oracle_->jacobian(iin_, iout_, false, false);
     set_function(jac, "jac_f_z");
     sp_jac_ = jac.sparsity_out(0);
 
