@@ -267,7 +267,7 @@ matrix:
         - mkdir build
         - pushd build
         - cmake  -DOLD_LLVM=ON -DCMAKE_INSTALL_PREFIX=/home/travis/build/matlab-install -DWITH_CLANG=ON -DWITH_ECOS=ON -DWITH_MOSEK=ON -DWITH_DEEPBIND=ON -DWITH_MATLAB=ON -DWITH_WORHP=ON -DWITH_SLICOT=OFF -DWITH_OOQP=ON -DWITH_PROFILING=ON -DWITH_DOC=ON -DWITH_EXAMPLES=ON -DWITH_COVERAGE=ON -DWITH_EXTRA_WARNINGS=ON -DWITH_JSON=ON ..
-        - make -j2
+        - make -j2 VERBOSE=1
         - sudo make -j2 install
         - popd
         - matlabtunnel
