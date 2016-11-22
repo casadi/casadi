@@ -1267,28 +1267,28 @@ const std::string &oind) "
 %feature("docstring")  casadi::Function::set_jac_sparsity(const Sparsity
 &sp, int iind, int oind, bool compact=false) "
 
-Generate the sparsity of a Jacobian block
+[DEPRECATED] Generate the sparsity of a Jacobian block
 
 ";
 
 %feature("docstring")  casadi::Function::set_jac_sparsity(const Sparsity
 &sp, const std::string &iind, int oind, bool compact=false) "
 
-Generate the sparsity of a Jacobian block
+[DEPRECATED] Generate the sparsity of a Jacobian block
 
 ";
 
 %feature("docstring")  casadi::Function::set_jac_sparsity(const Sparsity
 &sp, int iind, const std::string &oind, bool compact=false) "
 
-Generate the sparsity of a Jacobian block
+[DEPRECATED] Generate the sparsity of a Jacobian block
 
 ";
 
 %feature("docstring")  casadi::Function::set_jac_sparsity(const Sparsity
 &sp, const std::string &iind, const std::string &oind, bool compact=false) "
 
-Generate the sparsity of a Jacobian block
+[DEPRECATED] Generate the sparsity of a Jacobian block
 
 ";
 
@@ -3778,28 +3778,28 @@ C++ includes: function.hpp ";
 %feature("docstring")  casadi::Function::set_jac_sparsity(const Sparsity
 &sp, int iind, int oind, bool compact=false) "
 
-Generate the sparsity of a Jacobian block
+[DEPRECATED] Generate the sparsity of a Jacobian block
 
 ";
 
 %feature("docstring")  casadi::Function::set_jac_sparsity(const Sparsity
 &sp, const std::string &iind, int oind, bool compact=false) "
 
-Generate the sparsity of a Jacobian block
+[DEPRECATED] Generate the sparsity of a Jacobian block
 
 ";
 
 %feature("docstring")  casadi::Function::set_jac_sparsity(const Sparsity
 &sp, int iind, const std::string &oind, bool compact=false) "
 
-Generate the sparsity of a Jacobian block
+[DEPRECATED] Generate the sparsity of a Jacobian block
 
 ";
 
 %feature("docstring")  casadi::Function::set_jac_sparsity(const Sparsity
 &sp, const std::string &iind, const std::string &oind, bool compact=false) "
 
-Generate the sparsity of a Jacobian block
+[DEPRECATED] Generate the sparsity of a Jacobian block
 
 ";
 

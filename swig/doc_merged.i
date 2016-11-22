@@ -821,7 +821,7 @@ pointer to the internal class
 
 %feature("docstring") casadi::Callback::set_jac_sparsity "
 
-Generate the sparsity of a Jacobian block
+[DEPRECATED] Generate the sparsity of a Jacobian block
 
 ";
 
@@ -2609,7 +2609,7 @@ C++ includes: function.hpp ";
 
 %feature("docstring") casadi::Function::set_jac_sparsity "
 
-Generate the sparsity of a Jacobian block
+[DEPRECATED] Generate the sparsity of a Jacobian block
 
 ";
 
