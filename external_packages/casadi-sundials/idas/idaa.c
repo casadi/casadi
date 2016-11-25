@@ -274,6 +274,11 @@ int IDAAdjInit(void *ida_mem, long int steps, int interp)
   IDAADJ_mem->ia_nckpnts = 0;
   IDAADJ_mem->ia_ckpntData = NULL;
 
+  /* Initialize wrapper function workspace to NULL for safe deletion if unused */
+  IDAADJ_mem->ia_yyTmp = NULL;
+  IDAADJ_mem->ia_ypTmp = NULL;
+  IDAADJ_mem->ia_yySTmp = NULL;
+  IDAADJ_mem->ia_ypSTmp = NULL;
 
   /* Initialization of interpolation data. */
   IDAADJ_mem->ia_interpType = interp;
