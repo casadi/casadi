@@ -634,6 +634,9 @@ namespace casadi {
     casadi_copy(m->lam_g0, ng_, m->lam_gk);
     casadi_scal(ng_, -1., m->lam_gk);
 
+    casadi_copy(m->lam_xk, nx_, m->lam_qp);
+    casadi_copy(m->lam_gk, ng_, m->lam_qp+nx_);
+
     m->fstats.at("mainloop").tic();
     ret = run(m, max_iter_, warmstart_);
 
@@ -2079,7 +2082,11 @@ namespace casadi {
                 m->qp->getStatus() == qpOASES::QPS_SOLVED) {
                 ret = m->qp->hotstart(m->H, g, m->A, lb, lu, lbA, luA, maxIt, &cpuTime);
               } else {
-                ret = m->qp->init(m->H, g, m->A, lb, lu, lbA, luA, maxIt, &cpuTime);
+                if (warmstart_) {
+                  ret = m->qp->init(m->H, g, m->A, lb, lu, lbA, luA, maxIt, &cpuTime, deltaXi, lambdaQP);
+                } else {
+                  ret = m->qp->init(m->H, g, m->A, lb, lu, lbA, luA, maxIt, &cpuTime);
+                }
               }
           } else {
             // Second order correction: H and A do not change

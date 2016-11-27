@@ -2254,7 +2254,7 @@ returnValue QProblem::obtainAuxiliaryWorkingSet(    const real_t* const xOpt, co
         }
 
         /* Obtain initial working set in accordance to sign of dual solution vector. */
-        if ( ( xOpt == 0 ) && ( yOpt != 0 ) )
+        if (  yOpt != 0 )
         {
             for( i=0; i<nC; ++i )
             {
