@@ -630,7 +630,9 @@ namespace casadi {
     // Primal-dual initial guess
     casadi_copy(m->x0, nx_, m->xk);
     casadi_copy(m->lam_x0, nx_, m->lam_xk);
+    casadi_scal(nx_, -1., m->lam_xk);
     casadi_copy(m->lam_g0, ng_, m->lam_gk);
+    casadi_scal(ng_, -1., m->lam_gk);
 
     m->fstats.at("mainloop").tic();
     ret = run(m, max_iter_, warmstart_);
