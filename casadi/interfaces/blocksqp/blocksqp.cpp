@@ -632,6 +632,9 @@ namespace casadi {
     // Print header and information about the algorithmic parameters
     if (print_header_) printInfo(m);
 
+    // Statistics
+    for (auto&& s : m->fstats) s.second.reset();
+
     // Open output files
     initStats(m);
     initIterate(m);
