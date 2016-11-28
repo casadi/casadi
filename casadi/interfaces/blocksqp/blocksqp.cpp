@@ -2083,7 +2083,8 @@ namespace casadi {
                 ret = m->qp->hotstart(m->H, g, m->A, lb, lu, lbA, luA, maxIt, &cpuTime);
               } else {
                 if (warmstart_) {
-                  ret = m->qp->init(m->H, g, m->A, lb, lu, lbA, luA, maxIt, &cpuTime, deltaXi, lambdaQP);
+                  ret = m->qp->init(m->H, g, m->A, lb, lu, lbA, luA, maxIt, &cpuTime,
+                    deltaXi, lambdaQP);
                 } else {
                   ret = m->qp->init(m->H, g, m->A, lb, lu, lbA, luA, maxIt, &cpuTime);
                 }
