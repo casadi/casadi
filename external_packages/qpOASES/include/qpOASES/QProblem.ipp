@@ -134,8 +134,9 @@ inline returnValue QProblem::setA( Matrix *A_new )
         /* AW: TODO: Takes too much time - could be implemented differently
         // (ckirches) disable constraints with empty rows   
         */
-        if ( isZero( A->getRowNorm (j) ) == BT_TRUE )
-            constraints.setType ( j, ST_DISABLED );
+        //!!!
+        //if ( isZero( A->getRowNorm (j) ) == BT_TRUE )
+        //    constraints.setType ( j, ST_DISABLED );
     }
 
 
