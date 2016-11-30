@@ -2196,7 +2196,8 @@ namespace casadi {
                           " cannot be inlined in an MX expression");
 
     // Derivative information must be available
-    casadi_assert(hasDerivative());
+    casadi_assert_message(hasDerivative(),
+                          "Derivatives cannot be calculated for " + name_);
 
     // Number of directional derivatives
     int nfwd = fseed.size();
@@ -2296,7 +2297,8 @@ namespace casadi {
                           " cannot be inlined in an MX expression");
 
     // Derivative information must be available
-    casadi_assert(hasDerivative());
+    casadi_assert_message(hasDerivative(),
+                          "Derivatives cannot be calculated for " + name_);
 
     // Number of directional derivatives
     int nadj = aseed.size();
