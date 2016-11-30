@@ -127,16 +127,15 @@ inline returnValue QProblem::setA( Matrix *A_new )
 
     A->times(1, 1.0, x, nV, 0.0, Ax, nC);
 
+    A->getRowNorm(tempC);
+
     for( j=0; j<nC; ++j )
     {
         Ax_u[j] = ubA[j] - Ax[j];
         Ax_l[j] = Ax[j] - lbA[j];
-        /* AW: TODO: Takes too much time - could be implemented differently
         // (ckirches) disable constraints with empty rows   
-        */
-        //!!!
-        //if ( isZero( A->getRowNorm (j) ) == BT_TRUE )
-        //    constraints.setType ( j, ST_DISABLED );
+        if ( isZero( tempC[j] ) == BT_TRUE )
+           constraints.setType ( j, ST_DISABLED );
     }
 
 

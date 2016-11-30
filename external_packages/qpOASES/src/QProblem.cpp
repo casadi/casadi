@@ -71,6 +71,7 @@ QProblem::QProblem( ) : QProblemB( )
     delta_xFRz = 0;
     tempB = 0;
     delta_yAC_TMP = 0;
+    tempC = 0;
 }
 
 
@@ -150,12 +151,14 @@ QProblem::QProblem( int_t _nV, int_t _nC, HessianType _hessianType ) : QProblemB
         tempB = new real_t[_nC];            /* nAC */
         delta_xFRy = new real_t[_nC];       /* nAC */
         delta_yAC_TMP = new real_t[_nC];   /* nAC */
+        tempC = new real_t[_nC];   /* nAC */
     }
     else
     {
         tempB = 0;
         delta_xFRy = 0;
         delta_yAC_TMP = 0;
+        tempC = 0;
     }
 
     flipper.init( (uint_t)_nV,(uint_t)_nC );
@@ -1151,6 +1154,12 @@ returnValue QProblem::clear( )
         delta_yAC_TMP = 0;
     }
 
+    if ( tempC != 0 )
+    {
+        delete[] tempC;
+        tempC = 0;
+    }
+
     return SUCCESSFUL_RETURN;
 }
 
@@ -1260,12 +1269,14 @@ returnValue QProblem::copy( const QProblem& rhs
         delta_xFRy = new real_t[_nC];       /* nAC */
         tempB = new real_t[_nC];            /* nAC */
         delta_yAC_TMP = new real_t[_nC];   /* nAC */
+        tempC = new real_t[_nC];            /* nAC */
     }
     else
     {
         delta_xFRy = 0;
         tempB = 0;
         delta_yAC_TMP = 0;
+        tempC = 0;
     }
 
     return SUCCESSFUL_RETURN;

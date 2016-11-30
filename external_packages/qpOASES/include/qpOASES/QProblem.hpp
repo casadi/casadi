@@ -1064,6 +1064,8 @@ class QProblem : public QProblemB
         real_t* delta_xFRy;                     /**< Temporary for determineStepDirection. */
         real_t* delta_xFRz;                     /**< Temporary for determineStepDirection. */
         real_t* delta_yAC_TMP;                  /**< Temporary for determineStepDirection. */
+
+        real_t* tempC;                          /**< Temporary for cosntraint types. */
 };
 
 

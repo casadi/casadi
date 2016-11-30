@@ -160,6 +160,16 @@ real_t DenseMatrix::getRowNorm( int_t rNum, int_t type ) const
     return REFER_NAMESPACE_QPOASES getNorm( &(val[rNum*leaDim]),nCols,type );
 }
 
+returnValue DenseMatrix::getRowNorm( real_t *norm, int_t type ) const
+{
+    int_t i;
+    for (i = 0; i < nRows; ++i)
+    {
+      norm[i] = REFER_NAMESPACE_QPOASES getNorm( &(val[i*leaDim]),nCols,type );
+    }
+    return SUCCESSFUL_RETURN;
+}
+
 returnValue DenseMatrix::getRow(int_t rNum, const Indexlist* const icols, real_t alpha, real_t *row) const
 {
     int_t i;
@@ -803,6 +813,33 @@ real_t SparseMatrix::getRowNorm( int_t rNum, int_t type ) const
             THROWERROR( RET_INVALID_ARGUMENTS );
             return -INFTY;
     }
+}
+
+returnValue SparseMatrix::getRowNorm( real_t *norm, int_t type ) const
+{
+    int_t i,j;
+
+    for ( j=0; j < nCols; ++j ) norm[j] = 0.0;
+
+    switch( type )
+    {
+        case 2:
+            for ( j=0; j < nCols; ++j ) {
+                for (i = jc[j]; i < jc[j+1]; i++)
+                  norm[ir[i]] += val[i]*val[i];
+            }
+            for ( j=0; j < nCols; ++j ) norm[j] = getSqrt(norm[j]);
+            break;
+        case 1:
+            for ( j=0; j < nCols; ++j ) {
+                for (i = jc[j]; i < jc[j+1]; i++);
+                  norm[ir[i]] += getAbs( val[i] );
+            }
+            break;
+        default:
+            return RET_INVALID_ARGUMENTS;
+    }
+    return SUCCESSFUL_RETURN;
 }
 
 
@@ -1495,6 +1532,17 @@ real_t SparseMatrixRow::getRowNorm( int_t rNum, int_t type ) const
     return REFER_NAMESPACE_QPOASES getNorm( &(val[jr[rNum]]),length,type );
 }
 
+
+returnValue SparseMatrixRow::getRowNorm(  real_t* norm, int_t type) const
+{
+    int_t i;
+    for (i = 0; i < nRows; ++i)
+    {
+      int_t length = jr[i+1] - jr[i];
+      norm[i] = REFER_NAMESPACE_QPOASES getNorm( &(val[jr[i]]),length,type );
+    }
+    return SUCCESSFUL_RETURN;
+}
 
 
 returnValue SparseMatrixRow::getRow(int_t rNum, const Indexlist* const icols, real_t alpha, real_t *row) const
