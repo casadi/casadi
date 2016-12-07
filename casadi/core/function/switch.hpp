@@ -46,6 +46,9 @@ namespace casadi {
     /** \brief  Destructor */
     virtual ~Switch();
 
+    /** \brief Get type name */
+    virtual std::string type_name() const {return "switch";}
+
     ///@{
     /** \brief Number of function inputs and outputs */
     virtual size_t get_n_in();

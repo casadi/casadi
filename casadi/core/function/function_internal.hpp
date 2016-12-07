@@ -773,7 +773,7 @@ namespace casadi {
     bool print_time_;
 
     /** \brief Get type name */
-    virtual std::string type_name() const;
+    virtual std::string type_name() const = 0;
 
     /** \brief Check if the function is of a particular type */
     virtual bool is_a(const std::string& type, bool recursive) const;

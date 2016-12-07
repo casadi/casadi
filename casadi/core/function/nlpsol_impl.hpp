@@ -91,6 +91,11 @@ namespace casadi {
     /// Destructor
     virtual ~Nlpsol() = 0;
 
+    /** \brief Get type name */
+    virtual std::string type_name() const {
+      return std::string("nlpsol_") + plugin_name();
+    }
+
     ///@{
     /** \brief Number of function inputs and outputs */
     virtual size_t get_n_in() { return NLPSOL_NUM_IN;}

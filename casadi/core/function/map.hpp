@@ -45,6 +45,9 @@ namespace casadi {
     /** \brief Destructor */
     virtual ~Map();
 
+    /** \brief Get type name */
+    virtual std::string type_name() const {return "map";}
+
     /// @{
     /** \brief Sparsities of function inputs and outputs */
     virtual Sparsity get_sparsity_in(int i) {

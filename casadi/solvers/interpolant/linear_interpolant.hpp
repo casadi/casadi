@@ -93,6 +93,9 @@ namespace casadi {
     /// Destructor
     virtual ~LinearInterpolantJac() {}
 
+    /** \brief Get type name */
+    virtual std::string type_name() const { return "interpolant_linear_jac";}
+
     // Initialize
     virtual void init(const Dict& opts);
 

@@ -40,6 +40,9 @@ namespace casadi {
     /** \brief Destructor */
     virtual ~CallbackInternal();
 
+    /** \brief Get type name */
+    virtual std::string type_name() const {return "callback";}
+
     ///@{
     /** \brief Number of function inputs and outputs */
     virtual size_t get_n_in();

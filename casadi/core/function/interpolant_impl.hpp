@@ -49,6 +49,11 @@ namespace casadi {
     /// Destructor
     virtual ~Interpolant();
 
+    /** \brief Get type name */
+    virtual std::string type_name() const {
+      return std::string("interpolant_") + plugin_name();
+    }
+
     ///@{
     /** \brief Number of function inputs and outputs */
     virtual size_t get_n_in() { return 1;}

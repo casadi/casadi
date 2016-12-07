@@ -2520,10 +2520,6 @@ namespace casadi {
     return ret;
   }
 
-  std::string FunctionInternal::type_name() const {
-    return typeid(*this).name();
-  }
-
   bool FunctionInternal::is_a(const std::string& type, bool recursive) const {
     return type == "function";
   }

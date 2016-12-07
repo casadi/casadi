@@ -49,6 +49,11 @@ namespace casadi {
     // Destructor
     virtual ~Conic() = 0;
 
+    /** \brief Get type name */
+    virtual std::string type_name() const {
+      return std::string("conic_") + plugin_name();
+    }
+
     ///@{
     /** \brief Number of function inputs and outputs */
     virtual size_t get_n_in() { return CONIC_NUM_IN;}
