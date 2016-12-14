@@ -107,11 +107,13 @@ namespace casadi {
   }
 
   SharedObjectNode::~SharedObjectNode() {
+    #ifdef WITH_REFCOUNT_WARNINGS
     if (count!=0) {
       // Note that casadi_assert_warning cannot be used in destructors
       std::cerr << "Reference counting failure." <<
                    "Possible cause: Circular dependency in user code." << std::endl;
     }
+    #endif // WITH_REFCOUNT_WARNINGS
     if (weak_ref_!=0) {
       weak_ref_->kill();
       delete weak_ref_;
@@ -180,5 +182,3 @@ namespace casadi {
   }
 
 } // namespace casadi
-
-

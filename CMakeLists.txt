@@ -90,6 +90,7 @@ option(WITH_PYTHON3 "Use Python 3.*" OFF)
 option(WITH_JSON "Compile the JSON front-end" OFF)
 option(WITH_DEBIAN_BUILD "Add -DWITH_DEBIAN_BUILD (used for debian-specific warnings)" OFF)
 option(WITH_DEEPBIND "Load plugins with RTLD_DEEPBIND (can be used to resolve conflicting libraries in e.g. MATLAB)" ON)
+option(WITH_REFCOUNT_WARNINGS "Issue warnings upon reference counting failure" OFF)
 option(WITH_SELFCONTAINED "Make the install directory self-contained" OFF)
 option(WITH_DEPRECATED_FEATURES "Compile with syntax that is scheduled to be deprecated" ON)
 option(WITH_EXTENDING_CASADI "Compile a demonstration that shows how a project that depends on CasADi can be implemented." OFF)
@@ -612,6 +613,10 @@ endif()
 
 if(WITH_DEEPBIND)
   add_definitions(-DWITH_DEEPBIND)
+endif()
+
+if(WITH_REFCOUNT_WARNINGS)
+  add_definitions(-DWITH_REFCOUNT_WARNINGS)
 endif()
 
 ######################################################
