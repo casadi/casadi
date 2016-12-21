@@ -9370,9 +9370,21 @@ must be [x0 u0 x1 u1 ...]
 
 The constraints must be in order: [ gap0 lincon0 gap1 lincon1 ]
 
-The gap constraints must be diagonal sparse
+gap: Ak+1 = Ak xk + Bk uk lincon: yk= Ck xk + Dk uk
 
-Supply nx, ng, nu options
+
+
+::
+
+         A0 B0 -I
+         C0 D0
+                A1 B1 -I
+                C1 D1
+
+
+
+where I must be a diagonal sparse matrix Either supply all of N, nx, ng, nu
+options or rely on automatic detection
 
 >List of available options
 
