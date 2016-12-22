@@ -280,14 +280,6 @@ namespace casadi {
       "HPMPC interface: symbol \"" + ocp_solve_name + "\" found in " + searchpath + ".");
 #endif
 
-
-
-    /* Disassemble A input into:
-       B A   I
-       D C
-           B A  I
-           D C
-    */
     /* Disassemble A input into:
        A B I
        C D
@@ -634,19 +626,28 @@ namespace casadi {
     m->fstats.at("preprocessing").toc();
     m->fstats.at("solver").tic();
 
-    casadi_dense_transfer(0.5, arg[CONIC_LAM_A0], lamg_gapsp_, get_ptr(m->pi), pisp_, pv);
-    // Deal with non-unity I block
-    for (int k=0;k<N_;++k) {
-      int n_row = m->nx[k+1];
-      for (int i=0;i<n_row;++i) {
-        double f = -m->Is[k][i];
-        m->pis[k][i]*=f;
+
+    std::fill(m->pi.begin(), m->pi.end(), 0);
+    std::fill(m->lam.begin(), m->lam.end(), 0);
+
+    if (arg[CONIC_LAM_A0]) {
+      casadi_dense_transfer(0.5, arg[CONIC_LAM_A0], lamg_gapsp_, get_ptr(m->pi), pisp_, pv);
+      // Deal with non-unity I block
+      for (int k=0;k<N_;++k) {
+        int n_row = m->nx[k+1];
+        for (int i=0;i<n_row;++i) {
+          double f = -m->Is[k][i];
+          m->pis[k][i]*=f;
+        }
       }
+
+      casadi_dense_transfer(0.5, arg[CONIC_LAM_A0], lamg_csp_, get_ptr(m->lam), lam_cusp_, pv);
     }
 
-    casadi_dense_transfer(0.5, arg[CONIC_LAM_A0], lamg_csp_, get_ptr(m->lam), lam_cusp_, pv);
-    casadi_dense_transfer(0.5, arg[CONIC_LAM_X0], usp_, get_ptr(m->lam), lam_uusp_, pv);
-    casadi_dense_transfer(0.5, arg[CONIC_LAM_X0], xsp_, get_ptr(m->lam), lam_xusp_, pv);
+    if (arg[CONIC_LAM_X0]) {
+      casadi_dense_transfer(0.5, arg[CONIC_LAM_X0], usp_, get_ptr(m->lam), lam_uusp_, pv);
+      casadi_dense_transfer(0.5, arg[CONIC_LAM_X0], xsp_, get_ptr(m->lam), lam_xusp_, pv);
+    }
 
     m->return_status =
       fortran_order_d_ip_ocp_hard_tv(&m->iter_count, max_iter_, mu0_, tol_, N_, get_ptr(m->nx),
@@ -693,7 +694,8 @@ namespace casadi {
     // Construct f
     double f = casadi_dot(nx_, arg[CONIC_G], res[CONIC_X]);
     f += 0.5*casadi_bilin(arg[CONIC_H], sparsity_in(CONIC_H), res[CONIC_X], res[CONIC_X]);
-    res[CONIC_COST][0] = f;
+
+    if (res[CONIC_COST]) res[CONIC_COST][0] = f;
 
     m->fstats.at("postprocessing").toc();
 

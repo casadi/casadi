@@ -751,7 +751,7 @@ class ConicTests(casadiTestCase):
 
   @requires_conic("hpmpc")
   @requires_conic("qpoases")
-  def test_hpmc(self):
+  def test_hpmpc(self):
 
     inf = 100
     T = 10. # Time horizon
@@ -848,6 +848,14 @@ class ConicTests(casadiTestCase):
     self.checkarray(sol_ref["lam_x"], sol["lam_x"],digits=8)
     self.checkarray(sol_ref["f"], sol["f"])
     
+    solver = nlpsol('solver', 'sqpmethod', prob,{"qpsol": "hpmpc", "qpsol_options": {"tol":1e-12,"mu0":2,"max_iter":20}})
+    sol = solver(x0=w0, lbx=lbw, ubx=ubw, lbg=lbg, ubg=ubg)
+
+    self.checkarray(sol_ref["x"], sol["x"])
+    self.checkarray(sol_ref["lam_g"], sol["lam_g"],digits=8)
+    self.checkarray(sol_ref["lam_x"], sol["lam_x"],digits=8)
+    self.checkarray(sol_ref["f"], sol["f"])
+
   @requires_conic("hpmpc")
   @requires_conic("qpoases")
   def test_hpmc_timevarying(self):
