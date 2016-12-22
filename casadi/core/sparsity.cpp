@@ -537,8 +537,8 @@ namespace casadi {
     return (*this)->dim();
   }
 
-  std::string Sparsity::repr(int k) const {
-    return (*this)->repr(k);
+  std::string Sparsity::repr_el(int k) const {
+    return (*this)->repr_el(k);
   }
 
   Sparsity Sparsity::get_diag(std::vector<int>& mapping) const {

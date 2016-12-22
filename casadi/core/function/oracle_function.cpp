@@ -224,7 +224,7 @@ namespace casadi {
         int k = distance(m->res[i], it);
         bool is_nan = isnan(m->res[i][k]);
         ss << name() << ":" << fcn << " failed: " << (is_nan? "NaN" : "Inf") <<
-        " detected for output " << f.name_out(i) << ", at " << f.sparsity_out(i).repr(k) << ".";
+        " detected for output " << f.name_out(i) << ", at " << f.sparsity_out(i).repr_el(k) << ".";
 
         if (regularity_check_) {
           casadi_error(ss.str());

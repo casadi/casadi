@@ -1919,7 +1919,7 @@ namespace casadi {
     return ss.str();
   }
 
-  std::string SparsityInternal::repr(int k) const {
+  std::string SparsityInternal::repr_el(int k) const {
     std::stringstream ss;
     if (numel()!=nnz()) {
       ss << "nonzero index " << k << " ";

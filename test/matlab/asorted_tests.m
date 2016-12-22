@@ -339,4 +339,5 @@ assert(~issparse(b));
 assert(issparse(c));
 assert(~issparse(d));
 
+Sparsity(3,3)
 
