@@ -72,12 +72,16 @@ namespace casadi {
   }
 
   Sparsity::Sparsity(int nrow, int ncol) {
+    casadi_assert(nrow>=0);
+    casadi_assert(ncol>=0);
     std::vector<int> row, colind(ncol+1, 0);
     assign_cached(nrow, ncol, colind, row);
     sanity_check(true);
   }
 
   Sparsity::Sparsity(const std::pair<int, int>& rc) {
+    casadi_assert(rc.first>=0);
+    casadi_assert(rc.second>=0);
     std::vector<int> row, colind(rc.second+1, 0);
     assign_cached(rc.first, rc.second, colind, row);
     sanity_check(true);
@@ -85,11 +89,15 @@ namespace casadi {
 
   Sparsity::Sparsity(int nrow, int ncol, const std::vector<int>& colind,
                      const std::vector<int>& row) {
+    casadi_assert(nrow>=0);
+    casadi_assert(ncol>=0);
     assign_cached(nrow, ncol, colind, row);
     sanity_check(true);
   }
 
   Sparsity::Sparsity(int nrow, int ncol, const int* colind, const int* row) {
+    casadi_assert(nrow>=0);
+    casadi_assert(ncol>=0);
     if (colind==0 || colind[ncol]==nrow*ncol) {
       *this = dense(nrow, ncol);
     } else {
@@ -791,6 +799,8 @@ namespace casadi {
   }
 
   Sparsity Sparsity::dense(int nrow, int ncol) {
+    casadi_assert(nrow>=0);
+    casadi_assert(ncol>=0);
     // Column offset
     std::vector<int> colind(ncol+1);
     for (int cc=0; cc<ncol+1; ++cc) colind[cc] = cc*nrow;
@@ -907,6 +917,8 @@ namespace casadi {
                              const std::vector<int>& col, std::vector<int>& mapping,
                              bool invert_mapping) {
     // Assert dimensions
+    casadi_assert(nrow>=0);
+    casadi_assert(ncol>=0);
     casadi_assert_message(col.size()==row.size(), "inconsistent lengths");
 
     // Create the return sparsity pattern and access vectors
