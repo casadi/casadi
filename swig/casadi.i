@@ -2638,6 +2638,29 @@ class NZproxy:
       return n==1 ? $self->numel() : i==1 ? $self->size1() : $self->size2();
     }
 
+    
+    // Needed for brace syntax to access nonzeros
+    int numel(int k) const {
+      return 1;
+    }
+    
+    // Needed for brace syntax to access nonzeros
+    int numel(char rr) const {
+      casadi_assert(rr==':');
+      return 1;
+    }
+    
+    // Needed for brace syntax to access nonzeros
+    int numel(const std::vector<int> &k) const {
+      return 1;
+    }
+    
+    // Needed because original numel call gets hidden by the above extend overloads
+    int numel() const {
+      return $self->numel();
+    }
+
+    
     // Transpose using the A' syntax in addition to A.'
     Type ctranspose() const { return $self->T();}
 
@@ -3674,6 +3697,8 @@ namespace casadi{
     function varargout = subsref(self,s)
       if numel(s)==1 && strcmp(s.type,'()')
         [varargout{1}] = paren(self, s.subs{:});
+      elseif numel(s)==1 && strcmp(s.type,'{}')
+        [varargout{1}] = brace(self, s.subs{:});
       else
         [varargout{1:nargout}] = builtin('subsref',self,s);
       end
@@ -3681,6 +3706,8 @@ namespace casadi{
     function self = subsasgn(self,s,v)
       if numel(s)==1 && strcmp(s.type,'()')
         paren_asgn(self, v, s.subs{:});
+      elseif numel(s)==1 && strcmp(s.type,'{}')
+        brace_asgn(self, v, s.subs{:});
       else
         self = builtin('subsasgn',self,s,v);
       end

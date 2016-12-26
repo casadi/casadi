@@ -341,3 +341,16 @@ assert(~issparse(d));
 
 Sparsity(3,3)
 
+x = MX.sym('x',3,3);
+
+assert(numel(x)==9);
+
+xr = tril(x);
+xnz = xr{:};
+
+assert(numel(xnz)==6);
+
+
+
+
+

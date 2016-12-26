@@ -237,6 +237,16 @@
    fun:ensure_fromlist.lto_priv.1420
 }
 
+{
+   leaks
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   fun:dl_open_worker
+   fun:_dl_catch_error
+   fun:_dl_open
+}
+
 
 
 {
