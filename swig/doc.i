@@ -4787,13 +4787,6 @@ Get the number of elements.
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< MatType >::numel(int i) const
-"
-
-Get the number of elements in slice (cf. MATLAB)
-
-";
-
 %feature("docstring")  casadi::GenericMatrix< MatType >::zeros(int nrow=1,
 int ncol=1) "
 
@@ -6070,13 +6063,6 @@ answers are possible)
 const "
 
 Get the number of elements.
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< Matrix< Scalar >  >::numel(int
-i) const "
-
-Get the number of elements in slice (cf. MATLAB)
 
 ";
 
@@ -7620,12 +7606,6 @@ Get the number of elements.
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< MX  >::numel(int i) const "
-
-Get the number of elements in slice (cf. MATLAB)
-
-";
-
 %feature("docstring")  casadi::MX::enlarge(int nrow, int ncol, const
 std::vector< int > &rr, const std::vector< int > &cc, bool ind1=false) "
 
@@ -8758,12 +8738,6 @@ the spy command.
 
 ";
 
-%feature("docstring")  casadi::Sparsity::repr(int k) const  "
-
-Describe the nonzero location k as a string.
-
-";
-
 %feature("docstring")  casadi::SharedObject::repr(std::ostream
 &stream=casadi::userOut(), bool trailing_newline=true) const  "
 
@@ -8783,10 +8757,9 @@ Transpose the matrix.
 
 ";
 
-%feature("docstring")  casadi::Sparsity::nnz_diag() const  "
+%feature("docstring")  casadi::Sparsity::repr_el(int k) const  "
 
-Number of non-zeros on the diagonal, i.e. the number of elements (i, j) with
-j==i.
+Describe the nonzero location k as a string.
 
 ";
 
@@ -8814,6 +8787,12 @@ format.
 &rc) "
 
 Create a sparse matrix with all structural zeros.
+
+";
+
+%feature("docstring")  casadi::Sparsity::pattern_inverse() const  "
+
+Take the inverse of a sparsity pattern; flip zeros and non-zeros.
 
 ";
 
@@ -8910,9 +8889,10 @@ Make a patten dense.
 
 ";
 
-%feature("docstring")  casadi::Sparsity::pattern_inverse() const  "
+%feature("docstring")  casadi::Sparsity::nnz_diag() const  "
 
-Take the inverse of a sparsity pattern; flip zeros and non-zeros.
+Number of non-zeros on the diagonal, i.e. the number of elements (i, j) with
+j==i.
 
 ";
 

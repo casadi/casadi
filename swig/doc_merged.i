@@ -3435,15 +3435,7 @@ Get the first dimension (i.e. number of rows)
 
 %feature("docstring") casadi::GenericMatrix::numel "
 
->  int casadi::GenericMatrix< MatType >::numel() const 
-------------------------------------------------------------------------
-
 Get the number of elements.
-
->  int casadi::GenericMatrix< MatType >::numel(int i) const 
-------------------------------------------------------------------------
-
-Get the number of elements in slice (cf. MATLAB)
 
 ";
 
@@ -4481,15 +4473,7 @@ matrix is integer-valued (note that false negative answers are possible)
 
 %feature("docstring") casadi::Matrix::numel "
 
->  int casadi::GenericMatrix< Matrix< Scalar >  >::numel() const
-------------------------------------------------------------------------
-
 Get the number of elements.
-
->  int casadi::GenericMatrix< Matrix< Scalar >  >::numel(int i) const
-------------------------------------------------------------------------
-
-Get the number of elements in slice (cf. MATLAB)
 
 ";
 
@@ -5658,15 +5642,7 @@ Check if norm.
 
 %feature("docstring") casadi::MX::numel "
 
->  int casadi::GenericMatrix< MX  >::numel() const
-------------------------------------------------------------------------
-
 Get the number of elements.
-
->  int casadi::GenericMatrix< MX  >::numel(int i) const
-------------------------------------------------------------------------
-
-Get the number of elements in slice (cf. MATLAB)
 
 ";
 
@@ -6690,14 +6666,6 @@ the spy command.
 
 %feature("docstring") casadi::Sparsity::repr "
 
->  std::string casadi::Sparsity::repr(int k) const 
-------------------------------------------------------------------------
-
-Describe the nonzero location k as a string.
-
->  void casadi::SharedObject::repr(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const 
-------------------------------------------------------------------------
-
 Print a representation of the object.
 
 ";
@@ -6714,10 +6682,9 @@ Transpose the matrix.
 
 ";
 
-%feature("docstring") casadi::Sparsity::nnz_diag "
+%feature("docstring") casadi::Sparsity::repr_el "
 
-Number of non-zeros on the diagonal, i.e. the number of elements (i, j) with
-j==i.
+Describe the nonzero location k as a string.
 
 ";
 
@@ -6743,6 +6710,12 @@ format.
 ------------------------------------------------------------------------
 
 Create a sparse matrix with all structural zeros.
+
+";
+
+%feature("docstring") casadi::Sparsity::pattern_inverse "
+
+Take the inverse of a sparsity pattern; flip zeros and non-zeros.
 
 ";
 
@@ -6833,9 +6806,10 @@ Make a patten dense.
 
 ";
 
-%feature("docstring") casadi::Sparsity::pattern_inverse "
+%feature("docstring") casadi::Sparsity::nnz_diag "
 
-Take the inverse of a sparsity pattern; flip zeros and non-zeros.
+Number of non-zeros on the diagonal, i.e. the number of elements (i, j) with
+j==i.
 
 ";
 
