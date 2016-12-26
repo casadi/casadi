@@ -8,9 +8,6 @@ all: doxpublish
 options:
 	python extra/generate_options_doc.py
 
-tutorials:
-	cd ../tutorials/python && make
-
 example_pack:
 	cd ../example_pack && make
 
