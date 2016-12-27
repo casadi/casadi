@@ -69,10 +69,10 @@ unittests_octave:
 	python internal/test_octave.py matlab -skipfiles="callback.m"
 
 examples_matlab:
-	python internal/test_matlab.py '../docs/examples/matlab' -skipfiles="MyCallback.m"
+	python internal/test_matlab.py '../docs/examples/matlab' -skipfiles="MyCallback.m NlpCallback.m"
 
 examples_octave:
-	python internal/test_octave.py '../docs/examples/matlab' -skipfiles="MyCallback.m callback.m"
+	python internal/test_octave.py '../docs/examples/matlab' -skipfiles="MyCallback.m NlpCallback.m callback.m nlp_callback.m"
 
 # No memchecks because there is a memory leak in SuperLU
 examples_indoc_py:
