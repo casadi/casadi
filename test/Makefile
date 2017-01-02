@@ -66,7 +66,7 @@ unittests_matlab:
 
 unittests_octave:
 	python internal/test_octave.py octave
-	python internal/test_octave.py matlab -skipfiles="callback.m"
+	python internal/test_octave.py matlab -skipfiles="callback.m nlp_callback.m"
 
 examples_matlab:
 	python internal/test_matlab.py '../docs/examples/matlab' -skipfiles="MyCallback.m NlpCallback.m"
