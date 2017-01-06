@@ -2411,5 +2411,17 @@ class MXtests(casadiTestCase):
 
         self.checkfunction(f,fr,inputs=[0])
 
+  def test_sparsity_operation(self):
+    L = [MX(Sparsity(1,1)),MX(Sparsity(2,1)), MX.sym("x",1,1), MX.sym("x", Sparsity(1,1)), DM(1), DM(Sparsity(1,1),1), DM(Sparsity(2,1),1), DM(Sparsity.dense(2,1),1)]
+    
+    for a in L:
+      for b in L:
+        c = a*b
+        
+        if a.nnz()==0 or b.nnz()==0:
+          self.assertTrue(c.nnz()==0)
+        else:
+          self.assertTrue(c.nnz()>0)
+          
 if __name__ == '__main__':
     unittest.main()
