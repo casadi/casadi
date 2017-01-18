@@ -372,6 +372,11 @@ namespace casadi {
     double eta_;
     double obj_lo_;
     double obj_up_;
+
+    // feasibility restoration phase
+    double rho_;  // Regularization factor for first part of objective
+    double zeta_;  // Regularization factor for second part of objective
+    Function rp_solver_;  // restoration phase Solver
   };
 
 } // namespace casadi

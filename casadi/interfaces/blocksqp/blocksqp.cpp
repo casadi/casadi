@@ -211,7 +211,13 @@ namespace casadi {
         "Lower bound on objective function [-inf]"}},
       {"obj_up",
        {OT_DOUBLE,
-        "Upper bound on objective function [inf]"}}
+        "Upper bound on objective function [inf]"}},
+      {"rho",
+       {OT_DOUBLE,
+        "Feasibility restoration phase parameter"}},
+      {"zeta",
+       {OT_DOUBLE,
+        "Feasibility restoration phase parameter"}}
      }
   };
 
@@ -272,6 +278,8 @@ namespace casadi {
     eta_ = 1.0e-4;
     obj_lo_ = -inf;
     obj_up_ = inf;
+    rho_ = 1.0e-3;
+    zeta_ = 1.0e-3;
 
     // Read user options
     for (auto&& op : opts) {
@@ -381,6 +389,10 @@ namespace casadi {
         obj_lo_ = op.second;
       } else if (op.first=="obj_up") {
         obj_up_ = op.second;
+      } else if (op.first=="rho") {
+        rho_ = op.second;
+      } else if (op.first=="zeta") {
+        zeta_ = op.second;
       }
     }
 
@@ -398,6 +410,95 @@ namespace casadi {
              "Using BFGS updates instead.\n");
       hess_update_ = 2;
       hess_scaling_ = fallback_scaling_;
+    }
+
+    // Setup feasibility restoration phase
+    if(restore_feas_) {
+      // get orignal nlp
+      Function nlp = oracle_;
+      vector<MX> resv;
+      vector<MX> argv = nlp.mx_in();
+      resv = nlp(argv);
+    
+      // build fesibility restoration phase nlp
+      MX p = MX::sym("p",nlp.size1_in(0));
+      MX s = MX::sym("s",nlp.size1_out(1));
+      vector<MX> D;
+      for( int i=0; i<nlp.size1_in(0); ++i ) {
+  	D.push_back( fmin(1.0,1.0/abs(p.nz(i))) * (argv.at(0).nz(i) - p.nz(i)) );
+      }
+      MX d = MX::vertcat(D);
+      MX f_rp = 0.5 * rho_ * dot(s,s) + zeta_/2.0 * dot(d,d);
+      MX g_rp = nlp(argv).at(1) - s;
+      
+      MXDict nlp_rp = {{"x", MX::vertcat({MX::vertcat(argv),s})},
+	               {"p", p},
+                       {"f", f_rp},
+                       {"g", g_rp}};
+      //cout << "feasibility restoration phase nlp: " << nlp_rp << endl;
+
+      /*
+      // test solving restoration problem (for example blocksqp_test.cpp)
+      Dict solver_options;
+      solver_options["globalization"] = true;
+      solver_options["which_second_derv"] = 0;
+      solver_options["restore_feas"] = false;
+      solver_options["hess_update"] = 2;
+      solver_options["hess_lim_mem"] = 1;
+      solver_options["hess_scaling"] = 2;
+      solver_options["opttol"] = opttol_;
+      solver_options["nlinfeastol"] = nlinfeastol_;
+      rp_solver_ = nlpsol("rpsolver", "blocksqp", nlp_rp, solver_options);
+      
+      DMDict solver_in;
+      solver_in["x0"]=vector<double>{1,1,2};
+      solver_in["p"]=vector<double>{1,1};
+      solver_in["lbx"]=vector<double>{-10,1.2,-inf};
+      solver_in["ubx"]=vector<double>{10,2,inf};
+      solver_in["lbg"]=-10;
+      solver_in["ubg"]=10;
+
+      auto solver_out = rp_solver_(solver_in);
+
+      vector<double> x_opt(solver_out.at("x"));
+      cout << "x_opt = " << x_opt << endl;
+      */
+
+      /*
+      // test with 1 iteration, then blocksqp::run with warmstart
+      Dict solver_options;
+      solver_options["globalization"] = true;
+      solver_options["which_second_derv"] = 0;
+      solver_options["restore_feas"] = false;
+      solver_options["hess_update"] = 2;
+      solver_options["hess_lim_mem"] = 1;
+      solver_options["hess_scaling"] = 2;
+      solver_options["opttol"] = opttol_;
+      solver_options["nlinfeastol"] = nlinfeastol_;
+      solver_options["max_iter"] = 1;
+      rp_solver_ = nlpsol("rpsolver", "blocksqp", nlp_rp, solver_options);
+
+      DMDict solver_in;
+      solver_in["x0"]=vector<double>{1,1,2};
+      solver_in["p"]=vector<double>{1,1};
+      solver_in["lbx"]=vector<double>{-10,1.2,-inf};
+      solver_in["ubx"]=vector<double>{10,2,inf};
+      solver_in["lbg"]=-10;
+      solver_in["ubg"]=10;
+
+      auto solver_out = rp_solver_(solver_in);
+
+      vector<double> x_opt(solver_out.at("x"));
+      cout << "x_opt = " << x_opt << endl;
+
+      void* mem2 = rp_solver_.memory(0);
+      auto m2 = static_cast<BlocksqpMemory*>(mem2);
+      const Blocksqp* bp = static_cast<const Blocksqp*>(rp_solver_.get());
+      bp->run(m2,1,1); // try run with warmstart <- doesn't work (getting segmentation fault (core dumped))
+      mem2 = rp_solver_.memory(0);
+      m2 = static_cast<BlocksqpMemory*>(mem2);
+      cout << "HERE OBJ AFTER SOLVE: " << m2->obj << endl;
+      */
     }
 
     // Setup NLP functions
