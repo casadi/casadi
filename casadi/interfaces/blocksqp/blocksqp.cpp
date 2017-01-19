@@ -436,9 +436,7 @@ namespace casadi {
                        {"f", f_rp},
                        {"g", g_rp}};
       //cout << "feasibility restoration phase nlp: " << nlp_rp << endl;
-
-      /*
-      // test solving restoration problem (for example blocksqp_test.cpp)
+ 
       Dict solver_options;
       solver_options["globalization"] = true;
       solver_options["which_second_derv"] = 0;
@@ -450,6 +448,8 @@ namespace casadi {
       solver_options["nlinfeastol"] = nlinfeastol_;
       rp_solver_ = nlpsol("rpsolver", "blocksqp", nlp_rp, solver_options);
       
+      /*
+      // test solving restoration problem (for example blocksqp_test.cpp)
       DMDict solver_in;
       solver_in["x0"]=vector<double>{1,1,2};
       solver_in["p"]=vector<double>{1,1};
@@ -465,8 +465,7 @@ namespace casadi {
       */
 
       /*
-      // test with 1 iteration, then blocksqp::run with warmstart
-      Dict solver_options;
+      // test with 1 iteration, then blocksqp::run with warmstart (for example blocksqp_test.cpp)
       solver_options["globalization"] = true;
       solver_options["which_second_derv"] = 0;
       solver_options["restore_feas"] = false;
