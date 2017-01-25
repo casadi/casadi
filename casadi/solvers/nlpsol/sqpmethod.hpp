@@ -159,7 +159,7 @@ namespace casadi {
     ///@}
 
     // Print options
-    bool print_header_;
+    bool print_header_, print_iteration_;
 
     /// BFGS update function
     enum BFGSMdoe { BFGS_BK, BFGS_X, BFGS_X_OLD, BFGS_GLAG, BFGS_GLAG_OLD, BFGS_NUM_IN};

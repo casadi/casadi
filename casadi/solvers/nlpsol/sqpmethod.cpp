@@ -102,6 +102,9 @@ namespace casadi {
       {"print_header",
        {OT_BOOL,
         "Print the header with problem statistics"}},
+      {"print_iteration",
+       {OT_BOOL,
+        "Print the iterations"}},
       {"min_step_size",
        {OT_DOUBLE,
         "The size (inf-norm) of the step size should not become smaller than this."}}
@@ -127,6 +130,7 @@ namespace casadi {
     string qpsol_plugin;
     Dict qpsol_options;
     print_header_ = true;
+    print_iteration_ = true;
 
     // Read user options
     for (auto&& op : opts) {
@@ -158,6 +162,8 @@ namespace casadi {
         regularize_ = op.second;
       } else if (op.first=="print_header") {
         print_header_ = op.second;
+      } else if (op.first=="print_iteration") {
+        print_iteration_ = op.second;
       }
     }
 
@@ -391,11 +397,13 @@ namespace casadi {
       double dx_norminf = casadi_norm_inf(nx_, m->dx);
 
       // Print header occasionally
-      if (iter % 10 == 0) printIteration(userOut());
+      if (print_iteration_ && iter % 10 == 0) printIteration(userOut());
 
       // Printing information about the actual iterate
-      printIteration(userOut(), iter, m->fk, pr_inf, gLag_norminf, dx_norminf,
-                     m->reg, ls_iter, ls_success);
+      if (print_iteration_) {
+        printIteration(userOut(), iter, m->fk, pr_inf, gLag_norminf, dx_norminf,
+                       m->reg, ls_iter, ls_success);
+      }
 
       // Call callback function if present
       if (!fcallback_.is_null()) {
