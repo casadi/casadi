@@ -128,6 +128,8 @@ namespace casadi {
     Nlpsol::init_memory(mem);
     auto m = static_cast<WorhpMemory*>(mem);
 
+    WorhpPreInit(&m->worhp_o, &m->worhp_w, &m->worhp_p, &m->worhp_c);
+
     // Initialize parameters to default values
     int status;
     InitParams(&status, &m->worhp_p);
@@ -158,19 +160,18 @@ namespace casadi {
     // Set work in base classes
     Nlpsol::set_work(mem, arg, res, iw, w);
 
+    // Free existing Worhp memory (except parameters)
+    m->worhp_p.initialised = false; // Avoid freeing the memory for parameters
+    if (m->worhp_o.initialised || m->worhp_w.initialised || m->worhp_c.initialised) {
+      WorhpFree(&m->worhp_o, &m->worhp_w, &m->worhp_p, &m->worhp_c);
+    }
+    m->worhp_p.initialised = true;
+
     // Number of (free) variables
     m->worhp_o.n = nx_;
 
     // Number of constraints
     m->worhp_o.m = ng_;
-
-    // Free existing Worhp memory (except parameters)
-    bool p_init_backup = m->worhp_p.initialised;
-    m->worhp_p.initialised = false; // Avoid freeing the memory for parameters
-    if (m->worhp_o.initialised || m->worhp_w.initialised || m->worhp_c.initialised) {
-      WorhpFree(&m->worhp_o, &m->worhp_w, &m->worhp_p, &m->worhp_c);
-    }
-    m->worhp_p.initialised = p_init_backup;
 
     /// Control data structure needs to be reset every time
     m->worhp_c.initialised = false;

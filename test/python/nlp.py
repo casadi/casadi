@@ -36,6 +36,7 @@ solvers= []
 if has_nlpsol("worhp")  and not args.ignore_memory_heavy:
   solvers.append(("worhp",{"worhp": {"TolOpti":1e-20}}))
   #solvers.append(("worhp",{"TolOpti":1e-20,"TolFeas":1e-20,"UserHM": False}))
+  pass
 
 if has_nlpsol("ipopt"):
   solvers.append(("ipopt",{"ipopt": {"tol": 1e-10, "derivative_test":"second-order"}}))
@@ -888,7 +889,7 @@ class NLPtests(casadiTestCase):
       if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_x"][0],0,6,str(solver))
       if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_x"][1],0,6,str(solver))
 
-      if "bonmin" not in str(Solver): self.checkarray(solver_out["lam_g"],DM([4+8.0/9,20.0/9,0]),str(solver),digits=6)
+      if "bonmin" not in str(Solver) and "worhp" not in str(Solver): self.checkarray(solver_out["lam_g"],DM([4+8.0/9,20.0/9,0]),str(solver),digits=6)
 
       self.assertAlmostEqual(solver_out["f"][0],-10-16.0/9,6,str(solver))
 
@@ -907,7 +908,7 @@ class NLPtests(casadiTestCase):
       if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_x"][0],0,6,str(solver))
       if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_x"][1],0,6,str(solver))
 
-      if "bonmin" not in str(Solver): self.checkarray(solver_out["lam_g"],DM([4+8.0/9,20.0/9,0]),str(solver),digits=6)
+      if "bonmin" not in str(Solver) and "worhp" not in str(Solver): self.checkarray(solver_out["lam_g"],DM([4+8.0/9,20.0/9,0]),str(solver),digits=6)
 
       self.assertAlmostEqual(solver_out["f"][0],-10-16.0/9,6,str(solver))
 

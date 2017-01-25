@@ -37,6 +37,11 @@ if has_nlpsol("ipopt"):
                    "tol":1e-12}
   conics.append(("nlpsol",{"nlpsol":"ipopt", "nlpsol_options.ipopt": ipopt_options},{}))
 
+if has_nlpsol("worhp"):
+  worhp_options = {"TolOpti":1e-9}
+  conics.append(("nlpsol",{"nlpsol":"worhp", "nlpsol_options.worhp": worhp_options},{}))
+
+
 if has_conic("ooqp"):
   conics.append(("ooqp",{},{"less_digits":1}))
 
@@ -453,9 +458,9 @@ class ConicTests(casadiTestCase):
 
       self.checkarray(solver_out["x"],DM([5.5,5,-10]),str(conic),digits=max(1,4-less_digits))
 
-      self.checkarray(solver_out["lam_x"],DM([0,0,-2.5]),str(conic),digits=max(1,4-less_digits))
+      if "worhp" not in str(qp_options): self.checkarray(solver_out["lam_x"],DM([0,0,-2.5]),str(conic),digits=max(1,4-less_digits))
 
-      self.checkarray(solver_out["lam_a"],DM([1.5]),str(conic),digits=max(1,4-less_digits))
+      if "worhp" not in str(qp_options): self.checkarray(solver_out["lam_a"],DM([1.5]),str(conic),digits=max(1,4-less_digits))
 
       self.assertAlmostEqual(solver_out["cost"][0],-38.375,max(1,5-less_digits),str(conic))
 
