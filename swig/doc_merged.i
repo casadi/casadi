@@ -11374,6 +11374,8 @@ A textbook SQPMethod
 | print_header           | OT_BOOL                | Print the header with  |
 |                        |                        | problem statistics     |
 +------------------------+------------------------+------------------------+
+| print_iteration        | OT_BOOL                | Print the iterations   |
++------------------------+------------------------+------------------------+
 | qpsol                  | OT_STRING              | The QP solver to be    |
 |                        |                        | used by the SQP method |
 +------------------------+------------------------+------------------------+
