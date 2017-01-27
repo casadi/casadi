@@ -124,9 +124,23 @@ namespace casadi {
     alloc_w(nx_); // for fetching diagonal entries form Hessian
   }
 
+  void worhp_print(int mode, const char message[]) {
+    if (mode & WORHP_PRINT_MESSAGE) {
+      userOut() << message << std::endl;
+    }
+    if (mode & WORHP_PRINT_WARNING) {
+      userOut<true, PL_WARN>() << message << std::endl;
+    }
+    if (mode & WORHP_PRINT_ERROR) {
+      userOut<true, PL_WARN>() << message << std::endl;
+    }
+  }
+
   void WorhpInterface::init_memory(void* mem) const {
     Nlpsol::init_memory(mem);
     auto m = static_cast<WorhpMemory*>(mem);
+
+    SetWorhpPrint(&worhp_print);
 
     WorhpPreInit(&m->worhp_o, &m->worhp_w, &m->worhp_p, &m->worhp_c);
 
