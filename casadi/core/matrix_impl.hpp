@@ -2152,6 +2152,9 @@ namespace casadi {
                                                  const std::vector<Matrix<Scalar> >& x,
                                                  const Matrix<Scalar>& x_default,
                                                  bool short_circuit) {
+    casadi_assert_message(ind.is_scalar(true),
+      "conditional: first argument must be scalar. Got " + ind.dim()+ " instead.");
+
     Matrix<Scalar> ret = x_default;
     for (int k=0; k<x.size(); ++k) {
       ret = if_else(ind==k, x[k], ret, short_circuit);

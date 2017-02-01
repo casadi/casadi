@@ -1214,5 +1214,30 @@ class Functiontests(casadiTestCase):
       with self.assertRaises(Exception):
         solver = nlpsol("solver","ipopt",nlp,{"specific_options":{ "nlp_foo" : 3}})
 
+  def test_conditional(self):
+
+    np.random.seed(5)
+
+    x = MX.sym('x',2,2)
+    y = MX.sym('y',2,2)
+
+    sp1 = MX.sym('y',Sparsity.lower(2))
+    sp2 = MX.sym('z',Sparsity.diag(2))
+
+    f1 = Function("f",[sp2,x],[x**2,x*sp2])
+    f2 = Function("f",[sp1,x],[2*x**2,sin(sp1)])
+    f3 = Function("f",[sp1,sp2],[sp1*sp2,sp1+sp2])
+
+    F = Function.conditional("test",[f1,f2], f3)
+    Fsx = F.expand()
+
+    A = np.random.random((2,2))
+    B = np.random.random((2,2))
+
+    for i in range(3):
+      self.checkfunction(F,Fsx,inputs = [i,A,B])
+      self.check_codegen(F,inputs=[i,A,B])
+
+
 if __name__ == '__main__':
     unittest.main()

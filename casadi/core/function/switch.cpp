@@ -91,6 +91,10 @@ namespace casadi {
     // Buffer for mismatching sparsities
     size_t sz_buf=0;
 
+    // Needed for SX expansion
+    for (int i=0; i<n_out(); ++i) alloc_w(nnz_out(i), true);
+    alloc_res(n_out(), true);
+
     // Get required work
     for (int k=0; k<=f_.size(); ++k) {
       const Function& fk = k<f_.size() ? f_[k] : f_def_;
@@ -106,7 +110,7 @@ namespace casadi {
       for (int i=1; i<n_in(); ++i) {
         const Sparsity& s = fk.sparsity_in(i-1);
         if (s!=sparsity_in(i)) {
-          alloc_w(s.size1()); // for casadi_project
+          alloc_w(s.size1(), true); // for casadi_project
           sz_buf_k += s.nnz();
         }
       }
@@ -115,7 +119,7 @@ namespace casadi {
       for (int i=0; i<n_out(); ++i) {
         const Sparsity& s = fk.sparsity_out(i);
         if (s!=sparsity_out(i)) {
-          alloc_w(s.size1()); // for casadi_project
+          alloc_w(s.size1(), true); // for casadi_project
           sz_buf_k += s.nnz();
         }
       }
@@ -253,6 +257,87 @@ namespace casadi {
       const Function& fk = k<f_.size() ? f_[k] : f_def_;
       fk->addDependency(g);
     }
+  }
+
+  void Switch::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
+
+    // Shorthands
+    int n_in=this->n_in()-1, n_out=this->n_out();
+
+    // Input and output buffers
+    const SXElem** arg1 = arg + 1 + n_in;
+    SXElem** res1 = res + n_out;
+    SXElem** res_temp = res1 + n_out;
+
+    for (int k=0; k<f_.size()+1; ++k) {
+
+      // Local work vector
+      SXElem* wl = w;
+
+      if (k==0) {
+        // For the default case, redirect the temporary results to res
+        copy_n(res, n_out, res_temp);
+        for (int i=0; i<n_out; ++i) wl += nnz_out(i);
+      } else {
+        // For the other cases, store the temporary results
+        for (int i=0; i<n_out; ++i) {
+          res_temp[i] = wl;
+          wl += nnz_out(i);
+        }
+      }
+
+      copy_n(arg+1, n_in, arg1);
+      copy_n(res_temp, n_out, res1);
+
+      const Function& fk = k==0 ? f_def_ : f_[k-1];
+
+      // Project arguments with different sparsity
+      for (int i=0; i<n_in; ++i) {
+        if (arg1[i]) {
+          const Sparsity& f_sp = fk.sparsity_in(i);
+          const Sparsity& sp = sparsity_in(i+1);
+          if (f_sp!=sp) {
+            SXElem *t = wl; wl += f_sp.nnz(); // t is non-const
+            casadi_project(arg1[i], sp, t, f_sp, wl);
+            arg1[i] = t;
+          }
+        }
+      }
+
+      // Temporary memory for results with different sparsity
+      for (int i=0; i<n_out; ++i) {
+        if (res1[i]) {
+          const Sparsity& f_sp = fk.sparsity_out(i);
+          const Sparsity& sp = sparsity_out(i);
+          if (f_sp!=sp) res1[i] = wl; wl += f_sp.nnz();
+        }
+      }
+
+      // Evaluate the corresponding function
+      fk(arg1, res1, iw, wl, 0);
+
+      // Project results with different sparsity
+      for (int i=0; i<n_out; ++i) {
+        if (res1[i]) {
+          const Sparsity& f_sp = fk.sparsity_out(i);
+          const Sparsity& sp = sparsity_out(i);
+          if (f_sp!=sp) casadi_project(res1[i], f_sp, res_temp[i], sp, wl);
+        }
+      }
+
+      if (k>0) { // output the temporary results via an if_else
+        SXElem cond = k-1==arg[0][0];
+        for (int i=0; i<n_out; ++i) {
+          if (res[i]) {
+            for (int j=0; j<nnz_out(i); ++j) {
+              res[i][j] = if_else(cond, res_temp[i][j], res[i][j], true);
+            }
+          }
+        }
+      }
+
+    }
+
   }
 
   void Switch::generateBody(CodeGenerator& g) const {

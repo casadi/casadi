@@ -67,6 +67,9 @@ namespace casadi {
     /** \brief  Evaluate numerically, work vectors given */
     virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
 
+    /** \brief  evaluate symbolically while also propagating directional derivatives */
+    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const;
+
     ///@{
     /** \brief Generate a function that calculates \a nfwd forward derivatives */
     virtual Function get_forward(const std::string& name, int nfwd,
