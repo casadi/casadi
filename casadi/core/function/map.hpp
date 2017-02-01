@@ -58,6 +58,9 @@ namespace casadi {
     }
     /// @}
 
+    /** \brief Get default input value */
+    virtual double default_in(int ind) const { return f_.default_in(ind);}
+
     ///@{
     /** \brief Number of function inputs and outputs */
     virtual size_t get_n_in() { return f_.n_in();}
