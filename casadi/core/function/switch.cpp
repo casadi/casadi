@@ -91,10 +91,6 @@ namespace casadi {
     // Buffer for mismatching sparsities
     size_t sz_buf=0;
 
-    // Needed for SX expansion
-    for (int i=0; i<n_out(); ++i) alloc_w(nnz_out(i), true);
-    alloc_res(n_out(), true);
-
     // Get required work
     for (int k=0; k<=f_.size(); ++k) {
       const Function& fk = k<f_.size() ? f_[k] : f_def_;
@@ -110,7 +106,7 @@ namespace casadi {
       for (int i=1; i<n_in(); ++i) {
         const Sparsity& s = fk.sparsity_in(i-1);
         if (s!=sparsity_in(i)) {
-          alloc_w(s.size1(), true); // for casadi_project
+          alloc_w(s.size1()); // for casadi_project
           sz_buf_k += s.nnz();
         }
       }
@@ -119,7 +115,7 @@ namespace casadi {
       for (int i=0; i<n_out(); ++i) {
         const Sparsity& s = fk.sparsity_out(i);
         if (s!=sparsity_out(i)) {
-          alloc_w(s.size1(), true); // for casadi_project
+          alloc_w(s.size1()); // for casadi_project
           sz_buf_k += s.nnz();
         }
       }
@@ -164,7 +160,7 @@ namespace casadi {
       if (res1[i]) {
         const Sparsity& f_sp = fk.sparsity_out(i);
         const Sparsity& sp = sparsity_out(i);
-        if (f_sp!=sp) res1[i] = w; w += f_sp.nnz();
+        if (f_sp!=sp) { res1[i] = w; w += f_sp.nnz();}
       }
     }
 
@@ -267,22 +263,28 @@ namespace casadi {
     // Input and output buffers
     const SXElem** arg1 = arg + 1 + n_in;
     SXElem** res1 = res + n_out;
-    SXElem** res_temp = res1 + n_out;
+
+    // Extra memory needed for chaining if_else calls
+    std::vector<SXElem> w_extra(nnz_out());
+    std::vector<SXElem*> res_tempv(n_out);
+    SXElem** res_temp = get_ptr(res_tempv);
 
     for (int k=0; k<f_.size()+1; ++k) {
 
       // Local work vector
       SXElem* wl = w;
 
+      // Local work vector
+      SXElem* wll = get_ptr(w_extra);
+
       if (k==0) {
         // For the default case, redirect the temporary results to res
         copy_n(res, n_out, res_temp);
-        for (int i=0; i<n_out; ++i) wl += nnz_out(i);
       } else {
         // For the other cases, store the temporary results
         for (int i=0; i<n_out; ++i) {
-          res_temp[i] = wl;
-          wl += nnz_out(i);
+          res_temp[i] = wll;
+          wll += nnz_out(i);
         }
       }
 
@@ -309,7 +311,7 @@ namespace casadi {
         if (res1[i]) {
           const Sparsity& f_sp = fk.sparsity_out(i);
           const Sparsity& sp = sparsity_out(i);
-          if (f_sp!=sp) res1[i] = wl; wl += f_sp.nnz();
+          if (f_sp!=sp) { res1[i] = wl; wl += f_sp.nnz();}
         }
       }
 
@@ -400,8 +402,8 @@ namespace casadi {
             const Sparsity& f_sp = fk.sparsity_out(i);
             const Sparsity& sp = sparsity_out(i);
             if (f_sp!=sp) {
-              g.body << "    if (res1[" << i << "]) "
-                     << "res1[" << i << "] = w, w += " << f_sp.nnz() << ";" << endl;
+              g.body << "    if (res1[" << i << "]) {"
+                     << "res1[" << i << "] = w; w += " << f_sp.nnz() << ";}" << endl;
             }
           }
 
