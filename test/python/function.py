@@ -1234,7 +1234,7 @@ class Functiontests(casadiTestCase):
     A = np.random.random((2,2))
     B = np.random.random((2,2))
 
-    for i in range(3) + [-1]:
+    for i in list(range(3)) + [-1]:
       self.checkfunction(F,Fsx,inputs = [i,A,B])
       self.check_codegen(F,inputs=[i,A,B])
 
