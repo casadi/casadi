@@ -398,7 +398,8 @@ namespace casadi {
     rev(get_ptr(arg), get_ptr(res), get_ptr(iw), get_ptr(w), 0);
   }
 
-  Function Function::mapaccum(const string& name, int n, int n_accum, const Dict& opts) {
+  Function Function::mapaccum(const string& name, int n, int n_accum,
+                              const Dict& opts) const {
     // Shorthands
     int n_in = this->n_in(), n_out = this->n_out();
     // Consistency checks
@@ -444,7 +445,7 @@ namespace casadi {
   Function Function::mapaccum(const string& name, int n,
                               const vector<int>& accum_in,
                               const vector<int>& accum_out,
-                              const Dict& opts) {
+                              const Dict& opts) const {
     // Shorthands
     int n_in = this->n_in(), n_out = this->n_out();
     // Consistency checks
@@ -474,7 +475,7 @@ namespace casadi {
   Function Function::mapaccum(const string& name, int n,
                               const vector<string>& accum_in,
                               const vector<string>& accum_out,
-                              const Dict& opts) {
+                              const Dict& opts) const {
     vector<int> accum_in_num, accum_out_num;
     for (const string& s : accum_in) accum_in_num.push_back(index_in(s));
     for (const string& s : accum_out) accum_out_num.push_back(index_out(s));
