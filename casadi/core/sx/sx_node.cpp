@@ -112,10 +112,6 @@ namespace casadi {
     casadi_error("child() not defined for class " << typeid(*this).name());
   }
 
-  SXElem& SXNode::dep(int i) {
-    casadi_error("child() not defined for class " << typeid(*this).name());
-  }
-
   bool SXNode::is_smooth() const {
     return true; // nodes are smooth by default
   }

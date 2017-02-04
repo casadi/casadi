@@ -69,7 +69,7 @@ class CASADI_EXPORT BinarySX : public SXNode {
       // Start destruction method if any of the dependencies has dependencies
       for (int c1=0; c1<2; ++c1) {
         // Get the node of the dependency and remove it from the smart pointer
-        SXNode* n1 = dep(c1).assignNoDelete(casadi_limits<SXElem>::nan);
+        SXNode* n1 = const_cast<SXElem&>(dep(c1)).assignNoDelete(casadi_limits<SXElem>::nan);
 
         // Check if this was the last reference
         if (n1->count==0) {
@@ -99,7 +99,7 @@ class CASADI_EXPORT BinarySX : public SXNode {
 
                 // Get the node of the dependency of the top element
                 // and remove it from the smart pointer
-                SXNode *n2 = t->dep(c2).assignNoDelete(casadi_limits<SXElem>::nan);
+                SXNode *n2 = const_cast<SXElem&>(t->dep(c2)).assignNoDelete(casadi_limits<SXElem>::nan);
 
                 // Check if this is the only reference to the element
                 if (n2->count == 0) {
@@ -152,7 +152,6 @@ class CASADI_EXPORT BinarySX : public SXNode {
 
     /** \brief  get the reference of a dependency */
     virtual const SXElem& dep(int i) const { return i==0 ? dep0_ : dep1_;}
-    virtual SXElem& dep(int i) { return i==0 ? dep0_ : dep1_;}
 
     /** \brief  Get the operation */
     virtual int op() const { return op_;}
@@ -179,11 +178,12 @@ class CASADI_EXPORT BinarySX : public SXNode {
       return ss.str();
     }
 
+  protected:
     /** \brief  The binary operation as an 1 byte integer (allows 256 values) */
-    unsigned char op_;
+    const unsigned char op_;
 
     /** \brief  The dependencies of the node */
-    SXElem dep0_, dep1_;
+    const SXElem dep0_, dep1_;
 };
 
 } // namespace casadi

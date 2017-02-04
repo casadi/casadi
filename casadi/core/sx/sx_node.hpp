@@ -89,9 +89,6 @@ namespace casadi {
     /** \brief  get the reference of a child */
     virtual const SXElem& dep(int i) const;
 
-    /** \brief  get the reference of a child */
-    virtual SXElem& dep(int i);
-
     /** \brief  Check if smooth */
     virtual bool is_smooth() const;
 

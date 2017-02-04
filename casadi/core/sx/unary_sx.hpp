@@ -77,7 +77,6 @@ class CASADI_EXPORT UnarySX : public SXNode {
 
     /** \brief  get the reference of a dependency */
     virtual const SXElem& dep(int i) const { return dep_; }
-    virtual SXElem& dep(int i) { return dep_; }
 
     /** \brief  Get the operation */
     virtual int op() const { return op_;}
@@ -98,11 +97,12 @@ class CASADI_EXPORT UnarySX : public SXNode {
       return ss.str();
     }
 
+  protected:
     /** \brief  The binary operation as an 1 byte integer (allows 256 values) */
-    unsigned char op_;
+    const unsigned char op_;
 
     /** \brief  The dependencies of the node */
-    SXElem dep_;
+    const SXElem dep_;
 };
 
 } // namespace casadi
