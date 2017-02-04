@@ -259,17 +259,17 @@ namespace casadi {
   }
 
   void Function::call(const vector<DM> &arg, vector<DM> &res,
-                      bool always_inline, bool never_inline) {
+                      bool always_inline, bool never_inline) const {
     (*this)->call(arg, res, always_inline, never_inline);
   }
 
   void Function::call(const vector<SX> &arg, vector<SX>& res,
-                      bool always_inline, bool never_inline) {
+                      bool always_inline, bool never_inline) const {
     (*this)->call(arg, res, always_inline, never_inline);
   }
 
   void Function::call(const vector<MX> &arg, vector<MX>& res,
-                      bool always_inline, bool never_inline) {
+                      bool always_inline, bool never_inline) const {
     (*this)->call(arg, res, always_inline, never_inline);
   }
 
@@ -881,19 +881,19 @@ namespace casadi {
     return ss.str();
   }
 
-  vector<DM> Function::operator()(const vector<DM>& arg) {
+  vector<DM> Function::operator()(const vector<DM>& arg) const {
     vector<DM> res;
     call(arg, res);
     return res;
   }
 
-  vector<SX> Function::operator()(const vector<SX>& arg) {
+  vector<SX> Function::operator()(const vector<SX>& arg) const {
     vector<SX> res;
     call(arg, res);
     return res;
   }
 
-  vector<MX> Function::operator()(const vector<MX>& arg) {
+  vector<MX> Function::operator()(const vector<MX>& arg) const {
     vector<MX> res;
     call(arg, res);
     return res;
@@ -901,7 +901,7 @@ namespace casadi {
 
   template<typename M>
   void Function::_call(const std::map<string, M>& arg, std::map<string, M>& res,
-                       bool always_inline, bool never_inline) {
+                       bool always_inline, bool never_inline) const {
     // Get default inputs
     vector<M> arg_v(n_in());
     for (int i=0; i<arg_v.size(); ++i) {
@@ -924,36 +924,36 @@ namespace casadi {
     }
   }
 
-  const DMDict Function::operator()(const DMDict& arg) {
+  const DMDict Function::operator()(const DMDict& arg) const {
     DMDict res;
     call(arg, res);
     return res;
   }
 
-  const SXDict Function::operator()(const SXDict& arg) {
+  const SXDict Function::operator()(const SXDict& arg) const {
     SXDict res;
     call(arg, res);
     return res;
   }
 
-  const MXDict Function::operator()(const MXDict& arg) {
+  const MXDict Function::operator()(const MXDict& arg) const {
     MXDict res;
     call(arg, res);
     return res;
   }
 
   void Function::call(const DMDict& arg, DMDict& res,
-                      bool always_inline, bool never_inline) {
+                      bool always_inline, bool never_inline) const {
     return _call(arg, res, always_inline, never_inline);
   }
 
   void Function::call(const SXDict& arg, SXDict& res,
-                      bool always_inline, bool never_inline) {
+                      bool always_inline, bool never_inline) const {
     return _call(arg, res, always_inline, never_inline);
   }
 
   void Function::call(const MXDict& arg, MXDict& res,
-                      bool always_inline, bool never_inline) {
+                      bool always_inline, bool never_inline) const {
     return _call(arg, res, always_inline, never_inline);
   }
 

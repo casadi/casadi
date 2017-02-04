@@ -415,28 +415,28 @@ namespace casadi {
     ///@{
     /** \brief Evaluate the function symbolically or numerically  */
     void call(const std::vector<DM> &arg, std::vector<DM>& SWIG_OUTPUT(res),
-              bool always_inline=false, bool never_inline=false);
+              bool always_inline=false, bool never_inline=false) const;
     void call(const std::vector<SX> &arg, std::vector<SX>& SWIG_OUTPUT(res),
-              bool always_inline=false, bool never_inline=false);
+              bool always_inline=false, bool never_inline=false) const;
     void call(const std::vector<MX> &arg, std::vector<MX>& SWIG_OUTPUT(res),
-              bool always_inline=false, bool never_inline=false);
+              bool always_inline=false, bool never_inline=false) const;
     void call(const DMDict& arg, DMDict& SWIG_OUTPUT(res),
-              bool always_inline=false, bool never_inline=false);
+              bool always_inline=false, bool never_inline=false) const;
     void call(const SXDict& arg, SXDict& SWIG_OUTPUT(res),
-              bool always_inline=false, bool never_inline=false);
+              bool always_inline=false, bool never_inline=false) const;
     void call(const MXDict& arg, MXDict& SWIG_OUTPUT(res),
-              bool always_inline=false, bool never_inline=false);
+              bool always_inline=false, bool never_inline=false) const;
     ///@}
 
 #ifndef SWIG
     ///@{
     /// Functor shorthand for evaluation
-    std::vector<DM> operator()(const std::vector<DM>& arg);
-    std::vector<SX> operator()(const std::vector<SX>& arg);
-    std::vector<MX> operator()(const std::vector<MX>& arg);
-    const DMDict operator()(const DMDict& arg);
-    const SXDict operator()(const SXDict& arg);
-    const MXDict operator()(const MXDict& arg);
+    std::vector<DM> operator()(const std::vector<DM>& arg) const;
+    std::vector<SX> operator()(const std::vector<SX>& arg) const;
+    std::vector<MX> operator()(const std::vector<MX>& arg) const;
+    const DMDict operator()(const DMDict& arg) const;
+    const SXDict operator()(const SXDict& arg) const;
+    const MXDict operator()(const MXDict& arg) const;
     ///@}
 
     ///@{
@@ -479,13 +479,13 @@ namespace casadi {
 
     ///@{
     /// Functor shorthand for evaluation, single argument (only C++)
-    std::vector<DM> operator()(const DM& arg0) {
+    std::vector<DM> operator()(const DM& arg0) const {
       return operator()(std::vector<DM>{arg0});
     }
-    std::vector<SX> operator()(const SX& arg0) {
+    std::vector<SX> operator()(const SX& arg0) const {
       return operator()(std::vector<SX>{arg0});
     }
-    std::vector<MX> operator()(const MX& arg0) {
+    std::vector<MX> operator()(const MX& arg0) const {
       return operator()(std::vector<MX>{arg0});
     }
     ///@}
@@ -815,7 +815,7 @@ namespace casadi {
     /** \brief Call using a map */
     template<typename M>
     void _call(const std::map<std::string, M>& arg, std::map<std::string, M>& res,
-               bool always_inline, bool never_inline);
+               bool always_inline, bool never_inline) const;
 #endif // SWIG
     /// \endcond
 
