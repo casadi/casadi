@@ -351,7 +351,7 @@ namespace casadi {
   }
 
   template<typename D>
-  void Function::_call(vector<const D*> arg, vector<D*> res) {
+  void Function::_call(vector<const D*> arg, vector<D*> res) const {
     // Input buffer
     casadi_assert(arg.size()>=n_in());
     arg.resize(sz_arg());
@@ -369,15 +369,15 @@ namespace casadi {
   }
 
 
-  void Function::operator()(vector<const double*> arg, vector<double*> res) {
+  void Function::operator()(vector<const double*> arg, vector<double*> res) const {
     return _call(arg, res);
   }
 
-  void Function::operator()(vector<const bvec_t*> arg, vector<bvec_t*> res) {
+  void Function::operator()(vector<const bvec_t*> arg, vector<bvec_t*> res) const {
     return _call(arg, res);
   }
 
-  void Function::operator()(vector<const SXElem*> arg, vector<SXElem*> res) {
+  void Function::operator()(vector<const SXElem*> arg, vector<SXElem*> res) const {
     return _call(arg, res);
   }
 

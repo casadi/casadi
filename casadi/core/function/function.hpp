@@ -441,10 +441,10 @@ namespace casadi {
 
     ///@{
     /** \brief Evaluate with temporary memory allocation */
-    void operator()(std::vector<const double*> arg, std::vector<double*> res);
-    void operator()(std::vector<const bvec_t*> arg, std::vector<bvec_t*> res);
-    void operator()(std::vector<const SXElem*> arg, std::vector<SXElem*> res);
-    template<typename D> void _call(std::vector<const D*> arg, std::vector<D*> res);
+    void operator()(std::vector<const double*> arg, std::vector<double*> res) const;
+    void operator()(std::vector<const bvec_t*> arg, std::vector<bvec_t*> res) const;
+    void operator()(std::vector<const SXElem*> arg, std::vector<SXElem*> res) const;
+    template<typename D> void _call(std::vector<const D*> arg, std::vector<D*> res) const;
     ///@}
 
     ///@{
