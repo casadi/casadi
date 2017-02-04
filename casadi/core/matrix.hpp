@@ -713,10 +713,22 @@ namespace casadi {
 #endif
 
     /** \brief Set or reset the depth to which equalities are being checked for simplifications */
-    static void setEqualityCheckingDepth(int eq_depth=1);
+    static void set_max_depth(int eq_depth=1);
 
     /** \brief Get the depth to which equalities are being checked for simplifications */
-    static int getEqualityCheckingDepth();
+    static int get_max_depth();
+
+#ifdef WITH_DEPRECATED_FEATURES
+    /** \brief [DEPRECATED] Renamed set_max_depth */
+    static void setEqualityCheckingDepth(int eq_depth=1) {
+      set_max_depth(eq_depth);
+    }
+
+    /** \brief [DEPRECATED] Renamed get_max_depth */
+    static int getEqualityCheckingDepth() {
+      return get_max_depth();
+    }
+#endif // WITH_DEPRECATED_FEATURES
 
     /** \brief Get function input */
     static std::vector<Matrix<Scalar> > get_input(const Function& f);

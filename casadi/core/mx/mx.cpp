@@ -734,11 +734,11 @@ namespace casadi {
 
   int MX::eq_depth_ = 1;
 
-  void MX::setEqualityCheckingDepth(int eq_depth) {
+  void MX::set_max_depth(int eq_depth) {
     eq_depth_ = eq_depth;
   }
 
-  int MX::getEqualityCheckingDepth() {
+  int MX::get_max_depth() {
     return eq_depth_;
   }
 

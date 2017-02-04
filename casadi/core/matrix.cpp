@@ -72,12 +72,12 @@ namespace casadi {
   }
 
   template<>
-  void SX::setEqualityCheckingDepth(int eq_depth) {
+  void SX::set_max_depth(int eq_depth) {
     SXNode::eq_depth_ = eq_depth;
   }
 
   template<>
-  int SX::getEqualityCheckingDepth() {
+  int SX::get_max_depth() {
     return SXNode::eq_depth_;
   }
 
