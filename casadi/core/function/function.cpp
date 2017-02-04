@@ -482,7 +482,7 @@ namespace casadi {
   }
 
   Function Function::map(const string& name, const std::string& parallelization, int n,
-      const vector<int>& reduce_in, const vector<int>& reduce_out, const Dict& opts) {
+      const vector<int>& reduce_in, const vector<int>& reduce_out, const Dict& opts) const {
     // Wrap in an MXFunction
     Function f = map(n, parallelization);
     // Start with the fully mapped inputs
@@ -505,7 +505,7 @@ namespace casadi {
 
   Function Function::map(const string& name, const string& parallelization, int n,
       const vector<string>& reduce_in, const vector<string>& reduce_out,
-      const Dict& opts) {
+      const Dict& opts) const {
     vector<int> reduce_in_num, reduce_out_num;
     for (const string& s : reduce_in) reduce_in_num.push_back(index_in(s));
     for (const string& s : reduce_out) reduce_out_num.push_back(index_out(s));
@@ -513,7 +513,7 @@ namespace casadi {
   }
 
   Function
-  Function::map(int n, const std::string& parallelization) {
+  Function::map(int n, const std::string& parallelization) const {
     // Make sure not degenerate
     casadi_assert_message(n>0, "Degenerate map operation");
     // Quick return if possible

@@ -577,7 +577,7 @@ namespace casadi {
 
         \param parallelization Type of parallelization used: unroll|serial|openmp
     */
-    Function map(int n, const std::string& parallelization="serial");
+    Function map(int n, const std::string& parallelization="serial") const;
 
     ///@{
     /** \brief Map with reduction
@@ -587,11 +587,11 @@ namespace casadi {
     Function map(const std::string& name, const std::string& parallelization, int n,
       const std::vector<int>& reduce_in,
       const std::vector<int>& reduce_out,
-      const Dict& opts=Dict());
+      const Dict& opts=Dict()) const;
     Function map(const std::string& name, const std::string& parallelization, int n,
       const std::vector<std::string>& reduce_in,
       const std::vector<std::string>& reduce_out,
-      const Dict& opts=Dict());
+      const Dict& opts=Dict()) const;
     ///@}
 
     /** \brief returns a new function with a selection of inputs/outputs of the original */
