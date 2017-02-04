@@ -466,15 +466,15 @@ namespace casadi {
 
     ///@{
     /** \brief Numerical evaluation */
-    void operator()(VecArg arg, VecRes res) { (*this)(buf_in(arg), buf_out(res)); }
-    void operator()(VecArg arg, MapRes res) { (*this)(buf_in(arg), buf_out(res)); }
-    void operator()(VecArg arg, VPrRes res) { (*this)(buf_in(arg), buf_out(res)); }
-    void operator()(VecArg arg, MPrRes res) { (*this)(buf_in(arg), buf_out(res)); }
+    void operator()(VecArg arg, VecRes res) const { (*this)(buf_in(arg), buf_out(res)); }
+    void operator()(VecArg arg, MapRes res) const { (*this)(buf_in(arg), buf_out(res)); }
+    void operator()(VecArg arg, VPrRes res) const { (*this)(buf_in(arg), buf_out(res)); }
+    void operator()(VecArg arg, MPrRes res) const { (*this)(buf_in(arg), buf_out(res)); }
 
-    void operator()(MapArg arg, VecRes res) { (*this)(buf_in(arg), buf_out(res)); }
-    void operator()(MapArg arg, MapRes res) { (*this)(buf_in(arg), buf_out(res)); }
-    void operator()(MapArg arg, VPrRes res) { (*this)(buf_in(arg), buf_out(res)); }
-    void operator()(MapArg arg, MPrRes res) { (*this)(buf_in(arg), buf_out(res)); }
+    void operator()(MapArg arg, VecRes res) const { (*this)(buf_in(arg), buf_out(res)); }
+    void operator()(MapArg arg, MapRes res) const { (*this)(buf_in(arg), buf_out(res)); }
+    void operator()(MapArg arg, VPrRes res) const { (*this)(buf_in(arg), buf_out(res)); }
+    void operator()(MapArg arg, MPrRes res) const { (*this)(buf_in(arg), buf_out(res)); }
     ///@}
 
     ///@{
