@@ -76,6 +76,10 @@ class CASADI_EXPORT BinarySX : public SXNode {
         auto key = std::make_tuple(op, dep0.__hash__(), dep1.__hash__());
         // Find the key in the cache
         auto it = cached_binarysx_.find(key);
+        // If not found and op is commutative try with swapped deps.
+        // This way the same cache for e.g. x+y and y+x is used.
+        if (it==cached_binarysx_.end() && operation_checker<CommChecker>(op))
+          it = cached_binarysx_.find(std::make_tuple(op, dep1.__hash__(), dep0.__hash__()));
         if (it==cached_binarysx_.end()) { // not found -> create new object and return it
           // Allocate a new object
           BinarySX* n = new BinarySX(op, dep0, dep1);
