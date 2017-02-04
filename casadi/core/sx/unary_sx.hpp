@@ -31,7 +31,21 @@
 
 /// \cond INTERNAL
 
+#include <unordered_map>
+
 namespace casadi {
+
+// hash the key type of the UnarySX cache
+struct UnarySXCacheKeyHash
+{
+  size_t operator()(const std::tuple<int, size_t>& v) const
+  {                                              
+    std::size_t ret=0;
+    hash_combine(ret, std::get<0>(v));
+    hash_combine(ret, std::get<1>(v));
+    return ret;
+  }                                              
+};
 
 /** \brief Represents a basic unary operation on an SXElem node
   \author Joel Andersson
@@ -54,13 +68,41 @@ class CASADI_EXPORT UnarySX : public SXNode {
         casadi_math<double>::fun(op, dep_val, dep_val, ret_val);
         return ret_val;
       } else {
-        // Expression containing free variables
-        return SXElem::create(new UnarySX(op, dep));
+        // The key of the cache
+        auto key = std::make_tuple(op, dep.__hash__());
+        // Find the key in the cache
+        auto it = cached_unarysx_.find(key);
+        if (it==cached_unarysx_.end()) { // not found -> create new object and return it
+          // Allocate a new object
+          UnarySX* n = new UnarySX(op, dep);
+
+          // Add to hash_table
+          cached_unarysx_.emplace_hint(it, key, n);
+
+          // Return it to caller
+          return SXElem::create(n);
+        } else { // found -> return cached object
+          return SXElem::create(it->second);
+        }
       }
     }
 
     /** \brief Destructor */
-    virtual ~UnarySX() {}
+    virtual ~UnarySX() {
+      assert(count == 0 || count == SXNode::countToBeDeleted);
+
+      // If count == 0 then this destructor was called directly (not via the none recursive ~BinarySX hack).
+      // In this case remove this node from the cache. If count is SXNode::countToBeDeleted then this node
+      // was already removed from the cache by the call to assignNoDelete in ~BinarySX.
+      if(count==0)
+        removeFromCache();
+    }
+
+    void removeFromCache() {
+      size_t num_erased = cached_unarysx_.erase(std::make_tuple(op_, dep_.__hash__()));
+      assert(num_erased==1);
+      (void)num_erased;
+    }
 
     virtual bool is_smooth() const { return operation_checker<SmoothChecker>(op_);}
 
@@ -103,6 +145,10 @@ class CASADI_EXPORT UnarySX : public SXNode {
 
     /** \brief  The dependencies of the node */
     const SXElem dep_;
+
+    /** \brief Hash map of all binary SX currently allocated
+     * (storage is allocated for it in sx_element.cpp) */
+    static std::unordered_map<std::tuple<int, size_t>, UnarySX*, UnarySXCacheKeyHash> cached_unarysx_;
 };
 
 } // namespace casadi

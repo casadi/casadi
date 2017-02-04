@@ -33,7 +33,6 @@
 
 // Cashing of constants requires a map
 #include <unordered_map>
-#define CACHING_MAP std::unordered_map
 
 namespace casadi {
 
@@ -96,7 +95,7 @@ class CASADI_EXPORT RealtypeSX : public ConstantSX {
     /// Static creator function (use instead of constructor)
     inline static RealtypeSX* create(double value) {
       // Try to find the constant
-      CACHING_MAP<double, RealtypeSX*>::iterator it = cached_constants_.find(value);
+      std::unordered_map<double, RealtypeSX*>::iterator it = cached_constants_.find(value);
 
       // If not found, add it,
       if (it==cached_constants_.end()) {
@@ -124,7 +123,7 @@ class CASADI_EXPORT RealtypeSX : public ConstantSX {
   protected:
     /** \brief Hash map of all constants currently allocated
      * (storage is allocated for it in sx_element.cpp) */
-    static CACHING_MAP<double, RealtypeSX*> cached_constants_;
+    static std::unordered_map<double, RealtypeSX*> cached_constants_;
 
     /** \brief  Data members */
     double value;
@@ -152,7 +151,7 @@ class CASADI_EXPORT IntegerSX : public ConstantSX {
     /// Static creator function (use instead of constructor)
     inline static IntegerSX* create(int value) {
       // Try to find the constant
-      CACHING_MAP<int, IntegerSX*>::iterator it = cached_constants_.find(value);
+      std::unordered_map<int, IntegerSX*>::iterator it = cached_constants_.find(value);
 
       // If not found, add it,
       if (it==cached_constants_.end()) {
@@ -182,7 +181,7 @@ class CASADI_EXPORT IntegerSX : public ConstantSX {
 
     /** \brief Hash map of all constants currently allocated
      * (storage is allocated for it in sx_element.cpp) */
-    static CACHING_MAP<int, IntegerSX*> cached_constants_;
+    static std::unordered_map<int, IntegerSX*> cached_constants_;
 
     /** \brief  Data members */
     int value;

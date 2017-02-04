@@ -39,8 +39,10 @@ using namespace std;
 namespace casadi {
 
   // Allocate storage for the caching
-  CACHING_MAP<int, IntegerSX*> IntegerSX::cached_constants_;
-  CACHING_MAP<double, RealtypeSX*> RealtypeSX::cached_constants_;
+  std::unordered_map<int, IntegerSX*> IntegerSX::cached_constants_;
+  std::unordered_map<double, RealtypeSX*> RealtypeSX::cached_constants_;
+  std::unordered_map<tuple<int, size_t>, UnarySX*, UnarySXCacheKeyHash> UnarySX::cached_unarysx_;
+  std::unordered_map<tuple<int, size_t, size_t>, BinarySX*, BinarySXCacheKeyHash> BinarySX::cached_binarysx_;
 
   SXElem::SXElem() {
     node = casadi_limits<SXElem>::nan.node;
@@ -115,6 +117,11 @@ namespace casadi {
 
     // decrease the counter but do not delete if this was the last pointer
     --node->count;
+    // if this is the last pointer remove the node from the cache and mark the node as to be deleted.
+    if(node->count == 0) {
+      node->removeFromCache();
+      node->count = SXNode::countToBeDeleted;
+    }
 
     // save the new pointer
     node = scalar.node;

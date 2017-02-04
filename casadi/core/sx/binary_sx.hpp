@@ -31,7 +31,23 @@
 
 
 /// \cond INTERNAL
+
+#include <unordered_map>
+
 namespace casadi {
+
+// hash the key type of the BinarySX cache
+struct BinarySXCacheKeyHash
+{
+  size_t operator()(const std::tuple<int, size_t, size_t>& v) const
+  {                                              
+    std::size_t ret=0;
+    hash_combine(ret, std::get<0>(v));
+    hash_combine(ret, std::get<1>(v));
+    hash_combine(ret, std::get<2>(v));
+    return ret;
+  }                                              
+};
 
 /** \brief Represents a basic binary operation on two SXElem nodes
   \author Joel Andersson
@@ -56,8 +72,22 @@ class CASADI_EXPORT BinarySX : public SXNode {
         casadi_math<double>::fun(op, dep0_val, dep1_val, ret_val);
         return ret_val;
       } else {
-        // Expression containing free variables
-        return SXElem::create(new BinarySX(op, dep0, dep1));
+        // The key of the cache
+        auto key = std::make_tuple(op, dep0.__hash__(), dep1.__hash__());
+        // Find the key in the cache
+        auto it = cached_binarysx_.find(key);
+        if (it==cached_binarysx_.end()) { // not found -> create new object and return it
+          // Allocate a new object
+          BinarySX* n = new BinarySX(op, dep0, dep1);
+
+          // Add to hash_table
+          cached_binarysx_.emplace_hint(it, key, n);
+
+          // Return it to caller
+          return SXElem::create(n);
+        } else { // found -> return cached object
+          return SXElem::create(it->second);
+        }
       }
     }
 
@@ -66,13 +96,21 @@ class CASADI_EXPORT BinarySX : public SXNode {
     can cause stack overflow due to recursive calling.
     */
     virtual ~BinarySX() {
+      assert(count == 0 || count == SXNode::countToBeDeleted);
+
+      // If count == 0 then this destructor was called directly (not via the none recursive ~BinarySX hack).
+      // In this case remove this node from the cache. If count is SXNode::countToBeDeleted then this node
+      // was already removed from the cache by the call to assignNoDelete in ~BinarySX.
+      if(count==0)
+        removeFromCache();
+
       // Start destruction method if any of the dependencies has dependencies
       for (int c1=0; c1<2; ++c1) {
         // Get the node of the dependency and remove it from the smart pointer
         SXNode* n1 = const_cast<SXElem&>(dep(c1)).assignNoDelete(casadi_limits<SXElem>::nan);
 
-        // Check if this was the last reference
-        if (n1->count==0) {
+        // Check if this was the last reference but node is not deleted already
+        if (n1->count==SXNode::countToBeDeleted) {
 
           // Check if binary
           if (!n1->hasDep()) { // n1 is not binary
@@ -101,8 +139,8 @@ class CASADI_EXPORT BinarySX : public SXNode {
                 // and remove it from the smart pointer
                 SXNode *n2 = const_cast<SXElem&>(t->dep(c2)).assignNoDelete(casadi_limits<SXElem>::nan);
 
-                // Check if this is the only reference to the element
-                if (n2->count == 0) {
+                // Check if this is the only reference to the element but node is not deleted already
+                if (n2->count == SXNode::countToBeDeleted) {
 
                   // Check if binary
                   if (!n2->hasDep()) {
@@ -128,6 +166,13 @@ class CASADI_EXPORT BinarySX : public SXNode {
           }
         }
       }
+    }
+
+    void removeFromCache() {
+      // remove from cache
+      size_t num_erased = cached_binarysx_.erase(std::make_tuple(op_, dep0_.__hash__(), dep1_.__hash__()));
+      assert(num_erased==1);
+      (void)num_erased;
     }
 
     virtual bool is_smooth() const { return operation_checker<SmoothChecker>(op_);}
@@ -184,6 +229,10 @@ class CASADI_EXPORT BinarySX : public SXNode {
 
     /** \brief  The dependencies of the node */
     const SXElem dep0_, dep1_;
+
+    /** \brief Hash map of all binary SX currently allocated
+     * (storage is allocated for it in sx_element.cpp) */
+    static std::unordered_map<std::tuple<int, size_t, size_t>, BinarySX*, BinarySXCacheKeyHash> cached_binarysx_;
 };
 
 } // namespace casadi
