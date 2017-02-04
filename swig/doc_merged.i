@@ -889,15 +889,15 @@ Get an atomic operation operator index.
 
 %feature("docstring") casadi::Callback::map "
 
->  Function casadi::Function::map(const std::string &name, const std::string &parallelization, int n, const std::vector< int > &reduce_in, const std::vector< int > &reduce_out, const Dict &opts=Dict())
+>  Function casadi::Function::map(const std::string &name, const std::string &parallelization, int n, const std::vector< int > &reduce_in, const std::vector< int > &reduce_out, const Dict &opts=Dict()) const
 
->  Function casadi::Function::map(const std::string &name, const std::string &parallelization, int n, const std::vector< std::string > &reduce_in, const std::vector< std::string > &reduce_out, const Dict &opts=Dict())
+>  Function casadi::Function::map(const std::string &name, const std::string &parallelization, int n, const std::vector< std::string > &reduce_in, const std::vector< std::string > &reduce_out, const Dict &opts=Dict()) const 
 ------------------------------------------------------------------------
 
 Map with reduction A subset of the inputs are non-repeated and a subset of
 the outputs summed up.
 
->  Function casadi::Function::map(int n, const std::string &parallelization=\"serial\")
+>  Function casadi::Function::map(int n, const std::string &parallelization=\"serial\") const 
 ------------------------------------------------------------------------
 
 Create a mapped version of this function.
@@ -2267,15 +2267,15 @@ the output elements).
 
 %feature("docstring") casadi::Function::map "
 
->  Function casadi::Function::map(const std::string &name, const std::string &parallelization, int n, const std::vector< int > &reduce_in, const std::vector< int > &reduce_out, const Dict &opts=Dict())
+>  Function casadi::Function::map(const std::string &name, const std::string &parallelization, int n, const std::vector< int > &reduce_in, const std::vector< int > &reduce_out, const Dict &opts=Dict()) const
 
->  Function casadi::Function::map(const std::string &name, const std::string &parallelization, int n, const std::vector< std::string > &reduce_in, const std::vector< std::string > &reduce_out, const Dict &opts=Dict())
+>  Function casadi::Function::map(const std::string &name, const std::string &parallelization, int n, const std::vector< std::string > &reduce_in, const std::vector< std::string > &reduce_out, const Dict &opts=Dict()) const 
 ------------------------------------------------------------------------
 
 Map with reduction A subset of the inputs are non-repeated and a subset of
 the outputs summed up.
 
->  Function casadi::Function::map(int n, const std::string &parallelization=\"serial\")
+>  Function casadi::Function::map(int n, const std::string &parallelization=\"serial\") const 
 ------------------------------------------------------------------------
 
 Create a mapped version of this function.

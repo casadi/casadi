@@ -346,7 +346,7 @@ Get input dimension.
 
 %feature("docstring")  casadi::Function::call(const std::vector< DM > &arg,
 std::vector< DM > &output_res, bool always_inline=false, bool
-never_inline=false) "
+never_inline=false) const  "
 
 Evaluate the function symbolically or numerically.
 
@@ -354,7 +354,7 @@ Evaluate the function symbolically or numerically.
 
 %feature("docstring")  casadi::Function::call(const std::vector< SX > &arg,
 std::vector< SX > &output_res, bool always_inline=false, bool
-never_inline=false) "
+never_inline=false) const  "
 
 Evaluate the function symbolically or numerically.
 
@@ -362,28 +362,28 @@ Evaluate the function symbolically or numerically.
 
 %feature("docstring")  casadi::Function::call(const std::vector< MX > &arg,
 std::vector< MX > &output_res, bool always_inline=false, bool
-never_inline=false) "
+never_inline=false) const  "
 
 Evaluate the function symbolically or numerically.
 
 ";
 
 %feature("docstring")  casadi::Function::call(const DMDict &arg, DMDict
-&output_res, bool always_inline=false, bool never_inline=false) "
+&output_res, bool always_inline=false, bool never_inline=false) const  "
 
 Evaluate the function symbolically or numerically.
 
 ";
 
 %feature("docstring")  casadi::Function::call(const SXDict &arg, SXDict
-&output_res, bool always_inline=false, bool never_inline=false) "
+&output_res, bool always_inline=false, bool never_inline=false) const  "
 
 Evaluate the function symbolically or numerically.
 
 ";
 
 %feature("docstring")  casadi::Function::call(const MXDict &arg, MXDict
-&output_res, bool always_inline=false, bool never_inline=false) "
+&output_res, bool always_inline=false, bool never_inline=false) const  "
 
 Evaluate the function symbolically or numerically.
 
@@ -1378,7 +1378,7 @@ Get an atomic operation operator index.
 
 %feature("docstring")  casadi::Function::map(const std::string &name, const
 std::string &parallelization, int n, const std::vector< int > &reduce_in,
-const std::vector< int > &reduce_out, const Dict &opts=Dict()) "
+const std::vector< int > &reduce_out, const Dict &opts=Dict()) const  "
 
 Map with reduction A subset of the inputs are non-repeated and a subset of
 the outputs summed up.
@@ -1388,7 +1388,7 @@ the outputs summed up.
 %feature("docstring")  casadi::Function::map(const std::string &name, const
 std::string &parallelization, int n, const std::vector< std::string >
 &reduce_in, const std::vector< std::string > &reduce_out, const Dict
-&opts=Dict()) "
+&opts=Dict()) const  "
 
 Map with reduction A subset of the inputs are non-repeated and a subset of
 the outputs summed up.
@@ -1396,7 +1396,7 @@ the outputs summed up.
 ";
 
 %feature("docstring")  casadi::Function::map(int n, const std::string
-&parallelization="serial") "
+&parallelization="serial") const  "
 
 Create a mapped version of this function.
 
@@ -1443,7 +1443,7 @@ Print all information there is to know about a certain option.
 ";
 
 %feature("docstring")  casadi::Function::mapaccum(const std::string &name,
-int n, int n_accum=1, const Dict &opts=Dict()) "
+int n, int n_accum=1, const Dict &opts=Dict()) const  "
 
 Create a mapaccumulated version of this function.
 
@@ -1480,7 +1480,7 @@ The the mapaccumulated version has the signature:
 
 %feature("docstring")  casadi::Function::mapaccum(const std::string &name,
 int n, const std::vector< int > &accum_in, const std::vector< int >
-&accum_out, const Dict &opts=Dict()) "
+&accum_out, const Dict &opts=Dict()) const  "
 
 Create a mapaccumulated version of this function.
 
@@ -1517,7 +1517,7 @@ The the mapaccumulated version has the signature:
 
 %feature("docstring")  casadi::Function::mapaccum(const std::string &name,
 int n, const std::vector< std::string > &accum_in, const std::vector<
-std::string > &accum_out, const Dict &opts=Dict()) "
+std::string > &accum_out, const Dict &opts=Dict()) const  "
 
 Create a mapaccumulated version of this function.
 
@@ -2890,7 +2890,7 @@ Get all the free variables of the function.
 ";
 
 %feature("docstring")  casadi::Function::mapaccum(const std::string &name,
-int n, int n_accum=1, const Dict &opts=Dict()) "
+int n, int n_accum=1, const Dict &opts=Dict()) const  "
 
 Create a mapaccumulated version of this function.
 
@@ -2927,7 +2927,7 @@ The the mapaccumulated version has the signature:
 
 %feature("docstring")  casadi::Function::mapaccum(const std::string &name,
 int n, const std::vector< int > &accum_in, const std::vector< int >
-&accum_out, const Dict &opts=Dict()) "
+&accum_out, const Dict &opts=Dict()) const  "
 
 Create a mapaccumulated version of this function.
 
@@ -2964,7 +2964,7 @@ The the mapaccumulated version has the signature:
 
 %feature("docstring")  casadi::Function::mapaccum(const std::string &name,
 int n, const std::vector< std::string > &accum_in, const std::vector<
-std::string > &accum_out, const Dict &opts=Dict()) "
+std::string > &accum_out, const Dict &opts=Dict()) const  "
 
 Create a mapaccumulated version of this function.
 
@@ -3380,7 +3380,7 @@ the output elements).
 
 %feature("docstring")  casadi::Function::map(const std::string &name, const
 std::string &parallelization, int n, const std::vector< int > &reduce_in,
-const std::vector< int > &reduce_out, const Dict &opts=Dict()) "
+const std::vector< int > &reduce_out, const Dict &opts=Dict()) const  "
 
 Map with reduction A subset of the inputs are non-repeated and a subset of
 the outputs summed up.
@@ -3390,7 +3390,7 @@ the outputs summed up.
 %feature("docstring")  casadi::Function::map(const std::string &name, const
 std::string &parallelization, int n, const std::vector< std::string >
 &reduce_in, const std::vector< std::string > &reduce_out, const Dict
-&opts=Dict()) "
+&opts=Dict()) const  "
 
 Map with reduction A subset of the inputs are non-repeated and a subset of
 the outputs summed up.
@@ -3398,7 +3398,7 @@ the outputs summed up.
 ";
 
 %feature("docstring")  casadi::Function::map(int n, const std::string
-&parallelization="serial") "
+&parallelization="serial") const  "
 
 Create a mapped version of this function.
 
@@ -3911,7 +3911,7 @@ Get input dimension.
 
 %feature("docstring")  casadi::Function::call(const std::vector< DM > &arg,
 std::vector< DM > &output_res, bool always_inline=false, bool
-never_inline=false) "
+never_inline=false) const  "
 
 Evaluate the function symbolically or numerically.
 
@@ -3919,7 +3919,7 @@ Evaluate the function symbolically or numerically.
 
 %feature("docstring")  casadi::Function::call(const std::vector< SX > &arg,
 std::vector< SX > &output_res, bool always_inline=false, bool
-never_inline=false) "
+never_inline=false) const  "
 
 Evaluate the function symbolically or numerically.
 
@@ -3927,28 +3927,28 @@ Evaluate the function symbolically or numerically.
 
 %feature("docstring")  casadi::Function::call(const std::vector< MX > &arg,
 std::vector< MX > &output_res, bool always_inline=false, bool
-never_inline=false) "
+never_inline=false) const  "
 
 Evaluate the function symbolically or numerically.
 
 ";
 
 %feature("docstring")  casadi::Function::call(const DMDict &arg, DMDict
-&output_res, bool always_inline=false, bool never_inline=false) "
+&output_res, bool always_inline=false, bool never_inline=false) const  "
 
 Evaluate the function symbolically or numerically.
 
 ";
 
 %feature("docstring")  casadi::Function::call(const SXDict &arg, SXDict
-&output_res, bool always_inline=false, bool never_inline=false) "
+&output_res, bool always_inline=false, bool never_inline=false) const  "
 
 Evaluate the function symbolically or numerically.
 
 ";
 
 %feature("docstring")  casadi::Function::call(const MXDict &arg, MXDict
-&output_res, bool always_inline=false, bool never_inline=false) "
+&output_res, bool always_inline=false, bool never_inline=false) const  "
 
 Evaluate the function symbolically or numerically.
 
