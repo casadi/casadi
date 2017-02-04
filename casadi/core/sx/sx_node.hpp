@@ -30,6 +30,7 @@
 #include <string>
 #include <sstream>
 #include <math.h>
+#include <climits>
 
 /** \brief  Scalar expression (which also works as a smart pointer class to this class) */
 #include "sx_elem.hpp"
@@ -125,7 +126,7 @@ namespace casadi {
 
     // A special value for count which means that the count is 0 but the SXNode is not deleted but about to be deleted.
     // (only used in BinarySX::~BinarySX to avoid a recursive call of this destructor)
-    static const decltype(count) countToBeDeleted = std::numeric_limits<decltype(count)>::max();
+    static const decltype(count) countToBeDeleted = UINT_MAX;
 
     virtual void removeFromCache() {}
   };
