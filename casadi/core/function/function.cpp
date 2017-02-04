@@ -381,7 +381,7 @@ namespace casadi {
     return _call(arg, res);
   }
 
-  void Function::rev(std::vector<bvec_t*> arg, std::vector<bvec_t*> res) {
+  void Function::rev(std::vector<bvec_t*> arg, std::vector<bvec_t*> res) const {
     // Input buffer
     casadi_assert(arg.size()>=n_in());
     arg.resize(sz_arg());

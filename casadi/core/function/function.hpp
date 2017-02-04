@@ -505,7 +505,7 @@ namespace casadi {
     void rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem=0) const;
 
     /** \brief Propagate sparsity backward with temporary memory allocation */
-    void rev(std::vector<bvec_t*> arg, std::vector<bvec_t*> res);
+    void rev(std::vector<bvec_t*> arg, std::vector<bvec_t*> res) const;
 
 #endif // SWIG
 
