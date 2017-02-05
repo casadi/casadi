@@ -2539,7 +2539,7 @@ namespace casadi {
   }
 
   void FunctionInternal::generate_lifted(Function& vdef_fcn,
-                                                  Function& vinit_fcn) {
+                                         Function& vinit_fcn) const {
     casadi_error("'generate_lifted' only defined for 'mxfunction'");
   }
 

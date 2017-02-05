@@ -755,7 +755,7 @@ namespace casadi {
 
     /** \brief Extract the functions needed for the Lifted Newton method */
     void generate_lifted(Function& SWIG_OUTPUT(vdef_fcn),
-                                  Function& SWIG_OUTPUT(vinit_fcn));
+                         Function& SWIG_OUTPUT(vinit_fcn)) const;
 
     /** \brief Get the number of atomic operations */
     int getAlgorithmSize() const;

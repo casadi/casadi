@@ -1023,7 +1023,7 @@ namespace casadi {
     return (*this)->has_free();
   }
 
-  void Function::generate_lifted(Function& vdef_fcn, Function& vinit_fcn) {
+  void Function::generate_lifted(Function& vdef_fcn, Function& vinit_fcn) const {
     (*this)->generate_lifted(vdef_fcn, vinit_fcn);
   }
 

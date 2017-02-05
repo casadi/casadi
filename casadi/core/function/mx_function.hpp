@@ -119,7 +119,7 @@ namespace casadi {
 
     /** \brief Extract the residual function G and the modified function Z out of an expression
      * (see Albersmeyer2010 paper) */
-    void generate_lifted(Function& vdef_fcn, Function& vinit_fcn);
+    void generate_lifted(Function& vdef_fcn, Function& vinit_fcn) const;
 
     /** Inline calls? */
     virtual bool should_inline(bool always_inline, bool never_inline) const {
