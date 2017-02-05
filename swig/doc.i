@@ -390,7 +390,7 @@ Evaluate the function symbolically or numerically.
 ";
 
 %feature("docstring")  casadi::Function::generate_dependencies(const
-std::string &fname, const Dict &opts=Dict()) "
+std::string &fname, const Dict &opts=Dict()) const  "
 
 Export / Generate C code for the dependency function.
 
@@ -617,13 +617,14 @@ Print dimensions of inputs and outputs.
 ";
 
 %feature("docstring")  casadi::Function::generate(const std::string &fname,
-const Dict &opts=Dict()) "
+const Dict &opts=Dict()) const  "
 
 Export / Generate C code for the function.
 
 ";
 
-%feature("docstring")  casadi::Function::generate(const Dict &opts=Dict()) "
+%feature("docstring")  casadi::Function::generate(const Dict &opts=Dict())
+const  "
 
 Export / Generate C code for the function.
 
@@ -1017,36 +1018,37 @@ no cached version is available.
 ";
 
 %feature("docstring")  casadi::Function::sparsity_jac(int iind=0, int
-oind=0, bool compact=false, bool symmetric=false) "
+oind=0, bool compact=false, bool symmetric=false) const  "
 
 Get, if necessary generate, the sparsity of a Jacobian block
 
 ";
 
 %feature("docstring")  casadi::Function::sparsity_jac(const std::string
-&iind, int oind=0, bool compact=false, bool symmetric=false) "
+&iind, int oind=0, bool compact=false, bool symmetric=false) const  "
 
 Get, if necessary generate, the sparsity of a Jacobian block
 
 ";
 
 %feature("docstring")  casadi::Function::sparsity_jac(int iind, const
-std::string &oind, bool compact=false, bool symmetric=false) "
+std::string &oind, bool compact=false, bool symmetric=false) const  "
 
 Get, if necessary generate, the sparsity of a Jacobian block
 
 ";
 
 %feature("docstring")  casadi::Function::sparsity_jac(const std::string
-&iind, const std::string &oind, bool compact=false, bool symmetric=false) "
+&iind, const std::string &oind, bool compact=false, bool symmetric=false)
+const  "
 
 Get, if necessary generate, the sparsity of a Jacobian block
 
 ";
 
-%feature("docstring")  casadi::Function::rootfinder_fun() "
+%feature("docstring")  casadi::Function::rootfinder_fun() const  "
 
-Access rhs function for a rootfinder.
+[DEPRECATED] Use oracle() instead
 
 ";
 
@@ -1293,7 +1295,7 @@ const std::string &oind) "
 ";
 
 %feature("docstring")  casadi::Function::mapsum(const std::vector< MX >
-&arg, const std::string &parallelization="serial") "
+&arg, const std::string &parallelization="serial") const  "
 
 Evaluate symbolically in parallel and sum (matrix graph)
 
@@ -1648,7 +1650,7 @@ adheres to SCHEME_NLPINput
 ";
 
 %feature("docstring")  casadi::Function::generate_lifted(Function
-&output_vdef_fcn, Function &output_vinit_fcn) "
+&output_vdef_fcn, Function &output_vinit_fcn) const  "
 
 Extract the functions needed for the Lifted Newton method.
 
@@ -2877,7 +2879,7 @@ guarantee that subsequent calls return unique answers.
 ";
 
 %feature("docstring")  casadi::Function::generate_dependencies(const
-std::string &fname, const Dict &opts=Dict()) "
+std::string &fname, const Dict &opts=Dict()) const  "
 
 Export / Generate C code for the dependency function.
 
@@ -3201,7 +3203,7 @@ returns a new function with a selection of inputs/outputs of the original
 ";
 
 %feature("docstring")  casadi::Function::mapsum(const std::vector< MX >
-&arg, const std::string &parallelization="serial") "
+&arg, const std::string &parallelization="serial") const  "
 
 Evaluate symbolically in parallel and sum (matrix graph)
 
@@ -3238,28 +3240,29 @@ For a particular output or for all of the outputs
 ";
 
 %feature("docstring")  casadi::Function::sparsity_jac(int iind=0, int
-oind=0, bool compact=false, bool symmetric=false) "
+oind=0, bool compact=false, bool symmetric=false) const  "
 
 Get, if necessary generate, the sparsity of a Jacobian block
 
 ";
 
 %feature("docstring")  casadi::Function::sparsity_jac(const std::string
-&iind, int oind=0, bool compact=false, bool symmetric=false) "
+&iind, int oind=0, bool compact=false, bool symmetric=false) const  "
 
 Get, if necessary generate, the sparsity of a Jacobian block
 
 ";
 
 %feature("docstring")  casadi::Function::sparsity_jac(int iind, const
-std::string &oind, bool compact=false, bool symmetric=false) "
+std::string &oind, bool compact=false, bool symmetric=false) const  "
 
 Get, if necessary generate, the sparsity of a Jacobian block
 
 ";
 
 %feature("docstring")  casadi::Function::sparsity_jac(const std::string
-&iind, const std::string &oind, bool compact=false, bool symmetric=false) "
+&iind, const std::string &oind, bool compact=false, bool symmetric=false)
+const  "
 
 Get, if necessary generate, the sparsity of a Jacobian block
 
@@ -3853,21 +3856,22 @@ are kept internally
 ";
 
 %feature("docstring")  casadi::Function::generate(const std::string &fname,
-const Dict &opts=Dict()) "
+const Dict &opts=Dict()) const  "
 
 Export / Generate C code for the function.
 
 ";
 
-%feature("docstring")  casadi::Function::generate(const Dict &opts=Dict()) "
+%feature("docstring")  casadi::Function::generate(const Dict &opts=Dict())
+const  "
 
 Export / Generate C code for the function.
 
 ";
 
-%feature("docstring")  casadi::Function::rootfinder_fun() "
+%feature("docstring")  casadi::Function::rootfinder_fun() const  "
 
-Access rhs function for a rootfinder.
+[DEPRECATED] Use oracle() instead
 
 ";
 
@@ -3981,7 +3985,7 @@ Get output dimension.
 ";
 
 %feature("docstring")  casadi::Function::generate_lifted(Function
-&output_vdef_fcn, Function &output_vinit_fcn) "
+&output_vdef_fcn, Function &output_vinit_fcn) const  "
 
 Extract the functions needed for the Lifted Newton method.
 

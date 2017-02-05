@@ -678,7 +678,7 @@ Get, if necessary generate, the sparsity of a Jacobian block
 
 %feature("docstring") casadi::Callback::rootfinder_fun "
 
-Access rhs function for a rootfinder.
+[DEPRECATED] Use oracle() instead
 
 ";
 
@@ -2647,7 +2647,7 @@ Export / Generate C code for the function.
 
 %feature("docstring") casadi::Function::rootfinder_fun "
 
-Access rhs function for a rootfinder.
+[DEPRECATED] Use oracle() instead
 
 ";
 
