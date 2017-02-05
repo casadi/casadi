@@ -552,7 +552,7 @@ For a particular input or for all of the inputs
 
 ";
 
-%feature("docstring")  casadi::Function::forward(int nfwd) "
+%feature("docstring")  casadi::Function::forward(int nfwd) const  "
 
 Get a function that calculates nfwd forward derivatives.
 
@@ -806,7 +806,7 @@ Checkout a memory object.
 
 ";
 
-%feature("docstring")  casadi::Function::reverse(int nadj) "
+%feature("docstring")  casadi::Function::reverse(int nadj) const  "
 
 Get a function that calculates nadj adjoint derivatives.
 
@@ -1008,7 +1008,7 @@ guarantee that subsequent calls return unique answers.
 
 %feature("docstring")  casadi::Callback::get_forward(const std::string
 &name, int nfwd, const std::vector< std::string > &i_names, const
-std::vector< std::string > &o_names, const Dict &opts) "
+std::vector< std::string > &o_names, const Dict &opts) const  "
 
 Return function that calculates forward derivatives forward(nfwd) returns a
 cached instance if available, and calls  Function get_forward(int nfwd) if
@@ -1580,7 +1580,7 @@ Get sparsity of a given input.
 
 %feature("docstring")  casadi::Callback::get_reverse(const std::string
 &name, int nadj, const std::vector< std::string > &i_names, const
-std::vector< std::string > &o_names, const Dict &opts) "
+std::vector< std::string > &o_names, const Dict &opts) const  "
 
 Return function that calculates adjoint derivatives reverse(nadj) returns a
 cached instance if available, and calls  Function get_reverse(int nadj) if
@@ -3107,7 +3107,7 @@ Is a null pointer?
 
 ";
 
-%feature("docstring")  casadi::Function::forward(int nfwd) "
+%feature("docstring")  casadi::Function::forward(int nfwd) const  "
 
 Get a function that calculates nfwd forward derivatives.
 
@@ -3547,7 +3547,7 @@ guarantee that subsequent calls return unique answers.
 
 ";
 
-%feature("docstring")  casadi::Function::reverse(int nadj) "
+%feature("docstring")  casadi::Function::reverse(int nadj) const  "
 
 Get a function that calculates nadj adjoint derivatives.
 
