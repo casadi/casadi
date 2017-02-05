@@ -139,7 +139,7 @@ namespace casadi {
   ::get_forward(const std::string& name, int nfwd,
                 const std::vector<std::string>& i_names,
                 const std::vector<std::string>& o_names,
-                const Dict& opts) {
+                const Dict& opts) const {
     // Shorthands
     int n_in = this->n_in(), n_out = this->n_out();
 
@@ -192,7 +192,8 @@ namespace casadi {
   Function Map
   ::get_reverse(const std::string& name, int nadj,
                 const std::vector<std::string>& i_names,
-                const std::vector<std::string>& o_names, const Dict& opts) {
+                const std::vector<std::string>& o_names,
+                const Dict& opts) const {
     // Shorthands
     int n_in = this->n_in(), n_out = this->n_out();
 

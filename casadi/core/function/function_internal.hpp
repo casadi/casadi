@@ -227,11 +227,11 @@ namespace casadi {
     virtual void call_forward(const std::vector<MX>& arg, const std::vector<MX>& res,
                             const std::vector<std::vector<MX> >& fseed,
                             std::vector<std::vector<MX> >& fsens,
-                            bool always_inline, bool never_inline);
+                            bool always_inline, bool never_inline) const;
     virtual void call_forward(const std::vector<SX>& arg, const std::vector<SX>& res,
                             const std::vector<std::vector<SX> >& fseed,
                             std::vector<std::vector<SX> >& fsens,
-                            bool always_inline, bool never_inline);
+                            bool always_inline, bool never_inline) const;
     ///@}
 
     ///@{
@@ -239,11 +239,11 @@ namespace casadi {
     virtual void call_reverse(const std::vector<MX>& arg, const std::vector<MX>& res,
                             const std::vector<std::vector<MX> >& aseed,
                             std::vector<std::vector<MX> >& asens,
-                            bool always_inline, bool never_inline);
+                            bool always_inline, bool never_inline) const;
     virtual void call_reverse(const std::vector<SX>& arg, const std::vector<SX>& res,
                             const std::vector<std::vector<SX> >& aseed,
                             std::vector<std::vector<SX> >& asens,
-                            bool always_inline, bool never_inline);
+                            bool always_inline, bool never_inline) const;
     ///@}
 
     ///@{
@@ -296,11 +296,11 @@ namespace casadi {
      *    and calls <tt>Function get_forward(int nfwd)</tt>
      *    if no cached version is available.
      */
-    Function forward(int nfwd);
+    Function forward(int nfwd) const;
     virtual Function get_forward(const std::string& name, int nfwd,
                                  const std::vector<std::string>& i_names,
                                  const std::vector<std::string>& o_names,
-                                 const Dict& opts);
+                                 const Dict& opts) const;
     virtual int get_n_forward() const { return 0;}
     ///@}
 
@@ -310,10 +310,11 @@ namespace casadi {
      *    and calls <tt>Function get_reverse(int nadj)</tt>
      *    if no cached version is available.
      */
-    Function reverse(int nadj);
+    Function reverse(int nadj) const;
     virtual Function get_reverse(const std::string& name, int nadj,
                                  const std::vector<std::string>& i_names,
-                                 const std::vector<std::string>& o_names, const Dict& opts);
+                                 const std::vector<std::string>& o_names,
+                                 const Dict& opts) const;
     virtual int get_n_reverse() const { return 0;}
     ///@}
 
@@ -696,8 +697,8 @@ namespace casadi {
 
     ///@{
     /** \brief Calculate derivatives by multiplying the full Jacobian and multiplying */
-    virtual bool fwdViaJac(int nfwd);
-    virtual bool adjViaJac(int nadj);
+    virtual bool fwdViaJac(int nfwd) const;
+    virtual bool adjViaJac(int nadj) const;
     ///@}
 
     /// Checkout a memory object
@@ -729,16 +730,16 @@ namespace casadi {
     bool has_refcount_;
 
     /// Cache for functions to evaluate directional derivatives
-    std::vector<WeakRef> forward_, reverse_;
+    mutable std::vector<WeakRef> forward_, reverse_;
 
     /// Cache for full Jacobian
-    WeakRef full_jacobian_;
+    mutable WeakRef full_jacobian_;
 
     /// Cache for sparsities of the Jacobian blocks
-    SparseStorage<Sparsity> jac_sparsity_, jac_sparsity_compact_;
+    mutable SparseStorage<Sparsity> jac_sparsity_, jac_sparsity_compact_;
 
     /// Cache for Jacobians
-    SparseStorage<WeakRef> jac_, jac_compact_;
+    mutable SparseStorage<WeakRef> jac_, jac_compact_;
 
     /// If the function is the derivative of another function
     Function derivative_of_;
@@ -784,11 +785,13 @@ namespace casadi {
 
     /** \brief Symbolic expressions for the forward seeds */
     template<typename MatType>
-    std::vector<std::vector<MatType> > symbolicFwdSeed(int nfwd, const std::vector<MatType>& v);
+    std::vector<std::vector<MatType> >
+    symbolicFwdSeed(int nfwd, const std::vector<MatType>& v) const;
 
     /** \brief Symbolic expressions for the adjoint seeds */
     template<typename MatType>
-    std::vector<std::vector<MatType> > symbolicAdjSeed(int nadj, const std::vector<MatType>& v);
+    std::vector<std::vector<MatType> >
+    symbolicAdjSeed(int nadj, const std::vector<MatType>& v) const;
 
   protected:
     static void print_stats_line(int maxNameLen, std::string label, double n_call,
@@ -818,7 +821,8 @@ namespace casadi {
 
   template<typename MatType>
   std::vector<std::vector<MatType> >
-  FunctionInternal::symbolicFwdSeed(int nfwd, const std::vector<MatType>& v) {
+  FunctionInternal::
+  symbolicFwdSeed(int nfwd, const std::vector<MatType>& v) const {
     std::vector<std::vector<MatType> > fseed(nfwd, v);
     for (int dir=0; dir<nfwd; ++dir) {
       // Replace symbolic inputs
@@ -841,7 +845,8 @@ namespace casadi {
 
   template<typename MatType>
   std::vector<std::vector<MatType> >
-  FunctionInternal::symbolicAdjSeed(int nadj, const std::vector<MatType>& v) {
+  FunctionInternal::
+  symbolicAdjSeed(int nadj, const std::vector<MatType>& v) const {
     std::vector<std::vector<MatType> > aseed(nadj, v);
     for (int dir=0; dir<nadj; ++dir) {
       // Replace symbolic inputs

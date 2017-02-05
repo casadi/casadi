@@ -769,11 +769,11 @@ namespace casadi {
     }
   }
 
-  Function Function::forward(int nfwd) {
+  Function Function::forward(int nfwd) const {
     return (*this)->forward(nfwd);
   }
 
-  Function Function::reverse(int nadj) {
+  Function Function::reverse(int nadj) const {
     return (*this)->reverse(nadj);
   }
 

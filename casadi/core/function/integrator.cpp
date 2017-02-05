@@ -326,7 +326,7 @@ namespace casadi {
   }
 
   template<typename MatType>
-  map<string, MatType> Integrator::aug_fwd(int nfwd) {
+  map<string, MatType> Integrator::aug_fwd(int nfwd) const {
     log("Integrator::aug_fwd", "call");
 
     // Get input expressions
@@ -401,7 +401,7 @@ namespace casadi {
   }
 
   template<typename MatType>
-  map<string, MatType> Integrator::aug_adj(int nadj) {
+  map<string, MatType> Integrator::aug_adj(int nadj) const {
     log("Integrator::aug_adj", "call");
     // Get input expressions
     vector<MatType> arg = MatType::get_input(oracle_);
@@ -686,7 +686,8 @@ namespace casadi {
   Function Integrator::
   get_forward(const std::string& name, int nfwd,
               const std::vector<std::string>& i_names,
-              const std::vector<std::string>& o_names, const Dict& opts) {
+              const std::vector<std::string>& o_names,
+              const Dict& opts) const {
     log("Integrator::get_forward", "begin");
 
     // Integrator options
@@ -811,7 +812,7 @@ namespace casadi {
   get_reverse(const std::string& name, int nadj,
               const std::vector<std::string>& i_names,
               const std::vector<std::string>& o_names,
-              const Dict& opts) {
+              const Dict& opts) const {
     log("Integrator::get_reverse", "begin");
 
     // Integrator options
@@ -957,7 +958,7 @@ namespace casadi {
     return Function(name, ret_in, ret_out, i_names, o_names, opts);
   }
 
-  Dict Integrator::getDerivativeOptions(bool fwd) {
+  Dict Integrator::getDerivativeOptions(bool fwd) const {
     // Copy all options
     return opts_;
   }

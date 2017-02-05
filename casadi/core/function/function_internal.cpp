@@ -1430,7 +1430,7 @@ namespace casadi {
     return wrap().jacobian(iind, oind, compact, symmetric);
   }
 
-  Function FunctionInternal::forward(int nfwd) {
+  Function FunctionInternal::forward(int nfwd) const {
     casadi_assert(nfwd>=0);
 
     // Check if there are enough forward directions allocated
@@ -1487,7 +1487,7 @@ namespace casadi {
     return ret;
   }
 
-  Function FunctionInternal::reverse(int nadj) {
+  Function FunctionInternal::reverse(int nadj) const {
     casadi_assert(nadj>=0);
 
     // Check if there are enough adjoint directions allocated
@@ -1547,14 +1547,16 @@ namespace casadi {
   Function FunctionInternal::
   get_forward(const std::string& name, int nfwd,
               const std::vector<std::string>& i_names,
-              const std::vector<std::string>& o_names, const Dict& opts) {
+              const std::vector<std::string>& o_names,
+              const Dict& opts) const {
     casadi_error("'get_forward' not defined for " + type_name());
   }
 
   Function FunctionInternal::
   get_reverse(const std::string& name, int nadj,
               const std::vector<std::string>& i_names,
-              const std::vector<std::string>& o_names, const Dict& opts) {
+              const std::vector<std::string>& o_names,
+              const Dict& opts) const {
     casadi_error("'get_reverse' not defined for " + type_name());
   }
 
@@ -2156,7 +2158,7 @@ namespace casadi {
     return get_n_forward()>0 || get_n_reverse()>0 || hasFullJacobian();
   }
 
-  bool FunctionInternal::fwdViaJac(int nfwd) {
+  bool FunctionInternal::fwdViaJac(int nfwd) const {
     if (get_n_forward()==0) return true;
     if (jac_penalty_==-1) return false;
 
@@ -2171,7 +2173,7 @@ namespace casadi {
     return false;
   }
 
-  bool FunctionInternal::adjViaJac(int nadj) {
+  bool FunctionInternal::adjViaJac(int nadj) const {
     if (get_n_reverse()==0) return true;
     if (jac_penalty_==-1) return false;
 
@@ -2190,7 +2192,7 @@ namespace casadi {
   call_forward(const std::vector<MX>& arg, const std::vector<MX>& res,
              const std::vector<std::vector<MX> >& fseed,
              std::vector<std::vector<MX> >& fsens,
-             bool always_inline, bool never_inline) {
+             bool always_inline, bool never_inline) const {
     casadi_assert_message(!(always_inline && never_inline), "Inconsistent options");
     casadi_assert_message(!always_inline, "Class " + type_name() +
                           " cannot be inlined in an MX expression");
@@ -2227,7 +2229,7 @@ namespace casadi {
       }
 
       // Multiply the Jacobian from the right
-      MX J = fullJacobian()(arg).at(0);
+      MX J = const_cast<FunctionInternal*>(this)->fullJacobian()(arg).at(0);
       v = horzsplit(mtimes(J, horzcat(v)));
 
       // Vertical offsets
@@ -2291,7 +2293,7 @@ namespace casadi {
   call_reverse(const std::vector<MX>& arg, const std::vector<MX>& res,
              const std::vector<std::vector<MX> >& aseed,
              std::vector<std::vector<MX> >& asens,
-             bool always_inline, bool never_inline) {
+             bool always_inline, bool never_inline) const {
     casadi_assert_message(!(always_inline && never_inline), "Inconsistent options");
     casadi_assert_message(!always_inline, "Class " + type_name() +
                           " cannot be inlined in an MX expression");
@@ -2328,7 +2330,7 @@ namespace casadi {
       }
 
       // Multiply the transposed Jacobian from the right
-      MX J = fullJacobian()(arg).at(0);
+      MX J = const_cast<FunctionInternal*>(this)->fullJacobian()(arg).at(0);
       v = horzsplit(mtimes(J.T(), horzcat(v)));
 
       // Vertical offsets
@@ -2400,7 +2402,7 @@ namespace casadi {
   call_forward(const std::vector<SX>& arg, const std::vector<SX>& res,
              const std::vector<std::vector<SX> >& fseed,
              std::vector<std::vector<SX> >& fsens,
-             bool always_inline, bool never_inline) {
+             bool always_inline, bool never_inline) const {
     casadi_assert_message(!(always_inline && never_inline), "Inconsistent options");
     if (fseed.empty()) { // Quick return if no seeds
       fsens.clear();
@@ -2413,7 +2415,7 @@ namespace casadi {
   call_reverse(const std::vector<SX>& arg, const std::vector<SX>& res,
              const std::vector<std::vector<SX> >& aseed,
              std::vector<std::vector<SX> >& asens,
-             bool always_inline, bool never_inline) {
+             bool always_inline, bool never_inline) const {
     casadi_assert_message(!(always_inline && never_inline), "Inconsistent options");
     if (aseed.empty()) { // Quick return if no seeds
       asens.clear();

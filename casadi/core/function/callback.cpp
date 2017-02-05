@@ -133,7 +133,7 @@ namespace casadi {
   get_forward(const std::string& name, int nfwd,
                   const std::vector<std::string>& i_names,
                   const std::vector<std::string>& o_names,
-                  const Dict& opts) {
+                  const Dict& opts) const {
     return (*this)->FunctionInternal::get_forward(name, nfwd, i_names, o_names, opts);
   }
 
@@ -145,7 +145,7 @@ namespace casadi {
   get_reverse(const std::string& name, int nadj,
                   const std::vector<std::string>& i_names,
                   const std::vector<std::string>& o_names,
-                  const Dict& opts) {
+                  const Dict& opts) const {
     return (*this)->FunctionInternal::get_reverse(name, nadj, i_names, o_names, opts);
   }
 
