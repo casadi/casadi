@@ -45,13 +45,6 @@ namespace casadi {
     return Rootfinder::getPlugin(name).doc;
   }
 
-Function Function::rootfinder_fun() {
-    casadi_assert(!is_null());
-    Rootfinder* n = dynamic_cast<Rootfinder*>(get());
-    casadi_assert_message(n!=0, "Not a rootfinder");
-    return n->oracle();
-  }
-
   Function rootfinder(const std::string& name, const std::string& solver,
                    const Function& f, const Dict& opts) {
     Function ret;

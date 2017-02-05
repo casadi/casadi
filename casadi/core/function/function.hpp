@@ -875,8 +875,10 @@ namespace casadi {
     // Check if a particular dependency exists
     bool has_function(const std::string& fname) const;
 
-    /// Access rhs function for a rootfinder
-    Function rootfinder_fun();
+#ifdef WITH_DEPRECATED_FEATURES
+    /** [DEPRECATED] Use oracle() instead */
+    Function rootfinder_fun() const { return oracle();}
+#endif // WITH_DEPRECATED_FEATURES
 
     /** Generate native code in the interfaced language for debugging */
     void conic_debug(const std::string &filename) const;
