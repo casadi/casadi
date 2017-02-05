@@ -554,7 +554,7 @@ namespace casadi {
   }
 
   vector<MX> Function::mapsum(const vector< MX > &x,
-                              const string& parallelization) {
+                              const string& parallelization) const {
     return (*this)->mapsum_mx(x, parallelization);
   }
 

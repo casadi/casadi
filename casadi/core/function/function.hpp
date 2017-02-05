@@ -513,7 +513,7 @@ namespace casadi {
         \param parallelization Type of parallelization used: unroll|serial|openmp
     */
     std::vector<MX> mapsum(const std::vector<MX > &arg,
-                           const std::string& parallelization="serial");
+                           const std::string& parallelization="serial") const;
 
     ///@{
     /** \brief  Create a mapaccumulated version of this function
