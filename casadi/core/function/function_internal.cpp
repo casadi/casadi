@@ -2027,7 +2027,8 @@ namespace casadi {
     g.body << "#error Code generation not supported for " << type_name() << endl;
   }
 
-  std::string FunctionInternal::generate_dependencies(const std::string& fname, const Dict& opts) {
+  std::string FunctionInternal::
+  generate_dependencies(const std::string& fname, const Dict& opts) const {
     casadi_error("'generate_dependencies' not defined for " + type_name());
   }
 

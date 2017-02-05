@@ -680,13 +680,13 @@ namespace casadi {
 #endif // WITH_DEPRECATED_FEATURES
 
     /** \brief Export / Generate C code for the function */
-    std::string generate(const std::string& fname, const Dict& opts=Dict());
+    std::string generate(const std::string& fname, const Dict& opts=Dict()) const;
 
     /** \brief Export / Generate C code for the function */
-    std::string generate(const Dict& opts=Dict());
+    std::string generate(const Dict& opts=Dict()) const;
 
     /** \brief Export / Generate C code for the dependency function */
-    std::string generate_dependencies(const std::string& fname, const Dict& opts=Dict());
+    std::string generate_dependencies(const std::string& fname, const Dict& opts=Dict()) const;
 
 #ifndef SWIG
     /// \cond INTERNAL

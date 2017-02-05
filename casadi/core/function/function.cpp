@@ -794,17 +794,17 @@ namespace casadi {
     (*this)->print_free(stream);
   }
 
-  std::string Function::generate(const Dict& opts) {
+  std::string Function::generate(const Dict& opts) const {
     return generate(name(), opts);
   }
 
-  std::string Function::generate(const string& fname, const Dict& opts) {
+  std::string Function::generate(const string& fname, const Dict& opts) const {
     CodeGenerator gen(fname, opts);
     gen.add(*this);
     return gen.generate();
   }
 
-  std::string Function::generate_dependencies(const string& fname, const Dict& opts) {
+  std::string Function::generate_dependencies(const string& fname, const Dict& opts) const {
     return (*this)->generate_dependencies(fname, opts);
   }
 

@@ -442,7 +442,7 @@ namespace casadi {
     virtual void generateBody(CodeGenerator& g) const;
 
     /** \brief Export / Generate C code for the dependency function */
-    virtual std::string generate_dependencies(const std::string& fname, const Dict& opts);
+    virtual std::string generate_dependencies(const std::string& fname, const Dict& opts) const;
 
     /** \brief Is codegen supported? */
     virtual bool has_codegen() const { return false;}

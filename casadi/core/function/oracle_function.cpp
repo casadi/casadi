@@ -244,7 +244,7 @@ namespace casadi {
   }
 
   std::string OracleFunction::
-  generate_dependencies(const std::string& fname, const Dict& opts) {
+  generate_dependencies(const std::string& fname, const Dict& opts) const {
     CodeGenerator gen(fname, opts);
     gen.add(oracle_);
     for (auto&& e : all_functions_) {
