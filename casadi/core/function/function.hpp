@@ -644,17 +644,18 @@ namespace casadi {
 
     ///@{
     /// Get, if necessary generate, the sparsity of a Jacobian block
-    const Sparsity sparsity_jac(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
-    const Sparsity sparsity_jac(const std::string &iind, int oind=0, bool compact=false,
-                                bool symmetric=false) {
+    const Sparsity sparsity_jac(int iind=0, int oind=0,
+                                bool compact=false, bool symmetric=false) const;
+    const Sparsity sparsity_jac(const std::string &iind, int oind=0,
+                                bool compact=false, bool symmetric=false) const {
       return sparsity_jac(index_in(iind), oind, compact, symmetric);
     }
-    const Sparsity sparsity_jac(int iind, const std::string &oind, bool compact=false,
-                                bool symmetric=false) {
+    const Sparsity sparsity_jac(int iind, const std::string &oind,
+                                bool compact=false, bool symmetric=false) const {
       return sparsity_jac(iind, index_out(oind), compact, symmetric);
     }
     const Sparsity sparsity_jac(const std::string &iind, const std::string &oind,
-                          bool compact=false, bool symmetric=false) {
+                                bool compact=false, bool symmetric=false) const {
       return sparsity_jac(index_in(iind), index_out(oind), compact, symmetric);
     }
     ///@}

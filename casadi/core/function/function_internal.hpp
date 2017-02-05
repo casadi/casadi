@@ -517,25 +517,25 @@ namespace casadi {
     const std::string& name() const { return name_;}
 
     /// Generate the sparsity of a Jacobian block
-    virtual Sparsity getJacSparsity(int iind, int oind, bool symmetric);
+    virtual Sparsity getJacSparsity(int iind, int oind, bool symmetric) const;
 
     /// Get the sparsity pattern, forward mode
     template<bool fwd>
-    Sparsity getJacSparsityGen(int iind, int oind, bool symmetric, int gr_i=1, int gr_o=1);
+    Sparsity getJacSparsityGen(int iind, int oind, bool symmetric, int gr_i=1, int gr_o=1) const;
 
     /// A flavor of getJacSparsity that does hierarchical block structure recognition
-    Sparsity getJacSparsityHierarchical(int iind, int oind);
+    Sparsity getJacSparsityHierarchical(int iind, int oind) const;
 
     /** A flavor of getJacSparsity that does hierarchical block
     * structure recognition for symmetric Jacobians
     */
-    Sparsity getJacSparsityHierarchicalSymm(int iind, int oind);
+    Sparsity getJacSparsityHierarchicalSymm(int iind, int oind) const;
 
     /// Generate the sparsity of a Jacobian block
     void set_jac_sparsity(const Sparsity& sp, int iind, int oind, bool compact);
 
     /// Get, if necessary generate, the sparsity of a Jacobian block
-    Sparsity& sparsity_jac(int iind, int oind, bool compact, bool symmetric);
+    Sparsity& sparsity_jac(int iind, int oind, bool compact, bool symmetric) const;
 
     /// Get a vector of symbolic variables corresponding to the outputs
     virtual std::vector<MX> symbolicOutput(const std::vector<MX>& arg);

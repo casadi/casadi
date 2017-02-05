@@ -676,7 +676,8 @@ namespace casadi {
     return (*this)->_get_stats(mem);
   }
 
-  const Sparsity Function::sparsity_jac(int iind, int oind, bool compact, bool symmetric) {
+  const Sparsity Function::
+  sparsity_jac(int iind, int oind, bool compact, bool symmetric) const {
     return (*this)->sparsity_jac(iind, oind, compact, symmetric);
   }
 

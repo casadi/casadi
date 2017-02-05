@@ -547,8 +547,8 @@ namespace casadi {
   };
 
   template<bool fwd>
-  Sparsity FunctionInternal::getJacSparsityGen(int iind, int oind,
-                                               bool symmetric, int gr_i, int gr_o) {
+  Sparsity FunctionInternal::
+  getJacSparsityGen(int iind, int oind, bool symmetric, int gr_i, int gr_o) const {
     // Number of nonzero inputs and outputs
     int nz_in = nnz_in(iind);
     int nz_out = nnz_out(oind);
@@ -651,7 +651,8 @@ namespace casadi {
     return ret;
   }
 
-  Sparsity FunctionInternal::getJacSparsityHierarchicalSymm(int iind, int oind) {
+  Sparsity FunctionInternal::
+  getJacSparsityHierarchicalSymm(int iind, int oind) const {
     casadi_assert(has_spfwd());
 
     // Number of nonzero inputs
@@ -874,7 +875,8 @@ namespace casadi {
     return r.T();
   }
 
-  Sparsity FunctionInternal::getJacSparsityHierarchical(int iind, int oind) {
+  Sparsity FunctionInternal::
+  getJacSparsityHierarchical(int iind, int oind) const {
     // Number of nonzero inputs
     int nz_in = nnz_in(iind);
 
@@ -1168,7 +1170,7 @@ namespace casadi {
     return r.T();
   }
 
-  Sparsity FunctionInternal::getJacSparsity(int iind, int oind, bool symmetric) {
+  Sparsity FunctionInternal::getJacSparsity(int iind, int oind, bool symmetric) const {
     // Check if we are able to propagate dependencies through the function
     if (has_spfwd() || has_sprev()) {
       Sparsity sp;
@@ -1222,7 +1224,8 @@ namespace casadi {
     }
   }
 
-  Sparsity& FunctionInternal::sparsity_jac(int iind, int oind, bool compact, bool symmetric) {
+  Sparsity& FunctionInternal::
+  sparsity_jac(int iind, int oind, bool compact, bool symmetric) const {
     // Get an owning reference to the block
     Sparsity jsp = compact ? jac_sparsity_compact_.elem(oind, iind)
         : jac_sparsity_.elem(oind, iind);
