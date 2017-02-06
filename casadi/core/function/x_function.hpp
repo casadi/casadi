@@ -121,7 +121,7 @@ namespace casadi {
     virtual Function get_forward(const std::string& name, int nfwd,
                                  const std::vector<std::string>& i_names,
                                  const std::vector<std::string>& o_names,
-                                 const Dict& opts);
+                                 const Dict& opts) const;
     virtual int get_n_forward() const { return 64;}
     ///@}
 
@@ -130,7 +130,7 @@ namespace casadi {
     virtual Function get_reverse(const std::string& name, int nadj,
                                  const std::vector<std::string>& i_names,
                                  const std::vector<std::string>& o_names,
-                                 const Dict& opts);
+                                 const Dict& opts) const;
     virtual int get_n_reverse() const { return 64;}
     ///@}
 
@@ -158,14 +158,14 @@ namespace casadi {
                               const std::vector<MatType>& res,
                               const std::vector<std::vector<MatType> >& fseed,
                               std::vector<std::vector<MatType> >& fsens,
-                              bool always_inline, bool never_inline);
+                              bool always_inline, bool never_inline) const;
 
     /** \brief Create call to (cached) derivative function, reverse mode  */
     virtual void call_reverse(const std::vector<MatType>& arg,
                               const std::vector<MatType>& res,
                               const std::vector<std::vector<MatType> >& aseed,
                               std::vector<std::vector<MatType> >& asens,
-                              bool always_inline, bool never_inline);
+                              bool always_inline, bool never_inline) const;
 
     ///@{
     /** \brief Number of function inputs and outputs */
@@ -636,7 +636,7 @@ namespace casadi {
     }
 
     // Calculate with forward mode AD
-    static_cast<DerivedType*>(this)->eval_forward(fseed, fsens);
+    static_cast<const DerivedType*>(this)->eval_forward(fseed, fsens);
 
     // Return adjoint directional derivative
     return fsens[0].at(oind);
@@ -856,10 +856,10 @@ namespace casadi {
       if (verbose()) userOut() << "XFunction::jac making function call" << std::endl;
       if (fseed.size()>0) {
         casadi_assert(aseed.size()==0);
-        static_cast<DerivedType*>(this)->eval_forward(fseed, fsens);
+        static_cast<const DerivedType*>(this)->eval_forward(fseed, fsens);
       } else if (aseed.size()>0) {
         casadi_assert(fseed.size()==0);
-        static_cast<DerivedType*>(this)->eval_reverse(aseed, asens);
+        static_cast<const DerivedType*>(this)->eval_reverse(aseed, asens);
       }
 
       // Carry out the forward sweeps
@@ -1054,12 +1054,12 @@ namespace casadi {
   ::get_forward(const std::string& name, int nfwd,
                 const std::vector<std::string>& i_names,
                 const std::vector<std::string>& o_names,
-                const Dict& opts) {
+                const Dict& opts) const {
     // Seeds
     std::vector<std::vector<MatType> > fseed = symbolicFwdSeed(nfwd, in_), fsens;
 
     // Evaluate symbolically
-    static_cast<DerivedType*>(this)->eval_forward(fseed, fsens);
+    static_cast<const DerivedType*>(this)->eval_forward(fseed, fsens);
     casadi_assert(fsens.size()==fseed.size());
 
     // Number inputs and outputs
@@ -1098,12 +1098,12 @@ namespace casadi {
   ::get_reverse(const std::string& name, int nadj,
                 const std::vector<std::string>& i_names,
                 const std::vector<std::string>& o_names,
-                const Dict& opts) {
+                const Dict& opts) const {
     // Seeds
     std::vector<std::vector<MatType> > aseed = symbolicAdjSeed(nadj, out_), asens;
 
     // Evaluate symbolically
-    static_cast<DerivedType*>(this)->eval_reverse(aseed, asens);
+    static_cast<const DerivedType*>(this)->eval_reverse(aseed, asens);
 
     // Number inputs and outputs
     int num_in = n_in();
@@ -1181,7 +1181,7 @@ namespace casadi {
                const std::vector<MatType>& res,
                const std::vector<std::vector<MatType> >& fseed,
                std::vector<std::vector<MatType> >& fsens,
-               bool always_inline, bool never_inline) {
+               bool always_inline, bool never_inline) const {
     casadi_assert_message(!(always_inline && never_inline), "Inconsistent options");
     if (!should_inline(always_inline, never_inline)) {
       // The non-inlining version is implemented in the base class
@@ -1198,7 +1198,7 @@ namespace casadi {
     // Call inlining
     if (isInput(arg)) {
       // Argument agrees with in_, call eval_forward directly
-      static_cast<DerivedType*>(this)->eval_forward(fseed, fsens);
+      static_cast<const DerivedType*>(this)->eval_forward(fseed, fsens);
     } else {
       // Need to create a temporary function
       Function f("tmp", arg, res);
@@ -1212,7 +1212,7 @@ namespace casadi {
                const std::vector<MatType>& res,
                const std::vector<std::vector<MatType> >& aseed,
                std::vector<std::vector<MatType> >& asens,
-               bool always_inline, bool never_inline) {
+               bool always_inline, bool never_inline) const {
     casadi_assert_message(!(always_inline && never_inline), "Inconsistent options");
     if (!should_inline(always_inline, never_inline)) {
       // The non-inlining version is implemented in the base class
@@ -1229,7 +1229,7 @@ namespace casadi {
     // Call inlining
     if (isInput(arg)) {
       // Argument agrees with in_, call eval_reverse directly
-      static_cast<DerivedType*>(this)->eval_reverse(aseed, asens);
+      static_cast<const DerivedType*>(this)->eval_reverse(aseed, asens);
     } else {
       // Need to create a temporary function
       Function f("tmp", arg, res);

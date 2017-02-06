@@ -75,7 +75,7 @@ namespace casadi {
     virtual Function get_forward(const std::string& name, int nfwd,
                                  const std::vector<std::string>& i_names,
                                  const std::vector<std::string>& o_names,
-                                 const Dict& opts);
+                                 const Dict& opts) const;
     virtual int get_n_forward() const { return 64;}
     ///@}
 
@@ -84,7 +84,7 @@ namespace casadi {
     virtual Function get_reverse(const std::string& name, int nadj,
                                  const std::vector<std::string>& i_names,
                                  const std::vector<std::string>& o_names,
-                                 const Dict& opts);
+                                 const Dict& opts) const;
     virtual int get_n_reverse() const { return 64;}
     ///@}
 

@@ -243,7 +243,7 @@ namespace casadi {
   Function Dple::get_forward(const std::string& name, int nfwd,
                                const std::vector<std::string>& i_names,
                                const std::vector<std::string>& o_names,
-                               const Dict& opts) {
+                               const Dict& opts) const {
     // Symbolic A
     MX A = MX::sym("A", sparsity_in(DPLE_A));
     Function Vdotf;
@@ -272,7 +272,7 @@ namespace casadi {
   Function Dple::get_reverse(const std::string& name, int nadj,
                                const std::vector<std::string>& i_names,
                                const std::vector<std::string>& o_names,
-                               const Dict& opts) {
+                               const Dict& opts) const {
 
     // Symbolic A
     MX A = MX::sym("A", sparsity_in(DPLE_A));

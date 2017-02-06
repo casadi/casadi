@@ -45,13 +45,6 @@ namespace casadi {
     return Rootfinder::getPlugin(name).doc;
   }
 
-Function Function::rootfinder_fun() {
-    casadi_assert(!is_null());
-    Rootfinder* n = dynamic_cast<Rootfinder*>(get());
-    casadi_assert_message(n!=0, "Not a rootfinder");
-    return n->oracle();
-  }
-
   Function rootfinder(const std::string& name, const std::string& solver,
                    const Function& f, const Dict& opts) {
     Function ret;
@@ -197,7 +190,8 @@ Function Function::rootfinder_fun() {
   Function Rootfinder
   ::get_forward(const std::string& name, int nfwd,
                 const std::vector<std::string>& i_names,
-                const std::vector<std::string>& o_names, const Dict& opts) {
+                const std::vector<std::string>& o_names,
+                const Dict& opts) const {
     // Symbolic expression for the input
     vector<MX> arg = mx_in();
     arg[iin_] = MX::sym(arg[iin_].name() + "_guess",
@@ -224,7 +218,8 @@ Function Function::rootfinder_fun() {
   Function Rootfinder
   ::get_reverse(const std::string& name, int nadj,
                 const std::vector<std::string>& i_names,
-                const std::vector<std::string>& o_names, const Dict& opts) {
+                const std::vector<std::string>& o_names,
+                const Dict& opts) const {
     // Symbolic expression for the input
     vector<MX> arg = mx_in();
     arg[iin_] = MX::sym(arg[iin_].name() + "_guess",

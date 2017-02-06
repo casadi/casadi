@@ -10,6 +10,9 @@
 %exception  casadi::Function::gradient(int iind=0, int oind=0) {
  CATCH_OR_NOT(DEPRECATED_MSG("") $action)
 }
+%exception  casadi::Function::rootfinder_fun() const  {
+ CATCH_OR_NOT(DEPRECATED_MSG("") $action)
+}
 %exception  casadi::Function::setJacobian(const Function &jac, int iind=0, int oind=0, bool compact=false) {
  CATCH_OR_NOT(DEPRECATED_MSG("") $action)
 }

@@ -259,17 +259,17 @@ namespace casadi {
   }
 
   void Function::call(const vector<DM> &arg, vector<DM> &res,
-                      bool always_inline, bool never_inline) {
+                      bool always_inline, bool never_inline) const {
     (*this)->call(arg, res, always_inline, never_inline);
   }
 
   void Function::call(const vector<SX> &arg, vector<SX>& res,
-                      bool always_inline, bool never_inline) {
+                      bool always_inline, bool never_inline) const {
     (*this)->call(arg, res, always_inline, never_inline);
   }
 
   void Function::call(const vector<MX> &arg, vector<MX>& res,
-                      bool always_inline, bool never_inline) {
+                      bool always_inline, bool never_inline) const {
     (*this)->call(arg, res, always_inline, never_inline);
   }
 
@@ -351,7 +351,7 @@ namespace casadi {
   }
 
   template<typename D>
-  void Function::_call(vector<const D*> arg, vector<D*> res) {
+  void Function::_call(vector<const D*> arg, vector<D*> res) const {
     // Input buffer
     casadi_assert(arg.size()>=n_in());
     arg.resize(sz_arg());
@@ -369,19 +369,19 @@ namespace casadi {
   }
 
 
-  void Function::operator()(vector<const double*> arg, vector<double*> res) {
+  void Function::operator()(vector<const double*> arg, vector<double*> res) const {
     return _call(arg, res);
   }
 
-  void Function::operator()(vector<const bvec_t*> arg, vector<bvec_t*> res) {
+  void Function::operator()(vector<const bvec_t*> arg, vector<bvec_t*> res) const {
     return _call(arg, res);
   }
 
-  void Function::operator()(vector<const SXElem*> arg, vector<SXElem*> res) {
+  void Function::operator()(vector<const SXElem*> arg, vector<SXElem*> res) const {
     return _call(arg, res);
   }
 
-  void Function::rev(std::vector<bvec_t*> arg, std::vector<bvec_t*> res) {
+  void Function::rev(std::vector<bvec_t*> arg, std::vector<bvec_t*> res) const {
     // Input buffer
     casadi_assert(arg.size()>=n_in());
     arg.resize(sz_arg());
@@ -398,7 +398,8 @@ namespace casadi {
     rev(get_ptr(arg), get_ptr(res), get_ptr(iw), get_ptr(w), 0);
   }
 
-  Function Function::mapaccum(const string& name, int n, int n_accum, const Dict& opts) {
+  Function Function::mapaccum(const string& name, int n, int n_accum,
+                              const Dict& opts) const {
     // Shorthands
     int n_in = this->n_in(), n_out = this->n_out();
     // Consistency checks
@@ -444,7 +445,7 @@ namespace casadi {
   Function Function::mapaccum(const string& name, int n,
                               const vector<int>& accum_in,
                               const vector<int>& accum_out,
-                              const Dict& opts) {
+                              const Dict& opts) const {
     // Shorthands
     int n_in = this->n_in(), n_out = this->n_out();
     // Consistency checks
@@ -474,7 +475,7 @@ namespace casadi {
   Function Function::mapaccum(const string& name, int n,
                               const vector<string>& accum_in,
                               const vector<string>& accum_out,
-                              const Dict& opts) {
+                              const Dict& opts) const {
     vector<int> accum_in_num, accum_out_num;
     for (const string& s : accum_in) accum_in_num.push_back(index_in(s));
     for (const string& s : accum_out) accum_out_num.push_back(index_out(s));
@@ -482,7 +483,7 @@ namespace casadi {
   }
 
   Function Function::map(const string& name, const std::string& parallelization, int n,
-      const vector<int>& reduce_in, const vector<int>& reduce_out, const Dict& opts) {
+      const vector<int>& reduce_in, const vector<int>& reduce_out, const Dict& opts) const {
     // Wrap in an MXFunction
     Function f = map(n, parallelization);
     // Start with the fully mapped inputs
@@ -505,7 +506,7 @@ namespace casadi {
 
   Function Function::map(const string& name, const string& parallelization, int n,
       const vector<string>& reduce_in, const vector<string>& reduce_out,
-      const Dict& opts) {
+      const Dict& opts) const {
     vector<int> reduce_in_num, reduce_out_num;
     for (const string& s : reduce_in) reduce_in_num.push_back(index_in(s));
     for (const string& s : reduce_out) reduce_out_num.push_back(index_out(s));
@@ -513,7 +514,7 @@ namespace casadi {
   }
 
   Function
-  Function::map(int n, const std::string& parallelization) {
+  Function::map(int n, const std::string& parallelization) const {
     // Make sure not degenerate
     casadi_assert_message(n>0, "Degenerate map operation");
     // Quick return if possible
@@ -553,7 +554,7 @@ namespace casadi {
   }
 
   vector<MX> Function::mapsum(const vector< MX > &x,
-                              const string& parallelization) {
+                              const string& parallelization) const {
     return (*this)->mapsum_mx(x, parallelization);
   }
 
@@ -675,7 +676,8 @@ namespace casadi {
     return (*this)->_get_stats(mem);
   }
 
-  const Sparsity Function::sparsity_jac(int iind, int oind, bool compact, bool symmetric) {
+  const Sparsity Function::
+  sparsity_jac(int iind, int oind, bool compact, bool symmetric) const {
     return (*this)->sparsity_jac(iind, oind, compact, symmetric);
   }
 
@@ -768,11 +770,11 @@ namespace casadi {
     }
   }
 
-  Function Function::forward(int nfwd) {
+  Function Function::forward(int nfwd) const {
     return (*this)->forward(nfwd);
   }
 
-  Function Function::reverse(int nadj) {
+  Function Function::reverse(int nadj) const {
     return (*this)->reverse(nadj);
   }
 
@@ -792,17 +794,17 @@ namespace casadi {
     (*this)->print_free(stream);
   }
 
-  std::string Function::generate(const Dict& opts) {
+  std::string Function::generate(const Dict& opts) const {
     return generate(name(), opts);
   }
 
-  std::string Function::generate(const string& fname, const Dict& opts) {
+  std::string Function::generate(const string& fname, const Dict& opts) const {
     CodeGenerator gen(fname, opts);
     gen.add(*this);
     return gen.generate();
   }
 
-  std::string Function::generate_dependencies(const string& fname, const Dict& opts) {
+  std::string Function::generate_dependencies(const string& fname, const Dict& opts) const {
     return (*this)->generate_dependencies(fname, opts);
   }
 
@@ -881,19 +883,19 @@ namespace casadi {
     return ss.str();
   }
 
-  vector<DM> Function::operator()(const vector<DM>& arg) {
+  vector<DM> Function::operator()(const vector<DM>& arg) const {
     vector<DM> res;
     call(arg, res);
     return res;
   }
 
-  vector<SX> Function::operator()(const vector<SX>& arg) {
+  vector<SX> Function::operator()(const vector<SX>& arg) const {
     vector<SX> res;
     call(arg, res);
     return res;
   }
 
-  vector<MX> Function::operator()(const vector<MX>& arg) {
+  vector<MX> Function::operator()(const vector<MX>& arg) const {
     vector<MX> res;
     call(arg, res);
     return res;
@@ -901,7 +903,7 @@ namespace casadi {
 
   template<typename M>
   void Function::_call(const std::map<string, M>& arg, std::map<string, M>& res,
-                       bool always_inline, bool never_inline) {
+                       bool always_inline, bool never_inline) const {
     // Get default inputs
     vector<M> arg_v(n_in());
     for (int i=0; i<arg_v.size(); ++i) {
@@ -924,36 +926,36 @@ namespace casadi {
     }
   }
 
-  const DMDict Function::operator()(const DMDict& arg) {
+  const DMDict Function::operator()(const DMDict& arg) const {
     DMDict res;
     call(arg, res);
     return res;
   }
 
-  const SXDict Function::operator()(const SXDict& arg) {
+  const SXDict Function::operator()(const SXDict& arg) const {
     SXDict res;
     call(arg, res);
     return res;
   }
 
-  const MXDict Function::operator()(const MXDict& arg) {
+  const MXDict Function::operator()(const MXDict& arg) const {
     MXDict res;
     call(arg, res);
     return res;
   }
 
   void Function::call(const DMDict& arg, DMDict& res,
-                      bool always_inline, bool never_inline) {
+                      bool always_inline, bool never_inline) const {
     return _call(arg, res, always_inline, never_inline);
   }
 
   void Function::call(const SXDict& arg, SXDict& res,
-                      bool always_inline, bool never_inline) {
+                      bool always_inline, bool never_inline) const {
     return _call(arg, res, always_inline, never_inline);
   }
 
   void Function::call(const MXDict& arg, MXDict& res,
-                      bool always_inline, bool never_inline) {
+                      bool always_inline, bool never_inline) const {
     return _call(arg, res, always_inline, never_inline);
   }
 
@@ -1021,7 +1023,7 @@ namespace casadi {
     return (*this)->has_free();
   }
 
-  void Function::generate_lifted(Function& vdef_fcn, Function& vinit_fcn) {
+  void Function::generate_lifted(Function& vdef_fcn, Function& vinit_fcn) const {
     (*this)->generate_lifted(vdef_fcn, vinit_fcn);
   }
 

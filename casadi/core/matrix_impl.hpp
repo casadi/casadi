@@ -1447,13 +1447,13 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  void Matrix<Scalar>::setEqualityCheckingDepth(int eq_depth) {
-    casadi_error("'setEqualityCheckingDepth' not defined for " + type_name());
+  void Matrix<Scalar>::set_max_depth(int eq_depth) {
+    casadi_error("'set_max_depth' not defined for " + type_name());
   }
 
   template<typename Scalar>
-  int Matrix<Scalar>::getEqualityCheckingDepth() {
-    casadi_error("'getEqualityCheckingDepth' not defined for " + type_name());
+  int Matrix<Scalar>::get_max_depth() {
+    casadi_error("'get_max_depth' not defined for " + type_name());
   }
 
   template<typename Scalar>
@@ -2497,8 +2497,8 @@ namespace casadi {
   template<> SX SX::dep(int ch) const;
   template<> int SX::n_dep() const;
   template<> std::string SX::name() const;
-  template<> void SX::setEqualityCheckingDepth(int eq_depth);
-  template<> int SX::getEqualityCheckingDepth();
+  template<> void SX::set_max_depth(int eq_depth);
+  template<> int SX::get_max_depth();
   template<> size_t SX::element_hash() const;
   template<> void SX::expand(const SX& f, SX& weights, SX& terms);
   template<> SX SX::pw_const(const SX& t, const SX& tval, const SX& val);

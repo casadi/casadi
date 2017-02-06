@@ -415,36 +415,36 @@ namespace casadi {
     ///@{
     /** \brief Evaluate the function symbolically or numerically  */
     void call(const std::vector<DM> &arg, std::vector<DM>& SWIG_OUTPUT(res),
-              bool always_inline=false, bool never_inline=false);
+              bool always_inline=false, bool never_inline=false) const;
     void call(const std::vector<SX> &arg, std::vector<SX>& SWIG_OUTPUT(res),
-              bool always_inline=false, bool never_inline=false);
+              bool always_inline=false, bool never_inline=false) const;
     void call(const std::vector<MX> &arg, std::vector<MX>& SWIG_OUTPUT(res),
-              bool always_inline=false, bool never_inline=false);
+              bool always_inline=false, bool never_inline=false) const;
     void call(const DMDict& arg, DMDict& SWIG_OUTPUT(res),
-              bool always_inline=false, bool never_inline=false);
+              bool always_inline=false, bool never_inline=false) const;
     void call(const SXDict& arg, SXDict& SWIG_OUTPUT(res),
-              bool always_inline=false, bool never_inline=false);
+              bool always_inline=false, bool never_inline=false) const;
     void call(const MXDict& arg, MXDict& SWIG_OUTPUT(res),
-              bool always_inline=false, bool never_inline=false);
+              bool always_inline=false, bool never_inline=false) const;
     ///@}
 
 #ifndef SWIG
     ///@{
     /// Functor shorthand for evaluation
-    std::vector<DM> operator()(const std::vector<DM>& arg);
-    std::vector<SX> operator()(const std::vector<SX>& arg);
-    std::vector<MX> operator()(const std::vector<MX>& arg);
-    const DMDict operator()(const DMDict& arg);
-    const SXDict operator()(const SXDict& arg);
-    const MXDict operator()(const MXDict& arg);
+    std::vector<DM> operator()(const std::vector<DM>& arg) const;
+    std::vector<SX> operator()(const std::vector<SX>& arg) const;
+    std::vector<MX> operator()(const std::vector<MX>& arg) const;
+    const DMDict operator()(const DMDict& arg) const;
+    const SXDict operator()(const SXDict& arg) const;
+    const MXDict operator()(const MXDict& arg) const;
     ///@}
 
     ///@{
     /** \brief Evaluate with temporary memory allocation */
-    void operator()(std::vector<const double*> arg, std::vector<double*> res);
-    void operator()(std::vector<const bvec_t*> arg, std::vector<bvec_t*> res);
-    void operator()(std::vector<const SXElem*> arg, std::vector<SXElem*> res);
-    template<typename D> void _call(std::vector<const D*> arg, std::vector<D*> res);
+    void operator()(std::vector<const double*> arg, std::vector<double*> res) const;
+    void operator()(std::vector<const bvec_t*> arg, std::vector<bvec_t*> res) const;
+    void operator()(std::vector<const SXElem*> arg, std::vector<SXElem*> res) const;
+    template<typename D> void _call(std::vector<const D*> arg, std::vector<D*> res) const;
     ///@}
 
     ///@{
@@ -466,26 +466,26 @@ namespace casadi {
 
     ///@{
     /** \brief Numerical evaluation */
-    void operator()(VecArg arg, VecRes res) { (*this)(buf_in(arg), buf_out(res)); }
-    void operator()(VecArg arg, MapRes res) { (*this)(buf_in(arg), buf_out(res)); }
-    void operator()(VecArg arg, VPrRes res) { (*this)(buf_in(arg), buf_out(res)); }
-    void operator()(VecArg arg, MPrRes res) { (*this)(buf_in(arg), buf_out(res)); }
+    void operator()(VecArg arg, VecRes res) const { (*this)(buf_in(arg), buf_out(res)); }
+    void operator()(VecArg arg, MapRes res) const { (*this)(buf_in(arg), buf_out(res)); }
+    void operator()(VecArg arg, VPrRes res) const { (*this)(buf_in(arg), buf_out(res)); }
+    void operator()(VecArg arg, MPrRes res) const { (*this)(buf_in(arg), buf_out(res)); }
 
-    void operator()(MapArg arg, VecRes res) { (*this)(buf_in(arg), buf_out(res)); }
-    void operator()(MapArg arg, MapRes res) { (*this)(buf_in(arg), buf_out(res)); }
-    void operator()(MapArg arg, VPrRes res) { (*this)(buf_in(arg), buf_out(res)); }
-    void operator()(MapArg arg, MPrRes res) { (*this)(buf_in(arg), buf_out(res)); }
+    void operator()(MapArg arg, VecRes res) const { (*this)(buf_in(arg), buf_out(res)); }
+    void operator()(MapArg arg, MapRes res) const { (*this)(buf_in(arg), buf_out(res)); }
+    void operator()(MapArg arg, VPrRes res) const { (*this)(buf_in(arg), buf_out(res)); }
+    void operator()(MapArg arg, MPrRes res) const { (*this)(buf_in(arg), buf_out(res)); }
     ///@}
 
     ///@{
     /// Functor shorthand for evaluation, single argument (only C++)
-    std::vector<DM> operator()(const DM& arg0) {
+    std::vector<DM> operator()(const DM& arg0) const {
       return operator()(std::vector<DM>{arg0});
     }
-    std::vector<SX> operator()(const SX& arg0) {
+    std::vector<SX> operator()(const SX& arg0) const {
       return operator()(std::vector<SX>{arg0});
     }
-    std::vector<MX> operator()(const MX& arg0) {
+    std::vector<MX> operator()(const MX& arg0) const {
       return operator()(std::vector<MX>{arg0});
     }
     ///@}
@@ -505,7 +505,7 @@ namespace casadi {
     void rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem=0) const;
 
     /** \brief Propagate sparsity backward with temporary memory allocation */
-    void rev(std::vector<bvec_t*> arg, std::vector<bvec_t*> res);
+    void rev(std::vector<bvec_t*> arg, std::vector<bvec_t*> res) const;
 
 #endif // SWIG
 
@@ -513,7 +513,7 @@ namespace casadi {
         \param parallelization Type of parallelization used: unroll|serial|openmp
     */
     std::vector<MX> mapsum(const std::vector<MX > &arg,
-                           const std::string& parallelization="serial");
+                           const std::string& parallelization="serial") const;
 
     ///@{
     /** \brief  Create a mapaccumulated version of this function
@@ -542,15 +542,15 @@ namespace casadi {
 
     */
     Function mapaccum(const std::string& name, int n, int n_accum=1,
-                      const Dict& opts = Dict());
+                      const Dict& opts = Dict()) const;
     Function mapaccum(const std::string& name, int n,
                       const std::vector<int>& accum_in,
                       const std::vector<int>& accum_out,
-                      const Dict& opts=Dict());
+                      const Dict& opts=Dict()) const;
     Function mapaccum(const std::string& name, int n,
                       const std::vector<std::string>& accum_in,
                       const std::vector<std::string>& accum_out,
-                      const Dict& opts=Dict());
+                      const Dict& opts=Dict()) const;
     ///@}
 
     /** \brief  Create a mapped version of this function
@@ -577,7 +577,7 @@ namespace casadi {
 
         \param parallelization Type of parallelization used: unroll|serial|openmp
     */
-    Function map(int n, const std::string& parallelization="serial");
+    Function map(int n, const std::string& parallelization="serial") const;
 
     ///@{
     /** \brief Map with reduction
@@ -587,11 +587,11 @@ namespace casadi {
     Function map(const std::string& name, const std::string& parallelization, int n,
       const std::vector<int>& reduce_in,
       const std::vector<int>& reduce_out,
-      const Dict& opts=Dict());
+      const Dict& opts=Dict()) const;
     Function map(const std::string& name, const std::string& parallelization, int n,
       const std::vector<std::string>& reduce_in,
       const std::vector<std::string>& reduce_out,
-      const Dict& opts=Dict());
+      const Dict& opts=Dict()) const;
     ///@}
 
     /** \brief returns a new function with a selection of inputs/outputs of the original */
@@ -621,7 +621,7 @@ namespace casadi {
      *        The functions returned are cached, meaning that if called multiple timed
      *        with the same value, then multiple references to the same function will be returned.
      */
-    Function forward(int nfwd);
+    Function forward(int nfwd) const;
 
     /** \brief Get a function that calculates \a nadj adjoint derivatives
      *
@@ -640,21 +640,22 @@ namespace casadi {
      *        The functions returned are cached, meaning that if called multiple timed
      *        with the same value, then multiple references to the same function will be returned.
      */
-    Function reverse(int nadj);
+    Function reverse(int nadj) const;
 
     ///@{
     /// Get, if necessary generate, the sparsity of a Jacobian block
-    const Sparsity sparsity_jac(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
-    const Sparsity sparsity_jac(const std::string &iind, int oind=0, bool compact=false,
-                                bool symmetric=false) {
+    const Sparsity sparsity_jac(int iind=0, int oind=0,
+                                bool compact=false, bool symmetric=false) const;
+    const Sparsity sparsity_jac(const std::string &iind, int oind=0,
+                                bool compact=false, bool symmetric=false) const {
       return sparsity_jac(index_in(iind), oind, compact, symmetric);
     }
-    const Sparsity sparsity_jac(int iind, const std::string &oind, bool compact=false,
-                                bool symmetric=false) {
+    const Sparsity sparsity_jac(int iind, const std::string &oind,
+                                bool compact=false, bool symmetric=false) const {
       return sparsity_jac(iind, index_out(oind), compact, symmetric);
     }
     const Sparsity sparsity_jac(const std::string &iind, const std::string &oind,
-                          bool compact=false, bool symmetric=false) {
+                                bool compact=false, bool symmetric=false) const {
       return sparsity_jac(index_in(iind), index_out(oind), compact, symmetric);
     }
     ///@}
@@ -679,13 +680,13 @@ namespace casadi {
 #endif // WITH_DEPRECATED_FEATURES
 
     /** \brief Export / Generate C code for the function */
-    std::string generate(const std::string& fname, const Dict& opts=Dict());
+    std::string generate(const std::string& fname, const Dict& opts=Dict()) const;
 
     /** \brief Export / Generate C code for the function */
-    std::string generate(const Dict& opts=Dict());
+    std::string generate(const Dict& opts=Dict()) const;
 
     /** \brief Export / Generate C code for the dependency function */
-    std::string generate_dependencies(const std::string& fname, const Dict& opts=Dict());
+    std::string generate_dependencies(const std::string& fname, const Dict& opts=Dict()) const;
 
 #ifndef SWIG
     /// \cond INTERNAL
@@ -754,7 +755,7 @@ namespace casadi {
 
     /** \brief Extract the functions needed for the Lifted Newton method */
     void generate_lifted(Function& SWIG_OUTPUT(vdef_fcn),
-                                  Function& SWIG_OUTPUT(vinit_fcn));
+                         Function& SWIG_OUTPUT(vinit_fcn)) const;
 
     /** \brief Get the number of atomic operations */
     int getAlgorithmSize() const;
@@ -815,7 +816,7 @@ namespace casadi {
     /** \brief Call using a map */
     template<typename M>
     void _call(const std::map<std::string, M>& arg, std::map<std::string, M>& res,
-               bool always_inline, bool never_inline);
+               bool always_inline, bool never_inline) const;
 #endif // SWIG
     /// \endcond
 
@@ -874,8 +875,10 @@ namespace casadi {
     // Check if a particular dependency exists
     bool has_function(const std::string& fname) const;
 
-    /// Access rhs function for a rootfinder
-    Function rootfinder_fun();
+#ifdef WITH_DEPRECATED_FEATURES
+    /** [DEPRECATED] Use oracle() instead */
+    Function rootfinder_fun() const { return oracle();}
+#endif // WITH_DEPRECATED_FEATURES
 
     /** Generate native code in the interfaced language for debugging */
     void conic_debug(const std::string &filename) const;

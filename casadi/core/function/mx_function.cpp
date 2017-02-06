@@ -1187,7 +1187,7 @@ namespace casadi {
     }
   }
 
-  void MXFunction::generate_lifted(Function& vdef_fcn, Function& vinit_fcn) {
+  void MXFunction::generate_lifted(Function& vdef_fcn, Function& vinit_fcn) const {
     vector<MX> swork(workloc_.size()-1);
 
     vector<MX> arg1, res1;

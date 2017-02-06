@@ -121,7 +121,7 @@ namespace casadi {
     virtual bool has_function(const std::string& fname) const;
 
     /** \brief Export / Generate C code for the generated functions */
-    virtual std::string generate_dependencies(const std::string& fname, const Dict& opts);
+    virtual std::string generate_dependencies(const std::string& fname, const Dict& opts) const;
 
     /** \brief JIT for dependencies */
     virtual void jit_dependencies(const std::string& fname);

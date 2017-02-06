@@ -346,7 +346,7 @@ Get input dimension.
 
 %feature("docstring")  casadi::Function::call(const std::vector< DM > &arg,
 std::vector< DM > &output_res, bool always_inline=false, bool
-never_inline=false) "
+never_inline=false) const  "
 
 Evaluate the function symbolically or numerically.
 
@@ -354,7 +354,7 @@ Evaluate the function symbolically or numerically.
 
 %feature("docstring")  casadi::Function::call(const std::vector< SX > &arg,
 std::vector< SX > &output_res, bool always_inline=false, bool
-never_inline=false) "
+never_inline=false) const  "
 
 Evaluate the function symbolically or numerically.
 
@@ -362,35 +362,35 @@ Evaluate the function symbolically or numerically.
 
 %feature("docstring")  casadi::Function::call(const std::vector< MX > &arg,
 std::vector< MX > &output_res, bool always_inline=false, bool
-never_inline=false) "
+never_inline=false) const  "
 
 Evaluate the function symbolically or numerically.
 
 ";
 
 %feature("docstring")  casadi::Function::call(const DMDict &arg, DMDict
-&output_res, bool always_inline=false, bool never_inline=false) "
+&output_res, bool always_inline=false, bool never_inline=false) const  "
 
 Evaluate the function symbolically or numerically.
 
 ";
 
 %feature("docstring")  casadi::Function::call(const SXDict &arg, SXDict
-&output_res, bool always_inline=false, bool never_inline=false) "
+&output_res, bool always_inline=false, bool never_inline=false) const  "
 
 Evaluate the function symbolically or numerically.
 
 ";
 
 %feature("docstring")  casadi::Function::call(const MXDict &arg, MXDict
-&output_res, bool always_inline=false, bool never_inline=false) "
+&output_res, bool always_inline=false, bool never_inline=false) const  "
 
 Evaluate the function symbolically or numerically.
 
 ";
 
 %feature("docstring")  casadi::Function::generate_dependencies(const
-std::string &fname, const Dict &opts=Dict()) "
+std::string &fname, const Dict &opts=Dict()) const  "
 
 Export / Generate C code for the dependency function.
 
@@ -552,7 +552,7 @@ For a particular input or for all of the inputs
 
 ";
 
-%feature("docstring")  casadi::Function::forward(int nfwd) "
+%feature("docstring")  casadi::Function::forward(int nfwd) const  "
 
 Get a function that calculates nfwd forward derivatives.
 
@@ -617,13 +617,14 @@ Print dimensions of inputs and outputs.
 ";
 
 %feature("docstring")  casadi::Function::generate(const std::string &fname,
-const Dict &opts=Dict()) "
+const Dict &opts=Dict()) const  "
 
 Export / Generate C code for the function.
 
 ";
 
-%feature("docstring")  casadi::Function::generate(const Dict &opts=Dict()) "
+%feature("docstring")  casadi::Function::generate(const Dict &opts=Dict())
+const  "
 
 Export / Generate C code for the function.
 
@@ -806,7 +807,7 @@ Checkout a memory object.
 
 ";
 
-%feature("docstring")  casadi::Function::reverse(int nadj) "
+%feature("docstring")  casadi::Function::reverse(int nadj) const  "
 
 Get a function that calculates nadj adjoint derivatives.
 
@@ -1008,7 +1009,7 @@ guarantee that subsequent calls return unique answers.
 
 %feature("docstring")  casadi::Callback::get_forward(const std::string
 &name, int nfwd, const std::vector< std::string > &i_names, const
-std::vector< std::string > &o_names, const Dict &opts) "
+std::vector< std::string > &o_names, const Dict &opts) const  "
 
 Return function that calculates forward derivatives forward(nfwd) returns a
 cached instance if available, and calls  Function get_forward(int nfwd) if
@@ -1017,36 +1018,37 @@ no cached version is available.
 ";
 
 %feature("docstring")  casadi::Function::sparsity_jac(int iind=0, int
-oind=0, bool compact=false, bool symmetric=false) "
+oind=0, bool compact=false, bool symmetric=false) const  "
 
 Get, if necessary generate, the sparsity of a Jacobian block
 
 ";
 
 %feature("docstring")  casadi::Function::sparsity_jac(const std::string
-&iind, int oind=0, bool compact=false, bool symmetric=false) "
+&iind, int oind=0, bool compact=false, bool symmetric=false) const  "
 
 Get, if necessary generate, the sparsity of a Jacobian block
 
 ";
 
 %feature("docstring")  casadi::Function::sparsity_jac(int iind, const
-std::string &oind, bool compact=false, bool symmetric=false) "
+std::string &oind, bool compact=false, bool symmetric=false) const  "
 
 Get, if necessary generate, the sparsity of a Jacobian block
 
 ";
 
 %feature("docstring")  casadi::Function::sparsity_jac(const std::string
-&iind, const std::string &oind, bool compact=false, bool symmetric=false) "
+&iind, const std::string &oind, bool compact=false, bool symmetric=false)
+const  "
 
 Get, if necessary generate, the sparsity of a Jacobian block
 
 ";
 
-%feature("docstring")  casadi::Function::rootfinder_fun() "
+%feature("docstring")  casadi::Function::rootfinder_fun() const  "
 
-Access rhs function for a rootfinder.
+[DEPRECATED] Use oracle() instead
 
 ";
 
@@ -1293,7 +1295,7 @@ const std::string &oind) "
 ";
 
 %feature("docstring")  casadi::Function::mapsum(const std::vector< MX >
-&arg, const std::string &parallelization="serial") "
+&arg, const std::string &parallelization="serial") const  "
 
 Evaluate symbolically in parallel and sum (matrix graph)
 
@@ -1378,7 +1380,7 @@ Get an atomic operation operator index.
 
 %feature("docstring")  casadi::Function::map(const std::string &name, const
 std::string &parallelization, int n, const std::vector< int > &reduce_in,
-const std::vector< int > &reduce_out, const Dict &opts=Dict()) "
+const std::vector< int > &reduce_out, const Dict &opts=Dict()) const  "
 
 Map with reduction A subset of the inputs are non-repeated and a subset of
 the outputs summed up.
@@ -1388,7 +1390,7 @@ the outputs summed up.
 %feature("docstring")  casadi::Function::map(const std::string &name, const
 std::string &parallelization, int n, const std::vector< std::string >
 &reduce_in, const std::vector< std::string > &reduce_out, const Dict
-&opts=Dict()) "
+&opts=Dict()) const  "
 
 Map with reduction A subset of the inputs are non-repeated and a subset of
 the outputs summed up.
@@ -1396,7 +1398,7 @@ the outputs summed up.
 ";
 
 %feature("docstring")  casadi::Function::map(int n, const std::string
-&parallelization="serial") "
+&parallelization="serial") const  "
 
 Create a mapped version of this function.
 
@@ -1443,7 +1445,7 @@ Print all information there is to know about a certain option.
 ";
 
 %feature("docstring")  casadi::Function::mapaccum(const std::string &name,
-int n, int n_accum=1, const Dict &opts=Dict()) "
+int n, int n_accum=1, const Dict &opts=Dict()) const  "
 
 Create a mapaccumulated version of this function.
 
@@ -1480,7 +1482,7 @@ The the mapaccumulated version has the signature:
 
 %feature("docstring")  casadi::Function::mapaccum(const std::string &name,
 int n, const std::vector< int > &accum_in, const std::vector< int >
-&accum_out, const Dict &opts=Dict()) "
+&accum_out, const Dict &opts=Dict()) const  "
 
 Create a mapaccumulated version of this function.
 
@@ -1517,7 +1519,7 @@ The the mapaccumulated version has the signature:
 
 %feature("docstring")  casadi::Function::mapaccum(const std::string &name,
 int n, const std::vector< std::string > &accum_in, const std::vector<
-std::string > &accum_out, const Dict &opts=Dict()) "
+std::string > &accum_out, const Dict &opts=Dict()) const  "
 
 Create a mapaccumulated version of this function.
 
@@ -1580,7 +1582,7 @@ Get sparsity of a given input.
 
 %feature("docstring")  casadi::Callback::get_reverse(const std::string
 &name, int nadj, const std::vector< std::string > &i_names, const
-std::vector< std::string > &o_names, const Dict &opts) "
+std::vector< std::string > &o_names, const Dict &opts) const  "
 
 Return function that calculates adjoint derivatives reverse(nadj) returns a
 cached instance if available, and calls  Function get_reverse(int nadj) if
@@ -1648,7 +1650,7 @@ adheres to SCHEME_NLPINput
 ";
 
 %feature("docstring")  casadi::Function::generate_lifted(Function
-&output_vdef_fcn, Function &output_vinit_fcn) "
+&output_vdef_fcn, Function &output_vinit_fcn) const  "
 
 Extract the functions needed for the Lifted Newton method.
 
@@ -2877,7 +2879,7 @@ guarantee that subsequent calls return unique answers.
 ";
 
 %feature("docstring")  casadi::Function::generate_dependencies(const
-std::string &fname, const Dict &opts=Dict()) "
+std::string &fname, const Dict &opts=Dict()) const  "
 
 Export / Generate C code for the dependency function.
 
@@ -2890,7 +2892,7 @@ Get all the free variables of the function.
 ";
 
 %feature("docstring")  casadi::Function::mapaccum(const std::string &name,
-int n, int n_accum=1, const Dict &opts=Dict()) "
+int n, int n_accum=1, const Dict &opts=Dict()) const  "
 
 Create a mapaccumulated version of this function.
 
@@ -2927,7 +2929,7 @@ The the mapaccumulated version has the signature:
 
 %feature("docstring")  casadi::Function::mapaccum(const std::string &name,
 int n, const std::vector< int > &accum_in, const std::vector< int >
-&accum_out, const Dict &opts=Dict()) "
+&accum_out, const Dict &opts=Dict()) const  "
 
 Create a mapaccumulated version of this function.
 
@@ -2964,7 +2966,7 @@ The the mapaccumulated version has the signature:
 
 %feature("docstring")  casadi::Function::mapaccum(const std::string &name,
 int n, const std::vector< std::string > &accum_in, const std::vector<
-std::string > &accum_out, const Dict &opts=Dict()) "
+std::string > &accum_out, const Dict &opts=Dict()) const  "
 
 Create a mapaccumulated version of this function.
 
@@ -3107,7 +3109,7 @@ Is a null pointer?
 
 ";
 
-%feature("docstring")  casadi::Function::forward(int nfwd) "
+%feature("docstring")  casadi::Function::forward(int nfwd) const  "
 
 Get a function that calculates nfwd forward derivatives.
 
@@ -3201,7 +3203,7 @@ returns a new function with a selection of inputs/outputs of the original
 ";
 
 %feature("docstring")  casadi::Function::mapsum(const std::vector< MX >
-&arg, const std::string &parallelization="serial") "
+&arg, const std::string &parallelization="serial") const  "
 
 Evaluate symbolically in parallel and sum (matrix graph)
 
@@ -3238,28 +3240,29 @@ For a particular output or for all of the outputs
 ";
 
 %feature("docstring")  casadi::Function::sparsity_jac(int iind=0, int
-oind=0, bool compact=false, bool symmetric=false) "
+oind=0, bool compact=false, bool symmetric=false) const  "
 
 Get, if necessary generate, the sparsity of a Jacobian block
 
 ";
 
 %feature("docstring")  casadi::Function::sparsity_jac(const std::string
-&iind, int oind=0, bool compact=false, bool symmetric=false) "
+&iind, int oind=0, bool compact=false, bool symmetric=false) const  "
 
 Get, if necessary generate, the sparsity of a Jacobian block
 
 ";
 
 %feature("docstring")  casadi::Function::sparsity_jac(int iind, const
-std::string &oind, bool compact=false, bool symmetric=false) "
+std::string &oind, bool compact=false, bool symmetric=false) const  "
 
 Get, if necessary generate, the sparsity of a Jacobian block
 
 ";
 
 %feature("docstring")  casadi::Function::sparsity_jac(const std::string
-&iind, const std::string &oind, bool compact=false, bool symmetric=false) "
+&iind, const std::string &oind, bool compact=false, bool symmetric=false)
+const  "
 
 Get, if necessary generate, the sparsity of a Jacobian block
 
@@ -3380,7 +3383,7 @@ the output elements).
 
 %feature("docstring")  casadi::Function::map(const std::string &name, const
 std::string &parallelization, int n, const std::vector< int > &reduce_in,
-const std::vector< int > &reduce_out, const Dict &opts=Dict()) "
+const std::vector< int > &reduce_out, const Dict &opts=Dict()) const  "
 
 Map with reduction A subset of the inputs are non-repeated and a subset of
 the outputs summed up.
@@ -3390,7 +3393,7 @@ the outputs summed up.
 %feature("docstring")  casadi::Function::map(const std::string &name, const
 std::string &parallelization, int n, const std::vector< std::string >
 &reduce_in, const std::vector< std::string > &reduce_out, const Dict
-&opts=Dict()) "
+&opts=Dict()) const  "
 
 Map with reduction A subset of the inputs are non-repeated and a subset of
 the outputs summed up.
@@ -3398,7 +3401,7 @@ the outputs summed up.
 ";
 
 %feature("docstring")  casadi::Function::map(int n, const std::string
-&parallelization="serial") "
+&parallelization="serial") const  "
 
 Create a mapped version of this function.
 
@@ -3547,7 +3550,7 @@ guarantee that subsequent calls return unique answers.
 
 ";
 
-%feature("docstring")  casadi::Function::reverse(int nadj) "
+%feature("docstring")  casadi::Function::reverse(int nadj) const  "
 
 Get a function that calculates nadj adjoint derivatives.
 
@@ -3853,21 +3856,22 @@ are kept internally
 ";
 
 %feature("docstring")  casadi::Function::generate(const std::string &fname,
-const Dict &opts=Dict()) "
+const Dict &opts=Dict()) const  "
 
 Export / Generate C code for the function.
 
 ";
 
-%feature("docstring")  casadi::Function::generate(const Dict &opts=Dict()) "
+%feature("docstring")  casadi::Function::generate(const Dict &opts=Dict())
+const  "
 
 Export / Generate C code for the function.
 
 ";
 
-%feature("docstring")  casadi::Function::rootfinder_fun() "
+%feature("docstring")  casadi::Function::rootfinder_fun() const  "
 
-Access rhs function for a rootfinder.
+[DEPRECATED] Use oracle() instead
 
 ";
 
@@ -3911,7 +3915,7 @@ Get input dimension.
 
 %feature("docstring")  casadi::Function::call(const std::vector< DM > &arg,
 std::vector< DM > &output_res, bool always_inline=false, bool
-never_inline=false) "
+never_inline=false) const  "
 
 Evaluate the function symbolically or numerically.
 
@@ -3919,7 +3923,7 @@ Evaluate the function symbolically or numerically.
 
 %feature("docstring")  casadi::Function::call(const std::vector< SX > &arg,
 std::vector< SX > &output_res, bool always_inline=false, bool
-never_inline=false) "
+never_inline=false) const  "
 
 Evaluate the function symbolically or numerically.
 
@@ -3927,28 +3931,28 @@ Evaluate the function symbolically or numerically.
 
 %feature("docstring")  casadi::Function::call(const std::vector< MX > &arg,
 std::vector< MX > &output_res, bool always_inline=false, bool
-never_inline=false) "
+never_inline=false) const  "
 
 Evaluate the function symbolically or numerically.
 
 ";
 
 %feature("docstring")  casadi::Function::call(const DMDict &arg, DMDict
-&output_res, bool always_inline=false, bool never_inline=false) "
+&output_res, bool always_inline=false, bool never_inline=false) const  "
 
 Evaluate the function symbolically or numerically.
 
 ";
 
 %feature("docstring")  casadi::Function::call(const SXDict &arg, SXDict
-&output_res, bool always_inline=false, bool never_inline=false) "
+&output_res, bool always_inline=false, bool never_inline=false) const  "
 
 Evaluate the function symbolically or numerically.
 
 ";
 
 %feature("docstring")  casadi::Function::call(const MXDict &arg, MXDict
-&output_res, bool always_inline=false, bool never_inline=false) "
+&output_res, bool always_inline=false, bool never_inline=false) const  "
 
 Evaluate the function symbolically or numerically.
 
@@ -3981,7 +3985,7 @@ Get output dimension.
 ";
 
 %feature("docstring")  casadi::Function::generate_lifted(Function
-&output_vdef_fcn, Function &output_vinit_fcn) "
+&output_vdef_fcn, Function &output_vinit_fcn) const  "
 
 Extract the functions needed for the Lifted Newton method.
 

@@ -127,7 +127,7 @@ namespace casadi {
     virtual Function get_forward(const std::string& name, int nfwd,
                                  const std::vector<std::string>& i_names,
                                  const std::vector<std::string>& o_names,
-                                 const Dict& opts);
+                                 const Dict& opts) const;
     virtual int get_n_forward() const { return 64;}
     ///@}
 
@@ -136,7 +136,7 @@ namespace casadi {
     virtual Function get_reverse(const std::string& name, int nadj,
                                  const std::vector<std::string>& i_names,
                                  const std::vector<std::string>& o_names,
-                                 const Dict& opts);
+                                 const Dict& opts) const;
     virtual int get_n_reverse() const { return 64;}
     ///@}
 
@@ -144,13 +144,13 @@ namespace casadi {
     virtual void setStopTime(IntegratorMemory* mem, double tf) const;
 
     /** \brief Set solver specific options to generated augmented integrators */
-    virtual Dict getDerivativeOptions(bool fwd);
+    virtual Dict getDerivativeOptions(bool fwd) const;
 
     /** \brief Generate a augmented DAE system with \a nfwd forward sensitivities */
-    template<typename MatType> std::map<std::string, MatType> aug_fwd(int nfwd);
+    template<typename MatType> std::map<std::string, MatType> aug_fwd(int nfwd) const;
 
     /** \brief Generate a augmented DAE system with \a nadj adjoint sensitivities */
-    template<typename MatType> std::map<std::string, MatType> aug_adj(int nadj);
+    template<typename MatType> std::map<std::string, MatType> aug_adj(int nadj) const;
 
     /// Create sparsity pattern of the extended Jacobian (forward problem)
     Sparsity sp_jac_dae();
@@ -163,15 +163,15 @@ namespace casadi {
 
     ///@{
     // Shorthands
-    const Sparsity&  t() { return oracle_.sparsity_in(DE_T);}
-    const Sparsity&  x() { return oracle_.sparsity_in(DE_X);}
-    const Sparsity&  z() { return oracle_.sparsity_in(DE_Z);}
-    const Sparsity&  p() { return oracle_.sparsity_in(DE_P);}
-    const Sparsity&  q() { return oracle_.sparsity_out(DE_QUAD);}
-    const Sparsity& rx() { return oracle_.sparsity_in(DE_RX);}
-    const Sparsity& rz() { return oracle_.sparsity_in(DE_RZ);}
-    const Sparsity& rp() { return oracle_.sparsity_in(DE_RP);}
-    const Sparsity& rq() { return oracle_.sparsity_out(DE_RQUAD);}
+    const Sparsity&  t() const { return oracle_.sparsity_in(DE_T);}
+    const Sparsity&  x() const { return oracle_.sparsity_in(DE_X);}
+    const Sparsity&  z() const { return oracle_.sparsity_in(DE_Z);}
+    const Sparsity&  p() const { return oracle_.sparsity_in(DE_P);}
+    const Sparsity&  q() const { return oracle_.sparsity_out(DE_QUAD);}
+    const Sparsity& rx() const { return oracle_.sparsity_in(DE_RX);}
+    const Sparsity& rz() const { return oracle_.sparsity_in(DE_RZ);}
+    const Sparsity& rp() const { return oracle_.sparsity_in(DE_RP);}
+    const Sparsity& rq() const { return oracle_.sparsity_out(DE_RQUAD);}
     ///@}
 
     /// Number of states for the forward integration

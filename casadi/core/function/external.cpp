@@ -278,7 +278,7 @@ namespace casadi {
   ::get_forward(const std::string& name, int nfwd,
                 const std::vector<std::string>& i_names,
                 const std::vector<std::string>& o_names,
-                const Dict& opts) {
+                const Dict& opts) const {
     // Consistency check
     int n=1;
     while (n<nfwd) n*=2;
@@ -302,7 +302,7 @@ namespace casadi {
   ::get_reverse(const std::string& name, int nadj,
                 const std::vector<std::string>& i_names,
                 const std::vector<std::string>& o_names,
-                const Dict& opts) {
+                const Dict& opts) const {
     // Consistency check
     int n=1;
     while (n<nadj) n*=2;
