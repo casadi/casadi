@@ -92,6 +92,9 @@ namespace casadi {
   template<typename real_t>
   void CASADI_PREFIX(fill)(real_t* x, int n, real_t alpha);
 
+  /// FILL: x <- alpha
+  void CASADI_PREFIX(fill_int)(int* x, int n, int alpha);
+
   /// Sparse matrix-matrix multiplication: z <- z + x*y
   template<typename real_t>
   void CASADI_PREFIX(mtimes)(const real_t* x, const int* sp_x, const real_t* y, const int* sp_y, real_t* z, const int* sp_z, real_t* w, int tr);
@@ -153,23 +156,19 @@ namespace casadi {
 
   // Get weights for the multilinear interpolant
   template<typename real_t>
-  void CASADI_PREFIX(interpn_weights)(int ndim, const real_t* grid, const int* offset,
-    const real_t* x, real_t* alpha, int* index);
+  void CASADI_PREFIX(interpn_weights)(int ndim, const real_t* grid, const int* offset, const real_t* x, real_t* alpha, int* index);
 
   // Get coefficients for the multilinear interpolant
   template<typename real_t>
-  real_t CASADI_PREFIX(interpn_interpolate)(int ndim, const int* offset, const real_t* values,
-                    const real_t* alpha, const int* index, const int* corner, real_t* coeff);
+  real_t CASADI_PREFIX(interpn_interpolate)(int ndim, const int* offset, const real_t* values, const real_t* alpha, const int* index, const int* corner, real_t* coeff);
 
-  // Multiinear interpolant
+  // Multilinear interpolant
   template<typename real_t>
-  real_t CASADI_PREFIX(interpn)(int ndim, const real_t* grid, const int* offset,
-    const real_t* values, const real_t* x, int* iw, real_t* w);
+  real_t CASADI_PREFIX(interpn)(int ndim, const real_t* grid, const int* offset, const real_t* values, const real_t* x, int* iw, real_t* w);
 
-  // Multiinear interpolant - calculate gradient
+  // Multilinear interpolant - calculate gradient
   template<typename real_t>
-  void CASADI_PREFIX(interpn_grad)(real_t* grad, int ndim, const real_t* grid, const int* offset,
-                                   const real_t* values, const real_t* x, int* iw, real_t* w);
+  void CASADI_PREFIX(interpn_grad)(real_t* grad, int ndim, const real_t* grid, const int* offset, const real_t* values, const real_t* x, int* iw, real_t* w);
 }
 
 // Implementations
@@ -394,6 +393,14 @@ namespace casadi {
 
   template<typename real_t>
   void CASADI_PREFIX(fill)(real_t* x, int n, real_t alpha) {
+    int i;
+    if (x) {
+      for (i=0; i<n; ++i) *x++ = alpha;
+    }
+  }
+
+  inline
+  void CASADI_PREFIX(fill_int)(int* x, int n, int alpha) {
     int i;
     if (x) {
       for (i=0; i<n; ++i) *x++ = alpha;
@@ -684,8 +691,7 @@ namespace casadi {
   }
 
   template<typename real_t>
-  void CASADI_PREFIX(interpn_weights)(int ndim, const real_t* grid, const int* offset,
-    const real_t* x, real_t* alpha, int* index) {
+  void CASADI_PREFIX(interpn_weights)(int ndim, const real_t* grid, const int* offset, const real_t* x, real_t* alpha, int* index) {
     /* Left index and fraction of interval */
     int i;
     for (i=0; i<ndim; ++i) {
@@ -702,8 +708,7 @@ namespace casadi {
   }
 
   template<typename real_t>
-  real_t CASADI_PREFIX(interpn_interpolate)(int ndim, const int* offset, const real_t* values,
-                    const real_t* alpha, const int* index, const int* corner, real_t* coeff) {
+  real_t CASADI_PREFIX(interpn_interpolate)(int ndim, const int* offset, const real_t* values, const real_t* alpha, const int* index, const int* corner, real_t* coeff) {
     /* Get weight and value for corner */
     real_t c=1;
     int ld=1; /* leading dimension */
@@ -726,8 +731,7 @@ namespace casadi {
   }
 
   template<typename real_t>
-  real_t CASADI_PREFIX(interpn)(int ndim, const real_t* grid, const int* offset,
-    const real_t* values, const real_t* x, int* iw, real_t* w) {
+  real_t CASADI_PREFIX(interpn)(int ndim, const real_t* grid, const int* offset, const real_t* values, const real_t* x, int* iw, real_t* w) {
     /* Work vectors */
     real_t* alpha = w; w += ndim;
     int* index = iw; iw += ndim;
@@ -735,7 +739,7 @@ namespace casadi {
     /* Left index and fraction of interval */
     CASADI_PREFIX(interpn_weights)(ndim, grid, offset, x, alpha, index);
     /* Loop over all corners, add contribution to output */
-    CASADI_PREFIX(fill)(corner, ndim, 0);
+    CASADI_PREFIX(fill_int)(corner, ndim, 0);
     real_t ret = 0;
     do {
       real_t* coeff = 0;
@@ -746,8 +750,7 @@ namespace casadi {
   }
 
   template<typename real_t>
-  void CASADI_PREFIX(interpn_grad)(real_t* grad, int ndim, const real_t* grid, const int* offset,
-                                   const real_t* values, const real_t* x, int* iw, real_t* w) {
+  void CASADI_PREFIX(interpn_grad)(real_t* grad, int ndim, const real_t* grid, const int* offset, const real_t* values, const real_t* x, int* iw, real_t* w) {
     /* Quick return */
     if (!grad) return;
     /* Work vectors */
@@ -758,7 +761,7 @@ namespace casadi {
     /* Left index and fraction of interval */
     CASADI_PREFIX(interpn_weights)(ndim, grid, offset, x, alpha, index);
     /* Loop over all corners, add contribution to output */
-    CASADI_PREFIX(fill)(corner, ndim, 0);
+    CASADI_PREFIX(fill_int)(corner, ndim, 0);
     CASADI_PREFIX(fill)(grad, ndim, 0.);
     do {
       /* Get coefficients */

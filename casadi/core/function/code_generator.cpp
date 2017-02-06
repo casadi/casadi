@@ -522,6 +522,14 @@ namespace casadi {
     }
   }
 
+  std::string CodeGenerator::constant(const std::vector<int>& v) {
+    return "s" + to_string(getConstant(v, true));
+  }
+
+  std::string CodeGenerator::constant(const std::vector<double>& v) {
+    return "c" + to_string(getConstant(v, true));
+  }
+
   void CodeGenerator::addAuxiliary(Auxiliary f) {
     // Register the new auxiliary
     bool added = added_auxiliaries_.insert(f).second;
@@ -575,6 +583,49 @@ namespace casadi {
         << codegen_str_iamax_define
         << endl;
       break;
+    case AUX_INTERPN:
+      addAuxiliary(AUX_INTERPN_WEIGHTS);
+      addAuxiliary(AUX_INTERPN_INTERPOLATE);
+      addAuxiliary(AUX_FLIP);
+      addAuxiliary(AUX_FILL);
+      addAuxiliary(AUX_FILL_INT);
+      this->auxiliaries
+        << codegen_str_interpn
+        << codegen_str_interpn_define << endl
+        << endl;
+      break;
+    case AUX_INTERPN_GRAD:
+      addAuxiliary(AUX_INTERPN);
+      this->auxiliaries
+        << codegen_str_interpn_grad
+        << codegen_str_interpn_grad_define << endl
+        << endl;
+      break;
+    case AUX_FLIP:
+      this->auxiliaries
+        << codegen_str_flip
+        << codegen_str_flip_define << endl
+        << endl;
+      break;
+    case AUX_LOW:
+      this->auxiliaries
+        << codegen_str_low
+        << codegen_str_low_define << endl
+        << endl;
+      break;
+    case AUX_INTERPN_WEIGHTS:
+      addAuxiliary(AUX_LOW);
+      this->auxiliaries
+        << codegen_str_interpn_weights
+        << codegen_str_interpn_weights_define << endl
+        << endl;
+      break;
+    case AUX_INTERPN_INTERPOLATE:
+      this->auxiliaries
+        << codegen_str_interpn_interpolate
+        << codegen_str_interpn_interpolate_define << endl
+        << endl;
+      break;
     case AUX_NORM_1:
       this->auxiliaries << codegen_str_norm_1
         << codegen_str_norm_1_define
@@ -594,6 +645,12 @@ namespace casadi {
       this->auxiliaries
         << codegen_str_fill
         << codegen_str_fill_define << endl
+        << endl;
+      break;
+    case AUX_FILL_INT:
+      this->auxiliaries
+        << codegen_str_fill_int
+        << codegen_str_fill_int_define << endl
         << endl;
       break;
     case AUX_MTIMES:
@@ -814,6 +871,27 @@ namespace casadi {
     stringstream s;
     s << "rank1(" << A << ", " << sparsity(sp_A) << ", "
       << alpha << ", " << x << ", " << y << ");";
+    return s.str();
+  }
+
+  std::string CodeGenerator::interpn(int ndim, const std::string& grid, const std::string& offset,
+                                   const std::string& values, const std::string& x,
+                                   const std::string& iw, const std::string& w) {
+    addAuxiliary(AUX_INTERPN);
+    stringstream s;
+    s << "interpn(" << ndim << ", " << grid << ", "
+      << offset << ", " << values << ", " << x << ", " << iw << ", " << w << ");";
+    return s.str();
+  }
+
+  std::string CodeGenerator::interpn_grad(const std::string& grad,
+                                   int ndim, const std::string& grid, const std::string& offset,
+                                   const std::string& values, const std::string& x,
+                                   const std::string& iw, const std::string& w) {
+    addAuxiliary(AUX_INTERPN_GRAD);
+    stringstream s;
+    s << "interpn_grad(" << grad << ", " << ndim << ", " << grid << ", "
+      << offset << ", " << values << ", " << x << ", " << iw << ", " << w << ");";
     return s.str();
   }
 

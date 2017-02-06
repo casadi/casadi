@@ -843,29 +843,112 @@ class Functiontests(casadiTestCase):
     self.assertTrue("not symbolic" in s)
 
   def test_1d_interpolant(self):
-    grid = [[0, 1, 2]]
-    values = [0, 1, 2]
+    grid = [[0, 1, 1.5, 2, 3]]
+    values = [0, 1, 2, 5, 3]
     F = interpolant('F', 'linear', grid, values)
     def same(a, b): return abs(float(a)-b)<1e-8
-    self.assertTrue(same(F(2.4), 2.4))
-    self.assertTrue(same(F(1.4), 1.4))
-    self.assertTrue(same(F(0.4), 0.4))
-    self.assertTrue(same(F(-.6), -.6))
+    pairs = [
+      (3.4,3-0.4*2),
+      (2.4,5-0.4*2),
+      (1.6,2+3*0.1/0.5),
+      (1.4,1+0.4/0.5),
+      (0.4,0.4),
+      (-.6,-0.6)
+    ]
+    
+    X = MX.sym("x")
+    
+    J = Function("F",[X],[F(X)])
+    
+    for a,r in pairs:
+      self.assertTrue(same(F(a), r))
+      self.check_codegen(F,inputs=[a])
+
+    
+    X = MX.sym("x")
+    
+    J = Function("F",[X],[jacobian(F(X),X)])
+
+    pairs = [
+      (3.4,-2),
+      (2.4,-2),
+      (1.6,6),
+      (1.4,2),
+      (0.4,1),
+      (-.6,1),
+      
+      (1,2),
+      (0.99,1),
+    ]
+
+    for a,r in pairs:
+      self.assertTrue(same(J(a), r))
+      self.check_codegen(J,inputs=[a])
 
   def test_2d_interpolant(self):
-    grid = [[0, 1, 2], [0, 1, 2]]
-    values = [0, 1, 2, 10, 11, 12, 20, 21, 22]
+    grid = [[0, 1, 4, 5],
+            [0, 2, 3]]
+    
+    values = [0,   1,  8,  3,
+              10, -11, 12, 13,
+              20, 31, -42, 53]
     F = interpolant('F', 'linear', grid, values)
-    def same(a, b): return abs(float(a)-b)<1e-8
-    self.assertTrue(same(F([2.4, 0.5]), 7.4))
-    self.assertTrue(same(F([1.4, 0.5]), 6.4))
-    self.assertTrue(same(F([0.4, 0.5]), 5.4))
-    self.assertTrue(same(F([-.6, 0.5]), 4.4))
-    self.assertTrue(same(F([-.6, 1.5]), 14.4))
-    self.assertTrue(same(F([-.6, 2.5]), 24.4))
-    self.assertTrue(same(F([-.6, 3.5]), 34.4))
+    
+    
+    a0 = -11+0.4*(31+11)
+    a1 = 12+0.4*(-42-12)
+    pairs = [
+      (vertcat(1,2), -11),
+      (vertcat(1,3), 31),
+      (vertcat(4,2), 12),
+      (vertcat(4,3), -42),
 
+      (vertcat(1,2.4), a0),
+      (vertcat(4,2.4), a1),
 
+      (vertcat(3,2), -11+2.0/3*(12+11)),
+      (vertcat(3,3), 31+2.0/3*(-42-31)),
+      
+      (vertcat(3,2.4), a0+2.0/3*(a1-a0))
+    ]
+    
+    for a,r in pairs:
+      self.checkarray(F(a), r)
+      self.check_codegen(F,inputs=[a])
+
+    
+    X = MX.sym("x",2)
+    
+    J = Function("F",[X],[jacobian(F(X),X)])
+    
+    jx0 = (12+11)/3.0
+    jx1 = (-42-31)/3.0
+    jx2 = (13-12)
+    jx3 = (53+42)
+    
+    jy0 = 31+11
+    jy1 = -42-12
+
+    pairs = [
+      (vertcat(1,2), vertcat(jx0,jy0)),
+      (vertcat(1,3), vertcat(jx1,jy0)),
+      (vertcat(4,2), vertcat(jx2,jy1)),
+      (vertcat(4,3), vertcat(jx3,jy1)),
+
+      (vertcat(1,2.4), vertcat(jx0+(jx1-jx0)*0.4, 31+11)),
+      (vertcat(4,2.4), vertcat(jx2+(jx3-jx2)*0.4, -42-12)),
+
+      (vertcat(3,2), vertcat(jx0,jy0+(jy1-jy0)*2.0/3)),
+      (vertcat(3,3), vertcat(jx1,jy0+(jy1-jy0)*2.0/3)),
+      
+      (vertcat(3,2.4), vertcat(jx0+(jx1-jx0)*0.4,jy0+(jy1-jy0)*2.0/3)),
+      
+    ]
+    
+    for a,r in pairs:
+      self.checkarray(J(a).T, r)
+      self.check_codegen(J,inputs=[a])
+      
   def test_Callback_Jacobian(self):
     x = MX.sym("x")
     y = MX.sym("y")
@@ -1237,7 +1320,6 @@ class Functiontests(casadiTestCase):
     for i in range(-1,3):
       self.checkfunction(F,Fsx,inputs = [i,A,B])
       self.check_codegen(F,inputs=[i,A,B])
-
 
 if __name__ == '__main__':
     unittest.main()

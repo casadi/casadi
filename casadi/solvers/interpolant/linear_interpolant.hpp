@@ -77,8 +77,17 @@ namespace casadi {
     ///@{
     /** \brief Full Jacobian */
     virtual bool hasFullJacobian() const { return true;}
-    virtual Function getFullJacobian(const std::string& name, const Dict& opts);
+    virtual Function getFullJacobian(const std::string& name,
+                                      const std::vector<std::string>& i_names,
+                                      const std::vector<std::string>& o_names,
+                                      const Dict& opts);
     ///@}
+
+    /** \brief Is codegen supported? */
+    virtual bool has_codegen() const { return true;}
+
+    /** \brief Generate code for the body of the C function */
+    virtual void generateBody(CodeGenerator& g) const;
 
     /// A documentation string
     static const std::string meta_doc;
@@ -95,6 +104,12 @@ namespace casadi {
 
     /** \brief Get type name */
     virtual std::string type_name() const { return "interpolant_linear_jac";}
+
+    /** \brief Is codegen supported? */
+    virtual bool has_codegen() const { return true;}
+
+    /** \brief Generate code for the body of the C function */
+    virtual void generateBody(CodeGenerator& g) const;
 
     // Initialize
     virtual void init(const Dict& opts);
