@@ -83,6 +83,12 @@ namespace casadi {
     /** \brief Get or add an integer constant */
     int getConstant(const std::vector<int>& v, bool allow_adding=false);
 
+    /** \brief Represent an array constant; adding it when new */
+    std::string constant(const std::vector<int>& v);
+
+    /** \brief Represent an array constant; adding it when new */
+    std::string constant(const std::vector<double>& v);
+
     /** \brief Use simplified signature */
     static bool simplifiedCall(const Function& f);
 
@@ -118,6 +124,16 @@ namespace casadi {
     std::string rank1(const std::string& A, const Sparsity& sp_A, const std::string& alpha,
                       const std::string& x, const std::string& y);
 
+    std::string interpn(int ndim, const std::string& grid, const std::string& offset,
+                                         const std::string& values, const std::string& x,
+                                         const std::string& iw, const std::string& w);
+
+    std::string interpn_grad(const std::string& grad,
+                                     int ndim, const std::string& grid,
+                                     const std::string& offset,
+                                     const std::string& values, const std::string& x,
+                                     const std::string& iw, const std::string& w);
+
     /** \brief Declare a function */
     std::string declare(std::string s);
 
@@ -141,7 +157,14 @@ namespace casadi {
       AUX_PROJECT,
       AUX_TRANS,
       AUX_TO_MEX,
-      AUX_FROM_MEX
+      AUX_FROM_MEX,
+      AUX_INTERPN,
+      AUX_INTERPN_GRAD,
+      AUX_FLIP,
+      AUX_INTERPN_WEIGHTS,
+      AUX_LOW,
+      AUX_INTERPN_INTERPOLATE,
+      AUX_FILL_INT
     };
 
     /** \brief Add a built-in auxiliary function */
