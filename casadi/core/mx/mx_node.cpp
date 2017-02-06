@@ -529,14 +529,12 @@ namespace casadi {
     // Create binary node
     if (sparsity().is_scalar(false)) {
       if (nnz()==0) {
-        if (operation_checker<F0XChecker>(op)) return MX::zeros(Sparsity(y.size()));
         return toMatrix(MX(0)->getBinary(op, y, true, false), y.sparsity());
       } else {
         return toMatrix(getBinary(op, y, true, false), y.sparsity());
       }
     } else if (y.is_scalar()) {
       if (y.nnz()==0) {
-        if (operation_checker<FX0Checker>(op)) return MX::zeros(Sparsity(size()));
         return toMatrix(getBinary(op, MX(0), false, true), sparsity());
       } else {
         return toMatrix(getBinary(op, y, false, true), sparsity());
@@ -567,12 +565,7 @@ namespace casadi {
 
     if (GlobalOptions::simplification_on_the_fly) {
 
-      // If identically zero due to one argument being zero
-      if ((operation_checker<F0XChecker>(op) && nnz()==0) ||
-         (operation_checker<FX0Checker>(op) && y->nnz()==0)) {
-        return MX::zeros(Sparsity(size()));
-      }
-
+      // If identically zero due to one argumebt being zero
       if ((operation_checker<F0XChecker>(op) && is_zero()) ||
          (operation_checker<FX0Checker>(op) && y->is_zero())) {
         return MX::zeros(sparsity());

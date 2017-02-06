@@ -1087,11 +1087,6 @@ namespace casadi {
   Matrix<Scalar> Matrix<Scalar>::scalar_matrix(int op,
                                                    const Matrix<Scalar> &x,
                                                    const Matrix<Scalar> &y) {
-
-    if ( (operation_checker<FX0Checker>(op) && y.nnz()==0) ||
-         (operation_checker<F0XChecker>(op) && x.nnz()==0))
-            return Matrix<Scalar>::zeros(Sparsity(y.size()));
-
     // Return value
     Matrix<Scalar> ret = Matrix<Scalar>::zeros(y.sparsity());
 
@@ -1123,11 +1118,6 @@ namespace casadi {
   Matrix<Scalar> Matrix<Scalar>::matrix_scalar(int op,
                                                    const Matrix<Scalar> &x,
                                                    const Matrix<Scalar> &y) {
-
-    if ( (operation_checker<FX0Checker>(op) && y.nnz()==0) ||
-         (operation_checker<F0XChecker>(op) && x.nnz()==0))
-            return Matrix<Scalar>::zeros(Sparsity(x.size()));
-
     // Return value
     Matrix<Scalar> ret = Matrix<Scalar>::zeros(x.sparsity());
 

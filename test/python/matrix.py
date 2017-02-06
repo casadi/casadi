@@ -993,20 +993,6 @@ class Matrixtests(casadiTestCase):
       DM([DM([1,2]),DM([1,2])])
     a = DM([DM([1]),DM([2])])
     self.checkarray(a,DM([1,2]))
-    
-  def test_sparsity_operation(self):
-    L = [DM(1), DM(Sparsity(1,1),1), DM(Sparsity(2,1),1), DM(Sparsity.dense(2,1),1)]
-    
-    for a in L:
-      for b in L:
-        c = a*b
-        
-        if a.nnz()==0 or b.nnz()==0:
-          self.assertTrue(c.nnz()==0)
-        else:
-          self.assertTrue(c.nnz()>0)
-
-    self.assertTrue(sum2(IM(Sparsity(1,1),1)).nnz()==0)
 
 if __name__ == '__main__':
     unittest.main()
