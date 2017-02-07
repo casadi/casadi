@@ -10460,18 +10460,6 @@ You can retrieve the entire state trajectory as follows, after the evaluate
 call: Call reset. Then call integrate(t_i) and getOuput for a series of
 times t_i.
 
-Note: depending on the dimension and structure of your problem, you may
-experience a dramatic speed-up by using a sparse linear solver:
-
-
-
-::
-
-     intg.setOption(\"linear_solver\",\"csparse\")
-     intg.setOption(\"linear_solver_type\",\"user_defined\")
-
-
-
 >List of available options
 
 +------------------------+------------------------+------------------------+
@@ -10566,18 +10554,6 @@ idas
 
 
 Interface to IDAS from the Sundials suite.
-
-Note: depending on the dimension and structure of your problem, you may
-experience a dramatic speed-up by using a sparse linear solver:
-
-
-
-::
-
-     intg.setOption(\"linear_solver\",\"csparse\")
-     intg.setOption(\"linear_solver_type\",\"user_defined\")
-
-
 
 >List of available options
 
