@@ -11,12 +11,12 @@ for L in file("src/Makefile","r"):
 targets = sorted(list(targets))
 
 combinations = [
-("X64_AVX","GENERIC"),
-("X64_AVX2","X64_INTEL_HASWELL"),
-("X64_AVX","X64_INTEL_SANDY_BRIDGE"),
-("X64_SSE3","X64_INTEL_CORE"),
-("X64_SSE3","X64_AMD_BULLDOZER"),
-("C99_4X4","GENERIC")]
+("X64_AVX2","X64_INTEL_HASWELL")]
+#("X64_AVX","GENERIC"),
+#("X64_AVX","X64_INTEL_SANDY_BRIDGE"),
+#("X64_SSE3","X64_INTEL_CORE"),
+#("X64_SSE3","X64_AMD_BULLDOZER"),
+#("C99_4X4","GENERIC")]
 #("C99_4X4_PREFETCH","GENERIC")]
 
 #("CORTEX_A7","GENERIC"),
