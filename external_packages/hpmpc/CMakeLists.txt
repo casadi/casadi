@@ -41,7 +41,7 @@ src/mpc_solvers/avx/d_res_ip_res_hard.c
 src/interfaces/c/c_interface_work_space.c
 src/interfaces/c/c_order_interface.c
 src/interfaces/c/fortran_order_interface.c)
-SET_TARGET_PROPERTIES(casadi_hpmpc_X64_AVX_GENERIC PROPERTIES COMPILE_FLAGS "-DLA_BLASFEO -DTARGET_GENERIC -DTARGET_X64_AVX -O2 -fPIC -DBLASFEO -m64 -mavx -DTARGET_X64_AVX ${HPMPC_FLAGS}")
+SET_TARGET_PROPERTIES(casadi_hpmpc_X64_AVX_GENERIC PROPERTIES COMPILE_FLAGS "-DLA_HIGH_PERFORMANCE -DTARGET_GENERIC -DTARGET_X64_AVX -O2 -fPIC -DBLASFEO -m64 -mavx -DTARGET_X64_AVX ${HPMPC_FLAGS}")
 
 target_link_libraries(casadi_hpmpc_X64_AVX_GENERIC casadi_blasfeo_GENERIC m)
 endif()
@@ -76,7 +76,7 @@ src/mpc_solvers/avx/d_res_ip_res_hard.c
 src/interfaces/c/c_interface_work_space.c
 src/interfaces/c/c_order_interface.c
 src/interfaces/c/fortran_order_interface.c)
-SET_TARGET_PROPERTIES(casadi_hpmpc_X64_AVX2_X64_INTEL_HASWELL PROPERTIES COMPILE_FLAGS "-DLA_BLASFEO -DTARGET_X64_INTEL_HASWELL -DTARGET_X64_AVX2 -O2 -fPIC -DBLASFEO -m64 -mavx2 -mfma -DTARGET_X64_AVX2 ${HPMPC_FLAGS}")
+SET_TARGET_PROPERTIES(casadi_hpmpc_X64_AVX2_X64_INTEL_HASWELL PROPERTIES COMPILE_FLAGS "-DLA_HIGH_PERFORMANCE -DTARGET_X64_INTEL_HASWELL -DTARGET_X64_AVX2 -O2 -fPIC -DBLASFEO -m64 -mavx2 -mfma -DTARGET_X64_AVX2 ${HPMPC_FLAGS}")
 
 target_link_libraries(casadi_hpmpc_X64_AVX2_X64_INTEL_HASWELL casadi_blasfeo_X64_INTEL_HASWELL m)
 endif()
@@ -111,7 +111,7 @@ src/mpc_solvers/avx/d_res_ip_res_hard.c
 src/interfaces/c/c_interface_work_space.c
 src/interfaces/c/c_order_interface.c
 src/interfaces/c/fortran_order_interface.c)
-SET_TARGET_PROPERTIES(casadi_hpmpc_X64_AVX_X64_INTEL_SANDY_BRIDGE PROPERTIES COMPILE_FLAGS "-DLA_BLASFEO -DTARGET_X64_INTEL_SANDY_BRIDGE -DTARGET_X64_AVX -O2 -fPIC -DBLASFEO -m64 -mavx -DTARGET_X64_AVX ${HPMPC_FLAGS}")
+SET_TARGET_PROPERTIES(casadi_hpmpc_X64_AVX_X64_INTEL_SANDY_BRIDGE PROPERTIES COMPILE_FLAGS "-DLA_HIGH_PERFORMANCE -DTARGET_X64_INTEL_SANDY_BRIDGE -DTARGET_X64_AVX -O2 -fPIC -DBLASFEO -m64 -mavx -DTARGET_X64_AVX ${HPMPC_FLAGS}")
 
 target_link_libraries(casadi_hpmpc_X64_AVX_X64_INTEL_SANDY_BRIDGE casadi_blasfeo_X64_INTEL_SANDY_BRIDGE m)
 endif()
@@ -146,7 +146,7 @@ src/mpc_solvers/c99/d_res_ip_res_hard.c
 src/interfaces/c/c_interface_work_space.c
 src/interfaces/c/c_order_interface.c
 src/interfaces/c/fortran_order_interface.c)
-SET_TARGET_PROPERTIES(casadi_hpmpc_X64_SSE3_X64_INTEL_CORE PROPERTIES COMPILE_FLAGS "-DLA_BLASFEO -DTARGET_X64_INTEL_CORE -DTARGET_X64_SSE3 -O2 -fPIC -DBLASFEO -m64 -msse3 -DTARGET_X64_SSE3 ${HPMPC_FLAGS}")
+SET_TARGET_PROPERTIES(casadi_hpmpc_X64_SSE3_X64_INTEL_CORE PROPERTIES COMPILE_FLAGS "-DLA_HIGH_PERFORMANCE -DTARGET_X64_INTEL_CORE -DTARGET_X64_SSE3 -O2 -fPIC -DBLASFEO -m64 -msse3 -DTARGET_X64_SSE3 ${HPMPC_FLAGS}")
 
 target_link_libraries(casadi_hpmpc_X64_SSE3_X64_INTEL_CORE casadi_blasfeo_X64_INTEL_CORE m)
 endif()
@@ -181,7 +181,7 @@ src/mpc_solvers/c99/d_res_ip_res_hard.c
 src/interfaces/c/c_interface_work_space.c
 src/interfaces/c/c_order_interface.c
 src/interfaces/c/fortran_order_interface.c)
-SET_TARGET_PROPERTIES(casadi_hpmpc_X64_SSE3_X64_AMD_BULLDOZER PROPERTIES COMPILE_FLAGS "-DLA_BLASFEO -DTARGET_X64_AMD_BULLDOZER -DTARGET_X64_SSE3 -O2 -fPIC -DBLASFEO -m64 -msse3 -DTARGET_X64_SSE3 ${HPMPC_FLAGS}")
+SET_TARGET_PROPERTIES(casadi_hpmpc_X64_SSE3_X64_AMD_BULLDOZER PROPERTIES COMPILE_FLAGS "-DLA_HIGH_PERFORMANCE -DTARGET_X64_AMD_BULLDOZER -DTARGET_X64_SSE3 -O2 -fPIC -DBLASFEO -m64 -msse3 -DTARGET_X64_SSE3 ${HPMPC_FLAGS}")
 
 target_link_libraries(casadi_hpmpc_X64_SSE3_X64_AMD_BULLDOZER casadi_blasfeo_X64_AMD_BULLDOZER m)
 endif()
@@ -215,6 +215,6 @@ src/mpc_solvers/c99/d_res_ip_res_hard.c
 src/interfaces/c/c_interface_work_space.c
 src/interfaces/c/c_order_interface.c
 src/interfaces/c/fortran_order_interface.c)
-SET_TARGET_PROPERTIES(casadi_hpmpc_C99_4X4_GENERIC PROPERTIES COMPILE_FLAGS "-DLA_BLASFEO -DTARGET_GENERIC -DTARGET_C99_4X4 -O2 -fPIC -DBLASFEO -march=native -DTARGET_C99_4X4 ${HPMPC_FLAGS}")
+SET_TARGET_PROPERTIES(casadi_hpmpc_C99_4X4_GENERIC PROPERTIES COMPILE_FLAGS "-DLA_HIGH_PERFORMANCE -DTARGET_GENERIC -DTARGET_C99_4X4 -O2 -fPIC -DBLASFEO -march=native -DTARGET_C99_4X4 ${HPMPC_FLAGS}")
 
 target_link_libraries(casadi_hpmpc_C99_4X4_GENERIC casadi_blasfeo_GENERIC m)
