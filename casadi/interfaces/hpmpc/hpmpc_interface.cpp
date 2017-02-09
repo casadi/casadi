@@ -101,7 +101,7 @@ namespace casadi {
     inf_ = 1e6;
     //target_ = "C99_4X4";
     target_ = "X64_AVX2";
-    blasfeo_target_ = "GENERIC";
+    blasfeo_target_ = "X64_INTEL_HASWELL";
     int struct_cnt=0;
     // Read options
     for (auto&& op : opts) {
