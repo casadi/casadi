@@ -38,6 +38,7 @@ src/mpc_solvers/d_res_ip_hard.c
 src/mpc_solvers/d_ip2_res_hard.c
 src/mpc_solvers/avx/d_aux_ip_hard_lib4.c
 src/mpc_solvers/avx/d_res_ip_res_hard.c
+src/mpc_solvers/d_res_ip_soft.c
 src/interfaces/c/c_interface_work_space.c
 src/interfaces/c/c_order_interface.c
 src/interfaces/c/fortran_order_interface.c)
@@ -73,6 +74,7 @@ src/mpc_solvers/d_res_ip_hard.c
 src/mpc_solvers/d_ip2_res_hard.c
 src/mpc_solvers/avx/d_aux_ip_hard_lib4.c
 src/mpc_solvers/avx/d_res_ip_res_hard.c
+src/mpc_solvers/d_res_ip_soft.c
 src/interfaces/c/c_interface_work_space.c
 src/interfaces/c/c_order_interface.c
 src/interfaces/c/fortran_order_interface.c)
@@ -108,6 +110,7 @@ src/mpc_solvers/d_res_ip_hard.c
 src/mpc_solvers/d_ip2_res_hard.c
 src/mpc_solvers/avx/d_aux_ip_hard_lib4.c
 src/mpc_solvers/avx/d_res_ip_res_hard.c
+src/mpc_solvers/d_res_ip_soft.c
 src/interfaces/c/c_interface_work_space.c
 src/interfaces/c/c_order_interface.c
 src/interfaces/c/fortran_order_interface.c)
@@ -143,6 +146,7 @@ src/mpc_solvers/d_res_ip_hard.c
 src/mpc_solvers/d_ip2_res_hard.c
 src/mpc_solvers/c99/d_aux_ip_hard_lib4.c
 src/mpc_solvers/c99/d_res_ip_res_hard.c
+src/mpc_solvers/d_res_ip_soft.c
 src/interfaces/c/c_interface_work_space.c
 src/interfaces/c/c_order_interface.c
 src/interfaces/c/fortran_order_interface.c)
@@ -178,6 +182,7 @@ src/mpc_solvers/d_res_ip_hard.c
 src/mpc_solvers/d_ip2_res_hard.c
 src/mpc_solvers/c99/d_aux_ip_hard_lib4.c
 src/mpc_solvers/c99/d_res_ip_res_hard.c
+src/mpc_solvers/d_res_ip_soft.c
 src/interfaces/c/c_interface_work_space.c
 src/interfaces/c/c_order_interface.c
 src/interfaces/c/fortran_order_interface.c)
@@ -212,6 +217,7 @@ src/mpc_solvers/d_res_ip_hard.c
 src/mpc_solvers/d_ip2_res_hard.c
 src/mpc_solvers/c99/d_aux_ip_hard_lib4.c
 src/mpc_solvers/c99/d_res_ip_res_hard.c
+src/mpc_solvers/d_res_ip_soft.c
 src/interfaces/c/c_interface_work_space.c
 src/interfaces/c/c_order_interface.c
 src/interfaces/c/fortran_order_interface.c)
