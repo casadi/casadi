@@ -139,6 +139,7 @@ namespace casadi {
     int max_krylov_;
     bool use_precon_;
     bool second_order_correction_;
+    double step0_;
     ///@}
 
     /// Linear solver

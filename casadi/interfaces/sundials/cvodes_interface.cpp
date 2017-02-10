@@ -148,6 +148,9 @@ namespace casadi {
     // Maximum number of steps
     THROWING(CVodeSetMaxNumSteps, m->mem, max_num_steps_);
 
+    // Initial step size
+    if (step0_) THROWING(CVodeSetInitStep, m->mem, step0_);
+
     // attach a linear solver
     if (newton_scheme_==SD_DIRECT) {
       // Direct scheme

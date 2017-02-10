@@ -91,8 +91,11 @@ namespace casadi {
        {OT_DICT,
         "Options to be passed to the linear solver"}},
       {"second_order_correction",
-       {OT_BOOL,
-        "Second order correction in the augmented system Jacobian [true]"}}
+        {OT_BOOL,
+        "Second order correction in the augmented system Jacobian [true]"}},
+      {"step0",
+        {OT_DOUBLE,
+          "initial step size [default: 0/estimated]"}}
      }
   };
 
@@ -119,6 +122,7 @@ namespace casadi {
     disable_internal_warnings_ = false;
     max_multistep_order_ = 5;
     second_order_correction_ = true;
+    step0_ = 0;
 
     // Read options
     for (auto&& op : opts) {
@@ -152,6 +156,8 @@ namespace casadi {
         max_multistep_order_ = op.second;
       } else if (op.first=="second_order_correction") {
         second_order_correction_ = op.second;
+      } else if (op.first=="step0") {
+        step0_ = op.second;
       }
     }
 
