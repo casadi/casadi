@@ -8315,6 +8315,9 @@ experience a dramatic speed-up by using a sparse linear solver:
 | sensitivity_method     | OT_STRING              | Sensitivity method:    |
 |                        |                        | SIMULTANEOUS|staggered |
 +------------------------+------------------------+------------------------+
+| step0                  | OT_DOUBLE              | initial step size      |
+|                        |                        | [default: 0/estimated] |
++------------------------+------------------------+------------------------+
 | steps_per_checkpoint   | OT_INT                 | Number of steps        |
 |                        |                        | between two            |
 |                        |                        | consecutive            |
@@ -8437,6 +8440,9 @@ experience a dramatic speed-up by using a sparse linear solver:
 +------------------------+------------------------+------------------------+
 | sensitivity_method     | OT_STRING              | Sensitivity method:    |
 |                        |                        | SIMULTANEOUS|staggered |
++------------------------+------------------------+------------------------+
+| step0                  | OT_DOUBLE              | initial step size      |
+|                        |                        | [default: 0/estimated] |
 +------------------------+------------------------+------------------------+
 | steps_per_checkpoint   | OT_INT                 | Number of steps        |
 |                        |                        | between two            |
