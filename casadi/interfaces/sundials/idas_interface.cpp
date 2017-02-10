@@ -289,6 +289,15 @@ namespace casadi {
     // Set maximum step size
     THROWING(IDASetMaxStep, m->mem, max_step_size_);
 
+    // Initial step size
+    if (step0_) THROWING(IDASetInitStep, m->mem, step0_);
+
+    // Maximum order of method
+    if (max_order_) THROWING(IDASetMaxOrd, m->mem, max_order_);
+
+    // Coeff. in the nonlinear convergence test
+    if (nonlin_conv_coeff_) THROWING(IDASetNonlinConvCoef, m->mem, nonlin_conv_coeff_);
+
     if (!abstolv_.empty()) {
       // Vector absolute tolerances
       N_Vector nv_abstol = N_VNew_Serial(abstolv_.size());
@@ -436,6 +445,9 @@ namespace casadi {
     THROWING(IDAGetIntegratorStats, m->mem, &m->nsteps, &m->nfevals, &m->nlinsetups,
              &m->netfails, &m->qlast, &m->qcur, &m->hinused,
              &m->hlast, &m->hcur, &m->tcur);
+
+    THROWING(IDAGetNonlinSolvStats, m->mem, &m->nniters, &m->nncfails);
+
   }
 
   void IdasInterface::resetB(IntegratorMemory* mem, double t, const double* rx,

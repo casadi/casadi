@@ -91,11 +91,17 @@ namespace casadi {
        {OT_DICT,
         "Options to be passed to the linear solver"}},
       {"second_order_correction",
-        {OT_BOOL,
+       {OT_BOOL,
         "Second order correction in the augmented system Jacobian [true]"}},
       {"step0",
-        {OT_DOUBLE,
-          "initial step size [default: 0/estimated]"}}
+       {OT_DOUBLE,
+        "initial step size [default: 0/estimated]"}},
+      {"max_order",
+       {OT_DOUBLE,
+        "Maximum order"}},
+      {"nonlin_conv_coeff",
+       {OT_DOUBLE,
+        "Coefficient in the nonlinear convergence test"}}
      }
   };
 
@@ -123,6 +129,8 @@ namespace casadi {
     max_multistep_order_ = 5;
     second_order_correction_ = true;
     step0_ = 0;
+    max_order_ = 0;
+    nonlin_conv_coeff_ = 0;
 
     // Read options
     for (auto&& op : opts) {
@@ -158,6 +166,10 @@ namespace casadi {
         second_order_correction_ = op.second;
       } else if (op.first=="step0") {
         step0_ = op.second;
+      } else if (op.first=="max_order") {
+        max_order_ = op.second;
+      } else if (op.first=="nonlin_conv_coeff") {
+        nonlin_conv_coeff_ = op.second;
       }
     }
 
@@ -299,6 +311,8 @@ namespace casadi {
     stats["hlast"] = m->hlast;
     stats["hcur"] = m->hcur;
     stats["tcur"] = m->tcur;
+    stats["nniters"] = static_cast<int>(m->nniters);
+    stats["nncfails"] = static_cast<int>(m->nncfails);
 
     // Counters, backward problem
     stats["nstepsB"] = static_cast<int>(m->nstepsB);
@@ -311,6 +325,8 @@ namespace casadi {
     stats["hlastB"] = m->hlastB;
     stats["hcurB"] = m->hcurB;
     stats["tcurB"] = m->tcurB;
+    stats["nnitersB"] = static_cast<int>(m->nnitersB);
+    stats["nncfailsB"] = static_cast<int>(m->nncfailsB);
     return stats;
   }
 
@@ -328,7 +344,8 @@ namespace casadi {
     stream << "Step size taken on the last internal step: " << m->hlast << endl;
     stream << "Step size to be attempted on the next internal step: " << m->hcur << endl;
     stream << "Current internal time reached: " << m->tcur << endl;
-    stream << "Number of checkpoints stored: " << m->ncheck << endl;
+    stream << "Number of nonlinear iterations performed: " << m->nniters << endl;
+    stream << "Number of nonlinear convergence failures: " << m->nncfails << endl;
     if (nrx_>0) {
       stream << "BACKWARD INTEGRATION:" << endl;
       stream << "Number of steps taken by SUNDIALS: " << m->nstepsB << endl;
@@ -342,6 +359,8 @@ namespace casadi {
       stream << "Step size taken on the last internal step: " << m->hlastB << endl;
       stream << "Step size to be attempted on the next internal step: " << m->hcurB << endl;
       stream << "Current internal time reached: " << m->tcurB << endl;
+      stream << "Number of nonlinear iterations performed: " << m->nnitersB << endl;
+      stream << "Number of nonlinear convergence failures: " << m->nncfailsB << endl;
     }
     stream << endl;
   }
