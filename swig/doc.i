@@ -10517,10 +10517,16 @@ experience a dramatic speed-up by using a sparse linear solver:
 | max_num_steps          | OT_INT                 | Maximum number of      |
 |                        |                        | integrator steps       |
 +------------------------+------------------------+------------------------+
+| max_order              | OT_DOUBLE              | Maximum order          |
++------------------------+------------------------+------------------------+
 | newton_scheme          | OT_STRING              | Linear solver scheme   |
 |                        |                        | in the Newton method:  |
 |                        |                        | DIRECT|gmres|bcgstab|t |
 |                        |                        | fqmr                   |
++------------------------+------------------------+------------------------+
+| nonlin_conv_coeff      | OT_DOUBLE              | Coefficient in the     |
+|                        |                        | nonlinear convergence  |
+|                        |                        | test                   |
 +------------------------+------------------------+------------------------+
 | nonlinear_solver_itera | OT_STRING              | Nonlinear solver type: |
 | tion                   |                        | NEWTON|functional      |
@@ -10644,12 +10650,18 @@ experience a dramatic speed-up by using a sparse linear solver:
 | max_num_steps          | OT_INT                 | Maximum number of      |
 |                        |                        | integrator steps       |
 +------------------------+------------------------+------------------------+
+| max_order              | OT_DOUBLE              | Maximum order          |
++------------------------+------------------------+------------------------+
 | max_step_size          | OT_DOUBLE              | Maximim step size      |
 +------------------------+------------------------+------------------------+
 | newton_scheme          | OT_STRING              | Linear solver scheme   |
 |                        |                        | in the Newton method:  |
 |                        |                        | DIRECT|gmres|bcgstab|t |
 |                        |                        | fqmr                   |
++------------------------+------------------------+------------------------+
+| nonlin_conv_coeff      | OT_DOUBLE              | Coefficient in the     |
+|                        |                        | nonlinear convergence  |
+|                        |                        | test                   |
 +------------------------+------------------------+------------------------+
 | quad_err_con           | OT_BOOL                | Should the quadratures |
 |                        |                        | affect the step size   |
