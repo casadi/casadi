@@ -54,6 +54,7 @@ src/lqcp_solvers/d_tree_back_ric_rec_libstr.c
 src/lqcp_solvers/d_part_cond_libstr.c
 src/mpc_solvers/c99/d_aux_ip_hard_libstr.c
 src/mpc_solvers/c99/d_res_ip_res_hard_libstr.c
+#src/mpc_solvers/avx/d_aux_tree_ip_hard_libstr.c
 src/mpc_solvers/d_ip2_res_hard_libstr.c
 src/mpc_solvers/d_tree_ip2_res_hard_libstr.c
 src/interfaces/c/fortran_order_interface_libstr.c)
@@ -67,11 +68,13 @@ src/auxiliary/i_aux.c
 src/lqcp_solvers/d_back_ric_rec_libstr.c
 src/lqcp_solvers/d_tree_back_ric_rec_libstr.c
 src/lqcp_solvers/d_part_cond_libstr.c
+src/mpc_solvers/avx/d_aux_tree_ip_hard_libstr.c
 src/mpc_solvers/c99/d_aux_ip_hard_libstr.c
 src/mpc_solvers/c99/d_res_ip_res_hard_libstr.c
 src/mpc_solvers/d_ip2_res_hard_libstr.c
 src/mpc_solvers/d_tree_ip2_res_hard_libstr.c
 src/interfaces/c/fortran_order_interface_libstr.c)
-SET_TARGET_PROPERTIES(casadi_hpmpc_C99_4X4_GENERIC PROPERTIES COMPILE_FLAGS "-DLA_HIGH_PERFORMANCE -DTARGET_GENERIC -DTARGET_C99_4X4 -O2 -fPIC -DBLASFEO -march=native -DTARGET_C99_4X4 ${HPMPC_FLAGS}")
+#SET_TARGET_PROPERTIES(casadi_hpmpc_C99_4X4_GENERIC PROPERTIES COMPILE_FLAGS "-DLA_HIGH_PERFORMANCE -DTARGET_GENERIC -DTARGET_C99_4X4 -O2 -fPIC -DBLASFEO -march=native -DTARGET_C99_4X4 ${HPMPC_FLAGS}")
+SET_TARGET_PROPERTIES(casadi_hpmpc_C99_4X4_GENERIC PROPERTIES COMPILE_FLAGS "-DLA_HIGH_PERFORMANCE -DTARGET_C99_4X4 -O2 -fPIC -DBLASFEO -march=native ${HPMPC_FLAGS}")
 
 target_link_libraries(casadi_hpmpc_C99_4X4_GENERIC casadi_blasfeo_GENERIC m)
