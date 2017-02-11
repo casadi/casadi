@@ -350,6 +350,39 @@ namespace casadi {
     options->SetRegisteredOptions(roptions);
     bonmin.setOptionsAndJournalist(roptions, options, journalist);
     bonmin.registerOptions();
+    // Get all options available in BONMIN
+    auto regops = bonmin.roptions()->RegisteredOptionsList();
+
+    // Pass all the options to BONMIN
+    for (auto&& op : opts_) {
+      // Find the option
+      auto regops_it = regops.find(op.first);
+      if (regops_it==regops.end()) {
+        casadi_error("No such BONMIN option: " + op.first);
+      }
+
+      // Get the type
+      Ipopt::RegisteredOptionType ipopt_type = regops_it->second->Type();
+
+      // Pass to BONMIN
+      bool ret;
+      switch (ipopt_type) {
+      case Ipopt::OT_Number:
+        ret = bonmin.options()->SetNumericValue(op.first, op.second.to_double(), false);
+        break;
+      case Ipopt::OT_Integer:
+        ret = bonmin.options()->SetIntegerValue(op.first, op.second.to_int(), false);
+        break;
+      case Ipopt::OT_String:
+        ret = bonmin.options()->SetStringValue(op.first, op.second.to_string(), false);
+        break;
+      case Ipopt::OT_Unknown:
+      default:
+        casadi_warning("Cannot handle option \"" + op.first + "\", ignored");
+        continue;
+      }
+      if (!ret) casadi_error("Invalid options were detected by BONMIN.");
+    }
 
     // Initialize
     bonmin.initialize(GetRawPtr(tminlp));
