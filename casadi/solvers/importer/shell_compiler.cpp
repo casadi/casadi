@@ -70,14 +70,28 @@ namespace casadi {
      {{"compiler",
        {OT_STRING,
         "Compiler command"}},
+      {"linker",
+       {OT_STRING,
+        "Linker command"}},
+      {"folder",
+       {OT_STRING,
+        "Folder to put temporary objects in."}},
       {"compiler_setup",
        {OT_STRING,
         "Compiler setup command. Intended to be fixed."
         " The 'flag' option is the prefered way to set"
         " custom flags."}},
-      {"flags",
+      {"linker_setup",
+       {OT_STRING,
+        "Linker setup command. Intended to be fixed."
+        " The 'flag' option is the prefered way to set"
+        " custom flags."}},
+      {"compiler_flags",
        {OT_STRINGVECTOR,
-      "Compile flags for the JIT compiler. Default: None"}}
+        "Compile flags for the JIT compiler. Default: None"}},
+      {"linker_flags",
+       {OT_STRINGVECTOR,
+        "Linker flags for the JIT compiler. Default: None"}}
      }
   };
 
@@ -87,36 +101,41 @@ namespace casadi {
 
     // Default options
     string compiler = "gcc";
-    string compiler_setup = "-fPIC -shared";
-    vector<string> flags;
+    string linker = "gcc";
+    string compiler_setup = "-fPIC -c";
+    string linker_setup = "-shared";
+    vector<string> compiler_flags;
+    vector<string> linker_flags;
 
     // Read options
     for (auto&& op : opts) {
       if (op.first=="compiler") {
         compiler = op.second.to_string();
+      } else if (op.first=="linker") {
+        linker = op.second.to_string();
       } else if (op.first=="compiler_setup") {
         compiler_setup = op.second.to_string();
-      } else if (op.first=="flags") {
-        flags = op.second;
+      } else if (op.first=="linker_setup") {
+        linker_setup = op.second.to_string();
+      } else if (op.first=="compiler_flags") {
+        compiler_flags = op.second;
+      } else if (op.first=="linker_flags") {
+        linker_flags = op.second;
       }
     }
-
-    // Construct the compiler command
-    stringstream cmd;
-    cmd << compiler << " " << compiler_setup;
-    for (vector<string>::const_iterator i=flags.begin(); i!=flags.end(); ++i) {
-      cmd << " " << *i;
-    }
-
-    // C/C++ source file
-    cmd << " " << name_;
 
     // Name of temporary file
 #ifdef HAVE_MKSTEMPS
     // Preferred solution
+    char obj_name[] = "tmp_casadi_compiler_shell_XXXXXX.o";
+    if (mkstemps(obj_name, 2) == -1) {
+      casadi_error("Failed to create a temporary object file name");
+    }
+    std::string obj_name_ = obj_name;
+
     char bin_name[] = "tmp_casadi_compiler_shell_XXXXXX.so";
     if (mkstemps(bin_name, 3) == -1) {
-      casadi_error("Failed to create a temporary file name");
+      casadi_error("Failed to create a temporary library file name");
     }
     bin_name_ = bin_name;
 #else
@@ -127,16 +146,49 @@ namespace casadi {
 #endif
 
     // Have relative paths start with ./
+    if (obj_name_.at(0)!='/') {
+      obj_name_ = "./" + obj_name_;
+    }
+
     if (bin_name_.at(0)!='/') {
       bin_name_ = "./" + bin_name_;
     }
 
+    // Construct the compiler command
+    stringstream cccmd;
+    cccmd << compiler;
+    for (vector<string>::const_iterator i=compiler_flags.begin(); i!=compiler_flags.end(); ++i) {
+      cccmd << " " << *i;
+    }
+    cccmd << " " << compiler_setup;
+
+    // C/C++ source file
+    cccmd << " " << name_;
+
+    // Temporary object file
+    cccmd << " -o " << obj_name_;
+
+    // Compile into an object
+    std::cout << "calling \"" << cccmd.str() << "\"" << std::endl;
+    if (system(cccmd.str().c_str())) {
+      casadi_error("Compilation failed. Tried \"" + cccmd.str() + "\"");
+    }
+
+    // Link step
+    stringstream ldcmd;
+    ldcmd << linker;
+    for (vector<string>::const_iterator i=linker_flags.begin(); i!=linker_flags.end(); ++i) {
+      ldcmd << " " << *i;
+    }
+    ldcmd << " " << linker_setup;
+
     // Temporary file
-    cmd << " -o " << bin_name_;
+    ldcmd << " " << obj_name_ << " -o " << bin_name_;
 
     // Compile into a shared library
-    if (system(cmd.str().c_str())) {
-      casadi_error("Compilation failed. Tried \"" + cmd.str() + "\"");
+    std::cout << "calling \"" << ldcmd.str() << "\"" << std::endl;
+    if (system(ldcmd.str().c_str())) {
+      casadi_error("Linking failed. Tried \"" + ldcmd.str() + "\"");
     }
 
     // Load shared library
