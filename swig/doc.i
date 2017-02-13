@@ -5239,6 +5239,10 @@ Interface to the JIT compiler SHELL
 +========================+========================+========================+
 | compiler               | OT_STRING              | Compiler command       |
 +------------------------+------------------------+------------------------+
+| compiler_flags         | OT_STRINGVECTOR        | Compile flags for the  |
+|                        |                        | JIT compiler. Default: |
+|                        |                        | None                   |
++------------------------+------------------------+------------------------+
 | compiler_setup         | OT_STRING              | Compiler setup         |
 |                        |                        | command. Intended to   |
 |                        |                        | be fixed. The 'flag'   |
@@ -5246,9 +5250,20 @@ Interface to the JIT compiler SHELL
 |                        |                        | way to set custom      |
 |                        |                        | flags.                 |
 +------------------------+------------------------+------------------------+
-| flags                  | OT_STRINGVECTOR        | Compile flags for the  |
+| folder                 | OT_STRING              | Folder to put          |
+|                        |                        | temporary objects in.  |
++------------------------+------------------------+------------------------+
+| linker                 | OT_STRING              | Linker command         |
++------------------------+------------------------+------------------------+
+| linker_flags           | OT_STRINGVECTOR        | Linker flags for the   |
 |                        |                        | JIT compiler. Default: |
 |                        |                        | None                   |
++------------------------+------------------------+------------------------+
+| linker_setup           | OT_STRING              | Linker setup command.  |
+|                        |                        | Intended to be fixed.  |
+|                        |                        | The 'flag' option is   |
+|                        |                        | the prefered way to    |
+|                        |                        | set custom flags.      |
 +------------------------+------------------------+------------------------+
 
 --------------------------------------------------------------------------------
