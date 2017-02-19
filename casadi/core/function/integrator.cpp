@@ -114,6 +114,7 @@ namespace casadi {
     // Default options
     print_stats_ = false;
     output_t0_ = false;
+    print_time_ = false;
   }
 
   Integrator::~Integrator() {
@@ -148,6 +149,11 @@ namespace casadi {
   void Integrator::
   eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
     auto m = static_cast<IntegratorMemory*>(mem);
+
+    // Statistics
+    for (auto&& s : m->fstats) s.second.reset();
+
+    m->fstats.at("mainloop").tic();
 
     // Read inputs
     const double* x0 = arg[INTEGRATOR_X0];
@@ -194,8 +200,13 @@ namespace casadi {
       retreat(m, grid_.front(), rx, rz, rq);
     }
 
+    m->fstats.at("mainloop").toc();
+
     // Print statistics
     if (print_stats_) print_stats(m, userOut());
+
+    // Show statistics
+    if (print_time_)  print_fstats(static_cast<OracleMemory*>(mem));
   }
 
   Options Integrator::options_
@@ -323,6 +334,9 @@ namespace casadi {
 
   void Integrator::init_memory(void* mem) const {
     OracleFunction::init_memory(mem);
+
+    auto m = static_cast<IntegratorMemory*>(mem);
+    m->fstats["mainloop"] = FStats();
   }
 
   template<typename MatType>
