@@ -948,7 +948,57 @@ class Functiontests(casadiTestCase):
     for a,r in pairs:
       self.checkarray(J(a).T, r)
       self.check_codegen(J,inputs=[a])
+
+  def test_1d_interpolant_uniform(self):
+    grid = [[0, 1, 2]]
+    values = [0, 1, 2]
+    for opts in [{"lookup_mode": ["linear"]},{"lookup_mode": ["exact"]}]:
+      F = interpolant('F', 'linear', grid, values, opts)
+      def same(a, b): return abs(float(a)-b)<1e-8
+      self.assertTrue(same(F(2.4), 2.4))
+      self.assertTrue(same(F(1.4), 1.4))
+      self.assertTrue(same(F(0), 0))
+      self.assertTrue(same(F(1), 1))
+      self.assertTrue(same(F(2), 2))
+      self.assertTrue(same(F(6), 6))
+      self.assertTrue(same(F(0.4), 0.4))
+      self.assertTrue(same(F(-.6), -.6))
       
+      F = interpolant('F', 'linear', [np.linspace(0,1,7)], range(7), {"lookup_mode": ["exact"]})
+    
+    grid = [[2, 4, 6]]
+    values = [10, 7, 1]
+    for opts in [{"lookup_mode": ["linear"]},{"lookup_mode": ["exact"]}]:
+      F = interpolant('F', 'linear', grid, values, opts)
+      def same(a, b): return abs(float(a)-b)<1e-8
+      self.assertTrue(same(F(1), 11.5))
+      self.assertTrue(same(F(2), 10))
+      self.assertTrue(same(F(3), 8.5))
+      self.assertTrue(same(F(4), 7))
+      self.assertTrue(same(F(5), 4))
+      self.assertTrue(same(F(6), 1))
+      self.assertTrue(same(F(7), -2))
+      
+      F = interpolant('F', 'linear', [np.linspace(0,1,7)], range(7), {"lookup_mode": ["exact"]})
+    
+  def test_2d_interpolant_uniform(self):
+    grid = [[0, 1, 2], [0, 1, 2]]
+    values = [0, 1, 2, 10, 11, 12, 20, 21, 22]
+    for opts in [{"lookup_mode": ["linear","linear"]},{"lookup_mode": ["exact","exact"]}]:
+      F = interpolant('F', 'linear', grid, values, opts)
+      def same(a, b): return abs(float(a)-b)<1e-8
+      self.assertTrue(same(F([2.4, 0.5]), 7.4))
+      self.assertTrue(same(F([1.4, 0.5]), 6.4))
+      self.assertTrue(same(F([0.4, 0.5]), 5.4))
+      self.assertTrue(same(F([1, 0.5]), 6))
+      self.assertTrue(same(F([1, 0]), 1))
+      self.assertTrue(same(F([0, 0]), 0))
+      self.assertTrue(same(F([0.4, 1]), 10.4))
+      self.assertTrue(same(F([-.6, 0.5]), 4.4))
+      self.assertTrue(same(F([-.6, 1.5]), 14.4))
+      self.assertTrue(same(F([-.6, 2.5]), 24.4))
+      self.assertTrue(same(F([-.6, 3.5]), 34.4))
+    
   def test_Callback_Jacobian(self):
     x = MX.sym("x")
     y = MX.sym("y")

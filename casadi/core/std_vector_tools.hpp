@@ -90,6 +90,8 @@ namespace casadi {
   */
   CASADI_EXPORT std::vector<int> range(int stop);
 
+  CASADI_EXPORT bool isEquallySpaced(const std::vector<double> &v);
+
   /**  \brief Slicing vector
   *  \param v Vector to slice
   *  \param i List of indices

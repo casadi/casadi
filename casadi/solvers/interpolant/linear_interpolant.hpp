@@ -91,6 +91,14 @@ namespace casadi {
 
     /// A documentation string
     static const std::string meta_doc;
+
+    ///@{
+    /** \brief Options */
+    static Options options_;
+    virtual const Options& get_options() const { return options_;}
+    ///@}
+
+    std::vector<int> lookup_mode_;
   };
 
   /** First order derivatives */
