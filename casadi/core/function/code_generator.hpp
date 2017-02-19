@@ -126,12 +126,14 @@ namespace casadi {
 
     std::string interpn(int ndim, const std::string& grid, const std::string& offset,
                                          const std::string& values, const std::string& x,
+                                         const std::string& lookup_mode,
                                          const std::string& iw, const std::string& w);
 
     std::string interpn_grad(const std::string& grad,
                                      int ndim, const std::string& grid,
                                      const std::string& offset,
                                      const std::string& values, const std::string& x,
+                                     const std::string& lookup_mode,
                                      const std::string& iw, const std::string& w);
 
     /** \brief Declare a function */

@@ -876,22 +876,24 @@ namespace casadi {
 
   std::string CodeGenerator::interpn(int ndim, const std::string& grid, const std::string& offset,
                                    const std::string& values, const std::string& x,
+                                   const std::string& lookup_mode,
                                    const std::string& iw, const std::string& w) {
     addAuxiliary(AUX_INTERPN);
     stringstream s;
-    s << "interpn(" << ndim << ", " << grid << ", "
-      << offset << ", " << values << ", " << x << ", " << iw << ", " << w << ");";
+    s << "interpn(" << ndim << ", " << grid << ", "  << offset << ", "
+      << values << ", " << x << ", " << lookup_mode << ", " << iw << ", " << w << ");";
     return s.str();
   }
 
   std::string CodeGenerator::interpn_grad(const std::string& grad,
                                    int ndim, const std::string& grid, const std::string& offset,
                                    const std::string& values, const std::string& x,
+                                   const std::string& lookup_mode,
                                    const std::string& iw, const std::string& w) {
     addAuxiliary(AUX_INTERPN_GRAD);
     stringstream s;
-    s << "interpn_grad(" << grad << ", " << ndim << ", " << grid << ", "
-      << offset << ", " << values << ", " << x << ", " << iw << ", " << w << ");";
+    s << "interpn_grad(" << grad << ", " << ndim << ", " << grid << ", " << offset << ", "
+      << values << ", " << x << ", " << lookup_mode << ", " << iw << ", " << w << ");";
     return s.str();
   }
 

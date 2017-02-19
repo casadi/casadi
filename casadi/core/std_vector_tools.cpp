@@ -41,6 +41,18 @@ namespace casadi {
     return ret;
   }
 
+  bool isEquallySpaced(const std::vector<double> &v) {
+    if (v.size()<=1) return true;
+
+    double margin = (v[v.size()-1]-v[0])*1e-14;
+
+    for (int i=2;i<v.size();++i) {
+      double ref = v[0]+(i*(v[v.size()-1]-v[0]))/(v.size()-1);
+      if (abs(ref-v[i])>margin) return false;
+    }
+    return true;
+  }
+
   std::vector<int> range(int stop) {
     return range(0, stop);
   }
