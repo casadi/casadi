@@ -402,14 +402,16 @@ namespace casadi {
   const Function& OracleFunction::get_function(const std::string &name) const {
     auto it = all_functions_.find(name);
     casadi_assert_message(it!=all_functions_.end(),
-      "No function \"" + name + "\" in " + this->name());
+      "No function \"" + name + "\" in " + this->name() + ". " +
+      "Available functions: " + join(get_function()) + ".");
     return it->second.f;
   }
 
   bool OracleFunction::monitored(const std::string &name) const {
     auto it = all_functions_.find(name);
     casadi_assert_message(it!=all_functions_.end(),
-      "No function \"" + name + "\" in " + this->name());
+      "No function \"" + name + "\" in " + this->name()+ ". " +
+      "Available functions: " + join(get_function()) + ".");
     return it->second.monitored;
   }
 
