@@ -71,15 +71,9 @@ namespace casadi {
     // Print dimensions
     stream << size1() << "x" << size2();
 
-    // Print shape
-    if (is_empty()) {
-      // Print nothing, shape clear anyway
-    } else if (is_dense()) {
-      stream << ", dense";
-    } else if (is_diag()) {
-      stream << ", diagonal";
-    } else {
-      stream << ", " << nnz() << " nnz";
+    // Print shape unless dense
+    if (!is_dense()) {
+      stream << "," << nnz() << "nz";
     }
   }
 
