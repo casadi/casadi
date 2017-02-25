@@ -27,6 +27,7 @@
 #define CASADI_BINARY_SX_HPP
 
 #include "sx_node.hpp"
+#include "casadi/core/global_options.hpp"
 #include <stack>
 
 
@@ -72,6 +73,11 @@ class CASADI_EXPORT BinarySX : public SXNode {
         casadi_math<double>::fun(op, dep0_val, dep1_val, ret_val);
         return ret_val;
       } else {
+        if(!GlobalOptions::getSXCaching()) {
+          // Expression containing free variables
+          return SXElem::create(new BinarySX(op, dep0, dep1));
+        }
+
         // The key of the cache
         auto key = std::make_tuple(op, dep0.__hash__(), dep1.__hash__());
         // Find the key in the cache
@@ -175,7 +181,7 @@ class CASADI_EXPORT BinarySX : public SXNode {
     void removeFromCache() {
       // remove from cache
       size_t num_erased = cached_binarysx_.erase(std::make_tuple(op_, dep0_.__hash__(), dep1_.__hash__()));
-      assert(num_erased==1);
+      // assert(num_erased==1); only possible if the cache is enabled permanently
       (void)num_erased;
     }
 

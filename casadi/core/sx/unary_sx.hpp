@@ -27,6 +27,7 @@
 #define UNARY_SXElem_HPP
 
 #include "sx_node.hpp"
+#include "casadi/core/global_options.hpp"
 #include <stack>
 
 /// \cond INTERNAL
@@ -68,6 +69,11 @@ class CASADI_EXPORT UnarySX : public SXNode {
         casadi_math<double>::fun(op, dep_val, dep_val, ret_val);
         return ret_val;
       } else {
+        if(!GlobalOptions::getSXCaching()) {
+          // Expression containing free variables
+          return SXElem::create(new UnarySX(op, dep));
+        }
+
         // The key of the cache
         auto key = std::make_tuple(op, dep.__hash__());
         // Find the key in the cache
@@ -100,7 +106,7 @@ class CASADI_EXPORT UnarySX : public SXNode {
 
     void removeFromCache() {
       size_t num_erased = cached_unarysx_.erase(std::make_tuple(op_, dep_.__hash__()));
-      assert(num_erased==1);
+      // assert(num_erased==1);  only possible if the cache is enabled permanently
       (void)num_erased;
     }
 
