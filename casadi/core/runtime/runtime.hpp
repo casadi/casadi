@@ -695,9 +695,9 @@ namespace casadi {
       case 1:
         {
           double g0 = grid[0];
-          int ret = (int) ((x-g0)*(ng-2)/(grid[ng-1]-g0));
-          if (ret<0) return 0;
-          if (ret>ng-1) return ng-1;
+          int ret = (int) ((x-g0)*(ng-1)/(grid[ng-1]-g0));
+          if (ret<0) ret=0;
+          if (ret>ng-2) ret=ng-2;
           return ret;
         }
     }
