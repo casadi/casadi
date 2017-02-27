@@ -57,7 +57,7 @@ namespace casadi {
   }
 
   Options LapackLu::options_
-  = {{&LinsolInternal::options_},
+  = {{&FunctionInternal::options_},
      {{"equilibration",
        {OT_BOOL,
         "Equilibrate the matrix"}},

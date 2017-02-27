@@ -162,15 +162,7 @@ namespace casadi {
     auto m = static_cast<LinsolMemory*>((*this)->memory(0));
     casadi_assert_message(m->is_factorized, "Linear system has not been factorized");
 
-    int max_nrhs = (*this)->max_nrhs_;
-
-    int offset = 0;
-    while (nrhs>0) {
-      (*this)->solve(m, x+offset, min(max_nrhs, nrhs), tr);
-      nrhs-= max_nrhs;
-      offset+= max_nrhs*m->nrow();
-    }
-
+    (*this)->solve(m, x, nrhs, tr);
   }
 
   Sparsity Linsol::cholesky_sparsity(bool tr) const {

@@ -52,9 +52,26 @@ namespace casadi {
     clear_memory();
   }
 
+  Options LapackQr::options_
+  = {{&FunctionInternal::options_},
+     {{"max_nrhs",
+       {OT_INT,
+        "Maximum number of right-hand-sides that get processed in a single pass [default:10]."}}
+     }
+  };
+
   void LapackQr::init(const Dict& opts) {
     // Call the base class initializer
     LinsolInternal::init(opts);
+
+    max_nrhs_ = 10;
+
+    // Read options
+    for (auto&& op : opts) {
+      if (op.first=="max_nrhs") {
+        max_nrhs_ = op.second;
+      }
+    }
   }
 
   void LapackQr::init_memory(void* mem) const {
@@ -89,6 +106,18 @@ namespace casadi {
   }
 
   void LapackQr::solve(void* mem, double* x, int nrhs, bool tr) const {
+    auto m = static_cast<LapackQrMemory*>(mem);
+
+    // Solve up to max_nrhs rhs at a time
+    int offset = 0;
+    while (nrhs>0) {
+      _solve(m, x+offset, min(max_nrhs_, nrhs), tr);
+      nrhs-= max_nrhs_;
+      offset+= max_nrhs_*m->nrow();
+    }
+  }
+
+  void LapackQr::_solve(void* mem, double* x, int nrhs, bool tr) const {
     auto m = static_cast<LapackQrMemory*>(mem);
 
     // Dimensions

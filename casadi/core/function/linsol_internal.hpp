@@ -76,12 +76,6 @@ namespace casadi {
     /// Initialize
     virtual void init(const Dict& opts);
 
-    ///@{
-    /** \brief Options */
-    static Options options_;
-    virtual const Options& get_options() const { return options_;}
-    ///@}
-
     /** \brief Create memory block */
     virtual void* alloc_memory() const { return new LinsolMemory();}
 
@@ -137,8 +131,6 @@ namespace casadi {
     // Get name of the plugin
     virtual const char* plugin_name() const = 0;
 
-    // Maximum number of right-hand-sides
-    int max_nrhs_;
   };
 
 

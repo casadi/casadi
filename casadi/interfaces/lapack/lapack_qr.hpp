@@ -87,6 +87,12 @@ namespace casadi {
     // Initialize the solver
     virtual void init(const Dict& opts);
 
+    ///@{
+    /** \brief Options */
+    static Options options_;
+    virtual const Options& get_options() const { return options_;}
+    ///@}
+
     /** \brief Create memory block */
     virtual void* alloc_memory() const { return new LapackQrMemory();}
 
@@ -103,6 +109,9 @@ namespace casadi {
     virtual void factorize(void* mem, const double* A) const;
 
     // Solve the linear system
+    void _solve(void* mem, double* x, int nrhs, bool tr) const;
+
+    // Solve the linear system
     virtual void solve(void* mem, double* x, int nrhs, bool tr) const;
 
     /// A documentation string
@@ -110,6 +119,9 @@ namespace casadi {
 
     // Get name of the plugin
     virtual const char* plugin_name() const { return "lapackqr";}
+
+    // Maximum number of right-hand-sides
+    int max_nrhs_;
   };
 
 } // namespace casadi
