@@ -34,11 +34,28 @@ namespace casadi {
   LinsolInternal::~LinsolInternal() {
   }
 
+  Options LinsolInternal::options_
+  = {{&FunctionInternal::options_},
+     {{"max_nrhs",
+       {OT_INT,
+        "Maximum number of right-hand-sides that get processed in a single pass [default:10]."}}
+     }
+  };
+
   void LinsolInternal::init(const Dict& opts) {
     // Call the base class initializer
     FunctionInternal::init(opts);
 
+    max_nrhs_ = 10;
+
+    // Read options
+    for (auto&& op : opts) {
+      if (op.first=="max_nrhs") {
+        max_nrhs_ = op.second;
+      }
+    }
   }
+
 
   void LinsolInternal::init_memory(void* mem) const {
     //auto m = static_cast<LinsolMemory*>(mem);

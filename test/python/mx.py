@@ -2422,6 +2422,21 @@ class MXtests(casadiTestCase):
           self.assertTrue(c.nnz()==0)
         else:
           self.assertTrue(c.nnz()>0)
+
+  def test_solve(self):
+    N = 3
+    nrhs = 50
+    np.random.seed(0)
+    A = np.random.random((3,3))
+    B = np.random.random((3,50))
+    
+    
+    C = solve(A, B, "lapackqr", {"max_nrhs": 50})
+    C1 = solve(A, B, "lapackqr", {"max_nrhs": 20})
+    C2 = solve(A, B, "lapackqr")
+    
+    self.checkarray(C, C1)
+    self.checkarray(C1, C2)
           
 if __name__ == '__main__':
     unittest.main()

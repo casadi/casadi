@@ -66,7 +66,7 @@ namespace casadi {
     auto m = static_cast<LapackQrMemory*>(mem);
     m->mat.resize(m->ncol() * m->ncol());
     m->tau.resize(m->ncol());
-    m->work.resize(10*m->ncol());
+    m->work.resize(max(max_nrhs_, m->ncol())*10);
   }
 
   void LapackQr::factorize(void* mem, const double* A) const {
@@ -84,8 +84,8 @@ namespace casadi {
     int lwork = m->work.size();
     dgeqrf_(&ncol, &ncol, get_ptr(m->mat), &ncol, get_ptr(m->tau),
             get_ptr(m->work), &lwork, &info);
-    if (info != 0) throw CasadiException("LapackQr::prepare: dgeqrf_ "
-                                         "failed to factorize the Jacobian");
+    casadi_assert_message(info == 0, "LapackQr::prepare: dgeqrf_ "
+                                      "failed to factorize the Jacobian. Info: " << info << ".");
   }
 
   void LapackQr::solve(void* mem, double* x, int nrhs, bool tr) const {
@@ -118,17 +118,16 @@ namespace casadi {
       int info = 100;
       dormqr_(&sideQ, &transQ, &ncol, &nrhs, &k, get_ptr(m->mat), &ncol, get_ptr(m->tau), x,
               &ncol, get_ptr(m->work), &lwork, &info);
-      if (info != 0) throw CasadiException("LapackQr::solve: dormqr_ failed "
-                                          "to solve the linear system");
-
+      casadi_assert_message(info == 0, "LapackQr::solve: dormqr_ A failed "
+                                          "to solve the linear system. Info: " << info << ".");
     } else {
 
       // Multiply by transpose(Q)
       int info = 100;
       dormqr_(&sideQ, &transQ, &ncol, &nrhs, &k, get_ptr(m->mat), &ncol, get_ptr(m->tau), x,
               &ncol, get_ptr(m->work), &lwork, &info);
-      if (info != 0) throw CasadiException("LapackQr::solve: dormqr_ failed to "
-                                          "solve the linear system");
+      casadi_assert_message(info == 0, "LapackQr::solve: dormqr_ B failed to "
+                                          "solve the linear system. Info: " << info << ".");
 
       // Solve for R
       dtrsm_(&sideR, &uploR, &transR, &diagR, &ncol, &nrhs, &alphaR,
