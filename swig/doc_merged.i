@@ -4192,9 +4192,19 @@ lapackqr
 This class solves the linear system A.x=b by making an QR factorization of
 A: A = Q.R, with Q orthogonal and R upper triangular
 
+>List of available options
+
++------------------------+------------------------+------------------------+
+|           Id           |          Type          |      Description       |
++========================+========================+========================+
+| max_nrhs               | OT_INT                 | Maximum number of      |
+|                        |                        | right-hand-sides that  |
+|                        |                        | get processed in a     |
+|                        |                        | single pass            |
+|                        |                        | [default:10].          |
++------------------------+------------------------+------------------------+
+
 --------------------------------------------------------------------------------
-
-
 
 
 
