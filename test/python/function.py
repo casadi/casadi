@@ -964,7 +964,7 @@ class Functiontests(casadiTestCase):
       self.assertTrue(same(F(0.4), 0.4))
       self.assertTrue(same(F(-.6), -.6))
       
-      F = interpolant('F', 'linear', [np.linspace(0,1,7)], range(7), {"lookup_mode": ["exact"]})
+      F = interpolant('F', 'linear', [np.linspace(0,1,7)], list(range(7)), {"lookup_mode": ["exact"]})
     
     grid = [[2, 4, 6]]
     values = [10, 7, 1]
@@ -979,7 +979,7 @@ class Functiontests(casadiTestCase):
       self.assertTrue(same(F(6), 1))
       self.assertTrue(same(F(7), -2))
       
-      F = interpolant('F', 'linear', [np.linspace(0,1,7)], range(7), {"lookup_mode": ["exact"]})
+      F = interpolant('F', 'linear', [np.linspace(0,1,7)], list(range(7)), {"lookup_mode": ["exact"]})
     
   def test_2d_interpolant_uniform(self):
     grid = [[0, 1, 2], [0, 1, 2]]
