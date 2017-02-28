@@ -9967,7 +9967,21 @@ linear
 
 
 
+>List of available options
 
++------------------------+------------------------+------------------------+
+|           Id           |          Type          |      Description       |
++========================+========================+========================+
+| lookup_mode            | OT_STRINGVECTOR        | Sets, for each grid    |
+|                        |                        | dimenion, the lookup   |
+|                        |                        | algorithm used to find |
+|                        |                        | the correct index.     |
+|                        |                        | 'linear' uses a for-   |
+|                        |                        | loop + break; 'exact'  |
+|                        |                        | uses floored division  |
+|                        |                        | (only for uniform      |
+|                        |                        | grids).                |
++------------------------+------------------------+------------------------+
 
 --------------------------------------------------------------------------------
 

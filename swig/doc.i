@@ -10266,6 +10266,12 @@ const real_t *grid, const int *offset, const real_t *values, const real_t
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::casadi_interpn_grad(real_t *grad, int ndim,
+const real_t *grid, const int *offset, const real_t *values, const real_t
+*x, const int *lookup_mode, int *iw, real_t *w) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::casadi_dense_transfer(real_t factor, const
 real_t *x, const int *sp_x, real_t *y, const int *sp_y, real_t *w) "
 
@@ -10829,6 +10835,12 @@ Check if the vector is non-increasing.
 %feature("docstring")  casadi::casadi_interpn(int ndim, const real_t *grid,
 const int *offset, const real_t *values, const real_t *x, int *iw, real_t
 *w) "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::casadi_interpn(int ndim, const real_t *grid,
+const int *offset, const real_t *values, const real_t *x, const int
+*lookup_mode, int *iw, real_t *w) "
 
 [INTERNAL] ";
 
@@ -12225,6 +12237,12 @@ Default input for an NLP solver.
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::casadi_interpn_weights(int ndim, const real_t
+*grid, const int *offset, const real_t *x, real_t *alpha, int *index, const
+int *lookup_mode) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::casadi_norm_inf(int n, const real_t *x) "
 
 [INTERNAL]  Inf-norm of a vector * Returns the largest element in absolute
@@ -12310,7 +12328,21 @@ linear
 
 
 
+>List of available options
 
++------------------------+------------------------+------------------------+
+|           Id           |          Type          |      Description       |
++========================+========================+========================+
+| lookup_mode            | OT_STRINGVECTOR        | Sets, for each grid    |
+|                        |                        | dimenion, the lookup   |
+|                        |                        | algorithm used to find |
+|                        |                        | the correct index.     |
+|                        |                        | 'linear' uses a for-   |
+|                        |                        | loop + break; 'exact'  |
+|                        |                        | uses floored division  |
+|                        |                        | (only for uniform      |
+|                        |                        | grids).                |
++------------------------+------------------------+------------------------+
 
 --------------------------------------------------------------------------------
 
@@ -12719,6 +12751,11 @@ Get the number of QP solver outputs.
 
 %feature("docstring")  casadi::casadi_low(real_t x, const double *grid, int
 ng) "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::casadi_low(real_t x, const double *grid, int
+ng, int lookup_mode) "
 
 [INTERNAL] ";
 
