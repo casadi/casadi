@@ -542,7 +542,7 @@ namespace casadi {
 
     m->pv.resize(2*(nx_+na_));
 
-    m->res.resize(4);
+    m->res.resize(5);
 
     m->fstats["preprocessing"]  = FStats();
     m->fstats["solver"]         = FStats();
