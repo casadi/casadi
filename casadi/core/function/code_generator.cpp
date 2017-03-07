@@ -919,7 +919,7 @@ namespace casadi {
     // Create call
     addAuxiliary(CodeGenerator::AUX_PROJECT);
     stringstream s;
-    s << "  project(" << arg << ", " << sparsity(sp_arg) << ", " << res << ", "
+    s << "project(" << arg << ", " << sparsity(sp_arg) << ", " << res << ", "
       << sparsity(sp_res) << ", " << w << ");";
     return s.str();
   }
