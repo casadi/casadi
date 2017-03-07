@@ -367,13 +367,23 @@ namespace casadi {
     // Shorthands
     int n_in=this->n_in()-1, n_out=this->n_out();
 
-    // Input and output buffers
+    // Local variables
     g.body << "  int i;" << endl
-           << "  real_t* t;" << endl
-           << "  const real_t** arg1 = arg + " << (1 + n_in) << ";" << endl
-           << "  for (i=0; i<" << n_in << "; ++i) arg1[i] = arg[1+i];" << endl
-           << "  real_t** res1 = res + " << n_out << ";" << endl
-           << "  for (i=0; i<" << n_out << "; ++i) res1[i] = res[i];" << endl;
+           << "  real_t* t;" << endl;
+
+    // Project arguments with different sparsity
+    if (any_project_in_) {
+      // Project one or more argument
+      g.body << "  const real_t** arg1 = arg + " << (1 + n_in) << ";" << endl
+             << "  for(i=0; i<" << n_in << "; ++i) arg1[i]=arg[i];" << endl;
+    }
+
+    // Temporary memory for results with different sparsity
+    if (any_project_out_) {
+      // Project one or more results
+      g.body << "  real_t** res1 = res + " << n_out << ";" << endl
+             << "  for (i=0; i<" << n_out << "; ++i) res1[i]=res[i];" << endl;
+    }
 
     // Codegen condition
     bool if_else = f_.size()==1;
@@ -409,42 +419,47 @@ namespace casadi {
           const Sparsity& f_sp = fk.sparsity_in(i);
           const Sparsity& sp = sparsity_in(i+1);
           if (f_sp!=sp) {
-            g.body << "    if (arg1[" << i << "]) {" << endl
-                   << "      t = w, w += " << f_sp.nnz() << ";" << endl
-                   << "      " << g.project("arg1[" + to_string(i) + "]", sp,
-                                            "t", f_sp, "w") << endl
-                   << "      arg1[" << i << "] = t;" << endl
-                   << "    }" << endl;
+            if (f_sp.nnz()==0) {
+              g.body << "    arg1[" << i << "]=0;" << endl;
+            } else {
+              g.body << "    arg1[" << i << "]=t=w, w+=" << f_sp.nnz() << ","
+                     << g.project("arg1[" + to_string(i) + "]", sp,
+                                            "t", f_sp, "w") << endl;
             }
           }
+        }
 
-          // Temporary memory for results with different sparsity
-          for (int i=0; i<n_out; ++i) {
-            const Sparsity& f_sp = fk.sparsity_out(i);
-            const Sparsity& sp = sparsity_out(i);
-            if (f_sp!=sp) {
-              g.body << "    if (res1[" << i << "]) {"
-                     << "res1[" << i << "] = w; w += " << f_sp.nnz() << ";}" << endl;
+        // Temporary memory for results with different sparsity
+        for (int i=0; i<n_out; ++i) {
+          const Sparsity& f_sp = fk.sparsity_out(i);
+          const Sparsity& sp = sparsity_out(i);
+          if (f_sp!=sp) {
+            if (f_sp.nnz()==0) {
+              g.body << "    res1[" << i << "]=0;" << endl;
+            } else {
+              g.body << "    res1[" << i << "]=w, w+=" << f_sp.nnz() << ";" << endl;
             }
           }
+        }
 
-          // Function call
-          g.body << "    if (" << g(fk, "arg1", "res1", "iw", "w") << ") return 1;" << endl;
+        // Function call
+        g.body << "    if (" << g(fk, any_project_in_ ? "arg1" : "arg+1",
+                                  any_project_out_ ? "res1" : "res",
+                                  "iw", "w") << ") return 1;" << endl;
 
-          // Project results with different sparsity
-          for (int i=0; i<n_out; ++i) {
-            const Sparsity& f_sp = fk.sparsity_out(i);
-            const Sparsity& sp = sparsity_out(i);
-            if (f_sp!=sp) {
-              g.body << "    if (res[" << i << "]) "
-                     << g.project("res1[" + to_string(i) + "]", f_sp,
-                                  "res[" + to_string(i) + "]", sp, "w") << endl;
-            }
+        // Project results with different sparsity
+        for (int i=0; i<n_out; ++i) {
+          const Sparsity& f_sp = fk.sparsity_out(i);
+          const Sparsity& sp = sparsity_out(i);
+          if (f_sp!=sp) {
+            g.body << "  " << g.project("res1[" + to_string(i) + "]", f_sp,
+                      "res[" + to_string(i) + "]", sp, "w") << endl;
           }
+        }
 
-          // Break (if switch)
-          if (!if_else) g.body << "    break;" << endl;
-       }
+        // Break (if switch)
+        if (!if_else) g.body << "    break;" << endl;
+      }
     }
 
     // End switch/else
