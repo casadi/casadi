@@ -1121,20 +1121,17 @@ namespace casadi {
           }
           string r = "res[" + g.to_string(oind) + "]";
           int i = e.arg.front();
-          s << "  if (" << r << ") ";
           if (n==1) {
-            s << "*" << r << " = " << g.workel(i) << ";" << endl;
+            s << "  if (" << r << ") *" << r << " = " << g.workel(i) << ";" << endl;
           } else {
-            s << g.copy(g.work(i, n), n, r) << endl;
+            s << "  " << g.copy(g.work(i, n), n, r) << endl;
           }
         }
       } else if (e.op==OP_INPUT) {
         int n = e.data.nnz();
         if (n!=0) {
           int iind = e.arg.at(0), ip = e.arg.at(1), ic = e.arg.at(2);
-          std::string arg = "arg[" + g.to_string(iind) + "]";
-          std::string arg_nz = arg;
-          if (ic!=0) arg_nz += "+" + g.to_string(ic);
+          std::string arg = "arg[" + to_string(iind) + "]";
           int i = e.res.front();
           if (g.verbose) {
             s << "  /* #" << k++ << ": Input " << iind;
@@ -1144,11 +1141,11 @@ namespace casadi {
           if (n==1) {
             s << "  " << g.workel(i) << " = " << arg << " ? "
               << arg << "[" << ic << "] : 0;" << endl;
+          } else if (ic==0) {
+            s << "  " << g.copy(arg, n, g.work(i, n)) << endl;
           } else {
-            s << "  if (" << arg << ")" << endl
-              << "    " << g.copy(arg_nz, n, g.work(i, n)) << endl
-              << "  else " << endl
-              << "    " << g.fill(g.work(i, n), n, "0") << endl;
+            s << "  " << g.copy(arg + " ? " + arg + "+" + to_string(ic) + " : 0",
+                                n, g.work(i, n)) << endl;
           }
         }
       } else {
