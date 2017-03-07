@@ -157,17 +157,17 @@ namespace casadi {
             stream << *p_it++;
           } else {
             int ndep = casadi_math<double>::ndeps(a.op);
-            casadi_math<double>::printPre(a.op, stream);
+            stream << casadi_math<double>::pre(a.op);
             for (int c=0; c<ndep; ++c) {
               if (c==0) {
                 stream << "@" << a.i1;
               } else {
-                casadi_math<double>::printSep(a.op, stream);
+                stream << casadi_math<double>::sep(a.op);
                 stream << "@" << a.i2;
               }
 
             }
-            casadi_math<double>::printPost(a.op, stream);
+            stream << casadi_math<double>::post(a.op);
           }
         }
       }
@@ -214,16 +214,15 @@ namespace casadi {
           g.body << "arg[" << a.i1 << "] ? arg[" << a.i1 << "][" << a.i2 << "] : 0";
         } else {
           int ndep = casadi_math<double>::ndeps(a.op);
-          casadi_math<double>::printPre(a.op, g.body);
+          g.body << casadi_math<double>::pre(a.op);
           for (int c=0; c<ndep; ++c) {
             if (c==0) {
               g.body << "a" << a.i1;
             } else {
-              casadi_math<double>::printSep(a.op, g.body);
-              g.body << "a" << a.i2;
+              g.body << casadi_math<double>::sep(a.op) << "a" << a.i2;
             }
           }
-          casadi_math<double>::printPost(a.op, g.body);
+          g.body << casadi_math<double>::post(a.op);
         }
       }
       g.body  << ";" << endl;

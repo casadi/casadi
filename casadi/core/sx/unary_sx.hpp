@@ -85,16 +85,7 @@ class CASADI_EXPORT UnarySX : public SXNode {
     /** \brief  Print expression */
     virtual std::string print(const std::string& arg1, const std::string& arg2) const {
       std::stringstream ss;
-
-      // Print the prefix
-      casadi_math<double>::printPre(op_, ss);
-
-      // Print the dependency
-      ss << arg1;
-
-      // Print the suffix
-      casadi_math<double>::printPost(op_, ss);
-
+      casadi_math<double>::print(op_, ss, arg1);
       return ss.str();
     }
 

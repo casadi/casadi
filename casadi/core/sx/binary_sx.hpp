@@ -162,19 +162,7 @@ class CASADI_EXPORT BinarySX : public SXNode {
       std::stringstream ss;
 
       // Print the prefix
-      casadi_math<double>::printPre(op_, ss);
-
-      // Print the first dependency
-      ss << arg1;
-
-      //Print the infix
-      casadi_math<double>::printSep(op_, ss);
-
-      // Print the second dependency
-      ss << arg2;
-
-      // Print the suffix
-      casadi_math<double>::printPost(op_, ss);
+      casadi_math<double>::print(op_, ss, arg1, arg2);
 
       return ss.str();
     }

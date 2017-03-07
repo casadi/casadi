@@ -45,9 +45,7 @@ namespace casadi {
 
   std::string UnaryMX::print(const std::vector<std::string>& arg) const {
     stringstream ss;
-    casadi_math<double>::printPre(op_, ss);
-    ss << arg.at(0);
-    casadi_math<double>::printPost(op_, ss);
+    casadi_math<double>::print(op_, ss, arg.at(0));
     return ss.str();
   }
 
@@ -118,9 +116,7 @@ namespace casadi {
 
     // Output the operation
     g.body << r << " = ";
-    casadi_math<double>::printPre(op_, g.body);
-    g.body << " " << x << " ";
-    casadi_math<double>::printPost(op_, g.body);
+    casadi_math<double>::print(op_, g.body, " " + x + " ");
     g.body << ";" << endl;
   }
 
