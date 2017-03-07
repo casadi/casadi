@@ -365,10 +365,10 @@ namespace casadi {
 
     // Input and output buffers
     g.body << "  int i;" << endl
-           << "  double* t;" << endl
-           << "  const double** arg1 = arg + " << (1 + n_in) << ";" << endl
+           << "  real_t* t;" << endl
+           << "  const real_t** arg1 = arg + " << (1 + n_in) << ";" << endl
            << "  for (i=0; i<" << n_in << "; ++i) arg1[i] = arg[1+i];" << endl
-           << "  double** res1 = res + " << n_out << ";" << endl
+           << "  real_t** res1 = res + " << n_out << ";" << endl
            << "  for (i=0; i<" << n_out << "; ++i) res1[i] = res[i];" << endl;
 
     // Codegen condition
