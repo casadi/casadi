@@ -105,6 +105,9 @@ namespace casadi {
 
     // Default case;
     Function f_def_;
+
+    // Sparsity projection needed?
+    bool project_in_, project_out_;
   };
 
 } // namespace casadi

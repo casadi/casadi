@@ -101,11 +101,13 @@ namespace casadi {
 
       // Required work vectors
       size_t sz_buf_k=0;
+      project_in_ = project_out_ = false;
 
       // Add size for input buffers
       for (int i=1; i<n_in(); ++i) {
         const Sparsity& s = fk.sparsity_in(i-1);
         if (s!=sparsity_in(i)) {
+          project_in_ = true;
           alloc_w(s.size1()); // for casadi_project
           sz_buf_k += s.nnz();
         }
@@ -115,6 +117,7 @@ namespace casadi {
       for (int i=0; i<n_out(); ++i) {
         const Sparsity& s = fk.sparsity_out(i);
         if (s!=sparsity_out(i)) {
+          project_out_ = true;
           alloc_w(s.size1()); // for casadi_project
           sz_buf_k += s.nnz();
         }
@@ -134,45 +137,57 @@ namespace casadi {
 
     // Get the function to be evaluated
     int k = arg[0] ? static_cast<int>(*arg[0]) : 0;
-    const Function& fk = k<f_.size() ? f_[k] : f_def_;
-
-    // Input and output buffers
-    const double** arg1 = arg + 1 + n_in;
-    copy_n(arg+1, n_in, arg1);
-    double** res1 = res + n_out;
-    copy_n(res, n_out, res1);
+    const Function& fk = k>=0 && k<f_.size() ? f_[k] : f_def_;
 
     // Project arguments with different sparsity
-    for (int i=0; i<n_in; ++i) {
-      if (arg1[i]) {
+    const double** arg1;
+    if (project_in_) {
+      // Project one or more argument
+      arg1 = arg + 1 + n_in;
+      for (int i=0; i<n_in; ++i) {
         const Sparsity& f_sp = fk.sparsity_in(i);
         const Sparsity& sp = sparsity_in(i+1);
-        if (f_sp!=sp) {
-          double *t = w; w += f_sp.nnz(); // t is non-const
-          casadi_project(arg1[i], sp, t, f_sp, w);
-          arg1[i] = t;
+        arg1[i] = arg[i+1];
+        if (arg1[i] && f_sp!=sp) {
+          casadi_project(arg1[i], sp, w, f_sp, w + f_sp.nnz());
+          arg1[i] = w; w += f_sp.nnz();
         }
       }
+    } else {
+      // No inputs projected
+      arg1 = arg + 1;
     }
 
     // Temporary memory for results with different sparsity
-    for (int i=0; i<n_out; ++i) {
-      if (res1[i]) {
+    double** res1;
+    if (project_out_) {
+      // Project one or more results
+      res1 = res + n_out;
+      for (int i=0; i<n_out; ++i) {
         const Sparsity& f_sp = fk.sparsity_out(i);
         const Sparsity& sp = sparsity_out(i);
-        if (f_sp!=sp) { res1[i] = w; w += f_sp.nnz();}
+        res1[i] = res[i];
+        if (res1[i] && f_sp!=sp) {
+          res1[i] = w;
+          w += f_sp.nnz();
+        }
       }
+    } else {
+      // No outputs projected
+      res1 = res;
     }
 
     // Evaluate the corresponding function
     fk(arg1, res1, iw, w, 0);
 
     // Project results with different sparsity
-    for (int i=0; i<n_out; ++i) {
-      if (res1[i]) {
+    if (project_out_) {
+      for (int i=0; i<n_out; ++i) {
         const Sparsity& f_sp = fk.sparsity_out(i);
         const Sparsity& sp = sparsity_out(i);
-        if (f_sp!=sp) casadi_project(res1[i], f_sp, res[i], sp, w);
+        if (res[i] && f_sp!=sp) {
+          casadi_project(res1[i], f_sp, res[i], sp, w);
+        }
       }
     }
   }
