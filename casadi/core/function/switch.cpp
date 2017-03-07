@@ -92,9 +92,7 @@ namespace casadi {
     size_t sz_buf=0;
 
     // Keep track of sparsity projections
-    project_in_.resize(n_in()-1, false);
-    project_out_.resize(n_out(), false);
-    any_project_in_ = any_project_out_ = false;
+    project_in_ = project_out_ = false;
 
     // Get required work
     for (int k=0; k<=f_.size(); ++k) {
@@ -111,7 +109,7 @@ namespace casadi {
       for (int i=1; i<n_in(); ++i) {
         const Sparsity& s = fk.sparsity_in(i-1);
         if (s!=sparsity_in(i)) {
-          project_in_[i-1] = any_project_in_ = true;
+          project_in_ = true;
           alloc_w(s.size1()); // for casadi_project
           sz_buf_k += s.nnz();
         }
@@ -121,7 +119,7 @@ namespace casadi {
       for (int i=0; i<n_out(); ++i) {
         const Sparsity& s = fk.sparsity_out(i);
         if (s!=sparsity_out(i)) {
-          project_out_[i] = any_project_out_ = true;
+          project_out_ = true;
           alloc_w(s.size1()); // for casadi_project
           sz_buf_k += s.nnz();
         }
@@ -145,7 +143,7 @@ namespace casadi {
 
     // Project arguments with different sparsity
     const double** arg1;
-    if (any_project_in_) {
+    if (project_in_) {
       // Project one or more argument
       arg1 = arg + 1 + n_in;
       for (int i=0; i<n_in; ++i) {
@@ -164,7 +162,7 @@ namespace casadi {
 
     // Temporary memory for results with different sparsity
     double** res1;
-    if (any_project_out_) {
+    if (project_out_) {
       // Project one or more results
       res1 = res + n_out;
       for (int i=0; i<n_out; ++i) {
@@ -185,7 +183,7 @@ namespace casadi {
     fk(arg1, res1, iw, w, 0);
 
     // Project results with different sparsity
-    if (any_project_out_) {
+    if (project_out_) {
       for (int i=0; i<n_out; ++i) {
         const Sparsity& f_sp = fk.sparsity_out(i);
         const Sparsity& sp = sparsity_out(i);
@@ -372,14 +370,14 @@ namespace casadi {
            << "  real_t* t;" << endl;
 
     // Project arguments with different sparsity
-    if (any_project_in_) {
+    if (project_in_) {
       // Project one or more argument
       g.body << "  const real_t** arg1 = arg + " << (1 + n_in) << ";" << endl
              << "  for(i=0; i<" << n_in << "; ++i) arg1[i]=arg[i];" << endl;
     }
 
     // Temporary memory for results with different sparsity
-    if (any_project_out_) {
+    if (project_out_) {
       // Project one or more results
       g.body << "  real_t** res1 = res + " << n_out << ";" << endl
              << "  for (i=0; i<" << n_out << "; ++i) res1[i]=res[i];" << endl;
@@ -443,8 +441,8 @@ namespace casadi {
         }
 
         // Function call
-        g.body << "    if (" << g(fk, any_project_in_ ? "arg1" : "arg+1",
-                                  any_project_out_ ? "res1" : "res",
+        g.body << "    if (" << g(fk, project_in_ ? "arg1" : "arg+1",
+                                  project_out_ ? "res1" : "res",
                                   "iw", "w") << ") return 1;" << endl;
 
         // Project results with different sparsity
