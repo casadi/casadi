@@ -133,7 +133,7 @@ namespace casadi {
     int n_in=this->n_in()-1, n_out=this->n_out();
 
     // Get the function to be evaluated
-    int k = static_cast<int>(*arg[0]);
+    int k = arg[0] ? static_cast<int>(*arg[0]) : 0;
     const Function& fk = k<f_.size() ? f_[k] : f_def_;
 
     // Input and output buffers
@@ -358,7 +358,7 @@ namespace casadi {
 
     // Codegen condition
     bool if_else = f_.size()==1;
-    g.body << "  " << (if_else ? "if" : "switch")  << " (to_int(arg[0][0])) {" << endl;
+    g.body << "  " << (if_else ? "if" : "switch")  << " (arg[0] ? to_int(*arg[0]) : 0) {" << endl;
 
     // Loop over cases/functions
     for (int k=0; k<=f_.size(); ++k) {
