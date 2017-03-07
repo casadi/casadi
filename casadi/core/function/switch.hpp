@@ -107,7 +107,8 @@ namespace casadi {
     Function f_def_;
 
     // Sparsity projection needed?
-    bool project_in_, project_out_;
+    std::vector<bool> project_in_, project_out_;
+    bool any_project_in_, any_project_out_;
   };
 
 } // namespace casadi

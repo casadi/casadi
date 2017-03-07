@@ -91,6 +91,11 @@ namespace casadi {
     // Buffer for mismatching sparsities
     size_t sz_buf=0;
 
+    // Keep track of sparsity projections
+    project_in_.resize(n_in()-1, false);
+    project_out_.resize(n_out(), false);
+    any_project_in_ = any_project_out_ = false;
+
     // Get required work
     for (int k=0; k<=f_.size(); ++k) {
       const Function& fk = k<f_.size() ? f_[k] : f_def_;
@@ -101,13 +106,12 @@ namespace casadi {
 
       // Required work vectors
       size_t sz_buf_k=0;
-      project_in_ = project_out_ = false;
 
       // Add size for input buffers
       for (int i=1; i<n_in(); ++i) {
         const Sparsity& s = fk.sparsity_in(i-1);
         if (s!=sparsity_in(i)) {
-          project_in_ = true;
+          project_in_[i-1] = any_project_in_ = true;
           alloc_w(s.size1()); // for casadi_project
           sz_buf_k += s.nnz();
         }
@@ -117,7 +121,7 @@ namespace casadi {
       for (int i=0; i<n_out(); ++i) {
         const Sparsity& s = fk.sparsity_out(i);
         if (s!=sparsity_out(i)) {
-          project_out_ = true;
+          project_out_[i] = any_project_out_ = true;
           alloc_w(s.size1()); // for casadi_project
           sz_buf_k += s.nnz();
         }
@@ -141,7 +145,7 @@ namespace casadi {
 
     // Project arguments with different sparsity
     const double** arg1;
-    if (project_in_) {
+    if (any_project_in_) {
       // Project one or more argument
       arg1 = arg + 1 + n_in;
       for (int i=0; i<n_in; ++i) {
@@ -160,7 +164,7 @@ namespace casadi {
 
     // Temporary memory for results with different sparsity
     double** res1;
-    if (project_out_) {
+    if (any_project_out_) {
       // Project one or more results
       res1 = res + n_out;
       for (int i=0; i<n_out; ++i) {
@@ -181,7 +185,7 @@ namespace casadi {
     fk(arg1, res1, iw, w, 0);
 
     // Project results with different sparsity
-    if (project_out_) {
+    if (any_project_out_) {
       for (int i=0; i<n_out; ++i) {
         const Sparsity& f_sp = fk.sparsity_out(i);
         const Sparsity& sp = sparsity_out(i);
