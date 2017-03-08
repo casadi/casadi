@@ -1470,7 +1470,34 @@ namespace casadi {
 
     // Return value
     casadi_assert(get_n_forward()>0);
-    Function ret = get_forward(name, nfwd, i_names, o_names, opts);
+    Function ret;
+
+    int n=1;
+    while (n<nfwd) n*=2;
+    if (n==nfwd) {
+      ret = get_forward(name, nfwd, i_names, o_names, opts);
+    } else {
+      ret = get_forward(name, n, i_names, o_names, opts);
+      std::vector<MX> args_n = ret.mx_in();
+      std::vector<MX> args_nfwd = args_n;
+      for (int i=0;i<n_in;++i) {
+        MX seed = horzcat(MX::sym("seed", sparsity_in(i), nfwd));
+        args_nfwd[i+n_in+n_out] = seed;
+
+        DM z = DM::zeros(repmat(sparsity_in(i), 1, n-nfwd));
+        args_n[i+n_in+n_out] = horzcat(seed, z);
+      }
+      std::vector<MX> out = ret(args_n);
+
+      for (int i=0;i<n_out;++i) {
+        MX& sens = out[i];
+        sens = horzsplit(sens, {0, (sens.size2()*nfwd)/n, sens.size2()})[0];
+      }
+
+      ret = Function(name, args_nfwd, out, opts);
+    }
+
+    ret.print_dimensions(userOut());
 
     // Consistency check for inputs
     casadi_assert(ret.n_in()==n_in + n_out + n_in);
@@ -1527,7 +1554,32 @@ namespace casadi {
 
     // Return value
     casadi_assert(get_n_reverse()>0);
-    Function ret = get_reverse(name, nadj, i_names, o_names, opts);
+    Function ret;
+
+    int n=1;
+    while (n<nadj) n*=2;
+    if (n==nadj) {
+      ret = get_reverse(name, nadj, i_names, o_names, opts);
+    } else {
+      ret = get_reverse(name, nadj, i_names, o_names, opts);
+      std::vector<MX> args_n = ret.mx_in();
+      std::vector<MX> args_nadj = args_n;
+      for (int i=0;i<n_out;++i) {
+        MX seed = horzcat(MX::sym("seed", sparsity_out(i), nadj));
+        args_nadj[i+n_in+n_out] = seed;
+
+        DM z = DM::zeros(repmat(sparsity_out(i), 1, n-nadj));
+        args_n[i+n_in+n_out] = horzcat(seed, z);
+      }
+      std::vector<MX> out = ret(args_n);
+
+      for (int i=0;i<n_in;++i) {
+        MX& sens = out[i];
+        sens = horzsplit(sens, {0, (sens.size2()*nadj)/n, sens.size2()})[0];
+      }
+
+      ret = Function(name, args_nadj, out, opts);
+    }
 
     // Consistency check for inputs
     casadi_assert(ret.n_in()==n_in + n_out + n_out);

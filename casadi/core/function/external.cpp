@@ -280,12 +280,15 @@ namespace casadi {
                 const std::vector<std::string>& o_names,
                 const Dict& opts) const {
     // Consistency check
+    userOut() << "get_forward requested:" << nfwd << std::endl;
     int n=1;
     while (n<nfwd) n*=2;
-    if (n!=nfwd || nfwd>get_n_forward()) {
-      // Inefficient code to be replaced later
-      Function fwd1 = forward(1);
-      return fwd1.map(name, "serial", nfwd, range(n_in()+n_out()), std::vector<int>(), opts);
+    casadi_assert(n==nfwd);
+    if (nfwd>get_n_forward()) {
+      int n_max = get_n_forward();
+      casadi_assert(n_max);
+      Function fwd1 = forward(n_max);
+      return fwd1.map(name, "serial", nfwd/n_max, range(n_in()+n_out()), std::vector<int>(), opts);
       //casadi_error("Internal error: Refactoring needed, cf. #1055");
     }
     return external(name, li_, opts);
@@ -306,13 +309,16 @@ namespace casadi {
                 const std::vector<std::string>& i_names,
                 const std::vector<std::string>& o_names,
                 const Dict& opts) const {
+    userOut() << "get_reverse requested:" << nadj << std::endl;
     // Consistency check
     int n=1;
     while (n<nadj) n*=2;
-    if (n!=nadj || nadj>get_n_reverse()) {
-      // Inefficient code to be replaced later
-      Function adj1 = reverse(1);
-      return adj1.map(name, "serial", nadj, range(n_in()+n_out()), std::vector<int>(), opts);
+    casadi_assert(n==nadj);
+    if (nadj>get_n_reverse()) {
+      int n_max = get_n_reverse();
+      casadi_assert(n_max);
+      Function adj1 = reverse(n_max);
+      return adj1.map(name, "serial", nadj/n_max, range(n_in()+n_out()), std::vector<int>(), opts);
       //casadi_error("Internal error: Refactoring needed, cf. #1055");
     }
     return external(name, li_, opts);
