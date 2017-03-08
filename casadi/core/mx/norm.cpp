@@ -73,9 +73,9 @@ namespace casadi {
 
   void NormF::generate(CodeGenerator& g, const std::string& mem,
                        const std::vector<int>& arg, const std::vector<int>& res) const {
-    g.assign(g.body, g.workel(res[0]),
-             "sqrt(" + g.dot(dep().nnz(), g.work(arg[0], dep(0).nnz()),
-                             g.work(arg[0], dep(0).nnz())) + ")");
+    g.body << "  " << g.workel(res[0]) << " = sqrt("
+        << g.dot(dep().nnz(), g.work(arg[0], dep(0).nnz()), g.work(arg[0], dep(0).nnz()))
+        << ");\n";
   }
 
   std::string Norm2::print(const std::vector<std::string>& arg) const {

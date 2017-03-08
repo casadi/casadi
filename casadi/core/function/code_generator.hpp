@@ -212,9 +212,6 @@ namespace casadi {
                          const std::string& res, std::size_t res_off, const Sparsity& sp_res,
                          const std::string& w);
 
-    /** \brief Assignment */
-    static void assign(std::ostream &s, const std::string& lhs, const std::string& rhs);
-
     /** \brief Printf */
     std::string printf(const std::string& str,
                        const std::vector<std::string>& arg=std::vector<std::string>());

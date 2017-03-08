@@ -354,10 +354,6 @@ namespace casadi {
     return s.str();
   }
 
-  void CodeGenerator::assign(std::ostream &s, const std::string& lhs, const std::string& rhs) {
-    s << "  " << lhs << " = " << rhs << ";" << endl;
-  }
-
   std::string CodeGenerator::array(const std::string& type, const std::string& name, int len,
                                    const std::string& def) {
     std::stringstream s;
