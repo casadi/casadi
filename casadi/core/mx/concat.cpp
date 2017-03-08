@@ -79,14 +79,14 @@ namespace casadi {
 
   void Concat::generate(CodeGenerator& g, const std::string& mem,
                         const std::vector<int>& arg, const std::vector<int>& res) const {
-    g.body << "  rr=" << g.work(res[0], nnz()) << ";" << endl;
+    g << "  rr=" << g.work(res[0], nnz()) << ";\n";
     for (int i=0; i<arg.size(); ++i) {
       int nz = dep(i).nnz();
       if (nz==1) {
-        g.body << "  *rr++ = " << g.workel(arg[i]) << ";" << endl;
+        g << "  *rr++ = " << g.workel(arg[i]) << ";\n";
       } else if (nz!=0) {
-        g.body << "  for (i=0, " << "cs=" << g.work(arg[i], nz) << "; "
-               << "i<" << nz << "; ++i) *rr++ = *cs++;" << endl;
+        g << "  for (i=0, " << "cs=" << g.work(arg[i], nz) << "; "
+          << "i<" << nz << "; ++i) *rr++ = *cs++;\n";
       }
     }
   }

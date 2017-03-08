@@ -192,40 +192,40 @@ namespace casadi {
     // Run the algorithm
     for (auto&& a : algorithm_) {
       // Indent
-      g.body << "  ";
+      g << "  ";
 
       if (a.op==OP_OUTPUT) {
-        g.body << "if (res[" << a.i0 << "]!=0) "
-                      << "res["<< a.i0 << "][" << a.i2 << "]=" << "a" << a.i1;
+        g << "if (res[" << a.i0 << "]!=0) "
+          << "res["<< a.i0 << "][" << a.i2 << "]=" << "a" << a.i1;
       } else {
         // Declare result if not already declared
         if (!declared[a.i0]) {
-          g.body << "real_t ";
+          g << "real_t ";
           declared[a.i0]=true;
         }
 
         // Where to store the result
-        g.body << "a" << a.i0 << "=";
+        g << "a" << a.i0 << "=";
 
         // What to store
         if (a.op==OP_CONST) {
-          g.body << g.constant(a.d);
+          g << g.constant(a.d);
         } else if (a.op==OP_INPUT) {
-          g.body << "arg[" << a.i1 << "] ? arg[" << a.i1 << "][" << a.i2 << "] : 0";
+          g << "arg[" << a.i1 << "] ? arg[" << a.i1 << "][" << a.i2 << "] : 0";
         } else {
           int ndep = casadi_math<double>::ndeps(a.op);
-          g.body << casadi_math<double>::pre(a.op);
+          g << casadi_math<double>::pre(a.op);
           for (int c=0; c<ndep; ++c) {
             if (c==0) {
-              g.body << "a" << a.i1;
+              g << "a" << a.i1;
             } else {
-              g.body << casadi_math<double>::sep(a.op) << "a" << a.i2;
+              g << casadi_math<double>::sep(a.op) << "a" << a.i2;
             }
           }
-          g.body << casadi_math<double>::post(a.op);
+          g << casadi_math<double>::post(a.op);
         }
       }
-      g.body  << ";" << endl;
+      g  << ";\n";
     }
   }
 

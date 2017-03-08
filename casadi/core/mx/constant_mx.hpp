@@ -479,10 +479,9 @@ namespace casadi {
     if (nnz()==0) {
       // Quick return
     } else if (nnz()==1) {
-      g.body << "  " << g.workel(res[0]) << " = " << g.constant(v_.value)
-             << ";" << std::endl;
+      g << "  " << g.workel(res[0]) << " = " << g.constant(v_.value) << ";\n";
     } else {
-      g.body << "  " << g.fill(g.work(res[0], nnz()), nnz(), g.constant(v_.value)) << std::endl;
+      g << "  " << g.fill(g.work(res[0], nnz()), nnz(), g.constant(v_.value)) << '\n';
     }
   }
 

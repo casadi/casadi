@@ -417,34 +417,35 @@ namespace casadi {
     casadi_msg("MXFunction::eval():end "  << name_);
   }
 
-  void MXFunction::print(ostream &stream, const AlgEl& el) const {
+  string MXFunction::print(const AlgEl& el) const {
+    stringstream s;
     if (el.op==OP_OUTPUT) {
-      stream << "output[" << el.res.front() << "] = @" << el.arg.at(0);
+      s << "output[" << el.res.front() << "] = @" << el.arg.at(0);
     } else if (el.op==OP_SETNONZEROS || el.op==OP_ADDNONZEROS) {
       if (el.res.front()!=el.arg.at(0)) {
-        stream << "@" << el.res.front() << " = @" << el.arg.at(0) << "; ";
+        s << "@" << el.res.front() << " = @" << el.arg.at(0) << "; ";
       }
       vector<string> arg(2);
       arg[0] = "@" + CodeGenerator::to_string(el.res.front());
       arg[1] = "@" + CodeGenerator::to_string(el.arg.at(1));
-      stream << el.data->print(arg);
+      s << el.data->print(arg);
     } else {
       if (el.res.size()==1) {
-        stream << "@" << el.res.front() << " = ";
+        s << "@" << el.res.front() << " = ";
       } else {
-        stream << "{";
+        s << "{";
         for (int i=0; i<el.res.size(); ++i) {
-          if (i!=0) stream << ", ";
+          if (i!=0) s << ", ";
           if (el.res[i]>=0) {
-            stream << "@" << el.res[i];
+            s << "@" << el.res[i];
           } else {
-            stream << "NULL";
+            s << "NULL";
           }
         }
-        stream << "} = ";
+        s << "} = ";
       }
       if (el.op==OP_INPUT) {
-        stream << "input[" << el.arg.at(0) << "][" << el.arg.at(1) << "]";
+        s << "input[" << el.arg.at(0) << "][" << el.arg.at(1) << "]";
       } else {
         vector<string> arg(el.arg.size());
         for (int i=0; i<el.arg.size(); ++i) {
@@ -454,17 +455,17 @@ namespace casadi {
             arg[i] = "NULL";
           }
         }
-        stream << el.data->print(arg);
+        s << el.data->print(arg);
       }
     }
+    return s.str();
   }
 
   void MXFunction::print(ostream &stream) const {
     FunctionInternal::print(stream);
     for (auto&& e : algorithm_) {
       InterruptHandler::check();
-      print(stream, e);
-      stream << endl;
+      stream << print(e) << endl;
     }
   }
 
@@ -1065,16 +1066,13 @@ namespace casadi {
   }
 
   void MXFunction::generateBody(CodeGenerator& g) const {
-    // Shorthand
-    ostream &s = g.body;
-
     // Temporary variables and vectors
-    s << "  int i, j, k, *ii, *jj, *kk;" << endl
-      << "  const int *cii;" << endl
-      << "  real_t r, s, t, *rr, *ss, *tt;" << endl
-      << "  const real_t *cr, *cs, *ct;" << endl
-      << "  const real_t** arg1=arg+" << n_in() << ";" << endl
-      << "  real_t** res1=res+" << n_out() << ";" << endl;
+    g << "  int i, j, k, *ii, *jj, *kk;\n"
+      << "  const int *cii;\n"
+      << "  real_t r, s, t, *rr, *ss, *tt;\n"
+      << "  const real_t *cr, *cs, *ct;\n"
+      << "  const real_t** arg1=arg+" << n_in() << ";\n"
+      << "  real_t** res1=res+" << n_out() << ";\n";
 
     // Declare scalar work vector elements as local variables
     bool first = true;
@@ -1082,25 +1080,25 @@ namespace casadi {
       int n=workloc_[i+1]-workloc_[i];
       if (n==0) continue;
       if (first) {
-        s << "  real_t ";
+        g << "  real_t ";
         first = false;
       } else {
-        s << ", ";
+        g << ", ";
       }
       /* Could use local variables for small work vector elements here, e.g.:
          ...
          } else if (n<10) {
-         s << "w" << i << "[" << n << "]";
+         g << "w" << i << "[" << n << "]";
          } else {
          ...
       */
       if (!g.codegen_scalars && n==1) {
-        s << "w" << i;
+        g << "w" << i;
       } else {
-        s << "*w" << i << "=w+" << workloc_[i];
+        g << "*w" << i << "=w+" << workloc_[i];
       }
     }
-    if (!first) s << ";" << endl;
+    if (!first) g << ";\n";
 
     // Operation number (for printing)
     int k=0;
@@ -1115,16 +1113,15 @@ namespace casadi {
         if (n!=0) {
           int oind = e.res.front();
           if (g.verbose) {
-            s << "  /* #" << k++ << ": Output " << oind;
-            s << " (" << oscheme_.at(oind) << ")";
-            s << " */" << endl;
+            g << "  /* #" << k++ << ": Output " << oind
+              << " (" << oscheme_.at(oind) << ") */\n";
           }
           string r = "res[" + g.to_string(oind) + "]";
           int i = e.arg.front();
           if (n==1) {
-            s << "  if (" << r << ") *" << r << " = " << g.workel(i) << ";" << endl;
+            g << "  if (" << r << ") *" << r << " = " << g.workel(i) << ";\n";
           } else {
-            s << "  " << g.copy(g.work(i, n), n, r) << endl;
+            g << "  " << g.copy(g.work(i, n), n, r) << "\n";
           }
         }
       } else if (e.op==OP_INPUT) {
@@ -1134,26 +1131,24 @@ namespace casadi {
           std::string arg = "arg[" + to_string(iind) + "]";
           int i = e.res.front();
           if (g.verbose) {
-            s << "  /* #" << k++ << ": Input " << iind;
-            s << " (" << ischeme_.at(iind) << ")";
-            s << ", part " << ip << " (" << e.data.name() << ") */" << endl;
+            g << "  /* #" << k++ << ": Input " << iind
+              << " (" << ischeme_.at(iind) << ")"
+              << ", part " << ip << " (" << e.data.name() << ") */\n";
           }
           if (n==1) {
-            s << "  " << g.workel(i) << " = " << arg << " ? "
-              << arg << "[" << ic << "] : 0;" << endl;
+            g << "  " << g.workel(i) << " = " << arg << " ? "
+              << arg << "[" << ic << "] : 0;\n";
           } else if (ic==0) {
-            s << "  " << g.copy(arg, n, g.work(i, n)) << endl;
+            g << "  " << g.copy(arg, n, g.work(i, n)) << "\n";
           } else {
-            s << "  " << g.copy(arg + " ? " + arg + "+" + to_string(ic) + " : 0",
-                                n, g.work(i, n)) << endl;
+            g << "  " << g.copy(arg + " ? " + arg + "+" + to_string(ic) + " : 0",
+                                n, g.work(i, n)) << "\n";
           }
         }
       } else {
         // Generate comment
         if (g.verbose) {
-          s << "  /* #" << k++ << ": ";
-          print(s, e);
-          s << " */" << endl;
+          g << "  /* #" << k++ << ": " << print(e) << " */\n";
         }
 
         // Get the names of the operation arguments

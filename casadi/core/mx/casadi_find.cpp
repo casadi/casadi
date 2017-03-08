@@ -73,15 +73,15 @@ namespace casadi {
   void Find::generate(CodeGenerator& g, const std::string& mem,
                       const std::vector<int>& arg, const std::vector<int>& res) const {
     int nnz = dep(0).nnz();
-    g.body << "  for (i=0, cr=" << g.work(arg[0], nnz) << "; i<" << nnz
-           << " && *cr++==0; ++i) {}" << endl
-           << "  " << g.workel(res[0]) << " = ";
+    g << "  for (i=0, cr=" << g.work(arg[0], nnz) << "; i<" << nnz
+      << " && *cr++==0; ++i) {}\n"
+      << "  " << g.workel(res[0]) << " = ";
     if (dep(0).is_dense()) {
-      g.body << "i" << ";" << endl;
+      g << "i;\n";
     } else {
       // The row is in position 1+1+2+i (colind has length 2)
-      g.body << "i<" << nnz << " ? " << g.sparsity(dep(0).sparsity()) << "[4+i] : "
-             << dep(0).size1() << endl;
+      g << "i<" << nnz << " ? " << g.sparsity(dep(0).sparsity()) << "[4+i] : "
+        << dep(0).size1() << "\n";
     }
   }
 

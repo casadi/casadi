@@ -121,7 +121,7 @@ namespace casadi {
     }
 
     // Print indent
-    g.body << "  ";
+    g << "  ";
 
     // Scalar names of arguments (start assuming all scalars)
     string r = g.workel(res[0]);
@@ -131,33 +131,33 @@ namespace casadi {
     // Codegen loop, if needed
     if (nnz()>1) {
       // Iterate over result
-      g.body << "for (i=0, " << "rr=" << g.work(res[0], nnz());
+      g << "for (i=0, " << "rr=" << g.work(res[0], nnz());
       r = "(*rr++)";
 
       // Iterate over first argument?
       if (!ScX && !inplace) {
-        g.body << ", cr=" << g.work(arg[0], dep(0).nnz());
+        g << ", cr=" << g.work(arg[0], dep(0).nnz());
         x = "(*cr++)";
       }
 
       // Iterate over second argument?
       if (!ScY) {
-        g.body << ", cs=" << g.work(arg[1], dep(1).nnz());
+        g << ", cs=" << g.work(arg[1], dep(1).nnz());
         y = "(*cs++)";
       }
 
       // Close loop
-      g.body << "; i<" << nnz() << "; ++i) ";
+      g << "; i<" << nnz() << "; ++i) ";
     }
 
     // Perform operation
-    g.body << r << " ";
+    g << r << " ";
     if (inplace) {
-      g.body << casadi_math<double>::sep(op_) << "= " << y;
+      g << casadi_math<double>::sep(op_) << "= " << y;
     } else {
-      g.body << " = " << casadi_math<double>::print(op_, x, y);
+      g << " = " << casadi_math<double>::print(op_, x, y);
     }
-    g.body << ";" << endl;
+    g << ";\n";
   }
 
   template<bool ScX, bool ScY>

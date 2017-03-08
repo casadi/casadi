@@ -99,21 +99,21 @@ namespace casadi {
   void UnaryMX::generate(CodeGenerator& g, const std::string& mem,
                          const std::vector<int>& arg, const std::vector<int>& res) const {
     string r, x;
-    g.body << "  ";
+    g << "  ";
     if (nnz()==1) {
       // Scalar assignment
       r = g.workel(res[0]);
       x = g.workel(arg[0]);
     } else {
       // Vector assignment
-      g.body << "for (i=0, rr=" << g.work(res[0], nnz()) << ", cs=" << g.work(arg[0], nnz())
-             << "; i<" << sparsity().nnz() << "; ++i) ";
+      g << "for (i=0, rr=" << g.work(res[0], nnz()) << ", cs=" << g.work(arg[0], nnz())
+        << "; i<" << sparsity().nnz() << "; ++i) ";
       r = "*rr++";
       x = "*cs++";
     }
 
     // Output the operation
-    g.body << r << " = " << casadi_math<double>::print(op_, " " + x + " ") << ";" << endl;
+    g << r << " = " << casadi_math<double>::print(op_, " " + x + " ") << ";\n";
   }
 
   MX UnaryMX::getUnary(int op) const {

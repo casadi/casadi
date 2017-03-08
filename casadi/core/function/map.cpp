@@ -112,27 +112,27 @@ namespace casadi {
 
   void Map::generateBody(CodeGenerator& g) const {
     int n_in = this->n_in(), n_out = this->n_out();
-    g.body << "  int i;" << endl;
+    g << "  int i;\n";
     // Input buffer
-    g.body << "  const real_t** arg1 = arg+" << n_in << ";"<< endl
-           << "  for (i=0; i<" << n_in << "; ++i) arg1[i]=arg[i];" << endl;
+    g << "  const real_t** arg1 = arg+" << n_in << ";\n"
+      << "  for (i=0; i<" << n_in << "; ++i) arg1[i]=arg[i];\n";
     // Output buffer
-    g.body << "  real_t** res1 = res+" << n_out << ";" << endl
-           << "  for (i=0; i<" << n_out << "; ++i) res1[i]=res[i];" << endl
-           << "  for (i=0; i<" << n_ << "; ++i) {" << endl;
+    g << "  real_t** res1 = res+" << n_out << ";\n"
+      << "  for (i=0; i<" << n_out << "; ++i) res1[i]=res[i];\n"
+      << "  for (i=0; i<" << n_ << "; ++i) {\n";
     // Evaluate
-    g.body << "    if (" << g(f_, "arg1", "res1", "iw", "w") << ") return 1;" << endl;
+    g << "    if (" << g(f_, "arg1", "res1", "iw", "w") << ") return 1;\n";
     // Update input buffers
     for (int j=0; j<n_in; ++j) {
-      g.body << "    if (arg1[" << j << "]) arg1[" << j << "]+="
-             << f_.nnz_in(j) << ";" << endl;
+      g << "    if (arg1[" << j << "]) arg1[" << j << "]+="
+        << f_.nnz_in(j) << ";\n";
     }
     // Update output buffers
     for (int j=0; j<n_out; ++j) {
-      g.body << "    if (res1[" << j << "]) res1[" << j << "]+="
-             << f_.nnz_out(j) << ";" << endl;
+      g << "    if (res1[" << j << "]) res1[" << j << "]+="
+        << f_.nnz_out(j) << ";\n";
     }
-    g.body << "  }" << std::endl;
+    g << "  }\n";
   }
 
   Function Map
@@ -289,25 +289,25 @@ namespace casadi {
     int n_in = this->n_in(), n_out = this->n_out();
     size_t sz_arg, sz_res, sz_iw, sz_w;
     f_.sz_work(sz_arg, sz_res, sz_iw, sz_w);
-    g.body << "  int i;" << endl;
-    g.body << "  const double** arg1;" << endl;
-    g.body << "  double** res1;" << endl;
-    g.body << "#pragma omp parallel for private(i,arg1,res1)" << endl;
-    g.body << "  for (i=0; i<" << n_ << "; ++i) {" << endl;
-    g.body << "    arg1 = arg + " << n_in << "+i*" << sz_arg << ";" << endl;
+    g << "  int i;\n"
+      << "  const double** arg1;\n"
+      << "  double** res1;\n"
+      << "#pragma omp parallel for private(i,arg1,res1)\n"
+      << "  for (i=0; i<" << n_ << "; ++i) {\n"
+      << "    arg1 = arg + " << n_in << "+i*" << sz_arg << ";\n";
     for (int j=0; j<n_in; ++j) {
-      g.body << "    arg1[" << j << "] = arg[" << j << "] ? "
-             << "arg[" << j << "]+i*" << f_.nnz_in(j) << ": 0;" << endl;
+      g << "    arg1[" << j << "] = arg[" << j << "] ? "
+        << "arg[" << j << "]+i*" << f_.nnz_in(j) << ": 0;\n";
     }
-    g.body << "    res1 = res + " <<  n_out << "+i*" <<  sz_res << ";" << endl;
+    g << "    res1 = res + " <<  n_out << "+i*" <<  sz_res << ";\n";
     for (int j=0; j<n_out; ++j) {
-      g.body << "    res1[" << j << "] = res[" << j << "] ?"
-             << "res[" << j << "]+i*" << f_.nnz_out(j) << ": 0;" << endl;
+      g << "    res1[" << j << "] = res[" << j << "] ?"
+        << "res[" << j << "]+i*" << f_.nnz_out(j) << ": 0;\n";
     }
-    g.body << "    " << g(f_, "arg1", "res1",
-                          "iw+i*" + to_string(sz_iw),
-                          "w+i*" + to_string(sz_w)) << ";" << endl;
-    g.body << "  }" << std::endl;
+    g << "    " << g(f_, "arg1", "res1",
+                     "iw+i*" + to_string(sz_iw),
+                     "w+i*" + to_string(sz_w)) << ";\n"
+      << "  }\n";
   }
 
   void MapOmp::init(const Dict& opts) {

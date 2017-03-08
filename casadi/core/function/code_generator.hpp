@@ -100,6 +100,17 @@ namespace casadi {
     /** \brief Generate a call to a function (simplified signature) */
     std::string operator()(const Function& f, const std::string& arg, const std::string& res) const;
 
+    /** \brief Print a string to function body  */
+    CodeGenerator& operator<<(const std::string& s);
+
+    /** \brief Print an arbitrary type to function body */
+    template<typename T>
+    CodeGenerator& operator<<(T s) {
+      std::stringstream ss;
+      ss << s;
+      return (*this) << ss.str();
+    }
+
     /** \brief Print a constant in a lossless but compact manner */
     static std::string constant(double v);
 
@@ -279,7 +290,7 @@ namespace casadi {
     // Stringstreams holding the different parts of the file being generated
     std::stringstream includes;
     std::stringstream auxiliaries;
-    std::stringstream body;
+    std::stringstream body_;
     std::stringstream header;
 
     // Names of exposed functions

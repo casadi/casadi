@@ -744,18 +744,18 @@ namespace casadi {
            const std::vector<int>& arg, const std::vector<int>& res) const {
     // Copy first argument if not inplace
     if (arg[0]!=res[0]) {
-      g.body << "  " << g.copy(g.work(arg[0], this->dep(0).nnz()), this->nnz(),
-                               g.work(res[0], this->nnz())) << endl;
+      g << "  " << g.copy(g.work(arg[0], this->dep(0).nnz()), this->nnz(),
+                          g.work(res[0], this->nnz())) << '\n';
     }
 
     // Condegen the indices
     int ind = g.getConstant(this->nz_, true);
 
     // Perform the operation inplace
-    g.body << "  for (cii=s" << ind << ", rr=" << g.work(res[0], this->nnz()) << ", "
-           << "ss=" << g.work(arg[1], this->dep(1).nnz()) << "; cii!=s" << ind
-           << "+" << this->nz_.size() << "; ++cii, ++ss)";
-    g.body << " if (*cii>=0) rr[*cii] " << (Add?"+=":"=") << " *ss;" << endl;
+    g << "  for (cii=s" << ind << ", rr=" << g.work(res[0], this->nnz()) << ", "
+      << "ss=" << g.work(arg[1], this->dep(1).nnz()) << "; cii!=s" << ind
+      << "+" << this->nz_.size() << "; ++cii, ++ss)"
+      << " if (*cii>=0) rr[*cii] " << (Add?"+=":"=") << " *ss;\n";
   }
 
   template<bool Add>
@@ -764,16 +764,16 @@ namespace casadi {
            const std::vector<int>& arg, const std::vector<int>& res) const {
     // Copy first argument if not inplace
     if (arg[0]!=res[0]) {
-      g.body << "  " << g.copy(g.work(arg[0], this->dep(0).nnz()), this->nnz(),
-                               g.work(res[0], this->nnz())) << endl;
+      g << "  " << g.copy(g.work(arg[0], this->dep(0).nnz()), this->nnz(),
+                          g.work(res[0], this->nnz())) << '\n';
     }
 
     // Perform the operation inplace
-    g.body << "  for (rr=" << g.work(res[0], this->nnz()) << "+" << s_.start << ", ss="
-           << g.work(arg[1], this->dep(1).nnz()) << "; rr!="
-           << g.work(res[0], this->nnz()) << "+" << s_.stop
-           << "; rr+=" << s_.step << ")";
-    g.body << " *rr " << (Add?"+=":"=") << " *ss++;" << endl;
+    g << "  for (rr=" << g.work(res[0], this->nnz()) << "+" << s_.start << ", ss="
+      << g.work(arg[1], this->dep(1).nnz()) << "; rr!="
+      << g.work(res[0], this->nnz()) << "+" << s_.stop
+      << "; rr+=" << s_.step << ")"
+      << " *rr " << (Add?"+=":"=") << " *ss++;\n";
   }
 
   template<bool Add>
@@ -782,18 +782,18 @@ namespace casadi {
            const std::vector<int>& arg, const std::vector<int>& res) const {
     // Copy first argument if not inplace
     if (arg[0]!=res[0]) {
-      g.body << "  " << g.copy(g.work(arg[0], this->dep(0).nnz()), this->nnz(),
-                               g.work(res[0], this->nnz())) << endl;
+      g << "  " << g.copy(g.work(arg[0], this->dep(0).nnz()), this->nnz(),
+                          g.work(res[0], this->nnz())) << '\n';
     }
 
     // Perform the operation inplace
-    g.body << "  for (rr=" << g.work(res[0], this->nnz()) << "+" << outer_.start
-           << ", ss=" << g.work(arg[1], this->dep(1).nnz()) << "; rr!="
-           << g.work(res[0], this->nnz()) << "+" << outer_.stop
-           << "; rr+=" << outer_.step << ")";
-    g.body << " for (tt=rr+" << inner_.start << "; tt!=rr+" << inner_.stop
-           << "; tt+=" << inner_.step << ")";
-    g.body << " *tt " << (Add?"+=":"=") << " *ss++;" << endl;
+    g << "  for (rr=" << g.work(res[0], this->nnz()) << "+" << outer_.start
+      << ", ss=" << g.work(arg[1], this->dep(1).nnz()) << "; rr!="
+      << g.work(res[0], this->nnz()) << "+" << outer_.stop
+      << "; rr+=" << outer_.step << ")"
+      << " for (tt=rr+" << inner_.start << "; tt!=rr+" << inner_.stop
+      << "; tt+=" << inner_.step << ")"
+      << " *tt " << (Add?"+=":"=") << " *ss++;\n";
   }
 
   template<bool Add>

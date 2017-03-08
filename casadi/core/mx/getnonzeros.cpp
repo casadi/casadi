@@ -439,10 +439,10 @@ namespace casadi {
     int ind = g.getConstant(nz_, true);
 
     // Codegen the assignments
-    g.body << "  for (cii=s" << ind << ", rr=" << g.work(res[0], nnz())
-           << ", ss=" << g.work(arg[0], dep(0).nnz())
-           << "; cii!=s" << ind << "+" << nz_.size()
-           << "; ++cii) *rr++ = *cii>=0 ? ss[*cii] : 0;" << endl;
+    g << "  for (cii=s" << ind << ", rr=" << g.work(res[0], nnz())
+      << ", ss=" << g.work(arg[0], dep(0).nnz())
+      << "; cii!=s" << ind << "+" << nz_.size()
+      << "; ++cii) *rr++ = *cii>=0 ? ss[*cii] : 0;\n";
   }
 
   void GetNonzerosSlice::simplifyMe(MX& ex) {
@@ -467,22 +467,18 @@ namespace casadi {
 
   void GetNonzerosSlice::generate(CodeGenerator& g, const std::string& mem,
                                   const std::vector<int>& arg, const std::vector<int>& res) const {
-    g.body << "  for (rr=" << g.work(res[0], nnz()) << ", ss="
-           << g.work(arg[0], dep(0).nnz()) << "+" << s_.start
-           << "; ss!=" << g.work(arg[0], dep(0).nnz()) << "+" << s_.stop
-           << "; ss+=" << s_.step << ") "
-           << "*rr++ = *ss;" << endl;
+    g << "  for (rr=" << g.work(res[0], nnz()) << ", ss=" << g.work(arg[0], dep(0).nnz())
+      << "+" << s_.start << "; ss!=" << g.work(arg[0], dep(0).nnz()) << "+" << s_.stop
+      << "; ss+=" << s_.step << ") *rr++ = *ss;\n";
   }
 
   void GetNonzerosSlice2::generate(CodeGenerator& g, const std::string& mem,
                                    const std::vector<int>& arg, const std::vector<int>& res) const {
-    g.body << "  for (rr=" << g.work(res[0], nnz()) << ", ss="
-           << g.work(arg[0], dep(0).nnz()) << "+" << outer_.start
-           << "; ss!=" << g.work(arg[0], dep(0).nnz()) << "+" << outer_.stop << "; ss+="
-           << outer_.step << ") "
-           << "for (tt=ss+" << inner_.start << "; tt!=ss+" << inner_.stop
-           << "; tt+=" << inner_.step << ") "
-           << "*rr++ = *tt;" << endl;
+    g << "  for (rr=" << g.work(res[0], nnz()) << ", ss=" << g.work(arg[0], dep(0).nnz())
+      << "+" << outer_.start << "; ss!=" << g.work(arg[0], dep(0).nnz()) << "+"
+      << outer_.stop << "; ss+=" << outer_.step << ") "
+      << "for (tt=ss+" << inner_.start << "; tt!=ss+" << inner_.stop
+      << "; tt+=" << inner_.step << ") *rr++ = *tt;\n";
   }
 
   bool GetNonzerosVector::is_equal(const MXNode* node, int depth) const {

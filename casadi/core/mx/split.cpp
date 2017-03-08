@@ -99,20 +99,20 @@ namespace casadi {
       int nz = nz_last-nz_first;
       if (res[i]>=0 && nz>0) { // if anything to assign
         if (nz==1) { // assign scalar
-          g.body << "  " << g.workel(res[i]) << " = ";
+          g << "  " << g.workel(res[i]) << " = ";
           if (dep(0).nnz()==1) {
             // rhs is also scalar
             casadi_assert(nz_first==0);
-            g.body << g.workel(arg[0]) << ";" << endl;
+            g << g.workel(arg[0]) << ";\n";
           } else {
             // rhs is an element in a vector
-            g.body << g.work(arg[0], dep(0).nnz()) << "[" << nz_first << "];" << endl;
+            g << g.work(arg[0], dep(0).nnz()) << "[" << nz_first << "];\n";
           }
         } else {
           // assign vector
           std::string r = g.work(arg[0], dep(0).nnz());
           if (nz_first!=0) r = r + "+" + g.to_string(nz_first);
-          g.body << "  " << g.copy(r, nz, g.work(res[i], nnz(i))) << endl;
+          g << "  " << g.copy(r, nz, g.work(res[i], nnz(i))) << "\n";
         }
       }
     }

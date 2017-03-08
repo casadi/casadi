@@ -113,10 +113,10 @@ namespace casadi {
   }
 
   void LinearInterpolant::generateBody(CodeGenerator& g) const {
-    g.body << "  if (res[0]) {" << endl;
-    g.body << "    res[0][0] = " << g.interpn(ndim_, g.constant(grid_), g.constant(offset_),
-      g.constant(values_), "arg[0]", g.constant(lookup_mode_), "iw", "w") << endl;
-    g.body << "  }" << endl;
+    g << "  if (res[0]) {\n"
+      << "    res[0][0] = " << g.interpn(ndim_, g.constant(grid_), g.constant(offset_),
+      g.constant(values_), "arg[0]", g.constant(lookup_mode_), "iw", "w") << "\n"
+      << "  }\n";
   }
 
   Function LinearInterpolant::
@@ -152,9 +152,9 @@ namespace casadi {
 
     auto m = derivative_of_.get<LinearInterpolant>();
 
-    g.body << "  " << g.interpn_grad("res[0]", m->ndim_,
+    g << "  " << g.interpn_grad("res[0]", m->ndim_,
       g.constant(m->grid_), g.constant(m->offset_), g.constant(m->values_),
-      "arg[0]", g.constant(m->lookup_mode_), "iw", "w") << endl;
+      "arg[0]", g.constant(m->lookup_mode_), "iw", "w") << "\n";
   }
 
 } // namespace casadi

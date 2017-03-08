@@ -324,7 +324,7 @@ namespace casadi {
     }
 
     // Codegen body
-    s << this->body.str();
+    s << body_.str();
 
     // End with new line
     s << endl;
@@ -964,5 +964,11 @@ namespace casadi {
       << z << ", " << sparsity(sp_z) << ", " << w << ", " <<  (tr ? "1" : "0") << ");";
     return s.str();
   }
+
+  CodeGenerator& CodeGenerator::operator<<(const std::string& s) {
+    body_ << s;
+    return *this;
+  }
+
 
 } // namespace casadi

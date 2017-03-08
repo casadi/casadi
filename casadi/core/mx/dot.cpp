@@ -95,9 +95,9 @@ namespace casadi {
 
   void Dot::generate(CodeGenerator& g, const std::string& mem,
                            const std::vector<int>& arg, const std::vector<int>& res) const {
-    g.body << "  " << g.workel(res[0]) << " = "
-        << g.dot(dep().nnz(), g.work(arg[0], dep(0).nnz()), g.work(arg[1], dep(1).nnz()))
-        << ";\n";
+    g << "  " << g.workel(res[0]) << " = "
+      << g.dot(dep().nnz(), g.work(arg[0], dep(0).nnz()), g.work(arg[1], dep(1).nnz()))
+      << ";\n";
   }
 
 } // namespace casadi

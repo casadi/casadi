@@ -231,10 +231,8 @@ namespace casadi {
 
   void External::generateFunction(CodeGenerator& g, const std::string& fname,
                                   bool decl_static) const {
-    g.body
-      << signature(fname) << " {" << endl
-      << li_.body(eval_name())
-      << endl;
+    g << signature(fname) << " {\n"
+      << li_.body(eval_name()) << "\n";
   }
 
   void External::addDependency(CodeGenerator& g) const {

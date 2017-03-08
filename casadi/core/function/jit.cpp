@@ -103,7 +103,7 @@ namespace casadi {
   }
 
   void Jit::generateBody(CodeGenerator& g) const {
-    g.body << body_;
+    g << body_;
   }
 
   bool Jit::hasFullJacobian() const {

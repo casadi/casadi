@@ -154,7 +154,7 @@ namespace casadi {
     virtual void sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const;
 
     // print an element of an algorithm
-    void print(std::ostream &stream, const AlgEl& el) const;
+    std::string print(const AlgEl& el) const;
 
     /** \brief Gradient expression */
     virtual MX grad_mx(int iind=0, int oind=0);

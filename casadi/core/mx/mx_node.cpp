@@ -364,7 +364,7 @@ namespace casadi {
     casadi_warning("Cannot code generate MX nodes of type " + type_name() +
                    "The generation will proceed, but compilation of the code will "
                    "not be possible.");
-    g.body << "#error " <<  type_name() << ": " << arg << " => " << res << endl;
+    g << "#error " <<  type_name() << ": " << arg << " => " << res << '\n';
   }
 
   double MXNode::to_double() const {
