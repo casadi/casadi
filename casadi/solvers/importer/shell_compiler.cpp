@@ -58,10 +58,12 @@ namespace casadi {
     // Unload
     if (handle_) dlclose(handle_);
 
-    // Delete the temporary file
-    std::string rmcmd = "rm " + bin_name_;
-    if (system(rmcmd.c_str())) {
-      casadi_warning("Failed to delete temporary file:" + bin_name_);
+    if (cleanup_) {
+      // Delete the temporary file
+      std::string rmcmd = "rm " + bin_name_;
+      if (system(rmcmd.c_str())) {
+        casadi_warning("Failed to delete temporary file:" + bin_name_);
+      }
     }
   }
 
@@ -77,7 +79,10 @@ namespace casadi {
         " custom flags."}},
       {"flags",
        {OT_STRINGVECTOR,
-      "Compile flags for the JIT compiler. Default: None"}}
+        "Compile flags for the JIT compiler. Default: None"}},
+      {"cleanup",
+       {OT_BOOL,
+        "Cleanup temporary files when unloading. Default: true"}}
      }
   };
 
@@ -89,6 +94,7 @@ namespace casadi {
     string compiler = "gcc";
     string compiler_setup = "-fPIC -shared";
     vector<string> flags;
+    cleanup_ = true;
 
     // Read options
     for (auto&& op : opts) {
@@ -98,6 +104,8 @@ namespace casadi {
         compiler_setup = op.second.to_string();
       } else if (op.first=="flags") {
         flags = op.second;
+      } else if (op.first=="cleanup") {
+        cleanup_ = op.second;
       }
     }
 

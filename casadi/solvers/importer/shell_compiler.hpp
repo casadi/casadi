@@ -81,6 +81,9 @@ namespace casadi {
     /// Temporary file
     std::string bin_name_;
 
+    /// Cleanup temporary files when unloading
+    bool cleanup_;
+
     // Shared library handle
     typedef void* handle_t;
     handle_t handle_;
