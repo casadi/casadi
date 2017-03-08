@@ -1162,7 +1162,7 @@ namespace casadi {
 
     if (!(x.size2() == y.size2() && x.size1() == y.size1())) {
       std::stringstream ss;
-      casadi_math<Scalar>::print(op, ss, "lhs", "rhs");
+      ss << casadi_math<Scalar>::print(op, "lhs", "rhs");
       casadi_error("matrix_matrix: dimension mismatch in element-wise matrix operation "
                    << ss.str() <<"." << std::endl << "Left argument has shape " << x.dim()
                    << ", right has shape " << y.dim() << ". They should be equal.");

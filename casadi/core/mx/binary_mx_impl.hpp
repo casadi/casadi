@@ -52,9 +52,7 @@ namespace casadi {
 
   template<bool ScX, bool ScY>
   std::string BinaryMX<ScX, ScY>::print(const std::vector<std::string>& arg) const {
-    stringstream ss;
-    casadi_math<double>::print(op_, ss, arg.at(0), arg.at(1));
-    return ss.str();
+    return casadi_math<double>::print(op_, arg.at(0), arg.at(1));
   }
 
   template<bool ScX, bool ScY>
@@ -157,8 +155,7 @@ namespace casadi {
     if (inplace) {
       g.body << casadi_math<double>::sep(op_) << "= " << y;
     } else {
-      g.body << " = ";
-      casadi_math<double>::print(op_, g.body, x, y);
+      g.body << " = " << casadi_math<double>::print(op_, x, y);
     }
     g.body << ";" << endl;
   }

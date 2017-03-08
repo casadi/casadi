@@ -1077,9 +1077,9 @@ namespace casadi {
     static inline int ndeps(unsigned char op);
 
     /** \brief Print */
-    static inline void print(unsigned char op, std::ostream &stream, const std::string& x,
+    static inline std::string print(unsigned char op, const std::string& x,
                              const std::string& y);
-    static inline void print(unsigned char op, std::ostream &stream, const std::string& x);
+    static inline std::string print(unsigned char op, const std::string& x);
     static inline std::string name(unsigned char op);
     static inline std::string pre(unsigned char op);
     static inline std::string sep(unsigned char op);
@@ -1146,12 +1146,12 @@ namespace casadi {
     }
 
     /** \brief Print */
-    static inline void print(unsigned char op, std::ostream &stream, const std::string& x,
-                             const std::string& y) {
-      casadi_math<double>::print(op, stream, x, y);
+    static inline std::string print(unsigned char op, const std::string& x,
+                                    const std::string& y) {
+      return casadi_math<double>::print(op, x, y);
     }
-    static inline void print(unsigned char op, std::ostream &stream, const std::string& x) {
-      casadi_math<double>::print(op, stream, x);
+    static inline std::string print(unsigned char op, const std::string& x) {
+      return casadi_math<double>::print(op, x);
     }
     static inline std::string pre(unsigned char op) {
       return casadi_math<double>::pre(op);
@@ -1405,22 +1405,18 @@ namespace casadi {
   }
 
   template<typename T>
-  inline void
-  casadi_math<T>::print(unsigned char op, std::ostream &stream,
-                        const std::string& x,
-                        const std::string& y) {
-    if (ndeps(op)==2) {
-      stream << pre(op) << x << sep(op) << y << post(op);
-    } else {
-      stream << pre(op) << x << post(op);
-    }
+  inline std::string
+  casadi_math<T>::print(unsigned char op,
+                        const std::string& x, const std::string& y) {
+    casadi_assert(ndeps(op)==2);
+    return pre(op) + x + sep(op) + y + post(op);
   }
 
   template<typename T>
-  inline void
-  casadi_math<T>::print(unsigned char op, std::ostream &stream,
-                        const std::string& x) {
-    stream << pre(op) << x << post(op);
+  inline std::string
+  casadi_math<T>::print(unsigned char op, const std::string& x) {
+    casadi_assert(ndeps(op)==1);
+    return pre(op) + x + post(op);
   }
 
   template<typename T>

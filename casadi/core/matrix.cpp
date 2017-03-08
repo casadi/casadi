@@ -750,13 +750,14 @@ namespace casadi {
   string
   SX::print_operator(const SX& X, const vector<string>& args) {
     SXElem x = X.scalar();
-    if (!x.hasDep())
-        throw CasadiException("print_operator: SXElem must be binary operator");
-    if (args.size() == 0 || (casadi_math<double>::ndeps(x.op())==2 && args.size() < 2))
-        throw CasadiException("print_operator: not enough arguments supplied");
-    stringstream s;
-    casadi_math<double>::print(x.op(), s, args[0], args[1]);
-    return s.str();
+    int ndeps = casadi_math<double>::ndeps(x.op());
+    casadi_assert_message(ndeps==1 || ndeps==2, "Not a unary or binary operator");
+    casadi_assert_message(args.size()==ndeps, "Wrong number of arguments");
+    if (ndeps==1) {
+      return casadi_math<double>::print(x.op(), args.at(0));
+    } else {
+      return casadi_math<double>::print(x.op(), args.at(0), args.at(1));
+    }
   }
 
   template<>

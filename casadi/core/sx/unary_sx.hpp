@@ -84,9 +84,7 @@ class CASADI_EXPORT UnarySX : public SXNode {
 
     /** \brief  Print expression */
     virtual std::string print(const std::string& arg1, const std::string& arg2) const {
-      std::stringstream ss;
-      casadi_math<double>::print(op_, ss, arg1);
-      return ss.str();
+      return casadi_math<double>::print(op_, arg1);
     }
 
     /** \brief  The binary operation as an 1 byte integer (allows 256 values) */
