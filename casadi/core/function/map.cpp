@@ -115,23 +115,23 @@ namespace casadi {
     g << "int i;\n";
     // Input buffer
     g << "const real_t** arg1 = arg+" << n_in << ";\n"
-      << "  for (i=0; i<" << n_in << "; ++i) arg1[i]=arg[i];\n";
+      << "for (i=0; i<" << n_in << "; ++i) arg1[i]=arg[i];\n";
     // Output buffer
     g << "real_t** res1 = res+" << n_out << ";\n"
-      << "  for (i=0; i<" << n_out << "; ++i) res1[i]=res[i];\n"
-      << "  for (i=0; i<" << n_ << "; ++i) {\n";
+      << "for (i=0; i<" << n_out << "; ++i) res1[i]=res[i];\n"
+      << "for (i=0; i<" << n_ << "; ++i) {\n";
+    g.increase_indent();
     // Evaluate
-    g << "  if (" << g(f_, "arg1", "res1", "iw", "w") << ") return 1;\n";
+    g << "if (" << g(f_, "arg1", "res1", "iw", "w") << ") return 1;\n";
     // Update input buffers
     for (int j=0; j<n_in; ++j) {
-      g << "  if (arg1[" << j << "]) arg1[" << j << "]+="
-        << f_.nnz_in(j) << ";\n";
+      g << "if (arg1[" << j << "]) arg1[" << j << "]+=" << f_.nnz_in(j) << ";\n";
     }
     // Update output buffers
     for (int j=0; j<n_out; ++j) {
-      g << "  if (res1[" << j << "]) res1[" << j << "]+="
-        << f_.nnz_out(j) << ";\n";
+      g << "if (res1[" << j << "]) res1[" << j << "]+=" << f_.nnz_out(j) << ";\n";
     }
+    g.decrease_indent();
     g << "}\n";
   }
 
@@ -290,24 +290,25 @@ namespace casadi {
     size_t sz_arg, sz_res, sz_iw, sz_w;
     f_.sz_work(sz_arg, sz_res, sz_iw, sz_w);
     g << "int i;\n"
-      << "  const double** arg1;\n"
-      << "  double** res1;\n"
+      << "const double** arg1;\n"
+      << "double** res1;\n"
       << "#pragma omp parallel for private(i,arg1,res1)\n"
-      << "  for (i=0; i<" << n_ << "; ++i) {\n"
-      << "    arg1 = arg + " << n_in << "+i*" << sz_arg << ";\n";
+      << "for (i=0; i<" << n_ << "; ++i) {\n";
+    g.increase_indent();
+    g << "arg1 = arg + " << n_in << "+i*" << sz_arg << ";\n";
     for (int j=0; j<n_in; ++j) {
-      g << "  arg1[" << j << "] = arg[" << j << "] ? "
+      g << "arg1[" << j << "] = arg[" << j << "] ? "
         << "arg[" << j << "]+i*" << f_.nnz_in(j) << ": 0;\n";
     }
-    g << "  res1 = res + " <<  n_out << "+i*" <<  sz_res << ";\n";
+    g << "res1 = res + " <<  n_out << "+i*" <<  sz_res << ";\n";
     for (int j=0; j<n_out; ++j) {
-      g << "  res1[" << j << "] = res[" << j << "] ?"
+      g << "res1[" << j << "] = res[" << j << "] ?"
         << "res[" << j << "]+i*" << f_.nnz_out(j) << ": 0;\n";
     }
-    g << "  " << g(f_, "arg1", "res1",
-                     "iw+i*" + to_string(sz_iw),
-                     "w+i*" + to_string(sz_w)) << ";\n"
-      << "  }\n";
+    g << g(f_, "arg1", "res1",
+           "iw+i*" + to_string(sz_iw), "w+i*" + to_string(sz_w)) << ";\n";
+    g.decrease_indent();
+    g << "}\n";
   }
 
   void MapOmp::init(const Dict& opts) {
