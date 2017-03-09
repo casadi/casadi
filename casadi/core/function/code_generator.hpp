@@ -100,19 +100,25 @@ namespace casadi {
     /** \brief Generate a call to a function (simplified signature) */
     std::string operator()(const Function& f, const std::string& arg, const std::string& res) const;
 
-    /** \brief Print a string to function body  */
+    /** \brief Print a string to buffer  */
     CodeGenerator& operator<<(const std::string& s);
 
     /** \brief Print without newline characters */
     void print_formatted(const std::string& s);
 
-    /** \brief Print an arbitrary type to function body */
+    /** \brief Print an arbitrary type to buffer */
     template<typename T>
     CodeGenerator& operator<<(T s) {
       std::stringstream ss;
       ss << s;
       return (*this) << ss.str();
     }
+
+    /** \brief Flush the buffer to a stream of choice */
+    void flush(std::ostream &s);
+
+    /** \brief Declare a local variable */
+    void local(const std::string& name, const std::string& type, const std::string& ref="");
 
     /** \brief Increase indent */
     void increase_indent();
@@ -299,8 +305,9 @@ namespace casadi {
     // Stringstreams holding the different parts of the file being generated
     std::stringstream includes;
     std::stringstream auxiliaries;
-    std::stringstream body_;
+    std::stringstream body;
     std::stringstream header;
+    std::stringstream buffer;
 
     // Are we at a new line?
     bool newline_;
@@ -321,6 +328,7 @@ namespace casadi {
     PointerMap added_dependencies_;
     std::multimap<size_t, size_t> added_double_constants_;
     std::multimap<size_t, size_t> added_integer_constants_;
+    std::map<std::string, std::pair<std::string, std::string> > local_variables_;
 
     // Constants
     std::vector<std::vector<double> > double_constants_;

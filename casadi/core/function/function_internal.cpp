@@ -1703,15 +1703,33 @@ namespace casadi {
       g << "extern \"C\" ";
     }
     g << signature(fname) << " {\n";
-
-    // Insert the function body
     g.increase_indent();
+    g.flush(g.body);
+    g.local_variables_.clear();
+
+    // Generate function body
     generateBody(g);
+
+    // Collect local variables
+    std::map<string, set<string>> local_variables_by_type;
+    for (auto&& e : g.local_variables_) {
+      local_variables_by_type[e.second.first].insert(e.second.second + e.first);
+    }
+    for (auto&& e : local_variables_by_type) {
+      g.body << "  " << e.first;
+      for (auto it=e.second.begin(); it!=e.second.end(); ++it) {
+        g.body << (it==e.second.begin() ? " " : ", ") << *it;
+      }
+      g.body << ";\n";
+    }
 
     // Finalize the function
     if (!simplifiedCall()) g << "return 0;\n";
     g.decrease_indent();
     g << "}\n\n";
+
+    // Flush to function body
+    g.flush(g.body);
   }
 
   std::string FunctionInternal::signature(const std::string& fname) const {
@@ -1951,6 +1969,8 @@ namespace casadi {
       g.decrease_indent();
       g << "}\n";
     }
+    // Flush
+    g.flush(g.body);
   }
 
   std::string FunctionInternal::codegen_name(const CodeGenerator& g) const {

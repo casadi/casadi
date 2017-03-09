@@ -335,7 +335,7 @@ namespace casadi {
     }
 
     // Codegen body
-    s << body_.str();
+    s << this->body.str();
 
     // End with new line
     s << endl;
@@ -982,12 +982,12 @@ namespace casadi {
 
     // If new line, add indentation
     if (newline_) {
-      body_ << string(indent_*current_indent_, ' ');
+      this->buffer << string(indent_*current_indent_, ' ');
       newline_ = false;
     }
 
     // Print to body
-    body_ << s;
+    this->buffer << s;
   }
 
   CodeGenerator& CodeGenerator::operator<<(const string& s) {
@@ -1002,7 +1002,7 @@ namespace casadi {
       } else {
         // Ends with newline
         print_formatted(s.substr(off, pos-off));
-        body_ << '\n';
+        this->buffer << '\n';
         newline_ = true;
         off = pos+1;
       }
@@ -1018,6 +1018,25 @@ namespace casadi {
   void CodeGenerator::decrease_indent() {
     casadi_assert(current_indent_>0);
     current_indent_--;
+  }
+
+  void CodeGenerator::flush(std::ostream &s) {
+    s << this->buffer.str();
+    this->buffer.str(string());
+  }
+
+  void CodeGenerator::local(const std::string& name, const std::string& type,
+                            const std::string& ref) {
+    // Check if the variable already exists
+    auto it = local_variables_.find(name);
+    if (it==local_variables_.end()) {
+      // Add it
+      local_variables_[name] = make_pair(type, ref);
+    } else {
+      // Consistency check
+      casadi_assert_message(it->second.first==type, "Type mismatch for " + name);
+      casadi_assert_message(it->second.second==ref, "Type mismatch for " + name);
+    }
   }
 
 } // namespace casadi
