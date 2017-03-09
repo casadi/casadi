@@ -1348,6 +1348,7 @@ class Functiontests(casadiTestCase):
         solver = nlpsol("solver","ipopt",nlp,{"specific_options":{ "nlp_foo" : 3}})
         
   @memory_heavy()
+  @requires_expm("slicot")
   def test_expm(self):
       eps = 1e-6
       t = MX.sym('t')

@@ -583,6 +583,18 @@ class requires_nlpsol(object):
       print("Not available NLP plugin %s, skipping unittests" % self.n)
       return None
 
+class requires_expm(object):
+  def __init__(self,n):
+    self.n = n
+
+  def __call__(self,c):
+    try:
+      load_expm(self.n)
+      return c
+    except:
+      print("Not available Expm plugin %s, skipping unittests" % self.n)
+      return None
+
 class requires_integrator(object):
   def __init__(self,n):
     self.n = n
