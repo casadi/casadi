@@ -120,9 +120,6 @@ namespace casadi {
       break;
     }
 
-    // Print indent
-    g << "  ";
-
     // Scalar names of arguments (start assuming all scalars)
     string r = g.workel(res[0]);
     string x = g.workel(arg[0]);

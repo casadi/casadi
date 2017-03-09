@@ -106,11 +106,11 @@ namespace casadi {
                                 const std::vector<int>& arg, const std::vector<int>& res) const {
     // Copy first argument if not inplace
     if (arg[0]!=res[0]) {
-      g << "  " << g.copy(g.work(arg[0], nnz()), nnz(), g.work(res[0], nnz())) << '\n';
+      g << g.copy(g.work(arg[0], nnz()), nnz(), g.work(res[0], nnz())) << '\n';
     }
 
     // Perform sparse matrix multiplication
-    g << "  " << g.mtimes(g.work(arg[1], dep(1).nnz()), dep(1).sparsity(),
+    g << g.mtimes(g.work(arg[1], dep(1).nnz()), dep(1).sparsity(),
                           g.work(arg[2], dep(2).nnz()), dep(2).sparsity(),
                           g.work(res[0], nnz()), sparsity(), "w", false) << '\n';
   }
@@ -120,12 +120,12 @@ namespace casadi {
            const std::vector<int>& arg, const std::vector<int>& res) const {
     // Copy first argument if not inplace
     if (arg[0]!=res[0]) {
-      g << "  " << g.copy(g.work(arg[0], nnz()), nnz(),
+      g << g.copy(g.work(arg[0], nnz()), nnz(),
                           g.work(res[0], nnz())) << '\n';
     }
 
     int nrow_x = dep(1).size1(), nrow_y = dep(2).size1(), ncol_y = dep(2).size2();
-    g << "  for (i=0, rr=" << g.work(res[0], nnz()) <<"; i<" << ncol_y << "; ++i)"
+    g << "for (i=0, rr=" << g.work(res[0], nnz()) <<"; i<" << ncol_y << "; ++i)"
       << " for (j=0; j<" << nrow_x << "; ++j, ++rr)"
       << " for (k=0, ss=" << g.work(arg[1], dep(1).nnz()) << "+j, tt="
       << g.work(arg[2], dep(2).nnz()) << "+i*" << nrow_y << "; k<" << nrow_y << "; ++k)"

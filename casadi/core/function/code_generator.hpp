@@ -115,10 +115,10 @@ namespace casadi {
     }
 
     /** \brief Increase indent */
-    CodeGenerator& operator++();
+    void increase_indent();
 
     /** \brief Decrease indent */
-    CodeGenerator& operator--();
+    void decrease_indent();
 
     /** \brief Print a constant in a lossless but compact manner */
     static std::string constant(double v);

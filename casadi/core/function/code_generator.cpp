@@ -1011,15 +1011,13 @@ namespace casadi {
     return *this;
   }
 
-  CodeGenerator& CodeGenerator::operator++() {
+  void CodeGenerator::increase_indent() {
     current_indent_++;
-    return *this;
   }
 
-  CodeGenerator& CodeGenerator::operator--() {
+  void CodeGenerator::decrease_indent() {
+    casadi_assert(current_indent_>0);
     current_indent_--;
-    casadi_assert(current_indent_>=0);
-    return *this;
   }
 
 } // namespace casadi

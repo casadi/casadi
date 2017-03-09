@@ -97,14 +97,14 @@ namespace casadi {
   void Assertion::generate(CodeGenerator& g, const std::string& mem,
                            const std::vector<int>& arg, const std::vector<int>& res) const {
     // Generate assertion
-    g << "  if (" << g.workel(arg[1]) << "!=1.) {\n"
+    g << "if (" << g.workel(arg[1]) << "!=1.) {\n"
       << "    /* " << fail_message_ << " */\n"
       << "    return 1;\n"
       << "  }\n";
 
     // Copy if not inplace
     if (arg[0]!=res[0]) {
-      g << "  " << g.copy(g.work(arg[0], nnz()), nnz(), g.work(res[0], nnz())) << '\n';
+      g << g.copy(g.work(arg[0], nnz()), nnz(), g.work(res[0], nnz())) << '\n';
     }
   }
 

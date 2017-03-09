@@ -744,7 +744,7 @@ namespace casadi {
            const std::vector<int>& arg, const std::vector<int>& res) const {
     // Copy first argument if not inplace
     if (arg[0]!=res[0]) {
-      g << "  " << g.copy(g.work(arg[0], this->dep(0).nnz()), this->nnz(),
+      g << g.copy(g.work(arg[0], this->dep(0).nnz()), this->nnz(),
                           g.work(res[0], this->nnz())) << '\n';
     }
 
@@ -752,7 +752,7 @@ namespace casadi {
     int ind = g.getConstant(this->nz_, true);
 
     // Perform the operation inplace
-    g << "  for (cii=s" << ind << ", rr=" << g.work(res[0], this->nnz()) << ", "
+    g << "for (cii=s" << ind << ", rr=" << g.work(res[0], this->nnz()) << ", "
       << "ss=" << g.work(arg[1], this->dep(1).nnz()) << "; cii!=s" << ind
       << "+" << this->nz_.size() << "; ++cii, ++ss)"
       << " if (*cii>=0) rr[*cii] " << (Add?"+=":"=") << " *ss;\n";
@@ -764,12 +764,12 @@ namespace casadi {
            const std::vector<int>& arg, const std::vector<int>& res) const {
     // Copy first argument if not inplace
     if (arg[0]!=res[0]) {
-      g << "  " << g.copy(g.work(arg[0], this->dep(0).nnz()), this->nnz(),
+      g << g.copy(g.work(arg[0], this->dep(0).nnz()), this->nnz(),
                           g.work(res[0], this->nnz())) << '\n';
     }
 
     // Perform the operation inplace
-    g << "  for (rr=" << g.work(res[0], this->nnz()) << "+" << s_.start << ", ss="
+    g << "for (rr=" << g.work(res[0], this->nnz()) << "+" << s_.start << ", ss="
       << g.work(arg[1], this->dep(1).nnz()) << "; rr!="
       << g.work(res[0], this->nnz()) << "+" << s_.stop
       << "; rr+=" << s_.step << ")"
@@ -782,12 +782,12 @@ namespace casadi {
            const std::vector<int>& arg, const std::vector<int>& res) const {
     // Copy first argument if not inplace
     if (arg[0]!=res[0]) {
-      g << "  " << g.copy(g.work(arg[0], this->dep(0).nnz()), this->nnz(),
+      g << g.copy(g.work(arg[0], this->dep(0).nnz()), this->nnz(),
                           g.work(res[0], this->nnz())) << '\n';
     }
 
     // Perform the operation inplace
-    g << "  for (rr=" << g.work(res[0], this->nnz()) << "+" << outer_.start
+    g << "for (rr=" << g.work(res[0], this->nnz()) << "+" << outer_.start
       << ", ss=" << g.work(arg[1], this->dep(1).nnz()) << "; rr!="
       << g.work(res[0], this->nnz()) << "+" << outer_.stop
       << "; rr+=" << outer_.step << ")"

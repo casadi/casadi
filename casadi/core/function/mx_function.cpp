@@ -1067,12 +1067,12 @@ namespace casadi {
 
   void MXFunction::generateBody(CodeGenerator& g) const {
     // Temporary variables and vectors
-    g << "  int i, j, k, *ii, *jj, *kk;\n"
-      << "  const int *cii;\n"
-      << "  real_t r, s, t, *rr, *ss, *tt;\n"
-      << "  const real_t *cr, *cs, *ct;\n"
-      << "  const real_t** arg1=arg+" << n_in() << ";\n"
-      << "  real_t** res1=res+" << n_out() << ";\n";
+    g << "int i, j, k, *ii, *jj, *kk;\n"
+      << "const int *cii;\n"
+      << "real_t r, s, t, *rr, *ss, *tt;\n"
+      << "const real_t *cr, *cs, *ct;\n"
+      << "const real_t** arg1=arg+" << n_in() << ";\n"
+      << "real_t** res1=res+" << n_out() << ";\n";
 
     // Declare scalar work vector elements as local variables
     bool first = true;
@@ -1080,7 +1080,7 @@ namespace casadi {
       int n=workloc_[i+1]-workloc_[i];
       if (n==0) continue;
       if (first) {
-        g << "  real_t ";
+        g << "real_t ";
         first = false;
       } else {
         g << ", ";
@@ -1113,15 +1113,15 @@ namespace casadi {
         if (n!=0) {
           int oind = e.res.front();
           if (g.verbose) {
-            g << "  /* #" << k++ << ": Output " << oind
+            g << "/* #" << k++ << ": Output " << oind
               << " (" << oscheme_.at(oind) << ") */\n";
           }
           string r = "res[" + g.to_string(oind) + "]";
           int i = e.arg.front();
           if (n==1) {
-            g << "  if (" << r << ") *" << r << " = " << g.workel(i) << ";\n";
+            g << "if (" << r << ") *" << r << " = " << g.workel(i) << ";\n";
           } else {
-            g << "  " << g.copy(g.work(i, n), n, r) << "\n";
+            g << g.copy(g.work(i, n), n, r) << "\n";
           }
         }
       } else if (e.op==OP_INPUT) {
@@ -1131,24 +1131,24 @@ namespace casadi {
           std::string arg = "arg[" + to_string(iind) + "]";
           int i = e.res.front();
           if (g.verbose) {
-            g << "  /* #" << k++ << ": Input " << iind
+            g << "/* #" << k++ << ": Input " << iind
               << " (" << ischeme_.at(iind) << ")"
               << ", part " << ip << " (" << e.data.name() << ") */\n";
           }
           if (n==1) {
-            g << "  " << g.workel(i) << " = " << arg << " ? "
+            g << g.workel(i) << " = " << arg << " ? "
               << arg << "[" << ic << "] : 0;\n";
           } else if (ic==0) {
-            g << "  " << g.copy(arg, n, g.work(i, n)) << "\n";
+            g << g.copy(arg, n, g.work(i, n)) << "\n";
           } else {
-            g << "  " << g.copy(arg + " ? " + arg + "+" + to_string(ic) + " : 0",
+            g << g.copy(arg + " ? " + arg + "+" + to_string(ic) + " : 0",
                                 n, g.work(i, n)) << "\n";
           }
         }
       } else {
         // Generate comment
         if (g.verbose) {
-          g << "  /* #" << k++ << ": " << print(e) << " */\n";
+          g << "/* #" << k++ << ": " << print(e) << " */\n";
         }
 
         // Get the names of the operation arguments

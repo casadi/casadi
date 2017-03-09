@@ -94,7 +94,7 @@ namespace casadi {
   void HorzRepmat::generate(CodeGenerator& g, const std::string& mem,
                             const std::vector<int>& arg, const std::vector<int>& res) const {
     int nnz = dep(0).nnz();
-    g << "  for (i=0;i<" << n_ << ";++i) {\n"
+    g << "for (i=0;i<" << n_ << ";++i) {\n"
       << "    " << g.copy(g.work(arg[0], dep(0).nnz()), nnz,
                           g.work(res[0], sparsity().nnz()) + "+ i*" + g.to_string(nnz)) << "\n"
       << "  }\n";
@@ -171,7 +171,7 @@ namespace casadi {
   void HorzRepsum::generate(CodeGenerator& g, const std::string& mem,
                             const std::vector<int>& arg, const std::vector<int>& res) const {
     int nnz = sparsity().nnz();
-    g << "  " << g.fill(g.work(res[0], nnz), nnz, "0") << "\n"
+    g << g.fill(g.work(res[0], nnz), nnz, "0") << "\n"
       << "  for (i=0;i<" << n_ << ";++i) {\n"
       << "    for (j=0;j<" << nnz << ";++j) {\n"
       << "      " << g.work(res[0], nnz)<< "[j] += "

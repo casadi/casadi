@@ -191,9 +191,6 @@ namespace casadi {
 
     // Run the algorithm
     for (auto&& a : algorithm_) {
-      // Indent
-      g << "  ";
-
       if (a.op==OP_OUTPUT) {
         g << "if (res[" << a.i0 << "]!=0) "
           << "res["<< a.i0 << "][" << a.i2 << "]=" << "a" << a.i1;

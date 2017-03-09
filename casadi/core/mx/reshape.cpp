@@ -93,7 +93,7 @@ namespace casadi {
   void Reshape::generate(CodeGenerator& g, const std::string& mem,
                          const std::vector<int>& arg, const std::vector<int>& res) const {
     if (arg[0]==res[0]) return;
-    g << "  " << g.copy(g.work(arg[0], nnz()), nnz(), g.work(res[0], nnz())) << "\n";
+    g << g.copy(g.work(arg[0], nnz()), nnz(), g.work(res[0], nnz())) << "\n";
   }
 
   MX Reshape::getReshape(const Sparsity& sp) const {

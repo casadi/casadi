@@ -157,32 +157,32 @@ namespace casadi {
 
       // Collect input arguments
       for (int i=0; i<arg.size(); ++i) {
-        g << "  w[" << i << "]=" << g.workel(arg[i]) << ";\n";
+        g << "w[" << i << "]=" << g.workel(arg[i]) << ";\n";
       }
 
       // Call function
-      g << "  " << g(fcn_, "w", "w+"+g.to_string(arg.size())) << ";\n";
+      g << g(fcn_, "w", "w+"+g.to_string(arg.size())) << ";\n";
 
       // Collect output arguments
       for (int i=0; i<res.size(); ++i) {
         if (res[i]>=0) {
-          g << "  " << g.workel(res[i]) << "=w[" << (arg.size()+i) << "];\n";
+          g << g.workel(res[i]) << "=w[" << (arg.size()+i) << "];\n";
         }
       }
     } else {
 
       // Collect input arguments
       for (int i=0; i<arg.size(); ++i) {
-        g << "  arg1[" << i << "]=" << g.work(arg[i], fcn_.nnz_in(i)) << ";\n";
+        g << "arg1[" << i << "]=" << g.work(arg[i], fcn_.nnz_in(i)) << ";\n";
       }
 
       // Collect output arguments
       for (int i=0; i<res.size(); ++i) {
-        g << "  res1[" << i << "]=" << g.work(res[i], fcn_.nnz_out(i)) << ";\n";
+        g << "res1[" << i << "]=" << g.work(res[i], fcn_.nnz_out(i)) << ";\n";
       }
 
       // Call function
-      g << "  if (" << g(fcn_, "arg1", "res1", "iw", "w") << ") return 1;\n";
+      g << "if (" << g(fcn_, "arg1", "res1", "iw", "w") << ") return 1;\n";
     }
   }
 
@@ -190,7 +190,7 @@ namespace casadi {
     if (has_refcount()) {
       auto i = added.insert(fcn_.get());
       if (i.second) { // prevent duplicate calls
-        g << "  " << fcn_->codegen_name(g) << "_incref();\n";
+        g << fcn_->codegen_name(g) << "_incref();\n";
       }
     }
   }
@@ -199,7 +199,7 @@ namespace casadi {
     if (has_refcount()) {
       auto i = added.insert(fcn_.get());
       if (i.second) { // prevent duplicate calls
-        g << "  " << fcn_->codegen_name(g) << "_decref();\n";
+        g << fcn_->codegen_name(g) << "_decref();\n";
       }
     }
   }

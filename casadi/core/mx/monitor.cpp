@@ -105,7 +105,7 @@ namespace casadi {
   void Monitor::generate(CodeGenerator& g, const std::string& mem,
                          const std::vector<int>& arg, const std::vector<int>& res) const {
     // Print comment
-    g << "  " << g.printf(comment_ + "\\n[") << "\n"
+    g << g.printf(comment_ + "\\n[") << "\n"
       << "  for (i=0, rr=" << g.work(arg[0], dep(0).nnz())
       << "; i!=" << nnz() << "; ++i) {\n"
       << "    if (i!=0) " << g.printf(", ") << "\n"
@@ -116,9 +116,9 @@ namespace casadi {
     // Copy if not inplace
     if (arg[0]!=res[0]) {
       if (nnz()==1) {
-        g << "  " << g.workel(res[0]) << " = " << g.workel(arg[0]) << ";\n";
+        g << g.workel(res[0]) << " = " << g.workel(arg[0]) << ";\n";
       } else {
-        g << "  " << g.copy(g.work(arg[0], nnz()), nnz(), g.work(res[0], nnz())) << "\n";
+        g << g.copy(g.work(arg[0], nnz()), nnz(), g.work(res[0], nnz())) << "\n";
       }
     }
   }

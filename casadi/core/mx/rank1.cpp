@@ -129,11 +129,11 @@ namespace casadi {
                        const std::vector<int>& arg, const std::vector<int>& res) const {
     // Copy first argument if not inplace
     if (arg[0]!=res[0]) {
-      g << "  " << g.copy(g.work(arg[0], nnz()), nnz(), g.work(res[0], nnz())) << "\n";
+      g << g.copy(g.work(arg[0], nnz()), nnz(), g.work(res[0], nnz())) << "\n";
     }
 
     // Perform operation inplace
-    g << "  " << g.rank1(g.work(arg[0], dep(0).nnz()), sparsity(), g.workel(arg[1]),
+    g << g.rank1(g.work(arg[0], dep(0).nnz()), sparsity(), g.workel(arg[1]),
                          g.work(arg[2], dep(2).nnz()), g.work(arg[3], dep(3).nnz())) << "\n";
   }
 

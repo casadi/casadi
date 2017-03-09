@@ -99,7 +99,7 @@ namespace casadi {
       int nz = nz_last-nz_first;
       if (res[i]>=0 && nz>0) { // if anything to assign
         if (nz==1) { // assign scalar
-          g << "  " << g.workel(res[i]) << " = ";
+          g << g.workel(res[i]) << " = ";
           if (dep(0).nnz()==1) {
             // rhs is also scalar
             casadi_assert(nz_first==0);
@@ -112,7 +112,7 @@ namespace casadi {
           // assign vector
           std::string r = g.work(arg[0], dep(0).nnz());
           if (nz_first!=0) r = r + "+" + g.to_string(nz_first);
-          g << "  " << g.copy(r, nz, g.work(res[i], nnz(i))) << "\n";
+          g << g.copy(r, nz, g.work(res[i], nnz(i))) << "\n";
         }
       }
     }

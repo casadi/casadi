@@ -366,26 +366,26 @@ namespace casadi {
     int n_in=this->n_in()-1, n_out=this->n_out();
 
     // Local variables
-    g << "  int i;\n"
-      << "  real_t* t;\n";
+    g << "int i;\n"
+      << "real_t* t;\n";
 
     // Project arguments with different sparsity
     if (project_in_) {
       // Project one or more argument
-      g << "  const real_t** arg1 = arg + " << (1 + n_in) << ";\n"
-        << "  for(i=0; i<" << n_in << "; ++i) arg1[i]=arg[i];\n";
+      g << "const real_t** arg1 = arg + " << (1 + n_in) << ";\n"
+        << "for(i=0; i<" << n_in << "; ++i) arg1[i]=arg[i];\n";
     }
 
     // Temporary memory for results with different sparsity
     if (project_out_) {
       // Project one or more results
-      g << "  real_t** res1 = res + " << n_out << ";\n"
-        << "  for (i=0; i<" << n_out << "; ++i) res1[i]=res[i];\n";
+      g << "real_t** res1 = res + " << n_out << ";\n"
+        << "for (i=0; i<" << n_out << "; ++i) res1[i]=res[i];\n";
     }
 
     // Codegen condition
     bool if_else = f_.size()==1;
-    g << "  " << (if_else ? "if" : "switch")  << " (arg[0] ? to_int(*arg[0]) : 0) {\n";
+    g << (if_else ? "if" : "switch")  << " (arg[0] ? to_int(*arg[0]) : 0) {\n";
 
     // Loop over cases/functions
     for (int k=0; k<=f_.size(); ++k) {
@@ -396,19 +396,20 @@ namespace casadi {
       if (!if_else) {
         // Codegen cases
         if (k1<f_.size()) {
-          g << "  case " << k1 << ":\n";
+          g << "case " << k1 << ":\n";
         } else {
-          g << "  default:\n";
+          g << "default:\n";
         }
       } else if (k1==0) {
         // Else
-        g << "  } else {\n";
+        g << "} else {\n";
       }
+      g.increase_indent();
 
       // Get the function:
       const Function& fk = k1<f_.size() ? f_[k1] : f_def_;
       if (fk.is_null()) {
-        g << "    return 1;\n";
+        g << "return 1;\n";
       } else if (g.simplifiedCall(fk)) {
         casadi_error("Not implemented.");
       } else {
@@ -418,9 +419,9 @@ namespace casadi {
           const Sparsity& sp = sparsity_in(i+1);
           if (f_sp!=sp) {
             if (f_sp.nnz()==0) {
-              g << "    arg1[" << i << "]=0;\n";
+              g << "arg1[" << i << "]=0;\n";
             } else {
-              g << "    arg1[" << i << "]=t=w, w+=" << f_sp.nnz() << ", "
+              g << "arg1[" << i << "]=t=w, w+=" << f_sp.nnz() << ", "
                 << g.project("arg1[" + to_string(i) + "]", sp,
                                             "t", f_sp, "w") << "\n";
             }
@@ -433,35 +434,36 @@ namespace casadi {
           const Sparsity& sp = sparsity_out(i);
           if (f_sp!=sp) {
             if (f_sp.nnz()==0) {
-              g << "    res1[" << i << "]=0;\n";
+              g << "res1[" << i << "]=0;\n";
             } else {
-              g << "    res1[" << i << "]=w, w+=" << f_sp.nnz() << ";\n";
+              g << "res1[" << i << "]=w, w+=" << f_sp.nnz() << ";\n";
             }
           }
         }
 
         // Function call
-        g << "    if (" << g(fk, project_in_ ? "arg1" : "arg+1",
-                             project_out_ ? "res1" : "res",
-                             "iw", "w") << ") return 1;\n";
+        g << "if (" << g(fk, project_in_ ? "arg1" : "arg+1",
+                         project_out_ ? "res1" : "res",
+                         "iw", "w") << ") return 1;\n";
 
         // Project results with different sparsity
         for (int i=0; i<n_out; ++i) {
           const Sparsity& f_sp = fk.sparsity_out(i);
           const Sparsity& sp = sparsity_out(i);
           if (f_sp!=sp) {
-            g << "    " << g.project("res1[" + to_string(i) + "]", f_sp,
-                                     "res[" + to_string(i) + "]", sp, "w") << "\n";
+            g << g.project("res1[" + to_string(i) + "]", f_sp,
+                           "res[" + to_string(i) + "]", sp, "w") << "\n";
           }
         }
 
         // Break (if switch)
-        if (!if_else) g << "    break;\n";
+        if (!if_else) g << "break;\n";
+        g.decrease_indent();
       }
     }
 
     // End switch/else
-    g << "  }\n";
+    g << "}\n";
   }
 
 } // namespace casadi
