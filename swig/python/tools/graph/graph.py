@@ -571,7 +571,10 @@ class SXNonLeafArtist(DotArtist):
     if not(k.is_commutative()):
       # Non-commutative operators are represented by 'record' shapes.
       # The dependencies have different 'ports' where arrows should arrive.
-      s = print_operator(self.s,["| <f0> | ", " | <f1> |"])
+      if len(dep)==2:
+        s = print_operator(self.s,["| <f0> | ", " | <f1> |"])
+      else:
+        s = print_operator(self.s,["| <f0> | "])
       if s.startswith("(|") and s.endswith("|)"):
         s=s[2:-2]
       
