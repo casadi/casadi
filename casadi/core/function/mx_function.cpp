@@ -1070,7 +1070,6 @@ namespace casadi {
     g << "int i, j, k, *ii, *jj, *kk;\n"
       << "const int *cii;\n"
       << "real_t r, s, t, *rr, *ss, *tt;\n"
-      << "const real_t *cr, *cs, *ct;\n"
       << "const real_t** arg1=arg+" << n_in() << ";\n"
       << "real_t** res1=res+" << n_out() << ";\n";
 

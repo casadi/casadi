@@ -190,6 +190,7 @@ namespace casadi {
 
   void DenseTranspose::generate(CodeGenerator& g, const std::string& mem,
                                 const std::vector<int>& arg, const std::vector<int>& res) const {
+    g.local("cs", "const real_t", "*");
     g << "for (i=0, rr=" << g.work(res[0], nnz()) << ", "
       << "cs=" << g.work(arg[0], nnz()) << "; i<" << dep().size2() << "; ++i) "
       << "for (j=0; j<" << dep().size1() << "; ++j) "
