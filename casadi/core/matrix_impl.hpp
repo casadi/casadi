@@ -837,7 +837,7 @@ namespace casadi {
         *this = Matrix<Scalar>(sp, densify(d).nonzeros(), false);
       }
     } else {
-      casadi_error("Matrix(Sparsisty, Matrix): Only allowed for scalars and vectors");
+      casadi_error("Matrix(Sparsity, Matrix): Only allowed for scalars and vectors");
     }
   }
 
