@@ -27,6 +27,7 @@
 #include "function/sx_function.hpp"
 #include "sx/sx_node.hpp"
 #include "function/linsol.hpp"
+#include "function/expm.hpp"
 
 using namespace std;
 
@@ -62,6 +63,19 @@ namespace casadi {
     } else {
       return solve(mtimes(A, A.T()), A, lsolver, dict).T();
     }
+  }
+
+  template<>
+  Matrix<double> Matrix<double>::
+  expm_const(const Matrix<double>& A, const Matrix<double>& t) {
+    return expm(A*t);
+  }
+
+  template<>
+  Matrix<double> Matrix<double>::
+  expm(const Matrix<double>& A) {
+    Function ret = expmsol("mysolver", "slicot", A.sparsity());
+    return ret(std::vector<DM>{A, 1})[0];
   }
 
   template<>

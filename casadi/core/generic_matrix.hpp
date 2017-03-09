@@ -502,6 +502,14 @@ namespace casadi {
       return MatType::pinv(A, lsolver, dict);
     }
 
+    friend inline MatType expm_const(const MatType& A, const MatType& t) {
+      return MatType::expm_const(A, t);
+    }
+
+    friend inline MatType expm(const MatType& A) {
+      return MatType::expm(A);
+    }
+
     ///@{
     /** \brief Calculate Jacobian
     */

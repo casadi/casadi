@@ -23,25 +23,56 @@
  */
 
 
-#ifndef CASADI_SLICOT_LAYER_HPP
-#define CASADI_SLICOT_LAYER_HPP
+#ifndef CASADI_EXPM_HPP
+#define CASADI_EXPM_HPP
+
+#include "function.hpp"
 
 namespace casadi {
-  int slicot_mb03vd(int n, int p, int ilo, int ihi, double * a, int lda1, int lda2, double * tau,
-                     int ldtau, double * dwork=0);
 
-  int slicot_mb03vy(int n, int p, int ilo, int ihi, double * a, int lda1, int lda2,
-                     const double * tau, int ldtau, double * dwork=0, int ldwork=0);
+  /** \defgroup main_expm
 
-  int slicot_mb03wd(char job, char compz, int n, int p, int ilo, int ihi, int iloz, int ihiz,
-                     double *h, int ldh1, int ldh2, double* z, int ldz1, int ldz2, double* wr,
-                     double *wi, double * dwork=0, int ldwork=0);
+      Performs a matrix exponentiation
+      expm(A)
 
-  int slicot_mb05nd(int n, double delta, const double* a, int lda,
-                     double* ex, int ldex, double * exint, int ldexin,
-                     double tol, int* iwork, double * dwork, int ldwork);
 
+      \generalsection{Expm}
+      \pluginssection{Expm}
+
+      \author Joris Gillis
+      \date 2017
+  */
+
+  /** \defgroup expm
+  * @copydoc main_expm
+  *  @{
+  */
+
+  /** \if EXPANDED
+  * @copydoc main_expm
+  * \endif
+  */
+  ///@{
+  CASADI_EXPORT Function expmsol(const std::string& name, const std::string& solver,
+                           const Sparsity& A, const Dict& opts=Dict());
+  ///@}
+
+  /** \brief Get the number of expm solver inputs */
+  CASADI_EXPORT int expm_n_in();
+
+  /** \brief Get the number of expm solver outputs */
+  CASADI_EXPORT int expm_n_out();
+
+  /// Check if a particular plugin is available
+  CASADI_EXPORT bool has_expm(const std::string& name);
+
+  /// Explicitly load a plugin dynamically
+  CASADI_EXPORT void load_expm(const std::string& name);
+
+  /// Get the documentation string for a plugin
+  CASADI_EXPORT std::string doc_expm(const std::string& name);
+
+  /** @} */
 } // namespace casadi
 
-/// \endcond
-#endif // CASADI_SLICOT_LAYER_HPP
+#endif // CASADI_EXPM_HPP

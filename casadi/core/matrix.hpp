@@ -293,6 +293,8 @@ namespace casadi {
     static Matrix<Scalar> pinv(const Matrix<Scalar> &x);
     static Matrix<Scalar> pinv(const Matrix<Scalar> &A,
                                  const std::string& lsolver, const Dict& opts);
+    static Matrix<Scalar> expm_const(const Matrix<Scalar> &A, const Matrix<Scalar> &t);
+    static Matrix<Scalar> expm(const Matrix<Scalar> &A);
     static Matrix<Scalar> solve(const Matrix<Scalar> &A, const Matrix<Scalar>& b);
     static Matrix<Scalar> solve(const Matrix<Scalar> &A, const Matrix<Scalar>& b,
                                   const std::string& lsolver, const Dict& opts);

@@ -101,6 +101,7 @@ set(CASADI_SRCS
   function/conic.hpp               function/conic_impl.hpp         function/conic.cpp
   function/dple.hpp                function/dple_impl.hpp          function/dple.cpp
   function/interpolant.hpp         function/interpolant_impl.hpp   function/interpolant.cpp
+  function/expm.hpp                function/expm_impl.hpp          function/expm.cpp
   function/code_generator.hpp      function/code_generator.cpp
   function/switch.hpp              function/switch.cpp
   function/map.hpp                 function/map.cpp

@@ -1346,6 +1346,61 @@ class Functiontests(casadiTestCase):
       self.assertTrue("nlp_g" in out[1])
       with self.assertRaises(Exception):
         solver = nlpsol("solver","ipopt",nlp,{"specific_options":{ "nlp_foo" : 3}})
+        
+  @memory_heavy()
+  def test_expm(self):
+      eps = 1e-6
+      t = MX.sym('t')
+      tnum = 0.2
+
+      n = 4
+
+      np.random.seed(0)
+      Anum = np.random.random((n,n))
+      Bnum = np.random.random((n,2))
+      Bb = np.random.random((n,2))
+
+      dA = np.random.random((n,n))
+      Yb = np.random.random((n,2))
+      
+      def expm(A):
+
+        n = A.shape[0]
+        x = MX.sym('x',n)
+        As = MX.sym('A',n,n)
+
+        dae = {'x':x,'p':vec(As),'ode':mtimes(As,x)}
+        intg = integrator('intg','cvodes',dae,{'reltol':1e-14,'abstol':1e-14})
+
+        Intg = intg.map('identity','serial',n,[1],[])
+
+        out = Intg(x0=DM.eye(n),p=vec(As))
+        expmF = Function('expm',[As],[out["xf"]])
+        return expmF(A)
+      
+      A = MX.sym("A",n,n)
+      t = MX.sym("t")
+      fr = Function('fr',[A,t],[expm(A*t)])
+      f = Function('f',[A,t],[casadi.expm(A*t)])
+      
+      self.checkfunction(fr,f,inputs=[Anum, 1.1],digits=8)
+      
+      fr = Function('fr',[t],[expm(Anum*t)])
+      f = Function('f',[t],[casadi.expm_const(Anum,t)])
+      
+      self.checkfunction(fr,f,inputs=[1.1],digits=8)
+      
+      JA = jacobian(casadi.expm(A*t),A)
+      Jt = jacobian(casadi.expm(A*t),t)
+      
+      self.assertTrue(JA.nnz()==n**4)
+      self.assertTrue(Jt.nnz()==n**2)
+            
+      JA = jacobian(casadi.expm_const(A,t),A)
+      Jt = jacobian(casadi.expm_const(A,t),t)
+      
+      self.assertTrue(JA.nnz()==0)
+      self.assertTrue(Jt.nnz()==n**2)
 
   def test_conditional(self):
 
@@ -1370,6 +1425,7 @@ class Functiontests(casadiTestCase):
     for i in range(-1,3):
       self.checkfunction(F,Fsx,inputs = [i,A,B])
       self.check_codegen(F,inputs=[i,A,B])
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -2021,6 +2021,20 @@ namespace casadi {
   }
 
   template<typename Scalar>
+  Matrix<Scalar> Matrix<Scalar>::
+  expm_const(const Matrix<Scalar>& A, const Matrix<Scalar>& t) {
+    casadi_error("'solve' not defined for " + type_name());
+    return Matrix<Scalar>();
+  }
+
+  template<typename Scalar>
+  Matrix<Scalar> Matrix<Scalar>::
+  expm(const Matrix<Scalar>& A) {
+    casadi_error("'solve' not defined for " + type_name());
+    return Matrix<Scalar>();
+  }
+
+  template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::kron(const Matrix<Scalar>& a, const Matrix<Scalar>& b) {
     const Sparsity &a_sp = a.sparsity();
     Matrix<Scalar> filler = Matrix<Scalar>(b.size());
@@ -2479,6 +2493,14 @@ namespace casadi {
   template<>
   CASADI_EXPORT Matrix<double> Matrix<double>::
   pinv(const Matrix<double>& A, const std::string& lsolver, const Dict& dict);
+
+  template<>
+  CASADI_EXPORT Matrix<double> Matrix<double>::
+  expm_const(const Matrix<double>& A, const Matrix<double>& t);
+
+  template<>
+  CASADI_EXPORT Matrix<double> Matrix<double>::
+  expm(const Matrix<double>& A);
 
   template<>
   CASADI_EXPORT bool Matrix<SXElem>::__nonzero__() const;

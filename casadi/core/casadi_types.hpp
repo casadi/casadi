@@ -421,6 +421,23 @@ namespace casadi {
     DPLE_NUM_OUT
   };
 
+  /// Input arguments of a \e c2d solver [c2dIn]
+  enum C2dInput {
+    ///
+    C2D_T,
+    C2D_NUM_IN
+  };
+
+  /// Output arguments of a \e c2d solver [c2dOut]
+  enum C2dOutput {
+    ///
+    C2D_A,
+    ///
+    C2D_B,
+    /// Number of arguments.
+    C2D_NUM_OUT
+  };
+
 #endif // SWIG
 
 } // namespace casadi

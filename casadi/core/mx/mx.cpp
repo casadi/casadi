@@ -32,6 +32,7 @@
 #include "../calculus.hpp"
 #include "../function/mx_function.hpp"
 #include "../function/linsol.hpp"
+#include "../function/expm.hpp"
 
 using namespace std;
 namespace casadi {
@@ -1693,6 +1694,18 @@ namespace casadi {
     } else {
       return solve(mtimes(A, A.T()), A, lsolver, dict).T();
     }
+  }
+
+  MX MX::expm_const(const MX& A, const MX& t) {
+    Dict opts;
+    opts["const_A"] = true;
+    Function ret = expmsol("mysolver", "slicot", A.sparsity(), opts);
+    return ret(std::vector<MX>{A, t})[0];
+  }
+
+  MX MX::expm(const MX& A) {
+    Function ret = expmsol("mysolver", "slicot", A.sparsity());
+    return ret(std::vector<MX>{A, 1})[0];
   }
 
   MX MX::nullspace(const MX& A) {

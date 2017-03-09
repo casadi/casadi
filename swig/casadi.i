@@ -3040,6 +3040,14 @@ DECL M casadi_pinv(const M& A, const std::string& lsolver,
   return pinv(A, lsolver, opts);
 }
 
+DECL M casadi_expm_const(const M& A, const M& t) {
+  return expm_const(A, t);
+}
+
+DECL M casadi_expm(const M& A) {
+  return expm(A);
+}
+
 DECL M casadi_jacobian(const M &ex, const M &arg) {
   return jacobian(ex, arg);
 }
@@ -3824,6 +3832,7 @@ namespace casadi{
 %include <casadi/core/function/rootfinder.hpp>
 %include <casadi/core/function/linsol.hpp>
 %include <casadi/core/function/dple.hpp>
+%include <casadi/core/function/expm.hpp>
 %include <casadi/core/function/interpolant.hpp>
 
 %feature("copyctor", "0") casadi::CodeGenerator;
