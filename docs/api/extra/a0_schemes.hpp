@@ -129,6 +129,12 @@
 <tr><td>DPLE_V</td><td>v</td><td>V matrices (horzcat when const_dim, diagcat otherwise) [v].</td></tr>
 </table>
 */
+/** \defgroup scheme_C2dOutput
+<a name='schemes'></a><table>
+<caption>Output scheme: casadi::C2dOutput  (C2D_NUM_OUT = 2)</caption>
+<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
+</table>
+*/
 /** \defgroup scheme_NLPInput
 <a name='schemes'></a><table>
 <caption>Input scheme: casadi::NLPInput  (NL_NUM_IN = 2)</caption>
@@ -153,6 +159,12 @@
 <tr><td>JACG_JAC</td><td>jac</td><td>Jacobian of the constraints.</td></tr>
 <tr><td>JACG_F</td><td>f</td><td>Objective function.</td></tr>
 <tr><td>JACG_G</td><td>g</td><td>Constraint function.</td></tr>
+</table>
+*/
+/** \defgroup scheme_C2dInput
+<a name='schemes'></a><table>
+<caption>Input scheme: casadi::C2dInput  (C2D_NUM_IN = 1)</caption>
+<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
 </table>
 */
 /** \defgroup scheme_ConicInput

@@ -2456,6 +2456,9 @@ Add an ordinary differential equation.
 // File: classcasadi_1_1Dple.xml
 
 
+// File: classcasadi_1_1Expm.xml
+
+
 // File: classcasadi_1_1External.xml
 
 
@@ -4890,6 +4893,10 @@ Find out which variables enter with some order.
 
 ";
 
+%feature("docstring")  expm_const(const MatType &A, const MatType &t) "
+
+";
+
 %feature("docstring")  diag(const MatType &A) "
 
 Get the diagonal of a matrix or construct a diagonal When the input is
@@ -4902,6 +4909,10 @@ diagonal matrix is constructed with it.
 "
 
 Get the number of non-zeros in the lower triangular half.
+
+";
+
+%feature("docstring")  expm(const MatType &A) "
 
 ";
 
@@ -5237,6 +5248,10 @@ Interface to the JIT compiler SHELL
 +------------------------+------------------------+------------------------+
 |           Id           |          Type          |      Description       |
 +========================+========================+========================+
+| cleanup                | OT_BOOL                | Cleanup temporary      |
+|                        |                        | files when unloading.  |
+|                        |                        | Default: true          |
++------------------------+------------------------+------------------------+
 | compiler               | OT_STRING              | Compiler command       |
 +------------------------+------------------------+------------------------+
 | compiler_setup         | OT_STRING              | Compiler setup         |
@@ -6411,6 +6426,11 @@ if symbolic scalar. Wraps SXElem SXElem::dep(int ch=0) const.
 
 ";
 
+%feature("docstring")  casadi::Matrix< double >::expm(const Matrix< double >
+&A) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::GenericMatrix< Matrix< Scalar >  >::sym(const
 std::string &name, int nrow=1, int ncol=1) "
 
@@ -6613,6 +6633,11 @@ Check if the matrix is a row vector (i.e. size1()==1)
 ";
 
 %feature("docstring") casadi::Matrix::__nonzero__ "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::Matrix< double >::expm_const(const Matrix<
+double > &A, const Matrix< double > &t) "
 
 [INTERNAL] ";
 
@@ -8476,6 +8501,9 @@ Return a string with a representation (for SWIG)
 // File: classcasadi_1_1SlicotDple.xml
 
 
+// File: classcasadi_1_1SlicotExpm.xml
+
+
 // File: classcasadi_1_1Solve.xml
 
 
@@ -10099,6 +10127,12 @@ Check if for each element of v holds: lower <= v_i < upper.
 
 ";
 
+%feature("docstring")  casadi::load_expm(const std::string &name) "
+
+Explicitly load a plugin dynamically.
+
+";
+
 %feature("docstring")  casadi::casadi_rank1(real_t *A, const int *sp_A,
 real_t alpha, const real_t *x) "
 
@@ -10164,6 +10198,235 @@ strideC) "
 
 ";
 
+%feature("docstring")  casadi::expmsol(const std::string &name, const
+std::string &solver, const Sparsity &A, const Dict &opts=Dict()) "
+
+Performs a matrix exponentiation expm(A)
+
+General information
+===================
+
+
+
+>List of available options
+
++-----------------+-----------------+-----------------+-----------------+
+|       Id        |      Type       |   Description   |     Used in     |
++=================+=================+=================+=================+
+| ad_weight       | OT_DOUBLE       | Weighting       | casadi::Functio |
+|                 |                 | factor for      | nInternal       |
+|                 |                 | derivative calc |                 |
+|                 |                 | ulation.When    |                 |
+|                 |                 | there is an     |                 |
+|                 |                 | option of       |                 |
+|                 |                 | either using    |                 |
+|                 |                 | forward or      |                 |
+|                 |                 | reverse mode    |                 |
+|                 |                 | directional     |                 |
+|                 |                 | derivatives,    |                 |
+|                 |                 | the condition a |                 |
+|                 |                 | d_weight*nf<=(1 |                 |
+|                 |                 | -ad_weight)*na  |                 |
+|                 |                 | is used where   |                 |
+|                 |                 | nf and na are   |                 |
+|                 |                 | estimates of    |                 |
+|                 |                 | the number of   |                 |
+|                 |                 | forward/reverse |                 |
+|                 |                 | mode            |                 |
+|                 |                 | directional     |                 |
+|                 |                 | derivatives     |                 |
+|                 |                 | needed. By      |                 |
+|                 |                 | default,        |                 |
+|                 |                 | ad_weight is    |                 |
+|                 |                 | calculated      |                 |
+|                 |                 | automatically,  |                 |
+|                 |                 | but this can be |                 |
+|                 |                 | overridden by   |                 |
+|                 |                 | setting this    |                 |
+|                 |                 | option. In      |                 |
+|                 |                 | particular, 0   |                 |
+|                 |                 | means forcing   |                 |
+|                 |                 | forward mode    |                 |
+|                 |                 | and 1 forcing   |                 |
+|                 |                 | reverse mode.   |                 |
+|                 |                 | Leave unset for |                 |
+|                 |                 | (class          |                 |
+|                 |                 | specific)       |                 |
+|                 |                 | heuristics.     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| ad_weight_sp    | OT_DOUBLE       | Weighting       | casadi::Functio |
+|                 |                 | factor for      | nInternal       |
+|                 |                 | sparsity        |                 |
+|                 |                 | pattern         |                 |
+|                 |                 | calculation cal |                 |
+|                 |                 | culation.Overri |                 |
+|                 |                 | des default     |                 |
+|                 |                 | behavior. Set   |                 |
+|                 |                 | to 0 and 1 to   |                 |
+|                 |                 | force forward   |                 |
+|                 |                 | and reverse     |                 |
+|                 |                 | mode            |                 |
+|                 |                 | respectively.   |                 |
+|                 |                 | Cf. option      |                 |
+|                 |                 | \"ad_weight\".    |                 |
++-----------------+-----------------+-----------------+-----------------+
+| compiler        | OT_STRING       | Just-in-time    | casadi::Functio |
+|                 |                 | compiler plugin | nInternal       |
+|                 |                 | to be used.     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| const_A         | OT_BOOL         | Assume A is     | casadi::Expm    |
+|                 |                 | constant.       |                 |
+|                 |                 | Default: false. |                 |
++-----------------+-----------------+-----------------+-----------------+
+| derivative_of   | OT_FUNCTION     | The function is | casadi::Functio |
+|                 |                 | a derivative of | nInternal       |
+|                 |                 | another         |                 |
+|                 |                 | function. The   |                 |
+|                 |                 | type of         |                 |
+|                 |                 | derivative      |                 |
+|                 |                 | (directional    |                 |
+|                 |                 | derivative,     |                 |
+|                 |                 | Jacobian) is    |                 |
+|                 |                 | inferred from   |                 |
+|                 |                 | the function    |                 |
+|                 |                 | name.           |                 |
++-----------------+-----------------+-----------------+-----------------+
+| gather_stats    | OT_BOOL         | Deprecated      | casadi::Functio |
+|                 |                 | option          | nInternal       |
+|                 |                 | (ignored):      |                 |
+|                 |                 | Statistics are  |                 |
+|                 |                 | now always      |                 |
+|                 |                 | collected.      |                 |
++-----------------+-----------------+-----------------+-----------------+
+| input_scheme    | OT_STRINGVECTOR | Custom input    | casadi::Functio |
+|                 |                 | scheme          | nInternal       |
++-----------------+-----------------+-----------------+-----------------+
+| inputs_check    | OT_BOOL         | Throw           | casadi::Functio |
+|                 |                 | exceptions when | nInternal       |
+|                 |                 | the numerical   |                 |
+|                 |                 | values of the   |                 |
+|                 |                 | inputs don't    |                 |
+|                 |                 | make sense      |                 |
++-----------------+-----------------+-----------------+-----------------+
+| jac_penalty     | OT_DOUBLE       | When requested  | casadi::Functio |
+|                 |                 | for a number of | nInternal       |
+|                 |                 | forward/reverse |                 |
+|                 |                 | directions, it  |                 |
+|                 |                 | may be cheaper  |                 |
+|                 |                 | to compute      |                 |
+|                 |                 | first the full  |                 |
+|                 |                 | jacobian and    |                 |
+|                 |                 | then multiply   |                 |
+|                 |                 | with seeds,     |                 |
+|                 |                 | rather than     |                 |
+|                 |                 | obtain the      |                 |
+|                 |                 | requested       |                 |
+|                 |                 | directions in a |                 |
+|                 |                 | straightforward |                 |
+|                 |                 | manner. Casadi  |                 |
+|                 |                 | uses a          |                 |
+|                 |                 | heuristic to    |                 |
+|                 |                 | decide which is |                 |
+|                 |                 | cheaper. A high |                 |
+|                 |                 | value of        |                 |
+|                 |                 | 'jac_penalty'   |                 |
+|                 |                 | makes it less   |                 |
+|                 |                 | likely for the  |                 |
+|                 |                 | heurstic to     |                 |
+|                 |                 | chose the full  |                 |
+|                 |                 | Jacobian        |                 |
+|                 |                 | strategy. The   |                 |
+|                 |                 | special value   |                 |
+|                 |                 | -1 indicates    |                 |
+|                 |                 | never to use    |                 |
+|                 |                 | the full        |                 |
+|                 |                 | Jacobian        |                 |
+|                 |                 | strategy        |                 |
++-----------------+-----------------+-----------------+-----------------+
+| jit             | OT_BOOL         | Use just-in-    | casadi::Functio |
+|                 |                 | time compiler   | nInternal       |
+|                 |                 | to speed up the |                 |
+|                 |                 | evaluation      |                 |
++-----------------+-----------------+-----------------+-----------------+
+| jit_options     | OT_DICT         | Options to be   | casadi::Functio |
+|                 |                 | passed to the   | nInternal       |
+|                 |                 | jit compiler.   |                 |
++-----------------+-----------------+-----------------+-----------------+
+| max_num_dir     | OT_INT          | Specify the     | casadi::Functio |
+|                 |                 | maximum number  | nInternal       |
+|                 |                 | of directions   |                 |
+|                 |                 | for derivative  |                 |
+|                 |                 | functions.      |                 |
+|                 |                 | Overrules the   |                 |
+|                 |                 | builtin optimiz |                 |
+|                 |                 | ed_num_dir.     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| output_scheme   | OT_STRINGVECTOR | Custom output   | casadi::Functio |
+|                 |                 | scheme          | nInternal       |
++-----------------+-----------------+-----------------+-----------------+
+| print_time      | OT_BOOL         | print           | casadi::Functio |
+|                 |                 | information     | nInternal       |
+|                 |                 | about execution |                 |
+|                 |                 | time            |                 |
++-----------------+-----------------+-----------------+-----------------+
+| regularity_chec | OT_BOOL         | Throw           | casadi::Functio |
+| k               |                 | exceptions when | nInternal       |
+|                 |                 | NaN or Inf      |                 |
+|                 |                 | appears during  |                 |
+|                 |                 | evaluation      |                 |
++-----------------+-----------------+-----------------+-----------------+
+| user_data       | OT_VOIDPTR      | A user-defined  | casadi::Functio |
+|                 |                 | field that can  | nInternal       |
+|                 |                 | be used to      |                 |
+|                 |                 | identify the    |                 |
+|                 |                 | function or     |                 |
+|                 |                 | pass additional |                 |
+|                 |                 | information     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| verbose         | OT_BOOL         | Verbose         | casadi::Functio |
+|                 |                 | evaluation  for | nInternal       |
+|                 |                 | debugging       |                 |
++-----------------+-----------------+-----------------+-----------------+
+
+List of plugins
+===============
+
+
+
+- slicot
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+Expm.doc(\"myextraplugin\")
+
+
+
+--------------------------------------------------------------------------------
+
+slicot
+------
+
+
+
+
+
+--------------------------------------------------------------------------------
+
+
+
+Joris Gillis
+
+";
+
+%feature("docstring")  casadi::casadi_mtimes(const real_t *x, const int
+*sp_x, const real_t *y, const int *sp_y, real_t *z, const int *sp_z, real_t
+*w, int tr) "
+
+[INTERNAL]  Sparse matrix-matrix multiplication: z <- z + x*y.
+
+";
+
 %feature("docstring")  casadi::integrator_n_out() "
 
 Get the number of integrator outputs.
@@ -10222,6 +10485,12 @@ Explicitly load a plugin dynamically.
 
 ";
 
+%feature("docstring")  casadi::expm_n_out() "
+
+Get the number of expm solver outputs.
+
+";
+
 %feature("docstring")  casadi::casadi_sum_viol(int n, const real_t *x, const
 real_t *lb, const real_t *ub) "
 
@@ -10258,6 +10527,12 @@ Read matrix, matlab style.
 %feature("docstring")  casadi::casadi_interpn_grad(real_t *grad, int ndim,
 const real_t *grid, const int *offset, const real_t *values, const real_t
 *x, int *iw, real_t *w) "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::casadi_interpn_grad(real_t *grad, int ndim,
+const real_t *grid, const int *offset, const real_t *values, const real_t
+*x, const int *lookup_mode, int *iw, real_t *w) "
 
 [INTERNAL] ";
 
@@ -10762,13 +11037,6 @@ Check if the vector has negative entries.
 
 ";
 
-%feature("docstring")  casadi::casadi_project(const real_t *x, const int
-*sp_x, real_t *y, const int *sp_y, real_t *w) "
-
-[INTERNAL]  Sparse copy: y <- x, w work vector (length >= number of rows)
-
-";
-
 %feature("docstring")  casadi::check_exposed(T t) "
 
 [INTERNAL] ";
@@ -10785,17 +11053,23 @@ const int *offset, const real_t *values, const real_t *x, int *iw, real_t
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::casadi_interpn(int ndim, const real_t *grid,
+const int *offset, const real_t *values, const real_t *x, const int
+*lookup_mode, int *iw, real_t *w) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::casadi_norm_1(int n, const real_t *x) "
 
 [INTERNAL]  NORM_1: ||x||_1 -> return.
 
 ";
 
-%feature("docstring")  casadi::casadi_mtimes(const real_t *x, const int
-*sp_x, const real_t *y, const int *sp_y, real_t *z, const int *sp_z, real_t
-*w, int tr) "
+%feature("docstring")  casadi::casadi_iamax(int n, const real_t *x, int
+inc_x) "
 
-[INTERNAL]  Sparse matrix-matrix multiplication: z <- z + x*y.
+[INTERNAL]  IAMAX: index corresponding to the entry with the largest
+absolute value.
 
 ";
 
@@ -11103,6 +11377,12 @@ Construct from an index vector (requires is_slice(v) to be true)
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::expm_n_in() "
+
+Get the number of expm solver inputs.
+
+";
+
 %feature("docstring")  casadi::conic_in() "
 
 Get input scheme of QP solvers.
@@ -11112,6 +11392,12 @@ Get input scheme of QP solvers.
 %feature("docstring")  casadi::conic_in(int ind) "
 
 Get QP solver input scheme name by index.
+
+";
+
+%feature("docstring")  casadi::doc_expm(const std::string &name) "
+
+Get the documentation string for a plugin.
 
 ";
 
@@ -12178,10 +12464,22 @@ Default input for an NLP solver.
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::casadi_interpn_weights(int ndim, const real_t
+*grid, const int *offset, const real_t *x, real_t *alpha, int *index, const
+int *lookup_mode) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::casadi_norm_inf(int n, const real_t *x) "
 
 [INTERNAL]  Inf-norm of a vector * Returns the largest element in absolute
 value
+
+";
+
+%feature("docstring")  casadi::slicot_mb05nd(int n, double delta, const
+double *a, int lda, double *ex, int ldex, double *exint, int ldexin, double
+tol, int *iwork, double *dwork, int ldwork) "
 
 ";
 
@@ -12217,11 +12515,10 @@ Generate a hash value incrementally (function taken from boost)
 
 ";
 
-%feature("docstring")  casadi::casadi_iamax(int n, const real_t *x, int
-inc_x) "
+%feature("docstring")  casadi::casadi_project(const real_t *x, const int
+*sp_x, real_t *y, const int *sp_y, real_t *w) "
 
-[INTERNAL]  IAMAX: index corresponding to the entry with the largest
-absolute value.
+[INTERNAL]  Sparse copy: y <- x, w work vector (length >= number of rows)
 
 ";
 
@@ -12263,7 +12560,21 @@ linear
 
 
 
+>List of available options
 
++------------------------+------------------------+------------------------+
+|           Id           |          Type          |      Description       |
++========================+========================+========================+
+| lookup_mode            | OT_STRINGVECTOR        | Sets, for each grid    |
+|                        |                        | dimenion, the lookup   |
+|                        |                        | algorithm used to find |
+|                        |                        | the correct index.     |
+|                        |                        | 'linear' uses a for-   |
+|                        |                        | loop + break; 'exact'  |
+|                        |                        | uses floored division  |
+|                        |                        | (only for uniform      |
+|                        |                        | grids).                |
++------------------------+------------------------+------------------------+
 
 --------------------------------------------------------------------------------
 
@@ -12675,6 +12986,11 @@ ng) "
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::casadi_low(real_t x, const double *grid, int
+ng, int lookup_mode) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::load_rootfinder(const std::string &name) "
 
 Explicitly load a plugin dynamically.
@@ -12786,6 +13102,12 @@ Get output scheme name by index.
 |                        |                        | for bounds on P at the |
 |                        |                        | solution (np x 1)      |
 +------------------------+------------------------+------------------------+
+
+";
+
+%feature("docstring")  casadi::has_expm(const std::string &name) "
+
+Check if a particular plugin is available.
 
 ";
 
@@ -12926,6 +13248,11 @@ Get DPLE input scheme name by index.
 
 %feature("docstring")  casadi::dense_copy_t_stride(int n, int m, const
 double *A, double *B, int strideA, int strideB) "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::dense_mul_nn2(int n, int m, int l, const
+double *A, const double *B, double *C) "
 
 [INTERNAL] ";
 

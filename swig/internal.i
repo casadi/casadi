@@ -340,6 +340,12 @@
 %exception  casadi::Matrix< Scalar >::unary(int op, const Matrix< Scalar > &x) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Matrix< double >::expm(const Matrix< double > &A) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Matrix< double >::expm_const(const Matrix< double > &A, const Matrix< double > &t) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::Matrix< double >::pinv(const Matrix< double > &A, const std::string &lsolver, const Dict &dict) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
