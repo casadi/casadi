@@ -103,6 +103,9 @@ namespace casadi {
     /** \brief Print a string to function body  */
     CodeGenerator& operator<<(const std::string& s);
 
+    /** \brief Print without newline characters */
+    void print_formatted(const std::string& s);
+
     /** \brief Print an arbitrary type to function body */
     template<typename T>
     CodeGenerator& operator<<(T s) {
@@ -110,6 +113,12 @@ namespace casadi {
       ss << s;
       return (*this) << ss.str();
     }
+
+    /** \brief Increase indent */
+    CodeGenerator& operator++();
+
+    /** \brief Decrease indent */
+    CodeGenerator& operator--();
 
     /** \brief Print a constant in a lossless but compact manner */
     static std::string constant(double v);
@@ -292,6 +301,13 @@ namespace casadi {
     std::stringstream auxiliaries;
     std::stringstream body_;
     std::stringstream header;
+
+    // Are we at a new line?
+    bool newline_;
+
+    // Indentation
+    int indent_;
+    int current_indent_;
 
     // Names of exposed functions
     std::vector<std::string> exposed_fname;

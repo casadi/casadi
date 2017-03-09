@@ -42,6 +42,7 @@ namespace casadi {
     this->codegen_scalars = false;
     this->with_header = false;
     this->with_mem = false;
+    indent_ = 2;
 
     // Read options
     for (auto&& e : opts) {
@@ -61,10 +62,17 @@ namespace casadi {
         this->with_header = e.second;
       } else if (e.first=="with_mem") {
         this->with_mem = e.second;
+      } else if (e.first=="indent") {
+        indent_ = e.second;
+        casadi_assert(indent_>=0);
       } else {
         casadi_error("Unrecongnized option: " << e.first);
       }
     }
+
+    // Start at new line with no indentation
+    newline_ = true;
+    current_indent_ = 0;
 
     // Divide name into base and suffix (if any)
     string::size_type dotpos = name.rfind('.');
@@ -264,6 +272,9 @@ namespace casadi {
   }
 
   void CodeGenerator::dump(std::ostream& s) const {
+    // Consistency check
+    casadi_assert(current_indent_ == 0);
+
     // Prefix internal symbols to avoid symbol collisions
     s << "#ifdef CODEGEN_PREFIX" << endl
          << "  #define NAMESPACE_CONCAT(NS, ID) _NAMESPACE_CONCAT(NS, ID)" << endl
@@ -965,10 +976,50 @@ namespace casadi {
     return s.str();
   }
 
-  CodeGenerator& CodeGenerator::operator<<(const std::string& s) {
+  void CodeGenerator::print_formatted(const std::string& s) {
+    // Quick return if empty
+    if (s.empty()) return;
+
+    // If new line, add indentation
+    if (newline_) {
+      body_ << string(indent_*current_indent_, ' ');
+      newline_ = false;
+    }
+
+    // Print to body
     body_ << s;
+  }
+
+  CodeGenerator& CodeGenerator::operator<<(const string& s) {
+    // Loop over newline characters
+    size_t off=0;
+    while (true) {
+      size_t pos = s.find('\n', off);
+      if (pos==string::npos) {
+        // No more newline characters
+        print_formatted(s.substr(off));
+        break;
+      } else {
+        // Ends with newline
+        print_formatted(s.substr(off, pos-off));
+        body_ << '\n';
+        newline_ = true;
+        off = pos+1;
+      }
+    }
+
     return *this;
   }
 
+  CodeGenerator& CodeGenerator::operator++() {
+    current_indent_++;
+    return *this;
+  }
+
+  CodeGenerator& CodeGenerator::operator--() {
+    current_indent_--;
+    casadi_assert(current_indent_>=0);
+    return *this;
+  }
 
 } // namespace casadi
