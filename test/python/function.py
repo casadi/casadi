@@ -1346,9 +1346,9 @@ class Functiontests(casadiTestCase):
       self.assertTrue("nlp_g" in out[1])
       with self.assertRaises(Exception):
         solver = nlpsol("solver","ipopt",nlp,{"specific_options":{ "nlp_foo" : 3}})
-        
+   
+  @requires_expm("slicot")     
   @memory_heavy()
-  @requires_expm("slicot")
   def test_expm(self):
       eps = 1e-6
       t = MX.sym('t')
