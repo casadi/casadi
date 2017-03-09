@@ -1477,7 +1477,8 @@ namespace casadi {
     if (n==nfwd) {
       ret = get_forward(name, nfwd, i_names, o_names, opts);
     } else {
-      ret = get_forward(name, n, i_names, o_names, opts);
+      string name_n = "fwd" + to_string(n) + "_" + name_;
+      ret = get_forward(name_n, n, i_names, o_names, opts);
       std::vector<MX> args_n = ret.mx_in();
       std::vector<MX> args_nfwd = args_n;
       for (int i=0;i<n_in;++i) {
