@@ -1067,8 +1067,8 @@ namespace casadi {
 
   void MXFunction::generateBody(CodeGenerator& g) const {
     // Temporary variables and vectors
-    g << "const real_t** arg1=arg+" << n_in() << ";\n"
-      << "real_t** res1=res+" << n_out() << ";\n";
+    g.init_local("arg1", "arg+" + to_string(n_in()));
+    g.init_local("res1", "res+" + to_string(n_out()));
 
     // Declare scalar work vector elements as local variables
     bool first = true;

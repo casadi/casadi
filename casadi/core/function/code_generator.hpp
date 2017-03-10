@@ -120,6 +120,9 @@ namespace casadi {
     /** \brief Declare a local variable */
     void local(const std::string& name, const std::string& type, const std::string& ref="");
 
+    /** \brief Specify the default value for a local variable */
+    void init_local(const std::string& name, const std::string& def);
+
     /** \brief Increase indentation */
     void indent() {current_indent_++;}
 
@@ -329,6 +332,7 @@ namespace casadi {
     std::multimap<size_t, size_t> added_double_constants_;
     std::multimap<size_t, size_t> added_integer_constants_;
     std::map<std::string, std::pair<std::string, std::string> > local_variables_;
+    std::map<std::string, std::string> local_default_;
 
     // Constants
     std::vector<std::vector<double> > double_constants_;

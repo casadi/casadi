@@ -1705,19 +1705,23 @@ namespace casadi {
     g << signature(fname) << " {\n";
     g.flush(g.body);
     g.local_variables_.clear();
+    g.local_default_.clear();
 
     // Generate function body
     generateBody(g);
 
     // Collect local variables
-    std::map<string, set<string>> local_variables_by_type;
+    std::map<string, set<pair<string, string>>> local_variables_by_type;
     for (auto&& e : g.local_variables_) {
-      local_variables_by_type[e.second.first].insert(e.second.second + e.first);
+      local_variables_by_type[e.second.first].insert(make_pair(e.first, e.second.second));
     }
     for (auto&& e : local_variables_by_type) {
       g.body << "  " << e.first;
       for (auto it=e.second.begin(); it!=e.second.end(); ++it) {
-        g.body << (it==e.second.begin() ? " " : ", ") << *it;
+        g.body << (it==e.second.begin() ? " " : ", ") << it->second << it->first;
+        // Insert definition, if any
+        auto k=g.local_default_.find(it->first);
+        if (k!=g.local_default_.end()) g.body << "=" << k->second;
       }
       g.body << ";\n";
     }

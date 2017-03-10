@@ -1042,4 +1042,9 @@ namespace casadi {
     }
   }
 
+  void CodeGenerator::init_local(const string& name, const string& def) {
+    bool inserted = local_default_.insert(make_pair(name, def)).second;
+    casadi_assert_message(inserted, name + " already defined");
+  }
+
 } // namespace casadi
