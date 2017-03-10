@@ -106,6 +106,7 @@ namespace casadi {
                          const std::vector<int>& arg, const std::vector<int>& res) const {
     // Print comment
     g.local("rr", "real_t", "*");
+    g.local("i", "int");
     g << g.printf(comment_ + "\\n[") << "\n"
       << "  for (i=0, rr=" << g.work(arg[0], dep(0).nnz())
       << "; i!=" << nnz() << "; ++i) {\n"

@@ -128,6 +128,9 @@ namespace casadi {
     g.local("rr", "real_t", "*");
     g.local("ss", "real_t", "*");
     g.local("tt", "real_t", "*");
+    g.local("i", "int");
+    g.local("j", "int");
+    g.local("k", "int");
     g << "for (i=0, rr=" << g.work(res[0], nnz()) <<"; i<" << ncol_y << "; ++i)"
       << " for (j=0; j<" << nrow_x << "; ++j, ++rr)"
       << " for (k=0, ss=" << g.work(arg[1], dep(1).nnz()) << "+j, tt="

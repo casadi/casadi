@@ -107,6 +107,7 @@ namespace casadi {
       // Vector assignment
       g.local("cs", "const real_t", "*");
       g.local("rr", "real_t", "*");
+      g.local("i", "int");
       g << "for (i=0, rr=" << g.work(res[0], nnz()) << ", cs=" << g.work(arg[0], nnz())
         << "; i<" << sparsity().nnz() << "; ++i) ";
       r = "*rr++";

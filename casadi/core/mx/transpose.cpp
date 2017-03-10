@@ -192,6 +192,8 @@ namespace casadi {
                                 const std::vector<int>& arg, const std::vector<int>& res) const {
     g.local("cs", "const real_t", "*");
     g.local("rr", "real_t", "*");
+    g.local("i", "int");
+    g.local("j", "int");
     g << "for (i=0, rr=" << g.work(res[0], nnz()) << ", "
       << "cs=" << g.work(arg[0], nnz()) << "; i<" << dep().size2() << "; ++i) "
       << "for (j=0; j<" << dep().size1() << "; ++j) "

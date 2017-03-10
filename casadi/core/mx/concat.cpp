@@ -86,6 +86,7 @@ namespace casadi {
       if (nz==1) {
         g << "*rr++ = " << g.workel(arg[i]) << ";\n";
       } else if (nz!=0) {
+        g.local("i", "int");
         g.local("cs", "const real_t", "*");
         g << "for (i=0, " << "cs=" << g.work(arg[i], nz) << "; "
           << "i<" << nz << "; ++i) *rr++ = *cs++;\n";
