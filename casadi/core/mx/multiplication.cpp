@@ -125,6 +125,9 @@ namespace casadi {
     }
 
     int nrow_x = dep(1).size1(), nrow_y = dep(2).size1(), ncol_y = dep(2).size2();
+    g.local("rr", "real_t", "*");
+    g.local("ss", "real_t", "*");
+    g.local("tt", "real_t", "*");
     g << "for (i=0, rr=" << g.work(res[0], nnz()) <<"; i<" << ncol_y << "; ++i)"
       << " for (j=0; j<" << nrow_x << "; ++j, ++rr)"
       << " for (k=0, ss=" << g.work(arg[1], dep(1).nnz()) << "+j, tt="

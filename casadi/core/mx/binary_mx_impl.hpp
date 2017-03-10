@@ -128,6 +128,7 @@ namespace casadi {
     // Codegen loop, if needed
     if (nnz()>1) {
       // Iterate over result
+      g.local("rr", "real_t", "*");
       g << "for (i=0, " << "rr=" << g.work(res[0], nnz());
       r = "(*rr++)";
 

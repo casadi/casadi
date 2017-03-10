@@ -105,6 +105,7 @@ namespace casadi {
   void Monitor::generate(CodeGenerator& g, const std::string& mem,
                          const std::vector<int>& arg, const std::vector<int>& res) const {
     // Print comment
+    g.local("rr", "real_t", "*");
     g << g.printf(comment_ + "\\n[") << "\n"
       << "  for (i=0, rr=" << g.work(arg[0], dep(0).nnz())
       << "; i!=" << nnz() << "; ++i) {\n"

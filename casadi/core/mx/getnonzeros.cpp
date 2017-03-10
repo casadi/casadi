@@ -440,6 +440,8 @@ namespace casadi {
 
     // Codegen the assignments
     g.local("cii", "const int", "*");
+    g.local("rr", "real_t", "*");
+    g.local("ss", "real_t", "*");
     g << "for (cii=s" << ind << ", rr=" << g.work(res[0], nnz())
       << ", ss=" << g.work(arg[0], dep(0).nnz())
       << "; cii!=s" << ind << "+" << nz_.size()
@@ -468,6 +470,8 @@ namespace casadi {
 
   void GetNonzerosSlice::generate(CodeGenerator& g, const std::string& mem,
                                   const std::vector<int>& arg, const std::vector<int>& res) const {
+    g.local("rr", "real_t", "*");
+    g.local("ss", "real_t", "*");
     g << "for (rr=" << g.work(res[0], nnz()) << ", ss=" << g.work(arg[0], dep(0).nnz())
       << "+" << s_.start << "; ss!=" << g.work(arg[0], dep(0).nnz()) << "+" << s_.stop
       << "; ss+=" << s_.step << ") *rr++ = *ss;\n";
@@ -475,6 +479,9 @@ namespace casadi {
 
   void GetNonzerosSlice2::generate(CodeGenerator& g, const std::string& mem,
                                    const std::vector<int>& arg, const std::vector<int>& res) const {
+    g.local("rr", "real_t", "*");
+    g.local("ss", "real_t", "*");
+    g.local("tt", "real_t", "*");
     g << "for (rr=" << g.work(res[0], nnz()) << ", ss=" << g.work(arg[0], dep(0).nnz())
       << "+" << outer_.start << "; ss!=" << g.work(arg[0], dep(0).nnz()) << "+"
       << outer_.stop << "; ss+=" << outer_.step << ") "

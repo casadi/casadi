@@ -79,6 +79,7 @@ namespace casadi {
 
   void Concat::generate(CodeGenerator& g, const std::string& mem,
                         const std::vector<int>& arg, const std::vector<int>& res) const {
+    g.local("rr", "real_t", "*");
     g << "rr=" << g.work(res[0], nnz()) << ";\n";
     for (int i=0; i<arg.size(); ++i) {
       int nz = dep(i).nnz();
