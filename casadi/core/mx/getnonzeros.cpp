@@ -439,6 +439,7 @@ namespace casadi {
     int ind = g.getConstant(nz_, true);
 
     // Codegen the assignments
+    g.local("cii", "const int", "*");
     g << "for (cii=s" << ind << ", rr=" << g.work(res[0], nnz())
       << ", ss=" << g.work(arg[0], dep(0).nnz())
       << "; cii!=s" << ind << "+" << nz_.size()

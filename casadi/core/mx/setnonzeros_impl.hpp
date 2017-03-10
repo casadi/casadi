@@ -752,6 +752,7 @@ namespace casadi {
     int ind = g.getConstant(this->nz_, true);
 
     // Perform the operation inplace
+    g.local("cii", "const int", "*");
     g << "for (cii=s" << ind << ", rr=" << g.work(res[0], this->nnz()) << ", "
       << "ss=" << g.work(arg[1], this->dep(1).nnz()) << "; cii!=s" << ind
       << "+" << this->nz_.size() << "; ++cii, ++ss)"
