@@ -365,13 +365,10 @@ namespace casadi {
     // Shorthands
     int n_in=this->n_in()-1, n_out=this->n_out();
 
-    // Local variables
-    g << "int i;\n"
-      << "real_t* t;\n";
-
     // Project arguments with different sparsity
     if (project_in_) {
       // Project one or more argument
+      g.local("i", "int");
       g << "const real_t** arg1 = arg + " << (1 + n_in) << ";\n"
         << "for(i=0; i<" << n_in << "; ++i) arg1[i]=arg[i];\n";
     }
@@ -379,6 +376,7 @@ namespace casadi {
     // Temporary memory for results with different sparsity
     if (project_out_) {
       // Project one or more results
+      g.local("i", "int");
       g << "real_t** res1 = res + " << n_out << ";\n"
         << "for (i=0; i<" << n_out << "; ++i) res1[i]=res[i];\n";
     }
@@ -420,6 +418,7 @@ namespace casadi {
             if (f_sp.nnz()==0) {
               g << "arg1[" << i << "]=0;\n";
             } else {
+              g.local("t", "real_t");
               g << "arg1[" << i << "]=t=w, w+=" << f_sp.nnz() << ", "
                 << g.project("arg1[" + to_string(i) + "]", sp,
                                             "t", f_sp, "w") << "\n";
