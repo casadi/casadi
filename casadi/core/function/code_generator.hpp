@@ -120,11 +120,11 @@ namespace casadi {
     /** \brief Declare a local variable */
     void local(const std::string& name, const std::string& type, const std::string& ref="");
 
-    /** \brief Increase indent */
-    void increase_indent();
+    /** \brief Increase indentation */
+    void indent() {current_indent_++;}
 
-    /** \brief Decrease indent */
-    void decrease_indent();
+    /** \brief Decrease indentation */
+    void unindent() {current_indent_--;}
 
     /** \brief Print a constant in a lossless but compact manner */
     static std::string constant(double v);

@@ -982,12 +982,24 @@ namespace casadi {
 
     // If new line, add indentation
     if (newline_) {
-      this->buffer << string(indent_*current_indent_, ' ');
+      int shift = s.front()=='}' ? -1 : 0;
+      casadi_assert(current_indent_+shift>=0);
+      this->buffer << string(indent_*(current_indent_+shift), ' ');
       newline_ = false;
     }
 
     // Print to body
     this->buffer << s;
+
+    // Brackets change indentation for next row
+    // NOTE(@jaeandersson): Should ignore strings, comments
+    for (char c : s) {
+      if (c=='{') {
+        indent();
+      } else if (c=='}') {
+        unindent();
+      }
+    }
   }
 
   CodeGenerator& CodeGenerator::operator<<(const string& s) {
@@ -1009,15 +1021,6 @@ namespace casadi {
     }
 
     return *this;
-  }
-
-  void CodeGenerator::increase_indent() {
-    current_indent_++;
-  }
-
-  void CodeGenerator::decrease_indent() {
-    casadi_assert(current_indent_>0);
-    current_indent_--;
   }
 
   void CodeGenerator::flush(std::ostream &s) {

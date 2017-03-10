@@ -120,7 +120,6 @@ namespace casadi {
     g << "real_t** res1 = res+" << n_out << ";\n"
       << "for (i=0; i<" << n_out << "; ++i) res1[i]=res[i];\n"
       << "for (i=0; i<" << n_ << "; ++i) {\n";
-    g.increase_indent();
     // Evaluate
     g << "if (" << g(f_, "arg1", "res1", "iw", "w") << ") return 1;\n";
     // Update input buffers
@@ -131,7 +130,6 @@ namespace casadi {
     for (int j=0; j<n_out; ++j) {
       g << "if (res1[" << j << "]) res1[" << j << "]+=" << f_.nnz_out(j) << ";\n";
     }
-    g.decrease_indent();
     g << "}\n";
   }
 
@@ -293,9 +291,8 @@ namespace casadi {
       << "const double** arg1;\n"
       << "double** res1;\n"
       << "#pragma omp parallel for private(i,arg1,res1)\n"
-      << "for (i=0; i<" << n_ << "; ++i) {\n";
-    g.increase_indent();
-    g << "arg1 = arg + " << n_in << "+i*" << sz_arg << ";\n";
+      << "for (i=0; i<" << n_ << "; ++i) {\n"
+      << "arg1 = arg + " << n_in << "+i*" << sz_arg << ";\n";
     for (int j=0; j<n_in; ++j) {
       g << "arg1[" << j << "] = arg[" << j << "] ? "
         << "arg[" << j << "]+i*" << f_.nnz_in(j) << ": 0;\n";
@@ -306,9 +303,8 @@ namespace casadi {
         << "res[" << j << "]+i*" << f_.nnz_out(j) << ": 0;\n";
     }
     g << g(f_, "arg1", "res1",
-           "iw+i*" + to_string(sz_iw), "w+i*" + to_string(sz_w)) << ";\n";
-    g.decrease_indent();
-    g << "}\n";
+           "iw+i*" + to_string(sz_iw), "w+i*" + to_string(sz_w)) << ";\n"
+      << "}\n";
   }
 
   void MapOmp::init(const Dict& opts) {

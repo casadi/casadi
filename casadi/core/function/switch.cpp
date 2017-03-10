@@ -404,7 +404,6 @@ namespace casadi {
         // Else
         g << "} else {\n";
       }
-      g.increase_indent();
 
       // Get the function:
       const Function& fk = k1<f_.size() ? f_[k1] : f_def_;
@@ -458,7 +457,6 @@ namespace casadi {
 
         // Break (if switch)
         if (!if_else) g << "break;\n";
-        g.decrease_indent();
       }
     }
 

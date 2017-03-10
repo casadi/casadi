@@ -1703,7 +1703,6 @@ namespace casadi {
       g << "extern \"C\" ";
     }
     g << signature(fname) << " {\n";
-    g.increase_indent();
     g.flush(g.body);
     g.local_variables_.clear();
 
@@ -1725,7 +1724,6 @@ namespace casadi {
 
     // Finalize the function
     if (!simplifiedCall()) g << "return 0;\n";
-    g.decrease_indent();
     g << "}\n\n";
 
     // Flush to function body
@@ -1760,63 +1758,53 @@ namespace casadi {
       << " { return " << n_out << ";}\n\n";
 
     // Input names
-    g << g.declare("const char* " + fname + "_name_in(int i)") << "{\n";
-    g.increase_indent();
-    g << "switch (i) {\n";
+    g << g.declare("const char* " + fname + "_name_in(int i)") << "{\n"
+      << "switch (i) {\n";
     for (int i=0; i<n_in; ++i) {
       g << "case " << i << ": return \"" << name_in(i) << "\";\n";
     }
-    g << "default: return 0;\n}\n";
-    g.decrease_indent();
-    g << "}\n\n";
+    g << "default: return 0;\n}\n"
+      << "}\n\n";
 
     // Output names
-    g << g.declare("const char* " + fname + "_name_out(int i)") << "{\n";
-    g.increase_indent();
-    g << "switch (i) {\n";
+    g << g.declare("const char* " + fname + "_name_out(int i)") << "{\n"
+      << "switch (i) {\n";
     for (int i=0; i<n_out; ++i) {
       g << "case " << i << ": return \"" << name_out(i) << "\";\n";
     }
-    g << "default: return 0;\n}\n";
-    g.decrease_indent();
-    g << "}\n\n";
+    g << "default: return 0;\n}\n"
+      << "}\n\n";
 
     // Quick return if simplified syntax
     if (simplifiedCall()) return;
 
     // Input sparsities
-    g << g.declare("const int* " + fname + "_sparsity_in(int i)") << " {\n";
-    g.increase_indent();
-    g << "switch (i) {\n";
+    g << g.declare("const int* " + fname + "_sparsity_in(int i)") << " {\n"
+      << "switch (i) {\n";
     for (int i=0; i<n_in; ++i) {
       g << "case " << i << ": return s" << g.addSparsity(sparsity_in(i)) << ";\n";
     }
-    g << "default: return 0;\n}\n";
-    g.decrease_indent();
-    g << "}\n\n";
+    g << "default: return 0;\n}\n"
+      << "}\n\n";
 
     // Output sparsities
-    g << g.declare("const int* " + fname + "_sparsity_out(int i)") << " {\n";
-    g.increase_indent();
-    g << "switch (i) {\n";
+    g << g.declare("const int* " + fname + "_sparsity_out(int i)") << " {\n"
+      << "switch (i) {\n";
     for (int i=0; i<n_out; ++i) {
       g << "case " << i << ": return s" << g.addSparsity(sparsity_out(i)) << ";\n";
     }
-    g << "default: return 0;\n}\n";
-    g.decrease_indent();
-    g << "}\n\n";
+    g << "default: return 0;\n}\n"
+      << "}\n\n";
 
     // Function that returns work vector lengths
     g << g.declare("int " + fname + "_work(int *sz_arg, int* sz_res, int *sz_iw, int *sz_w)")
-      << " {\n";
-    g.increase_indent();
-    g << "if (sz_arg) *sz_arg = " << sz_arg() << ";\n"
+      << " {\n"
+      << "if (sz_arg) *sz_arg = " << sz_arg() << ";\n"
       << "if (sz_res) *sz_res = " << sz_res() << ";\n"
       << "if (sz_iw) *sz_iw = " << sz_iw() << ";\n"
       << "if (sz_w) *sz_w = " << sz_w() << ";\n"
-      << "return 0;\n";
-    g.decrease_indent();
-    g << "}\n\n";
+      << "return 0;\n"
+      << "}\n\n";
 
     // Generate mex gateway for the function
     if (g.mex) {
@@ -1825,9 +1813,8 @@ namespace casadi {
 
       // Declare wrapper
       g << "void mex_" << fname
-        << "(int resc, mxArray *resv[], int argc, const mxArray *argv[]) {\n";
-      g.increase_indent();
-      g << "int i, j;\n";
+        << "(int resc, mxArray *resv[], int argc, const mxArray *argv[]) {\n"
+        << "int i, j;\n";
 
       // Check arguments
       g << "if (argc>" << n_in << ") mexErrMsgIdAndTxt(\"Casadi:RuntimeError\","
@@ -1889,7 +1876,6 @@ namespace casadi {
       }
 
       // End conditional compilation and function
-      g.decrease_indent();
       g << "}\n"
         << "#endif\n\n";
     }
@@ -1897,7 +1883,6 @@ namespace casadi {
     if (g.main) {
       // Declare wrapper
       g << "int main_" << fname << "(int argc, char* argv[]) {\n";
-      g.increase_indent();
 
       // Work vectors and input and output buffers
       size_t nr = sz_w() + nnz_in() + nnz_out();
@@ -1942,18 +1927,15 @@ namespace casadi {
       g << g.printf("\\n") << "\n";
 
       // Finalize function
-      g << "return 0;\n";
-      g.decrease_indent();
-      g << "}\n\n";
+      g << "return 0;\n"
+        << "}\n\n";
     }
 
     if (g.with_mem) {
       // Allocate memory
-      g << g.declare("casadi_functions* " + fname + "_functions(void)") << " {\n";
-      g.increase_indent();
-      g << "static casadi_functions fun = {\n";
-      g.increase_indent();
-      g << fname << "_incref,\n"
+      g << g.declare("casadi_functions* " + fname + "_functions(void)") << " {\n"
+        << "static casadi_functions fun = {\n"
+        << fname << "_incref,\n"
         << fname << "_decref,\n"
         << fname << "_n_in,\n"
         << fname << "_n_out,\n"
@@ -1962,12 +1944,10 @@ namespace casadi {
         << fname << "_sparsity_in,\n"
         << fname << "_sparsity_out,\n"
         << fname << "_work,\n"
-        << fname << "\n";
-      g.decrease_indent();
-      g << "};\n"
-        << "return &fun;\n";
-      g.decrease_indent();
-      g << "}\n";
+        << fname << "\n"
+        << "};\n"
+        << "return &fun;\n"
+        << "}\n";
     }
     // Flush
     g.flush(g.body);
