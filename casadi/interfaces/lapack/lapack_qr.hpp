@@ -29,21 +29,6 @@
 #include "casadi/core/function/linsol_internal.hpp"
 #include <casadi/interfaces/lapack/casadi_linsol_lapackqr_export.h>
 
-extern "C" {
-  /// QR-factorize dense matrix (lapack)
-  void dgeqrf_(int *m, int *n, double *a, int *lda, double *tau,
-               double *work, int *lwork, int *info);
-
-  /// Multiply right hand side with Q-transpose (lapack)
-  void dormqr_(char *side, char *trans, int *n, int *m, int *k, double *a,
-               int *lda, double *tau, double *c, int *ldc,
-               double *work, int *lwork, int *info);
-
-  /// Solve upper triangular system (lapack)
-  void dtrsm_(char *side, char *uplo, char *transa, char *diag, int *m, int *n,
-                         double *alpha, double *a, int *lda, double *b, int *ldb);
-}
-
 /** \defgroup plugin_Linsol_lapackqr
 *
 * This class solves the linear system <tt>A.x=b</tt> by making an QR factorization of A: \n
@@ -119,6 +104,16 @@ namespace casadi {
 
     // Maximum number of right-hand-sides
     int max_nrhs_;
+
+    virtual size_t sz_w() const { return LinsolInternal::sz_w()+100;}
+
+    void generate(CodeGenerator& g, const std::string& mem,
+      const std::vector<int>& arg, const std::vector<int>& res,
+      const Sparsity& A,
+      int nrhs, bool transpose) const override;
+
+    bool can_generate() const override { return true; }
+
   };
 
 } // namespace casadi

@@ -257,6 +257,24 @@ namespace casadi {
     return linsol_->sz_w() + sparsity().size1();
   }
 
+  template<bool Tr>
+  void Solve<Tr>::generate(CodeGenerator& g, const std::string& mem,
+      const std::vector<int>& arg, const std::vector<int>& res) const {
+
+
+    //g.body << " void static_cast< const Solve<" << Tr << ">* >(" <<  << ")->eval(const double** arg, double** res, int* iw, double* w, int mem);" << std:endl;
+
+
+    if (linsol_->can_generate()) {
+      g.body << "  {" << std::endl;
+      linsol_->generate(g, mem, arg, res, dep(1).sparsity(), dep(0).size2(), Tr);
+      g.body << "  }" << std::endl;
+    } else {
+      MXNode::generate(g, mem, arg, res);
+    }
+  }
+
+
 } // namespace casadi
 
 #endif // CASADI_SOLVE_IMPL_HPP

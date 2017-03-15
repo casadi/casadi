@@ -182,6 +182,7 @@ namespace casadi {
       AUX_NORM_INF,
       AUX_IAMAX,
       AUX_FILL,
+      AUX_DENSIFY,
       AUX_SQ,
       AUX_SIGN,
       AUX_MTIMES,
@@ -197,7 +198,8 @@ namespace casadi {
       AUX_INTERPN_INTERPOLATE,
       AUX_FILL_INT,
       AUX_DE_BOOR,
-      AUX_ND_BOOR_EVAL
+      AUX_ND_BOOR_EVAL,
+      AUX_LAPACKQR
     };
 
     /** \brief Add a built-in auxiliary function */
@@ -229,6 +231,10 @@ namespace casadi {
 
     /** \brief Create a fill operation */
     std::string fill(const std::string& res, std::size_t n, const std::string& v);
+
+    /** \brief Create a densify operation */
+    std::string densify(const std::string& arg, const Sparsity& sp,
+        const std::string& res, bool tranpose);
 
     /** \brief Sparse assignment */
     std::string project(const std::string& arg, const Sparsity& sp_arg,

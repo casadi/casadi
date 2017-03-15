@@ -131,6 +131,13 @@ namespace casadi {
     // Get name of the plugin
     virtual const char* plugin_name() const = 0;
 
+    virtual void generate(CodeGenerator& g, const std::string& mem,
+      const std::vector<int>& arg, const std::vector<int>& res,
+      const Sparsity& A,
+      int nrhs, bool transpose) const;
+
+    virtual bool can_generate() const { return false; }
+
   };
 
 

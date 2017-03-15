@@ -676,6 +676,13 @@ namespace casadi {
         << codegen_str_fill_int_define << endl
         << endl;
       break;
+      case AUX_DENSIFY:
+        addAuxiliary(AUX_FILL);
+        this->auxiliaries
+          << codegen_str_densify
+          << codegen_str_densify_define << endl
+          << endl;
+        break;
     case AUX_MTIMES:
       this->auxiliaries << codegen_str_mtimes
         << codegen_str_mtimes_define
@@ -693,6 +700,17 @@ namespace casadi {
         << codegen_str_project_define
         << endl << endl;
       break;
+      case AUX_LAPACKQR:
+        addAuxiliary(AUX_DENSIFY);
+        this->auxiliaries
+          << codegen_str_lapackqr_factorize
+          << codegen_str_lapackqr_solve_
+          << codegen_str_lapackqr_solve
+          << codegen_str_lapackqr_factorize_define
+          << codegen_str_lapackqr_solve__define
+          << codegen_str_lapackqr_solve_define
+          << endl << endl;
+        break;
     case AUX_TRANS:
       this->auxiliaries << codegen_str_trans
         << "#define trans(x, sp_x, y, sp_y, tmp) CASADI_PREFIX(trans)(x, sp_x, y, sp_y, tmp)"
@@ -868,6 +886,15 @@ namespace casadi {
     // Perform operation
     addAuxiliary(AUX_FILL);
     s << "fill(" << res << ", " << n << ", " << v << ");";
+    return s.str();
+  }
+
+  std::string CodeGenerator::densify(const std::string& arg, const Sparsity& sp,
+        const std::string& res, bool tranpose) {
+    stringstream s;
+    // Perform operation
+    addAuxiliary(AUX_DENSIFY);
+    s << "densify(" << arg << ", " << sparsity(sp) << ", " << res << "," << tranpose << ");";
     return s.str();
   }
 

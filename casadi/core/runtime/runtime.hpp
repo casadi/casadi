@@ -74,7 +74,11 @@ namespace casadi {
 
   /// Convert sparse to dense
   template<typename real1_t, typename real2_t>
-  void CASADI_PREFIX(densify)(const real1_t* x, const int* sp_x, real2_t* y, int tr);
+  void CASADI_PREFIX(densify2)(const real1_t* x, const int* sp_x, real2_t* y, int tr);
+
+  /// Convert sparse to dense
+  template<typename real_t>
+  void CASADI_PREFIX(densify)(const real_t* x, const int* sp_x, real_t* y, int tr);
 
   /// Convert dense to sparse
   template<typename real1_t, typename real2_t>
@@ -314,8 +318,35 @@ namespace casadi {
     }
   }
 
+  template<typename real_t >
+  void CASADI_PREFIX(densify)(const real_t* x, const int* sp_x, real_t* y, int tr) {
+    /* Quick return - output ignored */
+    if (!y) return;
+    int nrow_x = sp_x[0], ncol_x = sp_x[1];
+    const int *colind_x = sp_x+2, *row_x = sp_x+ncol_x+3;
+    /* Zero out return value */
+    CASADI_PREFIX(fill)(y, nrow_x*ncol_x, CASADI_CAST(real_t, 0));
+    /* Quick return - input is zero */
+    if (!x) return;
+    /* Copy nonzeros */
+    int i, el;
+    if (tr) {
+      for (i=0; i<ncol_x; ++i) {
+        for (el=colind_x[i]; el!=colind_x[i+1]; ++el) {
+          y[i + row_x[el]*ncol_x] = *x++;
+        }
+      }
+    } else {
+      for (i=0; i<ncol_x; ++i) {
+        for (el=colind_x[i]; el!=colind_x[i+1]; ++el) {
+          y[row_x[el] + i*nrow_x] = *x++;
+        }
+      }
+    }
+  }
+
   template<typename real1_t, typename real2_t>
-  void CASADI_PREFIX(densify)(const real1_t* x, const int* sp_x, real2_t* y, int tr) {
+  void CASADI_PREFIX(densify2)(const real1_t* x, const int* sp_x, real2_t* y, int tr) {
     /* Quick return - output ignored */
     if (!y) return;
     int nrow_x = sp_x[0], ncol_x = sp_x[1];
@@ -957,7 +988,7 @@ namespace casadi {
   template<typename real_t>
   int CASADI_PREFIX(lapackqr_factorize)(const real_t* A, int ncol, int lwork, const int* sparsity, real_t* mat, real_t* tau, real_t* work) {
     // Get the elements of the matrix, dense format
-    CASADI_PREFIX(densify)(A, sparsity, mat, false);
+    CASADI_PREFIX(densify)(A, sparsity, mat, 0);
 
     // Factorize the matrix
     int info = -100;

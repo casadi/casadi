@@ -96,6 +96,10 @@ namespace casadi {
     /** \brief Get required length of w field */
     virtual size_t sz_w() const;
 
+    /** \brief Generate code for the operation */
+    virtual void generate(CodeGenerator& g, const std::string& mem,
+                          const std::vector<int>& arg, const std::vector<int>& res) const override;
+
     /// Linear Solver (may be shared between multiple nodes)
     Linsol linsol_;
   };

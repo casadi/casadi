@@ -105,4 +105,49 @@ namespace casadi {
                                           "to solve the linear system. Info: " << ret << ".");
   }
 
+  void LapackQr::generate(CodeGenerator& g, const std::string& mem,
+      const std::vector<int>& arg, const std::vector<int>& res,
+      const Sparsity& A,
+      int nrhs, bool transpose) const {
+
+    g.addAuxiliary(CodeGenerator::AUX_LAPACKQR);
+
+    g.addExternal("void dgeqrf_(int *m, int *n, double *a, int *lda, double *tau,"
+                   "double *work, int *lwork, int *info);");
+    g.addExternal("void dormqr_(char *side, char *trans, int *n, int *m, "
+                      "int *k, double *a, int *lda, double *tau, double *c, int *ldc, "
+                      "double *work, int *lwork, int *info);");
+    g.addExternal("void dtrsm_(char *side, char *uplo, char *transa, "
+                      "char *diag, int *m, int *n, "
+                      "double *alpha, double *a, int *lda, double *b, int *ldb);");
+
+
+    g.addExternal("#define CASADI_CAST(TYPE, ARG) ((TYPE) ARG)");
+
+
+    int ncol = A.size2();
+    int work_size = max(max_nrhs_, ncol)*10;
+    int nnz = nrhs * ncol;
+
+    // Copy first argument if not inplace
+    if (arg[0]!=res[0]) {
+      g.body << "  " << g.copy(g.work(arg[0], nnz), nnz, g.work(res[0], nnz)) << endl;
+    }
+
+    g.body << "{" << std::endl;
+    g.body << "real_t mat[" << ncol*ncol << "];" << std::endl;
+    g.body << "real_t tau[" << ncol << "];" << std::endl;
+    g.body << "real_t work[" << work_size << "];" << std::endl;
+
+    g.body << "CASADI_PREFIX(lapackqr_factorize)(" << g.work(arg[1], A.nnz()) << "," << ncol << ","
+      << work_size << ","  << g.sparsity(A) << ", mat, tau, work);" << std::endl;
+    g.body << "CASADI_PREFIX(lapackqr_solve)(" << max_nrhs_ << "," << A.size1() << "," << nrhs <<
+      "," << (transpose? 1 : 0) << "," << g.work(res[0], nnz) << "," << ncol << "," << ncol << ","
+      << work_size << ", mat, tau, work);" << std::endl;
+
+    //  int ret = casadi_lapackqr_solve(max_nrhs_, m->nrow(), nrhs, tr, x, m->ncol(), m->tau.size(),
+    //    m->work.size(), get_ptr(m->mat), get_ptr(m->tau), get_ptr(m->work));
+    g.body << "}" << std::endl;
+  }
+
 } // namespace casadi
