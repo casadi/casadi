@@ -30,6 +30,22 @@
 #define CASADI_PREFIX(ID) casadi_##ID
 #define CASADI_CAST(TYPE, ARG) static_cast<TYPE>(ARG)
 
+extern "C" {
+  /// QR-factorize dense matrix (lapack)
+  void dgeqrf_(int *m, int *n, double *a, int *lda, double *tau,
+               double *work, int *lwork, int *info);
+
+  /// Multiply right hand side with Q-transpose (lapack)
+  void dormqr_(char *side, char *trans, int *n, int *m, int *k, double *a,
+               int *lda, double *tau, double *c, int *ldc,
+               double *work, int *lwork, int *info);
+
+  /// Solve upper triangular system (lapack)
+  void dtrsm_(char *side, char *uplo, char *transa, char *diag, int *m, int *n,
+                         double *alpha, double *a, int *lda, double *b, int *ldb);
+}
+
+
 /// \cond INTERNAL
 namespace casadi {
   /// COPY: y <-x
@@ -178,7 +194,19 @@ namespace casadi {
   template<typename real_t>
   void CASADI_PREFIX(nd_boor_eval)(real_t* ret, int n_dims, const real_t* knots, const int* offset, const int* degree, const int* strides, const real_t* c, int m, const real_t* x, const int* lookup_mode, int reverse, int* iw, real_t* w);
 
+  template<typename real_t>
+  int CASADI_PREFIX(lapackqr_factorize)(const real_t* A, int ncol, int lwork, const int* sparsity,real_t* mat, real_t* tau, real_t* work);
+
+  template<typename real_t>
+  int CASADI_PREFIX(lapackqr_solve_)(int nrhs, int tr, real_t* x, int ncol, int k, int lwork, real_t* mat, real_t* tau, real_t* work);
+
+  template<typename real_t>
+  int CASADI_PREFIX(lapackqr_solve)(int max_nrhs, int n_row, int nrhs, int tr, real_t* x, int ncol, int k, int lwork, real_t* mat, real_t* tau, real_t* work);
+
+
 }
+
+
 
 // Implementations
 
@@ -924,6 +952,70 @@ namespace casadi {
       coeff_offset[0] = (starts[0]+index[0])*m+coeff_offset[1];
 
     }
+  }
+
+  template<typename real_t>
+  int CASADI_PREFIX(lapackqr_factorize)(const real_t* A, int ncol, int lwork, const int* sparsity, real_t* mat, real_t* tau, real_t* work) {
+    // Get the elements of the matrix, dense format
+    CASADI_PREFIX(densify)(A, sparsity, mat, false);
+
+    // Factorize the matrix
+    int info = -100;
+    dgeqrf_(&ncol, &ncol, mat, &ncol, tau, work, &lwork, &info);
+    return info;
+  }
+
+  template<typename real_t>
+  int CASADI_PREFIX(lapackqr_solve)(int max_nrhs, int n_row, int nrhs, int tr, real_t* x, int ncol, int k, int lwork, real_t* mat, real_t* tau, real_t* work) {
+
+    // Solve up to max_nrhs rhs at a time
+    int offset = 0;
+    while (nrhs>0) {
+      int ret = CASADI_PREFIX(lapackqr_solve_)(max_nrhs< nrhs? max_nrhs: nrhs, tr, x+offset, ncol, k, lwork, mat, tau, work);
+      if (ret) return ret;
+      nrhs-= max_nrhs;
+      offset+= max_nrhs*n_row;
+    }
+    return 0;
+  }
+
+  template<typename real_t>
+  int CASADI_PREFIX(lapackqr_solve_)(int nrhs, int tr, real_t* x, int ncol, int k, int lwork, real_t* mat, real_t* tau, real_t* work) {
+
+    // Properties of R
+    char uploR = 'U';
+    char diagR = 'N';
+    char sideR = 'L';
+    double alphaR = 1.;
+    char transR = tr ? 'T' : 'N';
+
+    // Properties of Q
+    char transQ = tr ? 'N' : 'T';
+    char sideQ = 'L';
+
+    if (tr) {
+
+      // Solve for transpose(R)
+      dtrsm_(&sideR, &uploR, &transR, &diagR, &ncol, &nrhs, &alphaR,
+             mat, &ncol, x, &ncol);
+
+      // Multiply by Q
+      int info = 100;
+      dormqr_(&sideQ, &transQ, &ncol, &nrhs, &k, mat, &ncol, tau, x,
+              &ncol, work, &lwork, &info);
+      if (info) return info;
+    } else {
+
+      // Multiply by transpose(Q)
+      int info = 100;
+      dormqr_(&sideQ, &transQ, &ncol, &nrhs, &k, mat, &ncol, tau, x,
+              &ncol, work, &lwork, &info);
+      if (info) return info;
+      // Solve for R
+      dtrsm_(&sideR, &uploR, &transR, &diagR, &ncol, &nrhs, &alphaR, mat, &ncol, x, &ncol);
+    }
+
+    return 0;
   }
 
 } // namespace casadi

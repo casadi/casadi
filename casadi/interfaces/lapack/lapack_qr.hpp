@@ -109,9 +109,6 @@ namespace casadi {
     virtual void factorize(void* mem, const double* A) const;
 
     // Solve the linear system
-    void _solve(void* mem, double* x, int nrhs, bool tr) const;
-
-    // Solve the linear system
     virtual void solve(void* mem, double* x, int nrhs, bool tr) const;
 
     /// A documentation string

@@ -89,79 +89,20 @@ namespace casadi {
   void LapackQr::factorize(void* mem, const double* A) const {
     auto m = static_cast<LapackQrMemory*>(mem);
 
-    // Dimensions
-    //int nrow = this->nrow();
-    int ncol = m->ncol();
+    int ret = casadi_lapackqr_factorize(A, m->ncol(), m->work.size(), get_ptr(m->sparsity),
+      get_ptr(m->mat), get_ptr(m->tau), get_ptr(m->work));
+    casadi_assert_message(ret == 0, "LapackQr::prepare: dgeqrf_ "
+                                      "failed to factorize the Jacobian. Info: " << ret << ".");
 
-    // Get the elements of the matrix, dense format
-    casadi_densify(A, get_ptr(m->sparsity), get_ptr(m->mat), false);
-
-    // Factorize the matrix
-    int info = -100;
-    int lwork = m->work.size();
-    dgeqrf_(&ncol, &ncol, get_ptr(m->mat), &ncol, get_ptr(m->tau),
-            get_ptr(m->work), &lwork, &info);
-    casadi_assert_message(info == 0, "LapackQr::prepare: dgeqrf_ "
-                                      "failed to factorize the Jacobian. Info: " << info << ".");
   }
 
   void LapackQr::solve(void* mem, double* x, int nrhs, bool tr) const {
     auto m = static_cast<LapackQrMemory*>(mem);
 
-    // Solve up to max_nrhs rhs at a time
-    int offset = 0;
-    while (nrhs>0) {
-      _solve(m, x+offset, min(max_nrhs_, nrhs), tr);
-      nrhs-= max_nrhs_;
-      offset+= max_nrhs_*m->nrow();
-    }
-  }
-
-  void LapackQr::_solve(void* mem, double* x, int nrhs, bool tr) const {
-    auto m = static_cast<LapackQrMemory*>(mem);
-
-    // Dimensions
-    //int nrow = this->nrow();
-    int ncol = m->ncol();
-
-    // Properties of R
-    char uploR = 'U';
-    char diagR = 'N';
-    char sideR = 'L';
-    double alphaR = 1.;
-    char transR = tr ? 'T' : 'N';
-
-    // Properties of Q
-    char transQ = tr ? 'N' : 'T';
-    char sideQ = 'L';
-    int k = m->tau.size(); // minimum of ncol and nrow
-    int lwork = m->work.size();
-
-    if (tr) {
-
-      // Solve for transpose(R)
-      dtrsm_(&sideR, &uploR, &transR, &diagR, &ncol, &nrhs, &alphaR,
-             get_ptr(m->mat), &ncol, x, &ncol);
-
-      // Multiply by Q
-      int info = 100;
-      dormqr_(&sideQ, &transQ, &ncol, &nrhs, &k, get_ptr(m->mat), &ncol, get_ptr(m->tau), x,
-              &ncol, get_ptr(m->work), &lwork, &info);
-      casadi_assert_message(info == 0, "LapackQr::solve: dormqr_ A failed "
-                                          "to solve the linear system. Info: " << info << ".");
-    } else {
-
-      // Multiply by transpose(Q)
-      int info = 100;
-      dormqr_(&sideQ, &transQ, &ncol, &nrhs, &k, get_ptr(m->mat), &ncol, get_ptr(m->tau), x,
-              &ncol, get_ptr(m->work), &lwork, &info);
-      casadi_assert_message(info == 0, "LapackQr::solve: dormqr_ B failed to "
-                                          "solve the linear system. Info: " << info << ".");
-
-      // Solve for R
-      dtrsm_(&sideR, &uploR, &transR, &diagR, &ncol, &nrhs, &alphaR,
-             get_ptr(m->mat), &ncol, x, &ncol);
-    }
+    int ret = casadi_lapackqr_solve(max_nrhs_, m->nrow(), nrhs, tr, x, m->ncol(), m->tau.size(),
+      m->work.size(), get_ptr(m->mat), get_ptr(m->tau), get_ptr(m->work));
+    if (ret) casadi_assert_message(ret == 0, "LapackQr::solve: dormqr_ failed "
+                                          "to solve the linear system. Info: " << ret << ".");
   }
 
 } // namespace casadi
