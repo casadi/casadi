@@ -122,7 +122,7 @@ namespace casadi {
   bool inBounds(const std::vector<T> &v, int lower, int upper);
 
   /** \brief swap inner and outer indices of list of lists
-  * 
+  *
   * \verbatim
   * [[apple0,apple1,...],[pear0,pear1,...]] ->
   *   [[apple0,pear0],[apple1,pear1],...]
@@ -147,7 +147,7 @@ namespace casadi {
   *  Duplicates are treated by looking up last occurrence
   */
   CASADI_EXPORT std::vector<int> lookupvector(const std::vector<int> &v, int size);
-
+  CASADI_EXPORT std::vector<int> lookupvector(const std::vector<int> &v);
 
   /// \cond INTERNAL
 #ifndef SWIG

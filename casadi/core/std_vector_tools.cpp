@@ -86,6 +86,11 @@ namespace casadi {
     return lookup;
   }
 
+  std::vector<int> lookupvector(const std::vector<int> &v) {
+    casadi_assert(!hasNegative(v));
+    return lookupvector(v, (*std::max_element(v.begin(), v.end()))+1);
+  }
+
   bvec_t* get_bvec_t(std::vector<double>& v) {
     if (v.empty()) {
       return 0;

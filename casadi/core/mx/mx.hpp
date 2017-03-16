@@ -349,6 +349,30 @@ namespace casadi {
     void set_nz(const MX& m, bool ind1, const Matrix<int>& kk);
     ///@}
 
+    ///@{
+    /** \brief Computes an einstein dense tensor contraction
+
+        Computes the product:
+        C_c = A_a + B_b
+          where a b c are index/einstein notation in an encoded form
+
+        For example, an matrix-matrix product may be written as:
+        C_ij = A_ik B_kj
+
+        The encoded form uses strictly negative numbers to indicate labels.
+        For the above example, we would have:
+        a {-1, -3} b {-3, -2} c {-1 -2}
+
+    */
+    static MX einstein(const MX& A, const MX& B, const MX& C,
+      const std::vector<int>& dim_a, const std::vector<int>& dim_b, const std::vector<int>& dim_c,
+      const std::vector<int>& a, const std::vector<int>& b, const std::vector<int>& c);
+
+    static MX einstein(const MX& A, const MX& B,
+      const std::vector<int>& dim_a, const std::vector<int>& dim_b, const std::vector<int>& dim_c,
+      const std::vector<int>& a, const std::vector<int>& b, const std::vector<int>& c);
+    ///@}
+
 #ifndef SWIG
     /// \cond CLUTTER
     ///@{

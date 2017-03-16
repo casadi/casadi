@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.6)
 
 set(EMBEDDED_SRC "")
-file(GLOB SRC *.hpp)
+file(GLOB SRC runtime.hpp)
 
 foreach(file ${SRC})
   get_filename_component(FILE_BASENAME ${file} NAME_WE)

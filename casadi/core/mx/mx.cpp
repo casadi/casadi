@@ -581,6 +581,18 @@ namespace casadi {
     }
   }
 
+  MX MX::einstein(const MX& A, const MX& B, const MX& C,
+      const std::vector<int>& dim_a, const std::vector<int>& dim_b, const std::vector<int>& dim_c,
+      const std::vector<int>& a, const std::vector<int>& b, const std::vector<int>& c) {
+    return C->getEinstein(A, B, dim_c, dim_a, dim_b, c, a, b);
+  }
+
+  MX MX::einstein(const MX& A, const MX& B,
+      const std::vector<int>& dim_a, const std::vector<int>& dim_b, const std::vector<int>& dim_c,
+      const std::vector<int>& a, const std::vector<int>& b, const std::vector<int>& c) {
+    return MX::zeros(product(dim_c), 1)->getEinstein(A, B, dim_c, dim_a, dim_b, c, a, b);
+  }
+
   MX MX::mac(const MX& x, const MX& y, const MX& z) {
     if (x.is_scalar() || y.is_scalar()) {
       // Use element-wise multiplication if at least one factor scalar

@@ -49,6 +49,7 @@
 #include "monitor.hpp"
 #include "repmat.hpp"
 #include "casadi_find.hpp"
+#include "einstein.hpp"
 
 // Template implementations
 #include "setnonzeros_impl.hpp"
@@ -412,6 +413,14 @@ namespace casadi {
     } else {
       return MX::create(new Multiplication(z, x, y));
     }
+  }
+
+  MX MXNode::getEinstein(const MX& A, const MX& B,
+      const std::vector<int>& dim_c, const std::vector<int>& dim_a, const std::vector<int>& dim_b,
+      const std::vector<int>& c, const std::vector<int>& a, const std::vector<int>& b) const {
+
+    MX C = densify(shared_from_this<MX>());
+    return MX::create(new Einstein(C, densify(A), densify(B), dim_c, dim_a, dim_b, c, a, b));
   }
 
   MX MXNode::getBilin(const MX& x, const MX& y) const {

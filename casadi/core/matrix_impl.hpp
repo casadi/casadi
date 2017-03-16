@@ -28,6 +28,7 @@
 #include "function/function.hpp"
 
 #include "casadi_interrupt.hpp"
+#include "runtime/shared.hpp"
 
 /// \cond INTERNAL
 
@@ -518,6 +519,37 @@ namespace casadi {
 
     // Construct return matrix
     return Matrix<Scalar>(Sparsity::dense(x.size()), d);
+  }
+
+  template<typename Scalar>
+  Matrix<Scalar> Matrix<Scalar>::einstein(
+      const Matrix<Scalar>& A, const Matrix<Scalar>& B, const Matrix<Scalar>& C,
+      const std::vector<int>& dim_a, const std::vector<int>& dim_b, const std::vector<int>& dim_c,
+      const std::vector<int>& a, const std::vector<int>& b, const std::vector<int>& c) {
+    std::vector<int> iter_dims;
+    std::vector<int> strides_a;
+    std::vector<int> strides_b;
+    std::vector<int> strides_c;
+    int n_iter = einstein_process(A, B, C, dim_a, dim_b, dim_c, a, b, c,
+          iter_dims, strides_a, strides_b, strides_c);
+
+    const std::vector<Scalar>& Av = A.nonzeros();
+    const std::vector<Scalar>& Bv = B.nonzeros();
+
+    Matrix<Scalar> ret = C;
+    std::vector<Scalar>& Cv = ret.nonzeros();
+
+    einstein_eval(n_iter, iter_dims, strides_a, strides_b, strides_c,
+      get_ptr(Av), get_ptr(Bv), get_ptr(Cv));
+    return ret;
+  }
+
+  template<typename Scalar>
+  Matrix<Scalar> Matrix<Scalar>::einstein(const Matrix<Scalar>& A, const Matrix<Scalar>& B,
+      const std::vector<int>& dim_a, const std::vector<int>& dim_b, const std::vector<int>& dim_c,
+      const std::vector<int>& a, const std::vector<int>& b, const std::vector<int>& c) {
+    return Matrix<Scalar>::einstein(A, B, Matrix<Scalar>::zeros(product(dim_c), 1),
+      dim_a, dim_b, dim_c, a, b, c);
   }
 
   template<typename Scalar>

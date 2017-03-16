@@ -344,6 +344,14 @@ namespace casadi {
     static Matrix<Scalar> polyval(const Matrix<Scalar> &p, const Matrix<Scalar>& x);
     static Matrix<Scalar> densify(const Matrix<Scalar> &x, const Matrix<Scalar>& val);
     static Matrix<Scalar> densify(const Matrix<Scalar> &x);
+    static Matrix<Scalar> einstein(const Matrix<Scalar>& A, const Matrix<Scalar>& B,
+      const Matrix<Scalar>& C,
+      const std::vector<int>& dim_a, const std::vector<int>& dim_b, const std::vector<int>& dim_c,
+      const std::vector<int>& a, const std::vector<int>& b, const std::vector<int>& c);
+
+    static Matrix<Scalar> einstein(const Matrix<Scalar>& A, const Matrix<Scalar>& B,
+      const std::vector<int>& dim_a, const std::vector<int>& dim_b, const std::vector<int>& dim_c,
+      const std::vector<int>& a, const std::vector<int>& b, const std::vector<int>& c);
     ///@}
 
     ///@{

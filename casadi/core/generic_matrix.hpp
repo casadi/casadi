@@ -234,6 +234,35 @@ namespace casadi {
       return MatType::mpower(x, n);
     }
 
+    /** \brief Compute any contraction of two dense tensors, using index/einstein notation
+        einstein(A, B, a, b, c) -> C
+
+        Given two tensors, A and B, computes a third tensor C such that:
+
+        C_c = A_a * B_b
+
+        With a, b, c representing einstein indices.
+        Instead of the classical index labels i,j,k,... we employ -1,-2,-3,...
+
+        A, B, C are represented as CasADi vectors, with dim_a, dim_b, dim_c
+        indictating theire tensorial dimensions.
+    */
+    ///@{
+    inline friend MatType
+      einstein(const MatType &A, const MatType &B, const MatType &C,
+        const std::vector<int>& dim_a, const std::vector<int>& dim_b, const std::vector<int>& dim_c,
+        const std::vector<int>& a, const std::vector<int>& b, const std::vector<int>& c) {
+      return MatType::einstein(A, B, C, dim_a, dim_b, dim_c, a, b, c);
+    }
+
+    inline friend MatType
+      einstein(const MatType &A, const MatType &B,
+        const std::vector<int>& dim_a, const std::vector<int>& dim_b, const std::vector<int>& dim_c,
+        const std::vector<int>& a, const std::vector<int>& b, const std::vector<int>& c) {
+      return MatType::einstein(A, B, dim_a, dim_b, dim_c, a, b, c);
+    }
+    ///@}
+
     /** \brief Matrix divide (cf. slash '/' in MATLAB)
      */
     inline friend MatType mrdivide(const MatType& x, const MatType& n) {

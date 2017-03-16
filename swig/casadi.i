@@ -3084,7 +3084,16 @@ DECL std::string casadi_print_operator(const M& xb,
 DECL M casadi_repsum(const M& A, int n, int m=1) {
   return repsum(A, n, m);
 }
-
+DECL M casadi_einstein(const M& A, const M& B, const M& C,
+  const std::vector<int>& dim_a, const std::vector<int>& dim_b, const std::vector<int>& dim_c,
+  const std::vector<int>& a, const std::vector<int>& b, const std::vector<int>& c) {
+  return einstein(A, B, C, dim_a, dim_b, dim_c, a, b, c);
+}
+DECL M casadi_einstein(const M& A, const M& B,
+  const std::vector<int>& dim_a, const std::vector<int>& dim_b, const std::vector<int>& dim_c,
+  const std::vector<int>& a, const std::vector<int>& b, const std::vector<int>& c) {
+  return einstein(A, B, dim_a, dim_b, dim_c, a, b, c);
+}
 #endif // FLAG & IS_MEMBER
 
 #if FLAG & IS_GLOBAL

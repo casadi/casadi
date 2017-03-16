@@ -348,6 +348,11 @@ namespace casadi {
     /** \brief Matrix multiplication and addition */
     virtual MX getMultiplication(const MX& y, const MX& z) const;
 
+    /** \brief Einstein product and addition */
+    virtual MX getEinstein(const MX& A, const MX& B,
+      const std::vector<int>& dim_c, const std::vector<int>& dim_a, const std::vector<int>& dim_b,
+      const std::vector<int>& c, const std::vector<int>& a, const std::vector<int>& b) const;
+
     /** \brief Bilinear form */
     virtual MX getBilin(const MX& x, const MX& y) const;
 

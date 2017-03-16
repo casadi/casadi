@@ -58,6 +58,7 @@ set(CASADI_SRCS
   mx/unary_mx.hpp            mx/unary_mx.cpp            # Unary operation
   mx/binary_mx.hpp           mx/binary_mx_impl.hpp      # Binary operation
   mx/multiplication.hpp      mx/multiplication.cpp      # Matrix multiplication
+  mx/einstein.hpp            mx/einstein.cpp            # Einstein product
   mx/solve.hpp               mx/solve_impl.hpp          # Solve linear system of equations
   mx/casadi_call.hpp         mx/casadi_call.cpp         # Function call
   mx/casadi_find.hpp         mx/casadi_find.cpp         # Find first nonzero
@@ -114,6 +115,9 @@ set(CASADI_SRCS
   misc/xml_file.hpp                misc/xml_file.cpp                misc/xml_file_internal.hpp                misc/xml_file_internal.cpp
   misc/variable.hpp                misc/variable.cpp
   misc/dae_builder.hpp             misc/dae_builder.cpp
+
+  # runtime
+  runtime/shared.cpp
 
   # User include class with the most essential includes
   core.hpp

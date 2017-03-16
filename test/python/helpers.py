@@ -514,6 +514,8 @@ class casadiTestCase(unittest.TestCase):
               #self.checkarray(IM(a.sparsity(),1),IM(b.sparsity(),1),("%s, output(%d)" % (order,k))+str(vf.getInput(0))+failmessage,digits=digits_sens)
               self.checkarray(a,b,("%s, output(%d)" % (order,k))+failmessage,digits=digits_sens)
 
+  def check_sparsity(self, a,b):
+    self.assertTrue(a==b, msg=str(a) + " <-> " + str(b))
 
   def check_codegen(self,F,inputs=None):
     if args.run_slow:

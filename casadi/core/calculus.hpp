@@ -170,9 +170,11 @@ namespace casadi {
 
     OP_ERFINV,
     OP_PRINTME,
-    OP_LIFT
+    OP_LIFT,
+
+    OP_EINSTEIN
   };
-  #define NUM_BUILT_IN_OPS (OP_LIFT+1)
+  #define NUM_BUILT_IN_OPS (OP_EINSTEIN+1)
 
 #ifndef SWIG
 
@@ -1043,6 +1045,7 @@ namespace casadi {
     case OP_ERFINV:        return F<OP_ERFINV>::check;
     case OP_PRINTME:       return F<OP_PRINTME>::check;
     case OP_LIFT:          return F<OP_LIFT>::check;
+    case OP_EINSTEIN:      return F<OP_EINSTEIN>::check;
     }
   }
 
@@ -1498,6 +1501,7 @@ namespace casadi {
     case OP_ERFINV:         return "erfinv";
     case OP_PRINTME:        return "printme";
     case OP_LIFT:           return "lift";
+    case OP_EINSTEIN:       return "einstein";
     }
     return 0;
   }
