@@ -261,6 +261,11 @@ namespace casadi {
   void sort(const std::vector<T> &values, std::vector<T> &sorted_values, std::vector<int> &indices,
             bool invert_indices =false);
 
+  /** \brief product
+  *
+  */
+  template<typename T>
+  T product(const std::vector<T> &values);
 
   /** \brief cumulative sum
   *
@@ -623,6 +628,13 @@ namespace casadi {
     for (size_t i=0; i<values.size(); ++i) {
       sorted_values[i] = values[indices[i]];
     }
+  }
+
+  template<typename T>
+  T product(const std::vector<T> &values) {
+    T r = 1;
+    for (int i=0;i<values.size();++i) r*=values[i];
+    return r;
   }
 
   template<typename T>
