@@ -602,6 +602,23 @@ namespace casadi {
     static Function conditional(const std::string& name, const std::vector<Function>& f,
                                 const Function& f_def, const Dict& opts=Dict());
 
+    /** \brief BSpline evaluator function
+     *
+     *  Requires a known coefficient tensor
+     */
+    static Function bspline(const std::string &name,
+      const std::vector< std::vector<double> >& knots, const std::vector<double>& coeffs,
+      const std::vector<int>& degree, int m=1, const Dict& opts=Dict());
+
+    /** \brief Dual BSpline evaluator function
+    *
+    *  Requires known evaluation positions
+    *  WARNING: This function may drastically change or be removed
+    */
+    static Function bspline_dual(const std::string &name,
+      const std::vector< std::vector<double> >& knots, const std::vector<double>& x,
+      const std::vector<int>& degree, int m=1, bool reverse=false, const Dict& opts=Dict());
+
     /** \brief Constructor (if-else) */
     static Function if_else(const std::string& name, const Function& f_true,
                             const Function& f_false, const Dict& opts=Dict());

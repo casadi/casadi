@@ -169,6 +169,15 @@ namespace casadi {
   // Multilinear interpolant - calculate gradient
   template<typename real_t>
   void CASADI_PREFIX(interpn_grad)(real_t* grad, int ndim, const real_t* grid, const int* offset, const real_t* values, const real_t* x, int* iw, real_t* w);
+
+  // De boor single basis evaluation
+  template<typename real_t>
+  void CASADI_PREFIX(de_boor)(real_t x, const real_t* knots, int n_knots, int degree, real_t* boor);
+
+  // De boor nd evaluation
+  template<typename real_t>
+  void CASADI_PREFIX(nd_boor_eval)(real_t* ret, int n_dims, const real_t* knots, const int* offset, const int* degree, const int* strides, const real_t* c, int m, const real_t* x, const int* lookup_mode, int reverse, int* iw, real_t* w);
+
 }
 
 // Implementations
@@ -801,6 +810,121 @@ namespace casadi {
     }
   }
 
+  template<typename real_t>
+  void CASADI_PREFIX(de_boor)(real_t x, const real_t* knots, int n_knots, int degree, real_t* boor) {
+    // length boor: n_knots-1
+    for (int d=1;d<degree+1;++d) {
+      for (int i=0;i<n_knots-d-1;++i) {
+        real_t b = 0;
+        real_t bottom = knots[i + d] - knots[i];
+        if (bottom) b = (x - knots[i]) * boor[i] / bottom;
+        bottom = knots[i + d + 1] - knots[i + 1];
+        if (bottom) b += (knots[i + d + 1] - x) * boor[i + 1] / bottom;
+        boor[i] = b;
+      }
+    }
+  }
+
+
+  template<typename real_t>
+  void CASADI_PREFIX(nd_boor_eval)(real_t* ret, int n_dims, const real_t* all_knots, const int* offset, const int* all_degree, const int* strides, const real_t* c, int m, const real_t* all_x, const int* lookup_mode, int reverse, int* iw, real_t* w) {
+    int* boor_offset = iw; iw+=n_dims+1;
+    int* starts = iw; iw+=n_dims;
+    int* index = iw; iw+=n_dims;
+    int* coeff_offset = iw;
+
+    real_t* cumprod = w; w+= n_dims+1;
+    real_t* all_boor = w;
+
+    boor_offset[0] = 0;
+    cumprod[n_dims] = 1;
+    coeff_offset[n_dims] = 0;
+
+    int n_iter = 1;
+    for (int k=0;k<n_dims;++k) {
+      real_t* boor = all_boor+boor_offset[k];
+
+      int degree = all_degree[k];
+      const real_t* knots = all_knots + offset[k];
+      int n_knots = offset[k+1]-offset[k];
+      int n_b = n_knots-degree-1;
+
+      real_t x = all_x[k];
+      int L = CASADI_PREFIX(low)(x, knots+degree, n_knots-2*degree, lookup_mode[k]);
+
+      int start = L;
+      if (start>n_b-degree-1) start = n_b-degree-1;
+
+      starts[k] = start;
+
+      CASADI_PREFIX(fill)(boor, 2*degree+1, 0.0);
+      if (x>=knots[0] && x<=knots[n_knots-1]) {
+        if (x==knots[1]) {
+          CASADI_PREFIX(fill)(boor, degree+1, 1.0);
+        } else if (x==knots[n_knots-1]) {
+          boor[degree] = 1;
+        } else if (knots[L+degree]==x) {
+          boor[degree-1] = 1;
+        } else {
+          boor[degree] = 1;
+        }
+      }
+      CASADI_PREFIX(de_boor)(x, knots+start, 2*degree+2, degree, boor);
+      boor+= degree+1;
+      n_iter*= degree+1;
+      boor_offset[k+1] = boor_offset[k] + degree+1;
+    }
+
+    CASADI_PREFIX(fill_int)(index, n_dims, 0);
+
+    // Prepare cumulative product
+    for (int pivot=n_dims-1;pivot>=0;--pivot) {
+      cumprod[pivot] = (*(all_boor+boor_offset[pivot]))*cumprod[pivot+1];
+      coeff_offset[pivot] = starts[pivot]*strides[pivot]+coeff_offset[pivot+1];
+    }
+
+    for (int k=0;k<n_iter;++k) {
+
+      // accumulate result
+      for (int i=0;i<m;++i) {
+        if (reverse) {
+          ret[coeff_offset[0]+i] += c[i]*cumprod[0];
+        } else {
+          ret[i] += c[coeff_offset[0]+i]*cumprod[0];
+        }
+      }
+
+      // Increment index
+      index[0]++;
+      int pivot = 0;
+
+      // Handle index overflow
+      {
+        // increment next index (forward)
+        while (index[pivot]==boor_offset[pivot+1]-boor_offset[pivot]) {
+          index[pivot] = 0;
+          if (pivot==n_dims-1) break;
+          index[++pivot]++;
+        }
+
+        // update cumulative structures (reverse)
+        while (pivot>0) {
+          // Compute product
+          cumprod[pivot] = (*(all_boor+boor_offset[pivot]+index[pivot]))*cumprod[pivot+1];
+          // Compute offset
+          coeff_offset[pivot] = (starts[pivot]+index[pivot])*strides[pivot]+coeff_offset[pivot+1];
+          pivot--;
+        }
+      }
+
+      // Compute product
+      cumprod[0] = (*(all_boor+index[0]))*cumprod[1];
+
+      // Compute offset
+      coeff_offset[0] = (starts[0]+index[0])*m+coeff_offset[1];
+
+    }
+  }
 
 } // namespace casadi
 

@@ -28,6 +28,14 @@ import unittest
 from types import *
 from helpers import *
 
+scipy_interpolate = False
+try:
+  import scipy.interpolate
+  scipy.interpolate.RectBivariateSpline
+  scipy_interpolate = True
+except:
+  pass
+
 class Functiontests(casadiTestCase):
 
   def test_call_empty(self):
@@ -998,7 +1006,92 @@ class Functiontests(casadiTestCase):
       self.assertTrue(same(F([-.6, 1.5]), 14.4))
       self.assertTrue(same(F([-.6, 2.5]), 24.4))
       self.assertTrue(same(F([-.6, 3.5]), 34.4))
+
+  @skip(not scipy_interpolate)
+  def test_2d_bspline(self):
+    import scipy.interpolate
+    np.random.seed(0)
     
+    d_knots = [list(np.linspace(0,1,5)),list(np.linspace(0,1,6))]
+
+    data = np.random.random([len(e) for e in d_knots])
+    r = np.meshgrid(*d_knots,indexing='ij')
+
+    xyz = np.vstack(e.ravel(order='F') for e in r).ravel(order='F')
+    
+    d_flat = data.ravel(order='F')
+
+    LUT = casadi.interpolant('name','bspline',d_knots,d_flat)
+    LUTJ = LUT.jacobian()
+    LUTH = LUT.hessian()
+
+    self.check_codegen(LUT, [vertcat(0.2,0.3)])
+    #scipy.interpolate.interpn(d_knots, data, [0.2,0.3], method='splinef2d')
+
+    interp = scipy.interpolate.RectBivariateSpline(d_knots[0], d_knots[1], data)
+    for x in [0,0.01,0.1,0.2,0.9,0.99,1]:
+      for y in [0,0.01,0.1,0.2,0.9,0.99,1]:
+        m = LUT([x,y])
+        r = interp.ev(x,y)
+        self.checkarray(m,r)
+        
+        m = LUTJ([x,y])[0]
+        try:
+          r = [interp.ev(x,y, 1, 0), interp.ev(x,y, 0, 1)]
+        except:
+          r = None
+        if r is not None:
+          self.checkarray(m,r)
+
+        m = LUTH([x,y])[0]
+        try:
+          r = blockcat([[interp.ev(x,y, 2, 0),interp.ev(x,y, 1, 1)],[interp.ev(x,y, 1, 1), interp.ev(x,y, 0, 2)]])
+        except:
+          r = None
+        if r is not None:
+          self.checkarray(m,r)
+
+  @skip(not scipy_interpolate)
+  def test_1d_bspline(self):
+    import scipy.interpolate
+    np.random.seed(0)
+    
+    d_knots = [list(np.linspace(0,1,5))]
+
+    data = np.random.random([len(e) for e in d_knots])
+    r = np.array(d_knots)
+
+    xyz = np.vstack(e.ravel(order='F') for e in r).ravel(order='F')
+    
+    d_flat = data.ravel(order='F')
+
+    LUT = casadi.interpolant('name','bspline',d_knots,d_flat)
+    self.check_codegen(LUT, [0.2])
+    LUTJ = LUT.jacobian()
+    LUTH = LUT.hessian()
+
+    interp = scipy.interpolate.InterpolatedUnivariateSpline(d_knots[0], data)
+    for x in [0,0.01,0.1,0.2,0.9,0.99,1]:
+      m = LUT(x)
+      r = interp(x)
+      self.checkarray(m,r)
+      
+      m = LUTJ(x)[0]
+      try:
+        r = interp(x, 1)
+      except:
+        r = None
+      if r is not None:
+        self.checkarray(m,r)
+
+      m = LUTH(x)[0]
+      try:
+        r = interp(x, 2)
+      except:
+        r = None
+      if r is not None:
+        self.checkarray(m,r)
+
   def test_Callback_Jacobian(self):
     x = MX.sym("x")
     y = MX.sym("y")

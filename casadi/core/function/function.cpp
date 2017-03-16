@@ -29,6 +29,7 @@
 #include "mx_function.hpp"
 #include "map.hpp"
 #include "switch.hpp"
+#include "bspline.hpp"
 #include "nlpsol.hpp"
 #include "conic.hpp"
 #include "jit.hpp"
@@ -564,6 +565,18 @@ namespace casadi {
     ret.assignNode(new Switch(name, f, f_def));
     ret->construct(opts);
     return ret;
+  }
+
+  Function Function::bspline(const std::string &name,
+    const std::vector< std::vector<double> >& knots, const vector<double>& coeffs,
+    const vector<int>& degree, int m, const Dict& opts) {
+    return BSpline::create(name, knots, coeffs, degree, m, opts);
+  }
+
+  Function Function::bspline_dual(const std::string &name,
+    const std::vector< std::vector<double> >& knots, const vector<double>& x,
+    const vector<int>& degree, int m, bool reverse, const Dict& opts) {
+    return BSplineDual::create(name, knots, x, degree, m, reverse, opts);
   }
 
   Function Function::if_else(const string& name, const Function& f_true,

@@ -105,6 +105,7 @@ set(CASADI_SRCS
   function/expm.hpp                function/expm_impl.hpp          function/expm.cpp
   function/code_generator.hpp      function/code_generator.cpp
   function/switch.hpp              function/switch.cpp
+  function/bspline.hpp             function/bspline.cpp
   function/map.hpp                 function/map.cpp
   function/importer.hpp            function/importer.cpp            function/importer_internal.hpp function/importer_internal.cpp
 

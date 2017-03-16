@@ -195,7 +195,9 @@ namespace casadi {
       AUX_INTERPN_WEIGHTS,
       AUX_LOW,
       AUX_INTERPN_INTERPOLATE,
-      AUX_FILL_INT
+      AUX_FILL_INT,
+      AUX_DE_BOOR,
+      AUX_ND_BOOR_EVAL
     };
 
     /** \brief Add a built-in auxiliary function */
