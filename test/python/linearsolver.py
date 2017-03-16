@@ -30,7 +30,7 @@ from helpers import *
 import random
 
 warnings.filterwarnings("ignore",category=DeprecationWarning)
-
+  
 lsolvers = []
 try:
   load_linsol("csparse")
@@ -60,6 +60,12 @@ except:
 try:
   load_linsol("symbolicqr")
   lsolvers.append(("symbolicqr",{},set()))
+except:
+  pass
+  
+try:
+  load_linsol("lsqr")
+  lsolvers.append(("lsqr",{},set()))
 except:
   pass
 
