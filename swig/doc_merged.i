@@ -273,6 +273,18 @@ Method to return the gradient of the objective
 %feature("docstring") casadi::BonminUserClass::get_variables_linearity "[INTERNAL] ";
 
 
+// File: classcasadi_1_1BSpline.xml
+
+
+// File: classcasadi_1_1BSplineCommon.xml
+
+
+// File: classcasadi_1_1BSplineDual.xml
+
+
+// File: classcasadi_1_1BSplineInterpolant.xml
+
+
 // File: classcasadi_1_1Call.xml
 
 
@@ -1783,6 +1795,9 @@ Add an ordinary differential equation.
 // File: classcasadi_1_1Dple.xml
 
 
+// File: classcasadi_1_1Einstein.xml
+
+
 // File: classcasadi_1_1Expm.xml
 
 
@@ -3076,7 +3091,7 @@ Count number of nodes
 
 %feature("docstring") casadi::GenericMatrix::bilin "
 
-Matrix power x^n.
+Calculate bilinear form x^T A y.
 
 ";
 
@@ -3194,19 +3209,28 @@ optionally both dimensions)
 
 ";
 
-%feature("docstring") friendwrap_conditional "
+%feature("docstring") friendwrap_einstein "
 
-Create a switch.
+>  MatType einstein(const MatType &A, const MatType &B, const MatType &C, const std::vector< int > &dim_a, const std::vector< int > &dim_b, const std::vector< int > &dim_c, const std::vector< int > &a, const std::vector< int > &b, const std::vector< int > &c)
+------------------------------------------------------------------------
 
-If the condition
+Compute any contraction of two dense tensors, using index/einstein notation
+einstein(A, B, a, b, c) -> C.
 
-Parameters:
------------
+Given two tensors, A and B, computes a third tensor C such that:
 
-ind:  evaluates to the integer k, where 0<=k<f.size(), then x[k] will be
-returned, otherwise
+C_c = A_a * B_b
 
-x_default:  will be returned.
+With a, b, c representing einstein indices. Instead of the classical index
+labels i,j,k,... we employ -1,-2,-3,...
+
+A, B, C are represented as CasADi vectors, with dim_a, dim_b, dim_c
+indictating theire tensorial dimensions.
+
+>  MatType einstein(const MatType &A, const MatType &B, const std::vector< int > &dim_a, const std::vector< int > &dim_b, const std::vector< int > &dim_c, const std::vector< int > &a, const std::vector< int > &b, const std::vector< int > &c)
+------------------------------------------------------------------------
+
+Matrix power x^n.
 
 ";
 
@@ -3359,12 +3383,6 @@ Get string representation of dimensions. The representation is (nrow x ncol
 
 ";
 
-%feature("docstring") friendwrap_bilin "
-
-Calculate bilinear form x^T A y.
-
-";
-
 %feature("docstring") friendwrap_symvar "
 
 Get all symbols contained in the supplied expression Get all symbols on
@@ -3373,6 +3391,14 @@ which the supplied expression depends.
 See:  SXFunction::getFree(), MXFunction::getFree()
 
 ";
+
+%feature("docstring") friendwrap_bilin "
+
+Calculate bilinear form x^T A y.
+
+";
+
+%feature("docstring") friendwrap_hessian "";
 
 %feature("docstring") casadi::GenericMatrix::is_vector "
 
@@ -3511,6 +3537,22 @@ Branching on MX nodes Ternary operator, \"cond ? if_true : if_false\".
 
 ";
 
+%feature("docstring") friendwrap_conditional "
+
+Create a switch.
+
+If the condition
+
+Parameters:
+-----------
+
+ind:  evaluates to the integer k, where 0<=k<f.size(), then x[k] will be
+returned, otherwise
+
+x_default:  will be returned.
+
+";
+
 %feature("docstring") friendwrap_which_depends "
 
 Find out which variables enter with some order.
@@ -3540,8 +3582,6 @@ Get the number of non-zeros in the lower triangular half.
 Convert a upper triangular matrix to a symmetric one.
 
 ";
-
-%feature("docstring") friendwrap_hessian "";
 
 %feature("docstring") casadi::GenericMatrix::nnz "
 
@@ -4226,6 +4266,9 @@ symbolicqr
 
 
 
+Linear solver for sparse least-squares problems Inspired
+fromhttps://github.com/scipy/scipy/blob/v0.14.0/scipy/sparse/linalg/isolve/lsqr.py#L96
+
 Linsol based on QR factorization with sparsity pattern based reordering
 without partial pivoting
 
@@ -4295,6 +4338,9 @@ CasADi routines should go through this files.
 Joel Andersson
 
 C++ includes: casadi_logger.hpp ";
+
+
+// File: classcasadi_1_1Lsqr.xml
 
 
 // File: classcasadi_1_1Map.xml
@@ -4539,7 +4585,7 @@ Get an owning reference to the sparsity pattern.
 
 %feature("docstring") casadi::Matrix::bilin "
 
-Matrix power x^n.
+Calculate bilinear form x^T A y.
 
 ";
 
@@ -5335,9 +5381,9 @@ Create nodes by their ID.
 
 ";
 
-%feature("docstring") casadi::MX::is_commutative "
+%feature("docstring") casadi::MX::sparsity "
 
-Check if commutative operation.
+Get the sparsity pattern.
 
 ";
 
@@ -5439,6 +5485,20 @@ one.
 %feature("docstring") casadi::MX::is_transpose "
 
 Is the expression a transpose?
+
+";
+
+%feature("docstring") casadi::MX::einstein "
+
+Computes an einstein dense tensor contraction.
+
+Computes the product: C_c = A_a + B_b where a b c are index/einstein
+notation in an encoded form
+
+For example, an matrix-matrix product may be written as: C_ij = A_ik B_kj
+
+The encoded form uses strictly negative numbers to indicate labels. For the
+above example, we would have: a {-1, -3} b {-3, -2} c {-1 -2}
 
 ";
 
@@ -5838,7 +5898,7 @@ Make a rank-1 update to a matrix A Calculates A + 1/2 * alpha * x*y'.
 
 %feature("docstring") casadi::MX::bilin "
 
-Matrix power x^n.
+Calculate bilinear form x^T A y.
 
 ";
 
@@ -5854,9 +5914,9 @@ Is unary operation.
 
 ";
 
-%feature("docstring") casadi::MX::sparsity "
+%feature("docstring") casadi::MX::is_commutative "
 
-Get the sparsity pattern.
+Check if commutative operation.
 
 ";
 
@@ -7978,7 +8038,9 @@ swap inner and outer indices of list of lists
 
 %feature("docstring") casadi::is_zero "";
 
-%feature("docstring") casadi::casadi_copy "[INTERNAL]  COPY: y <-x.
+%feature("docstring") casadi::doc_linsol "
+
+Get the documentation string for a plugin.
 
 ";
 
@@ -8278,17 +8340,11 @@ Explicitly load a plugin dynamically.
 
 ";
 
-%feature("docstring") casadi::read_matlab "
+%feature("docstring") casadi::Contraction "";
 
->  void casadi::read_matlab(std::istream &stream, std::vector< T > &v)
-------------------------------------------------------------------------
+%feature("docstring") casadi::load_linsol "
 
-Read vector, matlab style.
-
->  void casadi::read_matlab(std::ifstream &file, std::vector< std::vector< T > > &v)
-------------------------------------------------------------------------
-
-Read matrix, matlab style.
+Explicitly load a plugin dynamically.
 
 ";
 
@@ -8781,6 +8837,8 @@ Joel Andersson
 
 ";
 
+%feature("docstring") casadi::einstein_eval "";
+
 %feature("docstring") casadi::hasNegative "
 
 Check if the vector has negative entries.
@@ -9099,6 +9157,10 @@ Construct from an index vector (requires is_slice(v) to be true)
 
 %feature("docstring") casadi::dense_copy_stride "[INTERNAL] ";
 
+%feature("docstring") casadi::casadi_copy "[INTERNAL]  COPY: y <-x.
+
+";
+
 %feature("docstring") casadi::expm_n_in "
 
 Get the number of expm solver inputs.
@@ -9126,6 +9188,9 @@ Get the documentation string for a plugin.
 ";
 
 %feature("docstring") casadi::lookupvector "
+
+>  std::vector<int> casadi::lookupvector(const std::vector< int > &v, int size)
+------------------------------------------------------------------------
 
 Returns a vector for quickly looking up entries of supplied list.
 
@@ -9964,10 +10029,7 @@ Get the documentation string for a plugin.
 
 ";
 
-%feature("docstring") casadi::casadi_densify "[INTERNAL]  Convert sparse to
-dense.
-
-";
+%feature("docstring") casadi::qpsol "";
 
 %feature("docstring") casadi::zip "[INTERNAL] ";
 
@@ -10060,6 +10122,20 @@ Checks if array does not contain NaN or Inf.
 
 %feature("docstring") casadi::slicot_mb03vy "";
 
+%feature("docstring") casadi::read_matlab "
+
+>  void casadi::read_matlab(std::istream &stream, std::vector< T > &v)
+------------------------------------------------------------------------
+
+Read vector, matlab style.
+
+>  void casadi::read_matlab(std::ifstream &file, std::vector< std::vector< T > > &v)
+------------------------------------------------------------------------
+
+Read matrix, matlab style.
+
+";
+
 %feature("docstring") casadi::_which_depends "[INTERNAL] ";
 
 %feature("docstring") casadi::casadi_polyval "[INTERNAL]  Evaluate a
@@ -10105,6 +10181,8 @@ scheme:   Collocation scheme, as excepted by collocationPoints function.
 Default input for an NLP solver.
 
 ";
+
+%feature("docstring") casadi::einstein_process "";
 
 %feature("docstring") casadi::casadi_interpn_weights "[INTERNAL] ";
 
@@ -10168,12 +10246,35 @@ List of plugins
 
 
 
+- bspline
+
 - linear
 
 Note: some of the plugins in this list might not be available on your
 system. Also, there might be extra plugins available to you that are not
 listed here. You can obtain their documentation with
 Interpolant.doc(\"myextraplugin\")
+
+
+
+--------------------------------------------------------------------------------
+
+bspline
+-------
+
+
+
+>List of available options
+
++------------------------+------------------------+------------------------+
+|           Id           |          Type          |      Description       |
++========================+========================+========================+
+| degree                 | OT_INTVECTOR           | Sets, for each grid    |
+|                        |                        | dimenion, the degree   |
+|                        |                        | of the spline.         |
++------------------------+------------------------+------------------------+
+
+--------------------------------------------------------------------------------
 
 
 
@@ -10553,6 +10654,8 @@ Get the documentation string for a plugin.
 
 ";
 
+%feature("docstring") casadi::casadi_de_boor "[INTERNAL] ";
+
 %feature("docstring") casadi::has_conic "
 
 Check if a particular plugin is available.
@@ -10622,6 +10725,8 @@ mul(A, y))
 trans(x) , w work vector (length >= rows x)
 
 ";
+
+%feature("docstring") casadi::casadi_nd_boor_eval "[INTERNAL] ";
 
 %feature("docstring") casadi::nlpsol_out "
 
@@ -10698,6 +10803,12 @@ Get output scheme name by index.
 ";
 
 %feature("docstring") casadi::has_expm "
+
+Check if a particular plugin is available.
+
+";
+
+%feature("docstring") casadi::has_linsol "
 
 Check if a particular plugin is available.
 
@@ -10812,7 +10923,10 @@ Get the number of QP solver inputs.
 
 ";
 
-%feature("docstring") casadi::qpsol "";
+%feature("docstring") casadi::casadi_densify "[INTERNAL]  Convert sparse to
+dense.
+
+";
 
 %feature("docstring") casadi::doc_rootfinder "
 

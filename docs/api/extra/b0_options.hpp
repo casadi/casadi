@@ -1,4 +1,114 @@
 /// \cond INTERNAL
+/** \class casadi::BSpline
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
+<tr><td>ad_weight</td><td>OT_DOUBLE</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>ad_weight_sp</td><td>OT_DOUBLE</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>compiler</td><td>OT_STRING</td><td>Just-in-time compiler plugin to be used.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_DOUBLE</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jit</td><td>OT_BOOL</td><td>Use just-in-time compiler to speed up the evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jit_options</td><td>OT_DICT</td><td>Options to be passed to the jit compiler.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>lookup_mode</td><td>OT_STRINGVECTOR</td><td>Sets, for each grid dimenion, the lookup algorithm used to find the correct index. 'linear' uses a for-loop + break; 'exact' uses floored division (only for uniform grids).</td><td>casadi::BSpline</td></tr>
+<tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
+</table>
+*/
+/// \endcond
+/// \cond INTERNAL
+/** \class casadi::BSplineCommon
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
+<tr><td>ad_weight</td><td>OT_DOUBLE</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>ad_weight_sp</td><td>OT_DOUBLE</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>compiler</td><td>OT_STRING</td><td>Just-in-time compiler plugin to be used.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_DOUBLE</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jit</td><td>OT_BOOL</td><td>Use just-in-time compiler to speed up the evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jit_options</td><td>OT_DICT</td><td>Options to be passed to the jit compiler.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>lookup_mode</td><td>OT_STRINGVECTOR</td><td>Sets, for each grid dimenion, the lookup algorithm used to find the correct index. 'linear' uses a for-loop + break; 'exact' uses floored division (only for uniform grids).</td><td>casadi::BSplineCommon</td></tr>
+<tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
+</table>
+*/
+/// \endcond
+/// \cond INTERNAL
+/** \class casadi::BSplineDual
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
+<tr><td>ad_weight</td><td>OT_DOUBLE</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>ad_weight_sp</td><td>OT_DOUBLE</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>compiler</td><td>OT_STRING</td><td>Just-in-time compiler plugin to be used.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_DOUBLE</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jit</td><td>OT_BOOL</td><td>Use just-in-time compiler to speed up the evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jit_options</td><td>OT_DICT</td><td>Options to be passed to the jit compiler.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>lookup_mode</td><td>OT_STRINGVECTOR</td><td>Sets, for each grid dimenion, the lookup algorithm used to find the correct index. 'linear' uses a for-loop + break; 'exact' uses floored division (only for uniform grids).</td><td>casadi::BSplineDual</td></tr>
+<tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
+</table>
+*/
+/// \endcond
+/// \cond INTERNAL
+/** \class casadi::BSplineInterpolant
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
+<tr><td>degree</td><td>OT_INTVECTOR</td><td>Sets, for each grid dimenion, the degree of the spline.</td><td>casadi::BSplineInterpolant</td></tr>
+</table>
+*/
+/// \endcond
+/** \addtogroup plugin_Interpolant_bspline
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Description</th></tr>
+<tr><td>degree</td><td>OT_INTVECTOR</td><td>Sets, for each grid dimenion, the degree of the spline.</td></tr>
+</table>
+*/
+/** \addtogroup general_BSplineInterpolant
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
+<tr><td>degree</td><td>OT_INTVECTOR</td><td>Sets, for each grid dimenion, the degree of the spline.</td><td>casadi::BSplineInterpolant</td></tr>
+</table>
+*/
+/// \cond INTERNAL
 /** \class casadi::Blocksqp
 \n
 \par
@@ -1525,6 +1635,68 @@
 </table>
 */
 /// \endcond
+/// \cond INTERNAL
+/** \class casadi::Lsqr
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
+<tr><td>ad_weight</td><td>OT_DOUBLE</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>ad_weight_sp</td><td>OT_DOUBLE</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>codegen</td><td>OT_BOOL</td><td>C-code generation</td><td>casadi::Lsqr</td></tr>
+<tr><td>compiler</td><td>OT_STRING</td><td>Compiler command to be used for compiling generated code</td><td>casadi::Lsqr</td></tr>
+<tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_DOUBLE</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jit</td><td>OT_BOOL</td><td>Use just-in-time compiler to speed up the evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jit_options</td><td>OT_DICT</td><td>Options to be passed to the jit compiler.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
+</table>
+*/
+/// \endcond
+/** \addtogroup plugin_Linsol_symbolicqr
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Description</th></tr>
+<tr><td>codegen</td><td>OT_BOOL</td><td>C-code generation</td></tr>
+<tr><td>compiler</td><td>OT_STRING</td><td>Compiler command to be used for compiling generated code</td></tr>
+</table>
+*/
+/** \addtogroup general_Lsqr
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
+<tr><td>ad_weight</td><td>OT_DOUBLE</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>ad_weight_sp</td><td>OT_DOUBLE</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>codegen</td><td>OT_BOOL</td><td>C-code generation</td><td>casadi::Lsqr</td></tr>
+<tr><td>compiler</td><td>OT_STRING</td><td>Compiler command to be used for compiling generated code</td><td>casadi::Lsqr</td></tr>
+<tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_DOUBLE</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jit</td><td>OT_BOOL</td><td>Use just-in-time compiler to speed up the evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jit_options</td><td>OT_DICT</td><td>Options to be passed to the jit compiler.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
+</table>
+*/
 /// \cond INTERNAL
 /** \class casadi::MXFunction
 \n
