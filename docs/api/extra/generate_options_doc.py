@@ -186,6 +186,9 @@ def brackets(a):
 
 def gbrackets(a):
   return Group(brackets(a))
+  
+def delimitedListTrailing( expr, delim=","):
+    return ( expr + ZeroOrMore( Suppress( delim ) + expr ) + Optional( Suppress(delim) ) )
 
 
 parse_optiondata = parse_type + comma + parse_quoted_string
@@ -194,7 +197,7 @@ parse_optiondata_collection = gbrackets(parse_optiondata)
 parse_option = parse_quoted_string + comma + parse_optiondata_collection
 parse_option_collection = gbrackets(parse_option)
 
-parse_options = delimitedList(parse_option_collection, delim=",")
+parse_options = delimitedListTrailing(parse_option_collection, delim=",")
 parse_options_collection = gbrackets(parse_options)
 
 parse_options_group = (brackets( Suppress(Literal("&")) + Word(alphanums + ".:-_"))) | parse_options_collection
