@@ -537,6 +537,7 @@ namespace casadi {
 #ifndef SWIG
   template<typename MatType>
   MatType SparsityInterface<MatType>::vec(const MatType& x) {
+    if (x.size2()==1) return x;
     return reshape(x, x.numel(), 1);
   }
 
