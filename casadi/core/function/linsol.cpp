@@ -173,4 +173,16 @@ namespace casadi {
     return (*this)->linsol_cholesky((*this)->memory(0), tr);
   }
 
+  bool has_linsol(const string& name) {
+    return Linsol::has_plugin(name);
+  }
+
+  void load_linsol(const string& name) {
+    Linsol::load_plugin(name);
+  }
+
+  string doc_linsol(const string& name) {
+    return Linsol::doc(name);
+  }
+
 } // namespace casadi

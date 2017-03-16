@@ -79,7 +79,7 @@ def nullspacewrapper(name, sp, options):
 
 nsolvers.append((nullspacewrapper,{},set()))
 
-print(lsolvers)
+print("linear solvers", lsolvers)
 
 class LinearSolverTests(casadiTestCase):
 
@@ -282,34 +282,6 @@ class LinearSolverTests(casadiTestCase):
       res = np.linalg.solve(A0,b)
       self.checkarray(x, res)
 
-  def test_simple_function_direct(self):
-
-    for Solver, options,req in lsolvers:
-      A_ = DM([[3,1],[7,2]])
-      if "symmetry" in req: A_ = A_.T + A_
-      A = MX.sym("A",A_.sparsity())
-      b_ = DM([1,0.5])
-      b = MX.sym("b",b_.sparsity())
-
-      print(Solver)
-      solver = casadi.linsol_new("solver", Solver, A.sparsity(),1, options)
-      solver_in = {}
-      solver_in["A"]=A_
-      solver_in["B"]=b_
-
-      A_0 = A[0,0]
-      A_1 = A[0,1]
-      A_2 = A[1,0]
-      A_3 = A[1,1]
-
-      b_0 = b[0]
-      b_1 = b[1]
-
-      solution = Function("solution", {"A":A, "B":b, "X":vertcat(*[(((A_3/((A_0*A_3)-(A_2*A_1)))*b_0)+(((-A_1)/((A_0*A_3)-(A_2*A_1)))*b_1)),((((-A_2)/((A_0*A_3)-(A_2*A_1)))*b_0)+((A_0/((A_0*A_3)-(A_2*A_1)))*b_1))])}, ["A","B"], ["X"])
-
-      self.checkfunction(solver,solution,inputs=solver_in,jacobian=False,evals=False)
-
-
   def test_simple_function_indirect(self):
 
     for Solver, options,req in lsolvers:
@@ -319,12 +291,12 @@ class LinearSolverTests(casadiTestCase):
       b = MX.sym("b",b_.sparsity())
       if "symmetry" in req: A_ = A_.T + A_
       print(Solver)
-      solver = casadi.linsol_new("solver", Solver, A.sparsity(), 1, options)
+      solver = casadi.Linsol("solver", Solver, options)
       solver_in = {}
       solver_in["A"]=A_
       solver_in["B"]=b_
 
-      sol = solver(A=A,B=b)
+      sol = {"X": solver.solve(A,b)}
       sol["A"] = A
       sol["B"] = b
       relay = Function("relay", sol, ["A","B"], ["X"])
@@ -501,14 +473,16 @@ class LinearSolverTests(casadiTestCase):
       As = MX.sym("A",A.sparsity())
       bs = MX.sym("B",b.sparsity())
       C = solve(A,b,Solver,options)
+      
+      digits = 7 if "ma" in str(Solver) else 10
 
-      self.checkarray(mtimes(A,C),b)
+      self.checkarray(mtimes(A,C),b,digits=digits)
 
       for As_,A_ in [(As,A),(densify(As),densify(A)),(densify(As).T,densify(A).T),(densify(As.T),densify(A.T)),(As.T,A.T)]:
         f = Function("f", [As,bs],[solve(As_,bs,Solver,options)])
         f_out = f(A, b)
 
-        self.checkarray(mtimes(A_,f_out),b)
+        self.checkarray(mtimes(A_,f_out),b,digits=digits)
 
   def test_dimmismatch(self):
     A = DM.eye(5)

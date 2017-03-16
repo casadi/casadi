@@ -122,6 +122,15 @@ namespace casadi {
     int rank() const;
   };
 
+  /// Check if a particular plugin is available
+  CASADI_EXPORT bool has_linsol(const std::string& name);
+
+  /// Explicitly load a plugin dynamically
+  CASADI_EXPORT void load_linsol(const std::string& name);
+
+  /// Get the documentation string for a plugin
+  CASADI_EXPORT std::string doc_linsol(const std::string& name);
+
 } // namespace casadi
 
 #endif // CASADI_LINSOL_HPP
