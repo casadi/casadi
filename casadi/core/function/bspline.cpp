@@ -240,9 +240,6 @@ namespace casadi {
 
     std::vector<double> BSpline::derivative_coeff(int i) const {
       int n_dims = degree_.size();
-      std::vector<int> coeffs_dims(n_dims+1);
-      coeffs_dims[0] = m_;
-      for (int k=0;k<n_dims;++k) coeffs_dims[k+1] = offset_[k+1]-offset_[k]-degree_[k]-1;
 
       std:vector<double> coeffs;
       int n_knots = offset_[i+1]-offset_[i];
@@ -260,10 +257,10 @@ namespace casadi {
       for (int j=0;j<n_dims+1;++j) ai[j] = -j-1;
       std::vector<int> bi = std::vector<int>{-n_dims-2, -i-2};
       std::vector<int> ci = ai; ci[i+1] = {-n_dims-2};
-      std::vector<int> coeffs_dims_new = coeffs_dims;
+      std::vector<int> coeffs_dims_new = coeffs_dims_;
       coeffs_dims_new[i+1] = T.size1();
 
-      DM r = einstein(DM(coeffs_), vec(T*degree_[i]), coeffs_dims, {T.size1(), T.size2()},
+      DM r = einstein(DM(coeffs_), vec(T*degree_[i]), coeffs_dims_, {T.size1(), T.size2()},
         coeffs_dims_new, ai, bi, ci);
       coeffs = r.nonzeros();
       casadi_assert(coeffs.size()==product(coeffs_dims_new));
