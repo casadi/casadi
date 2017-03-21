@@ -152,7 +152,7 @@ namespace casadi {
 
   // Find the interval to which a value belongs
   template<typename real_t>
-  int CASADI_PREFIX(low)(real_t x, const double* grid, int ng);
+  int CASADI_PREFIX(low)(real_t x, const double* grid, int ng, int lookup_mode);
 
   // Get weights for the multilinear interpolant
   template<typename real_t>
@@ -692,23 +692,18 @@ namespace casadi {
 
   template<typename real_t>
   int CASADI_PREFIX(low)(real_t x, const double* grid, int ng, int lookup_mode) {
-    switch(lookup_mode) {
-      case 0:
-        {
-          int i;
-          for (i=0; i<ng-2; ++i) {
-            if (x < grid[i+1]) break;
-          }
-          return i;
-        }
-      case 1:
-        {
-          double g0 = grid[0];
-          int ret = (int) ((x-g0)*(ng-1)/(grid[ng-1]-g0));
-          if (ret<0) ret=0;
-          if (ret>ng-2) ret=ng-2;
-          return ret;
-        }
+    if (lookup_mode) {
+      double g0 = grid[0];
+      int ret = (int) ((x-g0)*(ng-1)/(grid[ng-1]-g0));
+      if (ret<0) ret=0;
+      if (ret>ng-2) ret=ng-2;
+      return ret;
+    } else {
+      int i;
+      for (i=0; i<ng-2; ++i) {
+        if (x < grid[i+1]) break;
+      }
+      return i;
     }
   }
 
