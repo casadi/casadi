@@ -422,9 +422,9 @@ namespace casadi {
         // accumulate result
         for (int i=0;i<m;++i) {
           if (reverse) {
-            ret[coeff_offset[0]+i] += c[i];
+            ret[coeff_offset[0]+i] |= c[i];
           } else {
-            ret[i] += c[coeff_offset[0]+i];
+            ret[i] |= c[coeff_offset[0]+i];
           }
         }
 
