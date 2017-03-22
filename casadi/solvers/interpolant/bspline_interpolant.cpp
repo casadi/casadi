@@ -45,9 +45,12 @@ namespace casadi {
 
   Options BSplineInterpolant::options_
   = {{&Interpolant::options_},
-     {{"degree",
+      {{"degree",
        {OT_INTVECTOR,
-        "Sets, for each grid dimenion, the degree of the spline."}}
+        "Sets, for each grid dimenion, the degree of the spline."}},
+       {"linear_solver",
+        {OT_STRING,
+         "Solver used for constructing the coefficient tensor."}}
      }
   };
 
@@ -115,10 +118,14 @@ namespace casadi {
 
     degree_  = std::vector<int>(offset_.size()-1, 3);
 
+    linear_solver_ = "lsqr";
+
     // Read options
     for (auto&& op : opts) {
       if (op.first=="degree") {
         degree_ = op.second;
+      } else if (op.first=="linear_solver") {
+        linear_solver_ = op.second.to_string();
       }
     }
 
@@ -148,7 +155,7 @@ namespace casadi {
 
     casadi_assert(J.size1()==J.size2());
 
-    DM C_opt = solve(J, DM(values_), "lsqr");
+    DM C_opt = solve(J, DM(values_), linear_solver_);
 
     double fit = static_cast<double>(norm_1(mtimes(J, C_opt) - DM(values_)));
 

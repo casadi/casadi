@@ -104,6 +104,9 @@ namespace casadi {
     /// Degree of the spline
     std::vector<int> degree_;
 
+    /// Linear solvere
+    std::string linear_solver_;
+
     // Spline Function
     Function S_;
   };
