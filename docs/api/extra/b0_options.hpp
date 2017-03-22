@@ -87,6 +87,7 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
 <tr><td>degree</td><td>OT_INTVECTOR</td><td>Sets, for each grid dimenion, the degree of the spline.</td><td>casadi::BSplineInterpolant</td></tr>
+<tr><td>linear_solver</td><td>OT_STRING</td><td>Solver used for constructing the coefficient tensor.</td><td>casadi::BSplineInterpolant</td></tr>
 </table>
 */
 /// \endcond
@@ -97,6 +98,7 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th></tr>
 <tr><td>degree</td><td>OT_INTVECTOR</td><td>Sets, for each grid dimenion, the degree of the spline.</td></tr>
+<tr><td>linear_solver</td><td>OT_STRING</td><td>Solver used for constructing the coefficient tensor.</td></tr>
 </table>
 */
 /** \addtogroup general_BSplineInterpolant
@@ -106,6 +108,7 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
 <tr><td>degree</td><td>OT_INTVECTOR</td><td>Sets, for each grid dimenion, the degree of the spline.</td><td>casadi::BSplineInterpolant</td></tr>
+<tr><td>linear_solver</td><td>OT_STRING</td><td>Solver used for constructing the coefficient tensor.</td><td>casadi::BSplineInterpolant</td></tr>
 </table>
 */
 /// \cond INTERNAL
