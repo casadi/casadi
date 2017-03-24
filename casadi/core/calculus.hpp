@@ -515,7 +515,9 @@ namespace casadi {
 
   ///@{
   /// If evaluated with both arguments zero, is the result zero?
-  template<int I> struct F00Checker { static const bool check=F0XChecker<I>::check;};
+  template<int I> struct F00Checker {
+    static const bool check=F0XChecker<I>::check || FX0Checker<I>::check;
+  };
   template<>      struct F00Checker<OP_ADD>{ static const bool check=true;};
   template<>      struct F00Checker<OP_SUB>{ static const bool check=true;};
   template<>      struct F00Checker<OP_FMIN>{ static const bool check=true;};
@@ -523,6 +525,7 @@ namespace casadi {
   template<>      struct F00Checker<OP_AND>{ static const bool check=true;};
   template<>      struct F00Checker<OP_OR>{ static const bool check=true;};
   template<>      struct F00Checker<OP_COPYSIGN>{ static const bool check=true;};
+  template<>      struct F00Checker<OP_LT>{ static const bool check=true;};
   ///@}
 
   ///@{
