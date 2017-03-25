@@ -2562,6 +2562,10 @@ class MXtests(casadiTestCase):
     
     self.checkarray(C, C1)
     self.checkarray(C1, C2)
+  def test_sparse_lt(self):
+    x = MX.sym("x",Sparsity.lower(5))
+    self.assertEqual((x>0).nnz(),5*6/2)
+    self.assertEqual((x>=0).nnz(),5*5)
           
 if __name__ == '__main__':
     unittest.main()
