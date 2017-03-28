@@ -3048,8 +3048,8 @@ DECL M casadi_expm(const M& A) {
   return expm(A);
 }
 
-DECL M casadi_jacobian(const M &ex, const M &arg) {
-  return jacobian(ex, arg);
+DECL M casadi_jacobian(const M &ex, const M &arg, const Dict& opts=Dict()) {
+  return jacobian(ex, arg, opts);
 }
 
 DECL M casadi_jtimes(const M& ex, const M& arg, const M& v, bool tr=false) {
