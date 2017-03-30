@@ -802,7 +802,7 @@ class SXtests(casadiTestCase):
 
   def test_if_else(self):
     x = SX.sym("x")
-    y = if_else(x,1,2)
+    y = if_else(x,1,2,False)
     f = Function("f", [x],[y])
     f_in = [0]*f.n_in();f_in[0]=1
     f_out = f.call(f_in)
@@ -812,7 +812,7 @@ class SXtests(casadiTestCase):
     self.assertTrue(f_out[0]==2,"if_else")
 
     x0 = 2.1
-    y = if_else(x>1,x**2,x**3)
+    y = if_else(x>1,x**2,x**3,False)
     f = Function("f", [x],[y])
     f_in = [0]*f.n_in();f_in[0]=x0
     f_out = f.call(f_in)
@@ -1280,7 +1280,7 @@ class SXtests(casadiTestCase):
 
       a = 1+3*x+sqrt(3*x)*x+7*x
       b = 1+2*x+sin(2*x)*x +x
-      z = if_else(x>0,a,b)*x
+      z = if_else(x>0,a,b,False)*x
 
       f = Function("f",[x],[z,jacobian(z,x)])
       fa = Function("f",[x],[a*x,jacobian(a*x,x)])

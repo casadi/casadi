@@ -2638,29 +2638,29 @@ class NZproxy:
       return n==1 ? $self->numel() : i==1 ? $self->size1() : $self->size2();
     }
 
-    
+
     // Needed for brace syntax to access nonzeros
     int numel(int k) const {
       return 1;
     }
-    
+
     // Needed for brace syntax to access nonzeros
     int numel(char rr) const {
       casadi_assert(rr==':');
       return 1;
     }
-    
+
     // Needed for brace syntax to access nonzeros
     int numel(const std::vector<int> &k) const {
       return 1;
     }
-    
+
     // Needed because original numel call gets hidden by the above extend overloads
     int numel() const {
       return $self->numel();
     }
 
-    
+
     // Transpose using the A' syntax in addition to A.'
     Type ctranspose() const { return $self->T();}
 
@@ -3008,12 +3008,12 @@ DECL M casadi_project(const M& A, const Sparsity& sp, bool intersect=false) {
 }
 
 DECL M casadi_if_else(const M& cond, const M& if_true,
-                    const M& if_false, bool short_circuit=true) {
+                    const M& if_false, bool short_circuit) {
   return if_else(cond, if_true, if_false, short_circuit);
 }
 
 DECL M casadi_conditional(const M& ind, const std::vector< M > &x,
-                        const M& x_default, bool short_circuit=true) {
+                        const M& x_default, bool short_circuit) {
   return conditional(ind, x, x_default, short_circuit);
 }
 

@@ -784,7 +784,7 @@ class typemaptests(casadiTestCase):
   def test_issue1217(self):
     a = numpy.matrix([0,SX.sym("x")])
 
-    print(if_else(0,a,a))
+    print(if_else(0,a,a,False))
 
   def test_issue1373(self):
     print(np.array(casadi.DM([2])))
