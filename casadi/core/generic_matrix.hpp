@@ -442,7 +442,7 @@ namespace casadi {
      * then x[k] will be returned, otherwise \param x_default will be returned.
      */
     inline friend MatType conditional(const MatType& ind, const std::vector<MatType> &x,
-                                      const MatType &x_default, bool short_circuit=true) {
+                                      const MatType &x_default, bool short_circuit) {
       return MatType::conditional(ind, x, x_default, short_circuit);
     }
 
