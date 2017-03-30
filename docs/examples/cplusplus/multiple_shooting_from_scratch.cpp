@@ -156,7 +156,6 @@ int main(){
   Dict opts;
   opts["ipopt.tol"] = 1e-5;
   opts["ipopt.max_iter"] = 100;
-  opts["ipopt.linear_solver"] = "ma27";
 
   // Create an NLP solver and buffers
   Function solver = nlpsol("nlpsol", "ipopt", nlp, opts);
