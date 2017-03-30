@@ -432,7 +432,7 @@ namespace casadi {
         Ternary operator, "cond ? if_true : if_false"
     */
     inline friend MatType if_else(const MatType &cond, const MatType &if_true,
-                                  const MatType &if_false, bool short_circuit) {
+                                  const MatType &if_false, bool short_circuit=false) {
       return MatType::if_else(cond, if_true, if_false, short_circuit);
     }
 
@@ -442,7 +442,7 @@ namespace casadi {
      * then x[k] will be returned, otherwise \param x_default will be returned.
      */
     inline friend MatType conditional(const MatType& ind, const std::vector<MatType> &x,
-                                      const MatType &x_default, bool short_circuit) {
+                                      const MatType &x_default, bool short_circuit=false) {
       return MatType::conditional(ind, x, x_default, short_circuit);
     }
 

@@ -417,7 +417,7 @@ namespace casadi {
 
       // Evaluate ifs
       for (int i=n-3; i>=0; i -= 2) {
-        ex = if_else(read_expr(node[i]), read_expr(node[i+1]), ex, false);
+        ex = if_else(read_expr(node[i]), read_expr(node[i+1]), ex);
       }
 
       return ex;

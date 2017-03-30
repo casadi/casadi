@@ -2190,6 +2190,8 @@ namespace casadi {
                                              const Matrix<Scalar> &if_true,
                                              const Matrix<Scalar> &if_false,
                                              bool short_circuit) {
+    casadi_assert_message(!short_circuit,
+      "Short-circuiting 'if_else' not supported for " + type_name());
     return cond*if_true + !cond*if_false;
   }
 
@@ -2198,6 +2200,8 @@ namespace casadi {
                                                  const std::vector<Matrix<Scalar> >& x,
                                                  const Matrix<Scalar>& x_default,
                                                  bool short_circuit) {
+    casadi_assert_message(!short_circuit,
+      "Short-circuiting 'conditional' not supported for " + type_name());
     casadi_assert_message(ind.is_scalar(true),
       "conditional: first argument must be scalar. Got " + ind.dim()+ " instead.");
 

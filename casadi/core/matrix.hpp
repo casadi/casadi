@@ -316,11 +316,11 @@ namespace casadi {
     static Matrix<Scalar> if_else(const Matrix<Scalar> &x,
                                     const Matrix<Scalar> &if_true,
                                     const Matrix<Scalar> &if_false,
-                                    bool short_circuit);
+                                    bool short_circuit=false);
     static Matrix<Scalar> conditional(const Matrix<Scalar> &ind,
                                         const std::vector<Matrix<Scalar> > &x,
                                         const Matrix<Scalar> &x_default,
-                                        bool short_circuit);
+                                        bool short_circuit=false);
     static bool depends_on(const Matrix<Scalar> &x, const Matrix<Scalar> &arg);
     static Matrix<Scalar> mpower(const Matrix<Scalar> &x, const Matrix<Scalar> &y);
     static Matrix<Scalar> mrdivide(const Matrix<Scalar> &x, const Matrix<Scalar> &y);

@@ -208,7 +208,7 @@ namespace casadi {
       SX skBksk = dot(sk, qk);
       SX omega = if_else(dot(yk, sk) < 0.2 * dot(sk, qk),
                          0.8 * skBksk / (skBksk - dot(sk, yk)),
-                         1, false);
+                         1);
       yk = omega * yk + (1 - omega) * qk;
       SX theta = 1. / dot(sk, yk);
       SX phi = 1. / dot(qk, sk);
