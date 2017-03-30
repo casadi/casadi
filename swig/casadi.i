@@ -3008,12 +3008,12 @@ DECL M casadi_project(const M& A, const Sparsity& sp, bool intersect=false) {
 }
 
 DECL M casadi_if_else(const M& cond, const M& if_true,
-                    const M& if_false, bool short_circuit) {
+                    const M& if_false, bool short_circuit=false) {
   return if_else(cond, if_true, if_false, short_circuit);
 }
 
 DECL M casadi_conditional(const M& ind, const std::vector< M > &x,
-                        const M& x_default, bool short_circuit) {
+                        const M& x_default, bool short_circuit=false) {
   return conditional(ind, x, x_default, short_circuit);
 }
 

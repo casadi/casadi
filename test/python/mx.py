@@ -1216,7 +1216,7 @@ class MXtests(casadiTestCase):
 
   def test_if_else_zero(self):
     x = MX.sym("x")
-    y = if_else(x,5,0,False)
+    y = if_else(x,5,0)
     f = Function("f", [x],[y])
     f_in = 1
     f_out = f(f_in)
@@ -1228,7 +1228,7 @@ class MXtests(casadiTestCase):
 
   def test_if_else(self):
     x = MX.sym("x")
-    y = if_else(x,1,2,False)
+    y = if_else(x,1,2)
     f = Function("f", [x],[y])
     f_in = 1
     f_out = f(f_in)
