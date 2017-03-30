@@ -432,7 +432,7 @@ namespace casadi {
         Ternary operator, "cond ? if_true : if_false"
     */
     inline friend MatType if_else(const MatType &cond, const MatType &if_true,
-                                  const MatType &if_false, bool short_circuit=true) {
+                                  const MatType &if_false, bool short_circuit) {
       return MatType::if_else(cond, if_true, if_false, short_circuit);
     }
 

@@ -437,7 +437,7 @@ namespace casadi {
                               std::vector<MX>& vdef, const std::string& v_prefix,
                               const std::string& v_suffix);
     static MX if_else(const MX& cond, const MX& if_true,
-                      const MX& if_false, bool short_circuit=true);
+                      const MX& if_false, bool short_circuit);
     static MX conditional(const MX& ind, const std::vector<MX> &x, const MX& x_default,
                           bool short_circuit=true);
     static bool depends_on(const MX& x, const MX& arg);

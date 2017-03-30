@@ -1129,7 +1129,7 @@ namespace casadi {
     } else {
       MX ret = x_default;
       for (int k=0; k<x.size(); ++k) {
-        ret = if_else(ind==k, x[k], ret);
+        ret = if_else(ind==k, x[k], ret, false);
       }
       return ret;
     }

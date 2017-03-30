@@ -416,7 +416,7 @@ namespace casadi {
       MX ex = read_expr(node[n-1]);
 
       // Evaluate ifs
-      for (int i=n-3; i>=0; i -= 2) ex = if_else(read_expr(node[i]), read_expr(node[i+1]), ex);
+      for (int i=n-3; i>=0; i -= 2) ex = if_else(read_expr(node[i]), read_expr(node[i+1]), ex, false);
 
       return ex;
     } else if (name.compare("Pow")==0) {
