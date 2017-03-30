@@ -4916,14 +4916,14 @@ Forward directional derivative.
 ";
 
 %feature("docstring")  if_else(const MatType &cond, const MatType &if_true,
-const MatType &if_false, bool short_circuit=true) "
+const MatType &if_false, bool short_circuit) "
 
 Branching on MX nodes Ternary operator, \"cond ? if_true : if_false\".
 
 ";
 
 %feature("docstring")  conditional(const MatType &ind, const std::vector<
-MatType > &x, const MatType &x_default, bool short_circuit=true) "
+MatType > &x, const MatType &x_default, bool short_circuit) "
 
 Create a switch.
 
