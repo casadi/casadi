@@ -429,7 +429,8 @@ namespace casadi {
       DM Ac = A->getMatrixValue();
       DM Bc = B->getMatrixValue();
       DM Cc = C->getMatrixValue();
-      return einstein(vec(densify(Ac)), vec(densify(Bc)), vec(densify(Cc)), dim_a, dim_b, dim_c, a, b, c);
+      return einstein(vec(densify(Ac)), vec(densify(Bc)), vec(densify(Cc)),
+        dim_a, dim_b, dim_c, a, b, c);
     }
 
     return MX::create(new Einstein(C, densify(A), densify(B), dim_c, dim_a, dim_b, c, a, b));
