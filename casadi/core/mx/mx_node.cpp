@@ -419,7 +419,19 @@ namespace casadi {
       const std::vector<int>& dim_c, const std::vector<int>& dim_a, const std::vector<int>& dim_b,
       const std::vector<int>& c, const std::vector<int>& a, const std::vector<int>& b) const {
 
+    if (A.is_zero() || B.is_zero())
+      return shared_from_this<MX>();
+
     MX C = densify(shared_from_this<MX>());
+
+    if (A.is_constant() && B.is_constant() && C.is_constant()) {
+      // Constant folding
+      DM Ac = A->getMatrixValue();
+      DM Bc = B->getMatrixValue();
+      DM Cc = C->getMatrixValue();
+      return einstein(vec(densify(Ac)), vec(densify(Bc)), vec(densify(Cc)), dim_a, dim_b, dim_c, a, b, c);
+    }
+
     return MX::create(new Einstein(C, densify(A), densify(B), dim_c, dim_a, dim_b, c, a, b));
   }
 
