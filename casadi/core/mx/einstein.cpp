@@ -126,45 +126,41 @@ namespace casadi {
   }
 
   void Einstein::generate(CodeGenerator& g, const std::string& mem,
-                                const std::vector<int>& arg, const std::vector<int>& res) const {
+                          const std::vector<int>& arg, const std::vector<int>& res) const {
 
     // Copy first argument if not inplace
     if (arg[0]!=res[0]) {
-      g << "  " << g.copy(g.work(arg[0], nnz()), nnz(),
-                               g.work(res[0], nnz()));
+      g << g.copy(g.work(arg[0], nnz()), nnz(), g.work(res[0], nnz()));
     }
 
-    g.local("i", "int");
-    g.local("j", "int");
-    g.local("k", "int");
-
-    g.local("cr", "const real_t", "*");
-    g.local("cs", "const real_t", "*");
-
-    g.local("rr", "real_t", "*");
-
     // main loop
-    g << "  for (i=0;i<" << n_iter_ << ";++i) {\n";
+    g.local("i", "int");
+    g << "for (i=0; i<" << n_iter_ << "; ++i) {\n";
 
     // Data pointers
-    g << "    cr = " << g.work(arg[1], dep(1).nnz()) << "+" << strides_a_[0] << ";\n";
-    g << "    cs = " << g.work(arg[2], dep(2).nnz()) << "+" << strides_b_[0] << ";\n";
-    g << "    rr = " << g.work(res[0], dep(0).nnz()) << "+" << strides_c_[0] << ";\n";
+    g.local("cr", "const real_t", "*");
+    g.local("cs", "const real_t", "*");
+    g.local("rr", "real_t", "*");
+    g << "cr = " << g.work(arg[1], dep(1).nnz()) << "+" << strides_a_[0] << ";\n";
+    g << "cs = " << g.work(arg[2], dep(2).nnz()) << "+" << strides_b_[0] << ";\n";
+    g << "rr = " << g.work(res[0], dep(0).nnz()) << "+" << strides_c_[0] << ";\n";
 
     // Construct indices
-    g << "    k = i;\n";
-    for (int j=0;j<iter_dims_.size();++j) {
-      g << "    j = k % " << iter_dims_[j] << ";\n";
-      if (j+1<iter_dims_.size()) g << "    k/= " <<  iter_dims_[j] << ";\n";
-      if (strides_a_[1+j]) g << "    cr += j*" << strides_a_[1+j] << ";\n";
-      if (strides_b_[1+j]) g << "    cs += j*" << strides_b_[1+j] << ";\n";
-      if (strides_c_[1+j]) g << "    rr += j*" << strides_c_[1+j] << ";\n";
+    g.local("k", "int");
+    g << "k = i;\n";
+    for (int j=0; j<iter_dims_.size(); ++j) {
+      g.local("j", "int");
+      g << "j = k % " << iter_dims_[j] << ";\n";
+      if (j+1<iter_dims_.size()) g << "k /= " << iter_dims_[j] << ";\n";
+      if (strides_a_[1+j]) g << "cr += j*" << strides_a_[1+j] << ";\n";
+      if (strides_b_[1+j]) g << "cs += j*" << strides_b_[1+j] << ";\n";
+      if (strides_c_[1+j]) g << "rr += j*" << strides_c_[1+j] << ";\n";
     }
 
     // Perform the actual multiplication
-    g << "    (*rr) += (*cr)*(*cs);\n";
+    g << "*rr += *cr**cs;\n";
 
-    g << "  }\n";
+    g << "}\n";
   }
 
 } // namespace casadi
