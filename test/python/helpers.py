@@ -523,7 +523,7 @@ class casadiTestCase(unittest.TestCase):
       name = "codegen_%s" % (hashlib.md5(("%f" % np.random.random()+str(F)+str(time.time())).encode()).hexdigest())
       F.generate(name)
       import subprocess
-      p = subprocess.Popen("gcc -fPIC -shared -Wall -Werror -O3 %s.c -o %s.so" % (name,name) ,shell=True).wait()
+      p = subprocess.Popen("gcc -fPIC -shared -Wall -Werror -Wno-unknown-pragmas -O3 %s.c -o %s.so" % (name,name) ,shell=True).wait()
       F2 = external(F.name(), './' + name + '.so')
 
       Fout = F.call(inputs)
