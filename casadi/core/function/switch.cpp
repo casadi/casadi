@@ -418,10 +418,10 @@ namespace casadi {
             if (f_sp.nnz()==0) {
               g << "arg1[" << i << "]=0;\n";
             } else {
-              g.local("t", "real_t");
-              g << "arg1[" << i << "]=t=w, w+=" << f_sp.nnz() << ", "
-                << g.project("arg1[" + to_string(i) + "]", sp,
-                                            "t", f_sp, "w") << "\n";
+              g.local("t", "real_t", "*");
+              g << "t=w, w+=" << f_sp.nnz() << ";\n"
+                << g.project("arg1[" + to_string(i) + "]", sp, "t", f_sp, "w") << "\n"
+                << "arg1[" << i << "]=t;\n";
             }
           }
         }
