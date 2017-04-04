@@ -146,10 +146,12 @@ namespace casadi {
     g << "rr = " << g.work(res[0], dep(0).nnz()) << "+" << strides_c_[0] << ";\n";
 
     // Construct indices
-    g.local("k", "int");
-    g << "k = i;\n";
     for (int j=0; j<iter_dims_.size(); ++j) {
-      g.local("j", "int");
+      if (j==0) {
+        g.local("k", "int");
+        g << "k = i;\n";
+        g.local("j", "int");
+      }
       g << "j = k % " << iter_dims_[j] << ";\n";
       if (j+1<iter_dims_.size()) g << "k /= " << iter_dims_[j] << ";\n";
       if (strides_a_[1+j]) g << "cr += j*" << strides_a_[1+j] << ";\n";
