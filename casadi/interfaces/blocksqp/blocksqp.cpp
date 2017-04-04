@@ -419,7 +419,7 @@ namespace casadi {
       vector<MX> resv;
       vector<MX> argv = nlp.mx_in();
       resv = nlp(argv);
-    
+
       // build fesibility restoration phase nlp
       MX p = MX::sym("p",nlp.size1_in(0));
       MX s = MX::sym("s",nlp.size1_out(1));
@@ -430,13 +430,14 @@ namespace casadi {
       MX d = MX::vertcat(D);
       MX f_rp = 0.5 * rho_ * dot(s,s) + zeta_/2.0 * dot(d,d);
       MX g_rp = nlp(argv).at(1) - s;
-      
+
       MXDict nlp_rp = {{"x", MX::vertcat({MX::vertcat(argv),s})},
 	               {"p", p},
                        {"f", f_rp},
                        {"g", g_rp}};
-      //cout << "feasibility restoration phase nlp: " << nlp_rp << endl;
- 
+
+
+      // Set options for the SQP method for the restoration problem
       Dict solver_options;
       solver_options["globalization"] = true;
       solver_options["which_second_derv"] = 0;
@@ -446,58 +447,13 @@ namespace casadi {
       solver_options["hess_scaling"] = 2;
       solver_options["opttol"] = opttol_;
       solver_options["nlinfeastol"] = nlinfeastol_;
-      rp_solver_ = nlpsol("rpsolver", "blocksqp", nlp_rp, solver_options);
-      
-      /*
-      // test solving restoration problem (for example blocksqp_test.cpp)
-      DMDict solver_in;
-      solver_in["x0"]=vector<double>{1,1,2};
-      solver_in["p"]=vector<double>{1,1};
-      solver_in["lbx"]=vector<double>{-10,1.2,-inf};
-      solver_in["ubx"]=vector<double>{10,2,inf};
-      solver_in["lbg"]=-10;
-      solver_in["ubg"]=10;
-
-      auto solver_out = rp_solver_(solver_in);
-
-      vector<double> x_opt(solver_out.at("x"));
-      cout << "x_opt = " << x_opt << endl;
-      */
-
-      /*
-      // test with 1 iteration, then blocksqp::run with warmstart (for example blocksqp_test.cpp)
-      solver_options["globalization"] = true;
-      solver_options["which_second_derv"] = 0;
-      solver_options["restore_feas"] = false;
-      solver_options["hess_update"] = 2;
-      solver_options["hess_lim_mem"] = 1;
-      solver_options["hess_scaling"] = 2;
-      solver_options["opttol"] = opttol_;
-      solver_options["nlinfeastol"] = nlinfeastol_;
       solver_options["max_iter"] = 1;
+      // solver_options["print_time"] = false;
+      // solver_options["print_header"] = false;
+      // solver_options["print_iteration"] = false;
+
+      // Create and initialize solver for the restoration problem
       rp_solver_ = nlpsol("rpsolver", "blocksqp", nlp_rp, solver_options);
-
-      DMDict solver_in;
-      solver_in["x0"]=vector<double>{1,1,2};
-      solver_in["p"]=vector<double>{1,1};
-      solver_in["lbx"]=vector<double>{-10,1.2,-inf};
-      solver_in["ubx"]=vector<double>{10,2,inf};
-      solver_in["lbg"]=-10;
-      solver_in["ubg"]=10;
-
-      auto solver_out = rp_solver_(solver_in);
-
-      vector<double> x_opt(solver_out.at("x"));
-      cout << "x_opt = " << x_opt << endl;
-
-      void* mem2 = rp_solver_.memory(0);
-      auto m2 = static_cast<BlocksqpMemory*>(mem2);
-      const Blocksqp* bp = static_cast<const Blocksqp*>(rp_solver_.get());
-      bp->run(m2,1,1); // try run with warmstart <- doesn't work (getting segmentation fault (core dumped))
-      mem2 = rp_solver_.memory(0);
-      m2 = static_cast<BlocksqpMemory*>(mem2);
-      cout << "HERE OBJ AFTER SOLVE: " << m2->obj << endl;
-      */
     }
 
     // Setup NLP functions
@@ -741,6 +697,8 @@ namespace casadi {
     ret = run(m, max_iter_, warmstart_);
 
     m->fstats.at("mainloop").toc();
+
+    m->ret_ = ret;
 
     if (ret==1) casadi_warning("Maximum number of iterations reached");
 
@@ -1449,8 +1407,198 @@ namespace casadi {
     // No Feasibility restoration phase
     if (!restore_feas_) return -1;
 
-    casadi_error("not implemented");
-    return 0;
+    m->nRestPhaseCalls++;
+
+    int ret, it, i, k, info;
+    int maxRestIt = 100;
+    int warmStart;
+    double cNormTrial, objTrial, lStpNorm;
+
+
+    // Create Input for the minimum norm NLP
+    DMDict solver_in;
+
+    // The reference point is the starting value for the restoration phase
+    vector<double> in_x0(m->xk,m->xk+nx_);
+
+    // Initialize slack variables such that the constraints are feasible
+    for( i=0; i<ng_; ++i){
+      if( m->gk[i] <= m->lbg[i])
+        in_x0.push_back( m->gk[i] - m->lbg[i] );
+      else if( m->gk[i] > m->ubg[i] )
+        in_x0.push_back( m->gk[i] - m->ubg[i] );
+      else
+        in_x0.push_back( 0.0 );
+    }
+    
+    // Set parameter p to current iterate xk
+    vector<double> in_p(m->xk,m->xk+nx_);
+
+    // Set bounds for variables
+    vector<double> in_lbx(m->lbx,m->lbx+nx_);
+    vector<double> in_ubx(m->ubx,m->ubx+nx_);
+    for( i=0; i<ng_; ++i){
+      in_lbx.push_back(-inf);
+      in_ubx.push_back(inf);
+    }
+
+    // Set bounds for constraints
+    vector<double> in_lbg(m->lbg,m->lbg+ng_);
+    vector<double> in_ubg(m->ubg,m->ubg+ng_);
+
+    solver_in["x0"]=in_x0;
+    solver_in["p"]=in_p;
+    solver_in["lbx"]=in_lbx;
+    solver_in["ubx"]=in_ubx;
+    solver_in["lbg"]=in_lbg;
+    solver_in["ubg"]=in_ubg;
+
+      /*
+
+        Consider the following simple call:
+        auto solver_out = rp_solver_(solver_in);
+
+        This call in fact allocates memory,
+        calls a memory-less eval(),
+        and clears up the memory again.
+
+        Since we want to access the memory later on,
+        we need to unravel the simple call into its parts,
+        and avoid the memory cleanup
+
+      */
+
+    // perform first iteration for the minimum norm NLP
+
+    // Get the number of inputs and outputs
+    int n_in = rp_solver_.n_in();
+    int n_out = rp_solver_.n_out();
+
+    // Get default inputs
+    vector<DM> arg_v(n_in);
+    for (int i=0; i<arg_v.size(); ++i)
+      arg_v[i] = DM::repmat(rp_solver_.default_in(i), rp_solver_.size1_in(i), 1);
+
+    // Assign provided inputs
+    for (auto&& e : solver_in) arg_v.at(rp_solver_.index_in(e.first)) = e.second;
+
+    // Check sparsities
+    for (int i=0; i<arg_v.size(); ++i)
+      casadi_assert(arg_v[i].sparsity()==rp_solver_.sparsity_in(i));
+
+    // Allocate results
+    std::vector<DM> res(n_out);
+    for (int i=0; i<n_out; ++i) {
+      if (res[i].sparsity()!=rp_solver_.sparsity_out(i))
+        res[i] = DM::zeros(rp_solver_.sparsity_out(i));
+    }
+
+    // Allocate temporary memory if needed
+    std::vector<int> iw_tmp(rp_solver_.sz_iw());
+    std::vector<double> w_tmp(rp_solver_.sz_w());
+
+    // Get pointers to input arguments
+    std::vector<const double*> argp(rp_solver_.sz_arg());
+    for (int i=0; i<n_in; ++i) argp[i]=get_ptr(arg_v[i]);
+
+    // Get pointers to output arguments
+    std::vector<double*> resp(rp_solver_.sz_res());
+    for (int i=0; i<n_out; ++i) resp[i]=get_ptr(res[i]);
+
+    void* mem2 = rp_solver_.memory(0);
+
+    // perform The m
+    rp_solver_->eval(mem2, get_ptr(argp), get_ptr(resp), get_ptr(iw_tmp), get_ptr(w_tmp));
+
+    // Get BlocksqpMemory and Blocksqp from restoration phase
+    auto m2 = static_cast<BlocksqpMemory*>(mem2);
+    const Blocksqp* bp = static_cast<const Blocksqp*>(rp_solver_.get());
+    ret = m2->ret_;
+
+    warmStart = 1;
+    for( it=0; it<maxRestIt; it++){
+      // One iteration for minimum norm NLP
+      if(it > 0)
+        ret = bp->run(m2,1,warmStart);
+       
+      // If restMethod yields error, stop restoration phase
+      if( ret == -1 )
+        break;
+    
+      // Get new xi from the restoration phase
+      for( i=0; i<nx_; i++ )
+        m->trial_xk[i] = m2->xk[i];
+
+      // Compute objective at trial point
+      info = evaluate(m, m->trial_xk, &objTrial, m->gk);
+      m->nFunCalls++;
+      cNormTrial = lInfConstraintNorm(m, m->trial_xk, m->gk);
+      if( info != 0 || objTrial < obj_lo_ || objTrial > obj_up_ || !(objTrial == objTrial) || !(cNormTrial == cNormTrial) )
+        continue;
+
+      // Is this iterate acceptable for the filter?
+      if( !pairInFilter(m, cNormTrial, objTrial) )
+      {
+        // success
+        casadi_printf("Found a point acceptable for the filter.\n");
+        ret = 0;
+        break;
+      }
+
+      // If minimum norm NLP has converged, declare local infeasibility
+        if( m2->tol < opttol_ && m2->cNormS < nlinfeastol_ )
+        {
+          ret = 1;
+          break;
+        }
+    }
+
+    // Success or locally infeasible
+    if( ret == 0 || ret == 1 )
+    {
+        // Store the infinity norm of the multiplier step
+        m->lambdaStepNorm = 0.0;
+        // Compute restoration step
+        for( k=0; k<nx_; k++ )
+        {
+            m->dxk[k] = m->xk[k];
+
+            m->xk[k] = m->trial_xk[k];
+
+            // Store lInf norm of dual step
+            if( (lStpNorm = fabs( m2->lam_xk[k] - m->lam_xk[k] )) > m->lambdaStepNorm )
+                m->lambdaStepNorm = lStpNorm;
+            m->lam_xk[k] = m2->lam_xk[k];
+            m->lam_qp[k] = m2->lam_qp[k];
+
+            m->dxk[k] -= m->xk[k];
+        }
+        for( k=0; k<ng_; k++ )
+        {
+            // skip the dual variables for the slack variables in the restoration problem
+            if( (lStpNorm = fabs( m2->lam_gk[k] - m->lam_gk[k] )) > m->lambdaStepNorm )
+                m->lambdaStepNorm = lStpNorm;
+            m->lam_gk[k] = m2->lam_gk[k];
+            m->lam_qp[k] = m2->lam_qp[nx_+ng_+k];
+        }
+        m->alpha = 1.0;
+        m->nSOCS = 0;
+
+        // reset reduced step counter
+        m->reducedStepCount = 0;
+
+        // reset Hessian and limited memory information
+        resetHessian(m);
+    }
+
+    if( ret == 1 )
+    {
+        if(print_iteration_) printProgress(m);
+        updateStats(m);
+        casadi_printf("The problem seems to be locally infeasible. Infeasibilities minimized.\n");
+    }
+
+    return ret;
   }
 
 

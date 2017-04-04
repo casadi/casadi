@@ -135,6 +135,8 @@ namespace casadi {
 
     // Temporary memory
     double* jac;
+
+    int ret_;  // return value (only needed for first iteration of restoration phase)
   };
 
   /** \brief \pluginbrief{Nlpsol,blocksqp}
