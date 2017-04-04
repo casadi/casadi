@@ -370,7 +370,7 @@ namespace casadi {
       // Project one or more argument
       g.local("i", "int");
       g << "const real_t** arg1 = arg + " << (1 + n_in) << ";\n"
-        << "for(i=0; i<" << n_in << "; ++i) arg1[i]=arg[i];\n";
+        << "for(i=0; i<" << n_in << "; ++i) arg1[i]=arg[i+1];\n";
     }
 
     // Temporary memory for results with different sparsity
