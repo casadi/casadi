@@ -30,6 +30,7 @@
 #include <string>
 #include <sstream>
 #include <math.h>
+#include <climits>
 
 /** \brief  Scalar expression (which also works as a smart pointer class to this class) */
 #include "sx_elem.hpp"
@@ -89,9 +90,6 @@ namespace casadi {
     /** \brief  get the reference of a child */
     virtual const SXElem& dep(int i) const;
 
-    /** \brief  get the reference of a child */
-    virtual SXElem& dep(int i);
-
     /** \brief  Check if smooth */
     virtual bool is_smooth() const;
 
@@ -126,6 +124,11 @@ namespace casadi {
     // Reference counter -- counts the number of parents of the node
     unsigned int count;
 
+    // A special value for count which means that the count is 0 but the SXNode is not deleted but about to be deleted.
+    // (only used in BinarySX::~BinarySX to avoid a recursive call of this destructor)
+    static const decltype(count) countToBeDeleted = UINT_MAX;
+
+    virtual void removeFromCache() {}
   };
 
 } // namespace casadi

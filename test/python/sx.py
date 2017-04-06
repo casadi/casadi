@@ -784,6 +784,34 @@ class SXtests(casadiTestCase):
       self.checkarray(f_out[0],array(DM(op(-0.3))),"simplifications")
       self.assertEqual(str(y),"(-x)")
 
+  def test_SXcaching(self):
+    self.message("SX caching")
+    
+    def temp():
+      a = SX.sym("a")
+      b = SX.sym("b")
+      c1 = a * b
+      c2 = b * a # = a * b = c1 (commutative operator)
+      d1 = sin(a)
+      d2 = jacobian(jacobian(d1, a), a) # = -sin(a) = -d1
+      return c1 + d1 + c2 + d2
+
+    # test without SX cache
+    caching = GlobalOptions.getSXCaching()
+    GlobalOptions.setSXCaching(False)
+    y = temp()
+    self.assertEqual(str(y), "((((a*b)+sin(a))+(b*a))-sin(a))")
+    self.assertEqual(n_nodes(y), 9)
+    GlobalOptions.setSXCaching(caching)
+
+    # test with SX cache
+    caching = GlobalOptions.getSXCaching()
+    GlobalOptions.setSXCaching(True)
+    y = temp()
+    self.assertEqual(str(y), "@1=(a*b), @2=sin(a), (((@1+@2)+@1)-@2)")
+    self.assertEqual(n_nodes(y), 7)
+    GlobalOptions.setSXCaching(caching)
+
   def test_truth(self):
     self.message("Truth values")
     self.assertRaises(Exception, lambda : bool(SX.sym("x")))

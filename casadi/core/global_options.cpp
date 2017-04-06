@@ -33,4 +33,6 @@ namespace casadi {
 
   std::string GlobalOptions::casadipath = "";
 
+  bool GlobalOptions::sx_cache = false;
+
 } // namespace casadi
