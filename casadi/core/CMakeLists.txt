@@ -32,15 +32,14 @@ set(CASADI_PUBLIC
   polynomial.hpp              polynomial.cpp            # Helper class for differentiating and integrating simple polynomials
 
   # Template class Matrix<>, implements a sparse Matrix with col compressed storage, designed to work well with symbolic data types (SX)
-  generic_expression.hpp                                # Base class for SXElem MX and Matrix<>
-  generic_matrix.hpp                                    # Base class for Matrix<> and MX
-  matrix.hpp           matrix_impl.hpp   matrix.cpp     # The Matrix template class
-  sparse_storage.hpp   sparse_storage_impl.hpp
+  generic_expression.hpp      # Base class for SXElem MX and Matrix<>
+  generic_matrix.hpp          # Base class for Matrix<> and MX
+  matrix.hpp                  # The Matrix template class
   sparsity_interface.hpp
-  sparsity.hpp         sparsity.cpp  sparsity_internal.hpp   sparsity_internal.cpp    # reference counted sparsity pattern
-  slice.hpp            slice.cpp                        # A "slice" in a language such as Python, A[start:stop:step], or Matlab, A(start:step:stop)
-  submatrix.hpp                                         # A reference to a block of the matrix to allow operations such as A(:,3) = ...
-  nonzeros.hpp                                          # A reference to a set of nonzeros of the matrix to allow operations such as A[3] = ...
+  sparsity.hpp                # reference counted sparsity pattern
+  slice.hpp                   # A "slice" in a language such as Python, A[start:stop:step], or Matlab, A(start:step:stop)
+  submatrix.hpp               # A reference to a block of the matrix to allow operations such as A(:,3) = ...
+  nonzeros.hpp                # A reference to a set of nonzeros of the matrix to allow operations such as A[3] = ...
 
   # Directed, acyclic graph representation with scalar expressions
   sx/sx_elem.hpp
@@ -80,6 +79,12 @@ set(CASADI_PUBLIC
 )
 
 set(CASADI_INTERNAL
+# Template class Matrix<>, implements a sparse Matrix with col compressed storage, designed to work well with symbolic data types (SX)
+matrix.cpp
+sparse_storage.hpp   sparse_storage_impl.hpp
+sparsity.cpp  sparsity_internal.hpp   sparsity_internal.cpp
+slice.cpp
+
 # Directed, acyclic graph representation with scalar expressions
 sx/sx_elem.cpp             # Symbolic expression class (scalar-valued atomics)
 sx/sx_node.hpp             sx/sx_node.cpp             # Base class for all the nodes
