@@ -19,3 +19,7 @@ endforeach()
 add_custom_target(casadi_runtime_embedded DEPENDS ${EMBEDDED_SRC})
 
 set(RUNTIME_EMBEDDED_SRC "${EMBEDDED_SRC}" PARENT_SCOPE)
+
+install(FILES runtime.hpp shared.hpp
+  DESTINATION include/casadi/core/runtime
+)

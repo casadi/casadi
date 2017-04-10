@@ -72,117 +72,113 @@ set(CASADI_PUBLIC
 )
 
 set(CASADI_INTERNAL
-# For a so/dll with default hidden visibility, we need to instantiate some templates
-# Since this compilation takes some time, we put it up-front,
-# So that a make -jn will not be blocked
-casadi_instantiations.cpp
+  # For a so/dll with default hidden visibility, we need to instantiate some templates
+  # Since this compilation takes some time, we put it up-front,
+  # So that a make -jn will not be blocked
+  casadi_instantiations.cpp
 
-# MISC
-casadi_logger.cpp
-casadi_file.cpp
-casadi_interrupt.cpp
-global_options.cpp
-${PROJECT_BINARY_DIR}/casadi_meta.cpp
-shared_object.cpp
-weak_ref.cpp
-generic_type.cpp
-generic_type_internal.hpp
-options.cpp
-std_vector_tools.cpp
-timing.cpp
-polynomial.cpp
+  # MISC
+  casadi_logger.cpp
+  casadi_file.cpp
+  casadi_interrupt.cpp
+  global_options.cpp
+  ${PROJECT_BINARY_DIR}/casadi_meta.cpp
+  shared_object.cpp
+  weak_ref.cpp
+  generic_type.cpp
+  generic_type_internal.hpp
+  options.cpp
+  std_vector_tools.cpp
+  timing.cpp
+  polynomial.cpp
 
-# Template class Matrix<>, implements a sparse Matrix with col compressed storage, designed to work well with symbolic data types (SX)
-matrix.cpp
-sparse_storage.hpp   sparse_storage_impl.hpp
-sparsity.cpp  sparsity_internal.hpp   sparsity_internal.cpp
-slice.cpp
+  # Template class Matrix<>, implements a sparse Matrix with col compressed storage, designed to work well with symbolic data types (SX)
+  matrix.cpp
+  sparse_storage.hpp   sparse_storage_impl.hpp
+  sparsity.cpp  sparsity_internal.hpp   sparsity_internal.cpp
+  slice.cpp
 
-# Directed, acyclic graph representation with scalar expressions
-sx_elem.cpp             # Symbolic expression class (scalar-valued atomics)
-sx_node.hpp             sx_node.cpp             # Base class for all the nodes
-symbolic_sx.hpp                                    # A symbolic SXElem variable
-constant_sx.hpp                                    # A constant SXElem node
-unary_sx.hpp                                       # A unary operation
-binary_sx.hpp                                      # A binary operation
+  # Directed, acyclic graph representation with scalar expressions
+  sx_elem.cpp             # Symbolic expression class (scalar-valued atomics)
+  sx_node.hpp             sx_node.cpp             # Base class for all the nodes
+  symbolic_sx.hpp                                    # A symbolic SXElem variable
+  constant_sx.hpp                                    # A constant SXElem node
+  unary_sx.hpp                                       # A unary operation
+  binary_sx.hpp                                      # A binary operation
 
-# More general graph representation with sparse matrix expressions and function evaluations
-mx.cpp                  # Symbolic expression class (matrix-valued atomics)
-mx_node.hpp             mx_node.cpp             # Base class for all the MX nodes
-constant_mx.hpp         constant_mx.cpp         # A constant MX node
-symbolic_mx.hpp         symbolic_mx.cpp         # A symbolic MX variable
-unary_mx.hpp            unary_mx.cpp            # Unary operation
-binary_mx.hpp           binary_mx_impl.hpp      # Binary operation
-multiplication.hpp      multiplication.cpp      # Matrix multiplication
-einstein.hpp            einstein.cpp            # Einstein product
-solve.hpp               solve_impl.hpp          # Solve linear system of equations
-casadi_call.hpp         casadi_call.cpp         # Function call
-casadi_find.hpp         casadi_find.cpp         # Find first nonzero
-norm.hpp                norm.cpp                # 1-norm, 2-norm and infinity-norm
-transpose.hpp           transpose.cpp           # Transpose
-concat.hpp              concat.cpp              # Concatenation
-split.hpp               split.cpp               # Split (inverse of concatenation)
-reshape.hpp             reshape.cpp             # Reshape
-subref.hpp              subref.cpp              # Submatrix reference
-subassign.hpp           subassign.cpp           # Submatrix assignment
-getnonzeros.hpp         getnonzeros.cpp         # Get the nonzeros of matrix
-setnonzeros.hpp         setnonzeros_impl.hpp    # Assign the nonzeros of a matrix to another matrix
-project.hpp             project.cpp             # Sparse copy to another sparsity pattern
-determinant.hpp         determinant.cpp         # Determinant
-inverse.hpp             inverse.cpp             # Matrix inverse
-dot.hpp                 dot.cpp                 # Inner product
-bilin.hpp               bilin.cpp               # Bilinear form
-rank1.hpp               rank1.cpp               # Rank-1 update
-multiple_output.hpp     multiple_output.cpp     # Base class for nodes with multiple outputs
-assertion.hpp           assertion.cpp           # Assertion
-monitor.hpp             monitor.cpp             # Monitor
-repmat.hpp              repmat.cpp              # RepMat
+  # More general graph representation with sparse matrix expressions and function evaluations
+  mx.cpp                  # Symbolic expression class (matrix-valued atomics)
+  mx_node.hpp             mx_node.cpp             # Base class for all the MX nodes
+  constant_mx.hpp         constant_mx.cpp         # A constant MX node
+  symbolic_mx.hpp         symbolic_mx.cpp         # A symbolic MX variable
+  unary_mx.hpp            unary_mx.cpp            # Unary operation
+  binary_mx.hpp           binary_mx_impl.hpp      # Binary operation
+  multiplication.hpp      multiplication.cpp      # Matrix multiplication
+  einstein.hpp            einstein.cpp            # Einstein product
+  solve.hpp               solve_impl.hpp          # Solve linear system of equations
+  casadi_call.hpp         casadi_call.cpp         # Function call
+  casadi_find.hpp         casadi_find.cpp         # Find first nonzero
+  norm.hpp                norm.cpp                # 1-norm, 2-norm and infinity-norm
+  transpose.hpp           transpose.cpp           # Transpose
+  concat.hpp              concat.cpp              # Concatenation
+  split.hpp               split.cpp               # Split (inverse of concatenation)
+  reshape.hpp             reshape.cpp             # Reshape
+  subref.hpp              subref.cpp              # Submatrix reference
+  subassign.hpp           subassign.cpp           # Submatrix assignment
+  getnonzeros.hpp         getnonzeros.cpp         # Get the nonzeros of matrix
+  setnonzeros.hpp         setnonzeros_impl.hpp    # Assign the nonzeros of a matrix to another matrix
+  project.hpp             project.cpp             # Sparse copy to another sparsity pattern
+  determinant.hpp         determinant.cpp         # Determinant
+  inverse.hpp             inverse.cpp             # Matrix inverse
+  dot.hpp                 dot.cpp                 # Inner product
+  bilin.hpp               bilin.cpp               # Bilinear form
+  rank1.hpp               rank1.cpp               # Rank-1 update
+  multiple_output.hpp     multiple_output.cpp     # Base class for nodes with multiple outputs
+  assertion.hpp           assertion.cpp           # Assertion
+  monitor.hpp             monitor.cpp             # Monitor
+  repmat.hpp              repmat.cpp              # RepMat
 
-# A dynamically created function with AD capabilities
-function.cpp
-function_internal.hpp   function_internal.cpp   # Function object class (internal API)
-oracle_function.hpp     oracle_function.cpp     # Specialization of FunctionInternal to hold an oracle
-callback.cpp            # Interface for user-defined function classes (public API)
-callback_internal.cpp   callback_internal.hpp   # Interface for user-defined function classes (internal API)
-plugin_interface.hpp                                     # Plugin interface for Function
-factory.hpp                                              # Helper class for derivative function generation
-x_function.hpp                                           # Base class for SXFunction and MXFunction
-sx_function.hpp         sx_function.cpp
-mx_function.hpp         mx_function.cpp
-external.cpp
-jit.cpp
-linsol.cpp              linsol_internal.hpp  linsol_internal.cpp
-rootfinder_impl.hpp     rootfinder.cpp
-integrator_impl.hpp     integrator.cpp
-nlpsol.hpp              nlpsol_impl.hpp        nlpsol.cpp
-conic_impl.hpp          conic.cpp
-dple_impl.hpp           dple.cpp
-interpolant_impl.hpp    interpolant.cpp
-expm_impl.hpp           expm.cpp
-code_generator.cpp
-switch.hpp              switch.cpp
-bspline.hpp             bspline.cpp
-map.hpp                 map.cpp
-importer.cpp            importer_internal.hpp importer_internal.cpp
+  # A dynamically created function with AD capabilities
+  function.cpp
+  function_internal.hpp   function_internal.cpp   # Function object class (internal API)
+  oracle_function.hpp     oracle_function.cpp     # Specialization of FunctionInternal to hold an oracle
+  callback.cpp            # Interface for user-defined function classes (public API)
+  callback_internal.cpp   callback_internal.hpp   # Interface for user-defined function classes (internal API)
+  plugin_interface.hpp                                     # Plugin interface for Function
+  factory.hpp                                              # Helper class for derivative function generation
+  x_function.hpp                                           # Base class for SXFunction and MXFunction
+  sx_function.hpp         sx_function.cpp
+  mx_function.hpp         mx_function.cpp
+  external.cpp
+  jit.cpp
+  linsol.cpp              linsol_internal.hpp  linsol_internal.cpp
+  rootfinder_impl.hpp     rootfinder.cpp
+  integrator_impl.hpp     integrator.cpp
+  nlpsol.hpp              nlpsol_impl.hpp        nlpsol.cpp
+  conic_impl.hpp          conic.cpp
+  dple_impl.hpp           dple.cpp
+  interpolant_impl.hpp    interpolant.cpp
+  expm_impl.hpp           expm.cpp
+  code_generator.cpp
+  switch.hpp              switch.cpp
+  bspline.hpp             bspline.cpp
+  map.hpp                 map.cpp
+  importer.cpp            importer_internal.hpp importer_internal.cpp
 
-# MISC useful stuff
-integration_tools.cpp
-nlp_builder.cpp
-xml_node.cpp
-xml_file.cpp                xml_file_internal.hpp                xml_file_internal.cpp
-variable.cpp
-dae_builder.cpp
+  # MISC useful stuff
+  integration_tools.cpp
+  nlp_builder.cpp
+  xml_node.cpp
+  xml_file.cpp                xml_file_internal.hpp                xml_file_internal.cpp
+  variable.cpp
+  dae_builder.cpp
 
-# runtime
-runtime/shared.cpp
+  # runtime
+  runtime/shared.cpp
 )
 
-set(CASADI_SRCS ${CASADI_PUBLIC} ${CASADI_INTERNAL})
-
-
 set_source_files_properties( ${RUNTIME_EMBEDDED_SRC} PROPERTIES GENERATED TRUE )
-
-casadi_library(casadi ${CASADI_SRCS} ${RUNTIME_EMBEDDED_SRC})
+casadi_library(casadi ${CASADI_PUBLIC} ${CASADI_INTERNAL} ${RUNTIME_EMBEDDED_SRC})
 
 add_dependencies(casadi casadi_runtime_embedded)
 
@@ -201,7 +197,6 @@ if(RT)
   target_link_libraries(casadi ${RT})
 endif()
 
-install(DIRECTORY ./
+install(FILES ${CASADI_PUBLIC}
   DESTINATION include/casadi/core
-  FILES_MATCHING PATTERN "*.hpp"
-  PATTERN ".svn" EXCLUDE)
+)
