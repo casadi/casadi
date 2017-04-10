@@ -31,7 +31,7 @@
 #include <sstream>
 #include <iomanip>
 #include "../std_vector_tools.hpp"
-#include "../sx/sx_node.hpp"
+#include "../sx_node.hpp"
 #include "../casadi_types.hpp"
 #include "../sparsity_internal.hpp"
 #include "../global_options.hpp"

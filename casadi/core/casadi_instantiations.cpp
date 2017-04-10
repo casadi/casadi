@@ -25,7 +25,7 @@
 
 #include "function/function.hpp"
 
-#include "sx/sx_elem.hpp"
+#include "sx_elem.hpp"
 #include "matrix.hpp"
 #include "sparse_storage.hpp"
 #include "mx.hpp"

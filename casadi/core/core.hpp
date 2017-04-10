@@ -27,7 +27,7 @@
 #define CASADI_CORE_HPP
 
 // Scalar expressions (why do I need to put it up here?)
-#include "sx/sx_elem.hpp"
+#include "sx_elem.hpp"
 
 // Generic tools
 #include "polynomial.hpp"

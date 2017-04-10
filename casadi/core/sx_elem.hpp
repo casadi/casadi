@@ -27,11 +27,11 @@
 #define CASADI_SX_ELEMENT_HPP
 
 // exception class
-#include "../printable_object.hpp"
-#include "../exception.hpp"
-#include "../casadi_limits.hpp"
-#include "../matrix.hpp"
-#include "../generic_expression.hpp"
+#include "printable_object.hpp"
+#include "exception.hpp"
+#include "casadi_limits.hpp"
+#include "matrix.hpp"
+#include "generic_expression.hpp"
 
 /** \brief  C/C++ */
 #include <iostream>

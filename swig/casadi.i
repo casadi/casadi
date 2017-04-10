@@ -3561,7 +3561,7 @@ namespace casadi{
 } // namespace casadi
 #endif // SWIGPYTHON
 
-%include <casadi/core/sx/sx_elem.hpp>
+%include <casadi/core/sx_elem.hpp>
 
 #ifdef SWIGPYTHON
 %extend casadi::Sparsity{

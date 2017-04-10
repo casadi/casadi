@@ -24,16 +24,16 @@
 
 
 #include "sx_elem.hpp"
-#include "../matrix.hpp"
+#include "matrix.hpp"
 #include <stack>
 #include <cassert>
-#include "../calculus.hpp"
+#include "calculus.hpp"
 #include "constant_sx.hpp"
 #include "symbolic_sx.hpp"
 #include "unary_sx.hpp"
 #include "binary_sx.hpp"
-#include "../global_options.hpp"
-#include "../function/sx_function.hpp"
+#include "global_options.hpp"
+#include "function/sx_function.hpp"
 
 using namespace std;
 namespace casadi {

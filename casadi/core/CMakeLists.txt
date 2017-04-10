@@ -35,7 +35,7 @@ set(CASADI_PUBLIC
   nonzeros.hpp                # A reference to a set of nonzeros of the matrix to allow operations such as A[3] = ...
 
   # Directed, acyclic graph representation with scalar expressions
-  sx/sx_elem.hpp
+  sx_elem.hpp
 
   # More general graph representation with sparse matrix expressions and function evaluations
   mx.hpp
@@ -99,12 +99,12 @@ sparsity.cpp  sparsity_internal.hpp   sparsity_internal.cpp
 slice.cpp
 
 # Directed, acyclic graph representation with scalar expressions
-sx/sx_elem.cpp             # Symbolic expression class (scalar-valued atomics)
-sx/sx_node.hpp             sx/sx_node.cpp             # Base class for all the nodes
-sx/symbolic_sx.hpp                                    # A symbolic SXElem variable
-sx/constant_sx.hpp                                    # A constant SXElem node
-sx/unary_sx.hpp                                       # A unary operation
-sx/binary_sx.hpp                                      # A binary operation
+sx_elem.cpp             # Symbolic expression class (scalar-valued atomics)
+sx_node.hpp             sx_node.cpp             # Base class for all the nodes
+symbolic_sx.hpp                                    # A symbolic SXElem variable
+constant_sx.hpp                                    # A constant SXElem node
+unary_sx.hpp                                       # A unary operation
+binary_sx.hpp                                      # A binary operation
 
 # More general graph representation with sparse matrix expressions and function evaluations
 mx.cpp                  # Symbolic expression class (matrix-valued atomics)
