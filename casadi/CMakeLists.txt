@@ -35,8 +35,6 @@ macro(casadi_library_or_plugin name is_plugin)
   # Make sure the exported header is installed
   file(RELATIVE_PATH RELPATH "${CMAKE_BINARY_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/${name}_export.h")
   get_filename_component(RELPATH ${RELPATH} PATH)
-  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${name}_export.h
-  DESTINATION include/${RELPATH})
 
   if(NOT "${name}" STREQUAL "casadi")
     target_link_libraries(${name} casadi)
