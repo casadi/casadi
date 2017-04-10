@@ -102,12 +102,12 @@ set(CASADI_PUBLIC
   function/importer.hpp
 
   # MISC useful stuff
-  misc/integration_tools.hpp       misc/integration_tools.cpp
-  misc/nlp_builder.hpp             misc/nlp_builder.cpp
-  misc/xml_node.hpp                misc/xml_node.cpp
-  misc/xml_file.hpp                misc/xml_file.cpp                misc/xml_file_internal.hpp                misc/xml_file_internal.cpp
-  misc/variable.hpp                misc/variable.cpp
-  misc/dae_builder.hpp             misc/dae_builder.cpp
+  misc/integration_tools.hpp
+  misc/nlp_builder.hpp
+  misc/xml_node.hpp
+  misc/xml_file.hpp
+  misc/variable.hpp
+  misc/dae_builder.hpp
 
   # User include class with the most essential includes
   core.hpp
@@ -140,6 +140,14 @@ function/switch.hpp              function/switch.cpp
 function/bspline.hpp             function/bspline.cpp
 function/map.hpp                 function/map.cpp
 function/importer.cpp            function/importer_internal.hpp function/importer_internal.cpp
+
+# MISC useful stuff
+misc/integration_tools.cpp
+misc/nlp_builder.cpp
+misc/xml_node.cpp
+misc/xml_file.cpp                misc/xml_file_internal.hpp                misc/xml_file_internal.cpp
+misc/variable.cpp
+misc/dae_builder.cpp
 
 # runtime
 runtime/shared.cpp
