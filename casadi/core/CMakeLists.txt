@@ -5,31 +5,24 @@ cmake_minimum_required(VERSION 2.8.6)
 add_subdirectory(runtime)
 
 set(CASADI_PUBLIC
-
-  # For a so/dll with default hidden visibility, we need to instantiate some templates
-  # Since this compilation takes some time, we put it up-front,
-  # So that a make -jn will not be blocked
-  casadi_instantiations.cpp
-
   # MISC
   casadi_limits.hpp
   casadi_types.hpp
-  casadi_logger.hpp           casadi_logger.cpp
-  casadi_file.hpp             casadi_file.cpp
-  casadi_interrupt.hpp        casadi_interrupt.cpp
+  casadi_logger.hpp
+  casadi_file.hpp
+  casadi_interrupt.hpp
   exception.hpp
   calculus.hpp
-  global_options.hpp          global_options.cpp
-  casadi_meta.hpp             ${PROJECT_BINARY_DIR}/casadi_meta.cpp
-  printable_object.hpp                                  # Interface class enabling printing a Python-style "description" as well as a shorter "representation" of a class
-  shared_object.hpp           shared_object.cpp         # This base class implements the reference counting (garbage collection) framework used in CasADi
-  weak_ref.hpp                weak_ref.cpp              # Provides weak reference functionality (non-owning smart pointers)
-  generic_type.hpp            generic_type.cpp          # Generic type used for options and for compatibility with dynamically typed languages like Python
-  generic_type_internal.hpp                             # Internal class for the same
-  options.cpp                 options.hpp               # Functionality for passing options to a class
-  std_vector_tools.hpp        std_vector_tools.cpp      # Set of useful functions for the vector template class in STL
-  timing.hpp                  timing.cpp
-  polynomial.hpp              polynomial.cpp            # Helper class for differentiating and integrating simple polynomials
+  global_options.hpp
+  casadi_meta.hpp
+  printable_object.hpp        # Interface class enabling printing a Python-style "description" as well as a shorter "representation" of a class
+  shared_object.hpp           # This base class implements the reference counting (garbage collection) framework used in CasADi
+  weak_ref.hpp                # Provides weak reference functionality (non-owning smart pointers)
+  generic_type.hpp            # Generic type used for options and for compatibility with dynamically typed languages like Python
+  options.hpp                 # Functionality for passing options to a class
+  std_vector_tools.hpp        # Set of useful functions for the vector template class in STL
+  timing.hpp
+  polynomial.hpp              # Helper class for differentiating and integrating simple polynomials
 
   # Template class Matrix<>, implements a sparse Matrix with col compressed storage, designed to work well with symbolic data types (SX)
   generic_expression.hpp      # Base class for SXElem MX and Matrix<>
@@ -79,6 +72,26 @@ set(CASADI_PUBLIC
 )
 
 set(CASADI_INTERNAL
+# For a so/dll with default hidden visibility, we need to instantiate some templates
+# Since this compilation takes some time, we put it up-front,
+# So that a make -jn will not be blocked
+casadi_instantiations.cpp
+
+# MISC
+casadi_logger.cpp
+casadi_file.cpp
+casadi_interrupt.cpp
+global_options.cpp
+${PROJECT_BINARY_DIR}/casadi_meta.cpp
+shared_object.cpp
+weak_ref.cpp
+generic_type.cpp
+generic_type_internal.hpp
+options.cpp
+std_vector_tools.cpp
+timing.cpp
+polynomial.cpp
+
 # Template class Matrix<>, implements a sparse Matrix with col compressed storage, designed to work well with symbolic data types (SX)
 matrix.cpp
 sparse_storage.hpp   sparse_storage_impl.hpp
