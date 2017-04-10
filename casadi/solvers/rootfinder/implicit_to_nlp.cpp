@@ -24,7 +24,7 @@
 
 
 #include "implicit_to_nlp.hpp"
-#include "casadi/core/function/nlpsol.hpp"
+#include "casadi/core/nlpsol.hpp"
 
 using namespace std;
 namespace casadi {

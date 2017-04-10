@@ -29,8 +29,8 @@
 #include "mx.hpp"
 #include "sx_elem.hpp"
 #include "calculus.hpp"
-#include "function/code_generator.hpp"
-#include "function/linsol.hpp"
+#include "code_generator.hpp"
+#include "linsol.hpp"
 #include <vector>
 #include <stack>
 

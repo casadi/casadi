@@ -26,7 +26,7 @@
 #ifndef CASADI_QP_TO_NLP_HPP
 #define CASADI_QP_TO_NLP_HPP
 
-#include "casadi/core/function/conic_impl.hpp"
+#include "casadi/core/conic_impl.hpp"
 #include <casadi/solvers/conic/casadi_conic_nlpsol_export.h>
 
 

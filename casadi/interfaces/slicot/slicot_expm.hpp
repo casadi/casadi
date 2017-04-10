@@ -26,8 +26,8 @@
 #ifndef CASADI_SLICOT_EXPM_HPP
 #define CASADI_SLICOT_EXPM_HPP
 
-#include "../../core/function/expm_impl.hpp"
-#include "../../core/function/linsol.hpp"
+#include "../../core/expm_impl.hpp"
+#include "../../core/linsol.hpp"
 #include <casadi/interfaces/slicot/casadi_expm_slicot_export.h>
 
 /** \defgroup plugin_Expm_slicot

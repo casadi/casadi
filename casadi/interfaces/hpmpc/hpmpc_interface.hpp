@@ -26,8 +26,8 @@
 #ifndef CASADI_HPMPC_INTERFACE_HPP
 #define CASADI_HPMPC_INTERFACE_HPP
 
-#include "casadi/core/function/conic_impl.hpp"
-#include "casadi/core/function/linsol.hpp"
+#include "casadi/core/conic_impl.hpp"
+#include "casadi/core/linsol.hpp"
 #include <casadi/interfaces/hpmpc/casadi_conic_hpmpc_export.h>
 
 /** \defgroup plugin_Conic_hpmpc

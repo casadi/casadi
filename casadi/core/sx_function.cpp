@@ -30,12 +30,12 @@
 #include <fstream>
 #include <sstream>
 #include <iomanip>
-#include "../std_vector_tools.hpp"
-#include "../sx_node.hpp"
-#include "../casadi_types.hpp"
-#include "../sparsity_internal.hpp"
-#include "../global_options.hpp"
-#include "../casadi_interrupt.hpp"
+#include "std_vector_tools.hpp"
+#include "sx_node.hpp"
+#include "casadi_types.hpp"
+#include "sparsity_internal.hpp"
+#include "global_options.hpp"
+#include "casadi_interrupt.hpp"
 
 namespace casadi {
 

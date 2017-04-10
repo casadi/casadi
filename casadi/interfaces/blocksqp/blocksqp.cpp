@@ -25,7 +25,7 @@
 
 #include "blocksqp.hpp"
 #include "casadi/core/std_vector_tools.hpp"
-#include "casadi/core/function/conic.hpp"
+#include "casadi/core/conic.hpp"
 
 using namespace std;
 namespace casadi {

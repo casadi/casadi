@@ -27,7 +27,7 @@
 #define CASADI_ORACLE_FUNCTION_HPP
 
 #include "function_internal.hpp"
-#include "../timing.hpp"
+#include "timing.hpp"
 
 /// \cond INTERNAL
 namespace casadi {

@@ -25,7 +25,7 @@
 #ifndef CASADI_CPLEX_INTERFACE_HPP
 #define CASADI_CPLEX_INTERFACE_HPP
 
-#include "casadi/core/function/conic_impl.hpp"
+#include "casadi/core/conic_impl.hpp"
 #include <casadi/interfaces/cplex/casadi_conic_cplex_export.h>
 #include "ilcplex/cplex.h"
 

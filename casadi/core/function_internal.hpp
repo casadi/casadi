@@ -27,13 +27,13 @@
 #define CASADI_FUNCTION_INTERNAL_HPP
 
 #include "function.hpp"
-#include "../weak_ref.hpp"
+#include "weak_ref.hpp"
 #include <set>
 #include <stack>
 #include "code_generator.hpp"
 #include "importer.hpp"
-#include "../sparse_storage.hpp"
-#include "../options.hpp"
+#include "sparse_storage.hpp"
+#include "options.hpp"
 
 // This macro is for documentation purposes
 #define INPUTSCHEME(name)

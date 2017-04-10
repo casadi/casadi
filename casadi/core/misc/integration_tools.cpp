@@ -24,8 +24,8 @@
 
 
 #include "integration_tools.hpp"
-#include "../function/integrator.hpp"
-#include "../function/rootfinder.hpp"
+#include "../integrator.hpp"
+#include "../rootfinder.hpp"
 
 #include <vector>
 

@@ -26,8 +26,8 @@
 #ifndef CASADI_SLICOT_DPLE_HPP
 #define CASADI_SLICOT_DPLE_HPP
 
-#include "../../core/function/dple_impl.hpp"
-#include "../../core/function/linsol.hpp"
+#include "../../core/dple_impl.hpp"
+#include "../../core/linsol.hpp"
 #include <casadi/interfaces/slicot/casadi_dple_slicot_export.h>
 
 /** \defgroup plugin_Dple_slicot

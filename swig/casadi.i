@@ -3681,7 +3681,7 @@ def PyFunction(name, obj, inputs, outputs, opts={}):
 %}
 #endif
 
-%include <casadi/core/function/function.hpp>
+%include <casadi/core/function.hpp>
 #ifdef SWIGPYTHON
 namespace casadi{
 %extend Function {
@@ -3833,19 +3833,19 @@ namespace casadi{
  }
 }
 #endif // SWIGMATLAB
-%include <casadi/core/function/external.hpp>
-%include <casadi/core/function/jit.hpp>
-%include <casadi/core/function/integrator.hpp>
-%include <casadi/core/function/conic.hpp>
-%include <casadi/core/function/nlpsol.hpp>
-%include <casadi/core/function/rootfinder.hpp>
-%include <casadi/core/function/linsol.hpp>
-%include <casadi/core/function/dple.hpp>
-%include <casadi/core/function/expm.hpp>
-%include <casadi/core/function/interpolant.hpp>
+%include <casadi/core/external.hpp>
+%include <casadi/core/jit.hpp>
+%include <casadi/core/integrator.hpp>
+%include <casadi/core/conic.hpp>
+%include <casadi/core/nlpsol.hpp>
+%include <casadi/core/rootfinder.hpp>
+%include <casadi/core/linsol.hpp>
+%include <casadi/core/dple.hpp>
+%include <casadi/core/expm.hpp>
+%include <casadi/core/interpolant.hpp>
 
 %feature("copyctor", "0") casadi::CodeGenerator;
-%include <casadi/core/function/code_generator.hpp>
+%include <casadi/core/code_generator.hpp>
 
 #ifdef SWIGMATLAB
 // Wrap (static) member functions
@@ -3987,8 +3987,8 @@ namespace casadi {
 
 %feature("director") casadi::Callback;
 
-%include <casadi/core/function/importer.hpp>
-%include <casadi/core/function/callback.hpp>
+%include <casadi/core/importer.hpp>
+%include <casadi/core/callback.hpp>
 %include <casadi/core/global_options.hpp>
 %include <casadi/core/casadi_meta.hpp>
 %include <casadi/core/misc/integration_tools.hpp>

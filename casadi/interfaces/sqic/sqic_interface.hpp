@@ -26,7 +26,7 @@
 #ifndef CASADI_SQIC_INTERFACE_HPP
 #define CASADI_SQIC_INTERFACE_HPP
 
-#include "casadi/core/function/conic.hpp"
+#include "casadi/core/conic.hpp"
 #include <casadi/interfaces/sqic/casadi_conic_sqic_export.h>
 
 /** \defgroup plugin_Conic_sqic

@@ -26,7 +26,7 @@
 #ifndef CASADI_OOQP_INTERFACE_HPP
 #define CASADI_OOQP_INTERFACE_HPP
 
-#include "casadi/core/function/conic_impl.hpp"
+#include "casadi/core/conic_impl.hpp"
 #include <casadi/interfaces/ooqp/casadi_conic_ooqp_export.h>
 
 /** \defgroup plugin_Conic_ooqp

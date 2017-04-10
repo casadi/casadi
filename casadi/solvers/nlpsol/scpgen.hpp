@@ -26,7 +26,7 @@
 #ifndef CASADI_SCPGEN_HPP
 #define CASADI_SCPGEN_HPP
 
-#include "casadi/core/function/nlpsol_impl.hpp"
+#include "casadi/core/nlpsol_impl.hpp"
 #include <casadi/solvers/nlpsol/casadi_nlpsol_scpgen_export.h>
 
 #include <deque>

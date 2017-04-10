@@ -27,7 +27,7 @@
 #define CASADI_MULTIPLE_OUTPUT_HPP
 
 #include "mx_node.hpp"
-#include "function/function.hpp"
+#include "function.hpp"
 #include <set>
 
 /// \cond INTERNAL

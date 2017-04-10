@@ -36,7 +36,7 @@
 #include "BonOaNlpOptim.hpp"
 
 #include <casadi/interfaces/bonmin/casadi_nlpsol_bonmin_export.h>
-#include "casadi/core/function/nlpsol_impl.hpp"
+#include "casadi/core/nlpsol_impl.hpp"
 #include "casadi/core/timing.hpp"
 
 

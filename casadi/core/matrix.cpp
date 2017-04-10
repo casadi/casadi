@@ -24,10 +24,10 @@
 
 #define CASADI_MATRIX_CPP
 #include "matrix_impl.hpp"
-#include "function/sx_function.hpp"
+#include "sx_function.hpp"
 #include "sx_node.hpp"
-#include "function/linsol.hpp"
-#include "function/expm.hpp"
+#include "linsol.hpp"
+#include "expm.hpp"
 
 using namespace std;
 

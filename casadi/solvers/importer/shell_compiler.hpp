@@ -26,7 +26,7 @@
 #ifndef CASADI_SHELL_INTERFACE_HPP
 #define CASADI_SHELL_INTERFACE_HPP
 
-#include "casadi/core/function/importer_internal.hpp"
+#include "casadi/core/importer_internal.hpp"
 #include <casadi/solvers/importer/casadi_importer_shell_export.h>
 
 /** \defgroup plugin_Importer_shell

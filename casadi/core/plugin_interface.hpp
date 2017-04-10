@@ -23,8 +23,8 @@
 #ifndef CASADI_PLUGIN_INTERFACE_HPP
 #define CASADI_PLUGIN_INTERFACE_HPP
 
-#include "../function/function_internal.hpp"
-#include "../global_options.hpp"
+#include "function_internal.hpp"
+#include "global_options.hpp"
 
 #include <stdlib.h>
 

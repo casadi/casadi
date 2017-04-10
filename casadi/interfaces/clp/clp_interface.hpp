@@ -25,7 +25,7 @@
 #ifndef CASADI_CLP_INTERFACE_HPP
 #define CASADI_CLP_INTERFACE_HPP
 
-#include "casadi/core/function/conic_impl.hpp"
+#include "casadi/core/conic_impl.hpp"
 #include <casadi/interfaces/clp/casadi_conic_clp_export.h>
 
 #include "ClpSimplex.hpp"

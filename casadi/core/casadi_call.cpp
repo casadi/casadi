@@ -24,7 +24,7 @@
 
 
 #include "casadi_call.hpp"
-#include "function/function_internal.hpp"
+#include "function_internal.hpp"
 #include "std_vector_tools.hpp"
 
 using namespace std;

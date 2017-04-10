@@ -29,7 +29,7 @@
 #include "conic.hpp"
 #include "function_internal.hpp"
 #include "plugin_interface.hpp"
-#include "../timing.hpp"
+#include "timing.hpp"
 
 /// \cond INTERNAL
 namespace casadi {

@@ -24,11 +24,11 @@
 
 
 #include "rootfinder_impl.hpp"
-#include "../mx_node.hpp"
+#include "mx_node.hpp"
 #include <iterator>
 #include "linsol.hpp"
 
-#include "../global_options.hpp"
+#include "global_options.hpp"
 
 using namespace std;
 namespace casadi {

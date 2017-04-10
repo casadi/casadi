@@ -26,8 +26,8 @@
 #ifndef CASADI_QPOASES_INTERFACE_HPP
 #define CASADI_QPOASES_INTERFACE_HPP
 
-#include "casadi/core/function/conic_impl.hpp"
-#include "casadi/core/function/linsol.hpp"
+#include "casadi/core/conic_impl.hpp"
+#include "casadi/core/linsol.hpp"
 #include <casadi/interfaces/qpoases/casadi_conic_qpoases_export.h>
 #include <qpOASES.hpp>
 

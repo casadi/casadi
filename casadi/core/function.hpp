@@ -26,8 +26,8 @@
 #ifndef CASADI_FUNCTION_HPP
 #define CASADI_FUNCTION_HPP
 
-#include "../sx_elem.hpp"
-#include "../mx.hpp"
+#include "sx_elem.hpp"
+#include "mx.hpp"
 
 #include <exception>
 
@@ -932,6 +932,6 @@ namespace casadi {
 
 } // namespace casadi
 
-#include "../matrix_impl.hpp"
+#include "matrix_impl.hpp"
 
 #endif // CASADI_FUNCTION_HPP

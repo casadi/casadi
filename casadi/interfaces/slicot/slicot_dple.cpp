@@ -28,8 +28,8 @@
 #include "slicot_la.hpp"
 
 #include "../../core/std_vector_tools.hpp"
-#include "../../core/function/mx_function.hpp"
-#include "../../core/function/sx_function.hpp"
+#include "../../core/mx_function.hpp"
+#include "../../core/sx_function.hpp"
 
 #include <cassert>
 #include <ctime>

@@ -27,7 +27,7 @@
 #define CASADI_XML_FILE_INTERNAL_HPP
 
 #include "xml_file.hpp"
-#include "../function/plugin_interface.hpp"
+#include "../plugin_interface.hpp"
 
 /// \cond INTERNAL
 namespace casadi {

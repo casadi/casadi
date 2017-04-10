@@ -23,4 +23,4 @@
  */
 
 // redirection
-#include "function/sx_function.hpp"
+#include "sx_function.hpp"

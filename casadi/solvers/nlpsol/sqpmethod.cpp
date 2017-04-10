@@ -27,7 +27,7 @@
 
 #include "casadi/core/std_vector_tools.hpp"
 #include "casadi/core/calculus.hpp"
-#include "casadi/core/function/conic.hpp"
+#include "casadi/core/conic.hpp"
 
 #include <ctime>
 #include <iomanip>

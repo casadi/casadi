@@ -26,7 +26,7 @@
 #ifndef CASADI_CLANG_COMPILER_HPP
 #define CASADI_CLANG_COMPILER_HPP
 
-#include "casadi/core/function/importer_internal.hpp"
+#include "casadi/core/importer_internal.hpp"
 #include <casadi/interfaces/clang/casadi_importer_clang_export.h>
 
 #include <clang/CodeGen/CodeGenAction.h>

@@ -23,10 +23,10 @@
  */
 
 #include "mx_function.hpp"
-#include "../std_vector_tools.hpp"
-#include "../casadi_types.hpp"
-#include "../global_options.hpp"
-#include "../casadi_interrupt.hpp"
+#include "std_vector_tools.hpp"
+#include "casadi_types.hpp"
+#include "global_options.hpp"
+#include "casadi_interrupt.hpp"
 
 #include <stack>
 #include <typeinfo>

@@ -26,7 +26,7 @@
 #ifndef CASADI_INTEGRATION_TOOLS_HPP
 #define CASADI_INTEGRATION_TOOLS_HPP
 
-#include "casadi/core/function/function.hpp"
+#include "casadi/core/function.hpp"
 
 namespace casadi {
 

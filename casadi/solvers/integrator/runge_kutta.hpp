@@ -26,7 +26,7 @@
 #ifndef CASADI_RUNGE_KUTTA_HPP
 #define CASADI_RUNGE_KUTTA_HPP
 
-#include "casadi/core/function/integrator_impl.hpp"
+#include "casadi/core/integrator_impl.hpp"
 #include <casadi/solvers/integrator/casadi_integrator_rk_export.h>
 
 /** \defgroup plugin_Integrator_rk

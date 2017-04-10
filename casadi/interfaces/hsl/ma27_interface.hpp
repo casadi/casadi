@@ -26,7 +26,7 @@
 #ifndef CASADI_MA27_INTERFACE_HPP
 #define CASADI_MA27_INTERFACE_HPP
 
-#include "casadi/core/function/linsol_internal.hpp"
+#include "casadi/core/linsol_internal.hpp"
 #include <casadi/interfaces/hsl/casadi_linsol_ma27_export.h>
 
 extern "C" {

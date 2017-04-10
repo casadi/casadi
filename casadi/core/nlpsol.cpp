@@ -26,7 +26,7 @@
 #include "nlpsol_impl.hpp"
 #include "external.hpp"
 #include "casadi/core/timing.hpp"
-#include "../misc/nlp_builder.hpp"
+#include "misc/nlp_builder.hpp"
 
 using namespace std;
 namespace casadi {

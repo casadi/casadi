@@ -30,9 +30,9 @@
 #include "std_vector_tools.hpp"
 #include "norm.hpp"
 #include "calculus.hpp"
-#include "function/mx_function.hpp"
-#include "function/linsol.hpp"
-#include "function/expm.hpp"
+#include "mx_function.hpp"
+#include "linsol.hpp"
+#include "expm.hpp"
 
 using namespace std;
 namespace casadi {

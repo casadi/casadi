@@ -28,7 +28,7 @@
 #define CASADI_JIT_HPP
 
 #include "function.hpp"
-#include "../casadi_file.hpp"
+#include "casadi_file.hpp"
 
 namespace casadi {
 

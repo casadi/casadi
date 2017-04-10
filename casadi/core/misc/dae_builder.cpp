@@ -34,7 +34,7 @@
 
 #include "../std_vector_tools.hpp"
 #include "../exception.hpp"
-#include "../function/code_generator.hpp"
+#include "../code_generator.hpp"
 #include "../calculus.hpp"
 #include "xml_file.hpp"
 

@@ -26,7 +26,7 @@
 #ifndef CASADI_BSPLINE_INTERPOLANT_HPP
 #define CASADI_BSPLINE_INTERPOLANT_HPP
 
-#include "casadi/core/function/interpolant_impl.hpp"
+#include "casadi/core/interpolant_impl.hpp"
 #include <casadi/solvers/interpolant/casadi_interpolant_bspline_export.h>
 
 /** \defgroup plugin_Interpolant_bspline

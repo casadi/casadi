@@ -24,7 +24,7 @@
 
 
 #include "function_internal.hpp"
-#include "../std_vector_tools.hpp"
+#include "std_vector_tools.hpp"
 #include "sx_function.hpp"
 #include "mx_function.hpp"
 #include "map.hpp"
@@ -33,7 +33,7 @@
 #include "nlpsol.hpp"
 #include "conic.hpp"
 #include "jit.hpp"
-#include "../casadi_file.hpp"
+#include "casadi_file.hpp"
 
 #include <typeinfo>
 #include <fstream>

@@ -25,7 +25,7 @@
 #ifndef CASADI_MATRIX_IMPL_HPP
 #define CASADI_MATRIX_IMPL_HPP
 
-#include "function/function.hpp"
+#include "function.hpp"
 
 #include "casadi_interrupt.hpp"
 #include "runtime/shared.hpp"

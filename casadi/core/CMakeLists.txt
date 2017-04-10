@@ -41,23 +41,23 @@ set(CASADI_PUBLIC
   mx.hpp
 
   # A dynamically created function with AD capabilities
-  function/function.hpp
-  function/callback.hpp
-  function/external.hpp
-  function/jit.hpp
-  function/linsol.hpp
-  function/rootfinder.hpp
-  function/integrator.hpp
-  function/nlpsol.hpp
-  function/conic.hpp
-  function/dple.hpp
-  function/interpolant.hpp
-  function/expm.hpp
-  function/code_generator.hpp
-  function/switch.hpp
-  function/bspline.hpp
-  function/map.hpp
-  function/importer.hpp
+  function.hpp
+  callback.hpp
+  external.hpp
+  jit.hpp
+  linsol.hpp
+  rootfinder.hpp
+  integrator.hpp
+  nlpsol.hpp
+  conic.hpp
+  dple.hpp
+  interpolant.hpp
+  expm.hpp
+  code_generator.hpp
+  switch.hpp
+  bspline.hpp
+  map.hpp
+  importer.hpp
 
   # MISC useful stuff
   misc/integration_tools.hpp
@@ -139,31 +139,31 @@ monitor.hpp             monitor.cpp             # Monitor
 repmat.hpp              repmat.cpp              # RepMat
 
 # A dynamically created function with AD capabilities
-function/function.cpp
-function/function_internal.hpp   function/function_internal.cpp   # Function object class (internal API)
-function/oracle_function.hpp     function/oracle_function.cpp     # Specialization of FunctionInternal to hold an oracle
-function/callback.cpp            # Interface for user-defined function classes (public API)
-function/callback_internal.cpp   function/callback_internal.hpp   # Interface for user-defined function classes (internal API)
-function/plugin_interface.hpp                                     # Plugin interface for Function
-function/factory.hpp                                              # Helper class for derivative function generation
-function/x_function.hpp                                           # Base class for SXFunction and MXFunction
-function/sx_function.hpp         function/sx_function.cpp
-function/mx_function.hpp         function/mx_function.cpp
-function/external.cpp
-function/jit.cpp
-function/linsol.cpp              function/linsol_internal.hpp  function/linsol_internal.cpp
-function/rootfinder_impl.hpp     function/rootfinder.cpp
-function/integrator_impl.hpp     function/integrator.cpp
-function/nlpsol.hpp              function/nlpsol_impl.hpp        function/nlpsol.cpp
-function/conic_impl.hpp          function/conic.cpp
-function/dple_impl.hpp           function/dple.cpp
-function/interpolant_impl.hpp    function/interpolant.cpp
-function/expm_impl.hpp           function/expm.cpp
-function/code_generator.cpp
-function/switch.hpp              function/switch.cpp
-function/bspline.hpp             function/bspline.cpp
-function/map.hpp                 function/map.cpp
-function/importer.cpp            function/importer_internal.hpp function/importer_internal.cpp
+function.cpp
+function_internal.hpp   function_internal.cpp   # Function object class (internal API)
+oracle_function.hpp     oracle_function.cpp     # Specialization of FunctionInternal to hold an oracle
+callback.cpp            # Interface for user-defined function classes (public API)
+callback_internal.cpp   callback_internal.hpp   # Interface for user-defined function classes (internal API)
+plugin_interface.hpp                                     # Plugin interface for Function
+factory.hpp                                              # Helper class for derivative function generation
+x_function.hpp                                           # Base class for SXFunction and MXFunction
+sx_function.hpp         sx_function.cpp
+mx_function.hpp         mx_function.cpp
+external.cpp
+jit.cpp
+linsol.cpp              linsol_internal.hpp  linsol_internal.cpp
+rootfinder_impl.hpp     rootfinder.cpp
+integrator_impl.hpp     integrator.cpp
+nlpsol.hpp              nlpsol_impl.hpp        nlpsol.cpp
+conic_impl.hpp          conic.cpp
+dple_impl.hpp           dple.cpp
+interpolant_impl.hpp    interpolant.cpp
+expm_impl.hpp           expm.cpp
+code_generator.cpp
+switch.hpp              switch.cpp
+bspline.hpp             bspline.cpp
+map.hpp                 map.cpp
+importer.cpp            importer_internal.hpp importer_internal.cpp
 
 # MISC useful stuff
 misc/integration_tools.cpp

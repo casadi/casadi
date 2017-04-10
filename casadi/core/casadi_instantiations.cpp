@@ -23,7 +23,7 @@
  */
 
 
-#include "function/function.hpp"
+#include "function.hpp"
 
 #include "sx_elem.hpp"
 #include "matrix.hpp"
