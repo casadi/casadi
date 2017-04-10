@@ -38,13 +38,13 @@ namespace casadi {
 
   /// \cond INTERNAL
   // Forward declaration of internal class
-  class SharedObjectNode;
+  class SharedObjectInternal;
   /// \endcond
 
   /** \brief SharedObject implements a reference counting framework similar for efficient and
       easily-maintained memory management.
 
-      To use the class, both the SharedObject class (the public class), and the SharedObjectNode
+      To use the class, both the SharedObject class (the public class), and the SharedObjectInternal
       class (the internal class) must be inherited from. It can be done in two different files
       and together with memory management, this approach provides a clear distinction of which
       methods of the class are to be considered "public", i.e. methods for public use that can
@@ -100,16 +100,16 @@ namespace casadi {
 
     /// \cond INTERNAL
     /// Assign the node to a node class pointer (or null)
-    void assignNode(SharedObjectNode* node);
+    void assignNode(SharedObjectInternal* node);
 
     /** \brief Assign the node to a node class pointer without reference counting
      *
      * improper use will cause memory leaks!
      */
-    void assignNodeNoCount(SharedObjectNode* node);
+    void assignNodeNoCount(SharedObjectInternal* node);
 
     /// Get a const pointer to the node
-    SharedObjectNode* get() const;
+    SharedObjectInternal* get() const;
 
     /// Get the reference count
     int getCount() const;
@@ -118,7 +118,7 @@ namespace casadi {
     void swap(SharedObject& other);
 
     /// Access a member function or object
-    SharedObjectNode* operator->() const;
+    SharedObjectInternal* operator->() const;
     /// \endcond
 #endif // SWIG
 
@@ -149,73 +149,12 @@ namespace casadi {
     void count_up(); // increase counter of the node
     void count_down(); // decrease counter of the node
   private:
-    SharedObjectNode *node;
+    SharedObjectInternal *node;
 #endif // SWIG
 /// \endcond
   };
 
 #ifndef SWIG
-  /// \cond INTERNAL
-  /// Internal class for the reference counting framework, see comments on the public class.
-  class CASADI_EXPORT SharedObjectNode {
-    friend class SharedObject;
-    friend class Memory;
-  public:
-
-    /// Default constructor
-    SharedObjectNode();
-
-    /// Copy constructor
-    SharedObjectNode(const SharedObjectNode& node);
-
-    /// Assignment operator
-    SharedObjectNode& operator=(const SharedObjectNode& node);
-
-    /// Destructor
-    virtual ~SharedObjectNode() = 0;
-
-    /// Get the reference count
-    int getCount() const;
-
-    /// Print a representation of the object
-    virtual void repr(std::ostream &stream) const;
-
-    /// Print a description of the object
-    virtual void print(std::ostream &stream) const;
-
-    /** \brief Get a weak reference to the object */
-    WeakRef* weak();
-
-  protected:
-    /** Called in the constructor of singletons to avoid that the counter reaches zero */
-    void initSingleton() {
-      casadi_assert(count==0);
-      count++;
-    }
-
-    /** Called in the destructor of singletons */
-    void destroySingleton() {
-      count--;
-    }
-
-    /// Get a shared object from the current internal object
-    template<class B>
-    B shared_from_this();
-
-    /// Get a shared object from the current internal object
-    template<class B>
-    const B shared_from_this() const;
-
-  private:
-    /// Number of references pointing to the object
-    unsigned int count;
-
-    /// Weak pointer (non-owning) object for the object
-    WeakRef* weak_ref_;
-  };
-  /// \endcond
-
-  /// \cond INTERNAL
   /** \brief Typecast a shared object to a base class to a shared object to a derived class,
    * cf. dynamic_cast
    */
@@ -223,7 +162,7 @@ namespace casadi {
   B shared_cast(SharedObject& A) {
 
     /// Get a pointer to the node
-    SharedObjectNode* ptr = A.get();
+    SharedObjectInternal* ptr = A.get();
 
     /// Create a return object
     B ret;
@@ -244,16 +183,15 @@ namespace casadi {
     SharedObject A_copy = A;
     return shared_cast<B>(A_copy);
   }
-  /// \endcond
 
   ///@{
   /// \cond INTERNAL
   template<class A>
-  A getcopy(const A& a, std::map<SharedObjectNode*, SharedObject>& already_copied) {
+  A getcopy(const A& a, std::map<SharedObjectInternal*, SharedObject>& already_copied) {
     A ret;
     if (!a.is_null()) {
-      std::map<SharedObjectNode*, SharedObject>::iterator it =
-          already_copied.find(const_cast<SharedObjectNode*>(a.get()));
+      std::map<SharedObjectInternal*, SharedObject>::iterator it =
+          already_copied.find(const_cast<SharedObjectInternal*>(a.get()));
       if (it!=already_copied.end()) {
         ret.assignNode(it->second.get());
       }
@@ -263,26 +201,47 @@ namespace casadi {
   /// \endcond
   ///@}
 
-  /// \cond INTERNAL
-  /// Template function implementations
-  template<class B>
-  B SharedObjectNode::shared_from_this() {
-    casadi_assert(B::test_cast(this));
-    B ret;
-    ret.assignNode(this);
-    return ret;
-  }
-
-  template<class B>
-  const B SharedObjectNode::shared_from_this() const {
-    casadi_assert(B::test_cast(this));
-    B ret;
-    ret.assignNode(const_cast<SharedObjectNode*>(this));
-    return ret;
-  }
-  /// \endcond
-
 #endif // SWIG
+
+  // Forward declaration
+  class WeakRefInternal;
+
+  /** \brief Weak reference type
+      A weak reference to a SharedObject
+      \author Joel Andersson
+      \date 2013
+  */
+  class CASADI_EXPORT WeakRef : public SharedObject {
+  public:
+    friend class SharedObjectInternal;
+
+    /** \brief Default constructor */
+    WeakRef(int dummy=0);
+
+    /** \brief Construct from a shared object (also implicit type conversion) */
+    WeakRef(SharedObject shared);
+
+    /** \brief Get a shared (owning) reference */
+    SharedObject shared();
+
+    /** \brief Check if alive */
+    bool alive() const;
+
+    /** \brief  Access functions of the node */
+    WeakRefInternal* operator->();
+
+    /** \brief  Const access functions of the node */
+    const WeakRefInternal* operator->() const;
+
+  #ifndef SWIG
+  private:
+    /** \brief Construct from a shared object (internal) */
+    explicit WeakRef(SharedObjectInternal* raw);
+
+    /** \brief The shared object has been deleted */
+    void kill();
+  #endif // SWIG
+  };
 
 
 } // namespace casadi

@@ -27,7 +27,7 @@
 #define CASADI_FUNCTION_INTERNAL_HPP
 
 #include "function.hpp"
-#include "weak_ref.hpp"
+#include "shared_object_internal.hpp"
 #include <set>
 #include <stack>
 #include "code_generator.hpp"
@@ -60,7 +60,7 @@ namespace casadi {
       \author Joel Andersson
       \date 2010-2015
   */
-  class CASADI_EXPORT FunctionInternal : public SharedObjectNode {
+  class CASADI_EXPORT FunctionInternal : public SharedObjectInternal {
   public:
     /** \brief Constructor */
     FunctionInternal(const std::string& name);

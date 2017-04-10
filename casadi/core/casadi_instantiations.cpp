@@ -32,7 +32,7 @@
 
 #include "casadi_limits.hpp"
 
-#include "weak_ref.hpp"
+#include "shared_object.hpp"
 #include <iostream>
 
 #include "sparse_storage_impl.hpp"

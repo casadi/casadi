@@ -681,7 +681,7 @@ namespace casadi {
     (*this)->full_jacobian_ = jac;
   }
 
-  bool Function::test_cast(const SharedObjectNode* ptr) {
+  bool Function::test_cast(const SharedObjectInternal* ptr) {
     return dynamic_cast<const FunctionInternal*>(ptr)!=0;
   }
 

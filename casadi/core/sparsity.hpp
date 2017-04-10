@@ -33,7 +33,6 @@
 #include <list>
 #include <limits>
 #include <unordered_map>
-#include "weak_ref.hpp"
 
 namespace casadi {
 
@@ -721,7 +720,7 @@ namespace casadi {
     std::size_t hash() const;
 
     /// Check if a particular cast is allowed
-    static bool test_cast(const SharedObjectNode* ptr);
+    static bool test_cast(const SharedObjectInternal* ptr);
 
 #ifndef SWIG
     /** \brief Assign the nonzero entries of one sparsity pattern to the nonzero

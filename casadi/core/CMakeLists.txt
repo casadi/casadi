@@ -17,7 +17,6 @@ set(CASADI_PUBLIC
   casadi_meta.hpp
   printable_object.hpp        # Interface class enabling printing a Python-style "description" as well as a shorter "representation" of a class
   shared_object.hpp           # This base class implements the reference counting (garbage collection) framework used in CasADi
-  weak_ref.hpp                # Provides weak reference functionality (non-owning smart pointers)
   generic_type.hpp            # Generic type used for options and for compatibility with dynamically typed languages like Python
   options.hpp                 # Functionality for passing options to a class
   std_vector_tools.hpp        # Set of useful functions for the vector template class in STL
@@ -80,8 +79,7 @@ set(CASADI_INTERNAL
   casadi_interrupt.cpp
   global_options.cpp
   ${PROJECT_BINARY_DIR}/casadi_meta.cpp
-  shared_object.cpp
-  weak_ref.cpp
+  shared_object.cpp shared_object_internal.hpp shared_object_internal.cpp
   generic_type.cpp
   generic_type_internal.hpp
   options.cpp

@@ -6259,7 +6259,7 @@ SharedObject implements a reference counting framework similar for efficient
 and easily-maintained memory management.
 
 To use the class, both the SharedObject class (the public class), and the
-SharedObjectNode class (the internal class) must be inherited from. It can
+SharedObjectInternal class (the internal class) must be inherited from. It can
 be done in two different files and together with memory management, this
 approach provides a clear distinction of which methods of the class are to
 be considered \"public\", i.e. methods for public use that can be considered
