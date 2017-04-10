@@ -54,9 +54,6 @@ set(CASADI_PUBLIC
   interpolant.hpp
   expm.hpp
   code_generator.hpp
-  switch.hpp
-  bspline.hpp
-  map.hpp
   importer.hpp
 
   # MISC useful stuff
