@@ -27,7 +27,7 @@
 #define CASADI_COLLOCATION_HPP
 
 #include "casadi/core/integrator_impl.hpp"
-#include "casadi/core/misc/integration_tools.hpp"
+#include "casadi/core/integration_tools.hpp"
 #include <casadi/solvers/integrator/casadi_integrator_collocation_export.h>
 
 /** \defgroup plugin_Integrator_collocation

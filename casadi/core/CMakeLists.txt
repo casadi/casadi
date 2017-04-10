@@ -60,12 +60,12 @@ set(CASADI_PUBLIC
   importer.hpp
 
   # MISC useful stuff
-  misc/integration_tools.hpp
-  misc/nlp_builder.hpp
-  misc/xml_node.hpp
-  misc/xml_file.hpp
-  misc/variable.hpp
-  misc/dae_builder.hpp
+  integration_tools.hpp
+  nlp_builder.hpp
+  xml_node.hpp
+  xml_file.hpp
+  variable.hpp
+  dae_builder.hpp
 
   # User include class with the most essential includes
   core.hpp
@@ -166,12 +166,12 @@ map.hpp                 map.cpp
 importer.cpp            importer_internal.hpp importer_internal.cpp
 
 # MISC useful stuff
-misc/integration_tools.cpp
-misc/nlp_builder.cpp
-misc/xml_node.cpp
-misc/xml_file.cpp                misc/xml_file_internal.hpp                misc/xml_file_internal.cpp
-misc/variable.cpp
-misc/dae_builder.cpp
+integration_tools.cpp
+nlp_builder.cpp
+xml_node.cpp
+xml_file.cpp                xml_file_internal.hpp                xml_file_internal.cpp
+variable.cpp
+dae_builder.cpp
 
 # runtime
 runtime/shared.cpp

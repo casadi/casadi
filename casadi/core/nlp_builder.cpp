@@ -24,7 +24,7 @@
 
 
 #include "nlp_builder.hpp"
-#include "../core.hpp"
+#include "core.hpp"
 #include <fstream>
 
 using namespace std;

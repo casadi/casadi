@@ -23,7 +23,7 @@
  */
 
 
-#include "../exception.hpp"
+#include "exception.hpp"
 #include "variable.hpp"
 
 using namespace std;

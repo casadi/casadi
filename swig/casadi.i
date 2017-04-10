@@ -3991,11 +3991,11 @@ namespace casadi {
 %include <casadi/core/callback.hpp>
 %include <casadi/core/global_options.hpp>
 %include <casadi/core/casadi_meta.hpp>
-%include <casadi/core/misc/integration_tools.hpp>
-%include <casadi/core/misc/nlp_builder.hpp>
-%include <casadi/core/misc/variable.hpp>
-%include <casadi/core/misc/dae_builder.hpp>
-%include <casadi/core/misc/xml_file.hpp>
+%include <casadi/core/integration_tools.hpp>
+%include <casadi/core/nlp_builder.hpp>
+%include <casadi/core/variable.hpp>
+%include <casadi/core/dae_builder.hpp>
+%include <casadi/core/xml_file.hpp>
 
 // Cleanup for dependent modules
 %exception {

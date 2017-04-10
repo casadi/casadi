@@ -33,7 +33,7 @@ if (WIN32)
 else()
   # Get C and C++ system includes
   # Note on OSX, "gcc" is often an alias for clang
-  set(GET_SYSTEM_INCLUDES_SH ${CMAKE_CURRENT_SOURCE_DIR}/../../../misc/get_system_includes.sh)
+  set(GET_SYSTEM_INCLUDES_SH ${CMAKE_CURRENT_SOURCE_DIR}/../../../get_system_includes.sh)
   execute_process(COMMAND ${GET_SYSTEM_INCLUDES_SH} gcc c
                   OUTPUT_VARIABLE CSYSTEM_INCLUDES)
   file(APPEND ${CSYSTEM_FILE} "${CSYSTEM_INCLUDES}")

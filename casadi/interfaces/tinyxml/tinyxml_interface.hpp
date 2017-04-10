@@ -34,7 +34,7 @@
 
 /// \cond INTERNAL
 #include <tinyxml.h>
-#include "casadi/core/misc/xml_file_internal.hpp"
+#include "casadi/core/xml_file_internal.hpp"
 #include <casadi/interfaces/tinyxml/casadi_xmlfile_tinyxml_export.h>
 
 namespace casadi {

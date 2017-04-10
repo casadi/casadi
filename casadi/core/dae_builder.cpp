@@ -32,10 +32,10 @@
 #include <ctime>
 #include <cctype>
 
-#include "../std_vector_tools.hpp"
-#include "../exception.hpp"
-#include "../code_generator.hpp"
-#include "../calculus.hpp"
+#include "std_vector_tools.hpp"
+#include "exception.hpp"
+#include "code_generator.hpp"
+#include "calculus.hpp"
 #include "xml_file.hpp"
 
 using namespace std;

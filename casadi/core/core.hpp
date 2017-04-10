@@ -57,10 +57,10 @@
 #include "external.hpp"
 
 // Misc
-#include "misc/integration_tools.hpp"
-#include "misc/nlp_builder.hpp"
-#include "misc/variable.hpp"
-#include "misc/dae_builder.hpp"
-#include "misc/xml_file.hpp"
+#include "integration_tools.hpp"
+#include "nlp_builder.hpp"
+#include "variable.hpp"
+#include "dae_builder.hpp"
+#include "xml_file.hpp"
 
 #endif // CASADI_CORE_HPP

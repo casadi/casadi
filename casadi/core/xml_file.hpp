@@ -27,7 +27,7 @@
 #define CASADI_XML_FILE_HPP
 
 #include "xml_file.hpp"
-#include "../shared_object.hpp"
+#include "shared_object.hpp"
 #include "xml_node.hpp"
 
 namespace casadi {
