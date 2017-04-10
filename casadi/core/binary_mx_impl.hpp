@@ -29,8 +29,8 @@
 #include "binary_mx.hpp"
 #include <vector>
 #include <sstream>
-#include "../std_vector_tools.hpp"
-#include "../global_options.hpp"
+#include "std_vector_tools.hpp"
+#include "global_options.hpp"
 
 using namespace std;
 

@@ -26,7 +26,7 @@
 #ifndef CASADI_NLP_BUILDER_HPP
 #define CASADI_NLP_BUILDER_HPP
 
-#include "../mx/mx.hpp"
+#include "../mx.hpp"
 
 namespace casadi {
 

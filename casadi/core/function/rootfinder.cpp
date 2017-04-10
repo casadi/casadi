@@ -24,7 +24,7 @@
 
 
 #include "rootfinder_impl.hpp"
-#include "../mx/mx_node.hpp"
+#include "../mx_node.hpp"
 #include <iterator>
 #include "linsol.hpp"
 

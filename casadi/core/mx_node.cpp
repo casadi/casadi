@@ -24,7 +24,7 @@
 
 
 #include "mx_node.hpp"
-#include "../std_vector_tools.hpp"
+#include "std_vector_tools.hpp"
 #include <typeinfo>
 #include "transpose.hpp"
 #include "reshape.hpp"

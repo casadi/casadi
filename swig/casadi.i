@@ -3619,7 +3619,7 @@ namespace casadi {
    %template(SX) Matrix<double>;
 };
 
-%include <casadi/core/mx/mx.hpp>
+%include <casadi/core/mx.hpp>
 
 %extend casadi::MX{
   %matrix_helpers(casadi::MX)

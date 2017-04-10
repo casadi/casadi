@@ -32,7 +32,7 @@
 #include <iostream>
 
 #include "x_function.hpp"
-#include "../mx/mx_node.hpp"
+#include "../mx_node.hpp"
 
 /// \cond INTERNAL
 

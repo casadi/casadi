@@ -27,10 +27,10 @@
 #define CASADI_MX_NODE_HPP
 
 #include "mx.hpp"
-#include "../sx/sx_elem.hpp"
-#include "../calculus.hpp"
-#include "../function/code_generator.hpp"
-#include "../function/linsol.hpp"
+#include "sx/sx_elem.hpp"
+#include "calculus.hpp"
+#include "function/code_generator.hpp"
+#include "function/linsol.hpp"
 #include <vector>
 #include <stack>
 

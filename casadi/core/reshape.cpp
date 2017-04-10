@@ -24,7 +24,7 @@
 
 
 #include "reshape.hpp"
-#include "../std_vector_tools.hpp"
+#include "std_vector_tools.hpp"
 
 using namespace std;
 

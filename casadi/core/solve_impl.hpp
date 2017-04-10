@@ -27,7 +27,7 @@
 #define CASADI_SOLVE_IMPL_HPP
 
 #include "solve.hpp"
-#include "../function/linsol_internal.hpp"
+#include "function/linsol_internal.hpp"
 
 using namespace std;
 

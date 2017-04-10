@@ -24,7 +24,7 @@
 
 
 #include "dot.hpp"
-#include "../runtime/runtime.hpp"
+#include "runtime/runtime.hpp"
 
 using namespace std;
 

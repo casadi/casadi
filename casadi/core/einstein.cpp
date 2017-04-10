@@ -27,9 +27,9 @@
 #define CASADI_EINSTEIN_CPP
 
 #include "einstein.hpp"
-#include "../std_vector_tools.hpp"
-#include "../function/function_internal.hpp"
-#include "../runtime/shared.hpp"
+#include "std_vector_tools.hpp"
+#include "function/function_internal.hpp"
+#include "runtime/shared.hpp"
 
 using namespace std;
 

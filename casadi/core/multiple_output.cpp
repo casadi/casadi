@@ -24,8 +24,8 @@
 
 
 #include "multiple_output.hpp"
-#include "../function/function_internal.hpp"
-#include "../std_vector_tools.hpp"
+#include "function/function_internal.hpp"
+#include "std_vector_tools.hpp"
 
 using namespace std;
 

@@ -38,7 +38,7 @@ set(CASADI_PUBLIC
   sx/sx_elem.hpp
 
   # More general graph representation with sparse matrix expressions and function evaluations
-  mx/mx.hpp
+  mx.hpp
 
   # A dynamically created function with AD capabilities
   function/function.hpp
@@ -107,36 +107,36 @@ sx/unary_sx.hpp                                       # A unary operation
 sx/binary_sx.hpp                                      # A binary operation
 
 # More general graph representation with sparse matrix expressions and function evaluations
-mx/mx.cpp                  # Symbolic expression class (matrix-valued atomics)
-mx/mx_node.hpp             mx/mx_node.cpp             # Base class for all the MX nodes
-mx/constant_mx.hpp         mx/constant_mx.cpp         # A constant MX node
-mx/symbolic_mx.hpp         mx/symbolic_mx.cpp         # A symbolic MX variable
-mx/unary_mx.hpp            mx/unary_mx.cpp            # Unary operation
-mx/binary_mx.hpp           mx/binary_mx_impl.hpp      # Binary operation
-mx/multiplication.hpp      mx/multiplication.cpp      # Matrix multiplication
-mx/einstein.hpp            mx/einstein.cpp            # Einstein product
-mx/solve.hpp               mx/solve_impl.hpp          # Solve linear system of equations
-mx/casadi_call.hpp         mx/casadi_call.cpp         # Function call
-mx/casadi_find.hpp         mx/casadi_find.cpp         # Find first nonzero
-mx/norm.hpp                mx/norm.cpp                # 1-norm, 2-norm and infinity-norm
-mx/transpose.hpp           mx/transpose.cpp           # Transpose
-mx/concat.hpp              mx/concat.cpp              # Concatenation
-mx/split.hpp               mx/split.cpp               # Split (inverse of concatenation)
-mx/reshape.hpp             mx/reshape.cpp             # Reshape
-mx/subref.hpp              mx/subref.cpp              # Submatrix reference
-mx/subassign.hpp           mx/subassign.cpp           # Submatrix assignment
-mx/getnonzeros.hpp         mx/getnonzeros.cpp         # Get the nonzeros of matrix
-mx/setnonzeros.hpp         mx/setnonzeros_impl.hpp    # Assign the nonzeros of a matrix to another matrix
-mx/project.hpp             mx/project.cpp             # Sparse copy to another sparsity pattern
-mx/determinant.hpp         mx/determinant.cpp         # Determinant
-mx/inverse.hpp             mx/inverse.cpp             # Matrix inverse
-mx/dot.hpp                 mx/dot.cpp                 # Inner product
-mx/bilin.hpp               mx/bilin.cpp               # Bilinear form
-mx/rank1.hpp               mx/rank1.cpp               # Rank-1 update
-mx/multiple_output.hpp     mx/multiple_output.cpp     # Base class for nodes with multiple outputs
-mx/assertion.hpp           mx/assertion.cpp           # Assertion
-mx/monitor.hpp             mx/monitor.cpp             # Monitor
-mx/repmat.hpp              mx/repmat.cpp              # RepMat
+mx.cpp                  # Symbolic expression class (matrix-valued atomics)
+mx_node.hpp             mx_node.cpp             # Base class for all the MX nodes
+constant_mx.hpp         constant_mx.cpp         # A constant MX node
+symbolic_mx.hpp         symbolic_mx.cpp         # A symbolic MX variable
+unary_mx.hpp            unary_mx.cpp            # Unary operation
+binary_mx.hpp           binary_mx_impl.hpp      # Binary operation
+multiplication.hpp      multiplication.cpp      # Matrix multiplication
+einstein.hpp            einstein.cpp            # Einstein product
+solve.hpp               solve_impl.hpp          # Solve linear system of equations
+casadi_call.hpp         casadi_call.cpp         # Function call
+casadi_find.hpp         casadi_find.cpp         # Find first nonzero
+norm.hpp                norm.cpp                # 1-norm, 2-norm and infinity-norm
+transpose.hpp           transpose.cpp           # Transpose
+concat.hpp              concat.cpp              # Concatenation
+split.hpp               split.cpp               # Split (inverse of concatenation)
+reshape.hpp             reshape.cpp             # Reshape
+subref.hpp              subref.cpp              # Submatrix reference
+subassign.hpp           subassign.cpp           # Submatrix assignment
+getnonzeros.hpp         getnonzeros.cpp         # Get the nonzeros of matrix
+setnonzeros.hpp         setnonzeros_impl.hpp    # Assign the nonzeros of a matrix to another matrix
+project.hpp             project.cpp             # Sparse copy to another sparsity pattern
+determinant.hpp         determinant.cpp         # Determinant
+inverse.hpp             inverse.cpp             # Matrix inverse
+dot.hpp                 dot.cpp                 # Inner product
+bilin.hpp               bilin.cpp               # Bilinear form
+rank1.hpp               rank1.cpp               # Rank-1 update
+multiple_output.hpp     multiple_output.cpp     # Base class for nodes with multiple outputs
+assertion.hpp           assertion.cpp           # Assertion
+monitor.hpp             monitor.cpp             # Monitor
+repmat.hpp              repmat.cpp              # RepMat
 
 # A dynamically created function with AD capabilities
 function/function.cpp

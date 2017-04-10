@@ -24,7 +24,7 @@
 
 
 #include "function_internal.hpp"
-#include "../mx/casadi_call.hpp"
+#include "../casadi_call.hpp"
 #include "../std_vector_tools.hpp"
 #include "../global_options.hpp"
 #include "external.hpp"

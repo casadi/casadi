@@ -27,8 +27,8 @@
 #define CASADI_MULTIPLICATION_CPP
 
 #include "multiplication.hpp"
-#include "../std_vector_tools.hpp"
-#include "../function/function_internal.hpp"
+#include "std_vector_tools.hpp"
+#include "function/function_internal.hpp"
 
 using namespace std;
 

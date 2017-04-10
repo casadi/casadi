@@ -27,7 +27,7 @@
 #define CASADI_CALL_HPP
 
 #include "multiple_output.hpp"
-#include "../function/function.hpp"
+#include "function/function.hpp"
 
 /// \cond INTERNAL
 

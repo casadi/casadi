@@ -27,7 +27,7 @@
 #define CASADI_SETNONZEROS_IMPL_HPP
 
 #include "setnonzeros.hpp"
-#include "../std_vector_tools.hpp"
+#include "std_vector_tools.hpp"
 
 /// \cond INTERNAL
 

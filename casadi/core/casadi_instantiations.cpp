@@ -28,7 +28,7 @@
 #include "sx/sx_elem.hpp"
 #include "matrix.hpp"
 #include "sparse_storage.hpp"
-#include "mx/mx.hpp"
+#include "mx.hpp"
 
 #include "casadi_limits.hpp"
 

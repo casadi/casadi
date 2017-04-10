@@ -39,7 +39,7 @@
 #include "matrix.hpp"
 
 // Matrix expressions
-#include "mx/mx.hpp"
+#include "mx.hpp"
 
 // Functions
 #include "function/code_generator.hpp"

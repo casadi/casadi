@@ -27,12 +27,12 @@
 #include "symbolic_mx.hpp"
 #include "constant_mx.hpp"
 #include "multiple_output.hpp"
-#include "../std_vector_tools.hpp"
+#include "std_vector_tools.hpp"
 #include "norm.hpp"
-#include "../calculus.hpp"
-#include "../function/mx_function.hpp"
-#include "../function/linsol.hpp"
-#include "../function/expm.hpp"
+#include "calculus.hpp"
+#include "function/mx_function.hpp"
+#include "function/linsol.hpp"
+#include "function/expm.hpp"
 
 using namespace std;
 namespace casadi {

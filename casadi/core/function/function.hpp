@@ -27,7 +27,7 @@
 #define CASADI_FUNCTION_HPP
 
 #include "../sx/sx_elem.hpp"
-#include "../mx/mx.hpp"
+#include "../mx.hpp"
 
 #include <exception>
 
