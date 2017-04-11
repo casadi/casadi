@@ -26,6 +26,8 @@
 #ifndef CASADI_SPARSE_STORAGE_IMPL_HPP
 #define CASADI_SPARSE_STORAGE_IMPL_HPP
 
+#include "sparse_storage.hpp"
+
 /// \cond INTERNAL
 
 namespace casadi {

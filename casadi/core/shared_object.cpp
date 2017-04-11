@@ -23,10 +23,14 @@
  */
 
 #include "shared_object_internal.hpp"
+#include "sparse_storage_impl.hpp"
 #include <typeinfo>
 
 using namespace std;
 namespace casadi {
+
+  // Instantiate templates
+  template class SparseStorage<WeakRef>;
 
   SharedObject::SharedObject() {
     node = 0;
