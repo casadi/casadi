@@ -35,6 +35,8 @@
 #include "shared_object.hpp"
 #include <iostream>
 
+#include "sparse_storage_impl.hpp"
+
 using namespace std;
 namespace casadi {
 
@@ -52,6 +54,9 @@ namespace casadi {
 
   template class casadi_limits<double>;
   template class casadi_limits<int>;
+
+  template class SparseStorage<Sparsity>;
+  template class SparseStorage<WeakRef>;
 
 } // namespace casadi
 
