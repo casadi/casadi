@@ -69,11 +69,6 @@ set(CASADI_PUBLIC
 )
 
 set(CASADI_INTERNAL
-  # For a so/dll with default hidden visibility, we need to instantiate some templates
-  # Since this compilation takes some time, we put it up-front,
-  # So that a make -jn will not be blocked
-  casadi_instantiations.cpp
-
   # MISC
   casadi_logger.cpp
   casadi_file.cpp

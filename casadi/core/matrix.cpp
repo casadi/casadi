@@ -34,6 +34,8 @@ using namespace std;
 namespace casadi {
 
   // Instantiate templates
+  template class casadi_limits<double>;
+  template class casadi_limits<int>;
   template class Matrix<double>;
   template class Matrix<int>;
   template class Matrix< SXElem >;

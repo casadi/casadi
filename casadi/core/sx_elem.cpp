@@ -38,6 +38,8 @@
 using namespace std;
 namespace casadi {
 
+
+
   // Allocate storage for the caching
   CACHING_MAP<int, IntegerSX*> IntegerSX::cached_constants_;
   CACHING_MAP<double, RealtypeSX*> RealtypeSX::cached_constants_;
@@ -608,33 +610,10 @@ namespace casadi {
 
 using namespace casadi;
 namespace std {
-/**
-  const bool numeric_limits<casadi::SXElem>::is_specialized = true;
-  const int  numeric_limits<casadi::SXElem>::digits = 0;
-  const int  numeric_limits<casadi::SXElem>::digits10 = 0;
-  const bool numeric_limits<casadi::SXElem>::is_signed = false;
-  const bool numeric_limits<casadi::SXElem>::is_integer = false;
-  const bool numeric_limits<casadi::SXElem>::is_exact = false;
-  const int numeric_limits<casadi::SXElem>::radix = 0;
-  const int  numeric_limits<casadi::SXElem>::min_exponent = 0;
-  const int  numeric_limits<casadi::SXElem>::min_exponent10 = 0;
-  const int  numeric_limits<casadi::SXElem>::max_exponent = 0;
-  const int  numeric_limits<casadi::SXElem>::max_exponent10 = 0;
 
-  const bool numeric_limits<casadi::SXElem>::has_infinity = true;
-  const bool numeric_limits<casadi::SXElem>::has_quiet_NaN = true;
-  const bool numeric_limits<casadi::SXElem>::has_signaling_NaN = false;
-  const float_denorm_style has_denorm = denorm absent;
-  const bool numeric_limits<casadi::SXElem>::has_denorm_loss = false;
+  // Template instantiation
+  template class std::numeric_limits<casadi::SXElem>;
 
-  const bool numeric_limits<casadi::SXElem>::is_iec559 = false;
-  const bool numeric_limits<casadi::SXElem>::is_bounded = false;
-  const bool numeric_limits<casadi::SXElem>::is_modulo = false;
-
-  const bool numeric_limits<casadi::SXElem>::traps = false;
-  const bool numeric_limits<casadi::SXElem>::tinyness_before = false;
-  const float_round_style numeric_limits<casadi::SXElem>::round_style = round_toward_zero;
-*/
   SXElem numeric_limits<SXElem>::infinity() throw() {
     return casadi::casadi_limits<SXElem>::inf;
   }
