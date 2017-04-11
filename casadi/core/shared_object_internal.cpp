@@ -23,6 +23,7 @@
  */
 
 #include "shared_object_internal.hpp"
+#include <typeinfo>
 
 using namespace std;
 namespace casadi {
