@@ -26,11 +26,14 @@
 #include "sparsity_internal.hpp"
 #include "matrix.hpp"
 #include "std_vector_tools.hpp"
+#include "sparse_storage_impl.hpp"
 #include <climits>
 
 using namespace std;
 
 namespace casadi {
+  // Instantiate templates
+  template class SparseStorage<Sparsity>;
 
   /// \cond INTERNAL
   // Singletons

@@ -29,6 +29,7 @@
 #include <vector>
 #include <typeinfo>
 #include "exception.hpp"
+#include "sparsity.hpp"
 
 /// \cond INTERNAL
 
