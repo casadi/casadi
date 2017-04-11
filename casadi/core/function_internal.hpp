@@ -33,6 +33,7 @@
 #include "importer.hpp"
 #include "sparse_storage.hpp"
 #include "options.hpp"
+#include "shared_object_internal.hpp"
 
 // This macro is for documentation purposes
 #define INPUTSCHEME(name)

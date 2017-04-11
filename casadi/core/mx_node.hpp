@@ -27,6 +27,7 @@
 #define CASADI_MX_NODE_HPP
 
 #include "mx.hpp"
+#include "shared_object_internal.hpp"
 #include "sx_elem.hpp"
 #include "calculus.hpp"
 #include "code_generator.hpp"

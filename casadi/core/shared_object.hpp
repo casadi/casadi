@@ -194,67 +194,6 @@ namespace casadi {
 
 #ifndef SWIG
 
-  /// \cond INTERNAL
-  /// Internal class for the reference counting framework, see comments on the public class.
-  class CASADI_EXPORT SharedObjectInternal {
-    friend class SharedObject;
-    friend class Memory;
-  public:
-
-    /// Default constructor
-    SharedObjectInternal();
-
-    /// Copy constructor
-    SharedObjectInternal(const SharedObjectInternal& node);
-
-    /// Assignment operator
-    SharedObjectInternal& operator=(const SharedObjectInternal& node);
-
-    /// Destructor
-    virtual ~SharedObjectInternal() = 0;
-
-    /// Get the reference count
-    int getCount() const;
-
-    /// Print a representation of the object
-    virtual void repr(std::ostream &stream) const;
-
-    /// Print a description of the object
-    virtual void print(std::ostream &stream) const;
-
-    /** \brief Get a weak reference to the object */
-    WeakRef* weak();
-
-  protected:
-    /** Called in the constructor of singletons to avoid that the counter reaches zero */
-    void initSingleton() {
-      casadi_assert(count==0);
-      count++;
-    }
-
-    /** Called in the destructor of singletons */
-    void destroySingleton() {
-      count--;
-    }
-
-    /// Get a shared object from the current internal object
-    template<class B>
-    B shared_from_this();
-
-    /// Get a shared object from the current internal object
-    template<class B>
-    const B shared_from_this() const;
-
-  private:
-    /// Number of references pointing to the object
-    unsigned int count;
-
-    /// Weak pointer (non-owning) object for the object
-    WeakRef* weak_ref_;
-  };
-  /// \endcond
-
-  /// \cond INTERNAL
   /** \brief Typecast a shared object to a base class to a shared object to a derived class,
    * cf. dynamic_cast
    */
@@ -283,43 +222,6 @@ namespace casadi {
     SharedObject A_copy = A;
     return shared_cast<B>(A_copy);
   }
-  /// \endcond
-
-  ///@{
-  /// \cond INTERNAL
-  template<class A>
-  A getcopy(const A& a, std::map<SharedObjectInternal*, SharedObject>& already_copied) {
-    A ret;
-    if (!a.is_null()) {
-      std::map<SharedObjectInternal*, SharedObject>::iterator it =
-          already_copied.find(const_cast<SharedObjectInternal*>(a.get()));
-      if (it!=already_copied.end()) {
-        ret.assignNode(it->second.get());
-      }
-    }
-    return ret;
-  }
-  /// \endcond
-  ///@}
-
-  /// \cond INTERNAL
-  /// Template function implementations
-  template<class B>
-  B SharedObjectInternal::shared_from_this() {
-    casadi_assert(B::test_cast(this));
-    B ret;
-    ret.assignNode(this);
-    return ret;
-  }
-
-  template<class B>
-  const B SharedObjectInternal::shared_from_this() const {
-    casadi_assert(B::test_cast(this));
-    B ret;
-    ret.assignNode(const_cast<SharedObjectInternal*>(this));
-    return ret;
-  }
-  /// \endcond
 
 #endif // SWIG
 

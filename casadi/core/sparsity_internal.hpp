@@ -27,6 +27,7 @@
 #define CASADI_SPARSITY_INTERNAL_HPP
 
 #include "sparsity.hpp"
+#include "shared_object_internal.hpp"
 /// \cond INTERNAL
 
 namespace casadi {

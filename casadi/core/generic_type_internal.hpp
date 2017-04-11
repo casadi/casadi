@@ -28,6 +28,7 @@
 
 #include "generic_type.hpp"
 #include "std_vector_tools.hpp"
+#include "shared_object_internal.hpp"
 
 /// \cond INTERNAL
 
