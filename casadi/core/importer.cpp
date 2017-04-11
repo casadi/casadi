@@ -53,7 +53,7 @@ namespace casadi {
     return static_cast<const ImporterInternal*>(SharedObject::operator->());
   }
 
-  bool Importer::test_cast(const SharedObjectNode* ptr) {
+  bool Importer::test_cast(const SharedObjectInternal* ptr) {
     return dynamic_cast<const ImporterInternal*>(ptr)!=0;
   }
 

@@ -31,7 +31,7 @@
 
 namespace casadi {
 
-  class CASADI_EXPORT SparsityInternal : public SharedObjectNode {
+  class CASADI_EXPORT SparsityInternal : public SharedObjectInternal {
   private:
     /* \brief Sparsity pattern in compressed column storage (CCS) format
        The first two entries are the number of rows (nrow) and columns (ncol).

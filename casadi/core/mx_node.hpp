@@ -76,7 +76,7 @@ namespace casadi {
       \date 2010
       Internal class.
   */
-  class CASADI_EXPORT MXNode : public SharedObjectNode {
+  class CASADI_EXPORT MXNode : public SharedObjectInternal {
     friend class MX;
 
   public:

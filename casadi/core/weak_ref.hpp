@@ -43,7 +43,7 @@ namespace casadi {
   */
   class CASADI_EXPORT WeakRef : public SharedObject {
   public:
-    friend class SharedObjectNode;
+    friend class SharedObjectInternal;
 
     /** \brief Default constructor */
     WeakRef(int dummy=0);
@@ -66,7 +66,7 @@ namespace casadi {
 #ifndef SWIG
   private:
     /** \brief Construct from a shared object (internal) */
-    explicit WeakRef(SharedObjectNode* raw);
+    explicit WeakRef(SharedObjectInternal* raw);
 
     /** \brief The shared object has been deleted */
     void kill();
@@ -74,16 +74,16 @@ namespace casadi {
  };
 
 #ifndef SWIG
-  class CASADI_EXPORT WeakRefInternal : public SharedObjectNode {
+  class CASADI_EXPORT WeakRefInternal : public SharedObjectInternal {
   public:
     // Constructor
-    WeakRefInternal(SharedObjectNode* raw);
+    WeakRefInternal(SharedObjectInternal* raw);
 
     // Destructor
     ~WeakRefInternal();
 
     // Raw pointer to the cached object
-    SharedObjectNode* raw_;
+    SharedObjectInternal* raw_;
   };
 
 #endif // SWIG

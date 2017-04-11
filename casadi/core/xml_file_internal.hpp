@@ -33,7 +33,7 @@
 namespace casadi {
 
   class CASADI_EXPORT
-  XmlFileInternal : public SharedObjectNode,
+  XmlFileInternal : public SharedObjectInternal,
                     public PluginInterface<XmlFileInternal> {
   public:
     // Constructor

@@ -722,7 +722,7 @@ namespace casadi {
     FunctionInternal* operator->() const;
 
     /// Check if a particular cast is allowed
-    static bool test_cast(const SharedObjectNode* ptr);
+    static bool test_cast(const SharedObjectInternal* ptr);
     /// \endcond
 #endif // SWIG
 

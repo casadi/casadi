@@ -57,7 +57,7 @@ namespace casadi {
     assignNode(shared.weak()->get());
   }
 
-  WeakRef::WeakRef(SharedObjectNode* raw) {
+  WeakRef::WeakRef(SharedObjectInternal* raw) {
     assignNode(new WeakRefInternal(raw));
   }
 
@@ -65,7 +65,7 @@ namespace casadi {
     (*this)->raw_ = 0;
   }
 
-  WeakRefInternal::WeakRefInternal(SharedObjectNode* raw) : raw_(raw) {
+  WeakRefInternal::WeakRefInternal(SharedObjectInternal* raw) : raw_(raw) {
   }
 
   WeakRefInternal::~WeakRefInternal() {
