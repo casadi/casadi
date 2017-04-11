@@ -62,7 +62,7 @@ namespace casadi {
     const LinsolInternal* operator->() const;
 
     /// Check if a particular cast is allowed
-    static bool test_cast(const SharedObjectInternal* ptr);
+    static bool test_cast(const SharedObjectNode* ptr);
 
     /// Check if a plugin is available
     static bool has_plugin(const std::string& name);

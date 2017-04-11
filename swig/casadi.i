@@ -2684,6 +2684,7 @@ class NZproxy:
 
 %include <casadi/core/shared_object.hpp>
 %include <casadi/core/std_vector_tools.hpp>
+%include <casadi/core/weak_ref.hpp>
 %include <casadi/core/casadi_types.hpp>
 %include <casadi/core/generic_type.hpp>
 %include <casadi/core/calculus.hpp>

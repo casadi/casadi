@@ -27,12 +27,11 @@
 #define CASADI_SPARSITY_INTERNAL_HPP
 
 #include "sparsity.hpp"
-#include "shared_object_internal.hpp"
 /// \cond INTERNAL
 
 namespace casadi {
 
-  class CASADI_EXPORT SparsityInternal : public SharedObjectInternal {
+  class CASADI_EXPORT SparsityInternal : public SharedObjectNode {
   private:
     /* \brief Sparsity pattern in compressed column storage (CCS) format
        The first two entries are the number of rows (nrow) and columns (ncol).

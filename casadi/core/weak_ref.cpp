@@ -23,33 +23,53 @@
  */
 
 
-#ifndef CASADI_GENERIC_TYPE_INTERNAL_HPP
-#define CASADI_GENERIC_TYPE_INTERNAL_HPP
+#include "weak_ref.hpp"
 
-#include "generic_type.hpp"
-#include "std_vector_tools.hpp"
-
-/// \cond INTERNAL
+using namespace std;
 
 namespace casadi {
 
-  class CASADI_EXPORT GenericTypeBase : public SharedObjectNode {
-  public:
-    virtual ~GenericTypeBase() {}
-    virtual TypeID getType() const = 0;
-  };
+  WeakRef::WeakRef(int dummy) {
+    casadi_assert(dummy==0);
+  }
 
-  template<TypeID ID, typename T>
-  class CASADI_EXPORT GenericTypeInternal : public GenericTypeBase {
-  public:
-    explicit GenericTypeInternal(const T& d) : d_(d) {}
-    virtual ~GenericTypeInternal() {}
-    virtual void print(std::ostream &stream) const { stream << d_; }
-    virtual TypeID getType() const { return ID;}
-    T d_;
-  };
+  bool WeakRef::alive() const {
+    return !is_null() && (*this)->raw_ != 0;
+  }
+
+  SharedObject WeakRef::shared() {
+    SharedObject ret;
+    if (alive()) {
+      ret.assignNode((*this)->raw_);
+    }
+    return ret;
+  }
+
+  const WeakRefInternal* WeakRef::operator->() const {
+    return static_cast<const WeakRefInternal*>(SharedObject::operator->());
+  }
+
+  WeakRefInternal* WeakRef::operator->() {
+    return static_cast<WeakRefInternal*>(SharedObject::operator->());
+  }
+
+  WeakRef::WeakRef(SharedObject shared) {
+    assignNode(shared.weak()->get());
+  }
+
+  WeakRef::WeakRef(SharedObjectNode* raw) {
+    assignNode(new WeakRefInternal(raw));
+  }
+
+  void WeakRef::kill() {
+    (*this)->raw_ = 0;
+  }
+
+  WeakRefInternal::WeakRefInternal(SharedObjectNode* raw) : raw_(raw) {
+  }
+
+  WeakRefInternal::~WeakRefInternal() {
+  }
 
 } // namespace casadi
-/// \endcond
 
-#endif // CASADI_GENERIC_TYPE_INTERNAL_HPP

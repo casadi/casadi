@@ -841,7 +841,7 @@ namespace casadi {
     return (*this)->getTranspose();
   }
 
-  bool MX::test_cast(const SharedObjectInternal* ptr) {
+  bool MX::test_cast(const SharedObjectNode* ptr) {
     return dynamic_cast<const MXNode*>(ptr)!=0;
   }
 

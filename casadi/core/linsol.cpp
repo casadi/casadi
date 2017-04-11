@@ -46,7 +46,7 @@ namespace casadi {
     return static_cast<const LinsolInternal*>(SharedObject::operator->());
   }
 
-  bool Linsol::test_cast(const SharedObjectInternal* ptr) {
+  bool Linsol::test_cast(const SharedObjectNode* ptr) {
     return dynamic_cast<const LinsolInternal*>(ptr)!=0;
   }
 

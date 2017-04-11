@@ -27,7 +27,6 @@
 #define CASADI_MX_NODE_HPP
 
 #include "mx.hpp"
-#include "shared_object_internal.hpp"
 #include "sx_elem.hpp"
 #include "calculus.hpp"
 #include "code_generator.hpp"
@@ -77,7 +76,7 @@ namespace casadi {
       \date 2010
       Internal class.
   */
-  class CASADI_EXPORT MXNode : public SharedObjectInternal {
+  class CASADI_EXPORT MXNode : public SharedObjectNode {
     friend class MX;
 
   public:

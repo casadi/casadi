@@ -591,7 +591,7 @@ namespace casadi {
 #endif // WITH_DEPRECATED_FEATURES
 
     /// Check if a particular cast is allowed
-    static bool test_cast(const SharedObjectInternal* ptr);
+    static bool test_cast(const SharedObjectNode* ptr);
 
     /** \brief Get function inputs */
     static std::vector<MX> get_input(const Function& f);

@@ -41,7 +41,7 @@ namespace casadi {
   \date 2010-2013
 */
   class CASADI_EXPORT
-  ImporterInternal : public SharedObjectInternal,
+  ImporterInternal : public SharedObjectNode,
                      public PluginInterface<ImporterInternal> {
 
   public:
