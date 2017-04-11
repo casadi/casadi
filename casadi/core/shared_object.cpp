@@ -22,7 +22,7 @@
  *
  */
 
-#include "shared_object.hpp"
+#include "shared_object_internal.hpp"
 #include "weak_ref.hpp"
 #include "sparse_storage_impl.hpp"
 #include <typeinfo>
@@ -35,16 +35,6 @@ namespace casadi {
 
   SharedObject::SharedObject() {
     node = 0;
-  }
-
-  SharedObjectInternal::SharedObjectInternal(const SharedObjectInternal& node) {
-    count = 0; // reference counter is _not_ copied
-    weak_ref_ = 0; // nor will they have the same weak references
-  }
-
-  SharedObjectInternal& SharedObjectInternal::operator=(const SharedObjectInternal& node) {
-    // do _not_ copy the reference counter
-    return *this;
   }
 
   SharedObject::SharedObject(const SharedObject& ref) {
@@ -103,25 +93,6 @@ namespace casadi {
     return node;
   }
 
-  SharedObjectInternal::SharedObjectInternal() {
-    count = 0;
-    weak_ref_ = 0;
-  }
-
-  SharedObjectInternal::~SharedObjectInternal() {
-    #ifdef WITH_REFCOUNT_WARNINGS
-    if (count!=0) {
-      // Note that casadi_assert_warning cannot be used in destructors
-      std::cerr << "Reference counting failure." <<
-                   "Possible cause: Circular dependency in user code." << std::endl;
-    }
-    #endif // WITH_REFCOUNT_WARNINGS
-    if (weak_ref_!=0) {
-      weak_ref_->kill();
-      delete weak_ref_;
-    }
-  }
-
   void SharedObject::repr(std::ostream &stream, bool trailing_newline) const {
     if (is_null()) {
       stream << 0;
@@ -129,11 +100,6 @@ namespace casadi {
       (*this)->repr(stream);
     }
     if (trailing_newline) stream << std::endl;
-  }
-
-  void SharedObjectInternal::repr(std::ostream &stream) const {
-    // Print description by default
-    print(stream);
   }
 
   void SharedObject::print(std::ostream &stream, bool trailing_newline) const {
@@ -149,11 +115,6 @@ namespace casadi {
     stream << node;
   }
 
-  void SharedObjectInternal::print(std::ostream &stream) const {
-    // Print the name of the object by default
-    stream << typeid(this).name();
-  }
-
   void SharedObject::swap(SharedObject& other) {
     SharedObject temp = *this;
     *this = other;
@@ -164,19 +125,8 @@ namespace casadi {
     return (*this)->getCount();
   }
 
-  int SharedObjectInternal::getCount() const {
-    return count;
-  }
-
   WeakRef* SharedObject::weak() {
     return (*this)->weak();
-  }
-
-  WeakRef* SharedObjectInternal::weak() {
-    if (weak_ref_==0) {
-      weak_ref_ = new WeakRef(this);
-    }
-    return weak_ref_;
   }
 
   size_t SharedObject::__hash__() const {
