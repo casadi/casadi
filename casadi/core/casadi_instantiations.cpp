@@ -38,17 +38,6 @@
 using namespace std;
 namespace casadi {
 
-  template<class T>
-  const T casadi_limits<T>::zero = T(0);
-
-  template<class T>
-  const T casadi_limits<T>::one = 1;
-
-  template<class T>
-  const T casadi_limits<T>::two = 2;
-
-  template<class T>
-  const T casadi_limits<T>::minus_one = -1;
 
   template class casadi_limits<double>;
   template class casadi_limits<int>;
