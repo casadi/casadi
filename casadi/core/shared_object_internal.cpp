@@ -23,7 +23,6 @@
  */
 
 #include "shared_object_internal.hpp"
-#include "weak_ref.hpp"
 
 using namespace std;
 namespace casadi {
@@ -76,6 +75,12 @@ namespace casadi {
       weak_ref_ = new WeakRef(this);
     }
     return weak_ref_;
+  }
+
+  WeakRefInternal::WeakRefInternal(SharedObjectInternal* raw) : raw_(raw) {
+  }
+
+  WeakRefInternal::~WeakRefInternal() {
   }
 
 } // namespace casadi

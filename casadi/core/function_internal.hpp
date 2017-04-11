@@ -27,7 +27,6 @@
 #define CASADI_FUNCTION_INTERNAL_HPP
 
 #include "function.hpp"
-#include "weak_ref.hpp"
 #include <set>
 #include <stack>
 #include "code_generator.hpp"

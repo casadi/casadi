@@ -37,8 +37,9 @@ namespace casadi {
   class WeakRef;
 
   /// \cond INTERNAL
-  // Forward declaration of internal class
+  // Forward declaration of internal classes
   class SharedObjectInternal;
+  class WeakRefInternal;
   /// \endcond
 
   /** \brief SharedObject implements a reference counting framework similar for efficient and
@@ -154,7 +155,45 @@ namespace casadi {
 /// \endcond
   };
 
+/** \brief Weak reference type
+    A weak reference to a SharedObject
+    \author Joel Andersson
+    \date 2013
+*/
+  class CASADI_EXPORT WeakRef : public SharedObject {
+  public:
+    friend class SharedObjectInternal;
+
+    /** \brief Default constructor */
+    WeakRef(int dummy=0);
+
+    /** \brief Construct from a shared object (also implicit type conversion) */
+    WeakRef(SharedObject shared);
+
+    /** \brief Get a shared (owning) reference */
+    SharedObject shared();
+
+    /** \brief Check if alive */
+    bool alive() const;
+
+    /** \brief  Access functions of the node */
+    WeakRefInternal* operator->();
+
+    /** \brief  Const access functions of the node */
+    const WeakRefInternal* operator->() const;
+
 #ifndef SWIG
+  private:
+    /** \brief Construct from a shared object (internal) */
+    explicit WeakRef(SharedObjectInternal* raw);
+
+    /** \brief The shared object has been deleted */
+    void kill();
+#endif // SWIG
+  };
+
+#ifndef SWIG
+
   /// \cond INTERNAL
   /// Internal class for the reference counting framework, see comments on the public class.
   class CASADI_EXPORT SharedObjectInternal {

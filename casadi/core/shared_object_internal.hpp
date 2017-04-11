@@ -30,6 +30,17 @@
 
 namespace casadi {
 
+  class CASADI_EXPORT WeakRefInternal : public SharedObjectInternal {
+  public:
+    // Constructor
+    WeakRefInternal(SharedObjectInternal* raw);
+
+    // Destructor
+    ~WeakRefInternal();
+
+    // Raw pointer to the cached object
+    SharedObjectInternal* raw_;
+  };
 
 } // namespace casadi
 

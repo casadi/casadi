@@ -23,7 +23,6 @@
  */
 
 #include "shared_object_internal.hpp"
-#include "weak_ref.hpp"
 #include "sparse_storage_impl.hpp"
 #include <typeinfo>
 
@@ -131,6 +130,42 @@ namespace casadi {
 
   size_t SharedObject::__hash__() const {
     return reinterpret_cast<size_t>(get());
+  }
+
+  WeakRef::WeakRef(int dummy) {
+    casadi_assert(dummy==0);
+  }
+
+  bool WeakRef::alive() const {
+    return !is_null() && (*this)->raw_ != 0;
+  }
+
+  SharedObject WeakRef::shared() {
+    SharedObject ret;
+    if (alive()) {
+      ret.assignNode((*this)->raw_);
+    }
+    return ret;
+  }
+
+  const WeakRefInternal* WeakRef::operator->() const {
+    return static_cast<const WeakRefInternal*>(SharedObject::operator->());
+  }
+
+  WeakRefInternal* WeakRef::operator->() {
+    return static_cast<WeakRefInternal*>(SharedObject::operator->());
+  }
+
+  WeakRef::WeakRef(SharedObject shared) {
+    assignNode(shared.weak()->get());
+  }
+
+  WeakRef::WeakRef(SharedObjectInternal* raw) {
+    assignNode(new WeakRefInternal(raw));
+  }
+
+  void WeakRef::kill() {
+    (*this)->raw_ = 0;
   }
 
 } // namespace casadi

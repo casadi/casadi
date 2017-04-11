@@ -33,7 +33,6 @@
 #include <list>
 #include <limits>
 #include <unordered_map>
-#include "weak_ref.hpp"
 
 namespace casadi {
 
