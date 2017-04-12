@@ -96,6 +96,9 @@ namespace casadi {
     /// Check if a plugin is available or can be loaded
     static bool has_plugin(const std::string& pname, bool verbose=false);
 
+    /// Get the plugin options
+    static const Options& plugin_options(const std::string& pname);
+
     /// Instantiate a Plugin struct from a factory function
     static Plugin pluginFromRegFcn(RegFcn regfcn);
 
@@ -141,6 +144,13 @@ namespace casadi {
       }
       return false;
     }
+  }
+
+  template<class Derived>
+  const Options& PluginInterface<Derived>::plugin_options(const std::string& pname) {
+    const Options *op = getPlugin(pname).options;
+    casadi_assert_message(op!=0, "Plugin \"" + pname + "\" does not support options");
+    return *op;
   }
 
   template<class Derived>

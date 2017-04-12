@@ -410,4 +410,16 @@ namespace casadi {
     res += NLPSOL_NUM_OUT;
   }
 
+  std::vector<std::string> nlpsol_options(const std::string& name) {
+    return Nlpsol::plugin_options(name).all();
+  }
+
+  std::string nlpsol_option_type(const std::string& name, const std::string& op) {
+    return Nlpsol::plugin_options(name).type(op);
+  }
+
+  std::string nlpsol_option_info(const std::string& name, const std::string& op) {
+    return Nlpsol::plugin_options(name).info(op);
+  }
+
 } // namespace casadi

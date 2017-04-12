@@ -122,6 +122,15 @@ namespace casadi {
   CASADI_EXPORT std::vector<double> nlpsol_default_in();
   ///@}
 
+  /** \brief Get all options for a plugin */
+  CASADI_EXPORT std::vector<std::string> nlpsol_options(const std::string& name);
+
+  /** \brief Get type info for a particular option */
+  CASADI_EXPORT std::string nlpsol_option_type(const std::string& name, const std::string& op);
+
+  /** \brief Get documentation for a particular option */
+  CASADI_EXPORT std::string nlpsol_option_info(const std::string& name, const std::string& op);
+
   /// Check if a particular plugin is available
   CASADI_EXPORT bool has_nlpsol(const std::string& name);
 
