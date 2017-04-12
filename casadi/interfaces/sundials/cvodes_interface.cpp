@@ -39,6 +39,7 @@ namespace casadi {
     plugin->name = "cvodes";
     plugin->doc = CvodesInterface::meta_doc.c_str();;
     plugin->version = CASADI_VERSION;
+    plugin->options = &CvodesInterface::options_;
     return 0;
   }
 

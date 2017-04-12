@@ -35,6 +35,7 @@ namespace casadi {
     plugin->name = "bspline";
     plugin->doc = BSplineInterpolant::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
+    plugin->options = &BSplineInterpolant::options_;
     return 0;
   }
 

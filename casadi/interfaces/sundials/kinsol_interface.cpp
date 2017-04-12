@@ -35,6 +35,7 @@ namespace casadi {
     plugin->name = "kinsol";
     plugin->doc = KinsolInterface::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
+    plugin->options = &KinsolInterface::options_;
     return 0;
   }
 

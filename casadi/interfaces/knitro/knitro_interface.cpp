@@ -39,6 +39,7 @@ namespace casadi {
     plugin->name = "knitro";
     plugin->doc = KnitroInterface::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
+    plugin->options = &KnitroInterface::options_;
     return 0;
   }
 

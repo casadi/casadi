@@ -45,6 +45,7 @@ namespace casadi {
     plugin->name = "slicot";
     plugin->doc = SlicotDple::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
+    plugin->options = &SlicotDple::options_;
     return 0;
   }
 

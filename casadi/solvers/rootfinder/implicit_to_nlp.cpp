@@ -36,6 +36,7 @@ namespace casadi {
     plugin->name = "nlpsol";
     plugin->doc = ImplicitToNlp::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
+    plugin->options = &ImplicitToNlp::options_;
     return 0;
   }
 

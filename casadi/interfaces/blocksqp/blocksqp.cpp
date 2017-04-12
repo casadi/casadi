@@ -37,6 +37,7 @@ namespace casadi {
     plugin->name = "blocksqp";
     plugin->doc = Blocksqp::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
+    plugin->options = &Blocksqp::options_;
     return 0;
   }
 

@@ -45,6 +45,7 @@ namespace casadi {
     plugin->name = "sqpmethod";
     plugin->doc = Sqpmethod::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
+    plugin->options = &Sqpmethod::options_;
     return 0;
   }
 

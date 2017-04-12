@@ -34,7 +34,8 @@ namespace casadi {
     plugin->creator = HpmpcInterface::creator;
     plugin->name = "hpmpc";
     plugin->doc = HpmpcInterface::meta_doc.c_str();
-    plugin->version = 30;
+    plugin->version = CASADI_VERSION;
+    plugin->options = &HpmpcInterface::options_;
     return 0;
   }
 

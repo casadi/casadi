@@ -47,6 +47,7 @@ namespace casadi {
     plugin->name = "ipopt";
     plugin->doc = IpoptInterface::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
+    plugin->options = &IpoptInterface::options_;
     return 0;
   }
 

@@ -35,6 +35,7 @@ namespace casadi {
     plugin->name = "linear";
     plugin->doc = LinearInterpolant::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
+    plugin->options = &LinearInterpolant::options_;
     return 0;
   }
 

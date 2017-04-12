@@ -85,6 +85,9 @@ namespace casadi {
       const char* doc;
       int version;
       typename Derived::Exposed exposed;
+      const Options* options;
+      // Constructor
+      Plugin() : creator(0), name(0), doc(0), version(0), options(0) {}
     };
 
     // Plugin registration function

@@ -39,6 +39,7 @@ namespace casadi {
     plugin->name = "symbolicqr";
     plugin->doc = SymbolicQr::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
+    plugin->options = &SymbolicQr::options_;
     return 0;
   }
 

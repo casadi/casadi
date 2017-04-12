@@ -43,6 +43,7 @@ namespace casadi {
     plugin->name = "cplex";
     plugin->doc = CplexInterface::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
+    plugin->options = &CplexInterface::options_;
     return 0;
   }
 

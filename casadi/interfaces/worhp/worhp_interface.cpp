@@ -40,6 +40,7 @@ namespace casadi {
     plugin->name = "worhp";
     plugin->doc = WorhpInterface::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
+    plugin->options = &WorhpInterface::options_;
     return 0;
   }
 
