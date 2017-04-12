@@ -65117,6 +65117,13 @@ Check if the vector is strictly decreasing.
 
 ";
 
+%feature("docstring")  casadi::to_slice2(const std::vector< int > &v) "
+
+Construct nested slices from an index vector (requires is_slice2(v) to be
+true)
+
+";
+
 %feature("docstring")  casadi::load_integrator(const std::string &name) "
 
 Explicitly load a plugin dynamically.
@@ -65187,6 +65194,407 @@ real_t *x, const int *sp_x, real_t *y, const int *sp_y, real_t *w) "
 real_t *y, int inc_y) "
 
 [INTERNAL]  SWAP: x <-> y.
+
+";
+
+%feature("docstring")  casadi::nlpsol_options(const std::string &name) "
+
+Get all options for a plugin.
+
+";
+
+%feature("docstring")  casadi::einstein_eval(int n_iter, const std::vector<
+int > &iter_dims, const std::vector< int > &strides_a, const std::vector<
+int > &strides_b, const std::vector< int > &strides_c, const T *a_in, const
+T *b_in, T *c_in) "
+
+";
+
+%feature("docstring")  casadi::hasNegative(const std::vector< T > &v) "
+
+Check if the vector has negative entries.
+
+";
+
+%feature("docstring")  casadi::check_exposed(T t) "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::isNon_increasing(const std::vector< T > &v) "
+
+Check if the vector is non-increasing.
+
+";
+
+%feature("docstring")  casadi::casadi_interpn(int ndim, const real_t *grid,
+const int *offset, const real_t *values, const real_t *x, int *iw, real_t
+*w) "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::casadi_interpn(int ndim, const real_t *grid,
+const int *offset, const real_t *values, const real_t *x, const int
+*lookup_mode, int *iw, real_t *w) "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::casadi_norm_1(int n, const real_t *x) "
+
+[INTERNAL]  NORM_1: ||x||_1 -> return.
+
+";
+
+%feature("docstring")  casadi::casadi_iamax(int n, const real_t *x, int
+inc_x) "
+
+[INTERNAL]  IAMAX: index corresponding to the entry with the largest
+absolute value.
+
+";
+
+%feature("docstring")  casadi::doc_interpolant(const std::string &name) "
+
+Get the documentation string for a plugin.
+
+";
+
+%feature("docstring")  casadi::write_matlab(std::ostream &stream, const
+std::vector< T > &v) "
+
+Print vector, matlab style.
+
+";
+
+%feature("docstring")  casadi::write_matlab(std::ostream &stream, const
+std::vector< std::vector< T > > &v) "
+
+Print matrix, matlab style.
+
+";
+
+%feature("docstring")  casadi::casadi_sparsify(const real1_t *x, real2_t *y,
+const int *sp_y, int tr) "
+
+[INTERNAL]  Convert dense to sparse.
+
+";
+
+%feature("docstring")  casadi::hash_sparsity(int nrow, int ncol, const
+std::vector< int > &colind, const std::vector< int > &row) "
+
+Hash a sparsity pattern.
+
+";
+
+%feature("docstring")  casadi::hash_sparsity(int nrow, int ncol, const int
+*colind, const int *row) "
+
+";
+
+%feature("docstring")  casadi::is_slice2(const std::vector< int > &v) "
+
+Check if an index vector can be represented more efficiently as two nested
+slices.
+
+";
+
+%feature("docstring")  casadi::rootfinder(const std::string &name, const
+std::string &solver, const Function &f, const Dict &opts=Dict()) "
+
+Create a solver for rootfinding problems Takes a function where one of the
+inputs is unknown and one of the outputs is a residual function that is
+always zero, defines a new function where the the unknown input has been
+replaced by a guess for the unknown and the residual output has been
+replaced by the calculated value for the input.
+
+For a function [y0, y1, ...,yi, .., yn] = F(x0, x1, ..., xj, ..., xm), where
+xj is unknown and yi=0, defines a new function [y0, y1, ...,xj, .., yn] =
+G(x0, x1, ..., xj_guess, ..., xm),
+
+xj and yi must have the same dimension and d(yi)/d(xj) must be invertable.
+
+By default, the first input is unknown and the first output is the residual.
+
+General information
+===================
+
+
+
+>List of available options
+
++-----------+--------+-------------------------------------------------+-----------+
+|    Id     |  Type  |                   Description                   |  Used in  |
++===========+========+=================================================+===========+
+| common_op | OT_DIC | Options for auto-generated functions            | casadi::O |
+| tions     | T      |                                                 | racleFunc |
+|           |        |                                                 | tion      |
++-----------+--------+-------------------------------------------------+-----------+
+| constrain | OT_INT | Constrain the unknowns. 0 (default): no         | casadi::R |
+| ts        | VECTOR | constraint on ui, 1: ui >= 0.0, -1: ui <= 0.0,  | ootfinder |
+|           |        | 2: ui > 0.0, -2: ui < 0.0.                      |           |
++-----------+--------+-------------------------------------------------+-----------+
+| implicit_ | OT_INT | Index of the input that corresponds to the      | casadi::R |
+| input     |        | actual root-finding                             | ootfinder |
++-----------+--------+-------------------------------------------------+-----------+
+| implicit_ | OT_INT | Index of the output that corresponds to the     | casadi::R |
+| output    |        | actual root-finding                             | ootfinder |
++-----------+--------+-------------------------------------------------+-----------+
+| jacobian_ | OT_FUN | Function object for calculating the Jacobian    | casadi::R |
+| function  | CTION  | (autogenerated by default)                      | ootfinder |
++-----------+--------+-------------------------------------------------+-----------+
+| linear_so | OT_STR | User-defined linear solver class. Needed for    | casadi::R |
+| lver      | ING    | sensitivities.                                  | ootfinder |
++-----------+--------+-------------------------------------------------+-----------+
+| linear_so | OT_DIC | Options to be passed to the linear solver.      | casadi::R |
+| lver_opti | T      |                                                 | ootfinder |
+| ons       |        |                                                 |           |
++-----------+--------+-------------------------------------------------+-----------+
+| monitor   | OT_STR | Set of user problem functions to be monitored   | casadi::O |
+|           | INGVEC |                                                 | racleFunc |
+|           | TOR    |                                                 | tion      |
++-----------+--------+-------------------------------------------------+-----------+
+| specific_ | OT_DIC | Options for specific auto-generated functions,  | casadi::O |
+| options   | T      | overwriting the defaults from common_options.   | racleFunc |
+|           |        | Nested dictionary.                              | tion      |
++-----------+--------+-------------------------------------------------+-----------+
+
+List of plugins
+===============
+
+
+
+- kinsol
+
+- nlpsol
+
+- newton
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+Rootfinder.doc(\"myextraplugin\")
+
+
+
+--------------------------------------------------------------------------------
+
+kinsol
+------
+
+
+
+KINSOL interface from the Sundials suite
+
+>List of available options
+
++-----------------+-----------+-------------------------------------------------+
+|       Id        |   Type    |                   Description                   |
++=================+===========+=================================================+
+| abstol          | OT_DOUBLE | Stopping criterion tolerance                    |
++-----------------+-----------+-------------------------------------------------+
+| disable_interna | OT_BOOL   | Disable KINSOL internal warning messages        |
+| l_warnings      |           |                                                 |
++-----------------+-----------+-------------------------------------------------+
+| exact_jacobian  | OT_BOOL   | Use exact Jacobian information                  |
++-----------------+-----------+-------------------------------------------------+
+| f_scale         | OT_DOUBLE | Equation scaling factors                        |
+|                 | VECTOR    |                                                 |
++-----------------+-----------+-------------------------------------------------+
+| iterative_solve | OT_STRING | gmres|bcgstab|tfqmr                             |
+| r               |           |                                                 |
++-----------------+-----------+-------------------------------------------------+
+| linear_solver_t | OT_STRING | dense|banded|iterative|user_defined             |
+| ype             |           |                                                 |
++-----------------+-----------+-------------------------------------------------+
+| lower_bandwidth | OT_INT    | Lower bandwidth for banded linear solvers       |
++-----------------+-----------+-------------------------------------------------+
+| max_iter        | OT_INT    | Maximum number of Newton iterations. Putting 0  |
+|                 |           | sets the default value of KinSol.               |
++-----------------+-----------+-------------------------------------------------+
+| max_krylov      | OT_INT    | Maximum Krylov space dimension                  |
++-----------------+-----------+-------------------------------------------------+
+| pretype         | OT_STRING | Type of preconditioner                          |
++-----------------+-----------+-------------------------------------------------+
+| strategy        | OT_STRING | Globalization strategy                          |
++-----------------+-----------+-------------------------------------------------+
+| u_scale         | OT_DOUBLE | Variable scaling factors                        |
+|                 | VECTOR    |                                                 |
++-----------------+-----------+-------------------------------------------------+
+| upper_bandwidth | OT_INT    | Upper bandwidth for banded linear solvers       |
++-----------------+-----------+-------------------------------------------------+
+| use_preconditio | OT_BOOL   | Precondition an iterative solver                |
+| ner             |           |                                                 |
++-----------------+-----------+-------------------------------------------------+
+
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+
+nlpsol
+------
+
+
+
+
+
+--------------------------------------------------------------------------------
+
+
+
+
+
+--------------------------------------------------------------------------------
+
+newton
+------
+
+
+
+Implements simple newton iterations to solve an implicit function.
+
+>List of available options
+
++--------------+---------+----------------------------------------------------+
+|      Id      |  Type   |                    Description                     |
++==============+=========+====================================================+
+| abstol       | OT_DOUB | Stopping criterion tolerance on max(|F|)           |
+|              | LE      |                                                    |
++--------------+---------+----------------------------------------------------+
+| abstolStep   | OT_DOUB | Stopping criterion tolerance on step size          |
+|              | LE      |                                                    |
++--------------+---------+----------------------------------------------------+
+| max_iter     | OT_INT  | Maximum number of Newton iterations to perform     |
+|              |         | before returning.                                  |
++--------------+---------+----------------------------------------------------+
+| print_iterat | OT_BOOL | Print information about each iteration             |
+| ion          |         |                                                    |
++--------------+---------+----------------------------------------------------+
+
+--------------------------------------------------------------------------------
+
+
+
+Joel Andersson
+
+";
+
+%feature("docstring")  casadi::isStrictlyMonotone(const std::vector< T > &v)
+"
+
+Check if the vector is strictly monotone.
+
+";
+
+%feature("docstring")  casadi::dple_n_in() "
+
+Get the number of QP solver inputs.
+
+";
+
+%feature("docstring")  casadi::casadi_eprintf(const char *fmt,...) "
+
+";
+
+%feature("docstring")  casadi::casadi_norm_2(int n, const real_t *x) "
+
+[INTERNAL]  NORM_2: ||x||_2 -> return.
+
+";
+
+%feature("docstring")  casadi::to_slice(const IM &x, bool ind1=false) "
+
+Convert IM to Slice.
+
+";
+
+%feature("docstring")  casadi::to_slice(const std::vector< int > &v, bool
+ind1=false) "
+
+Construct from an index vector (requires is_slice(v) to be true)
+
+";
+
+%feature("docstring")  casadi::dense_copy_stride(int n, int m, const double
+*A, double *B, int strideA, int strideB) "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::casadi_copy(const real_t *x, int n, real_t
+*y) "
+
+[INTERNAL]  COPY: y <-x.
+
+";
+
+%feature("docstring")  casadi::expm_n_in() "
+
+Get the number of expm solver inputs.
+
+";
+
+%feature("docstring")  casadi::conic_in() "
+
+Get input scheme of QP solvers.
+
+";
+
+%feature("docstring")  casadi::conic_in(int ind) "
+
+Get QP solver input scheme name by index.
+
+";
+
+%feature("docstring")  casadi::doc_expm(const std::string &name) "
+
+Get the documentation string for a plugin.
+
+";
+
+%feature("docstring")  casadi::lookupvector(const std::vector< int > &v, int
+size) "
+
+Returns a vector for quickly looking up entries of supplied list.
+
+lookupvector[i]!=-1 <=> v contains i v[lookupvector[i]] == i <=> v contains
+i
+
+Duplicates are treated by looking up last occurrence
+
+";
+
+%feature("docstring")  casadi::lookupvector(const std::vector< int > &v) "
+
+";
+
+%feature("docstring")  casadi::slicot_mb03vy(int n, int p, int ilo, int ihi,
+double *a, int lda1, int lda2, const double *tau, int ldtau, double
+*dwork=0, int ldwork=0) "
+
+";
+
+%feature("docstring")  casadi::doc_dple(const std::string &name) "
+
+Get the documentation string for a plugin.
+
+";
+
+%feature("docstring")  casadi::has_interpolant(const std::string &name) "
+
+Check if a particular plugin is available.
+
+";
+
+%feature("docstring")  casadi::has_integrator(const std::string &name) "
+
+Check if a particular plugin is available.
+
+";
+
+%feature("docstring")  casadi::isNonDecreasing(const std::vector< T > &v) "
+
+Check if the vector is non-decreasing.
 
 ";
 
@@ -65586,395 +65994,6 @@ Joel Andersson
 
 %feature("docstring")  casadi::integrator(const std::string &name, const
 std::string &solver, const MXDict &dae, const Dict &opts=Dict()) "
-
-";
-
-%feature("docstring")  casadi::einstein_eval(int n_iter, const std::vector<
-int > &iter_dims, const std::vector< int > &strides_a, const std::vector<
-int > &strides_b, const std::vector< int > &strides_c, const T *a_in, const
-T *b_in, T *c_in) "
-
-";
-
-%feature("docstring")  casadi::hasNegative(const std::vector< T > &v) "
-
-Check if the vector has negative entries.
-
-";
-
-%feature("docstring")  casadi::check_exposed(T t) "
-
-[INTERNAL] ";
-
-%feature("docstring")  casadi::isNon_increasing(const std::vector< T > &v) "
-
-Check if the vector is non-increasing.
-
-";
-
-%feature("docstring")  casadi::casadi_interpn(int ndim, const real_t *grid,
-const int *offset, const real_t *values, const real_t *x, int *iw, real_t
-*w) "
-
-[INTERNAL] ";
-
-%feature("docstring")  casadi::casadi_interpn(int ndim, const real_t *grid,
-const int *offset, const real_t *values, const real_t *x, const int
-*lookup_mode, int *iw, real_t *w) "
-
-[INTERNAL] ";
-
-%feature("docstring")  casadi::casadi_norm_1(int n, const real_t *x) "
-
-[INTERNAL]  NORM_1: ||x||_1 -> return.
-
-";
-
-%feature("docstring")  casadi::casadi_iamax(int n, const real_t *x, int
-inc_x) "
-
-[INTERNAL]  IAMAX: index corresponding to the entry with the largest
-absolute value.
-
-";
-
-%feature("docstring")  casadi::doc_interpolant(const std::string &name) "
-
-Get the documentation string for a plugin.
-
-";
-
-%feature("docstring")  casadi::write_matlab(std::ostream &stream, const
-std::vector< T > &v) "
-
-Print vector, matlab style.
-
-";
-
-%feature("docstring")  casadi::write_matlab(std::ostream &stream, const
-std::vector< std::vector< T > > &v) "
-
-Print matrix, matlab style.
-
-";
-
-%feature("docstring")  casadi::casadi_sparsify(const real1_t *x, real2_t *y,
-const int *sp_y, int tr) "
-
-[INTERNAL]  Convert dense to sparse.
-
-";
-
-%feature("docstring")  casadi::hash_sparsity(int nrow, int ncol, const
-std::vector< int > &colind, const std::vector< int > &row) "
-
-Hash a sparsity pattern.
-
-";
-
-%feature("docstring")  casadi::hash_sparsity(int nrow, int ncol, const int
-*colind, const int *row) "
-
-";
-
-%feature("docstring")  casadi::is_slice2(const std::vector< int > &v) "
-
-Check if an index vector can be represented more efficiently as two nested
-slices.
-
-";
-
-%feature("docstring")  casadi::rootfinder(const std::string &name, const
-std::string &solver, const Function &f, const Dict &opts=Dict()) "
-
-Create a solver for rootfinding problems Takes a function where one of the
-inputs is unknown and one of the outputs is a residual function that is
-always zero, defines a new function where the the unknown input has been
-replaced by a guess for the unknown and the residual output has been
-replaced by the calculated value for the input.
-
-For a function [y0, y1, ...,yi, .., yn] = F(x0, x1, ..., xj, ..., xm), where
-xj is unknown and yi=0, defines a new function [y0, y1, ...,xj, .., yn] =
-G(x0, x1, ..., xj_guess, ..., xm),
-
-xj and yi must have the same dimension and d(yi)/d(xj) must be invertable.
-
-By default, the first input is unknown and the first output is the residual.
-
-General information
-===================
-
-
-
->List of available options
-
-+-----------+--------+-------------------------------------------------+-----------+
-|    Id     |  Type  |                   Description                   |  Used in  |
-+===========+========+=================================================+===========+
-| common_op | OT_DIC | Options for auto-generated functions            | casadi::O |
-| tions     | T      |                                                 | racleFunc |
-|           |        |                                                 | tion      |
-+-----------+--------+-------------------------------------------------+-----------+
-| constrain | OT_INT | Constrain the unknowns. 0 (default): no         | casadi::R |
-| ts        | VECTOR | constraint on ui, 1: ui >= 0.0, -1: ui <= 0.0,  | ootfinder |
-|           |        | 2: ui > 0.0, -2: ui < 0.0.                      |           |
-+-----------+--------+-------------------------------------------------+-----------+
-| implicit_ | OT_INT | Index of the input that corresponds to the      | casadi::R |
-| input     |        | actual root-finding                             | ootfinder |
-+-----------+--------+-------------------------------------------------+-----------+
-| implicit_ | OT_INT | Index of the output that corresponds to the     | casadi::R |
-| output    |        | actual root-finding                             | ootfinder |
-+-----------+--------+-------------------------------------------------+-----------+
-| jacobian_ | OT_FUN | Function object for calculating the Jacobian    | casadi::R |
-| function  | CTION  | (autogenerated by default)                      | ootfinder |
-+-----------+--------+-------------------------------------------------+-----------+
-| linear_so | OT_STR | User-defined linear solver class. Needed for    | casadi::R |
-| lver      | ING    | sensitivities.                                  | ootfinder |
-+-----------+--------+-------------------------------------------------+-----------+
-| linear_so | OT_DIC | Options to be passed to the linear solver.      | casadi::R |
-| lver_opti | T      |                                                 | ootfinder |
-| ons       |        |                                                 |           |
-+-----------+--------+-------------------------------------------------+-----------+
-| monitor   | OT_STR | Set of user problem functions to be monitored   | casadi::O |
-|           | INGVEC |                                                 | racleFunc |
-|           | TOR    |                                                 | tion      |
-+-----------+--------+-------------------------------------------------+-----------+
-| specific_ | OT_DIC | Options for specific auto-generated functions,  | casadi::O |
-| options   | T      | overwriting the defaults from common_options.   | racleFunc |
-|           |        | Nested dictionary.                              | tion      |
-+-----------+--------+-------------------------------------------------+-----------+
-
-List of plugins
-===============
-
-
-
-- kinsol
-
-- nlpsol
-
-- newton
-
-Note: some of the plugins in this list might not be available on your
-system. Also, there might be extra plugins available to you that are not
-listed here. You can obtain their documentation with
-Rootfinder.doc(\"myextraplugin\")
-
-
-
---------------------------------------------------------------------------------
-
-kinsol
-------
-
-
-
-KINSOL interface from the Sundials suite
-
->List of available options
-
-+-----------------+-----------+-------------------------------------------------+
-|       Id        |   Type    |                   Description                   |
-+=================+===========+=================================================+
-| abstol          | OT_DOUBLE | Stopping criterion tolerance                    |
-+-----------------+-----------+-------------------------------------------------+
-| disable_interna | OT_BOOL   | Disable KINSOL internal warning messages        |
-| l_warnings      |           |                                                 |
-+-----------------+-----------+-------------------------------------------------+
-| exact_jacobian  | OT_BOOL   | Use exact Jacobian information                  |
-+-----------------+-----------+-------------------------------------------------+
-| f_scale         | OT_DOUBLE | Equation scaling factors                        |
-|                 | VECTOR    |                                                 |
-+-----------------+-----------+-------------------------------------------------+
-| iterative_solve | OT_STRING | gmres|bcgstab|tfqmr                             |
-| r               |           |                                                 |
-+-----------------+-----------+-------------------------------------------------+
-| linear_solver_t | OT_STRING | dense|banded|iterative|user_defined             |
-| ype             |           |                                                 |
-+-----------------+-----------+-------------------------------------------------+
-| lower_bandwidth | OT_INT    | Lower bandwidth for banded linear solvers       |
-+-----------------+-----------+-------------------------------------------------+
-| max_iter        | OT_INT    | Maximum number of Newton iterations. Putting 0  |
-|                 |           | sets the default value of KinSol.               |
-+-----------------+-----------+-------------------------------------------------+
-| max_krylov      | OT_INT    | Maximum Krylov space dimension                  |
-+-----------------+-----------+-------------------------------------------------+
-| pretype         | OT_STRING | Type of preconditioner                          |
-+-----------------+-----------+-------------------------------------------------+
-| strategy        | OT_STRING | Globalization strategy                          |
-+-----------------+-----------+-------------------------------------------------+
-| u_scale         | OT_DOUBLE | Variable scaling factors                        |
-|                 | VECTOR    |                                                 |
-+-----------------+-----------+-------------------------------------------------+
-| upper_bandwidth | OT_INT    | Upper bandwidth for banded linear solvers       |
-+-----------------+-----------+-------------------------------------------------+
-| use_preconditio | OT_BOOL   | Precondition an iterative solver                |
-| ner             |           |                                                 |
-+-----------------+-----------+-------------------------------------------------+
-
---------------------------------------------------------------------------------
-
-
-
---------------------------------------------------------------------------------
-
-nlpsol
-------
-
-
-
-
-
---------------------------------------------------------------------------------
-
-
-
-
-
---------------------------------------------------------------------------------
-
-newton
-------
-
-
-
-Implements simple newton iterations to solve an implicit function.
-
->List of available options
-
-+--------------+---------+----------------------------------------------------+
-|      Id      |  Type   |                    Description                     |
-+==============+=========+====================================================+
-| abstol       | OT_DOUB | Stopping criterion tolerance on max(|F|)           |
-|              | LE      |                                                    |
-+--------------+---------+----------------------------------------------------+
-| abstolStep   | OT_DOUB | Stopping criterion tolerance on step size          |
-|              | LE      |                                                    |
-+--------------+---------+----------------------------------------------------+
-| max_iter     | OT_INT  | Maximum number of Newton iterations to perform     |
-|              |         | before returning.                                  |
-+--------------+---------+----------------------------------------------------+
-| print_iterat | OT_BOOL | Print information about each iteration             |
-| ion          |         |                                                    |
-+--------------+---------+----------------------------------------------------+
-
---------------------------------------------------------------------------------
-
-
-
-Joel Andersson
-
-";
-
-%feature("docstring")  casadi::isStrictlyMonotone(const std::vector< T > &v)
-"
-
-Check if the vector is strictly monotone.
-
-";
-
-%feature("docstring")  casadi::dple_n_in() "
-
-Get the number of QP solver inputs.
-
-";
-
-%feature("docstring")  casadi::casadi_eprintf(const char *fmt,...) "
-
-";
-
-%feature("docstring")  casadi::casadi_norm_2(int n, const real_t *x) "
-
-[INTERNAL]  NORM_2: ||x||_2 -> return.
-
-";
-
-%feature("docstring")  casadi::to_slice(const IM &x, bool ind1=false) "
-
-Convert IM to Slice.
-
-";
-
-%feature("docstring")  casadi::to_slice(const std::vector< int > &v, bool
-ind1=false) "
-
-Construct from an index vector (requires is_slice(v) to be true)
-
-";
-
-%feature("docstring")  casadi::dense_copy_stride(int n, int m, const double
-*A, double *B, int strideA, int strideB) "
-
-[INTERNAL] ";
-
-%feature("docstring")  casadi::casadi_copy(const real_t *x, int n, real_t
-*y) "
-
-[INTERNAL]  COPY: y <-x.
-
-";
-
-%feature("docstring")  casadi::expm_n_in() "
-
-Get the number of expm solver inputs.
-
-";
-
-%feature("docstring")  casadi::conic_in() "
-
-Get input scheme of QP solvers.
-
-";
-
-%feature("docstring")  casadi::conic_in(int ind) "
-
-Get QP solver input scheme name by index.
-
-";
-
-%feature("docstring")  casadi::doc_expm(const std::string &name) "
-
-Get the documentation string for a plugin.
-
-";
-
-%feature("docstring")  casadi::lookupvector(const std::vector< int > &v, int
-size) "
-
-Returns a vector for quickly looking up entries of supplied list.
-
-lookupvector[i]!=-1 <=> v contains i v[lookupvector[i]] == i <=> v contains
-i
-
-Duplicates are treated by looking up last occurrence
-
-";
-
-%feature("docstring")  casadi::lookupvector(const std::vector< int > &v) "
-
-";
-
-%feature("docstring")  casadi::doc_dple(const std::string &name) "
-
-Get the documentation string for a plugin.
-
-";
-
-%feature("docstring")  casadi::has_interpolant(const std::string &name) "
-
-Check if a particular plugin is available.
-
-";
-
-%feature("docstring")  casadi::has_integrator(const std::string &name) "
-
-Check if a particular plugin is available.
-
-";
-
-%feature("docstring")  casadi::isNonDecreasing(const std::vector< T > &v) "
-
-Check if the vector is non-decreasing.
 
 ";
 
@@ -66734,10 +66753,10 @@ scheme:   Collocation scheme, as excepted by collocationPoints function.
 
 ";
 
-%feature("docstring")  casadi::to_slice2(const std::vector< int > &v) "
+%feature("docstring")  casadi::nlpsol_option_type(const std::string &name,
+const std::string &op) "
 
-Construct nested slices from an index vector (requires is_slice2(v) to be
-true)
+Get type info for a particular option.
 
 ";
 
@@ -66882,9 +66901,10 @@ SharedObjectInternal *, SharedObject > &already_copied) "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::slicot_mb03vy(int n, int p, int ilo, int ihi,
-double *a, int lda1, int lda2, const double *tau, int ldtau, double
-*dwork=0, int ldwork=0) "
+%feature("docstring")  casadi::nlpsol_option_info(const std::string &name,
+const std::string &op) "
+
+Get documentation for a particular option.
 
 ";
 
