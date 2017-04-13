@@ -135,8 +135,15 @@ namespace casadi {
 
     // Temporary memory
     double* jac;
+    double* exact_hess_lag;
 
     int ret_;  // return value (only needed for first iteration of restoration phase)
+
+    /*
+     * Variables for convexification strategy
+     */
+    double delta_w;  // current trial scaling factor
+    double delta_w_last;  // last successful scaling factor for conv_strategy_ = 1 (add multiples of Identity)
   };
 
   /** \brief \pluginbrief{Nlpsol,blocksqp}
@@ -192,6 +199,7 @@ namespace casadi {
 
     // Jacobian/Hessian sparsity
     Sparsity Asp_, Hsp_;
+    Sparsity exact_hess_lag_sp_;
 
     /// Main Loop of SQP method
     int run(BlocksqpMemory* m, int maxIt, int warmStart = 0) const;
@@ -269,6 +277,8 @@ namespace casadi {
     void calcHessianUpdate(BlocksqpMemory* m, int updateType, int hessScaling) const;
     // Compute limited memory Hessian approximations based on update formulas
     void calcHessianUpdateLimitedMemory(BlocksqpMemory* m, int updateType, int hessScaling) const;
+    // Compute exact Hessian update
+    void calcHessianUpdateExact(BlocksqpMemory* m) const;
     // [blockwise] Compute new approximation for Hessian by SR1 update
     void calcSR1(BlocksqpMemory* m, const double* gamma, const double* delta,
       int b) const;
@@ -309,6 +319,10 @@ namespace casadi {
     /// Evaluate objective and constraints, no derivatives
     int evaluate(BlocksqpMemory* m, const double *xk,
                  double *f, double *g) const;
+
+    /// Evaluate exact hessian of Lagrangian
+    int evaluate(BlocksqpMemory* m,
+                 double *exact_hess_lag) const;
 
     //  Declaration of general purpose routines for matrix and vector computations
     double lInfConstraintNorm(BlocksqpMemory* m, const double* xk, const double* g) const;
@@ -379,6 +393,14 @@ namespace casadi {
     double rho_;  // Regularization factor for first part of objective
     double zeta_;  // Regularization factor for second part of objective
     Function rp_solver_;  // restoration phase Solver
+
+    // convexification strategy
+    double deltabar_w_0_;
+    double deltabar_w_min_;
+    double deltabar_w_max_;
+    double kappa_w_minus_;
+    double kappa_w_plus_;
+    double kappabar_w_plus_;
   };
 
 } // namespace casadi

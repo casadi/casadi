@@ -152,8 +152,16 @@ int main(){
   // NLP
   MXDict nlp = {{"x", V}, {"f", J}, {"g", vertcat(g)}};
 
+  
+  Dict solver_options;
+  /*
+  solver_options["hess_update"] = 4;
+  solver_options["max_conv_qp"] = 4;
+  //solver_options["conv_strategy"] = 1;
+  */
+
   // Create an NLP solver and buffers
-  Function solver = nlpsol("nlpsol", "blocksqp", nlp);
+  Function solver = nlpsol("nlpsol", "blocksqp", nlp, solver_options);
   std::map<std::string, DM> arg, res;
 
   // Bounds and initial guess

@@ -61,6 +61,31 @@ int main(){
   solver_in["lbg"]=-10;
   solver_in["ubg"]=10;
   auto solver_out = solver(solver_in);
+  
+  /*
+  // another simple test example
+  auto x1=SX::sym("x1");
+  auto x2=SX::sym("x2");
+  auto x3=SX::sym("x3");
+  auto x4=SX::sym("x4");
+  auto x5=SX::sym("x5");
+  SXDict nlp = {{"x", SX::vertcat({x1,x2,x3,x4,x5})},
+                {"f", x1*sq(x2)+x3*sq(x4)+sq(x5)},
+                {"g", sq(x1)+x2-x3+pow(x4,3)+x5}};
+  Dict solver_options;
+  solver_options["hess_update"] = 4;
+  solver_options["max_conv_qp"] = 4;
+  //solver_options["conv_strategy"] = 1;
+  auto solver = nlpsol("mysolver", "blocksqp", nlp, solver_options);
+  DMDict solver_in;
+  solver_in["x0"]=vector<double>{0.5,1,1.5,2,1};
+  solver_in["lbx"]=vector<double>{-10,-10,-10,-10,-10};
+  solver_in["ubx"]=vector<double>{10,10,10,10,10};
+  solver_in["lbg"]=10;
+  solver_in["ubg"]=10;
+  auto solver_out = solver(solver_in);
+  cout << "opt = " << solver_out.at("x") << endl;
+  */
 
   return 0;
 }
