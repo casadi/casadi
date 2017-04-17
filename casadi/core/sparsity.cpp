@@ -1171,18 +1171,46 @@ namespace casadi {
   }
 
   Sparsity Sparsity::kron(const Sparsity& a, const Sparsity& b) {
-    Sparsity filler = Sparsity(b.size());
-    std::vector< std::vector< Sparsity > >
-      blocks(a.size1(), std::vector< Sparsity >(a.size2(), filler));
-    for (int i=0; i<a.size1(); ++i) {
-      for (int j=0; j<a.size2(); ++j) {
-        int k = a.get_nz(i, j);
-        if (k!=-1) {
-          blocks[i][j] = b;
+    int a_ncol = a.size2();
+    int b_ncol = b.size2();
+    int a_nrow = a.size1();
+    int b_nrow = b.size1();
+
+    const int* a_colind = a.colind();
+    const int* a_row = a.row();
+    const int* b_colind = b.colind();
+    const int* b_row = b.row();
+
+    std::vector<int> r_colind(a_ncol*b_ncol+1, 0);
+    std::vector<int> r_row(a.nnz()*b.nnz());
+
+    int* r_colind_ptr = get_ptr(r_colind);
+    int* r_row_ptr = get_ptr(r_row);
+
+    int i=0;
+    int j=0;
+    // Loop over the columns
+    for (int a_cc=0; a_cc<a_ncol; ++a_cc) {
+      int a_start = a_colind[a_cc];
+      int a_stop  = a_colind[a_cc+1];
+      // Loop over the columns
+      for (int b_cc=0; b_cc<b_ncol; ++b_cc) {
+        int b_start = b_colind[b_cc];
+        int b_stop  = b_colind[b_cc+1];
+        // Loop over existing nonzeros
+        for (int a_el=a_start; a_el<a_stop; ++a_el) {
+          int a_r = a_row[a_el];
+          // Loop over existing nonzeros
+          for (int b_el=b_start; b_el<b_stop; ++b_el) {
+            int b_r = b_row[b_el];
+            r_row_ptr[i++] = a_r*b_nrow+b_r;
+          }
         }
+        j+=1;
+        r_colind_ptr[j] = r_colind_ptr[j-1] + (b_stop-b_start)*(a_stop-a_start);
       }
     }
-    return blockcat(blocks);
+    return Sparsity(a_nrow*b_nrow, a_ncol*b_ncol, r_colind, r_row);
   }
 
   Sparsity Sparsity::vertcat(const std::vector<Sparsity> & sp) {
