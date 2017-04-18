@@ -550,6 +550,24 @@ namespace casadi {
     m->fstats["postprocessing"] = FStats();
   }
 
+  inline void mproject(double factor, const double* x, const int* sp_x,
+                       double* y, const int* sp_y, double* w) {
+    int ncol_x = sp_x[1];
+    const int *colind_x = sp_x+2, *row_x = sp_x + 2 + ncol_x+1;
+    int ncol_y = sp_y[1];
+    const int *colind_y = sp_y+2, *row_y = sp_y + 2 + ncol_y+1;
+    /* Loop over columns of x and y */
+    int i, el;
+    for (i=0; i<ncol_x; ++i) {
+      /* Zero out requested entries in y */
+      for (el=colind_y[i]; el<colind_y[i+1]; ++el) w[row_y[el]] = 0;
+      /* Set x entries */
+      for (el=colind_x[i]; el<colind_x[i+1]; ++el) w[row_x[el]] = x[el];
+      /* Retrieve requested entries in y */
+      for (el=colind_y[i]; el<colind_y[i+1]; ++el) y[el] = factor*w[row_y[el]];
+    }
+  }
+
   void HpmpcInterface::
   eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
     auto m = static_cast<HpmpcMemory*>(mem);
@@ -567,13 +585,13 @@ namespace casadi {
     casadi_project(arg[CONIC_A], sparsity_in(CONIC_A), get_ptr(m->I), Isp_, pv);
 
     // Dissect H matrix; definition of HPMPC lacks a factor 2
-    casadi_mproject(0.5, arg[CONIC_H], sparsity_in(CONIC_H), get_ptr(m->R), Rsp_, pv);
-    casadi_mproject(0.5, arg[CONIC_H], sparsity_in(CONIC_H), get_ptr(m->S), Ssp_, pv);
-    casadi_mproject(0.5, arg[CONIC_H], sparsity_in(CONIC_H), get_ptr(m->Q), Qsp_, pv);
+    mproject(0.5, arg[CONIC_H], sparsity_in(CONIC_H), get_ptr(m->R), Rsp_, pv);
+    mproject(0.5, arg[CONIC_H], sparsity_in(CONIC_H), get_ptr(m->S), Ssp_, pv);
+    mproject(0.5, arg[CONIC_H], sparsity_in(CONIC_H), get_ptr(m->Q), Qsp_, pv);
 
     // Dissect LBA/UBA
-    casadi_mproject(-1.0, arg[CONIC_LBA], sparsity_in(CONIC_LBA), get_ptr(m->b), bsp_, pv);
-    casadi_mproject(-1.0, arg[CONIC_UBA], sparsity_in(CONIC_UBA), get_ptr(m->b2), bsp_, pv);
+    mproject(-1.0, arg[CONIC_LBA], sparsity_in(CONIC_LBA), get_ptr(m->b), bsp_, pv);
+    mproject(-1.0, arg[CONIC_UBA], sparsity_in(CONIC_UBA), get_ptr(m->b2), bsp_, pv);
     casadi_assert(std::equal(m->b.begin(), m->b.end(), m->b2.begin()));
     casadi_project(arg[CONIC_LBA], sparsity_in(CONIC_LBA), get_ptr(m->lg), lugsp_, pv);
     casadi_project(arg[CONIC_UBA], sparsity_in(CONIC_UBA), get_ptr(m->ug), lugsp_, pv);
@@ -588,8 +606,8 @@ namespace casadi {
     casadi_dense_transfer(1.0, arg[CONIC_UBX], usp_, get_ptr(m->ub), theirs_usp_, pv);
 
     // Dissect G
-    casadi_mproject(0.5, arg[CONIC_G], sparsity_in(CONIC_G), get_ptr(m->r), usp_, pv);
-    casadi_mproject(0.5, arg[CONIC_G], sparsity_in(CONIC_G), get_ptr(m->q), xsp_, pv);
+    mproject(0.5, arg[CONIC_G], sparsity_in(CONIC_G), get_ptr(m->r), usp_, pv);
+    mproject(0.5, arg[CONIC_G], sparsity_in(CONIC_G), get_ptr(m->q), xsp_, pv);
 
     // Dissect X0
     casadi_project(arg[CONIC_X0], sparsity_in(CONIC_X0), get_ptr(m->u), usp_, pv);
