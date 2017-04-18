@@ -555,7 +555,7 @@ namespace casadi {
     int ncol_y = sp_y[1];
     const int *colind_y = sp_y+2;
     casadi_project(x, sp_x, y, sp_y, w);
-    casadi_scal(factor, colind_y[ncol_y], y);
+    casadi_scal(colind_y[ncol_y], factor, y);
   }
 
   void HpmpcInterface::dense_transfer(double factor, const double* x, const int* sp_x, double* y,
