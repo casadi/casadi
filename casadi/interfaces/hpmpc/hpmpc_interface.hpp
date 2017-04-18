@@ -39,17 +39,17 @@ In order to use this interface, you must:
  - Decision variables must only by state and control,
    and the variable ordering must be [x0 u0 x1 u1 ...]
  - The constraints must be in order: [ gap0 lincon0 gap1 lincon1  ]
-    
+
     gap: Ak+1 = Ak xk + Bk uk
     lincon: yk= Ck xk + Dk uk
-    
+
     \verbatim
        A0 B0 -I
        C0 D0
               A1 B1 -I
               C1 D1
     \endverbatim
-   
+
    where I must be a diagonal sparse matrix
  - Either supply all of N, nx, ng, nu options or rely on automatic detection
 
@@ -158,6 +158,10 @@ namespace casadi {
 
     /** \brief  Evaluate numerically */
     virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
+
+    /** \brief Helper function */
+    static void mproject(double factor, const double* x, const int* sp_x,
+                         double* y, const int* sp_y, double* w);
 
     /// A documentation string
     static const std::string meta_doc;
