@@ -558,6 +558,19 @@ namespace casadi {
     casadi_scal(factor, colind_y[ncol_y], y);
   }
 
+  void HpmpcInterface::dense_transfer(double factor, const double* x, const int* sp_x, double* y,
+                                      const int* sp_y, double* w) {
+    CASADI_PREFIX(sparsify)(x, w, sp_x, false);
+    int nrow_y = sp_y[0];
+    int ncol_y = sp_y[1];
+    const int *colind_y = sp_y+2, *row_y = sp_y + 2 + ncol_y+1;
+    /* Loop over columns of y */
+    int i, el;
+    for (i=0; i<ncol_y; ++i) {
+      for (el=colind_y[i]; el<colind_y[i+1]; ++el) y[nrow_y*i + row_y[el]] += factor*(*w++);
+    }
+  }
+
   void HpmpcInterface::
   eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
     auto m = static_cast<HpmpcMemory*>(mem);
@@ -590,10 +603,10 @@ namespace casadi {
     std::fill(m->lb.begin(), m->lb.end(), 0);
     std::fill(m->ub.begin(), m->ub.end(), 0);
 
-    casadi_dense_transfer(1.0, arg[CONIC_LBX], xsp_, get_ptr(m->lb), theirs_xsp_, pv);
-    casadi_dense_transfer(1.0, arg[CONIC_UBX], xsp_, get_ptr(m->ub), theirs_xsp_, pv);
-    casadi_dense_transfer(1.0, arg[CONIC_LBX], usp_, get_ptr(m->lb), theirs_usp_, pv);
-    casadi_dense_transfer(1.0, arg[CONIC_UBX], usp_, get_ptr(m->ub), theirs_usp_, pv);
+    dense_transfer(1.0, arg[CONIC_LBX], xsp_, get_ptr(m->lb), theirs_xsp_, pv);
+    dense_transfer(1.0, arg[CONIC_UBX], xsp_, get_ptr(m->ub), theirs_xsp_, pv);
+    dense_transfer(1.0, arg[CONIC_LBX], usp_, get_ptr(m->lb), theirs_usp_, pv);
+    dense_transfer(1.0, arg[CONIC_UBX], usp_, get_ptr(m->ub), theirs_usp_, pv);
 
     // Dissect G
     mproject(0.5, arg[CONIC_G], sparsity_in(CONIC_G), get_ptr(m->r), usp_, pv);
@@ -640,7 +653,7 @@ namespace casadi {
     std::fill(m->lam.begin(), m->lam.end(), 0);
 
     if (arg[CONIC_LAM_A0]) {
-      casadi_dense_transfer(0.5, arg[CONIC_LAM_A0], lamg_gapsp_, get_ptr(m->pi), pisp_, pv);
+      dense_transfer(0.5, arg[CONIC_LAM_A0], lamg_gapsp_, get_ptr(m->pi), pisp_, pv);
       // Deal with non-unity I block
       for (int k=0;k<N_;++k) {
         int n_row = m->nx[k+1];
@@ -650,12 +663,12 @@ namespace casadi {
         }
       }
 
-      casadi_dense_transfer(0.5, arg[CONIC_LAM_A0], lamg_csp_, get_ptr(m->lam), lam_cusp_, pv);
+      dense_transfer(0.5, arg[CONIC_LAM_A0], lamg_csp_, get_ptr(m->lam), lam_cusp_, pv);
     }
 
     if (arg[CONIC_LAM_X0]) {
-      casadi_dense_transfer(0.5, arg[CONIC_LAM_X0], usp_, get_ptr(m->lam), lam_uusp_, pv);
-      casadi_dense_transfer(0.5, arg[CONIC_LAM_X0], xsp_, get_ptr(m->lam), lam_xusp_, pv);
+      dense_transfer(0.5, arg[CONIC_LAM_X0], usp_, get_ptr(m->lam), lam_uusp_, pv);
+      dense_transfer(0.5, arg[CONIC_LAM_X0], xsp_, get_ptr(m->lam), lam_xusp_, pv);
     }
 
     m->return_status =
@@ -676,8 +689,8 @@ namespace casadi {
     }
 
     std::fill(res[CONIC_X], res[CONIC_X]+nx_, 0);
-    casadi_dense_transfer(1.0, get_ptr(m->x), theirs_Xsp_, res[CONIC_X], xsp_, pv);
-    casadi_dense_transfer(1.0, get_ptr(m->u), theirs_Usp_, res[CONIC_X], usp_, pv);
+    dense_transfer(1.0, get_ptr(m->x), theirs_Xsp_, res[CONIC_X], xsp_, pv);
+    dense_transfer(1.0, get_ptr(m->u), theirs_Usp_, res[CONIC_X], usp_, pv);
 
     std::fill(res[CONIC_LAM_X], res[CONIC_LAM_X]+nx_, 0);
     std::fill(res[CONIC_LAM_A], res[CONIC_LAM_A]+na_, 0);
@@ -691,14 +704,14 @@ namespace casadi {
       }
     }
 
-    casadi_dense_transfer(2.0, get_ptr(m->pi), pisp_, res[CONIC_LAM_A], lamg_gapsp_, pv);
-    casadi_dense_transfer(2.0, get_ptr(m->lam), lam_cusp_, res[CONIC_LAM_A], lamg_csp_, pv);
-    casadi_dense_transfer(-2.0, get_ptr(m->lam), lam_clsp_, res[CONIC_LAM_A], lamg_csp_, pv);
+    dense_transfer(2.0, get_ptr(m->pi), pisp_, res[CONIC_LAM_A], lamg_gapsp_, pv);
+    dense_transfer(2.0, get_ptr(m->lam), lam_cusp_, res[CONIC_LAM_A], lamg_csp_, pv);
+    dense_transfer(-2.0, get_ptr(m->lam), lam_clsp_, res[CONIC_LAM_A], lamg_csp_, pv);
 
-    casadi_dense_transfer(-2.0, get_ptr(m->lam), lam_ulsp_, res[CONIC_LAM_X], usp_, pv);
-    casadi_dense_transfer(2.0, get_ptr(m->lam), lam_uusp_, res[CONIC_LAM_X], usp_, pv);
-    casadi_dense_transfer(-2.0, get_ptr(m->lam), lam_xlsp_, res[CONIC_LAM_X], xsp_,  pv);
-    casadi_dense_transfer(2.0, get_ptr(m->lam), lam_xusp_, res[CONIC_LAM_X], xsp_,  pv);
+    dense_transfer(-2.0, get_ptr(m->lam), lam_ulsp_, res[CONIC_LAM_X], usp_, pv);
+    dense_transfer(2.0, get_ptr(m->lam), lam_uusp_, res[CONIC_LAM_X], usp_, pv);
+    dense_transfer(-2.0, get_ptr(m->lam), lam_xlsp_, res[CONIC_LAM_X], xsp_,  pv);
+    dense_transfer(2.0, get_ptr(m->lam), lam_xusp_, res[CONIC_LAM_X], xsp_,  pv);
 
     // Construct f
     double f = casadi_dot(nx_, arg[CONIC_G], res[CONIC_X]);

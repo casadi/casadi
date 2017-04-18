@@ -44,10 +44,6 @@ namespace casadi {
   template<typename real_t>
   void CASADI_PREFIX(project)(const real_t* x, const int* sp_x, real_t* y, const int* sp_y, real_t* w);
 
-  /// Dense transfer: y(y_sp).nonzeros() <- x(x_sp).nonzeros()  (length >= max(number of rows, nnz))
-  template<typename real_t>
-  void CASADI_PREFIX(dense_transfer)(real_t factor, const real_t* x, const int* sp_x, real_t* y, const int* sp_y, real_t* w);
-
   /// Convert sparse to dense
   template<typename real1_t, typename real2_t>
   void CASADI_PREFIX(densify)(const real1_t* x, const int* sp_x, real2_t* y, int tr);
@@ -226,19 +222,6 @@ namespace casadi {
       for (el=colind_x[i]; el<colind_x[i+1]; ++el) w[row_x[el]] = x[el];
       /* Retrieve requested entries in y */
       for (el=colind_y[i]; el<colind_y[i+1]; ++el) y[el] = w[row_y[el]];
-    }
-  }
-
-  template<typename real_t>
-  void CASADI_PREFIX(dense_transfer)(real_t factor, const real_t* x, const int* sp_x, real_t* y, const int* sp_y, real_t* w) {
-    CASADI_PREFIX(sparsify)(x, w, sp_x, false);
-    int nrow_y = sp_y[0];
-    int ncol_y = sp_y[1];
-    const int *colind_y = sp_y+2, *row_y = sp_y + 2 + ncol_y+1;
-    /* Loop over columns of y */
-    int i, el;
-    for (i=0; i<ncol_y; ++i) {
-      for (el=colind_y[i]; el<colind_y[i+1]; ++el) y[nrow_y*i + row_y[el]] += factor*(*w++);
     }
   }
 

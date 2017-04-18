@@ -163,6 +163,10 @@ namespace casadi {
     static void mproject(double factor, const double* x, const int* sp_x,
                          double* y, const int* sp_y, double* w);
 
+    /// Dense transfer: y(y_sp).nonzeros() <- x(x_sp).nonzeros()  (length >= max(number of rows, nnz))
+    static void dense_transfer(double factor, const double* x, const int* sp_x, double* y,
+                               const int* sp_y, double* w);
+
     /// A documentation string
     static const std::string meta_doc;
 
