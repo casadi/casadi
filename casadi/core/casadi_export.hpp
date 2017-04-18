@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef CASADI_EXPORT_H
-#define CASADI_EXPORT_H
+#ifndef CASADI_CASADI_EXPORT_HPP
+#define CASADI_CASADI_EXPORT_HPP
 
 #ifdef CASADI_STATIC_DEFINE
 #  define CASADI_EXPORT
@@ -61,4 +61,4 @@
 # define CASADI_NO_DEPRECATED
 #endif
 
-#endif
+#endif // CASADI_CASADI_EXPORT_HPP

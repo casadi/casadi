@@ -26,7 +26,7 @@
 #ifndef CASADI_CASADI_COMMON_HPP
 #define CASADI_CASADI_COMMON_HPP
 
-#include <casadi/core/casadi_export.h>
+#include "casadi_export.hpp"
 
 #ifdef casadi_EXPORTS
 #define casadi_implementation
@@ -37,4 +37,3 @@
 #endif
 
 #endif // CASADI_CASADI_COMMON_HPP
-
