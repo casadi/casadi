@@ -26,7 +26,7 @@
 #ifndef CASADI_LOGGER_HPP
 #define CASADI_LOGGER_HPP
 
-#include "casadi_export.hpp"
+#include <casadi/core/casadi_export.h>
 
 #include <iostream>
 #include <fstream>
