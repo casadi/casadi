@@ -46382,8 +46382,9 @@ swap inner and outer indices of list of lists
 
 %feature("docstring") casadi::dense_mul_nt_stride "[INTERNAL] ";
 
-%feature("docstring") casadi::casadi_mproject "[INTERNAL]  Sparse copy: y
-<- x, w work vector (length >= number of rows)
+%feature("docstring") casadi::isNon_increasing "
+
+Check if the vector is non-increasing.
 
 ";
 
@@ -46607,11 +46608,6 @@ Get the number of integrator outputs.
 
 ";
 
-%feature("docstring") casadi::casadi_maddproject "[INTERNAL]  Sparse copy:
-y <- x, w work vector (length >= number of rows)
-
-";
-
 %feature("docstring") casadi::slicot_periodic_schur "[INTERNAL] ";
 
 %feature("docstring") casadi::external "
@@ -46689,9 +46685,9 @@ Explicitly load a plugin dynamically.
 
 %feature("docstring") casadi::casadi_interpn_grad "[INTERNAL] ";
 
-%feature("docstring") casadi::casadi_dense_transfer "[INTERNAL]  Dense
-transfer: y(y_sp).nonzeros() <- x(x_sp).nonzeros() (length >= max(number of
-rows, nnz))
+%feature("docstring") casadi::has_interpolant "
+
+Check if a particular plugin is available.
 
 ";
 
@@ -46714,12 +46710,6 @@ Check if the vector has negative entries.
 ";
 
 %feature("docstring") casadi::check_exposed "[INTERNAL] ";
-
-%feature("docstring") casadi::isNon_increasing "
-
-Check if the vector is non-increasing.
-
-";
 
 %feature("docstring") casadi::casadi_interpn "[INTERNAL] ";
 
@@ -47042,9 +47032,19 @@ Get the documentation string for a plugin.
 
 ";
 
-%feature("docstring") casadi::has_interpolant "
+%feature("docstring") casadi::hash_combine "
 
-Check if a particular plugin is available.
+>  void casadi::hash_combine(std::size_t &seed, T v)
+
+>  void casadi::hash_combine(std::size_t &seed, const std::vector< int > &v)
+------------------------------------------------------------------------
+
+Generate a hash value incrementally (function taken from boost)
+
+>  void casadi::hash_combine(std::size_t &seed, const int *v, int sz)
+------------------------------------------------------------------------
+
+Generate a hash value incrementally, array.
 
 ";
 
@@ -48388,22 +48388,6 @@ Check if a particular plugin is available.
 %feature("docstring") casadi::conic_n_out "
 
 Get the number of QP solver outputs.
-
-";
-
-%feature("docstring") casadi::hash_combine "
-
->  void casadi::hash_combine(std::size_t &seed, T v)
-
->  void casadi::hash_combine(std::size_t &seed, const std::vector< int > &v)
-------------------------------------------------------------------------
-
-Generate a hash value incrementally (function taken from boost)
-
->  void casadi::hash_combine(std::size_t &seed, const int *v, int sz)
-------------------------------------------------------------------------
-
-Generate a hash value incrementally, array.
 
 ";
 

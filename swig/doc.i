@@ -64859,10 +64859,9 @@ strideC) "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::casadi_mproject(real_t factor, const real_t
-*x, const int *sp_x, real_t *y, const int *sp_y, real_t *w) "
+%feature("docstring")  casadi::isNon_increasing(const std::vector< T > &v) "
 
-[INTERNAL]  Sparse copy: y <- x, w work vector (length >= number of rows)
+Check if the vector is non-increasing.
 
 ";
 
@@ -65099,13 +65098,6 @@ Get the number of integrator outputs.
 
 ";
 
-%feature("docstring")  casadi::casadi_maddproject(real_t factor, const
-real_t *x, const int *sp_x, real_t *y, const int *sp_y, real_t *w) "
-
-[INTERNAL]  Sparse copy: y <- x, w work vector (length >= number of rows)
-
-";
-
 %feature("docstring")  casadi::slicot_periodic_schur(int n, int K, const
 double *a, double *t, double *z, double *dwork, double *eig_real, double
 *eig_imag, double num_zero=0) "
@@ -65210,11 +65202,9 @@ const real_t *grid, const int *offset, const real_t *values, const real_t
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::casadi_dense_transfer(real_t factor, const
-real_t *x, const int *sp_x, real_t *y, const int *sp_y, real_t *w) "
+%feature("docstring")  casadi::has_interpolant(const std::string &name) "
 
-[INTERNAL]  Dense transfer: y(y_sp).nonzeros() <- x(x_sp).nonzeros() (length
->= max(number of rows, nnz))
+Check if a particular plugin is available.
 
 ";
 
@@ -65247,12 +65237,6 @@ Check if the vector has negative entries.
 %feature("docstring")  casadi::check_exposed(T t) "
 
 [INTERNAL] ";
-
-%feature("docstring")  casadi::isNon_increasing(const std::vector< T > &v) "
-
-Check if the vector is non-increasing.
-
-";
 
 %feature("docstring")  casadi::casadi_interpn(int ndim, const real_t *grid,
 const int *offset, const real_t *values, const real_t *x, int *iw, real_t
@@ -65608,9 +65592,23 @@ Get the documentation string for a plugin.
 
 ";
 
-%feature("docstring")  casadi::has_interpolant(const std::string &name) "
+%feature("docstring")  casadi::hash_combine(std::size_t &seed, T v) "
 
-Check if a particular plugin is available.
+Generate a hash value incrementally (function taken from boost)
+
+";
+
+%feature("docstring")  casadi::hash_combine(std::size_t &seed, const int *v,
+int sz) "
+
+Generate a hash value incrementally, array.
+
+";
+
+%feature("docstring")  casadi::hash_combine(std::size_t &seed, const
+std::vector< int > &v) "
+
+Generate a hash value incrementally (function taken from boost)
 
 ";
 
@@ -67062,26 +67060,6 @@ Check if a particular plugin is available.
 %feature("docstring")  casadi::conic_n_out() "
 
 Get the number of QP solver outputs.
-
-";
-
-%feature("docstring")  casadi::hash_combine(std::size_t &seed, T v) "
-
-Generate a hash value incrementally (function taken from boost)
-
-";
-
-%feature("docstring")  casadi::hash_combine(std::size_t &seed, const int *v,
-int sz) "
-
-Generate a hash value incrementally, array.
-
-";
-
-%feature("docstring")  casadi::hash_combine(std::size_t &seed, const
-std::vector< int > &v) "
-
-Generate a hash value incrementally (function taken from boost)
 
 ";
 
