@@ -8802,6 +8802,13 @@ Get, if necessary generate, the sparsity of a Jacobian block
 
 ";
 
+%feature("docstring")  casadi::Callback::alloc_w(size_t sz_w, bool
+persistent=false) "
+
+Ensure required length of w field.
+
+";
+
 %feature("docstring")  casadi::Function::size1_out(int ind) const  "
 
 Get output dimension.
@@ -9091,7 +9098,7 @@ are kept internally
 ";
 
 %feature("docstring")  casadi::Callback::eval(const std::vector< DM > &arg)
-"
+const  "
 
 Evaluate numerically, temporary matrices and work vectors.
 

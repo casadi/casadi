@@ -6283,6 +6283,12 @@ Get, if necessary generate, the sparsity of a Jacobian block
 
 ";
 
+%feature("docstring") casadi::Callback::alloc_w "
+
+Ensure required length of w field.
+
+";
+
 %feature("docstring") casadi::Callback::size1_out "
 
 Get output dimension.
