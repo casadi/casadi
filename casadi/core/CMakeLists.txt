@@ -29,6 +29,7 @@ set(CASADI_PUBLIC
   generic_expression.hpp      # Base class for SXElem MX and Matrix<>
   generic_matrix.hpp          # Base class for Matrix<> and MX
   matrix.hpp                  # The Matrix template class
+  matrix_impl.hpp             # Template implementations
   sparsity_interface.hpp
   sparsity.hpp                # reference counted sparsity pattern
   slice.hpp                   # A "slice" in a language such as Python, A[start:stop:step], or Matlab, A(start:step:stop)
