@@ -8803,9 +8803,9 @@ Get, if necessary generate, the sparsity of a Jacobian block
 ";
 
 %feature("docstring")  casadi::Callback::alloc_w(size_t sz_w, bool
-persistent=false) "
+persist=false) "
 
-Ensure required length of w field.
+Allocate work vectors.
 
 ";
 
@@ -8934,6 +8934,13 @@ Get input scheme name by index.
 %feature("docstring")  casadi::Function::has_free() const  "
 
 Does the function have free variables.
+
+";
+
+%feature("docstring")  casadi::Callback::alloc_res(size_t sz_res, bool
+persist=false) "
+
+Allocate work vectors.
 
 ";
 
@@ -9082,6 +9089,20 @@ Return Jacobian of all input elements with respect to all output elements.
 
 ";
 
+%feature("docstring")  casadi::Callback::alloc_iw(size_t sz_iw, bool
+persist=false) "
+
+Allocate work vectors.
+
+";
+
+%feature("docstring")  casadi::Callback::alloc_arg(size_t sz_arg, bool
+persist=false) "
+
+Allocate work vectors.
+
+";
+
 %feature("docstring")  casadi::Function::oracle() const  "
 
 Get oracle.
@@ -9098,7 +9119,7 @@ are kept internally
 ";
 
 %feature("docstring")  casadi::Callback::eval(const std::vector< DM > &arg)
-const  "
+"
 
 Evaluate numerically, temporary matrices and work vectors.
 

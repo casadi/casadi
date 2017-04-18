@@ -6285,7 +6285,7 @@ Get, if necessary generate, the sparsity of a Jacobian block
 
 %feature("docstring") casadi::Callback::alloc_w "
 
-Ensure required length of w field.
+Allocate work vectors.
 
 ";
 
@@ -6386,6 +6386,12 @@ Does the function have free variables.
 
 ";
 
+%feature("docstring") casadi::Callback::alloc_res "
+
+Allocate work vectors.
+
+";
+
 %feature("docstring") casadi::Callback::assert_size_in "
 
 Assert that an input dimension is equal so some given value.
@@ -6457,6 +6463,18 @@ length of res field.
 %feature("docstring") casadi::Callback::get_jacobian "
 
 Return Jacobian of all input elements with respect to all output elements.
+
+";
+
+%feature("docstring") casadi::Callback::alloc_iw "
+
+Allocate work vectors.
+
+";
+
+%feature("docstring") casadi::Callback::alloc_arg "
+
+Allocate work vectors.
 
 ";
 
