@@ -15,6 +15,7 @@ set(CASADI_PUBLIC
   calculus.hpp
   global_options.hpp
   casadi_meta.hpp
+  casadi_common.hpp
   printable_object.hpp        # Interface class enabling printing a Python-style "description" as well as a shorter "representation" of a class
   shared_object.hpp           # This base class implements the reference counting (garbage collection) framework used in CasADi
   generic_type.hpp            # Generic type used for options and for compatibility with dynamically typed languages like Python
