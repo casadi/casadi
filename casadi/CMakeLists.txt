@@ -30,13 +30,13 @@ macro(casadi_library_or_plugin name is_plugin)
     add_definitions(-DSHARED_LIBRARY)
     add_library(${name} SHARED ${ARGN})
   endif()
-  generate_export_header(${name})
-
-  # Make sure the exported header is installed
-  file(RELATIVE_PATH RELPATH "${CMAKE_BINARY_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/${name}_export.h")
-  get_filename_component(RELPATH ${RELPATH} PATH)
-
   if(NOT "${name}" STREQUAL "casadi")
+    generate_export_header(${name})
+
+    # Make sure the exported header is installed
+    file(RELATIVE_PATH RELPATH "${CMAKE_BINARY_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/${name}_export.h")
+    get_filename_component(RELPATH ${RELPATH} PATH)
+
     target_link_libraries(${name} casadi)
   endif()
 
