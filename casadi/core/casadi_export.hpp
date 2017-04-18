@@ -26,39 +26,34 @@
 #define CASADI_CASADI_EXPORT_HPP
 
 #ifdef CASADI_STATIC_DEFINE
-#  define CASADI_EXPORT
-#  define CASADI_NO_EXPORT
-#else
-#  ifndef CASADI_EXPORT
-#    ifdef casadi_EXPORTS
-        /* We are building this library */
-#      define CASADI_EXPORT __attribute__((visibility("default")))
-#    else
-        /* We are using this library */
-#      define CASADI_EXPORT __attribute__((visibility("default")))
-#    endif
-#  endif
+#define CASADI_EXPORT
+#define CASADI_NO_EXPORT
+#else // CASADI_STATIC_DEFINE
+#ifndef CASADI_EXPORT
+#ifdef casadi_EXPORTS
+// We are building this library
+#define CASADI_EXPORT __attribute__((visibility("default")))
+#else // casadi_EXPORTS
+// We are using this library
+#define CASADI_EXPORT __attribute__((visibility("default")))
+#endif // casadi_EXPORTS
+#endif // CASADI_EXPORT
 
-#  ifndef CASADI_NO_EXPORT
-#    define CASADI_NO_EXPORT __attribute__((visibility("hidden")))
-#  endif
-#endif
+#ifndef CASADI_NO_EXPORT
+#define CASADI_NO_EXPORT __attribute__((visibility("hidden")))
+#endif // CASADI_NO_EXPORT
+#endif // CASADI_STATIC_DEFINE
 
 #ifndef CASADI_DEPRECATED
-#  define CASADI_DEPRECATED __attribute__ ((__deprecated__))
-#endif
+#define CASADI_DEPRECATED __attribute__ ((__deprecated__))
+#endif // CASADI_DEPRECATED
 
 #ifndef CASADI_DEPRECATED_EXPORT
-#  define CASADI_DEPRECATED_EXPORT CASADI_EXPORT CASADI_DEPRECATED
-#endif
+#define CASADI_DEPRECATED_EXPORT CASADI_EXPORT CASADI_DEPRECATED
+#endif // CASADI_DEPRECATED_EXPORT
 
 #ifndef CASADI_DEPRECATED_NO_EXPORT
-#  define CASADI_DEPRECATED_NO_EXPORT CASADI_NO_EXPORT CASADI_DEPRECATED
-#endif
-
-#define DEFINE_NO_DEPRECATED 0
-#if DEFINE_NO_DEPRECATED
-# define CASADI_NO_DEPRECATED
-#endif
+#define CASADI_DEPRECATED_NO_EXPORT CASADI_NO_EXPORT CASADI_DEPRECATED
+#endif // CASADI_DEPRECATED_NO_EXPORT
 
 #endif // CASADI_CASADI_EXPORT_HPP
