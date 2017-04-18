@@ -70,6 +70,9 @@ namespace casadi {
     /** \brief  Evaluate numerically, work vectors given */
     virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
 
+    /** \brief  Evaluate symbolically, work vectors given */
+    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const;
+
     ///@{
     /** \brief Return Jacobian of all input elements with respect to all output elements */
     virtual bool hasFullJacobian() const;

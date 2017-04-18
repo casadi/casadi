@@ -98,6 +98,11 @@ namespace casadi {
     TRY_CALL(eval, self_, arg, res, iw, w, 0);
   }
 
+  void CallbackInternal::
+  eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
+    TRY_CALL(eval_sx, self_, arg, res, iw, w, mem);
+  }
+
   bool CallbackInternal::hasFullJacobian() const {
     TRY_CALL(has_jacobian, self_);
   }

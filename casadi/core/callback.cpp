@@ -54,12 +54,12 @@ namespace casadi {
     return ret;
   }
 
-  std::vector<DM> Callback::eval(const std::vector<DM>& arg) {
+  std::vector<DM> Callback::eval(const std::vector<DM>& arg) const {
     casadi_error("Callback::eval has not been implemented");
     return std::vector<DM>();
   }
 
-  void Callback::eval(const double** arg, double** res, int* iw, double* w, int mem) {
+  void Callback::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
     // Allocate input matrices
     int n_in = this->n_in();
     std::vector<DM> argv(n_in);
@@ -86,6 +86,10 @@ namespace casadi {
     for (int i=0; i<n_out; ++i) {
       casadi_copy(resv[i].ptr(), resv[i].nnz(), res[i]);
     }
+  }
+
+  void Callback::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
+    casadi_error("Cannot expand");
   }
 
   const CallbackInternal* Callback::operator->() const {
@@ -151,6 +155,10 @@ namespace casadi {
 
   int Callback::get_n_reverse() const {
     return (*this)->FunctionInternal::get_n_reverse();
+  }
+
+  void Callback::alloc_w(size_t sz_w, bool persistent) {
+    return (*this)->alloc_w(sz_w, persistent);
   }
 
   void Callback::transfer_ownership() {
