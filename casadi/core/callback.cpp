@@ -157,8 +157,20 @@ namespace casadi {
     return (*this)->FunctionInternal::get_n_reverse();
   }
 
-  void Callback::alloc_w(size_t sz_w, bool persistent) {
-    return (*this)->alloc_w(sz_w, persistent);
+  void Callback::alloc_w(size_t sz_w, bool persist) {
+    return (*this)->alloc_w(sz_w, persist);
+  }
+
+  void Callback::alloc_iw(size_t sz_iw, bool persist) {
+    return (*this)->alloc_iw(sz_iw, persist);
+  }
+
+  void Callback::alloc_arg(size_t sz_arg, bool persist) {
+    return (*this)->alloc_arg(sz_arg, persist);
+  }
+
+  void Callback::alloc_res(size_t sz_res, bool persist) {
+    return (*this)->alloc_res(sz_res, persist);
   }
 
   void Callback::transfer_ownership() {
