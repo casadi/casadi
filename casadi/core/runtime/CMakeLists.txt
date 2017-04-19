@@ -24,7 +24,7 @@ CASADI_STRINGIFY("${CMAKE_CURRENT_BINARY_DIR}/casadi_runtime_str.h"
   casadi_swap.hpp        casadi_swap_decl.hpp
   casadi_project.hpp     casadi_project_decl.hpp
   casadi_densify.hpp     casadi_densify_decl.hpp
-  casadi_sparsify.hpp    casadi_densify_decl.hpp
+  casadi_sparsify.hpp    casadi_sparsify_decl.hpp
   casadi_scal.hpp        casadi_scal_decl.hpp
   casadi_axpy.hpp        casadi_axpy_decl.hpp
   casadi_dot.hpp         casadi_dot_decl.hpp

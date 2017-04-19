@@ -28,6 +28,7 @@
 #include "function_internal.hpp"
 #include <iomanip>
 #include "casadi/core/runtime/runtime_embedded.hpp"
+#include "casadi_runtime_str.h"
 
 using namespace std;
 namespace casadi {

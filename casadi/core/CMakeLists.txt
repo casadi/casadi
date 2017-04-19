@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 2.8.6)
 
-# Make the shared library prefix and suffix available in C++
-
+# Create runtime
 add_subdirectory(runtime)
+include_directories("${CMAKE_CURRENT_BINARY_DIR}/runtime")
 
 set(CASADI_PUBLIC
   # MISC
