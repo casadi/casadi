@@ -20,19 +20,19 @@ endmacro()
 
 # Stringify C runtime
 CASADI_STRINGIFY("${CMAKE_CURRENT_BINARY_DIR}/casadi_runtime_str.h"
-  casadi_copy.hpp        casadi_copy_decl.hpp
-  casadi_swap.hpp        casadi_swap_decl.hpp
-  casadi_project.hpp     casadi_project_decl.hpp
-  casadi_densify.hpp     casadi_densify_decl.hpp
-  casadi_sparsify.hpp    casadi_sparsify_decl.hpp
-  casadi_scal.hpp        casadi_scal_decl.hpp
-  casadi_axpy.hpp        casadi_axpy_decl.hpp
-  casadi_dot.hpp         casadi_dot_decl.hpp
-  casadi_fill.hpp        casadi_fill_decl.hpp
-  casadi_mtimes.hpp      casadi_mtimes_decl.hpp
-  casadi_mv.hpp          casadi_mv_decl.hpp
-  casadi_trans.hpp       casadi_trans_decl.hpp
-  casadi_bilin.hpp       casadi_bilin_decl.hpp)
+  casadi_copy.hpp
+  casadi_swap.hpp
+  casadi_project.hpp
+  casadi_densify.hpp
+  casadi_sparsify.hpp
+  casadi_scal.hpp
+  casadi_axpy.hpp
+  casadi_dot.hpp
+  casadi_fill.hpp
+  casadi_mtimes.hpp
+  casadi_mv.hpp
+  casadi_trans.hpp
+  casadi_bilin.hpp)
 
 set(EMBEDDED_SRC "")
 file(GLOB SRC runtime.hpp)

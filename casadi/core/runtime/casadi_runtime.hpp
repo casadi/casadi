@@ -1,4 +1,3 @@
-#include "casadi_runtime_decl.hpp"
 #include "casadi_copy.hpp"
 #include "casadi_swap.hpp"
 #include "casadi_project.hpp"
