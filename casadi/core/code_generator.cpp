@@ -586,20 +586,14 @@ namespace casadi {
       this->auxiliaries << sanitize_source(casadi_interpn_grad_str);
       break;
     case AUX_DE_BOOR:
-      this->auxiliaries
-        << codegen_str_de_boor
-        << codegen_str_de_boor_define << endl
-        << endl;
+      this->auxiliaries << sanitize_source(casadi_de_boor_str);
       break;
     case AUX_ND_BOOR_EVAL:
       addAuxiliary(AUX_DE_BOOR);
       addAuxiliary(AUX_FILL);
       addAuxiliary(AUX_FILL_INT);
       addAuxiliary(AUX_LOW);
-      this->auxiliaries
-        << codegen_str_nd_boor_eval
-        << codegen_str_nd_boor_eval_define << endl
-        << endl;
+      this->auxiliaries << sanitize_source(casadi_nd_boor_eval_str);
       break;
     case AUX_FLIP:
       this->auxiliaries
