@@ -1,5 +1,5 @@
-template<typename real_t>
-void CASADI_PREFIX(project)(const real_t* x, const int* sp_x, real_t* y, const int* sp_y, real_t* w) {
+template<typename T1>
+void CASADI_PREFIX(project)(const T1* x, const int* sp_x, T1* y, const int* sp_y, T1* w) {
   int ncol_x = sp_x[1];
   const int *colind_x = sp_x+2, *row_x = sp_x + 2 + ncol_x+1;
   int ncol_y = sp_y[1];

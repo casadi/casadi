@@ -1,5 +1,5 @@
-template<typename real_t>
-int CASADI_PREFIX(low)(real_t x, const double* grid, int ng, int lookup_mode) {
+template<typename T1>
+int CASADI_PREFIX(low)(T1 x, const double* grid, int ng, int lookup_mode) {
   if (lookup_mode) {
     double g0 = grid[0];
     int ret = (int) ((x-g0)*(ng-1)/(grid[ng-1]-g0));

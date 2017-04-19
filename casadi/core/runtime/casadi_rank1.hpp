@@ -1,5 +1,5 @@
-template<typename real_t>
-void CASADI_PREFIX(rank1)(real_t* A, const int* sp_A, real_t alpha, const real_t* x, const real_t* y) {
+template<typename T1>
+void CASADI_PREFIX(rank1)(T1* A, const int* sp_A, T1 alpha, const T1* x, const T1* y) {
   /* Get sparsities */
   int ncol_A = sp_A[1];
   const int *colind_A = sp_A+2, *row_A = sp_A + 2 + ncol_A+1;

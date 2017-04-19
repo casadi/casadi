@@ -1,6 +1,6 @@
-template<typename real_t>
-void CASADI_PREFIX(swap)(int n, real_t* x, int inc_x, real_t* y, int inc_y) {
-  real_t t;
+template<typename T1>
+void CASADI_PREFIX(swap)(int n, T1* x, int inc_x, T1* y, int inc_y) {
+  T1 t;
   int i;
   for (i=0; i<n; ++i) {
     t = *x;

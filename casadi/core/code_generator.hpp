@@ -137,8 +137,8 @@ namespace casadi {
     static std::string initializer(const std::vector<int>& v);
 
     /** \brief Sanitize source files for codegen */
-    typedef std::map<std::string, std::string> StrRep;
-    static std::string sanitize_source(const std::string& src, const StrRep& rep=StrRep());
+    static std::string sanitize_source(const std::string& src, bool shorthand,
+                                       const std::vector<std::string>& inst);
 
     /** \brief Codegen inner product */
     std::string dot(int n, const std::string& x, const std::string& y);
@@ -205,7 +205,7 @@ namespace casadi {
     };
 
     /** \brief Add a built-in auxiliary function */
-    void addAuxiliary(Auxiliary f);
+    void addAuxiliary(Auxiliary f, const std::vector<std::string>& inst = {"real_t"});
 
     /** Convert in integer to a string */
     static std::string to_string(int n);
@@ -332,7 +332,7 @@ namespace casadi {
     typedef std::map<const void*, int> PointerMap;
     std::set<std::string> added_includes_;
     std::set<std::string> added_externals_;
-    std::set<Auxiliary> added_auxiliaries_;
+    std::multimap<Auxiliary, std::vector<std::string>> added_auxiliaries_;
     PointerMap added_sparsities_;
     PointerMap added_dependencies_;
     std::multimap<size_t, size_t> added_double_constants_;

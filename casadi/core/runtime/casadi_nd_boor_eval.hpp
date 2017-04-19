@@ -1,12 +1,12 @@
-template<typename real_t>
-void CASADI_PREFIX(nd_boor_eval)(real_t* ret, int n_dims, const real_t* all_knots, const int* offset, const int* all_degree, const int* strides, const real_t* c, int m, const real_t* all_x, const int* lookup_mode, int reverse, int* iw, real_t* w) {
+template<typename T1>
+void CASADI_PREFIX(nd_boor_eval)(T1* ret, int n_dims, const T1* all_knots, const int* offset, const int* all_degree, const int* strides, const T1* c, int m, const T1* all_x, const int* lookup_mode, int reverse, int* iw, T1* w) {
   int* boor_offset = iw; iw+=n_dims+1;
   int* starts = iw; iw+=n_dims;
   int* index = iw; iw+=n_dims;
   int* coeff_offset = iw;
 
-  real_t* cumprod = w; w+= n_dims+1;
-  real_t* all_boor = w;
+  T1* cumprod = w; w+= n_dims+1;
+  T1* all_boor = w;
 
   boor_offset[0] = 0;
   cumprod[n_dims] = 1;
@@ -14,14 +14,14 @@ void CASADI_PREFIX(nd_boor_eval)(real_t* ret, int n_dims, const real_t* all_knot
 
   int n_iter = 1;
   for (int k=0;k<n_dims;++k) {
-    real_t* boor = all_boor+boor_offset[k];
+    T1* boor = all_boor+boor_offset[k];
 
     int degree = all_degree[k];
-    const real_t* knots = all_knots + offset[k];
+    const T1* knots = all_knots + offset[k];
     int n_knots = offset[k+1]-offset[k];
     int n_b = n_knots-degree-1;
 
-    real_t x = all_x[k];
+    T1 x = all_x[k];
     int L = CASADI_PREFIX(low)(x, knots+degree, n_knots-2*degree, lookup_mode[k]);
 
     int start = L;

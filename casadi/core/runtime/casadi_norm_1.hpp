@@ -1,6 +1,6 @@
-template<typename real_t>
-real_t CASADI_PREFIX(norm_1)(int n, const real_t* x) {
-  real_t ret = 0;
+template<typename T1>
+T1 CASADI_PREFIX(norm_1)(int n, const T1* x) {
+  T1 ret = 0;
   int i;
   if (x) {
     for (i=0; i<n; ++i) ret += fabs(*x++);

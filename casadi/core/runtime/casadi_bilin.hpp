@@ -1,10 +1,10 @@
-template<typename real_t>
-real_t CASADI_PREFIX(bilin)(const real_t* A, const int* sp_A, const real_t* x, const real_t* y) {
+template<typename T1>
+T1 CASADI_PREFIX(bilin)(const T1* A, const int* sp_A, const T1* x, const T1* y) {
   /* Get sparsities */
   int ncol_A = sp_A[1];
   const int *colind_A = sp_A+2, *row_A = sp_A + 2 + ncol_A+1;
   /* Return value */
-  real_t ret=0;
+  T1 ret=0;
   /* Loop over the columns of A */
   int cc, rr, el;
   for (cc=0; cc<ncol_A; ++cc) {

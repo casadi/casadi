@@ -491,9 +491,8 @@ namespace casadi {
     size_t h = hash(v);
 
     // Try to locate it in already added constants
-    pair<multimap<size_t, size_t>::iterator, multimap<size_t, size_t>::iterator> eq =
-      added_double_constants_.equal_range(h);
-    for (multimap<size_t, size_t>::iterator i=eq.first; i!=eq.second; ++i) {
+    auto eq = added_double_constants_.equal_range(h);
+    for (auto i=eq.first; i!=eq.second; ++i) {
       if (equal(v, double_constants_[i->second])) return i->second;
     }
 
@@ -501,7 +500,7 @@ namespace casadi {
       // Add to constants
       int ind = double_constants_.size();
       double_constants_.push_back(v);
-      added_double_constants_.insert(pair<size_t, size_t>(h, ind));
+      added_double_constants_.insert(make_pair(h, ind));
       return ind;
     } else {
       casadi_error("Constant not found");
@@ -540,85 +539,89 @@ namespace casadi {
     return "c" + to_string(getConstant(v, true));
   }
 
-  void CodeGenerator::addAuxiliary(Auxiliary f) {
-    // Register the new auxiliary
-    bool added = added_auxiliaries_.insert(f).second;
-
-    // Quick return if it already exists
-    if (!added) return;
+  void CodeGenerator::addAuxiliary(Auxiliary f, const vector<string>& inst) {
+    // Look for existing instantiations
+    auto f_match = added_auxiliaries_.equal_range(f);
+    // Look for duplicates
+    bool first = true;
+    for (auto it=f_match.first; it!=f_match.second; ++it) {
+      first = false;
+      if (it->second==inst) return;
+    }
+    added_auxiliaries_.insert(make_pair(f, inst));
 
     // Add the appropriate function
     switch (f) {
     case AUX_COPY:
-      this->auxiliaries << sanitize_source(casadi_copy_str);
+      this->auxiliaries << sanitize_source(casadi_copy_str, first, inst);
       break;
     case AUX_SWAP:
-      this->auxiliaries << sanitize_source(casadi_swap_str);
+      this->auxiliaries << sanitize_source(casadi_swap_str, first, inst);
       break;
     case AUX_SCAL:
-      this->auxiliaries << sanitize_source(casadi_scal_str);
+      this->auxiliaries << sanitize_source(casadi_scal_str, first, inst);
       break;
     case AUX_AXPY:
-      this->auxiliaries << sanitize_source(casadi_axpy_str);
+      this->auxiliaries << sanitize_source(casadi_axpy_str, first, inst);
       break;
     case AUX_DOT:
-      this->auxiliaries << sanitize_source(casadi_dot_str);
+      this->auxiliaries << sanitize_source(casadi_dot_str, first, inst);
       break;
     case AUX_BILIN:
-      this->auxiliaries << sanitize_source(casadi_bilin_str);
+      this->auxiliaries << sanitize_source(casadi_bilin_str, first, inst);
       break;
     case AUX_RANK1:
-      this->auxiliaries << sanitize_source(casadi_rank1_str);
+      this->auxiliaries << sanitize_source(casadi_rank1_str, first, inst);
       break;
     case AUX_IAMAX:
-      this->auxiliaries << sanitize_source(casadi_iamax_str);
+      this->auxiliaries << sanitize_source(casadi_iamax_str, first, inst);
       break;
     case AUX_INTERPN:
       addAuxiliary(AUX_INTERPN_WEIGHTS);
       addAuxiliary(AUX_INTERPN_INTERPOLATE);
-      addAuxiliary(AUX_FLIP);
+      addAuxiliary(AUX_FLIP, {});
       addAuxiliary(AUX_FILL);
       addAuxiliary(AUX_FILL_INT);
-      this->auxiliaries << sanitize_source(casadi_interpn_str);
+      this->auxiliaries << sanitize_source(casadi_interpn_str, first, inst);
       break;
     case AUX_INTERPN_GRAD:
       addAuxiliary(AUX_INTERPN);
-      this->auxiliaries << sanitize_source(casadi_interpn_grad_str);
+      this->auxiliaries << sanitize_source(casadi_interpn_grad_str, first, inst);
       break;
     case AUX_DE_BOOR:
-      this->auxiliaries << sanitize_source(casadi_de_boor_str);
+      this->auxiliaries << sanitize_source(casadi_de_boor_str, first, inst);
       break;
     case AUX_ND_BOOR_EVAL:
       addAuxiliary(AUX_DE_BOOR);
       addAuxiliary(AUX_FILL);
       addAuxiliary(AUX_FILL_INT);
       addAuxiliary(AUX_LOW);
-      this->auxiliaries << sanitize_source(casadi_nd_boor_eval_str);
+      this->auxiliaries << sanitize_source(casadi_nd_boor_eval_str, first, inst);
       break;
     case AUX_FLIP:
-      this->auxiliaries << sanitize_source(casadi_flip_str);
+      this->auxiliaries << sanitize_source(casadi_flip_str, first, inst);
       break;
     case AUX_LOW:
-      this->auxiliaries << sanitize_source(casadi_low_str);
+      this->auxiliaries << sanitize_source(casadi_low_str, first, inst);
       break;
     case AUX_INTERPN_WEIGHTS:
       addAuxiliary(AUX_LOW);
-      this->auxiliaries << sanitize_source(casadi_interpn_weights_str);
+      this->auxiliaries << sanitize_source(casadi_interpn_weights_str, first, inst);
       break;
     case AUX_INTERPN_INTERPOLATE:
-      this->auxiliaries << sanitize_source(casadi_interpn_interpolate_str);
+      this->auxiliaries << sanitize_source(casadi_interpn_interpolate_str, first, inst);
       break;
     case AUX_NORM_1:
-      this->auxiliaries << sanitize_source(casadi_norm_1_str);
+      this->auxiliaries << sanitize_source(casadi_norm_1_str, first, inst);
       break;
     case AUX_NORM_2:
-      this->auxiliaries << sanitize_source(casadi_norm_2_str);
+      this->auxiliaries << sanitize_source(casadi_norm_2_str, first, inst);
       break;
     case AUX_NORM_INF:
-      this->auxiliaries << sanitize_source(casadi_norm_inf_str);
+      this->auxiliaries << sanitize_source(casadi_norm_inf_str, first, inst);
       break;
     case AUX_FILL:
-      this->auxiliaries << sanitize_source(casadi_fill_str);
+      this->auxiliaries << sanitize_source(casadi_fill_str, first, inst);
       break;
     case AUX_FILL_INT:
       this->auxiliaries
@@ -627,7 +630,7 @@ namespace casadi {
         << endl;
       break;
     case AUX_MTIMES:
-      this->auxiliaries << sanitize_source(casadi_mtimes_str);
+      this->auxiliaries << sanitize_source(casadi_mtimes_str, first, inst);
       break;
     case AUX_SQ:
       auxSq();
@@ -636,10 +639,10 @@ namespace casadi {
       auxSign();
       break;
     case AUX_PROJECT:
-      this->auxiliaries << sanitize_source(casadi_project_str);
+      this->auxiliaries << sanitize_source(casadi_project_str, first, inst);
       break;
     case AUX_TRANS:
-      this->auxiliaries << sanitize_source(casadi_trans_str);
+      this->auxiliaries << sanitize_source(casadi_trans_str, first, inst);
       break;
     case AUX_TO_MEX:
       this->auxiliaries
@@ -885,7 +888,7 @@ namespace casadi {
     if (sp_arg==sp_res) return copy(arg, sp_arg.nnz(), res);
 
     // Create call
-    addAuxiliary(CodeGenerator::AUX_PROJECT);
+    addAuxiliary(AUX_PROJECT);
     stringstream s;
     s << "project(" << arg << ", " << sparsity(sp_arg) << ", " << res << ", "
       << sparsity(sp_res) << ", " << w << ");";
@@ -928,7 +931,7 @@ namespace casadi {
                                     const std::string& y, const Sparsity& sp_y,
                                     const std::string& z, const Sparsity& sp_z,
                                     const std::string& w, bool tr) {
-    addAuxiliary(CodeGenerator::AUX_MTIMES);
+    addAuxiliary(AUX_MTIMES);
     stringstream s;
     s << "mtimes(" << x << ", " << sparsity(sp_x) << ", " << y << ", " << sparsity(sp_y) << ", "
       << z << ", " << sparsity(sp_z) << ", " << w << ", " <<  (tr ? "1" : "0") << ");";
@@ -1006,13 +1009,24 @@ namespace casadi {
     casadi_assert_message(inserted, name + " already defined");
   }
 
-  string CodeGenerator::sanitize_source(const std::string& src, const StrRep& rep) {
+  string CodeGenerator::
+  sanitize_source(const std::string& src, bool shorthand, const vector<string>& inst) {
+    // Construct map of name replacements
+    std::map<std::string, std::string> rep;
+    for (int i=0; i<inst.size(); ++i) rep["T" + to_string(i+1)] = inst[i];
+    // Return object
     stringstream ret;
+    // Number of template parameters
+    size_t npar = 0;
+    // Process source
     istringstream stream(src);
-    string line, def;
+    string line, def, fname = "n/a";
     while (std::getline(stream, line)) {
-      // Ignore C++ template declaration
-      if (line.find("template")==0) continue;
+      // C++ template declaration
+      if (line.find("template")==0) {
+        npar = count(line.begin(), line.end(), ',') + 1;
+        continue;
+      }
       // Ignore C++ style comments at beginning of lines
       if (line.find("//")==0) continue;
       // Generate shorthand
@@ -1022,7 +1036,7 @@ namespace casadi {
         casadi_assert(def.empty());
 
         // Get function name, e.g. "fmin"
-        string fname = regex_replace(line, r, "$1");
+        fname = regex_replace(line, r, "$1");
 
         // Get argument list, e.g. "x,y"
         string args = regex_replace(line, r, "$2") + ",";
@@ -1049,8 +1063,15 @@ namespace casadi {
       ret << line << "\n";
     }
 
+    // Assert number of template parameters
+    casadi_assert_message(npar==inst.size(),
+      "Mismatching number of template parameters for " + fname);
+
     // Add shorthand
-    ret << def << "\n";
+    if (shorthand) ret << def;
+
+    // Trailing newline
+    ret << "\n";
     return ret.str();
   }
 

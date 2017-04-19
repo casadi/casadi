@@ -1,5 +1,5 @@
-template<typename real_t>
-void CASADI_PREFIX(fill)(real_t* x, int n, real_t alpha) {
+template<typename T1>
+void CASADI_PREFIX(fill)(T1* x, int n, T1 alpha) {
   int i;
   if (x) {
     for (i=0; i<n; ++i) *x++ = alpha;

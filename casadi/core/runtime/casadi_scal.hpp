@@ -1,3 +1,3 @@
 // SCAL: x <- alpha*x
-template<typename real_t>
-void CASADI_PREFIX(scal)(int n, real_t alpha, real_t* x);
+template<typename T1>
+void CASADI_PREFIX(scal)(int n, T1 alpha, T1* x);

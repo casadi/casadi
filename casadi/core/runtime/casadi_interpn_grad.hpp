@@ -1,10 +1,10 @@
-template<typename real_t>
-void CASADI_PREFIX(interpn_grad)(real_t* grad, int ndim, const real_t* grid, const int* offset, const real_t* values, const real_t* x, const int* lookup_mode, int* iw, real_t* w) {
+template<typename T1>
+void CASADI_PREFIX(interpn_grad)(T1* grad, int ndim, const T1* grid, const int* offset, const T1* values, const T1* x, const int* lookup_mode, int* iw, T1* w) {
   /* Quick return */
   if (!grad) return;
   /* Work vectors */
-  real_t* alpha = w; w += ndim;
-  real_t* coeff = w; w += ndim;
+  T1* alpha = w; w += ndim;
+  T1* coeff = w; w += ndim;
   int* index = iw; iw += ndim;
   int* corner = iw; iw += ndim;
   /* Left index and fraction of interval */
@@ -14,7 +14,7 @@ void CASADI_PREFIX(interpn_grad)(real_t* grad, int ndim, const real_t* grid, con
   CASADI_PREFIX(fill)(grad, ndim, 0.);
   do {
     /* Get coefficients */
-    real_t v = CASADI_PREFIX(interpn_interpolate)(ndim, offset, values,
+    T1 v = CASADI_PREFIX(interpn_interpolate)(ndim, offset, values,
       alpha, index, corner, coeff);
     /* Propagate to alpha */
     int i;
@@ -31,7 +31,7 @@ void CASADI_PREFIX(interpn_grad)(real_t* grad, int ndim, const real_t* grid, con
   /* Propagate to x */
   int i;
   for (i=0; i<ndim; ++i) {
-    const real_t* g = grid + offset[i];
+    const T1* g = grid + offset[i];
     int j = index[i];
     grad[i] /= g[j+1]-g[j];
   }

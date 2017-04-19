@@ -1,5 +1,5 @@
-template<typename real_t>
-void CASADI_PREFIX(copy)(const real_t* x, int n, real_t* y) {
+template<typename T1>
+void CASADI_PREFIX(copy)(const T1* x, int n, T1* y) {
   int i;
   if (y) {
     if (x) {
