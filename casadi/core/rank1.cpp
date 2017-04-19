@@ -24,10 +24,7 @@
 
 
 #include "rank1.hpp"
-#include "runtime/runtime.hpp"
-
 using namespace std;
-
 namespace casadi {
 
   Rank1::Rank1(const MX& A, const MX& alpha, const MX& x, const MX& y) {

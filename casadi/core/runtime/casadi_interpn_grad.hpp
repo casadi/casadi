@@ -10,7 +10,7 @@ void CASADI_PREFIX(interpn_grad)(T1* grad, int ndim, const T1* grid, const int* 
   /* Left index and fraction of interval */
   CASADI_PREFIX(interpn_weights)(ndim, grid, offset, x, alpha, index, lookup_mode);
   /* Loop over all corners, add contribution to output */
-  CASADI_PREFIX(fill_int)(corner, ndim, 0);
+  CASADI_PREFIX(fill)(corner, ndim, 0);
   CASADI_PREFIX(fill)(grad, ndim, 0.);
   do {
     /* Get coefficients */

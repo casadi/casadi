@@ -1,3 +1,0 @@
-namespace casadi {
-  const char * codegen_str_${FILE_BASENAME} = "${FILE_CONTENTS}";
-}

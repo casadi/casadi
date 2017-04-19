@@ -24,10 +24,8 @@
 
 
 #include "bilin.hpp"
-#include "runtime/runtime.hpp"
 
 using namespace std;
-
 namespace casadi {
 
   Bilin::Bilin(const MX& A, const MX& x, const MX& y) {

@@ -24,10 +24,7 @@
 
 
 #include "dot.hpp"
-#include "runtime/runtime.hpp"
-
 using namespace std;
-
 namespace casadi {
 
   Dot::Dot(const MX& x, const MX& y) {

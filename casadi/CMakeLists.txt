@@ -1,3 +1,21 @@
+# Turn a runtime file into a file with strings
+macro(CASADI_STRINGIFY STRFILE)
+  # Start with an empty file
+  file(WRITE ${STRFILE} "")
+  foreach(FILE ${ARGN})
+    # Add declaration of string
+    get_filename_component(FILENAME ${FILE} NAME_WE)
+    file(APPEND ${STRFILE} "const char* ${FILENAME}_str =")
+    # Append file as strings
+    file(STRINGS ${FILE} FILE_CONTENTS)
+    foreach(FILE_LINE ${FILE_CONTENTS})
+      file(APPEND ${STRFILE} "\n  \"${FILE_LINE}\\n\"")
+    endforeach()
+    # End declaration
+    file(APPEND ${STRFILE} ";\n\n")
+  endforeach()
+endmacro()
+
 macro(casadi_plugin_link_libraries Type name)
   string(TOLOWER ${Type} type)
   target_link_libraries(casadi_${type}_${name} ${ARGN})

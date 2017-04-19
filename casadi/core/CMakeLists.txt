@@ -164,15 +164,10 @@ set(CASADI_INTERNAL
   xml_file.cpp                xml_file_internal.hpp                xml_file_internal.cpp
   variable.cpp
   dae_builder.cpp
-
-  # runtime
-  runtime/shared.cpp
 )
 
-set_source_files_properties( ${RUNTIME_EMBEDDED_SRC} PROPERTIES GENERATED TRUE )
-casadi_library(casadi ${CASADI_PUBLIC} ${CASADI_INTERNAL} ${RUNTIME_EMBEDDED_SRC})
-
-add_dependencies(casadi casadi_runtime_embedded)
+set_source_files_properties(${CASADI_RUNTIME_SRC} PROPERTIES GENERATED TRUE)
+casadi_library(casadi ${CASADI_PUBLIC} ${CASADI_INTERNAL} ${CASADI_RUNTIME_SRC})
 
 if(WITH_DL)
   # Core needs support for dynamic linking
