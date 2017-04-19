@@ -596,16 +596,10 @@ namespace casadi {
       this->auxiliaries << sanitize_source(casadi_nd_boor_eval_str);
       break;
     case AUX_FLIP:
-      this->auxiliaries
-        << codegen_str_flip
-        << codegen_str_flip_define << endl
-        << endl;
+      this->auxiliaries << sanitize_source(casadi_flip_str);
       break;
     case AUX_LOW:
-      this->auxiliaries
-        << codegen_str_low
-        << codegen_str_low_define << endl
-        << endl;
+      this->auxiliaries << sanitize_source(casadi_low_str);
       break;
     case AUX_INTERPN_WEIGHTS:
       addAuxiliary(AUX_LOW);
