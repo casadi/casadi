@@ -550,34 +550,22 @@ namespace casadi {
     // Add the appropriate function
     switch (f) {
     case AUX_COPY:
-      this->auxiliaries << sanitize_source(casadi_copy_str) << "\n";
+      this->auxiliaries << sanitize_source(casadi_copy_str);
       break;
     case AUX_SWAP:
-      this->auxiliaries << codegen_str_swap
-        << codegen_str_swap_define
-        << endl;
+      this->auxiliaries << sanitize_source(casadi_swap_str);
       break;
     case AUX_SCAL:
-      this->auxiliaries << codegen_str_scal
-        << codegen_str_scal_define
-        << endl;
+      this->auxiliaries << sanitize_source(casadi_scal_str);
       break;
     case AUX_AXPY:
-      this->auxiliaries << codegen_str_axpy
-        << codegen_str_axpy_define
-        << endl;
+      this->auxiliaries << sanitize_source(casadi_axpy_str);
       break;
     case AUX_DOT:
-      this->auxiliaries
-        << codegen_str_dot
-        << codegen_str_dot_define << endl
-        << endl;
+      this->auxiliaries << sanitize_source(casadi_dot_str);
       break;
     case AUX_BILIN:
-      this->auxiliaries
-        << codegen_str_bilin
-        << codegen_str_bilin_define << endl
-        << endl;
+      this->auxiliaries << sanitize_source(casadi_bilin_str);
       break;
     case AUX_RANK1:
       this->auxiliaries
@@ -665,10 +653,7 @@ namespace casadi {
         << endl;
       break;
     case AUX_FILL:
-      this->auxiliaries
-        << codegen_str_fill
-        << codegen_str_fill_define << endl
-        << endl;
+      this->auxiliaries << sanitize_source(casadi_fill_str);
       break;
     case AUX_FILL_INT:
       this->auxiliaries
@@ -677,9 +662,7 @@ namespace casadi {
         << endl;
       break;
     case AUX_MTIMES:
-      this->auxiliaries << codegen_str_mtimes
-        << codegen_str_mtimes_define
-        << endl;
+      this->auxiliaries << sanitize_source(casadi_mtimes_str);
       break;
     case AUX_SQ:
       auxSq();
@@ -688,15 +671,10 @@ namespace casadi {
       auxSign();
       break;
     case AUX_PROJECT:
-      this->auxiliaries
-        << codegen_str_project
-        << codegen_str_project_define
-        << endl << endl;
+      this->auxiliaries << sanitize_source(casadi_project_str);
       break;
     case AUX_TRANS:
-      this->auxiliaries << codegen_str_trans
-        << "#define trans(x, sp_x, y, sp_y, tmp) CASADI_PREFIX(trans)(x, sp_x, y, sp_y, tmp)"
-        << endl << endl;
+      this->auxiliaries << sanitize_source(casadi_trans_str);
       break;
     case AUX_TO_MEX:
       this->auxiliaries
@@ -1107,7 +1085,7 @@ namespace casadi {
     }
 
     // Add shorthand
-    ret << def;
+    ret << def << "\n";
     return ret.str();
   }
 
