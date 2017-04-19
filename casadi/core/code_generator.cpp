@@ -571,9 +571,7 @@ namespace casadi {
       this->auxiliaries << sanitize_source(casadi_rank1_str);
       break;
     case AUX_IAMAX:
-      this->auxiliaries << codegen_str_iamax
-        << codegen_str_iamax_define
-        << endl;
+      this->auxiliaries << sanitize_source(casadi_iamax_str);
       break;
     case AUX_INTERPN:
       addAuxiliary(AUX_INTERPN_WEIGHTS);
