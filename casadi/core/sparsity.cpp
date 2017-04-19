@@ -1175,6 +1175,7 @@ namespace casadi {
     int b_ncol = b.size2();
     int a_nrow = a.size1();
     int b_nrow = b.size1();
+    if (a.is_dense() && b.is_dense()) return Sparsity::dense(a_nrow*b_nrow, a_ncol*b_ncol);
 
     const int* a_colind = a.colind();
     const int* a_row = a.row();
