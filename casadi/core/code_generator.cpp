@@ -621,19 +621,13 @@ namespace casadi {
       this->auxiliaries << sanitize_source(casadi_interpn_interpolate_str);
       break;
     case AUX_NORM_1:
-      this->auxiliaries << codegen_str_norm_1
-        << codegen_str_norm_1_define
-        << endl;
+      this->auxiliaries << sanitize_source(casadi_norm_1_str);
       break;
     case AUX_NORM_2:
-      this->auxiliaries << codegen_str_norm_2
-        << codegen_str_norm_2_define
-        << endl;
+      this->auxiliaries << sanitize_source(casadi_norm_2_str);
       break;
     case AUX_NORM_INF:
-      this->auxiliaries << codegen_str_norm_inf
-        << codegen_str_norm_inf_define
-        << endl;
+      this->auxiliaries << sanitize_source(casadi_norm_inf_str);
       break;
     case AUX_FILL:
       this->auxiliaries << sanitize_source(casadi_fill_str);

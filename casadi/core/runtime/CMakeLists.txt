@@ -39,6 +39,9 @@ CASADI_STRINGIFY("${CMAKE_CURRENT_BINARY_DIR}/casadi_runtime_str.h"
 	casadi_interpn_grad.hpp
 	casadi_interpn_interpolate.hpp
 	casadi_interpn_weights.hpp
+  casadi_norm_1.hpp
+  casadi_norm_2.hpp
+  casadi_norm_inf.hpp
 )
 
 set(EMBEDDED_SRC "")
