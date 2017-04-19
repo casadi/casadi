@@ -579,17 +579,11 @@ namespace casadi {
       addAuxiliary(AUX_FLIP);
       addAuxiliary(AUX_FILL);
       addAuxiliary(AUX_FILL_INT);
-      this->auxiliaries
-        << codegen_str_interpn
-        << codegen_str_interpn_define << endl
-        << endl;
+      this->auxiliaries << sanitize_source(casadi_interpn_str);
       break;
     case AUX_INTERPN_GRAD:
       addAuxiliary(AUX_INTERPN);
-      this->auxiliaries
-        << codegen_str_interpn_grad
-        << codegen_str_interpn_grad_define << endl
-        << endl;
+      this->auxiliaries << sanitize_source(casadi_interpn_grad_str);
       break;
     case AUX_DE_BOOR:
       this->auxiliaries
@@ -621,16 +615,10 @@ namespace casadi {
       break;
     case AUX_INTERPN_WEIGHTS:
       addAuxiliary(AUX_LOW);
-      this->auxiliaries
-        << codegen_str_interpn_weights
-        << codegen_str_interpn_weights_define << endl
-        << endl;
+      this->auxiliaries << sanitize_source(casadi_interpn_weights_str);
       break;
     case AUX_INTERPN_INTERPOLATE:
-      this->auxiliaries
-        << codegen_str_interpn_interpolate
-        << codegen_str_interpn_interpolate_define << endl
-        << endl;
+      this->auxiliaries << sanitize_source(casadi_interpn_interpolate_str);
       break;
     case AUX_NORM_1:
       this->auxiliaries << codegen_str_norm_1

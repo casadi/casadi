@@ -34,7 +34,12 @@ CASADI_STRINGIFY("${CMAKE_CURRENT_BINARY_DIR}/casadi_runtime_str.h"
   casadi_trans.hpp
   casadi_bilin.hpp
   casadi_rank1.hpp
-  casadi_iamax.hpp)
+  casadi_iamax.hpp
+  casadi_interpn.hpp
+	casadi_interpn_grad.hpp
+	casadi_interpn_interpolate.hpp
+	casadi_interpn_weights.hpp
+)
 
 set(EMBEDDED_SRC "")
 file(GLOB SRC runtime.hpp)
