@@ -568,10 +568,7 @@ namespace casadi {
       this->auxiliaries << sanitize_source(casadi_bilin_str);
       break;
     case AUX_RANK1:
-      this->auxiliaries
-        << codegen_str_rank1
-        << codegen_str_rank1_define << endl
-        << endl;
+      this->auxiliaries << sanitize_source(casadi_rank1_str);
       break;
     case AUX_IAMAX:
       this->auxiliaries << codegen_str_iamax
