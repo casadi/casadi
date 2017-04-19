@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 2.8.6)
 
 # C runtime sources
 set(RUNTIME_SRC
+  casadi_axpy.hpp
   casadi_bilin.hpp
   casadi_copy.hpp
   casadi_de_boor.hpp
