@@ -80,9 +80,6 @@ namespace casadi {
   template<typename real_t>
   void CASADI_PREFIX(fill)(real_t* x, int n, real_t alpha);
 
-  /// FILL: x <- alpha
-  void CASADI_PREFIX(fill_int)(int* x, int n, int alpha);
-
   /// Sparse matrix-matrix multiplication: z <- z + x*y
   template<typename real_t>
   void CASADI_PREFIX(mtimes)(const real_t* x, const int* sp_x, const real_t* y, const int* sp_y, real_t* z, const int* sp_z, real_t* w, int tr);
@@ -341,14 +338,6 @@ namespace casadi {
 
   template<typename real_t>
   void CASADI_PREFIX(fill)(real_t* x, int n, real_t alpha) {
-    int i;
-    if (x) {
-      for (i=0; i<n; ++i) *x++ = alpha;
-    }
-  }
-
-  inline
-  void CASADI_PREFIX(fill_int)(int* x, int n, int alpha) {
     int i;
     if (x) {
       for (i=0; i<n; ++i) *x++ = alpha;
@@ -695,7 +684,7 @@ namespace casadi {
     /* Left index and fraction of interval */
     CASADI_PREFIX(interpn_weights)(ndim, grid, offset, x, alpha, index, lookup_mode);
     /* Loop over all corners, add contribution to output */
-    CASADI_PREFIX(fill_int)(corner, ndim, 0);
+    CASADI_PREFIX(fill)(corner, ndim, 0);
     real_t ret = 0;
     do {
       real_t* coeff = 0;
@@ -717,7 +706,7 @@ namespace casadi {
     /* Left index and fraction of interval */
     CASADI_PREFIX(interpn_weights)(ndim, grid, offset, x, alpha, index, lookup_mode);
     /* Loop over all corners, add contribution to output */
-    CASADI_PREFIX(fill_int)(corner, ndim, 0);
+    CASADI_PREFIX(fill)(corner, ndim, 0);
     CASADI_PREFIX(fill)(grad, ndim, 0.);
     do {
       /* Get coefficients */
@@ -809,7 +798,7 @@ namespace casadi {
       boor_offset[k+1] = boor_offset[k] + degree+1;
     }
 
-    CASADI_PREFIX(fill_int)(index, n_dims, 0);
+    CASADI_PREFIX(fill)(index, n_dims, 0);
 
     // Prepare cumulative product
     for (int pivot=n_dims-1;pivot>=0;--pivot) {

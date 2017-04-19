@@ -581,7 +581,7 @@ namespace casadi {
       addAuxiliary(AUX_INTERPN_INTERPOLATE);
       addAuxiliary(AUX_FLIP, {});
       addAuxiliary(AUX_FILL);
-      addAuxiliary(AUX_FILL_INT);
+      addAuxiliary(AUX_FILL, {"int"});
       this->auxiliaries << sanitize_source(casadi_interpn_str, first, inst);
       break;
     case AUX_INTERPN_GRAD:
@@ -594,7 +594,7 @@ namespace casadi {
     case AUX_ND_BOOR_EVAL:
       addAuxiliary(AUX_DE_BOOR);
       addAuxiliary(AUX_FILL);
-      addAuxiliary(AUX_FILL_INT);
+      addAuxiliary(AUX_FILL, {"int"});
       addAuxiliary(AUX_LOW);
       this->auxiliaries << sanitize_source(casadi_nd_boor_eval_str, first, inst);
       break;
@@ -622,12 +622,6 @@ namespace casadi {
       break;
     case AUX_FILL:
       this->auxiliaries << sanitize_source(casadi_fill_str, first, inst);
-      break;
-    case AUX_FILL_INT:
-      this->auxiliaries
-        << codegen_str_fill_int
-        << codegen_str_fill_int_define << endl
-        << endl;
       break;
     case AUX_MTIMES:
       this->auxiliaries << sanitize_source(casadi_mtimes_str, first, inst);

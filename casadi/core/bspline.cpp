@@ -410,7 +410,7 @@ namespace casadi {
         n_iter*= degree+1;
       }
 
-      casadi_fill_int(index, n_dims, 0);
+      casadi_fill(index, n_dims, 0);
 
       // Prepare offset
       for (int pivot=n_dims-1;pivot>=0;--pivot) {
