@@ -27,8 +27,9 @@
 #include "code_generator.hpp"
 #include "function_internal.hpp"
 #include <iomanip>
+#include <regex>
 #include "casadi/core/runtime/runtime_embedded.hpp"
-#include "casadi_runtime_str.h"
+#include <casadi_runtime_str.h>
 
 using namespace std;
 namespace casadi {
@@ -549,10 +550,7 @@ namespace casadi {
     // Add the appropriate function
     switch (f) {
     case AUX_COPY:
-      this->auxiliaries
-        << codegen_str_copy
-        << codegen_str_copy_define << endl
-        << endl;
+      this->auxiliaries << sanitize_source(casadi_copy_str) << "\n";
       break;
     case AUX_SWAP:
       this->auxiliaries << codegen_str_swap
@@ -1063,6 +1061,54 @@ namespace casadi {
   void CodeGenerator::init_local(const string& name, const string& def) {
     bool inserted = local_default_.insert(make_pair(name, def)).second;
     casadi_assert_message(inserted, name + " already defined");
+  }
+
+  string CodeGenerator::sanitize_source(const std::string& src, const StrRep& rep) {
+    stringstream ret;
+    istringstream stream(src);
+    string line, def;
+    while (std::getline(stream, line)) {
+      // Ignore C++ template declaration
+      if (line.find("template")==0) continue;
+      // Ignore C++ style comments at beginning of lines
+      if (line.find("//")==0) continue;
+      // Generate shorthand
+      regex r(".* CASADI_PREFIX\\(([a-z_0-9]+)\\)\\((.*)\\).*\\{.*");
+      if (regex_match(line, r)) {
+        // Make sure only one match
+        casadi_assert(def.empty());
+
+        // Get function name, e.g. "fmin"
+        string fname = regex_replace(line, r, "$1");
+
+        // Get argument list, e.g. "x,y"
+        string args = regex_replace(line, r, "$2") + ",";
+        r = regex("[^,]* ([a-zA-Z_0-9]+),");
+        smatch sm;
+        while (regex_search(args, sm, r)) {
+          def = def.empty() ? string(sm[1]) : def + ", " + string(sm[1]);
+          args = sm.suffix();
+        }
+
+        // Finalize shorthand, e.g. #define fmin(x,y) CASADI_PREFIX(fmin)(x,y)
+        def = "#define " + fname + "(" + def + ") CASADI_PREFIX(" + fname + ")(" + def + ")\n";
+      }
+
+      // Perform string replacements
+      for (auto&& r : rep) {
+        string::size_type n = 0;
+        while ((n = line.find(r.first, n)) != string::npos) {
+          line.replace(n, r.first.size(), r.second);
+          n += r.second.size();
+        }
+      }
+      // Append to return
+      ret << line << "\n";
+    }
+
+    // Add shorthand
+    ret << def;
+    return ret.str();
   }
 
 } // namespace casadi

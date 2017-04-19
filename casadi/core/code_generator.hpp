@@ -136,6 +136,10 @@ namespace casadi {
     static std::string initializer(const std::vector<double>& v);
     static std::string initializer(const std::vector<int>& v);
 
+    /** \brief Sanitize source files for codegen */
+    typedef std::map<std::string, std::string> StrRep;
+    static std::string sanitize_source(const std::string& src, const StrRep& rep=StrRep());
+
     /** \brief Codegen inner product */
     std::string dot(int n, const std::string& x, const std::string& y);
 
