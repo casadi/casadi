@@ -197,6 +197,10 @@ namespace casadi {
 
   // warning C4800: 'int' : forcing value to bool 'true'or 'false'(performance warning)
 #pragma warning(disable:4800)
+
+// warning C4244: Potential loss of data converting double to int
+#pragma warning(disable:4244)
+
 #endif
 
   ///@{
