@@ -82,7 +82,8 @@ namespace casadi {
 
   /// Sparse matrix-matrix multiplication: z <- z + x*y
   template<typename T1>
-  void CASADI_PREFIX(mtimes)(const T1* x, const int* sp_x, const T1* y, const int* sp_y, T1* z, const int* sp_z, T1* w, int tr);
+  void CASADI_PREFIX(mtimes)(const T1* x, const int* sp_x, const T1* y, const int* sp_y,
+                             T1* z, const int* sp_z, T1* w, int tr);
 
   /// Sparse matrix-vector multiplication: z <- z + x*y
   template<typename T1>
@@ -141,19 +142,24 @@ namespace casadi {
 
   // Get weights for the multilinear interpolant
   template<typename T1>
-  void CASADI_PREFIX(interpn_weights)(int ndim, const T1* grid, const int* offset, const T1* x, T1* alpha, int* index);
+  void CASADI_PREFIX(interpn_weights)(int ndim, const T1* grid, const int* offset,
+                                      const T1* x, T1* alpha, int* index);
 
   // Get coefficients for the multilinear interpolant
   template<typename T1>
-  T1 CASADI_PREFIX(interpn_interpolate)(int ndim, const int* offset, const T1* values, const T1* alpha, const int* index, const int* corner, T1* coeff);
+  T1 CASADI_PREFIX(interpn_interpolate)(int ndim, const int* offset, const T1* values,
+                                        const T1* alpha, const int* index,
+                                        const int* corner, T1* coeff);
 
   // Multilinear interpolant
   template<typename T1>
-  T1 CASADI_PREFIX(interpn)(int ndim, const T1* grid, const int* offset, const T1* values, const T1* x, int* iw, T1* w);
+  T1 CASADI_PREFIX(interpn)(int ndim, const T1* grid, const int* offset, const T1* values,
+                            const T1* x, int* iw, T1* w);
 
   // Multilinear interpolant - calculate gradient
   template<typename T1>
-  void CASADI_PREFIX(interpn_grad)(T1* grad, int ndim, const T1* grid, const int* offset, const T1* values, const T1* x, int* iw, T1* w);
+  void CASADI_PREFIX(interpn_grad)(T1* grad, int ndim, const T1* grid, const int* offset,
+                                   const T1* values, const T1* x, int* iw, T1* w);
 
   // De boor single basis evaluation
   template<typename T1>
@@ -161,7 +167,10 @@ namespace casadi {
 
   // De boor nd evaluation
   template<typename T1>
-  void CASADI_PREFIX(nd_boor_eval)(T1* ret, int n_dims, const T1* knots, const int* offset, const int* degree, const int* strides, const T1* c, int m, const T1* x, const int* lookup_mode, int reverse, int* iw, T1* w);
+  void CASADI_PREFIX(nd_boor_eval)(T1* ret, int n_dims, const T1* knots, const int* offset,
+                                   const int* degree, const int* strides, const T1* c, int m,
+                                   const T1* x, const int* lookup_mode, int reverse, int* iw,
+                                   T1* w);
 
   // Alias names
   inline void CASADI_PREFIX(copy_int)(const int* x, int n, int* y) {
