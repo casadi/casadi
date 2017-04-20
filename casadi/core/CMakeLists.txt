@@ -166,8 +166,9 @@ set(CASADI_INTERNAL
   dae_builder.cpp
 )
 
-set_source_files_properties(${CASADI_RUNTIME_SRC} PROPERTIES GENERATED TRUE)
-casadi_library(casadi ${CASADI_PUBLIC} ${CASADI_INTERNAL} ${CASADI_RUNTIME_SRC})
+#set_source_files_properties(${CASADI_RUNTIME_SRC} PROPERTIES GENERATED TRUE)
+#casadi_library(casadi ${CASADI_PUBLIC} ${CASADI_INTERNAL} ${CASADI_RUNTIME_SRC})
+casadi_library(casadi ${CASADI_PUBLIC} ${CASADI_INTERNAL})
 
 if(WITH_DL)
   # Core needs support for dynamic linking
