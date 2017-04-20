@@ -47,7 +47,7 @@ void CASADI_PREFIX(nd_boor_eval)(T1* ret, int n_dims, const T1* all_knots, const
     boor_offset[k+1] = boor_offset[k] + degree+1;
   }
 
-  CASADI_PREFIX(fill)(index, n_dims, 0);
+  CASADI_PREFIX(fill_int)(index, n_dims, 0);
 
   // Prepare cumulative product
   for (int pivot=n_dims-1;pivot>=0;--pivot) {

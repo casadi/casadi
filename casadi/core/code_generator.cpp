@@ -542,9 +542,7 @@ namespace casadi {
     // Look for existing instantiations
     auto f_match = added_auxiliaries_.equal_range(f);
     // Look for duplicates
-    bool first = true;
     for (auto it=f_match.first; it!=f_match.second; ++it) {
-      first = false;
       if (it->second==inst) return;
     }
     added_auxiliaries_.insert(make_pair(f, inst));
@@ -552,28 +550,28 @@ namespace casadi {
     // Add the appropriate function
     switch (f) {
     case AUX_COPY:
-      this->auxiliaries << sanitize_source(casadi_copy_str, first, inst);
+      this->auxiliaries << sanitize_source(casadi_copy_str, inst);
       break;
     case AUX_SWAP:
-      this->auxiliaries << sanitize_source(casadi_swap_str, first, inst);
+      this->auxiliaries << sanitize_source(casadi_swap_str, inst);
       break;
     case AUX_SCAL:
-      this->auxiliaries << sanitize_source(casadi_scal_str, first, inst);
+      this->auxiliaries << sanitize_source(casadi_scal_str, inst);
       break;
     case AUX_AXPY:
-      this->auxiliaries << sanitize_source(casadi_axpy_str, first, inst);
+      this->auxiliaries << sanitize_source(casadi_axpy_str, inst);
       break;
     case AUX_DOT:
-      this->auxiliaries << sanitize_source(casadi_dot_str, first, inst);
+      this->auxiliaries << sanitize_source(casadi_dot_str, inst);
       break;
     case AUX_BILIN:
-      this->auxiliaries << sanitize_source(casadi_bilin_str, first, inst);
+      this->auxiliaries << sanitize_source(casadi_bilin_str, inst);
       break;
     case AUX_RANK1:
-      this->auxiliaries << sanitize_source(casadi_rank1_str, first, inst);
+      this->auxiliaries << sanitize_source(casadi_rank1_str, inst);
       break;
     case AUX_IAMAX:
-      this->auxiliaries << sanitize_source(casadi_iamax_str, first, inst);
+      this->auxiliaries << sanitize_source(casadi_iamax_str, inst);
       break;
     case AUX_INTERPN:
       addAuxiliary(AUX_INTERPN_WEIGHTS);
@@ -581,49 +579,49 @@ namespace casadi {
       addAuxiliary(AUX_FLIP, {});
       addAuxiliary(AUX_FILL);
       addAuxiliary(AUX_FILL, {"int"});
-      this->auxiliaries << sanitize_source(casadi_interpn_str, first, inst);
+      this->auxiliaries << sanitize_source(casadi_interpn_str, inst);
       break;
     case AUX_INTERPN_GRAD:
       addAuxiliary(AUX_INTERPN);
-      this->auxiliaries << sanitize_source(casadi_interpn_grad_str, first, inst);
+      this->auxiliaries << sanitize_source(casadi_interpn_grad_str, inst);
       break;
     case AUX_DE_BOOR:
-      this->auxiliaries << sanitize_source(casadi_de_boor_str, first, inst);
+      this->auxiliaries << sanitize_source(casadi_de_boor_str, inst);
       break;
     case AUX_ND_BOOR_EVAL:
       addAuxiliary(AUX_DE_BOOR);
       addAuxiliary(AUX_FILL);
       addAuxiliary(AUX_FILL, {"int"});
       addAuxiliary(AUX_LOW);
-      this->auxiliaries << sanitize_source(casadi_nd_boor_eval_str, first, inst);
+      this->auxiliaries << sanitize_source(casadi_nd_boor_eval_str, inst);
       break;
     case AUX_FLIP:
-      this->auxiliaries << sanitize_source(casadi_flip_str, first, inst);
+      this->auxiliaries << sanitize_source(casadi_flip_str, inst);
       break;
     case AUX_LOW:
-      this->auxiliaries << sanitize_source(casadi_low_str, first, inst);
+      this->auxiliaries << sanitize_source(casadi_low_str, inst);
       break;
     case AUX_INTERPN_WEIGHTS:
       addAuxiliary(AUX_LOW);
-      this->auxiliaries << sanitize_source(casadi_interpn_weights_str, first, inst);
+      this->auxiliaries << sanitize_source(casadi_interpn_weights_str, inst);
       break;
     case AUX_INTERPN_INTERPOLATE:
-      this->auxiliaries << sanitize_source(casadi_interpn_interpolate_str, first, inst);
+      this->auxiliaries << sanitize_source(casadi_interpn_interpolate_str, inst);
       break;
     case AUX_NORM_1:
-      this->auxiliaries << sanitize_source(casadi_norm_1_str, first, inst);
+      this->auxiliaries << sanitize_source(casadi_norm_1_str, inst);
       break;
     case AUX_NORM_2:
-      this->auxiliaries << sanitize_source(casadi_norm_2_str, first, inst);
+      this->auxiliaries << sanitize_source(casadi_norm_2_str, inst);
       break;
     case AUX_NORM_INF:
-      this->auxiliaries << sanitize_source(casadi_norm_inf_str, first, inst);
+      this->auxiliaries << sanitize_source(casadi_norm_inf_str, inst);
       break;
     case AUX_FILL:
-      this->auxiliaries << sanitize_source(casadi_fill_str, first, inst);
+      this->auxiliaries << sanitize_source(casadi_fill_str, inst);
       break;
     case AUX_MTIMES:
-      this->auxiliaries << sanitize_source(casadi_mtimes_str, first, inst);
+      this->auxiliaries << sanitize_source(casadi_mtimes_str, inst);
       break;
     case AUX_SQ:
       auxSq();
@@ -632,10 +630,10 @@ namespace casadi {
       auxSign();
       break;
     case AUX_PROJECT:
-      this->auxiliaries << sanitize_source(casadi_project_str, first, inst);
+      this->auxiliaries << sanitize_source(casadi_project_str, inst);
       break;
     case AUX_TRANS:
-      this->auxiliaries << sanitize_source(casadi_trans_str, first, inst);
+      this->auxiliaries << sanitize_source(casadi_trans_str, inst);
       break;
     case AUX_TO_MEX:
       this->auxiliaries
@@ -1003,7 +1001,16 @@ namespace casadi {
   }
 
   string CodeGenerator::
-  sanitize_source(const std::string& src, bool shorthand, const vector<string>& inst) {
+  sanitize_source(const std::string& src, const vector<string>& inst, bool shorthand) {
+    // Create suffix if templates type are not all "real_t"
+    string suffix;
+    for (const string& s : inst) {
+      if (s!="real_t") {
+        for (const string& s : inst) suffix += "_" + s;
+        break;
+      }
+    }
+
     // Construct map of name replacements
     std::map<std::string, std::string> rep;
     for (int i=0; i<inst.size(); ++i) rep["T" + to_string(i+1)] = inst[i];
@@ -1032,7 +1039,7 @@ namespace casadi {
           casadi_assert(def.empty());
 
           // Get function name, e.g. "fmin"
-          fname = regex_replace(line, r, string("$1"));
+          fname = regex_replace(line, r, string("$1")) + suffix;
 
           // Get argument list, e.g. "x,y"
           string args = regex_replace(line, r, string("$2")) + ",";

@@ -137,8 +137,9 @@ namespace casadi {
     static std::string initializer(const std::vector<int>& v);
 
     /** \brief Sanitize source files for codegen */
-    static std::string sanitize_source(const std::string& src, bool shorthand,
-                                       const std::vector<std::string>& inst);
+    static std::string sanitize_source(const std::string& src,
+                                       const std::vector<std::string>& inst,
+                                       bool shorthand=true);
 
     /** \brief Codegen inner product */
     std::string dot(int n, const std::string& x, const std::string& y);

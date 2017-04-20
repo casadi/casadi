@@ -163,21 +163,22 @@ namespace casadi {
   template<typename T1>
   void CASADI_PREFIX(nd_boor_eval)(T1* ret, int n_dims, const T1* knots, const int* offset, const int* degree, const int* strides, const T1* c, int m, const T1* x, const int* lookup_mode, int reverse, int* iw, T1* w);
 
-}
+  // Alias names
+  inline void CASADI_PREFIX(copy_int)(const int* x, int n, int* y) {
+    CASADI_PREFIX(copy)(x, n, y);
+  }
+  inline void CASADI_PREFIX(fill_int)(int* x, int n, int alpha) {
+    CASADI_PREFIX(fill)(x, n, alpha);
+  }
 
-// Implementations
+  // Dense matrix multiplication
+  #define CASADI_GEMM_NT(M, N, K, A, LDA, B, LDB, C, LDC) \
+    for (i=0, rr=C; i<M; ++i) \
+      for (j=0; j<N; ++j, ++rr) \
+        for (k=0, ss=A+i*LDA, tt=B+j*LDB; k<K; ++k) \
+          *rr += *ss++**tt++;
 
-// Note: due to restrictions of cmake IO processing, make sure that
-//      1)   semicolons (;) are never immediately preceded by whitespace
-//      2)   line continuation slashes (\) are always immediately preceded by whitespace
-#define CASADI_GEMM_NT(M, N, K, A, LDA, B, LDB, C, LDC) \
-  for (i=0, rr=C; i<M; ++i) \
-    for (j=0; j<N; ++j, ++rr) \
-      for (k=0, ss=A+i*LDA, tt=B+j*LDB; k<K; ++k) \
-        *rr += *ss++**tt++;
-
-
-namespace casadi {
+  // Template function implementations
   #include "casadi_copy.hpp"
   #include "casadi_swap.hpp"
   #include "casadi_project.hpp"
@@ -208,7 +209,6 @@ namespace casadi {
   #include "casadi_interpn_interpolate.hpp"
   #include "casadi_interpn.hpp"
   #include "casadi_interpn_grad.hpp"
-
 } // namespace casadi
 
 
