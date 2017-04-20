@@ -164,10 +164,17 @@ set(CASADI_INTERNAL
   xml_file.cpp                xml_file_internal.hpp                xml_file_internal.cpp
   variable.cpp
   dae_builder.cpp
+
+  # Runtime headers
+  runtime/casadi_runtime.hpp
 )
 
+# Add the runtime sources to internal (installed separately)
+foreach(FILE ${CASADI_RUNTIME_SRC})
+  set(CASADI_INTERNAL ${CASADI_INTERNAL} runtime/${FILE})
+endforeach()
+
 #set_source_files_properties(${CASADI_RUNTIME_SRC} PROPERTIES GENERATED TRUE)
-#casadi_library(casadi ${CASADI_PUBLIC} ${CASADI_INTERNAL} ${CASADI_RUNTIME_SRC})
 casadi_library(casadi ${CASADI_PUBLIC} ${CASADI_INTERNAL})
 
 if(WITH_DL)
