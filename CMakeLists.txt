@@ -94,6 +94,8 @@ option(WITH_REFCOUNT_WARNINGS "Issue warnings upon reference counting failure" O
 option(WITH_SELFCONTAINED "Make the install directory self-contained" OFF)
 option(WITH_DEPRECATED_FEATURES "Compile with syntax that is scheduled to be deprecated" ON)
 option(WITH_EXTENDING_CASADI "Compile a demonstration that shows how a project that depends on CasADi can be implemented." OFF)
+option(WITH_LINT "Compile with support for linting (syntax checking)" ON)
+option(WITH_SPELL "Compile with support for spell-checking" ON)
 
 # static on windows, shared on linux/osx by default
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
@@ -633,8 +635,14 @@ if(WITH_PYTHON OR WITH_MATLAB OR WITH_OCTAVE OR WITH_JSON)
   add_subdirectory(swig)
 endif()
 
-include(CppLint)
-include(SpellCheck)
+if(WITH_LINT)
+  include(CppLint)
+endif()
+
+if(WITH_SPELL)
+  include(SpellCheck)
+endif()
+
 include(embed_resources)
 include(GenerateExportHeader)
 

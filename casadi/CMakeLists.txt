@@ -66,12 +66,17 @@ macro(casadi_library name)
     )
   endif()
 
-  # Lint etc
-  add_style_check_target(${name} "${ARGN}")
-  set_property(GLOBAL APPEND PROPERTY LINT_TARGETS  "lint_${name}")
-  add_spell_check_target(${name} "${ARGN}")
-  set_property(GLOBAL APPEND PROPERTY SPELL_TARGETS  "spell_${name}")
-  set(SPELL_TARGETS ${SPELL_TARGETS} "spell_${name}" PARENT_SCOPE)
+  if(WITH_LINT)
+    add_style_check_target(${name} "${ARGN}")
+    set_property(GLOBAL APPEND PROPERTY LINT_TARGETS  "lint_${name}")
+  endif()
+
+  if(WITH_SPELL)
+    add_spell_check_target(${name} "${ARGN}")
+    set_property(GLOBAL APPEND PROPERTY SPELL_TARGETS  "spell_${name}")
+    set(SPELL_TARGETS ${SPELL_TARGETS} "spell_${name}" PARENT_SCOPE)
+  endif()
+
   set_property(GLOBAL APPEND PROPERTY CASADI_MODULES ${name})
 endmacro()
 
@@ -95,22 +100,18 @@ endif()
 add_definitions(-DSHARED_LIBRARY_PREFIX="\\"${CMAKE_SHARED_LIBRARY_PREFIX}\\"")
 add_definitions(-DSHARED_LIBRARY_SUFFIX="\\"${CMAKE_SHARED_LIBRARY_SUFFIX}\\"")
 
-add_subdirectory(core)        # needed by all except external_packages
-add_subdirectory(interfaces)  # needs external_packages
-add_subdirectory(solvers)     # needs interfaces
+add_subdirectory(core)
+add_subdirectory(interfaces)
+add_subdirectory(solvers)
 
-get_property(LINT_TARGETS GLOBAL PROPERTY LINT_TARGETS)
-get_property(SPELL_TARGETS GLOBAL PROPERTY SPELL_TARGETS)
-
-# add a dummy custom target which does nothing but
-# depend on the other lint targets
-add_custom_target(lint
-  DEPENDS ${LINT_TARGETS}
-  VERBATIM)
-
-add_custom_target(spell
-  DEPENDS ${SPELL_TARGETS}
-  VERBATIM)
+if(WITH_LINT)
+  get_property(LINT_TARGETS GLOBAL PROPERTY LINT_TARGETS)
+  add_custom_target(lint DEPENDS ${LINT_TARGETS} VERBATIM)
+endif()
+if(WITH_SPELL)
+  get_property(SPELL_TARGETS GLOBAL PROPERTY SPELL_TARGETS)
+  add_custom_target(spell DEPENDS ${SPELL_TARGETS} VERBATIM)
+endif()
 
 get_property(CASADI_MODULES GLOBAL PROPERTY CASADI_MODULES)
 get_property(CASADI_PLUGINS GLOBAL PROPERTY CASADI_PLUGINS)

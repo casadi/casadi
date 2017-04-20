@@ -70,7 +70,6 @@ if(BLOCKSQP_FOUND)
   add_subdirectory(blocksqp)
 endif()
 
-
 if(HPMPC_FOUND)
   add_subdirectory(hpmpc)
 endif()
@@ -79,6 +78,12 @@ if(SLICOT_FOUND)
   add_subdirectory(slicot)
 endif()
 
-set(LINT_TARGETS ${LINT_TARGETS} PARENT_SCOPE)
-set(SPELL_TARGETS ${SPELL_TARGETS} PARENT_SCOPE)
+if(WITH_LINT)
+  set(LINT_TARGETS ${LINT_TARGETS} PARENT_SCOPE)
+endif()
+
+if(WITH_SPELL)
+  set(SPELL_TARGETS ${SPELL_TARGETS} PARENT_SCOPE)
+endif()
+
 set(CASADI_MODULES ${CASADI_MODULES} PARENT_SCOPE)
