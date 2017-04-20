@@ -65,6 +65,30 @@ namespace casadi {
   class Importer;
 
 #ifndef SWIG
+// Get GCC version if GCC is used
+#ifdef __GNUC__
+#ifdef __GNUC_MINOR__
+#ifdef __GNUC_PATCHLEVEL__
+#define GCC_VERSION (__GNUC__ * 10000 +__GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
+#endif // __GNUC_PATCHLEVEL__
+#endif // __GNUC_MINOR__
+#endif // __GNUC__
+
+// Disable some Visual studio warnings
+#ifdef _MSC_VER
+
+#pragma warning(disable:4996)
+
+// warning C4018: '<' : signed/unsigned mismatch
+#pragma warning(disable:4018)
+
+// warning C4800: 'int' : forcing value to bool 'true'or 'false'(performance warning)
+#pragma warning(disable:4800)
+
+// warning C4244: Potential loss of data converting double to int
+#pragma warning(disable:4244)
+#endif // _MSC_VER
+
   // Workarond for MinGW bug
 #if defined(__MINGW32__) || defined(__MINGW64__)
   template<typename T>
