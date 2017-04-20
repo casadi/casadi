@@ -1023,10 +1023,10 @@ namespace casadi {
       // Ignore C++ style comments at beginning of lines
       if (line.find("//")==0) continue;
 
-      // Generate shorthand
-      regex r(".* CASADI_PREFIX\\(([a-z_0-9]+)\\)\\((.*)\\).*\\{.*");
-
       try {
+        // Generate shorthand
+        regex r(".* CASADI_PREFIX\\(([a-z_0-9]+)\\)\\((.*)\\).*\\{.*");
+
         if (regex_match(line, r)) {
           // Make sure only one match
           casadi_assert(def.empty());
