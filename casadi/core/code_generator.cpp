@@ -1022,26 +1022,32 @@ namespace casadi {
       }
       // Ignore C++ style comments at beginning of lines
       if (line.find("//")==0) continue;
+
       // Generate shorthand
       regex r(".* CASADI_PREFIX\\(([a-z_0-9]+)\\)\\((.*)\\).*\\{.*");
-      if (regex_match(line, r)) {
-        // Make sure only one match
-        casadi_assert(def.empty());
 
-        // Get function name, e.g. "fmin"
-        fname = regex_replace(line, r, string("$1"));
+      try {
+        if (regex_match(line, r)) {
+          // Make sure only one match
+          casadi_assert(def.empty());
 
-        // Get argument list, e.g. "x,y"
-        string args = regex_replace(line, r, string("$2")) + ",";
-        r = regex("[^,]* ([a-zA-Z_0-9]+),");
-        smatch sm;
-        while (regex_search(args, sm, r)) {
-          def = def.empty() ? string(sm[1]) : def + ", " + string(sm[1]);
-          args = sm.suffix();
+          // Get function name, e.g. "fmin"
+          fname = regex_replace(line, r, string("$1"));
+
+          // Get argument list, e.g. "x,y"
+          string args = regex_replace(line, r, string("$2")) + ",";
+          r = regex("[^,]* ([a-zA-Z_0-9]+),");
+          smatch sm;
+          while (regex_search(args, sm, r)) {
+            def = def.empty() ? string(sm[1]) : def + ", " + string(sm[1]);
+            args = sm.suffix();
+          }
+
+          // Finalize shorthand, e.g. #define fmin(x,y) CASADI_PREFIX(fmin)(x,y)
+          def = "#define " + fname + "(" + def + ") CASADI_PREFIX(" + fname + ")(" + def + ")\n";
         }
-
-        // Finalize shorthand, e.g. #define fmin(x,y) CASADI_PREFIX(fmin)(x,y)
-        def = "#define " + fname + "(" + def + ") CASADI_PREFIX(" + fname + ")(" + def + ")\n";
+      } catch (const regex_error& e) {
+        casadi_error("regex error for line \"" + line + "\" (" + string(e.what()) + ")");
       }
 
       // Perform string replacements
