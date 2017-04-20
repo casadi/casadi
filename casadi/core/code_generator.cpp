@@ -1029,10 +1029,10 @@ namespace casadi {
         casadi_assert(def.empty());
 
         // Get function name, e.g. "fmin"
-        fname = regex_replace(line, r, "$1");
+        fname = regex_replace(line, r, string("$1"));
 
         // Get argument list, e.g. "x,y"
-        string args = regex_replace(line, r, "$2") + ",";
+        string args = regex_replace(line, r, string("$2")) + ",";
         r = regex("[^,]* ([a-zA-Z_0-9]+),");
         smatch sm;
         while (regex_search(args, sm, r)) {
