@@ -16,31 +16,10 @@ macro(CASADI_STRINGIFY STRFILE)
   endforeach()
 endmacro()
 
-macro(casadi_plugin_link_libraries Type name)
-  string(TOLOWER ${Type} type)
-  target_link_libraries(casadi_${type}_${name} ${ARGN})
-endmacro()
-
-macro(casadi_plugin Type name)
-  string(TOLOWER ${Type} type)
-  casadi_library_or_plugin(casadi_${type}_${name} TRUE ${ARGN})
-  set_property(GLOBAL APPEND PROPERTY CASADI_PLUGINS "${Type}::${name}")
-endmacro()
-
-macro(casadi_library name)
-  casadi_library_or_plugin(${name} FALSE ${ARGN})
-endmacro()
-
-if(ENABLE_SHARED)
-  if(NOT ENABLE_EXPORT_ALL)
-    add_compiler_export_flags()
-  endif()
-endif()
-
 # this function handles libraries and plugins
 # there is so much similarity in plugins/libraries, we just
 # use a flag and wrap this with casadi_plugin or casadi_library (above)
-macro(casadi_library_or_plugin name is_plugin)
+macro(casadi_library name)
   if(ENABLE_STATIC)
     add_library(${name} STATIC ${ARGN})
   endif()
@@ -54,6 +33,7 @@ macro(casadi_library_or_plugin name is_plugin)
   file(RELATIVE_PATH RELPATH "${CMAKE_BINARY_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/${name}_export.h")
   get_filename_component(RELPATH ${RELPATH} PATH)
 
+  # Link with the core
   if(NOT "${name}" STREQUAL "casadi")
     target_link_libraries(${name} casadi)
   endif()
@@ -86,14 +66,31 @@ macro(casadi_library_or_plugin name is_plugin)
     )
   endif()
 
+  # Lint etc
   add_style_check_target(${name} "${ARGN}")
   set_property(GLOBAL APPEND PROPERTY LINT_TARGETS  "lint_${name}")
   add_spell_check_target(${name} "${ARGN}")
   set_property(GLOBAL APPEND PROPERTY SPELL_TARGETS  "spell_${name}")
   set(SPELL_TARGETS ${SPELL_TARGETS} "spell_${name}" PARENT_SCOPE)
-
   set_property(GLOBAL APPEND PROPERTY CASADI_MODULES ${name})
 endmacro()
+
+macro(casadi_plugin Type name)
+  string(TOLOWER ${Type} type)
+  casadi_library(casadi_${type}_${name} ${ARGN})
+  set_property(GLOBAL APPEND PROPERTY CASADI_PLUGINS "${Type}::${name}")
+endmacro()
+
+macro(casadi_plugin_link_libraries Type name)
+  string(TOLOWER ${Type} type)
+  target_link_libraries(casadi_${type}_${name} ${ARGN})
+endmacro()
+
+if(ENABLE_SHARED)
+  if(NOT ENABLE_EXPORT_ALL)
+    add_compiler_export_flags()
+  endif()
+endif()
 
 add_definitions(-DSHARED_LIBRARY_PREFIX="\\"${CMAKE_SHARED_LIBRARY_PREFIX}\\"")
 add_definitions(-DSHARED_LIBRARY_SUFFIX="\\"${CMAKE_SHARED_LIBRARY_SUFFIX}\\"")
