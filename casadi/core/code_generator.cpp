@@ -1039,7 +1039,7 @@ namespace casadi {
           casadi_assert(def.empty());
 
           // Get function name, e.g. "fmin"
-          fname = regex_replace(line, r, string("$1")) + suffix;
+          fname = regex_replace(line, r, string("$1"));
 
           // Get argument list, e.g. "x,y"
           string args = regex_replace(line, r, string("$2")) + ",";
@@ -1048,6 +1048,12 @@ namespace casadi {
           while (regex_search(args, sm, r)) {
             def = def.empty() ? string(sm[1]) : def + ", " + string(sm[1]);
             args = sm.suffix();
+          }
+
+          // Add suffix
+          if (!suffix.empty()) {
+            line.replace(line.find(fname), fname.size(), fname + suffix);
+            fname += suffix;
           }
 
           // Finalize shorthand, e.g. #define fmin(x,y) CASADI_PREFIX(fmin)(x,y)
