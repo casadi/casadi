@@ -1030,37 +1030,62 @@ namespace casadi {
       // Ignore C++ style comments at beginning of lines
       if (line.find("//")==0) continue;
 
+      regex r;
       try {
-        // Generate shorthand
-        regex r(".* CASADI_PREFIX\\(([a-z_0-9]+)\\)\\((.*)\\).*\\{.*");
+        r = regex(".* CASADI_PREFIX\\(([a-z_0-9]+)\\)\\((.*)\\).*\\{.*");
+      } catch (const regex_error& e) {
+        casadi_error("regex error for line \"" + line + "\"");
+      }
+      bool m;
+      try {
+        m = regex_match(line, r);
+      } catch (const regex_error& e) {
+        casadi_error("regex match error for line \"" + line + "\"");
+      }
 
-        if (regex_match(line, r)) {
-          // Make sure only one match
-          casadi_assert(def.empty());
+      // Generate shorthand
+      if (m) {
+        // Make sure only one match
+        casadi_assert(def.empty());
 
-          // Get function name, e.g. "fmin"
+        // Get function name, e.g. "fmin"
+        try {
           fname = regex_replace(line, r, string("$1"));
+        } catch (const regex_error& e) {
+          casadi_error("regex replace error for line \"" + line + "\"");
+        }
 
-          // Get argument list, e.g. "x,y"
-          string args = regex_replace(line, r, string("$2")) + ",";
+        // Get argument list, e.g. "x,y"
+        string args;
+        try {
+          args = regex_replace(line, r, string("$2")) + ",";
+        } catch (const regex_error& e) {
+          casadi_error("regex replace (2) error for line \"" + line + "\"");
+        }
+        try {
           r = regex("[^,]* ([a-zA-Z_0-9]+),");
+        } catch (const regex_error& e) {
+          casadi_error("regex error (2) for line \"" + line + "\"");
+        }
+
+        try {
           smatch sm;
           while (regex_search(args, sm, r)) {
             def = def.empty() ? string(sm[1]) : def + ", " + string(sm[1]);
             args = sm.suffix();
           }
-
-          // Add suffix
-          if (!suffix.empty()) {
-            line.replace(line.find(fname), fname.size(), fname + suffix);
-            fname += suffix;
-          }
-
-          // Finalize shorthand, e.g. #define fmin(x,y) CASADI_PREFIX(fmin)(x,y)
-          def = "#define " + fname + "(" + def + ") CASADI_PREFIX(" + fname + ")(" + def + ")\n";
+        } catch (const regex_error& e) {
+          casadi_error("regex search error for line \"" + line + "\"");
         }
-      } catch (const regex_error& e) {
-        casadi_error("regex error for line \"" + line + "\" (" + string(e.what()) + ")");
+
+        // Add suffix
+        if (!suffix.empty()) {
+          line.replace(line.find(fname), fname.size(), fname + suffix);
+          fname += suffix;
+        }
+
+        // Finalize shorthand, e.g. #define fmin(x,y) CASADI_PREFIX(fmin)(x,y)
+        def = "#define " + fname + "(" + def + ") CASADI_PREFIX(" + fname + ")(" + def + ")\n";
       }
 
       // Perform string replacements
