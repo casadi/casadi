@@ -2073,9 +2073,9 @@ namespace casadi {
     int a_ncol = a.size2();
     int b_ncol = b.size2();
     const int* a_colind = a.colind();
-    const int* a_row = a.row();
+    //const int* a_row = a.row();
     const int* b_colind = b.colind();
-    const int* b_row = b.row();
+    //const int* b_row = b.row();
 
     std::vector<Scalar> ret(a.nnz()*b.nnz());
     Scalar* ret_ptr = get_ptr(ret);
