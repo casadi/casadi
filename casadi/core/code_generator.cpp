@@ -1035,7 +1035,7 @@ namespace casadi {
         string s = "CASADI_PREFIX(";
         n1 = line.find(s);
         casadi_assert_message(n1!=string::npos,
-          "Cannot read function name, must be declared inside CASADI_PREFIX(..)");
+          "Function name must be declared inside CASADI_PREFIX(..):\n" + line);
         n1 += s.size();
         s = ")(";
         n2=line.find(s, n1);
