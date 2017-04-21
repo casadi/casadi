@@ -635,78 +635,15 @@ namespace casadi {
       this->auxiliaries << sanitize_source(casadi_trans_str, inst);
       break;
     case AUX_TO_MEX:
-      this->auxiliaries
-        << "#ifdef MATLAB_MEX_FILE" << endl
-        << "mxArray* CASADI_PREFIX(to_mex)(const int* sp, const real_t* x) {" << endl
-        << "  int nrow = *sp++, ncol = *sp++, nnz = sp[ncol];" << endl
-        << "  mxArray* p = mxCreateSparse(nrow, ncol, nnz, mxREAL);" << endl
-        << "  int i;" << endl
-        << "  mwIndex* j;" << endl
-        << "  for (i=0, j=mxGetJc(p); i<=ncol; ++i) *j++ = *sp++;" << endl
-        << "  for (i=0, j=mxGetIr(p); i<nnz; ++i) *j++ = *sp++;" << endl
-        << "  if (x) {" << endl
-        << "    double* d = (double*)mxGetData(p);" << endl
-        << "    for (i=0; i<nnz; ++i) *d++ = to_double(*x++);" << endl
-        << "  }" << endl
-        << "  return p;" << endl
-        << "}" << endl
-        << "#define to_mex(sp, x) CASADI_PREFIX(to_mex)(sp, x)" << endl
-        << "#endif" << endl << endl;
+      this->auxiliaries << "#ifdef MATLAB_MEX_FILE\n"
+                        << sanitize_source(casadi_to_mex_str, inst)
+                        << "#endif" << endl << endl;
       break;
     case AUX_FROM_MEX:
       addAuxiliary(AUX_FILL);
-      this->auxiliaries
-        << "#ifdef MATLAB_MEX_FILE" << endl
-        << "real_t* CASADI_PREFIX(from_mex)(const mxArray *p, "
-        << "real_t* y, const int* sp, real_t* w) {" << endl
-        << "  if (!mxIsDouble(p) || mxGetNumberOfDimensions(p)!=2)" << endl
-        << "    mexErrMsgIdAndTxt(\"Casadi:RuntimeError\",\"\\\"from_mex\\\" failed: "
-        << "Not a two-dimensional matrix of double precision.\");" << endl
-        << "  int nrow = *sp++, ncol = *sp++, nnz = sp[ncol];" << endl
-        << "  const int *colind=sp, *row=sp+ncol+1;" << endl
-        << "  size_t p_nrow = mxGetM(p), p_ncol = mxGetN(p);" << endl
-        << "  const double* p_data = (const double*)mxGetData(p);" << endl
-        << "  bool is_sparse = mxIsSparse(p);" << endl
-        << "  mwIndex *Jc = is_sparse ? mxGetJc(p) : 0;" << endl
-        << "  mwIndex *Ir = is_sparse ? mxGetIr(p) : 0;" << endl
-        << "  if (p_nrow==1 && p_ncol==1) {" << endl
-        << "    double v = is_sparse && Jc[1]==0 ? 0 : *p_data;" << endl
-        << "    fill(y, nnz, v);" << endl
-        << "  } else {" << endl
-        << "    bool tr = false;" << endl
-        << "    if (nrow!=p_nrow || ncol!=p_ncol) {" << endl
-        << "      tr = nrow==p_ncol && ncol==p_nrow && (nrow==1 || ncol==1);" << endl
-        << "      if (!tr) mexErrMsgIdAndTxt(\"Casadi:RuntimeError\",\"\\\"from_mex\\\""
-        << " failed: Dimension mismatch.\");" << endl
-        << "    }" << endl
-        << "    int r,c,k;" << endl
-        << "    if (is_sparse) {" << endl
-        << "      if (tr) {" << endl
-        << "        for (c=0; c<ncol; ++c)" << endl
-        << "          for (k=colind[c]; k<colind[c+1]; ++k) w[row[k]+c*nrow]=0;" << endl
-        << "        for (c=0; c<p_ncol; ++c)" << endl
-        << "          for (k=Jc[c]; k<Jc[c+1]; ++k) w[c+Ir[k]*p_ncol] = p_data[k];" << endl
-        << "        for (c=0; c<ncol; ++c)" << endl
-        << "          for (k=colind[c]; k<colind[c+1]; ++k) y[k] = w[row[k]+c*nrow];" << endl
-        << "      } else {" << endl
-        << "        for (c=0; c<ncol; ++c) {" << endl
-        << "          for (k=colind[c]; k<colind[c+1]; ++k) w[row[k]]=0;" << endl
-        << "          for (k=Jc[c]; k<Jc[c+1]; ++k) w[Ir[k]]=p_data[k];" << endl
-        << "          for (k=colind[c]; k<colind[c+1]; ++k) y[k]=w[row[k]];" << endl
-        << "        }" << endl
-        << "      }" << endl
-        << "    } else {" << endl
-        << "      for (c=0; c<ncol; ++c) {" << endl
-        << "        for (k=colind[c]; k<colind[c+1]; ++k) {" << endl
-        << "          y[k] = p_data[row[k]+c*nrow];" << endl
-        << "        }" << endl
-        << "      }" << endl
-        << "    }" << endl
-        << "  }" << endl
-        << "  return y;" << endl
-        << "}" << endl
-        << "#define from_mex(p, y, sp, w) CASADI_PREFIX(from_mex)(p, y, sp, w)" << endl
-        << "#endif" << endl << endl;
+      this->auxiliaries << "#ifdef MATLAB_MEX_FILE\n"
+                        << sanitize_source(casadi_from_mex_str, inst)
+                        << "#endif" << endl << endl;
       break;
     }
   }

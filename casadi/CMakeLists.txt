@@ -8,13 +8,18 @@ macro(CASADI_STRINGIFY STRFILE)
     file(APPEND ${STRFILE} "const char* ${FILENAME}_str =")
     # Append file as strings
     file(STRINGS ${FILE} FILE_CONTENTS)
-    foreach(FILE_LINE ${FILE_CONTENTS})
-      file(APPEND ${STRFILE} "\n  \"${FILE_LINE}\\n\"")
+    foreach(LINE ${FILE_CONTENTS})
+      string(REPLACE "\\" "\\\\" LINE ${LINE}) # Replace \ with \\
+      string(REPLACE "\"" "\\\"" LINE ${LINE}) # Replace " with \"
+      file(APPEND ${STRFILE} "\n  \"${LINE}\\n\"")
     endforeach()
     # End declaration
     file(APPEND ${STRFILE} ";\n\n")
   endforeach()
 endmacro()
+
+# if (!tr) mexErrMsgIdAndTxt("Casadi:RuntimeError","\"from_mex\" failed: Dimension mismatch.");
+#   "      if (!tr) mexErrMsgIdAndTxt(\"Casadi:RuntimeError\",\"\\"from_mex\\" failed: Dimension mismatch.\")\n"
 
 # this function handles libraries and plugins
 # there is so much similarity in plugins/libraries, we just
