@@ -93,7 +93,7 @@ namespace casadi {
       \date 2011-2014
   */
   template<typename M, typename I>
-  class CASADI_EXPORT SubIndex : public M {
+  class SubIndex : public M {
   private:
     /// A reference to the matrix that is allowed to be modified
     M& mat_;
