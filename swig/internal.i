@@ -1237,9 +1237,6 @@
 %exception  casadi::Matrix< Scalar >::getMinor(const Matrix< Scalar > &x, int i, int j) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Matrix< Scalar >::get_nonzeros() const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::Matrix< Scalar >::get_nz(Matrix< Scalar > &output_m, bool ind1, const Matrix< int > &k) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -1388,6 +1385,15 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Matrix< Scalar >::set_nz(const Matrix< Scalar > &m, bool ind1, const Slice &k) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Matrix< Scalar >::set_precision(int precision) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Matrix< Scalar >::set_scientific(bool scientific) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Matrix< Scalar >::set_width(int width) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Matrix< Scalar >::sparsify(const Matrix< Scalar > &A, double tol=0) {

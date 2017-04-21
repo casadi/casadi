@@ -29480,6 +29480,11 @@ Return a string with a representation (for SWIG)
 
 ";
 
+%feature("docstring") casadi::Matrix::set_width "[INTERNAL]  Set the
+'precision, width & scientific' used in printing and serializing to streams.
+
+";
+
 %feature("docstring") casadi::Matrix::sanity_check "[INTERNAL]  Check if
 the dimensions and colind, row vectors are compatible.
 
@@ -29501,19 +29506,14 @@ their ID.
 
 ";
 
-%feature("docstring") casadi::Matrix::erase "
+%feature("docstring") casadi::Matrix::set_precision "[INTERNAL]  Set the
+'precision, width & scientific' used in printing and serializing to streams.
 
->  void casadi::Matrix< Scalar >::erase(const std::vector< int > &rr, const std::vector< int > &cc, bool ind1=false)
-------------------------------------------------------------------------
-[INTERNAL] 
-Erase a submatrix (leaving structural zeros in its place) Erase rows
-and/or columns of a matrix.
+";
 
->  void casadi::Matrix< Scalar >::erase(const std::vector< int > &rr, bool ind1=false)
-------------------------------------------------------------------------
-[INTERNAL] 
-Erase a submatrix (leaving structural zeros in its place) Erase
-elements of a matrix.
+%feature("docstring") casadi::Matrix::is_tril "
+
+Check if the matrix is lower triangular.
 
 ";
 
@@ -29566,6 +29566,12 @@ Get the sparsity pattern.
 
 ";
 
+%feature("docstring") casadi::Matrix::get_row "
+
+Get the sparsity pattern. See the Sparsity class for details.
+
+";
+
 %feature("docstring") casadi::Matrix::get_sparsity "
 
 Get an owning reference to the sparsity pattern.
@@ -29587,6 +29593,11 @@ Get string representation of dimensions. The representation is (nrow x ncol
 
 %feature("docstring") casadi::Matrix::get_nz "[INTERNAL]  Get a set of
 nonzeros
+
+";
+
+%feature("docstring") casadi::Matrix::is_one "[INTERNAL]  check if the
+matrix is 1 (note that false negative answers are possible)
 
 ";
 
@@ -29619,13 +29630,6 @@ roots are real.
 
 ";
 
-%feature("docstring") casadi::Matrix::setScientific "
-
-Set the 'precision, width & scientific' used in printing and serializing to
-streams.
-
-";
-
 %feature("docstring") casadi::Matrix::is_dense "
 
 Check if the matrix expression is dense.
@@ -29645,8 +29649,19 @@ Get the number of non-zeros in the lower triangular half.
 
 %feature("docstring") casadi::Matrix::reserve "[INTERNAL] ";
 
-%feature("docstring") casadi::Matrix::is_one "[INTERNAL]  check if the
-matrix is 1 (note that false negative answers are possible)
+%feature("docstring") casadi::Matrix::erase "
+
+>  void casadi::Matrix< Scalar >::erase(const std::vector< int > &rr, const std::vector< int > &cc, bool ind1=false)
+------------------------------------------------------------------------
+[INTERNAL] 
+Erase a submatrix (leaving structural zeros in its place) Erase rows
+and/or columns of a matrix.
+
+>  void casadi::Matrix< Scalar >::erase(const std::vector< int > &rr, bool ind1=false)
+------------------------------------------------------------------------
+[INTERNAL] 
+Erase a submatrix (leaving structural zeros in its place) Erase
+elements of a matrix.
 
 ";
 
@@ -29685,12 +29700,6 @@ vector-style.
 
 Create a dense matrix or a matrix with specified sparsity with all entries
 one.
-
-";
-
-%feature("docstring") casadi::Matrix::is_column "
-
-Check if the matrix is a column vector (i.e. size2()==1)
 
 ";
 
@@ -29740,9 +29749,13 @@ sparsity can be accessed with Sparsity& sparsity() Joel Andersson
 
 C++ includes: casadi_types.hpp ";
 
-%feature("docstring") casadi::Matrix::dep "[INTERNAL]  Get expressions of
-the children of the expression Only defined if symbolic scalar. Wraps SXElem
-SXElem::dep(int ch=0) const.
+%feature("docstring") friendwrap_rectangle "[INTERNAL]  rectangle function
+
+\\\\[ \\\\begin {cases} \\\\Pi(x) = 1 & |x| < 1/2 \\\\\\\\ \\\\Pi(x) = 1/2 &
+|x| = 1/2 \\\\\\\\ \\\\Pi(x) = 0 & |x| > 1/2 \\\\\\\\ \\\\end {cases} \\\\]
+
+Also called: gate function, block function, band function, pulse function,
+window function
 
 ";
 
@@ -29862,13 +29875,6 @@ matrix.
 
 \\\\[ \\\\begin {cases} H(x) = 0 & x<0 \\\\\\\\ H(x) = 1/2 & x=0 \\\\\\\\
 H(x) = 1 & x>0 \\\\\\\\ \\\\end {cases} \\\\]
-
-";
-
-%feature("docstring") casadi::Matrix::setPrecision "
-
-Set the 'precision, width & scientific' used in printing and serializing to
-streams.
 
 ";
 
@@ -30029,15 +30035,8 @@ Integrate f from a to b using Gaussian quadrature with n points.
 
 %feature("docstring") casadi::Matrix::pinv "[INTERNAL] ";
 
-%feature("docstring") casadi::Matrix::get_row "
-
-Get the sparsity pattern. See the Sparsity class for details.
-
-";
-
-%feature("docstring") casadi::Matrix::is_tril "
-
-Check if the matrix is lower triangular.
+%feature("docstring") casadi::Matrix::set_scientific "[INTERNAL]  Set the
+'precision, width & scientific' used in printing and serializing to streams.
 
 ";
 
@@ -30081,10 +30080,9 @@ as tval)
 
 ";
 
-%feature("docstring") casadi::Matrix::setWidth "
+%feature("docstring") casadi::Matrix::is_column "
 
-Set the 'precision, width & scientific' used in printing and serializing to
-streams.
+Check if the matrix is a column vector (i.e. size2()==1)
 
 ";
 
@@ -30156,13 +30154,9 @@ matrices.
 
 ";
 
-%feature("docstring") friendwrap_rectangle "[INTERNAL]  rectangle function
-
-\\\\[ \\\\begin {cases} \\\\Pi(x) = 1 & |x| < 1/2 \\\\\\\\ \\\\Pi(x) = 1/2 &
-|x| = 1/2 \\\\\\\\ \\\\Pi(x) = 0 & |x| > 1/2 \\\\\\\\ \\\\end {cases} \\\\]
-
-Also called: gate function, block function, band function, pulse function,
-window function
+%feature("docstring") casadi::Matrix::dep "[INTERNAL]  Get expressions of
+the children of the expression Only defined if symbolic scalar. Wraps SXElem
+SXElem::dep(int ch=0) const.
 
 ";
 
@@ -30187,8 +30181,11 @@ their ID.
 
 ";
 
-%feature("docstring") casadi::Matrix::get_nonzeros "[INTERNAL]  Get all
-nonzeros.
+%feature("docstring") casadi::Matrix::get_nonzeros "
+
+Get all nonzeros.
+
+Implementation of Matrix::get_nonzeros (in public API)
 
 ";
 
@@ -46354,12 +46351,12 @@ Explicitly load a plugin dynamically.
 
 %feature("docstring") casadi::casadi_rank1 "
 
->  void casadi::casadi_rank1(real_t *A, const int *sp_A, real_t alpha, const real_t *x)
+>  void casadi::casadi_rank1(T1 *A, const int *sp_A, T1 alpha, const T1 *x)
 ------------------------------------------------------------------------
 [INTERNAL] 
 Adds a multiple alpha/2 of the outer product mul(x, trans(x)) to A.
 
->  void casadi::casadi_rank1(real_t *A, const int *sp_A, real_t alpha, const real_t *x, const real_t *y)
+>  void casadi::casadi_rank1(T1 *A, const int *sp_A, T1 alpha, const T1 *x, const T1 *y)
 ------------------------------------------------------------------------
 [INTERNAL] 
 ";
@@ -46959,11 +46956,6 @@ Get the number of QP solver inputs.
 
 %feature("docstring") casadi::casadi_eprintf "";
 
-%feature("docstring") casadi::casadi_norm_2 "[INTERNAL]  NORM_2: ||x||_2 ->
-return.
-
-";
-
 %feature("docstring") casadi::to_slice "
 
 >  Slice casadi::to_slice(const IM &x, bool ind1=false)
@@ -47047,6 +47039,8 @@ Generate a hash value incrementally (function taken from boost)
 Generate a hash value incrementally, array.
 
 ";
+
+%feature("docstring") casadi::casadi_copy_int "[INTERNAL] ";
 
 %feature("docstring") casadi::has_integrator "
 
@@ -47476,6 +47470,8 @@ void fname(const real_t* arg, real_t* res) { <FUNCTION_BODY> }
 Check if a particular plugin is available.
 
 ";
+
+%feature("docstring") casadi::_jtimes "[INTERNAL] ";
 
 %feature("docstring") casadi::dense_mul_nn "[INTERNAL] ";
 
@@ -48322,17 +48318,18 @@ Read matrix, matlab style.
 
 ";
 
-%feature("docstring") casadi::_which_depends "[INTERNAL] ";
+%feature("docstring") casadi::hash_value "
+
+Hash value of an integer.
+
+";
 
 %feature("docstring") casadi::casadi_polyval "[INTERNAL]  Evaluate a
 polynomial.
 
 ";
 
-%feature("docstring") casadi::casadi_fill_int "[INTERNAL]  FILL: x <-
-alpha.
-
-";
+%feature("docstring") casadi::casadi_fill_int "[INTERNAL] ";
 
 %feature("docstring") casadi::dense_mul_nt "[INTERNAL] ";
 
@@ -48844,15 +48841,14 @@ multiplication: z <- z + x*y.
 
 ";
 
-%feature("docstring") casadi::_jtimes "[INTERNAL] ";
+%feature("docstring") casadi::casadi_norm_2 "[INTERNAL]  NORM_2: ||x||_2 ->
+return.
+
+";
 
 %feature("docstring") casadi::dense_kron_stride "[INTERNAL] ";
 
-%feature("docstring") casadi::hash_value "
-
-Hash value of an integer.
-
-";
+%feature("docstring") casadi::_which_depends "[INTERNAL] ";
 
 %feature("docstring") casadi::casadi_bilin "[INTERNAL]  Calculates dot(x,
 mul(A, y))
