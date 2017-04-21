@@ -41423,11 +41423,10 @@ const  "
 in the Symbolic Toolbox for Matlab but instead creating a CasADi symbolic
 primitive.
 
-*/ %feature("docstring")  casadi::Matrix< Scalar
->::print_scalar(std::ostream &stream=casadi::userOut(), bool
-trailing_newline=true) const  "
+*/ %feature("docstring")  casadi::Matrix< T >::print_scalar(std::ostream
+&stream=casadi::userOut(), bool trailing_newline=true) const  "
 
-[INTERNAL]  Print scalar.
+Print scalar.
 
 ";
 
@@ -41438,43 +41437,42 @@ Get the number of non-zeros in the upper triangular half.
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::repr(std::ostream
+%feature("docstring")  casadi::Matrix< T >::repr(std::ostream
 &stream=casadi::userOut(), bool trailing_newline=true) const  "
 
-[INTERNAL]  Print a representation of the object.
+Print a representation of the object.
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::expand(const Matrix< Scalar
-> &ex, Matrix< Scalar > &weights, Matrix< Scalar > &terms) "
+%feature("docstring")  expand(const Matrix< Scalar > &ex, Matrix< Scalar >
+&weights, Matrix< Scalar > &terms) "
 
-[INTERNAL]  Expand the expression as a weighted sum (with constant weights)
-
-";
-
-%feature("docstring")  casadi::Matrix< Scalar >::is_constant() const  "
-
-[INTERNAL]  Check if the matrix is constant (note that false negative
-answers are possible)
+Expand the expression as a weighted sum (with constant weights)
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::mtaylor(const Matrix<
-Scalar > &ex, const Matrix< Scalar > &x, const Matrix< Scalar > &a, int
-order=1) "
+%feature("docstring")  casadi::Matrix< T >::is_constant() const  "
 
-[INTERNAL]  multivariate Taylor series expansion
+Check if the matrix is constant (note that false negative answers are
+possible)
+
+";
+
+%feature("docstring")  mtaylor(const Matrix< Scalar > &ex, const Matrix<
+Scalar > &x, const Matrix< Scalar > &a, int order=1) "
+
+multivariate Taylor series expansion
 
 Do Taylor expansions until the aggregated order of a term is equal to
 'order'. The aggregated order of $x^n y^m$ equals $n+m$.
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::mtaylor(const Matrix<
-Scalar > &ex, const Matrix< Scalar > &x, const Matrix< Scalar > &a, int
-order, const std::vector< int > &order_contributions) "
+%feature("docstring")  mtaylor(const Matrix< Scalar > &ex, const Matrix<
+Scalar > &x, const Matrix< Scalar > &a, int order, const std::vector< int >
+&order_contributions) "
 
-[INTERNAL]  multivariate Taylor series expansion
+multivariate Taylor series expansion
 
 Do Taylor expansions until the aggregated order of a term is equal to
 'order'. The aggregated order of $x^n y^m$ equals $n+m$.
@@ -41490,52 +41488,52 @@ x+y^3)/6 $ $ (-3 x^2 y-x^3)/6+y+x $
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::set(const Matrix< Scalar >
-&m, bool ind1, const Slice &rr) "
+%feature("docstring")  casadi::Matrix< T >::set(const Matrix< Scalar > &m,
+bool ind1, const Slice &rr) "
 
-[INTERNAL]  Set a submatrix, single argument
-
-";
-
-%feature("docstring")  casadi::Matrix< Scalar >::set(const Matrix< Scalar >
-&m, bool ind1, const Matrix< int > &rr) "
-
-[INTERNAL]  Set a submatrix, single argument
+Set a submatrix, single argument
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::set(const Matrix< Scalar >
-&m, bool ind1, const Sparsity &sp) "
+%feature("docstring")  casadi::Matrix< T >::set(const Matrix< Scalar > &m,
+bool ind1, const Matrix< int > &rr) "
 
-[INTERNAL]  Set a submatrix, single argument
-
-";
-
-%feature("docstring")  casadi::Matrix< Scalar >::set(const Matrix< Scalar >
-&m, bool ind1, const Slice &rr, const Slice &cc) "
-
-[INTERNAL]  Set a submatrix, two arguments
+Set a submatrix, single argument
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::set(const Matrix< Scalar >
-&m, bool ind1, const Slice &rr, const Matrix< int > &cc) "
+%feature("docstring")  casadi::Matrix< T >::set(const Matrix< Scalar > &m,
+bool ind1, const Sparsity &sp) "
 
-[INTERNAL]  Set a submatrix, two arguments
-
-";
-
-%feature("docstring")  casadi::Matrix< Scalar >::set(const Matrix< Scalar >
-&m, bool ind1, const Matrix< int > &rr, const Slice &cc) "
-
-[INTERNAL]  Set a submatrix, two arguments
+Set a submatrix, single argument
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::set(const Matrix< Scalar >
-&m, bool ind1, const Matrix< int > &rr, const Matrix< int > &cc) "
+%feature("docstring")  casadi::Matrix< T >::set(const Matrix< Scalar > &m,
+bool ind1, const Slice &rr, const Slice &cc) "
 
-[INTERNAL]  Set a submatrix, two arguments
+Set a submatrix, two arguments
+
+";
+
+%feature("docstring")  casadi::Matrix< T >::set(const Matrix< Scalar > &m,
+bool ind1, const Slice &rr, const Matrix< int > &cc) "
+
+Set a submatrix, two arguments
+
+";
+
+%feature("docstring")  casadi::Matrix< T >::set(const Matrix< Scalar > &m,
+bool ind1, const Matrix< int > &rr, const Slice &cc) "
+
+Set a submatrix, two arguments
+
+";
+
+%feature("docstring")  casadi::Matrix< T >::set(const Matrix< Scalar > &m,
+bool ind1, const Matrix< int > &rr, const Matrix< int > &cc) "
+
+Set a submatrix, two arguments
 
 ";
 
@@ -41546,97 +41544,93 @@ Get the number of (structural) non-zero elements.
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::remove(const std::vector<
-int > &rr, const std::vector< int > &cc) "
+%feature("docstring")  casadi::Matrix< T >::remove(const std::vector< int >
+&rr, const std::vector< int > &cc) "
 
-[INTERNAL]  Remove columns and rows Remove/delete rows and/or columns of a
-matrix.
-
-";
-
-%feature("docstring")  casadi::Matrix< Scalar >::get(Matrix< Scalar >
-&output_m, bool ind1, const Slice &rr) const  "
-
-[INTERNAL]  Get a submatrix, single argument
+Remove columns and rows Remove/delete rows and/or columns of a matrix.
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::get(Matrix< Scalar >
-&output_m, bool ind1, const Matrix< int > &rr) const  "
+%feature("docstring")  casadi::Matrix< T >::get(Matrix< Scalar > &output_m,
+bool ind1, const Slice &rr) const  "
 
-[INTERNAL]  Get a submatrix, single argument
-
-";
-
-%feature("docstring")  casadi::Matrix< Scalar >::get(Matrix< Scalar >
-&output_m, bool ind1, const Sparsity &sp) const  "
-
-[INTERNAL]  Get a submatrix, single argument
+Get a submatrix, single argument
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::get(Matrix< Scalar >
-&output_m, bool ind1, const Slice &rr, const Slice &cc) const  "
+%feature("docstring")  casadi::Matrix< T >::get(Matrix< Scalar > &output_m,
+bool ind1, const Matrix< int > &rr) const  "
 
-[INTERNAL]  Get a submatrix, two arguments
-
-";
-
-%feature("docstring")  casadi::Matrix< Scalar >::get(Matrix< Scalar >
-&output_m, bool ind1, const Slice &rr, const Matrix< int > &cc) const  "
-
-[INTERNAL]  Get a submatrix, two arguments
+Get a submatrix, single argument
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::get(Matrix< Scalar >
-&output_m, bool ind1, const Matrix< int > &rr, const Slice &cc) const  "
+%feature("docstring")  casadi::Matrix< T >::get(Matrix< Scalar > &output_m,
+bool ind1, const Sparsity &sp) const  "
 
-[INTERNAL]  Get a submatrix, two arguments
-
-";
-
-%feature("docstring")  casadi::Matrix< Scalar >::get(Matrix< Scalar >
-&output_m, bool ind1, const Matrix< int > &rr, const Matrix< int > &cc)
-const  "
-
-[INTERNAL]  Get a submatrix, two arguments
+Get a submatrix, single argument
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::triangle(const Matrix<
-Scalar > &x) "
+%feature("docstring")  casadi::Matrix< T >::get(Matrix< Scalar > &output_m,
+bool ind1, const Slice &rr, const Slice &cc) const  "
 
-[INTERNAL]  triangle function
+Get a submatrix, two arguments
+
+";
+
+%feature("docstring")  casadi::Matrix< T >::get(Matrix< Scalar > &output_m,
+bool ind1, const Slice &rr, const Matrix< int > &cc) const  "
+
+Get a submatrix, two arguments
+
+";
+
+%feature("docstring")  casadi::Matrix< T >::get(Matrix< Scalar > &output_m,
+bool ind1, const Matrix< int > &rr, const Slice &cc) const  "
+
+Get a submatrix, two arguments
+
+";
+
+%feature("docstring")  casadi::Matrix< T >::get(Matrix< Scalar > &output_m,
+bool ind1, const Matrix< int > &rr, const Matrix< int > &cc) const  "
+
+Get a submatrix, two arguments
+
+";
+
+%feature("docstring")  triangle(const Matrix< Scalar > &x) "
+
+triangle function
 
 \\\\[ \\\\begin {cases} \\\\Lambda(x) = 0 & |x| >= 1 \\\\\\\\ \\\\Lambda(x)
 = 1-|x| & |x| < 1 \\\\end {cases} \\\\]
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::adj(const Matrix< Scalar >
-&A) "
+%feature("docstring")  adj(const Matrix< Scalar > &A) "
 
-[INTERNAL]   Matrix adjoint.
+Matrix adjoint.
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::triplet(const std::vector<
-int > &row, const std::vector< int > &col, const Matrix< Scalar > &d) "
+%feature("docstring")  casadi::Matrix< T >::triplet(const std::vector< int >
+&row, const std::vector< int > &col, const Matrix< Scalar > &d) "
 
-[INTERNAL] ";
+";
 
-%feature("docstring")  casadi::Matrix< Scalar >::triplet(const std::vector<
-int > &row, const std::vector< int > &col, const Matrix< Scalar > &d, int
-nrow, int ncol) "
+%feature("docstring")  casadi::Matrix< T >::triplet(const std::vector< int >
+&row, const std::vector< int > &col, const Matrix< Scalar > &d, int nrow,
+int ncol) "
 
-[INTERNAL] ";
+";
 
-%feature("docstring")  casadi::Matrix< Scalar >::triplet(const std::vector<
-int > &row, const std::vector< int > &col, const Matrix< Scalar > &d, const
+%feature("docstring")  casadi::Matrix< T >::triplet(const std::vector< int >
+&row, const std::vector< int > &col, const Matrix< Scalar > &d, const
 std::pair< int, int > &rc) "
 
-[INTERNAL] ";
+";
 
 %feature("docstring")  casadi::PrintableObject< Matrix< Scalar >
 >::getRepresentation() const "
@@ -41645,17 +41639,17 @@ Return a string with a representation (for SWIG)
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::set_width(int width) "
+%feature("docstring")  casadi::Matrix< T >::set_width(int width) "
 
-[INTERNAL]  Set the 'precision, width & scientific' used in printing and
-serializing to streams.
+Set the 'precision, width & scientific' used in printing and serializing to
+streams.
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::sanity_check(bool
+%feature("docstring")  casadi::Matrix< T >::sanity_check(bool
 complete=false) const  "
 
-[INTERNAL]  Check if the dimensions and colind, row vectors are compatible.
+Check if the dimensions and colind, row vectors are compatible.
 
 Parameters:
 -----------
@@ -41673,18 +41667,17 @@ interdependencies.
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::unary(int op, const Matrix<
+%feature("docstring")  casadi::Matrix< T >::unary(int op, const Matrix<
 Scalar > &x) "
 
 [INTERNAL]  Create nodes by their ID.
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::set_precision(int
-precision) "
+%feature("docstring")  casadi::Matrix< T >::set_precision(int precision) "
 
-[INTERNAL]  Set the 'precision, width & scientific' used in printing and
-serializing to streams.
+Set the 'precision, width & scientific' used in printing and serializing to
+streams.
 
 ";
 
@@ -41695,17 +41688,17 @@ Check if the matrix is lower triangular.
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::norm_inf_mul(const Matrix<
-Scalar > &x, const Matrix< Scalar > &y) "
+%feature("docstring")  norm_inf_mul(const Matrix< Scalar > &x, const Matrix<
+Scalar > &y) "
 
-[INTERNAL]  Inf-norm of a Matrix-Matrix product.
+Inf-norm of a Matrix-Matrix product.
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::is_integer() const  "
+%feature("docstring")  casadi::Matrix< T >::is_integer() const  "
 
-[INTERNAL]  Check if the matrix is integer-valued (note that false negative
-answers are possible)
+Check if the matrix is integer-valued (note that false negative answers are
+possible)
 
 ";
 
@@ -41723,10 +41716,9 @@ Check if the matrix is upper triangular.
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::all(const Matrix< Scalar >
-&x) "
+%feature("docstring")  all(const Matrix< Scalar > &x) "
 
-[INTERNAL]  Returns true only if every element in the matrix is true.
+Returns true only if every element in the matrix is true.
 
 ";
 
@@ -41736,17 +41728,17 @@ Check if the matrix is upper triangular.
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::set_nz(const Matrix< Scalar
-> &m, bool ind1, const Slice &k) "
+%feature("docstring")  casadi::Matrix< T >::set_nz(const Matrix< Scalar >
+&m, bool ind1, const Slice &k) "
 
-[INTERNAL]  Set a set of nonzeros
+Set a set of nonzeros
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::set_nz(const Matrix< Scalar
-> &m, bool ind1, const Matrix< int > &k) "
+%feature("docstring")  casadi::Matrix< T >::set_nz(const Matrix< Scalar >
+&m, bool ind1, const Matrix< int > &k) "
 
-[INTERNAL]  Set a set of nonzeros
+Set a set of nonzeros
 
 ";
 
@@ -41793,37 +41785,35 @@ Get string representation of dimensions. The representation is (nrow x ncol
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::get_nz(Matrix< Scalar >
+%feature("docstring")  casadi::Matrix< T >::get_nz(Matrix< Scalar >
 &output_m, bool ind1, const Slice &k) const  "
 
-[INTERNAL]  Get a set of nonzeros
+Get a set of nonzeros
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::get_nz(Matrix< Scalar >
+%feature("docstring")  casadi::Matrix< T >::get_nz(Matrix< Scalar >
 &output_m, bool ind1, const Matrix< int > &k) const  "
 
-[INTERNAL]  Get a set of nonzeros
+Get a set of nonzeros
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::is_one() const  "
+%feature("docstring")  casadi::Matrix< T >::is_one() const  "
 
-[INTERNAL]  check if the matrix is 1 (note that false negative answers are
-possible)
-
-";
-
-%feature("docstring")  casadi::Matrix< Scalar >::T() const  "
-
-[INTERNAL]   Transpose the matrix.
+check if the matrix is 1 (note that false negative answers are possible)
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::any(const Matrix< Scalar >
-&x) "
+%feature("docstring")  casadi::Matrix< T >::T() const  "
 
-[INTERNAL]  Returns true only if any element in the matrix is true.
+Transpose the matrix.
+
+";
+
+%feature("docstring")  any(const Matrix< Scalar > &x) "
+
+Returns true only if any element in the matrix is true.
 
 ";
 
@@ -41833,21 +41823,19 @@ possible)
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::clear() "
-
-[INTERNAL] ";
-
-%feature("docstring")  casadi::Matrix< Scalar >::is_minus_one() const  "
-
-[INTERNAL]  check if the matrix is -1 (note that false negative answers are
-possible)
+%feature("docstring")  casadi::Matrix< T >::clear() "
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::poly_roots(const Matrix<
-Scalar > &p) "
+%feature("docstring")  casadi::Matrix< T >::is_minus_one() const  "
 
-[INTERNAL]  Attempts to find the roots of a polynomial.
+check if the matrix is -1 (note that false negative answers are possible)
+
+";
+
+%feature("docstring")  poly_roots(const Matrix< Scalar > &p) "
+
+Attempts to find the roots of a polynomial.
 
 This will only work for polynomials up to order 3 It is assumed that the
 roots are real.
@@ -41861,10 +41849,10 @@ Check if the matrix expression is dense.
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::print_sparse(std::ostream
+%feature("docstring")  casadi::Matrix< T >::print_sparse(std::ostream
 &stream=casadi::userOut(), bool trailing_newline=true) const  "
 
-[INTERNAL]  Print sparse matrix style.
+Print sparse matrix style.
 
 ";
 
@@ -41875,48 +41863,46 @@ Get the number of non-zeros in the lower triangular half.
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::reserve(int nnz) "
-
-[INTERNAL] ";
-
-%feature("docstring")  casadi::Matrix< Scalar >::reserve(int nnz, int ncol)
-"
-
-[INTERNAL] ";
-
-%feature("docstring")  casadi::Matrix< Scalar >::erase(const std::vector<
-int > &rr, const std::vector< int > &cc, bool ind1=false) "
-
-[INTERNAL]  Erase a submatrix (leaving structural zeros in its place) Erase
-rows and/or columns of a matrix.
+%feature("docstring")  casadi::Matrix< T >::reserve(int nnz) "
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::erase(const std::vector<
-int > &rr, bool ind1=false) "
-
-[INTERNAL]  Erase a submatrix (leaving structural zeros in its place) Erase
-elements of a matrix.
+%feature("docstring")  casadi::Matrix< T >::reserve(int nnz, int ncol) "
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::inf(const Sparsity &sp) "
+%feature("docstring")  casadi::Matrix< T >::erase(const std::vector< int >
+&rr, const std::vector< int > &cc, bool ind1=false) "
 
-[INTERNAL]  create a matrix with all inf
-
-";
-
-%feature("docstring")  casadi::Matrix< Scalar >::inf(int nrow=1, int ncol=1)
-"
-
-[INTERNAL]  create a matrix with all inf
+Erase a submatrix (leaving structural zeros in its place) Erase rows and/or
+columns of a matrix.
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::inf(const std::pair< int,
-int > &rc) "
+%feature("docstring")  casadi::Matrix< T >::erase(const std::vector< int >
+&rr, bool ind1=false) "
 
-[INTERNAL]  create a matrix with all inf
+Erase a submatrix (leaving structural zeros in its place) Erase elements of
+a matrix.
+
+";
+
+%feature("docstring")  casadi::Matrix< T >::inf(const Sparsity &sp) "
+
+create a matrix with all inf
+
+";
+
+%feature("docstring")  casadi::Matrix< T >::inf(int nrow=1, int ncol=1) "
+
+create a matrix with all inf
+
+";
+
+%feature("docstring")  casadi::Matrix< T >::inf(const std::pair< int, int >
+&rc) "
+
+create a matrix with all inf
 
 ";
 
@@ -41928,17 +41914,16 @@ Only defined if symbolic scalar.
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::scalar_matrix(int op, const
+%feature("docstring")  casadi::Matrix< T >::scalar_matrix(int op, const
 Matrix< Scalar > &x, const Matrix< Scalar > &y) "
 
 [INTERNAL]  Create nodes by their ID.
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::ramp(const Matrix< Scalar >
-&x) "
+%feature("docstring")  ramp(const Matrix< Scalar > &x) "
 
-[INTERNAL]  ramp function
+ramp function
 
 \\\\[ \\\\begin {cases} R(x) = 0 & x <= 1 \\\\\\\\ R(x) = x & x > 1 \\\\\\\\
 \\\\end {cases} \\\\]
@@ -41947,10 +41932,10 @@ Also called: slope function
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::print_vector(std::ostream
+%feature("docstring")  casadi::Matrix< T >::print_vector(std::ostream
 &stream=casadi::userOut(), bool trailing_newline=true) const  "
 
-[INTERNAL]  Print vector-style.
+Print vector-style.
 
 ";
 
@@ -41978,18 +41963,17 @@ one.
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::resize(int nrow, int ncol)
-"
+%feature("docstring")  casadi::Matrix< T >::resize(int nrow, int ncol) "
 
-[INTERNAL] ";
+";
 
-%feature("docstring")  casadi::Matrix< Scalar >::qr(const Matrix< Scalar >
-&A, Matrix< Scalar > &Q, Matrix< Scalar > &R) "
+%feature("docstring")  qr(const Matrix< Scalar > &A, Matrix< Scalar > &Q,
+Matrix< Scalar > &R) "
 
-[INTERNAL]  QR factorization using the modified Gram-Schmidt algorithm More
-stable than the classical Gram-Schmidt, but may break down if the rows of A
-are nearly linearly dependent See J. Demmel: Applied Numerical Linear
-Algebra (algorithm 3.1.). Note that in SWIG, Q and R are returned by value.
+QR factorization using the modified Gram-Schmidt algorithm More stable than
+the classical Gram-Schmidt, but may break down if the rows of A are nearly
+linearly dependent See J. Demmel: Applied Numerical Linear Algebra
+(algorithm 3.1.). Note that in SWIG, Q and R are returned by value.
 
 ";
 
@@ -42049,10 +42033,9 @@ sparsity can be accessed with Sparsity& sparsity() Joel Andersson
 
 C++ includes: casadi_types.hpp ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::rectangle(const Matrix<
-Scalar > &x) "
+%feature("docstring")  rectangle(const Matrix< Scalar > &x) "
 
-[INTERNAL]  rectangle function
+rectangle function
 
 \\\\[ \\\\begin {cases} \\\\Pi(x) = 1 & |x| < 1/2 \\\\\\\\ \\\\Pi(x) = 1/2 &
 |x| = 1/2 \\\\\\\\ \\\\Pi(x) = 0 & |x| > 1/2 \\\\\\\\ \\\\end {cases} \\\\]
@@ -42061,11 +42044,6 @@ Also called: gate function, block function, band function, pulse function,
 window function
 
 ";
-
-%feature("docstring")  casadi::Matrix< double >::expm(const Matrix< double >
-&A) "
-
-[INTERNAL] ";
 
 %feature("docstring")  casadi::GenericMatrix< Matrix< Scalar >  >::sym(const
 std::string &name, int nrow=1, int ncol=1) "
@@ -42127,17 +42105,15 @@ Only defined if symbolic scalar.
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::sparsify(const Matrix<
-Scalar > &A, double tol=0) "
+%feature("docstring")  sparsify(const Matrix< Scalar > &A, double tol=0) "
 
-[INTERNAL]  Make a matrix sparse by removing numerical zeros.
+Make a matrix sparse by removing numerical zeros.
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::cofactor(const Matrix<
-Scalar > &x, int i, int j) "
+%feature("docstring")  cofactor(const Matrix< Scalar > &x, int i, int j) "
 
-[INTERNAL]  Get the (i,j) cofactor matrix.
+Get the (i,j) cofactor matrix.
 
 ";
 
@@ -42148,10 +42124,10 @@ Get the sparsity pattern. See the Sparsity class for details.
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::print_dense(std::ostream
+%feature("docstring")  casadi::Matrix< T >::print_dense(std::ostream
 &stream=casadi::userOut(), bool trailing_newline=true) const  "
 
-[INTERNAL]  Print dense matrix-stype.
+Print dense matrix-stype.
 
 ";
 
@@ -42161,30 +42137,29 @@ Returns true if the matrix has a non-zero at location rr, cc.
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::matrix_scalar(int op, const
+%feature("docstring")  casadi::Matrix< T >::matrix_scalar(int op, const
 Matrix< Scalar > &x, const Matrix< Scalar > &y) "
 
 [INTERNAL]  Create nodes by their ID.
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::nan(const Sparsity &sp) "
+%feature("docstring")  casadi::Matrix< T >::nan(const Sparsity &sp) "
 
-[INTERNAL]  create a matrix with all nan
-
-";
-
-%feature("docstring")  casadi::Matrix< Scalar >::nan(int nrow=1, int ncol=1)
-"
-
-[INTERNAL]  create a matrix with all nan
+create a matrix with all nan
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::nan(const std::pair< int,
-int > &rc) "
+%feature("docstring")  casadi::Matrix< T >::nan(int nrow=1, int ncol=1) "
 
-[INTERNAL]  create a matrix with all nan
+create a matrix with all nan
+
+";
+
+%feature("docstring")  casadi::Matrix< T >::nan(const std::pair< int, int >
+&rc) "
+
+create a matrix with all nan
 
 ";
 
@@ -42210,17 +42185,15 @@ matrices can return true if all non-zero elements are symbolic.
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::getMinor(const Matrix<
-Scalar > &x, int i, int j) "
+%feature("docstring")  getMinor(const Matrix< Scalar > &x, int i, int j) "
 
-[INTERNAL]  Get the (i,j) minor matrix.
+Get the (i,j) minor matrix.
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::heaviside(const Matrix<
-Scalar > &x) "
+%feature("docstring")  heaviside(const Matrix< Scalar > &x) "
 
-[INTERNAL]  Heaviside function.
+Heaviside function.
 
 \\\\[ \\\\begin {cases} H(x) = 0 & x<0 \\\\\\\\ H(x) = 1/2 & x=0 \\\\\\\\
 H(x) = 1 & x>0 \\\\\\\\ \\\\end {cases} \\\\]
@@ -42257,7 +42230,7 @@ Check if the matrix is a row vector (i.e. size1()==1)
 
 %feature("docstring") casadi::Matrix::__nonzero__ "
 
-[INTERNAL]  Returns the truth value of a Matrix.
+Returns the truth value of a Matrix.
 
 ";
 
@@ -42265,21 +42238,10 @@ Check if the matrix is a row vector (i.e. size1()==1)
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::Matrix< double >::expm_const(const Matrix<
-double > &A, const Matrix< double > &t) "
+%feature("docstring")  taylor(const Matrix< Scalar > &ex, const Matrix<
+Scalar > &x, const Matrix< Scalar > &a, int order=1) "
 
-[INTERNAL] ";
-
-%feature("docstring")  casadi::Matrix< double >::solve(const Matrix< double
-> &a, const Matrix< double > &b, const std::string &lsolver, const Dict
-&dict) "
-
-[INTERNAL] ";
-
-%feature("docstring")  casadi::Matrix< Scalar >::taylor(const Matrix< Scalar
-> &ex, const Matrix< Scalar > &x, const Matrix< Scalar > &a, int order=1) "
-
-[INTERNAL]  univariate Taylor series expansion
+univariate Taylor series expansion
 
 Calculate the Taylor expansion of expression 'ex' up to order 'order' with
 respect to variable 'x' around the point 'a'
@@ -42347,18 +42309,17 @@ optionally both dimensions)
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::is_identity() const  "
+%feature("docstring")  casadi::Matrix< T >::is_identity() const  "
 
-[INTERNAL]  check if the matrix is an identity matrix (note that false
-negative answers are possible)
+check if the matrix is an identity matrix (note that false negative answers
+are possible)
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::chol(const Matrix< Scalar >
-&A) "
+%feature("docstring")  chol(const Matrix< Scalar > &A) "
 
-[INTERNAL]  Obtain a Cholesky factorisation of a matrix Returns an upper
-triangular R such that R'R = A. Matrix A must be positive definite.
+Obtain a Cholesky factorisation of a matrix Returns an upper triangular R
+such that R'R = A. Matrix A must be positive definite.
 
 At the moment, the algorithm is dense (Cholesky-Banachiewicz). There is an
 open ticket #1212 to make it sparse.
@@ -42371,10 +42332,10 @@ open ticket #1212 to make it sparse.
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::poly_coeff(const Matrix<
-Scalar > &f, const Matrix< Scalar > &x) "
+%feature("docstring")  poly_coeff(const Matrix< Scalar > &f, const Matrix<
+Scalar > &x) "
 
-[INTERNAL]  extracts polynomial coefficients from an expression
+extracts polynomial coefficients from an expression
 
 Parameters:
 -----------
@@ -42385,45 +42346,40 @@ x:  Scalar symbol that the polynomial is build up with
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::printme(const Matrix<
-Scalar > &y) const  "
-
-[INTERNAL] ";
-
-%feature("docstring")  casadi::Matrix< Scalar >::gauss_quadrature(const
-Matrix< Scalar > &f, const Matrix< Scalar > &x, const Matrix< Scalar > &a,
-const Matrix< Scalar > &b, int order=5) "
-
-[INTERNAL]  Integrate f from a to b using Gaussian quadrature with n points.
+%feature("docstring")  casadi::Matrix< T >::printme(const Matrix< Scalar >
+&y) const  "
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::gauss_quadrature(const
-Matrix< Scalar > &f, const Matrix< Scalar > &x, const Matrix< Scalar > &a,
-const Matrix< Scalar > &b, int order, const Matrix< Scalar > &w) "
+%feature("docstring")  gauss_quadrature(const Matrix< Scalar > &f, const
+Matrix< Scalar > &x, const Matrix< Scalar > &a, const Matrix< Scalar > &b,
+int order=5) "
 
-[INTERNAL]   Matrix adjoint.
-
-";
-
-%feature("docstring")  casadi::Matrix< double >::pinv(const Matrix< double >
-&A, const std::string &lsolver, const Dict &dict) "
-
-[INTERNAL] ";
-
-%feature("docstring")  casadi::Matrix< Scalar >::set_scientific(bool
-scientific) "
-
-[INTERNAL]  Set the 'precision, width & scientific' used in printing and
-serializing to streams.
+Integrate f from a to b using Gaussian quadrature with n points.
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::pw_const(const Matrix<
-Scalar > &t, const Matrix< Scalar > &tval, const Matrix< Scalar > &val) "
+%feature("docstring")  gauss_quadrature(const Matrix< Scalar > &f, const
+Matrix< Scalar > &x, const Matrix< Scalar > &a, const Matrix< Scalar > &b,
+int order, const Matrix< Scalar > &w) "
 
-[INTERNAL]  Create a piecewise constant function Create a piecewise constant
-function with n=val.size() intervals.
+Matrix adjoint.
+
+";
+
+%feature("docstring")  casadi::Matrix< T >::set_scientific(bool scientific)
+"
+
+Set the 'precision, width & scientific' used in printing and serializing to
+streams.
+
+";
+
+%feature("docstring")  pw_const(const Matrix< Scalar > &t, const Matrix<
+Scalar > &tval, const Matrix< Scalar > &val) "
+
+Create a piecewise constant function Create a piecewise constant function
+with n=val.size() intervals.
 
 Inputs:
 
@@ -42439,12 +42395,12 @@ val:  vector with the value of the function for each interval (length n)
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::enlarge(int nrow, int ncol,
+%feature("docstring")  casadi::Matrix< T >::enlarge(int nrow, int ncol,
 const std::vector< int > &rr, const std::vector< int > &cc, bool ind1=false)
 "
 
-[INTERNAL]  Enlarge matrix Make the matrix larger by inserting empty rows
-and columns, keeping the existing non-zeros.
+Enlarge matrix Make the matrix larger by inserting empty rows and columns,
+keeping the existing non-zeros.
 
 ";
 
@@ -42455,10 +42411,10 @@ false.
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::pw_lin(const Matrix< Scalar
-> &t, const Matrix< Scalar > &tval, const Matrix< Scalar > &val) "
+%feature("docstring")  pw_lin(const Matrix< Scalar > &t, const Matrix<
+Scalar > &tval, const Matrix< Scalar > &val) "
 
-[INTERNAL]  t a scalar variable (e.g. time)
+t a scalar variable (e.g. time)
 
 Create a piecewise linear function Create a piecewise linear function:
 
@@ -42475,52 +42431,51 @@ Check if the matrix is a column vector (i.e. size2()==1)
 
 ";
 
-%feature("docstring") casadi::Matrix< Scalar >::Matrix() "
+%feature("docstring") casadi::Matrix< T >::Matrix() "
 
-[INTERNAL]  constructors
+constructors
 
 empty 0-by-0 matrix constructor
 
 ";
 
-%feature("docstring") casadi::Matrix< Scalar >::Matrix(const Matrix< Scalar
-> &m) "
+%feature("docstring") casadi::Matrix< T >::Matrix(const Matrix< Scalar > &m)
+"
 
-[INTERNAL]  Copy constructor.
-
-";
-
-%feature("docstring") casadi::Matrix< Scalar >::Matrix(int nrow, int ncol) "
-
-[INTERNAL]  Create a sparse matrix with all structural zeros.
+Copy constructor.
 
 ";
 
-%feature("docstring") casadi::Matrix< Scalar >::Matrix(const Sparsity &sp) "
+%feature("docstring") casadi::Matrix< T >::Matrix(int nrow, int ncol) "
 
-[INTERNAL]  Create a sparse matrix from a sparsity pattern. Same as
+Create a sparse matrix with all structural zeros.
+
+";
+
+%feature("docstring") casadi::Matrix< T >::Matrix(const Sparsity &sp) "
+
+Create a sparse matrix from a sparsity pattern. Same as
 Matrix::ones(sparsity)
 
 ";
 
-%feature("docstring") casadi::Matrix< Scalar >::Matrix(const Sparsity &sp,
-const Matrix< Scalar > &d) "
+%feature("docstring") casadi::Matrix< T >::Matrix(const Sparsity &sp, const
+Matrix< Scalar > &d) "
 
-[INTERNAL]  Construct matrix with a given sparsity and nonzeros.
-
-";
-
-%feature("docstring") casadi::Matrix< Scalar >::Matrix(double val) "
-
-[INTERNAL]  This constructor enables implicit type conversion from a numeric
-type.
+Construct matrix with a given sparsity and nonzeros.
 
 ";
 
-%feature("docstring") casadi::Matrix< Scalar >::Matrix(const std::vector<
+%feature("docstring") casadi::Matrix< T >::Matrix(double val) "
+
+This constructor enables implicit type conversion from a numeric type.
+
+";
+
+%feature("docstring") casadi::Matrix< T >::Matrix(const std::vector<
 std::vector< double > > &m) "
 
-[INTERNAL]  Dense matrix constructor with data given as vector of vectors.
+Dense matrix constructor with data given as vector of vectors.
 
 ";
 
@@ -42538,31 +42493,10 @@ the scalar conversion is valid.
 
 ";
 
-%feature("docstring") casadi::Matrix< T >::Matrix(const std::vector< Scalar
-> &x) "
+%feature("docstring")  eig_symbolic(const Matrix< Scalar > &m) "
 
-[INTERNAL] ";
-
-%feature("docstring") casadi::Matrix< T >::Matrix(const std::pair< int, int
-> &rc) "
-
-[INTERNAL] ";
-
-%feature("docstring") casadi::Matrix< T >::Matrix(const Sparsity &sp, const
-Scalar &val, bool dummy) "
-
-[INTERNAL] ";
-
-%feature("docstring") casadi::Matrix< T >::Matrix(const Sparsity &sp, const
-std::vector< Scalar > &d, bool dummy) "
-
-[INTERNAL] ";
-
-%feature("docstring")  casadi::Matrix< Scalar >::eig_symbolic(const Matrix<
-Scalar > &m) "
-
-[INTERNAL]  Attempts to find the eigenvalues of a symbolic matrix This will
-only work for up to 3x3 matrices.
+Attempts to find the eigenvalues of a symbolic matrix This will only work
+for up to 3x3 matrices.
 
 ";
 
@@ -42573,10 +42507,9 @@ if symbolic scalar. Wraps SXElem SXElem::dep(int ch=0) const.
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::is_zero() const  "
+%feature("docstring")  casadi::Matrix< T >::is_zero() const  "
 
-[INTERNAL]  check if the matrix is 0 (note that false negative answers are
-possible)
+check if the matrix is 0 (note that false negative answers are possible)
 
 ";
 
@@ -42587,15 +42520,15 @@ Check if the matrix is a row or column vector.
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::matrix_matrix(int op, const
+%feature("docstring")  casadi::Matrix< T >::matrix_matrix(int op, const
 Matrix< Scalar > &x, const Matrix< Scalar > &y) "
 
 [INTERNAL]  Create nodes by their ID.
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::binary(int op, const
-Matrix< Scalar > &x, const Matrix< Scalar > &y) "
+%feature("docstring")  casadi::Matrix< T >::binary(int op, const Matrix<
+Scalar > &x, const Matrix< Scalar > &y) "
 
 [INTERNAL]  Create nodes by their ID.
 
@@ -42625,10 +42558,9 @@ call reset_input() after usage.
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::has_zeros() const  "
+%feature("docstring")  casadi::Matrix< T >::has_zeros() const  "
 
-[INTERNAL]  Check if the matrix has any zero entries which are not
-structural zeros.
+Check if the matrix has any zero entries which are not structural zeros.
 
 ";
 
@@ -42646,10 +42578,10 @@ Get the sparsity pattern. See the Sparsity class for details.
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::print(std::ostream
+%feature("docstring")  casadi::Matrix< T >::print(std::ostream
 &stream=casadi::userOut(), bool trailing_newline=true) const  "
 
-[INTERNAL]  Print a description of the object.
+Print a description of the object.
 
 ";
 
