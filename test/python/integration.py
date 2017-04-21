@@ -140,7 +140,7 @@ class Integrationtests(casadiTestCase):
     # This test is not automized, but works by inspection only.
     # To activate, recompile after ucnommenting the printout lines in cvodes.c, near "Used for validating casadi#536"
     #return
-    DM.setPrecision(18)
+    DM.set_precision(18)
 
     tstart = SX.sym("tstart")
     tend = SX.sym("tend")

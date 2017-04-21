@@ -935,6 +935,5 @@ namespace casadi {
 #include "sx.hpp"
 #include "casadi_interrupt.hpp"
 #include "runtime/shared.hpp"
-#include "matrix_impl.hpp"
 
 #endif // CASADI_FUNCTION_HPP

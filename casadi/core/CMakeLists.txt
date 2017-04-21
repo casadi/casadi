@@ -28,7 +28,6 @@ set(CASADI_PUBLIC
   generic_expression.hpp      # Base class for SXElem MX and Matrix<>
   generic_matrix.hpp          # Base class for Matrix<> and MX
   matrix.hpp                  # The Matrix template class
-  matrix_impl.hpp             # Template implementations
   sparsity_interface.hpp
   sparsity.hpp                # reference counted sparsity pattern
   slice.hpp                   # A "slice" in a language such as Python, A[start:stop:step], or Matlab, A(start:step:stop)
@@ -86,7 +85,8 @@ set(CASADI_INTERNAL
   polynomial.cpp
 
   # Template class Matrix<>, implements a sparse Matrix with col compressed storage, designed to work well with symbolic data types (SX)
-  matrix.cpp
+  matrix.cpp    matrix_impl.hpp
+
   sparse_storage.hpp   sparse_storage_impl.hpp
   sparsity.cpp  sparsity_internal.hpp   sparsity_internal.cpp
   slice.cpp

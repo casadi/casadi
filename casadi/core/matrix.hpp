@@ -953,9 +953,9 @@ namespace casadi {
 
     // @{
     /// Set the 'precision, width & scientific' used in printing and serializing to streams
-    static void setPrecision(int precision) { stream_precision_ = precision; }
-    static void setWidth(int width) { stream_width_ = width; }
-    static void setScientific(bool scientific) { stream_scientific_ = scientific; }
+    static void set_precision(int precision);
+    static void set_width(int width);
+    static void set_scientific(bool scientific);
     // @}
 
 #ifndef SWIG
