@@ -37,6 +37,7 @@ set(CASADI_PUBLIC
 
   # Directed, acyclic graph representation with scalar expressions
   sx_elem.hpp
+  sx.hpp
 
   # More general graph representation with sparse matrix expressions and function evaluations
   mx.hpp

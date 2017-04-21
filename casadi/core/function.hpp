@@ -932,6 +932,7 @@ namespace casadi {
 
 } // namespace casadi
 
+#include "sx.hpp"
 #include "matrix_impl.hpp"
 
 #endif // CASADI_FUNCTION_HPP
