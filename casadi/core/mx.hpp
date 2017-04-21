@@ -611,6 +611,10 @@ namespace casadi {
     /// Construct constant matrix with a given sparsity and values
     MX(const Sparsity& sp, int val, bool dummy);
     MX(const Sparsity& sp, double val, bool dummy);
+
+    // Create matrix symbolic primitive
+    static MX _sym(const std::string& name, const Sparsity& sp);
+
   private:
 
     /// Create an expression from a node: extra dummy arguments to avoid ambiguity for 0/NULL
@@ -622,9 +626,6 @@ namespace casadi {
 #endif // SWIG
   };
 
-  // Create matrix symbolic primitive
-  template<>
-  MX GenericMatrix<MX>::sym(const std::string& name, const Sparsity& sp);
 
   ///@{
   /// Readability typedefs

@@ -755,8 +755,7 @@ namespace casadi {
     return eq_depth_;
   }
 
-  template<>
-  MX GenericMatrix<MX>::sym(const std::string& name, const Sparsity& sp) {
+  MX MX::_sym(const std::string& name, const Sparsity& sp) {
     if (sp.nnz()==0) {
       return MX(sp);
     } else {

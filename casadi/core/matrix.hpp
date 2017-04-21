@@ -965,6 +965,10 @@ namespace casadi {
     /// Sparse matrix with a given sparsity and non-zero elements.
     Matrix(const Sparsity& sp, const std::vector<Scalar>& d, bool dummy);
 
+    /// \cond INTERNAL
+    static Matrix<Scalar> _sym(const std::string& name, const Sparsity& sp);
+    /// \endcond
+
   private:
     /// Sparsity of the matrix in a compressed column storage (CCS) format
     Sparsity sparsity_;
