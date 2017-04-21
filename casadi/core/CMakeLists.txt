@@ -85,7 +85,7 @@ set(CASADI_INTERNAL
   polynomial.cpp
 
   # Template class Matrix<>, implements a sparse Matrix with col compressed storage, designed to work well with symbolic data types (SX)
-  matrix.cpp    matrix_impl.hpp
+  matrix.cpp
 
   sparse_storage.hpp   sparse_storage_impl.hpp
   sparsity.cpp  sparsity_internal.hpp   sparsity_internal.cpp

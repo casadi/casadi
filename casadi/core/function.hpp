@@ -36,7 +36,6 @@
   1. Forward declaration of Function (in casadi_types.hpp)
   2. Declaration of Matrix class (in matrix.hpp), Function only as references or return values
   3. Definition of Function (this file), requires Matrix to be complete type
-  4. Definition of Matrix class (in matrix_impl.hpp, included at the end of this file)
 */
 
 namespace casadi {
