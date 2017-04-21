@@ -54,13 +54,13 @@ if(WITH_IPOPT)
 endif()
 
 # Parse AMPL models and solve with Worhp
-if(WORHP_FOUND AND WITH_IPOPT)
+if(WITH_WORHP AND WITH_IPOPT)
   add_executable(worhp_nl worhp_nl.cpp)
   target_link_libraries(worhp_nl casadi)
 endif()
 
 # Parse AMPL models and solve with KNITRO
-if(KNITRO_FOUND)
+if(WITH_KNITRO)
   add_executable(knitro_nl knitro_nl.cpp)
   target_link_libraries(knitro_nl casadi)
 endif()

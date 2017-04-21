@@ -10,7 +10,7 @@ if(WITH_IPOPT)
   add_subdirectory(ipopt)
 endif()
 
-if(BONMIN_FOUND)
+if(WITH_BONMIN)
   add_subdirectory(bonmin)
 endif()
 
@@ -18,19 +18,19 @@ if(QPOASES_FOUND)
   add_subdirectory(qpoases)
 endif()
 
-if(KNITRO_FOUND)
+if(WITH_KNITRO)
   add_subdirectory(knitro)
 endif()
 
-if(CPLEX_FOUND)
+if(WITH_CPLEX)
   add_subdirectory(cplex)
 endif()
 
-if(CLP_FOUND)
+if(WITH_CLP)
   add_subdirectory(clp)
 endif()
 
-if(CSPARSE_FOUND)
+if(WITH_CSPARSE)
   add_subdirectory(csparse)
 endif()
 
@@ -46,11 +46,11 @@ if(OOQP_FOUND)
   add_subdirectory(ooqp)
 endif()
 
-if(GUROBI_FOUND)
+if(WITH_GUROBI)
   add_subdirectory(gurobi)
 endif()
 
-if(WORHP_FOUND)
+if(WITH_WORHP)
   add_subdirectory(worhp)
 endif()
 
