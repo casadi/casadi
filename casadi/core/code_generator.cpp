@@ -27,7 +27,6 @@
 #include "code_generator.hpp"
 #include "function_internal.hpp"
 #include <iomanip>
-#include <regex>
 #include <casadi_runtime_str.h>
 
 using namespace std;
@@ -1018,9 +1017,9 @@ namespace casadi {
     stringstream ret;
     // Number of template parameters
     size_t npar = 0;
-    // Process source
+    // Process C++ source
+    string line, def, fname;
     istringstream stream(src);
-    string line, def, fname = "n/a";
     while (std::getline(stream, line)) {
       // C++ template declaration
       if (line.find("template")==0) {
@@ -1030,52 +1029,38 @@ namespace casadi {
       // Ignore C++ style comments at beginning of lines
       if (line.find("//")==0) continue;
 
-      regex r;
-      try {
-        r = regex(".* CASADI_PREFIX\\(([a-z_0-9]+)\\)\\((.*)\\).*\\{.*");
-      } catch (const regex_error& e) {
-        casadi_error("regex error for line \"" + line + "\"");
-      }
-      bool m;
-      try {
-        m = regex_match(line, r);
-      } catch (const regex_error& e) {
-        casadi_error("regex match error for line \"" + line + "\"");
-      }
-
-      // Generate shorthand
-      if (m) {
-        // Make sure only one match
-        casadi_assert(def.empty());
-
-        // Get function name, e.g. "fmin"
-        try {
-          fname = regex_replace(line, r, string("$1"));
-        } catch (const regex_error& e) {
-          casadi_error("regex replace error for line \"" + line + "\"");
+      // Get function name (must be the first occurrence of CASADI_PREFIX)
+      if (fname.empty()) {
+        string::size_type n1, n2;
+        string s = "CASADI_PREFIX(";
+        n1 = line.find(s);
+        casadi_assert_message(n1!=string::npos,
+          "Cannot read function name, must be declared inside CASADI_PREFIX(..)");
+        n1 += s.size();
+        s = ")(";
+        n2=line.find(s, n1);
+        casadi_assert(n2!=string::npos);
+        fname = line.substr(n1, n2-n1);
+        casadi_assert(!fname.empty());
+        for (char c : fname) {
+          casadi_assert_message(isalnum(c) || c=='_', "Invalid filename: " + fname);
         }
 
-        // Get argument list, e.g. "x,y"
-        string args;
-        try {
-          args = regex_replace(line, r, string("$2")) + ",";
-        } catch (const regex_error& e) {
-          casadi_error("regex replace (2) error for line \"" + line + "\"");
-        }
-        try {
-          r = regex("[^,]* ([a-zA-Z_0-9]+),");
-        } catch (const regex_error& e) {
-          casadi_error("regex error (2) for line \"" + line + "\"");
-        }
+        // Get argument list
+        n1 = n2 + s.size();
+        n2 = line.find(")", n1);
 
-        try {
-          smatch sm;
-          while (regex_search(args, sm, r)) {
-            def = def.empty() ? string(sm[1]) : def + ", " + string(sm[1]);
-            args = sm.suffix();
-          }
-        } catch (const regex_error& e) {
-          casadi_error("regex search error for line \"" + line + "\"");
+        casadi_assert(n2!=string::npos);
+        string args = line.substr(n1, n2-n1) + ",";
+
+        // Get argument list
+        n1 = 0;
+        while ((n2 = args.find(',', n1)) != string::npos) {
+          n1 = args.rfind(' ', n2);
+          s = args.substr(n1+1, n2-n1-1);
+          def = def.empty() ? s : def + ", " + s;
+          n1 = n2 + 1;
+
         }
 
         // Add suffix
