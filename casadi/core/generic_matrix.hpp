@@ -151,11 +151,6 @@ namespace casadi {
     SWIG_CONSTREF(Sparsity) sparsity() const;
 
 #ifndef SWIG
-    /// \cond INTERNAL
-    /** \brief Access the sparsity */
-    Sparsity& sparsityRef();
-    /// \endcond
-
     /// \cond CLUTTER
     /**  @{  */
     /** \brief Accessed by friend functions */
@@ -709,11 +704,6 @@ namespace casadi {
   template<typename MatType>
   const Sparsity& GenericMatrix<MatType>::sparsity() const {
     return self().sparsity();
-  }
-
-  template<typename MatType>
-  Sparsity& GenericMatrix<MatType>::sparsityRef() {
-    return self().sparsityRef();
   }
 
   template<typename MatType>

@@ -81,9 +81,6 @@ namespace casadi {
     /// Const access the sparsity - reference to data member
     const Sparsity& sparsity() const { return sparsity_; }
 
-    /// Access the sparsity, make a copy if there are multiple references to it
-    Sparsity& sparsityRef();
-
   private:
     /// Sparsity of the matrix in a compressed column storage (CCS) format
     Sparsity sparsity_;
