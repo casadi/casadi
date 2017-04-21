@@ -1,7 +1,7 @@
 include_directories(../../)
 
 # Add IPOPT link directories
-if(IPOPT_FOUND)
+if(WITH_IPOPT)
   link_directories(${IPOPT_LIBRARY_DIRS})
 endif()
 
@@ -18,13 +18,13 @@ add_executable(propagating_sparsity propagating_sparsity.cpp)
 target_link_libraries(propagating_sparsity casadi)
 
 # Rosenbrock problem
-if(IPOPT_FOUND)
+if(WITH_IPOPT)
   add_executable(rosenbrock rosenbrock.cpp)
   target_link_libraries(rosenbrock casadi)
 endif()
 
 # Rocket using Ipopt
-if(IPOPT_FOUND)
+if(WITH_IPOPT)
   add_executable(rocket_ipopt rocket_ipopt.cpp)
   target_link_libraries(rocket_ipopt casadi)
 endif()
@@ -39,13 +39,13 @@ if(SNOPT_FOUND)
 endif()
 
 # Rocket solved with MX + SX
-if(IPOPT_FOUND)
+if(WITH_IPOPT)
   add_executable(rocket_mx_and_sx rocket_mx_and_sx.cpp)
   target_link_libraries(rocket_mx_and_sx casadi)
 endif()
 
 # Parse AMPL models and solve with Ipopt
-if(IPOPT_FOUND)
+if(WITH_IPOPT)
   add_executable(ipopt_nl ipopt_nl.cpp)
   target_link_libraries(ipopt_nl casadi)
 
@@ -54,7 +54,7 @@ if(IPOPT_FOUND)
 endif()
 
 # Parse AMPL models and solve with Worhp
-if(WORHP_FOUND AND IPOPT_FOUND)
+if(WORHP_FOUND AND WITH_IPOPT)
   add_executable(worhp_nl worhp_nl.cpp)
   target_link_libraries(worhp_nl casadi)
 endif()
@@ -66,7 +66,7 @@ if(KNITRO_FOUND)
 endif()
 
 # rocket example using sundials and ipopt, also demonstrating linking with plugins
-if(WITH_SUNDIALS AND IPOPT_FOUND)
+if(WITH_SUNDIALS AND WITH_IPOPT)
   add_executable(rocket_single_shooting rocket_single_shooting.cpp)
   target_link_libraries(rocket_single_shooting
     casadi_integrator_cvodes
@@ -77,7 +77,7 @@ if(WITH_SUNDIALS AND IPOPT_FOUND)
 endif()
 
 # Writing a multiple shooting code from scratch
-if(WITH_SUNDIALS AND IPOPT_FOUND)
+if(WITH_SUNDIALS AND WITH_IPOPT)
   add_executable(multiple_shooting_from_scratch multiple_shooting_from_scratch.cpp)
   target_link_libraries(multiple_shooting_from_scratch casadi)
 endif()
@@ -93,7 +93,7 @@ if(WITH_SUNDIALS AND WITH_CSPARSE)
 endif()
 
 # Parametric NLP
-if(IPOPT_FOUND)
+if(WITH_IPOPT)
   add_executable(parametric_nlp parametric_nlp.cpp)
   target_link_libraries(parametric_nlp casadi)
 endif()
@@ -104,7 +104,7 @@ if(WITH_OPENCL)
   target_link_libraries(test_opencl ${OPENCL_LIBRARIES})
 endif()
 
-if(WITH_DL AND IPOPT_FOUND)
+if(WITH_DL AND WITH_IPOPT)
   add_executable(nlp_codegen nlp_codegen.cpp)
   target_link_libraries(nlp_codegen casadi)
 endif()

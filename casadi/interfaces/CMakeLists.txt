@@ -6,7 +6,7 @@ if(SUNDIALS_FOUND)
   add_subdirectory(sundials)
 endif()
 
-if(IPOPT_FOUND)
+if(WITH_IPOPT)
   add_subdirectory(ipopt)
 endif()
 

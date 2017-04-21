@@ -70,7 +70,7 @@ option(WITH_ECOS "Compile the interface to ECOS" OFF)
 option(WITH_BUILD_CSPARSE "Compile the included source code for CSparse" ON)
 option(WITH_CSPARSE "Compile the interface to CSparse" ON)
 option(WITH_GUROBI "Compile the interface to GUROBI" ON)
-option(WITH_IPOPT "Compile the interface to IPOPT" ON)
+option(WITH_IPOPT "Compile the interface to IPOPT" OFF)
 option(WITH_BONMIN "Compile the interface to BONMIN" ON)
 option(WITH_KNITRO "Compile the interface to KNITRO" ON)
 option(WITH_CPLEX "Compile the interface to CPLEX" ON)
@@ -543,9 +543,9 @@ add_feature_info(opencl-support WITH_OPENCL "Enable just-in-time compiliation to
 
 
 if(WITH_IPOPT)
-  find_package(IPOPT)
+  find_package(IPOPT REQUIRED)
 endif()
-add_feature_info(ipopt-interface IPOPT_FOUND "Interface to the NLP solver Ipopt.")
+add_feature_info(ipopt-interface WITH_IPOPT "Interface to the NLP solver Ipopt.")
 
 if(WITH_BONMIN)
   find_package(BONMIN)
