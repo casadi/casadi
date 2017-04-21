@@ -18,9 +18,6 @@ macro(CASADI_STRINGIFY STRFILE)
   endforeach()
 endmacro()
 
-# if (!tr) mexErrMsgIdAndTxt("Casadi:RuntimeError","\"from_mex\" failed: Dimension mismatch.");
-#   "      if (!tr) mexErrMsgIdAndTxt(\"Casadi:RuntimeError\",\"\\"from_mex\\" failed: Dimension mismatch.\")\n"
-
 # this function handles libraries and plugins
 # there is so much similarity in plugins/libraries, we just
 # use a flag and wrap this with casadi_plugin or casadi_library (above)
