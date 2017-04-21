@@ -662,7 +662,9 @@ namespace casadi {
     }
 
     /** \brief Create symbolic primitive with a given sparsity pattern */
-    static MatType sym(const std::string& name, const Sparsity& sp);
+    static MatType sym(const std::string& name, const Sparsity& sp) {
+      return MatType::_sym(name, sp);
+    }
 
     /** \brief Create a vector of length p with with matrices
      * with symbolic primitives of given sparsity */
@@ -794,11 +796,6 @@ namespace casadi {
       ret[k] = sym(ss.str(), sp, p);
     }
     return ret;
-  }
-
-  template<typename MatType>
-  MatType GenericMatrix<MatType>::sym(const std::string& name, const Sparsity& sp) {
-    throw CasadiException("\"sym\" not defined for instantiation");
   }
 
   template<typename MatType>

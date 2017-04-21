@@ -30,7 +30,7 @@
 namespace casadi {
   template<> CASADI_EXPORT bool Matrix<SXElem>::__nonzero__() const;
   template<> inline std::string matrixName<SXElem>() { return "SX"; }
-  template<> SX GenericMatrix<SX>::sym(const std::string& name, const Sparsity& sp);
+  template<> SX SX::_sym(const std::string& name, const Sparsity& sp);
   template<> bool SX::is_regular() const;
   template<> bool SX::is_smooth() const;
   template<> bool SX::is_leaf() const;

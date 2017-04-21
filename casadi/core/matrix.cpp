@@ -2519,6 +2519,11 @@ namespace casadi {
     return static_cast<int>(scalar());
   }
 
+  template<typename Scalar>
+  Matrix<Scalar> Matrix<Scalar>::_sym(const std::string& name, const Sparsity& sp) {
+    casadi_error("'sym' not defined for " + type_name());
+  }
+
   // Template specializations
   template<>
   CASADI_EXPORT Matrix<double> Matrix<double>::
@@ -2595,7 +2600,7 @@ namespace casadi {
   }
 
   template<>
-  SX GenericMatrix<SX>::sym(const string& name, const Sparsity& sp) {
+  SX SX::_sym(const string& name, const Sparsity& sp) {
     // Create a dense n-by-m matrix
     vector<SXElem> retv;
 
