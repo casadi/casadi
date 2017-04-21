@@ -1026,6 +1026,12 @@ namespace casadi {
         npar = count(line.begin(), line.end(), ',') + 1;
         continue;
       }
+
+      // Inline declaration
+      if (line == "inline") {
+        continue;
+      }
+
       // Ignore C++ style comments at beginning of lines
       if (line.find("//")==0) continue;
 
