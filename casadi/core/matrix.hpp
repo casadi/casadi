@@ -994,6 +994,34 @@ namespace casadi {
   ///  Convert IM to Slice
   Slice CASADI_EXPORT to_slice(const IM& x, bool ind1=false);
 
+  /// Implementation of Matrix::get_nonzeros (in public API)
+  template<typename Scalar>
+  template<typename A>
+  std::vector<A> Matrix<Scalar>::get_nonzeros() const {
+    std::vector<A> ret(nnz());
+    auto r = ret.begin();
+    for (auto&& e : nonzeros()) *r++ = static_cast<A>(e);
+    return ret;
+  }
+
+  /// Implementation of std::vector(Matrix) (in public API)
+  template<typename Scalar>
+  template<typename A>
+  Matrix<Scalar>::operator std::vector<A>() const {
+    // Get sparsity pattern
+    int size1 = this->size1(), size2 = this->size2();
+    const int *colind = this->colind(), *row = this->row();
+    // Copy the nonzeros
+    auto it = nonzeros().begin();
+    std::vector<A> ret(numel(), 0);
+    for (int cc=0; cc<size2; ++cc) {
+      for (int el=colind[cc]; el<colind[cc+1]; ++el) {
+        ret[row[el] + cc*size1] = static_cast<A>(*it++);
+      }
+    }
+    return ret;
+  }
+
 
 } // namespace casadi
 
