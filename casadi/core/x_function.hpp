@@ -1321,6 +1321,55 @@ namespace casadi {
     return MatType::which_depends(veccat(res), arg, order, tr);
   }
 
+  template<typename MatType>
+  MatType _jtimes(const MatType &ex, const MatType &arg, const MatType &v, bool tr) {
+    // Seeds as a vector of vectors
+    int seed_dim = tr ? ex.size2() : arg.size2();
+    casadi_assert(v.size2() % seed_dim == 0);
+    std::vector<MatType> w = horzsplit(v, seed_dim);
+    std::vector<std::vector<MatType> > ww(w.size(), std::vector<MatType>(1));
+    for (int i=0; i<w.size(); ++i) ww[i][0] = w[i];
+
+    // Calculate directional derivatives
+    if (tr) {
+      ww = reverse({ex}, {arg}, ww);
+    } else {
+      ww = forward({ex}, {arg}, ww);
+    }
+
+    // Get results
+    for (int i=0; i<w.size(); ++i) w[i] = ww[i][0];
+    return horzcat(w);
+  }
+
+  template<typename MatType>
+  std::vector<bool> _which_depends(const MatType &expr, const MatType &var, int order, bool tr) {
+    MatType e = expr;
+
+    // Create a function for calculating a forward-mode derivative
+    casadi_assert_message(order==1 || order==2,
+      "which_depends: order argument must be 1 or 2, got " << order << " instead.");
+
+    MatType v = MatType::sym("v", var.sparsity());
+    for (int i=1;i<order;++i) {
+      e = jtimes(e, var, v);
+    }
+
+    Function f = Function("tmp", {var}, {e});
+    // Propagate sparsities backwards seeding all outputs
+    std::vector<bvec_t> seed(tr? f.nnz_in(0) : f.nnz_out(0), 1);
+    std::vector<bvec_t> sens(tr? f.nnz_out(0) : f.nnz_in(0), 0);
+
+    if (tr)
+      f({get_ptr(seed)}, {get_ptr(sens)});
+    else
+      f.rev({get_ptr(sens)}, {get_ptr(seed)});
+    // Temporaries for evaluation
+    std::vector<bool> ret(sens.size());
+    std::copy(sens.begin(), sens.end(), ret.begin());
+    return ret;
+  }
+
 } // namespace casadi
 /// \endcond
 
