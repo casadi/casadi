@@ -1021,6 +1021,8 @@ namespace casadi {
     string line, def, fname;
     istringstream stream(src);
     while (std::getline(stream, line)) {
+      size_t n1, n2;
+
       // C++ template declaration
       if (line.find("template")==0) {
         npar = count(line.begin(), line.end(), ',') + 1;
@@ -1032,20 +1034,27 @@ namespace casadi {
         continue;
       }
 
-      // Ignore C++ style comments at beginning of lines
-      if (line.find("//")==0) continue;
+      // Ignore C++ style comment
+      if ((n1 = line.find("//")) != string::npos) line.erase(n1);
+
+      // Remove trailing spaces
+      if ((n1 = line.find_last_not_of(' ')) != string::npos) {
+        line.erase(n1 + 1);
+      } else {
+        continue;
+      }
 
       // Get function name (must be the first occurrence of CASADI_PREFIX)
       if (fname.empty()) {
-        string::size_type n1, n2;
         string s = "CASADI_PREFIX(";
-        n1 = line.find(s);
-        casadi_assert_message(n1!=string::npos,
-          "Function name must be declared inside CASADI_PREFIX(..):\n" + line);
+        if ((n1 = line.find(s)) == string::npos) {
+          casadi_error("Cannot find \"" + s + "\" in " + line);
+        }
         n1 += s.size();
         s = ")(";
-        n2=line.find(s, n1);
-        casadi_assert(n2!=string::npos);
+        if ((n2=line.find(s, n1)) == string::npos) {
+          casadi_error("Cannot find \"" + s + "\" in " + line);
+        }
         fname = line.substr(n1, n2-n1);
         casadi_assert(!fname.empty());
         for (char c : fname) {
@@ -1087,6 +1096,7 @@ namespace casadi {
           n += r.second.size();
         }
       }
+
       // Append to return
       ret << line << "\n";
     }
