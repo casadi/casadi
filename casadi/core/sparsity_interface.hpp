@@ -44,7 +44,7 @@ namespace casadi {
       \date 2014
   */
   template<typename MatType>
-  class CASADI_EXPORT SparsityInterface : public SparsityInterfaceCommon {
+  class SparsityInterface : public SparsityInterfaceCommon {
 #ifndef SWIG
   protected:
     // Helper functions

@@ -75,7 +75,7 @@ namespace casadi {
       \date 2013
   */
   template<class Derived>
-  class CASADI_EXPORT PluginInterface {
+  class PluginInterface {
     public:
 
     /// Fields
