@@ -1,3 +1,4 @@
+// NOLINT(legal/copyright)
 template<typename T1>
 T1 CASADI_PREFIX(dot)(int n, const T1* x, const T1* y) {
   T1 r = 0;

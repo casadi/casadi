@@ -1,14 +1,15 @@
+// NOLINT(legal/copyright)
 template<typename T1, typename T2>
 void CASADI_PREFIX(densify)(const T1* x, const int* sp_x, T2* y, int tr) {
-  /* Quick return - output ignored */
+  // Quick return - output ignored
   if (!y) return;
   int nrow_x = sp_x[0], ncol_x = sp_x[1];
   const int *colind_x = sp_x+2, *row_x = sp_x+ncol_x+3;
-  /* Zero out return value */
+  // Zero out return value
   CASADI_PREFIX(fill)(y, nrow_x*ncol_x, CASADI_CAST(T2, 0));
-  /* Quick return - input is zero */
+  // Quick return - input is zero
   if (!x) return;
-  /* Copy nonzeros */
+  // Copy nonzeros
   int i, el;
   if (tr) {
     for (i=0; i<ncol_x; ++i) {

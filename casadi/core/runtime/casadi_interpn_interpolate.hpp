@@ -1,8 +1,9 @@
+// NOLINT(legal/copyright)
 template<typename T1>
-T1 CASADI_PREFIX(interpn_interpolate)(int ndim, const int* offset, const T1* values, const T1* alpha, const int* index, const int* corner, T1* coeff) {
-  /* Get weight and value for corner */
+T1 CASADI_PREFIX(interpn_interpolate)(int ndim, const int* offset, const T1* values, const T1* alpha, const int* index, const int* corner, T1* coeff) { // NOLINT(whitespace/line_length)
+  // Get weight and value for corner
   T1 c=1;
-  int ld=1; /* leading dimension */
+  int ld=1; // leading dimension
   int i;
   for (i=0; i<ndim; ++i) {
     if (coeff) *coeff++ = c;

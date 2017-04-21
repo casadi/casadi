@@ -1,17 +1,18 @@
+// NOLINT(legal/copyright)
 template<typename T1>
-T1 CASADI_PREFIX(norm_inf_mul)(const T1* x, const int* sp_x, const T1* y, const int* sp_y, T1* dwork, int* iwork) {
+T1 CASADI_PREFIX(norm_inf_mul)(const T1* x, const int* sp_x, const T1* y, const int* sp_y, T1* dwork, int* iwork) { // NOLINT(whitespace/line_length)
   T1 res = 0;
-  /* Get sparsities */
+  // Get sparsities
   int nrow_x = sp_x[0], ncol_x = sp_x[1];
   const int *colind_x = sp_x+2, *row_x = sp_x + 2 + ncol_x+1;
   int ncol_y = sp_y[1];
   const int *colind_y = sp_y+2, *row_y = sp_y + 2 + ncol_y+1;
 
-  /* Implementation borrowed from Scipy's sparsetools/csr.h */
-  /* method that uses O(n) temp storage */
+  // Implementation borrowed from Scipy's sparsetools/csr.h
+  // method that uses O(n) temp storage
   int *mask = iwork + ncol_y+1;
 
-  int i,jj,kk;
+  int i, jj, kk;
   // Pass 1
   for (i=0; i<nrow_x; ++i) mask[i] = -1;
   iwork[0] = 0;

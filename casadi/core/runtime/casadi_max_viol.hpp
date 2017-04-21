@@ -1,3 +1,4 @@
+// NOLINT(legal/copyright)
 template<typename T1>
 T1 CASADI_PREFIX(max_viol)(int n, const T1* x, const T1* lb, const T1* ub) {
   T1 r = 0;

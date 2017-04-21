@@ -1,3 +1,4 @@
+// NOLINT(legal/copyright)
 template<typename T1>
 void CASADI_PREFIX(trans)(const T1* x, const int* sp_x, T1* y, const int* sp_y, int* tmp) {
   int ncol_x = sp_x[1];

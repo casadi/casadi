@@ -171,9 +171,9 @@ set(CASADI_INTERNAL
 )
 
 # Add the runtime sources to internal (installed separately)
-#foreach(FILE ${CASADI_RUNTIME_SRC})
-  #set(CASADI_INTERNAL ${CASADI_INTERNAL} runtime/${FILE})
-#endforeach()
+foreach(FILE ${CASADI_RUNTIME_SRC})
+  set(CASADI_INTERNAL ${CASADI_INTERNAL} runtime/${FILE})
+endforeach()
 
 #set_source_files_properties(${CASADI_RUNTIME_SRC} PROPERTIES GENERATED TRUE)
 casadi_library(casadi ${CASADI_PUBLIC} ${CASADI_INTERNAL})

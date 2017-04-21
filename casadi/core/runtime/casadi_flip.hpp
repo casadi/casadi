@@ -1,3 +1,4 @@
+// NOLINT(legal/copyright)
 inline
 int CASADI_PREFIX(flip)(int* corner, int ndim) {
   int i;

@@ -1,3 +1,4 @@
+// NOLINT(legal/copyright)
 template<typename T1>
 void CASADI_PREFIX(fill)(T1* x, int n, T1 alpha) {
   int i;

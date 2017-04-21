@@ -1,3 +1,4 @@
+// NOLINT(legal/copyright)
 template<typename T1>
 int CASADI_PREFIX(iamax)(int n, const T1* x, int inc_x) {
   T1 t;
