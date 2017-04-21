@@ -41736,11 +41736,6 @@ Const access the non-zero elements.
 
 %feature("docstring") casadi::SparseStorage::resize "[INTERNAL] ";
 
-%feature("docstring") casadi::SparseStorage::sparsityRef "[INTERNAL]
-Access the sparsity, make a copy if there are multiple references to it.
-
-";
-
 %feature("docstring") casadi::SparseStorage "[INTERNAL] C++ includes:
 sparse_storage.hpp ";
 

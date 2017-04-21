@@ -1513,9 +1513,6 @@
 %exception  casadi::SparseStorage< DataType >::sparsity() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::SparseStorage< DataType >::sparsityRef() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::Sqpmethod::alloc_memory() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }

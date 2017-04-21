@@ -58694,13 +58694,6 @@ int ncol) "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::SparseStorage< DataType >::sparsityRef() "
-
-[INTERNAL]  Access the sparsity, make a copy if there are multiple
-references to it.
-
-";
-
 %feature("docstring") casadi::SparseStorage "
 
 [INTERNAL] C++ includes: sparse_storage.hpp ";
