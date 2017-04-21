@@ -96,15 +96,8 @@ option(WITH_DEPRECATED_FEATURES "Compile with syntax that is scheduled to be dep
 option(WITH_EXTENDING_CASADI "Compile a demonstration that shows how a project that depends on CasADi can be implemented." OFF)
 option(WITH_LINT "Compile with support for linting (syntax checking)" ON)
 option(WITH_SPELL "Compile with support for spell-checking" ON)
-
-# static on windows, shared on linux/osx by default
-if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-  option(ENABLE_STATIC "Compile static libraries (.a on Linux)" ON)
-  option(ENABLE_SHARED "Compile shared libraries (.so on Linux)" OFF)
-else()
-  option(ENABLE_STATIC "Compile static libraries (.a on Linux)" OFF)
-  option(ENABLE_SHARED "Compile shared libraries (.so on Linux)" ON)
-endif()
+option(ENABLE_STATIC "Compile static libraries (.a on Linux)" OFF)
+option(ENABLE_SHARED "Compile shared libraries (.so on Linux)" ON)
 
 ############################################################
 ####################### Fortran ############################
