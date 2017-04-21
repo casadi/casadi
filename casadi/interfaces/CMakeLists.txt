@@ -70,7 +70,7 @@ if(BLOCKSQP_FOUND)
   add_subdirectory(blocksqp)
 endif()
 
-if(HPMPC_FOUND)
+if(WITH_HPMPC)
   add_subdirectory(hpmpc)
 endif()
 
