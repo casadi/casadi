@@ -30,7 +30,7 @@ if(WITH_IPOPT)
 endif()
 
 # basic snopt example
-if(SNOPT_FOUND)
+if(WITH_SNOPT)
   add_executable(snopt_nl snopt_nl.cpp)
   target_link_libraries(snopt_nl casadi)
 

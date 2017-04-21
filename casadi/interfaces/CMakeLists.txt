@@ -58,7 +58,7 @@ if(SQIC_FOUND)
   add_subdirectory(sqic)
 endif()
 
-if(SNOPT_FOUND OR WITH_SNOPT_FORCE_DUMMY)
+if(WITH_SNOPT)
   add_subdirectory(snopt)
 endif()
 
