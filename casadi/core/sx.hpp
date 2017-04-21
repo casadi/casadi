@@ -28,10 +28,7 @@
 /// \cond INTERNAL
 
 namespace casadi {
-  template<>
-  CASADI_EXPORT bool Matrix<SXElem>::__nonzero__() const;
-
-  // Specialize functions in GenericMatrix<SX> and SX
+  template<> CASADI_EXPORT bool Matrix<SXElem>::__nonzero__() const;
   template<> inline std::string matrixName<SXElem>() { return "SX"; }
   template<> SX GenericMatrix<SX>::sym(const std::string& name, const Sparsity& sp);
   template<> bool SX::is_regular() const;
@@ -101,6 +98,12 @@ namespace casadi {
   template<> std::vector<SX> SX::get_input(const Function& f);
   template<> std::vector<SX> SX::get_free(const Function& f);
 
+  // Templates instantiated in matrix.cpp
+#ifndef CASADI_MATRIX_CPP
+  extern template class Matrix<double>;
+  extern template class Matrix<int>;
+  extern template class Matrix<SXElem>;
+#endif // CASADI_MATRIX_CPP
 } // namespace casadi
 
 /// \endcond

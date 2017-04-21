@@ -22,6 +22,7 @@
  *
  */
 
+#define CASADI_MATRIX_CPP
 #include "sx_function.hpp"
 #include "sx_node.hpp"
 #include "linsol.hpp"
@@ -2536,13 +2537,6 @@ namespace casadi {
   CASADI_EXPORT Matrix<double> Matrix<double>::
   expm(const Matrix<double>& A);
 
-  // Instantiate templates
-  template class casadi_limits<double>;
-  template class casadi_limits<int>;
-  template class Matrix<double>;
-  template class Matrix<int>;
-  template class Matrix< SXElem >;
-
   bool CASADI_EXPORT is_slice(const IM& x, bool ind1) {
     return x.is_scalar() || (x.is_column() && x.is_dense() && is_slice(x.nonzeros(), ind1));
   }
@@ -3564,4 +3558,10 @@ namespace casadi {
     return f.free_sx();
   }
 
+  // Instantiate templates
+  template class casadi_limits<double>;
+  template class casadi_limits<int>;
+  template class Matrix<double>;
+  template class Matrix<int>;
+  template class Matrix< SXElem >;
 } // namespace casadi

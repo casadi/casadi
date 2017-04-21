@@ -1022,7 +1022,6 @@ namespace casadi {
     return ret;
   }
 
-
 } // namespace casadi
 
 #endif // CASADI_MATRIX_HPP
