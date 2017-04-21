@@ -16606,7 +16606,7 @@ Create an nrow-by-ncol symbolic primitive.
 
 Construct a symbolic primitive with given dimensions.
 
->  MatType casadi::GenericMatrix< MatType >::sym(const std::string &name, const Sparsity &sp)
+>  static MatType casadi::GenericMatrix< MatType >::sym(const std::string &name, const Sparsity &sp)
 ------------------------------------------------------------------------
 
 Create symbolic primitive with a given sparsity pattern.
@@ -16634,9 +16634,6 @@ with given sparsity.
 Create a vector of length r of vectors of length p with nrow-by-ncol
 symbolic primitives.
 
->  SX casadi::GenericMatrix< SX >::sym(const std::string &name, const Sparsity &sp)
-------------------------------------------------------------------------
-[INTERNAL] 
 ";
 
 %feature("docstring") friendwrap_project "

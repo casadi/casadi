@@ -23299,16 +23299,6 @@ symbolic primitives.
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< MX >::sym(const std::string
-&name, const Sparsity &sp) "
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< SX >::sym(const std::string
-&name, const Sparsity &sp) "
-
-[INTERNAL] ";
-
 %feature("docstring")  project(const MatType &A, const Sparsity &sp, bool
 intersect=false) "
 

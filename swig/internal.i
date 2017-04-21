@@ -829,9 +829,6 @@
 %exception  casadi::GenericExternal::n_mem() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::GenericMatrix< SX >::sym(const std::string &name, const Sparsity &sp) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::GenericTypeBase::getType() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
