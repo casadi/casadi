@@ -120,7 +120,7 @@ if(WITH_SUNDIALS AND WITH_CSPARSE)
   target_link_libraries(implicit_runge-kutta casadi)
 endif()
 
-if (QPOASES_FOUND)
+if (WITH_QPOASES)
   add_executable(chain_qp chain_qp.cpp)
   target_link_libraries(chain_qp casadi)
 

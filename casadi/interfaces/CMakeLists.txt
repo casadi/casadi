@@ -14,7 +14,7 @@ if(WITH_BONMIN)
   add_subdirectory(bonmin)
 endif()
 
-if(QPOASES_FOUND)
+if(WITH_QPOASES)
   add_subdirectory(qpoases)
 endif()
 

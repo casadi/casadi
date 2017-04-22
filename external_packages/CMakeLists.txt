@@ -23,7 +23,7 @@ if(WITH_BUILD_SUNDIALS)
   add_subdirectory(casadi-sundials)
 endif()
 
-if(QPOASES_FOUND)
+if(WITH_QPOASES)
   add_subdirectory(qpOASES)
 endif()
 

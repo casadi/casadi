@@ -35,7 +35,21 @@ if((PACKAGE_VERSION_FULL STREQUAL "") OR (NOT PACKAGE_VERSION MATCHES "\\+"))
   set(PACKAGE_VERSION_FULL "${PACKAGE_VERSION}")
 endif()
 
+# We use the FeatureSummary module to get a more readable CMake output
+include(FeatureSummary)
+if(NOT COMMAND add_feature_info)
+  function(add_feature_info _name _enabled _description)
+    message(STATUS "Detected: ${_name} ${_description}")
+  endfunction()
+  function(feature_summary)
+  endfunction()
+endif()
 
+# Find BLAS and LAPACK (optional but required by some plugins)
+find_package(BLAS)
+add_feature_info(blas-available BLAS_FOUND "Blas available on system")
+find_package(LAPACK)
+add_feature_info(lapack-available LAPACK_FOUND "LAPACK available on system")
 
 ##################################################################
 ########################## Options ###############################
@@ -56,7 +70,7 @@ option(WITH_SNOPT_FORCE_DUMMY "Compile the SNOPT interface against a dummy libra
 option(WITH_EIGEN3 "Use Eigen3 backend for matrix operations" OFF)
 option(WITH_BUILD_SUNDIALS "Compile the included source code for Sundials 2.6.1" ON)
 option(WITH_SUNDIALS "Compile the interface to Sundials" ON)
-option(WITH_QPOASES "Compile the interface to qpOASES (the source code for qpOASES is included)" ON)
+option(WITH_QPOASES "Compile the interface to qpOASES (the source code for qpOASES is included)" LAPACK_FOUND)
 option(WITH_NO_QPOASES_BANNER "Add -D__NO_COPYRIGHT__ to qpOASES definitions" OFF)
 option(WITH_BLOCKSQP "Compile the interface to blockSQP (the source code for blockSQP is included)" ON)
 option(WITH_BUILD_DSDP "Compile the the included source code for DSDP" ON)
@@ -144,16 +158,6 @@ endif()
 # find the macports python libs if they exist
 if(APPLE)
   set(CMAKE_LIBRARY_PATH /opt/local/lib ${CMAKE_LIBRARY_PATH})
-endif()
-
-# We use the FeatureSummary module to get a more readable CMake output
-include(FeatureSummary)
-if(NOT COMMAND add_feature_info)
-  function(add_feature_info _name _enabled _description)
-    message(STATUS "Detected: ${_name} ${_description}")
-  endfunction()
-  function(feature_summary)
-  endfunction()
 endif()
 
 ############################################################
@@ -381,16 +385,11 @@ include_directories(${CMAKE_BINARY_DIR})
 ########################### find packages ############################
 #######################################################################
 # Optional auxillary dependencies
-find_package(BLAS QUIET)
 find_package(HSL QUIET)
 add_feature_info(hsl-interface HSL_FOUND "Interface to HSL.")
 find_package(WSMP QUIET)
 find_package(METIS QUIET)
 find_package(LibXml2 QUIET)
-if(WITH_LAPACK)
-  find_package(LAPACK)
-endif()
-add_feature_info(lapack-interface LAPACK_FOUND "Interface to LAPACK.")
 
 #######################################################################
 ################# third-party libraries we can build ##################
@@ -511,15 +510,14 @@ endif()
 add_feature_info(ecos-interface ECOS_FOUND "Interface to the interior point SOCP solver ECOS.")
 
 # Use the included qpOASES
-if(WITH_QPOASES AND BLAS_FOUND AND LAPACK_FOUND)
+if(WITH_QPOASES)
   set(QPOASES_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_packages/qpOASES/include)
   set(QPOASES_LIBRARIES casadi_qpoases)
-  set(QPOASES_FOUND true)
 endif()
-add_feature_info(qpoases-interface QPOASES_FOUND "Interface to the active-set QP solver qpOASES.")
+add_feature_info(qpoases-interface WITH_QPOASES "Interface to the active-set QP solver qpOASES.")
 
 # Use the included blockSQP
-if(WITH_BLOCKSQP AND QPOASES_FOUND)
+if(WITH_BLOCKSQP AND WITH_QPOASES)
   set(BLOCKSQP_FOUND true)
 endif()
 add_feature_info(blocksqp-interface BLOCKSQP_FOUND "Interface to the NLP solver blockSQP.")
