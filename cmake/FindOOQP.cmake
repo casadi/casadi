@@ -1,14 +1,17 @@
 # TRY TO FIND THE INCLUDE DIRECTORY
-find_path(OOQP_INCLUDE_DIR 
+find_path(OOQP_INCLUDE_DIR
 QpGenData.h
 HINTS $ENV{OOQP}/include/ooqp /usr/local/include/ooqp/
 )
+
+find_package(HSL QUIET REQUIRED)
+find_package(BLAS QUIET REQUIRED)
 
 set(OOQP_LIBRARIES ${BLAS_LIBRARIES} ${HSL_LIBRARIES})
 
 if(OOQP_INCLUDE_DIR)
   set(OOQP_FOUND_INCLUDE TRUE)
-  set(OOQP_INCLUDE_DIRS 
+  set(OOQP_INCLUDE_DIRS
   ${OOQP_INCLUDE_DIR})
   message(STATUS "Found OOQP include dirs: ${OOQP_INCLUDE_DIRS}")
 else(OOQP_INCLUDE_DIR)
@@ -34,17 +37,15 @@ endforeach(LIB)
 
 # print OOQP_LIBRARIES
 if(OOQP_FOUND_LIBS)
-  message(STATUS "Found OOQP libraries: ${OOQP_LIBRARIES}")  
+  message(STATUS "Found OOQP libraries: ${OOQP_LIBRARIES}")
 elseif(OOQP_FOUND_INCLUDE AND OOQP_FOUND_LIBS)
-  message(STATUS "Cound not find OOQP libraries")  
+  message(STATUS "Cound not find OOQP libraries")
 endif(OOQP_FOUND_LIBS)
 
 # SUCCESS if BOTH THE LIBRARIES AND THE INCLUDE DIRECTORIES WERE FOUND
 if(OOQP_FOUND_INCLUDE AND OOQP_FOUND_LIBS)
   set(OOQP_FOUND TRUE)
-  message(STATUS "Found OOQP")  
+  message(STATUS "Found OOQP")
 elseif(OOQP_FOUND_INCLUDE AND OOQP_FOUND_LIBS)
-  message(STATUS "Cound not find OOQP")  
+  message(STATUS "Cound not find OOQP")
 endif(OOQP_FOUND_INCLUDE AND OOQP_FOUND_LIBS)
-
-

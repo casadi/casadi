@@ -42,7 +42,7 @@ if(WITH_HSL)
   add_subdirectory(hsl)
 endif()
 
-if(OOQP_FOUND)
+if(WITH_OOQP)
   add_subdirectory(ooqp)
 endif()
 
