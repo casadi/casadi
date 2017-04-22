@@ -383,14 +383,6 @@ include_directories(${CMAKE_BINARY_DIR})
 
 
 #######################################################################
-########################### find packages ############################
-#######################################################################
-# Optional auxillary dependencies
-find_package(WSMP QUIET)
-find_package(METIS QUIET)
-find_package(LibXml2 QUIET)
-
-#######################################################################
 ################# third-party libraries we can build ##################
 #######################################################################
 # sundials
@@ -597,12 +589,10 @@ if(Fortran_language_works AND WITH_SLICOT)
 endif()
 add_feature_info(slicot-interface SLICOT_FOUND "Interface to the controls library SLICOT.")
 
-
 if(WITH_WORHP)
   find_package(WORHP REQUIRED)
 endif()
 add_feature_info(worhp-interface WITH_WORHP "Interface to the NLP solver Worhp (requires gfortran, gomp).")
-
 
 if(WITH_PROFILING)
   find_library(RT rt)

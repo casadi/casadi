@@ -1,3 +1,7 @@
+find_package(WSMP QUIET)
+find_package(METIS QUIET)
+find_package(LibXml2 QUIET)
+
 # TRY TO FIND THE INCLUDE DIRECTORY
 find_file(WORHP_LICENSE_KEY
 worhp.lic

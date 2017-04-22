@@ -4,8 +4,9 @@ QpGenData.h
 HINTS $ENV{OOQP}/include/ooqp /usr/local/include/ooqp/
 )
 
-find_package(HSL QUIET REQUIRED)
-find_package(BLAS QUIET REQUIRED)
+# Dependent packages
+find_package(HSL QUIET)
+find_package(BLAS QUIET)
 
 set(OOQP_LIBRARIES ${BLAS_LIBRARIES} ${HSL_LIBRARIES})
 
