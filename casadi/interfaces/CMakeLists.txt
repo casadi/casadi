@@ -38,7 +38,7 @@ if(CLANG_FOUND)
   add_subdirectory(clang)
 endif()
 
-if(HSL_FOUND)
+if(WITH_HSL)
   add_subdirectory(hsl)
 endif()
 

@@ -63,6 +63,7 @@ option(WITH_EXAMPLES "Build examples" ON)
 option(WITH_OPENMP "Compile with parallelization support" OFF)
 option(WITH_OOQP "Enable OOQP interface" ON)
 option(WITH_SQIC "Enable SQIC interface" OFF)
+option(WITH_HSL "Enable HSL interface" OFF)
 option(WITH_SLICOT "Enable SLICOT interface" OFF)
 option(WITH_WORHP "Compile the WORHP interface" OFF)
 option(WITH_SNOPT "Compile the SNOPT interface if SNOPT libraries can be found" OFF)
@@ -385,8 +386,6 @@ include_directories(${CMAKE_BINARY_DIR})
 ########################### find packages ############################
 #######################################################################
 # Optional auxillary dependencies
-find_package(HSL QUIET)
-add_feature_info(hsl-interface HSL_FOUND "Interface to HSL.")
 find_package(WSMP QUIET)
 find_package(METIS QUIET)
 find_package(LibXml2 QUIET)
@@ -524,7 +523,7 @@ add_feature_info(blocksqp-interface BLOCKSQP_FOUND "Interface to the NLP solver 
 #######################################################################
 ############### third-party libraries we don't build ##################
 #######################################################################
-# enabling openmp support if requesed
+# enabling OpenMP support if requested
 if(WITH_OPENMP)
   find_package(OpenMP)
   if(OPENMP_FOUND)
@@ -573,7 +572,12 @@ if(WITH_SNOPT AND NOT WITH_SNOPT_FORCE_DUMMY)
   find_package(SNOPT REQUIRED)
 endif()
 
-if(WITH_OOQP AND BLAS_FOUND AND HSL_FOUND)
+if(WITH_HSL)
+  find_package(HSL REQUIRED)
+endif()
+add_feature_info(hsl-interface WITH_HSL "Interface to HSL.")
+
+if(WITH_OOQP AND BLAS_FOUND AND WITH_HSL)
   find_package(OOQP)
 endif()
 add_feature_info(ooqp-interface OOQP_FOUND "Interface to the QP solver OOQP (requires BLAS and HSL libraries).")
