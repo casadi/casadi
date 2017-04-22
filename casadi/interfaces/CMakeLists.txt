@@ -62,7 +62,7 @@ if(WITH_SNOPT)
   add_subdirectory(snopt)
 endif()
 
-if(TINYXML_FOUND)
+if(WITH_TINYXML)
   add_subdirectory(tinyxml)
 endif()
 

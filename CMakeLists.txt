@@ -466,13 +466,12 @@ if(WITH_TINYXML)
     # build the included tinyxml
     set(TINYXML_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_packages/tinyxml-2.6.2)
     set(TINYXML_LIBRARIES casadi_tinyxml)
-    set(TINYXML_FOUND ON)
   else()
     # try to find system tinyxml
-    find_package(TINYXML)
+    find_package(TINYXML REQUIRED)
   endif()
 endif()
-add_feature_info(tinyxml-interface TINYXML_FOUND "Interface to the XML parser TinyXML.")
+add_feature_info(tinyxml-interface WITH_TINYXML "Interface to the XML parser TinyXML.")
 
 # DSDP
 if(WITH_DSDP)

@@ -11,11 +11,11 @@ macro(casadi_external_library name)
   add_library(${name} STATIC ${ARGN})
 endmacro()
 
-if(WITH_BUILD_TINYXML)
+if(WITH_TINYXML AND WITH_BUILD_TINYXML)
   add_subdirectory(tinyxml-2.6.2)
 endif()
 
-if(WITH_BUILD_CSPARSE)
+if(WITH_CSPARSE AND WITH_BUILD_CSPARSE)
   add_subdirectory(CSparse)
 endif()
 
