@@ -66,7 +66,7 @@ if(WITH_TINYXML)
   add_subdirectory(tinyxml)
 endif()
 
-if(BLOCKSQP_FOUND)
+if(WITH_BLOCKSQP)
   add_subdirectory(blocksqp)
 endif()
 

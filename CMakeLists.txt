@@ -70,7 +70,7 @@ option(WITH_BUILD_SUNDIALS "Compile the included source code for Sundials 2.6.1"
 option(WITH_SUNDIALS "Compile the interface to Sundials" ON)
 option(WITH_QPOASES "Compile the interface to qpOASES (the source code for qpOASES is included)" LAPACK_FOUND)
 option(WITH_NO_QPOASES_BANNER "Add -D__NO_COPYRIGHT__ to qpOASES definitions" OFF)
-option(WITH_BLOCKSQP "Compile the interface to blockSQP (the source code for blockSQP is included)" ON)
+option(WITH_BLOCKSQP "Compile the interface to blockSQP (the source code for blockSQP is included)" LAPACK_FOUND)
 option(WITH_BUILD_DSDP "Compile the the included source code for DSDP" ON)
 option(WITH_DSDP "Compile the interface to DSDP" ON)
 option(WITH_HPMPC "Compile the interface to HPMPC" OFF)
@@ -486,10 +486,12 @@ endif()
 add_feature_info(qpoases-interface WITH_QPOASES "Interface to the active-set QP solver qpOASES.")
 
 # Use the included blockSQP
-if(WITH_BLOCKSQP AND WITH_QPOASES)
-  set(BLOCKSQP_FOUND true)
+if(WITH_BLOCKSQP)
+  if (NOT WITH_QPOASES)
+    message(FATAL_ERROR "WITH_BLOCKSQP requires WITH_QPOASES.")
+  endif()
 endif()
-add_feature_info(blocksqp-interface BLOCKSQP_FOUND "Interface to the NLP solver blockSQP.")
+add_feature_info(blocksqp-interface WITH_BLOCKSQP "Interface to the NLP solver blockSQP.")
 
 #######################################################################
 ############### third-party libraries we don't build ##################

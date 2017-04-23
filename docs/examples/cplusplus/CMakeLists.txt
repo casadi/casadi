@@ -128,7 +128,7 @@ if (WITH_QPOASES)
   target_link_libraries(lowlevel_qp casadi)
 endif()
 
-if(BLOCKSQP_FOUND)
+if(WITH_BLOCKSQP)
   add_executable(test_blocksqp test_blocksqp.cpp)
   target_link_libraries(test_blocksqp casadi)
 endif()
