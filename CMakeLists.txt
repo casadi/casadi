@@ -77,7 +77,6 @@ option(WITH_HPMPC "Compile the interface to HPMPC" OFF)
 option(WITH_BUILD_HPMPC "Compile the the included source code for HPMPC" ON)
 option(WITH_BLASFEO "Compile the interface to BLASFEO" OFF)
 option(WITH_BUILD_BLASFEO "Compile the the included source code for BLASFEO" ON)
-option(WITH_MOSEK "Compile the interface to MOSEK" OFF)
 option(WITH_ECOS "Compile the interface to ECOS" OFF)
 option(WITH_BUILD_CSPARSE "Compile the included source code for CSparse" ON)
 option(WITH_CSPARSE "Compile the interface to CSparse" ON)
@@ -473,13 +472,6 @@ if(WITH_DSDP)
   endif()
 endif()
 add_feature_info(dsdp-interface WITH_DSDP "Interface to the interior point SDP solver DSDP.")
-
-# MOSEK
-if(WITH_MOSEK)
-  # try to find system mosek
-  find_package(MOSEK)
-endif()
-add_feature_info(mosek-interface MOSEK_FOUND "Interface to the interior point SOCP solver MOSEK.")
 
 # CLANG
 if(WITH_CLANG)
