@@ -77,7 +77,6 @@ option(WITH_HPMPC "Compile the interface to HPMPC" OFF)
 option(WITH_BUILD_HPMPC "Compile the the included source code for HPMPC" ON)
 option(WITH_BLASFEO "Compile the interface to BLASFEO" OFF)
 option(WITH_BUILD_BLASFEO "Compile the the included source code for BLASFEO" ON)
-option(WITH_ECOS "Compile the interface to ECOS" OFF)
 option(WITH_BUILD_CSPARSE "Compile the included source code for CSparse" ON)
 option(WITH_CSPARSE "Compile the interface to CSparse" ON)
 option(WITH_GUROBI "Compile the interface to GUROBI" OFF)
@@ -479,13 +478,6 @@ if(WITH_CLANG)
   find_package(CLANG)
 endif()
 add_feature_info(clang-interface CLANG_FOUND "Interface to the Clang JIT compiler.")
-
-# ECOS
-if(WITH_ECOS)
-  # try to find system ecos
-  find_package(ECOS)
-endif()
-add_feature_info(ecos-interface ECOS_FOUND "Interface to the interior point SOCP solver ECOS.")
 
 # Use the included qpOASES
 if(WITH_QPOASES)
