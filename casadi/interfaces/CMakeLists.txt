@@ -74,7 +74,7 @@ if(WITH_HPMPC)
   add_subdirectory(hpmpc)
 endif()
 
-if(SLICOT_FOUND)
+if(WITH_SLICOT)
   add_subdirectory(slicot)
 endif()
 

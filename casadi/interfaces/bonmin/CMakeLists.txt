@@ -14,9 +14,7 @@ else()
   add_definitions(-DHAVE_CSTDDEF)
 endif()
 
-if(BONMIN_FOUND)
-  add_definitions(${BONMIN_CFLAGS_OTHER})
-endif()
+add_definitions(${BONMIN_CFLAGS_OTHER})
 
 casadi_plugin(Nlpsol bonmin ${NLPSOL_BONMIN_SRCS})
 casadi_plugin_link_libraries(Nlpsol bonmin ${BONMIN_LIBRARIES})
