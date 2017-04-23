@@ -474,9 +474,9 @@ add_feature_info(dsdp-interface WITH_DSDP "Interface to the interior point SDP s
 # CLANG
 if(WITH_CLANG)
   # try to find system CLANG
-  find_package(CLANG)
+  find_package(CLANG REQUIRED)
 endif()
-add_feature_info(clang-interface CLANG_FOUND "Interface to the Clang JIT compiler.")
+add_feature_info(clang-interface WITH_CLANG "Interface to the Clang JIT compiler.")
 
 # Use the included qpOASES
 if(WITH_QPOASES)

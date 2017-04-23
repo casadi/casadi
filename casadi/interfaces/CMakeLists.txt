@@ -34,7 +34,7 @@ if(WITH_CSPARSE)
   add_subdirectory(csparse)
 endif()
 
-if(CLANG_FOUND)
+if(WITH_CLANG)
   add_subdirectory(clang)
 endif()
 
