@@ -104,8 +104,8 @@ option(WITH_REFCOUNT_WARNINGS "Issue warnings upon reference counting failure" O
 option(WITH_SELFCONTAINED "Make the install directory self-contained" OFF)
 option(WITH_DEPRECATED_FEATURES "Compile with syntax that is scheduled to be deprecated" ON)
 option(WITH_EXTENDING_CASADI "Compile a demonstration that shows how a project that depends on CasADi can be implemented." OFF)
-option(WITH_LINT "Compile with support for linting (syntax checking)" ON)
-option(WITH_SPELL "Compile with support for spell-checking" ON)
+option(WITH_LINT "Compile with support for linting (syntax checking)" OFF)
+option(WITH_SPELL "Compile with support for spell-checking" OFF)
 option(ENABLE_STATIC "Compile static libraries (.a on Linux)" OFF)
 option(ENABLE_SHARED "Compile shared libraries (.so on Linux)" ON)
 
