@@ -2,7 +2,7 @@ if(WITH_LAPACK)
   add_subdirectory(lapack)
 endif()
 
-if(SUNDIALS_FOUND)
+if(WITH_SUNDIALS)
   add_subdirectory(sundials)
 endif()
 

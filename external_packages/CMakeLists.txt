@@ -19,7 +19,7 @@ if(WITH_CSPARSE AND WITH_BUILD_CSPARSE)
   add_subdirectory(CSparse)
 endif()
 
-if(WITH_BUILD_SUNDIALS)
+if(WITH_SUNDIALS AND WITH_BUILD_SUNDIALS)
   add_subdirectory(casadi-sundials)
 endif()
 

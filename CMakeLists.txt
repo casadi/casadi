@@ -386,11 +386,10 @@ if(WITH_SUNDIALS)
     # build the included sundials
     set(SUNDIALS_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_packages/casadi-sundials)
     set(SUNDIALS_LIBRARIES casadi_sundials)
-    set(SUNDIALS_FOUND ON)
   else()
     # try to find system sundials
     add_definitions(-DWITH_SYSTEM_SUNDIALS)
-    find_package(SUNDIALS)
+    find_package(SUNDIALS REQUIRED)
   endif()
 endif()
 add_feature_info(sundials-interface SUNDIALS_FOUND "Interface to the ODE/DAE integrator suite SUNDIALS.")
