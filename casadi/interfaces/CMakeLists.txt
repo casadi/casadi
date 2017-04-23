@@ -1,4 +1,4 @@
-if(LAPACK_FOUND)
+if(WITH_LAPACK)
   add_subdirectory(lapack)
 endif()
 

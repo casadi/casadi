@@ -45,11 +45,8 @@ if(NOT COMMAND add_feature_info)
   endfunction()
 endif()
 
-# Find BLAS and LAPACK (optional but required by some plugins)
-find_package(BLAS)
-add_feature_info(blas-available BLAS_FOUND "Blas available on system")
-find_package(LAPACK)
-add_feature_info(lapack-available LAPACK_FOUND "LAPACK available on system")
+# LAPACK quietly (for some default options)
+find_package(LAPACK QUIET)
 
 ##################################################################
 ########################## Options ###############################
@@ -90,7 +87,7 @@ option(WITH_BONMIN "Compile the interface to BONMIN" OFF)
 option(WITH_KNITRO "Compile the interface to KNITRO" OFF)
 option(WITH_CPLEX "Compile the interface to CPLEX" OFF)
 option(WITH_CLP "Compile the CLP interface" OFF)
-option(WITH_LAPACK "Compile the interface to LAPACK" ON)
+option(WITH_LAPACK "Compile the interface to LAPACK" LAPACK_FOUND)
 option(WITH_OPENCL "Compile with OpenCL support (experimental)" OFF)
 option(WITH_BUILD_TINYXML "Compile the included TinyXML source code" ON)
 option(WITH_TINYXML "Compile the interface to TinyXML" ON)
@@ -466,17 +463,16 @@ add_feature_info(tinyxml-interface WITH_TINYXML "Interface to the XML parser Tin
 
 # DSDP
 if(WITH_DSDP)
-  if(WITH_BUILD_DSDP AND BLAS_FOUND AND LAPACK_FOUND)
+  if(WITH_BUILD_DSDP)
     # build the included dsdp
     set(DSDP_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_packages/DSDP/include)
     set(DSDP_LIBRARIES casadi_dsdp)
-    set(DSDP_FOUND true)
   else()
     # try to find system dsdp
-    find_package(DSDP)
+    find_package(DSDP REQUIRED)
   endif()
 endif()
-add_feature_info(dsdp-interface DSDP_FOUND "Interface to the interior point SDP solver DSDP.")
+add_feature_info(dsdp-interface WITH_DSDP "Interface to the interior point SDP solver DSDP.")
 
 # MOSEK
 if(WITH_MOSEK)
@@ -533,7 +529,10 @@ if(WITH_OPENCL)
 endif()
 add_feature_info(opencl-support WITH_OPENCL "Enable just-in-time compiliation to CPUs and GPUs with OpenCL.")
 
-
+if(WITH_LAPACK)
+  find_package(LAPACK REQUIRED)
+endif()
+add_feature_info(lapack-interface WITH_LAPACK "Interface to LAPACK.")
 
 if(WITH_IPOPT)
   find_package(IPOPT REQUIRED)
@@ -572,7 +571,7 @@ add_feature_info(hsl-interface WITH_HSL "Interface to HSL.")
 if(WITH_OOQP)
   find_package(OOQP REQUIRED)
 endif()
-add_feature_info(ooqp-interface OOQP_FOUND "Interface to the QP solver OOQP (requires BLAS and HSL libraries).")
+add_feature_info(ooqp-interface WITH_OOQP "Interface to the QP solver OOQP (requires BLAS and HSL libraries).")
 
 if(WITH_GUROBI)
   find_package(GUROBI REQUIRED)
