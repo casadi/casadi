@@ -75,7 +75,8 @@ set(CASADI_INTERNAL
   casadi_file.cpp
   casadi_interrupt.cpp
   global_options.cpp
-  ${PROJECT_BINARY_DIR}/casadi_meta.cpp
+  ${PROJECT_BINARY_DIR}/casadi_meta.h
+  casadi_meta.cpp
   shared_object.cpp shared_object_internal.hpp shared_object_internal.cpp
   generic_type.cpp
   generic_type_internal.hpp

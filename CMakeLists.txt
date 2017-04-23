@@ -668,8 +668,8 @@ endforeach()
 
 # Pass meta information
 configure_file(
-  ${CMAKE_SOURCE_DIR}/casadi/core/casadi_meta.cpp.cmake
-  ${PROJECT_BINARY_DIR}/casadi_meta.cpp
+  ${CMAKE_SOURCE_DIR}/casadi/core/casadi_meta.h.cmake
+  ${PROJECT_BINARY_DIR}/casadi_meta.h
   ESCAPE_QUOTES
 )
 
