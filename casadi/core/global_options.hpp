@@ -29,7 +29,7 @@
 #include <iostream>
 #include <fstream>
 
-#include "casadi_common.hpp"
+#include "casadi_types.hpp"
 
 namespace casadi {
 

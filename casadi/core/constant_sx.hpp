@@ -41,7 +41,7 @@ namespace casadi {
   \author Joel Andersson
   \date 2010
 */
-class CASADI_EXPORT ConstantSX : public SXNode {
+class ConstantSX : public SXNode {
 public:
 
 // Destructor
@@ -79,7 +79,7 @@ protected:
   \author Joel Andersson
   \date 2010
 */
-class CASADI_EXPORT RealtypeSX : public ConstantSX {
+class RealtypeSX : public ConstantSX {
   private:
     /// Constructor is private, use "create" below
     explicit RealtypeSX(double value) : value(value) {}
@@ -135,7 +135,7 @@ class CASADI_EXPORT RealtypeSX : public ConstantSX {
   \author Joel Andersson
   \date 2010
 */
-class CASADI_EXPORT IntegerSX : public ConstantSX {
+class IntegerSX : public ConstantSX {
   private:
     /// Constructor is private, use "create" below
     explicit IntegerSX(int value) : value(value) {}
@@ -192,7 +192,7 @@ class CASADI_EXPORT IntegerSX : public ConstantSX {
   \author Joel Andersson
   \date 2010
 */
-class CASADI_EXPORT ZeroSX : public ConstantSX {
+class ZeroSX : public ConstantSX {
 public:
 
   virtual ~ZeroSX() {}
@@ -217,7 +217,7 @@ public:
   \author Joel Andersson
   \date 2010
 */
-class CASADI_EXPORT OneSX : public ConstantSX {
+class OneSX : public ConstantSX {
 public:
 
   explicit OneSX() {}
@@ -238,7 +238,7 @@ public:
   \author Joel Andersson
   \date 2010
 */
-class CASADI_EXPORT MinusOneSX : public ConstantSX {
+class MinusOneSX : public ConstantSX {
 public:
 
   explicit MinusOneSX() {}
@@ -263,7 +263,7 @@ public:
   \author Joel Andersson
   \date 2010
 */
-class CASADI_EXPORT InfSX : public ConstantSX {
+class InfSX : public ConstantSX {
 public:
 
   explicit InfSX() {}
@@ -282,7 +282,7 @@ public:
   \author Joel Andersson
   \date 2010
 */
-class CASADI_EXPORT MinusInfSX : public ConstantSX {
+class MinusInfSX : public ConstantSX {
 public:
 
   explicit MinusInfSX() {}
@@ -301,7 +301,7 @@ public:
   \author Joel Andersson
   \date 2010
 */
-class CASADI_EXPORT NanSX : public ConstantSX {
+class NanSX : public ConstantSX {
 public:
 
   explicit NanSX() {this->count++;}
