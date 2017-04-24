@@ -63,6 +63,7 @@ namespace casadi {
   class DaeBuilder;
   class XmlFile;
   class Importer;
+  class ParsedFile;
 
 #ifndef SWIG
 // Get GCC version if GCC is used

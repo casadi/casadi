@@ -9,7 +9,6 @@ set(CASADI_PUBLIC
   casadi_limits.hpp
   casadi_types.hpp
   casadi_logger.hpp
-  casadi_file.hpp
   casadi_interrupt.hpp
   exception.hpp
   calculus.hpp
@@ -72,7 +71,7 @@ set(CASADI_PUBLIC
 set(CASADI_INTERNAL
   # MISC
   casadi_logger.cpp
-  casadi_file.cpp
+  casadi_file.hpp casadi_file.cpp
   casadi_interrupt.cpp
   global_options.cpp
   ${PROJECT_BINARY_DIR}/casadi_meta.h

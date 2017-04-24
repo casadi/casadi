@@ -28,7 +28,6 @@
 #define CASADI_JIT_HPP
 
 #include "function.hpp"
-#include "casadi_file.hpp"
 
 namespace casadi {
 
@@ -41,7 +40,7 @@ namespace casadi {
    * type with the same API as 'double'.
    *
    * The final generated function will have a structure similar to:
-   * 
+   *
    * void fname(const real_t* arg, real_t* res) {
    *   <FUNCTION_BODY>
    * }
