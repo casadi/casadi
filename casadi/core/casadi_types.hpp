@@ -87,6 +87,9 @@ namespace casadi {
 // warinng C4251: Need a dll interface?
 #pragma warning(disable:4251)
 
+// warning C4715: Not all control paths return a value
+#pragma warning(disable:4715)
+
 // warning C4800: 'int' : forcing value to bool 'true'or 'false'(performance warning)
 #pragma warning(disable:4800)
 
