@@ -78,16 +78,24 @@ namespace casadi {
 // Disable some Visual studio warnings
 #ifdef _MSC_VER
 
-#pragma warning(disable:4996)
-
 // warning C4018: '<' : signed/unsigned mismatch
 #pragma warning(disable:4018)
+
+// warning C4244: Potential loss of data converting double to int
+#pragma warning(disable:4244)
+
+// warinng C4251: Need a dll interface?
+#pragma warning(disable:4251)
 
 // warning C4800: 'int' : forcing value to bool 'true'or 'false'(performance warning)
 #pragma warning(disable:4800)
 
-// warning C4244: Potential loss of data converting double to int
-#pragma warning(disable:4244)
+// warning C4910: __declspec(dllexport) and extern incompatible on an explicit instantiation
+#pragma warning(disable:4910)
+
+// ?
+#pragma warning(disable:4996)
+
 #endif // _MSC_VER
 
   // Workarond for MinGW bug
