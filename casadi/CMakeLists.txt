@@ -118,4 +118,7 @@ set(CASADI_PLUGINS ${CASADI_PLUGINS} PARENT_SCOPE)
 
 add_custom_target(libs ALL DEPENDS ${CASADI_MODULES})
 
-install(FILES casadi.hpp DESTINATION include/casadi)
+# Main header files
+configure_file(config.h.cmake "${CMAKE_CURRENT_BINARY_DIR}/config.h" ESCAPE_QUOTES)
+install(FILES casadi.hpp "${CMAKE_CURRENT_BINARY_DIR}/config.h"
+        DESTINATION include/casadi)

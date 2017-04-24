@@ -24,29 +24,29 @@
 
 
 #include "casadi_meta.hpp"
-#include <casadi_meta.h>
+#include <casadi/config.h>
 
 namespace casadi {
-  const char* CasadiMeta::version() { return casadi_version ;}
+  const char* CasadiMeta::version() { return CASADI_VERSION_STRING;}
 
-  const char* CasadiMeta::git_revision() { return casadi_git_revision ;}
+  const char* CasadiMeta::git_revision() { return CASADI_GIT_REVISION;}
 
-  const char* CasadiMeta::git_describe() { return casadi_git_describe ;}
+  const char* CasadiMeta::git_describe() { return CASADI_GIT_DESCRIBE;}
 
-  const char* CasadiMeta::feature_list() { return casadi_feature_list ;}
+  const char* CasadiMeta::feature_list() { return CASADI_FEATURE_LIST;}
 
-  const char* CasadiMeta::build_type() { return casadi_build_type ;}
+  const char* CasadiMeta::build_type() { return CASADI_BUILD_TYPE;}
 
-  const char* CasadiMeta::compiler_id() { return casadi_compiler_id ;}
+  const char* CasadiMeta::compiler_id() { return CASADI_COMPILER_ID;}
 
-  const char* CasadiMeta::compiler() { return casadi_compiler ;}
+  const char* CasadiMeta::compiler() { return CASADI_COMPILER;}
 
-  const char* CasadiMeta::compiler_flags() { return casadi_compiler_flags ;}
+  const char* CasadiMeta::compiler_flags() { return CASADI_COMPILER_FLAGS;}
 
-  const char* CasadiMeta::modules() { return casadi_modules ;}
+  const char* CasadiMeta::modules() { return CASADI_MODULES;}
 
-  const char* CasadiMeta::plugins() { return casadi_plugins ;}
+  const char* CasadiMeta::plugins() { return CASADI_PLUGINS;}
 
-  const char* CasadiMeta::install_prefix() { return casadi_install_prefix ;}
+  const char* CasadiMeta::install_prefix() { return CASADI_INSTALL_PREFIX;}
 
 }  // namespace casadi

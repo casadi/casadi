@@ -1,7 +1,17 @@
 cmake_minimum_required(VERSION 2.8.6)
 project(casadi C CXX)
+
+set(CASADI_MAJOR_VERSION 3)
+set(CASADI_MINOR_VERSION 1)
+set(CASADI_PATCH_VERSION 0)
+set(CASADI_IS_RELEASE 0)
+
+set(CASADI_VERSION ${CASADI_MAJOR_VERSION}.${CASADI_MINOR_VERSION}.${CASADI_PATCH_VERSION})
+if(NOT CASADI_IS_RELEASE)
+  set(CASADI_VERSION "${CASADI_VERSION}+")
+endif()
 set(PACKAGE_NAME "CasADi")
-set(PACKAGE_VERSION "3.1.0+")
+set(PACKAGE_VERSION ${CASADI_VERSION})
 set(PACKAGE_SO_VERSION "3.2")
 set(PACKAGE_DESCRIPTION "CasADi is a symbolic framework for automatic differentation and numeric optimization")
 set(PACKAGE_AUTHOR "Joel Andersson and Joris Gillis")
@@ -665,13 +675,6 @@ set(EXTRA_CXX_FLAGS_FROM_DEFS "")
 foreach(DEF ${compiler_definitions})
   set(EXTRA_CXX_FLAGS_FROM_DEFS "${EXTRA_CXX_FLAGS_FROM_DEFS} -D${DEF}")
 endforeach()
-
-# Pass meta information
-configure_file(
-  ${CMAKE_SOURCE_DIR}/casadi/core/casadi_meta.h.cmake
-  ${PROJECT_BINARY_DIR}/casadi_meta.h
-  ESCAPE_QUOTES
-)
 
 # what is this?
 if(EXTRA_CMAKE)

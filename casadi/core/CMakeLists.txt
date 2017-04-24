@@ -73,7 +73,7 @@ set(CASADI_INTERNAL
   casadi_file.hpp casadi_file.cpp
   casadi_interrupt.cpp
   global_options.cpp
-  ${PROJECT_BINARY_DIR}/casadi_meta.h
+  ${CMAKE_CURRENT_BINARY_DIR}/../config.h
   casadi_meta.cpp
   shared_object.cpp shared_object_internal.hpp shared_object_internal.cpp
   generic_type.cpp
@@ -174,7 +174,7 @@ foreach(FILE ${CASADI_RUNTIME_SRC})
   set(CASADI_INTERNAL ${CASADI_INTERNAL} runtime/${FILE})
 endforeach()
 
-#set_source_files_properties(${CASADI_RUNTIME_SRC} PROPERTIES GENERATED TRUE)
+# Build static and/or shared
 casadi_library(casadi ${CASADI_PUBLIC} ${CASADI_INTERNAL})
 
 if(WITH_DL)
