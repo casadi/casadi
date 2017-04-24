@@ -99,7 +99,7 @@ namespace casadi {
 #endif // _MSC_VER
 
   // Workarond for MinGW bug
-#if defined(__MINGW32__) || defined(__MINGW64__)
+#if defined(__MINGW32__) || defined(__MINGW64__) || defined(_MSC_VER)
   template<typename T>
   std::string to_string(const T& n) {
     std::stringstream s;
