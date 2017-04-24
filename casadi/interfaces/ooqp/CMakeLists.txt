@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION 2.8.6)
 
-include_directories(../)
 include_directories(${OOQP_INCLUDE_DIRS})
 
 casadi_plugin(Conic ooqp
