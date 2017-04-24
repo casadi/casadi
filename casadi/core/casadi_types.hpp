@@ -30,7 +30,6 @@
 #include <vector>
 #include <utility>
 
-#include "casadi_common.hpp"
 #include "casadi_logger.hpp"
 
 #ifdef SWIG
