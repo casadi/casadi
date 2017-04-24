@@ -36,7 +36,7 @@
 namespace casadi {
 
   template<typename DataType>
-  class CASADI_EXPORT SparseStorage {
+  class SparseStorage {
   public:
 
     /** \brief  constructors */
