@@ -59,7 +59,7 @@ namespace casadi {
   class Sparsity;
   class CodeGenerator;
   class NlpBuilder;
-  class Variable;
+  struct Variable;
   class DaeBuilder;
   class XmlFile;
   class Importer;
