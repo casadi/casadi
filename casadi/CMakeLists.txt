@@ -31,10 +31,6 @@ macro(casadi_library name)
   endif()
   generate_export_header(${name})
 
-  # Make sure the exported header is installed
-  file(RELATIVE_PATH RELPATH "${CMAKE_BINARY_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/${name}_export.h")
-  get_filename_component(RELPATH ${RELPATH} PATH)
-
   # Link with the core
   if(NOT "${name}" STREQUAL "casadi")
     target_link_libraries(${name} casadi)
