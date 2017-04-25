@@ -210,7 +210,7 @@ else()
   # (but later on when installing)
   set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
 
-  set(CMAKE_INSTALL_RPATH "${INSTALL_LIB_DIR};${INSTALL_LIB_DIR}/casadi")
+  set(CMAKE_INSTALL_RPATH "${INSTALL_LIB_DIR}")
 
   # add the automatically determined parts of the RPATH
   # which point to directories outside the build tree to the install RPATH
@@ -219,7 +219,7 @@ else()
   # the RPATH to be used when installing, but only if it's not a system directory
   list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${INSTALL_LIB_DIR}" isSystemDir)
   if("${isSystemDir}" STREQUAL "-1")
-    set(CMAKE_INSTALL_RPATH "${INSTALL_LIB_DIR};${INSTALL_LIB_DIR}/casadi")
+    set(CMAKE_INSTALL_RPATH "${INSTALL_LIB_DIR}")
   endif()
 endif()
 
