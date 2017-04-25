@@ -424,24 +424,22 @@ namespace casadi {
       Function nlp = oracle_;
       vector<MX> resv;
       vector<MX> argv = nlp.mx_in();
-      resv = nlp(argv);
 
       // build fesibility restoration phase nlp
-      MX p = MX::sym("p",nlp.size1_in(0));
-      MX s = MX::sym("s",nlp.size1_out(1));
+      MX p = MX::sym("p",nlp.size1_in("x"));
+      MX s = MX::sym("s",nlp.size1_out("g"));
       vector<MX> D;
-      for( int i=0; i<nlp.size1_in(0); ++i ) {
-  	D.push_back( fmin(1.0,1.0/abs(p.nz(i))) * (argv.at(0).nz(i) - p.nz(i)) );
+      for( int i=0; i<nlp.size1_in("x"); ++i ) {
+  	D.push_back( fmin(1.0,1.0/abs(p(i))) * (argv.at(0)(i) - p(i)) );
       }
       MX d = MX::vertcat(D);
       MX f_rp = 0.5 * rho_ * dot(s,s) + zeta_/2.0 * dot(d,d);
       MX g_rp = nlp(argv).at(1) - s;
 
-      MXDict nlp_rp = {{"x", MX::vertcat({MX::vertcat(argv),s})},
-	               {"p", p},
+      MXDict nlp_rp = {{"x", MX::vertcat({argv.at(0),s})},
+	               {"p", MX::vertcat({argv.at(1),p})},
                        {"f", f_rp},
                        {"g", g_rp}};
-
 
       // Set options for the SQP method for the restoration problem
       Dict solver_options;
@@ -1446,8 +1444,10 @@ namespace casadi {
         in_x0.push_back( 0.0 );
     }
     
-    // Set parameter p to current iterate xk
-    vector<double> in_p(m->xk,m->xk+nx_);
+    // Add current iterate xk to parameter p
+    vector<double> in_p(m->p,m->p+np_);
+    vector<double> in_p2(m->xk,m->xk+nx_);
+    in_p.insert(in_p.end(), in_p2.begin(), in_p2.end());
 
     // Set bounds for variables
     vector<double> in_lbx(m->lbx,m->lbx+nx_);
