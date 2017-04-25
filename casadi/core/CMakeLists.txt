@@ -192,6 +192,6 @@ if(RT)
   target_link_libraries(casadi ${RT})
 endif()
 
-install(FILES ${CASADI_PUBLIC} ${PROJECT_BINARY_DIR}/casadi_export.h
+install(FILES ${CASADI_PUBLIC} ${CMAKE_CURRENT_BINARY_DIR}/casadi_export.h
   DESTINATION include/casadi/core
 )
