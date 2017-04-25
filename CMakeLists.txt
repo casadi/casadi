@@ -18,7 +18,6 @@ set(PACKAGE_AUTHOR "Joel Andersson and Joris Gillis")
 set(PACKAGE_MAINTAINER "Joel Andersson and Joris Gillis")
 set(PACKAGE_URL "http://casadi.org")
 
-
 #############################################################
 ########################## Version ##########################
 #############################################################
@@ -156,6 +155,33 @@ endif()
 if(POLICY CMP0054)
   cmake_policy(SET CMP0054 NEW)
 endif()
+
+############################################################
+################# Installation location ####################
+############################################################
+if(WIN32 AND NOT CYGWIN)
+  set(DEF_LIB .)
+  set(DEF_BIN .)
+  set(DEF_INSTALL_CMAKE_DIR cmake)
+else()
+  set(DEF_LIB lib)
+  set(DEF_BIN bin)
+  set(DEF_INSTALL_CMAKE_DIR lib/cmake/casadi)
+endif()
+set(INSTALL_LIB_DIR ${DEF_LIB} CACHE PATH "Installation directory for libraries")
+set(INSTALL_BIN_DIR ${DEF_BIN} CACHE PATH "Installation directory for executables")
+set(INSTALL_INCLUDE_DIR include CACHE PATH "Installation directory for header files")
+set(INSTALL_CMAKE_DIR ${DEF_INSTALL_CMAKE_DIR} CACHE PATH "Installation directory for CMake files")
+
+# Make relative paths absolute (needed later on)
+foreach(p LIB BIN INCLUDE CMAKE)
+  set(var INSTALL_${p}_DIR)
+  if(NOT IS_ABSOLUTE "${${var}}")
+    set(${var} "${CMAKE_INSTALL_PREFIX}/${${var}}")
+  endif()
+endforeach()
+
+
 
 
 ############################################################
