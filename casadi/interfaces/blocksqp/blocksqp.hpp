@@ -351,6 +351,7 @@ namespace casadi {
     int max_it_qp_;  // Maximum number of QP iterations per SQP iteration
     int max_iter_; // Maximum number of SQP steps
     bool warmstart_; // Use warmstarting
+    bool qp_init_;
     bool block_hess_;  // Blockwise Hessian approximation?
     int hess_scaling_;// Scaling strategy for Hessian approximation
     int fallback_scaling_;  // If indefinite update is used, the type of fallback strategy

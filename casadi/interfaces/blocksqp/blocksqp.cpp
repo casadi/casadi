@@ -104,6 +104,9 @@ namespace casadi {
       {"warmstart",
        {OT_BOOL,
         "Use warmstarting"}},
+      {"qp_init",
+       {OT_BOOL,
+        "Use warmstarting"}},
       {"max_it_qp",
        {OT_INT,
         "Maximum number of QP iterations per SQP iteration"}},
@@ -286,6 +289,7 @@ namespace casadi {
     kappa_w_minus_ = 0.333;
     kappa_w_plus_ = 8.0;
     kappabar_w_plus_ = 100.0;
+    qp_init_ = true;
 
     // Read user options
     for (auto&& op : opts) {
@@ -323,6 +327,8 @@ namespace casadi {
         max_iter_ = op.second;
       } else if (op.first=="warmstart") {
         warmstart_ = op.second;
+      } else if (op.first=="qp_init") {
+        qp_init_ = op.second;
       } else if (op.first=="max_it_qp") {
         max_it_qp_ = op.second;
       } else if (op.first=="block_hess") {
@@ -574,6 +580,8 @@ namespace casadi {
     if (schur_) {
       m->qpoases_mem = new QpoasesMemory(linsol_);
     }
+
+    m->qp = 0;
   }
 
   void Blocksqp::set_work(void* mem, const double**& arg, double**& res,
@@ -672,21 +680,28 @@ namespace casadi {
     reset_sqp(m);
 
     // Free existing memory, if any
-    if (m->qp) delete m->qp;
-    m->qp = 0;
-    if (schur_) {
-      m->qp = new qpOASES::SQProblemSchur(nx_, ng_, qpOASES::HST_UNKNOWN, 50,
-                                          m->qpoases_mem,
-                                          QpoasesInterface::qpoases_init,
-                                          QpoasesInterface::qpoases_sfact,
-                                          QpoasesInterface::qpoases_nfact,
-                                          QpoasesInterface::qpoases_solve);
-    } else {
-      m->qp = new qpOASES::SQProblem(nx_, ng_);
+    if (qp_init_) {
+      if (m->qp) delete m->qp;
+      m->qp = 0;
+    }
+    if (!m->qp) {
+      if (schur_) {
+        m->qp = new qpOASES::SQProblemSchur(nx_, ng_, qpOASES::HST_UNKNOWN, 50,
+                                            m->qpoases_mem,
+                                            QpoasesInterface::qpoases_init,
+                                            QpoasesInterface::qpoases_sfact,
+                                            QpoasesInterface::qpoases_nfact,
+                                            QpoasesInterface::qpoases_solve);
+      } else {
+        m->qp = new qpOASES::SQProblem(nx_, ng_);
+      }
     }
 
     // Print header and information about the algorithmic parameters
     if (print_header_) printInfo(m);
+
+    // Statistics
+    for (auto&& s : m->fstats) s.second.reset();
 
     // Open output files
     initStats(m);
@@ -2437,12 +2452,7 @@ namespace casadi {
                 m->qp->getStatus() == qpOASES::QPS_SOLVED) {
                 ret = m->qp->hotstart(m->H, g, m->A, lb, lu, lbA, luA, maxIt, &cpuTime);
               } else {
-                if (warmstart_) {
-                  ret = m->qp->init(m->H, g, m->A, lb, lu, lbA, luA, maxIt, &cpuTime,
-                    deltaXi, lambdaQP);
-                } else {
-                  ret = m->qp->init(m->H, g, m->A, lb, lu, lbA, luA, maxIt, &cpuTime);
-                }
+                ret = m->qp->init(m->H, g, m->A, lb, lu, lbA, luA, maxIt, &cpuTime);
               }
           } else {
             // Second order correction: H and A do not change
