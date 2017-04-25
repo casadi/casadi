@@ -216,8 +216,6 @@ if(WITH_SELFCONTAINED)
     set(CMAKE_INSTALL_RPATH "$ORIGIN")
   endif()
 else()
-  set(CMAKE_INSTALL_RPATH "${LIB_PREFIX}")
-
   # add the automatically determined parts of the RPATH
   # which point to directories outside the build tree to the install RPATH
   set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
