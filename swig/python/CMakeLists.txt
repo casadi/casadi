@@ -78,13 +78,6 @@ if(NOT ${CASADI_PYTHON_LIBRARY_SUFFIX})
 endif()
 set(CASADI_PYTHON_LIBRARY ${SWIG_MODULE_casadi_REAL_NAME}${CASADI_PYTHON_LIBRARY_SUFFIX})
 
-# Workaround bug in cmake 2.8.3 and lower. See #704.
-add_custom_command(
-  TARGET python
-  COMMAND ${CMAKE_COMMAND}
-  ARGS -E touch ${PROJECT_BINARY_DIR}/_casadi_python_dummy_target
-)
-
 if(NOT DEFINED PYTHON_PREFIX)
   if(PYTHONINTERP_FOUND)
     #determining the installation path for python libraries
