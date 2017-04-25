@@ -2548,6 +2548,7 @@ class MXtests(casadiTestCase):
         else:
           self.assertTrue(c.nnz()>0)
 
+  @requiresPlugin(Linsol,"lapackqr")
   def test_solve(self):
     N = 3
     nrhs = 50
