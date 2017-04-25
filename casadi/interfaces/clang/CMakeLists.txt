@@ -58,15 +58,5 @@ endif()
 file(COPY ${SYSTEM_FILE} ${CSYSTEM_FILE} ${CXXSYSTEM_FILE}
      DESTINATION ${LIBRARY_OUTPUT_PATH}/casadi/jit)
 
-if(WITH_SELFCONTAINED)
-if (WITH_MATLAB OR WITH_OCTAVE)
 install(DIRECTORY ${LIBRARY_OUTPUT_PATH}/casadi/jit
-        DESTINATION ${CMAKE_INSTALL_PREFIX}/casadi)
-else()
-install(DIRECTORY ${LIBRARY_OUTPUT_PATH}/casadi/jit
-        DESTINATION ${CMAKE_INSTALL_PREFIX}/casadi/casadi)
-endif()
-else()
-install(DIRECTORY ${LIBRARY_OUTPUT_PATH}/casadi/jit
-        DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/casadi)
-endif()
+        DESTINATION ${LIB_PREFIX}/casadi)
