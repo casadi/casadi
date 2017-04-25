@@ -35,29 +35,12 @@ macro(casadi_library name)
     target_link_libraries(${name} casadi)
   endif()
 
-  if(WITH_SELFCONTAINED)
-    if (WITH_PYTHON)
-      install(TARGETS ${name}
-        LIBRARY DESTINATION casadi
-        ARCHIVE DESTINATION casadi
-        RUNTIME DESTINATION casadi
-      )
-    endif()
-    if (WITH_MATLAB OR WITH_OCTAVE)
-      install(TARGETS ${name}
-        LIBRARY DESTINATION .
-        ARCHIVE DESTINATION .
-        RUNTIME DESTINATION .
-      )
-    endif()
-  else()
-    install(TARGETS ${name}
-      LIBRARY DESTINATION ${LIB_PREFIX}
-      ARCHIVE DESTINATION ${LIB_PREFIX}
-      RUNTIME DESTINATION ${BIN_PREFIX}
-    )
-    SET_TARGET_PROPERTIES(${name} PROPERTIES SOVERSION ${PACKAGE_SO_VERSION})
-  endif()
+  install(TARGETS ${name}
+    LIBRARY DESTINATION ${LIB_PREFIX}
+    ARCHIVE DESTINATION ${LIB_PREFIX}
+    RUNTIME DESTINATION ${BIN_PREFIX}
+  )
+  SET_TARGET_PROPERTIES(${name} PROPERTIES SOVERSION ${PACKAGE_SO_VERSION})
 
   if(WITH_LINT)
     add_style_check_target(${name} "${ARGN}")

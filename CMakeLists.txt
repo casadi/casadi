@@ -159,8 +159,8 @@ endif()
 ############################################################
 ################# Installation location ####################
 ############################################################
-# Flat hierarchy by default for Windows, else non-flat
-if(WIN32 AND NOT CYGWIN)
+# Flat hierarchy if self-contained and on Windows
+if(WITH_SELFCONTAINED OR (WIN32 AND NOT CYGWIN))
   set(DEF_LIB_PREFIX casadi)
   set(DEF_BIN_PREFIX casadi)
   set(DEF_CMAKE_PREFIX cmake)
