@@ -159,24 +159,37 @@ endif()
 ############################################################
 ################# Installation location ####################
 ############################################################
+# Flat hierarchy by default for Windows, else non-flat
 if(WIN32 AND NOT CYGWIN)
-  set(DEF_LIB)
-  set(DEF_BIN)
-  set(DEF_INSTALL_CMAKE_DIR cmake)
+  set(DEF_LIB_PREFIX casadi)
+  set(DEF_BIN_PREFIX casadi)
+  set(DEF_CMAKE_PREFIX cmake)
+  set(DEF_PYTHON_PREFIX) # Note: Files installed in a casadi subdirectory
+  set(DEF_OCTAVE_PREFIX casadi)
+  set(DEF_MATLAB_PREFIX casadi)
 else()
-  set(DEF_LIB lib)
-  set(DEF_BIN bin)
-  set(DEF_INSTALL_CMAKE_DIR lib/cmake/casadi)
+  set(DEF_LIB_PREFIX lib)
+  set(DEF_BIN_PREFIX bin)
+  set(DEF_CMAKE_PREFIX lib/cmake/casadi)
+  set(DEF_PYTHON_PREFIX python)
+  set(DEF_OCTAVE_PREFIX octave)
+  set(DEF_MATLAB_PREFIX matlab)
 endif()
-set(INSTALL_LIB_DIR ${DEF_LIB} CACHE PATH "Installation directory for libraries")
-set(INSTALL_BIN_DIR ${DEF_BIN} CACHE PATH "Installation directory for executables")
-set(INSTALL_INCLUDE_DIR include CACHE PATH "Installation directory for header files")
-set(INSTALL_CMAKE_DIR ${DEF_INSTALL_CMAKE_DIR} CACHE PATH "Installation directory for CMake files")
+set(DEF_INCLUDE_PREFIX include)
+
+# Installation directories are cache entries that can be modified
+set(LIB_PREFIX ${DEF_LIB_PREFIX} CACHE PATH "Installation directory for libraries")
+set(BIN_PREFIX ${DEF_BIN_PREFIX} CACHE PATH "Installation directory for executables")
+set(INCLUDE_PREFIX ${DEF_INCLUDE_PREFIX} CACHE PATH "Installation directory for header files")
+set(CMAKE_PREFIX ${DEF_CMAKE_PREFIX} CACHE PATH "Installation directory for CMake files")
+set(PYTHON_PREFIX ${DEF_PYTHON_PREFIX} CACHE PATH "Installation directory for Python files")
+set(OCTAVE_PREFIX ${DEF_OCTAVE_PREFIX} CACHE PATH "Installation directory for Octave files")
+set(MATLAB_PREFIX ${DEF_MATLAB_PREFIX} CACHE PATH "Installation directory for MATLAB files")
 
 # Make relative paths absolute (needed later on)
-foreach(p LIB BIN INCLUDE CMAKE)
-  set(var INSTALL_${p}_DIR)
-  if(${${var}})
+foreach(p LIB BIN INCLUDE CMAKE PYTHON OCTAVE MATLAB)
+  set(var ${p}_PREFIX)
+  if(${var})
     if(NOT IS_ABSOLUTE "${${var}}")
       # Turn relative path into absolute
       set(${var} "${CMAKE_INSTALL_PREFIX}/${${var}}")
@@ -186,9 +199,6 @@ foreach(p LIB BIN INCLUDE CMAKE)
     set(${var} "${CMAKE_INSTALL_PREFIX}")
   endif()
 endforeach()
-
-
-
 
 ############################################################
 ####################### macports python ####################
@@ -216,16 +226,16 @@ else()
   # (but later on when installing)
   set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
 
-  set(CMAKE_INSTALL_RPATH "${INSTALL_LIB_DIR}")
+  set(CMAKE_INSTALL_RPATH "${LIB_PREFIX}")
 
   # add the automatically determined parts of the RPATH
   # which point to directories outside the build tree to the install RPATH
   set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
   # the RPATH to be used when installing, but only if it's not a system directory
-  list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${INSTALL_LIB_DIR}" isSystemDir)
+  list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${LIB_PREFIX}" isSystemDir)
   if("${isSystemDir}" STREQUAL "-1")
-    set(CMAKE_INSTALL_RPATH "${INSTALL_LIB_DIR}")
+    set(CMAKE_INSTALL_RPATH "${LIB_PREFIX}")
   endif()
 endif()
 

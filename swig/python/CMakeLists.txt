@@ -78,38 +78,6 @@ if(NOT ${CASADI_PYTHON_LIBRARY_SUFFIX})
 endif()
 set(CASADI_PYTHON_LIBRARY ${SWIG_MODULE_casadi_REAL_NAME}${CASADI_PYTHON_LIBRARY_SUFFIX})
 
-if(NOT DEFINED PYTHON_PREFIX)
-  if(PYTHONINTERP_FOUND)
-    #determining the installation path for python libraries
-    execute_process(COMMAND "${PYTHON_EXECUTABLE}"
-      "${CMAKE_CURRENT_SOURCE_DIR}/find_installation_path.py"
-      OUTPUT_VARIABLE PYTHON_INSTALLATION_PATH
-      RESULT_VARIABLE PYTHON_INSTALLATION_PATH_RESULT
-      ERROR_VARIABLE PYTHON_INSTALLATION_PATH_ERROR)
-  endif()
-  if(NOT "${PYTHON_INSTALLATION_PATH_RESULT}" STREQUAL "0")
-message(FATAL_ERROR "Something went wrong detecting your python setup...
-${PROJECT_BINARY_DIR} \$ ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/find_installation_path.py
-Returned the following error messages:
-${PYTHON_INSTALLATION_PATH_ERROR}
-You may try to fix this problem, or supply PYTHON_PREFIX manually.
-
-e.g.
-\$ cmake -DPYTHON_PREFIX=\"/usr/lib/python2.7/dist-packages\" ..
-
-The idea is to supply a directory that python knows about (included in PYTHONPATH).
-
-")
-  else()
-    # Replace backslashes with normal slashes
-    if(MSYS)
-      string(REGEX REPLACE "\\\\" "/" PYTHON_INSTALLATION_PATH ${PYTHON_INSTALLATION_PATH})
-    endif()
-
-    set(PYTHON_PREFIX  ${PYTHON_INSTALLATION_PATH} CACHE PATH "Python installation prefix")
-  endif()
-endif()
-
 # Custom installation command for Python
 add_custom_target(install_python
 COMMAND ${CMAKE_COMMAND}
