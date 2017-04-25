@@ -160,8 +160,8 @@ endif()
 ################# Installation location ####################
 ############################################################
 if(WIN32 AND NOT CYGWIN)
-  set(DEF_LIB .)
-  set(DEF_BIN .)
+  set(DEF_LIB)
+  set(DEF_BIN)
   set(DEF_INSTALL_CMAKE_DIR cmake)
 else()
   set(DEF_LIB lib)
@@ -176,8 +176,14 @@ set(INSTALL_CMAKE_DIR ${DEF_INSTALL_CMAKE_DIR} CACHE PATH "Installation director
 # Make relative paths absolute (needed later on)
 foreach(p LIB BIN INCLUDE CMAKE)
   set(var INSTALL_${p}_DIR)
-  if(NOT IS_ABSOLUTE "${${var}}")
-    set(${var} "${CMAKE_INSTALL_PREFIX}/${${var}}")
+  if(${${var}})
+    if(NOT IS_ABSOLUTE "${${var}}")
+      # Turn relative path into absolute
+      set(${var} "${CMAKE_INSTALL_PREFIX}/${${var}}")
+    endif()
+  else()
+    # Flat installation hierarchy
+    set(${var} "${CMAKE_INSTALL_PREFIX}")
   endif()
 endforeach()
 
