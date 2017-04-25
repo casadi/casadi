@@ -117,16 +117,6 @@ The idea is to supply a directory that python knows about (included in PYTHONPAT
   endif()
 endif()
 
-# NOTE(@jaeandersson): What is this?
-install(DIRECTORY ${PROJECT_BINARY_DIR}/python/casadi
-  DESTINATION "${PYTHON_PREFIX}"
-  COMPONENT install_python
-  USE_SOURCE_PERMISSIONS
-  PATTERN .pyc EXCLUDE
-  PATTERN .svn EXCLUDE
-  PATTERN .py EXCLUDE
-)
-
 # Custom installation command for Python
 add_custom_target(install_python
 COMMAND ${CMAKE_COMMAND}
