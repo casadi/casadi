@@ -696,3 +696,36 @@ endforeach()
 if(EXTRA_CMAKE)
   include(${EXTRA_CMAKE})
 endif()
+
+########################################################
+########### Generate config files ######################
+########################################################
+# Add all targets to the build-tree export set
+export(TARGETS casadi
+  FILE "${PROJECT_BINARY_DIR}/casadi-targets.cmake")
+
+# Export the package for use from the build-tree
+# (this registers the build-tree with a global CMake-registry)
+export(PACKAGE CasADi)
+
+# Create the casadi-config.cmake and casadi-config-version.cmake files
+file(RELATIVE_PATH REL_INCLUDE_PREFIX "${CMAKE_PREFIX}" "${INCLUDE_PREFIX}")
+# ... for the build tree
+set(CONF_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}" "${PROJECT_BINARY_DIR}")
+configure_file(casadi-config.cmake.in "${PROJECT_BINARY_DIR}/casadi-config.cmake" @ONLY)
+# ... for the install tree
+set(CONF_INCLUDE_DIRS "\${CASADI_CMAKE_DIR}/${REL_INCLUDE_PREFIX}")
+configure_file(casadi-config.cmake.in
+  "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/casadi-config.cmake" @ONLY)
+# ... for both
+configure_file(casadi-config-version.cmake.in
+  "${PROJECT_BINARY_DIR}/casadi-config-version.cmake" @ONLY)
+
+# Install the casadi-config.cmake and casadi-config-version.cmake
+install(FILES
+  "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/casadi-config.cmake"
+  "${PROJECT_BINARY_DIR}/casadi-config-version.cmake"
+  DESTINATION "${CMAKE_PREFIX}" COMPONENT dev)
+
+# Install the export set for use with the install-tree
+install(EXPORT casadi-targets DESTINATION "${CMAKE_PREFIX}" COMPONENT dev)
