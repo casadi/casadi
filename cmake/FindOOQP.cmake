@@ -24,9 +24,9 @@ if(OOQP_INCLUDE_DIR)
   set(OOQP_INCLUDE_DIRS
   ${OOQP_INCLUDE_DIR})
   message(STATUS "Found OOQP include dirs: ${OOQP_INCLUDE_DIRS}")
-else(OOQP_INCLUDE_DIR)
+else()
   message(STATUS "Could not find OOQP include dir")
-endif(OOQP_INCLUDE_DIR)
+endif()
 
 # TRY TO FIND THE LIBRARIES
 set(OOQP_LIBS_LIST
@@ -40,22 +40,22 @@ foreach(LIB ${OOQP_LIBS_LIST})
     HINTS /usr/local/libs/)
   if(OOQP_LIB_${LIB})
     set(OOQP_LIBRARIES ${OOQP_LIBRARIES} ${OOQP_LIB_${LIB}})
-  else(OOQP_LIB_${LIB})
+  else()
     set(OOQP_FOUND_LIBS FALSE)
-  endif(OOQP_LIB_${LIB})
-endforeach(LIB)
+  endif()
+endforeach()
 
 # print OOQP_LIBRARIES
 if(OOQP_FOUND_LIBS)
   message(STATUS "Found OOQP libraries: ${OOQP_LIBRARIES}")
-elseif(OOQP_FOUND_INCLUDE AND OOQP_FOUND_LIBS)
+elseif()
   message(STATUS "Cound not find OOQP libraries")
-endif(OOQP_FOUND_LIBS)
+endif()
 
 # SUCCESS if BOTH THE LIBRARIES AND THE INCLUDE DIRECTORIES WERE FOUND
 if(OOQP_FOUND_INCLUDE AND OOQP_FOUND_LIBS AND BLAS_FOUND AND HSL_FOUND)
   set(OOQP_FOUND TRUE)
   message(STATUS "Found OOQP")
-elseif(OOQP_FOUND_INCLUDE AND OOQP_FOUND_LIBS)
+elseif()
   message(STATUS "Cound not find OOQP")
-endif(OOQP_FOUND_INCLUDE AND OOQP_FOUND_LIBS)
+endif()
