@@ -23,20 +23,17 @@ set(PACKAGE_URL "http://casadi.org")
 #############################################################
 # For systems with git installed, find out revsion and description.
 execute_process(COMMAND git rev-parse HEAD
-OUTPUT_VARIABLE git_revision
-OUTPUT_STRIP_TRAILING_WHITESPACE
-ERROR_QUIET
+  OUTPUT_VARIABLE git_revision
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+  ERROR_QUIET
 )
-
 execute_process(COMMAND git describe --first-parent HEAD
-OUTPUT_VARIABLE git_describe
-OUTPUT_STRIP_TRAILING_WHITESPACE
-ERROR_QUIET
+  OUTPUT_VARIABLE git_describe
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+  ERROR_QUIET
 )
-
 string(REPLACE "+-" "+" git_describe "${git_describe}")
 string(REPLACE "-g" "." git_describe "${git_describe}")
-
 set(PACKAGE_VERSION_FULL "${git_describe}")
 
 # overwrite version numbers for official release
@@ -54,74 +51,14 @@ if(NOT COMMAND add_feature_info)
   endfunction()
 endif()
 
-# LAPACK quietly (for some default options)
-find_package(LAPACK QUIET)
+# Default build type is Release
+if(NOT DEFINED CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release)
+endif()
 
-##################################################################
-########################## Options ###############################
-##################################################################
-option(WITH_EXTRA_WARNINGS "Add extra warnings (like -Wall -Wextra)" OFF)
-option(WITH_WERROR "Add -Werror" OFF)
-option(WITH_DL "Enable dynamic loading of functions" ON)
-option(WITH_DOC "Enable documentation generation" OFF)
-option(ENABLE_EXPORT_ALL "Export all symbols to a shared library" OFF)
-option(WITH_EXAMPLES "Build examples" ON)
-option(WITH_OPENMP "Compile with parallelization support" OFF)
-option(WITH_OOQP "Enable OOQP interface" OFF)
-option(WITH_SQIC "Enable SQIC interface" OFF)
-option(WITH_HSL "Enable HSL interface" OFF)
-option(WITH_SLICOT "Enable SLICOT interface" OFF)
-option(WITH_WORHP "Compile the WORHP interface" OFF)
-option(WITH_SNOPT "Compile the SNOPT interface if SNOPT libraries can be found" OFF)
-option(WITH_SNOPT_FORCE_DUMMY "Compile the SNOPT interface against a dummy library (for Debian distribution; breaks normal SNOPT build)" OFF)
-option(WITH_EIGEN3 "Use Eigen3 backend for matrix operations" OFF)
-option(WITH_BUILD_SUNDIALS "Compile the included source code for Sundials 2.6.1" ON)
-option(WITH_SUNDIALS "Compile the interface to Sundials" ON)
-option(WITH_QPOASES "Compile the interface to qpOASES (the source code for qpOASES is included)" ${LAPACK_FOUND})
-option(WITH_NO_QPOASES_BANNER "Add -D__NO_COPYRIGHT__ to qpOASES definitions" OFF)
-option(WITH_BLOCKSQP "Compile the interface to blockSQP (the source code for blockSQP is included)" ${LAPACK_FOUND})
-option(WITH_BUILD_DSDP "Compile the the included source code for DSDP" OFF)
-option(WITH_DSDP "Compile the interface to DSDP" OFF)
-option(WITH_HPMPC "Compile the interface to HPMPC" OFF)
-option(WITH_BUILD_HPMPC "Compile the the included source code for HPMPC" ON)
-option(WITH_BLASFEO "Compile the interface to BLASFEO" OFF)
-option(WITH_BUILD_BLASFEO "Compile the the included source code for BLASFEO" ON)
-option(WITH_BUILD_CSPARSE "Compile the included source code for CSparse" ON)
-option(WITH_CSPARSE "Compile the interface to CSparse" ON)
-option(WITH_GUROBI "Compile the interface to GUROBI" OFF)
-option(WITH_IPOPT "Compile the interface to IPOPT" OFF)
-option(WITH_BONMIN "Compile the interface to BONMIN" OFF)
-option(WITH_KNITRO "Compile the interface to KNITRO" OFF)
-option(WITH_CPLEX "Compile the interface to CPLEX" OFF)
-option(WITH_CLP "Compile the CLP interface" OFF)
-option(WITH_LAPACK "Compile the interface to LAPACK" ${LAPACK_FOUND})
-option(WITH_OPENCL "Compile with OpenCL support (experimental)" OFF)
-option(WITH_BUILD_TINYXML "Compile the included TinyXML source code" ON)
-option(WITH_TINYXML "Compile the interface to TinyXML" ON)
-option(WITH_COVERAGE "Create coverage report" OFF)
-option(OLD_LLVM "Use pre-3.5 LLVM" OFF)
-option(WITH_CLANG "Compile the interface to clang JIT" OFF)
-option(WITH_PYTHON "Compile the Python front-end" OFF)
-option(WITH_MATLAB "Compile the MATLAB front-end" OFF)
-option(WITH_OCTAVE "Compile the Octave front-end (experimental)" OFF)
-option(WITH_OCTAVE_IMPORT "Export import.m routine for octave" OFF)
-option(WITH_PYTHON3 "Use Python 3.*" OFF)
-option(WITH_JSON "Compile the JSON front-end" OFF)
-option(WITH_DEBIAN_BUILD "Add -DWITH_DEBIAN_BUILD (used for debian-specific warnings)" OFF)
-option(WITH_DEEPBIND "Load plugins with RTLD_DEEPBIND (can be used to resolve conflicting libraries in e.g. MATLAB)" ON)
-option(WITH_REFCOUNT_WARNINGS "Issue warnings upon reference counting failure" OFF)
-option(WITH_SELFCONTAINED "Make the install directory self-contained" OFF)
-option(WITH_DEPRECATED_FEATURES "Compile with syntax that is scheduled to be deprecated" ON)
-option(WITH_EXTENDING_CASADI "Compile a demonstration that shows how a project that depends on CasADi can be implemented." OFF)
-option(WITH_LINT "Compile with support for linting (syntax checking)" OFF)
-option(WITH_SPELL "Compile with support for spell-checking" OFF)
-option(ENABLE_STATIC "Compile static libraries (.a on Linux)" OFF)
-option(ENABLE_SHARED "Compile shared libraries (.so on Linux)" ON)
-
-############################################################
-####################### Fortran ############################
-############################################################
-# begin workaround for
+########################################################################
+############################# Fortran ##################################
+########################################################################
 # http://public.kitware.com/Bug/print_bug_page.php?bug_id=9220
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 include(language_support)
@@ -129,112 +66,6 @@ workaround_9220(Fortran Fortran_language_works)
 if(Fortran_language_works)
   enable_language(Fortran OPTIONAL)
 endif()
-#end workaround
-
-############################################################
-####################### Policies ###########################
-############################################################
-# Enforce cmake2.4+ style behaviour for
-# mixed filename/full path linker directives
-cmake_policy(SET CMP0003 NEW)
-
-# cmake_policy propagation rules
-if(POLICY CMP0011)
-cmake_policy(SET CMP0011 OLD)
-endif()
-
-# cmake_policy avoid escaping in add_definitions
-cmake_policy(SET CMP0005 OLD)
-
-# cmake_policy use MACOSX_RPATH=ON by default
-if(POLICY CMP0042)
-  cmake_policy(SET CMP0042 NEW)
-endif()
-
-# cmake_policy how to interpret string arguments
-if(POLICY CMP0054)
-  cmake_policy(SET CMP0054 NEW)
-endif()
-
-############################################################
-################# Installation location ####################
-############################################################
-# Flat hierarchy if self-contained and on Windows
-if(WITH_SELFCONTAINED OR (WIN32 AND NOT CYGWIN))
-  set(DEF_LIB_PREFIX casadi)
-  set(DEF_BIN_PREFIX casadi)
-  set(DEF_CMAKE_PREFIX cmake)
-  set(DEF_PYTHON_PREFIX) # Note: Files installed in a casadi subdirectory
-  set(DEF_MATLAB_PREFIX casadi)
-else()
-  set(DEF_LIB_PREFIX lib)
-  set(DEF_BIN_PREFIX bin)
-  set(DEF_CMAKE_PREFIX lib/cmake/casadi)
-  set(DEF_PYTHON_PREFIX python)
-  set(DEF_MATLAB_PREFIX matlab)
-endif()
-set(DEF_INCLUDE_PREFIX include)
-
-# Installation directories are cache entries that can be modified
-set(LIB_PREFIX ${DEF_LIB_PREFIX} CACHE PATH "Installation directory for libraries")
-set(BIN_PREFIX ${DEF_BIN_PREFIX} CACHE PATH "Installation directory for executables")
-set(INCLUDE_PREFIX ${DEF_INCLUDE_PREFIX} CACHE PATH "Installation directory for header files")
-set(CMAKE_PREFIX ${DEF_CMAKE_PREFIX} CACHE PATH "Installation directory for CMake files")
-set(PYTHON_PREFIX ${DEF_PYTHON_PREFIX} CACHE PATH "Installation directory for Python files")
-set(MATLAB_PREFIX ${DEF_MATLAB_PREFIX} CACHE PATH "Installation directory for MATLAB/Octave files")
-
-# Make relative paths absolute (needed later on)
-foreach(p LIB BIN INCLUDE CMAKE PYTHON MATLAB)
-  set(var ${p}_PREFIX)
-  if(${var})
-    if(NOT IS_ABSOLUTE "${${var}}")
-      # Turn relative path into absolute
-      set(${var} "${CMAKE_INSTALL_PREFIX}/${${var}}")
-    endif()
-  else()
-    # Flat installation hierarchy
-    set(${var} "${CMAKE_INSTALL_PREFIX}")
-  endif()
-endforeach()
-
-############################################################
-####################### macports python ####################
-############################################################
-# find the macports python libs if they exist
-if(APPLE)
-  set(CMAKE_LIBRARY_PATH /opt/local/lib ${CMAKE_LIBRARY_PATH})
-endif()
-
-############################################################
-######################## rpath #############################
-############################################################
-
-if(WITH_SELFCONTAINED)
-  if(APPLE)
-    set(CMAKE_INSTALL_RPATH "@loader_path/")
-  else()
-    set(CMAKE_INSTALL_RPATH "$ORIGIN")
-  endif()
-else()
-  # add the automatically determined parts of the RPATH
-  # which point to directories outside the build tree to the install RPATH
-  set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-
-  # the RPATH to be used when installing, but only if it's not a system directory
-  list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${LIB_PREFIX}" isSystemDir)
-  if("${isSystemDir}" STREQUAL "-1")
-    set(CMAKE_INSTALL_RPATH "${LIB_PREFIX}")
-  endif()
-endif()
-
-
-# For code optimization
-if(CMAKE_BUILD_TYPE)
-else()
-  set(CMAKE_BUILD_TYPE Release)
-  #set(CMAKE_BUILD_TYPE Debug)
-endif()
-string(TOUPPER ${CMAKE_BUILD_TYPE} UPPER_CMAKE_BUILD_TYPE)
 
 ########################################################################
 ############################# C++11 ####################################
@@ -319,10 +150,146 @@ if(NOT WIN32)
   endif()
 endif()
 
+############################################################
+####################### Policies ###########################
+############################################################
+# Enforce cmake2.4+ style behaviour for
+# mixed filename/full path linker directives
+cmake_policy(SET CMP0003 NEW)
+
+# cmake_policy propagation rules
+if(POLICY CMP0011)
+cmake_policy(SET CMP0011 OLD)
+endif()
+
+# cmake_policy avoid escaping in add_definitions
+cmake_policy(SET CMP0005 OLD)
+
+# cmake_policy use MACOSX_RPATH=ON by default
+if(POLICY CMP0042)
+  cmake_policy(SET CMP0042 NEW)
+endif()
+
+# cmake_policy how to interpret string arguments
+if(POLICY CMP0054)
+  cmake_policy(SET CMP0054 NEW)
+endif()
+
+############################################################
+####################### macports python ####################
+############################################################
+# find the macports python libs if they exist
+if(APPLE)
+  set(CMAKE_LIBRARY_PATH /opt/local/lib ${CMAKE_LIBRARY_PATH})
+endif()
+
+############################################################
+################# Misc options #############################
+############################################################
+option(ENABLE_EXPORT_ALL "Export all symbols to a shared library" OFF)
+option(ENABLE_STATIC "Compile static libraries (.a on Linux)" OFF)
+option(ENABLE_SHARED "Compile shared libraries (.so on Linux)" ON)
+
+# enabling OpenMP support if requested
+option(WITH_OPENMP "Compile with parallelization support" OFF)
+if(WITH_OPENMP)
+  find_package(OpenMP)
+  if(OPENMP_FOUND)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -DWITH_OPENMP")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS} -DWITH_OPENMP")
+  endif()
+endif()
+
+# OpenCL
+option(WITH_OPENCL "Compile with OpenCL support (experimental)" OFF)
+if(WITH_OPENCL)
+  # Core depends on OpenCL for GPU calculations
+  find_package(OpenCL REQUIRED)
+  add_definitions(-DWITH_OPENCL)
+  include_directories(${OPENCL_INCLUDE_DIRS})
+endif()
+add_feature_info(opencl-support WITH_OPENCL "Enable just-in-time compiliation to CPUs and GPUs with OpenCL.")
+
+# Enable: RTLD_DEEPBIND
+option(WITH_DEEPBIND "Load plugins with RTLD_DEEPBIND (can be used to resolve conflicting libraries in e.g. MATLAB)" ON)
+if(WITH_DEEPBIND)
+  add_definitions(-DWITH_DEEPBIND)
+endif()
+
+# Suppress warnings for refcounting failures (at program closure)
+option(WITH_REFCOUNT_WARNINGS "Issue warnings upon reference counting failure" OFF)
+if(WITH_REFCOUNT_WARNINGS)
+  add_definitions(-DWITH_REFCOUNT_WARNINGS)
+endif()
+
+############################################################
+################# Installation location ####################
+############################################################
+# Flat hierarchy if self-contained and on Windows
+option(WITH_SELFCONTAINED "Make the install directory self-contained" OFF)
+if(WITH_SELFCONTAINED OR (WIN32 AND NOT CYGWIN))
+  set(DEF_LIB_PREFIX casadi)
+  set(DEF_BIN_PREFIX casadi)
+  set(DEF_CMAKE_PREFIX cmake)
+  set(DEF_PYTHON_PREFIX) # Note: Files installed in a casadi subdirectory
+  set(DEF_MATLAB_PREFIX casadi)
+else()
+  set(DEF_LIB_PREFIX lib)
+  set(DEF_BIN_PREFIX bin)
+  set(DEF_CMAKE_PREFIX lib/cmake/casadi)
+  set(DEF_PYTHON_PREFIX python)
+  set(DEF_MATLAB_PREFIX matlab)
+endif()
+set(DEF_INCLUDE_PREFIX include)
+
+# Installation directories are cache entries that can be modified
+set(LIB_PREFIX ${DEF_LIB_PREFIX} CACHE PATH "Installation directory for libraries")
+set(BIN_PREFIX ${DEF_BIN_PREFIX} CACHE PATH "Installation directory for executables")
+set(INCLUDE_PREFIX ${DEF_INCLUDE_PREFIX} CACHE PATH "Installation directory for header files")
+set(CMAKE_PREFIX ${DEF_CMAKE_PREFIX} CACHE PATH "Installation directory for CMake files")
+set(PYTHON_PREFIX ${DEF_PYTHON_PREFIX} CACHE PATH "Installation directory for Python files")
+set(MATLAB_PREFIX ${DEF_MATLAB_PREFIX} CACHE PATH "Installation directory for MATLAB/Octave files")
+
+# Make relative paths absolute (needed later on)
+foreach(p LIB BIN INCLUDE CMAKE PYTHON MATLAB)
+  set(var ${p}_PREFIX)
+  if(${var})
+    if(NOT IS_ABSOLUTE "${${var}}")
+      # Turn relative path into absolute
+      set(${var} "${CMAKE_INSTALL_PREFIX}/${${var}}")
+    endif()
+  else()
+    # Flat installation hierarchy
+    set(${var} "${CMAKE_INSTALL_PREFIX}")
+  endif()
+endforeach()
+
+# Set rpath
+if(WITH_SELFCONTAINED)
+  if(APPLE)
+    set(CMAKE_INSTALL_RPATH "@loader_path/")
+  else()
+    set(CMAKE_INSTALL_RPATH "$ORIGIN")
+  endif()
+else()
+  # add the automatically determined parts of the RPATH
+  # which point to directories outside the build tree to the install RPATH
+  set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+
+  # the RPATH to be used when installing, but only if it's not a system directory
+  list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${LIB_PREFIX}" isSystemDir)
+  if("${isSystemDir}" STREQUAL "-1")
+    set(CMAKE_INSTALL_RPATH "${LIB_PREFIX}")
+  endif()
+endif()
+
+
 ################################################################################
 ############################### compiler warnings ##############################
 ################################################################################
 # add compiler warnings
+option(WITH_EXTRA_WARNINGS "Add extra warnings (like -Wall -Wextra)" OFF)
+option(WITH_WERROR "Add -Werror" OFF)
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
   if(WITH_EXTRA_WARNINGS)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-unused-parameter -Wno-sign-compare")
@@ -373,6 +340,7 @@ endif()
 #######################################################################
 ########################### code coverage #############################
 #######################################################################
+option(WITH_COVERAGE "Create coverage report" OFF)
 if(WITH_COVERAGE)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -fprofile-arcs -ftest-coverage")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fprofile-arcs -ftest-coverage")
@@ -396,19 +364,15 @@ add_definitions(-DCASADI_VERSION=31)
 add_definitions(-D_USE_MATH_DEFINES)
 add_definitions(-D_SCL_SECURE_NO_WARNINGS)
 
+# Dynamic loading (needed for loading plugins and external functions)
+option(WITH_DL "Enable dynamic loading of functions" ON)
 if(WITH_DL)
   add_definitions(-DWITH_DL)
 endif()
 add_feature_info(dynamic-loading WITH_DL "Compile with support for dynamic loading of generated functions (needed for ExternalFunction)")
 
-if(WITH_PRINTME)
-  add_definitions(-DWITH_PRINTME)
-endif()
-
-if(WITH_DEBIAN_BUILD)
-  add_definitions(-DWITH_DEBIAN_BUILD)
-endif()
-
+# Include support for deprecated features (to be removed in the next release)
+option(WITH_DEPRECATED_FEATURES "Compile with syntax that is scheduled to be deprecated" ON)
 if (WITH_DEPRECATED_FEATURES)
   add_definitions(-DWITH_DEPRECATED_FEATURES)
 endif()
@@ -416,11 +380,12 @@ endif()
 include_directories(.)
 include_directories(${CMAKE_BINARY_DIR})
 
-
 #######################################################################
-################# third-party libraries we can build ##################
+################# 3rd party interface #################################
 #######################################################################
-# sundials
+# Sundials: Solve initial-value problems in ODE and DAE
+option(WITH_BUILD_SUNDIALS "Compile the included source code for Sundials 2.6.1" ON)
+option(WITH_SUNDIALS "Compile the interface to Sundials" ON)
 if(WITH_SUNDIALS)
   if(WITH_BUILD_SUNDIALS)
     # build the included sundials
@@ -434,7 +399,9 @@ if(WITH_SUNDIALS)
 endif()
 add_feature_info(sundials-interface WITH_SUNDIALS "Interface to the ODE/DAE integrator suite SUNDIALS.")
 
-# CSparse
+# CSparse: A sparse direct linear solver (included in the source)
+option(WITH_BUILD_CSPARSE "Compile the included source code for CSparse" ON)
+option(WITH_CSPARSE "Compile the interface to CSparse" ON)
 if(WITH_CSPARSE)
   if(WITH_BUILD_CSPARSE)
     # build the included csparse
@@ -448,6 +415,8 @@ endif()
 add_feature_info(csparse-interface WITH_CSPARSE "Interface to the sparse direct linear solver CSparse.")
 
 # BLASFEO
+option(WITH_BLASFEO "Compile the interface to BLASFEO" OFF)
+option(WITH_BUILD_BLASFEO "Compile the the included source code for BLASFEO" ON)
 if(WITH_BLASFEO)
   if(WITH_BUILD_BLASFEO)
     if(EXISTS ${CMAKE_SOURCE_DIR}/external_packages/blasfeo/src/include)
@@ -465,6 +434,8 @@ endif()
 add_feature_info(blasfeo-interface WITH_BLASFEO "Interface to blasfeo.")
 
 # HPMPC
+option(WITH_HPMPC "Compile the interface to HPMPC" OFF)
+option(WITH_BUILD_HPMPC "Compile the the included source code for HPMPC" ON)
 if(WITH_HPMPC)
   if(NOT WITH_BLASFEO)
     message(FATAL_ERROR "WITH_HPMPC requires WITH_BLASFEO")
@@ -485,7 +456,9 @@ if(WITH_HPMPC)
 endif()
 add_feature_info(hpmpc-interface WITH_HPMPC "Interface to hpmpc.")
 
-# TinyXML
+# TinyXML: An XML reader, needed e.g. by the Modelica interface
+option(WITH_BUILD_TINYXML "Compile the included TinyXML source code" ON)
+option(WITH_TINYXML "Compile the interface to TinyXML" ON)
 if(WITH_TINYXML)
   if(WITH_BUILD_TINYXML)
     # build the included tinyxml
@@ -499,6 +472,8 @@ endif()
 add_feature_info(tinyxml-interface WITH_TINYXML "Interface to the XML parser TinyXML.")
 
 # DSDP
+option(WITH_BUILD_DSDP "Compile the the included source code for DSDP" OFF)
+option(WITH_DSDP "Compile the interface to DSDP" OFF)
 if(WITH_DSDP)
   if(WITH_BUILD_DSDP)
     # build the included dsdp
@@ -511,21 +486,34 @@ if(WITH_DSDP)
 endif()
 add_feature_info(dsdp-interface WITH_DSDP "Interface to the interior point SDP solver DSDP.")
 
-# CLANG
+# CLANG: A just-in-time compiler
+option(OLD_LLVM "Use pre-3.5 LLVM" OFF)
+option(WITH_CLANG "Compile the interface to clang JIT" OFF)
 if(WITH_CLANG)
   # try to find system CLANG
   find_package(CLANG REQUIRED)
 endif()
 add_feature_info(clang-interface WITH_CLANG "Interface to the Clang JIT compiler.")
 
-# Use the included qpOASES
+# Lapack: Dense linear solvers
+find_package(LAPACK QUIET)
+option(WITH_LAPACK "Compile the interface to LAPACK" ${LAPACK_FOUND})
+if(WITH_LAPACK)
+  find_package(LAPACK REQUIRED)
+endif()
+add_feature_info(lapack-interface WITH_LAPACK "Interface to LAPACK.")
+
+# qpOASES: An active-set QP solver
+option(WITH_QPOASES "Compile the interface to qpOASES (the source code for qpOASES is included)" ${LAPACK_FOUND})
+option(WITH_NO_QPOASES_BANNER "Add -D__NO_COPYRIGHT__ to qpOASES definitions" OFF)
 if(WITH_QPOASES)
   set(QPOASES_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_packages/qpOASES/include)
   set(QPOASES_LIBRARIES casadi_qpoases)
 endif()
 add_feature_info(qpoases-interface WITH_QPOASES "Interface to the active-set QP solver qpOASES.")
 
-# Use the included blockSQP
+# blockSQP: A block-structure-exploiting SQP method
+option(WITH_BLOCKSQP "Compile the interface to blockSQP (the source code for blockSQP is included)" ${LAPACK_FOUND})
 if(WITH_BLOCKSQP)
   if (NOT WITH_QPOASES)
     message(FATAL_ERROR "WITH_BLOCKSQP requires WITH_QPOASES.")
@@ -533,76 +521,71 @@ if(WITH_BLOCKSQP)
 endif()
 add_feature_info(blocksqp-interface WITH_BLOCKSQP "Interface to the NLP solver blockSQP.")
 
-#######################################################################
-############### third-party libraries we don't build ##################
-#######################################################################
-# enabling OpenMP support if requested
-if(WITH_OPENMP)
-  find_package(OpenMP)
-  if(OPENMP_FOUND)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -DWITH_OPENMP")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS} -DWITH_OPENMP")
-  endif()
-endif()
-
-# OpenCL
-if(WITH_OPENCL)
-  # Core depends on OpenCL for GPU calculations
-  find_package(OpenCL REQUIRED)
-  add_definitions(-DWITH_OPENCL)
-  include_directories(${OPENCL_INCLUDE_DIRS})
-endif()
-add_feature_info(opencl-support WITH_OPENCL "Enable just-in-time compiliation to CPUs and GPUs with OpenCL.")
-
-if(WITH_LAPACK)
-  find_package(LAPACK REQUIRED)
-endif()
-add_feature_info(lapack-interface WITH_LAPACK "Interface to LAPACK.")
-
+# IPOPT: A sparse interior point NLP solver with filter line-search
+option(WITH_IPOPT "Compile the interface to IPOPT" OFF)
 if(WITH_IPOPT)
   find_package(IPOPT REQUIRED)
 endif()
 add_feature_info(ipopt-interface WITH_IPOPT "Interface to the NLP solver Ipopt.")
 
+# Bonmin: An MINLP solver
+option(WITH_BONMIN "Compile the interface to BONMIN" OFF)
 if(WITH_BONMIN)
   find_package(BONMIN REQUIRED)
 endif()
 add_feature_info(bonmin-interface WITH_BONMIN "Interface to the MINLP framework Bonmin.")
 
+# Knitro: An NLP solver
+option(WITH_KNITRO "Compile the interface to KNITRO" OFF)
 if(WITH_KNITRO)
   find_package(KNITRO REQUIRED)
 endif()
 add_feature_info(knitro-interface WITH_KNITRO "Interface to the NLP solver KNITRO.")
 
+# CPLEX: A sparse mixed-integer QP solver
+option(WITH_CPLEX "Compile the interface to CPLEX" OFF)
 if(WITH_CPLEX)
   find_package(CPLEX REQUIRED)
 endif()
 add_feature_info(cplex-interface WITH_CPLEX "Interface to the QP solver CPLEX.")
 
+# CLP: A sparse linear solver
+option(WITH_CLP "Compile the CLP interface" OFF)
 if(WITH_CLP)
   find_package(CLP REQUIRED)
 endif()
 add_feature_info(clp-interface WITH_CLP "Interface to the LP solver CLP.")
 
+# SNOPT: An SQP method
+option(WITH_SNOPT "Compile the SNOPT interface if SNOPT libraries can be found" OFF)
+option(WITH_SNOPT_FORCE_DUMMY "Compile the SNOPT interface against a dummy library (for Debian distribution; breaks normal SNOPT build)" OFF)
 if(WITH_SNOPT AND NOT WITH_SNOPT_FORCE_DUMMY)
   find_package(SNOPT REQUIRED)
 endif()
 
+# HSL: Sparse direct linear solvers
+option(WITH_HSL "Enable HSL interface" OFF)
 if(WITH_HSL)
   find_package(HSL REQUIRED)
 endif()
 add_feature_info(hsl-interface WITH_HSL "Interface to HSL.")
 
+# OOQP: A sparse interior point QP solver
+option(WITH_OOQP "Enable OOQP interface" OFF)
 if(WITH_OOQP)
   find_package(OOQP REQUIRED)
 endif()
 add_feature_info(ooqp-interface WITH_OOQP "Interface to the QP solver OOQP (requires BLAS and HSL libraries).")
 
+# GUROBI: A sparse mixed-integer QP solver
+option(WITH_GUROBI "Compile the interface to GUROBI" OFF)
 if(WITH_GUROBI)
   find_package(GUROBI REQUIRED)
 endif()
 add_feature_info(gurobi-interface WITH_GUROBI "Interface to the (mixed-integer) QP solver GUROBI")
 
+# SQIC: A QP solver
+option(WITH_SQIC "Enable SQIC interface" OFF)
 if(WITH_SQIC)
   if (NOT Fortran_language_works)
     message(FATAL_ERROR "SQIC requires Fortran support.")
@@ -611,6 +594,8 @@ if(WITH_SQIC)
 endif()
 add_feature_info(sqic-interface WITH_SQIC "Interface to the QP solver SQIC.")
 
+# @jgillis: What it this for?
+option(WITH_SLICOT "Enable SLICOT interface" OFF)
 if(WITH_SLICOT)
   if (NOT Fortran_language_works)
     message(FATAL_ERROR "SLICOT requires Fortran support.")
@@ -619,23 +604,12 @@ if(WITH_SLICOT)
 endif()
 add_feature_info(slicot-interface WITH_SLICOT "Interface to the controls library SLICOT.")
 
+# Worhp: A sparse SQP method
+option(WITH_WORHP "Compile the WORHP interface" OFF)
 if(WITH_WORHP)
   find_package(WORHP REQUIRED)
 endif()
 add_feature_info(worhp-interface WITH_WORHP "Interface to the NLP solver Worhp (requires gfortran, gomp).")
-
-if(WITH_PROFILING)
-  find_library(RT rt)
-  add_definitions(-DWITH_PROFILING)
-endif()
-
-if(WITH_DEEPBIND)
-  add_definitions(-DWITH_DEEPBIND)
-endif()
-
-if(WITH_REFCOUNT_WARNINGS)
-  add_definitions(-DWITH_REFCOUNT_WARNINGS)
-endif()
 
 ######################################################
 ##################### paths ##########################
@@ -653,14 +627,23 @@ endif()
 #####################################################
 ######################### swig ######################
 #####################################################
+option(WITH_PYTHON "Compile the Python front-end" OFF)
+option(WITH_MATLAB "Compile the MATLAB front-end" OFF)
+option(WITH_OCTAVE "Compile the Octave front-end (experimental)" OFF)
+option(WITH_JSON "Compile the JSON front-end" OFF)
+option(WITH_OCTAVE_IMPORT "Export import.m routine for octave" OFF)
+option(WITH_PYTHON3 "Use Python 3.*" OFF)
+option(WITH_EXTENDING_CASADI "Compile a demonstration that shows how a project that depends on CasADi can be implemented." OFF)
 if(WITH_PYTHON OR WITH_MATLAB OR WITH_OCTAVE OR WITH_JSON)
   add_subdirectory(swig)
 endif()
 
+option(WITH_LINT "Compile with support for linting (syntax checking)" OFF)
 if(WITH_LINT)
   include(CppLint)
 endif()
 
+option(WITH_SPELL "Compile with support for spell-checking" OFF)
 if(WITH_SPELL)
   include(SpellCheck)
 endif()
@@ -676,6 +659,7 @@ add_subdirectory(casadi)
 add_subdirectory(experimental EXCLUDE_FROM_ALL)
 add_subdirectory(misc)
 
+option(WITH_EXAMPLES "Build examples" ON)
 if(WITH_EXAMPLES)
   add_subdirectory(docs/examples)
   add_subdirectory(docs/api/examples/ctemplate)
@@ -684,6 +668,7 @@ endif()
 #####################################################
 ######################### docs ######################
 #####################################################
+option(WITH_DOC "Enable documentation generation" OFF)
 if(WITH_DOC)
   set(DOXYFILE_LATEX "NO")
   set(DOXYFILE_IN_DIR ${CMAKE_SOURCE_DIR}/docs/api)
