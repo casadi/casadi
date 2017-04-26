@@ -710,11 +710,14 @@ export(PACKAGE CasADi)
 
 # Create the casadi-config.cmake and casadi-config-version.cmake files
 file(RELATIVE_PATH REL_INCLUDE_PREFIX "${CMAKE_PREFIX}" "${INCLUDE_PREFIX}")
+file(RELATIVE_PATH REL_LIB_PREFIX "${CMAKE_PREFIX}" "${LIB_PREFIX}")
 # ... for the build tree
 set(CONF_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}" "${PROJECT_BINARY_DIR}")
+set(CONF_LIBRARY_DIRS "${LIBRARY_OUTPUT_PATH}")
 configure_file(casadi-config.cmake.in "${PROJECT_BINARY_DIR}/casadi-config.cmake" @ONLY)
 # ... for the install tree
 set(CONF_INCLUDE_DIRS "\${CASADI_CMAKE_DIR}/${REL_INCLUDE_PREFIX}")
+set(CONF_LIBRARY_DIRS "\${CASADI_CMAKE_DIR}/${REL_LIB_PREFIX}")
 configure_file(casadi-config.cmake.in
   "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/casadi-config.cmake" @ONLY)
 # ... for both
