@@ -523,6 +523,7 @@ namespace casadi {
             fk_cand = eval_f(m, m->x_cand);
             eval_g(m, m->x_cand, m->gk_cand);
           } catch(const CasadiException& ex) {
+			(void)ex;
             // Silent ignore; line-search failed
             ls_iter++;
             // Backtracking
