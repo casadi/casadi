@@ -193,5 +193,5 @@ if(RT)
 endif()
 
 install(FILES ${CASADI_PUBLIC} ${CMAKE_CURRENT_BINARY_DIR}/casadi_export.h
-  DESTINATION ${INCLUDE_PREFIX}/core
+  DESTINATION ${INCLUDE_PREFIX}/casadi/core
 )
