@@ -522,7 +522,8 @@ endif()
 add_feature_info(blocksqp-interface WITH_BLOCKSQP "Interface to the NLP solver blockSQP.")
 
 # IPOPT: A sparse interior point NLP solver with filter line-search
-option(WITH_IPOPT "Compile the interface to IPOPT" OFF)
+find_package(IPOPT QUIET)
+option(WITH_IPOPT "Compile the interface to IPOPT" ${IPOPT_FOUND})
 if(WITH_IPOPT)
   find_package(IPOPT REQUIRED)
 endif()
