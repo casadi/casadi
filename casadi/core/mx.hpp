@@ -405,7 +405,6 @@ namespace casadi {
     static MX tangent(const MX& f, const MX& x);
     static MX hessian(const MX& f, const MX& x);
     static MX hessian(const MX& f, const MX& x, MX& g);
-    static MX jtimes(const MX &ex, const MX &arg, const MX &v, bool tr=false);
     static std::vector<std::vector<MX> >
     forward(const std::vector<MX> &ex,
             const std::vector<MX> &arg,

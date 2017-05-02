@@ -69,7 +69,6 @@ namespace casadi {
   template<> SX SX::tangent(const SX &f, const SX &x);
   template<> SX SX::hessian(const SX &f, const SX &x);
   template<> SX SX::hessian(const SX &f, const SX &x, SX &g);
-  template<> SX SX::jtimes(const SX &ex, const SX &arg, const SX &v, bool tr);
   template<> std::vector<std::vector<SX> >
   SX::forward(const std::vector<SX> &ex, const std::vector<SX> &arg,
           const std::vector<std::vector<SX> > &v, const Dict& opts);

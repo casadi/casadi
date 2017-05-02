@@ -636,6 +636,12 @@ namespace casadi {
     }
 
 
+    ///@{
+    /// Functions called by friend functions defined here
+    static MatType jtimes(const MatType &ex, const MatType &arg,
+                          const MatType &v, bool tr=false);
+    ///@}
+
 /** @} */
 #endif // SWIG
 
@@ -942,6 +948,30 @@ namespace casadi {
     // Call the class specific method
     return MatType::_rank1(A, alpha, x, y);
   }
+
+
+  template<typename MatType>
+  MatType GenericMatrix<MatType>::jtimes(const MatType &ex, const MatType &arg,
+                                         const MatType &v, bool tr) {
+    // Seeds as a vector of vectors
+    int seed_dim = tr ? ex.size2() : arg.size2();
+    casadi_assert(v.size2() % seed_dim == 0);
+    std::vector<MatType> w = horzsplit(v, seed_dim);
+    std::vector<std::vector<MatType> > ww(w.size(), std::vector<MatType>(1));
+    for (int i=0; i<w.size(); ++i) ww[i][0] = w[i];
+
+    // Calculate directional derivatives
+    if (tr) {
+      ww = reverse({ex}, {arg}, ww);
+    } else {
+      ww = forward({ex}, {arg}, ww);
+    }
+
+    // Get results
+    for (int i=0; i<w.size(); ++i) w[i] = ww[i][0];
+    return horzcat(w);
+  }
+
 
 } // namespace casadi
 

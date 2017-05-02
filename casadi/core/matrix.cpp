@@ -2348,14 +2348,6 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  Matrix<Scalar> Matrix<Scalar>::jtimes(const Matrix<Scalar> &ex,
-                                            const Matrix<Scalar> &arg,
-                                            const Matrix<Scalar> &v,
-                                            bool tr) {
-    casadi_error("'jtimes' not defined for " + type_name());
-  }
-
-  template<typename Scalar>
   std::vector<std::vector<Matrix<Scalar> > >
   Matrix<Scalar>::
   forward(const std::vector<Matrix<Scalar> > &ex,
@@ -3140,11 +3132,6 @@ namespace casadi {
   SX SX::hessian(const SX &ex, const SX &arg, SX &g) {
     g = gradient(ex, arg);
     return jacobian(g, arg, {{"symmetric", true}});
-  }
-
-  template<>
-  SX SX::jtimes(const SX &ex, const SX &arg, const SX &v, bool tr) {
-    return _jtimes(ex, arg, v, tr);
   }
 
   template<>
