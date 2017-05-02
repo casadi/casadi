@@ -819,7 +819,7 @@ returnValue SparseMatrix::getRowNorm( real_t *norm, int_t type ) const
 {
     int_t i,j;
 
-    for ( j=0; j < nCols; ++j ) norm[j] = 0.0;
+    for ( j=0; j < nRows; ++j ) norm[j] = 0.0;
 
     switch( type )
     {
@@ -828,7 +828,7 @@ returnValue SparseMatrix::getRowNorm( real_t *norm, int_t type ) const
                 for (i = jc[j]; i < jc[j+1]; i++)
                   norm[ir[i]] += val[i]*val[i];
             }
-            for ( j=0; j < nCols; ++j ) norm[j] = getSqrt(norm[j]);
+            for ( j=0; j < nRows; ++j ) norm[j] = getSqrt(norm[j]);
             break;
         case 1:
             for ( j=0; j < nCols; ++j ) {
