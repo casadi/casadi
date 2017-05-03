@@ -302,6 +302,7 @@ branches:
     - /.*appveyor.*/
 
 before_install:
+  - export PYTHONPATH=$PYTHONPATH:/usr/local/python
   - pushd ../../ && git clone https://github.com/casadi/testbot.git
   - pushd testbot && git checkout merged && source recipes/setup.sh && popd
   - sudo apt-get install p7zip-full -y
