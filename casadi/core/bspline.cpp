@@ -336,9 +336,9 @@ namespace casadi {
 
       // Input and output buffers
       g << "  if (res[0]) for (int i=0;i<" << N_ << ";++i) CASADI_PREFIX(nd_boor_eval)(res[0]"
-        << (reverse_? "" : "+i*" + std::to_string(m_)) << "," << n_dims << "," << g.constant(knots_)
+        << (reverse_? "" : "+i*" + to_string(m_)) << "," << n_dims << "," << g.constant(knots_)
         << "," << g.constant(offset_) << "," <<  g.constant(degree_)
-        << "," << g.constant(strides_) << ",arg[0]" << (reverse_? "i*" + std::to_string(m_) : "")
+        << "," << g.constant(strides_) << ",arg[0]" << (reverse_? "i*" + to_string(m_) : "")
         << "," << m_  << "," << g.constant(x_) <<"+i*" << n_dims << "," <<  g.constant(lookup_mode_)
         << ", 0, iw, w);\n";
     }
