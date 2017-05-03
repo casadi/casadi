@@ -3231,7 +3231,7 @@ namespace casadi {
     SX result = substitute(ex, x, a)*current_dx/current_denom;
     for (int i=0;i<x.nnz();i++) {
       if (order_contributions[i]<=order) {
-        result += mtaylor_recursive(jacobian(ex, x->at(i)),
+        result += mtaylor_recursive(SX::jacobian(ex, x->at(i)),
                                     x, a,
                                     order-order_contributions[i],
                                     order_contributions,

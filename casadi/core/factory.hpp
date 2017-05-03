@@ -317,7 +317,7 @@ namespace casadi {
     for (auto &&b : jac_) {
       const MatType& ex = out_.at(b.ex);
       const MatType& arg = in_.at(b.arg);
-      out_["jac:" + b.ex + ":" + b.arg] = jacobian(ex, arg);
+      out_["jac:" + b.ex + ":" + b.arg] = MatType::jacobian(ex, arg);
     }
 
     // Gradient blocks

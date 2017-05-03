@@ -1332,9 +1332,9 @@ namespace casadi {
 
     // Calculate directional derivatives
     if (tr) {
-      ww = reverse({ex}, {arg}, ww);
+      ww = MatType::reverse({ex}, {arg}, ww);
     } else {
-      ww = forward({ex}, {arg}, ww);
+      ww = MatType::forward({ex}, {arg}, ww);
     }
 
     // Get results
