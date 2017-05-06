@@ -154,8 +154,8 @@ class TestSuite:
         signal(SIGALRM, alarm_handler)
 
     # Don't buffer
-    sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
-    sys.stderr = os.fdopen(sys.stderr.fileno(), 'w', 0)
+    sys.stdout = os.fdopen(sys.stdout.fileno(), 'wb', 0)
+    sys.stderr = os.fdopen(sys.stderr.fileno(), 'wb', 0)
 
     self.stats={'numtests':0,'numfails':0}
     self.suffix = suffix
