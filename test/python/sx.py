@@ -784,6 +784,7 @@ class SXtests(casadiTestCase):
       self.checkarray(f_out[0],array(DM(op(-0.3))),"simplifications")
       self.assertEqual(str(y),"(-x)")
 
+  @skip(python3)
   def test_truth(self):
     self.message("Truth values")
     self.assertRaises(Exception, lambda : bool(SX.sym("x")))
@@ -829,8 +830,9 @@ class SXtests(casadiTestCase):
 
     self.assertTrue(SX(0).is_regular())
     self.assertFalse(SX(inf).is_regular())
-    with self.assertRaises(Exception):
-      self.assertTrue(x.nz[0])
+    if not python3:
+      with self.assertRaises(Exception):
+        self.assertTrue(x.nz[0])
 
     self.assertTrue(SX(DM([0,1])).is_regular())
     self.assertFalse(SX(DM([0,inf])).is_regular())

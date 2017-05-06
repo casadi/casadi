@@ -35,8 +35,10 @@ import argparse
 import struct
 
 if sys.version_info >= (3, 0):
+  python3 = True
   import builtins
 else:
+  python3 = False
   import __builtin__
   builtins = __builtin__
 
