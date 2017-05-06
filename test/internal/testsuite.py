@@ -153,8 +153,9 @@ class TestSuite:
         signal(SIGALRM, alarm_handler)
 
     # Don't buffer
-    sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
-    sys.stderr = os.fdopen(sys.stderr.fileno(), 'w', 0)
+    if sys.version_info < (3, 0):
+      sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
+      sys.stderr = os.fdopen(sys.stderr.fileno(), 'w', 0)
 
     self.stats={'numtests':0,'numfails':0}
     self.suffix = suffix
@@ -240,6 +241,11 @@ class TestSuite:
     except TimeoutEvent:
       killProcess(p.pid)
       raise Exception("Timout.")
+    try:
+      stdoutdata = stdoutdata.decode("ascii")
+      stderrdata = stderrdata.decode("ascii")
+    except:
+      pass
     alarm(0) # Remove alarm
     t = time.clock() - t0
     if self.custom_stdout is not None:
