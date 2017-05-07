@@ -29,6 +29,7 @@ from numpy import array, double, int32, atleast_2d, ones, matrix, zeros
 import unittest
 from types import *
 from helpers import *
+from distutils.version import LooseVersion
 
 scipy_available = True
 try:
@@ -230,8 +231,13 @@ class typemaptests(casadiTestCase):
   def test_matmul(self):
     A = DM([[1,3],[4,5]])
     B = DM([[7,2],[0,9]])
-    for L in [A]: # np.array(A)
-      for R in [B]: # np.array(B)
+    LA = [A]
+    RB = [B]
+    if LooseVersion(np.__version__) >= LooseVersion("1.10"):
+      LA.append(np.array(A))
+      RB.append(np.array(B))
+    for L in LA:
+      for R in RB:
         #y = L @ R
         y = eval("L @ R",{"L":L,"R":R})
         self.checkarray(y,mtimes(A,B))
