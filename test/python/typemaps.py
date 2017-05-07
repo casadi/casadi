@@ -230,8 +230,8 @@ class typemaptests(casadiTestCase):
   def test_matmul(self):
     A = DM([[1,3],[4,5]])
     B = DM([[7,2],[0,9]])
-    for L in [np.array(A),A]:
-      for R in [np.array(B),B]:
+    for L in [A]: # np.array(A)
+      for R in [B]: # np.array(B)
         #y = L @ R
         y = eval("L @ R",{"L":L,"R":R})
         self.checkarray(y,mtimes(A,B))
