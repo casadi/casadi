@@ -351,6 +351,7 @@ namespace casadi {
     int max_it_qp_;  // Maximum number of QP iterations per SQP iteration
     int max_iter_; // Maximum number of SQP steps
     bool warmstart_; // Use warmstarting
+    bool qp_init_;
     bool block_hess_;  // Blockwise Hessian approximation?
     int hess_scaling_;// Scaling strategy for Hessian approximation
     int fallback_scaling_;  // If indefinite update is used, the type of fallback strategy
@@ -393,6 +394,7 @@ namespace casadi {
     double rho_;  // Regularization factor for first part of objective
     double zeta_;  // Regularization factor for second part of objective
     Function rp_solver_;  // restoration phase Solver
+    bool print_maxit_reached_;
 
     // convexification strategy
     double deltabar_w_0_;

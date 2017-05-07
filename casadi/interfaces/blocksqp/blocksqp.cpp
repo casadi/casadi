@@ -104,6 +104,9 @@ namespace casadi {
       {"warmstart",
        {OT_BOOL,
         "Use warmstarting"}},
+      {"qp_init",
+       {OT_BOOL,
+        "Use warmstarting"}},
       {"max_it_qp",
        {OT_INT,
         "Maximum number of QP iterations per SQP iteration"}},
@@ -217,7 +220,10 @@ namespace casadi {
         "Feasibility restoration phase parameter"}},
       {"zeta",
        {OT_DOUBLE,
-        "Feasibility restoration phase parameter"}}
+        "Feasibility restoration phase parameter"}},
+      {"print_maxit_reached",
+       {OT_BOOL,
+        "Print error when maximum number of SQP iterations reached"}}
      }
   };
 
@@ -278,7 +284,7 @@ namespace casadi {
     eta_ = 1.0e-4;
     obj_lo_ = -inf;
     obj_up_ = inf;
-    rho_ = 1.0e-3;
+    rho_ = 1.0e3;
     zeta_ = 1.0e-3;
     deltabar_w_0_ = 1.0e-4;
     deltabar_w_min_ = 1.0e-20;
@@ -286,6 +292,8 @@ namespace casadi {
     kappa_w_minus_ = 0.333;
     kappa_w_plus_ = 8.0;
     kappabar_w_plus_ = 100.0;
+    print_maxit_reached_ = true;
+    qp_init_ = true;
 
     // Read user options
     for (auto&& op : opts) {
@@ -323,6 +331,8 @@ namespace casadi {
         max_iter_ = op.second;
       } else if (op.first=="warmstart") {
         warmstart_ = op.second;
+      } else if (op.first=="qp_init") {
+        qp_init_ = op.second;
       } else if (op.first=="max_it_qp") {
         max_it_qp_ = op.second;
       } else if (op.first=="block_hess") {
@@ -399,6 +409,8 @@ namespace casadi {
         rho_ = op.second;
       } else if (op.first=="zeta") {
         zeta_ = op.second;
+      } else if (op.first=="print_maxit_reached") {
+        print_maxit_reached_ = op.second;
       }
     }
 
@@ -452,9 +464,10 @@ namespace casadi {
       solver_options["opttol"] = opttol_;
       solver_options["nlinfeastol"] = nlinfeastol_;
       solver_options["max_iter"] = 1;
-      // solver_options["print_time"] = false;
-      // solver_options["print_header"] = false;
-      // solver_options["print_iteration"] = false;
+      solver_options["print_time"] = false;
+      solver_options["print_header"] = false;
+      solver_options["print_iteration"] = false;
+      solver_options["print_maxit_reached"] = false;
 
       // Create and initialize solver for the restoration problem
       rp_solver_ = nlpsol("rpsolver", "blocksqp", nlp_rp, solver_options);
@@ -574,6 +587,8 @@ namespace casadi {
     if (schur_) {
       m->qpoases_mem = new QpoasesMemory(linsol_);
     }
+
+    m->qp = 0;
   }
 
   void Blocksqp::set_work(void* mem, const double**& arg, double**& res,
@@ -672,21 +687,28 @@ namespace casadi {
     reset_sqp(m);
 
     // Free existing memory, if any
-    if (m->qp) delete m->qp;
-    m->qp = 0;
-    if (schur_) {
-      m->qp = new qpOASES::SQProblemSchur(nx_, ng_, qpOASES::HST_UNKNOWN, 50,
-                                          m->qpoases_mem,
-                                          QpoasesInterface::qpoases_init,
-                                          QpoasesInterface::qpoases_sfact,
-                                          QpoasesInterface::qpoases_nfact,
-                                          QpoasesInterface::qpoases_solve);
-    } else {
-      m->qp = new qpOASES::SQProblem(nx_, ng_);
+    if (qp_init_) {
+      if (m->qp) delete m->qp;
+      m->qp = 0;
+    }
+    if (!m->qp) {
+      if (schur_) {
+        m->qp = new qpOASES::SQProblemSchur(nx_, ng_, qpOASES::HST_UNKNOWN, 50,
+                                            m->qpoases_mem,
+                                            QpoasesInterface::qpoases_init,
+                                            QpoasesInterface::qpoases_sfact,
+                                            QpoasesInterface::qpoases_nfact,
+                                            QpoasesInterface::qpoases_solve);
+      } else {
+        m->qp = new qpOASES::SQProblem(nx_, ng_);
+      }
     }
 
     // Print header and information about the algorithmic parameters
     if (print_header_) printInfo(m);
+
+    // Statistics
+    for (auto&& s : m->fstats) s.second.reset();
 
     // Open output files
     initStats(m);
@@ -712,7 +734,7 @@ namespace casadi {
 
     m->ret_ = ret;
 
-    if (ret==1) casadi_warning("Maximum number of iterations reached");
+    if (ret==1 && print_maxit_reached_) casadi_warning("Maximum number of iterations reached");
 
     // Get optimal cost
     if (m->f) *m->f = m->obj;
@@ -2437,12 +2459,7 @@ namespace casadi {
                 m->qp->getStatus() == qpOASES::QPS_SOLVED) {
                 ret = m->qp->hotstart(m->H, g, m->A, lb, lu, lbA, luA, maxIt, &cpuTime);
               } else {
-                if (warmstart_) {
-                  ret = m->qp->init(m->H, g, m->A, lb, lu, lbA, luA, maxIt, &cpuTime,
-                    deltaXi, lambdaQP);
-                } else {
-                  ret = m->qp->init(m->H, g, m->A, lb, lu, lbA, luA, maxIt, &cpuTime);
-                }
+                ret = m->qp->init(m->H, g, m->A, lb, lu, lbA, luA, maxIt, &cpuTime);
               }
           } else {
             // Second order correction: H and A do not change
