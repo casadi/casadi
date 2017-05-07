@@ -57,7 +57,12 @@ if (WITH_OCTAVE)
   # Compile MEX file
   add_library(casadiOCTAVE MODULE ${MEX_FILE})
   target_include_directories(casadiOCTAVE PUBLIC ${OCTAVE_INCLUDE_DIRS})
-  target_link_libraries(casadiOCTAVE ${OCTAVE_LIBRARIES} casadi)
+  if(APPLE)
+    target_link_libraries(casadiOCTAVE casadi)
+    set_target_properties(casadiOCTAVE PROPERTIES LINK_FLAGS "-undefined dynamic_lookup")
+  else()
+    target_link_libraries(casadiOCTAVE ${OCTAVE_LIBRARIES} casadi)
+  endif()
   set_target_properties(casadiOCTAVE
     PROPERTIES OUTPUT_NAME "casadiMEX"
                PREFIX ""
