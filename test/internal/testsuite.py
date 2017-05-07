@@ -242,6 +242,11 @@ class TestSuite:
     except TimeoutEvent:
       killProcess(p.pid)
       raise Exception("Timout.")
+    try:
+      stdoutdata = stdoutdata.decode("ascii")
+      stderrdata = stderrdata.decode("ascii")
+    except:
+      pass
     alarm(0) # Remove alarm
     t = time.clock() - t0
     if self.custom_stdout is not None:
