@@ -539,7 +539,6 @@ class Matrixtests(casadiTestCase):
           self.checkarray(c==A,m([[0,0],[0,0]]),"==")
           self.checkarray(c!=A,m([[1,1],[1,1]]),"!=")
 
-  @skip(python3)
   def test_truth(self):
     self.assertTrue(bool(DM([1])))
     self.assertFalse(bool(DM([0])))

@@ -1168,7 +1168,6 @@ class MXtests(casadiTestCase):
     self.assertEqual(D.shape[0],4)
     self.assertEqual(D.shape[1],7)
 
-  @skip(python3)
   def test_truth(self):
     self.message("Truth values")
     self.assertRaises(Exception, lambda : bool(MX.sym("x")))
@@ -1365,7 +1364,6 @@ class MXtests(casadiTestCase):
     self.checkarray(f_out,DM([[3,6],[9,12]]))
 
 
-  @skip(python3)
   def test_veccats(self):
     x= MX.sym("x",2)
     self.assertTrue(hash(vec(x))==hash(x))
