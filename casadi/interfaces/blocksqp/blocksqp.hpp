@@ -394,6 +394,7 @@ namespace casadi {
     double rho_;  // Regularization factor for first part of objective
     double zeta_;  // Regularization factor for second part of objective
     Function rp_solver_;  // restoration phase Solver
+    bool print_maxit_reached_;
 
     // convexification strategy
     double deltabar_w_0_;

@@ -220,7 +220,10 @@ namespace casadi {
         "Feasibility restoration phase parameter"}},
       {"zeta",
        {OT_DOUBLE,
-        "Feasibility restoration phase parameter"}}
+        "Feasibility restoration phase parameter"}},
+      {"print_maxit_reached",
+       {OT_BOOL,
+        "Print error when maximum number of SQP iterations reached"}}
      }
   };
 
@@ -281,7 +284,7 @@ namespace casadi {
     eta_ = 1.0e-4;
     obj_lo_ = -inf;
     obj_up_ = inf;
-    rho_ = 1.0e-3;
+    rho_ = 1.0e3;
     zeta_ = 1.0e-3;
     deltabar_w_0_ = 1.0e-4;
     deltabar_w_min_ = 1.0e-20;
@@ -289,6 +292,7 @@ namespace casadi {
     kappa_w_minus_ = 0.333;
     kappa_w_plus_ = 8.0;
     kappabar_w_plus_ = 100.0;
+    print_maxit_reached_ = true;
     qp_init_ = true;
 
     // Read user options
@@ -405,6 +409,8 @@ namespace casadi {
         rho_ = op.second;
       } else if (op.first=="zeta") {
         zeta_ = op.second;
+      } else if (op.first=="print_maxit_reached") {
+        print_maxit_reached_ = op.second;
       }
     }
 
@@ -458,9 +464,10 @@ namespace casadi {
       solver_options["opttol"] = opttol_;
       solver_options["nlinfeastol"] = nlinfeastol_;
       solver_options["max_iter"] = 1;
-      // solver_options["print_time"] = false;
-      // solver_options["print_header"] = false;
-      // solver_options["print_iteration"] = false;
+      solver_options["print_time"] = false;
+      solver_options["print_header"] = false;
+      solver_options["print_iteration"] = false;
+      solver_options["print_maxit_reached"] = false;
 
       // Create and initialize solver for the restoration problem
       rp_solver_ = nlpsol("rpsolver", "blocksqp", nlp_rp, solver_options);
@@ -568,7 +575,7 @@ namespace casadi {
     alloc_res(nblocks_*n_hess, true);
     alloc_w(n_hess*nnz_H_, true);
     alloc_iw(nnz_H_ + (nx_+1) + nx_, true); // hessIndRow
-    
+
     alloc_w(exact_hess_lag_sp_.nnz(), true); // exact_hess_lag
   }
 
@@ -727,7 +734,7 @@ namespace casadi {
 
     m->ret_ = ret;
 
-    if (ret==1) casadi_warning("Maximum number of iterations reached");
+    if (ret==1 && print_maxit_reached_) casadi_warning("Maximum number of iterations reached");
 
     // Get optimal cost
     if (m->f) *m->f = m->obj;
@@ -761,7 +768,7 @@ namespace casadi {
       /// Evaluate all functions and gradients for xk_0
       (void)evaluate(m, &m->obj, m->gk, m->grad_fk, m->jac_g);
       m->nDerCalls++;
-      
+
       /// Check if converged
       hasConverged = calcOptTol(m);
       if (print_iteration_) printProgress(m);
@@ -910,7 +917,7 @@ namespace casadi {
 
       /// Check if converged
       hasConverged = calcOptTol(m);
-    
+
       /// Print one line of output for the current iteration
       if (print_iteration_) printProgress(m);
       updateStats(m);
@@ -919,7 +926,7 @@ namespace casadi {
         m->itCount++;
         return 0; //Convergence achieved!
       }
-    
+
       /// Calculate difference of old and new Lagrange gradient:
       // gamma = -gamma + dL(xi_k+1, lambda_k+1)
       calcLagrangeGradient(m, m->gamma, 1);
@@ -1458,7 +1465,7 @@ namespace casadi {
       else
         in_x0.push_back( 0.0 );
     }
-    
+
     // Add current iterate xk to parameter p
     vector<double> in_p(m->p,m->p+np_);
     vector<double> in_p2(m->xk,m->xk+nx_);
@@ -1550,11 +1557,11 @@ namespace casadi {
       // One iteration for minimum norm NLP
       if(it > 0)
         ret = bp->run(m2,1,warmStart);
-       
+
       // If restMethod yields error, stop restoration phase
       if( ret == -1 )
         break;
-    
+
       // Get new xi from the restoration phase
       for( i=0; i<nx_; i++ )
         m->trial_xk[i] = m2->xk[i];
@@ -2093,7 +2100,7 @@ namespace casadi {
     m->averageSizingFactor /= nBlocks;
   }
 
-  
+
   void Blocksqp::
   calcHessianUpdateExact(BlocksqpMemory* m) const {
     // compute exact hessian
@@ -2133,14 +2140,14 @@ namespace casadi {
       cout << "block " << k << ": " << vector<double>(m->hess[k],m->hess[k]+dim_[k]*dim_[k]) << endl;
     }
     */
-    
-    // Prepare to compute fallback update as well 
+
+    // Prepare to compute fallback update as well
     m->hess = m->hess2;
     if(fallback_update_ == 2 && !hess_lim_mem_)
         calcHessianUpdate(m, fallback_update_, fallback_scaling_);
     else if (fallback_update_ == 0)
         calcInitialHessian(m);  // Set fallback as Identity
-      
+
     // Reset pointer
     m->hess = m->hess1;
 ;  }
@@ -2335,12 +2342,12 @@ namespace casadi {
         if(m->delta_w > deltabar_w_max_)
           m->hess = m->hess2;
         else {
-          // add scaled Identity delta_w*I 
+          // add scaled Identity delta_w*I
           for (int b=0; b<nblocks_; b++) {
             int dim = dim_[b];
             for(int i=0; i<dim; i++)
               m->hess[b][i+i*dim] += m->delta_w;
-          } 
+          }
         }
       }
       else
@@ -2421,7 +2428,7 @@ namespace casadi {
           if(conv_strategy_==1 && l<maxQP-1 && m->delta_w <= deltabar_w_max_)
             scalar += m->delta_w; // save scalars for restoring Hessian
         }
-        
+
         if (l == maxQP-1) {
           // Enable inertia correction for supposedly convex QPs, just in case
           opts.enableInertiaCorrection = qpOASES::BT_TRUE;
@@ -2474,12 +2481,12 @@ namespace casadi {
                 }
               }
 
-            if (ret == qpOASES::SUCCESSFUL_RETURN) { 
+            if (ret == qpOASES::SUCCESSFUL_RETURN) {
               // QP was solved successfully and curvature is positive after removing bounds
                 m->qpIterations = maxIt + 1;
                 m->delta_w_last = m->delta_w; // safe successful scaling factor
                 break; // Success!
-              } else { 
+              } else {
               // QP solution is rejected, save statistics
                 if (ret == qpOASES::RET_SETUP_AUXILIARYQP_FAILED)
                   m->qpIterations2++;
@@ -2514,7 +2521,7 @@ namespace casadi {
 
     // Point Hessian again to the first Hessian
     m->hess = m->hess1;
-    
+
     /* Restore Hessian if scaled Identities were added */
     if(conv_strategy_ == 1){
       for (int b=0; b<nblocks_; b++) {
@@ -2523,7 +2530,7 @@ namespace casadi {
             m->hess1[b][i+i*dim] -= scalar;
       }
     }
-    
+
     /* For full-memory Hessian: Restore fallback Hessian if convex combinations
      * were used during the loop */
     if (!hess_lim_mem_ && !fallback_update_ != 0 && conv_strategy_ == 0 && maxQP > 2 && matricesChanged && l>0 && l<maxQP-1) { // if l=0 or l>=maxQP-1, then fallback Hessian is restored already
