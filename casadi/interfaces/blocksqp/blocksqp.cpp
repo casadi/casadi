@@ -227,6 +227,33 @@ namespace casadi {
      }
   };
 
+  Dict Blocksqp::get_stats(void *mem) const{
+    auto m = static_cast<BlocksqpMemory*>(mem);
+
+    Dict ret = Nlpsol::get_stats(mem);
+
+    ret["iter_count"] = m->itCount;
+    ret["qpItTotal"] = m->qpItTotal;
+    ret["qpIterations"] = m->qpIterations;
+    ret["qpIterations2"] = m->qpIterations2;
+    ret["hessSkipped"] = m->hessSkipped;
+    ret["hessDamped"] = m->hessDamped;
+    ret["averageSizingFactor"] = m->averageSizingFactor;
+
+
+    ret["qpResolve"] = m->qpResolve; 
+    ret["nFunCalls"] = m->nFunCalls;
+    ret["nDerCalls"] = m->nDerCalls;
+    ret["nRestHeurCalls"] = m->nRestHeurCalls;
+    ret["nRestPhaseCalls"] = m->nRestPhaseCalls;
+    ret["rejectedSR1"] = m->rejectedSR1;
+    ret["nTotalUpdates"] = m->nTotalUpdates;
+    ret["nTotalSkippedUpdates"] = m->nTotalSkippedUpdates;
+
+    return ret;
+
+  }
+
   void Blocksqp::init(const Dict& opts) {
     // Call the init method of the base class
     Nlpsol::init(opts);
