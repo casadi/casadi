@@ -16,7 +16,6 @@ env:
 before_script:
   - set -e
   - set -o pipefail  # otherwise, piping with grep discards exit statuses
-  - export casadi_build_flags="-DWITH_COMMON=ON "
 
 
 
@@ -302,6 +301,7 @@ branches:
     - /.*appveyor.*/
 
 before_install:
+  - export casadi_build_flags="-DWITH_COMMON=ON "
   - export PYTHONPATH=$PYTHONPATH:/usr/local/python
   - pushd ../../ && git clone https://github.com/casadi/testbot.git
   - pushd testbot && git checkout merged && source recipes/setup.sh && popd
