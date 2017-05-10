@@ -234,7 +234,7 @@ matrix:
         #- brew outdated pkg-config || brew install pkg-config
         #- brew doctor
         - sudo easy_install pip
-        - sudo pip install ipython matplotlib numpy scipy
+        - sudo pip install matplotlib numpy scipy
       script:
         - mkdir build
         - pushd build
