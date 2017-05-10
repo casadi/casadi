@@ -194,11 +194,15 @@ if(WITH_COMMON)
   # qpOASES and blockSQP built if LAPACK available
   set(WITH_QPOASES_DEF ${LAPACK_FOUND})
   set(WITH_BLOCKSQP_DEF ${LAPACK_FOUND})
+  # Look for IPOPT
+  find_package(IPOPT QUIET)
+  set(WITH_IPOPT_DEF ${IPOPT_FOUND})
 else()
   # Disabled by default
   set(WITH_LAPACK_DEF OFF)
   set(WITH_QPOASES_DEF OFF)
   set(WITH_BLOCKSQP_DEF OFF)
+  set(WITH_IPOPT_DEF OFF)
 endif()
 
 ############################################################
@@ -540,8 +544,7 @@ endif()
 add_feature_info(blocksqp-interface WITH_BLOCKSQP "Interface to the NLP solver blockSQP.")
 
 # IPOPT: A sparse interior point NLP solver with filter line-search
-find_package(IPOPT QUIET)
-option(WITH_IPOPT "Compile the interface to IPOPT" ${IPOPT_FOUND})
+option(WITH_IPOPT "Compile the interface to IPOPT" ${WITH_IPOPT_DEF})
 if(WITH_IPOPT)
   find_package(IPOPT REQUIRED)
 endif()
