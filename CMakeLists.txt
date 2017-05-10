@@ -191,9 +191,14 @@ if(WITH_COMMON)
   # Look for LAPACK
   find_package(LAPACK QUIET)
   set(WITH_LAPACK_DEF ${LAPACK_FOUND})
+  # qpOASES and blockSQP built if LAPACK available
+  set(WITH_QPOASES_DEF ${LAPACK_FOUND})
+  set(WITH_BLOCKSQP_DEF ${LAPACK_FOUND})
 else()
   # Disabled by default
   set(WITH_LAPACK_DEF OFF)
+  set(WITH_QPOASES_DEF OFF)
+  set(WITH_BLOCKSQP_DEF OFF)
 endif()
 
 ############################################################
@@ -517,7 +522,7 @@ endif()
 add_feature_info(lapack-interface WITH_LAPACK "Interface to LAPACK.")
 
 # qpOASES: An active-set QP solver
-option(WITH_QPOASES "Compile the interface to qpOASES (the source code for qpOASES is included)" ${LAPACK_FOUND})
+option(WITH_QPOASES "Compile the interface to qpOASES (the source code for qpOASES is included)" ${WITH_QPOASES_DEF})
 option(WITH_NO_QPOASES_BANNER "Add -D__NO_COPYRIGHT__ to qpOASES definitions" OFF)
 if(WITH_QPOASES)
   set(QPOASES_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_packages/qpOASES/include)
@@ -526,7 +531,7 @@ endif()
 add_feature_info(qpoases-interface WITH_QPOASES "Interface to the active-set QP solver qpOASES.")
 
 # blockSQP: A block-structure-exploiting SQP method
-option(WITH_BLOCKSQP "Compile the interface to blockSQP (the source code for blockSQP is included)" ${LAPACK_FOUND})
+option(WITH_BLOCKSQP "Compile the interface to blockSQP (the source code for blockSQP is included)" ${WITH_BLOCKSQP_DEF})
 if(WITH_BLOCKSQP)
   if (NOT WITH_QPOASES)
     message(FATAL_ERROR "WITH_BLOCKSQP requires WITH_QPOASES.")
