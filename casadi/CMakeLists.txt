@@ -9,8 +9,8 @@ macro(CASADI_STRINGIFY STRFILE)
     # Append file as strings
     file(STRINGS ${FILE} FILE_CONTENTS)
     foreach(LINE ${FILE_CONTENTS})
-      string(REPLACE "\\" "\\\\" LINE ${LINE}) # Replace \ with \\
-      string(REPLACE "\"" "\\\"" LINE ${LINE}) # Replace " with \"
+      string(REPLACE "\\" "\\\\" LINE "${LINE}") # Replace \ with \\
+      string(REPLACE "\"" "\\\"" LINE "${LINE}") # Replace " with \"
       file(APPEND ${STRFILE} "\n  \"${LINE}\\n\"")
     endforeach()
     # End declaration
