@@ -184,6 +184,19 @@ if(APPLE)
 endif()
 
 ############################################################
+################# WITH_ALL option ##########################
+############################################################
+option(WITH_ALL "Tries to find external dependencies corresponding to stable interface" OFF)
+if(WITH_ALL)
+  # Look for LAPACK
+  find_package(LAPACK QUIET)
+  set(WITH_LAPACK_DEF ${LAPACK_FOUND})
+else()
+  # Disabled by default
+  set(WITH_LAPACK_DEF OFF)
+endif()
+
+############################################################
 ################# Misc options #############################
 ############################################################
 option(ENABLE_EXPORT_ALL "Export all symbols to a shared library" OFF)
@@ -497,8 +510,7 @@ endif()
 add_feature_info(clang-interface WITH_CLANG "Interface to the Clang JIT compiler.")
 
 # Lapack: Dense linear solvers
-find_package(LAPACK QUIET)
-option(WITH_LAPACK "Compile the interface to LAPACK" ${LAPACK_FOUND})
+option(WITH_LAPACK "Compile the interface to LAPACK" ${WITH_LAPACK_DEF})
 if(WITH_LAPACK)
   find_package(LAPACK REQUIRED)
 endif()
