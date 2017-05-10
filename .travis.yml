@@ -8,7 +8,7 @@ env:
     - CMAKE_LIBRARY_PATH=/home/travis/build/testbot/restricted/cplex/cplex/lib/x86-64_sles10_4.1/static_pic/:/home/travis/build/testbot/restricted/cplex/concert/lib/x86-64_sles10_4.1/static_pic/
     - ILOG_LICENSE_FILE=/home/travis/build/testbot/restricted/cplex/access.ilm
     - SNOPT=/home/travis/build/snopt75
-    - MATLABPATH=/home/travis/build/matlab-install
+    - MATLABPATH=/home/travis/build/matlab-install/matlab
     - MATLAB_ROOT=/home/travis/build/matlab
     - MATLABRELEASE=R2014a
     - SLURP_OS=trusty
@@ -295,7 +295,7 @@ matrix:
         - popd
         - Xvfb :1 &
         - export DISPLAY=:1
-        - octave --no-gui --no-window-system --eval "addpath('/home/travis/build/octave-install');savepath;"
+        - octave --no-gui --no-window-system --eval "addpath('/home/travis/build/octave-install/matlab');savepath;"
         - pushd test && make octave && popd
 branches:
   except:
