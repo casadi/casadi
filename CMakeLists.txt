@@ -184,10 +184,10 @@ if(APPLE)
 endif()
 
 ############################################################
-################# WITH_ALL option ##########################
+################# WITH_COMMON option #######################
 ############################################################
-option(WITH_ALL "Tries to find external dependencies corresponding to stable interface" OFF)
-if(WITH_ALL)
+option(WITH_COMMON "Build common, stable interfaces, if found" OFF)
+if(WITH_COMMON)
   # Look for LAPACK
   find_package(LAPACK QUIET)
   set(WITH_LAPACK_DEF ${LAPACK_FOUND})
