@@ -35,7 +35,6 @@ matrix:
         - sudo make -j2 install
         - popd
         - python -c "from casadi.tools import *;loadAllCompiledPlugins()"
-        - remote_access
         - pushd test && make unittests_py_valgrind && popd
       after_success:
         - cd build
