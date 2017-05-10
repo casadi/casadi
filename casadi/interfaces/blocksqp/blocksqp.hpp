@@ -218,6 +218,8 @@ namespace casadi {
     /// Update optimization tolerance (similar to SNOPT) in current iterate
     bool calcOptTol(BlocksqpMemory* m) const;
 
+    int intermediateCallback(BlocksqpMemory* m) const;
+
     /*
      * Solve QP subproblem
      */

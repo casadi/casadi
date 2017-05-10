@@ -781,6 +781,23 @@ namespace casadi {
     }
   }
 
+  int Blocksqp::intermediateCallback(BlocksqpMemory* m) const {
+    if (!fcallback_.is_null()) {
+      m->arg[NLPSOL_X] = m->xk;
+      m->arg[NLPSOL_F] = &m->obj;
+      m->arg[NLPSOL_G] = m->gk;
+      m->arg[NLPSOL_LAM_X] = m->lam_xk;
+      m->arg[NLPSOL_LAM_G] = m->lam_gk;
+      double dret;
+      m->res[0] = &dret;
+      fcallback_(m->arg, m->res, m->iw, m->w);
+
+      return static_cast<int>(dret);
+    } else {
+      return 1;
+    }
+  }
+
   int Blocksqp::run(BlocksqpMemory* m, int maxIt, int warmStart) const {
     int it, infoQP = 0;
     bool skipLineSearch = false;
@@ -940,6 +957,10 @@ namespace casadi {
 
       /// Evaluate functions and gradients at the new xk
       (void)evaluate(m, &m->obj, m->gk, m->grad_fk, m->jac_g);
+
+      /// Callback function at new xk
+      intermediateCallback(m);
+
       m->nDerCalls++;
 
       /// Check if converged
