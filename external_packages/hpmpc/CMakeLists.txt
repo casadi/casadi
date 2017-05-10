@@ -11,7 +11,8 @@ cmake_minimum_required(VERSION 2.8.6)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dummy_include)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dummy_include/foo/bar)
 if( CMAKE_SIZEOF_VOID_P EQUAL 8 )
-casadi_external_library(casadi_hpmpc_X64_AVX_GENERIC src/auxiliary/d_aux_lib4.c
+add_library(casadi_hpmpc_X64_AVX_GENERIC SHARED
+src/auxiliary/d_aux_lib4.c
 src/auxiliary/d_aux_extern_depend_lib4.c
 src/auxiliary/i_aux.c
 src/kernel/avx/kernel_dgemm_avx_lib4.c
@@ -46,7 +47,8 @@ SET_TARGET_PROPERTIES(casadi_hpmpc_X64_AVX_GENERIC PROPERTIES COMPILE_FLAGS "-DL
 target_link_libraries(casadi_hpmpc_X64_AVX_GENERIC casadi_blasfeo_GENERIC m)
 endif()
 if( CMAKE_SIZEOF_VOID_P EQUAL 8 )
-casadi_external_library(casadi_hpmpc_X64_AVX2_X64_INTEL_HASWELL src/auxiliary/d_aux_lib4.c
+add_library(casadi_hpmpc_X64_AVX2_X64_INTEL_HASWELL SHARED
+src/auxiliary/d_aux_lib4.c
 src/auxiliary/d_aux_extern_depend_lib4.c
 src/auxiliary/i_aux.c
 src/kernel/avx2/kernel_dgemm_avx2_lib4.c
@@ -81,7 +83,8 @@ SET_TARGET_PROPERTIES(casadi_hpmpc_X64_AVX2_X64_INTEL_HASWELL PROPERTIES COMPILE
 target_link_libraries(casadi_hpmpc_X64_AVX2_X64_INTEL_HASWELL casadi_blasfeo_X64_INTEL_HASWELL m)
 endif()
 if( CMAKE_SIZEOF_VOID_P EQUAL 8 )
-casadi_external_library(casadi_hpmpc_X64_AVX_X64_INTEL_SANDY_BRIDGE src/auxiliary/d_aux_lib4.c
+add_library(casadi_hpmpc_X64_AVX_X64_INTEL_SANDY_BRIDGE SHARED
+src/auxiliary/d_aux_lib4.c
 src/auxiliary/d_aux_extern_depend_lib4.c
 src/auxiliary/i_aux.c
 src/kernel/avx/kernel_dgemm_avx_lib4.c
@@ -116,7 +119,8 @@ SET_TARGET_PROPERTIES(casadi_hpmpc_X64_AVX_X64_INTEL_SANDY_BRIDGE PROPERTIES COM
 target_link_libraries(casadi_hpmpc_X64_AVX_X64_INTEL_SANDY_BRIDGE casadi_blasfeo_X64_INTEL_SANDY_BRIDGE m)
 endif()
 if( CMAKE_SIZEOF_VOID_P EQUAL 8 )
-casadi_external_library(casadi_hpmpc_X64_SSE3_X64_INTEL_CORE src/auxiliary/d_aux_lib4.c
+add_library(casadi_hpmpc_X64_SSE3_X64_INTEL_CORE SHARED
+src/auxiliary/d_aux_lib4.c
 src/auxiliary/d_aux_extern_depend_lib4.c
 src/auxiliary/i_aux.c
 src/kernel/sse3/kernel_dgemm_sse3_lib4.c
@@ -151,7 +155,8 @@ SET_TARGET_PROPERTIES(casadi_hpmpc_X64_SSE3_X64_INTEL_CORE PROPERTIES COMPILE_FL
 target_link_libraries(casadi_hpmpc_X64_SSE3_X64_INTEL_CORE casadi_blasfeo_X64_INTEL_CORE m)
 endif()
 if( CMAKE_SIZEOF_VOID_P EQUAL 8 )
-casadi_external_library(casadi_hpmpc_X64_SSE3_X64_AMD_BULLDOZER src/auxiliary/d_aux_lib4.c
+add_library(casadi_hpmpc_X64_SSE3_X64_AMD_BULLDOZER SHARED
+src/auxiliary/d_aux_lib4.c
 src/auxiliary/d_aux_extern_depend_lib4.c
 src/auxiliary/i_aux.c
 src/kernel/sse3/kernel_dgemm_sse3_lib4.c
@@ -185,7 +190,8 @@ SET_TARGET_PROPERTIES(casadi_hpmpc_X64_SSE3_X64_AMD_BULLDOZER PROPERTIES COMPILE
 
 target_link_libraries(casadi_hpmpc_X64_SSE3_X64_AMD_BULLDOZER casadi_blasfeo_X64_AMD_BULLDOZER m)
 endif()
-casadi_external_library(casadi_hpmpc_C99_4X4_GENERIC src/auxiliary/d_aux_lib4.c
+add_library(casadi_hpmpc_C99_4X4_GENERIC SHARED
+src/auxiliary/d_aux_lib4.c
 src/auxiliary/d_aux_extern_depend_lib4.c
 src/auxiliary/i_aux.c
 src/kernel/c99/kernel_dgemm_c99_lib4.c
