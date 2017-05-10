@@ -40,4 +40,4 @@
 #define CASADI_PLUGINS "${CASADI_PLUGINS}"  // NOLINT(whitespace/line_length)
 #define CASADI_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}"  // NOLINT(whitespace/line_length)
 
-#endif // BUILD_CASADI_CONFIG_H_
+#endif  // BUILD_CASADI_CONFIG_H_
