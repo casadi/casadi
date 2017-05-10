@@ -202,7 +202,7 @@ matrix:
         - export languagetool="$mypwd/LanguageTool-2.7"
         - mkdir build
         - pushd build
-        - cmake $casadi_build_flags -DWITH_SLICOT=OFF -DWITH_WERROR=ON -DWITH_EXTRA_WARNINGS=ON ..
+        - cmake $casadi_build_flags -DWITH_SLICOT=OFF -DWITH_WERROR=ON -DWITH_EXTRA_WARNINGS=ON -DWITH_SPELL=ON -DWITH_LINT=ON ..
         - make lint
         - export languagetool="$mypwd/LanguageTool-2.7" make spell
         - popd && pushd misc && python autogencode.py && popd
