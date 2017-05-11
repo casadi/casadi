@@ -223,7 +223,10 @@ namespace casadi {
         "Feasibility restoration phase parameter"}},
       {"print_maxit_reached",
        {OT_BOOL,
-        "Print error when maximum number of SQP iterations reached"}}
+        "Print error when maximum number of SQP iterations reached"}},
+      {"restoration_options",
+       {OT_DICT,
+        "Options to be passed to restoration phase"}}
      }
   };
 
@@ -241,7 +244,7 @@ namespace casadi {
     ret["averageSizingFactor"] = m->averageSizingFactor;
 
 
-    ret["qpResolve"] = m->qpResolve; 
+    ret["qpResolve"] = m->qpResolve;
     ret["nFunCalls"] = m->nFunCalls;
     ret["nDerCalls"] = m->nDerCalls;
     ret["nRestHeurCalls"] = m->nRestHeurCalls;
@@ -321,6 +324,8 @@ namespace casadi {
     kappabar_w_plus_ = 100.0;
     print_maxit_reached_ = true;
     qp_init_ = true;
+
+    Dict restoration_options;
 
     // Read user options
     for (auto&& op : opts) {
@@ -438,6 +443,8 @@ namespace casadi {
         zeta_ = op.second;
       } else if (op.first=="print_maxit_reached") {
         print_maxit_reached_ = op.second;
+      } else if (op.first=="restoration_options") {
+        restoration_options = op.second;
       }
     }
 
@@ -481,7 +488,7 @@ namespace casadi {
                        {"g", g_rp}};
 
       // Set options for the SQP method for the restoration problem
-      Dict solver_options;
+      Dict solver_options = restoration_options;
       solver_options["globalization"] = true;
       solver_options["which_second_derv"] = 0;
       solver_options["restore_feas"] = false;
