@@ -7,13 +7,6 @@ cmake_minimum_required(VERSION 2.8.6)
 project(sundials-2.6.1mod C)
 include_directories(.)
 
-# cmake_policy use MACOSX_RPATH=ON by default
-if(COMMAND cmake_policy)
-  if(CMAKE_MAJOR_VERSION GREATER 2)
-    cmake_policy(SET CMP0042 NEW)
-  endif()
-endif()
-
 set(SUNDIALS_INCLUDES
   nvector/nvector_serial.h
 
@@ -136,4 +129,4 @@ set(SUNDIALS_SOURCES
   kinsol/kinsol_sptfqmr.c
 )
 
-casadi_external_library(casadi_sundials ${SUNDIALS_INCLUDES} ${SUNDIALS_SOURCES})
+add_library(casadi_sundials STATIC ${SUNDIALS_INCLUDES} ${SUNDIALS_SOURCES})

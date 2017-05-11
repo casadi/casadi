@@ -44,7 +44,7 @@ for t in targets:
       cfile = line[-1]
       flags = [f for f in line[2:-4] if not f.startswith("-I") and not f.startswith("-DOS")]
       data.append((cfile,pwd,flags))
-      
+
   for cfile,pwd,f in data:
     assert f==data[0][2] or len(f)==0
   target_data[t] = data
@@ -67,16 +67,16 @@ with file('CMakeLists.txt','w') as f:
   f.write("include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dummy_include)\n")
   f.write("include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dummy_include/foo/bar)\n")
   #f.write("include_directories(/opt/blasfeo/include)\n")
-  
+
   for t,blasfeo_target in combinations:
     data = target_data[t]
-    
+
     libname = "casadi_hpmpc_%s_%s" % (t,blasfeo_target)
     blasfeo_libname = "casadi_blasfeo_%s" % blasfeo_target
     bitness64 = "-m64" in data[0][2]
     if bitness64:
       f.write("if( CMAKE_SIZEOF_VOID_P EQUAL 8 )\n")
-    f.write("casadi_external_library(%s %s)\n" % (libname, "\n".join([ os.path.join(pwd,cfile) for cfile, pwd, _ in data])))
+    f.write("add_library(%s SHARED %s)\n" % (libname, "\n".join([ os.path.join(pwd,cfile) for cfile, pwd, _ in data])))
     f.write("SET_TARGET_PROPERTIES(%s PROPERTIES COMPILE_FLAGS \"-DLA_BLASFEO -DTARGET_%s -DTARGET_%s %s ${HPMPC_FLAGS}\")\n\n" % (libname, blasfeo_target,t , " ".join(data[0][2])))
     f.write("target_link_libraries(%s %s m)\n" % (libname, blasfeo_libname))
     if bitness64:

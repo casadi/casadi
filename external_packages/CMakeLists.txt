@@ -1,16 +1,5 @@
 cmake_minimum_required(VERSION 2.8.6)
 
-macro(casadi_external_library name)
-  # cmake_policy use MACOSX_RPATH=ON by default
-  if(COMMAND cmake_policy)
-    if(CMAKE_MAJOR_VERSION GREATER 2)
-      cmake_policy(SET CMP0042 NEW)
-    endif()
-  endif()
-  # External packages are always build statically, not installed
-  add_library(${name} STATIC ${ARGN})
-endmacro()
-
 if(WITH_TINYXML AND WITH_BUILD_TINYXML)
   add_subdirectory(tinyxml-2.6.2)
 endif()
