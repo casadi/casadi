@@ -12,6 +12,7 @@ env:
     - MATLAB_ROOT=/home/travis/build/matlab
     - MATLABRELEASE=R2014a
     - SLURP_OS=trusty
+    - PYTHONPATH=/usr/local/python
 
 before_script:
   - set -e
@@ -301,7 +302,6 @@ branches:
 
 before_install:
   - export casadi_build_flags="-DWITH_COMMON=ON "
-  - export PYTHONPATH=$PYTHONPATH:/usr/local/python
   - pushd ../../ && git clone https://github.com/casadi/testbot.git
   - pushd testbot && git checkout merged && source recipes/setup.sh && popd
   - sudo apt-get install p7zip-full -y
