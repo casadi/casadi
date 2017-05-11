@@ -16447,6 +16447,12 @@ Get a string representation for a binary MatType, using custom arguments.
 
 ";
 
+%feature("docstring") casadi::GenericMatrix::jtimes "
+
+Functions called by friend functions defined here
+
+";
+
 %feature("docstring") friendwrap_substitute_inplace "
 
 Inplace substitution with piggyback expressions Substitute variables v out
@@ -29929,6 +29935,12 @@ Get the size along a particular dimensions.
 
 ";
 
+%feature("docstring") casadi::Matrix::jtimes "
+
+Functions called by friend functions defined here
+
+";
+
 %feature("docstring") casadi::Matrix::n_dep "[INTERNAL]  Get the number of
 dependencies of a binary SXElem Only defined if symbolic scalar.
 
@@ -30274,6 +30286,12 @@ true.
 returns itself, but with an assertion attached
 
 If y does not evaluate to 1, a runtime error is raised
+
+";
+
+%feature("docstring") casadi::MX::jtimes "
+
+Functions called by friend functions defined here
 
 ";
 
@@ -41720,20 +41738,6 @@ reference to an element
 
 %feature("docstring") casadi::SparseStorage::reserve "[INTERNAL] ";
 
-%feature("docstring") casadi::SparseStorage::nonzeros "
-
->  std::vector< DataType > & casadi::SparseStorage< DataType >::nonzeros()
-------------------------------------------------------------------------
-[INTERNAL] 
-Access the non-zero elements.
-
->  const std::vector< DataType > & casadi::SparseStorage< DataType >::nonzeros() const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Const access the non-zero elements.
-
-";
-
 %feature("docstring") casadi::SparseStorage::resize "[INTERNAL] ";
 
 %feature("docstring") casadi::SparseStorage "[INTERNAL] C++ includes:
@@ -41765,8 +41769,17 @@ Copy constructor.
 
 ";
 
-%feature("docstring") casadi::SparseStorage::scalar "[INTERNAL]  Convert to
-scalar type.
+%feature("docstring") casadi::SparseStorage::nonzeros "
+
+>  std::vector< DataType > & casadi::SparseStorage< DataType >::nonzeros()
+------------------------------------------------------------------------
+[INTERNAL] 
+Access the non-zero elements.
+
+>  const std::vector< DataType > & casadi::SparseStorage< DataType >::nonzeros() const 
+------------------------------------------------------------------------
+[INTERNAL] 
+Const access the non-zero elements.
 
 ";
 

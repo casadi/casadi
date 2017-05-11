@@ -22941,8 +22941,8 @@ Get the size along a particular dimensions.
 
 ";
 
-%feature("docstring")  jtimes(const MatType &ex, const MatType &arg, const
-MatType &v, bool tr=false) "
+%feature("docstring")  casadi::GenericMatrix< MatType >::jtimes(const
+MatType &ex, const MatType &arg, const MatType &v, bool tr=false) "
 
 Calculate the Jacobian and multiply by a vector from the right This is
 equivalent to mul(jacobian(ex, arg), v) or mul(jacobian(ex, arg).T, v) for
@@ -23064,6 +23064,13 @@ Calculate Jacobian.
 std::string > &args) "
 
 Get a string representation for a binary MatType, using custom arguments.
+
+";
+
+%feature("docstring")  casadi::GenericMatrix< MatType >::jtimes(const
+MatType &ex, const MatType &arg, const MatType &v, bool tr=false) "
+
+Functions called by friend functions defined here
 
 ";
 
@@ -42204,6 +42211,14 @@ Get the size along a particular dimensions.
 
 ";
 
+%feature("docstring")  casadi::GenericMatrix< Matrix< Scalar >
+>::jtimes(const Matrix< Scalar > &ex, const Matrix< Scalar > &arg, const
+Matrix< Scalar > &v, bool tr=false) "
+
+Functions called by friend functions defined here
+
+";
+
 %feature("docstring")  casadi::SX::n_dep() const  "
 
 [INTERNAL]  Get the number of dependencies of a binary SXElem Only defined
@@ -42613,6 +42628,13 @@ std::string &fail_message="") const  "
 returns itself, but with an assertion attached
 
 If y does not evaluate to 1, a runtime error is raised
+
+";
+
+%feature("docstring")  casadi::GenericMatrix< MX  >::jtimes(const MX &ex,
+const MX &arg, const MX &v, bool tr=false) "
+
+Functions called by friend functions defined here
 
 ";
 
@@ -58676,19 +58698,6 @@ int ncol) "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::SparseStorage< DataType >::nonzeros() "
-
-[INTERNAL]  Access the non-zero elements.
-
-";
-
-%feature("docstring")  casadi::SparseStorage< DataType >::nonzeros() const
-"
-
-[INTERNAL]  Const access the non-zero elements.
-
-";
-
 %feature("docstring")  casadi::SparseStorage< DataType >::resize(int nrow,
 int ncol) "
 
@@ -58727,9 +58736,16 @@ SparseStorage< DataType > &m) "
 
 ";
 
-%feature("docstring")  casadi::SparseStorage< DataType >::scalar() const  "
+%feature("docstring")  casadi::SparseStorage< DataType >::nonzeros() "
 
-[INTERNAL]  Convert to scalar type.
+[INTERNAL]  Access the non-zero elements.
+
+";
+
+%feature("docstring")  casadi::SparseStorage< DataType >::nonzeros() const
+"
+
+[INTERNAL]  Const access the non-zero elements.
 
 ";
 
