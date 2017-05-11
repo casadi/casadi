@@ -1,80 +1,80 @@
-if(LAPACK_FOUND)
+if(WITH_LAPACK)
   add_subdirectory(lapack)
 endif()
 
-if(SUNDIALS_FOUND)
+if(WITH_SUNDIALS)
   add_subdirectory(sundials)
 endif()
 
-if(IPOPT_FOUND)
+if(WITH_IPOPT)
   add_subdirectory(ipopt)
 endif()
 
-if(BONMIN_FOUND)
+if(WITH_BONMIN)
   add_subdirectory(bonmin)
 endif()
 
-if(QPOASES_FOUND)
+if(WITH_QPOASES)
   add_subdirectory(qpoases)
 endif()
 
-if(KNITRO_FOUND)
+if(WITH_KNITRO)
   add_subdirectory(knitro)
 endif()
 
-if(CPLEX_FOUND)
+if(WITH_CPLEX)
   add_subdirectory(cplex)
 endif()
 
-if(CLP_FOUND)
+if(WITH_CLP)
   add_subdirectory(clp)
 endif()
 
-if(CSPARSE_FOUND)
+if(WITH_CSPARSE)
   add_subdirectory(csparse)
 endif()
 
-if(CLANG_FOUND)
+if(WITH_CLANG)
   add_subdirectory(clang)
 endif()
 
-if(HSL_FOUND)
+if(WITH_HSL)
   add_subdirectory(hsl)
 endif()
 
-if(OOQP_FOUND)
+if(WITH_OOQP)
   add_subdirectory(ooqp)
 endif()
 
-if(GUROBI_FOUND)
+if(WITH_GUROBI)
   add_subdirectory(gurobi)
 endif()
 
-if(WORHP_FOUND)
+if(WITH_WORHP)
   add_subdirectory(worhp)
 endif()
 
-if(SQIC_FOUND)
+if(WITH_SQIC)
   add_subdirectory(sqic)
 endif()
 
-if(SNOPT_FOUND OR WITH_SNOPT_FORCE_DUMMY)
+if(WITH_SNOPT)
   add_subdirectory(snopt)
 endif()
 
-if(TINYXML_FOUND)
+if(WITH_TINYXML)
   add_subdirectory(tinyxml)
 endif()
 
-if(BLOCKSQP_FOUND)
+if(WITH_BLOCKSQP)
   add_subdirectory(blocksqp)
 endif()
 
-if(HPMPC_FOUND)
+if(WITH_HPMPC)
   add_subdirectory(hpmpc)
 endif()
 
-if(SLICOT_FOUND)
+if(WITH_SLICOT)
   add_subdirectory(slicot)
 endif()
 

@@ -30,7 +30,6 @@
 #include <vector>
 #include <utility>
 
-#include "casadi_common.hpp"
 #include "casadi_logger.hpp"
 
 #ifdef SWIG
@@ -59,10 +58,11 @@ namespace casadi {
   class Sparsity;
   class CodeGenerator;
   class NlpBuilder;
-  class Variable;
+  struct Variable;
   class DaeBuilder;
   class XmlFile;
   class Importer;
+  class ParsedFile;
 
 #ifndef SWIG
 // Get GCC version if GCC is used
@@ -77,20 +77,31 @@ namespace casadi {
 // Disable some Visual studio warnings
 #ifdef _MSC_VER
 
-#pragma warning(disable:4996)
-
 // warning C4018: '<' : signed/unsigned mismatch
 #pragma warning(disable:4018)
+
+// warning C4244: Potential loss of data converting double to int
+#pragma warning(disable:4244)
+
+// warinng C4251: Need a dll interface?
+#pragma warning(disable:4251)
+
+// warning C4715: Not all control paths return a value
+#pragma warning(disable:4715)
 
 // warning C4800: 'int' : forcing value to bool 'true'or 'false'(performance warning)
 #pragma warning(disable:4800)
 
-// warning C4244: Potential loss of data converting double to int
-#pragma warning(disable:4244)
+// warning C4910: __declspec(dllexport) and extern incompatible on an explicit instantiation
+#pragma warning(disable:4910)
+
+// ?
+#pragma warning(disable:4996)
+
 #endif // _MSC_VER
 
   // Workarond for MinGW bug
-#if defined(__MINGW32__) || defined(__MINGW64__)
+#if defined(__MINGW32__) || defined(__MINGW64__) || defined(_MSC_VER)
   template<typename T>
   std::string to_string(const T& n) {
     std::stringstream s;

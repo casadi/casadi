@@ -18,9 +18,7 @@ if(WITH_IPOPT_CALLBACK)
   add_definitions(-DWITH_IPOPT_CALLBACK)
 endif()
 
-if(IPOPT_FOUND)
-  add_definitions(${IPOPT_CFLAGS_OTHER})
-endif()
+add_definitions(${IPOPT_CFLAGS_OTHER})
 
 casadi_plugin(Nlpsol ipopt ${NLPSOL_IPOPT_SRCS})
 casadi_plugin_link_libraries(Nlpsol ipopt ${IPOPT_LIBRARIES})

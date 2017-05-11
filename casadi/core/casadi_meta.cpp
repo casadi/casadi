@@ -23,18 +23,30 @@
  */
 
 
-#ifndef CASADI_CASADI_COMMON_HPP
-#define CASADI_CASADI_COMMON_HPP
+#include "casadi_meta.hpp"
+#include <casadi/config.h>
 
-#include <casadi/core/casadi_export.h>
+namespace casadi {
+  const char* CasadiMeta::version() { return CASADI_VERSION_STRING;}
 
-#ifdef casadi_EXPORTS
-#define casadi_implementation
-#endif
+  const char* CasadiMeta::git_revision() { return CASADI_GIT_REVISION;}
 
-#ifndef SHARED_LIBRARY
-#define casadi_implementation
-#endif
+  const char* CasadiMeta::git_describe() { return CASADI_GIT_DESCRIBE;}
 
-#endif // CASADI_CASADI_COMMON_HPP
+  const char* CasadiMeta::feature_list() { return CASADI_FEATURE_LIST;}
 
+  const char* CasadiMeta::build_type() { return CASADI_BUILD_TYPE;}
+
+  const char* CasadiMeta::compiler_id() { return CASADI_COMPILER_ID;}
+
+  const char* CasadiMeta::compiler() { return CASADI_COMPILER;}
+
+  const char* CasadiMeta::compiler_flags() { return CASADI_COMPILER_FLAGS;}
+
+  const char* CasadiMeta::modules() { return CASADI_MODULES;}
+
+  const char* CasadiMeta::plugins() { return CASADI_PLUGINS;}
+
+  const char* CasadiMeta::install_prefix() { return CASADI_INSTALL_PREFIX;}
+
+}  // namespace casadi

@@ -241,7 +241,7 @@ namespace casadi {
     std::vector<double> BSpline::derivative_coeff(int i) const {
       int n_dims = degree_.size();
 
-      std:vector<double> coeffs;
+      std::vector<double> coeffs;
       int n_knots = offset_[i+1]-offset_[i];
       int n = n_knots-degree_[i]-1;
       DM knots = std::vector<double>(get_ptr(knots_)+offset_[i], get_ptr(knots_)+offset_[i+1]);

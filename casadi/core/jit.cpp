@@ -24,6 +24,7 @@
 
 
 #include "jit_impl.hpp"
+#include "casadi_file.hpp"
 
 #include <iostream>
 #include <fstream>

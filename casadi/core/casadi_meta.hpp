@@ -27,7 +27,7 @@
 #define CASADI_CASADI_META_HPP
 
 #include <string>
-#include "casadi_common.hpp"
+#include <casadi/core/casadi_export.h>
 
 namespace casadi {
   /**
@@ -41,19 +41,31 @@ namespace casadi {
       /// No instances are allowed
       CasadiMeta();
     public:
-#ifndef SWIG
-      static const std::string version;
-      static const std::string git_revision;
-      static const std::string git_describe;
-      static const std::string feature_list;
-      static const std::string build_type;
-      static const std::string compiler_id;
-      static const std::string compiler;
-      static const std::string compiler_flags;
-      static const std::string modules;
-      static const std::string plugins;
-      static const std::string install_prefix;
-#endif //SWIG
+#ifdef WITH_DEPRECATED_FEATURES
+  /** \brief [DEPRECATED] Renamed version */
+  static std::string getVersion() { return version(); }
+  /** \brief [DEPRECATED] Renamed git_revision */
+  static std::string getGitRevision() { return git_revision(); }
+  /** \brief [DEPRECATED] Renamed git_describe */
+  static std::string getGitDescribe() { return git_describe(); }
+  /** \brief [DEPRECATED] Renamed feature_list */
+  static std::string getFeatureList() { return feature_list(); }
+  /** \brief [DEPRECATED] Renamed build_type */
+  static std::string getBuildType() { return build_type(); }
+  /** \brief [DEPRECATED] Renamed compiler_id */
+  static std::string getCompilerId() { return compiler_id(); }
+  /** \brief [DEPRECATED] Renamed compiler */
+  static std::string getCompiler() { return compiler(); }
+  /** \brief [DEPRECATED] Renamed compiler_flags */
+  static std::string getCompilerFlags() { return compiler_flags(); }
+  /** \brief [DEPRECATED] Renamed modules */
+  static std::string getModules() { return modules(); }
+  /** \brief [DEPRECATED] Renamed plugins */
+  static std::string getPlugins() { return plugins(); }
+  /** \brief [DEPRECATED] Renamed install_prefix */
+  static std::string getInstallPrefix() { return install_prefix(); }
+#endif // WITH_DEPRECATED_FEATURES
+
     /** \brief Obtain the version number of CasADi
     *  The format is 'x.y.z' or 'x.y.z+'
     *
@@ -64,40 +76,40 @@ namespace casadi {
     *
     *  \see getGitRevision getGitDescribe
     */
-    static std::string getVersion() { return version; }
+    static const char* version();
     /** \brief Obtain the git hash of this build
     *      (only available if built from a git repo)
     */
-    static std::string getGitRevision() { return git_revision; }
+    static const char* git_revision();
     /** \brief Obtain the git description of this build
     *      (only available if built from a git repo)
     */
-    static std::string getGitDescribe() { return git_describe; }
+    static const char* git_describe();
     /** \brief Obtain list of features that were compiled into this build
     */
-    static std::string getFeatureList() { return feature_list; }
+    static const char* feature_list();
     /** \brief Obtain build type: RELEASE/Debug
     */
-    static std::string getBuildType() { return build_type; }
+    static const char* build_type();
     /** \brief Obtain compiler identification
     * Provided by http://www.cmake.org/cmake/help/v2.8.10/cmake.html#variable:CMAKE_LANG_COMPILER_ID
     */
-    static std::string getCompilerId() { return compiler_id; }
+    static const char* compiler_id();
     /** \brief Obtain compiler
     */
-    static std::string getCompiler() { return compiler; }
+    static const char* compiler();
     /** \brief Obtain compiler flags
     */
-    static std::string getCompilerFlags() { return compiler_flags; }
+    static const char* compiler_flags();
     /** \brief Obtain modules list
     */
-    static std::string getModules() { return modules; }
+    static const char* modules();
     /** \brief Obtain plugins list
     */
-    static std::string getPlugins() { return plugins; }
+    static const char* plugins();
     /** \brief Obtain install prefix
     */
-    static std::string getInstallPrefix() { return install_prefix; }
+    static const char* install_prefix();
   };
 
 }  // namespace casadi

@@ -9,8 +9,8 @@ macro(CASADI_STRINGIFY STRFILE)
     # Append file as strings
     file(STRINGS ${FILE} FILE_CONTENTS)
     foreach(LINE ${FILE_CONTENTS})
-      string(REPLACE "\\" "\\\\" LINE ${LINE}) # Replace \ with \\
-      string(REPLACE "\"" "\\\"" LINE ${LINE}) # Replace " with \"
+      string(REPLACE "\\" "\\\\" LINE "${LINE}") # Replace \ with \\
+      string(REPLACE "\"" "\\\"" LINE "${LINE}") # Replace " with \"
       file(APPEND ${STRFILE} "\n  \"${LINE}\\n\"")
     endforeach()
     # End declaration
@@ -26,47 +26,31 @@ macro(casadi_library name)
     add_library(${name} STATIC ${ARGN})
   endif()
   if(ENABLE_SHARED)
-    add_definitions(-DSHARED_LIBRARY)
     add_library(${name} SHARED ${ARGN})
   endif()
   generate_export_header(${name})
 
-  # Make sure the exported header is installed
-  file(RELATIVE_PATH RELPATH "${CMAKE_BINARY_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/${name}_export.h")
-  get_filename_component(RELPATH ${RELPATH} PATH)
-
   # Link with the core
   if(NOT "${name}" STREQUAL "casadi")
+    # Not core
     target_link_libraries(${name} casadi)
+    install(TARGETS ${name}
+      LIBRARY DESTINATION ${LIB_PREFIX}
+      ARCHIVE DESTINATION ${LIB_PREFIX}
+      RUNTIME DESTINATION ${BIN_PREFIX}
+    )
+  else()
+    # Core
+    install(TARGETS ${name}
+      # IMPORTANT: Add the library to the "export-set"
+      EXPORT casadi-targets
+      LIBRARY DESTINATION ${LIB_PREFIX}
+      ARCHIVE DESTINATION ${LIB_PREFIX}
+      RUNTIME DESTINATION ${BIN_PREFIX}
+    )
   endif()
 
-  if(WITH_SELFCONTAINED)
-    if (WITH_PYTHON)
-      install(TARGETS ${name}
-        LIBRARY DESTINATION casadi
-        ARCHIVE DESTINATION casadi
-        RUNTIME DESTINATION casadi
-      )
-    endif()
-    if (WITH_MATLAB OR WITH_OCTAVE)
-      install(TARGETS ${name}
-        LIBRARY DESTINATION .
-        ARCHIVE DESTINATION .
-        RUNTIME DESTINATION .
-      )
-    endif()
-  else()
-    install(TARGETS ${name}
-      LIBRARY DESTINATION lib
-      ARCHIVE DESTINATION lib
-      RUNTIME DESTINATION lib
-    )
-    SET_TARGET_PROPERTIES(
-      ${name}
-    PROPERTIES
-      SOVERSION ${PACKAGE_SO_VERSION}
-    )
-  endif()
+  SET_TARGET_PROPERTIES(${name} PROPERTIES SOVERSION ${PACKAGE_SO_VERSION})
 
   if(WITH_LINT)
     add_style_check_target(${name} "${ARGN}")
@@ -123,4 +107,7 @@ set(CASADI_PLUGINS ${CASADI_PLUGINS} PARENT_SCOPE)
 
 add_custom_target(libs ALL DEPENDS ${CASADI_MODULES})
 
-install(FILES casadi.hpp DESTINATION include/casadi)
+# Main header files
+configure_file(config.h.cmake "${CMAKE_CURRENT_BINARY_DIR}/config.h" ESCAPE_QUOTES)
+install(FILES casadi.hpp mem.h "${CMAKE_CURRENT_BINARY_DIR}/config.h"
+        DESTINATION ${INCLUDE_PREFIX}/casadi)

@@ -399,8 +399,6 @@ namespace casadi {
                                              const Matrix<Scalar> &x, const Matrix<Scalar> &a,
                                              const Matrix<Scalar> &b, int order,
                                              const Matrix<Scalar>& w);
-    static Matrix<Scalar> jtimes(const Matrix<Scalar> &ex, const Matrix<Scalar> &arg,
-                                   const Matrix<Scalar> &v, bool tr=false);
     static std::vector<std::vector<Matrix<Scalar> > >
     forward(const std::vector<Matrix<Scalar> > &ex,
             const std::vector<Matrix<Scalar> > &arg,

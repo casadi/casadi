@@ -32,8 +32,7 @@ matrix:
         - sudo apt-get install valgrind libgomp1 -y
         - mkdir build
         - pushd build
-        - cmake -DWITH_OPENMP=ON -DOLD_LLVM=ON -DWITH_CLANG=ON -DWITH_ECOS=ON -DWITH_MOSEK=ON -DWITH_PYTHON=ON -DWITH_WORHP=ON -DWITH_SLICOT=ON -DWITH_OOQP=ON -DWITH_PROFILING=ON -DWITH_DOC=ON -DWITH_EXAMPLES=ON -DWITH_COVERAGE=ON -DWITH_EXTRA_WARNINGS=ON -DWITH_PYTHON=ON -DWITH_JSON=ON -DWITH_BLASFEO=ON -DWITH_BUILD_BLASFEO=ON -DWITH_HPMPC=ON -DWITH_BUILD_HPMPC=ON ..
-
+        - cmake -DWITH_OPENMP=ON $casadi_build_flags -DWITH_PROFILING=ON -DWITH_DOC=ON -DWITH_EXAMPLES=ON -DWITH_COVERAGE=ON -DWITH_EXTRA_WARNINGS=ON -DWITH_PYTHON=ON -DWITH_JSON=ON -DWITH_BLASFEO=ON -DWITH_BUILD_BLASFEO=ON -DWITH_HPMPC=ON -DWITH_BUILD_HPMPC=ON ..
         - make -j2
         - sudo make -j2 install
         - popd
@@ -53,7 +52,7 @@ matrix:
         - sudo apt-get install valgrind libgomp1 -y
         - mkdir build
         - pushd build
-        - cmake -DWITH_OPENMP=ON -DOLD_LLVM=ON -DWITH_CLANG=ON -DWITH_ECOS=ON -DWITH_MOSEK=ON -DWITH_PYTHON=ON -DWITH_WORHP=ON -DWITH_SLICOT=OFF -DWITH_OOQP=ON -DWITH_PROFILING=ON -DWITH_DOC=ON -DWITH_EXAMPLES=ON -DWITH_COVERAGE=ON -DWITH_EXTRA_WARNINGS=ON -DWITH_PYTHON=ON -DWITH_JSON=ON -DWITH_BLASFEO=ON -DWITH_BUILD_BLASFEO=ON -DWITH_HPMPC=ON -DWITH_BUILD_HPMPC=ON ..
+        - cmake -DWITH_OPENMP=ON $casadi_build_flags -DWITH_SLICOT=OFF -DWITH_PROFILING=ON -DWITH_DOC=ON -DWITH_EXAMPLES=ON -DWITH_COVERAGE=ON -DWITH_EXTRA_WARNINGS=ON -DWITH_PYTHON=ON -DWITH_JSON=ON -DWITH_BLASFEO=ON -DWITH_BUILD_BLASFEO=ON -DWITH_HPMPC=ON -DWITH_BUILD_HPMPC=ON ..
 
         - make -j2
         - sudo make -j2 install
@@ -85,7 +84,7 @@ matrix:
         - pushd build
         - cmake --version
         - python3 --version
-        - cmake -DWITH_OPENMP=OFF -DCMAKE_BUILD_TYPE=Debug -DOLD_LLVM=ON -DWITH_CLANG=ON -DWITH_ECOS=ON -DWITH_MOSEK=ON -DWITH_PYTHON=ON -DWITH_WORHP=ON -DWITH_SLICOT=OFF -DWITH_OOQP=ON -DWITH_PROFILING=ON -DWITH_DOC=ON -DWITH_EXAMPLES=ON -DWITH_EXTRA_WARNINGS=ON -DWITH_PYTHON=ON -DWITH_PYTHON3=ON -DWITH_JSON=ON ..
+        - cmake -DWITH_OPENMP=OFF $casadi_build_flags -DWITH_SLICOT=OFF -DCMAKE_BUILD_TYPE=Debug -DWITH_PROFILING=ON -DWITH_DOC=ON -DWITH_EXAMPLES=ON -DWITH_EXTRA_WARNINGS=ON -DWITH_PYTHON=ON -DWITH_PYTHON3=ON -DWITH_JSON=ON ..
 
         - make -j2
         - sudo make -j2 install
@@ -122,7 +121,7 @@ matrix:
         - set -e
         - mkdir build
         - pushd build
-        - cmake  -DOLD_LLVM=ON -DWITH_CLANG=ON -DWITH_JSON=ON -DWITH_ECOS=ON -DWITH_MOSEK=ON -DCMAKE_BUILD_TYPE=Debug -DWITH_PYTHON=ON -DWITH_WORHP=ON -DWITH_SLICOT=OFF -DWITH_OOQP=ON -DWITH_PROFILING=ON -DWITH_DOC=ON -DWITH_EXAMPLES=ON -DWITH_COVERAGE=ON -DWITH_EXTRA_WARNINGS=ON ..
+        - cmake $casadi_build_flags -DWITH_SLICOT=OFF -DWITH_JSON=ON -DCMAKE_BUILD_TYPE=Debug -DWITH_PROFILING=ON -DWITH_DOC=ON -DWITH_EXAMPLES=ON -DWITH_COVERAGE=ON -DWITH_EXTRA_WARNINGS=ON -DWITH_PYTHON=ON ..
         - make -j2
         - sudo make -j2 install
         - popd
@@ -147,7 +146,7 @@ matrix:
       script:
         - mkdir build
         - pushd build
-        - cmake  -DOLD_LLVM=ON -DWITH_CLANG=ON -DWITH_ECOS=ON -DWITH_MOSEK=ON -DWITH_PYTHON=ON -DWITH_WORHP=ON -DWITH_SLICOT=OFF -DWITH_PYTHON=ON -DWITH_JSON=ON ..
+        - cmake $casadi_build_flags -DWITH_SLICOT=OFF -DWITH_PYTHON=ON -DWITH_JSON=ON ..
         - make
         - sudo make install
         - popd
@@ -161,7 +160,7 @@ matrix:
       script:
         - mkdir build
         - pushd build
-        - cmake  -DOLD_LLVM=ON -DWITH_CLANG=ON -DWITH_DEPRECATED_FEATURES=OFF -DWITH_ECOS=ON -DWITH_MOSEK=ON -DWITH_PYTHON=ON -DWITH_WORHP=ON -DWITH_SLICOT=OFF -DWITH_PYTHON=ON -DWITH_JSON=ON ..
+        - cmake $casadi_build_flags -DWITH_SLICOT=OFF -DWITH_DEPRECATED_FEATURES=OFF -DWITH_PYTHON=ON -DWITH_JSON=ON ..
         - make
         - sudo make install
         - popd
@@ -180,7 +179,7 @@ matrix:
         - export CXX=g++-6
         - mkdir build
         - pushd build
-        - cmake  -DOLD_LLVM=ON -DWITH_CLANG=ON -DWITH_DEPRECATED_FEATURES=OFF -DWITH_ECOS=ON -DWITH_MOSEK=ON -DWITH_PYTHON=ON -DWITH_WORHP=ON -DWITH_SLICOT=OFF -DWITH_PYTHON=ON -DWITH_JSON=ON ..
+        - cmake  $casadi_build_flags -DWITH_SLICOT=OFF -DWITH_DEPRECATED_FEATURES=OFF -DWITH_PYTHON=ON -DWITH_JSON=ON ..
         - make
         - sudo make install
         - popd
@@ -203,7 +202,7 @@ matrix:
         - export languagetool="$mypwd/LanguageTool-2.7"
         - mkdir build
         - pushd build
-        - cmake  -DOLD_LLVM=ON -DWITH_CLANG=ON -DWITH_ECOS=ON -DWITH_MOSEK=ON -DWITH_WORHP=ON -DWITH_SLICOT=OFF -DWITH_OOQP=ON -DWITH_WERROR=ON -DWITH_EXTRA_WARNINGS=ON ..
+        - cmake $casadi_build_flags -DWITH_SLICOT=OFF -DWITH_WERROR=ON -DWITH_EXTRA_WARNINGS=ON -DWITH_SPELL=ON -DWITH_LINT=ON ..
         - make lint
         - export languagetool="$mypwd/LanguageTool-2.7" make spell
         - popd && pushd misc && python autogencode.py && popd
@@ -240,7 +239,7 @@ matrix:
       script:
         - mkdir build
         - pushd build
-        - cmake  -DOLD_LLVM=ON -DWITH_ECOS=ON -DWITH_MOSEK=ON -DWITH_WORHP=ON -DWITH_SLICOT=OFF -DWITH_PYTHON=ON -DWITH_JSON=ON ..
+        - cmake $casadi_build_flags -DWITH_SLICOT=OFF -DWITH_PYTHON=ON -DWITH_JSON=ON ..
         - make VERBOSE=1
         - sudo make install
         - popd
@@ -267,7 +266,7 @@ matrix:
         - popd
         - mkdir build
         - pushd build
-        - cmake  -DOLD_LLVM=ON -DCMAKE_INSTALL_PREFIX=/home/travis/build/matlab-install -DWITH_CLANG=ON -DWITH_ECOS=ON -DWITH_MOSEK=ON -DWITH_DEEPBIND=ON -DWITH_MATLAB=ON -DWITH_WORHP=ON -DWITH_SLICOT=OFF -DWITH_OOQP=ON -DWITH_PROFILING=ON -DWITH_DOC=ON -DWITH_EXAMPLES=ON -DWITH_COVERAGE=ON -DWITH_EXTRA_WARNINGS=ON -DWITH_JSON=ON ..
+        - cmake $casadi_build_flags -DWITH_SLICOT=OFF -DCMAKE_INSTALL_PREFIX=/home/travis/build/matlab-install -DWITH_DEEPBIND=ON -DWITH_MATLAB=ON -DWITH_PROFILING=ON -DWITH_DOC=ON -DWITH_EXAMPLES=ON -DWITH_COVERAGE=ON -DWITH_EXTRA_WARNINGS=ON -DWITH_JSON=ON ..
         - make -j2 VERBOSE=1
         - sudo make -j2 install
         - popd
@@ -290,7 +289,7 @@ matrix:
 
         - mkdir build
         - pushd build
-        - cmake  -DOLD_LLVM=ON -DCMAKE_INSTALL_PREFIX=/home/travis/build/octave-install -DWITH_CLANG=ON -DWITH_ECOS=ON -DWITH_MOSEK=ON -DWITH_DEEPBIND=ON -DWITH_OCTAVE=ON -DWITH_OCTAVE_IMPORT=ON -DWITH_WORHP=ON -DWITH_SLICOT=OFF -DWITH_OOQP=ON -DWITH_PROFILING=ON -DWITH_DOC=ON -DWITH_EXAMPLES=ON -DWITH_COVERAGE=ON -DWITH_EXTRA_WARNINGS=ON -DWITH_JSON=ON ..
+        - cmake $casadi_build_flags -DWITH_SLICOT=OFF -DCMAKE_INSTALL_PREFIX=/home/travis/build/octave-install -DWITH_DEEPBIND=ON -DWITH_OCTAVE=ON -DWITH_OCTAVE_IMPORT=ON -DWITH_PROFILING=ON -DWITH_DOC=ON -DWITH_EXAMPLES=ON -DWITH_COVERAGE=ON -DWITH_EXTRA_WARNINGS=ON -DWITH_JSON=ON ..
         - make -j2
         - sudo make -j2 install
         - popd
@@ -303,6 +302,7 @@ branches:
     - /.*appveyor.*/
 
 before_install:
+  - export PYTHONPATH=$PYTHONPATH:/usr/local/python
   - pushd ../../ && git clone https://github.com/casadi/testbot.git
   - pushd testbot && git checkout merged && source recipes/setup.sh && popd
   - sudo apt-get install p7zip-full -y

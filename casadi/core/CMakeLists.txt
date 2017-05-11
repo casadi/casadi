@@ -9,13 +9,11 @@ set(CASADI_PUBLIC
   casadi_limits.hpp
   casadi_types.hpp
   casadi_logger.hpp
-  casadi_file.hpp
   casadi_interrupt.hpp
   exception.hpp
   calculus.hpp
   global_options.hpp
   casadi_meta.hpp
-  casadi_common.hpp
   printable_object.hpp        # Interface class enabling printing a Python-style "description" as well as a shorter "representation" of a class
   shared_object.hpp           # This base class implements the reference counting (garbage collection) framework used in CasADi
   generic_type.hpp            # Generic type used for options and for compatibility with dynamically typed languages like Python
@@ -72,10 +70,11 @@ set(CASADI_PUBLIC
 set(CASADI_INTERNAL
   # MISC
   casadi_logger.cpp
-  casadi_file.cpp
+  casadi_file.hpp casadi_file.cpp
   casadi_interrupt.cpp
   global_options.cpp
-  ${PROJECT_BINARY_DIR}/casadi_meta.cpp
+  ${CMAKE_CURRENT_BINARY_DIR}/../config.h
+  casadi_meta.cpp
   shared_object.cpp shared_object_internal.hpp shared_object_internal.cpp
   generic_type.cpp
   generic_type_internal.hpp
@@ -175,7 +174,7 @@ foreach(FILE ${CASADI_RUNTIME_SRC})
   set(CASADI_INTERNAL ${CASADI_INTERNAL} runtime/${FILE})
 endforeach()
 
-#set_source_files_properties(${CASADI_RUNTIME_SRC} PROPERTIES GENERATED TRUE)
+# Build static and/or shared
 casadi_library(casadi ${CASADI_PUBLIC} ${CASADI_INTERNAL})
 
 if(WITH_DL)
@@ -193,6 +192,6 @@ if(RT)
   target_link_libraries(casadi ${RT})
 endif()
 
-install(FILES ${CASADI_PUBLIC}
-  DESTINATION include/casadi/core
+install(FILES ${CASADI_PUBLIC} ${CMAKE_CURRENT_BINARY_DIR}/casadi_export.h
+  DESTINATION ${INCLUDE_PREFIX}/casadi/core
 )

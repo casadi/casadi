@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 2.8.6)
 
+find_package(LAPACK REQUIRED)
+
 include_directories(include src/bounds src/lp src/sdp src/solver src/sys src/vecmat)
 
 # cmake_policy use MACOSX_RPATH=ON by default

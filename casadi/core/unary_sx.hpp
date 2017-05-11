@@ -23,8 +23,8 @@
  */
 
 
-#ifndef UNARY_SXElem_HPP
-#define UNARY_SXElem_HPP
+#ifndef UNARY_SX_HPP
+#define UNARY_SX_HPP
 
 #include "sx_node.hpp"
 #include <stack>
@@ -37,7 +37,7 @@ namespace casadi {
   \author Joel Andersson
   \date 2012
 */
-class CASADI_EXPORT UnarySX : public SXNode {
+class UnarySX : public SXNode {
   private:
 
     /** \brief  Constructor is private, use "create" below */
@@ -97,4 +97,4 @@ class CASADI_EXPORT UnarySX : public SXNode {
 } // namespace casadi
 
 /// \endcond
-#endif // UNARY_SXElem_HPP
+#endif // UNARY_SX_HPP

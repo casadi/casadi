@@ -39,7 +39,7 @@ def print_subclasses(myclass, depth=0):
     print_subclasses(s,depth=depth+1)
 
 def loadAllCompiledPlugins():
-  for k in CasadiMeta.getPlugins().split(";"):
+  for k in CasadiMeta.plugins().split(";"):
     cls, name = k.split("::")
     print("Testing: ", cls, name)
     if cls in ("Importer","XmlFile","Linsol"):

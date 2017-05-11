@@ -1567,10 +1567,6 @@ namespace casadi {
     return jacobian(g, x, {{"symmetric", true}});
   }
 
-  MX MX::jtimes(const MX &ex, const MX &arg, const MX &v, bool tr) {
-    return _jtimes(ex, arg, v, tr);
-  }
-
   std::vector<std::vector<MX> >
   MX::forward(const std::vector<MX> &ex,
               const std::vector<MX> &arg,

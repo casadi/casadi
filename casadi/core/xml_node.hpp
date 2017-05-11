@@ -30,6 +30,7 @@
 #include <vector>
 #include <map>
 #include "exception.hpp"
+#include "casadi_types.hpp"
 
 /// \cond INTERNAL
 

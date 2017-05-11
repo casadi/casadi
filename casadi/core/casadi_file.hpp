@@ -42,7 +42,7 @@ namespace casadi {
       \author Joel Andersson
       \date 2016
   */
-  class CASADI_EXPORT ParsedFile {
+  class ParsedFile {
   public:
     /** \brief Default constructor (no commands) */
     ParsedFile() {}

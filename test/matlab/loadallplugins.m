@@ -1,6 +1,6 @@
 import casadi.*
 
-for pl = strsplit(CasadiMeta.getPlugins(),';')
+for pl = strsplit(CasadiMeta.plugins(),';')
   out  = strsplit(pl{:},'::');
   cls  = out{1};
   name = out{2};
