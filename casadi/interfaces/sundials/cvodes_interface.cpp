@@ -525,7 +525,7 @@ namespace casadi {
       // Sensitivity equations
       if (s.ns_>0) {
         // Second order correction
-        if (true) {
+        if (s.second_order_correction_) {
           // The outputs will double as seeds for jtimesF
           casadi_fill(v + s.nx1_, s.nx_ - s.nx1_, 0.);
           m->arg[0] = &t; // t
@@ -574,7 +574,7 @@ namespace casadi {
       // Sensitivity equations
       if (s.ns_>0) {
         // Second order correction
-        if (true) {
+        if (s.second_order_correction_) {
           // The outputs will double as seeds for jtimesF
           casadi_fill(v + s.nrx1_, s.nrx_ - s.nrx1_, 0.);
           m->arg[0] = &t; // t
