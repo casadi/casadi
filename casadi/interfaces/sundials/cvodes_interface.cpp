@@ -587,7 +587,7 @@ namespace casadi {
           s.calc_function(m, "jtimesB");
 
           // Subtract m->v2 from m->v1, scaled with gammaB
-          casadi_axpy(s.nrx_-s.nrx1_, -gammaB, m->v2, m->v1 + s.nrx1_);
+          casadi_axpy(s.nrx_-s.nrx1_, -gammaB, m->v2 + s.nrx1_, m->v1 + s.nrx1_);
         }
 
         // Solve for sensitivity right-hand-sides
