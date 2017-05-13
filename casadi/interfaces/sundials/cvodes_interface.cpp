@@ -536,7 +536,7 @@ namespace casadi {
           s.calc_function(m, "jtimesF");
 
           // Subtract m->v2 from m->v1, scaled with -gamma
-          casadi_axpy(s.nx_ - s.nx1_, gamma, m->v2 + s.nx1_, m->v1 + s.nx1_);
+          casadi_axpy(s.nx_ - s.nx1_, m->gamma, m->v2 + s.nx1_, m->v1 + s.nx1_);
         }
 
         // Solve for sensitivity right-hand-sides
@@ -587,7 +587,7 @@ namespace casadi {
           s.calc_function(m, "jtimesB");
 
           // Subtract m->v2 from m->v1, scaled with gammaB
-          casadi_axpy(s.nrx_-s.nrx1_, -gammaB, m->v2 + s.nrx1_, m->v1 + s.nrx1_);
+          casadi_axpy(s.nrx_-s.nrx1_, -m->gammaB, m->v2 + s.nrx1_, m->v1 + s.nrx1_);
         }
 
         // Solve for sensitivity right-hand-sides
@@ -612,6 +612,9 @@ namespace casadi {
     try {
       auto m = to_mem(user_data);
       auto& s = m->self;
+      // Store gamma for later
+      m->gamma = gamma;
+
       // Calculate Jacobian
       double d1 = -gamma, d2 = 1.;
       m->arg[0] = &t;
@@ -641,6 +644,8 @@ namespace casadi {
     try {
       auto m = to_mem(user_data);
       auto& s = m->self;
+      // Store gamma for later
+      m->gammaB = gammaB;
       // Calculate Jacobian
       double one=1;
       m->arg[0] = &t;
