@@ -65,6 +65,9 @@ namespace casadi {
     // Ids of backward problem
     int whichB;
 
+    // Remember the gamma and gammaB from last factorization
+    double gamma, gammaB;
+
     /// Constructor
     CvodesMemory(const CvodesInterface& s);
 
