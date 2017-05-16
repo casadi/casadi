@@ -1472,10 +1472,11 @@ namespace casadi {
 
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::project(const Matrix<Scalar>& x,
-                                             const Sparsity& sp, bool intersect) {
+                                         const Sparsity& sp, bool intersect) {
     if (intersect) {
       return project(x, sp.intersect(x.sparsity()), false);
     } else {
+      casadi_assert_message(sp.size()==x.size(), "Dimension mismatch");
       Matrix<Scalar> ret = Matrix<Scalar>::zeros(sp);
       std::vector<Scalar> w(x.size1());
       casadi_project(x.ptr(), x.sparsity(), ret.ptr(), sp, get_ptr(w));

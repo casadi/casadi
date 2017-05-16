@@ -724,6 +724,7 @@ namespace casadi {
     if (x.is_empty() || (sp==x.sparsity())) {
       return x;
     } else {
+      casadi_assert_message(sp.size()==x.size(), "Dimension mismatch");
       if (intersect) {
         return x->getProject(sp.intersect(x.sparsity()));
       } else {
