@@ -188,6 +188,8 @@ namespace casadi {
     // Solve the NLP
     virtual void solve(void* mem) const;
 
+    virtual Dict get_stats(void* mem) const;
+
     /// A documentation string
     static const std::string meta_doc;
 
@@ -215,6 +217,8 @@ namespace casadi {
     void printInfo(BlocksqpMemory* m) const;
     /// Update optimization tolerance (similar to SNOPT) in current iterate
     bool calcOptTol(BlocksqpMemory* m) const;
+
+    int intermediateCallback(BlocksqpMemory* m) const;
 
     /*
      * Solve QP subproblem

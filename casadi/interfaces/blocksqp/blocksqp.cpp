@@ -227,6 +227,33 @@ namespace casadi {
      }
   };
 
+  Dict Blocksqp::get_stats(void *mem) const{
+    auto m = static_cast<BlocksqpMemory*>(mem);
+
+    Dict ret = Nlpsol::get_stats(mem);
+
+    ret["iter_count"] = m->itCount;
+    ret["qpItTotal"] = m->qpItTotal;
+    ret["qpIterations"] = m->qpIterations;
+    ret["qpIterations2"] = m->qpIterations2;
+    ret["hessSkipped"] = m->hessSkipped;
+    ret["hessDamped"] = m->hessDamped;
+    ret["averageSizingFactor"] = m->averageSizingFactor;
+
+
+    ret["qpResolve"] = m->qpResolve; 
+    ret["nFunCalls"] = m->nFunCalls;
+    ret["nDerCalls"] = m->nDerCalls;
+    ret["nRestHeurCalls"] = m->nRestHeurCalls;
+    ret["nRestPhaseCalls"] = m->nRestPhaseCalls;
+    ret["rejectedSR1"] = m->rejectedSR1;
+    ret["nTotalUpdates"] = m->nTotalUpdates;
+    ret["nTotalSkippedUpdates"] = m->nTotalSkippedUpdates;
+
+    return ret;
+
+  }
+
   void Blocksqp::init(const Dict& opts) {
     // Call the init method of the base class
     Nlpsol::init(opts);
@@ -440,11 +467,8 @@ namespace casadi {
       // build fesibility restoration phase nlp
       MX p = MX::sym("p",nlp.size1_in("x"));
       MX s = MX::sym("s",nlp.size1_out("g"));
-      vector<MX> D;
-      for( int i=0; i<nlp.size1_in("x"); ++i ) {
-  	D.push_back( fmin(1.0,1.0/abs(p(i))) * (argv.at(0)(i) - p(i)) );
-      }
-      MX d = MX::vertcat(D);
+
+      MX d = fmin(1.0,1.0/abs(p)) * (argv.at(0) - p);
       MX f_rp = 0.5 * rho_ * dot(s,s) + zeta_/2.0 * dot(d,d);
       MX g_rp = nlp(argv).at(1) - s;
 
@@ -575,7 +599,7 @@ namespace casadi {
     alloc_res(nblocks_*n_hess, true);
     alloc_w(n_hess*nnz_H_, true);
     alloc_iw(nnz_H_ + (nx_+1) + nx_, true); // hessIndRow
-    
+
     alloc_w(exact_hess_lag_sp_.nnz(), true); // exact_hess_lag
   }
 
@@ -754,6 +778,23 @@ namespace casadi {
     }
   }
 
+  int Blocksqp::intermediateCallback(BlocksqpMemory* m) const {
+    if (!fcallback_.is_null()) {
+      m->arg[NLPSOL_X] = m->xk;
+      m->arg[NLPSOL_F] = &m->obj;
+      m->arg[NLPSOL_G] = m->gk;
+      m->arg[NLPSOL_LAM_X] = m->lam_xk;
+      m->arg[NLPSOL_LAM_G] = m->lam_gk;
+      double dret;
+      m->res[0] = &dret;
+      fcallback_(m->arg, m->res, m->iw, m->w);
+
+      return static_cast<int>(dret);
+    } else {
+      return 1;
+    }
+  }
+
   int Blocksqp::run(BlocksqpMemory* m, int maxIt, int warmStart) const {
     int it, infoQP = 0;
     bool skipLineSearch = false;
@@ -768,7 +809,7 @@ namespace casadi {
       /// Evaluate all functions and gradients for xk_0
       (void)evaluate(m, &m->obj, m->gk, m->grad_fk, m->jac_g);
       m->nDerCalls++;
-      
+
       /// Check if converged
       hasConverged = calcOptTol(m);
       if (print_iteration_) printProgress(m);
@@ -913,11 +954,15 @@ namespace casadi {
 
       /// Evaluate functions and gradients at the new xk
       (void)evaluate(m, &m->obj, m->gk, m->grad_fk, m->jac_g);
+
+      /// Callback function at new xk
+      intermediateCallback(m);
+
       m->nDerCalls++;
 
       /// Check if converged
       hasConverged = calcOptTol(m);
-    
+
       /// Print one line of output for the current iteration
       if (print_iteration_) printProgress(m);
       updateStats(m);
@@ -926,7 +971,7 @@ namespace casadi {
         m->itCount++;
         return 0; //Convergence achieved!
       }
-    
+
       /// Calculate difference of old and new Lagrange gradient:
       // gamma = -gamma + dL(xi_k+1, lambda_k+1)
       calcLagrangeGradient(m, m->gamma, 1);
@@ -1465,7 +1510,7 @@ namespace casadi {
       else
         in_x0.push_back( 0.0 );
     }
-    
+
     // Add current iterate xk to parameter p
     vector<double> in_p(m->p,m->p+np_);
     vector<double> in_p2(m->xk,m->xk+nx_);
@@ -1557,11 +1602,11 @@ namespace casadi {
       // One iteration for minimum norm NLP
       if(it > 0)
         ret = bp->run(m2,1,warmStart);
-       
+
       // If restMethod yields error, stop restoration phase
       if( ret == -1 )
         break;
-    
+
       // Get new xi from the restoration phase
       for( i=0; i<nx_; i++ )
         m->trial_xk[i] = m2->xk[i];
@@ -2100,7 +2145,7 @@ namespace casadi {
     m->averageSizingFactor /= nBlocks;
   }
 
-  
+
   void Blocksqp::
   calcHessianUpdateExact(BlocksqpMemory* m) const {
     // compute exact hessian
@@ -2140,14 +2185,14 @@ namespace casadi {
       cout << "block " << k << ": " << vector<double>(m->hess[k],m->hess[k]+dim_[k]*dim_[k]) << endl;
     }
     */
-    
-    // Prepare to compute fallback update as well 
+
+    // Prepare to compute fallback update as well
     m->hess = m->hess2;
     if(fallback_update_ == 2 && !hess_lim_mem_)
         calcHessianUpdate(m, fallback_update_, fallback_scaling_);
     else if (fallback_update_ == 0)
         calcInitialHessian(m);  // Set fallback as Identity
-      
+
     // Reset pointer
     m->hess = m->hess1;
 ;  }
@@ -2342,12 +2387,12 @@ namespace casadi {
         if(m->delta_w > deltabar_w_max_)
           m->hess = m->hess2;
         else {
-          // add scaled Identity delta_w*I 
+          // add scaled Identity delta_w*I
           for (int b=0; b<nblocks_; b++) {
             int dim = dim_[b];
             for(int i=0; i<dim; i++)
               m->hess[b][i+i*dim] += m->delta_w;
-          } 
+          }
         }
       }
       else
@@ -2428,7 +2473,7 @@ namespace casadi {
           if(conv_strategy_==1 && l<maxQP-1 && m->delta_w <= deltabar_w_max_)
             scalar += m->delta_w; // save scalars for restoring Hessian
         }
-        
+
         if (l == maxQP-1) {
           // Enable inertia correction for supposedly convex QPs, just in case
           opts.enableInertiaCorrection = qpOASES::BT_TRUE;
@@ -2481,12 +2526,12 @@ namespace casadi {
                 }
               }
 
-            if (ret == qpOASES::SUCCESSFUL_RETURN) { 
+            if (ret == qpOASES::SUCCESSFUL_RETURN) {
               // QP was solved successfully and curvature is positive after removing bounds
                 m->qpIterations = maxIt + 1;
                 m->delta_w_last = m->delta_w; // safe successful scaling factor
                 break; // Success!
-              } else { 
+              } else {
               // QP solution is rejected, save statistics
                 if (ret == qpOASES::RET_SETUP_AUXILIARYQP_FAILED)
                   m->qpIterations2++;
@@ -2521,7 +2566,7 @@ namespace casadi {
 
     // Point Hessian again to the first Hessian
     m->hess = m->hess1;
-    
+
     /* Restore Hessian if scaled Identities were added */
     if(conv_strategy_ == 1){
       for (int b=0; b<nblocks_; b++) {
@@ -2530,7 +2575,7 @@ namespace casadi {
             m->hess1[b][i+i*dim] -= scalar;
       }
     }
-    
+
     /* For full-memory Hessian: Restore fallback Hessian if convex combinations
      * were used during the loop */
     if (!hess_lim_mem_ && !fallback_update_ != 0 && conv_strategy_ == 0 && maxQP > 2 && matricesChanged && l>0 && l<maxQP-1) { // if l=0 or l>=maxQP-1, then fallback Hessian is restored already
