@@ -59,12 +59,17 @@ endif()
 ########################################################################
 ############################# Fortran ##################################
 ########################################################################
+option(FORTRAN_REQUIRED "Make fortran a required dependency" OFF)
+if(FORTRAN_REQUIRED)
+  enable_language(Fortran)
+else()
 # http://public.kitware.com/Bug/print_bug_page.php?bug_id=9220
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 include(language_support)
 workaround_9220(Fortran Fortran_language_works)
 if(Fortran_language_works)
   enable_language(Fortran OPTIONAL)
+endif()
 endif()
 
 ########################################################################
