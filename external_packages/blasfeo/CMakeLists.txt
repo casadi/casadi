@@ -1,4 +1,3 @@
-cmake_minimum_required(VERSION 2.8.6)
 
     if(WIN32)
     set(BLASFEO_FLAGS -DOS_WINDOWS)
