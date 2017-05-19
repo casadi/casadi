@@ -30,6 +30,7 @@ set(CASADI_SRCS
   std_vector_tools.hpp        std_vector_tools.cpp      # Set of useful functions for the vector template class in STL
   timing.hpp                  timing.cpp
   polynomial.hpp              polynomial.cpp            # Helper class for differentiating and integrating simple polynomials
+  casadi_mem.h                                          # Simplified C API for codegen
 
   # Template class Matrix<>, implements a sparse Matrix with col compressed storage, designed to work well with symbolic data types (SX)
   generic_expression.hpp                                # Base class for SXElem MX and Matrix<>
@@ -141,5 +142,5 @@ endif()
 
 install(DIRECTORY ./
   DESTINATION include/casadi/core
-  FILES_MATCHING PATTERN "*.hpp"
+  FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h"
   PATTERN ".svn" EXCLUDE)
