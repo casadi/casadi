@@ -119,7 +119,7 @@ endif()
 
 # NOTE(@jaeandersson): What is this?
 install(DIRECTORY ${PROJECT_BINARY_DIR}/python/casadi
-  DESTINATION "${PYTHON_PREFIX}"
+  DESTINATION "${CMAKE_INSTALL_PREFIX}/${PYTHON_PREFIX}"
   COMPONENT install_python
   USE_SOURCE_PERMISSIONS
   PATTERN .pyc EXCLUDE
@@ -131,26 +131,26 @@ install(DIRECTORY ${PROJECT_BINARY_DIR}/python/casadi
 add_custom_target(install_python
 COMMAND ${CMAKE_COMMAND}
   -D COMPONENT=install_python
-  -D CMAKE_INSTALL_PREFIX="${PYTHON_PREFIX}"
+  -D CMAKE_INSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}/${PYTHON_PREFIX}"
   -P cmake_install.cmake
 )
 add_dependencies(install_python _casadi)
 
 # Install C++ wrapper library
 install(TARGETS _casadi
-  DESTINATION "${PYTHON_PREFIX}/casadi"
+  DESTINATION "${CMAKE_INSTALL_PREFIX}/${PYTHON_PREFIX}/casadi"
   COMPONENT install_python
 )
 
 # Install Python proxy classes
 install(FILES ${PROJECT_BINARY_DIR}/swig/python/casadi.py
-  DESTINATION "${PYTHON_PREFIX}/casadi"
+  DESTINATION "${CMAKE_INSTALL_PREFIX}/${PYTHON_PREFIX}/casadi"
   COMPONENT install_python
 )
 
 # Install Python tools
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tools
-  DESTINATION "${PYTHON_PREFIX}/casadi"
+  DESTINATION "${CMAKE_INSTALL_PREFIX}/${PYTHON_PREFIX}/casadi"
   COMPONENT install_python
   USE_SOURCE_PERMISSIONS
   PATTERN .pyc EXCLUDE
@@ -159,7 +159,7 @@ install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tools
 
 # Install Python package initialization
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/__init__.py
-  DESTINATION "${PYTHON_PREFIX}/casadi"
+  DESTINATION "${CMAKE_INSTALL_PREFIX}/${PYTHON_PREFIX}/casadi"
   COMPONENT install_python
 )
 
@@ -178,17 +178,17 @@ if (WITH_EXTENDING_CASADI)
   add_custom_target(extending_casadi_python DEPENDS _extending_casadi extending_casadi)
 
   install(TARGETS _extending_casadi
-    DESTINATION "${PYTHON_PREFIX}/extending_casadi"
+    DESTINATION "${CMAKE_INSTALL_PREFIX}/${PYTHON_PREFIX}/extending_casadi"
     COMPONENT install_python
   )
 
   install(FILES ${PROJECT_BINARY_DIR}/swig/python/extending_casadi.py
-    DESTINATION "${PYTHON_PREFIX}/extending_casadi"
+    DESTINATION "${CMAKE_INSTALL_PREFIX}/${PYTHON_PREFIX}/extending_casadi"
     COMPONENT install_python
   )
 
   install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../extending_casadi/__init__.py
-    DESTINATION "${PYTHON_PREFIX}/extending_casadi"
+    DESTINATION "${CMAKE_INSTALL_PREFIX}/${PYTHON_PREFIX}/extending_casadi"
     COMPONENT install_python
   )
 
