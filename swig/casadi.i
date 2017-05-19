@@ -2451,6 +2451,7 @@ def dcat(args): return _diagcat(args)
 %rename(uplus) operator+;
 %feature("varargin","1") casadi_vertcat;
 %feature("varargin","1") casadi_horzcat;
+%feature("varargin","1") casadi_diagcat;
 %feature("varargin","1") casadi_veccat;
 %feature("optionalunpack","1") size;
 
