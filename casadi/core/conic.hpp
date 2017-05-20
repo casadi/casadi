@@ -96,6 +96,15 @@ namespace casadi {
   /** \brief Get the number of QP solver outputs */
   CASADI_EXPORT int conic_n_out();
 
+  /** \brief Get all options for a plugin */
+  CASADI_EXPORT std::vector<std::string> conic_options(const std::string& name);
+
+  /** \brief Get type info for a particular option */
+  CASADI_EXPORT std::string conic_option_type(const std::string& name, const std::string& op);
+
+  /** \brief Get documentation for a particular option */
+  CASADI_EXPORT std::string conic_option_info(const std::string& name, const std::string& op);
+
   /// Check if a particular plugin is available
   CASADI_EXPORT bool has_conic(const std::string& name);
 
