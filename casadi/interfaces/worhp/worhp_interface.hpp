@@ -43,6 +43,9 @@
 #undef Q
 /**\defgroup plugin_Nlpsol_worhp
  WORHP interface
+ 
+ Designed for Worhp 1.10
+ 
 */
 /** \pluginsection{Nlpsol,worhp} **/
 
