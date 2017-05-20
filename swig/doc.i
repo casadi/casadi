@@ -65169,15 +65169,10 @@ to be monotonously increasing
 
 ";
 
-%feature("docstring")  casadi::dple_out() "
+%feature("docstring")  casadi::conic_option_type(const std::string &name,
+const std::string &op) "
 
-Get output scheme of DPLE solvers.
-
-";
-
-%feature("docstring")  casadi::dple_out(int ind) "
-
-Get DPLE output scheme name by index.
+Get type info for a particular option.
 
 ";
 
@@ -65258,9 +65253,15 @@ strideC) "
 
 ";
 
-%feature("docstring")  casadi::doc_linsol(const std::string &name) "
+%feature("docstring")  casadi::dple_out() "
 
-Get the documentation string for a plugin.
+Get output scheme of DPLE solvers.
+
+";
+
+%feature("docstring")  casadi::dple_out(int ind) "
+
+Get DPLE output scheme name by index.
 
 ";
 
@@ -65573,6 +65574,12 @@ bvec_t &r) "
 
 ";
 
+%feature("docstring")  casadi::conic_options(const std::string &name) "
+
+Get all options for a plugin.
+
+";
+
 %feature("docstring")  casadi::load_linsol(const std::string &name) "
 
 Explicitly load a plugin dynamically.
@@ -65620,6 +65627,13 @@ T *b_in, T *c_in) "
 %feature("docstring")  casadi::hasNegative(const std::vector< T > &v) "
 
 Check if the vector has negative entries.
+
+";
+
+%feature("docstring")  casadi::conic_option_info(const std::string &name,
+const std::string &op) "
+
+Get documentation for a particular option.
 
 ";
 
@@ -65940,9 +65954,9 @@ Construct from an index vector (requires is_slice(v) to be true)
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::casadi_copy(const T1 *x, int n, T1 *y) "
+%feature("docstring")  casadi::doc_linsol(const std::string &name) "
 
-[INTERNAL]  COPY: y <-x.
+Get the documentation string for a plugin.
 
 ";
 
@@ -66476,19 +66490,15 @@ std::string &solver, const MXDict &dae, const Dict &opts=Dict()) "
 
 ";
 
-%feature("docstring")  casadi::jit(const std::string &name, int n_in, int
-n_out, const std::string &body, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::integrator_out() "
 
-Create a just-in-time compiled function from a C/C++ language string The
-function can an arbitrary number of inputs and outputs that must all be
-scalar-valued. Only specify the function body, assuming that the inputs are
-stored in an array named 'arg' and the outputs stored in an array named
-'res'. The data type used must be 'real_t', which is typically equal to
-'double` or another data type with the same API as 'double'.
+Get integrator output scheme of integrators.
 
-The final generated function will have a structure similar to:
+";
 
-void fname(const real_t* arg, real_t* res) { <FUNCTION_BODY> }
+%feature("docstring")  casadi::integrator_out(int ind) "
+
+Get output scheme name by index.
 
 ";
 
@@ -67449,6 +67459,12 @@ int *offset, const T1 *values, const T1 *alpha, const int *index, const int
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::casadi_copy(const T1 *x, int n, T1 *y) "
+
+[INTERNAL]  COPY: y <-x.
+
+";
+
 %feature("docstring")  casadi::slicot_mb03vd(int n, int p, int ilo, int ihi,
 double *a, int lda1, int lda2, double *tau, int ldtau, double *dwork=0) "
 
@@ -67955,15 +67971,19 @@ Explicitly load a plugin dynamically.
 
 ";
 
-%feature("docstring")  casadi::integrator_out() "
+%feature("docstring")  casadi::jit(const std::string &name, int n_in, int
+n_out, const std::string &body, const Dict &opts=Dict()) "
 
-Get integrator output scheme of integrators.
+Create a just-in-time compiled function from a C/C++ language string The
+function can an arbitrary number of inputs and outputs that must all be
+scalar-valued. Only specify the function body, assuming that the inputs are
+stored in an array named 'arg' and the outputs stored in an array named
+'res'. The data type used must be 'real_t', which is typically equal to
+'double` or another data type with the same API as 'double'.
 
-";
+The final generated function will have a structure similar to:
 
-%feature("docstring")  casadi::integrator_out(int ind) "
-
-Get output scheme name by index.
+void fname(const real_t* arg, real_t* res) { <FUNCTION_BODY> }
 
 ";
 
