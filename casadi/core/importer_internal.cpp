@@ -47,10 +47,7 @@ namespace casadi {
   const std::string ImporterInternal::infix_ = "importer";
 
   Options ImporterInternal::options_
-  = {{},
-     {{}
-     }
-  };
+  = {};
 
   void ImporterInternal::construct(const Dict& opts) {
     // Sanitize dictionary is needed
