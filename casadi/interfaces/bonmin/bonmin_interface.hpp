@@ -147,7 +147,8 @@ namespace casadi {
     Dict opts_;
 
     // Bonmin callback functions
-    void finalize_solution(BonminMemory* m, const double* x, double obj_value) const;
+    void finalize_solution(BonminMemory* m, Bonmin::TMINLP::SolverReturn status,
+                           const double* x, double obj_value) const;
     bool get_bounds_info(BonminMemory* m, double* x_l, double* x_u,
                          double* g_l, double* g_u) const;
     bool get_starting_point(BonminMemory* m, bool init_x, double* x,
