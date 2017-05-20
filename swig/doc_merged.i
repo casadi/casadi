@@ -50182,6 +50182,8 @@ worhp
 
 WORHP interface
 
+Designed for Worhp 1.10
+
 >List of available options
 
 +-------+---------+-------------------------------+
