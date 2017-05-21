@@ -327,6 +327,29 @@ namespace casadi {
     /** \brief Generate a Jacobian function of output \a oind with respect to input \a iind
      * \param iind The index of the input
      * \param oind The index of the output
+     * Legacy function: To be deprecated in a future version of CasADi.
+     * Exists only for compatibility with Function::jacobian pre-CasADi 3.2
+     */
+    Function jacobian_old(int iind, int oind, bool compact=false, bool symmetric=false);
+
+    /** \brief Generate a Hessian function of output \a oind with respect to input \a iind
+     * \param iind The index of the input
+     * \param oind The index of the output
+     * Legacy function: To be deprecated in a future version of CasADi.
+     * Exists only for compatibility with Function::hessian pre-CasADi 3.2
+     */
+    Function hessian_old(int iind, int oind);
+
+    /** \brief Generate a Jacobian function of all the inputs elements with respect to all
+     * the output elements).
+     * Legacy function: To be deprecated
+     */
+    Function fullJacobian();
+
+    ///@{
+    /** \brief Generate a Jacobian function of output \a oind with respect to input \a iind
+     * \param iind The index of the input
+     * \param oind The index of the output
      *
      * The default behavior of this class is defined by the derived class.
      * If compact is set to true, only the nonzeros of the input and output expressions are
@@ -339,17 +362,19 @@ namespace casadi {
      * to the Jacobian and the same number of inputs.
      *
      */
-    Function jacobian(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
+    Function jacobian(int iind=0, int oind=0, bool compact=false, bool symmetric=false) {
+      return jacobian_old(iind, oind, compact, symmetric);
+    }
     Function jacobian(const std::string& iind,  int oind=0, bool compact=false,
                       bool symmetric=false) {
-        return jacobian(index_in(iind), oind, compact, symmetric);
+      return jacobian(index_in(iind), oind, compact, symmetric);
     }
     Function jacobian(int iind, const std::string& oind, bool compact=false, bool symmetric=false) {
-        return jacobian(iind, index_out(oind), compact, symmetric);
+      return jacobian(iind, index_out(oind), compact, symmetric);
     }
     Function jacobian(const std::string& iind, const std::string& oind, bool compact=false,
                       bool symmetric=false) {
-        return jacobian(index_in(iind), index_out(oind), compact, symmetric);
+      return jacobian(index_in(iind), index_out(oind), compact, symmetric);
     }
     ///@}
 
@@ -384,20 +409,6 @@ namespace casadi {
     ///@}
 
 #endif // WITH_DEPRECATED_FEATURES
-
-    /** \brief Generate a Jacobian function of all the inputs elements with respect to all
-     * the output elements).
-     * Legacy function: To be deprecated
-     */
-    Function fullJacobian();
-
-    /** \brief Generate a Hessian function of output \a oind with respect to input \a iind
-     * \param iind The index of the input
-     * \param oind The index of the output
-     * Legacy function: To be deprecated.
-     * Exists for compatibility with Function::hessian pre-CasADi 3.2
-     */
-    Function hessian_old(int iind, int oind);
 
     ///@{
     /** \brief Generate a Hessian function of output \a oind with respect to input \a iind

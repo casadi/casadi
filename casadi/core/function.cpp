@@ -651,10 +651,6 @@ namespace casadi {
     return (*this)->numel_out(ind);
   }
 
-  Function Function::jacobian(int iind, int oind, bool compact, bool symmetric) {
-    return (*this)->jacobian(iind, oind, compact, symmetric);
-  }
-
   #ifdef WITH_DEPRECATED_FEATURES
   void Function::setJacobian(const Function& jac, int iind, int oind, bool compact) {
     (*this)->setJacobian(jac, iind, oind, compact);
@@ -672,6 +668,10 @@ namespace casadi {
     (*this)->full_jacobian_ = jac;
   }
 #endif // WITH_DEPRECATED_FEATURES
+
+  Function Function::jacobian_old(int iind, int oind, bool compact, bool symmetric) {
+    return (*this)->jacobian(iind, oind, compact, symmetric);
+  }
 
   Function Function::hessian_old(int iind, int oind) {
     return (*this)->hessian(iind, oind);
