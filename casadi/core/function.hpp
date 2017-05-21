@@ -382,6 +382,10 @@ namespace casadi {
     Function tangent(const std::string& iind, const std::string& oind)
     { return tangent(index_in(iind), index_out(oind)); }
     ///@}
+
+    /** Set the Jacobian of all the input nonzeros with respect to all output nonzeros
+     NOTE: Does _not_ take ownership, only weak references to the Jacobian are kept internally */
+    void setFullJacobian(const Function& jac);
 #endif // WITH_DEPRECATED_FEATURES
 
     ///@{
@@ -406,10 +410,6 @@ namespace casadi {
      * the output elements).
      */
     Function fullJacobian();
-
-    /** Set the Jacobian of all the input nonzeros with respect to all output nonzeros
-     NOTE: Does _not_ take ownership, only weak references to the Jacobian are kept internally */
-    void setFullJacobian(const Function& jac);
 
     ///@{
     /** \brief Evaluate the function symbolically or numerically  */

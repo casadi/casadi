@@ -667,6 +667,10 @@ namespace casadi {
   Function Function::tangent(int iind, int oind) {
     return (*this)->tangent(iind, oind);
   }
+
+  void Function::setFullJacobian(const Function& jac) {
+    (*this)->full_jacobian_ = jac;
+  }
 #endif // WITH_DEPRECATED_FEATURES
 
   Function Function::hessian(int iind, int oind) {
@@ -675,10 +679,6 @@ namespace casadi {
 
   Function Function::fullJacobian() {
     return (*this)->fullJacobian();
-  }
-
-  void Function::setFullJacobian(const Function& jac) {
-    (*this)->full_jacobian_ = jac;
   }
 
   bool Function::test_cast(const SharedObjectInternal* ptr) {
