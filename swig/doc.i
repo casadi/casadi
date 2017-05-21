@@ -8335,6 +8335,21 @@ returns a new function with a selection of inputs/outputs of the original
 
 ";
 
+%feature("docstring")  casadi::Function::hessian_old(int iind, int oind) "
+
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output Legacy function: To be deprecated in a future
+version of CasADi. Exists only for compatibility with Function::hessian pre-
+CasADi 3.2
+
+";
+
 %feature("docstring")  casadi::SharedObject::print(std::ostream
 &stream=casadi::userOut(), bool trailing_newline=true) const  "
 
@@ -8577,16 +8592,9 @@ Parameters:
 
 iind:  The index of the input
 
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. If
-compact is set to true, only the nonzeros of the input and output
-expressions are considered. If symmetric is set to true, the Jacobian being
-calculated is known to be symmetric (usually a Hessian), which can be
-exploited by the algorithm.
-
-The generated Jacobian has one more output than the calling function
-corresponding to the Jacobian and the same number of inputs.
+oind:  The index of the output Legacy function: To be deprecated in a future
+version of CasADi. Exists only for compatibility with Function::jacobian
+pre-CasADi 3.2
 
 ";
 
@@ -8600,16 +8608,9 @@ Parameters:
 
 iind:  The index of the input
 
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. If
-compact is set to true, only the nonzeros of the input and output
-expressions are considered. If symmetric is set to true, the Jacobian being
-calculated is known to be symmetric (usually a Hessian), which can be
-exploited by the algorithm.
-
-The generated Jacobian has one more output than the calling function
-corresponding to the Jacobian and the same number of inputs.
+oind:  The index of the output Legacy function: To be deprecated in a future
+version of CasADi. Exists only for compatibility with Function::jacobian
+pre-CasADi 3.2
 
 ";
 
@@ -8623,16 +8624,9 @@ Parameters:
 
 iind:  The index of the input
 
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. If
-compact is set to true, only the nonzeros of the input and output
-expressions are considered. If symmetric is set to true, the Jacobian being
-calculated is known to be symmetric (usually a Hessian), which can be
-exploited by the algorithm.
-
-The generated Jacobian has one more output than the calling function
-corresponding to the Jacobian and the same number of inputs.
+oind:  The index of the output Legacy function: To be deprecated in a future
+version of CasADi. Exists only for compatibility with Function::jacobian
+pre-CasADi 3.2
 
 ";
 
@@ -8820,9 +8814,9 @@ tr:  Flip the relationship. Return which expressions contain the variables
 %feature("docstring")  casadi::Function::setFullJacobian(const Function
 &jac) "
 
-Set the Jacobian of all the input nonzeros with respect to all output
-nonzeros NOTE: Does not take ownership, only weak references to the Jacobian
-are kept internally
+[DEPRECATED] Set the Jacobian of all the input nonzeros with respect to all
+output nonzeros NOTE: Does not take ownership, only weak references to the
+Jacobian are kept internally
 
 ";
 
@@ -9529,6 +9523,22 @@ Get the number of function outputs.
 
 ";
 
+%feature("docstring")  casadi::Function::jacobian_old(int iind, int oind,
+bool compact=false, bool symmetric=false) "
+
+Generate a Jacobian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output Legacy function: To be deprecated in a future
+version of CasADi. Exists only for compatibility with Function::jacobian
+pre-CasADi 3.2
+
+";
+
 %feature("docstring") casadi::Callback::__hash__ "
 
 Returns a number that is unique for a given Node. If the Object does not
@@ -9601,7 +9611,7 @@ Get output dimension.
 %feature("docstring")  casadi::Function::fullJacobian() "
 
 Generate a Jacobian function of all the inputs elements with respect to all
-the output elements).
+the output elements). Legacy function: To be deprecated.
 
 ";
 
@@ -19866,16 +19876,9 @@ Parameters:
 
 iind:  The index of the input
 
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. If
-compact is set to true, only the nonzeros of the input and output
-expressions are considered. If symmetric is set to true, the Jacobian being
-calculated is known to be symmetric (usually a Hessian), which can be
-exploited by the algorithm.
-
-The generated Jacobian has one more output than the calling function
-corresponding to the Jacobian and the same number of inputs.
+oind:  The index of the output Legacy function: To be deprecated in a future
+version of CasADi. Exists only for compatibility with Function::jacobian
+pre-CasADi 3.2
 
 ";
 
@@ -19889,16 +19892,9 @@ Parameters:
 
 iind:  The index of the input
 
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. If
-compact is set to true, only the nonzeros of the input and output
-expressions are considered. If symmetric is set to true, the Jacobian being
-calculated is known to be symmetric (usually a Hessian), which can be
-exploited by the algorithm.
-
-The generated Jacobian has one more output than the calling function
-corresponding to the Jacobian and the same number of inputs.
+oind:  The index of the output Legacy function: To be deprecated in a future
+version of CasADi. Exists only for compatibility with Function::jacobian
+pre-CasADi 3.2
 
 ";
 
@@ -19912,16 +19908,9 @@ Parameters:
 
 iind:  The index of the input
 
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. If
-compact is set to true, only the nonzeros of the input and output
-expressions are considered. If symmetric is set to true, the Jacobian being
-calculated is known to be symmetric (usually a Hessian), which can be
-exploited by the algorithm.
-
-The generated Jacobian has one more output than the calling function
-corresponding to the Jacobian and the same number of inputs.
+oind:  The index of the output Legacy function: To be deprecated in a future
+version of CasADi. Exists only for compatibility with Function::jacobian
+pre-CasADi 3.2
 
 ";
 
@@ -19934,9 +19923,9 @@ Get all statistics obtained at the end of the last evaluate call.
 %feature("docstring")  casadi::Function::setFullJacobian(const Function
 &jac) "
 
-Set the Jacobian of all the input nonzeros with respect to all output
-nonzeros NOTE: Does not take ownership, only weak references to the Jacobian
-are kept internally
+[DEPRECATED] Set the Jacobian of all the input nonzeros with respect to all
+output nonzeros NOTE: Does not take ownership, only weak references to the
+Jacobian are kept internally
 
 ";
 
@@ -20563,7 +20552,22 @@ Print all information there is to know about a certain option.
 %feature("docstring")  casadi::Function::fullJacobian() "
 
 Generate a Jacobian function of all the inputs elements with respect to all
-the output elements).
+the output elements). Legacy function: To be deprecated.
+
+";
+
+%feature("docstring")  casadi::Function::hessian_old(int iind, int oind) "
+
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output Legacy function: To be deprecated in a future
+version of CasADi. Exists only for compatibility with Function::hessian pre-
+CasADi 3.2
 
 ";
 
@@ -21197,6 +21201,22 @@ tr:  Flip the relationship. Return which expressions contain the variables
 %feature("docstring")  casadi::Function::getWorkSize() const  "
 
 Get the length of the work vector.
+
+";
+
+%feature("docstring")  casadi::Function::jacobian_old(int iind, int oind,
+bool compact=false, bool symmetric=false) "
+
+Generate a Jacobian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output Legacy function: To be deprecated in a future
+version of CasADi. Exists only for compatibility with Function::jacobian
+pre-CasADi 3.2
 
 ";
 

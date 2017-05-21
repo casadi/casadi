@@ -6077,6 +6077,21 @@ returns a new function with a selection of inputs/outputs of the original
 
 ";
 
+%feature("docstring") casadi::Callback::hessian_old "
+
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output Legacy function: To be deprecated in a future
+version of CasADi. Exists only for compatibility with Function::hessian pre-
+CasADi 3.2
+
+";
+
 %feature("docstring") casadi::Callback::print "
 
 Print a description of the object.
@@ -6220,6 +6235,9 @@ Get type name.
 
 %feature("docstring") casadi::Callback::jacobian "
 
+>  Function casadi::Function::jacobian(int iind=0, int oind=0, bool compact=false, bool symmetric=false)
+------------------------------------------------------------------------
+
 Generate a Jacobian function of output oind with respect to input iind.
 
 Parameters:
@@ -6237,6 +6255,24 @@ exploited by the algorithm.
 
 The generated Jacobian has one more output than the calling function
 corresponding to the Jacobian and the same number of inputs.
+
+>  Function casadi::Function::jacobian(const std::string &iind, int oind=0, bool compact=false, bool symmetric=false)
+
+>  Function casadi::Function::jacobian(int iind, const std::string &oind, bool compact=false, bool symmetric=false)
+
+>  Function casadi::Function::jacobian(const std::string &iind, const std::string &oind, bool compact=false, bool symmetric=false)
+------------------------------------------------------------------------
+
+Generate a Jacobian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output Legacy function: To be deprecated in a future
+version of CasADi. Exists only for compatibility with Function::jacobian
+pre-CasADi 3.2
 
 ";
 
@@ -6344,9 +6380,9 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 %feature("docstring") casadi::Callback::setFullJacobian "
 
-Set the Jacobian of all the input nonzeros with respect to all output
-nonzeros NOTE: Does not take ownership, only weak references to the Jacobian
-are kept internally
+[DEPRECATED] Set the Jacobian of all the input nonzeros with respect to all
+output nonzeros NOTE: Does not take ownership, only weak references to the
+Jacobian are kept internally
 
 ";
 
@@ -6777,6 +6813,21 @@ Get the number of function outputs.
 
 ";
 
+%feature("docstring") casadi::Callback::jacobian_old "
+
+Generate a Jacobian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output Legacy function: To be deprecated in a future
+version of CasADi. Exists only for compatibility with Function::jacobian
+pre-CasADi 3.2
+
+";
+
 %feature("docstring") casadi::Callback::__hash__ "
 
 Returns a number that is unique for a given Node. If the Object does not
@@ -6833,7 +6884,7 @@ Get output dimension.
 %feature("docstring") casadi::Callback::fullJacobian "
 
 Generate a Jacobian function of all the inputs elements with respect to all
-the output elements).
+the output elements). Legacy function: To be deprecated.
 
 ";
 
@@ -14220,6 +14271,9 @@ pointer to the internal class
 
 %feature("docstring") casadi::Function::jacobian "
 
+>  Function casadi::Function::jacobian(int iind=0, int oind=0, bool compact=false, bool symmetric=false)
+------------------------------------------------------------------------
+
 Generate a Jacobian function of output oind with respect to input iind.
 
 Parameters:
@@ -14238,6 +14292,24 @@ exploited by the algorithm.
 The generated Jacobian has one more output than the calling function
 corresponding to the Jacobian and the same number of inputs.
 
+>  Function casadi::Function::jacobian(const std::string &iind, int oind=0, bool compact=false, bool symmetric=false)
+
+>  Function casadi::Function::jacobian(int iind, const std::string &oind, bool compact=false, bool symmetric=false)
+
+>  Function casadi::Function::jacobian(const std::string &iind, const std::string &oind, bool compact=false, bool symmetric=false)
+------------------------------------------------------------------------
+
+Generate a Jacobian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output Legacy function: To be deprecated in a future
+version of CasADi. Exists only for compatibility with Function::jacobian
+pre-CasADi 3.2
+
 ";
 
 %feature("docstring") casadi::Function::stats "
@@ -14248,9 +14320,9 @@ Get all statistics obtained at the end of the last evaluate call.
 
 %feature("docstring") casadi::Function::setFullJacobian "
 
-Set the Jacobian of all the input nonzeros with respect to all output
-nonzeros NOTE: Does not take ownership, only weak references to the Jacobian
-are kept internally
+[DEPRECATED] Set the Jacobian of all the input nonzeros with respect to all
+output nonzeros NOTE: Does not take ownership, only weak references to the
+Jacobian are kept internally
 
 ";
 
@@ -14591,7 +14663,22 @@ Print all information there is to know about a certain option.
 %feature("docstring") casadi::Function::fullJacobian "
 
 Generate a Jacobian function of all the inputs elements with respect to all
-the output elements).
+the output elements). Legacy function: To be deprecated.
+
+";
+
+%feature("docstring") casadi::Function::hessian_old "
+
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output Legacy function: To be deprecated in a future
+version of CasADi. Exists only for compatibility with Function::hessian pre-
+CasADi 3.2
 
 ";
 
@@ -15046,6 +15133,21 @@ tr:  Flip the relationship. Return which expressions contain the variables
 %feature("docstring") casadi::Function::getWorkSize "
 
 Get the length of the work vector.
+
+";
+
+%feature("docstring") casadi::Function::jacobian_old "
+
+Generate a Jacobian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output Legacy function: To be deprecated in a future
+version of CasADi. Exists only for compatibility with Function::jacobian
+pre-CasADi 3.2
 
 ";
 
