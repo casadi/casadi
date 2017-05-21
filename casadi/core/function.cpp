@@ -673,7 +673,7 @@ namespace casadi {
   }
 #endif // WITH_DEPRECATED_FEATURES
 
-  Function Function::hessian(int iind, int oind) {
+  Function Function::hessian_old(int iind, int oind) {
     return (*this)->hessian(iind, oind);
   }
 

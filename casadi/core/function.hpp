@@ -353,10 +353,14 @@ namespace casadi {
     }
     ///@}
 
-    #ifdef WITH_DEPRECATED_FEATURES
+#ifdef WITH_DEPRECATED_FEATURES
     /** [DEPRECATED] Set the Jacobian function of output \a oind with respect to input \a iind
      NOTE: Does _not_ take ownership, only weak references to the Jacobians are kept internally */
     void setJacobian(const Function& jac, int iind=0, int oind=0, bool compact=false);
+
+    /** [DEPRECATED] Set the Jacobian of all the input nonzeros with respect to all output nonzeros
+     NOTE: Does _not_ take ownership, only weak references to the Jacobian are kept internally */
+    void setFullJacobian(const Function& jac);
 
     ///@{
     /** \brief [DEPRECATED] Use Function::factory instead */
@@ -370,10 +374,6 @@ namespace casadi {
     Function gradient(const std::string& iind, const std::string& oind) {
         return gradient(index_in(iind), index_out(oind));
     }
-    ///@}
-
-    ///@{
-    /** \brief [DEPRECATED] Use Function::factory instead */
     Function tangent(int iind=0, int oind=0);
     Function tangent(const std::string& iind, int oind=0)
     { return tangent(index_in(iind), oind); }
@@ -383,10 +383,21 @@ namespace casadi {
     { return tangent(index_in(iind), index_out(oind)); }
     ///@}
 
-    /** Set the Jacobian of all the input nonzeros with respect to all output nonzeros
-     NOTE: Does _not_ take ownership, only weak references to the Jacobian are kept internally */
-    void setFullJacobian(const Function& jac);
 #endif // WITH_DEPRECATED_FEATURES
+
+    /** \brief Generate a Jacobian function of all the inputs elements with respect to all
+     * the output elements).
+     * Legacy function: To be deprecated
+     */
+    Function fullJacobian();
+
+    /** \brief Generate a Hessian function of output \a oind with respect to input \a iind
+     * \param iind The index of the input
+     * \param oind The index of the output
+     * Legacy function: To be deprecated.
+     * Exists for compatibility with Function::hessian pre-CasADi 3.2
+     */
+    Function hessian_old(int iind, int oind);
 
     ///@{
     /** \brief Generate a Hessian function of output \a oind with respect to input \a iind
@@ -397,7 +408,9 @@ namespace casadi {
      * to the Hessian and the gradients.
      *
      */
-    Function hessian(int iind=0, int oind=0);
+    Function hessian(int iind=0, int oind=0) {
+      return hessian_old(iind, oind);
+    }
     Function hessian(const std::string& iind, int oind=0)
     { return hessian(index_in(iind), oind); }
     Function hessian(int iind, const std::string& oind)
@@ -405,11 +418,6 @@ namespace casadi {
     Function hessian(const std::string& iind, const std::string& oind)
     { return hessian(index_in(iind), index_out(oind)); }
     ///@}
-
-    /** \brief Generate a Jacobian function of all the inputs elements with respect to all
-     * the output elements).
-     */
-    Function fullJacobian();
 
     ///@{
     /** \brief Evaluate the function symbolically or numerically  */
