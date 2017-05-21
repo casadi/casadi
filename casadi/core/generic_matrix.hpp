@@ -499,6 +499,11 @@ namespace casadi {
       return MatType::solve(A, b, lsolver, dict);
     }
 
+    /** \brief Linearize an expression */
+    friend inline MatType linearize(const MatType& f, const MatType& x, const MatType& x0) {
+      return MatType::linearize(f, x, x0);
+    }
+
     /** \brief Computes the Moore-Penrose pseudo-inverse
      *
      * If the matrix A is fat (size1<size2), mul(A, pinv(A)) is unity.
@@ -640,6 +645,7 @@ namespace casadi {
     /// Functions called by friend functions defined here
     static MatType jtimes(const MatType &ex, const MatType &arg,
                           const MatType &v, bool tr=false);
+    static MatType linearize(const MatType& f, const MatType& x, const MatType& x0);
     ///@}
 
 /** @} */
@@ -972,6 +978,21 @@ namespace casadi {
     return horzcat(w);
   }
 
+  template<typename MatType>
+  MatType GenericMatrix<MatType>::
+  linearize(const MatType& f, const MatType& x, const MatType& x0) {
+    MatType x_lin = MatType::sym("x_lin", x.sparsity());
+    // mismatching dimensions
+    if (x0.size() != x.size()) {
+      // Scalar x0 is ok
+      if (x0.sparsity().is_scalar()) {
+        return linearize(f, x, MatType(x.sparsity(), x0));
+      }
+      casadi_error("Dimension mismatch in 'linearize'");
+    }
+    return substitute(f + jtimes(f, x, x_lin),
+      MatType::vertcat({x_lin, x}), MatType::vertcat({x, x0}));
+  }
 
 } // namespace casadi
 

@@ -3057,6 +3057,10 @@ DECL M casadi_jtimes(const M& ex, const M& arg, const M& v, bool tr=false) {
   return jtimes(ex, arg, v, tr);
 }
 
+DECL M casadi_linearize(const M& f, const M& x, const M& x0) {
+  return linearize(f, x, x0);
+}
+
 DECL std::vector<bool> casadi_which_depends(const M& expr, const M& var,
                                             int order=1, bool tr=false) {
   return which_depends(expr, var, order, tr);
