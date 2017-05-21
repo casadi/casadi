@@ -23255,6 +23255,13 @@ Calculate Jacobian.
 
 ";
 
+%feature("docstring")  casadi::GenericMatrix< MatType >::linearize(const
+MatType &f, const MatType &x, const MatType &x0) "
+
+Linearize an expression.
+
+";
+
 %feature("docstring")  print_operator(const MatType &xb, const std::vector<
 std::string > &args) "
 
@@ -23544,6 +23551,13 @@ Computes the Moore-Penrose pseudo-inverse.
 
 If the matrix A is fat (size1>size2), mul(A, pinv(A)) is unity. If the
 matrix A is slender (size2<size1), mul(pinv(A), A) is unity.
+
+";
+
+%feature("docstring")  casadi::GenericMatrix< MatType >::linearize(const
+MatType &f, const MatType &x, const MatType &x0) "
+
+Functions called by friend functions defined here
 
 ";
 
@@ -42387,6 +42401,13 @@ symbolic primitives.
 
 ";
 
+%feature("docstring")  eig_symbolic(const Matrix< Scalar > &m) "
+
+Attempts to find the eigenvalues of a symbolic matrix This will only work
+for up to 3x3 matrices.
+
+";
+
 %feature("docstring")  casadi::SX::is_leaf() const  "
 
 [INTERNAL]  Check if SX is a leaf of the SX graph.
@@ -42614,13 +42635,11 @@ are possible)
 
 ";
 
-%feature("docstring")  chol(const Matrix< Scalar > &A) "
+%feature("docstring")  casadi::GenericMatrix< Matrix< Scalar >
+>::linearize(const Matrix< Scalar > &f, const Matrix< Scalar > &x, const
+Matrix< Scalar > &x0) "
 
-Obtain a Cholesky factorisation of a matrix Returns an upper triangular R
-such that R'R = A. Matrix A must be positive definite.
-
-At the moment, the algorithm is dense (Cholesky-Banachiewicz). There is an
-open ticket #1212 to make it sparse.
+Functions called by friend functions defined here
 
 ";
 
@@ -42791,10 +42810,13 @@ the scalar conversion is valid.
 
 ";
 
-%feature("docstring")  eig_symbolic(const Matrix< Scalar > &m) "
+%feature("docstring")  chol(const Matrix< Scalar > &A) "
 
-Attempts to find the eigenvalues of a symbolic matrix This will only work
-for up to 3x3 matrices.
+Obtain a Cholesky factorisation of a matrix Returns an upper triangular R
+such that R'R = A. Matrix A must be positive definite.
+
+At the moment, the algorithm is dense (Cholesky-Banachiewicz). There is an
+open ticket #1212 to make it sparse.
 
 ";
 
@@ -43093,6 +43115,13 @@ Get the second dimension (i.e. number of columns)
 %feature("docstring")  casadi::GenericMatrix< MX  >::size1() const "
 
 Get the first dimension (i.e. number of rows)
+
+";
+
+%feature("docstring")  casadi::GenericMatrix< MX  >::linearize(const MX &f,
+const MX &x, const MX &x0) "
+
+Functions called by friend functions defined here
 
 ";
 

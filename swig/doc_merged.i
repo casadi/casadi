@@ -16636,6 +16636,12 @@ Calculate Jacobian.
 
 ";
 
+%feature("docstring") friendwrap_linearize "
+
+Linearize an expression.
+
+";
+
 %feature("docstring") friendwrap_print_operator "
 
 Get a string representation for a binary MatType, using custom arguments.
@@ -16878,6 +16884,12 @@ Computes the Moore-Penrose pseudo-inverse.
 
 If the matrix A is fat (size1>size2), mul(A, pinv(A)) is unity. If the
 matrix A is slender (size2<size1), mul(pinv(A), A) is unity.
+
+";
+
+%feature("docstring") casadi::GenericMatrix::linearize "
+
+Functions called by friend functions defined here
 
 ";
 
@@ -30132,6 +30144,13 @@ symbolic primitives.
 
 ";
 
+%feature("docstring") friendwrap_eig_symbolic "
+
+Attempts to find the eigenvalues of a symbolic matrix This will only work
+for up to 3x3 matrices.
+
+";
+
 %feature("docstring") casadi::Matrix::is_leaf "[INTERNAL]  Check if SX is a
 leaf of the SX graph.
 
@@ -30309,13 +30328,9 @@ are possible)
 
 ";
 
-%feature("docstring") friendwrap_chol "
+%feature("docstring") casadi::Matrix::linearize "
 
-Obtain a Cholesky factorisation of a matrix Returns an upper triangular R
-such that R'R = A. Matrix A must be positive definite.
-
-At the moment, the algorithm is dense (Cholesky-Banachiewicz). There is an
-open ticket #1212 to make it sparse.
+Functions called by friend functions defined here
 
 ";
 
@@ -30462,10 +30477,13 @@ the scalar conversion is valid.
 
 ";
 
-%feature("docstring") friendwrap_eig_symbolic "
+%feature("docstring") friendwrap_chol "
 
-Attempts to find the eigenvalues of a symbolic matrix This will only work
-for up to 3x3 matrices.
+Obtain a Cholesky factorisation of a matrix Returns an upper triangular R
+such that R'R = A. Matrix A must be positive definite.
+
+At the moment, the algorithm is dense (Cholesky-Banachiewicz). There is an
+open ticket #1212 to make it sparse.
 
 ";
 
@@ -30718,6 +30736,12 @@ Get the second dimension (i.e. number of columns)
 %feature("docstring") casadi::MX::size1 "
 
 Get the first dimension (i.e. number of rows)
+
+";
+
+%feature("docstring") casadi::MX::linearize "
+
+Functions called by friend functions defined here
 
 ";
 
