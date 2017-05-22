@@ -188,9 +188,7 @@ namespace casadi {
     // Solve the NLP
     void solve(void* mem) const override;
 
-    virtual Dict get_stats(void* mem) const;
-
-    virtual Dict get_stats(void* mem) const;
+    Dict get_stats(void* mem) const override;
 
     /// A documentation string
     static const std::string meta_doc;
