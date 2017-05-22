@@ -170,6 +170,7 @@
 <tr><td>qp_init</td><td>OT_BOOL</td><td>Use warmstarting</td><td>casadi::Blocksqp</td></tr>
 <tr><td>qpsol</td><td>OT_STRING</td><td>The QP solver to be used by the SQP method</td><td>casadi::Blocksqp</td></tr>
 <tr><td>qpsol_options</td><td>OT_DICT</td><td>Options to be passed to the QP solver</td><td>casadi::Blocksqp</td></tr>
+<tr><td>restoration_options</td><td>OT_DICT</td><td>Options to be passed to restoration phase</td><td>casadi::Blocksqp</td></tr>
 <tr><td>restore_feas</td><td>OT_BOOL</td><td>Use feasibility restoration phase</td><td>casadi::Blocksqp</td></tr>
 <tr><td>rho</td><td>OT_DOUBLE</td><td>Feasibility restoration phase parameter</td><td>casadi::Blocksqp</td></tr>
 <tr><td>s_f</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
@@ -237,6 +238,7 @@
 <tr><td>qp_init</td><td>OT_BOOL</td><td>Use warmstarting</td></tr>
 <tr><td>qpsol</td><td>OT_STRING</td><td>The QP solver to be used by the SQP method</td></tr>
 <tr><td>qpsol_options</td><td>OT_DICT</td><td>Options to be passed to the QP solver</td></tr>
+<tr><td>restoration_options</td><td>OT_DICT</td><td>Options to be passed to restoration phase</td></tr>
 <tr><td>restore_feas</td><td>OT_BOOL</td><td>Use feasibility restoration phase</td></tr>
 <tr><td>rho</td><td>OT_DOUBLE</td><td>Feasibility restoration phase parameter</td></tr>
 <tr><td>s_f</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td></tr>
@@ -308,6 +310,7 @@
 <tr><td>qp_init</td><td>OT_BOOL</td><td>Use warmstarting</td><td>casadi::Blocksqp</td></tr>
 <tr><td>qpsol</td><td>OT_STRING</td><td>The QP solver to be used by the SQP method</td><td>casadi::Blocksqp</td></tr>
 <tr><td>qpsol_options</td><td>OT_DICT</td><td>Options to be passed to the QP solver</td><td>casadi::Blocksqp</td></tr>
+<tr><td>restoration_options</td><td>OT_DICT</td><td>Options to be passed to restoration phase</td><td>casadi::Blocksqp</td></tr>
 <tr><td>restore_feas</td><td>OT_BOOL</td><td>Use feasibility restoration phase</td><td>casadi::Blocksqp</td></tr>
 <tr><td>rho</td><td>OT_DOUBLE</td><td>Feasibility restoration phase parameter</td><td>casadi::Blocksqp</td></tr>
 <tr><td>s_f</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
