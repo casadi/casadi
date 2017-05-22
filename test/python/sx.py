@@ -134,7 +134,7 @@ class SXtests(casadiTestCase):
       x0=array([[0.738]])
 
       def fmod(f,x):
-        J=f.jacobian()
+        J=f.jacobian_old(0, 0)
         return J
 
       self.numpyEvaluationCheckPool(self.Jpool,[x],x0,name="SX unary operations, jacobian",fmod=fmod)
@@ -157,7 +157,7 @@ class SXtests(casadiTestCase):
       x0=array([0.738,0.9,0.3])
 
       def fmod(f,x):
-        J=f.jacobian()
+        J=f.jacobian_old(0, 0)
         return J
 
       self.numpyEvaluationCheckPool(self.Jpool,[x],x0,name="SX unary operations, jacobian",fmod=fmod)
@@ -169,7 +169,7 @@ class SXtests(casadiTestCase):
       x0=array([0.738,0.9,0.3])
 
       def fmod(f,x):
-        J=f.jacobian()
+        J=f.jacobian_old(0, 0)
         return J
 
       self.numpyEvaluationCheckPool(self.Jpool,[x],x0,name="SX unary operations, jacobian",fmod=fmod)
@@ -313,7 +313,7 @@ class SXtests(casadiTestCase):
     for i in range(3):
       self.assertAlmostEqual(z[i], zr[i],10,'SXfunction output in correct')
     self.message("SXFunction jacobian evaluation")
-    J=f.jacobian()
+    J=f.jacobian_old(0, 0)
     J_in = [0]*J.n_in();J_in[0]=L
     J_out = J.call(J_in)
     Jr=matrix([[1,1],[3,2],[4,27]])
@@ -1144,7 +1144,7 @@ class SXtests(casadiTestCase):
     f_out = f.call(f_in)
     self.checkarray(f_out[0],DM([2]))
 
-    J = f.jacobian()
+    J = f.jacobian_old(0, 0)
 
     J_in = [0]*J.n_in();J_in[0]=2
     J_in[1]=0.5
@@ -1171,7 +1171,7 @@ class SXtests(casadiTestCase):
     J_out = J.call(J_in)
     self.checkarray(J_out[0],DM([1]))
 
-    J = f.jacobian(1)
+    J = f.jacobian_old(1, 0)
 
     J_in = [0]*J.n_in();J_in[0]=2
     J_in[1]=0.5

@@ -302,7 +302,7 @@ class ADtests(casadiTestCase):
               opts["ad_weight"] = 0 if mode=='forward' else 1
               opts["ad_weight_sp"] = 0 if mode=='forward' else 1
               f=Function("f", self.sxinputs[inputshape][inputtype],self.sxoutputs[outputshape][outputtype], opts)
-              Jf=f.jacobian(0,0)
+              Jf=f.jacobian_old(0,0)
               J_in = DM(f.sparsity_in(0),n)
               Jout,_ = Jf(J_in)
               J = self.jacobians[inputtype][outputtype](*n)
@@ -352,7 +352,7 @@ class ADtests(casadiTestCase):
               opts["ad_weight"] = 0 if mode=='forward' else 1
               opts["ad_weight_sp"] = 0 if mode=='forward' else 1
               f=Function("f", self.mxinputs[inputshape][inputtype],self.mxoutputs[outputshape][outputtype](self.mxinputs[inputshape][inputtype][0]), opts)
-              Jf=f.jacobian(0,0)
+              Jf=f.jacobian_old(0,0)
               J_in = DM(f.sparsity_in(0),n)
               J_out,_ = Jf(J_in)
               J = self.jacobians[inputtype][outputtype](*n)
@@ -370,7 +370,7 @@ class ADtests(casadiTestCase):
               opts["ad_weight"] = 0 if mode=='forward' else 1
               opts["ad_weight_sp"] = 0 if mode=='forward' else 1
               f=Function("f", self.mxinputs[inputshape][inputtype],self.mxoutputs[outputshape][outputtype](self.mxinputs[inputshape][inputtype][0]), opts)
-              Jf=f.jacobian(0,0)
+              Jf=f.jacobian_old(0,0)
               J_in = DM(f.sparsity_in(0),n)
               J_out,_ = Jf(J_in)
               J = self.jacobians[inputtype][outputtype](*n)
@@ -386,12 +386,12 @@ class ADtests(casadiTestCase):
     z=SX.sym("z")
     n=array([1.2,2.3,7])
     f=Function("f", [vertcat(*[x,y,z])],[vertcat(*[x+2*y**3+3*z**4])])
-    J=f.jacobian(0,0)
+    J=f.jacobian_old(0,0)
     m=MX.sym("m",3,1)
     JT,_ = J(m)
     JT = Function("JT", [m],[JT.T])
     JT(n)
-    H = JT.jacobian(0,0)
+    H = JT.jacobian_old(0,0)
     H(n)
     #H_out = H(H_in)
 
@@ -408,7 +408,7 @@ class ADtests(casadiTestCase):
     inp[3,0]=y
 
     f=Function("f", [inp],[vertcat(*[x+y,x,y])])
-    J=f.jacobian(0,0)
+    J=f.jacobian_old(0,0)
     J(DM(f.sparsity_in(0),[2,7]))
 
     self.assertEqual(f.size1_out(0),3,"Jacobian shape bug")
@@ -425,12 +425,12 @@ class ADtests(casadiTestCase):
     inp[3,0]=y
 
     f=Function("f", [inp],[vertcat(*[x+y,x,y])])
-    J=f.jacobian(0,0)
+    J=f.jacobian_old(0,0)
     J_in = DM(f.sparsity_in(0),[2,7])
     J_out,_ = J(J_in)
 
     f=Function("f", [inp],[vertcat(*[x+y,x,y])])
-    J=f.jacobian(0,0)
+    J=f.jacobian_old(0,0)
 
   @memory_heavy()
   def test_MX(self):
@@ -725,7 +725,7 @@ class ADtests(casadiTestCase):
           ind = 0 if mode=='forward' else 1
           f = fun_ad[ind] if expand  else funsx_ad[ind]
 
-          Jf=f.jacobian(0,0)
+          Jf=f.jacobian_old(0,0)
           Jf_out = Jf.call(values)
 
           self.check_codegen(Jf,inputs=values)

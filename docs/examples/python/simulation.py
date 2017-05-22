@@ -30,7 +30,7 @@ from casadi.tools import *
 # System states
 states = struct_symSX(["x","y","dx","dy"])
 x,y,dx,dy = states[...]
-    
+
 # System controls
 controls = struct_symSX(["u","v"])
 u,v = controls[...]
@@ -99,13 +99,13 @@ rhs["dy"] = F[1]
 
 # # === Method 1: integrator sensitivity ===
 # # PF = d(I)/d(x0) P0 [d(I)/d(x0)]^T
-  
+
 # P0 = states.squared()
 # P0[:,:] = 0.01*DM.eye(states.size)
 # P0["x","dy"] = P0["dy","x"] = 0.002
 
 # # Not supported in current revision, cf. #929
-# # J = csim.jacobian("x0","xf")
+# # J = csim.jacobian_old(csim.index_in("x0"),csim.index_out("xf"))
 # # J.setInput(x0,"x0")
 # # J.setInput(parameters_,"p")
 # # J.setInput(controls_,"u")
@@ -167,7 +167,7 @@ rhs["dy"] = F[1]
 #   csim.setInput(x0_,"x0")
 #   csim.evaluate()
 #   simulated_x.append(csim.getOutput()[-1,:])
-  
+
 # simulated_x = vertcat(simulated_x).T
 
 # Xf_mean = mtimes(simulated_x,W)

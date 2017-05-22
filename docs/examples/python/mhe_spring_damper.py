@@ -96,10 +96,10 @@ k4 = f(states+dt*k3,controls,disturbances)
 
 states_1 = states+dt/6.0*(k1+2*k2+2*k3+k4)
 phi = Function('phi', [states,controls,disturbances],[states_1])
-PHI = phi.jacobian()
+PHI = phi.jacobian_old(0, 0)
 # Define the measurement system
 h = Function('h', [states],[x]) # We have measurements of the position
-H = h.jacobian()
+H = h.jacobian_old(0, 0)
 # Build the objective
 obj = 0
 # First the arrival cost
@@ -175,7 +175,7 @@ for i in range(1,Nsimulation-N+1):
   x0 = phi(x0, current_parameters["U",0], solution["W",0])
   F = PHI(solution["X",0], current_parameters["U",0], solution["W",0])[0]
   P = mtimes([F,P,F.T]) + linalg.inv(Q)
-  # Get the measurements and control inputs 
+  # Get the measurements and control inputs
   current_parameters["U",lambda x: horzcat(*x)] = simulated_U[:,i:i+N-1]
   current_parameters["Y",lambda x: horzcat(*x)] = simulated_Y[:,i:i+N]
   current_parameters["S"] = linalg.inv(P)

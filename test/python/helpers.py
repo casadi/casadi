@@ -388,14 +388,14 @@ class casadiTestCase(unittest.TestCase):
       for i in range(trial.n_in()):
         if (allow_empty and (trial.sparsity_in(i).is_empty() or solution.sparsity_in(i).is_empty() )): continue
         for j in range(trial.n_out()):
-          trialjac = trial.jacobian(i,j)
+          trialjac = trial.jacobian_old(i,j)
           self.assertEqual(trialjac.n_in(),trial.n_in())
           self.assertEqual(trialjac.n_out(),trial.n_out()+1)
-          solutionjac = solution.jacobian(i,j)
+          solutionjac = solution.jacobian_old(i,j)
           self.assertEqual(solutionjac.n_in(),solution.n_in())
           self.assertEqual(solutionjac.n_out(),solution.n_out()+1)
 
-          self.checkfunction(trialjac,solutionjac,inputs=inputs,fwd=fwd if sens_der else False,adj=adj if sens_der else False,jacobian=False,gradient=False,hessian=False,evals=False,digits=digits_sens,failmessage="(%s).jacobian(%d,%d)" % (failmessage,i,j),allow_empty=allow_empty,verbose=verbose,allow_nondiff=allow_nondiff)
+          self.checkfunction(trialjac,solutionjac,inputs=inputs,fwd=fwd if sens_der else False,adj=adj if sens_der else False,jacobian=False,gradient=False,hessian=False,evals=False,digits=digits_sens,failmessage="(%s).jacobian_old(%d,%d)" % (failmessage,i,j),allow_empty=allow_empty,verbose=verbose,allow_nondiff=allow_nondiff)
 
     if hessian:
       for i in range(trial.n_in()):

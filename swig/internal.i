@@ -301,6 +301,15 @@
 %exception  casadi::Function::checkInputs() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Function::jacobian(const std::string &iind, const std::string &oind, bool compact=false, bool symmetric=false) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Function::jacobian(const std::string &iind, int oind=0, bool compact=false, bool symmetric=false) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Function::jacobian(int iind, const std::string &oind, bool compact=false, bool symmetric=false) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::Function::spCanEvaluate(bool fwd) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }

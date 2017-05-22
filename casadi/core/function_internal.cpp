@@ -483,7 +483,7 @@ namespace casadi {
 
     // Return the Jacobian of the gradient, exploiting symmetry (the gradient has output index 0)
     log("FunctionInternal::getHessian generating Jacobian of gradient");
-    return g.jacobian(iind, 0, false, true);
+    return g.jacobian_old(iind, 0, false, true);
   }
 
   void FunctionInternal::log(const string& msg) const {
@@ -1430,7 +1430,7 @@ namespace casadi {
   Function FunctionInternal::
   getJacobian(const std::string& name, int iind, int oind, bool compact, bool symmetric,
               const Dict& opts) {
-    return wrap().jacobian(iind, oind, compact, symmetric);
+    return wrap().jacobian_old(iind, oind, compact, symmetric);
   }
 
   Function FunctionInternal::forward(int nfwd) const {
