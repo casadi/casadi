@@ -190,6 +190,8 @@ namespace casadi {
 
     virtual Dict get_stats(void* mem) const;
 
+    virtual Dict get_stats(void* mem) const;
+
     /// A documentation string
     static const std::string meta_doc;
 

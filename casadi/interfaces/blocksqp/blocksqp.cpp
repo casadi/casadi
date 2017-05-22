@@ -244,7 +244,6 @@ namespace casadi {
     ret["hessDamped"] = m->hessDamped;
     ret["averageSizingFactor"] = m->averageSizingFactor;
 
-
     ret["qpResolve"] = m->qpResolve;
     ret["nFunCalls"] = m->nFunCalls;
     ret["nDerCalls"] = m->nDerCalls;
@@ -475,11 +474,8 @@ namespace casadi {
       // build fesibility restoration phase nlp
       MX p = MX::sym("p",nlp.size1_in("x"));
       MX s = MX::sym("s",nlp.size1_out("g"));
-      vector<MX> D;
-      for( int i=0; i<nlp.size1_in("x"); ++i ) {
-  	D.push_back( fmin(1.0,1.0/abs(p(i))) * (argv.at(0)(i) - p(i)) );
-      }
-      MX d = MX::vertcat(D);
+
+      MX d = fmin(1.0,1.0/abs(p)) * (argv.at(0) - p);
       MX f_rp = 0.5 * rho_ * dot(s,s) + zeta_/2.0 * dot(d,d);
       MX g_rp = nlp(argv).at(1) - s;
 
