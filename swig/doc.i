@@ -9783,6 +9783,9 @@ Joris Gillis  Interface to the JIT compiler CLANG
 |              |                 | be automatically   |                    |
 |              |                 | appended.          |                    |
 +--------------+-----------------+--------------------+--------------------+
+| verbose      | OT_BOOL         | Verbose evaluation | casadi::ImporterIn |
+|              |                 | for debugging      | ternal             |
++--------------+-----------------+--------------------+--------------------+
 
 Diagrams
 --------
@@ -13668,9 +13671,23 @@ const override "
 
 %feature("docstring") casadi::DllLibrary "
 
-[INTERNAL]  Dynamically linked library.
+Dynamically linked library.
 
 Joel Andersson
+
+>List of available options
+
++---------+---------+---------------------------------+--------------------+
+|   Id    |  Type   |           Description           |      Used in       |
++=========+=========+=================================+====================+
+| verbose | OT_BOOL | Verbose evaluation  for         | casadi::DllLibrary |
+|         |         | debugging                       |                    |
++---------+---------+---------------------------------+--------------------+
+
+Diagrams
+--------
+
+
 
 C++ includes: importer_internal.hpp ";
 
@@ -26813,12 +26830,23 @@ Interface to the JIT compiler SHELL
 +----------------+-----------------+---------------------------------------+
 | compiler       | OT_STRING       | Compiler command                      |
 +----------------+-----------------+---------------------------------------+
+| compiler_flags | OT_STRINGVECTOR | Compile flags for the JIT compiler.   |
+|                |                 | Default: None                         |
++----------------+-----------------+---------------------------------------+
 | compiler_setup | OT_STRING       | Compiler setup command. Intended to   |
 |                |                 | be fixed. The 'flag' option is the    |
 |                |                 | prefered way to set custom flags.     |
 +----------------+-----------------+---------------------------------------+
-| flags          | OT_STRINGVECTOR | Compile flags for the JIT compiler.   |
+| folder         | OT_STRING       | Folder to put temporary objects in.   |
++----------------+-----------------+---------------------------------------+
+| linker         | OT_STRING       | Linker command                        |
++----------------+-----------------+---------------------------------------+
+| linker_flags   | OT_STRINGVECTOR | Linker flags for the JIT compiler.    |
 |                |                 | Default: None                         |
++----------------+-----------------+---------------------------------------+
+| linker_setup   | OT_STRING       | Linker setup command. Intended to be  |
+|                |                 | fixed. The 'flag' option is the       |
+|                |                 | prefered way to set custom flags.     |
 +----------------+-----------------+---------------------------------------+
 
 --------------------------------------------------------------------------------
@@ -54941,12 +54969,23 @@ Joel Andersson  Interface to the JIT compiler SHELL
 +----------------+-----------------+---------------------------------------+
 | compiler       | OT_STRING       | Compiler command                      |
 +----------------+-----------------+---------------------------------------+
+| compiler_flags | OT_STRINGVECTOR | Compile flags for the JIT compiler.   |
+|                |                 | Default: None                         |
++----------------+-----------------+---------------------------------------+
 | compiler_setup | OT_STRING       | Compiler setup command. Intended to   |
 |                |                 | be fixed. The 'flag' option is the    |
 |                |                 | prefered way to set custom flags.     |
 +----------------+-----------------+---------------------------------------+
-| flags          | OT_STRINGVECTOR | Compile flags for the JIT compiler.   |
+| folder         | OT_STRING       | Folder to put temporary objects in.   |
++----------------+-----------------+---------------------------------------+
+| linker         | OT_STRING       | Linker command                        |
++----------------+-----------------+---------------------------------------+
+| linker_flags   | OT_STRINGVECTOR | Linker flags for the JIT compiler.    |
 |                |                 | Default: None                         |
++----------------+-----------------+---------------------------------------+
+| linker_setup   | OT_STRING       | Linker setup command. Intended to be  |
+|                |                 | fixed. The 'flag' option is the       |
+|                |                 | prefered way to set custom flags.     |
 +----------------+-----------------+---------------------------------------+
 
 >List of available options
@@ -54962,6 +55001,10 @@ Joel Andersson  Interface to the JIT compiler SHELL
 | compiler       | OT_STRING       | Compiler command  | casadi::ShellComp |
 |                |                 |                   | iler              |
 +----------------+-----------------+-------------------+-------------------+
+| compiler_flags | OT_STRINGVECTOR | Compile flags for | casadi::ShellComp |
+|                |                 | the JIT compiler. | iler              |
+|                |                 | Default: None     |                   |
++----------------+-----------------+-------------------+-------------------+
 | compiler_setup | OT_STRING       | Compiler setup    | casadi::ShellComp |
 |                |                 | command. Intended | iler              |
 |                |                 | to be fixed. The  |                   |
@@ -54970,9 +55013,28 @@ Joel Andersson  Interface to the JIT compiler SHELL
 |                |                 | to set custom     |                   |
 |                |                 | flags.            |                   |
 +----------------+-----------------+-------------------+-------------------+
-| flags          | OT_STRINGVECTOR | Compile flags for | casadi::ShellComp |
+| folder         | OT_STRING       | Folder to put     | casadi::ShellComp |
+|                |                 | temporary objects | iler              |
+|                |                 | in.               |                   |
++----------------+-----------------+-------------------+-------------------+
+| linker         | OT_STRING       | Linker command    | casadi::ShellComp |
+|                |                 |                   | iler              |
++----------------+-----------------+-------------------+-------------------+
+| linker_flags   | OT_STRINGVECTOR | Linker flags for  | casadi::ShellComp |
 |                |                 | the JIT compiler. | iler              |
 |                |                 | Default: None     |                   |
++----------------+-----------------+-------------------+-------------------+
+| linker_setup   | OT_STRING       | Linker setup      | casadi::ShellComp |
+|                |                 | command. Intended | iler              |
+|                |                 | to be fixed. The  |                   |
+|                |                 | 'flag' option is  |                   |
+|                |                 | the prefered way  |                   |
+|                |                 | to set custom     |                   |
+|                |                 | flags.            |                   |
++----------------+-----------------+-------------------+-------------------+
+| verbose        | OT_BOOL         | Verbose           | casadi::ImporterI |
+|                |                 | evaluation  for   | nternal           |
+|                |                 | debugging         |                   |
 +----------------+-----------------+-------------------+-------------------+
 
 Diagrams
@@ -66376,9 +66438,14 @@ times t_i.
 | max_num_steps              | OT_INT    | Maximum number of integrator    |
 |                            |           | steps                           |
 +----------------------------+-----------+---------------------------------+
+| max_order                  | OT_DOUBLE | Maximum order                   |
++----------------------------+-----------+---------------------------------+
 | newton_scheme              | OT_STRING | Linear solver scheme in the     |
 |                            |           | Newton method:                  |
 |                            |           | DIRECT|gmres|bcgstab|tfqmr      |
++----------------------------+-----------+---------------------------------+
+| nonlin_conv_coeff          | OT_DOUBLE | Coefficient in the nonlinear    |
+|                            |           | convergence test                |
 +----------------------------+-----------+---------------------------------+
 | nonlinear_solver_iteration | OT_STRING | Nonlinear solver type:          |
 |                            |           | NEWTON|functional               |
@@ -66395,6 +66462,9 @@ times t_i.
 +----------------------------+-----------+---------------------------------+
 | sensitivity_method         | OT_STRING | Sensitivity method:             |
 |                            |           | SIMULTANEOUS|staggered          |
++----------------------------+-----------+---------------------------------+
+| step0                      | OT_DOUBLE | initial step size [default:     |
+|                            |           | 0/estimated]                    |
 +----------------------------+-----------+---------------------------------+
 | steps_per_checkpoint       | OT_INT    | Number of steps between two     |
 |                            |           | consecutive checkpoints         |
@@ -66478,11 +66548,16 @@ Interface to IDAS from the Sundials suite.
 | max_num_steps             | OT_INT          | Maximum number of          |
 |                           |                 | integrator steps           |
 +---------------------------+-----------------+----------------------------+
+| max_order                 | OT_DOUBLE       | Maximum order              |
++---------------------------+-----------------+----------------------------+
 | max_step_size             | OT_DOUBLE       | Maximim step size          |
 +---------------------------+-----------------+----------------------------+
 | newton_scheme             | OT_STRING       | Linear solver scheme in    |
 |                           |                 | the Newton method:         |
 |                           |                 | DIRECT|gmres|bcgstab|tfqmr |
++---------------------------+-----------------+----------------------------+
+| nonlin_conv_coeff         | OT_DOUBLE       | Coefficient in the         |
+|                           |                 | nonlinear convergence test |
 +---------------------------+-----------------+----------------------------+
 | quad_err_con              | OT_BOOL         | Should the quadratures     |
 |                           |                 | affect the step size       |
@@ -66497,6 +66572,9 @@ Interface to IDAS from the Sundials suite.
 +---------------------------+-----------------+----------------------------+
 | sensitivity_method        | OT_STRING       | Sensitivity method:        |
 |                           |                 | SIMULTANEOUS|staggered     |
++---------------------------+-----------------+----------------------------+
+| step0                     | OT_DOUBLE       | initial step size          |
+|                           |                 | [default: 0/estimated]     |
 +---------------------------+-----------------+----------------------------+
 | steps_per_checkpoint      | OT_INT          | Number of steps between    |
 |                           |                 | two consecutive            |
