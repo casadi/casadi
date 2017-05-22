@@ -6326,17 +6326,10 @@ Get the (integer) output argument of an atomic operation.
 
 %feature("docstring") casadi::Callback::hessian "
 
-Generate a Hessian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The generated Hessian has two more outputs than the calling function
-corresponding to the Hessian and the gradients.
+[DEPRECATED] Alias of Function::jacobian_old This function is of internal
+character and should be avoided, if possible. The preferred way is to use
+unction::factory instead. This function will change behavior in the next
+version of CasADi.
 
 ";
 
@@ -14600,17 +14593,10 @@ Print a description of the object.
 
 %feature("docstring") casadi::Function::hessian "
 
-Generate a Hessian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The generated Hessian has two more outputs than the calling function
-corresponding to the Hessian and the gradients.
+[DEPRECATED] Alias of Function::jacobian_old This function is of internal
+character and should be avoided, if possible. The preferred way is to use
+unction::factory instead. This function will change behavior in the next
+version of CasADi.
 
 ";
 

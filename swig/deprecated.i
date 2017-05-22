@@ -10,6 +10,18 @@
 %exception  casadi::Function::gradient(int iind=0, int oind=0) {
  CATCH_OR_NOT(DEPRECATED_MSG("") $action)
 }
+%exception  casadi::Function::hessian(const std::string &iind, const std::string &oind) {
+ CATCH_OR_NOT(DEPRECATED_MSG("") $action)
+}
+%exception  casadi::Function::hessian(const std::string &iind, int oind=0) {
+ CATCH_OR_NOT(DEPRECATED_MSG("") $action)
+}
+%exception  casadi::Function::hessian(int iind, const std::string &oind) {
+ CATCH_OR_NOT(DEPRECATED_MSG("") $action)
+}
+%exception  casadi::Function::hessian(int iind=0, int oind=0) {
+ CATCH_OR_NOT(DEPRECATED_MSG("") $action)
+}
 %exception  casadi::Function::jacobian(int iind=0, int oind=0, bool compact=false, bool symmetric=false) {
  CATCH_OR_NOT(DEPRECATED_MSG("") $action)
 }
