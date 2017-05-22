@@ -44,61 +44,61 @@ namespace casadi {
                    const std::vector<Function>& f, const Function& f_def);
 
     /** \brief  Destructor */
-    virtual ~Switch();
+    ~Switch() override;
 
     /** \brief Get type name */
-    virtual std::string type_name() const {return "switch";}
+    std::string type_name() const override {return "switch";}
 
     ///@{
     /** \brief Number of function inputs and outputs */
-    virtual size_t get_n_in();
-    virtual size_t get_n_out();
+    size_t get_n_in() override;
+    size_t get_n_out() override;
     ///@}
 
     /// @{
     /** \brief Sparsities of function inputs and outputs */
-    virtual Sparsity get_sparsity_in(int i);
-    virtual Sparsity get_sparsity_out(int i);
+    Sparsity get_sparsity_in(int i) override;
+    Sparsity get_sparsity_out(int i) override;
     /// @}
 
     /** \brief  Initialize */
-    virtual void init(const Dict& opts);
+    void init(const Dict& opts) override;
 
     /** \brief  Evaluate numerically, work vectors given */
-    virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
+    void eval(void* mem, const double** arg, double** res, int* iw, double* w) const override;
 
     /** \brief  evaluate symbolically while also propagating directional derivatives */
-    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const;
+    void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const override;
 
     ///@{
     /** \brief Generate a function that calculates \a nfwd forward derivatives */
-    virtual Function get_forward(const std::string& name, int nfwd,
+    Function get_forward(const std::string& name, int nfwd,
                                  const std::vector<std::string>& i_names,
                                  const std::vector<std::string>& o_names,
-                                 const Dict& opts) const;
-    virtual int get_n_forward() const { return 64;}
+                                 const Dict& opts) const override;
+    int get_n_forward() const override { return 64;}
     ///@}
 
     ///@{
     /** \brief Generate a function that calculates \a nadj adjoint derivatives */
-    virtual Function get_reverse(const std::string& name, int nadj,
+    Function get_reverse(const std::string& name, int nadj,
                                  const std::vector<std::string>& i_names,
                                  const std::vector<std::string>& o_names,
-                                 const Dict& opts) const;
-    virtual int get_n_reverse() const { return 64;}
+                                 const Dict& opts) const override;
+    int get_n_reverse() const override { return 64;}
     ///@}
 
     /** \brief  Print description */
-    virtual void print(std::ostream &stream) const;
+    void print(std::ostream &stream) const override;
 
     /** \brief Generate code for the declarations of the C function */
-    virtual void generateDeclarations(CodeGenerator& g) const;
+    void generateDeclarations(CodeGenerator& g) const override;
 
     /** \brief Is codegen supported? */
-    virtual bool has_codegen() const { return true;}
+    bool has_codegen() const override { return true;}
 
     /** \brief Generate code for the body of the C function */
-    virtual void generateBody(CodeGenerator& g) const;
+    void generateBody(CodeGenerator& g) const override;
 
     // Function to be evaluated for each case
     std::vector<Function> f_;

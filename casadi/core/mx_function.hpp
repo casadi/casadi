@@ -82,111 +82,111 @@ namespace casadi {
                        const std::vector<MX>& output);
 
     /** \brief  Destructor */
-    virtual ~MXFunction();
+    ~MXFunction() override;
 
     /** \brief  Evaluate numerically, work vectors given */
-    virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
+    void eval(void* mem, const double** arg, double** res, int* iw, double* w) const override;
 
     /** \brief  Print description */
-    virtual void print(std::ostream &stream) const;
+    void print(std::ostream &stream) const override;
 
     /** \brief Get type name */
-    virtual std::string type_name() const {return "mxfunction";}
+    std::string type_name() const override {return "mxfunction";}
 
     /** \brief Check if the function is of a particular type */
-    virtual bool is_a(const std::string& type, bool recursive) const;
+    bool is_a(const std::string& type, bool recursive) const override;
 
     ///@{
     /** \brief Options */
     static Options options_;
-    virtual const Options& get_options() const { return options_;}
+    const Options& get_options() const override { return options_;}
     ///@}
 
     /** \brief  Initialize */
-    virtual void init(const Dict& opts);
+    void init(const Dict& opts) override;
 
     /** \brief Generate code for the declarations of the C function */
-    virtual void generateDeclarations(CodeGenerator& g) const;
+    void generateDeclarations(CodeGenerator& g) const override;
 
     /** \brief Codegen incref for dependencies */
-    virtual void codegen_incref(CodeGenerator& g) const;
+    void codegen_incref(CodeGenerator& g) const override;
 
     /** \brief Codegen decref for dependencies */
-    virtual void codegen_decref(CodeGenerator& g) const;
+    void codegen_decref(CodeGenerator& g) const override;
 
     /** \brief Generate code for the body of the C function */
-    virtual void generateBody(CodeGenerator& g) const;
+    void generateBody(CodeGenerator& g) const override;
 
     /** \brief Extract the residual function G and the modified function Z out of an expression
      * (see Albersmeyer2010 paper) */
-    void generate_lifted(Function& vdef_fcn, Function& vinit_fcn) const;
+    void generate_lifted(Function& vdef_fcn, Function& vinit_fcn) const override;
 
     /** Inline calls? */
-    virtual bool should_inline(bool always_inline, bool never_inline) const {
+    bool should_inline(bool always_inline, bool never_inline) const override {
       return always_inline;
     }
 
     /** \brief Evaluate symbolically, SX type*/
-    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const;
+    void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const override;
 
     /** \brief Evaluate symbolically, MX type */
-    virtual void eval_mx(const MXVector& arg, MXVector& res,
-                         bool always_inline, bool never_inline) const;
+    void eval_mx(const MXVector& arg, MXVector& res,
+                         bool always_inline, bool never_inline) const override;
 
     /** \brief Calculate forward mode directional derivatives */
-    virtual void eval_forward(const std::vector<std::vector<MX> >& fwdSeed,
+    void eval_forward(const std::vector<std::vector<MX> >& fwdSeed,
                         std::vector<std::vector<MX> >& fwdSens) const;
 
     /** \brief Calculate reverse mode directional derivatives */
-    virtual void eval_reverse(const std::vector<std::vector<MX> >& adjSeed,
+    void eval_reverse(const std::vector<std::vector<MX> >& adjSeed,
                         std::vector<std::vector<MX> >& adjSens) const;
 
     /** \brief Expand the matrix valued graph into a scalar valued graph */
     Function expand(const std::vector<SX>& inputv);
 
     /// Get a vector of symbolic variables corresponding to the outputs
-    virtual std::vector<MX> symbolicOutput(const std::vector<MX>& arg);
+    std::vector<MX> symbolicOutput(const std::vector<MX>& arg) override;
 
     /** \brief  Propagate sparsity forward */
-    virtual void sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const;
+    void sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
 
     /** \brief  Propagate sparsity backwards */
-    virtual void sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const;
+    void sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
 
     // print an element of an algorithm
     std::string print(const AlgEl& el) const;
 
     /** \brief Gradient expression */
-    virtual MX grad_mx(int iind=0, int oind=0);
+    MX grad_mx(int iind=0, int oind=0) override;
 
     /** \brief Tangent expression */
-    virtual MX tang_mx(int iind=0, int oind=0);
+    MX tang_mx(int iind=0, int oind=0) override;
 
     /** \brief Jacobian expression */
-    virtual MX jac_mx(int iind=0, int oind=0, const Dict& opts = Dict());
+    MX jac_mx(int iind=0, int oind=0, const Dict& opts = Dict()) override;
 
     ///@{
     /** \brief Get function input(s) and output(s)  */
-    virtual const MX mx_in(int ind) const;
-    virtual const std::vector<MX> mx_in() const;
+    const MX mx_in(int ind) const override;
+    const std::vector<MX> mx_in() const override;
     ///@}
 
     /// Get free variables (MX)
-    virtual std::vector<MX> free_mx() const {return free_vars_;}
+    std::vector<MX> free_mx() const override {return free_vars_;}
 
     /** \brief Does the function have free variables */
-    virtual bool has_free() const { return !free_vars_.empty();}
+    bool has_free() const override { return !free_vars_.empty();}
 
     /** \brief Print free variables */
-    virtual void print_free(std::ostream &stream) const {
+    void print_free(std::ostream &stream) const override {
       stream << free_vars_;
     }
 
     /** \brief Number of nodes in the algorithm */
-    virtual int n_nodes() const { return algorithm_.size();}
+    int n_nodes() const override { return algorithm_.size();}
 
     /** \brief Get default input value */
-    virtual double default_in(int ind) const { return default_in_.at(ind);}
+    double default_in(int ind) const override { return default_in_.at(ind);}
   };
 
 } // namespace casadi

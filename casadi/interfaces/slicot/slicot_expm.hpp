@@ -84,29 +84,29 @@ namespace casadi {
     }
 
     /** \brief  Destructor */
-    virtual ~SlicotExpm();
+    ~SlicotExpm() override;
 
     // Get name of the plugin
-    virtual const char* plugin_name() const { return "slicot";}
+    const char* plugin_name() const override { return "slicot";}
 
     /** \brief  Initialize */
-    virtual void init(const Dict& opts);
+    void init(const Dict& opts) override;
 
     /** \brief Create memory block */
-    virtual void* alloc_memory() const { return new SlicotExpmMemory();}
+    void* alloc_memory() const override { return new SlicotExpmMemory();}
 
     /** \brief Free memory block */
-    virtual void free_memory(void *mem) const { delete static_cast<SlicotExpmMemory*>(mem);}
+    void free_memory(void *mem) const override { delete static_cast<SlicotExpmMemory*>(mem);}
 
     /** \brief Set the (persistent) work vectors */
-    virtual void set_work(void* mem, const double**& arg, double**& res,
-                          int*& iw, double*& w) const;
+    void set_work(void* mem, const double**& arg, double**& res,
+                          int*& iw, double*& w) const override;
 
     /** \brief Initalize memory block */
-    virtual void init_memory(void* mem) const;
+    void init_memory(void* mem) const override;
 
     /** \brief  Evaluate numerically */
-    virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
+    void eval(void* mem, const double** arg, double** res, int* iw, double* w) const override;
 
     /// A documentation string
     static const std::string meta_doc;

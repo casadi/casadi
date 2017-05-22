@@ -75,68 +75,68 @@ namespace casadi {
     External(const std::string& name, const Importer& li);
 
     /** \brief Destructor */
-    virtual ~External() = 0;
+    ~External() override = 0;
 
     // Factory
-    virtual Function factory(const std::string& name,
+    Function factory(const std::string& name,
                              const std::vector<std::string>& s_in,
                              const std::vector<std::string>& s_out,
                              const Function::AuxOut& aux,
-                             const Dict& opts) const;
+                             const Dict& opts) const override;
 
     /** \brief Get type name */
-    virtual std::string type_name() const { return "external";}
+    std::string type_name() const override { return "external";}
 
     /// Initialize
-    virtual void init(const Dict& opts);
+    void init(const Dict& opts) override;
 
     /** \brief Add a dependent function */
-    virtual void addDependency(CodeGenerator& g) const;
+    void addDependency(CodeGenerator& g) const override;
 
     /** \brief Generate code the function */
-    virtual void generateFunction(CodeGenerator& g, const std::string& fname,
-                                  bool decl_static) const;
+    void generateFunction(CodeGenerator& g, const std::string& fname,
+                                  bool decl_static) const override;
 
     /** \brief Get name in codegen */
-    virtual std::string codegen_name(const CodeGenerator& g) const;
+    std::string codegen_name(const CodeGenerator& g) const override;
 
     ///@{
     /** \brief Number of function inputs and outputs */
-    virtual size_t get_n_in();
-    virtual size_t get_n_out();
+    size_t get_n_in() override;
+    size_t get_n_out() override;
     ///@}
 
     ///@{
     /** \brief Names of function input and outputs */
-    virtual std::string get_name_in(int i);
-    virtual std::string get_name_out(int i);
+    std::string get_name_in(int i) override;
+    std::string get_name_out(int i) override;
     /// @}
 
     ///@{
     /** \brief Forward mode derivatives */
-    virtual Function get_forward(const std::string& name, int nfwd,
+    Function get_forward(const std::string& name, int nfwd,
                                  const std::vector<std::string>& i_names,
                                  const std::vector<std::string>& o_names,
-                                 const Dict& opts) const;
-    virtual int get_n_forward() const;
+                                 const Dict& opts) const override;
+    int get_n_forward() const override;
     ///@}
 
     ///@{
     /** \brief Reverse mode derivatives */
-    virtual Function get_reverse(const std::string& name, int nadj,
+    Function get_reverse(const std::string& name, int nadj,
                                  const std::vector<std::string>& i_names,
                                  const std::vector<std::string>& o_names,
-                                 const Dict& opts) const;
-    virtual int get_n_reverse() const;
+                                 const Dict& opts) const override;
+    int get_n_reverse() const override;
     ///@}
 
     ///@{
     /** \brief Full Jacobian */
-    virtual bool hasFullJacobian() const;
-    virtual Function getFullJacobian(const std::string& name,
+    bool hasFullJacobian() const override;
+    Function getFullJacobian(const std::string& name,
                                      const std::vector<std::string>& i_names,
                                      const std::vector<std::string>& o_names,
-                                     const Dict& opts);
+                                     const Dict& opts) override;
     ///@}
   };
 
@@ -146,18 +146,18 @@ namespace casadi {
     SimplifiedExternal(const std::string& name, const Importer& li);
 
     /** \brief  Destructor */
-    virtual ~SimplifiedExternal() { this->clear_memory();}
+    ~SimplifiedExternal() override { this->clear_memory();}
 
     /// Initialize
-    virtual void init(const Dict& opts);
+    void init(const Dict& opts) override;
 
     /** \brief Use simplified signature */
-    virtual bool simplifiedCall() const { return true;}
+    bool simplifiedCall() const override { return true;}
 
     /// @{
     /** \brief Retreive sparsities */
-    virtual Sparsity get_sparsity_in(int i) { return Sparsity::scalar();}
-    virtual Sparsity get_sparsity_out(int i) { return Sparsity::scalar();}
+    Sparsity get_sparsity_in(int i) override { return Sparsity::scalar();}
+    Sparsity get_sparsity_out(int i) override { return Sparsity::scalar();}
     /// @}
   };
 
@@ -173,19 +173,19 @@ namespace casadi {
     GenericExternal(const std::string& name, const Importer& li);
 
     /** \brief  Destructor */
-    virtual ~GenericExternal() { this->clear_memory();}
+    ~GenericExternal() override { this->clear_memory();}
 
     /// Initialize
-    virtual void init(const Dict& opts);
+    void init(const Dict& opts) override;
 
     /// @{
     /** \brief Retreive sparsities */
-    virtual Sparsity get_sparsity_in(int i);
-    virtual Sparsity get_sparsity_out(int i);
+    Sparsity get_sparsity_in(int i) override;
+    Sparsity get_sparsity_out(int i) override;
     /// @}
 
     /** \brief Maximum number of memory objects */
-    virtual int n_mem() const { return n_mem_;}
+    int n_mem() const override { return n_mem_;}
   };
 
 

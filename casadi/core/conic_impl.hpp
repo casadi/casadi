@@ -47,39 +47,39 @@ namespace casadi {
     Conic(const std::string& name, const std::map<std::string, Sparsity> &st);
 
     // Destructor
-    virtual ~Conic() = 0;
+    ~Conic() override = 0;
 
     /** \brief Get type name */
-    virtual std::string type_name() const {
+    std::string type_name() const override {
       return std::string("conic_") + plugin_name();
     }
 
     ///@{
     /** \brief Number of function inputs and outputs */
-    virtual size_t get_n_in() { return CONIC_NUM_IN;}
-    virtual size_t get_n_out() { return CONIC_NUM_OUT;}
+    size_t get_n_in() override { return CONIC_NUM_IN;}
+    size_t get_n_out() override { return CONIC_NUM_OUT;}
     ///@}
 
     /// @{
     /** \brief Sparsities of function inputs and outputs */
-    virtual Sparsity get_sparsity_in(int i);
-    virtual Sparsity get_sparsity_out(int i);
+    Sparsity get_sparsity_in(int i) override;
+    Sparsity get_sparsity_out(int i) override;
     /// @}
 
     ///@{
     /** \brief Names of function input and outputs */
-    virtual std::string get_name_in(int i) { return conic_in(i);}
-    virtual std::string get_name_out(int i) { return conic_out(i);}
+    std::string get_name_in(int i) override { return conic_in(i);}
+    std::string get_name_out(int i) override { return conic_out(i);}
     /// @}
 
     ///@{
     /** \brief Options */
     static Options options_;
-    virtual const Options& get_options() const { return options_;}
+    const Options& get_options() const override { return options_;}
     ///@}
 
     // Initialize
-    virtual void init(const Dict& opts);
+    void init(const Dict& opts) override;
 
     /// \brief Check if the numerical values of the supplied bounds make sense
     virtual void checkInputs(const double* lbx, const double* ubx,
@@ -105,7 +105,7 @@ namespace casadi {
     static std::string shortname() { return "conic";}
 
     /** \brief Get default input value */
-    virtual double default_in(int ind) const;
+    double default_in(int ind) const override;
 
     /// Can discrete variables be treated
     virtual bool integer_support() const { return false;}

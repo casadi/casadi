@@ -62,21 +62,21 @@ namespace casadi {
     }
 
     /** \brief  Destructor */
-    virtual ~QpToNlp();
+    ~QpToNlp() override;
 
     // Get name of the plugin
-    virtual const char* plugin_name() const { return "nlpsol";}
+    const char* plugin_name() const override { return "nlpsol";}
 
     ///@{
     /** \brief Options */
     static Options options_;
-    virtual const Options& get_options() const { return options_;}
+    const Options& get_options() const override { return options_;}
     ///@}
 
     /** \brief  Initialize */
-    virtual void init(const Dict& opts);
+    void init(const Dict& opts) override;
 
-    virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
+    void eval(void* mem, const double** arg, double** res, int* iw, double* w) const override;
 
     /// A documentation string
     static const std::string meta_doc;

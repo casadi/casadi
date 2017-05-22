@@ -92,47 +92,47 @@ namespace casadi {
     }
 
     /** \brief  Destructor */
-    virtual ~CvodesInterface();
+    ~CvodesInterface() override;
 
     // Get name of the plugin
-    virtual const char* plugin_name() const { return "cvodes";}
+    const char* plugin_name() const override { return "cvodes";}
 
     ///@{
     /** \brief Options */
     static Options options_;
-    virtual const Options& get_options() const { return options_;}
+    const Options& get_options() const override { return options_;}
     ///@}
 
     /** \brief  Initialize stage */
-    virtual void init(const Dict& opts);
+    void init(const Dict& opts) override;
 
     /** \brief Create memory block */
-    virtual void* alloc_memory() const { return new CvodesMemory(*this);}
+    void* alloc_memory() const override { return new CvodesMemory(*this);}
 
     /** \brief Free memory block */
-    virtual void free_memory(void *mem) const { delete static_cast<CvodesMemory*>(mem);}
+    void free_memory(void *mem) const override { delete static_cast<CvodesMemory*>(mem);}
 
     /** \brief Initalize memory block */
-    virtual void init_memory(void* mem) const;
+    void init_memory(void* mem) const override;
 
     /** \brief  Reset the forward problem and bring the time back to t0 */
-    virtual void reset(IntegratorMemory* mem, double t, const double* x,
-                       const double* z, const double* p) const;
+    void reset(IntegratorMemory* mem, double t, const double* x,
+                       const double* z, const double* p) const override;
 
     /** \brief  Advance solution in time */
-    virtual void advance(IntegratorMemory* mem, double t, double* x,
-                         double* z, double* q) const;
+    void advance(IntegratorMemory* mem, double t, double* x,
+                         double* z, double* q) const override;
 
     /** \brief  Reset the backward problem and take time to tf */
-    virtual void resetB(IntegratorMemory* mem, double t,
-                        const double* rx, const double* rz, const double* rp) const;
+    void resetB(IntegratorMemory* mem, double t,
+                        const double* rx, const double* rz, const double* rp) const override;
 
     /** \brief  Retreat solution in time */
-    virtual void retreat(IntegratorMemory* mem, double t, double* rx,
-                         double* rz, double* rq) const;
+    void retreat(IntegratorMemory* mem, double t, double* rx,
+                         double* rz, double* rq) const override;
 
     /** \brief  Set the stop time of the forward integration */
-    virtual void setStopTime(IntegratorMemory* mem, double tf) const;
+    void setStopTime(IntegratorMemory* mem, double tf) const override;
 
     /** \brief Cast to memory object */
     static CvodesMemory* to_mem(void *mem) {
@@ -143,7 +143,7 @@ namespace casadi {
 
     ///@{
     // Get system Jacobian
-    virtual Function getJ(bool backward) const;
+    Function getJ(bool backward) const override;
     template<typename MatType> Function getJ(bool backward) const;
     ///@}
 

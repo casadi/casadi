@@ -40,14 +40,14 @@ namespace casadi {
 class SymbolicSX : public SXNode {
 public:
   explicit SymbolicSX(const std::string &name) : name_(name) {}
-  virtual ~SymbolicSX() {}
+  ~SymbolicSX() override {}
 
-  virtual bool is_symbolic() const { return true; }
+  bool is_symbolic() const override { return true; }
 
-  virtual const std::string& name() const { return name_; }
+  const std::string& name() const override { return name_; }
 
     /** \brief  Get the operation */
-  virtual int op() const { return OP_PARAMETER;}
+  int op() const override { return OP_PARAMETER;}
 
   /** \brief  Name */
   std::string name_;
@@ -55,7 +55,7 @@ public:
 protected:
 
   /** \brief  Print expression */
-  virtual std::string print(const std::string& arg1, const std::string& arg2) const {
+  std::string print(const std::string& arg1, const std::string& arg2) const override {
     return name_;
   }
 };

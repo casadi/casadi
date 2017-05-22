@@ -83,7 +83,7 @@ namespace casadi {
         const std::vector<int>& degree, int m);
 
       /** \brief  Destructor */
-      virtual ~BSpline() {}
+      ~BSpline() override {}
 
       /// @{
       /** \brief Sparsities of function inputs and outputs */
@@ -108,7 +108,7 @@ namespace casadi {
 
       ///@{
       /** \brief Generate a function that calculates \a nadj adjoint derivatives */
-      virtual Function get_reverse(const std::string& name, int nadj,
+      Function get_reverse(const std::string& name, int nadj,
                                    const std::vector<std::string>& i_names,
                                    const std::vector<std::string>& o_names,
                                    const Dict& opts) const override;
@@ -152,7 +152,7 @@ namespace casadi {
         const std::vector<int>& degree, int m, bool reverse);
 
       /** \brief  Destructor */
-      virtual ~BSplineDual() {}
+      ~BSplineDual() override {}
 
       ///@{
       /** \brief Number of function inputs and outputs */

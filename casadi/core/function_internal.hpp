@@ -66,7 +66,7 @@ namespace casadi {
     FunctionInternal(const std::string& name);
 
     /** \brief  Destructor */
-    virtual ~FunctionInternal() = 0;
+    ~FunctionInternal() override = 0;
 
     /** \brief  Obtain solver name from Adaptor */
     virtual std::string getAdaptorSolverName() const { return ""; }
@@ -451,10 +451,10 @@ namespace casadi {
     virtual void jit_dependencies(const std::string& fname) {}
 
     /** \brief  Print */
-    virtual void print(std::ostream &stream) const;
+    void print(std::ostream &stream) const override;
 
     /** \brief  Print */
-    virtual void repr(std::ostream &stream) const;
+    void repr(std::ostream &stream) const override;
 
     /** \brief Check if the numerical values of the supplied bounds make sense */
     virtual void checkInputs() const {}

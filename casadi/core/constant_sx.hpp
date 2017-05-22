@@ -45,19 +45,19 @@ class ConstantSX : public SXNode {
 public:
 
 // Destructor
-virtual ~ConstantSX() {}
+~ConstantSX() override {}
 
 /** \brief  Get the value must be defined */
-virtual double to_double() const = 0;
+double to_double() const override = 0;
 
 /** \brief  Properties */
-virtual bool is_constant() const { return true; }
+bool is_constant() const override { return true; }
 
 /** \brief  Get the operation */
-virtual int op() const { return OP_CONST;}
+int op() const override { return OP_CONST;}
 
 /** \brief Check if two nodes are equivalent up to a given depth */
-virtual bool is_equal(const SXNode* node, int depth) const {
+bool is_equal(const SXNode* node, int depth) const override {
   const ConstantSX* n = dynamic_cast<const ConstantSX*>(node);
   return n && n->to_double()==to_double();
 }
@@ -65,7 +65,7 @@ virtual bool is_equal(const SXNode* node, int depth) const {
 protected:
 
 /** \brief  Print expression */
- virtual std::string print(const std::string& arg1, const std::string& arg2) const {
+std::string print(const std::string& arg1, const std::string& arg2) const override {
    std::stringstream ss;
    ss << to_double();
    return ss.str();
@@ -87,7 +87,7 @@ class RealtypeSX : public ConstantSX {
   public:
 
     /// Destructor
-    virtual ~RealtypeSX() {
+    ~RealtypeSX() override {
       size_t num_erased = cached_constants_.erase(value);
       assert(num_erased==1);
       (void)num_erased;
@@ -115,11 +115,11 @@ class RealtypeSX : public ConstantSX {
 
     ///@{
     /** \brief  Get the value */
-    virtual double to_double() const { return value;}
-    virtual int to_int() const { return static_cast<int>(value);}
+    double to_double() const override { return value;}
+    int to_int() const override { return static_cast<int>(value);}
     ///@}
 
-    virtual bool isAlmostZero(double tol) const { return fabs(value)<=tol; }
+    bool isAlmostZero(double tol) const override { return fabs(value)<=tol; }
 
   protected:
     /** \brief Hash map of all constants currently allocated
@@ -143,7 +143,7 @@ class IntegerSX : public ConstantSX {
   public:
 
     /// Destructor
-    virtual ~IntegerSX() {
+    ~IntegerSX() override {
       size_t num_erased = cached_constants_.erase(value);
       assert(num_erased==1);
       (void)num_erased;
@@ -171,12 +171,12 @@ class IntegerSX : public ConstantSX {
 
     ///@{
     /** \brief  evaluate function */
-    virtual double to_double() const {  return value; }
-    virtual int to_int() const {  return value; }
+    double to_double() const override {  return value; }
+    int to_int() const override {  return value; }
     ///@}
 
     /** \brief  Properties */
-    virtual bool is_integer() const { return true; }
+    bool is_integer() const override { return true; }
 
   protected:
 
@@ -195,20 +195,20 @@ class IntegerSX : public ConstantSX {
 class ZeroSX : public ConstantSX {
 public:
 
-  virtual ~ZeroSX() {}
+  ~ZeroSX() override {}
   explicit ZeroSX() {}
 
   ///@{
   /** \brief  Get the value */
-  virtual double to_double() const { return 0;}
-  virtual int to_int() const { return 0;}
+  double to_double() const override { return 0;}
+  int to_int() const override { return 0;}
   ///@}
 
   ///@{
   /** \brief  Properties */
-  virtual bool is_integer() const { return true; }
-  virtual bool is_zero() const { return true; }
-  virtual bool isAlmostZero(double tol) const { return true; }
+  bool is_integer() const override { return true; }
+  bool is_zero() const override { return true; }
+  bool isAlmostZero(double tol) const override { return true; }
   ///@}
 };
 
@@ -221,15 +221,15 @@ class OneSX : public ConstantSX {
 public:
 
   explicit OneSX() {}
-  virtual ~OneSX() {}
+  ~OneSX() override {}
 
   /** \brief  Get the value */
-  virtual double to_double() const { return 1;}
-  virtual int to_int() const { return 1;}
+  double to_double() const override { return 1;}
+  int to_int() const override { return 1;}
 
   /** \brief  Properties */
-  virtual bool is_integer() const { return true; }
-  virtual bool is_one() const { return true; }
+  bool is_integer() const override { return true; }
+  bool is_one() const override { return true; }
 
 };
 
@@ -242,18 +242,18 @@ class MinusOneSX : public ConstantSX {
 public:
 
   explicit MinusOneSX() {}
-  virtual ~MinusOneSX() {}
+  ~MinusOneSX() override {}
 
   ///@{
   /** \brief  Get the value */
-  virtual double to_double() const { return -1;}
-  virtual int to_int() const { return -1;}
+  double to_double() const override { return -1;}
+  int to_int() const override { return -1;}
   ///@}
 
   ///@{
   /** \brief  Properties */
-  virtual bool is_integer() const { return true; }
-  virtual bool is_minus_one() const { return true; }
+  bool is_integer() const override { return true; }
+  bool is_minus_one() const override { return true; }
   ///@}
 
 };
@@ -267,13 +267,13 @@ class InfSX : public ConstantSX {
 public:
 
   explicit InfSX() {}
-  virtual ~InfSX() {}
+  ~InfSX() override {}
 
   /** \brief  Get the value */
-  virtual double to_double() const { return std::numeric_limits<double>::infinity();}
+  double to_double() const override { return std::numeric_limits<double>::infinity();}
 
   /** \brief  Properties */
-  virtual bool isInf() const { return true; }
+  bool isInf() const override { return true; }
 
 };
 
@@ -286,13 +286,13 @@ class MinusInfSX : public ConstantSX {
 public:
 
   explicit MinusInfSX() {}
-  virtual ~MinusInfSX() {}
+  ~MinusInfSX() override {}
 
   /** \brief  Get the value */
-  virtual double to_double() const { return -std::numeric_limits<double>::infinity();}
+  double to_double() const override { return -std::numeric_limits<double>::infinity();}
 
   /** \brief  Properties */
-  virtual bool isMinusInf() const { return true; }
+  bool isMinusInf() const override { return true; }
 
 };
 
@@ -305,13 +305,13 @@ class NanSX : public ConstantSX {
 public:
 
   explicit NanSX() {this->count++;}
-  virtual ~NanSX() {this->count--;}
+  ~NanSX() override {this->count--;}
 
   /** \brief  Get the value */
-  virtual double to_double() const { return std::numeric_limits<double>::quiet_NaN();}
+  double to_double() const override { return std::numeric_limits<double>::quiet_NaN();}
 
   /** \brief  Properties */
-  virtual bool isNan() const { return true; }
+  bool isNan() const override { return true; }
 
 };
 

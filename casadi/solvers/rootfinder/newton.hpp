@@ -67,10 +67,10 @@ namespace casadi {
     explicit Newton(const std::string& name, const Function& f);
 
     /** \brief  Destructor */
-    virtual ~Newton();
+    ~Newton() override;
 
     // Get name of the plugin
-    virtual const char* plugin_name() const { return "newton";}
+    const char* plugin_name() const override { return "newton";}
 
     /** \brief  Create a new Rootfinder */
     static Rootfinder* creator(const std::string& name, const Function& f) {
@@ -80,27 +80,27 @@ namespace casadi {
     ///@{
     /** \brief Options */
     static Options options_;
-    virtual const Options& get_options() const { return options_;}
+    const Options& get_options() const override { return options_;}
     ///@}
 
     /** \brief  Initialize */
-    virtual void init(const Dict& opts);
+    void init(const Dict& opts) override;
 
     /** \brief Create memory block */
-    virtual void* alloc_memory() const { return new NewtonMemory();}
+    void* alloc_memory() const override { return new NewtonMemory();}
 
     /** \brief Initalize memory block */
-    virtual void init_memory(void* mem) const;
+    void init_memory(void* mem) const override;
 
     /** \brief Free memory block */
-    virtual void free_memory(void *mem) const { delete static_cast<NewtonMemory*>(mem);}
+    void free_memory(void *mem) const override { delete static_cast<NewtonMemory*>(mem);}
 
     /** \brief Set the (persistent) work vectors */
-    virtual void set_work(void* mem, const double**& arg, double**& res,
-                          int*& iw, double*& w) const;
+    void set_work(void* mem, const double**& arg, double**& res,
+                          int*& iw, double*& w) const override;
 
     /// Solve the system of equations and calculate derivatives
-    virtual void solve(void* mem) const;
+    void solve(void* mem) const override;
 
     /// A documentation string
     static const std::string meta_doc;

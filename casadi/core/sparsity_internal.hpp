@@ -52,7 +52,7 @@ namespace casadi {
     SparsityInternal(int nrow, int ncol, const int* colind, const int* row);
 
     /// Destructor
-    virtual ~SparsityInternal();
+    ~SparsityInternal() override;
 
     /** \brief Get number of rows (see public class) */
     inline const std::vector<int>& sp() const { return sp_;}
@@ -410,10 +410,10 @@ namespace casadi {
     std::size_t hash() const;
 
     /// Print representation
-    virtual void repr(std::ostream &stream) const;
+    void repr(std::ostream &stream) const override;
 
     /// Print description
-    virtual void print(std::ostream &stream) const;
+    void print(std::ostream &stream) const override;
 
     /** \brief Perform a unidirectional coloring
      *

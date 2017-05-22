@@ -60,10 +60,10 @@ namespace casadi {
     explicit SqicInterface(const std::map<std::string, Sparsity>& st);
 
     /** \brief  Destructor */
-    virtual ~SqicInterface();
+    ~SqicInterface() override;
 
     // Get name of the plugin
-    virtual const char* plugin_name() const { return "sqic";}
+    const char* plugin_name() const override { return "sqic";}
 
     /** \brief  Initialize */
     virtual void init();

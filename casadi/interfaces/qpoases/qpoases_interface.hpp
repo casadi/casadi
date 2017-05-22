@@ -102,31 +102,31 @@ namespace casadi {
                               const std::map<std::string, Sparsity>& st);
 
     /** \brief  Destructor */
-    virtual ~QpoasesInterface();
+    ~QpoasesInterface() override;
 
     // Get name of the plugin
-    virtual const char* plugin_name() const { return "qpoases";}
+    const char* plugin_name() const override { return "qpoases";}
 
     ///@{
     /** \brief Options */
     static Options options_;
-    virtual const Options& get_options() const { return options_;}
+    const Options& get_options() const override { return options_;}
     ///@}
 
     /** \brief  Initialize */
-    virtual void init(const Dict& opts);
+    void init(const Dict& opts) override;
 
     /** \brief Create memory block */
-    virtual void* alloc_memory() const { return new QpoasesMemory(linsol_);}
+    void* alloc_memory() const override { return new QpoasesMemory(linsol_);}
 
     /** \brief Free memory block */
-    virtual void free_memory(void *mem) const { delete static_cast<QpoasesMemory*>(mem);}
+    void free_memory(void *mem) const override { delete static_cast<QpoasesMemory*>(mem);}
 
     /** \brief Initalize memory block */
-    virtual void init_memory(void* mem) const;
+    void init_memory(void* mem) const override;
 
     /** \brief  Evaluate numerically */
-    virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
+    void eval(void* mem, const double** arg, double** res, int* iw, double* w) const override;
 
     /// A documentation string
     static const std::string meta_doc;

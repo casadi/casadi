@@ -51,42 +51,42 @@ namespace casadi {
     Integrator(const std::string& name, const Function& oracle);
 
     /** \brief  Destructor */
-    virtual ~Integrator()=0;
+    ~Integrator() override=0;
 
     /** \brief Get type name */
-    virtual std::string type_name() const {
+    std::string type_name() const override {
       return std::string("integrator_") + plugin_name();
     }
 
     ///@{
     /** \brief Number of function inputs and outputs */
-    virtual size_t get_n_in() { return INTEGRATOR_NUM_IN;}
-    virtual size_t get_n_out() { return INTEGRATOR_NUM_OUT;}
+    size_t get_n_in() override { return INTEGRATOR_NUM_IN;}
+    size_t get_n_out() override { return INTEGRATOR_NUM_OUT;}
     ///@}
 
    /// @{
     /** \brief Sparsities of function inputs and outputs */
-    virtual Sparsity get_sparsity_in(int i);
-    virtual Sparsity get_sparsity_out(int i);
+    Sparsity get_sparsity_in(int i) override;
+    Sparsity get_sparsity_out(int i) override;
     /// @}
 
     ///@{
     /** \brief Names of function input and outputs */
-    virtual std::string get_name_in(int i) { return integrator_in(i);}
-    virtual std::string get_name_out(int i) { return integrator_out(i);}
+    std::string get_name_in(int i) override { return integrator_in(i);}
+    std::string get_name_out(int i) override { return integrator_out(i);}
     /// @}
 
     /** \brief Initalize memory block */
-    virtual void init_memory(void* mem) const;
+    void init_memory(void* mem) const override;
 
     ///@{
     /** \brief Options */
     static Options options_;
-    virtual const Options& get_options() const { return options_;}
+    const Options& get_options() const override { return options_;}
     ///@}
 
     /** \brief  Initialize */
-    virtual void init(const Dict& opts);
+    void init(const Dict& opts) override;
 
     /** \brief Reset the forward problem */
     virtual void reset(IntegratorMemory* mem, double t,
@@ -105,39 +105,39 @@ namespace casadi {
                          double* rx, double* rz, double* rq) const = 0;
 
     /** \brief  evaluate */
-    virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
+    void eval(void* mem, const double** arg, double** res, int* iw, double* w) const override;
 
     /** \brief  Print solver statistics */
     virtual void print_stats(IntegratorMemory* mem, std::ostream &stream) const {}
 
     /** \brief  Propagate sparsity forward */
-    virtual void sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const;
+    void sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
 
     /** \brief  Propagate sparsity backwards */
-    virtual void sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const;
+    void sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
 
     ///@{
     /// Is the class able to propagate seeds through the algorithm?
-    virtual bool has_spfwd() const { return true;}
-    virtual bool has_sprev() const { return true;}
+    bool has_spfwd() const override { return true;}
+    bool has_sprev() const override { return true;}
     ///@}
 
     ///@{
     /** \brief Generate a function that calculates \a nfwd forward derivatives */
-    virtual Function get_forward(const std::string& name, int nfwd,
+    Function get_forward(const std::string& name, int nfwd,
                                  const std::vector<std::string>& i_names,
                                  const std::vector<std::string>& o_names,
-                                 const Dict& opts) const;
-    virtual int get_n_forward() const { return 64;}
+                                 const Dict& opts) const override;
+    int get_n_forward() const override { return 64;}
     ///@}
 
     ///@{
     /** \brief Generate a function that calculates \a nadj adjoint derivatives */
-    virtual Function get_reverse(const std::string& name, int nadj,
+    Function get_reverse(const std::string& name, int nadj,
                                  const std::vector<std::string>& i_names,
                                  const std::vector<std::string>& o_names,
-                                 const Dict& opts) const;
-    virtual int get_n_reverse() const { return 64;}
+                                 const Dict& opts) const override;
+    int get_n_reverse() const override { return 64;}
     ///@}
 
     /** \brief  Set stop time for the integration */
@@ -251,44 +251,44 @@ namespace casadi {
     explicit FixedStepIntegrator(const std::string& name, const Function& dae);
 
     /// Destructor
-    virtual ~FixedStepIntegrator();
+    ~FixedStepIntegrator() override;
 
     ///@{
     /** \brief Options */
     static Options options_;
-    virtual const Options& get_options() const { return options_;}
+    const Options& get_options() const override { return options_;}
     ///@}
 
     /// Initialize stage
-    virtual void init(const Dict& opts);
+    void init(const Dict& opts) override;
 
     /** \brief Create memory block */
-    virtual void* alloc_memory() const { return new FixedStepMemory();}
+    void* alloc_memory() const override { return new FixedStepMemory();}
 
     /** \brief Free memory block */
-    virtual void free_memory(void *mem) const { delete static_cast<FixedStepMemory*>(mem);}
+    void free_memory(void *mem) const override { delete static_cast<FixedStepMemory*>(mem);}
 
     /** \brief Initalize memory block */
-    virtual void init_memory(void* mem) const;
+    void init_memory(void* mem) const override;
 
     /// Setup F and G
     virtual void setupFG() = 0;
 
     /** \brief Reset the forward problem */
-    virtual void reset(IntegratorMemory* mem, double t,
-                       const double* x, const double* z, const double* p) const;
+    void reset(IntegratorMemory* mem, double t,
+                       const double* x, const double* z, const double* p) const override;
 
     /** \brief  Advance solution in time */
-    virtual void advance(IntegratorMemory* mem, double t,
-                         double* x, double* z, double* q) const;
+    void advance(IntegratorMemory* mem, double t,
+                         double* x, double* z, double* q) const override;
 
     /// Reset the backward problem and take time to tf
-    virtual void resetB(IntegratorMemory* mem, double t,
-                        const double* rx, const double* rz, const double* rp) const;
+    void resetB(IntegratorMemory* mem, double t,
+                        const double* rx, const double* rz, const double* rp) const override;
 
     /** \brief  Retreat solution in time */
-    virtual void retreat(IntegratorMemory* mem, double t,
-                         double* rx, double* rz, double* rq) const;
+    void retreat(IntegratorMemory* mem, double t,
+                         double* rx, double* rz, double* rq) const override;
 
     /// Get explicit dynamics
     virtual const Function& getExplicit() const { return F_;}
@@ -316,22 +316,22 @@ namespace casadi {
     explicit ImplicitFixedStepIntegrator(const std::string& name, const Function& dae);
 
     /// Destructor
-    virtual ~ImplicitFixedStepIntegrator();
+    ~ImplicitFixedStepIntegrator() override;
 
     ///@{
     /** \brief Options */
     static Options options_;
-    virtual const Options& get_options() const { return options_;}
+    const Options& get_options() const override { return options_;}
     ///@}
 
     /// Initialize stage
-    virtual void init(const Dict& opts);
+    void init(const Dict& opts) override;
 
     /// Get explicit dynamics
-    virtual const Function& getExplicit() const { return rootfinder_;}
+    const Function& getExplicit() const override { return rootfinder_;}
 
     /// Get explicit dynamics (backward problem)
-    virtual const Function& getExplicitB() const { return backward_rootfinder_;}
+    const Function& getExplicitB() const override { return backward_rootfinder_;}
 
     // Implicit function solver
     Function rootfinder_, backward_rootfinder_;

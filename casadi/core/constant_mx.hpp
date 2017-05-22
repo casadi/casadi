@@ -48,7 +48,7 @@ namespace casadi {
     explicit ConstantMX(const Sparsity& sp);
 
     /// Destructor
-    virtual ~ConstantMX() = 0;
+    ~ConstantMX() override = 0;
 
     // Creator (all values are the same integer)
     static ConstantMX* create(const Sparsity& sp, int val);
@@ -60,67 +60,67 @@ namespace casadi {
     static ConstantMX* create(const Matrix<double>& val);
 
     /// Evaluate the function numerically
-    virtual void eval(const double** arg, double** res, int* iw, double* w, int mem) const = 0;
+    void eval(const double** arg, double** res, int* iw, double* w, int mem) const override = 0;
 
     /// Evaluate the function symbolically (SX)
-    virtual void eval_sx(const SXElem** arg, SXElem** res,
-                         int* iw, SXElem* w, int mem) const = 0;
+    void eval_sx(const SXElem** arg, SXElem** res,
+                         int* iw, SXElem* w, int mem) const override = 0;
 
     /** \brief  Evaluate symbolically (MX) */
-    virtual void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const;
+    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
 
     /** \brief Calculate forward mode directional derivatives */
-    virtual void eval_forward(const std::vector<std::vector<MX> >& fseed,
-                         std::vector<std::vector<MX> >& fsens) const;
+    void eval_forward(const std::vector<std::vector<MX> >& fseed,
+                         std::vector<std::vector<MX> >& fsens) const override;
 
     /** \brief Calculate reverse mode directional derivatives */
-    virtual void eval_reverse(const std::vector<std::vector<MX> >& aseed,
-                         std::vector<std::vector<MX> >& asens) const;
+    void eval_reverse(const std::vector<std::vector<MX> >& aseed,
+                         std::vector<std::vector<MX> >& asens) const override;
 
     /** \brief  Propagate sparsity forward */
-    virtual void sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const;
+    void sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
 
     /** \brief  Propagate sparsity backwards */
-    virtual void sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const;
+    void sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
 
     /** \brief Get the operation */
-    virtual int op() const { return OP_CONST;}
+    int op() const override { return OP_CONST;}
 
     /// Get the value (only for scalar constant nodes)
-    virtual double to_double() const = 0;
+    double to_double() const override = 0;
 
     /// Get the value (only for constant nodes)
-    virtual Matrix<double> getMatrixValue() const = 0;
+    Matrix<double> getMatrixValue() const override = 0;
 
     /// Matrix multiplication
     //    virtual MX getMultiplication(const MX& y) const;
 
     /// Inner product
-    virtual MX getDot(const MX& y) const;
+    MX getDot(const MX& y) const override;
 
     /// Return truth value of an MX
-    virtual bool __nonzero__() const;
+    bool __nonzero__() const override;
 
     /** \brief  Check if valid function input */
-    virtual bool is_valid_input() const { return sparsity().nnz()==0;}
+    bool is_valid_input() const override { return sparsity().nnz()==0;}
 
     /** \brief Get the number of symbolic primitives */
-    virtual int n_primitives() const { return 0;}
+    int n_primitives() const override { return 0;}
 
     /** \brief Get symbolic primitives */
-    virtual void primitives(std::vector<MX>::iterator& it) const {}
+    void primitives(std::vector<MX>::iterator& it) const override {}
 
     /** \brief Split up an expression along symbolic primitives */
-    virtual void split_primitives(const MX& x, std::vector<MX>::iterator& it) const {}
+    void split_primitives(const MX& x, std::vector<MX>::iterator& it) const override {}
 
     /** \brief Join an expression along symbolic primitives */
-    virtual MX join_primitives(std::vector<MX>::const_iterator& it) const { return MX(sparsity());}
+    MX join_primitives(std::vector<MX>::const_iterator& it) const override { return MX(sparsity());}
 
     /** \brief Detect duplicate symbolic expressions */
-    virtual bool has_duplicates() const { return false;}
+    bool has_duplicates() const override { return false;}
 
     /** \brief Reset the marker for an input expression */
-    virtual void reset_input() const {}
+    void reset_input() const override {}
   };
 
   /// A constant given as a DM
@@ -131,42 +131,42 @@ namespace casadi {
     explicit ConstantDM(const Matrix<double>& x) : ConstantMX(x.sparsity()), x_(x) {}
 
     /// Destructor
-    virtual ~ConstantDM() {}
+    ~ConstantDM() override {}
 
     /** \brief  Print expression */
-    virtual std::string print(const std::vector<std::string>& arg) const {
+    std::string print(const std::vector<std::string>& arg) const override {
       return x_.getDescription();
     }
 
     /** \brief  Evaluate the function numerically */
-    virtual void eval(const double** arg, double** res, int* iw, double* w, int mem) const {
+    void eval(const double** arg, double** res, int* iw, double* w, int mem) const override {
       std::copy(x_->begin(), x_->end(), res[0]);
     }
 
     /** \brief  Evaluate the function symbolically (SX) */
-    virtual void eval_sx(const SXElem** arg, SXElem** res,
-                         int* iw, SXElem* w, int mem) const {
+    void eval_sx(const SXElem** arg, SXElem** res,
+                         int* iw, SXElem* w, int mem) const override {
       std::copy(x_->begin(), x_->end(), res[0]);
     }
 
     /** \brief Generate code for the operation */
-    virtual void generate(CodeGenerator& g, const std::string& mem,
-                          const std::vector<int>& arg, const std::vector<int>& res) const;
+    void generate(CodeGenerator& g, const std::string& mem,
+                          const std::vector<int>& arg, const std::vector<int>& res) const override;
 
     /** \brief  Check if a particular integer value */
-    virtual bool is_zero() const;
-    virtual bool is_one() const;
-    virtual bool is_minus_one() const;
-    virtual bool is_identity() const;
+    bool is_zero() const override;
+    bool is_one() const override;
+    bool is_minus_one() const override;
+    bool is_identity() const override;
 
     /// Get the value (only for scalar constant nodes)
-    virtual double to_double() const {return x_.scalar();}
+    double to_double() const override {return x_.scalar();}
 
     /// Get the value (only for constant nodes)
-    virtual Matrix<double> getMatrixValue() const { return x_;}
+    Matrix<double> getMatrixValue() const override { return x_;}
 
     /** \brief Check if two nodes are equivalent up to a given depth */
-    virtual bool is_equal(const MXNode* node, int depth) const;
+    bool is_equal(const MXNode* node, int depth) const override;
 
     /** \brief  data member */
     Matrix<double> x_;
@@ -188,57 +188,57 @@ namespace casadi {
     }
 
     /// Destructor
-    virtual ~ZeroByZero() {
+    ~ZeroByZero() override {
       destroySingleton();
     }
 
     /** \brief  Print expression */
-    virtual std::string print(const std::vector<std::string>& arg) const;
+    std::string print(const std::vector<std::string>& arg) const override;
 
     /** \brief  Evaluate the function numerically */
     /// Evaluate the function numerically
-    virtual void eval(const double** arg, double** res, int* iw, double* w, int mem) const {}
+    void eval(const double** arg, double** res, int* iw, double* w, int mem) const override {}
 
     /// Evaluate the function symbolically (SX)
-    virtual void eval_sx(const SXElem** arg, SXElem** res,
-                         int* iw, SXElem* w, int mem) const {}
+    void eval_sx(const SXElem** arg, SXElem** res,
+                         int* iw, SXElem* w, int mem) const override {}
 
     /** \brief Generate code for the operation */
-    virtual void generate(CodeGenerator& g, const std::string& mem,
-                          const std::vector<int>& arg, const std::vector<int>& res) const {}
+    void generate(CodeGenerator& g, const std::string& mem,
+                      const std::vector<int>& arg, const std::vector<int>& res) const override {}
 
     /// Get the value (only for scalar constant nodes)
-    virtual double to_double() const { return 0;}
+    double to_double() const override { return 0;}
 
     /// Get the value (only for constant nodes)
-    virtual DM getMatrixValue() const { return DM(); }
+    DM getMatrixValue() const override { return DM(); }
 
     /// Get densification
-    virtual MX getProject(const Sparsity& sp) const;
+    MX getProject(const Sparsity& sp) const override;
 
     /// Get the nonzeros of matrix
-    virtual MX getGetNonzeros(const Sparsity& sp, const std::vector<int>& nz) const;
+    MX getGetNonzeros(const Sparsity& sp, const std::vector<int>& nz) const override;
 
     /// Assign the nonzeros of a matrix to another matrix
-    virtual MX getSetNonzeros(const MX& y, const std::vector<int>& nz) const;
+    MX getSetNonzeros(const MX& y, const std::vector<int>& nz) const override;
 
     /// Transpose
-    virtual MX getTranspose() const;
+    MX getTranspose() const override;
 
     /// Get a unary operation
-    virtual MX getUnary(int op) const;
+    MX getUnary(int op) const override;
 
     /// Get a binary operation operation
-    virtual MX getBinary(int op, const MX& y, bool ScX, bool ScY) const;
+    MX getBinary(int op, const MX& y, bool ScX, bool ScY) const override;
 
     /// Reshape
-    virtual MX getReshape(const Sparsity& sp) const;
+    MX getReshape(const Sparsity& sp) const override;
 
     /** \brief  Check if valid function input */
-    virtual bool is_valid_input() const { return true;}
+    bool is_valid_input() const override { return true;}
 
     /** \brief  Get the name */
-    virtual const std::string& name() const {
+    const std::string& name() const override {
       static std::string dummyname;
       return dummyname;
     }
@@ -267,67 +267,67 @@ namespace casadi {
     explicit Constant(const Sparsity& sp, Value v = Value()) : ConstantMX(sp), v_(v) {}
 
     /// Destructor
-    virtual ~Constant() {}
+    ~Constant() override {}
 
     /** \brief  Print expression */
-    virtual std::string print(const std::vector<std::string>& arg) const;
+    std::string print(const std::vector<std::string>& arg) const override;
 
     /** \brief  Evaluate the function numerically */
     /// Evaluate the function numerically
-    virtual void eval(const double** arg, double** res, int* iw, double* w, int mem) const;
+    void eval(const double** arg, double** res, int* iw, double* w, int mem) const override;
 
     /// Evaluate the function symbolically (SX)
-    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const;
+    void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const override;
 
     /** \brief Generate code for the operation */
-    virtual void generate(CodeGenerator& g, const std::string& mem,
-                          const std::vector<int>& arg, const std::vector<int>& res) const;
+    void generate(CodeGenerator& g, const std::string& mem,
+                          const std::vector<int>& arg, const std::vector<int>& res) const override;
 
     /** \brief  Check if a particular integer value */
-    virtual bool is_zero() const { return v_.value==0;}
-    virtual bool is_one() const { return v_.value==1;}
-    virtual bool is_identity() const { return v_.value==1 && sparsity().is_diag();}
-    virtual bool isValue(double val) const { return v_.value==val;}
+    bool is_zero() const override { return v_.value==0;}
+    bool is_one() const override { return v_.value==1;}
+    bool is_identity() const override { return v_.value==1 && sparsity().is_diag();}
+    bool isValue(double val) const override { return v_.value==val;}
 
     /// Get the value (only for scalar constant nodes)
-    virtual double to_double() const {
+    double to_double() const override {
       return v_.value;
     }
 
     /// Get the value (only for constant nodes)
-    virtual Matrix<double> getMatrixValue() const {
+    Matrix<double> getMatrixValue() const override {
       return Matrix<double>(sparsity(), v_.value, false);
     }
 
     /// Get densification
-    virtual MX getProject(const Sparsity& sp) const;
+    MX getProject(const Sparsity& sp) const override;
 
     /// Get the nonzeros of matrix
-    virtual MX getGetNonzeros(const Sparsity& sp, const std::vector<int>& nz) const;
+    MX getGetNonzeros(const Sparsity& sp, const std::vector<int>& nz) const override;
 
     /// Assign the nonzeros of a matrix to another matrix
-    virtual MX getSetNonzeros(const MX& y, const std::vector<int>& nz) const;
+    MX getSetNonzeros(const MX& y, const std::vector<int>& nz) const override;
 
     /// Transpose
-    virtual MX getTranspose() const;
+    MX getTranspose() const override;
 
     /// Get a unary operation
-    virtual MX getUnary(int op) const;
+    MX getUnary(int op) const override;
 
     /// Get a binary operation operation
-    virtual MX getBinary(int op, const MX& y, bool ScX, bool ScY) const;
+    MX getBinary(int op, const MX& y, bool ScX, bool ScY) const override;
 
     /// Reshape
-    virtual MX getReshape(const Sparsity& sp) const;
+    MX getReshape(const Sparsity& sp) const override;
 
     /// Create a horizontal concatenation node
-    virtual MX getHorzcat(const std::vector<MX>& x) const;
+    MX getHorzcat(const std::vector<MX>& x) const override;
 
     /// Create a vertical concatenation node (vectors only)
-    virtual MX getVertcat(const std::vector<MX>& x) const;
+    MX getVertcat(const std::vector<MX>& x) const override;
 
     /** \brief Check if two nodes are equivalent up to a given depth */
-    virtual bool is_equal(const MXNode* node, int depth) const;
+    bool is_equal(const MXNode* node, int depth) const override;
 
     /** \brief The actual numerical value */
     Value v_;
