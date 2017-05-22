@@ -250,6 +250,9 @@ if(WITH_REFCOUNT_WARNINGS)
   add_definitions(-DWITH_REFCOUNT_WARNINGS)
 endif()
 
+# Have an so version?
+option(WITH_SO_VERSION "Use an so version for the library (version suffix) when applicable" ON)
+
 ############################################################
 ################# Installation location ####################
 ############################################################

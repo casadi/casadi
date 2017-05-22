@@ -50,7 +50,9 @@ macro(casadi_library name)
     )
   endif()
 
-  SET_TARGET_PROPERTIES(${name} PROPERTIES SOVERSION ${PACKAGE_SO_VERSION})
+  if(WITH_SO_VERSION)
+    SET_TARGET_PROPERTIES(${name} PROPERTIES SOVERSION ${PACKAGE_SO_VERSION})
+  endif()
 
   if(WITH_LINT)
     add_style_check_target(${name} "${ARGN}")
