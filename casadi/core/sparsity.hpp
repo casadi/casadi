@@ -634,8 +634,7 @@ namespace casadi {
     int btf(std::vector<int>& SWIG_OUTPUT(rowperm), std::vector<int>& SWIG_OUTPUT(colperm),
             std::vector<int>& SWIG_OUTPUT(rowblock), std::vector<int>& SWIG_OUTPUT(colblock),
             std::vector<int>& SWIG_OUTPUT(coarse_rowblock),
-            std::vector<int>& SWIG_OUTPUT(coarse_colblock),
-            int seed=0) const;
+            std::vector<int>& SWIG_OUTPUT(coarse_colblock)) const;
 #ifndef SWIG
     const Btf& btf() const;
 #endif // SWIG

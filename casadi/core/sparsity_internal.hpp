@@ -133,10 +133,11 @@ namespace casadi {
     /// Compute the Dulmage-Mendelsohn decomposition : see cs_dmperm in CSparse
     int btf(std::vector<int>& rowperm, std::vector<int>& colperm,
                           std::vector<int>& rowblock, std::vector<int>& colblock,
-                          std::vector<int>& coarse_rowblock, std::vector<int>& coarse_colblock,
-                          int seed) const {
-      return T()->btfUpper(colperm, rowperm, colblock, rowblock,
-                                                 coarse_colblock, coarse_rowblock, seed);
+                          std::vector<int>& coarse_rowblock,
+                          std::vector<int>& coarse_colblock) const {
+      T()->dmperm(colperm, rowperm, colblock, rowblock,
+                  coarse_colblock, coarse_rowblock);
+      return rowblock.size()-1;
     }
 
     /// Get cached block triangular form
@@ -147,10 +148,10 @@ namespace casadi {
      *
      * -- upper triangular TODO: refactor and merge with the above
      */
-    int btfUpper(std::vector<int>& rowperm, std::vector<int>& colperm,
-                               std::vector<int>& rowblock, std::vector<int>& colblock,
-                               std::vector<int>& coarse_rowblock,
-                               std::vector<int>& coarse_colblock, int seed) const;
+    void dmperm(std::vector<int>& rowperm, std::vector<int>& colperm,
+                std::vector<int>& rowblock, std::vector<int>& colblock,
+                std::vector<int>& coarse_rowblock,
+                std::vector<int>& coarse_colblock) const;
 
     /// Compute the maximum transversal (maximum matching): see cs_maxtrans in CSparse
     void maxTransversal(std::vector<int>& imatch,
