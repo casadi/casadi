@@ -30,7 +30,7 @@ from helpers import *
 import random
 
 warnings.filterwarnings("ignore",category=DeprecationWarning)
-  
+
 lsolvers = []
 try:
   load_linsol("csparse")
@@ -62,7 +62,7 @@ try:
   lsolvers.append(("symbolicqr",{},set()))
 except:
   pass
-  
+
 try:
   load_linsol("lsqr")
   lsolvers.append(("lsqr",{},set()))
@@ -113,13 +113,13 @@ class LinearSolverTests(casadiTestCase):
         options["ad_weight_sp"] = 0
         solver = Solver("solver", A.T.sparsity(), options)
 
-        Jf = solver.jacobian()
+        Jf = solver.jacobian_old(0, 0)
 
         options["ad_weight"] = 1
         options["ad_weight_sp"] = 1
         solver = Solver("solver", A.T.sparsity(), options)
 
-        Jb = solver.jacobian()
+        Jb = solver.jacobian_old(0, 0)
 
         Jf_in = [0]*Jf.n_in();Jf_in[0]=A.T
         Jb_in = [0]*Jb.n_in();Jb_in[0]=A.T
@@ -479,7 +479,7 @@ class LinearSolverTests(casadiTestCase):
       As = MX.sym("A",A.sparsity())
       bs = MX.sym("B",b.sparsity())
       C = solve(A,b,Solver,options)
-      
+
       digits = 7 if "ma" in str(Solver) else 10
 
       self.checkarray(mtimes(A,C),b,digits=digits)
