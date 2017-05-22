@@ -9,11 +9,11 @@ casadi_plugin(Conic hpmpc
 casadi_plugin_link_libraries(Conic hpmpc ${HPMPC_LIBRARIES} ${BLASFEO_LIBRARIES})
 
 if(HPMPC_DLOPEN)
-add_definitions(-DHPMPC_DLOPEN)
+  add_definitions(-DHPMPC_DLOPEN)
 endif()
 
 if(BLASFEO_DLOPEN)
-add_definitions(-DBLASFEO_DLOPEN)
+  add_definitions(-DBLASFEO_DLOPEN)
 endif()
 
 casadi_plugin_link_libraries(Conic hpmpc ${HPMPC_LIBRARIES} ${BLASFEO_LIBRARIES})

@@ -69,7 +69,7 @@ namespace casadi {
       \date 2012
   */
   template<typename MatType>
-  class CASADI_EXPORT GenericMatrix
+  class GenericMatrix
     : public GenericMatrixCommon,
       public SparsityInterface<MatType> {
     using SparsityInterface<MatType>::self;
@@ -89,9 +89,6 @@ namespace casadi {
 
     /** \brief Get the number of elements */
     int numel() const;
-
-    /** \brief Get the number of elements in slice (cf. MATLAB) */
-    int numel(int i) const { return 1;}
 
     /** \brief Get the first dimension (i.e. number of rows) */
     int size1() const;
@@ -154,11 +151,6 @@ namespace casadi {
     SWIG_CONSTREF(Sparsity) sparsity() const;
 
 #ifndef SWIG
-    /// \cond INTERNAL
-    /** \brief Access the sparsity */
-    Sparsity& sparsityRef();
-    /// \endcond
-
     /// \cond CLUTTER
     /**  @{  */
     /** \brief Accessed by friend functions */
@@ -236,6 +228,35 @@ namespace casadi {
     inline friend MatType mpower(const MatType& x, const MatType& n) {
       return MatType::mpower(x, n);
     }
+
+    /** \brief Compute any contraction of two dense tensors, using index/einstein notation
+        einstein(A, B, a, b, c) -> C
+
+        Given two tensors, A and B, computes a third tensor C such that:
+
+        C_c = A_a * B_b
+
+        With a, b, c representing einstein indices.
+        Instead of the classical index labels i,j,k,... we employ -1,-2,-3,...
+
+        A, B, C are represented as CasADi vectors, with dim_a, dim_b, dim_c
+        indictating theire tensorial dimensions.
+    */
+    ///@{
+    inline friend MatType
+      einstein(const MatType &A, const MatType &B, const MatType &C,
+        const std::vector<int>& dim_a, const std::vector<int>& dim_b, const std::vector<int>& dim_c,
+        const std::vector<int>& a, const std::vector<int>& b, const std::vector<int>& c) {
+      return MatType::einstein(A, B, C, dim_a, dim_b, dim_c, a, b, c);
+    }
+
+    inline friend MatType
+      einstein(const MatType &A, const MatType &B,
+        const std::vector<int>& dim_a, const std::vector<int>& dim_b, const std::vector<int>& dim_c,
+        const std::vector<int>& a, const std::vector<int>& b, const std::vector<int>& c) {
+      return MatType::einstein(A, B, dim_a, dim_b, dim_c, a, b, c);
+    }
+    ///@}
 
     /** \brief Matrix divide (cf. slash '/' in MATLAB)
      */
@@ -406,7 +427,7 @@ namespace casadi {
         Ternary operator, "cond ? if_true : if_false"
     */
     inline friend MatType if_else(const MatType &cond, const MatType &if_true,
-                                  const MatType &if_false, bool short_circuit=true) {
+                                  const MatType &if_false, bool short_circuit=false) {
       return MatType::if_else(cond, if_true, if_false, short_circuit);
     }
 
@@ -416,7 +437,7 @@ namespace casadi {
      * then x[k] will be returned, otherwise \param x_default will be returned.
      */
     inline friend MatType conditional(const MatType& ind, const std::vector<MatType> &x,
-                                      const MatType &x_default, bool short_circuit=true) {
+                                      const MatType &x_default, bool short_circuit=false) {
       return MatType::conditional(ind, x, x_default, short_circuit);
     }
 
@@ -478,6 +499,11 @@ namespace casadi {
       return MatType::solve(A, b, lsolver, dict);
     }
 
+    /** \brief Linearize an expression */
+    friend inline MatType linearize(const MatType& f, const MatType& x, const MatType& x0) {
+      return MatType::linearize(f, x, x0);
+    }
+
     /** \brief Computes the Moore-Penrose pseudo-inverse
      *
      * If the matrix A is fat (size1<size2), mul(A, pinv(A)) is unity.
@@ -503,6 +529,14 @@ namespace casadi {
     friend inline MatType pinv(const MatType& A, const std::string& lsolver,
                                const Dict& dict = Dict()) {
       return MatType::pinv(A, lsolver, dict);
+    }
+
+    friend inline MatType expm_const(const MatType& A, const MatType& t) {
+      return MatType::expm_const(A, t);
+    }
+
+    friend inline MatType expm(const MatType& A) {
+      return MatType::expm(A);
     }
 
     ///@{
@@ -607,6 +641,13 @@ namespace casadi {
     }
 
 
+    ///@{
+    /// Functions called by friend functions defined here
+    static MatType jtimes(const MatType &ex, const MatType &arg,
+                          const MatType &v, bool tr=false);
+    static MatType linearize(const MatType& f, const MatType& x, const MatType& x0);
+    ///@}
+
 /** @} */
 #endif // SWIG
 
@@ -628,7 +669,9 @@ namespace casadi {
     }
 
     /** \brief Create symbolic primitive with a given sparsity pattern */
-    static MatType sym(const std::string& name, const Sparsity& sp);
+    static MatType sym(const std::string& name, const Sparsity& sp) {
+      return MatType::_sym(name, sp);
+    }
 
     /** \brief Create a vector of length p with with matrices
      * with symbolic primitives of given sparsity */
@@ -673,11 +716,6 @@ namespace casadi {
   template<typename MatType>
   const Sparsity& GenericMatrix<MatType>::sparsity() const {
     return self().sparsity();
-  }
-
-  template<typename MatType>
-  Sparsity& GenericMatrix<MatType>::sparsityRef() {
-    return self().sparsityRef();
   }
 
   template<typename MatType>
@@ -760,11 +798,6 @@ namespace casadi {
       ret[k] = sym(ss.str(), sp, p);
     }
     return ret;
-  }
-
-  template<typename MatType>
-  MatType GenericMatrix<MatType>::sym(const std::string& name, const Sparsity& sp) {
-    throw CasadiException("\"sym\" not defined for instantiation");
   }
 
   template<typename MatType>
@@ -920,6 +953,45 @@ namespace casadi {
 
     // Call the class specific method
     return MatType::_rank1(A, alpha, x, y);
+  }
+
+
+  template<typename MatType>
+  MatType GenericMatrix<MatType>::jtimes(const MatType &ex, const MatType &arg,
+                                         const MatType &v, bool tr) {
+    // Seeds as a vector of vectors
+    int seed_dim = tr ? ex.size2() : arg.size2();
+    casadi_assert(v.size2() % seed_dim == 0);
+    std::vector<MatType> w = horzsplit(v, seed_dim);
+    std::vector<std::vector<MatType> > ww(w.size(), std::vector<MatType>(1));
+    for (int i=0; i<w.size(); ++i) ww[i][0] = w[i];
+
+    // Calculate directional derivatives
+    if (tr) {
+      ww = reverse({ex}, {arg}, ww);
+    } else {
+      ww = forward({ex}, {arg}, ww);
+    }
+
+    // Get results
+    for (int i=0; i<w.size(); ++i) w[i] = ww[i][0];
+    return horzcat(w);
+  }
+
+  template<typename MatType>
+  MatType GenericMatrix<MatType>::
+  linearize(const MatType& f, const MatType& x, const MatType& x0) {
+    MatType x_lin = MatType::sym("x_lin", x.sparsity());
+    // mismatching dimensions
+    if (x0.size() != x.size()) {
+      // Scalar x0 is ok
+      if (x0.sparsity().is_scalar()) {
+        return linearize(f, x, MatType(x.sparsity(), x0));
+      }
+      casadi_error("Dimension mismatch in 'linearize'");
+    }
+    return substitute(f + jtimes(f, x, x_lin),
+      MatType::vertcat({x_lin, x}), MatType::vertcat({x, x0}));
   }
 
 } // namespace casadi

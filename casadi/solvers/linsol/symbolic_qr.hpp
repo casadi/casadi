@@ -26,7 +26,7 @@
 #ifndef CASADI_SYMBOLIC_QR_HPP
 #define CASADI_SYMBOLIC_QR_HPP
 
-#include "casadi/core/function/linsol_internal.hpp"
+#include "casadi/core/linsol_internal.hpp"
 #include <casadi/solvers/linsol/casadi_linsol_symbolicqr_export.h>
 
 /** \defgroup plugin_Linsol_symbolicqr
@@ -74,10 +74,10 @@ namespace casadi {
     SymbolicQr(const std::string& name);
 
     // Destructor
-    virtual ~SymbolicQr();
+    ~SymbolicQr() override;
 
     // Get name of the plugin
-    virtual const char* plugin_name() const { return "symbolicqr";}
+    const char* plugin_name() const override { return "symbolicqr";}
 
     /** \brief  Create a new Linsol */
     static LinsolInternal* creator(const std::string& name) {
@@ -87,33 +87,33 @@ namespace casadi {
     ///@{
     /** \brief Options */
     static Options options_;
-    virtual const Options& get_options() const { return options_;}
+    const Options& get_options() const override { return options_;}
     ///@}
 
     // Initialize
-    virtual void init(const Dict& opts);
+    void init(const Dict& opts) override;
 
     /** \brief Create memory block */
-    virtual void* alloc_memory() const { return new SymbolicQrMemory();}
+    void* alloc_memory() const override { return new SymbolicQrMemory();}
 
     /** \brief Free memory block */
-    virtual void free_memory(void *mem) const { delete static_cast<SymbolicQrMemory*>(mem);}
+    void free_memory(void *mem) const override { delete static_cast<SymbolicQrMemory*>(mem);}
 
     /** \brief Initalize memory block */
-    virtual void init_memory(void* mem) const;
+    void init_memory(void* mem) const override;
 
     // Set sparsity pattern
-    virtual void reset(void* mem, const int* sp) const;
+    void reset(void* mem, const int* sp) const override;
 
     // Factorize the linear system
-    virtual void factorize(void* mem, const double* A) const;
+    void factorize(void* mem, const double* A) const override;
 
     // Solve the linear system
-    virtual void solve(void* mem, double* x, int nrhs, bool tr) const;
+    void solve(void* mem, double* x, int nrhs, bool tr) const override;
 
     /** \brief Evaluate symbolically (SX) */
-    virtual void linsol_eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem,
-                               bool tr, int nrhs) const;
+    void linsol_eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem,
+                               bool tr, int nrhs) const override;
 
     /// A documentation string
     static const std::string meta_doc;

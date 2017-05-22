@@ -29,7 +29,6 @@
 */
 
 #include <casadi/casadi.hpp>
-#include <casadi/core/misc/integration_tools.hpp>
 #include <iomanip>
 
 using namespace casadi;

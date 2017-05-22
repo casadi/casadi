@@ -32,7 +32,7 @@
 #include "printable_object.hpp"
 #include "casadi_limits.hpp"
 #include "std_vector_tools.hpp"
-#include "runtime/runtime.hpp"
+#include "runtime/casadi_runtime.hpp"
 #include "generic_matrix.hpp"
 #include "generic_expression.hpp"
 
@@ -293,6 +293,8 @@ namespace casadi {
     static Matrix<Scalar> pinv(const Matrix<Scalar> &x);
     static Matrix<Scalar> pinv(const Matrix<Scalar> &A,
                                  const std::string& lsolver, const Dict& opts);
+    static Matrix<Scalar> expm_const(const Matrix<Scalar> &A, const Matrix<Scalar> &t);
+    static Matrix<Scalar> expm(const Matrix<Scalar> &A);
     static Matrix<Scalar> solve(const Matrix<Scalar> &A, const Matrix<Scalar>& b);
     static Matrix<Scalar> solve(const Matrix<Scalar> &A, const Matrix<Scalar>& b,
                                   const std::string& lsolver, const Dict& opts);
@@ -314,11 +316,11 @@ namespace casadi {
     static Matrix<Scalar> if_else(const Matrix<Scalar> &x,
                                     const Matrix<Scalar> &if_true,
                                     const Matrix<Scalar> &if_false,
-                                    bool short_circuit);
+                                    bool short_circuit=false);
     static Matrix<Scalar> conditional(const Matrix<Scalar> &ind,
                                         const std::vector<Matrix<Scalar> > &x,
                                         const Matrix<Scalar> &x_default,
-                                        bool short_circuit);
+                                        bool short_circuit=false);
     static bool depends_on(const Matrix<Scalar> &x, const Matrix<Scalar> &arg);
     static Matrix<Scalar> mpower(const Matrix<Scalar> &x, const Matrix<Scalar> &y);
     static Matrix<Scalar> mrdivide(const Matrix<Scalar> &x, const Matrix<Scalar> &y);
@@ -342,6 +344,14 @@ namespace casadi {
     static Matrix<Scalar> polyval(const Matrix<Scalar> &p, const Matrix<Scalar>& x);
     static Matrix<Scalar> densify(const Matrix<Scalar> &x, const Matrix<Scalar>& val);
     static Matrix<Scalar> densify(const Matrix<Scalar> &x);
+    static Matrix<Scalar> einstein(const Matrix<Scalar>& A, const Matrix<Scalar>& B,
+      const Matrix<Scalar>& C,
+      const std::vector<int>& dim_a, const std::vector<int>& dim_b, const std::vector<int>& dim_c,
+      const std::vector<int>& a, const std::vector<int>& b, const std::vector<int>& c);
+
+    static Matrix<Scalar> einstein(const Matrix<Scalar>& A, const Matrix<Scalar>& B,
+      const std::vector<int>& dim_a, const std::vector<int>& dim_b, const std::vector<int>& dim_c,
+      const std::vector<int>& a, const std::vector<int>& b, const std::vector<int>& c);
     ///@}
 
     ///@{
@@ -389,8 +399,6 @@ namespace casadi {
                                              const Matrix<Scalar> &x, const Matrix<Scalar> &a,
                                              const Matrix<Scalar> &b, int order,
                                              const Matrix<Scalar>& w);
-    static Matrix<Scalar> jtimes(const Matrix<Scalar> &ex, const Matrix<Scalar> &arg,
-                                   const Matrix<Scalar> &v, bool tr=false);
     static std::vector<std::vector<Matrix<Scalar> > >
     forward(const std::vector<Matrix<Scalar> > &ex,
             const std::vector<Matrix<Scalar> > &arg,
@@ -713,10 +721,22 @@ namespace casadi {
 #endif
 
     /** \brief Set or reset the depth to which equalities are being checked for simplifications */
-    static void setEqualityCheckingDepth(int eq_depth=1);
+    static void set_max_depth(int eq_depth=1);
 
     /** \brief Get the depth to which equalities are being checked for simplifications */
-    static int getEqualityCheckingDepth();
+    static int get_max_depth();
+
+#ifdef WITH_DEPRECATED_FEATURES
+    /** \brief [DEPRECATED] Renamed set_max_depth */
+    static void setEqualityCheckingDepth(int eq_depth=1) {
+      set_max_depth(eq_depth);
+    }
+
+    /** \brief [DEPRECATED] Renamed get_max_depth */
+    static int getEqualityCheckingDepth() {
+      return get_max_depth();
+    }
+#endif // WITH_DEPRECATED_FEATURES
 
     /** \brief Get function input */
     static std::vector<Matrix<Scalar> > get_input(const Function& f);
@@ -931,9 +951,9 @@ namespace casadi {
 
     // @{
     /// Set the 'precision, width & scientific' used in printing and serializing to streams
-    static void setPrecision(int precision) { stream_precision_ = precision; }
-    static void setWidth(int width) { stream_width_ = width; }
-    static void setScientific(bool scientific) { stream_scientific_ = scientific; }
+    static void set_precision(int precision);
+    static void set_width(int width);
+    static void set_scientific(bool scientific);
     // @}
 
 #ifndef SWIG
@@ -942,6 +962,10 @@ namespace casadi {
 
     /// Sparse matrix with a given sparsity and non-zero elements.
     Matrix(const Sparsity& sp, const std::vector<Scalar>& d, bool dummy);
+
+    /// \cond INTERNAL
+    static Matrix<Scalar> _sym(const std::string& name, const Sparsity& sp);
+    /// \endcond
 
   private:
     /// Sparsity of the matrix in a compressed column storage (CCS) format
@@ -972,6 +996,33 @@ namespace casadi {
   ///  Convert IM to Slice
   Slice CASADI_EXPORT to_slice(const IM& x, bool ind1=false);
 
+  /// Implementation of Matrix::get_nonzeros (in public API)
+  template<typename Scalar>
+  template<typename A>
+  std::vector<A> Matrix<Scalar>::get_nonzeros() const {
+    std::vector<A> ret(nnz());
+    auto r = ret.begin();
+    for (auto&& e : nonzeros()) *r++ = static_cast<A>(e);
+    return ret;
+  }
+
+  /// Implementation of std::vector(Matrix) (in public API)
+  template<typename Scalar>
+  template<typename A>
+  Matrix<Scalar>::operator std::vector<A>() const {
+    // Get sparsity pattern
+    int size1 = this->size1(), size2 = this->size2();
+    const int *colind = this->colind(), *row = this->row();
+    // Copy the nonzeros
+    auto it = nonzeros().begin();
+    std::vector<A> ret(numel(), 0);
+    for (int cc=0; cc<size2; ++cc) {
+      for (int el=colind[cc]; el<colind[cc+1]; ++el) {
+        ret[row[el] + cc*size1] = static_cast<A>(*it++);
+      }
+    }
+    return ret;
+  }
 
 } // namespace casadi
 

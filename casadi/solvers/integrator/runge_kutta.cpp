@@ -35,6 +35,7 @@ namespace casadi {
     plugin->name = "rk";
     plugin->doc = RungeKutta::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
+    plugin->options = &RungeKutta::options_;
     return 0;
   }
 

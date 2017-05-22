@@ -195,7 +195,7 @@ namespace casadi {
           J = d->getJ(backward);
         }
       }
-      set_function(J);
+      set_function(J, J.name(), true);
       alloc_w(J.nnz_out(0), true);
     }
 

@@ -55,6 +55,15 @@ namespace casadi {
     // Locate an entry
     const Options::Entry* find(const std::string& name) const;
 
+    // Get all entries
+    std::vector<std::string> all() const;
+
+    // Get type of an entry
+    std::string type(const std::string& name) const;
+
+    // Get description for an entry
+    std::string info(const std::string& name) const;
+
     // Print all entries
     void print(std::ostream &stream) const;
 

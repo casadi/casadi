@@ -90,6 +90,8 @@ namespace casadi {
   */
   CASADI_EXPORT std::vector<int> range(int stop);
 
+  CASADI_EXPORT bool isEquallySpaced(const std::vector<double> &v);
+
   /**  \brief Slicing vector
   *  \param v Vector to slice
   *  \param i List of indices
@@ -120,7 +122,7 @@ namespace casadi {
   bool inBounds(const std::vector<T> &v, int lower, int upper);
 
   /** \brief swap inner and outer indices of list of lists
-  * 
+  *
   * \verbatim
   * [[apple0,apple1,...],[pear0,pear1,...]] ->
   *   [[apple0,pear0],[apple1,pear1],...]
@@ -145,7 +147,7 @@ namespace casadi {
   *  Duplicates are treated by looking up last occurrence
   */
   CASADI_EXPORT std::vector<int> lookupvector(const std::vector<int> &v, int size);
-
+  CASADI_EXPORT std::vector<int> lookupvector(const std::vector<int> &v);
 
   /// \cond INTERNAL
 #ifndef SWIG
@@ -259,6 +261,11 @@ namespace casadi {
   void sort(const std::vector<T> &values, std::vector<T> &sorted_values, std::vector<int> &indices,
             bool invert_indices =false);
 
+  /** \brief product
+  *
+  */
+  template<typename T>
+  T product(const std::vector<T> &values);
 
   /** \brief cumulative sum
   *
@@ -621,6 +628,13 @@ namespace casadi {
     for (size_t i=0; i<values.size(); ++i) {
       sorted_values[i] = values[indices[i]];
     }
+  }
+
+  template<typename T>
+  T product(const std::vector<T> &values) {
+    T r = 1;
+    for (int i=0;i<values.size();++i) r*=values[i];
+    return r;
   }
 
   template<typename T>

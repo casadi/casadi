@@ -37,6 +37,11 @@ if has_nlpsol("ipopt"):
                    "tol":1e-12}
   conics.append(("nlpsol",{"nlpsol":"ipopt", "nlpsol_options.ipopt": ipopt_options},{}))
 
+if has_nlpsol("worhp"):
+  worhp_options = {"TolOpti":1e-9}
+  conics.append(("nlpsol",{"nlpsol":"worhp", "nlpsol_options.worhp": worhp_options},{}))
+
+
 if has_conic("ooqp"):
   conics.append(("ooqp",{},{"less_digits":1}))
 
@@ -453,9 +458,9 @@ class ConicTests(casadiTestCase):
 
       self.checkarray(solver_out["x"],DM([5.5,5,-10]),str(conic),digits=max(1,4-less_digits))
 
-      self.checkarray(solver_out["lam_x"],DM([0,0,-2.5]),str(conic),digits=max(1,4-less_digits))
+      if "worhp" not in str(qp_options): self.checkarray(solver_out["lam_x"],DM([0,0,-2.5]),str(conic),digits=max(1,4-less_digits))
 
-      self.checkarray(solver_out["lam_a"],DM([1.5]),str(conic),digits=max(1,4-less_digits))
+      if "worhp" not in str(qp_options): self.checkarray(solver_out["lam_a"],DM([1.5]),str(conic),digits=max(1,4-less_digits))
 
       self.assertAlmostEqual(solver_out["cost"][0],-38.375,max(1,5-less_digits),str(conic))
 
@@ -751,7 +756,7 @@ class ConicTests(casadiTestCase):
 
   @requires_conic("hpmpc")
   @requires_conic("qpoases")
-  def test_hpmc(self):
+  def test_hpmpc(self):
 
     inf = 100
     T = 10. # Time horizon
@@ -848,6 +853,14 @@ class ConicTests(casadiTestCase):
     self.checkarray(sol_ref["lam_x"], sol["lam_x"],digits=8)
     self.checkarray(sol_ref["f"], sol["f"])
     
+    solver = nlpsol('solver', 'sqpmethod', prob,{"qpsol": "hpmpc", "qpsol_options": {"tol":1e-12,"mu0":2,"max_iter":20}})
+    sol = solver(x0=w0, lbx=lbw, ubx=ubw, lbg=lbg, ubg=ubg)
+
+    self.checkarray(sol_ref["x"], sol["x"])
+    self.checkarray(sol_ref["lam_g"], sol["lam_g"],digits=8)
+    self.checkarray(sol_ref["lam_x"], sol["lam_x"],digits=8)
+    self.checkarray(sol_ref["f"], sol["f"])
+
   @requires_conic("hpmpc")
   @requires_conic("qpoases")
   def test_hpmc_timevarying(self):

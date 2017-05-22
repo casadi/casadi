@@ -25,7 +25,7 @@
 
 #include "blocksqp.hpp"
 #include "casadi/core/std_vector_tools.hpp"
-#include "casadi/core/function/conic.hpp"
+#include "casadi/core/conic.hpp"
 
 using namespace std;
 namespace casadi {
@@ -37,6 +37,7 @@ namespace casadi {
     plugin->name = "blocksqp";
     plugin->doc = Blocksqp::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
+    plugin->options = &Blocksqp::options_;
     return 0;
   }
 
@@ -2234,9 +2235,9 @@ namespace casadi {
       for (int k=0; k<dim; k++)
         Bdelta[i] += B[i+k*dim] * delta[k];
 
-        h1 += delta[i] * Bdelta[i];
-        //h2 += delta[i] * gamma[i];
-      }
+      h1 += delta[i] * Bdelta[i];
+      //h2 += delta[i] * gamma[i];
+    }
     h2 = m->delta_gamma[b];
 
     /* Powell's damping strategy to maintain pos. def. (Nocedal/Wright p.537; SNOPT paper)

@@ -34,7 +34,8 @@ namespace casadi {
     plugin->creator = HpmpcInterface::creator;
     plugin->name = "hpmpc";
     plugin->doc = HpmpcInterface::meta_doc.c_str();
-    plugin->version = 30;
+    plugin->version = CASADI_VERSION;
+    plugin->options = &HpmpcInterface::options_;
     return 0;
   }
 
@@ -280,14 +281,6 @@ namespace casadi {
       "HPMPC interface: symbol \"" + ocp_solve_name + "\" found in " + searchpath + ".");
 #endif
 
-
-
-    /* Disassemble A input into:
-       B A   I
-       D C
-           B A  I
-           D C
-    */
     /* Disassemble A input into:
        A B I
        C D
@@ -557,6 +550,27 @@ namespace casadi {
     m->fstats["postprocessing"] = FStats();
   }
 
+  void HpmpcInterface::mproject(double factor, const double* x, const int* sp_x,
+                                double* y, const int* sp_y, double* w) {
+    int ncol_y = sp_y[1];
+    const int *colind_y = sp_y+2;
+    casadi_project(x, sp_x, y, sp_y, w);
+    casadi_scal(colind_y[ncol_y], factor, y);
+  }
+
+  void HpmpcInterface::dense_transfer(double factor, const double* x, const int* sp_x, double* y,
+                                      const int* sp_y, double* w) {
+    CASADI_PREFIX(sparsify)(x, w, sp_x, false);
+    int nrow_y = sp_y[0];
+    int ncol_y = sp_y[1];
+    const int *colind_y = sp_y+2, *row_y = sp_y + 2 + ncol_y+1;
+    /* Loop over columns of y */
+    int i, el;
+    for (i=0; i<ncol_y; ++i) {
+      for (el=colind_y[i]; el<colind_y[i+1]; ++el) y[nrow_y*i + row_y[el]] += factor*(*w++);
+    }
+  }
+
   void HpmpcInterface::
   eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
     auto m = static_cast<HpmpcMemory*>(mem);
@@ -574,13 +588,13 @@ namespace casadi {
     casadi_project(arg[CONIC_A], sparsity_in(CONIC_A), get_ptr(m->I), Isp_, pv);
 
     // Dissect H matrix; definition of HPMPC lacks a factor 2
-    casadi_mproject(0.5, arg[CONIC_H], sparsity_in(CONIC_H), get_ptr(m->R), Rsp_, pv);
-    casadi_mproject(0.5, arg[CONIC_H], sparsity_in(CONIC_H), get_ptr(m->S), Ssp_, pv);
-    casadi_mproject(0.5, arg[CONIC_H], sparsity_in(CONIC_H), get_ptr(m->Q), Qsp_, pv);
+    mproject(0.5, arg[CONIC_H], sparsity_in(CONIC_H), get_ptr(m->R), Rsp_, pv);
+    mproject(0.5, arg[CONIC_H], sparsity_in(CONIC_H), get_ptr(m->S), Ssp_, pv);
+    mproject(0.5, arg[CONIC_H], sparsity_in(CONIC_H), get_ptr(m->Q), Qsp_, pv);
 
     // Dissect LBA/UBA
-    casadi_mproject(-1.0, arg[CONIC_LBA], sparsity_in(CONIC_LBA), get_ptr(m->b), bsp_, pv);
-    casadi_mproject(-1.0, arg[CONIC_UBA], sparsity_in(CONIC_UBA), get_ptr(m->b2), bsp_, pv);
+    mproject(-1.0, arg[CONIC_LBA], sparsity_in(CONIC_LBA), get_ptr(m->b), bsp_, pv);
+    mproject(-1.0, arg[CONIC_UBA], sparsity_in(CONIC_UBA), get_ptr(m->b2), bsp_, pv);
     casadi_assert(std::equal(m->b.begin(), m->b.end(), m->b2.begin()));
     casadi_project(arg[CONIC_LBA], sparsity_in(CONIC_LBA), get_ptr(m->lg), lugsp_, pv);
     casadi_project(arg[CONIC_UBA], sparsity_in(CONIC_UBA), get_ptr(m->ug), lugsp_, pv);
@@ -589,22 +603,20 @@ namespace casadi {
     std::fill(m->lb.begin(), m->lb.end(), 0);
     std::fill(m->ub.begin(), m->ub.end(), 0);
 
-    casadi_dense_transfer(1.0, arg[CONIC_LBX], xsp_, get_ptr(m->lb), theirs_xsp_, pv);
-    casadi_dense_transfer(1.0, arg[CONIC_UBX], xsp_, get_ptr(m->ub), theirs_xsp_, pv);
-    casadi_dense_transfer(1.0, arg[CONIC_LBX], usp_, get_ptr(m->lb), theirs_usp_, pv);
-    casadi_dense_transfer(1.0, arg[CONIC_UBX], usp_, get_ptr(m->ub), theirs_usp_, pv);
+    dense_transfer(1.0, arg[CONIC_LBX], xsp_, get_ptr(m->lb), theirs_xsp_, pv);
+    dense_transfer(1.0, arg[CONIC_UBX], xsp_, get_ptr(m->ub), theirs_xsp_, pv);
+    dense_transfer(1.0, arg[CONIC_LBX], usp_, get_ptr(m->lb), theirs_usp_, pv);
+    dense_transfer(1.0, arg[CONIC_UBX], usp_, get_ptr(m->ub), theirs_usp_, pv);
 
     // Dissect G
-    casadi_mproject(0.5, arg[CONIC_G], sparsity_in(CONIC_G), get_ptr(m->r), usp_, pv);
-    casadi_mproject(0.5, arg[CONIC_G], sparsity_in(CONIC_G), get_ptr(m->q), xsp_, pv);
+    mproject(0.5, arg[CONIC_G], sparsity_in(CONIC_G), get_ptr(m->r), usp_, pv);
+    mproject(0.5, arg[CONIC_G], sparsity_in(CONIC_G), get_ptr(m->q), xsp_, pv);
 
     // Dissect X0
     casadi_project(arg[CONIC_X0], sparsity_in(CONIC_X0), get_ptr(m->u), usp_, pv);
     casadi_project(arg[CONIC_X0], sparsity_in(CONIC_X0), get_ptr(m->x), xsp_, pv);
 
     m->iter_count = -1;
-
-    int N = N_;
 
     // Deal with non-unity I block
     for (int k=0;k<N_;++k) {
@@ -634,19 +646,28 @@ namespace casadi {
     m->fstats.at("preprocessing").toc();
     m->fstats.at("solver").tic();
 
-    casadi_dense_transfer(0.5, arg[CONIC_LAM_A0], lamg_gapsp_, get_ptr(m->pi), pisp_, pv);
-    // Deal with non-unity I block
-    for (int k=0;k<N_;++k) {
-      int n_row = m->nx[k+1];
-      for (int i=0;i<n_row;++i) {
-        double f = -m->Is[k][i];
-        m->pis[k][i]*=f;
+
+    std::fill(m->pi.begin(), m->pi.end(), 0);
+    std::fill(m->lam.begin(), m->lam.end(), 0);
+
+    if (arg[CONIC_LAM_A0]) {
+      dense_transfer(0.5, arg[CONIC_LAM_A0], lamg_gapsp_, get_ptr(m->pi), pisp_, pv);
+      // Deal with non-unity I block
+      for (int k=0;k<N_;++k) {
+        int n_row = m->nx[k+1];
+        for (int i=0;i<n_row;++i) {
+          double f = -m->Is[k][i];
+          m->pis[k][i]*=f;
+        }
       }
+
+      dense_transfer(0.5, arg[CONIC_LAM_A0], lamg_csp_, get_ptr(m->lam), lam_cusp_, pv);
     }
 
-    casadi_dense_transfer(0.5, arg[CONIC_LAM_A0], lamg_csp_, get_ptr(m->lam), lam_cusp_, pv);
-    casadi_dense_transfer(0.5, arg[CONIC_LAM_X0], usp_, get_ptr(m->lam), lam_uusp_, pv);
-    casadi_dense_transfer(0.5, arg[CONIC_LAM_X0], xsp_, get_ptr(m->lam), lam_xusp_, pv);
+    if (arg[CONIC_LAM_X0]) {
+      dense_transfer(0.5, arg[CONIC_LAM_X0], usp_, get_ptr(m->lam), lam_uusp_, pv);
+      dense_transfer(0.5, arg[CONIC_LAM_X0], xsp_, get_ptr(m->lam), lam_xusp_, pv);
+    }
 
     m->return_status =
       fortran_order_d_ip_ocp_hard_tv(&m->iter_count, max_iter_, mu0_, tol_, N_, get_ptr(m->nx),
@@ -666,8 +687,8 @@ namespace casadi {
     }
 
     std::fill(res[CONIC_X], res[CONIC_X]+nx_, 0);
-    casadi_dense_transfer(1.0, get_ptr(m->x), theirs_Xsp_, res[CONIC_X], xsp_, pv);
-    casadi_dense_transfer(1.0, get_ptr(m->u), theirs_Usp_, res[CONIC_X], usp_, pv);
+    dense_transfer(1.0, get_ptr(m->x), theirs_Xsp_, res[CONIC_X], xsp_, pv);
+    dense_transfer(1.0, get_ptr(m->u), theirs_Usp_, res[CONIC_X], usp_, pv);
 
     std::fill(res[CONIC_LAM_X], res[CONIC_LAM_X]+nx_, 0);
     std::fill(res[CONIC_LAM_A], res[CONIC_LAM_A]+na_, 0);
@@ -681,19 +702,20 @@ namespace casadi {
       }
     }
 
-    casadi_dense_transfer(2.0, get_ptr(m->pi), pisp_, res[CONIC_LAM_A], lamg_gapsp_, pv);
-    casadi_dense_transfer(2.0, get_ptr(m->lam), lam_cusp_, res[CONIC_LAM_A], lamg_csp_, pv);
-    casadi_dense_transfer(-2.0, get_ptr(m->lam), lam_clsp_, res[CONIC_LAM_A], lamg_csp_, pv);
+    dense_transfer(2.0, get_ptr(m->pi), pisp_, res[CONIC_LAM_A], lamg_gapsp_, pv);
+    dense_transfer(2.0, get_ptr(m->lam), lam_cusp_, res[CONIC_LAM_A], lamg_csp_, pv);
+    dense_transfer(-2.0, get_ptr(m->lam), lam_clsp_, res[CONIC_LAM_A], lamg_csp_, pv);
 
-    casadi_dense_transfer(-2.0, get_ptr(m->lam), lam_ulsp_, res[CONIC_LAM_X], usp_, pv);
-    casadi_dense_transfer(2.0, get_ptr(m->lam), lam_uusp_, res[CONIC_LAM_X], usp_, pv);
-    casadi_dense_transfer(-2.0, get_ptr(m->lam), lam_xlsp_, res[CONIC_LAM_X], xsp_,  pv);
-    casadi_dense_transfer(2.0, get_ptr(m->lam), lam_xusp_, res[CONIC_LAM_X], xsp_,  pv);
+    dense_transfer(-2.0, get_ptr(m->lam), lam_ulsp_, res[CONIC_LAM_X], usp_, pv);
+    dense_transfer(2.0, get_ptr(m->lam), lam_uusp_, res[CONIC_LAM_X], usp_, pv);
+    dense_transfer(-2.0, get_ptr(m->lam), lam_xlsp_, res[CONIC_LAM_X], xsp_,  pv);
+    dense_transfer(2.0, get_ptr(m->lam), lam_xusp_, res[CONIC_LAM_X], xsp_,  pv);
 
     // Construct f
     double f = casadi_dot(nx_, arg[CONIC_G], res[CONIC_X]);
     f += 0.5*casadi_bilin(arg[CONIC_H], sparsity_in(CONIC_H), res[CONIC_X], res[CONIC_X]);
-    res[CONIC_COST][0] = f;
+
+    if (res[CONIC_COST]) res[CONIC_COST][0] = f;
 
     m->fstats.at("postprocessing").toc();
 

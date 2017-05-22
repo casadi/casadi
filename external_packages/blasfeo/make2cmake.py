@@ -27,7 +27,7 @@ for t in targets:
       cfile = line[-1]
       flags = [f for f in line[2:-4] if not f.startswith("-I") and not f.startswith("-DOS")]
       data.append((cfile,pwd,flags))
-      
+
   for cfile,pwd,f in data:
     if not( f==data[0][2] or len(f)==0):
       print "warning", f, data[0][2]
@@ -45,22 +45,21 @@ with file('CMakeLists.txt','w') as f:
      set(BLASFEO_FLAGS -DOS_LINUX)
     endif()
     """)
-  
+
   for t in targets:
     data = target_data[t]
-    
+
     libname = "casadi_blasfeo_%s" % t
     bitness64 = "-m64" in data[0][2]
     if bitness64:
       f.write("if( CMAKE_SIZEOF_VOID_P EQUAL 8 )\n")
-    
-    
-    f.write("casadi_external_library(%s %s)\n" % (libname, "\n".join([ os.path.join(pwd,cfile) for cfile, pwd, _ in data])))
+
+
+    f.write("add_library(%s SHARED %s)\n" % (libname, "\n".join([ os.path.join(pwd,cfile) for cfile, pwd, _ in data])))
     f.write("set_target_properties(%s PROPERTIES COMPILE_FLAGS \"%s ${BLASFEO_FLAGS}\")\n\n" % (libname, " ".join(data[0][2])))
     for cfile, pwd, _ in data:
       if cfile.endswith("S"):
         f.write("set_property(SOURCE %s PROPERTY LANGUAGE C)\n" % os.path.join(pwd,cfile))
-        
+
     if bitness64:
       f.write("endif()\n")
-

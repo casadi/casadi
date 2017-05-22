@@ -27,8 +27,8 @@
 #define CASADI_BLOCKSQP_HPP
 
 #include <casadi/interfaces/blocksqp/casadi_nlpsol_blocksqp_export.h>
-#include "casadi/core/function/linsol.hpp"
-#include "casadi/core/function/nlpsol_impl.hpp"
+#include "casadi/core/linsol.hpp"
+#include "casadi/core/nlpsol_impl.hpp"
 #include "../qpoases/qpoases_interface.hpp"
 
 /** \defgroup plugin_Nlpsol_blocksqp
@@ -153,10 +153,10 @@ namespace casadi {
   class CASADI_NLPSOL_BLOCKSQP_EXPORT Blocksqp : public Nlpsol {
   public:
     explicit Blocksqp(const std::string& name, const Function& nlp);
-    virtual ~Blocksqp();
+    ~Blocksqp() override;
 
     // Get name of the plugin
-    virtual const char* plugin_name() const { return "blocksqp";}
+    const char* plugin_name() const override { return "blocksqp";}
 
     /** \brief  Create a new NLP Solver */
     static Nlpsol* creator(const std::string& name, const Function& nlp) {
@@ -166,27 +166,27 @@ namespace casadi {
     ///@{
     /** \brief Options */
     static Options options_;
-    virtual const Options& get_options() const { return options_;}
+    const Options& get_options() const override { return options_;}
     ///@}
 
     // Initialize the solver
-    virtual void init(const Dict& opts);
+    void init(const Dict& opts) override;
 
     /** \brief Create memory block */
-    virtual void* alloc_memory() const { return new BlocksqpMemory();}
+    void* alloc_memory() const override { return new BlocksqpMemory();}
 
     /** \brief Free memory block */
-    virtual void free_memory(void *mem) const { delete static_cast<BlocksqpMemory*>(mem);}
+    void free_memory(void *mem) const override { delete static_cast<BlocksqpMemory*>(mem);}
 
     /** \brief Initalize memory block */
-    virtual void init_memory(void* mem) const;
+    void init_memory(void* mem) const override;
 
     /** \brief Set the (persistent) work vectors */
-    virtual void set_work(void* mem, const double**& arg, double**& res,
-                          int*& iw, double*& w) const;
+    void set_work(void* mem, const double**& arg, double**& res,
+                          int*& iw, double*& w) const override;
 
     // Solve the NLP
-    virtual void solve(void* mem) const;
+    void solve(void* mem) const override;
 
     virtual Dict get_stats(void* mem) const;
 

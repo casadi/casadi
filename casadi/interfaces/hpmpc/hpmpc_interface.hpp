@@ -26,8 +26,8 @@
 #ifndef CASADI_HPMPC_INTERFACE_HPP
 #define CASADI_HPMPC_INTERFACE_HPP
 
-#include "casadi/core/function/conic_impl.hpp"
-#include "casadi/core/function/linsol.hpp"
+#include "casadi/core/conic_impl.hpp"
+#include "casadi/core/linsol.hpp"
 #include <casadi/interfaces/hpmpc/casadi_conic_hpmpc_export.h>
 
 /** \defgroup plugin_Conic_hpmpc
@@ -39,8 +39,19 @@ In order to use this interface, you must:
  - Decision variables must only by state and control,
    and the variable ordering must be [x0 u0 x1 u1 ...]
  - The constraints must be in order: [ gap0 lincon0 gap1 lincon1  ]
- - The gap constraints must be diagonal sparse
- - Supply nx, ng, nu options
+
+    gap: Ak+1 = Ak xk + Bk uk
+    lincon: yk= Ck xk + Dk uk
+
+    \verbatim
+       A0 B0 -I
+       C0 D0
+              A1 B1 -I
+              C1 D1
+    \endverbatim
+
+   where I must be a diagonal sparse matrix
+ - Either supply all of N, nx, ng, nu options or rely on automatic detection
 
 
 */
@@ -119,34 +130,43 @@ namespace casadi {
                               const std::map<std::string, Sparsity>& st);
 
     /// Get all statistics
-    virtual Dict get_stats(void* mem) const;
+    Dict get_stats(void* mem) const override;
 
     /** \brief  Destructor */
-    virtual ~HpmpcInterface();
+    ~HpmpcInterface() override;
 
     // Get name of the plugin
-    virtual const char* plugin_name() const { return "hpmpc";}
+    const char* plugin_name() const override { return "hpmpc";}
 
     ///@{
     /** \brief Options */
     static Options options_;
-    virtual const Options& get_options() const { return options_;}
+    const Options& get_options() const override { return options_;}
     ///@}
 
     /** \brief  Initialize */
-    virtual void init(const Dict& opts);
+    void init(const Dict& opts) override;
 
     /** \brief Create memory block */
-    virtual void* alloc_memory() const { return new HpmpcMemory();}
+    void* alloc_memory() const override { return new HpmpcMemory();}
 
     /** \brief Free memory block */
-    virtual void free_memory(void *mem) const { delete static_cast<HpmpcMemory*>(mem);}
+    void free_memory(void *mem) const override { delete static_cast<HpmpcMemory*>(mem);}
 
     /** \brief Initalize memory block */
-    virtual void init_memory(void* mem) const;
+    void init_memory(void* mem) const override;
 
     /** \brief  Evaluate numerically */
-    virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
+    void eval(void* mem, const double** arg, double** res, int* iw, double* w) const override;
+
+    /** \brief Helper function */
+    static void mproject(double factor, const double* x, const int* sp_x,
+                         double* y, const int* sp_y, double* w);
+
+    /** Dense transfer: y(y_sp).nonzeros() <- x(x_sp).nonzeros()
+     (length >= max(number of rows, nnz)) */
+    static void dense_transfer(double factor, const double* x, const int* sp_x, double* y,
+                               const int* sp_y, double* w);
 
     /// A documentation string
     static const std::string meta_doc;

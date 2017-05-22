@@ -38,6 +38,12 @@ extern "C" {
   int mb03wd_(char* job, char* compz, f_int* n, f_int* p, f_int* ilo, f_int* ihi, f_int* iloz,
               f_int* ihiz, double *h, f_int* ldh1, f_int* ldh2, double* z, f_int* ldz1,
               f_int* ldz2, double* wr, double *wi, double* dwork, f_int *ld_work, f_int *info);
+
+
+  int mb05nd_(f_int* n, double* delta, const double* a, f_int* lda,
+                double* ex, f_int* ldex, double * exint, f_int* ldexin,
+                double* tol, f_int* iwork, double * dwork, f_int* ldwork, f_int *info);
+
 }
 
 namespace casadi {
@@ -95,5 +101,21 @@ namespace casadi {
      return ret_;
   }
 
+
+  int slicot_mb05nd(int n, double delta, const double* a, int lda,
+                     double* ex, int ldex, double * exint, int ldexin,
+                     double tol, int* iwork, double * dwork, int ldwork) {
+    f_int n_ = n;
+    f_int lda_ = lda;
+    f_int ldex_ = ldex;
+    f_int ldexin_ = ldexin;
+    f_int* iwork_ = reinterpret_cast<f_int*>(iwork);
+    f_int ldwork_ = ldwork;
+    f_int ret_ = 0;
+    mb05nd_(&n_, &delta, a, &lda_, ex, &ldex_, exint, &ldexin_,
+      &tol, iwork_, dwork, &ldwork_, &ret_);
+
+    return ret_;
+  }
 
 } // namespace casadi

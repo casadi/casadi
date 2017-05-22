@@ -307,36 +307,51 @@ y = SX.sym('y',2)
 z = SX.sym('z',2,2)
 a = SX.sym('a',Sparsity.upper(2))
 
+if ~(is_octave & ismac)
+  f = Function('f',{x,y,z,a},{x,y,z,a})
+  F = returntypes('full',f);
 
-f = Function('f',{x,y,z,a},{x,y,z,a})
-F = returntypes('full',f);
+  [a,b,c,d] = F(1,2,3,4);
 
-[a,b,c,d] = F(1,2,3,4);
+  assert(~issparse(c));
+  assert(~issparse(d));
 
-assert(~issparse(c));
-assert(~issparse(d));
+  F = returntypes('sparse',f);
 
-F = returntypes('sparse',f);
+  [a,b,c,d] = F(1,2,3,4);
 
-[a,b,c,d] = F(1,2,3,4);
+  assert(issparse(c));
+  assert(issparse(d));
 
-assert(issparse(c));
-assert(issparse(d));
+  F = returntypes('full|sparse',f);
 
-F = returntypes('full|sparse',f);
+  [a,b,c,d] = F(1,2,3,4);
 
-[a,b,c,d] = F(1,2,3,4);
+  assert(~issparse(c));
+  assert(issparse(d));
 
-assert(~issparse(c));
-assert(issparse(d));
+  F = returntypes({'sparse','full','sparse','full'},f);
 
-F = returntypes({'sparse','full','sparse','full'},f);
+  [a,b,c,d] = F(1,2,3,4);
 
-[a,b,c,d] = F(1,2,3,4);
+  assert(issparse(a));
+  assert(~issparse(b));
+  assert(issparse(c));
+  assert(~issparse(d));
+end
 
-assert(issparse(a));
-assert(~issparse(b));
-assert(issparse(c));
-assert(~issparse(d));
+Sparsity(3,3)
+
+x = MX.sym('x',3,3);
+
+assert(numel(x)==9);
+
+xr = tril(x);
+xnz = xr{:};
+
+assert(numel(xnz)==6);
+
+
+
 
 

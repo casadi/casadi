@@ -23,7 +23,7 @@
  */
 
 
-#include "mx/mx.hpp"
+#include "mx.hpp"
 
 #include "std_vector_tools.hpp"
 
@@ -39,6 +39,18 @@ namespace casadi {
       ind += step;
     }
     return ret;
+  }
+
+  bool isEquallySpaced(const std::vector<double> &v) {
+    if (v.size()<=1) return true;
+
+    double margin = (v[v.size()-1]-v[0])*1e-14;
+
+    for (int i=2;i<v.size();++i) {
+      double ref = v[0]+(i*(v[v.size()-1]-v[0]))/(v.size()-1);
+      if (abs(ref-v[i])>margin) return false;
+    }
+    return true;
   }
 
   std::vector<int> range(int stop) {
@@ -72,6 +84,11 @@ namespace casadi {
       lookup[v[i]] = i;
     }
     return lookup;
+  }
+
+  std::vector<int> lookupvector(const std::vector<int> &v) {
+    casadi_assert(!hasNegative(v));
+    return lookupvector(v, (*std::max_element(v.begin(), v.end()))+1);
   }
 
   bvec_t* get_bvec_t(std::vector<double>& v) {

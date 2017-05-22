@@ -33,7 +33,7 @@ iswindows = os.name=="nt"
 if iswindows:
   t = TestSuite(dirname=src,
     suffix="m",
-    command = lambda dir,fn, opt:  ["matlab","-nodisplay","-nosplash","-nodesktop","-nojvm","-logfile",fn + ".log","-wait","-r","try," + fn[:-2]+", disp('MATLABOKAY') , catch E , disp(getReport(E)), disp('MATLABERROR'), end;quit"] + opt,
+    command = lambda dir,fn, opt:  ["matlab","-nodisplay","-nosplash","-nodesktop","-logfile",fn + ".log","-wait","-r","try," + fn[:-2]+", disp('MATLABOKAY') , catch E , disp(getReport(E)), disp('MATLABERROR'), end;quit"] + opt,
     skipdirs=[".svn","ctemplate","defs"],
      inputs = lambda dir,fn : {fn: file(dir + "/" + fn,"r").read()},
       args=sys.argv[2:],

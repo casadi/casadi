@@ -26,7 +26,7 @@
 #ifndef CASADI_LINEAR_INTERPOLANT_HPP
 #define CASADI_LINEAR_INTERPOLANT_HPP
 
-#include "casadi/core/function/interpolant_impl.hpp"
+#include "casadi/core/interpolant_impl.hpp"
 #include <casadi/solvers/interpolant/casadi_interpolant_linear_export.h>
 
 /** \defgroup plugin_Interpolant_linear
@@ -55,10 +55,10 @@ namespace casadi {
                       const std::vector<double>& values);
 
     // Destructor
-    virtual ~LinearInterpolant();
+    ~LinearInterpolant() override;
 
     // Get name of the plugin
-    virtual const char* plugin_name() const { return "linear";}
+    const char* plugin_name() const override { return "linear";}
 
     /** \brief  Create a new Interpolant */
     static Interpolant* creator(const std::string& name,
@@ -69,19 +69,36 @@ namespace casadi {
     }
 
     // Initialize
-    virtual void init(const Dict& opts);
+    void init(const Dict& opts) override;
 
     /// Evaluate numerically
-    virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
+    void eval(void* mem, const double** arg, double** res, int* iw, double* w) const override;
 
     ///@{
     /** \brief Full Jacobian */
-    virtual bool hasFullJacobian() const { return true;}
-    virtual Function getFullJacobian(const std::string& name, const Dict& opts);
+    bool hasFullJacobian() const override { return true;}
+    Function getFullJacobian(const std::string& name,
+                                      const std::vector<std::string>& i_names,
+                                      const std::vector<std::string>& o_names,
+                                      const Dict& opts) override;
     ///@}
+
+    /** \brief Is codegen supported? */
+    bool has_codegen() const override { return true;}
+
+    /** \brief Generate code for the body of the C function */
+    void generateBody(CodeGenerator& g) const override;
 
     /// A documentation string
     static const std::string meta_doc;
+
+    ///@{
+    /** \brief Options */
+    static Options options_;
+    const Options& get_options() const override { return options_;}
+    ///@}
+
+    std::vector<int> lookup_mode_;
   };
 
   /** First order derivatives */
@@ -91,16 +108,22 @@ namespace casadi {
     LinearInterpolantJac(const std::string& name) : FunctionInternal(name) {}
 
     /// Destructor
-    virtual ~LinearInterpolantJac() {}
+    ~LinearInterpolantJac() override {}
 
     /** \brief Get type name */
-    virtual std::string type_name() const { return "interpolant_linear_jac";}
+    std::string type_name() const override { return "interpolant_linear_jac";}
+
+    /** \brief Is codegen supported? */
+    bool has_codegen() const override { return true;}
+
+    /** \brief Generate code for the body of the C function */
+    void generateBody(CodeGenerator& g) const override;
 
     // Initialize
-    virtual void init(const Dict& opts);
+    void init(const Dict& opts) override;
 
     /// Evaluate numerically
-    virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
+    void eval(void* mem, const double** arg, double** res, int* iw, double* w) const override;
   };
 
 } // namespace casadi

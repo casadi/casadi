@@ -33,7 +33,7 @@
 #include <iostream>
 #include <stdexcept>
 
-#include "casadi_common.hpp"
+#include <casadi/core/casadi_export.h>
 
 namespace casadi {
 
@@ -53,7 +53,7 @@ namespace casadi {
                 }
         \endcode
 */
-class CASADI_EXPORT CasadiException : public std::exception {
+class CasadiException : public std::exception {
   public:
   //! \brief Default constructor
   CasadiException() {
@@ -66,7 +66,7 @@ class CASADI_EXPORT CasadiException : public std::exception {
   ~CasadiException() throw() {}
 
   //! \brief Display error
-  virtual const char* what() const throw() {
+  const char* what() const throw() override {
     return msg_.c_str();
   }
 

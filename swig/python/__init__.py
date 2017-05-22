@@ -38,7 +38,7 @@ else:
 GlobalOptions.setCasadiPath(os.path.dirname(__file__))
 
 import types
-  
+
 def wrapper(f, warning,error=False):
     def new(*args, **kwargs):
         print(("*" * 40))
@@ -81,7 +81,6 @@ import inspect
 import re
 
 
-__version__ = CasadiMeta.getVersion()
-if '+' in __version__ and CasadiMeta.getGitDescribe()!='':
-    __version__  = CasadiMeta.getGitDescribe()
-  
+__version__ = CasadiMeta.version()
+if '+' in __version__ and CasadiMeta.git_describe()!='':
+    __version__  = CasadiMeta.git_describe()

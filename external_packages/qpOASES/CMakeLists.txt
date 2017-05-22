@@ -13,19 +13,12 @@ endif()
 # Uncomment to bypass user-defined linear solver (requires HSL)
 #add_definitions(-DSOLVER_MA27)
 
-# cmake_policy use MACOSX_RPATH=ON by default
-if(COMMAND cmake_policy)
-  if(CMAKE_MAJOR_VERSION GREATER 2)
-    cmake_policy(SET CMP0042 NEW)
-  endif()
-endif()
-
 include_directories(include)
 set(QPOASES_LIBRARIES ${QPOASES_LIBRARIES})
 file(GLOB SRC src/*.cpp)
 file(GLOB EXTRAS_SRC src/extras/*.cpp)
 
-casadi_external_library(casadi_qpoases ${SRC} ${EXTRAS_SRC})
+add_library(casadi_qpoases STATIC ${SRC} ${EXTRAS_SRC})
 target_link_libraries(casadi_qpoases ${LAPACK_LIBRARIES} ${BLAS_LIBRARIES})
 
 # Uncomment to bypass user-defined linear solver (requires HSL)

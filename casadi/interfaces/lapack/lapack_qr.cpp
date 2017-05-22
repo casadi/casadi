@@ -36,6 +36,7 @@ namespace casadi {
     plugin->name = "lapackqr";
     plugin->doc = LapackQr::meta_doc.c_str();;
     plugin->version = CASADI_VERSION;
+    plugin->options = &LapackQr::options_;
     return 0;
   }
 
@@ -52,9 +53,26 @@ namespace casadi {
     clear_memory();
   }
 
+  Options LapackQr::options_
+  = {{&FunctionInternal::options_},
+     {{"max_nrhs",
+       {OT_INT,
+        "Maximum number of right-hand-sides that get processed in a single pass [default:10]."}}
+     }
+  };
+
   void LapackQr::init(const Dict& opts) {
     // Call the base class initializer
     LinsolInternal::init(opts);
+
+    max_nrhs_ = 10;
+
+    // Read options
+    for (auto&& op : opts) {
+      if (op.first=="max_nrhs") {
+        max_nrhs_ = op.second;
+      }
+    }
   }
 
   void LapackQr::init_memory(void* mem) const {
@@ -66,7 +84,7 @@ namespace casadi {
     auto m = static_cast<LapackQrMemory*>(mem);
     m->mat.resize(m->ncol() * m->ncol());
     m->tau.resize(m->ncol());
-    m->work.resize(10*m->ncol());
+    m->work.resize(max(max_nrhs_, m->ncol())*10);
   }
 
   void LapackQr::factorize(void* mem, const double* A) const {
@@ -84,11 +102,23 @@ namespace casadi {
     int lwork = m->work.size();
     dgeqrf_(&ncol, &ncol, get_ptr(m->mat), &ncol, get_ptr(m->tau),
             get_ptr(m->work), &lwork, &info);
-    if (info != 0) throw CasadiException("LapackQr::prepare: dgeqrf_ "
-                                         "failed to factorize the Jacobian");
+    casadi_assert_message(info == 0, "LapackQr::prepare: dgeqrf_ "
+                                      "failed to factorize the Jacobian. Info: " << info << ".");
   }
 
   void LapackQr::solve(void* mem, double* x, int nrhs, bool tr) const {
+    auto m = static_cast<LapackQrMemory*>(mem);
+
+    // Solve up to max_nrhs rhs at a time
+    int offset = 0;
+    while (nrhs>0) {
+      _solve(m, x+offset, min(max_nrhs_, nrhs), tr);
+      nrhs-= max_nrhs_;
+      offset+= max_nrhs_*m->nrow();
+    }
+  }
+
+  void LapackQr::_solve(void* mem, double* x, int nrhs, bool tr) const {
     auto m = static_cast<LapackQrMemory*>(mem);
 
     // Dimensions
@@ -118,17 +148,16 @@ namespace casadi {
       int info = 100;
       dormqr_(&sideQ, &transQ, &ncol, &nrhs, &k, get_ptr(m->mat), &ncol, get_ptr(m->tau), x,
               &ncol, get_ptr(m->work), &lwork, &info);
-      if (info != 0) throw CasadiException("LapackQr::solve: dormqr_ failed "
-                                          "to solve the linear system");
-
+      casadi_assert_message(info == 0, "LapackQr::solve: dormqr_ A failed "
+                                          "to solve the linear system. Info: " << info << ".");
     } else {
 
       // Multiply by transpose(Q)
       int info = 100;
       dormqr_(&sideQ, &transQ, &ncol, &nrhs, &k, get_ptr(m->mat), &ncol, get_ptr(m->tau), x,
               &ncol, get_ptr(m->work), &lwork, &info);
-      if (info != 0) throw CasadiException("LapackQr::solve: dormqr_ failed to "
-                                          "solve the linear system");
+      casadi_assert_message(info == 0, "LapackQr::solve: dormqr_ B failed to "
+                                          "solve the linear system. Info: " << info << ".");
 
       // Solve for R
       dtrsm_(&sideR, &uploR, &transR, &diagR, &ncol, &nrhs, &alphaR,

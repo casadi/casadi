@@ -37,6 +37,7 @@ namespace casadi {
     plugin->name = "ma27";
     plugin->doc = Ma27Interface::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
+    plugin->options = &Ma27Interface::options_;
     return 0;
   }
 

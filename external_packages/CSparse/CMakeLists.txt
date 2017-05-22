@@ -15,4 +15,4 @@ set(CSPARSE_SRC
   Source/cs_dfs.c Source/cs_reach.c Source/cs_spsolve.c Source/cs_ereach.c Source/cs_leaf.c Source/cs_randperm.c
 )
 
-casadi_external_library(casadi_csparse ${CSPARSE_SRC})
+add_library(casadi_csparse STATIC ${CSPARSE_SRC})

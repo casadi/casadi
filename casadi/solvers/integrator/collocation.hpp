@@ -26,8 +26,8 @@
 #ifndef CASADI_COLLOCATION_HPP
 #define CASADI_COLLOCATION_HPP
 
-#include "casadi/core/function/integrator_impl.hpp"
-#include "casadi/core/misc/integration_tools.hpp"
+#include "casadi/core/integrator_impl.hpp"
+#include "casadi/core/integration_tools.hpp"
 #include <casadi/solvers/integrator/casadi_integrator_collocation_export.h>
 
 /** \defgroup plugin_Integrator_collocation
@@ -66,33 +66,33 @@ namespace casadi {
     }
 
     /// Destructor
-    virtual ~Collocation();
+    ~Collocation() override;
 
     // Get name of the plugin
-    virtual const char* plugin_name() const { return "collocation";}
+    const char* plugin_name() const override { return "collocation";}
 
     ///@{
     /** \brief Options */
     static Options options_;
-    virtual const Options& get_options() const { return options_;}
+    const Options& get_options() const override { return options_;}
     ///@}
 
     /// Initialize stage
-    virtual void init(const Dict& opts);
+    void init(const Dict& opts) override;
 
     /// Setup F and G
-    virtual void setupFG();
+    void setupFG() override;
 
     // Return zero if smaller than machine epsilon
     static double zeroIfSmall(double x);
 
     /** \brief Reset the forward problem */
-    virtual void reset(IntegratorMemory* mem, double t, const double* x,
-                       const double* z, const double* p) const;
+    void reset(IntegratorMemory* mem, double t, const double* x,
+                       const double* z, const double* p) const override;
 
     /// Reset the backward problem and take time to tf
-    virtual void resetB(IntegratorMemory* mem, double t, const double* rx,
-                        const double* rz, const double* rp) const;
+    void resetB(IntegratorMemory* mem, double t, const double* rx,
+                        const double* rz, const double* rp) const override;
 
     // Interpolation order
     int deg_;

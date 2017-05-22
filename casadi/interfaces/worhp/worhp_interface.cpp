@@ -40,6 +40,7 @@ namespace casadi {
     plugin->name = "worhp";
     plugin->doc = WorhpInterface::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
+    plugin->options = &WorhpInterface::options_;
     return 0;
   }
 
@@ -124,9 +125,25 @@ namespace casadi {
     alloc_w(nx_); // for fetching diagonal entries form Hessian
   }
 
+  void worhp_print(int mode, const char message[]) {
+    if (mode & WORHP_PRINT_MESSAGE) {
+      userOut() << message << std::endl;
+    }
+    if (mode & WORHP_PRINT_WARNING) {
+      userOut<true, PL_WARN>() << message << std::endl;
+    }
+    if (mode & WORHP_PRINT_ERROR) {
+      userOut<true, PL_WARN>() << message << std::endl;
+    }
+  }
+
   void WorhpInterface::init_memory(void* mem) const {
     Nlpsol::init_memory(mem);
     auto m = static_cast<WorhpMemory*>(mem);
+
+    SetWorhpPrint(&worhp_print);
+
+    WorhpPreInit(&m->worhp_o, &m->worhp_w, &m->worhp_p, &m->worhp_c);
 
     // Initialize parameters to default values
     int status;
@@ -147,6 +164,7 @@ namespace casadi {
       WorhpSetIntParam(&m->worhp_p, op.first.c_str(), op.second);
     }
 
+
     // Mark the parameters as set
     m->worhp_p.initialised = true;
   }
@@ -158,19 +176,18 @@ namespace casadi {
     // Set work in base classes
     Nlpsol::set_work(mem, arg, res, iw, w);
 
+    // Free existing Worhp memory (except parameters)
+    m->worhp_p.initialised = false; // Avoid freeing the memory for parameters
+    if (m->worhp_o.initialised || m->worhp_w.initialised || m->worhp_c.initialised) {
+      WorhpFree(&m->worhp_o, &m->worhp_w, &m->worhp_p, &m->worhp_c);
+    }
+    m->worhp_p.initialised = true;
+
     // Number of (free) variables
     m->worhp_o.n = nx_;
 
     // Number of constraints
     m->worhp_o.m = ng_;
-
-    // Free existing Worhp memory (except parameters)
-    bool p_init_backup = m->worhp_p.initialised;
-    m->worhp_p.initialised = false; // Avoid freeing the memory for parameters
-    if (m->worhp_o.initialised || m->worhp_w.initialised || m->worhp_c.initialised) {
-      WorhpFree(&m->worhp_o, &m->worhp_w, &m->worhp_p, &m->worhp_c);
-    }
-    m->worhp_p.initialised = p_init_backup;
 
     /// Control data structure needs to be reset every time
     m->worhp_c.initialised = false;
@@ -317,7 +334,7 @@ namespace casadi {
             m->iter = m->worhp_w.MajorIter;
             m->iter_sqp = m->worhp_w.MinorIter;
             m->inf_pr = m->worhp_w.NormMax_CV;
-            m->inf_du = m->worhp_w.ScaledKKT;
+            m->inf_du = m->worhp_p.ScaledKKT;
             m->alpha_pr = m->worhp_w.ArmijoAlpha;
 
             // Inputs
@@ -341,7 +358,7 @@ namespace casadi {
             m->fstats.at("callback_fun").toc();
             int ret = static_cast<int>(ret_double);
 
-            if (ret) m->worhp_c.status = TerminatedByUser;
+            if (ret) m->worhp_c.status = TerminateError;
           }
         }
 
@@ -440,36 +457,40 @@ namespace casadi {
     switch (flag) {
     case TerminateSuccess: return "TerminateSuccess";
     case OptimalSolution: return "OptimalSolution";
+    case OptimalSolutionConstantF: return "OptimalSolutionConstantF";
     case SearchDirectionZero: return "SearchDirectionZero";
     case SearchDirectionSmall: return "SearchDirectionSmall";
-    case StationaryPointFound: return "StationaryPointFound";
-    case AcceptablePrevious: return "AcceptablePrevious";
     case FritzJohn: return "FritzJohn";
     case NotDiffable: return "NotDiffable";
     case Unbounded: return "Unbounded";
     case FeasibleSolution: return "FeasibleSolution";
     case LowPassFilterOptimal: return "LowPassFilterOptimal";
     case LowPassFilterAcceptable: return "LowPassFilterAcceptable";
+    case AcceptableSolution: return "AcceptableSolution";
+    case AcceptablePrevious: return "AcceptablePrevious";
+    case AcceptableSolutionConstantF: return "AcceptableSolutionConstantF";
+    case AcceptablePreviousConstantF: return "AcceptablePreviousConstantF";
+    case AcceptableSolutionSKKT: return "AcceptableSolutionSKKT";
+    case AcceptableSolutionScaled: return "AcceptableSolutionScaled";
+    case AcceptablePreviousScaled: return "AcceptablePreviousScaled";
     case TerminateError: return "TerminateError";
-    case InitError: return "InitError";
-    case DataError: return "DataError";
     case MaxCalls: return "MaxCalls";
     case MaxIter: return "MaxIter";
-    case MinimumStepsize: return "MinimumStepsize";
-    case QPerror: return "QPerror";
-    case ProblemInfeasible: return "ProblemInfeasible";
-    case GroupsComposition: return "GroupsComposition";
-    case TooBig: return "TooBig";
     case Timeout: return "Timeout";
-    case FDError: return "FDError";
-    case LocalInfeas: return "LocalInfeas";
+    case TooBig: return "TooBig";
+    case evalsNaN: return "evalsNaN";
+    case DivergingPrimal: return "DivergingPrimal";
+    case DivergingDual: return "DivergingDual";
+    case MinimumStepsize: return "MinimumStepsize";
+    case RegularizationFailed: return "RegularizationFailed";
+    case InitError: return "InitError";
+    case DataError: return "DataError";
+    case RestartError: return "RestartError";
+    case QPerror: return "QPerror";
+    case LinearSolverFailed: return "LinearSolverFailed";
+    case TerminatedByCheckFD: return "TerminatedByCheckFD";
     case LicenseError: return "LicenseError";
-    case TerminatedByUser: return "TerminatedByUser";
-    case FunctionErrorF: return "FunctionErrorF";
-    case FunctionErrorG: return "FunctionErrorG";
-    case FunctionErrorDF: return "FunctionErrorDF";
-    case FunctionErrorDG: return "FunctionErrorDG";
-    case FunctionErrorHM: return "FunctionErrorHM";
+    case Debug: return "Debug";
     }
     return "Unknown WORHP return code";
   }

@@ -36,6 +36,7 @@ namespace casadi {
     plugin->name = "gurobi";
     plugin->doc = GurobiInterface::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
+    plugin->options = &GurobiInterface::options_;
     return 0;
   }
 

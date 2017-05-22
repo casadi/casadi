@@ -47,6 +47,7 @@ namespace casadi {
     plugin->name = "ipopt";
     plugin->doc = IpoptInterface::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
+    plugin->options = &IpoptInterface::options_;
     return 0;
   }
 
@@ -440,11 +441,8 @@ namespace casadi {
         return 1;
       }
     } catch(exception& ex) {
-      if (iteration_callback_ignore_errors_) {
-        userOut<true, PL_WARN>() << "intermediate_callback: " << ex.what() << endl;
-      } else {
-        throw ex;
-      }
+      userOut<true, PL_WARN>() << "intermediate_callback: " << ex.what() << endl;
+      if (iteration_callback_ignore_errors_) return 0;
       return 1;
     }
   }

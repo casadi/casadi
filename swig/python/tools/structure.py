@@ -27,6 +27,7 @@ from casadi import *
 import numpy as np
 import operator
 import sys
+import copy
 
 import __builtin__
 
@@ -885,7 +886,7 @@ class CasadiStructured(Structured,CasadiStructureDerivable):
     self.__init__(cs,order=state["order"])
 
   def __getstate__(self):
-    d = self.struct.__getstate__()
+    d = copy.deepcopy(self.struct.__getstate__())
     d["order"] = self.order
     return d
 
@@ -1033,7 +1034,7 @@ class DMStruct(MatrixStruct):
     self.__init__(cs,data=state["master"])
 
   def __getstate__(self):
-    d = self.struct.__getstate__()
+    d = copy.deepcopy(self.struct.__getstate__())
     d["master"] = self.master
     return d
 

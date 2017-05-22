@@ -37,6 +37,10 @@ namespace casadi {
                      double *h, int ldh1, int ldh2, double* z, int ldz1, int ldz2, double* wr,
                      double *wi, double * dwork=0, int ldwork=0);
 
+  int slicot_mb05nd(int n, double delta, const double* a, int lda,
+                     double* ex, int ldex, double * exint, int ldexin,
+                     double tol, int* iwork, double * dwork, int ldwork);
+
 } // namespace casadi
 
 /// \endcond

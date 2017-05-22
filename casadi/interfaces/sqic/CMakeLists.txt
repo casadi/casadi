@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION 2.8.6)
 
-include_directories(../)
 include_directories(${SQIC_INCLUDE_DIR})
 
 embed_resource("sqic" "wsqic.f90" resource_file)

@@ -90,6 +90,19 @@ namespace casadi {
     dense_mul_nn_stride(n, m, l, A, B, C, n, l, n);
   }
 
+  //  A : n-by-l   B: l-by-m
+  //  C = A*B
+  inline void dense_mul_nn2(int n, int m, int l, const double *A, const double *B, double *C) {
+    for (int i=0;i<n;++i) {
+      for (int j=0;j<m;++j) {
+        for (int k=0;k<l;++k) {
+          C[i + n*j] += A[i + n*k]*B[k + l*j];
+        }
+      }
+    }
+    //dense_mul_nn_stride(m, n, l, B, A, C, l, n, n);
+  }
+
   //  A : l-by-n   B: l-by-m
   //  C = A'*B
   inline void dense_mul_tn(int n, int m, int l, const double *A, const double *B, double *C) {

@@ -2420,6 +2420,7 @@ def veccat(*args): return _veccat(args)
 def vertcat(*args): return _vertcat(args)
 def horzcat(*args): return _horzcat(args)
 def diagcat(*args): return _diagcat(args)
+def vvcat(args): return _veccat(args)
 def vcat(args): return _vertcat(args)
 def hcat(args): return _horzcat(args)
 def dcat(args): return _diagcat(args)
@@ -2450,6 +2451,7 @@ def dcat(args): return _diagcat(args)
 %rename(uplus) operator+;
 %feature("varargin","1") casadi_vertcat;
 %feature("varargin","1") casadi_horzcat;
+%feature("varargin","1") casadi_diagcat;
 %feature("varargin","1") casadi_veccat;
 %feature("optionalunpack","1") size;
 
@@ -2638,6 +2640,29 @@ class NZproxy:
       return n==1 ? $self->numel() : i==1 ? $self->size1() : $self->size2();
     }
 
+
+    // Needed for brace syntax to access nonzeros
+    int numel(int k) const {
+      return 1;
+    }
+
+    // Needed for brace syntax to access nonzeros
+    int numel(char rr) const {
+      casadi_assert(rr==':');
+      return 1;
+    }
+
+    // Needed for brace syntax to access nonzeros
+    int numel(const std::vector<int> &k) const {
+      return 1;
+    }
+
+    // Needed because original numel call gets hidden by the above extend overloads
+    int numel() const {
+      return $self->numel();
+    }
+
+
     // Transpose using the A' syntax in addition to A.'
     Type ctranspose() const { return $self->T();}
 
@@ -2661,7 +2686,6 @@ class NZproxy:
 
 %include <casadi/core/shared_object.hpp>
 %include <casadi/core/std_vector_tools.hpp>
-%include <casadi/core/weak_ref.hpp>
 %include <casadi/core/casadi_types.hpp>
 %include <casadi/core/generic_type.hpp>
 %include <casadi/core/calculus.hpp>
@@ -2985,12 +3009,12 @@ DECL M casadi_project(const M& A, const Sparsity& sp, bool intersect=false) {
 }
 
 DECL M casadi_if_else(const M& cond, const M& if_true,
-                    const M& if_false, bool short_circuit=true) {
+                    const M& if_false, bool short_circuit=false) {
   return if_else(cond, if_true, if_false, short_circuit);
 }
 
 DECL M casadi_conditional(const M& ind, const std::vector< M > &x,
-                        const M& x_default, bool short_circuit=true) {
+                        const M& x_default, bool short_circuit=false) {
   return conditional(ind, x, x_default, short_circuit);
 }
 
@@ -3017,12 +3041,24 @@ DECL M casadi_pinv(const M& A, const std::string& lsolver,
   return pinv(A, lsolver, opts);
 }
 
-DECL M casadi_jacobian(const M &ex, const M &arg) {
-  return jacobian(ex, arg);
+DECL M casadi_expm_const(const M& A, const M& t) {
+  return expm_const(A, t);
+}
+
+DECL M casadi_expm(const M& A) {
+  return expm(A);
+}
+
+DECL M casadi_jacobian(const M &ex, const M &arg, const Dict& opts=Dict()) {
+  return jacobian(ex, arg, opts);
 }
 
 DECL M casadi_jtimes(const M& ex, const M& arg, const M& v, bool tr=false) {
   return jtimes(ex, arg, v, tr);
+}
+
+DECL M casadi_linearize(const M& f, const M& x, const M& x0) {
+  return linearize(f, x, x0);
 }
 
 DECL std::vector<bool> casadi_which_depends(const M& expr, const M& var,
@@ -3053,7 +3089,16 @@ DECL std::string casadi_print_operator(const M& xb,
 DECL M casadi_repsum(const M& A, int n, int m=1) {
   return repsum(A, n, m);
 }
-
+DECL M casadi_einstein(const M& A, const M& B, const M& C,
+  const std::vector<int>& dim_a, const std::vector<int>& dim_b, const std::vector<int>& dim_c,
+  const std::vector<int>& a, const std::vector<int>& b, const std::vector<int>& c) {
+  return einstein(A, B, C, dim_a, dim_b, dim_c, a, b, c);
+}
+DECL M casadi_einstein(const M& A, const M& B,
+  const std::vector<int>& dim_a, const std::vector<int>& dim_b, const std::vector<int>& dim_c,
+  const std::vector<int>& a, const std::vector<int>& b, const std::vector<int>& c) {
+  return einstein(A, B, dim_a, dim_b, dim_c, a, b, c);
+}
 #endif // FLAG & IS_MEMBER
 
 #if FLAG & IS_GLOBAL
@@ -3521,7 +3566,7 @@ namespace casadi{
 } // namespace casadi
 #endif // SWIGPYTHON
 
-%include <casadi/core/sx/sx_elem.hpp>
+%include <casadi/core/sx_elem.hpp>
 
 #ifdef SWIGPYTHON
 %extend casadi::Sparsity{
@@ -3579,7 +3624,7 @@ namespace casadi {
    %template(SX) Matrix<double>;
 };
 
-%include <casadi/core/mx/mx.hpp>
+%include <casadi/core/mx.hpp>
 
 %extend casadi::MX{
   %matrix_helpers(casadi::MX)
@@ -3641,7 +3686,7 @@ def PyFunction(name, obj, inputs, outputs, opts={}):
 %}
 #endif
 
-%include <casadi/core/function/function.hpp>
+%include <casadi/core/function.hpp>
 #ifdef SWIGPYTHON
 namespace casadi{
 %extend Function {
@@ -3674,6 +3719,8 @@ namespace casadi{
     function varargout = subsref(self,s)
       if numel(s)==1 && strcmp(s.type,'()')
         [varargout{1}] = paren(self, s.subs{:});
+      elseif numel(s)==1 && strcmp(s.type,'{}')
+        [varargout{1}] = brace(self, s.subs{:});
       else
         [varargout{1:nargout}] = builtin('subsref',self,s);
       end
@@ -3681,6 +3728,8 @@ namespace casadi{
     function self = subsasgn(self,s,v)
       if numel(s)==1 && strcmp(s.type,'()')
         paren_asgn(self, v, s.subs{:});
+      elseif numel(s)==1 && strcmp(s.type,'{}')
+        brace_asgn(self, v, s.subs{:});
       else
         self = builtin('subsasgn',self,s,v);
       end
@@ -3789,18 +3838,19 @@ namespace casadi{
  }
 }
 #endif // SWIGMATLAB
-%include <casadi/core/function/external.hpp>
-%include <casadi/core/function/jit.hpp>
-%include <casadi/core/function/integrator.hpp>
-%include <casadi/core/function/conic.hpp>
-%include <casadi/core/function/nlpsol.hpp>
-%include <casadi/core/function/rootfinder.hpp>
-%include <casadi/core/function/linsol.hpp>
-%include <casadi/core/function/dple.hpp>
-%include <casadi/core/function/interpolant.hpp>
+%include <casadi/core/external.hpp>
+%include <casadi/core/jit.hpp>
+%include <casadi/core/integrator.hpp>
+%include <casadi/core/conic.hpp>
+%include <casadi/core/nlpsol.hpp>
+%include <casadi/core/rootfinder.hpp>
+%include <casadi/core/linsol.hpp>
+%include <casadi/core/dple.hpp>
+%include <casadi/core/expm.hpp>
+%include <casadi/core/interpolant.hpp>
 
 %feature("copyctor", "0") casadi::CodeGenerator;
-%include <casadi/core/function/code_generator.hpp>
+%include <casadi/core/code_generator.hpp>
 
 #ifdef SWIGMATLAB
 // Wrap (static) member functions
@@ -3942,15 +3992,15 @@ namespace casadi {
 
 %feature("director") casadi::Callback;
 
-%include <casadi/core/function/importer.hpp>
-%include <casadi/core/function/callback.hpp>
+%include <casadi/core/importer.hpp>
+%include <casadi/core/callback.hpp>
 %include <casadi/core/global_options.hpp>
 %include <casadi/core/casadi_meta.hpp>
-%include <casadi/core/misc/integration_tools.hpp>
-%include <casadi/core/misc/nlp_builder.hpp>
-%include <casadi/core/misc/variable.hpp>
-%include <casadi/core/misc/dae_builder.hpp>
-%include <casadi/core/misc/xml_file.hpp>
+%include <casadi/core/integration_tools.hpp>
+%include <casadi/core/nlp_builder.hpp>
+%include <casadi/core/variable.hpp>
+%include <casadi/core/dae_builder.hpp>
+%include <casadi/core/xml_file.hpp>
 
 // Cleanup for dependent modules
 %exception {

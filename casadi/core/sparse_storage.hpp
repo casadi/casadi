@@ -29,13 +29,14 @@
 #include <vector>
 #include <typeinfo>
 #include "exception.hpp"
+#include "sparsity.hpp"
 
 /// \cond INTERNAL
 
 namespace casadi {
 
   template<typename DataType>
-  class CASADI_EXPORT SparseStorage {
+  class SparseStorage {
   public:
 
     /** \brief  constructors */
@@ -52,12 +53,6 @@ namespace casadi {
 
     /// Assignment (normal)
     SparseStorage<DataType>& operator=(const SparseStorage<DataType>& m);
-
-    /// Convert to scalar type
-    const DataType scalar() const;
-
-    /// Scalar type
-    typedef DataType ScalarType;
 
     /// get a reference to an element
     DataType& elem(int rr, int cc);
@@ -79,9 +74,6 @@ namespace casadi {
 
     /// Const access the sparsity - reference to data member
     const Sparsity& sparsity() const { return sparsity_; }
-
-    /// Access the sparsity, make a copy if there are multiple references to it
-    Sparsity& sparsityRef();
 
   private:
     /// Sparsity of the matrix in a compressed column storage (CCS) format

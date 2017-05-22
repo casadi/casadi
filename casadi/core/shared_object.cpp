@@ -22,27 +22,18 @@
  *
  */
 
-
-#include "shared_object.hpp"
-#include "weak_ref.hpp"
-
+#include "shared_object_internal.hpp"
+#include "sparse_storage_impl.hpp"
 #include <typeinfo>
 
 using namespace std;
 namespace casadi {
 
+  // Instantiate templates
+  template class SparseStorage<WeakRef>;
+
   SharedObject::SharedObject() {
     node = 0;
-  }
-
-  SharedObjectNode::SharedObjectNode(const SharedObjectNode& node) {
-    count = 0; // reference counter is _not_ copied
-    weak_ref_ = 0; // nor will they have the same weak references
-  }
-
-  SharedObjectNode& SharedObjectNode::operator=(const SharedObjectNode& node) {
-    // do _not_ copy the reference counter
-    return *this;
   }
 
   SharedObject::SharedObject(const SharedObject& ref) {
@@ -54,13 +45,13 @@ namespace casadi {
     count_down();
   }
 
-  void SharedObject::assignNode(SharedObjectNode* node_) {
+  void SharedObject::assignNode(SharedObjectInternal* node_) {
     count_down();
     node = node_;
     count_up();
   }
 
-  void SharedObject::assignNodeNoCount(SharedObjectNode* node_) {
+  void SharedObject::assignNodeNoCount(SharedObjectInternal* node_) {
     node = node_;
   }
 
@@ -77,7 +68,7 @@ namespace casadi {
     return *this;
   }
 
-  SharedObjectNode* SharedObject::get() const {
+  SharedObjectInternal* SharedObject::get() const {
     return node;
   }
 
@@ -96,28 +87,9 @@ namespace casadi {
     }
   }
 
-  SharedObjectNode* SharedObject::operator->() const {
+  SharedObjectInternal* SharedObject::operator->() const {
     casadi_assert(!is_null());
     return node;
-  }
-
-  SharedObjectNode::SharedObjectNode() {
-    count = 0;
-    weak_ref_ = 0;
-  }
-
-  SharedObjectNode::~SharedObjectNode() {
-    #ifdef WITH_REFCOUNT_WARNINGS
-    if (count!=0) {
-      // Note that casadi_assert_warning cannot be used in destructors
-      std::cerr << "Reference counting failure." <<
-                   "Possible cause: Circular dependency in user code." << std::endl;
-    }
-    #endif // WITH_REFCOUNT_WARNINGS
-    if (weak_ref_!=0) {
-      weak_ref_->kill();
-      delete weak_ref_;
-    }
   }
 
   void SharedObject::repr(std::ostream &stream, bool trailing_newline) const {
@@ -127,11 +99,6 @@ namespace casadi {
       (*this)->repr(stream);
     }
     if (trailing_newline) stream << std::endl;
-  }
-
-  void SharedObjectNode::repr(std::ostream &stream) const {
-    // Print description by default
-    print(stream);
   }
 
   void SharedObject::print(std::ostream &stream, bool trailing_newline) const {
@@ -147,11 +114,6 @@ namespace casadi {
     stream << node;
   }
 
-  void SharedObjectNode::print(std::ostream &stream) const {
-    // Print the name of the object by default
-    stream << typeid(this).name();
-  }
-
   void SharedObject::swap(SharedObject& other) {
     SharedObject temp = *this;
     *this = other;
@@ -162,23 +124,48 @@ namespace casadi {
     return (*this)->getCount();
   }
 
-  int SharedObjectNode::getCount() const {
-    return count;
-  }
-
   WeakRef* SharedObject::weak() {
     return (*this)->weak();
   }
 
-  WeakRef* SharedObjectNode::weak() {
-    if (weak_ref_==0) {
-      weak_ref_ = new WeakRef(this);
-    }
-    return weak_ref_;
-  }
-
   size_t SharedObject::__hash__() const {
     return reinterpret_cast<size_t>(get());
+  }
+
+  WeakRef::WeakRef(int dummy) {
+    casadi_assert(dummy==0);
+  }
+
+  bool WeakRef::alive() const {
+    return !is_null() && (*this)->raw_ != 0;
+  }
+
+  SharedObject WeakRef::shared() {
+    SharedObject ret;
+    if (alive()) {
+      ret.assignNode((*this)->raw_);
+    }
+    return ret;
+  }
+
+  const WeakRefInternal* WeakRef::operator->() const {
+    return static_cast<const WeakRefInternal*>(SharedObject::operator->());
+  }
+
+  WeakRefInternal* WeakRef::operator->() {
+    return static_cast<WeakRefInternal*>(SharedObject::operator->());
+  }
+
+  WeakRef::WeakRef(SharedObject shared) {
+    assignNode(shared.weak()->get());
+  }
+
+  WeakRef::WeakRef(SharedObjectInternal* raw) {
+    assignNode(new WeakRefInternal(raw));
+  }
+
+  void WeakRef::kill() {
+    (*this)->raw_ = 0;
   }
 
 } // namespace casadi

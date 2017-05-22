@@ -140,7 +140,7 @@ class Integrationtests(casadiTestCase):
     # This test is not automized, but works by inspection only.
     # To activate, recompile after ucnommenting the printout lines in cvodes.c, near "Used for validating casadi#536"
     #return
-    DM.setPrecision(18)
+    DM.set_precision(18)
 
     tstart = SX.sym("tstart")
     tend = SX.sym("tend")
@@ -734,7 +734,7 @@ class Integrationtests(casadiTestCase):
     tend=num['tend']
     q0=num['q0']
     p=num['p']
-    self.assertAlmostEqual(H_out[0][0],(q0*tend**6*exp(tend**3/(3*p)))/(9*p**4)+(2*q0*tend**3*exp(tend**3/(3*p)))/(3*p**3),9,"Evaluation output mismatch")
+    self.assertAlmostEqual(H_out[0][0],(q0*tend**6*exp(tend**3/(3*p)))/(9*p**4)+(2*q0*tend**3*exp(tend**3/(3*p)))/(3*p**3),8,"Evaluation output mismatch")
 
   def test_glibcbug(self):
     self.message("former glibc error")

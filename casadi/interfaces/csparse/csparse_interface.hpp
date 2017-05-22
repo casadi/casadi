@@ -34,7 +34,7 @@
 
 /// \cond INTERNAL
 #include <cs.h>
-#include "casadi/core/function/linsol_internal.hpp"
+#include "casadi/core/linsol_internal.hpp"
 #include <casadi/interfaces/csparse/casadi_linsol_csparse_export.h>
 
 namespace casadi {
@@ -71,37 +71,37 @@ namespace casadi {
     }
 
     // Destructor
-    virtual ~CsparseInterface();
+    ~CsparseInterface() override;
 
     // Initialize the solver
-    virtual void init(const Dict& opts);
+    void init(const Dict& opts) override;
 
     /** \brief Create memory block */
-    virtual void* alloc_memory() const { return new CsparseMemory();}
+    void* alloc_memory() const override { return new CsparseMemory();}
 
     /** \brief Free memory block */
-    virtual void free_memory(void *mem) const { delete static_cast<CsparseMemory*>(mem);}
+    void free_memory(void *mem) const override { delete static_cast<CsparseMemory*>(mem);}
 
     /** \brief Initalize memory block */
-    virtual void init_memory(void* mem) const;
+    void init_memory(void* mem) const override;
 
     // Set sparsity pattern
-    virtual void reset(void* mem, const int* sp) const;
+    void reset(void* mem, const int* sp) const override;
 
     // Symbolic factorization
-    virtual void pivoting(void* mem, const double* A) const;
+    void pivoting(void* mem, const double* A) const override;
 
     // Factorize the linear system
-    virtual void factorize(void* mem, const double* A) const;
+    void factorize(void* mem, const double* A) const override;
 
     // Solve the linear system
-    virtual void solve(void* mem, double* x, int nrhs, bool tr) const;
+    void solve(void* mem, double* x, int nrhs, bool tr) const override;
 
     /// A documentation string
     static const std::string meta_doc;
 
     // Get name of the plugin
-    virtual const char* plugin_name() const { return "csparse";}
+    const char* plugin_name() const override { return "csparse";}
   };
 
 } // namespace casadi

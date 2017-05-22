@@ -46,6 +46,7 @@ namespace casadi {
     plugin->name = "bonmin";
     plugin->doc = BonminInterface::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
+    plugin->options = &BonminInterface::options_;
     return 0;
   }
 
@@ -232,46 +233,20 @@ namespace casadi {
     }
   }
 
-  inline const char* return_status_string(Ipopt::ApplicationReturnStatus status) {
+  inline const char* return_status_string(Bonmin::TMINLP::SolverReturn status) {
     switch (status) {
-    case Solve_Succeeded:
-      return "Solve_Succeeded";
-    case Solved_To_Acceptable_Level:
-      return "Solved_To_Acceptable_Level";
-    case Infeasible_Problem_Detected:
-      return "Infeasible_Problem_Detected";
-    case Search_Direction_Becomes_Too_Small:
-      return "Search_Direction_Becomes_Too_Small";
-    case Diverging_Iterates:
-      return "Diverging_Iterates";
-    case User_Requested_Stop:
-      return "User_Requested_Stop";
-    case Maximum_Iterations_Exceeded:
-      return "Maximum_Iterations_Exceeded";
-    case Restoration_Failed:
-      return "Restoration_Failed";
-    case Error_In_Step_Computation:
-      return "Error_In_Step_Computation";
-    case Not_Enough_Degrees_Of_Freedom:
-      return "Not_Enough_Degrees_Of_Freedom";
-    case Invalid_Problem_Definition:
-      return "Invalid_Problem_Definition";
-    case Invalid_Option:
-      return "Invalid_Option";
-    case Invalid_Number_Detected:
-      return "Invalid_Number_Detected";
-    case Unrecoverable_Exception:
-      return "Unrecoverable_Exception";
-    case NonIpopt_Exception_Thrown:
-      return "NonIpopt_Exception_Thrown";
-    case Insufficient_Memory:
-      return "Insufficient_Memory";
-    case Internal_Error:
-      return "Internal_Error";
-    case Maximum_CpuTime_Exceeded:
-      return "Maximum_CpuTime_Exceeded";
-    case Feasible_Point_Found:
-      return "Feasible_Point_Found";
+    case Bonmin::TMINLP::MINLP_ERROR:
+      return "MINLP_ERROR";
+    case Bonmin::TMINLP::SUCCESS:
+      return "SUCCESS";
+    case Bonmin::TMINLP::INFEASIBLE:
+      return "INFEASIBLE";
+    case Bonmin::TMINLP::CONTINUOUS_UNBOUNDED:
+      return "CONTINUOUS_UNBOUNDED";
+    case Bonmin::TMINLP::LIMIT_EXCEEDED:
+      return "LIMIT_EXCEEDED";
+    case Bonmin::TMINLP::USER_INTERRUPT:
+      return "USER_INTERRUPT";
     }
     return "Unknown";
   }
@@ -286,18 +261,18 @@ namespace casadi {
   public:
     BonMinMessageHandler(): CoinMessageHandler() { }
     /// Core of the class: the method that directs the messages
-    virtual int print() {
+    int print() override {
       userOut() << messageBuffer_ << std::endl;
       return 0;
     }
-    virtual ~BonMinMessageHandler() { }
+    ~BonMinMessageHandler() override { }
     BonMinMessageHandler(const BonMinMessageHandler &other): CoinMessageHandler(other) {}
     BonMinMessageHandler(const CoinMessageHandler &other): CoinMessageHandler(other) {}
     BonMinMessageHandler & operator=(const BonMinMessageHandler &rhs) {
       BonMinMessageHandler::operator=(rhs);
       return *this;
     }
-    virtual CoinMessageHandler* clone() const {
+    CoinMessageHandler* clone() const override {
       return new BonMinMessageHandler(*this);
     }
   };
@@ -350,6 +325,39 @@ namespace casadi {
     options->SetRegisteredOptions(roptions);
     bonmin.setOptionsAndJournalist(roptions, options, journalist);
     bonmin.registerOptions();
+    // Get all options available in BONMIN
+    auto regops = bonmin.roptions()->RegisteredOptionsList();
+
+    // Pass all the options to BONMIN
+    for (auto&& op : opts_) {
+      // Find the option
+      auto regops_it = regops.find(op.first);
+      if (regops_it==regops.end()) {
+        casadi_error("No such BONMIN option: " + op.first);
+      }
+
+      // Get the type
+      Ipopt::RegisteredOptionType ipopt_type = regops_it->second->Type();
+
+      // Pass to BONMIN
+      bool ret;
+      switch (ipopt_type) {
+      case Ipopt::OT_Number:
+        ret = bonmin.options()->SetNumericValue(op.first, op.second.to_double(), false);
+        break;
+      case Ipopt::OT_Integer:
+        ret = bonmin.options()->SetIntegerValue(op.first, op.second.to_int(), false);
+        break;
+      case Ipopt::OT_String:
+        ret = bonmin.options()->SetStringValue(op.first, op.second.to_string(), false);
+        break;
+      case Ipopt::OT_Unknown:
+      default:
+        casadi_warning("Cannot handle option \"" + op.first + "\", ignored");
+        continue;
+      }
+      if (!ret) casadi_error("Invalid options were detected by BONMIN.");
+    }
 
     // Initialize
     bonmin.initialize(GetRawPtr(tminlp));
@@ -362,7 +370,6 @@ namespace casadi {
       bb(bonmin);
     }
 
-    //m->return_status = return_status_string(status);
     m->fstats.at("mainloop").toc();
 
     // Save results to outputs
@@ -448,7 +455,8 @@ namespace casadi {
   }
 
   void BonminInterface::
-  finalize_solution(BonminMemory* m, const double* x, double obj_value) const {
+  finalize_solution(BonminMemory* m, TMINLP::SolverReturn status,
+      const double* x, double obj_value) const {
     try {
       // Get primal solution
       casadi_copy(x, nx_, m->xk);
@@ -471,6 +479,9 @@ namespace casadi {
 
       // Get statistics
       m->iter_count = 0;
+
+      // Interpret return code
+      m->return_status = return_status_string(status);
 
     } catch(exception& ex) {
       userOut<true, PL_WARN>() << "finalize_solution failed: " << ex.what() << endl;

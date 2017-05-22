@@ -26,7 +26,7 @@
 #ifndef CASADI_SQPMETHOD_HPP
 #define CASADI_SQPMETHOD_HPP
 
-#include "casadi/core/function/nlpsol_impl.hpp"
+#include "casadi/core/nlpsol_impl.hpp"
 #include <deque>
 
 #include <casadi/solvers/nlpsol/casadi_nlpsol_sqpmethod_export.h>
@@ -99,10 +99,10 @@ namespace casadi {
     Function hess_l_fcn_;
 
     explicit Sqpmethod(const std::string& name, const Function& nlp);
-    virtual ~Sqpmethod();
+    ~Sqpmethod() override;
 
-  // Get name of the plugin
-  virtual const char* plugin_name() const { return "sqpmethod";}
+    // Get name of the plugin
+    const char* plugin_name() const override { return "sqpmethod";}
 
     /** \brief  Create a new NLP Solver */
     static Nlpsol* creator(const std::string& name, const Function& nlp) {
@@ -112,24 +112,24 @@ namespace casadi {
     ///@{
     /** \brief Options */
     static Options options_;
-    virtual const Options& get_options() const { return options_;}
+    const Options& get_options() const override { return options_;}
     ///@}
 
     // Initialize the solver
-    virtual void init(const Dict& opts);
+    void init(const Dict& opts) override;
 
     /** \brief Create memory block */
-    virtual void* alloc_memory() const { return new SqpmethodMemory();}
+    void* alloc_memory() const override { return new SqpmethodMemory();}
 
     /** \brief Free memory block */
-    virtual void free_memory(void *mem) const { delete static_cast<SqpmethodMemory*>(mem);}
+    void free_memory(void *mem) const override { delete static_cast<SqpmethodMemory*>(mem);}
 
     /** \brief Set the (persistent) work vectors */
-    virtual void set_work(void* mem, const double**& arg, double**& res,
-                          int*& iw, double*& w) const;
+    void set_work(void* mem, const double**& arg, double**& res,
+                          int*& iw, double*& w) const override;
 
     // Solve the NLP
-    virtual void solve(void* mem) const;
+    void solve(void* mem) const override;
 
     /// QP solver for the subproblems
     Function qpsol_;
@@ -159,7 +159,7 @@ namespace casadi {
     ///@}
 
     // Print options
-    bool print_header_;
+    bool print_header_, print_iteration_;
 
     /// BFGS update function
     enum BFGSMdoe { BFGS_BK, BFGS_X, BFGS_X_OLD, BFGS_GLAG, BFGS_GLAG_OLD, BFGS_NUM_IN};

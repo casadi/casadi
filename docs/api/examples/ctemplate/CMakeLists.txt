@@ -1,4 +1,4 @@
-if(LAPACK_FOUND AND BLAS_FOUND AND WITH_CSPARSE)
+if(WITH_LAPACK AND WITH_CSPARSE)
 add_executable(ctemplate ctemplate.cpp)
 target_link_libraries(ctemplate
   casadi_integrator_cvodes

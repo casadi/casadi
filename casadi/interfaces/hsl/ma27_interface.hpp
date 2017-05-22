@@ -26,7 +26,7 @@
 #ifndef CASADI_MA27_INTERFACE_HPP
 #define CASADI_MA27_INTERFACE_HPP
 
-#include "casadi/core/function/linsol_internal.hpp"
+#include "casadi/core/linsol_internal.hpp"
 #include <casadi/interfaces/hsl/casadi_linsol_ma27_export.h>
 
 extern "C" {
@@ -123,44 +123,44 @@ namespace casadi {
     }
 
     // Destructor
-    virtual ~Ma27Interface();
+    ~Ma27Interface() override;
 
     // Initialize the solver
-    virtual void init(const Dict& opts);
+    void init(const Dict& opts) override;
 
     /** \brief Create memory block */
-    virtual void* alloc_memory() const { return new Ma27Memory();}
+    void* alloc_memory() const override { return new Ma27Memory();}
 
     /** \brief Free memory block */
-    virtual void free_memory(void *mem) const { delete static_cast<Ma27Memory*>(mem);}
+    void free_memory(void *mem) const override { delete static_cast<Ma27Memory*>(mem);}
 
     /** \brief Initalize memory block */
-    virtual void init_memory(void* mem) const;
+    void init_memory(void* mem) const override;
 
     // Set sparsity pattern
-    virtual void reset(void* mem, const int* sp) const;
+    void reset(void* mem, const int* sp) const override;
 
     // Factorize the linear system
-    virtual void factorize(void* mem, const double* A) const;
+    void factorize(void* mem, const double* A) const override;
 
     /// Number of negative eigenvalues
-    virtual int neig(void* mem) const;
+    int neig(void* mem) const override;
 
     /// Matrix rank
-    virtual int rank(void* mem) const;
+    int rank(void* mem) const override;
 
     // Solve the linear system
-    virtual void solve(void* mem, double* x, int nrhs, bool tr) const;
+    void solve(void* mem, double* x, int nrhs, bool tr) const override;
 
     /// A documentation string
     static const std::string meta_doc;
 
     // Get name of the plugin
-    virtual const char* plugin_name() const { return "ma27";}
+    const char* plugin_name() const override { return "ma27";}
 
     /** \brief Set the (persistent) work vectors */
-    virtual void set_work(void* mem, const double**& arg, double**& res,
-                          int*& iw, double*& w) const;
+    void set_work(void* mem, const double**& arg, double**& res,
+                          int*& iw, double*& w) const override;
   };
 
 } // namespace casadi

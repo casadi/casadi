@@ -27,7 +27,7 @@
 #define CASADI_KINSOL_INTERFACE_HPP
 
 #include <casadi/interfaces/sundials/casadi_rootfinder_kinsol_export.h>
-#include "casadi/core/function/rootfinder_impl.hpp"
+#include "casadi/core/rootfinder_impl.hpp"
 #include <nvector/nvector_serial.h>   /* serial N_Vector types, fcts., and macros */
 #include <sundials/sundials_dense.h>  /* definitions DlsMat DENSE_ELEM */
 #include <sundials/sundials_types.h>  /* definition of type double */
@@ -83,7 +83,7 @@ namespace casadi {
     explicit KinsolInterface(const std::string& name, const Function& f);
 
     /** \brief  Destructor */
-    virtual ~KinsolInterface();
+    ~KinsolInterface() override;
 
     /** \brief  Create a new Rootfinder */
     static Rootfinder* creator(const std::string& name, const Function& f) {
@@ -93,17 +93,17 @@ namespace casadi {
     ///@{
     /** \brief Options */
     static Options options_;
-    virtual const Options& get_options() const { return options_;}
+    const Options& get_options() const override { return options_;}
     ///@}
 
     /** \brief  Initialize stage */
-    virtual void init(const Dict& opts);
+    void init(const Dict& opts) override;
 
     /// Solve the system of equations and calculate derivatives
-    virtual void solve(void* mem) const;
+    void solve(void* mem) const override;
 
     // Get name of the plugin
-    virtual const char* plugin_name() const { return "kinsol";}
+    const char* plugin_name() const override { return "kinsol";}
 
     // Scaling
     N_Vector u_scale_, f_scale_;
@@ -153,17 +153,17 @@ namespace casadi {
     static const std::string meta_doc;
 
     /** \brief Create memory block */
-    virtual void* alloc_memory() const { return new KinsolMemory(*this);}
+    void* alloc_memory() const override { return new KinsolMemory(*this);}
 
     /** \brief Free memory block */
-    virtual void free_memory(void *mem) const { delete static_cast<KinsolMemory*>(mem);}
+    void free_memory(void *mem) const override { delete static_cast<KinsolMemory*>(mem);}
 
     /** \brief Initalize memory block */
-    virtual void init_memory(void* mem) const;
+    void init_memory(void* mem) const override;
 
     /** \brief Set the (persistent) work vectors */
-    virtual void set_work(void* mem, const double**& arg, double**& res,
-                          int*& iw, double*& w) const;
+    void set_work(void* mem, const double**& arg, double**& res,
+                          int*& iw, double*& w) const override;
 
     /** \brief Cast to memory object */
     static KinsolMemory* to_mem(void *mem) {

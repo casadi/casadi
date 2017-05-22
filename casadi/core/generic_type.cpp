@@ -28,7 +28,7 @@
 #include "exception.hpp"
 #include <cmath>
 
-#include "function/function.hpp"
+#include "function.hpp"
 
 using namespace std;
 

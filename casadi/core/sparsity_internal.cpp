@@ -71,15 +71,9 @@ namespace casadi {
     // Print dimensions
     stream << size1() << "x" << size2();
 
-    // Print shape
-    if (is_empty()) {
-      // Print nothing, shape clear anyway
-    } else if (is_dense()) {
-      stream << ", dense";
-    } else if (is_diag()) {
-      stream << ", diagonal";
-    } else {
-      stream << ", " << nnz() << " nnz";
+    // Print shape unless dense
+    if (!is_dense()) {
+      stream << "," << nnz() << "nz";
     }
   }
 
@@ -1919,7 +1913,7 @@ namespace casadi {
     return ss.str();
   }
 
-  std::string SparsityInternal::repr(int k) const {
+  std::string SparsityInternal::repr_el(int k) const {
     std::stringstream ss;
     if (numel()!=nnz()) {
       ss << "nonzero index " << k << " ";

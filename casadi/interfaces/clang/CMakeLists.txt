@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.6)
-include_directories(${CLANG_INCLUDE_DIR})
+include_directories(SYSTEM ${CLANG_INCLUDE_DIR})
 add_definitions(${CLANG_DEFINITIONS})
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CLANG_CXX_FLAGS}")
 
@@ -58,15 +58,5 @@ endif()
 file(COPY ${SYSTEM_FILE} ${CSYSTEM_FILE} ${CXXSYSTEM_FILE}
      DESTINATION ${LIBRARY_OUTPUT_PATH}/casadi/jit)
 
-if(WITH_SELFCONTAINED)
-if (WITH_MATLAB OR WITH_OCTAVE)
 install(DIRECTORY ${LIBRARY_OUTPUT_PATH}/casadi/jit
-        DESTINATION ${CMAKE_INSTALL_PREFIX}/casadi)
-else()
-install(DIRECTORY ${LIBRARY_OUTPUT_PATH}/casadi/jit
-        DESTINATION ${CMAKE_INSTALL_PREFIX}/casadi/casadi)
-endif()
-else()
-install(DIRECTORY ${LIBRARY_OUTPUT_PATH}/casadi/jit
-        DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/casadi)
-endif()
+        DESTINATION ${LIB_PREFIX}/casadi)

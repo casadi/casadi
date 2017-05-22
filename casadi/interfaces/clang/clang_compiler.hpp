@@ -26,7 +26,7 @@
 #ifndef CASADI_CLANG_COMPILER_HPP
 #define CASADI_CLANG_COMPILER_HPP
 
-#include "casadi/core/function/importer_internal.hpp"
+#include "casadi/core/importer_internal.hpp"
 #include <casadi/interfaces/clang/casadi_importer_clang_export.h>
 
 #include <clang/CodeGen/CodeGenAction.h>
@@ -89,22 +89,22 @@ namespace casadi {
     }
 
     /** \brief Destructor */
-    virtual ~ClangCompiler();
+    ~ClangCompiler() override;
 
     ///@{
     /** \brief Options */
     static Options options_;
-    virtual const Options& get_options() const { return options_;}
+    const Options& get_options() const override { return options_;}
     ///@}
 
     /** \brief Initialize */
-    virtual void init(const Dict& opts);
+    void init(const Dict& opts) override;
 
     /// A documentation string
     static const std::string meta_doc;
 
     /// Get name of plugin
-    virtual const char* plugin_name() const { return "clang";}
+    const char* plugin_name() const override { return "clang";}
 
     /// Get a function pointer for numerical evaluation
     virtual signal_t get_function(const std::string& symname);

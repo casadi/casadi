@@ -26,7 +26,7 @@
 #ifndef CASADI_OOQP_INTERFACE_HPP
 #define CASADI_OOQP_INTERFACE_HPP
 
-#include "casadi/core/function/conic_impl.hpp"
+#include "casadi/core/conic_impl.hpp"
 #include <casadi/interfaces/ooqp/casadi_conic_ooqp_export.h>
 
 /** \defgroup plugin_Conic_ooqp
@@ -60,22 +60,22 @@ namespace casadi {
     }
 
     /** \brief  Destructor */
-    virtual ~OoqpInterface();
+    ~OoqpInterface() override;
 
     // Get name of the plugin
-    virtual const char* plugin_name() const { return "ooqp";}
+    const char* plugin_name() const override { return "ooqp";}
 
     ///@{
     /** \brief Options */
     static Options options_;
-    virtual const Options& get_options() const { return options_;}
+    const Options& get_options() const override { return options_;}
     ///@}
 
     /** \brief  Initialize */
-    virtual void init(const Dict& opts);
+    void init(const Dict& opts) override;
 
     /// Solve the QP
-    virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
+    void eval(void* mem, const double** arg, double** res, int* iw, double* w) const override;
 
     /// Throw error
     static const char* errFlag(int flag);

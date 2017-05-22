@@ -28,6 +28,14 @@ import unittest
 from types import *
 from helpers import *
 
+scipy_interpolate = False
+try:
+  import scipy.interpolate
+  scipy.interpolate.RectBivariateSpline
+  scipy_interpolate = True
+except:
+  pass
+
 class Functiontests(casadiTestCase):
 
   def test_call_empty(self):
@@ -843,28 +851,246 @@ class Functiontests(casadiTestCase):
     self.assertTrue("not symbolic" in s)
 
   def test_1d_interpolant(self):
-    grid = [[0, 1, 2]]
-    values = [0, 1, 2]
+    grid = [[0, 1, 1.5, 2, 3]]
+    values = [0, 1, 2, 5, 3]
     F = interpolant('F', 'linear', grid, values)
     def same(a, b): return abs(float(a)-b)<1e-8
-    self.assertTrue(same(F(2.4), 2.4))
-    self.assertTrue(same(F(1.4), 1.4))
-    self.assertTrue(same(F(0.4), 0.4))
-    self.assertTrue(same(F(-.6), -.6))
+    pairs = [
+      (3.4,3-0.4*2),
+      (2.4,5-0.4*2),
+      (1.6,2+3*0.1/0.5),
+      (1.4,1+0.4/0.5),
+      (0.4,0.4),
+      (-.6,-0.6)
+    ]
+    
+    X = MX.sym("x")
+    
+    J = Function("F",[X],[F(X)])
+    
+    for a,r in pairs:
+      self.assertTrue(same(F(a), r))
+      self.check_codegen(F,inputs=[a])
+
+    
+    X = MX.sym("x")
+    
+    J = Function("F",[X],[jacobian(F(X),X)])
+
+    pairs = [
+      (3.4,-2),
+      (2.4,-2),
+      (1.6,6),
+      (1.4,2),
+      (0.4,1),
+      (-.6,1),
+      
+      (1,2),
+      (0.99,1),
+    ]
+
+    for a,r in pairs:
+      self.assertTrue(same(J(a), r))
+      self.check_codegen(J,inputs=[a])
 
   def test_2d_interpolant(self):
+    grid = [[0, 1, 4, 5],
+            [0, 2, 3]]
+    
+    values = [0,   1,  8,  3,
+              10, -11, 12, 13,
+              20, 31, -42, 53]
+    F = interpolant('F', 'linear', grid, values)
+    
+    
+    a0 = -11+0.4*(31+11)
+    a1 = 12+0.4*(-42-12)
+    pairs = [
+      (vertcat(1,2), -11),
+      (vertcat(1,3), 31),
+      (vertcat(4,2), 12),
+      (vertcat(4,3), -42),
+
+      (vertcat(1,2.4), a0),
+      (vertcat(4,2.4), a1),
+
+      (vertcat(3,2), -11+2.0/3*(12+11)),
+      (vertcat(3,3), 31+2.0/3*(-42-31)),
+      
+      (vertcat(3,2.4), a0+2.0/3*(a1-a0))
+    ]
+    
+    for a,r in pairs:
+      self.checkarray(F(a), r)
+      self.check_codegen(F,inputs=[a])
+
+    
+    X = MX.sym("x",2)
+    
+    J = Function("F",[X],[jacobian(F(X),X)])
+    
+    jx0 = (12+11)/3.0
+    jx1 = (-42-31)/3.0
+    jx2 = (13-12)
+    jx3 = (53+42)
+    
+    jy0 = 31+11
+    jy1 = -42-12
+
+    pairs = [
+      (vertcat(1,2), vertcat(jx0,jy0)),
+      (vertcat(1,3), vertcat(jx1,jy0)),
+      (vertcat(4,2), vertcat(jx2,jy1)),
+      (vertcat(4,3), vertcat(jx3,jy1)),
+
+      (vertcat(1,2.4), vertcat(jx0+(jx1-jx0)*0.4, 31+11)),
+      (vertcat(4,2.4), vertcat(jx2+(jx3-jx2)*0.4, -42-12)),
+
+      (vertcat(3,2), vertcat(jx0,jy0+(jy1-jy0)*2.0/3)),
+      (vertcat(3,3), vertcat(jx1,jy0+(jy1-jy0)*2.0/3)),
+      
+      (vertcat(3,2.4), vertcat(jx0+(jx1-jx0)*0.4,jy0+(jy1-jy0)*2.0/3)),
+      
+    ]
+    
+    for a,r in pairs:
+      self.checkarray(J(a).T, r)
+      self.check_codegen(J,inputs=[a])
+
+  def test_1d_interpolant_uniform(self):
+    grid = [[0, 1, 2]]
+    values = [0, 1, 2]
+    for opts in [{"lookup_mode": ["linear"]},{"lookup_mode": ["exact"]}]:
+      F = interpolant('F', 'linear', grid, values, opts)
+      def same(a, b): return abs(float(a)-b)<1e-8
+      self.assertTrue(same(F(2.4), 2.4))
+      self.assertTrue(same(F(1.4), 1.4))
+      self.assertTrue(same(F(0), 0))
+      self.assertTrue(same(F(1), 1))
+      self.assertTrue(same(F(2), 2))
+      self.assertTrue(same(F(6), 6))
+      self.assertTrue(same(F(0.4), 0.4))
+      self.assertTrue(same(F(-.6), -.6))
+      
+      F = interpolant('F', 'linear', [np.linspace(0,1,7)], list(range(7)), {"lookup_mode": ["exact"]})
+    
+    grid = [[2, 4, 6]]
+    values = [10, 7, 1]
+    for opts in [{"lookup_mode": ["linear"]},{"lookup_mode": ["exact"]}]:
+      F = interpolant('F', 'linear', grid, values, opts)
+      def same(a, b): return abs(float(a)-b)<1e-8
+      self.assertTrue(same(F(1), 11.5))
+      self.assertTrue(same(F(2), 10))
+      self.assertTrue(same(F(3), 8.5))
+      self.assertTrue(same(F(4), 7))
+      self.assertTrue(same(F(5), 4))
+      self.assertTrue(same(F(6), 1))
+      self.assertTrue(same(F(7), -2))
+      
+      F = interpolant('F', 'linear', [np.linspace(0,1,7)], list(range(7)), {"lookup_mode": ["exact"]})
+    
+  def test_2d_interpolant_uniform(self):
     grid = [[0, 1, 2], [0, 1, 2]]
     values = [0, 1, 2, 10, 11, 12, 20, 21, 22]
-    F = interpolant('F', 'linear', grid, values)
-    def same(a, b): return abs(float(a)-b)<1e-8
-    self.assertTrue(same(F([2.4, 0.5]), 7.4))
-    self.assertTrue(same(F([1.4, 0.5]), 6.4))
-    self.assertTrue(same(F([0.4, 0.5]), 5.4))
-    self.assertTrue(same(F([-.6, 0.5]), 4.4))
-    self.assertTrue(same(F([-.6, 1.5]), 14.4))
-    self.assertTrue(same(F([-.6, 2.5]), 24.4))
-    self.assertTrue(same(F([-.6, 3.5]), 34.4))
+    for opts in [{"lookup_mode": ["linear","linear"]},{"lookup_mode": ["exact","exact"]}]:
+      F = interpolant('F', 'linear', grid, values, opts)
+      def same(a, b): return abs(float(a)-b)<1e-8
+      self.assertTrue(same(F([2.4, 0.5]), 7.4))
+      self.assertTrue(same(F([1.4, 0.5]), 6.4))
+      self.assertTrue(same(F([0.4, 0.5]), 5.4))
+      self.assertTrue(same(F([1, 0.5]), 6))
+      self.assertTrue(same(F([1, 0]), 1))
+      self.assertTrue(same(F([0, 0]), 0))
+      self.assertTrue(same(F([0.4, 1]), 10.4))
+      self.assertTrue(same(F([-.6, 0.5]), 4.4))
+      self.assertTrue(same(F([-.6, 1.5]), 14.4))
+      self.assertTrue(same(F([-.6, 2.5]), 24.4))
+      self.assertTrue(same(F([-.6, 3.5]), 34.4))
 
+  @skip(not scipy_interpolate)
+  def test_2d_bspline(self):
+    import scipy.interpolate
+    np.random.seed(0)
+    
+    d_knots = [list(np.linspace(0,1,5)),list(np.linspace(0,1,6))]
+
+    data = np.random.random([len(e) for e in d_knots])
+    r = np.meshgrid(*d_knots,indexing='ij')
+
+    xyz = np.vstack(e.ravel(order='F') for e in r).ravel(order='F')
+    
+    d_flat = data.ravel(order='F')
+
+    LUT = casadi.interpolant('name','bspline',d_knots,d_flat)
+    LUTJ = LUT.jacobian()
+    LUTH = LUT.hessian()
+
+    self.check_codegen(LUT, [vertcat(0.2,0.3)])
+    #scipy.interpolate.interpn(d_knots, data, [0.2,0.3], method='splinef2d')
+
+    interp = scipy.interpolate.RectBivariateSpline(d_knots[0], d_knots[1], data)
+    for x in [0,0.01,0.1,0.2,0.9,0.99,1]:
+      for y in [0,0.01,0.1,0.2,0.9,0.99,1]:
+        m = LUT([x,y])
+        r = interp.ev(x,y)
+        self.checkarray(m,r)
+        
+        m = LUTJ([x,y])[0]
+        try:
+          r = [interp.ev(x,y, 1, 0), interp.ev(x,y, 0, 1)]
+        except:
+          r = None
+        if r is not None:
+          self.checkarray(m,r)
+
+        m = LUTH([x,y])[0]
+        try:
+          r = blockcat([[interp.ev(x,y, 2, 0),interp.ev(x,y, 1, 1)],[interp.ev(x,y, 1, 1), interp.ev(x,y, 0, 2)]])
+        except:
+          r = None
+        if r is not None:
+          self.checkarray(m,r)
+
+  @skip(not scipy_interpolate)
+  def test_1d_bspline(self):
+    import scipy.interpolate
+    np.random.seed(0)
+    
+    d_knots = [list(np.linspace(0,1,5))]
+
+    data = np.random.random([len(e) for e in d_knots])
+    r = np.array(d_knots)
+
+    xyz = np.vstack(e.ravel(order='F') for e in r).ravel(order='F')
+    
+    d_flat = data.ravel(order='F')
+
+    LUT = casadi.interpolant('name','bspline',d_knots,d_flat)
+    self.check_codegen(LUT, [0.2])
+    LUTJ = LUT.jacobian()
+    LUTH = LUT.hessian()
+
+    interp = scipy.interpolate.InterpolatedUnivariateSpline(d_knots[0], data)
+    for x in [0,0.01,0.1,0.2,0.9,0.99,1]:
+      m = LUT(x)
+      r = interp(x)
+      self.checkarray(m,r)
+      
+      m = LUTJ(x)[0]
+      try:
+        r = interp(x, 1)
+      except:
+        r = None
+      if r is not None:
+        self.checkarray(m,r)
+
+      m = LUTH(x)[0]
+      try:
+        r = interp(x, 2)
+      except:
+        r = None
+      if r is not None:
+        self.checkarray(m,r)
 
   def test_Callback_Jacobian(self):
     x = MX.sym("x")
@@ -1213,6 +1439,87 @@ class Functiontests(casadiTestCase):
       self.assertTrue("nlp_g" in out[1])
       with self.assertRaises(Exception):
         solver = nlpsol("solver","ipopt",nlp,{"specific_options":{ "nlp_foo" : 3}})
+   
+  @requires_expm("slicot")     
+  @memory_heavy()
+  def test_expm(self):
+      eps = 1e-6
+      t = MX.sym('t')
+      tnum = 0.2
+
+      n = 4
+
+      np.random.seed(0)
+      Anum = np.random.random((n,n))
+      Bnum = np.random.random((n,2))
+      Bb = np.random.random((n,2))
+
+      dA = np.random.random((n,n))
+      Yb = np.random.random((n,2))
+      
+      def expm(A):
+
+        n = A.shape[0]
+        x = MX.sym('x',n)
+        As = MX.sym('A',n,n)
+
+        dae = {'x':x,'p':vec(As),'ode':mtimes(As,x)}
+        intg = integrator('intg','cvodes',dae,{'reltol':1e-14,'abstol':1e-14})
+
+        Intg = intg.map('identity','serial',n,[1],[])
+
+        out = Intg(x0=DM.eye(n),p=vec(As))
+        expmF = Function('expm',[As],[out["xf"]])
+        return expmF(A)
+      
+      A = MX.sym("A",n,n)
+      t = MX.sym("t")
+      fr = Function('fr',[A,t],[expm(A*t)])
+      f = Function('f',[A,t],[casadi.expm(A*t)])
+      
+      self.checkfunction(fr,f,inputs=[Anum, 1.1],digits=8)
+      
+      fr = Function('fr',[t],[expm(Anum*t)])
+      f = Function('f',[t],[casadi.expm_const(Anum,t)])
+      
+      self.checkfunction(fr,f,inputs=[1.1],digits=8)
+      
+      JA = jacobian(casadi.expm(A*t),A)
+      Jt = jacobian(casadi.expm(A*t),t)
+      
+      self.assertTrue(JA.nnz()==n**4)
+      self.assertTrue(Jt.nnz()==n**2)
+            
+      JA = jacobian(casadi.expm_const(A,t),A)
+      Jt = jacobian(casadi.expm_const(A,t),t)
+      
+      self.assertTrue(JA.nnz()==0)
+      self.assertTrue(Jt.nnz()==n**2)
+
+  def test_conditional(self):
+
+    np.random.seed(5)
+
+    x = MX.sym('x',2,2)
+    y = MX.sym('y',2,2)
+
+    sp1 = MX.sym('y',Sparsity.lower(2))
+    sp2 = MX.sym('z',Sparsity.diag(2))
+
+    f1 = Function("f",[sp2,x],[x**2,x*sp2])
+    f2 = Function("f",[sp1,x],[2*x**2,sin(sp1)])
+    f3 = Function("f",[sp1,sp2],[sp1*sp2,sp1+sp2])
+
+    F = Function.conditional("test",[f1,f2], f3)
+    Fsx = F.expand()
+
+    A = np.random.random((2,2))
+    B = np.random.random((2,2))
+
+    for i in range(-1,3):
+      self.checkfunction(F,Fsx,inputs = [i,A,B])
+      self.check_codegen(F,inputs=[i,A,B])
+
 
 if __name__ == '__main__':
     unittest.main()

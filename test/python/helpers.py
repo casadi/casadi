@@ -514,6 +514,8 @@ class casadiTestCase(unittest.TestCase):
               #self.checkarray(IM(a.sparsity(),1),IM(b.sparsity(),1),("%s, output(%d)" % (order,k))+str(vf.getInput(0))+failmessage,digits=digits_sens)
               self.checkarray(a,b,("%s, output(%d)" % (order,k))+failmessage,digits=digits_sens)
 
+  def check_sparsity(self, a,b):
+    self.assertTrue(a==b, msg=str(a) + " <-> " + str(b))
 
   def check_codegen(self,F,inputs=None):
     if args.run_slow:
@@ -521,7 +523,7 @@ class casadiTestCase(unittest.TestCase):
       name = "codegen_%s" % (hashlib.md5(("%f" % np.random.random()+str(F)+str(time.time())).encode()).hexdigest())
       F.generate(name)
       import subprocess
-      p = subprocess.Popen("gcc -fPIC -shared -O3 %s.c -o %s.so" % (name,name) ,shell=True).wait()
+      p = subprocess.Popen("gcc -fPIC -shared -Wall -Werror -Wno-unknown-pragmas -O3 %s.c -o %s.so" % (name,name) ,shell=True).wait()
       F2 = external(F.name(), './' + name + '.so')
 
       Fout = F.call(inputs)
@@ -581,6 +583,18 @@ class requires_nlpsol(object):
       return c
     except:
       print("Not available NLP plugin %s, skipping unittests" % self.n)
+      return None
+
+class requires_expm(object):
+  def __init__(self,n):
+    self.n = n
+
+  def __call__(self,c):
+    try:
+      load_expm(self.n)
+      return c
+    except:
+      print("Not available Expm plugin %s, skipping unittests" % self.n)
       return None
 
 class requires_integrator(object):

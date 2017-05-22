@@ -28,8 +28,8 @@
 #include "slicot_la.hpp"
 
 #include "../../core/std_vector_tools.hpp"
-#include "../../core/function/mx_function.hpp"
-#include "../../core/function/sx_function.hpp"
+#include "../../core/mx_function.hpp"
+#include "../../core/sx_function.hpp"
 
 #include <cassert>
 #include <ctime>
@@ -45,6 +45,7 @@ namespace casadi {
     plugin->name = "slicot";
     plugin->doc = SlicotDple::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
+    plugin->options = &SlicotDple::options_;
     return 0;
   }
 

@@ -37,6 +37,7 @@ namespace casadi {
     plugin->name = "csparsecholesky";
     plugin->doc = CSparseCholeskyInterface::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
+    plugin->options = &CSparseCholeskyInterface::options_;
     return 0;
   }
 

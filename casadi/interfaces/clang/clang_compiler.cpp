@@ -47,6 +47,7 @@ namespace casadi {
     plugin->name = "clang";
     plugin->doc = ClangCompiler::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
+    plugin->options = &ClangCompiler::options_;
     return 0;
   }
 

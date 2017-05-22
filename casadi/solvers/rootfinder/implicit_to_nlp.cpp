@@ -24,7 +24,7 @@
 
 
 #include "implicit_to_nlp.hpp"
-#include "casadi/core/function/nlpsol.hpp"
+#include "casadi/core/nlpsol.hpp"
 
 using namespace std;
 namespace casadi {
@@ -36,6 +36,7 @@ namespace casadi {
     plugin->name = "nlpsol";
     plugin->doc = ImplicitToNlp::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
+    plugin->options = &ImplicitToNlp::options_;
     return 0;
   }
 

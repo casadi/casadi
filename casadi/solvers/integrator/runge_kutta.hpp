@@ -26,7 +26,7 @@
 #ifndef CASADI_RUNGE_KUTTA_HPP
 #define CASADI_RUNGE_KUTTA_HPP
 
-#include "casadi/core/function/integrator_impl.hpp"
+#include "casadi/core/integrator_impl.hpp"
 #include <casadi/solvers/integrator/casadi_integrator_rk_export.h>
 
 /** \defgroup plugin_Integrator_rk
@@ -61,16 +61,16 @@ namespace casadi {
     }
 
     /// Destructor
-    virtual ~RungeKutta();
+    ~RungeKutta() override;
 
     // Get name of the plugin
-    virtual const char* plugin_name() const { return "rk";}
+    const char* plugin_name() const override { return "rk";}
 
     /// Initialize stage
-    virtual void init(const Dict& opts);
+    void init(const Dict& opts) override;
 
     /// Setup F and G
-    virtual void setupFG();
+    void setupFG() override;
 
     /// A documentation string
     static const std::string meta_doc;

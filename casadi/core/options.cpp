@@ -271,4 +271,22 @@ namespace casadi {
     }
   }
 
+  std::vector<std::string> Options::all() const {
+    std::vector<std::string> ret;
+    for (auto&& e : entries) ret.push_back(e.first);
+    return ret;
+  }
+
+  std::string Options::type(const std::string& name) const {
+    const Options::Entry* entry = find(name);
+    casadi_assert_message(entry!=0, "Option \"" + name + "\" does not exist");
+    return GenericType::get_type_description(entry->type);
+  }
+
+  std::string Options::info(const std::string& name) const {
+    const Options::Entry* entry = find(name);
+    casadi_assert_message(entry!=0, "Option \"" + name + "\" does not exist");
+    return entry->description;
+  }
+
 } // namespace casadi

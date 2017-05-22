@@ -27,7 +27,7 @@
 #define CASADI_CORE_HPP
 
 // Scalar expressions (why do I need to put it up here?)
-#include "sx/sx_elem.hpp"
+#include "sx_elem.hpp"
 
 // Generic tools
 #include "polynomial.hpp"
@@ -39,27 +39,28 @@
 #include "matrix.hpp"
 
 // Matrix expressions
-#include "mx/mx.hpp"
+#include "mx.hpp"
 
 // Functions
-#include "function/code_generator.hpp"
-#include "function/importer.hpp"
-#include "function/callback.hpp"
-#include "function/integrator.hpp"
-#include "function/conic.hpp"
-#include "function/nlpsol.hpp"
-#include "function/rootfinder.hpp"
-#include "function/linsol.hpp"
-#include "function/dple.hpp"
-#include "function/interpolant.hpp"
-#include "function/jit.hpp"
-#include "function/external.hpp"
+#include "code_generator.hpp"
+#include "importer.hpp"
+#include "callback.hpp"
+#include "integrator.hpp"
+#include "conic.hpp"
+#include "nlpsol.hpp"
+#include "rootfinder.hpp"
+#include "linsol.hpp"
+#include "dple.hpp"
+#include "expm.hpp"
+#include "interpolant.hpp"
+#include "jit.hpp"
+#include "external.hpp"
 
 // Misc
-#include "misc/integration_tools.hpp"
-#include "misc/nlp_builder.hpp"
-#include "misc/variable.hpp"
-#include "misc/dae_builder.hpp"
-#include "misc/xml_file.hpp"
+#include "integration_tools.hpp"
+#include "nlp_builder.hpp"
+#include "variable.hpp"
+#include "dae_builder.hpp"
+#include "xml_file.hpp"
 
 #endif // CASADI_CORE_HPP

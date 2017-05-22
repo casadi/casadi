@@ -2411,5 +2411,162 @@ class MXtests(casadiTestCase):
 
         self.checkfunction(f,fr,inputs=[0])
 
+  @memory_heavy()
+  def test_einstein(self):
+        dim_b = [3, 3]
+        dim_a = [3, 3]
+
+
+
+
+        def free(a):
+            return set([i for i in a if i<0])
+
+
+        def dim_map(dim_a, dim_b, dim_c, ind_a, ind_b, ind_c):
+          dim_map = {}
+          for dim, ind in [(dim_a,ind_a), (dim_b,ind_b)]:
+            for i,j in enumerate(ind):
+              if j<0:
+                if j in dim_map:
+                  assert dim_map[j]==dim[i]
+                else:
+                  dim_map[j]=dim[i]
+          return dim_map
+
+        def sub2ind(dims, sub):
+          ret = []
+          for i in range(len(dims)):
+            ret.append(sub % dims[i])
+            sub/= dims[i]
+          return ret
+
+        def ind2sub(dims, ind):
+          ret=0
+          cumprod = 1
+          for i in range(len(dims)):
+            ret+= ind[i]*cumprod
+            cumprod*= dims[i]
+          return ret
+
+        def combine(dim_a, dim_b, ind_a, ind_b, ind_c):
+          dim_map = {}
+          for dim, ind in [(dim_a,ind_a), (dim_b,ind_b)]:
+            for i,j in enumerate(ind):
+              if j<0:
+                if j in dim_map:
+                  assert dim_map[j]==dim[i]
+                else:
+                  dim_map[j]=dim[i]
+          return [dim_map[i] for i in ind_c]
+
+
+        def subs(e,old,n):
+          return [ n[old.index(i)] if i in old else i for i in e ]
+
+
+        def einstein_tests(dim_a, dim_b, dim_c, ind_a, ind_b, ind_c):
+
+
+          A = MX.sym("A", np.product(dim_a))
+          B = MX.sym("B", np.product(dim_b))
+          C = MX.sym("C", int(np.product(dim_c)),1)
+
+          A_sx = SX.sym("A", np.product(dim_a))
+          B_sx = SX.sym("B", np.product(dim_b))
+          C_sx = SX.sym("C", int(np.product(dim_c)),1)
+
+          np.random.seed(0)
+
+          A_ = np.random.random(A.shape)
+          B_ = np.random.random(B.shape)
+          C_ = np.random.random(C.shape)
+
+
+
+          out = casadi.einstein(A, B, C, dim_a, dim_b, dim_c, ind_a, ind_b, ind_c)
+          out_sx = casadi.einstein(A_sx, B_sx, C_sx, dim_a, dim_b, dim_c, ind_a, ind_b, ind_c)
+          f = Function('f',[A,B,C],[out],{"ad_weight_sp": 0})
+          frev = Function('f',[A,B,C],[out],{"ad_weight_sp": 1})
+          fr = Function('fr',[A,B,C],[my_einstein(A, B, C, dim_a, dim_b, dim_c, ind_a, ind_b, ind_c)])
+          f_sx = Function('f',[A_sx,B_sx,C_sx],[out_sx])
+
+          fsx = f.expand()
+          self.checkfunction(f, fr, inputs=[A_,B_,C_])
+          self.checkfunction(fsx, fr, inputs=[A_,B_,C_])
+          self.check_codegen(f, inputs=[A_,B_,C_])
+          self.checkfunction(fsx, f_sx, inputs=[A_,B_,C_])
+
+          for i in range(3):
+            self.check_sparsity(f.sparsity_jac(i, 0), fsx.sparsity_jac(i, 0))
+            self.check_sparsity(frev.sparsity_jac(i, 0), fsx.sparsity_jac(i, 0))
+
+
+        def my_einstein(A, B, C, dim_a, dim_b, dim_c, ind_a, ind_b, ind_c):
+          try:
+            R = DM(C)
+          except:
+            R = MX(C)
+
+          d = dim_map(dim_a, dim_b, dim_c, ind_a, ind_b, ind_c)
+
+          dk = list(d.keys())
+
+          for val in itertools.product(*[range(d[k]) for k in dk]):
+            ind_a_ = subs(ind_a, dk, val)
+            ind_b_ = subs(ind_b, dk, val)
+            ind_c_ = subs(ind_c, dk, val)
+
+
+            ai = ind2sub(dim_a, ind_a_)
+            bi = ind2sub(dim_b, ind_b_)
+            ci = ind2sub(dim_c, ind_c_)
+
+            R[ci]+= A[ai]*B[bi]
+
+          return R
+
+        ind = [ [0, -1], [1, -1], [0, 1], [-1, -2], [-2, -1] ]
+
+        for ind_a in ind:
+            for ind_b in ind:
+                for ind_c in itertools.permutations(list(free(ind_a) ^ free(ind_b))):
+                  dim_c = combine(dim_a, dim_b, ind_a, ind_b, ind_c)
+                  einstein_tests(dim_a, dim_b, dim_c, ind_a, ind_b, ind_c)
+
+        einstein_tests([2,4,3], [2,5,3], [5, 4], [-1, -2, -3], [-1, -4, -3], [-4, -2])
+
+  def test_sparsity_operation(self):
+    L = [MX(Sparsity(1,1)),MX(Sparsity(2,1)), MX.sym("x",1,1), MX.sym("x", Sparsity(1,1)), DM(1), DM(Sparsity(1,1),1), DM(Sparsity(2,1),1), DM(Sparsity.dense(2,1),1)]
+
+    for a in L:
+      for b in L:
+        c = a*b
+
+        if a.nnz()==0 or b.nnz()==0:
+          self.assertTrue(c.nnz()==0)
+        else:
+          self.assertTrue(c.nnz()>0)
+
+  @requiresPlugin(Linsol,"lapackqr")
+  def test_solve(self):
+    N = 3
+    nrhs = 50
+    np.random.seed(0)
+    A = np.random.random((3,3))
+    B = np.random.random((3,50))
+
+
+    C = solve(A, B, "lapackqr", {"max_nrhs": 50})
+    C1 = solve(A, B, "lapackqr", {"max_nrhs": 20})
+    C2 = solve(A, B, "lapackqr")
+
+    self.checkarray(C, C1)
+    self.checkarray(C1, C2)
+  def test_sparse_lt(self):
+    x = MX.sym("x",Sparsity.lower(5))
+    self.assertEqual((x>0).nnz(),5*6/2)
+    self.assertEqual((x>=0).nnz(),5*5)
+
 if __name__ == '__main__':
     unittest.main()

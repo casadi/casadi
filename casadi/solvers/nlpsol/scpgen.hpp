@@ -26,7 +26,7 @@
 #ifndef CASADI_SCPGEN_HPP
 #define CASADI_SCPGEN_HPP
 
-#include "casadi/core/function/nlpsol_impl.hpp"
+#include "casadi/core/nlpsol_impl.hpp"
 #include <casadi/solvers/nlpsol/casadi_nlpsol_scpgen_export.h>
 
 #include <deque>
@@ -100,10 +100,10 @@ namespace casadi {
   class CASADI_NLPSOL_SCPGEN_EXPORT Scpgen : public Nlpsol {
   public:
     explicit Scpgen(const std::string& name, const Function& nlp);
-    virtual ~Scpgen();
+    ~Scpgen() override;
 
     // Get name of the plugin
-    virtual const char* plugin_name() const { return "scpgen";}
+    const char* plugin_name() const override { return "scpgen";}
 
     /** \brief  Create a new NLP Solver */
     static Nlpsol* creator(const std::string& name, const Function& nlp) {
@@ -113,30 +113,30 @@ namespace casadi {
     ///@{
     /** \brief Options */
     static Options options_;
-    virtual const Options& get_options() const { return options_;}
+    const Options& get_options() const override { return options_;}
     ///@}
 
     // Initialize the solver
-    virtual void init(const Dict& opts);
+    void init(const Dict& opts) override;
 
     /** \brief Create memory block */
-    virtual void* alloc_memory() const { return new ScpgenMemory();}
+    void* alloc_memory() const override { return new ScpgenMemory();}
 
     /** \brief Free memory block */
-    virtual void free_memory(void *mem) const { delete static_cast<ScpgenMemory*>(mem);}
+    void free_memory(void *mem) const override { delete static_cast<ScpgenMemory*>(mem);}
 
     /** \brief Initalize memory block */
-    virtual void init_memory(void* mem) const;
+    void init_memory(void* mem) const override;
 
     /// Get all statistics
-    virtual Dict get_stats(void* mem) const;
+    Dict get_stats(void* mem) const override;
 
     /** \brief Set the (persistent) work vectors */
-    virtual void set_work(void* mem, const double**& arg, double**& res,
-                          int*& iw, double*& w) const;
+    void set_work(void* mem, const double**& arg, double**& res,
+                          int*& iw, double*& w) const override;
 
     // Solve the NLP
-    virtual void solve(void* mem) const;
+    void solve(void* mem) const override;
 
     // Calculate the L1-norm of the primal infeasibility
     double primalInfeasibility(ScpgenMemory* m) const;

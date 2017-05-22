@@ -1,21 +1,48 @@
 cmake_minimum_required(VERSION 2.8.6)
 
-set(EMBEDDED_SRC "")
-file(GLOB SRC *.hpp)
+# C runtime sources
+set(RUNTIME_SRC
+  casadi_axpy.hpp
+  casadi_bilin.hpp
+  casadi_copy.hpp
+  casadi_de_boor.hpp
+  casadi_densify.hpp
+  casadi_dot.hpp
+  casadi_fill.hpp
+  casadi_flip.hpp
+  casadi_getu.hpp
+  casadi_iamax.hpp
+  casadi_interpn.hpp
+  casadi_interpn_grad.hpp
+  casadi_interpn_interpolate.hpp
+  casadi_interpn_weights.hpp
+  casadi_low.hpp
+  casadi_max_viol.hpp
+  casadi_mtimes.hpp
+  casadi_mv.hpp
+  casadi_nd_boor_eval.hpp
+  casadi_norm_1.hpp
+  casadi_norm_2.hpp
+  casadi_norm_inf.hpp
+  casadi_norm_inf_mul.hpp
+  casadi_polyval.hpp
+  casadi_project.hpp
+  casadi_rank1.hpp
+  casadi_scal.hpp
+  casadi_sparsify.hpp
+  casadi_sum_viol.hpp
+  casadi_swap.hpp
+  casadi_trans.hpp
+)
+set(CASADI_RUNTIME_SRC "${RUNTIME_SRC}" PARENT_SCOPE)
 
-foreach(file ${SRC})
-  get_filename_component(FILE_BASENAME ${file} NAME_WE)
-  string(REGEX REPLACE ".hpp$" "_embedded.hpp" FILE_NEWNAME "${FILENAME}")
-  add_custom_command(
-    OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${FILE_BASENAME}_embedded.hpp"
-    COMMAND ${CMAKE_COMMAND} -D "FILE_BASENAME=${FILE_BASENAME}" -D "FILE=${file}"  -D "BINARY_DIR=${CMAKE_CURRENT_BINARY_DIR}" -P ${CMAKE_CURRENT_SOURCE_DIR}/embedded.cmake
-    DEPENDS
-      ${CMAKE_CURRENT_SOURCE_DIR}/embedded.cmake
-      ${CMAKE_CURRENT_SOURCE_DIR}/${FILE_BASENAME}.hpp
-    VERBATIM)
-  set(EMBEDDED_SRC ${EMBEDDED_SRC} "${CMAKE_CURRENT_BINARY_DIR}/${FILE_BASENAME}_embedded.hpp")
-endforeach()
+# Stringify C runtime
+CASADI_STRINGIFY("${CMAKE_CURRENT_BINARY_DIR}/casadi_runtime_str.h"
+  ${RUNTIME_SRC}
+  casadi_to_mex.hpp
+  casadi_from_mex.hpp
+)
 
-add_custom_target(casadi_runtime_embedded DEPENDS ${EMBEDDED_SRC})
-
-set(RUNTIME_EMBEDDED_SRC "${EMBEDDED_SRC}" PARENT_SCOPE)
+install(FILES casadi_runtime.hpp shared.hpp ${RUNTIME_SRC}
+  DESTINATION ${INCLUDE_PREFIX}/casadi/core/runtime
+)

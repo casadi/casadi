@@ -27,11 +27,12 @@
 #define CASADI_SPARSITY_INTERNAL_HPP
 
 #include "sparsity.hpp"
+#include "shared_object_internal.hpp"
 /// \cond INTERNAL
 
 namespace casadi {
 
-  class CASADI_EXPORT SparsityInternal : public SharedObjectNode {
+  class CASADI_EXPORT SparsityInternal : public SharedObjectInternal {
   private:
     /* \brief Sparsity pattern in compressed column storage (CCS) format
        The first two entries are the number of rows (nrow) and columns (ncol).
@@ -51,7 +52,7 @@ namespace casadi {
     SparsityInternal(int nrow, int ncol, const int* colind, const int* row);
 
     /// Destructor
-    virtual ~SparsityInternal();
+    ~SparsityInternal() override;
 
     /** \brief Get number of rows (see public class) */
     inline const std::vector<int>& sp() const { return sp_;}
@@ -314,7 +315,7 @@ namespace casadi {
     std::string dim() const;
 
     /// Describe the nonzero location k as a string
-    std::string repr(int k) const;
+    std::string repr_el(int k) const;
 
     /// Sparsity pattern for a matrix-matrix product (details in public class)
     Sparsity _mtimes(const Sparsity& y) const;
@@ -409,10 +410,10 @@ namespace casadi {
     std::size_t hash() const;
 
     /// Print representation
-    virtual void repr(std::ostream &stream) const;
+    void repr(std::ostream &stream) const override;
 
     /// Print description
-    virtual void print(std::ostream &stream) const;
+    void print(std::ostream &stream) const override;
 
     /** \brief Perform a unidirectional coloring
      *

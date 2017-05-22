@@ -26,7 +26,7 @@
 #ifndef CASADI_IMPLICIT_TO_NLP_HPP
 #define CASADI_IMPLICIT_TO_NLP_HPP
 
-#include "casadi/core/function/rootfinder_impl.hpp"
+#include "casadi/core/rootfinder_impl.hpp"
 #include <casadi/solvers/rootfinder/casadi_rootfinder_nlpsol_export.h>
 
 /** \defgroup plugin_Rootfinder_nlp
@@ -64,7 +64,7 @@ namespace casadi {
     explicit ImplicitToNlp(const std::string& name, const Function& f);
 
     /** \brief  Destructor */
-    virtual ~ImplicitToNlp();
+    ~ImplicitToNlp() override;
 
     /** \brief  Create a new Rootfinder */
     static Rootfinder* creator(const std::string& name, const Function& f) {
@@ -72,29 +72,29 @@ namespace casadi {
     }
 
     // Get name of the plugin
-    virtual const char* plugin_name() const { return "nlpsol";}
+    const char* plugin_name() const override { return "nlpsol";}
 
     ///@{
     /** \brief Options */
     static Options options_;
-    virtual const Options& get_options() const { return options_;}
+    const Options& get_options() const override { return options_;}
     ///@}
 
     /** \brief  Initialize */
-    virtual void init(const Dict& opts);
+    void init(const Dict& opts) override;
 
     /** \brief Create memory block */
-    virtual void* alloc_memory() const { return new ImplicitToNlpMemory();}
+    void* alloc_memory() const override { return new ImplicitToNlpMemory();}
 
     /** \brief Free memory block */
-    virtual void free_memory(void *mem) const { delete static_cast<ImplicitToNlpMemory*>(mem);}
+    void free_memory(void *mem) const override { delete static_cast<ImplicitToNlpMemory*>(mem);}
 
     /** \brief Set the (persistent) work vectors */
-    virtual void set_work(void* mem, const double**& arg, double**& res,
-                          int*& iw, double*& w) const;
+    void set_work(void* mem, const double**& arg, double**& res,
+                          int*& iw, double*& w) const override;
 
     /// Solve the system of equations and calculate derivatives
-    virtual void solve(void* mem) const;
+    void solve(void* mem) const override;
 
     /// A documentation string
     static const std::string meta_doc;

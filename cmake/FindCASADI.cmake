@@ -1,5 +1,5 @@
-find_path(CASADI_INCLUDE_DIR 
-  casadi/core/sx/sx_elem.hpp
+find_path(CASADI_INCLUDE_DIR
+  casadi/casadi.hpp
   HINTS $ENV{CASADI_PREFIX}/include
 )
 
