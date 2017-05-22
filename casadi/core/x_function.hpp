@@ -864,6 +864,10 @@ namespace casadi {
 
       // Carry out the forward sweeps
       for (int d=0; d<nfdir_batch; ++d) {
+        // Skip if nothing to add
+        if (fsens[d][oind].nnz()==0) {
+          continue;
+        }
 
         // If symmetric, see how many times each output appears
         if (symmetric) {
@@ -971,6 +975,10 @@ namespace casadi {
 
       // Add elements to the Jacobian matrix
       for (int d=0; d<nadir_batch; ++d) {
+        // Skip if nothing to add
+        if (asens[d][iind].nnz()==0) {
+          continue;
+        }
 
         // Locate the nonzeros of the adjoint sensitivity matrix
         sparsity_in(iind).find(nzmap);
