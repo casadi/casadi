@@ -605,16 +605,6 @@ namespace casadi {
     int scc(std::vector<int>& SWIG_OUTPUT(index),
             std::vector<int>& SWIG_OUTPUT(offset)) const;
 
-#ifndef SWIG
-    /** \brief Structure to hold the block triangular form */
-    struct Btf {
-      int nb;
-      std::vector<int> rowperm, colperm;
-      std::vector<int> rowblock, colblock;
-      std::vector<int> coarse_rowblock, coarse_colblock;
-    };
-#endif // SWIG
-
     /// @{
     /** \brief Calculate the block triangular form (BTF)
         See Direct Methods for Sparse Linear Systems by Davis (2006).
@@ -635,9 +625,6 @@ namespace casadi {
             std::vector<int>& SWIG_OUTPUT(rowblock), std::vector<int>& SWIG_OUTPUT(colblock),
             std::vector<int>& SWIG_OUTPUT(coarse_rowblock),
             std::vector<int>& SWIG_OUTPUT(coarse_colblock)) const;
-#ifndef SWIG
-    const Btf& btf() const;
-#endif // SWIG
     /// @}
 
 #ifndef SWIG

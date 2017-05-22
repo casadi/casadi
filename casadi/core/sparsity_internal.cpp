@@ -48,9 +48,9 @@ namespace casadi {
     if (btf_) delete btf_;
   }
 
-  const Sparsity::Btf& SparsityInternal::btf() const {
+  const SparsityInternal::Btf& SparsityInternal::btf() const {
     if (!btf_) {
-      btf_ = new Sparsity::Btf();
+      btf_ = new SparsityInternal::Btf();
       btf_->nb = btf(btf_->rowperm, btf_->colperm, btf_->rowblock, btf_->colblock,
                      btf_->coarse_rowblock, btf_->coarse_rowblock);
     }
@@ -3945,7 +3945,7 @@ namespace casadi {
 
   void SparsityInternal::
   spsolve(bvec_t* X, const bvec_t* B, bool tr) const {
-    const Sparsity::Btf& btf = this->btf();
+    const Btf& btf = this->btf();
     const int* colind = this->colind();
     const int* row = this->row();
 

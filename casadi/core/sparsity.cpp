@@ -578,10 +578,6 @@ namespace casadi {
                         coarse_rowblock, coarse_colblock);
   }
 
-  const Sparsity::Btf& Sparsity::btf() const {
-    return (*this)->btf();
-  }
-
   void Sparsity::spsolve(bvec_t* X, const bvec_t* B, bool tr) const {
     (*this)->spsolve(X, B, tr);
   }

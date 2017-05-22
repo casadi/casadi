@@ -42,10 +42,18 @@ namespace casadi {
        for more info about the CCS format used in CasADi. */
     std::vector<int> sp_;
 
+    /** \brief Structure to hold the block triangular form */
+    struct Btf {
+      int nb;
+      std::vector<int> rowperm, colperm;
+      std::vector<int> rowblock, colblock;
+      std::vector<int> coarse_rowblock, coarse_colblock;
+    };
+
     /* \brief The block-triangular factorization for the sparsity
       Calculated on first call, then cached
     */
-    mutable Sparsity::Btf* btf_;
+    mutable Btf* btf_;
 
   public:
     /// Construct a sparsity pattern from arrays
@@ -141,7 +149,7 @@ namespace casadi {
     }
 
     /// Get cached block triangular form
-    const Sparsity::Btf& btf() const;
+    const Btf& btf() const;
 
 
     /** \brief Compute the Dulmage-Mendelsohn decomposition
