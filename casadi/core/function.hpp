@@ -682,8 +682,10 @@ namespace casadi {
     ///@}
 
 #ifdef WITH_DEPRECATED_FEATURES
-    /// [DEPRECATED] First two arguments for Function::sparsity_jac now required.
-    Get, if necessary generate, the sparsity of a Jacobian block
+    /* [DEPRECATED] First two arguments for Function::sparsity_jac now required.
+
+      Get, if necessary generate, the sparsity of a Jacobian block
+    */
     const Sparsity sparsity_jac(int iind=0) const {
       return sparsity_jac(iind, 0);
     }
