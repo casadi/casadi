@@ -29,6 +29,7 @@ using namespace std;
 namespace casadi {
 
   ImporterInternal::ImporterInternal(const std::string& name) : name_(name) {
+    verbose_ = false;
   }
 
   ImporterInternal::~ImporterInternal() {
@@ -47,7 +48,12 @@ namespace casadi {
   const std::string ImporterInternal::infix_ = "importer";
 
   Options ImporterInternal::options_
-  = {};
+  = {{},
+     {{"verbose",
+       {OT_BOOL,
+        "Verbose evaluation -- for debugging"}}
+      }
+    };
 
   void ImporterInternal::construct(const Dict& opts) {
     // Sanitize dictionary is needed
@@ -110,6 +116,13 @@ namespace casadi {
           read_external(sym, inlined, file, offset);
           continue;
         }
+      }
+    }
+
+    // Read options
+    for (auto&& op : opts) {
+      if (op.first=="verbose") {
+        verbose_ = op.second;
       }
     }
   }

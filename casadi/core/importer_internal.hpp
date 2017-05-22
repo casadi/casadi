@@ -135,6 +135,9 @@ namespace casadi {
 
     /// External functions
     std::map<std::string, std::pair<bool, std::string> > external_;
+
+    /** \brief  Verbose -- for debugging purposes */
+    bool verbose_;
   };
 
   /** \brief Dynamically linked library

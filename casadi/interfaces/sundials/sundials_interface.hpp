@@ -63,10 +63,12 @@ namespace casadi {
     long nsteps, nfevals, nlinsetups, netfails;
     int qlast, qcur;
     double hinused, hlast, hcur, tcur;
+    long nniters, nncfails;
 
     long nstepsB, nfevalsB, nlinsetupsB, netfailsB;
     int qlastB, qcurB;
     double hinusedB, hlastB, hcurB, tcurB;
+    long nnitersB, nncfailsB;
 
     // Temporaries for [x;z] or [rx;rz]
     double *v1, *v2;
@@ -139,6 +141,9 @@ namespace casadi {
     int max_krylov_;
     bool use_precon_;
     bool second_order_correction_;
+    double step0_;
+    double nonlin_conv_coeff_;
+    double max_order_;
     ///@}
 
     /// Linear solver

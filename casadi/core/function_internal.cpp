@@ -74,7 +74,7 @@ namespace casadi {
     inputs_check_ = true;
     jit_ = false;
     compilerplugin_ = "clang";
-
+    print_time_ = true;
     eval_ = 0;
     simple_ = 0;
 
@@ -189,7 +189,6 @@ namespace casadi {
 
   void FunctionInternal::init(const Dict& opts) {
 
-    print_time_ = true;
     // Read options
     for (auto&& op : opts) {
       if (op.first=="verbose") {
