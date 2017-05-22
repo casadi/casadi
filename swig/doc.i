@@ -8864,8 +8864,8 @@ no cached version is available.
 
 ";
 
-%feature("docstring")  casadi::Function::sparsity_jac(int iind=0, int
-oind=0, bool compact=false, bool symmetric=false) const  "
+%feature("docstring")  casadi::Function::sparsity_jac(int iind, int oind,
+bool compact=false, bool symmetric=false) const  "
 
 Get, if necessary generate, the sparsity of a Jacobian block
 
@@ -8892,6 +8892,10 @@ const  "
 Get, if necessary generate, the sparsity of a Jacobian block
 
 ";
+
+%feature("docstring")  casadi::Function::sparsity_jac(int iind=0) const  "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::Function::rootfinder_fun() const  "
 
@@ -20399,8 +20403,8 @@ For a particular output or for all of the outputs
 
 ";
 
-%feature("docstring")  casadi::Function::sparsity_jac(int iind=0, int
-oind=0, bool compact=false, bool symmetric=false) const  "
+%feature("docstring")  casadi::Function::sparsity_jac(int iind, int oind,
+bool compact=false, bool symmetric=false) const  "
 
 Get, if necessary generate, the sparsity of a Jacobian block
 
@@ -20427,6 +20431,10 @@ const  "
 Get, if necessary generate, the sparsity of a Jacobian block
 
 ";
+
+%feature("docstring")  casadi::Function::sparsity_jac(int iind=0) const  "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::SharedObject::print(std::ostream
 &stream=casadi::userOut(), bool trailing_newline=true) const  "

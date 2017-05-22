@@ -6415,8 +6415,20 @@ no cached version is available.
 
 %feature("docstring") casadi::Callback::sparsity_jac "
 
+>  const Sparsity casadi::Function::sparsity_jac(int iind, int oind, bool compact=false, bool symmetric=false) const
+
+>  const Sparsity casadi::Function::sparsity_jac(const std::string &iind, int oind=0, bool compact=false, bool symmetric=false) const
+
+>  const Sparsity casadi::Function::sparsity_jac(int iind, const std::string &oind, bool compact=false, bool symmetric=false) const
+
+>  const Sparsity casadi::Function::sparsity_jac(const std::string &iind, const std::string &oind, bool compact=false, bool symmetric=false) const 
+------------------------------------------------------------------------
+
 Get, if necessary generate, the sparsity of a Jacobian block
 
+>  const Sparsity casadi::Function::sparsity_jac(int iind=0) const 
+------------------------------------------------------------------------
+[INTERNAL] 
 ";
 
 %feature("docstring") casadi::Callback::rootfinder_fun "
@@ -14581,8 +14593,20 @@ For a particular output or for all of the outputs
 
 %feature("docstring") casadi::Function::sparsity_jac "
 
+>  const Sparsity casadi::Function::sparsity_jac(int iind, int oind, bool compact=false, bool symmetric=false) const
+
+>  const Sparsity casadi::Function::sparsity_jac(const std::string &iind, int oind=0, bool compact=false, bool symmetric=false) const
+
+>  const Sparsity casadi::Function::sparsity_jac(int iind, const std::string &oind, bool compact=false, bool symmetric=false) const
+
+>  const Sparsity casadi::Function::sparsity_jac(const std::string &iind, const std::string &oind, bool compact=false, bool symmetric=false) const 
+------------------------------------------------------------------------
+
 Get, if necessary generate, the sparsity of a Jacobian block
 
+>  const Sparsity casadi::Function::sparsity_jac(int iind=0) const 
+------------------------------------------------------------------------
+[INTERNAL] 
 ";
 
 %feature("docstring") casadi::Function::print "

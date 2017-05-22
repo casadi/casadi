@@ -313,6 +313,9 @@
 %exception  casadi::Function::spCanEvaluate(bool fwd) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Function::sparsity_jac(int iind=0) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::Function::sz_arg() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
