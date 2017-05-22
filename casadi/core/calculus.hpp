@@ -1030,6 +1030,7 @@ namespace casadi {
     case OP_LIFT:          return F<OP_LIFT>::check;
     case OP_EINSTEIN:      return F<OP_EINSTEIN>::check;
     }
+    return T();
   }
 
   template<template<int> class F>
