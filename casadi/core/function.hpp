@@ -665,7 +665,7 @@ namespace casadi {
 
     ///@{
     /// Get, if necessary generate, the sparsity of a Jacobian block
-    const Sparsity sparsity_jac(int iind=0, int oind=0,
+    const Sparsity sparsity_jac(int iind, int oind,
                                 bool compact=false, bool symmetric=false) const;
     const Sparsity sparsity_jac(const std::string &iind, int oind=0,
                                 bool compact=false, bool symmetric=false) const {
@@ -682,6 +682,12 @@ namespace casadi {
     ///@}
 
 #ifdef WITH_DEPRECATED_FEATURES
+    /// [DEPRECATED] First two arguments for Function::sparsity_jac now required.
+    Get, if necessary generate, the sparsity of a Jacobian block
+    const Sparsity sparsity_jac(int iind=0) const {
+      return sparsity_jac(iind, 0);
+    }
+
     ///@{
     /// [DEPRECATED] Generate the sparsity of a Jacobian block
     void set_jac_sparsity(const Sparsity& sp, int iind, int oind, bool compact=false);
