@@ -47,29 +47,29 @@ namespace casadi {
                 const std::vector<double>& values);
 
     /// Destructor
-    virtual ~Interpolant();
+    ~Interpolant() override;
 
     /** \brief Get type name */
-    virtual std::string type_name() const {
+    std::string type_name() const override {
       return std::string("interpolant_") + plugin_name();
     }
 
     ///@{
     /** \brief Number of function inputs and outputs */
-    virtual size_t get_n_in() { return 1;}
-    virtual size_t get_n_out() { return 1;}
+    size_t get_n_in() override { return 1;}
+    size_t get_n_out() override { return 1;}
     ///@}
 
     /// @{
     /** \brief Sparsities of function inputs and outputs */
-    virtual Sparsity get_sparsity_in(int i);
-    virtual Sparsity get_sparsity_out(int i);
+    Sparsity get_sparsity_in(int i) override;
+    Sparsity get_sparsity_out(int i) override;
     /// @}
 
     ///@{
     /** \brief Names of function input and outputs */
-    virtual std::string get_name_in(int i);
-    virtual std::string get_name_out(int i);
+    std::string get_name_in(int i) override;
+    std::string get_name_out(int i) override;
     /// @}
 
     // Creator function for internal class

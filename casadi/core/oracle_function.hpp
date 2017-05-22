@@ -71,22 +71,22 @@ namespace casadi {
     OracleFunction(const std::string& name, const Function& oracle);
 
     /** \brief  Destructor */
-    virtual ~OracleFunction() = 0;
+    ~OracleFunction() override = 0;
 
     ///@{
     /** \brief Options */
     static Options options_;
-    virtual const Options& get_options() const { return options_;}
+    const Options& get_options() const override { return options_;}
     ///@}
 
     /** Initialize  */
-    virtual void init(const Dict& opts);
+    void init(const Dict& opts) override;
 
     /// Finalize initialization
-    virtual void finalize(const Dict& opts);
+    void finalize(const Dict& opts) override;
 
     /** \brief Get oracle */
-    virtual const Function& oracle() const { return oracle_;}
+    const Function& oracle() const override { return oracle_;}
 
     // Replace MX oracle with SX oracle?
     void expand();
@@ -109,41 +109,41 @@ namespace casadi {
                       const double* const* arg=0) const;
 
     // Get list of dependency functions
-    virtual std::vector<std::string> get_function() const;
+    std::vector<std::string> get_function() const override;
 
     // Get a dependency function
-    virtual const Function& get_function(const std::string &name) const;
+    const Function& get_function(const std::string &name) const override;
 
     // Is a function monitored?
     virtual bool monitored(const std::string &name) const;
 
     // Check if a particular dependency exists
-    virtual bool has_function(const std::string& fname) const;
+    bool has_function(const std::string& fname) const override;
 
     /** \brief Export / Generate C code for the generated functions */
-    virtual std::string generate_dependencies(const std::string& fname, const Dict& opts) const;
+    std::string generate_dependencies(const std::string& fname, const Dict& opts) const override;
 
     /** \brief JIT for dependencies */
-    virtual void jit_dependencies(const std::string& fname);
+    void jit_dependencies(const std::string& fname) override;
 
     /** \brief Create memory block */
-    virtual void* alloc_memory() const { return new OracleMemory();}
+    void* alloc_memory() const override { return new OracleMemory();}
 
     /** \brief Free memory block */
-    virtual void free_memory(void *mem) const { delete static_cast<OracleMemory*>(mem);}
+    void free_memory(void *mem) const override { delete static_cast<OracleMemory*>(mem);}
 
     /** \brief Initalize memory block */
-    virtual void init_memory(void* mem) const;
+    void init_memory(void* mem) const override;
 
     /** \brief Set the work vectors */
-    virtual void set_temp(void* mem, const double** arg, double** res,
-                          int* iw, double* w) const;
+    void set_temp(void* mem, const double** arg, double** res,
+                          int* iw, double* w) const override;
 
     /// Print statistics
     void print_fstats(const OracleMemory* m) const;
 
     /// Get all statistics
-    virtual Dict get_stats(void* mem) const;
+    Dict get_stats(void* mem) const override;
   };
 
 } // namespace casadi

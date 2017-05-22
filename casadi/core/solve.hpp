@@ -50,51 +50,51 @@ namespace casadi {
     Solve(const MX& r, const MX& A, const Linsol& linear_solver);
 
     /** \brief  Destructor */
-    virtual ~Solve() {}
+    ~Solve() override {}
 
     /** \brief  Print expression */
-    virtual std::string print(const std::vector<std::string>& arg) const;
+    std::string print(const std::vector<std::string>& arg) const override;
 
     /// Evaluate the function numerically
-    virtual void eval(const double** arg, double** res, int* iw, double* w, int mem) const;
+    void eval(const double** arg, double** res, int* iw, double* w, int mem) const override;
 
     /// Evaluate the function symbolically (SX)
-    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const;
+    void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const override;
 
     /** \brief  Evaluate symbolically (MX) */
-    virtual void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const;
+    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
 
     /** \brief Calculate forward mode directional derivatives */
-    virtual void eval_forward(const std::vector<std::vector<MX> >& fseed,
-                         std::vector<std::vector<MX> >& fsens) const;
+    void eval_forward(const std::vector<std::vector<MX> >& fseed,
+                         std::vector<std::vector<MX> >& fsens) const override;
 
     /** \brief Calculate reverse mode directional derivatives */
-    virtual void eval_reverse(const std::vector<std::vector<MX> >& aseed,
-                         std::vector<std::vector<MX> >& asens) const;
+    void eval_reverse(const std::vector<std::vector<MX> >& aseed,
+                         std::vector<std::vector<MX> >& asens) const override;
 
     /** \brief  Propagate sparsity forward */
-    virtual void sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const;
+    void sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
 
     /** \brief  Propagate sparsity backwards */
-    virtual void sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const;
+    void sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
 
     /** \brief Get the operation */
-    virtual int op() const { return OP_SOLVE;}
+    int op() const override { return OP_SOLVE;}
 
     /// Can the operation be performed inplace (i.e. overwrite the result)
-    virtual int numInplace() const { return 1;}
+    int numInplace() const override { return 1;}
 
     /** \brief Get required length of arg field */
-    virtual size_t sz_arg() const;
+    size_t sz_arg() const override;
 
     /** \brief Get required length of res field */
-    virtual size_t sz_res() const;
+    size_t sz_res() const override;
 
     /** \brief Get required length of iw field */
-    virtual size_t sz_iw() const;
+    size_t sz_iw() const override;
 
     /** \brief Get required length of w field */
-    virtual size_t sz_w() const;
+    size_t sz_w() const override;
 
     /// Linear Solver (may be shared between multiple nodes)
     Linsol linsol_;

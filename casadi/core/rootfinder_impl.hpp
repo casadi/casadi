@@ -53,81 +53,81 @@ namespace casadi {
     Rootfinder(const std::string& name, const Function& oracle);
 
     /// Destructor
-    virtual ~Rootfinder() = 0;
+    ~Rootfinder() override = 0;
 
     /** \brief Get type name */
-    virtual std::string type_name() const {
+    std::string type_name() const override {
       return std::string("rootfinder_") + plugin_name();
     }
 
     ///@{
     /** \brief Number of function inputs and outputs */
-    virtual size_t get_n_in() { return oracle_.n_in();}
-    virtual size_t get_n_out() { return oracle_.n_out();}
+    size_t get_n_in() override { return oracle_.n_in();}
+    size_t get_n_out() override { return oracle_.n_out();}
     ///@}
 
     /// @{
     /** \brief Sparsities of function inputs and outputs */
-    virtual Sparsity get_sparsity_in(int i) { return oracle_.sparsity_in(i);}
-    virtual Sparsity get_sparsity_out(int i) { return oracle_.sparsity_out(i);}
+    Sparsity get_sparsity_in(int i) override { return oracle_.sparsity_in(i);}
+    Sparsity get_sparsity_out(int i) override { return oracle_.sparsity_out(i);}
     /// @}
 
     ///@{
     /** \brief Names of function input and outputs */
-    virtual std::string get_name_in(int i) { return oracle_.name_in(i);}
-    virtual std::string get_name_out(int i) { return oracle_.name_out(i);}
+    std::string get_name_in(int i) override { return oracle_.name_in(i);}
+    std::string get_name_out(int i) override { return oracle_.name_out(i);}
     /// @}
 
     ///@{
     /** \brief Options */
     static Options options_;
-    virtual const Options& get_options() const { return options_;}
+    const Options& get_options() const override { return options_;}
     ///@}
 
     /// Initialize
-    virtual void init(const Dict& opts);
+    void init(const Dict& opts) override;
 
     /** \brief Initalize memory block */
-    virtual void init_memory(void* mem) const;
+    void init_memory(void* mem) const override;
 
     /** \brief Set the (persistent) work vectors */
-    virtual void set_work(void* mem, const double**& arg, double**& res,
-                          int*& iw, double*& w) const;
+    void set_work(void* mem, const double**& arg, double**& res,
+                          int*& iw, double*& w) const override;
 
     // Evaluate numerically
-    virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
+    void eval(void* mem, const double** arg, double** res, int* iw, double* w) const override;
 
     // Solve the NLP
     virtual void solve(void* mem) const = 0;
 
     /** \brief  Propagate sparsity forward */
-    virtual void sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const;
+    void sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
 
     /** \brief  Propagate sparsity backwards */
-    virtual void sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const;
+    void sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
 
     ///@{
     /// Is the class able to propagate seeds through the algorithm?
-    virtual bool has_spfwd() const { return true;}
-    virtual bool has_sprev() const { return true;}
+    bool has_spfwd() const override { return true;}
+    bool has_sprev() const override { return true;}
     ///@}
 
     ///@{
     /** \brief Generate a function that calculates \a nfwd forward derivatives */
-    virtual Function get_forward(const std::string& name, int nfwd,
+    Function get_forward(const std::string& name, int nfwd,
                                  const std::vector<std::string>& i_names,
                                  const std::vector<std::string>& o_names,
-                                 const Dict& opts) const;
-    virtual int get_n_forward() const { return 64;}
+                                 const Dict& opts) const override;
+    int get_n_forward() const override { return 64;}
     ///@}
 
     ///@{
     /** \brief Generate a function that calculates \a nadj adjoint derivatives */
-    virtual Function get_reverse(const std::string& name, int nadj,
+    Function get_reverse(const std::string& name, int nadj,
                                  const std::vector<std::string>& i_names,
                                  const std::vector<std::string>& o_names,
-                                 const Dict& opts) const;
-    virtual int get_n_reverse() const { return 64;}
+                                 const Dict& opts) const override;
+    int get_n_reverse() const override { return 64;}
     ///@}
 
     /** \brief Create call to (cached) derivative function, forward mode  */

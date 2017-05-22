@@ -54,16 +54,16 @@ namespace casadi {
     { return new TinyXmlInterface();}
 
     // Get name of the plugin
-    virtual const char* plugin_name() const { return "tinyxml";}
+    const char* plugin_name() const override { return "tinyxml";}
 
     // Parse an XML file
-    virtual XmlNode parse(const std::string& filename);
+    XmlNode parse(const std::string& filename) override;
 
     // Parse an XML tree
     XmlNode addNode(TiXmlNode* n);
 
     // Destructor
-    virtual ~TinyXmlInterface();
+    ~TinyXmlInterface() override;
 
     /// A documentation string
     static const std::string meta_doc;

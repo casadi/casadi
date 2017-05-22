@@ -58,25 +58,25 @@ namespace casadi {
     }
 
     /** \brief Destructor */
-    virtual ~ShellCompiler();
+    ~ShellCompiler() override;
 
     ///@{
     /** \brief Options */
     static Options options_;
-    virtual const Options& get_options() const { return options_;}
+    const Options& get_options() const override { return options_;}
     ///@}
 
     /** \brief Initialize */
-    virtual void init(const Dict& opts);
+    void init(const Dict& opts) override;
 
     /// A documentation string
     static const std::string meta_doc;
 
     /// Get name of plugin
-    virtual const char* plugin_name() const { return "shell";}
+    const char* plugin_name() const override { return "shell";}
 
     /// Get a function pointer for numerical evaluation
-    virtual signal_t get_function(const std::string& symname);
+    signal_t get_function(const std::string& symname) override;
   protected:
     /// Temporary file
     std::string bin_name_;

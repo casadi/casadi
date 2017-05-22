@@ -261,18 +261,18 @@ namespace casadi {
   public:
     BonMinMessageHandler(): CoinMessageHandler() { }
     /// Core of the class: the method that directs the messages
-    virtual int print() {
+    int print() override {
       userOut() << messageBuffer_ << std::endl;
       return 0;
     }
-    virtual ~BonMinMessageHandler() { }
+    ~BonMinMessageHandler() override { }
     BonMinMessageHandler(const BonMinMessageHandler &other): CoinMessageHandler(other) {}
     BonMinMessageHandler(const CoinMessageHandler &other): CoinMessageHandler(other) {}
     BonMinMessageHandler & operator=(const BonMinMessageHandler &rhs) {
       BonMinMessageHandler::operator=(rhs);
       return *this;
     }
-    virtual CoinMessageHandler* clone() const {
+    CoinMessageHandler* clone() const override {
       return new BonMinMessageHandler(*this);
     }
   };

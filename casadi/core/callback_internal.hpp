@@ -38,66 +38,66 @@ namespace casadi {
     explicit CallbackInternal(const std::string& name, Callback* self);
 
     /** \brief Destructor */
-    virtual ~CallbackInternal();
+    ~CallbackInternal() override;
 
     /** \brief Get type name */
-    virtual std::string type_name() const {return "callback";}
+    std::string type_name() const override {return "callback";}
 
     ///@{
     /** \brief Number of function inputs and outputs */
-    virtual size_t get_n_in();
-    virtual size_t get_n_out();
+    size_t get_n_in() override;
+    size_t get_n_out() override;
     ///@}
 
     /// @{
     /** \brief Sparsities of function inputs and outputs */
-    virtual Sparsity get_sparsity_in(int i);
-    virtual Sparsity get_sparsity_out(int i);
+    Sparsity get_sparsity_in(int i) override;
+    Sparsity get_sparsity_out(int i) override;
     /// @}
 
     ///@{
     /** \brief Names of function input and outputs */
-    virtual std::string get_name_in(int i);
-    virtual std::string get_name_out(int i);
+    std::string get_name_in(int i) override;
+    std::string get_name_out(int i) override;
     /// @}
 
     /** \brief  Initialize */
-    virtual void init(const Dict& opts);
+    void init(const Dict& opts) override;
 
     /** \brief Finalize the object creation */
-    virtual void finalize(const Dict& opts);
+    void finalize(const Dict& opts) override;
 
     /** \brief  Evaluate numerically, work vectors given */
-    virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
+    void eval(void* mem, const double** arg, double** res, int* iw, double* w) const override;
 
     /** \brief  Evaluate symbolically, work vectors given */
-    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const;
+    void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const override;
 
     ///@{
     /** \brief Return Jacobian of all input elements with respect to all output elements */
-    virtual bool hasFullJacobian() const;
-    virtual Function getFullJacobian(const std::string& name,
+    bool hasFullJacobian() const override;
+    Function getFullJacobian(const std::string& name,
                                      const std::vector<std::string>& i_names,
                                      const std::vector<std::string>& o_names,
-                                     const Dict& opts);
+                                     const Dict& opts) override;
     ///@}
 
     ///@{
     /** \brief Return function that calculates forward derivatives */
-    virtual Function get_forward(const std::string& name, int nfwd,
+    Function get_forward(const std::string& name, int nfwd,
                                  const std::vector<std::string>& i_names,
                                  const std::vector<std::string>& o_names,
-                                 const Dict& opts) const;
-    virtual int get_n_forward() const;
+                                 const Dict& opts) const override;
+    int get_n_forward() const override;
     ///@}
 
     ///@{
     /** \brief Return function that calculates adjoint derivatives */
-    virtual Function get_reverse(const std::string& name, int nadj,
+    Function get_reverse(const std::string& name, int nadj,
                                  const std::vector<std::string>& i_names,
                                  const std::vector<std::string>& o_names,
-                                 const Dict& opts) const;
-    virtual int get_n_reverse() const;
+                                 const Dict& opts) const override;
+    int get_n_reverse() const override;
     ///@}
 
     /** \brief Pointer to the public class */

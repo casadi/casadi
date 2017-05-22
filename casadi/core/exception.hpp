@@ -66,7 +66,7 @@ class CasadiException : public std::exception {
   ~CasadiException() throw() {}
 
   //! \brief Display error
-  virtual const char* what() const throw() {
+  const char* what() const throw() override {
     return msg_.c_str();
   }
 

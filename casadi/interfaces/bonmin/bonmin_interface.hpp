@@ -102,10 +102,10 @@ namespace casadi {
     Sparsity hesslag_sp_;
 
     explicit BonminInterface(const std::string& name, const Function& nlp);
-    virtual ~BonminInterface();
+    ~BonminInterface() override;
 
     // Get name of the plugin
-    virtual const char* plugin_name() const { return "bonmin";}
+    const char* plugin_name() const override { return "bonmin";}
 
     /** \brief  Create a new NLP Solver */
     static Nlpsol* creator(const std::string& name, const Function& nlp) {
@@ -115,30 +115,30 @@ namespace casadi {
     ///@{
     /** \brief Options */
     static Options options_;
-    virtual const Options& get_options() const { return options_;}
+    const Options& get_options() const override { return options_;}
     ///@}
 
     // Initialize the solver
-    virtual void init(const Dict& opts);
+    void init(const Dict& opts) override;
 
     /** \brief Create memory block */
-    virtual void* alloc_memory() const { return new BonminMemory();}
+    void* alloc_memory() const override { return new BonminMemory();}
 
     /** \brief Free memory block */
-    virtual void free_memory(void *mem) const { delete static_cast<BonminMemory*>(mem);}
+    void free_memory(void *mem) const override { delete static_cast<BonminMemory*>(mem);}
 
     /** \brief Initalize memory block */
-    virtual void init_memory(void* mem) const;
+    void init_memory(void* mem) const override;
 
     /// Get all statistics
-    virtual Dict get_stats(void* mem) const;
+    Dict get_stats(void* mem) const override;
 
     /** \brief Set the (persistent) work vectors */
-    virtual void set_work(void* mem, const double**& arg, double**& res,
-                          int*& iw, double*& w) const;
+    void set_work(void* mem, const double**& arg, double**& res,
+                          int*& iw, double*& w) const override;
 
     // Solve the NLP
-    virtual void solve(void* mem) const;
+    void solve(void* mem) const override;
 
     /// Exact Hessian?
     bool exact_hessian_;
@@ -166,7 +166,7 @@ namespace casadi {
                                int ls_trials, bool full_callback) const;
 
     /// Can discrete variables be treated
-    virtual bool integer_support() const { return true;}
+    bool integer_support() const override { return true;}
 
     /// A documentation string
     static const std::string meta_doc;
