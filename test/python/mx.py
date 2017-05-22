@@ -2204,7 +2204,7 @@ class MXtests(casadiTestCase):
 
     f = Function("f", [x],[y])
 
-    H = f.hessian()
+    H = f.hessian_old(0, 0)
 
   def test_bug_1042(self):
 

@@ -748,7 +748,7 @@ class ADtests(casadiTestCase):
           f_out = f.call(values)
           J_ = f_out[1]
 
-          Hf=f.hessian(0,0)
+          Hf=f.hessian_old(0, 0)
           Hf_out = Hf.call(values)
           self.check_codegen(Hf,inputs=values)
           if H_ is None:

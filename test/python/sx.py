@@ -1050,7 +1050,7 @@ class SXtests(casadiTestCase):
     f = Function("f", [x],[mtimes([x.T,H,x])], {'verbose':True})
     H *= 2
 
-    h = f.hessian()
+    h = f.hessian_old(0, 0)
     h_out = h.call([0])
 
     self.assertTrue(h.sparsity_out(0)==H.sparsity())

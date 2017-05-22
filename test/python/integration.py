@@ -728,7 +728,7 @@ class Integrationtests(casadiTestCase):
     sol["p"] = p
     qe = Function("qe", sol, ["q0", "p"], casadi.integrator_out())
 
-    H = qe.hessian(1)
+    H = qe.hessian_old(1, 0)
     H_out = H([num['q0']], [num['p']])
     num=self.num
     tend=num['tend']

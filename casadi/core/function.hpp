@@ -398,27 +398,23 @@ namespace casadi {
     { return tangent(index_in(iind), index_out(oind)); }
     ///@}
 
-#endif // WITH_DEPRECATED_FEATURES
-
     ///@{
-    /** \brief Generate a Hessian function of output \a oind with respect to input \a iind
-     * \param iind The index of the input
-     * \param oind The index of the output
-     *
-     * The generated Hessian has two more outputs than the calling function corresponding
-     * to the Hessian and the gradients.
-     *
+    /** \brief [DEPRECATED] Alias of Function::jacobian_old
+     * This function is of internal character and should be avoided, if possible. The preferred way
+     * is to use unction::factory instead.
+     * This function will change behavior in the next version of CasADi.
      */
-    Function hessian(int iind=0, int oind=0) {
-      return hessian_old(iind, oind);
-    }
-    Function hessian(const std::string& iind, int oind=0)
-    { return hessian(index_in(iind), oind); }
-    Function hessian(int iind, const std::string& oind)
-    { return hessian(iind, index_out(oind)); }
-    Function hessian(const std::string& iind, const std::string& oind)
-    { return hessian(index_in(iind), index_out(oind)); }
-    ///@}
+     Function hessian(int iind=0, int oind=0) {
+       return hessian_old(iind, oind);
+     }
+     Function hessian(const std::string& iind, int oind=0)
+     { return hessian(index_in(iind), oind); }
+     Function hessian(int iind, const std::string& oind)
+     { return hessian(iind, index_out(oind)); }
+     Function hessian(const std::string& iind, const std::string& oind)
+     { return hessian(index_in(iind), index_out(oind)); }
+     ///@}
+#endif // WITH_DEPRECATED_FEATURES
 
     ///@{
     /** \brief Evaluate the function symbolically or numerically  */
