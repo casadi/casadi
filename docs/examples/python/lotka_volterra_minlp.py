@@ -167,7 +167,7 @@ def plot_sol(w_opt):
 # Solve the NLP
 sol = nlp_solver(x0=vertcat(*w0), lbx=lbw, ubx=ubw, lbg=lbg, ubg=ubg)
 
-print nlp_solver.stats()
+print(nlp_solver.stats())
 
 w1_opt = sol['x']
 lam_w_opt = sol['lam_x']
