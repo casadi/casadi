@@ -618,8 +618,6 @@ namespace casadi {
 
     m->iter_count = -1;
 
-    int N = N_;
-
     // Deal with non-unity I block
     for (int k=0;k<N_;++k) {
       int n_row = m->nx[k+1];

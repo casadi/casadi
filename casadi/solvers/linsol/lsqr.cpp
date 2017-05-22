@@ -157,7 +157,7 @@ namespace casadi {
 
     int itn = 0;
     int istop = 0;
-    int nstop = 0;
+    //int nstop = 0;
     double ctol = 0;
     if (conlim > 0) ctol = 1/conlim;
     double anorm = 0;
@@ -195,8 +195,8 @@ namespace casadi {
     double phibar = beta;
     double bnorm = beta;
     double rnorm = beta;
-    double r1norm = rnorm;
-    double r2norm = rnorm;
+    //double r1norm = rnorm;
+    //double r2norm = rnorm;
 
     double arnorm = alpha * beta;
 
@@ -204,8 +204,8 @@ namespace casadi {
   //  userOut() << "   Itn      x[0]       r1norm     r2norm "
   //               "Compatible    LS      Norm A   Cond A" << std::endl;
 
-    double test1 = 1;
-    double test2 = alpha / beta;
+  //  double test1 = 1;
+  //  double test2 = alpha / beta;
 
 
   //  userOut() << itn << ":" << xx[0] << ":" << r1norm << ":" <<
@@ -273,7 +273,7 @@ namespace casadi {
       double r1sq = rnorm*rnorm - dampsq * xxnorm;
       double r1norm = sqrt(fabs(r1sq));
       if (r1sq < 0) r1norm = -r1norm;
-      double r2norm = rnorm;
+      //double r2norm = rnorm;
 
       double test1 = rnorm / bnorm;
       double test2 = arnorm / (anorm * rnorm);
@@ -300,7 +300,6 @@ namespace casadi {
   void Lsqr::solve(void* mem, double* x, int nrhs, bool tr) const {
     auto m = static_cast<LsqrMemory*>(mem);
 
-    int m_ = m->sparsity[0];
     int n_ = m->sparsity[1];
 
     for (int i=0;i<nrhs;++i) {

@@ -86,6 +86,9 @@ endif()
 add_definitions(-DSHARED_LIBRARY_PREFIX="\\"${CMAKE_SHARED_LIBRARY_PREFIX}\\"")
 add_definitions(-DSHARED_LIBRARY_SUFFIX="\\"${CMAKE_SHARED_LIBRARY_SUFFIX}\\"")
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${EXTRA_CASADI_CXX_FLAGS}")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${EXTRA_CASADI_C_FLAGS}")
+
 add_subdirectory(core)
 add_subdirectory(interfaces)
 add_subdirectory(solvers)
