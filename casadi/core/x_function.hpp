@@ -54,15 +54,15 @@ namespace casadi {
               const std::vector<MatType>& outputv);
 
     /** \brief  Destructor */
-    virtual ~XFunction() {}
+    ~XFunction() override {}
 
     /** \brief  Initialize */
-    virtual void init(const Dict& opts);
+    void init(const Dict& opts) override;
 
     ///@{
     /// Is the class able to propagate seeds through the algorithm?
-    virtual bool has_spfwd() const { return true;}
-    virtual bool has_sprev() const { return true;}
+    bool has_spfwd() const override { return true;}
+    bool has_sprev() const override { return true;}
     ///@}
 
     /** \brief  Topological sorting of the nodes based on Depth-First Search (DFS) */
@@ -86,66 +86,66 @@ namespace casadi {
     MatType jac(int iind=0, int oind=0, const Dict& opts = Dict());
 
     /** \brief Check if the function is of a particular type */
-    virtual bool is_a(const std::string& type, bool recursive) const {
+    bool is_a(const std::string& type, bool recursive) const override {
       return type=="xfunction" || (recursive && FunctionInternal::is_a(type, recursive));
     }
 
     // Factory
-    virtual Function factory(const std::string& name,
+    Function factory(const std::string& name,
                              const std::vector<std::string>& s_in,
                              const std::vector<std::string>& s_out,
                              const Function::AuxOut& aux,
-                             const Dict& opts) const;
+                             const Dict& opts) const override;
 
     /** \brief Which variables enter with some order
     *
     * \param[in] order Only 1 (linear) and 2 (nonlinear) allowed
     * \param[in] tr   Flip the relationship. Return which expressions contain the variables
     */
-    virtual std::vector<bool> which_depends(const std::string& s_in,
+    std::vector<bool> which_depends(const std::string& s_in,
                                             const std::vector<std::string>& s_out,
-                                            int order, bool tr=false) const;
+                                            int order, bool tr=false) const override;
 
     /** \brief Return gradient function  */
-    virtual Function getGradient(const std::string& name, int iind, int oind, const Dict& opts);
+    Function getGradient(const std::string& name, int iind, int oind, const Dict& opts) override;
 
     /** \brief Return tangent function  */
-    virtual Function getTangent(const std::string& name, int iind, int oind, const Dict& opts);
+    Function getTangent(const std::string& name, int iind, int oind, const Dict& opts) override;
 
     /** \brief Return Jacobian function  */
-    virtual Function getJacobian(const std::string& name, int iind, int oind,
-                                 bool compact, bool symmetric, const Dict& opts);
+    Function getJacobian(const std::string& name, int iind, int oind,
+                                 bool compact, bool symmetric, const Dict& opts) override;
 
     ///@{
     /** \brief Generate a function that calculates \a nfwd forward derivatives */
-    virtual Function get_forward(const std::string& name, int nfwd,
+    Function get_forward(const std::string& name, int nfwd,
                                  const std::vector<std::string>& i_names,
                                  const std::vector<std::string>& o_names,
-                                 const Dict& opts) const;
-    virtual int get_n_forward() const { return 64;}
+                                 const Dict& opts) const override;
+    int get_n_forward() const override { return 64;}
     ///@}
 
     ///@{
     /** \brief Generate a function that calculates \a nadj adjoint derivatives */
-    virtual Function get_reverse(const std::string& name, int nadj,
+    Function get_reverse(const std::string& name, int nadj,
                                  const std::vector<std::string>& i_names,
                                  const std::vector<std::string>& o_names,
-                                 const Dict& opts) const;
-    virtual int get_n_reverse() const { return 64;}
+                                 const Dict& opts) const override;
+    int get_n_reverse() const override { return 64;}
     ///@}
 
     /** \brief returns a new function with a selection of inputs/outputs of the original */
-    virtual Function slice(const std::string& name, const std::vector<int>& order_in,
-                           const std::vector<int>& order_out, const Dict& opts) const;
+    Function slice(const std::string& name, const std::vector<int>& order_in,
+                           const std::vector<int>& order_out, const Dict& opts) const override;
 
     /** \brief Generate code for the declarations of the C function */
-    virtual void generateDeclarations(CodeGenerator& g) const = 0;
+    void generateDeclarations(CodeGenerator& g) const override = 0;
 
     /** \brief Generate code for the body of the C function */
-    virtual void generateBody(CodeGenerator& g) const = 0;
+    void generateBody(CodeGenerator& g) const override = 0;
 
     /** \brief Is codegen supported? */
-    virtual bool has_codegen() const { return true;}
+    bool has_codegen() const override { return true;}
 
     /** \brief Helper function: Check if a vector equals inputv */
     virtual bool isInput(const std::vector<MatType>& arg) const;
@@ -154,29 +154,29 @@ namespace casadi {
     virtual bool should_inline(bool always_inline, bool never_inline) const = 0;
 
     /** \brief Create call to (cached) derivative function, forward mode  */
-    virtual void call_forward(const std::vector<MatType>& arg,
+    void call_forward(const std::vector<MatType>& arg,
                               const std::vector<MatType>& res,
                               const std::vector<std::vector<MatType> >& fseed,
                               std::vector<std::vector<MatType> >& fsens,
-                              bool always_inline, bool never_inline) const;
+                              bool always_inline, bool never_inline) const override;
 
     /** \brief Create call to (cached) derivative function, reverse mode  */
-    virtual void call_reverse(const std::vector<MatType>& arg,
+    void call_reverse(const std::vector<MatType>& arg,
                               const std::vector<MatType>& res,
                               const std::vector<std::vector<MatType> >& aseed,
                               std::vector<std::vector<MatType> >& asens,
-                              bool always_inline, bool never_inline) const;
+                              bool always_inline, bool never_inline) const override;
 
     ///@{
     /** \brief Number of function inputs and outputs */
-    virtual size_t get_n_in() { return in_.size(); }
-    virtual size_t get_n_out() { return out_.size(); }
+    size_t get_n_in() override { return in_.size(); }
+    size_t get_n_out() override { return out_.size(); }
     ///@}
 
     /// @{
     /** \brief Sparsities of function inputs and outputs */
-    virtual Sparsity get_sparsity_in(int i) { return in_.at(i).sparsity();}
-    virtual Sparsity get_sparsity_out(int i) { return out_.at(i).sparsity();}
+    Sparsity get_sparsity_in(int i) override { return in_.at(i).sparsity();}
+    Sparsity get_sparsity_out(int i) override { return out_.at(i).sparsity();}
     /// @}
 
     // Data members (all public)
@@ -864,6 +864,10 @@ namespace casadi {
 
       // Carry out the forward sweeps
       for (int d=0; d<nfdir_batch; ++d) {
+        // Skip if nothing to add
+        if (fsens[d][oind].nnz()==0) {
+          continue;
+        }
 
         // If symmetric, see how many times each output appears
         if (symmetric) {
@@ -971,6 +975,10 @@ namespace casadi {
 
       // Add elements to the Jacobian matrix
       for (int d=0; d<nadir_batch; ++d) {
+        // Skip if nothing to add
+        if (asens[d][iind].nnz()==0) {
+          continue;
+        }
 
         // Locate the nonzeros of the adjoint sensitivity matrix
         sparsity_in(iind).find(nzmap);

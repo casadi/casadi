@@ -798,9 +798,11 @@ namespace casadi {
       case OP_PARAMETER:
         w[e.i0] = 0; break;
       case OP_INPUT:
-        w[e.i0] = arg[e.i1]==0 ? 0 : arg[e.i1][e.i2]; break;
+        w[e.i0] = arg[e.i1]==0 ? 0 : arg[e.i1][e.i2];
+        break;
       case OP_OUTPUT:
-        if (res[e.i0]!=0) res[e.i0][e.i2] = w[e.i1]; break;
+        if (res[e.i0]!=0) res[e.i0][e.i2] = w[e.i1];
+        break;
       default: // Unary or binary operation
         w[e.i0] = w[e.i1] | w[e.i2]; break;
       }

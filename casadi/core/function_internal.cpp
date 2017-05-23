@@ -74,7 +74,7 @@ namespace casadi {
     inputs_check_ = true;
     jit_ = false;
     compilerplugin_ = "clang";
-
+    print_time_ = true;
     eval_ = 0;
     simple_ = 0;
 
@@ -189,7 +189,6 @@ namespace casadi {
 
   void FunctionInternal::init(const Dict& opts) {
 
-    print_time_ = true;
     // Read options
     for (auto&& op : opts) {
       if (op.first=="verbose") {
@@ -483,7 +482,7 @@ namespace casadi {
 
     // Return the Jacobian of the gradient, exploiting symmetry (the gradient has output index 0)
     log("FunctionInternal::getHessian generating Jacobian of gradient");
-    return g.jacobian(iind, 0, false, true);
+    return g.jacobian_old(iind, 0, false, true);
   }
 
   void FunctionInternal::log(const string& msg) const {
@@ -1430,7 +1429,7 @@ namespace casadi {
   Function FunctionInternal::
   getJacobian(const std::string& name, int iind, int oind, bool compact, bool symmetric,
               const Dict& opts) {
-    return wrap().jacobian(iind, oind, compact, symmetric);
+    return wrap().jacobian_old(iind, oind, compact, symmetric);
   }
 
   Function FunctionInternal::forward(int nfwd) const {

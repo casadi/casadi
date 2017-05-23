@@ -47,7 +47,7 @@ class Misctests(casadiTestCase):
     def calc_sparsity():
       x = casadi.SX.sym("x")
       f = casadi.Function('f', [x], [x ** 2])
-      return f.sparsity_jac()
+      return f.sparsity_jac(0, 0)
 
     def print_sparsity():
         sparsity = calc_sparsity()
@@ -351,4 +351,3 @@ class Misctests(casadiTestCase):
 
 if __name__ == '__main__':
     unittest.main()
-

@@ -6077,6 +6077,21 @@ returns a new function with a selection of inputs/outputs of the original
 
 ";
 
+%feature("docstring") casadi::Callback::hessian_old "
+
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output Legacy function: To be deprecated in a future
+version of CasADi. Exists only for compatibility with Function::hessian pre-
+CasADi 3.2
+
+";
+
 %feature("docstring") casadi::Callback::print "
 
 Print a description of the object.
@@ -6220,6 +6235,21 @@ Get type name.
 
 %feature("docstring") casadi::Callback::jacobian "
 
+>  Function casadi::Function::jacobian(int iind=0, int oind=0, bool compact=false, bool symmetric=false)
+------------------------------------------------------------------------
+
+[DEPRECATED] Alias of Function::jacobian_old This function is of internal
+character and should be avoided, if possible. The preferred way is to use
+unction::factory instead. This function will change behavior in the next
+version of CasADi.
+
+>  Function casadi::Function::jacobian(const std::string &iind, int oind=0, bool compact=false, bool symmetric=false)
+
+>  Function casadi::Function::jacobian(int iind, const std::string &oind, bool compact=false, bool symmetric=false)
+
+>  Function casadi::Function::jacobian(const std::string &iind, const std::string &oind, bool compact=false, bool symmetric=false)
+------------------------------------------------------------------------
+[INTERNAL] 
 Generate a Jacobian function of output oind with respect to input iind.
 
 Parameters:
@@ -6227,16 +6257,9 @@ Parameters:
 
 iind:  The index of the input
 
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. If
-compact is set to true, only the nonzeros of the input and output
-expressions are considered. If symmetric is set to true, the Jacobian being
-calculated is known to be symmetric (usually a Hessian), which can be
-exploited by the algorithm.
-
-The generated Jacobian has one more output than the calling function
-corresponding to the Jacobian and the same number of inputs.
+oind:  The index of the output Legacy function: To be deprecated in a future
+version of CasADi. Exists only for compatibility with Function::jacobian
+pre-CasADi 3.2
 
 ";
 
@@ -6303,17 +6326,10 @@ Get the (integer) output argument of an atomic operation.
 
 %feature("docstring") casadi::Callback::hessian "
 
-Generate a Hessian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The generated Hessian has two more outputs than the calling function
-corresponding to the Hessian and the gradients.
+[DEPRECATED] Alias of Function::jacobian_old This function is of internal
+character and should be avoided, if possible. The preferred way is to use
+unction::factory instead. This function will change behavior in the next
+version of CasADi.
 
 ";
 
@@ -6344,9 +6360,9 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 %feature("docstring") casadi::Callback::setFullJacobian "
 
-Set the Jacobian of all the input nonzeros with respect to all output
-nonzeros NOTE: Does not take ownership, only weak references to the Jacobian
-are kept internally
+[DEPRECATED] Set the Jacobian of all the input nonzeros with respect to all
+output nonzeros NOTE: Does not take ownership, only weak references to the
+Jacobian are kept internally
 
 ";
 
@@ -6399,8 +6415,20 @@ no cached version is available.
 
 %feature("docstring") casadi::Callback::sparsity_jac "
 
+>  const Sparsity casadi::Function::sparsity_jac(int iind, int oind, bool compact=false, bool symmetric=false) const
+
+>  const Sparsity casadi::Function::sparsity_jac(const std::string &iind, int oind=0, bool compact=false, bool symmetric=false) const
+
+>  const Sparsity casadi::Function::sparsity_jac(int iind, const std::string &oind, bool compact=false, bool symmetric=false) const
+
+>  const Sparsity casadi::Function::sparsity_jac(const std::string &iind, const std::string &oind, bool compact=false, bool symmetric=false) const 
+------------------------------------------------------------------------
+
 Get, if necessary generate, the sparsity of a Jacobian block
 
+>  const Sparsity casadi::Function::sparsity_jac(int iind=0) const 
+------------------------------------------------------------------------
+[INTERNAL] 
 ";
 
 %feature("docstring") casadi::Callback::rootfinder_fun "
@@ -6777,6 +6805,21 @@ Get the number of function outputs.
 
 ";
 
+%feature("docstring") casadi::Callback::jacobian_old "
+
+Generate a Jacobian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output Legacy function: To be deprecated in a future
+version of CasADi. Exists only for compatibility with Function::jacobian
+pre-CasADi 3.2
+
+";
+
 %feature("docstring") casadi::Callback::__hash__ "
 
 Returns a number that is unique for a given Node. If the Object does not
@@ -6833,7 +6876,7 @@ Get output dimension.
 %feature("docstring") casadi::Callback::fullJacobian "
 
 Generate a Jacobian function of all the inputs elements with respect to all
-the output elements).
+the output elements). Legacy function: To be deprecated.
 
 ";
 
@@ -6984,6 +7027,9 @@ Joris Gillis  Interface to the JIT compiler CLANG
 |              |                 | with CasADi will   |                    |
 |              |                 | be automatically   |                    |
 |              |                 | appended.          |                    |
++--------------+-----------------+--------------------+--------------------+
+| verbose      | OT_BOOL         | Verbose evaluation | casadi::ImporterIn |
+|              |                 | for debugging      | ternal             |
 +--------------+-----------------+--------------------+--------------------+
 
 Diagrams
@@ -9901,10 +9947,25 @@ Prepares the function for evaluation.
 
 ";
 
-%feature("docstring") casadi::DllLibrary "[INTERNAL]  Dynamically linked
-library.
+%feature("docstring") casadi::DllLibrary "
+
+Dynamically linked library.
 
 Joel Andersson
+
+>List of available options
+
++---------+---------+---------------------------------+--------------------+
+|   Id    |  Type   |           Description           |      Used in       |
++=========+=========+=================================+====================+
+| verbose | OT_BOOL | Verbose evaluation  for         | casadi::DllLibrary |
+|         |         | debugging                       |                    |
++---------+---------+---------------------------------+--------------------+
+
+Diagrams
+--------
+
+
 
 C++ includes: importer_internal.hpp ";
 
@@ -14220,6 +14281,21 @@ pointer to the internal class
 
 %feature("docstring") casadi::Function::jacobian "
 
+>  Function casadi::Function::jacobian(int iind=0, int oind=0, bool compact=false, bool symmetric=false)
+------------------------------------------------------------------------
+
+[DEPRECATED] Alias of Function::jacobian_old This function is of internal
+character and should be avoided, if possible. The preferred way is to use
+unction::factory instead. This function will change behavior in the next
+version of CasADi.
+
+>  Function casadi::Function::jacobian(const std::string &iind, int oind=0, bool compact=false, bool symmetric=false)
+
+>  Function casadi::Function::jacobian(int iind, const std::string &oind, bool compact=false, bool symmetric=false)
+
+>  Function casadi::Function::jacobian(const std::string &iind, const std::string &oind, bool compact=false, bool symmetric=false)
+------------------------------------------------------------------------
+[INTERNAL] 
 Generate a Jacobian function of output oind with respect to input iind.
 
 Parameters:
@@ -14227,16 +14303,9 @@ Parameters:
 
 iind:  The index of the input
 
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. If
-compact is set to true, only the nonzeros of the input and output
-expressions are considered. If symmetric is set to true, the Jacobian being
-calculated is known to be symmetric (usually a Hessian), which can be
-exploited by the algorithm.
-
-The generated Jacobian has one more output than the calling function
-corresponding to the Jacobian and the same number of inputs.
+oind:  The index of the output Legacy function: To be deprecated in a future
+version of CasADi. Exists only for compatibility with Function::jacobian
+pre-CasADi 3.2
 
 ";
 
@@ -14248,9 +14317,9 @@ Get all statistics obtained at the end of the last evaluate call.
 
 %feature("docstring") casadi::Function::setFullJacobian "
 
-Set the Jacobian of all the input nonzeros with respect to all output
-nonzeros NOTE: Does not take ownership, only weak references to the Jacobian
-are kept internally
+[DEPRECATED] Set the Jacobian of all the input nonzeros with respect to all
+output nonzeros NOTE: Does not take ownership, only weak references to the
+Jacobian are kept internally
 
 ";
 
@@ -14542,8 +14611,20 @@ For a particular output or for all of the outputs
 
 %feature("docstring") casadi::Function::sparsity_jac "
 
+>  const Sparsity casadi::Function::sparsity_jac(int iind, int oind, bool compact=false, bool symmetric=false) const
+
+>  const Sparsity casadi::Function::sparsity_jac(const std::string &iind, int oind=0, bool compact=false, bool symmetric=false) const
+
+>  const Sparsity casadi::Function::sparsity_jac(int iind, const std::string &oind, bool compact=false, bool symmetric=false) const
+
+>  const Sparsity casadi::Function::sparsity_jac(const std::string &iind, const std::string &oind, bool compact=false, bool symmetric=false) const 
+------------------------------------------------------------------------
+
 Get, if necessary generate, the sparsity of a Jacobian block
 
+>  const Sparsity casadi::Function::sparsity_jac(int iind=0) const 
+------------------------------------------------------------------------
+[INTERNAL] 
 ";
 
 %feature("docstring") casadi::Function::print "
@@ -14554,17 +14635,10 @@ Print a description of the object.
 
 %feature("docstring") casadi::Function::hessian "
 
-Generate a Hessian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The generated Hessian has two more outputs than the calling function
-corresponding to the Hessian and the gradients.
+[DEPRECATED] Alias of Function::jacobian_old This function is of internal
+character and should be avoided, if possible. The preferred way is to use
+unction::factory instead. This function will change behavior in the next
+version of CasADi.
 
 ";
 
@@ -14591,7 +14665,22 @@ Print all information there is to know about a certain option.
 %feature("docstring") casadi::Function::fullJacobian "
 
 Generate a Jacobian function of all the inputs elements with respect to all
-the output elements).
+the output elements). Legacy function: To be deprecated.
+
+";
+
+%feature("docstring") casadi::Function::hessian_old "
+
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output Legacy function: To be deprecated in a future
+version of CasADi. Exists only for compatibility with Function::hessian pre-
+CasADi 3.2
 
 ";
 
@@ -15046,6 +15135,21 @@ tr:  Flip the relationship. Return which expressions contain the variables
 %feature("docstring") casadi::Function::getWorkSize "
 
 Get the length of the work vector.
+
+";
+
+%feature("docstring") casadi::Function::jacobian_old "
+
+Generate a Jacobian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output Legacy function: To be deprecated in a future
+version of CasADi. Exists only for compatibility with Function::jacobian
+pre-CasADi 3.2
 
 ";
 
@@ -16636,6 +16740,12 @@ Calculate Jacobian.
 
 ";
 
+%feature("docstring") friendwrap_linearize "
+
+Linearize an expression.
+
+";
+
 %feature("docstring") friendwrap_print_operator "
 
 Get a string representation for a binary MatType, using custom arguments.
@@ -16878,6 +16988,12 @@ Computes the Moore-Penrose pseudo-inverse.
 
 If the matrix A is fat (size1>size2), mul(A, pinv(A)) is unity. If the
 matrix A is slender (size2<size1), mul(pinv(A), A) is unity.
+
+";
+
+%feature("docstring") casadi::GenericMatrix::linearize "
+
+Functions called by friend functions defined here
 
 ";
 
@@ -19052,12 +19168,23 @@ Interface to the JIT compiler SHELL
 +----------------+-----------------+---------------------------------------+
 | compiler       | OT_STRING       | Compiler command                      |
 +----------------+-----------------+---------------------------------------+
+| compiler_flags | OT_STRINGVECTOR | Compile flags for the JIT compiler.   |
+|                |                 | Default: None                         |
++----------------+-----------------+---------------------------------------+
 | compiler_setup | OT_STRING       | Compiler setup command. Intended to   |
 |                |                 | be fixed. The 'flag' option is the    |
 |                |                 | prefered way to set custom flags.     |
 +----------------+-----------------+---------------------------------------+
-| flags          | OT_STRINGVECTOR | Compile flags for the JIT compiler.   |
+| folder         | OT_STRING       | Folder to put temporary objects in.   |
++----------------+-----------------+---------------------------------------+
+| linker         | OT_STRING       | Linker command                        |
++----------------+-----------------+---------------------------------------+
+| linker_flags   | OT_STRINGVECTOR | Linker flags for the JIT compiler.    |
 |                |                 | Default: None                         |
++----------------+-----------------+---------------------------------------+
+| linker_setup   | OT_STRING       | Linker setup command. Intended to be  |
+|                |                 | fixed. The 'flag' option is the       |
+|                |                 | prefered way to set custom flags.     |
 +----------------+-----------------+---------------------------------------+
 
 --------------------------------------------------------------------------------
@@ -30132,6 +30259,13 @@ symbolic primitives.
 
 ";
 
+%feature("docstring") friendwrap_eig_symbolic "
+
+Attempts to find the eigenvalues of a symbolic matrix This will only work
+for up to 3x3 matrices.
+
+";
+
 %feature("docstring") casadi::Matrix::is_leaf "[INTERNAL]  Check if SX is a
 leaf of the SX graph.
 
@@ -30309,13 +30443,9 @@ are possible)
 
 ";
 
-%feature("docstring") friendwrap_chol "
+%feature("docstring") casadi::Matrix::linearize "
 
-Obtain a Cholesky factorisation of a matrix Returns an upper triangular R
-such that R'R = A. Matrix A must be positive definite.
-
-At the moment, the algorithm is dense (Cholesky-Banachiewicz). There is an
-open ticket #1212 to make it sparse.
+Functions called by friend functions defined here
 
 ";
 
@@ -30462,10 +30592,13 @@ the scalar conversion is valid.
 
 ";
 
-%feature("docstring") friendwrap_eig_symbolic "
+%feature("docstring") friendwrap_chol "
 
-Attempts to find the eigenvalues of a symbolic matrix This will only work
-for up to 3x3 matrices.
+Obtain a Cholesky factorisation of a matrix Returns an upper triangular R
+such that R'R = A. Matrix A must be positive definite.
+
+At the moment, the algorithm is dense (Cholesky-Banachiewicz). There is an
+open ticket #1212 to make it sparse.
 
 ";
 
@@ -30718,6 +30851,12 @@ Get the second dimension (i.e. number of columns)
 %feature("docstring") casadi::MX::size1 "
 
 Get the first dimension (i.e. number of rows)
+
+";
+
+%feature("docstring") casadi::MX::linearize "
+
+Functions called by friend functions defined here
 
 ";
 
@@ -39148,12 +39287,23 @@ Joel Andersson  Interface to the JIT compiler SHELL
 +----------------+-----------------+---------------------------------------+
 | compiler       | OT_STRING       | Compiler command                      |
 +----------------+-----------------+---------------------------------------+
+| compiler_flags | OT_STRINGVECTOR | Compile flags for the JIT compiler.   |
+|                |                 | Default: None                         |
++----------------+-----------------+---------------------------------------+
 | compiler_setup | OT_STRING       | Compiler setup command. Intended to   |
 |                |                 | be fixed. The 'flag' option is the    |
 |                |                 | prefered way to set custom flags.     |
 +----------------+-----------------+---------------------------------------+
-| flags          | OT_STRINGVECTOR | Compile flags for the JIT compiler.   |
+| folder         | OT_STRING       | Folder to put temporary objects in.   |
++----------------+-----------------+---------------------------------------+
+| linker         | OT_STRING       | Linker command                        |
++----------------+-----------------+---------------------------------------+
+| linker_flags   | OT_STRINGVECTOR | Linker flags for the JIT compiler.    |
 |                |                 | Default: None                         |
++----------------+-----------------+---------------------------------------+
+| linker_setup   | OT_STRING       | Linker setup command. Intended to be  |
+|                |                 | fixed. The 'flag' option is the       |
+|                |                 | prefered way to set custom flags.     |
 +----------------+-----------------+---------------------------------------+
 
 >List of available options
@@ -39169,6 +39319,10 @@ Joel Andersson  Interface to the JIT compiler SHELL
 | compiler       | OT_STRING       | Compiler command  | casadi::ShellComp |
 |                |                 |                   | iler              |
 +----------------+-----------------+-------------------+-------------------+
+| compiler_flags | OT_STRINGVECTOR | Compile flags for | casadi::ShellComp |
+|                |                 | the JIT compiler. | iler              |
+|                |                 | Default: None     |                   |
++----------------+-----------------+-------------------+-------------------+
 | compiler_setup | OT_STRING       | Compiler setup    | casadi::ShellComp |
 |                |                 | command. Intended | iler              |
 |                |                 | to be fixed. The  |                   |
@@ -39177,9 +39331,28 @@ Joel Andersson  Interface to the JIT compiler SHELL
 |                |                 | to set custom     |                   |
 |                |                 | flags.            |                   |
 +----------------+-----------------+-------------------+-------------------+
-| flags          | OT_STRINGVECTOR | Compile flags for | casadi::ShellComp |
+| folder         | OT_STRING       | Folder to put     | casadi::ShellComp |
+|                |                 | temporary objects | iler              |
+|                |                 | in.               |                   |
++----------------+-----------------+-------------------+-------------------+
+| linker         | OT_STRING       | Linker command    | casadi::ShellComp |
+|                |                 |                   | iler              |
++----------------+-----------------+-------------------+-------------------+
+| linker_flags   | OT_STRINGVECTOR | Linker flags for  | casadi::ShellComp |
 |                |                 | the JIT compiler. | iler              |
 |                |                 | Default: None     |                   |
++----------------+-----------------+-------------------+-------------------+
+| linker_setup   | OT_STRING       | Linker setup      | casadi::ShellComp |
+|                |                 | command. Intended | iler              |
+|                |                 | to be fixed. The  |                   |
+|                |                 | 'flag' option is  |                   |
+|                |                 | the prefered way  |                   |
+|                |                 | to set custom     |                   |
+|                |                 | flags.            |                   |
++----------------+-----------------+-------------------+-------------------+
+| verbose        | OT_BOOL         | Verbose           | casadi::ImporterI |
+|                |                 | evaluation  for   | nternal           |
+|                |                 | debugging         |                   |
 +----------------+-----------------+-------------------+-------------------+
 
 Diagrams
@@ -46779,17 +46952,9 @@ to be monotonously increasing
 
 ";
 
-%feature("docstring") casadi::dple_out "
+%feature("docstring") casadi::conic_option_type "
 
->  std::vector<std::string> casadi::dple_out()
-------------------------------------------------------------------------
-
-Get output scheme of DPLE solvers.
-
->  std::string casadi::dple_out(int ind)
-------------------------------------------------------------------------
-
-Get DPLE output scheme name by index.
+Get type info for a particular option.
 
 ";
 
@@ -46855,9 +47020,17 @@ Check if the vector is non-increasing.
 
 %feature("docstring") casadi::is_zero "";
 
-%feature("docstring") casadi::doc_linsol "
+%feature("docstring") casadi::dple_out "
 
-Get the documentation string for a plugin.
+>  std::vector<std::string> casadi::dple_out()
+------------------------------------------------------------------------
+
+Get output scheme of DPLE solvers.
+
+>  std::string casadi::dple_out(int ind)
+------------------------------------------------------------------------
+
+Get DPLE output scheme name by index.
 
 ";
 
@@ -47150,6 +47323,12 @@ Explicitly load a plugin dynamically.
 
 %feature("docstring") casadi::Contraction "";
 
+%feature("docstring") casadi::conic_options "
+
+Get all options for a plugin.
+
+";
+
 %feature("docstring") casadi::load_linsol "
 
 Explicitly load a plugin dynamically.
@@ -47179,6 +47358,12 @@ Get all options for a plugin.
 %feature("docstring") casadi::hasNegative "
 
 Check if the vector has negative entries.
+
+";
+
+%feature("docstring") casadi::conic_option_info "
+
+Get documentation for a particular option.
 
 ";
 
@@ -47474,7 +47659,9 @@ Construct from an index vector (requires is_slice(v) to be true)
 
 %feature("docstring") casadi::dense_copy_stride "[INTERNAL] ";
 
-%feature("docstring") casadi::casadi_copy "[INTERNAL]  COPY: y <-x.
+%feature("docstring") casadi::doc_linsol "
+
+Get the documentation string for a plugin.
 
 ";
 
@@ -47776,9 +47963,14 @@ times t_i.
 | max_num_steps              | OT_INT    | Maximum number of integrator    |
 |                            |           | steps                           |
 +----------------------------+-----------+---------------------------------+
+| max_order                  | OT_DOUBLE | Maximum order                   |
++----------------------------+-----------+---------------------------------+
 | newton_scheme              | OT_STRING | Linear solver scheme in the     |
 |                            |           | Newton method:                  |
 |                            |           | DIRECT|gmres|bcgstab|tfqmr      |
++----------------------------+-----------+---------------------------------+
+| nonlin_conv_coeff          | OT_DOUBLE | Coefficient in the nonlinear    |
+|                            |           | convergence test                |
 +----------------------------+-----------+---------------------------------+
 | nonlinear_solver_iteration | OT_STRING | Nonlinear solver type:          |
 |                            |           | NEWTON|functional               |
@@ -47795,6 +47987,9 @@ times t_i.
 +----------------------------+-----------+---------------------------------+
 | sensitivity_method         | OT_STRING | Sensitivity method:             |
 |                            |           | SIMULTANEOUS|staggered          |
++----------------------------+-----------+---------------------------------+
+| step0                      | OT_DOUBLE | initial step size [default:     |
+|                            |           | 0/estimated]                    |
 +----------------------------+-----------+---------------------------------+
 | steps_per_checkpoint       | OT_INT    | Number of steps between two     |
 |                            |           | consecutive checkpoints         |
@@ -47878,11 +48073,16 @@ Interface to IDAS from the Sundials suite.
 | max_num_steps             | OT_INT          | Maximum number of          |
 |                           |                 | integrator steps           |
 +---------------------------+-----------------+----------------------------+
+| max_order                 | OT_DOUBLE       | Maximum order              |
++---------------------------+-----------------+----------------------------+
 | max_step_size             | OT_DOUBLE       | Maximim step size          |
 +---------------------------+-----------------+----------------------------+
 | newton_scheme             | OT_STRING       | Linear solver scheme in    |
 |                           |                 | the Newton method:         |
 |                           |                 | DIRECT|gmres|bcgstab|tfqmr |
++---------------------------+-----------------+----------------------------+
+| nonlin_conv_coeff         | OT_DOUBLE       | Coefficient in the         |
+|                           |                 | nonlinear convergence test |
 +---------------------------+-----------------+----------------------------+
 | quad_err_con              | OT_BOOL         | Should the quadratures     |
 |                           |                 | affect the step size       |
@@ -47897,6 +48097,9 @@ Interface to IDAS from the Sundials suite.
 +---------------------------+-----------------+----------------------------+
 | sensitivity_method        | OT_STRING       | Sensitivity method:        |
 |                           |                 | SIMULTANEOUS|staggered     |
++---------------------------+-----------------+----------------------------+
+| step0                     | OT_DOUBLE       | initial step size          |
+|                           |                 | [default: 0/estimated]     |
 +---------------------------+-----------------+----------------------------+
 | steps_per_checkpoint      | OT_INT          | Number of steps between    |
 |                           |                 | two consecutive            |
@@ -47994,18 +48197,17 @@ Joel Andersson
 
 ";
 
-%feature("docstring") casadi::jit "
+%feature("docstring") casadi::integrator_out "
 
-Create a just-in-time compiled function from a C/C++ language string The
-function can an arbitrary number of inputs and outputs that must all be
-scalar-valued. Only specify the function body, assuming that the inputs are
-stored in an array named 'arg' and the outputs stored in an array named
-'res'. The data type used must be 'real_t', which is typically equal to
-'double` or another data type with the same API as 'double'.
+>  std::vector<std::string> casadi::integrator_out()
+------------------------------------------------------------------------
 
-The final generated function will have a structure similar to:
+Get integrator output scheme of integrators.
 
-void fname(const real_t* arg, real_t* res) { <FUNCTION_BODY> }
+>  std::string casadi::integrator_out(int ind)
+------------------------------------------------------------------------
+
+Get output scheme name by index.
 
 ";
 
@@ -48893,6 +49095,10 @@ scheme:   Collocation scheme, as excepted by collocationPoints function.
 
 %feature("docstring") casadi::casadi_interpn_interpolate "[INTERNAL] ";
 
+%feature("docstring") casadi::casadi_copy "[INTERNAL]  COPY: y <-x.
+
+";
+
 %feature("docstring") casadi::slicot_mb03vd "";
 
 %feature("docstring") casadi::nlpsol_default_in "
@@ -49347,17 +49553,18 @@ Explicitly load a plugin dynamically.
 
 ";
 
-%feature("docstring") casadi::integrator_out "
+%feature("docstring") casadi::jit "
 
->  std::vector<std::string> casadi::integrator_out()
-------------------------------------------------------------------------
+Create a just-in-time compiled function from a C/C++ language string The
+function can an arbitrary number of inputs and outputs that must all be
+scalar-valued. Only specify the function body, assuming that the inputs are
+stored in an array named 'arg' and the outputs stored in an array named
+'res'. The data type used must be 'real_t', which is typically equal to
+'double` or another data type with the same API as 'double'.
 
-Get integrator output scheme of integrators.
+The final generated function will have a structure similar to:
 
->  std::string casadi::integrator_out(int ind)
-------------------------------------------------------------------------
-
-Get output scheme name by index.
+void fname(const real_t* arg, real_t* res) { <FUNCTION_BODY> }
 
 ";
 
@@ -50181,6 +50388,8 @@ worhp
 
 
 WORHP interface
+
+Designed for Worhp 1.10
 
 >List of available options
 

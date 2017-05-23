@@ -2420,6 +2420,7 @@ def veccat(*args): return _veccat(args)
 def vertcat(*args): return _vertcat(args)
 def horzcat(*args): return _horzcat(args)
 def diagcat(*args): return _diagcat(args)
+def vvcat(args): return _veccat(args)
 def vcat(args): return _vertcat(args)
 def hcat(args): return _horzcat(args)
 def dcat(args): return _diagcat(args)
@@ -2450,6 +2451,7 @@ def dcat(args): return _diagcat(args)
 %rename(uplus) operator+;
 %feature("varargin","1") casadi_vertcat;
 %feature("varargin","1") casadi_horzcat;
+%feature("varargin","1") casadi_diagcat;
 %feature("varargin","1") casadi_veccat;
 %feature("optionalunpack","1") size;
 
@@ -3053,6 +3055,10 @@ DECL M casadi_jacobian(const M &ex, const M &arg, const Dict& opts=Dict()) {
 
 DECL M casadi_jtimes(const M& ex, const M& arg, const M& v, bool tr=false) {
   return jtimes(ex, arg, v, tr);
+}
+
+DECL M casadi_linearize(const M& f, const M& x, const M& x0) {
+  return linearize(f, x, x0);
 }
 
 DECL std::vector<bool> casadi_which_depends(const M& expr, const M& var,

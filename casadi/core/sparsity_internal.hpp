@@ -42,17 +42,25 @@ namespace casadi {
        for more info about the CCS format used in CasADi. */
     std::vector<int> sp_;
 
+    /** \brief Structure to hold the block triangular form */
+    struct Btf {
+      int nb;
+      std::vector<int> rowperm, colperm;
+      std::vector<int> rowblock, colblock;
+      std::vector<int> coarse_rowblock, coarse_colblock;
+    };
+
     /* \brief The block-triangular factorization for the sparsity
       Calculated on first call, then cached
     */
-    mutable Sparsity::Btf* btf_;
+    mutable Btf* btf_;
 
   public:
     /// Construct a sparsity pattern from arrays
     SparsityInternal(int nrow, int ncol, const int* colind, const int* row);
 
     /// Destructor
-    virtual ~SparsityInternal();
+    ~SparsityInternal() override;
 
     /** \brief Get number of rows (see public class) */
     inline const std::vector<int>& sp() const { return sp_;}
@@ -133,24 +141,25 @@ namespace casadi {
     /// Compute the Dulmage-Mendelsohn decomposition : see cs_dmperm in CSparse
     int btf(std::vector<int>& rowperm, std::vector<int>& colperm,
                           std::vector<int>& rowblock, std::vector<int>& colblock,
-                          std::vector<int>& coarse_rowblock, std::vector<int>& coarse_colblock,
-                          int seed) const {
-      return T()->btfUpper(colperm, rowperm, colblock, rowblock,
-                                                 coarse_colblock, coarse_rowblock, seed);
+                          std::vector<int>& coarse_rowblock,
+                          std::vector<int>& coarse_colblock) const {
+      T()->dmperm(colperm, rowperm, colblock, rowblock,
+                  coarse_colblock, coarse_rowblock);
+      return rowblock.size()-1;
     }
 
     /// Get cached block triangular form
-    const Sparsity::Btf& btf() const;
+    const Btf& btf() const;
 
 
     /** \brief Compute the Dulmage-Mendelsohn decomposition
      *
      * -- upper triangular TODO: refactor and merge with the above
      */
-    int btfUpper(std::vector<int>& rowperm, std::vector<int>& colperm,
-                               std::vector<int>& rowblock, std::vector<int>& colblock,
-                               std::vector<int>& coarse_rowblock,
-                               std::vector<int>& coarse_colblock, int seed) const;
+    void dmperm(std::vector<int>& rowperm, std::vector<int>& colperm,
+                std::vector<int>& rowblock, std::vector<int>& colblock,
+                std::vector<int>& coarse_rowblock,
+                std::vector<int>& coarse_colblock) const;
 
     /// Compute the maximum transversal (maximum matching): see cs_maxtrans in CSparse
     void maxTransversal(std::vector<int>& imatch,
@@ -410,10 +419,10 @@ namespace casadi {
     std::size_t hash() const;
 
     /// Print representation
-    virtual void repr(std::ostream &stream) const;
+    void repr(std::ostream &stream) const override;
 
     /// Print description
-    virtual void print(std::ostream &stream) const;
+    void print(std::ostream &stream) const override;
 
     /** \brief Perform a unidirectional coloring
      *

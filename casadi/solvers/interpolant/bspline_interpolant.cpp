@@ -146,7 +146,7 @@ namespace casadi {
     Function B = Function::bspline_dual("spline", knots, meshgrid(grid), degree_, 1, false,
       opts_dual);
 
-    Function Jf = B.jacobian();
+    Function Jf = B.jacobian_old(0, 0);
 
     MX C = MX::sym("C", B.size_in(0));
 

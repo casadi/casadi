@@ -394,4 +394,16 @@ namespace casadi {
 
   }
 
+  std::vector<std::string> conic_options(const std::string& name) {
+    return Conic::plugin_options(name).all();
+  }
+
+  std::string conic_option_type(const std::string& name, const std::string& op) {
+    return Conic::plugin_options(name).type(op);
+  }
+
+  std::string conic_option_info(const std::string& name, const std::string& op) {
+    return Conic::plugin_options(name).info(op);
+  }
+
 } // namespace casadi

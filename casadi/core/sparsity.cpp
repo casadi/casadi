@@ -573,13 +573,9 @@ namespace casadi {
   int Sparsity::btf(std::vector<int>& rowperm, std::vector<int>& colperm,
                                   std::vector<int>& rowblock, std::vector<int>& colblock,
                                   std::vector<int>& coarse_rowblock,
-                                  std::vector<int>& coarse_colblock, int seed) const {
+                                  std::vector<int>& coarse_colblock) const {
     return (*this)->btf(rowperm, colperm, rowblock, colblock,
-                        coarse_rowblock, coarse_colblock, seed);
-  }
-
-  const Sparsity::Btf& Sparsity::btf() const {
-    return (*this)->btf();
+                        coarse_rowblock, coarse_colblock);
   }
 
   void Sparsity::spsolve(bvec_t* X, const bvec_t* B, bool tr) const {

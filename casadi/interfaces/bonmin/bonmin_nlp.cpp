@@ -154,7 +154,7 @@ namespace casadi {
 
   void BonminUserClass::finalize_solution(TMINLP::SolverReturn status,
         Ipopt::Index n, const Ipopt::Number* x, Ipopt::Number obj_value) {
-    solver_.finalize_solution(mem_, x, obj_value);
+    solver_.finalize_solution(mem_, status, x, obj_value);
   }
 
 

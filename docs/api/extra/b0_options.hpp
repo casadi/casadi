@@ -439,6 +439,7 @@
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
 <tr><td>flags</td><td>OT_STRINGVECTOR</td><td>Compile flags for the JIT compiler. Default: None</td><td>casadi::ClangCompiler</td></tr>
 <tr><td>include_path</td><td>OT_STRING</td><td>Include paths for the JIT compiler. The include directory shipped with CasADi will be automatically appended.</td><td>casadi::ClangCompiler</td></tr>
+<tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::ImporterInternal</td></tr>
 </table>
 */
 /// \endcond
@@ -460,6 +461,7 @@
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
 <tr><td>flags</td><td>OT_STRINGVECTOR</td><td>Compile flags for the JIT compiler. Default: None</td><td>casadi::ClangCompiler</td></tr>
 <tr><td>include_path</td><td>OT_STRING</td><td>Include paths for the JIT compiler. The include directory shipped with CasADi will be automatically appended.</td><td>casadi::ClangCompiler</td></tr>
+<tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::ImporterInternal</td></tr>
 </table>
 */
 /// \cond INTERNAL
@@ -643,12 +645,15 @@
 <tr><td>max_krylov</td><td>OT_INT</td><td>Maximum Krylov subspace size</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_multistep_order</td><td>OT_INT</td><td>Maximum order for the (variable-order) multistep method</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_num_steps</td><td>OT_INT</td><td>Maximum number of integrator steps</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>max_order</td><td>OT_DOUBLE</td><td>Maximum order</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>newton_scheme</td><td>OT_STRING</td><td>Linear solver scheme in the Newton method: DIRECT|gmres|bcgstab|tfqmr</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>nonlin_conv_coeff</td><td>OT_DOUBLE</td><td>Coefficient in the nonlinear convergence test</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>nonlinear_solver_iteration</td><td>OT_STRING</td><td>Nonlinear solver type: NEWTON|functional</td><td>casadi::CvodesInterface</td></tr>
 <tr><td>quad_err_con</td><td>OT_BOOL</td><td>Should the quadratures affect the step size control</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>reltol</td><td>OT_DOUBLE</td><td>Relative tolerence for the IVP solution</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>second_order_correction</td><td>OT_BOOL</td><td>Second order correction in the augmented system Jacobian [true]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>sensitivity_method</td><td>OT_STRING</td><td>Sensitivity method: SIMULTANEOUS|staggered</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>step0</td><td>OT_DOUBLE</td><td>initial step size [default: 0/estimated]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>steps_per_checkpoint</td><td>OT_INT</td><td>Number of steps between two consecutive checkpoints</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>stop_at_end</td><td>OT_BOOL</td><td>Stop the integrator at the end of the interval</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
@@ -672,12 +677,15 @@
 <tr><td>max_krylov</td><td>OT_INT</td><td>Maximum Krylov subspace size</td></tr>
 <tr><td>max_multistep_order</td><td>OT_INT</td><td>Maximum order for the (variable-order) multistep method</td></tr>
 <tr><td>max_num_steps</td><td>OT_INT</td><td>Maximum number of integrator steps</td></tr>
+<tr><td>max_order</td><td>OT_DOUBLE</td><td>Maximum order</td></tr>
 <tr><td>newton_scheme</td><td>OT_STRING</td><td>Linear solver scheme in the Newton method: DIRECT|gmres|bcgstab|tfqmr</td></tr>
+<tr><td>nonlin_conv_coeff</td><td>OT_DOUBLE</td><td>Coefficient in the nonlinear convergence test</td></tr>
 <tr><td>nonlinear_solver_iteration</td><td>OT_STRING</td><td>Nonlinear solver type: NEWTON|functional</td></tr>
 <tr><td>quad_err_con</td><td>OT_BOOL</td><td>Should the quadratures affect the step size control</td></tr>
 <tr><td>reltol</td><td>OT_DOUBLE</td><td>Relative tolerence for the IVP solution</td></tr>
 <tr><td>second_order_correction</td><td>OT_BOOL</td><td>Second order correction in the augmented system Jacobian [true]</td></tr>
 <tr><td>sensitivity_method</td><td>OT_STRING</td><td>Sensitivity method: SIMULTANEOUS|staggered</td></tr>
+<tr><td>step0</td><td>OT_DOUBLE</td><td>initial step size [default: 0/estimated]</td></tr>
 <tr><td>steps_per_checkpoint</td><td>OT_INT</td><td>Number of steps between two consecutive checkpoints</td></tr>
 <tr><td>stop_at_end</td><td>OT_BOOL</td><td>Stop the integrator at the end of the interval</td></tr>
 <tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td></tr>
@@ -700,15 +708,38 @@
 <tr><td>max_krylov</td><td>OT_INT</td><td>Maximum Krylov subspace size</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_multistep_order</td><td>OT_INT</td><td>Maximum order for the (variable-order) multistep method</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_num_steps</td><td>OT_INT</td><td>Maximum number of integrator steps</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>max_order</td><td>OT_DOUBLE</td><td>Maximum order</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>newton_scheme</td><td>OT_STRING</td><td>Linear solver scheme in the Newton method: DIRECT|gmres|bcgstab|tfqmr</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>nonlin_conv_coeff</td><td>OT_DOUBLE</td><td>Coefficient in the nonlinear convergence test</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>nonlinear_solver_iteration</td><td>OT_STRING</td><td>Nonlinear solver type: NEWTON|functional</td><td>casadi::CvodesInterface</td></tr>
 <tr><td>quad_err_con</td><td>OT_BOOL</td><td>Should the quadratures affect the step size control</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>reltol</td><td>OT_DOUBLE</td><td>Relative tolerence for the IVP solution</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>second_order_correction</td><td>OT_BOOL</td><td>Second order correction in the augmented system Jacobian [true]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>sensitivity_method</td><td>OT_STRING</td><td>Sensitivity method: SIMULTANEOUS|staggered</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>step0</td><td>OT_DOUBLE</td><td>initial step size [default: 0/estimated]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>steps_per_checkpoint</td><td>OT_INT</td><td>Number of steps between two consecutive checkpoints</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>stop_at_end</td><td>OT_BOOL</td><td>Stop the integrator at the end of the interval</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
+</table>
+*/
+/// \cond INTERNAL
+/** \class casadi::DllLibrary
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
+<tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::DllLibrary</td></tr>
+</table>
+*/
+/// \endcond
+/** \addtogroup general_DllLibrary
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
+<tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::DllLibrary</td></tr>
 </table>
 */
 /// \cond INTERNAL
@@ -1027,12 +1058,15 @@
 <tr><td>max_krylov</td><td>OT_INT</td><td>Maximum Krylov subspace size</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_multistep_order</td><td>OT_INT</td><td>Maximum order for the (variable-order) multistep method</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_num_steps</td><td>OT_INT</td><td>Maximum number of integrator steps</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>max_order</td><td>OT_DOUBLE</td><td>Maximum order</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_step_size</td><td>OT_DOUBLE</td><td>Maximim step size</td><td>casadi::IdasInterface</td></tr>
 <tr><td>newton_scheme</td><td>OT_STRING</td><td>Linear solver scheme in the Newton method: DIRECT|gmres|bcgstab|tfqmr</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>nonlin_conv_coeff</td><td>OT_DOUBLE</td><td>Coefficient in the nonlinear convergence test</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>quad_err_con</td><td>OT_BOOL</td><td>Should the quadratures affect the step size control</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>reltol</td><td>OT_DOUBLE</td><td>Relative tolerence for the IVP solution</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>second_order_correction</td><td>OT_BOOL</td><td>Second order correction in the augmented system Jacobian [true]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>sensitivity_method</td><td>OT_STRING</td><td>Sensitivity method: SIMULTANEOUS|staggered</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>step0</td><td>OT_DOUBLE</td><td>initial step size [default: 0/estimated]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>steps_per_checkpoint</td><td>OT_INT</td><td>Number of steps between two consecutive checkpoints</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>stop_at_end</td><td>OT_BOOL</td><td>Stop the integrator at the end of the interval</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>suppress_algebraic</td><td>OT_BOOL</td><td>Suppress algebraic variables in the error testing</td><td>casadi::IdasInterface</td></tr>
@@ -1061,12 +1095,15 @@
 <tr><td>max_krylov</td><td>OT_INT</td><td>Maximum Krylov subspace size</td></tr>
 <tr><td>max_multistep_order</td><td>OT_INT</td><td>Maximum order for the (variable-order) multistep method</td></tr>
 <tr><td>max_num_steps</td><td>OT_INT</td><td>Maximum number of integrator steps</td></tr>
+<tr><td>max_order</td><td>OT_DOUBLE</td><td>Maximum order</td></tr>
 <tr><td>max_step_size</td><td>OT_DOUBLE</td><td>Maximim step size</td></tr>
 <tr><td>newton_scheme</td><td>OT_STRING</td><td>Linear solver scheme in the Newton method: DIRECT|gmres|bcgstab|tfqmr</td></tr>
+<tr><td>nonlin_conv_coeff</td><td>OT_DOUBLE</td><td>Coefficient in the nonlinear convergence test</td></tr>
 <tr><td>quad_err_con</td><td>OT_BOOL</td><td>Should the quadratures affect the step size control</td></tr>
 <tr><td>reltol</td><td>OT_DOUBLE</td><td>Relative tolerence for the IVP solution</td></tr>
 <tr><td>second_order_correction</td><td>OT_BOOL</td><td>Second order correction in the augmented system Jacobian [true]</td></tr>
 <tr><td>sensitivity_method</td><td>OT_STRING</td><td>Sensitivity method: SIMULTANEOUS|staggered</td></tr>
+<tr><td>step0</td><td>OT_DOUBLE</td><td>initial step size [default: 0/estimated]</td></tr>
 <tr><td>steps_per_checkpoint</td><td>OT_INT</td><td>Number of steps between two consecutive checkpoints</td></tr>
 <tr><td>stop_at_end</td><td>OT_BOOL</td><td>Stop the integrator at the end of the interval</td></tr>
 <tr><td>suppress_algebraic</td><td>OT_BOOL</td><td>Suppress algebraic variables in the error testing</td></tr>
@@ -1094,12 +1131,15 @@
 <tr><td>max_krylov</td><td>OT_INT</td><td>Maximum Krylov subspace size</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_multistep_order</td><td>OT_INT</td><td>Maximum order for the (variable-order) multistep method</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_num_steps</td><td>OT_INT</td><td>Maximum number of integrator steps</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>max_order</td><td>OT_DOUBLE</td><td>Maximum order</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_step_size</td><td>OT_DOUBLE</td><td>Maximim step size</td><td>casadi::IdasInterface</td></tr>
 <tr><td>newton_scheme</td><td>OT_STRING</td><td>Linear solver scheme in the Newton method: DIRECT|gmres|bcgstab|tfqmr</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>nonlin_conv_coeff</td><td>OT_DOUBLE</td><td>Coefficient in the nonlinear convergence test</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>quad_err_con</td><td>OT_BOOL</td><td>Should the quadratures affect the step size control</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>reltol</td><td>OT_DOUBLE</td><td>Relative tolerence for the IVP solution</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>second_order_correction</td><td>OT_BOOL</td><td>Second order correction in the augmented system Jacobian [true]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>sensitivity_method</td><td>OT_STRING</td><td>Sensitivity method: SIMULTANEOUS|staggered</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>step0</td><td>OT_DOUBLE</td><td>initial step size [default: 0/estimated]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>steps_per_checkpoint</td><td>OT_INT</td><td>Number of steps between two consecutive checkpoints</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>stop_at_end</td><td>OT_BOOL</td><td>Stop the integrator at the end of the interval</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>suppress_algebraic</td><td>OT_BOOL</td><td>Suppress algebraic variables in the error testing</td><td>casadi::IdasInterface</td></tr>
@@ -1192,6 +1232,26 @@
 <tr><td>linear_solver_options</td><td>OT_DICT</td><td>Options to be passed to the linear solver.</td><td>casadi::Rootfinder</td></tr>
 <tr><td>nlpsol</td><td>OT_STRING</td><td>Name of solver.</td><td>casadi::ImplicitToNlp</td></tr>
 <tr><td>nlpsol_options</td><td>OT_DICT</td><td>Options to be passed to solver.</td><td>casadi::ImplicitToNlp</td></tr>
+</table>
+*/
+/// \cond INTERNAL
+/** \class casadi::ImporterInternal
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
+<tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::ImporterInternal</td></tr>
+</table>
+*/
+/// \endcond
+/** \addtogroup general_ImporterInternal
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
+<tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::ImporterInternal</td></tr>
 </table>
 */
 /// \cond INTERNAL
@@ -2238,8 +2298,13 @@
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
 <tr><td>cleanup</td><td>OT_BOOL</td><td>Cleanup temporary files when unloading. Default: true</td><td>casadi::ShellCompiler</td></tr>
 <tr><td>compiler</td><td>OT_STRING</td><td>Compiler command</td><td>casadi::ShellCompiler</td></tr>
+<tr><td>compiler_flags</td><td>OT_STRINGVECTOR</td><td>Compile flags for the JIT compiler. Default: None</td><td>casadi::ShellCompiler</td></tr>
 <tr><td>compiler_setup</td><td>OT_STRING</td><td>Compiler setup command. Intended to be fixed. The 'flag' option is the prefered way to set custom flags.</td><td>casadi::ShellCompiler</td></tr>
-<tr><td>flags</td><td>OT_STRINGVECTOR</td><td>Compile flags for the JIT compiler. Default: None</td><td>casadi::ShellCompiler</td></tr>
+<tr><td>folder</td><td>OT_STRING</td><td>Folder to put temporary objects in.</td><td>casadi::ShellCompiler</td></tr>
+<tr><td>linker</td><td>OT_STRING</td><td>Linker command</td><td>casadi::ShellCompiler</td></tr>
+<tr><td>linker_flags</td><td>OT_STRINGVECTOR</td><td>Linker flags for the JIT compiler. Default: None</td><td>casadi::ShellCompiler</td></tr>
+<tr><td>linker_setup</td><td>OT_STRING</td><td>Linker setup command. Intended to be fixed. The 'flag' option is the prefered way to set custom flags.</td><td>casadi::ShellCompiler</td></tr>
+<tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::ImporterInternal</td></tr>
 </table>
 */
 /// \endcond
@@ -2251,8 +2316,12 @@
 <tr><th>Id</th><th>Type</th><th>Description</th></tr>
 <tr><td>cleanup</td><td>OT_BOOL</td><td>Cleanup temporary files when unloading. Default: true</td></tr>
 <tr><td>compiler</td><td>OT_STRING</td><td>Compiler command</td></tr>
+<tr><td>compiler_flags</td><td>OT_STRINGVECTOR</td><td>Compile flags for the JIT compiler. Default: None</td></tr>
 <tr><td>compiler_setup</td><td>OT_STRING</td><td>Compiler setup command. Intended to be fixed. The 'flag' option is the prefered way to set custom flags.</td></tr>
-<tr><td>flags</td><td>OT_STRINGVECTOR</td><td>Compile flags for the JIT compiler. Default: None</td></tr>
+<tr><td>folder</td><td>OT_STRING</td><td>Folder to put temporary objects in.</td></tr>
+<tr><td>linker</td><td>OT_STRING</td><td>Linker command</td></tr>
+<tr><td>linker_flags</td><td>OT_STRINGVECTOR</td><td>Linker flags for the JIT compiler. Default: None</td></tr>
+<tr><td>linker_setup</td><td>OT_STRING</td><td>Linker setup command. Intended to be fixed. The 'flag' option is the prefered way to set custom flags.</td></tr>
 </table>
 */
 /** \addtogroup general_ShellCompiler
@@ -2263,8 +2332,13 @@
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
 <tr><td>cleanup</td><td>OT_BOOL</td><td>Cleanup temporary files when unloading. Default: true</td><td>casadi::ShellCompiler</td></tr>
 <tr><td>compiler</td><td>OT_STRING</td><td>Compiler command</td><td>casadi::ShellCompiler</td></tr>
+<tr><td>compiler_flags</td><td>OT_STRINGVECTOR</td><td>Compile flags for the JIT compiler. Default: None</td><td>casadi::ShellCompiler</td></tr>
 <tr><td>compiler_setup</td><td>OT_STRING</td><td>Compiler setup command. Intended to be fixed. The 'flag' option is the prefered way to set custom flags.</td><td>casadi::ShellCompiler</td></tr>
-<tr><td>flags</td><td>OT_STRINGVECTOR</td><td>Compile flags for the JIT compiler. Default: None</td><td>casadi::ShellCompiler</td></tr>
+<tr><td>folder</td><td>OT_STRING</td><td>Folder to put temporary objects in.</td><td>casadi::ShellCompiler</td></tr>
+<tr><td>linker</td><td>OT_STRING</td><td>Linker command</td><td>casadi::ShellCompiler</td></tr>
+<tr><td>linker_flags</td><td>OT_STRINGVECTOR</td><td>Linker flags for the JIT compiler. Default: None</td><td>casadi::ShellCompiler</td></tr>
+<tr><td>linker_setup</td><td>OT_STRING</td><td>Linker setup command. Intended to be fixed. The 'flag' option is the prefered way to set custom flags.</td><td>casadi::ShellCompiler</td></tr>
+<tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::ImporterInternal</td></tr>
 </table>
 */
 /// \cond INTERNAL
@@ -2468,7 +2542,9 @@
 <tr><td>max_krylov</td><td>OT_INT</td><td>Maximum Krylov subspace size</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_multistep_order</td><td>OT_INT</td><td>Maximum order for the (variable-order) multistep method</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_num_steps</td><td>OT_INT</td><td>Maximum number of integrator steps</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>max_order</td><td>OT_DOUBLE</td><td>Maximum order</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>newton_scheme</td><td>OT_STRING</td><td>Linear solver scheme in the Newton method: DIRECT|gmres|bcgstab|tfqmr</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>nonlin_conv_coeff</td><td>OT_DOUBLE</td><td>Coefficient in the nonlinear convergence test</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>number_of_finite_elements</td><td>OT_INT</td><td>Number of finite elements</td><td>casadi::Integrator</td></tr>
 <tr><td>output_t0</td><td>OT_BOOL</td><td>Output the state at the initial time</td><td>casadi::Integrator</td></tr>
 <tr><td>print_stats</td><td>OT_BOOL</td><td>Print out statistics after integration</td><td>casadi::Integrator</td></tr>
@@ -2478,6 +2554,7 @@
 <tr><td>rootfinder_options</td><td>OT_DICT</td><td>Options to be passed to the NLP Solver</td><td>casadi::Integrator</td></tr>
 <tr><td>second_order_correction</td><td>OT_BOOL</td><td>Second order correction in the augmented system Jacobian [true]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>sensitivity_method</td><td>OT_STRING</td><td>Sensitivity method: SIMULTANEOUS|staggered</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>step0</td><td>OT_DOUBLE</td><td>initial step size [default: 0/estimated]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>steps_per_checkpoint</td><td>OT_INT</td><td>Number of steps between two consecutive checkpoints</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>stop_at_end</td><td>OT_BOOL</td><td>Stop the integrator at the end of the interval</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>t0</td><td>OT_DOUBLE</td><td>Beginning of the time horizon</td><td>casadi::Integrator</td></tr>
@@ -2504,7 +2581,9 @@
 <tr><td>max_krylov</td><td>OT_INT</td><td>Maximum Krylov subspace size</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_multistep_order</td><td>OT_INT</td><td>Maximum order for the (variable-order) multistep method</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_num_steps</td><td>OT_INT</td><td>Maximum number of integrator steps</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>max_order</td><td>OT_DOUBLE</td><td>Maximum order</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>newton_scheme</td><td>OT_STRING</td><td>Linear solver scheme in the Newton method: DIRECT|gmres|bcgstab|tfqmr</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>nonlin_conv_coeff</td><td>OT_DOUBLE</td><td>Coefficient in the nonlinear convergence test</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>number_of_finite_elements</td><td>OT_INT</td><td>Number of finite elements</td><td>casadi::Integrator</td></tr>
 <tr><td>output_t0</td><td>OT_BOOL</td><td>Output the state at the initial time</td><td>casadi::Integrator</td></tr>
 <tr><td>print_stats</td><td>OT_BOOL</td><td>Print out statistics after integration</td><td>casadi::Integrator</td></tr>
@@ -2514,6 +2593,7 @@
 <tr><td>rootfinder_options</td><td>OT_DICT</td><td>Options to be passed to the NLP Solver</td><td>casadi::Integrator</td></tr>
 <tr><td>second_order_correction</td><td>OT_BOOL</td><td>Second order correction in the augmented system Jacobian [true]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>sensitivity_method</td><td>OT_STRING</td><td>Sensitivity method: SIMULTANEOUS|staggered</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>step0</td><td>OT_DOUBLE</td><td>initial step size [default: 0/estimated]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>steps_per_checkpoint</td><td>OT_INT</td><td>Number of steps between two consecutive checkpoints</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>stop_at_end</td><td>OT_BOOL</td><td>Stop the integrator at the end of the interval</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>t0</td><td>OT_DOUBLE</td><td>Beginning of the time horizon</td><td>casadi::Integrator</td></tr>

@@ -85,7 +85,7 @@ namespace casadi {
     MXNode();
 
     /** \brief  Destructor */
-    virtual ~MXNode()=0;
+    ~MXNode() override=0;
 
     /** \brief Check the truth value of this node
      */
@@ -96,6 +96,9 @@ namespace casadi {
 
     /** \brief Check if identically one */
     virtual bool is_one() const { return false;}
+
+    /** \brief Check if identically  minus one */
+    virtual bool is_minus_one() const { return false;}
 
     /** \brief Check if a certain value */
     virtual bool isValue(double val) const { return false;}
@@ -110,10 +113,10 @@ namespace casadi {
     virtual bool is_binaryOp() const { return false;}
 
     /** \brief  Print a representation */
-    virtual void repr(std::ostream &stream) const;
+    void repr(std::ostream &stream) const override;
 
     /** \brief  Print a description */
-    virtual void print(std::ostream &stream) const;
+    void print(std::ostream &stream) const override;
 
     /** \brief Find out which nodes can be inlined */
     void can_inline(std::map<const MXNode*, int>& nodeind) const;

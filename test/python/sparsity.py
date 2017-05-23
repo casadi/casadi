@@ -456,7 +456,7 @@ class Sparsitytests(casadiTestCase):
 
     g = Function('g', [optvar,p],[X*p], {'verbose':True})
 
-    J = g.jacobian()
+    J = g.jacobian_old(0, 0)
 
     self.assertTrue(DM(J.sparsity_out(0))[:,:X.nnz()].sparsity()==Sparsity.diag(100))
 
@@ -467,7 +467,7 @@ class Sparsitytests(casadiTestCase):
 
     g = Function('g', [X,p],[vertcat(*[X*p,P])], {'verbose':True})
 
-    J = g.jacobian()
+    J = g.jacobian_old(0, 0)
 
     self.assertTrue(DM(J.sparsity_out(0))[:X.nnz(),:].sparsity()==Sparsity.diag(100))
 
@@ -512,4 +512,3 @@ class Sparsitytests(casadiTestCase):
 
 if __name__ == '__main__':
     unittest.main()
-

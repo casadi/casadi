@@ -62,28 +62,28 @@ namespace casadi {
     LinsolInternal(const std::string& name);
 
     /// Destructor
-    virtual ~LinsolInternal();
+    ~LinsolInternal() override;
 
     /** \brief Get type name */
-    virtual std::string type_name() const {return std::string("linsol_") + plugin_name();}
+    std::string type_name() const override {return std::string("linsol_") + plugin_name();}
 
     ///@{
     /** \brief Number of function inputs and outputs */
-    virtual size_t get_n_in() { return 0;}
-    virtual size_t get_n_out() { return 0;}
+    size_t get_n_in() override { return 0;}
+    size_t get_n_out() override { return 0;}
     ///@}
 
     /// Initialize
-    virtual void init(const Dict& opts);
+    void init(const Dict& opts) override;
 
     /** \brief Create memory block */
-    virtual void* alloc_memory() const { return new LinsolMemory();}
+    void* alloc_memory() const override { return new LinsolMemory();}
 
     /** \brief Free memory block */
-    virtual void free_memory(void *mem) const { delete static_cast<LinsolMemory*>(mem);}
+    void free_memory(void *mem) const override { delete static_cast<LinsolMemory*>(mem);}
 
     /** \brief Initalize memory block */
-    virtual void init_memory(void* mem) const;
+    void init_memory(void* mem) const override;
 
     /// Evaluate SX, possibly transposed
     virtual void linsol_eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem,
@@ -129,7 +129,7 @@ namespace casadi {
     static const std::string infix_;
 
     // Get name of the plugin
-    virtual const char* plugin_name() const = 0;
+    const char* plugin_name() const override = 0;
 
   };
 

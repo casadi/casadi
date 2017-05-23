@@ -50,7 +50,9 @@ macro(casadi_library name)
     )
   endif()
 
-  SET_TARGET_PROPERTIES(${name} PROPERTIES SOVERSION ${PACKAGE_SO_VERSION})
+  if(WITH_SO_VERSION)
+    SET_TARGET_PROPERTIES(${name} PROPERTIES SOVERSION ${PACKAGE_SO_VERSION})
+  endif()
 
   if(WITH_LINT)
     add_style_check_target(${name} "${ARGN}")
@@ -85,6 +87,9 @@ endif()
 
 add_definitions(-DSHARED_LIBRARY_PREFIX="\\"${CMAKE_SHARED_LIBRARY_PREFIX}\\"")
 add_definitions(-DSHARED_LIBRARY_SUFFIX="\\"${CMAKE_SHARED_LIBRARY_SUFFIX}\\"")
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${EXTRA_CASADI_CXX_FLAGS}")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${EXTRA_CASADI_C_FLAGS}")
 
 add_subdirectory(core)
 add_subdirectory(interfaces)

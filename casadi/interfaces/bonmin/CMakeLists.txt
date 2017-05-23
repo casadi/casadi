@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.6)
-include_directories(${BONMIN_INCLUDE_DIRS})
+include_directories(SYSTEM ${BONMIN_INCLUDE_DIRS})
 link_directories(${BONMIN_LIBRARY_DIRS})
 
 set(NLPSOL_BONMIN_SRCS

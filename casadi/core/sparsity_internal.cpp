@@ -48,11 +48,11 @@ namespace casadi {
     if (btf_) delete btf_;
   }
 
-  const Sparsity::Btf& SparsityInternal::btf() const {
+  const SparsityInternal::Btf& SparsityInternal::btf() const {
     if (!btf_) {
-      btf_ = new Sparsity::Btf();
+      btf_ = new SparsityInternal::Btf();
       btf_->nb = btf(btf_->rowperm, btf_->colperm, btf_->rowblock, btf_->colblock,
-                     btf_->coarse_rowblock, btf_->coarse_rowblock, 0);
+                     btf_->coarse_rowblock, btf_->coarse_rowblock);
     }
     return *btf_;
   }
@@ -593,12 +593,14 @@ namespace casadi {
         Cimatch[Cjmatch[i]] = i;
   }
 
-  int SparsityInternal::btfUpper(std::vector<int>& rowperm,
-                                               std::vector<int>& colperm,
-                                               std::vector<int>& rowblock,
-                                               std::vector<int>& colblock,
-                                               std::vector<int>& coarse_rowblock,
-                                               std::vector<int>& coarse_colblock, int seed) const {
+  void SparsityInternal::dmperm(std::vector<int>& rowperm,
+                                std::vector<int>& colperm,
+                                std::vector<int>& rowblock,
+                                std::vector<int>& colblock,
+                                std::vector<int>& coarse_rowblock,
+                                std::vector<int>& coarse_colblock) const {
+    int seed = 0;
+
     // The transpose of the expression
     Sparsity trans;
 
@@ -748,7 +750,6 @@ namespace casadi {
     // Shrink rowblock and colblock
     rowblock.resize(nb2+1);
     colblock.resize(nb2+1);
-    return nb2;
   }
 
   std::vector<int> SparsityInternal::randomPermutation(int n, int seed) {
@@ -3944,7 +3945,7 @@ namespace casadi {
 
   void SparsityInternal::
   spsolve(bvec_t* X, const bvec_t* B, bool tr) const {
-    const Sparsity::Btf& btf = this->btf();
+    const Btf& btf = this->btf();
     const int* colind = this->colind();
     const int* row = this->row();
 

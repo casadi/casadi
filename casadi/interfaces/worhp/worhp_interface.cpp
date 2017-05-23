@@ -164,6 +164,7 @@ namespace casadi {
       WorhpSetIntParam(&m->worhp_p, op.first.c_str(), op.second);
     }
 
+
     // Mark the parameters as set
     m->worhp_p.initialised = true;
   }
@@ -333,7 +334,7 @@ namespace casadi {
             m->iter = m->worhp_w.MajorIter;
             m->iter_sqp = m->worhp_w.MinorIter;
             m->inf_pr = m->worhp_w.NormMax_CV;
-            m->inf_du = m->worhp_w.ScaledKKT;
+            m->inf_du = m->worhp_p.ScaledKKT;
             m->alpha_pr = m->worhp_w.ArmijoAlpha;
 
             // Inputs
@@ -357,7 +358,7 @@ namespace casadi {
             m->fstats.at("callback_fun").toc();
             int ret = static_cast<int>(ret_double);
 
-            if (ret) m->worhp_c.status = TerminatedByUser;
+            if (ret) m->worhp_c.status = TerminateError;
           }
         }
 
@@ -456,36 +457,40 @@ namespace casadi {
     switch (flag) {
     case TerminateSuccess: return "TerminateSuccess";
     case OptimalSolution: return "OptimalSolution";
+    case OptimalSolutionConstantF: return "OptimalSolutionConstantF";
     case SearchDirectionZero: return "SearchDirectionZero";
     case SearchDirectionSmall: return "SearchDirectionSmall";
-    case StationaryPointFound: return "StationaryPointFound";
-    case AcceptablePrevious: return "AcceptablePrevious";
     case FritzJohn: return "FritzJohn";
     case NotDiffable: return "NotDiffable";
     case Unbounded: return "Unbounded";
     case FeasibleSolution: return "FeasibleSolution";
     case LowPassFilterOptimal: return "LowPassFilterOptimal";
     case LowPassFilterAcceptable: return "LowPassFilterAcceptable";
+    case AcceptableSolution: return "AcceptableSolution";
+    case AcceptablePrevious: return "AcceptablePrevious";
+    case AcceptableSolutionConstantF: return "AcceptableSolutionConstantF";
+    case AcceptablePreviousConstantF: return "AcceptablePreviousConstantF";
+    case AcceptableSolutionSKKT: return "AcceptableSolutionSKKT";
+    case AcceptableSolutionScaled: return "AcceptableSolutionScaled";
+    case AcceptablePreviousScaled: return "AcceptablePreviousScaled";
     case TerminateError: return "TerminateError";
-    case InitError: return "InitError";
-    case DataError: return "DataError";
     case MaxCalls: return "MaxCalls";
     case MaxIter: return "MaxIter";
-    case MinimumStepsize: return "MinimumStepsize";
-    case QPerror: return "QPerror";
-    case ProblemInfeasible: return "ProblemInfeasible";
-    case GroupsComposition: return "GroupsComposition";
-    case TooBig: return "TooBig";
     case Timeout: return "Timeout";
-    case FDError: return "FDError";
-    case LocalInfeas: return "LocalInfeas";
+    case TooBig: return "TooBig";
+    case evalsNaN: return "evalsNaN";
+    case DivergingPrimal: return "DivergingPrimal";
+    case DivergingDual: return "DivergingDual";
+    case MinimumStepsize: return "MinimumStepsize";
+    case RegularizationFailed: return "RegularizationFailed";
+    case InitError: return "InitError";
+    case DataError: return "DataError";
+    case RestartError: return "RestartError";
+    case QPerror: return "QPerror";
+    case LinearSolverFailed: return "LinearSolverFailed";
+    case TerminatedByCheckFD: return "TerminatedByCheckFD";
     case LicenseError: return "LicenseError";
-    case TerminatedByUser: return "TerminatedByUser";
-    case FunctionErrorF: return "FunctionErrorF";
-    case FunctionErrorG: return "FunctionErrorG";
-    case FunctionErrorDF: return "FunctionErrorDF";
-    case FunctionErrorDG: return "FunctionErrorDG";
-    case FunctionErrorHM: return "FunctionErrorHM";
+    case Debug: return "Debug";
     }
     return "Unknown WORHP return code";
   }

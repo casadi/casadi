@@ -130,34 +130,34 @@ namespace casadi {
                               const std::map<std::string, Sparsity>& st);
 
     /// Get all statistics
-    virtual Dict get_stats(void* mem) const;
+    Dict get_stats(void* mem) const override;
 
     /** \brief  Destructor */
-    virtual ~HpmpcInterface();
+    ~HpmpcInterface() override;
 
     // Get name of the plugin
-    virtual const char* plugin_name() const { return "hpmpc";}
+    const char* plugin_name() const override { return "hpmpc";}
 
     ///@{
     /** \brief Options */
     static Options options_;
-    virtual const Options& get_options() const { return options_;}
+    const Options& get_options() const override { return options_;}
     ///@}
 
     /** \brief  Initialize */
-    virtual void init(const Dict& opts);
+    void init(const Dict& opts) override;
 
     /** \brief Create memory block */
-    virtual void* alloc_memory() const { return new HpmpcMemory();}
+    void* alloc_memory() const override { return new HpmpcMemory();}
 
     /** \brief Free memory block */
-    virtual void free_memory(void *mem) const { delete static_cast<HpmpcMemory*>(mem);}
+    void free_memory(void *mem) const override { delete static_cast<HpmpcMemory*>(mem);}
 
     /** \brief Initalize memory block */
-    virtual void init_memory(void* mem) const;
+    void init_memory(void* mem) const override;
 
     /** \brief  Evaluate numerically */
-    virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
+    void eval(void* mem, const double** arg, double** res, int* iw, double* w) const override;
 
     /** \brief Helper function */
     static void mproject(double factor, const double* x, const int* sp_x,

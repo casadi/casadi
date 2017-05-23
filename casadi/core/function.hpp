@@ -327,36 +327,55 @@ namespace casadi {
     /** \brief Generate a Jacobian function of output \a oind with respect to input \a iind
      * \param iind The index of the input
      * \param oind The index of the output
-     *
-     * The default behavior of this class is defined by the derived class.
-     * If compact is set to true, only the nonzeros of the input and output expressions are
-     * considered.
-     * If symmetric is set to true, the Jacobian being calculated is known to be symmetric
-     * (usually a Hessian),
-     * which can be exploited by the algorithm.
-     *
-     * The generated Jacobian has one more output than the calling function corresponding
-     * to the Jacobian and the same number of inputs.
-     *
+     * Legacy function: To be deprecated in a future version of CasADi.
+     * Exists only for compatibility with Function::jacobian pre-CasADi 3.2
      */
-    Function jacobian(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
+    Function jacobian_old(int iind, int oind, bool compact=false, bool symmetric=false);
+
+    /** \brief Generate a Hessian function of output \a oind with respect to input \a iind
+     * \param iind The index of the input
+     * \param oind The index of the output
+     * Legacy function: To be deprecated in a future version of CasADi.
+     * Exists only for compatibility with Function::hessian pre-CasADi 3.2
+     */
+    Function hessian_old(int iind, int oind);
+
+    /** \brief Generate a Jacobian function of all the inputs elements with respect to all
+     * the output elements).
+     * Legacy function: To be deprecated
+     */
+    Function fullJacobian();
+
+#ifdef WITH_DEPRECATED_FEATURES
+    ///@{
+    /** \brief [DEPRECATED] Alias of Function::jacobian_old
+     * This function is of internal character and should be avoided, if possible. The preferred way
+     * is to use unction::factory instead.
+     * This function will change behavior in the next version of CasADi.
+     */
+    Function jacobian(int iind=0, int oind=0, bool compact=false, bool symmetric=false) {
+      return jacobian_old(iind, oind, compact, symmetric);
+    }
     Function jacobian(const std::string& iind,  int oind=0, bool compact=false,
                       bool symmetric=false) {
-        return jacobian(index_in(iind), oind, compact, symmetric);
+      return jacobian(index_in(iind), oind, compact, symmetric);
     }
     Function jacobian(int iind, const std::string& oind, bool compact=false, bool symmetric=false) {
-        return jacobian(iind, index_out(oind), compact, symmetric);
+      return jacobian(iind, index_out(oind), compact, symmetric);
     }
     Function jacobian(const std::string& iind, const std::string& oind, bool compact=false,
                       bool symmetric=false) {
-        return jacobian(index_in(iind), index_out(oind), compact, symmetric);
+      return jacobian(index_in(iind), index_out(oind), compact, symmetric);
     }
     ///@}
 
-    #ifdef WITH_DEPRECATED_FEATURES
     /** [DEPRECATED] Set the Jacobian function of output \a oind with respect to input \a iind
      NOTE: Does _not_ take ownership, only weak references to the Jacobians are kept internally */
     void setJacobian(const Function& jac, int iind=0, int oind=0, bool compact=false);
+
+    /** [DEPRECATED] Set the Jacobian of all the input nonzeros with respect to all output nonzeros
+     NOTE: Does _not_ take ownership, only weak references to the Jacobian are kept internally */
+    void setFullJacobian(const Function& jac);
 
     ///@{
     /** \brief [DEPRECATED] Use Function::factory instead */
@@ -370,10 +389,6 @@ namespace casadi {
     Function gradient(const std::string& iind, const std::string& oind) {
         return gradient(index_in(iind), index_out(oind));
     }
-    ///@}
-
-    ///@{
-    /** \brief [DEPRECATED] Use Function::factory instead */
     Function tangent(int iind=0, int oind=0);
     Function tangent(const std::string& iind, int oind=0)
     { return tangent(index_in(iind), oind); }
@@ -382,34 +397,24 @@ namespace casadi {
     Function tangent(const std::string& iind, const std::string& oind)
     { return tangent(index_in(iind), index_out(oind)); }
     ///@}
-#endif // WITH_DEPRECATED_FEATURES
 
     ///@{
-    /** \brief Generate a Hessian function of output \a oind with respect to input \a iind
-     * \param iind The index of the input
-     * \param oind The index of the output
-     *
-     * The generated Hessian has two more outputs than the calling function corresponding
-     * to the Hessian and the gradients.
-     *
+    /** \brief [DEPRECATED] Alias of Function::jacobian_old
+     * This function is of internal character and should be avoided, if possible. The preferred way
+     * is to use unction::factory instead.
+     * This function will change behavior in the next version of CasADi.
      */
-    Function hessian(int iind=0, int oind=0);
-    Function hessian(const std::string& iind, int oind=0)
-    { return hessian(index_in(iind), oind); }
-    Function hessian(int iind, const std::string& oind)
-    { return hessian(iind, index_out(oind)); }
-    Function hessian(const std::string& iind, const std::string& oind)
-    { return hessian(index_in(iind), index_out(oind)); }
-    ///@}
-
-    /** \brief Generate a Jacobian function of all the inputs elements with respect to all
-     * the output elements).
-     */
-    Function fullJacobian();
-
-    /** Set the Jacobian of all the input nonzeros with respect to all output nonzeros
-     NOTE: Does _not_ take ownership, only weak references to the Jacobian are kept internally */
-    void setFullJacobian(const Function& jac);
+     Function hessian(int iind=0, int oind=0) {
+       return hessian_old(iind, oind);
+     }
+     Function hessian(const std::string& iind, int oind=0)
+     { return hessian(index_in(iind), oind); }
+     Function hessian(int iind, const std::string& oind)
+     { return hessian(iind, index_out(oind)); }
+     Function hessian(const std::string& iind, const std::string& oind)
+     { return hessian(index_in(iind), index_out(oind)); }
+     ///@}
+#endif // WITH_DEPRECATED_FEATURES
 
     ///@{
     /** \brief Evaluate the function symbolically or numerically  */
@@ -660,7 +665,7 @@ namespace casadi {
 
     ///@{
     /// Get, if necessary generate, the sparsity of a Jacobian block
-    const Sparsity sparsity_jac(int iind=0, int oind=0,
+    const Sparsity sparsity_jac(int iind, int oind,
                                 bool compact=false, bool symmetric=false) const;
     const Sparsity sparsity_jac(const std::string &iind, int oind=0,
                                 bool compact=false, bool symmetric=false) const {
@@ -677,6 +682,14 @@ namespace casadi {
     ///@}
 
 #ifdef WITH_DEPRECATED_FEATURES
+    /* [DEPRECATED] First two arguments for Function::sparsity_jac now required.
+
+      Get, if necessary generate, the sparsity of a Jacobian block
+    */
+    const Sparsity sparsity_jac(int iind=0) const {
+      return sparsity_jac(iind, 0);
+    }
+
     ///@{
     /// [DEPRECATED] Generate the sparsity of a Jacobian block
     void set_jac_sparsity(const Sparsity& sp, int iind, int oind, bool compact=false);

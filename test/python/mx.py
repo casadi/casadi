@@ -530,7 +530,7 @@ class MXtests(casadiTestCase):
     x0=array([[0.738]])
 
     def fmod(f,x):
-      J=f.jacobian()
+      J=f.jacobian_old(0, 0)
       return J
 
     self.numpyEvaluationCheckPool(self.Jpool,[x],x0,name="MX unary operations, jacobian",fmod=fmod)
@@ -542,7 +542,7 @@ class MXtests(casadiTestCase):
       x0=array([0.738,0.9,0.3])
 
       def fmod(f,x):
-        J=f.jacobian()
+        J=f.jacobian_old(0, 0)
         return J
 
       self.numpyEvaluationCheckPool(self.Jpool,[x],x0,name="MX unary operations, jacobian",fmod=fmod)
@@ -750,7 +750,7 @@ class MXtests(casadiTestCase):
 
     for w in [0, 1]:
       f = Function("f", [x,A,b,C,D,e], [a], {"ad_weight":w, "ad_weight_sp":w})
-      J = f.jacobian()
+      J = f.jacobian_old(0, 0)
       J_in = [0]*J.n_in();J_in[0]=x_
       J_in[1]=A_
       J_in[2]=b_
@@ -820,7 +820,7 @@ class MXtests(casadiTestCase):
     for w in [0, 1]:
       f = Function("f", [x,A,b,C,D,e], [a], {"ad_weight":w, "ad_weight_sp":w})
 
-      J = f.jacobian()
+      J = f.jacobian_old(0, 0)
       J_in = [0]*J.n_in();J_in[0]=x_
       J_in[1]=A_
       J_in[2]=b_
@@ -893,7 +893,7 @@ class MXtests(casadiTestCase):
 
     for w in [0, 1]:
       f = Function("f", [x,A,b,C,D,e], [a], {"ad_weight":w, "ad_weight_sp":w})
-      J = f.jacobian()
+      J = f.jacobian_old(0, 0)
       J_in = [0]*J.n_in();J_in[0]=x_
       J_in[1]=A_
       J_in[2]=b_
@@ -910,7 +910,7 @@ class MXtests(casadiTestCase):
     x=SX.sym("x")
     y=x**3
     f=Function("f", [x],[y])
-    J=f.jacobian()
+    J=f.jacobian_old(0, 0)
 
     X=MX.sym("X")
     F=Function("F", [X], J(X))
@@ -984,79 +984,6 @@ class MXtests(casadiTestCase):
     J = jacobian(vertcat(X,Y),Y)
     JJ = DM.ones(J.sparsity())
     self.checkarray(JJ,numpy.vstack((zeros((3,2)),eye(2))),"diag")
-
-
-  def test_MatrixAlgebraTableDense(self):
-    self.message("Table of derivatives https://ccrma.stanford.edu/~dattorro/matrixcalc.pdf")
-
-    n = m = K = L = k = 3
-    t_ = 0.3
-    mu_ = 0.13
-
-    def gentest(m,n):
-      A = MX.sym("A",m,n)
-      return (DM(numpy.random.random((m,n))),A)
-
-    (a_,a) = gentest(m,1)
-    (b_,b) = gentest(m,1)
-    (x_,x) = gentest(n,1)
-    (y_,y) = gentest(n,1)
-    (A_,A) = gentest(m,n)
-    (B_,B) = gentest(m,n)
-    (C_,C) = gentest(m,n)
-    (X_,X) = gentest(K,L)
-    (Y_,Y) = gentest(K,L)
-    t = MX(t_)
-    mu = MX(mu_)
-
-    ins = [a,b,x,y,A,B,C,X,Y]
-    ins_ = [a_,b_,x_,y_,A_,B_,C_,X_,Y_]
-
-    def grad(y,x):
-      f = Function("f", ins,[x])
-      J = f.jacobian([i for i in range(len(ins)) if ins[i] is y][0])
-      if x.shape[0]==1 and x.shape[1]==1:
-        return (J(*ins)[0].T).reshape(y.shape)
-      return J(*ins)[0].T
-
-    def eye(n):
-      return DM(numpy.eye(n))
-
-    Axb = mtimes(A,x)-b
-    ab = mtimes(a,b.T)
-    tests = [
-    (grad(x,x),eye(k)),
-    (grad(x,x.T),eye(k)),
-    (grad(x,Axb),A.T),
-    #(grad(x,Axb.T),A)   incorrect?
-    (grad(x,mtimes(Axb.T,Axb)),2*mtimes(A.T,Axb)),
-    #(grad(x,norm_2(Axb)),mtimes(A.T,Axb)/norm_2(Axb)), #  norm_2 not implemented
-    (grad(x,mtimes(mtimes(x.T,A),x)+2*mtimes(mtimes(x.T,B),y)+mtimes(mtimes(y.T,C),y)),mtimes((A+A.T),x)+2*mtimes(B,y)),
-    #(grad(x,mtimes(a.T,mtimes(x.T,x)*b)),2*mtimes(mtimes(x,a.T),b))
-    (grad(X,X),eye(k**2)),
-    #(grad(X,X.T),eye(k**2))
-    (grad(X,mtimes(a.T,mtimes(X,b))),ab),
-    (grad(X,mtimes(b.T,mtimes(X.T,a))),ab),
-    (grad(X,mtimes(a.T,mtimes(mtimes(X,X),b))),mtimes(X.T,ab)+mtimes(ab,X.T)),
-    (grad(X,mtimes(a.T,mtimes(mtimes(X.T,X),b))),mtimes(X,ab + ab.T)),
-    (grad(x,x*mu),MX(eye(k))*mu),
-    (grad(X,c.trace(X*mu)),MX(eye(k))*mu),
-    (grad(X,c.trace(mtimes(X.T,Y))),Y),
-    (grad(X,c.trace(mtimes(Y,X.T))),Y),
-    (grad(X,c.trace(mtimes(Y.T,X))),Y),
-    (grad(X,c.trace(mtimes(X,Y.T))),Y),
-    (grad(X,c.trace(mtimes(a.T,mtimes(X,b)))),ab)
-    #(grad(X,log(c.det(X))),c.inv(X_)),
-    ]
-
-    cnt = 0
-    for symbol, solution in tests:
-      f = Function("f", ins,[symbol])
-      f_out = f(*ins_)
-      g = Function("g", ins,[solution])
-      g_out = g(*ins_)
-      self.checkarray(f_out, g_out, "#%d" % cnt )
-      cnt+=1
 
   def test_null(self):
     self.message("Function null")
@@ -1255,7 +1182,7 @@ class MXtests(casadiTestCase):
         gfcn = Function("gfcn", [U], [G]).expand("e_gfcn", {"ad_weight":1})
       else:
         gfcn = Function("gfcn", [U],[G], {"ad_weight":1})
-      J = gfcn.jacobian()
+      J = gfcn.jacobian_old(0, 0)
       J_in = [0]*J.n_in();J_in[0]=1
       J_out = J.call(J_in)
       self.assertAlmostEqual(J_out[0],1,9)
@@ -2277,7 +2204,7 @@ class MXtests(casadiTestCase):
 
     f = Function("f", [x],[y])
 
-    H = f.hessian()
+    H = f.hessian_old(0, 0)
 
   def test_bug_1042(self):
 
@@ -2390,7 +2317,7 @@ class MXtests(casadiTestCase):
 
     g = Function("g", [x],[MX(1,1)])
 
-    h = g.jacobian(0,0,False,True)
+    h = g.jacobian_old(0,0,False,True)
 
     x = MX.sym("x",2)
 
