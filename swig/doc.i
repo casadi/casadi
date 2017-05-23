@@ -59426,8 +59426,8 @@ with it.
 %feature("docstring")  casadi::Sparsity::btf(std::vector< int >
 &output_rowperm, std::vector< int > &output_colperm, std::vector< int >
 &output_rowblock, std::vector< int > &output_colblock, std::vector< int >
-&output_coarse_rowblock, std::vector< int > &output_coarse_colblock, int
-seed=0) const  "
+&output_coarse_rowblock, std::vector< int > &output_coarse_colblock) const
+"
 
 Calculate the block triangular form (BTF) See Direct Methods for Sparse
 Linear Systems by Davis (2006).
