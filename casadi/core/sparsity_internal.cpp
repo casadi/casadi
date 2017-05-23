@@ -52,7 +52,7 @@ namespace casadi {
     if (!btf_) {
       btf_ = new SparsityInternal::Btf();
       btf_->nb = btf(btf_->rowperm, btf_->colperm, btf_->rowblock, btf_->colblock,
-                     btf_->coarse_rowblock, btf_->coarse_rowblock);
+                     btf_->coarse_rowblock, btf_->coarse_colblock);
     }
     return *btf_;
   }
