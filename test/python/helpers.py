@@ -155,8 +155,8 @@ class casadiTestCase(unittest.TestCase):
     e = None
     try:
       yield
-    except Exception as e:
-      e = str(e)
+    except Exception as err:
+      e = str(err)
     self.assertFalse(e is None)
     self.assertTrue(s in e)
 
