@@ -128,7 +128,7 @@ e = y_data-Xn[0,:].T;
 
 V = veccat(params, X)
 
-nlp = {'x':V, 'f':0.5*dot(e,e),'g':gaps}
+nlp = {'x':V, 'f':0.5*dot(e,e),'g': vec(gaps)}
 
 # Multipleshooting allows for careful initialization
 yd = np.diff(y_data,axis=0)*fs
