@@ -30,6 +30,7 @@ import sys
 from math import isnan, isinf
 import itertools
 import time
+from contextlib import contextmanager
 
 import argparse
 import struct
@@ -145,8 +146,19 @@ def toMX_fun(fun):
   ins = fun.mx_in()
   return Function("f",ins,fun(ins))
 
+
+
 class casadiTestCase(unittest.TestCase):
 
+  @contextmanager
+  def assertInException(self,s):
+    e = None
+    try:
+      yield
+    except Exception as e:
+      e = str(e)
+    self.assertFalse(e is None)
+    self.assertTrue(s in e)
 
   def tearDown(self):
     t = time.time() - self.startTime

@@ -131,6 +131,20 @@ namespace casadi {
         casadi_error("No such field: " + i.first);
       }
     }
+
+    if (f.is_empty()) f = 0;
+    if (g.is_empty()) g = M(0, 1);
+
+    // Dimension checks
+    casadi_assert_message(g.is_dense() && g.is_vector(),
+      "Expected a dense vector 'g', but got " + g.dim() + ".");
+
+    casadi_assert_message(f.is_dense() && f.is_scalar(),
+      "Expected a dense scalar 'f', but got " + f.dim() + ".");
+
+    casadi_assert_message(x.is_dense() && x.is_vector(),
+      "Expected a dense vector 'x', but got " + x.dim() + ".");
+
     if (g.is_empty(true)) g = M(0, 1); // workaround
 
     // Gradient of the objective: gf == Hx + g

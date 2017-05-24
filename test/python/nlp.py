@@ -72,6 +72,46 @@ except:
 
 class NLPtests(casadiTestCase):
 
+  def test_wrongdims(self):
+    x=SX.sym("x",2)
+    nlp={'x':x, 'f':-x[0],'g':diag(x)}
+
+    for Solver, solver_options in solvers:
+      with self.assertInException("dense vector"):
+        solver = nlpsol("mysolver", Solver, nlp, solver_options)
+    nlp={'x':x, 'f':-x[0],'g':mtimes(x,x.T)}
+
+    for Solver, solver_options in solvers:
+      with self.assertInException("dense vector"):
+        solver = nlpsol("mysolver", Solver, nlp, solver_options)
+
+    nlp={'x':x, 'f':SX(1,1),'g':x}
+
+    for Solver, solver_options in solvers:
+      with self.assertInException("dense scalar"):
+        solver = nlpsol("mysolver", Solver, nlp, solver_options)
+
+    nlp={'x':x, 'f':SX.zeros(0,0),'g':x}
+
+    for Solver, solver_options in solvers:
+      solver = nlpsol("mysolver", Solver, nlp, solver_options)
+
+    nlp={'x':x, 'g':x}
+    for Solver, solver_options in solvers:
+      solver = nlpsol("mysolver", Solver, nlp, solver_options)
+
+    nlp={'x':x, 'f':SX.zeros(2,1),'g':x}
+
+    for Solver, solver_options in solvers:
+      with self.assertInException("dense scalar"):
+        solver = nlpsol("mysolver", Solver, nlp, solver_options)
+        
+    x = vec(diag(SX.sym("x",2)))
+    nlp={'x':x, 'f':mtimes(x.T,x),'g':x[0]}
+    for Solver, solver_options in solvers:
+      with self.assertInException("dense vector"):
+        solver = nlpsol("mysolver", Solver, nlp, solver_options)
+
 
   def test_initialcond(self):
     x=SX.sym("x")
@@ -355,6 +395,8 @@ class NLPtests(casadiTestCase):
     for Solver, solver_options in solvers:
       self.message(str(Solver))
       if "worhp"==Solver:
+        continue
+      if "sqpmethod"==Solver:
         continue
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
       solver_in = {}

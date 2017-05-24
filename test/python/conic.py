@@ -57,6 +57,47 @@ print(conics)
 
 class ConicTests(casadiTestCase):
 
+  def test_wrongdims(self):
+    x=SX.sym("x",2)
+    qp={'x':x, 'f':-x[0],'g':diag(x)}
+
+    for conic, qp_options, aux_options in conics:
+      with self.assertInException("dense vector"):
+        solver = qpsol("mysolver", conic, qp, qp_options)
+    qp={'x':x, 'f':-x[0],'g':mtimes(x,x.T)}
+
+    for conic, qp_options, aux_options in conics:
+      with self.assertInException("dense vector"):
+        solver = qpsol("mysolver", conic, qp, qp_options)
+
+    qp={'x':x, 'f':SX(1,1),'g':x}
+
+    for conic, qp_options, aux_options in conics:
+      with self.assertInException("dense scalar"):
+        solver = qpsol("mysolver", conic, qp, qp_options)
+
+    qp={'x':x, 'f':SX.zeros(0,0),'g':x}
+
+    for conic, qp_options, aux_options in conics:
+      solver = qpsol("mysolver", conic, qp, qp_options)
+
+    qp={'x':x, 'g':x}
+    for conic, qp_options, aux_options in conics:
+      solver = qpsol("mysolver", conic, qp, qp_options)
+
+    qp={'x':x, 'f':SX.zeros(2,1),'g':x}
+
+    for conic, qp_options, aux_options in conics:
+      with self.assertInException("dense scalar"):
+        solver = qpsol("mysolver", conic, qp, qp_options)
+        
+    x = vec(diag(SX.sym("x",2)))
+    qp={'x':x, 'f':mtimes(x.T,x),'g':x[0]}
+    for conic, qp_options, aux_options in conics:
+      with self.assertInException("dense vector"):
+        solver = qpsol("mysolver", conic, qp, qp_options)
+
+
   def testboundsviol(self):
 
     H = DM([[1,-1],[-1,2]])

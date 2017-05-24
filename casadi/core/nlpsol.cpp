@@ -189,7 +189,7 @@ namespace casadi {
   Sparsity Nlpsol::get_sparsity_out(int i) {
     switch (static_cast<NlpsolOutput>(i)) {
     case NLPSOL_F:
-      return Sparsity::scalar();
+      return oracle_.sparsity_out(NL_F);
     case NLPSOL_X:
     case NLPSOL_LAM_X:
       return oracle_.sparsity_in(NL_X);
@@ -271,6 +271,16 @@ namespace casadi {
     nx_ = nnz_out(NLPSOL_X);
     np_ = nnz_in(NLPSOL_P);
     ng_ = nnz_out(NLPSOL_G);
+
+    // Dimension checks
+    casadi_assert_message(sparsity_out(NLPSOL_G).is_dense() && sparsity_out(NLPSOL_G).is_vector(),
+        "Expected a dense vector 'g', but got " + sparsity_out(NLPSOL_G).dim() + ".");
+
+    casadi_assert_message(sparsity_out(NLPSOL_F).is_dense() && sparsity_out(NLPSOL_F).is_scalar(),
+        "Expected a dense scalar 'f', but got " + sparsity_out(NLPSOL_F).dim() + ".");
+
+    casadi_assert_message(sparsity_out(NLPSOL_X).is_dense() && sparsity_out(NLPSOL_X).is_vector(),
+      "Expected a dense vector 'x', but got " + sparsity_out(NLPSOL_X).dim() + ".");
 
     // Discrete marker
     mi_ = false;
@@ -355,8 +365,10 @@ namespace casadi {
 
     // Make sure enough degrees of freedom
     using casadi::to_string; // Workaround, MingGW bug, cf. CasADi issue #890
-    casadi_assert_message(n_eq <= nx_, "NLP is overconstrained: There are " + to_string(n_eq)
+    if (n_eq> nx_) {
+      casadi_warning("NLP is overconstrained: There are " + to_string(n_eq)
                          + " equality constraints but only " + to_string(nx_) + " variables.");
+    }
   }
 
   std::map<std::string, Nlpsol::Plugin> Nlpsol::solvers_;

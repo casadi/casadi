@@ -200,6 +200,8 @@ namespace casadi {
         casadi_error("No such field: " + i.first);
       }
     }
+    if (nl_out[NL_F].is_empty()) nl_out[NL_F] = 0;
+    if (nl_out[NL_G].is_empty()) nl_out[NL_G] = XType(0, 1);
     return Function("nlp", nl_in, nl_out, NL_INPUTS, NL_OUTPUTS);
   }
 
