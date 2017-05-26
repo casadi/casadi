@@ -652,7 +652,11 @@ namespace casadi {
   }
 
   Function Function::jacobian_old(int iind, int oind) {
-    return (*this)->jacobian(iind, oind);
+    // Redirect to factory class
+    vector<string> s_in = name_in();
+    vector<string> s_out = name_out();
+    s_out.insert(s_out.begin(), "jac:" + name_out(oind) + ":" + name_in(iind));
+    return factory("jac_" + name(), s_in, s_out);
   }
 
   Function Function::hessian_old(int iind, int oind) {

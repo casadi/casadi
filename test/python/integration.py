@@ -676,7 +676,7 @@ class Integrationtests(casadiTestCase):
     tend=num['tend']
     q0=num['q0']
     p=num['p']
-    self.assertAlmostEqual(H_out["ddxf_dp_dp"][0],(q0*tend**6*exp(tend**3/(3*p)))/(9*p**4)+(2*q0*tend**3*exp(tend**3/(3*p)))/(3*p**3),9,"Evaluation output mismatch")
+    self.assertAlmostEqual(H_out["jac_jac_xf_p_p"][0],(q0*tend**6*exp(tend**3/(3*p)))/(9*p**4)+(2*q0*tend**3*exp(tend**3/(3*p)))/(3*p**3),9,"Evaluation output mismatch")
 
   def test_hess4(self):
     self.message('CVodes integration: hessian to p: Jacobian of integrator.jacobian indirect')
@@ -756,7 +756,7 @@ class Integrationtests(casadiTestCase):
     par  = MX.sym("p",9,1)
     qend = integrator(x0=q0, p=par)["xf"]
     qe=integrator.jacobian_old(integrator.index_in("p"),integrator.index_out("xf"))
-    qe = qe(x0=q0,p=par)['dxf_dp']
+    qe = qe(x0=q0,p=par)['jac_xf_p']
     qef=Function("qef", [q0,par],[qe])
     qef_out = qef(A, B.ravel())
 
@@ -788,12 +788,12 @@ class Integrationtests(casadiTestCase):
     qend = integrator(x0=q0, p=par)["xf"]
     qe=Function("qe", [q0,par],[qend])
     qendJ=integrator.jacobian_old(integrator.index_in("x0"),integrator.index_out("xf"))
-    qendJ = qendJ(x0=q0,p=par)['dxf_dx0']
+    qendJ = qendJ(x0=q0,p=par)['jac_xf_x0']
 
     qeJ=Function("qeJ", [q0,par],[qendJ])
 
     qendJ2=integrator.jacobian_old(integrator.index_in("x0"),integrator.index_out("xf"))
-    qendJ2 = qendJ2(x0=q0,p=par)['dxf_dx0']
+    qendJ2 = qendJ2(x0=q0,p=par)['jac_xf_x0']
 
     qeJ2=Function("qeJ2", [q0,par],[qendJ2])
     qe_out = qe(A, vec(B))
@@ -835,7 +835,7 @@ class Integrationtests(casadiTestCase):
     qend = integrator(x0=q0, p=par)["xf"]
     qe=Function("qe", [q0,par],[qend])
     qendJ=integrator.jacobian_old(integrator.index_in("x0"), integrator.index_out("xf"))
-    qendJ =qendJ(x0=q0,p=par)['dxf_dx0']
+    qendJ =qendJ(x0=q0,p=par)['jac_xf_x0']
     qeJ=Function("qeJ", [q0,par],[qendJ])
     qe_out = qe(A, B)
     print(array(qe_out))
@@ -878,7 +878,7 @@ class Integrationtests(casadiTestCase):
     qend = integrator(x0=q0, p=par)["xf"]
     qe=Function("qe", [q0,par],[qend])
     qendJ=integrator.jacobian_old(integrator.index_in("x0"), integrator.index_out("xf"))
-    qendJ = qendJ(x0=q0, p=par)['dxf_dx0']
+    qendJ = qendJ(x0=q0, p=par)['jac_xf_x0']
     qeJ=Function("qeJ", [q0,par],[qendJ])
     qe_out = qe(A, p0)
 
@@ -911,7 +911,7 @@ class Integrationtests(casadiTestCase):
     self.checkarray(Jf_out[0],Jr,"Jacobian of Nonlin ODE")
 
     qendJ=integrator.jacobian_old(integrator.index_in("p"),integrator.index_out("xf"))
-    qendJ = qendJ(x0=q0,p=par)['dxf_dp']
+    qendJ = qendJ(x0=q0,p=par)['jac_xf_p']
     qeJ=Function("qeJ", [q0,par],[qendJ])
 
     qeJ_out = qeJ(A, p0)
