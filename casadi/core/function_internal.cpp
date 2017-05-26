@@ -249,9 +249,7 @@ namespace casadi {
                           "Changing the problem formulation is strongly encouraged.");
 
     // Resize the matrix that holds the sparsity of the Jacobian blocks
-    jac_sparsity_ = jac_sparsity_compact_ =
-        SparseStorage<Sparsity>(Sparsity(n_out, n_in));
-    jac_ = SparseStorage<WeakRef>(Sparsity(n_out, n_in));
+    jac_sparsity_ = jac_sparsity_compact_ = SparseStorage<Sparsity>(Sparsity(n_out, n_in));
 
     // If input scheme empty, provide default names
     if (ischeme_.empty()) {
@@ -1293,53 +1291,6 @@ namespace casadi {
   void FunctionInternal::
   eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
     casadi_error("'eval_sx' not defined for " + type_name());
-  }
-
-  Function FunctionInternal::jacobian(int iind, int oind) {
-
-    // Return value
-    WeakRef cached = jac_.elem(oind, iind);
-
-    // Check if cached
-    if (cached.alive()) {
-      // Return an owning reference
-      return shared_cast<Function>(cached.shared());
-
-    } else {
-      // Give it a suitable name
-      stringstream ss;
-      ss << "jacobian_" << name_ << "_" << iind << "_" << oind;
-
-      // Output names
-      std::vector<std::string> ionames;
-      ionames.reserve(1 + n_out());
-      ionames.push_back("d" + name_out(oind) + "_d" + name_in(iind));
-      for (int i=0; i<n_out(); ++i) {
-        ionames.push_back(oscheme_.at(i));
-      }
-
-      // Generate a Jacobian
-      Dict opts;
-      opts["verbose"] = verbose_;
-      opts["input_scheme"] = ischeme_;
-      opts["output_scheme"] = ionames;
-      opts["max_num_dir"] = max_num_dir_;
-      opts["derivative_of"] = self();
-      Function ret = getJacobian(ss.str(), iind, oind, opts);
-
-      // Save in cache
-      jac_.elem(oind, iind) = ret;
-      return ret;
-    }
-  }
-
-  void FunctionInternal::setJacobian(const Function& jac, int iind, int oind) {
-    jac_.elem(oind, iind) = jac;
-  }
-
-  Function FunctionInternal::
-  getJacobian(const std::string& name, int iind, int oind, const Dict& opts) {
-    return wrap().jacobian_old(iind, oind);
   }
 
   Function FunctionInternal::forward(int nfwd) const {
