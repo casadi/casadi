@@ -577,18 +577,6 @@ namespace casadi {
     /** \brief Get the depth to which equalities are being checked for simplifications */
     static int get_max_depth();
 
-#ifdef WITH_DEPRECATED_FEATURES
-    /** \brief [DEPRECATED] Renamed set_max_depth */
-    static void setEqualityCheckingDepth(int eq_depth=1) {
-      set_max_depth(eq_depth);
-    }
-
-    /** \brief [DEPRECATED] Renamed get_max_depth */
-    static int getEqualityCheckingDepth() {
-      return get_max_depth();
-    }
-#endif // WITH_DEPRECATED_FEATURES
-
     /// Check if a particular cast is allowed
     static bool test_cast(const SharedObjectInternal* ptr);
 

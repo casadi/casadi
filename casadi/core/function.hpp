@@ -346,76 +346,6 @@ namespace casadi {
      */
     Function fullJacobian();
 
-#ifdef WITH_DEPRECATED_FEATURES
-    ///@{
-    /** \brief [DEPRECATED] Alias of Function::jacobian_old
-     * This function is of internal character and should be avoided, if possible. The preferred way
-     * is to use unction::factory instead.
-     * This function will change behavior in the next version of CasADi.
-     */
-    Function jacobian(int iind=0, int oind=0, bool compact=false, bool symmetric=false) {
-      return jacobian_old(iind, oind, compact, symmetric);
-    }
-    Function jacobian(const std::string& iind,  int oind=0, bool compact=false,
-                      bool symmetric=false) {
-      return jacobian(index_in(iind), oind, compact, symmetric);
-    }
-    Function jacobian(int iind, const std::string& oind, bool compact=false, bool symmetric=false) {
-      return jacobian(iind, index_out(oind), compact, symmetric);
-    }
-    Function jacobian(const std::string& iind, const std::string& oind, bool compact=false,
-                      bool symmetric=false) {
-      return jacobian(index_in(iind), index_out(oind), compact, symmetric);
-    }
-    ///@}
-
-    /** [DEPRECATED] Set the Jacobian function of output \a oind with respect to input \a iind
-     NOTE: Does _not_ take ownership, only weak references to the Jacobians are kept internally */
-    void setJacobian(const Function& jac, int iind=0, int oind=0, bool compact=false);
-
-    /** [DEPRECATED] Set the Jacobian of all the input nonzeros with respect to all output nonzeros
-     NOTE: Does _not_ take ownership, only weak references to the Jacobian are kept internally */
-    void setFullJacobian(const Function& jac);
-
-    ///@{
-    /** \brief [DEPRECATED] Use Function::factory instead */
-    Function gradient(int iind=0, int oind=0);
-    Function gradient(const std::string& iind, int oind=0) {
-        return gradient(index_in(iind), oind);
-    }
-    Function gradient(int iind, const std::string& oind) {
-        return gradient(iind, index_out(oind));
-    }
-    Function gradient(const std::string& iind, const std::string& oind) {
-        return gradient(index_in(iind), index_out(oind));
-    }
-    Function tangent(int iind=0, int oind=0);
-    Function tangent(const std::string& iind, int oind=0)
-    { return tangent(index_in(iind), oind); }
-    Function tangent(int iind, const std::string& oind)
-    { return tangent(iind, index_out(oind)); }
-    Function tangent(const std::string& iind, const std::string& oind)
-    { return tangent(index_in(iind), index_out(oind)); }
-    ///@}
-
-    ///@{
-    /** \brief [DEPRECATED] Alias of Function::jacobian_old
-     * This function is of internal character and should be avoided, if possible. The preferred way
-     * is to use unction::factory instead.
-     * This function will change behavior in the next version of CasADi.
-     */
-     Function hessian(int iind=0, int oind=0) {
-       return hessian_old(iind, oind);
-     }
-     Function hessian(const std::string& iind, int oind=0)
-     { return hessian(index_in(iind), oind); }
-     Function hessian(int iind, const std::string& oind)
-     { return hessian(iind, index_out(oind)); }
-     Function hessian(const std::string& iind, const std::string& oind)
-     { return hessian(index_in(iind), index_out(oind)); }
-     ///@}
-#endif // WITH_DEPRECATED_FEATURES
-
     ///@{
     /** \brief Evaluate the function symbolically or numerically  */
     void call(const std::vector<DM> &arg, std::vector<DM>& SWIG_OUTPUT(res),
@@ -681,33 +611,6 @@ namespace casadi {
     }
     ///@}
 
-#ifdef WITH_DEPRECATED_FEATURES
-    /* [DEPRECATED] First two arguments for Function::sparsity_jac now required.
-
-      Get, if necessary generate, the sparsity of a Jacobian block
-    */
-    const Sparsity sparsity_jac(int iind=0) const {
-      return sparsity_jac(iind, 0);
-    }
-
-    ///@{
-    /// [DEPRECATED] Generate the sparsity of a Jacobian block
-    void set_jac_sparsity(const Sparsity& sp, int iind, int oind, bool compact=false);
-    void set_jac_sparsity(const Sparsity& sp, const std::string &iind, int oind,
-                          bool compact=false) {
-      set_jac_sparsity(sp, index_in(iind), oind, compact);
-    }
-    void set_jac_sparsity(const Sparsity& sp, int iind, const std::string &oind,
-                          bool compact=false) {
-      set_jac_sparsity(sp, iind, index_out(oind), compact);
-    }
-    void set_jac_sparsity(const Sparsity& sp, const std::string &iind, const std::string &oind,
-                          bool compact=false) {
-      set_jac_sparsity(sp, index_in(iind), index_out(oind), compact);
-    }
-    ///@}
-#endif // WITH_DEPRECATED_FEATURES
-
     /** \brief Export / Generate C code for the function */
     std::string generate(const std::string& fname, const Dict& opts=Dict()) const;
 
@@ -903,11 +806,6 @@ namespace casadi {
 
     // Check if a particular dependency exists
     bool has_function(const std::string& fname) const;
-
-#ifdef WITH_DEPRECATED_FEATURES
-    /** [DEPRECATED] Use oracle() instead */
-    Function rootfinder_fun() const { return oracle();}
-#endif // WITH_DEPRECATED_FEATURES
 
     /** Generate native code in the interfaced language for debugging */
     void conic_debug(const std::string &filename) const;

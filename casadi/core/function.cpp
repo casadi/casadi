@@ -651,24 +651,6 @@ namespace casadi {
     return (*this)->numel_out(ind);
   }
 
-  #ifdef WITH_DEPRECATED_FEATURES
-  void Function::setJacobian(const Function& jac, int iind, int oind, bool compact) {
-    (*this)->setJacobian(jac, iind, oind, compact);
-  }
-
-  Function Function::gradient(int iind, int oind) {
-    return (*this)->gradient(iind, oind);
-  }
-
-  Function Function::tangent(int iind, int oind) {
-    return (*this)->tangent(iind, oind);
-  }
-
-  void Function::setFullJacobian(const Function& jac) {
-    (*this)->full_jacobian_ = jac;
-  }
-#endif // WITH_DEPRECATED_FEATURES
-
   Function Function::jacobian_old(int iind, int oind, bool compact, bool symmetric) {
     return (*this)->jacobian(iind, oind, compact, symmetric);
   }
@@ -693,12 +675,6 @@ namespace casadi {
   sparsity_jac(int iind, int oind, bool compact, bool symmetric) const {
     return (*this)->sparsity_jac(iind, oind, compact, symmetric);
   }
-
-#ifdef WITH_DEPRECATED_FEATURES
-  void Function::set_jac_sparsity(const Sparsity& sp, int iind, int oind, bool compact) {
-    (*this)->set_jac_sparsity(sp, iind, oind, compact);
-  }
-#endif // WITH_DEPRECATED_FEATURES
 
   vector<string> Function::name_in() const {
     return (*this)->ischeme_;
