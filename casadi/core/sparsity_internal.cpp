@@ -1860,28 +1860,10 @@ namespace casadi {
     // Mapping
     mapping.clear();
 
-    if (nrow==ncol) {
+    if (is_vector()) {
       // Sparsity pattern
-      vector<int> ret_colind(2, 0), ret_row;
-
-      // Loop over diagonal entries
-      for (int cc=0; cc<ncol; ++cc) {
-        for (int el = colind[cc]; el<colind[cc+1]; ++el) {
-          if (row[el]==cc) {
-            ret_row.push_back(row[el]);
-            mapping.push_back(el);
-          }
-        }
-      }
-      ret_colind[1] = ret_row.size();
-
-      // Construct sparsity pattern
-      return Sparsity(ncol, 1, ret_colind, ret_row);
-
-    } else if (nrow==1 || ncol==1) {
-      // Sparsity pattern
-      int ret_nrow = std::max(nrow, ncol);
-      vector<int> ret_colind(ret_nrow+1, 0), ret_row;
+      int n = nrow * ncol;
+      vector<int> ret_colind(n+1, 0), ret_row;
 
       // Loop over all entries
       int ret_i=0;
@@ -1894,13 +1876,29 @@ namespace casadi {
           mapping.push_back(k);
         }
       }
-      while (ret_i<=ret_nrow) ret_colind[ret_i++]=ret_row.size();
+      while (ret_i<=n) ret_colind[ret_i++]=ret_row.size();
 
       // Construct sparsity pattern
-      return Sparsity(ret_nrow, ret_nrow, ret_colind, ret_row);
+      return Sparsity(n, n, ret_colind, ret_row);
+
     } else {
-      casadi_error("diag: wrong argument shape. Expecting square matrix or vector-like, but got "
-                   << dim() << " instead.");
+      // Sparsity pattern
+      int n = std::min(nrow, ncol);
+      vector<int> ret_row, ret_colind(2, 0);
+
+      // Loop over diagonal nonzeros
+      for (int cc=0; cc<n; ++cc) {
+        for (int el = colind[cc]; el<colind[cc+1]; ++el) {
+          if (row[el]==cc) {
+            ret_row.push_back(row[el]);
+            ret_colind[1]++;
+            mapping.push_back(el);
+          }
+        }
+      }
+
+      // Construct sparsity pattern
+      return Sparsity(n, 1, ret_colind, ret_row);
     }
   }
 
@@ -2016,7 +2014,7 @@ namespace casadi {
     // Check if matrix is square
     if (size2() != size1()) return false;
 
-    // Check if correct number of non-zeros (one per col)
+    // Check if correct number of non-zeros (one per column)
     if (nnz() != size2()) return false;
 
     // Check that the row indices are correct
