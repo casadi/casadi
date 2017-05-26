@@ -592,39 +592,6 @@ class Functiontests(casadiTestCase):
             for f in [F,toSX_fun(F)]:
               self.checkfunction(f,Fref,inputs=inputs,sparsity_mod=args.run_slow)
 
-  def test_issue1522(self):
-    V = MX.sym("X",2)
-    P = MX.sym("X",0)
-
-    x =  V[0]
-    y =  V[1]
-
-    obj = (x-(x+y))**2
-
-    nlp = Function("nlp", [V, P], [obj, MX()], ['x', 'p'], ['f', 'g'])
-
-    self.assertTrue(nlp.hessian_old(0,0).sparsity_out(0).is_symmetric())
-
-    V = MX.sym("X",6)
-
-    xs =      [ V[0:2], V[2:4] ]
-    travels = [ V[4],   V[5]   ]
-
-    dist = 0
-
-    for j in range(2):
-      dist+=sum1((xs[0]-(xs[j]+travels[j]))**2)
-
-    nlp = Function("nlp", [V, P], [-dist, MX()], ['x', 'p'], ['f', 'g'])
-
-    hs = []
-    for n in [nlp, nlp.expand('nlp_expanded')]:
-        H = n.reverse(1).jacobian_old(0,0,False,True)
-
-        h = H(der_x=1,adj_f=1)[H.name_out(0)]
-        hs.append(h)
-    self.checkarray(*hs)
-
   def test_repmatnode(self):
     x = MX.sym("x",2)
 

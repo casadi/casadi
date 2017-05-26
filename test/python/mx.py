@@ -2311,15 +2311,6 @@ class MXtests(casadiTestCase):
 
       x2 = diagcat(*[c.zeros(0,0)] + x1s+x1st + [c.zeros(0,0)])
       self.checkarray(x2.shape,(10,10))
-  def test_empty_symm_jac(self):
-
-    x = MX.sym("x",2)
-
-    g = Function("g", [x],[MX(1,1)])
-
-    h = g.jacobian_old(0,0,False,True)
-
-    x = MX.sym("x",2)
 
   def test_exprjac(self):
 

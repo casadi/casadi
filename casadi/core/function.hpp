@@ -330,7 +330,7 @@ namespace casadi {
      * Legacy function: To be deprecated in a future version of CasADi.
      * Exists only for compatibility with Function::jacobian pre-CasADi 3.2
      */
-    Function jacobian_old(int iind, int oind, bool compact=false, bool symmetric=false);
+    Function jacobian_old(int iind, int oind);
 
     /** \brief Generate a Hessian function of output \a oind with respect to input \a iind
      * \param iind The index of the input

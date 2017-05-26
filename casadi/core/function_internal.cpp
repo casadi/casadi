@@ -251,7 +251,7 @@ namespace casadi {
     // Resize the matrix that holds the sparsity of the Jacobian blocks
     jac_sparsity_ = jac_sparsity_compact_ =
         SparseStorage<Sparsity>(Sparsity(n_out, n_in));
-    jac_ = jac_compact_ = SparseStorage<WeakRef>(Sparsity(n_out, n_in));
+    jac_ = SparseStorage<WeakRef>(Sparsity(n_out, n_in));
 
     // If input scheme empty, provide default names
     if (ischeme_.empty()) {
@@ -1295,10 +1295,10 @@ namespace casadi {
     casadi_error("'eval_sx' not defined for " + type_name());
   }
 
-  Function FunctionInternal::jacobian(int iind, int oind, bool compact, bool symmetric) {
+  Function FunctionInternal::jacobian(int iind, int oind) {
 
     // Return value
-    WeakRef cached = compact ? jac_compact_.elem(oind, iind) : jac_.elem(oind, iind);
+    WeakRef cached = jac_.elem(oind, iind);
 
     // Check if cached
     if (cached.alive()) {
@@ -1325,26 +1325,21 @@ namespace casadi {
       opts["output_scheme"] = ionames;
       opts["max_num_dir"] = max_num_dir_;
       opts["derivative_of"] = self();
-      Function ret = getJacobian(ss.str(), iind, oind, compact, symmetric, opts);
+      Function ret = getJacobian(ss.str(), iind, oind, opts);
 
       // Save in cache
-      compact ? jac_compact_.elem(oind, iind) : jac_.elem(oind, iind) = ret;
+      jac_.elem(oind, iind) = ret;
       return ret;
     }
   }
 
-  void FunctionInternal::setJacobian(const Function& jac, int iind, int oind, bool compact) {
-    if (compact) {
-      jac_compact_.elem(oind, iind) = jac;
-    } else {
-      jac_.elem(oind, iind) = jac;
-    }
+  void FunctionInternal::setJacobian(const Function& jac, int iind, int oind) {
+    jac_.elem(oind, iind) = jac;
   }
 
   Function FunctionInternal::
-  getJacobian(const std::string& name, int iind, int oind, bool compact, bool symmetric,
-              const Dict& opts) {
-    return wrap().jacobian_old(iind, oind, compact, symmetric);
+  getJacobian(const std::string& name, int iind, int oind, const Dict& opts) {
+    return wrap().jacobian_old(iind, oind);
   }
 
   Function FunctionInternal::forward(int nfwd) const {

@@ -651,8 +651,8 @@ namespace casadi {
     return (*this)->numel_out(ind);
   }
 
-  Function Function::jacobian_old(int iind, int oind, bool compact, bool symmetric) {
-    return (*this)->jacobian(iind, oind, compact, symmetric);
+  Function Function::jacobian_old(int iind, int oind) {
+    return (*this)->jacobian(iind, oind);
   }
 
   Function Function::hessian_old(int iind, int oind) {

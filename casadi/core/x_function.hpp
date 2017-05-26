@@ -108,7 +108,7 @@ namespace casadi {
 
     /** \brief Return Jacobian function  */
     Function getJacobian(const std::string& name, int iind, int oind,
-                                 bool compact, bool symmetric, const Dict& opts) override;
+                         const Dict& opts) override;
 
     ///@{
     /** \brief Generate a function that calculates \a nfwd forward derivatives */
@@ -1012,13 +1012,11 @@ namespace casadi {
 
   template<typename DerivedType, typename MatType, typename NodeType>
   Function XFunction<DerivedType, MatType, NodeType>
-  ::getJacobian(const std::string& name, int iind, int oind, bool compact, bool symmetric,
-              const Dict& opts) {
+  ::getJacobian(const std::string& name, int iind, int oind, const Dict& opts) {
     // Return function expression
     std::vector<MatType> ret_out;
     ret_out.reserve(1+out_.size());
-    Dict jopts = {{"compact", compact}, {"symmetric", symmetric}};
-    ret_out.push_back(jac(iind, oind, jopts));
+    ret_out.push_back(jac(iind, oind));
     ret_out.insert(ret_out.end(), out_.begin(), out_.end());
 
     // Return function

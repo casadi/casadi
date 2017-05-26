@@ -256,10 +256,9 @@ namespace casadi {
 
     ///@{
     /** \brief Return Jacobian function */
-    Function jacobian(int iind, int oind, bool compact, bool symmetric);
-    void setJacobian(const Function& jac, int iind, int oind, bool compact);
-    virtual Function getJacobian(const std::string& name, int iind, int oind,
-                                 bool compact, bool symmetric, const Dict& opts);
+    Function jacobian(int iind, int oind);
+    void setJacobian(const Function& jac, int iind, int oind);
+    virtual Function getJacobian(const std::string& name, int iind, int oind, const Dict& opts);
     ///@}
 
     ///@{
@@ -721,7 +720,7 @@ namespace casadi {
     mutable SparseStorage<Sparsity> jac_sparsity_, jac_sparsity_compact_;
 
     /// Cache for Jacobians
-    mutable SparseStorage<WeakRef> jac_, jac_compact_;
+    mutable SparseStorage<WeakRef> jac_;
 
     /// If the function is the derivative of another function
     Function derivative_of_;
