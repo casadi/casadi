@@ -408,32 +408,6 @@ namespace casadi {
     return getGradient(ss.str(), iind, oind, opts);
   }
 
-  Function FunctionInternal::tangent(int iind, int oind) {
-    // Assert scalar
-    casadi_assert_message(sparsity_in(iind).is_scalar(),
-                          "Only tangent of scalar input functions allowed. Use jacobian instead.");
-
-    // Give it a suitable name
-    stringstream ss;
-    ss << "tangent_" << name_ << "_" << iind << "_" << oind;
-
-    // Output names
-    std::vector<std::string> ionames;
-    ionames.reserve(1 + n_out());
-    ionames.push_back("tangent");
-    for (int i=0; i<n_out(); ++i) {
-      ionames.push_back(oscheme_.at(i));
-    }
-
-    // Generate gradient function
-    Dict opts;
-    opts["input_scheme"] = ischeme_;
-    opts["output_scheme"] = ionames;
-    opts["max_num_dir"] = max_num_dir_;
-    opts["derivative_of"] = self();
-    return getTangent(ss.str(), iind, oind, opts);
-  }
-
   Function FunctionInternal::hessian(int iind, int oind) {
     log("FunctionInternal::hessian");
 
@@ -448,11 +422,6 @@ namespace casadi {
   Function FunctionInternal::getGradient(const std::string& name, int iind, int oind,
                                          const Dict& opts) {
     return wrap()->gradient(iind, oind);
-  }
-
-  Function FunctionInternal::getTangent(const std::string& name, int iind, int oind,
-                                        const Dict& opts) {
-    return wrap()->tangent(iind, oind);
   }
 
   Function FunctionInternal::wrap() const {

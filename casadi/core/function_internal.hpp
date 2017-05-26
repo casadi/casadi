@@ -267,12 +267,6 @@ namespace casadi {
     ///@}
 
     ///@{
-    /** \brief Return tangent function */
-    Function tangent(int iind, int oind);
-    virtual Function getTangent(const std::string& name, int iind, int oind, const Dict& opts);
-    ///@}
-
-    ///@{
     /** \brief Return Jacobian function */
     Function jacobian(int iind, int oind, bool compact, bool symmetric);
     void setJacobian(const Function& jac, int iind, int oind, bool compact);
