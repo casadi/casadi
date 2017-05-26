@@ -255,12 +255,6 @@ namespace casadi {
     ///@}
 
     ///@{
-    /** \brief Return Hessian function */
-    Function hessian(int iind, int oind);
-    virtual Function getHessian(int iind, int oind);
-    ///@}
-
-    ///@{
     /** \brief Return gradient function */
     Function gradient(int iind, int oind);
     virtual Function getGradient(const std::string& name, int iind, int oind, const Dict& opts);

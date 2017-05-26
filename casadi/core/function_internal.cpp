@@ -408,17 +408,6 @@ namespace casadi {
     return getGradient(ss.str(), iind, oind, opts);
   }
 
-  Function FunctionInternal::hessian(int iind, int oind) {
-    log("FunctionInternal::hessian");
-
-    // Assert scalar
-    casadi_assert_message(sparsity_out(oind).is_scalar(),
-                          "Only hessians of scalar functions allowed.");
-
-    // Generate gradient function
-    return getHessian(iind, oind);
-  }
-
   Function FunctionInternal::getGradient(const std::string& name, int iind, int oind,
                                          const Dict& opts) {
     return wrap()->gradient(iind, oind);
@@ -440,18 +429,6 @@ namespace casadi {
     vector<MX> arg = mx_in();
     vector<MX> res = self()(arg);
     return Function("wrap_" + name_, arg, res, ischeme_, oscheme_, opts);
-  }
-
-  Function FunctionInternal::getHessian(int iind, int oind) {
-    log("FunctionInternal::getHessian");
-
-    // Create gradient function
-    log("FunctionInternal::getHessian generating gradient");
-    Function g = gradient(iind, oind);
-
-    // Return the Jacobian of the gradient, exploiting symmetry (the gradient has output index 0)
-    log("FunctionInternal::getHessian generating Jacobian of gradient");
-    return g.jacobian_old(iind, 0, false, true);
   }
 
   void FunctionInternal::log(const string& msg) const {
