@@ -656,7 +656,13 @@ namespace casadi {
   }
 
   Function Function::hessian_old(int iind, int oind) {
-    return (*this)->hessian(iind, oind);
+    // Redirect to factory class
+    vector<string> s_in = name_in();
+    vector<string> s_out = name_out();
+    s_out.insert(s_out.begin(), "grad:" + name_out(oind) + ":" + name_in(iind));
+    s_out.insert(s_out.begin(),
+                 "sym:hess:" + name_out(oind) + ":" + name_in(iind) + ":" + name_in(iind));
+    return factory("hess_" + name(), s_in, s_out);
   }
 
   Function Function::fullJacobian() {
