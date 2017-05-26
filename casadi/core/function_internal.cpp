@@ -382,37 +382,6 @@ namespace casadi {
     stream << name_;
   }
 
-  Function FunctionInternal::gradient(int iind, int oind) {
-    // Assert scalar
-    casadi_assert_message(sparsity_out(oind).is_scalar(),
-                          "Only gradients of scalar functions allowed. Use jacobian instead.");
-
-    // Give it a suitable name
-    stringstream ss;
-    ss << "gradient_" << name_ << "_" << iind << "_" << oind;
-
-    // Output names
-    std::vector<std::string> ionames;
-    ionames.reserve(1 + n_out());
-    ionames.push_back("grad");
-    for (int i=0; i<n_out(); ++i) {
-      ionames.push_back(oscheme_.at(i));
-    }
-
-    // Generate gradient function
-    Dict opts;
-    opts["input_scheme"] = ischeme_;
-    opts["output_scheme"] = ionames;
-    opts["max_num_dir"] = max_num_dir_;
-    opts["derivative_of"] = self();
-    return getGradient(ss.str(), iind, oind, opts);
-  }
-
-  Function FunctionInternal::getGradient(const std::string& name, int iind, int oind,
-                                         const Dict& opts) {
-    return wrap()->gradient(iind, oind);
-  }
-
   Function FunctionInternal::wrap() const {
     // Construct options of the wrapping MXFunction
     Dict opts;

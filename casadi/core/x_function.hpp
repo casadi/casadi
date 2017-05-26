@@ -106,9 +106,6 @@ namespace casadi {
                                             const std::vector<std::string>& s_out,
                                             int order, bool tr=false) const override;
 
-    /** \brief Return gradient function  */
-    Function getGradient(const std::string& name, int iind, int oind, const Dict& opts) override;
-
     /** \brief Return Jacobian function  */
     Function getJacobian(const std::string& name, int iind, int oind,
                                  bool compact, bool symmetric, const Dict& opts) override;
@@ -1011,19 +1008,6 @@ namespace casadi {
     // Return
     if (verbose()) userOut() << "XFunction::jac end" << std::endl;
     return ret.T();
-  }
-
-  template<typename DerivedType, typename MatType, typename NodeType>
-  Function XFunction<DerivedType, MatType, NodeType>
-  ::getGradient(const std::string& name, int iind, int oind, const Dict& opts) {
-    // Create expressions for the gradient
-    std::vector<MatType> ret_out;
-    ret_out.reserve(1+out_.size());
-    ret_out.push_back(grad(iind, oind));
-    ret_out.insert(ret_out.end(), out_.begin(), out_.end());
-
-    // Return function
-    return Function(name, in_, ret_out, opts);
   }
 
   template<typename DerivedType, typename MatType, typename NodeType>

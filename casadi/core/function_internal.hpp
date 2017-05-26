@@ -255,12 +255,6 @@ namespace casadi {
     ///@}
 
     ///@{
-    /** \brief Return gradient function */
-    Function gradient(int iind, int oind);
-    virtual Function getGradient(const std::string& name, int iind, int oind, const Dict& opts);
-    ///@}
-
-    ///@{
     /** \brief Return Jacobian function */
     Function jacobian(int iind, int oind, bool compact, bool symmetric);
     void setJacobian(const Function& jac, int iind, int oind, bool compact);
