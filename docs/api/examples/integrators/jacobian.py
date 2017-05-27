@@ -30,9 +30,9 @@ from numpy import *
 #!
 #$ $\ddot{u}+\dot{u}-\epsilon (2 \mu \dot{u}+\alpha u^3+2 k u \cos(\Omega t))$ with $\Omega = 2 + \epsilon \sigma$.
 
-t = SX.sym('t') 
-u = SX.sym('u') 
-v = SX.sym('v') 
+t = SX.sym('t')
+u = SX.sym('u')
+v = SX.sym('v')
 
 eps   = SX.sym('eps')
 mu    = SX.sym('mu')
@@ -47,7 +47,7 @@ rhs    = vertcat(v,-u-eps*(2*mu*v+alpha*u**3+2*k*u*cos(Omega*t)))
 
 dae = {'x':states, 'p':params, 't':t, 'ode':rhs}
 
-integrator = integrator('integrator', 'cvodes', dae)
+F = integrator('F', 'cvodes', dae)
 
 #! First argument is input index, secpnd argument is output index
-jac = integrator.jacobian('p', 'xf')
+jac = F.factory('jac_F', F.name_in(), ['jac:xf:p'])
