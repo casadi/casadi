@@ -457,12 +457,6 @@
 %exception  casadi::FunctionInternal::getFullJacobian(const std::string &name, const std::vector< std::string > &i_names, const std::vector< std::string > &o_names, const Dict &opts) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::FunctionInternal::getGradient(const std::string &name, int iind, int oind, const Dict &opts) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::FunctionInternal::getHessian(int iind, int oind) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::FunctionInternal::getJacSparsity(int iind, int oind, bool symmetric) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -475,13 +469,7 @@
 %exception  casadi::FunctionInternal::getJacSparsityHierarchicalSymm(int iind, int oind) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::FunctionInternal::getJacobian(const std::string &name, int iind, int oind, bool compact, bool symmetric, const Dict &opts) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::FunctionInternal::getPartition(int iind, int oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool allow_forward, bool allow_reverse) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::FunctionInternal::getTangent(const std::string &name, int iind, int oind, const Dict &opts) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::getWorkSize() const  {
@@ -532,9 +520,6 @@
 %exception  casadi::FunctionInternal::grad_sx(int iind=0, int oind=0) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::FunctionInternal::gradient(int iind, int oind) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::FunctionInternal::hasDerivative() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -559,9 +544,6 @@
 %exception  casadi::FunctionInternal::hess_sx(int iind=0, int oind=0) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::FunctionInternal::hessian(int iind, int oind) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::FunctionInternal::index_in(const std::string &name) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -578,9 +560,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::jac_sx(int iind=0, int oind=0, const Dict &opts=Dict()) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::FunctionInternal::jacobian(int iind, int oind, bool compact, bool symmetric) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::jit_dependencies(const std::string &fname) {
@@ -709,9 +688,6 @@
 %exception  casadi::FunctionInternal::self() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::FunctionInternal::setJacobian(const Function &jac, int iind, int oind, bool compact) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::FunctionInternal::set_jac_sparsity(const Sparsity &sp, int iind, int oind, bool compact) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -800,9 +776,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::tang_sx(int iind=0, int oind=0) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::FunctionInternal::tangent(int iind, int oind) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::type_name() const  {
