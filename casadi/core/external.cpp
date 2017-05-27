@@ -255,20 +255,20 @@ namespace casadi {
     }
   }
 
-  bool External::hasFullJacobian() const {
-    if (FunctionInternal::hasFullJacobian()) return true;
+  bool External::has_jacobian() const {
+    if (FunctionInternal::has_jacobian()) return true;
     return li_.has_function(name_ + "_jac");
   }
 
   Function External
-  ::getFullJacobian(const std::string& name,
+  ::get_jacobian(const std::string& name,
                     const std::vector<std::string>& i_names,
                     const std::vector<std::string>& o_names,
-                    const Dict& opts) {
-    if (hasFullJacobian()) {
+                    const Dict& opts) const {
+    if (has_jacobian()) {
       return external(name, li_, opts);
     } else {
-      return FunctionInternal::getFullJacobian(name, i_names, o_names, opts);
+      return FunctionInternal::get_jacobian(name, i_names, o_names, opts);
     }
   }
 

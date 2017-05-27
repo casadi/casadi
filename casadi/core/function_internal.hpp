@@ -256,12 +256,12 @@ namespace casadi {
 
     ///@{
     /** \brief Return Jacobian of all input elements with respect to all output elements */
-    Function fullJacobian();
-    virtual bool hasFullJacobian() const;
-    virtual Function getFullJacobian(const std::string& name,
-                                     const std::vector<std::string>& i_names,
-                                     const std::vector<std::string>& o_names,
-                                     const Dict& opts);
+    Function jacobian() const;
+    virtual bool has_jacobian() const;
+    virtual Function get_jacobian(const std::string& name,
+                                  const std::vector<std::string>& i_names,
+                                  const std::vector<std::string>& o_names,
+                                  const Dict& opts) const;
     ///@}
 
     ///@{
@@ -512,7 +512,7 @@ namespace casadi {
     Sparsity& sparsity_jac(int iind, int oind, bool compact, bool symmetric) const;
 
     /// Get a vector of symbolic variables corresponding to the outputs
-    virtual std::vector<MX> symbolicOutput(const std::vector<MX>& arg);
+    virtual std::vector<MX> symbolic_output(const std::vector<MX>& arg) const;
 
     /** \brief Get input scheme index by name */
     virtual int index_in(const std::string &name) const {
@@ -707,7 +707,7 @@ namespace casadi {
     mutable std::vector<WeakRef> forward_, reverse_;
 
     /// Cache for full Jacobian
-    mutable WeakRef full_jacobian_;
+    mutable WeakRef jacobian_;
 
     /// Cache for sparsities of the Jacobian blocks
     mutable SparseStorage<Sparsity> jac_sparsity_, jac_sparsity_compact_;

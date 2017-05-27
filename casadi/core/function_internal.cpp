@@ -414,7 +414,7 @@ namespace casadi {
     return verbose_;
   }
 
-  std::vector<MX> FunctionInternal::symbolicOutput(const std::vector<MX>& arg) {
+  std::vector<MX> FunctionInternal::symbolic_output(const std::vector<MX>& arg) const {
     return self()(arg);
   }
 
@@ -1459,31 +1459,31 @@ namespace casadi {
     res = Call::create(self(), arg);
   }
 
-  Function FunctionInternal::fullJacobian() {
-    if (full_jacobian_.alive()) {
+  Function FunctionInternal::jacobian() const {
+    if (jacobian_.alive()) {
       // Return cached Jacobian
-      return shared_cast<Function>(full_jacobian_.shared());
+      return shared_cast<Function>(jacobian_.shared());
     } else {
       // Options
       Dict opts;
       opts["derivative_of"] = self();
-      Function ret = getFullJacobian(name_ + "_jac", ischeme_, {"jac"}, opts);
+      Function ret = get_jacobian(name_ + "_jac", ischeme_, {"jac"}, opts);
 
       // Consistency check
       casadi_assert(ret.n_in()==n_in());
       casadi_assert(ret.n_out()==1);
 
       // Cache it for reuse and return
-      full_jacobian_ = ret;
+      jacobian_ = ret;
       return ret;
     }
   }
 
   Function FunctionInternal::
-  getFullJacobian(const std::string& name,
+  get_jacobian(const std::string& name,
                   const std::vector<std::string>& i_names,
                   const std::vector<std::string>& o_names,
-                  const Dict& opts) {
+                  const Dict& opts) const {
     casadi_assert(get_n_forward()>0 || get_n_reverse()>0);
     // Number inputs and outputs
     int n_in = this->n_in();
@@ -1499,7 +1499,7 @@ namespace casadi {
     if (n_in==1) {
       argv = ret_argv;
       arg = argv.front();
-      resv = symbolicOutput(argv);
+      resv = symbolic_output(argv);
     } else {
       // Collect Sparsity patterns of inputs
       vector<Sparsity> sp_argv(n_in);
@@ -2025,12 +2025,12 @@ namespace casadi {
     alloc_w(sz_w, persistent);
   }
 
-  bool FunctionInternal::hasFullJacobian() const {
-    return full_jacobian_.alive();
+  bool FunctionInternal::has_jacobian() const {
+    return jacobian_.alive();
   }
 
   bool FunctionInternal::hasDerivative() const {
-    return get_n_forward()>0 || get_n_reverse()>0 || hasFullJacobian();
+    return get_n_forward()>0 || get_n_reverse()>0 || has_jacobian();
   }
 
   bool FunctionInternal::fwdViaJac(int nfwd) const {
@@ -2104,7 +2104,7 @@ namespace casadi {
       }
 
       // Multiply the Jacobian from the right
-      MX J = const_cast<FunctionInternal*>(this)->fullJacobian()(arg).at(0);
+      MX J = const_cast<FunctionInternal*>(this)->jacobian()(arg).at(0);
       v = horzsplit(mtimes(J, horzcat(v)));
 
       // Vertical offsets
@@ -2205,7 +2205,7 @@ namespace casadi {
       }
 
       // Multiply the transposed Jacobian from the right
-      MX J = const_cast<FunctionInternal*>(this)->fullJacobian()(arg).at(0);
+      MX J = const_cast<FunctionInternal*>(this)->jacobian()(arg).at(0);
       v = horzsplit(mtimes(J.T(), horzcat(v)));
 
       // Vertical offsets

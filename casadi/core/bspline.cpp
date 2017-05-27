@@ -268,9 +268,9 @@ namespace casadi {
     }
 
 
-    Function BSpline::getFullJacobian(const std::string& name,
+    Function BSpline::get_jacobian(const std::string& name,
           const std::vector<std::string>& i_names,
-          const std::vector<std::string>& o_names, const Dict& opts) {
+          const std::vector<std::string>& o_names, const Dict& opts) const {
 
       MX x = MX::sym("x", degree_.size());
       return Function(name, {x}, {jac(x)}, opts);

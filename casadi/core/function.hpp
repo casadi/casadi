@@ -342,9 +342,13 @@ namespace casadi {
 
     /** \brief Generate a Jacobian function of all the inputs elements with respect to all
      * the output elements).
-     * Legacy function: To be deprecated
      */
-    Function fullJacobian();
+    Function jacobian() const;
+
+#ifdef WITH_DEPRECATED_FEATURES
+    /** \brief [DEPRECATED] Alias of Function::jacobian */
+    Function fullJacobian() const {return jacobian();}
+#endif // WITH_DEPRECATED_FEATURES
 
     ///@{
     /** \brief Evaluate the function symbolically or numerically  */

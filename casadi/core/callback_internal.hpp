@@ -75,11 +75,11 @@ namespace casadi {
 
     ///@{
     /** \brief Return Jacobian of all input elements with respect to all output elements */
-    bool hasFullJacobian() const override;
-    Function getFullJacobian(const std::string& name,
+    bool has_jacobian() const override;
+    Function get_jacobian(const std::string& name,
                                      const std::vector<std::string>& i_names,
                                      const std::vector<std::string>& o_names,
-                                     const Dict& opts) override;
+                                     const Dict& opts) const override;
     ///@}
 
     ///@{

@@ -107,14 +107,14 @@ namespace casadi {
     g << body_;
   }
 
-  bool Jit::hasFullJacobian() const {
+  bool Jit::has_jacobian() const {
     return !jac_body_.empty();
   }
 
-  Function Jit::getFullJacobian(const std::string& name,
+  Function Jit::get_jacobian(const std::string& name,
                                 const std::vector<std::string>& i_names,
                                 const std::vector<std::string>& o_names,
-                                const Dict& opts) {
+                                const Dict& opts) const {
     // Create a JIT-function for the Jacobian
     Dict jit_opts;
     if (!hess_body_.empty()) jit_opts["jac"] = hess_body_;

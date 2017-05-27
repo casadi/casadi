@@ -76,11 +76,11 @@ namespace casadi {
 
     ///@{
     /** \brief Full Jacobian */
-    bool hasFullJacobian() const override { return true;}
-    Function getFullJacobian(const std::string& name,
+    bool has_jacobian() const override { return true;}
+    Function get_jacobian(const std::string& name,
                                       const std::vector<std::string>& i_names,
                                       const std::vector<std::string>& o_names,
-                                      const Dict& opts) override;
+                                      const Dict& opts) const override;
     ///@}
 
     /** \brief Is codegen supported? */

@@ -115,10 +115,10 @@ namespace casadi {
       int get_n_reverse() const override { return 64;}
       ///@}
 
-      bool hasFullJacobian() const override { return true;}
-      Function getFullJacobian(const std::string& name,
+      bool has_jacobian() const override { return true;}
+      Function get_jacobian(const std::string& name,
             const std::vector<std::string>& i_names,
-            const std::vector<std::string>& o_names, const Dict& opts) override;
+            const std::vector<std::string>& o_names, const Dict& opts) const override;
 
       /** \brief  Print description */
       void print(std::ostream &stream) const override { stream << "BSpline"; }

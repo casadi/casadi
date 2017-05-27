@@ -549,7 +549,7 @@ namespace casadi {
     }
   }
 
-  std::vector<MX> MXFunction::symbolicOutput(const std::vector<MX>& arg) {
+  std::vector<MX> MXFunction::symbolic_output(const std::vector<MX>& arg) const {
     // Check if input is given
     const int checking_depth = 2;
     bool input_given = true;
@@ -563,7 +563,7 @@ namespace casadi {
     if (input_given) {
       return out_;
     } else {
-      return FunctionInternal::symbolicOutput(arg);
+      return FunctionInternal::symbolic_output(arg);
     }
   }
 

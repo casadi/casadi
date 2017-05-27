@@ -103,15 +103,15 @@ namespace casadi {
     TRY_CALL(eval_sx, self_, arg, res, iw, w, mem);
   }
 
-  bool CallbackInternal::hasFullJacobian() const {
+  bool CallbackInternal::has_jacobian() const {
     TRY_CALL(has_jacobian, self_);
   }
 
   Function CallbackInternal::
-  getFullJacobian(const std::string& name,
+  get_jacobian(const std::string& name,
                   const std::vector<std::string>& i_names,
                   const std::vector<std::string>& o_names,
-                  const Dict& opts) {
+                  const Dict& opts) const {
     TRY_CALL(get_jacobian, self_, name, opts);
   }
 
