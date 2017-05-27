@@ -330,7 +330,7 @@ namespace casadi {
      * Legacy function: To be deprecated in a future version of CasADi.
      * Exists only for compatibility with Function::jacobian pre-CasADi 3.2
      */
-    Function jacobian_old(int iind, int oind);
+    Function jacobian_old(int iind, int oind) const;
 
     /** \brief Generate a Hessian function of output \a oind with respect to input \a iind
      * \param iind The index of the input
@@ -338,7 +338,7 @@ namespace casadi {
      * Legacy function: To be deprecated in a future version of CasADi.
      * Exists only for compatibility with Function::hessian pre-CasADi 3.2
      */
-    Function hessian_old(int iind, int oind);
+    Function hessian_old(int iind, int oind) const;
 
     /** \brief Generate a Jacobian function of all the inputs elements with respect to all
      * the output elements).

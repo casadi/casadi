@@ -651,7 +651,7 @@ namespace casadi {
     return (*this)->numel_out(ind);
   }
 
-  Function Function::jacobian_old(int iind, int oind) {
+  Function Function::jacobian_old(int iind, int oind) const {
     // Redirect to factory class
     vector<string> s_in = name_in();
     vector<string> s_out = name_out();
@@ -659,7 +659,7 @@ namespace casadi {
     return factory("jac_" + name(), s_in, s_out);
   }
 
-  Function Function::hessian_old(int iind, int oind) {
+  Function Function::hessian_old(int iind, int oind) const {
     // Redirect to factory class
     vector<string> s_in = name_in();
     vector<string> s_out = name_out();
