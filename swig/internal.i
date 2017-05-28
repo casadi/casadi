@@ -1,7 +1,7 @@
 %exception  casadi::BSplineInterpolant::generateBody(CodeGenerator &g) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::BSplineInterpolant::get_jacobian(const std::string &name, const std::vector< std::string > &i_names, const std::vector< std::string > &o_names, const Dict &opts) const override {
+%exception  casadi::BSplineInterpolant::get_jacobian(const std::string &name, const std::vector< std::string > &inames, const std::vector< std::string > &onames, const Dict &opts) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::BSplineInterpolant::get_options() const override {
@@ -112,19 +112,13 @@
 %exception  casadi::Dple::default_in(int ind) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Dple::get_forward(const std::string &name, int nfwd, const std::vector< std::string > &i_names, const std::vector< std::string > &o_names, const Dict &opts) const override {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Dple::get_n_forward() const override {
+%exception  casadi::Dple::get_forward(int nfwd, const std::string &name, const std::vector< std::string > &inames, const std::vector< std::string > &onames, const Dict &opts) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Dple::get_n_in() override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Dple::get_n_out() override {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Dple::get_n_reverse() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Dple::get_name_in(int i) override {
@@ -136,13 +130,19 @@
 %exception  casadi::Dple::get_options() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Dple::get_reverse(const std::string &name, int nadj, const std::vector< std::string > &i_names, const std::vector< std::string > &o_names, const Dict &opts) const override {
+%exception  casadi::Dple::get_reverse(int nadj, const std::string &name, const std::vector< std::string > &inames, const std::vector< std::string > &onames, const Dict &opts) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Dple::get_sparsity_in(int i) override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Dple::get_sparsity_out(int i) override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Dple::has_forward(int nfwd) const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Dple::has_reverse(int nadj) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Dple::init(const Dict &opts) override {
@@ -157,10 +157,7 @@
 %exception  casadi::Expm::getJacSparsity(int iind, int oind, bool symmetric) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Expm::get_forward(const std::string &name, int nfwd, const std::vector< std::string > &i_names, const std::vector< std::string > &o_names, const Dict &opts) const override {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Expm::get_n_forward() const override {
+%exception  casadi::Expm::get_forward(int nfwd, const std::string &name, const std::vector< std::string > &inames, const std::vector< std::string > &onames, const Dict &opts) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Expm::get_n_in() override {
@@ -169,19 +166,22 @@
 %exception  casadi::Expm::get_n_out() override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Expm::get_n_reverse() const override {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::Expm::get_options() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Expm::get_reverse(const std::string &name, int nadj, const std::vector< std::string > &i_names, const std::vector< std::string > &o_names, const Dict &opts) const override {
+%exception  casadi::Expm::get_reverse(int nadj, const std::string &name, const std::vector< std::string > &inames, const std::vector< std::string > &onames, const Dict &opts) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Expm::get_sparsity_in(int i) override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Expm::get_sparsity_out(int i) override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Expm::has_forward(int nfwd) const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Expm::has_reverse(int nadj) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Expm::init(const Dict &opts) override {
@@ -202,13 +202,10 @@
 %exception  casadi::External::generateFunction(CodeGenerator &g, const std::string &fname, bool decl_static) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::External::get_forward(const std::string &name, int nfwd, const std::vector< std::string > &i_names, const std::vector< std::string > &o_names, const Dict &opts) const override {
+%exception  casadi::External::get_forward(int nfwd, const std::string &name, const std::vector< std::string > &inames, const std::vector< std::string > &onames, const Dict &opts) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::External::get_jacobian(const std::string &name, const std::vector< std::string > &i_names, const std::vector< std::string > &o_names, const Dict &opts) const override {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::External::get_n_forward() const override {
+%exception  casadi::External::get_jacobian(const std::string &name, const std::vector< std::string > &inames, const std::vector< std::string > &onames, const Dict &opts) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::External::get_n_in() override {
@@ -217,19 +214,22 @@
 %exception  casadi::External::get_n_out() override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::External::get_n_reverse() const override {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::External::get_name_in(int i) override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::External::get_name_out(int i) override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::External::get_reverse(const std::string &name, int nadj, const std::vector< std::string > &i_names, const std::vector< std::string > &o_names, const Dict &opts) const override {
+%exception  casadi::External::get_reverse(int nadj, const std::string &name, const std::vector< std::string > &inames, const std::vector< std::string > &onames, const Dict &opts) const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::External::has_forward(int nfwd) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::External::has_jacobian() const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::External::has_reverse(int nadj) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::External::init(const Dict &opts) override {
@@ -469,7 +469,7 @@
 %exception  casadi::FunctionInternal::getWorkSize() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::FunctionInternal::get_forward(const std::string &name, int nfwd, const std::vector< std::string > &i_names, const std::vector< std::string > &o_names, const Dict &opts) const  {
+%exception  casadi::FunctionInternal::get_forward(int nfwd, const std::string &name, const std::vector< std::string > &inames, const std::vector< std::string > &onames, const Dict &opts) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::get_function() const  {
@@ -478,19 +478,13 @@
 %exception  casadi::FunctionInternal::get_function(const std::string &name) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::FunctionInternal::get_jacobian(const std::string &name, const std::vector< std::string > &i_names, const std::vector< std::string > &o_names, const Dict &opts) const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::FunctionInternal::get_n_forward() const  {
+%exception  casadi::FunctionInternal::get_jacobian(const std::string &name, const std::vector< std::string > &inames, const std::vector< std::string > &onames, const Dict &opts) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::get_n_in() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::get_n_out() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::FunctionInternal::get_n_reverse() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::get_name_in(int i) {
@@ -502,7 +496,7 @@
 %exception  casadi::FunctionInternal::get_options() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::FunctionInternal::get_reverse(const std::string &name, int nadj, const std::vector< std::string > &i_names, const std::vector< std::string > &o_names, const Dict &opts) const  {
+%exception  casadi::FunctionInternal::get_reverse(int nadj, const std::string &name, const std::vector< std::string > &inames, const std::vector< std::string > &onames, const Dict &opts) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::get_sparsity_in(int i) {
@@ -523,6 +517,9 @@
 %exception  casadi::FunctionInternal::has_codegen() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::FunctionInternal::has_forward(int nfwd) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::FunctionInternal::has_free() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -530,6 +527,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::has_jacobian() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::FunctionInternal::has_reverse(int nadj) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::has_spfwd() const  {
@@ -883,19 +883,13 @@
 %exception  casadi::Integrator::getDerivativeOptions(bool fwd) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Integrator::get_forward(const std::string &name, int nfwd, const std::vector< std::string > &i_names, const std::vector< std::string > &o_names, const Dict &opts) const override {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Integrator::get_n_forward() const override {
+%exception  casadi::Integrator::get_forward(int nfwd, const std::string &name, const std::vector< std::string > &inames, const std::vector< std::string > &onames, const Dict &opts) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Integrator::get_n_in() override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Integrator::get_n_out() override {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Integrator::get_n_reverse() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Integrator::get_name_in(int i) override {
@@ -907,13 +901,19 @@
 %exception  casadi::Integrator::get_options() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Integrator::get_reverse(const std::string &name, int nadj, const std::vector< std::string > &i_names, const std::vector< std::string > &o_names, const Dict &opts) const override {
+%exception  casadi::Integrator::get_reverse(int nadj, const std::string &name, const std::vector< std::string > &inames, const std::vector< std::string > &onames, const Dict &opts) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Integrator::get_sparsity_in(int i) override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Integrator::get_sparsity_out(int i) override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Integrator::has_forward(int nfwd) const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Integrator::has_reverse(int nadj) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Integrator::has_spfwd() const override {
@@ -1018,7 +1018,7 @@
 %exception  casadi::LinearInterpolant::generateBody(CodeGenerator &g) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::LinearInterpolant::get_jacobian(const std::string &name, const std::vector< std::string > &i_names, const std::vector< std::string > &o_names, const Dict &opts) const override {
+%exception  casadi::LinearInterpolant::get_jacobian(const std::string &name, const std::vector< std::string > &inames, const std::vector< std::string > &onames, const Dict &opts) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::LinearInterpolant::get_options() const override {
@@ -1090,10 +1090,7 @@
 %exception  casadi::Map::generateDeclarations(CodeGenerator &g) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Map::get_forward(const std::string &name, int nfwd, const std::vector< std::string > &i_names, const std::vector< std::string > &o_names, const Dict &opts) const override {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Map::get_n_forward() const override {
+%exception  casadi::Map::get_forward(int nfwd, const std::string &name, const std::vector< std::string > &inames, const std::vector< std::string > &onames, const Dict &opts) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Map::get_n_in() override {
@@ -1102,16 +1099,13 @@
 %exception  casadi::Map::get_n_out() override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Map::get_n_reverse() const override {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::Map::get_name_in(int i) override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Map::get_name_out(int i) override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Map::get_reverse(const std::string &name, int nadj, const std::vector< std::string > &i_names, const std::vector< std::string > &o_names, const Dict &opts) const override {
+%exception  casadi::Map::get_reverse(int nadj, const std::string &name, const std::vector< std::string > &inames, const std::vector< std::string > &onames, const Dict &opts) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Map::get_sparsity_in(int i) override {
@@ -1121,6 +1115,12 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Map::has_codegen() const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Map::has_forward(int nfwd) const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Map::has_reverse(int nadj) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Map::has_spfwd() const override {
@@ -1288,19 +1288,13 @@
 %exception  casadi::Rootfinder::eval_reverse(const std::vector< MX > &arg, const std::vector< MX > &res, const std::vector< std::vector< MX > > &aseed, std::vector< std::vector< MX > > &asens, bool always_inline, bool never_inline) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Rootfinder::get_forward(const std::string &name, int nfwd, const std::vector< std::string > &i_names, const std::vector< std::string > &o_names, const Dict &opts) const override {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Rootfinder::get_n_forward() const override {
+%exception  casadi::Rootfinder::get_forward(int nfwd, const std::string &name, const std::vector< std::string > &inames, const std::vector< std::string > &onames, const Dict &opts) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Rootfinder::get_n_in() override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Rootfinder::get_n_out() override {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Rootfinder::get_n_reverse() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Rootfinder::get_name_in(int i) override {
@@ -1312,13 +1306,19 @@
 %exception  casadi::Rootfinder::get_options() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Rootfinder::get_reverse(const std::string &name, int nadj, const std::vector< std::string > &i_names, const std::vector< std::string > &o_names, const Dict &opts) const override {
+%exception  casadi::Rootfinder::get_reverse(int nadj, const std::string &name, const std::vector< std::string > &inames, const std::vector< std::string > &onames, const Dict &opts) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Rootfinder::get_sparsity_in(int i) override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Rootfinder::get_sparsity_out(int i) override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Rootfinder::has_forward(int nfwd) const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Rootfinder::has_reverse(int nadj) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Rootfinder::has_spfwd() const override {
@@ -1510,10 +1510,7 @@
 %exception  casadi::Switch::generateDeclarations(CodeGenerator &g) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Switch::get_forward(const std::string &name, int nfwd, const std::vector< std::string > &i_names, const std::vector< std::string > &o_names, const Dict &opts) const override {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Switch::get_n_forward() const override {
+%exception  casadi::Switch::get_forward(int nfwd, const std::string &name, const std::vector< std::string > &inames, const std::vector< std::string > &onames, const Dict &opts) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Switch::get_n_in() override {
@@ -1522,10 +1519,7 @@
 %exception  casadi::Switch::get_n_out() override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Switch::get_n_reverse() const override {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Switch::get_reverse(const std::string &name, int nadj, const std::vector< std::string > &i_names, const std::vector< std::string > &o_names, const Dict &opts) const override {
+%exception  casadi::Switch::get_reverse(int nadj, const std::string &name, const std::vector< std::string > &inames, const std::vector< std::string > &onames, const Dict &opts) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Switch::get_sparsity_in(int i) override {
@@ -1535,6 +1529,12 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Switch::has_codegen() const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Switch::has_forward(int nfwd) const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Switch::has_reverse(int nadj) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Switch::init(const Dict &opts) override {

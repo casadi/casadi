@@ -228,6 +228,13 @@ globalization strategy.
 
 ";
 
+%feature("docstring") casadi::Blocksqp::has_reverse "[INTERNAL]  Return
+function that calculates adjoint derivatives reverse(nadj) returns a cached
+instance if available, and calls  Function get_reverse(int nadj) if no
+cached version is available.
+
+";
+
 %feature("docstring") casadi::Blocksqp::jacobian "[INTERNAL]  Return
 Jacobian of all input elements with respect to all output elements.
 
@@ -372,6 +379,13 @@ Set new primal dual iterate.
 >  void casadi::Blocksqp::acceptStep(BlocksqpMemory *m, double alpha) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
+";
+
+%feature("docstring") casadi::Blocksqp::has_forward "[INTERNAL]  Return
+function that calculates forward derivatives forward(nfwd) returns a cached
+instance if available, and calls  Function get_forward(int nfwd) if no
+cached version is available.
+
 ";
 
 %feature("docstring") casadi::Blocksqp "
@@ -1136,13 +1150,6 @@ dimensions of inputs and outputs.
 
 ";
 
-%feature("docstring") casadi::Blocksqp::get_n_reverse "[INTERNAL]  Return
-function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(int nadj) if no
-cached version is available.
-
-";
-
 %feature("docstring") casadi::Blocksqp::getJacSparsityHierarchicalSymm "[INTERNAL]  A flavor of getJacSparsity that does hierarchical block
 structure recognition for symmetric Jacobians
 
@@ -1307,13 +1314,6 @@ statistics.
 
 %feature("docstring") casadi::Blocksqp::generate_lifted "[INTERNAL]
 Extract the functions needed for the Lifted Newton method.
-
-";
-
-%feature("docstring") casadi::Blocksqp::get_n_forward "[INTERNAL]  Return
-function that calculates forward derivatives forward(nfwd) returns a cached
-instance if available, and calls  Function get_forward(int nfwd) if no
-cached version is available.
 
 ";
 
@@ -1730,6 +1730,12 @@ vector of symbolic variables corresponding to the outputs.
 
 ";
 
+%feature("docstring") casadi::BSpline::has_reverse "
+
+Generate a function that calculates nadj adjoint derivatives.
+
+";
+
 %feature("docstring") casadi::BSpline::getPartition "[INTERNAL]  Get the
 unidirectional or bidirectional partition.
 
@@ -1958,12 +1964,6 @@ information there is to know about a certain option.
 
 %feature("docstring") casadi::BSpline::replaceFwdSeed "[INTERNAL]  Replace
 0-by-0 forward seeds.
-
-";
-
-%feature("docstring") casadi::BSpline::get_n_reverse "
-
-Generate a function that calculates nadj adjoint derivatives.
 
 ";
 
@@ -2305,12 +2305,6 @@ templated.
 
 ";
 
-%feature("docstring") casadi::BSpline::get_n_forward "
-
-Generate a function that calculates nfwd forward derivatives.
-
-";
-
 %feature("docstring") casadi::BSpline::getJacSparsityHierarchicalSymm "[INTERNAL]  A flavor of getJacSparsity that does hierarchical block
 structure recognition for symmetric Jacobians
 
@@ -2413,6 +2407,12 @@ function have free variables.
 ";
 
 %feature("docstring") casadi::BSpline::oracle "[INTERNAL]  Get oracle.
+
+";
+
+%feature("docstring") casadi::BSpline::has_forward "
+
+Generate a function that calculates nfwd forward derivatives.
 
 ";
 
@@ -3338,8 +3338,10 @@ structure recognition for symmetric Jacobians
 
 ";
 
-%feature("docstring") casadi::BSplineCommon::default_in "[INTERNAL]  Get
-default input value.
+%feature("docstring") casadi::BSplineCommon::has_forward "[INTERNAL]
+Return function that calculates forward derivatives forward(nfwd) returns a
+cached instance if available, and calls  Function get_forward(int nfwd) if
+no cached version is available.
 
 ";
 
@@ -3348,10 +3350,8 @@ nodes in the algorithm.
 
 ";
 
-%feature("docstring") casadi::BSplineCommon::get_n_forward "[INTERNAL]
-Return function that calculates forward derivatives forward(nfwd) returns a
-cached instance if available, and calls  Function get_forward(int nfwd) if
-no cached version is available.
+%feature("docstring") casadi::BSplineCommon::adjViaJac "[INTERNAL]
+Calculate derivatives by multiplying the full Jacobian and multiplying.
 
 ";
 
@@ -3482,6 +3482,13 @@ Codegen incref for dependencies.
 
 ";
 
+%feature("docstring") casadi::BSplineCommon::has_reverse "[INTERNAL]
+Return function that calculates adjoint derivatives reverse(nadj) returns a
+cached instance if available, and calls  Function get_reverse(int nadj) if
+no cached version is available.
+
+";
+
 %feature("docstring") casadi::BSplineCommon::checkArg "[INTERNAL]  Check if
 input arguments have correct length and dimensions.
 
@@ -3512,6 +3519,11 @@ function input(s) and output(s)
 
 ";
 
+%feature("docstring") casadi::BSplineCommon::default_in "[INTERNAL]  Get
+default input value.
+
+";
+
 %feature("docstring") casadi::BSplineCommon::mapsum_mx "[INTERNAL]
 Parallel evaluation.
 
@@ -3533,11 +3545,6 @@ Log the status of the solver, function given.
 
 %feature("docstring") casadi::BSplineCommon::wrap "[INTERNAL]  Wrap in an
 Function instance consisting of only one MX call.
-
-";
-
-%feature("docstring") casadi::BSplineCommon::adjViaJac "[INTERNAL]
-Calculate derivatives by multiplying the full Jacobian and multiplying.
 
 ";
 
@@ -3639,10 +3646,8 @@ input/output nonzeros.
 
 ";
 
-%feature("docstring") casadi::BSplineCommon::get_n_reverse "[INTERNAL]
-Return function that calculates adjoint derivatives reverse(nadj) returns a
-cached instance if available, and calls  Function get_reverse(int nadj) if
-no cached version is available.
+%feature("docstring") casadi::BSplineCommon::tang_sx "[INTERNAL]  Tangent
+expression.
 
 ";
 
@@ -3694,11 +3699,6 @@ generate the function.
 
 %feature("docstring") casadi::BSplineCommon::sz_work "[INTERNAL]  Get
 number of temporary variables needed.
-
-";
-
-%feature("docstring") casadi::BSplineCommon::tang_sx "[INTERNAL]  Tangent
-expression.
 
 ";
 
@@ -3876,8 +3876,10 @@ Get type name.
 
 ";
 
-%feature("docstring") casadi::BSplineDual::sz_res "[INTERNAL]  Get required
-length of res field.
+%feature("docstring") casadi::BSplineDual::reverse "[INTERNAL]  Return
+function that calculates adjoint derivatives reverse(nadj) returns a cached
+instance if available, and calls  Function get_reverse(int nadj) if no
+cached version is available.
 
 ";
 
@@ -4046,9 +4048,8 @@ input/output nonzeros.
 
 ";
 
-%feature("docstring") casadi::BSplineDual::get_n_reverse "
-
-Generate a function that calculates nadj adjoint derivatives.
+%feature("docstring") casadi::BSplineDual::getAtomicInput "[INTERNAL]  Get
+the (integer) input arguments of an atomic operation.
 
 ";
 
@@ -4081,12 +4082,6 @@ Propagate sparsity backwards.
 
 %feature("docstring") casadi::BSplineDual::_call "[INTERNAL]   Call a
 function, overloaded.
-
-";
-
-%feature("docstring") casadi::BSplineDual::get_n_forward "
-
-Generate a function that calculates nfwd forward derivatives.
 
 ";
 
@@ -4234,10 +4229,9 @@ length of arg field.
 
 ";
 
-%feature("docstring") casadi::BSplineDual::reverse "[INTERNAL]  Return
-function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(int nadj) if no
-cached version is available.
+%feature("docstring") casadi::BSplineDual::has_forward "
+
+Generate a function that calculates nfwd forward derivatives.
 
 ";
 
@@ -4443,6 +4437,12 @@ reference to the object.
 
 ";
 
+%feature("docstring") casadi::BSplineDual::has_reverse "
+
+Generate a function that calculates nadj adjoint derivatives.
+
+";
+
 %feature("docstring") casadi::BSplineDual::getJacSparsityHierarchical "[INTERNAL]  A flavor of getJacSparsity that does hierarchical block
 structure recognition.
 
@@ -4599,6 +4599,11 @@ Generate the sparsity of a Jacobian block.
 ";
 
 %feature("docstring") casadi::BSplineDual::repr "[INTERNAL]  Print.
+
+";
+
+%feature("docstring") casadi::BSplineDual::sz_res "[INTERNAL]  Get required
+length of res field.
 
 ";
 
@@ -4787,11 +4792,6 @@ input(s) and output(s)
 
 %feature("docstring") casadi::BSplineDual::grad_mx "[INTERNAL]  Gradient
 expression.
-
-";
-
-%feature("docstring") casadi::BSplineDual::getAtomicInput "[INTERNAL]  Get
-the (integer) input arguments of an atomic operation.
 
 ";
 
@@ -4993,11 +4993,6 @@ oracle.
 
 ";
 
-%feature("docstring") casadi::BSplineInterpolant::sp_rev "[INTERNAL]
-Propagate sparsity backwards.
-
-";
-
 %feature("docstring") casadi::BSplineInterpolant::sz_iw "[INTERNAL]  Get
 required length of iw field.
 
@@ -5178,6 +5173,10 @@ Can derivatives be calculated in any way?
 
 ";
 
+%feature("docstring") casadi::BSplineInterpolant::repr "[INTERNAL]  Print.
+
+";
+
 %feature("docstring") casadi::BSplineInterpolant::set_work "[INTERNAL]  Set
 the (persistent) work vectors.
 
@@ -5221,7 +5220,10 @@ function, templated.
 
 ";
 
-%feature("docstring") casadi::BSplineInterpolant::repr "[INTERNAL]  Print.
+%feature("docstring") casadi::BSplineInterpolant::has_forward "[INTERNAL]
+Return function that calculates forward derivatives forward(nfwd) returns a
+cached instance if available, and calls  Function get_forward(int nfwd) if
+no cached version is available.
 
 ";
 
@@ -5314,10 +5316,8 @@ Parallel evaluation.
 
 ";
 
-%feature("docstring") casadi::BSplineInterpolant::get_n_reverse "[INTERNAL]
-Return function that calculates adjoint derivatives reverse(nadj) returns a
-cached instance if available, and calls  Function get_reverse(int nadj) if
-no cached version is available.
+%feature("docstring") casadi::BSplineInterpolant::sp_rev "[INTERNAL]
+Propagate sparsity backwards.
 
 ";
 
@@ -5370,13 +5370,6 @@ number of temporary variables needed.
 ";
 
 %feature("docstring") casadi::BSplineInterpolant::codegen_decref "[INTERNAL]  Codegen decref for dependencies.
-
-";
-
-%feature("docstring") casadi::BSplineInterpolant::get_n_forward "[INTERNAL]
-Return function that calculates forward derivatives forward(nfwd) returns a
-cached instance if available, and calls  Function get_forward(int nfwd) if
-no cached version is available.
 
 ";
 
@@ -5771,6 +5764,13 @@ Generate meta-information allowing a user to evaluate a generated function.
 
 ";
 
+%feature("docstring") casadi::BSplineInterpolant::has_reverse "[INTERNAL]
+Return function that calculates adjoint derivatives reverse(nadj) returns a
+cached instance if available, and calls  Function get_reverse(int nadj) if
+no cached version is available.
+
+";
+
 %feature("docstring") casadi::BSplineInterpolant::get_name_in "[INTERNAL]
 Names of function input and outputs.
 
@@ -5781,6 +5781,14 @@ Names of function input and outputs.
 
 
 // File: classcasadi_1_1Callback.xml
+%feature("docstring") casadi::Callback::has_forward "
+
+Return function that calculates forward derivatives forward(nfwd) returns a
+cached instance if available, and calls  Function get_forward(int nfwd) if
+no cached version is available.
+
+";
+
 %feature("docstring") casadi::Callback::size2_in "
 
 Get input dimension.
@@ -6020,11 +6028,9 @@ Is a null pointer?
 
 ";
 
-%feature("docstring") casadi::Callback::get_n_reverse "
+%feature("docstring") casadi::Callback::getDescription "
 
-Return function that calculates adjoint derivatives reverse(nadj) returns a
-cached instance if available, and calls  Function get_reverse(int nadj) if
-no cached version is available.
+Return a string with a description (for SWIG)
 
 ";
 
@@ -6109,9 +6115,11 @@ Generate native code in the interfaced language for debugging
 
 ";
 
-%feature("docstring") casadi::Callback::getDescription "
+%feature("docstring") casadi::Callback::has_reverse "
 
-Return a string with a description (for SWIG)
+Return function that calculates adjoint derivatives reverse(nadj) returns a
+cached instance if available, and calls  Function get_reverse(int nadj) if
+no cached version is available.
 
 ";
 
@@ -6149,14 +6157,6 @@ adheres to SCHEME_NLPINput
 Construct internal object This is the step that actually construct the
 internal object, as the class constructor only creates a null pointer. It
 should be called from the user constructor.
-
-";
-
-%feature("docstring") casadi::Callback::get_n_forward "
-
-Return function that calculates forward derivatives forward(nfwd) returns a
-cached instance if available, and calls  Function get_forward(int nfwd) if
-no cached version is available.
 
 ";
 
@@ -6917,7 +6917,10 @@ length of arg field.
 
 ";
 
-%feature("docstring") casadi::Collocation::factory "[INTERNAL] ";
+%feature("docstring") casadi::Collocation::has_forward "[INTERNAL]
+Generate a function that calculates nfwd forward derivatives.
+
+";
 
 %feature("docstring") casadi::Collocation::oracle "[INTERNAL]  Get oracle.
 
@@ -7044,125 +7047,6 @@ explicit dynamics (backward problem)
 0-by-0 outputs.
 
 ";
-
-%feature("docstring") casadi::Collocation "
-
-'collocation' plugin for Integrator
-
-Fixed-step implicit Runge-Kutta integrator ODE/DAE integrator based on
-collocation schemes
-
-The method is still under development
-
->List of available options
-
-+---------------------------+-----------------+----------------------------+
-|            Id             |      Type       |        Description         |
-+===========================+=================+============================+
-| augmented_options         | OT_DICT         | Options to be passed down  |
-|                           |                 | to the augmented           |
-|                           |                 | integrator, if one is      |
-|                           |                 | constructed.               |
-+---------------------------+-----------------+----------------------------+
-| collocation_scheme        | OT_STRING       | Collocation scheme:        |
-|                           |                 | radau|legendre             |
-+---------------------------+-----------------+----------------------------+
-| expand                    | OT_BOOL         | Replace MX with SX         |
-|                           |                 | expressions in problem     |
-|                           |                 | formulation [false]        |
-+---------------------------+-----------------+----------------------------+
-| grid                      | OT_DOUBLEVECTOR | Time grid                  |
-+---------------------------+-----------------+----------------------------+
-| interpolation_order       | OT_INT          | Order of the interpolating |
-|                           |                 | polynomials                |
-+---------------------------+-----------------+----------------------------+
-| number_of_finite_elements | OT_INT          | Number of finite elements  |
-+---------------------------+-----------------+----------------------------+
-| output_t0                 | OT_BOOL         | Output the state at the    |
-|                           |                 | initial time               |
-+---------------------------+-----------------+----------------------------+
-| print_stats               | OT_BOOL         | Print out statistics after |
-|                           |                 | integration                |
-+---------------------------+-----------------+----------------------------+
-| rootfinder                | OT_STRING       | An implicit function       |
-|                           |                 | solver                     |
-+---------------------------+-----------------+----------------------------+
-| rootfinder_options        | OT_DICT         | Options to be passed to    |
-|                           |                 | the NLP Solver             |
-+---------------------------+-----------------+----------------------------+
-| t0                        | OT_DOUBLE       | Beginning of the time      |
-|                           |                 | horizon                    |
-+---------------------------+-----------------+----------------------------+
-| tf                        | OT_DOUBLE       | End of the time horizon    |
-+---------------------------+-----------------+----------------------------+
-
-Joel Andersson
-
->List of available options
-
-+------------------+-----------------+------------------+------------------+
-|        Id        |      Type       |   Description    |     Used in      |
-+==================+=================+==================+==================+
-| augmented_option | OT_DICT         | Options to be    | casadi::Implicit |
-| s                |                 | passed down to   | FixedStepIntegra |
-|                  |                 | the augmented    | tor              |
-|                  |                 | integrator, if   |                  |
-|                  |                 | one is           |                  |
-|                  |                 | constructed.     |                  |
-+------------------+-----------------+------------------+------------------+
-| collocation_sche | OT_STRING       | Collocation      | casadi::Collocat |
-| me               |                 | scheme:          | ion              |
-|                  |                 | radau|legendre   |                  |
-+------------------+-----------------+------------------+------------------+
-| expand           | OT_BOOL         | Replace MX with  | casadi::Implicit |
-|                  |                 | SX expressions   | FixedStepIntegra |
-|                  |                 | in problem       | tor              |
-|                  |                 | formulation      |                  |
-|                  |                 | [false]          |                  |
-+------------------+-----------------+------------------+------------------+
-| grid             | OT_DOUBLEVECTOR | Time grid        | casadi::Implicit |
-|                  |                 |                  | FixedStepIntegra |
-|                  |                 |                  | tor              |
-+------------------+-----------------+------------------+------------------+
-| interpolation_or | OT_INT          | Order of the     | casadi::Collocat |
-| der              |                 | interpolating    | ion              |
-|                  |                 | polynomials      |                  |
-+------------------+-----------------+------------------+------------------+
-| number_of_finite | OT_INT          | Number of finite | casadi::Implicit |
-| _elements        |                 | elements         | FixedStepIntegra |
-|                  |                 |                  | tor              |
-+------------------+-----------------+------------------+------------------+
-| output_t0        | OT_BOOL         | Output the state | casadi::Implicit |
-|                  |                 | at the initial   | FixedStepIntegra |
-|                  |                 | time             | tor              |
-+------------------+-----------------+------------------+------------------+
-| print_stats      | OT_BOOL         | Print out        | casadi::Implicit |
-|                  |                 | statistics after | FixedStepIntegra |
-|                  |                 | integration      | tor              |
-+------------------+-----------------+------------------+------------------+
-| rootfinder       | OT_STRING       | An implicit      | casadi::Implicit |
-|                  |                 | function solver  | FixedStepIntegra |
-|                  |                 |                  | tor              |
-+------------------+-----------------+------------------+------------------+
-| rootfinder_optio | OT_DICT         | Options to be    | casadi::Implicit |
-| ns               |                 | passed to the    | FixedStepIntegra |
-|                  |                 | NLP Solver       | tor              |
-+------------------+-----------------+------------------+------------------+
-| t0               | OT_DOUBLE       | Beginning of the | casadi::Implicit |
-|                  |                 | time horizon     | FixedStepIntegra |
-|                  |                 |                  | tor              |
-+------------------+-----------------+------------------+------------------+
-| tf               | OT_DOUBLE       | End of the time  | casadi::Implicit |
-|                  |                 | horizon          | FixedStepIntegra |
-|                  |                 |                  | tor              |
-+------------------+-----------------+------------------+------------------+
-
-Diagrams
---------
-
-
-
-C++ includes: collocation.hpp ";
 
 %feature("docstring") casadi::Collocation::setupFG "[INTERNAL]  Setup F and
 G.
@@ -7294,10 +7178,7 @@ function.
 
 ";
 
-%feature("docstring") casadi::Collocation::n_mem "[INTERNAL]  Maximum
-number of memory objects.
-
-";
+%feature("docstring") casadi::Collocation::factory "[INTERNAL] ";
 
 %feature("docstring") casadi::Collocation::has_sprev "[INTERNAL]  Is the
 class able to propagate seeds through the algorithm?
@@ -7331,6 +7212,11 @@ function have free variables.
 
 %feature("docstring") casadi::Collocation::size2_out "[INTERNAL]
 Input/output dimensions.
+
+";
+
+%feature("docstring") casadi::Collocation::has_reverse "[INTERNAL]
+Generate a function that calculates nadj adjoint derivatives.
 
 ";
 
@@ -7574,10 +7460,124 @@ sparsity backwards.
 
 ";
 
-%feature("docstring") casadi::Collocation::get_n_forward "[INTERNAL]
-Generate a function that calculates nfwd forward derivatives.
+%feature("docstring") casadi::Collocation "
 
-";
+'collocation' plugin for Integrator
+
+Fixed-step implicit Runge-Kutta integrator ODE/DAE integrator based on
+collocation schemes
+
+The method is still under development
+
+>List of available options
+
++---------------------------+-----------------+----------------------------+
+|            Id             |      Type       |        Description         |
++===========================+=================+============================+
+| augmented_options         | OT_DICT         | Options to be passed down  |
+|                           |                 | to the augmented           |
+|                           |                 | integrator, if one is      |
+|                           |                 | constructed.               |
++---------------------------+-----------------+----------------------------+
+| collocation_scheme        | OT_STRING       | Collocation scheme:        |
+|                           |                 | radau|legendre             |
++---------------------------+-----------------+----------------------------+
+| expand                    | OT_BOOL         | Replace MX with SX         |
+|                           |                 | expressions in problem     |
+|                           |                 | formulation [false]        |
++---------------------------+-----------------+----------------------------+
+| grid                      | OT_DOUBLEVECTOR | Time grid                  |
++---------------------------+-----------------+----------------------------+
+| interpolation_order       | OT_INT          | Order of the interpolating |
+|                           |                 | polynomials                |
++---------------------------+-----------------+----------------------------+
+| number_of_finite_elements | OT_INT          | Number of finite elements  |
++---------------------------+-----------------+----------------------------+
+| output_t0                 | OT_BOOL         | Output the state at the    |
+|                           |                 | initial time               |
++---------------------------+-----------------+----------------------------+
+| print_stats               | OT_BOOL         | Print out statistics after |
+|                           |                 | integration                |
++---------------------------+-----------------+----------------------------+
+| rootfinder                | OT_STRING       | An implicit function       |
+|                           |                 | solver                     |
++---------------------------+-----------------+----------------------------+
+| rootfinder_options        | OT_DICT         | Options to be passed to    |
+|                           |                 | the NLP Solver             |
++---------------------------+-----------------+----------------------------+
+| t0                        | OT_DOUBLE       | Beginning of the time      |
+|                           |                 | horizon                    |
++---------------------------+-----------------+----------------------------+
+| tf                        | OT_DOUBLE       | End of the time horizon    |
++---------------------------+-----------------+----------------------------+
+
+Joel Andersson
+
+>List of available options
+
++------------------+-----------------+------------------+------------------+
+|        Id        |      Type       |   Description    |     Used in      |
++==================+=================+==================+==================+
+| augmented_option | OT_DICT         | Options to be    | casadi::Implicit |
+| s                |                 | passed down to   | FixedStepIntegra |
+|                  |                 | the augmented    | tor              |
+|                  |                 | integrator, if   |                  |
+|                  |                 | one is           |                  |
+|                  |                 | constructed.     |                  |
++------------------+-----------------+------------------+------------------+
+| collocation_sche | OT_STRING       | Collocation      | casadi::Collocat |
+| me               |                 | scheme:          | ion              |
+|                  |                 | radau|legendre   |                  |
++------------------+-----------------+------------------+------------------+
+| expand           | OT_BOOL         | Replace MX with  | casadi::Implicit |
+|                  |                 | SX expressions   | FixedStepIntegra |
+|                  |                 | in problem       | tor              |
+|                  |                 | formulation      |                  |
+|                  |                 | [false]          |                  |
++------------------+-----------------+------------------+------------------+
+| grid             | OT_DOUBLEVECTOR | Time grid        | casadi::Implicit |
+|                  |                 |                  | FixedStepIntegra |
+|                  |                 |                  | tor              |
++------------------+-----------------+------------------+------------------+
+| interpolation_or | OT_INT          | Order of the     | casadi::Collocat |
+| der              |                 | interpolating    | ion              |
+|                  |                 | polynomials      |                  |
++------------------+-----------------+------------------+------------------+
+| number_of_finite | OT_INT          | Number of finite | casadi::Implicit |
+| _elements        |                 | elements         | FixedStepIntegra |
+|                  |                 |                  | tor              |
++------------------+-----------------+------------------+------------------+
+| output_t0        | OT_BOOL         | Output the state | casadi::Implicit |
+|                  |                 | at the initial   | FixedStepIntegra |
+|                  |                 | time             | tor              |
++------------------+-----------------+------------------+------------------+
+| print_stats      | OT_BOOL         | Print out        | casadi::Implicit |
+|                  |                 | statistics after | FixedStepIntegra |
+|                  |                 | integration      | tor              |
++------------------+-----------------+------------------+------------------+
+| rootfinder       | OT_STRING       | An implicit      | casadi::Implicit |
+|                  |                 | function solver  | FixedStepIntegra |
+|                  |                 |                  | tor              |
++------------------+-----------------+------------------+------------------+
+| rootfinder_optio | OT_DICT         | Options to be    | casadi::Implicit |
+| ns               |                 | passed to the    | FixedStepIntegra |
+|                  |                 | NLP Solver       | tor              |
++------------------+-----------------+------------------+------------------+
+| t0               | OT_DOUBLE       | Beginning of the | casadi::Implicit |
+|                  |                 | time horizon     | FixedStepIntegra |
+|                  |                 |                  | tor              |
++------------------+-----------------+------------------+------------------+
+| tf               | OT_DOUBLE       | End of the time  | casadi::Implicit |
+|                  |                 | horizon          | FixedStepIntegra |
+|                  |                 |                  | tor              |
++------------------+-----------------+------------------+------------------+
+
+Diagrams
+--------
+
+
+
+C++ includes: collocation.hpp ";
 
 %feature("docstring") casadi::Collocation::getAtomicOperation "[INTERNAL]
 Get an atomic operation operator index.
@@ -7749,11 +7749,6 @@ Jacobian of all input elements with respect to all output elements.
 
 ";
 
-%feature("docstring") casadi::Collocation::get_n_reverse "[INTERNAL]
-Generate a function that calculates nadj adjoint derivatives.
-
-";
-
 %feature("docstring") casadi::Collocation::monitored "[INTERNAL] ";
 
 %feature("docstring") casadi::Collocation::getAlgorithmSize "[INTERNAL]
@@ -7768,6 +7763,11 @@ input/output nonzeros.
 
 %feature("docstring") casadi::Collocation::symbolicFwdSeed "[INTERNAL]
 Symbolic expressions for the forward seeds.
+
+";
+
+%feature("docstring") casadi::Collocation::n_mem "[INTERNAL]  Maximum
+number of memory objects.
 
 ";
 
@@ -8217,6 +8217,11 @@ expressions for the adjoint seeds.
 
 ";
 
+%feature("docstring") casadi::Conic::mapsum_mx "[INTERNAL]  Parallel
+evaluation.
+
+";
+
 %feature("docstring") casadi::Conic::init "[INTERNAL]  Initialize
 Initialize and make the object ready for setting arguments and evaluation.
 This method is typically called after setting options but before evaluating.
@@ -8285,8 +8290,10 @@ function input and outputs.
 
 ";
 
-%feature("docstring") casadi::Conic::mapsum_mx "[INTERNAL]  Parallel
-evaluation.
+%feature("docstring") casadi::Conic::has_reverse "[INTERNAL]  Return
+function that calculates adjoint derivatives reverse(nadj) returns a cached
+instance if available, and calls  Function get_reverse(int nadj) if no
+cached version is available.
 
 ";
 
@@ -8766,13 +8773,6 @@ structure recognition for symmetric Jacobians
 
 ";
 
-%feature("docstring") casadi::Conic::get_n_reverse "[INTERNAL]  Return
-function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(int nadj) if no
-cached version is available.
-
-";
-
 %feature("docstring") casadi::Conic::type_name "[INTERNAL]  Get type name.
 
 ";
@@ -8838,8 +8838,8 @@ reference count.
 
 ";
 
-%feature("docstring") casadi::Conic::getAtomicInput "[INTERNAL]  Get the
-(integer) input arguments of an atomic operation.
+%feature("docstring") casadi::Conic::has_free "[INTERNAL]  Does the
+function have free variables.
 
 ";
 
@@ -8913,13 +8913,6 @@ statistics
 
 ";
 
-%feature("docstring") casadi::Conic::get_n_forward "[INTERNAL]  Return
-function that calculates forward derivatives forward(nfwd) returns a cached
-instance if available, and calls  Function get_forward(int nfwd) if no
-cached version is available.
-
-";
-
 %feature("docstring") casadi::Conic::has_codegen "[INTERNAL]  Is codegen
 supported?
 
@@ -8968,6 +8961,11 @@ Log the status of the solver, function given.
 
 ";
 
+%feature("docstring") casadi::Conic::getAtomicInput "[INTERNAL]  Get the
+(integer) input arguments of an atomic operation.
+
+";
+
 %feature("docstring") casadi::Conic::wrap "[INTERNAL]  Wrap in an Function
 instance consisting of only one MX call.
 
@@ -8985,8 +8983,10 @@ is available.
 
 ";
 
-%feature("docstring") casadi::Conic::has_free "[INTERNAL]  Does the
-function have free variables.
+%feature("docstring") casadi::Conic::has_forward "[INTERNAL]  Return
+function that calculates forward derivatives forward(nfwd) returns a cached
+instance if available, and calls  Function get_forward(int nfwd) if no
+cached version is available.
 
 ";
 
@@ -9776,10 +9776,202 @@ vector of symbolic variables corresponding to the outputs.
 
 ";
 
-%feature("docstring") casadi::Dple::hasDerivative "[INTERNAL]  Can
-derivatives be calculated in any way?
+%feature("docstring") casadi::Dple "
 
-";
+Internal class.
+
+>List of available options
+
++------------------+-----------------+------------------+------------------+
+|        Id        |      Type       |   Description    |     Used in      |
++==================+=================+==================+==================+
+| ad_weight        | OT_DOUBLE       | Weighting factor | casadi::Function |
+|                  |                 | for derivative   | Internal         |
+|                  |                 | calculation.When |                  |
+|                  |                 | there is an      |                  |
+|                  |                 | option of either |                  |
+|                  |                 | using forward or |                  |
+|                  |                 | reverse mode     |                  |
+|                  |                 | directional      |                  |
+|                  |                 | derivatives, the |                  |
+|                  |                 | condition ad_wei |                  |
+|                  |                 | ght*nf<=(1-ad_we |                  |
+|                  |                 | ight)*na is used |                  |
+|                  |                 | where nf and na  |                  |
+|                  |                 | are estimates of |                  |
+|                  |                 | the number of    |                  |
+|                  |                 | forward/reverse  |                  |
+|                  |                 | mode directional |                  |
+|                  |                 | derivatives      |                  |
+|                  |                 | needed. By       |                  |
+|                  |                 | default,         |                  |
+|                  |                 | ad_weight is     |                  |
+|                  |                 | calculated       |                  |
+|                  |                 | automatically,   |                  |
+|                  |                 | but this can be  |                  |
+|                  |                 | overridden by    |                  |
+|                  |                 | setting this     |                  |
+|                  |                 | option. In       |                  |
+|                  |                 | particular, 0    |                  |
+|                  |                 | means forcing    |                  |
+|                  |                 | forward mode and |                  |
+|                  |                 | 1 forcing        |                  |
+|                  |                 | reverse mode.    |                  |
+|                  |                 | Leave unset for  |                  |
+|                  |                 | (class specific) |                  |
+|                  |                 | heuristics.      |                  |
++------------------+-----------------+------------------+------------------+
+| ad_weight_sp     | OT_DOUBLE       | Weighting factor | casadi::Function |
+|                  |                 | for sparsity     | Internal         |
+|                  |                 | pattern          |                  |
+|                  |                 | calculation calc |                  |
+|                  |                 | ulation.Override |                  |
+|                  |                 | s default        |                  |
+|                  |                 | behavior. Set to |                  |
+|                  |                 | 0 and 1 to force |                  |
+|                  |                 | forward and      |                  |
+|                  |                 | reverse mode     |                  |
+|                  |                 | respectively.    |                  |
+|                  |                 | Cf. option       |                  |
+|                  |                 | \"ad_weight\".     |                  |
++------------------+-----------------+------------------+------------------+
+| compiler         | OT_STRING       | Just-in-time     | casadi::Function |
+|                  |                 | compiler plugin  | Internal         |
+|                  |                 | to be used.      |                  |
++------------------+-----------------+------------------+------------------+
+| const_dim        | OT_BOOL         | Assume constant  | casadi::Dple     |
+|                  |                 | dimension of P   |                  |
++------------------+-----------------+------------------+------------------+
+| derivative_of    | OT_FUNCTION     | The function is  | casadi::Function |
+|                  |                 | a derivative of  | Internal         |
+|                  |                 | another          |                  |
+|                  |                 | function. The    |                  |
+|                  |                 | type of          |                  |
+|                  |                 | derivative       |                  |
+|                  |                 | (directional     |                  |
+|                  |                 | derivative,      |                  |
+|                  |                 | Jacobian) is     |                  |
+|                  |                 | inferred from    |                  |
+|                  |                 | the function     |                  |
+|                  |                 | name.            |                  |
++------------------+-----------------+------------------+------------------+
+| eps_unstable     | OT_DOUBLE       | A margin for     | casadi::Dple     |
+|                  |                 | unstability      |                  |
+|                  |                 | detection        |                  |
++------------------+-----------------+------------------+------------------+
+| error_unstable   | OT_BOOL         | Throw an         | casadi::Dple     |
+|                  |                 | exception when   |                  |
+|                  |                 | it is detected   |                  |
+|                  |                 | that             |                  |
+|                  |                 | Product(A_i,     |                  |
+|                  |                 | i=N..1)has       |                  |
+|                  |                 | eigenvalues      |                  |
+|                  |                 | greater than     |                  |
+|                  |                 | 1-eps_unstable   |                  |
++------------------+-----------------+------------------+------------------+
+| gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
+|                  |                 | option           | Internal         |
+|                  |                 | (ignored):       |                  |
+|                  |                 | Statistics are   |                  |
+|                  |                 | now always       |                  |
+|                  |                 | collected.       |                  |
++------------------+-----------------+------------------+------------------+
+| input_scheme     | OT_STRINGVECTOR | Custom input     | casadi::Function |
+|                  |                 | scheme           | Internal         |
++------------------+-----------------+------------------+------------------+
+| inputs_check     | OT_BOOL         | Throw exceptions | casadi::Function |
+|                  |                 | when the         | Internal         |
+|                  |                 | numerical values |                  |
+|                  |                 | of the inputs    |                  |
+|                  |                 | don't make sense |                  |
++------------------+-----------------+------------------+------------------+
+| jac_penalty      | OT_DOUBLE       | When requested   | casadi::Function |
+|                  |                 | for a number of  | Internal         |
+|                  |                 | forward/reverse  |                  |
+|                  |                 | directions, it   |                  |
+|                  |                 | may be cheaper   |                  |
+|                  |                 | to compute first |                  |
+|                  |                 | the full         |                  |
+|                  |                 | jacobian and     |                  |
+|                  |                 | then multiply    |                  |
+|                  |                 | with seeds,      |                  |
+|                  |                 | rather than      |                  |
+|                  |                 | obtain the       |                  |
+|                  |                 | requested        |                  |
+|                  |                 | directions in a  |                  |
+|                  |                 | straightforward  |                  |
+|                  |                 | manner. Casadi   |                  |
+|                  |                 | uses a heuristic |                  |
+|                  |                 | to decide which  |                  |
+|                  |                 | is cheaper. A    |                  |
+|                  |                 | high value of    |                  |
+|                  |                 | 'jac_penalty'    |                  |
+|                  |                 | makes it less    |                  |
+|                  |                 | likely for the   |                  |
+|                  |                 | heurstic to      |                  |
+|                  |                 | chose the full   |                  |
+|                  |                 | Jacobian         |                  |
+|                  |                 | strategy. The    |                  |
+|                  |                 | special value -1 |                  |
+|                  |                 | indicates never  |                  |
+|                  |                 | to use the full  |                  |
+|                  |                 | Jacobian         |                  |
+|                  |                 | strategy         |                  |
++------------------+-----------------+------------------+------------------+
+| jit              | OT_BOOL         | Use just-in-time | casadi::Function |
+|                  |                 | compiler to      | Internal         |
+|                  |                 | speed up the     |                  |
+|                  |                 | evaluation       |                  |
++------------------+-----------------+------------------+------------------+
+| jit_options      | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to the    | Internal         |
+|                  |                 | jit compiler.    |                  |
++------------------+-----------------+------------------+------------------+
+| max_num_dir      | OT_INT          | Specify the      | casadi::Function |
+|                  |                 | maximum number   | Internal         |
+|                  |                 | of directions    |                  |
+|                  |                 | for derivative   |                  |
+|                  |                 | functions.       |                  |
+|                  |                 | Overrules the    |                  |
+|                  |                 | builtin optimize |                  |
+|                  |                 | d_num_dir.       |                  |
++------------------+-----------------+------------------+------------------+
+| output_scheme    | OT_STRINGVECTOR | Custom output    | casadi::Function |
+|                  |                 | scheme           | Internal         |
++------------------+-----------------+------------------+------------------+
+| pos_def          | OT_BOOL         | Assume P         | casadi::Dple     |
+|                  |                 | positive         |                  |
+|                  |                 | definite         |                  |
++------------------+-----------------+------------------+------------------+
+| print_time       | OT_BOOL         | print            | casadi::Function |
+|                  |                 | information      | Internal         |
+|                  |                 | about execution  |                  |
+|                  |                 | time             |                  |
++------------------+-----------------+------------------+------------------+
+| regularity_check | OT_BOOL         | Throw exceptions | casadi::Function |
+|                  |                 | when NaN or Inf  | Internal         |
+|                  |                 | appears during   |                  |
+|                  |                 | evaluation       |                  |
++------------------+-----------------+------------------+------------------+
+| user_data        | OT_VOIDPTR      | A user-defined   | casadi::Function |
+|                  |                 | field that can   | Internal         |
+|                  |                 | be used to       |                  |
+|                  |                 | identify the     |                  |
+|                  |                 | function or pass |                  |
+|                  |                 | additional       |                  |
+|                  |                 | information      |                  |
++------------------+-----------------+------------------+------------------+
+| verbose          | OT_BOOL         | Verbose          | casadi::Function |
+|                  |                 | evaluation  for  | Internal         |
+|                  |                 | debugging        |                  |
++------------------+-----------------+------------------+------------------+
+
+Diagrams
+--------
+
+
+
+C++ includes: dple_impl.hpp ";
 
 %feature("docstring") casadi::Dple::n_nodes "[INTERNAL]  Number of nodes in
 the algorithm.
@@ -9803,11 +9995,6 @@ statistics
 
 %feature("docstring") casadi::Dple::codegen_decref "[INTERNAL]  Codegen
 decref for dependencies.
-
-";
-
-%feature("docstring") casadi::Dple::get_n_forward "[INTERNAL]  Generate a
-function that calculates nfwd forward derivatives.
 
 ";
 
@@ -10054,6 +10241,11 @@ instance.
 
 ";
 
+%feature("docstring") casadi::Dple::grad_sx "[INTERNAL]  Gradient
+expression.
+
+";
+
 %feature("docstring") casadi::Dple::replaceAdjSeed "[INTERNAL]  Replace
 0-by-0 reverse seeds.
 
@@ -10064,8 +10256,8 @@ function input and outputs.
 
 ";
 
-%feature("docstring") casadi::Dple::is_a "[INTERNAL]  Check if the function
-is of a particular type.
+%feature("docstring") casadi::Dple::has_reverse "[INTERNAL]  Generate a
+function that calculates nadj adjoint derivatives.
 
 ";
 
@@ -10140,6 +10332,11 @@ for chosing forward/reverse mode, sparsity propagation.
 
 ";
 
+%feature("docstring") casadi::Dple::is_a "[INTERNAL]  Check if the function
+is of a particular type.
+
+";
+
 %feature("docstring") casadi::Dple::sparsity_out "[INTERNAL]  Get sparsity
 of a given output.
 
@@ -10155,8 +10352,8 @@ length of arg field.
 
 ";
 
-%feature("docstring") casadi::Dple::grad_sx "[INTERNAL]  Gradient
-expression.
+%feature("docstring") casadi::Dple::has_forward "[INTERNAL]  Generate a
+function that calculates nfwd forward derivatives.
 
 ";
 
@@ -10188,210 +10385,13 @@ input(s) and output(s)
 
 ";
 
-%feature("docstring") casadi::Dple "
-
-Internal class.
-
->List of available options
-
-+------------------+-----------------+------------------+------------------+
-|        Id        |      Type       |   Description    |     Used in      |
-+==================+=================+==================+==================+
-| ad_weight        | OT_DOUBLE       | Weighting factor | casadi::Function |
-|                  |                 | for derivative   | Internal         |
-|                  |                 | calculation.When |                  |
-|                  |                 | there is an      |                  |
-|                  |                 | option of either |                  |
-|                  |                 | using forward or |                  |
-|                  |                 | reverse mode     |                  |
-|                  |                 | directional      |                  |
-|                  |                 | derivatives, the |                  |
-|                  |                 | condition ad_wei |                  |
-|                  |                 | ght*nf<=(1-ad_we |                  |
-|                  |                 | ight)*na is used |                  |
-|                  |                 | where nf and na  |                  |
-|                  |                 | are estimates of |                  |
-|                  |                 | the number of    |                  |
-|                  |                 | forward/reverse  |                  |
-|                  |                 | mode directional |                  |
-|                  |                 | derivatives      |                  |
-|                  |                 | needed. By       |                  |
-|                  |                 | default,         |                  |
-|                  |                 | ad_weight is     |                  |
-|                  |                 | calculated       |                  |
-|                  |                 | automatically,   |                  |
-|                  |                 | but this can be  |                  |
-|                  |                 | overridden by    |                  |
-|                  |                 | setting this     |                  |
-|                  |                 | option. In       |                  |
-|                  |                 | particular, 0    |                  |
-|                  |                 | means forcing    |                  |
-|                  |                 | forward mode and |                  |
-|                  |                 | 1 forcing        |                  |
-|                  |                 | reverse mode.    |                  |
-|                  |                 | Leave unset for  |                  |
-|                  |                 | (class specific) |                  |
-|                  |                 | heuristics.      |                  |
-+------------------+-----------------+------------------+------------------+
-| ad_weight_sp     | OT_DOUBLE       | Weighting factor | casadi::Function |
-|                  |                 | for sparsity     | Internal         |
-|                  |                 | pattern          |                  |
-|                  |                 | calculation calc |                  |
-|                  |                 | ulation.Override |                  |
-|                  |                 | s default        |                  |
-|                  |                 | behavior. Set to |                  |
-|                  |                 | 0 and 1 to force |                  |
-|                  |                 | forward and      |                  |
-|                  |                 | reverse mode     |                  |
-|                  |                 | respectively.    |                  |
-|                  |                 | Cf. option       |                  |
-|                  |                 | \"ad_weight\".     |                  |
-+------------------+-----------------+------------------+------------------+
-| compiler         | OT_STRING       | Just-in-time     | casadi::Function |
-|                  |                 | compiler plugin  | Internal         |
-|                  |                 | to be used.      |                  |
-+------------------+-----------------+------------------+------------------+
-| const_dim        | OT_BOOL         | Assume constant  | casadi::Dple     |
-|                  |                 | dimension of P   |                  |
-+------------------+-----------------+------------------+------------------+
-| derivative_of    | OT_FUNCTION     | The function is  | casadi::Function |
-|                  |                 | a derivative of  | Internal         |
-|                  |                 | another          |                  |
-|                  |                 | function. The    |                  |
-|                  |                 | type of          |                  |
-|                  |                 | derivative       |                  |
-|                  |                 | (directional     |                  |
-|                  |                 | derivative,      |                  |
-|                  |                 | Jacobian) is     |                  |
-|                  |                 | inferred from    |                  |
-|                  |                 | the function     |                  |
-|                  |                 | name.            |                  |
-+------------------+-----------------+------------------+------------------+
-| eps_unstable     | OT_DOUBLE       | A margin for     | casadi::Dple     |
-|                  |                 | unstability      |                  |
-|                  |                 | detection        |                  |
-+------------------+-----------------+------------------+------------------+
-| error_unstable   | OT_BOOL         | Throw an         | casadi::Dple     |
-|                  |                 | exception when   |                  |
-|                  |                 | it is detected   |                  |
-|                  |                 | that             |                  |
-|                  |                 | Product(A_i,     |                  |
-|                  |                 | i=N..1)has       |                  |
-|                  |                 | eigenvalues      |                  |
-|                  |                 | greater than     |                  |
-|                  |                 | 1-eps_unstable   |                  |
-+------------------+-----------------+------------------+------------------+
-| gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
-|                  |                 | option           | Internal         |
-|                  |                 | (ignored):       |                  |
-|                  |                 | Statistics are   |                  |
-|                  |                 | now always       |                  |
-|                  |                 | collected.       |                  |
-+------------------+-----------------+------------------+------------------+
-| input_scheme     | OT_STRINGVECTOR | Custom input     | casadi::Function |
-|                  |                 | scheme           | Internal         |
-+------------------+-----------------+------------------+------------------+
-| inputs_check     | OT_BOOL         | Throw exceptions | casadi::Function |
-|                  |                 | when the         | Internal         |
-|                  |                 | numerical values |                  |
-|                  |                 | of the inputs    |                  |
-|                  |                 | don't make sense |                  |
-+------------------+-----------------+------------------+------------------+
-| jac_penalty      | OT_DOUBLE       | When requested   | casadi::Function |
-|                  |                 | for a number of  | Internal         |
-|                  |                 | forward/reverse  |                  |
-|                  |                 | directions, it   |                  |
-|                  |                 | may be cheaper   |                  |
-|                  |                 | to compute first |                  |
-|                  |                 | the full         |                  |
-|                  |                 | jacobian and     |                  |
-|                  |                 | then multiply    |                  |
-|                  |                 | with seeds,      |                  |
-|                  |                 | rather than      |                  |
-|                  |                 | obtain the       |                  |
-|                  |                 | requested        |                  |
-|                  |                 | directions in a  |                  |
-|                  |                 | straightforward  |                  |
-|                  |                 | manner. Casadi   |                  |
-|                  |                 | uses a heuristic |                  |
-|                  |                 | to decide which  |                  |
-|                  |                 | is cheaper. A    |                  |
-|                  |                 | high value of    |                  |
-|                  |                 | 'jac_penalty'    |                  |
-|                  |                 | makes it less    |                  |
-|                  |                 | likely for the   |                  |
-|                  |                 | heurstic to      |                  |
-|                  |                 | chose the full   |                  |
-|                  |                 | Jacobian         |                  |
-|                  |                 | strategy. The    |                  |
-|                  |                 | special value -1 |                  |
-|                  |                 | indicates never  |                  |
-|                  |                 | to use the full  |                  |
-|                  |                 | Jacobian         |                  |
-|                  |                 | strategy         |                  |
-+------------------+-----------------+------------------+------------------+
-| jit              | OT_BOOL         | Use just-in-time | casadi::Function |
-|                  |                 | compiler to      | Internal         |
-|                  |                 | speed up the     |                  |
-|                  |                 | evaluation       |                  |
-+------------------+-----------------+------------------+------------------+
-| jit_options      | OT_DICT         | Options to be    | casadi::Function |
-|                  |                 | passed to the    | Internal         |
-|                  |                 | jit compiler.    |                  |
-+------------------+-----------------+------------------+------------------+
-| max_num_dir      | OT_INT          | Specify the      | casadi::Function |
-|                  |                 | maximum number   | Internal         |
-|                  |                 | of directions    |                  |
-|                  |                 | for derivative   |                  |
-|                  |                 | functions.       |                  |
-|                  |                 | Overrules the    |                  |
-|                  |                 | builtin optimize |                  |
-|                  |                 | d_num_dir.       |                  |
-+------------------+-----------------+------------------+------------------+
-| output_scheme    | OT_STRINGVECTOR | Custom output    | casadi::Function |
-|                  |                 | scheme           | Internal         |
-+------------------+-----------------+------------------+------------------+
-| pos_def          | OT_BOOL         | Assume P         | casadi::Dple     |
-|                  |                 | positive         |                  |
-|                  |                 | definite         |                  |
-+------------------+-----------------+------------------+------------------+
-| print_time       | OT_BOOL         | print            | casadi::Function |
-|                  |                 | information      | Internal         |
-|                  |                 | about execution  |                  |
-|                  |                 | time             |                  |
-+------------------+-----------------+------------------+------------------+
-| regularity_check | OT_BOOL         | Throw exceptions | casadi::Function |
-|                  |                 | when NaN or Inf  | Internal         |
-|                  |                 | appears during   |                  |
-|                  |                 | evaluation       |                  |
-+------------------+-----------------+------------------+------------------+
-| user_data        | OT_VOIDPTR      | A user-defined   | casadi::Function |
-|                  |                 | field that can   | Internal         |
-|                  |                 | be used to       |                  |
-|                  |                 | identify the     |                  |
-|                  |                 | function or pass |                  |
-|                  |                 | additional       |                  |
-|                  |                 | information      |                  |
-+------------------+-----------------+------------------+------------------+
-| verbose          | OT_BOOL         | Verbose          | casadi::Function |
-|                  |                 | evaluation  for  | Internal         |
-|                  |                 | debugging        |                  |
-+------------------+-----------------+------------------+------------------+
-
-Diagrams
---------
-
-
-
-C++ includes: dple_impl.hpp ";
-
-%feature("docstring") casadi::Dple::checkInputs "[INTERNAL]  Check if the
-numerical values of the supplied bounds make sense.
+%feature("docstring") casadi::Dple::hasDerivative "[INTERNAL]  Can
+derivatives be calculated in any way?
 
 ";
 
-%feature("docstring") casadi::Dple::set_jac_sparsity "[INTERNAL]  Generate
-the sparsity of a Jacobian block.
+%feature("docstring") casadi::Dple::checkInputs "[INTERNAL]  Check if the
+numerical values of the supplied bounds make sense.
 
 ";
 
@@ -10659,8 +10659,8 @@ expression.
 
 ";
 
-%feature("docstring") casadi::Dple::get_n_reverse "[INTERNAL]  Generate a
-function that calculates nadj adjoint derivatives.
+%feature("docstring") casadi::Dple::set_jac_sparsity "[INTERNAL]  Generate
+the sparsity of a Jacobian block.
 
 ";
 
@@ -10729,8 +10729,8 @@ forward.
 
 
 // File: classcasadi_1_1Expm.xml
-%feature("docstring") casadi::Expm::get_n_forward "[INTERNAL]  Generate a
-function that calculates nfwd forward derivatives.
+%feature("docstring") casadi::Expm::index_in "[INTERNAL]  Get input scheme
+index by name.
 
 ";
 
@@ -11060,11 +11060,6 @@ order is run after init() has been completed.
 
 %feature("docstring") casadi::Expm::mx_out "[INTERNAL]  Get function
 input(s) and output(s)
-
-";
-
-%feature("docstring") casadi::Expm::index_in "[INTERNAL]  Get input scheme
-index by name.
 
 ";
 
@@ -11599,6 +11594,11 @@ outputs.
 
 ";
 
+%feature("docstring") casadi::Expm::has_reverse "[INTERNAL]  Generate a
+function that calculates nadj adjoint derivatives.
+
+";
+
 %feature("docstring") casadi::Expm::getJacSparsity "[INTERNAL]  Generate
 the sparsity of a Jacobian block.
 
@@ -11635,6 +11635,11 @@ function that calculates nadj adjoint derivatives.
 
 %feature("docstring") casadi::Expm::n_out "[INTERNAL]  Number of function
 inputs and outputs.
+
+";
+
+%feature("docstring") casadi::Expm::has_forward "[INTERNAL]  Generate a
+function that calculates nfwd forward derivatives.
 
 ";
 
@@ -11684,11 +11689,6 @@ expression.
 
 %feature("docstring") casadi::Expm::simple "[INTERNAL]  Evaluate
 numerically, simplied syntax.
-
-";
-
-%feature("docstring") casadi::Expm::get_n_reverse "[INTERNAL]  Generate a
-function that calculates nadj adjoint derivatives.
 
 ";
 
@@ -11817,6 +11817,11 @@ evaluation.
 
 %feature("docstring") casadi::External::sx_out "[INTERNAL]  Get function
 input(s) and output(s)
+
+";
+
+%feature("docstring") casadi::External::has_forward "[INTERNAL]  Forward
+mode derivatives.
 
 ";
 
@@ -12159,11 +12164,6 @@ the evaluation function.
 
 ";
 
-%feature("docstring") casadi::External::get_n_forward "[INTERNAL]  Forward
-mode derivatives.
-
-";
-
 %feature("docstring") casadi::External::init "[INTERNAL]  Initialize.
 
 ";
@@ -12351,6 +12351,11 @@ function inputs and outputs.
 
 ";
 
+%feature("docstring") casadi::External::has_reverse "[INTERNAL]  Reverse
+mode derivatives.
+
+";
+
 %feature("docstring") casadi::External::has_codegen "[INTERNAL]  Is codegen
 supported?
 
@@ -12373,11 +12378,6 @@ structure recognition.
 
 %feature("docstring") casadi::External::size2_out "[INTERNAL]  Input/output
 dimensions.
-
-";
-
-%feature("docstring") casadi::External::signature "[INTERNAL]  Code
-generate the function.
 
 ";
 
@@ -12426,8 +12426,8 @@ input/output nonzeros.
 
 ";
 
-%feature("docstring") casadi::External::get_n_reverse "[INTERNAL]  Reverse
-mode derivatives.
+%feature("docstring") casadi::External::signature "[INTERNAL]  Code
+generate the function.
 
 ";
 
@@ -12870,10 +12870,6 @@ function input(s) and output(s)
 
 ";
 
-%feature("docstring") casadi::FixedStepIntegrator::get_n_reverse "[INTERNAL]  Generate a function that calculates nadj adjoint derivatives.
-
-";
-
 %feature("docstring") casadi::FixedStepIntegrator::hess_sx "[INTERNAL]
 Hessian expression.
 
@@ -12991,9 +12987,7 @@ Number of input/output elements.
 
 ";
 
-%feature("docstring") casadi::FixedStepIntegrator::get_n_forward "[INTERNAL]  Generate a function that calculates nfwd forward derivatives.
-
-";
+%feature("docstring") casadi::FixedStepIntegrator::monitored "[INTERNAL] ";
 
 %feature("docstring") casadi::FixedStepIntegrator::has_free "[INTERNAL]
 Does the function have free variables.
@@ -13279,14 +13273,13 @@ Generate a augmented DAE system with nadj adjoint sensitivities.
 
 ";
 
-%feature("docstring") casadi::FixedStepIntegrator::monitored "[INTERNAL] ";
-
 %feature("docstring") casadi::FixedStepIntegrator::alloc_arg "[INTERNAL]
 Ensure required length of arg field.
 
 ";
 
-%feature("docstring") casadi::FixedStepIntegrator::codegen_incref "[INTERNAL]  Codegen incref for dependencies.
+%feature("docstring") casadi::FixedStepIntegrator::has_forward "[INTERNAL]
+Generate a function that calculates nfwd forward derivatives.
 
 ";
 
@@ -13450,6 +13443,10 @@ Get explicit dynamics.
 
 ";
 
+%feature("docstring") casadi::FixedStepIntegrator::codegen_incref "[INTERNAL]  Codegen incref for dependencies.
+
+";
+
 %feature("docstring") casadi::FixedStepIntegrator::symbolic_output "[INTERNAL]  Get a vector of symbolic variables corresponding to the outputs.
 
 ";
@@ -13515,6 +13512,11 @@ Set the work vectors.
 
 %feature("docstring") casadi::FixedStepIntegrator::call_reverse "[INTERNAL]
 Reverse mode, virtual functions overloaded in derived classes.
+
+";
+
+%feature("docstring") casadi::FixedStepIntegrator::has_reverse "[INTERNAL]
+Generate a function that calculates nadj adjoint derivatives.
 
 ";
 
@@ -14954,6 +14956,11 @@ Full Jacobian.
 
 ";
 
+%feature("docstring") casadi::GenericExternal::has_forward "[INTERNAL]
+Forward mode derivatives.
+
+";
+
 %feature("docstring") casadi::GenericExternal::getJacSparsityHierarchical "[INTERNAL]  A flavor of getJacSparsity that does hierarchical block
 structure recognition.
 
@@ -15309,8 +15316,8 @@ function inputs and outputs.
 
 ";
 
-%feature("docstring") casadi::GenericExternal::get_n_reverse "[INTERNAL]
-Reverse mode derivatives.
+%feature("docstring") casadi::GenericExternal::addShorthand "[INTERNAL]
+Generate shorthand macro.
 
 ";
 
@@ -15417,11 +15424,6 @@ Weighting factor for chosing forward/reverse mode.
 
 ";
 
-%feature("docstring") casadi::GenericExternal::addShorthand "[INTERNAL]
-Generate shorthand macro.
-
-";
-
 %feature("docstring") casadi::GenericExternal::get_forward "[INTERNAL]
 Forward mode derivatives.
 
@@ -15429,11 +15431,6 @@ Forward mode derivatives.
 
 %feature("docstring") casadi::GenericExternal::default_in "[INTERNAL]  Get
 default input value.
-
-";
-
-%feature("docstring") casadi::GenericExternal::get_n_forward "[INTERNAL]
-Forward mode derivatives.
 
 ";
 
@@ -15494,6 +15491,11 @@ expression.
 
 %feature("docstring") casadi::GenericExternal::sx_in "[INTERNAL]  Get
 function input(s) and output(s)
+
+";
+
+%feature("docstring") casadi::GenericExternal::has_reverse "[INTERNAL]
+Reverse mode derivatives.
 
 ";
 
@@ -16925,6 +16927,10 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
+%feature("docstring") casadi::ImplicitFixedStepIntegrator::has_forward "[INTERNAL]  Generate a function that calculates nfwd forward derivatives.
+
+";
+
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::matchingRes "[INTERNAL]  Check if output arguments that needs to be replaced.
 
 ";
@@ -17025,10 +17031,6 @@ recognition.
 ";
 
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::sparsity_jac "[INTERNAL]  Get, if necessary generate, the sparsity of a Jacobian block.
-
-";
-
-%feature("docstring") casadi::ImplicitFixedStepIntegrator::get_n_reverse "[INTERNAL]  Generate a function that calculates nadj adjoint derivatives.
 
 ";
 
@@ -17243,6 +17245,10 @@ Name of the function.
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::rq "[INTERNAL]
 ";
 
+%feature("docstring") casadi::ImplicitFixedStepIntegrator::has_reverse "[INTERNAL]  Generate a function that calculates nadj adjoint derivatives.
+
+";
+
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::get_forward "[INTERNAL]  Generate a function that calculates nfwd forward derivatives.
 
 ";
@@ -17312,10 +17318,6 @@ problem)
 ";
 
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::aug_adj "[INTERNAL]  Generate a augmented DAE system with nadj adjoint sensitivities.
-
-";
-
-%feature("docstring") casadi::ImplicitFixedStepIntegrator::get_n_forward "[INTERNAL]  Generate a function that calculates nfwd forward derivatives.
 
 ";
 
@@ -17611,6 +17613,11 @@ Diagrams
 
 C++ includes: implicit_to_nlp.hpp ";
 
+%feature("docstring") casadi::ImplicitToNlp::has_reverse "[INTERNAL]
+Generate a function that calculates nadj adjoint derivatives.
+
+";
+
 %feature("docstring") casadi::ImplicitToNlp::release "[INTERNAL]  Release a
 memory object.
 
@@ -17794,8 +17801,8 @@ Generate a function that calculates nfwd forward derivatives.
 
 ";
 
-%feature("docstring") casadi::ImplicitToNlp::get_n_reverse "[INTERNAL]
-Generate a function that calculates nadj adjoint derivatives.
+%feature("docstring") casadi::ImplicitToNlp::getAtomicInput "[INTERNAL]
+Get the (integer) input arguments of an atomic operation.
 
 ";
 
@@ -17819,27 +17826,13 @@ Input/output dimensions.
 
 ";
 
-%feature("docstring") casadi::ImplicitToNlp::log "
-
->  void casadi::FunctionInternal::log(const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver.
-
->  void casadi::FunctionInternal::log(const std::string &fcn, const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver, function given.
+%feature("docstring") casadi::ImplicitToNlp::has_forward "[INTERNAL]
+Generate a function that calculates nfwd forward derivatives.
 
 ";
 
 %feature("docstring") casadi::ImplicitToNlp::alloc_w "[INTERNAL]  Ensure
 required length of w field.
-
-";
-
-%feature("docstring") casadi::ImplicitToNlp::getAtomicInput "[INTERNAL]
-Get the (integer) input arguments of an atomic operation.
 
 ";
 
@@ -17935,6 +17928,20 @@ Get the floating point output argument of an atomic operation.
 
 %feature("docstring") casadi::ImplicitToNlp::eval "[INTERNAL]  Evaluate
 numerically.
+
+";
+
+%feature("docstring") casadi::ImplicitToNlp::log "
+
+>  void casadi::FunctionInternal::log(const std::string &msg) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+Log the status of the solver.
+
+>  void casadi::FunctionInternal::log(const std::string &fcn, const std::string &msg) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+Log the status of the solver, function given.
 
 ";
 
@@ -18215,11 +18222,6 @@ Names of function input and outputs.
 ";
 
 %feature("docstring") casadi::ImplicitToNlp::expand "[INTERNAL] ";
-
-%feature("docstring") casadi::ImplicitToNlp::get_n_forward "[INTERNAL]
-Generate a function that calculates nfwd forward derivatives.
-
-";
 
 %feature("docstring") casadi::ImplicitToNlp::get_stats "[INTERNAL]  Get all
 statistics.
@@ -18530,8 +18532,8 @@ scheme name by index.
 
 ";
 
-%feature("docstring") casadi::Integrator::get_n_reverse "[INTERNAL]
-Generate a function that calculates nadj adjoint derivatives.
+%feature("docstring") casadi::Integrator::eval_name "[INTERNAL]  Get name
+of the evaluation function.
 
 ";
 
@@ -18857,6 +18859,11 @@ solution in time.
 
 ";
 
+%feature("docstring") casadi::Integrator::has_reverse "[INTERNAL]  Generate
+a function that calculates nadj adjoint derivatives.
+
+";
+
 %feature("docstring") casadi::Integrator::getJacSparsityGen "[INTERNAL]
 Get the sparsity pattern, forward mode.
 
@@ -19034,11 +19041,6 @@ expression.
 
 ";
 
-%feature("docstring") casadi::Integrator::eval_name "[INTERNAL]  Get name
-of the evaluation function.
-
-";
-
 %feature("docstring") casadi::Integrator::sparsity_in "[INTERNAL]  Get
 sparsity of a given input.
 
@@ -19175,11 +19177,6 @@ structure recognition.
 
 ";
 
-%feature("docstring") casadi::Integrator::get_n_forward "[INTERNAL]
-Generate a function that calculates nfwd forward derivatives.
-
-";
-
 %feature("docstring") casadi::Integrator::checkArg "[INTERNAL]  Check if
 input arguments have correct length and dimensions.
 
@@ -19293,6 +19290,11 @@ Evaluate a function, overloaded.
 ";
 
 %feature("docstring") casadi::Integrator::oracle "[INTERNAL]  Get oracle.
+
+";
+
+%feature("docstring") casadi::Integrator::has_forward "[INTERNAL]  Generate
+a function that calculates nfwd forward derivatives.
 
 ";
 
@@ -19569,10 +19571,8 @@ statistics
 
 ";
 
-%feature("docstring") casadi::Interpolant::get_n_forward "[INTERNAL]
-Return function that calculates forward derivatives forward(nfwd) returns a
-cached instance if available, and calls  Function get_forward(int nfwd) if
-no cached version is available.
+%feature("docstring") casadi::Interpolant::size1_out "[INTERNAL]
+Input/output dimensions.
 
 ";
 
@@ -19609,11 +19609,6 @@ Forward mode AD, virtual functions overloaded in derived classes.
 
 %feature("docstring") casadi::Interpolant::signature "[INTERNAL]  Code
 generate the function.
-
-";
-
-%feature("docstring") casadi::Interpolant::size1_out "[INTERNAL]
-Input/output dimensions.
 
 ";
 
@@ -19818,13 +19813,6 @@ function inputs and outputs.
 
 ";
 
-%feature("docstring") casadi::Interpolant::get_n_reverse "[INTERNAL]
-Return function that calculates adjoint derivatives reverse(nadj) returns a
-cached instance if available, and calls  Function get_reverse(int nadj) if
-no cached version is available.
-
-";
-
 %feature("docstring") casadi::Interpolant::getJacSparsityHierarchicalSymm "[INTERNAL]  A flavor of getJacSparsity that does hierarchical block
 structure recognition for symmetric Jacobians
 
@@ -19964,6 +19952,13 @@ function inputs and outputs.
 
 ";
 
+%feature("docstring") casadi::Interpolant::has_reverse "[INTERNAL]  Return
+function that calculates adjoint derivatives reverse(nadj) returns a cached
+instance if available, and calls  Function get_reverse(int nadj) if no
+cached version is available.
+
+";
+
 %feature("docstring") casadi::Interpolant::sparsity_jac "[INTERNAL]  Get,
 if necessary generate, the sparsity of a Jacobian block.
 
@@ -19981,6 +19976,13 @@ Input/output dimensions.
 
 %feature("docstring") casadi::Interpolant::addDependency "[INTERNAL]  Add a
 dependent function.
+
+";
+
+%feature("docstring") casadi::Interpolant::has_forward "[INTERNAL]  Return
+function that calculates forward derivatives forward(nfwd) returns a cached
+instance if available, and calls  Function get_forward(int nfwd) if no
+cached version is available.
 
 ";
 
@@ -20579,14 +20581,21 @@ inputs and outputs.
 
 ";
 
+%feature("docstring") casadi::Jit::has_forward "[INTERNAL]  Return function
+that calculates forward derivatives forward(nfwd) returns a cached instance
+if available, and calls  Function get_forward(int nfwd) if no cached version
+is available.
+
+";
+
 %feature("docstring") casadi::Jit::generateBody "
 
 Generate code for the function body.
 
 ";
 
-%feature("docstring") casadi::Jit::sparsity_out "[INTERNAL]  Get sparsity
-of a given output.
+%feature("docstring") casadi::Jit::call "[INTERNAL]   Call a function,
+templated.
 
 ";
 
@@ -20610,9 +20619,8 @@ number of atomic operations.
 
 ";
 
-%feature("docstring") casadi::Jit::get_sparsity_out "
-
-All inputs and outputs are scalars.
+%feature("docstring") casadi::Jit::jacobian "[INTERNAL]  Return Jacobian of
+all input elements with respect to all output elements.
 
 ";
 
@@ -20807,8 +20815,8 @@ floating point output argument of an atomic operation.
 
 ";
 
-%feature("docstring") casadi::Jit::call "[INTERNAL]   Call a function,
-templated.
+%feature("docstring") casadi::Jit::sparsity_out "[INTERNAL]  Get sparsity
+of a given output.
 
 ";
 
@@ -20929,9 +20937,9 @@ evaluation function.
 
 ";
 
-%feature("docstring") casadi::Jit::forward "[INTERNAL]  Return function
-that calculates forward derivatives forward(nfwd) returns a cached instance
-if available, and calls  Function get_forward(int nfwd) if no cached version
+%feature("docstring") casadi::Jit::has_reverse "[INTERNAL]  Return function
+that calculates adjoint derivatives reverse(nadj) returns a cached instance
+if available, and calls  Function get_reverse(int nadj) if no cached version
 is available.
 
 ";
@@ -21014,18 +21022,6 @@ and output(s)
 
 ";
 
-%feature("docstring") casadi::Jit::get_n_reverse "[INTERNAL]  Return
-function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(int nadj) if no
-cached version is available.
-
-";
-
-%feature("docstring") casadi::Jit::release "[INTERNAL]  Release a memory
-object.
-
-";
-
 %feature("docstring") casadi::Jit::verbose "[INTERNAL]  Verbose mode?
 
 ";
@@ -21075,8 +21071,9 @@ for chosing forward/reverse mode.
 
 ";
 
-%feature("docstring") casadi::Jit::jacobian "[INTERNAL]  Return Jacobian of
-all input elements with respect to all output elements.
+%feature("docstring") casadi::Jit::get_sparsity_out "
+
+All inputs and outputs are scalars.
 
 ";
 
@@ -21179,13 +21176,8 @@ for chosing forward/reverse mode, sparsity propagation.
 
 ";
 
-%feature("docstring") casadi::Jit::replaceArg "[INTERNAL]  Replace 0-by-0
-inputs.
-
-Parameters:
------------
-
-hcat:  check if horizontal repetion of the function input is allowed
+%feature("docstring") casadi::Jit::release "[INTERNAL]  Release a memory
+object.
 
 ";
 
@@ -21530,10 +21522,13 @@ Initialize.
 
 ";
 
-%feature("docstring") casadi::Jit::get_n_forward "[INTERNAL]  Return
-function that calculates forward derivatives forward(nfwd) returns a cached
-instance if available, and calls  Function get_forward(int nfwd) if no
-cached version is available.
+%feature("docstring") casadi::Jit::replaceArg "[INTERNAL]  Replace 0-by-0
+inputs.
+
+Parameters:
+-----------
+
+hcat:  check if horizontal repetion of the function input is allowed
 
 ";
 
@@ -21550,6 +21545,13 @@ is available.
 
 %feature("docstring") casadi::Jit::grad_mx "[INTERNAL]  Gradient
 expression.
+
+";
+
+%feature("docstring") casadi::Jit::forward "[INTERNAL]  Return function
+that calculates forward derivatives forward(nfwd) returns a cached instance
+if available, and calls  Function get_forward(int nfwd) if no cached version
+is available.
 
 ";
 
@@ -21723,13 +21725,6 @@ reference to the object.
 
 ";
 
-%feature("docstring") casadi::LapackLu::get_n_reverse "[INTERNAL]  Return
-function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(int nadj) if no
-cached version is available.
-
-";
-
 %feature("docstring") casadi::LapackLu::name_in "[INTERNAL]  Get input
 scheme name by index.
 
@@ -21861,6 +21856,13 @@ function input and outputs.
 
 ";
 
+%feature("docstring") casadi::LapackLu::has_forward "[INTERNAL]  Return
+function that calculates forward derivatives forward(nfwd) returns a cached
+instance if available, and calls  Function get_forward(int nfwd) if no
+cached version is available.
+
+";
+
 %feature("docstring") casadi::LapackLu::replaceAdjSeed "[INTERNAL]  Replace
 0-by-0 reverse seeds.
 
@@ -21883,13 +21885,6 @@ numerically.
 
 %feature("docstring") casadi::LapackLu::get_name_out "[INTERNAL]  Names of
 function input and outputs.
-
-";
-
-%feature("docstring") casadi::LapackLu::get_n_forward "[INTERNAL]  Return
-function that calculates forward derivatives forward(nfwd) returns a cached
-instance if available, and calls  Function get_forward(int nfwd) if no
-cached version is available.
 
 ";
 
@@ -22212,6 +22207,13 @@ variables.
 
 %feature("docstring") casadi::LapackLu::print_dimensions "[INTERNAL]  Print
 dimensions of inputs and outputs.
+
+";
+
+%feature("docstring") casadi::LapackLu::has_reverse "[INTERNAL]  Return
+function that calculates adjoint derivatives reverse(nadj) returns a cached
+instance if available, and calls  Function get_reverse(int nadj) if no
+cached version is available.
 
 ";
 
@@ -22665,6 +22667,13 @@ information there is to know about a certain option.
 
 
 // File: classcasadi_1_1LapackQr.xml
+%feature("docstring") casadi::LapackQr::has_reverse "[INTERNAL]  Return
+function that calculates adjoint derivatives reverse(nadj) returns a cached
+instance if available, and calls  Function get_reverse(int nadj) if no
+cached version is available.
+
+";
+
 %feature("docstring") casadi::LapackQr::memory "[INTERNAL]  Memory objects.
 
 ";
@@ -22754,13 +22763,6 @@ nodes in the algorithm.
 
 %feature("docstring") casadi::LapackQr::has_spfwd "[INTERNAL]  Is the class
 able to propagate seeds through the algorithm?
-
-";
-
-%feature("docstring") casadi::LapackQr::get_n_reverse "[INTERNAL]  Return
-function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(int nadj) if no
-cached version is available.
 
 ";
 
@@ -22984,11 +22986,6 @@ Extract the functions needed for the Lifted Newton method.
 
 ";
 
-%feature("docstring") casadi::LapackQr::jacobian "[INTERNAL]  Return
-Jacobian of all input elements with respect to all output elements.
-
-";
-
 %feature("docstring") casadi::LapackQr::neig "[INTERNAL]  Number of
 negative eigenvalues.
 
@@ -23001,6 +22998,13 @@ factor for chosing forward/reverse mode, sparsity propagation.
 
 %feature("docstring") casadi::LapackQr::solve_cholesky "[INTERNAL]   Solve
 Cholesky.
+
+";
+
+%feature("docstring") casadi::LapackQr::has_forward "[INTERNAL]  Return
+function that calculates forward derivatives forward(nfwd) returns a cached
+instance if available, and calls  Function get_forward(int nfwd) if no
+cached version is available.
 
 ";
 
@@ -23107,6 +23111,11 @@ length of iw field.
 
 ";
 
+%feature("docstring") casadi::LapackQr::n_out "[INTERNAL]  Number of
+function inputs and outputs.
+
+";
+
 %feature("docstring") casadi::LapackQr::generateDeclarations "[INTERNAL]
 Generate code for the declarations of the C function.
 
@@ -23157,8 +23166,8 @@ statistics
 
 ";
 
-%feature("docstring") casadi::LapackQr::size2_out "[INTERNAL]  Input/output
-dimensions.
+%feature("docstring") casadi::LapackQr::jacobian "[INTERNAL]  Return
+Jacobian of all input elements with respect to all output elements.
 
 ";
 
@@ -23248,8 +23257,8 @@ hcat:  check if horizontal repetion of the function input is allowed
 
 %feature("docstring") casadi::LapackQr::plugin_name "[INTERNAL] ";
 
-%feature("docstring") casadi::LapackQr::call "[INTERNAL]   Call a function,
-templated.
+%feature("docstring") casadi::LapackQr::adjViaJac "[INTERNAL]  Calculate
+derivatives by multiplying the full Jacobian and multiplying.
 
 ";
 
@@ -23290,11 +23299,6 @@ function inputs and outputs.
 
 %feature("docstring") casadi::LapackQr::generateFunction "[INTERNAL]
 Generate code the function.
-
-";
-
-%feature("docstring") casadi::LapackQr::checkInputs "[INTERNAL]  Check if
-the numerical values of the supplied bounds make sense.
 
 ";
 
@@ -23459,8 +23463,8 @@ function.
 
 ";
 
-%feature("docstring") casadi::LapackQr::adjViaJac "[INTERNAL]  Calculate
-derivatives by multiplying the full Jacobian and multiplying.
+%feature("docstring") casadi::LapackQr::call "[INTERNAL]   Call a function,
+templated.
 
 ";
 
@@ -23498,8 +23502,8 @@ input/output nonzeros.
 
 %feature("docstring") casadi::LapackQr::~LapackQr "[INTERNAL] ";
 
-%feature("docstring") casadi::LapackQr::n_out "[INTERNAL]  Number of
-function inputs and outputs.
+%feature("docstring") casadi::LapackQr::linsol_cholesky "[INTERNAL]  Get
+Cholesky factor.
 
 ";
 
@@ -23609,10 +23613,8 @@ structure recognition.
 
 ";
 
-%feature("docstring") casadi::LapackQr::get_n_forward "[INTERNAL]  Return
-function that calculates forward derivatives forward(nfwd) returns a cached
-instance if available, and calls  Function get_forward(int nfwd) if no
-cached version is available.
+%feature("docstring") casadi::LapackQr::size_in "[INTERNAL]  Input/output
+dimensions.
 
 ";
 
@@ -23655,8 +23657,8 @@ output arguments have correct length and dimensions.
 
 ";
 
-%feature("docstring") casadi::LapackQr::linsol_cholesky "[INTERNAL]  Get
-Cholesky factor.
+%feature("docstring") casadi::LapackQr::size2_out "[INTERNAL]  Input/output
+dimensions.
 
 ";
 
@@ -23734,8 +23736,8 @@ function inputs and outputs.
 
 ";
 
-%feature("docstring") casadi::LapackQr::size_in "[INTERNAL]  Input/output
-dimensions.
+%feature("docstring") casadi::LapackQr::checkInputs "[INTERNAL]  Check if
+the numerical values of the supplied bounds make sense.
 
 ";
 
@@ -23760,13 +23762,6 @@ the sparsity pattern, forward mode.
 // File: classcasadi_1_1LinearInterpolant.xml
 %feature("docstring") casadi::LinearInterpolant::grad_sx "[INTERNAL]
 Gradient expression.
-
-";
-
-%feature("docstring") casadi::LinearInterpolant::get_n_forward "[INTERNAL]
-Return function that calculates forward derivatives forward(nfwd) returns a
-cached instance if available, and calls  Function get_forward(int nfwd) if
-no cached version is available.
 
 ";
 
@@ -23917,8 +23912,8 @@ Jacobian expression.
 
 ";
 
-%feature("docstring") casadi::LinearInterpolant::_set_work "[INTERNAL]  Set
-the (persistent) work vectors.
+%feature("docstring") casadi::LinearInterpolant::sparsity_out "[INTERNAL]
+Get sparsity of a given output.
 
 ";
 
@@ -24021,14 +24016,6 @@ Print list of options.
 
 ";
 
-%feature("docstring") casadi::LinearInterpolant::init "[INTERNAL]
-Initialize Initialize and make the object ready for setting arguments and
-evaluation. This method is typically called after setting options but before
-evaluating. If passed to another class (in the constructor), this class
-should invoke this function when initialized.
-
-";
-
 %feature("docstring") casadi::LinearInterpolant::matchingArg "[INTERNAL]
 Check if input arguments that needs to be replaced.
 
@@ -24036,6 +24023,11 @@ Parameters:
 -----------
 
 hcat:  check if horizontal repetion of the function input is allowed
+
+";
+
+%feature("docstring") casadi::LinearInterpolant::getCount "[INTERNAL]  Get
+the reference count.
 
 ";
 
@@ -24269,15 +24261,8 @@ hcat:  check if horizontal repetion of the function input is allowed
 
 ";
 
-%feature("docstring") casadi::LinearInterpolant::sparsity_out "[INTERNAL]
-Get sparsity of a given output.
-
-";
-
-%feature("docstring") casadi::LinearInterpolant::get_n_reverse "[INTERNAL]
-Return function that calculates adjoint derivatives reverse(nadj) returns a
-cached instance if available, and calls  Function get_reverse(int nadj) if
-no cached version is available.
+%feature("docstring") casadi::LinearInterpolant::_set_work "[INTERNAL]  Set
+the (persistent) work vectors.
 
 ";
 
@@ -24291,8 +24276,10 @@ function input(s) and output(s)
 
 ";
 
-%feature("docstring") casadi::LinearInterpolant::generateMeta "[INTERNAL]
-Generate meta-information allowing a user to evaluate a generated function.
+%feature("docstring") casadi::LinearInterpolant::has_reverse "[INTERNAL]
+Return function that calculates adjoint derivatives reverse(nadj) returns a
+cached instance if available, and calls  Function get_reverse(int nadj) if
+no cached version is available.
 
 ";
 
@@ -24335,11 +24322,6 @@ input scheme index by name.
 
 %feature("docstring") casadi::LinearInterpolant::get_n_out "[INTERNAL]
 Number of function inputs and outputs.
-
-";
-
-%feature("docstring") casadi::LinearInterpolant::getCount "[INTERNAL]  Get
-the reference count.
 
 ";
 
@@ -24455,6 +24437,13 @@ Input/output dimensions.
 
 ";
 
+%feature("docstring") casadi::LinearInterpolant::has_forward "[INTERNAL]
+Return function that calculates forward derivatives forward(nfwd) returns a
+cached instance if available, and calls  Function get_forward(int nfwd) if
+no cached version is available.
+
+";
+
 %feature("docstring") casadi::LinearInterpolant::name_out "[INTERNAL]  Get
 output scheme name by index.
 
@@ -24490,6 +24479,11 @@ Evaluate with symbolic scalars.
 %feature("docstring") casadi::LinearInterpolant::LinearInterpolant "[INTERNAL] ";
 
 %feature("docstring") casadi::LinearInterpolant::getAdaptorSolverName "[INTERNAL]  Obtain solver name from Adaptor.
+
+";
+
+%feature("docstring") casadi::LinearInterpolant::generateMeta "[INTERNAL]
+Generate meta-information allowing a user to evaluate a generated function.
 
 ";
 
@@ -24540,6 +24534,14 @@ all statistics
 
 %feature("docstring") casadi::LinearInterpolant::eval "[INTERNAL]  Evaluate
 numerically.
+
+";
+
+%feature("docstring") casadi::LinearInterpolant::init "[INTERNAL]
+Initialize Initialize and make the object ready for setting arguments and
+evaluation. This method is typically called after setting options but before
+evaluating. If passed to another class (in the constructor), this class
+should invoke this function when initialized.
 
 ";
 
@@ -24974,12 +24976,6 @@ hcat:  check if horizontal repetion of the function input is allowed
 
 ";
 
-%feature("docstring") casadi::LinearInterpolantJac::get_n_reverse "[INTERNAL]  Return function that calculates adjoint derivatives
-reverse(nadj) returns a cached instance if available, and calls  Function
-get_reverse(int nadj) if no cached version is available.
-
-";
-
 %feature("docstring") casadi::LinearInterpolantJac::size1_in "[INTERNAL]
 Input/output dimensions.
 
@@ -25215,6 +25211,13 @@ Code generate the function.
 
 ";
 
+%feature("docstring") casadi::LinearInterpolantJac::has_reverse "[INTERNAL]
+Return function that calculates adjoint derivatives reverse(nadj) returns a
+cached instance if available, and calls  Function get_reverse(int nadj) if
+no cached version is available.
+
+";
+
 %feature("docstring") casadi::LinearInterpolantJac "[INTERNAL]  First order
 derivatives
 
@@ -25266,6 +25269,13 @@ Parallel evaluation.
 
 %feature("docstring") casadi::LinearInterpolantJac::has_free "[INTERNAL]
 Does the function have free variables.
+
+";
+
+%feature("docstring") casadi::LinearInterpolantJac::has_forward "[INTERNAL]
+Return function that calculates forward derivatives forward(nfwd) returns a
+cached instance if available, and calls  Function get_forward(int nfwd) if
+no cached version is available.
 
 ";
 
@@ -25405,12 +25415,6 @@ Replace 0-by-0 outputs.
 
 %feature("docstring") casadi::LinearInterpolantJac::memory "[INTERNAL]
 Memory objects.
-
-";
-
-%feature("docstring") casadi::LinearInterpolantJac::get_n_forward "[INTERNAL]  Return function that calculates forward derivatives
-forward(nfwd) returns a cached instance if available, and calls  Function
-get_forward(int nfwd) if no cached version is available.
 
 ";
 
@@ -25783,13 +25787,6 @@ C++ includes: casadi_logger.hpp ";
 
 
 // File: classcasadi_1_1Lsqr.xml
-%feature("docstring") casadi::Lsqr::get_n_reverse "[INTERNAL]  Return
-function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(int nadj) if no
-cached version is available.
-
-";
-
 %feature("docstring") casadi::Lsqr::print "[INTERNAL]  Print.
 
 ";
@@ -25944,13 +25941,6 @@ Cholesky.
 
 ";
 
-%feature("docstring") casadi::Lsqr::get_n_forward "[INTERNAL]  Return
-function that calculates forward derivatives forward(nfwd) returns a cached
-instance if available, and calls  Function get_forward(int nfwd) if no
-cached version is available.
-
-";
-
 %feature("docstring") casadi::Lsqr::size_in "[INTERNAL]  Input/output
 dimensions.
 
@@ -25965,6 +25955,13 @@ memory block.
 
 %feature("docstring") casadi::Lsqr::has_spfwd "[INTERNAL]  Is the class
 able to propagate seeds through the algorithm?
+
+";
+
+%feature("docstring") casadi::Lsqr::has_forward "[INTERNAL]  Return
+function that calculates forward derivatives forward(nfwd) returns a cached
+instance if available, and calls  Function get_forward(int nfwd) if no
+cached version is available.
 
 ";
 
@@ -26032,11 +26029,6 @@ the function.
 
 ";
 
-%feature("docstring") casadi::Lsqr::sparsity_out "[INTERNAL]  Get sparsity
-of a given output.
-
-";
-
 %feature("docstring") casadi::Lsqr::checkRes "[INTERNAL]  Check if output
 arguments have correct length and dimensions.
 
@@ -26069,6 +26061,10 @@ input value.
 
 %feature("docstring") casadi::Lsqr::alloc_res "[INTERNAL]  Ensure required
 length of res field.
+
+";
+
+%feature("docstring") casadi::Lsqr::rank "[INTERNAL]   Matrix rank.
 
 ";
 
@@ -26350,6 +26346,13 @@ function input and outputs.
 %feature("docstring") casadi::Lsqr::getJacSparsityHierarchical "[INTERNAL]
 A flavor of getJacSparsity that does hierarchical block structure
 recognition.
+
+";
+
+%feature("docstring") casadi::Lsqr::has_reverse "[INTERNAL]  Return
+function that calculates adjoint derivatives reverse(nadj) returns a cached
+instance if available, and calls  Function get_reverse(int nadj) if no
+cached version is available.
 
 ";
 
@@ -26717,8 +26720,8 @@ evaluation function.
 
 ";
 
-%feature("docstring") casadi::Lsqr::n_out "[INTERNAL]  Number of function
-inputs and outputs.
+%feature("docstring") casadi::Lsqr::sparsity_out "[INTERNAL]  Get sparsity
+of a given output.
 
 ";
 
@@ -26770,7 +26773,8 @@ dimensions.
 
 ";
 
-%feature("docstring") casadi::Lsqr::rank "[INTERNAL]   Matrix rank.
+%feature("docstring") casadi::Lsqr::n_out "[INTERNAL]  Number of function
+inputs and outputs.
 
 ";
 
@@ -26912,6 +26916,11 @@ dimensions.
 
 ";
 
+%feature("docstring") casadi::Map::has_forward "[INTERNAL]  Generate a
+function that calculates nfwd forward derivatives.
+
+";
+
 %feature("docstring") casadi::Map::matchingRes "[INTERNAL]  Check if output
 arguments that needs to be replaced.
 
@@ -26932,19 +26941,8 @@ dependent function.
 
 ";
 
-%feature("docstring") casadi::Map::_eval "
-
->  void casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, int mem) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Evaluate numerically.
-
->  void casadi::FunctionInternal::_eval(const SXElem **arg, SXElem **res, int *iw, SXElem *w, int mem) const
-
->  void casadi::FunctionInternal::_eval(const bvec_t **arg, bvec_t **res, int *iw, bvec_t *w, int mem) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Evaluate a function, overloaded.
+%feature("docstring") casadi::Map::has_reverse "[INTERNAL]  Generate a
+function that calculates nadj adjoint derivatives.
 
 ";
 
@@ -26983,8 +26981,7 @@ of the work vector.
 
 ";
 
-%feature("docstring") casadi::Map::get_n_reverse "[INTERNAL]  Generate a
-function that calculates nadj adjoint derivatives.
+%feature("docstring") casadi::Map::oracle "[INTERNAL]  Get oracle.
 
 ";
 
@@ -27027,10 +27024,6 @@ and output(s)
 
 %feature("docstring") casadi::Map::eval_mx "[INTERNAL]  Evaluate with
 symbolic matrices.
-
-";
-
-%feature("docstring") casadi::Map::oracle "[INTERNAL]  Get oracle.
 
 ";
 
@@ -27365,8 +27358,19 @@ AD, virtual functions overloaded in derived classes.
 
 %feature("docstring") casadi::Map::get_function "[INTERNAL] ";
 
-%feature("docstring") casadi::Map::get_n_forward "[INTERNAL]  Generate a
-function that calculates nfwd forward derivatives.
+%feature("docstring") casadi::Map::_eval "
+
+>  void casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, int mem) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+Evaluate numerically.
+
+>  void casadi::FunctionInternal::_eval(const SXElem **arg, SXElem **res, int *iw, SXElem *w, int mem) const
+
+>  void casadi::FunctionInternal::_eval(const bvec_t **arg, bvec_t **res, int *iw, bvec_t *w, int mem) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+Evaluate a function, overloaded.
 
 ";
 
@@ -27794,6 +27798,11 @@ expression.
 
 %feature("docstring") casadi::MapOmp::free_mx "[INTERNAL]  Get free
 variables ( MX)
+
+";
+
+%feature("docstring") casadi::MapOmp::has_reverse "[INTERNAL]  Generate a
+function that calculates nadj adjoint derivatives.
 
 ";
 
@@ -28284,11 +28293,6 @@ propagate sparsities.
 
 ";
 
-%feature("docstring") casadi::MapOmp::get_n_forward "[INTERNAL]  Generate a
-function that calculates nfwd forward derivatives.
-
-";
-
 %feature("docstring") casadi::MapOmp::hasDerivative "[INTERNAL]  Can
 derivatives be calculated in any way?
 
@@ -28330,11 +28334,6 @@ Sparsities of function inputs and outputs.
 
 %feature("docstring") casadi::MapOmp::matchingRes "[INTERNAL]  Check if
 output arguments that needs to be replaced.
-
-";
-
-%feature("docstring") casadi::MapOmp::get_n_reverse "[INTERNAL]  Generate a
-function that calculates nadj adjoint derivatives.
 
 ";
 
@@ -28479,6 +28478,11 @@ Prepares the function for evaluation.
 
 %feature("docstring") casadi::MapOmp::numel_in "[INTERNAL]  Number of
 input/output elements.
+
+";
+
+%feature("docstring") casadi::MapOmp::has_forward "[INTERNAL]  Generate a
+function that calculates nfwd forward derivatives.
 
 ";
 
@@ -30294,7 +30298,10 @@ derivatives by multiplying the full Jacobian and multiplying.
 
 ";
 
-%feature("docstring") casadi::Newton::expand "[INTERNAL] ";
+%feature("docstring") casadi::Newton::n_out "[INTERNAL]  Number of function
+inputs and outputs.
+
+";
 
 %feature("docstring") casadi::Newton::get_sparsity_in "[INTERNAL]
 Sparsities of function inputs and outputs.
@@ -30335,16 +30342,6 @@ expression.
 
 %feature("docstring") casadi::Newton::getAtomicOutput "[INTERNAL]  Get the
 (integer) output argument of an atomic operation.
-
-";
-
-%feature("docstring") casadi::Newton::replaceArg "[INTERNAL]  Replace
-0-by-0 inputs.
-
-Parameters:
------------
-
-hcat:  check if horizontal repetion of the function input is allowed
 
 ";
 
@@ -30486,10 +30483,7 @@ symbolic scalars.
 
 ";
 
-%feature("docstring") casadi::Newton::n_out "[INTERNAL]  Number of function
-inputs and outputs.
-
-";
+%feature("docstring") casadi::Newton::expand "[INTERNAL] ";
 
 %feature("docstring") casadi::Newton::checkInputs "[INTERNAL]  Check if the
 numerical values of the supplied bounds make sense.
@@ -30587,6 +30581,11 @@ dimensions.
 
 %feature("docstring") casadi::Newton::has_spfwd "[INTERNAL]  Is the class
 able to propagate seeds through the algorithm?
+
+";
+
+%feature("docstring") casadi::Newton::has_reverse "[INTERNAL]  Generate a
+function that calculates nadj adjoint derivatives.
 
 ";
 
@@ -30743,8 +30742,13 @@ to (cached) derivative function, reverse mode.
 
 ";
 
-%feature("docstring") casadi::Newton::get_n_reverse "[INTERNAL]  Generate a
-function that calculates nadj adjoint derivatives.
+%feature("docstring") casadi::Newton::replaceArg "[INTERNAL]  Replace
+0-by-0 inputs.
+
+Parameters:
+-----------
+
+hcat:  check if horizontal repetion of the function input is allowed
 
 ";
 
@@ -31161,6 +31165,11 @@ dimensions.
 
 ";
 
+%feature("docstring") casadi::Newton::has_forward "[INTERNAL]  Generate a
+function that calculates nfwd forward derivatives.
+
+";
+
 %feature("docstring") casadi::Newton::eval "[INTERNAL]  Evaluate
 numerically.
 
@@ -31168,11 +31177,6 @@ numerically.
 
 %feature("docstring") casadi::Newton::sp_fwd "[INTERNAL]  Propagate
 sparsity forward.
-
-";
-
-%feature("docstring") casadi::Newton::get_n_forward "[INTERNAL]  Generate a
-function that calculates nfwd forward derivatives.
 
 ";
 
@@ -31331,7 +31335,17 @@ mode AD, virtual functions overloaded in derived classes.
 
 ";
 
+%feature("docstring") casadi::Nlpsol::sx_out "[INTERNAL]  Get function
+input(s) and output(s)
+
+";
+
 %feature("docstring") casadi::Nlpsol::get_function "[INTERNAL] ";
+
+%feature("docstring") casadi::Nlpsol::clear_memory "[INTERNAL]  Clear all
+memory (called from destructor)
+
+";
 
 %feature("docstring") casadi::Nlpsol::signature "[INTERNAL]  Code generate
 the function.
@@ -31354,13 +31368,6 @@ Jacobian of all input elements with respect to all output elements.
 ";
 
 %feature("docstring") casadi::Nlpsol::Nlpsol "[INTERNAL]  Constructor.
-
-";
-
-%feature("docstring") casadi::Nlpsol::get_n_forward "[INTERNAL]  Return
-function that calculates forward derivatives forward(nfwd) returns a cached
-instance if available, and calls  Function get_forward(int nfwd) if no
-cached version is available.
 
 ";
 
@@ -31457,8 +31464,8 @@ required length of arg field.
 
 ";
 
-%feature("docstring") casadi::Nlpsol::clear_memory "[INTERNAL]  Clear all
-memory (called from destructor)
+%feature("docstring") casadi::Nlpsol::eval "[INTERNAL]  Evaluate
+numerically.
 
 ";
 
@@ -31650,11 +31657,6 @@ variables (SX)
 
 %feature("docstring") casadi::Nlpsol::has_function "[INTERNAL] ";
 
-%feature("docstring") casadi::Nlpsol::has_spfwd "[INTERNAL]  Is the class
-able to propagate seeds through the algorithm?
-
-";
-
 %feature("docstring") casadi::Nlpsol::n_out "[INTERNAL]  Number of function
 inputs and outputs.
 
@@ -31724,13 +31726,6 @@ templated.
 
 %feature("docstring") casadi::Nlpsol::solve "[INTERNAL] ";
 
-%feature("docstring") casadi::Nlpsol::get_n_reverse "[INTERNAL]  Return
-function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(int nadj) if no
-cached version is available.
-
-";
-
 %feature("docstring") casadi::Nlpsol::jacobian "[INTERNAL]  Return Jacobian
 of all input elements with respect to all output elements.
 
@@ -31743,6 +31738,13 @@ dimensions.
 
 %feature("docstring") casadi::Nlpsol::matchingRes "[INTERNAL]  Check if
 output arguments that needs to be replaced.
+
+";
+
+%feature("docstring") casadi::Nlpsol::has_forward "[INTERNAL]  Return
+function that calculates forward derivatives forward(nfwd) returns a cached
+instance if available, and calls  Function get_forward(int nfwd) if no
+cached version is available.
 
 ";
 
@@ -31760,8 +31762,10 @@ dependent function.
 
 %feature("docstring") casadi::Nlpsol::calc_function "[INTERNAL] ";
 
-%feature("docstring") casadi::Nlpsol::eval "[INTERNAL]  Evaluate
-numerically.
+%feature("docstring") casadi::Nlpsol::has_reverse "[INTERNAL]  Return
+function that calculates adjoint derivatives reverse(nadj) returns a cached
+instance if available, and calls  Function get_reverse(int nadj) if no
+cached version is available.
 
 ";
 
@@ -32194,8 +32198,8 @@ codegen.
 
 ";
 
-%feature("docstring") casadi::Nlpsol::sx_out "[INTERNAL]  Get function
-input(s) and output(s)
+%feature("docstring") casadi::Nlpsol::has_spfwd "[INTERNAL]  Is the class
+able to propagate seeds through the algorithm?
 
 ";
 
@@ -32342,8 +32346,10 @@ input scheme name by index.
 
 ";
 
-%feature("docstring") casadi::OracleFunction::verbose "[INTERNAL]  Verbose
-mode?
+%feature("docstring") casadi::OracleFunction::has_forward "[INTERNAL]
+Return function that calculates forward derivatives forward(nfwd) returns a
+cached instance if available, and calls  Function get_forward(int nfwd) if
+no cached version is available.
 
 ";
 
@@ -32521,6 +32527,11 @@ Input/output dimensions.
 
 ";
 
+%feature("docstring") casadi::OracleFunction::verbose "[INTERNAL]  Verbose
+mode?
+
+";
+
 %feature("docstring") casadi::OracleFunction::eval_mx "[INTERNAL]  Evaluate
 with symbolic matrices.
 
@@ -32547,6 +32558,13 @@ Forward mode AD, virtual functions overloaded in derived classes.
 ";
 
 %feature("docstring") casadi::OracleFunction::generate_dependencies "[INTERNAL]  Export / Generate C code for the generated functions.
+
+";
+
+%feature("docstring") casadi::OracleFunction::has_reverse "[INTERNAL]
+Return function that calculates adjoint derivatives reverse(nadj) returns a
+cached instance if available, and calls  Function get_reverse(int nadj) if
+no cached version is available.
 
 ";
 
@@ -33148,13 +33166,6 @@ Replace 0-by-0 outputs.
 
 ";
 
-%feature("docstring") casadi::OracleFunction::get_n_reverse "[INTERNAL]
-Return function that calculates adjoint derivatives reverse(nadj) returns a
-cached instance if available, and calls  Function get_reverse(int nadj) if
-no cached version is available.
-
-";
-
 %feature("docstring") casadi::OracleFunction::name_out "[INTERNAL]  Get
 output scheme name by index.
 
@@ -33266,13 +33277,6 @@ function input(s) and output(s)
 
 %feature("docstring") casadi::OracleFunction::sz_work "[INTERNAL]  Get
 number of temporary variables needed.
-
-";
-
-%feature("docstring") casadi::OracleFunction::get_n_forward "[INTERNAL]
-Return function that calculates forward derivatives forward(nfwd) returns a
-cached instance if available, and calls  Function get_forward(int nfwd) if
-no cached version is available.
 
 ";
 
@@ -33648,6 +33652,13 @@ variables ( MX)
 
 ";
 
+%feature("docstring") casadi::QpToNlp::has_reverse "[INTERNAL]  Return
+function that calculates adjoint derivatives reverse(nadj) returns a cached
+instance if available, and calls  Function get_reverse(int nadj) if no
+cached version is available.
+
+";
+
 %feature("docstring") casadi::QpToNlp::hasDerivative "[INTERNAL]  Can
 derivatives be calculated in any way?
 
@@ -33720,13 +33731,6 @@ statistics
 
 ";
 
-%feature("docstring") casadi::QpToNlp::get_n_reverse "[INTERNAL]  Return
-function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(int nadj) if no
-cached version is available.
-
-";
-
 %feature("docstring") casadi::QpToNlp::sx_in "[INTERNAL]  Get function
 input(s) and output(s)
 
@@ -33774,6 +33778,11 @@ dependencies.
 
 %feature("docstring") casadi::QpToNlp::getPartition "[INTERNAL]  Get the
 unidirectional or bidirectional partition.
+
+";
+
+%feature("docstring") casadi::QpToNlp::set_temp "[INTERNAL]  Set the
+(temporary) work vectors.
 
 ";
 
@@ -34348,13 +34357,6 @@ inputs and outputs.
 
 ";
 
-%feature("docstring") casadi::QpToNlp::get_n_forward "[INTERNAL]  Return
-function that calculates forward derivatives forward(nfwd) returns a cached
-instance if available, and calls  Function get_forward(int nfwd) if no
-cached version is available.
-
-";
-
 %feature("docstring") casadi::QpToNlp::verbose "[INTERNAL]  Verbose mode?
 
 ";
@@ -34409,8 +34411,10 @@ function inputs and outputs.
 
 ";
 
-%feature("docstring") casadi::QpToNlp::set_temp "[INTERNAL]  Set the
-(temporary) work vectors.
+%feature("docstring") casadi::QpToNlp::has_forward "[INTERNAL]  Return
+function that calculates forward derivatives forward(nfwd) returns a cached
+instance if available, and calls  Function get_forward(int nfwd) if no
+cached version is available.
 
 ";
 
@@ -34582,10 +34586,8 @@ reference count.
 
 ";
 
-%feature("docstring") casadi::Rootfinder::reverse "[INTERNAL]  Return
-function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(int nadj) if no
-cached version is available.
+%feature("docstring") casadi::Rootfinder::tang_sx "[INTERNAL]  Tangent
+expression.
 
 ";
 
@@ -34648,6 +34650,11 @@ Prepares the function for evaluation.
 
 ";
 
+%feature("docstring") casadi::Rootfinder::has_reverse "[INTERNAL]  Generate
+a function that calculates nadj adjoint derivatives.
+
+";
+
 %feature("docstring") casadi::Rootfinder::self "[INTERNAL]  Get a public
 class instance.
 
@@ -34690,8 +34697,10 @@ memory block.
 
 ";
 
-%feature("docstring") casadi::Rootfinder::get_n_reverse "[INTERNAL]
-Generate a function that calculates nadj adjoint derivatives.
+%feature("docstring") casadi::Rootfinder::reverse "[INTERNAL]  Return
+function that calculates adjoint derivatives reverse(nadj) returns a cached
+instance if available, and calls  Function get_reverse(int nadj) if no
+cached version is available.
 
 ";
 
@@ -34821,6 +34830,11 @@ default input value.
 
 ";
 
+%feature("docstring") casadi::Rootfinder::has_forward "[INTERNAL]  Generate
+a function that calculates nfwd forward derivatives.
+
+";
+
 %feature("docstring") casadi::Rootfinder::n_nodes "[INTERNAL]  Number of
 nodes in the algorithm.
 
@@ -34919,11 +34933,6 @@ function inputs and outputs.
 
 %feature("docstring") casadi::Rootfinder::has_sprev "[INTERNAL]  Is the
 class able to propagate seeds through the algorithm?
-
-";
-
-%feature("docstring") casadi::Rootfinder::adjViaJac "[INTERNAL]  Calculate
-derivatives by multiplying the full Jacobian and multiplying.
 
 ";
 
@@ -35095,11 +35104,6 @@ Parameters:
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
-
-";
-
-%feature("docstring") casadi::Rootfinder::tang_sx "[INTERNAL]  Tangent
-expression.
 
 ";
 
@@ -35355,8 +35359,8 @@ length of arg field.
 
 ";
 
-%feature("docstring") casadi::Rootfinder::get_n_forward "[INTERNAL]
-Generate a function that calculates nfwd forward derivatives.
+%feature("docstring") casadi::Rootfinder::adjViaJac "[INTERNAL]  Calculate
+derivatives by multiplying the full Jacobian and multiplying.
 
 ";
 
@@ -35541,13 +35545,23 @@ length of arg field.
 
 ";
 
+%feature("docstring") casadi::RungeKutta::has_forward "[INTERNAL]  Generate
+a function that calculates nfwd forward derivatives.
+
+";
+
 %feature("docstring") casadi::RungeKutta::aug_fwd "[INTERNAL]  Generate a
 augmented DAE system with nfwd forward sensitivities.
 
 ";
 
-%feature("docstring") casadi::RungeKutta::get_n_forward "[INTERNAL]
-Generate a function that calculates nfwd forward derivatives.
+%feature("docstring") casadi::RungeKutta::matchingArg "[INTERNAL]  Check if
+input arguments that needs to be replaced.
+
+Parameters:
+-----------
+
+hcat:  check if horizontal repetion of the function input is allowed
 
 ";
 
@@ -35643,8 +35657,7 @@ function inputs and outputs.
 
 ";
 
-%feature("docstring") casadi::RungeKutta::free_mx "[INTERNAL]  Get free
-variables ( MX)
+%feature("docstring") casadi::RungeKutta::print "[INTERNAL]  Print.
 
 ";
 
@@ -35979,8 +35992,8 @@ Input/output dimensions.
 
 ";
 
-%feature("docstring") casadi::RungeKutta::get_n_reverse "[INTERNAL]
-Generate a function that calculates nadj adjoint derivatives.
+%feature("docstring") casadi::RungeKutta::free_mx "[INTERNAL]  Get free
+variables ( MX)
 
 ";
 
@@ -36164,6 +36177,11 @@ length of res field.
 
 %feature("docstring") casadi::RungeKutta::_get_stats "[INTERNAL]  Get all
 statistics
+
+";
+
+%feature("docstring") casadi::RungeKutta::has_reverse "[INTERNAL]  Generate
+a function that calculates nadj adjoint derivatives.
 
 ";
 
@@ -36432,16 +36450,6 @@ augmented DAE system with nadj adjoint sensitivities.
 
 ";
 
-%feature("docstring") casadi::RungeKutta::matchingArg "[INTERNAL]  Check if
-input arguments that needs to be replaced.
-
-Parameters:
------------
-
-hcat:  check if horizontal repetion of the function input is allowed
-
-";
-
 %feature("docstring") casadi::RungeKutta::call "[INTERNAL]   Call a
 function, templated.
 
@@ -36471,10 +36479,6 @@ structure recognition for symmetric Jacobians
 
 %feature("docstring") casadi::RungeKutta::call_reverse "[INTERNAL]  Reverse
 mode, virtual functions overloaded in derived classes.
-
-";
-
-%feature("docstring") casadi::RungeKutta::print "[INTERNAL]  Print.
 
 ";
 
@@ -36909,6 +36913,13 @@ input(s) and output(s)
 
 ";
 
+%feature("docstring") casadi::Scpgen::has_reverse "[INTERNAL]  Return
+function that calculates adjoint derivatives reverse(nadj) returns a cached
+instance if available, and calls  Function get_reverse(int nadj) if no
+cached version is available.
+
+";
+
 %feature("docstring") casadi::Scpgen::weak "[INTERNAL]  Get a weak
 reference to the object.
 
@@ -36918,13 +36929,6 @@ reference to the object.
 
 %feature("docstring") casadi::Scpgen::addShorthand "[INTERNAL]  Generate
 shorthand macro.
-
-";
-
-%feature("docstring") casadi::Scpgen::get_n_reverse "[INTERNAL]  Return
-function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(int nadj) if no
-cached version is available.
 
 ";
 
@@ -37211,6 +37215,11 @@ dimensions.
 
 ";
 
+%feature("docstring") casadi::Scpgen::codegen_name "[INTERNAL]  Get name in
+codegen.
+
+";
+
 %feature("docstring") casadi::Scpgen::verbose "[INTERNAL]  Verbose mode?
 
 ";
@@ -37244,8 +37253,10 @@ the functions needed for the Lifted Newton method.
 
 ";
 
-%feature("docstring") casadi::Scpgen::codegen_name "[INTERNAL]  Get name in
-codegen.
+%feature("docstring") casadi::Scpgen::has_forward "[INTERNAL]  Return
+function that calculates forward derivatives forward(nfwd) returns a cached
+instance if available, and calls  Function get_forward(int nfwd) if no
+cached version is available.
 
 ";
 
@@ -37606,13 +37617,6 @@ output arguments that needs to be replaced.
 
 %feature("docstring") casadi::Scpgen::has_function "[INTERNAL] ";
 
-%feature("docstring") casadi::Scpgen::get_n_forward "[INTERNAL]  Return
-function that calculates forward derivatives forward(nfwd) returns a cached
-instance if available, and calls  Function get_forward(int nfwd) if no
-cached version is available.
-
-";
-
 %feature("docstring") casadi::Scpgen::printIteration "[INTERNAL] ";
 
 
@@ -37958,11 +37962,6 @@ Does the function have free variables.
 
 ";
 
-%feature("docstring") casadi::SimplifiedExternal::alloc_res "[INTERNAL]
-Ensure required length of res field.
-
-";
-
 %feature("docstring") casadi::SimplifiedExternal::generate_dependencies "[INTERNAL]  Export / Generate C code for the dependency function.
 
 ";
@@ -38170,6 +38169,11 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
+%feature("docstring") casadi::SimplifiedExternal::has_reverse "[INTERNAL]
+Reverse mode derivatives.
+
+";
+
 %feature("docstring") casadi::SimplifiedExternal::verbose "[INTERNAL]
 Verbose mode?
 
@@ -38210,8 +38214,8 @@ Evaluate with symbolic scalars.
 
 ";
 
-%feature("docstring") casadi::SimplifiedExternal::has_codegen "[INTERNAL]
-Is codegen supported?
+%feature("docstring") casadi::SimplifiedExternal::alloc_res "[INTERNAL]
+Ensure required length of res field.
 
 ";
 
@@ -38290,11 +38294,6 @@ Reverse mode, virtual functions overloaded in derived classes.
 
 ";
 
-%feature("docstring") casadi::SimplifiedExternal::get_n_forward "[INTERNAL]
-Forward mode derivatives.
-
-";
-
 %feature("docstring") casadi::SimplifiedExternal::init "[INTERNAL]
 Initialize.
 
@@ -38343,8 +38342,13 @@ free variables ( MX)
 
 ";
 
-%feature("docstring") casadi::SimplifiedExternal::get_n_reverse "[INTERNAL]
-Reverse mode derivatives.
+%feature("docstring") casadi::SimplifiedExternal::default_in "[INTERNAL]
+Get default input value.
+
+";
+
+%feature("docstring") casadi::SimplifiedExternal::has_codegen "[INTERNAL]
+Is codegen supported?
 
 ";
 
@@ -38681,8 +38685,8 @@ Number of input/output elements.
 
 ";
 
-%feature("docstring") casadi::SimplifiedExternal::default_in "[INTERNAL]
-Get default input value.
+%feature("docstring") casadi::SimplifiedExternal::has_forward "[INTERNAL]
+Forward mode derivatives.
 
 ";
 
@@ -38848,8 +38852,8 @@ expression.
 
 ";
 
-%feature("docstring") casadi::SlicotDple::set_temp "[INTERNAL]  Set the
-(temporary) work vectors.
+%feature("docstring") casadi::SlicotDple::adjViaJac "[INTERNAL]  Calculate
+derivatives by multiplying the full Jacobian and multiplying.
 
 ";
 
@@ -39249,6 +39253,11 @@ function, templated.
 
 ";
 
+%feature("docstring") casadi::SlicotDple::set_temp "[INTERNAL]  Set the
+(temporary) work vectors.
+
+";
+
 %feature("docstring") casadi::SlicotDple::sp_fwd "[INTERNAL]  Propagate
 sparsity forward.
 
@@ -39421,11 +39430,6 @@ Input/output dimensions.
 
 ";
 
-%feature("docstring") casadi::SlicotDple::get_n_reverse "[INTERNAL]
-Generate a function that calculates nadj adjoint derivatives.
-
-";
-
 %feature("docstring") casadi::SlicotDple::codegen_name "[INTERNAL]  Get
 name in codegen.
 
@@ -39462,11 +39466,6 @@ Symbolic expressions for the adjoint seeds.
 
 %feature("docstring") casadi::SlicotDple::call_forward "[INTERNAL]  Forward
 mode AD, virtual functions overloaded in derived classes.
-
-";
-
-%feature("docstring") casadi::SlicotDple::get_n_forward "[INTERNAL]
-Generate a function that calculates nfwd forward derivatives.
 
 ";
 
@@ -39647,8 +39646,8 @@ output arguments that needs to be replaced.
 
 ";
 
-%feature("docstring") casadi::SlicotDple::adjViaJac "[INTERNAL]  Calculate
-derivatives by multiplying the full Jacobian and multiplying.
+%feature("docstring") casadi::SlicotDple::has_reverse "[INTERNAL]  Generate
+a function that calculates nadj adjoint derivatives.
 
 ";
 
@@ -39669,6 +39668,11 @@ class able to propagate seeds through the algorithm?
 
 %feature("docstring") casadi::SlicotDple::_get_stats "[INTERNAL]  Get all
 statistics
+
+";
+
+%feature("docstring") casadi::SlicotDple::has_forward "[INTERNAL]  Generate
+a function that calculates nfwd forward derivatives.
 
 ";
 
@@ -39790,8 +39794,8 @@ derivatives be calculated in any way?
 
 ";
 
-%feature("docstring") casadi::SlicotExpm::get_n_reverse "[INTERNAL]
-Generate a function that calculates nadj adjoint derivatives.
+%feature("docstring") casadi::SlicotExpm::getAtomicInput "[INTERNAL]  Get
+the (integer) input arguments of an atomic operation.
 
 ";
 
@@ -39861,11 +39865,6 @@ input/output elements.
 ";
 
 %feature("docstring") casadi::SlicotExpm::oracle "[INTERNAL]  Get oracle.
-
-";
-
-%feature("docstring") casadi::SlicotExpm::getAtomicInput "[INTERNAL]  Get
-the (integer) input arguments of an atomic operation.
 
 ";
 
@@ -40019,9 +40018,8 @@ Generate the sparsity of a Jacobian block.
 
 ";
 
-%feature("docstring") casadi::SlicotExpm::finalize "[INTERNAL]  Finalize
-the object creation This function, which visits the class hierarchy in
-reverse order is run after init() has been completed.
+%feature("docstring") casadi::SlicotExpm::replaceFwdSeed "[INTERNAL]
+Replace 0-by-0 forward seeds.
 
 ";
 
@@ -40206,11 +40204,6 @@ Evaluate a function, overloaded.
 
 ";
 
-%feature("docstring") casadi::SlicotExpm::get_n_forward "[INTERNAL]
-Generate a function that calculates nfwd forward derivatives.
-
-";
-
 %feature("docstring") casadi::SlicotExpm::numel_in "[INTERNAL]  Number of
 input/output elements.
 
@@ -40243,6 +40236,11 @@ function inputs and outputs.
 
 %feature("docstring") casadi::SlicotExpm::name "[INTERNAL]  Name of the
 function.
+
+";
+
+%feature("docstring") casadi::SlicotExpm::has_forward "[INTERNAL]  Generate
+a function that calculates nfwd forward derivatives.
 
 ";
 
@@ -40371,6 +40369,11 @@ hcat:  check if horizontal repetion of the function input is allowed
 
 ";
 
+%feature("docstring") casadi::SlicotExpm::replaceAdjSeed "[INTERNAL]
+Replace 0-by-0 reverse seeds.
+
+";
+
 %feature("docstring") casadi::SlicotExpm::alloc_iw "[INTERNAL]  Ensure
 required length of iw field.
 
@@ -40463,8 +40466,8 @@ hcat:  check if horizontal repetion of the function input is allowed
 
 ";
 
-%feature("docstring") casadi::SlicotExpm::replaceAdjSeed "[INTERNAL]
-Replace 0-by-0 reverse seeds.
+%feature("docstring") casadi::SlicotExpm::has_reverse "[INTERNAL]  Generate
+a function that calculates nadj adjoint derivatives.
 
 ";
 
@@ -40561,8 +40564,9 @@ function input and outputs.
 
 ";
 
-%feature("docstring") casadi::SlicotExpm::replaceFwdSeed "[INTERNAL]
-Replace 0-by-0 forward seeds.
+%feature("docstring") casadi::SlicotExpm::finalize "[INTERNAL]  Finalize
+the object creation This function, which visits the class hierarchy in
+reverse order is run after init() has been completed.
 
 ";
 
@@ -41989,11 +41993,6 @@ memory block.
 
 ";
 
-%feature("docstring") casadi::Sqpmethod::nnz_out "[INTERNAL]  Number of
-input/output nonzeros.
-
-";
-
 %feature("docstring") casadi::Sqpmethod::size2_in "[INTERNAL]  Input/output
 dimensions.
 
@@ -42106,6 +42105,13 @@ class able to propagate seeds through the algorithm?
 
 %feature("docstring") casadi::Sqpmethod::alloc "[INTERNAL]  Ensure work
 vectors long enough to evaluate function.
+
+";
+
+%feature("docstring") casadi::Sqpmethod::has_reverse "[INTERNAL]  Return
+function that calculates adjoint derivatives reverse(nadj) returns a cached
+instance if available, and calls  Function get_reverse(int nadj) if no
+cached version is available.
 
 ";
 
@@ -42368,6 +42374,11 @@ Symbolic expressions for the adjoint seeds.
 
 ";
 
+%feature("docstring") casadi::Sqpmethod::hasDerivative "[INTERNAL]  Can
+derivatives be calculated in any way?
+
+";
+
 %feature("docstring") casadi::Sqpmethod::get_forward "[INTERNAL]  Return
 function that calculates forward derivatives forward(nfwd) returns a cached
 instance if available, and calls  Function get_forward(int nfwd) if no
@@ -42437,6 +42448,13 @@ the evaluation function.
 
 %feature("docstring") casadi::Sqpmethod::set_function "[INTERNAL]  Register
 the function for evaluation and statistics gathering
+
+";
+
+%feature("docstring") casadi::Sqpmethod::has_forward "[INTERNAL]  Return
+function that calculates forward derivatives forward(nfwd) returns a cached
+instance if available, and calls  Function get_forward(int nfwd) if no
+cached version is available.
 
 ";
 
@@ -42551,13 +42569,6 @@ dimensions.
 
 %feature("docstring") casadi::Sqpmethod::tang_mx "[INTERNAL]  Tangent
 expression.
-
-";
-
-%feature("docstring") casadi::Sqpmethod::get_n_reverse "[INTERNAL]  Return
-function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(int nadj) if no
-cached version is available.
 
 ";
 
@@ -42786,13 +42797,6 @@ all information there is to know about a certain option.
 
 ";
 
-%feature("docstring") casadi::Sqpmethod::get_n_forward "[INTERNAL]  Return
-function that calculates forward derivatives forward(nfwd) returns a cached
-instance if available, and calls  Function get_forward(int nfwd) if no
-cached version is available.
-
-";
-
 %feature("docstring") casadi::Sqpmethod::simplifiedCall "[INTERNAL]  Use
 simplified signature.
 
@@ -42834,8 +42838,8 @@ Extract the functions needed for the Lifted Newton method.
 
 ";
 
-%feature("docstring") casadi::Sqpmethod::hasDerivative "[INTERNAL]  Can
-derivatives be calculated in any way?
+%feature("docstring") casadi::Sqpmethod::has_jacobian "[INTERNAL]  Return
+Jacobian of all input elements with respect to all output elements.
 
 ";
 
@@ -42966,8 +42970,8 @@ objects.
 
 ";
 
-%feature("docstring") casadi::Sqpmethod::has_jacobian "[INTERNAL]  Return
-Jacobian of all input elements with respect to all output elements.
+%feature("docstring") casadi::Sqpmethod::nnz_out "[INTERNAL]  Number of
+input/output nonzeros.
 
 ";
 
@@ -43060,11 +43064,6 @@ vector of symbolic variables corresponding to the outputs.
 
 %feature("docstring") casadi::Switch::eval_mx "[INTERNAL]  Evaluate with
 symbolic matrices.
-
-";
-
-%feature("docstring") casadi::Switch::get_n_forward "[INTERNAL]  Generate a
-function that calculates nfwd forward derivatives.
 
 ";
 
@@ -43226,6 +43225,11 @@ block.
 
 ";
 
+%feature("docstring") casadi::Switch::has_forward "[INTERNAL]  Generate a
+function that calculates nfwd forward derivatives.
+
+";
+
 %feature("docstring") casadi::Switch::log "
 
 >  void casadi::FunctionInternal::log(const std::string &msg) const 
@@ -43364,11 +43368,6 @@ dimensions.
 
 %feature("docstring") casadi::Switch::name_in "[INTERNAL]  Get input scheme
 name by index.
-
-";
-
-%feature("docstring") casadi::Switch::get_n_reverse "[INTERNAL]  Generate a
-function that calculates nadj adjoint derivatives.
 
 ";
 
@@ -43730,6 +43729,11 @@ numerical values of the supplied bounds make sense.
 
 ";
 
+%feature("docstring") casadi::Switch::has_reverse "[INTERNAL]  Generate a
+function that calculates nadj adjoint derivatives.
+
+";
+
 %feature("docstring") casadi::Switch "[INTERNAL]   Switch statement Joel
 Andersson
 
@@ -44041,11 +44045,6 @@ Codegen incref for dependencies.
 
 ";
 
-%feature("docstring") casadi::SymbolicQr::eval_mx "[INTERNAL]  Evaluate
-with symbolic matrices.
-
-";
-
 %feature("docstring") casadi::SymbolicQr::symbolicFwdSeed "[INTERNAL]
 Symbolic expressions for the forward seeds.
 
@@ -44058,6 +44057,13 @@ function.
 
 %feature("docstring") casadi::SymbolicQr::size_in "[INTERNAL]  Input/output
 dimensions.
+
+";
+
+%feature("docstring") casadi::SymbolicQr::has_forward "[INTERNAL]  Return
+function that calculates forward derivatives forward(nfwd) returns a cached
+instance if available, and calls  Function get_forward(int nfwd) if no
+cached version is available.
 
 ";
 
@@ -44088,6 +44094,11 @@ Get an atomic operation operator index.
 
 ";
 
+%feature("docstring") casadi::SymbolicQr::checkout "[INTERNAL]  Checkout a
+memory object.
+
+";
+
 %feature("docstring") casadi::SymbolicQr::solve_cholesky "[INTERNAL]
 Solve Cholesky.
 
@@ -44098,7 +44109,10 @@ the (integer) input arguments of an atomic operation.
 
 ";
 
-%feature("docstring") casadi::SymbolicQr::get_options "[INTERNAL]  Options.
+%feature("docstring") casadi::SymbolicQr::forward "[INTERNAL]  Return
+function that calculates forward derivatives forward(nfwd) returns a cached
+instance if available, and calls  Function get_forward(int nfwd) if no
+cached version is available.
 
 ";
 
@@ -44189,8 +44203,7 @@ Log the status of the solver, function given.
 
 %feature("docstring") casadi::SymbolicQr::has_function "[INTERNAL] ";
 
-%feature("docstring") casadi::SymbolicQr::n_in "[INTERNAL]  Number of
-function inputs and outputs.
+%feature("docstring") casadi::SymbolicQr::get_options "[INTERNAL]  Options.
 
 ";
 
@@ -44243,6 +44256,11 @@ evaluation.
 
 %feature("docstring") casadi::SymbolicQr::print_dimensions "[INTERNAL]
 Print dimensions of inputs and outputs.
+
+";
+
+%feature("docstring") casadi::SymbolicQr::n_in "[INTERNAL]  Number of
+function inputs and outputs.
 
 ";
 
@@ -44323,10 +44341,8 @@ hcat:  check if horizontal repetion of the function input is allowed
 
 ";
 
-%feature("docstring") casadi::SymbolicQr::get_n_reverse "[INTERNAL]  Return
-function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(int nadj) if no
-cached version is available.
+%feature("docstring") casadi::SymbolicQr::eval_mx "[INTERNAL]  Evaluate
+with symbolic matrices.
 
 ";
 
@@ -44356,8 +44372,10 @@ Evaluate a function, overloaded.
 
 ";
 
-%feature("docstring") casadi::SymbolicQr::checkout "[INTERNAL]  Checkout a
-memory object.
+%feature("docstring") casadi::SymbolicQr::has_reverse "[INTERNAL]  Return
+function that calculates adjoint derivatives reverse(nadj) returns a cached
+instance if available, and calls  Function get_reverse(int nadj) if no
+cached version is available.
 
 ";
 
@@ -44527,13 +44545,6 @@ memory block.
 ";
 
 %feature("docstring") casadi::SymbolicQr::init "[INTERNAL]  Initialize.
-
-";
-
-%feature("docstring") casadi::SymbolicQr::forward "[INTERNAL]  Return
-function that calculates forward derivatives forward(nfwd) returns a cached
-instance if available, and calls  Function get_forward(int nfwd) if no
-cached version is available.
 
 ";
 
@@ -44897,13 +44908,6 @@ structure recognition.
 
 %feature("docstring") casadi::SymbolicQr::replaceRes "[INTERNAL]  Replace
 0-by-0 outputs.
-
-";
-
-%feature("docstring") casadi::SymbolicQr::get_n_forward "[INTERNAL]  Return
-function that calculates forward derivatives forward(nfwd) returns a cached
-instance if available, and calls  Function get_forward(int nfwd) if no
-cached version is available.
 
 ";
 
