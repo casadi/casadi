@@ -1386,8 +1386,8 @@ namespace casadi {
     opts["derivative_of"] = self();
 
     // Return value
-    casadi_assert(has_reverse(1));
-    Function ret = get_reverse(name, nadj, inames, onames, opts);
+    casadi_assert(has_reverse(1)); // FIXME(@jaeandersson)
+    Function ret = get_reverse(nadj, name, inames, onames, opts);
 
     // Consistency check for inputs
     casadi_assert(ret.n_in()==n_in + n_out + n_out);
@@ -1416,7 +1416,7 @@ namespace casadi {
   }
 
   Function FunctionInternal::
-  get_reverse(const std::string& name, int nadj,
+  get_reverse(int nadj, const std::string& name,
               const std::vector<std::string>& inames,
               const std::vector<std::string>& onames,
               const Dict& opts) const {

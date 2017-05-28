@@ -84,20 +84,20 @@ namespace casadi {
 
     ///@{
     /** \brief Return function that calculates forward derivatives */
+    bool has_forward(int nfwd) const override;
     Function get_forward(int nfwd, const std::string& name,
                          const std::vector<std::string>& inames,
                          const std::vector<std::string>& onames,
                          const Dict& opts) const override;
-    bool has_forward(int nfwd) const override;
     ///@}
 
     ///@{
     /** \brief Return function that calculates adjoint derivatives */
-    Function get_reverse(const std::string& name, int nadj,
+    bool has_reverse(int nadj) const override;
+    Function get_reverse(int nadj, const std::string& name,
                          const std::vector<std::string>& inames,
                          const std::vector<std::string>& onames,
                          const Dict& opts) const override;
-    bool has_reverse(int nadj) const override;
     ///@}
 
     /** \brief Pointer to the public class */

@@ -192,7 +192,7 @@ namespace casadi {
       return Function(name, {x, dummy, horzcat(seed)}, {horzcat(sens)}, opts);
     }
 
-    Function BSpline::get_reverse(const std::string& name, int nadj,
+    Function BSpline::get_reverse(int nadj, const std::string& name,
                   const std::vector<std::string>& inames,
                   const std::vector<std::string>& onames,
                   const Dict& opts) const {
@@ -361,7 +361,7 @@ namespace casadi {
 
     }
 
-    Function BSplineDual::get_reverse(const std::string& name, int nadj,
+    Function BSplineDual::get_reverse(int nadj, const std::string& name,
                   const std::vector<std::string>& inames,
                   const std::vector<std::string>& onames,
                   const Dict& opts) const {

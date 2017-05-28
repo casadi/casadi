@@ -118,7 +118,7 @@ namespace casadi {
     ///@{
     /** \brief Generate a function that calculates \a nadj adjoint derivatives */
     bool has_reverse(int nadj) const override { return true;}
-    Function get_reverse(const std::string& name, int nadj,
+    Function get_reverse(int nadj, const std::string& name,
                          const std::vector<std::string>& inames,
                          const std::vector<std::string>& onames,
                          const Dict& opts) const override;
@@ -1052,7 +1052,7 @@ namespace casadi {
 
   template<typename DerivedType, typename MatType, typename NodeType>
   Function XFunction<DerivedType, MatType, NodeType>
-  ::get_reverse(const std::string& name, int nadj,
+  ::get_reverse(int nadj, const std::string& name,
                 const std::vector<std::string>& inames,
                 const std::vector<std::string>& onames,
                 const Dict& opts) const {

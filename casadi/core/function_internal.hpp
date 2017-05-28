@@ -285,7 +285,7 @@ namespace casadi {
      *    if no cached version is available.
      */
     Function reverse(int nadj) const;
-    virtual Function get_reverse(const std::string& name, int nadj,
+    virtual Function get_reverse(int nadj, const std::string& name,
                                  const std::vector<std::string>& inames,
                                  const std::vector<std::string>& onames,
                                  const Dict& opts) const;

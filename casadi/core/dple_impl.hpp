@@ -71,20 +71,20 @@ namespace casadi {
 
     ///@{
     /** \brief Generate a function that calculates \a nfwd forward derivatives */
-    Function get_forward(int nfwd, const std::string& name,
-                                 const std::vector<std::string>& inames,
-                                 const std::vector<std::string>& onames,
-                                 const Dict& opts) const override;
     bool has_forward(int nfwd) const override { return true;}
+    Function get_forward(int nfwd, const std::string& name,
+                         const std::vector<std::string>& inames,
+                         const std::vector<std::string>& onames,
+                         const Dict& opts) const override;
     ///@}
 
     ///@{
     /** \brief Generate a function that calculates \a nadj adjoint derivatives */
-    Function get_reverse(const std::string& name, int nadj,
-                                 const std::vector<std::string>& inames,
-                                 const std::vector<std::string>& onames,
-                                 const Dict& opts) const override;
     bool has_reverse(int nadj) const override { return true;}
+    Function get_reverse(int nadj, const std::string& name,
+                         const std::vector<std::string>& inames,
+                         const std::vector<std::string>& onames,
+                         const Dict& opts) const override;
     ///@}
 
     // Creator function for internal class

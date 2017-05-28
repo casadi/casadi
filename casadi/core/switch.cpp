@@ -224,7 +224,7 @@ namespace casadi {
   }
 
   Function Switch
-  ::get_reverse(const std::string& name, int nadj,
+  ::get_reverse(int nadj, const std::string& name,
                 const std::vector<std::string>& inames,
                 const std::vector<std::string>& onames,
                 const Dict& opts) const {

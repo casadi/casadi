@@ -149,11 +149,11 @@ namespace casadi {
   }
 
   Function Callback::
-  get_reverse(const std::string& name, int nadj,
+  get_reverse(int nadj, const std::string& name,
               const std::vector<std::string>& inames,
               const std::vector<std::string>& onames,
               const Dict& opts) const {
-    return (*this)->FunctionInternal::get_reverse(name, nadj, inames, onames, opts);
+    return (*this)->FunctionInternal::get_reverse(nadj, name, inames, onames, opts);
   }
 
   bool Callback::has_reverse(int nadj) const {

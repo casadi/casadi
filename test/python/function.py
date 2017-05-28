@@ -1301,7 +1301,7 @@ class Functiontests(casadiTestCase):
 
         if has_adj:
           def has_reverse(self,nadj): return nadj==1
-          def get_reverse(self,name,nadj,inames,onames,opts):
+          def get_reverse(self,nadj,name,inames,onames,opts):
             assert(nadj==1)
             class BackwardFun(Callback):
               # sin(x+3*y)

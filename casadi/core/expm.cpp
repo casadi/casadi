@@ -137,7 +137,7 @@ namespace casadi {
 
   }
 
-  Function Expm::get_reverse(const std::string& name, int nadj,
+  Function Expm::get_reverse(int nadj, const std::string& name,
                                const std::vector<std::string>& inames,
                                const std::vector<std::string>& onames,
                                const Dict& opts) const {

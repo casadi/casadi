@@ -64,7 +64,7 @@ classdef Convolution < casadi.Callback
             out = casadi.Function(name, {arg, dummy, fwd_in}, {fwd_out},...
                                   inames, onames, opts);
         end
-        function out = get_reverse(self,name,nadj,inames,onames,opts)
+        function out = get_reverse(self,nadj,name,inames,onames,opts)
             mf = self.get_transpose().map(nadj, 'serial');
             adj_in = casadi.MX.sym('x',self.n,nadj);
             adj_out = mf(adj_in);
