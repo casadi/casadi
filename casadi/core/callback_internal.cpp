@@ -116,10 +116,10 @@ namespace casadi {
   }
 
   Function CallbackInternal::
-  get_forward(const std::string& name, int nfwd,
+  get_forward(int nfwd, const std::string& name,
               const std::vector<std::string>& inames,
               const std::vector<std::string>& onames, const Dict& opts) const {
-    TRY_CALL(get_forward, self_, name, nfwd, inames, onames, opts);
+    TRY_CALL(get_forward, self_, nfwd, name, inames, onames, opts);
   }
 
   bool CallbackInternal::has_forward(int nfwd) const {

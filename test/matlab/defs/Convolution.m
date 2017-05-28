@@ -55,7 +55,7 @@ classdef Convolution < casadi.Callback
         function out = has_reverse(self,nadj)
             out = True;
         end
-        function out = get_forward(self,name,nfwd,inames,onames,opts)
+        function out = get_forward(self,nfwd,name,inames,onames,opts)
             mf = self.map(nfwd, 'serial');
             fwd_in = casadi.MX.sym('x',self.m,nfwd);
             fwd_out = mf(fwd_in);

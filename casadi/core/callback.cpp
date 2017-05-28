@@ -137,11 +137,11 @@ namespace casadi {
   }
 
   Function Callback::
-  get_forward(const std::string& name, int nfwd,
+  get_forward(int nfwd, const std::string& name,
               const std::vector<std::string>& inames,
               const std::vector<std::string>& onames,
               const Dict& opts) const {
-    return (*this)->FunctionInternal::get_forward(name, nfwd, inames, onames, opts);
+    return (*this)->FunctionInternal::get_forward(nfwd, name, inames, onames, opts);
   }
 
   bool Callback::has_forward(int nfwd) const {

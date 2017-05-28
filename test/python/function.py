@@ -1264,7 +1264,7 @@ class Functiontests(casadiTestCase):
 
         if has_fwd:
           def has_forward(self,nfwd): return nfwd==1
-          def get_forward(self,name,nfwd,inames,onames,opts):
+          def get_forward(self,nfwd,name,inames,onames,opts):
             assert(nfwd==1)
             class ForwardFun(Callback):
               # sin(x+3*y)

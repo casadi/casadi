@@ -1329,8 +1329,8 @@ namespace casadi {
     opts["derivative_of"] = self();
 
     // Return value
-    casadi_assert(has_forward(1));
-    Function ret = get_forward(name, nfwd, inames, onames, opts);
+    casadi_assert(has_forward(1)); //FIXME(@jaeandersson)
+    Function ret = get_forward(nfwd, name, inames, onames, opts);
 
     // Consistency check for inputs
     casadi_assert(ret.n_in()==n_in + n_out + n_in);
@@ -1408,7 +1408,7 @@ namespace casadi {
   }
 
   Function FunctionInternal::
-  get_forward(const std::string& name, int nfwd,
+  get_forward(int nfwd, const std::string& name,
               const std::vector<std::string>& inames,
               const std::vector<std::string>& onames,
               const Dict& opts) const {

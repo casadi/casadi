@@ -109,7 +109,7 @@ namespace casadi {
     ///@{
     /** \brief Generate a function that calculates \a nfwd forward derivatives */
     bool has_forward(int nfwd) const override { return true;}
-    Function get_forward(const std::string& name, int nfwd,
+    Function get_forward(int nfwd, const std::string& name,
                          const std::vector<std::string>& inames,
                          const std::vector<std::string>& onames,
                          const Dict& opts) const override;
@@ -1008,7 +1008,7 @@ namespace casadi {
 
   template<typename DerivedType, typename MatType, typename NodeType>
   Function XFunction<DerivedType, MatType, NodeType>
-  ::get_forward(const std::string& name, int nfwd,
+  ::get_forward(int nfwd, const std::string& name,
                 const std::vector<std::string>& inames,
                 const std::vector<std::string>& onames,
                 const Dict& opts) const {

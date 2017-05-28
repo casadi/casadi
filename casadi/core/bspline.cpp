@@ -175,7 +175,7 @@ namespace casadi {
         <<  g.constant(lookup_mode_) << ", 0, iw, w);\n";
     }
 
-    Function BSpline::get_forward(const std::string& name, int nfwd,
+    Function BSpline::get_forward(int nfwd, const std::string& name,
                   const std::vector<std::string>& inames,
                   const std::vector<std::string>& onames,
                   const Dict& opts) const {
@@ -343,7 +343,7 @@ namespace casadi {
         << ", 0, iw, w);\n";
     }
 
-    Function BSplineDual::get_forward(const std::string& name, int nfwd,
+    Function BSplineDual::get_forward(int nfwd, const std::string& name,
                   const std::vector<std::string>& inames,
                   const std::vector<std::string>& onames,
                   const Dict& opts) const {

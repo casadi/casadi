@@ -114,7 +114,7 @@ namespace casadi {
 
     ///@{
     /** \brief Forward mode derivatives */
-    Function get_forward(const std::string& name, int nfwd,
+    Function get_forward(int nfwd, const std::string& name,
                                  const std::vector<std::string>& inames,
                                  const std::vector<std::string>& onames,
                                  const Dict& opts) const override;

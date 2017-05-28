@@ -271,7 +271,7 @@ namespace casadi {
      *    if no cached version is available.
      */
     Function forward(int nfwd) const;
-    virtual Function get_forward(const std::string& name, int nfwd,
+    virtual Function get_forward(int nfwd, const std::string& name,
                                  const std::vector<std::string>& inames,
                                  const std::vector<std::string>& onames,
                                  const Dict& opts) const;
