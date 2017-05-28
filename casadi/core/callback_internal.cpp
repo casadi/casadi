@@ -112,7 +112,7 @@ namespace casadi {
                   const std::vector<std::string>& i_names,
                   const std::vector<std::string>& o_names,
                   const Dict& opts) const {
-    TRY_CALL(get_jacobian, self_, name, opts);
+    TRY_CALL(get_jacobian, self_, name, i_names, o_names, opts);
   }
 
   Function CallbackInternal::
