@@ -150,14 +150,14 @@ namespace casadi {
 
   Function Callback::
   get_reverse(const std::string& name, int nadj,
-                  const std::vector<std::string>& inames,
-                  const std::vector<std::string>& onames,
-                  const Dict& opts) const {
+              const std::vector<std::string>& inames,
+              const std::vector<std::string>& onames,
+              const Dict& opts) const {
     return (*this)->FunctionInternal::get_reverse(name, nadj, inames, onames, opts);
   }
 
-  int Callback::get_n_reverse() const {
-    return (*this)->FunctionInternal::get_n_reverse();
+  bool Callback::has_reverse(int nadj) const {
+    return (*this)->FunctionInternal::has_reverse(nadj);
   }
 
   void Callback::alloc_w(size_t sz_w, bool persist) {

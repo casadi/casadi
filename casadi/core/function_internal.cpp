@@ -1215,7 +1215,7 @@ namespace casadi {
                  << A.size1() << " without coloring).");
 
     } else {
-      casadi_assert(has_forward(1) || get_n_reverse()>0);
+      casadi_assert(has_forward(1) || has_reverse(1));
       // Get weighting factor
       double w = ad_weight();
 
@@ -1386,7 +1386,7 @@ namespace casadi {
     opts["derivative_of"] = self();
 
     // Return value
-    casadi_assert(get_n_reverse()>0);
+    casadi_assert(has_reverse(1));
     Function ret = get_reverse(name, nadj, inames, onames, opts);
 
     // Consistency check for inputs
@@ -1484,7 +1484,7 @@ namespace casadi {
                   const std::vector<std::string>& inames,
                   const std::vector<std::string>& onames,
                   const Dict& opts) const {
-    casadi_assert(has_forward(1) || get_n_reverse()>0);
+    casadi_assert(has_forward(1) || has_reverse(1));
     // Number inputs and outputs
     int n_in = this->n_in();
     int n_out = this->n_out();
@@ -2030,7 +2030,7 @@ namespace casadi {
   }
 
   bool FunctionInternal::hasDerivative() const {
-    return has_forward(1) || get_n_reverse()>0 || has_jacobian();
+    return has_forward(1) || has_reverse(1) || has_jacobian();
   }
 
   bool FunctionInternal::fwdViaJac(int nfwd) const {
@@ -2042,14 +2042,14 @@ namespace casadi {
 
     // Heuristic 2: Jac calculated via reverse mode likely cheaper
     double w = ad_weight();
-    if (get_n_reverse()>0 && jac_penalty_*(1-w)*nnz_out()<w*nfwd)
+    if (has_reverse(1) && jac_penalty_*(1-w)*nnz_out()<w*nfwd)
       return true;
 
     return false;
   }
 
   bool FunctionInternal::adjViaJac(int nadj) const {
-    if (get_n_reverse()==0) return true;
+    if (!has_reverse(1)) return true;
     if (jac_penalty_==-1) return false;
 
     // Heuristic 1: Jac calculated via reverse mode likely cheaper
@@ -2123,10 +2123,10 @@ namespace casadi {
 
     } else {
       // Evaluate in batches
-      int offset = 0;
       casadi_assert(has_forward(1));
       int max_nfwd = 64;
       while (!has_forward(max_nfwd)) max_nfwd/=2;
+      int offset = 0;
       while (offset<nfwd) {
         // Number of derivatives, in this batch
         int nfwd_batch = min(nfwd-offset, max_nfwd);
@@ -2230,8 +2230,10 @@ namespace casadi {
       }
     } else {
       // Evaluate in batches
+      casadi_assert(has_reverse(1));
+      int max_nadj = 64;
+      while (!has_reverse(max_nadj)) max_nadj/=2;
       int offset = 0;
-      int max_nadj = get_n_reverse();
       while (offset<nadj) {
         // Number of derivatives, in this batch
         int nadj_batch = min(nadj-offset, max_nadj);
@@ -2303,7 +2305,7 @@ namespace casadi {
 
   double FunctionInternal::ad_weight() const {
     // If reverse mode derivatives unavailable, use forward
-    if (get_n_reverse()==0) return 0;
+    if (!has_reverse(1)) return 0;
 
     // If forward mode derivatives unavailable, use reverse
     if (!has_forward(1)) return 1;

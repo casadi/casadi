@@ -301,7 +301,7 @@ namespace casadi {
     // Consistency check
     int n=1;
     while (n<nadj) n*=2;
-    if (n!=nadj || nadj>get_n_reverse()) {
+    if (n!=nadj || !has_reverse(nadj)) {
       // Inefficient code to be replaced later
       Function adj1 = reverse(1);
       return adj1.map(name, "serial", nadj, range(n_in()+n_out()), std::vector<int>(), opts);
@@ -310,14 +310,8 @@ namespace casadi {
     return external(name, li_, opts);
   }
 
-  int External::get_n_reverse() const {
-    // Will try 64, 32, 16, 8, 4, 2, 1 directions
-    for (int i=64; i>0; i/=2) {
-      stringstream ss;
-      ss << "adj" << i << "_" << name_;
-      if (li_.has_function(ss.str())) return i;
-    }
-    return 0;
+  bool External::has_reverse(int nadj) const {
+    return li_.has_function("adj" + to_string(nadj) + "_" + name_);
   }
 
   Function External::factory(const std::string& name,

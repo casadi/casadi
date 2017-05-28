@@ -148,11 +148,11 @@ namespace casadi {
      *    and calls <tt>Function get_forward(int nfwd)</tt>
      *    if no cached version is available.
      */
+    virtual bool has_forward(int nfwd) const;
     virtual Function get_forward(const std::string& name, int nfwd,
                                  const std::vector<std::string>& inames,
                                  const std::vector<std::string>& onames,
                                  const Dict& opts) const;
-    virtual bool has_forward(int nfwd) const;
     ///@}
 
     ///@{
@@ -161,11 +161,11 @@ namespace casadi {
      *    and calls <tt>Function get_reverse(int nadj)</tt>
      *    if no cached version is available.
      */
+    virtual bool has_reverse(int nadj) const;
     virtual Function get_reverse(const std::string& name, int nadj,
-                                     const std::vector<std::string>& inames,
-                                     const std::vector<std::string>& onames,
-                                     const Dict& opts) const;
-    virtual int get_n_reverse() const;
+                                 const std::vector<std::string>& inames,
+                                 const std::vector<std::string>& onames,
+                                 const Dict& opts) const;
     ///@}
 
     ///@{

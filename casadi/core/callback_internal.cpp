@@ -133,7 +133,7 @@ namespace casadi {
     TRY_CALL(get_reverse, self_, name, nadj, inames, onames, opts);
   }
 
-  int CallbackInternal::get_n_reverse() const {
-    TRY_CALL(get_n_reverse, self_);
+  bool CallbackInternal::has_reverse(int nadj) const {
+    TRY_CALL(has_reverse, self_, nadj);
   }
 } // namespace casadi

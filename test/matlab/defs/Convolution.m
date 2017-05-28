@@ -49,11 +49,11 @@ classdef Convolution < casadi.Callback
         function out = get_n_out(self)
             out = 1;
         end
-        function out = has_forward(self)
+        function out = has_forward(self,nfwd)
             out = True;
         end
-        function out = get_n_reverse(self)
-            out = 64;
+        function out = has_reverse(self,nadj)
+            out = True;
         end
         function out = get_forward(self,name,nfwd,inames,onames,opts)
             mf = self.map(nfwd, 'serial');

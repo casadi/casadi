@@ -84,7 +84,7 @@ namespace casadi {
                                  const std::vector<std::string>& inames,
                                  const std::vector<std::string>& onames,
                                  const Dict& opts) const override;
-    int get_n_reverse() const override { return 64;}
+    bool has_reverse(int nadj) const override { return true;}
     ///@}
 
     // Creator function for internal class

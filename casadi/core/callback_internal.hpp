@@ -77,27 +77,27 @@ namespace casadi {
     /** \brief Return Jacobian of all input elements with respect to all output elements */
     bool has_jacobian() const override;
     Function get_jacobian(const std::string& name,
-                                     const std::vector<std::string>& inames,
-                                     const std::vector<std::string>& onames,
-                                     const Dict& opts) const override;
+                          const std::vector<std::string>& inames,
+                          const std::vector<std::string>& onames,
+                          const Dict& opts) const override;
     ///@}
 
     ///@{
     /** \brief Return function that calculates forward derivatives */
     Function get_forward(const std::string& name, int nfwd,
-                                 const std::vector<std::string>& inames,
-                                 const std::vector<std::string>& onames,
-                                 const Dict& opts) const override;
+                         const std::vector<std::string>& inames,
+                         const std::vector<std::string>& onames,
+                         const Dict& opts) const override;
     bool has_forward(int nfwd) const override;
     ///@}
 
     ///@{
     /** \brief Return function that calculates adjoint derivatives */
     Function get_reverse(const std::string& name, int nadj,
-                                 const std::vector<std::string>& inames,
-                                 const std::vector<std::string>& onames,
-                                 const Dict& opts) const override;
-    int get_n_reverse() const override;
+                         const std::vector<std::string>& inames,
+                         const std::vector<std::string>& onames,
+                         const Dict& opts) const override;
+    bool has_reverse(int nadj) const override;
     ///@}
 
     /** \brief Pointer to the public class */

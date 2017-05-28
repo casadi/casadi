@@ -99,26 +99,30 @@ namespace casadi {
 
       ///@{
       /** \brief Generate a function that calculates \a nfwd forward derivatives */
-      Function get_forward(const std::string& name, int nfwd,
-                                   const std::vector<std::string>& inames,
-                                   const std::vector<std::string>& onames,
-                                   const Dict& opts) const override;
       bool has_forward(int nfwd) const override { return true;}
+      Function get_forward(const std::string& name, int nfwd,
+                           const std::vector<std::string>& inames,
+                           const std::vector<std::string>& onames,
+                           const Dict& opts) const override;
       ///@}
 
       ///@{
       /** \brief Generate a function that calculates \a nadj adjoint derivatives */
+      bool has_reverse(int nadj) const override { return true;}
       Function get_reverse(const std::string& name, int nadj,
-                                   const std::vector<std::string>& inames,
-                                   const std::vector<std::string>& onames,
-                                   const Dict& opts) const override;
-      int get_n_reverse() const override { return 64;}
+                           const std::vector<std::string>& inames,
+                           const std::vector<std::string>& onames,
+                           const Dict& opts) const override;
       ///@}
 
+      ///@{
+      /** \brief Return Jacobian of all input elements with respect to all output elements */
       bool has_jacobian() const override { return true;}
       Function get_jacobian(const std::string& name,
-            const std::vector<std::string>& inames,
-            const std::vector<std::string>& onames, const Dict& opts) const override;
+                            const std::vector<std::string>& inames,
+                            const std::vector<std::string>& onames,
+                            const Dict& opts) const override;
+      ///@}
 
       /** \brief  Print description */
       void print(std::ostream &stream) const override { stream << "BSpline"; }
@@ -187,7 +191,7 @@ namespace casadi {
                                    const std::vector<std::string>& inames,
                                    const std::vector<std::string>& onames,
                                    const Dict& opts) const override;
-      int get_n_reverse() const override { return 64;}
+      bool has_reverse(int nadj) const override { return true;}
       ///@}
 
 

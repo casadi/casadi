@@ -289,7 +289,7 @@ namespace casadi {
                                  const std::vector<std::string>& inames,
                                  const std::vector<std::string>& onames,
                                  const Dict& opts) const;
-    virtual int get_n_reverse() const { return 0;}
+    virtual bool has_reverse(int nadj) const { return false;}
     ///@}
 
     /** \brief returns a new function with a selection of inputs/outputs of the original */
