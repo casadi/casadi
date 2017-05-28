@@ -122,8 +122,8 @@ namespace casadi {
     TRY_CALL(get_forward, self_, name, nfwd, inames, onames, opts);
   }
 
-  int CallbackInternal::get_n_forward() const {
-    TRY_CALL(get_n_forward, self_);
+  bool CallbackInternal::has_forward(int nfwd) const {
+    TRY_CALL(has_forward, self_, nfwd);
   }
 
   Function CallbackInternal::

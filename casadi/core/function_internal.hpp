@@ -275,7 +275,7 @@ namespace casadi {
                                  const std::vector<std::string>& inames,
                                  const std::vector<std::string>& onames,
                                  const Dict& opts) const;
-    virtual int get_n_forward() const { return 0;}
+    virtual bool has_forward(int nfwd) const { return false;}
     ///@}
 
     ///@{

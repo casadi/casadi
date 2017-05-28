@@ -1084,7 +1084,7 @@ class Functiontests(casadiTestCase):
           z2 = sin(z1)
           return [z2]
 
-        def get_n_forward(self): return 0
+        def has_forward(self, nfwd): return False
         def get_n_reverse(self): return 0
 
         def has_jacobian(self): return True
@@ -1263,7 +1263,7 @@ class Functiontests(casadiTestCase):
           return [z2]
 
         if has_fwd:
-          def get_n_forward(self): return 1
+          def has_forward(self,nfwd): return nfwd==1
           def get_forward(self,name,nfwd,inames,onames,opts):
             assert(nfwd==1)
             class ForwardFun(Callback):

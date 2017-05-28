@@ -75,7 +75,7 @@ namespace casadi {
                                  const std::vector<std::string>& inames,
                                  const std::vector<std::string>& onames,
                                  const Dict& opts) const override;
-    int get_n_forward() const override { return 64;}
+    bool has_forward(int nfwd) const override { return true;}
     ///@}
 
     ///@{

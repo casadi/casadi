@@ -280,7 +280,7 @@ namespace casadi {
     // Consistency check
     int n=1;
     while (n<nfwd) n*=2;
-    if (n!=nfwd || nfwd>get_n_forward()) {
+    if (n!=nfwd || !has_forward(nfwd)) {
       // Inefficient code to be replaced later
       Function fwd1 = forward(1);
       return fwd1.map(name, "serial", nfwd, range(n_in()+n_out()), std::vector<int>(), opts);
@@ -289,14 +289,8 @@ namespace casadi {
     return external(name, li_, opts);
   }
 
-  int External::get_n_forward() const {
-    // Will try 64, 32, 16, 8, 4, 2, 1 directions
-    for (int i=64; i>0; i/=2) {
-      stringstream ss;
-      ss << "fwd" << i << "_" << name_;
-      if (li_.has_function(ss.str())) return i;
-    }
-    return 0;
+  bool External::has_forward(int nfwd) const {
+    return li_.has_function("fwd" + to_string(nfwd) + "_" + name_);
   }
 
   Function External

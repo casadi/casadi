@@ -144,8 +144,8 @@ namespace casadi {
     return (*this)->FunctionInternal::get_forward(name, nfwd, inames, onames, opts);
   }
 
-  int Callback::get_n_forward() const {
-    return (*this)->FunctionInternal::get_n_forward();
+  bool Callback::has_forward(int nfwd) const {
+    return (*this)->FunctionInternal::has_forward(nfwd);
   }
 
   Function Callback::

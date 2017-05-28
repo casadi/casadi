@@ -49,8 +49,8 @@ classdef Convolution < casadi.Callback
         function out = get_n_out(self)
             out = 1;
         end
-        function out = get_n_forward(self)
-            out = 64;
+        function out = has_forward(self)
+            out = True;
         end
         function out = get_n_reverse(self)
             out = 64;
