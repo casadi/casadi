@@ -239,8 +239,8 @@ class CASADI_EXPORT SXFunction :
 
   /** \brief Return Jacobian of all input elements with respect to all output elements */
   Function get_jacobian(const std::string& name,
-                                   const std::vector<std::string>& i_names,
-                                   const std::vector<std::string>& o_names,
+                                   const std::vector<std::string>& inames,
+                                   const std::vector<std::string>& onames,
                                    const Dict& opts) const override;
 
   /** \brief Get default input value */

@@ -112,8 +112,8 @@ namespace casadi {
   }
 
   Function Jit::get_jacobian(const std::string& name,
-                                const std::vector<std::string>& i_names,
-                                const std::vector<std::string>& o_names,
+                                const std::vector<std::string>& inames,
+                                const std::vector<std::string>& onames,
                                 const Dict& opts) const {
     // Create a JIT-function for the Jacobian
     Dict jit_opts;

@@ -196,8 +196,8 @@ namespace casadi {
 
   Function Switch
   ::get_forward(const std::string& name, int nfwd,
-                const std::vector<std::string>& i_names,
-                const std::vector<std::string>& o_names,
+                const std::vector<std::string>& inames,
+                const std::vector<std::string>& onames,
                 const Dict& opts) const {
     // Derivative of each case
     vector<Function> der(f_.size());
@@ -220,13 +220,13 @@ namespace casadi {
     arg.insert(arg.begin() + n_in() + n_out(), MX(1, nfwd));
 
     // Create wrapper
-    return Function(name, arg, res, i_names, o_names, opts);
+    return Function(name, arg, res, inames, onames, opts);
   }
 
   Function Switch
   ::get_reverse(const std::string& name, int nadj,
-                const std::vector<std::string>& i_names,
-                const std::vector<std::string>& o_names,
+                const std::vector<std::string>& inames,
+                const std::vector<std::string>& onames,
                 const Dict& opts) const {
     // Derivative of each case
     vector<Function> der(f_.size());
@@ -249,7 +249,7 @@ namespace casadi {
     res.insert(res.begin(), MX(1, nadj));
 
     // Create wrapper
-    return Function(name, arg, res, i_names, o_names, opts);
+    return Function(name, arg, res, inames, onames, opts);
   }
 
   void Switch::print(ostream &stream) const {

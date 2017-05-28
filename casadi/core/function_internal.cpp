@@ -1314,14 +1314,14 @@ namespace casadi {
     string name = "fwd" + to_string(nfwd) + "_" + name_;
 
     // Names of inputs
-    std::vector<std::string> i_names;
-    for (int i=0; i<n_in; ++i) i_names.push_back("der_" + name_in(i));
-    for (int i=0; i<n_out; ++i) i_names.push_back("der_" + name_out(i));
-    for (int i=0; i<n_in; ++i) i_names.push_back("fwd_" + name_in(i));
+    std::vector<std::string> inames;
+    for (int i=0; i<n_in; ++i) inames.push_back("der_" + name_in(i));
+    for (int i=0; i<n_out; ++i) inames.push_back("der_" + name_out(i));
+    for (int i=0; i<n_in; ++i) inames.push_back("fwd_" + name_in(i));
 
     // Names of outputs
-    std::vector<std::string> o_names;
-    for (int i=0; i<n_out; ++i) o_names.push_back("fwd_" + name_out(i));
+    std::vector<std::string> onames;
+    for (int i=0; i<n_out; ++i) onames.push_back("fwd_" + name_out(i));
 
     // Options
     Dict opts;;
@@ -1330,7 +1330,7 @@ namespace casadi {
 
     // Return value
     casadi_assert(get_n_forward()>0);
-    Function ret = get_forward(name, nfwd, i_names, o_names, opts);
+    Function ret = get_forward(name, nfwd, inames, onames, opts);
 
     // Consistency check for inputs
     casadi_assert(ret.n_in()==n_in + n_out + n_in);
@@ -1371,14 +1371,14 @@ namespace casadi {
     string name = "adj" + to_string(nadj) + "_" + name_;
 
     // Names of inputs
-    std::vector<std::string> i_names;
-    for (int i=0; i<n_in; ++i) i_names.push_back("der_" + name_in(i));
-    for (int i=0; i<n_out; ++i) i_names.push_back("der_" + name_out(i));
-    for (int i=0; i<n_out; ++i) i_names.push_back("adj_" + name_out(i));
+    std::vector<std::string> inames;
+    for (int i=0; i<n_in; ++i) inames.push_back("der_" + name_in(i));
+    for (int i=0; i<n_out; ++i) inames.push_back("der_" + name_out(i));
+    for (int i=0; i<n_out; ++i) inames.push_back("adj_" + name_out(i));
 
     // Names of outputs
-    std::vector<std::string> o_names;
-    for (int i=0; i<n_in; ++i) o_names.push_back("adj_" + name_in(i));
+    std::vector<std::string> onames;
+    for (int i=0; i<n_in; ++i) onames.push_back("adj_" + name_in(i));
 
     // Options
     Dict opts;
@@ -1387,7 +1387,7 @@ namespace casadi {
 
     // Return value
     casadi_assert(get_n_reverse()>0);
-    Function ret = get_reverse(name, nadj, i_names, o_names, opts);
+    Function ret = get_reverse(name, nadj, inames, onames, opts);
 
     // Consistency check for inputs
     casadi_assert(ret.n_in()==n_in + n_out + n_out);
@@ -1409,16 +1409,16 @@ namespace casadi {
 
   Function FunctionInternal::
   get_forward(const std::string& name, int nfwd,
-              const std::vector<std::string>& i_names,
-              const std::vector<std::string>& o_names,
+              const std::vector<std::string>& inames,
+              const std::vector<std::string>& onames,
               const Dict& opts) const {
     casadi_error("'get_forward' not defined for " + type_name());
   }
 
   Function FunctionInternal::
   get_reverse(const std::string& name, int nadj,
-              const std::vector<std::string>& i_names,
-              const std::vector<std::string>& o_names,
+              const std::vector<std::string>& inames,
+              const std::vector<std::string>& onames,
               const Dict& opts) const {
     casadi_error("'get_reverse' not defined for " + type_name());
   }
@@ -1481,8 +1481,8 @@ namespace casadi {
 
   Function FunctionInternal::
   get_jacobian(const std::string& name,
-                  const std::vector<std::string>& i_names,
-                  const std::vector<std::string>& o_names,
+                  const std::vector<std::string>& inames,
+                  const std::vector<std::string>& onames,
                   const Dict& opts) const {
     casadi_assert(get_n_forward()>0 || get_n_reverse()>0);
     // Number inputs and outputs
@@ -1540,7 +1540,7 @@ namespace casadi {
     }
 
     // Form an expression for the full Jacobian
-    return Function(name, ret_argv, {J}, i_names, o_names, opts);
+    return Function(name, ret_argv, {J}, inames, onames, opts);
   }
 
   void FunctionInternal::generateFunction(CodeGenerator& g,

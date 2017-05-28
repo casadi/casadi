@@ -115,8 +115,8 @@ namespace casadi {
     ///@{
     /** \brief Forward mode derivatives */
     Function get_forward(const std::string& name, int nfwd,
-                                 const std::vector<std::string>& i_names,
-                                 const std::vector<std::string>& o_names,
+                                 const std::vector<std::string>& inames,
+                                 const std::vector<std::string>& onames,
                                  const Dict& opts) const override;
     int get_n_forward() const override;
     ///@}
@@ -124,8 +124,8 @@ namespace casadi {
     ///@{
     /** \brief Reverse mode derivatives */
     Function get_reverse(const std::string& name, int nadj,
-                                 const std::vector<std::string>& i_names,
-                                 const std::vector<std::string>& o_names,
+                                 const std::vector<std::string>& inames,
+                                 const std::vector<std::string>& onames,
                                  const Dict& opts) const override;
     int get_n_reverse() const override;
     ///@}
@@ -134,8 +134,8 @@ namespace casadi {
     /** \brief Full Jacobian */
     bool has_jacobian() const override;
     Function get_jacobian(const std::string& name,
-                                     const std::vector<std::string>& i_names,
-                                     const std::vector<std::string>& o_names,
+                                     const std::vector<std::string>& inames,
+                                     const std::vector<std::string>& onames,
                                      const Dict& opts) const override;
     ///@}
   };

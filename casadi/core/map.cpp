@@ -135,8 +135,8 @@ namespace casadi {
 
   Function Map
   ::get_forward(const std::string& name, int nfwd,
-                const std::vector<std::string>& i_names,
-                const std::vector<std::string>& o_names,
+                const std::vector<std::string>& inames,
+                const std::vector<std::string>& onames,
                 const Dict& opts) const {
     // Shorthands
     int n_in = this->n_in(), n_out = this->n_out();
@@ -184,13 +184,13 @@ namespace casadi {
     }
 
     // Construct return function
-    return Function(name, arg, res, i_names, o_names, opts);
+    return Function(name, arg, res, inames, onames, opts);
   }
 
   Function Map
   ::get_reverse(const std::string& name, int nadj,
-                const std::vector<std::string>& i_names,
-                const std::vector<std::string>& o_names,
+                const std::vector<std::string>& inames,
+                const std::vector<std::string>& onames,
                 const Dict& opts) const {
     // Shorthands
     int n_in = this->n_in(), n_out = this->n_out();
@@ -238,7 +238,7 @@ namespace casadi {
     }
 
     // Construct return function
-    return Function(name, arg, res, i_names, o_names, opts);
+    return Function(name, arg, res, inames, onames, opts);
   }
 
   void Map::eval(void* mem, const double** arg, double** res, int* iw, double* w) const {

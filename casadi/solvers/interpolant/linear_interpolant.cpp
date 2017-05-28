@@ -122,8 +122,8 @@ namespace casadi {
 
   Function LinearInterpolant::
   get_jacobian(const std::string& name,
-                  const std::vector<std::string>& i_names,
-                  const std::vector<std::string>& o_names,
+                  const std::vector<std::string>& inames,
+                  const std::vector<std::string>& onames,
                   const Dict& opts) const {
     Function ret;
     ret.assignNode(new LinearInterpolantJac(name));

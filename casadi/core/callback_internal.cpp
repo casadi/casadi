@@ -109,17 +109,17 @@ namespace casadi {
 
   Function CallbackInternal::
   get_jacobian(const std::string& name,
-                  const std::vector<std::string>& i_names,
-                  const std::vector<std::string>& o_names,
+                  const std::vector<std::string>& inames,
+                  const std::vector<std::string>& onames,
                   const Dict& opts) const {
-    TRY_CALL(get_jacobian, self_, name, i_names, o_names, opts);
+    TRY_CALL(get_jacobian, self_, name, inames, onames, opts);
   }
 
   Function CallbackInternal::
   get_forward(const std::string& name, int nfwd,
-              const std::vector<std::string>& i_names,
-              const std::vector<std::string>& o_names, const Dict& opts) const {
-    TRY_CALL(get_forward, self_, name, nfwd, i_names, o_names, opts);
+              const std::vector<std::string>& inames,
+              const std::vector<std::string>& onames, const Dict& opts) const {
+    TRY_CALL(get_forward, self_, name, nfwd, inames, onames, opts);
   }
 
   int CallbackInternal::get_n_forward() const {
@@ -128,9 +128,9 @@ namespace casadi {
 
   Function CallbackInternal::
   get_reverse(const std::string& name, int nadj,
-              const std::vector<std::string>& i_names,
-              const std::vector<std::string>& o_names, const Dict& opts) const {
-    TRY_CALL(get_reverse, self_, name, nadj, i_names, o_names, opts);
+              const std::vector<std::string>& inames,
+              const std::vector<std::string>& onames, const Dict& opts) const {
+    TRY_CALL(get_reverse, self_, name, nadj, inames, onames, opts);
   }
 
   int CallbackInternal::get_n_reverse() const {

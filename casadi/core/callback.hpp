@@ -137,8 +137,8 @@ namespace casadi {
     /** \brief Return Jacobian of all input elements with respect to all output elements */
     virtual bool has_jacobian() const;
     virtual Function get_jacobian(const std::string& name,
-                                  const std::vector<std::string>& i_names,
-                                  const std::vector<std::string>& o_names,
+                                  const std::vector<std::string>& inames,
+                                  const std::vector<std::string>& onames,
                                   const Dict& opts) const;
     ///@}
 
@@ -149,8 +149,8 @@ namespace casadi {
      *    if no cached version is available.
      */
     virtual Function get_forward(const std::string& name, int nfwd,
-                                 const std::vector<std::string>& i_names,
-                                 const std::vector<std::string>& o_names,
+                                 const std::vector<std::string>& inames,
+                                 const std::vector<std::string>& onames,
                                  const Dict& opts) const;
     virtual int get_n_forward() const;
     ///@}
@@ -162,8 +162,8 @@ namespace casadi {
      *    if no cached version is available.
      */
     virtual Function get_reverse(const std::string& name, int nadj,
-                                     const std::vector<std::string>& i_names,
-                                     const std::vector<std::string>& o_names,
+                                     const std::vector<std::string>& inames,
+                                     const std::vector<std::string>& onames,
                                      const Dict& opts) const;
     virtual int get_n_reverse() const;
     ///@}

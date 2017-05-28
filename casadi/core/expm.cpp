@@ -111,8 +111,8 @@ namespace casadi {
   }
 
   Function Expm::get_forward(const std::string& name, int nfwd,
-                               const std::vector<std::string>& i_names,
-                               const std::vector<std::string>& o_names,
+                               const std::vector<std::string>& inames,
+                               const std::vector<std::string>& onames,
                                const Dict& opts) const {
     MX A = MX::sym("A", A_);
     MX t = MX::sym("t");
@@ -138,8 +138,8 @@ namespace casadi {
   }
 
   Function Expm::get_reverse(const std::string& name, int nadj,
-                               const std::vector<std::string>& i_names,
-                               const std::vector<std::string>& o_names,
+                               const std::vector<std::string>& inames,
+                               const std::vector<std::string>& onames,
                                const Dict& opts) const {
     MX A = MX::sym("A", A_);
     MX t = MX::sym("t");

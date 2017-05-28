@@ -843,11 +843,11 @@ namespace casadi {
   }
 
   Function SXFunction::get_jacobian(const std::string& name,
-                                       const std::vector<std::string>& i_names,
-                                       const std::vector<std::string>& o_names,
+                                       const std::vector<std::string>& inames,
+                                       const std::vector<std::string>& onames,
                                        const Dict& opts) const {
     SX J = SX::jacobian(veccat(out_), veccat(in_));
-    return Function(name, in_, {J}, i_names, o_names, opts);
+    return Function(name, in_, {J}, inames, onames, opts);
   }
 
 

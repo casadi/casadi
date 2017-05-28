@@ -130,18 +130,18 @@ namespace casadi {
 
   Function Callback::
   get_jacobian(const std::string& name,
-               const std::vector<std::string>& i_names,
-               const std::vector<std::string>& o_names,
+               const std::vector<std::string>& inames,
+               const std::vector<std::string>& onames,
                const Dict& opts) const {
-    return (*this)->FunctionInternal::get_jacobian(name, i_names, o_names, opts);
+    return (*this)->FunctionInternal::get_jacobian(name, inames, onames, opts);
   }
 
   Function Callback::
   get_forward(const std::string& name, int nfwd,
-              const std::vector<std::string>& i_names,
-              const std::vector<std::string>& o_names,
+              const std::vector<std::string>& inames,
+              const std::vector<std::string>& onames,
               const Dict& opts) const {
-    return (*this)->FunctionInternal::get_forward(name, nfwd, i_names, o_names, opts);
+    return (*this)->FunctionInternal::get_forward(name, nfwd, inames, onames, opts);
   }
 
   int Callback::get_n_forward() const {
@@ -150,10 +150,10 @@ namespace casadi {
 
   Function Callback::
   get_reverse(const std::string& name, int nadj,
-                  const std::vector<std::string>& i_names,
-                  const std::vector<std::string>& o_names,
+                  const std::vector<std::string>& inames,
+                  const std::vector<std::string>& onames,
                   const Dict& opts) const {
-    return (*this)->FunctionInternal::get_reverse(name, nadj, i_names, o_names, opts);
+    return (*this)->FunctionInternal::get_reverse(name, nadj, inames, onames, opts);
   }
 
   int Callback::get_n_reverse() const {

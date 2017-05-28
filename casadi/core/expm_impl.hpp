@@ -64,8 +64,8 @@ namespace casadi {
     ///@{
     /** \brief Generate a function that calculates \a nfwd forward derivatives */
     Function get_forward(const std::string& name, int nfwd,
-                                 const std::vector<std::string>& i_names,
-                                 const std::vector<std::string>& o_names,
+                                 const std::vector<std::string>& inames,
+                                 const std::vector<std::string>& onames,
                                  const Dict& opts) const override;
     int get_n_forward() const override { return 64;}
     ///@}
@@ -73,8 +73,8 @@ namespace casadi {
     ///@{
     /** \brief Generate a function that calculates \a nadj adjoint derivatives */
     Function get_reverse(const std::string& name, int nadj,
-                                 const std::vector<std::string>& i_names,
-                                 const std::vector<std::string>& o_names,
+                                 const std::vector<std::string>& inames,
+                                 const std::vector<std::string>& onames,
                                  const Dict& opts) const override;
     int get_n_reverse() const override { return 64;}
     ///@}

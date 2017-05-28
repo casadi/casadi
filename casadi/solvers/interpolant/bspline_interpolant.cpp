@@ -180,10 +180,10 @@ namespace casadi {
 
   Function BSplineInterpolant::
   get_jacobian(const std::string& name,
-                  const std::vector<std::string>& i_names,
-                  const std::vector<std::string>& o_names,
+                  const std::vector<std::string>& inames,
+                  const std::vector<std::string>& onames,
                   const Dict& opts) const {
-    return S_->get_jacobian(name, i_names, o_names, opts);
+    return S_->get_jacobian(name, inames, onames, opts);
   }
 
 } // namespace casadi

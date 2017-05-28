@@ -262,20 +262,20 @@ namespace casadi {
 
   Function External
   ::get_jacobian(const std::string& name,
-                    const std::vector<std::string>& i_names,
-                    const std::vector<std::string>& o_names,
+                    const std::vector<std::string>& inames,
+                    const std::vector<std::string>& onames,
                     const Dict& opts) const {
     if (has_jacobian()) {
       return external(name, li_, opts);
     } else {
-      return FunctionInternal::get_jacobian(name, i_names, o_names, opts);
+      return FunctionInternal::get_jacobian(name, inames, onames, opts);
     }
   }
 
   Function External
   ::get_forward(const std::string& name, int nfwd,
-                const std::vector<std::string>& i_names,
-                const std::vector<std::string>& o_names,
+                const std::vector<std::string>& inames,
+                const std::vector<std::string>& onames,
                 const Dict& opts) const {
     // Consistency check
     int n=1;
@@ -301,8 +301,8 @@ namespace casadi {
 
   Function External
   ::get_reverse(const std::string& name, int nadj,
-                const std::vector<std::string>& i_names,
-                const std::vector<std::string>& o_names,
+                const std::vector<std::string>& inames,
+                const std::vector<std::string>& onames,
                 const Dict& opts) const {
     // Consistency check
     int n=1;

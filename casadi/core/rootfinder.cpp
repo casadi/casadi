@@ -189,8 +189,8 @@ namespace casadi {
 
   Function Rootfinder
   ::get_forward(const std::string& name, int nfwd,
-                const std::vector<std::string>& i_names,
-                const std::vector<std::string>& o_names,
+                const std::vector<std::string>& inames,
+                const std::vector<std::string>& onames,
                 const Dict& opts) const {
     // Symbolic expression for the input
     vector<MX> arg = mx_in();
@@ -212,13 +212,13 @@ namespace casadi {
       for (int d=0; d<nfwd; ++d) v[d] = fsens[d][i];
       res.push_back(horzcat(v));
     }
-    return Function(name, arg, res, i_names, o_names, opts);
+    return Function(name, arg, res, inames, onames, opts);
   }
 
   Function Rootfinder
   ::get_reverse(const std::string& name, int nadj,
-                const std::vector<std::string>& i_names,
-                const std::vector<std::string>& o_names,
+                const std::vector<std::string>& inames,
+                const std::vector<std::string>& onames,
                 const Dict& opts) const {
     // Symbolic expression for the input
     vector<MX> arg = mx_in();
@@ -240,7 +240,7 @@ namespace casadi {
       for (int d=0; d<nadj; ++d) v[d] = asens[d][i];
       res.push_back(horzcat(v));
     }
-    return Function(name, arg, res, i_names, o_names, opts);
+    return Function(name, arg, res, inames, onames, opts);
   }
 
   void Rootfinder::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {

@@ -176,8 +176,8 @@ namespace casadi {
     }
 
     Function BSpline::get_forward(const std::string& name, int nfwd,
-                  const std::vector<std::string>& i_names,
-                  const std::vector<std::string>& o_names,
+                  const std::vector<std::string>& inames,
+                  const std::vector<std::string>& onames,
                   const Dict& opts) const {
       MX x = MX::sym("x", degree_.size());
       MX J = jac(x);
@@ -193,8 +193,8 @@ namespace casadi {
     }
 
     Function BSpline::get_reverse(const std::string& name, int nadj,
-                  const std::vector<std::string>& i_names,
-                  const std::vector<std::string>& o_names,
+                  const std::vector<std::string>& inames,
+                  const std::vector<std::string>& onames,
                   const Dict& opts) const {
 
       MX x = MX::sym("x", degree_.size());
@@ -269,8 +269,8 @@ namespace casadi {
 
 
     Function BSpline::get_jacobian(const std::string& name,
-          const std::vector<std::string>& i_names,
-          const std::vector<std::string>& o_names, const Dict& opts) const {
+          const std::vector<std::string>& inames,
+          const std::vector<std::string>& onames, const Dict& opts) const {
 
       MX x = MX::sym("x", degree_.size());
       return Function(name, {x}, {jac(x)}, opts);
@@ -344,8 +344,8 @@ namespace casadi {
     }
 
     Function BSplineDual::get_forward(const std::string& name, int nfwd,
-                  const std::vector<std::string>& i_names,
-                  const std::vector<std::string>& o_names,
+                  const std::vector<std::string>& inames,
+                  const std::vector<std::string>& onames,
                   const Dict& opts) const {
 
       MX C = MX::sym("C", sparsity_in(0));
@@ -356,14 +356,14 @@ namespace casadi {
       for (int i=0;i<nfwd;++i) {
         sens.push_back(self(seed[i])[0]);
       }
-      Function ret = Function(name, {C, dummy, horzcat(seed)}, {horzcat(sens)}, i_names, o_names);
+      Function ret = Function(name, {C, dummy, horzcat(seed)}, {horzcat(sens)}, inames, onames);
       return ret;
 
     }
 
     Function BSplineDual::get_reverse(const std::string& name, int nadj,
-                  const std::vector<std::string>& i_names,
-                  const std::vector<std::string>& o_names,
+                  const std::vector<std::string>& inames,
+                  const std::vector<std::string>& onames,
                   const Dict& opts) const {
 
       MX C = MX::sym("C", sparsity_in(0));
@@ -376,7 +376,7 @@ namespace casadi {
       for (int i=0;i<nadj;++i) {
         sens.push_back(rev(seed[i])[0]);
       }
-      Function ret = Function(name, {C, dummy, horzcat(seed)}, {horzcat(sens)}, i_names, o_names);
+      Function ret = Function(name, {C, dummy, horzcat(seed)}, {horzcat(sens)}, inames, onames);
       return ret;
 
     }
