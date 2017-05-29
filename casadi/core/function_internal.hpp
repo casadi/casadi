@@ -271,11 +271,11 @@ namespace casadi {
      *    if no cached version is available.
      */
     Function forward(int nfwd) const;
+    virtual bool has_forward(int nfwd) const { return false;}
     virtual Function get_forward(int nfwd, const std::string& name,
                                  const std::vector<std::string>& inames,
                                  const std::vector<std::string>& onames,
                                  const Dict& opts) const;
-    virtual bool has_forward(int nfwd) const { return false;}
     ///@}
 
     ///@{
@@ -285,11 +285,11 @@ namespace casadi {
      *    if no cached version is available.
      */
     Function reverse(int nadj) const;
+    virtual bool has_reverse(int nadj) const { return false;}
     virtual Function get_reverse(int nadj, const std::string& name,
                                  const std::vector<std::string>& inames,
                                  const std::vector<std::string>& onames,
                                  const Dict& opts) const;
-    virtual bool has_reverse(int nadj) const { return false;}
     ///@}
 
     /** \brief returns a new function with a selection of inputs/outputs of the original */
