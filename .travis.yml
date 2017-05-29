@@ -320,6 +320,7 @@ before_install:
   - slurp bonmin
   - slurp ipopt
   - slurp worhp
+  - slurp slicot
   - popd
   - sudo apt-get update -qq
   - sudo apt-get install -q -y binutils gcc g++ gfortran git cmake liblapack-dev liblapack3 libblas3 ipython python-dev python-numpy python-scipy python-matplotlib coinor-libipopt-dev libmumps-seq-dev libxml2-dev
