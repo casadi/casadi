@@ -251,6 +251,19 @@ namespace casadi {
     return "Unknown";
   }
 
+  inline std::string to_str(const CoinError& e) {
+    std::stringstream ss;
+    if (e.lineNumber()<0) {
+      ss << e.message()<< " in "<< e.className()<< "::" << e.methodName();
+    } else {
+      ss << e.fileName() << ":" << e.lineNumber() << " method " << e.methodName()
+         << " : assertion \'" << e.message() <<"\' failed.";
+      if (e.className()!="")
+        ss <<"Possible reason: "<< e.className();
+    }
+    return ss.str();
+  }
+
 
   /** \brief Helper class to direct messages to userOut()
   *
@@ -366,8 +379,12 @@ namespace casadi {
 
     if (true) {
       // Branch-and-bound
-      Bab bb;
-      bb(bonmin);
+      try {
+        Bab bb;
+        bb(bonmin);
+      } catch (CoinError& e) {
+        casadi_error("CoinError occured: " + to_str(e));
+      }
     }
 
     m->fstats.at("mainloop").toc();

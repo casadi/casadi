@@ -29,7 +29,7 @@
 #include <BonTMINLP.hpp>
 #include <IpIpoptCalculatedQuantities.hpp>
 #include <IpIpoptData.hpp>
-
+#include <CoinError.hpp>
 #include <iostream>
 
 #include <casadi/interfaces/bonmin/casadi_nlpsol_bonmin_export.h>
