@@ -189,6 +189,21 @@ namespace casadi {
   SXElem SXElem::binary(int op, const SXElem& x, const SXElem& y) {
     // Simplifications
     if (GlobalOptions::simplification_on_the_fly) {
+
+      // Make sure NaN does not propagate through an inactive branch
+      // On demand by Deltares, July 2016
+      if (op!=OP_IF_ELSE_ZERO) {
+        if (operation_checker<F0XChecker>(op) && x.is_op(OP_IF_ELSE_ZERO)) {
+          return if_else_zero(x.dep(0), binary(op, x.dep(1), y));
+        } else if (operation_checker<FX0Checker>(op) && y.is_op(OP_IF_ELSE_ZERO)) {
+          return if_else_zero(y.dep(0), binary(op, x, y.dep(1)));
+        }
+      }
+      if (operation_checker<F00Checker>(op) &&
+          x.is_op(OP_IF_ELSE_ZERO) && y.is_op(OP_IF_ELSE_ZERO)) {
+        if (is_equal(x.dep(0), y.dep(0), SXNode::eq_depth_))
+          return if_else_zero(x.dep(0), binary(op, x.dep(1), y.dep(1)));
+      }
       switch (op) {
       case OP_ADD:
         if (x.is_zero())
@@ -244,12 +259,6 @@ namespace casadi {
           return sq(x);
         else if (!x.is_constant() && y.is_constant())
           return y * x;
-        // Make sure NaN does not propagate through an inactive branch
-        // On demand by Deltares, July 2016
-        else if (x.is_op(OP_IF_ELSE_ZERO))
-          return if_else_zero(x.dep(0), x.dep(1)*y);
-        else if (y.is_op(OP_IF_ELSE_ZERO))
-          return if_else_zero(y.dep(0), y.dep(1)*x);
         else if (x.is_zero() || y->is_zero()) // one of the terms is zero
           return 0;
         else if (x.is_one()) // term1 is one
@@ -382,6 +391,10 @@ namespace casadi {
   SXElem SXElem::unary(int op, const SXElem& x) {
     // Simplifications
     if (GlobalOptions::simplification_on_the_fly) {
+
+      if (operation_checker<F0XChecker>(op) && x.is_op(OP_IF_ELSE_ZERO)) {
+        return if_else_zero(x.dep(0), unary(op, x.dep(1)));
+      }
       switch (op) {
         case OP_SQ:
           if (x.is_op(OP_SQRT))

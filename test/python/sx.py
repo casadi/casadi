@@ -1274,9 +1274,8 @@ class SXtests(casadiTestCase):
 
   def test_if_else_zero_sens(self):
 
-    for X in [SX]:
+    for X in [SX,MX]:
       x=X.sym('x')
-
 
       a = 1+3*x+sqrt(3*x)*x+7*x
       b = 1+2*x+sin(2*x)*x +x
@@ -1298,7 +1297,8 @@ class SXtests(casadiTestCase):
       fb = Function("f",[x],[b*x])
 
       self.checkfunction(f,fa,inputs=[3])
-      self.checkfunction(f,fb,inputs=[-3],evals=1)
+      self.checkfunction(f,fb,inputs=[-3])
+      
 
 if __name__ == '__main__':
     unittest.main()

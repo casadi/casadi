@@ -533,6 +533,9 @@ namespace casadi {
   }
 
   MX MXNode::getUnary(int op) const {
+    if (operation_checker<F0XChecker>(op) && this->op()==OP_IF_ELSE_ZERO) {
+      return if_else_zero(dep(0), dep(1)->getUnary(op));
+    }
     if (operation_checker<F0XChecker>(op) && is_zero()) {
       // If identically zero
       return MX::zeros(sparsity());
@@ -623,6 +626,19 @@ namespace casadi {
       default: break; // no rule
       }
 
+      // // Make sure NaN does not propagate through an inactive branch
+      if (op!=OP_IF_ELSE_ZERO) {
+        if (operation_checker<F0XChecker>(op) && this->op()==OP_IF_ELSE_ZERO) {
+          return if_else_zero(dep(0), dep(1)->getBinary(op, y, scX, scY));
+        } else if (operation_checker<FX0Checker>(op) && y->op()==OP_IF_ELSE_ZERO) {
+          return if_else_zero(y.dep(0), shared_from_this<MX>()->getBinary(op, y.dep(1), scX, scY));
+        }
+      }
+      if (operation_checker<F00Checker>(op) &&
+          this->op()==OP_IF_ELSE_ZERO && y->op()==OP_IF_ELSE_ZERO) {
+        if (MXNode::is_equal(dep(0).get(), y.dep(0).get(), maxDepth()))
+          return if_else_zero(dep(0), dep(1)->getBinary(op, y.dep(1), scX, scY));
+      }
       // Handle special cases for the second argument
       switch (y->op()) {
       case OP_CONST:
