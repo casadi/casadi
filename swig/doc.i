@@ -379,8 +379,8 @@ classes.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -1127,13 +1127,6 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::index_in(const std::string
-&name) const  "
-
-[INTERNAL]  Get input scheme index by name.
-
-";
-
 %feature("docstring")  casadi::Blocksqp::filterLineSearch(BlocksqpMemory *m)
 const  "
 
@@ -1358,6 +1351,14 @@ always_inline, bool never_inline) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_partition(int iind, int
+oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
+allow_forward, bool allow_reverse) const  "
+
+[INTERNAL]  Get the unidirectional or bidirectional partition.
+
+";
+
 %feature("docstring")  casadi::Blocksqp::free_memory(void *mem) const
 override "
 
@@ -1419,8 +1420,8 @@ persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -1570,11 +1571,10 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getPartition(int iind, int
-oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
-allow_forward, bool allow_reverse) "
+%feature("docstring")  casadi::FunctionInternal::index_in(const std::string
+&name) const  "
 
-[INTERNAL]  Get the unidirectional or bidirectional partition.
+[INTERNAL]  Get input scheme index by name.
 
 ";
 
@@ -2326,22 +2326,14 @@ Generate a function that calculates nadj adjoint derivatives.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getPartition(int iind, int
-oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
-allow_forward, bool allow_reverse) "
-
-[INTERNAL]  Get the unidirectional or bidirectional partition.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::get_name_out(int i) "
 
 [INTERNAL]  Names of function input and outputs.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -2351,6 +2343,12 @@ oind=0, const Dict &opts=Dict()) "
 double **&arg, double **&res, int *&iw, double *&w) const  "
 
 [INTERNAL]  Set the (persistent) work vectors.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::checkout() const  "
+
+[INTERNAL]  Checkout a memory object.
 
 ";
 
@@ -2438,9 +2436,11 @@ oind=0) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::checkout() const  "
+%feature("docstring")  casadi::FunctionInternal::get_partition(int iind, int
+oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
+allow_forward, bool allow_reverse) const  "
 
-[INTERNAL]  Checkout a memory object.
+[INTERNAL]  Get the unidirectional or bidirectional partition.
 
 ";
 
@@ -2827,8 +2827,8 @@ double *res) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -4155,13 +4155,6 @@ std::string &name, std::ostream &stream) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::free_memory(void *mem)
-const  "
-
-[INTERNAL]  Free memory block.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::has_jacobian() const  "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
@@ -4656,11 +4649,10 @@ bool persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getPartition(int iind, int
-oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
-allow_forward, bool allow_reverse) "
+%feature("docstring")  casadi::FunctionInternal::free_memory(void *mem)
+const  "
 
-[INTERNAL]  Get the unidirectional or bidirectional partition.
+[INTERNAL]  Free memory block.
 
 ";
 
@@ -4882,6 +4874,14 @@ const std::vector< int > &degree, int m) "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_partition(int iind, int
+oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
+allow_forward, bool allow_reverse) const  "
+
+[INTERNAL]  Get the unidirectional or bidirectional partition.
+
+";
+
 %feature("docstring") casadi::BSplineCommon::_set_work "
 
 [INTERNAL]  Set the (persistent) work vectors.
@@ -4995,8 +4995,8 @@ size_t &sz_res, size_t &sz_iw, size_t &sz_w) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -5105,8 +5105,8 @@ Options.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -5337,14 +5337,6 @@ bool persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getPartition(int iind, int
-oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
-allow_forward, bool allow_reverse) "
-
-[INTERNAL]  Get the unidirectional or bidirectional partition.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::call_forward(const
 std::vector< MX > &arg, const std::vector< MX > &res, const std::vector<
 std::vector< MX > > &fseed, std::vector< std::vector< MX > > &fsens, bool
@@ -5499,6 +5491,13 @@ std::vector< M > &res) const  "
 %feature("docstring")  casadi::FunctionInternal::size1_out(int ind) const  "
 
 [INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::is_a(const std::string
+&type, bool recursive) const  "
+
+[INTERNAL]  Check if the function is of a particular type.
 
 ";
 
@@ -6257,8 +6256,8 @@ std::string > &s_out, const Function::AuxOut &aux, const Dict &opts) const
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -6291,8 +6290,8 @@ Generate code for the declarations of the C function.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -6369,10 +6368,11 @@ std::string &fname) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::is_a(const std::string
-&type, bool recursive) const  "
+%feature("docstring")  casadi::FunctionInternal::get_partition(int iind, int
+oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
+allow_forward, bool allow_reverse) const  "
 
-[INTERNAL]  Check if the function is of a particular type.
+[INTERNAL]  Get the unidirectional or bidirectional partition.
 
 ";
 
@@ -6610,8 +6610,8 @@ oind, bool compact, bool symmetric) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -6640,14 +6640,6 @@ double **arg, double **res, int *iw, double *w) const  "
 %feature("docstring")  casadi::FunctionInternal::size2_in(int ind) const  "
 
 [INTERNAL]  Input/output dimensions.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getPartition(int iind, int
-oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
-allow_forward, bool allow_reverse) "
-
-[INTERNAL]  Get the unidirectional or bidirectional partition.
 
 ";
 
@@ -7026,6 +7018,14 @@ casadi::FunctionInternal::generateFunction(CodeGenerator &g, const
 std::string &fname, bool decl_static) const  "
 
 [INTERNAL]  Generate code the function.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_partition(int iind, int
+oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
+allow_forward, bool allow_reverse) const  "
+
+[INTERNAL]  Get the unidirectional or bidirectional partition.
 
 ";
 
@@ -7573,8 +7573,8 @@ get_reverse(int nadj) if no cached version is available.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -9654,8 +9654,8 @@ CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -9731,6 +9731,14 @@ std::vector< M > &res) const  "
 %feature("docstring")  casadi::Collocation::setupFG() override "
 
 [INTERNAL]  Setup F and G.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_partition(int iind, int
+oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
+allow_forward, bool allow_reverse) const  "
+
+[INTERNAL]  Get the unidirectional or bidirectional partition.
 
 ";
 
@@ -10060,14 +10068,6 @@ OracleMemory *m) const  "
 %feature("docstring")  casadi::FunctionInternal::sz_iw() const  "
 
 [INTERNAL]  Get required length of iw field.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getPartition(int iind, int
-oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
-allow_forward, bool allow_reverse) "
-
-[INTERNAL]  Get the unidirectional or bidirectional partition.
 
 ";
 
@@ -10863,8 +10863,8 @@ get_forward(int nfwd) if no cached version is available.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -11037,14 +11037,6 @@ oind=0) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getPartition(int iind, int
-oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
-allow_forward, bool allow_reverse) "
-
-[INTERNAL]  Get the unidirectional or bidirectional partition.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::ad_weight() const  "
 
 [INTERNAL]  Weighting factor for chosing forward/reverse mode.
@@ -11101,8 +11093,8 @@ std::string &iname) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -11262,6 +11254,14 @@ class hierarchy in reverse order is run after init() has been completed.
 oind=0) "
 
 [INTERNAL]  Gradient expression.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_partition(int iind, int
+oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
+allow_forward, bool allow_reverse) const  "
+
+[INTERNAL]  Get the unidirectional or bidirectional partition.
 
 ";
 
@@ -11621,8 +11621,8 @@ multiplying.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -13892,8 +13892,8 @@ hcat:  check if horizontal repetion of the function input is allowed
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -13909,14 +13909,6 @@ oind=0, const Dict &opts=Dict()) "
 %feature("docstring")  casadi::FunctionInternal::sz_arg() const  "
 
 [INTERNAL]  Get required length of arg field.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getPartition(int iind, int
-oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
-allow_forward, bool allow_reverse) "
-
-[INTERNAL]  Get the unidirectional or bidirectional partition.
 
 ";
 
@@ -14424,10 +14416,18 @@ class hierarchy in reverse order is run after init() has been completed.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_partition(int iind, int
+oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
+allow_forward, bool allow_reverse) const  "
+
+[INTERNAL]  Get the unidirectional or bidirectional partition.
 
 ";
 
@@ -14863,8 +14863,8 @@ std::string &iname) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -15212,11 +15212,9 @@ hcat:  check if horizontal repetion of the function input is allowed
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getPartition(int iind, int
-oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
-allow_forward, bool allow_reverse) "
+%feature("docstring")  casadi::FunctionInternal::sz_w() const  "
 
-[INTERNAL]  Get the unidirectional or bidirectional partition.
+[INTERNAL]  Get required length of w field.
 
 ";
 
@@ -15243,6 +15241,14 @@ std::string &fname, const Dict &opts) const  "
 %feature("docstring") casadi::Expm::_set_work "
 
 [INTERNAL]  Set the (persistent) work vectors.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_partition(int iind, int
+oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
+allow_forward, bool allow_reverse) const  "
+
+[INTERNAL]  Get the unidirectional or bidirectional partition.
 
 ";
 
@@ -15335,16 +15341,10 @@ oind=0) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::sz_w() const  "
-
-[INTERNAL]  Get required length of w field.
 
 ";
 
@@ -16202,8 +16202,8 @@ override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -16887,8 +16887,8 @@ hcat:  check if horizontal repetion of the function input is allowed
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -16950,14 +16950,6 @@ override "
 %feature("docstring")  casadi::FunctionInternal::has_codegen() const  "
 
 [INTERNAL]  Is codegen supported?
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getPartition(int iind, int
-oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
-allow_forward, bool allow_reverse) "
-
-[INTERNAL]  Get the unidirectional or bidirectional partition.
 
 ";
 
@@ -17098,6 +17090,14 @@ bvec_t **res, int *iw, bvec_t *w, int mem) const  "
 %feature("docstring")  casadi::FunctionInternal::numel_out() const  "
 
 [INTERNAL]  Number of input/output elements.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_partition(int iind, int
+oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
+allow_forward, bool allow_reverse) const  "
+
+[INTERNAL]  Get the unidirectional or bidirectional partition.
 
 ";
 
@@ -17444,13 +17444,6 @@ std::string &fname, bool decl_static) const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::FunctionInternal::default_in(int ind) const
-"
-
-[INTERNAL]  Get default input value.
-
-";
-
 %feature("docstring")  casadi::Integrator::x() const  "
 
 [INTERNAL] ";
@@ -17552,6 +17545,14 @@ hcat:  check if horizontal repetion of the function input is allowed
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_partition(int iind, int
+oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
+allow_forward, bool allow_reverse) const  "
+
+[INTERNAL]  Get the unidirectional or bidirectional partition.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::tang_mx(int iind=0, int
 oind=0) "
 
@@ -17563,11 +17564,10 @@ oind=0) "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::FunctionInternal::getPartition(int iind, int
-oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
-allow_forward, bool allow_reverse) "
+%feature("docstring")  casadi::FunctionInternal::default_in(int ind) const
+"
 
-[INTERNAL]  Get the unidirectional or bidirectional partition.
+[INTERNAL]  Get default input value.
 
 ";
 
@@ -17809,8 +17809,8 @@ persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -18587,8 +18587,8 @@ std::vector< MX > &arg) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -21313,6 +21313,13 @@ get_reverse(int nadj) if no cached version is available.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::getJacSparsityGen(int iind,
+int oind, bool symmetric, int gr_i=1, int gr_o=1) const  "
+
+[INTERNAL]  Get the sparsity pattern, forward mode.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::grad_sx(int iind=0, int
 oind=0) "
 
@@ -21349,8 +21356,8 @@ structure recognition for symmetric Jacobians
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -21478,8 +21485,8 @@ generated function.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -21593,14 +21600,6 @@ override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getPartition(int iind, int
-oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
-allow_forward, bool allow_reverse) "
-
-[INTERNAL]  Get the unidirectional or bidirectional partition.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::name() const  "
 
 [INTERNAL]  Name of the function.
@@ -21688,10 +21687,11 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getJacSparsityGen(int iind,
-int oind, bool symmetric, int gr_i=1, int gr_o=1) const  "
+%feature("docstring")  casadi::FunctionInternal::get_partition(int iind, int
+oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
+allow_forward, bool allow_reverse) const  "
 
-[INTERNAL]  Get the sparsity pattern, forward mode.
+[INTERNAL]  Get the unidirectional or bidirectional partition.
 
 ";
 
@@ -22966,9 +22966,11 @@ std::vector< M > &res) const  "
 
 ";
 
-%feature("docstring")  casadi::SharedObjectInternal::weak() "
+%feature("docstring")  casadi::FunctionInternal::get_partition(int iind, int
+oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
+allow_forward, bool allow_reverse) const  "
 
-[INTERNAL]  Get a weak reference to the object.
+[INTERNAL]  Get the unidirectional or bidirectional partition.
 
 ";
 
@@ -23526,8 +23528,8 @@ const override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -23689,14 +23691,6 @@ oind=0) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getPartition(int iind, int
-oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
-allow_forward, bool allow_reverse) "
-
-[INTERNAL]  Get the unidirectional or bidirectional partition.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::simple(const double *arg,
 double *res) const  "
 
@@ -23808,6 +23802,12 @@ size_t &sz_res, size_t &sz_iw, size_t &sz_w) const  "
 
 ";
 
+%feature("docstring")  casadi::SharedObjectInternal::weak() "
+
+[INTERNAL]  Get a weak reference to the object.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::get_jacobian(const
 std::string &name, const std::vector< std::string > &inames, const
 std::vector< std::string > &onames, const Dict &opts) const  "
@@ -23870,8 +23870,8 @@ double **arg, double **res, int *iw, double *w) const override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -25176,8 +25176,8 @@ override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -25243,6 +25243,14 @@ get_reverse(int nadj) if no cached version is available.
 %feature("docstring")  casadi::FunctionInternal::n_nodes() const  "
 
 [INTERNAL]  Number of nodes in the algorithm.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_partition(int iind, int
+oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
+allow_forward, bool allow_reverse) const  "
+
+[INTERNAL]  Get the unidirectional or bidirectional partition.
 
 ";
 
@@ -25399,14 +25407,6 @@ override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getPartition(int iind, int
-oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
-allow_forward, bool allow_reverse) "
-
-[INTERNAL]  Get the unidirectional or bidirectional partition.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::numel_in() const  "
 
 [INTERNAL]  Number of input/output elements.
@@ -25502,8 +25502,8 @@ int oind, bool symmetric, int gr_i=1, int gr_o=1) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -26118,14 +26118,6 @@ hcat:  check if horizontal repetion of the function input is allowed
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getPartition(int iind, int
-oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
-allow_forward, bool allow_reverse) "
-
-[INTERNAL]  Get the unidirectional or bidirectional partition.
-
-";
-
 %feature("docstring")  casadi::PluginInterface< Integrator  >::plugin_name()
 const  "
 
@@ -26613,8 +26605,8 @@ casadi::FunctionInternal::print_dimensions(std::ostream &stream) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -26706,6 +26698,14 @@ hcat:  check if horizontal repetion of the function input is allowed
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_partition(int iind, int
+oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
+allow_forward, bool allow_reverse) const  "
+
+[INTERNAL]  Get the unidirectional or bidirectional partition.
+
+";
+
 %feature("docstring")  casadi::OracleFunction::set_function(const Function
 &fcn, const std::string &fname, bool jit=false) "
 
@@ -26783,8 +26783,8 @@ casadi::FunctionInternal::codegen_incref(CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -27969,14 +27969,6 @@ double **arg, double **res, int *iw, double *w) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getPartition(int iind, int
-oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
-allow_forward, bool allow_reverse) "
-
-[INTERNAL]  Get the unidirectional or bidirectional partition.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::checkArg(const std::vector<
 M > &arg, bool hcat=false) const  "
 
@@ -28270,8 +28262,8 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -28349,6 +28341,14 @@ std::vector< std::vector< M > > &fseed) const  "
 %feature("docstring") casadi::Interpolant::~Interpolant "
 
 [INTERNAL]  Destructor.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_partition(int iind, int
+oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
+allow_forward, bool allow_reverse) const  "
+
+[INTERNAL]  Get the unidirectional or bidirectional partition.
 
 ";
 
@@ -28481,8 +28481,8 @@ constructor), this class should invoke this function when initialized.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -28758,6 +28758,14 @@ const std::vector< MatType > &v) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_partition(int iind, int
+oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
+allow_forward, bool allow_reverse) const  "
+
+[INTERNAL]  Get the unidirectional or bidirectional partition.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::getAlgorithmSize() const  "
 
 [INTERNAL]  Get the number of atomic operations.
@@ -28778,8 +28786,8 @@ elements.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -29059,14 +29067,6 @@ multiplying.
 %feature("docstring")  casadi::FunctionInternal::numel_in(int ind) const  "
 
 [INTERNAL]  Number of input/output elements.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getPartition(int iind, int
-oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
-allow_forward, bool allow_reverse) "
-
-[INTERNAL]  Get the unidirectional or bidirectional partition.
 
 ";
 
@@ -30031,8 +30031,8 @@ get_reverse(int nadj) if no cached version is available.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -30674,8 +30674,8 @@ hcat:  check if horizontal repetion of the function input is allowed
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -30827,8 +30827,8 @@ const std::string &msg) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -31045,14 +31045,6 @@ double *res) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getPartition(int iind, int
-oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
-allow_forward, bool allow_reverse) "
-
-[INTERNAL]  Get the unidirectional or bidirectional partition.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::mapsum_mx(const
 std::vector< MX > &arg, const std::string &parallelization) "
 
@@ -31238,6 +31230,14 @@ hcat:  check if horizontal repetion of the function input is allowed
 const override "
 
 [INTERNAL] ";
+
+%feature("docstring")  casadi::FunctionInternal::get_partition(int iind, int
+oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
+allow_forward, bool allow_reverse) const  "
+
+[INTERNAL]  Get the unidirectional or bidirectional partition.
+
+";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_name(const
 CodeGenerator &g) const  "
@@ -31639,14 +31639,6 @@ Parameters:
 -----------
 
 hcat:  check if horizontal repetion of the function input is allowed
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getPartition(int iind, int
-oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
-allow_forward, bool allow_reverse) "
-
-[INTERNAL]  Get the unidirectional or bidirectional partition.
 
 ";
 
@@ -32241,8 +32233,8 @@ elements.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -32347,6 +32339,14 @@ hcat:  check if horizontal repetion of the function input is allowed
 %feature("docstring")  casadi::LapackQr::plugin_name() const override "
 
 [INTERNAL] ";
+
+%feature("docstring")  casadi::FunctionInternal::get_partition(int iind, int
+oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
+allow_forward, bool allow_reverse) const  "
+
+[INTERNAL]  Get the unidirectional or bidirectional partition.
+
+";
 
 %feature("docstring")  casadi::FunctionInternal::adjViaJac(int nadj) const
 "
@@ -32795,8 +32795,8 @@ original
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -33203,14 +33203,6 @@ always_inline, bool never_inline) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getPartition(int iind, int
-oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
-allow_forward, bool allow_reverse) "
-
-[INTERNAL]  Get the unidirectional or bidirectional partition.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::name_in(int ind) const  "
 
 [INTERNAL]  Get input scheme name by index.
@@ -33326,8 +33318,8 @@ override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -33437,6 +33429,14 @@ std::string &name) const  "
 %feature("docstring")  casadi::FunctionInternal::n_out() const  "
 
 [INTERNAL]  Number of function inputs and outputs.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_partition(int iind, int
+oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
+allow_forward, bool allow_reverse) const  "
+
+[INTERNAL]  Get the unidirectional or bidirectional partition.
 
 ";
 
@@ -34171,8 +34171,8 @@ oind, bool compact, bool symmetric) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -35068,8 +35068,8 @@ std::vector< M > &arg) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -35203,6 +35203,14 @@ elements.
 "
 
 [INTERNAL]  Get default input value.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_partition(int iind, int
+oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
+allow_forward, bool allow_reverse) const  "
+
+[INTERNAL]  Get the unidirectional or bidirectional partition.
 
 ";
 
@@ -35345,14 +35353,6 @@ get_forward(int nfwd) if no cached version is available.
 double *res) const  "
 
 [INTERNAL]  Evaluate numerically, simplied syntax.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getPartition(int iind, int
-oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
-allow_forward, bool allow_reverse) "
-
-[INTERNAL]  Get the unidirectional or bidirectional partition.
 
 ";
 
@@ -35513,8 +35513,8 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -36292,6 +36292,12 @@ structure recognition for symmetric Jacobians
 
 ";
 
+%feature("docstring")  casadi::SharedObjectInternal::getCount() const  "
+
+[INTERNAL]  Get the reference count.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::log(const std::string &msg)
 const  "
 
@@ -36466,9 +36472,11 @@ oind=0) "
 
 ";
 
-%feature("docstring")  casadi::SharedObjectInternal::getCount() const  "
+%feature("docstring")  casadi::FunctionInternal::get_partition(int iind, int
+oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
+allow_forward, bool allow_reverse) const  "
 
-[INTERNAL]  Get the reference count.
+[INTERNAL]  Get the unidirectional or bidirectional partition.
 
 ";
 
@@ -37169,14 +37177,6 @@ classes.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getPartition(int iind, int
-oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
-allow_forward, bool allow_reverse) "
-
-[INTERNAL]  Get the unidirectional or bidirectional partition.
-
-";
-
 %feature("docstring") casadi::Lsqr::_setup "
 
 [INTERNAL]  Set the (persistent and temporary) work vectors.
@@ -37340,8 +37340,8 @@ bool tr) const override "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -37469,8 +37469,8 @@ bool persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -37933,8 +37933,8 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -38101,8 +38101,8 @@ oind=0) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -38117,6 +38117,14 @@ oind=0, const Dict &opts=Dict()) "
 %feature("docstring")  casadi::FunctionInternal::numel_out() const  "
 
 [INTERNAL]  Number of input/output elements.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_partition(int iind, int
+oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
+allow_forward, bool allow_reverse) const  "
+
+[INTERNAL]  Get the unidirectional or bidirectional partition.
 
 ";
 
@@ -38143,14 +38151,6 @@ casadi::FunctionInternal::codegen_decref(CodeGenerator &g) const  "
 %feature("docstring")  casadi::FunctionInternal::get_options() const  "
 
 [INTERNAL]  Options.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getPartition(int iind, int
-oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
-allow_forward, bool allow_reverse) "
-
-[INTERNAL]  Get the unidirectional or bidirectional partition.
 
 ";
 
@@ -38818,8 +38818,8 @@ int oind, bool symmetric, int gr_i=1, int gr_o=1) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -38965,8 +38965,8 @@ casadi::FunctionInternal::print_dimensions(std::ostream &stream) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -39295,6 +39295,14 @@ std::string &fname) "
 const  "
 
 [INTERNAL]  Initalize memory block.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_partition(int iind, int
+oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
+allow_forward, bool allow_reverse) const  "
+
+[INTERNAL]  Get the unidirectional or bidirectional partition.
 
 ";
 
@@ -39741,14 +39749,6 @@ elements.
 %feature("docstring")  casadi::Map::get_name_out(int i) override "
 
 [INTERNAL]  Names of function input and outputs.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getPartition(int iind, int
-oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
-allow_forward, bool allow_reverse) "
-
-[INTERNAL]  Get the unidirectional or bidirectional partition.
 
 ";
 
@@ -42223,8 +42223,8 @@ elements.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -42436,14 +42436,6 @@ SXElem **res, int *iw, SXElem *w, int mem) const  "
 %feature("docstring")  casadi::FunctionInternal::checkInputs() const  "
 
 [INTERNAL]  Check if the numerical values of the supplied bounds make sense.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getPartition(int iind, int
-oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
-allow_forward, bool allow_reverse) "
-
-[INTERNAL]  Get the unidirectional or bidirectional partition.
 
 ";
 
@@ -42875,8 +42867,8 @@ elements.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -42952,6 +42944,14 @@ bool never_inline) const  "
 &arg, std::vector< M > &res, bool always_inline, bool never_inline) const  "
 
 [INTERNAL]   Call a function, templated.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_partition(int iind, int
+oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
+allow_forward, bool allow_reverse) const  "
+
+[INTERNAL]  Get the unidirectional or bidirectional partition.
 
 ";
 
@@ -43605,14 +43605,6 @@ bool persistent=false) "
 %feature("docstring")  casadi::OracleFunction::oracle() const override "
 
 [INTERNAL]  Get oracle.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getPartition(int iind, int
-oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
-allow_forward, bool allow_reverse) "
-
-[INTERNAL]  Get the unidirectional or bidirectional partition.
 
 ";
 
@@ -44760,8 +44752,8 @@ std::string &iname) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -44955,8 +44947,8 @@ oind=0) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -44983,6 +44975,14 @@ oind=0, const Dict &opts=Dict()) "
 %feature("docstring") casadi::Nlpsol::_set_temp "
 
 [INTERNAL]  Set the (temporary) work vectors.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_partition(int iind, int
+oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
+allow_forward, bool allow_reverse) const  "
+
+[INTERNAL]  Get the unidirectional or bidirectional partition.
 
 ";
 
@@ -45069,9 +45069,11 @@ get_reverse(int nadj) if no cached version is available.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::name_in(int ind) const  "
+%feature("docstring")  casadi::FunctionInternal::get_partition(int iind, int
+oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
+allow_forward, bool allow_reverse) const  "
 
-[INTERNAL]  Get input scheme name by index.
+[INTERNAL]  Get the unidirectional or bidirectional partition.
 
 ";
 
@@ -45324,6 +45326,12 @@ casadi::FunctionInternal::codegen_incref(CodeGenerator &g) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::name_in(int ind) const  "
+
+[INTERNAL]  Get input scheme name by index.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::eval_name() const  "
 
 [INTERNAL]  Get name of the evaluation function.
@@ -45444,14 +45452,6 @@ double **&arg, double **&res, int *&iw, double *&w) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getPartition(int iind, int
-oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
-allow_forward, bool allow_reverse) "
-
-[INTERNAL]  Get the unidirectional or bidirectional partition.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::size_out(int ind) const  "
 
 [INTERNAL]  Input/output dimensions.
@@ -45530,8 +45530,8 @@ const std::string &msg) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -45949,8 +45949,8 @@ override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -47023,14 +47023,6 @@ std::string &fname) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getPartition(int iind, int
-oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
-allow_forward, bool allow_reverse) "
-
-[INTERNAL]  Get the unidirectional or bidirectional partition.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::set_temp(void *mem, const
 double **arg, double **res, int *iw, double *w) const  "
 
@@ -47463,8 +47455,8 @@ oind=0) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -47473,6 +47465,14 @@ oind=0, const Dict &opts=Dict()) "
 %feature("docstring")  casadi::SharedObjectInternal::weak() "
 
 [INTERNAL]  Get a weak reference to the object.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_partition(int iind, int
+oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
+allow_forward, bool allow_reverse) const  "
+
+[INTERNAL]  Get the unidirectional or bidirectional partition.
 
 ";
 
@@ -47713,8 +47713,8 @@ std::string &fname, const Dict &opts) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -48657,8 +48657,8 @@ always_inline, bool never_inline) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -49021,6 +49021,14 @@ int oind, bool symmetric) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_partition(int iind, int
+oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
+allow_forward, bool allow_reverse) const  "
+
+[INTERNAL]  Get the unidirectional or bidirectional partition.
+
+";
+
 %feature("docstring")
 casadi::FunctionInternal::getJacSparsityHierarchical(int iind, int oind)
 const  "
@@ -49296,8 +49304,8 @@ structure recognition for symmetric Jacobians
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -49485,14 +49493,6 @@ bool never_inline) const  "
 %feature("docstring")  casadi::FunctionInternal::mx_in() const  "
 
 [INTERNAL]  Get function input(s) and output(s)
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getPartition(int iind, int
-oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
-allow_forward, bool allow_reverse) "
-
-[INTERNAL]  Get the unidirectional or bidirectional partition.
 
 ";
 
@@ -49846,8 +49846,8 @@ CodeGenerator &g) const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -49972,8 +49972,8 @@ override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -50429,14 +50429,6 @@ propagation.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getPartition(int iind, int
-oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
-allow_forward, bool allow_reverse) "
-
-[INTERNAL]  Get the unidirectional or bidirectional partition.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::hasDerivative() const  "
 
 [INTERNAL]  Can derivatives be calculated in any way?
@@ -50516,6 +50508,14 @@ override "
 casadi::FunctionInternal::codegen_incref(CodeGenerator &g) const  "
 
 [INTERNAL]  Codegen incref for dependencies.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_partition(int iind, int
+oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
+allow_forward, bool allow_reverse) const  "
+
+[INTERNAL]  Get the unidirectional or bidirectional partition.
 
 ";
 
@@ -51024,8 +51024,8 @@ std::vector< std::string > &s_out, const Function::AuxOut
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -51256,8 +51256,8 @@ hcat:  check if horizontal repetion of the function input is allowed
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -51535,6 +51535,14 @@ const std::vector< MatType > &v) const  "
 size_t &sz_res, size_t &sz_iw, size_t &sz_w) const  "
 
 [INTERNAL]  Get number of temporary variables needed.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_partition(int iind, int
+oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
+allow_forward, bool allow_reverse) const  "
+
+[INTERNAL]  Get the unidirectional or bidirectional partition.
 
 ";
 
@@ -52232,14 +52240,6 @@ std::string > &s_out, const Function::AuxOut &aux, const Dict &opts) const
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::FunctionInternal::getPartition(int iind, int
-oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
-allow_forward, bool allow_reverse) "
-
-[INTERNAL]  Get the unidirectional or bidirectional partition.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::sz_arg() const  "
 
 [INTERNAL]  Get required length of arg field.
@@ -52868,8 +52868,8 @@ override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -53003,14 +53003,6 @@ casadi::FunctionInternal::generateDeclarations(CodeGenerator &g) const  "
 %feature("docstring")  casadi::FunctionInternal::size_out(int ind) const  "
 
 [INTERNAL]  Input/output dimensions.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getPartition(int iind, int
-oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
-allow_forward, bool allow_reverse) "
-
-[INTERNAL]  Get the unidirectional or bidirectional partition.
 
 ";
 
@@ -53306,8 +53298,8 @@ Sparsity &sp, int iind, int oind, bool compact) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -53467,6 +53459,14 @@ casadi::FunctionInternal::codegen_decref(CodeGenerator &g) const  "
 %feature("docstring")  casadi::FunctionInternal::sz_w() const  "
 
 [INTERNAL]  Get required length of w field.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_partition(int iind, int
+oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
+allow_forward, bool allow_reverse) const  "
+
+[INTERNAL]  Get the unidirectional or bidirectional partition.
 
 ";
 
@@ -54275,9 +54275,11 @@ std::vector< M > &res) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sz_res() const  "
+%feature("docstring")  casadi::FunctionInternal::get_partition(int iind, int
+oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
+allow_forward, bool allow_reverse) const  "
 
-[INTERNAL]  Get required length of res field.
+[INTERNAL]  Get the unidirectional or bidirectional partition.
 
 ";
 
@@ -54888,8 +54890,8 @@ casadi::FunctionInternal::codegen_decref(CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -54938,6 +54940,12 @@ casadi::FunctionInternal::generateDeclarations(CodeGenerator &g) const  "
 %feature("docstring")  casadi::FunctionInternal::memory(int ind) const  "
 
 [INTERNAL]  Memory objects.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::sz_res() const  "
+
+[INTERNAL]  Get required length of res field.
 
 ";
 
@@ -55169,8 +55177,8 @@ original
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -55448,14 +55456,6 @@ Sparsity &sp, int iind, int oind, bool compact) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getPartition(int iind, int
-oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
-allow_forward, bool allow_reverse) "
-
-[INTERNAL]  Get the unidirectional or bidirectional partition.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::print_options(std::ostream
 &stream) const  "
 
@@ -55660,8 +55660,8 @@ const override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -56018,6 +56018,14 @@ get_forward(int nfwd) if no cached version is available.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_partition(int iind, int
+oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
+allow_forward, bool allow_reverse) const  "
+
+[INTERNAL]  Get the unidirectional or bidirectional partition.
+
+";
+
 %feature("docstring")
 casadi::FunctionInternal::getJacSparsityHierarchical(int iind, int oind)
 const  "
@@ -56126,14 +56134,6 @@ std::string &fname, const Dict &opts) const  "
 %feature("docstring")  casadi::FunctionInternal::numel_in(int ind) const  "
 
 [INTERNAL]  Number of input/output elements.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getPartition(int iind, int
-oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
-allow_forward, bool allow_reverse) "
-
-[INTERNAL]  Get the unidirectional or bidirectional partition.
 
 ";
 
@@ -56698,8 +56698,8 @@ hcat:  check if horizontal repetion of the function input is allowed
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -58235,8 +58235,8 @@ double *x) const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -58440,8 +58440,8 @@ multiplying.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -59364,14 +59364,6 @@ get_reverse(int nadj) if no cached version is available.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getPartition(int iind, int
-oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
-allow_forward, bool allow_reverse) "
-
-[INTERNAL]  Get the unidirectional or bidirectional partition.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::eval_sx(const SXElem **arg,
 SXElem **res, int *iw, SXElem *w, int mem) const  "
 
@@ -59672,6 +59664,14 @@ std::string &fname, bool decl_static) const  "
 std::vector< std::vector< M > > &aseed) const  "
 
 [INTERNAL]  Replace 0-by-0 reverse seeds.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_partition(int iind, int
+oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
+allow_forward, bool allow_reverse) const  "
+
+[INTERNAL]  Get the unidirectional or bidirectional partition.
 
 ";
 
@@ -60017,6 +60017,14 @@ MX > &arg, const std::string &parallelization) "
 double **arg, double **res, int *iw, double *w) const  "
 
 [INTERNAL]  Set the (temporary) work vectors.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_partition(int iind, int
+oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
+allow_forward, bool allow_reverse) const  "
+
+[INTERNAL]  Get the unidirectional or bidirectional partition.
 
 ";
 
@@ -60533,8 +60541,8 @@ oind=0) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -60613,14 +60621,6 @@ Parameters:
 -----------
 
 hcat:  check if horizontal repetion of the function input is allowed
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getPartition(int iind, int
-oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
-allow_forward, bool allow_reverse) "
-
-[INTERNAL]  Get the unidirectional or bidirectional partition.
 
 ";
 
@@ -60913,8 +60913,8 @@ get_forward(int nfwd) if no cached version is available.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -61187,8 +61187,8 @@ SXElem **res, int *iw, SXElem *w, int mem) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_mx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -61442,8 +61442,8 @@ std::string &fname) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind=0, int
-oind=0, const Dict &opts=Dict()) "
+%feature("docstring")  casadi::FunctionInternal::jac_sx(int iind, int oind,
+const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
 
@@ -61686,14 +61686,6 @@ hcat:  check if horizontal repetion of the function input is allowed
 [INTERNAL]  Return function that calculates adjoint derivatives
 reverse(nadj) returns a cached instance if available, and calls  Function
 get_reverse(int nadj) if no cached version is available.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getPartition(int iind, int
-oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
-allow_forward, bool allow_reverse) "
-
-[INTERNAL]  Get the unidirectional or bidirectional partition.
 
 ";
 
@@ -62359,6 +62351,14 @@ bvec_t **res, int *iw, bvec_t *w, int mem) const  "
 const  "
 
 [INTERNAL]  Get the floating point output argument of an atomic operation.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_partition(int iind, int
+oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
+allow_forward, bool allow_reverse) const  "
+
+[INTERNAL]  Get the unidirectional or bidirectional partition.
 
 ";
 

@@ -894,11 +894,6 @@ the floating point output argument of an atomic operation.
 
 ";
 
-%feature("docstring") casadi::Blocksqp::index_in "[INTERNAL]  Get input
-scheme index by name.
-
-";
-
 %feature("docstring") casadi::Blocksqp::filterLineSearch "[INTERNAL] ";
 
 %feature("docstring") casadi::Blocksqp::size2_out "[INTERNAL]  Input/output
@@ -1043,6 +1038,11 @@ statistics
 
 %feature("docstring") casadi::Blocksqp::call_reverse "[INTERNAL]  Reverse
 mode, virtual functions overloaded in derived classes.
+
+";
+
+%feature("docstring") casadi::Blocksqp::get_partition "[INTERNAL]  Get the
+unidirectional or bidirectional partition.
 
 ";
 
@@ -1192,8 +1192,8 @@ variables ( MX)
 
 ";
 
-%feature("docstring") casadi::Blocksqp::getPartition "[INTERNAL]  Get the
-unidirectional or bidirectional partition.
+%feature("docstring") casadi::Blocksqp::index_in "[INTERNAL]  Get input
+scheme index by name.
 
 ";
 
@@ -1736,11 +1736,6 @@ Generate a function that calculates nadj adjoint derivatives.
 
 ";
 
-%feature("docstring") casadi::BSpline::getPartition "[INTERNAL]  Get the
-unidirectional or bidirectional partition.
-
-";
-
 %feature("docstring") casadi::BSpline::get_name_out "[INTERNAL]  Names of
 function input and outputs.
 
@@ -1753,6 +1748,11 @@ expression.
 
 %feature("docstring") casadi::BSpline::set_work "[INTERNAL]  Set the
 (persistent) work vectors.
+
+";
+
+%feature("docstring") casadi::BSpline::checkout "[INTERNAL]  Checkout a
+memory object.
 
 ";
 
@@ -1808,8 +1808,8 @@ expression.
 
 ";
 
-%feature("docstring") casadi::BSpline::checkout "[INTERNAL]  Checkout a
-memory object.
+%feature("docstring") casadi::BSpline::get_partition "[INTERNAL]  Get the
+unidirectional or bidirectional partition.
 
 ";
 
@@ -3133,11 +3133,6 @@ Input/output dimensions.
 
 ";
 
-%feature("docstring") casadi::BSplineCommon::free_memory "[INTERNAL]  Free
-memory block.
-
-";
-
 %feature("docstring") casadi::BSplineCommon::has_jacobian "[INTERNAL]
 Return Jacobian of all input elements with respect to all output elements.
 
@@ -3467,8 +3462,8 @@ vectors long enough to evaluate function.
 
 ";
 
-%feature("docstring") casadi::BSplineCommon::getPartition "[INTERNAL]  Get
-the unidirectional or bidirectional partition.
+%feature("docstring") casadi::BSplineCommon::free_memory "[INTERNAL]  Free
+memory block.
 
 ";
 
@@ -3628,6 +3623,11 @@ Evaluate a function, overloaded.
 
 %feature("docstring") casadi::BSplineCommon::type_name "[INTERNAL]  Get
 type name.
+
+";
+
+%feature("docstring") casadi::BSplineCommon::get_partition "[INTERNAL]  Get
+the unidirectional or bidirectional partition.
 
 ";
 
@@ -3948,11 +3948,6 @@ vectors long enough to evaluate function.
 
 ";
 
-%feature("docstring") casadi::BSplineDual::getPartition "[INTERNAL]  Get
-the unidirectional or bidirectional partition.
-
-";
-
 %feature("docstring") casadi::BSplineDual::call_forward "[INTERNAL]
 Forward mode AD, virtual functions overloaded in derived classes.
 
@@ -4055,6 +4050,11 @@ the (integer) input arguments of an atomic operation.
 
 %feature("docstring") casadi::BSplineDual::size1_out "[INTERNAL]
 Input/output dimensions.
+
+";
+
+%feature("docstring") casadi::BSplineDual::is_a "[INTERNAL]  Check if the
+function is of a particular type.
 
 ";
 
@@ -4722,8 +4722,8 @@ Jit dependencies.
 
 ";
 
-%feature("docstring") casadi::BSplineDual::is_a "[INTERNAL]  Check if the
-function is of a particular type.
+%feature("docstring") casadi::BSplineDual::get_partition "[INTERNAL]  Get
+the unidirectional or bidirectional partition.
 
 ";
 
@@ -4914,11 +4914,6 @@ input scheme index by name.
 
 %feature("docstring") casadi::BSplineInterpolant::size2_in "[INTERNAL]
 Input/output dimensions.
-
-";
-
-%feature("docstring") casadi::BSplineInterpolant::getPartition "[INTERNAL]
-Get the unidirectional or bidirectional partition.
 
 ";
 
@@ -5188,6 +5183,11 @@ Ensure required length of res field.
 ";
 
 %feature("docstring") casadi::BSplineInterpolant::generateFunction "[INTERNAL]  Generate code the function.
+
+";
+
+%feature("docstring") casadi::BSplineInterpolant::get_partition "[INTERNAL]
+Get the unidirectional or bidirectional partition.
 
 ";
 
@@ -7053,6 +7053,11 @@ G.
 
 ";
 
+%feature("docstring") casadi::Collocation::get_partition "[INTERNAL]  Get
+the unidirectional or bidirectional partition.
+
+";
+
 %feature("docstring") casadi::Collocation::generateDeclarations "[INTERNAL]
 Generate code for the declarations of the C function.
 
@@ -7277,11 +7282,6 @@ statistics.
 
 %feature("docstring") casadi::Collocation::sz_iw "[INTERNAL]  Get required
 length of iw field.
-
-";
-
-%feature("docstring") casadi::Collocation::getPartition "[INTERNAL]  Get
-the unidirectional or bidirectional partition.
 
 ";
 
@@ -7959,11 +7959,6 @@ expression.
 
 ";
 
-%feature("docstring") casadi::Conic::getPartition "[INTERNAL]  Get the
-unidirectional or bidirectional partition.
-
-";
-
 %feature("docstring") casadi::Conic::ad_weight "[INTERNAL]  Weighting
 factor for chosing forward/reverse mode.
 
@@ -8098,6 +8093,11 @@ order is run after init() has been completed.
 
 %feature("docstring") casadi::Conic::grad_mx "[INTERNAL]  Gradient
 expression.
+
+";
+
+%feature("docstring") casadi::Conic::get_partition "[INTERNAL]  Get the
+unidirectional or bidirectional partition.
 
 ";
 
@@ -10216,11 +10216,6 @@ of arg field.
 
 ";
 
-%feature("docstring") casadi::Dple::getPartition "[INTERNAL]  Get the
-unidirectional or bidirectional partition.
-
-";
-
 %feature("docstring") casadi::Dple::has_jacobian "[INTERNAL]  Return
 Jacobian of all input elements with respect to all output elements.
 
@@ -10566,6 +10561,11 @@ order is run after init() has been completed.
 
 %feature("docstring") casadi::Dple::jac_mx "[INTERNAL]  Jacobian
 expression.
+
+";
+
+%feature("docstring") casadi::Dple::get_partition "[INTERNAL]  Get the
+unidirectional or bidirectional partition.
 
 ";
 
@@ -11106,8 +11106,8 @@ function inputs and outputs.
 
 ";
 
-%feature("docstring") casadi::Expm::getPartition "[INTERNAL]  Get the
-unidirectional or bidirectional partition.
+%feature("docstring") casadi::Expm::sz_w "[INTERNAL]  Get required length
+of w field.
 
 ";
 
@@ -11128,6 +11128,11 @@ Export / Generate C code for the dependency function.
 
 %feature("docstring") casadi::Expm::_set_work "[INTERNAL]  Set the
 (persistent) work vectors.
+
+";
+
+%feature("docstring") casadi::Expm::get_partition "[INTERNAL]  Get the
+unidirectional or bidirectional partition.
 
 ";
 
@@ -11195,11 +11200,6 @@ of arg field.
 
 %feature("docstring") casadi::Expm::jac_sx "[INTERNAL]  Jacobian
 expression.
-
-";
-
-%feature("docstring") casadi::Expm::sz_w "[INTERNAL]  Get required length
-of w field.
 
 ";
 
@@ -12361,11 +12361,6 @@ supported?
 
 ";
 
-%feature("docstring") casadi::External::getPartition "[INTERNAL]  Get the
-unidirectional or bidirectional partition.
-
-";
-
 %feature("docstring") casadi::External::mx_in "[INTERNAL]  Get function
 input(s) and output(s)
 
@@ -12453,6 +12448,11 @@ sparsity forward.
 
 %feature("docstring") casadi::External::numel_out "[INTERNAL]  Number of
 input/output elements.
+
+";
+
+%feature("docstring") casadi::External::get_partition "[INTERNAL]  Get the
+unidirectional or bidirectional partition.
 
 ";
 
@@ -12678,11 +12678,6 @@ Generate a augmented DAE system with nfwd forward sensitivities.
 
 %feature("docstring") casadi::FixedStepIntegrator::z "[INTERNAL] ";
 
-%feature("docstring") casadi::FixedStepIntegrator::default_in "[INTERNAL]
-Get default input value.
-
-";
-
 %feature("docstring") casadi::FixedStepIntegrator::x "[INTERNAL] ";
 
 %feature("docstring") casadi::FixedStepIntegrator::set_work "[INTERNAL]
@@ -12749,6 +12744,10 @@ hcat:  check if horizontal repetion of the function input is allowed
 
 ";
 
+%feature("docstring") casadi::FixedStepIntegrator::get_partition "[INTERNAL]  Get the unidirectional or bidirectional partition.
+
+";
+
 %feature("docstring") casadi::FixedStepIntegrator::tang_mx "[INTERNAL]
 Tangent expression.
 
@@ -12756,8 +12755,8 @@ Tangent expression.
 
 %feature("docstring") casadi::FixedStepIntegrator::expand "[INTERNAL] ";
 
-%feature("docstring") casadi::FixedStepIntegrator::getPartition "[INTERNAL]
-Get the unidirectional or bidirectional partition.
+%feature("docstring") casadi::FixedStepIntegrator::default_in "[INTERNAL]
+Get default input value.
 
 ";
 
@@ -15364,6 +15363,10 @@ cached version is available.
 
 ";
 
+%feature("docstring") casadi::GenericExternal::getJacSparsityGen "[INTERNAL]  Get the sparsity pattern, forward mode.
+
+";
+
 %feature("docstring") casadi::GenericExternal::grad_sx "[INTERNAL]
 Gradient expression.
 
@@ -15569,11 +15572,6 @@ the class able to propagate seeds through the algorithm?
 
 ";
 
-%feature("docstring") casadi::GenericExternal::getPartition "[INTERNAL]
-Get the unidirectional or bidirectional partition.
-
-";
-
 %feature("docstring") casadi::GenericExternal::name "[INTERNAL]  Name of
 the function.
 
@@ -15629,7 +15627,8 @@ Propagate sparsity backwards.
 
 ";
 
-%feature("docstring") casadi::GenericExternal::getJacSparsityGen "[INTERNAL]  Get the sparsity pattern, forward mode.
+%feature("docstring") casadi::GenericExternal::get_partition "[INTERNAL]
+Get the unidirectional or bidirectional partition.
 
 ";
 
@@ -16646,8 +16645,7 @@ Call a function, templated.
 
 ";
 
-%feature("docstring") casadi::ImplicitFixedStepIntegrator::weak "[INTERNAL]
-Get a weak reference to the object.
+%feature("docstring") casadi::ImplicitFixedStepIntegrator::get_partition "[INTERNAL]  Get the unidirectional or bidirectional partition.
 
 ";
 
@@ -17112,10 +17110,6 @@ evaluate
 
 ";
 
-%feature("docstring") casadi::ImplicitFixedStepIntegrator::getPartition "[INTERNAL]  Get the unidirectional or bidirectional partition.
-
-";
-
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::simple "[INTERNAL]  Evaluate numerically, simplied syntax.
 
 ";
@@ -17179,6 +17173,11 @@ Log the status of the solver, function given.
 ";
 
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::eval_mx "[INTERNAL]  Evaluate with symbolic matrices.
+
+";
+
+%feature("docstring") casadi::ImplicitFixedStepIntegrator::weak "[INTERNAL]
+Get a weak reference to the object.
 
 ";
 
@@ -18133,6 +18132,11 @@ nodes in the algorithm.
 
 ";
 
+%feature("docstring") casadi::ImplicitToNlp::get_partition "[INTERNAL]  Get
+the unidirectional or bidirectional partition.
+
+";
+
 %feature("docstring") casadi::ImplicitToNlp::_set_temp "[INTERNAL]  Set the
 (temporary) work vectors.
 
@@ -18241,11 +18245,6 @@ Evaluate numerically.
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate a function, overloaded.
-
-";
-
-%feature("docstring") casadi::ImplicitToNlp::getPartition "[INTERNAL]  Get
-the unidirectional or bidirectional partition.
 
 ";
 
@@ -18783,11 +18782,6 @@ hcat:  check if horizontal repetion of the function input is allowed
 
 ";
 
-%feature("docstring") casadi::Integrator::getPartition "[INTERNAL]  Get the
-unidirectional or bidirectional partition.
-
-";
-
 %feature("docstring") casadi::Integrator::plugin_name "[INTERNAL] ";
 
 %feature("docstring") casadi::Integrator::codegen_name "[INTERNAL]  Get
@@ -19209,6 +19203,11 @@ length of arg field.
 
 %feature("docstring") casadi::Integrator::has_codegen "[INTERNAL]  Is
 codegen supported?
+
+";
+
+%feature("docstring") casadi::Integrator::get_partition "[INTERNAL]  Get
+the unidirectional or bidirectional partition.
 
 ";
 
@@ -20062,11 +20061,6 @@ if the numerical values of the supplied bounds make sense.
 
 ";
 
-%feature("docstring") casadi::Interpolant::getPartition "[INTERNAL]  Get
-the unidirectional or bidirectional partition.
-
-";
-
 %feature("docstring") casadi::Interpolant::checkArg "[INTERNAL]  Check if
 input arguments have correct length and dimensions.
 
@@ -20316,6 +20310,11 @@ Replace 0-by-0 forward seeds.
 
 %feature("docstring") casadi::Interpolant::~Interpolant "[INTERNAL]
 Destructor.
+
+";
+
+%feature("docstring") casadi::Interpolant::get_partition "[INTERNAL]  Get
+the unidirectional or bidirectional partition.
 
 ";
 
@@ -20614,6 +20613,11 @@ expressions for the forward seeds.
 
 ";
 
+%feature("docstring") casadi::Jit::get_partition "[INTERNAL]  Get the
+unidirectional or bidirectional partition.
+
+";
+
 %feature("docstring") casadi::Jit::getAlgorithmSize "[INTERNAL]  Get the
 number of atomic operations.
 
@@ -20797,11 +20801,6 @@ derivatives by multiplying the full Jacobian and multiplying.
 
 %feature("docstring") casadi::Jit::numel_in "[INTERNAL]  Number of
 input/output elements.
-
-";
-
-%feature("docstring") casadi::Jit::getPartition "[INTERNAL]  Get the
-unidirectional or bidirectional partition.
 
 ";
 
@@ -22237,11 +22236,6 @@ dependent function.
 
 ";
 
-%feature("docstring") casadi::LapackLu::getPartition "[INTERNAL]  Get the
-unidirectional or bidirectional partition.
-
-";
-
 %feature("docstring") casadi::LapackLu::mapsum_mx "[INTERNAL]  Parallel
 evaluation.
 
@@ -22362,6 +22356,11 @@ hcat:  check if horizontal repetion of the function input is allowed
 ";
 
 %feature("docstring") casadi::LapackLu::reset "[INTERNAL] ";
+
+%feature("docstring") casadi::LapackLu::get_partition "[INTERNAL]  Get the
+unidirectional or bidirectional partition.
+
+";
 
 %feature("docstring") casadi::LapackLu::codegen_name "[INTERNAL]  Get name
 in codegen.
@@ -22700,11 +22699,6 @@ Parameters:
 -----------
 
 hcat:  check if horizontal repetion of the function input is allowed
-
-";
-
-%feature("docstring") casadi::LapackQr::getPartition "[INTERNAL]  Get the
-unidirectional or bidirectional partition.
 
 ";
 
@@ -23256,6 +23250,11 @@ hcat:  check if horizontal repetion of the function input is allowed
 ";
 
 %feature("docstring") casadi::LapackQr::plugin_name "[INTERNAL] ";
+
+%feature("docstring") casadi::LapackQr::get_partition "[INTERNAL]  Get the
+unidirectional or bidirectional partition.
+
+";
 
 %feature("docstring") casadi::LapackQr::adjViaJac "[INTERNAL]  Calculate
 derivatives by multiplying the full Jacobian and multiplying.
@@ -23822,11 +23821,6 @@ Reverse mode, virtual functions overloaded in derived classes.
 
 ";
 
-%feature("docstring") casadi::LinearInterpolant::getPartition "[INTERNAL]
-Get the unidirectional or bidirectional partition.
-
-";
-
 %feature("docstring") casadi::LinearInterpolant::name_in "[INTERNAL]  Get
 input scheme name by index.
 
@@ -23979,6 +23973,11 @@ objects.
 
 %feature("docstring") casadi::LinearInterpolant::n_out "[INTERNAL]  Number
 of function inputs and outputs.
+
+";
+
+%feature("docstring") casadi::LinearInterpolant::get_partition "[INTERNAL]
+Get the unidirectional or bidirectional partition.
 
 ";
 
@@ -25184,6 +25183,10 @@ Get default input value.
 
 ";
 
+%feature("docstring") casadi::LinearInterpolantJac::get_partition "[INTERNAL]  Get the unidirectional or bidirectional partition.
+
+";
+
 %feature("docstring") casadi::LinearInterpolantJac::set_jac_sparsity "[INTERNAL]  Generate the sparsity of a Jacobian block.
 
 ";
@@ -25286,10 +25289,6 @@ required length of iw field.
 
 %feature("docstring") casadi::LinearInterpolantJac::simple "[INTERNAL]
 Evaluate numerically, simplied syntax.
-
-";
-
-%feature("docstring") casadi::LinearInterpolantJac::getPartition "[INTERNAL]  Get the unidirectional or bidirectional partition.
 
 ";
 
@@ -26005,6 +26004,11 @@ structure recognition for symmetric Jacobians
 
 ";
 
+%feature("docstring") casadi::Lsqr::getCount "[INTERNAL]  Get the reference
+count.
+
+";
+
 %feature("docstring") casadi::Lsqr::log "
 
 >  void casadi::FunctionInternal::log(const std::string &msg) const 
@@ -26125,8 +26129,8 @@ expression.
 
 ";
 
-%feature("docstring") casadi::Lsqr::getCount "[INTERNAL]  Get the reference
-count.
+%feature("docstring") casadi::Lsqr::get_partition "[INTERNAL]  Get the
+unidirectional or bidirectional partition.
 
 ";
 
@@ -26685,11 +26689,6 @@ Evaluate a function, overloaded.
 
 %feature("docstring") casadi::Lsqr::index_out "[INTERNAL]  Get output
 scheme index by name.
-
-";
-
-%feature("docstring") casadi::Lsqr::getPartition "[INTERNAL]  Get the
-unidirectional or bidirectional partition.
 
 ";
 
@@ -27313,6 +27312,11 @@ input/output elements.
 
 ";
 
+%feature("docstring") casadi::Map::get_partition "[INTERNAL]  Get the
+unidirectional or bidirectional partition.
+
+";
+
 %feature("docstring") casadi::Map::codegen_decref "[INTERNAL]  Codegen
 decref for dependencies.
 
@@ -27329,11 +27333,6 @@ dimensions.
 ";
 
 %feature("docstring") casadi::Map::get_options "[INTERNAL]  Options.
-
-";
-
-%feature("docstring") casadi::Map::getPartition "[INTERNAL]  Get the
-unidirectional or bidirectional partition.
 
 ";
 
@@ -28125,6 +28124,11 @@ memory block.
 
 ";
 
+%feature("docstring") casadi::MapOmp::get_partition "[INTERNAL]  Get the
+unidirectional or bidirectional partition.
+
+";
+
 %feature("docstring") casadi::MapOmp::log "
 
 >  void casadi::FunctionInternal::log(const std::string &msg) const 
@@ -28429,11 +28433,6 @@ Jacobian of all input elements with respect to all output elements.
 
 %feature("docstring") casadi::MapOmp::get_name_out "[INTERNAL]  Names of
 function input and outputs.
-
-";
-
-%feature("docstring") casadi::MapOmp::getPartition "[INTERNAL]  Get the
-unidirectional or bidirectional partition.
 
 ";
 
@@ -30490,11 +30489,6 @@ numerical values of the supplied bounds make sense.
 
 ";
 
-%feature("docstring") casadi::Newton::getPartition "[INTERNAL]  Get the
-unidirectional or bidirectional partition.
-
-";
-
 %feature("docstring") casadi::Newton::size_in "[INTERNAL]  Input/output
 dimensions.
 
@@ -30860,6 +30854,11 @@ of w field.
 
 %feature("docstring") casadi::Newton::call "[INTERNAL]   Call a function,
 templated.
+
+";
+
+%feature("docstring") casadi::Newton::get_partition "[INTERNAL]  Get the
+unidirectional or bidirectional partition.
 
 ";
 
@@ -31304,11 +31303,6 @@ vectors long enough to evaluate function.
 ";
 
 %feature("docstring") casadi::Nlpsol::oracle "[INTERNAL]  Get oracle.
-
-";
-
-%feature("docstring") casadi::Nlpsol::getPartition "[INTERNAL]  Get the
-unidirectional or bidirectional partition.
 
 ";
 
@@ -32272,6 +32266,11 @@ dimensions.
 
 ";
 
+%feature("docstring") casadi::Nlpsol::get_partition "[INTERNAL]  Get the
+unidirectional or bidirectional partition.
+
+";
+
 %feature("docstring") casadi::Nlpsol::codegen_decref "[INTERNAL]  Codegen
 decref for dependencies.
 
@@ -32341,8 +32340,8 @@ input scheme index by name.
 
 ";
 
-%feature("docstring") casadi::OracleFunction::name_in "[INTERNAL]  Get
-input scheme name by index.
+%feature("docstring") casadi::OracleFunction::get_partition "[INTERNAL]
+Get the unidirectional or bidirectional partition.
 
 ";
 
@@ -32517,6 +32516,11 @@ required length of iw field.
 
 ";
 
+%feature("docstring") casadi::OracleFunction::name_in "[INTERNAL]  Get
+input scheme name by index.
+
+";
+
 %feature("docstring") casadi::OracleFunction::eval_name "[INTERNAL]  Get
 name of the evaluation function.
 
@@ -32595,11 +32599,6 @@ Generate code for the function body.
 
 %feature("docstring") casadi::OracleFunction::set_work "[INTERNAL]  Set the
 (persistent) work vectors.
-
-";
-
-%feature("docstring") casadi::OracleFunction::getPartition "[INTERNAL]  Get
-the unidirectional or bidirectional partition.
 
 ";
 
@@ -33776,11 +33775,6 @@ dependencies.
 
 ";
 
-%feature("docstring") casadi::QpToNlp::getPartition "[INTERNAL]  Get the
-unidirectional or bidirectional partition.
-
-";
-
 %feature("docstring") casadi::QpToNlp::set_temp "[INTERNAL]  Set the
 (temporary) work vectors.
 
@@ -34096,6 +34090,11 @@ expression.
 
 %feature("docstring") casadi::QpToNlp::weak "[INTERNAL]  Get a weak
 reference to the object.
+
+";
+
+%feature("docstring") casadi::QpToNlp::get_partition "[INTERNAL]  Get the
+unidirectional or bidirectional partition.
 
 ";
 
@@ -35206,6 +35205,11 @@ Generate the sparsity of a Jacobian block.
 
 ";
 
+%feature("docstring") casadi::Rootfinder::get_partition "[INTERNAL]  Get
+the unidirectional or bidirectional partition.
+
+";
+
 %feature("docstring") casadi::Rootfinder::getJacSparsityHierarchical "[INTERNAL]  A flavor of getJacSparsity that does hierarchical block
 structure recognition.
 
@@ -35497,11 +35501,6 @@ variables ( MX)
 
 %feature("docstring") casadi::Rootfinder::mx_in "[INTERNAL]  Get function
 input(s) and output(s)
-
-";
-
-%feature("docstring") casadi::Rootfinder::getPartition "[INTERNAL]  Get the
-unidirectional or bidirectional partition.
 
 ";
 
@@ -36141,11 +36140,6 @@ factor for chosing forward/reverse mode, sparsity propagation.
 
 ";
 
-%feature("docstring") casadi::RungeKutta::getPartition "[INTERNAL]  Get the
-unidirectional or bidirectional partition.
-
-";
-
 %feature("docstring") casadi::RungeKutta::hasDerivative "[INTERNAL]  Can
 derivatives be calculated in any way?
 
@@ -36197,6 +36191,11 @@ Generate code for the function body.
 
 %feature("docstring") casadi::RungeKutta::codegen_incref "[INTERNAL]
 Codegen incref for dependencies.
+
+";
+
+%feature("docstring") casadi::RungeKutta::get_partition "[INTERNAL]  Get
+the unidirectional or bidirectional partition.
 
 ";
 
@@ -36898,6 +36897,11 @@ temporary variables needed.
 
 ";
 
+%feature("docstring") casadi::Scpgen::get_partition "[INTERNAL]  Get the
+unidirectional or bidirectional partition.
+
+";
+
 %feature("docstring") casadi::Scpgen::numel_in "[INTERNAL]  Number of
 input/output elements.
 
@@ -37354,11 +37358,6 @@ scheme name by index.
 ";
 
 %feature("docstring") casadi::Scpgen::factory "[INTERNAL] ";
-
-%feature("docstring") casadi::Scpgen::getPartition "[INTERNAL]  Get the
-unidirectional or bidirectional partition.
-
-";
 
 %feature("docstring") casadi::Scpgen::sz_arg "[INTERNAL]  Get required
 length of arg field.
@@ -37998,11 +37997,6 @@ Input/output dimensions.
 
 ";
 
-%feature("docstring") casadi::SimplifiedExternal::getPartition "[INTERNAL]
-Get the unidirectional or bidirectional partition.
-
-";
-
 %feature("docstring") casadi::SimplifiedExternal::replaceArg "[INTERNAL]
 Replace 0-by-0 inputs.
 
@@ -38310,6 +38304,11 @@ the (persistent and temporary) work vectors.
 
 %feature("docstring") casadi::SimplifiedExternal::sz_w "[INTERNAL]  Get
 required length of w field.
+
+";
+
+%feature("docstring") casadi::SimplifiedExternal::get_partition "[INTERNAL]
+Get the unidirectional or bidirectional partition.
 
 ";
 
@@ -38882,8 +38881,8 @@ the (integer) input arguments of an atomic operation.
 
 ";
 
-%feature("docstring") casadi::SlicotDple::sz_res "[INTERNAL]  Get required
-length of res field.
+%feature("docstring") casadi::SlicotDple::get_partition "[INTERNAL]  Get
+the unidirectional or bidirectional partition.
 
 ";
 
@@ -39395,6 +39394,11 @@ objects.
 
 ";
 
+%feature("docstring") casadi::SlicotDple::sz_res "[INTERNAL]  Get required
+length of res field.
+
+";
+
 %feature("docstring") casadi::SlicotDple::call_reverse "[INTERNAL]  Reverse
 mode, virtual functions overloaded in derived classes.
 
@@ -39728,11 +39732,6 @@ sparsity of a given output.
 
 %feature("docstring") casadi::SlicotDple::set_jac_sparsity "[INTERNAL]
 Generate the sparsity of a Jacobian block.
-
-";
-
-%feature("docstring") casadi::SlicotDple::getPartition "[INTERNAL]  Get the
-unidirectional or bidirectional partition.
 
 ";
 
@@ -40128,6 +40127,11 @@ length of w field.
 
 ";
 
+%feature("docstring") casadi::SlicotExpm::get_partition "[INTERNAL]  Get
+the unidirectional or bidirectional partition.
+
+";
+
 %feature("docstring") casadi::SlicotExpm::getJacSparsityHierarchical "[INTERNAL]  A flavor of getJacSparsity that does hierarchical block
 structure recognition.
 
@@ -40206,11 +40210,6 @@ Evaluate a function, overloaded.
 
 %feature("docstring") casadi::SlicotExpm::numel_in "[INTERNAL]  Number of
 input/output elements.
-
-";
-
-%feature("docstring") casadi::SlicotExpm::getPartition "[INTERNAL]  Get the
-unidirectional or bidirectional partition.
 
 ";
 
@@ -42777,11 +42776,6 @@ cached version is available.
 
 ";
 
-%feature("docstring") casadi::Sqpmethod::getPartition "[INTERNAL]  Get the
-unidirectional or bidirectional partition.
-
-";
-
 %feature("docstring") casadi::Sqpmethod::eval_sx "[INTERNAL]  Evaluate with
 symbolic scalars.
 
@@ -42984,6 +42978,11 @@ Generate code the function.
 
 %feature("docstring") casadi::Sqpmethod::replaceAdjSeed "[INTERNAL]
 Replace 0-by-0 reverse seeds.
+
+";
+
+%feature("docstring") casadi::Sqpmethod::get_partition "[INTERNAL]  Get the
+unidirectional or bidirectional partition.
 
 ";
 
@@ -43217,6 +43216,11 @@ evaluation.
 
 %feature("docstring") casadi::Switch::set_temp "[INTERNAL]  Set the
 (temporary) work vectors.
+
+";
+
+%feature("docstring") casadi::Switch::get_partition "[INTERNAL]  Get the
+unidirectional or bidirectional partition.
 
 ";
 
@@ -43630,11 +43634,6 @@ Parameters:
 -----------
 
 hcat:  check if horizontal repetion of the function input is allowed
-
-";
-
-%feature("docstring") casadi::Switch::getPartition "[INTERNAL]  Get the
-unidirectional or bidirectional partition.
 
 ";
 
@@ -44379,11 +44378,6 @@ cached version is available.
 
 ";
 
-%feature("docstring") casadi::SymbolicQr::getPartition "[INTERNAL]  Get the
-unidirectional or bidirectional partition.
-
-";
-
 %feature("docstring") casadi::SymbolicQr::codegen_name "[INTERNAL]  Get
 name in codegen.
 
@@ -44891,6 +44885,11 @@ Generate shorthand macro.
 
 %feature("docstring") casadi::SymbolicQr::getAtomicInputReal "[INTERNAL]
 Get the floating point output argument of an atomic operation.
+
+";
+
+%feature("docstring") casadi::SymbolicQr::get_partition "[INTERNAL]  Get
+the unidirectional or bidirectional partition.
 
 ";
 

@@ -463,9 +463,6 @@
 %exception  casadi::FunctionInternal::getJacSparsityHierarchicalSymm(int iind, int oind) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::FunctionInternal::getPartition(int iind, int oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool allow_forward, bool allow_reverse) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::FunctionInternal::getWorkSize() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -494,6 +491,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::get_options() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::FunctionInternal::get_partition(int iind, int oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool allow_forward, bool allow_reverse) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::get_reverse(int nadj, const std::string &name, const std::vector< std::string > &inames, const std::vector< std::string > &onames, const Dict &opts) const  {
@@ -553,10 +553,10 @@
 %exception  casadi::FunctionInternal::is_a(const std::string &type, bool recursive) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::FunctionInternal::jac_mx(int iind=0, int oind=0, const Dict &opts=Dict()) {
+%exception  casadi::FunctionInternal::jac_mx(int iind, int oind, const Dict &opts) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::FunctionInternal::jac_sx(int iind=0, int oind=0, const Dict &opts=Dict()) {
+%exception  casadi::FunctionInternal::jac_sx(int iind, int oind, const Dict &opts) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::jacobian() const  {
