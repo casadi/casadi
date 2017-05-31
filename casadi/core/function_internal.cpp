@@ -1193,10 +1193,10 @@ namespace casadi {
     return jsp_ref;
   }
 
-  void FunctionInternal::getPartition(int iind, int oind, Sparsity& D1, Sparsity& D2,
-                                      bool compact, bool symmetric,
-                                      bool allow_forward, bool allow_reverse) {
-    log("FunctionInternal::getPartition begin");
+  void FunctionInternal::get_partition(int iind, int oind, Sparsity& D1, Sparsity& D2,
+                                       bool compact, bool symmetric,
+                                       bool allow_forward, bool allow_reverse) const {
+    log("FunctionInternal::get_partition begin");
     casadi_assert_message(allow_forward || allow_reverse, "Inconsistent options");
 
     // Sparsity pattern with transpose
@@ -1242,7 +1242,7 @@ namespace casadi {
 
         // Perform the coloring
         if (fwd) {
-          log("FunctionInternal::getPartition unidirectional coloring (forward mode)");
+          log("FunctionInternal::get_partition unidirectional coloring (forward mode)");
           int max_colorings_to_test = best_coloring>=w*A.size1() ? A.size1() :
             floor(best_coloring/w);
           D1 = AT.uni_coloring(A, max_colorings_to_test);
@@ -1257,7 +1257,7 @@ namespace casadi {
             best_coloring = w*D1.size2();
           }
         } else {
-          log("FunctionInternal::getPartition unidirectional coloring (adjoint mode)");
+          log("FunctionInternal::get_partition unidirectional coloring (adjoint mode)");
           int max_colorings_to_test = best_coloring>=(1-w)*A.size2() ? A.size2() :
             floor(best_coloring/(1-w));
 
@@ -1276,7 +1276,7 @@ namespace casadi {
       }
 
     }
-    log("FunctionInternal::getPartition end");
+    log("FunctionInternal::get_partition end");
   }
 
   void FunctionInternal::eval(void* mem,

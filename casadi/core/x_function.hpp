@@ -680,7 +680,7 @@ namespace casadi {
 
     // Get a bidirectional partition
     Sparsity D1, D2;
-    getPartition(iind, oind, D1, D2, true, symmetric, allow_forward, allow_reverse);
+    get_partition(iind, oind, D1, D2, true, symmetric, allow_forward, allow_reverse);
     if (verbose()) userOut() << "XFunction::jac graph coloring completed" << std::endl;
 
     // Get the number of forward and adjoint sweeps

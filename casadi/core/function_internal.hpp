@@ -446,9 +446,9 @@ namespace casadi {
     virtual void print_free(std::ostream &stream) const;
 
     /** \brief Get the unidirectional or bidirectional partition */
-    void getPartition(int iind, int oind, Sparsity& D1, Sparsity& D2,
+    void get_partition(int iind, int oind, Sparsity& D1, Sparsity& D2,
                       bool compact, bool symmetric,
-                      bool allow_forward, bool allow_reverse);
+                      bool allow_forward, bool allow_reverse) const;
 
     /// Verbose mode?
     bool verbose() const;
