@@ -187,6 +187,17 @@ namespace casadi {
 
     /** \brief Get default input value */
     double default_in(int ind) const override { return default_in_.at(ind);}
+
+    ///@{
+    /** \brief Return Jacobian of all input elements with respect to all output elements */
+    bool has_jacobian() const override { return true;}
+    Function get_jacobian(const std::string& name,
+                          const std::vector<std::string>& inames,
+                          const std::vector<std::string>& onames,
+                          const Dict& opts) const override;
+    ///@}
+
+
   };
 
 } // namespace casadi

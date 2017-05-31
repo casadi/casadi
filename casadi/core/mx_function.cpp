@@ -1285,4 +1285,19 @@ namespace casadi {
           MX, MXNode>::is_a(type, recursive));
   }
 
+  Function MXFunction
+  ::get_jacobian(const std::string& name,
+                 const std::vector<std::string>& inames,
+                 const std::vector<std::string>& onames,
+                 const Dict& opts) const {
+    // Temporary single-input, single-output function
+    Function tmp("tmp", {veccat(in_)}, {veccat(out_)},
+                 {{"ad_weight", ad_weight()}, {"ad_weight_sp", sp_weight()}});
+    // Jacobian expression
+    MX J = dynamic_cast<MXFunction*>(tmp.get())->jac(0, 0, Dict());
+
+    // Form an expression for the full Jacobian
+    return Function(name, in_, {J}, inames, onames, opts);
+  }
+
 } // namespace casadi
