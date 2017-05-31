@@ -124,6 +124,15 @@ namespace casadi {
                          const Dict& opts) const override;
     ///@}
 
+    ///@{
+    /** \brief Return Jacobian of all input elements with respect to all output elements */
+    bool has_jacobian() const override { return true;}
+    Function get_jacobian(const std::string& name,
+                          const std::vector<std::string>& inames,
+                          const std::vector<std::string>& onames,
+                          const Dict& opts) const override;
+    ///@}
+
     /** \brief returns a new function with a selection of inputs/outputs of the original */
     Function slice(const std::string& name, const std::vector<int>& order_in,
                    const std::vector<int>& order_out, const Dict& opts) const override;
@@ -1092,6 +1101,24 @@ namespace casadi {
     // Assemble function and return
     return Function(name, ret_in, ret_out, inames, onames, opts);
   }
+
+  template<typename DerivedType, typename MatType, typename NodeType>
+  Function XFunction<DerivedType, MatType, NodeType>
+  ::get_jacobian(const std::string& name,
+                 const std::vector<std::string>& inames,
+                 const std::vector<std::string>& onames,
+                 const Dict& opts) const {
+    // Temporary single-input, single-output function
+    Function tmp("tmp", {veccat(in_)}, {veccat(out_)},
+                 {{"ad_weight", ad_weight()}, {"ad_weight_sp", sp_weight()}});
+
+    // Jacobian expression
+    MatType J = dynamic_cast<const DerivedType&>(*tmp.get()).jac(0, 0, Dict());
+
+    // Form an expression for the full Jacobian
+    return Function(name, in_, {J}, inames, onames, opts);
+  }
+
 
   template<typename DerivedType, typename MatType, typename NodeType>
   Function XFunction<DerivedType, MatType, NodeType>
