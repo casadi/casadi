@@ -1531,7 +1531,7 @@ namespace casadi {
     {
       Function tmp("tmp", {arg}, {res}, {{"ad_weight", ad_weight()},
                                          {"ad_weight_sp", sp_weight()}});
-      J = tmp->jac_mx(0, 0);
+      J = tmp->jac_mx(0, 0, Dict());
     }
 
     // Make sure argv is the input of J
@@ -2333,7 +2333,7 @@ namespace casadi {
     casadi_error("'tang_mx' not defined for " + type_name());
   }
 
-  MX FunctionInternal::jac_mx(int iind, int oind, const Dict& opts) {
+  MX FunctionInternal::jac_mx(int iind, int oind, const Dict& opts) const {
     casadi_error("'jac_mx' not defined for " + type_name());
   }
 
@@ -2345,7 +2345,7 @@ namespace casadi {
     casadi_error("'tang_sx' not defined for " + type_name());
   }
 
-  SX FunctionInternal::jac_sx(int iind, int oind, const Dict& opts) {
+  SX FunctionInternal::jac_sx(int iind, int oind, const Dict& opts) const {
     casadi_error("'jac_sx' not defined for " + type_name());
   }
 

@@ -132,7 +132,7 @@ class CASADI_EXPORT SXFunction :
   SX tang_sx(int iind=0, int oind=0) override;
 
   /** \brief Jacobian expression */
-  SX jac_sx(int iind=0, int oind=0, const Dict& opts = Dict()) override;
+  SX jac_sx(int iind, int oind, const Dict& opts) const override;
 
   /** \brief Hessian expression */
   SX hess_sx(int iind, int oind) override;

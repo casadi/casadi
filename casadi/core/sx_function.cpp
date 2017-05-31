@@ -1386,7 +1386,7 @@ namespace casadi {
     return tang(iind, oind);
   }
 
-  SX SXFunction::jac_sx(int iind, int oind, const Dict& opts) {
+  SX SXFunction::jac_sx(int iind, int oind, const Dict& opts) const {
     return jac(iind, oind, opts);
   }
 

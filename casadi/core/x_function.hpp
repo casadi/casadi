@@ -83,7 +83,7 @@ namespace casadi {
     MatType tang(int iind=0, int oind=0);
 
     /** \brief  Construct a complete Jacobian by compression */
-    MatType jac(int iind=0, int oind=0, const Dict& opts = Dict());
+    MatType jac(int iind, int oind, const Dict& opts) const;
 
     /** \brief Check if the function is of a particular type */
     bool is_a(const std::string& type, bool recursive) const override {
@@ -634,7 +634,7 @@ namespace casadi {
 
   template<typename DerivedType, typename MatType, typename NodeType>
   MatType XFunction<DerivedType, MatType, NodeType>
-  ::jac(int iind, int oind, const Dict& opts) {
+  ::jac(int iind, int oind, const Dict& opts) const {
     using namespace std;
     if (verbose()) userOut() << "XFunction::jac begin" << std::endl;
 

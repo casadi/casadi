@@ -316,7 +316,7 @@ namespace casadi {
     virtual MX tang_mx(int iind=0, int oind=0);
 
     /** \brief Jacobian expression */
-    virtual MX jac_mx(int iind=0, int oind=0, const Dict& opts = Dict());
+    virtual MX jac_mx(int iind, int oind, const Dict& opts) const;
 
     /** \brief Gradient expression */
     virtual SX grad_sx(int iind=0, int oind=0);
@@ -325,7 +325,7 @@ namespace casadi {
     virtual SX tang_sx(int iind=0, int oind=0);
 
     /** \brief Jacobian expression */
-    virtual SX jac_sx(int iind=0, int oind=0, const Dict& opts = Dict());
+    virtual SX jac_sx(int iind, int oind, const Dict& opts) const;
 
     /** \brief Hessian expression */
     virtual SX hess_sx(int iind=0, int oind=0);

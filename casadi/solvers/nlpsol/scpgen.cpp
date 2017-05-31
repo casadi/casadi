@@ -423,7 +423,7 @@ namespace casadi {
     Function lgrad("lgrad", mfcn_in, mfcn_out);
 
     // Jacobian of the constraints
-    MX jac = lgrad->jac_mx(mod_x_, mod_g_);
+    MX jac = lgrad->jac_mx(mod_x_, mod_g_, Dict());
     log("Formed Jacobian of the constraints.");
 
     // Hessian of the Lagrangian
