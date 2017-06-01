@@ -1273,9 +1273,9 @@ class SXtests(casadiTestCase):
     self.checkarray(which_depends(e, vertcat(x,y,p),2,False),[True, False, True])
 
   def test_if_else_zero_sens(self):
-
+  
     for X in [SX,MX]:
-      x=X.sym('x')
+      x=X.sym('x',2)
 
       a = 1+3*x+sqrt(3*x)*x+7*x
       b = 1+2*x+sin(2*x)*x +x
@@ -1285,10 +1285,10 @@ class SXtests(casadiTestCase):
       fa = Function("f",[x],[a*x,jacobian(a*x,x)])
       fb = Function("f",[x],[b*x,jacobian(b*x,x)])
 
-      for i,j in zip(f([3]),fa([3])):
+      for i,j in zip(f([3,2]),fa([3,2])):
         self.checkarray(i,j)
 
-      for i,j in zip(f([-3]),fb([-3])):
+      for i,j in zip(f([-3,-2]),fb([-3,-2])):
         self.checkarray(i,j)
 
 
@@ -1296,8 +1296,8 @@ class SXtests(casadiTestCase):
       fa = Function("f",[x],[a*x])
       fb = Function("f",[x],[b*x])
 
-      self.checkfunction(f,fa,inputs=[3])
-      self.checkfunction(f,fb,inputs=[-3])
+      self.checkfunction(f,fa,inputs=[[3,2]])
+      self.checkfunction(f,fb,inputs=[[-3,-2]])
       
 
 if __name__ == '__main__':

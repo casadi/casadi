@@ -629,15 +629,15 @@ namespace casadi {
       // // Make sure NaN does not propagate through an inactive branch
       if (op!=OP_IF_ELSE_ZERO) {
         if (operation_checker<F0XChecker>(op) && this->op()==OP_IF_ELSE_ZERO) {
-          return if_else_zero(dep(0), dep(1)->getBinary(op, y, scX, scY));
+          return if_else_zero(dep(0), dep(1)->getBinarySwitch(op, y));
         } else if (operation_checker<FX0Checker>(op) && y->op()==OP_IF_ELSE_ZERO) {
-          return if_else_zero(y.dep(0), shared_from_this<MX>()->getBinary(op, y.dep(1), scX, scY));
+          return if_else_zero(y.dep(0), shared_from_this<MX>()->getBinarySwitch(op, y.dep(1)));
         }
       }
       if (operation_checker<F00Checker>(op) &&
           this->op()==OP_IF_ELSE_ZERO && y->op()==OP_IF_ELSE_ZERO) {
         if (MXNode::is_equal(dep(0).get(), y.dep(0).get(), maxDepth()))
-          return if_else_zero(dep(0), dep(1)->getBinary(op, y.dep(1), scX, scY));
+          return if_else_zero(dep(0), dep(1)->getBinarySwitch(op, y.dep(1)));
       }
       // Handle special cases for the second argument
       switch (y->op()) {
