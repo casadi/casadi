@@ -388,6 +388,12 @@ namespace casadi {
       // Options
       Dict opts;
       opts["derivative_of"] = derivative_of_;
+
+      // Propagate AD parameters
+      opts["ad_weight"] = ad_weight();
+      opts["ad_weight_sp"] = sp_weight();
+      opts["max_num_dir"] = max_num_dir_;
+
       // Wrap the function
       vector<MX> arg = mx_in();
       vector<MX> res = self()(arg);
@@ -1310,7 +1316,7 @@ namespace casadi {
       forward_.resize(nfwd+1);
     }
 
-    // Quick return if already cached
+    // Quick return if cached
     if (forward_[nfwd].alive()) {
       return shared_cast<Function>(forward_[nfwd].shared());
     }
@@ -1375,7 +1381,7 @@ namespace casadi {
       reverse_.resize(nadj+1);
     }
 
-    // Quick return if already cached
+    // Quick return if cached
     if (reverse_[nadj].alive()) {
       return shared_cast<Function>(reverse_[nadj].shared());
     }
@@ -1477,23 +1483,31 @@ namespace casadi {
   }
 
   Function FunctionInternal::jacobian() const {
-    if (jacobian_.alive()) {
-      // Return cached Jacobian
-      return shared_cast<Function>(jacobian_.shared());
-    } else {
-      // Options
-      Dict opts;
-      opts["derivative_of"] = self();
-      Function ret = get_jacobian(name_ + "_jac", ischeme_, {"jac"}, opts);
-
-      // Consistency check
-      casadi_assert(ret.n_in()==n_in());
-      casadi_assert(ret.n_out()==1);
-
-      // Cache it for reuse and return
-      jacobian_ = ret;
-      return ret;
+    // Used wrapped function if jacobian not available
+    if (!has_jacobian()) {
+      // Derivative information must be available
+      casadi_assert_message(has_derivative(),
+                            "Derivatives cannot be calculated for " + name_);
+      return wrap().jacobian();
     }
+
+    // Quick return if cached
+    if (jacobian_.alive()) {
+      return shared_cast<Function>(jacobian_.shared());
+    }
+
+    // Generate Jacobian
+    Dict opts;
+    opts["derivative_of"] = self();
+    Function ret = get_jacobian(name_ + "_jac", ischeme_, {"jac"}, opts);
+
+    // Consistency check
+    casadi_assert(ret.n_in()==n_in());
+    casadi_assert(ret.n_out()==1);
+
+    // Cache it for reuse and return
+    jacobian_ = ret;
+    return ret;
   }
 
   Function FunctionInternal::
@@ -1501,63 +1515,7 @@ namespace casadi {
                   const std::vector<std::string>& inames,
                   const std::vector<std::string>& onames,
                   const Dict& opts) const {
-    casadi_assert(has_forward(1) || has_reverse(1));
-    // Number inputs and outputs
-    int n_in = this->n_in();
-    int n_out = this->n_out();
-
-    // Symbolic inputs of the full Jacobian function under construction
-    vector<MX> ret_argv = mx_in(), argv, resv;
-
-    // Symbolic input of the SISO function formed for generating the Jacobian
-    MX arg;
-
-    // Reuse the same symbolic primitives, if single input
-    if (n_in==1) {
-      argv = ret_argv;
-      arg = argv.front();
-      resv = symbolic_output(argv);
-    } else {
-      // Collect Sparsity patterns of inputs
-      vector<Sparsity> sp_argv(n_in);
-      vector<int> row_offset(n_in+1, 0);
-      for (int i=0; i<n_in; ++i) {
-        sp_argv[i] = vec(sparsity_in(i));
-        row_offset[i+1] = row_offset[i]+sp_argv[i].numel();
-      }
-      Sparsity sp_arg = vertcat(sp_argv);
-
-      // Create symbolic primitive
-      arg = MX::sym("x", sp_arg);
-
-      // Split up and reshape to correct shape
-      argv = vertsplit(arg, row_offset);
-      for (int i=0; i<n_in; ++i) {
-        argv[i] = reshape(argv[i], sparsity_in(i));
-      }
-
-      // Evaluate symbolically
-      resv = self()(argv);
-    }
-
-    // Reuse the same output, if possible
-    MX res = n_out==1 ? resv.front() : veccat(resv);
-
-    // Form Jacobian
-    MX J;
-    {
-      Function tmp("tmp", {arg}, {res}, {{"ad_weight", ad_weight()},
-                                         {"ad_weight_sp", sp_weight()}});
-      J = tmp->jac_mx(0, 0, Dict());
-    }
-
-    // Make sure argv is the input of J
-    if (n_in!=1) {
-      J = substitute(J, arg, veccat(ret_argv));
-    }
-
-    // Form an expression for the full Jacobian
-    return Function(name, ret_argv, {J}, inames, onames, opts);
+    casadi_error("'get_jacobian' not defined for " + type_name());
   }
 
   void FunctionInternal::generateFunction(CodeGenerator& g,
