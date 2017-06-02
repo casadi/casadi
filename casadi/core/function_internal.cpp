@@ -2026,11 +2026,7 @@ namespace casadi {
     alloc_w(sz_w, persistent);
   }
 
-  bool FunctionInternal::has_jacobian() const {
-    return jacobian_.alive();
-  }
-
-  bool FunctionInternal::hasDerivative() const {
+  bool FunctionInternal::has_derivative() const {
     return has_forward(1) || has_reverse(1) || has_jacobian();
   }
 
@@ -2074,7 +2070,7 @@ namespace casadi {
                           " cannot be inlined in an MX expression");
 
     // Derivative information must be available
-    casadi_assert_message(hasDerivative(),
+    casadi_assert_message(has_derivative(),
                           "Derivatives cannot be calculated for " + name_);
 
     // Number of directional derivatives
@@ -2177,7 +2173,7 @@ namespace casadi {
                           " cannot be inlined in an MX expression");
 
     // Derivative information must be available
-    casadi_assert_message(hasDerivative(),
+    casadi_assert_message(has_derivative(),
                           "Derivatives cannot be calculated for " + name_);
 
     // Number of directional derivatives

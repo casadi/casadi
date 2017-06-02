@@ -257,7 +257,7 @@ namespace casadi {
     ///@{
     /** \brief Return Jacobian of all input elements with respect to all output elements */
     Function jacobian() const;
-    virtual bool has_jacobian() const;
+    virtual bool has_jacobian() const { return false;}
     virtual Function get_jacobian(const std::string& name,
                                   const std::vector<std::string>& inames,
                                   const std::vector<std::string>& onames,
@@ -300,7 +300,7 @@ namespace casadi {
     virtual const Function& oracle() const;
 
     /** \brief Can derivatives be calculated in any way? */
-    bool hasDerivative() const;
+    bool has_derivative() const;
 
     /** \brief  Weighting factor for chosing forward/reverse mode */
     virtual double ad_weight() const;
