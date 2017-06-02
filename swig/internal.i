@@ -511,10 +511,10 @@
 %exception  casadi::FunctionInternal::grad_sx(int iind=0, int oind=0) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::FunctionInternal::hasDerivative() const  {
+%exception  casadi::FunctionInternal::has_codegen() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::FunctionInternal::has_codegen() const  {
+%exception  casadi::FunctionInternal::has_derivative() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::has_forward(int nfwd) const  {

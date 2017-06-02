@@ -152,6 +152,11 @@ reference to the object.
 
 ";
 
+%feature("docstring") casadi::Blocksqp::getJacSparsity "[INTERNAL]
+Generate the sparsity of a Jacobian block.
+
+";
+
 %feature("docstring") casadi::Blocksqp::init "[INTERNAL]  Initialize.
 
 ";
@@ -1252,8 +1257,8 @@ vector of symbolic variables corresponding to the outputs.
 
 ";
 
-%feature("docstring") casadi::Blocksqp::getJacSparsity "[INTERNAL]
-Generate the sparsity of a Jacobian block.
+%feature("docstring") casadi::Blocksqp::has_derivative "[INTERNAL]  Can
+derivatives be calculated in any way?
 
 ";
 
@@ -1287,11 +1292,6 @@ vectors.
 function that calculates forward derivatives forward(nfwd) returns a cached
 instance if available, and calls  Function get_forward(int nfwd) if no
 cached version is available.
-
-";
-
-%feature("docstring") casadi::Blocksqp::hasDerivative "[INTERNAL]  Can
-derivatives be calculated in any way?
 
 ";
 
@@ -1910,11 +1910,6 @@ derivatives by multiplying the full Jacobian and multiplying.
 
 ";
 
-%feature("docstring") casadi::BSpline::hasDerivative "[INTERNAL]  Can
-derivatives be calculated in any way?
-
-";
-
 %feature("docstring") casadi::BSpline::log "
 
 >  void casadi::FunctionInternal::log(const std::string &msg) const 
@@ -2302,6 +2297,11 @@ templated.
 ";
 
 %feature("docstring") casadi::BSpline::memory "[INTERNAL]  Memory objects.
+
+";
+
+%feature("docstring") casadi::BSpline::has_derivative "[INTERNAL]  Can
+derivatives be calculated in any way?
 
 ";
 
@@ -3484,6 +3484,11 @@ no cached version is available.
 
 ";
 
+%feature("docstring") casadi::BSplineCommon::has_derivative "[INTERNAL]
+Can derivatives be calculated in any way?
+
+";
+
 %feature("docstring") casadi::BSplineCommon::checkArg "[INTERNAL]  Check if
 input arguments have correct length and dimensions.
 
@@ -3565,11 +3570,6 @@ Codegen decref for dependencies.
 
 %feature("docstring") casadi::BSplineCommon::nnz_out "[INTERNAL]  Number of
 input/output nonzeros.
-
-";
-
-%feature("docstring") casadi::BSplineCommon::hasDerivative "[INTERNAL]  Can
-derivatives be calculated in any way?
 
 ";
 
@@ -3960,11 +3960,6 @@ dependent function.
 
 %feature("docstring") casadi::BSplineDual::free_memory "[INTERNAL]  Free
 memory block.
-
-";
-
-%feature("docstring") casadi::BSplineDual::hasDerivative "[INTERNAL]  Can
-derivatives be calculated in any way?
 
 ";
 
@@ -4688,6 +4683,11 @@ expression.
 
 ";
 
+%feature("docstring") casadi::BSplineDual::has_derivative "[INTERNAL]  Can
+derivatives be calculated in any way?
+
+";
+
 %feature("docstring") casadi::BSplineDual::name_out "[INTERNAL]  Get output
 scheme name by index.
 
@@ -5163,11 +5163,6 @@ Diagrams
 
 C++ includes: bspline_interpolant.hpp ";
 
-%feature("docstring") casadi::BSplineInterpolant::hasDerivative "[INTERNAL]
-Can derivatives be calculated in any way?
-
-";
-
 %feature("docstring") casadi::BSplineInterpolant::repr "[INTERNAL]  Print.
 
 ";
@@ -5623,6 +5618,10 @@ function input(s) and output(s)
 
 %feature("docstring") casadi::BSplineInterpolant::free_mx "[INTERNAL]  Get
 free variables ( MX)
+
+";
+
+%feature("docstring") casadi::BSplineInterpolant::has_derivative "[INTERNAL]  Can derivatives be calculated in any way?
 
 ";
 
@@ -7270,11 +7269,6 @@ required length of iw field.
 
 ";
 
-%feature("docstring") casadi::Collocation::hasDerivative "[INTERNAL]  Can
-derivatives be calculated in any way?
-
-";
-
 %feature("docstring") casadi::Collocation::print_fstats "[INTERNAL]  Print
 statistics.
 
@@ -7333,6 +7327,11 @@ Extract the functions needed for the Lifted Newton method.
 
 %feature("docstring") casadi::Collocation::getAtomicInputReal "[INTERNAL]
 Get the floating point output argument of an atomic operation.
+
+";
+
+%feature("docstring") casadi::Collocation::has_derivative "[INTERNAL]  Can
+derivatives be calculated in any way?
 
 ";
 
@@ -8363,6 +8362,11 @@ expression.
 
 ";
 
+%feature("docstring") casadi::Conic::has_derivative "[INTERNAL]  Can
+derivatives be calculated in any way?
+
+";
+
 %feature("docstring") casadi::Conic::sx_in "[INTERNAL]  Get function
 input(s) and output(s)
 
@@ -8519,11 +8523,6 @@ expressions for the forward seeds.
 
 %feature("docstring") casadi::Conic::construct "[INTERNAL]  Construct
 Prepares the function for evaluation.
-
-";
-
-%feature("docstring") casadi::Conic::hasDerivative "[INTERNAL]  Can
-derivatives be calculated in any way?
 
 ";
 
@@ -10362,8 +10361,8 @@ outputs.
 
 ";
 
-%feature("docstring") casadi::Dple::clear_memory "[INTERNAL]  Clear all
-memory (called from destructor)
+%feature("docstring") casadi::Dple::has_derivative "[INTERNAL]  Can
+derivatives be calculated in any way?
 
 ";
 
@@ -10380,8 +10379,8 @@ input(s) and output(s)
 
 ";
 
-%feature("docstring") casadi::Dple::hasDerivative "[INTERNAL]  Can
-derivatives be calculated in any way?
+%feature("docstring") casadi::Dple::getAtomicInput "[INTERNAL]  Get the
+(integer) input arguments of an atomic operation.
 
 ";
 
@@ -10433,13 +10432,13 @@ dimensions.
 
 ";
 
-%feature("docstring") casadi::Dple::get_sparsity_out "[INTERNAL]
-Sparsities of function inputs and outputs.
+%feature("docstring") casadi::Dple::clear_memory "[INTERNAL]  Clear all
+memory (called from destructor)
 
 ";
 
-%feature("docstring") casadi::Dple::getAtomicInput "[INTERNAL]  Get the
-(integer) input arguments of an atomic operation.
+%feature("docstring") casadi::Dple::get_sparsity_out "[INTERNAL]
+Sparsities of function inputs and outputs.
 
 ";
 
@@ -10756,11 +10755,6 @@ instance.
 
 %feature("docstring") casadi::Expm::symbolic_output "[INTERNAL]  Get a
 vector of symbolic variables corresponding to the outputs.
-
-";
-
-%feature("docstring") casadi::Expm::hasDerivative "[INTERNAL]  Can
-derivatives be calculated in any way?
 
 ";
 
@@ -11245,6 +11239,11 @@ object.
 
 %feature("docstring") casadi::Expm::sz_res "[INTERNAL]  Get required length
 of res field.
+
+";
+
+%feature("docstring") casadi::Expm::has_derivative "[INTERNAL]  Can
+derivatives be calculated in any way?
 
 ";
 
@@ -11792,6 +11791,11 @@ sparsity of a given output.
 
 %feature("docstring") casadi::External::default_in "[INTERNAL]  Get default
 input value.
+
+";
+
+%feature("docstring") casadi::External::has_derivative "[INTERNAL]  Can
+derivatives be calculated in any way?
 
 ";
 
@@ -12533,11 +12537,6 @@ Symbolic expressions for the forward seeds.
 
 ";
 
-%feature("docstring") casadi::External::hasDerivative "[INTERNAL]  Can
-derivatives be calculated in any way?
-
-";
-
 %feature("docstring") casadi::External::clear_memory "[INTERNAL]  Clear all
 memory (called from destructor)
 
@@ -12818,11 +12817,6 @@ Construct Prepares the function for evaluation.
 
 %feature("docstring") casadi::FixedStepIntegrator::size2_out "[INTERNAL]
 Input/output dimensions.
-
-";
-
-%feature("docstring") casadi::FixedStepIntegrator::sparsity_jac "[INTERNAL]
-Get, if necessary generate, the sparsity of a Jacobian block.
 
 ";
 
@@ -13524,7 +13518,8 @@ Print solver statistics.
 
 ";
 
-%feature("docstring") casadi::FixedStepIntegrator::hasDerivative "[INTERNAL]  Can derivatives be calculated in any way?
+%feature("docstring") casadi::FixedStepIntegrator::sparsity_jac "[INTERNAL]
+Get, if necessary generate, the sparsity of a Jacobian block.
 
 ";
 
@@ -13584,6 +13579,10 @@ of the function.
 
 %feature("docstring") casadi::FixedStepIntegrator::get_n_in "[INTERNAL]
 Number of function inputs and outputs.
+
+";
+
+%feature("docstring") casadi::FixedStepIntegrator::has_derivative "[INTERNAL]  Can derivatives be calculated in any way?
 
 ";
 
@@ -14913,6 +14912,11 @@ the class able to propagate seeds through the algorithm?
 
 ";
 
+%feature("docstring") casadi::GenericExternal::has_derivative "[INTERNAL]
+Can derivatives be calculated in any way?
+
+";
+
 %feature("docstring") casadi::GenericExternal::generate_lifted "[INTERNAL]
 Extract the functions needed for the Lifted Newton method.
 
@@ -15250,11 +15254,6 @@ Full Jacobian.
 
 %feature("docstring") casadi::GenericExternal::size1_in "[INTERNAL]
 Input/output dimensions.
-
-";
-
-%feature("docstring") casadi::GenericExternal::hasDerivative "[INTERNAL]
-Can derivatives be calculated in any way?
 
 ";
 
@@ -17079,6 +17078,10 @@ Get a public class instance.
 
 ";
 
+%feature("docstring") casadi::ImplicitFixedStepIntegrator::has_derivative "[INTERNAL]  Can derivatives be calculated in any way?
+
+";
+
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::has_jacobian "[INTERNAL]  Return Jacobian of all input elements with respect to all output
 elements.
 
@@ -17119,10 +17122,6 @@ evaluate
 ";
 
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::mapsum_mx "[INTERNAL]  Parallel evaluation.
-
-";
-
-%feature("docstring") casadi::ImplicitFixedStepIntegrator::hasDerivative "[INTERNAL]  Can derivatives be calculated in any way?
 
 ";
 
@@ -17479,6 +17478,11 @@ variables (SX)
 
 ";
 
+%feature("docstring") casadi::ImplicitToNlp::has_derivative "[INTERNAL]
+Can derivatives be calculated in any way?
+
+";
+
 %feature("docstring") casadi::ImplicitToNlp::call_forward "[INTERNAL]
 Forward mode AD, virtual functions overloaded in derived classes.
 
@@ -17772,11 +17776,6 @@ Symbolic expressions for the adjoint seeds.
 
 %feature("docstring") casadi::ImplicitToNlp::~ImplicitToNlp "[INTERNAL]
 Destructor.
-
-";
-
-%feature("docstring") casadi::ImplicitToNlp::hasDerivative "[INTERNAL]  Can
-derivatives be calculated in any way?
 
 ";
 
@@ -18643,8 +18642,8 @@ with symbolic scalars.
 
 %feature("docstring") casadi::Integrator::t "[INTERNAL] ";
 
-%feature("docstring") casadi::Integrator::weak "[INTERNAL]  Get a weak
-reference to the object.
+%feature("docstring") casadi::Integrator::has_derivative "[INTERNAL]  Can
+derivatives be calculated in any way?
 
 ";
 
@@ -18805,11 +18804,6 @@ sparsity pattern of the extended Jacobian (forward problem)
 
 %feature("docstring") casadi::Integrator::alloc_iw "[INTERNAL]  Ensure
 required length of iw field.
-
-";
-
-%feature("docstring") casadi::Integrator::hasDerivative "[INTERNAL]  Can
-derivatives be calculated in any way?
 
 ";
 
@@ -19319,6 +19313,11 @@ dependent function.
 
 %feature("docstring") casadi::Integrator::name "[INTERNAL]  Name of the
 function.
+
+";
+
+%feature("docstring") casadi::Integrator::weak "[INTERNAL]  Get a weak
+reference to the object.
 
 ";
 
@@ -19849,8 +19848,8 @@ input/output nonzeros.
 
 ";
 
-%feature("docstring") casadi::Interpolant::alloc_w "[INTERNAL]  Ensure
-required length of w field.
+%feature("docstring") casadi::Interpolant::getCount "[INTERNAL]  Get the
+reference count.
 
 ";
 
@@ -20017,6 +20016,11 @@ simplified signature.
 
 %feature("docstring") casadi::Interpolant::generate_lifted "[INTERNAL]
 Extract the functions needed for the Lifted Newton method.
+
+";
+
+%feature("docstring") casadi::Interpolant::n_mem "[INTERNAL]  Maximum
+number of memory objects.
 
 ";
 
@@ -20224,11 +20228,6 @@ Generate code for the declarations of the C function.
 
 ";
 
-%feature("docstring") casadi::Interpolant::getCount "[INTERNAL]  Get the
-reference count.
-
-";
-
 %feature("docstring") casadi::Interpolant::sparsity_in "[INTERNAL]  Get
 sparsity of a given input.
 
@@ -20323,8 +20322,8 @@ with symbolic scalars.
 
 ";
 
-%feature("docstring") casadi::Interpolant::hasDerivative "[INTERNAL]  Can
-derivatives be calculated in any way?
+%feature("docstring") casadi::Interpolant::alloc_w "[INTERNAL]  Ensure
+required length of w field.
 
 ";
 
@@ -20357,8 +20356,8 @@ memory object.
 
 ";
 
-%feature("docstring") casadi::Interpolant::n_mem "[INTERNAL]  Maximum
-number of memory objects.
+%feature("docstring") casadi::Interpolant::has_derivative "[INTERNAL]  Can
+derivatives be calculated in any way?
 
 ";
 
@@ -20911,6 +20910,11 @@ dimensions of inputs and outputs.
 
 ";
 
+%feature("docstring") casadi::Jit::has_derivative "[INTERNAL]  Can
+derivatives be calculated in any way?
+
+";
+
 %feature("docstring") casadi::Jit::getAtomicOperation "[INTERNAL]  Get an
 atomic operation operator index.
 
@@ -20945,11 +20949,6 @@ is available.
 
 %feature("docstring") casadi::Jit::_set_temp "[INTERNAL]  Set the
 (temporary) work vectors.
-
-";
-
-%feature("docstring") casadi::Jit::hasDerivative "[INTERNAL]  Can
-derivatives be calculated in any way?
 
 ";
 
@@ -21840,6 +21839,11 @@ Generate the sparsity of a Jacobian block.
 
 ";
 
+%feature("docstring") casadi::LapackLu::has_derivative "[INTERNAL]  Can
+derivatives be calculated in any way?
+
+";
+
 %feature("docstring") casadi::LapackLu::symbolicFwdSeed "[INTERNAL]
 Symbolic expressions for the forward seeds.
 
@@ -21972,11 +21976,6 @@ statistics
 
 %feature("docstring") casadi::LapackLu::jac_sx "[INTERNAL]  Jacobian
 expression.
-
-";
-
-%feature("docstring") casadi::LapackLu::hasDerivative "[INTERNAL]  Can
-derivatives be calculated in any way?
 
 ";
 
@@ -23075,6 +23074,11 @@ output arguments that needs to be replaced.
 
 ";
 
+%feature("docstring") casadi::LapackQr::has_derivative "[INTERNAL]  Can
+derivatives be calculated in any way?
+
+";
+
 %feature("docstring") casadi::LapackQr::ad_weight "[INTERNAL]  Weighting
 factor for chosing forward/reverse mode.
 
@@ -23573,11 +23577,6 @@ name.
 
 ";
 
-%feature("docstring") casadi::LapackQr::hasDerivative "[INTERNAL]  Can
-derivatives be calculated in any way?
-
-";
-
 %feature("docstring") casadi::LapackQr::print_dimensions "[INTERNAL]  Print
 dimensions of inputs and outputs.
 
@@ -23941,11 +23940,6 @@ free variables ( MX)
 
 ";
 
-%feature("docstring") casadi::LinearInterpolant::hasDerivative "[INTERNAL]
-Can derivatives be calculated in any way?
-
-";
-
 %feature("docstring") casadi::LinearInterpolant::get_forward "[INTERNAL]
 Return function that calculates forward derivatives forward(nfwd) returns a
 cached instance if available, and calls  Function get_forward(int nfwd) if
@@ -24001,8 +23995,8 @@ Number of function inputs and outputs.
 
 ";
 
-%feature("docstring") casadi::LinearInterpolant::checkInputs "[INTERNAL]
-Check if the numerical values of the supplied bounds make sense.
+%feature("docstring") casadi::LinearInterpolant::has_derivative "[INTERNAL]
+Can derivatives be calculated in any way?
 
 ";
 
@@ -24235,6 +24229,11 @@ Is codegen supported?
 
 %feature("docstring") casadi::LinearInterpolant::n_nodes "[INTERNAL]
 Number of nodes in the algorithm.
+
+";
+
+%feature("docstring") casadi::LinearInterpolant::checkInputs "[INTERNAL]
+Check if the numerical values of the supplied bounds make sense.
 
 ";
 
@@ -24891,8 +24890,7 @@ Get sparsity of a given input.
 
 ";
 
-%feature("docstring") casadi::LinearInterpolantJac::index_in "[INTERNAL]
-Get input scheme index by name.
+%feature("docstring") casadi::LinearInterpolantJac::has_derivative "[INTERNAL]  Can derivatives be calculated in any way?
 
 ";
 
@@ -25482,7 +25480,8 @@ Number of function inputs and outputs.
 
 ";
 
-%feature("docstring") casadi::LinearInterpolantJac::hasDerivative "[INTERNAL]  Can derivatives be calculated in any way?
+%feature("docstring") casadi::LinearInterpolantJac::index_in "[INTERNAL]
+Get input scheme index by name.
 
 ";
 
@@ -25942,6 +25941,11 @@ Cholesky.
 
 %feature("docstring") casadi::Lsqr::size_in "[INTERNAL]  Input/output
 dimensions.
+
+";
+
+%feature("docstring") casadi::Lsqr::has_derivative "[INTERNAL]  Can
+derivatives be calculated in any way?
 
 ";
 
@@ -26777,11 +26781,6 @@ inputs and outputs.
 
 ";
 
-%feature("docstring") casadi::Lsqr::hasDerivative "[INTERNAL]  Can
-derivatives be calculated in any way?
-
-";
-
 %feature("docstring") casadi::Lsqr::eval "[INTERNAL]  Evaluate numerically.
 
 ";
@@ -27153,6 +27152,11 @@ dependencies.
 
 ";
 
+%feature("docstring") casadi::Map::alloc_w "[INTERNAL]  Ensure required
+length of w field.
+
+";
+
 %feature("docstring") casadi::Map::generateDeclarations "[INTERNAL]
 Generate code for the declarations of the C function.
 
@@ -27220,8 +27224,8 @@ statistics
 
 ";
 
-%feature("docstring") casadi::Map::alloc_w "[INTERNAL]  Ensure required
-length of w field.
+%feature("docstring") casadi::Map::has_derivative "[INTERNAL]  Can
+derivatives be calculated in any way?
 
 ";
 
@@ -27593,11 +27597,6 @@ of res field.
 
 %feature("docstring") casadi::Map::adjViaJac "[INTERNAL]  Calculate
 derivatives by multiplying the full Jacobian and multiplying.
-
-";
-
-%feature("docstring") casadi::Map::hasDerivative "[INTERNAL]  Can
-derivatives be calculated in any way?
 
 ";
 
@@ -27978,6 +27977,11 @@ statistics
 
 ";
 
+%feature("docstring") casadi::MapOmp::alloc_res "[INTERNAL]  Ensure
+required length of res field.
+
+";
+
 %feature("docstring") casadi::MapOmp::nnz_out "[INTERNAL]  Number of
 input/output nonzeros.
 
@@ -28297,11 +28301,6 @@ propagate sparsities.
 
 ";
 
-%feature("docstring") casadi::MapOmp::hasDerivative "[INTERNAL]  Can
-derivatives be calculated in any way?
-
-";
-
 %feature("docstring") casadi::MapOmp::size1_in "[INTERNAL]  Input/output
 dimensions.
 
@@ -28514,8 +28513,8 @@ number of atomic operations.
 
 ";
 
-%feature("docstring") casadi::MapOmp::alloc_res "[INTERNAL]  Ensure
-required length of res field.
+%feature("docstring") casadi::MapOmp::has_derivative "[INTERNAL]  Can
+derivatives be calculated in any way?
 
 ";
 
@@ -31137,6 +31136,11 @@ dimensions.
 
 ";
 
+%feature("docstring") casadi::Newton::has_derivative "[INTERNAL]  Can
+derivatives be calculated in any way?
+
+";
+
 %feature("docstring") casadi::Newton::call_reverse "[INTERNAL]  Reverse
 mode, virtual functions overloaded in derived classes.
 
@@ -31191,11 +31195,6 @@ input(s) and output(s)
 
 %feature("docstring") casadi::Newton::free_mx "[INTERNAL]  Get free
 variables ( MX)
-
-";
-
-%feature("docstring") casadi::Newton::hasDerivative "[INTERNAL]  Can
-derivatives be calculated in any way?
 
 ";
 
@@ -31335,11 +31334,6 @@ input(s) and output(s)
 ";
 
 %feature("docstring") casadi::Nlpsol::get_function "[INTERNAL] ";
-
-%feature("docstring") casadi::Nlpsol::clear_memory "[INTERNAL]  Clear all
-memory (called from destructor)
-
-";
 
 %feature("docstring") casadi::Nlpsol::signature "[INTERNAL]  Code generate
 the function.
@@ -32157,6 +32151,11 @@ discrete variables be treated.
 
 ";
 
+%feature("docstring") casadi::Nlpsol::has_derivative "[INTERNAL]  Can
+derivatives be calculated in any way?
+
+";
+
 %feature("docstring") casadi::Nlpsol::eval_sx "[INTERNAL]  Evaluate with
 symbolic scalars.
 
@@ -32247,8 +32246,8 @@ expression.
 
 ";
 
-%feature("docstring") casadi::Nlpsol::hasDerivative "[INTERNAL]  Can
-derivatives be calculated in any way?
+%feature("docstring") casadi::Nlpsol::clear_memory "[INTERNAL]  Clear all
+memory (called from destructor)
 
 ";
 
@@ -32785,11 +32784,6 @@ function, overloaded.
 
 ";
 
-%feature("docstring") casadi::OracleFunction::hasDerivative "[INTERNAL]
-Can derivatives be calculated in any way?
-
-";
-
 %feature("docstring") casadi::OracleFunction::checkRes "[INTERNAL]  Check
 if output arguments have correct length and dimensions.
 
@@ -32799,6 +32793,11 @@ if output arguments have correct length and dimensions.
 function that calculates adjoint derivatives reverse(nadj) returns a cached
 instance if available, and calls  Function get_reverse(int nadj) if no
 cached version is available.
+
+";
+
+%feature("docstring") casadi::OracleFunction::has_derivative "[INTERNAL]
+Can derivatives be calculated in any way?
 
 ";
 
@@ -33658,11 +33657,6 @@ cached version is available.
 
 ";
 
-%feature("docstring") casadi::QpToNlp::hasDerivative "[INTERNAL]  Can
-derivatives be calculated in any way?
-
-";
-
 %feature("docstring") casadi::QpToNlp::hess_sx "[INTERNAL]  Hessian
 expression.
 
@@ -33717,6 +33711,11 @@ Symbolic expressions for the forward seeds.
 
 %feature("docstring") casadi::QpToNlp::get_jacobian "[INTERNAL]  Return
 Jacobian of all input elements with respect to all output elements.
+
+";
+
+%feature("docstring") casadi::QpToNlp::has_derivative "[INTERNAL]  Can
+derivatives be calculated in any way?
 
 ";
 
@@ -34538,8 +34537,8 @@ derivatives by multiplying the full Jacobian and multiplying.
 
 
 // File: classcasadi_1_1Rootfinder.xml
-%feature("docstring") casadi::Rootfinder::checkInputs "[INTERNAL]  Check if
-the numerical values of the supplied bounds make sense.
+%feature("docstring") casadi::Rootfinder::has_derivative "[INTERNAL]  Can
+derivatives be calculated in any way?
 
 ";
 
@@ -35135,11 +35134,6 @@ Jacobian of all input elements with respect to all output elements.
 
 ";
 
-%feature("docstring") casadi::Rootfinder::hasDerivative "[INTERNAL]  Can
-derivatives be calculated in any way?
-
-";
-
 %feature("docstring") casadi::Rootfinder::get_jacobian "[INTERNAL]  Return
 Jacobian of all input elements with respect to all output elements.
 
@@ -35217,6 +35211,11 @@ structure recognition.
 
 %feature("docstring") casadi::Rootfinder::print_free "[INTERNAL]  Print
 free variables.
+
+";
+
+%feature("docstring") casadi::Rootfinder::checkInputs "[INTERNAL]  Check if
+the numerical values of the supplied bounds make sense.
 
 ";
 
@@ -36041,6 +36040,11 @@ length of the work vector.
 
 ";
 
+%feature("docstring") casadi::RungeKutta::has_derivative "[INTERNAL]  Can
+derivatives be calculated in any way?
+
+";
+
 %feature("docstring") casadi::RungeKutta::advance "[INTERNAL]  Advance
 solution in time.
 
@@ -36137,11 +36141,6 @@ expression.
 
 %feature("docstring") casadi::RungeKutta::sp_weight "[INTERNAL]  Weighting
 factor for chosing forward/reverse mode, sparsity propagation.
-
-";
-
-%feature("docstring") casadi::RungeKutta::hasDerivative "[INTERNAL]  Can
-derivatives be calculated in any way?
 
 ";
 
@@ -37338,6 +37337,11 @@ input/output nonzeros.
 
 ";
 
+%feature("docstring") casadi::Scpgen::has_derivative "[INTERNAL]  Can
+derivatives be calculated in any way?
+
+";
+
 %feature("docstring") casadi::Scpgen::eval_sx "[INTERNAL]  Evaluate with
 symbolic scalars.
 
@@ -37587,11 +37591,6 @@ Diagrams
 
 
 C++ includes: scpgen.hpp ";
-
-%feature("docstring") casadi::Scpgen::hasDerivative "[INTERNAL]  Can
-derivatives be calculated in any way?
-
-";
 
 %feature("docstring") casadi::Scpgen::get_n_in "[INTERNAL]  Number of
 function inputs and outputs.
@@ -38081,11 +38080,6 @@ Number of nodes in the algorithm.
 
 ";
 
-%feature("docstring") casadi::SimplifiedExternal::hasDerivative "[INTERNAL]
-Can derivatives be calculated in any way?
-
-";
-
 %feature("docstring") casadi::SimplifiedExternal::numel_out "[INTERNAL]
 Number of input/output elements.
 
@@ -38178,8 +38172,7 @@ Number of function inputs and outputs.
 
 ";
 
-%feature("docstring") casadi::SimplifiedExternal::signature "[INTERNAL]
-Code generate the function.
+%feature("docstring") casadi::SimplifiedExternal::getAtomicInput "[INTERNAL]  Get the (integer) input arguments of an atomic operation.
 
 ";
 
@@ -38210,6 +38203,11 @@ Evaluate with symbolic scalars.
 
 %feature("docstring") casadi::SimplifiedExternal::alloc_res "[INTERNAL]
 Ensure required length of res field.
+
+";
+
+%feature("docstring") casadi::SimplifiedExternal::signature "[INTERNAL]
+Code generate the function.
 
 ";
 
@@ -38337,7 +38335,7 @@ free variables ( MX)
 
 ";
 
-%feature("docstring") casadi::SimplifiedExternal::getAtomicInput "[INTERNAL]  Get the (integer) input arguments of an atomic operation.
+%feature("docstring") casadi::SimplifiedExternal::replaceFwdSeed "[INTERNAL]  Replace 0-by-0 forward seeds.
 
 ";
 
@@ -38518,7 +38516,7 @@ Tangent expression.
 
 ";
 
-%feature("docstring") casadi::SimplifiedExternal::replaceFwdSeed "[INTERNAL]  Replace 0-by-0 forward seeds.
+%feature("docstring") casadi::SimplifiedExternal::has_derivative "[INTERNAL]  Can derivatives be calculated in any way?
 
 ";
 
@@ -39335,8 +39333,8 @@ dependent function.
 
 ";
 
-%feature("docstring") casadi::SlicotDple::hasDerivative "[INTERNAL]  Can
-derivatives be calculated in any way?
+%feature("docstring") casadi::SlicotDple::matchingRes "[INTERNAL]  Check if
+output arguments that needs to be replaced.
 
 ";
 
@@ -39406,6 +39404,11 @@ mode, virtual functions overloaded in derived classes.
 
 %feature("docstring") casadi::SlicotDple::sz_arg "[INTERNAL]  Get required
 length of arg field.
+
+";
+
+%feature("docstring") casadi::SlicotDple::has_derivative "[INTERNAL]  Can
+derivatives be calculated in any way?
 
 ";
 
@@ -39645,11 +39648,6 @@ default input value.
 
 ";
 
-%feature("docstring") casadi::SlicotDple::matchingRes "[INTERNAL]  Check if
-output arguments that needs to be replaced.
-
-";
-
 %feature("docstring") casadi::SlicotDple::has_reverse "[INTERNAL]  Generate
 a function that calculates nadj adjoint derivatives.
 
@@ -39788,13 +39786,13 @@ required length of arg field.
 // File: classcasadi_1_1SlicotExpm.xml
 %feature("docstring") casadi::SlicotExpm::plugin_name "[INTERNAL] ";
 
-%feature("docstring") casadi::SlicotExpm::hasDerivative "[INTERNAL]  Can
-derivatives be calculated in any way?
+%feature("docstring") casadi::SlicotExpm::getAtomicInput "[INTERNAL]  Get
+the (integer) input arguments of an atomic operation.
 
 ";
 
-%feature("docstring") casadi::SlicotExpm::getAtomicInput "[INTERNAL]  Get
-the (integer) input arguments of an atomic operation.
+%feature("docstring") casadi::SlicotExpm::has_derivative "[INTERNAL]  Can
+derivatives be calculated in any way?
 
 ";
 
@@ -42373,11 +42371,6 @@ Symbolic expressions for the adjoint seeds.
 
 ";
 
-%feature("docstring") casadi::Sqpmethod::hasDerivative "[INTERNAL]  Can
-derivatives be calculated in any way?
-
-";
-
 %feature("docstring") casadi::Sqpmethod::get_forward "[INTERNAL]  Return
 function that calculates forward derivatives forward(nfwd) returns a cached
 instance if available, and calls  Function get_forward(int nfwd) if no
@@ -42791,6 +42784,11 @@ all information there is to know about a certain option.
 
 ";
 
+%feature("docstring") casadi::Sqpmethod::has_derivative "[INTERNAL]  Can
+derivatives be calculated in any way?
+
+";
+
 %feature("docstring") casadi::Sqpmethod::simplifiedCall "[INTERNAL]  Use
 simplified signature.
 
@@ -43155,6 +43153,11 @@ function is of a particular type.
 
 %feature("docstring") casadi::Switch::getAlgorithmSize "[INTERNAL]  Get the
 number of atomic operations.
+
+";
+
+%feature("docstring") casadi::Switch::has_derivative "[INTERNAL]  Can
+derivatives be calculated in any way?
 
 ";
 
@@ -43752,11 +43755,6 @@ code for the body of the C function.
 
 ";
 
-%feature("docstring") casadi::Switch::hasDerivative "[INTERNAL]  Can
-derivatives be calculated in any way?
-
-";
-
 %feature("docstring") casadi::Switch::getJacSparsityHierarchical "[INTERNAL]  A flavor of getJacSparsity that does hierarchical block
 structure recognition.
 
@@ -43908,6 +43906,11 @@ Generate code for the declarations of the C function.
 
 
 // File: classcasadi_1_1SymbolicQr.xml
+%feature("docstring") casadi::SymbolicQr::has_derivative "[INTERNAL]  Can
+derivatives be calculated in any way?
+
+";
+
 %feature("docstring") casadi::SymbolicQr::grad_mx "[INTERNAL]  Gradient
 expression.
 
@@ -44604,11 +44607,6 @@ the (integer) output argument of an atomic operation.
 
 %feature("docstring") casadi::SymbolicQr::free_mx "[INTERNAL]  Get free
 variables ( MX)
-
-";
-
-%feature("docstring") casadi::SymbolicQr::hasDerivative "[INTERNAL]  Can
-derivatives be calculated in any way?
 
 ";
 

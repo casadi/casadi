@@ -211,6 +211,13 @@ persistent=false) "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::getJacSparsity(int iind,
+int oind, bool symmetric) const  "
+
+[INTERNAL]  Generate the sparsity of a Jacobian block.
+
+";
+
 %feature("docstring")  casadi::Blocksqp::init(const Dict &opts) override "
 
 [INTERNAL]  Initialize.
@@ -1658,10 +1665,9 @@ std::vector< MX > &arg) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getJacSparsity(int iind,
-int oind, bool symmetric) const  "
+%feature("docstring")  casadi::FunctionInternal::has_derivative() const  "
 
-[INTERNAL]  Generate the sparsity of a Jacobian block.
+[INTERNAL]  Can derivatives be calculated in any way?
 
 ";
 
@@ -1719,12 +1725,6 @@ double **arg, double **res, int *iw, double *w) const override "
 [INTERNAL]  Return function that calculates forward derivatives
 forward(nfwd) returns a cached instance if available, and calls  Function
 get_forward(int nfwd) if no cached version is available.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::hasDerivative() const  "
-
-[INTERNAL]  Can derivatives be calculated in any way?
 
 ";
 
@@ -2585,12 +2585,6 @@ multiplying.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::hasDerivative() const  "
-
-[INTERNAL]  Can derivatives be calculated in any way?
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::log(const std::string &msg)
 const  "
 
@@ -3139,6 +3133,12 @@ propagation.
 %feature("docstring")  casadi::FunctionInternal::memory(int ind) const  "
 
 [INTERNAL]  Memory objects.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::has_derivative() const  "
+
+[INTERNAL]  Can derivatives be calculated in any way?
 
 ";
 
@@ -4678,6 +4678,12 @@ get_reverse(int nadj) if no cached version is available.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::has_derivative() const  "
+
+[INTERNAL]  Can derivatives be calculated in any way?
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::checkArg(const std::vector<
 M > &arg, bool hcat=false) const  "
 
@@ -4796,12 +4802,6 @@ casadi::FunctionInternal::codegen_decref(CodeGenerator &g) const  "
 %feature("docstring")  casadi::FunctionInternal::nnz_out(int ind) const  "
 
 [INTERNAL]  Number of input/output nonzeros.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::hasDerivative() const  "
-
-[INTERNAL]  Can derivatives be calculated in any way?
 
 ";
 
@@ -5368,12 +5368,6 @@ classes.
 const  "
 
 [INTERNAL]  Free memory block.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::hasDerivative() const  "
-
-[INTERNAL]  Can derivatives be calculated in any way?
 
 ";
 
@@ -6329,6 +6323,12 @@ oind=0) "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::has_derivative() const  "
+
+[INTERNAL]  Can derivatives be calculated in any way?
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::name_out(int ind) const  "
 
 [INTERNAL]  Get output scheme name by index.
@@ -6985,12 +6985,6 @@ Diagrams
 
 
 C++ includes: bspline_interpolant.hpp ";
-
-%feature("docstring")  casadi::FunctionInternal::hasDerivative() const  "
-
-[INTERNAL]  Can derivatives be calculated in any way?
-
-";
 
 %feature("docstring")  casadi::FunctionInternal::repr(std::ostream &stream)
 const override "
@@ -7672,6 +7666,12 @@ std::string &fname) "
 %feature("docstring")  casadi::FunctionInternal::free_mx() const  "
 
 [INTERNAL]  Get free variables ( MX)
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::has_derivative() const  "
+
+[INTERNAL]  Can derivatives be calculated in any way?
 
 ";
 
@@ -10052,12 +10052,6 @@ persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::hasDerivative() const  "
-
-[INTERNAL]  Can derivatives be calculated in any way?
-
-";
-
 %feature("docstring")  casadi::OracleFunction::print_fstats(const
 OracleMemory *m) const  "
 
@@ -10149,6 +10143,12 @@ casadi::FunctionInternal::codegen_incref(CodeGenerator &g) const  "
 const  "
 
 [INTERNAL]  Get the floating point output argument of an atomic operation.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::has_derivative() const  "
+
+[INTERNAL]  Can derivatives be calculated in any way?
 
 ";
 
@@ -11628,6 +11628,12 @@ const Dict &opts) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::has_derivative() const  "
+
+[INTERNAL]  Can derivatives be calculated in any way?
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::sx_in(int ind) const  "
 
 [INTERNAL]  Get function input(s) and output(s)
@@ -11862,12 +11868,6 @@ const std::vector< MatType > &v) const  "
 "
 
 [INTERNAL]  Construct Prepares the function for evaluation.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::hasDerivative() const  "
-
-[INTERNAL]  Can derivatives be calculated in any way?
 
 ";
 
@@ -14125,9 +14125,9 @@ std::vector< M > &res) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::clear_memory() "
+%feature("docstring")  casadi::FunctionInternal::has_derivative() const  "
 
-[INTERNAL]  Clear all memory (called from destructor)
+[INTERNAL]  Can derivatives be calculated in any way?
 
 ";
 
@@ -14155,9 +14155,10 @@ std::vector< M > &res) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::hasDerivative() const  "
+%feature("docstring")  casadi::FunctionInternal::getAtomicInput(int k) const
+"
 
-[INTERNAL]  Can derivatives be calculated in any way?
+[INTERNAL]  Get the (integer) input arguments of an atomic operation.
 
 ";
 
@@ -14227,16 +14228,15 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::Dple::get_sparsity_out(int i) override "
+%feature("docstring")  casadi::FunctionInternal::clear_memory() "
 
-[INTERNAL]  Sparsities of function inputs and outputs.
+[INTERNAL]  Clear all memory (called from destructor)
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicInput(int k) const
-"
+%feature("docstring")  casadi::Dple::get_sparsity_out(int i) override "
 
-[INTERNAL]  Get the (integer) input arguments of an atomic operation.
+[INTERNAL]  Sparsities of function inputs and outputs.
 
 ";
 
@@ -14695,12 +14695,6 @@ bvec_t **res, int *iw, bvec_t *w, int mem) const  "
 std::vector< MX > &arg) const  "
 
 [INTERNAL]  Get a vector of symbolic variables corresponding to the outputs.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::hasDerivative() const  "
-
-[INTERNAL]  Can derivatives be calculated in any way?
 
 ";
 
@@ -15413,6 +15407,12 @@ MX > &arg, const std::string &parallelization) "
 %feature("docstring")  casadi::FunctionInternal::sz_res() const  "
 
 [INTERNAL]  Get required length of res field.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::has_derivative() const  "
+
+[INTERNAL]  Can derivatives be calculated in any way?
 
 ";
 
@@ -16153,6 +16153,12 @@ std::string &iname) const  "
 "
 
 [INTERNAL]  Get default input value.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::has_derivative() const  "
+
+[INTERNAL]  Can derivatives be calculated in any way?
 
 ";
 
@@ -17220,12 +17226,6 @@ const std::vector< MatType > &v) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::hasDerivative() const  "
-
-[INTERNAL]  Can derivatives be calculated in any way?
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::clear_memory() "
 
 [INTERNAL]  Clear all memory (called from destructor)
@@ -17649,13 +17649,6 @@ override "
 %feature("docstring")  casadi::FunctionInternal::size2_out(int ind) const  "
 
 [INTERNAL]  Input/output dimensions.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::sparsity_jac(int iind, int
-oind, bool compact, bool symmetric) const  "
-
-[INTERNAL]  Get, if necessary generate, the sparsity of a Jacobian block.
 
 ";
 
@@ -18687,9 +18680,10 @@ override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::hasDerivative() const  "
+%feature("docstring")  casadi::FunctionInternal::sparsity_jac(int iind, int
+oind, bool compact, bool symmetric) const  "
 
-[INTERNAL]  Can derivatives be calculated in any way?
+[INTERNAL]  Get, if necessary generate, the sparsity of a Jacobian block.
 
 ";
 
@@ -18778,6 +18772,12 @@ oind=0) "
 %feature("docstring")  casadi::Integrator::get_n_in() override "
 
 [INTERNAL]  Number of function inputs and outputs.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::has_derivative() const  "
+
+[INTERNAL]  Can derivatives be calculated in any way?
 
 ";
 
@@ -20656,6 +20656,12 @@ std::string &iname) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::has_derivative() const  "
+
+[INTERNAL]  Can derivatives be calculated in any way?
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::generate_lifted(Function
 &vdef_fcn, Function &vinit_fcn) const  "
 
@@ -21153,12 +21159,6 @@ std::string > &onames, const Dict &opts) const override "
 %feature("docstring")  casadi::FunctionInternal::size1_in(int ind) const  "
 
 [INTERNAL]  Input/output dimensions.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::hasDerivative() const  "
-
-[INTERNAL]  Can derivatives be calculated in any way?
 
 ";
 
@@ -23642,6 +23642,12 @@ casadi::FunctionInternal::generateDeclarations(CodeGenerator &g) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::has_derivative() const  "
+
+[INTERNAL]  Can derivatives be calculated in any way?
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::has_jacobian() const  "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
@@ -23709,12 +23715,6 @@ oind=0) "
 std::vector< MX > &arg, const std::string &parallelization) "
 
 [INTERNAL]  Parallel evaluation.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::hasDerivative() const  "
-
-[INTERNAL]  Can derivatives be calculated in any way?
 
 ";
 
@@ -24319,6 +24319,12 @@ size_t &sz_res, size_t &sz_iw, size_t &sz_w) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::has_derivative() const  "
+
+[INTERNAL]  Can derivatives be calculated in any way?
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::call_forward(const
 std::vector< MX > &arg, const std::vector< MX > &res, const std::vector<
 std::vector< MX > > &fseed, std::vector< std::vector< MX > > &fsens, bool
@@ -24729,12 +24735,6 @@ const std::vector< MatType > &v) const  "
 %feature("docstring") casadi::ImplicitToNlp::~ImplicitToNlp "
 
 [INTERNAL]  Destructor.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::hasDerivative() const  "
-
-[INTERNAL]  Can derivatives be calculated in any way?
 
 ";
 
@@ -25914,9 +25914,9 @@ SXElem **res, int *iw, SXElem *w, int mem) const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::SharedObjectInternal::weak() "
+%feature("docstring")  casadi::FunctionInternal::has_derivative() const  "
 
-[INTERNAL]  Get a weak reference to the object.
+[INTERNAL]  Can derivatives be calculated in any way?
 
 ";
 
@@ -26155,12 +26155,6 @@ problem)
 persistent=false) "
 
 [INTERNAL]  Ensure required length of iw field.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::hasDerivative() const  "
-
-[INTERNAL]  Can derivatives be calculated in any way?
 
 ";
 
@@ -26872,6 +26866,12 @@ std::string &iname) const  "
 %feature("docstring")  casadi::FunctionInternal::name() const  "
 
 [INTERNAL]  Name of the function.
+
+";
+
+%feature("docstring")  casadi::SharedObjectInternal::weak() "
+
+[INTERNAL]  Get a weak reference to the object.
 
 ";
 
@@ -27685,10 +27685,9 @@ double **arg, double **res, int *iw, double *w) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::alloc_w(size_t sz_w, bool
-persistent=false) "
+%feature("docstring")  casadi::SharedObjectInternal::getCount() const  "
 
-[INTERNAL]  Ensure required length of w field.
+[INTERNAL]  Get the reference count.
 
 ";
 
@@ -27909,6 +27908,12 @@ elements.
 &vdef_fcn, Function &vinit_fcn) const  "
 
 [INTERNAL]  Extract the functions needed for the Lifted Newton method.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::n_mem() const  "
+
+[INTERNAL]  Maximum number of memory objects.
 
 ";
 
@@ -28208,12 +28213,6 @@ casadi::FunctionInternal::generateDeclarations(CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")  casadi::SharedObjectInternal::getCount() const  "
-
-[INTERNAL]  Get the reference count.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::sparsity_in(int ind) const
 "
 
@@ -28359,9 +28358,10 @@ SXElem **res, int *iw, SXElem *w, int mem) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::hasDerivative() const  "
+%feature("docstring")  casadi::FunctionInternal::alloc_w(size_t sz_w, bool
+persistent=false) "
 
-[INTERNAL]  Can derivatives be calculated in any way?
+[INTERNAL]  Ensure required length of w field.
 
 ";
 
@@ -28408,9 +28408,9 @@ std::string &fname, const Dict &opts) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::n_mem() const  "
+%feature("docstring")  casadi::FunctionInternal::has_derivative() const  "
 
-[INTERNAL]  Maximum number of memory objects.
+[INTERNAL]  Can derivatives be calculated in any way?
 
 ";
 
@@ -29222,6 +29222,12 @@ casadi::FunctionInternal::print_dimensions(std::ostream &stream) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::has_derivative() const  "
+
+[INTERNAL]  Can derivatives be calculated in any way?
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::getAtomicOperation(int k)
 const  "
 
@@ -29268,12 +29274,6 @@ get_reverse(int nadj) if no cached version is available.
 %feature("docstring") casadi::Jit::_set_temp "
 
 [INTERNAL]  Set the (temporary) work vectors.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::hasDerivative() const  "
-
-[INTERNAL]  Can derivatives be calculated in any way?
 
 ";
 
@@ -30481,6 +30481,12 @@ Sparsity &sp, int iind, int oind, bool compact) "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::has_derivative() const  "
+
+[INTERNAL]  Can derivatives be calculated in any way?
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::symbolicFwdSeed(int nfwd,
 const std::vector< MatType > &v) const  "
 
@@ -30678,12 +30684,6 @@ hcat:  check if horizontal repetion of the function input is allowed
 const Dict &opts) const  "
 
 [INTERNAL]  Jacobian expression.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::hasDerivative() const  "
-
-[INTERNAL]  Can derivatives be calculated in any way?
 
 ";
 
@@ -32101,6 +32101,12 @@ std::vector< M > &arg) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::has_derivative() const  "
+
+[INTERNAL]  Can derivatives be calculated in any way?
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::ad_weight() const  "
 
 [INTERNAL]  Weighting factor for chosing forward/reverse mode.
@@ -32822,12 +32828,6 @@ const std::vector< MatType > &v) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::hasDerivative() const  "
-
-[INTERNAL]  Can derivatives be calculated in any way?
-
-";
-
 %feature("docstring")
 casadi::FunctionInternal::print_dimensions(std::ostream &stream) const  "
 
@@ -33381,12 +33381,6 @@ std::string &iname) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::hasDerivative() const  "
-
-[INTERNAL]  Can derivatives be calculated in any way?
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::get_forward(int nfwd, const
 std::string &name, const std::vector< std::string > &inames, const
 std::vector< std::string > &onames, const Dict &opts) const  "
@@ -33465,9 +33459,9 @@ bool persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::checkInputs() const  "
+%feature("docstring")  casadi::FunctionInternal::has_derivative() const  "
 
-[INTERNAL]  Check if the numerical values of the supplied bounds make sense.
+[INTERNAL]  Can derivatives be calculated in any way?
 
 ";
 
@@ -33800,6 +33794,12 @@ override "
 %feature("docstring")  casadi::FunctionInternal::n_nodes() const  "
 
 [INTERNAL]  Number of nodes in the algorithm.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::checkInputs() const  "
+
+[INTERNAL]  Check if the numerical values of the supplied bounds make sense.
 
 ";
 
@@ -34764,10 +34764,9 @@ std::string &iname) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::index_in(const std::string
-&name) const  "
+%feature("docstring")  casadi::FunctionInternal::has_derivative() const  "
 
-[INTERNAL]  Get input scheme index by name.
+[INTERNAL]  Can derivatives be calculated in any way?
 
 ";
 
@@ -35649,9 +35648,10 @@ casadi::FunctionInternal::print_dimensions(std::ostream &stream) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::hasDerivative() const  "
+%feature("docstring")  casadi::FunctionInternal::index_in(const std::string
+&name) const  "
 
-[INTERNAL]  Can derivatives be calculated in any way?
+[INTERNAL]  Get input scheme index by name.
 
 ";
 
@@ -36199,6 +36199,12 @@ double *x, int nrhs, bool tr) const  "
 %feature("docstring")  casadi::FunctionInternal::size_in(int ind) const  "
 
 [INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::has_derivative() const  "
+
+[INTERNAL]  Can derivatives be calculated in any way?
 
 ";
 
@@ -37322,12 +37328,6 @@ const std::vector< MatType > &v) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::hasDerivative() const  "
-
-[INTERNAL]  Can derivatives be calculated in any way?
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::eval(void *mem, const
 double **arg, double **res, int *iw, double *w) const  "
 
@@ -37878,6 +37878,13 @@ std::string &fname) "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::alloc_w(size_t sz_w, bool
+persistent=false) "
+
+[INTERNAL]  Ensure required length of w field.
+
+";
+
 %feature("docstring")  casadi::Map::generateDeclarations(CodeGenerator &g)
 const override "
 
@@ -37988,10 +37995,9 @@ MX > &arg, const std::string &parallelization) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::alloc_w(size_t sz_w, bool
-persistent=false) "
+%feature("docstring")  casadi::FunctionInternal::has_derivative() const  "
 
-[INTERNAL]  Ensure required length of w field.
+[INTERNAL]  Can derivatives be calculated in any way?
 
 ";
 
@@ -38540,12 +38546,6 @@ multiplying.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::hasDerivative() const  "
-
-[INTERNAL]  Can derivatives be calculated in any way?
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::symbolicFwdSeed(int nfwd,
 const std::vector< MatType > &v) const  "
 
@@ -39088,6 +39088,13 @@ oind=0) "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::alloc_res(size_t sz_res,
+bool persistent=false) "
+
+[INTERNAL]  Ensure required length of res field.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::nnz_out() const  "
 
 [INTERNAL]  Number of input/output nonzeros.
@@ -39553,12 +39560,6 @@ T *w) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::hasDerivative() const  "
-
-[INTERNAL]  Can derivatives be calculated in any way?
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::size1_in(int ind) const  "
 
 [INTERNAL]  Input/output dimensions.
@@ -39869,10 +39870,9 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::alloc_res(size_t sz_res,
-bool persistent=false) "
+%feature("docstring")  casadi::FunctionInternal::has_derivative() const  "
 
-[INTERNAL]  Ensure required length of res field.
+[INTERNAL]  Can derivatives be calculated in any way?
 
 ";
 
@@ -43365,6 +43365,12 @@ Sparsity &sp, int iind, int oind, bool compact) "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::has_derivative() const  "
+
+[INTERNAL]  Can derivatives be calculated in any way?
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::call_reverse(const
 std::vector< MX > &arg, const std::vector< MX > &res, const std::vector<
 std::vector< MX > > &aseed, std::vector< std::vector< MX > > &asens, bool
@@ -43465,12 +43471,6 @@ override "
 %feature("docstring")  casadi::FunctionInternal::free_mx() const  "
 
 [INTERNAL]  Get free variables ( MX)
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::hasDerivative() const  "
-
-[INTERNAL]  Can derivatives be calculated in any way?
 
 ";
 
@@ -43674,12 +43674,6 @@ const override "
 std::string &name) const override "
 
 [INTERNAL] ";
-
-%feature("docstring")  casadi::FunctionInternal::clear_memory() "
-
-[INTERNAL]  Clear all memory (called from destructor)
-
-";
 
 %feature("docstring")  casadi::FunctionInternal::signature(const std::string
 &fname) const  "
@@ -44826,6 +44820,12 @@ persistent=false) "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::has_derivative() const  "
+
+[INTERNAL]  Can derivatives be calculated in any way?
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::eval_sx(const SXElem **arg,
 SXElem **res, int *iw, SXElem *w, int mem) const  "
 
@@ -44954,9 +44954,9 @@ const Dict &opts) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::hasDerivative() const  "
+%feature("docstring")  casadi::FunctionInternal::clear_memory() "
 
-[INTERNAL]  Can derivatives be calculated in any way?
+[INTERNAL]  Clear all memory (called from destructor)
 
 ";
 
@@ -45716,12 +45716,6 @@ get_forward(int nfwd) if no cached version is available.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::hasDerivative() const  "
-
-[INTERNAL]  Can derivatives be calculated in any way?
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::checkRes(const std::vector<
 M > &res) const  "
 
@@ -45734,6 +45728,12 @@ M > &res) const  "
 [INTERNAL]  Return function that calculates adjoint derivatives
 reverse(nadj) returns a cached instance if available, and calls  Function
 get_reverse(int nadj) if no cached version is available.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::has_derivative() const  "
+
+[INTERNAL]  Can derivatives be calculated in any way?
 
 ";
 
@@ -46841,12 +46841,6 @@ get_reverse(int nadj) if no cached version is available.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::hasDerivative() const  "
-
-[INTERNAL]  Can derivatives be calculated in any way?
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::hess_sx(int iind=0, int
 oind=0) "
 
@@ -46931,6 +46925,12 @@ std::vector< std::string > &onames, const Dict &opts) const  "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
 elements.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::has_derivative() const  "
+
+[INTERNAL]  Can derivatives be calculated in any way?
 
 ";
 
@@ -48102,9 +48102,9 @@ multiplying.
 
 
 // File: classcasadi_1_1Rootfinder.xml
-%feature("docstring")  casadi::FunctionInternal::checkInputs() const  "
+%feature("docstring")  casadi::FunctionInternal::has_derivative() const  "
 
-[INTERNAL]  Check if the numerical values of the supplied bounds make sense.
+[INTERNAL]  Can derivatives be calculated in any way?
 
 ";
 
@@ -48921,12 +48921,6 @@ elements.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::hasDerivative() const  "
-
-[INTERNAL]  Can derivatives be calculated in any way?
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::get_jacobian(const
 std::string &name, const std::vector< std::string > &inames, const
 std::vector< std::string > &onames, const Dict &opts) const  "
@@ -49042,6 +49036,12 @@ structure recognition.
 &stream) const  "
 
 [INTERNAL]  Print free variables.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::checkInputs() const  "
+
+[INTERNAL]  Check if the numerical values of the supplied bounds make sense.
 
 ";
 
@@ -50290,6 +50290,12 @@ casadi::FunctionInternal::codegen_decref(CodeGenerator &g) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::has_derivative() const  "
+
+[INTERNAL]  Can derivatives be calculated in any way?
+
+";
+
 %feature("docstring")  casadi::FixedStepIntegrator::advance(IntegratorMemory
 *mem, double t, double *x, double *z, double *q) const override "
 
@@ -50426,12 +50432,6 @@ oind=0) "
 
 [INTERNAL]  Weighting factor for chosing forward/reverse mode, sparsity
 propagation.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::hasDerivative() const  "
-
-[INTERNAL]  Can derivatives be calculated in any way?
 
 ";
 
@@ -52206,6 +52206,12 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::has_derivative() const  "
+
+[INTERNAL]  Can derivatives be calculated in any way?
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::eval_sx(const SXElem **arg,
 SXElem **res, int *iw, SXElem *w, int mem) const  "
 
@@ -52473,12 +52479,6 @@ Diagrams
 
 
 C++ includes: scpgen.hpp ";
-
-%feature("docstring")  casadi::FunctionInternal::hasDerivative() const  "
-
-[INTERNAL]  Can derivatives be calculated in any way?
-
-";
 
 %feature("docstring")  casadi::Nlpsol::get_n_in() override "
 
@@ -53123,12 +53123,6 @@ multiplying.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::hasDerivative() const  "
-
-[INTERNAL]  Can derivatives be calculated in any way?
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::numel_out(int ind) const  "
 
 [INTERNAL]  Number of input/output elements.
@@ -53272,10 +53266,10 @@ override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::signature(const std::string
-&fname) const  "
+%feature("docstring")  casadi::FunctionInternal::getAtomicInput(int k) const
+"
 
-[INTERNAL]  Code generate the function.
+[INTERNAL]  Get the (integer) input arguments of an atomic operation.
 
 ";
 
@@ -53323,6 +53317,13 @@ casadi::FunctionInternal::codegen_incref(CodeGenerator &g) const  "
 bool persistent=false) "
 
 [INTERNAL]  Ensure required length of res field.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::signature(const std::string
+&fname) const  "
+
+[INTERNAL]  Code generate the function.
 
 ";
 
@@ -53504,10 +53505,10 @@ persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicInput(int k) const
-"
+%feature("docstring")  casadi::FunctionInternal::replaceFwdSeed(const
+std::vector< std::vector< M > > &fseed) const  "
 
-[INTERNAL]  Get the (integer) input arguments of an atomic operation.
+[INTERNAL]  Replace 0-by-0 forward seeds.
 
 ";
 
@@ -53758,10 +53759,9 @@ oind=0) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::replaceFwdSeed(const
-std::vector< std::vector< M > > &fseed) const  "
+%feature("docstring")  casadi::FunctionInternal::has_derivative() const  "
 
-[INTERNAL]  Replace 0-by-0 forward seeds.
+[INTERNAL]  Can derivatives be calculated in any way?
 
 ";
 
@@ -54864,9 +54864,10 @@ const override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::hasDerivative() const  "
+%feature("docstring")  casadi::FunctionInternal::matchingRes(const
+std::vector< M > &arg) const  "
 
-[INTERNAL]  Can derivatives be calculated in any way?
+[INTERNAL]  Check if output arguments that needs to be replaced.
 
 ";
 
@@ -54970,6 +54971,12 @@ always_inline, bool never_inline) const  "
 %feature("docstring")  casadi::FunctionInternal::sz_arg() const  "
 
 [INTERNAL]  Get required length of arg field.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::has_derivative() const  "
+
+[INTERNAL]  Can derivatives be calculated in any way?
 
 ";
 
@@ -55329,13 +55336,6 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::matchingRes(const
-std::vector< M > &arg) const  "
-
-[INTERNAL]  Check if output arguments that needs to be replaced.
-
-";
-
 %feature("docstring")  casadi::Dple::has_reverse(int nadj) const override "
 
 [INTERNAL]  Generate a function that calculates nadj adjoint derivatives.
@@ -55539,16 +55539,16 @@ bool persistent=false) "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::FunctionInternal::hasDerivative() const  "
-
-[INTERNAL]  Can derivatives be calculated in any way?
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::getAtomicInput(int k) const
 "
 
 [INTERNAL]  Get the (integer) input arguments of an atomic operation.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::has_derivative() const  "
+
+[INTERNAL]  Can derivatives be calculated in any way?
 
 ";
 
@@ -58763,12 +58763,6 @@ const std::vector< MatType > &v) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::hasDerivative() const  "
-
-[INTERNAL]  Can derivatives be calculated in any way?
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::get_forward(int nfwd, const
 std::string &name, const std::vector< std::string > &inames, const
 std::vector< std::string > &onames, const Dict &opts) const  "
@@ -59385,6 +59379,12 @@ std::string &name, std::ostream &stream) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::has_derivative() const  "
+
+[INTERNAL]  Can derivatives be calculated in any way?
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::simplifiedCall() const  "
 
 [INTERNAL]  Use simplified signature.
@@ -59920,6 +59920,12 @@ hcat:  check if horizontal repetion of the function input is allowed
 %feature("docstring")  casadi::FunctionInternal::getAlgorithmSize() const  "
 
 [INTERNAL]  Get the number of atomic operations.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::has_derivative() const  "
+
+[INTERNAL]  Can derivatives be calculated in any way?
 
 ";
 
@@ -60780,12 +60786,6 @@ const override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::hasDerivative() const  "
-
-[INTERNAL]  Can derivatives be calculated in any way?
-
-";
-
 %feature("docstring")
 casadi::FunctionInternal::getJacSparsityHierarchical(int iind, int oind)
 const  "
@@ -61007,6 +61007,12 @@ std::vector< M > &res) const  "
 
 
 // File: classcasadi_1_1SymbolicQr.xml
+%feature("docstring")  casadi::FunctionInternal::has_derivative() const  "
+
+[INTERNAL]  Can derivatives be calculated in any way?
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::grad_mx(int iind=0, int
 oind=0) "
 
@@ -62039,12 +62045,6 @@ const  "
 %feature("docstring")  casadi::FunctionInternal::free_mx() const  "
 
 [INTERNAL]  Get free variables ( MX)
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::hasDerivative() const  "
-
-[INTERNAL]  Can derivatives be calculated in any way?
 
 ";
 
