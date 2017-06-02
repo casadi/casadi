@@ -1362,6 +1362,14 @@ namespace casadi {
   Function FunctionInternal::reverse(int nadj) const {
     casadi_assert(nadj>=0);
 
+    // Used wrapped function if reverse not available
+    if (!has_reverse(1)) {
+      // Derivative information must be available
+      casadi_assert_message(has_derivative(),
+                            "Derivatives cannot be calculated for " + name_);
+      return wrap().reverse(nadj);
+    }
+
     // Check if there are enough adjoint directions allocated
     if (nadj>=reverse_.size()) {
       reverse_.resize(nadj+1);
