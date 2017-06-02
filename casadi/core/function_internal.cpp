@@ -1940,8 +1940,7 @@ namespace casadi {
         if (arg[iind]==0 || nnz_in(iind)==0) continue;
 
         // Get the sparsity of the Jacobian block
-        Sparsity sp = const_cast<FunctionInternal*>(this)->
-                      sparsity_jac(iind, oind, true, false);
+        Sparsity sp = sparsity_jac(iind, oind, true, false);
         if (sp.is_null() || sp.nnz() == 0) continue; // Skip if zero
 
         // Carry out the sparse matrix-vector multiplication
@@ -1973,8 +1972,7 @@ namespace casadi {
         if (arg[iind]==0 || nnz_in(iind)==0) continue;
 
         // Get the sparsity of the Jacobian block
-        Sparsity sp = const_cast<FunctionInternal*>(this)->
-                      sparsity_jac(iind, oind, true, false);
+        Sparsity sp = sparsity_jac(iind, oind, true, false);
         if (sp.is_null() || sp.nnz() == 0) continue; // Skip if zero
 
         // Carry out the sparse matrix-vector multiplication
@@ -2117,7 +2115,7 @@ namespace casadi {
       }
 
       // Multiply the Jacobian from the right
-      MX J = const_cast<FunctionInternal*>(this)->jacobian()(arg).at(0);
+      MX J = jacobian()(arg).at(0);
       v = horzsplit(mtimes(J, horzcat(v)));
 
       // Vertical offsets
@@ -2220,7 +2218,7 @@ namespace casadi {
       }
 
       // Multiply the transposed Jacobian from the right
-      MX J = const_cast<FunctionInternal*>(this)->jacobian()(arg).at(0);
+      MX J = jacobian()(arg).at(0);
       v = horzsplit(mtimes(J.T(), horzcat(v)));
 
       // Vertical offsets
