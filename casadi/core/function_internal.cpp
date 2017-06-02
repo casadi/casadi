@@ -381,16 +381,22 @@ namespace casadi {
   }
 
   Function FunctionInternal::wrap() const {
-    // Construct options of the wrapping MXFunction
-    Dict opts;
+    if (wrap_.alive()) {
+      // Return cached Jacobian
+      return shared_cast<Function>(wrap_.shared());
+    } else {
+      // Options
+      Dict opts;
+      opts["derivative_of"] = derivative_of_;
+      // Wrap the function
+      vector<MX> arg = mx_in();
+      vector<MX> res = self()(arg);
+      Function ret(name_ + "_wrap", arg, res, ischeme_, oscheme_, opts);
 
-    // Propagate information about AD
-    opts["derivative_of"] = derivative_of_;
-
-    // Wrap the function
-    vector<MX> arg = mx_in();
-    vector<MX> res = self()(arg);
-    return Function("wrap_" + name_, arg, res, ischeme_, oscheme_, opts);
+      // Cache it for reuse and return
+      wrap_ = ret;
+      return ret;
+    }
   }
 
   void FunctionInternal::log(const string& msg) const {

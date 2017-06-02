@@ -715,6 +715,9 @@ namespace casadi {
     /// If the function is the derivative of another function
     Function derivative_of_;
 
+    /// Wrapper function for indirect derivative calculation
+    mutable WeakRef wrap_;
+
     /// User-set field
     void* user_data_;
 
