@@ -1297,6 +1297,14 @@ namespace casadi {
   Function FunctionInternal::forward(int nfwd) const {
     casadi_assert(nfwd>=0);
 
+    // Used wrapped function if forward not available
+    if (!has_forward(1)) {
+      // Derivative information must be available
+      casadi_assert_message(has_derivative(),
+                            "Derivatives cannot be calculated for " + name_);
+      return wrap().forward(nfwd);
+    }
+
     // Check if there are enough forward directions allocated
     if (nfwd>=forward_.size()) {
       forward_.resize(nfwd+1);
