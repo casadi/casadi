@@ -384,11 +384,6 @@ namespace casadi {
     // Construct options of the wrapping MXFunction
     Dict opts;
 
-    // Propagate AD parameters
-    opts["ad_weight"] = ad_weight();
-    opts["ad_weight_sp"] = sp_weight();
-    opts["max_num_dir"] = max_num_dir_;
-
     // Propagate information about AD
     opts["derivative_of"] = derivative_of_;
 
