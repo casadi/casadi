@@ -92,6 +92,9 @@ namespace casadi {
         " custom flags."}},
       {"compiler_flags",
        {OT_STRINGVECTOR,
+        "Alias for 'compiler_flags'"}},
+      {"flags",
+        {OT_STRINGVECTOR,
         "Compile flags for the JIT compiler. Default: None"}},
       {"linker_flags",
        {OT_STRINGVECTOR,
@@ -129,7 +132,7 @@ namespace casadi {
         cleanup_ = op.second;
       } else if (op.first=="linker_setup") {
         linker_setup = op.second.to_string();
-      } else if (op.first=="compiler_flags") {
+      } else if (op.first=="compiler_flags" || op.first=="flags") {
         compiler_flags = op.second;
       } else if (op.first=="linker_flags") {
         linker_flags = op.second;
