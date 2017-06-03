@@ -25643,12 +25643,14 @@ Interface to the JIT compiler SHELL
 +----------------+-----------------+---------------------------------------+
 | compiler       | OT_STRING       | Compiler command                      |
 +----------------+-----------------+---------------------------------------+
-| compiler_flags | OT_STRINGVECTOR | Compile flags for the JIT compiler.   |
-|                |                 | Default: None                         |
+| compiler_flags | OT_STRINGVECTOR | Alias for 'compiler_flags'            |
 +----------------+-----------------+---------------------------------------+
 | compiler_setup | OT_STRING       | Compiler setup command. Intended to   |
 |                |                 | be fixed. The 'flag' option is the    |
 |                |                 | prefered way to set custom flags.     |
++----------------+-----------------+---------------------------------------+
+| flags          | OT_STRINGVECTOR | Compile flags for the JIT compiler.   |
+|                |                 | Default: None                         |
 +----------------+-----------------+---------------------------------------+
 | folder         | OT_STRING       | Folder to put temporary objects in.   |
 +----------------+-----------------+---------------------------------------+
@@ -52724,12 +52726,14 @@ Joel Andersson  Interface to the JIT compiler SHELL
 +----------------+-----------------+---------------------------------------+
 | compiler       | OT_STRING       | Compiler command                      |
 +----------------+-----------------+---------------------------------------+
-| compiler_flags | OT_STRINGVECTOR | Compile flags for the JIT compiler.   |
-|                |                 | Default: None                         |
+| compiler_flags | OT_STRINGVECTOR | Alias for 'compiler_flags'            |
 +----------------+-----------------+---------------------------------------+
 | compiler_setup | OT_STRING       | Compiler setup command. Intended to   |
 |                |                 | be fixed. The 'flag' option is the    |
 |                |                 | prefered way to set custom flags.     |
++----------------+-----------------+---------------------------------------+
+| flags          | OT_STRINGVECTOR | Compile flags for the JIT compiler.   |
+|                |                 | Default: None                         |
 +----------------+-----------------+---------------------------------------+
 | folder         | OT_STRING       | Folder to put temporary objects in.   |
 +----------------+-----------------+---------------------------------------+
@@ -52756,9 +52760,8 @@ Joel Andersson  Interface to the JIT compiler SHELL
 | compiler       | OT_STRING       | Compiler command  | casadi::ShellComp |
 |                |                 |                   | iler              |
 +----------------+-----------------+-------------------+-------------------+
-| compiler_flags | OT_STRINGVECTOR | Compile flags for | casadi::ShellComp |
-|                |                 | the JIT compiler. | iler              |
-|                |                 | Default: None     |                   |
+| compiler_flags | OT_STRINGVECTOR | Alias for         | casadi::ShellComp |
+|                |                 | 'compiler_flags'  | iler              |
 +----------------+-----------------+-------------------+-------------------+
 | compiler_setup | OT_STRING       | Compiler setup    | casadi::ShellComp |
 |                |                 | command. Intended | iler              |
@@ -52767,6 +52770,10 @@ Joel Andersson  Interface to the JIT compiler SHELL
 |                |                 | the prefered way  |                   |
 |                |                 | to set custom     |                   |
 |                |                 | flags.            |                   |
++----------------+-----------------+-------------------+-------------------+
+| flags          | OT_STRINGVECTOR | Compile flags for | casadi::ShellComp |
+|                |                 | the JIT compiler. | iler              |
+|                |                 | Default: None     |                   |
 +----------------+-----------------+-------------------+-------------------+
 | folder         | OT_STRING       | Folder to put     | casadi::ShellComp |
 |                |                 | temporary objects | iler              |
