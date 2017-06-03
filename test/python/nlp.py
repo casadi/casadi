@@ -88,7 +88,7 @@ class NLPtests(casadiTestCase):
     nlp={'x':x, 'f':SX(1,1),'g':x}
 
     for Solver, solver_options in solvers:
-      with self.assertInException("dense scalar"):
+      with self.assertInException("dense"):
         solver = nlpsol("mysolver", Solver, nlp, solver_options)
 
     nlp={'x':x, 'f':SX.zeros(0,0),'g':x}
@@ -100,12 +100,6 @@ class NLPtests(casadiTestCase):
     for Solver, solver_options in solvers:
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
 
-    nlp={'x':x, 'f':SX.zeros(2,1),'g':x}
-
-    for Solver, solver_options in solvers:
-      with self.assertInException("dense scalar"):
-        solver = nlpsol("mysolver", Solver, nlp, solver_options)
-        
     x = vec(diag(SX.sym("x",2)))
     nlp={'x':x, 'f':mtimes(x.T,x),'g':x[0]}
     for Solver, solver_options in solvers:

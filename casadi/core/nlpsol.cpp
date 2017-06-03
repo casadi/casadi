@@ -276,8 +276,8 @@ namespace casadi {
     casadi_assert_message(sparsity_out(NLPSOL_G).is_dense() && sparsity_out(NLPSOL_G).is_vector(),
         "Expected a dense vector 'g', but got " + sparsity_out(NLPSOL_G).dim() + ".");
 
-    casadi_assert_message(sparsity_out(NLPSOL_F).is_dense() && sparsity_out(NLPSOL_F).is_scalar(),
-        "Expected a dense scalar 'f', but got " + sparsity_out(NLPSOL_F).dim() + ".");
+    casadi_assert_message(sparsity_out(NLPSOL_F).is_dense(),
+        "Expected a dense 'f', but got " + sparsity_out(NLPSOL_F).dim() + ".");
 
     casadi_assert_message(sparsity_out(NLPSOL_X).is_dense() && sparsity_out(NLPSOL_X).is_vector(),
       "Expected a dense vector 'x', but got " + sparsity_out(NLPSOL_X).dim() + ".");
