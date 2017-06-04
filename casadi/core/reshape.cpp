@@ -32,8 +32,8 @@ namespace casadi {
 
   Reshape::Reshape(const MX& x, Sparsity sp) {
     casadi_assert(x.nnz()==sp.nnz());
-    setDependencies(x);
-    setSparsity(sp);
+    set_dep(x);
+    set_sparsity(sp);
   }
 
   void Reshape::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
@@ -50,11 +50,11 @@ namespace casadi {
   }
 
   void Reshape::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
-    copyFwd(arg[0], res[0], nnz());
+    copy_fwd(arg[0], res[0], nnz());
   }
 
   void Reshape::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
-    copyAdj(arg[0], res[0], nnz());
+    copy_rev(arg[0], res[0], nnz());
   }
 
   std::string Reshape::print(const std::vector<std::string>& arg) const {

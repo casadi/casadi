@@ -31,11 +31,11 @@ using namespace std;
 namespace casadi {
 
   SymbolicMX::SymbolicMX(const std::string& name, int nrow, int ncol) : name_(name) {
-    setSparsity(Sparsity::dense(nrow, ncol));
+    set_sparsity(Sparsity::dense(nrow, ncol));
   }
 
   SymbolicMX::SymbolicMX(const std::string& name, const Sparsity & sp) : name_(name) {
-    setSparsity(sp);
+    set_sparsity(sp);
   }
 
   std::string SymbolicMX::print(const std::vector<std::string>& arg) const {

@@ -55,13 +55,13 @@ namespace casadi {
     int nout() const override=0;
 
     /** \brief  Get an output */
-    MX getOutput(int oind) const override;
+    MX get_output(int oind) const override;
 
     /** \brief  Get the sparsity of output oind */
     const Sparsity& sparsity(int oind) const override=0;
 
     /** \brief  Check if a multiple output node */
-    bool isMultipleOutput() const override {return true;}
+    bool has_output() const override {return true;}
 
   };
 
@@ -77,17 +77,11 @@ namespace casadi {
     /** \brief  Print expression */
     std::string print(const std::vector<std::string>& arg) const override;
 
-    /** \brief Is the node nonlinear */
-    bool isNonLinear() override {return true;}
-
     /** \brief  Check if evaluation output */
-    bool isOutputNode() const override {return true;}
-
-    /** \brief  Get function input */
-    int getFunction_input() const override { return -1;}
+    bool is_output() const override {return true;}
 
     /** \brief  Get function output */
-    int getFunctionOutput() const override { return oind_;}
+    int which_output() const override { return oind_;}
 
     /** \brief Get the operation */
     int op() const override { return -1;}

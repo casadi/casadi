@@ -37,8 +37,8 @@ namespace casadi {
 
   template<bool Add>
   SetNonzeros<Add>::SetNonzeros(const MX& y, const MX& x) {
-    this->setSparsity(y.sparsity());
-    this->setDependencies(y, x);
+    this->set_sparsity(y.sparsity());
+    this->set_dep(y, x);
   }
 
   template<bool Add>
@@ -130,7 +130,7 @@ namespace casadi {
       res[0].sparsity().get_nz(r_nz);
 
       // Zero out the corresponding entries
-      res[0] = MX::zeros(isp)->get_set_nz(res[0], r_nz);
+      res[0] = MX::zeros(isp)->get_nzassign(res[0], r_nz);
     }
 
     // Get the nz locations of the elements in arg corresponding to the argument sparsity pattern
@@ -182,7 +182,7 @@ namespace casadi {
     }
 
     // Add to the element to the sensitivity, if any
-    res[0] = arg[1]->getAddNonzeros(res[0], r_nz);
+    res[0] = arg[1]->get_nzadd(res[0], r_nz);
   }
 
   template<bool Add>
@@ -262,7 +262,7 @@ namespace casadi {
         res.sparsity().get_nz(r_nz);
 
         // Zero out the corresponding entries
-        res = MX::zeros(isp)->get_set_nz(res, r_nz);
+        res = MX::zeros(isp)->get_nzassign(res, r_nz);
       }
 
       // Get the nz locations of the elements in arg corresponding to the argument sparsity pattern
@@ -314,7 +314,7 @@ namespace casadi {
       }
 
       // Add to the element to the sensitivity, if any
-      res = arg->getAddNonzeros(res, r_nz);
+      res = arg->get_nzadd(res, r_nz);
     }
   }
 
@@ -423,9 +423,9 @@ namespace casadi {
       if (!r_nz.empty()) {
         // Create a sparsity pattern from vectors
         Sparsity f_sp(isp.size1(), isp.size2(), r_colind, r_row);
-        asens[d][1] += aseed[d][0]->get_get_nz(f_sp, r_nz);
+        asens[d][1] += aseed[d][0]->get_nzref(f_sp, r_nz);
         if (!Add) {
-          asens[d][0] += MX::zeros(f_sp)->get_set_nz(aseed[d][0], r_nz);
+          asens[d][0] += MX::zeros(f_sp)->get_nzassign(aseed[d][0], r_nz);
         } else {
           asens[d][0] += aseed[d][0];
         }
@@ -567,7 +567,7 @@ namespace casadi {
         }
       }
     }
-    MXNode::copyAdj(arg[0], r, this->nnz());
+    MXNode::copy_rev(arg[0], r, this->nnz());
   }
 
   template<bool Add>
@@ -600,7 +600,7 @@ namespace casadi {
         r[k] = 0;
       }
     }
-    MXNode::copyAdj(arg[0], r, this->nnz());
+    MXNode::copy_rev(arg[0], r, this->nnz());
   }
 
   template<bool Add>
@@ -637,7 +637,7 @@ namespace casadi {
         }
       }
     }
-    MXNode::copyAdj(arg[0], r, this->nnz());
+    MXNode::copy_rev(arg[0], r, this->nnz());
   }
 
   template<bool Add>

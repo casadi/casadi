@@ -31,8 +31,8 @@ namespace casadi {
 
   Find::Find(const MX& x) {
     casadi_assert(x.is_column());
-    setDependencies(x);
-    setSparsity(Sparsity::scalar());
+    set_dep(x);
+    set_sparsity(Sparsity::scalar());
   }
 
   std::string Find::print(const std::vector<std::string>& arg) const {

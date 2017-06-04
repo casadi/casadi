@@ -30,7 +30,7 @@ using namespace std;
 namespace casadi {
 
   SubRef::SubRef(const MX& x, const Slice& i, const Slice& j) : i_(i), j_(j) {
-    setDependencies(x);
+    set_dep(x);
   }
 
   void SubRef::eval(const double** arg, double** res, int* iw, double* w, int mem) const {

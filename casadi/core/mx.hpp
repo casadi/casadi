@@ -44,7 +44,7 @@ namespace casadi {
       in particular matrix valued operations and calls to arbitrary differentiable functions.
 
       The MX class is designed to have identical syntax with the Matrix<> template class,
-      and uses Matrix<double> as its internal representation of the values at a node. By keeping
+      and uses DM (i.e. Matrix<double>) as its internal representation of the values at a node. By keeping
       the syntaxes identical, it is possible to switch from one class to the other,
       as well as inlining MX functions to SXElem functions.
 
@@ -164,7 +164,7 @@ namespace casadi {
     int n_out() const;
 
     /** \brief  Get an output */
-    MX getOutput(int oind=0) const;
+    MX get_output(int oind) const;
 
     /** \brief Get the number of dependencies of a binary SXElem */
     int n_dep() const;
@@ -190,8 +190,8 @@ namespace casadi {
     /// Check if evaluation output
     bool is_output() const;
 
-    /// Get the index of evaluation output - only valid when is_calloutput() is true
-    int get_output() const;
+    /// Get the index of evaluation output - only valid when is_output() is true
+    int which_output() const;
 
     /// Is it a certain operation
     bool is_op(int op) const;
@@ -254,12 +254,6 @@ namespace casadi {
 
     /// Checks if expression does not contain NaN or Inf
     bool is_regular() const;
-
-    /** \brief  Number of functions */
-    int numFunctions() const;
-
-    /// Get function
-    Function getFunction(int i=0);
 
     /// Is binary operation
     bool is_binary() const;

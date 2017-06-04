@@ -101,16 +101,16 @@ namespace casadi {
     virtual bool is_minus_one() const { return false;}
 
     /** \brief Check if a certain value */
-    virtual bool isValue(double val) const { return false;}
+    virtual bool is_value(double val) const { return false;}
 
     /** \brief Check if identity matrix */
     virtual bool is_identity() const { return false;}
 
     /** \brief Check if unary operation */
-    virtual bool is_unaryOp() const { return false;}
+    virtual bool is_unary() const { return false;}
 
     /** \brief Check if binary operation */
-    virtual bool is_binaryOp() const { return false;}
+    virtual bool is_binary() const { return false;}
 
     /** \brief  Print a representation */
     void repr(std::ostream &stream) const override;
@@ -195,22 +195,13 @@ namespace casadi {
     virtual void reset_input() const;
 
     /** \brief  Check if evaluation output */
-    virtual bool isOutputNode() const {return false;}
+    virtual bool is_output() const {return false;}
 
     /** \brief  Check if a multiple output node */
-    virtual bool isMultipleOutput() const {return false;}
-
-    /** \brief  Number of functions */
-    virtual int numFunctions() const {return 0;}
-
-    /** \brief  Get function reference */
-    virtual const Function& getFunction(int i) const;
-
-    /** \brief  Get function input */
-    virtual int getFunction_input() const;
+    virtual bool has_output() const {return false;}
 
     /** \brief  Get function output */
-    virtual int getFunctionOutput() const;
+    virtual int which_output() const;
 
     /** \brief Get the operation */
     virtual int op() const = 0;
@@ -239,7 +230,7 @@ namespace casadi {
     virtual int nout() const { return 1;}
 
     /** \brief  Get an output */
-    virtual MX getOutput(int oind) const;
+    virtual MX get_output(int oind) const;
 
     /// Get the sparsity
     const Sparsity& sparsity() const { return sparsity_;}
@@ -254,11 +245,8 @@ namespace casadi {
     int size2() const { return sparsity().size2(); }
     std::pair<int, int> size() const { return sparsity().size();}
 
-    /** \brief Is the node nonlinear */
-    virtual bool isNonLinear() {return false;}
-
     /// Set the sparsity
-    void setSparsity(const Sparsity& sparsity);
+    void set_sparsity(const Sparsity& sparsity);
 
     /** \brief Get required length of arg field */
     virtual size_t sz_arg() const { return ndep();}
@@ -273,19 +261,16 @@ namespace casadi {
     virtual size_t sz_w() const { return 0;}
 
     /// Set unary dependency
-    void setDependencies(const MX& dep);
+    void set_dep(const MX& dep);
 
     /// Set binary dependencies
-    void setDependencies(const MX& dep1, const MX& dep2);
+    void set_dep(const MX& dep1, const MX& dep2);
 
     /// Set ternary dependencies
-    void setDependencies(const MX& dep1, const MX& dep2, const MX& dep3);
+    void set_dep(const MX& dep1, const MX& dep2, const MX& dep3);
 
     /// Set multiple dependencies
-    void setDependencies(const std::vector<MX>& dep);
-
-    /// Add a dependency
-    int addDependency(const MX& dep);
+    void set_dep(const std::vector<MX>& dep);
 
     /// Assign nonzeros (mapping matrix)
     virtual void assign(const MX& d, const std::vector<int>& inz,
@@ -295,7 +280,7 @@ namespace casadi {
     virtual void assign(const MX& d, const std::vector<int>& inz, bool add=false);
 
     /// Convert scalar to matrix
-    inline static MX toMatrix(const MX& x, const Sparsity& sp) {
+    inline static MX to_matrix(const MX& x, const Sparsity& sp) {
       if (x.size()==sp.size()) {
         return x;
       } else {
@@ -307,10 +292,10 @@ namespace casadi {
     virtual double to_double() const;
 
     /// Get the value (only for constant nodes)
-    virtual Matrix<double> getMatrixValue() const;
+    virtual DM get_DM() const;
 
     /// Can the operation be performed inplace (i.e. overwrite the result)
-    virtual int numInplace() const { return 0;}
+    virtual int n_inplace() const { return 0;}
 
     /// Simplify the expression (ex is a reference to the node)
     virtual void simplifyMe(MX& ex) {}
@@ -373,19 +358,19 @@ namespace casadi {
     virtual MX get_solve(const MX& r, bool tr, const Linsol& linear_solver) const;
 
     /// Get the nonzeros of matrix
-    virtual MX get_get_nz(const Sparsity& sp, const std::vector<int>& nz) const;
+    virtual MX get_nzref(const Sparsity& sp, const std::vector<int>& nz) const;
 
     /// Assign the nonzeros of a matrix to another matrix
-    virtual MX get_set_nz(const MX& y, const std::vector<int>& nz) const;
+    virtual MX get_nzassign(const MX& y, const std::vector<int>& nz) const;
 
     /// Add the nonzeros of a matrix to another matrix
-    virtual MX getAddNonzeros(const MX& y, const std::vector<int>& nz) const;
+    virtual MX get_nzadd(const MX& y, const std::vector<int>& nz) const;
 
     /// Get submatrix reference
-    virtual MX getRef(const Slice& i, const Slice& j) const;
+    virtual MX get_subref(const Slice& i, const Slice& j) const;
 
     /// Get submatrix assignment
-    virtual MX getAssign(const MX& y, const Slice& i, const Slice& j) const;
+    virtual MX get_subassign(const MX& y, const Slice& i, const Slice& j) const;
 
     /// Create set sparse
     virtual MX get_project(const Sparsity& sp) const;
@@ -394,10 +379,10 @@ namespace casadi {
     virtual MX get_unary(int op) const;
 
     /// Get a binary operation operation
-    MX getBinarySwitch(int op, const MX& y) const;
+    MX get_binary(int op, const MX& y) const;
 
     /// Get a binary operation operation (matrix-matrix)
-    virtual MX getBinary(int op, const MX& y, bool scX, bool scY) const;
+    virtual MX _get_binary(int op, const MX& y, bool scX, bool scY) const;
 
     /// Determinant
     virtual MX get_det() const;
@@ -421,10 +406,10 @@ namespace casadi {
     virtual MX get_norm_1() const;
 
     /// Assertion
-    MX getAssertion(const MX& y, const std::string& fail_message) const;
+    MX get_assert(const MX& y, const std::string& fail_message) const;
 
     /// Monitor
-    MX getMonitor(const std::string& comment) const;
+    MX get_monitor(const std::string& comment) const;
 
     /// Find
     MX get_find() const;
@@ -442,10 +427,10 @@ namespace casadi {
     Sparsity sparsity_;
 
     /** \brief Propagate sparsities forward through a copy operation */
-    static void copyFwd(const bvec_t* arg, bvec_t* res, int len);
+    static void copy_fwd(const bvec_t* arg, bvec_t* res, int len);
 
     /** \brief Propagate sparsities backwards through a copy operation */
-    static void copyAdj(bvec_t* arg, bvec_t* res, int len);
+    static void copy_rev(bvec_t* arg, bvec_t* res, int len);
   };
 
   /// \endcond

@@ -51,7 +51,7 @@ namespace casadi {
     int op() const override { return op_;}
 
     /** \brief Check if binary operation */
-    bool is_binaryOp() const override { return true;}
+    bool is_binary() const override { return true;}
 
     /** \brief  Evaluate symbolically (MX) */
     void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
@@ -81,7 +81,7 @@ namespace casadi {
     void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const override;
 
     /// Can the operation be performed inplace (i.e. overwrite the result)
-    int numInplace() const override { return 2;}
+    int n_inplace() const override { return 2;}
 
     /** \brief Generate code for the operation */
     void generate(CodeGenerator& g, const std::string& mem,
@@ -91,7 +91,7 @@ namespace casadi {
     MX get_unary(int op) const override;
 
     /// Get a binary operation operation
-    MX getBinary(int op, const MX& y, bool scX, bool scY) const override;
+    MX _get_binary(int op, const MX& y, bool scX, bool scY) const override;
 
     /** \brief Check if two nodes are equivalent up to a given depth */
     bool is_equal(const MXNode* node, int depth) const override {

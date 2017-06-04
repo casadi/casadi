@@ -84,7 +84,7 @@ namespace casadi {
     int op() const override { return OP_RESHAPE;}
 
     /// Can the operation be performed inplace (i.e. overwrite the result)
-    int numInplace() const override { return 1;}
+    int n_inplace() const override { return 1;}
 
     /// Reshape
     MX get_reshape(const Sparsity& sp) const override;

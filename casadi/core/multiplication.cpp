@@ -41,8 +41,8 @@ namespace casadi {
       << x.dim() << " with " << y.dim()
       << " and add the result to " << z.dim());
 
-    setDependencies(z, x, y);
-    setSparsity(z.sparsity());
+    set_dep(z, x, y);
+    set_sparsity(z.sparsity());
   }
 
   std::string Multiplication::print(const std::vector<std::string>& arg) const {
@@ -89,7 +89,7 @@ namespace casadi {
   }
 
   void Multiplication::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
-    copyFwd(arg[0], res[0], nnz());
+    copy_fwd(arg[0], res[0], nnz());
     Sparsity::mul_sparsityF(arg[1], dep(1).sparsity(),
                             arg[2], dep(2).sparsity(),
                             res[0], sparsity(), w);
@@ -99,7 +99,7 @@ namespace casadi {
     Sparsity::mul_sparsityR(arg[1], dep(1).sparsity(),
                             arg[2], dep(2).sparsity(),
                             res[0], sparsity(), w);
-    copyAdj(arg[0], res[0], nnz());
+    copy_rev(arg[0], res[0], nnz());
   }
 
   void Multiplication::generate(CodeGenerator& g, const std::string& mem,

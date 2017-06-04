@@ -32,8 +32,8 @@ using namespace std;
 namespace casadi {
 
   Split::Split(const MX& x, const std::vector<int>& offset) : offset_(offset) {
-    setDependencies(x);
-    setSparsity(Sparsity::scalar());
+    set_dep(x);
+    set_sparsity(Sparsity::scalar());
   }
 
   Split::~Split() {
@@ -330,7 +330,7 @@ namespace casadi {
 
     // Check x content
     for (int i=0; i<x.size(); ++i) {
-      if (!(x[i]->isOutputNode() && x[i]->getFunctionOutput()==i && x[i]->dep().get()==this)) {
+      if (!(x[i]->is_output() && x[i]->which_output()==i && x[i]->dep().get()==this)) {
         return MXNode::get_horzcat(x);
       }
     }
@@ -347,7 +347,7 @@ namespace casadi {
 
     // Check x content
     for (int i=0; i<x.size(); ++i) {
-      if (!(x[i]->isOutputNode() && x[i]->getFunctionOutput()==i && x[i]->dep().get()==this)) {
+      if (!(x[i]->is_output() && x[i]->which_output()==i && x[i]->dep().get()==this)) {
         return MXNode::get_vertcat(x);
       }
     }
@@ -364,7 +364,7 @@ namespace casadi {
 
     // Check x content
     for (int i=0; i<x.size(); ++i) {
-      if (!(x[i]->isOutputNode() && x[i]->getFunctionOutput()==i && x[i]->dep().get()==this)) {
+      if (!(x[i]->is_output() && x[i]->which_output()==i && x[i]->dep().get()==this)) {
         return MXNode::get_diagcat(x);
       }
     }

@@ -69,7 +69,7 @@ namespace casadi {
     Matrix<int> mapping() const override;
 
     /// Can the operation be performed inplace (i.e. overwrite the result)
-    int numInplace() const override { return 1;}
+    int n_inplace() const override { return 1;}
   };
 
 

@@ -29,8 +29,8 @@ namespace casadi {
 
   Dot::Dot(const MX& x, const MX& y) {
     casadi_assert(x.sparsity()==y.sparsity());
-    setDependencies(x, y);
-    setSparsity(Sparsity::scalar());
+    set_dep(x, y);
+    set_sparsity(Sparsity::scalar());
   }
 
   std::string Dot::print(const std::vector<std::string>& arg) const {

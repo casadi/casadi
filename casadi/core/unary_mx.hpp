@@ -70,7 +70,7 @@ namespace casadi {
     void sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
 
     /** \brief Check if unary operation */
-    bool is_unaryOp() const override { return true;}
+    bool is_unary() const override { return true;}
 
     /** \brief Get the operation */
     int op() const override { return op_;}
@@ -80,13 +80,13 @@ namespace casadi {
                           const std::vector<int>& arg, const std::vector<int>& res) const override;
 
     /// Can the operation be performed inplace (i.e. overwrite the result)
-    int numInplace() const override { return 1;}
+    int n_inplace() const override { return 1;}
 
     /// Get a unary operation
     MX get_unary(int op) const override;
 
     /// Get a binary operation operation
-    MX getBinary(int op, const MX& y, bool scX, bool scY) const override;
+    MX _get_binary(int op, const MX& y, bool scX, bool scY) const override;
 
     /** \brief Check if two nodes are equivalent up to a given depth */
     bool is_equal(const MXNode* node, int depth) const override {

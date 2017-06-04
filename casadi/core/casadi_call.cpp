@@ -68,8 +68,8 @@ namespace casadi {
     for (int i=0; i<num_in; ++i) {
       arg1[i] = projectArg(arg[i], fcn_.sparsity_in(i), i);
     }
-    setDependencies(arg1);
-    setSparsity(Sparsity::scalar());
+    set_dep(arg1);
+    set_sparsity(Sparsity::scalar());
   }
 
   std::string Call::print(const std::vector<std::string>& arg) const {
@@ -109,7 +109,7 @@ namespace casadi {
     vector<MX> arg(ndep());
     for (int i=0; i<arg.size(); ++i) arg[i] = dep(i);
     vector<MX> res(nout());
-    for (int i=0; i<res.size(); ++i) res[i] = getOutput(i);
+    for (int i=0; i<res.size(); ++i) res[i] = get_output(i);
 
     // Call the cached functions
     fcn_->call_forward(arg, res, fseed, fsens, false, false);
@@ -121,7 +121,7 @@ namespace casadi {
     vector<MX> arg(ndep());
     for (int i=0; i<arg.size(); ++i) arg[i] = dep(i);
     vector<MX> res(nout());
-    for (int i=0; i<res.size(); ++i) res[i] = getOutput(i);
+    for (int i=0; i<res.size(); ++i) res[i] = get_output(i);
 
     // Call the cached functions
     vector<vector<MX> > v;

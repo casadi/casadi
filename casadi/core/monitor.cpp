@@ -31,8 +31,8 @@ namespace casadi {
 
   Monitor::Monitor(const MX& x, const std::string& comment) : comment_(comment) {
     casadi_assert(x.nnz()>0);
-    setDependencies(x);
-    setSparsity(x.sparsity());
+    set_dep(x);
+    set_sparsity(x.sparsity());
   }
 
   std::string Monitor::print(const std::vector<std::string>& arg) const {

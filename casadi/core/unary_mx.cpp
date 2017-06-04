@@ -39,8 +39,8 @@ namespace casadi {
       x = densify(x);
     }
 
-    setDependencies(x);
-    setSparsity(x->sparsity());
+    set_dep(x);
+    set_sparsity(x->sparsity());
   }
 
   std::string UnaryMX::print(const std::vector<std::string>& arg) const {
@@ -89,11 +89,11 @@ namespace casadi {
   }
 
   void UnaryMX::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
-    copyFwd(arg[0], res[0], nnz());
+    copy_fwd(arg[0], res[0], nnz());
   }
 
   void UnaryMX::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
-    copyAdj(arg[0], res[0], nnz());
+    copy_rev(arg[0], res[0], nnz());
   }
 
   void UnaryMX::generate(CodeGenerator& g, const std::string& mem,
@@ -158,15 +158,15 @@ namespace casadi {
     return MXNode::get_unary(op);
   }
 
-  MX UnaryMX::getBinary(int op, const MX& y, bool scX, bool scY) const {
+  MX UnaryMX::_get_binary(int op, const MX& y, bool scX, bool scY) const {
     switch (op_) {
     case OP_NEG:
-      if (op==OP_ADD) return y->getBinary(OP_SUB, dep(), scY, scX);
-      else if (op==OP_MUL) return -dep()->getBinary(OP_MUL, y, scX, scY);
-      else if (op==OP_DIV) return -dep()->getBinary(OP_DIV, y, scX, scY);
+      if (op==OP_ADD) return y->_get_binary(OP_SUB, dep(), scY, scX);
+      else if (op==OP_MUL) return -dep()->_get_binary(OP_MUL, y, scX, scY);
+      else if (op==OP_DIV) return -dep()->_get_binary(OP_DIV, y, scX, scY);
       break;
     case OP_INV:
-      if (op==OP_MUL) return y->getBinary(OP_DIV, dep(), scY, scX);
+      if (op==OP_MUL) return y->_get_binary(OP_DIV, dep(), scY, scX);
       break;
     case OP_TWICE:
       if (op==OP_SUB && MX::is_equal(y, dep(), maxDepth())) return dep();
@@ -182,7 +182,7 @@ namespace casadi {
     }
 
     // Fallback to default implementation
-    return MXNode::getBinary(op, y, scX, scY);
+    return MXNode::_get_binary(op, y, scX, scY);
   }
 
 } // namespace casadi

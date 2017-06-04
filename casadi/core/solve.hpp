@@ -82,7 +82,7 @@ namespace casadi {
     int op() const override { return OP_SOLVE;}
 
     /// Can the operation be performed inplace (i.e. overwrite the result)
-    int numInplace() const override { return 1;}
+    int n_inplace() const override { return 1;}
 
     /** \brief Get required length of arg field */
     size_t sz_arg() const override;

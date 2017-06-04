@@ -30,7 +30,7 @@ using namespace std;
 namespace casadi {
 
   SubAssign::SubAssign(const MX& x, const MX& y, const Slice& i, const Slice& j) : i_(i), j_(j) {
-    setDependencies(x, y);
+    set_dep(x, y);
     casadi_error("not ready");
   }
 

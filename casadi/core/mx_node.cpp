@@ -164,31 +164,26 @@ namespace casadi {
     return dep_.size();
   }
 
-  void MXNode::setSparsity(const Sparsity& sparsity) {
+  void MXNode::set_sparsity(const Sparsity& sparsity) {
     sparsity_ = sparsity;
   }
 
-  void MXNode::setDependencies(const MX& dep) {
+  void MXNode::set_dep(const MX& dep) {
     dep_.resize(1);
     dep_[0] = dep;
   }
 
-  void MXNode::setDependencies(const MX& dep1, const MX& dep2) {
+  void MXNode::set_dep(const MX& dep1, const MX& dep2) {
     dep_.resize(2);
     dep_[0] = dep1;
     dep_[1] = dep2;
   }
 
-  void MXNode::setDependencies(const MX& dep1, const MX& dep2, const MX& dep3) {
+  void MXNode::set_dep(const MX& dep1, const MX& dep2, const MX& dep3) {
     dep_.resize(3);
     dep_[0] = dep1;
     dep_[1] = dep2;
     dep_[2] = dep3;
-  }
-
-  int MXNode::addDependency(const MX& dep) {
-    dep_.push_back(dep);
-    return dep_.size()-1;
   }
 
   void MXNode::assign(const MX& d, const vector<int>& inz, bool add) {
@@ -200,7 +195,7 @@ namespace casadi {
     casadi_assert(0);
   }
 
-  void MXNode::setDependencies(const vector<MX>& dep) {
+  void MXNode::set_dep(const vector<MX>& dep) {
     dep_ = dep;
   }
 
@@ -278,16 +273,8 @@ namespace casadi {
     }
   }
 
-  const Function& MXNode::getFunction(int i) const {
-    casadi_error("'getFunction' not defined for class " + type_name());
-  }
-
-  int MXNode::getFunctionOutput() const {
-    casadi_error("'getFunctionOutput' not defined for class " + type_name());
-  }
-
-  int MXNode::getFunction_input() const {
-    casadi_error("'getFunctionOutput' not defined for class " + type_name());
+  int MXNode::which_output() const {
+    casadi_error("'which_output' not defined for class " + type_name());
   }
 
   void MXNode::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
@@ -355,7 +342,7 @@ namespace casadi {
     }
   }
 
-  MX MXNode::getOutput(int oind) const {
+  MX MXNode::get_output(int oind) const {
     casadi_assert_message(oind==0, "Output index out of bounds");
     return shared_from_this<MX>();
   }
@@ -372,8 +359,8 @@ namespace casadi {
     casadi_error("'to_double' not defined for class " + type_name());
   }
 
-  Matrix<double> MXNode::getMatrixValue() const {
-    casadi_error("'getMatrixValue' not defined for class " + type_name());
+  DM MXNode::get_DM() const {
+    casadi_error("'get_DM' not defined for class " + type_name());
   }
 
   MX MXNode::get_transpose() const {
@@ -426,9 +413,9 @@ namespace casadi {
 
     if (A.is_constant() && B.is_constant() && C.is_constant()) {
       // Constant folding
-      DM Ac = A->getMatrixValue();
-      DM Bc = B->getMatrixValue();
-      DM Cc = C->getMatrixValue();
+      DM Ac = A->get_DM();
+      DM Bc = B->get_DM();
+      DM Cc = C->get_DM();
       return einstein(vec(densify(Ac)), vec(densify(Bc)), vec(densify(Cc)),
         dim_a, dim_b, dim_c, a, b, c);
     }
@@ -452,7 +439,7 @@ namespace casadi {
     }
   }
 
-  MX MXNode::get_get_nz(const Sparsity& sp, const vector<int>& nz) const {
+  MX MXNode::get_nzref(const Sparsity& sp, const vector<int>& nz) const {
     if (nz.size()==0) {
       return MX::zeros(sp);
     } else {
@@ -469,7 +456,7 @@ namespace casadi {
     }
   }
 
-  MX MXNode::get_set_nz(const MX& y, const vector<int>& nz) const {
+  MX MXNode::get_nzassign(const MX& y, const vector<int>& nz) const {
     // Check if any element needs to be set at all
     bool set_any = false;
     for (auto i=nz.begin(); i!=nz.end() && !set_any; ++i) {
@@ -496,7 +483,7 @@ namespace casadi {
   }
 
 
-  MX MXNode::getAddNonzeros(const MX& y, const vector<int>& nz) const {
+  MX MXNode::get_nzadd(const MX& y, const vector<int>& nz) const {
     if (nz.size()==0 || is_zero()) {
       return y;
     } else {
@@ -524,11 +511,11 @@ namespace casadi {
     }
   }
 
-  MX MXNode::getRef(const Slice& i, const Slice& j) const {
+  MX MXNode::get_subref(const Slice& i, const Slice& j) const {
     return MX::create(new SubRef(shared_from_this<MX>(), i, j));
   }
 
-  MX MXNode::getAssign(const MX& y, const Slice& i, const Slice& j) const {
+  MX MXNode::get_subassign(const MX& y, const Slice& i, const Slice& j) const {
     return MX::create(new SubAssign(shared_from_this<MX>(), y, i, j));
   }
 
@@ -542,7 +529,7 @@ namespace casadi {
     }
   }
 
-  MX MXNode::getBinarySwitch(int op, const MX& y) const {
+  MX MXNode::get_binary(int op, const MX& y) const {
     // Make sure that dimensions match
     casadi_assert_message(sparsity().is_scalar() || y.is_scalar() || sparsity().size()==y.size(),
                           "Dimension mismatch." << "lhs is " << sparsity().dim()
@@ -552,22 +539,22 @@ namespace casadi {
     if (sparsity().is_scalar(false)) {
       if (nnz()==0) {
         if (operation_checker<F0XChecker>(op)) return MX::zeros(Sparsity(y.size()));
-        return toMatrix(MX(0)->getBinary(op, y, true, false), y.sparsity());
+        return to_matrix(MX(0)->_get_binary(op, y, true, false), y.sparsity());
       } else {
-        return toMatrix(getBinary(op, y, true, false), y.sparsity());
+        return to_matrix(_get_binary(op, y, true, false), y.sparsity());
       }
     } else if (y.is_scalar()) {
       if (y.nnz()==0) {
         if (operation_checker<FX0Checker>(op)) return MX::zeros(Sparsity(size()));
-        return toMatrix(getBinary(op, MX(0), false, true), sparsity());
+        return to_matrix(_get_binary(op, MX(0), false, true), sparsity());
       } else {
-        return toMatrix(getBinary(op, y, false, true), sparsity());
+        return to_matrix(_get_binary(op, y, false, true), sparsity());
       }
     } else {
       casadi_assert_message(sparsity().size() == y.sparsity().size(), "Dimension mismatch.");
       if (sparsity()==y.sparsity()) {
         // Matching sparsities
-        return getBinary(op, y, false, false);
+        return _get_binary(op, y, false, false);
       } else {
         // Get the sparsity pattern of the result
         // (ignoring structural zeros giving rise to nonzero result)
@@ -579,12 +566,12 @@ namespace casadi {
         // Project the arguments to this sparsity
         MX xx = project(shared_from_this<MX>(), r_sp);
         MX yy = project(y, r_sp);
-        return xx->getBinary(op, yy, false, false);
+        return xx->_get_binary(op, yy, false, false);
       }
     }
   }
 
-  MX MXNode::getBinary(int op, const MX& y, bool scX, bool scY) const {
+  MX MXNode::_get_binary(int op, const MX& y, bool scX, bool scY) const {
     casadi_assert(sparsity()==y.sparsity() || scX || scY);
 
     if (GlobalOptions::simplification_on_the_fly) {
@@ -628,16 +615,16 @@ namespace casadi {
       case OP_CONST:
         // Make the constant the first argument, if possible
         if (this->op()!=OP_CONST && operation_checker<CommChecker>(op)) {
-          return y->getBinary(op, shared_from_this<MX>(), scY, scX);
+          return y->_get_binary(op, shared_from_this<MX>(), scY, scX);
         } else {
           switch (op) {
           case OP_POW:
-            return getBinary(OP_CONSTPOW, y, scX, scY);
+            return _get_binary(OP_CONSTPOW, y, scX, scY);
           case OP_CONSTPOW:
-            if (y->isValue(-1)) return get_unary(OP_INV);
-            else if (y->isValue(0)) return MX::ones(sparsity());
-            else if (y->isValue(1)) return shared_from_this<MX>();
-            else if (y->isValue(2)) return get_unary(OP_SQ);
+            if (y->is_value(-1)) return get_unary(OP_INV);
+            else if (y->is_value(0)) return MX::ones(sparsity());
+            else if (y->is_value(1)) return shared_from_this<MX>();
+            else if (y->is_value(2)) return get_unary(OP_SQ);
             break;
           case OP_ADD:
           case OP_SUB:
@@ -645,11 +632,11 @@ namespace casadi {
                 return scX ? repmat(shared_from_this<MX>(), y.size()) : shared_from_this<MX>();
             break;
           case OP_MUL:
-            if (y->isValue(1)) return shared_from_this<MX>();
+            if (y->is_value(1)) return shared_from_this<MX>();
             break;
           case OP_DIV:
-            if (y->isValue(1)) return shared_from_this<MX>();
-            else if (y->isValue(0.5)) return get_unary(OP_TWICE);
+            if (y->is_value(1)) return shared_from_this<MX>();
+            else if (y->is_value(0.5)) return get_unary(OP_TWICE);
             break;
           default: break; // no rule
           }
@@ -657,20 +644,20 @@ namespace casadi {
         break;
       case OP_NEG:
         if (op==OP_ADD) {
-          return getBinary(OP_SUB, y->dep(), scX, scY);
+          return _get_binary(OP_SUB, y->dep(), scX, scY);
         } else if (op==OP_SUB) {
-          return getBinary(OP_ADD, y->dep(), scX, scY);
+          return _get_binary(OP_ADD, y->dep(), scX, scY);
         } else if (op==OP_MUL) {
-          return -getBinary(OP_MUL, y->dep(), scX, scY);
+          return -_get_binary(OP_MUL, y->dep(), scX, scY);
         } else if (op==OP_DIV) {
-          return -getBinary(OP_DIV, y->dep(), scX, scY);
+          return -_get_binary(OP_DIV, y->dep(), scX, scY);
         }
         break;
       case OP_INV:
         if (op==OP_MUL) {
-          return getBinary(OP_DIV, y->dep(), scX, scY);
+          return _get_binary(OP_DIV, y->dep(), scX, scY);
         } else if (op==OP_DIV) {
-          return getBinary(OP_MUL, y->dep(), scX, scY);
+          return _get_binary(OP_MUL, y->dep(), scX, scY);
         }
         break;
       default: break; // no rule
@@ -686,7 +673,7 @@ namespace casadi {
         return MX::create(new BinaryMX<true, false>(Operation(op), shared_from_this<MX>(), y));
       } else {
         // Put a densification node in between
-        return getBinary(op, densify(y), true, false);
+        return _get_binary(op, densify(y), true, false);
       }
     } else if (scY) {
       // Check if it is ok to loop over nonzeros only
@@ -696,7 +683,7 @@ namespace casadi {
         return MX::create(new BinaryMX<false, true>(Operation(op), shared_from_this<MX>(), y));
       } else {
         // Put a densification node in between
-        return densify(shared_from_this<MX>())->getBinary(op, y, false, true);
+        return densify(shared_from_this<MX>())->_get_binary(op, y, false, true);
       }
     } else {
       // Loop over nonzeros only
@@ -727,11 +714,11 @@ namespace casadi {
     return true;
   }
 
-  MX MXNode::getAssertion(const MX& y, const std::string& fail_message) const {
+  MX MXNode::get_assert(const MX& y, const std::string& fail_message) const {
     return MX::create(new Assertion(shared_from_this<MX>(), y, fail_message));
   }
 
-  MX MXNode::getMonitor(const std::string& comment) const {
+  MX MXNode::get_monitor(const std::string& comment) const {
     if (nnz()==0) {
       return shared_from_this<MX>();
     } else {
@@ -763,7 +750,7 @@ namespace casadi {
       if (sparsity().nnz()==0) {
         return 0;
       } else if (sparsity().is_scalar()) {
-        return getBinarySwitch(OP_MUL, y);
+        return get_binary(OP_MUL, y);
       } else {
         return MX::create(new Dot(shared_from_this<MX>(), y));
       }
@@ -936,13 +923,13 @@ namespace casadi {
     return ret;
   }
 
-  void MXNode::copyFwd(const bvec_t* arg, bvec_t* res, int len) {
+  void MXNode::copy_fwd(const bvec_t* arg, bvec_t* res, int len) {
     if (arg!=res) {
       copy(arg, arg+len, res);
     }
   }
 
-  void MXNode::copyAdj(bvec_t* arg, bvec_t* res, int len) {
+  void MXNode::copy_rev(bvec_t* arg, bvec_t* res, int len) {
     if (arg!=res) {
       for (int k=0; k<len; ++k) {
         *arg++ |= *res;

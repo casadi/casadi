@@ -31,8 +31,8 @@ using namespace std;
 namespace casadi {
 
   HorzRepmat::HorzRepmat(const MX& x, int n) : n_(n) {
-    setDependencies(x);
-    setSparsity(repmat(x.sparsity(), 1, n));
+    set_dep(x);
+    set_sparsity(repmat(x.sparsity(), 1, n));
   }
 
   std::string HorzRepmat::print(const std::vector<std::string>& arg) const {
@@ -109,8 +109,8 @@ namespace casadi {
       block = block+sp[i];
     }
     Sparsity goal = repmat(block, 1, n);
-    setDependencies(project(x, goal));
-    setSparsity(block);
+    set_dep(project(x, goal));
+    set_sparsity(block);
   }
 
   std::string HorzRepsum::print(const std::vector<std::string>& arg) const {

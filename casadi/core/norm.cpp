@@ -29,8 +29,8 @@ using namespace std;
 namespace casadi {
 
   Norm::Norm(const MX& x) {
-    setDependencies(x);
-    setSparsity(Sparsity::scalar());
+    set_dep(x);
+    set_sparsity(Sparsity::scalar());
   }
 
   std::string NormF::print(const std::vector<std::string>& arg) const {

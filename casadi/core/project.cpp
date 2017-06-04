@@ -33,8 +33,8 @@ using namespace std;
 namespace casadi {
 
   Project::Project(const MX& x, const Sparsity& sp) {
-    setDependencies(x);
-    setSparsity(Sparsity(sp));
+    set_dep(x);
+    set_sparsity(Sparsity(sp));
   }
 
   std::string Project::print(const std::vector<std::string>& arg) const {

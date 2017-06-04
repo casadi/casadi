@@ -30,8 +30,8 @@ using namespace std;
 namespace casadi {
 
   Determinant::Determinant(const MX& x) {
-    setDependencies(x);
-    setSparsity(Sparsity::dense(1, 1));
+    set_dep(x);
+    set_sparsity(Sparsity::dense(1, 1));
   }
 
   std::string Determinant::print(const std::vector<std::string>& arg) const {

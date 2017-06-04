@@ -40,8 +40,8 @@ namespace casadi {
     const std::vector<int>& c, const std::vector<int>& a, const std::vector<int>& b):
       dim_c_(dim_c), dim_a_(dim_a), dim_b_(dim_b), c_(c), a_(a), b_(b) {
 
-    setDependencies(C, A, B);
-    setSparsity(C.sparsity());
+    set_dep(C, A, B);
+    set_sparsity(C.sparsity());
 
     n_iter_ = einstein_process(A, B, C, dim_a, dim_b, dim_c, a, b, c,
       iter_dims_, strides_a_, strides_b_, strides_c_);
@@ -118,7 +118,7 @@ namespace casadi {
       Contraction<bvec_t>(*c, 0, *a);
       Contraction<bvec_t>(0, *c, *b);
     }
-    copyAdj(arg[0], res[0], nnz());
+    copy_rev(arg[0], res[0], nnz());
   }
 
   void Einstein::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {

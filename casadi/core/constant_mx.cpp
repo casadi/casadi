@@ -33,7 +33,7 @@ using namespace std;
 namespace casadi {
 
   ConstantMX::ConstantMX(const Sparsity& sp) {
-    setSparsity(sp);
+    set_sparsity(sp);
   }
 
   ConstantMX::~ConstantMX() {
@@ -144,8 +144,8 @@ namespace casadi {
   // MX ConstantMX::get_mac(const MX& y) const {
   //   if (y.is_constant()) {
   //     // Constant folding
-  //     DM xv = getMatrixValue();
-  //     DM yv = y->getMatrixValue();
+  //     DM xv = get_DM();
+  //     DM yv = y->get_DM();
   //     return mul(xv, yv);
   //   } else {
   //     return MXNode::get_mac(y);
@@ -155,8 +155,8 @@ namespace casadi {
   MX ConstantMX::get_dot(const MX& y) const {
     if (y.is_constant()) {
       // Constant folding
-      DM xv = getMatrixValue();
-      DM yv = y->getMatrixValue();
+      DM xv = get_DM();
+      DM yv = y->get_DM();
       return dot(xv, yv);
     } else {
       return MXNode::get_dot(y);
@@ -185,12 +185,12 @@ namespace casadi {
     return shared_from_this<MX>();
   }
 
-  MX ZeroByZero::get_get_nz(const Sparsity& sp, const std::vector<int>& nz) const {
+  MX ZeroByZero::get_nzref(const Sparsity& sp, const std::vector<int>& nz) const {
     casadi_assert(nz.empty());
     return MX::zeros(sp);
   }
 
-  MX ZeroByZero::get_set_nz(const MX& y, const std::vector<int>& nz) const {
+  MX ZeroByZero::get_nzassign(const MX& y, const std::vector<int>& nz) const {
     return shared_from_this<MX>();
   }
 
@@ -202,7 +202,7 @@ namespace casadi {
     return shared_from_this<MX>();
   }
 
-  MX ZeroByZero::getBinary(int op, const MX& y, bool ScX, bool ScY) const {
+  MX ZeroByZero::_get_binary(int op, const MX& y, bool ScX, bool ScY) const {
     return shared_from_this<MX>();
   }
 

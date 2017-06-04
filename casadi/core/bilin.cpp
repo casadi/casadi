@@ -29,8 +29,8 @@ using namespace std;
 namespace casadi {
 
   Bilin::Bilin(const MX& A, const MX& x, const MX& y) {
-    setDependencies(x, A);
-    setSparsity(Sparsity::scalar());
+    set_dep(x, A);
+    set_sparsity(Sparsity::scalar());
   }
 
   std::string Bilin::print(const std::vector<std::string>& arg) const {

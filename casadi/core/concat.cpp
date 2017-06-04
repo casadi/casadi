@@ -31,7 +31,7 @@ using namespace std;
 namespace casadi {
 
   Concat::Concat(const vector<MX>& x) {
-    setDependencies(x);
+    set_dep(x);
   }
 
   Concat::~Concat() {
@@ -94,7 +94,7 @@ namespace casadi {
     }
   }
 
-  MX Concat::get_get_nz(const Sparsity& sp, const std::vector<int>& nz) const {
+  MX Concat::get_nzref(const Sparsity& sp, const std::vector<int>& nz) const {
     // Get the first nonnegative nz
     int nz_test = -1;
     for (auto&& i : nz) {
@@ -121,17 +121,17 @@ namespace casadi {
       if (j>=0 && (j < begin || j >= end)) {
 
         // Fallback to the base class
-        return MXNode::get_get_nz(sp, nz);
+        return MXNode::get_nzref(sp, nz);
       }
     }
 
     // All nz refer to the same dependency, update the nonzero indices
     if (begin==0) {
-      return dep(i)->get_get_nz(sp, nz);
+      return dep(i)->get_nzref(sp, nz);
     } else {
       vector<int> nz_new(nz);
       for (auto&& j : nz_new) if (j>=0) j -= begin;
-      return dep(i)->get_get_nz(sp, nz_new);
+      return dep(i)->get_nzref(sp, nz_new);
     }
   }
 
@@ -140,7 +140,7 @@ namespace casadi {
     casadi_assert(x.size()>1);
     std::vector<Sparsity> sp(x.size());
     for (int i=0; i<x.size(); ++i) sp[i] = x[i].sparsity();
-    setSparsity(diagcat(sp));
+    set_sparsity(diagcat(sp));
   }
 
   std::string Diagcat::print(const std::vector<std::string>& arg) const {
@@ -193,7 +193,7 @@ namespace casadi {
     std::vector<Sparsity> sp(x.size());
     for (int i=0; i<x.size(); ++i)
       sp[i] = x[i].sparsity();
-    setSparsity(horzcat(sp));
+    set_sparsity(horzcat(sp));
   }
 
   std::string Horzcat::print(const std::vector<std::string>& arg) const {
@@ -244,7 +244,7 @@ namespace casadi {
     casadi_assert(x.size()>1);
     std::vector<Sparsity> sp(x.size());
     for (int i=0; i<x.size(); ++i) sp[i] = x[i].sparsity();
-    setSparsity(vertcat(sp));
+    set_sparsity(vertcat(sp));
   }
 
   std::string Vertcat::print(const std::vector<std::string>& arg) const {

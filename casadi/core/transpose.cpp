@@ -30,8 +30,8 @@ using namespace std;
 namespace casadi {
 
   Transpose::Transpose(const MX& x) {
-    setDependencies(x);
-    setSparsity(x.sparsity().T());
+    set_dep(x);
+    set_sparsity(x.sparsity().T());
   }
 
   void Transpose::eval(const double** arg, double** res, int* iw, double* w, int mem) const {

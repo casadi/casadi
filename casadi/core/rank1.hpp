@@ -78,7 +78,7 @@ namespace casadi {
                   const std::vector<int>& arg, const std::vector<int>& res) const override;
 
     /// Can the operation be performed inplace (i.e. overwrite the result)
-    int numInplace() const override { return 1;}
+    int n_inplace() const override { return 1;}
 
     /** \brief  Print expression */
     std::string print(const std::vector<std::string>& arg) const override;

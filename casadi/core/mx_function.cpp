@@ -152,7 +152,7 @@ namespace casadi {
             ae.arg[i] = n->dep(i)->temp;
           }
           ae.res.resize(n->nout());
-          if (n->isMultipleOutput()) {
+          if (n->has_output()) {
             fill(ae.res.begin(), ae.res.end(), -1);
           } else {
             ae.res[0] = n->temp;
@@ -172,7 +172,7 @@ namespace casadi {
 
       } else { // Function output node
         // Get the output index
-        int oind = n->getFunctionOutput();
+        int oind = n->which_output();
 
         // Get the index of the parent node
         int pind = place_in_alg[n->dep(0)->temp];
@@ -206,7 +206,7 @@ namespace casadi {
       // There are two tasks, allocate memory of the result and free the
       // memory off the arguments, order depends on whether inplace is possible
       int first_to_free = 0;
-      int last_to_free = e.op==OP_OUTPUT ? 1 : e.data->numInplace();
+      int last_to_free = e.op==OP_OUTPUT ? 1 : e.data->n_inplace();
       for (int task=0; task<2; ++task) {
 
         // Dereference or free the memory of the arguments

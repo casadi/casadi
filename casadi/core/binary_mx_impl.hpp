@@ -38,11 +38,11 @@ namespace casadi {
 
   template<bool ScX, bool ScY>
   BinaryMX<ScX, ScY>::BinaryMX(Operation op, const MX& x, const MX& y) : op_(op) {
-    setDependencies(x, y);
+    set_dep(x, y);
     if (ScX) {
-      setSparsity(y.sparsity());
+      set_sparsity(y.sparsity());
     } else {
-      setSparsity(x.sparsity());
+      set_sparsity(x.sparsity());
     }
   }
 
@@ -239,8 +239,8 @@ namespace casadi {
   }
 
   template<bool ScX, bool ScY>
-  MX BinaryMX<ScX, ScY>::getBinary(int op, const MX& y, bool scX, bool scY) const {
-    if (!GlobalOptions::simplification_on_the_fly) return MXNode::getBinary(op, y, scX, scY);
+  MX BinaryMX<ScX, ScY>::_get_binary(int op, const MX& y, bool scX, bool scY) const {
+    if (!GlobalOptions::simplification_on_the_fly) return MXNode::_get_binary(op, y, scX, scY);
 
     switch (op_) {
     case OP_ADD:
@@ -255,7 +255,7 @@ namespace casadi {
     }
 
     // Fallback to default implementation
-    return MXNode::getBinary(op, y, scX, scY);
+    return MXNode::_get_binary(op, y, scX, scY);
   }
 
 

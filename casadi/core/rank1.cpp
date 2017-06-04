@@ -28,8 +28,8 @@ using namespace std;
 namespace casadi {
 
   Rank1::Rank1(const MX& A, const MX& alpha, const MX& x, const MX& y) {
-    setDependencies({A, alpha, x, y});
-    setSparsity(A.sparsity());
+    set_dep({A, alpha, x, y});
+    set_sparsity(A.sparsity());
   }
 
   std::string Rank1::print(const std::vector<std::string>& arg) const {
@@ -119,7 +119,7 @@ namespace casadi {
     }
 
     // Clear seeds
-    copyAdj(arg[0], res[0], nnz());
+    copy_rev(arg[0], res[0], nnz());
   }
 
   void Rank1::generate(CodeGenerator& g, const std::string& mem,
