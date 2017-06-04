@@ -114,6 +114,12 @@ namespace casadi {
   /// Get the documentation string for a plugin
   CASADI_EXPORT std::string doc_conic(const std::string& name);
 
+  /** Generate native code in the interfaced language for debugging */
+  CASADI_EXPORT void conic_debug(const Function& f, const std::string &filename);
+
+  /** Generate native code in the interfaced language for debugging */
+  CASADI_EXPORT void conic_debug(const Function& f, std::ostream &file);
+
   /** @} */
 } // namespace casadi
 

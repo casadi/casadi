@@ -50,18 +50,27 @@ namespace casadi {
     return ret;
   }
 
-  void Function::conic_debug(const string &filename) const {
+  void conic_debug(const Function& f, const std::string &filename) {
     ofstream file;
     file.open(filename.c_str());
-    conic_debug(file);
+    conic_debug(f, file);
+  }
+
+  void conic_debug(const Function& f, std::ostream &file) {
+    casadi_assert(!f.is_null());
+    const Conic* n = f.get<Conic>();
+    return n->generateNativeCode(file);
+  }
+
+#ifdef WITH_DEPRECATED_FEATURES
+  void Function::conic_debug(const string &filename) const {
+    casadi::conic_debug(*this, filename);
   }
 
   void Function::conic_debug(ostream &file) const {
-    casadi_assert(!is_null());
-    const Conic* n = dynamic_cast<const Conic*>(get());
-    casadi_assert_message(n!=0, "Not a QP solver");
-    return n->generateNativeCode(file);
+    casadi::conic_debug(*this, file);
   }
+#endif // WITH_DEPRECATED_FEATURES
 
   vector<string> conic_in() {
     vector<string> ret(conic_n_in());

@@ -764,11 +764,13 @@ namespace casadi {
     // Check if a particular dependency exists
     bool has_function(const std::string& fname) const;
 
+#ifdef WITH_DEPRECATED_FEATURES
     /** Generate native code in the interfaced language for debugging */
     void conic_debug(const std::string &filename) const;
 
     /** Generate native code in the interfaced language for debugging */
     void conic_debug(std::ostream &file) const;
+#endif // WITH_DEPRECATED_FEATURES
 
 #ifndef SWIG
     protected:
