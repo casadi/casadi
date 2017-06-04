@@ -1259,14 +1259,6 @@ namespace casadi {
     vinit_fcn = Function("lifting_variable_guess", f_in, f_out);
   }
 
-  MX MXFunction::grad_mx(int iind, int oind) {
-    return grad(iind, oind);
-  }
-
-  MX MXFunction::tang_mx(int iind, int oind) {
-    return tang(iind, oind);
-  }
-
   const MX MXFunction::mx_in(int ind) const {
     return in_.at(ind);
   }

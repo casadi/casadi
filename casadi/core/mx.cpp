@@ -1550,12 +1550,12 @@ namespace casadi {
 
   MX MX::gradient(const MX& f, const MX& x) {
     Function temp("helper_gradient_MX", {x}, {f});
-    return temp->grad_mx(0, 0);
+    return temp.get<MXFunction>()->grad(0, 0);
   }
 
   MX MX::tangent(const MX& f, const MX& x) {
     Function temp("helper_tangent_MX", {x}, {f});
-    return temp->tang_mx(0, 0);
+    return temp.get<MXFunction>()->tang(0, 0);
   }
 
   MX MX::hessian(const MX& f, const MX& x) {

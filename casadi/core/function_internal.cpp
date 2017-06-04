@@ -2294,14 +2294,6 @@ namespace casadi {
     return ad_weight_sp_;
   }
 
-  MX FunctionInternal::grad_mx(int iind, int oind) {
-    casadi_error("'grad_mx' not defined for " + type_name());
-  }
-
-  MX FunctionInternal::tang_mx(int iind, int oind) {
-    casadi_error("'tang_mx' not defined for " + type_name());
-  }
-
   const SX FunctionInternal::sx_in(int ind) const {
     return SX::sym("x_" + CodeGenerator::to_string(ind), sparsity_in(ind));
   }

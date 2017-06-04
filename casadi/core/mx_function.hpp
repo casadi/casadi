@@ -156,12 +156,6 @@ namespace casadi {
     // print an element of an algorithm
     std::string print(const AlgEl& el) const;
 
-    /** \brief Gradient expression */
-    MX grad_mx(int iind=0, int oind=0) override;
-
-    /** \brief Tangent expression */
-    MX tang_mx(int iind=0, int oind=0) override;
-
     ///@{
     /** \brief Get function input(s) and output(s)  */
     const MX mx_in(int ind) const override;

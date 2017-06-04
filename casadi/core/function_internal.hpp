@@ -309,12 +309,6 @@ namespace casadi {
         sparsity propagation */
     virtual double sp_weight() const;
 
-    /** \brief Gradient expression */
-    virtual MX grad_mx(int iind=0, int oind=0);
-
-    /** \brief Tangent expression */
-    virtual MX tang_mx(int iind=0, int oind=0);
-
     ///@{
     /** \brief Get function input(s) and output(s)  */
     virtual const SX sx_in(int ind) const;
