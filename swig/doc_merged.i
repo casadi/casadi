@@ -328,11 +328,6 @@ meta-information allowing a user to evaluate a generated function.
 
 %feature("docstring") casadi::Blocksqp::get_function "[INTERNAL] ";
 
-%feature("docstring") casadi::Blocksqp::set_jac_sparsity "[INTERNAL]
-Generate the sparsity of a Jacobian block.
-
-";
-
 %feature("docstring") casadi::Blocksqp::sparsity_jac "[INTERNAL]  Get, if
 necessary generate, the sparsity of a Jacobian block.
 
@@ -2171,11 +2166,6 @@ input/output nonzeros.
 
 ";
 
-%feature("docstring") casadi::BSpline::set_jac_sparsity "[INTERNAL]
-Generate the sparsity of a Jacobian block.
-
-";
-
 %feature("docstring") casadi::BSpline::default_in "[INTERNAL]  Get default
 input value.
 
@@ -3323,11 +3313,6 @@ if output arguments that needs to be replaced.
 
 ";
 
-%feature("docstring") casadi::BSplineCommon::set_jac_sparsity "[INTERNAL]
-Generate the sparsity of a Jacobian block.
-
-";
-
 %feature("docstring") casadi::BSplineCommon::n_in "[INTERNAL]  Number of
 function inputs and outputs.
 
@@ -4086,11 +4071,6 @@ Evaluate numerically, work vectors given.
 
 %feature("docstring") casadi::BSplineDual::verbose "[INTERNAL]  Verbose
 mode?
-
-";
-
-%feature("docstring") casadi::BSplineDual::set_jac_sparsity "[INTERNAL]
-Generate the sparsity of a Jacobian block.
 
 ";
 
@@ -4871,10 +4851,6 @@ Print list of options.
 
 %feature("docstring") casadi::BSplineInterpolant::construct "[INTERNAL]
 Construct Prepares the function for evaluation.
-
-";
-
-%feature("docstring") casadi::BSplineInterpolant::set_jac_sparsity "[INTERNAL]  Generate the sparsity of a Jacobian block.
 
 ";
 
@@ -6985,11 +6961,6 @@ memory block.
 
 ";
 
-%feature("docstring") casadi::Collocation::set_jac_sparsity "[INTERNAL]
-Generate the sparsity of a Jacobian block.
-
-";
-
 %feature("docstring") casadi::Collocation::x "[INTERNAL] ";
 
 %feature("docstring") casadi::Collocation::name "[INTERNAL]  Name of the
@@ -8634,11 +8605,6 @@ able to propagate seeds through the algorithm?
 %feature("docstring") casadi::Conic::getJacSparsityHierarchical "[INTERNAL]
 A flavor of getJacSparsity that does hierarchical block structure
 recognition.
-
-";
-
-%feature("docstring") casadi::Conic::set_jac_sparsity "[INTERNAL]  Generate
-the sparsity of a Jacobian block.
 
 ";
 
@@ -10383,11 +10349,6 @@ able to propagate seeds through the algorithm?
 
 %feature("docstring") casadi::Dple::has_function "[INTERNAL] ";
 
-%feature("docstring") casadi::Dple::set_jac_sparsity "[INTERNAL]  Generate
-the sparsity of a Jacobian block.
-
-";
-
 %feature("docstring") casadi::Dple::call_forward "[INTERNAL]  Forward mode
 AD, virtual functions overloaded in derived classes.
 
@@ -10623,8 +10584,8 @@ Evaluate a function, overloaded.
 
 ";
 
-%feature("docstring") casadi::Expm::set_jac_sparsity "[INTERNAL]  Generate
-the sparsity of a Jacobian block.
+%feature("docstring") casadi::Expm::clear_memory "[INTERNAL]  Clear all
+memory (called from destructor)
 
 ";
 
@@ -11437,11 +11398,6 @@ of the work vector.
 
 ";
 
-%feature("docstring") casadi::Expm::clear_memory "[INTERNAL]  Clear all
-memory (called from destructor)
-
-";
-
 
 // File: classcasadi_1_1External.xml
 %feature("docstring") casadi::External::call_reverse "[INTERNAL]  Reverse
@@ -11581,11 +11537,6 @@ meta-information allowing a user to evaluate a generated function.
 
 %feature("docstring") casadi::External::size_out "[INTERNAL]  Input/output
 dimensions.
-
-";
-
-%feature("docstring") casadi::External::set_jac_sparsity "[INTERNAL]
-Generate the sparsity of a Jacobian block.
 
 ";
 
@@ -12574,10 +12525,6 @@ Check if output arguments have correct length and dimensions.
 ";
 
 %feature("docstring") casadi::FixedStepIntegrator::addDependency "[INTERNAL]  Add a dependent function.
-
-";
-
-%feature("docstring") casadi::FixedStepIntegrator::set_jac_sparsity "[INTERNAL]  Generate the sparsity of a Jacobian block.
 
 ";
 
@@ -14745,11 +14692,6 @@ Replace 0-by-0 outputs.
 
 ";
 
-%feature("docstring") casadi::GenericExternal::set_jac_sparsity "[INTERNAL]
-Generate the sparsity of a Jacobian block.
-
-";
-
 %feature("docstring") casadi::GenericExternal::jit_dependencies "[INTERNAL]
 Jit dependencies.
 
@@ -16608,11 +16550,6 @@ structure recognition for symmetric Jacobians
 
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::get_function "[INTERNAL] ";
 
-%feature("docstring") casadi::ImplicitFixedStepIntegrator::set_jac_sparsity
-"[INTERNAL]  Generate the sparsity of a Jacobian block.
-
-";
-
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::adjViaJac "[INTERNAL]  Calculate derivatives by multiplying the full Jacobian and
 multiplying.
 
@@ -17398,11 +17335,6 @@ a memory object.
 %feature("docstring") casadi::ImplicitToNlp::getJacSparsityHierarchicalSymm
 "[INTERNAL]  A flavor of getJacSparsity that does hierarchical block
 structure recognition for symmetric Jacobians
-
-";
-
-%feature("docstring") casadi::ImplicitToNlp::set_jac_sparsity "[INTERNAL]
-Generate the sparsity of a Jacobian block.
 
 ";
 
@@ -18526,11 +18458,6 @@ Get an atomic operation operator index.
 
 ";
 
-%feature("docstring") casadi::Integrator::set_jac_sparsity "[INTERNAL]
-Generate the sparsity of a Jacobian block.
-
-";
-
 %feature("docstring") casadi::Integrator::getAtomicOutput "[INTERNAL]  Get
 the (integer) output argument of an atomic operation.
 
@@ -19394,8 +19321,8 @@ default input value.
 
 ";
 
-%feature("docstring") casadi::Interpolant::set_jac_sparsity "[INTERNAL]
-Generate the sparsity of a Jacobian block.
+%feature("docstring") casadi::Interpolant::init_memory "[INTERNAL]
+Initalize memory block.
 
 ";
 
@@ -19679,11 +19606,6 @@ sparsity backwards.
 
 %feature("docstring") casadi::Interpolant::name_in "[INTERNAL]  Get input
 scheme name by index.
-
-";
-
-%feature("docstring") casadi::Interpolant::init_memory "[INTERNAL]
-Initalize memory block.
 
 ";
 
@@ -20668,11 +20590,6 @@ the algorithm.
 
 ";
 
-%feature("docstring") casadi::Jit::set_jac_sparsity "[INTERNAL]  Generate
-the sparsity of a Jacobian block.
-
-";
-
 %feature("docstring") casadi::Jit::getWorkSize "[INTERNAL]  Get the length
 of the work vector.
 
@@ -21253,8 +21170,8 @@ dimensions.
 
 ";
 
-%feature("docstring") casadi::LapackLu::set_jac_sparsity "[INTERNAL]
-Generate the sparsity of a Jacobian block.
+%feature("docstring") casadi::LapackLu::sz_iw "[INTERNAL]  Get required
+length of iw field.
 
 ";
 
@@ -21501,11 +21418,6 @@ the numerical values of the supplied bounds make sense.
 
 %feature("docstring") casadi::LapackLu::index_in "[INTERNAL]  Get input
 scheme index by name.
-
-";
-
-%feature("docstring") casadi::LapackLu::sz_iw "[INTERNAL]  Get required
-length of iw field.
 
 ";
 
@@ -22680,11 +22592,6 @@ Generate code the function.
 
 %feature("docstring") casadi::LapackQr::set_work "[INTERNAL]  Set the
 (persistent) work vectors.
-
-";
-
-%feature("docstring") casadi::LapackQr::set_jac_sparsity "[INTERNAL]
-Generate the sparsity of a Jacobian block.
 
 ";
 
@@ -23924,10 +23831,6 @@ Evaluate numerically, simplied syntax.
 
 ";
 
-%feature("docstring") casadi::LinearInterpolant::set_jac_sparsity "[INTERNAL]  Generate the sparsity of a Jacobian block.
-
-";
-
 %feature("docstring") casadi::LinearInterpolant::~LinearInterpolant "[INTERNAL] ";
 
 %feature("docstring") casadi::LinearInterpolant::has_function "[INTERNAL]
@@ -24481,10 +24384,6 @@ Get default input value.
 ";
 
 %feature("docstring") casadi::LinearInterpolantJac::get_partition "[INTERNAL]  Get the unidirectional or bidirectional partition.
-
-";
-
-%feature("docstring") casadi::LinearInterpolantJac::set_jac_sparsity "[INTERNAL]  Generate the sparsity of a Jacobian block.
 
 ";
 
@@ -25374,11 +25273,6 @@ Obtain solver name from Adaptor.
 
 %feature("docstring") casadi::Lsqr::map_mx "[INTERNAL]  Parallel
 evaluation.
-
-";
-
-%feature("docstring") casadi::Lsqr::set_jac_sparsity "[INTERNAL]  Generate
-the sparsity of a Jacobian block.
 
 ";
 
@@ -26605,11 +26499,6 @@ dimensions.
 
 ";
 
-%feature("docstring") casadi::Map::init_memory "[INTERNAL]  Initalize
-memory block.
-
-";
-
 %feature("docstring") casadi::Map::signature "[INTERNAL]  Code generate the
 function.
 
@@ -26864,8 +26753,8 @@ is of a particular type.
 
 ";
 
-%feature("docstring") casadi::Map::set_jac_sparsity "[INTERNAL]  Generate
-the sparsity of a Jacobian block.
+%feature("docstring") casadi::Map::init_memory "[INTERNAL]  Initalize
+memory block.
 
 ";
 
@@ -27113,11 +27002,6 @@ symbolic matrices.
 
 %feature("docstring") casadi::MapOmp::_set_work "[INTERNAL]  Set the
 (persistent) work vectors.
-
-";
-
-%feature("docstring") casadi::MapOmp::set_jac_sparsity "[INTERNAL]
-Generate the sparsity of a Jacobian block.
 
 ";
 
@@ -28822,15 +28706,15 @@ Get the sparsity pattern.
 
 ";
 
-%feature("docstring") casadi::MX::is_tril "
-
-Check if the matrix is lower triangular.
-
-";
-
 %feature("docstring") friendwrap_lift "
 
 Lift the expression Experimental feature.
+
+";
+
+%feature("docstring") casadi::MX::is_tril "
+
+Check if the matrix is lower triangular.
 
 ";
 
@@ -29266,6 +29150,12 @@ Returns the truth value of an MX expression.
 %feature("docstring") casadi::MX::name "
 
 Get the name.
+
+";
+
+%feature("docstring") casadi::MX::which_function "
+
+Get function - only valid when is_call() is true.
 
 ";
 
@@ -30227,11 +30117,6 @@ function.
 
 ";
 
-%feature("docstring") casadi::Newton::set_jac_sparsity "[INTERNAL]
-Generate the sparsity of a Jacobian block.
-
-";
-
 %feature("docstring") casadi::Newton::wrap "[INTERNAL]  Wrap in an Function
 instance consisting of only one MX call.
 
@@ -30791,8 +30676,8 @@ required length of res field.
 
 ";
 
-%feature("docstring") casadi::Nlpsol::set_jac_sparsity "[INTERNAL]
-Generate the sparsity of a Jacobian block.
+%feature("docstring") casadi::Nlpsol::is_a "[INTERNAL]  Check if the
+function is of a particular type.
 
 ";
 
@@ -31186,11 +31071,6 @@ scheme index by name.
 
 %feature("docstring") casadi::Nlpsol::free_memory "[INTERNAL]  Free memory
 block.
-
-";
-
-%feature("docstring") casadi::Nlpsol::is_a "[INTERNAL]  Check if the
-function is of a particular type.
 
 ";
 
@@ -32369,11 +32249,6 @@ JIT for dependencies.
 
 ";
 
-%feature("docstring") casadi::OracleFunction::set_jac_sparsity "[INTERNAL]
-Generate the sparsity of a Jacobian block.
-
-";
-
 %feature("docstring") casadi::OracleFunction::getAtomicOperation "[INTERNAL]  Get an atomic operation operator index.
 
 ";
@@ -32902,11 +32777,6 @@ sparsity of a given output.
 
 %feature("docstring") casadi::QpToNlp::eval "[INTERNAL]  Evaluate
 numerically.
-
-";
-
-%feature("docstring") casadi::QpToNlp::set_jac_sparsity "[INTERNAL]
-Generate the sparsity of a Jacobian block.
 
 ";
 
@@ -33954,11 +33824,6 @@ memory object.
 
 %feature("docstring") casadi::Rootfinder::symbolic_output "[INTERNAL]  Get
 a vector of symbolic variables corresponding to the outputs.
-
-";
-
-%feature("docstring") casadi::Rootfinder::set_jac_sparsity "[INTERNAL]
-Generate the sparsity of a Jacobian block.
 
 ";
 
@@ -35184,11 +35049,6 @@ output arguments have correct length and dimensions.
 
 ";
 
-%feature("docstring") casadi::RungeKutta::set_jac_sparsity "[INTERNAL]
-Generate the sparsity of a Jacobian block.
-
-";
-
 %feature("docstring") casadi::RungeKutta::n_out "[INTERNAL]  Number of
 function inputs and outputs.
 
@@ -36219,11 +36079,6 @@ memory (called from destructor)
 
 ";
 
-%feature("docstring") casadi::Scpgen::set_jac_sparsity "[INTERNAL]
-Generate the sparsity of a Jacobian block.
-
-";
-
 %feature("docstring") casadi::Scpgen::get_stats "[INTERNAL]  Get all
 statistics.
 
@@ -37096,10 +36951,6 @@ Number of function inputs and outputs.
 ";
 
 %feature("docstring") casadi::SimplifiedExternal::SimplifiedExternal "[INTERNAL]  Constructor.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::set_jac_sparsity "[INTERNAL]  Generate the sparsity of a Jacobian block.
 
 ";
 
@@ -38323,11 +38174,6 @@ all memory (called from destructor)
 
 ";
 
-%feature("docstring") casadi::SlicotDple::symbolicAdjSeed "[INTERNAL]
-Symbolic expressions for the adjoint seeds.
-
-";
-
 %feature("docstring") casadi::SlicotDple::call_forward "[INTERNAL]  Forward
 mode AD, virtual functions overloaded in derived classes.
 
@@ -38584,8 +38430,8 @@ sparsity of a given output.
 
 ";
 
-%feature("docstring") casadi::SlicotDple::set_jac_sparsity "[INTERNAL]
-Generate the sparsity of a Jacobian block.
+%feature("docstring") casadi::SlicotDple::symbolicAdjSeed "[INTERNAL]
+Symbolic expressions for the adjoint seeds.
 
 ";
 
@@ -39251,11 +39097,6 @@ function is of a particular type.
 
 %feature("docstring") casadi::SlicotExpm::index_in "[INTERNAL]  Get input
 scheme index by name.
-
-";
-
-%feature("docstring") casadi::SlicotExpm::set_jac_sparsity "[INTERNAL]
-Generate the sparsity of a Jacobian block.
 
 ";
 
@@ -40776,11 +40617,6 @@ class instance.
 
 %feature("docstring") casadi::Sqpmethod::nnz_in "[INTERNAL]  Number of
 input/output nonzeros.
-
-";
-
-%feature("docstring") casadi::Sqpmethod::set_jac_sparsity "[INTERNAL]
-Generate the sparsity of a Jacobian block.
 
 ";
 
@@ -42364,11 +42200,6 @@ memory block.
 
 ";
 
-%feature("docstring") casadi::Switch::set_jac_sparsity "[INTERNAL]
-Generate the sparsity of a Jacobian block.
-
-";
-
 %feature("docstring") casadi::Switch::alloc_arg "[INTERNAL]  Ensure
 required length of arg field.
 
@@ -42952,11 +42783,6 @@ Log the status of the solver, function given.
 
 %feature("docstring") casadi::SymbolicQr::adjViaJac "[INTERNAL]  Calculate
 derivatives by multiplying the full Jacobian and multiplying.
-
-";
-
-%feature("docstring") casadi::SymbolicQr::set_jac_sparsity "[INTERNAL]
-Generate the sparsity of a Jacobian block.
 
 ";
 

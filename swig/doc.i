@@ -495,13 +495,6 @@ std::string &name) const override "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::FunctionInternal::set_jac_sparsity(const
-Sparsity &sp, int iind, int oind, bool compact) "
-
-[INTERNAL]  Generate the sparsity of a Jacobian block.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::sparsity_jac(int iind, int
 oind, bool compact, bool symmetric) const  "
 
@@ -2937,13 +2930,6 @@ elements.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::set_jac_sparsity(const
-Sparsity &sp, int iind, int oind, bool compact) "
-
-[INTERNAL]  Generate the sparsity of a Jacobian block.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::default_in(int ind) const
 "
 
@@ -4442,13 +4428,6 @@ std::vector< M > &arg) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::set_jac_sparsity(const
-Sparsity &sp, int iind, int oind, bool compact) "
-
-[INTERNAL]  Generate the sparsity of a Jacobian block.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::n_in() const  "
 
 [INTERNAL]  Number of function inputs and outputs.
@@ -5552,13 +5531,6 @@ Evaluate numerically, work vectors given.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::set_jac_sparsity(const
-Sparsity &sp, int iind, int oind, bool compact) "
-
-[INTERNAL]  Generate the sparsity of a Jacobian block.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::release(int mem) const  "
 
 [INTERNAL]  Release a memory object.
@@ -6591,13 +6563,6 @@ int oind, bool symmetric) const  "
 "
 
 [INTERNAL]  Construct Prepares the function for evaluation.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::set_jac_sparsity(const
-Sparsity &sp, int iind, int oind, bool compact) "
-
-[INTERNAL]  Generate the sparsity of a Jacobian block.
 
 ";
 
@@ -9650,13 +9615,6 @@ const override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::set_jac_sparsity(const
-Sparsity &sp, int iind, int oind, bool compact) "
-
-[INTERNAL]  Generate the sparsity of a Jacobian block.
-
-";
-
 %feature("docstring")  casadi::Integrator::x() const  "
 
 [INTERNAL] ";
@@ -11973,13 +11931,6 @@ structure recognition.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::set_jac_sparsity(const
-Sparsity &sp, int iind, int oind, bool compact) "
-
-[INTERNAL]  Generate the sparsity of a Jacobian block.
-
-";
-
 %feature("docstring")  casadi::Conic::print_fstats(const ConicMemory *m)
 const  "
 
@@ -14170,13 +14121,6 @@ std::string &fname) const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::FunctionInternal::set_jac_sparsity(const
-Sparsity &sp, int iind, int oind, bool compact) "
-
-[INTERNAL]  Generate the sparsity of a Jacobian block.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::call_forward(const
 std::vector< MX > &arg, const std::vector< MX > &res, const std::vector<
 std::vector< MX > > &fseed, std::vector< std::vector< MX > > &fsens, bool
@@ -14514,10 +14458,9 @@ Sparsity &A) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::set_jac_sparsity(const
-Sparsity &sp, int iind, int oind, bool compact) "
+%feature("docstring")  casadi::FunctionInternal::clear_memory() "
 
-[INTERNAL]  Generate the sparsity of a Jacobian block.
+[INTERNAL]  Clear all memory (called from destructor)
 
 ";
 
@@ -15635,12 +15578,6 @@ const std::vector< MatType > &v) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::clear_memory() "
-
-[INTERNAL]  Clear all memory (called from destructor)
-
-";
-
 
 // File: classcasadi_1_1External.xml
 %feature("docstring")  casadi::FunctionInternal::call_reverse(const
@@ -15883,13 +15820,6 @@ generated function.
 %feature("docstring")  casadi::FunctionInternal::size_out(int ind) const  "
 
 [INTERNAL]  Input/output dimensions.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::set_jac_sparsity(const
-Sparsity &sp, int iind, int oind, bool compact) "
-
-[INTERNAL]  Generate the sparsity of a Jacobian block.
 
 ";
 
@@ -17335,13 +17265,6 @@ M > &res) const  "
 &g) const  "
 
 [INTERNAL]  Add a dependent function.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::set_jac_sparsity(const
-Sparsity &sp, int iind, int oind, bool compact) "
-
-[INTERNAL]  Generate the sparsity of a Jacobian block.
 
 ";
 
@@ -20443,13 +20366,6 @@ std::vector< M > &res) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::set_jac_sparsity(const
-Sparsity &sp, int iind, int oind, bool compact) "
-
-[INTERNAL]  Generate the sparsity of a Jacobian block.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::jit_dependencies(const
 std::string &fname) "
 
@@ -22977,13 +22893,6 @@ std::string &name) const override "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::FunctionInternal::set_jac_sparsity(const
-Sparsity &sp, int iind, int oind, bool compact) "
-
-[INTERNAL]  Generate the sparsity of a Jacobian block.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::adjViaJac(int nadj) const
 "
 
@@ -24199,13 +24108,6 @@ const  "
 
 [INTERNAL]  A flavor of getJacSparsity that does hierarchical block
 structure recognition for symmetric Jacobians
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::set_jac_sparsity(const
-Sparsity &sp, int iind, int oind, bool compact) "
-
-[INTERNAL]  Generate the sparsity of a Jacobian block.
 
 ";
 
@@ -25722,13 +25624,6 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::set_jac_sparsity(const
-Sparsity &sp, int iind, int oind, bool compact) "
-
-[INTERNAL]  Generate the sparsity of a Jacobian block.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::getAtomicOutput(int k)
 const  "
 
@@ -27036,10 +26931,10 @@ double **&arg, double **&res, int *&iw, double *&w) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::set_jac_sparsity(const
-Sparsity &sp, int iind, int oind, bool compact) "
+%feature("docstring")  casadi::FunctionInternal::init_memory(void *mem)
+const  "
 
-[INTERNAL]  Generate the sparsity of a Jacobian block.
+[INTERNAL]  Initalize memory block.
 
 ";
 
@@ -27434,13 +27329,6 @@ double *res) const  "
 %feature("docstring")  casadi::FunctionInternal::name_in(int ind) const  "
 
 [INTERNAL]  Get input scheme name by index.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::init_memory(void *mem)
-const  "
-
-[INTERNAL]  Initalize memory block.
 
 ";
 
@@ -28888,13 +28776,6 @@ double **arg, double **res, int *iw, double *w) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::set_jac_sparsity(const
-Sparsity &sp, int iind, int oind, bool compact) "
-
-[INTERNAL]  Generate the sparsity of a Jacobian block.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::getWorkSize() const  "
 
 [INTERNAL]  Get the length of the work vector.
@@ -29643,10 +29524,9 @@ std::string &name) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::set_jac_sparsity(const
-Sparsity &sp, int iind, int oind, bool compact) "
+%feature("docstring")  casadi::FunctionInternal::sz_iw() const  "
 
-[INTERNAL]  Generate the sparsity of a Jacobian block.
+[INTERNAL]  Get required length of iw field.
 
 ";
 
@@ -30004,12 +29884,6 @@ size_t &sz_res, size_t &sz_iw, size_t &sz_w) const  "
 &name) const  "
 
 [INTERNAL]  Get input scheme index by name.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::sz_iw() const  "
-
-[INTERNAL]  Get required length of iw field.
 
 ";
 
@@ -31524,13 +31398,6 @@ std::string &fname, bool decl_static) const  "
 double **&arg, double **&res, int *&iw, double *&w) const  "
 
 [INTERNAL]  Set the (persistent) work vectors.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::set_jac_sparsity(const
-Sparsity &sp, int iind, int oind, bool compact) "
-
-[INTERNAL]  Generate the sparsity of a Jacobian block.
 
 ";
 
@@ -33364,13 +33231,6 @@ double *res) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::set_jac_sparsity(const
-Sparsity &sp, int iind, int oind, bool compact) "
-
-[INTERNAL]  Generate the sparsity of a Jacobian block.
-
-";
-
 %feature("docstring") casadi::LinearInterpolant::~LinearInterpolant "
 
 [INTERNAL] ";
@@ -34211,13 +34071,6 @@ oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
 allow_forward, bool allow_reverse) const  "
 
 [INTERNAL]  Get the unidirectional or bidirectional partition.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::set_jac_sparsity(const
-Sparsity &sp, int iind, int oind, bool compact) "
-
-[INTERNAL]  Generate the sparsity of a Jacobian block.
 
 ";
 
@@ -35401,13 +35254,6 @@ std::vector< MX > > &arg, const std::string &parallelization) "
 MX > &arg, const std::string &parallelization) "
 
 [INTERNAL]  Parallel evaluation.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::set_jac_sparsity(const
-Sparsity &sp, int iind, int oind, bool compact) "
-
-[INTERNAL]  Generate the sparsity of a Jacobian block.
 
 ";
 
@@ -37121,13 +36967,6 @@ std::string &name) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::init_memory(void *mem)
-const  "
-
-[INTERNAL]  Initalize memory block.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::signature(const std::string
 &fname) const  "
 
@@ -37503,10 +37342,10 @@ const override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::set_jac_sparsity(const
-Sparsity &sp, int iind, int oind, bool compact) "
+%feature("docstring")  casadi::FunctionInternal::init_memory(void *mem)
+const  "
 
-[INTERNAL]  Generate the sparsity of a Jacobian block.
+[INTERNAL]  Initalize memory block.
 
 ";
 
@@ -37861,13 +37700,6 @@ structure recognition.
 %feature("docstring") casadi::MapOmp::_set_work "
 
 [INTERNAL]  Set the (persistent) work vectors.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::set_jac_sparsity(const
-Sparsity &sp, int iind, int oind, bool compact) "
-
-[INTERNAL]  Generate the sparsity of a Jacobian block.
 
 ";
 
@@ -40165,15 +39997,15 @@ Get the sparsity pattern.
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< MX  >::is_tril() const "
-
-Check if the matrix is lower triangular.
-
-";
-
 %feature("docstring")  lift(const MX &x, const MX &x_guess) "
 
 Lift the expression Experimental feature.
+
+";
+
+%feature("docstring")  casadi::GenericMatrix< MX  >::is_tril() const "
+
+Check if the matrix is lower triangular.
 
 ";
 
@@ -40766,6 +40598,12 @@ Returns the truth value of an MX expression.
 %feature("docstring")  casadi::MX::name() const  "
 
 Get the name.
+
+";
+
+%feature("docstring")  casadi::MX::which_function() const  "
+
+Get function - only valid when is_call() is true.
 
 ";
 
@@ -42067,13 +41905,6 @@ std::vector< M > &arg) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::set_jac_sparsity(const
-Sparsity &sp, int iind, int oind, bool compact) "
-
-[INTERNAL]  Generate the sparsity of a Jacobian block.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::wrap() const  "
 
 [INTERNAL]  Wrap in an Function instance consisting of only one MX call.
@@ -42919,10 +42750,10 @@ bool persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::set_jac_sparsity(const
-Sparsity &sp, int iind, int oind, bool compact) "
+%feature("docstring")  casadi::FunctionInternal::is_a(const std::string
+&type, bool recursive) const  "
 
-[INTERNAL]  Generate the sparsity of a Jacobian block.
+[INTERNAL]  Check if the function is of a particular type.
 
 ";
 
@@ -43439,13 +43270,6 @@ const std::vector< MatType > &v) const  "
 "
 
 [INTERNAL]  Free memory block.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::is_a(const std::string
-&type, bool recursive) const  "
-
-[INTERNAL]  Check if the function is of a particular type.
 
 ";
 
@@ -45083,13 +44907,6 @@ std::string &fname) override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::set_jac_sparsity(const
-Sparsity &sp, int iind, int oind, bool compact) "
-
-[INTERNAL]  Generate the sparsity of a Jacobian block.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::getAtomicOperation(int k)
 const  "
 
@@ -45798,13 +45615,6 @@ std::string &iname) const  "
 double **res, int *iw, double *w) const override "
 
 [INTERNAL]  Evaluate numerically.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::set_jac_sparsity(const
-Sparsity &sp, int iind, int oind, bool compact) "
-
-[INTERNAL]  Generate the sparsity of a Jacobian block.
 
 ";
 
@@ -47287,13 +47097,6 @@ std::string &name, std::ostream &stream) const  "
 std::vector< MX > &arg) const  "
 
 [INTERNAL]  Get a vector of symbolic variables corresponding to the outputs.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::set_jac_sparsity(const
-Sparsity &sp, int iind, int oind, bool compact) "
-
-[INTERNAL]  Generate the sparsity of a Jacobian block.
 
 ";
 
@@ -49085,13 +48888,6 @@ M > &res) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::set_jac_sparsity(const
-Sparsity &sp, int iind, int oind, bool compact) "
-
-[INTERNAL]  Generate the sparsity of a Jacobian block.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::n_out() const  "
 
 [INTERNAL]  Number of function inputs and outputs.
@@ -50613,13 +50409,6 @@ structure recognition.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::set_jac_sparsity(const
-Sparsity &sp, int iind, int oind, bool compact) "
-
-[INTERNAL]  Generate the sparsity of a Jacobian block.
-
-";
-
 %feature("docstring")  casadi::Scpgen::get_stats(void *mem) const override "
 
 [INTERNAL]  Get all statistics.
@@ -51742,13 +51531,6 @@ std::string &fname) const  "
 std::string &name, const Importer &li) "
 
 [INTERNAL]  Constructor.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::set_jac_sparsity(const
-Sparsity &sp, int iind, int oind, bool compact) "
-
-[INTERNAL]  Generate the sparsity of a Jacobian block.
 
 ";
 
@@ -53446,13 +53228,6 @@ oind, bool compact, bool symmetric) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::symbolicAdjSeed(int nadj,
-const std::vector< MatType > &v) const  "
-
-[INTERNAL]  Symbolic expressions for the adjoint seeds.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::call_forward(const
 std::vector< MX > &arg, const std::vector< MX > &res, const std::vector<
 std::vector< MX > > &fseed, std::vector< std::vector< MX > > &fsens, bool
@@ -53826,10 +53601,10 @@ std::string &iname) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::set_jac_sparsity(const
-Sparsity &sp, int iind, int oind, bool compact) "
+%feature("docstring")  casadi::FunctionInternal::symbolicAdjSeed(int nadj,
+const std::vector< MatType > &v) const  "
 
-[INTERNAL]  Generate the sparsity of a Jacobian block.
+[INTERNAL]  Symbolic expressions for the adjoint seeds.
 
 ";
 
@@ -54800,13 +54575,6 @@ std::string &fname) const  "
 &name) const  "
 
 [INTERNAL]  Get input scheme index by name.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::set_jac_sparsity(const
-Sparsity &sp, int iind, int oind, bool compact) "
-
-[INTERNAL]  Generate the sparsity of a Jacobian block.
 
 ";
 
@@ -56571,13 +56339,6 @@ double *x) const  "
 %feature("docstring")  casadi::FunctionInternal::nnz_in(int ind) const  "
 
 [INTERNAL]  Number of input/output nonzeros.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::set_jac_sparsity(const
-Sparsity &sp, int iind, int oind, bool compact) "
-
-[INTERNAL]  Generate the sparsity of a Jacobian block.
 
 ";
 
@@ -58818,13 +58579,6 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::set_jac_sparsity(const
-Sparsity &sp, int iind, int oind, bool compact) "
-
-[INTERNAL]  Generate the sparsity of a Jacobian block.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::alloc_arg(size_t sz_arg,
 bool persistent=false) "
 
@@ -59669,13 +59423,6 @@ std::string &fname) const  "
 
 [INTERNAL]  Calculate derivatives by multiplying the full Jacobian and
 multiplying.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::set_jac_sparsity(const
-Sparsity &sp, int iind, int oind, bool compact) "
-
-[INTERNAL]  Generate the sparsity of a Jacobian block.
 
 ";
 

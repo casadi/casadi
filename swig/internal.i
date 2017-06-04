@@ -673,9 +673,6 @@
 %exception  casadi::FunctionInternal::self() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::FunctionInternal::set_jac_sparsity(const Sparsity &sp, int iind, int oind, bool compact) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::FunctionInternal::signature(const std::string &fname) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
