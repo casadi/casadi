@@ -40002,10 +40002,9 @@ Print a description of the object.
 in the Symbolic Toolbox for Matlab but instead creating a CasADi symbolic
 primitive.
 
-*/ %feature("docstring")  casadi::MX::get_output() const  "
+*/ %feature("docstring")  casadi::MX::get_output(int oind) const  "
 
-Get the index of evaluation output - only valid when is_calloutput() is
-true.
+Get an output.
 
 ";
 
@@ -40036,10 +40035,10 @@ general operations than does SX, in particular matrix valued operations and
 calls to arbitrary differentiable functions.
 
 The MX class is designed to have identical syntax with the Matrix<> template
-class, and uses Matrix<double> as its internal representation of the values
-at a node. By keeping the syntaxes identical, it is possible to switch from
-one class to the other, as well as inlining MX functions to SXElem
-functions.
+class, and uses DM (i.e. Matrix<double>) as its internal representation of
+the values at a node. By keeping the syntaxes identical, it is possible to
+switch from one class to the other, as well as inlining MX functions to
+SXElem functions.
 
 Note that an operation is always \"lazy\", making a matrix multiplication
 will create a matrix multiplication node, not perform the actual
@@ -40166,15 +40165,15 @@ Get the sparsity pattern.
 
 ";
 
-%feature("docstring")  lift(const MX &x, const MX &x_guess) "
-
-Lift the expression Experimental feature.
-
-";
-
 %feature("docstring")  casadi::GenericMatrix< MX  >::is_tril() const "
 
 Check if the matrix is lower triangular.
+
+";
+
+%feature("docstring")  lift(const MX &x, const MX &x_guess) "
+
+Lift the expression Experimental feature.
 
 ";
 
@@ -40310,40 +40309,6 @@ one.
 %feature("docstring")  casadi::MX::is_transpose() const  "
 
 Is the expression a transpose?
-
-";
-
-%feature("docstring")  casadi::MX::einstein(const MX &A, const MX &B, const
-MX &C, const std::vector< int > &dim_a, const std::vector< int > &dim_b,
-const std::vector< int > &dim_c, const std::vector< int > &a, const
-std::vector< int > &b, const std::vector< int > &c) "
-
-Computes an einstein dense tensor contraction.
-
-Computes the product: C_c = A_a + B_b where a b c are index/einstein
-notation in an encoded form
-
-For example, an matrix-matrix product may be written as: C_ij = A_ik B_kj
-
-The encoded form uses strictly negative numbers to indicate labels. For the
-above example, we would have: a {-1, -3} b {-3, -2} c {-1 -2}
-
-";
-
-%feature("docstring")  casadi::MX::einstein(const MX &A, const MX &B, const
-std::vector< int > &dim_a, const std::vector< int > &dim_b, const
-std::vector< int > &dim_c, const std::vector< int > &a, const std::vector<
-int > &b, const std::vector< int > &c) "
-
-Computes an einstein dense tensor contraction.
-
-Computes the product: C_c = A_a + B_b where a b c are index/einstein
-notation in an encoded form
-
-For example, an matrix-matrix product may be written as: C_ij = A_ik B_kj
-
-The encoded form uses strictly negative numbers to indicate labels. For the
-above example, we would have: a {-1, -3} b {-3, -2} c {-1 -2}
 
 ";
 
@@ -40517,12 +40482,6 @@ Get the number of non-zeros in the upper triangular half.
 
 Returns a number that is unique for a given Node. If the Object does not
 point to any node, \"0\" is returned.
-
-";
-
-%feature("docstring")  casadi::MX::getOutput(int oind=0) const  "
-
-Get an output.
 
 ";
 
@@ -40758,15 +40717,37 @@ Print a representation of the object.
 
 ";
 
-%feature("docstring")  casadi::MX::getFunction(int i=0) "
+%feature("docstring")  casadi::MX::einstein(const MX &A, const MX &B, const
+MX &C, const std::vector< int > &dim_a, const std::vector< int > &dim_b,
+const std::vector< int > &dim_c, const std::vector< int > &a, const
+std::vector< int > &b, const std::vector< int > &c) "
 
-Get function.
+Computes an einstein dense tensor contraction.
+
+Computes the product: C_c = A_a + B_b where a b c are index/einstein
+notation in an encoded form
+
+For example, an matrix-matrix product may be written as: C_ij = A_ik B_kj
+
+The encoded form uses strictly negative numbers to indicate labels. For the
+above example, we would have: a {-1, -3} b {-3, -2} c {-1 -2}
 
 ";
 
-%feature("docstring")  casadi::MX::numFunctions() const  "
+%feature("docstring")  casadi::MX::einstein(const MX &A, const MX &B, const
+std::vector< int > &dim_a, const std::vector< int > &dim_b, const
+std::vector< int > &dim_c, const std::vector< int > &a, const std::vector<
+int > &b, const std::vector< int > &c) "
 
-Number of functions.
+Computes an einstein dense tensor contraction.
+
+Computes the product: C_c = A_a + B_b where a b c are index/einstein
+notation in an encoded form
+
+For example, an matrix-matrix product may be written as: C_ij = A_ik B_kj
+
+The encoded form uses strictly negative numbers to indicate labels. For the
+above example, we would have: a {-1, -3} b {-3, -2} c {-1 -2}
 
 ";
 
@@ -40919,6 +40900,12 @@ Get get the number of non-zeros on the diagonal.
 %feature("docstring")  casadi::MX::unary(int op, const MX &x) "
 
 Create nodes by their ID.
+
+";
+
+%feature("docstring")  casadi::MX::which_output() const  "
+
+Get the index of evaluation output - only valid when is_output() is true.
 
 ";
 

@@ -28695,8 +28695,7 @@ primitive.
 
 */ %feature("docstring") casadi::MX::get_output "
 
-Get the index of evaluation output - only valid when is_calloutput() is
-true.
+Get an output.
 
 ";
 
@@ -28725,10 +28724,10 @@ general operations than does SX, in particular matrix valued operations and
 calls to arbitrary differentiable functions.
 
 The MX class is designed to have identical syntax with the Matrix<> template
-class, and uses Matrix<double> as its internal representation of the values
-at a node. By keeping the syntaxes identical, it is possible to switch from
-one class to the other, as well as inlining MX functions to SXElem
-functions.
+class, and uses DM (i.e. Matrix<double>) as its internal representation of
+the values at a node. By keeping the syntaxes identical, it is possible to
+switch from one class to the other, as well as inlining MX functions to
+SXElem functions.
 
 Note that an operation is always \"lazy\", making a matrix multiplication
 will create a matrix multiplication node, not perform the actual
@@ -28823,15 +28822,15 @@ Get the sparsity pattern.
 
 ";
 
-%feature("docstring") friendwrap_lift "
-
-Lift the expression Experimental feature.
-
-";
-
 %feature("docstring") casadi::MX::is_tril "
 
 Check if the matrix is lower triangular.
+
+";
+
+%feature("docstring") friendwrap_lift "
+
+Lift the expression Experimental feature.
 
 ";
 
@@ -28927,20 +28926,6 @@ one.
 %feature("docstring") casadi::MX::is_transpose "
 
 Is the expression a transpose?
-
-";
-
-%feature("docstring") casadi::MX::einstein "
-
-Computes an einstein dense tensor contraction.
-
-Computes the product: C_c = A_a + B_b where a b c are index/einstein
-notation in an encoded form
-
-For example, an matrix-matrix product may be written as: C_ij = A_ik B_kj
-
-The encoded form uses strictly negative numbers to indicate labels. For the
-above example, we would have: a {-1, -3} b {-3, -2} c {-1 -2}
 
 ";
 
@@ -29085,12 +29070,6 @@ variable
 
 Returns a number that is unique for a given Node. If the Object does not
 point to any node, \"0\" is returned.
-
-";
-
-%feature("docstring") casadi::MX::getOutput "
-
-Get an output.
 
 ";
 
@@ -29258,15 +29237,17 @@ Print a representation of the object.
 
 ";
 
-%feature("docstring") casadi::MX::getFunction "
+%feature("docstring") casadi::MX::einstein "
 
-Get function.
+Computes an einstein dense tensor contraction.
 
-";
+Computes the product: C_c = A_a + B_b where a b c are index/einstein
+notation in an encoded form
 
-%feature("docstring") casadi::MX::numFunctions "
+For example, an matrix-matrix product may be written as: C_ij = A_ik B_kj
 
-Number of functions.
+The encoded form uses strictly negative numbers to indicate labels. For the
+above example, we would have: a {-1, -3} b {-3, -2} c {-1 -2}
 
 ";
 
@@ -29413,6 +29394,12 @@ Get get the number of non-zeros on the diagonal.
 %feature("docstring") casadi::MX::unary "
 
 Create nodes by their ID.
+
+";
+
+%feature("docstring") casadi::MX::which_output "
+
+Get the index of evaluation output - only valid when is_output() is true.
 
 ";
 
