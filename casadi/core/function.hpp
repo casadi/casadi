@@ -31,13 +31,6 @@
 
 #include <exception>
 
-/*
-  NOTE: The order of includes is as follows:
-  1. Forward declaration of Function (in casadi_types.hpp)
-  2. Declaration of Matrix class (in matrix.hpp), Function only as references or return values
-  3. Definition of Function (this file), requires Matrix to be complete type
-*/
-
 namespace casadi {
 
 #ifndef SWIG
@@ -46,58 +39,18 @@ namespace casadi {
 
 #endif // SWIG
 
-  /** \brief General function
+  /** \brief Function object
+      A Function instance is a general multiple-input, multiple-output function
+      where each input and output can be a sparse matrix.\n
 
-      A general function \f$f\f$ in casadi can be multi-input, multi-output.\n
-      Number of inputs:  \a nin    n_in()\n
-      Number of outputs: \a nout   n_out()\n
+      For an introduction to this class, see the CasADi user guide.\n
 
-      We can view this function as a being composed of a (\a nin, \a nout) grid of single-input,
-      single-output primitive functions.\n
-      Each such primitive function \f$f_ {i, j} \forall i \in [0, nin-1], j \in [0, nout-1]\f$ can
-      map as \f$\mathbf {R}^{n, m}\to\mathbf{R}^{p, q}\f$,
-      in which n, m, p, q can take different values for every (i, j) pair.\n
-
-      When passing input, you specify which partition \f$i\f$ is active.
-      You pass the numbers vectorized, as a vector of size \f$(n*m)\f$.\n
-      When requesting output, you specify which partition \f$j\f$ is active.
-      You get the numbers vectorized, as a vector of size \f$(p*q)\f$.\n
-
-      To calculate Jacobians, you need to have \f$(m=1, q=1)\f$.
-
-      Write the Jacobian as \f$J_ {i, j} = \nabla f_{i, j} =
-      \frac {\partial f_{i, j}(\vec{x})}{\partial \vec{x}}\f$.
-
-      We have the following relationships for function mapping from a row vector to a row vector:
-
-      \f$ \vec {s}_f = \nabla f_{i, j} . \vec{v}\f$ \n
-      \f$ \vec {s}_a = (\nabla f_{i, j})^T . \vec{w}\f$
-
-      Some quantities in these formulas must be transposed: \n
-      input  col: transpose \f$ \vec {v} \f$ and \f$\vec{s}_a\f$ \n
-      output col: transpose \f$ \vec {w} \f$ and \f$\vec{s}_f\f$ \n
-
-      NOTE: Functions are allowed to modify their input arguments when evaluating:
-            implicitFunction, IDAS solver
-      Further releases may disallow this.
-
-      \internal
-      \section Notes for developers
-
-      Each function consists of 4 files:\n
-      1. public class header file: imported in python\n
-      2. public class implementation\n
-      3. internal class header file: should only be used by derived classes\n
-      4. internal class implementation\n
-
-      python and c++ should be 1-to-1\n
-      There should be no extra features in 1.\n
-      All the functionality should exist in 1.\n
-      If it means that c++ will be more "pythonic", so be it.
-      \endinternal
+      Function is a reference counted and immutable class; copying a class instance
+      is very cheap and its behavior (with some exceptions) is not affected by
+      calling its member functions.\n
 
       \author Joel Andersson
-      \date 2010
+      \date 2010-2017
   */
   class CASADI_EXPORT Function : public SharedObject {
   public:
