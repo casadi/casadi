@@ -58,7 +58,7 @@ namespace casadi {
   }
 
   void HorzRepmat::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
-    res[0] = arg[0]->getRepmat(1, n_);
+    res[0] = arg[0]->get_repmat(1, n_);
   }
 
   static bvec_t Orring(bvec_t x, bvec_t y) { return x | y; }
@@ -80,14 +80,14 @@ namespace casadi {
   void HorzRepmat::eval_forward(const std::vector<std::vector<MX> >& fseed,
                           std::vector<std::vector<MX> >& fsens) const {
     for (int d=0; d<fsens.size(); ++d) {
-      fsens[d][0] = fseed[d][0]->getRepmat(1, n_);
+      fsens[d][0] = fseed[d][0]->get_repmat(1, n_);
     }
   }
 
   void HorzRepmat::eval_reverse(const std::vector<std::vector<MX> >& aseed,
                           std::vector<std::vector<MX> >& asens) const {
     for (int d=0; d<asens.size(); ++d) {
-      asens[d][0] += aseed[d][0]->getRepsum(1, n_);
+      asens[d][0] += aseed[d][0]->get_repsum(1, n_);
     }
   }
 
@@ -138,7 +138,7 @@ namespace casadi {
   }
 
   void HorzRepsum::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
-    res[0] = arg[0]->getRepsum(1, n_);
+    res[0] = arg[0]->get_repsum(1, n_);
   }
 
   void HorzRepsum::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
@@ -158,14 +158,14 @@ namespace casadi {
   void HorzRepsum::eval_forward(const std::vector<std::vector<MX> >& fseed,
                           std::vector<std::vector<MX> >& fsens) const {
     for (int d=0; d<fsens.size(); ++d) {
-      fsens[d][0] = fseed[d][0]->getRepsum(1, n_);
+      fsens[d][0] = fseed[d][0]->get_repsum(1, n_);
     }
   }
 
   void HorzRepsum::eval_reverse(const std::vector<std::vector<MX> >& aseed,
                           std::vector<std::vector<MX> >& asens) const {
     for (int d=0; d<asens.size(); ++d) {
-      asens[d][0] += aseed[d][0]->getRepmat(1, n_);
+      asens[d][0] += aseed[d][0]->get_repmat(1, n_);
     }
   }
 

@@ -67,7 +67,7 @@ namespace casadi {
     int op() const override { return OP_GETNONZEROS;}
 
     /// Get the nonzeros of matrix
-    MX getGetNonzeros(const Sparsity& sp, const std::vector<int>& nz) const override;
+    MX get_get_nz(const Sparsity& sp, const std::vector<int>& nz) const override;
   };
 
   class CASADI_EXPORT GetNonzerosVector : public GetNonzeros {

@@ -96,16 +96,16 @@ namespace casadi {
     g << g.copy(g.work(arg[0], nnz()), nnz(), g.work(res[0], nnz())) << "\n";
   }
 
-  MX Reshape::getReshape(const Sparsity& sp) const {
+  MX Reshape::get_reshape(const Sparsity& sp) const {
     return reshape(dep(0), sp);
   }
 
-  MX Reshape::getTranspose() const {
+  MX Reshape::get_transpose() const {
     // For vectors, reshape is also a transpose
     if (dep().is_vector() && sparsity().is_vector()) {
       return dep();
     } else {
-      return MXNode::getTranspose();
+      return MXNode::get_transpose();
     }
   }
 

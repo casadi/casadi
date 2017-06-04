@@ -319,22 +319,22 @@ namespace casadi {
     virtual Matrix<int> mapping() const;
 
     /// Create a horizontal concatenation node
-    virtual MX getHorzcat(const std::vector<MX>& x) const;
+    virtual MX get_horzcat(const std::vector<MX>& x) const;
 
     /// Create a horizontal split node
-    virtual std::vector<MX> getHorzsplit(const std::vector<int>& output_offset) const;
+    virtual std::vector<MX> get_horzsplit(const std::vector<int>& output_offset) const;
 
     /// Create a repeated matrix node
-    virtual MX getRepmat(int m, int n) const;
+    virtual MX get_repmat(int m, int n) const;
 
     /// Create a repeated sum node
-    virtual MX getRepsum(int m, int n) const;
+    virtual MX get_repsum(int m, int n) const;
 
     /// Create a vertical concatenation node (vectors only)
-    virtual MX getVertcat(const std::vector<MX>& x) const;
+    virtual MX get_vertcat(const std::vector<MX>& x) const;
 
     /// Create a vertical split node (vectors only)
-    virtual std::vector<MX> getVertsplit(const std::vector<int>& output_offset) const;
+    virtual std::vector<MX> get_vertsplit(const std::vector<int>& output_offset) const;
 
     /// Create a diagonal concatenation node
     virtual MX get_diagcat(const std::vector<MX>& x) const;
@@ -344,39 +344,39 @@ namespace casadi {
                                          const std::vector<int>& offset2) const;
 
     /// Transpose
-    virtual MX getTranspose() const;
+    virtual MX get_transpose() const;
 
     /// Reshape
-    virtual MX getReshape(const Sparsity& sp) const;
+    virtual MX get_reshape(const Sparsity& sp) const;
 
     /** \brief Matrix multiplication and addition */
-    virtual MX getMultiplication(const MX& y, const MX& z) const;
+    virtual MX get_mac(const MX& y, const MX& z) const;
 
     /** \brief Einstein product and addition */
-    virtual MX getEinstein(const MX& A, const MX& B,
+    virtual MX get_einstein(const MX& A, const MX& B,
       const std::vector<int>& dim_c, const std::vector<int>& dim_a, const std::vector<int>& dim_b,
       const std::vector<int>& c, const std::vector<int>& a, const std::vector<int>& b) const;
 
     /** \brief Bilinear form */
-    virtual MX getBilin(const MX& x, const MX& y) const;
+    virtual MX get_bilin(const MX& x, const MX& y) const;
 
     /** \brief Bilinear form */
-    virtual MX getRank1(const MX& alpha, const MX& x, const MX& y) const;
+    virtual MX get_rank1(const MX& alpha, const MX& x, const MX& y) const;
 
     /** \brief Solve a system of linear equations
     *
     *      For system Ax = b:
     *
-    *      A->getSolve(b)
+    *      A->get_solve(b)
     *
     */
-    virtual MX getSolve(const MX& r, bool tr, const Linsol& linear_solver) const;
+    virtual MX get_solve(const MX& r, bool tr, const Linsol& linear_solver) const;
 
     /// Get the nonzeros of matrix
-    virtual MX getGetNonzeros(const Sparsity& sp, const std::vector<int>& nz) const;
+    virtual MX get_get_nz(const Sparsity& sp, const std::vector<int>& nz) const;
 
     /// Assign the nonzeros of a matrix to another matrix
-    virtual MX getSetNonzeros(const MX& y, const std::vector<int>& nz) const;
+    virtual MX get_set_nz(const MX& y, const std::vector<int>& nz) const;
 
     /// Add the nonzeros of a matrix to another matrix
     virtual MX getAddNonzeros(const MX& y, const std::vector<int>& nz) const;
@@ -388,10 +388,10 @@ namespace casadi {
     virtual MX getAssign(const MX& y, const Slice& i, const Slice& j) const;
 
     /// Create set sparse
-    virtual MX getProject(const Sparsity& sp) const;
+    virtual MX get_project(const Sparsity& sp) const;
 
     /// Get a unary operation
-    virtual MX getUnary(int op) const;
+    virtual MX get_unary(int op) const;
 
     /// Get a binary operation operation
     MX getBinarySwitch(int op, const MX& y) const;
@@ -400,25 +400,25 @@ namespace casadi {
     virtual MX getBinary(int op, const MX& y, bool scX, bool scY) const;
 
     /// Determinant
-    virtual MX getDeterminant() const;
+    virtual MX get_det() const;
 
     /// Inverse
-    virtual MX getInverse() const;
+    virtual MX get_inv() const;
 
     /// Inner product
-    virtual MX getDot(const MX& y) const;
+    virtual MX get_dot(const MX& y) const;
 
     /// Frobenius norm
-    virtual MX getNormF() const;
+    virtual MX get_norm_fro() const;
 
     /// Spectral norm
-    virtual MX getNorm2() const;
+    virtual MX get_norm_2() const;
 
     /// Infinity norm
-    virtual MX getNormInf() const;
+    virtual MX get_norm_inf() const;
 
     /// 1-norm
-    virtual MX getNorm1() const;
+    virtual MX get_norm_1() const;
 
     /// Assertion
     MX getAssertion(const MX& y, const std::string& fail_message) const;
@@ -427,7 +427,7 @@ namespace casadi {
     MX getMonitor(const std::string& comment) const;
 
     /// Find
-    MX getFind() const;
+    MX get_find() const;
 
     /** Temporary variables to be used in user algorithms like sorting,
         the user is responsible of making sure that use is thread-safe

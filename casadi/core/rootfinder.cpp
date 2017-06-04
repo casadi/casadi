@@ -343,7 +343,7 @@ namespace casadi {
     // Solve for all the forward derivatives at once
     vector<MX> rhs(nfwd);
     for (int d=0; d<nfwd; ++d) rhs[d] = vec(fsens[d][iout_]);
-    rhs = horzsplit(J->getSolve(-horzcat(rhs), false, linsol_));
+    rhs = horzsplit(J->get_solve(-horzcat(rhs), false, linsol_));
     for (int d=0; d<nfwd; ++d) fsens[d][iout_] = reshape(rhs[d], size_in(iin_));
 
     // Propagate to auxiliary outputs
@@ -397,7 +397,7 @@ namespace casadi {
     }
 
     // Solve for all the adjoint seeds at once
-    rhs = horzsplit(J->getSolve(-horzcat(rhs), true, linsol_));
+    rhs = horzsplit(J->get_solve(-horzcat(rhs), true, linsol_));
     for (int d=0; d<nadj; ++d) {
       for (int i=0; i<num_out; ++i) {
         if (i==iout_) {

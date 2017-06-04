@@ -87,14 +87,14 @@ namespace casadi {
     int numInplace() const override { return 1;}
 
     /// Reshape
-    MX getReshape(const Sparsity& sp) const override;
+    MX get_reshape(const Sparsity& sp) const override;
 
     /** \brief Check if two nodes are equivalent up to a given depth */
     bool is_equal(const MXNode* node, int depth) const override
     { return sameOpAndDeps(node, depth) && sparsity()==node->sparsity();}
 
     /// Transpose (if a dimension is one)
-    MX getTranspose() const override;
+    MX get_transpose() const override;
 
     /** \brief  Check if valid function input */
     bool is_valid_input() const override;

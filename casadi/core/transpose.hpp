@@ -87,11 +87,11 @@ namespace casadi {
     size_t sz_iw() const override { return size2()+1;}
 
     /// Transpose
-    MX getTranspose() const override { return dep();}
+    MX get_transpose() const override { return dep();}
 
     /// Solve for square linear system
-    //virtual MX getSolve(const MX& r, bool tr, const Linsol& linear_solver) const {
-    // return dep()->getSolve(r, !tr, linear_solver);} // FIXME #1001
+    //virtual MX get_solve(const MX& r, bool tr, const Linsol& linear_solver) const {
+    // return dep()->get_solve(r, !tr, linear_solver);} // FIXME #1001
 
     /** \brief Check if two nodes are equivalent up to a given depth */
     bool is_equal(const MXNode* node, int depth) const override {

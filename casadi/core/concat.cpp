@@ -94,7 +94,7 @@ namespace casadi {
     }
   }
 
-  MX Concat::getGetNonzeros(const Sparsity& sp, const std::vector<int>& nz) const {
+  MX Concat::get_get_nz(const Sparsity& sp, const std::vector<int>& nz) const {
     // Get the first nonnegative nz
     int nz_test = -1;
     for (auto&& i : nz) {
@@ -121,17 +121,17 @@ namespace casadi {
       if (j>=0 && (j < begin || j >= end)) {
 
         // Fallback to the base class
-        return MXNode::getGetNonzeros(sp, nz);
+        return MXNode::get_get_nz(sp, nz);
       }
     }
 
     // All nz refer to the same dependency, update the nonzero indices
     if (begin==0) {
-      return dep(i)->getGetNonzeros(sp, nz);
+      return dep(i)->get_get_nz(sp, nz);
     } else {
       vector<int> nz_new(nz);
       for (auto&& j : nz_new) if (j>=0) j -= begin;
-      return dep(i)->getGetNonzeros(sp, nz_new);
+      return dep(i)->get_get_nz(sp, nz_new);
     }
   }
 

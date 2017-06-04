@@ -67,7 +67,7 @@ namespace casadi {
                           const std::vector<int>& arg, const std::vector<int>& res) const override;
 
     /// Get the nonzeros of matrix
-    MX getGetNonzeros(const Sparsity& sp, const std::vector<int>& nz) const override;
+    MX get_get_nz(const Sparsity& sp, const std::vector<int>& nz) const override;
 
     /** \brief Check if two nodes are equivalent up to a given depth */
     bool is_equal(const MXNode* node, int depth) const override {

@@ -93,10 +93,10 @@ namespace casadi {
     Matrix<double> getMatrixValue() const override = 0;
 
     /// Matrix multiplication
-    //    virtual MX getMultiplication(const MX& y) const;
+    //    virtual MX get_mac(const MX& y) const;
 
     /// Inner product
-    MX getDot(const MX& y) const override;
+    MX get_dot(const MX& y) const override;
 
     /// Return truth value of an MX
     bool __nonzero__() const override;
@@ -214,25 +214,25 @@ namespace casadi {
     DM getMatrixValue() const override { return DM(); }
 
     /// Get densification
-    MX getProject(const Sparsity& sp) const override;
+    MX get_project(const Sparsity& sp) const override;
 
     /// Get the nonzeros of matrix
-    MX getGetNonzeros(const Sparsity& sp, const std::vector<int>& nz) const override;
+    MX get_get_nz(const Sparsity& sp, const std::vector<int>& nz) const override;
 
     /// Assign the nonzeros of a matrix to another matrix
-    MX getSetNonzeros(const MX& y, const std::vector<int>& nz) const override;
+    MX get_set_nz(const MX& y, const std::vector<int>& nz) const override;
 
     /// Transpose
-    MX getTranspose() const override;
+    MX get_transpose() const override;
 
     /// Get a unary operation
-    MX getUnary(int op) const override;
+    MX get_unary(int op) const override;
 
     /// Get a binary operation operation
     MX getBinary(int op, const MX& y, bool ScX, bool ScY) const override;
 
     /// Reshape
-    MX getReshape(const Sparsity& sp) const override;
+    MX get_reshape(const Sparsity& sp) const override;
 
     /** \brief  Check if valid function input */
     bool is_valid_input() const override { return true;}
@@ -300,31 +300,31 @@ namespace casadi {
     }
 
     /// Get densification
-    MX getProject(const Sparsity& sp) const override;
+    MX get_project(const Sparsity& sp) const override;
 
     /// Get the nonzeros of matrix
-    MX getGetNonzeros(const Sparsity& sp, const std::vector<int>& nz) const override;
+    MX get_get_nz(const Sparsity& sp, const std::vector<int>& nz) const override;
 
     /// Assign the nonzeros of a matrix to another matrix
-    MX getSetNonzeros(const MX& y, const std::vector<int>& nz) const override;
+    MX get_set_nz(const MX& y, const std::vector<int>& nz) const override;
 
     /// Transpose
-    MX getTranspose() const override;
+    MX get_transpose() const override;
 
     /// Get a unary operation
-    MX getUnary(int op) const override;
+    MX get_unary(int op) const override;
 
     /// Get a binary operation operation
     MX getBinary(int op, const MX& y, bool ScX, bool ScY) const override;
 
     /// Reshape
-    MX getReshape(const Sparsity& sp) const override;
+    MX get_reshape(const Sparsity& sp) const override;
 
     /// Create a horizontal concatenation node
-    MX getHorzcat(const std::vector<MX>& x) const override;
+    MX get_horzcat(const std::vector<MX>& x) const override;
 
     /// Create a vertical concatenation node (vectors only)
-    MX getVertcat(const std::vector<MX>& x) const override;
+    MX get_vertcat(const std::vector<MX>& x) const override;
 
     /** \brief Check if two nodes are equivalent up to a given depth */
     bool is_equal(const MXNode* node, int depth) const override;
@@ -334,12 +334,12 @@ namespace casadi {
   };
 
   template<typename Value>
-  MX Constant<Value>::getHorzcat(const std::vector<MX>& x) const {
+  MX Constant<Value>::get_horzcat(const std::vector<MX>& x) const {
     // Check if all arguments have the same constant value
     for (auto&& i : x) {
       if (!i->isValue(v_.value)) {
         // Not all the same value, fall back to base class
-        return ConstantMX::getHorzcat(x);
+        return ConstantMX::get_horzcat(x);
       }
     }
 
@@ -350,12 +350,12 @@ namespace casadi {
   }
 
   template<typename Value>
-  MX Constant<Value>::getVertcat(const std::vector<MX>& x) const {
+  MX Constant<Value>::get_vertcat(const std::vector<MX>& x) const {
     // Check if all arguments have the same constant value
     for (auto&& i : x) {
       if (!i->isValue(v_.value)) {
         // Not all the same value, fall back to base class
-        return ConstantMX::getVertcat(x);
+        return ConstantMX::get_vertcat(x);
       }
     }
 
@@ -366,17 +366,17 @@ namespace casadi {
   }
 
   template<typename Value>
-  MX Constant<Value>::getReshape(const Sparsity& sp) const {
+  MX Constant<Value>::get_reshape(const Sparsity& sp) const {
     return MX::create(new Constant<Value>(sp, v_));
   }
 
   template<typename Value>
-  MX Constant<Value>::getTranspose() const {
+  MX Constant<Value>::get_transpose() const {
     return MX::create(new Constant<Value>(sparsity().T(), v_));
   }
 
   template<typename Value>
-  MX Constant<Value>::getUnary(int op) const {
+  MX Constant<Value>::get_unary(int op) const {
     // Constant folding
     double ret(0);
     casadi_math<double>::fun(op, v_.value, 0.0, ret);
@@ -434,16 +434,16 @@ namespace casadi {
     case OP_MUL:
       if (v_.value==1) return y;
       if (v_.value==-1) return -y;
-      if (v_.value==2) return y->getUnary(OP_TWICE);
+      if (v_.value==2) return y->get_unary(OP_TWICE);
       break;
     case OP_DIV:
-      if (v_.value==1) return y->getUnary(OP_INV);
-      if (v_.value==-1) return -y->getUnary(OP_INV);
+      if (v_.value==1) return y->get_unary(OP_INV);
+      if (v_.value==-1) return -y->get_unary(OP_INV);
       break;
     case OP_POW:
       if (v_.value==0) return MX::zeros(y.sparsity());
       if (v_.value==1) return MX::ones(y.sparsity());
-      if (v_.value==std::exp(1.0)) return y->getUnary(OP_EXP);
+      if (v_.value==std::exp(1.0)) return y->get_unary(OP_EXP);
       break;
     default: break; //no rule
     }
@@ -486,13 +486,13 @@ namespace casadi {
   }
 
   template<typename Value>
-  MX Constant<Value>::getGetNonzeros(const Sparsity& sp, const std::vector<int>& nz) const {
+  MX Constant<Value>::get_get_nz(const Sparsity& sp, const std::vector<int>& nz) const {
     if (v_.value!=0) {
       // Check if any "holes"
       for (std::vector<int>::const_iterator k=nz.begin(); k!=nz.end(); ++k) {
         if (*k<0) {
           // Do not simplify
-          return MXNode::getGetNonzeros(sp, nz);
+          return MXNode::get_get_nz(sp, nz);
         }
       }
     }
@@ -500,23 +500,23 @@ namespace casadi {
   }
 
   template<typename Value>
-  MX Constant<Value>::getSetNonzeros(const MX& y, const std::vector<int>& nz) const {
+  MX Constant<Value>::get_set_nz(const MX& y, const std::vector<int>& nz) const {
     if (y.is_constant() && y->is_zero() && v_.value==0) {
       return y;
     }
 
     // Fall-back
-    return MXNode::getSetNonzeros(y, nz);
+    return MXNode::get_set_nz(y, nz);
   }
 
   template<typename Value>
-  MX Constant<Value>::getProject(const Sparsity& sp) const {
+  MX Constant<Value>::get_project(const Sparsity& sp) const {
     if (is_zero()) {
       return MX::create(new Constant<Value>(sp, v_));
     } else if (sp.is_dense()) {
       return densify(getMatrixValue());
     } else {
-      return MXNode::getProject(sp);
+      return MXNode::get_project(sp);
     }
   }
 

@@ -229,13 +229,13 @@ namespace casadi {
   }
 
   template<bool ScX, bool ScY>
-  MX BinaryMX<ScX, ScY>::getUnary(int op) const {
+  MX BinaryMX<ScX, ScY>::get_unary(int op) const {
     //switch (op_) {
     //default: break; // no rule
     //}
 
     // Fallback to default implementation
-    return MXNode::getUnary(op);
+    return MXNode::get_unary(op);
   }
 
   template<bool ScX, bool ScY>

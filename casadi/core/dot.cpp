@@ -38,14 +38,14 @@ namespace casadi {
   }
 
   void Dot::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
-    res[0] = arg[0]->getDot(arg[1]);
+    res[0] = arg[0]->get_dot(arg[1]);
   }
 
   void Dot::eval_forward(const std::vector<std::vector<MX> >& fseed,
                           std::vector<std::vector<MX> >& fsens) const {
     for (int d=0; d<fsens.size(); ++d) {
-      fsens[d][0] = dep(0)->getDot(fseed[d][1])
-        + fseed[d][0]->getDot(dep(1));
+      fsens[d][0] = dep(0)->get_dot(fseed[d][1])
+        + fseed[d][0]->get_dot(dep(1));
     }
   }
 

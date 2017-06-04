@@ -88,7 +88,7 @@ namespace casadi {
                   const std::vector<int>& arg, const std::vector<int>& res) const override;
 
     /// Get a unary operation
-    MX getUnary(int op) const override;
+    MX get_unary(int op) const override;
 
     /// Get a binary operation operation
     MX getBinary(int op, const MX& y, bool scX, bool scY) const override;

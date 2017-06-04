@@ -118,22 +118,22 @@ namespace casadi {
     g << r << " = " << casadi_math<double>::print(op_, " " + x + " ") << ";\n";
   }
 
-  MX UnaryMX::getUnary(int op) const {
-    if (!GlobalOptions::simplification_on_the_fly) return MXNode::getUnary(op);
+  MX UnaryMX::get_unary(int op) const {
+    if (!GlobalOptions::simplification_on_the_fly) return MXNode::get_unary(op);
 
     switch (op_) {
     case OP_NEG:
       if (op==OP_NEG) return dep();
-      else if (op==OP_SQ) return dep()->getUnary(OP_SQ);
-      else if (op==OP_FABS) return dep()->getUnary(OP_FABS);
-      else if (op==OP_COS) return dep()->getUnary(OP_COS);
+      else if (op==OP_SQ) return dep()->get_unary(OP_SQ);
+      else if (op==OP_FABS) return dep()->get_unary(OP_FABS);
+      else if (op==OP_COS) return dep()->get_unary(OP_COS);
       break;
     case OP_SQRT:
       if (op==OP_SQ) return dep();
       else if (op==OP_FABS) return shared_from_this<MX>();
       break;
     case OP_SQ:
-      if (op==OP_SQRT) return dep()->getUnary(OP_FABS);
+      if (op==OP_SQRT) return dep()->get_unary(OP_FABS);
       else if (op==OP_FABS) return shared_from_this<MX>();
       break;
     case OP_EXP:
@@ -145,8 +145,8 @@ namespace casadi {
       break;
     case OP_FABS:
       if (op==OP_FABS) return shared_from_this<MX>();
-      else if (op==OP_SQ) return dep()->getUnary(OP_SQ);
-      else if (op==OP_COS) return dep()->getUnary(OP_COS);
+      else if (op==OP_SQ) return dep()->get_unary(OP_SQ);
+      else if (op==OP_COS) return dep()->get_unary(OP_COS);
       break;
     case OP_INV:
       if (op==OP_INV) return dep();
@@ -155,7 +155,7 @@ namespace casadi {
     }
 
     // Fallback to default implementation
-    return MXNode::getUnary(op);
+    return MXNode::get_unary(op);
   }
 
   MX UnaryMX::getBinary(int op, const MX& y, bool scX, bool scY) const {

@@ -322,16 +322,16 @@ namespace casadi {
     }
   }
 
-  MX Horzsplit::getHorzcat(const std::vector<MX>& x) const {
+  MX Horzsplit::get_horzcat(const std::vector<MX>& x) const {
     // Check x length
     if (x.size()!=nout()) {
-      return MXNode::getHorzcat(x);
+      return MXNode::get_horzcat(x);
     }
 
     // Check x content
     for (int i=0; i<x.size(); ++i) {
       if (!(x[i]->isOutputNode() && x[i]->getFunctionOutput()==i && x[i]->dep().get()==this)) {
-        return MXNode::getHorzcat(x);
+        return MXNode::get_horzcat(x);
       }
     }
 
@@ -339,16 +339,16 @@ namespace casadi {
     return dep();
   }
 
-  MX Vertsplit::getVertcat(const std::vector<MX>& x) const {
+  MX Vertsplit::get_vertcat(const std::vector<MX>& x) const {
     // Check x length
     if (x.size()!=nout()) {
-      return MXNode::getVertcat(x);
+      return MXNode::get_vertcat(x);
     }
 
     // Check x content
     for (int i=0; i<x.size(); ++i) {
       if (!(x[i]->isOutputNode() && x[i]->getFunctionOutput()==i && x[i]->dep().get()==this)) {
-        return MXNode::getVertcat(x);
+        return MXNode::get_vertcat(x);
       }
     }
 

@@ -376,11 +376,11 @@ namespace casadi {
     casadi_error("'getMatrixValue' not defined for class " + type_name());
   }
 
-  MX MXNode::getTranspose() const {
+  MX MXNode::get_transpose() const {
     if (sparsity().is_scalar()) {
       return shared_from_this<MX>();
     } else if (sparsity().is_vector()) {
-      return getReshape(sparsity().T());
+      return get_reshape(sparsity().T());
     } else if (sparsity().is_dense()) {
       return MX::create(new DenseTranspose(shared_from_this<MX>()));
     } else {
@@ -388,7 +388,7 @@ namespace casadi {
     }
   }
 
-  MX MXNode::getReshape(const Sparsity& sp) const {
+  MX MXNode::get_reshape(const Sparsity& sp) const {
     casadi_assert(sp.isReshape(sparsity()));
     if (sp==sparsity()) {
       return shared_from_this<MX>();
@@ -398,7 +398,7 @@ namespace casadi {
   }
 
 
-  MX MXNode::getMultiplication(const MX& y, const MX& z) const {
+  MX MXNode::get_mac(const MX& y, const MX& z) const {
     // Get reference to transposed first argument
     MX x = shared_from_this<MX>();
 
@@ -415,7 +415,7 @@ namespace casadi {
     }
   }
 
-  MX MXNode::getEinstein(const MX& A, const MX& B,
+  MX MXNode::get_einstein(const MX& A, const MX& B,
       const std::vector<int>& dim_c, const std::vector<int>& dim_a, const std::vector<int>& dim_b,
       const std::vector<int>& c, const std::vector<int>& a, const std::vector<int>& b) const {
 
@@ -436,15 +436,15 @@ namespace casadi {
     return MX::create(new Einstein(C, densify(A), densify(B), dim_c, dim_a, dim_b, c, a, b));
   }
 
-  MX MXNode::getBilin(const MX& x, const MX& y) const {
+  MX MXNode::get_bilin(const MX& x, const MX& y) const {
     return MX::create(new Bilin(shared_from_this<MX>(), x, y));
   }
 
-  MX MXNode::getRank1(const MX& alpha, const MX& x, const MX& y) const {
+  MX MXNode::get_rank1(const MX& alpha, const MX& x, const MX& y) const {
     return MX::create(new Rank1(shared_from_this<MX>(), alpha, x, y));
   }
 
-  MX MXNode::getSolve(const MX& r, bool tr, const Linsol& linear_solver) const {
+  MX MXNode::get_solve(const MX& r, bool tr, const Linsol& linear_solver) const {
     if (tr) {
       return MX::create(new Solve<true>(densify(r), shared_from_this<MX>(), linear_solver));
     } else {
@@ -452,7 +452,7 @@ namespace casadi {
     }
   }
 
-  MX MXNode::getGetNonzeros(const Sparsity& sp, const vector<int>& nz) const {
+  MX MXNode::get_get_nz(const Sparsity& sp, const vector<int>& nz) const {
     if (nz.size()==0) {
       return MX::zeros(sp);
     } else {
@@ -469,7 +469,7 @@ namespace casadi {
     }
   }
 
-  MX MXNode::getSetNonzeros(const MX& y, const vector<int>& nz) const {
+  MX MXNode::get_set_nz(const MX& y, const vector<int>& nz) const {
     // Check if any element needs to be set at all
     bool set_any = false;
     for (auto i=nz.begin(); i!=nz.end() && !set_any; ++i) {
@@ -514,7 +514,7 @@ namespace casadi {
     }
   }
 
-  MX MXNode::getProject(const Sparsity& sp) const {
+  MX MXNode::get_project(const Sparsity& sp) const {
     if (sp==sparsity()) {
       return shared_from_this<MX>();
     } else if (sp.nnz()==0) {
@@ -532,7 +532,7 @@ namespace casadi {
     return MX::create(new SubAssign(shared_from_this<MX>(), y, i, j));
   }
 
-  MX MXNode::getUnary(int op) const {
+  MX MXNode::get_unary(int op) const {
     if (operation_checker<F0XChecker>(op) && is_zero()) {
       // If identically zero
       return MX::zeros(sparsity());
@@ -603,7 +603,7 @@ namespace casadi {
       // Handle special operations (independent of type)
       switch (op) {
       case OP_ADD:
-        if (MXNode::is_equal(y.get(), this, maxDepth())) return getUnary(OP_TWICE);
+        if (MXNode::is_equal(y.get(), this, maxDepth())) return get_unary(OP_TWICE);
         break;
       case OP_SUB:
       case OP_NE:
@@ -618,7 +618,7 @@ namespace casadi {
         if (MXNode::is_equal(y.get(), this, maxDepth())) return MX::ones(sparsity());
         break;
       case OP_MUL:
-        if (MXNode::is_equal(y.get(), this, maxDepth())) return getUnary(OP_SQ);
+        if (MXNode::is_equal(y.get(), this, maxDepth())) return get_unary(OP_SQ);
         break;
       default: break; // no rule
       }
@@ -634,10 +634,10 @@ namespace casadi {
           case OP_POW:
             return getBinary(OP_CONSTPOW, y, scX, scY);
           case OP_CONSTPOW:
-            if (y->isValue(-1)) return getUnary(OP_INV);
+            if (y->isValue(-1)) return get_unary(OP_INV);
             else if (y->isValue(0)) return MX::ones(sparsity());
             else if (y->isValue(1)) return shared_from_this<MX>();
-            else if (y->isValue(2)) return getUnary(OP_SQ);
+            else if (y->isValue(2)) return get_unary(OP_SQ);
             break;
           case OP_ADD:
           case OP_SUB:
@@ -649,7 +649,7 @@ namespace casadi {
             break;
           case OP_DIV:
             if (y->isValue(1)) return shared_from_this<MX>();
-            else if (y->isValue(0.5)) return getUnary(OP_TWICE);
+            else if (y->isValue(0.5)) return get_unary(OP_TWICE);
             break;
           default: break; // no rule
           }
@@ -739,20 +739,20 @@ namespace casadi {
     }
   }
 
-  MX MXNode::getFind() const {
+  MX MXNode::get_find() const {
     return MX::create(new Find(shared_from_this<MX>()));
   }
 
-  MX MXNode::getDeterminant() const {
+  MX MXNode::get_det() const {
     return MX::create(new Determinant(shared_from_this<MX>()));
   }
 
-  MX MXNode::getInverse() const {
+  MX MXNode::get_inv() const {
     return MX::create(new Inverse(shared_from_this<MX>()));
   }
 
 
-  MX MXNode::getDot(const MX& y) const {
+  MX MXNode::get_dot(const MX& y) const {
     casadi_assert_message(
       size2()==y.size2() && size1()==y.size1(),
       "MXNode::dot: Dimension mismatch. dot requires its "
@@ -772,27 +772,27 @@ namespace casadi {
       Sparsity sp = sparsity().intersect(y.sparsity());
       MX xx = project(shared_from_this<MX>(), sp);
       MX yy = project(y, sp);
-      return xx->getDot(yy);
+      return xx->get_dot(yy);
     }
   }
 
-  MX MXNode::getNormF() const {
+  MX MXNode::get_norm_fro() const {
     return MX::create(new NormF(shared_from_this<MX>()));
   }
 
-  MX MXNode::getNorm2() const {
+  MX MXNode::get_norm_2() const {
     return MX::create(new Norm2(shared_from_this<MX>()));
   }
 
-  MX MXNode::getNormInf() const {
+  MX MXNode::get_norm_inf() const {
     return MX::create(new NormInf(shared_from_this<MX>()));
   }
 
-  MX MXNode::getNorm1() const {
+  MX MXNode::get_norm_1() const {
     return MX::create(new Norm1(shared_from_this<MX>()));
   }
 
-  MX MXNode::getHorzcat(const vector<MX>& x) const {
+  MX MXNode::get_horzcat(const vector<MX>& x) const {
     // Check if there is any existing horzcat operation
     for (auto i=x.begin(); i!=x.end(); ++i) {
       if (i->op()==OP_HORZCAT) {
@@ -818,7 +818,7 @@ namespace casadi {
     return MX::create(new Diagcat(x));
   }
 
-  MX MXNode::getVertcat(const vector<MX>& x) const {
+  MX MXNode::get_vertcat(const vector<MX>& x) const {
     // Check if there is any existing vertcat operation
     for (auto i=x.begin(); i!=x.end(); ++i) {
       if (i->op()==OP_VERTCAT) {
@@ -838,7 +838,7 @@ namespace casadi {
     return MX::create(new Vertcat(x));
   }
 
-  vector<MX> MXNode::getHorzsplit(const vector<int>& output_offset) const {
+  vector<MX> MXNode::get_horzsplit(const vector<int>& output_offset) const {
     if (is_zero()) {
       vector<MX> ret =
           MX::createMultipleOutput(new Horzsplit(shared_from_this<MX>(), output_offset));
@@ -870,7 +870,7 @@ namespace casadi {
     return ret;
   }
 
-  MX MXNode::getRepmat(int n, int m) const {
+  MX MXNode::get_repmat(int n, int m) const {
     if (n==1) {
       return MX::create(new HorzRepmat(shared_from_this<MX>(), m));
     } else {
@@ -879,7 +879,7 @@ namespace casadi {
     }
   }
 
-  MX MXNode::getRepsum(int n, int m) const {
+  MX MXNode::get_repsum(int n, int m) const {
     if (n==1) {
       return MX::create(new HorzRepsum(shared_from_this<MX>(), m));
     } else {
@@ -904,7 +904,7 @@ namespace casadi {
     return ret;
   }
 
-  vector<MX> MXNode::getVertsplit(const vector<int>& output_offset) const {
+  vector<MX> MXNode::get_vertsplit(const vector<int>& output_offset) const {
     if (is_zero()) {
       vector<MX> ret =
           MX::createMultipleOutput(new Vertsplit(shared_from_this<MX>(), output_offset));

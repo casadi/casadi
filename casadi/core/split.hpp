@@ -108,7 +108,7 @@ namespace casadi {
     int op() const override { return OP_HORZSPLIT;}
 
     /// Create a horizontal concatenation node
-    MX getHorzcat(const std::vector<MX>& x) const override;
+    MX get_horzcat(const std::vector<MX>& x) const override;
   };
 
   /** \brief Diag split, x -> x0, x1, ...
@@ -176,7 +176,7 @@ namespace casadi {
     int op() const override { return OP_VERTSPLIT;}
 
     /// Create a vertical concatenation node (vectors only)
-    MX getVertcat(const std::vector<MX>& x) const override;
+    MX get_vertcat(const std::vector<MX>& x) const override;
   };
 
 } // namespace casadi

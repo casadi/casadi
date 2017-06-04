@@ -130,7 +130,7 @@ namespace casadi {
       res[0].sparsity().get_nz(r_nz);
 
       // Zero out the corresponding entries
-      res[0] = MX::zeros(isp)->getSetNonzeros(res[0], r_nz);
+      res[0] = MX::zeros(isp)->get_set_nz(res[0], r_nz);
     }
 
     // Get the nz locations of the elements in arg corresponding to the argument sparsity pattern
@@ -164,7 +164,7 @@ namespace casadi {
         // Create a new pattern which includes both the the previous seed
         // and the addition/assignment
         Sparsity sp = res[0].sparsity().unite(osp);
-        res[0] = res[0]->getProject(sp);
+        res[0] = res[0]->get_project(sp);
 
         // Recalculate the nz locations in the arguments corresponding to the inputs
         copy(el_output.begin(), el_output.end(), r_ind.begin());
@@ -262,7 +262,7 @@ namespace casadi {
         res.sparsity().get_nz(r_nz);
 
         // Zero out the corresponding entries
-        res = MX::zeros(isp)->getSetNonzeros(res, r_nz);
+        res = MX::zeros(isp)->get_set_nz(res, r_nz);
       }
 
       // Get the nz locations of the elements in arg corresponding to the argument sparsity pattern
@@ -296,7 +296,7 @@ namespace casadi {
           // Create a new pattern which includes both the the previous seed
           // and the addition/assignment
           Sparsity sp = res.sparsity().unite(osp);
-          res = res->getProject(sp);
+          res = res->get_project(sp);
 
           // Recalculate the nz locations in the arguments corresponding to the inputs
           copy(el_output.begin(), el_output.end(), r_ind.begin());
@@ -423,9 +423,9 @@ namespace casadi {
       if (!r_nz.empty()) {
         // Create a sparsity pattern from vectors
         Sparsity f_sp(isp.size1(), isp.size2(), r_colind, r_row);
-        asens[d][1] += aseed[d][0]->getGetNonzeros(f_sp, r_nz);
+        asens[d][1] += aseed[d][0]->get_get_nz(f_sp, r_nz);
         if (!Add) {
-          asens[d][0] += MX::zeros(f_sp)->getSetNonzeros(aseed[d][0], r_nz);
+          asens[d][0] += MX::zeros(f_sp)->get_set_nz(aseed[d][0], r_nz);
         } else {
           asens[d][0] += aseed[d][0];
         }

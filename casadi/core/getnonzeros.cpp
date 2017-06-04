@@ -244,7 +244,7 @@ namespace casadi {
       res[0] = MX(osp.size());
     } else {
       Sparsity f_sp(osp.size1(), osp.size2(), r_colind, r_row);
-      res[0] = arg[0]->getGetNonzeros(f_sp, r_nz);
+      res[0] = arg[0]->get_get_nz(f_sp, r_nz);
     }
   }
 
@@ -325,7 +325,7 @@ namespace casadi {
         res = MX(osp.size());
       } else {
         Sparsity f_sp(osp.size1(), osp.size2(), r_colind, r_row);
-        res = arg->getGetNonzeros(f_sp, r_nz);
+        res = arg->get_get_nz(f_sp, r_nz);
       }
     }
   }
@@ -392,7 +392,7 @@ namespace casadi {
 
           // Create a new pattern which includes both the the previous seed and the addition
           Sparsity sp = asens0.sparsity().unite(dep().sparsity());
-          asens0 = asens0->getProject(sp);
+          asens0 = asens0->get_project(sp);
 
           // Recalculate the nz locations in the adjoint sensitivity corresponding to the inputs
           copy(el_input.begin(), el_input.end(), r_ind.begin());
@@ -456,7 +456,7 @@ namespace casadi {
     }
   }
 
-  MX GetNonzeros::getGetNonzeros(const Sparsity& sp, const std::vector<int>& nz) const {
+  MX GetNonzeros::get_get_nz(const Sparsity& sp, const std::vector<int>& nz) const {
     // Get all the nonzeros
     vector<int> nz_all = all();
 
@@ -465,7 +465,7 @@ namespace casadi {
     for (vector<int>::iterator i=nz_new.begin(); i!=nz_new.end(); ++i) {
       if (*i>=0) *i = nz_all[*i];
     }
-    return dep()->getGetNonzeros(sp, nz_new);
+    return dep()->get_get_nz(sp, nz_new);
   }
 
   void GetNonzerosSlice::generate(CodeGenerator& g, const std::string& mem,

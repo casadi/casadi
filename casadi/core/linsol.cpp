@@ -87,7 +87,7 @@ namespace casadi {
   }
 
   MX Linsol::solve(const MX& A, const MX& B, bool tr) const {
-    return A->getSolve(B, tr, *this);
+    return A->get_solve(B, tr, *this);
   }
 
   void Linsol::solve_cholesky(double* x, int nrhs, bool tr) const {

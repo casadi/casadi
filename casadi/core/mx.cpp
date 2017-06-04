@@ -75,7 +75,7 @@ namespace casadi {
         if (val.is_constant()) {
           assignNode(ConstantMX::create(sp, static_cast<double>(val)));
         } else {
-          *this = val->getGetNonzeros(sp, std::vector<int>(sp.nnz(), 0));
+          *this = val->get_get_nz(sp, std::vector<int>(sp.nnz(), 0));
         }
       } else {
         // Empty matrix
@@ -83,7 +83,7 @@ namespace casadi {
       }
     } else {
       casadi_assert(val.is_column() && sp.nnz()==val.size1());
-      *this = densify(val)->getGetNonzeros(sp, range(sp.nnz()));
+      *this = densify(val)->get_get_nz(sp, range(sp.nnz()));
     }
   }
 
@@ -153,7 +153,7 @@ namespace casadi {
     Sparsity sp = sparsity().sub(rr.nonzeros(), cc.nonzeros(), mapping, ind1);
 
     // Create return MX
-    m = (*this)->getGetNonzeros(sp, mapping);
+    m = (*this)->get_get_nz(sp, mapping);
   }
 
   void MX::get(MX& m, bool ind1, const Slice& rr) const {
@@ -176,7 +176,7 @@ namespace casadi {
                                  mapping, ind1);
 
     // Create return MX
-    m = (*this)->getGetNonzeros(sp, mapping);
+    m = (*this)->get_get_nz(sp, mapping);
   }
 
   void MX::get(MX& m, bool ind1, const Sparsity& sp) const {
@@ -346,7 +346,7 @@ namespace casadi {
     sparsity().get_nz(nz);
 
     // Create a nonzero assignment node
-    *this = simplify(m->getSetNonzeros(*this, nz));
+    *this = simplify(m->get_set_nz(*this, nz));
   }
 
   void MX::set(const MX& m, bool ind1, const Sparsity& sp) {
@@ -402,7 +402,7 @@ namespace casadi {
     }
 
     // Return reference to the nonzeros
-    m = (*this)->getGetNonzeros(tr ? kk.sparsity().T() : kk.sparsity(), kk.nonzeros());
+    m = (*this)->get_get_nz(tr ? kk.sparsity().T() : kk.sparsity(), kk.nonzeros());
   }
 
   void MX::set_nz(const MX& m, bool ind1, const Slice& kk) {
@@ -468,7 +468,7 @@ namespace casadi {
     }
 
     // Create a nonzero assignment node
-    *this = simplify(m->getSetNonzeros(*this, kk.nonzeros()));
+    *this = simplify(m->get_set_nz(*this, kk.nonzeros()));
   }
 
   MX MX::binary(int op, const MX &x, const MX &y) {
@@ -476,7 +476,7 @@ namespace casadi {
   }
 
   MX MX::unary(int op, const MX &x) {
-    return x->getUnary(Operation(op));
+    return x->get_unary(Operation(op));
   }
 
   MXNode* MX::get() const {
@@ -523,7 +523,7 @@ namespace casadi {
     if ((*this)->op()==OP_NEG) {
       return (*this)->dep(0);
     } else {
-      return (*this)->getUnary(OP_NEG);
+      return (*this)->get_unary(OP_NEG);
     }
   }
 
@@ -543,7 +543,7 @@ namespace casadi {
 
     // Create new matrix
     if (mapping.size()!=nnz()) {
-      MX ret = (*this)->getGetNonzeros(sp, mapping);
+      MX ret = (*this)->get_get_nz(sp, mapping);
       *this = ret;
     }
   }
@@ -557,7 +557,7 @@ namespace casadi {
 
     // Create new matrix
     if (mapping.size()!=nnz()) {
-      MX ret = (*this)->getGetNonzeros(sp, mapping);
+      MX ret = (*this)->get_get_nz(sp, mapping);
       *this = ret;
     }
   }
@@ -567,7 +567,7 @@ namespace casadi {
     Sparsity sp = sparsity();
     sp.enlarge(nrow, ncol, rr, cc, ind1);
 
-    MX ret = (*this)->getGetNonzeros(sp, range(nnz())); // FIXME?
+    MX ret = (*this)->get_get_nz(sp, range(nnz())); // FIXME?
     *this = ret;
   }
 
@@ -584,13 +584,13 @@ namespace casadi {
   MX MX::einstein(const MX& A, const MX& B, const MX& C,
       const std::vector<int>& dim_a, const std::vector<int>& dim_b, const std::vector<int>& dim_c,
       const std::vector<int>& a, const std::vector<int>& b, const std::vector<int>& c) {
-    return C->getEinstein(A, B, dim_c, dim_a, dim_b, c, a, b);
+    return C->get_einstein(A, B, dim_c, dim_a, dim_b, c, a, b);
   }
 
   MX MX::einstein(const MX& A, const MX& B,
       const std::vector<int>& dim_a, const std::vector<int>& dim_b, const std::vector<int>& dim_c,
       const std::vector<int>& a, const std::vector<int>& b, const std::vector<int>& c) {
-    return MX::zeros(product(dim_c), 1)->getEinstein(A, B, dim_c, dim_a, dim_b, c, a, b);
+    return MX::zeros(product(dim_c), 1)->get_einstein(A, B, dim_c, dim_a, dim_b, c, a, b);
   }
 
   MX MX::mac(const MX& x, const MX& y, const MX& z) {
@@ -612,12 +612,12 @@ namespace casadi {
     } else if (x.is_zero() || y.is_zero()) {
       return z;
     } else {
-      return x->getMultiplication(y, z);
+      return x->get_mac(y, z);
     }
   }
 
   MX MX::dot(const MX& x, const MX& y) {
-    return x->getDot(y);
+    return x->get_dot(y);
   }
 
   MX MX::printme(const MX& b) const {
@@ -726,9 +726,9 @@ namespace casadi {
     } else {
       casadi_assert_message(sp.size()==x.size(), "Dimension mismatch");
       if (intersect) {
-        return x->getProject(sp.intersect(x.sparsity()));
+        return x->get_project(sp.intersect(x.sparsity()));
       } else {
-        return x->getProject(sp);
+        return x->get_project(sp);
       }
     }
   }
@@ -838,7 +838,7 @@ namespace casadi {
   }
 
   MX MX::T() const {
-    return (*this)->getTranspose();
+    return (*this)->get_transpose();
   }
 
   bool MX::test_cast(const SharedObjectInternal* ptr) {
@@ -891,7 +891,7 @@ namespace casadi {
         return horzcat(ret);
       }
     } else {
-      return x.front()->getHorzcat(x);
+      return x.front()->get_horzcat(x);
     }
   }
 
@@ -955,7 +955,7 @@ namespace casadi {
       for (vector<MX>::iterator i=xT.begin(); i!=xT.end(); ++i) *i = i->T();
       return horzcat(xT).T();
     } else {
-      return x.front()->getVertcat(x);
+      return x.front()->get_vertcat(x);
     }
   }
 
@@ -972,7 +972,7 @@ namespace casadi {
     } else if (offset.size()==2) {
       return vector<MX>(1, x);
     } else {
-      return x->getHorzsplit(offset);
+      return x->get_horzsplit(offset);
     }
   }
 
@@ -1007,7 +1007,7 @@ namespace casadi {
       } else if (offset.size()==2) {
         return vector<MX>(1, x);
       } else {
-        return x->getVertsplit(offset);
+        return x->get_vertsplit(offset);
       }
     } else {
       std::vector<MX> ret = horzsplit(x.T(), offset);
@@ -1041,20 +1041,20 @@ namespace casadi {
     if (x.is_column()) {
       return norm_fro(x);
     } else {
-      return x->getNorm2();
+      return x->get_norm_2();
     }
   }
 
   MX MX::norm_fro(const MX& x) {
-    return x->getNormF();
+    return x->get_norm_fro();
   }
 
   MX MX::norm_1(const MX& x) {
-    return x->getNorm1();
+    return x->get_norm_1();
   }
 
   MX MX::norm_inf(const MX& x) {
-    return x->getNormInf();
+    return x->get_norm_inf();
   }
 
   MX MX::simplify(const MX& x) {
@@ -1076,7 +1076,7 @@ namespace casadi {
     if (sp==x.sparsity()) return x;
 
     // Call internal method
-    return x->getReshape(sp);
+    return x->get_reshape(sp);
   }
 
   MX MX::if_else(const MX &cond, const MX &x_true, const MX &x_false, bool short_circuit) {
@@ -1156,8 +1156,8 @@ namespace casadi {
 
     // Create mapping
     MX ret = MX::zeros(sp);
-    ret = A->getSetNonzeros(ret, nzA);
-    ret = B->getSetNonzeros(ret, nzB);
+    ret = A->get_set_nz(ret, nzA);
+    ret = B->get_set_nz(ret, nzB);
     return ret;
   }
 
@@ -1178,7 +1178,7 @@ namespace casadi {
     Sparsity sp = x.sparsity().get_diag(mapping);
 
     // Create a reference to the nonzeros
-    return x->getGetNonzeros(sp, mapping);
+    return x->get_get_nz(sp, mapping);
   }
 
   int MX::n_nodes(const MX& x) {
@@ -1619,11 +1619,11 @@ namespace casadi {
   }
 
   MX MX::det(const MX& x) {
-    return x->getDeterminant();
+    return x->get_det();
   }
 
   MX MX::inv(const MX& x) {
-    return x->getInverse();
+    return x->get_inv();
   }
 
   std::vector<MX> MX::symvar(const MX& x) {
@@ -1683,12 +1683,12 @@ namespace casadi {
     } else if (n==1 && m==1) {
       return x;
     } else {
-      return x->getRepmat(n, m);
+      return x->get_repmat(n, m);
     }
   }
 
   MX MX::repsum(const MX& x, int n, int m) {
-    return x->getRepsum(n, m);
+    return x->get_repsum(n, m);
   }
 
   MX MX::solve(const MX& a, const MX& b, const std::string& lsolver, const Dict& dict) {
@@ -1741,7 +1741,7 @@ namespace casadi {
   }
 
   MX MX::find(const MX& x) {
-    return x->getFind();
+    return x->get_find();
   }
 
   std::vector<MX> MX::get_input(const Function& f) {
@@ -1757,11 +1757,11 @@ namespace casadi {
   }
 
   MX MX::_bilin(const MX& A, const MX& x, const MX& y) {
-   return A->getBilin(x, y);
+   return A->get_bilin(x, y);
  }
 
  MX MX::_rank1(const MX& A, const MX& alpha, const MX& x, const MX& y) {
-   return A->getRank1(alpha, x, y);
+   return A->get_rank1(alpha, x, y);
  }
 
 } // namespace casadi
