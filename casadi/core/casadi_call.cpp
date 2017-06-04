@@ -31,7 +31,7 @@ using namespace std;
 
 namespace casadi {
 
-  MX GenericCall::projectArg(const MX& x, const Sparsity& sp, int i) {
+  MX Call::projectArg(const MX& x, const Sparsity& sp, int i) {
     if (x.size()==sp.size()) {
       // Insert sparsity projection nodes if needed
       return project(x, sp);

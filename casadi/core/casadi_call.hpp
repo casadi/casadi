@@ -33,37 +33,20 @@
 
 namespace casadi {
 
-  /** Base class for nodes involving function calls
-      \author Joel Andersson
-      \date 2015
-  */
-  class CASADI_EXPORT GenericCall : public MultipleOutput {
-  public:
-
-    /** \brief Constructor */
-    GenericCall() {}
-
-    /** \brief Destructor */
-    ~GenericCall() override {}
-
-    /** \brief  Get called function */
-    const Function& which_function() const override = 0;
-
-    /** \brief Project a function input to a particular sparsity */
-    static MX projectArg(const MX& x, const Sparsity& sp, int i);
-  };
-
   /** Embeds a function call in an expression graph
       \author Joel Andersson
       \date 2010-2015
   */
-  class CASADI_EXPORT Call : public GenericCall {
+  class CASADI_EXPORT Call : public MultipleOutput {
   public:
     /** \brief  Create function call node */
     static std::vector<MX> create(const Function& fcn, const std::vector<MX>& arg);
 
     /** \brief  Destructor */
     ~Call() override {}
+
+    /** \brief Project a function input to a particular sparsity */
+    static MX projectArg(const MX& x, const Sparsity& sp, int i);
 
     /** \brief  Print expression */
     std::string print(const std::vector<std::string>& arg) const override;
