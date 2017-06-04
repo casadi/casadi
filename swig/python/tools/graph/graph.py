@@ -233,7 +233,7 @@ class MXEvaluationArtist(DotArtist):
 
     deps = getDeps(s)
 
-    f = s.getFunction()
+    f = s.which_function()
 
     for k,d in enumerate(deps):
       graph.add_edge(pydot.Edge(str(d.__hash__()),"funinput" + str(s.__hash__())+ ":f%d" % k,rankdir="LR"))

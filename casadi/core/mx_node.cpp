@@ -273,6 +273,10 @@ namespace casadi {
     }
   }
 
+  const Function& MXNode::which_function() const {
+    casadi_error("'which_function' not defined for class " + type_name());
+  }
+
   int MXNode::which_output() const {
     casadi_error("'which_output' not defined for class " + type_name());
   }

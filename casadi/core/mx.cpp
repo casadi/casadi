@@ -655,20 +655,53 @@ namespace casadi {
     return pow(a, b);
   }
 
-  MX MX::dep(int ch) const { return (*this)->dep(ch); }
+  MX MX::dep(int ch) const {
+    return (*this)->dep(ch);
+  }
 
-  int MX::n_dep() const { return (*this)->ndep(); }
+  int MX::n_dep() const {
+    return (*this)->ndep();
+  }
 
-  std::string MX::name() const { return (*this)->name(); }
+  std::string MX::name() const {
+    return (*this)->name();
+  }
 
-  bool         MX::is_symbolic () const { return (*this)->op()==OP_PARAMETER; }
-  bool         MX::is_constant () const { return (*this)->op()==OP_CONST; }
-  bool         MX::is_call () const { return (*this)->op()==OP_CALL; }
-  bool         MX::is_output () const { return (*this)->is_output(); }
-  int         MX::which_output() const { return (*this)->which_output(); }
-  bool         MX::is_op (int op) const { return (*this)->op()==op; }
-  bool         MX::is_multiplication () const { return (*this)->op()==OP_MTIMES; }
-  bool         MX::is_norm () const { return dynamic_cast<const Norm*>(get())!=0; }
+  bool MX::is_symbolic() const {
+    return (*this)->op()==OP_PARAMETER;
+  }
+
+  bool MX::is_constant() const {
+    return (*this)->op()==OP_CONST;
+  }
+
+  bool MX::is_call() const {
+    return (*this)->op()==OP_CALL;
+  }
+
+  Function MX::which_function() const {
+    return (*this)->which_function();
+  }
+
+  bool MX::is_output() const {
+    return (*this)->is_output();
+  }
+
+  int MX::which_output() const {
+    return (*this)->which_output();
+  }
+
+  bool MX::is_op(int op) const {
+    return (*this)->op()==op;
+  }
+
+  bool MX::is_multiplication() const {
+    return (*this)->op()==OP_MTIMES;
+  }
+
+  bool MX::is_norm() const {
+    return dynamic_cast<const Norm*>(get())!=0;
+  }
 
   MX::operator double() const {
     return (*this)->to_double();
@@ -678,9 +711,13 @@ namespace casadi {
     return (*this)->get_DM();
   }
 
-  bool MX::is_binary() const { return (*this)->is_binary();}
+  bool MX::is_binary() const {
+    return (*this)->is_binary();
+  }
 
-  bool MX::is_unary() const { return (*this)->is_unary();}
+  bool MX::is_unary() const {
+    return (*this)->is_unary();
+  }
 
   int MX::op() const {
     return (*this)->op();

@@ -187,6 +187,9 @@ namespace casadi {
     /// Check if evaluation
     bool is_call() const;
 
+    /// Get function - only valid when is_call() is true
+    Function which_function() const;
+
     /// Check if evaluation output
     bool is_output() const;
 

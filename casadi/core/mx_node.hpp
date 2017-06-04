@@ -203,6 +203,9 @@ namespace casadi {
     /** \brief  Get function output */
     virtual int which_output() const;
 
+    /** \brief  Get called function */
+    virtual const Function& which_function() const;
+
     /** \brief Get the operation */
     virtual int op() const = 0;
 

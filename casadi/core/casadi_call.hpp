@@ -46,6 +46,9 @@ namespace casadi {
     /** \brief Destructor */
     ~GenericCall() override {}
 
+    /** \brief  Get called function */
+    const Function& which_function() const override = 0;
+
     /** \brief Project a function input to a particular sparsity */
     static MX projectArg(const MX& x, const Sparsity& sp, int i);
   };
@@ -103,6 +106,9 @@ namespace casadi {
 
     /** \brief  Propagate sparsity backwards */
     void sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
+
+    /** \brief  Get called function */
+    const Function& which_function() const override { return fcn_;}
 
     /** \brief  Get function output */
     int which_output() const override { return -1;}
