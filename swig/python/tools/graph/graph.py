@@ -31,16 +31,16 @@ except:
     import pydot
   except:
     raise Exception("To use the functionality of casadi.tools.graph, you need to have pydot Installed. Try `easy_install pydot`.")
-      
+
 #import ipdb
 
 def hashcompare(self,other):
   return cmp(hash(self),hash(other))
-  
-  
+
+
 def equality(self,other):
   return hash(self)==hash(other)
-  
+
 def getDeps(s):
   deps = []
   if not(hasattr(s,'n_dep')): return deps
@@ -50,7 +50,7 @@ def getDeps(s):
     d.__class__.__eq__  = equality
     deps.append(d)
   return deps
- 
+
 def addDependency(master,slave,dep={},invdep={}):
   #print master.__hash__() , " => ", slave.__hash__(), "   ", master , " => ", slave
   if master in dep:
@@ -61,7 +61,7 @@ def addDependency(master,slave,dep={},invdep={}):
     invdep[slave].add(master)
   else:
     invdep[slave] = set([master])
-    
+
 def addDependencies(master,slaves,dep={},invdep={}):
   for slave in slaves:
     addDependency(master,slave,dep = dep,invdep = invdep)
@@ -82,7 +82,7 @@ def dependencyGraph(s,dep = {},invdep = {}):
   elif isinstance(s,MX):
     addDependencies(s,getDeps(s),dep = dep,invdep = invdep)
   return (dep,invdep)
-  
+
 class DotArtist:
   sparsitycol = "#eeeeee"
   def __init__(self,s,dep={},invdep={},graph=None,artists={},**kwargs):
@@ -92,10 +92,10 @@ class DotArtist:
     self.graph = graph
     self.artists = artists
     self.kwargs = kwargs
-    
+
   def hasPorts(self):
     return False
-    
+
   def drawSparsity(self,s,id=None,depid=None,graph=None,nzlabels=None):
     if id is None:
       id = str(s.__hash__())
@@ -126,11 +126,11 @@ class DotArtist:
       label+="</TABLE>>"
       graph.add_node(pydot.Node(id,label=label,shape='plaintext'))
     graph.add_edge(pydot.Edge(depid,id))
-    
+
 class MXSymbolicArtist(DotArtist):
   def hasPorts(self):
     return True
-    
+
   def draw(self):
     s = self.s
     graph = self.graph
@@ -155,34 +155,34 @@ class MXSymbolicArtist(DotArtist):
         label+="</TR>"
       label+="</TABLE>>"
       graph.add_node(pydot.Node(str(self.s.__hash__()),label=label,shape='plaintext'))
-    
+
 # class MXMappingArtist(DotArtist):
 #   def draw(self):
 #     s = self.s
 #     graph = self.graph
 #     sp = s.sparsity()
 #     row = sp.row()
-    
-    
+
+
 #     # Note: due to Mapping restructuring, this is no longer efficient code
 #     deps = getDeps(s)
-    
+
 #     depind = s.depInd()
 #     nzmap = sum([s.mapping(i) for i in range(len(deps))])
-    
+
 #     for k,d in enumerate(deps):
 #       candidates = map(hash,filter(lambda i: i.isMapping(),self.invdep[d]))
 #       candidates.sort()
 #       if candidates[0] == hash(s):
 #         graph.add_edge(pydot.Edge(str(d.__hash__()),"mapinput" + str(d.__hash__())))
-      
+
 #     graph = pydot.Cluster('clustertest' + str(s.__hash__()), rank='max', label='Mapping')
 #     self.graph.add_subgraph(graph)
-    
 
-    
+
+
 #     colors = ['#eeeecc','#ccccee','#cceeee','#eeeecc','#eeccee','#cceecc']
-    
+
 #     for k,d in enumerate(deps):
 #       spd = d.sparsity()
 #       #ipdb.set_trace()
@@ -191,7 +191,7 @@ class MXSymbolicArtist(DotArtist):
 #       candidates.sort()
 #       if candidates[0] == hash(s):
 #         label = '<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" COLOR="#0000aa">'
-#         if not(d.numel()==1 and d.numel()==d.nnz()): 
+#         if not(d.numel()==1 and d.numel()==d.nnz()):
 #           label+="<TR><TD COLSPAN='%d' BGCOLOR='#dddddd'><font>%s</font></TD></TR>" % (d.size2(), d.dim())
 #         for i in range(d.size1()):
 #           label+="<TR>"
@@ -205,10 +205,10 @@ class MXSymbolicArtist(DotArtist):
 #         label+="</TABLE>>"
 #         graph.add_node(pydot.Node("mapinput" + str(d.__hash__()),label=label,shape='plaintext'))
 #       graph.add_edge(pydot.Edge("mapinput" + str(d.__hash__()),str(s.__hash__())))
-      
+
 #     # The Matrix grid is represented by a html table with 'ports'
 #     label = '<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">'
-#     if not(s.numel()==1 and s.numel()==s.nnz()): 
+#     if not(s.numel()==1 and s.numel()==s.nnz()):
 #       label+="<TR><TD COLSPAN='%d'><font color='#666666'>%s</font></TD></TR>" % (s.size2(), s.dim())
 #     for i in range(s.size1()):
 #       label+="<TR>"
@@ -221,33 +221,33 @@ class MXSymbolicArtist(DotArtist):
 #       label+="</TR>"
 #     label+="</TABLE>>"
 #     graph.add_node(pydot.Node(str(self.s.__hash__()),label=label,shape='plaintext'))
-    
-   
+
+
 class MXEvaluationArtist(DotArtist):
   def draw(self):
     s = self.s
     graph = self.graph
     sp = s.sparsity()
     row = sp.row()
-    
-    
+
+
     deps = getDeps(s)
-    
+
     f = s.getFunction()
-    
+
     for k,d in enumerate(deps):
       graph.add_edge(pydot.Edge(str(d.__hash__()),"funinput" + str(s.__hash__())+ ":f%d" % k,rankdir="LR"))
-      
+
     graph = pydot.Cluster(str(s.__hash__()), rank='max', label='Function:\n %s' % f.name())
     self.graph.add_subgraph(graph)
-    
+
     s = (" %d inputs: |" % f.n_in()) + " | ".join("<f%d> %d" % (i,i) for i in range(f.n_in()))
     graph.add_node(pydot.Node("funinput" + str(self.s.__hash__()),label=s,shape='Mrecord'))
 
     s = (" %d outputs: |" % f.n_out())+ " | ".join("<f%d> %d" % (i,i) for i in range(f.n_out()))
     graph.add_node(pydot.Node(str(self.s.__hash__()),label=s,shape='Mrecord'))
-    
-    
+
+
 class MXConstantArtist(DotArtist):
   def hasPorts(self):
     return True
@@ -284,20 +284,20 @@ class MXGenericArtist(DotArtist):
     dep = getDeps(k)
 
     show_sp = not(all([d.sparsity()==k.sparsity() for d in dep]))
-    
+
     if show_sp:
       op = "op"
       self.drawSparsity(k,depid=op + str(k.__hash__()))
     else:
       op = ""
-    
+
     if len(dep)>1:
       # Non-commutative operators are represented by 'record' shapes.
       # The dependencies have different 'ports' where arrows should arrive.
       s = print_operator(self.s,["| <f%d> | " %i for i in range(len(dep))])
       if s.startswith("(|") and s.endswith("|)"):
         s=s[2:-2]
-      
+
       graph.add_node(pydot.Node(op + str(k.__hash__()),label=s,shape='Mrecord'))
       for i,n in enumerate(dep):
         graph.add_edge(pydot.Edge(str(n.__hash__()),op + str(k.__hash__())+":f%d" % i))
@@ -312,16 +312,16 @@ class MXGetNonzerosArtist(DotArtist):
     s = self.s
     graph = self.graph
     n = getDeps(s)[0]
-    
-    
+
+
     show_sp = not(s.nnz() == s.numel() and s.nnz() == 1)
-    
+
     if show_sp:
       op = "op"
       self.drawSparsity(s,depid=op + str(s.__hash__()))
     else:
       op = ""
-      
+
     sp = s.sparsity()
     row = sp.row()
     M = s.mapping()
@@ -352,20 +352,20 @@ class MXSetNonzerosArtist(DotArtist):
     graph = self.graph
     entry = getDeps(s)[0]
     target = getDeps(s)[1]
-    
-    
+
+
     show_sp = not(all([d.sparsity()==s.sparsity() for d in getDeps(s)]))
-    
+
     if show_sp:
       op = "op"
       self.drawSparsity(s,depid=op + str(s.__hash__()))
     else:
       op = ""
-      
+
     sp = target.sparsity()
     row = sp.row()
     M = list(s.mapping())
-    Mk = 0 
+    Mk = 0
     col = "#333333"
 
     # The Matrix grid is represented by a html table with 'ports'
@@ -380,7 +380,7 @@ class MXSetNonzerosArtist(DotArtist):
           if Mk< len(M)-1 and M[Mk]==-1 and k!=-1: Mk+=1
         else:
           label+="<TD PORT='f%d' BGCOLOR='#eeeeff'> %s </TD>" % (Mk,Mk)
-          Mk+=1 
+          Mk+=1
       label+="</TR>"
     label+="</TABLE>>"
     graph.add_node(pydot.Node(op+str(s.__hash__()),label=label,shape='plaintext'))
@@ -396,17 +396,17 @@ class MXAddNonzerosArtist(DotArtist):
     target = getDeps(s)[1]
 
     show_sp = not(all([d.sparsity()==s.sparsity() for d in getDeps(s)]))
-    
+
     if show_sp:
       op = "op"
       self.drawSparsity(s,depid=op + str(s.__hash__()))
     else:
       op = ""
-      
+
     sp = target.sparsity()
     row = sp.row()
     M = list(s.mapping())
-    Mk = 0 
+    Mk = 0
     col = "#333333"
 
     # The Matrix grid is represented by a html table with 'ports'
@@ -421,44 +421,44 @@ class MXAddNonzerosArtist(DotArtist):
           if Mk< len(M)-1 and M[Mk]==-1 and k!=-1: Mk+=1
         else:
           label+="<TD PORT='f%d' BGCOLOR='#eeeeff'> %s </TD>" % (Mk,Mk)
-          Mk+=1 
+          Mk+=1
       label+="</TR>"
     label+="</TABLE>>"
     graph.add_node(pydot.Node(op+str(s.__hash__()),label=label,shape='plaintext'))
     self.graph.add_edge(pydot.Edge(str(entry.__hash__()),op+str(s.__hash__())+':entry'))
     self.graph.add_edge(pydot.Edge(str(target.__hash__()),op+str(s.__hash__())))
-      
-      
+
+
 class MXOperationArtist(DotArtist):
   def draw(self):
     k = self.s
     graph = self.graph
     dep = getDeps(k)
-    
+
     show_sp = True
-    
+
     if k.is_unary() and dep[0].sparsity()==k.sparsity():
       show_sp = False
     if k.is_binary() and dep[0].sparsity()==k.sparsity() and dep[1].sparsity()==k.sparsity():
       show_sp = False
-    
+
     if show_sp:
       op = "op"
       self.drawSparsity(k,depid=op + str(k.__hash__()))
     else:
       op = ""
-    
+
     if not(k.is_commutative()):
       # Non-commutative operators are represented by 'record' shapes.
       # The dependencies have different 'ports' where arrows should arrive.
       s = print_operator(self.s,["| <f0> | ", " | <f1> |"])
       if s.startswith("(|") and s.endswith("|)"):
         s=s[2:-2]
-      
+
       graph.add_node(pydot.Node(op + str(k.__hash__()),label=s,shape='Mrecord'))
       for i,n in enumerate(dep):
         graph.add_edge(pydot.Edge(str(n.__hash__()),op + str(k.__hash__())+":f%d" % i))
-    else: 
+    else:
      # Commutative operators can be represented more compactly as 'oval' shapes.
       s = print_operator(k,[".", "."])
       if s.startswith("(.") and s.endswith(".)"):
@@ -474,21 +474,21 @@ class MXIfTestArtist(DotArtist):
     k = self.s
     graph = self.graph
     dep = getDeps(k)
-    
+
     show_sp = True
-    
+
     s = "<f0> ? | <f1> true"
-    
+
     graph.add_node(pydot.Node(str(k.__hash__()),label=s,shape='Mrecord'))
     for i,n in enumerate(dep):
       graph.add_edge(pydot.Edge(str(n.__hash__()),str(k.__hash__())+":f%d" % i))
-    
+
 class MXDensificationArtist(DotArtist):
   def draw(self):
     k = self.s
     graph = self.graph
     dep = getDeps(k)
-    
+
     self.graph.add_node(pydot.Node(str(k.__hash__()),label="densify(.)",shape='oval'))
     self.graph.add_edge(pydot.Edge(str(dep[0].__hash__()),str(k.__hash__())))
 
@@ -500,14 +500,14 @@ class MXNormArtist(DotArtist):
     s = print_operator(k,[".", "."])
     self.graph.add_node(pydot.Node(str(k.__hash__()),label=s,shape='oval'))
     self.graph.add_edge(pydot.Edge(str(dep[0].__hash__()),str(k.__hash__())))
-        
+
 class MXEvaluationOutputArtist(DotArtist):
   def draw(self):
     k = self.s
 
-    self.drawSparsity(k,depid=str(hash(k.dep(0))) + ":f%d" % k.get_output())
-    
-       
+    self.drawSparsity(k,depid=str(hash(k.dep(0))) + ":f%d" % k.which_output())
+
+
 class MXMultiplicationArtist(DotArtist):
   def draw(self):
     k = self.s
@@ -521,14 +521,14 @@ class MXMultiplicationArtist(DotArtist):
     graph.add_node(pydot.Node(str(k.__hash__()),label=s,shape='Mrecord'))
     for i,n in enumerate(dep):
       graph.add_edge(pydot.Edge(str(n.__hash__()),str(k.__hash__())+":f%d" % i))
-        
+
 class SXArtist(DotArtist):
   def draw(self):
     s = self.s
     graph = self.graph
     sp = s.sparsity()
     row = sp.row()
-      
+
     # The Matrix grid is represented by a html table with 'ports'
     label = '<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">'
     for i in range(s.size1()):
@@ -547,10 +547,10 @@ class SXArtist(DotArtist):
       label+="</TR>"
     label+="</TABLE>>"
     graph.add_node(pydot.Node(str(self.s.__hash__()),label=label,shape='plaintext'))
-    
+
   def shouldEmbed(self,sx):
     return len(self.invdep[sx]) == 1 and sx.is_leaf()
-    
+
 class SXLeafArtist(DotArtist):
   def draw(self):
     if len(self.invdep[self.s]) == 1:
@@ -561,7 +561,7 @@ class SXLeafArtist(DotArtist):
     style = "solid" # Symbolic nodes are represented box'es
     if self.s.is_constant():
       style = "bold" # Constants are represented by bold box'es
-    self.graph.add_node(pydot.Node(str(self.s.__hash__()),label=str(self.s),shape="box",style=style)) 
+    self.graph.add_node(pydot.Node(str(self.s.__hash__()),label=str(self.s),shape="box",style=style))
 
 class SXNonLeafArtist(DotArtist):
   def draw(self):
@@ -577,11 +577,11 @@ class SXNonLeafArtist(DotArtist):
         s = print_operator(self.s,["| <f0> | "])
       if s.startswith("(|") and s.endswith("|)"):
         s=s[2:-2]
-      
+
       graph.add_node(pydot.Node(str(k.__hash__()),label=s,shape='Mrecord'))
       for i,n in enumerate(dep):
         graph.add_edge(pydot.Edge(str(n.__hash__()),str(k.__hash__())+":f%d" % i))
-    else: 
+    else:
      # Commutative operators can be represented more compactly as 'oval' shapes.
       s = print_operator(k,[".", "."])
       if s.startswith("(.") and s.endswith(".)"):
@@ -591,9 +591,9 @@ class SXNonLeafArtist(DotArtist):
       self.graph.add_node(pydot.Node(str(k.__hash__()),label=s,shape='oval'))
       for i,n in enumerate(dep):
         self.graph.add_edge(pydot.Edge(str(n.__hash__()),str(k.__hash__())))
-        
-        
-  
+
+
+
 def createArtist(node,dep={},invdep={},graph=None,artists={},**kwargs):
   if isinstance(node,SX):
     if node.is_scalar(True):
@@ -603,8 +603,8 @@ def createArtist(node,dep={},invdep={},graph=None,artists={},**kwargs):
         return SXNonLeafArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists,**kwargs)
     else:
       return SXArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists,**kwargs)
-    
-    
+
+
   elif isinstance(node,MX):
     if node.is_symbolic():
       return MXSymbolicArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists,**kwargs)
@@ -628,11 +628,11 @@ def createArtist(node,dep={},invdep={},graph=None,artists={},**kwargs):
       return MXGenericArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists,**kwargs)
   else:
     raise Exception("Cannot create artist for %s" % str(type(s)))
-        
+
 def dotgraph(s,direction="BT",**kwargs):
   """
   Creates and returns a pydot graph structure that represents an SX.
-  
+
   direction   one of "BT", "LR", "TB", "RL"
   """
 
@@ -645,32 +645,32 @@ def dotgraph(s,direction="BT",**kwargs):
           return SX__hash__backup(e)
       else:
         return 0
-        
+
     SX__hash__backup = SX.__hash__
     SX.__hash__ = getHashSX
-    
+
     # Get the dependencies and inverse dependencies in a dict
     dep, invdep = dependencyGraph(s,{},{})
-    
+
     allnodes = set(dep.keys()).union(set(invdep.keys()))
-    
+
     #print "a", set(dep.keys()), [i.__hash__() for i in dep.keys()]
     #print "b", set(invdep.keys()), [i.__hash__() for i in invdep.keys()]
     #print "allnodes", allnodes, [i.__hash__() for i in allnodes]
-    
+
     #return None
-    
+
     artists = {}
-    
+
     graph = pydot.Dot('G', graph_type='digraph',rankdir=direction)
-      
+
     for node in allnodes:
       artists[node] = createArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists,**kwargs)
-      
+
     for artist in artists.values():
       if artist is None: continue
       artist.draw()
-    
+
     open('source.dot','w').write(graph.to_string())
   finally:
     SX.__hash__ = SX__hash__backup
@@ -680,14 +680,14 @@ def dotgraph(s,direction="BT",**kwargs):
 def dotsave(s,format='ps',filename="temp",direction="RL",**kwargs):
   """
   Make a drawing of an SX and save it.
-  
+
   format can be one of:
     dot canon cmap cmapx cmapx_np dia dot fig gd gd2 gif hpgl imap imap_np
     ismap jpe jpeg jpg mif mp pcl pdf pic plain plain-ext png ps ps2 raw
     svg svgz vml vmlz vrml vtx wbmp xdot xlib
-    
+
   direction   one of "BT", "LR", "TB", "RL"
-  
+
   """
   g = dotgraph(s,direction=direction,**kwargs)
   if hasattr(g,'write_'+format):
@@ -700,14 +700,14 @@ def dotsave(s,format='ps',filename="temp",direction="RL",**kwargs):
         l.append(n[6:])
     s+= " ".join(l)
     raise Exception(s)
-  
+
 def dotdraw(s,direction="RL",**kwargs):
   """
   Make a drawing of an SX and display it.
-  
+
   direction   one of "BT", "LR", "TB", "RL"
   """
-  
+
   try:  # Check if we have pylab
     from pylab import imread, imshow,show,figure, axes
   except:
@@ -715,15 +715,15 @@ def dotdraw(s,direction="RL",**kwargs):
     print("casadi.tools.graph.dotdraw: no pylab detected, will not show drawing on screen.")
     dotgraph(s,direction=direction,**kwargs).write_ps("temp.ps")
     return
-   
-  if hasattr(show,'__class__') and show.__class__.__name__=='PylabShow':  
+
+  if hasattr(show,'__class__') and show.__class__.__name__=='PylabShow':
     # catch pyreport case, so we have true vector graphics
     figure_name = '%s%d.%s' % ( show.basename, len(show.figure_list), show.figure_extension )
     show.figure_list += (figure_name, )
     dotgraph(s,direction=direction,**kwargs).write_pdf(figure_name)
     print("Here goes figure %s (dotdraw)" % figure_name)
   else:
-    # Matplotlib does not allow to display vector graphics on screen, 
+    # Matplotlib does not allow to display vector graphics on screen,
     # so we fall back to png
     temp="_temp.png"
     dotgraph(s,direction=direction,**kwargs).write_png(temp)
