@@ -505,12 +505,6 @@
 %exception  casadi::FunctionInternal::get_sparsity_out(int i) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::FunctionInternal::grad_mx(int iind=0, int oind=0) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::FunctionInternal::grad_sx(int iind=0, int oind=0) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::FunctionInternal::has_codegen() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -538,9 +532,6 @@
 %exception  casadi::FunctionInternal::has_sprev() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::FunctionInternal::hess_sx(int iind=0, int oind=0) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::FunctionInternal::index_in(const std::string &name) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -551,12 +542,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::is_a(const std::string &type, bool recursive) const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::FunctionInternal::jac_mx(int iind, int oind, const Dict &opts) const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::FunctionInternal::jac_sx(int iind, int oind, const Dict &opts) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::jacobian() const  {
@@ -770,12 +755,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::sz_work(size_t &sz_arg, size_t &sz_res, size_t &sz_iw, size_t &sz_w) const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::FunctionInternal::tang_mx(int iind=0, int oind=0) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::FunctionInternal::tang_sx(int iind=0, int oind=0) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::type_name() const  {
