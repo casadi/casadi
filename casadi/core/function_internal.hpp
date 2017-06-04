@@ -315,18 +315,6 @@ namespace casadi {
     /** \brief Tangent expression */
     virtual MX tang_mx(int iind=0, int oind=0);
 
-    /** \brief Gradient expression */
-    virtual SX grad_sx(int iind=0, int oind=0);
-
-    /** \brief Tangent expression */
-    virtual SX tang_sx(int iind=0, int oind=0);
-
-    /** \brief Jacobian expression */
-    virtual SX jac_sx(int iind, int oind, const Dict& opts) const;
-
-    /** \brief Hessian expression */
-    virtual SX hess_sx(int iind=0, int oind=0);
-
     ///@{
     /** \brief Get function input(s) and output(s)  */
     virtual const SX sx_in(int ind) const;

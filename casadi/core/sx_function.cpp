@@ -101,30 +101,6 @@ namespace casadi {
     casadi_msg("SXFunction::eval():end " << name_);
   }
 
-
-  SX SXFunction::hess(int iind, int oind) {
-    casadi_assert_message(sparsity_out(oind).is_scalar(false), "Function must be scalar");
-    SX g = densify(grad(iind, oind));
-    if (verbose())  userOut() << "SXFunction::hess: calculating gradient done " << endl;
-
-    // Create function
-    Dict opts;
-    opts["verbose"] = verbose_;
-    Function gfcn("gfcn", {in_.at(iind)}, {g}, opts);
-
-    // Calculate jacobian of gradient
-    if (verbose()) {
-      userOut() << "SXFunction::hess: calculating Jacobian " << endl;
-    }
-    SX ret = gfcn->jac_sx(0, 0, {{"symmetric", true}});
-    if (verbose()) {
-      userOut() << "SXFunction::hess: calculating Jacobian done" << endl;
-    }
-
-    // Return jacobian of the gradient
-    return ret;
-  }
-
   bool SXFunction::is_smooth() const {
     // Go through all nodes and check if any node is non-smooth
     for (auto&& a : algorithm_) {
@@ -1377,22 +1353,6 @@ namespace casadi {
   }
 
 #endif // WITH_OPENCL
-
-  SX SXFunction::grad_sx(int iind, int oind) {
-    return grad(iind, oind);
-  }
-
-  SX SXFunction::tang_sx(int iind, int oind) {
-    return tang(iind, oind);
-  }
-
-  SX SXFunction::jac_sx(int iind, int oind, const Dict& opts) const {
-    return jac(iind, oind, opts);
-  }
-
-  SX SXFunction::hess_sx(int iind, int oind) {
-    return hess(iind, oind);
-  }
 
   const SX SXFunction::sx_in(int ind) const {
     return in_.at(ind);

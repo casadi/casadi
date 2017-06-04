@@ -125,18 +125,6 @@ class CASADI_EXPORT SXFunction :
   /** \brief Check if the function is of a particular type */
   bool is_a(const std::string& type, bool recursive) const override;
 
-  /** \brief Gradient expression */
-  SX grad_sx(int iind=0, int oind=0) override;
-
-  /** \brief Tangent expression */
-  SX tang_sx(int iind=0, int oind=0) override;
-
-  /** \brief Jacobian expression */
-  SX jac_sx(int iind, int oind, const Dict& opts) const override;
-
-  /** \brief Hessian expression */
-  SX hess_sx(int iind, int oind) override;
-
   ///@{
   /** \brief Get function input(s) and output(s)  */
   const SX sx_in(int ind) const override;

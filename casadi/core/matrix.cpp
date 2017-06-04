@@ -2662,7 +2662,7 @@ namespace casadi {
     Function temp("temp", {SX()}, {*this});
 
     // Run the function on the temporary variable
-    auto *t = dynamic_cast<SXFunction *>(temp.get());
+    SXFunction* t = temp.get<SXFunction>();
     return t->is_smooth();
   }
 
@@ -3038,7 +3038,7 @@ namespace casadi {
     Function f("tmp", f_in, f_out);
 
     // Get references to the internal data structures
-    auto *ff = dynamic_cast<SXFunction *>(f.get());
+    SXFunction *ff = f.get<SXFunction>();
     const vector<ScalarAtomic>& algorithm = ff->algorithm_;
     vector<SXElem> work(f.getWorkSize());
 
@@ -3108,19 +3108,19 @@ namespace casadi {
   template<>
   SX SX::jacobian(const SX &ex, const SX &arg, const Dict& opts) {
     Function temp("temp", {arg}, {ex});
-    return temp->jac_sx(0, 0, opts);
+    return temp.get<SXFunction>()->jac(0, 0, opts);
   }
 
   template<>
   SX SX::gradient(const SX &ex, const SX &arg) {
     Function temp("temp", {arg}, {ex});
-    return temp->grad_sx(0, 0);
+    return temp.get<SXFunction>()->grad(0, 0);
   }
 
   template<>
   SX SX::tangent(const SX &ex, const SX &arg) {
     Function temp("temp", {arg}, {ex});
-    return temp->tang_sx(0, 0);
+    return temp.get<SXFunction>()->tang(0, 0);
   }
 
   template<>
@@ -3281,7 +3281,7 @@ namespace casadi {
 
     // Sort the expression
     Function f("tmp", vector<SX>(), ex);
-    auto *ff = dynamic_cast<SXFunction *>(f.get());
+    SXFunction *ff = f.get<SXFunction>();
 
     // Get references to the internal data structures
     const vector<ScalarAtomic>& algorithm = ff->algorithm_;
