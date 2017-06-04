@@ -2302,10 +2302,6 @@ namespace casadi {
     casadi_error("'tang_mx' not defined for " + type_name());
   }
 
-  MX FunctionInternal::jac_mx(int iind, int oind, const Dict& opts) const {
-    casadi_error("'jac_mx' not defined for " + type_name());
-  }
-
   SX FunctionInternal::grad_sx(int iind, int oind) {
     casadi_error("'grad_sx' not defined for " + type_name());
   }

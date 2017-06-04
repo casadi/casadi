@@ -419,15 +419,12 @@ namespace casadi {
     mfcn_out.push_back(f_z);                             mod_f_ = n++;
     mfcn_out.push_back(gL_z);                            mod_gl_ = n++;
 
-    // Lagrangian gradient function
-    Function lgrad("lgrad", mfcn_in, mfcn_out);
-
     // Jacobian of the constraints
-    MX jac = lgrad->jac_mx(mod_x_, mod_g_, Dict());
+    MX jac = MX::jacobian(mfcn_out[mod_g_], mfcn_in[mod_x_]);
     log("Formed Jacobian of the constraints.");
 
     // Hessian of the Lagrangian
-    MX hes = lgrad->jac_mx(mod_x_, mod_gl_, {{"symmetric", !gauss_newton_}});
+    MX hes = MX::jacobian(mfcn_out[mod_gl_], mfcn_in[mod_x_], {{"symmetric", !gauss_newton_}});
     if (gauss_newton_) {
       log("Formed square root of Gauss-Newton Hessian.");
     } else {

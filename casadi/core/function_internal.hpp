@@ -315,9 +315,6 @@ namespace casadi {
     /** \brief Tangent expression */
     virtual MX tang_mx(int iind=0, int oind=0);
 
-    /** \brief Jacobian expression */
-    virtual MX jac_mx(int iind, int oind, const Dict& opts) const;
-
     /** \brief Gradient expression */
     virtual SX grad_sx(int iind=0, int oind=0);
 

@@ -1545,7 +1545,7 @@ namespace casadi {
 
   MX MX::jacobian(const MX &f, const MX &x, const Dict& opts) {
     Function temp("helper_jacobian_MX", {x}, {f});
-    return temp->jac_mx(0, 0, opts);
+    return temp.get<MXFunction>()->jac(0, 0, opts);
   }
 
   MX MX::gradient(const MX& f, const MX& x) {

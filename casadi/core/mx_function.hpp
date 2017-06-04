@@ -162,9 +162,6 @@ namespace casadi {
     /** \brief Tangent expression */
     MX tang_mx(int iind=0, int oind=0) override;
 
-    /** \brief Jacobian expression */
-    MX jac_mx(int iind, int oind, const Dict& opts) const override;
-
     ///@{
     /** \brief Get function input(s) and output(s)  */
     const MX mx_in(int ind) const override;
