@@ -161,11 +161,6 @@ able to propagate seeds through the algorithm?
 
 ";
 
-%feature("docstring") casadi::Blocksqp::sp_rev "[INTERNAL]  Propagate
-sparsity backwards.
-
-";
-
 %feature("docstring") casadi::Blocksqp::construct "[INTERNAL]  Construct
 Prepares the function for evaluation.
 
@@ -260,11 +255,6 @@ hcat:  check if horizontal repetion of the function input is allowed
 
 ";
 
-%feature("docstring") casadi::Blocksqp::sp_fwd "[INTERNAL]  Propagate
-sparsity forward.
-
-";
-
 %feature("docstring") casadi::Blocksqp::get_n_in "[INTERNAL]  Number of
 function inputs and outputs.
 
@@ -282,6 +272,11 @@ required length of res field.
 
 %feature("docstring") casadi::Blocksqp::get_sparsity_in "[INTERNAL]
 Sparsities of function inputs and outputs.
+
+";
+
+%feature("docstring") casadi::Blocksqp::sp_reverse "[INTERNAL]  Propagate
+sparsity backwards.
 
 ";
 
@@ -349,6 +344,11 @@ length of res field.
 
 %feature("docstring") casadi::Blocksqp::simple "[INTERNAL]  Evaluate
 numerically, simplied syntax.
+
+";
+
+%feature("docstring") casadi::Blocksqp::sp_forward "[INTERNAL]  Propagate
+sparsity forward.
 
 ";
 
@@ -1758,23 +1758,18 @@ dimensions.
 
 ";
 
+%feature("docstring") casadi::BSpline::sp_forward "[INTERNAL]  Propagate
+sparsity forward.
+
+";
+
 %feature("docstring") casadi::BSpline::get_partition "[INTERNAL]  Get the
 unidirectional or bidirectional partition.
 
 ";
 
-%feature("docstring") casadi::BSpline::sp_fwd "[INTERNAL]  Propagate
-sparsity forward.
-
-";
-
 %feature("docstring") casadi::BSpline::_set_temp "[INTERNAL]  Set the
 (temporary) work vectors.
-
-";
-
-%feature("docstring") casadi::BSpline::sz_iw "[INTERNAL]  Get required
-length of iw field.
 
 ";
 
@@ -1912,6 +1907,11 @@ information there is to know about a certain option.
 
 ";
 
+%feature("docstring") casadi::BSpline::sp_reverse "[INTERNAL]  Propagate
+sparsity backwards.
+
+";
+
 %feature("docstring") casadi::BSpline::has_codegen "
 
 Is codegen supported?
@@ -1996,8 +1996,8 @@ Evaluate a function, overloaded.
 
 ";
 
-%feature("docstring") casadi::BSpline::sp_rev "[INTERNAL]  Propagate
-sparsity backwards.
+%feature("docstring") casadi::BSpline::sz_iw "[INTERNAL]  Get required
+length of iw field.
 
 ";
 
@@ -2756,11 +2756,6 @@ class able to propagate seeds through the algorithm?
 
 ";
 
-%feature("docstring") casadi::BSplineCommon::sp_fwd "[INTERNAL]  Propagate
-sparsity forward.
-
-";
-
 %feature("docstring") casadi::BSplineCommon::getAdaptorSolverName "[INTERNAL]  Obtain solver name from Adaptor.
 
 ";
@@ -3056,6 +3051,11 @@ structure recognition.
 
 %feature("docstring") casadi::BSplineCommon::get_jacobian "[INTERNAL]
 Return Jacobian of all input elements with respect to all output elements.
+
+";
+
+%feature("docstring") casadi::BSplineCommon::sp_forward "[INTERNAL]
+Propagate sparsity forward.
 
 ";
 
@@ -3406,6 +3406,11 @@ function input(s) and output(s)
 
 ";
 
+%feature("docstring") casadi::BSplineCommon::sp_reverse "[INTERNAL]
+Propagate sparsity backwards.
+
+";
+
 %feature("docstring") casadi::BSplineCommon::default_in "[INTERNAL]  Get
 default input value.
 
@@ -3672,11 +3677,6 @@ codegen supported?
 
 ";
 
-%feature("docstring") casadi::BSplineCommon::sp_rev "[INTERNAL]  Propagate
-sparsity backwards.
-
-";
-
 %feature("docstring") casadi::BSplineCommon::ad_weight "[INTERNAL]
 Weighting factor for chosing forward/reverse mode.
 
@@ -3765,6 +3765,12 @@ cached version is available.
 
 %feature("docstring") casadi::BSplineDual::signature "[INTERNAL]  Code
 generate the function.
+
+";
+
+%feature("docstring") casadi::BSplineDual::sp_reverse "
+
+Propagate sparsity backwards.
 
 ";
 
@@ -3941,12 +3947,6 @@ input/output elements.
 
 %feature("docstring") casadi::BSplineDual::nnz_out "[INTERNAL]  Number of
 input/output nonzeros.
-
-";
-
-%feature("docstring") casadi::BSplineDual::sp_rev "
-
-Propagate sparsity backwards.
 
 ";
 
@@ -4416,12 +4416,6 @@ length of iw field.
 
 ";
 
-%feature("docstring") casadi::BSplineDual::sp_fwd "
-
-Propagate sparsity forward.
-
-";
-
 %feature("docstring") casadi::BSplineDual::simplifiedCall "[INTERNAL]  Use
 simplified signature.
 
@@ -4617,6 +4611,12 @@ output arguments have correct length and dimensions.
 
 %feature("docstring") casadi::BSplineDual::sx_out "[INTERNAL]  Get function
 input(s) and output(s)
+
+";
+
+%feature("docstring") casadi::BSplineDual::sp_forward "
+
+Propagate sparsity forward.
 
 ";
 
@@ -5026,6 +5026,11 @@ the reference count.
 
 ";
 
+%feature("docstring") casadi::BSplineInterpolant::sp_forward "[INTERNAL]
+Propagate sparsity forward.
+
+";
+
 %feature("docstring") casadi::BSplineInterpolant::checkRes "[INTERNAL]
 Check if output arguments have correct length and dimensions.
 
@@ -5129,11 +5134,6 @@ a function, overloaded.
 
 %feature("docstring") casadi::BSplineInterpolant::map_mx "[INTERNAL]
 Parallel evaluation.
-
-";
-
-%feature("docstring") casadi::BSplineInterpolant::sp_rev "[INTERNAL]
-Propagate sparsity backwards.
 
 ";
 
@@ -5378,11 +5378,6 @@ Get type name.
 
 ";
 
-%feature("docstring") casadi::BSplineInterpolant::sp_fwd "[INTERNAL]
-Propagate sparsity forward.
-
-";
-
 %feature("docstring") casadi::BSplineInterpolant::n_nodes "[INTERNAL]
 Number of nodes in the algorithm.
 
@@ -5505,6 +5500,11 @@ Input/output dimensions.
 
 %feature("docstring") casadi::BSplineInterpolant::verbose "[INTERNAL]
 Verbose mode?
+
+";
+
+%feature("docstring") casadi::BSplineInterpolant::sp_reverse "[INTERNAL]
+Propagate sparsity backwards.
 
 ";
 
@@ -6662,6 +6662,11 @@ scheme name by index.
 
 ";
 
+%feature("docstring") casadi::Collocation::sp_reverse "[INTERNAL]
+Propagate sparsity backwards.
+
+";
+
 %feature("docstring") casadi::Collocation::print_option "[INTERNAL]  Print
 all information there is to know about a certain option.
 
@@ -6694,6 +6699,11 @@ structure recognition for symmetric Jacobians
 
 %feature("docstring") casadi::Collocation::weak "[INTERNAL]  Get a weak
 reference to the object.
+
+";
+
+%feature("docstring") casadi::Collocation::sp_forward "[INTERNAL]
+Propagate sparsity forward.
 
 ";
 
@@ -7230,11 +7240,6 @@ derivatives by multiplying the full Jacobian and multiplying.
 
 ";
 
-%feature("docstring") casadi::Collocation::sp_rev "[INTERNAL]  Propagate
-sparsity backwards.
-
-";
-
 %feature("docstring") casadi::Collocation "
 
 'collocation' plugin for Integrator
@@ -7538,11 +7543,6 @@ number of memory objects.
 
 %feature("docstring") casadi::Collocation::size_in "[INTERNAL]
 Input/output dimensions.
-
-";
-
-%feature("docstring") casadi::Collocation::sp_fwd "[INTERNAL]  Propagate
-sparsity forward.
 
 ";
 
@@ -7992,11 +7992,6 @@ to the object.
 
 %feature("docstring") casadi::Conic::index_in "[INTERNAL]  Get input scheme
 index by name.
-
-";
-
-%feature("docstring") casadi::Conic::sp_rev "[INTERNAL]  Propagate sparsity
-backwards.
 
 ";
 
@@ -8507,11 +8502,6 @@ input/output nonzeros.
 
 ";
 
-%feature("docstring") casadi::Conic::sp_fwd "[INTERNAL]  Propagate sparsity
-forward.
-
-";
-
 %feature("docstring") casadi::Conic::sz_res "[INTERNAL]  Get required
 length of res field.
 
@@ -8555,6 +8545,11 @@ outputs.
 
 %feature("docstring") casadi::Conic::get_name_out "[INTERNAL]  Names of
 function input and outputs.
+
+";
+
+%feature("docstring") casadi::Conic::sp_reverse "[INTERNAL]  Propagate
+sparsity backwards.
 
 ";
 
@@ -8707,6 +8702,11 @@ is available.
 function that calculates forward derivatives forward(nfwd) returns a cached
 instance if available, and calls  Function get_forward(int nfwd) if no
 cached version is available.
+
+";
+
+%feature("docstring") casadi::Conic::sp_forward "[INTERNAL]  Propagate
+sparsity forward.
 
 ";
 
@@ -9971,6 +9971,11 @@ input/output nonzeros.
 
 ";
 
+%feature("docstring") casadi::Dple::sp_forward "[INTERNAL]  Propagate
+sparsity forward.
+
+";
+
 %feature("docstring") casadi::Dple::index_in "[INTERNAL]  Get input scheme
 index by name.
 
@@ -10130,11 +10135,6 @@ atomic operation operator index.
 
 %feature("docstring") casadi::Dple::size1_in "[INTERNAL]  Input/output
 dimensions.
-
-";
-
-%feature("docstring") casadi::Dple::clear_memory "[INTERNAL]  Clear all
-memory (called from destructor)
 
 ";
 
@@ -10322,11 +10322,6 @@ expressions for the adjoint seeds.
 
 ";
 
-%feature("docstring") casadi::Dple::sp_rev "[INTERNAL]  Propagate sparsity
-backwards.
-
-";
-
 %feature("docstring") casadi::Dple::codegen_name "[INTERNAL]  Get name in
 codegen.
 
@@ -10384,6 +10379,11 @@ function inputs and outputs.
 
 ";
 
+%feature("docstring") casadi::Dple::sp_reverse "[INTERNAL]  Propagate
+sparsity backwards.
+
+";
+
 %feature("docstring") casadi::Dple::free_mx "[INTERNAL]  Get free variables
 ( MX)
 
@@ -10399,8 +10399,8 @@ hcat:  check if horizontal repetion of the function input is allowed
 
 ";
 
-%feature("docstring") casadi::Dple::sp_fwd "[INTERNAL]  Propagate sparsity
-forward.
+%feature("docstring") casadi::Dple::clear_memory "[INTERNAL]  Clear all
+memory (called from destructor)
 
 ";
 
@@ -10898,6 +10898,11 @@ object.
 
 ";
 
+%feature("docstring") casadi::Expm::sp_reverse "[INTERNAL]  Propagate
+sparsity backwards.
+
+";
+
 %feature("docstring") casadi::Expm::sz_res "[INTERNAL]  Get required length
 of res field.
 
@@ -10905,11 +10910,6 @@ of res field.
 
 %feature("docstring") casadi::Expm::has_derivative "[INTERNAL]  Can
 derivatives be calculated in any way?
-
-";
-
-%feature("docstring") casadi::Expm::sp_fwd "[INTERNAL]  Propagate sparsity
-forward.
 
 ";
 
@@ -11298,6 +11298,11 @@ information there is to know about a certain option.
 
 ";
 
+%feature("docstring") casadi::Expm::sp_forward "[INTERNAL]  Propagate
+sparsity forward.
+
+";
+
 %feature("docstring") casadi::Expm::weak "[INTERNAL]  Get a weak reference
 to the object.
 
@@ -11356,11 +11361,6 @@ incref for dependencies.
 
 %feature("docstring") casadi::Expm::nnz_out "[INTERNAL]  Number of
 input/output nonzeros.
-
-";
-
-%feature("docstring") casadi::Expm::sp_rev "[INTERNAL]  Propagate sparsity
-backwards.
 
 ";
 
@@ -11644,11 +11644,6 @@ required length of w field.
 
 ";
 
-%feature("docstring") casadi::External::sp_rev "[INTERNAL]  Propagate
-sparsity backwards.
-
-";
-
 %feature("docstring") casadi::External::alloc_memory "[INTERNAL]  Create
 memory block.
 
@@ -11781,6 +11776,11 @@ statistics
 
 %feature("docstring") casadi::External::simple "[INTERNAL]  Evaluate
 numerically, simplied syntax.
+
+";
+
+%feature("docstring") casadi::External::sp_forward "[INTERNAL]  Propagate
+sparsity forward.
 
 ";
 
@@ -12061,11 +12061,6 @@ Jacobian.
 
 ";
 
-%feature("docstring") casadi::External::sp_fwd "[INTERNAL]  Propagate
-sparsity forward.
-
-";
-
 %feature("docstring") casadi::External::numel_out "[INTERNAL]  Number of
 input/output elements.
 
@@ -12109,6 +12104,11 @@ derivatives by multiplying the full Jacobian and multiplying.
 
 %feature("docstring") casadi::External::get_forward "[INTERNAL]  Forward
 mode derivatives.
+
+";
+
+%feature("docstring") casadi::External::sp_reverse "[INTERNAL]  Propagate
+sparsity backwards.
 
 ";
 
@@ -12274,6 +12274,11 @@ Generate a augmented DAE system with nfwd forward sensitivities.
 %feature("docstring") casadi::FixedStepIntegrator::z "[INTERNAL] ";
 
 %feature("docstring") casadi::FixedStepIntegrator::x "[INTERNAL] ";
+
+%feature("docstring") casadi::FixedStepIntegrator::sp_reverse "[INTERNAL]
+Propagate sparsity backwards.
+
+";
 
 %feature("docstring") casadi::FixedStepIntegrator::set_work "[INTERNAL]
 Set the (persistent) work vectors.
@@ -12702,11 +12707,6 @@ Print all information there is to know about a certain option.
 
 ";
 
-%feature("docstring") casadi::FixedStepIntegrator::sp_rev "[INTERNAL]
-Propagate sparsity backwards.
-
-";
-
 %feature("docstring") casadi::FixedStepIntegrator::get_stats "[INTERNAL]
 Get all statistics.
 
@@ -12963,11 +12963,6 @@ Get input scheme index by name.
 
 ";
 
-%feature("docstring") casadi::FixedStepIntegrator::sp_fwd "[INTERNAL]
-Propagate sparsity forward.
-
-";
-
 %feature("docstring") casadi::FixedStepIntegrator::ad_weight "[INTERNAL]
 Weighting factor for chosing forward/reverse mode.
 
@@ -13103,6 +13098,11 @@ Input/output dimensions.
 %feature("docstring")
 casadi::FixedStepIntegrator::getJacSparsityHierarchical "[INTERNAL]  A
 flavor of getJacSparsity that does hierarchical block structure recognition.
+
+";
+
+%feature("docstring") casadi::FixedStepIntegrator::sp_forward "[INTERNAL]
+Propagate sparsity forward.
 
 ";
 
@@ -13825,36 +13825,13 @@ Get input dimension.
 
 %feature("docstring") casadi::Function "
 
-General function.
+Function object A Function instance is a general multiple-input, multiple-
+output function where each input and output can be a sparse matrix. .
 
-A general function $f$ in casadi can be multi-input, multi-output. Number of
-inputs: nin n_in() Number of outputs: nout n_out()  We can view this
-function as a being composed of a ( nin, nout) grid of single-input, single-
-output primitive functions. Each such primitive function $f_ {i, j}
-\\\\forall i \\\\in [0, nin-1], j \\\\in [0, nout-1]$ can map as $\\\\mathbf
-{R}^{n, m}\\\\to\\\\mathbf{R}^{p, q}$, in which n, m, p, q can take
-different values for every (i, j) pair.  When passing input, you specify
-which partition $i$ is active. You pass the numbers vectorized, as a vector
-of size $(n*m)$. When requesting output, you specify which partition $j$ is
-active. You get the numbers vectorized, as a vector of size $(p*q)$.  To
-calculate Jacobians, you need to have $(m=1, q=1)$.
-
-Write the Jacobian as $J_ {i, j} = \\\\nabla f_{i, j} = \\\\frac
-{\\\\partial f_{i, j}(\\\\vec{x})}{\\\\partial \\\\vec{x}}$.
-
-We have the following relationships for function mapping from a row vector
-to a row vector:
-
-$ \\\\vec {s}_f = \\\\nabla f_{i, j} . \\\\vec{v}$ $ \\\\vec {s}_a =
-(\\\\nabla f_{i, j})^T . \\\\vec{w}$
-
-Some quantities in these formulas must be transposed: input col: transpose $
-\\\\vec {v} $ and $\\\\vec{s}_a$ output col: transpose $ \\\\vec {w} $ and
-$\\\\vec{s}_f$  NOTE: Functions are allowed to modify their input arguments
-when evaluating: implicitFunction, IDAS solver Further releases may disallow
-this.
-
-Joel Andersson >List of available options
+For an introduction to this class, see the CasADi user guide. Function is a
+reference counted and immutable class; copying a class instance is very
+cheap and its behavior (with some exceptions) is not affected by calling its
+member functions. Joel Andersson >List of available options
 
 +------------------+-----------------+------------------+------------------+
 |        Id        |      Type       |   Description    |     Used in      |
@@ -14144,9 +14121,6 @@ Number of nodes in the algorithm.
 Get the number of function inputs.
 
 ";
-
-
-// File: classcasadi_1_1GenericCall.xml
 
 
 // File: classcasadi_1_1GenericExpression.xml
@@ -14484,11 +14458,6 @@ Extract the functions needed for the Lifted Newton method.
 
 ";
 
-%feature("docstring") casadi::GenericExternal::sp_fwd "[INTERNAL]
-Propagate sparsity forward.
-
-";
-
 %feature("docstring") casadi::GenericExternal::print_free "[INTERNAL]
 Print free variables.
 
@@ -14669,6 +14638,11 @@ Constructor.
 
 %feature("docstring") casadi::GenericExternal::call_reverse "[INTERNAL]
 Reverse mode, virtual functions overloaded in derived classes.
+
+";
+
+%feature("docstring") casadi::GenericExternal::sp_reverse "[INTERNAL]
+Propagate sparsity backwards.
 
 ";
 
@@ -15143,13 +15117,13 @@ Free memory block.
 
 ";
 
-%feature("docstring") casadi::GenericExternal::mx_out "[INTERNAL]  Get
-function input(s) and output(s)
+%feature("docstring") casadi::GenericExternal::sp_forward "[INTERNAL]
+Propagate sparsity forward.
 
 ";
 
-%feature("docstring") casadi::GenericExternal::sp_rev "[INTERNAL]
-Propagate sparsity backwards.
+%feature("docstring") casadi::GenericExternal::mx_out "[INTERNAL]  Get
+function input(s) and output(s)
 
 ";
 
@@ -16106,7 +16080,7 @@ Evaluate a function, overloaded.
 
 ";
 
-%feature("docstring") casadi::ImplicitFixedStepIntegrator::alloc_arg "[INTERNAL]  Ensure required length of arg field.
+%feature("docstring") casadi::ImplicitFixedStepIntegrator::sp_forward "[INTERNAL]  Propagate sparsity forward.
 
 ";
 
@@ -16151,6 +16125,10 @@ Call a function, templated.
 ";
 
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::replaceFwdSeed "[INTERNAL]  Replace 0-by-0 forward seeds.
+
+";
+
+%feature("docstring") casadi::ImplicitFixedStepIntegrator::sp_reverse "[INTERNAL]  Propagate sparsity backwards.
 
 ";
 
@@ -16299,10 +16277,6 @@ casadi::ImplicitFixedStepIntegrator::~ImplicitFixedStepIntegrator "[INTERNAL]  D
 ";
 
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::name_in "[INTERNAL]  Get input scheme name by index.
-
-";
-
-%feature("docstring") casadi::ImplicitFixedStepIntegrator::sp_rev "[INTERNAL]  Propagate sparsity backwards.
 
 ";
 
@@ -16504,10 +16478,6 @@ Wrap in an Function instance consisting of only one MX call.
 ";
 
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::getExplicit "[INTERNAL]  Get explicit dynamics.
-
-";
-
-%feature("docstring") casadi::ImplicitFixedStepIntegrator::sp_fwd "[INTERNAL]  Propagate sparsity forward.
 
 ";
 
@@ -16845,6 +16815,10 @@ elements.
 
 ";
 
+%feature("docstring") casadi::ImplicitFixedStepIntegrator::alloc_arg "[INTERNAL]  Ensure required length of arg field.
+
+";
+
 %feature("docstring")
 casadi::ImplicitFixedStepIntegrator::ImplicitFixedStepIntegrator "[INTERNAL]  Constructor.
 
@@ -16902,6 +16876,11 @@ input/output nonzeros.
 
 ";
 
+%feature("docstring") casadi::ImplicitToNlp::eval_name "[INTERNAL]  Get
+name of the evaluation function.
+
+";
+
 %feature("docstring") casadi::ImplicitToNlp::free_mx "[INTERNAL]  Get free
 variables ( MX)
 
@@ -16914,11 +16893,6 @@ function inputs and outputs.
 
 %feature("docstring") casadi::ImplicitToNlp::free_memory "[INTERNAL]  Free
 memory block.
-
-";
-
-%feature("docstring") casadi::ImplicitToNlp::sz_w "[INTERNAL]  Get required
-length of w field.
 
 ";
 
@@ -16997,8 +16971,8 @@ Extract the functions needed for the Lifted Newton method.
 
 ";
 
-%feature("docstring") casadi::ImplicitToNlp::eval_name "[INTERNAL]  Get
-name of the evaluation function.
+%feature("docstring") casadi::ImplicitToNlp::sp_forward "[INTERNAL]
+Propagate sparsity forward.
 
 ";
 
@@ -17024,6 +16998,11 @@ function input(s) and output(s)
 
 %feature("docstring") casadi::ImplicitToNlp::replaceFwdSeed "[INTERNAL]
 Replace 0-by-0 forward seeds.
+
+";
+
+%feature("docstring") casadi::ImplicitToNlp::ad_forward "[INTERNAL]  Create
+call to (cached) derivative function, forward mode.
 
 ";
 
@@ -17233,8 +17212,8 @@ function, templated.
 
 ";
 
-%feature("docstring") casadi::ImplicitToNlp::sp_fwd "[INTERNAL]  Propagate
-sparsity forward.
+%feature("docstring") casadi::ImplicitToNlp::sz_w "[INTERNAL]  Get required
+length of w field.
 
 ";
 
@@ -17383,6 +17362,11 @@ Input/output dimensions.
 
 ";
 
+%feature("docstring") casadi::ImplicitToNlp::sp_reverse "[INTERNAL]
+Propagate sparsity backwards.
+
+";
+
 %feature("docstring") casadi::ImplicitToNlp::get_reverse "[INTERNAL]
 Generate a function that calculates nadj adjoint derivatives.
 
@@ -17454,11 +17438,6 @@ number of memory objects.
 
 %feature("docstring") casadi::ImplicitToNlp::getAtomicOutput "[INTERNAL]
 Get the (integer) output argument of an atomic operation.
-
-";
-
-%feature("docstring") casadi::ImplicitToNlp::eval_forward "[INTERNAL]
-Create call to (cached) derivative function, forward mode.
 
 ";
 
@@ -17563,6 +17542,11 @@ Codegen decref for dependencies.
 
 ";
 
+%feature("docstring") casadi::ImplicitToNlp::ad_reverse "[INTERNAL]  Create
+call to (cached) derivative function, reverse mode.
+
+";
+
 %feature("docstring") casadi::ImplicitToNlp::generateMeta "[INTERNAL]
 Generate meta-information allowing a user to evaluate a generated function.
 
@@ -17585,8 +17569,8 @@ Input/output dimensions.
 
 ";
 
-%feature("docstring") casadi::ImplicitToNlp::sp_rev "[INTERNAL]  Propagate
-sparsity backwards.
+%feature("docstring") casadi::ImplicitToNlp::has_free "[INTERNAL]  Does the
+function have free variables.
 
 ";
 
@@ -17637,11 +17621,6 @@ cached version is available.
 
 ";
 
-%feature("docstring") casadi::ImplicitToNlp::eval_reverse "[INTERNAL]
-Create call to (cached) derivative function, reverse mode.
-
-";
-
 %feature("docstring") casadi::ImplicitToNlp::which_depends "[INTERNAL]
 Which variables enter with some order.
 
@@ -17666,11 +17645,6 @@ hcat:  check if horizontal repetion of the function input is allowed
 
 %feature("docstring") casadi::ImplicitToNlp::wrap "[INTERNAL]  Wrap in an
 Function instance consisting of only one MX call.
-
-";
-
-%feature("docstring") casadi::ImplicitToNlp::has_free "[INTERNAL]  Does the
-function have free variables.
 
 ";
 
@@ -18187,11 +18161,6 @@ function, templated.
 
 ";
 
-%feature("docstring") casadi::Integrator::sp_rev "[INTERNAL]  Propagate
-sparsity backwards.
-
-";
-
 %feature("docstring") casadi::Integrator::generateMeta "[INTERNAL]
 Generate meta-information allowing a user to evaluate a generated function.
 
@@ -18229,6 +18198,11 @@ Parameters:
 -----------
 
 hcat:  check if horizontal repetion of the function input is allowed
+
+";
+
+%feature("docstring") casadi::Integrator::sp_reverse "[INTERNAL]  Propagate
+sparsity backwards.
 
 ";
 
@@ -18571,11 +18545,6 @@ the number of atomic operations.
 
 %feature("docstring") casadi::Integrator::construct "[INTERNAL]  Construct
 Prepares the function for evaluation.
-
-";
-
-%feature("docstring") casadi::Integrator::sp_fwd "[INTERNAL]  Propagate
-sparsity forward.
 
 ";
 
@@ -18959,6 +18928,11 @@ the numerical values of the supplied bounds make sense.
 
 ";
 
+%feature("docstring") casadi::Integrator::sp_forward "[INTERNAL]  Propagate
+sparsity forward.
+
+";
+
 
 // File: classcasadi_1_1Interpolant.xml
 %feature("docstring") casadi::Interpolant::getAlgorithmSize "[INTERNAL]
@@ -19078,11 +19052,6 @@ Jacobian of all input elements with respect to all output elements.
 
 %feature("docstring") casadi::Interpolant::n_nodes "[INTERNAL]  Number of
 nodes in the algorithm.
-
-";
-
-%feature("docstring") casadi::Interpolant::sp_fwd "[INTERNAL]  Propagate
-sparsity forward.
 
 ";
 
@@ -19254,8 +19223,8 @@ input/output nonzeros.
 
 ";
 
-%feature("docstring") casadi::Interpolant::getCount "[INTERNAL]  Get the
-reference count.
+%feature("docstring") casadi::Interpolant::sp_forward "[INTERNAL]
+Propagate sparsity forward.
 
 ";
 
@@ -19599,13 +19568,13 @@ length of the work vector.
 
 ";
 
-%feature("docstring") casadi::Interpolant::sp_rev "[INTERNAL]  Propagate
-sparsity backwards.
+%feature("docstring") casadi::Interpolant::name_in "[INTERNAL]  Get input
+scheme name by index.
 
 ";
 
-%feature("docstring") casadi::Interpolant::name_in "[INTERNAL]  Get input
-scheme name by index.
+%feature("docstring") casadi::Interpolant::sp_reverse "[INTERNAL]
+Propagate sparsity backwards.
 
 ";
 
@@ -19616,6 +19585,11 @@ Constructor.
 
 %feature("docstring") casadi::Interpolant::generateDeclarations "[INTERNAL]
 Generate code for the declarations of the C function.
+
+";
+
+%feature("docstring") casadi::Interpolant::getCount "[INTERNAL]  Get the
+reference count.
 
 ";
 
@@ -19988,6 +19962,11 @@ unidirectional or bidirectional partition.
 
 ";
 
+%feature("docstring") casadi::Jit::sp_forward "[INTERNAL]  Propagate
+sparsity forward.
+
+";
+
 %feature("docstring") casadi::Jit::getAlgorithmSize "[INTERNAL]  Get the
 number of atomic operations.
 
@@ -20003,8 +19982,8 @@ index by name.
 
 ";
 
-%feature("docstring") casadi::Jit::alloc "[INTERNAL]  Ensure work vectors
-long enough to evaluate function.
+%feature("docstring") casadi::Jit::sp_reverse "[INTERNAL]  Propagate
+sparsity backwards.
 
 ";
 
@@ -20047,11 +20026,6 @@ dimensions.
 
 %feature("docstring") casadi::Jit::replaceRes "[INTERNAL]  Replace 0-by-0
 outputs.
-
-";
-
-%feature("docstring") casadi::Jit::sp_fwd "[INTERNAL]  Propagate sparsity
-forward.
 
 ";
 
@@ -20157,11 +20131,6 @@ of arg field.
 
 %feature("docstring") casadi::Jit::checkRes "[INTERNAL]  Check if output
 arguments have correct length and dimensions.
-
-";
-
-%feature("docstring") casadi::Jit::sp_rev "[INTERNAL]  Propagate sparsity
-backwards.
 
 ";
 
@@ -20521,6 +20490,11 @@ dependent function.
 that calculates adjoint derivatives reverse(nadj) returns a cached instance
 if available, and calls  Function get_reverse(int nadj) if no cached version
 is available.
+
+";
+
+%feature("docstring") casadi::Jit::alloc "[INTERNAL]  Ensure work vectors
+long enough to evaluate function.
 
 ";
 
@@ -21044,11 +21018,6 @@ function inputs and outputs.
 
 ";
 
-%feature("docstring") casadi::LapackLu::sp_fwd "[INTERNAL]  Propagate
-sparsity forward.
-
-";
-
 %feature("docstring") casadi::LapackLu::get_sparsity_in "[INTERNAL]  Get
 sparsity of a given input.
 
@@ -21305,6 +21274,11 @@ statistics
 
 ";
 
+%feature("docstring") casadi::LapackLu::sp_reverse "[INTERNAL]  Propagate
+sparsity backwards.
+
+";
+
 %feature("docstring") casadi::LapackLu::codegen_decref "[INTERNAL]  Codegen
 decref for dependencies.
 
@@ -21494,11 +21468,6 @@ length of w field.
 
 ";
 
-%feature("docstring") casadi::LapackLu::sp_rev "[INTERNAL]  Propagate
-sparsity backwards.
-
-";
-
 %feature("docstring") casadi::LapackLu::numel_out "[INTERNAL]  Number of
 input/output elements.
 
@@ -21506,6 +21475,11 @@ input/output elements.
 
 %feature("docstring") casadi::LapackLu::release "[INTERNAL]  Release a
 memory object.
+
+";
+
+%feature("docstring") casadi::LapackLu::sp_forward "[INTERNAL]  Propagate
+sparsity forward.
 
 ";
 
@@ -22419,7 +22393,7 @@ memory block.
 
 ";
 
-%feature("docstring") casadi::LapackQr::sp_rev "[INTERNAL]  Propagate
+%feature("docstring") casadi::LapackQr::sp_reverse "[INTERNAL]  Propagate
 sparsity backwards.
 
 ";
@@ -22980,11 +22954,6 @@ length of w field.
 
 ";
 
-%feature("docstring") casadi::LapackQr::sp_fwd "[INTERNAL]  Propagate
-sparsity forward.
-
-";
-
 %feature("docstring") casadi::LapackQr::get_n_out "[INTERNAL]  Number of
 function inputs and outputs.
 
@@ -23006,6 +22975,11 @@ input/output elements.
 ";
 
 %feature("docstring") casadi::LapackQr::pivoting "[INTERNAL] ";
+
+%feature("docstring") casadi::LapackQr::sp_forward "[INTERNAL]  Propagate
+sparsity forward.
+
+";
 
 %feature("docstring") casadi::LapackQr::getJacSparsityGen "[INTERNAL]  Get
 the sparsity pattern, forward mode.
@@ -23037,8 +23011,8 @@ weak reference to the object.
 
 ";
 
-%feature("docstring") casadi::LinearInterpolant::sp_rev "[INTERNAL]
-Propagate sparsity backwards.
+%feature("docstring") casadi::LinearInterpolant::sz_w "[INTERNAL]  Get
+required length of w field.
 
 ";
 
@@ -23641,13 +23615,13 @@ Diagrams
 
 C++ includes: linear_interpolant.hpp ";
 
-%feature("docstring") casadi::LinearInterpolant::is_a "[INTERNAL]  Check if
-the function is of a particular type.
+%feature("docstring") casadi::LinearInterpolant::sp_reverse "[INTERNAL]
+Propagate sparsity backwards.
 
 ";
 
-%feature("docstring") casadi::LinearInterpolant::sp_fwd "[INTERNAL]
-Propagate sparsity forward.
+%feature("docstring") casadi::LinearInterpolant::is_a "[INTERNAL]  Check if
+the function is of a particular type.
 
 ";
 
@@ -23821,17 +23795,17 @@ Get sparsity of a given input.
 
 ";
 
-%feature("docstring") casadi::LinearInterpolant::sz_w "[INTERNAL]  Get
-required length of w field.
-
-";
-
 %feature("docstring") casadi::LinearInterpolant::simple "[INTERNAL]
 Evaluate numerically, simplied syntax.
 
 ";
 
 %feature("docstring") casadi::LinearInterpolant::~LinearInterpolant "[INTERNAL] ";
+
+%feature("docstring") casadi::LinearInterpolant::sp_forward "[INTERNAL]
+Propagate sparsity forward.
+
+";
 
 %feature("docstring") casadi::LinearInterpolant::has_function "[INTERNAL]
 ";
@@ -24038,10 +24012,6 @@ Get all statistics
 
 ";
 
-%feature("docstring") casadi::LinearInterpolantJac::alloc_memory "[INTERNAL]  Create memory block.
-
-";
-
 %feature("docstring") casadi::LinearInterpolantJac::numel_in "[INTERNAL]
 Number of input/output elements.
 
@@ -24120,8 +24090,7 @@ Number of input/output nonzeros.
 
 ";
 
-%feature("docstring") casadi::LinearInterpolantJac::alloc_arg "[INTERNAL]
-Ensure required length of arg field.
+%feature("docstring") casadi::LinearInterpolantJac::alloc_memory "[INTERNAL]  Create memory block.
 
 ";
 
@@ -24219,6 +24188,11 @@ Get input scheme name by index.
 
 ";
 
+%feature("docstring") casadi::LinearInterpolantJac::sp_reverse "[INTERNAL]
+Propagate sparsity backwards.
+
+";
+
 %feature("docstring") casadi::LinearInterpolantJac::alloc "[INTERNAL]
 Ensure work vectors long enough to evaluate function.
 
@@ -24299,6 +24273,11 @@ Number of input/output nonzeros.
 
 %feature("docstring") casadi::LinearInterpolantJac::matchingRes "[INTERNAL]
 Check if output arguments that needs to be replaced.
+
+";
+
+%feature("docstring") casadi::LinearInterpolantJac::sp_forward "[INTERNAL]
+Propagate sparsity forward.
 
 ";
 
@@ -24538,11 +24517,6 @@ function input(s) and output(s)
 
 ";
 
-%feature("docstring") casadi::LinearInterpolantJac::free_memory "[INTERNAL]
-Free memory block.
-
-";
-
 %feature("docstring") casadi::LinearInterpolantJac::name "[INTERNAL]  Name
 of the function.
 
@@ -24584,8 +24558,8 @@ Ensure required length of w field.
 
 ";
 
-%feature("docstring") casadi::LinearInterpolantJac::sp_fwd "[INTERNAL]
-Propagate sparsity forward.
+%feature("docstring") casadi::LinearInterpolantJac::alloc_arg "[INTERNAL]
+Ensure required length of arg field.
 
 ";
 
@@ -24681,8 +24655,8 @@ Weighting factor for chosing forward/reverse mode, sparsity propagation.
 
 ";
 
-%feature("docstring") casadi::LinearInterpolantJac::sp_rev "[INTERNAL]
-Propagate sparsity backwards.
+%feature("docstring") casadi::LinearInterpolantJac::free_memory "[INTERNAL]
+Free memory block.
 
 ";
 
@@ -25032,11 +25006,6 @@ able to propagate seeds through the algorithm?
 
 ";
 
-%feature("docstring") casadi::Lsqr::sp_rev "[INTERNAL]  Propagate sparsity
-backwards.
-
-";
-
 %feature("docstring") casadi::Lsqr::type_name "[INTERNAL]  Get type name.
 
 ";
@@ -25235,6 +25204,11 @@ input value.
 
 ";
 
+%feature("docstring") casadi::Lsqr::sp_forward "[INTERNAL]  Propagate
+sparsity forward.
+
+";
+
 %feature("docstring") casadi::Lsqr::alloc_res "[INTERNAL]  Ensure required
 length of res field.
 
@@ -25363,11 +25337,6 @@ derivatives by multiplying the full Jacobian and multiplying.
 
 ";
 
-%feature("docstring") casadi::Lsqr::sp_fwd "[INTERNAL]  Propagate sparsity
-forward.
-
-";
-
 %feature("docstring") casadi::Lsqr::matchingArg "[INTERNAL]  Check if input
 arguments that needs to be replaced.
 
@@ -25471,6 +25440,11 @@ function input and outputs.
 
 %feature("docstring") casadi::Lsqr::getAtomicOutput "[INTERNAL]  Get the
 (integer) output argument of an atomic operation.
+
+";
+
+%feature("docstring") casadi::Lsqr::sp_reverse "[INTERNAL]  Propagate
+sparsity backwards.
 
 ";
 
@@ -26102,6 +26076,11 @@ length of iw field.
 
 ";
 
+%feature("docstring") casadi::Map::getCount "[INTERNAL]  Get the reference
+count.
+
+";
+
 %feature("docstring") casadi::Map::checkArg "[INTERNAL]  Check if input
 arguments have correct length and dimensions.
 
@@ -26270,11 +26249,6 @@ dimensions of inputs and outputs.
 
 ";
 
-%feature("docstring") casadi::Map::sp_rev "[INTERNAL]  Propagate sparsity
-backwards.
-
-";
-
 %feature("docstring") casadi::Map::name_in "[INTERNAL]  Get input scheme
 name by index.
 
@@ -26282,6 +26256,11 @@ name by index.
 
 %feature("docstring") casadi::Map::jit_dependencies "[INTERNAL]   Jit
 dependencies.
+
+";
+
+%feature("docstring") casadi::Map::sp_reverse "[INTERNAL]  Propagate
+sparsity backwards.
 
 ";
 
@@ -26608,11 +26587,6 @@ length of arg field.
 
 ";
 
-%feature("docstring") casadi::Map::sp_fwd "[INTERNAL]  Propagate sparsity
-forward.
-
-";
-
 %feature("docstring") casadi::Map::finalize "[INTERNAL]  Finalize the
 object creation This function, which visits the class hierarchy in reverse
 order is run after init() has been completed.
@@ -26728,8 +26702,8 @@ structure recognition for symmetric Jacobians
 
 ";
 
-%feature("docstring") casadi::Map::getCount "[INTERNAL]  Get the reference
-count.
+%feature("docstring") casadi::Map::sp_forward "[INTERNAL]  Propagate
+sparsity forward.
 
 ";
 
@@ -27015,6 +26989,11 @@ shorthand macro.
 
 ";
 
+%feature("docstring") casadi::MapOmp::sp_reverse "[INTERNAL]  Propagate
+sparsity backwards.
+
+";
+
 %feature("docstring") casadi::MapOmp::free_sx "[INTERNAL]  Get free
 variables (SX)
 
@@ -27263,11 +27242,6 @@ evaluation.
 
 %feature("docstring") casadi::MapOmp::eval_name "[INTERNAL]  Get name of
 the evaluation function.
-
-";
-
-%feature("docstring") casadi::MapOmp::sp_fwd "[INTERNAL]  Propagate
-sparsity forward.
 
 ";
 
@@ -27598,8 +27572,8 @@ length of w field.
 
 %feature("docstring") casadi::MapOmp::has_function "[INTERNAL] ";
 
-%feature("docstring") casadi::MapOmp::sp_rev "[INTERNAL]  Propagate
-sparsity backwards.
+%feature("docstring") casadi::MapOmp::sp_forward "[INTERNAL]  Propagate
+sparsity forward.
 
 ";
 
@@ -29470,6 +29444,11 @@ Prepares the function for evaluation.
 
 ";
 
+%feature("docstring") casadi::Newton::sp_forward "[INTERNAL]  Propagate
+sparsity forward.
+
+";
+
 %feature("docstring") casadi::Newton::which_depends "[INTERNAL]  Which
 variables enter with some order.
 
@@ -29603,13 +29582,13 @@ length of res field.
 
 ";
 
-%feature("docstring") casadi::Newton::getAdaptorSolverName "[INTERNAL]
-Obtain solver name from Adaptor.
+%feature("docstring") casadi::Newton::ad_forward "[INTERNAL]  Create call
+to (cached) derivative function, forward mode.
 
 ";
 
-%feature("docstring") casadi::Newton::addDependency "[INTERNAL]  Add a
-dependent function.
+%feature("docstring") casadi::Newton::getAdaptorSolverName "[INTERNAL]
+Obtain solver name from Adaptor.
 
 ";
 
@@ -29618,8 +29597,23 @@ dimensions.
 
 ";
 
+%feature("docstring") casadi::Newton::addDependency "[INTERNAL]  Add a
+dependent function.
+
+";
+
+%feature("docstring") casadi::Newton::sp_reverse "[INTERNAL]  Propagate
+sparsity backwards.
+
+";
+
 %feature("docstring") casadi::Newton::has_spfwd "[INTERNAL]  Is the class
 able to propagate seeds through the algorithm?
+
+";
+
+%feature("docstring") casadi::Newton::ad_reverse "[INTERNAL]  Create call
+to (cached) derivative function, reverse mode.
 
 ";
 
@@ -29771,11 +29765,6 @@ input(s) and output(s)
 
 ";
 
-%feature("docstring") casadi::Newton::eval_reverse "[INTERNAL]  Create call
-to (cached) derivative function, reverse mode.
-
-";
-
 %feature("docstring") casadi::Newton::replaceArg "[INTERNAL]  Replace
 0-by-0 inputs.
 
@@ -29877,11 +29866,6 @@ inputs and outputs.
 
 ";
 
-%feature("docstring") casadi::Newton::eval_forward "[INTERNAL]  Create call
-to (cached) derivative function, forward mode.
-
-";
-
 %feature("docstring") casadi::Newton::sz_arg "[INTERNAL]  Get required
 length of arg field.
 
@@ -29951,11 +29935,6 @@ the functions needed for the Lifted Newton method.
 
 ";
 
-%feature("docstring") casadi::Newton::eval_name "[INTERNAL]  Get name of
-the evaluation function.
-
-";
-
 %feature("docstring") casadi::Newton::get_options "[INTERNAL]  Options.
 
 ";
@@ -29972,11 +29951,6 @@ arguments have correct length and dimensions.
 
 %feature("docstring") casadi::Newton::setup "[INTERNAL]  Set the
 (persistent and temporary) work vectors.
-
-";
-
-%feature("docstring") casadi::Newton::sp_rev "[INTERNAL]  Propagate
-sparsity backwards.
 
 ";
 
@@ -30204,8 +30178,8 @@ numerically.
 
 ";
 
-%feature("docstring") casadi::Newton::sp_fwd "[INTERNAL]  Propagate
-sparsity forward.
+%feature("docstring") casadi::Newton::eval_name "[INTERNAL]  Get name of
+the evaluation function.
 
 ";
 
@@ -30417,6 +30391,11 @@ an oracle function
 
 ";
 
+%feature("docstring") casadi::Nlpsol::getCount "[INTERNAL]  Get the
+reference count.
+
+";
+
 %feature("docstring") casadi::Nlpsol::n_nodes "[INTERNAL]  Number of nodes
 in the algorithm.
 
@@ -30470,11 +30449,6 @@ required length of arg field.
 
 %feature("docstring") casadi::Nlpsol::eval "[INTERNAL]  Evaluate
 numerically.
-
-";
-
-%feature("docstring") casadi::Nlpsol::sp_fwd "[INTERNAL]  Propagate
-sparsity forward.
 
 ";
 
@@ -30602,8 +30576,8 @@ function inputs and outputs.
 
 ";
 
-%feature("docstring") casadi::Nlpsol::getCount "[INTERNAL]  Get the
-reference count.
+%feature("docstring") casadi::Nlpsol::sp_forward "[INTERNAL]  Propagate
+sparsity forward.
 
 ";
 
@@ -31020,6 +30994,11 @@ Check if the numerical values of the supplied bounds make sense.
 
 ";
 
+%feature("docstring") casadi::Nlpsol::sp_reverse "[INTERNAL]  Propagate
+sparsity backwards.
+
+";
+
 %feature("docstring") casadi::Nlpsol::replaceFwdSeed "[INTERNAL]  Replace
 0-by-0 forward seeds.
 
@@ -31032,11 +31011,6 @@ name by index.
 
 %feature("docstring") casadi::Nlpsol::generateDeclarations "[INTERNAL]
 Generate code for the declarations of the C function.
-
-";
-
-%feature("docstring") casadi::Nlpsol::sp_rev "[INTERNAL]  Propagate
-sparsity backwards.
 
 ";
 
@@ -31659,6 +31633,11 @@ Get the (integer) input arguments of an atomic operation.
 
 ";
 
+%feature("docstring") casadi::OracleFunction::sp_reverse "[INTERNAL]
+Propagate sparsity backwards.
+
+";
+
 %feature("docstring") casadi::OracleFunction::generateMeta "[INTERNAL]
 Generate meta-information allowing a user to evaluate a generated function.
 
@@ -31848,13 +31827,13 @@ Input/output dimensions.
 
 ";
 
-%feature("docstring") casadi::OracleFunction::sparsity_jac "[INTERNAL]
-Get, if necessary generate, the sparsity of a Jacobian block.
+%feature("docstring") casadi::OracleFunction::sp_forward "[INTERNAL]
+Propagate sparsity forward.
 
 ";
 
-%feature("docstring") casadi::OracleFunction::sp_fwd "[INTERNAL]  Propagate
-sparsity forward.
+%feature("docstring") casadi::OracleFunction::sparsity_jac "[INTERNAL]
+Get, if necessary generate, the sparsity of a Jacobian block.
 
 ";
 
@@ -32102,11 +32081,6 @@ free variables.
 
 %feature("docstring") casadi::OracleFunction::set_function "[INTERNAL]
 Register the function for evaluation and statistics gathering
-
-";
-
-%feature("docstring") casadi::OracleFunction::sp_rev "[INTERNAL]  Propagate
-sparsity backwards.
 
 ";
 
@@ -32566,6 +32540,11 @@ function input and outputs.
 
 ";
 
+%feature("docstring") casadi::QpToNlp::sp_reverse "[INTERNAL]  Propagate
+sparsity backwards.
+
+";
+
 %feature("docstring") casadi::QpToNlp::has_codegen "[INTERNAL]  Is codegen
 supported?
 
@@ -32632,6 +32611,11 @@ function inputs and outputs.
 
 %feature("docstring") casadi::QpToNlp::getAtomicOutput "[INTERNAL]  Get the
 (integer) output argument of an atomic operation.
+
+";
+
+%feature("docstring") casadi::QpToNlp::sp_forward "[INTERNAL]  Propagate
+sparsity forward.
 
 ";
 
@@ -33211,18 +33195,13 @@ temporary variables needed.
 
 ";
 
-%feature("docstring") casadi::QpToNlp::sp_fwd "[INTERNAL]  Propagate
-sparsity forward.
+%feature("docstring") casadi::QpToNlp::sz_w "[INTERNAL]  Get required
+length of w field.
 
 ";
 
 %feature("docstring") casadi::QpToNlp::release "[INTERNAL]  Release a
 memory object.
-
-";
-
-%feature("docstring") casadi::QpToNlp::sp_rev "[INTERNAL]  Propagate
-sparsity backwards.
 
 ";
 
@@ -33302,11 +33281,6 @@ input/output elements.
 
 %feature("docstring") casadi::QpToNlp::codegen_name "[INTERNAL]  Get name
 in codegen.
-
-";
-
-%feature("docstring") casadi::QpToNlp::sz_w "[INTERNAL]  Get required
-length of w field.
 
 ";
 
@@ -33712,11 +33686,6 @@ function inputs and outputs.
 
 ";
 
-%feature("docstring") casadi::Rootfinder::generateDeclarations "[INTERNAL]
-Generate code for the declarations of the C function.
-
-";
-
 %feature("docstring") casadi::Rootfinder::get_function "[INTERNAL] ";
 
 %feature("docstring") casadi::Rootfinder::default_in "[INTERNAL]  Get
@@ -33740,11 +33709,6 @@ of memory objects.
 ";
 
 %feature("docstring") casadi::Rootfinder::solve "[INTERNAL] ";
-
-%feature("docstring") casadi::Rootfinder::sp_rev "[INTERNAL]  Propagate
-sparsity backwards.
-
-";
 
 %feature("docstring") casadi::Rootfinder::weak "[INTERNAL]  Get a weak
 reference to the object.
@@ -33795,6 +33759,11 @@ Generate shorthand macro.
 
 ";
 
+%feature("docstring") casadi::Rootfinder::ad_forward "[INTERNAL]  Create
+call to (cached) derivative function, forward mode.
+
+";
+
 %feature("docstring") casadi::Rootfinder::~Rootfinder "[INTERNAL]
 Destructor.
 
@@ -33824,11 +33793,6 @@ memory object.
 
 %feature("docstring") casadi::Rootfinder::symbolic_output "[INTERNAL]  Get
 a vector of symbolic variables corresponding to the outputs.
-
-";
-
-%feature("docstring") casadi::Rootfinder::sp_fwd "[INTERNAL]  Propagate
-sparsity forward.
 
 ";
 
@@ -33978,6 +33942,11 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
+%feature("docstring") casadi::Rootfinder::sp_forward "[INTERNAL]  Propagate
+sparsity forward.
+
+";
+
 %feature("docstring") casadi::Rootfinder::log "
 
 >  void casadi::FunctionInternal::log(const std::string &msg) const 
@@ -34009,6 +33978,11 @@ Jacobian of all input elements with respect to all output elements.
 
 %feature("docstring") casadi::Rootfinder::getAtomicInput "[INTERNAL]  Get
 the (integer) input arguments of an atomic operation.
+
+";
+
+%feature("docstring") casadi::Rootfinder::sp_reverse "[INTERNAL]  Propagate
+sparsity backwards.
 
 ";
 
@@ -34077,8 +34051,8 @@ structure recognition.
 
 ";
 
-%feature("docstring") casadi::Rootfinder::print_free "[INTERNAL]  Print
-free variables.
+%feature("docstring") casadi::Rootfinder::ad_reverse "[INTERNAL]  Create
+call to (cached) derivative function, reverse mode.
 
 ";
 
@@ -34138,6 +34112,11 @@ dependent function.
 
 %feature("docstring") casadi::Rootfinder::map_mx "[INTERNAL]  Parallel
 evaluation.
+
+";
+
+%feature("docstring") casadi::Rootfinder::print_free "[INTERNAL]  Print
+free variables.
 
 ";
 
@@ -34309,11 +34288,6 @@ numerically.
 
 ";
 
-%feature("docstring") casadi::Rootfinder::eval_forward "[INTERNAL]  Create
-call to (cached) derivative function, forward mode.
-
-";
-
 %feature("docstring") casadi::Rootfinder::eval_name "[INTERNAL]  Get name
 of the evaluation function.
 
@@ -34339,8 +34313,8 @@ mode?
 
 ";
 
-%feature("docstring") casadi::Rootfinder::eval_reverse "[INTERNAL]  Create
-call to (cached) derivative function, reverse mode.
+%feature("docstring") casadi::Rootfinder::generateDeclarations "[INTERNAL]
+Generate code for the declarations of the C function.
 
 ";
 
@@ -34588,10 +34562,7 @@ name in codegen.
 
 %feature("docstring") casadi::RungeKutta::t "[INTERNAL] ";
 
-%feature("docstring") casadi::RungeKutta::sp_rev "[INTERNAL]  Propagate
-sparsity backwards.
-
-";
+%feature("docstring") casadi::RungeKutta::z "[INTERNAL] ";
 
 %feature("docstring") casadi::RungeKutta::mx_out "[INTERNAL]  Get function
 input(s) and output(s)
@@ -34614,6 +34585,11 @@ memory object.
 
 %feature("docstring") casadi::RungeKutta::size_out "[INTERNAL]
 Input/output dimensions.
+
+";
+
+%feature("docstring") casadi::RungeKutta::sp_forward "[INTERNAL]  Propagate
+sparsity forward.
 
 ";
 
@@ -34718,11 +34694,6 @@ Replace 0-by-0 forward seeds.
 
 ";
 
-%feature("docstring") casadi::RungeKutta::getJacSparsity "[INTERNAL]
-Generate the sparsity of a Jacobian block.
-
-";
-
 %feature("docstring") casadi::RungeKutta::adjViaJac "[INTERNAL]  Calculate
 derivatives by multiplying the full Jacobian and multiplying.
 
@@ -34733,7 +34704,10 @@ name.
 
 ";
 
-%feature("docstring") casadi::RungeKutta::z "[INTERNAL] ";
+%feature("docstring") casadi::RungeKutta::getJacSparsity "[INTERNAL]
+Generate the sparsity of a Jacobian block.
+
+";
 
 %feature("docstring") casadi::RungeKutta::index_out "[INTERNAL]  Get output
 scheme index by name.
@@ -34745,8 +34719,8 @@ length of iw field.
 
 ";
 
-%feature("docstring") casadi::RungeKutta::sp_fwd "[INTERNAL]  Propagate
-sparsity forward.
+%feature("docstring") casadi::RungeKutta::getWorkSize "[INTERNAL]  Get the
+length of the work vector.
 
 ";
 
@@ -34866,11 +34840,6 @@ Generate shorthand macro.
 
 ";
 
-%feature("docstring") casadi::RungeKutta::getWorkSize "[INTERNAL]  Get the
-length of the work vector.
-
-";
-
 %feature("docstring") casadi::RungeKutta::has_derivative "[INTERNAL]  Can
 derivatives be calculated in any way?
 
@@ -34972,6 +34941,11 @@ the unidirectional or bidirectional partition.
 
 %feature("docstring") casadi::RungeKutta::sp_weight "[INTERNAL]  Weighting
 factor for chosing forward/reverse mode, sparsity propagation.
+
+";
+
+%feature("docstring") casadi::RungeKutta::sp_reverse "[INTERNAL]  Propagate
+sparsity backwards.
 
 ";
 
@@ -35538,11 +35512,6 @@ input/output nonzeros.
 
 ";
 
-%feature("docstring") casadi::Scpgen::sp_fwd "[INTERNAL]  Propagate
-sparsity forward.
-
-";
-
 %feature("docstring") casadi::Scpgen::integer_support "[INTERNAL]  Can
 discrete variables be treated.
 
@@ -35764,11 +35733,6 @@ of a given input.
 ";
 
 %feature("docstring") casadi::Scpgen::eval_exp "[INTERNAL] ";
-
-%feature("docstring") casadi::Scpgen::sp_rev "[INTERNAL]  Propagate
-sparsity backwards.
-
-";
 
 %feature("docstring") casadi::Scpgen::checkout "[INTERNAL]  Checkout a
 memory object.
@@ -36009,6 +35973,11 @@ dimensions.
 
 ";
 
+%feature("docstring") casadi::Scpgen::sp_forward "[INTERNAL]  Propagate
+sparsity forward.
+
+";
+
 %feature("docstring") casadi::Scpgen::codegen_name "[INTERNAL]  Get name in
 codegen.
 
@@ -36125,6 +36094,11 @@ derivatives be calculated in any way?
 
 %feature("docstring") casadi::Scpgen::eval_sx "[INTERNAL]  Evaluate with
 symbolic scalars.
+
+";
+
+%feature("docstring") casadi::Scpgen::sp_reverse "[INTERNAL]  Propagate
+sparsity backwards.
 
 ";
 
@@ -36851,6 +36825,11 @@ Number of nodes in the algorithm.
 
 ";
 
+%feature("docstring") casadi::SimplifiedExternal::sp_forward "[INTERNAL]
+Propagate sparsity forward.
+
+";
+
 %feature("docstring") casadi::SimplifiedExternal::numel_out "[INTERNAL]
 Number of input/output elements.
 
@@ -37033,11 +37012,6 @@ Maximum number of memory objects.
 
 ";
 
-%feature("docstring") casadi::SimplifiedExternal::sp_rev "[INTERNAL]
-Propagate sparsity backwards.
-
-";
-
 %feature("docstring") casadi::SimplifiedExternal::call_reverse "[INTERNAL]
 Reverse mode, virtual functions overloaded in derived classes.
 
@@ -37193,11 +37167,6 @@ Construct Prepares the function for evaluation.
 
 ";
 
-%feature("docstring") casadi::SimplifiedExternal::sp_fwd "[INTERNAL]
-Propagate sparsity forward.
-
-";
-
 %feature("docstring") casadi::SimplifiedExternal::generateMeta "[INTERNAL]
 Generate meta-information allowing a user to evaluate a generated function.
 
@@ -37269,6 +37238,11 @@ Evaluate a function, overloaded.
 ";
 
 %feature("docstring") casadi::SimplifiedExternal::has_derivative "[INTERNAL]  Can derivatives be calculated in any way?
+
+";
+
+%feature("docstring") casadi::SimplifiedExternal::sp_reverse "[INTERNAL]
+Propagate sparsity backwards.
 
 ";
 
@@ -37626,8 +37600,8 @@ the unidirectional or bidirectional partition.
 
 ";
 
-%feature("docstring") casadi::SlicotDple::sp_rev "[INTERNAL]  Propagate
-sparsity backwards.
+%feature("docstring") casadi::SlicotDple::sz_iw "[INTERNAL]  Get required
+length of iw field.
 
 ";
 
@@ -37973,11 +37947,6 @@ function, templated.
 
 ";
 
-%feature("docstring") casadi::SlicotDple::sp_fwd "[INTERNAL]  Propagate
-sparsity forward.
-
-";
-
 %feature("docstring") casadi::SlicotDple::simplifiedCall "[INTERNAL]  Use
 simplified signature.
 
@@ -38298,11 +38267,6 @@ length of the work vector.
 
 ";
 
-%feature("docstring") casadi::SlicotDple::sz_iw "[INTERNAL]  Get required
-length of iw field.
-
-";
-
 %feature("docstring") casadi::SlicotDple::finalize "[INTERNAL]  Finalize
 the object creation This function, which visits the class hierarchy in
 reverse order is run after init() has been completed.
@@ -38338,6 +38302,11 @@ function is of a particular type.
 
 %feature("docstring") casadi::SlicotDple::default_in "[INTERNAL]  Get
 default input value.
+
+";
+
+%feature("docstring") casadi::SlicotDple::sp_reverse "[INTERNAL]  Propagate
+sparsity backwards.
 
 ";
 
@@ -38422,6 +38391,11 @@ Log the status of the solver.
 ------------------------------------------------------------------------
 [INTERNAL] 
 Log the status of the solver, function given.
+
+";
+
+%feature("docstring") casadi::SlicotDple::sp_forward "[INTERNAL]  Propagate
+sparsity forward.
 
 ";
 
@@ -38634,6 +38608,11 @@ length of arg field.
 
 ";
 
+%feature("docstring") casadi::SlicotExpm::sp_reverse "[INTERNAL]  Propagate
+sparsity backwards.
+
+";
+
 %feature("docstring") casadi::SlicotExpm::get_options "[INTERNAL]  Options.
 
 ";
@@ -38712,6 +38691,11 @@ scheme name by index.
 
 ";
 
+%feature("docstring") casadi::SlicotExpm::sp_forward "[INTERNAL]  Propagate
+sparsity forward.
+
+";
+
 %feature("docstring") casadi::SlicotExpm::simple "[INTERNAL]  Evaluate
 numerically, simplied syntax.
 
@@ -38782,11 +38766,6 @@ Jacobian of all input elements with respect to all output elements.
 
 %feature("docstring") casadi::SlicotExpm::get_sparsity_out "[INTERNAL]
 Sparsities of function inputs and outputs.
-
-";
-
-%feature("docstring") casadi::SlicotExpm::sp_fwd "[INTERNAL]  Propagate
-sparsity forward.
 
 ";
 
@@ -39246,11 +39225,6 @@ Parameters:
 -----------
 
 hcat:  check if horizontal repetion of the function input is allowed
-
-";
-
-%feature("docstring") casadi::SlicotExpm::sp_rev "[INTERNAL]  Propagate
-sparsity backwards.
 
 ";
 
@@ -40652,11 +40626,6 @@ Codegen incref for dependencies.
 
 ";
 
-%feature("docstring") casadi::Sqpmethod::sp_rev "[INTERNAL]  Propagate
-sparsity backwards.
-
-";
-
 %feature("docstring") casadi::Sqpmethod::n_nodes "[INTERNAL]  Number of
 nodes in the algorithm.
 
@@ -41119,6 +41088,11 @@ structure recognition for symmetric Jacobians
 
 ";
 
+%feature("docstring") casadi::Sqpmethod::sp_reverse "[INTERNAL]  Propagate
+sparsity backwards.
+
+";
+
 %feature("docstring") casadi::Sqpmethod::codegen_decref "[INTERNAL]
 Codegen decref for dependencies.
 
@@ -41435,11 +41409,6 @@ of memory objects.
 
 ";
 
-%feature("docstring") casadi::Sqpmethod::sp_fwd "[INTERNAL]  Propagate
-sparsity forward.
-
-";
-
 %feature("docstring") casadi::Sqpmethod::addShorthand "[INTERNAL]  Generate
 shorthand macro.
 
@@ -41503,6 +41472,11 @@ Prepares the function for evaluation.
 
 %feature("docstring") casadi::Sqpmethod::call_reverse "[INTERNAL]  Reverse
 mode, virtual functions overloaded in derived classes.
+
+";
+
+%feature("docstring") casadi::Sqpmethod::sp_forward "[INTERNAL]  Propagate
+sparsity forward.
 
 ";
 
@@ -41883,11 +41857,6 @@ in the algorithm.
 
 ";
 
-%feature("docstring") casadi::Switch::sp_fwd "[INTERNAL]  Propagate
-sparsity forward.
-
-";
-
 %feature("docstring") casadi::Switch::free_sx "[INTERNAL]  Get free
 variables (SX)
 
@@ -42060,6 +42029,11 @@ scheme name by index.
 
 ";
 
+%feature("docstring") casadi::Switch::sp_forward "[INTERNAL]  Propagate
+sparsity forward.
+
+";
+
 %feature("docstring") casadi::Switch::n_mem "[INTERNAL]  Maximum number of
 memory objects.
 
@@ -42127,6 +42101,11 @@ dimensions.
 
 %feature("docstring") casadi::Switch::sparsity_out "[INTERNAL]  Get
 sparsity of a given output.
+
+";
+
+%feature("docstring") casadi::Switch::sp_reverse "[INTERNAL]  Propagate
+sparsity backwards.
 
 ";
 
@@ -42234,11 +42213,6 @@ Parameters:
 -----------
 
 hcat:  check if horizontal repetion of the function input is allowed
-
-";
-
-%feature("docstring") casadi::Switch::sp_rev "[INTERNAL]  Propagate
-sparsity backwards.
 
 ";
 
@@ -42584,6 +42558,11 @@ numerically, simplied syntax.
 
 ";
 
+%feature("docstring") casadi::SymbolicQr::sp_forward "[INTERNAL]  Propagate
+sparsity forward.
+
+";
+
 %feature("docstring") casadi::SymbolicQr::eval_sx "[INTERNAL]  Evaluate
 with symbolic scalars.
 
@@ -42736,11 +42715,6 @@ Extract the functions needed for the Lifted Newton method.
 
 %feature("docstring") casadi::SymbolicQr::sz_iw "[INTERNAL]  Get required
 length of iw field.
-
-";
-
-%feature("docstring") casadi::SymbolicQr::clear_memory "[INTERNAL]  Clear
-all memory (called from destructor)
 
 ";
 
@@ -43157,8 +43131,8 @@ variables ( MX)
 
 ";
 
-%feature("docstring") casadi::SymbolicQr::sp_rev "[INTERNAL]  Propagate
-sparsity backwards.
+%feature("docstring") casadi::SymbolicQr::clear_memory "[INTERNAL]  Clear
+all memory (called from destructor)
 
 ";
 
@@ -43401,13 +43375,13 @@ Input/output dimensions.
 
 ";
 
-%feature("docstring") casadi::SymbolicQr::signature "[INTERNAL]  Code
-generate the function.
+%feature("docstring") casadi::SymbolicQr::sp_reverse "[INTERNAL]  Propagate
+sparsity backwards.
 
 ";
 
-%feature("docstring") casadi::SymbolicQr::sp_fwd "[INTERNAL]  Propagate
-sparsity forward.
+%feature("docstring") casadi::SymbolicQr::signature "[INTERNAL]  Code
+generate the function.
 
 ";
 

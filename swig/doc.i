@@ -223,13 +223,6 @@ int oind, bool symmetric) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sp_rev(bvec_t **arg, bvec_t
-**res, int *iw, bvec_t *w, int mem) const  "
-
-[INTERNAL]  Propagate sparsity backwards.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::construct(const Dict &opts)
 "
 
@@ -384,13 +377,6 @@ hcat:  check if horizontal repetion of the function input is allowed
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sp_fwd(const bvec_t **arg,
-bvec_t **res, int *iw, bvec_t *w, int mem) const  "
-
-[INTERNAL]  Propagate sparsity forward.
-
-";
-
 %feature("docstring")  casadi::Nlpsol::get_n_in() override "
 
 [INTERNAL]  Number of function inputs and outputs.
@@ -414,6 +400,13 @@ double **arg, double **res, int *iw, double *w) const  "
 %feature("docstring")  casadi::Nlpsol::get_sparsity_in(int i) override "
 
 [INTERNAL]  Sparsities of function inputs and outputs.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::sp_reverse(bvec_t **arg,
+bvec_t **res, int *iw, bvec_t *w, int mem) const  "
+
+[INTERNAL]  Propagate sparsity backwards.
 
 ";
 
@@ -528,6 +521,13 @@ const Function &nlp) "
 double *res) const  "
 
 [INTERNAL]  Evaluate numerically, simplied syntax.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::sp_forward(const bvec_t
+**arg, bvec_t **res, int *iw, bvec_t *w, int mem) const  "
+
+[INTERNAL]  Propagate sparsity forward.
 
 ";
 
@@ -2366,6 +2366,13 @@ const std::vector< MatType > &v) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::sp_forward(const bvec_t
+**arg, bvec_t **res, int *iw, bvec_t *w, int mem) const  "
+
+[INTERNAL]  Propagate sparsity forward.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::get_partition(int iind, int
 oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
 allow_forward, bool allow_reverse) const  "
@@ -2374,22 +2381,9 @@ allow_forward, bool allow_reverse) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sp_fwd(const bvec_t **arg,
-bvec_t **res, int *iw, bvec_t *w, int mem) const  "
-
-[INTERNAL]  Propagate sparsity forward.
-
-";
-
 %feature("docstring") casadi::BSpline::_set_temp "
 
 [INTERNAL]  Set the (temporary) work vectors.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::sz_iw() const  "
-
-[INTERNAL]  Get required length of iw field.
 
 ";
 
@@ -2580,6 +2574,13 @@ std::vector< std::vector< M > > &fseed) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::sp_reverse(bvec_t **arg,
+bvec_t **res, int *iw, bvec_t *w, int mem) const  "
+
+[INTERNAL]  Propagate sparsity backwards.
+
+";
+
 %feature("docstring")  casadi::BSpline::has_codegen() const override "
 
 Is codegen supported?
@@ -2691,10 +2692,9 @@ const override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sp_rev(bvec_t **arg, bvec_t
-**res, int *iw, bvec_t *w, int mem) const  "
+%feature("docstring")  casadi::FunctionInternal::sz_iw() const  "
 
-[INTERNAL]  Propagate sparsity backwards.
+[INTERNAL]  Get required length of iw field.
 
 ";
 
@@ -3701,13 +3701,6 @@ double **arg, double **res, int *iw, double *w) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sp_fwd(const bvec_t **arg,
-bvec_t **res, int *iw, bvec_t *w, int mem) const  "
-
-[INTERNAL]  Propagate sparsity forward.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::getAdaptorSolverName()
 const  "
 
@@ -4051,6 +4044,13 @@ std::vector< std::string > &onames, const Dict &opts) const  "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
 elements.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::sp_forward(const bvec_t
+**arg, bvec_t **res, int *iw, bvec_t *w, int mem) const  "
+
+[INTERNAL]  Propagate sparsity forward.
 
 ";
 
@@ -4578,6 +4578,13 @@ hcat:  check if horizontal repetion of the function input is allowed
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::sp_reverse(bvec_t **arg,
+bvec_t **res, int *iw, bvec_t *w, int mem) const  "
+
+[INTERNAL]  Propagate sparsity backwards.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::default_in(int ind) const
 "
 
@@ -4956,13 +4963,6 @@ Options.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sp_rev(bvec_t **arg, bvec_t
-**res, int *iw, bvec_t *w, int mem) const  "
-
-[INTERNAL]  Propagate sparsity backwards.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::ad_weight() const  "
 
 [INTERNAL]  Weighting factor for chosing forward/reverse mode.
@@ -5083,6 +5083,13 @@ get_reverse(int nadj) if no cached version is available.
 &fname) const  "
 
 [INTERNAL]  Code generate the function.
+
+";
+
+%feature("docstring")  casadi::BSplineDual::sp_reverse(bvec_t **arg, bvec_t
+**res, int *iw, bvec_t *w, int mem) const override "
+
+Propagate sparsity backwards.
 
 ";
 
@@ -5348,13 +5355,6 @@ Print description.
 %feature("docstring")  casadi::FunctionInternal::nnz_out(int ind) const  "
 
 [INTERNAL]  Number of input/output nonzeros.
-
-";
-
-%feature("docstring")  casadi::BSplineDual::sp_rev(bvec_t **arg, bvec_t
-**res, int *iw, bvec_t *w, int mem) const override "
-
-Propagate sparsity backwards.
 
 ";
 
@@ -5935,13 +5935,6 @@ bool persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::BSplineDual::sp_fwd(const bvec_t **arg,
-bvec_t **res, int *iw, bvec_t *w, int mem) const override "
-
-Propagate sparsity forward.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::simplifiedCall() const  "
 
 [INTERNAL]  Use simplified signature.
@@ -6229,6 +6222,13 @@ M > &res) const  "
 %feature("docstring")  casadi::FunctionInternal::sx_out() const  "
 
 [INTERNAL]  Get function input(s) and output(s)
+
+";
+
+%feature("docstring")  casadi::BSplineDual::sp_forward(const bvec_t **arg,
+bvec_t **res, int *iw, bvec_t *w, int mem) const override "
+
+Propagate sparsity forward.
 
 ";
 
@@ -6803,6 +6803,13 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::sp_forward(const bvec_t
+**arg, bvec_t **res, int *iw, bvec_t *w, int mem) const  "
+
+[INTERNAL]  Propagate sparsity forward.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::checkRes(const std::vector<
 M > &res) const  "
 
@@ -6976,13 +6983,6 @@ std::vector< MX > > &arg, const std::string &parallelization) "
 MX > &arg, const std::string &parallelization) "
 
 [INTERNAL]  Parallel evaluation.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::sp_rev(bvec_t **arg, bvec_t
-**res, int *iw, bvec_t *w, int mem) const  "
-
-[INTERNAL]  Propagate sparsity backwards.
 
 ";
 
@@ -7326,13 +7326,6 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sp_fwd(const bvec_t **arg,
-bvec_t **res, int *iw, bvec_t *w, int mem) const  "
-
-[INTERNAL]  Propagate sparsity forward.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::n_nodes() const  "
 
 [INTERNAL]  Number of nodes in the algorithm.
@@ -7518,6 +7511,13 @@ hcat:  check if horizontal repetion of the function input is allowed
 %feature("docstring")  casadi::FunctionInternal::verbose() const  "
 
 [INTERNAL]  Verbose mode?
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::sp_reverse(bvec_t **arg,
+bvec_t **res, int *iw, bvec_t *w, int mem) const  "
+
+[INTERNAL]  Propagate sparsity backwards.
 
 ";
 
@@ -9179,6 +9179,13 @@ files and may be a directory or a file prefix. returns the filename.
 
 ";
 
+%feature("docstring")  casadi::Integrator::sp_reverse(bvec_t **arg, bvec_t
+**res, int *iw, bvec_t *w, int mem) const override "
+
+[INTERNAL]  Propagate sparsity backwards.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::print_option(const
 std::string &name, std::ostream &stream) const  "
 
@@ -9228,6 +9235,13 @@ structure recognition for symmetric Jacobians
 %feature("docstring")  casadi::SharedObjectInternal::weak() "
 
 [INTERNAL]  Get a weak reference to the object.
+
+";
+
+%feature("docstring")  casadi::Integrator::sp_forward(const bvec_t **arg,
+bvec_t **res, int *iw, bvec_t *w, int mem) const override "
+
+[INTERNAL]  Propagate sparsity forward.
 
 ";
 
@@ -10033,13 +10047,6 @@ multiplying.
 
 ";
 
-%feature("docstring")  casadi::Integrator::sp_rev(bvec_t **arg, bvec_t
-**res, int *iw, bvec_t *w, int mem) const override "
-
-[INTERNAL]  Propagate sparsity backwards.
-
-";
-
 %feature("docstring") casadi::Collocation "
 
 'collocation' plugin for Integrator
@@ -10451,13 +10458,6 @@ const std::vector< MatType > &v) const  "
 %feature("docstring")  casadi::FunctionInternal::size_in(int ind) const  "
 
 [INTERNAL]  Input/output dimensions.
-
-";
-
-%feature("docstring")  casadi::Integrator::sp_fwd(const bvec_t **arg, bvec_t
-**res, int *iw, bvec_t *w, int mem) const override "
-
-[INTERNAL]  Propagate sparsity forward.
 
 ";
 
@@ -11113,13 +11113,6 @@ const  "
 &name) const  "
 
 [INTERNAL]  Get input scheme index by name.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::sp_rev(bvec_t **arg, bvec_t
-**res, int *iw, bvec_t *w, int mem) const  "
-
-[INTERNAL]  Propagate sparsity backwards.
 
 ";
 
@@ -11793,13 +11786,6 @@ const override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sp_fwd(const bvec_t **arg,
-bvec_t **res, int *iw, bvec_t *w, int mem) const  "
-
-[INTERNAL]  Propagate sparsity forward.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::sz_res() const  "
 
 [INTERNAL]  Get required length of res field.
@@ -11863,6 +11849,13 @@ std::vector< M > &res) const  "
 %feature("docstring")  casadi::Conic::get_name_out(int i) override "
 
 [INTERNAL]  Names of function input and outputs.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::sp_reverse(bvec_t **arg,
+bvec_t **res, int *iw, bvec_t *w, int mem) const  "
+
+[INTERNAL]  Propagate sparsity backwards.
 
 ";
 
@@ -12057,6 +12050,13 @@ get_forward(int nfwd) if no cached version is available.
 [INTERNAL]  Return function that calculates forward derivatives
 forward(nfwd) returns a cached instance if available, and calls  Function
 get_forward(int nfwd) if no cached version is available.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::sp_forward(const bvec_t
+**arg, bvec_t **res, int *iw, bvec_t *w, int mem) const  "
+
+[INTERNAL]  Propagate sparsity forward.
 
 ";
 
@@ -13568,6 +13568,13 @@ std::vector< std::vector< M > > &aseed) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::sp_forward(const bvec_t
+**arg, bvec_t **res, int *iw, bvec_t *w, int mem) const  "
+
+[INTERNAL]  Propagate sparsity forward.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::index_in(const std::string
 &name) const  "
 
@@ -13805,12 +13812,6 @@ const  "
 %feature("docstring")  casadi::FunctionInternal::size1_in(int ind) const  "
 
 [INTERNAL]  Input/output dimensions.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::clear_memory() "
-
-[INTERNAL]  Clear all memory (called from destructor)
 
 ";
 
@@ -14082,13 +14083,6 @@ const std::vector< MatType > &v) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sp_rev(bvec_t **arg, bvec_t
-**res, int *iw, bvec_t *w, int mem) const  "
-
-[INTERNAL]  Propagate sparsity backwards.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::codegen_name(const
 CodeGenerator &g) const  "
 
@@ -14181,6 +14175,13 @@ std::vector< MX > &arg, const std::string &parallelization) "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::sp_reverse(bvec_t **arg,
+bvec_t **res, int *iw, bvec_t *w, int mem) const  "
+
+[INTERNAL]  Propagate sparsity backwards.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::free_mx() const  "
 
 [INTERNAL]  Get free variables ( MX)
@@ -14199,10 +14200,9 @@ hcat:  check if horizontal repetion of the function input is allowed
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sp_fwd(const bvec_t **arg,
-bvec_t **res, int *iw, bvec_t *w, int mem) const  "
+%feature("docstring")  casadi::FunctionInternal::clear_memory() "
 
-[INTERNAL]  Propagate sparsity forward.
+[INTERNAL]  Clear all memory (called from destructor)
 
 ";
 
@@ -14927,6 +14927,13 @@ MX > &arg, const std::string &parallelization) "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::sp_reverse(bvec_t **arg,
+bvec_t **res, int *iw, bvec_t *w, int mem) const  "
+
+[INTERNAL]  Propagate sparsity backwards.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::sz_res() const  "
 
 [INTERNAL]  Get required length of res field.
@@ -14936,13 +14943,6 @@ MX > &arg, const std::string &parallelization) "
 %feature("docstring")  casadi::FunctionInternal::has_derivative() const  "
 
 [INTERNAL]  Can derivatives be calculated in any way?
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::sp_fwd(const bvec_t **arg,
-bvec_t **res, int *iw, bvec_t *w, int mem) const  "
-
-[INTERNAL]  Propagate sparsity forward.
 
 ";
 
@@ -15429,6 +15429,13 @@ std::string &name, std::ostream &stream) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::sp_forward(const bvec_t
+**arg, bvec_t **res, int *iw, bvec_t *w, int mem) const  "
+
+[INTERNAL]  Propagate sparsity forward.
+
+";
+
 %feature("docstring")  casadi::SharedObjectInternal::weak() "
 
 [INTERNAL]  Get a weak reference to the object.
@@ -15520,13 +15527,6 @@ casadi::FunctionInternal::codegen_incref(CodeGenerator &g) const  "
 %feature("docstring")  casadi::FunctionInternal::nnz_out(int ind) const  "
 
 [INTERNAL]  Number of input/output nonzeros.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::sp_rev(bvec_t **arg, bvec_t
-**res, int *iw, bvec_t *w, int mem) const  "
-
-[INTERNAL]  Propagate sparsity backwards.
 
 ";
 
@@ -15965,13 +15965,6 @@ persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sp_rev(bvec_t **arg, bvec_t
-**res, int *iw, bvec_t *w, int mem) const  "
-
-[INTERNAL]  Propagate sparsity backwards.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::alloc_memory() const  "
 
 [INTERNAL]  Create memory block.
@@ -16160,6 +16153,13 @@ std::vector< std::vector< M > > &fseed) const  "
 double *res) const  "
 
 [INTERNAL]  Evaluate numerically, simplied syntax.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::sp_forward(const bvec_t
+**arg, bvec_t **res, int *iw, bvec_t *w, int mem) const  "
+
+[INTERNAL]  Propagate sparsity forward.
 
 ";
 
@@ -16541,13 +16541,6 @@ std::string > &onames, const Dict &opts) const override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sp_fwd(const bvec_t **arg,
-bvec_t **res, int *iw, bvec_t *w, int mem) const  "
-
-[INTERNAL]  Propagate sparsity forward.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::numel_out(int ind) const  "
 
 [INTERNAL]  Number of input/output elements.
@@ -16627,6 +16620,13 @@ std::string &name, const std::vector< std::string > &inames, const
 std::vector< std::string > &onames, const Dict &opts) const override "
 
 [INTERNAL]  Forward mode derivatives.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::sp_reverse(bvec_t **arg,
+bvec_t **res, int *iw, bvec_t *w, int mem) const  "
+
+[INTERNAL]  Propagate sparsity backwards.
 
 ";
 
@@ -16880,6 +16880,13 @@ std::string &fname, bool decl_static) const  "
 %feature("docstring")  casadi::Integrator::x() const  "
 
 [INTERNAL] ";
+
+%feature("docstring")  casadi::Integrator::sp_reverse(bvec_t **arg, bvec_t
+**res, int *iw, bvec_t *w, int mem) const override "
+
+[INTERNAL]  Propagate sparsity backwards.
+
+";
 
 %feature("docstring")  casadi::FunctionInternal::set_work(void *mem, const
 double **&arg, double **&res, int *&iw, double *&w) const  "
@@ -17542,13 +17549,6 @@ std::string &name, const Function &dae) "
 
 ";
 
-%feature("docstring")  casadi::Integrator::sp_rev(bvec_t **arg, bvec_t
-**res, int *iw, bvec_t *w, int mem) const override "
-
-[INTERNAL]  Propagate sparsity backwards.
-
-";
-
 %feature("docstring")  casadi::OracleFunction::get_stats(void *mem) const
 override "
 
@@ -17897,13 +17897,6 @@ const std::vector< MatType > &v) const  "
 
 ";
 
-%feature("docstring")  casadi::Integrator::sp_fwd(const bvec_t **arg, bvec_t
-**res, int *iw, bvec_t *w, int mem) const override "
-
-[INTERNAL]  Propagate sparsity forward.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::ad_weight() const  "
 
 [INTERNAL]  Weighting factor for chosing forward/reverse mode.
@@ -18097,6 +18090,13 @@ const  "
 
 [INTERNAL]  A flavor of getJacSparsity that does hierarchical block
 structure recognition.
+
+";
+
+%feature("docstring")  casadi::Integrator::sp_forward(const bvec_t **arg,
+bvec_t **res, int *iw, bvec_t *w, int mem) const override "
+
+[INTERNAL]  Propagate sparsity forward.
 
 ";
 
@@ -19273,36 +19273,13 @@ Get input dimension.
 
 %feature("docstring") casadi::Function "
 
-General function.
+Function object A Function instance is a general multiple-input, multiple-
+output function where each input and output can be a sparse matrix. .
 
-A general function $f$ in casadi can be multi-input, multi-output. Number of
-inputs: nin n_in() Number of outputs: nout n_out()  We can view this
-function as a being composed of a ( nin, nout) grid of single-input, single-
-output primitive functions. Each such primitive function $f_ {i, j}
-\\\\forall i \\\\in [0, nin-1], j \\\\in [0, nout-1]$ can map as $\\\\mathbf
-{R}^{n, m}\\\\to\\\\mathbf{R}^{p, q}$, in which n, m, p, q can take
-different values for every (i, j) pair.  When passing input, you specify
-which partition $i$ is active. You pass the numbers vectorized, as a vector
-of size $(n*m)$. When requesting output, you specify which partition $j$ is
-active. You get the numbers vectorized, as a vector of size $(p*q)$.  To
-calculate Jacobians, you need to have $(m=1, q=1)$.
-
-Write the Jacobian as $J_ {i, j} = \\\\nabla f_{i, j} = \\\\frac
-{\\\\partial f_{i, j}(\\\\vec{x})}{\\\\partial \\\\vec{x}}$.
-
-We have the following relationships for function mapping from a row vector
-to a row vector:
-
-$ \\\\vec {s}_f = \\\\nabla f_{i, j} . \\\\vec{v}$ $ \\\\vec {s}_a =
-(\\\\nabla f_{i, j})^T . \\\\vec{w}$
-
-Some quantities in these formulas must be transposed: input col: transpose $
-\\\\vec {v} $ and $\\\\vec{s}_a$ output col: transpose $ \\\\vec {w} $ and
-$\\\\vec{s}_f$  NOTE: Functions are allowed to modify their input arguments
-when evaluating: implicitFunction, IDAS solver Further releases may disallow
-this.
-
-Joel Andersson >List of available options
+For an introduction to this class, see the CasADi user guide. Function is a
+reference counted and immutable class; copying a class instance is very
+cheap and its behavior (with some exceptions) is not affected by calling its
+member functions. Joel Andersson >List of available options
 
 +------------------+-----------------+------------------+------------------+
 |        Id        |      Type       |   Description    |     Used in      |
@@ -19656,9 +19633,6 @@ Number of nodes in the algorithm.
 Get the number of function inputs.
 
 ";
-
-
-// File: classcasadi_1_1GenericCall.xml
 
 
 // File: classcasadi_1_1GenericExpression.xml
@@ -20053,13 +20027,6 @@ std::string &iname) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sp_fwd(const bvec_t **arg,
-bvec_t **res, int *iw, bvec_t *w, int mem) const  "
-
-[INTERNAL]  Propagate sparsity forward.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::print_free(std::ostream
 &stream) const  "
 
@@ -20336,6 +20303,13 @@ std::vector< SX > > &aseed, std::vector< std::vector< SX > > &asens, bool
 always_inline, bool never_inline) const  "
 
 [INTERNAL]  Reverse mode, virtual functions overloaded in derived classes.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::sp_reverse(bvec_t **arg,
+bvec_t **res, int *iw, bvec_t *w, int mem) const  "
+
+[INTERNAL]  Propagate sparsity backwards.
 
 ";
 
@@ -21003,6 +20977,13 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::sp_forward(const bvec_t
+**arg, bvec_t **res, int *iw, bvec_t *w, int mem) const  "
+
+[INTERNAL]  Propagate sparsity forward.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::mx_out(int ind) const  "
 
 [INTERNAL]  Get function input(s) and output(s)
@@ -21012,13 +20993,6 @@ const  "
 %feature("docstring")  casadi::FunctionInternal::mx_out() const  "
 
 [INTERNAL]  Get function input(s) and output(s)
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::sp_rev(bvec_t **arg, bvec_t
-**res, int *iw, bvec_t *w, int mem) const  "
-
-[INTERNAL]  Propagate sparsity backwards.
 
 ";
 
@@ -22193,10 +22167,10 @@ OracleMemory *m) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::alloc_arg(size_t sz_arg,
-bool persistent=false) "
+%feature("docstring")  casadi::Integrator::sp_forward(const bvec_t **arg,
+bvec_t **res, int *iw, bvec_t *w, int mem) const override "
 
-[INTERNAL]  Ensure required length of arg field.
+[INTERNAL]  Propagate sparsity forward.
 
 ";
 
@@ -22271,6 +22245,13 @@ int oind, bool symmetric, int gr_i=1, int gr_o=1) const  "
 std::vector< std::vector< M > > &fseed) const  "
 
 [INTERNAL]  Replace 0-by-0 forward seeds.
+
+";
+
+%feature("docstring")  casadi::Integrator::sp_reverse(bvec_t **arg, bvec_t
+**res, int *iw, bvec_t *w, int mem) const override "
+
+[INTERNAL]  Propagate sparsity backwards.
 
 ";
 
@@ -22472,13 +22453,6 @@ const std::vector< MatType > &v) const  "
 %feature("docstring")  casadi::FunctionInternal::name_in(int ind) const  "
 
 [INTERNAL]  Get input scheme name by index.
-
-";
-
-%feature("docstring")  casadi::Integrator::sp_rev(bvec_t **arg, bvec_t
-**res, int *iw, bvec_t *w, int mem) const override "
-
-[INTERNAL]  Propagate sparsity backwards.
 
 ";
 
@@ -22818,13 +22792,6 @@ SXElem **res, int *iw, SXElem *w, int mem) const  "
 const override "
 
 [INTERNAL]  Get explicit dynamics.
-
-";
-
-%feature("docstring")  casadi::Integrator::sp_fwd(const bvec_t **arg, bvec_t
-**res, int *iw, bvec_t *w, int mem) const override "
-
-[INTERNAL]  Propagate sparsity forward.
 
 ";
 
@@ -23405,6 +23372,13 @@ std::vector< std::string > &s_out, const Function::AuxOut
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::alloc_arg(size_t sz_arg,
+bool persistent=false) "
+
+[INTERNAL]  Ensure required length of arg field.
+
+";
+
 %feature("docstring")
 casadi::ImplicitFixedStepIntegrator::ImplicitFixedStepIntegrator(const
 std::string &name, const Function &dae) "
@@ -23500,6 +23474,12 @@ std::vector< MX > &arg, const std::string &parallelization) "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::eval_name() const  "
+
+[INTERNAL]  Get name of the evaluation function.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::free_mx() const  "
 
 [INTERNAL]  Get free variables ( MX)
@@ -23516,12 +23496,6 @@ std::vector< MX > &arg, const std::string &parallelization) "
 override "
 
 [INTERNAL]  Free memory block.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::sz_w() const  "
-
-[INTERNAL]  Get required length of w field.
 
 ";
 
@@ -23657,9 +23631,10 @@ classes.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::eval_name() const  "
+%feature("docstring")  casadi::Rootfinder::sp_forward(const bvec_t **arg,
+bvec_t **res, int *iw, bvec_t *w, int mem) const override "
 
-[INTERNAL]  Get name of the evaluation function.
+[INTERNAL]  Propagate sparsity forward.
 
 ";
 
@@ -23700,6 +23675,15 @@ bool persistent=false) "
 std::vector< std::vector< M > > &fseed) const  "
 
 [INTERNAL]  Replace 0-by-0 forward seeds.
+
+";
+
+%feature("docstring")  casadi::Rootfinder::ad_forward(const std::vector< MX
+> &arg, const std::vector< MX > &res, const std::vector< std::vector< MX > >
+&fseed, std::vector< std::vector< MX > > &fsens, bool always_inline, bool
+never_inline) const  "
+
+[INTERNAL]  Create call to (cached) derivative function, forward mode.
 
 ";
 
@@ -23957,10 +23941,9 @@ structure recognition.
 
 ";
 
-%feature("docstring")  casadi::Rootfinder::sp_fwd(const bvec_t **arg, bvec_t
-**res, int *iw, bvec_t *w, int mem) const override "
+%feature("docstring")  casadi::FunctionInternal::sz_w() const  "
 
-[INTERNAL]  Propagate sparsity forward.
+[INTERNAL]  Get required length of w field.
 
 ";
 
@@ -24179,6 +24162,13 @@ std::string > &s_out, const Function::AuxOut &aux, const Dict &opts) const
 
 ";
 
+%feature("docstring")  casadi::Rootfinder::sp_reverse(bvec_t **arg, bvec_t
+**res, int *iw, bvec_t *w, int mem) const override "
+
+[INTERNAL]  Propagate sparsity backwards.
+
+";
+
 %feature("docstring")  casadi::Rootfinder::get_reverse(int nadj, const
 std::string &name, const std::vector< std::string > &inames, const
 std::vector< std::string > &onames, const Dict &opts) const override "
@@ -24274,15 +24264,6 @@ hcat:  check if horizontal repetion of the function input is allowed
 const  "
 
 [INTERNAL]  Get the (integer) output argument of an atomic operation.
-
-";
-
-%feature("docstring")  casadi::Rootfinder::eval_forward(const std::vector<
-MX > &arg, const std::vector< MX > &res, const std::vector< std::vector< MX
-> > &fseed, std::vector< std::vector< MX > > &fsens, bool always_inline,
-bool never_inline) const  "
-
-[INTERNAL]  Create call to (cached) derivative function, forward mode.
 
 ";
 
@@ -24441,6 +24422,15 @@ casadi::FunctionInternal::codegen_decref(CodeGenerator &g) const  "
 
 ";
 
+%feature("docstring")  casadi::Rootfinder::ad_reverse(const std::vector< MX
+> &arg, const std::vector< MX > &res, const std::vector< std::vector< MX > >
+&aseed, std::vector< std::vector< MX > > &asens, bool always_inline, bool
+never_inline) const  "
+
+[INTERNAL]  Create call to (cached) derivative function, reverse mode.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::generateMeta(CodeGenerator
 &g, const std::string &fname) const  "
 
@@ -24471,10 +24461,9 @@ get_reverse(int nadj) if no cached version is available.
 
 ";
 
-%feature("docstring")  casadi::Rootfinder::sp_rev(bvec_t **arg, bvec_t
-**res, int *iw, bvec_t *w, int mem) const override "
+%feature("docstring")  casadi::FunctionInternal::has_free() const  "
 
-[INTERNAL]  Propagate sparsity backwards.
+[INTERNAL]  Does the function have free variables.
 
 ";
 
@@ -24547,15 +24536,6 @@ get_forward(int nfwd) if no cached version is available.
 
 ";
 
-%feature("docstring")  casadi::Rootfinder::eval_reverse(const std::vector<
-MX > &arg, const std::vector< MX > &res, const std::vector< std::vector< MX
-> > &aseed, std::vector< std::vector< MX > > &asens, bool always_inline,
-bool never_inline) const  "
-
-[INTERNAL]  Create call to (cached) derivative function, reverse mode.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::which_depends(const
 std::string &s_in, const std::vector< std::string > &s_out, int order, bool
 tr=false) const  "
@@ -24586,12 +24566,6 @@ hcat:  check if horizontal repetion of the function input is allowed
 %feature("docstring")  casadi::FunctionInternal::wrap() const  "
 
 [INTERNAL]  Wrap in an Function instance consisting of only one MX call.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::has_free() const  "
-
-[INTERNAL]  Does the function have free variables.
 
 ";
 
@@ -25275,13 +25249,6 @@ double t, const double *rx, const double *rz, const double *rp) const  "
 
 ";
 
-%feature("docstring")  casadi::Integrator::sp_rev(bvec_t **arg, bvec_t
-**res, int *iw, bvec_t *w, int mem) const override "
-
-[INTERNAL]  Propagate sparsity backwards.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::generateMeta(CodeGenerator
 &g, const std::string &fname) const  "
 
@@ -25333,6 +25300,13 @@ Parameters:
 -----------
 
 hcat:  check if horizontal repetion of the function input is allowed
+
+";
+
+%feature("docstring")  casadi::Integrator::sp_reverse(bvec_t **arg, bvec_t
+**res, int *iw, bvec_t *w, int mem) const override "
+
+[INTERNAL]  Propagate sparsity backwards.
 
 ";
 
@@ -25802,13 +25776,6 @@ casadi::FunctionInternal::print_dimensions(std::ostream &stream) const  "
 "
 
 [INTERNAL]  Construct Prepares the function for evaluation.
-
-";
-
-%feature("docstring")  casadi::Integrator::sp_fwd(const bvec_t **arg, bvec_t
-**res, int *iw, bvec_t *w, int mem) const override "
-
-[INTERNAL]  Propagate sparsity forward.
 
 ";
 
@@ -26387,6 +26354,13 @@ override "
 
 ";
 
+%feature("docstring")  casadi::Integrator::sp_forward(const bvec_t **arg,
+bvec_t **res, int *iw, bvec_t *w, int mem) const override "
+
+[INTERNAL]  Propagate sparsity forward.
+
+";
+
 
 // File: classcasadi_1_1Interpolant.xml
 %feature("docstring")  casadi::FunctionInternal::getAlgorithmSize() const  "
@@ -26584,13 +26558,6 @@ elements.
 %feature("docstring")  casadi::FunctionInternal::n_nodes() const  "
 
 [INTERNAL]  Number of nodes in the algorithm.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::sp_fwd(const bvec_t **arg,
-bvec_t **res, int *iw, bvec_t *w, int mem) const  "
-
-[INTERNAL]  Propagate sparsity forward.
 
 ";
 
@@ -26840,9 +26807,10 @@ double **arg, double **res, int *iw, double *w) const  "
 
 ";
 
-%feature("docstring")  casadi::SharedObjectInternal::getCount() const  "
+%feature("docstring")  casadi::FunctionInternal::sp_forward(const bvec_t
+**arg, bvec_t **res, int *iw, bvec_t *w, int mem) const  "
 
-[INTERNAL]  Get the reference count.
+[INTERNAL]  Propagate sparsity forward.
 
 ";
 
@@ -27319,16 +27287,16 @@ double *res) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sp_rev(bvec_t **arg, bvec_t
-**res, int *iw, bvec_t *w, int mem) const  "
-
-[INTERNAL]  Propagate sparsity backwards.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::name_in(int ind) const  "
 
 [INTERNAL]  Get input scheme name by index.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::sp_reverse(bvec_t **arg,
+bvec_t **res, int *iw, bvec_t *w, int mem) const  "
+
+[INTERNAL]  Propagate sparsity backwards.
 
 ";
 
@@ -27344,6 +27312,12 @@ const std::vector< double > &values) "
 casadi::FunctionInternal::generateDeclarations(CodeGenerator &g) const  "
 
 [INTERNAL]  Generate code for the declarations of the C function.
+
+";
+
+%feature("docstring")  casadi::SharedObjectInternal::getCount() const  "
+
+[INTERNAL]  Get the reference count.
 
 ";
 
@@ -27872,6 +27846,13 @@ allow_forward, bool allow_reverse) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::sp_forward(const bvec_t
+**arg, bvec_t **res, int *iw, bvec_t *w, int mem) const  "
+
+[INTERNAL]  Propagate sparsity forward.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::getAlgorithmSize() const  "
 
 [INTERNAL]  Get the number of atomic operations.
@@ -27892,10 +27873,10 @@ elements.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::alloc(const Function &f,
-bool persistent=false) "
+%feature("docstring")  casadi::FunctionInternal::sp_reverse(bvec_t **arg,
+bvec_t **res, int *iw, bvec_t *w, int mem) const  "
 
-[INTERNAL]  Ensure work vectors long enough to evaluate function.
+[INTERNAL]  Propagate sparsity backwards.
 
 ";
 
@@ -27954,13 +27935,6 @@ const  "
 std::vector< M > &res) const  "
 
 [INTERNAL]  Replace 0-by-0 outputs.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::sp_fwd(const bvec_t **arg,
-bvec_t **res, int *iw, bvec_t *w, int mem) const  "
-
-[INTERNAL]  Propagate sparsity forward.
 
 ";
 
@@ -28146,13 +28120,6 @@ casadi::FunctionInternal::generateDeclarations(CodeGenerator &g) const  "
 M > &res) const  "
 
 [INTERNAL]  Check if output arguments have correct length and dimensions.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::sp_rev(bvec_t **arg, bvec_t
-**res, int *iw, bvec_t *w, int mem) const  "
-
-[INTERNAL]  Propagate sparsity backwards.
 
 ";
 
@@ -28669,6 +28636,13 @@ std::vector< std::string > &onames, const Dict &opts) const  "
 [INTERNAL]  Return function that calculates adjoint derivatives
 reverse(nadj) returns a cached instance if available, and calls  Function
 get_reverse(int nadj) if no cached version is available.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::alloc(const Function &f,
+bool persistent=false) "
+
+[INTERNAL]  Ensure work vectors long enough to evaluate function.
 
 ";
 
@@ -29340,13 +29314,6 @@ class hierarchy in reverse order is run after init() has been completed.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sp_fwd(const bvec_t **arg,
-bvec_t **res, int *iw, bvec_t *w, int mem) const  "
-
-[INTERNAL]  Propagate sparsity forward.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::get_sparsity_in(int i) "
 
 [INTERNAL]  Get sparsity of a given input.
@@ -29722,6 +29689,13 @@ hcat:  check if horizontal repetion of the function input is allowed
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::sp_reverse(bvec_t **arg,
+bvec_t **res, int *iw, bvec_t *w, int mem) const  "
+
+[INTERNAL]  Propagate sparsity backwards.
+
+";
+
 %feature("docstring")
 casadi::FunctionInternal::codegen_decref(CodeGenerator &g) const  "
 
@@ -29980,13 +29954,6 @@ structure recognition.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sp_rev(bvec_t **arg, bvec_t
-**res, int *iw, bvec_t *w, int mem) const  "
-
-[INTERNAL]  Propagate sparsity backwards.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::numel_out(int ind) const  "
 
 [INTERNAL]  Number of input/output elements.
@@ -30002,6 +29969,13 @@ structure recognition.
 %feature("docstring")  casadi::FunctionInternal::release(int mem) const  "
 
 [INTERNAL]  Release a memory object.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::sp_forward(const bvec_t
+**arg, bvec_t **res, int *iw, bvec_t *w, int mem) const  "
+
+[INTERNAL]  Propagate sparsity forward.
 
 ";
 
@@ -31154,8 +31128,8 @@ override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sp_rev(bvec_t **arg, bvec_t
-**res, int *iw, bvec_t *w, int mem) const  "
+%feature("docstring")  casadi::FunctionInternal::sp_reverse(bvec_t **arg,
+bvec_t **res, int *iw, bvec_t *w, int mem) const  "
 
 [INTERNAL]  Propagate sparsity backwards.
 
@@ -31982,13 +31956,6 @@ CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sp_fwd(const bvec_t **arg,
-bvec_t **res, int *iw, bvec_t *w, int mem) const  "
-
-[INTERNAL]  Propagate sparsity forward.
-
-";
-
 %feature("docstring")  casadi::LinsolInternal::get_n_out() override "
 
 [INTERNAL]  Number of function inputs and outputs.
@@ -32031,6 +31998,13 @@ std::string &iname) const  "
 double *A) const  "
 
 [INTERNAL] ";
+
+%feature("docstring")  casadi::FunctionInternal::sp_forward(const bvec_t
+**arg, bvec_t **res, int *iw, bvec_t *w, int mem) const  "
+
+[INTERNAL]  Propagate sparsity forward.
+
+";
 
 %feature("docstring")  casadi::FunctionInternal::getJacSparsityGen(int iind,
 int oind, bool symmetric, int gr_i=1, int gr_o=1) const  "
@@ -32076,10 +32050,9 @@ original
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sp_rev(bvec_t **arg, bvec_t
-**res, int *iw, bvec_t *w, int mem) const  "
+%feature("docstring")  casadi::FunctionInternal::sz_w() const  "
 
-[INTERNAL]  Propagate sparsity backwards.
+[INTERNAL]  Get required length of w field.
 
 ";
 
@@ -32950,17 +32923,17 @@ Diagrams
 
 C++ includes: linear_interpolant.hpp ";
 
+%feature("docstring")  casadi::FunctionInternal::sp_reverse(bvec_t **arg,
+bvec_t **res, int *iw, bvec_t *w, int mem) const  "
+
+[INTERNAL]  Propagate sparsity backwards.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::is_a(const std::string
 &type, bool recursive) const  "
 
 [INTERNAL]  Check if the function is of a particular type.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::sp_fwd(const bvec_t **arg,
-bvec_t **res, int *iw, bvec_t *w, int mem) const  "
-
-[INTERNAL]  Propagate sparsity forward.
 
 ";
 
@@ -33218,12 +33191,6 @@ std::string &iname) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sz_w() const  "
-
-[INTERNAL]  Get required length of w field.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::simple(const double *arg,
 double *res) const  "
 
@@ -33234,6 +33201,13 @@ double *res) const  "
 %feature("docstring") casadi::LinearInterpolant::~LinearInterpolant "
 
 [INTERNAL] ";
+
+%feature("docstring")  casadi::FunctionInternal::sp_forward(const bvec_t
+**arg, bvec_t **res, int *iw, bvec_t *w, int mem) const  "
+
+[INTERNAL]  Propagate sparsity forward.
+
+";
 
 %feature("docstring")  casadi::FunctionInternal::has_function(const
 std::string &fname) const  "
@@ -33527,12 +33501,6 @@ hcat:  check if horizontal repetion of the function input is allowed
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::alloc_memory() const  "
-
-[INTERNAL]  Create memory block.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::numel_in() const  "
 
 [INTERNAL]  Number of input/output elements.
@@ -33670,10 +33638,9 @@ int oind, bool symmetric, int gr_i=1, int gr_o=1) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::alloc_arg(size_t sz_arg,
-bool persistent=false) "
+%feature("docstring")  casadi::FunctionInternal::alloc_memory() const  "
 
-[INTERNAL]  Ensure required length of arg field.
+[INTERNAL]  Create memory block.
 
 ";
 
@@ -33797,6 +33764,13 @@ const std::string &msg) const  "
 %feature("docstring")  casadi::FunctionInternal::name_in(int ind) const  "
 
 [INTERNAL]  Get input scheme name by index.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::sp_reverse(bvec_t **arg,
+bvec_t **res, int *iw, bvec_t *w, int mem) const  "
+
+[INTERNAL]  Propagate sparsity backwards.
 
 ";
 
@@ -33945,6 +33919,13 @@ std::vector< std::vector< M > > &aseed) const  "
 std::vector< M > &arg) const  "
 
 [INTERNAL]  Check if output arguments that needs to be replaced.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::sp_forward(const bvec_t
+**arg, bvec_t **res, int *iw, bvec_t *w, int mem) const  "
+
+[INTERNAL]  Propagate sparsity forward.
 
 ";
 
@@ -34283,13 +34264,6 @@ std::vector< MX > &arg) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::free_memory(void *mem)
-const  "
-
-[INTERNAL]  Free memory block.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::name() const  "
 
 [INTERNAL]  Name of the function.
@@ -34365,10 +34339,10 @@ persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sp_fwd(const bvec_t **arg,
-bvec_t **res, int *iw, bvec_t *w, int mem) const  "
+%feature("docstring")  casadi::FunctionInternal::alloc_arg(size_t sz_arg,
+bool persistent=false) "
 
-[INTERNAL]  Propagate sparsity forward.
+[INTERNAL]  Ensure required length of arg field.
 
 ";
 
@@ -34509,10 +34483,10 @@ casadi::LinearInterpolantJac::LinearInterpolantJac(const std::string &name)
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sp_rev(bvec_t **arg, bvec_t
-**res, int *iw, bvec_t *w, int mem) const  "
+%feature("docstring")  casadi::FunctionInternal::free_memory(void *mem)
+const  "
 
-[INTERNAL]  Propagate sparsity backwards.
+[INTERNAL]  Free memory block.
 
 ";
 
@@ -34906,13 +34880,6 @@ double **&arg, double **&res, int *&iw, double *&w) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sp_rev(bvec_t **arg, bvec_t
-**res, int *iw, bvec_t *w, int mem) const  "
-
-[INTERNAL]  Propagate sparsity backwards.
-
-";
-
 %feature("docstring")  casadi::LinsolInternal::type_name() const override "
 
 [INTERNAL]  Get type name.
@@ -35182,6 +35149,13 @@ std::vector< std::vector< M > > &fseed) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::sp_forward(const bvec_t
+**arg, bvec_t **res, int *iw, bvec_t *w, int mem) const  "
+
+[INTERNAL]  Propagate sparsity forward.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::alloc_res(size_t sz_res,
 bool persistent=false) "
 
@@ -35382,13 +35356,6 @@ multiplying.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sp_fwd(const bvec_t **arg,
-bvec_t **res, int *iw, bvec_t *w, int mem) const  "
-
-[INTERNAL]  Propagate sparsity forward.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::matchingArg(const
 std::vector< M > &arg, bool hcat=false) const  "
 
@@ -35524,6 +35491,13 @@ std::vector< M > &res) const  "
 const  "
 
 [INTERNAL]  Get the (integer) output argument of an atomic operation.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::sp_reverse(bvec_t **arg,
+bvec_t **res, int *iw, bvec_t *w, int mem) const  "
+
+[INTERNAL]  Propagate sparsity backwards.
 
 ";
 
@@ -36378,6 +36352,12 @@ persistent=false) "
 
 ";
 
+%feature("docstring")  casadi::SharedObjectInternal::getCount() const  "
+
+[INTERNAL]  Get the reference count.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::checkArg(const std::vector<
 M > &arg, bool hcat=false) const  "
 
@@ -36621,13 +36601,6 @@ std::vector< std::vector< M > > &fseed) const  "
 
 ";
 
-%feature("docstring")  casadi::Map::sp_rev(bvec_t **arg, bvec_t **res, int
-*iw, bvec_t *w, int mem) const override "
-
-[INTERNAL]  Propagate sparsity backwards.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::name_in(int ind) const  "
 
 [INTERNAL]  Get input scheme name by index.
@@ -36638,6 +36611,13 @@ std::vector< std::vector< M > > &fseed) const  "
 std::string &fname) "
 
 [INTERNAL]   Jit dependencies.
+
+";
+
+%feature("docstring")  casadi::Map::sp_reverse(bvec_t **arg, bvec_t **res,
+int *iw, bvec_t *w, int mem) const override "
+
+[INTERNAL]  Propagate sparsity backwards.
 
 ";
 
@@ -37131,13 +37111,6 @@ bool persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::Map::sp_fwd(const bvec_t **arg, bvec_t **res,
-int *iw, bvec_t *w, int mem) const override "
-
-[INTERNAL]  Propagate sparsity forward.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::finalize(const Dict &opts)
 "
 
@@ -37302,9 +37275,10 @@ structure recognition for symmetric Jacobians
 
 ";
 
-%feature("docstring")  casadi::SharedObjectInternal::getCount() const  "
+%feature("docstring")  casadi::Map::sp_forward(const bvec_t **arg, bvec_t
+**res, int *iw, bvec_t *w, int mem) const override "
 
-[INTERNAL]  Get the reference count.
+[INTERNAL]  Propagate sparsity forward.
 
 ";
 
@@ -37717,6 +37691,13 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::Map::sp_reverse(bvec_t **arg, bvec_t **res,
+int *iw, bvec_t *w, int mem) const override "
+
+[INTERNAL]  Propagate sparsity backwards.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::free_sx() const  "
 
 [INTERNAL]  Get free variables (SX)
@@ -38062,13 +38043,6 @@ std::vector< std::vector< M > > &fseed) const  "
 %feature("docstring")  casadi::FunctionInternal::eval_name() const  "
 
 [INTERNAL]  Get name of the evaluation function.
-
-";
-
-%feature("docstring")  casadi::Map::sp_fwd(const bvec_t **arg, bvec_t **res,
-int *iw, bvec_t *w, int mem) const override "
-
-[INTERNAL]  Propagate sparsity forward.
 
 ";
 
@@ -38558,10 +38532,10 @@ std::string &fname) const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::Map::sp_rev(bvec_t **arg, bvec_t **res, int
-*iw, bvec_t *w, int mem) const override "
+%feature("docstring")  casadi::Map::sp_forward(const bvec_t **arg, bvec_t
+**res, int *iw, bvec_t *w, int mem) const override "
 
-[INTERNAL]  Propagate sparsity backwards.
+[INTERNAL]  Propagate sparsity forward.
 
 ";
 
@@ -40986,6 +40960,13 @@ bool persistent=false) "
 
 ";
 
+%feature("docstring")  casadi::Rootfinder::sp_forward(const bvec_t **arg,
+bvec_t **res, int *iw, bvec_t *w, int mem) const override "
+
+[INTERNAL]  Propagate sparsity forward.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::which_depends(const
 std::string &s_in, const std::vector< std::string > &s_out, int order, bool
 tr=false) const  "
@@ -41181,10 +41162,25 @@ bool persistent=false) "
 
 ";
 
+%feature("docstring")  casadi::Rootfinder::ad_forward(const std::vector< MX
+> &arg, const std::vector< MX > &res, const std::vector< std::vector< MX > >
+&fseed, std::vector< std::vector< MX > > &fsens, bool always_inline, bool
+never_inline) const  "
+
+[INTERNAL]  Create call to (cached) derivative function, forward mode.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::getAdaptorSolverName()
 const  "
 
 [INTERNAL]  Obtain solver name from Adaptor.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::size1_out(int ind) const  "
+
+[INTERNAL]  Input/output dimensions.
 
 ";
 
@@ -41195,15 +41191,25 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::size1_out(int ind) const  "
+%feature("docstring")  casadi::Rootfinder::sp_reverse(bvec_t **arg, bvec_t
+**res, int *iw, bvec_t *w, int mem) const override "
 
-[INTERNAL]  Input/output dimensions.
+[INTERNAL]  Propagate sparsity backwards.
 
 ";
 
 %feature("docstring")  casadi::Rootfinder::has_spfwd() const override "
 
 [INTERNAL]  Is the class able to propagate seeds through the algorithm?
+
+";
+
+%feature("docstring")  casadi::Rootfinder::ad_reverse(const std::vector< MX
+> &arg, const std::vector< MX > &res, const std::vector< std::vector< MX > >
+&aseed, std::vector< std::vector< MX > > &asens, bool always_inline, bool
+never_inline) const  "
+
+[INTERNAL]  Create call to (cached) derivative function, reverse mode.
 
 ";
 
@@ -41400,15 +41406,6 @@ casadi::FunctionInternal::print_dimensions(std::ostream &stream) const  "
 
 ";
 
-%feature("docstring")  casadi::Rootfinder::eval_reverse(const std::vector<
-MX > &arg, const std::vector< MX > &res, const std::vector< std::vector< MX
-> > &aseed, std::vector< std::vector< MX > > &asens, bool always_inline,
-bool never_inline) const  "
-
-[INTERNAL]  Create call to (cached) derivative function, reverse mode.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::replaceArg(const
 std::vector< M > &arg, bool hcat=false) const  "
 
@@ -41549,15 +41546,6 @@ const std::vector< MatType > &v) const  "
 
 ";
 
-%feature("docstring")  casadi::Rootfinder::eval_forward(const std::vector<
-MX > &arg, const std::vector< MX > &res, const std::vector< std::vector< MX
-> > &fseed, std::vector< std::vector< MX > > &fsens, bool always_inline,
-bool never_inline) const  "
-
-[INTERNAL]  Create call to (cached) derivative function, forward mode.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::sz_arg() const  "
 
 [INTERNAL]  Get required length of arg field.
@@ -41652,12 +41640,6 @@ const override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::eval_name() const  "
-
-[INTERNAL]  Get name of the evaluation function.
-
-";
-
 %feature("docstring")  casadi::Newton::get_options() const override "
 
 [INTERNAL]  Options.
@@ -41687,13 +41669,6 @@ M > &res) const  "
 double **arg, double **res, int *iw, double *w) const  "
 
 [INTERNAL]  Set the (persistent and temporary) work vectors.
-
-";
-
-%feature("docstring")  casadi::Rootfinder::sp_rev(bvec_t **arg, bvec_t
-**res, int *iw, bvec_t *w, int mem) const override "
-
-[INTERNAL]  Propagate sparsity backwards.
 
 ";
 
@@ -42051,10 +42026,9 @@ override "
 
 ";
 
-%feature("docstring")  casadi::Rootfinder::sp_fwd(const bvec_t **arg, bvec_t
-**res, int *iw, bvec_t *w, int mem) const override "
+%feature("docstring")  casadi::FunctionInternal::eval_name() const  "
 
-[INTERNAL]  Propagate sparsity forward.
+[INTERNAL]  Get name of the evaluation function.
 
 ";
 
@@ -42377,6 +42351,12 @@ std::vector< std::string > &s_out, const Function::AuxOut
 
 ";
 
+%feature("docstring")  casadi::SharedObjectInternal::getCount() const  "
+
+[INTERNAL]  Get the reference count.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::n_nodes() const  "
 
 [INTERNAL]  Number of nodes in the algorithm.
@@ -42449,13 +42429,6 @@ bool persistent=false) "
 double **res, int *iw, double *w) const override "
 
 [INTERNAL]  Evaluate numerically.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::sp_fwd(const bvec_t **arg,
-bvec_t **res, int *iw, bvec_t *w, int mem) const  "
-
-[INTERNAL]  Propagate sparsity forward.
 
 ";
 
@@ -42645,9 +42618,10 @@ structure recognition for symmetric Jacobians
 
 ";
 
-%feature("docstring")  casadi::SharedObjectInternal::getCount() const  "
+%feature("docstring")  casadi::FunctionInternal::sp_forward(const bvec_t
+**arg, bvec_t **res, int *iw, bvec_t *w, int mem) const  "
 
-[INTERNAL]  Get the reference count.
+[INTERNAL]  Propagate sparsity forward.
 
 ";
 
@@ -43198,6 +43172,13 @@ size_t &sz_res, size_t &sz_iw, size_t &sz_w) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::sp_reverse(bvec_t **arg,
+bvec_t **res, int *iw, bvec_t *w, int mem) const  "
+
+[INTERNAL]  Propagate sparsity backwards.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::replaceFwdSeed(const
 std::vector< std::vector< M > > &fseed) const  "
 
@@ -43215,13 +43196,6 @@ std::vector< std::vector< M > > &fseed) const  "
 casadi::FunctionInternal::generateDeclarations(CodeGenerator &g) const  "
 
 [INTERNAL]  Generate code for the declarations of the C function.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::sp_rev(bvec_t **arg, bvec_t
-**res, int *iw, bvec_t *w, int mem) const  "
-
-[INTERNAL]  Propagate sparsity backwards.
 
 ";
 
@@ -44095,6 +44069,13 @@ const override "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::sp_reverse(bvec_t **arg,
+bvec_t **res, int *iw, bvec_t *w, int mem) const  "
+
+[INTERNAL]  Propagate sparsity backwards.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::generateMeta(CodeGenerator
 &g, const std::string &fname) const  "
 
@@ -44389,17 +44370,17 @@ get_forward(int nfwd) if no cached version is available.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::sp_forward(const bvec_t
+**arg, bvec_t **res, int *iw, bvec_t *w, int mem) const  "
+
+[INTERNAL]  Propagate sparsity forward.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::sparsity_jac(int iind, int
 oind, bool compact, bool symmetric) const  "
 
 [INTERNAL]  Get, if necessary generate, the sparsity of a Jacobian block.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::sp_fwd(const bvec_t **arg,
-bvec_t **res, int *iw, bvec_t *w, int mem) const  "
-
-[INTERNAL]  Propagate sparsity forward.
 
 ";
 
@@ -44683,13 +44664,6 @@ C++ includes: oracle_function.hpp ";
 &fcn) "
 
 [INTERNAL]  Register the function for evaluation and statistics gathering
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::sp_rev(bvec_t **arg, bvec_t
-**res, int *iw, bvec_t *w, int mem) const  "
-
-[INTERNAL]  Propagate sparsity backwards.
 
 ";
 
@@ -45276,6 +45250,13 @@ Return a string with a description (for SWIG)
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::sp_reverse(bvec_t **arg,
+bvec_t **res, int *iw, bvec_t *w, int mem) const  "
+
+[INTERNAL]  Propagate sparsity backwards.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::has_codegen() const  "
 
 [INTERNAL]  Is codegen supported?
@@ -45384,6 +45365,13 @@ get_reverse(int nadj) if no cached version is available.
 const  "
 
 [INTERNAL]  Get the (integer) output argument of an atomic operation.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::sp_forward(const bvec_t
+**arg, bvec_t **res, int *iw, bvec_t *w, int mem) const  "
+
+[INTERNAL]  Propagate sparsity forward.
 
 ";
 
@@ -46213,23 +46201,15 @@ size_t &sz_res, size_t &sz_iw, size_t &sz_w) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sp_fwd(const bvec_t **arg,
-bvec_t **res, int *iw, bvec_t *w, int mem) const  "
+%feature("docstring")  casadi::FunctionInternal::sz_w() const  "
 
-[INTERNAL]  Propagate sparsity forward.
+[INTERNAL]  Get required length of w field.
 
 ";
 
 %feature("docstring")  casadi::FunctionInternal::release(int mem) const  "
 
 [INTERNAL]  Release a memory object.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::sp_rev(bvec_t **arg, bvec_t
-**res, int *iw, bvec_t *w, int mem) const  "
-
-[INTERNAL]  Propagate sparsity backwards.
 
 ";
 
@@ -46346,12 +46326,6 @@ const std::vector< MatType > &v) const  "
 CodeGenerator &g) const  "
 
 [INTERNAL]  Get name in codegen.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::sz_w() const  "
-
-[INTERNAL]  Get required length of w field.
 
 ";
 
@@ -46925,13 +46899,6 @@ f:   Function mapping from (n+1) inputs to 1 output.
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::generateDeclarations(CodeGenerator &g) const  "
-
-[INTERNAL]  Generate code for the declarations of the C function.
-
-";
-
 %feature("docstring")  casadi::OracleFunction::get_function() const override
 "
 
@@ -46971,13 +46938,6 @@ override "
 %feature("docstring")  casadi::Rootfinder::solve(void *mem) const  "
 
 [INTERNAL] ";
-
-%feature("docstring")  casadi::Rootfinder::sp_rev(bvec_t **arg, bvec_t
-**res, int *iw, bvec_t *w, int mem) const override "
-
-[INTERNAL]  Propagate sparsity backwards.
-
-";
 
 %feature("docstring")  casadi::SharedObjectInternal::weak() "
 
@@ -47057,6 +47017,15 @@ always_inline, bool never_inline) const  "
 
 ";
 
+%feature("docstring")  casadi::Rootfinder::ad_forward(const std::vector< MX
+> &arg, const std::vector< MX > &res, const std::vector< std::vector< MX > >
+&fseed, std::vector< std::vector< MX > > &fsens, bool always_inline, bool
+never_inline) const  "
+
+[INTERNAL]  Create call to (cached) derivative function, forward mode.
+
+";
+
 %feature("docstring") casadi::Rootfinder::~Rootfinder "
 
 [INTERNAL]  Destructor.
@@ -47097,13 +47066,6 @@ std::string &name, std::ostream &stream) const  "
 std::vector< MX > &arg) const  "
 
 [INTERNAL]  Get a vector of symbolic variables corresponding to the outputs.
-
-";
-
-%feature("docstring")  casadi::Rootfinder::sp_fwd(const bvec_t **arg, bvec_t
-**res, int *iw, bvec_t *w, int mem) const override "
-
-[INTERNAL]  Propagate sparsity forward.
 
 ";
 
@@ -47283,6 +47245,13 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
+%feature("docstring")  casadi::Rootfinder::sp_forward(const bvec_t **arg,
+bvec_t **res, int *iw, bvec_t *w, int mem) const override "
+
+[INTERNAL]  Propagate sparsity forward.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::log(const std::string &msg)
 const  "
 
@@ -47324,6 +47293,13 @@ elements.
 "
 
 [INTERNAL]  Get the (integer) input arguments of an atomic operation.
+
+";
+
+%feature("docstring")  casadi::Rootfinder::sp_reverse(bvec_t **arg, bvec_t
+**res, int *iw, bvec_t *w, int mem) const override "
+
+[INTERNAL]  Propagate sparsity backwards.
 
 ";
 
@@ -47422,10 +47398,12 @@ structure recognition.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_free(std::ostream
-&stream) const  "
+%feature("docstring")  casadi::Rootfinder::ad_reverse(const std::vector< MX
+> &arg, const std::vector< MX > &res, const std::vector< std::vector< MX > >
+&aseed, std::vector< std::vector< MX > > &asens, bool always_inline, bool
+never_inline) const  "
 
-[INTERNAL]  Print free variables.
+[INTERNAL]  Create call to (cached) derivative function, reverse mode.
 
 ";
 
@@ -47540,6 +47518,13 @@ std::vector< MX > > &arg, const std::string &parallelization) "
 MX > &arg, const std::string &parallelization) "
 
 [INTERNAL]  Parallel evaluation.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::print_free(std::ostream
+&stream) const  "
+
+[INTERNAL]  Print free variables.
 
 ";
 
@@ -47791,15 +47776,6 @@ std::string &iname) const  "
 
 ";
 
-%feature("docstring")  casadi::Rootfinder::eval_forward(const std::vector<
-MX > &arg, const std::vector< MX > &res, const std::vector< std::vector< MX
-> > &fseed, std::vector< std::vector< MX > > &fsens, bool always_inline,
-bool never_inline) const  "
-
-[INTERNAL]  Create call to (cached) derivative function, forward mode.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::eval_name() const  "
 
 [INTERNAL]  Get name of the evaluation function.
@@ -47834,12 +47810,10 @@ std::vector< std::string > &onames, const Dict &opts) const override "
 
 ";
 
-%feature("docstring")  casadi::Rootfinder::eval_reverse(const std::vector<
-MX > &arg, const std::vector< MX > &res, const std::vector< std::vector< MX
-> > &aseed, std::vector< std::vector< MX > > &asens, bool always_inline,
-bool never_inline) const  "
+%feature("docstring")
+casadi::FunctionInternal::generateDeclarations(CodeGenerator &g) const  "
 
-[INTERNAL]  Create call to (cached) derivative function, reverse mode.
+[INTERNAL]  Generate code for the declarations of the C function.
 
 ";
 
@@ -48196,12 +48170,9 @@ CodeGenerator &g) const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::Integrator::sp_rev(bvec_t **arg, bvec_t
-**res, int *iw, bvec_t *w, int mem) const override "
+%feature("docstring")  casadi::Integrator::z() const  "
 
-[INTERNAL]  Propagate sparsity backwards.
-
-";
+[INTERNAL] ";
 
 %feature("docstring")  casadi::FunctionInternal::mx_out(int ind) const  "
 
@@ -48245,6 +48216,13 @@ double **&arg, double **&res, int *&iw, double *&w) const  "
 %feature("docstring")  casadi::FunctionInternal::size_out(int ind) const  "
 
 [INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring")  casadi::Integrator::sp_forward(const bvec_t **arg,
+bvec_t **res, int *iw, bvec_t *w, int mem) const override "
+
+[INTERNAL]  Propagate sparsity forward.
 
 ";
 
@@ -48405,13 +48383,6 @@ std::vector< std::vector< M > > &fseed) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getJacSparsity(int iind,
-int oind, bool symmetric) const  "
-
-[INTERNAL]  Generate the sparsity of a Jacobian block.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::adjViaJac(int nadj) const
 "
 
@@ -48426,9 +48397,12 @@ multiplying.
 
 ";
 
-%feature("docstring")  casadi::Integrator::z() const  "
+%feature("docstring")  casadi::FunctionInternal::getJacSparsity(int iind,
+int oind, bool symmetric) const  "
 
-[INTERNAL] ";
+[INTERNAL]  Generate the sparsity of a Jacobian block.
+
+";
 
 %feature("docstring")  casadi::FunctionInternal::index_out(const std::string
 &name) const  "
@@ -48443,10 +48417,9 @@ multiplying.
 
 ";
 
-%feature("docstring")  casadi::Integrator::sp_fwd(const bvec_t **arg, bvec_t
-**res, int *iw, bvec_t *w, int mem) const override "
+%feature("docstring")  casadi::FunctionInternal::getWorkSize() const  "
 
-[INTERNAL]  Propagate sparsity forward.
+[INTERNAL]  Get the length of the work vector.
 
 ";
 
@@ -48620,12 +48593,6 @@ casadi::FunctionInternal::codegen_decref(CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getWorkSize() const  "
-
-[INTERNAL]  Get the length of the work vector.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::has_derivative() const  "
 
 [INTERNAL]  Can derivatives be calculated in any way?
@@ -48769,6 +48736,13 @@ allow_forward, bool allow_reverse) const  "
 
 [INTERNAL]  Weighting factor for chosing forward/reverse mode, sparsity
 propagation.
+
+";
+
+%feature("docstring")  casadi::Integrator::sp_reverse(bvec_t **arg, bvec_t
+**res, int *iw, bvec_t *w, int mem) const override "
+
+[INTERNAL]  Propagate sparsity backwards.
 
 ";
 
@@ -49616,13 +49590,6 @@ override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sp_fwd(const bvec_t **arg,
-bvec_t **res, int *iw, bvec_t *w, int mem) const  "
-
-[INTERNAL]  Propagate sparsity forward.
-
-";
-
 %feature("docstring")  casadi::Nlpsol::integer_support() const  "
 
 [INTERNAL]  Can discrete variables be treated.
@@ -49947,13 +49914,6 @@ std::string &iname) const  "
 %feature("docstring")  casadi::Scpgen::eval_exp(ScpgenMemory *m) const  "
 
 [INTERNAL] ";
-
-%feature("docstring")  casadi::FunctionInternal::sp_rev(bvec_t **arg, bvec_t
-**res, int *iw, bvec_t *w, int mem) const  "
-
-[INTERNAL]  Propagate sparsity backwards.
-
-";
 
 %feature("docstring")  casadi::FunctionInternal::checkout() const  "
 
@@ -50306,6 +50266,13 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::sp_forward(const bvec_t
+**arg, bvec_t **res, int *iw, bvec_t *w, int mem) const  "
+
+[INTERNAL]  Propagate sparsity forward.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::codegen_name(const
 CodeGenerator &g) const  "
 
@@ -50482,6 +50449,13 @@ const  "
 SXElem **res, int *iw, SXElem *w, int mem) const  "
 
 [INTERNAL]  Evaluate with symbolic scalars.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::sp_reverse(bvec_t **arg,
+bvec_t **res, int *iw, bvec_t *w, int mem) const  "
+
+[INTERNAL]  Propagate sparsity backwards.
 
 ";
 
@@ -51373,6 +51347,13 @@ multiplying.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::sp_forward(const bvec_t
+**arg, bvec_t **res, int *iw, bvec_t *w, int mem) const  "
+
+[INTERNAL]  Propagate sparsity forward.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::numel_out(int ind) const  "
 
 [INTERNAL]  Number of input/output elements.
@@ -51641,13 +51622,6 @@ std::string &name, std::ostream &stream) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sp_rev(bvec_t **arg, bvec_t
-**res, int *iw, bvec_t *w, int mem) const  "
-
-[INTERNAL]  Propagate sparsity backwards.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::call_reverse(const
 std::vector< MX > &arg, const std::vector< MX > &res, const std::vector<
 std::vector< MX > > &aseed, std::vector< std::vector< MX > > &asens, bool
@@ -51881,13 +51855,6 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sp_fwd(const bvec_t **arg,
-bvec_t **res, int *iw, bvec_t *w, int mem) const  "
-
-[INTERNAL]  Propagate sparsity forward.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::generateMeta(CodeGenerator
 &g, const std::string &fname) const  "
 
@@ -51984,6 +51951,13 @@ int oind, bool symmetric) const  "
 %feature("docstring")  casadi::FunctionInternal::has_derivative() const  "
 
 [INTERNAL]  Can derivatives be calculated in any way?
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::sp_reverse(bvec_t **arg,
+bvec_t **res, int *iw, bvec_t *w, int mem) const  "
+
+[INTERNAL]  Propagate sparsity backwards.
 
 ";
 
@@ -52491,10 +52465,9 @@ allow_forward, bool allow_reverse) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sp_rev(bvec_t **arg, bvec_t
-**res, int *iw, bvec_t *w, int mem) const  "
+%feature("docstring")  casadi::FunctionInternal::sz_iw() const  "
 
-[INTERNAL]  Propagate sparsity backwards.
+[INTERNAL]  Get required length of iw field.
 
 ";
 
@@ -52942,13 +52915,6 @@ size_t &sz_res, size_t &sz_iw, size_t &sz_w) const  "
 double **arg, double **res, int *iw, double *w) const  "
 
 [INTERNAL]  Set the (temporary) work vectors.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::sp_fwd(const bvec_t **arg,
-bvec_t **res, int *iw, bvec_t *w, int mem) const  "
-
-[INTERNAL]  Propagate sparsity forward.
 
 ";
 
@@ -53427,12 +53393,6 @@ std::string &fname, const Dict &opts) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sz_iw() const  "
-
-[INTERNAL]  Get required length of iw field.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::finalize(const Dict &opts)
 "
 
@@ -53478,6 +53438,13 @@ const  "
 %feature("docstring")  casadi::Dple::default_in(int ind) const override "
 
 [INTERNAL]  Get default input value.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::sp_reverse(bvec_t **arg,
+bvec_t **res, int *iw, bvec_t *w, int mem) const  "
+
+[INTERNAL]  Propagate sparsity backwards.
 
 ";
 
@@ -53584,6 +53551,13 @@ const  "
 const std::string &msg) const  "
 
 [INTERNAL]  Log the status of the solver, function given.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::sp_forward(const bvec_t
+**arg, bvec_t **res, int *iw, bvec_t *w, int mem) const  "
+
+[INTERNAL]  Propagate sparsity forward.
 
 ";
 
@@ -53894,6 +53868,13 @@ std::string > &onames, const Dict &opts) const override "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::sp_reverse(bvec_t **arg,
+bvec_t **res, int *iw, bvec_t *w, int mem) const  "
+
+[INTERNAL]  Propagate sparsity backwards.
+
+";
+
 %feature("docstring")  casadi::Expm::get_options() const override "
 
 [INTERNAL]  Options.
@@ -54019,6 +54000,13 @@ std::vector< std::vector< M > > &fseed) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::sp_forward(const bvec_t
+**arg, bvec_t **res, int *iw, bvec_t *w, int mem) const  "
+
+[INTERNAL]  Propagate sparsity forward.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::simple(const double *arg,
 double *res) const  "
 
@@ -54113,13 +54101,6 @@ elements.
 %feature("docstring")  casadi::Expm::get_sparsity_out(int i) override "
 
 [INTERNAL]  Sparsities of function inputs and outputs.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::sp_fwd(const bvec_t **arg,
-bvec_t **res, int *iw, bvec_t *w, int mem) const  "
-
-[INTERNAL]  Propagate sparsity forward.
 
 ";
 
@@ -54776,13 +54757,6 @@ Parameters:
 -----------
 
 hcat:  check if horizontal repetion of the function input is allowed
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::sp_rev(bvec_t **arg, bvec_t
-**res, int *iw, bvec_t *w, int mem) const  "
-
-[INTERNAL]  Propagate sparsity backwards.
 
 ";
 
@@ -56389,13 +56363,6 @@ casadi::FunctionInternal::codegen_incref(CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sp_rev(bvec_t **arg, bvec_t
-**res, int *iw, bvec_t *w, int mem) const  "
-
-[INTERNAL]  Propagate sparsity backwards.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::n_nodes() const  "
 
 [INTERNAL]  Number of nodes in the algorithm.
@@ -56997,6 +56964,13 @@ structure recognition for symmetric Jacobians
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::sp_reverse(bvec_t **arg,
+bvec_t **res, int *iw, bvec_t *w, int mem) const  "
+
+[INTERNAL]  Propagate sparsity backwards.
+
+";
+
 %feature("docstring")
 casadi::FunctionInternal::codegen_decref(CodeGenerator &g) const  "
 
@@ -57457,13 +57431,6 @@ const override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sp_fwd(const bvec_t **arg,
-bvec_t **res, int *iw, bvec_t *w, int mem) const  "
-
-[INTERNAL]  Propagate sparsity forward.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::addShorthand(CodeGenerator
 &g, const std::string &name) const  "
 
@@ -57567,6 +57534,13 @@ std::vector< SX > > &aseed, std::vector< std::vector< SX > > &asens, bool
 always_inline, bool never_inline) const  "
 
 [INTERNAL]  Reverse mode, virtual functions overloaded in derived classes.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::sp_forward(const bvec_t
+**arg, bvec_t **res, int *iw, bvec_t *w, int mem) const  "
+
+[INTERNAL]  Propagate sparsity forward.
 
 ";
 
@@ -58116,13 +58090,6 @@ multiplying.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sp_fwd(const bvec_t **arg,
-bvec_t **res, int *iw, bvec_t *w, int mem) const  "
-
-[INTERNAL]  Propagate sparsity forward.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::free_sx() const  "
 
 [INTERNAL]  Get free variables (SX)
@@ -58363,6 +58330,13 @@ std::vector< std::vector< M > > &aseed) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::sp_forward(const bvec_t
+**arg, bvec_t **res, int *iw, bvec_t *w, int mem) const  "
+
+[INTERNAL]  Propagate sparsity forward.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::n_mem() const  "
 
 [INTERNAL]  Maximum number of memory objects.
@@ -58469,6 +58443,13 @@ std::string &fname, const Dict &opts) const  "
 std::string &iname) const  "
 
 [INTERNAL]  Get sparsity of a given output.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::sp_reverse(bvec_t **arg,
+bvec_t **res, int *iw, bvec_t *w, int mem) const  "
+
+[INTERNAL]  Propagate sparsity backwards.
 
 ";
 
@@ -58632,13 +58613,6 @@ Parameters:
 -----------
 
 hcat:  check if horizontal repetion of the function input is allowed
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::sp_rev(bvec_t **arg, bvec_t
-**res, int *iw, bvec_t *w, int mem) const  "
-
-[INTERNAL]  Propagate sparsity backwards.
 
 ";
 
@@ -59143,6 +59117,13 @@ double *res) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::sp_forward(const bvec_t
+**arg, bvec_t **res, int *iw, bvec_t *w, int mem) const  "
+
+[INTERNAL]  Propagate sparsity forward.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::eval_sx(const SXElem **arg,
 SXElem **res, int *iw, SXElem *w, int mem) const  "
 
@@ -59363,12 +59344,6 @@ const override "
 %feature("docstring")  casadi::FunctionInternal::sz_iw() const  "
 
 [INTERNAL]  Get required length of iw field.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::clear_memory() "
-
-[INTERNAL]  Clear all memory (called from destructor)
 
 ";
 
@@ -59983,10 +59958,9 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sp_rev(bvec_t **arg, bvec_t
-**res, int *iw, bvec_t *w, int mem) const  "
+%feature("docstring")  casadi::FunctionInternal::clear_memory() "
 
-[INTERNAL]  Propagate sparsity backwards.
+[INTERNAL]  Clear all memory (called from destructor)
 
 ";
 
@@ -60245,17 +60219,17 @@ C++ includes: symbolic_qr.hpp ";
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::sp_reverse(bvec_t **arg,
+bvec_t **res, int *iw, bvec_t *w, int mem) const  "
+
+[INTERNAL]  Propagate sparsity backwards.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::signature(const std::string
 &fname) const  "
 
 [INTERNAL]  Code generate the function.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::sp_fwd(const bvec_t **arg,
-bvec_t **res, int *iw, bvec_t *w, int mem) const  "
-
-[INTERNAL]  Propagate sparsity forward.
 
 ";
 
