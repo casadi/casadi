@@ -57,10 +57,10 @@ namespace casadi {
     void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const override;
 
     /** \brief  Propagate sparsity forward */
-    void sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
+    void sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
 
     /** \brief  Propagate sparsity backwards */
-    void sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
+    void sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
 
     /** \brief Generate code for the operation */
     void generate(CodeGenerator& g, const std::string& mem,
@@ -111,11 +111,11 @@ namespace casadi {
     void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
 
     /** \brief Calculate forward mode directional derivatives */
-    void eval_forward(const std::vector<std::vector<MX> >& fseed,
+    void ad_forward(const std::vector<std::vector<MX> >& fseed,
                          std::vector<std::vector<MX> >& fsens) const override;
 
     /** \brief Calculate reverse mode directional derivatives */
-    void eval_reverse(const std::vector<std::vector<MX> >& aseed,
+    void ad_reverse(const std::vector<std::vector<MX> >& aseed,
                          std::vector<std::vector<MX> >& asens) const override;
 
     /** \brief Get the operation */
@@ -151,11 +151,11 @@ namespace casadi {
     void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
 
     /** \brief Calculate forward mode directional derivatives */
-    void eval_forward(const std::vector<std::vector<MX> >& fseed,
+    void ad_forward(const std::vector<std::vector<MX> >& fseed,
                          std::vector<std::vector<MX> >& fsens) const override;
 
     /** \brief Calculate reverse mode directional derivatives */
-    void eval_reverse(const std::vector<std::vector<MX> >& aseed,
+    void ad_reverse(const std::vector<std::vector<MX> >& aseed,
                          std::vector<std::vector<MX> >& asens) const override;
 
     /** \brief Get the operation */
@@ -191,11 +191,11 @@ namespace casadi {
     void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
 
     /** \brief Calculate forward mode directional derivatives */
-    void eval_forward(const std::vector<std::vector<MX> >& fseed,
+    void ad_forward(const std::vector<std::vector<MX> >& fseed,
                          std::vector<std::vector<MX> >& fsens) const override;
 
     /** \brief Calculate reverse mode directional derivatives */
-    void eval_reverse(const std::vector<std::vector<MX> >& aseed,
+    void ad_reverse(const std::vector<std::vector<MX> >& aseed,
                          std::vector<std::vector<MX> >& asens) const override;
 
     /** \brief Get the operation */

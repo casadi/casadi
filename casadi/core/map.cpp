@@ -85,18 +85,18 @@ namespace casadi {
     evalGen(arg, res, iw, w);
   }
 
-  void Map::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  void Map::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     evalGen(arg, res, iw, w);
   }
 
-  void Map::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  void Map::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     int n_in = this->n_in(), n_out = this->n_out();
     bvec_t** arg1 = arg+n_in;
     copy_n(arg, n_in, arg1);
     bvec_t** res1 = res+n_out;
     copy_n(res, n_out, res1);
     for (int i=0; i<n_; ++i) {
-      f_->sp_rev(arg1, res1, iw, w, 0);
+      f_->sp_reverse(arg1, res1, iw, w, 0);
       for (int j=0; j<n_in; ++j) {
         if (arg1[j]) arg1[j] += f_.nnz_in(j);
       }

@@ -51,22 +51,22 @@ namespace casadi {
     res[0] = find(arg[0]);
   }
 
-  void Find::eval_forward(const std::vector<std::vector<MX> >& fseed,
+  void Find::ad_forward(const std::vector<std::vector<MX> >& fseed,
                      std::vector<std::vector<MX> >& fsens) const {
     for (int d=0; d<fsens.size(); ++d) {
       fsens[d][0] = 0;
     }
   }
 
-  void Find::eval_reverse(const std::vector<std::vector<MX> >& aseed,
+  void Find::ad_reverse(const std::vector<std::vector<MX> >& aseed,
                      std::vector<std::vector<MX> >& asens) const {
   }
 
-  void Find::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  void Find::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     res[0][0] = 0; // pw constant
   }
 
-  void Find::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  void Find::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     res[0][0] = 0; // pw constant
   }
 

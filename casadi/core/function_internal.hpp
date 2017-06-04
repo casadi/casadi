@@ -558,10 +558,10 @@ namespace casadi {
     void log(const std::string& fcn, const std::string& msg) const;
 
     /** \brief  Propagate sparsity forward */
-    virtual void sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const;
+    virtual void sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const;
 
     /** \brief  Propagate sparsity backwards */
-    virtual void sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const;
+    virtual void sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const;
 
     /** \brief Get number of temporary variables needed */
     void sz_work(size_t& sz_arg, size_t& sz_res, size_t& sz_iw, size_t& sz_w) const;

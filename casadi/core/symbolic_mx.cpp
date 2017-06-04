@@ -51,11 +51,11 @@ namespace casadi {
   void SymbolicMX::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
   }
 
-  void SymbolicMX::eval_forward(const std::vector<std::vector<MX> >& fseed,
+  void SymbolicMX::ad_forward(const std::vector<std::vector<MX> >& fseed,
                            std::vector<std::vector<MX> >& fsens) const {
   }
 
-  void SymbolicMX::eval_reverse(const std::vector<std::vector<MX> >& aseed,
+  void SymbolicMX::ad_reverse(const std::vector<std::vector<MX> >& aseed,
                            std::vector<std::vector<MX> >& asens) const {
   }
 
@@ -63,11 +63,11 @@ namespace casadi {
     return name_;
   }
 
-  void SymbolicMX::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  void SymbolicMX::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     fill_n(res[0], nnz(), 0);
   }
 
-  void SymbolicMX::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  void SymbolicMX::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     fill_n(res[0], nnz(), 0);
   }
 

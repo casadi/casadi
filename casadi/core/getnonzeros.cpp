@@ -102,14 +102,14 @@ namespace casadi {
   }
 
   void GetNonzerosVector::
-  sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     const bvec_t *a = arg[0];
     bvec_t *r = res[0];
     for (auto&& k : nz_) *r++ = k>=0 ? a[k] : 0;
   }
 
   void GetNonzerosVector::
-  sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     bvec_t *a = arg[0];
     bvec_t *r = res[0];
     for (auto&& k : nz_) {
@@ -119,7 +119,7 @@ namespace casadi {
   }
 
   void GetNonzerosSlice::
-  sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     const bvec_t *a = arg[0];
     bvec_t *r = res[0];
     for (int k=s_.start; k!=s_.stop; k+=s_.step) {
@@ -128,7 +128,7 @@ namespace casadi {
   }
 
   void GetNonzerosSlice::
-  sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     bvec_t *a = arg[0];
     bvec_t *r = res[0];
     for (int k=s_.start; k!=s_.stop; k+=s_.step) {
@@ -138,7 +138,7 @@ namespace casadi {
   }
 
   void GetNonzerosSlice2::
-  sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     const bvec_t *a = arg[0];
     bvec_t *r = res[0];
     for (int k1=outer_.start; k1!=outer_.stop; k1+=outer_.step) {
@@ -149,7 +149,7 @@ namespace casadi {
   }
 
   void GetNonzerosSlice2::
-  sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     bvec_t *a = arg[0];
     bvec_t *r = res[0];
     for (int k1=outer_.start; k1!=outer_.stop; k1+=outer_.step) {
@@ -248,7 +248,7 @@ namespace casadi {
     }
   }
 
-  void GetNonzeros::eval_forward(const std::vector<std::vector<MX> >& fseed,
+  void GetNonzeros::ad_forward(const std::vector<std::vector<MX> >& fseed,
                             std::vector<std::vector<MX> >& fsens) const {
     // Get all the nonzeros
     vector<int> nz = all();
@@ -330,7 +330,7 @@ namespace casadi {
     }
   }
 
-  void GetNonzeros::eval_reverse(const std::vector<std::vector<MX> >& aseed,
+  void GetNonzeros::ad_reverse(const std::vector<std::vector<MX> >& aseed,
                             std::vector<std::vector<MX> >& asens) const {
     // Get all the nonzeros
     vector<int> nz = all();

@@ -503,8 +503,8 @@ namespace casadi {
     return ret;
   }
 
-  void Integrator::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
-    log("Integrator::sp_fwd", "begin");
+  void Integrator::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+    log("Integrator::sp_forward", "begin");
 
     // Work vectors
     bvec_t *tmp_x = w; w += nx_;
@@ -581,11 +581,11 @@ namespace casadi {
         oracle_(arg1, res1, iw, w, 0);
       }
     }
-    log("Integrator::sp_fwd", "end");
+    log("Integrator::sp_forward", "end");
   }
 
-  void Integrator::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
-    log("Integrator::sp_rev", "begin");
+  void Integrator::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+    log("Integrator::sp_reverse", "begin");
 
     // Work vectors
     bvec_t** arg1 = arg+n_in();
@@ -694,7 +694,7 @@ namespace casadi {
     arg1[DE_Z] = 0; // arg[INTEGRATOR_Z0] is a guess, no dependency
     oracle_.rev(arg1, res1, iw, w, 0);
 
-    log("Integrator::sp_rev", "end");
+    log("Integrator::sp_reverse", "end");
   }
 
   Function Integrator::

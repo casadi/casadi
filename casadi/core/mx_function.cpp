@@ -469,7 +469,7 @@ namespace casadi {
     }
   }
 
-  void MXFunction::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  void MXFunction::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     // Temporaries to hold pointers to operation input and outputs
     const bvec_t** arg1=arg+n_in();
     bvec_t** res1=res+n_out();
@@ -503,12 +503,12 @@ namespace casadi {
           res1[i] = e.res[i]>=0 ? w+workloc_[e.res[i]] : 0;
 
         // Propagate sparsity forwards
-        e.data->sp_fwd(arg1, res1, iw, w, 0);
+        e.data->sp_forward(arg1, res1, iw, w, 0);
       }
     }
   }
 
-  void MXFunction::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  void MXFunction::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     // Temporaries to hold pointers to operation input and outputs
     bvec_t** arg1=arg+n_in();
     bvec_t** res1=res+n_out();
@@ -544,7 +544,7 @@ namespace casadi {
           res1[i] = it->res[i]>=0 ? w+workloc_[it->res[i]] : 0;
 
         // Propagate sparsity backwards
-        it->data->sp_rev(arg1, res1, iw, w, 0);
+        it->data->sp_reverse(arg1, res1, iw, w, 0);
       }
     }
   }
@@ -631,9 +631,9 @@ namespace casadi {
     log("MXFunction::eval_mx end");
   }
 
-  void MXFunction::eval_forward(const std::vector<std::vector<MX> >& fseed,
+  void MXFunction::ad_forward(const std::vector<std::vector<MX> >& fseed,
                                 std::vector<std::vector<MX> >& fsens) const {
-    log("MXFunction::eval_forward begin");
+    log("MXFunction::ad_forward begin");
 
     // Allocate results
     int nfwd = fseed.size();
@@ -648,7 +648,7 @@ namespace casadi {
     // Check if seeds need to have dimensions corrected
     for (auto&& r : fseed) {
       if (!matchingArg(r)) {
-        return eval_forward(replaceFwdSeed(fseed), fsens);
+        return ad_forward(replaceFwdSeed(fseed), fsens);
       }
     }
 
@@ -671,7 +671,7 @@ namespace casadi {
         }
 
         // Call recursively
-        eval_forward(fseed_purged, fsens_purged);
+        ad_forward(fseed_purged, fsens_purged);
 
         // Fetch result
         for (int d=0; d<fseed_purged.size(); ++d) {
@@ -689,7 +689,7 @@ namespace casadi {
     // Work vector, forward derivatives
     std::vector<std::vector<MX> > dwork(workloc_.size()-1);
     fill(dwork.begin(), dwork.end(), std::vector<MX>(nfwd));
-    log("MXFunction::eval_forward allocated derivative work vector (forward mode)");
+    log("MXFunction::ad_forward allocated derivative work vector (forward mode)");
 
     // Split up fseed analogous to symbolic primitives
     vector<vector<vector<MX> > > fseed_split(nfwd);
@@ -747,7 +747,7 @@ namespace casadi {
         osens.resize(oseed.size());
         if (!osens.empty()) {
           fill(osens.begin(), osens.end(), vector<MX>(e.res.size()));
-          e.data->eval_forward(oseed, osens);
+          e.data->ad_forward(oseed, osens);
         }
 
         // Store sensitivities
@@ -763,12 +763,12 @@ namespace casadi {
         }
       }
     }
-    log("MXFunction::eval_forward end");
+    log("MXFunction::ad_forward end");
   }
 
-  void MXFunction::eval_reverse(const std::vector<std::vector<MX> >& aseed,
+  void MXFunction::ad_reverse(const std::vector<std::vector<MX> >& aseed,
                                 std::vector<std::vector<MX> >& asens) const {
-    log("MXFunction::eval_reverse begin");
+    log("MXFunction::ad_reverse begin");
 
     // Allocate results
     int nadj = aseed.size();
@@ -783,7 +783,7 @@ namespace casadi {
     // Check if seeds need to have dimensions corrected
     for (auto&& r : aseed) {
       if (!matchingRes(r)) {
-        return eval_reverse(replaceAdjSeed(aseed), asens);
+        return ad_reverse(replaceAdjSeed(aseed), asens);
       }
     }
 
@@ -807,7 +807,7 @@ namespace casadi {
         }
 
         // Call recursively
-        eval_reverse(aseed_purged, asens_purged);
+        ad_reverse(aseed_purged, asens_purged);
 
         // Fetch result
         for (int d=0; d<aseed_purged.size(); ++d) {
@@ -835,7 +835,7 @@ namespace casadi {
     // Work vector, adjoint derivatives
     std::vector<std::vector<MX> > dwork(workloc_.size()-1);
     fill(dwork.begin(), dwork.end(), std::vector<MX>(nadj));
-    log("MXFunction::eval_reverse allocated derivative work vector (adjoint mode)");
+    log("MXFunction::ad_reverse allocated derivative work vector (adjoint mode)");
 
     // Loop over computational nodes in reverse order
     for (auto it=algorithm_.rbegin(); it!=algorithm_.rend(); ++it) {
@@ -913,7 +913,7 @@ namespace casadi {
 
         // Perform the operation
         if (!osens.empty()) {
-          it->data->eval_reverse(oseed, osens);
+          it->data->ad_reverse(oseed, osens);
         }
 
         // Store sensitivities
@@ -943,7 +943,7 @@ namespace casadi {
       }
     }
 
-    log("MXFunction::eval_reverse end");
+    log("MXFunction::ad_reverse end");
   }
 
   void MXFunction::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {

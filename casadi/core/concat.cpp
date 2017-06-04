@@ -55,7 +55,7 @@ namespace casadi {
     }
   }
 
-  void Concat::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  void Concat::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     bvec_t *res_ptr = res[0];
     for (int i=0; i<ndep(); ++i) {
       int n_i = dep(i).nnz();
@@ -65,7 +65,7 @@ namespace casadi {
     }
   }
 
-  void Concat::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  void Concat::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     bvec_t *res_ptr = res[0];
     for (int i=0; i<ndep(); ++i) {
       int n_i = dep(i).nnz();
@@ -155,7 +155,7 @@ namespace casadi {
     res[0] = diagcat(arg);
   }
 
-  void Diagcat::eval_forward(const std::vector<std::vector<MX> >& fseed,
+  void Diagcat::ad_forward(const std::vector<std::vector<MX> >& fseed,
                         std::vector<std::vector<MX> >& fsens) const {
     int nfwd = fsens.size();
     for (int d = 0; d<nfwd; ++d) fsens[d][0] = diagcat(fseed[d]);
@@ -173,7 +173,7 @@ namespace casadi {
     return make_pair(offset1, offset2);
   }
 
-  void Diagcat::eval_reverse(const std::vector<std::vector<MX> >& aseed,
+  void Diagcat::ad_reverse(const std::vector<std::vector<MX> >& aseed,
                         std::vector<std::vector<MX> >& asens) const {
     // Get offsets for each row and column
     auto off = offset();
@@ -208,7 +208,7 @@ namespace casadi {
     res[0] = horzcat(arg);
   }
 
-  void Horzcat::eval_forward(const std::vector<std::vector<MX> >& fseed,
+  void Horzcat::ad_forward(const std::vector<std::vector<MX> >& fseed,
                         std::vector<std::vector<MX> >& fsens) const {
     int nfwd = fsens.size();
     for (int d = 0; d<nfwd; ++d) {
@@ -225,7 +225,7 @@ namespace casadi {
     return col_offset;
   }
 
-  void Horzcat::eval_reverse(const std::vector<std::vector<MX> >& aseed,
+  void Horzcat::ad_reverse(const std::vector<std::vector<MX> >& aseed,
                         std::vector<std::vector<MX> >& asens) const {
     // Get offsets for each column
     vector<int> col_offset = offset();
@@ -259,7 +259,7 @@ namespace casadi {
     res[0] = vertcat(arg);
   }
 
-  void Vertcat::eval_forward(const std::vector<std::vector<MX> >& fseed,
+  void Vertcat::ad_forward(const std::vector<std::vector<MX> >& fseed,
                         std::vector<std::vector<MX> >& fsens) const {
     int nfwd = fsens.size();
     for (int d = 0; d<nfwd; ++d) {
@@ -276,7 +276,7 @@ namespace casadi {
     return row_offset;
   }
 
-  void Vertcat::eval_reverse(const std::vector<std::vector<MX> >& aseed,
+  void Vertcat::ad_reverse(const std::vector<std::vector<MX> >& aseed,
                         std::vector<std::vector<MX> >& asens) const {
     // Get offsets for each row
     vector<int> row_offset = offset();

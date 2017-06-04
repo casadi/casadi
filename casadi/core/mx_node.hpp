@@ -154,18 +154,18 @@ namespace casadi {
     virtual void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const;
 
     /** \brief Calculate forward mode directional derivatives */
-    virtual void eval_forward(const std::vector<std::vector<MX> >& fseed,
+    virtual void ad_forward(const std::vector<std::vector<MX> >& fseed,
                          std::vector<std::vector<MX> >& fsens) const;
 
     /** \brief Calculate reverse mode directional derivatives */
-    virtual void eval_reverse(const std::vector<std::vector<MX> >& aseed,
+    virtual void ad_reverse(const std::vector<std::vector<MX> >& aseed,
                          std::vector<std::vector<MX> >& asens) const;
 
     /** \brief  Propagate sparsity forward */
-    virtual void sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const;
+    virtual void sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const;
 
     /** \brief  Propagate sparsity backwards */
-    virtual void sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const;
+    virtual void sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const;
 
     /** \brief  Get the name */
     virtual const std::string& name() const;

@@ -198,7 +198,7 @@ namespace casadi {
                         Sparsity(arg[iin_].size()));
     vector<MX> res = mx_out();
     vector<vector<MX> > fseed = symbolicFwdSeed(nfwd, arg), fsens;
-    eval_forward(arg, res, fseed, fsens, false, false);
+    ad_forward(arg, res, fseed, fsens, false, false);
 
     // Construct return function
     arg.insert(arg.end(), res.begin(), res.end());
@@ -226,7 +226,7 @@ namespace casadi {
                         Sparsity(arg[iin_].size()));
     vector<MX> res = mx_out();
     vector<vector<MX> > aseed = symbolicAdjSeed(nadj, res), asens;
-    eval_reverse(arg, res, aseed, asens, false, false);
+    ad_reverse(arg, res, aseed, asens, false, false);
 
     // Construct return function
     arg.insert(arg.end(), res.begin(), res.end());
@@ -243,7 +243,7 @@ namespace casadi {
     return Function(name, arg, res, inames, onames, opts);
   }
 
-  void Rootfinder::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  void Rootfinder::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     int num_out = n_out();
     int num_in = n_in();
     bvec_t* tmp1 = w; w += n_;
@@ -272,7 +272,7 @@ namespace casadi {
     }
   }
 
-  void Rootfinder::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  void Rootfinder::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     int num_out = n_out();
     int num_in = n_in();
     bvec_t* tmp1 = w; w += n_;
@@ -313,7 +313,7 @@ namespace casadi {
   const std::string Rootfinder::infix_ = "rootfinder";
 
   void Rootfinder::
-  eval_forward(const std::vector<MX>& arg, const std::vector<MX>& res,
+  ad_forward(const std::vector<MX>& arg, const std::vector<MX>& res,
           const std::vector<std::vector<MX> >& fseed,
           std::vector<std::vector<MX> >& fsens,
           bool always_inline, bool never_inline) const {
@@ -357,7 +357,7 @@ namespace casadi {
   }
 
   void Rootfinder::
-  eval_reverse(const std::vector<MX>& arg, const std::vector<MX>& res,
+  ad_reverse(const std::vector<MX>& arg, const std::vector<MX>& res,
           const std::vector<std::vector<MX> >& aseed,
           std::vector<std::vector<MX> >& asens,
           bool always_inline, bool never_inline) const {

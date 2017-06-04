@@ -106,11 +106,11 @@ class CASADI_EXPORT SXFunction :
   }
 
   /** \brief Calculate forward mode directional derivatives */
-  void eval_forward(const std::vector<std::vector<SX> >& fseed,
+  void ad_forward(const std::vector<std::vector<SX> >& fseed,
                             std::vector<std::vector<SX> >& fsens) const;
 
   /** \brief Calculate reverse mode directional derivatives */
-  void eval_reverse(const std::vector<std::vector<SX> >& aseed,
+  void ad_reverse(const std::vector<std::vector<SX> >& aseed,
                             std::vector<std::vector<SX> >& asens) const;
 
   /** \brief  Check if smooth */
@@ -220,10 +220,10 @@ class CASADI_EXPORT SXFunction :
   void generateBody(CodeGenerator& g) const override;
 
   /** \brief  Propagate sparsity forward */
-  void sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
+  void sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
 
   /** \brief  Propagate sparsity backwards */
-  void sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
+  void sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
 
   /** \brief Return Jacobian of all input elements with respect to all output elements */
   Function get_jacobian(const std::string& name,
@@ -277,7 +277,7 @@ class CASADI_EXPORT SXFunction :
 
   // Buffers and kernels for sparsity propagation
   std::vector<cl_mem> sp_input_memobj_, sp_output_memobj_;
-  cl_kernel sp_fwd_kernel_, sp_adj_kernel_;
+  cl_kernel sp_forward_kernel_, sp_adj_kernel_;
 
   // OpenCL context. TODO: Nothing class specific in this class, move to a central location
   static SparsityPropagationKernel sparsity_propagation_kernel_;

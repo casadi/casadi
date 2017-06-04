@@ -62,7 +62,7 @@ namespace casadi {
     res[0] = project(arg[0], sparsity());
   }
 
-  void Project::eval_forward(const std::vector<std::vector<MX> >& fseed,
+  void Project::ad_forward(const std::vector<std::vector<MX> >& fseed,
                           std::vector<std::vector<MX> >& fsens) const {
     int nfwd = fsens.size();
     for (int d=0; d<nfwd; ++d) {
@@ -70,7 +70,7 @@ namespace casadi {
     }
   }
 
-  void Project::eval_reverse(const std::vector<std::vector<MX> >& aseed,
+  void Project::ad_reverse(const std::vector<std::vector<MX> >& aseed,
                           std::vector<std::vector<MX> >& asens) const {
     int nadj = aseed.size();
     for (int d=0; d<nadj; ++d) {
@@ -78,11 +78,11 @@ namespace casadi {
     }
   }
 
-  void Project::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  void Project::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     sparsity().set(res[0], arg[0], dep().sparsity());
   }
 
-  void Project::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  void Project::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     dep().sparsity().bor(arg[0], res[0], sparsity());
     fill(res[0], res[0]+nnz(), 0);
   }

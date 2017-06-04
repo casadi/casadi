@@ -42,7 +42,7 @@ namespace casadi {
     res[0] = det(arg[0]);
   }
 
-  void Determinant::eval_forward(const std::vector<std::vector<MX> >& fseed,
+  void Determinant::ad_forward(const std::vector<std::vector<MX> >& fseed,
                             std::vector<std::vector<MX> >& fsens) const {
     const MX& X = dep();
     MX det_X = shared_from_this<MX>();
@@ -52,7 +52,7 @@ namespace casadi {
     }
   }
 
-  void Determinant::eval_reverse(const std::vector<std::vector<MX> >& aseed,
+  void Determinant::ad_reverse(const std::vector<std::vector<MX> >& aseed,
                             std::vector<std::vector<MX> >& asens) const {
     const MX& X = dep();
     MX det_X = shared_from_this<MX>();

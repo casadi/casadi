@@ -455,7 +455,8 @@ namespace casadi {
       }
     }
 
-    void BSplineDual::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+    void BSplineDual::
+    sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
       if (!res[0]) return;
       casadi_fill(res[0], reverse_? coeffs_size_: m_*N_, bvec_t(0));
 
@@ -467,7 +468,8 @@ namespace casadi {
       }
     }
 
-    void BSplineDual::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+    void BSplineDual::
+    sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
       if (!res[0]) return;
 
       int n_dims = degree_.size();

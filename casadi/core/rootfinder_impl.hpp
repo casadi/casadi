@@ -101,10 +101,10 @@ namespace casadi {
     virtual void solve(void* mem) const = 0;
 
     /** \brief  Propagate sparsity forward */
-    void sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
+    void sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
 
     /** \brief  Propagate sparsity backwards */
-    void sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
+    void sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
 
     ///@{
     /// Is the class able to propagate seeds through the algorithm?
@@ -131,13 +131,13 @@ namespace casadi {
     ///@}
 
     /** \brief Create call to (cached) derivative function, forward mode  */
-    virtual void eval_forward(const std::vector<MX>& arg, const std::vector<MX>& res,
+    virtual void ad_forward(const std::vector<MX>& arg, const std::vector<MX>& res,
                          const std::vector<std::vector<MX> >& fseed,
                          std::vector<std::vector<MX> >& fsens,
                          bool always_inline, bool never_inline) const;
 
     /** \brief Create call to (cached) derivative function, reverse mode  */
-    virtual void eval_reverse(const std::vector<MX>& arg, const std::vector<MX>& res,
+    virtual void ad_reverse(const std::vector<MX>& arg, const std::vector<MX>& res,
                          const std::vector<std::vector<MX> >& aseed,
                          std::vector<std::vector<MX> >& asens,
                          bool always_inline, bool never_inline) const;

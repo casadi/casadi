@@ -43,7 +43,7 @@ namespace casadi {
     res[0] = arg[0].monitor(comment_);
   }
 
-  void Monitor::eval_forward(const std::vector<std::vector<MX> >& fseed,
+  void Monitor::ad_forward(const std::vector<std::vector<MX> >& fseed,
                         std::vector<std::vector<MX> >& fsens) const {
     for (int d=0; d<fsens.size(); ++d) {
       stringstream ss;
@@ -52,7 +52,7 @@ namespace casadi {
     }
   }
 
-  void Monitor::eval_reverse(const std::vector<std::vector<MX> >& aseed,
+  void Monitor::ad_reverse(const std::vector<std::vector<MX> >& aseed,
                         std::vector<std::vector<MX> >& asens) const {
     for (int d=0; d<aseed.size(); ++d) {
       stringstream ss;
@@ -84,13 +84,13 @@ namespace casadi {
     }
   }
 
-  void Monitor::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  void Monitor::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     if (arg[0]!=res[0]) {
       copy(arg[0], arg[0]+nnz(), res[0]);
     }
   }
 
-  void Monitor::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  void Monitor::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     bvec_t *a = arg[0];
     bvec_t *r = res[0];
     int n = nnz();

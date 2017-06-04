@@ -62,7 +62,7 @@ namespace casadi {
     casadi_math<MX>::fun(op_, arg[0], dummy, res[0]);
   }
 
-  void UnaryMX::eval_forward(const std::vector<std::vector<MX> >& fseed,
+  void UnaryMX::ad_forward(const std::vector<std::vector<MX> >& fseed,
                      std::vector<std::vector<MX> >& fsens) const {
     // Get partial derivatives
     MX pd[2];
@@ -75,7 +75,7 @@ namespace casadi {
     }
   }
 
-  void UnaryMX::eval_reverse(const std::vector<std::vector<MX> >& aseed,
+  void UnaryMX::ad_reverse(const std::vector<std::vector<MX> >& aseed,
                      std::vector<std::vector<MX> >& asens) const {
     // Get partial derivatives
     MX pd[2];
@@ -88,11 +88,11 @@ namespace casadi {
     }
   }
 
-  void UnaryMX::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  void UnaryMX::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     copy_fwd(arg[0], res[0], nnz());
   }
 
-  void UnaryMX::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  void UnaryMX::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     copy_rev(arg[0], res[0], nnz());
   }
 

@@ -739,11 +739,11 @@ namespace casadi {
   size_t Function::sz_w() const { return (*this)->sz_w();}
 
   void Function::operator()(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
-    (*const_cast<Function*>(this))->sp_fwd(arg, res, iw, w, mem);
+    (*const_cast<Function*>(this))->sp_forward(arg, res, iw, w, mem);
   }
 
   void Function::rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
-    (*this)->sp_rev(arg, res, iw, w, mem);
+    (*this)->sp_reverse(arg, res, iw, w, mem);
   }
 
   void Function::set_work(const double**& arg, double**& res, int*& iw, double*& w,

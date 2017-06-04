@@ -43,7 +43,7 @@ namespace casadi {
     res[0] = shared_from_this<MX>();
   }
 
- void ConstantMX::eval_forward(const std::vector<std::vector<MX> >& fseed,
+ void ConstantMX::ad_forward(const std::vector<std::vector<MX> >& fseed,
                           std::vector<std::vector<MX> >& fsens) const {
    MX zero_sens(size1(), size2());
    for (int d=0; d<fsens.size(); ++d) {
@@ -51,15 +51,15 @@ namespace casadi {
    }
  }
 
-  void ConstantMX::eval_reverse(const std::vector<std::vector<MX> >& aseed,
+  void ConstantMX::ad_reverse(const std::vector<std::vector<MX> >& aseed,
                            std::vector<std::vector<MX> >& asens) const {
   }
 
-  void ConstantMX::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  void ConstantMX::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     fill_n(res[0], nnz(), 0);
   }
 
-  void ConstantMX::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  void ConstantMX::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     fill_n(res[0], nnz(), 0);
   }
 

@@ -344,7 +344,7 @@ namespace casadi {
 
   void FunctionInternal::
   _eval(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
-    sp_fwd(arg, res, iw, w, mem);
+    sp_forward(arg, res, iw, w, mem);
   }
 
   void FunctionInternal::print_dimensions(ostream &stream) const {
@@ -453,7 +453,7 @@ namespace casadi {
     static inline void sp(const FunctionInternal *f,
                           const bvec_t** arg, bvec_t** res,
                           int* iw, bvec_t* w, int mem) {
-      f->sp_fwd(arg, res, iw, w, mem);
+      f->sp_forward(arg, res, iw, w, mem);
     }
   };
   template<> struct JacSparsityTraits<false> {
@@ -461,7 +461,7 @@ namespace casadi {
     static inline void sp(const FunctionInternal *f,
                           bvec_t** arg, bvec_t** res,
                           int* iw, bvec_t* w, int mem) {
-      f->sp_rev(arg, res, iw, w, mem);
+      f->sp_reverse(arg, res, iw, w, mem);
     }
   };
 
@@ -724,7 +724,7 @@ namespace casadi {
             lookup(duplicates.sparsity()) = -bvec_size;
 
             // Propagate the dependencies
-            sp_fwd(get_ptr(arg), get_ptr(res), get_ptr(iw), get_ptr(w), 0);
+            sp_forward(get_ptr(arg), get_ptr(res), get_ptr(iw), get_ptr(w), 0);
 
             // Temporary bit work vector
             bvec_t spsens;
@@ -1010,10 +1010,10 @@ namespace casadi {
 
             // Propagate the dependencies
             if (use_fwd) {
-              sp_fwd(get_ptr(arg_fwd), get_ptr(res), get_ptr(iw), get_ptr(w), 0);
+              sp_forward(get_ptr(arg_fwd), get_ptr(res), get_ptr(iw), get_ptr(w), 0);
             } else {
               fill(w.begin(), w.end(), 0);
-              sp_rev(get_ptr(arg_adj), get_ptr(res), get_ptr(iw), get_ptr(w), 0);
+              sp_reverse(get_ptr(arg_adj), get_ptr(res), get_ptr(iw), get_ptr(w), 0);
             }
 
             // Temporary bit work vector
@@ -1871,7 +1871,7 @@ namespace casadi {
   }
 
   void FunctionInternal::
-  sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     // Get the number of inputs and outputs
     int n_in = this->n_in();
     int n_out = this->n_out();
@@ -1906,7 +1906,7 @@ namespace casadi {
   }
 
   void FunctionInternal::
-  sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     // Get the number of inputs and outputs
     int n_in = this->n_in();
     int n_out = this->n_out();

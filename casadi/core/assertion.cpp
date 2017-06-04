@@ -46,14 +46,14 @@ namespace casadi {
     res[0] = arg[0].attachAssert(arg[1], fail_message_);
   }
 
-  void Assertion::eval_forward(const std::vector<std::vector<MX> >& fseed,
+  void Assertion::ad_forward(const std::vector<std::vector<MX> >& fseed,
                      std::vector<std::vector<MX> >& fsens) const {
     for (int d=0; d<fsens.size(); ++d) {
       fsens[d][0] = fseed[d][0];
     }
   }
 
-  void Assertion::eval_reverse(const std::vector<std::vector<MX> >& aseed,
+  void Assertion::ad_reverse(const std::vector<std::vector<MX> >& aseed,
                      std::vector<std::vector<MX> >& asens) const {
     for (int d=0; d<aseed.size(); ++d) {
       asens[d][0] += aseed[d][0];
@@ -76,13 +76,13 @@ namespace casadi {
     }
   }
 
-  void Assertion::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  void Assertion::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     if (arg[0]!=res[0]) {
       copy(arg[0], arg[0]+nnz(), res[0]);
     }
   }
 
-  void Assertion::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  void Assertion::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     bvec_t *a = arg[0];
     bvec_t *r = res[0];
     int n = nnz();

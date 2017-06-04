@@ -61,7 +61,7 @@ namespace casadi {
   }
 
   template<bool ScX, bool ScY>
-  void BinaryMX<ScX, ScY>::eval_forward(const std::vector<std::vector<MX> >& fseed,
+  void BinaryMX<ScX, ScY>::ad_forward(const std::vector<std::vector<MX> >& fseed,
                                    std::vector<std::vector<MX> >& fsens) const {
     // Get partial derivatives
     MX pd[2];
@@ -74,7 +74,7 @@ namespace casadi {
   }
 
   template<bool ScX, bool ScY>
-  void BinaryMX<ScX, ScY>::eval_reverse(const std::vector<std::vector<MX> >& aseed,
+  void BinaryMX<ScX, ScY>::ad_reverse(const std::vector<std::vector<MX> >& aseed,
                                    std::vector<std::vector<MX> >& asens) const {
     // Get partial derivatives
     MX pd[2];
@@ -193,7 +193,7 @@ namespace casadi {
 
   template<bool ScX, bool ScY>
   void BinaryMX<ScX, ScY>::
-  sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     const bvec_t *a0=arg[0], *a1=arg[1];
     bvec_t *r=res[0];
     int n=nnz();
@@ -211,7 +211,7 @@ namespace casadi {
 
   template<bool ScX, bool ScY>
   void BinaryMX<ScX, ScY>::
-  sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     bvec_t *a0=arg[0], *a1=arg[1], *r = res[0];
     int n=nnz();
     for (int i=0; i<n; ++i) {

@@ -68,7 +68,7 @@ namespace casadi {
 
   }
 
-  void Einstein::eval_forward(const std::vector<std::vector<MX> >& fseed,
+  void Einstein::ad_forward(const std::vector<std::vector<MX> >& fseed,
                                std::vector<std::vector<MX> >& fsens) const {
     for (int d=0; d<fsens.size(); ++d) {
       fsens[d][0] = fseed[d][0]
@@ -77,7 +77,7 @@ namespace casadi {
     }
   }
 
-  void Einstein::eval_reverse(const std::vector<std::vector<MX> >& aseed,
+  void Einstein::ad_reverse(const std::vector<std::vector<MX> >& aseed,
                                std::vector<std::vector<MX> >& asens) const {
     for (int d=0; d<aseed.size(); ++d) {
       asens[d][1] += MX::einstein(aseed[d][0], dep(2), dim_c_, dim_b_, dim_a_, c_, b_, a_);
@@ -88,11 +88,11 @@ namespace casadi {
 
 
 
-  void Einstein::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  void Einstein::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     evalGen<bvec_t>(arg, res, iw, w, mem);
   }
 
-  void Einstein::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  void Einstein::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     //int* ind = iw;
     //int cumprod;
 

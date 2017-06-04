@@ -87,10 +87,10 @@ namespace casadi {
     void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const override;
 
     /** \brief  Propagate sparsity forward */
-    void sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
+    void sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
 
     /** \brief  Propagate sparsity backwards */
-    void sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
+    void sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
 
     ///@{
     /// Is the class able to propagate seeds through the algorithm?

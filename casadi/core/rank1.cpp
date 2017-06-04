@@ -41,7 +41,7 @@ namespace casadi {
     res[0] = rank1(arg[0], arg[1], arg[2], arg[3]);
   }
 
-  void Rank1::eval_forward(const std::vector<std::vector<MX> >& fseed,
+  void Rank1::ad_forward(const std::vector<std::vector<MX> >& fseed,
                       std::vector<std::vector<MX> >& fsens) const {
     for (int d=0; d<fsens.size(); ++d) {
       MX v = project(fseed[d][0], sparsity());
@@ -52,7 +52,7 @@ namespace casadi {
     }
   }
 
-  void Rank1::eval_reverse(const std::vector<std::vector<MX> >& aseed,
+  void Rank1::ad_reverse(const std::vector<std::vector<MX> >& aseed,
                       std::vector<std::vector<MX> >& asens) const {
     for (int d=0; d<aseed.size(); ++d) {
       asens[d][1] += bilin(aseed[d][0], dep(2), dep(3));
@@ -76,7 +76,7 @@ namespace casadi {
     casadi_rank1(res[0], sparsity(), *arg[1], arg[2], arg[3]);
   }
 
-  void Rank1::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  void Rank1::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     /* If not inline, copy to result */
     if (arg[0]!=res[0]) copy(arg[0], arg[0]+dep(0).nnz(), res[0]);
 
@@ -98,7 +98,7 @@ namespace casadi {
     }
   }
 
-  void Rank1::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  void Rank1::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     /* Get sparsities */
     int ncol_A = sparsity().size2();
     const int *colind_A = sparsity().colind(), *row_A = sparsity().row();

@@ -88,7 +88,8 @@ namespace casadi {
     }
   }
 
-  void Transpose::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  void Transpose::
+  sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     // Shortands
     const bvec_t *x = arg[0];
     bvec_t *xT = res[0];
@@ -106,7 +107,8 @@ namespace casadi {
     }
   }
 
-  void Transpose::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  void Transpose::
+  sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     // Shortands
     bvec_t *x = arg[0];
     bvec_t *xT = res[0];
@@ -126,7 +128,8 @@ namespace casadi {
     }
   }
 
-  void DenseTranspose::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  void DenseTranspose::
+  sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     // Shorthands
     const bvec_t *x = arg[0];
     bvec_t *xT = res[0];
@@ -141,7 +144,8 @@ namespace casadi {
     }
   }
 
-  void DenseTranspose::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  void DenseTranspose::
+  sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     // Shorthands
     bvec_t *x = arg[0];
     bvec_t *xT = res[0];
@@ -165,14 +169,14 @@ namespace casadi {
     res[0] = arg[0].T();
   }
 
-  void Transpose::eval_forward(const std::vector<std::vector<MX> >& fseed,
+  void Transpose::ad_forward(const std::vector<std::vector<MX> >& fseed,
                           std::vector<std::vector<MX> >& fsens) const {
     for (int d=0; d<fsens.size(); ++d) {
       fsens[d][0] = fseed[d][0].T();
     }
   }
 
-  void Transpose::eval_reverse(const std::vector<std::vector<MX> >& aseed,
+  void Transpose::ad_reverse(const std::vector<std::vector<MX> >& aseed,
                           std::vector<std::vector<MX> >& asens) const {
     for (int d=0; d<aseed.size(); ++d) {
       asens[d][0] += aseed[d][0].T();

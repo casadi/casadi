@@ -103,7 +103,7 @@ namespace casadi {
     res = create(fcn_, arg);
   }
 
-  void Call::eval_forward(const vector<vector<MX> >& fseed,
+  void Call::ad_forward(const vector<vector<MX> >& fseed,
                      vector<vector<MX> >& fsens) const {
     // Nondifferentiated inputs and outputs
     vector<MX> arg(ndep());
@@ -115,7 +115,7 @@ namespace casadi {
     fcn_->call_forward(arg, res, fseed, fsens, false, false);
   }
 
-  void Call::eval_reverse(const vector<vector<MX> >& aseed,
+  void Call::ad_reverse(const vector<vector<MX> >& aseed,
                      vector<vector<MX> >& asens) const {
     // Nondifferentiated inputs and outputs
     vector<MX> arg(ndep());
@@ -135,11 +135,11 @@ namespace casadi {
     }
   }
 
-  void Call::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  void Call::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     fcn_(arg, res, iw, w, mem);
   }
 
-  void Call::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  void Call::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     fcn_.rev(arg, res, iw, w, mem);
   }
 

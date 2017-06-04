@@ -49,11 +49,11 @@ namespace casadi {
     if (arg[0]!=res[0]) copy(arg[0], arg[0]+nnz(), res[0]);
   }
 
-  void Reshape::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  void Reshape::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     copy_fwd(arg[0], res[0], nnz());
   }
 
-  void Reshape::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  void Reshape::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     copy_rev(arg[0], res[0], nnz());
   }
 
@@ -76,14 +76,14 @@ namespace casadi {
     res[0] = reshape(arg[0], size());
   }
 
-  void Reshape::eval_forward(const std::vector<std::vector<MX> >& fseed,
+  void Reshape::ad_forward(const std::vector<std::vector<MX> >& fseed,
                         std::vector<std::vector<MX> >& fsens) const {
     for (int d = 0; d<fsens.size(); ++d) {
       fsens[d][0] = reshape(fseed[d][0], size());
     }
   }
 
-  void Reshape::eval_reverse(const std::vector<std::vector<MX> >& aseed,
+  void Reshape::ad_reverse(const std::vector<std::vector<MX> >& aseed,
                         std::vector<std::vector<MX> >& asens) const {
     for (int d=0; d<aseed.size(); ++d) {
       asens[d][0] += reshape(aseed[d][0], dep().size());

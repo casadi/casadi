@@ -75,7 +75,7 @@ namespace casadi {
   }
 
   template<bool Tr>
-  void Solve<Tr>::eval_forward(const std::vector<std::vector<MX> >& fseed,
+  void Solve<Tr>::ad_forward(const std::vector<std::vector<MX> >& fseed,
                           std::vector<std::vector<MX> >& fsens) const {
     // Nondifferentiated inputs and outputs
     vector<MX> arg(ndep());
@@ -108,7 +108,7 @@ namespace casadi {
   }
 
   template<bool Tr>
-  void Solve<Tr>::eval_reverse(const std::vector<std::vector<MX> >& aseed,
+  void Solve<Tr>::ad_reverse(const std::vector<std::vector<MX> >& aseed,
                           std::vector<std::vector<MX> >& asens) const {
     // Nondifferentiated inputs and outputs
     vector<MX> arg(ndep());
@@ -158,7 +158,7 @@ namespace casadi {
   }
 
   template<bool Tr>
-  void Solve<Tr>::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  void Solve<Tr>::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     // Number of right-hand-sides
     int nrhs = dep(0).size2();
 
@@ -197,7 +197,7 @@ namespace casadi {
   }
 
   template<bool Tr>
-  void Solve<Tr>::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  void Solve<Tr>::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     // Number of right-hand-sides
     int nrhs = dep(0).size2();
 

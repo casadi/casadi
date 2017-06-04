@@ -55,11 +55,11 @@ namespace casadi {
     void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
 
     /** \brief Calculate forward mode directional derivatives */
-    void eval_forward(const std::vector<std::vector<MX> >& fseed,
+    void ad_forward(const std::vector<std::vector<MX> >& fseed,
                          std::vector<std::vector<MX> >& fsens) const override;
 
     /** \brief Calculate reverse mode directional derivatives */
-    void eval_reverse(const std::vector<std::vector<MX> >& aseed,
+    void ad_reverse(const std::vector<std::vector<MX> >& aseed,
                          std::vector<std::vector<MX> >& asens) const override;
 
     /** \brief Get the operation */
@@ -101,10 +101,10 @@ namespace casadi {
     void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const override;
 
     /** \brief  Propagate sparsity forward */
-    void sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
+    void sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
 
     /** \brief  Propagate sparsity backwards */
-    void sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
+    void sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
 
     /** \brief  Print expression */
     std::string print(const std::vector<std::string>& arg) const override;
@@ -141,10 +141,10 @@ namespace casadi {
     void simplifyMe(MX& ex) override;
 
     /** \brief  Propagate sparsity forward */
-    void sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
+    void sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
 
     /** \brief  Propagate sparsity backwards */
-    void sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
+    void sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
 
     /// Evaluate the function (template)
     template<typename T>
@@ -186,10 +186,10 @@ namespace casadi {
     std::vector<int> all() const override { return inner_.all(outer_, outer_.stop);}
 
     /** \brief  Propagate sparsity forward */
-    void sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
+    void sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
 
     /** \brief  Propagate sparsity backwards */
-    void sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
+    void sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
 
     /// Evaluate the function (template)
     template<typename T>
