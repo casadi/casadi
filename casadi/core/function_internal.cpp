@@ -1135,14 +1135,6 @@ namespace casadi {
     }
   }
 
-  void FunctionInternal::set_jac_sparsity(const Sparsity& sp, int iind, int oind, bool compact) {
-    if (compact) {
-      jac_sparsity_compact_.elem(oind, iind) = sp;
-    } else {
-      jac_sparsity_.elem(oind, iind) = sp;
-    }
-  }
-
   Sparsity& FunctionInternal::
   sparsity_jac(int iind, int oind, bool compact, bool symmetric) const {
     // Get an owning reference to the block

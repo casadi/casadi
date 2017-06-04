@@ -484,9 +484,6 @@ namespace casadi {
     */
     Sparsity getJacSparsityHierarchicalSymm(int iind, int oind) const;
 
-    /// Generate the sparsity of a Jacobian block
-    void set_jac_sparsity(const Sparsity& sp, int iind, int oind, bool compact);
-
     /// Get, if necessary generate, the sparsity of a Jacobian block
     Sparsity& sparsity_jac(int iind, int oind, bool compact, bool symmetric) const;
 
