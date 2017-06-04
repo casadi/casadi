@@ -301,6 +301,12 @@
 %exception  casadi::Function::checkInputs() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Function::conic_debug(const std::string &filename) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Function::conic_debug(std::ostream &file) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::Function::spCanEvaluate(bool fwd) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }

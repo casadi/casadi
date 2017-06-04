@@ -8125,14 +8125,14 @@ Get the (integer) output argument of an atomic operation.
 %feature("docstring")  casadi::Function::conic_debug(const std::string
 &filename) const  "
 
-Generate native code in the interfaced language for debugging
+[INTERNAL]  Generate native code in the interfaced language for debugging
 
 ";
 
 %feature("docstring")  casadi::Function::conic_debug(std::ostream &file)
 const  "
 
-Generate native code in the interfaced language for debugging
+[INTERNAL]  Generate native code in the interfaced language for debugging
 
 ";
 
@@ -19052,14 +19052,14 @@ Get the (integer) input arguments of an atomic operation.
 %feature("docstring")  casadi::Function::conic_debug(const std::string
 &filename) const  "
 
-Generate native code in the interfaced language for debugging
+[INTERNAL]  Generate native code in the interfaced language for debugging
 
 ";
 
 %feature("docstring")  casadi::Function::conic_debug(std::ostream &file)
 const  "
 
-Generate native code in the interfaced language for debugging
+[INTERNAL]  Generate native code in the interfaced language for debugging
 
 ";
 
@@ -61053,6 +61053,20 @@ T1 *grid, const int *offset, const T1 *values, const T1 *x, const int
 %feature("docstring")  casadi::has_interpolant(const std::string &name) "
 
 Check if a particular plugin is available.
+
+";
+
+%feature("docstring")  casadi::conic_debug(const Function &f, const
+std::string &filename) "
+
+Generate native code in the interfaced language for debugging
+
+";
+
+%feature("docstring")  casadi::conic_debug(const Function &f, std::ostream
+&file) "
+
+Generate native code in the interfaced language for debugging
 
 ";
 

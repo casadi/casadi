@@ -5909,9 +5909,8 @@ Get the (integer) output argument of an atomic operation.
 
 ";
 
-%feature("docstring") casadi::Callback::conic_debug "
-
-Generate native code in the interfaced language for debugging
+%feature("docstring") casadi::Callback::conic_debug "[INTERNAL]  Generate
+native code in the interfaced language for debugging
 
 ";
 
@@ -13663,9 +13662,8 @@ Get the (integer) input arguments of an atomic operation.
 
 ";
 
-%feature("docstring") casadi::Function::conic_debug "
-
-Generate native code in the interfaced language for debugging
+%feature("docstring") casadi::Function::conic_debug "[INTERNAL]  Generate
+native code in the interfaced language for debugging
 
 ";
 
@@ -44086,6 +44084,12 @@ Explicitly load a plugin dynamically.
 %feature("docstring") casadi::has_interpolant "
 
 Check if a particular plugin is available.
+
+";
+
+%feature("docstring") casadi::conic_debug "
+
+Generate native code in the interfaced language for debugging
 
 ";
 
