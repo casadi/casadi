@@ -103,8 +103,11 @@ namespace casadi {
     * \param[in] tr   Flip the relationship. Return which expressions contain the variables
     */
     std::vector<bool> which_depends(const std::string& s_in,
-                                            const std::vector<std::string>& s_out,
-                                            int order, bool tr=false) const override;
+                                    const std::vector<std::string>& s_out,
+                                    int order, bool tr=false) const override;
+
+    /** \brief Do the derivative functions need nondifferentiated outputs? */
+    bool uses_output() const override {return false;}
 
     ///@{
     /** \brief Generate a function that calculates \a nfwd forward derivatives */
@@ -1033,14 +1036,7 @@ namespace casadi {
     int num_out = n_out();
 
     // All inputs of the return function
-    std::vector<MatType> ret_in;
-    ret_in.reserve(num_in + num_out + num_in);
-    ret_in.insert(ret_in.end(), in_.begin(), in_.end());
-    for (int i=0; i<num_out; ++i) {
-      std::stringstream ss;
-      ss << "dummy_output_" << i;
-      ret_in.push_back(MatType::sym(ss.str(), Sparsity(out_.at(i).size())));
-    }
+    std::vector<MatType> ret_in = in_;
     std::vector<MatType> v(nfwd);
     for (int i=0; i<num_in; ++i) {
       for (int d=0; d<nfwd; ++d) v[d] = fseed[d][i];
