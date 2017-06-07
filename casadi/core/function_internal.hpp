@@ -254,6 +254,9 @@ namespace casadi {
     std::vector<MX> mapsum_mx(const std::vector<MX > &arg, const std::string& parallelization);
     ///@}
 
+    /** \brief Do the derivative functions need nondifferentiated outputs? */
+    virtual bool uses_output() const {return true;}
+
     ///@{
     /** \brief Return Jacobian of all input elements with respect to all output elements */
     Function jacobian() const;

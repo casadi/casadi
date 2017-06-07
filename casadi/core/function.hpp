@@ -276,6 +276,9 @@ namespace casadi {
     /** \brief Print free variables */
     void print_free(std::ostream &stream=casadi::userOut()) const;
 
+    /** \brief Do the derivative functions need nondifferentiated outputs? */
+    bool uses_output() const;
+
     ///@{
     /** \brief Generate a Jacobian function of output \a oind with respect to input \a iind
      * \param iind The index of the input
