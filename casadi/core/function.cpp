@@ -651,6 +651,10 @@ namespace casadi {
     return (*this)->numel_out(ind);
   }
 
+  bool Function::uses_output() const {
+    return (*this)->uses_output();
+  }
+
   Function Function::jacobian_old(int iind, int oind) const {
     // Redirect to factory class
     vector<string> s_in = name_in();

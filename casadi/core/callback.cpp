@@ -124,6 +124,10 @@ namespace casadi {
     return (*this)->FunctionInternal::get_name_out(i);
   }
 
+  bool Callback::uses_output() const {
+    return (*this)->FunctionInternal::uses_output();
+  }
+
   bool Callback::has_jacobian() const {
     return (*this)->FunctionInternal::has_jacobian();
   }

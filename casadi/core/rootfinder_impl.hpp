@@ -112,6 +112,9 @@ namespace casadi {
     bool has_sprev() const override { return true;}
     ///@}
 
+    /** \brief Do the derivative functions need nondifferentiated outputs? */
+    bool uses_output() const override {return true;}
+
     ///@{
     /** \brief Generate a function that calculates \a nfwd forward derivatives */
     bool has_forward(int nfwd) const override { return true;}

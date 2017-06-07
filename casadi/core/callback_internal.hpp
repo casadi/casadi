@@ -73,6 +73,9 @@ namespace casadi {
     /** \brief  Evaluate symbolically, work vectors given */
     void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const override;
 
+    /** \brief Do the derivative functions need nondifferentiated outputs? */
+    bool uses_output() const override;
+
     ///@{
     /** \brief Return Jacobian of all input elements with respect to all output elements */
     bool has_jacobian() const override;

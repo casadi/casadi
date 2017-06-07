@@ -133,6 +133,9 @@ namespace casadi {
      */
     virtual std::string get_name_out(int i);
 
+    /** \brief Do the derivative functions need nondifferentiated outputs? */
+    virtual bool uses_output() const;
+
     ///@{
     /** \brief Return Jacobian of all input elements with respect to all output elements */
     virtual bool has_jacobian() const;

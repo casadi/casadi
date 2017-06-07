@@ -103,6 +103,10 @@ namespace casadi {
     TRY_CALL(eval_sx, self_, arg, res, iw, w, mem);
   }
 
+  bool CallbackInternal::uses_output() const {
+    TRY_CALL(uses_output, self_);
+  }
+
   bool CallbackInternal::has_jacobian() const {
     TRY_CALL(has_jacobian, self_);
   }
