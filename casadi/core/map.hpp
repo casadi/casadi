@@ -110,6 +110,9 @@ namespace casadi {
     /** \brief  Initialize */
     void init(const Dict& opts) override;
 
+    /** \brief Do the derivative functions need nondifferentiated outputs? */
+    bool uses_output() const override {return f_.uses_output();}
+
     ///@{
     /** \brief Generate a function that calculates \a nfwd forward derivatives */
     bool has_forward(int nfwd) const override { return true;}

@@ -1313,9 +1313,10 @@ namespace casadi {
       return shared_cast<Function>(forward_[nfwd].shared());
     }
 
-    // Get the number of inputs and outputs
+    // Shorthands
     int n_in = this->n_in();
     int n_out = this->n_out();
+    bool uses_output = this->uses_output();
 
     // Give it a suitable name
     string name = "fwd" + to_string(nfwd) + "_" + name_;
@@ -1323,7 +1324,9 @@ namespace casadi {
     // Names of inputs
     std::vector<std::string> inames;
     for (int i=0; i<n_in; ++i) inames.push_back("der_" + name_in(i));
-    for (int i=0; i<n_out; ++i) inames.push_back("der_" + name_out(i));
+    if (uses_output) {
+      for (int i=0; i<n_out; ++i) inames.push_back("der_" + name_out(i));
+    }
     for (int i=0; i<n_in; ++i) inames.push_back("fwd_" + name_in(i));
 
     // Names of outputs
@@ -1340,10 +1343,12 @@ namespace casadi {
     Function ret = get_forward(nfwd, name, inames, onames, opts);
 
     // Consistency check for inputs
-    casadi_assert(ret.n_in()==n_in + n_out + n_in);
+    casadi_assert(ret.n_in()==n_in + uses_output*n_out + n_in);
     int ind=0;
     for (int i=0; i<n_in; ++i) ret.assert_size_in(ind++, size1_in(i), size2_in(i));
-    for (int i=0; i<n_out; ++i) ret.assert_size_in(ind++, size1_out(i), size2_out(i));
+    if (uses_output) {
+      for (int i=0; i<n_out; ++i) ret.assert_size_in(ind++, size1_out(i), size2_out(i));
+    }
     for (int i=0; i<n_in; ++i) ret.assert_size_in(ind++, size1_in(i), nfwd*size2_in(i));
 
     // Consistency check for outputs
@@ -2055,6 +2060,7 @@ namespace casadi {
     // Shorthands
     int n_in = this->n_in();
     int n_out = this->n_out();
+    bool uses_output = this->uses_output();
 
     // Calculating full Jacobian and then multiplying
     if (fwdViaJac(nfwd)) {
@@ -2093,10 +2099,8 @@ namespace casadi {
         int nfwd_batch = min(nfwd-offset, max_nfwd);
 
         // All inputs and seeds
-        vector<MX> darg;
-        darg.reserve(n_in + n_out + n_in);
-        darg.insert(darg.end(), arg.begin(), arg.end());
-        darg.insert(darg.end(), res.begin(), res.end());
+        vector<MX> darg = arg;
+        if (uses_output) darg.insert(darg.end(), res.begin(), res.end());
         vector<MX> v(nfwd_batch);
         for (int i=0; i<n_in; ++i) {
           for (int d=0; d<nfwd_batch; ++d) v[d] = fseed[offset+d][i];

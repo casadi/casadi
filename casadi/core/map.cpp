@@ -139,7 +139,7 @@ namespace casadi {
                 const std::vector<std::string>& onames,
                 const Dict& opts) const {
     // Shorthands
-    int n_in = this->n_in(), n_out = this->n_out();
+    int n_in = this->n_in(), n_out = this->n_out(), uses_output = this->uses_output();
 
     // Generate map of derivative
     Function df = f_.forward(nfwd);
@@ -147,10 +147,12 @@ namespace casadi {
 
     // Input expressions
     vector<MX> arg = dm.mx_in();
+    casadi_assert(arg.size()==n_in + uses_output*n_out + n_in);
 
     // Need to reorder sensitivity inputs
     vector<MX> res = arg;
-    vector<MX>::iterator it=res.begin()+n_in+n_out;
+    vector<MX>::iterator it=res.begin()+n_in;
+    if (uses_output) it += n_out;
     vector<int> ind;
     for (int i=0; i<n_in; ++i, ++it) {
       int sz = f_.size2_in(i);
