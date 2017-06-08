@@ -424,7 +424,7 @@ namespace casadi {
   }
 
   bool SXElem::is_commutative() const {
-    casadi_assert_message(n_dep()==2, "SX::is_commutative: must be binary");
+    casadi_assert_message(n_dep(), "SX::is_commutative: must be binary");
     return operation_checker<CommChecker>(op());
   }
 
