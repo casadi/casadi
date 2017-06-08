@@ -1421,7 +1421,7 @@ namespace casadi {
           if (it->res.size()==1 && it->res[0]>=0 && !node_tainted) {
             ores.at(0) = it->data;
           } else {
-            const_cast<MX&>(it->data)->eval_mx(oarg, ores);
+            it->data->eval_mx(oarg, ores);
           }
 
           // Get the result
@@ -1545,7 +1545,7 @@ namespace casadi {
 
           // Perform the operation
           ores.resize(it->res.size());
-          const_cast<MX&>(it->data)->eval_mx(oarg, ores);
+          it->data->eval_mx(oarg, ores);
 
           // Get the result
           for (int i=0; i<ores.size(); ++i) {

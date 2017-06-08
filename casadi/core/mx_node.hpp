@@ -36,42 +36,6 @@
 #include <stack>
 
 namespace casadi {
-  /// \cond INTERNAL
-  ///@{
-  /** \brief Convenience function, convert vectors to vectors of pointers */
-  template<class T>
-  std::vector<T*> ptrVec(std::vector<T>& v) {
-    std::vector<T*> ret(v.size());
-    for (int i=0; i<v.size(); ++i)
-      ret[i] = &v[i];
-    return ret;
-  }
-
-  template<class T>
-  const std::vector<T*> ptrVec(const std::vector<T>& v) {
-    std::vector<T*> ret(v.size());
-    for (int i=0; i<v.size(); ++i)
-      ret[i] = const_cast<T*>(&v[i]);
-    return ret;
-  }
-
-  template<class T>
-  std::vector<std::vector<T*> > ptrVec(std::vector<std::vector<T> >& v) {
-    std::vector<std::vector<T*> > ret(v.size());
-    for (int i=0; i<v.size(); ++i)
-      ret[i] = ptrVec(v[i]);
-    return ret;
-  }
-
-  template<class T>
-  const std::vector<std::vector<T*> > ptrVec(const std::vector<std::vector<T> >& v) {
-    std::vector<std::vector<T*> > ret(v.size());
-    for (int i=0; i<v.size(); ++i)
-      ret[i] = ptrVec(v[i]);
-    return ret;
-  }
-  ///@}
-
   /** \brief Node class for MX objects
       \author Joel Andersson
       \date 2010
