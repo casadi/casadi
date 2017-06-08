@@ -2451,7 +2451,7 @@ namespace casadi {
     // Quick return if there are no entries to be removed
     bool remove_nothing = true;
     for (auto it=x.nonzeros().begin(); it!=x.nonzeros().end() && remove_nothing; ++it) {
-      remove_nothing = !casadi_limits<Scalar>::isAlmostZero(*it, tol);
+      remove_nothing = !casadi_limits<Scalar>::is_almost_zero(*it, tol);
     }
     if (remove_nothing) return x;
 
@@ -2470,7 +2470,7 @@ namespace casadi {
       // Loop over existing nonzeros
       for (int el=colind[cc]; el<colind[cc+1]; ++el) {
         // If it is not known to be a zero
-        if (!casadi_limits<Scalar>::isAlmostZero(x->at(el), tol)) {
+        if (!casadi_limits<Scalar>::is_almost_zero(x->at(el), tol)) {
           // Save the nonzero in its new location
           new_data.push_back(x->at(el));
 
@@ -2646,7 +2646,7 @@ namespace casadi {
     for (int i=0; i<nnz(); ++i) {
       const SXElem& x = nonzeros().at(i);
       if (x.is_constant()) {
-        if (x.isNan() || x.isInf() || x.isMinusInf()) return false;
+        if (x.is_nan() || x.is_inf() || x.is_minus_inf()) return false;
       }
     }
     // Second pass: don't ignore symbolics
@@ -2767,9 +2767,9 @@ namespace casadi {
         // symbolic nodes have weight one and itself as factor
         w.push_back(1);
         f.push_back(to_be_expanded.top());
-      } else { // binary node
+      } else { // unary or binary node
 
-        casadi_assert(to_be_expanded.top()->hasDep()); // make sure that the node is binary
+        casadi_assert(to_be_expanded.top()->n_dep()); // make sure that the node is binary
 
         // Check if addition, subtracton or multiplication
         SXNode* node = to_be_expanded.top();

@@ -75,7 +75,7 @@ namespace casadi {
   std::string Call::print(const std::vector<std::string>& arg) const {
     stringstream ss;
     ss << fcn_.name() << "(";
-    for (int i=0; i<ndep(); ++i) {
+    for (int i=0; i<n_dep(); ++i) {
       if (i!=0) ss << ", ";
       ss << arg.at(i);
     }
@@ -106,7 +106,7 @@ namespace casadi {
   void Call::ad_forward(const vector<vector<MX> >& fseed,
                      vector<vector<MX> >& fsens) const {
     // Nondifferentiated inputs and outputs
-    vector<MX> arg(ndep());
+    vector<MX> arg(n_dep());
     for (int i=0; i<arg.size(); ++i) arg[i] = dep(i);
     vector<MX> res(nout());
     for (int i=0; i<res.size(); ++i) res[i] = get_output(i);
@@ -118,7 +118,7 @@ namespace casadi {
   void Call::ad_reverse(const vector<vector<MX> >& aseed,
                      vector<vector<MX> >& asens) const {
     // Nondifferentiated inputs and outputs
-    vector<MX> arg(ndep());
+    vector<MX> arg(n_dep());
     for (int i=0; i<arg.size(); ++i) arg[i] = dep(i);
     vector<MX> res(nout());
     for (int i=0; i<res.size(); ++i) res[i] = get_output(i);

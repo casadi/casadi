@@ -147,8 +147,8 @@ namespace casadi {
           ae.res.resize(1);
           ae.res[0] = curr_oind++;
         } else {
-          ae.arg.resize(n->ndep());
-          for (int i=0; i<n->ndep(); ++i) {
+          ae.arg.resize(n->n_dep());
+          for (int i=0; i<n->n_dep(); ++i) {
             ae.arg[i] = n->dep(i)->temp;
           }
           ae.res.resize(n->nout());

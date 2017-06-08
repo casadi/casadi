@@ -48,7 +48,7 @@ namespace casadi {
   template<typename T>
   void Concat::evalGen(const T* const* arg, T* const* res, int* iw, T* w) const {
     T* r = res[0];
-    for (int i=0; i<ndep(); ++i) {
+    for (int i=0; i<n_dep(); ++i) {
       int n = dep(i).nnz();
       copy(arg[i], arg[i]+n, r);
       r += n;
@@ -57,7 +57,7 @@ namespace casadi {
 
   void Concat::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     bvec_t *res_ptr = res[0];
-    for (int i=0; i<ndep(); ++i) {
+    for (int i=0; i<n_dep(); ++i) {
       int n_i = dep(i).nnz();
       const bvec_t *arg_i_ptr = arg[i];
       copy(arg_i_ptr, arg_i_ptr+n_i, res_ptr);
@@ -67,7 +67,7 @@ namespace casadi {
 
   void Concat::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     bvec_t *res_ptr = res[0];
-    for (int i=0; i<ndep(); ++i) {
+    for (int i=0; i<n_dep(); ++i) {
       int n_i = dep(i).nnz();
       bvec_t *arg_i_ptr = arg[i];
       for (int k=0; k<n_i; ++k) {
@@ -110,7 +110,7 @@ namespace casadi {
     // Find out to which dependency it might depend
     int begin=0, end=0;
     int i;
-    for (i=0; i<ndep(); ++i) {
+    for (i=0; i<n_dep(); ++i) {
       begin = end;
       end += dep(i).nnz();
       if (nz_test < end) break;
@@ -146,7 +146,7 @@ namespace casadi {
   std::string Diagcat::print(const std::vector<std::string>& arg) const {
     stringstream ss;
     ss << "diagcat(" << arg.at(0);
-    for (int i=1; i<ndep(); ++i) ss << ", " << arg.at(i);
+    for (int i=1; i<n_dep(); ++i) ss << ", " << arg.at(i);
     ss << ")";
     return ss.str();
   }
@@ -162,9 +162,9 @@ namespace casadi {
   }
 
   std::pair<std::vector<int>, std::vector<int> > Diagcat::offset() const {
-    vector<int> offset1(ndep()+1, 0);
-    vector<int> offset2(ndep()+1, 0);
-    for (int i=0; i<ndep(); ++i) {
+    vector<int> offset1(n_dep()+1, 0);
+    vector<int> offset2(n_dep()+1, 0);
+    for (int i=0; i<n_dep(); ++i) {
       int ncol = dep(i).sparsity().size2();
       int nrow = dep(i).sparsity().size1();
       offset2[i+1] = offset2[i] + ncol;
@@ -182,7 +182,7 @@ namespace casadi {
     int nadj = aseed.size();
     for (int d=0; d<nadj; ++d) {
       vector<MX> s = diagsplit(aseed[d][0], off.first, off.second);
-      for (int i=0; i<ndep(); ++i) {
+      for (int i=0; i<n_dep(); ++i) {
         asens[d][i] += s[i];
       }
     }
@@ -199,7 +199,7 @@ namespace casadi {
   std::string Horzcat::print(const std::vector<std::string>& arg) const {
     stringstream ss;
     ss << "horzcat(" << arg.at(0);
-    for (int i=1; i<ndep(); ++i) ss << ", " << arg.at(i);
+    for (int i=1; i<n_dep(); ++i) ss << ", " << arg.at(i);
     ss << ")";
     return ss.str();
   }
@@ -217,8 +217,8 @@ namespace casadi {
   }
 
   std::vector<int> Horzcat::offset() const {
-    vector<int> col_offset(ndep()+1, 0);
-    for (int i=0; i<ndep(); ++i) {
+    vector<int> col_offset(n_dep()+1, 0);
+    for (int i=0; i<n_dep(); ++i) {
       int ncol = dep(i).sparsity().size2();
       col_offset[i+1] = col_offset[i] + ncol;
     }
@@ -234,7 +234,7 @@ namespace casadi {
     int nadj = aseed.size();
     for (int d=0; d<nadj; ++d) {
       vector<MX> s = horzsplit(aseed[d][0], col_offset);
-      for (int i=0; i<ndep(); ++i) {
+      for (int i=0; i<n_dep(); ++i) {
         asens[d][i] += s[i];
       }
     }
@@ -250,7 +250,7 @@ namespace casadi {
   std::string Vertcat::print(const std::vector<std::string>& arg) const {
     stringstream ss;
     ss << "vertcat(" << arg.at(0);
-    for (int i=1; i<ndep(); ++i) ss << ", " << arg.at(i);
+    for (int i=1; i<n_dep(); ++i) ss << ", " << arg.at(i);
     ss << ")";
     return ss.str();
   }
@@ -268,8 +268,8 @@ namespace casadi {
   }
 
   std::vector<int> Vertcat::offset() const {
-    vector<int> row_offset(ndep()+1, 0);
-    for (int i=0; i<ndep(); ++i) {
+    vector<int> row_offset(n_dep()+1, 0);
+    for (int i=0; i<n_dep(); ++i) {
       int nrow = dep(i).sparsity().size1();
       row_offset[i+1] = row_offset[i] + nrow;
     }
@@ -285,14 +285,14 @@ namespace casadi {
     int nadj = aseed.size();
     for (int d=0; d<nadj; ++d) {
       vector<MX> s = vertsplit(aseed[d][0], row_offset);
-      for (int i=0; i<ndep(); ++i) {
+      for (int i=0; i<n_dep(); ++i) {
         asens[d][i] += s[i];
       }
     }
   }
 
   bool Concat::is_valid_input() const {
-    for (int i=0; i<ndep(); ++i) {
+    for (int i=0; i<n_dep(); ++i) {
       if (!dep(i)->is_valid_input()) return false;
     }
     return true;
@@ -300,7 +300,7 @@ namespace casadi {
 
   int Concat::n_primitives() const {
     int nprim = 0;
-    for (int i=0; i<ndep(); ++i) {
+    for (int i=0; i<n_dep(); ++i) {
       nprim +=  dep(i)->n_primitives();
     }
     return nprim;
@@ -314,7 +314,7 @@ namespace casadi {
   }
 
   MX Horzcat::join_primitives(std::vector<MX>::const_iterator& it) const {
-    vector<MX> s(ndep());
+    vector<MX> s(n_dep());
     for (int i=0; i<s.size(); ++i) {
       s[i] = dep(i)->join_primitives(it);
     }
@@ -329,7 +329,7 @@ namespace casadi {
   }
 
   MX Vertcat::join_primitives(std::vector<MX>::const_iterator& it) const {
-    vector<MX> s(ndep());
+    vector<MX> s(n_dep());
     for (int i=0; i<s.size(); ++i) {
       s[i] = dep(i)->join_primitives(it);
     }
@@ -345,7 +345,7 @@ namespace casadi {
   }
 
   MX Diagcat::join_primitives(std::vector<MX>::const_iterator& it) const {
-    vector<MX> s(ndep());
+    vector<MX> s(n_dep());
     for (int i=0; i<s.size(); ++i) {
       s[i] = dep(i)->join_primitives(it);
     }
@@ -354,20 +354,20 @@ namespace casadi {
 
   bool Concat::has_duplicates() const {
     bool has_duplicates = false;
-    for (int i=0; i<ndep(); ++i) {
+    for (int i=0; i<n_dep(); ++i) {
       has_duplicates = dep(i)->has_duplicates() || has_duplicates;
     }
     return has_duplicates;
   }
 
   void Concat::reset_input() const {
-    for (int i=0; i<ndep(); ++i) {
+    for (int i=0; i<n_dep(); ++i) {
       dep(i)->reset_input();
     }
   }
 
   void Concat::primitives(std::vector<MX>::iterator& it) const {
-    for (int i=0; i<ndep(); ++i) {
+    for (int i=0; i<n_dep(); ++i) {
       dep(i)->primitives(it);
     }
   }

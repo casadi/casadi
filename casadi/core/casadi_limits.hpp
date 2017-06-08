@@ -50,7 +50,7 @@ namespace casadi {
       static bool is_equal(const T& x, const T& y, int depth) {
         return x==y;
       }
-      static bool isAlmostZero(const T& val, double tol) {
+      static bool is_almost_zero(const T& val, double tol) {
         return val<=tol && val>=-tol;
       }
       static bool is_one(const T& val) {
@@ -65,13 +65,13 @@ namespace casadi {
       static bool is_integer(const T& val) {
         return val==static_cast<int>(val);
       }
-      static bool isInf(const T& val) {
+      static bool is_inf(const T& val) {
         return std::numeric_limits<T>::has_infinity && val==std::numeric_limits<T>::infinity();
       }
-      static bool isMinusInf(const T& val) {
+      static bool is_minus_inf(const T& val) {
         return std::numeric_limits<T>::has_infinity && val==-std::numeric_limits<T>::infinity();
       }
-      static bool isNaN(const T& val) {
+      static bool is_nan(const T& val) {
         return std::numeric_limits<T>::has_quiet_NaN && val!=val;
       }
       static const T zero;

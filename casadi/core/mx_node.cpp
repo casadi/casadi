@@ -160,7 +160,7 @@ namespace casadi {
 
   }
 
-  int MXNode::ndep() const {
+  int MXNode::n_dep() const {
     return dep_.size();
   }
 
@@ -235,7 +235,7 @@ namespace casadi {
       nodeind.insert(it, make_pair(this, 0));
 
       // Handle dependencies with recursion
-      for (int i=0; i<ndep(); ++i) {
+      for (int i=0; i<n_dep(); ++i) {
         dep(i)->can_inline(nodeind);
       }
     } else if (it->second==0 && op()!=OP_PARAMETER) {
@@ -253,7 +253,7 @@ namespace casadi {
     if (ind>0) return "@" + CodeGenerator::to_string(ind);
 
     // Get expressions for dependencies
-    vector<string> arg(ndep());
+    vector<string> arg(n_dep());
     for (int i=0; i<arg.size(); ++i) {
       arg[i] = dep(i)->print_compact(nodeind, intermed);
     }
@@ -308,7 +308,7 @@ namespace casadi {
     bvec_t all_depend(0);
 
     // Get dependencies of all inputs
-    for (int k=0; k<ndep(); ++k) {
+    for (int k=0; k<n_dep(); ++k) {
       const bvec_t* v = arg[k];
       for (int i=0; i<dep(k).nnz(); ++i) {
         all_depend |= v[i];
@@ -338,7 +338,7 @@ namespace casadi {
     }
 
     // Propagate to all inputs
-    for (int k=0; k<ndep(); ++k) {
+    for (int k=0; k<n_dep(); ++k) {
       bvec_t* v = arg[k];
       for (int i=0; i<dep(k).nnz(); ++i) {
         v[i] |= all_depend;
@@ -709,9 +709,9 @@ namespace casadi {
   }
 
   bool MXNode::sameOpAndDeps(const MXNode* node, int depth) const {
-    if (op()!=node->op() || ndep()!=node->ndep())
+    if (op()!=node->op() || n_dep()!=node->n_dep())
       return false;
-    for (int i=0; i<ndep(); ++i) {
+    for (int i=0; i<n_dep(); ++i) {
       if (!MX::is_equal(dep(i), node->dep(i), depth-1))
         return false;
     }
@@ -848,7 +848,7 @@ namespace casadi {
         int j = 0;
         for (int i=0;i<output_offset.size();++i) {
           while (offset_deps<output_offset[i]) { offset_deps+=dep(j).size2();++j; }
-          if (j>=ndep()) j = ndep()-1;
+          if (j>=n_dep()) j = n_dep()-1;
           if (output_offset[i]==offset_deps &&
               (i+1<output_offset.size()?output_offset[i+1]:size2()) ==
                offset_deps +dep(j).size2()) {
@@ -914,7 +914,7 @@ namespace casadi {
         int j = 0;
         for (int i=0;i<output_offset.size();++i) {
           while (offset_deps<output_offset[i]) { offset_deps+=dep(j).size1();++j; }
-          if (j>=ndep()) j = ndep()-1;
+          if (j>=n_dep()) j = n_dep()-1;
           if (output_offset[i]==offset_deps &&
               (i+1<output_offset.size()?output_offset[i+1]:size1()) ==
                offset_deps +dep(j).size1()) {

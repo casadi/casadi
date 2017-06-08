@@ -660,7 +660,7 @@ namespace casadi {
   }
 
   int MX::n_dep() const {
-    return (*this)->ndep();
+    return (*this)->n_dep();
   }
 
   std::string MX::name() const {

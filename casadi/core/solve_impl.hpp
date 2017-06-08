@@ -78,7 +78,7 @@ namespace casadi {
   void Solve<Tr>::ad_forward(const std::vector<std::vector<MX> >& fseed,
                           std::vector<std::vector<MX> >& fsens) const {
     // Nondifferentiated inputs and outputs
-    vector<MX> arg(ndep());
+    vector<MX> arg(n_dep());
     for (int i=0; i<arg.size(); ++i) arg[i] = dep(i);
     vector<MX> res(nout());
     for (int i=0; i<res.size(); ++i) res[i] = get_output(i);
@@ -111,7 +111,7 @@ namespace casadi {
   void Solve<Tr>::ad_reverse(const std::vector<std::vector<MX> >& aseed,
                           std::vector<std::vector<MX> >& asens) const {
     // Nondifferentiated inputs and outputs
-    vector<MX> arg(ndep());
+    vector<MX> arg(n_dep());
     for (int i=0; i<arg.size(); ++i) arg[i] = dep(i);
     vector<MX> res(nout());
     for (int i=0; i<res.size(); ++i) res[i] = get_output(i);
@@ -239,7 +239,7 @@ namespace casadi {
 
   template<bool Tr>
   size_t Solve<Tr>::sz_arg() const {
-    return ndep() + linsol_->sz_arg();
+    return n_dep() + linsol_->sz_arg();
   }
 
   template<bool Tr>

@@ -349,11 +349,11 @@ namespace casadi {
         }
         break;
         case OP_LE:
-        if ((y-x).isNonNegative())
+        if ((y-x).is_nonnegative())
           return 1;
         break;
       case OP_LT:
-        if (((x)-y).isNonNegative())
+        if (((x)-y).is_nonnegative())
           return 0;
         break;
       case OP_EQ:
@@ -424,7 +424,7 @@ namespace casadi {
   }
 
   bool SXElem::is_commutative() const {
-    if (!hasDep()) throw CasadiException("SX::is_commutative: must be binary");
+    casadi_assert_message(n_dep()==2, "SX::is_commutative: must be binary");
     return operation_checker<CommChecker>(op());
   }
 
@@ -440,16 +440,12 @@ namespace casadi {
     return node->is_symbolic();
   }
 
-  bool SXElem::hasDep() const {
-    return node->hasDep();
-  }
-
   bool SXElem::is_zero() const {
     return node->is_zero();
   }
 
-  bool SXElem::isAlmostZero(double tol) const {
-    return node->isAlmostZero(tol);
+  bool SXElem::is_almost_zero(double tol) const {
+    return node->is_almost_zero(tol);
   }
 
   bool SXElem::is_one() const {
@@ -460,16 +456,16 @@ namespace casadi {
     return node->is_minus_one();
   }
 
-  bool SXElem::isNan() const {
-    return node->isNan();
+  bool SXElem::is_nan() const {
+    return node->is_nan();
   }
 
-  bool SXElem::isInf() const {
-    return node->isInf();
+  bool SXElem::is_inf() const {
+    return node->is_inf();
   }
 
-  bool SXElem::isMinusInf() const {
-    return node->isMinusInf();
+  bool SXElem::is_minus_inf() const {
+    return node->is_minus_inf();
   }
 
   const std::string& SXElem::name() const {
@@ -481,7 +477,7 @@ namespace casadi {
   }
 
   bool SXElem::is_op(int op) const {
-    return hasDep() && op==this->op();
+    return node->is_op(op);
   }
 
   bool SXElem::is_equal(const SXElem& x, const SXElem& y, int depth) {
@@ -495,13 +491,14 @@ namespace casadi {
     }
   }
 
-  bool SXElem::isNonNegative() const {
-    if (is_constant())
+  bool SXElem::is_nonnegative() const {
+    if (is_constant()) {
       return static_cast<double>(*this)>=0;
-    else if (is_op(OP_SQ) || is_op(OP_FABS))
+    } else if (is_op(OP_SQ) || is_op(OP_FABS)) {
       return true;
-    else
+    } else {
       return false;
+    }
   }
 
   SXElem::operator double() const {
@@ -514,12 +511,11 @@ namespace casadi {
 
   SXElem SXElem::dep(int ch) const {
     casadi_assert(ch==0 || ch==1;)
-      return node->dep(ch);
+    return node->dep(ch);
   }
 
   int SXElem::n_dep() const {
-    if (!hasDep()) return 0;
-    return casadi_math<double>::ndeps(op());
+    return node->n_dep();
   }
 
   size_t SXElem::__hash__() const {
@@ -546,8 +542,8 @@ namespace casadi {
     return SXElem::is_equal(x, y, depth);
   }
 
-  bool casadi_limits<SXElem>::isAlmostZero(const SXElem& val, double tol) {
-    return val.isAlmostZero(tol);
+  bool casadi_limits<SXElem>::is_almost_zero(const SXElem& val, double tol) {
+    return val.is_almost_zero(tol);
   }
 
   bool casadi_limits<SXElem>::is_one(const SXElem& val) {
@@ -566,16 +562,16 @@ namespace casadi {
     return val.is_integer();
   }
 
-  bool casadi_limits<SXElem>::isInf(const SXElem& val) {
-    return val.isInf();
+  bool casadi_limits<SXElem>::is_inf(const SXElem& val) {
+    return val.is_inf();
   }
 
-  bool casadi_limits<SXElem>::isMinusInf(const SXElem& val) {
-    return val.isMinusInf();
+  bool casadi_limits<SXElem>::is_minus_inf(const SXElem& val) {
+    return val.is_minus_inf();
   }
 
-  bool casadi_limits<SXElem>::isNaN(const SXElem& val) {
-    return val.isNan();
+  bool casadi_limits<SXElem>::is_nan(const SXElem& val) {
+    return val.is_nan();
   }
 
   SXElem::operator SX() const {
@@ -600,7 +596,7 @@ namespace casadi {
 
   bool SXElem::is_regular() const {
     if (is_constant()) {
-      return !(isNan() || isInf() || isMinusInf());
+      return !(is_nan() || is_inf() || is_minus_inf());
     } else {
       casadi_error("Cannot check regularity for symbolic SXElem");
     }

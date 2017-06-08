@@ -188,10 +188,7 @@ namespace casadi {
     const MX& dep(int ind=0) const { return dep_.at(ind);}
 
     /** \brief  Number of dependencies */
-    int ndep() const;
-
-    /** \brief  Does the node depend on other nodes*/
-    virtual bool hasDep() const {return ndep()>0; }
+    int n_dep() const;
 
     /** \brief  Number of outputs */
     virtual int nout() const { return 1;}
@@ -216,7 +213,7 @@ namespace casadi {
     void set_sparsity(const Sparsity& sparsity);
 
     /** \brief Get required length of arg field */
-    virtual size_t sz_arg() const { return ndep();}
+    virtual size_t sz_arg() const { return n_dep();}
 
     /** \brief Get required length of res field */
     virtual size_t sz_res() const { return nout();}
