@@ -30,6 +30,26 @@ using namespace std;
 
 namespace casadi {
 
+  MX GetNonzeros::create(const Sparsity& sp, const MX& x, const std::vector<int>& nz) {
+    // Simplify to slice
+    if (is_slice(nz)) return create(sp, x, to_slice(nz));
+    // Simplify to slice2
+    if (is_slice2(nz)) {
+      pair<Slice, Slice> sl = to_slice2(nz);
+      return create(sp, x, sl.first, sl.second);
+    }
+    return MX::create(new GetNonzerosVector(sp, x, nz));
+  }
+
+  MX GetNonzeros::create(const Sparsity& sp, const MX& x, const Slice& s) {
+    return MX::create(new GetNonzerosSlice(sp, x, s));
+  }
+
+  MX GetNonzeros::create(const Sparsity& sp, const MX& x,
+                         const Slice& inner, const Slice& outer) {
+    return MX::create(new GetNonzerosSlice2(sp, x, inner, outer));
+  }
+
   GetNonzeros::GetNonzeros(const Sparsity& sp, const MX& y) {
     set_sparsity(sp);
     set_dep(y);

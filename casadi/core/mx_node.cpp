@@ -447,15 +447,7 @@ namespace casadi {
     if (nz.size()==0) {
       return MX::zeros(sp);
     } else {
-      MX ret;
-      if (is_slice(nz)) {
-        ret = MX::create(new GetNonzerosSlice(sp, shared_from_this<MX>(), to_slice(nz)));
-      } else if (is_slice2(nz)) {
-        pair<Slice, Slice> sl = to_slice2(nz);
-        ret = MX::create(new GetNonzerosSlice2(sp, shared_from_this<MX>(), sl.first, sl.second));
-      } else {
-        ret = MX::create(new GetNonzerosVector(sp, shared_from_this<MX>(), nz));
-      }
+      MX ret = GetNonzeros::create(sp, shared_from_this<MX>(), nz);
       return simplify(ret);
     }
   }

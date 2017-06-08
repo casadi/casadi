@@ -40,6 +40,13 @@ namespace casadi {
   class CASADI_EXPORT GetNonzeros : public MXNode {
   public:
 
+    ///@{
+    /// Create functions
+    static MX create(const Sparsity& sp, const MX& x, const std::vector<int>& nz);
+    static MX create(const Sparsity& sp, const MX& x, const Slice& s);
+    static MX create(const Sparsity& sp, const MX& x, const Slice& inner, const Slice& outer);
+    ///@}
+
     /// Constructor
     GetNonzeros(const Sparsity& sp, const MX& x);
 
