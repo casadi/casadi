@@ -444,12 +444,7 @@ namespace casadi {
   }
 
   MX MXNode::get_nzref(const Sparsity& sp, const vector<int>& nz) const {
-    if (nz.size()==0) {
-      return MX::zeros(sp);
-    } else {
-      MX ret = GetNonzeros::create(sp, shared_from_this<MX>(), nz);
-      return simplify(ret);
-    }
+    return GetNonzeros::create(sp, shared_from_this<MX>(), nz);
   }
 
   MX MXNode::get_nzassign(const MX& y, const vector<int>& nz) const {

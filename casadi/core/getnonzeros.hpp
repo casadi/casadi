@@ -135,9 +135,6 @@ namespace casadi {
     /// Check if the instance is in fact an identity mapping (that can be simplified)
     bool is_identity() const override;
 
-    /// Simplify
-    void simplifyMe(MX& ex) override;
-
     /** \brief  Propagate sparsity forward */
     void sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
 

@@ -31,6 +31,8 @@ using namespace std;
 namespace casadi {
 
   MX GetNonzeros::create(const Sparsity& sp, const MX& x, const std::vector<int>& nz) {
+    // No elements at all
+    if (nz.size()==0) return MX::zeros(sp);
     // Simplify to slice
     if (is_slice(nz)) return create(sp, x, to_slice(nz));
     // Simplify to slice2
@@ -42,6 +44,8 @@ namespace casadi {
   }
 
   MX GetNonzeros::create(const Sparsity& sp, const MX& x, const Slice& s) {
+    // Simplify identity assignments
+    if (sp==x.sparsity() && s.start==0 && s.step==1 && s.stop==x.nnz()) return x;
     return MX::create(new GetNonzerosSlice(sp, x, s));
   }
 
@@ -466,14 +470,6 @@ namespace casadi {
       << ", ss=" << g.work(arg[0], dep(0).nnz())
       << "; cii!=s" << ind << "+" << nz_.size()
       << "; ++cii) *rr++ = *cii>=0 ? ss[*cii] : 0;\n";
-  }
-
-  void GetNonzerosSlice::simplifyMe(MX& ex) {
-    // Simplify if identity
-    if (is_identity()) {
-      MX t = dep(0);
-      ex = t;
-    }
   }
 
   MX GetNonzeros::get_nzref(const Sparsity& sp, const std::vector<int>& nz) const {
