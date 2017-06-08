@@ -941,6 +941,11 @@ function input and outputs.
 
 %feature("docstring") casadi::Blocksqp::calcHessianUpdateLimitedMemory "[INTERNAL] ";
 
+%feature("docstring") casadi::Blocksqp::uses_output "[INTERNAL]  Do the
+derivative functions need nondifferentiated outputs?
+
+";
+
 %feature("docstring") casadi::Blocksqp::~Blocksqp "[INTERNAL] ";
 
 %feature("docstring") casadi::Blocksqp::sp_weight "[INTERNAL]  Weighting
@@ -2372,6 +2377,11 @@ an atomic operation operator index.
 
 ";
 
+%feature("docstring") casadi::BSpline::uses_output "[INTERNAL]  Do the
+derivative functions need nondifferentiated outputs?
+
+";
+
 %feature("docstring") casadi::BSpline::clear_memory "[INTERNAL]  Clear all
 memory (called from destructor)
 
@@ -2748,6 +2758,11 @@ Symbolic expressions for the forward seeds.
 
 %feature("docstring") casadi::BSplineCommon::eval "[INTERNAL]  Evaluate
 numerically.
+
+";
+
+%feature("docstring") casadi::BSplineCommon::uses_output "[INTERNAL]  Do
+the derivative functions need nondifferentiated outputs?
 
 ";
 
@@ -4042,6 +4057,11 @@ Jacobian of all input elements with respect to all output elements.
 
 ";
 
+%feature("docstring") casadi::BSplineDual::alloc_arg "[INTERNAL]  Ensure
+required length of arg field.
+
+";
+
 %feature("docstring") casadi::BSplineDual::alloc_memory "[INTERNAL]  Create
 memory block.
 
@@ -4482,8 +4502,8 @@ Is the class able to propagate seeds through the algorithm?
 
 ";
 
-%feature("docstring") casadi::BSplineDual::alloc_arg "[INTERNAL]  Ensure
-required length of arg field.
+%feature("docstring") casadi::BSplineDual::uses_output "[INTERNAL]  Do the
+derivative functions need nondifferentiated outputs?
 
 ";
 
@@ -5048,6 +5068,11 @@ no cached version is available.
 
 ";
 
+%feature("docstring") casadi::BSplineInterpolant::uses_output "[INTERNAL]
+Do the derivative functions need nondifferentiated outputs?
+
+";
+
 %feature("docstring") casadi::BSplineInterpolant::_set_work "[INTERNAL]
 Set the (persistent) work vectors.
 
@@ -5347,10 +5372,8 @@ of function inputs and outputs.
 
 ";
 
-%feature("docstring") casadi::BSplineInterpolant::reverse "[INTERNAL]
-Return function that calculates adjoint derivatives reverse(nadj) returns a
-cached instance if available, and calls  Function get_reverse(int nadj) if
-no cached version is available.
+%feature("docstring") casadi::BSplineInterpolant::sp_weight "[INTERNAL]
+Weighting factor for chosing forward/reverse mode, sparsity propagation.
 
 ";
 
@@ -5523,8 +5546,10 @@ Is codegen supported?
 
 ";
 
-%feature("docstring") casadi::BSplineInterpolant::sp_weight "[INTERNAL]
-Weighting factor for chosing forward/reverse mode, sparsity propagation.
+%feature("docstring") casadi::BSplineInterpolant::reverse "[INTERNAL]
+Return function that calculates adjoint derivatives reverse(nadj) returns a
+cached instance if available, and calls  Function get_reverse(int nadj) if
+no cached version is available.
 
 ";
 
@@ -5718,7 +5743,16 @@ For a particular output or for all of the outputs
 
 ";
 
-%feature("docstring") casadi::Callback::factory "";
+%feature("docstring") casadi::Callback::mapsum "
+
+Evaluate symbolically in parallel and sum (matrix graph)
+
+Parameters:
+-----------
+
+parallelization:  Type of parallelization used: unroll|serial|openmp
+
+";
 
 %feature("docstring") casadi::Callback::print_free "
 
@@ -5909,8 +5943,9 @@ Get the (integer) output argument of an atomic operation.
 
 ";
 
-%feature("docstring") casadi::Callback::conic_debug "[INTERNAL]  Generate
-native code in the interfaced language for debugging
+%feature("docstring") casadi::Callback::uses_output "
+
+Do the derivative functions need nondifferentiated outputs?
 
 ";
 
@@ -5919,6 +5954,11 @@ native code in the interfaced language for debugging
 Return function that calculates adjoint derivatives reverse(nadj) returns a
 cached instance if available, and calls  Function get_reverse(int nadj) if
 no cached version is available.
+
+";
+
+%feature("docstring") casadi::Callback::conic_debug "[INTERNAL]  Generate
+native code in the interfaced language for debugging
 
 ";
 
@@ -6117,16 +6157,7 @@ pointer to the internal class
 
 ";
 
-%feature("docstring") casadi::Callback::mapsum "
-
-Evaluate symbolically in parallel and sum (matrix graph)
-
-Parameters:
------------
-
-parallelization:  Type of parallelization used: unroll|serial|openmp
-
-";
+%feature("docstring") casadi::Callback::factory "";
 
 %feature("docstring") casadi::Callback::getAlgorithmSize "
 
@@ -6711,8 +6742,8 @@ Codegen decref for dependencies.
 
 ";
 
-%feature("docstring") casadi::Collocation::getCount "[INTERNAL]  Get the
-reference count.
+%feature("docstring") casadi::Collocation::uses_output "[INTERNAL]  Do the
+derivative functions need nondifferentiated outputs?
 
 ";
 
@@ -6967,6 +6998,11 @@ required length of res field.
 
 %feature("docstring") casadi::Collocation::free_memory "[INTERNAL]  Free
 memory block.
+
+";
+
+%feature("docstring") casadi::Collocation::getCount "[INTERNAL]  Get the
+reference count.
 
 ";
 
@@ -8572,6 +8608,11 @@ memory objects.
 
 ";
 
+%feature("docstring") casadi::Conic::uses_output "[INTERNAL]  Do the
+derivative functions need nondifferentiated outputs?
+
+";
+
 %feature("docstring") casadi::Conic::simple "[INTERNAL]  Evaluate
 numerically, simplied syntax.
 
@@ -10137,6 +10178,11 @@ dimensions.
 
 ";
 
+%feature("docstring") casadi::Dple::uses_output "[INTERNAL]  Do the
+derivative functions need nondifferentiated outputs?
+
+";
+
 %feature("docstring") casadi::Dple::get_sparsity_out "[INTERNAL]
 Sparsities of function inputs and outputs.
 
@@ -10543,6 +10589,11 @@ statistics
 
 %feature("docstring") casadi::Expm::get_name_in "[INTERNAL]  Names of
 function input and outputs.
+
+";
+
+%feature("docstring") casadi::Expm::uses_output "[INTERNAL]  Do the
+derivative functions need nondifferentiated outputs?
 
 ";
 
@@ -11950,6 +12001,11 @@ able to propagate seeds through the algorithm?
 
 ";
 
+%feature("docstring") casadi::External::uses_output "[INTERNAL]  Do the
+derivative functions need nondifferentiated outputs?
+
+";
+
 %feature("docstring") casadi::External::getJacSparsityGen "[INTERNAL]  Get
 the sparsity pattern, forward mode.
 
@@ -12343,7 +12399,7 @@ hcat:  check if horizontal repetion of the function input is allowed
 
 ";
 
-%feature("docstring") casadi::FixedStepIntegrator::get_partition "[INTERNAL]  Get the unidirectional or bidirectional partition.
+%feature("docstring") casadi::FixedStepIntegrator::getAlgorithmSize "[INTERNAL]  Get the number of atomic operations.
 
 ";
 
@@ -12368,7 +12424,8 @@ hcat:  check if horizontal repetion of the function input is allowed
 
 ";
 
-%feature("docstring") casadi::FixedStepIntegrator::getAlgorithmSize "[INTERNAL]  Get the number of atomic operations.
+%feature("docstring") casadi::FixedStepIntegrator::uses_output "[INTERNAL]
+Do the derivative functions need nondifferentiated outputs?
 
 ";
 
@@ -13025,6 +13082,10 @@ Input/output dimensions.
 
 ";
 
+%feature("docstring") casadi::FixedStepIntegrator::get_partition "[INTERNAL]  Get the unidirectional or bidirectional partition.
+
+";
+
 %feature("docstring") casadi::FixedStepIntegrator::adjViaJac "[INTERNAL]
 Calculate derivatives by multiplying the full Jacobian and multiplying.
 
@@ -13659,6 +13720,12 @@ pointer to the internal class
 %feature("docstring") casadi::Function::getAtomicInput "
 
 Get the (integer) input arguments of an atomic operation.
+
+";
+
+%feature("docstring") casadi::Function::uses_output "
+
+Do the derivative functions need nondifferentiated outputs?
 
 ";
 
@@ -14374,6 +14441,11 @@ input scheme index by name.
 
 %feature("docstring") casadi::GenericExternal::alloc_memory "[INTERNAL]
 Create memory block.
+
+";
+
+%feature("docstring") casadi::GenericExternal::get_sparsity_out "[INTERNAL]
+Retreive sparsities.
 
 ";
 
@@ -15105,8 +15177,8 @@ numerically.
 
 ";
 
-%feature("docstring") casadi::GenericExternal::get_sparsity_out "[INTERNAL]
-Retreive sparsities.
+%feature("docstring") casadi::GenericExternal::uses_output "[INTERNAL]  Do
+the derivative functions need nondifferentiated outputs?
 
 ";
 
@@ -16749,6 +16821,10 @@ problem)
 
 ";
 
+%feature("docstring") casadi::ImplicitFixedStepIntegrator::uses_output "[INTERNAL]  Do the derivative functions need nondifferentiated outputs?
+
+";
+
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::sp_jac_rdae "[INTERNAL]  Create sparsity pattern of the extended Jacobian (backward
 problem)
 
@@ -17365,6 +17441,11 @@ Propagate sparsity backwards.
 
 ";
 
+%feature("docstring") casadi::ImplicitToNlp::clear_memory "[INTERNAL]
+Clear all memory (called from destructor)
+
+";
+
 %feature("docstring") casadi::ImplicitToNlp::get_reverse "[INTERNAL]
 Generate a function that calculates nadj adjoint derivatives.
 
@@ -17607,8 +17688,8 @@ Return Jacobian of all input elements with respect to all output elements.
 
 ";
 
-%feature("docstring") casadi::ImplicitToNlp::get_sparsity_out "[INTERNAL]
-Sparsities of function inputs and outputs.
+%feature("docstring") casadi::ImplicitToNlp::uses_output "[INTERNAL]  Do
+the derivative functions need nondifferentiated outputs?
 
 ";
 
@@ -17713,8 +17794,8 @@ with symbolic matrices.
 
 ";
 
-%feature("docstring") casadi::ImplicitToNlp::clear_memory "[INTERNAL]
-Clear all memory (called from destructor)
+%feature("docstring") casadi::ImplicitToNlp::get_sparsity_out "[INTERNAL]
+Sparsities of function inputs and outputs.
 
 ";
 
@@ -18754,6 +18835,11 @@ factor for chosing forward/reverse mode.
 
 ";
 
+%feature("docstring") casadi::Integrator::uses_output "[INTERNAL]  Do the
+derivative functions need nondifferentiated outputs?
+
+";
+
 %feature("docstring") casadi::Integrator::get_options "[INTERNAL]  Options.
 
 ";
@@ -19038,8 +19124,8 @@ Generate meta-information allowing a user to evaluate a generated function.
 
 ";
 
-%feature("docstring") casadi::Interpolant::symbolic_output "[INTERNAL]  Get
-a vector of symbolic variables corresponding to the outputs.
+%feature("docstring") casadi::Interpolant::uses_output "[INTERNAL]  Do the
+derivative functions need nondifferentiated outputs?
 
 ";
 
@@ -19714,8 +19800,16 @@ input/output elements.
 
 ";
 
-%feature("docstring") casadi::Interpolant::has_derivative "[INTERNAL]  Can
-derivatives be calculated in any way?
+%feature("docstring") casadi::Interpolant::symbolic_output "[INTERNAL]  Get
+a vector of symbolic variables corresponding to the outputs.
+
+";
+
+%feature("docstring") casadi::Interpolant::init "[INTERNAL]  Initialize
+Initialize and make the object ready for setting arguments and evaluation.
+This method is typically called after setting options but before evaluating.
+If passed to another class (in the constructor), this class should invoke
+this function when initialized.
 
 ";
 
@@ -19746,11 +19840,8 @@ Prepares the function for evaluation.
 
 ";
 
-%feature("docstring") casadi::Interpolant::init "[INTERNAL]  Initialize
-Initialize and make the object ready for setting arguments and evaluation.
-This method is typically called after setting options but before evaluating.
-If passed to another class (in the constructor), this class should invoke
-this function when initialized.
+%feature("docstring") casadi::Interpolant::has_derivative "[INTERNAL]  Can
+derivatives be calculated in any way?
 
 ";
 
@@ -20012,8 +20103,8 @@ Is codegen supported?
 
 ";
 
-%feature("docstring") casadi::Jit::getAdaptorSolverName "[INTERNAL]  Obtain
-solver name from Adaptor.
+%feature("docstring") casadi::Jit::addShorthand "[INTERNAL]  Generate
+shorthand macro.
 
 ";
 
@@ -20034,10 +20125,6 @@ input/output elements.
 
 %feature("docstring") casadi::Jit::has_spfwd "[INTERNAL]  Is the class able
 to propagate seeds through the algorithm?
-
-";
-
-%feature("docstring") casadi::Jit::print "[INTERNAL]  Print.
 
 ";
 
@@ -20186,6 +20273,11 @@ w field.
 
 %feature("docstring") casadi::Jit::size_out "[INTERNAL]  Input/output
 dimensions.
+
+";
+
+%feature("docstring") casadi::Jit::sp_weight "[INTERNAL]  Weighting factor
+for chosing forward/reverse mode, sparsity propagation.
 
 ";
 
@@ -20496,8 +20588,8 @@ long enough to evaluate function.
 
 ";
 
-%feature("docstring") casadi::Jit::sp_weight "[INTERNAL]  Weighting factor
-for chosing forward/reverse mode, sparsity propagation.
+%feature("docstring") casadi::Jit::getAdaptorSolverName "[INTERNAL]  Obtain
+solver name from Adaptor.
 
 ";
 
@@ -20597,8 +20689,7 @@ to the object.
 
 ";
 
-%feature("docstring") casadi::Jit::addShorthand "[INTERNAL]  Generate
-shorthand macro.
+%feature("docstring") casadi::Jit::print "[INTERNAL]  Print.
 
 ";
 
@@ -20831,6 +20922,11 @@ Number of function inputs and outputs.
 
 ";
 
+%feature("docstring") casadi::Jit::print_free "[INTERNAL]  Print free
+variables.
+
+";
+
 %feature("docstring") casadi::Jit::init "
 
 Initialize.
@@ -20871,8 +20967,8 @@ and output(s)
 
 ";
 
-%feature("docstring") casadi::Jit::print_free "[INTERNAL]  Print free
-variables.
+%feature("docstring") casadi::Jit::uses_output "[INTERNAL]  Do the
+derivative functions need nondifferentiated outputs?
 
 ";
 
@@ -21639,8 +21735,8 @@ unidirectional or bidirectional partition.
 
 ";
 
-%feature("docstring") casadi::LapackLu::codegen_name "[INTERNAL]  Get name
-in codegen.
+%feature("docstring") casadi::LapackLu::uses_output "[INTERNAL]  Do the
+derivative functions need nondifferentiated outputs?
 
 ";
 
@@ -21883,6 +21979,11 @@ Diagrams
 
 
 C++ includes: lapack_lu.hpp ";
+
+%feature("docstring") casadi::LapackLu::codegen_name "[INTERNAL]  Get name
+in codegen.
+
+";
 
 %feature("docstring") casadi::LapackLu::getCount "[INTERNAL]  Get the
 reference count.
@@ -22270,6 +22371,11 @@ mode AD, virtual functions overloaded in derived classes.
 ";
 
 %feature("docstring") casadi::LapackQr::print "[INTERNAL]  Print.
+
+";
+
+%feature("docstring") casadi::LapackQr::uses_output "[INTERNAL]  Do the
+derivative functions need nondifferentiated outputs?
 
 ";
 
@@ -23512,6 +23618,11 @@ Get the length of the work vector.
 
 ";
 
+%feature("docstring") casadi::LinearInterpolant::uses_output "[INTERNAL]
+Do the derivative functions need nondifferentiated outputs?
+
+";
+
 %feature("docstring") casadi::LinearInterpolant::plugin_name "[INTERNAL] ";
 
 %feature("docstring") casadi::LinearInterpolant::factory "[INTERNAL] ";
@@ -23936,7 +24047,8 @@ Checkout a memory object.
 
 ";
 
-%feature("docstring") casadi::LinearInterpolantJac::codegen_decref "[INTERNAL]  Codegen decref for dependencies.
+%feature("docstring") casadi::LinearInterpolantJac::uses_output "[INTERNAL]
+Do the derivative functions need nondifferentiated outputs?
 
 ";
 
@@ -24206,7 +24318,7 @@ Get the reference count.
 
 ";
 
-%feature("docstring") casadi::LinearInterpolantJac::print_options "[INTERNAL]  Print list of options.
+%feature("docstring") casadi::LinearInterpolantJac::codegen_decref "[INTERNAL]  Codegen decref for dependencies.
 
 ";
 
@@ -24450,8 +24562,7 @@ no cached version is available.
 
 ";
 
-%feature("docstring") casadi::LinearInterpolantJac::sz_iw "[INTERNAL]  Get
-required length of iw field.
+%feature("docstring") casadi::LinearInterpolantJac::print_options "[INTERNAL]  Print list of options.
 
 ";
 
@@ -24507,6 +24618,11 @@ Number of function inputs and outputs.
 
 %feature("docstring") casadi::LinearInterpolantJac::size_in "[INTERNAL]
 Input/output dimensions.
+
+";
+
+%feature("docstring") casadi::LinearInterpolantJac::sz_iw "[INTERNAL]  Get
+required length of iw field.
 
 ";
 
@@ -24996,6 +25112,11 @@ of options.
 
 %feature("docstring") casadi::Lsqr::weak "[INTERNAL]  Get a weak reference
 to the object.
+
+";
+
+%feature("docstring") casadi::Lsqr::uses_output "[INTERNAL]  Do the
+derivative functions need nondifferentiated outputs?
 
 ";
 
@@ -25994,6 +26115,11 @@ floating point output argument of an atomic operation.
 
 ";
 
+%feature("docstring") casadi::Map::clear_memory "[INTERNAL]  Clear all
+memory (called from destructor)
+
+";
+
 %feature("docstring") casadi::Map::n_in "[INTERNAL]  Number of function
 inputs and outputs.
 
@@ -26606,8 +26732,8 @@ information allowing a user to evaluate a generated function.
 
 ";
 
-%feature("docstring") casadi::Map::symbolic_output "[INTERNAL]  Get a
-vector of symbolic variables corresponding to the outputs.
+%feature("docstring") casadi::Map::uses_output "[INTERNAL]  Do the
+derivative functions need nondifferentiated outputs?
 
 ";
 
@@ -26775,8 +26901,8 @@ block.
 
 ";
 
-%feature("docstring") casadi::Map::clear_memory "[INTERNAL]  Clear all
-memory (called from destructor)
+%feature("docstring") casadi::Map::symbolic_output "[INTERNAL]  Get a
+vector of symbolic variables corresponding to the outputs.
 
 ";
 
@@ -27258,6 +27384,11 @@ Jacobian of all input elements with respect to all output elements.
 
 %feature("docstring") casadi::MapOmp::wrap "[INTERNAL]  Wrap in an Function
 instance consisting of only one MX call.
+
+";
+
+%feature("docstring") casadi::MapOmp::uses_output "[INTERNAL]  Do the
+derivative functions need nondifferentiated outputs?
 
 ";
 
@@ -29459,6 +29590,8 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
+%feature("docstring") casadi::Newton::has_function "[INTERNAL] ";
+
 %feature("docstring") casadi::Newton::reverse "[INTERNAL]  Return function
 that calculates adjoint derivatives reverse(nadj) returns a cached instance
 if available, and calls  Function get_reverse(int nadj) if no cached version
@@ -29981,7 +30114,10 @@ function that calculates nfwd forward derivatives.
 
 ";
 
-%feature("docstring") casadi::Newton::has_function "[INTERNAL] ";
+%feature("docstring") casadi::Newton::uses_output "[INTERNAL]  Do the
+derivative functions need nondifferentiated outputs?
+
+";
 
 %feature("docstring") casadi::Newton::has_codegen "[INTERNAL]  Is codegen
 supported?
@@ -30452,8 +30588,8 @@ numerically.
 
 %feature("docstring") casadi::Nlpsol::monitored "[INTERNAL] ";
 
-%feature("docstring") casadi::Nlpsol::symbolic_output "[INTERNAL]  Get a
-vector of symbolic variables corresponding to the outputs.
+%feature("docstring") casadi::Nlpsol::uses_output "[INTERNAL]  Do the
+derivative functions need nondifferentiated outputs?
 
 ";
 
@@ -30576,6 +30712,11 @@ function inputs and outputs.
 
 %feature("docstring") casadi::Nlpsol::sp_forward "[INTERNAL]  Propagate
 sparsity forward.
+
+";
+
+%feature("docstring") casadi::Nlpsol::symbolic_output "[INTERNAL]  Get a
+vector of symbolic variables corresponding to the outputs.
 
 ";
 
@@ -32216,6 +32357,11 @@ of function inputs and outputs.
 
 ";
 
+%feature("docstring") casadi::OracleFunction::uses_output "[INTERNAL]  Do
+the derivative functions need nondifferentiated outputs?
+
+";
+
 %feature("docstring") casadi::OracleFunction::jit_dependencies "[INTERNAL]
 JIT for dependencies.
 
@@ -32838,6 +32984,11 @@ memory object.
 
 %feature("docstring") casadi::QpToNlp::default_in "[INTERNAL]  Get default
 input value.
+
+";
+
+%feature("docstring") casadi::QpToNlp::uses_output "[INTERNAL]  Do the
+derivative functions need nondifferentiated outputs?
 
 ";
 
@@ -33964,6 +34115,11 @@ Get the sparsity pattern, forward mode.
 
 ";
 
+%feature("docstring") casadi::Rootfinder::symbolicFwdSeed "[INTERNAL]
+Symbolic expressions for the forward seeds.
+
+";
+
 %feature("docstring") casadi::Rootfinder::has_jacobian "[INTERNAL]  Return
 Jacobian of all input elements with respect to all output elements.
 
@@ -34264,8 +34420,8 @@ work vectors.
 
 ";
 
-%feature("docstring") casadi::Rootfinder::symbolicFwdSeed "[INTERNAL]
-Symbolic expressions for the forward seeds.
+%feature("docstring") casadi::Rootfinder::uses_output "[INTERNAL]  Do the
+derivative functions need nondifferentiated outputs?
 
 ";
 
@@ -35072,6 +35228,11 @@ generate the function.
 
 ";
 
+%feature("docstring") casadi::RungeKutta::uses_output "[INTERNAL]  Do the
+derivative functions need nondifferentiated outputs?
+
+";
+
 %feature("docstring") casadi::RungeKutta::print_option "[INTERNAL]  Print
 all information there is to know about a certain option.
 
@@ -35497,6 +35658,11 @@ meta-information allowing a user to evaluate a generated function.
 
 %feature("docstring") casadi::Scpgen::finalize "[INTERNAL]  Finalize
 initialization.
+
+";
+
+%feature("docstring") casadi::Scpgen::uses_output "[INTERNAL]  Do the
+derivative functions need nondifferentiated outputs?
 
 ";
 
@@ -37093,6 +37259,11 @@ Evaluate with symbolic matrices.
 
 ";
 
+%feature("docstring") casadi::SimplifiedExternal::uses_output "[INTERNAL]
+Do the derivative functions need nondifferentiated outputs?
+
+";
+
 %feature("docstring") casadi::SimplifiedExternal::eval_name "[INTERNAL]
 Get name of the evaluation function.
 
@@ -38358,6 +38529,11 @@ variables ( MX)
 
 ";
 
+%feature("docstring") casadi::SlicotDple::uses_output "[INTERNAL]  Do the
+derivative functions need nondifferentiated outputs?
+
+";
+
 %feature("docstring") casadi::SlicotDple::getJacSparsityHierarchicalSymm "[INTERNAL]  A flavor of getJacSparsity that does hierarchical block
 structure recognition for symmetric Jacobians
 
@@ -38745,6 +38921,11 @@ nodes in the algorithm.
 
 %feature("docstring") casadi::SlicotExpm::generateBody "[INTERNAL]
 Generate code for the function body.
+
+";
+
+%feature("docstring") casadi::SlicotExpm::uses_output "[INTERNAL]  Do the
+derivative functions need nondifferentiated outputs?
 
 ";
 
@@ -41383,6 +41564,11 @@ derivatives be calculated in any way?
 
 ";
 
+%feature("docstring") casadi::Sqpmethod::uses_output "[INTERNAL]  Do the
+derivative functions need nondifferentiated outputs?
+
+";
+
 %feature("docstring") casadi::Sqpmethod::simplifiedCall "[INTERNAL]  Use
 simplified signature.
 
@@ -41962,6 +42148,11 @@ name by index.
 
 ";
 
+%feature("docstring") casadi::Switch::getJacSparsityHierarchical "[INTERNAL]  A flavor of getJacSparsity that does hierarchical block
+structure recognition.
+
+";
+
 %feature("docstring") casadi::Switch::name "[INTERNAL]  Name of the
 function.
 
@@ -42315,12 +42506,12 @@ code for the body of the C function.
 
 ";
 
-%feature("docstring") casadi::Switch::repr "[INTERNAL]  Print.
+%feature("docstring") casadi::Switch::uses_output "[INTERNAL]  Do the
+derivative functions need nondifferentiated outputs?
 
 ";
 
-%feature("docstring") casadi::Switch::getJacSparsityHierarchical "[INTERNAL]  A flavor of getJacSparsity that does hierarchical block
-structure recognition.
+%feature("docstring") casadi::Switch::repr "[INTERNAL]  Print.
 
 ";
 
@@ -42802,6 +42993,11 @@ function inputs and outputs.
 
 %feature("docstring") casadi::SymbolicQr::construct "[INTERNAL]  Construct
 Prepares the function for evaluation.
+
+";
+
+%feature("docstring") casadi::SymbolicQr::uses_output "[INTERNAL]  Do the
+derivative functions need nondifferentiated outputs?
 
 ";
 
@@ -45658,11 +45854,6 @@ N:  Number of integrator steps
 order:  Order of interpolating polynomials
 
 scheme:   Collocation scheme, as excepted by collocationPoints function.
-
-";
-
-%feature("docstring") casadi::ptrVec "[INTERNAL]  Convenience function,
-convert vectors to vectors of pointers.
 
 ";
 

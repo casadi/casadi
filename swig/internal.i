@@ -763,6 +763,9 @@
 %exception  casadi::FunctionInternal::type_name() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::FunctionInternal::uses_output() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::FunctionInternal::verbose() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -1315,6 +1318,9 @@
 %exception  casadi::Rootfinder::type_name() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Rootfinder::uses_output() const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::RungeKutta::init(const Dict &opts) override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -1550,18 +1556,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::matrixName< SXElem >() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::ptrVec(const std::vector< T > &v) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::ptrVec(const std::vector< std::vector< T > > &v) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::ptrVec(std::vector< T > &v) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::ptrVec(std::vector< std::vector< T > > &v) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::replaceMat(const M &arg, const Sparsity &inp, bool hcat=false) {

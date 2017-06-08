@@ -1216,6 +1216,12 @@ updateType, int hessScaling) const  "
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::FunctionInternal::uses_output() const  "
+
+[INTERNAL]  Do the derivative functions need nondifferentiated outputs?
+
+";
+
 %feature("docstring") casadi::Blocksqp::~Blocksqp "
 
 [INTERNAL] ";
@@ -3241,6 +3247,12 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::uses_output() const  "
+
+[INTERNAL]  Do the derivative functions need nondifferentiated outputs?
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::clear_memory() "
 
 [INTERNAL]  Clear all memory (called from destructor)
@@ -3692,6 +3704,12 @@ const std::vector< MatType > &v) const  "
 double **arg, double **res, int *iw, double *w) const  "
 
 [INTERNAL]  Evaluate numerically.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::uses_output() const  "
+
+[INTERNAL]  Do the derivative functions need nondifferentiated outputs?
 
 ";
 
@@ -5492,6 +5510,13 @@ elements.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::alloc_arg(size_t sz_arg,
+bool persistent=false) "
+
+[INTERNAL]  Ensure required length of arg field.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::alloc_memory() const  "
 
 [INTERNAL]  Create memory block.
@@ -6027,10 +6052,9 @@ Is the class able to propagate seeds through the algorithm?
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::alloc_arg(size_t sz_arg,
-bool persistent=false) "
+%feature("docstring")  casadi::FunctionInternal::uses_output() const  "
 
-[INTERNAL]  Ensure required length of arg field.
+[INTERNAL]  Do the derivative functions need nondifferentiated outputs?
 
 ";
 
@@ -6833,6 +6857,12 @@ get_forward(int nfwd) if no cached version is available.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::uses_output() const  "
+
+[INTERNAL]  Do the derivative functions need nondifferentiated outputs?
+
+";
+
 %feature("docstring") casadi::BSplineInterpolant::_set_work "
 
 [INTERNAL]  Set the (persistent) work vectors.
@@ -7286,11 +7316,10 @@ std::string &name, const std::vector< double > &grid, const std::vector< int
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::reverse(int nadj) const  "
+%feature("docstring")  casadi::FunctionInternal::sp_weight() const  "
 
-[INTERNAL]  Return function that calculates adjoint derivatives
-reverse(nadj) returns a cached instance if available, and calls  Function
-get_reverse(int nadj) if no cached version is available.
+[INTERNAL]  Weighting factor for chosing forward/reverse mode, sparsity
+propagation.
 
 ";
 
@@ -7554,10 +7583,11 @@ override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sp_weight() const  "
+%feature("docstring")  casadi::FunctionInternal::reverse(int nadj) const  "
 
-[INTERNAL]  Weighting factor for chosing forward/reverse mode, sparsity
-propagation.
+[INTERNAL]  Return function that calculates adjoint derivatives
+reverse(nadj) returns a cached instance if available, and calls  Function
+get_reverse(int nadj) if no cached version is available.
 
 ";
 
@@ -7866,9 +7896,15 @@ For a particular output or for all of the outputs
 
 ";
 
-%feature("docstring")  casadi::Function::factory(const std::string &name,
-const std::vector< std::string > &s_in, const std::vector< std::string >
-&s_out, const AuxOut &aux=AuxOut(), const Dict &opts=Dict()) const  "
+%feature("docstring")  casadi::Function::mapsum(const std::vector< MX >
+&arg, const std::string &parallelization="serial") const  "
+
+Evaluate symbolically in parallel and sum (matrix graph)
+
+Parameters:
+-----------
+
+parallelization:  Type of parallelization used: unroll|serial|openmp
 
 ";
 
@@ -8122,6 +8158,20 @@ Get the (integer) output argument of an atomic operation.
 
 ";
 
+%feature("docstring")  casadi::Callback::uses_output() const  "
+
+Do the derivative functions need nondifferentiated outputs?
+
+";
+
+%feature("docstring")  casadi::Callback::has_reverse(int nadj) const  "
+
+Return function that calculates adjoint derivatives reverse(nadj) returns a
+cached instance if available, and calls  Function get_reverse(int nadj) if
+no cached version is available.
+
+";
+
 %feature("docstring")  casadi::Function::conic_debug(const std::string
 &filename) const  "
 
@@ -8133,14 +8183,6 @@ Get the (integer) output argument of an atomic operation.
 const  "
 
 [INTERNAL]  Generate native code in the interfaced language for debugging
-
-";
-
-%feature("docstring")  casadi::Callback::has_reverse(int nadj) const  "
-
-Return function that calculates adjoint derivatives reverse(nadj) returns a
-cached instance if available, and calls  Function get_reverse(int nadj) if
-no cached version is available.
 
 ";
 
@@ -8421,15 +8463,9 @@ Get the number of function inputs.
 
 ";
 
-%feature("docstring")  casadi::Function::mapsum(const std::vector< MX >
-&arg, const std::string &parallelization="serial") const  "
-
-Evaluate symbolically in parallel and sum (matrix graph)
-
-Parameters:
------------
-
-parallelization:  Type of parallelization used: unroll|serial|openmp
+%feature("docstring")  casadi::Function::factory(const std::string &name,
+const std::vector< std::string > &s_in, const std::vector< std::string >
+&s_out, const AuxOut &aux=AuxOut(), const Dict &opts=Dict()) const  "
 
 ";
 
@@ -9252,9 +9288,9 @@ casadi::FunctionInternal::codegen_decref(CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")  casadi::SharedObjectInternal::getCount() const  "
+%feature("docstring")  casadi::FunctionInternal::uses_output() const  "
 
-[INTERNAL]  Get the reference count.
+[INTERNAL]  Do the derivative functions need nondifferentiated outputs?
 
 ";
 
@@ -9626,6 +9662,12 @@ bool persistent=false) "
 const override "
 
 [INTERNAL]  Free memory block.
+
+";
+
+%feature("docstring")  casadi::SharedObjectInternal::getCount() const  "
+
+[INTERNAL]  Get the reference count.
 
 ";
 
@@ -11884,6 +11926,12 @@ int oind, bool symmetric, int gr_i=1, int gr_o=1) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::uses_output() const  "
+
+[INTERNAL]  Do the derivative functions need nondifferentiated outputs?
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::simple(const double *arg,
 double *res) const  "
 
@@ -13815,6 +13863,12 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::uses_output() const  "
+
+[INTERNAL]  Do the derivative functions need nondifferentiated outputs?
+
+";
+
 %feature("docstring")  casadi::Dple::get_sparsity_out(int i) override "
 
 [INTERNAL]  Sparsities of function inputs and outputs.
@@ -14406,6 +14460,12 @@ std::string &iname) const  "
 %feature("docstring")  casadi::FunctionInternal::get_name_in(int i) "
 
 [INTERNAL]  Names of function input and outputs.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::uses_output() const  "
+
+[INTERNAL]  Do the derivative functions need nondifferentiated outputs?
 
 ";
 
@@ -16381,6 +16441,12 @@ std::string &name, std::ostream &stream) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::uses_output() const  "
+
+[INTERNAL]  Do the derivative functions need nondifferentiated outputs?
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::getJacSparsityGen(int iind,
 int oind, bool symmetric, int gr_i=1, int gr_o=1) const  "
 
@@ -16985,11 +17051,9 @@ hcat:  check if horizontal repetion of the function input is allowed
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::get_partition(int iind, int
-oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
-allow_forward, bool allow_reverse) const  "
+%feature("docstring")  casadi::FunctionInternal::getAlgorithmSize() const  "
 
-[INTERNAL]  Get the unidirectional or bidirectional partition.
+[INTERNAL]  Get the number of atomic operations.
 
 ";
 
@@ -17023,9 +17087,9 @@ int oind, bool symmetric) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAlgorithmSize() const  "
+%feature("docstring")  casadi::FunctionInternal::uses_output() const  "
 
-[INTERNAL]  Get the number of atomic operations.
+[INTERNAL]  Do the derivative functions need nondifferentiated outputs?
 
 ";
 
@@ -17975,6 +18039,14 @@ std::vector< MX > &arg) const  "
 %feature("docstring")  casadi::FunctionInternal::size1_in(int ind) const  "
 
 [INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_partition(int iind, int
+oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
+allow_forward, bool allow_reverse) const  "
+
+[INTERNAL]  Get the unidirectional or bidirectional partition.
 
 ";
 
@@ -19049,6 +19121,12 @@ Get the (integer) input arguments of an atomic operation.
 
 ";
 
+%feature("docstring")  casadi::Function::uses_output() const  "
+
+Do the derivative functions need nondifferentiated outputs?
+
+";
+
 %feature("docstring")  casadi::Function::conic_debug(const std::string
 &filename) const  "
 
@@ -19893,6 +19971,13 @@ Arc sine.
 %feature("docstring")  casadi::FunctionInternal::alloc_memory() const  "
 
 [INTERNAL]  Create memory block.
+
+";
+
+%feature("docstring")  casadi::GenericExternal::get_sparsity_out(int i)
+override "
+
+[INTERNAL]  Retreive sparsities.
 
 ";
 
@@ -20963,10 +21048,9 @@ double **arg, double **res, int *iw, double *w) const  "
 
 ";
 
-%feature("docstring")  casadi::GenericExternal::get_sparsity_out(int i)
-override "
+%feature("docstring")  casadi::FunctionInternal::uses_output() const  "
 
-[INTERNAL]  Retreive sparsities.
+[INTERNAL]  Do the derivative functions need nondifferentiated outputs?
 
 ";
 
@@ -23246,6 +23330,12 @@ problem)
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::uses_output() const  "
+
+[INTERNAL]  Do the derivative functions need nondifferentiated outputs?
+
+";
+
 %feature("docstring")  casadi::Integrator::sp_jac_rdae() "
 
 [INTERNAL]  Create sparsity pattern of the extended Jacobian (backward
@@ -24169,6 +24259,12 @@ std::string > &s_out, const Function::AuxOut &aux, const Dict &opts) const
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::clear_memory() "
+
+[INTERNAL]  Clear all memory (called from destructor)
+
+";
+
 %feature("docstring")  casadi::Rootfinder::get_reverse(int nadj, const
 std::string &name, const std::vector< std::string > &inames, const
 std::vector< std::string > &onames, const Dict &opts) const override "
@@ -24521,10 +24617,9 @@ elements.
 
 ";
 
-%feature("docstring")  casadi::Rootfinder::get_sparsity_out(int i) override
-"
+%feature("docstring")  casadi::Rootfinder::uses_output() const override "
 
-[INTERNAL]  Sparsities of function inputs and outputs.
+[INTERNAL]  Do the derivative functions need nondifferentiated outputs?
 
 ";
 
@@ -24662,9 +24757,10 @@ multiplying.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::clear_memory() "
+%feature("docstring")  casadi::Rootfinder::get_sparsity_out(int i) override
+"
 
-[INTERNAL]  Clear all memory (called from destructor)
+[INTERNAL]  Sparsities of function inputs and outputs.
 
 ";
 
@@ -26086,6 +26182,12 @@ override "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::uses_output() const  "
+
+[INTERNAL]  Do the derivative functions need nondifferentiated outputs?
+
+";
+
 %feature("docstring")  casadi::Integrator::get_options() const override "
 
 [INTERNAL]  Options.
@@ -26541,10 +26643,9 @@ generated function.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::symbolic_output(const
-std::vector< MX > &arg) const  "
+%feature("docstring")  casadi::FunctionInternal::uses_output() const  "
 
-[INTERNAL]  Get a vector of symbolic variables corresponding to the outputs.
+[INTERNAL]  Do the derivative functions need nondifferentiated outputs?
 
 ";
 
@@ -27509,9 +27610,19 @@ std::string &fname, const Dict &opts) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::has_derivative() const  "
+%feature("docstring")  casadi::FunctionInternal::symbolic_output(const
+std::vector< MX > &arg) const  "
 
-[INTERNAL]  Can derivatives be calculated in any way?
+[INTERNAL]  Get a vector of symbolic variables corresponding to the outputs.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::init(const Dict &opts) "
+
+[INTERNAL]  Initialize Initialize and make the object ready for setting
+arguments and evaluation. This method is typically called after setting
+options but before evaluating. If passed to another class (in the
+constructor), this class should invoke this function when initialized.
 
 ";
 
@@ -27553,12 +27664,9 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::init(const Dict &opts) "
+%feature("docstring")  casadi::FunctionInternal::has_derivative() const  "
 
-[INTERNAL]  Initialize Initialize and make the object ready for setting
-arguments and evaluation. This method is typically called after setting
-options but before evaluating. If passed to another class (in the
-constructor), this class should invoke this function when initialized.
+[INTERNAL]  Can derivatives be calculated in any way?
 
 ";
 
@@ -27918,10 +28026,10 @@ Is codegen supported?
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAdaptorSolverName()
-const  "
+%feature("docstring")  casadi::FunctionInternal::addShorthand(CodeGenerator
+&g, const std::string &name) const  "
 
-[INTERNAL]  Obtain solver name from Adaptor.
+[INTERNAL]  Generate shorthand macro.
 
 ";
 
@@ -27953,13 +28061,6 @@ std::vector< M > &res) const  "
 %feature("docstring")  casadi::FunctionInternal::has_spfwd() const  "
 
 [INTERNAL]  Is the class able to propagate seeds through the algorithm?
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::print(std::ostream &stream)
-const override "
-
-[INTERNAL]  Print.
 
 ";
 
@@ -28209,6 +28310,13 @@ const  "
 %feature("docstring")  casadi::FunctionInternal::size_out(int ind) const  "
 
 [INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::sp_weight() const  "
+
+[INTERNAL]  Weighting factor for chosing forward/reverse mode, sparsity
+propagation.
 
 ";
 
@@ -28646,10 +28754,10 @@ bool persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sp_weight() const  "
+%feature("docstring")  casadi::FunctionInternal::getAdaptorSolverName()
+const  "
 
-[INTERNAL]  Weighting factor for chosing forward/reverse mode, sparsity
-propagation.
+[INTERNAL]  Obtain solver name from Adaptor.
 
 ";
 
@@ -28796,10 +28904,10 @@ std::string &fname) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::addShorthand(CodeGenerator
-&g, const std::string &name) const  "
+%feature("docstring")  casadi::FunctionInternal::print(std::ostream &stream)
+const override "
 
-[INTERNAL]  Generate shorthand macro.
+[INTERNAL]  Print.
 
 ";
 
@@ -29043,6 +29151,13 @@ std::vector< std::vector< M > > &fseed) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::print_free(std::ostream
+&stream) const  "
+
+[INTERNAL]  Print free variables.
+
+";
+
 %feature("docstring")  casadi::Jit::init(const Dict &opts) override "
 
 Initialize.
@@ -29095,10 +29210,9 @@ get_forward(int nfwd) if no cached version is available.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_free(std::ostream
-&stream) const  "
+%feature("docstring")  casadi::FunctionInternal::uses_output() const  "
 
-[INTERNAL]  Print free variables.
+[INTERNAL]  Do the derivative functions need nondifferentiated outputs?
 
 ";
 
@@ -30221,10 +30335,9 @@ allow_forward, bool allow_reverse) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::codegen_name(const
-CodeGenerator &g) const  "
+%feature("docstring")  casadi::FunctionInternal::uses_output() const  "
 
-[INTERNAL]  Get name in codegen.
+[INTERNAL]  Do the derivative functions need nondifferentiated outputs?
 
 ";
 
@@ -30485,6 +30598,13 @@ Diagrams
 
 
 C++ includes: lapack_lu.hpp ";
+
+%feature("docstring")  casadi::FunctionInternal::codegen_name(const
+CodeGenerator &g) const  "
+
+[INTERNAL]  Get name in codegen.
+
+";
 
 %feature("docstring")  casadi::SharedObjectInternal::getCount() const  "
 
@@ -30975,6 +31095,12 @@ classes.
 const override "
 
 [INTERNAL]  Print.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::uses_output() const  "
+
+[INTERNAL]  Do the derivative functions need nondifferentiated outputs?
 
 ";
 
@@ -32778,6 +32904,12 @@ std::string &fname, const Dict &opts) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::uses_output() const  "
+
+[INTERNAL]  Do the derivative functions need nondifferentiated outputs?
+
+";
+
 %feature("docstring")  casadi::LinearInterpolant::plugin_name() const
 override "
 
@@ -33393,10 +33525,9 @@ SXElem **res, int *iw, SXElem *w, int mem) const  "
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::codegen_decref(CodeGenerator &g) const  "
+%feature("docstring")  casadi::FunctionInternal::uses_output() const  "
 
-[INTERNAL]  Codegen decref for dependencies.
+[INTERNAL]  Do the derivative functions need nondifferentiated outputs?
 
 ";
 
@@ -33794,10 +33925,10 @@ const override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_options(std::ostream
-&stream) const  "
+%feature("docstring")
+casadi::FunctionInternal::codegen_decref(CodeGenerator &g) const  "
 
-[INTERNAL]  Print list of options.
+[INTERNAL]  Codegen decref for dependencies.
 
 ";
 
@@ -34169,9 +34300,10 @@ get_forward(int nfwd) if no cached version is available.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sz_iw() const  "
+%feature("docstring")  casadi::FunctionInternal::print_options(std::ostream
+&stream) const  "
 
-[INTERNAL]  Get required length of iw field.
+[INTERNAL]  Print list of options.
 
 ";
 
@@ -34249,6 +34381,12 @@ std::vector< MX > &arg) const  "
 %feature("docstring")  casadi::FunctionInternal::size_in(int ind) const  "
 
 [INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::sz_iw() const  "
+
+[INTERNAL]  Get required length of iw field.
 
 ";
 
@@ -34871,6 +35009,12 @@ double **&arg, double **&res, int *&iw, double *&w) const  "
 %feature("docstring")  casadi::SharedObjectInternal::weak() "
 
 [INTERNAL]  Get a weak reference to the object.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::uses_output() const  "
+
+[INTERNAL]  Do the derivative functions need nondifferentiated outputs?
 
 ";
 
@@ -36236,6 +36380,12 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::clear_memory() "
+
+[INTERNAL]  Clear all memory (called from destructor)
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::n_in() const  "
 
 [INTERNAL]  Number of function inputs and outputs.
@@ -37140,10 +37290,9 @@ generated function.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::symbolic_output(const
-std::vector< MX > &arg) const  "
+%feature("docstring")  casadi::FunctionInternal::uses_output() const  "
 
-[INTERNAL]  Get a vector of symbolic variables corresponding to the outputs.
+[INTERNAL]  Do the derivative functions need nondifferentiated outputs?
 
 ";
 
@@ -37381,9 +37530,10 @@ casadi::FunctionInternal::codegen_incref(CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::clear_memory() "
+%feature("docstring")  casadi::FunctionInternal::symbolic_output(const
+std::vector< MX > &arg) const  "
 
-[INTERNAL]  Clear all memory (called from destructor)
+[INTERNAL]  Get a vector of symbolic variables corresponding to the outputs.
 
 ";
 
@@ -38068,6 +38218,12 @@ elements.
 %feature("docstring")  casadi::FunctionInternal::wrap() const  "
 
 [INTERNAL]  Wrap in an Function instance consisting of only one MX call.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::uses_output() const  "
+
+[INTERNAL]  Do the derivative functions need nondifferentiated outputs?
 
 ";
 
@@ -40982,6 +41138,11 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
+%feature("docstring")  casadi::OracleFunction::has_function(const
+std::string &fname) const override "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::FunctionInternal::reverse(int nadj) const  "
 
 [INTERNAL]  Return function that calculates adjoint derivatives
@@ -41714,10 +41875,11 @@ std::vector< std::string > &onames, const Dict &opts) const override "
 
 ";
 
-%feature("docstring")  casadi::OracleFunction::has_function(const
-std::string &fname) const override "
+%feature("docstring")  casadi::Rootfinder::uses_output() const override "
 
-[INTERNAL] ";
+[INTERNAL]  Do the derivative functions need nondifferentiated outputs?
+
+";
 
 %feature("docstring")  casadi::FunctionInternal::has_codegen() const  "
 
@@ -42437,10 +42599,9 @@ double **res, int *iw, double *w) const override "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::FunctionInternal::symbolic_output(const
-std::vector< MX > &arg) const  "
+%feature("docstring")  casadi::FunctionInternal::uses_output() const  "
 
-[INTERNAL]  Get a vector of symbolic variables corresponding to the outputs.
+[INTERNAL]  Do the derivative functions need nondifferentiated outputs?
 
 ";
 
@@ -42622,6 +42783,13 @@ structure recognition for symmetric Jacobians
 **arg, bvec_t **res, int *iw, bvec_t *w, int mem) const  "
 
 [INTERNAL]  Propagate sparsity forward.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::symbolic_output(const
+std::vector< MX > &arg) const  "
+
+[INTERNAL]  Get a vector of symbolic variables corresponding to the outputs.
 
 ";
 
@@ -44874,6 +45042,12 @@ size_t &sz_res, size_t &sz_iw, size_t &sz_w) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::uses_output() const  "
+
+[INTERNAL]  Do the derivative functions need nondifferentiated outputs?
+
+";
+
 %feature("docstring")  casadi::OracleFunction::jit_dependencies(const
 std::string &fname) override "
 
@@ -45712,6 +45886,12 @@ M > &res) const  "
 %feature("docstring")  casadi::Conic::default_in(int ind) const override "
 
 [INTERNAL]  Get default input value.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::uses_output() const  "
+
+[INTERNAL]  Do the derivative functions need nondifferentiated outputs?
 
 ";
 
@@ -47273,6 +47453,13 @@ int oind, bool symmetric, int gr_i=1, int gr_o=1) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::symbolicFwdSeed(int nfwd,
+const std::vector< MatType > &v) const  "
+
+[INTERNAL]  Symbolic expressions for the forward seeds.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::has_jacobian() const  "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
@@ -47734,10 +47921,9 @@ double **arg, double **res, int *iw, double *w) const override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::symbolicFwdSeed(int nfwd,
-const std::vector< MatType > &v) const  "
+%feature("docstring")  casadi::Rootfinder::uses_output() const override "
 
-[INTERNAL]  Symbolic expressions for the forward seeds.
+[INTERNAL]  Do the derivative functions need nondifferentiated outputs?
 
 ";
 
@@ -48935,6 +49121,12 @@ std::vector< MX > &arg) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::uses_output() const  "
+
+[INTERNAL]  Do the derivative functions need nondifferentiated outputs?
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::print_option(const
 std::string &name, std::ostream &stream) const  "
 
@@ -49569,6 +49761,12 @@ generated function.
 override "
 
 [INTERNAL]  Finalize initialization.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::uses_output() const  "
+
+[INTERNAL]  Do the derivative functions need nondifferentiated outputs?
 
 ";
 
@@ -51748,6 +51946,12 @@ std::vector< std::vector< M > > &fseed) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::uses_output() const  "
+
+[INTERNAL]  Do the derivative functions need nondifferentiated outputs?
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::eval_name() const  "
 
 [INTERNAL]  Get name of the evaluation function.
@@ -53513,6 +53717,12 @@ elements.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::uses_output() const  "
+
+[INTERNAL]  Do the derivative functions need nondifferentiated outputs?
+
+";
+
 %feature("docstring")
 casadi::FunctionInternal::getJacSparsityHierarchicalSymm(int iind, int oind)
 const  "
@@ -54075,6 +54285,12 @@ std::vector< M > &res) const  "
 &g) const  "
 
 [INTERNAL]  Generate code for the function body.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::uses_output() const  "
+
+[INTERNAL]  Do the derivative functions need nondifferentiated outputs?
 
 ";
 
@@ -57399,6 +57615,12 @@ std::string &name, std::ostream &stream) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::uses_output() const  "
+
+[INTERNAL]  Do the derivative functions need nondifferentiated outputs?
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::simplifiedCall() const  "
 
 [INTERNAL]  Use simplified signature.
@@ -58240,6 +58462,15 @@ size_t &sz_res, size_t &sz_iw, size_t &sz_w) const  "
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::getJacSparsityHierarchical(int iind, int oind)
+const  "
+
+[INTERNAL]  A flavor of getJacSparsity that does hierarchical block
+structure recognition.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::name() const  "
 
 [INTERNAL]  Name of the function.
@@ -58751,19 +58982,16 @@ override "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::uses_output() const  "
+
+[INTERNAL]  Do the derivative functions need nondifferentiated outputs?
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::repr(std::ostream &stream)
 const override "
 
 [INTERNAL]  Print.
-
-";
-
-%feature("docstring")
-casadi::FunctionInternal::getJacSparsityHierarchical(int iind, int oind)
-const  "
-
-[INTERNAL]  A flavor of getJacSparsity that does hierarchical block
-structure recognition.
 
 ";
 
@@ -59479,6 +59707,12 @@ casadi::FunctionInternal::print_dimensions(std::ostream &stream) const  "
 "
 
 [INTERNAL]  Construct Prepares the function for evaluation.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::uses_output() const  "
+
+[INTERNAL]  Do the derivative functions need nondifferentiated outputs?
 
 ";
 
@@ -62692,31 +62926,6 @@ N:  Number of integrator steps
 order:  Order of interpolating polynomials
 
 scheme:   Collocation scheme, as excepted by collocationPoints function.
-
-";
-
-%feature("docstring")  casadi::ptrVec(std::vector< T > &v) "
-
-[INTERNAL]  Convenience function, convert vectors to vectors of pointers.
-
-";
-
-%feature("docstring")  casadi::ptrVec(const std::vector< T > &v) "
-
-[INTERNAL]  Convenience function, convert vectors to vectors of pointers.
-
-";
-
-%feature("docstring")  casadi::ptrVec(std::vector< std::vector< T > > &v) "
-
-[INTERNAL]  Convenience function, convert vectors to vectors of pointers.
-
-";
-
-%feature("docstring")  casadi::ptrVec(const std::vector< std::vector< T > >
-&v) "
-
-[INTERNAL]  Convenience function, convert vectors to vectors of pointers.
 
 ";
 
