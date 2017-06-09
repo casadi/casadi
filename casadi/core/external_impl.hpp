@@ -133,7 +133,7 @@ namespace casadi {
     ///@{
     /** \brief Full Jacobian */
     bool has_jacobian() const override;
-    Function get_jacobian(const std::string& name,
+    Function get_jacobian2(const std::string& name,
                                      const std::vector<std::string>& inames,
                                      const std::vector<std::string>& onames,
                                      const Dict& opts) const override;

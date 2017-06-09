@@ -111,16 +111,16 @@ namespace casadi {
     return !jac_body_.empty();
   }
 
-  Function Jit::get_jacobian(const std::string& name,
+  Function Jit::get_jacobian2(const std::string& name,
                                 const std::vector<std::string>& inames,
                                 const std::vector<std::string>& onames,
                                 const Dict& opts) const {
     // Create a JIT-function for the Jacobian
     Dict jit_opts;
     if (!hess_body_.empty()) jit_opts["jac"] = hess_body_;
-    Function fcn = jit(name + "_jit", n_in_, n_in_*n_out_, jac_body_, jit_opts);
+    Function fcn = jit(name + "_jit", n_in_ + n_out_, n_in_*n_out_, jac_body_, jit_opts);
 
-    // Wrap in an MX function
+    // Wrap in an MX function FIXME(@jaeandersson)
     std::vector<MX> arg = fcn.mx_in();
     std::vector<MX> res = fcn(arg);
     MX J = reshape(vertcat(res), n_in_, n_out_);

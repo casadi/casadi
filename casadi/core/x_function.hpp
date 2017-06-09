@@ -119,7 +119,7 @@ namespace casadi {
     ///@{
     /** \brief Return Jacobian of all input elements with respect to all output elements */
     bool has_jacobian() const override { return true;}
-    Function get_jacobian(const std::string& name,
+    Function get_jacobian2(const std::string& name,
                           const std::vector<std::string>& inames,
                           const std::vector<std::string>& onames,
                           const Dict& opts) const override;
@@ -729,28 +729,26 @@ namespace casadi {
     casadi_assert(fsens.size()==fseed.size());
 
     // Number inputs and outputs
-    int num_in = n_in();
-    int num_out = n_out();
+    int n_in = this->n_in();
+    int n_out = this->n_out();
 
     // All inputs of the return function
-    std::vector<MatType> ret_in;
-    ret_in.reserve(num_in + num_out + num_in);
-    ret_in.insert(ret_in.end(), in_.begin(), in_.end());
-    for (int i=0; i<num_out; ++i) {
-      ret_in.push_back(MatType::sym(inames[num_in+i], Sparsity(out_.at(i).size())));
+    std::vector<MatType> ret_in(inames.size());
+    copy(in_.begin(), in_.end(), ret_in.begin());
+    for (int i=0; i<n_out; ++i) {
+      ret_in.at(n_in+i) = MatType::sym(inames[n_in+i], Sparsity(out_.at(i).size()));
     }
     std::vector<MatType> v(nfwd);
-    for (int i=0; i<num_in; ++i) {
+    for (int i=0; i<n_in; ++i) {
       for (int d=0; d<nfwd; ++d) v[d] = fseed[d][i];
-      ret_in.push_back(horzcat(v));
+      ret_in.at(n_in + n_out + i) = horzcat(v);
     }
 
     // All outputs of the return function
-    std::vector<MatType> ret_out;
-    ret_out.reserve(num_out);
-    for (int i=0; i<num_out; ++i) {
+    std::vector<MatType> ret_out(onames.size());
+    for (int i=0; i<n_out; ++i) {
       for (int d=0; d<nfwd; ++d) v[d] = fsens[d][i];
-      ret_out.push_back(horzcat(v));
+      ret_out.at(i) = horzcat(v);
     }
 
     // Assemble function and return
@@ -770,28 +768,26 @@ namespace casadi {
     static_cast<const DerivedType*>(this)->ad_reverse(aseed, asens);
 
     // Number inputs and outputs
-    int num_in = n_in();
-    int num_out = n_out();
+    int n_in = this->n_in();
+    int n_out = this->n_out();
 
     // All inputs of the return function
-    std::vector<MatType> ret_in;
-    ret_in.reserve(num_in + num_out + num_out);
-    ret_in.insert(ret_in.end(), in_.begin(), in_.end());
-    for (int i=0; i<num_out; ++i) {
-      ret_in.push_back(MatType::sym(inames[num_in+i], Sparsity(out_.at(i).size())));
+    std::vector<MatType> ret_in(inames.size());
+    copy(in_.begin(), in_.end(), ret_in.begin());
+    for (int i=0; i<n_out; ++i) {
+      ret_in.at(n_in + i) = MatType::sym(inames[n_in+i], Sparsity(out_.at(i).size()));
     }
     std::vector<MatType> v(nadj);
-    for (int i=0; i<num_out; ++i) {
+    for (int i=0; i<n_out; ++i) {
       for (int d=0; d<nadj; ++d) v[d] = aseed[d][i];
-      ret_in.push_back(horzcat(v));
+      ret_in.at(n_in + n_out + i)  = horzcat(v);
     }
 
     // All outputs of the return function
-    std::vector<MatType> ret_out;
-    ret_out.reserve(num_in);
-    for (int i=0; i<num_in; ++i) {
+    std::vector<MatType> ret_out(onames.size());
+    for (int i=0; i<n_in; ++i) {
       for (int d=0; d<nadj; ++d) v[d] = asens[d][i];
-      ret_out.push_back(horzcat(v));
+      ret_out.at(i) = horzcat(v);
     }
 
     // Assemble function and return
@@ -800,19 +796,30 @@ namespace casadi {
 
   template<typename DerivedType, typename MatType, typename NodeType>
   Function XFunction<DerivedType, MatType, NodeType>
-  ::get_jacobian(const std::string& name,
+  ::get_jacobian2(const std::string& name,
                  const std::vector<std::string>& inames,
                  const std::vector<std::string>& onames,
                  const Dict& opts) const {
-    // Temporary single-input, single-output function
+    // Temporary single-input, single-output function FIXME(@jaeandersson)
     Function tmp("tmp", {veccat(in_)}, {veccat(out_)},
                  {{"ad_weight", ad_weight()}, {"ad_weight_sp", sp_weight()}});
 
     // Jacobian expression
-    MatType J = dynamic_cast<const DerivedType&>(*tmp.get()).jac(0, 0, Dict());
+    MatType J = tmp.get<DerivedType>()->jac(0, 0, Dict());
 
-    // Form an expression for the full Jacobian
-    return Function(name, in_, {J}, inames, onames, opts);
+    // Number inputs and outputs
+    int n_in = this->n_in();
+    int n_out = this->n_out();
+
+    // All inputs of the return function
+    std::vector<MatType> ret_in(inames.size());
+    copy(in_.begin(), in_.end(), ret_in.begin());
+    for (int i=0; i<n_out; ++i) {
+      ret_in.at(n_in+i) = MatType::sym(inames[n_in+i], Sparsity(out_.at(i).size()));
+    }
+
+    // Assemble function and return
+    return Function(name, ret_in, {J}, inames, onames, opts);
   }
 
 

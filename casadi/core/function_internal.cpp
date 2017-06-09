@@ -1474,13 +1474,13 @@ namespace casadi {
     res = Call::create(self(), arg);
   }
 
-  Function FunctionInternal::jacobian() const {
+  Function FunctionInternal::jacobian2() const {
     // Used wrapped function if jacobian not available
     if (!has_jacobian()) {
       // Derivative information must be available
       casadi_assert_message(has_derivative(),
                             "Derivatives cannot be calculated for " + name_);
-      return wrap().jacobian();
+      return wrap().jacobian2();
     }
 
     // Quick return if cached
@@ -1498,7 +1498,7 @@ namespace casadi {
     // Names of inputs
     std::vector<std::string> inames;
     for (int i=0; i<n_in; ++i) inames.push_back(name_in(i));
-    //for (int i=0; i<n_out; ++i) inames.push_back("out_" + name_out(i));
+    for (int i=0; i<n_out; ++i) inames.push_back("out_" + name_out(i));
 
     // Names of outputs
     std::vector<std::string> onames = {"jac"};
@@ -1508,10 +1508,10 @@ namespace casadi {
     opts["derivative_of"] = self();
 
     // Generate derivative function
-    Function ret = get_jacobian(name, inames, onames, opts);
+    Function ret = get_jacobian2(name, inames, onames, opts);
 
     // Consistency check
-    casadi_assert(ret.n_in()==n_in);
+    casadi_assert(ret.n_in()==n_in + n_out);
     casadi_assert(ret.n_out()==1);
 
     // Cache it for reuse and return
@@ -1520,7 +1520,7 @@ namespace casadi {
   }
 
   Function FunctionInternal::
-  get_jacobian(const std::string& name,
+  get_jacobian2(const std::string& name,
                   const std::vector<std::string>& inames,
                   const std::vector<std::string>& onames,
                   const Dict& opts) const {
@@ -2082,7 +2082,9 @@ namespace casadi {
       }
 
       // Multiply the Jacobian from the right
-      MX J = jacobian()(arg).at(0);
+      vector<MX> darg = arg;
+      darg.insert(darg.end(), res.begin(), res.end());
+      MX J = jacobian2()(darg).at(0);
       v = horzsplit(mtimes(J, horzcat(v)));
 
       // Vertical offsets
@@ -2185,7 +2187,9 @@ namespace casadi {
       }
 
       // Multiply the transposed Jacobian from the right
-      MX J = jacobian()(arg).at(0);
+      vector<MX> darg = arg;
+      darg.insert(darg.end(), res.begin(), res.end());
+      MX J = jacobian2()(darg).at(0);
       v = horzsplit(mtimes(J.T(), horzcat(v)));
 
       // Vertical offsets
@@ -2523,7 +2527,7 @@ namespace casadi {
     if (!derivative_of_.is_null()) {
       string n = derivative_of_.name();
       if (name_ == "jac_" + n) {
-        return derivative_of_.n_in();
+        return derivative_of_.n_in() + derivative_of_.n_out();
       }
     }
     // One by default
@@ -2545,8 +2549,13 @@ namespace casadi {
     if (!derivative_of_.is_null()) {
       string n = derivative_of_.name();
       if (name_ == "jac_" + n) {
-        // Same as nondifferentiated function
-        return derivative_of_.sparsity_in(i);
+        if (i < derivative_of_.n_in()) {
+          // Same as nondifferentiated function
+          return derivative_of_.sparsity_in(i);
+        } else {
+          // Dummy output
+          return Sparsity(derivative_of_.size_out(i-derivative_of_.n_in()));
+        }
       }
     }
     // Scalar by default

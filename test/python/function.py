@@ -1089,10 +1089,11 @@ class Functiontests(casadiTestCase):
 
         def has_jacobian(self): return True
 
-        def get_jacobian(self, name, inames, onames, opts):
+        def get_jacobian2(self, name, inames, onames, opts):
           x = SX.sym("x")
           y = SX.sym("y")
-          J = Function(name, [x,y],[horzcat(cos(x+3*y),3*cos(x+3*y))], inames, onames, opts)
+          out_g = SX.sym('out_g', Sparsity(1,1))
+          J = Function(name, [x,y,out_g],[horzcat(cos(x+3*y),3*cos(x+3*y))], inames, onames, opts)
           return J
 
     f = Fun()

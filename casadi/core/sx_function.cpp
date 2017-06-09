@@ -818,12 +818,26 @@ namespace casadi {
     }
   }
 
-  Function SXFunction::get_jacobian(const std::string& name,
+  Function SXFunction::get_jacobian2(const std::string& name,
                                        const std::vector<std::string>& inames,
                                        const std::vector<std::string>& onames,
                                        const Dict& opts) const {
+    // Jacobian expression
     SX J = SX::jacobian(veccat(out_), veccat(in_));
-    return Function(name, in_, {J}, inames, onames, opts);
+
+    // Number inputs and outputs
+    int n_in = this->n_in();
+    int n_out = this->n_out();
+
+    // All inputs of the return function
+    std::vector<SX> ret_in(inames.size());
+    copy(in_.begin(), in_.end(), ret_in.begin());
+    for (int i=0; i<n_out; ++i) {
+      ret_in.at(n_in+i) = SX::sym(inames[n_in+i], Sparsity(out_.at(i).size()));
+    }
+
+    // Assemble function and return
+    return Function(name, ret_in, {J}, inames, onames, opts);
   }
 
 
