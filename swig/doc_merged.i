@@ -39610,6 +39610,12 @@ Get the dimension as a string.
 
 ";
 
+%feature("docstring") casadi::Sparsity::is_reshape "
+
+Check if the sparsity is a reshape of another.
+
+";
+
 %feature("docstring") casadi::Sparsity::add_nz "
 
 Get the index of a non-zero element Add the element if it does not exist and
@@ -39793,12 +39799,6 @@ Union of two sparsity patterns.
 
 ";
 
-%feature("docstring") casadi::Sparsity::get_ccs "
-
-Get the sparsity in compressed column storage (CCS) format.
-
-";
-
 %feature("docstring") casadi::Sparsity::is_transpose "
 
 Check if the sparsity is the transpose of another.
@@ -39823,9 +39823,9 @@ Append another sparsity patten horizontally.
 
 ";
 
-%feature("docstring") casadi::Sparsity::isReshape "
+%feature("docstring") casadi::Sparsity::get_ccs "
 
-Check if the sparsity is a reshape of another.
+Get the sparsity in compressed column storage (CCS) format.
 
 ";
 

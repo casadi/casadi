@@ -55238,6 +55238,13 @@ Get the dimension as a string.
 
 ";
 
+%feature("docstring")  casadi::Sparsity::is_reshape(const Sparsity &y) const
+"
+
+Check if the sparsity is a reshape of another.
+
+";
+
 %feature("docstring")  casadi::Sparsity::add_nz(int rr, int cc) "
 
 Get the index of a non-zero element Add the element if it does not exist and
@@ -55436,13 +55443,6 @@ Union of two sparsity patterns.
 
 ";
 
-%feature("docstring")  casadi::Sparsity::get_ccs(std::vector< int >
-&output_colind, std::vector< int > &output_row) const  "
-
-Get the sparsity in compressed column storage (CCS) format.
-
-";
-
 %feature("docstring")  casadi::Sparsity::is_transpose(const Sparsity &y)
 const  "
 
@@ -55469,10 +55469,10 @@ Append another sparsity patten horizontally.
 
 ";
 
-%feature("docstring")  casadi::Sparsity::isReshape(const Sparsity &y) const
-"
+%feature("docstring")  casadi::Sparsity::get_ccs(std::vector< int >
+&output_colind, std::vector< int > &output_row) const  "
 
-Check if the sparsity is a reshape of another.
+Get the sparsity in compressed column storage (CCS) format.
 
 ";
 
