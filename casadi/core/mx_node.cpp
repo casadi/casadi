@@ -453,15 +453,9 @@ namespace casadi {
     for (auto i=nz.begin(); i!=nz.end() && !set_any; ++i) {
       set_any = *i >= 0;
     }
+    if (!set_any) return y;
 
-    // Quick return
-    if (!set_any) {
-      return y;
-    }
-
-    // Check if slice
-    MX ret = SetNonzeros<false>::create(y, shared_from_this<MX>(), nz);
-    return simplify(ret);
+    return SetNonzeros<false>::create(y, shared_from_this<MX>(), nz);
   }
 
 
@@ -469,8 +463,7 @@ namespace casadi {
     if (nz.size()==0 || is_zero()) {
       return y;
     } else {
-      MX ret = SetNonzeros<true>::create(y, shared_from_this<MX>(), nz);
-      return simplify(ret);
+      return SetNonzeros<true>::create(y, shared_from_this<MX>(), nz);
     }
   }
 

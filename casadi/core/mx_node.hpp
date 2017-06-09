@@ -261,9 +261,6 @@ namespace casadi {
     /// Can the operation be performed inplace (i.e. overwrite the result)
     virtual int n_inplace() const { return 0;}
 
-    /// Simplify the expression (ex is a reference to the node)
-    virtual void simplifyMe(MX& ex) {}
-
     /// Get an IM representation of a GetNonzeros or SetNonzeros node
     virtual Matrix<int> mapping() const;
 

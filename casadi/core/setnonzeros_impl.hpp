@@ -47,6 +47,14 @@ namespace casadi {
 
   template<bool Add>
   MX SetNonzeros<Add>::create(const MX& y, const MX& x, const Slice& s) {
+    // Simplify if assignment
+    if (y.sparsity()==x.sparsity() && s.start==0 && s.step==1 && s.stop==x.nnz()) {
+      if (Add) {
+        return y + x;
+      } else {
+        return x;
+      }
+    }
     return MX::create(new SetNonzerosSlice<Add>(y, x, s));
   }
 
@@ -744,21 +752,6 @@ namespace casadi {
   }
 
   template<bool Add>
-  bool SetNonzerosSlice<Add>::isAssignment() const {
-    // Check sparsity
-    if (!(this->sparsity() == this->dep(1).sparsity()))
-      return false;
-
-    // Check if the nonzeros follow in increasing order
-    if (s_.start != 0) return false;
-    if (s_.step != 1) return false;
-    if (s_.stop != this->nnz()) return false;
-
-    // True if reached this point
-    return true;
-  }
-
-  template<bool Add>
   void SetNonzerosVector<Add>::
   generate(CodeGenerator& g, const std::string& mem,
            const std::vector<int>& arg, const std::vector<int>& res) const {
@@ -822,18 +815,6 @@ namespace casadi {
       << " for (tt=rr+" << inner_.start << "; tt!=rr+" << inner_.stop
       << "; tt+=" << inner_.step << ")"
       << " *tt " << (Add?"+=":"=") << " *ss++;\n";
-  }
-
-  template<bool Add>
-  void SetNonzerosSlice<Add>::simplifyMe(MX& ex) {
-    // Simplify if addition
-    if (isAssignment()) {
-      if (Add) {
-        ex = this->dep(0) + this->dep(1);
-      } else {
-        ex = this->dep(1);
-      }
-    }
   }
 
 } // namespace casadi
