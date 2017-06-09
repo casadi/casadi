@@ -30,4 +30,4 @@ A = rand(5);
 
 foo = Convolution(A, false);
 foo.forward(1);
-foo.jacobian();
+foo.jacobian2();
