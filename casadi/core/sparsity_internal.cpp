@@ -3691,7 +3691,7 @@ namespace casadi {
     return true;
   }
 
-  bool SparsityInternal::isReshape(const SparsityInternal& y) const {
+  bool SparsityInternal::is_reshape(const SparsityInternal& y) const {
     // Quick return if the objects are the same
     if (this==&y) return true;
 

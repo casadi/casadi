@@ -383,7 +383,7 @@ namespace casadi {
     bool is_transpose(const Sparsity& y) const;
 
     /// Check if the sparsity is a reshape of another
-    bool isReshape(const Sparsity& y) const;
+    bool is_reshape(const Sparsity& y) const;
 
     /// @{
     /** \brief Combine two sparsity patterns

@@ -380,7 +380,7 @@ namespace casadi {
   }
 
   MX MXNode::get_reshape(const Sparsity& sp) const {
-    casadi_assert(sp.isReshape(sparsity()));
+    casadi_assert(sp.is_reshape(sparsity()));
     if (sp==sparsity()) {
       return shared_from_this<MX>();
     } else {

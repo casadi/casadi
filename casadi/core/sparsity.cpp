@@ -248,7 +248,7 @@ namespace casadi {
   }
 
   Sparsity Sparsity::reshape(const Sparsity& x, const Sparsity& sp) {
-    casadi_assert(x.isReshape(sp));
+    casadi_assert(x.is_reshape(sp));
     return sp;
   }
 
@@ -641,8 +641,8 @@ namespace casadi {
     return (*this)->is_transpose(*y);
   }
 
-  bool Sparsity::isReshape(const Sparsity& y) const {
-    return (*this)->isReshape(*y);
+  bool Sparsity::is_reshape(const Sparsity& y) const {
+    return (*this)->is_reshape(*y);
   }
 
   std::size_t Sparsity::hash() const {

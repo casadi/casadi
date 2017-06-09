@@ -1649,7 +1649,7 @@ namespace casadi {
     if (sp==x.sparsity()) return x;
 
     // make sure that the patterns match
-    casadi_assert(sp.isReshape(x.sparsity()));
+    casadi_assert(sp.is_reshape(x.sparsity()));
 
     return Matrix<Scalar>(sp, x.nonzeros(), false);
   }

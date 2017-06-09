@@ -67,7 +67,7 @@ namespace casadi {
   }
 
   MX::MX(const Sparsity& sp, const MX& val) {
-    if (sp.isReshape(val.sparsity())) {
+    if (sp.is_reshape(val.sparsity())) {
       *this = reshape(val, sp);
     } else if (val.is_scalar()) {
       // Dense matrix if val dense
