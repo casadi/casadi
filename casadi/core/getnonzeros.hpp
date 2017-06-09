@@ -132,9 +132,6 @@ namespace casadi {
     /// Get all the nonzeros
     std::vector<int> all() const override { return s_.all(s_.stop);}
 
-    /// Check if the instance is in fact an identity mapping (that can be simplified)
-    bool is_identity() const override;
-
     /** \brief  Propagate sparsity forward */
     void sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
 

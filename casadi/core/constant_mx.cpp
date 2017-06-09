@@ -137,8 +137,8 @@ namespace casadi {
     return x_.is_minus_one();
   }
 
-  bool ConstantDM::is_identity() const {
-    return x_.is_identity();
+  bool ConstantDM::is_eye() const {
+    return x_.is_eye();
   }
 
   // MX ConstantMX::get_mac(const MX& y) const {

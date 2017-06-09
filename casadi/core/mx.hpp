@@ -241,7 +241,7 @@ namespace casadi {
   /// \endcond
 
     /** \brief  check if identity */
-    bool is_identity() const;
+    bool is_eye() const;
 
     /** \brief  check if zero (note that false negative answers are possible) */
     bool is_zero() const;

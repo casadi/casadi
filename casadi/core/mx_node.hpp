@@ -68,7 +68,7 @@ namespace casadi {
     virtual bool is_value(double val) const { return false;}
 
     /** \brief Check if identity matrix */
-    virtual bool is_identity() const { return false;}
+    virtual bool is_eye() const { return false;}
 
     /** \brief Check if unary operation */
     virtual bool is_unary() const { return false;}

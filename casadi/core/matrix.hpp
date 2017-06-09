@@ -897,7 +897,7 @@ namespace casadi {
 
     /** \brief  check if the matrix is an identity matrix (note that false negative answers
      * are possible)*/
-    bool is_identity() const;
+    bool is_eye() const;
 
     /** \brief  Check if the matrix has any zero entries which are not structural zeros */
     bool has_zeros() const;

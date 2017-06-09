@@ -605,9 +605,9 @@ namespace casadi {
                           << x.dim() << " and rhs is " << y.dim() << ".");
 
     // Check if we can simplify the product
-    if (x.is_identity()) {
+    if (x.is_eye()) {
       return y + z;
-    } else if (y.is_identity()) {
+    } else if (y.is_eye()) {
       return x + z;
     } else if (x.is_zero() || y.is_zero()) {
       return z;
@@ -839,8 +839,8 @@ namespace casadi {
     (*this)->reset_input();
   }
 
-  bool MX::is_identity() const {
-    return (*this)->is_identity();
+  bool MX::is_eye() const {
+    return (*this)->is_eye();
   }
 
   bool MX::is_zero() const {

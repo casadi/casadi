@@ -1045,9 +1045,9 @@ namespace casadi {
                           << mtimes(x, y).dim() << " and rhs is " << z.dim() << ".");
 
     // Check if we can simplify the product
-    if (x.is_identity()) {
+    if (x.is_eye()) {
       return y + z;
-    } else if (y.is_identity()) {
+    } else if (y.is_eye()) {
       return x + z;
     } else if (x.is_zero() || y.is_zero()) {
       return z;
@@ -1414,7 +1414,7 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  bool Matrix<Scalar>::is_identity() const {
+  bool Matrix<Scalar>::is_eye() const {
 
     // Make sure that the matrix is diagonal
     if (!sparsity().is_diag()) return false;

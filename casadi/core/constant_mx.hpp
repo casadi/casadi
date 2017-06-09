@@ -157,7 +157,7 @@ namespace casadi {
     bool is_zero() const override;
     bool is_one() const override;
     bool is_minus_one() const override;
-    bool is_identity() const override;
+    bool is_eye() const override;
 
     /// Get the value (only for scalar constant nodes)
     double to_double() const override {return x_.scalar();}
@@ -286,7 +286,7 @@ namespace casadi {
     /** \brief  Check if a particular integer value */
     bool is_zero() const override { return v_.value==0;}
     bool is_one() const override { return v_.value==1;}
-    bool is_identity() const override { return v_.value==1 && sparsity().is_diag();}
+    bool is_eye() const override { return v_.value==1 && sparsity().is_diag();}
     bool is_value(double val) const override { return v_.value==val;}
 
     /// Get the value (only for scalar constant nodes)

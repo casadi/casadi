@@ -443,20 +443,6 @@ namespace casadi {
     return Matrix<int>(sparsity(), nz, false);
   }
 
-  bool GetNonzerosSlice::is_identity() const {
-    // Check sparsity
-    if (!(sparsity() == dep().sparsity()))
-      return false;
-
-    // Check if the nonzeros follow in increasing order
-    if (s_.start != 0) return false;
-    if (s_.step != 1) return false;
-    if (s_.stop != nnz()) return false;
-
-    // True if reached this point
-    return true;
-  }
-
   void GetNonzerosVector::generate(CodeGenerator& g, const std::string& mem,
                                    const std::vector<int>& arg, const std::vector<int>& res) const {
     // Codegen the indices
