@@ -1331,11 +1331,11 @@ namespace casadi {
     for (int i=0; i<n_out; ++i) onames.push_back("fwd_" + name_out(i));
 
     // Options
-    Dict opts;;
+    Dict opts;
     opts["max_num_dir"] = max_num_dir_;
     opts["derivative_of"] = self();
 
-    // Return value
+    // Generate derivative function
     casadi_assert(has_forward(1)); //FIXME(@jaeandersson)
     Function ret = get_forward(nfwd, name, inames, onames, opts);
 
@@ -1400,7 +1400,7 @@ namespace casadi {
     opts["max_num_dir"] = max_num_dir_;
     opts["derivative_of"] = self();
 
-    // Return value
+    // Generate derivative function
     casadi_assert(has_reverse(1)); // FIXME(@jaeandersson)
     Function ret = get_reverse(nadj, name, inames, onames, opts);
 
@@ -1488,13 +1488,30 @@ namespace casadi {
       return shared_cast<Function>(jacobian_.shared());
     }
 
-    // Generate Jacobian
+    // Get the number of inputs and outputs
+    int n_in = this->n_in();
+    int n_out = this->n_out();
+
+    // Give it a suitable name
+    string name = "jac_" + name_;
+
+    // Names of inputs
+    std::vector<std::string> inames;
+    for (int i=0; i<n_in; ++i) inames.push_back(name_in(i));
+    //for (int i=0; i<n_out; ++i) inames.push_back("out_" + name_out(i));
+
+    // Names of outputs
+    std::vector<std::string> onames = {"jac"};
+
+    // Options
     Dict opts;
     opts["derivative_of"] = self();
-    Function ret = get_jacobian(name_ + "_jac", ischeme_, {"jac"}, opts);
+
+    // Generate derivative function
+    Function ret = get_jacobian(name, inames, onames, opts);
 
     // Consistency check
-    casadi_assert(ret.n_in()==n_in());
+    casadi_assert(ret.n_in()==n_in);
     casadi_assert(ret.n_out()==1);
 
     // Cache it for reuse and return
@@ -2505,7 +2522,7 @@ namespace casadi {
   size_t FunctionInternal::get_n_in() {
     if (!derivative_of_.is_null()) {
       string n = derivative_of_.name();
-      if (name_ == n + "_jac") {
+      if (name_ == "jac_" + n) {
         return derivative_of_.n_in();
       }
     }
@@ -2516,7 +2533,7 @@ namespace casadi {
   size_t FunctionInternal::get_n_out() {
     if (!derivative_of_.is_null()) {
       string n = derivative_of_.name();
-      if (name_ == n + "_jac") {
+      if (name_ == "jac_" + n) {
         return 1;
       }
     }
@@ -2527,7 +2544,7 @@ namespace casadi {
   Sparsity FunctionInternal::get_sparsity_in(int i) {
     if (!derivative_of_.is_null()) {
       string n = derivative_of_.name();
-      if (name_ == n + "_jac") {
+      if (name_ == "jac_" + n) {
         // Same as nondifferentiated function
         return derivative_of_.sparsity_in(i);
       }
@@ -2539,7 +2556,7 @@ namespace casadi {
   Sparsity FunctionInternal::get_sparsity_out(int i) {
     if (!derivative_of_.is_null()) {
       string n = derivative_of_.name();
-      if (name_ == n + "_jac") {
+      if (name_ == "jac_" + n) {
         // Dense Jacobian by default
         return Sparsity::dense(derivative_of_.nnz_out(), derivative_of_.nnz_in());
       }

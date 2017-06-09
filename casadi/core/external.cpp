@@ -257,7 +257,7 @@ namespace casadi {
 
   bool External::has_jacobian() const {
     if (FunctionInternal::has_jacobian()) return true;
-    return li_.has_function(name_ + "_jac");
+    return li_.has_function("jac_" + name_);
   }
 
   Function External

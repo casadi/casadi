@@ -894,7 +894,7 @@ class Functiontests(casadiTestCase):
 
     X = MX.sym("x",2)
 
-    J = Function("F",[X],[jacobian(F(X),X)])
+    J = Function("J",[X],[jacobian(F(X),X)])
 
     jx0 = (12+11)/3.0
     jx1 = (-42-31)/3.0
