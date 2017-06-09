@@ -1,3 +1,3 @@
-%exception  casadi::Function::fullJacobian2() const  {
+%exception  casadi::Function::fullJacobian() const  {
  CATCH_OR_NOT(DEPRECATED_MSG("") $action)
 }

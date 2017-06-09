@@ -1,7 +1,7 @@
 %exception  casadi::BSplineInterpolant::generateBody(CodeGenerator &g) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::BSplineInterpolant::get_jacobian2(const std::string &name, const std::vector< std::string > &inames, const std::vector< std::string > &onames, const Dict &opts) const override {
+%exception  casadi::BSplineInterpolant::get_jacobian(const std::string &name, const std::vector< std::string > &inames, const std::vector< std::string > &onames, const Dict &opts) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::BSplineInterpolant::get_options() const override {
@@ -205,7 +205,7 @@
 %exception  casadi::External::get_forward(int nfwd, const std::string &name, const std::vector< std::string > &inames, const std::vector< std::string > &onames, const Dict &opts) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::External::get_jacobian2(const std::string &name, const std::vector< std::string > &inames, const std::vector< std::string > &onames, const Dict &opts) const override {
+%exception  casadi::External::get_jacobian(const std::string &name, const std::vector< std::string > &inames, const std::vector< std::string > &onames, const Dict &opts) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::External::get_n_in() override {
@@ -472,6 +472,9 @@
 %exception  casadi::FunctionInternal::getWorkSize() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::FunctionInternal::get_fd(int nfwd, const std::string &name, const std::vector< std::string > &inames, const std::vector< std::string > &onames, const Dict &opts) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::FunctionInternal::get_forward(int nfwd, const std::string &name, const std::vector< std::string > &inames, const std::vector< std::string > &onames, const Dict &opts) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -481,7 +484,7 @@
 %exception  casadi::FunctionInternal::get_function(const std::string &name) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::FunctionInternal::get_jacobian2(const std::string &name, const std::vector< std::string > &inames, const std::vector< std::string > &onames, const Dict &opts) const  {
+%exception  casadi::FunctionInternal::get_jacobian(const std::string &name, const std::vector< std::string > &inames, const std::vector< std::string > &onames, const Dict &opts) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::get_n_in() {
@@ -550,7 +553,7 @@
 %exception  casadi::FunctionInternal::is_a(const std::string &type, bool recursive) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::FunctionInternal::jacobian2() const  {
+%exception  casadi::FunctionInternal::jacobian() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::jit_dependencies(const std::string &fname) {
@@ -1003,7 +1006,7 @@
 %exception  casadi::LinearInterpolant::generateBody(CodeGenerator &g) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::LinearInterpolant::get_jacobian2(const std::string &name, const std::vector< std::string > &inames, const std::vector< std::string > &onames, const Dict &opts) const override {
+%exception  casadi::LinearInterpolant::get_jacobian(const std::string &name, const std::vector< std::string > &inames, const std::vector< std::string > &onames, const Dict &opts) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::LinearInterpolant::get_options() const override {

@@ -9,6 +9,10 @@
 <tr><td>ad_weight_sp</td><td>OT_DOUBLE</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>compiler</td><td>OT_STRING</td><td>Just-in-time compiler plugin to be used.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_fd</td><td>OT_BOOL</td><td>Enable derivative calculation by finite differencing. [default: false]]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_forward</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobian-times-vector products - typically using forward mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
@@ -36,6 +40,10 @@
 <tr><td>ad_weight_sp</td><td>OT_DOUBLE</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>compiler</td><td>OT_STRING</td><td>Just-in-time compiler plugin to be used.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_fd</td><td>OT_BOOL</td><td>Enable derivative calculation by finite differencing. [default: false]]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_forward</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobian-times-vector products - typically using forward mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
@@ -63,6 +71,10 @@
 <tr><td>ad_weight_sp</td><td>OT_DOUBLE</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>compiler</td><td>OT_STRING</td><td>Just-in-time compiler plugin to be used.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_fd</td><td>OT_BOOL</td><td>Enable derivative calculation by finite differencing. [default: false]]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_forward</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobian-times-vector products - typically using forward mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
@@ -538,6 +550,10 @@
 <tr><td>compiler</td><td>OT_STRING</td><td>Just-in-time compiler plugin to be used.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
+<tr><td>enable_fd</td><td>OT_BOOL</td><td>Enable derivative calculation by finite differencing. [default: false]]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_forward</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobian-times-vector products - typically using forward mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
@@ -564,6 +580,10 @@
 <tr><td>compiler</td><td>OT_STRING</td><td>Just-in-time compiler plugin to be used.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
+<tr><td>enable_fd</td><td>OT_BOOL</td><td>Enable derivative calculation by finite differencing. [default: false]]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_forward</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobian-times-vector products - typically using forward mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
@@ -754,6 +774,10 @@
 <tr><td>compiler</td><td>OT_STRING</td><td>Just-in-time compiler plugin to be used.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>const_dim</td><td>OT_BOOL</td><td>Assume constant dimension of P</td><td>casadi::Dple</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_fd</td><td>OT_BOOL</td><td>Enable derivative calculation by finite differencing. [default: false]]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_forward</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobian-times-vector products - typically using forward mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>eps_unstable</td><td>OT_DOUBLE</td><td>A margin for unstability detection</td><td>casadi::Dple</td></tr>
 <tr><td>error_unstable</td><td>OT_BOOL</td><td>Throw an exception when it is detected that Product(A_i, i=N..1)has eigenvalues greater than 1-eps_unstable</td><td>casadi::Dple</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
@@ -783,6 +807,10 @@
 <tr><td>compiler</td><td>OT_STRING</td><td>Just-in-time compiler plugin to be used.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>const_dim</td><td>OT_BOOL</td><td>Assume constant dimension of P</td><td>casadi::Dple</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_fd</td><td>OT_BOOL</td><td>Enable derivative calculation by finite differencing. [default: false]]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_forward</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobian-times-vector products - typically using forward mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>eps_unstable</td><td>OT_DOUBLE</td><td>A margin for unstability detection</td><td>casadi::Dple</td></tr>
 <tr><td>error_unstable</td><td>OT_BOOL</td><td>Throw an exception when it is detected that Product(A_i, i=N..1)has eigenvalues greater than 1-eps_unstable</td><td>casadi::Dple</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
@@ -812,6 +840,10 @@
 <tr><td>compiler</td><td>OT_STRING</td><td>Just-in-time compiler plugin to be used.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>const_A</td><td>OT_BOOL</td><td>Assume A is constant. Default: false.</td><td>casadi::Expm</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_fd</td><td>OT_BOOL</td><td>Enable derivative calculation by finite differencing. [default: false]]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_forward</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobian-times-vector products - typically using forward mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
@@ -838,6 +870,10 @@
 <tr><td>compiler</td><td>OT_STRING</td><td>Just-in-time compiler plugin to be used.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>const_A</td><td>OT_BOOL</td><td>Assume A is constant. Default: false.</td><td>casadi::Expm</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_fd</td><td>OT_BOOL</td><td>Enable derivative calculation by finite differencing. [default: false]]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_forward</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobian-times-vector products - typically using forward mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
@@ -907,6 +943,10 @@
 <tr><td>ad_weight_sp</td><td>OT_DOUBLE</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>compiler</td><td>OT_STRING</td><td>Just-in-time compiler plugin to be used.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_fd</td><td>OT_BOOL</td><td>Enable derivative calculation by finite differencing. [default: false]]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_forward</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobian-times-vector products - typically using forward mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
@@ -930,6 +970,10 @@
 <tr><td>ad_weight_sp</td><td>OT_DOUBLE</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>compiler</td><td>OT_STRING</td><td>Just-in-time compiler plugin to be used.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_fd</td><td>OT_BOOL</td><td>Enable derivative calculation by finite differencing. [default: false]]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_forward</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobian-times-vector products - typically using forward mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
@@ -1386,6 +1430,10 @@
 <tr><td>ad_weight_sp</td><td>OT_DOUBLE</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>compiler</td><td>OT_STRING</td><td>Just-in-time compiler plugin to be used.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_fd</td><td>OT_BOOL</td><td>Enable derivative calculation by finite differencing. [default: false]]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_forward</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobian-times-vector products - typically using forward mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>hess</td><td>OT_STRING</td><td>Function body for Hessian</td><td>casadi::Jit</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -1545,6 +1593,10 @@
 <tr><td>allow_equilibration_failure</td><td>OT_BOOL</td><td>Non-fatal error when equilibration fails</td><td>casadi::LapackLu</td></tr>
 <tr><td>compiler</td><td>OT_STRING</td><td>Just-in-time compiler plugin to be used.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_fd</td><td>OT_BOOL</td><td>Enable derivative calculation by finite differencing. [default: false]]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_forward</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobian-times-vector products - typically using forward mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>equilibration</td><td>OT_BOOL</td><td>Equilibrate the matrix</td><td>casadi::LapackLu</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -1582,6 +1634,10 @@
 <tr><td>allow_equilibration_failure</td><td>OT_BOOL</td><td>Non-fatal error when equilibration fails</td><td>casadi::LapackLu</td></tr>
 <tr><td>compiler</td><td>OT_STRING</td><td>Just-in-time compiler plugin to be used.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_fd</td><td>OT_BOOL</td><td>Enable derivative calculation by finite differencing. [default: false]]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_forward</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobian-times-vector products - typically using forward mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>equilibration</td><td>OT_BOOL</td><td>Equilibrate the matrix</td><td>casadi::LapackLu</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -1608,6 +1664,10 @@
 <tr><td>ad_weight_sp</td><td>OT_DOUBLE</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>compiler</td><td>OT_STRING</td><td>Just-in-time compiler plugin to be used.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_fd</td><td>OT_BOOL</td><td>Enable derivative calculation by finite differencing. [default: false]]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_forward</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobian-times-vector products - typically using forward mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
@@ -1643,6 +1703,10 @@
 <tr><td>ad_weight_sp</td><td>OT_DOUBLE</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>compiler</td><td>OT_STRING</td><td>Just-in-time compiler plugin to be used.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_fd</td><td>OT_BOOL</td><td>Enable derivative calculation by finite differencing. [default: false]]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_forward</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobian-times-vector products - typically using forward mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
@@ -1710,6 +1774,10 @@
 <tr><td>codegen</td><td>OT_BOOL</td><td>C-code generation</td><td>casadi::Lsqr</td></tr>
 <tr><td>compiler</td><td>OT_STRING</td><td>Compiler command to be used for compiling generated code</td><td>casadi::Lsqr</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_fd</td><td>OT_BOOL</td><td>Enable derivative calculation by finite differencing. [default: false]]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_forward</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobian-times-vector products - typically using forward mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
@@ -1746,6 +1814,10 @@
 <tr><td>codegen</td><td>OT_BOOL</td><td>C-code generation</td><td>casadi::Lsqr</td></tr>
 <tr><td>compiler</td><td>OT_STRING</td><td>Compiler command to be used for compiling generated code</td><td>casadi::Lsqr</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_fd</td><td>OT_BOOL</td><td>Enable derivative calculation by finite differencing. [default: false]]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_forward</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobian-times-vector products - typically using forward mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
@@ -1772,6 +1844,10 @@
 <tr><td>compiler</td><td>OT_STRING</td><td>Just-in-time compiler plugin to be used.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>default_in</td><td>OT_DOUBLEVECTOR</td><td>Default input values</td><td>casadi::MXFunction</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_fd</td><td>OT_BOOL</td><td>Enable derivative calculation by finite differencing. [default: false]]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_forward</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobian-times-vector products - typically using forward mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
@@ -1929,6 +2005,10 @@
 <tr><td>common_options</td><td>OT_DICT</td><td>Options for auto-generated functions</td><td>casadi::OracleFunction</td></tr>
 <tr><td>compiler</td><td>OT_STRING</td><td>Just-in-time compiler plugin to be used.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_fd</td><td>OT_BOOL</td><td>Enable derivative calculation by finite differencing. [default: false]]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_forward</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobian-times-vector products - typically using forward mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
@@ -2167,6 +2247,10 @@
 <tr><td>compiler</td><td>OT_STRING</td><td>Just-in-time compiler plugin to be used.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>default_in</td><td>OT_DOUBLEVECTOR</td><td>Default input values</td><td>casadi::SXFunction</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_fd</td><td>OT_BOOL</td><td>Enable derivative calculation by finite differencing. [default: false]]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_forward</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobian-times-vector products - typically using forward mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
@@ -2616,6 +2700,10 @@
 <tr><td>codegen</td><td>OT_BOOL</td><td>C-code generation</td><td>casadi::SymbolicQr</td></tr>
 <tr><td>compiler</td><td>OT_STRING</td><td>Compiler command to be used for compiling generated code</td><td>casadi::SymbolicQr</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_fd</td><td>OT_BOOL</td><td>Enable derivative calculation by finite differencing. [default: false]]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_forward</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobian-times-vector products - typically using forward mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
@@ -2652,6 +2740,10 @@
 <tr><td>codegen</td><td>OT_BOOL</td><td>C-code generation</td><td>casadi::SymbolicQr</td></tr>
 <tr><td>compiler</td><td>OT_STRING</td><td>Compiler command to be used for compiling generated code</td><td>casadi::SymbolicQr</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_fd</td><td>OT_BOOL</td><td>Enable derivative calculation by finite differencing. [default: false]]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_forward</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobian-times-vector products - typically using forward mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
