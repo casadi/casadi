@@ -28409,17 +28409,17 @@ Get the first dimension (i.e. number of rows)
 
 ";
 
+%feature("docstring") casadi::Matrix::is_eye "
+
+check if the matrix is an identity matrix (note that false negative answers
+are possible)
+
+";
+
 %feature("docstring") casadi::Matrix::is_empty "
 
 Check if the sparsity is empty, i.e. if one of the dimensions is zero (or
 optionally both dimensions)
-
-";
-
-%feature("docstring") casadi::Matrix::is_identity "
-
-check if the matrix is an identity matrix (note that false negative answers
-are possible)
 
 ";
 
@@ -28949,6 +28949,12 @@ Check if symbolic.
 
 ";
 
+%feature("docstring") casadi::MX::is_eye "
+
+check if identity
+
+";
+
 %feature("docstring") casadi::MX::join_primitives "
 
 Join an expression along symbolic primitives.
@@ -28986,12 +28992,6 @@ to the internal class
 %feature("docstring") casadi::MX::nnz "
 
 Get the number of (structural) non-zero elements.
-
-";
-
-%feature("docstring") casadi::MX::is_identity "
-
-check if identity
 
 ";
 

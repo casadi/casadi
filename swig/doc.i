@@ -39654,18 +39654,18 @@ Get the first dimension (i.e. number of rows)
 
 ";
 
+%feature("docstring")  casadi::Matrix< T >::is_eye() const  "
+
+check if the matrix is an identity matrix (note that false negative answers
+are possible)
+
+";
+
 %feature("docstring")  casadi::GenericMatrix< Matrix< Scalar >
 >::is_empty(bool both=false) const "
 
 Check if the sparsity is empty, i.e. if one of the dimensions is zero (or
 optionally both dimensions)
-
-";
-
-%feature("docstring")  casadi::Matrix< T >::is_identity() const  "
-
-check if the matrix is an identity matrix (note that false negative answers
-are possible)
 
 ";
 
@@ -40331,6 +40331,12 @@ Check if symbolic.
 
 ";
 
+%feature("docstring")  casadi::MX::is_eye() const  "
+
+check if identity
+
+";
+
 %feature("docstring")  casadi::MX::join_primitives(const std::vector< MX >
 &v) const  "
 
@@ -40372,12 +40378,6 @@ Check if multiplication.
 %feature("docstring")  casadi::GenericMatrix< MX  >::nnz() const "
 
 Get the number of (structural) non-zero elements.
-
-";
-
-%feature("docstring")  casadi::MX::is_identity() const  "
-
-check if identity
 
 ";
 
