@@ -111,7 +111,7 @@ namespace casadi {
     return !jac_body_.empty();
   }
 
-  Function Jit::get_jacobian2(const std::string& name,
+  Function Jit::get_jacobian(const std::string& name,
                                 const std::vector<std::string>& inames,
                                 const std::vector<std::string>& onames,
                                 const Dict& opts) const {

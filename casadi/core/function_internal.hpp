@@ -259,9 +259,9 @@ namespace casadi {
 
     ///@{
     /** \brief Return Jacobian of all input elements with respect to all output elements */
-    Function jacobian2() const;
+    Function jacobian() const;
     virtual bool has_jacobian() const { return false;}
-    virtual Function get_jacobian2(const std::string& name,
+    virtual Function get_jacobian(const std::string& name,
                                   const std::vector<std::string>& inames,
                                   const std::vector<std::string>& onames,
                                   const Dict& opts) const;

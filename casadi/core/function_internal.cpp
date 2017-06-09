@@ -1474,13 +1474,13 @@ namespace casadi {
     res = Call::create(self(), arg);
   }
 
-  Function FunctionInternal::jacobian2() const {
+  Function FunctionInternal::jacobian() const {
     // Used wrapped function if jacobian not available
     if (!has_jacobian()) {
       // Derivative information must be available
       casadi_assert_message(has_derivative(),
                             "Derivatives cannot be calculated for " + name_);
-      return wrap().jacobian2();
+      return wrap().jacobian();
     }
 
     // Quick return if cached
@@ -1508,7 +1508,7 @@ namespace casadi {
     opts["derivative_of"] = self();
 
     // Generate derivative function
-    Function ret = get_jacobian2(name, inames, onames, opts);
+    Function ret = get_jacobian(name, inames, onames, opts);
 
     // Consistency check
     casadi_assert(ret.n_in()==n_in + n_out);
@@ -1520,7 +1520,7 @@ namespace casadi {
   }
 
   Function FunctionInternal::
-  get_jacobian2(const std::string& name,
+  get_jacobian(const std::string& name,
                   const std::vector<std::string>& inames,
                   const std::vector<std::string>& onames,
                   const Dict& opts) const {
@@ -2084,7 +2084,7 @@ namespace casadi {
       // Multiply the Jacobian from the right
       vector<MX> darg = arg;
       darg.insert(darg.end(), res.begin(), res.end());
-      MX J = jacobian2()(darg).at(0);
+      MX J = jacobian()(darg).at(0);
       v = horzsplit(mtimes(J, horzcat(v)));
 
       // Vertical offsets
@@ -2189,7 +2189,7 @@ namespace casadi {
       // Multiply the transposed Jacobian from the right
       vector<MX> darg = arg;
       darg.insert(darg.end(), res.begin(), res.end());
-      MX J = jacobian2()(darg).at(0);
+      MX J = jacobian()(darg).at(0);
       v = horzsplit(mtimes(J.T(), horzcat(v)));
 
       // Vertical offsets

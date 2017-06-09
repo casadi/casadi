@@ -119,7 +119,7 @@ namespace casadi {
     ///@{
     /** \brief Return Jacobian of all input elements with respect to all output elements */
     bool has_jacobian() const override { return true;}
-    Function get_jacobian2(const std::string& name,
+    Function get_jacobian(const std::string& name,
                           const std::vector<std::string>& inames,
                           const std::vector<std::string>& onames,
                           const Dict& opts) const override;
@@ -796,7 +796,7 @@ namespace casadi {
 
   template<typename DerivedType, typename MatType, typename NodeType>
   Function XFunction<DerivedType, MatType, NodeType>
-  ::get_jacobian2(const std::string& name,
+  ::get_jacobian(const std::string& name,
                  const std::vector<std::string>& inames,
                  const std::vector<std::string>& onames,
                  const Dict& opts) const {

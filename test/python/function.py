@@ -1089,7 +1089,7 @@ class Functiontests(casadiTestCase):
 
         def has_jacobian(self): return True
 
-        def get_jacobian2(self, name, inames, onames, opts):
+        def get_jacobian(self, name, inames, onames, opts):
           x = SX.sym("x")
           y = SX.sym("y")
           out_g = SX.sym('out_g', Sparsity(1,1))

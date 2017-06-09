@@ -673,8 +673,8 @@ namespace casadi {
     return factory("hess_" + name(), s_in, s_out);
   }
 
-  Function Function::jacobian2() const {
-    return (*this)->jacobian2();
+  Function Function::jacobian() const {
+    return (*this)->jacobian();
   }
 
   bool Function::test_cast(const SharedObjectInternal* ptr) {

@@ -818,7 +818,7 @@ namespace casadi {
     }
   }
 
-  Function SXFunction::get_jacobian2(const std::string& name,
+  Function SXFunction::get_jacobian(const std::string& name,
                                        const std::vector<std::string>& inames,
                                        const std::vector<std::string>& onames,
                                        const Dict& opts) const {
