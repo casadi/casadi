@@ -281,6 +281,12 @@ namespace casadi {
                                  const Dict& opts) const;
     ///@}
 
+    /// \brief Get directional derivatives using finite differencing
+    virtual Function get_fd(int nfwd, const std::string& name,
+                            const std::vector<std::string>& inames,
+                            const std::vector<std::string>& onames,
+                            const Dict& opts) const;
+
     ///@{
     /** \brief Return function that calculates adjoint derivatives
      *    reverse(nadj) returns a cached instance if available,
@@ -710,6 +716,9 @@ namespace casadi {
 
     /// Penalty factor for using a complete Jacobian to calculate directional derivatives
     double jac_penalty_;
+
+    // Types of derivative calculation permitted
+    bool enable_forward_, enable_reverse_, enable_jacobian_, enable_fd_;
 
     /// Weighting factor for derivative calculation and sparsity pattern calculation
     double ad_weight_, ad_weight_sp_;

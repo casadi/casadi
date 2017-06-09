@@ -77,9 +77,11 @@ namespace casadi {
     print_time_ = true;
     eval_ = 0;
     simple_ = 0;
-
     has_refcount_ = false;
-
+    enable_forward_ = true;
+    enable_reverse_ = true;
+    enable_jacobian_ = true;
+    enable_fd_ = false;
     sz_arg_tmp_ = 0;
     sz_res_tmp_ = 0;
     sz_iw_tmp_ = 0;
@@ -183,7 +185,25 @@ namespace casadi {
         " Overrules the builtin optimized_num_dir."}},
       {"print_time",
        {OT_BOOL,
-        "print information about execution time"}}
+        "print information about execution time"}},
+      {"enable_forward",
+       {OT_BOOL,
+        "Enable derivative calculation using generated functions for"
+        " Jacobian-times-vector products - typically using forward mode AD"
+        " - if available. [default: true]"}},
+      {"enable_reverse",
+        {OT_BOOL,
+        "Enable derivative calculation using generated functions for"
+        " transposed Jacobian-times-vector products - typically using reverse mode AD"
+        " - if available. [default: true]"}},
+      {"enable_jacobian",
+        {OT_BOOL,
+        "Enable derivative calculation using generated functions for"
+        " Jacobians of all differentiable outputs with respect to all differentiable inputs"
+        " - if available. [default: true]"}},
+      {"enable_fd",
+       {OT_BOOL,
+        "Enable derivative calculation by finite differencing. [default: false]]"}}
      }
   };
 
@@ -223,6 +243,14 @@ namespace casadi {
         max_num_dir_ = op.second;
       } else if (op.first=="print_time") {
         print_time_ = op.second;
+      } else if (op.first=="enable_forward") {
+        enable_forward_ = op.second;
+      } else if (op.first=="enable_reverse") {
+        enable_reverse_ = op.second;
+      } else if (op.first=="enable_jacobian") {
+        enable_jacobian_ = op.second;
+      } else if (op.first=="enable_fd") {
+        enable_fd_ = op.second;
       }
     }
 
@@ -262,6 +290,12 @@ namespace casadi {
       oscheme_.resize(n_out);
       for (int i=0; i<n_out; ++i) oscheme_[i] = get_name_out(i);
     }
+
+    // Type of derivative calculations enabled
+    enable_forward_ = enable_forward_ && has_forward(1);
+    enable_reverse_ = enable_reverse_ && has_reverse(1);
+    enable_jacobian_ = enable_jacobian_ && has_jacobian();
+    enable_fd_ = enable_fd_ && !enable_forward_;
 
     alloc_arg(0);
     alloc_res(0);
@@ -1204,7 +1238,7 @@ namespace casadi {
 
     // Get seed matrices by graph coloring
     if (symmetric) {
-      casadi_assert(has_forward(1));
+      casadi_assert(enable_forward_ || enable_fd_);
       casadi_assert(allow_forward);
 
       // Star coloring if symmetric
@@ -1214,7 +1248,7 @@ namespace casadi {
                  << A.size1() << " without coloring).");
 
     } else {
-      casadi_assert(has_forward(1) || has_reverse(1));
+      casadi_assert(enable_forward_ || enable_fd_ || enable_reverse_);
       // Get weighting factor
       double w = ad_weight();
 
@@ -1296,7 +1330,7 @@ namespace casadi {
     casadi_assert(nfwd>=0);
 
     // Used wrapped function if forward not available
-    if (!has_forward(1)) {
+    if (!enable_forward_ && !enable_fd_) {
       // Derivative information must be available
       casadi_assert_message(has_derivative(),
                             "Derivatives cannot be calculated for " + name_);
@@ -1336,8 +1370,13 @@ namespace casadi {
     opts["derivative_of"] = self();
 
     // Generate derivative function
-    casadi_assert(has_forward(1)); //FIXME(@jaeandersson)
-    Function ret = get_forward(nfwd, name, inames, onames, opts);
+    casadi_assert(enable_forward_ || enable_fd_);
+    Function ret;
+    if (enable_forward_) {
+      ret = get_forward(nfwd, name, inames, onames, opts);
+    } else {
+      ret = get_fd(nfwd, name, inames, onames, opts);
+    }
 
     // Consistency check for inputs
     casadi_assert(ret.n_in()==n_in + n_out + n_in);
@@ -1361,7 +1400,7 @@ namespace casadi {
     casadi_assert(nadj>=0);
 
     // Used wrapped function if reverse not available
-    if (!has_reverse(1)) {
+    if (!enable_reverse_) {
       // Derivative information must be available
       casadi_assert_message(has_derivative(),
                             "Derivatives cannot be calculated for " + name_);
@@ -1401,7 +1440,7 @@ namespace casadi {
     opts["derivative_of"] = self();
 
     // Generate derivative function
-    casadi_assert(has_reverse(1)); // FIXME(@jaeandersson)
+    casadi_assert(enable_reverse_);
     Function ret = get_reverse(nadj, name, inames, onames, opts);
 
     // Consistency check for inputs
@@ -1436,6 +1475,14 @@ namespace casadi {
               const std::vector<std::string>& onames,
               const Dict& opts) const {
     casadi_error("'get_reverse' not defined for " + type_name());
+  }
+
+  Function FunctionInternal::
+  get_fd(int nfwd, const std::string& name,
+              const std::vector<std::string>& inames,
+              const std::vector<std::string>& onames,
+              const Dict& opts) const {
+    casadi_error("'get_fd' not defined for " + type_name());
   }
 
   int FunctionInternal::nnz_in() const {
@@ -1508,6 +1555,7 @@ namespace casadi {
     opts["derivative_of"] = self();
 
     // Generate derivative function
+    casadi_assert(enable_jacobian_);
     Function ret = get_jacobian(name, inames, onames, opts);
 
     // Consistency check
@@ -2008,11 +2056,11 @@ namespace casadi {
   }
 
   bool FunctionInternal::has_derivative() const {
-    return has_forward(1) || has_reverse(1) || has_jacobian();
+    return enable_forward_ || enable_reverse_ || enable_jacobian_ || enable_fd_;
   }
 
   bool FunctionInternal::fwdViaJac(int nfwd) const {
-    if (!has_forward(1)) return true;
+    if (!enable_forward_ && !enable_fd_) return true;
     if (jac_penalty_==-1) return false;
 
     // Heuristic 1: Jac calculated via forward mode likely cheaper
@@ -2020,14 +2068,14 @@ namespace casadi {
 
     // Heuristic 2: Jac calculated via reverse mode likely cheaper
     double w = ad_weight();
-    if (has_reverse(1) && jac_penalty_*(1-w)*nnz_out()<w*nfwd)
+    if (enable_reverse_ && jac_penalty_*(1-w)*nnz_out()<w*nfwd)
       return true;
 
     return false;
   }
 
   bool FunctionInternal::adjViaJac(int nadj) const {
-    if (!has_reverse(1)) return true;
+    if (!enable_reverse_) return true;
     if (jac_penalty_==-1) return false;
 
     // Heuristic 1: Jac calculated via reverse mode likely cheaper
@@ -2035,7 +2083,7 @@ namespace casadi {
 
     // Heuristic 2: Jac calculated via forward mode likely cheaper
     double w = ad_weight();
-    if (has_forward(1) && jac_penalty_*w*nnz_in()<(1-w)*nadj)
+    if ((enable_forward_ || enable_fd_) && jac_penalty_*w*nnz_in()<(1-w)*nadj)
       return true;
 
     return false;
@@ -2103,7 +2151,7 @@ namespace casadi {
 
     } else {
       // Evaluate in batches
-      casadi_assert(has_forward(1));
+      casadi_assert(enable_forward_ || enable_fd_);
       int max_nfwd = 64;
       while (!has_forward(max_nfwd)) max_nfwd/=2;
       int offset = 0;
@@ -2212,7 +2260,7 @@ namespace casadi {
       }
     } else {
       // Evaluate in batches
-      casadi_assert(has_reverse(1));
+      casadi_assert(enable_reverse_);
       int max_nadj = 64;
       while (!has_reverse(max_nadj)) max_nadj/=2;
       int offset = 0;
@@ -2287,10 +2335,10 @@ namespace casadi {
 
   double FunctionInternal::ad_weight() const {
     // If reverse mode derivatives unavailable, use forward
-    if (!has_reverse(1)) return 0;
+    if (!enable_reverse_) return 0;
 
     // If forward mode derivatives unavailable, use reverse
-    if (!has_forward(1)) return 1;
+    if (!enable_forward_ && !enable_fd_) return 1;
 
     // Use the (potentially user set) option
     return ad_weight_;
