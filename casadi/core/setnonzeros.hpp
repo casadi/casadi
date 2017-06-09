@@ -41,6 +41,12 @@ namespace casadi {
   template<bool Add>
   class CASADI_EXPORT SetNonzeros : public MXNode {
   public:
+    ///@{
+    /// Create functions
+    static MX create(const MX& y, const MX& x, const std::vector<int>& nz);
+    static MX create(const MX& y, const MX& x, const Slice& s);
+    static MX create(const MX& y, const MX& x, const Slice& inner, const Slice& outer);
+    ///@}
 
     /// Constructor
     SetNonzeros(const MX& y, const MX& x);

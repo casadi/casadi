@@ -36,6 +36,26 @@ using namespace std;
 namespace casadi {
 
   template<bool Add>
+  MX SetNonzeros<Add>::create(const MX& y, const MX& x, const std::vector<int>& nz) {
+    if (is_slice(nz)) return create(y, x, to_slice(nz));
+    if (is_slice2(nz)) {
+      pair<Slice, Slice> sl = to_slice2(nz);
+      return create(y, x, sl.first, sl.second);
+    }
+    return MX::create(new SetNonzerosVector<Add>(y, x, nz));
+  }
+
+  template<bool Add>
+  MX SetNonzeros<Add>::create(const MX& y, const MX& x, const Slice& s) {
+    return MX::create(new SetNonzerosSlice<Add>(y, x, s));
+  }
+
+  template<bool Add>
+  MX SetNonzeros<Add>::create(const MX& y, const MX& x, const Slice& inner, const Slice& outer) {
+    return MX::create(new SetNonzerosSlice2<Add>(y, x, inner, outer));
+  }
+
+  template<bool Add>
   SetNonzeros<Add>::SetNonzeros(const MX& y, const MX& x) {
     this->set_sparsity(y.sparsity());
     this->set_dep(y, x);

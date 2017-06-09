@@ -460,16 +460,7 @@ namespace casadi {
     }
 
     // Check if slice
-    MX ret;
-    if (is_slice(nz)) {
-      ret = MX::create(new SetNonzerosSlice<false>(y, shared_from_this<MX>(), to_slice(nz)));
-    } else if (is_slice2(nz)) {
-      pair<Slice, Slice> sl = to_slice2(nz);
-      ret = MX::create(new SetNonzerosSlice2<false>(y, shared_from_this<MX>(),
-                                                    sl.first, sl.second));
-    } else {
-      ret = MX::create(new SetNonzerosVector<false>(y, shared_from_this<MX>(), nz));
-    }
+    MX ret = SetNonzeros<false>::create(y, shared_from_this<MX>(), nz);
     return simplify(ret);
   }
 
@@ -478,16 +469,7 @@ namespace casadi {
     if (nz.size()==0 || is_zero()) {
       return y;
     } else {
-      MX ret;
-      if (is_slice(nz)) {
-        ret = MX::create(new SetNonzerosSlice<true>(y, shared_from_this<MX>(), to_slice(nz)));
-      } else if (is_slice2(nz)) {
-        pair<Slice, Slice> sl = to_slice2(nz);
-        ret = MX::create(new SetNonzerosSlice2<true>(y, shared_from_this<MX>(),
-                                                     sl.first, sl.second));
-      } else {
-        ret = MX::create(new SetNonzerosVector<true>(y, shared_from_this<MX>(), nz));
-      }
+      MX ret = SetNonzeros<true>::create(y, shared_from_this<MX>(), nz);
       return simplify(ret);
     }
   }
