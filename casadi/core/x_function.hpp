@@ -737,9 +737,7 @@ namespace casadi {
     ret_in.reserve(num_in + num_out + num_in);
     ret_in.insert(ret_in.end(), in_.begin(), in_.end());
     for (int i=0; i<num_out; ++i) {
-      std::stringstream ss;
-      ss << "dummy_output_" << i;
-      ret_in.push_back(MatType::sym(ss.str(), Sparsity(out_.at(i).size())));
+      ret_in.push_back(MatType::sym(inames[num_in+i], Sparsity(out_.at(i).size())));
     }
     std::vector<MatType> v(nfwd);
     for (int i=0; i<num_in; ++i) {
@@ -780,9 +778,7 @@ namespace casadi {
     ret_in.reserve(num_in + num_out + num_out);
     ret_in.insert(ret_in.end(), in_.begin(), in_.end());
     for (int i=0; i<num_out; ++i) {
-      std::stringstream ss;
-      ss << "dummy_output_" << i;
-      ret_in.push_back(MatType::sym(ss.str(), Sparsity(out_.at(i).size())));
+      ret_in.push_back(MatType::sym(inames[num_in+i], Sparsity(out_.at(i).size())));
     }
     std::vector<MatType> v(nadj);
     for (int i=0; i<num_out; ++i) {

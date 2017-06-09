@@ -1322,8 +1322,8 @@ namespace casadi {
 
     // Names of inputs
     std::vector<std::string> inames;
-    for (int i=0; i<n_in; ++i) inames.push_back("der_" + name_in(i));
-    for (int i=0; i<n_out; ++i) inames.push_back("der_" + name_out(i));
+    for (int i=0; i<n_in; ++i) inames.push_back(name_in(i));
+    for (int i=0; i<n_out; ++i) inames.push_back("out_" + name_out(i));
     for (int i=0; i<n_in; ++i) inames.push_back("fwd_" + name_in(i));
 
     // Names of outputs
@@ -1387,8 +1387,8 @@ namespace casadi {
 
     // Names of inputs
     std::vector<std::string> inames;
-    for (int i=0; i<n_in; ++i) inames.push_back("der_" + name_in(i));
-    for (int i=0; i<n_out; ++i) inames.push_back("der_" + name_out(i));
+    for (int i=0; i<n_in; ++i) inames.push_back(name_in(i));
+    for (int i=0; i<n_out; ++i) inames.push_back("out_" + name_out(i));
     for (int i=0; i<n_out; ++i) inames.push_back("adj_" + name_out(i));
 
     // Names of outputs
