@@ -828,11 +828,10 @@ namespace casadi {
   void SetNonzerosSlice<Add>::simplifyMe(MX& ex) {
     // Simplify if addition
     if (isAssignment()) {
-      MX t = this->dep(1);
       if (Add) {
-        ex += t;
+        ex = this->dep(0) + this->dep(1);
       } else {
-        ex = t;
+        ex = this->dep(1);
       }
     }
   }
