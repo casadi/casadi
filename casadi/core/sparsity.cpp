@@ -1099,6 +1099,10 @@ namespace casadi {
     int nrow = v[0];
     int ncol = v[1];
     const int *colind = v+2;
+    if (colind[0]==1) {
+      // Dense matrix
+      return Sparsity::dense(nrow, ncol);
+    }
     int nnz = colind[ncol];
     if (nrow*ncol == nnz) {
       // Dense matrix
