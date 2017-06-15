@@ -333,14 +333,16 @@ namespace casadi {
                           const double* lba, const double* uba) const {
     for (int i=0; i<nx_; ++i) {
       double lb = lbx ? lbx[i] : 0., ub = ubx ? ubx[i] : 0.;
-      casadi_assert_message(lb <= ub,
+      casadi_assert_message(lb <= ub && lb!=inf && ub!=-inf,
+                            "Ill-posed problem detected: " <<
                             "LBX[" << i << "] <= UBX[" << i << "] was violated. "
                             << "Got LBX[" << i << "]=" << lb <<
                             " and UBX[" << i << "] = " << ub << ".");
     }
     for (int i=0; i<na_; ++i) {
       double lb = lba ? lba[i] : 0., ub = uba ? uba[i] : 0.;
-      casadi_assert_message(lb <= ub,
+      casadi_assert_message(lb <= ub && lb!=inf && ub!=-inf,
+                            "Ill-posed problem detected: " <<
                             "LBA[" << i << "] <= UBA[" << i << "] was violated. "
                             << "Got LBA[" << i << "] = " << lb <<
                             " and UBA[" << i << "] = " << ub << ".");
