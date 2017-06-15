@@ -341,26 +341,32 @@ namespace casadi {
 
     // Detect ill-posed problems (simple bounds)
     for (int i=0; i<nx_; ++i) {
-      double lbx = m->lbx ? m->lbx[i] : 0;
-      double ubx = m->ubx ? m->ubx[i] : 0;
+      double lb = m->lbx ? m->lbx[i] : 0;
+      double ub = m->ubx ? m->ubx[i] : 0;
       double x0 = m->x0 ? m->x0[i] : 0;
-      casadi_assert_message(!(lbx==inf || lbx>ubx || ubx==-inf),
-                            "Ill-posed problem detected (x bounds)");
-      if (warn_initial_bounds_ && (x0>ubx || x0<lbx)) {
+      casadi_assert_message(lb <= ub && lb!=inf && ub!=-inf,
+                            "Ill-posed problem detected: " <<
+                            "LBX[" << i << "] <= UBX[" << i << "] was violated. "
+                            << "Got LBX[" << i << "]=" << lb <<
+                            " and UBX[" << i << "] = " << ub << ".");
+      if (warn_initial_bounds_ && (x0>ub || x0<lb)) {
         casadi_warning("Nlpsol: The initial guess does not satisfy LBX and UBX. "
                        "Option 'warn_initial_bounds' controls this warning.");
         break;
       }
-      if (lbx==ubx) n_eq++;
+      if (lb==ub) n_eq++;
     }
 
     // Detect ill-posed problems (nonlinear bounds)
     for (int i=0; i<ng_; ++i) {
-      double lbg = m->lbg ? m->lbg[i] : 0;
-      double ubg = m->ubg ? m->ubg[i] : 0;
-      casadi_assert_message(!(lbg==inf || lbg>ubg || ubg==-inf),
-                            "Ill-posed problem detected (g bounds)");
-      if (lbg==ubg) n_eq++;
+      double lb = m->lbg ? m->lbg[i] : 0;
+      double ub = m->ubg ? m->ubg[i] : 0;
+      casadi_assert_message(lb <= ub && lb!=inf && ub!=-inf,
+                            "Ill-posed problem detected: " <<
+                            "LBA[" << i << "] <= UBA[" << i << "] was violated. "
+                            << "Got LBA[" << i << "] = " << lb <<
+                            " and UBA[" << i << "] = " << ub << ".");
+      if (lb==ub) n_eq++;
     }
 
     // Make sure enough degrees of freedom
