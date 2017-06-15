@@ -363,9 +363,9 @@ namespace casadi {
       double ub = m->ubg ? m->ubg[i] : 0;
       casadi_assert_message(lb <= ub && lb!=inf && ub!=-inf,
                             "Ill-posed problem detected: " <<
-                            "LBA[" << i << "] <= UBA[" << i << "] was violated. "
-                            << "Got LBA[" << i << "] = " << lb <<
-                            " and UBA[" << i << "] = " << ub << ".");
+                            "LBG[" << i << "] <= UBG[" << i << "] was violated. "
+                            << "Got LBG[" << i << "] = " << lb <<
+                            " and UBG[" << i << "] = " << ub << ".");
       if (lb==ub) n_eq++;
     }
 
