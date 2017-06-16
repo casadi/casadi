@@ -89,10 +89,10 @@ namespace casadi {
     vector<MXNode*> nodes;
 
     // Add the list of nodes
-    int ind=0;
-    for (vector<MX>::iterator it = out_.begin(); it != out_.end(); ++it, ++ind) {
+    for (MX& e : out_) {
       // Add outputs to the list
-      s.push(static_cast<MXNode*>(it->get()));
+
+      s.push(static_cast<MXNode*>(e.get()));
       sort_depth_first(s, nodes);
 
       // A null pointer means an output instruction
@@ -101,9 +101,7 @@ namespace casadi {
 
     // Set the temporary variables to be the corresponding place in the sorted graph
     for (int i=0; i<nodes.size(); ++i) {
-      if (nodes[i]) {
-        nodes[i]->temp = i;
-      }
+      if (nodes[i]) nodes[i]->temp = i;
     }
 
     // Place in the algorithm for each node
@@ -122,9 +120,7 @@ namespace casadi {
     // Get the sequence of instructions for the virtual machine
     algorithm_.resize(0);
     algorithm_.reserve(nodes.size());
-    for (vector<MXNode*>::iterator it=nodes.begin(); it!=nodes.end(); ++it) {
-      // Current node
-      MXNode* n = *it;
+    for (MXNode* n : nodes) {
 
       // Get the operation
       int op = n==0 ? OP_OUTPUT : n->op();
