@@ -565,6 +565,9 @@ namespace casadi {
   void Blocksqp::solve(void* mem) const {
     auto m = static_cast<BlocksqpMemory*>(mem);
 
+    // Check the provided inputs
+    checkInputs(mem);
+
     int ret = 0;
 
     // Create problem evaluation object

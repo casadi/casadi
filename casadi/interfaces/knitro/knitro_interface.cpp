@@ -132,6 +132,9 @@ namespace casadi {
   void KnitroInterface::solve(void* mem) const {
     auto m = static_cast<KnitroMemory*>(mem);
 
+    // Check the provided inputs
+    checkInputs(mem);
+
     // Allocate KNITRO memory block (move back to init!)
     casadi_assert(m->kc==0);
     m->kc = KTR_new();
