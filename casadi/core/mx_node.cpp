@@ -124,7 +124,7 @@ namespace casadi {
   }
 
   int MXNode::n_primitives() const {
-    casadi_error("'n_primitives' not defined for class " + type_name());
+    return 1;
   }
 
   bool MXNode::has_duplicates() const {
@@ -136,15 +136,21 @@ namespace casadi {
   }
 
   void MXNode::primitives(vector<MX>::iterator& it) const {
-    casadi_error("'primitives' not defined for class " + type_name());
+    *it++ = shared_from_this<MX>();
   }
 
   void MXNode::split_primitives(const MX& x, vector<MX>::iterator& it) const {
-    casadi_error("'split_primitives' not defined for class " + type_name());
+    *it++ = x;
   }
 
   MX MXNode::join_primitives(vector<MX>::const_iterator& it) const {
-    casadi_error("'join_primitives' not defined for class " + type_name());
+    MX ret = *it++;
+    if (ret.size()==size()) {
+      return ret;
+    } else {
+      casadi_assert(ret.is_empty(true));
+      return MX(size());
+    }
   }
 
   const string& MXNode::name() const {
@@ -166,6 +172,18 @@ namespace casadi {
 
   void MXNode::setSparsity(const Sparsity& sparsity) {
     sparsity_ = sparsity;
+  }
+
+  int MXNode::ind() const {
+    casadi_error("'ind' not defined for class " + type_name());
+  }
+
+  int MXNode::segment() const {
+    casadi_error("'segment' not defined for class " + type_name());
+  }
+
+  int MXNode::offset() const {
+    casadi_error("'offset' not defined for class " + type_name());
   }
 
   void MXNode::setDependencies(const MX& dep) {

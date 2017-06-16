@@ -128,7 +128,7 @@ namespace casadi {
     MX join_primitives(std::vector<MX>::const_iterator& it) const override;
 
     /** \brief Get offsets for split */
-    std::vector<int> offset() const;
+    std::vector<int> off() const;
   };
 
   /** \brief Vertical concatenation of vectors
@@ -168,7 +168,7 @@ namespace casadi {
     MX join_primitives(std::vector<MX>::const_iterator& it) const override;
 
     /** \brief Get offsets for split */
-    std::vector<int> offset() const;
+    std::vector<int> off() const;
   };
 
   /** \brief Diagonal concatenation of matrices
@@ -208,7 +208,7 @@ namespace casadi {
     MX join_primitives(std::vector<MX>::const_iterator& it) const override;
 
     /** \brief Get offsets for split */
-    std::pair<std::vector<int>, std::vector<int> > offset() const;
+    std::pair<std::vector<int>, std::vector<int> > off() const;
   };
 
 } // namespace casadi
