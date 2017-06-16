@@ -210,12 +210,11 @@ namespace casadi {
     */
     bool is_valid_input() const;
 
-    /** \brief Get the number of symbolic primitive
-        Assumes is_valid_input() returns true.
+    /** \brief Get the number of primitives for MXFunction inputs/outputs
     */
     int n_primitives() const;
 
-    /** \brief Get symbolic primitives */
+    /** \brief Get primitives */
     std::vector<MX> primitives() const;
 
     /** \brief Split up an expression along symbolic primitives */

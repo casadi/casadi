@@ -102,19 +102,19 @@ namespace casadi {
     bool __nonzero__() const override;
 
     /** \brief  Check if valid function input */
-    bool is_valid_input() const override { return sparsity().nnz()==0;}
+    bool is_valid_input() const override;
 
     /** \brief Get the number of symbolic primitives */
-    int n_primitives() const override { return 0;}
+    int n_primitives() const override;
 
     /** \brief Get symbolic primitives */
-    void primitives(std::vector<MX>::iterator& it) const override {}
+    void primitives(std::vector<MX>::iterator& it) const override;
 
     /** \brief Split up an expression along symbolic primitives */
-    void split_primitives(const MX& x, std::vector<MX>::iterator& it) const override {}
+    void split_primitives(const MX& x, std::vector<MX>::iterator& it) const override;
 
     /** \brief Join an expression along symbolic primitives */
-    MX join_primitives(std::vector<MX>::const_iterator& it) const override { return MX(sparsity());}
+    MX join_primitives(std::vector<MX>::const_iterator& it) const override;
 
     /** \brief Detect duplicate symbolic expressions */
     bool has_duplicates() const override { return false;}

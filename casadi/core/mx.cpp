@@ -764,7 +764,6 @@ namespace casadi {
   }
 
   int MX::n_primitives() const {
-    casadi_assert_message(is_valid_input(), "Not a valid input expression");
     return (*this)->n_primitives();
   }
 
@@ -1223,59 +1222,35 @@ namespace casadi {
     // quick return if nothing to replace
     if (v.empty()) return;
 
-    // Function inputs
-    std::vector<MX> f_in = v;
-
-    // Function outputs
-    std::vector<MX> f_out = vdef;
-    f_out.insert(f_out.end(), ex.begin(), ex.end());
-
-    // Write the mapping function
-    Function f("mapping", f_in, f_out);
-    auto *ff = dynamic_cast<MXFunction *>(f.get());
-
-    // Get references to the internal data structures
-    std::vector<MXAlgEl>& algorithm = ff->algorithm_;
-    vector<MX> work(ff->workloc_.size()-1);
-    vector<MX> oarg, ores;
-
-    for (vector<MXAlgEl>::iterator it=algorithm.begin(); it!=algorithm.end(); ++it) {
-      switch (it->op) {
-      case OP_INPUT:
-        work.at(it->res.front()) = vdef.at(it->arg.front());
-        break;
-      case OP_PARAMETER:
-      case OP_CONST:
-        work.at(it->res.front()) = it->data;
-        break;
-      case OP_OUTPUT:
-        if (it->res.front()<vdef.size()) {
-          vdef.at(it->res.front()) = work.at(it->arg.front());
-        } else {
-          ex.at(it->res.front()-vdef.size()) = work.at(it->arg.front());
+    // If ex can be split up, call recursively
+    for (const MX& e1 : ex) {
+      if (e1.n_primitives()!=1) {
+        // Split ex into its primitives
+        vector<MX> ex1;
+        for (const MX& e : ex) {
+          vector<MX> prim = e.primitives();
+          ex1.insert(ex1.end(), prim.begin(), prim.end());
         }
-        break;
-      default:
-        {
-          // Arguments of the operation
-          oarg.resize(it->arg.size());
-          for (int i=0; i<oarg.size(); ++i) {
-            int el = it->arg[i];
-            oarg[i] = el<0 ? MX(it->data->dep(i).size()) : work.at(el);
-          }
 
-          // Perform the operation
-          ores.resize(it->res.size());
-          it->data->eval_mx(oarg, ores);
+        // Call recursively
+        substitute_inplace(v, vdef, ex1, reverse);
 
-          // Get the result
-          for (int i=0; i<ores.size(); ++i) {
-            int el = it->res[i];
-            if (el>=0) work.at(el) = ores[i];
-          }
+        // Join primitives
+        vector<MX>::const_iterator start, stop=ex1.begin();
+        for (MX& e : ex) {
+          start = stop;
+          stop = start + e.n_primitives();
+          e = e.join_primitives(vector<MX>(start, stop));
         }
+        return;
       }
     }
+
+    // implemented in MXFunction
+    std::vector<MX> f_out = vdef;
+    f_out.insert(f_out.end(), ex.begin(), ex.end());
+    Function temp("temp", {v}, f_out);
+    temp.get<MXFunction>()->substitute_inplace(vdef, ex);
   }
 
   MX MX::substitute(const MX& ex, const MX& v, const MX& vdef) {
@@ -1348,7 +1323,7 @@ namespace casadi {
 
     for (auto it=algorithm.begin(); it!=algorithm.end(); ++it) {
 
-      if (!(it->data).is_null()) {
+      if (it->op != OP_OUTPUT) {
         // Check if it->data points to a supplied expr
         it_lookup = expr_lookup.find((it->data).operator->());
 
@@ -1369,7 +1344,8 @@ namespace casadi {
         tainted[it->res.front()] = false;
         break;
       case OP_OUTPUT:
-        f_out[it->res.front()] = swork[it->arg.front()];
+        casadi_assert_message(it->data->segment()==0, "Not implemented");
+        f_out[it->data->ind()] = swork[it->arg.front()];
         break;
       default:
         {
@@ -1498,9 +1474,14 @@ namespace casadi {
     k=0;
     for (auto it=algorithm.begin(); it<algorithm.end(); ++it, ++k) {
       switch (it->op) {
-      case OP_OUTPUT:     ex[it->res.front()] = work[it->arg.front()];      break;
+      case OP_OUTPUT:
+        casadi_assert_message(it->data->segment()==0, "Not implemented");
+        ex[it->data->ind()] = work[it->arg.front()];
+        break;
       case OP_CONST:
-      case OP_PARAMETER:  work[it->res.front()] = it->data; break;
+      case OP_PARAMETER:
+        work[it->res.front()] = it->data;
+        break;
       default:
         {
           // Arguments of the operation

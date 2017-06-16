@@ -257,6 +257,15 @@ namespace casadi {
     /** \brief Is the node nonlinear */
     virtual bool isNonLinear() {return false;}
 
+    // Get IO index
+    virtual int ind() const;
+
+    // Get IO segment
+    virtual int segment() const;
+
+    // Get IO offset
+    virtual int offset() const;
+
     /// Set the sparsity
     void setSparsity(const Sparsity& sparsity);
 

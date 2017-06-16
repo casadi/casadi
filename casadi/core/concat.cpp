@@ -161,7 +161,7 @@ namespace casadi {
     for (int d = 0; d<nfwd; ++d) fsens[d][0] = diagcat(fseed[d]);
   }
 
-  std::pair<std::vector<int>, std::vector<int> > Diagcat::offset() const {
+  std::pair<std::vector<int>, std::vector<int> > Diagcat::off() const {
     vector<int> offset1(ndep()+1, 0);
     vector<int> offset2(ndep()+1, 0);
     for (int i=0; i<ndep(); ++i) {
@@ -176,7 +176,7 @@ namespace casadi {
   void Diagcat::eval_reverse(const std::vector<std::vector<MX> >& aseed,
                         std::vector<std::vector<MX> >& asens) const {
     // Get offsets for each row and column
-    auto off = offset();
+    auto off = this->off();
 
     // Adjoint sensitivities
     int nadj = aseed.size();
@@ -216,7 +216,7 @@ namespace casadi {
     }
   }
 
-  std::vector<int> Horzcat::offset() const {
+  std::vector<int> Horzcat::off() const {
     vector<int> col_offset(ndep()+1, 0);
     for (int i=0; i<ndep(); ++i) {
       int ncol = dep(i).sparsity().size2();
@@ -228,7 +228,7 @@ namespace casadi {
   void Horzcat::eval_reverse(const std::vector<std::vector<MX> >& aseed,
                         std::vector<std::vector<MX> >& asens) const {
     // Get offsets for each column
-    vector<int> col_offset = offset();
+    vector<int> col_offset = off();
 
     // Adjoint sensitivities
     int nadj = aseed.size();
@@ -267,7 +267,7 @@ namespace casadi {
     }
   }
 
-  std::vector<int> Vertcat::offset() const {
+  std::vector<int> Vertcat::off() const {
     vector<int> row_offset(ndep()+1, 0);
     for (int i=0; i<ndep(); ++i) {
       int nrow = dep(i).sparsity().size1();
@@ -279,7 +279,7 @@ namespace casadi {
   void Vertcat::eval_reverse(const std::vector<std::vector<MX> >& aseed,
                         std::vector<std::vector<MX> >& asens) const {
     // Get offsets for each row
-    vector<int> row_offset = offset();
+    vector<int> row_offset = off();
 
     // Adjoint sensitivities
     int nadj = aseed.size();
@@ -307,7 +307,7 @@ namespace casadi {
   }
 
   void Horzcat::split_primitives(const MX& x, std::vector<MX>::iterator& it) const {
-    vector<MX> s = horzsplit(x, offset());
+    vector<MX> s = horzsplit(x, off());
     for (int i=0; i<s.size(); ++i) {
       dep(i)->split_primitives(s[i], it);
     }
@@ -322,7 +322,7 @@ namespace casadi {
   }
 
   void Vertcat::split_primitives(const MX& x, std::vector<MX>::iterator& it) const {
-    vector<MX> s = vertsplit(x, offset());
+    vector<MX> s = vertsplit(x, off());
     for (int i=0; i<s.size(); ++i) {
       dep(i)->split_primitives(s[i], it);
     }
@@ -337,7 +337,7 @@ namespace casadi {
   }
 
   void Diagcat::split_primitives(const MX& x, std::vector<MX>::iterator& it) const {
-    std::pair<std::vector<int>, std::vector<int> > off = offset();
+    std::pair<std::vector<int>, std::vector<int> > off = this->off();
     vector<MX> s = diagsplit(x, off.first, off.second);
     for (int i=0; i<s.size(); ++i) {
       dep(i)->split_primitives(s[i], it);

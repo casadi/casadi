@@ -187,6 +187,9 @@ namespace casadi {
 
     /** \brief Get default input value */
     double default_in(int ind) const override { return default_in_.at(ind);}
+
+    /// Substitute inplace, internal implementation
+    void substitute_inplace(std::vector<MX>& vdef, std::vector<MX>& ex) const;
   };
 
 } // namespace casadi
