@@ -83,6 +83,11 @@ namespace casadi {
     // Sort Worhp options
     int nopts = WorhpGetParamCount();
     for (auto&& op : worhp_opts) {
+      if (op.first.compare("qp")==0) {
+        qp_opts_ = op.second;
+        continue;
+      }
+
       // Get corresponding index using a linear search
       int ind;
       for (ind=1; ind<=nopts; ++ind) {
@@ -105,7 +110,7 @@ namespace casadi {
         int_opts_[op.first] = op.second;
         break;
       default:
-        casadi_error("Cannot handle WORHP option \"" + op.first + "\": Unknown type");
+        casadi_error("Cannot handle WORHP option \"" + op.first + "\": Unknown type " + to_string(WorhpGetParamType(ind)) + ".");
         break;
       }
     }
@@ -162,6 +167,71 @@ namespace casadi {
     // Pass integer parameters
     for (auto&& op : int_opts_) {
       WorhpSetIntParam(&m->worhp_p, op.first.c_str(), op.second);
+    }
+
+    // Pass qp parameters
+    for (auto&& op : qp_opts_) {
+      if (op.first=="ipBarrier") {
+        m->worhp_p.qp.ipBarrier = op.second;
+      } else if (op.first=="ipComTol") {
+        m->worhp_p.qp.ipComTol = op.second;
+      } else if (op.first=="ipFracBound") {
+        m->worhp_p.qp.ipFracBound = op.second;
+      } else if (op.first=="ipMinAlpha") {
+        m->worhp_p.qp.ipMinAlpha = op.second;
+      } else if (op.first=="ipRelaxDiv") {
+        m->worhp_p.qp.ipRelaxDiv = op.second;
+      } else if (op.first=="ipRelaxMax") {
+        m->worhp_p.qp.ipRelaxMax = op.second;
+      } else if (op.first=="ipRelaxMin") {
+        m->worhp_p.qp.ipRelaxMin = op.second;
+      } else if (op.first=="ipRelaxMult") {
+        m->worhp_p.qp.ipRelaxMult = op.second;
+      } else if (op.first=="ipResTol") {
+        m->worhp_p.qp.ipResTol = op.second;
+      } else if (op.first=="lsTol") {
+        m->worhp_p.qp.lsTol = op.second;
+      } else if (op.first=="nsnBeta") {
+        m->worhp_p.qp.nsnBeta = op.second;
+      } else if (op.first=="nsnKKT") {
+        m->worhp_p.qp.nsnKKT = op.second;
+      } else if (op.first=="nsnMinAlpha") {
+        m->worhp_p.qp.nsnMinAlpha = op.second;
+      } else if (op.first=="nsnSigma") {
+        m->worhp_p.qp.nsnSigma = op.second;
+      } else if (op.first=="ipLsMethod") {
+        m->worhp_p.qp.ipLsMethod = op.second;
+      } else if (op.first=="lsItMaxIter") {
+        m->worhp_p.qp.lsItMaxIter = op.second;
+      } else if (op.first=="lsItMethod") {
+        m->worhp_p.qp.lsItMethod = op.second;
+      } else if (op.first=="lsItPrecondMethod") {
+        m->worhp_p.qp.lsItPrecondMethod = op.second;
+      } else if (op.first=="lsRefineMaxIter") {
+        m->worhp_p.qp.lsRefineMaxIter = op.second;
+      } else if (op.first=="maxIter") {
+        m->worhp_p.qp.maxIter = op.second;
+      } else if (op.first=="method") {
+        m->worhp_p.qp.method = op.second;
+      } else if (op.first=="nsnLsMethod") {
+        m->worhp_p.qp.nsnLsMethod = op.second;
+      } else if (op.first=="printLevel") {
+        m->worhp_p.qp.printLevel = op.second;
+      } else if (op.first=="ipTryRelax") {
+        m->worhp_p.qp.ipTryRelax = op.second;
+      } else if (op.first=="lsScale") {
+        m->worhp_p.qp.lsScale = op.second;
+      } else if (op.first=="lsTrySimple") {
+        m->worhp_p.qp.lsTrySimple = op.second;
+      } else if (op.first=="nsnGradStep") {
+        m->worhp_p.qp.nsnGradStep = op.second;
+      } else if (op.first=="scaleIntern") {
+        m->worhp_p.qp.scaleIntern = op.second;
+      } else if (op.first=="strict") {
+        m->worhp_p.qp.strict = op.second;
+      } else {
+        casadi_error("No such Worhp option: qp." + op.first);
+      }
     }
 
 

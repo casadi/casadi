@@ -135,6 +135,7 @@ namespace casadi {
     std::map<std::string, bool> bool_opts_;
     std::map<std::string, int> int_opts_;
     std::map<std::string, double> double_opts_;
+    Dict qp_opts_;
 
     // WORHP return codes
     static const char* return_codes(int flag);
