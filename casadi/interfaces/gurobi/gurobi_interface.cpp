@@ -116,6 +116,10 @@ namespace casadi {
   eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
     auto m = static_cast<GurobiMemory*>(mem);
 
+    if (inputs_check_) {
+      checkInputs(arg[CONIC_LBX], arg[CONIC_UBX], arg[CONIC_LBA], arg[CONIC_UBA]);
+    }
+
     // Inputs
     const double *h=arg[CONIC_H],
       *g=arg[CONIC_G],

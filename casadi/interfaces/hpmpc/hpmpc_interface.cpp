@@ -573,6 +573,10 @@ namespace casadi {
 
   void HpmpcInterface::
   eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
+    if (inputs_check_) {
+      checkInputs(arg[CONIC_LBX], arg[CONIC_UBX], arg[CONIC_LBA], arg[CONIC_UBA]);
+    }
+
     auto m = static_cast<HpmpcMemory*>(mem);
     // Statistics
     for (auto&& s : m->fstats) s.second.reset();
