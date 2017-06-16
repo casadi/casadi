@@ -803,7 +803,6 @@ namespace casadi {
   }
 
   int MX::n_primitives() const {
-    casadi_assert_message(is_valid_input(), "Not a valid input expression");
     return (*this)->n_primitives();
   }
 
