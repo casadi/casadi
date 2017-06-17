@@ -421,7 +421,8 @@ namespace casadi {
   string MXFunction::print(const AlgEl& el) const {
     stringstream s;
     if (el.op==OP_OUTPUT) {
-      s << "output[" << el.res.front() << "] = @" << el.arg.at(0);
+      s << "output[" << el.res.at(0) << "][" << el.res.at(1) << "]"
+        << " = @" << el.arg.at(0);
     } else if (el.op==OP_SETNONZEROS || el.op==OP_ADDNONZEROS) {
       if (el.res.front()!=el.arg.at(0)) {
         s << "@" << el.res.front() << " = @" << el.arg.at(0) << "; ";
@@ -491,11 +492,12 @@ namespace casadi {
         }
       } else if (e.op==OP_OUTPUT) {
         // Get the output sensitivities
-        int i=e.res.front();
-        int nnz=nnz_out(i);
+        int nnz=e.data.nnz();
+        int i=e.res.at(0);
+        int nz_offset=e.res.at(2);
         bvec_t* resi = res[i];
         bvec_t* w1 = w + workloc_[e.arg.front()];
-        if (resi!=0) copy(w1, w1+nnz, resi);
+        if (resi!=0) copy(w1, w1+nnz, resi+nz_offset);
       } else {
         // Point pointers to the data corresponding to the element
         for (int i=0; i<e.arg.size(); ++i)
@@ -529,12 +531,13 @@ namespace casadi {
         fill_n(w1, nnz, 0);
       } else if (it->op==OP_OUTPUT) {
         // Pass output seeds
-        int i=it->res.front();
-        int nnz=nnz_out(i);
+        int nnz=it->data.nnz();
+        int i=it->res.at(0);
+        int nz_offset=it->res.at(2);
         bvec_t* resi = res[i];
         bvec_t* w1 = w + workloc_[it->arg.front()];
         if (resi!=0) {
-          for (int k=0; k<nnz; ++k) w1[k] |= resi[k];
+          for (int k=0; k<nnz; ++k) w1[k] |= resi[k+nz_offset];
           fill_n(resi, nnz, 0);
         }
       } else {
