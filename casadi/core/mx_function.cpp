@@ -134,15 +134,18 @@ namespace casadi {
       if (op>=0) {
         AlgEl ae;
         ae.op = op;
-        ae.data.assignNode(n);
 
         // Add input and output argument
         if (op==OP_OUTPUT) {
+          ae.data = out_.at(curr_oind);
           ae.arg.resize(1);
           ae.arg[0] = out_.at(curr_oind)->temp;
-          ae.res.resize(1);
+          ae.res.resize(3);
           ae.res[0] = curr_oind++;
+          ae.res[1] = 0; // primitives
+          ae.res[2] = 0; // nonzero offset
         } else {
+          ae.data.assignNode(n);
           ae.arg.resize(n->n_dep());
           for (int i=0; i<n->n_dep(); ++i) {
             ae.arg[i] = n->dep(i)->temp;
@@ -356,7 +359,7 @@ namespace casadi {
 
     // Does any embedded function have reference counting for codegen?
     for (auto&& a : algorithm_) {
-      if (!a.data.is_null() && a.data->has_refcount()) {
+      if (a.data->has_refcount()) {
         has_refcount_ = true;
         break;
       }
@@ -396,8 +399,10 @@ namespace casadi {
       } else if (e.op==OP_OUTPUT) {
         // Get an output
         double *w1 = w+workloc_[e.arg.front()];
-        int i=e.res.front();
-        if (res[i]!=0) copy(w1, w1+nnz_out(i), res[i]);
+        int nnz=e.data.nnz();
+        int i=e.res.at(0);
+        int nz_offset=e.res.at(2);
+        if (res[i]) copy(w1, w1+nnz, res[i]+nz_offset);
       } else {
         // Point pointers to the data corresponding to the element
         for (int i=0; i<e.arg.size(); ++i)
@@ -1037,27 +1042,21 @@ namespace casadi {
 
     // Generate code for the embedded functions
     for (auto&& a : algorithm_) {
-      if (!a.data.is_null()) {
-        a.data->addDependency(g);
-      }
+      a.data->addDependency(g);
     }
   }
 
   void MXFunction::codegen_incref(CodeGenerator& g) const {
     set<void*> added;
     for (auto&& a : algorithm_) {
-      if (!a.data.is_null()) {
-        a.data->codegen_incref(g, added);
-      }
+      a.data->codegen_incref(g, added);
     }
   }
 
   void MXFunction::codegen_decref(CodeGenerator& g) const {
     set<void*> added;
     for (auto&& a : algorithm_) {
-      if (!a.data.is_null()) {
-        a.data->codegen_decref(g, added);
-      }
+      a.data->codegen_decref(g, added);
     }
   }
 
