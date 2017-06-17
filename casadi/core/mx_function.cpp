@@ -596,8 +596,12 @@ namespace casadi {
 
     // Split up inputs analogous to symbolic primitives
     vector<vector<MX> > arg_split(arg.size());
-    for (int i=0; i<arg.size(); ++i)
-      arg_split[i] = in_[i].split_primitives(arg[i]);
+    for (int i=0; i<arg.size(); ++i) arg_split[i] = in_[i].split_primitives(arg[i]);
+
+    // Allocate storage for split outputs
+    vector<vector<MX> > res_split(res.size());
+    //for (int i=0; i<res.size(); ++i) res_split[i].resize(out_[i].n_primitives());
+    for (int i=0; i<res.size(); ++i) res_split[i].resize(1); // FIXME
 
     vector<MX> arg1, res1;
 
@@ -609,7 +613,7 @@ namespace casadi {
                                          it->data.sparsity(), true);
       } else if (it->op==OP_OUTPUT) {
         // Collect the results
-        res[it->res.front()] = swork[it->arg.front()];
+        res_split.at(it->res.at(0)).at(it->res.at(1)) = swork[it->arg.front()];
       } else if (it->op==OP_PARAMETER) {
         // Fetch parameter
         swork[it->res.front()] = it->data;
@@ -632,6 +636,11 @@ namespace casadi {
         }
       }
     }
+
+    // Join split outputs
+    //for (int i=0; i<res.size(); ++i) res[i] = out_[i].join_primitives(res_split[i]);
+    for (int i=0; i<res.size(); ++i) res[i] = res_split[i].at(0); // FIXME
+
     log("MXFunction::eval_mx end");
   }
 
@@ -685,11 +694,6 @@ namespace casadi {
       }
     }
 
-    // Allocate forward sensitivities
-    for (int d=0; d<nfwd; ++d) {
-      fsens[d].resize(out_.size());
-    }
-
     // Work vector, forward derivatives
     std::vector<std::vector<MX> > dwork(workloc_.size()-1);
     fill(dwork.begin(), dwork.end(), std::vector<MX>(nfwd));
@@ -701,6 +705,16 @@ namespace casadi {
       fseed_split[d].resize(fseed[d].size());
       for (int i=0; i<fseed[d].size(); ++i) {
         fseed_split[d][i] = in_[i].split_primitives(fseed[d][i]);
+      }
+    }
+
+    // Allocate splited forward sensitivities
+    vector<vector<vector<MX> > > fsens_split(nfwd);
+    for (int d=0; d<nfwd; ++d) {
+      fsens_split[d].resize(out_.size());
+      for (int i=0; i<out_.size(); ++i) {
+        //fsens_split[d][i].resize(out_[i].n_primitives());
+        fsens_split[d][i].resize(1); // FIXME
       }
     }
 
@@ -721,7 +735,7 @@ namespace casadi {
       } else if (e.op==OP_OUTPUT) {
         // Collect forward sensitivity
         for (int d=0; d<nfwd; ++d) {
-          fsens[d][e.res.front()] = dwork[e.arg.front()][d];
+          fsens_split[d][e.res.at(0)][e.res.at(1)] = dwork[e.arg.front()][d];
         }
       } else if (e.op==OP_PARAMETER) {
         // Fetch parameter
@@ -767,6 +781,15 @@ namespace casadi {
         }
       }
     }
+
+    // Get forward sensitivities
+    for (int d=0; d<nfwd; ++d) {
+      for (int i=0; i<out_.size(); ++i) {
+        //fsens[d][i] = out_[i].join_primitives(fsens_split[d][i]);
+        fsens[d][i] = fsens_split[d][i].at(0); //FIXME
+      }
+    }
+
     log("MXFunction::ad_forward end");
   }
 
@@ -821,6 +844,16 @@ namespace casadi {
       }
     }
 
+    // Split up aseed analogous to symbolic primitives
+    vector<vector<vector<MX> > > aseed_split(nadj);
+    for (int d=0; d<nadj; ++d) {
+      aseed_split[d].resize(out_.size());
+      for (int i=0; i<out_.size(); ++i) {
+        //aseed_split[d][i] = out_[i].split_primitives(aseed[d][i]);
+        aseed_split[d][i] = {aseed[d][i]}; // FIXME
+      }
+    }
+
     // Allocate splited adjoint sensitivities
     vector<vector<vector<MX> > > asens_split(nadj);
     for (int d=0; d<nadj; ++d) {
@@ -852,7 +885,8 @@ namespace casadi {
       } else if (it->op==OP_OUTPUT) {
         // Pass the adjoint seeds
         for (int d=0; d<nadj; ++d) {
-          MX a = project(aseed[d][it->res.front()], sparsity_out(it->res.front()), true);
+          MX a = project(aseed_split[d].at(it->res.at(0)).at(it->res.at(1)),
+                         it->data.sparsity(), true);
           if (dwork[it->arg.front()][d].is_empty(true)) {
             dwork[it->arg.front()][d] = a;
           } else {
@@ -941,7 +975,6 @@ namespace casadi {
 
     // Get adjoint sensitivities
     for (int d=0; d<nadj; ++d) {
-      asens[d].resize(in_.size());
       for (int i=0; i<in_.size(); ++i) {
         asens[d][i] = in_[i].join_primitives(asens_split[d][i]);
       }
