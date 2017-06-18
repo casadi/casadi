@@ -89,19 +89,25 @@ namespace casadi {
     vector<MXNode*> nodes;
 
     // Add the list of nodes
-    for (MX& e : out_) {
-      // Add outputs to the list
-
-      s.push(static_cast<MXNode*>(e.get()));
-      sort_depth_first(s, nodes);
-
-      // A null pointer means an output instruction
-      nodes.push_back(static_cast<MXNode*>(0));
+    for (int ind=0; ind<out_.size(); ++ind) {
+      // Loop over primitives of each output
+      //vector<MX> prim = out_[ind].primitives();
+      vector<MX> prim = {out_[ind]}; // FIXME
+      int nz_offset=0;
+      for (int p=0; p<prim.size(); ++p) {
+        // Get the nodes using a depth first search
+        s.push(prim[p].get());
+        sort_depth_first(s, nodes);
+        // Add an output instruction ("data" below will take ownership)
+        nodes.push_back(new Output(prim[p], ind, p, nz_offset));
+        // Update offset
+        nz_offset += prim[p].nnz();
+      }
     }
 
     // Set the temporary variables to be the corresponding place in the sorted graph
     for (int i=0; i<nodes.size(); ++i) {
-      if (nodes[i]) nodes[i]->temp = i;
+      nodes[i]->temp = i;
     }
 
     // Place in the algorithm for each node
@@ -110,9 +116,6 @@ namespace casadi {
 
     // Input instructions
     vector<pair<int, MXNode*> > symb_loc;
-
-    // Current output and nonzero, start with the first one
-    int curr_oind=0;
 
     // Count the number of times each node is used
     vector<int> refcount(nodes.size(), 0);
@@ -123,7 +126,7 @@ namespace casadi {
     for (MXNode* n : nodes) {
 
       // Get the operation
-      int op = n==0 ? OP_OUTPUT : n->op();
+      int op = n->op();
 
       // Store location if parameter (or input)
       if (op==OP_PARAMETER) {
@@ -134,22 +137,17 @@ namespace casadi {
       if (op>=0) {
         AlgEl ae;
         ae.op = op;
-
-        // Add input and output argument
+        ae.data.assignNode(n);
+        ae.arg.resize(n->n_dep());
+        for (int i=0; i<n->n_dep(); ++i) {
+          ae.arg[i] = n->dep(i)->temp;
+        }
         if (op==OP_OUTPUT) {
-          ae.data = out_.at(curr_oind);
-          ae.arg.resize(1);
-          ae.arg[0] = out_.at(curr_oind)->temp;
           ae.res.resize(3);
-          ae.res[0] = curr_oind++;
-          ae.res[1] = 0; // primitives
-          ae.res[2] = 0; // nonzero offset
+          ae.res[0] = n->ind();
+          ae.res[1] = n->segment();
+          ae.res[2] = n->offset();
         } else {
-          ae.data.assignNode(n);
-          ae.arg.resize(n->n_dep());
-          for (int i=0; i<n->n_dep(); ++i) {
-            ae.arg[i] = n->dep(i)->temp;
-          }
           ae.res.resize(n->nout());
           if (n->has_output()) {
             fill(ae.res.begin(), ae.res.end(), -1);
@@ -394,7 +392,7 @@ namespace casadi {
       } else if (e.op==OP_OUTPUT) {
         // Get an output
         double *w1 = w+workloc_[e.arg.front()];
-        int nnz=e.data.nnz();
+        int nnz=e.data.dep().nnz();
         int i=e.res.at(0);
         int nz_offset=e.res.at(2);
         if (res[i]) copy(w1, w1+nnz, res[i]+nz_offset);
@@ -486,7 +484,7 @@ namespace casadi {
         }
       } else if (e.op==OP_OUTPUT) {
         // Get the output sensitivities
-        int nnz=e.data.nnz();
+        int nnz=e.data.dep().nnz();
         int i=e.res.at(0);
         int nz_offset=e.res.at(2);
         bvec_t* resi = res[i];
@@ -525,7 +523,7 @@ namespace casadi {
         fill_n(w1, nnz, 0);
       } else if (it->op==OP_OUTPUT) {
         // Pass output seeds
-        int nnz=it->data.nnz();
+        int nnz=it->data.dep().nnz();
         int i=it->res.at(0);
         int nz_offset=it->res.at(2);
         bvec_t* resi = res[i];
@@ -881,7 +879,7 @@ namespace casadi {
         // Pass the adjoint seeds
         for (int d=0; d<nadj; ++d) {
           MX a = project(aseed_split[d].at(it->res.at(0)).at(it->res.at(1)),
-                         it->data.sparsity(), true);
+                         it->data.dep().sparsity(), true);
           if (dwork[it->arg.front()][d].is_empty(true)) {
             dwork[it->arg.front()][d] = a;
           } else {
@@ -1000,7 +998,7 @@ namespace casadi {
       } else if (a.op==OP_OUTPUT) {
         // Get the outputs
         SXElem *w1 = w+workloc_[a.arg.front()];
-        int nnz=a.data.nnz();
+        int nnz=a.data.dep().nnz();
         int i=a.res.at(0);
         int nz_offset=a.res.at(2);
         if (res[i]!=0)
