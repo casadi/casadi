@@ -91,8 +91,7 @@ namespace casadi {
     // Add the list of nodes
     for (int ind=0; ind<out_.size(); ++ind) {
       // Loop over primitives of each output
-      //vector<MX> prim = out_[ind].primitives();
-      vector<MX> prim = {out_[ind]}; // FIXME
+      vector<MX> prim = out_[ind].primitives();
       int nz_offset=0;
       for (int p=0; p<prim.size(); ++p) {
         // Get the nodes using a depth first search
@@ -196,7 +195,7 @@ namespace casadi {
       // There are two tasks, allocate memory of the result and free the
       // memory off the arguments, order depends on whether inplace is possible
       int first_to_free = 0;
-      int last_to_free = e.op==OP_OUTPUT ? 1 : e.data->n_inplace();
+      int last_to_free = e.data->n_inplace();
       for (int task=0; task<2; ++task) {
 
         // Dereference or free the memory of the arguments
@@ -228,7 +227,7 @@ namespace casadi {
         }
 
         // Nothing more to allocate
-        if (e.op==OP_OUTPUT || task==1) break;
+        if (task==1) break;
 
         // Free the rest in the next iteration
         first_to_free = last_to_free;
@@ -519,11 +518,12 @@ namespace casadi {
         int nnz=it->data.dep().nnz();
         int i=it->data->ind();
         int nz_offset=it->data->offset();
-        bvec_t* resi = res[i];
+        bvec_t* resi = res[i] ? res[i] + nz_offset : 0;
         bvec_t* w1 = w + workloc_[it->arg.front()];
         if (resi!=0) {
-          for (int k=0; k<nnz; ++k) w1[k] |= resi[k+nz_offset];
+          for (int k=0; k<nnz; ++k) w1[k] |= resi[k];
           fill_n(resi, nnz, 0);
+
         }
       } else {
         // Point pointers to the data corresponding to the element
@@ -580,13 +580,12 @@ namespace casadi {
     log("MXFunction::eval_mx allocated work vector");
 
     // Split up inputs analogous to symbolic primitives
-    vector<vector<MX> > arg_split(arg.size());
-    for (int i=0; i<arg.size(); ++i) arg_split[i] = in_[i].split_primitives(arg[i]);
+    vector<vector<MX> > arg_split(in_.size());
+    for (int i=0; i<in_.size(); ++i) arg_split[i] = in_[i].split_primitives(arg[i]);
 
     // Allocate storage for split outputs
-    vector<vector<MX> > res_split(res.size());
-    //for (int i=0; i<res.size(); ++i) res_split[i].resize(out_[i].n_primitives());
-    for (int i=0; i<res.size(); ++i) res_split[i].resize(1); // FIXME
+    vector<vector<MX> > res_split(out_.size());
+    for (int i=0; i<out_.size(); ++i) res_split[i].resize(out_[i].n_primitives());
 
     vector<MX> arg1, res1;
 
@@ -623,8 +622,7 @@ namespace casadi {
     }
 
     // Join split outputs
-    //for (int i=0; i<res.size(); ++i) res[i] = out_[i].join_primitives(res_split[i]);
-    for (int i=0; i<res.size(); ++i) res[i] = res_split[i].at(0); // FIXME
+    for (int i=0; i<res.size(); ++i) res[i] = out_[i].join_primitives(res_split[i]);
 
     log("MXFunction::eval_mx end");
   }
@@ -698,8 +696,7 @@ namespace casadi {
     for (int d=0; d<nfwd; ++d) {
       fsens_split[d].resize(out_.size());
       for (int i=0; i<out_.size(); ++i) {
-        //fsens_split[d][i].resize(out_[i].n_primitives());
-        fsens_split[d][i].resize(1); // FIXME
+        fsens_split[d][i].resize(out_[i].n_primitives());
       }
     }
 
@@ -771,8 +768,7 @@ namespace casadi {
     // Get forward sensitivities
     for (int d=0; d<nfwd; ++d) {
       for (int i=0; i<out_.size(); ++i) {
-        //fsens[d][i] = out_[i].join_primitives(fsens_split[d][i]);
-        fsens[d][i] = fsens_split[d][i].at(0); //FIXME
+        fsens[d][i] = out_[i].join_primitives(fsens_split[d][i]);
       }
     }
 
@@ -835,8 +831,7 @@ namespace casadi {
     for (int d=0; d<nadj; ++d) {
       aseed_split[d].resize(out_.size());
       for (int i=0; i<out_.size(); ++i) {
-        //aseed_split[d][i] = out_[i].split_primitives(aseed[d][i]);
-        aseed_split[d][i] = {aseed[d][i]}; // FIXME
+        aseed_split[d][i] = out_[i].split_primitives(aseed[d][i]);
       }
     }
 
@@ -994,8 +989,7 @@ namespace casadi {
         int nnz=a.data.dep().nnz();
         int i=a.data->ind();
         int nz_offset=a.data->offset();
-        if (res[i]!=0)
-          std::copy(w1, w1+nnz, res[i]+nz_offset);
+        if (res[i]) std::copy(w1, w1+nnz, res[i]+nz_offset);
       } else if (a.op==OP_PARAMETER) {
         continue; // FIXME
       } else {
@@ -1210,8 +1204,7 @@ namespace casadi {
     vector<MX> y;
     vector<MX> g;
     vector<vector<MX> > f_G(out_.size());
-    //for (int i=0; i<out_.size(); ++i) f_G[i].resize(out_[i].n_primitives());
-    for (int i=0; i<out_.size(); ++i) f_G[i].resize(1); // FIXME
+    for (int i=0; i<out_.size(); ++i) f_G[i].resize(out_[i].n_primitives());
 
     // Initial guess for intermediate variables
     vector<MX> x_init;
@@ -1280,8 +1273,7 @@ namespace casadi {
     vector<MX> f_in = in_;
     f_in.insert(f_in.end(), y.begin(), y.end());
     vector<MX> f_out;
-    //for (int i=0; i<out_.size(); ++i) f_out.push_back(out_[i].join_primitives(f_G[i]));
-    for (int i=0; i<out_.size(); ++i) f_out.push_back(f_G[i].at(0)); // FIXME
+    for (int i=0; i<out_.size(); ++i) f_out.push_back(out_[i].join_primitives(f_G[i]));
     f_out.insert(f_out.end(), g.begin(), g.end());
     vdef_fcn = Function("lifting_variable_definition", f_in, f_out);
 
