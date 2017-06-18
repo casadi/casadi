@@ -1280,10 +1280,11 @@ namespace casadi {
         work.at(it->res.front()) = it->data;
         break;
       case OP_OUTPUT:
-        if (it->res.front()<vdef.size()) {
-          vdef.at(it->res.front()) = work.at(it->arg.front());
+        casadi_assert_message(it->data->segment()==0, "Not implemented");
+        if (it->data->ind()<vdef.size()) {
+          vdef.at(it->data->ind()) = work.at(it->arg.front());
         } else {
-          ex.at(it->res.front()-vdef.size()) = work.at(it->arg.front());
+          ex.at(it->data->ind()-vdef.size()) = work.at(it->arg.front());
         }
         break;
       default:
@@ -1400,7 +1401,8 @@ namespace casadi {
         tainted[it->res.front()] = false;
         break;
       case OP_OUTPUT:
-        f_out[it->res.front()] = swork[it->arg.front()];
+        casadi_assert_message(it->data->segment()==0, "Not implemented");
+        f_out[it->data->ind()] = swork[it->arg.front()];
         break;
       default:
         {
@@ -1529,9 +1531,14 @@ namespace casadi {
     k=0;
     for (auto it=algorithm.begin(); it<algorithm.end(); ++it, ++k) {
       switch (it->op) {
-      case OP_OUTPUT:     ex[it->res.front()] = work[it->arg.front()];      break;
+      case OP_OUTPUT:
+        casadi_assert_message(it->data->segment()==0, "Not implemented");
+        ex[it->data->ind()] = work[it->arg.front()];
+        break;
       case OP_CONST:
-      case OP_PARAMETER:  work[it->res.front()] = it->data; break;
+      case OP_PARAMETER:
+        work[it->res.front()] = it->data;
+        break;
       default:
         {
           // Arguments of the operation

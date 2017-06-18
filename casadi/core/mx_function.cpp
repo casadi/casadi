@@ -393,8 +393,8 @@ namespace casadi {
         // Get an output
         double *w1 = w+workloc_[e.arg.front()];
         int nnz=e.data.dep().nnz();
-        int i=e.res.at(0);
-        int nz_offset=e.res.at(2);
+        int i=e.data->ind();
+        int nz_offset=e.data->offset();
         if (res[i]) copy(w1, w1+nnz, res[i]+nz_offset);
       } else {
         // Point pointers to the data corresponding to the element
@@ -414,7 +414,7 @@ namespace casadi {
   string MXFunction::print(const AlgEl& el) const {
     stringstream s;
     if (el.op==OP_OUTPUT) {
-      s << "output[" << el.res.at(0) << "][" << el.res.at(1) << "]"
+      s << "output[" << el.data->ind() << "][" << el.data->segment() << "]"
         << " = @" << el.arg.at(0);
     } else if (el.op==OP_SETNONZEROS || el.op==OP_ADDNONZEROS) {
       if (el.res.front()!=el.arg.at(0)) {
@@ -485,8 +485,8 @@ namespace casadi {
       } else if (e.op==OP_OUTPUT) {
         // Get the output sensitivities
         int nnz=e.data.dep().nnz();
-        int i=e.res.at(0);
-        int nz_offset=e.res.at(2);
+        int i=e.data->ind();
+        int nz_offset=e.data->offset();
         bvec_t* resi = res[i];
         bvec_t* w1 = w + workloc_[e.arg.front()];
         if (resi!=0) copy(w1, w1+nnz, resi+nz_offset);
@@ -524,8 +524,8 @@ namespace casadi {
       } else if (it->op==OP_OUTPUT) {
         // Pass output seeds
         int nnz=it->data.dep().nnz();
-        int i=it->res.at(0);
-        int nz_offset=it->res.at(2);
+        int i=it->data->ind();
+        int nz_offset=it->data->offset();
         bvec_t* resi = res[i];
         bvec_t* w1 = w + workloc_[it->arg.front()];
         if (resi!=0) {
@@ -605,7 +605,7 @@ namespace casadi {
                                          it->data.sparsity(), true);
       } else if (it->op==OP_OUTPUT) {
         // Collect the results
-        res_split.at(it->res.at(0)).at(it->res.at(1)) = swork[it->arg.front()];
+        res_split.at(it->data->ind()).at(it->data->segment()) = swork[it->arg.front()];
       } else if (it->op==OP_PARAMETER) {
         // Fetch parameter
         swork[it->res.front()] = it->data;
@@ -728,7 +728,7 @@ namespace casadi {
       } else if (e.op==OP_OUTPUT) {
         // Collect forward sensitivity
         for (int d=0; d<nfwd; ++d) {
-          fsens_split[d][e.res.at(0)][e.res.at(1)] = dwork[e.arg.front()][d];
+          fsens_split[d][e.data->ind()][e.data->segment()] = dwork[e.arg.front()][d];
         }
       } else if (e.op==OP_PARAMETER) {
         // Fetch parameter
@@ -878,7 +878,7 @@ namespace casadi {
       } else if (it->op==OP_OUTPUT) {
         // Pass the adjoint seeds
         for (int d=0; d<nadj; ++d) {
-          MX a = project(aseed_split[d].at(it->res.at(0)).at(it->res.at(1)),
+          MX a = project(aseed_split[d].at(it->data->ind()).at(it->data->segment()),
                          it->data.dep().sparsity(), true);
           if (dwork[it->arg.front()][d].is_empty(true)) {
             dwork[it->arg.front()][d] = a;
@@ -999,8 +999,8 @@ namespace casadi {
         // Get the outputs
         SXElem *w1 = w+workloc_[a.arg.front()];
         int nnz=a.data.dep().nnz();
-        int i=a.res.at(0);
-        int nz_offset=a.res.at(2);
+        int i=a.data->ind();
+        int nz_offset=a.data->offset();
         if (res[i]!=0)
           std::copy(w1, w1+nnz, res[i]+nz_offset);
       } else if (a.op==OP_PARAMETER) {
@@ -1133,7 +1133,7 @@ namespace casadi {
       if (e.op==OP_OUTPUT) {
         int n = e.data.nnz();
         if (n!=0) {
-          int oind = e.res.at(0), op = e.res.at(1), oc = e.res.at(2);
+          int oind = e.data->ind(), op = e.data->segment(), oc = e.data->offset();
           int i = e.arg.front();
           if (g.verbose) {
             g << "/* #" << k++ << ": Output " << oind
@@ -1257,7 +1257,7 @@ namespace casadi {
           break;
         case OP_OUTPUT:
           if (algNo==0) {
-            f_G.at(e.res.at(0)).at(e.res.at(1)) = swork[e.arg.front()];
+            f_G.at(e.data->ind()).at(e.data->segment()) = swork[e.arg.front()];
           }
           break;
         default:
