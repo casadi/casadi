@@ -142,18 +142,11 @@ namespace casadi {
         for (int i=0; i<n->n_dep(); ++i) {
           ae.arg[i] = n->dep(i)->temp;
         }
-        if (op==OP_OUTPUT) {
-          ae.res.resize(3);
-          ae.res[0] = n->ind();
-          ae.res[1] = n->segment();
-          ae.res[2] = n->offset();
-        } else {
-          ae.res.resize(n->nout());
-          if (n->has_output()) {
-            fill(ae.res.begin(), ae.res.end(), -1);
-          } else {
-            ae.res[0] = n->temp;
-          }
+        ae.res.resize(n->nout());
+        if (n->has_output()) {
+          fill(ae.res.begin(), ae.res.end(), -1);
+        } else if (!ae.res.empty()) {
+          ae.res[0] = n->temp;
         }
 
         // Increase the reference count of the dependencies
