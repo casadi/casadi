@@ -209,6 +209,15 @@ namespace casadi {
     int size2() const { return sparsity().size2(); }
     std::pair<int, int> size() const { return sparsity().size();}
 
+    // Get IO index
+    virtual int ind() const;
+
+    // Get IO segment
+    virtual int segment() const;
+
+    // Get IO offset
+    virtual int offset() const;
+
     /// Set the sparsity
     void set_sparsity(const Sparsity& sparsity);
 
@@ -393,6 +402,72 @@ namespace casadi {
     /** \brief Propagate sparsities backwards through a copy operation */
     static void copy_rev(bvec_t* arg, bvec_t* res, int len);
   };
+
+  /** \brief An input or output instruction */
+  class CASADI_EXPORT Instruction : public MXNode {
+  protected:
+    // Input/output index
+    int ind_;
+
+    // Segment number
+    int segment_;
+
+    // Nonzero offset
+    int offset_;
+
+    // Constructor (called from derived classes)
+    Instruction(int ind, int segment, int offset)
+      : ind_(ind), segment_(segment), offset_(offset) {}
+
+  public:
+    /// Destructor
+    ~Instruction() override {}
+
+    // Get IO index
+    int ind() const override { return ind_;}
+
+    // Get IO segment
+    int segment() const override { return segment_;}
+
+    // Get IO offset
+    int offset() const override { return offset_;}
+  };
+
+  /** \brief Input instruction  */
+  class CASADI_EXPORT Input : public Instruction {
+  public:
+    // Constructor (called from derived classes)
+    Input(const Sparsity& sp, int ind, int segment, int offset);
+
+    /// Destructor
+    ~Input() override {}
+
+    /** \brief Get the operation */
+    int op() const override { return OP_INPUT;}
+
+    /** \brief  Print expression */
+    std::string print(const std::vector<std::string>& arg) const override;
+  };
+
+  /** \brief Input instruction  */
+  class CASADI_EXPORT Output : public Instruction {
+  public:
+    // Constructor (called from derived classes)
+    Output(const MX& x, int ind, int segment, int offset);
+
+    /// Destructor
+    ~Output() override {}
+
+    /** \brief  Number of outputs */
+    int nout() const override { return 0;}
+
+    /** \brief Get the operation */
+    int op() const override { return OP_OUTPUT;}
+
+    /** \brief  Print expression */
+    std::string print(const std::vector<std::string>& arg) const override;
+  };
+
 
   /// \endcond
 } // namespace casadi

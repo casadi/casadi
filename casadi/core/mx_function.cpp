@@ -328,7 +328,11 @@ namespace casadi {
       for (int p=0; p<prim.size(); ++p) {
         int i = prim[p].get_temp()-1;
         if (i>=0) {
-          // Mark as input
+          // Mark read
+          prim[p].set_temp(0);
+
+          // Replace parameter with input instruction
+          algorithm_[i].data.assignNode(new Input(prim[p].sparsity(), ind, p, nz_offset));
           algorithm_[i].op = OP_INPUT;
 
           // Location of the input
@@ -337,8 +341,6 @@ namespace casadi {
           algorithm_[i].arg[1] = p;
           algorithm_[i].arg[2] = nz_offset;
 
-          // Mark input as read
-          prim[p].set_temp(0);
         }
         nz_offset += prim[p]->nnz();
       }
@@ -446,10 +448,9 @@ namespace casadi {
         }
         s << "} = ";
       }
-      if (el.op==OP_INPUT) {
-        s << "input[" << el.arg.at(0) << "][" << el.arg.at(1) << "]";
-      } else {
-        vector<string> arg(el.arg.size());
+      vector<string> arg;
+      if (el.op!=OP_INPUT) {
+        arg.resize(el.arg.size());
         for (int i=0; i<el.arg.size(); ++i) {
           if (el.arg[i]>=0) {
             arg[i] = "@" + CodeGenerator::to_string(el.arg[i]);
@@ -457,8 +458,8 @@ namespace casadi {
             arg[i] = "NULL";
           }
         }
-        s << el.data->print(arg);
       }
+      s << el.data->print(arg);
     }
     return s.str();
   }
@@ -1216,6 +1217,10 @@ namespace casadi {
 
     vector<MX> arg1, res1;
 
+    // Get input primitives
+    vector<vector<MX> > in_split(in_.size());
+    for (int i=0; i<in_.size(); ++i) in_split[i] = in_[i].primitives();
+
     // Definition of intermediate variables
     vector<MX> y;
     vector<MX> g;
@@ -1253,6 +1258,8 @@ namespace casadi {
             break;
           }
         case OP_INPUT:
+          swork[e.res.front()] = in_split.at(e.arg.at(0)).at(e.arg.at(1));
+          break;
         case OP_PARAMETER:
           swork[e.res.front()] = e.data;
           break;

@@ -170,6 +170,18 @@ namespace casadi {
     return dep_.size();
   }
 
+  int MXNode::ind() const {
+    casadi_error("'ind' not defined for class " + type_name());
+  }
+
+  int MXNode::segment() const {
+    casadi_error("'segment' not defined for class " + type_name());
+  }
+
+  int MXNode::offset() const {
+    casadi_error("'offset' not defined for class " + type_name());
+  }
+
   void MXNode::set_sparsity(const Sparsity& sparsity) {
     sparsity_ = sparsity;
   }
@@ -918,6 +930,28 @@ namespace casadi {
     } else {
       return false;
     }
+  }
+
+  Input::Input(const Sparsity& sp, int ind, int segment, int offset)
+    : Instruction(ind, segment, offset) {
+    set_sparsity(sp);
+  }
+
+  std::string Input::print(const std::vector<std::string>& arg) const {
+    stringstream s;
+    s << "input[" << ind_ << "][" << segment_ << "]";
+    return s.str();
+  }
+
+  Output::Output(const MX& x, int ind, int segment, int offset)
+    : Instruction(ind, segment, offset) {
+    set_dep(x);
+  }
+
+  std::string Output::print(const std::vector<std::string>& arg) const {
+    stringstream s;
+    s << "output[" << ind_ << "][" << segment_ << "]";
+    return s.str();
   }
 
 } // namespace casadi
