@@ -1124,7 +1124,7 @@ namespace casadi {
     // Codegen the algorithm
     for (auto&& e : algorithm_) {
       if (e.op==OP_OUTPUT) {
-        int n = e.data.nnz();
+        int n = e.data.dep().nnz();
         if (n!=0) {
           int oind = e.data->ind(), op = e.data->segment(), oc = e.data->offset();
           int i = e.arg.front();
@@ -1151,7 +1151,7 @@ namespace casadi {
           if (g.verbose) {
             g << "/* #" << k++ << ": Input " << iind
               << " (" << ischeme_.at(iind) << ")"
-              << ", part " << ip << " (" << e.data.name() << ") */\n";
+              << ", part " << ip << " */\n";
           }
           if (n==1) {
             g << g.workel(i) << " = " << arg << " ? "
