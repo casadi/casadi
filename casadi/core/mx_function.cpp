@@ -1219,7 +1219,9 @@ namespace casadi {
     // Definition of intermediate variables
     vector<MX> y;
     vector<MX> g;
-    vector<MX> f_G(n_out());
+    vector<vector<MX> > f_G(out_.size());
+    //for (int i=0; i<out_.size(); ++i) f_G[i].resize(out_[i].n_primitives());
+    for (int i=0; i<out_.size(); ++i) f_G[i].resize(1); // FIXME
 
     // Initial guess for intermediate variables
     vector<MX> x_init;
@@ -1256,7 +1258,7 @@ namespace casadi {
           break;
         case OP_OUTPUT:
           if (algNo==0) {
-            f_G[e.res.front()] = swork[e.arg.front()];
+            f_G.at(e.res.at(0)).at(e.res.at(1)) = swork[e.arg.front()];
           }
           break;
         default:
@@ -1285,7 +1287,9 @@ namespace casadi {
     // Definition of intermediate variables
     vector<MX> f_in = in_;
     f_in.insert(f_in.end(), y.begin(), y.end());
-    vector<MX> f_out = f_G;
+    vector<MX> f_out;
+    //for (int i=0; i<out_.size(); ++i) f_out.push_back(out_[i].join_primitives(f_G[i]));
+    for (int i=0; i<out_.size(); ++i) f_out.push_back(f_G[i].at(0)); // FIXME
     f_out.insert(f_out.end(), g.begin(), g.end());
     vdef_fcn = Function("lifting_variable_definition", f_in, f_out);
 
