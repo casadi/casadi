@@ -1005,9 +1005,11 @@ namespace casadi {
       } else if (a.op==OP_OUTPUT) {
         // Get the outputs
         SXElem *w1 = w+workloc_[a.arg.front()];
-        int i=a.res.front();
+        int nnz=a.data.nnz();
+        int i=a.res.at(0);
+        int nz_offset=a.res.at(2);
         if (res[i]!=0)
-          std::copy(w1, w1+nnz_out(i), res[i]);
+          std::copy(w1, w1+nnz, res[i]+nz_offset);
       } else if (a.op==OP_PARAMETER) {
         continue; // FIXME
       } else {
@@ -1136,19 +1138,22 @@ namespace casadi {
     // Codegen the algorithm
     for (auto&& e : algorithm_) {
       if (e.op==OP_OUTPUT) {
-        int n = nnz_out(e.res.front());
+        int n = e.data.nnz();
         if (n!=0) {
-          int oind = e.res.front();
+          int oind = e.res.at(0), op = e.res.at(1), oc = e.res.at(2);
+          int i = e.arg.front();
           if (g.verbose) {
             g << "/* #" << k++ << ": Output " << oind
-              << " (" << oscheme_.at(oind) << ") */\n";
+              << " (" << oscheme_.at(oind) << ")"
+              << ", part " << op << " */\n";
           }
           string r = "res[" + g.to_string(oind) + "]";
-          int i = e.arg.front();
           if (n==1) {
             g << "if (" << r << ") *" << r << " = " << g.workel(i) << ";\n";
-          } else {
+          } else if (oc==0) {
             g << g.copy(g.work(i, n), n, r) << "\n";
+          } else {
+            g << g.copy(g.work(i, n), n, r + " ? " + r + "+" + to_string(oc) + " : 0") << "\n";
           }
         }
       } else if (e.op==OP_INPUT) {
