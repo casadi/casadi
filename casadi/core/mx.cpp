@@ -1272,7 +1272,8 @@ namespace casadi {
     for (vector<MXAlgEl>::iterator it=algorithm.begin(); it!=algorithm.end(); ++it) {
       switch (it->op) {
       case OP_INPUT:
-        work.at(it->res.front()) = vdef.at(it->arg.front());
+        casadi_assert_message(it->data->segment()==0, "Not implemented");
+        work.at(it->res.front()) = vdef.at(it->data->ind());
         break;
       case OP_PARAMETER:
       case OP_CONST:

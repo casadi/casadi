@@ -334,13 +334,6 @@ namespace casadi {
           // Replace parameter with input instruction
           algorithm_[i].data.assignNode(new Input(prim[p].sparsity(), ind, p, nz_offset));
           algorithm_[i].op = OP_INPUT;
-
-          // Location of the input
-          algorithm_[i].arg.resize(3);
-          algorithm_[i].arg[0] = ind;
-          algorithm_[i].arg[1] = p;
-          algorithm_[i].arg[2] = nz_offset;
-
         }
         nz_offset += prim[p]->nnz();
       }
@@ -391,8 +384,8 @@ namespace casadi {
         // Pass an input
         double *w1 = w+workloc_[e.res.front()];
         int nnz=e.data.nnz();
-        int i=e.arg.at(0);
-        int nz_offset=e.arg.at(2);
+        int i=e.data->ind();
+        int nz_offset=e.data->offset();
         if (arg[i]==0) {
           fill(w1, w1+nnz, 0);
         } else {
@@ -482,8 +475,8 @@ namespace casadi {
       if (e.op==OP_INPUT) {
         // Pass input seeds
         int nnz=e.data.nnz();
-        int i=e.arg.at(0);
-        int nz_offset=e.arg.at(2);
+        int i=e.data->ind();
+        int nz_offset=e.data->offset();
         const bvec_t* argi = arg[i];
         bvec_t* w1 = w + workloc_[e.res.front()];
         if (argi!=0) {
@@ -524,8 +517,8 @@ namespace casadi {
       if (it->op==OP_INPUT) {
         // Get the input sensitivities and clear it from the work vector
         int nnz=it->data.nnz();
-        int i=it->arg.at(0);
-        int nz_offset=it->arg.at(2);
+        int i=it->data->ind();
+        int nz_offset=it->data->offset();
         bvec_t* argi = arg[i];
         bvec_t* w1 = w + workloc_[it->res.front()];
         if (argi!=0) for (int k=0; k<nnz; ++k) argi[nz_offset+k] |= w1[k];
@@ -610,7 +603,7 @@ namespace casadi {
     int alg_counter = 0;
     for (auto it=algorithm_.begin(); it!=algorithm_.end(); ++it, ++alg_counter) {
       if (it->op == OP_INPUT) {
-        swork[it->res.front()] = project(arg_split.at(it->arg.at(0)).at(it->arg.at(1)),
+        swork[it->res.front()] = project(arg_split.at(it->data->ind()).at(it->data->segment()),
                                          it->data.sparsity(), true);
       } else if (it->op==OP_OUTPUT) {
         // Collect the results
@@ -730,8 +723,9 @@ namespace casadi {
       if (e.op == OP_INPUT) {
         // Fetch forward seed
         for (int d=0; d<nfwd; ++d) {
-          dwork[e.res.front()][d] = project(fseed_split[d].at(e.arg.at(0)).at(e.arg.at(1)),
-                                              e.data.sparsity(), true);
+          dwork[e.res.front()][d] =
+            project(fseed_split[d].at(e.data->ind()).at(e.data->segment()),
+                                      e.data.sparsity(), true);
         }
       } else if (e.op==OP_OUTPUT) {
         // Collect forward sensitivity
@@ -880,7 +874,7 @@ namespace casadi {
       if (it->op == OP_INPUT) {
         // Get the adjoint sensitivities
         for (int d=0; d<nadj; ++d) {
-          asens_split[d].at(it->arg.at(0)).at(it->arg.at(1)) = dwork[it->res.front()][d];
+          asens_split[d].at(it->data->ind()).at(it->data->segment()) = dwork[it->res.front()][d];
           dwork[it->res.front()][d] = MX();
         }
       } else if (it->op==OP_OUTPUT) {
@@ -996,8 +990,8 @@ namespace casadi {
         // Pass an input
         SXElem *w1 = w+workloc_[a.res.front()];
         int nnz=a.data.nnz();
-        int i=a.arg.at(0);
-        int nz_offset=a.arg.at(2);
+        int i=a.data->ind();
+        int nz_offset=a.data->offset();
         if (arg[i]==0) {
           std::fill(w1, w1+nnz, 0);
         } else {
@@ -1160,7 +1154,7 @@ namespace casadi {
       } else if (e.op==OP_INPUT) {
         int n = e.data.nnz();
         if (n!=0) {
-          int iind = e.arg.at(0), ip = e.arg.at(1), ic = e.arg.at(2);
+          int iind = e.data->ind(), ip = e.data->segment(), ic = e.data->offset();
           std::string arg = "arg[" + to_string(iind) + "]";
           int i = e.res.front();
           if (g.verbose) {
@@ -1258,7 +1252,7 @@ namespace casadi {
             break;
           }
         case OP_INPUT:
-          swork[e.res.front()] = in_split.at(e.arg.at(0)).at(e.arg.at(1));
+          swork[e.res.front()] = in_split.at(e.data->ind()).at(e.data->segment());
           break;
         case OP_PARAMETER:
           swork[e.res.front()] = e.data;
