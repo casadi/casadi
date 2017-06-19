@@ -68,7 +68,7 @@ namespace casadi {
 
   void Output::generate(CodeGenerator& g, const string& mem,
                        const vector<int>& arg, const vector<int>& res) const {
-    int nnz = this->nnz();
+    int nnz = dep().nnz();
     if (nnz==0) return; // quick return
     int i = arg.front();
     string r = "res[" + g.to_string(ind_) + "]";
