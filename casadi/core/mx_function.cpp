@@ -1123,17 +1123,17 @@ namespace casadi {
           int oind = e.data->ind(), op = e.data->segment(), oc = e.data->offset();
           int i = e.arg.front();
           if (g.verbose) {
-            g << "/* #" << k++ << ": Output " << oind
-              << " (" << oscheme_.at(oind) << ")"
-              << ", part " << op << " */\n";
+            g << "/* #" << k++ << ": Output " << oind << " (" << oscheme_.at(oind) << "), "
+              << "segment " << op << " */\n";
           }
           string r = "res[" + g.to_string(oind) + "]";
+
           if (n==1) {
-            g << "if (" << r << ") *" << r << " = " << g.workel(i) << ";\n";
+            g << "if (" << r << ") " << r << "[" << oc << "] = " << g.workel(i) << ";\n";
           } else if (oc==0) {
             g << g.copy(g.work(i, n), n, r) << "\n";
           } else {
-            g << g.copy(g.work(i, n), n, r + " ? " + r + "+" + to_string(oc) + " : 0") << "\n";
+            g << "if (" << r << ") " << g.copy(g.work(i, n), n, r + "+" + to_string(oc)) << "\n";
           }
         }
       } else if (e.op==OP_INPUT) {
@@ -1143,13 +1143,11 @@ namespace casadi {
           std::string arg = "arg[" + to_string(iind) + "]";
           int i = e.res.front();
           if (g.verbose) {
-            g << "/* #" << k++ << ": Input " << iind
-              << " (" << ischeme_.at(iind) << ")"
-              << ", part " << ip << " */\n";
+            g << "/* #" << k++ << ": Input " << iind << " (" << ischeme_.at(iind) << "), "
+              << "segment " << ip << " */\n";
           }
           if (n==1) {
-            g << g.workel(i) << " = " << arg << " ? "
-              << arg << "[" << ic << "] : 0;\n";
+            g << g.workel(i) << " = " << arg << " ? " << arg << "[" << ic << "] : 0;\n";
           } else if (ic==0) {
             g << g.copy(arg, n, g.work(i, n)) << "\n";
           } else {
