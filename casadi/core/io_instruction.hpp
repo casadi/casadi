@@ -76,6 +76,10 @@ namespace casadi {
 
     /** \brief  Print expression */
     std::string print(const std::vector<std::string>& arg) const override;
+
+    /** \brief Generate code for the operation */
+    void generate(CodeGenerator& g, const std::string& mem,
+                  const std::vector<int>& arg, const std::vector<int>& res) const override;
   };
 
   /** \brief Input instruction  */
@@ -95,6 +99,10 @@ namespace casadi {
 
     /** \brief  Print expression */
     std::string print(const std::vector<std::string>& arg) const override;
+
+    /** \brief Generate code for the operation */
+    void generate(CodeGenerator& g, const std::string& mem,
+                  const std::vector<int>& arg, const std::vector<int>& res) const override;
   };
 
 

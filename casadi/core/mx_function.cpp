@@ -1118,75 +1118,35 @@ namespace casadi {
 
     // Codegen the algorithm
     for (auto&& e : algorithm_) {
-      if (e.op==OP_OUTPUT) {
-        int n = e.data.dep().nnz();
-        if (n!=0) {
-          int oind = e.data->ind(), op = e.data->segment(), oc = e.data->offset();
-          int i = e.arg.front();
-          if (g.verbose) {
-            g << "/* #" << k++ << ": Output " << oind << " (" << oscheme_.at(oind) << "), "
-              << "segment " << op << " */\n";
-          }
-          string r = "res[" + g.to_string(oind) + "]";
-
-          if (n==1) {
-            g << "if (" << r << ") " << r << "[" << oc << "] = " << g.workel(i) << ";\n";
-          } else if (oc==0) {
-            g << g.copy(g.work(i, n), n, r) << "\n";
-          } else {
-            g << "if (" << r << ") " << g.copy(g.work(i, n), n, r + "+" + to_string(oc)) << "\n";
-          }
-        }
-      } else if (e.op==OP_INPUT) {
-        int n = e.data.nnz();
-        if (n!=0) {
-          int iind = e.data->ind(), ip = e.data->segment(), ic = e.data->offset();
-          std::string arg = "arg[" + to_string(iind) + "]";
-          int i = e.res.front();
-          if (g.verbose) {
-            g << "/* #" << k++ << ": Input " << iind << " (" << ischeme_.at(iind) << "), "
-              << "segment " << ip << " */\n";
-          }
-          if (n==1) {
-            g << g.workel(i) << " = " << arg << " ? " << arg << "[" << ic << "] : 0;\n";
-          } else if (ic==0) {
-            g << g.copy(arg, n, g.work(i, n)) << "\n";
-          } else {
-            g << g.copy(arg + " ? " + arg + "+" + to_string(ic) + " : 0",
-                                n, g.work(i, n)) << "\n";
-          }
-        }
-      } else {
-        // Generate comment
-        if (g.verbose) {
-          g << "/* #" << k++ << ": " << print(e) << " */\n";
-        }
-
-        // Get the names of the operation arguments
-        arg.resize(e.arg.size());
-        for (int i=0; i<e.arg.size(); ++i) {
-          int j=e.arg.at(i);
-          if (j>=0 && workloc_.at(j)!=workloc_.at(j+1)) {
-            arg.at(i) = j;
-          } else {
-            arg.at(i) = -1;
-          }
-        }
-
-        // Get the names of the operation results
-        res.resize(e.res.size());
-        for (int i=0; i<e.res.size(); ++i) {
-          int j=e.res.at(i);
-          if (j>=0 && workloc_.at(j)!=workloc_.at(j+1)) {
-            res.at(i) = j;
-          } else {
-            res.at(i) = -1;
-          }
-        }
-
-        // Generate operation
-        e.data->generate(g, "0", arg, res);
+      // Generate comment
+      if (g.verbose) {
+        g << "/* #" << k++ << ": " << print(e) << " */\n";
       }
+
+      // Get the names of the operation arguments
+      arg.resize(e.arg.size());
+      for (int i=0; i<e.arg.size(); ++i) {
+        int j=e.arg.at(i);
+        if (j>=0 && workloc_.at(j)!=workloc_.at(j+1)) {
+          arg.at(i) = j;
+        } else {
+          arg.at(i) = -1;
+        }
+      }
+
+      // Get the names of the operation results
+      res.resize(e.res.size());
+      for (int i=0; i<e.res.size(); ++i) {
+        int j=e.res.at(i);
+        if (j>=0 && workloc_.at(j)!=workloc_.at(j+1)) {
+          res.at(i) = j;
+        } else {
+          res.at(i) = -1;
+        }
+      }
+
+      // Generate operation
+      e.data->generate(g, "0", arg, res);
     }
   }
 
