@@ -39,6 +39,38 @@ namespace casadi {
   ConstantMX::~ConstantMX() {
   }
 
+  bool ConstantMX::is_valid_input() const {
+    return nnz()==0;
+  }
+
+  int ConstantMX::n_primitives() const {
+    if (nnz()==0) {
+      return 0;
+    } else {
+      return MXNode::n_primitives();
+    }
+  }
+
+  void ConstantMX::primitives(std::vector<MX>::iterator& it) const {
+    if (nnz()!=0) {
+      MXNode::primitives(it);
+    }
+  }
+
+  void ConstantMX::split_primitives(const MX& x, std::vector<MX>::iterator& it) const {
+    if (nnz()!=0) {
+      MXNode::split_primitives(x, it);
+    }
+  }
+
+  MX ConstantMX::join_primitives(std::vector<MX>::const_iterator& it) const {
+    if (nnz()==0) {
+      return MX(sparsity());
+    } else {
+      return MXNode::join_primitives(it);
+    }
+  }
+
   void ConstantMX::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
     res[0] = shared_from_this<MX>();
   }
