@@ -1296,4 +1296,54 @@ namespace casadi {
       || (recursive && XFunction<MXFunction,
           MX, MXNode>::is_a(type, recursive));
   }
+
+  void MXFunction::substitute_inplace(std::vector<MX>& vdef, std::vector<MX>& ex) const {
+    vector<MX> work(workloc_.size()-1);
+    vector<MX> oarg, ores;
+
+    for (auto it=algorithm_.begin(); it!=algorithm_.end(); ++it) {
+      switch (it->op) {
+      case OP_INPUT:
+        casadi_assert_message(it->data->segment()==0, "Not implemented");
+        work.at(it->res.front()) = vdef.at(it->data->ind());
+        break;
+      case OP_PARAMETER:
+      case OP_CONST:
+        work.at(it->res.front()) = it->data;
+        break;
+      case OP_OUTPUT:
+        casadi_assert_message(it->data->segment()==0, "Not implemented");
+        if (it->data->ind()<vdef.size()) {
+          vdef.at(it->data->ind()) = work.at(it->arg.front());
+        } else {
+          ex.at(it->data->ind()-vdef.size()) = work.at(it->arg.front());
+        }
+        break;
+      default:
+        {
+          // Arguments of the operation
+          oarg.resize(it->arg.size());
+          for (int i=0; i<oarg.size(); ++i) {
+            int el = it->arg[i];
+            oarg[i] = el<0 ? MX(it->data->dep(i).size()) : work.at(el);
+          }
+
+          // Perform the operation
+          ores.resize(it->res.size());
+          it->data->eval_mx(oarg, ores);
+
+          // Get the result
+          for (int i=0; i<ores.size(); ++i) {
+            int el = it->res[i];
+            if (el>=0) work.at(el) = ores[i];
+          }
+        }
+      }
+    }
+  }
+
+
+
+
+
 } // namespace casadi
