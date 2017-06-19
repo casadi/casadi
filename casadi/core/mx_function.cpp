@@ -27,6 +27,7 @@
 #include "casadi_types.hpp"
 #include "global_options.hpp"
 #include "casadi_interrupt.hpp"
+#include "io_instruction.hpp"
 
 #include <stack>
 #include <typeinfo>

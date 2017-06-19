@@ -932,26 +932,4 @@ namespace casadi {
     }
   }
 
-  Input::Input(const Sparsity& sp, int ind, int segment, int offset)
-    : Instruction(ind, segment, offset) {
-    set_sparsity(sp);
-  }
-
-  std::string Input::print(const std::vector<std::string>& arg) const {
-    stringstream s;
-    s << "input[" << ind_ << "][" << segment_ << "]";
-    return s.str();
-  }
-
-  Output::Output(const MX& x, int ind, int segment, int offset)
-    : Instruction(ind, segment, offset) {
-    set_dep(x);
-  }
-
-  std::string Output::print(const std::vector<std::string>& arg) const {
-    stringstream s;
-    s << "output[" << ind_ << "][" << segment_ << "]";
-    return s.str();
-  }
-
 } // namespace casadi
