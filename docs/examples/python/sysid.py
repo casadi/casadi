@@ -94,7 +94,7 @@ def gauss_newton(e,nlp,V):
   H = triu(mtimes(J.T, J))
   sigma = MX.sym("sigma")
   hessLag = Function('nlp_hess_l',{'x':V,'lam_f':sigma, 'hess_gamma_x_x':sigma*H},
-                     ['x','p','lam_f','lam_g'], ['hess_gamma_x_x'])
+                     ['x','p','lam_f','lam_g'], ['hess_gamma_x_x'], dict(verbose=True, compiler="shell", jit=True))
   jit_options = dict(flags=["-O1"])
   nlpsol_options = dict(hess_lag=hessLag, jit=True, compiler="shell", jit_options=jit_options, verbose=True)
   return nlpsol("solver","ipopt", nlp, nlpsol_options)
