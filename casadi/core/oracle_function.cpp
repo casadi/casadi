@@ -146,6 +146,8 @@ namespace casadi {
   int OracleFunction::
   calc_function(OracleMemory* m, const std::string& fcn,
                 const double* const* arg) const {
+    // Print progress
+    if (verbose_) userOut() << "Calling \"" << fcn << "\"... " << flush;
 
     // Respond to a possible Crl+C signals
     InterruptHandler::check();
@@ -245,6 +247,9 @@ namespace casadi {
 
     // Update stats
     fstats.toc();
+
+    // Print progress
+    if (verbose_) userOut() << "done" << endl;
 
     // Success
     return 0;
