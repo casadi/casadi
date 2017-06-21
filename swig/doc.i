@@ -25482,6 +25482,9 @@ Check if a function is inlined.
 // File: classcasadi_1_1InfSX.xml
 
 
+// File: classcasadi_1_1Input.xml
+
+
 // File: classcasadi_1_1IntegerSX.xml
 
 
@@ -28167,6 +28170,9 @@ C++ includes: casadi_interrupt.hpp ";
 
 
 // File: classcasadi_1_1Inverse.xml
+
+
+// File: classcasadi_1_1IOInstruction.xml
 
 
 // File: classcasadi_1_1IpoptUserClass.xml
@@ -45961,6 +45967,9 @@ std::string &name, const Function &oracle) "
 [INTERNAL]  Checkout a memory object.
 
 ";
+
+
+// File: classcasadi_1_1Output.xml
 
 
 // File: classcasadi_1_1ParsedFile.xml
