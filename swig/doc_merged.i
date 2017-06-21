@@ -29419,7 +29419,7 @@ the nonzeros along with a comment.
 
 %feature("docstring") casadi::MX::primitives "
 
-Get symbolic primitives.
+Get primitives.
 
 ";
 
@@ -30020,7 +30020,7 @@ Get operation type.
 
 %feature("docstring") casadi::MX::n_primitives "
 
-Get the number of symbolic primitive Assumes is_valid_input() returns true.
+Get the number of primitives for MXFunction inputs/outputs.
 
 ";
 
