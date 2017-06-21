@@ -6,9 +6,9 @@ all: unittests
 
 # Each of these targets will be tested by CasADi's trunktesterbot as individual tests.
 # These targets must all go on one line
-trunktesterbot: unittests_py examples_indoc_py examples_indoc_cpp examples_code_py examples_code_cpp users_guide user_guide_snippets_py lint
+trunktesterbot: unittests_py examples_indoc_py examples_indoc_cpp examples_code_py examples_code_cpp users_guide user_guide_snippets_py
 
-trunktesterbot_no_unittests_py: examples_indoc_py examples_indoc_cpp examples_code_py examples_code_cpp users_guide user_guide_snippets_py lint
+trunktesterbot_no_unittests_py: examples_indoc_py examples_indoc_cpp examples_code_py examples_code_cpp users_guide user_guide_snippets_py
 
 trunktesterbot_knownbugs: unittests_py_knownbugs examples_indoc_py examples_indoc_cpp examples_code_py examples_code_cpp users_guide user_guide_snippets_py
 
