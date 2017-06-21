@@ -1054,6 +1054,25 @@ namespace casadi {
     // Temporaries for evaluation
     std::vector<bool> ret(sens.size());
     std::copy(sens.begin(), sens.end(), ret.begin());
+
+    // Project the result back on the original sparsity
+    if (tr && e.sparsity()!=expr.sparsity()) {
+      // std::vector<bool> is not accessible as bool*
+      // bool -> int
+      std::vector<int> source(sens.size());
+      std::copy(ret.begin(), ret.end(), source.begin());
+      std::vector<int> target(expr.nnz());
+
+      // project
+      std::vector<int> scratch(expr.size1());
+      casadi_project(get_ptr(source), e.sparsity(), get_ptr(target), expr.sparsity(),
+        get_ptr(scratch));
+
+      // int -> bool
+      ret.resize(expr.nnz());
+      std::copy(target.begin(), target.end(), ret.begin());
+    }
+
     return ret;
   }
 
