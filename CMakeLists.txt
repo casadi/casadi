@@ -671,12 +671,12 @@ endif()
 
 option(WITH_LINT "Compile with support for linting (syntax checking)" OFF)
 if(WITH_LINT)
-  include(CppLint)
+  include(CppLint REQUIRED)
 endif()
 
 option(WITH_SPELL "Compile with support for spell-checking" OFF)
 if(WITH_SPELL)
-  include(SpellCheck)
+  include(SpellCheck REQUIRED)
 endif()
 
 include(embed_resources)
