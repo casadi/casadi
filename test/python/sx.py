@@ -1232,45 +1232,46 @@ class SXtests(casadiTestCase):
       is_smooth(x)
 
   def test_which_depends(self):
-    x =SX.sym("x")
-    y =SX.sym("y")
+    for X in [SX,MX]:
+      x = X.sym("x")
+      y = X.sym("y")
 
-    p =SX.sym("p")
+      p = X.sym("p")
 
-    e = vertcat(0,x,y,p,2*p**3,x*y,x*p,sin(x),cos(y),sqrt(x+y),p*p*x,x*y*p)
+      e = vertcat(0,x,y,p,2*p**3,x*y,x*p,sin(x),cos(y),sqrt(x+y),p*p*x,x*y*p)
 
-    self.checkarray(which_depends(e, vertcat(x,y),2,True),[0, 0, 0, 0,0, 1, 0, 1, 1, 1, 0, 1])
-    self.checkarray(which_depends(e, vertcat(x,y),1,True),[0, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1])
+      self.checkarray(which_depends(e, vertcat(x,y),2,True),[0, 0, 0, 0,0, 1, 0, 1, 1, 1, 0, 1])
+      self.checkarray(which_depends(e, vertcat(x,y),1,True),[0, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1])
 
-    z =SX.sym("z")
-    e = vertcat(x*p,x+y)
-    self.checkarray(which_depends(e, vertcat(x,y,p,z),2,False),[True, False, True, False])
-    self.checkarray(which_depends(e, vertcat(x,y,p,z),1,False),[True, True, True, False])
+      z =X.sym("z")
+      e = vertcat(x*p,x+y)
+      self.checkarray(which_depends(e, vertcat(x,y,p,z),2,False),[True, False, True, False])
+      self.checkarray(which_depends(e, vertcat(x,y,p,z),1,False),[True, True, True, False])
 
-    e = vertcat(x*p,x+z*y)
-    self.checkarray(which_depends(e, vertcat(x,y,p),2,False),[True, False, True])
-    self.checkarray(which_depends(e, vertcat(x,y,p),1,False),[True, True, True])
+      e = vertcat(x*p,x+z*y)
+      self.checkarray(which_depends(e, vertcat(x,y,p),2,False),[True, False, True])
+      self.checkarray(which_depends(e, vertcat(x,y,p),1,False),[True, True, True])
 
-    e = vertcat(x*p,x+z*y)
-    self.checkarray(which_depends(e, vertcat(x,y,p,z),2,False),[True, True, True, True])
-    self.checkarray(which_depends(e, vertcat(x,y,p,z),1,False),[True, True, True, True])
+      e = vertcat(x*p,x+z*y)
+      self.checkarray(which_depends(e, vertcat(x,y,p,z),2,False),[True, True, True, True])
+      self.checkarray(which_depends(e, vertcat(x,y,p,z),1,False),[True, True, True, True])
 
-    e = vertcat(sin(x+y)+p)
-    self.checkarray(which_depends(e, vertcat(x,y,p,z),2,False),[True, True, False, False])
-    self.checkarray(which_depends(e, vertcat(x,y,p,z),1,False),[True, True, True, False])
+      e = vertcat(sin(x+y)+p)
+      self.checkarray(which_depends(e, vertcat(x,y,p,z),2,False),[True, True, False, False])
+      self.checkarray(which_depends(e, vertcat(x,y,p,z),1,False),[True, True, True, False])
 
-    e = vertcat(sin(x)*p**2,y**2)
-    #self.checkarray(which_depends(e, vertcat(x,y,p),3,True),[True, False])
-    #self.checkarray(which_depends(e, vertcat(x,y,p),3,False),[True, False, True])
-    self.checkarray(which_depends(e, vertcat(x,y,p),2,True),[True, True])
-    self.checkarray(which_depends(e, vertcat(x,y,p),2,False),[True, True, True])
+      e = vertcat(sin(x)*p**2,y**2)
+      #self.checkarray(which_depends(e, vertcat(x,y,p),3,True),[True, False])
+      #self.checkarray(which_depends(e, vertcat(x,y,p),3,False),[True, False, True])
+      self.checkarray(which_depends(e, vertcat(x,y,p),2,True),[True, True])
+      self.checkarray(which_depends(e, vertcat(x,y,p),2,False),[True, True, True])
 
-    e = vertcat(x**2*p,y)
-    #self.checkarray(which_depends(e, vertcat(x,y,p),3,True),[True, False])
-    #self.checkarray(which_depends(e, vertcat(x,y,p),3,False),[True, False, False])
+      e = vertcat(x**2*p,y)
+      #self.checkarray(which_depends(e, vertcat(x,y,p),3,True),[True, False])
+      #self.checkarray(which_depends(e, vertcat(x,y,p),3,False),[True, False, False])
 
-    self.checkarray(which_depends(e, vertcat(x,y,p),2,True),[True, False])
-    self.checkarray(which_depends(e, vertcat(x,y,p),2,False),[True, False, True])
+      self.checkarray(which_depends(e, vertcat(x,y,p),2,True),[True, False])
+      self.checkarray(which_depends(e, vertcat(x,y,p),2,False),[True, False, True])
 
   def test_if_else_zero_sens(self):
 
