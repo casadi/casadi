@@ -209,6 +209,15 @@ namespace casadi {
     int size2() const { return sparsity().size2(); }
     std::pair<int, int> size() const { return sparsity().size();}
 
+    // Get IO index
+    virtual int ind() const;
+
+    // Get IO segment
+    virtual int segment() const;
+
+    // Get IO offset
+    virtual int offset() const;
+
     /// Set the sparsity
     void set_sparsity(const Sparsity& sparsity);
 

@@ -101,6 +101,7 @@ set(CASADI_INTERNAL
   # More general graph representation with sparse matrix expressions and function evaluations
   mx.cpp                  # Symbolic expression class (matrix-valued atomics)
   mx_node.hpp             mx_node.cpp             # Base class for all the MX nodes
+  io_instruction.hpp      io_instruction.cpp      # Input and output MX instructions
   constant_mx.hpp         constant_mx.cpp         # A constant MX node
   symbolic_mx.hpp         symbolic_mx.cpp         # A symbolic MX variable
   unary_mx.hpp            unary_mx.cpp            # Unary operation

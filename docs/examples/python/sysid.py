@@ -84,9 +84,14 @@ y_data = X_measured[0,:].T
 # Use just-in-time compilation to speed up the evaluation
 if Importer.has_plugin('clang'):
   with_jit = True
+  compiler = 'clang'
+elif Importer.has_plugin('shell'):
+  with_jit = True
+  compiler = 'shell'
 else:
   print("WARNING; running without jit. This may result in very slow evaluation times")
   with_jit = False
+  compiler = ''
 
 ############ Create a Gauss-Newton solver ##########
 def gauss_newton(e,nlp,V):
@@ -94,9 +99,9 @@ def gauss_newton(e,nlp,V):
   H = triu(mtimes(J.T, J))
   sigma = MX.sym("sigma")
   hessLag = Function('nlp_hess_l',{'x':V,'lam_f':sigma, 'hess_gamma_x_x':sigma*H},
-                     ['x','p','lam_f','lam_g'], ['hess_gamma_x_x'])
-  return nlpsol("solver","ipopt", nlp, {"hess_lag":hessLag, "jit":with_jit})
-
+                     ['x','p','lam_f','lam_g'], ['hess_gamma_x_x'],
+                     dict(jit=with_jit, compiler=compiler))
+  return nlpsol("solver","ipopt", nlp, dict(hess_lag=hessLag, jit=with_jit, compiler=compiler))
 
 ############ Identifying the simulated system: single shooting strategy ##########
 

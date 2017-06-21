@@ -170,6 +170,18 @@ namespace casadi {
     return dep_.size();
   }
 
+  int MXNode::ind() const {
+    casadi_error("'ind' not defined for class " + type_name());
+  }
+
+  int MXNode::segment() const {
+    casadi_error("'segment' not defined for class " + type_name());
+  }
+
+  int MXNode::offset() const {
+    casadi_error("'offset' not defined for class " + type_name());
+  }
+
   void MXNode::set_sparsity(const Sparsity& sparsity) {
     sparsity_ = sparsity;
   }

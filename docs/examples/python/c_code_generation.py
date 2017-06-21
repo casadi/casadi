@@ -34,7 +34,7 @@ if len(sys.argv)>1 and sys.arg[0]=='nc':
   compileme = False
 else:
   print("Info: Use 'python c_code_generation.py nc' to omit compiling")
-  
+
 x = SX.sym("x",7,7)
 f = det(x)
 x = vec(x)
@@ -98,9 +98,7 @@ for f in f_test:
   print("result = ", r.nonzeros())
   dt = (t2-t1)/nrep
   print("time = ", dt*1e3, " ms")
-  
+
   num_op = gfcn.getAlgorithmSize()
   print("number of elementary operations: ", num_op)
   print("time per elementary operations: ", dt/num_op*1e9, " ns")
-  
-  
