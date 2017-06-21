@@ -82,12 +82,12 @@ y_data = X_measured[0,:].T
 # When noise is absent, the fit will be perfect.
 
 # Use just-in-time compilation to speed up the evaluation
-if Importer.has_plugin('shell'):
-  with_jit = True
-  compiler = 'shell'
-elif Importer.has_plugin('clang'):
+if Importer.has_plugin('clang'):
   with_jit = True
   compiler = 'clang'
+elif Importer.has_plugin('shell'):
+  with_jit = True
+  compiler = 'shell'
 else:
   print("WARNING; running without jit. This may result in very slow evaluation times")
   with_jit = False
