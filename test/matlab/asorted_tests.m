@@ -130,8 +130,8 @@ catch err
 end
 
 % See issue #1483
-%assert(~isempty(strfind(msg,'  Function(char,{SX} ,{SX} ,Dict)')))
-%assert(~isempty(strfind(msg,'You have: char, SX')))
+assert(~isempty(strfind(msg,'  FUNCTION(char,{SX},{SX},struct)')))
+assert(~isempty(strfind(msg,'You have: char, SX')))
 
 % Check mixing DM and MX
 res = (DM(1)+MX(1)) - (MX(1)+DM(1))
