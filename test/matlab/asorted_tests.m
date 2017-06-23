@@ -353,5 +353,18 @@ assert(numel(xnz)==6);
 
 
 
+x=SX.sym('x');
+y = 4;
+
+warning('dummy')
+save('test.mat','x','y');
+assert(~isempty(strfind(lastwarn,'not supported')))
+
+warning('dummy')
+data = load('test.mat');
+assert(~isempty(strfind(lastwarn,'not supported')))
+assert(data.y==4)
+assert(data.x.isnull)
+
 
 
