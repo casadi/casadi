@@ -322,11 +322,20 @@ namespace casadi {
 
     // Pass to qpOASES
     m->qp->setOptions(ops_);
+
+    m->fstats["preprocessing"]  = FStats();
+    m->fstats["solver"]         = FStats();
+    m->fstats["postprocessing"] = FStats();
   }
 
   void QpoasesInterface::
   eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
     auto m = static_cast<QpoasesMemory*>(mem);
+
+    // Statistics
+    for (auto&& s : m->fstats) s.second.reset();
+
+    m->fstats.at("preprocessing").tic();
 
     if (inputs_check_) {
       checkInputs(arg[CONIC_LBX], arg[CONIC_UBX], arg[CONIC_LBA], arg[CONIC_UBA]);
@@ -375,12 +384,16 @@ namespace casadi {
       if (m->a) delete m->a;
       m->a = new qpOASES::SparseMatrix(asp.size1(), asp.size2(), a_row, a_colind, a);
 
+      m->fstats.at("preprocessing").toc();
+      m->fstats.at("solver").tic();
+
       // Solve sparse
       if (m->called_once) {
         flag = m->sqp->hotstart(m->h, g, m->a, lb, ub, lbA, ubA, nWSR, cputime_ptr);
       } else {
         flag = m->sqp->init(m->h, g, m->a, lb, ub, lbA, ubA, nWSR, cputime_ptr);
       }
+      m->fstats.at("solver").toc();
 
     } else {
       // Get quadratic term
@@ -391,6 +404,8 @@ namespace casadi {
       double* a = w; w += nx_*na_;
       casadi_densify(arg[CONIC_A], asp, a, true);
 
+      m->fstats.at("preprocessing").toc();
+      m->fstats.at("solver").tic();
       // Solve dense
       if (na_==0) {
         if (m->called_once) {
@@ -408,10 +423,13 @@ namespace casadi {
           flag = m->sqp->init(h, g, a, lb, ub, lbA, ubA, nWSR, cputime_ptr);
         }
       }
+      m->fstats.at("solver").toc();
     }
 
     // Solver is "warm" now
     m->called_once = true;
+
+    m->fstats.at("postprocessing").tic();
 
     if (flag!=qpOASES::SUCCESSFUL_RETURN && flag!=qpOASES::RET_MAX_NWSR_REACHED) {
       throw CasadiException("qpOASES failed: " + getErrorMessage(flag));
@@ -431,6 +449,11 @@ namespace casadi {
       casadi_copy(dual, nx_, res[CONIC_LAM_X]);
       casadi_copy(dual+nx_, na_, res[CONIC_LAM_A]);
     }
+
+    m->fstats.at("postprocessing").toc();
+
+    // Show statistics
+    if (print_time_)  print_fstats(static_cast<ConicMemory*>(mem));
   }
 
   std::string QpoasesInterface::getErrorMessage(int flag) {

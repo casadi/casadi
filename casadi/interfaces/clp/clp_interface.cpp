@@ -71,12 +71,20 @@ namespace casadi {
   }
 
   void ClpInterface::init_memory(void* mem) const {
-    //auto m = static_cast<ClpMemory*>(mem);
+    auto m = static_cast<ClpMemory*>(mem);
+
+    m->fstats["preprocessing"]  = FStats();
+    m->fstats["solver"]         = FStats();
+    m->fstats["postprocessing"] = FStats();
   }
 
   void ClpInterface::
   eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
-    //auto m = static_cast<ClpMemory*>(mem);
+    auto m = static_cast<ClpMemory*>(mem);
+
+    // Statistics
+    for (auto&& s : m->fstats) s.second.reset();
+    m->fstats.at("preprocessing").tic();
 
     if (inputs_check_) {
       checkInputs(arg[CONIC_LBX], arg[CONIC_UBX], arg[CONIC_LBA], arg[CONIC_UBA]);
@@ -103,8 +111,14 @@ namespace casadi {
     model.loadProblem(A_.size2(), A_.size1(), A_.colind(), A_.row(), A,
                       lbx, ubx, g, lba, uba, nullptr);
 
+    m->fstats.at("preprocessing").toc();
+    m->fstats.at("solver").tic();
+
     // Solve the problem using the primal simplex algorithm
     model.primal();
+
+    m->fstats.at("solver").toc();
+    m->fstats.at("postprocessing").tic();
 
     // Primal solution
     double* x = model.primalColumnSolution();
@@ -127,6 +141,11 @@ namespace casadi {
     // Optimal cost
     double f = model.rawObjectiveValue();
     if (res[CONIC_COST]) *res[CONIC_COST] = f;
+
+    m->fstats.at("postprocessing").toc();
+
+    // Show statistics
+    if (print_time_)  print_fstats(static_cast<ConicMemory*>(mem));
   }
 
   ClpInterface::~ClpInterface() {

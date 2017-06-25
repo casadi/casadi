@@ -42,7 +42,7 @@
 
 namespace casadi {
 
-  struct CASADI_CONIC_CPLEX_EXPORT CplexMemory {
+  struct CASADI_CONIC_CPLEX_EXPORT CplexMemory : public ConicMemory {
     /// Indicates if we have to warm-start
     bool is_warm;
 

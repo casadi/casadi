@@ -45,7 +45,7 @@
 
 namespace casadi {
 
-  struct CASADI_CONIC_CLP_EXPORT ClpMemory {
+  struct CASADI_CONIC_CLP_EXPORT ClpMemory : public ConicMemory {
     /// Constructor
     ClpMemory();
 

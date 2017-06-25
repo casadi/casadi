@@ -110,11 +110,20 @@ namespace casadi {
     // Load environment
     int flag = GRBloadenv(&m->env, 0); // no log file
     casadi_assert_message(!flag && m->env, "Failed to create GUROBI environment");
+
+    m->fstats["preprocessing"]  = FStats();
+    m->fstats["solver"]         = FStats();
+    m->fstats["postprocessing"] = FStats();
   }
 
   void GurobiInterface::
   eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
     auto m = static_cast<GurobiMemory*>(mem);
+
+    // Statistics
+    for (auto&& s : m->fstats) s.second.reset();
+
+    m->fstats.at("preprocessing").tic();
 
     if (inputs_check_) {
       checkInputs(arg[CONIC_LBX], arg[CONIC_UBX], arg[CONIC_LBA], arg[CONIC_UBA]);
@@ -249,9 +258,16 @@ namespace casadi {
         }
       }
 
+      m->fstats.at("preprocessing").toc();
+      m->fstats.at("solver").tic();
+
       // Solve the optimization problem
       flag = GRBoptimize(model);
       casadi_assert_message(!flag, GRBgeterrormsg(m->env));
+
+      m->fstats.at("solver").toc();
+      m->fstats.at("postprocessing").tic();
+
       int optimstatus;
       flag = GRBgetintattr(model, GRB_INT_ATTR_STATUS, &optimstatus);
       casadi_assert_message(!flag, GRBgeterrormsg(m->env));
@@ -270,12 +286,16 @@ namespace casadi {
 
       // Free memory
       GRBfreemodel(model);
+      m->fstats.at("postprocessing").toc();
 
     } catch (...) {
       // Free memory
       if (model) GRBfreemodel(model);
       throw;
     }
+
+    // Show statistics
+    if (print_time_)  print_fstats(static_cast<ConicMemory*>(mem));
   }
 
   GurobiMemory::GurobiMemory() {
