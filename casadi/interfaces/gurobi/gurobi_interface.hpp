@@ -43,7 +43,7 @@ extern "C" {
 /// \cond INTERNAL
 namespace casadi {
 
-  struct CASADI_CONIC_GUROBI_EXPORT GurobiMemory {
+  struct CASADI_CONIC_GUROBI_EXPORT GurobiMemory : public ConicMemory {
     // Gurobi environment
     GRBenv *env;
 

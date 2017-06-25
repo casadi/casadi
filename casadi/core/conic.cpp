@@ -260,6 +260,8 @@ namespace casadi {
 
     nx_ = A_.size2();
     na_ = A_.size1();
+
+    print_time_ = false;
   }
 
   Sparsity Conic::get_sparsity_in(int i) {

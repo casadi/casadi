@@ -44,7 +44,7 @@ namespace casadi {
   // Forward declaration
   class QpoasesInterface;
 
-  struct CASADI_CONIC_QPOASES_EXPORT QpoasesMemory {
+  struct CASADI_CONIC_QPOASES_EXPORT QpoasesMemory : public ConicMemory {
     // Reference to the function
     const Linsol& linsol;
 
