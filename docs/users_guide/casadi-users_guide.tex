@@ -2087,7 +2087,8 @@ The integer field pointed to is structured as follows:
 \begin{itemize}
   \item The first two entries are the number of rows and columns, respectively.
   In the following referred to as \texttt{nrow} and \texttt{ncol}.
-  \item The subsequent $\texttt{ncol}+1$ entries are the nonzero offsets
+  \item If the third entry is \texttt{1}, the pattern is dense and any remaining entries are discarded.
+  \item If the third entry is \texttt{0}, that entry plus subsequent $\texttt{ncol}$ entries form the nonzero offsets
   for each column, \texttt{colind} in the following. E.g. column $i$ will consist
   of the nonzero indices ranging from $\texttt{colind}[i]$ to $\texttt{colind}[i+1]$.
   The last entry, $\texttt{colind}[\texttt{ncol}]$, will be equal to the number
