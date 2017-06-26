@@ -123,13 +123,9 @@ class NLPtests(casadiTestCase):
     x = vec(diag(SX.sym("x",2)))
     nlp={'x':x, 'f':mtimes(x.T,x),'g':x[0]}
     for Solver, solver_options in solvers:
-      with self.assertInException("dense"):
+      with self.assertInException("dense vector"):
         solver = nlpsol("mysolver", Solver, nlp, solver_options)
 
-    x = SX.sym("x",2,2)
-    nlp={'x':x, 'f':trace(x),'g':x[0]}
-    for Solver, solver_options in solvers:
-      solver = nlpsol("mysolver", Solver, nlp, solver_options)
 
   def test_initialcond(self):
     x=SX.sym("x")
