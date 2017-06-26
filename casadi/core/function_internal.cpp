@@ -1817,7 +1817,7 @@ namespace casadi {
       // Declare wrapper
       g << "void mex_" << fname
         << "(int resc, mxArray *resv[], int argc, const mxArray *argv[]) {\n"
-        << "int i, j;\n";
+        << "int i;\n";
 
       // Check arguments
       g << "if (argc>" << n_in << ") mexErrMsgIdAndTxt(\"Casadi:RuntimeError\","
