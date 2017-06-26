@@ -3735,7 +3735,7 @@ namespace casadi{
       end
     end
     function out = sum(self,varargin)
-      narginchk(1,2);
+      narginchk(1,3);
       if nargin==1
         if is_vector(self)
           if is_column(self)
