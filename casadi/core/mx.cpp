@@ -883,10 +883,13 @@ namespace casadi {
         // We still want horzcat(zeros(0,5),zeros(0,5)) -> zeros(0,10)
         ret = trim_empty(x, true);
         int s = 0;
+        int nrow = 0;
         for (int i=0;i<ret.size();++i) {
           s+= ret[i].size2();
+          casadi_assert(nrow==0 || nrow==ret[i].size1())
+          nrow = ret[i].size1();
         }
-        return MX::zeros(0, s);
+        return MX::zeros(nrow, s);
       } else {
         return horzcat(ret);
       }
@@ -942,10 +945,13 @@ namespace casadi {
         // We still want vertcat(zeros(5,0),zeros(5,0)) -> zeros(10,0)
         ret = trim_empty(x, true);
         int s = 0;
+        int ncol = 0;
         for (int i=0;i<ret.size();++i) {
           s+= ret[i].size1();
+          casadi_assert(ncol==0 || ret[i].size2()==ncol);
+          ncol = ret[i].size2();
         }
-        return MX::zeros(s, 0);
+        return MX::zeros(s, ncol);
       } else {
         return vertcat(ret);
       }
