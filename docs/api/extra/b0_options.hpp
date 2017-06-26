@@ -2298,8 +2298,9 @@
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
 <tr><td>cleanup</td><td>OT_BOOL</td><td>Cleanup temporary files when unloading. Default: true</td><td>casadi::ShellCompiler</td></tr>
 <tr><td>compiler</td><td>OT_STRING</td><td>Compiler command</td><td>casadi::ShellCompiler</td></tr>
-<tr><td>compiler_flags</td><td>OT_STRINGVECTOR</td><td>Compile flags for the JIT compiler. Default: None</td><td>casadi::ShellCompiler</td></tr>
+<tr><td>compiler_flags</td><td>OT_STRINGVECTOR</td><td>Alias for 'compiler_flags'</td><td>casadi::ShellCompiler</td></tr>
 <tr><td>compiler_setup</td><td>OT_STRING</td><td>Compiler setup command. Intended to be fixed. The 'flag' option is the prefered way to set custom flags.</td><td>casadi::ShellCompiler</td></tr>
+<tr><td>flags</td><td>OT_STRINGVECTOR</td><td>Compile flags for the JIT compiler. Default: None</td><td>casadi::ShellCompiler</td></tr>
 <tr><td>folder</td><td>OT_STRING</td><td>Folder to put temporary objects in.</td><td>casadi::ShellCompiler</td></tr>
 <tr><td>linker</td><td>OT_STRING</td><td>Linker command</td><td>casadi::ShellCompiler</td></tr>
 <tr><td>linker_flags</td><td>OT_STRINGVECTOR</td><td>Linker flags for the JIT compiler. Default: None</td><td>casadi::ShellCompiler</td></tr>
@@ -2316,8 +2317,9 @@
 <tr><th>Id</th><th>Type</th><th>Description</th></tr>
 <tr><td>cleanup</td><td>OT_BOOL</td><td>Cleanup temporary files when unloading. Default: true</td></tr>
 <tr><td>compiler</td><td>OT_STRING</td><td>Compiler command</td></tr>
-<tr><td>compiler_flags</td><td>OT_STRINGVECTOR</td><td>Compile flags for the JIT compiler. Default: None</td></tr>
+<tr><td>compiler_flags</td><td>OT_STRINGVECTOR</td><td>Alias for 'compiler_flags'</td></tr>
 <tr><td>compiler_setup</td><td>OT_STRING</td><td>Compiler setup command. Intended to be fixed. The 'flag' option is the prefered way to set custom flags.</td></tr>
+<tr><td>flags</td><td>OT_STRINGVECTOR</td><td>Compile flags for the JIT compiler. Default: None</td></tr>
 <tr><td>folder</td><td>OT_STRING</td><td>Folder to put temporary objects in.</td></tr>
 <tr><td>linker</td><td>OT_STRING</td><td>Linker command</td></tr>
 <tr><td>linker_flags</td><td>OT_STRINGVECTOR</td><td>Linker flags for the JIT compiler. Default: None</td></tr>
@@ -2332,8 +2334,9 @@
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
 <tr><td>cleanup</td><td>OT_BOOL</td><td>Cleanup temporary files when unloading. Default: true</td><td>casadi::ShellCompiler</td></tr>
 <tr><td>compiler</td><td>OT_STRING</td><td>Compiler command</td><td>casadi::ShellCompiler</td></tr>
-<tr><td>compiler_flags</td><td>OT_STRINGVECTOR</td><td>Compile flags for the JIT compiler. Default: None</td><td>casadi::ShellCompiler</td></tr>
+<tr><td>compiler_flags</td><td>OT_STRINGVECTOR</td><td>Alias for 'compiler_flags'</td><td>casadi::ShellCompiler</td></tr>
 <tr><td>compiler_setup</td><td>OT_STRING</td><td>Compiler setup command. Intended to be fixed. The 'flag' option is the prefered way to set custom flags.</td><td>casadi::ShellCompiler</td></tr>
+<tr><td>flags</td><td>OT_STRINGVECTOR</td><td>Compile flags for the JIT compiler. Default: None</td><td>casadi::ShellCompiler</td></tr>
 <tr><td>folder</td><td>OT_STRING</td><td>Folder to put temporary objects in.</td><td>casadi::ShellCompiler</td></tr>
 <tr><td>linker</td><td>OT_STRING</td><td>Linker command</td><td>casadi::ShellCompiler</td></tr>
 <tr><td>linker_flags</td><td>OT_STRINGVECTOR</td><td>Linker flags for the JIT compiler. Default: None</td><td>casadi::ShellCompiler</td></tr>
