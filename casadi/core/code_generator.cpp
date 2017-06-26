@@ -295,7 +295,9 @@ namespace casadi {
     s << "#define to_double(x) "
       << (this->cpp ? "static_cast<double>(x)" : "(double) x") << endl
       << "#define to_int(x) "
-      << (this->cpp ? "static_cast<int>(x)" : "(int) x") << endl;
+      << (this->cpp ? "static_cast<int>(x)" : "(int) x") << endl
+      << "#define CASADI_CAST(x,y) "
+      << (this->cpp ? "static_cast<x>(y)" : "(x) y") << endl;
 
     // External function declarations
     if (!added_externals_.empty()) {
@@ -631,10 +633,19 @@ namespace casadi {
     case AUX_PROJECT:
       this->auxiliaries << sanitize_source(casadi_project_str, inst);
       break;
+    case AUX_DENSIFY:
+      addAuxiliary(AUX_FILL);
+      {
+        std::vector<std::string> inst2 = inst;
+        if (inst.size()==1) inst2.push_back(inst[0]);
+        this->auxiliaries << sanitize_source(casadi_densify_str, inst2);
+      }
+      break;
     case AUX_TRANS:
       this->auxiliaries << sanitize_source(casadi_trans_str, inst);
       break;
     case AUX_TO_MEX:
+      addAuxiliary(AUX_DENSIFY);
       this->auxiliaries << "#ifdef MATLAB_MEX_FILE\n"
                         << sanitize_source(casadi_to_mex_str, inst)
                         << "#endif" << endl << endl;

@@ -6,10 +6,17 @@ T1* CASADI_PREFIX(from_mex)(const mxArray* p, T1* y, const int* sp, T1* w) {
   int nrow = *sp++, ncol = *sp++, nnz = sp[ncol];
   const int *colind=sp, *row=sp+ncol+1;
   size_t p_nrow = mxGetM(p), p_ncol = mxGetN(p);
-  const double* p_data = (const double*)mxGetData(p);
   bool is_sparse = mxIsSparse(p);
-  mwIndex *Jc = is_sparse ? mxGetJc(p) : 0;
-  mwIndex *Ir = is_sparse ? mxGetIr(p) : 0;
+  mwIndex *Jc, *Ir;
+  if (is_sparse) {
+#ifndef CASADI_MEX_NO_SPARSE
+    Jc = mxGetJc(p);
+    Ir = mxGetIr(p);
+#else /* CASADI_MEX_NO_SPARSE */
+    mexErrMsgIdAndTxt("Casadi:RuntimeError","\"from_mex\" failed: Sparse inputs disabled.");
+#endif /* CASADI_MEX_NO_SPARSE */
+  }
+  const double* p_data = (const double*)mxGetData(p);
   if (p_nrow==1 && p_ncol==1) {
     double v = is_sparse && Jc[1]==0 ? 0 : *p_data;
     fill(y, nnz, v);

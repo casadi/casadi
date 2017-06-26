@@ -263,7 +263,7 @@ if has_nlpsol('bonmin')
   sol = solver('x0',[1 1]);
 
   assert(all(full(sol.x)==[3;4]))
-  
+
   options = struct;
   options.discrete = {true,true};
   solver = nlpsol('solver', 'bonmin', nlp,options);
@@ -353,7 +353,7 @@ assert(numel(xnz)==6);
 
 
 
-if ~is_octave 
+if ~is_octave
   x=SX.sym('x');
   y = 4;
 
@@ -368,4 +368,26 @@ if ~is_octave
   assert(data.x.isnull)
 end
 
-
+x=SX.sym('x');
+f=Function('f',{x},{2*x,DM.eye(2)*x});
+f.generate('fmex',struct('mex',true));
+if is_octave
+mex fmex.c
+else
+mex fmex.c -largeArrayDims
+end
+[a,b] = fmex('f',3);
+assert(norm(a-6,1)==0);
+assert(norm(b-3*eye(2),1)==0);
+assert(~issparse(a));
+assert(issparse(b));
+if is_octave
+mex fmex.c -DCASASI_MEX_NO_SPARSE
+else
+mex fmex.c -largeArrayDims -DCASASI_MEX_NO_SPARSE
+end
+[a,b] = fmex('f',3);
+assert(norm(a-6,1)==0);
+assert(norm(b-3*eye(2),1)==0);
+assert(~issparse(a));
+assert(~issparse(b));
