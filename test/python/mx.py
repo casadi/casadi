@@ -2271,6 +2271,10 @@ class MXtests(casadiTestCase):
 
       x2 = vertcat(*[c.zeros(0,0)] + x1s + [c.zeros(0,0)])
       self.checkarray(x2.shape,(10,0))
+      
+      x0 = c.zeros(0,1)
+      x2 = vertcat(x0,c.zeros(0,0),x0)
+      self.checkarray(x2.shape,(0,1))
 
     for c in [MX,SX,DM]:
       x0 = c.zeros(0,10)
@@ -2285,6 +2289,10 @@ class MXtests(casadiTestCase):
 
       x2 = horzcat(*[c.zeros(0,0)] + x1s + [c.zeros(0,0)])
       self.checkarray(x2.shape,(0,10))
+
+      x0 = c.zeros(1,0)
+      x2 = horzcat(x0,c.zeros(0,0),x0)
+      self.checkarray(x2.shape,(1,0))
 
     for c in [MX,SX,DM]:
       x0 = c.zeros(10,0)
