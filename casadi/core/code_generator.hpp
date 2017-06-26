@@ -191,6 +191,7 @@ namespace casadi {
       AUX_SIGN,
       AUX_MTIMES,
       AUX_PROJECT,
+      AUX_DENSIFY,
       AUX_TRANS,
       AUX_TO_MEX,
       AUX_FROM_MEX,

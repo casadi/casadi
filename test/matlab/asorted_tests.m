@@ -368,4 +368,26 @@ if ~is_octave
   assert(data.x.isnull)
 end
 
+x=SX.sym('x');
+f=Function('f',{x},{2*x,DM.eye(2)*x});
+f.generate('fmex',struct('mex',true));
+mex fmex.c -largeArrayDims
+[a,b] = fmex('f',3);
+assert(norm(a-6,1)==0);
+assert(norm(b-3*eye(2),1)==0);
+assert(issparse(a));
+assert(issparse(b));
+mex fmex.c -largeArrayDims -DCASASI_MEX_ALWAYS_DENSE
+[a,b] = fmex('f',3);
+assert(norm(a-6,1)==0);
+assert(norm(b-3*eye(2),1)==0);
+assert(~issparse(a));
+assert(~issparse(b));
+mex fmex.c -largeArrayDims -DCASASI_MEX_ALLOW_DENSE
+[a,b] = fmex('f',3);
+assert(norm(a-6,1)==0);
+assert(norm(b-3*eye(2),1)==0);
+assert(~issparse(a));
+assert(issparse(b));
+
 
