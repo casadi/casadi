@@ -300,6 +300,10 @@ namespace casadi {
     static Matrix<Scalar> solve(const Matrix<Scalar> &A, const Matrix<Scalar>& b);
     static Matrix<Scalar> solve(const Matrix<Scalar> &A, const Matrix<Scalar>& b,
                                   const std::string& lsolver, const Dict& opts);
+    static Matrix<Scalar> inv(const Matrix<Scalar> &A);
+    static Matrix<Scalar> inv(const Matrix<Scalar> &A,
+                                  const std::string& lsolver, const Dict& opts);
+
     static int n_nodes(const Matrix<Scalar> &x);
     static std::string print_operator(const Matrix<Scalar> &x,
                                       const std::vector<std::string>& args);
@@ -329,7 +333,7 @@ namespace casadi {
     static Matrix<Scalar> mldivide(const Matrix<Scalar> &x, const Matrix<Scalar> &y);
     static std::vector<Matrix<Scalar> > symvar(const Matrix<Scalar> &x);
     static Matrix<Scalar> det(const Matrix<Scalar> &x);
-    static Matrix<Scalar> inv(const Matrix<Scalar> &x);
+    static Matrix<Scalar> inv_minor(const Matrix<Scalar> &x);
     static Matrix<Scalar> trace(const Matrix<Scalar> &x);
     static Matrix<Scalar> norm_1(const Matrix<Scalar> &x);
     static Matrix<Scalar> norm_2(const Matrix<Scalar> &x);

@@ -339,7 +339,19 @@ namespace casadi {
     inline friend MatType det(const MatType& A) { return MatType::det(A);}
 
     /** \brief Matrix inverse (experimental) */
-    inline friend MatType inv(const MatType& A) { return MatType::inv(A);}
+    inline friend MatType inv_minor(const MatType& A) { return MatType::inv_minor(A);}
+
+    /** \brief Matrix inverse */
+    inline friend MatType inv(const MatType& A) {
+        return MatType::inv(A);
+    }
+
+    /** \brief Matrix inverse */
+    inline friend MatType inv(const MatType& A,
+      const std::string& lsolver,
+      const Dict& options=Dict()) {
+        return MatType::inv(A, lsolver, options);
+    }
 
     /** \brief Matrix trace */
     inline friend MatType trace(const MatType& x) { return MatType::trace(x);}
