@@ -403,7 +403,7 @@ class Matrixtests(casadiTestCase):
     s_ = DM.ones(sp)
     s_[:,:int(n/2)+1] = 1
 
-    I_ = DM.ones(inv(x).sparsity())
+    I_ = DM.ones(inv_minor(x).sparsity())
 
     s_ = densify(s_)
     T_ = densify(I_)
