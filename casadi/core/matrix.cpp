@@ -916,17 +916,17 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  Matrix<Scalar> Matrix<Scalar>::mrdivide(const Matrix<Scalar>& a,
-                                              const Matrix<Scalar>& b) {
-    casadi_assert_message(a.is_scalar() || b.is_scalar(), "Not implemented");
-    return a/b;
+  Matrix<Scalar> Matrix<Scalar>::mrdivide(const Matrix<Scalar>& b,
+                                              const Matrix<Scalar>& a) {
+    if (a.is_scalar() || b.is_scalar()) return b/a;
+    return solve(a.T(), b.T()).T();
   }
 
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::mldivide(const Matrix<Scalar>& a,
                                               const Matrix<Scalar>& b) {
-    casadi_assert_message(a.is_scalar() || b.is_scalar(), "Not implemented");
-    return b/a;
+    if (a.is_scalar() || b.is_scalar()) return b/a;
+    return solve(a, b);
   }
 
   template<typename Scalar>

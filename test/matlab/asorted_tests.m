@@ -368,6 +368,42 @@ if ~is_octave
   assert(data.x.isnull)
 end
 
+Xs = {SX, MX};
+for j=1:2;
+  X = Xs{j};
+  
+  for sA=[1,3]
+     for sy=[3]
+        
+        A = X.sym('A',sA,sA);
+        y = X.sym('y',sy);
+        
+        yv = [7;2;4];
+        Av = [13 0.2 1;1 9 2;0.1 1 3];
+        yv = yv(1:sy);
+        Av = Av(1:sA,1:sA);
+        F = Function('f',{A,y},{A\y, A\yv, Av\y, A\DM(yv), DM(Av)\y, DM(Av)\DM(yv)});
+        out = F.call({Av,yv});
+        for i=1:numel(out)
+          assert(norm(Av\yv-full(out{i}),1)<=1e-12);
+        end
+        
+        yv = yv';
+        y = y';
+        F = Function('f',{A,y},{y/A, yv/A, y/Av, DM(yv)/A, y/DM(Av), DM(yv)/DM(Av)});
+        out = F.call({Av,yv});
+        for i=1:numel(out)
+          assert(norm(yv/Av-full(out{i}),1)<=1e-12);
+        end
+    end
+  end
+
+
+end
+
+
+
+
 x=SX.sym('x');
 f=Function('f',{x},{2*x,DM.eye(2)*x});
 f.generate('fmex',struct('mex',true));
@@ -401,5 +437,8 @@ assert(norm(a-6,1)==0);
 assert(norm(b-3*eye(2),1)==0);
 assert(~issparse(a));
 assert(issparse(b));
+
+
+
 
 
