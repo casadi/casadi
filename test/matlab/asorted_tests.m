@@ -423,5 +423,14 @@ for j=1:2;
     end
   end
 
+  A = X.sym('A',3,3);
+  Av = [13 0.2 1;1 9 2;0.1 1 3];
+  for N=[-4,-3,-2,-1,0,1,2,3,4]
+    F = Function('f',{A},{A^N,DM(Av)^N});
+    out = F.call({Av});
+    for i=1:numel(out)
+      assert(norm(Av^N-full(out{i}),1)<=1e-12);
+    end
+  end
 
 end

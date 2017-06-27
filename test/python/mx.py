@@ -2495,10 +2495,9 @@ class MXtests(casadiTestCase):
     self.assertEqual((x>=0).nnz(),5*5)
   def test_inv(self):
    np.random.seed(0)
-   MX.inv_minor
-   MX.inv_node
+
    for X in [SX, MX]:
-     A  = SX.sym("x",3,3)
+     A  = X.sym("x",3,3)
      Av = np.random.random((3,3))
      f = Function('f',[A],[inv(A),inv(DM(Av)),A.__mpower__(-1), DM(Av).__mpower__(-1)])
      out = f(Av)

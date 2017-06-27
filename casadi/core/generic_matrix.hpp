@@ -677,6 +677,7 @@ namespace casadi {
     static MatType jtimes(const MatType &ex, const MatType &arg,
                           const MatType &v, bool tr=false);
     static MatType linearize(const MatType& f, const MatType& x, const MatType& x0);
+    static MatType mpower(const MatType &x, const MatType &y);
     ///@}
 
 /** @} */
@@ -1024,6 +1025,27 @@ namespace casadi {
     return substitute(f + jtimes(f, x, x_lin),
       MatType::vertcat({x_lin, x}), MatType::vertcat({x, x0}));
   }
+
+  template<typename MatType>
+  MatType GenericMatrix<MatType>::mpower(const MatType& a,
+                                            const MatType& b) {
+    if (a.is_scalar() && b.is_scalar()) return pow(a, b);
+    casadi_assert_message(a.is_square() && b.is_constant() && b.is_scalar(), "Not Implemented");
+    double bv = static_cast<double>(b);
+    int N = bv;
+    casadi_assert_message(bv==N, "Not Implemented");
+    if (N<0) return inv(mpower(a, -N));
+    if (N==0) return MatType::eye(a.size1());
+    if (N==1) return a;
+    if (N % 2 == 0) {
+      MatType h = mpower(a, N/2);
+      return MatType::mtimes(h, h);
+    } else {
+      return MatType::mtimes(mpower(a, N-1), a);
+    }
+  }
+
+
 
 } // namespace casadi
 

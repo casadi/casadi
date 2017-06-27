@@ -650,11 +650,6 @@ namespace casadi {
     return solve(a, b);
   }
 
-  MX MX::mpower(const MX& a, const MX& b) {
-    casadi_assert_message(a.is_scalar() && b.is_scalar(), "Not implemented");
-    return pow(a, b);
-  }
-
   MX MX::dep(int ch) const {
     return (*this)->dep(ch);
   }
