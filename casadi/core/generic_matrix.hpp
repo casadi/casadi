@@ -1020,9 +1020,9 @@ namespace casadi {
     if (N==1) return a;
     if (N % 2 == 0) {
       MatType h = mpower(a, N/2);
-      return mtimes(h, h);
+      return MatType::mtimes(h, h);
     } else {
-      return mtimes(mpower(a, N-1), a);
+      return MatType::mtimes(mpower(a, N-1), a);
     }
   }
 
