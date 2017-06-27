@@ -417,7 +417,7 @@ x=SX.sym('x');
 f=Function('f',{x},{2*x,DM.eye(2)*x});
 f.generate('fmex',struct('mex',true));
 if is_octave 
-mex fmex.c
+mex fmex.c -DMATLAB_MEX_FILE
 else
 mex fmex.c -largeArrayDims
 end
@@ -427,7 +427,7 @@ assert(norm(b-3*eye(2),1)==0);
 assert(issparse(a));
 assert(issparse(b));
 if is_octave 
-mex fmex.c -DCASASI_MEX_ALWAYS_DENSE
+mex fmex.c -DCASASI_MEX_ALWAYS_DENSE -DMATLAB_MEX_FILE
 else
 mex fmex.c -largeArrayDims -DCASASI_MEX_ALWAYS_DENSE
 end
@@ -437,7 +437,7 @@ assert(norm(b-3*eye(2),1)==0);
 assert(~issparse(a));
 assert(~issparse(b));
 if is_octave 
-mex fmex.c -DCASASI_MEX_ALLOW_DENSE
+mex fmex.c -DCASASI_MEX_ALLOW_DENSE -DMATLAB_MEX_FILE
 else
 mex fmex.c -largeArrayDims -DCASASI_MEX_ALLOW_DENSE
 end
