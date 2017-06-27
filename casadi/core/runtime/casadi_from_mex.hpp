@@ -3,7 +3,7 @@ template<typename T1>
 T1* CASADI_PREFIX(from_mex)(const mxArray* p, T1* y, const int* sp, T1* w) {
   if (!mxIsDouble(p) || mxGetNumberOfDimensions(p)!=2)
     mexErrMsgIdAndTxt("Casadi:RuntimeError","\"from_mex\" failed: Not a two-dimensional matrix of double precision.");
-  size_t nrow = *sp++
+  size_t nrow = *sp++;
   size_t ncol = *sp++;
   size_t nnz = sp[ncol];
   const int *colind=sp, *row=sp+ncol+1;
