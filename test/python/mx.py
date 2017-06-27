@@ -2502,6 +2502,18 @@ class MXtests(casadiTestCase):
     x = MX.sym("x",Sparsity.lower(5))
     self.assertEqual((x>0).nnz(),5*6/2)
     self.assertEqual((x>=0).nnz(),5*5)
+  def test_inv(self):
+   np.random.seed(0)
+   MX.inv_minor
+   MX.inv_node
+   for X in [SX, MX]:
+     A  = SX.sym("x",3,3)
+     Av = np.random.random((3,3))
+     f = Function('f',[A],[inv(A),inv(DM(Av)),A.__mpower__(-1), DM(Av).__mpower__(-1)])
+     out = f(Av)
+     for o in out:
+       self.checkarray(o, np.linalg.inv(np.array(Av)))
+    
 
 if __name__ == '__main__':
     unittest.main()

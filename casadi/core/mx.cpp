@@ -1628,8 +1628,16 @@ namespace casadi {
     return x->getDeterminant();
   }
 
-  MX MX::inv(const MX& x) {
+  MX MX::inv_node(const MX& x) {
     return x->getInverse();
+  }
+
+  MX MX::inv_minor(const MX& A) {
+    casadi_error("Not implemented");
+  }
+
+  MX MX::inv(const MX& x, const std::string& lsolver, const Dict& dict) {
+    return solve(x, MX::eye(x.size1()), lsolver, dict);
   }
 
   std::vector<MX> MX::symvar(const MX& x) {

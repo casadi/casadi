@@ -2940,8 +2940,17 @@ DECL M casadi_det(const M& A) {
   return det(A);
 }
 
+DECL M casadi_inv_minor(const M& A) {
+  return inv_minor(A);
+}
+
 DECL M casadi_inv(const M& A) {
   return inv(A);
+}
+
+DECL M casadi_inv(const M& A, const std::string& lsolver,
+                      const casadi::Dict& opts = casadi::Dict()) {
+  return inv(A, lsolver, opts);
 }
 
 DECL M casadi_trace(const M& a) {
@@ -3327,6 +3336,9 @@ MATRIX_FUN(DECL, (FLAG | IS_SX), Matrix<SXElem>)
 #if FLAG & IS_MEMBER
 DECL M casadi_find(const M& x) {
   return find(x);
+}
+DECL M casadi_inv_node(const M& x) {
+  return inv_node(x);
 }
 #endif // FLAG & IS_MEMBER
 

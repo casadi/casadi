@@ -424,9 +424,12 @@ namespace casadi {
     static void substitute_inplace(const std::vector<MX>& v,
                                   std::vector<MX>& vdef,
                                   std::vector<MX>& ex, bool reverse);
-    static MX solve(const MX& A, const MX& b, const std::string& lsolver="symbolicqr",
+    static MX solve(const MX& A, const MX& b, const std::string& lsolver="csparse",
                     const Dict& dict = Dict());
-    static MX pinv(const MX& A, const std::string& lsolver="symbolicqr",
+    static MX inv_minor(const MX& A);
+    static MX inv_node(const MX& A);
+    static MX inv(const MX& A, const std::string& lsolver="csparse", const Dict& dict = Dict());
+    static MX pinv(const MX& A, const std::string& lsolver="csparse",
                const Dict& dict = Dict());
     static MX expm_const(const MX& A, const MX& t);
     static MX expm(const MX& A);
@@ -442,7 +445,6 @@ namespace casadi {
     static bool depends_on(const MX& x, const MX& arg);
     static MX logic_not(const MX& x);
     static MX simplify(const MX& x);
-    static MX mpower(const MX& a, const MX& b);
     static MX dot(const MX& x, const MX& y);
     static MX mrdivide(const MX& a, const MX& b);
     static MX mldivide(const MX& a, const MX& b);
@@ -457,7 +459,6 @@ namespace casadi {
     static MX sum1(const MX& x);
     static MX polyval(const MX& p, const MX& x);
     static MX det(const MX& x);
-    static MX inv(const MX& x);
     static std::vector<MX> symvar(const MX& x);
     static MX nullspace(const MX& A);
     static MX repsum(const MX& x, int n, int m=1);
@@ -551,6 +552,14 @@ namespace casadi {
     inline friend MX lift(const MX& x, const MX& x_guess) {
       return MX::lift(x, x_guess);
     }
+
+    /** \brief Inverse node
+     *
+     */
+    inline friend MX inv_node(const MX& x) {
+      return MX::inv_node(x);
+    }
+
 /** @} */
 #endif // SWIG
 

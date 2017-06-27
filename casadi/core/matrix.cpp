@@ -1632,7 +1632,7 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  Matrix<Scalar> Matrix<Scalar>::inv(const Matrix<Scalar>& x) {
+  Matrix<Scalar> Matrix<Scalar>::inv_minor(const Matrix<Scalar>& x) {
     // laplace formula
     return adj(x)/det(x);
   }
@@ -2011,7 +2011,7 @@ namespace casadi {
       } else if (a.size2()<=3) {
 
         // Form inverse by minor expansion and multiply if very small (up to 3-by-3)
-        xperm = mtimes(inv(Aperm), bperm);
+        xperm = mtimes(inv_minor(Aperm), bperm);
 
       } else {
 
@@ -2038,7 +2038,21 @@ namespace casadi {
   Matrix<Scalar> Matrix<Scalar>::
   solve(const Matrix<Scalar>& a, const Matrix<Scalar>& b,
            const std::string& lsolver, const Dict& dict) {
-    casadi_error("'solve' not defined for " + type_name());
+    casadi_error("'solve' with plugin not defined for " + type_name());
+    return Matrix<Scalar>();
+  }
+
+  template<typename Scalar>
+  Matrix<Scalar> Matrix<Scalar>::
+  inv(const Matrix<Scalar>& a) {
+    return solve(a, Matrix<Scalar>::eye(a.size1()));
+  }
+
+  template<typename Scalar>
+  Matrix<Scalar> Matrix<Scalar>::
+  inv(const Matrix<Scalar>& a,
+           const std::string& lsolver, const Dict& dict) {
+    casadi_error("'inv' with plugin not defined for " + type_name());
     return Matrix<Scalar>();
   }
 
@@ -2549,6 +2563,13 @@ namespace casadi {
         const string& lsolver, const Dict& dict) {
     Linsol mysolver("tmp", lsolver, dict);
     return mysolver.solve(A, b, false);
+  }
+
+  template<>
+  Matrix<double> Matrix<double>::
+  inv(const Matrix<double>& A,
+        const string& lsolver, const Dict& dict) {
+    return solve(A, DM::eye(A.size1()), lsolver, dict);
   }
 
   template<>
