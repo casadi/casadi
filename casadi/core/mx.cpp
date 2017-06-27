@@ -640,14 +640,14 @@ namespace casadi {
     return x->_get_binary(OP_LIFT, x_guess, false, false);
   }
 
-  MX MX::mrdivide(const MX& a, const MX& b) {
-    casadi_assert_message(a.is_scalar() || b.is_scalar(), "Not implemented");
-    return a/b;
+  MX MX::mrdivide(const MX& b, const MX& a) {
+    if (a.is_scalar() || b.is_scalar()) return b/a;
+    return solve(a.T(), b.T()).T();
   }
 
   MX MX::mldivide(const MX& a, const MX& b) {
-    casadi_assert_message(a.is_scalar() || b.is_scalar(), "Not implemented");
-    return b/a;
+    if (a.is_scalar() || b.is_scalar()) return b/a;
+    return solve(a, b);
   }
 
   MX MX::mpower(const MX& a, const MX& b) {
