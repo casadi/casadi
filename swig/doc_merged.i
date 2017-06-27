@@ -16351,31 +16351,7 @@ if output arguments have correct length and dimensions.
 in the Symbolic Toolbox for Matlab but instead creating a CasADi symbolic
 primitive.
 
-*/ %feature("docstring") casadi::GenericMatrix::nnz_upper "
-
-Get the number of non-zeros in the upper triangular half.
-
-";
-
-%feature("docstring") casadi::GenericMatrix::size2 "
-
-Get the second dimension (i.e. number of columns)
-
-";
-
-%feature("docstring") friendwrap_norm_inf "
-
-Infinity-norm.
-
-";
-
-%feature("docstring") friendwrap_depends_on "
-
-Check if expression depends on the argument The argument must be symbolic.
-
-";
-
-%feature("docstring") friendwrap_sum2 "
+*/ %feature("docstring") friendwrap_sum2 "
 
 Return a column-wise summation of elements.
 
@@ -16387,63 +16363,74 @@ Return a row-wise summation of elements.
 
 ";
 
-%feature("docstring") friendwrap_n_nodes "
-
-Count number of nodes
-
-";
-
-%feature("docstring") casadi::GenericMatrix::bilin "
-
-Calculate bilinear form x^T A y.
-
-";
-
 %feature("docstring") friendwrap_mrdivide "
 
 Matrix divide (cf. slash '/' in MATLAB)
 
 ";
 
-%feature("docstring") friendwrap_linspace "
+%feature("docstring") friendwrap_if_else "
 
-Matlab's linspace command.
-
-";
-
-%feature("docstring") friendwrap_mldivide "
-
-Matrix divide (cf. backslash '\\\\' in MATLAB)
+Branching on MX nodes Ternary operator, \"cond ? if_true : if_false\".
 
 ";
 
-%feature("docstring") friendwrap_sum_square "
+%feature("docstring") friendwrap_tril2symm "
 
-Calculate some of squares: sum_ij X_ij^2.
-
-";
-
-%feature("docstring") casadi::GenericMatrix::get_colind "
-
-Get the sparsity pattern. See the Sparsity class for details.
+Convert a lower triangular matrix to a symmetric one.
 
 ";
 
-%feature("docstring") friendwrap_cross "
+%feature("docstring") friendwrap_det "
 
-Matlab's cross command.
-
-";
-
-%feature("docstring") casadi::GenericMatrix::is_scalar "
-
-Check if the matrix expression is scalar.
+Matrix determinant (experimental)
 
 ";
 
-%feature("docstring") friendwrap_shared "
+%feature("docstring") casadi::GenericMatrix::nnz_diag "
 
-Extract shared subexpressions from an set of expressions.
+Get get the number of non-zeros on the diagonal.
+
+";
+
+%feature("docstring") friendwrap_conditional "
+
+Create a switch.
+
+If the condition
+
+Parameters:
+-----------
+
+ind:  evaluates to the integer k, where 0<=k<f.size(), then x[k] will be
+returned, otherwise
+
+x_default:  will be returned.
+
+";
+
+%feature("docstring") friendwrap_pinv "
+
+>  MatType pinv(const MatType &A)
+------------------------------------------------------------------------
+
+Computes the Moore-Penrose pseudo-inverse.
+
+If the matrix A is fat (size1<size2), mul(A, pinv(A)) is unity.
+
+pinv(A)' = (AA')^(-1) A
+
+If the matrix A is slender (size1>size2), mul(pinv(A), A) is unity.
+
+pinv(A) = (A'A)^(-1) A'
+
+>  MatType pinv(const MatType &A, const std::string &lsolver, const Dict &dict=Dict())
+------------------------------------------------------------------------
+
+Computes the Moore-Penrose pseudo-inverse.
+
+If the matrix A is fat (size1>size2), mul(A, pinv(A)) is unity. If the
+matrix A is slender (size2<size1), mul(pinv(A), A) is unity.
 
 ";
 
@@ -16482,243 +16469,9 @@ Solve a system of equations: A*x = b.
 
 ";
 
-%feature("docstring") friendwrap_det "
+%feature("docstring") friendwrap_which_depends "
 
-Matrix determinant (experimental)
-
-";
-
-%feature("docstring") casadi::GenericMatrix::sparsity "
-
-Get the sparsity pattern.
-
-";
-
-%feature("docstring") casadi::GenericMatrix::is_column "
-
-Check if the matrix is a column vector (i.e. size2()==1)
-
-";
-
-%feature("docstring") casadi::GenericMatrix::is_triu "
-
-Check if the matrix is upper triangular.
-
-";
-
-%feature("docstring") casadi::GenericMatrix::is_empty "
-
-Check if the sparsity is empty, i.e. if one of the dimensions is zero (or
-optionally both dimensions)
-
-";
-
-%feature("docstring") friendwrap_einstein "
-
->  MatType einstein(const MatType &A, const MatType &B, const MatType &C, const std::vector< int > &dim_a, const std::vector< int > &dim_b, const std::vector< int > &dim_c, const std::vector< int > &a, const std::vector< int > &b, const std::vector< int > &c)
-------------------------------------------------------------------------
-
-Compute any contraction of two dense tensors, using index/einstein notation
-einstein(A, B, a, b, c) -> C.
-
-Given two tensors, A and B, computes a third tensor C such that:
-
-C_c = A_a * B_b
-
-With a, b, c representing einstein indices. Instead of the classical index
-labels i,j,k,... we employ -1,-2,-3,...
-
-A, B, C are represented as CasADi vectors, with dim_a, dim_b, dim_c
-indictating theire tensorial dimensions.
-
->  MatType einstein(const MatType &A, const MatType &B, const std::vector< int > &dim_a, const std::vector< int > &dim_b, const std::vector< int > &dim_c, const std::vector< int > &a, const std::vector< int > &b, const std::vector< int > &c)
-------------------------------------------------------------------------
-
-Matrix power x^n.
-
-";
-
-%feature("docstring") friendwrap_densify "
-
->  MatType densify(const MatType &x)
-------------------------------------------------------------------------
-
-Make the matrix dense if not already.
-
->  MatType densify(const MatType &x, const MatType &val)
-------------------------------------------------------------------------
-
-Make the matrix dense and assign nonzeros to a value.
-
-";
-
-%feature("docstring") friendwrap_mpower "
-
-Matrix power x^n.
-
-";
-
-%feature("docstring") casadi::GenericMatrix::is_row "
-
-Check if the matrix is a row vector (i.e. size1()==1)
-
-";
-
-%feature("docstring") casadi::GenericMatrix::is_tril "
-
-Check if the matrix is lower triangular.
-
-";
-
-%feature("docstring") friendwrap_tril2symm "
-
-Convert a lower triangular matrix to a symmetric one.
-
-";
-
-%feature("docstring") friendwrap_repsum "
-
-Given a repeated matrix, computes the sum of repeated parts.
-
-";
-
-%feature("docstring") friendwrap_inv_skew "
-
-Generate the 3-vector progenitor of a skew symmetric matrix.
-
-";
-
-%feature("docstring") friendwrap_dot "
-
-Inner product of two matrices with x and y matrices of the same dimension.
-
-";
-
-%feature("docstring") casadi::GenericMatrix::colind "
-
-Get the sparsity pattern. See the Sparsity class for details.
-
-";
-
-%feature("docstring") casadi::GenericMatrix::nnz_diag "
-
-Get get the number of non-zeros on the diagonal.
-
-";
-
-%feature("docstring") friendwrap_norm_fro "
-
-Frobenius norm.
-
-";
-
-%feature("docstring") friendwrap_rank1 "
-
-Make a rank-1 update to a matrix A Calculates A + 1/2 * alpha * x*y'.
-
-";
-
-%feature("docstring") casadi::GenericMatrix::size "
-
->  std::pair<int, int> casadi::GenericMatrix< MatType >::size() const 
-------------------------------------------------------------------------
-
-Get the shape.
-
->  int casadi::GenericMatrix< MatType >::size(int axis) const 
-------------------------------------------------------------------------
-
-Get the size along a particular dimensions.
-
-";
-
-%feature("docstring") friendwrap_jtimes "
-
-Calculate the Jacobian and multiply by a vector from the right This is
-equivalent to mul(jacobian(ex, arg), v) or mul(jacobian(ex, arg).T, v) for
-tr set to false and true respectively. If contrast to these expressions, it
-will use directional derivatives which is typically (but not necessarily)
-more efficient if the complete Jacobian is not needed and v has few rows.
-
-";
-
-%feature("docstring") casadi::GenericMatrix "
-
-Matrix base class.
-
-This is a common base class for MX and Matrix<>, introducing a uniform
-syntax and implementing common functionality using the curiously recurring
-template pattern (CRTP) idiom.  The class is designed with the idea that
-\"everything is a matrix\", that is, also scalars and vectors. This
-philosophy makes it easy to use and to interface in particularly with Python
-and Matlab/Octave.  The syntax tries to stay as close as possible to the
-ublas syntax when it comes to vector/matrix operations.  Index starts with
-0. Index vec happens as follows: (rr, cc) -> k = rr+cc*size1() Vectors are
-column vectors.  The storage format is Compressed Column Storage (CCS),
-similar to that used for sparse matrices in Matlab, but unlike this format,
-we do allow for elements to be structurally non-zero but numerically zero.
-The sparsity pattern, which is reference counted and cached, can be accessed
-with Sparsity& sparsity() Joel Andersson
-
-C++ includes: generic_matrix.hpp ";
-
-%feature("docstring") friendwrap_tangent "
-
-Calculate Jacobian.
-
-";
-
-%feature("docstring") casadi::GenericMatrix::is_square "
-
-Check if the matrix expression is square.
-
-";
-
-%feature("docstring") friendwrap_polyval "
-
-Evaluate a polynomial with coefficients p in x.
-
-";
-
-%feature("docstring") casadi::GenericMatrix::dim "
-
-Get string representation of dimensions. The representation is (nrow x ncol
-= numel | size)
-
-";
-
-%feature("docstring") friendwrap_symvar "
-
-Get all symbols contained in the supplied expression Get all symbols on
-which the supplied expression depends.
-
-See:  SXFunction::getFree(), MXFunction::getFree()
-
-";
-
-%feature("docstring") friendwrap_bilin "
-
-Calculate bilinear form x^T A y.
-
-";
-
-%feature("docstring") friendwrap_hessian "";
-
-%feature("docstring") casadi::GenericMatrix::is_vector "
-
-Check if the matrix is a row or column vector.
-
-";
-
-%feature("docstring") friendwrap_norm_1 "
-
-1-norm
-
-";
-
-%feature("docstring") friendwrap_unite "
-
-Unite two matrices no overlapping sparsity.
+Find out which variables enter with some order.
 
 ";
 
@@ -16728,15 +16481,9 @@ Get the sparsity pattern. See the Sparsity class for details.
 
 ";
 
-%feature("docstring") friendwrap_trace "
+%feature("docstring") friendwrap_print_operator "
 
-Matrix trace.
-
-";
-
-%feature("docstring") friendwrap_gradient "
-
-Calculate Jacobian.
+Get a string representation for a binary MatType, using custom arguments.
 
 ";
 
@@ -16746,15 +16493,47 @@ Linearize an expression.
 
 ";
 
-%feature("docstring") friendwrap_print_operator "
+%feature("docstring") friendwrap_jacobian "
 
-Get a string representation for a binary MatType, using custom arguments.
+Calculate Jacobian.
 
 ";
 
-%feature("docstring") casadi::GenericMatrix::jtimes "
+%feature("docstring") casadi::GenericMatrix::is_dense "
 
-Functions called by friend functions defined here
+Check if the matrix expression is dense.
+
+";
+
+%feature("docstring") casadi::GenericMatrix::nnz_lower "
+
+Get the number of non-zeros in the lower triangular half.
+
+";
+
+%feature("docstring") casadi::GenericMatrix::rank1 "
+
+Make a rank-1 update to a matrix A Calculates A + 1/2 * alpha * x*y'.
+
+";
+
+%feature("docstring") friendwrap_n_nodes "
+
+Count number of nodes
+
+";
+
+%feature("docstring") friendwrap_hessian "";
+
+%feature("docstring") friendwrap_nullspace "
+
+Computes the nullspace of a matrix A.
+
+Finds Z m-by-(m-n) such that AZ = 0 with A n-by-m with m > n
+
+Assumes A is full rank
+
+Inspired by Numerical Methods in Scientific Computing by Ake Bjorck
 
 ";
 
@@ -16766,9 +16545,70 @@ expressions piggyback.
 
 ";
 
+%feature("docstring") casadi::GenericMatrix::is_scalar "
+
+Check if the matrix expression is scalar.
+
+";
+
+%feature("docstring") casadi::GenericMatrix::is_column "
+
+Check if the matrix is a column vector (i.e. size2()==1)
+
+";
+
+%feature("docstring") friendwrap_skew "
+
+Generate a skew symmetric matrix from a 3-vector.
+
+";
+
+%feature("docstring") casadi::GenericMatrix::is_tril "
+
+Check if the matrix is lower triangular.
+
+";
+
+%feature("docstring") casadi::GenericMatrix::colind "
+
+Get the sparsity pattern. See the Sparsity class for details.
+
+";
+
+%feature("docstring") casadi::GenericMatrix::is_triu "
+
+Check if the matrix is upper triangular.
+
+";
+
+%feature("docstring") friendwrap_gradient "
+
+Calculate Jacobian.
+
+";
+
+%feature("docstring") friendwrap_unite "
+
+Unite two matrices no overlapping sparsity.
+
+";
+
+%feature("docstring") casadi::GenericMatrix::dim "
+
+Get string representation of dimensions. The representation is (nrow x ncol
+= numel | size)
+
+";
+
+%feature("docstring") friendwrap_sum_square "
+
+Calculate some of squares: sum_ij X_ij^2.
+
+";
+
 %feature("docstring") friendwrap_inv "
 
-Matrix inverse (experimental)
+Matrix inverse.
 
 ";
 
@@ -16778,22 +16618,52 @@ Get the first dimension (i.e. number of rows)
 
 ";
 
-%feature("docstring") casadi::GenericMatrix::numel "
+%feature("docstring") casadi::GenericMatrix::size2 "
 
-Get the number of elements.
-
-";
-
-%feature("docstring") casadi::GenericMatrix::zeros "
-
-Create a dense matrix or a matrix with specified sparsity with all entries
-zero.
+Get the second dimension (i.e. number of columns)
 
 ";
 
-%feature("docstring") friendwrap_reverse "
+%feature("docstring") friendwrap_norm_1 "
 
-Reverse directional derivative.
+1-norm
+
+";
+
+%feature("docstring") friendwrap_norm_2 "
+
+2-norm
+
+";
+
+%feature("docstring") friendwrap_forward "
+
+Forward directional derivative.
+
+";
+
+%feature("docstring") friendwrap_diag "
+
+Get the diagonal of a matrix or construct a diagonal When the input is
+square, the diagonal elements are returned. If the input is vector- like, a
+diagonal matrix is constructed with it.
+
+";
+
+%feature("docstring") friendwrap_project "
+
+Create a new matrix with a given sparsity pattern but with the nonzeros
+taken from an existing matrix.
+
+";
+
+%feature("docstring") friendwrap_jtimes "
+
+Calculate the Jacobian and multiply by a vector from the right This is
+equivalent to mul(jacobian(ex, arg), v) or mul(jacobian(ex, arg).T, v) for
+tr set to false and true respectively. If contrast to these expressions, it
+will use directional derivatives which is typically (but not necessarily)
+more efficient if the complete Jacobian is not needed and v has few rows.
 
 ";
 
@@ -16811,91 +16681,100 @@ Substitute variable var with expression expr in multiple expressions.
 
 ";
 
-%feature("docstring") friendwrap_jacobian "
+%feature("docstring") casadi::GenericMatrix::bilin "
+
+Calculate bilinear form x^T A y.
+
+";
+
+%feature("docstring") friendwrap_mldivide "
+
+Matrix divide (cf. backslash '\\\\' in MATLAB)
+
+";
+
+%feature("docstring") casadi::GenericMatrix::get_colind "
+
+Get the sparsity pattern. See the Sparsity class for details.
+
+";
+
+%feature("docstring") friendwrap_cross "
+
+Matlab's cross command.
+
+";
+
+%feature("docstring") friendwrap_shared "
+
+Extract shared subexpressions from an set of expressions.
+
+";
+
+%feature("docstring") casadi::GenericMatrix::is_empty "
+
+Check if the sparsity is empty, i.e. if one of the dimensions is zero (or
+optionally both dimensions)
+
+";
+
+%feature("docstring") casadi::GenericMatrix::is_row "
+
+Check if the matrix is a row vector (i.e. size1()==1)
+
+";
+
+%feature("docstring") friendwrap_rank1 "
+
+Make a rank-1 update to a matrix A Calculates A + 1/2 * alpha * x*y'.
+
+";
+
+%feature("docstring") friendwrap_inv_skew "
+
+Generate the 3-vector progenitor of a skew symmetric matrix.
+
+";
+
+%feature("docstring") friendwrap_tangent "
 
 Calculate Jacobian.
 
 ";
 
-%feature("docstring") casadi::GenericMatrix::is_dense "
+%feature("docstring") casadi::GenericMatrix::is_square "
 
-Check if the matrix expression is dense.
-
-";
-
-%feature("docstring") friendwrap_nullspace "
-
-Computes the nullspace of a matrix A.
-
-Finds Z m-by-(m-n) such that AZ = 0 with A n-by-m with m > n
-
-Assumes A is full rank
-
-Inspired by Numerical Methods in Scientific Computing by Ake Bjorck
+Check if the matrix expression is square.
 
 ";
 
-%feature("docstring") friendwrap_norm_2 "
+%feature("docstring") friendwrap_bilin "
 
-2-norm
-
-";
-
-%feature("docstring") friendwrap_forward "
-
-Forward directional derivative.
+Calculate bilinear form x^T A y.
 
 ";
 
-%feature("docstring") friendwrap_if_else "
+%feature("docstring") casadi::GenericMatrix::jtimes "
 
-Branching on MX nodes Ternary operator, \"cond ? if_true : if_false\".
-
-";
-
-%feature("docstring") friendwrap_conditional "
-
-Create a switch.
-
-If the condition
-
-Parameters:
------------
-
-ind:  evaluates to the integer k, where 0<=k<f.size(), then x[k] will be
-returned, otherwise
-
-x_default:  will be returned.
+Functions called by friend functions defined here
 
 ";
 
-%feature("docstring") friendwrap_which_depends "
+%feature("docstring") friendwrap_simplify "
 
-Find out which variables enter with some order.
-
-";
-
-%feature("docstring") friendwrap_expm_const "";
-
-%feature("docstring") friendwrap_diag "
-
-Get the diagonal of a matrix or construct a diagonal When the input is
-square, the diagonal elements are returned. If the input is vector- like, a
-diagonal matrix is constructed with it.
+Simplify an expression.
 
 ";
 
-%feature("docstring") casadi::GenericMatrix::nnz_lower "
+%feature("docstring") casadi::GenericMatrix::numel "
 
-Get the number of non-zeros in the lower triangular half.
+Get the number of elements.
 
 ";
 
-%feature("docstring") friendwrap_expm "";
+%feature("docstring") friendwrap_linspace "
 
-%feature("docstring") friendwrap_triu2symm "
-
-Convert a upper triangular matrix to a symmetric one.
+Matlab's linspace command.
 
 ";
 
@@ -16947,47 +16826,192 @@ symbolic primitives.
 
 ";
 
-%feature("docstring") friendwrap_project "
-
-Create a new matrix with a given sparsity pattern but with the nonzeros
-taken from an existing matrix.
-
-";
-
 %feature("docstring") casadi::GenericMatrix::row "
 
 Get the sparsity pattern. See the Sparsity class for details.
 
 ";
 
-%feature("docstring") friendwrap_skew "
+%feature("docstring") friendwrap_inv_minor "
 
-Generate a skew symmetric matrix from a 3-vector.
+Matrix inverse (experimental)
 
 ";
 
-%feature("docstring") friendwrap_pinv "
+%feature("docstring") casadi::GenericMatrix::nnz_upper "
 
->  MatType pinv(const MatType &A)
+Get the number of non-zeros in the upper triangular half.
+
+";
+
+%feature("docstring") casadi::GenericMatrix::sparsity "
+
+Get the sparsity pattern.
+
+";
+
+%feature("docstring") friendwrap_norm_inf "
+
+Infinity-norm.
+
+";
+
+%feature("docstring") casadi::GenericMatrix::mpower "
+
+Functions called by friend functions defined here
+
+";
+
+%feature("docstring") friendwrap_trace "
+
+Matrix trace.
+
+";
+
+%feature("docstring") friendwrap_einstein "
+
+>  MatType einstein(const MatType &A, const MatType &B, const MatType &C, const std::vector< int > &dim_a, const std::vector< int > &dim_b, const std::vector< int > &dim_c, const std::vector< int > &a, const std::vector< int > &b, const std::vector< int > &c)
 ------------------------------------------------------------------------
 
-Computes the Moore-Penrose pseudo-inverse.
+Compute any contraction of two dense tensors, using index/einstein notation
+einstein(A, B, a, b, c) -> C.
 
-If the matrix A is fat (size1<size2), mul(A, pinv(A)) is unity.
+Given two tensors, A and B, computes a third tensor C such that:
 
-pinv(A)' = (AA')^(-1) A
+C_c = A_a * B_b
 
-If the matrix A is slender (size1>size2), mul(pinv(A), A) is unity.
+With a, b, c representing einstein indices. Instead of the classical index
+labels i,j,k,... we employ -1,-2,-3,...
 
-pinv(A) = (A'A)^(-1) A'
+A, B, C are represented as CasADi vectors, with dim_a, dim_b, dim_c
+indictating theire tensorial dimensions.
 
->  MatType pinv(const MatType &A, const std::string &lsolver, const Dict &dict=Dict())
+>  MatType einstein(const MatType &A, const MatType &B, const std::vector< int > &dim_a, const std::vector< int > &dim_b, const std::vector< int > &dim_c, const std::vector< int > &a, const std::vector< int > &b, const std::vector< int > &c)
 ------------------------------------------------------------------------
 
-Computes the Moore-Penrose pseudo-inverse.
+Matrix power x^n.
 
-If the matrix A is fat (size1>size2), mul(A, pinv(A)) is unity. If the
-matrix A is slender (size2<size1), mul(pinv(A), A) is unity.
+";
+
+%feature("docstring") friendwrap_repsum "
+
+Given a repeated matrix, computes the sum of repeated parts.
+
+";
+
+%feature("docstring") friendwrap_dot "
+
+Inner product of two matrices with x and y matrices of the same dimension.
+
+";
+
+%feature("docstring") casadi::GenericMatrix::size "
+
+>  std::pair<int, int> casadi::GenericMatrix< MatType >::size() const 
+------------------------------------------------------------------------
+
+Get the shape.
+
+>  int casadi::GenericMatrix< MatType >::size(int axis) const 
+------------------------------------------------------------------------
+
+Get the size along a particular dimensions.
+
+";
+
+%feature("docstring") casadi::GenericMatrix "
+
+Matrix base class.
+
+This is a common base class for MX and Matrix<>, introducing a uniform
+syntax and implementing common functionality using the curiously recurring
+template pattern (CRTP) idiom.  The class is designed with the idea that
+\"everything is a matrix\", that is, also scalars and vectors. This
+philosophy makes it easy to use and to interface in particularly with Python
+and Matlab/Octave.  The syntax tries to stay as close as possible to the
+ublas syntax when it comes to vector/matrix operations.  Index starts with
+0. Index vec happens as follows: (rr, cc) -> k = rr+cc*size1() Vectors are
+column vectors.  The storage format is Compressed Column Storage (CCS),
+similar to that used for sparse matrices in Matlab, but unlike this format,
+we do allow for elements to be structurally non-zero but numerically zero.
+The sparsity pattern, which is reference counted and cached, can be accessed
+with Sparsity& sparsity() Joel Andersson
+
+C++ includes: generic_matrix.hpp ";
+
+%feature("docstring") friendwrap_polyval "
+
+Evaluate a polynomial with coefficients p in x.
+
+";
+
+%feature("docstring") friendwrap_triu2symm "
+
+Convert a upper triangular matrix to a symmetric one.
+
+";
+
+%feature("docstring") friendwrap_depends_on "
+
+Check if expression depends on the argument The argument must be symbolic.
+
+";
+
+%feature("docstring") friendwrap_symvar "
+
+Get all symbols contained in the supplied expression Get all symbols on
+which the supplied expression depends.
+
+See:  SXFunction::getFree(), MXFunction::getFree()
+
+";
+
+%feature("docstring") casadi::GenericMatrix::is_vector "
+
+Check if the matrix is a row or column vector.
+
+";
+
+%feature("docstring") friendwrap_mpower "
+
+Matrix power x^n.
+
+";
+
+%feature("docstring") friendwrap_norm_fro "
+
+Frobenius norm.
+
+";
+
+%feature("docstring") casadi::GenericMatrix::zeros "
+
+Create a dense matrix or a matrix with specified sparsity with all entries
+zero.
+
+";
+
+%feature("docstring") friendwrap_reverse "
+
+Reverse directional derivative.
+
+";
+
+%feature("docstring") friendwrap_expm_const "";
+
+%feature("docstring") friendwrap_expm "";
+
+%feature("docstring") friendwrap_densify "
+
+>  MatType densify(const MatType &x)
+------------------------------------------------------------------------
+
+Make the matrix dense if not already.
+
+>  MatType densify(const MatType &x, const MatType &val)
+------------------------------------------------------------------------
+
+Make the matrix dense and assign nonzeros to a value.
 
 ";
 
@@ -17001,18 +17025,6 @@ Functions called by friend functions defined here
 
 Create a dense matrix or a matrix with specified sparsity with all entries
 one.
-
-";
-
-%feature("docstring") casadi::GenericMatrix::rank1 "
-
-Make a rank-1 update to a matrix A Calculates A + 1/2 * alpha * x*y'.
-
-";
-
-%feature("docstring") friendwrap_simplify "
-
-Simplify an expression.
 
 ";
 
@@ -30029,6 +30041,12 @@ Calculate bilinear form x^T A y.
 
 ";
 
+%feature("docstring") casadi::Matrix::jtimes "
+
+Functions called by friend functions defined here
+
+";
+
 %feature("docstring") casadi::Matrix::dim "
 
 Get string representation of dimensions. The representation is (nrow x ncol
@@ -30364,7 +30382,7 @@ Get the size along a particular dimensions.
 
 ";
 
-%feature("docstring") casadi::Matrix::jtimes "
+%feature("docstring") casadi::Matrix::mpower "
 
 Functions called by friend functions defined here
 
@@ -30720,6 +30738,12 @@ If y does not evaluate to 1, a runtime error is raised
 %feature("docstring") casadi::MX::jtimes "
 
 Functions called by friend functions defined here
+
+";
+
+%feature("docstring") friendwrap_inv_node "
+
+Inverse node.
 
 ";
 
@@ -31173,6 +31197,12 @@ node using MX::set_temp. Make sure to call reset_input() after usage.
 %feature("docstring") casadi::MX::is_norm "
 
 Check if norm.
+
+";
+
+%feature("docstring") casadi::MX::mpower "
+
+Functions called by friend functions defined here
 
 ";
 
