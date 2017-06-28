@@ -9,14 +9,14 @@ T1* CASADI_PREFIX(from_mex)(const mxArray* p, T1* y, const int* sp, T1* w) {
   const int *colind=sp, *row=sp+ncol+1;
   size_t p_nrow = mxGetM(p), p_ncol = mxGetN(p);
   const double* p_data = (const double*)mxGetData(p);
-  bool is_sparse = mxIsSparse(p);
+  int is_sparse = mxIsSparse(p);
   mwIndex *Jc = is_sparse ? mxGetJc(p) : 0;
   mwIndex *Ir = is_sparse ? mxGetIr(p) : 0;
   if (p_nrow==1 && p_ncol==1) {
     double v = is_sparse && Jc[1]==0 ? 0 : *p_data;
     fill(y, nnz, v);
   } else {
-    bool tr = false;
+    int tr = false;
     if (nrow!=p_nrow || ncol!=p_ncol) {
       tr = nrow==p_ncol && ncol==p_nrow && (nrow==1 || ncol==1);
       if (!tr) mexErrMsgIdAndTxt("Casadi:RuntimeError","\"from_mex\" failed: Dimension mismatch.");
