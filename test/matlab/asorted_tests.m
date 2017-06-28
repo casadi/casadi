@@ -421,27 +421,29 @@ mex fmex.c -DMATLAB_MEX_FILE
 else
 mex fmex.c -largeArrayDims
 end
-[a,b] = fmex('f',3);
+[a,b] = fmex('f',3)
 assert(norm(a-6,1)==0);
 assert(norm(b-3*eye(2),1)==0);
 assert(issparse(a));
 assert(issparse(b));
+clear fmex
 if is_octave 
 mex fmex.c -DCASASI_MEX_ALWAYS_DENSE -DMATLAB_MEX_FILE
 else
 mex fmex.c -largeArrayDims -DCASASI_MEX_ALWAYS_DENSE
 end
-[a,b] = fmex('f',3);
+[a,b] = fmex('f',3)
 assert(norm(a-6,1)==0);
 assert(norm(b-3*eye(2),1)==0);
 assert(~issparse(a));
 assert(~issparse(b));
+clear  fmex
 if is_octave 
 mex fmex.c -DCASASI_MEX_ALLOW_DENSE -DMATLAB_MEX_FILE
 else
 mex fmex.c -largeArrayDims -DCASASI_MEX_ALLOW_DENSE
 end
-[a,b] = fmex('f',3);
+[a,b] = fmex('f',3)
 assert(norm(a-6,1)==0);
 assert(norm(b-3*eye(2),1)==0);
 assert(~issparse(a));
