@@ -3,13 +3,13 @@ template<typename T1>
 mxArray* CASADI_PREFIX(to_mex)(const int* sp, const T1* x) {
   int nrow = sp[0], ncol = sp[1], nnz = sp[ncol+2];
 
-  bool dense = false;
+  int dense = 0;
 
 #ifdef CASASI_MEX_ALLOW_DENSE
   dense = nrow*ncol==nnz;
 #endif
 #ifdef CASASI_MEX_ALWAYS_DENSE
-  dense = true;
+  dense = 1;
 #endif
 
   mxArray* p;
