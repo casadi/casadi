@@ -437,7 +437,7 @@ assert(norm(a-6,1)==0);
 assert(norm(b-3*eye(2),1)==0);
 assert(~issparse(a));
 assert(~issparse(b));
-clear  fmex
+clear fmex
 if is_octave 
 mex fmex.c -DCASASI_MEX_ALLOW_DENSE -DMATLAB_MEX_FILE
 else
