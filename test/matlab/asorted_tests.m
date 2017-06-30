@@ -382,9 +382,9 @@ assert(norm(b-3*eye(2),1)==0);
 assert(~issparse(a));
 assert(issparse(b));
 if is_octave
-mex fmex.c -DCASASI_MEX_NO_SPARSE
+mex fmex.c -DCASADI_MEX_NO_SPARSE
 else
-mex fmex.c -largeArrayDims -DCASASI_MEX_NO_SPARSE
+mex fmex.c -largeArrayDims -DCASADI_MEX_NO_SPARSE
 end
 [a,b] = fmex('f',3);
 assert(norm(a-6,1)==0);
