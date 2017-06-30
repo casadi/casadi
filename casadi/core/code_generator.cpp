@@ -645,7 +645,6 @@ namespace casadi {
       this->auxiliaries << sanitize_source(casadi_trans_str, inst);
       break;
     case AUX_TO_MEX:
-      addAuxiliary(AUX_DENSIFY);
       this->auxiliaries << "#ifdef MATLAB_MEX_FILE\n"
                         << sanitize_source(casadi_to_mex_str, inst)
                         << "#endif" << endl << endl;
