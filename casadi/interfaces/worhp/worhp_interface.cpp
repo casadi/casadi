@@ -341,29 +341,6 @@ namespace casadi {
     // Check the provided inputs
     checkInputs(mem);
 
-    double inf = numeric_limits<double>::infinity();
-
-    if (m->lbx && m->ubx) {
-      for (int i=0; i<nx_;++i) {
-        casadi_assert_message(m->lbx[i]!=m->ubx[i],
-                              "WorhpInterface::evaluate: Worhp cannot handle the case when "
-                              "LBX == UBX."
-                              "You have that case at non-zero " << i << " , which has value " <<
-                              m->ubx[i] << ". Reformulate your problem by using a parameter "
-                              "for the corresponding variable.");
-      }
-    }
-
-    if (m->lbg && m->ubg) {
-      for (int i=0; i<ng_; ++i) {
-        casadi_assert_message(!(m->lbg[i]==-inf && m->ubg[i] == inf),
-                              "WorhpInterface::evaluate: Worhp cannot handle the case when both "
-                              "LBG and UBG are infinite."
-                              "You have that case at non-zero " << i << "."
-                              "Reformulate your problem eliminating the corresponding constraint.");
-      }
-    }
-
     m->fstats.at("mainloop").tic();
 
     // Pass inputs to WORHP data structures
@@ -378,6 +355,7 @@ namespace casadi {
     }
 
     // Replace infinite bounds with m->worhp_p.Infty
+    double inf = numeric_limits<double>::infinity();
     for (int i=0; i<nx_; ++i) if (m->worhp_o.XL[i]==-inf) m->worhp_o.XL[i] = -m->worhp_p.Infty;
     for (int i=0; i<nx_; ++i) if (m->worhp_o.XU[i]== inf) m->worhp_o.XU[i] =  m->worhp_p.Infty;
     for (int i=0; i<ng_; ++i) if (m->worhp_o.GL[i]==-inf) m->worhp_o.GL[i] = -m->worhp_p.Infty;
