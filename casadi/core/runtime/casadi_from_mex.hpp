@@ -6,7 +6,7 @@ T1* CASADI_PREFIX(from_mex)(const mxArray* p, T1* y, const int* sp, T1* w) {
   int nrow = *sp++, ncol = *sp++, nnz = sp[ncol];
   const int *colind=sp, *row=sp+ncol+1;
   size_t p_nrow = mxGetM(p), p_ncol = mxGetN(p);
-  bool is_sparse = mxIsSparse(p);
+  int is_sparse = mxIsSparse(p);
   mwIndex *Jc, *Ir;
   if (is_sparse) {
 #ifndef CASADI_MEX_NO_SPARSE
@@ -21,7 +21,7 @@ T1* CASADI_PREFIX(from_mex)(const mxArray* p, T1* y, const int* sp, T1* w) {
     double v = is_sparse && Jc[1]==0 ? 0 : *p_data;
     fill(y, nnz, v);
   } else {
-    bool tr = false;
+    int tr = 0;
     if (nrow!=p_nrow || ncol!=p_ncol) {
       tr = nrow==p_ncol && ncol==p_nrow && (nrow==1 || ncol==1);
       if (!tr) mexErrMsgIdAndTxt("Casadi:RuntimeError","\"from_mex\" failed: Dimension mismatch.");
