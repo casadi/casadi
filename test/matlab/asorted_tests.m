@@ -307,7 +307,8 @@ y = SX.sym('y',2)
 z = SX.sym('z',2,2)
 a = SX.sym('a',Sparsity.upper(2))
 
-if ~(is_octave & ismac)
+#if ~(is_octave & ismac)
+if false
   f = Function('f',{x,y,z,a},{x,y,z,a})
   F = returntypes('full',f);
 
