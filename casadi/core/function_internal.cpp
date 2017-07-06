@@ -1482,7 +1482,45 @@ namespace casadi {
          const std::vector<std::string>& inames,
          const std::vector<std::string>& onames,
          const Dict& opts) const {
-    casadi_error("'get_fd' not defined for " + type_name());
+    // Get the number of inputs and outputs
+    int n_in = this->n_in();
+    int n_out = this->n_out();
+
+    // Nondifferentiated inputs and outputs
+    vector<MX> f_in = mx_in(), f_out = mx_out();
+    vector<vector<MX>> fseed = symbolicFwdSeed(nfwd, f_in);
+    vector<vector<MX>> fsens(nfwd, f_out);
+
+    // Get the step sizes
+    MX fd_step = this->fd_step();
+
+    // For each direction, call perturbed
+    for (int d=0; d<nfwd; ++d) {
+      // Perturbed input
+      vector<MX> p_in = f_in;
+      for (int i=0; i<n_in; ++i) p_in[i] += fd_step*fseed[d][i];
+      // Perturbed output
+      vector<MX> p_out;
+      call(p_in, p_out, false, true);
+      for (int i=0; i<n_out; ++i) fsens.at(d).at(i) = (p_out[i]-f_out[i])/fd_step;
+    }
+
+    // Collect inputs
+    vector<MX> ret_in(f_in);
+    ret_in.insert(ret_in.end(), f_out.begin(), f_out.end());
+    vector<MX> v(nfwd);
+    for (int i=0; i<n_in; ++i) {
+      for (int d=0; d<nfwd; ++d) v[d] = fseed[d][i];
+      ret_in.push_back(horzcat(v));
+    }
+    // Collect outputs
+    vector<MX> ret_out;
+    for (int i=0; i<n_out; ++i) {
+      for (int d=0; d<nfwd; ++d) v[d] = fsens[d][i];
+      ret_out.push_back(horzcat(v));
+    }
+    // Assemble and return
+    return Function(name, ret_in, ret_out, inames, onames, opts);
   }
 
   int FunctionInternal::nnz_in() const {

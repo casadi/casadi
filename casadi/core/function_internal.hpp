@@ -549,7 +549,7 @@ namespace casadi {
     }
 
     /** \brief Get perturbation size for finite difference perturbations */
-    virtual double step_in(int ind) const {
+    virtual double fd_step() const {
       return 1e-8;
     }
 
