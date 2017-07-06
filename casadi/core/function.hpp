@@ -233,6 +233,9 @@ namespace casadi {
     /** \brief Get smallest input value */
     double min_in(int ind) const;
 
+    /** \brief Get perturbation size for finite difference perturbations */
+    double step_in(int ind) const;
+
     /** \brief Get sparsity of a given input */
     /// @{
     const Sparsity& sparsity_in(int ind) const;

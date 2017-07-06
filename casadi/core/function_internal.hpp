@@ -548,6 +548,11 @@ namespace casadi {
       return -inf;
     }
 
+    /** \brief Get perturbation size for finite difference perturbations */
+    virtual double step_in(int ind) const {
+      return 1e-8;
+    }
+
     /** \brief Get sparsity of a given input */
     /// @{
     inline const Sparsity& sparsity_in(int ind) const {
