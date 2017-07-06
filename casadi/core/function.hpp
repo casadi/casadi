@@ -224,8 +224,14 @@ namespace casadi {
      */
     int index_out(const std::string &name) const;
 
-    /** \brief Get default input value (NOTE: constant reference) */
+    /** \brief Get default input value */
     double default_in(int ind) const;
+
+    /** \brief Get largest input value */
+    double max_in(int ind) const;
+
+    /** \brief Get smallest input value */
+    double min_in(int ind) const;
 
     /** \brief Get sparsity of a given input */
     /// @{

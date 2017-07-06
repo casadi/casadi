@@ -966,6 +966,14 @@ namespace casadi {
     return (*this)->default_in(ind);
   }
 
+  double Function::max_in(int ind) const {
+    return (*this)->max_in(ind);
+  }
+
+  double Function::min_in(int ind) const {
+    return (*this)->min_in(ind);
+  }
+
   void Function::operator()(const double** arg, double** res, int* iw, double* w, int mem) const {
     (*this)->_eval(arg, res, iw, w, mem);
   }

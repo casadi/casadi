@@ -1479,9 +1479,9 @@ namespace casadi {
 
   Function FunctionInternal::
   get_fd(int nfwd, const std::string& name,
-              const std::vector<std::string>& inames,
-              const std::vector<std::string>& onames,
-              const Dict& opts) const {
+         const std::vector<std::string>& inames,
+         const std::vector<std::string>& onames,
+         const Dict& opts) const {
     casadi_error("'get_fd' not defined for " + type_name());
   }
 

@@ -538,6 +538,16 @@ namespace casadi {
       return 0;
     }
 
+    /** \brief Get largest input value */
+    virtual double max_in(int ind) const {
+      return inf;
+    }
+
+    /** \brief Get smallest input value */
+    virtual double min_in(int ind) const {
+      return -inf;
+    }
+
     /** \brief Get sparsity of a given input */
     /// @{
     inline const Sparsity& sparsity_in(int ind) const {
