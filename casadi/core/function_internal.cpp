@@ -1352,7 +1352,7 @@ namespace casadi {
     int n_out = this->n_out();
 
     // Give it a suitable name
-    string name = "fwd" + to_string(nfwd) + "_" + name_;
+    string name = (enable_forward_ ? "fwd" : "fd") + to_string(nfwd) + "_" + name_;
 
     // Names of inputs
     std::vector<std::string> inames;
