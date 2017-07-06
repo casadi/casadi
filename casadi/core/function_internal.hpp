@@ -548,11 +548,6 @@ namespace casadi {
       return -inf;
     }
 
-    /** \brief Get perturbation size for finite difference perturbations */
-    virtual double fd_step() const {
-      return 1e-8;
-    }
-
     /** \brief Get sparsity of a given input */
     /// @{
     inline const Sparsity& sparsity_in(int ind) const {
@@ -749,6 +744,9 @@ namespace casadi {
 
     // Print timing statistics
     bool print_time_;
+
+    // Finite difference step
+    double fd_step_;
 
     /** \brief Get type name */
     virtual std::string type_name() const = 0;

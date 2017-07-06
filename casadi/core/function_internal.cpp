@@ -82,6 +82,7 @@ namespace casadi {
     enable_reverse_ = true;
     enable_jacobian_ = true;
     enable_fd_ = false;
+    fd_step_ = 1e-8;
     sz_arg_tmp_ = 0;
     sz_res_tmp_ = 0;
     sz_iw_tmp_ = 0;
@@ -203,7 +204,10 @@ namespace casadi {
         " - if available. [default: true]"}},
       {"enable_fd",
        {OT_BOOL,
-        "Enable derivative calculation by finite differencing. [default: false]]"}}
+        "Enable derivative calculation by finite differencing. [default: false]]"}},
+      {"fd_step",
+       {OT_DOUBLE,
+        "Perturbation size for finite differencing [default: 1e-8]]"}}
      }
   };
 
@@ -251,6 +255,8 @@ namespace casadi {
         enable_jacobian_ = op.second;
       } else if (op.first=="enable_fd") {
         enable_fd_ = op.second;
+      } else if (op.first=="fd_step") {
+        fd_step_ = op.second;
       }
     }
 
@@ -1492,7 +1498,7 @@ namespace casadi {
     vector<vector<MX>> fsens(nfwd, f_out);
 
     // Get the step sizes
-    MX fd_step = this->fd_step();
+    MX fd_step = fd_step_;
 
     // For each direction, call perturbed
     for (int d=0; d<nfwd; ++d) {

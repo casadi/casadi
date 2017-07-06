@@ -974,10 +974,6 @@ namespace casadi {
     return (*this)->min_in(ind);
   }
 
-  double Function::fd_step() const {
-    return (*this)->fd_step();
-  }
-
   void Function::operator()(const double** arg, double** res, int* iw, double* w, int mem) const {
     (*this)->_eval(arg, res, iw, w, mem);
   }
