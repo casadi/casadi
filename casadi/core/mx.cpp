@@ -792,7 +792,7 @@ namespace casadi {
 
   MX MX::_sym(const std::string& name, const Sparsity& sp) {
     if (sp.nnz()==0) {
-      return MX(sp);
+      return MX::zeros(sp);
     } else {
       return MX::create(new SymbolicMX(name, sp));
     }
