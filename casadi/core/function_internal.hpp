@@ -761,7 +761,7 @@ namespace casadi {
     /** \brief Symbolic expressions for the forward seeds */
     template<typename MatType>
     std::vector<std::vector<MatType> >
-    symbolicFwdSeed(int nfwd, const std::vector<MatType>& v) const;
+    fwd_seed(int nfwd) const;
 
     /** \brief Symbolic expressions for the adjoint seeds */
     template<typename MatType>
@@ -797,22 +797,14 @@ namespace casadi {
   template<typename MatType>
   std::vector<std::vector<MatType> >
   FunctionInternal::
-  symbolicFwdSeed(int nfwd, const std::vector<MatType>& v) const {
-    std::vector<std::vector<MatType> > fseed(nfwd, v);
+  fwd_seed(int nfwd) const {
+    std::vector<std::vector<MatType>> fseed(nfwd);
+    int n_in = this->n_in();
     for (int dir=0; dir<nfwd; ++dir) {
-      // Replace symbolic inputs
-      int iind=0;
-      for (auto i=fseed[dir].begin(); i!=fseed[dir].end(); ++i, ++iind) {
-        // Name of the forward seed
-        std::stringstream ss;
-        ss << "f";
-        if (nfwd>1) ss << dir;
-        ss << "_";
-        ss << iind;
-
-        // Save to matrix
-        *i = MatType::sym(ss.str(), i->sparsity());
-
+      fseed[dir].resize(n_in);
+      for (int iind=0; iind<n_in; ++iind) {
+        std::string n = "f" + to_string(dir) + "_" +  name_in(iind);
+        fseed[dir][iind] = MatType::sym(n, sparsity_in(iind));
       }
     }
     return fseed;

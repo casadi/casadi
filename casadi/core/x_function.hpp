@@ -722,7 +722,7 @@ namespace casadi {
                 const std::vector<std::string>& onames,
                 const Dict& opts) const {
     // Seeds
-    std::vector<std::vector<MatType> > fseed = symbolicFwdSeed(nfwd, in_), fsens;
+    std::vector<std::vector<MatType> > fseed = fwd_seed<MatType>(nfwd), fsens;
 
     // Evaluate symbolically
     static_cast<const DerivedType*>(this)->ad_forward(fseed, fsens);

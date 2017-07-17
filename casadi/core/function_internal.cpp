@@ -1494,7 +1494,7 @@ namespace casadi {
 
     // Nondifferentiated inputs and outputs
     vector<MX> f_in = mx_in(), f_out = mx_out();
-    vector<vector<MX>> fseed = symbolicFwdSeed(nfwd, f_in);
+    vector<vector<MX>> fseed = fwd_seed<MX>(nfwd);
     vector<vector<MX>> fsens(nfwd, f_out);
 
     // Get the step sizes

@@ -193,11 +193,10 @@ namespace casadi {
                 const std::vector<std::string>& onames,
                 const Dict& opts) const {
     // Symbolic expression for the input
-    vector<MX> arg = mx_in();
-    arg[iin_] = MX::sym(arg[iin_].name() + "_guess",
-                        Sparsity(arg[iin_].size()));
-    vector<MX> res = mx_out();
-    vector<vector<MX> > fseed = symbolicFwdSeed(nfwd, arg), fsens;
+    vector<MX> arg = mx_in(), res = mx_out();
+    vector<vector<MX>> fseed = fwd_seed<MX>(nfwd), fsens;
+    arg[iin_] = MX::sym(arg[iin_].name(), Sparsity(arg[iin_].size()));
+    for (auto&& e : fseed) e[iin_] = MX::sym(e[iin_].name(), e[iin_].size());
     ad_forward(arg, res, fseed, fsens, false, false);
 
     // Construct return function
