@@ -132,11 +132,9 @@ namespace casadi {
     int n_out = f_.n_out();
     for (int j=0; j<n_out; ++j) {
       const int nnz = f_.nnz_out(j);
-      if (sens[j]) {
-        casadi_copy(f_res_pert, nnz, sens[j]);
-        casadi_axpy(nnz, -1., f_res[j], sens[j]);
-        casadi_scal(nnz, 1./h_, sens[j]);
-      }
+      casadi_copy(f_res_pert, nnz, sens[j]);
+      casadi_axpy(nnz, -1., f_res[j], sens[j]);
+      casadi_scal(nnz, 1./h_, sens[j]);
       f_res_pert += nnz;
     }
   }
