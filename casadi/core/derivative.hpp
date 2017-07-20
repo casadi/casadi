@@ -101,21 +101,44 @@ namespace casadi {
     double h_;
   };
 
-  // Forward differences
-  class CASADI_EXPORT Forward1 : public Derivative {
+  // Forward differences, first order
+  class CASADI_EXPORT Forward : public Derivative {
   public:
     // Constructor
-    Forward1(const std::string& name, const Function& f, int n, double h)
+    Forward(const std::string& name, const Function& f, int n, double h)
              : Derivative(name, f, n, h) { }
 
     /** \brief Get type name */
-    std::string type_name() const override {return "forward1";}
+    std::string type_name() const override {return "forward";}
 
     /** \brief  Number of function calls */
     int n_calls() const override { return 1;}
 
     /** \brief Is the scheme using the (nondifferentiated) output? */
     bool uses_output() const override {return true;}
+
+    /** \brief  Calculate perturbed function inputs */
+    void perturb(const double** f_arg, double* f_arg_pert, const double** seed) const override;
+
+    /** \brief Calculate the finite difference approximation */
+    void finalize(const double** f_res, const double* f_res_pert, double** sens) const override;
+  };
+
+  // Central differences, first order
+  class CASADI_EXPORT Central : public Derivative {
+  public:
+    // Constructor
+    Central(const std::string& name, const Function& f, int n, double h)
+             : Derivative(name, f, n, h) { }
+
+    /** \brief Get type name */
+    std::string type_name() const override {return "central";}
+
+    /** \brief  Number of function calls */
+    int n_calls() const override { return 2;}
+
+    /** \brief Is the scheme using the (nondifferentiated) output? */
+    bool uses_output() const override {return false;}
 
     /** \brief  Calculate perturbed function inputs */
     void perturb(const double** f_arg, double* f_arg_pert, const double** seed) const override;

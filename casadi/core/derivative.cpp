@@ -32,7 +32,7 @@ namespace casadi {
   Function Derivative::create(const std::string& name, const Function& f,
                               int n, const Dict& opts) {
     // Default options
-    string scheme = "forward1";
+    string scheme = "central";
     double stepsize = 1e-8;
 
     // Read options
@@ -46,13 +46,13 @@ namespace casadi {
 
     // Create instance
     Function ret;
-    if (scheme=="forward1") {
-      ret.assignNode(new Forward1(name, f, n, stepsize));
-    } else if (scheme=="central1") {
-      casadi_error("'central1' Not yet implemented");
+    if (scheme=="forward") {
+      ret.assignNode(new Forward(name, f, n, stepsize));
+    } else if (scheme=="central") {
+      ret.assignNode(new Central(name, f, n, stepsize));
     } else {
       casadi_error("No such scheme: '" + scheme + "'"
-                   " Supported: 'forward1', 'central1'");
+                   " Supported: 'central', 'forward'");
     }
     ret->construct(opts);
     return ret;
@@ -72,7 +72,7 @@ namespace casadi {
         "Perturbation size [default: 1e-8]"}},
       {"scheme",
        {OT_STRING,
-        "Differencing scheme [default: 'forward1']"}}
+        "Differencing scheme [default: 'central']"}}
      }
   };
 
@@ -196,7 +196,7 @@ namespace casadi {
     }
   }
 
-  void Forward1::perturb(const double** f_arg, double* f_arg_pert, const double** seed) const {
+  void Forward::perturb(const double** f_arg, double* f_arg_pert, const double** seed) const {
     int n_in = f_.n_in();
     for (int j=0; j<n_in; ++j) {
       const int nnz = f_.nnz_in(j);
@@ -206,7 +206,7 @@ namespace casadi {
     }
   }
 
-  void Forward1::finalize(const double** f_res, const double* f_res_pert, double** sens) const {
+  void Forward::finalize(const double** f_res, const double* f_res_pert, double** sens) const {
     int n_out = f_.n_out();
     for (int j=0; j<n_out; ++j) {
       const int nnz = f_.nnz_out(j);
@@ -214,6 +214,31 @@ namespace casadi {
       casadi_axpy(nnz, -1., f_res[j], sens[j]);
       casadi_scal(nnz, 1./h_, sens[j]);
       f_res_pert += nnz;
+    }
+  }
+
+  void Central::perturb(const double** f_arg, double* f_arg_pert, const double** seed) const {
+    int n_in = f_.n_in();
+    for (int sign=0; sign<2; ++sign) {
+      for (int j=0; j<n_in; ++j) {
+        const int nnz = f_.nnz_in(j);
+        casadi_copy(f_arg[j], nnz, f_arg_pert);
+        casadi_axpy(nnz, sign ? -h_ : h_, seed[j], f_arg_pert);
+        f_arg_pert += nnz;
+      }
+    }
+  }
+
+  void Central::finalize(const double** f_res, const double* f_res_pert, double** sens) const {
+    const double* f_res_pert1 = f_res_pert + f_.nnz_in();
+    int n_out = f_.n_out();
+    for (int j=0; j<n_out; ++j) {
+      const int nnz = f_.nnz_out(j);
+      casadi_copy(f_res_pert, nnz, sens[j]);
+      f_res_pert += nnz;
+      casadi_axpy(nnz, -1., f_res_pert1, sens[j]);
+      casadi_scal(nnz, .5/h_, sens[j]);
+      f_res_pert1 += nnz;
     }
   }
 
