@@ -156,6 +156,7 @@ set(CASADI_INTERNAL
   switch.hpp              switch.cpp
   bspline.hpp             bspline.cpp
   map.hpp                 map.cpp
+  derivative.hpp          derivative.cpp
   importer.cpp            importer_internal.hpp importer_internal.cpp
 
   # MISC useful stuff

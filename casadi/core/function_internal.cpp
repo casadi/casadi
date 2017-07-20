@@ -28,6 +28,7 @@
 #include "std_vector_tools.hpp"
 #include "global_options.hpp"
 #include "external.hpp"
+#include "derivative.hpp"
 
 #include <typeinfo>
 #include <cctype>
@@ -1381,7 +1382,7 @@ namespace casadi {
     if (enable_forward_) {
       ret = get_forward(nfwd, name, inames, onames, opts);
     } else {
-      ret = get_fd(nfwd, name, inames, onames, opts);
+      ret = Derivative::create(name, self(), nfwd, opts);
     }
 
     // Consistency check for inputs
