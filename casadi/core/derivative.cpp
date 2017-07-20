@@ -31,18 +31,50 @@ namespace casadi {
 
   Function Derivative::create(const std::string& name, const Function& f,
                               int n, const Dict& opts) {
+    // Default options
+    string scheme = "forward1";
+    double stepsize = 1e-8;
+
+    // Read options
+    for (auto&& op : opts) {
+      if (op.first=="scheme") {
+        scheme = op.second.to_string();
+      } else if (op.first=="stepsize") {
+        stepsize = op.second;
+      }
+    }
+
+    // Create instance
     Function ret;
-    ret.assignNode(new Forward1(name, f, n));
+    if (scheme=="forward1") {
+      ret.assignNode(new Forward1(name, f, n, stepsize));
+    } else if (scheme=="central1") {
+      casadi_error("'central1' Not yet implemented");
+    } else {
+      casadi_error("No such scheme: '" + scheme + "'"
+                   " Supported: 'forward1', 'central1'");
+    }
     ret->construct(opts);
     return ret;
   }
 
-  Derivative::Derivative(const std::string& name, const Function& f, int n)
-    : FunctionInternal(name), f_(f), n_(n) {
+  Derivative::Derivative(const std::string& name, const Function& f, int n, double h)
+    : FunctionInternal(name), f_(f), n_(n), h_(h) {
   }
 
   Derivative::~Derivative() {
   }
+
+  Options Derivative::options_
+  = {{&FunctionInternal::options_},
+     {{"stepsize",
+       {OT_DOUBLE,
+        "Perturbation size [default: 1e-8]"}},
+      {"scheme",
+       {OT_STRING,
+        "Differencing scheme [default: 'forward1']"}}
+     }
+  };
 
   void Derivative::init(const Dict& opts) {
     // Call the initialization method of the base class
@@ -59,6 +91,52 @@ namespace casadi {
     // Allocate sufficient temporary memory for function evaluation
     alloc(f_);
   }
+
+  Sparsity Derivative::get_sparsity_in(int i) {
+    int n_in = f_.n_in(), n_out = f_.n_out();
+    if (i<n_in) {
+      // Non-differentiated input
+      return f_.sparsity_in(i);
+    } else if (i<n_in+n_out) {
+      // Non-differentiated output
+      if (uses_output()) {
+        return f_.sparsity_out(i-n_in);
+      } else {
+        return Sparsity(f_.size_out(i-n_in));
+      }
+    } else {
+      // Seeds
+      return repmat(f_.sparsity_in(i-n_in-n_out), 1, n_);
+    }
+  }
+
+  Sparsity Derivative::get_sparsity_out(int i) {
+    return repmat(f_.sparsity_out(i), 1, n_);
+  }
+
+  double Derivative::default_in(int ind) const {
+    if (ind<f_.n_in()) {
+      return f_.default_in(ind);
+    } else {
+      return 0;
+    }
+  }
+
+  std::string Derivative::get_name_in(int i) {
+    int n_in = f_.n_in(), n_out = f_.n_out();
+    if (i<n_in) {
+      return f_.name_in(i);
+    } else if (i<n_in+n_out) {
+      return "out_" + f_.name_out(i-n_in);
+    } else {
+      return "fwd_" + f_.name_in(i-n_in-n_out);
+    }
+  }
+
+  std::string Derivative::get_name_out(int i) {
+    return "fwd_" + f_.name_out(i);
+  }
+
 
   void Derivative::eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
     // Shorthands

@@ -45,31 +45,20 @@ namespace casadi {
     /** \brief Destructor */
     ~Derivative() override;
 
+    ///@{
+    /** \brief Options */
+    static Options options_;
+    const Options& get_options() const override { return options_;}
+    ///@}
+
     /// @{
     /** \brief Sparsities of function inputs and outputs */
-    Sparsity get_sparsity_in(int i) override {
-      int n_in = f_.n_in(), n_out = f_.n_out();
-      if (i<n_in) {
-        return f_.sparsity_in(i);
-      } else if (i<n_in+n_out) {
-        return f_.sparsity_out(i-n_in);
-      } else {
-        return repmat(f_.sparsity_in(i-n_in-n_out), 1, n_);
-      }
-    }
-    Sparsity get_sparsity_out(int i) override {
-      return repmat(f_.sparsity_out(i), 1, n_);
-    }
+    Sparsity get_sparsity_in(int i) override;
+    Sparsity get_sparsity_out(int i) override;
     /// @}
 
     /** \brief Get default input value */
-    double default_in(int ind) const override {
-      if (ind<f_.n_in()) {
-        return f_.default_in(ind);
-      } else {
-        return 0;
-      }
-    }
+    double default_in(int ind) const override;
 
     ///@{
     /** \brief Number of function inputs and outputs */
@@ -79,19 +68,8 @@ namespace casadi {
 
     ///@{
     /** \brief Names of function input and outputs */
-    std::string get_name_in(int i) override {
-      int n_in = f_.n_in(), n_out = f_.n_out();
-      if (i<n_in) {
-        return f_.name_in(i);
-      } else if (i<n_in+n_out) {
-        return "out_" + f_.name_out(i-n_in);
-      } else {
-        return "fwd_" + f_.name_in(i-n_in-n_out);
-      }
-    }
-    std::string get_name_out(int i) override {
-      return "fwd_" + f_.name_out(i);
-    }
+    std::string get_name_in(int i) override;
+    std::string get_name_out(int i) override;
     /// @}
 
     /** \brief  Initialize */
@@ -111,21 +89,24 @@ namespace casadi {
 
   protected:
     // Constructor (protected, use create function)
-    Derivative(const std::string& name, const Function& f, int n);
+    Derivative(const std::string& name, const Function& f, int n, double h);
 
     // The function which is to be differentiated
     Function f_;
 
     // Number of directional derivatives
     int n_;
+
+    // Perturbation
+    double h_;
   };
 
   // Forward differences
   class CASADI_EXPORT Forward1 : public Derivative {
   public:
     // Constructor
-    Forward1(const std::string& name, const Function& f, int n)
-             : Derivative(name, f, n) { h_ = 1e-8;}
+    Forward1(const std::string& name, const Function& f, int n, double h)
+             : Derivative(name, f, n, h) { }
 
     /** \brief Get type name */
     std::string type_name() const override {return "forward1";}
@@ -133,14 +114,14 @@ namespace casadi {
     /** \brief  Number of function calls */
     int n_calls() const override { return 1;}
 
+    /** \brief Is the scheme using the (nondifferentiated) output? */
+    bool uses_output() const override {return true;}
+
     /** \brief  Calculate perturbed function inputs */
     void perturb(const double** f_arg, double* f_arg_pert, const double** seed) const override;
 
     /** \brief Calculate the finite difference approximation */
     void finalize(const double** f_res, const double* f_res_pert, double** sens) const override;
-
-    // Perturbation
-    double h_;
   };
 
 } // namespace casadi
