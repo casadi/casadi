@@ -108,6 +108,9 @@ namespace casadi {
     Forward(const std::string& name, const Function& f, int n, double h)
              : Derivative(name, f, n, h) { }
 
+    /** \brief Destructor */
+    ~Forward() override {}
+
     /** \brief Get type name */
     std::string type_name() const override {return "forward";}
 
@@ -130,6 +133,9 @@ namespace casadi {
     // Constructor
     Central(const std::string& name, const Function& f, int n, double h)
              : Derivative(name, f, n, h) { }
+
+    /** \brief Destructor */
+    ~Central() override {}
 
     /** \brief Get type name */
     std::string type_name() const override {return "central";}
