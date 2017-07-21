@@ -41,7 +41,7 @@ namespace casadi {
   public:
     EmptySparsity() {
       const int colind[1] = {0};
-      assignNode(new SparsityInternal(0, 0, colind, 0));
+      own(new SparsityInternal(0, 0, colind, 0));
     }
   };
 
@@ -50,7 +50,7 @@ namespace casadi {
     ScalarSparsity() {
       const int colind[2] = {0, 1};
       const int row[1] = {0};
-      assignNode(new SparsityInternal(1, 1, colind, row));
+      own(new SparsityInternal(1, 1, colind, row));
     }
   };
 
@@ -59,7 +59,7 @@ namespace casadi {
     ScalarSparseSparsity() {
       const int colind[2] = {0, 0};
       const int row[1] = {0};
-      assignNode(new SparsityInternal(1, 1, colind, row));
+      own(new SparsityInternal(1, 1, colind, row));
     }
   };
   /// \endcond
@@ -70,7 +70,7 @@ namespace casadi {
 
   Sparsity Sparsity::create(SparsityInternal *node) {
     Sparsity ret;
-    ret.assignNode(node);
+    ret.own(node);
     return ret;
   }
 
@@ -705,7 +705,7 @@ namespace casadi {
           if (ref.is_equal(nrow, ncol, colind, row)) {
 
             // Found match!
-            assignNode(ref.get());
+            own(ref.get());
             return;
 
           } else { // There is a hash rowision (unlikely, but possible)
@@ -725,14 +725,14 @@ namespace casadi {
 
               // Match found if sparsity matches
               if (ref.is_equal(nrow, ncol, colind, row)) {
-                assignNode(ref.get());
+                own(ref.get());
                 return;
               }
             }
           }
 
           // The cached entry has been deleted, create a new one
-          assignNode(new SparsityInternal(nrow, ncol, colind, row));
+          own(new SparsityInternal(nrow, ncol, colind, row));
 
           // Cache this pattern
           wref = *this;
@@ -744,7 +744,7 @@ namespace casadi {
     }
 
     // No matching sparsity pattern could be found, create a new one
-    assignNode(new SparsityInternal(nrow, ncol, colind, row));
+    own(new SparsityInternal(nrow, ncol, colind, row));
 
     // Cache this pattern
     cache.insert(std::pair<std::size_t, WeakRef>(h, *this));

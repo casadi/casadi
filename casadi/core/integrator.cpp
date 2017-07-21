@@ -54,7 +54,7 @@ namespace casadi {
   Function integrator(const string& name, const string& solver,
                       const Function& dae, const Dict& opts) {
     Function ret;
-    ret.assignNode(Integrator::getPlugin(solver).creator(name, dae));
+    ret.own(Integrator::getPlugin(solver).creator(name, dae));
     ret->construct(opts);
     return ret;
   }

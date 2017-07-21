@@ -137,7 +137,7 @@ namespace casadi {
       if (op>=0) {
         AlgEl ae;
         ae.op = op;
-        ae.data.assignNode(n);
+        ae.data.own(n);
         ae.arg.resize(n->n_dep());
         for (int i=0; i<n->n_dep(); ++i) {
           ae.arg[i] = n->dep(i)->temp;
@@ -323,7 +323,7 @@ namespace casadi {
           prim[p].set_temp(0);
 
           // Replace parameter with input instruction
-          algorithm_[i].data.assignNode(new Input(prim[p].sparsity(), ind, p, nz_offset));
+          algorithm_[i].data.own(new Input(prim[p].sparsity(), ind, p, nz_offset));
           algorithm_[i].op = OP_INPUT;
         }
         nz_offset += prim[p]->nnz();

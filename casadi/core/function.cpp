@@ -208,14 +208,14 @@ namespace casadi {
   void Function::construct(const string& name,
                            const vector<SX>& arg, const vector<SX>& res,
                            const Dict& opts) {
-    assignNode(new SXFunction(name, arg, res));
+    own(new SXFunction(name, arg, res));
     (*this)->construct(opts);
   }
 
   void Function::construct(const string& name,
                            const vector<MX>& arg, const vector<MX>& res,
                            const Dict& opts) {
-    assignNode(new MXFunction(name, arg, res));
+    own(new MXFunction(name, arg, res));
     (*this)->construct(opts);
   }
 
@@ -247,7 +247,7 @@ namespace casadi {
 
   Function Function::create(FunctionInternal* node) {
     Function ret;
-    ret.assignNode(node);
+    ret.own(node);
     return ret;
   }
 
@@ -562,7 +562,7 @@ namespace casadi {
   Function Function::conditional(const string& name, const vector<Function>& f,
                                  const Function& f_def, const Dict& opts) {
     Function ret;
-    ret.assignNode(new Switch(name, f, f_def));
+    ret.own(new Switch(name, f, f_def));
     ret->construct(opts);
     return ret;
   }
@@ -582,7 +582,7 @@ namespace casadi {
   Function Function::if_else(const string& name, const Function& f_true,
                              const Function& f_false, const Dict& opts) {
     Function ret;
-    ret.assignNode(new Switch(name, vector<Function>(1, f_false), f_true));
+    ret.own(new Switch(name, vector<Function>(1, f_false), f_true));
     ret->construct(opts);
     return ret;
   }

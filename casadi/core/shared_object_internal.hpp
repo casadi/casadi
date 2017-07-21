@@ -109,7 +109,7 @@ namespace casadi {
       std::map<SharedObjectInternal*, SharedObject>::iterator it =
           already_copied.find(const_cast<SharedObjectInternal*>(a.get()));
       if (it!=already_copied.end()) {
-        ret.assignNode(it->second.get());
+        ret.own(it->second.get());
       }
     }
     return ret;
@@ -120,7 +120,7 @@ namespace casadi {
   B SharedObjectInternal::shared_from_this() {
     casadi_assert(B::test_cast(this));
     B ret;
-    ret.assignNode(this);
+    ret.own(this);
     return ret;
   }
 
@@ -128,7 +128,7 @@ namespace casadi {
   const B SharedObjectInternal::shared_from_this() const {
     casadi_assert(B::test_cast(this));
     B ret;
-    ret.assignNode(const_cast<SharedObjectInternal*>(this));
+    ret.own(const_cast<SharedObjectInternal*>(this));
     return ret;
   }
 

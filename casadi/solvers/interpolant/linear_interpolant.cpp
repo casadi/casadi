@@ -126,7 +126,7 @@ namespace casadi {
                   const std::vector<std::string>& onames,
                   const Dict& opts) const {
     Function ret;
-    ret.assignNode(new LinearInterpolantJac(name));
+    ret.own(new LinearInterpolantJac(name));
     ret->construct(opts);
     return ret;
   }

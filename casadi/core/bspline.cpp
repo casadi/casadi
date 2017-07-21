@@ -127,7 +127,7 @@ namespace casadi {
       BSplineCommon::from_knots(knots, offset, stacked);
 
       Function ret;
-      ret.assignNode(new BSpline(name, stacked, offset, coeffs, degree, m));
+      ret.own(new BSpline(name, stacked, offset, coeffs, degree, m));
       ret->construct(opts);
       return ret;
     }
@@ -294,7 +294,7 @@ namespace casadi {
       BSplineCommon::from_knots(knots, offset, stacked);
 
       Function ret;
-      ret.assignNode(new BSplineDual(name, stacked, offset, x, degree, m, reverse));
+      ret.own(new BSplineDual(name, stacked, offset, x, degree, m, reverse));
       ret->construct(opts);
       return ret;
     }
@@ -371,7 +371,7 @@ namespace casadi {
       std::vector<MX> seed = MX::sym("seed", sparsity_out(0), nadj);
       std::vector<MX> sens;
       Function rev;
-      rev.assignNode(new BSplineDual(name, knots_, offset_, x_, degree_, m_, !reverse_));
+      rev.own(new BSplineDual(name, knots_, offset_, x_, degree_, m_, !reverse_));
       rev->construct(opts);
       for (int i=0;i<nadj;++i) {
         sens.push_back(rev(seed[i])[0]);

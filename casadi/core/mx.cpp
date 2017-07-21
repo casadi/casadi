@@ -43,11 +43,11 @@ namespace casadi {
   }
 
   MX::MX() {
-    assignNode(ZeroByZero::getInstance());
+    own(ZeroByZero::getInstance());
   }
 
   MX::MX(MXNode* node, bool dummy1, bool dummy2, bool dummy3, bool dummy4) {
-    assignNode(node);
+    own(node);
   }
 
   MX MX::create(MXNode* node) {
@@ -55,15 +55,15 @@ namespace casadi {
   }
 
   MX::MX(double x) {
-    assignNode(ConstantMX::create(Sparsity::dense(1, 1), x));
+    own(ConstantMX::create(Sparsity::dense(1, 1), x));
   }
 
   MX::MX(const DM& x) {
-    assignNode(ConstantMX::create(x));
+    own(ConstantMX::create(x));
   }
 
   MX::MX(const std::vector<double>& x) {
-    assignNode(ConstantMX::create(DM(x)));
+    own(ConstantMX::create(DM(x)));
   }
 
   MX::MX(const Sparsity& sp, const MX& val) {
@@ -73,13 +73,13 @@ namespace casadi {
       // Dense matrix if val dense
       if (val.is_dense()) {
         if (val.is_constant()) {
-          assignNode(ConstantMX::create(sp, static_cast<double>(val)));
+          own(ConstantMX::create(sp, static_cast<double>(val)));
         } else {
           *this = val->get_nzref(sp, std::vector<int>(sp.nnz(), 0));
         }
       } else {
         // Empty matrix
-        assignNode(ConstantMX::create(Sparsity(sp.size()), 0));
+        own(ConstantMX::create(Sparsity(sp.size()), 0));
       }
     } else {
       casadi_assert(val.is_column() && sp.nnz()==val.size1());
@@ -88,23 +88,23 @@ namespace casadi {
   }
 
   MX::MX(const Sparsity& sp) {
-    assignNode(ConstantMX::create(sp, 1));
+    own(ConstantMX::create(sp, 1));
   }
 
   MX::MX(int nrow, int ncol) {
-    assignNode(ConstantMX::create(Sparsity(nrow, ncol), 0));
+    own(ConstantMX::create(Sparsity(nrow, ncol), 0));
   }
 
   MX::MX(const std::pair<int, int>& rc) {
-    assignNode(ConstantMX::create(Sparsity(rc), 0));
+    own(ConstantMX::create(Sparsity(rc), 0));
   }
 
   MX::MX(const Sparsity& sp, int val, bool dummy) {
-    assignNode(ConstantMX::create(sp, val));
+    own(ConstantMX::create(sp, val));
   }
 
   MX::MX(const Sparsity& sp, double val, bool dummy) {
-    assignNode(ConstantMX::create(sp, val));
+    own(ConstantMX::create(sp, val));
   }
 
   std::vector<MX> MX::createMultipleOutput(MXNode* node) {

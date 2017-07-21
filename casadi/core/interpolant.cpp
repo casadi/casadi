@@ -83,7 +83,7 @@ namespace casadi {
 
 
     Function ret;
-    ret.assignNode(Interpolant::getPlugin(solver).creator(name, stacked, offset, values));
+    ret.own(Interpolant::getPlugin(solver).creator(name, stacked, offset, values));
     ret->construct(opts);
     return ret;
   }

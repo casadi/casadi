@@ -81,7 +81,7 @@ namespace casadi {
   Function nlpsol(const string& name, const string& solver,
                   const Function& nlp, const Dict& opts) {
     Function ret;
-    ret.assignNode(Nlpsol::instantiatePlugin(name, solver, nlp));
+    ret.own(Nlpsol::instantiatePlugin(name, solver, nlp));
     ret->construct(opts);
     return ret;
   }

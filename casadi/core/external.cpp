@@ -38,10 +38,10 @@ namespace casadi {
     Function ret;
     if (li.has_function(name + "_simple")) {
       // Simplified, lower overhead external
-      ret.assignNode(new SimplifiedExternal(name, li));
+      ret.own(new SimplifiedExternal(name, li));
     } else {
       // Full information external
-      ret.assignNode(new GenericExternal(name, li));
+      ret.own(new GenericExternal(name, li));
     }
     ret->construct(opts);
     return ret;

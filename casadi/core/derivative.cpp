@@ -47,9 +47,9 @@ namespace casadi {
     // Create instance
     Function ret;
     if (scheme=="forward") {
-      ret.assignNode(new Forward(name, f, n, stepsize));
+      ret.own(new Forward(name, f, n, stepsize));
     } else if (scheme=="central") {
-      ret.assignNode(new Central(name, f, n, stepsize));
+      ret.own(new Central(name, f, n, stepsize));
     } else {
       casadi_error("No such scheme: '" + scheme + "'"
                    " Supported: 'central', 'forward'");

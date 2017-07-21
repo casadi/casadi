@@ -34,9 +34,9 @@ namespace casadi {
     string name = f.name() + "_" + to_string(n);
     Function ret;
     if (parallelization == "serial") {
-      ret.assignNode(new Map(name, f, n));
+      ret.own(new Map(name, f, n));
     } else if (parallelization== "openmp") {
-      ret.assignNode(new MapOmp(name, f, n));
+      ret.own(new MapOmp(name, f, n));
     } else {
       casadi_error("Unknown parallelization: " + parallelization);
     }

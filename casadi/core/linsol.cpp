@@ -34,7 +34,7 @@ namespace casadi {
 
   Linsol::Linsol(const std::string& name, const std::string& solver,
                  const Dict& opts) {
-    assignNode(LinsolInternal::getPlugin(solver).creator(name));
+    own(LinsolInternal::getPlugin(solver).creator(name));
     (*this)->construct(opts);
   }
 

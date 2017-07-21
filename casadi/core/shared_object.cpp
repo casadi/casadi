@@ -45,13 +45,13 @@ namespace casadi {
     count_down();
   }
 
-  void SharedObject::assignNode(SharedObjectInternal* node_) {
+  void SharedObject::own(SharedObjectInternal* node_) {
     count_down();
     node = node_;
     count_up();
   }
 
-  void SharedObject::assignNodeNoCount(SharedObjectInternal* node_) {
+  void SharedObject::assign(SharedObjectInternal* node_) {
     node = node_;
   }
 
@@ -143,7 +143,7 @@ namespace casadi {
   SharedObject WeakRef::shared() {
     SharedObject ret;
     if (alive()) {
-      ret.assignNode((*this)->raw_);
+      ret.own((*this)->raw_);
     }
     return ret;
   }
@@ -157,11 +157,11 @@ namespace casadi {
   }
 
   WeakRef::WeakRef(SharedObject shared) {
-    assignNode(shared.weak()->get());
+    own(shared.weak()->get());
   }
 
   WeakRef::WeakRef(SharedObjectInternal* raw) {
-    assignNode(new WeakRefInternal(raw));
+    own(new WeakRefInternal(raw));
   }
 
   void WeakRef::kill() {

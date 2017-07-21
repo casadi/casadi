@@ -46,7 +46,7 @@ namespace casadi {
     if (own_) {
       // Make self a null-pointer and then delete
       // No ownership since reference counter was decreased in Callback::transfer_ownership
-      self_->assignNodeNoCount(0);
+      self_->assign(0);
       delete self_;
     }
   }

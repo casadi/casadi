@@ -98,7 +98,7 @@ namespace casadi {
   Function dplesol(const string& name, const string& solver,
                 const SpDict& st, const Dict& opts) {
     Function ret;
-    ret.assignNode(Dple::instantiatePlugin(name, solver, st));
+    ret.own(Dple::instantiatePlugin(name, solver, st));
     ret->construct(opts);
     return ret;
   }
