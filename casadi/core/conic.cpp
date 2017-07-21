@@ -44,10 +44,7 @@ namespace casadi {
 
   Function conic(const string& name, const string& solver,
                 const SpDict& qp, const Dict& opts) {
-    Function ret;
-    ret.own(Conic::instantiatePlugin(name, solver, qp));
-    ret->construct(opts);
-    return ret;
+    return Function::create(Conic::instantiatePlugin(name, solver, qp), opts);
   }
 
   void conic_debug(const Function& f, const std::string &filename) {

@@ -45,17 +45,14 @@ namespace casadi {
     }
 
     // Create instance
-    Function ret;
     if (scheme=="forward") {
-      ret.own(new Forward(name, f, n, stepsize));
+      return Function::create(new Forward(name, f, n, stepsize), opts);
     } else if (scheme=="central") {
-      ret.own(new Central(name, f, n, stepsize));
+      return Function::create(new Central(name, f, n, stepsize), opts);
     } else {
       casadi_error("No such scheme: '" + scheme + "'"
                    " Supported: 'central', 'forward'");
     }
-    ret->construct(opts);
-    return ret;
   }
 
   Derivative::Derivative(const std::string& name, const Function& f, int n, double h)

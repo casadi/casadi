@@ -125,11 +125,7 @@ namespace casadi {
       vector<int> offset;
       vector<double> stacked;
       BSplineCommon::from_knots(knots, offset, stacked);
-
-      Function ret;
-      ret.own(new BSpline(name, stacked, offset, coeffs, degree, m));
-      ret->construct(opts);
-      return ret;
+      return Function::create(new BSpline(name, stacked, offset, coeffs, degree, m), opts);
     }
 
     BSplineCommon::BSplineCommon(const std::string &name, const std::vector<double>& knots,
@@ -292,11 +288,7 @@ namespace casadi {
       vector<int> offset;
       vector<double> stacked;
       BSplineCommon::from_knots(knots, offset, stacked);
-
-      Function ret;
-      ret.own(new BSplineDual(name, stacked, offset, x, degree, m, reverse));
-      ret->construct(opts);
-      return ret;
+      return Function::create(new BSplineDual(name, stacked, offset, x, degree, m, reverse), opts);
     }
 
     BSplineDual::BSplineDual(const std::string &name, const std::vector<double>& knots,
@@ -370,9 +362,8 @@ namespace casadi {
       MX dummy = MX(size_out(0));
       std::vector<MX> seed = MX::sym("seed", sparsity_out(0), nadj);
       std::vector<MX> sens;
-      Function rev;
-      rev.own(new BSplineDual(name, knots_, offset_, x_, degree_, m_, !reverse_));
-      rev->construct(opts);
+      Function rev = Function::create(new BSplineDual(name, knots_, offset_, x_,
+                                                      degree_, m_, !reverse_), opts);
       for (int i=0;i<nadj;++i) {
         sens.push_back(rev(seed[i])[0]);
       }

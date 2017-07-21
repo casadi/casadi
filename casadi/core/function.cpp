@@ -251,6 +251,12 @@ namespace casadi {
     return ret;
   }
 
+  Function Function::create(FunctionInternal* node, const Dict& opts) {
+    Function ret = create(node);
+    ret->construct(opts);
+    return ret;
+  }
+
   FunctionInternal* Function::operator->() const {
     return get();
   }
@@ -561,10 +567,7 @@ namespace casadi {
 
   Function Function::conditional(const string& name, const vector<Function>& f,
                                  const Function& f_def, const Dict& opts) {
-    Function ret;
-    ret.own(new Switch(name, f, f_def));
-    ret->construct(opts);
-    return ret;
+    return create(new Switch(name, f, f_def), opts);
   }
 
   Function Function::bspline(const std::string &name,
@@ -581,10 +584,7 @@ namespace casadi {
 
   Function Function::if_else(const string& name, const Function& f_true,
                              const Function& f_false, const Dict& opts) {
-    Function ret;
-    ret.own(new Switch(name, vector<Function>(1, f_false), f_true));
-    ret->construct(opts);
-    return ret;
+    return create(new Switch(name, vector<Function>(1, f_false), f_true), opts);
   }
 
   int Function::n_in() const {

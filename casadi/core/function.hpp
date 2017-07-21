@@ -127,6 +127,9 @@ namespace casadi {
 #ifndef SWIG
     /** \brief  Create from node */
     static Function create(FunctionInternal* node);
+
+    /** \brief  Create from node and initialize */
+    static Function create(FunctionInternal* node, const Dict& opts);
 #endif // SWIG
     /// \endcond
 

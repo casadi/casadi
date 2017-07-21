@@ -32,17 +32,13 @@ namespace casadi {
   Function Map::create(const std::string& parallelization, const Function& f, int n) {
     // Create instance of the right class
     string name = f.name() + "_" + to_string(n);
-    Function ret;
     if (parallelization == "serial") {
-      ret.own(new Map(name, f, n));
+      return Function::create(new Map(name, f, n), Dict());
     } else if (parallelization== "openmp") {
-      ret.own(new MapOmp(name, f, n));
+      return Function::create(new MapOmp(name, f, n), Dict());
     } else {
       casadi_error("Unknown parallelization: " + parallelization);
     }
-    // Finalize creation
-    ret->construct(Dict());
-    return ret;
   }
 
   Map::Map(const std::string& name, const Function& f, int n)

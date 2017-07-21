@@ -45,10 +45,7 @@ namespace casadi {
 
   Function expmsol(const string& name, const string& solver,
                 const Sparsity& A, const Dict& opts) {
-    Function ret;
-    ret.own(Expm::instantiatePlugin(name, solver, A));
-    ret->construct(opts);
-    return ret;
+    return Function::create(Expm::instantiatePlugin(name, solver, A), opts);
   }
 
   int expm_n_in() {

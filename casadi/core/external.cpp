@@ -35,16 +35,13 @@ namespace casadi {
 
   Function external(const string& name, const Importer& li,
                     const Dict& opts) {
-    Function ret;
     if (li.has_function(name + "_simple")) {
       // Simplified, lower overhead external
-      ret.own(new SimplifiedExternal(name, li));
+      return Function::create(new SimplifiedExternal(name, li), opts);
     } else {
       // Full information external
-      ret.own(new GenericExternal(name, li));
+      return Function::create(new GenericExternal(name, li), opts);
     }
-    ret->construct(opts);
-    return ret;
   }
 
   Function external(const string& name, const Dict& opts) {

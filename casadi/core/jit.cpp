@@ -35,10 +35,7 @@ namespace casadi {
 
   Function jit(const std::string& name, int n_in, int n_out,
                const std::string& body, const Dict& opts) {
-    Function ret;
-    ret.own(new Jit(name, n_in, n_out, body, opts));
-    ret->construct(opts);
-    return ret;
+    return Function::create(new Jit(name, n_in, n_out, body, opts), opts);
   }
 
   Function jit(const ParsedFile& file) {
