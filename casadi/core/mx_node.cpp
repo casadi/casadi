@@ -204,15 +204,6 @@ namespace casadi {
     dep_[2] = dep3;
   }
 
-  void MXNode::assign(const MX& d, const vector<int>& inz, bool add) {
-    casadi_assert(0);
-  }
-
-  void MXNode::assign(const MX& d, const vector<int>& inz,
-                      const vector<int>& onz, bool add) {
-    casadi_assert(0);
-  }
-
   void MXNode::set_dep(const vector<MX>& dep) {
     dep_ = dep;
   }

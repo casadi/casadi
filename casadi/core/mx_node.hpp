@@ -245,13 +245,6 @@ namespace casadi {
     /// Set multiple dependencies
     void set_dep(const std::vector<MX>& dep);
 
-    /// Assign nonzeros (mapping matrix)
-    virtual void assign(const MX& d, const std::vector<int>& inz,
-                        const std::vector<int>& onz, bool add=false);
-
-    /// Assign nonzeros (mapping matrix), output indices sequential
-    virtual void assign(const MX& d, const std::vector<int>& inz, bool add=false);
-
     /// Convert scalar to matrix
     inline static MX to_matrix(const MX& x, const Sparsity& sp) {
       if (x.size()==sp.size()) {
