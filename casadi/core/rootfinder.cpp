@@ -47,7 +47,7 @@ namespace casadi {
 
   Function rootfinder(const std::string& name, const std::string& solver,
                    const Function& f, const Dict& opts) {
-    return Function::create(Rootfinder::instantiatePlugin(name, solver, f), opts);
+    return Function::create(Rootfinder::instantiate(name, solver, f), opts);
   }
 
   Rootfinder::Rootfinder(const std::string& name, const Function& oracle)

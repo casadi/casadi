@@ -97,7 +97,7 @@ namespace casadi {
 
   Function dplesol(const string& name, const string& solver,
                 const SpDict& st, const Dict& opts) {
-    return Function::create(Dple::instantiatePlugin(name, solver, st), opts);
+    return Function::create(Dple::instantiate(name, solver, st), opts);
   }
 
   vector<string> dple_in() {

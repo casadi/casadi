@@ -80,7 +80,7 @@ namespace casadi {
 
   Function nlpsol(const string& name, const string& solver,
                   const Function& nlp, const Dict& opts) {
-    return Function::create(Nlpsol::instantiatePlugin(name, solver, nlp), opts);
+    return Function::create(Nlpsol::instantiate(name, solver, nlp), opts);
   }
 
   vector<string> nlpsol_in() {
