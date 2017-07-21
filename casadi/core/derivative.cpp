@@ -227,7 +227,7 @@ namespace casadi {
       for (int j=0; j<n_in; ++j) {
         const int nnz = derivative_of_.nnz_in(j);
         casadi_copy(f_arg[j], nnz, f_arg_pert);
-        casadi_axpy(nnz, sign ? -h_ : h_, seed[j], f_arg_pert);
+        casadi_axpy(nnz, sign ? -h_/2 : h_/2, seed[j], f_arg_pert);
         f_arg_pert += nnz;
       }
     }
@@ -241,7 +241,7 @@ namespace casadi {
       casadi_copy(f_res_pert, nnz, sens[j]);
       f_res_pert += nnz;
       casadi_axpy(nnz, -1., f_res_pert1, sens[j]);
-      casadi_scal(nnz, .5/h_, sens[j]);
+      casadi_scal(nnz, 1/h_, sens[j]);
       f_res_pert1 += nnz;
     }
   }
