@@ -39,8 +39,7 @@ namespace casadi {
   class CASADI_EXPORT Derivative : public FunctionInternal {
   public:
     // Create function (use instead of constructor)
-    static Function create(const std::string& name, const Function& f, int n,
-                           const Dict& opts);
+    static Function create(const std::string& name, int n, const Dict& opts);
 
     /** \brief Destructor */
     ~Derivative() override;
@@ -62,8 +61,8 @@ namespace casadi {
 
     ///@{
     /** \brief Number of function inputs and outputs */
-    size_t get_n_in() override { return f_.n_in() + f_.n_out() + f_.n_in();}
-    size_t get_n_out() override { return f_.n_out();}
+    size_t get_n_in() override;
+    size_t get_n_out() override;
     ///@}
 
     ///@{
@@ -89,10 +88,7 @@ namespace casadi {
 
   protected:
     // Constructor (protected, use create function)
-    Derivative(const std::string& name, const Function& f, int n, double h);
-
-    // The function which is to be differentiated
-    Function f_;
+    Derivative(const std::string& name, int n, double h);
 
     // Number of directional derivatives
     int n_;
@@ -105,8 +101,7 @@ namespace casadi {
   class CASADI_EXPORT Forward : public Derivative {
   public:
     // Constructor
-    Forward(const std::string& name, const Function& f, int n, double h)
-             : Derivative(name, f, n, h) { }
+    Forward(const std::string& name, int n, double h) : Derivative(name, n, h) { }
 
     /** \brief Destructor */
     ~Forward() override {}
@@ -131,8 +126,7 @@ namespace casadi {
   class CASADI_EXPORT Central : public Derivative {
   public:
     // Constructor
-    Central(const std::string& name, const Function& f, int n, double h)
-             : Derivative(name, f, n, h) { }
+    Central(const std::string& name, int n, double h) : Derivative(name, n, h) { }
 
     /** \brief Destructor */
     ~Central() override {}
