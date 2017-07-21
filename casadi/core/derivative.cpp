@@ -77,15 +77,15 @@ namespace casadi {
     FunctionInternal::init(opts);
 
     // Allocate work vector for perturbed inputs
-    alloc_w(n_calls() * derivative_of_.nnz_in(), true);
-    alloc_w(n_calls() * derivative_of_.nnz_out(), true);
+    alloc_w(n_calls() * f().nnz_in(), true);
+    alloc_w(n_calls() * f().nnz_out(), true);
 
     // Work vectors for seeds/sensitivities
     alloc_arg(derivative_of_.n_in(), true);
     alloc_res(derivative_of_.n_out(), true);
 
     // Allocate sufficient temporary memory for function evaluation
-    alloc(derivative_of_);
+    alloc(f());
   }
 
   Sparsity Derivative::get_sparsity_in(int i) {
@@ -165,8 +165,8 @@ namespace casadi {
     sens = res; res += n_out;
 
     // Work vectors for perturbed inputs and outputs
-    double* f_arg_pert = w; w += n_calls * derivative_of_.nnz_in();
-    double* f_res_pert = w; w += n_calls * derivative_of_.nnz_out();
+    double* f_arg_pert = w; w += n_calls * f().nnz_in();
+    double* f_res_pert = w; w += n_calls * f().nnz_out();
 
     // For each derivative direction
     for (int i=0; i<n_; ++i) {
@@ -180,15 +180,15 @@ namespace casadi {
         // Function inputs
         for (int j=0; j<n_in; ++j) {
           arg[j] = f_arg_pert1;
-          f_arg_pert1 += derivative_of_.nnz_in(j);
+          f_arg_pert1 += f().nnz_in(j);
         }
         // Function outputs
         for (int j=0; j<n_out; ++j) {
           res[j] = f_res_pert1;
-          f_res_pert1 += derivative_of_.nnz_out(j);
+          f_res_pert1 += f().nnz_out(j);
         }
         // Call function
-        derivative_of_(arg, res, iw, w, 0);
+        f()(arg, res, iw, w, 0);
       }
 
       // Calculate finite difference approximation

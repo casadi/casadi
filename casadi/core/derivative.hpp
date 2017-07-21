@@ -80,6 +80,9 @@ namespace casadi {
     /** \brief  Number of perturbed function calls */
     virtual int n_calls() const = 0;
 
+    /** \brief Function to be called */
+    virtual const Function& f() const { return derivative_of_;}
+
     /** \brief  Calculate perturbed function inputs */
     virtual void perturb(const double** f_arg, double* f_arg_pert, const double** seed) const = 0;
 
@@ -146,6 +149,24 @@ namespace casadi {
     /** \brief Calculate the finite difference approximation */
     void finalize(const double** f_res, const double* f_res_pert, double** sens) const override;
   };
+
+  // Second order derivatives
+  class CASADI_EXPORT SecondOrderDerivative : public Derivative {
+  public:
+    // Constructor
+    SecondOrderDerivative(const std::string& name, int n, double h, int n1)
+     : Derivative(name, n, h), n1_(n1) { }
+
+    /** \brief Destructor */
+    ~SecondOrderDerivative() override {}
+
+    /** \brief Function to be called */
+    const Function& f() const override { return derivative_of_->derivative_of_;}
+
+    // Number of directional derivatives, first order
+    int n1_;
+  };
+
 
 } // namespace casadi
 /// \endcond
