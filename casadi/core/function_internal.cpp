@@ -83,7 +83,6 @@ namespace casadi {
     enable_reverse_ = true;
     enable_jacobian_ = true;
     enable_fd_ = false;
-    fd_step_ = 1e-8;
     sz_arg_tmp_ = 0;
     sz_res_tmp_ = 0;
     sz_iw_tmp_ = 0;
@@ -206,8 +205,8 @@ namespace casadi {
       {"enable_fd",
        {OT_BOOL,
         "Enable derivative calculation by finite differencing. [default: false]]"}},
-      {"fd_step",
-       {OT_DOUBLE,
+      {"fd_options",
+       {OT_DICT,
         "Perturbation size for finite differencing [default: 1e-8]]"}}
      }
   };
@@ -256,8 +255,8 @@ namespace casadi {
         enable_jacobian_ = op.second;
       } else if (op.first=="enable_fd") {
         enable_fd_ = op.second;
-      } else if (op.first=="fd_step") {
-        fd_step_ = op.second;
+      } else if (op.first=="fd_options") {
+        fd_options_ = op.second;
       }
     }
 
@@ -1359,7 +1358,7 @@ namespace casadi {
     int n_out = this->n_out();
 
     // Give it a suitable name
-    string name = (enable_forward_ ? "fwd" : "fd") + to_string(nfwd) + "_" + name_;
+    string name = "fwd" + to_string(nfwd) + "_" + name_;
 
     // Names of inputs
     std::vector<std::string> inames;
@@ -1373,6 +1372,7 @@ namespace casadi {
 
     // Options
     Dict opts;
+    if (!enable_forward_) opts = fd_options_;
     opts["max_num_dir"] = max_num_dir_;
     opts["derivative_of"] = self();
 
@@ -1498,8 +1498,20 @@ namespace casadi {
     vector<vector<MX>> fseed = fwd_seed<MX>(nfwd);
     vector<vector<MX>> fsens(nfwd, f_out);
 
+    // Read options
+    string scheme = "forward";
+    double stepsize = 1e-8;
+    for (auto&& op : fd_options_) {
+      if (op.first=="scheme") {
+        scheme = op.second.to_string();
+      } else if (op.first=="stepsize") {
+        stepsize = op.second;
+      }
+    }
+    casadi_assert(scheme=="forward");
+
     // Get the step sizes
-    MX fd_step = fd_step_;
+    MX fd_step = stepsize;
 
     // For each direction, call perturbed
     for (int d=0; d<nfwd; ++d) {

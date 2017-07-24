@@ -746,7 +746,7 @@ namespace casadi {
     bool print_time_;
 
     // Finite difference step
-    double fd_step_;
+    Dict fd_options_;
 
     /** \brief Get type name */
     virtual std::string type_name() const = 0;
