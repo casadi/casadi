@@ -1382,7 +1382,10 @@ namespace casadi {
     if (enable_forward_) {
       ret = get_forward(nfwd, name, inames, onames, opts);
     } else {
+      Function ret2 = get_forward(nfwd, name, inames, onames, opts);
+
       ret = Derivative::create(name, nfwd, opts);
+      ret.get<Derivative>()->f2 = ret2;
     }
 
     // Consistency check for inputs
