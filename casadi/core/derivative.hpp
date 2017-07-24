@@ -97,7 +97,7 @@ namespace casadi {
     int n_;
 
     // Perturbation
-    double h_;
+    double h_, h2_;
   };
 
   // Forward differences, first order

@@ -66,6 +66,9 @@ namespace casadi {
      {{"stepsize",
        {OT_DOUBLE,
         "Perturbation size [default: 1e-8]"}},
+      {"second_order_stepsize",
+       {OT_DOUBLE,
+        "Second order perturbation size [default: 1e-3]"}},
       {"scheme",
        {OT_STRING,
         "Differencing scheme [default: 'central']"}}
@@ -75,6 +78,16 @@ namespace casadi {
   void Derivative::init(const Dict& opts) {
     // Call the initialization method of the base class
     FunctionInternal::init(opts);
+
+    // Default options
+    h2_ = 1e-3;
+
+    // Read options
+    for (auto&& op : opts) {
+      if (op.first=="second_order_stepsize") {
+        h2_ = op.second;
+      }
+    }
 
     // Allocate work vector for perturbed inputs
     alloc_w(n_calls() * f().nnz_in(), true);
@@ -145,14 +158,14 @@ namespace casadi {
                                    const std::vector<std::string>& inames,
                                    const std::vector<std::string>& onames,
                                    const Dict& opts) const {
-    return Function::create(new Central(name, nfwd, 1e-3), opts);
+    return Function::create(new Central(name, nfwd, h2_), opts);
   }
 
   Function Forward::get_forward(int nfwd, const std::string& name,
                                    const std::vector<std::string>& inames,
                                    const std::vector<std::string>& onames,
                                    const Dict& opts) const {
-    return Function::create(new Forward(name, nfwd, 1e-3), opts);
+    return Function::create(new Forward(name, nfwd, h2_), opts);
   }
 
   void Derivative::eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
