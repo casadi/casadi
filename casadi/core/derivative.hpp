@@ -69,7 +69,7 @@ namespace casadi {
     /** \brief Names of function input and outputs */
     std::string get_name_in(int i) override;
     std::string get_name_out(int i) override;
-    /// @}
+    ///@}
 
     /** \brief  Initialize */
     void init(const Dict& opts) override;
@@ -113,16 +113,25 @@ namespace casadi {
     std::string type_name() const override {return "forward";}
 
     /** \brief  Number of function calls */
-    int n_calls() const override { return 1;}
+    int n_calls() const override { return 2;}
 
     /** \brief Is the scheme using the (nondifferentiated) output? */
-    bool uses_output() const override {return true;}
+    bool uses_output() const override {return false;}
 
     /** \brief  Calculate perturbed function inputs */
     void perturb(const double** f_arg, double* f_arg_pert, const double** seed) const override;
 
     /** \brief Calculate the finite difference approximation */
     void finalize(const double** f_res, const double* f_res_pert, double** sens) const override;
+
+    ///@{
+    /** \brief Second order derivatives */
+    bool has_forward(int nfwd) const override { return true;}
+    Function get_forward(int nfwd, const std::string& name,
+                         const std::vector<std::string>& inames,
+                         const std::vector<std::string>& onames,
+                         const Dict& opts) const override;
+    ///@}
   };
 
   // Central differences, first order
@@ -148,6 +157,15 @@ namespace casadi {
 
     /** \brief Calculate the finite difference approximation */
     void finalize(const double** f_res, const double* f_res_pert, double** sens) const override;
+
+    ///@{
+    /** \brief Second order derivatives */
+    bool has_forward(int nfwd) const override { return true;}
+    Function get_forward(int nfwd, const std::string& name,
+                         const std::vector<std::string>& inames,
+                         const std::vector<std::string>& onames,
+                         const Dict& opts) const override;
+    ///@}
   };
 
   // Second order derivatives
@@ -165,6 +183,32 @@ namespace casadi {
 
     // Number of directional derivatives, first order
     int n1_;
+  };
+
+  // Central differences, first order
+  class CASADI_EXPORT SecondOrderCentral : public SecondOrderDerivative {
+  public:
+    // Constructor
+    SecondOrderCentral(const std::string& name, int n, double h, int n1)
+     : SecondOrderDerivative(name, n, h, n1) { }
+
+    /** \brief Destructor */
+    ~SecondOrderCentral() override {}
+
+    /** \brief Get type name */
+    std::string type_name() const override {return "second_order_central";}
+
+    /** \brief  Number of function calls */
+    int n_calls() const override { return 6;}
+
+    /** \brief Is the scheme using the (nondifferentiated) output? */
+    bool uses_output() const override {return false;}
+
+    /** \brief  Calculate perturbed function inputs */
+    void perturb(const double** f_arg, double* f_arg_pert, const double** seed) const override;
+
+    /** \brief Calculate the finite difference approximation */
+    void finalize(const double** f_res, const double* f_res_pert, double** sens) const override;
   };
 
 
