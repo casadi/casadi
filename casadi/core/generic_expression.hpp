@@ -58,71 +58,188 @@ class CASADI_EXPORT GenericExpression : public GenericExpressionCommon {
 \ingroup expression_tools
 @{
 */
-    /// Addition
-    friend inline ExType operator+(const ExType &x, const ExType &y) {
-      return ExType::binary(OP_ADD, x, y);
-    }
 
-    /// Subtraction
-    friend inline ExType operator-(const ExType &x, const ExType &y) {
-      return ExType::binary(OP_SUB, x, y);
-    }
+  ///@{
+  /** \brief Addition: (x,y) -> x + y */
+  static ExType plus(const ExType &x, const ExType &y) {
+    return ExType::binary(OP_ADD, x, y);
+  }
+  friend inline ExType plus(const ExType &x, const ExType &y) {
+    return ExType::plus(x, y);
+  }
+  friend inline ExType operator+(const ExType &x, const ExType &y) {
+    return plus(x, y);
+  }
+  inline ExType& operator+=(const ExType &y) { return self() = self() + y; }
+  ///@}
 
-    /// Elementwise multiplication
-    friend inline ExType operator*(const ExType &x, const ExType &y) {
-      return ExType::binary(OP_MUL, x, y);
-    }
+  ///@{
+  /** \brief Subtraction: (x,y) -> x - y */
+  static ExType minus(const ExType &x, const ExType &y) {
+    return ExType::binary(OP_SUB, x, y);
+  }
+  friend inline ExType minus(const ExType &x, const ExType &y) {
+    return ExType::minus(x, y);
+  }
+  friend inline ExType operator-(const ExType &x, const ExType &y) {
+    return minus(x, y);
+  }
+  inline ExType& operator-=(const ExType &y) { return self() = self() - y; }
+  ///@}
 
-    /// Elementwise division
-    friend inline ExType operator/(const ExType &x, const ExType &y) {
-      return ExType::binary(OP_DIV, x, y);
-    }
+  ///@{
+  /** \brief Elementwise multiplication: (x,y) -> x .* y */
+  static ExType times(const ExType &x, const ExType &y) {
+    return ExType::binary(OP_MUL, x, y);
+  }
+  friend inline ExType times(const ExType &x, const ExType &y) {
+    return ExType::times(x, y);
+  }
+  friend inline ExType operator*(const ExType &x, const ExType &y) {
+    return times(x, y);
+  }
+  inline ExType& operator*=(const ExType &y) {return self() = self() * y;}
+  ///@}
 
-    /// Logic less than
-    friend inline ExType operator<(const ExType &x, const ExType &y) {
-      return ExType::binary(OP_LT, x, y);
-    }
+  ///@{
+  /** \brief Elementwise division: (x,y) -> x ./ y */
+  static ExType rdivide(const ExType &x, const ExType &y) {
+    return ExType::binary(OP_DIV, x, y);
+  }
+  friend inline ExType rdivide(const ExType &x, const ExType &y) {
+    return ExType::rdivide(x, y);
+  }
+  friend inline ExType operator/(const ExType &x, const ExType &y) {
+    return rdivide(x, y);
+  }
+  inline ExType& operator/=(const ExType &y) {return self() = self() / y;}
+  ///@}
 
-    /// Logic less or equal to
-    friend inline ExType operator<=(const ExType &x, const ExType &y) {
-      return ExType::binary(OP_LE, x, y);
-    }
+  ///@{
+  /** \brief Logical less than: (x,y) -> x < y */
+  static ExType lt(const ExType &x, const ExType &y) {
+    return ExType::binary(OP_LT, x, y);
+  }
+  friend inline ExType lt(const ExType &x, const ExType &y) {
+    return ExType::lt(x, y);
+  }
+  friend inline ExType operator<(const ExType &x, const ExType &y) {
+    return lt(x, y);
+  }
+  ///@}
 
-    /// Logic greater than
-    friend inline ExType operator>(const ExType &x, const ExType &y) {
-      return ExType::binary(OP_LT, y, x);
-    }
+  ///@{
+  /** \brief Logical less or equal to: (x,y) -> x <= y */
+  static ExType le(const ExType &x, const ExType &y) {
+    return ExType::binary(OP_LE, x, y);
+  }
+  friend inline ExType le(const ExType &x, const ExType &y) {
+    return ExType::le(x, y);
+  }
+  friend inline ExType operator<=(const ExType &x, const ExType &y) {
+    return le(x, y);
+  }
+  ///@}
 
-    /// Logic greater or equal to
-    friend inline ExType operator>=(const ExType &x, const ExType &y) {
-      return ExType::binary(OP_LE, y, x);
-    }
+  ///@{
+  /** \brief Logical greater than: (x,y) -> x > y */
+  static ExType gt(const ExType &x, const ExType &y) {
+    return ExType::lt(y, x);
+  }
+  friend inline ExType gt(const ExType &x, const ExType &y) {
+    return ExType::gt(x, y);
+  }
+  friend inline ExType operator>(const ExType &x, const ExType &y) {
+    return gt(x, y);
+  }
+  ///@}
 
-    /// Logic equal to
-    friend inline ExType operator==(const ExType &x, const ExType &y) {
-      return ExType::binary(OP_EQ, x, y);
-    }
+  ///@{
+  /** \brief Logical greater or equal to: (x,y) -> x <= y */
+  static ExType ge(const ExType &x, const ExType &y) {
+    return ExType::le(y, x);
+  }
+  friend inline ExType ge(const ExType &x, const ExType &y) {
+    return ExType::ge(x, y);
+  }
+  friend inline ExType operator>=(const ExType &x, const ExType &y) {
+    return ge(x, y);
+  }
+  ///@}
 
-    /// Logic not equal to
-    friend inline ExType operator!=(const ExType &x, const ExType &y) {
-      return ExType::binary(OP_NE, x, y);
-    }
+  ///@{
+  /** \brief Logical equal to: (x,y) -> x == y */
+  static ExType eq(const ExType &x, const ExType &y) {
+    return ExType::binary(OP_EQ, x, y);
+  }
+  friend inline ExType eq(const ExType &x, const ExType &y) {
+    return ExType::eq(x, y);
+  }
+  friend inline ExType operator==(const ExType &x, const ExType &y) {
+    return eq(x, y);
+  }
+  ///@}
 
-    /** \brief Logical `and`
-     * Returns (an expression evaluating to) 1 if both
-     * expressions are nonzero and 0 otherwise
-     */
-    friend inline ExType operator&&(const ExType &x, const ExType &y) {
-      return ExType::binary(OP_AND, x, y);
-    }
+  ///@{
+  /** \brief Logical not equal to: (x,y) -> x ~= y */
+  static ExType ne(const ExType &x, const ExType &y) {
+    return ExType::binary(OP_NE, x, y);
+  }
+  friend inline ExType ne(const ExType &x, const ExType &y) {
+    return ExType::ne(x, y);
+  }
+  friend inline ExType operator!=(const ExType &x, const ExType &y) {
+    return ne(x, y);
+  }
+  ///@}
 
-    /** \brief  Logical `or`
-     * returns (an expression evaluating to) 1 if at
-     * least one expression is nonzero and 0 otherwise
-     */
-    friend inline ExType operator||(const ExType &x, const ExType &y) {
-      return ExType::binary(OP_OR, x, y);
+  ///@{
+  /** \brief Logical `and`
+   * Returns (an expression evaluating to) 1 if both
+   * expressions are nonzero and 0 otherwise
+   */
+   static ExType logic_and(const ExType &x, const ExType &y) {
+     return ExType::binary(OP_AND, x, y);
+   }
+   friend inline ExType logic_and(const ExType &x, const ExType &y) {
+     return ExType::logic_and(x, y);
+   }
+   friend inline ExType operator&&(const ExType &x, const ExType &y) {
+     return logic_and(x, y);
+   }
+  ///@}
+
+  ///@{
+  /** \brief  Logical `or`
+   * returns (an expression evaluating to) 1 if at
+   * least one expression is nonzero and 0 otherwise
+   */
+   static ExType logic_or(const ExType &x, const ExType &y) {
+     return ExType::binary(OP_OR, x, y);
+   }
+   friend inline ExType logic_or(const ExType &x, const ExType &y) {
+     return ExType::logic_or(x, y);
+   }
+   friend inline ExType operator||(const ExType &x, const ExType &y) {
+     return logic_or(x, y);
+   }
+   ///@}
+
+   ///@{
+   /** \brief  Logical `not`
+    * Returns (an expression evaluating to) 1 if
+    * expression is zero and 0 otherwise
+    */
+    static ExType logic_not(const ExType& x) {
+      return ExType::unary(OP_NOT, x);
     }
+    friend inline ExType logic_not(const ExType& x) {
+      return ExType::logic_not(x);
+    }
+    inline ExType operator!() const {
+      return logic_not(self());
+    }
+    ///@}
 
     /// Absolute value
     friend inline ExType fabs(const ExType& x) {
@@ -306,40 +423,6 @@ class CASADI_EXPORT GenericExpression : public GenericExpressionCommon {
       return ExType::binary(OP_PRINTME, x, y);
     }
 
-    /// In-place addition
-    inline ExType& operator+=(const ExType &y) { return self() = self() + y; }
-
-    /// In-place subtraction
-    inline ExType& operator-=(const ExType &y) { return self() = self() - y; }
-
-    /// In-place elementwise multiplication
-    inline ExType& operator*=(const ExType &y) {return self() = self() * y;}
-
-    /// In-place elementwise division
-    inline ExType& operator/=(const ExType &y) {return self() = self() / y;}
-
-    /** \brief  Logical `not`
-     * Returns (an expression evaluating to) 1 if
-     * expression is zero and 0 otherwise
-     */
-    inline ExType operator!() const {
-      return ExType::unary(OP_NOT, self());
-    }
-
-    /// Logical not, alternative syntax
-    friend inline ExType logic_not(const ExType& x) {
-      return !x;
-    }
-
-    /// Logical and, alternative syntax
-    friend inline ExType logic_and(const ExType& x, const ExType& y) {
-      return x && y;
-    }
-
-    /// Logical or, alterntive syntax
-    friend inline ExType logic_or(const ExType& x, const ExType& y) {
-      return x || y;
-    }
 /** @} */
 #endif // SWIG
 

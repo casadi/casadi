@@ -436,7 +436,6 @@ namespace casadi {
     static MX conditional(const MX& ind, const std::vector<MX> &x, const MX& x_default,
                           bool short_circuit=false);
     static bool depends_on(const MX& x, const MX& arg);
-    static MX logic_not(const MX& x);
     static MX simplify(const MX& x);
     static MX mpower(const MX& a, const MX& b);
     static MX dot(const MX& x, const MX& y);
