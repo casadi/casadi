@@ -1573,10 +1573,10 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  Matrix<Scalar> Matrix<Scalar>::getMinor(const Matrix<Scalar>& x,
+  Matrix<Scalar> Matrix<Scalar>::minor(const Matrix<Scalar>& x,
                                               int i, int j) {
     int n = x.size2();
-    casadi_assert_message(n == x.size1(), "getMinor: matrix must be square");
+    casadi_assert_message(n == x.size1(), "minor: matrix must be square");
 
     // Trivial return if scalar
     if (n==1) return 1;
@@ -1605,7 +1605,7 @@ namespace casadi {
   Matrix<Scalar> Matrix<Scalar>::cofactor(const Matrix<Scalar>& A, int i, int j) {
 
     // Calculate the i, j minor
-    Matrix<Scalar> minor_ij = getMinor(A, i, j);
+    Matrix<Scalar> minor_ij = minor(A, i, j);
     // Calculate the cofactor
     int sign_i = 1-2*((i+j) % 2);
 

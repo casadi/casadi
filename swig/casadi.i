@@ -3224,8 +3224,8 @@ DECL M casadi_adj(const M& A) {
   return adj(A);
 }
 
-DECL M casadi_getMinor(const M& x, int i, int j) {
-  return getMinor(x, i, j);
+DECL M casadi_minor(const M& x, int i, int j) {
+  return minor(x, i, j);
 }
 
 DECL M casadi_cofactor(const M& x, int i, int j) {

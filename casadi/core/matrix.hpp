@@ -425,7 +425,7 @@ namespace casadi {
     static Matrix<Scalar> all(const Matrix<Scalar>& x);
     static Matrix<Scalar> any(const Matrix<Scalar>& x);
     static Matrix<Scalar> adj(const Matrix<Scalar>& x);
-    static Matrix<Scalar> getMinor(const Matrix<Scalar>& x, int i, int j);
+    static Matrix<Scalar> minor(const Matrix<Scalar>& x, int i, int j);
     static Matrix<Scalar> cofactor(const Matrix<Scalar>& A, int i, int j);
     static Matrix<Scalar> chol(const Matrix<Scalar>& A);
     static Matrix<Scalar> norm_inf_mul(const Matrix<Scalar>& x, const Matrix<Scalar> &y);
@@ -452,8 +452,8 @@ namespace casadi {
 
     /** \brief Get the (i,j) minor matrix
      */
-    friend inline Matrix<Scalar> getMinor(const Matrix<Scalar> &x, int i, int j) {
-      return Matrix<Scalar>::getMinor(x, i, j);
+    friend inline Matrix<Scalar> minor(const Matrix<Scalar> &x, int i, int j) {
+      return Matrix<Scalar>::minor(x, i, j);
     }
 
     /** \brief Get the (i,j) cofactor matrix
