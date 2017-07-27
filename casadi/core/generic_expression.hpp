@@ -181,7 +181,7 @@ class CASADI_EXPORT GenericExpression : public GenericExpressionCommon {
   ///@}
 
   ///@{
-  /** \brief Logical not equal to: (x,y) -> x ~= y */
+  /** \brief Logical not equal to: (x,y) -> x != y */
   static ExType ne(const ExType &x, const ExType &y) {
     return ExType::binary(OP_NE, x, y);
   }
@@ -226,7 +226,7 @@ class CASADI_EXPORT GenericExpression : public GenericExpressionCommon {
    ///@}
 
    ///@{
-   /** \brief  Logical `not`
+   /** \brief  Logical `not` x -> !x
     * Returns (an expression evaluating to) 1 if
     * expression is zero and 0 otherwise
     */
@@ -241,187 +241,356 @@ class CASADI_EXPORT GenericExpression : public GenericExpressionCommon {
     }
     ///@}
 
-    /// Absolute value
-    friend inline ExType fabs(const ExType& x) {
+    ///@{
+    /** \brief Absolute value: x -> abs(x) */
+    static ExType abs(const ExType& x) {
       return ExType::unary(OP_FABS, x);
     }
-
-    /// Absolute value
     friend inline ExType abs(const ExType& x) {
-      return ExType::unary(OP_FABS, x);
+      return ExType::abs(x);
     }
+    friend inline ExType fabs(const ExType& x) {
+      return abs(x);
+    }
+    ///@}
 
-    /// Square root
-    friend inline ExType sqrt(const ExType& x) {
+    ///@{
+    /** \brief Square root: x -> sqrt(x) */
+    static ExType sqrt(const ExType& x) {
       return ExType::unary(OP_SQRT, x);
     }
+    friend inline ExType sqrt(const ExType& x) {
+      return ExType::sqrt(x);
+    }
+    ///@}
 
-    /// Square
-    friend inline ExType sq(const ExType& x) {
+    ///@{
+    /** \brief Square root: x -> sqrt(x) */
+    static ExType sq(const ExType& x) {
       return ExType::unary(OP_SQ, x);
     }
+    friend inline ExType sq(const ExType& x) {
+      return ExType::sq(x);
+    }
+    ///@}
 
-    /// Sine
-    friend inline ExType sin(const ExType& x) {
+    ///@{
+    /** \brief Sine: x -> sin(x) */
+    static ExType sin(const ExType& x) {
       return ExType::unary(OP_SIN, x);
     }
+    friend inline ExType sin(const ExType& x) {
+      return ExType::sin(x);
+    }
+    ///@}
 
-    /// Cosine
-    friend inline ExType cos(const ExType& x) {
+    ///@{
+    /** \brief Cosine: x -> cos(x) */
+    static ExType cos(const ExType& x) {
       return ExType::unary(OP_COS, x);
     }
+    friend inline ExType cos(const ExType& x) {
+      return ExType::cos(x);
+    }
+    ///@}
 
-    /// Tangent
-    friend inline ExType tan(const ExType& x) {
+    ///@{
+    /** \brief Tangent: x -> tan(x) */
+    static ExType tan(const ExType& x) {
       return ExType::unary(OP_TAN, x);
     }
+    friend inline ExType tan(const ExType& x) {
+      return ExType::tan(x);
+    }
+    ///@}
 
-    /// Arc tangent
-    friend inline ExType atan(const ExType& x) {
+    ///@{
+    /** \brief Arc tangent: x -> atan(x) */
+    static ExType atan(const ExType& x) {
       return ExType::unary(OP_ATAN, x);
     }
+    friend inline ExType atan(const ExType& x) {
+      return ExType::atan(x);
+    }
+    ///@}
 
-    /// Arc sine
-    friend inline ExType asin(const ExType& x) {
+    ///@{
+    /** \brief Arc sine: x -> asin(x) */
+    static ExType asin(const ExType& x) {
       return ExType::unary(OP_ASIN, x);
     }
+    friend inline ExType asin(const ExType& x) {
+      return ExType::asin(x);
+    }
+    ///@}
 
-    /// Arc cosine
-    friend inline ExType acos(const ExType& x) {
+    ///@{
+    /** \brief Arc cosine: x -> acos(x) */
+    static ExType acos(const ExType& x) {
       return ExType::unary(OP_ACOS, x);
     }
+    friend inline ExType acos(const ExType& x) {
+      return ExType::acos(x);
+    }
+    ///@}
 
-    /// Hyperbolic tangent
-    friend inline ExType tanh(const ExType& x) {
+    ///@{
+    /** \brief Hyperbolic tangent: x -> tanh(x) */
+    static ExType tanh(const ExType& x) {
       return ExType::unary(OP_TANH, x);
     }
+    friend inline ExType tanh(const ExType& x) {
+      return ExType::tanh(x);
+    }
+    ///@}
 
-    /// Hyperbolic sine
-    friend inline ExType sinh(const ExType& x) {
+    ///@{
+    /** \brief Hyperbolic sin: x -> sinh(x) */
+    static ExType sinh(const ExType& x) {
       return ExType::unary(OP_SINH, x);
     }
+    friend inline ExType sinh(const ExType& x) {
+      return ExType::sinh(x);
+    }
+    ///@}
 
-    /// Hyperbolic cosine
-    friend inline ExType cosh(const ExType& x) {
+    ///@{
+    /** \brief Hyperbolic cosine: x -> cosh(x) */
+    static ExType cosh(const ExType& x) {
       return ExType::unary(OP_COSH, x);
     }
+    friend inline ExType cosh(const ExType& x) {
+      return ExType::cosh(x);
+    }
+    ///@}
 
-    /// Inverse hyperbolic tangent
-    friend inline ExType atanh(const ExType& x) {
+    ///@{
+    /** \brief Inverse hyperbolic tangent: x -> atanh(x) */
+    static ExType atanh(const ExType& x) {
       return ExType::unary(OP_ATANH, x);
     }
+    friend inline ExType atanh(const ExType& x) {
+      return ExType::atanh(x);
+    }
+    ///@}
 
-    /// Inverse hyperbolic sine
-    friend inline ExType asinh(const ExType& x) {
+    ///@{
+    /** \brief Inverse hyperbolic sin: x -> asinh(x) */
+    static ExType asinh(const ExType& x) {
       return ExType::unary(OP_ASINH, x);
     }
+    friend inline ExType asinh(const ExType& x) {
+      return ExType::asinh(x);
+    }
+    ///@}
 
-    /// Inverse hyperbolic cosine
-    friend inline ExType acosh(const ExType& x) {
+    ///@{
+    /** \brief Inverse hyperbolic cosine: x -> acosh(x) */
+    static ExType acosh(const ExType& x) {
       return ExType::unary(OP_ACOSH, x);
     }
+    friend inline ExType acosh(const ExType& x) {
+      return ExType::acosh(x);
+    }
+    ///@}
 
-    /// Exponential function
-    friend inline ExType exp(const ExType& x) {
+    ///@{
+    /** \brief Elementwise exponential: x -> exp(x) */
+    static ExType exp(const ExType& x) {
       return ExType::unary(OP_EXP, x);
     }
+    friend inline ExType exp(const ExType& x) {
+      return ExType::exp(x);
+    }
+    ///@}
 
-    /// Natural logarithm
-    friend inline ExType log(const ExType& x) {
+    ///@{
+    /** \brief Natural logarithm: x -> log(x) */
+    static ExType log(const ExType& x) {
       return ExType::unary(OP_LOG, x);
     }
+    friend inline ExType log(const ExType& x) {
+      return ExType::log(x);
+    }
+    ///@}
 
-    /// Base-10 logarithm
-    friend inline ExType log10(const ExType& x) {
+    ///@{
+    /** \brief Base-10 logarithm: x -> log10(x) */
+    static ExType log10(const ExType& x) {
       return log(x)*(1/std::log(10.));
     }
+    friend inline ExType log10(const ExType& x) {
+      return ExType::log10(x);
+    }
+    ///@}
 
-    /// Round down to nearest integer
-    friend inline ExType floor(const ExType& x) {
+    ///@{
+    /** \brief Round down to nearest integer: x -> floor(x) */
+    static ExType floor(const ExType& x) {
       return ExType::unary(OP_FLOOR, x);
     }
+    friend inline ExType floor(const ExType& x) {
+      return ExType::floor(x);
+    }
+    ///@}
 
-    /// Round up to nearest integer
-    friend inline ExType ceil(const ExType& x) {
+    ///@{
+    /** \brief Round up to nearest integer: x -> ceil(x) */
+    static ExType ceil(const ExType& x) {
       return ExType::unary(OP_CEIL, x);
     }
+    friend inline ExType ceil(const ExType& x) {
+      return ExType::ceil(x);
+    }
+    ///@}
 
-    /// Error function
-    friend inline ExType erf(const ExType& x) {
+    ///@{
+    /** \brief Error function: x -> erf(x) */
+    static ExType erf(const ExType& x) {
       return ExType::unary(OP_ERF, x);
     }
+    friend inline ExType erf(const ExType& x) {
+      return ExType::erf(x);
+    }
+    ///@}
 
-    /// Invers error function
-    friend inline ExType erfinv(const ExType& x) {
+    ///@{
+    /** \brief Inverse error function: x -> erfinv(x) */
+    static ExType erfinv(const ExType& x) {
       return ExType::unary(OP_ERFINV, x);
     }
+    friend inline ExType erfinv(const ExType& x) {
+      return ExType::erfinv(x);
+    }
+    ///@}
 
-    /** Sine function
+    ///@{
+    /** \brief Sign function:
         sign(x)   := -1 for x<0
         sign(x)   :=  1 for x>0,
         sign(0)   :=  0
         sign(NaN) :=  NaN
-     */
-    friend inline ExType sign(const ExType& x) {
+    */
+    static ExType sign(const ExType& x) {
       return ExType::unary(OP_SIGN, x);
     }
+    friend inline ExType sign(const ExType& x) {
+      return ExType::sign(x);
+    }
+    ///@}
 
-    /// Elementwise power
-    friend inline ExType pow(const ExType& x, const ExType& y) {
+    ///@{
+    /** \brief Elementwise power: (x,y) -> x.^y */
+    static ExType pow(const ExType& x, const ExType& y) {
       return ExType::binary(OP_POW, x, y);
     }
+    friend inline ExType pow(const ExType& x, const ExType& y) {
+      return ExType::pow(x, y);
+    }
+    ///@}
 
-    /// Remainder after division
-    friend inline ExType fmod(const ExType& x, const ExType& y) {
+    ///@{
+    /** \brief Remainder after division: (x,y) -> mod(x,y) */
+    static ExType mod(const ExType& x, const ExType& y) {
       return ExType::binary(OP_FMOD, x, y);
     }
+    friend inline ExType mod(const ExType& x, const ExType& y) {
+      return ExType::mod(x, y);
+    }
+    friend inline ExType fmod(const ExType& x, const ExType& y) {
+      return mod(x, y);
+    }
+    ///@}
 
-    /// Two argument arc tangent
-    friend inline ExType atan2(const ExType& x, const ExType& y) {
+    ///@{
+    /** \brief Two argument arc tangent: (x,y) -> atan2(x,y) */
+    static ExType atan2(const ExType& x, const ExType& y) {
       return ExType::binary(OP_ATAN2, x, y);
     }
+    friend inline ExType atan2(const ExType& x, const ExType& y) {
+      return ExType::atan2(x, y);
+    }
+    ///@}
 
-    /// Conditional assignment
-    friend inline ExType if_else_zero(const ExType& x, const ExType& y) {
+    ///@{
+    /** \brief Conditional assignment: (x,y) -> x ? y : 0 */
+    static ExType if_else_zero(const ExType& x, const ExType& y) {
       return ExType::binary(OP_IF_ELSE_ZERO, x, y);
     }
+    friend inline ExType if_else_zero(const ExType& x, const ExType& y) {
+      return ExType::if_else_zero(x, y);
+    }
+    ///@}
 
-    /// Smallest of two values
-    friend inline ExType fmin(const ExType& x, const ExType& y) {
+    ///@{
+    /** \brief Smallest of two values: (x,y) -> min(x,y) */
+    static ExType min(const ExType& x, const ExType& y) {
       return ExType::binary(OP_FMIN, x, y);
     }
+    friend inline ExType min(const ExType& x, const ExType& y) {
+      return ExType::min(x, y);
+    }
+    friend inline ExType fmin(const ExType& x, const ExType& y) {
+      return min(x, y);
+    }
+    ///@}
 
-    /// Largest of two values
-    friend inline ExType fmax(const ExType& x, const ExType& y) {
+    ///@{
+    /** \brief Largest of two values: (x,y) -> max(x,y) */
+    static ExType max(const ExType& x, const ExType& y) {
       return ExType::binary(OP_FMAX, x, y);
     }
+    friend inline ExType max(const ExType& x, const ExType& y) {
+      return ExType::max(x, y);
+    }
+    friend inline ExType fmax(const ExType& x, const ExType& y) {
+      return max(x, y);
+    }
+    ///@}
 
+    ///@{
     /** \brief Check if two nodes are equivalent up to a given depth.
      * Depth=0 checks if the expressions are identical, i.e. points to the same node.
      *
      * a = x*x
      * b = x*x
      *
-     *  a.is_equal(b, 0)  will return false, but a.is_equal(b, 1) will return true
+     *  is_equal(a,b,0)  will return false, but a.is_equal(a,b,1) will return true
      */
-    friend inline bool is_equal(const ExType& x, const ExType& y, int depth=0) {
-      return ExType::is_equal(x, y, depth);
-    }
+     friend inline bool is_equal(const ExType& x, const ExType& y, int depth=0) {
+       return ExType::is_equal(x, y, depth);
+     }
+     ///@}
 
-    /// Copy sign
-    friend inline ExType copysign(const ExType& x, const ExType& y) {
-      return ExType::binary(OP_COPYSIGN, x, y);
-    }
+     ///@{
+     /// Copy sign
+     static ExType copysign(const ExType& x, const ExType& y) {
+       return ExType::binary(OP_COPYSIGN, x, y);
+     }
+     friend inline ExType copysign(const ExType& x, const ExType& y) {
+       return ExType::copysign(x, y);
+     }
+     ///@}
 
-    /// Elementwise power with const power
-    friend inline ExType constpow(const ExType& x, const ExType& y) {
-      return ExType::binary(OP_CONSTPOW, x, y);
-    }
+     ///@{
+     /// Elementwise power with const power
+     static ExType constpow(const ExType& x, const ExType& y) {
+       return ExType::binary(OP_CONSTPOW, x, y);
+     }
+     friend inline ExType constpow(const ExType& x, const ExType& y) {
+       return ExType::constpow(x, y);
+     }
+     ///@}
 
-    /// Debug printing
-    friend inline ExType printme(const ExType& x, const ExType& y) {
-      return ExType::binary(OP_PRINTME, x, y);
-    }
+     ///@{
+     /// Debug printing
+     static ExType printme(const ExType& x, const ExType& y) {
+       return ExType::binary(OP_PRINTME, x, y);
+     }
+     friend inline ExType printme(const ExType& x, const ExType& y) {
+       return ExType::binary(OP_PRINTME, x, y);
+     }
+     ///@}
 
 /** @} */
 #endif // SWIG

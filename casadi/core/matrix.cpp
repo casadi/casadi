@@ -2925,19 +2925,19 @@ namespace casadi {
 
     // Gauss points
     vector<double> xi;
-    xi.push_back(-sqrt(5 + 2*sqrt(10.0/7))/3);
-    xi.push_back(-sqrt(5 - 2*sqrt(10.0/7))/3);
+    xi.push_back(-std::sqrt(5 + 2*std::sqrt(10.0/7))/3);
+    xi.push_back(-std::sqrt(5 - 2*std::sqrt(10.0/7))/3);
     xi.push_back(0);
-    xi.push_back(sqrt(5 - 2*sqrt(10.0/7))/3);
-    xi.push_back(sqrt(5 + 2*sqrt(10.0/7))/3);
+    xi.push_back(std::sqrt(5 - 2*std::sqrt(10.0/7))/3);
+    xi.push_back(std::sqrt(5 + 2*std::sqrt(10.0/7))/3);
 
     // Gauss weights
     vector<double> wi;
-    wi.push_back((322-13*sqrt(70.0))/900.0);
-    wi.push_back((322+13*sqrt(70.0))/900.0);
+    wi.push_back((322-13*std::sqrt(70.0))/900.0);
+    wi.push_back((322+13*std::sqrt(70.0))/900.0);
     wi.push_back(128/225.0);
-    wi.push_back((322+13*sqrt(70.0))/900.0);
-    wi.push_back((322-13*sqrt(70.0))/900.0);
+    wi.push_back((322+13*std::sqrt(70.0))/900.0);
+    wi.push_back((322-13*std::sqrt(70.0))/900.0);
 
     // Evaluate at the Gauss points
     Function fcn("gauss_quadrature", {x}, {f});
