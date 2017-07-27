@@ -93,8 +93,14 @@ namespace casadi {
     /** \brief Get the first dimension (i.e. number of rows) */
     int size1() const;
 
+    /** \brief Get the number of rows, Octave-style syntax */
+    int rows() const {return size1();}
+
     /** \brief Get the second dimension (i.e. number of columns) */
     int size2() const;
+
+    /** \brief Get the number of columns, Octave-style syntax */
+    int columns() const {return size2();}
 
     /** \brief Get string representation of dimensions.
         The representation is (nrow x ncol = numel | size)

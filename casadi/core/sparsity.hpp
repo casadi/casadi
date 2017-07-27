@@ -236,8 +236,14 @@ namespace casadi {
     /// Get the number of rows
     int size1() const;
 
+    /// Get the number of rows, Octave-style syntax
+    int rows() const {return size1();}
+
     /// Get the number of columns
     int size2() const;
+
+    /// Get the number of columns, Octave-style syntax
+    int columns() const {return size2();}
 
     /** \brief The total number of elements, including structural zeros, i.e. size2()*size1()
         \see nnz()  */
