@@ -154,6 +154,8 @@ namespace casadi {
     /// \cond CLUTTER
     /**  @{  */
     /** \brief Accessed by friend functions */
+    static MatType interp1d(const std::vector<double>& x, const MatType &v,
+         const std::vector<double>& xq, const std::string& mode, bool equidistant);
     static int sprank(const MatType &x) { return Sparsity::sprank(x.sparsity());}
     static int norm_0_mul(const MatType &x, const MatType &y) {
       return Sparsity::norm_0_mul(x.sparsity(), y.sparsity());
@@ -223,6 +225,17 @@ namespace casadi {
 \ingroup expression_tools
 @{
 */
+
+     /** \brief Performs 1d linear interpolation
+     *
+     * The data-points to be interpolated are given as (x[i], v[i]).
+     * xq[j] is used as interplating value
+     */
+     inline friend MatType interp1d(const std::vector<double>& x, const MatType&v,
+         const std::vector<double>& xq, const std::string& mode, bool equidistant=false) {
+       return MatType::interp1d(x, v, xq, mode, equidistant);
+     }
+
     /** \brief Matrix power x^n
      */
     inline friend MatType mpower(const MatType& x, const MatType& n) {
@@ -859,6 +872,68 @@ namespace casadi {
     ret[2] = a1*b2-a2*b1;
 
     return t ? vertcat(ret) : horzcat(ret);
+  }
+
+  double CASADI_EXPORT index_interp1d(const std::vector<double>& x, double xq,
+    bool equidistant=false);
+
+  template<typename MatType>
+  MatType GenericMatrix<MatType>::interp1d(const std::vector<double>& x, const MatType& v,
+      const std::vector<double>& xq, const std::string& mode, bool equidistant) {
+
+    bool mode_floor = mode == "floor";
+    bool mode_ceil = mode == "ceil";
+
+    casadi_assert(isIncreasing(x));
+
+    casadi_assert_message(x.size()==v.size1(),
+      "interp1d(x, v, xq): dimensions mismatch. v expected to have " << x.size() << " rows,"
+      " but got " << v.size1() << " instead.");
+
+    // Need at least two elements
+    casadi_assert_message(x.size()>=2, "interp1d(x, v, xq): x must be at least length 2.");
+
+    // Vectors to compose a sparse matrix
+    std::vector<double> val;
+    std::vector<int> colind(1, 0);
+    std::vector<int> row;
+
+    // Number of nonzeros in to-be composed matrix
+    int nnz = 0;
+    for (int i=0;i<xq.size();++i) {
+      // Obtain index corresponding to xq[i]
+      double ind = index_interp1d(x, xq[i], equidistant);
+
+      if (mode_floor) ind = floor(ind);
+      if (mode_ceil) ind = ceil(ind);
+
+      // Split into integer and fractional part
+      double int_partd;
+      double frac_part = modf(ind, &int_partd);
+      int int_part = static_cast<int>(int_partd);
+
+      if (frac_part==0) {
+         // Create a single entry
+         val.push_back(1);
+         row.push_back(int_part);
+         nnz+=1;
+         colind.push_back(nnz);
+       } else {
+         // Create a double entry
+         val.push_back(1-frac_part);
+         val.push_back(frac_part);
+         row.push_back(int_part);
+         row.push_back(int_part+1);
+         nnz+=2;
+         colind.push_back(nnz);
+       }
+     }
+
+     // Construct sparsity for composed matrix
+     Sparsity sp(x.size(), xq.size() , colind, row);
+
+     return mtimes(MatType(sp, val).T(), v);
+
   }
 
   template<typename MatType>

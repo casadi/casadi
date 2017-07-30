@@ -88,7 +88,7 @@ set(CASADI_INTERNAL
 
   sparse_storage.hpp   sparse_storage_impl.hpp
   sparsity.cpp  sparsity_internal.hpp   sparsity_internal.cpp
-  slice.cpp
+  slice.cpp generic_matrix.cpp
 
   # Directed, acyclic graph representation with scalar expressions
   sx_elem.cpp             # Symbolic expression class (scalar-valued atomics)

@@ -2924,6 +2924,11 @@ DECL M casadi_linspace(const M& a, const M& b, int nsteps) {
   return linspace(a, b, nsteps);
 }
 
+DECL M casadi_interp1d(const std::vector<double>& x, const M&v,
+        const std::vector<double>& xq, const std::string& mode="linear", bool equidistant=false) {
+  return interp1d(x, v, xq, mode, equidistant);
+}
+
 DECL M casadi_cross(const M& a, const M& b, int dim = -1) {
   return cross(a, b, dim);
 }

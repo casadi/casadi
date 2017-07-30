@@ -2514,5 +2514,32 @@ class MXtests(casadiTestCase):
        self.checkarray(o, np.linalg.inv(np.array(Av)))
     
 
+  def test_interp1d(self):
+    v = [7,3,4,-3]
+    vs = MX.sym("x",4,1)
+
+    xq = [10,0,1,2,4,8,7,5,1.5]
+    x = [1,2,4,8]
+    F = Function("f",[vs],[interp1d(x,vs,xq)])
+
+    self.checkarray(F(v),np.interp(xq,x,v))
+
+    F = Function("f",[vs],[interp1d(x,vs,xq,"floor")])
+
+    self.checkarray(F(v),DM([-3,7,7,3,4,-3,4,4,7]))
+
+    F = Function("f",[vs],[interp1d(x,vs,xq,"ceil")])
+
+    self.checkarray(F(v),DM([-3,7,7,3,4,-3,-3,-3,3]))
+
+    v = [7,3,4,-3]
+    vs = MX.sym("x",4,1)
+
+    xq = [10,0,1,2,3,4,3.5,3.25,1.5]
+    x = [1,2,3,4]
+    F = Function("f",[vs],[interp1d(x,vs,xq,"linear",True)])
+
+    self.checkarray(F(v),np.interp(xq,x,v))
+
 if __name__ == '__main__':
     unittest.main()
