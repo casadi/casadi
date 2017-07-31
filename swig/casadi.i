@@ -2407,8 +2407,6 @@ arccosh = lambda x: _casadi.acosh(x)
 %rename(logic_all) casadi_all;
 %rename(logic_any) casadi_any;
 %rename(fabs) casadi_abs;
-%rename(fmin) casadi_min;
-%rename(fmax) casadi_max;
 
 // Concatenations
 %rename(_veccat) casadi_veccat;
@@ -3099,6 +3097,8 @@ DECL M casadi_einstein(const M& A, const M& B,
   const std::vector<int>& a, const std::vector<int>& b, const std::vector<int>& c) {
   return einstein(A, B, dim_a, dim_b, dim_c, a, b, c);
 }
+DECL M casadi_mmin(const M& x) { return mmin(x); }
+DECL M casadi_mmax(const M& x) { return mmax(x); }
 #endif // FLAG & IS_MEMBER
 
 #if FLAG & IS_GLOBAL
@@ -3193,8 +3193,8 @@ DECL M casadi_sign(const M& x) { using casadi::sign; return sign(x); }
 DECL M casadi_power(const M& x, const M& n) { return pow(x, n); }
 DECL M casadi_mod(const M& x, const M& y) { return fmod(x, y); }
 DECL M casadi_atan2(const M& x, const M& y) { return atan2(x, y); }
-DECL M casadi_min(const M& x, const M& y) { return fmin(x, y); }
-DECL M casadi_max(const M& x, const M& y) { return fmax(x, y); }
+DECL M casadi_fmin(const M& x, const M& y) { return fmin(x, y); }
+DECL M casadi_fmax(const M& x, const M& y) { return fmax(x, y); }
 DECL M casadi_simplify(const M& x) { using casadi::simplify; return simplify(x); }
 DECL bool casadi_is_equal(const M& x, const M& y, int depth=0) { using casadi::is_equal; return is_equal(x, y, depth); }
 DECL M casadi_copysign(const M& x, const M& y) { return copysign(x, y); }
@@ -3788,6 +3788,22 @@ namespace casadi{
           otherwise
             error(sprintf('Unknown norm argument: ''%s''', ind))
         end
+      end
+    end
+    function out = min(varargin)
+      narginchk(1,2);
+      if nargin==1
+        out = mmin(varargin{1});
+      else
+        out = fmin(varargin{1}, varargin{2});
+      end
+    end
+    function out = max(varargin)
+      narginchk(1,2);
+      if nargin==1
+        out = mmax(varargin{1});
+      else
+        out = fmax(varargin{1}, varargin{2});
       end
     end
     function b = isrow(self)

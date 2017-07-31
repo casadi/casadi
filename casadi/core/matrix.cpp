@@ -1446,6 +1446,56 @@ namespace casadi {
     return true;
   }
 
+  // To avoid overloaded function name conflicts
+  template<typename Scalar>
+  inline Matrix<Scalar> mmin_nonstatic(const Matrix<Scalar> &x) {
+    Scalar ret;
+    const Scalar* nz = x.ptr();
+    int nnz = x.nnz();
+    for (int i=0; i<nnz; ++i) {
+      if (i==0) {
+        if (x.sparsity().is_dense()) {
+          ret = *nz++;
+        } else {
+          ret = fmin(Scalar(0), *nz++);
+        }
+      } else {
+        ret = fmin(ret, *nz++);
+      }
+    }
+    return ret;
+  }
+
+  template<typename Scalar>
+  Matrix<Scalar> Matrix<Scalar>::mmin(const Matrix<Scalar> &x) {
+    return mmin_nonstatic(x);
+  }
+
+  // To avoid overloaded function name conflicts
+  template<typename Scalar>
+  inline Matrix<Scalar> mmax_nonstatic(const Matrix<Scalar> &x) {
+    Scalar ret;
+    const Scalar* nz = x.ptr();
+    int nnz = x.nnz();
+    for (int i=0; i<nnz; ++i) {
+      if (i==0) {
+        if (x.sparsity().is_dense()) {
+          ret = *nz++;
+        } else {
+          ret = fmax(Scalar(0), *nz++);
+        }
+      } else {
+        ret = fmax(ret, *nz++);
+      }
+    }
+    return ret;
+  }
+
+  template<typename Scalar>
+  Matrix<Scalar> Matrix<Scalar>::mmax(const Matrix<Scalar> &x) {
+    return mmax_nonstatic(x);
+  }
+
   template<typename Scalar>
   bool Matrix<Scalar>::has_zeros() const {
     // Check if the structural nonzero is known to be zero

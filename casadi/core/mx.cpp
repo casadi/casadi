@@ -727,6 +727,16 @@ namespace casadi {
     return MXNode::is_equal(x.get(), y.get(), depth);
   }
 
+  MX MX::mmin(const MX &x) {
+    casadi_error("Not implemented");
+    return x;
+  }
+
+  MX MX::mmax(const MX &x) {
+    casadi_error("Not implemented");
+    return x;
+  }
+
   bool MX::is_commutative() const {
     if (is_unary()) return true;
     casadi_assert_message(is_binary() || is_unary(),

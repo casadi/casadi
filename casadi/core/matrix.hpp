@@ -190,6 +190,8 @@ namespace casadi {
     using B::vertsplit;
     using B::diagsplit;
     using B::mtimes;
+    using GenericExpression<Matrix<Scalar>>::min;
+    using GenericExpression<Matrix<Scalar>>::max;
 #endif // SWIG
 
     /// Returns true if the matrix has a non-zero at location rr, cc
@@ -266,6 +268,8 @@ namespace casadi {
     ///@{
     /// Functions called by friend functions defined for GenericExpression
     static bool is_equal(const Matrix<Scalar> &x, const Matrix<Scalar> &y, int depth=0);
+    static Matrix<Scalar> mmin(const Matrix<Scalar> &x);
+    static Matrix<Scalar> mmax(const Matrix<Scalar> &x);
     ///@}
 
     ///@{

@@ -374,6 +374,8 @@ namespace casadi {
     ///@{
     /// Functions called by friend functions defined for GenericExpression
     static bool is_equal(const MX& x, const MX& y, int depth=0);
+    static MX mmin(const MX &x);
+    static MX mmax(const MX &x);
     ///@}
 
     ///@{

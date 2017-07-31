@@ -646,6 +646,19 @@ namespace casadi {
       return MatType::repsum(A, n, m);
     }
 
+    ///@{
+    /** \brief Smallest element in a matrix */
+    friend inline MatType mmin(const MatType& x) {
+      return MatType::mmin(x);
+    }
+    ///@}
+
+    ///@{
+    /** \brief Largest element in a matrix */
+    friend inline MatType mmax(const MatType& x) {
+      return MatType::mmax(x);
+    }
+    ///@}
 
     ///@{
     /// Functions called by friend functions defined here
