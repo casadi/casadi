@@ -241,6 +241,8 @@ namespace casadi {
         ops_.enableRegularisation = to_BooleanType(op.second);
       } else if (op.first=="enableCholeskyRefactorisation") {
         ops_.enableCholeskyRefactorisation = op.second;
+      } else if (op.first=="enableEqualities") {
+        ops_.enableEqualities = to_BooleanType(op.second);
       } else if (op.first=="terminationTolerance") {
         ops_.terminationTolerance = op.second;
       } else if (op.first=="boundTolerance") {
