@@ -101,6 +101,7 @@ matrix:
         #- pushd test && make trunktesterbot_no_unittests_py && popd
         #- pushd test && make unittests_py_slow && popd
         #- pushd build && make json && popd
+        - rm docs/api/examples/solvers/callback.py
         - pushd test && make unittests_py && popd
         - pushd test && make unittests_py_slow && popd
         - pushd test && make examples_code_py && popd
