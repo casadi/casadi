@@ -143,8 +143,7 @@ namespace casadi {
 
   void CentralDiff::eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
     // Memory structure
-    Mem m_tmp;
-    Mem *m = &m_tmp;
+    casadi_central_diff_mem<double> m_tmp, *m = &m_tmp;
     m->n_x = n_x_;
     m->n_f = n_f_;
     m->h = h_;
@@ -214,7 +213,7 @@ namespace casadi {
       m->n_calls = 0;
 
       // Call reverse communication algorithm
-      while (central_differences(m)) {
+      while (casadi_central_diff(m)) {
         derivative_of_(arg, res, iw, w, 0);
       }
 
@@ -226,41 +225,6 @@ namespace casadi {
         Jv1 += nnz;
       }
     }
-  }
-
-  bool CentralDiff::central_differences(Mem* m) {
-    bool ret = true;
-    switch (m->n_calls) {
-      case 0:
-      // Backup x and f
-      casadi_copy(m->x, m->n_x, m->x0);
-      casadi_copy(m->f, m->n_f, m->f0);
-
-      // Perturb x, positive direction
-      casadi_axpy(m->n_x, m->h/2, m->v, m->x);
-      break; // first function call
-      case 1:
-
-      // Save result, perturb in negative direction
-      casadi_copy(m->f, m->n_f, m->Jv);
-      casadi_copy(m->x0, m->n_x, m->x);
-      casadi_axpy(m->n_x, -m->h/2, m->v, m->x);
-      break; // second function call
-      case 2:
-
-      // Calculate finite difference approximation
-      casadi_axpy(m->n_f, -1., m->f, m->Jv);
-      casadi_scal(m->n_f, 1/m->h, m->Jv);
-
-      // Restore x and f
-      casadi_copy(m->x0, m->n_x, m->x);
-      casadi_copy(m->f0, m->n_f, m->f);
-      ret = false;
-    }
-
-    // Increase function call counter
-    if (ret) m->n_calls++;
-    return ret;
   }
 
 } // namespace casadi

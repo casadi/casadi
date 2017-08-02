@@ -80,28 +80,6 @@ namespace casadi {
     // Evaluate numerically
     void eval(void* mem, const double** arg, double** res, int* iw, double* w) const override;
 
-    /** \brief Memory structure */
-    struct Mem {
-      // Dimensions
-      int n_x, n_f;
-      // Perturbation size
-      double h;
-      // (Current) differentiable inputs
-      double *x, *x0;
-      // (Current) differentiable outputs
-      double *f, *f0;
-
-      // Vector with which the Jacobian is multiplied
-      double* v;
-      // Jacobian-times-vector product
-      double* Jv;
-      // Number of function calls (must be initialized to 0)
-      int n_calls;
-    };
-
-    /** \brief Central differences implementation: using reverse communication */
-    static bool central_differences(Mem* m);
-
     /** \brief Is the scheme using the (nondifferentiated) output? */
     bool uses_output() const override {return true;}
 
