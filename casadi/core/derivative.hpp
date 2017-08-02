@@ -93,7 +93,7 @@ namespace casadi {
     virtual void finalize(const double** f_res, const double* f_res_pert, double** sens) const;
 
     /** \brief Is the scheme using the (nondifferentiated) output? */
-    bool uses_output() const override {return false;}
+    bool uses_output() const override {return true;}
 
     ///@{
     /** \brief Second order derivatives */
