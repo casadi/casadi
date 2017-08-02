@@ -30,32 +30,11 @@ using namespace std;
 namespace casadi {
 
   Function Derivative::create(const std::string& name, int n, const Dict& opts) {
-    // Default options
-    string scheme = "central";
-    double stepsize = 1e-8;
-
-    // Read options
-    for (auto&& op : opts) {
-      if (op.first=="scheme") {
-        scheme = op.second.to_string();
-      } else if (op.first=="stepsize") {
-        stepsize = op.second;
-      }
-    }
-
-    // Create instance
-    if (scheme=="forward") {
-      return Function::create(new Forward(name, n, stepsize), opts);
-    } else if (scheme=="central") {
-      return Function::create(new Central(name, n, stepsize), opts);
-    } else {
-      casadi_error("No such scheme: '" + scheme + "'"
-                   " Supported: 'central', 'forward'");
-    }
+    return Function::create(new Derivative(name, n), opts);
   }
 
-  Derivative::Derivative(const std::string& name, int n, double h)
-    : FunctionInternal(name), n_(n), h_(h) {
+  Derivative::Derivative(const std::string& name, int n)
+    : FunctionInternal(name), n_(n) {
   }
 
   Derivative::~Derivative() {
@@ -80,12 +59,17 @@ namespace casadi {
     FunctionInternal::init(opts);
 
     // Default options
+    h_ = 1e-8;
     h2_ = 1e-3;
 
     // Read options
     for (auto&& op : opts) {
-      if (op.first=="second_order_stepsize") {
+      if (op.first=="stepsize") {
+        h_ = op.second;
+      } else if (op.first=="second_order_stepsize") {
         h2_ = op.second;
+      } else if (op.first=="scheme") {
+        casadi_warning("Option 'scheme' currently ignored");
       }
     }
 
@@ -154,18 +138,13 @@ namespace casadi {
     return "fwd_" + derivative_of_.name_out(i);
   }
 
-  Function Central::get_forward(int nfwd, const std::string& name,
+  Function Derivative::get_forward(int nfwd, const std::string& name,
                                    const std::vector<std::string>& inames,
                                    const std::vector<std::string>& onames,
                                    const Dict& opts) const {
-    return Function::create(new Central(name, nfwd, h2_), opts);
-  }
-
-  Function Forward::get_forward(int nfwd, const std::string& name,
-                                   const std::vector<std::string>& inames,
-                                   const std::vector<std::string>& onames,
-                                   const Dict& opts) const {
-    return Function::create(new Forward(name, nfwd, h2_), opts);
+    Dict opts_mod = opts;
+    opts_mod["stepsize"] = h2_;
+    return Function::create(new Derivative(name, nfwd), opts_mod);
   }
 
   void Derivative::eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
@@ -226,34 +205,7 @@ namespace casadi {
     }
   }
 
-  void Forward::perturb(const double** f_arg, double* f_arg_pert, const double** seed) const {
-    int n_in = derivative_of_.n_in();
-    for (int sign=0; sign<2; ++sign) {
-      for (int j=0; j<n_in; ++j) {
-        const int nnz = derivative_of_.nnz_in(j);
-        casadi_copy(f_arg[j], nnz, f_arg_pert);
-        if (sign) {
-          casadi_axpy(nnz, h_, seed[j], f_arg_pert);
-        }
-        f_arg_pert += nnz;
-      }
-    }
-  }
-
-  void Forward::finalize(const double** f_res, const double* f_res_pert, double** sens) const {
-    const double* f_res_pert1 = f_res_pert + derivative_of_.nnz_out();
-    int n_out = derivative_of_.n_out();
-    for (int j=0; j<n_out; ++j) {
-      const int nnz = derivative_of_.nnz_out(j);
-      casadi_copy(f_res_pert, nnz, sens[j]);
-      f_res_pert += nnz;
-      casadi_axpy(nnz, -1., f_res_pert1, sens[j]);
-      casadi_scal(nnz, -1/h_, sens[j]);
-      f_res_pert1 += nnz;
-    }
-  }
-
-  void Central::perturb(const double** f_arg, double* f_arg_pert, const double** seed) const {
+  void Derivative::perturb(const double** f_arg, double* f_arg_pert, const double** seed) const {
     int n_in = derivative_of_.n_in();
     for (int sign=0; sign<2; ++sign) {
       for (int j=0; j<n_in; ++j) {
@@ -265,7 +217,7 @@ namespace casadi {
     }
   }
 
-  void Central::finalize(const double** f_res, const double* f_res_pert, double** sens) const {
+  void Derivative::finalize(const double** f_res, const double* f_res_pert, double** sens) const {
     const double* f_res_pert1 = f_res_pert + derivative_of_.nnz_out();
     int n_out = derivative_of_.n_out();
     for (int j=0; j<n_out; ++j) {
@@ -276,16 +228,6 @@ namespace casadi {
       casadi_scal(nnz, 1/h_, sens[j]);
       f_res_pert1 += nnz;
     }
-  }
-
-  void SecondOrderCentral::
-  perturb(const double** f_arg, double* f_arg_pert, const double** seed) const {
-    casadi_error("no");
-  }
-
-  void SecondOrderCentral::
-  finalize(const double** f_res, const double* f_res_pert, double** sens) const {
-    casadi_error("no");
   }
 
 } // namespace casadi
