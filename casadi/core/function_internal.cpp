@@ -28,7 +28,7 @@
 #include "std_vector_tools.hpp"
 #include "global_options.hpp"
 #include "external.hpp"
-#include "derivative.hpp"
+#include "finite_differences.hpp"
 
 #include <typeinfo>
 #include <cctype>

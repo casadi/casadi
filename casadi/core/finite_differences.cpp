@@ -23,7 +23,7 @@
  */
 
 
-#include "derivative.hpp"
+#include "finite_differences.hpp"
 
 using namespace std;
 

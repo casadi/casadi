@@ -23,8 +23,8 @@
  */
 
 
-#ifndef CASADI_DERIVATIVE_HPP
-#define CASADI_DERIVATIVE_HPP
+#ifndef CASADI_FINITE_DIFFERENCES_HPP
+#define CASADI_FINITE_DIFFERENCES_HPP
 
 #include "function_internal.hpp"
 
@@ -117,4 +117,4 @@ namespace casadi {
 } // namespace casadi
 /// \endcond
 
-#endif // CASADI_DERIVATIVE_HPP
+#endif // CASADI_FINITE_DIFFERENCES_HPP
