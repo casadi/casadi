@@ -29,18 +29,18 @@ using namespace std;
 
 namespace casadi {
 
-  Function Derivative::create(const std::string& name, int n, const Dict& opts) {
-    return Function::create(new Derivative(name, n), opts);
+  Function CentralDiff::create(const std::string& name, int n, const Dict& opts) {
+    return Function::create(new CentralDiff(name, n), opts);
   }
 
-  Derivative::Derivative(const std::string& name, int n)
+  CentralDiff::CentralDiff(const std::string& name, int n)
     : FunctionInternal(name), n_(n) {
   }
 
-  Derivative::~Derivative() {
+  CentralDiff::~CentralDiff() {
   }
 
-  Options Derivative::options_
+  Options CentralDiff::options_
   = {{&FunctionInternal::options_},
      {{"stepsize",
        {OT_DOUBLE,
@@ -54,7 +54,7 @@ namespace casadi {
      }
   };
 
-  void Derivative::init(const Dict& opts) {
+  void CentralDiff::init(const Dict& opts) {
     // Call the initialization method of the base class
     FunctionInternal::init(opts);
 
@@ -85,7 +85,7 @@ namespace casadi {
     alloc(f());
   }
 
-  Sparsity Derivative::get_sparsity_in(int i) {
+  Sparsity CentralDiff::get_sparsity_in(int i) {
     int n_in = derivative_of_.n_in(), n_out = derivative_of_.n_out();
     if (i<n_in) {
       // Non-differentiated input
@@ -103,11 +103,11 @@ namespace casadi {
     }
   }
 
-  Sparsity Derivative::get_sparsity_out(int i) {
+  Sparsity CentralDiff::get_sparsity_out(int i) {
     return repmat(derivative_of_.sparsity_out(i), 1, n_);
   }
 
-  double Derivative::default_in(int ind) const {
+  double CentralDiff::default_in(int ind) const {
     if (ind<derivative_of_.n_in()) {
       return derivative_of_.default_in(ind);
     } else {
@@ -115,15 +115,15 @@ namespace casadi {
     }
   }
 
-  size_t Derivative::get_n_in() {
+  size_t CentralDiff::get_n_in() {
     return derivative_of_.n_in() + derivative_of_.n_out() + derivative_of_.n_in();
   }
 
-  size_t Derivative::get_n_out() {
+  size_t CentralDiff::get_n_out() {
     return derivative_of_.n_out();
   }
 
-  std::string Derivative::get_name_in(int i) {
+  std::string CentralDiff::get_name_in(int i) {
     int n_in = derivative_of_.n_in(), n_out = derivative_of_.n_out();
     if (i<n_in) {
       return derivative_of_.name_in(i);
@@ -134,20 +134,20 @@ namespace casadi {
     }
   }
 
-  std::string Derivative::get_name_out(int i) {
+  std::string CentralDiff::get_name_out(int i) {
     return "fwd_" + derivative_of_.name_out(i);
   }
 
-  Function Derivative::get_forward(int nfwd, const std::string& name,
+  Function CentralDiff::get_forward(int nfwd, const std::string& name,
                                    const std::vector<std::string>& inames,
                                    const std::vector<std::string>& onames,
                                    const Dict& opts) const {
     Dict opts_mod = opts;
     opts_mod["stepsize"] = h2_;
-    return Function::create(new Derivative(name, nfwd), opts_mod);
+    return Function::create(new CentralDiff(name, nfwd), opts_mod);
   }
 
-  void Derivative::eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
+  void CentralDiff::eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
     // Shorthands
     int n_in = derivative_of_.n_in(), n_out = derivative_of_.n_out(), n_calls = this->n_calls();
 
@@ -205,7 +205,7 @@ namespace casadi {
     }
   }
 
-  void Derivative::perturb(const double** f_arg, double* f_arg_pert, const double** seed) const {
+  void CentralDiff::perturb(const double** f_arg, double* f_arg_pert, const double** seed) const {
     int n_in = derivative_of_.n_in();
     for (int sign=0; sign<2; ++sign) {
       for (int j=0; j<n_in; ++j) {
@@ -217,7 +217,7 @@ namespace casadi {
     }
   }
 
-  void Derivative::finalize(const double** f_res, const double* f_res_pert, double** sens) const {
+  void CentralDiff::finalize(const double** f_res, const double* f_res_pert, double** sens) const {
     const double* f_res_pert1 = f_res_pert + derivative_of_.nnz_out();
     int n_out = derivative_of_.n_out();
     for (int j=0; j<n_out; ++j) {

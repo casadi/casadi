@@ -32,20 +32,20 @@
 
 namespace casadi {
 
-  /** Evaluate in parallel
+  /** Calculate derivative using central differences
       \author Joel Andersson
-      \date 2015
+      \date 2017
   */
-  class CASADI_EXPORT Derivative : public FunctionInternal {
+  class CASADI_EXPORT CentralDiff : public FunctionInternal {
   public:
     // Create function (use instead of constructor)
     static Function create(const std::string& name, int n, const Dict& opts);
 
     /** \brief Destructor */
-    ~Derivative() override;
+    ~CentralDiff() override;
 
     /** \brief Get type name */
-    std::string type_name() const override {return "fd_derivative";}
+    std::string type_name() const override {return "central_diff";}
 
     ///@{
     /** \brief Options */
@@ -105,7 +105,7 @@ namespace casadi {
 
   protected:
     // Constructor (protected, use create function)
-    Derivative(const std::string& name, int n);
+    CentralDiff(const std::string& name, int n);
 
     // Number of directional derivatives
     int n_;
