@@ -655,6 +655,16 @@ namespace casadi {
                         << sanitize_source(casadi_from_mex_str, inst)
                         << "#endif" << endl << endl;
       break;
+    case AUX_CENTRAL_DIFF_MEM:
+      this->auxiliaries << sanitize_source(casadi_central_diff_mem_str, inst);
+      break;
+    case AUX_CENTRAL_DIFF:
+      addAuxiliary(AUX_COPY);
+      addAuxiliary(AUX_AXPY);
+      addAuxiliary(AUX_SCAL);
+      addAuxiliary(AUX_CENTRAL_DIFF_MEM);
+      this->auxiliaries << sanitize_source(casadi_central_diff_str, inst);
+      break;
     }
   }
 
@@ -802,6 +812,12 @@ namespace casadi {
       << values << ", " << x << ", " << lookup_mode << ", " << iw << ", " << w << ");";
     return s.str();
   }
+
+  std::string CodeGenerator::central_diff(const std::string& m) {
+    addAuxiliary(AUX_CENTRAL_DIFF);
+    return "central_diff(" + m + ")";
+  }
+
 
   std::string CodeGenerator::declare(std::string s) {
     // Add C linkage?
@@ -965,7 +981,7 @@ namespace casadi {
     // Number of template parameters
     size_t npar = 0;
     // Process C++ source
-    string line, def, fname;
+    string line, def, sname;
     istringstream stream(src);
     while (std::getline(stream, line)) {
       size_t n1, n2;
@@ -976,10 +992,12 @@ namespace casadi {
         continue;
       }
 
+      // Macro definitions are ignored
+      if (line.find("#define")==0) continue;
+      if (line.find("#undef")==0) continue;
+
       // Inline declaration
-      if (line == "inline") {
-        continue;
-      }
+      if (line == "inline") continue;
 
       // Ignore C++ style comment
       if ((n1 = line.find("//")) != string::npos) line.erase(n1);
@@ -992,47 +1010,63 @@ namespace casadi {
       }
 
       // Get function name (must be the first occurrence of CASADI_PREFIX)
-      if (fname.empty()) {
+      if (sname.empty()) {
+        // Find the beginning of the declaration
         string s = "CASADI_PREFIX(";
         if ((n1 = line.find(s)) == string::npos) {
           casadi_error("Cannot find \"" + s + "\" in " + line);
         }
         n1 += s.size();
-        s = ")(";
+        s = ")";
         if ((n2=line.find(s, n1)) == string::npos) {
           casadi_error("Cannot find \"" + s + "\" in " + line);
         }
-        fname = line.substr(n1, n2-n1);
-        casadi_assert(!fname.empty());
-        for (char c : fname) {
-          casadi_assert_message(isalnum(c) || c=='_', "Invalid filename: " + fname);
+        sname = line.substr(n1, n2-n1);
+        casadi_assert(!sname.empty());
+        for (char c : sname) {
+          casadi_assert_message(isalnum(c) || c=='_', "Invalid symbol name: " + sname);
         }
 
-        // Get argument list
-        n1 = n2 + s.size();
-        n2 = line.find(")", n1);
+        // Check if struct or function
+        if (line.find("struct ")==0) {
+          // Struct
+          // Add suffix
+          if (!suffix.empty()) {
+            line.replace(line.find(sname), sname.size(), sname + suffix);
+            sname += suffix;
+          }
 
-        casadi_assert(n2!=string::npos);
-        string args = line.substr(n1, n2-n1) + ",";
+          // Finalize shorthand, e.g. #define mystruct struct CASADI_PREFIX(mystruct)
+          def = "#define " + sname + " struct CASADI_PREFIX(" + sname + ")\n";
 
-        // Get argument list
-        n1 = 0;
-        while ((n2 = args.find(',', n1)) != string::npos) {
-          n1 = args.rfind(' ', n2);
-          s = args.substr(n1+1, n2-n1-1);
-          def = def.empty() ? s : def + ", " + s;
-          n1 = n2 + 1;
+        } else {
+          // Function
+          // Get argument list
+          n1 = n2 + 1 + s.size();
+          n2 = line.find(")", n1);
 
+          casadi_assert(n2!=string::npos);
+          string args = line.substr(n1, n2-n1) + ",";
+
+          // Get argument list
+          n1 = 0;
+          while ((n2 = args.find(',', n1)) != string::npos) {
+            n1 = args.rfind(' ', n2);
+            s = args.substr(n1+1, n2-n1-1);
+            def = def.empty() ? s : def + ", " + s;
+            n1 = n2 + 1;
+
+          }
+
+          // Add suffix
+          if (!suffix.empty()) {
+            line.replace(line.find(sname), sname.size(), sname + suffix);
+            sname += suffix;
+          }
+
+          // Finalize shorthand, e.g. #define fmin(x,y) CASADI_PREFIX(fmin)(x,y)
+          def = "#define " + sname + "(" + def + ") CASADI_PREFIX(" + sname + ")(" + def + ")\n";
         }
-
-        // Add suffix
-        if (!suffix.empty()) {
-          line.replace(line.find(fname), fname.size(), fname + suffix);
-          fname += suffix;
-        }
-
-        // Finalize shorthand, e.g. #define fmin(x,y) CASADI_PREFIX(fmin)(x,y)
-        def = "#define " + fname + "(" + def + ") CASADI_PREFIX(" + fname + ")(" + def + ")\n";
       }
 
       // Perform string replacements
@@ -1050,7 +1084,7 @@ namespace casadi {
 
     // Assert number of template parameters
     casadi_assert_message(npar==inst.size(),
-      "Mismatching number of template parameters for " + fname);
+      "Mismatching number of template parameters for " + sname);
 
     // Add shorthand
     if (shorthand) ret << def;
@@ -1059,5 +1093,12 @@ namespace casadi {
     ret << "\n";
     return ret.str();
   }
+
+  void CodeGenerator::comment(const std::string& s) {
+    if (verbose) {
+      *this << "/* " << s << " */\n";
+    }
+  }
+
 
 } // namespace casadi

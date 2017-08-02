@@ -142,14 +142,14 @@ namespace casadi {
   }
 
   void CentralDiff::eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
+    // Shorthands
+    int n_in = derivative_of_.n_in(), n_out = derivative_of_.n_out();
+
     // Memory structure
     casadi_central_diff_mem<double> m_tmp, *m = &m_tmp;
     m->n_x = n_x_;
     m->n_f = n_f_;
     m->h = h_;
-
-    // Shorthands
-    int n_in = derivative_of_.n_in(), n_out = derivative_of_.n_out();
 
     // Non-differentiated input
     m->x = w;
@@ -226,5 +226,105 @@ namespace casadi {
       }
     }
   }
+
+  void CentralDiff::codegen_declarations(CodeGenerator& g) const {
+    derivative_of_->add_dependency(g);
+  }
+
+  void CentralDiff::codegen_body(CodeGenerator& g) const {
+    // Shorthands
+    int n_in = derivative_of_.n_in(), n_out = derivative_of_.n_out();
+
+    g.comment("Memory structure");
+    g.local("m_tmp", "central_diff_mem");
+    g.local("m", "central_diff_mem", "*");
+    g << "m = &m_tmp;\n"
+      << "m->n_x = " << n_x_ << ";\n"
+      << "m->n_f = " << n_f_ << ";\n"
+      << "m->h = " << h_ << ";\n";
+
+    g.comment("Non-differentiated input");
+    g << "m->x = w;\n";
+    for (int j=0; j<n_in; ++j) {
+      const int nnz = derivative_of_.nnz_in(j);
+      g << g.copy("*arg++", nnz, "w") << " w += " << nnz << ";\n";
+    }
+
+    g.comment("Non-differentiated output");
+    g << "m->f = w;\n";
+    for (int j=0; j<n_out; ++j) {
+      const int nnz = derivative_of_.nnz_out(j);
+      g << g.copy("*arg++", nnz, "w") << " w += " << nnz << ";\n";
+    }
+
+    g.comment("Forward seeds");
+    g.local("seed", "const real_t", "**");
+    g << "seed = arg; arg += " << n_in << ";\n";
+
+    g.comment("Forward sensitivities");
+    g.local("sens", "real_t", "**");
+    g << "sens = res; res += " << n_out << ";\n";
+
+    g.comment("Vector with which Jacobian is multiplied");
+    g << "m->v = w; w += " << n_x_ << ";\n";
+    g << g.fill("m->v", n_x_, "0.") << "\n";
+
+    g.comment("Jacobian-times-vector product");
+    g << "m->Jv = w; w += " << n_f_ << ";\n";
+
+    g.comment("Unperturbed input");
+    g << "m->x0 = w; w += " << n_x_ << ";\n";
+
+    g.comment("Unperturbed output");
+    g << "m->f0 = w; w += " << n_f_ << ";\n";
+
+    g.comment("Setup arg, res for calling function");
+    g.local("x1", "real_t", "*");
+    g << "x1 = m->x;\n";
+    for (int j=0; j<n_in; ++j) {
+      g << "arg[" << j << "] = x1; x1 += " << derivative_of_.nnz_in(j) << ";\n";
+    }
+    g.local("f1", "real_t", "*");
+    g << "f1 = m->f;\n";
+    for (int j=0; j<n_out; ++j) {
+      g << "res[" << j << "] = f1; f1 += " << derivative_of_.nnz_out(j) << ";\n";
+    }
+
+    g.comment("Loop over derivative directions");
+    g.local("i", "int");
+    g << "for (i=0; i<" << n_ << "; ++i) {\n";
+
+    g.comment("Copy seeds to v");
+    g.local("v1", "real_t", "*");
+    g << "v1 = m->v;\n";
+    for (int j=0; j<n_in; ++j) {
+      int nnz = derivative_of_.nnz_in(j);
+      string s = "seed[" + to_string(j) + "]";
+      g << "if (" << s << ") " << g.copy(s + "+i*" + to_string(nnz), nnz, "v1") << "\n"
+        << "v1 += " << nnz << ";\n";
+    }
+
+    g.comment("Reset counter");
+    g << "m->n_calls = 0;\n";
+
+    g.comment("Invoke reverse communication algorithm");
+    g << "while (" << g.central_diff("m") << ") {\n"
+      << "if (" << g(derivative_of_, "arg", "res", "iw", "w") << ") return 1;\n"
+      << "}\n";
+
+    g.comment("Gather sensitivities");
+    g.local("Jv1", "real_t", "*");
+    g << "Jv1 = m->Jv;\n";
+    for (int j=0; j<n_out; ++j) {
+      int nnz = derivative_of_.nnz_out(j);
+      string s = "sens[" + to_string(j) + "]";
+      g << "if (" << s << ") " << g.copy("Jv1", nnz, s + "+i*" + to_string(nnz)) << "\n"
+        << "Jv1 += " << nnz << ";\n";
+    }
+
+    // End for (i=0; ...
+    g << "}\n";
+  }
+
 
 } // namespace casadi

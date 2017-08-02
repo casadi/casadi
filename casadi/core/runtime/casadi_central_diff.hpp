@@ -1,7 +1,8 @@
 // NOLINT(legal/copyright)
+#define central_diff_mem CASADI_PREFIX(central_diff_mem)<T1>
 template<typename T1>
-bool CASADI_PREFIX(central_diff)(CASADI_PREFIX(central_diff_mem)<T1>* m) {
-  bool ret = true;
+int CASADI_PREFIX(central_diff)(central_diff_mem* m) {
+  int ret = 1;
   switch (m->n_calls) {
     case 0:
     // Backup x and f
@@ -23,9 +24,10 @@ bool CASADI_PREFIX(central_diff)(CASADI_PREFIX(central_diff_mem)<T1>* m) {
     // Restore x and f
     CASADI_PREFIX(copy)(m->x0, m->n_x, m->x);
     CASADI_PREFIX(copy)(m->f0, m->n_f, m->f);
-    ret = false;
+    ret = 0;
   }
   // Increase function call counter
   if (ret) m->n_calls++;
   return ret;
 }
+#undef central_diff_mem

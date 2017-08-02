@@ -83,6 +83,15 @@ namespace casadi {
     /** \brief Is the scheme using the (nondifferentiated) output? */
     bool uses_output() const override {return true;}
 
+    /** \brief Is codegen supported? */
+    bool has_codegen() const override { return true;}
+
+    /** \brief Generate code for the declarations of the C function */
+    void codegen_declarations(CodeGenerator& g) const override;
+
+    /** \brief Generate code for the body of the C function */
+    void codegen_body(CodeGenerator& g) const override;
+
     ///@{
     /** \brief Second order derivatives */
     bool has_forward(int nfwd) const override { return true;}

@@ -158,20 +158,28 @@ namespace casadi {
     std::string rank1(const std::string& A, const Sparsity& sp_A, const std::string& alpha,
                       const std::string& x, const std::string& y);
 
+    /** \brief Multilinear interpolation */
     std::string interpn(int ndim, const std::string& grid, const std::string& offset,
-                                         const std::string& values, const std::string& x,
-                                         const std::string& lookup_mode,
-                                         const std::string& iw, const std::string& w);
+                        const std::string& values, const std::string& x,
+                        const std::string& lookup_mode,
+                        const std::string& iw, const std::string& w);
 
+    /** \brief Multilinear interpolation - calculate gradient */
     std::string interpn_grad(const std::string& grad,
-                                     int ndim, const std::string& grid,
-                                     const std::string& offset,
-                                     const std::string& values, const std::string& x,
-                                     const std::string& lookup_mode,
-                                     const std::string& iw, const std::string& w);
+                             int ndim, const std::string& grid,
+                             const std::string& offset,
+                             const std::string& values, const std::string& x,
+                             const std::string& lookup_mode,
+                             const std::string& iw, const std::string& w);
+
+    /** \brief Codegen central differences */
+    std::string central_diff(const std::string& m);
 
     /** \brief Declare a function */
     std::string declare(std::string s);
+
+    /** \brief Write a comment line (ignored if not verbose) */
+    void comment(const std::string& s);
 
     /** \brief Auxiliary functions */
     enum Auxiliary {
@@ -202,7 +210,9 @@ namespace casadi {
       AUX_LOW,
       AUX_INTERPN_INTERPOLATE,
       AUX_DE_BOOR,
-      AUX_ND_BOOR_EVAL
+      AUX_ND_BOOR_EVAL,
+      AUX_CENTRAL_DIFF_MEM,
+      AUX_CENTRAL_DIFF
     };
 
     /** \brief Add a built-in auxiliary function */
