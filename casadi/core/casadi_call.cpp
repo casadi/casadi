@@ -143,8 +143,8 @@ namespace casadi {
     fcn_.rev(arg, res, iw, w, mem);
   }
 
-  void Call::addDependency(CodeGenerator& g) const {
-    fcn_->addDependency(g);
+  void Call::add_dependency(CodeGenerator& g) const {
+    fcn_->add_dependency(g);
   }
 
   bool Call::has_refcount() const {

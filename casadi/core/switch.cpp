@@ -267,10 +267,10 @@ namespace casadi {
     }
   }
 
-  void Switch::generateDeclarations(CodeGenerator& g) const {
+  void Switch::codegen_declarations(CodeGenerator& g) const {
     for (int k=0; k<=f_.size(); ++k) {
       const Function& fk = k<f_.size() ? f_[k] : f_def_;
-      fk->addDependency(g);
+      fk->add_dependency(g);
     }
   }
 
@@ -361,7 +361,7 @@ namespace casadi {
 
   }
 
-  void Switch::generateBody(CodeGenerator& g) const {
+  void Switch::codegen_body(CodeGenerator& g) const {
     // Shorthands
     int n_in=this->n_in()-1, n_out=this->n_out();
 

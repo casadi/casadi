@@ -1051,7 +1051,7 @@ namespace casadi {
     return Function("expand_" + name_, arg, res, ischeme_, oscheme_);
   }
 
-  void MXFunction::generateDeclarations(CodeGenerator& g) const {
+  void MXFunction::codegen_declarations(CodeGenerator& g) const {
 
     // Make sure that there are no free variables
     if (!free_vars_.empty()) {
@@ -1061,7 +1061,7 @@ namespace casadi {
 
     // Generate code for the embedded functions
     for (auto&& a : algorithm_) {
-      a.data->addDependency(g);
+      a.data->add_dependency(g);
     }
   }
 
@@ -1079,7 +1079,7 @@ namespace casadi {
     }
   }
 
-  void MXFunction::generateBody(CodeGenerator& g) const {
+  void MXFunction::codegen_body(CodeGenerator& g) const {
     // Temporary variables and vectors
     g.init_local("arg1", "arg+" + to_string(n_in()));
     g.init_local("res1", "res+" + to_string(n_out()));

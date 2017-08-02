@@ -214,10 +214,10 @@ class CASADI_EXPORT SXFunction :
   void init(const Dict& opts) override;
 
   /** \brief Generate code for the declarations of the C function */
-  void generateDeclarations(CodeGenerator& g) const override;
+  void codegen_declarations(CodeGenerator& g) const override;
 
   /** \brief Generate code for the body of the C function */
-  void generateBody(CodeGenerator& g) const override;
+  void codegen_body(CodeGenerator& g) const override;
 
   /** \brief  Propagate sparsity forward */
   void sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;

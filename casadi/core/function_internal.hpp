@@ -367,17 +367,17 @@ namespace casadi {
     Function wrap() const;
 
     /** \brief Generate code the function */
-    virtual void generateFunction(CodeGenerator& g, const std::string& fname,
+    virtual void codegen(CodeGenerator& g, const std::string& fname,
                                   bool decl_static) const;
 
     /** \brief Generate meta-information allowing a user to evaluate a generated function */
-    void generateMeta(CodeGenerator& g, const std::string& fname) const;
+    void codegen_meta(CodeGenerator& g, const std::string& fname) const;
 
     /** \brief Use simplified signature */
     virtual bool simplifiedCall() const { return false;}
 
     /** \brief Generate shorthand macro */
-    void addShorthand(CodeGenerator& g, const std::string& name) const;
+    void codegen_shorthand(CodeGenerator& g, const std::string& name) const;
 
     /** \brief Get name of the evaluation function */
     std::string eval_name() const;
@@ -386,7 +386,7 @@ namespace casadi {
     virtual std::string codegen_name(const CodeGenerator& g) const;
 
     /** \brief Add a dependent function */
-    virtual void addDependency(CodeGenerator& g) const;
+    virtual void add_dependency(CodeGenerator& g) const;
 
     /** \brief Codegen incref for dependencies */
     virtual void codegen_incref(CodeGenerator& g) const {}
@@ -398,10 +398,10 @@ namespace casadi {
     std::string signature(const std::string& fname) const;
 
     /** \brief Generate code for the declarations of the C function */
-    virtual void generateDeclarations(CodeGenerator& g) const;
+    virtual void codegen_declarations(CodeGenerator& g) const;
 
     /** \brief Generate code for the function body */
-    virtual void generateBody(CodeGenerator& g) const;
+    virtual void codegen_body(CodeGenerator& g) const;
 
     /** \brief Export / Generate C code for the dependency function */
     virtual std::string generate_dependencies(const std::string& fname, const Dict& opts) const;

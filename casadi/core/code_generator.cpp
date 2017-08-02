@@ -118,12 +118,12 @@ namespace casadi {
   }
 
   void CodeGenerator::add(const Function& f) {
-    f->generateFunction(*this, f.name(), false);
+    f->codegen(*this, f.name(), false);
     if (this->with_header) {
       if (this->cpp) this->header << "extern \"C\" " ; // C linkage
       this->header << f->signature(f.name()) << ";" << endl;
     }
-    f->generateMeta(*this, f.name());
+    f->codegen_meta(*this, f.name());
     this->exposed_fname.push_back(f.name());
   }
 

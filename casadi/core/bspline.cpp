@@ -157,7 +157,7 @@ namespace casadi {
         false, iw, w);
     }
 
-    void BSpline::generateBody(CodeGenerator& g) const {
+    void BSpline::codegen_body(CodeGenerator& g) const {
       int n_dims = offset_.size()-1;
 
       g.addAuxiliary(CodeGenerator::AUX_ND_BOOR_EVAL);
@@ -318,7 +318,7 @@ namespace casadi {
       }
     }
 
-    void BSplineDual::generateBody(CodeGenerator& g) const {
+    void BSplineDual::codegen_body(CodeGenerator& g) const {
       int n_dims = offset_.size()-1;
 
       g.addAuxiliary(CodeGenerator::AUX_ND_BOOR_EVAL);

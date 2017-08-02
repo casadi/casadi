@@ -99,13 +99,13 @@ namespace casadi {
     ///@}
 
     /** \brief Generate code for the declarations of the C function */
-    void generateDeclarations(CodeGenerator& g) const override;
+    void codegen_declarations(CodeGenerator& g) const override;
 
     /** \brief Is codegen supported? */
     bool has_codegen() const override { return true;}
 
     /** \brief Generate code for the body of the C function */
-    void generateBody(CodeGenerator& g) const override;
+    void codegen_body(CodeGenerator& g) const override;
 
     /** \brief  Initialize */
     void init(const Dict& opts) override;
@@ -165,7 +165,7 @@ namespace casadi {
     std::string parallelization() const override { return "openmp"; }
 
     /** \brief Generate code for the body of the C function */
-    void generateBody(CodeGenerator& g) const override;
+    void codegen_body(CodeGenerator& g) const override;
   };
 
 } // namespace casadi

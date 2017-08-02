@@ -151,7 +151,7 @@ namespace casadi {
     }
   }
 
-  void SXFunction::generateDeclarations(CodeGenerator& g) const {
+  void SXFunction::codegen_declarations(CodeGenerator& g) const {
 
     // Make sure that there are no free variables
     if (!free_vars_.empty()) {
@@ -160,7 +160,7 @@ namespace casadi {
     }
   }
 
-  void SXFunction::generateBody(CodeGenerator& g) const {
+  void SXFunction::codegen_body(CodeGenerator& g) const {
 
     // Which variables have been declared
     vector<bool> declared(sz_w(), false);
@@ -1125,7 +1125,7 @@ namespace casadi {
 
     // Generate the function
     CodeGenerator gen;
-    generateFunction(ss, "evaluate", "__global const double*", "__global double*", "double", gen);
+    codegen(ss, "evaluate", "__global const double*", "__global double*", "double", gen);
 
     // Form c-string
     std::string s = ss.str();

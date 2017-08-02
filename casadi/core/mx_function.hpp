@@ -106,7 +106,7 @@ namespace casadi {
     void init(const Dict& opts) override;
 
     /** \brief Generate code for the declarations of the C function */
-    void generateDeclarations(CodeGenerator& g) const override;
+    void codegen_declarations(CodeGenerator& g) const override;
 
     /** \brief Codegen incref for dependencies */
     void codegen_incref(CodeGenerator& g) const override;
@@ -115,7 +115,7 @@ namespace casadi {
     void codegen_decref(CodeGenerator& g) const override;
 
     /** \brief Generate code for the body of the C function */
-    void generateBody(CodeGenerator& g) const override;
+    void codegen_body(CodeGenerator& g) const override;
 
     /** \brief Extract the residual function G and the modified function Z out of an expression
      * (see Albersmeyer2010 paper) */

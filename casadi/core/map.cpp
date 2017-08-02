@@ -102,11 +102,11 @@ namespace casadi {
     }
   }
 
-  void Map::generateDeclarations(CodeGenerator& g) const {
-    f_->addDependency(g);
+  void Map::codegen_declarations(CodeGenerator& g) const {
+    f_->add_dependency(g);
   }
 
-  void Map::generateBody(CodeGenerator& g) const {
+  void Map::codegen_body(CodeGenerator& g) const {
     int n_in = this->n_in(), n_out = this->n_out();
     g << "int i;\n";
     // Input buffer
@@ -279,7 +279,7 @@ namespace casadi {
 #endif  // WITH_OPENMP
   }
 
-  void MapOmp::generateBody(CodeGenerator& g) const {
+  void MapOmp::codegen_body(CodeGenerator& g) const {
     int n_in = this->n_in(), n_out = this->n_out();
     size_t sz_arg, sz_res, sz_iw, sz_w;
     f_.sz_work(sz_arg, sz_res, sz_iw, sz_w);

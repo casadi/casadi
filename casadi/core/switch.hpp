@@ -92,13 +92,13 @@ namespace casadi {
     void print(std::ostream &stream) const override;
 
     /** \brief Generate code for the declarations of the C function */
-    void generateDeclarations(CodeGenerator& g) const override;
+    void codegen_declarations(CodeGenerator& g) const override;
 
     /** \brief Is codegen supported? */
     bool has_codegen() const override { return true;}
 
     /** \brief Generate code for the body of the C function */
-    void generateBody(CodeGenerator& g) const override;
+    void codegen_body(CodeGenerator& g) const override;
 
     // Function to be evaluated for each case
     std::vector<Function> f_;

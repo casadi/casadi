@@ -1632,7 +1632,7 @@ namespace casadi {
     casadi_error("'get_jacobian' not defined for " + type_name());
   }
 
-  void FunctionInternal::generateFunction(CodeGenerator& g,
+  void FunctionInternal::codegen(CodeGenerator& g,
                                           const std::string& fname, bool decl_static) const {
     // Add standard math
     g.addInclude("math.h");
@@ -1642,7 +1642,7 @@ namespace casadi {
     g.addAuxiliary(CodeGenerator::AUX_SIGN);
 
     // Generate declarations
-    generateDeclarations(g);
+    codegen_declarations(g);
 
     // Define function
     g << "/* " << name_ << " */\n";
@@ -1657,7 +1657,7 @@ namespace casadi {
     g.local_default_.clear();
 
     // Generate function body
-    generateBody(g);
+    codegen_body(g);
 
     // Collect local variables
     std::map<string, set<pair<string, string>>> local_variables_by_type;
@@ -1691,7 +1691,7 @@ namespace casadi {
     }
   }
 
-  void FunctionInternal::generateMeta(CodeGenerator& g, const std::string& fname) const {
+  void FunctionInternal::codegen_meta(CodeGenerator& g, const std::string& fname) const {
     // Short-hands
     int n_in = this->n_in();
     int n_out = this->n_out();
@@ -1918,7 +1918,7 @@ namespace casadi {
     return ss.str();
   }
 
-  void FunctionInternal::addShorthand(CodeGenerator& g, const string& name) const {
+  void FunctionInternal::codegen_shorthand(CodeGenerator& g, const string& name) const {
     if (simplifiedCall()) {
       g << "#define " << name << "(arg, res) "
         << "CASADI_PREFIX(" << name << ")(arg, res)\n\n";
@@ -1936,7 +1936,7 @@ namespace casadi {
     }
   }
 
-  void FunctionInternal::addDependency(CodeGenerator& g) const {
+  void FunctionInternal::add_dependency(CodeGenerator& g) const {
     // Get the current number of functions before looking for it
     size_t num_f_before = g.added_dependencies_.size();
 
@@ -1952,10 +1952,10 @@ namespace casadi {
       string name = "f" + CodeGenerator::to_string(ind);
 
       // Print to file
-      generateFunction(g, "CASADI_PREFIX(" + name + ")", true);
+      codegen(g, "CASADI_PREFIX(" + name + ")", true);
 
       // Shorthand
-      addShorthand(g, name);
+      codegen_shorthand(g, name);
 
       // Codegen reference count functions, if needed
       if (has_refcount_) {
@@ -1976,11 +1976,11 @@ namespace casadi {
     }
   }
 
-  void FunctionInternal::generateDeclarations(CodeGenerator& g) const {
+  void FunctionInternal::codegen_declarations(CodeGenerator& g) const {
     // Nothing to declare
   }
 
-  void FunctionInternal::generateBody(CodeGenerator& g) const {
+  void FunctionInternal::codegen_body(CodeGenerator& g) const {
     casadi_warning("The function \"" + name() + "\", which is of type \""
                    + type_name() + "\" cannot be code generated. The generation "
                    "will proceed, but compilation of the code will not be possible.");

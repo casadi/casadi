@@ -226,15 +226,15 @@ namespace casadi {
     }
   }
 
-  void External::generateFunction(CodeGenerator& g, const std::string& fname,
+  void External::codegen(CodeGenerator& g, const std::string& fname,
                                   bool decl_static) const {
     g << signature(fname) << " {\n"
       << li_.body(eval_name()) << "\n";
   }
 
-  void External::addDependency(CodeGenerator& g) const {
+  void External::add_dependency(CodeGenerator& g) const {
     if (li_.inlined(eval_name())) {
-      FunctionInternal::addDependency(g);
+      FunctionInternal::add_dependency(g);
     } else {
       g.addExternal(signature(name_) + ";");
     }

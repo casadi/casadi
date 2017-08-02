@@ -130,10 +130,10 @@ namespace casadi {
                    const std::vector<int>& order_out, const Dict& opts) const override;
 
     /** \brief Generate code for the declarations of the C function */
-    void generateDeclarations(CodeGenerator& g) const override = 0;
+    void codegen_declarations(CodeGenerator& g) const override = 0;
 
     /** \brief Generate code for the body of the C function */
-    void generateBody(CodeGenerator& g) const override = 0;
+    void codegen_body(CodeGenerator& g) const override = 0;
 
     /** \brief Is codegen supported? */
     bool has_codegen() const override { return true;}

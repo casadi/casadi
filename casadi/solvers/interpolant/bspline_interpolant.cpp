@@ -174,8 +174,8 @@ namespace casadi {
     S_->eval(mem, arg, res, iw, w);
   }
 
-  void BSplineInterpolant::generateBody(CodeGenerator& g) const {
-    S_->generateBody(g);
+  void BSplineInterpolant::codegen_body(CodeGenerator& g) const {
+    S_->codegen_body(g);
   }
 
   Function BSplineInterpolant::

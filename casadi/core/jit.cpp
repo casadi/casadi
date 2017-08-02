@@ -100,7 +100,7 @@ namespace casadi {
   Jit::~Jit() {
   }
 
-  void Jit::generateBody(CodeGenerator& g) const {
+  void Jit::codegen_body(CodeGenerator& g) const {
     g << body_;
   }
 

@@ -113,7 +113,7 @@ namespace casadi {
     }
   }
 
-  void LinearInterpolant::generateBody(CodeGenerator& g) const {
+  void LinearInterpolant::codegen_body(CodeGenerator& g) const {
     g << "  if (res[0]) {\n"
       << "    res[0][0] = " << g.interpn(ndim_, g.constant(grid_), g.constant(offset_),
       g.constant(values_), "arg[0]", g.constant(lookup_mode_), "iw", "w") << "\n"
@@ -149,7 +149,7 @@ namespace casadi {
   }
 
 
-  void LinearInterpolantJac::generateBody(CodeGenerator& g) const {
+  void LinearInterpolantJac::codegen_body(CodeGenerator& g) const {
 
     auto m = derivative_of_.get<LinearInterpolant>();
 

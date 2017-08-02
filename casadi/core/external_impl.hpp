@@ -91,10 +91,10 @@ namespace casadi {
     void init(const Dict& opts) override;
 
     /** \brief Add a dependent function */
-    void addDependency(CodeGenerator& g) const override;
+    void add_dependency(CodeGenerator& g) const override;
 
     /** \brief Generate code the function */
-    void generateFunction(CodeGenerator& g, const std::string& fname,
+    void codegen(CodeGenerator& g, const std::string& fname,
                                   bool decl_static) const override;
 
     /** \brief Get name in codegen */

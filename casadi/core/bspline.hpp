@@ -131,8 +131,8 @@ namespace casadi {
       bool has_codegen() const override { return true;}
 
       /** \brief Generate code for the body of the C function */
-      void generateBody(CodeGenerator& g) const override;
-      void generateDeclarations(CodeGenerator& g) const override {};
+      void codegen_body(CodeGenerator& g) const override;
+      void codegen_declarations(CodeGenerator& g) const override {};
 
       std::string type_name() const override { return "BSpline"; }
 
@@ -214,8 +214,8 @@ namespace casadi {
       bool has_codegen() const override { return true;}
 
       /** \brief Generate code for the body of the C function */
-      void generateBody(CodeGenerator& g) const override;
-      void generateDeclarations(CodeGenerator& g) const override {};
+      void codegen_body(CodeGenerator& g) const override;
+      void codegen_declarations(CodeGenerator& g) const override {};
 
       std::string type_name() const override { return "BSplineDual"; }
 
