@@ -74,11 +74,10 @@ namespace casadi {
     }
 
     // Allocate work vector for (perturbed) inputs and outputs
-    alloc_w((n_calls()+1) * f().nnz_in(), true);
-    alloc_w((n_calls()+1) * f().nnz_out(), true);
+    alloc_w((n_calls()+2) * f().nnz_in(), true);
+    alloc_w((n_calls()+2) * f().nnz_out(), true);
 
     // Work vectors for seeds/sensitivities
-    alloc_arg(derivative_of_.n_in(), true);
     alloc_res(derivative_of_.n_out(), true);
 
     // Allocate sufficient temporary memory for function evaluation
@@ -146,6 +145,7 @@ namespace casadi {
   void CentralDiff::eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
     // Shorthands
     int n_in = derivative_of_.n_in(), n_out = derivative_of_.n_out(), n_calls = this->n_calls();
+    int n_x = derivative_of_.nnz_in(), n_f = derivative_of_.nnz_out();
 
     // Non-differentiated input
     const double* f_arg = w;
@@ -169,9 +169,11 @@ namespace casadi {
     // Forward sensitivities
     double** sens = res; res += n_out;
 
+    // Temporary vector for seeds and sensitivities
+    double* v = w; w += derivative_of_.nnz_in();
+    double* Jv = w; w += derivative_of_.nnz_out();
+
     // Copy sensitivitity arguments to temporary vectors to allow modification
-    copy_n(seed, n_in, arg);
-    seed = arg; arg += n_in;
     copy_n(sens, n_out, res);
     sens = res; res += n_out;
 
@@ -181,8 +183,20 @@ namespace casadi {
 
     // For each derivative direction
     for (int i=0; i<n_; ++i) {
+      // Copy seeds to v
+      double* v1 = v;
+      for (int j=0; j<n_in; ++j) {
+        const int nnz = derivative_of_.nnz_in(j);
+        if (seed[j]) {
+          casadi_copy(seed[j] + nnz*i, nnz, v1);
+        } else {
+          casadi_fill(v1, nnz, 0.);
+        }
+        v1 += nnz;
+      }
+
       // Perturb function argument (depends on differentiation algorithm)
-      perturb(f_arg, f_arg_pert, seed);
+      perturb(n_x, f_arg, f_arg_pert, v);
 
       // Function evaluation
       double* f_arg_pert1 = f_arg_pert;
@@ -206,23 +220,15 @@ namespace casadi {
       finalize(f_res, f_res_pert, sens);
 
       // Proceed to the next direction
-      for (int j=0; j<n_in; ++j) if (seed[j]) seed[j] += derivative_of_.nnz_in(j);
       for (int j=0; j<n_out; ++j) if (sens[j]) sens[j] += derivative_of_.nnz_out(j);
     }
   }
 
-  void CentralDiff::perturb(const double* f_arg, double* f_arg_pert, const double** seed) const {
-    int n_in = derivative_of_.n_in();
-    for (int sign=0; sign<2; ++sign) {
-      const double* f_arg1 = f_arg;
-      for (int j=0; j<n_in; ++j) {
-        const int nnz = derivative_of_.nnz_in(j);
-        casadi_copy(f_arg1, nnz, f_arg_pert);
-        casadi_axpy(nnz, sign ? -h_/2 : h_/2, seed[j], f_arg_pert);
-        f_arg1 += nnz;
-        f_arg_pert += nnz;
-      }
-    }
+  void CentralDiff::perturb(int n_x, const double* x, double* x_pert, const double* v) const {
+    casadi_copy(x, n_x, x_pert);
+    casadi_axpy(n_x, h_/2, v, x_pert);
+    casadi_copy(x, n_x, x_pert + n_x);
+    casadi_axpy(n_x, -h_/2, v, x_pert + n_x);
   }
 
   void CentralDiff::finalize(const double* f_res, const double* f_res_pert, double** sens) const {

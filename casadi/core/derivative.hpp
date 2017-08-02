@@ -87,7 +87,7 @@ namespace casadi {
     virtual const Function& f() const { return derivative_of_;}
 
     /** \brief  Calculate perturbed function inputs */
-    virtual void perturb(const double* f_arg, double* f_arg_pert, const double** seed) const;
+    virtual void perturb(int n_x, const double* x, double* x_pert, const double* v) const;
 
     /** \brief Calculate the finite difference approximation */
     virtual void finalize(const double* f_res, const double* f_res_pert, double** sens) const;
