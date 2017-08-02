@@ -73,9 +73,9 @@ namespace casadi {
       }
     }
 
-    // Allocate work vector for perturbed inputs
-    alloc_w(n_calls() * f().nnz_in(), true);
-    alloc_w(n_calls() * f().nnz_out(), true);
+    // Allocate work vector for (perturbed) inputs and outputs
+    alloc_w((n_calls()+1) * f().nnz_in(), true);
+    alloc_w((n_calls()+1) * f().nnz_out(), true);
 
     // Work vectors for seeds/sensitivities
     alloc_arg(derivative_of_.n_in(), true);
@@ -92,11 +92,7 @@ namespace casadi {
       return derivative_of_.sparsity_in(i);
     } else if (i<n_in+n_out) {
       // Non-differentiated output
-      if (uses_output()) {
-        return derivative_of_.sparsity_out(i-n_in);
-      } else {
-        return Sparsity(derivative_of_.size_out(i-n_in));
-      }
+      return derivative_of_.sparsity_out(i-n_in);
     } else {
       // Seeds
       return repmat(derivative_of_.sparsity_in(i-n_in-n_out), 1, n_);
@@ -152,10 +148,20 @@ namespace casadi {
     int n_in = derivative_of_.n_in(), n_out = derivative_of_.n_out(), n_calls = this->n_calls();
 
     // Non-differentiated input
-    const double** f_arg = arg; arg += n_in;
+    const double* f_arg = w;
+    for (int j=0; j<n_in; ++j) {
+      const int nnz = derivative_of_.nnz_in(j);
+      casadi_copy(*arg++, nnz, w);
+      w += nnz;
+    }
 
     // Non-differentiated output
-    const double** f_res = arg; arg += n_out;
+    const double* f_res = w;
+    for (int j=0; j<n_out; ++j) {
+      const int nnz = derivative_of_.nnz_out(j);
+      casadi_copy(*arg++, nnz, w);
+      w += nnz;
+    }
 
     // Forward seeds
     const double** seed = arg; arg += n_in;
@@ -205,19 +211,21 @@ namespace casadi {
     }
   }
 
-  void CentralDiff::perturb(const double** f_arg, double* f_arg_pert, const double** seed) const {
+  void CentralDiff::perturb(const double* f_arg, double* f_arg_pert, const double** seed) const {
     int n_in = derivative_of_.n_in();
     for (int sign=0; sign<2; ++sign) {
+      const double* f_arg1 = f_arg;
       for (int j=0; j<n_in; ++j) {
         const int nnz = derivative_of_.nnz_in(j);
-        casadi_copy(f_arg[j], nnz, f_arg_pert);
+        casadi_copy(f_arg1, nnz, f_arg_pert);
         casadi_axpy(nnz, sign ? -h_/2 : h_/2, seed[j], f_arg_pert);
+        f_arg1 += nnz;
         f_arg_pert += nnz;
       }
     }
   }
 
-  void CentralDiff::finalize(const double** f_res, const double* f_res_pert, double** sens) const {
+  void CentralDiff::finalize(const double* f_res, const double* f_res_pert, double** sens) const {
     const double* f_res_pert1 = f_res_pert + derivative_of_.nnz_out();
     int n_out = derivative_of_.n_out();
     for (int j=0; j<n_out; ++j) {
