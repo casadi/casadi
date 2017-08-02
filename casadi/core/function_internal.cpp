@@ -301,7 +301,6 @@ namespace casadi {
     enable_forward_ = enable_forward_ && has_forward(1);
     enable_reverse_ = enable_reverse_ && has_reverse(1);
     enable_jacobian_ = enable_jacobian_ && has_jacobian();
-    enable_fd_ = enable_fd_ && !enable_forward_;
 
     alloc_arg(0);
     alloc_res(0);
@@ -1244,7 +1243,7 @@ namespace casadi {
 
     // Get seed matrices by graph coloring
     if (symmetric) {
-      casadi_assert(enable_forward_ || enable_fd_);
+      casadi_assert(enable_forward_);
       casadi_assert(allow_forward);
 
       // Star coloring if symmetric
@@ -1254,7 +1253,7 @@ namespace casadi {
                  << A.size1() << " without coloring).");
 
     } else {
-      casadi_assert(enable_forward_ || enable_fd_ || enable_reverse_);
+      casadi_assert(enable_forward_ || enable_reverse_);
       // Get weighting factor
       double w = ad_weight();
 
@@ -1336,7 +1335,7 @@ namespace casadi {
     casadi_assert(nfwd>=0);
 
     // Used wrapped function if forward not available
-    if (!enable_forward_ && !enable_fd_) {
+    if (!enable_forward_) {
       // Derivative information must be available
       casadi_assert_message(has_derivative(),
                             "Derivatives cannot be calculated for " + name_);
@@ -1377,13 +1376,8 @@ namespace casadi {
     opts["derivative_of"] = self();
 
     // Generate derivative function
-    casadi_assert(enable_forward_ || enable_fd_);
-    Function ret;
-    if (enable_forward_) {
-      ret = get_forward(nfwd, name, inames, onames, opts);
-    } else {
-      ret = Derivative::create(name, nfwd, opts);
-    }
+    casadi_assert(enable_forward_);
+    Function ret = get_forward(nfwd, name, inames, onames, opts);
 
     // Consistency check for inputs
     casadi_assert(ret.n_in()==n_in + n_out + n_in);
@@ -1580,7 +1574,7 @@ namespace casadi {
 
   Function FunctionInternal::jacobian() const {
     // Used wrapped function if jacobian not available
-    if (!has_jacobian()) {
+    if (!enable_fd_ && !has_jacobian()) {
       // Derivative information must be available
       casadi_assert_message(has_derivative(),
                             "Derivatives cannot be calculated for " + name_);
@@ -1612,8 +1606,14 @@ namespace casadi {
     opts["derivative_of"] = self();
 
     // Generate derivative function
-    casadi_assert(enable_jacobian_);
-    Function ret = get_jacobian(name, inames, onames, opts);
+    casadi_assert(enable_jacobian_ || enable_fd_);
+    Function ret;
+    if (enable_jacobian_) {
+      ret = get_jacobian(name, inames, onames, opts);
+    } else {
+      ret = Derivative::create(name, opts);
+      //ret = get_fd(name, inames, onames, opts);
+    }
 
     // Consistency check
     casadi_assert(ret.n_in()==n_in + n_out);
@@ -2117,7 +2117,7 @@ namespace casadi {
   }
 
   bool FunctionInternal::fwdViaJac(int nfwd) const {
-    if (!enable_forward_ && !enable_fd_) return true;
+    if (!enable_forward_) return true;
     if (jac_penalty_==-1) return false;
 
     // Heuristic 1: Jac calculated via forward mode likely cheaper
@@ -2140,7 +2140,7 @@ namespace casadi {
 
     // Heuristic 2: Jac calculated via forward mode likely cheaper
     double w = ad_weight();
-    if ((enable_forward_ || enable_fd_) && jac_penalty_*w*nnz_in()<(1-w)*nadj)
+    if ((enable_forward_) && jac_penalty_*w*nnz_in()<(1-w)*nadj)
       return true;
 
     return false;
@@ -2208,7 +2208,7 @@ namespace casadi {
 
     } else {
       // Evaluate in batches
-      casadi_assert(enable_forward_ || enable_fd_);
+      casadi_assert(enable_forward_);
       int max_nfwd = 64;
       while (!has_forward(max_nfwd)) max_nfwd/=2;
       int offset = 0;
@@ -2395,7 +2395,7 @@ namespace casadi {
     if (!enable_reverse_) return 0;
 
     // If forward mode derivatives unavailable, use reverse
-    if (!enable_forward_ && !enable_fd_) return 1;
+    if (!enable_forward_) return 1;
 
     // Use the (potentially user set) option
     return ad_weight_;

@@ -117,8 +117,11 @@ int main(){
 
   // ODE/DAE integrators
   vector<Solver> solvers;
+  Dict op2 = {{"enable_forward", false},
+              {"enable_reverse", false},
+              {"enable_fd", true}};
   solvers.push_back({"cvodes", true, Dict()});
-  solvers.push_back({"idas", false, Dict()});
+  solvers.push_back({"idas", false, op2});
   solvers.push_back({"rk", true, Dict()});
   Dict kinsol_options = {{"linear_solver", "csparse"},{"linear_solver_type", "dense"}};
 

@@ -39,7 +39,7 @@ namespace casadi {
   class CASADI_EXPORT Derivative : public FunctionInternal {
   public:
     // Create function (use instead of constructor)
-    static Function create(const std::string& name, int n, const Dict& opts);
+    static Function create(const std::string& name, const Dict& opts);
 
     /** \brief Destructor */
     ~Derivative() override;
@@ -84,17 +84,14 @@ namespace casadi {
     virtual const Function& f() const { return derivative_of_;}
 
     /** \brief  Calculate perturbed function inputs */
-    virtual void perturb(const double** f_arg, double* f_arg_pert, const double** seed) const = 0;
+    virtual void perturb(const double** f_arg, double* f_arg_pert) const = 0;
 
     /** \brief Calculate the finite difference approximation */
-    virtual void finalize(const double** f_res, const double* f_res_pert, double** sens) const = 0;
+    virtual void finalize(const double** f_res, const double* f_res_pert, double* jac) const = 0;
 
   protected:
     // Constructor (protected, use create function)
-    Derivative(const std::string& name, int n, double h);
-
-    // Number of directional derivatives
-    int n_;
+    Derivative(const std::string& name, double h);
 
     // Perturbation
     double h_, h2_;
@@ -104,7 +101,7 @@ namespace casadi {
   class CASADI_EXPORT Forward : public Derivative {
   public:
     // Constructor
-    Forward(const std::string& name, int n, double h) : Derivative(name, n, h) { }
+    Forward(const std::string& name, double h) : Derivative(name, h) { }
 
     /** \brief Destructor */
     ~Forward() override {}
@@ -119,26 +116,17 @@ namespace casadi {
     bool uses_output() const override {return false;}
 
     /** \brief  Calculate perturbed function inputs */
-    void perturb(const double** f_arg, double* f_arg_pert, const double** seed) const override;
+    void perturb(const double** f_arg, double* f_arg_pert) const override;
 
     /** \brief Calculate the finite difference approximation */
-    void finalize(const double** f_res, const double* f_res_pert, double** sens) const override;
-
-    ///@{
-    /** \brief Second order derivatives */
-    bool has_forward(int nfwd) const override { return true;}
-    Function get_forward(int nfwd, const std::string& name,
-                         const std::vector<std::string>& inames,
-                         const std::vector<std::string>& onames,
-                         const Dict& opts) const override;
-    ///@}
+    void finalize(const double** f_res, const double* f_res_pert, double* jac) const override;
   };
 
   // Central differences, first order
   class CASADI_EXPORT Central : public Derivative {
   public:
     // Constructor
-    Central(const std::string& name, int n, double h) : Derivative(name, n, h) { }
+    Central(const std::string& name, double h) : Derivative(name, h) { }
 
     /** \brief Destructor */
     ~Central() override {}
@@ -153,62 +141,10 @@ namespace casadi {
     bool uses_output() const override {return false;}
 
     /** \brief  Calculate perturbed function inputs */
-    void perturb(const double** f_arg, double* f_arg_pert, const double** seed) const override;
+    void perturb(int i, const double** f_arg, double* f_arg_pert) const override;
 
     /** \brief Calculate the finite difference approximation */
-    void finalize(const double** f_res, const double* f_res_pert, double** sens) const override;
-
-    ///@{
-    /** \brief Second order derivatives */
-    bool has_forward(int nfwd) const override { return true;}
-    Function get_forward(int nfwd, const std::string& name,
-                         const std::vector<std::string>& inames,
-                         const std::vector<std::string>& onames,
-                         const Dict& opts) const override;
-    ///@}
-  };
-
-  // Second order derivatives
-  class CASADI_EXPORT SecondOrderDerivative : public Derivative {
-  public:
-    // Constructor
-    SecondOrderDerivative(const std::string& name, int n, double h, int n1)
-     : Derivative(name, n, h), n1_(n1) { }
-
-    /** \brief Destructor */
-    ~SecondOrderDerivative() override {}
-
-    /** \brief Function to be called */
-    const Function& f() const override { return derivative_of_->derivative_of_;}
-
-    // Number of directional derivatives, first order
-    int n1_;
-  };
-
-  // Central differences, first order
-  class CASADI_EXPORT SecondOrderCentral : public SecondOrderDerivative {
-  public:
-    // Constructor
-    SecondOrderCentral(const std::string& name, int n, double h, int n1)
-     : SecondOrderDerivative(name, n, h, n1) { }
-
-    /** \brief Destructor */
-    ~SecondOrderCentral() override {}
-
-    /** \brief Get type name */
-    std::string type_name() const override {return "second_order_central";}
-
-    /** \brief  Number of function calls */
-    int n_calls() const override { return 6;}
-
-    /** \brief Is the scheme using the (nondifferentiated) output? */
-    bool uses_output() const override {return false;}
-
-    /** \brief  Calculate perturbed function inputs */
-    void perturb(const double** f_arg, double* f_arg_pert, const double** seed) const override;
-
-    /** \brief Calculate the finite difference approximation */
-    void finalize(const double** f_res, const double* f_res_pert, double** sens) const override;
+    void finalize(const double** f_res, const double* f_res_pert, double* jac) const override;
   };
 
 
