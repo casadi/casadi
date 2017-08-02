@@ -74,11 +74,13 @@ namespace casadi {
     }
 
     // Allocate work vector for (perturbed) inputs and outputs
-    alloc_w((n_calls()+2) * f().nnz_in(), true);
-    alloc_w((n_calls()+2) * f().nnz_out(), true);
+    n_x_ = derivative_of_.nnz_in();
+    n_f_ = derivative_of_.nnz_out();
+    alloc_w(3 * n_x_, true); // x, x0, v
+    alloc_w(3 * n_f_, true); // f, f0, Jv
 
     // Allocate sufficient temporary memory for function evaluation
-    alloc(f());
+    alloc(derivative_of_);
   }
 
   Sparsity CentralDiff::get_sparsity_in(int i) {
@@ -140,12 +142,18 @@ namespace casadi {
   }
 
   void CentralDiff::eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
+    // Memory structure
+    Mem m1;
+    Mem *m = &m1;
+    m->n_x = n_x_;
+    m->n_f = n_f_;
+    m->h = h_;
+
     // Shorthands
     int n_in = derivative_of_.n_in(), n_out = derivative_of_.n_out(), n_calls = this->n_calls();
-    int n_x = derivative_of_.nnz_in(), n_f = derivative_of_.nnz_out();
 
     // Non-differentiated input
-    const double* f_arg = w;
+    m->x = w;
     for (int j=0; j<n_in; ++j) {
       const int nnz = derivative_of_.nnz_in(j);
       casadi_copy(*arg++, nnz, w);
@@ -153,7 +161,7 @@ namespace casadi {
     }
 
     // Non-differentiated output
-    const double* f_res = w;
+    m->f = w;
     for (int j=0; j<n_out; ++j) {
       const int nnz = derivative_of_.nnz_out(j);
       casadi_copy(*arg++, nnz, w);
@@ -166,76 +174,74 @@ namespace casadi {
     // Forward sensitivities
     double** sens = res; res += n_out;
 
-    // Temporary vector for seeds and sensitivities
-    double* v = w; w += derivative_of_.nnz_in();
-    casadi_fill(v, n_x, 0.);
-    double* Jv = w; w += derivative_of_.nnz_out();
+    // Vector with which Jacobian is multiplied
+    m->v = w; w += m->n_x;
+    casadi_fill(m->v, m->n_x, 0.);
 
-    // Work vectors for perturbed inputs and outputs
-    double* f_arg_pert = w; w += n_calls * f().nnz_in();
-    double* f_res_pert = w; w += n_calls * f().nnz_out();
+    // Jacobian-times-vector product
+    m->Jv = w; w += m->n_f;
 
-    // Memory structure
-    Mem m;
-    m.n_x = n_x;
-    m.n_f = n_f;
-    m.h = h_;
+    // Unperturbed input
+    m->x0 = w; w += m->n_x;
+
+    // Unperturbed output
+    m->f0 = w; w += m->n_f;
+
+    // Setup arg, res for calling f
+    double* x1 = m->x;
+    for (int j=0; j<n_in; ++j) {
+      arg[j] = x1;
+      x1 += f().nnz_in(j);
+    }
+    double* f1 = m->f;
+    for (int j=0; j<n_out; ++j) {
+      res[j] = f1;
+      f1 += f().nnz_out(j);
+    }
+
 
     // For each derivative direction
     for (int i=0; i<n_; ++i) {
       // Copy seeds to v
-      double* v1 = v;
+      double* v1 = m->v;
       for (int j=0; j<n_in; ++j) {
         int nnz = derivative_of_.nnz_in(j);
         if (seed[j]) casadi_copy(seed[j] + nnz*i, nnz, v1);
         v1 += nnz;
       }
 
-      // Perturb function argument (depends on differentiation algorithm)
-      perturb(&m, f_arg, f_arg_pert, v);
+      // Backup x and f
+      casadi_copy(m->x, m->n_x, m->x0);
+      casadi_copy(m->f, m->n_f, m->f0);
 
-      // Function evaluation
-      double* f_arg_pert1 = f_arg_pert;
-      double* f_res_pert1 = f_res_pert;
-      for (int c=0; c<n_calls; ++c) {
-        // Function inputs
-        for (int j=0; j<n_in; ++j) {
-          arg[j] = f_arg_pert1;
-          f_arg_pert1 += f().nnz_in(j);
-        }
-        // Function outputs
-        for (int j=0; j<n_out; ++j) {
-          res[j] = f_res_pert1;
-          f_res_pert1 += f().nnz_out(j);
-        }
-        // Call function
-        f()(arg, res, iw, w, 0);
-      }
+      // Perturb x, positive direction
+      casadi_axpy(m->n_x, m->h/2, m->v, m->x);
+
+      f()(arg, res, iw, w, 0);
+
+      // Save result, perturb in negative direction
+      casadi_copy(m->f, m->n_f, m->Jv);
+      casadi_copy(m->x0, m->n_x, m->x);
+      casadi_axpy(m->n_x, -m->h/2, m->v, m->x);
+
+      f()(arg, res, iw, w, 0);
 
       // Calculate finite difference approximation
-      finalize(&m, f_res, f_res_pert, Jv);
+      casadi_axpy(m->n_f, -1., m->f, m->Jv);
+      casadi_scal(m->n_f, 1/m->h, m->Jv);
+
+      // Restore x and f
+      casadi_copy(m->x0, m->n_x, m->x);
+      casadi_copy(m->f0, m->n_f, m->f);
 
       // Gather sensitivities
-      double* Jv1 = Jv;
+      double* Jv1 = m->Jv;
       for (int j=0; j<n_out; ++j) {
         int nnz = derivative_of_.nnz_out(j);
         if (sens[j]) casadi_copy(Jv1, nnz, sens[j] + i*nnz);
         Jv1 += nnz;
       }
     }
-  }
-
-  void CentralDiff::perturb(Mem* m, const double* x, double* x_pert, const double* v) {
-    casadi_copy(x, m->n_x, x_pert);
-    casadi_axpy(m->n_x, m->h/2, v, x_pert);
-    casadi_copy(x, m->n_x, x_pert + m->n_x);
-    casadi_axpy(m->n_x, -m->h/2, v, x_pert + m->n_x);
-  }
-
-  void CentralDiff::finalize(Mem* m, const double* f, const double* f_pert, double* Jv) {
-    casadi_copy(f_pert, m->n_f, Jv);
-    casadi_axpy(m->n_f, -1., f_pert + m->n_f, Jv);
-    casadi_scal(m->n_f, 1/m->h, Jv);
   }
 
 } // namespace casadi

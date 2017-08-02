@@ -92,13 +92,16 @@ namespace casadi {
       int n_x, n_f;
       // Perturbation size
       double h;
+      // (Current) differentiable inputs
+      double *x, *x0;
+      // (Current) differentiable outputs
+      double *f, *f0;
+
+      // Vector with which the Jacobian is multiplied
+      double* v;
+      // Jacobian-times-vector product
+      double* Jv;
     };
-
-    /** \brief  Calculate perturbed function inputs */
-    static void perturb(Mem* m, const double* x, double* x_pert, const double* v);
-
-    /** \brief Calculate the finite difference approximation */
-    static void finalize(Mem* m, const double* f, const double* f_pert, double* Jv);
 
     /** \brief Is the scheme using the (nondifferentiated) output? */
     bool uses_output() const override {return true;}
@@ -117,6 +120,9 @@ namespace casadi {
 
     // Number of directional derivatives
     int n_;
+
+    // Dimensions
+    int n_x_, n_f_;
 
     // Perturbation
     double h_, h2_;
