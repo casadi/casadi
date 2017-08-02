@@ -87,10 +87,10 @@ namespace casadi {
     virtual const Function& f() const { return derivative_of_;}
 
     /** \brief  Calculate perturbed function inputs */
-    virtual void perturb(int n_x, const double* x, double* x_pert, const double* v) const;
+    static void perturb(double h, int n_x, const double* x, double* x_pert, const double* v);
 
     /** \brief Calculate the finite difference approximation */
-    virtual void finalize(const double* f_res, const double* f_res_pert, double** sens) const;
+    virtual void finalize(int n_f, const double* f, const double* f_pert, double* Jv) const;
 
     /** \brief Is the scheme using the (nondifferentiated) output? */
     bool uses_output() const override {return true;}
