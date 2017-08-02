@@ -143,14 +143,14 @@ namespace casadi {
 
   void CentralDiff::eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
     // Memory structure
-    Mem m1;
-    Mem *m = &m1;
+    Mem m_tmp;
+    Mem *m = &m_tmp;
     m->n_x = n_x_;
     m->n_f = n_f_;
     m->h = h_;
 
     // Shorthands
-    int n_in = derivative_of_.n_in(), n_out = derivative_of_.n_out(), n_calls = this->n_calls();
+    int n_in = derivative_of_.n_in(), n_out = derivative_of_.n_out();
 
     // Non-differentiated input
     m->x = w;
@@ -191,12 +191,12 @@ namespace casadi {
     double* x1 = m->x;
     for (int j=0; j<n_in; ++j) {
       arg[j] = x1;
-      x1 += f().nnz_in(j);
+      x1 += derivative_of_.nnz_in(j);
     }
     double* f1 = m->f;
     for (int j=0; j<n_out; ++j) {
       res[j] = f1;
-      f1 += f().nnz_out(j);
+      f1 += derivative_of_.nnz_out(j);
     }
 
 
@@ -210,29 +210,13 @@ namespace casadi {
         v1 += nnz;
       }
 
-      // Backup x and f
-      casadi_copy(m->x, m->n_x, m->x0);
-      casadi_copy(m->f, m->n_f, m->f0);
+      // Reset counter
+      m->n_calls = 0;
 
-      // Perturb x, positive direction
-      casadi_axpy(m->n_x, m->h/2, m->v, m->x);
-
-      f()(arg, res, iw, w, 0);
-
-      // Save result, perturb in negative direction
-      casadi_copy(m->f, m->n_f, m->Jv);
-      casadi_copy(m->x0, m->n_x, m->x);
-      casadi_axpy(m->n_x, -m->h/2, m->v, m->x);
-
-      f()(arg, res, iw, w, 0);
-
-      // Calculate finite difference approximation
-      casadi_axpy(m->n_f, -1., m->f, m->Jv);
-      casadi_scal(m->n_f, 1/m->h, m->Jv);
-
-      // Restore x and f
-      casadi_copy(m->x0, m->n_x, m->x);
-      casadi_copy(m->f0, m->n_f, m->f);
+      // Call reverse communication algorithm
+      while (central_differences(m)) {
+        derivative_of_(arg, res, iw, w, 0);
+      }
 
       // Gather sensitivities
       double* Jv1 = m->Jv;
@@ -242,6 +226,41 @@ namespace casadi {
         Jv1 += nnz;
       }
     }
+  }
+
+  bool CentralDiff::central_differences(Mem* m) {
+    bool ret = true;
+    switch (m->n_calls) {
+      case 0:
+      // Backup x and f
+      casadi_copy(m->x, m->n_x, m->x0);
+      casadi_copy(m->f, m->n_f, m->f0);
+
+      // Perturb x, positive direction
+      casadi_axpy(m->n_x, m->h/2, m->v, m->x);
+      break; // first function call
+      case 1:
+
+      // Save result, perturb in negative direction
+      casadi_copy(m->f, m->n_f, m->Jv);
+      casadi_copy(m->x0, m->n_x, m->x);
+      casadi_axpy(m->n_x, -m->h/2, m->v, m->x);
+      break; // second function call
+      case 2:
+
+      // Calculate finite difference approximation
+      casadi_axpy(m->n_f, -1., m->f, m->Jv);
+      casadi_scal(m->n_f, 1/m->h, m->Jv);
+
+      // Restore x and f
+      casadi_copy(m->x0, m->n_x, m->x);
+      casadi_copy(m->f0, m->n_f, m->f);
+      ret = false;
+    }
+
+    // Increase function call counter
+    if (ret) m->n_calls++;
+    return ret;
   }
 
 } // namespace casadi

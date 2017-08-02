@@ -80,12 +80,6 @@ namespace casadi {
     // Evaluate numerically
     void eval(void* mem, const double** arg, double** res, int* iw, double* w) const override;
 
-    /** \brief  Number of perturbed function calls */
-    inline int n_calls() const {return 2;}
-
-    /** \brief Function to be called */
-    virtual const Function& f() const { return derivative_of_;}
-
     /** \brief Memory structure */
     struct Mem {
       // Dimensions
@@ -101,7 +95,12 @@ namespace casadi {
       double* v;
       // Jacobian-times-vector product
       double* Jv;
+      // Number of function calls (must be initialized to 0)
+      int n_calls;
     };
+
+    /** \brief Central differences implementation: using reverse communication */
+    static bool central_differences(Mem* m);
 
     /** \brief Is the scheme using the (nondifferentiated) output? */
     bool uses_output() const override {return true;}
