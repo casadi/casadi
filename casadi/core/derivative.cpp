@@ -175,6 +175,12 @@ namespace casadi {
     double* f_arg_pert = w; w += n_calls * f().nnz_in();
     double* f_res_pert = w; w += n_calls * f().nnz_out();
 
+    // Memory structure
+    Mem m;
+    m.n_x = n_x;
+    m.n_f = n_f;
+    m.h = h_;
+
     // For each derivative direction
     for (int i=0; i<n_; ++i) {
       // Copy seeds to v
@@ -186,7 +192,7 @@ namespace casadi {
       }
 
       // Perturb function argument (depends on differentiation algorithm)
-      perturb(h_, n_x, f_arg, f_arg_pert, v);
+      perturb(&m, f_arg, f_arg_pert, v);
 
       // Function evaluation
       double* f_arg_pert1 = f_arg_pert;
@@ -207,7 +213,7 @@ namespace casadi {
       }
 
       // Calculate finite difference approximation
-      finalize(n_f, f_res, f_res_pert, Jv);
+      finalize(&m, f_res, f_res_pert, Jv);
 
       // Gather sensitivities
       double* Jv1 = Jv;
@@ -219,17 +225,17 @@ namespace casadi {
     }
   }
 
-  void CentralDiff::perturb(double h, int n_x, const double* x, double* x_pert, const double* v) {
-    casadi_copy(x, n_x, x_pert);
-    casadi_axpy(n_x, h/2, v, x_pert);
-    casadi_copy(x, n_x, x_pert + n_x);
-    casadi_axpy(n_x, -h/2, v, x_pert + n_x);
+  void CentralDiff::perturb(Mem* m, const double* x, double* x_pert, const double* v) {
+    casadi_copy(x, m->n_x, x_pert);
+    casadi_axpy(m->n_x, m->h/2, v, x_pert);
+    casadi_copy(x, m->n_x, x_pert + m->n_x);
+    casadi_axpy(m->n_x, -m->h/2, v, x_pert + m->n_x);
   }
 
-  void CentralDiff::finalize(int n_f, const double* f, const double* f_pert, double* Jv) const {
-    casadi_copy(f_pert, n_f, Jv);
-    casadi_axpy(n_f, -1., f_pert + n_f, Jv);
-    casadi_scal(n_f, 1/h_, Jv);
+  void CentralDiff::finalize(Mem* m, const double* f, const double* f_pert, double* Jv) {
+    casadi_copy(f_pert, m->n_f, Jv);
+    casadi_axpy(m->n_f, -1., f_pert + m->n_f, Jv);
+    casadi_scal(m->n_f, 1/m->h, Jv);
   }
 
 } // namespace casadi

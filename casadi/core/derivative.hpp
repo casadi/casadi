@@ -86,11 +86,19 @@ namespace casadi {
     /** \brief Function to be called */
     virtual const Function& f() const { return derivative_of_;}
 
+    /** \brief Memory structure */
+    struct Mem {
+      // Dimensions
+      int n_x, n_f;
+      // Perturbation size
+      double h;
+    };
+
     /** \brief  Calculate perturbed function inputs */
-    static void perturb(double h, int n_x, const double* x, double* x_pert, const double* v);
+    static void perturb(Mem* m, const double* x, double* x_pert, const double* v);
 
     /** \brief Calculate the finite difference approximation */
-    virtual void finalize(int n_f, const double* f, const double* f_pert, double* Jv) const;
+    static void finalize(Mem* m, const double* f, const double* f_pert, double* Jv);
 
     /** \brief Is the scheme using the (nondifferentiated) output? */
     bool uses_output() const override {return true;}
