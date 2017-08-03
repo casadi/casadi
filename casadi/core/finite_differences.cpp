@@ -245,7 +245,7 @@ namespace casadi {
 
     // Memory structure
     casadi_fd_jacobian_mem<double> m_tmp, *m = &m_tmp;
-    m->n_x = 1;
+    m->n_x = n_;
     m->n_f = n_f_;
     m->h = h_;
     m->f = f;
@@ -275,20 +275,17 @@ namespace casadi {
       f1 += derivative_of_.nnz_out(j);
     }
 
-    // For each derivative direction
-    for (int i=0; i<n_; ++i) {
-      // Call reverse communication algorithm
-      m->next = 0;
-      while (casadi_fd_jacobian(m)) {
-        casadi_copy(z0, n_z_, z);
-        casadi_axpy(n_z_, m->x[0], v + n_z_*i, z);
-        derivative_of_(arg, res, iw, w, 0);
+    // Call reverse communication algorithm
+    m->next = 0;
+    while (casadi_fd_jacobian(m)) {
+      casadi_copy(z0, n_z_, z);
+      for (int i=0; i<n_; ++i) {
+        casadi_axpy(n_z_, m->x[i], v + n_z_*i, z);
       }
-      m->J += n_f_;
+      derivative_of_(arg, res, iw, w, 0);
     }
 
     // Gather sensitivities
-    m->J -= n_*n_f_;
     for (int i=0; i<n_; ++i) {
       double* J1 = m->J + n_f_*i;
       for (int j=0; j<n_out; ++j) {
