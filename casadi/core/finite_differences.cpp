@@ -78,9 +78,8 @@ namespace casadi {
     n_f_ = derivative_of_.nnz_out();
     alloc_w(2 * n_, true); // m->x, m->x0
     alloc_w(2 * n_f_, true); // m->f, m->f0
-    alloc_w(2 * n_z_, true); // z, z0
     alloc_w(n_*n_f_, true); // m->J
-    alloc_w(n_*n_z_, true); // v
+    alloc_w(n_z_, true); // z
 
     // Allocate sufficient temporary memory for function evaluation
     alloc(derivative_of_);
@@ -207,17 +206,31 @@ namespace casadi {
     return DONE;
   }
 
+  template<typename T1>
+  void CASADI_PREFIX(mv_dense)(const T1* x, int nrow_x, int ncol_x, const T1* y, T1* z, int tr) {
+    if (!x || !y || !z) return;
+    int i, j;
+    if (tr) {
+      for (i=0; i<ncol_x; ++i) {
+        for (j=0; j<nrow_x; ++j) {
+          z[i] += *x++ * y[j];
+        }
+      }
+    } else {
+      for (i=0; i<ncol_x; ++i) {
+        for (j=0; j<nrow_x; ++j) {
+          z[j] += *x++ * y[i];
+        }
+      }
+    }
+  }
+
   void CentralDiff::eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
     // Shorthands
     int n_in = derivative_of_.n_in(), n_out = derivative_of_.n_out();
 
     // Non-differentiated input
-    const double* z0 = w;
-    for (int j=0; j<n_in; ++j) {
-      const int nnz = derivative_of_.nnz_in(j);
-      casadi_copy(*arg++, nnz, w);
-      w += nnz;
-    }
+    const double** z0 = arg; arg += n_in;
 
     // Non-differentiated output
     double* f = w;
@@ -233,35 +246,19 @@ namespace casadi {
     // Forward sensitivities
     double** sens = res; res += n_out;
 
-    // Vector with which Jacobian is multiplied
-    double* v = w;
-    for (int i=0; i<n_; ++i) {
-      for (int j=0; j<n_in; ++j) {
-        int nnz = derivative_of_.nnz_in(j);
-        if (seed[j]) casadi_copy(seed[j] + nnz*i, nnz, w);
-        w += nnz;
-      }
-    }
-
     // Memory structure
     casadi_fd_jacobian_mem<double> m_tmp, *m = &m_tmp;
     m->n_x = n_;
     m->n_f = n_f_;
     m->h = h_;
     m->f = f;
+    m->x = w; w += n_;
+    m->J = w; w += n_f_*n_;
+    m->x0 = w; w += n_;
+    m->f0 = w; w += n_f_;
 
     // fd_jacobian only sees a function with n_ inputs, initialized at 0
-    m->x = w; w += n_;
     casadi_fill(m->x, n_, 0.);
-
-    // Jacobian
-    m->J = w; w += n_f_*n_;
-
-    // Unperturbed input
-    m->x0 = w; w += n_;
-
-    // Unperturbed output
-    m->f0 = w; w += n_f_;
 
     // Setup arg, res for calling function
     double* z = w;
@@ -278,20 +275,22 @@ namespace casadi {
     // Call reverse communication algorithm
     m->next = 0;
     while (casadi_fd_jacobian(m)) {
-      casadi_copy(z0, n_z_, z);
-      for (int i=0; i<n_; ++i) {
-        casadi_axpy(n_z_, m->x[i], v + n_z_*i, z);
+      double* z1 = z;
+      for (int j=0; j<n_in; ++j) {
+        int nnz = derivative_of_.nnz_in(j);
+        casadi_copy(z0[j], nnz, z1);
+        casadi_mv_dense(seed[j], nnz, n_, m->x, z1, false);
+        z1 += nnz;
       }
       derivative_of_(arg, res, iw, w, 0);
     }
 
     // Gather sensitivities
     for (int i=0; i<n_; ++i) {
-      double* J1 = m->J + n_f_*i;
       for (int j=0; j<n_out; ++j) {
         int nnz = derivative_of_.nnz_out(j);
-        if (sens[j]) casadi_copy(J1, nnz, sens[j] + i*nnz);
-        J1 += nnz;
+        if (sens[j]) casadi_copy(m->J, nnz, sens[j] + i*nnz);
+        m->J += nnz;
       }
     }
   }
