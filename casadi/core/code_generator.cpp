@@ -621,6 +621,12 @@ namespace casadi {
     case AUX_FILL:
       this->auxiliaries << sanitize_source(casadi_fill_str, inst);
       break;
+    case AUX_MV:
+      this->auxiliaries << sanitize_source(casadi_mv_str, inst);
+      break;
+    case AUX_MV_DENSE:
+      this->auxiliaries << sanitize_source(casadi_mv_dense_str, inst);
+      break;
     case AUX_MTIMES:
       this->auxiliaries << sanitize_source(casadi_mtimes_str, inst);
       break;
@@ -880,15 +886,27 @@ namespace casadi {
     return printf(str, arg);
   }
 
+  std::string CodeGenerator::mv(const std::string& x, const Sparsity& sp_x,
+                                const std::string& y, const std::string& z, bool tr) {
+    addAuxiliary(AUX_MV);
+    return "mv(" + x + ", " + sparsity(sp_x) + ", " + y + ", "
+           + z + ", " +  (tr ? "1" : "0") + ");";
+  }
+
+  std::string CodeGenerator::mv(const std::string& x, int nrow_x, int ncol_x,
+                                const std::string& y, const std::string& z, bool tr) {
+    addAuxiliary(AUX_MV_DENSE);
+    return "mv(" + x + ", " + to_string(nrow_x) + ", " + to_string(ncol_x) + ", "
+           + y + ", " + z + ", " +  (tr ? "1" : "0") + ");";
+  }
+
   std::string CodeGenerator::mtimes(const std::string& x, const Sparsity& sp_x,
                                     const std::string& y, const Sparsity& sp_y,
                                     const std::string& z, const Sparsity& sp_z,
                                     const std::string& w, bool tr) {
     addAuxiliary(AUX_MTIMES);
-    stringstream s;
-    s << "mtimes(" << x << ", " << sparsity(sp_x) << ", " << y << ", " << sparsity(sp_y) << ", "
-      << z << ", " << sparsity(sp_z) << ", " << w << ", " <<  (tr ? "1" : "0") << ");";
-    return s.str();
+    return "mtimes(" + x + ", " + sparsity(sp_x) + ", " + y + ", " + sparsity(sp_y) + ", "
+      + z + ", " + sparsity(sp_z) + ", " + w + ", " +  (tr ? "1" : "0") + ");";
   }
 
   void CodeGenerator::print_formatted(const std::string& s) {

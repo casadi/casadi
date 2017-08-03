@@ -144,6 +144,14 @@ namespace casadi {
     /** \brief Codegen inner product */
     std::string dot(int n, const std::string& x, const std::string& y);
 
+    /** \brief Codegen sparse matrix-vector multiplication */
+    std::string mv(const std::string& x, const Sparsity& sp_x,
+                   const std::string& y, const std::string& z, bool tr);
+
+    /** \brief Codegen dense matrix-vector multiplication */
+    std::string mv(const std::string& x, int nrow_x, int ncol_x,
+                   const std::string& y, const std::string& z, bool tr);
+
     /** \brief Codegen sparse matrix-matrix multiplication */
     std::string mtimes(const std::string& x, const Sparsity& sp_x,
                        const std::string& y, const Sparsity& sp_y,
@@ -197,6 +205,8 @@ namespace casadi {
       AUX_FILL,
       AUX_SQ,
       AUX_SIGN,
+      AUX_MV,
+      AUX_MV_DENSE,
       AUX_MTIMES,
       AUX_PROJECT,
       AUX_DENSIFY,

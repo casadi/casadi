@@ -206,25 +206,6 @@ namespace casadi {
     return DONE;
   }
 
-  template<typename T1>
-  void CASADI_PREFIX(mv_dense)(const T1* x, int nrow_x, int ncol_x, const T1* y, T1* z, int tr) {
-    if (!x || !y || !z) return;
-    int i, j;
-    if (tr) {
-      for (i=0; i<ncol_x; ++i) {
-        for (j=0; j<nrow_x; ++j) {
-          z[i] += *x++ * y[j];
-        }
-      }
-    } else {
-      for (i=0; i<ncol_x; ++i) {
-        for (j=0; j<nrow_x; ++j) {
-          z[j] += *x++ * y[i];
-        }
-      }
-    }
-  }
-
   void CentralDiff::eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
     // Shorthands
     int n_in = derivative_of_.n_in(), n_out = derivative_of_.n_out();

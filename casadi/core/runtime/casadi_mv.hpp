@@ -1,6 +1,7 @@
 // NOLINT(legal/copyright)
 template<typename T1>
 void CASADI_PREFIX(mv)(const T1* x, const int* sp_x, const T1* y, T1* z, int tr) {
+  if (!x || !y || !z) return;
   // Get sparsities
   int ncol_x = sp_x[1];
   const int *colind_x = sp_x+2, *row_x = sp_x + 2 + ncol_x+1;
