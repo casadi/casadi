@@ -524,27 +524,21 @@ class CASADI_EXPORT GenericExpression : public GenericExpressionCommon {
 
     ///@{
     /** \brief Smallest of two values: (x,y) -> min(x,y) */
-    static ExType min(const ExType& x, const ExType& y) {
+    static ExType fmin(const ExType& x, const ExType& y) {
       return ExType::binary(OP_FMIN, x, y);
     }
-    friend inline ExType min(const ExType& x, const ExType& y) {
-      return ExType::min(x, y);
-    }
     friend inline ExType fmin(const ExType& x, const ExType& y) {
-      return min(x, y);
+      return ExType::fmin(x, y);
     }
     ///@}
 
     ///@{
     /** \brief Largest of two values: (x,y) -> max(x,y) */
-    static ExType max(const ExType& x, const ExType& y) {
+    static ExType fmax(const ExType& x, const ExType& y) {
       return ExType::binary(OP_FMAX, x, y);
     }
-    friend inline ExType max(const ExType& x, const ExType& y) {
-      return ExType::max(x, y);
-    }
     friend inline ExType fmax(const ExType& x, const ExType& y) {
-      return max(x, y);
+      return ExType::fmax(x, y);
     }
     ///@}
 

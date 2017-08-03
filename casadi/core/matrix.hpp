@@ -190,8 +190,6 @@ namespace casadi {
     using B::vertsplit;
     using B::diagsplit;
     using B::mtimes;
-    using GenericExpression<Matrix<Scalar>>::min;
-    using GenericExpression<Matrix<Scalar>>::max;
 #endif // SWIG
 
     /// Returns true if the matrix has a non-zero at location rr, cc
