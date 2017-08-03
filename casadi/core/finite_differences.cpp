@@ -174,6 +174,7 @@ namespace casadi {
     m->J = w; w += n_f_*n_;
     m->x0 = w; w += n_;
     m->f0 = w; w += n_f_;
+    m->status = 0;
 
     // central_diff only sees a function with n_ inputs, initialized at 0
     casadi_fill(m->x, n_, 0.);
@@ -190,7 +191,6 @@ namespace casadi {
     }
 
     // Call reverse communication algorithm
-    m->next = 0;
     while (casadi_central_diff(m)) {
       double* z1 = z;
       for (int j=0; j<n_in; ++j) {
@@ -251,7 +251,8 @@ namespace casadi {
       << "m->x = w; w += " << n_ << ";\n"
       << "m->J = w; w += " << n_f_*n_ << ";\n"
       << "m->x0 = w; w += " << n_ << ";\n"
-      << "m->f0 = w; w += " << n_f_ << ";\n";
+      << "m->f0 = w; w += " << n_f_ << ";\n"
+      << "m->status = 0;\n";
     g << g.fill("m->x", n_, "0.") << "\n";
 
     g.comment("Setup arg, res for calling function");
@@ -265,7 +266,6 @@ namespace casadi {
     }
 
     g.comment("Invoke reverse communication algorithm");
-    g << "m->next = 0;\n";
     g << "while (" << g.central_diff("m") << ") {\n";
     g.local("z1", "real_t", "*");
     g << "z1 = z;\n";

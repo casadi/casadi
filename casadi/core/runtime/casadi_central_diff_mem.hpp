@@ -12,5 +12,5 @@ struct CASADI_PREFIX(central_diff_mem) {
   // Jacobian
   T1* J;
   // Control
-  int next, i;
+  int status, i;
 };
