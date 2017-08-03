@@ -233,6 +233,16 @@ namespace casadi {
     // Forward sensitivities
     double** sens = res; res += n_out;
 
+    // Vector with which Jacobian is multiplied
+    double* v = w;
+    for (int i=0; i<n_; ++i) {
+      for (int j=0; j<n_in; ++j) {
+        int nnz = derivative_of_.nnz_in(j);
+        if (seed[j]) casadi_copy(seed[j] + nnz*i, nnz, w);
+        w += nnz;
+      }
+    }
+
     // Memory structure
     casadi_fd_jacobian_mem<double> m_tmp, *m = &m_tmp;
     m->n_x = 1;
@@ -240,12 +250,9 @@ namespace casadi {
     m->h = h_;
     m->f = f;
 
-    // Input
+    // fd_jacobian only sees a function with n_ inputs, initialized at 0
     m->x = w; w += n_;
     casadi_fill(m->x, n_, 0.);
-
-    // Vector with which Jacobian is multiplied
-    double* v = w; w += n_*n_z_;
 
     // Jacobian
     m->J = w; w += n_f_*n_;
@@ -270,24 +277,20 @@ namespace casadi {
 
     // For each derivative direction
     for (int i=0; i<n_; ++i) {
-      // Copy seeds to v
-      double* v1 = v;
-      for (int j=0; j<n_in; ++j) {
-        int nnz = derivative_of_.nnz_in(j);
-        if (seed[j]) casadi_copy(seed[j] + nnz*i, nnz, v1);
-        v1 += nnz;
-      }
-
       // Call reverse communication algorithm
       m->next = 0;
       while (casadi_fd_jacobian(m)) {
         casadi_copy(z0, n_z_, z);
-        casadi_axpy(n_z_, m->x[0], v, z);
+        casadi_axpy(n_z_, m->x[0], v + n_z_*i, z);
         derivative_of_(arg, res, iw, w, 0);
       }
+      m->J += n_f_;
+    }
 
-      // Gather sensitivities
-      double* J1 = m->J;
+    // Gather sensitivities
+    m->J -= n_*n_f_;
+    for (int i=0; i<n_; ++i) {
+      double* J1 = m->J + n_f_*i;
       for (int j=0; j<n_out; ++j) {
         int nnz = derivative_of_.nnz_out(j);
         if (sens[j]) casadi_copy(J1, nnz, sens[j] + i*nnz);
