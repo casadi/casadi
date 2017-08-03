@@ -9,11 +9,8 @@ struct CASADI_PREFIX(central_diff_mem) {
   T1 *x, *x0;
   // (Current) differentiable outputs
   T1 *f, *f0;
-
-  // Vector with which the Jacobian is multiplied
-  T1* v;
-  // Jacobian-times-vector product
-  T1* Jv;
-  // Number of function calls (must be initialized to 0)
-  int n_calls;
+  // Jacobian
+  T1* J;
+  // Control
+  int next, i;
 };

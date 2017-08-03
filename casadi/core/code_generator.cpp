@@ -668,6 +668,7 @@ namespace casadi {
       addAuxiliary(AUX_COPY);
       addAuxiliary(AUX_AXPY);
       addAuxiliary(AUX_SCAL);
+      addAuxiliary(AUX_MV_DENSE);
       addAuxiliary(AUX_CENTRAL_DIFF_MEM);
       this->auxiliaries << sanitize_source(casadi_central_diff_str, inst);
       break;
@@ -896,7 +897,7 @@ namespace casadi {
   std::string CodeGenerator::mv(const std::string& x, int nrow_x, int ncol_x,
                                 const std::string& y, const std::string& z, bool tr) {
     addAuxiliary(AUX_MV_DENSE);
-    return "mv(" + x + ", " + to_string(nrow_x) + ", " + to_string(ncol_x) + ", "
+    return "mv_dense(" + x + ", " + to_string(nrow_x) + ", " + to_string(ncol_x) + ", "
            + y + ", " + z + ", " +  (tr ? "1" : "0") + ");";
   }
 

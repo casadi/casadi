@@ -143,69 +143,6 @@ namespace casadi {
     return Function::create(new CentralDiff(name, nfwd), opts_mod);
   }
 
-  template<typename T1>
-  struct CASADI_PREFIX(fd_jacobian_mem) {
-    // Dimensions
-    int n_x, n_f;
-    // Perturbation size
-    T1 h;
-    // (Current) differentiable inputs
-    T1 *x, *x0;
-    // (Current) differentiable outputs
-    T1 *f, *f0;
-    // Jacobian
-    T1* J;
-    // Control
-    int next, i;
-  };
-
-  #define fd_jacobian_mem CASADI_PREFIX(fd_jacobian_mem)<T1>
-  template<typename T1>
-  int CASADI_PREFIX(fd_jacobian)(fd_jacobian_mem* m) {
-    // Define cases
-    const int INIT=0, POS_PERT=1, NEG_PERT=2, CALC_FD=3;
-    // Call user function?
-    const int DONE=0, CALL=1;
-    // Control loop
-    switch (m->next) {
-      case INIT:
-      // Backup x and f
-      CASADI_PREFIX(copy)(m->x, m->n_x, m->x0);
-      CASADI_PREFIX(copy)(m->f, m->n_f, m->f0);
-      // Reset direction counter
-      m->i = 0;
-      m->next = POS_PERT;
-      // No break or return
-      case POS_PERT:
-      // Perturb x, positive direction
-      m->x[m->i] += m->h/2;
-      m->next = NEG_PERT;
-      return CALL;
-      case NEG_PERT:
-      // Save result, perturb in negative direction
-      CASADI_PREFIX(copy)(m->f, m->n_f, m->J + m->i*m->n_f);
-      m->x[m->i] = m->x0[m->i] - m->h/2;
-      m->next = CALC_FD;
-      return CALL;
-      case CALC_FD:
-      // Reset x
-      m->x[m->i] = m->x0[m->i];
-      // Calculate finite difference approximation
-      CASADI_PREFIX(axpy)(m->n_f, -1., m->f, m->J + m->i*m->n_f);
-      CASADI_PREFIX(scal)(m->n_f, 1/m->h, m->J + m->i*m->n_f);
-      // Procede to next direction
-      m->i++;
-      if (m->i < m->n_x) {
-        // Continue to the next direction
-        m->next = POS_PERT;
-        return CALL;
-      }
-      // Restore f
-      CASADI_PREFIX(copy)(m->x0, m->n_x, m->x);
-    }
-    return DONE;
-  }
-
   void CentralDiff::eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
     // Shorthands
     int n_in = derivative_of_.n_in(), n_out = derivative_of_.n_out();
@@ -228,7 +165,7 @@ namespace casadi {
     double** sens = res; res += n_out;
 
     // Memory structure
-    casadi_fd_jacobian_mem<double> m_tmp, *m = &m_tmp;
+    casadi_central_diff_mem<double> m_tmp, *m = &m_tmp;
     m->n_x = n_;
     m->n_f = n_f_;
     m->h = h_;
@@ -238,7 +175,7 @@ namespace casadi {
     m->x0 = w; w += n_;
     m->f0 = w; w += n_f_;
 
-    // fd_jacobian only sees a function with n_ inputs, initialized at 0
+    // central_diff only sees a function with n_ inputs, initialized at 0
     casadi_fill(m->x, n_, 0.);
 
     // Setup arg, res for calling function
@@ -247,15 +184,14 @@ namespace casadi {
       arg[j] = w;
       w += derivative_of_.nnz_in(j);
     }
-    double* f1 = f;
     for (int j=0; j<n_out; ++j) {
-      res[j] = f1;
-      f1 += derivative_of_.nnz_out(j);
+      res[j] = f;
+      f += derivative_of_.nnz_out(j);
     }
 
     // Call reverse communication algorithm
     m->next = 0;
-    while (casadi_fd_jacobian(m)) {
+    while (casadi_central_diff(m)) {
       double* z1 = z;
       for (int j=0; j<n_in; ++j) {
         int nnz = derivative_of_.nnz_in(j);
@@ -284,23 +220,13 @@ namespace casadi {
     // Shorthands
     int n_in = derivative_of_.n_in(), n_out = derivative_of_.n_out();
 
-    g.comment("Memory structure");
-    g.local("m_tmp", "central_diff_mem");
-    g.local("m", "central_diff_mem", "*");
-    g << "m = &m_tmp;\n"
-      << "m->n_x = " << n_z_ << ";\n"
-      << "m->n_f = " << n_f_ << ";\n"
-      << "m->h = " << h_ << ";\n";
-
     g.comment("Non-differentiated input");
-    g << "m->x = w;\n";
-    for (int j=0; j<n_in; ++j) {
-      const int nnz = derivative_of_.nnz_in(j);
-      g << g.copy("*arg++", nnz, "w") << " w += " << nnz << ";\n";
-    }
+    g.local("z0", "const real_t", "**");
+    g << "z0 = arg; arg += " << n_in << ";\n";
 
     g.comment("Non-differentiated output");
-    g << "m->f = w;\n";
+    g.local("f", "real_t", "*");
+    g << "f = w;\n";
     for (int j=0; j<n_out; ++j) {
       const int nnz = derivative_of_.nnz_out(j);
       g << g.copy("*arg++", nnz, "w") << " w += " << nnz << ";\n";
@@ -314,65 +240,54 @@ namespace casadi {
     g.local("sens", "real_t", "**");
     g << "sens = res; res += " << n_out << ";\n";
 
-    g.comment("Vector with which Jacobian is multiplied");
-    g << "m->v = w; w += " << n_z_ << ";\n";
-    g << g.fill("m->v", n_z_, "0.") << "\n";
-
-    g.comment("Jacobian-times-vector product");
-    g << "m->Jv = w; w += " << n_f_ << ";\n";
-
-    g.comment("Unperturbed input");
-    g << "m->x0 = w; w += " << n_z_ << ";\n";
-
-    g.comment("Unperturbed output");
-    g << "m->f0 = w; w += " << n_f_ << ";\n";
+    g.comment("Memory structure");
+    g.local("m_tmp", "central_diff_mem");
+    g.local("m", "central_diff_mem", "*");
+    g << "m = &m_tmp;\n"
+      << "m->n_x = " << n_ << ";\n"
+      << "m->n_f = " << n_f_ << ";\n"
+      << "m->h = " << h_ << ";\n"
+      << "m->f = f;\n"
+      << "m->x = w; w += " << n_ << ";\n"
+      << "m->J = w; w += " << n_f_*n_ << ";\n"
+      << "m->x0 = w; w += " << n_ << ";\n"
+      << "m->f0 = w; w += " << n_f_ << ";\n";
+    g << g.fill("m->x", n_, "0.") << "\n";
 
     g.comment("Setup arg, res for calling function");
-    g.local("x1", "real_t", "*");
-    g << "x1 = m->x;\n";
+    g.local("z", "real_t", "*");
+    g << "z = w;\n";
     for (int j=0; j<n_in; ++j) {
-      g << "arg[" << j << "] = x1; x1 += " << derivative_of_.nnz_in(j) << ";\n";
+      g << "arg[" << j << "] = w; w += " << derivative_of_.nnz_in(j) << ";\n";
     }
-    g.local("f1", "real_t", "*");
-    g << "f1 = m->f;\n";
     for (int j=0; j<n_out; ++j) {
-      g << "res[" << j << "] = f1; f1 += " << derivative_of_.nnz_out(j) << ";\n";
+      g << "res[" << j << "] = f; f += " << derivative_of_.nnz_out(j) << ";\n";
     }
-
-    g.comment("Loop over derivative directions");
-    g.local("i", "int");
-    g << "for (i=0; i<" << n_ << "; ++i) {\n";
-
-    g.comment("Copy seeds to v");
-    g.local("v1", "real_t", "*");
-    g << "v1 = m->v;\n";
-    for (int j=0; j<n_in; ++j) {
-      int nnz = derivative_of_.nnz_in(j);
-      string s = "seed[" + to_string(j) + "]";
-      g << "if (" << s << ") " << g.copy(s + "+i*" + to_string(nnz), nnz, "v1") << "\n"
-        << "v1 += " << nnz << ";\n";
-    }
-
-    g.comment("Reset counter");
-    g << "m->n_calls = 0;\n";
 
     g.comment("Invoke reverse communication algorithm");
-    g << "while (" << g.central_diff("m") << ") {\n"
-      << "if (" << g(derivative_of_, "arg", "res", "iw", "w") << ") return 1;\n"
-      << "}\n";
+    g << "m->next = 0;\n";
+    g << "while (" << g.central_diff("m") << ") {\n";
+    g.local("z1", "real_t", "*");
+    g << "z1 = z;\n";
+    for (int j=0; j<n_in; ++j) {
+      int nnz = derivative_of_.nnz_in(j);
+      g << g.copy("z0[" + to_string(j) + "]", nnz, "z1") << "\n"
+        << g.mv("seed[" + to_string(j) + "]", nnz, n_, "m->x", "z1", false) << "\n"
+        << "z1 += " << nnz << ";\n";
+    }
+    g << "if (" << g(derivative_of_, "arg", "res", "iw", "w") << ") return 1;\n"
+      << "}\n"; // while (...)
 
     g.comment("Gather sensitivities");
-    g.local("Jv1", "real_t", "*");
-    g << "Jv1 = m->Jv;\n";
+    g.local("i", "int");
+    g << "for (i=0; i<" << n_ << "; ++i) {" << "\n";
     for (int j=0; j<n_out; ++j) {
       int nnz = derivative_of_.nnz_out(j);
       string s = "sens[" + to_string(j) + "]";
-      g << "if (" << s << ") " << g.copy("Jv1", nnz, s + "+i*" + to_string(nnz)) << "\n"
-        << "Jv1 += " << nnz << ";\n";
+      g << "if (" << s << ") " << g.copy("m->J", nnz, s + "+i*" + to_string(nnz)) << "\n"
+        << "m->J += " << nnz << ";\n";
     }
-
-    // End for (i=0; ...
-    g << "}\n";
+    g << "}\n"; // for (i=0, ...)
   }
 
 
