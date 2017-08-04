@@ -572,7 +572,7 @@ namespace casadi {
     }
 
     // Create call unless always_inline is true
-    if (never_inline || !always_inline) {
+    if (!should_inline(never_inline, always_inline)) {
       return FunctionInternal::eval_mx(arg, res, false, true);
     }
 

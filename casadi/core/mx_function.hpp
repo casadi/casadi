@@ -123,7 +123,7 @@ namespace casadi {
 
     /** Inline calls? */
     bool should_inline(bool always_inline, bool never_inline) const override {
-      return always_inline;
+      return always_inline || has_free();
     }
 
     /** \brief Evaluate symbolically, SX type*/
@@ -131,7 +131,7 @@ namespace casadi {
 
     /** \brief Evaluate symbolically, MX type */
     void eval_mx(const MXVector& arg, MXVector& res,
-                         bool always_inline, bool never_inline) const override;
+                 bool always_inline, bool never_inline) const override;
 
     /** \brief Calculate forward mode directional derivatives */
     void ad_forward(const std::vector<std::vector<MX> >& fwdSeed,
