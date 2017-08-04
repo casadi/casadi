@@ -1597,7 +1597,7 @@ namespace casadi {
               const std::vector<MX> &arg,
               const std::vector<std::vector<MX> > &v, const Dict& opts) {
     // Read options
-    bool always_inline = false;
+    bool always_inline = true;
     bool never_inline = false;
     for (auto&& op : opts) {
       if (op.first=="always_inline") {
@@ -1620,7 +1620,7 @@ namespace casadi {
               const std::vector<MX> &arg,
               const std::vector<std::vector<MX> > &v, const Dict& opts) {
     // Read options
-    bool always_inline = false;
+    bool always_inline = true;
     bool never_inline = false;
     for (auto&& op : opts) {
       if (op.first=="always_inline") {
