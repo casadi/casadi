@@ -571,7 +571,7 @@ namespace casadi {
       return;
     }
 
-    // Create call unless always_inline is true
+    // non-inlining call is implemented in the base-class
     if (!should_inline(never_inline, always_inline)) {
       return FunctionInternal::eval_mx(arg, res, false, true);
     }
@@ -1301,8 +1301,15 @@ namespace casadi {
     }
   }
 
-
-
-
+  bool MXFunction::should_inline(bool always_inline, bool never_inline) const {
+    // If inlining has been specified
+    casadi_assert_message(!(always_inline && never_inline), "Inconsistent options");
+    if (always_inline) return true;
+    if (never_inline) return false;
+    // Functions with free variables must be inlined
+    if (has_free()) return true;
+    // No inlining by default
+    return false;
+  }
 
 } // namespace casadi

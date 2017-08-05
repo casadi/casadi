@@ -122,9 +122,7 @@ namespace casadi {
     void generate_lifted(Function& vdef_fcn, Function& vinit_fcn) const override;
 
     /** Inline calls? */
-    bool should_inline(bool always_inline, bool never_inline) const override {
-      return always_inline || has_free();
-    }
+    bool should_inline(bool always_inline, bool never_inline) const override;
 
     /** \brief Evaluate symbolically, SX type*/
     void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const override;
