@@ -1701,6 +1701,7 @@ namespace casadi {
     } else if (g.cpp) {
       g << "extern \"C\" ";
     }
+    if (!decl_static && g.with_export) g << "CASADI_SYMBOL_EXPORT ";
     g << signature(fname) << " {\n";
     g.flush(g.body);
     g.local_variables_.clear();
@@ -1746,22 +1747,24 @@ namespace casadi {
     int n_in = this->n_in();
     int n_out = this->n_out();
 
+    std::string prefix = g.with_export ? "CASADI_SYMBOL_EXPORT " : "";
+
     // Reference counter routines
-    g << g.declare("void " + fname + "_incref(void)") << " {\n";
+    g << g.declare(prefix + "void " + fname + "_incref(void)") << " {\n";
     codegen_incref(g);
     g << "}\n\n"
-      << g.declare("void " + fname + "_decref(void)") << " {\n";
+      << g.declare(prefix + "void " + fname + "_decref(void)") << " {\n";
     codegen_decref(g);
     g << "}\n\n";
 
     // Number of inputs and outptus
-    g << g.declare("int " + fname + "_n_in(void)")
+    g << g.declare(prefix + "int " + fname + "_n_in(void)")
       << " { return " << n_in << ";}\n\n"
-      << g.declare("int " + fname + "_n_out(void)")
+      << g.declare(prefix + "int " + fname + "_n_out(void)")
       << " { return " << n_out << ";}\n\n";
 
     // Input names
-    g << g.declare("const char* " + fname + "_name_in(int i)") << "{\n"
+    g << g.declare(prefix + "const char* " + fname + "_name_in(int i)") << "{\n"
       << "switch (i) {\n";
     for (int i=0; i<n_in; ++i) {
       g << "case " << i << ": return \"" << name_in(i) << "\";\n";
@@ -1770,7 +1773,7 @@ namespace casadi {
       << "}\n\n";
 
     // Output names
-    g << g.declare("const char* " + fname + "_name_out(int i)") << "{\n"
+    g << g.declare(prefix + "const char* " + fname + "_name_out(int i)") << "{\n"
       << "switch (i) {\n";
     for (int i=0; i<n_out; ++i) {
       g << "case " << i << ": return \"" << name_out(i) << "\";\n";
@@ -1782,7 +1785,7 @@ namespace casadi {
     if (simplifiedCall()) return;
 
     // Input sparsities
-    g << g.declare("const int* " + fname + "_sparsity_in(int i)") << " {\n"
+    g << g.declare(prefix + "const int* " + fname + "_sparsity_in(int i)") << " {\n"
       << "switch (i) {\n";
     for (int i=0; i<n_in; ++i) {
       g << "case " << i << ": return s" << g.addSparsity(sparsity_in(i)) << ";\n";
@@ -1791,7 +1794,7 @@ namespace casadi {
       << "}\n\n";
 
     // Output sparsities
-    g << g.declare("const int* " + fname + "_sparsity_out(int i)") << " {\n"
+    g << g.declare(prefix + "const int* " + fname + "_sparsity_out(int i)") << " {\n"
       << "switch (i) {\n";
     for (int i=0; i<n_out; ++i) {
       g << "case " << i << ": return s" << g.addSparsity(sparsity_out(i)) << ";\n";
@@ -1800,7 +1803,8 @@ namespace casadi {
       << "}\n\n";
 
     // Function that returns work vector lengths
-    g << g.declare("int " + fname + "_work(int *sz_arg, int* sz_res, int *sz_iw, int *sz_w)")
+    g << g.declare(
+        prefix + "int " + fname + "_work(int *sz_arg, int* sz_res, int *sz_iw, int *sz_w)")
       << " {\n"
       << "if (sz_arg) *sz_arg = " << sz_arg() << ";\n"
       << "if (sz_res) *sz_res = " << sz_res() << ";\n"
