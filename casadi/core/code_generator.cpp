@@ -42,6 +42,7 @@ namespace casadi {
     this->codegen_scalars = false;
     this->with_header = false;
     this->with_mem = false;
+    this->with_export = true;
     indent_ = 2;
 
     // Read options
@@ -62,6 +63,8 @@ namespace casadi {
         this->with_header = e.second;
       } else if (e.first=="with_mem") {
         this->with_mem = e.second;
+      } else if (e.first=="with_export") {
+        this->with_export = e.second;
       } else if (e.first=="indent") {
         indent_ = e.second;
         casadi_assert(indent_>=0);
@@ -114,6 +117,23 @@ namespace casadi {
     } else {
       // Define printf as standard printf from stdio.h
       this->auxiliaries << "#define PRINTF printf" << endl;
+    }
+
+    if (this->with_export) {
+      this->auxiliaries
+        << "#ifndef CASADI_SYMBOL_EXPORT" << endl
+        << "#if defined(_WIN32) || defined(__WIN32__) || defined(__CYGWIN__)" << endl
+        << "#if defined(STATIC_LINKED)" << endl
+        << "#define CASADI_SYMBOL_EXPORT" << endl
+        << "#else /* defined(STATIC_LINKED) */" << endl
+        << "#define CASADI_SYMBOL_EXPORT __declspec(dllexport)" << endl
+        << "#endif /* defined(STATIC_LINKED) */" << endl
+        << "#elif defined(__GNUC__) && defined(GCC_HASCLASSVISIBILITY)" << endl
+        << "#define CASADI_SYMBOL_EXPORT __attribute__ ((visibility (\"default\")))" << endl
+        << "#else /* defined(_WIN32) || defined(__WIN32__) || defined(__CYGWIN__) */"  << endl
+        << "#define CASADI_SYMBOL_EXPORT" << endl
+        << "#endif /* defined(_WIN32) || defined(__WIN32__) || defined(__CYGWIN__) */" << endl
+        << "#endif /* CASADI_SYMBOL_EXPORT */" << endl;
     }
   }
 

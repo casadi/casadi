@@ -332,6 +332,9 @@ namespace casadi {
      */
     bool codegen_scalars;
 
+    // Have a flag for exporting symbols
+    bool with_export;
+
     // Stringstreams holding the different parts of the file being generated
     std::stringstream includes;
     std::stringstream auxiliaries;
