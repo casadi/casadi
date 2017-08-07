@@ -122,16 +122,18 @@ namespace casadi {
     if (this->with_export) {
       this->auxiliaries
         << "#ifndef CASADI_SYMBOL_EXPORT" << endl
-        << "#if defined(_WIN32) || defined(__CYGWIN__)" << endl
-        << "#define CASADI_SYMBOL_EXPORT __declspec(dllexport)" << endl
-        << "#else" << endl
-        << "#if __GNUC__ >= 4" << endl
-        << "#define CASADI_SYMBOL_EXPORT __attribute__ ((visibility (\"default\")))" << endl
-        << "#else"  << endl
+        << "#if defined(_WIN32) || defined(__WIN32__) || defined(__CYGWIN__)" << endl
+        << "#if defined(STATIC_LINKED)" << endl
         << "#define CASADI_SYMBOL_EXPORT" << endl
-        << "#endif" << endl
-        << "#endif" << endl
-        << "#endif" << endl;
+        << "#else /* defined(STATIC_LINKED) */" << endl
+        << "#define CASADI_SYMBOL_EXPORT __declspec(dllexport)" << endl
+        << "#endif /* defined(STATIC_LINKED) */"
+        << "#elif defined(__GNUC__) && defined(GCC_HASCLASSVISIBILITY)" << endl
+        << "#define CASADI_SYMBOL_EXPORT __attribute__ ((visibility (\"default\")))" << endl
+        << "#else /* defined(_WIN32) || defined(__WIN32__) || defined(__CYGWIN__) */"  << endl
+        << "#define CASADI_SYMBOL_EXPORT" << endl
+        << "#endif /* defined(_WIN32) || defined(__WIN32__) || defined(__CYGWIN__) */" << endl
+        << "#endif /* CASADI_SYMBOL_EXPORT */" << endl;
     }
   }
 
