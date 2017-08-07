@@ -37,11 +37,13 @@ f = (1-x)**2+100*(y-x**2)**2
 nlp={'x':vertcat(x,y), 'f':f,'g':x+y}
 fcn = Function('f', [x, y], [f])
 
+import matplotlib
+if "Agg" not in matplotlib.get_backend():
+  matplotlib.interactive(True)
+
 from pylab import figure, subplot, contourf, colorbar, draw, show, plot, title
 
 import time
-import matplotlib
-matplotlib.interactive(True)
 
 class MyCallback(Callback):
   def __init__(self, name, nx, ng, np, opts={}):

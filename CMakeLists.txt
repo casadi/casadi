@@ -3,7 +3,7 @@ project(casadi C CXX)
 
 set(CASADI_MAJOR_VERSION 3)
 set(CASADI_MINOR_VERSION 2)
-set(CASADI_PATCH_VERSION 1)
+set(CASADI_PATCH_VERSION 2)
 set(CASADI_IS_RELEASE 1)
 
 set(CASADI_VERSION ${CASADI_MAJOR_VERSION}.${CASADI_MINOR_VERSION}.${CASADI_PATCH_VERSION})
@@ -51,9 +51,8 @@ if(NOT COMMAND add_feature_info)
   endfunction()
 endif()
 
-# Default build type is Release
-if(NOT DEFINED CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE Release)
+if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+  set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Build type" FORCE)
 endif()
 
 ########################################################################
