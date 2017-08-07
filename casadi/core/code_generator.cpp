@@ -127,7 +127,7 @@ namespace casadi {
         << "#define CASADI_SYMBOL_EXPORT" << endl
         << "#else /* defined(STATIC_LINKED) */" << endl
         << "#define CASADI_SYMBOL_EXPORT __declspec(dllexport)" << endl
-        << "#endif /* defined(STATIC_LINKED) */"
+        << "#endif /* defined(STATIC_LINKED) */" << endl
         << "#elif defined(__GNUC__) && defined(GCC_HASCLASSVISIBILITY)" << endl
         << "#define CASADI_SYMBOL_EXPORT __attribute__ ((visibility (\"default\")))" << endl
         << "#else /* defined(_WIN32) || defined(__WIN32__) || defined(__CYGWIN__) */"  << endl
