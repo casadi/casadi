@@ -464,6 +464,10 @@ namespace casadi {
     std::pair<int, int> size_out(int ind) const { return sparsity_out(ind).size(); }
     ///@}
 
+    ///@{
+    /** \brief Are all inputs and outputs scalar */
+    bool all_scalar() const;
+
     /** \brief Name of the function */
     const std::string& name() const { return name_;}
 
@@ -827,6 +831,51 @@ namespace casadi {
   template<typename M>
   void FunctionInternal::call(const std::vector<M>& arg, std::vector<M>& res,
                               bool always_inline, bool never_inline) const {
+    // If all inputs are scalar ...
+    if (all_scalar()) {
+      // ... and some arguments are matrix-valued with matching dimensions ...
+      bool matrix_call = false;
+      std::pair<int, int> sz;
+      for (auto&& a : arg) {
+        if (!a.is_scalar() && !a.is_empty()) {
+          if (!matrix_call) {
+            // Matrix call
+            matrix_call = true;
+            sz = a.size();
+          } else if (a.size()!=sz) {
+            // Not same dimensions
+            matrix_call = false;
+            break;
+          }
+        }
+      }
+
+      // ... then, call multiple times
+      if (matrix_call) {
+        // Start with zeros
+        res.resize(n_out());
+        M z = M::zeros(sz);
+        for (auto&& a : res) a = z;
+        // Call multiple times
+        std::vector<M> arg1 = arg, res1;
+        for (int c=0; c<sz.second; ++c) {
+          for (int r=0; r<sz.first; ++r) {
+            // Get scalar arguments
+            for (int i=0; i<arg.size(); ++i) {
+              if (arg[i].size()==sz) arg1[i] = arg[i](r, c);
+            }
+            // Call recursively with scalar arguments
+            call(arg1, res1, always_inline, never_inline);
+            // Get results
+            casadi_assert(res.size() == res1.size());
+            for (int i=0; i<res.size(); ++i) res[i](r, c) = res1[i];
+          }
+        }
+        // All elements assigned
+        return;
+      }
+    }
+
     // Check if inputs need to be replaced
     if (!matching_arg(arg)) {
       return call(replace_arg(arg), res, always_inline, never_inline);

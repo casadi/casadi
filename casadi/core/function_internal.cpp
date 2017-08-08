@@ -2751,4 +2751,20 @@ namespace casadi {
     return wrap().slice(name, order_in, order_out, opts);
   }
 
+  bool FunctionInternal::all_scalar() const {
+    // Check inputs
+    int n_in = this->n_in();
+    for (int i=0; i<n_in; ++i) {
+      if (!sparsity_in(i).is_scalar()) return false;
+    }
+    // Check outputs
+    int n_out = this->n_out();
+    for (int i=0; i<n_out; ++i) {
+      if (!sparsity_out(i).is_scalar()) return false;
+    }
+    // All are scalar
+    return true;
+  }
+
+
 } // namespace casadi
