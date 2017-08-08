@@ -13979,6 +13979,14 @@ Add a implicit state.
 
 ";
 
+%feature("docstring")  casadi::DaeBuilder::add_fun(const std::string &name,
+const std::vector< std::string > &arg, const std::vector< std::string >
+&res) "
+
+Add a function.
+
+";
+
 %feature("docstring")  casadi::DaeBuilder::sanity_check() const  "
 
 Check if dimensions match.
@@ -14018,24 +14026,10 @@ Get the (optionally normalized) value(s) at time 0 by expression.
 
 ";
 
-%feature("docstring")  casadi::DaeBuilder::add_variable(const std::string
-&name, const Variable &var) "
+%feature("docstring")  casadi::DaeBuilder::add_aux(const std::string
+&name=std::string(), int n=1) "
 
-Add a variable.
-
-";
-
-%feature("docstring")  casadi::DaeBuilder::add_variable(const std::string
-&name, int n=1) "
-
-Add a new variable: returns corresponding symbolic expression.
-
-";
-
-%feature("docstring")  casadi::DaeBuilder::add_variable(const std::string
-&name, const Sparsity &sp) "
-
-Add a new variable: returns corresponding symbolic expression.
+Add an auxiliary variable.
 
 ";
 
@@ -14053,10 +14047,17 @@ Get the lower bound(s) by expression.
 
 ";
 
+%feature("docstring")  casadi::DaeBuilder::add_quad(const std::string &name,
+const MX &new_quad) "
+
+Add a quadrature equation.
+
+";
+
 %feature("docstring")  casadi::DaeBuilder::add_quad(const MX &new_quad,
 const std::string &name=std::string()) "
 
-Add a quadrature equation.
+[INTERNAL]  Add a quadrature equation. Old syntax: Swap arguments.
 
 ";
 
@@ -14140,10 +14141,18 @@ Sort the algebraic equations and algebraic states.
 
 ";
 
+%feature("docstring")  casadi::DaeBuilder::add_dae(const std::string &name,
+const MX &new_dae) "
+
+Add a differential-algebraic equation.
+
+";
+
 %feature("docstring")  casadi::DaeBuilder::add_dae(const MX &new_dae, const
 std::string &name=std::string()) "
 
-Add a differential-algebraic equation.
+[INTERNAL]  Add a differential-algebraic equation. Old syntax: Swap
+arguments.
 
 ";
 
@@ -14263,6 +14272,13 @@ Add a new parameter
 
 ";
 
+%feature("docstring")  casadi::DaeBuilder::var(const std::string &name)
+const  "
+
+Get variable expression by name.
+
+";
+
 %feature("docstring")  casadi::DaeBuilder::add_u(const std::string
 &name=std::string(), int n=1) "
 
@@ -14291,10 +14307,17 @@ Add a new algebraic variable.
 
 ";
 
+%feature("docstring")  casadi::DaeBuilder::add_y(const std::string &name,
+const MX &new_ydef) "
+
+Add a new output.
+
+";
+
 %feature("docstring")  casadi::DaeBuilder::add_y(const MX &new_ydef, const
 std::string &name=std::string()) "
 
-Add a new output.
+[INTERNAL]  Add a new output. Old syntax: Swap arguments.
 
 ";
 
@@ -14346,10 +14369,38 @@ Import existing problem from FMI/XML
 
 ";
 
+%feature("docstring")  casadi::DaeBuilder::add_variable(const std::string
+&name, const Variable &var) "
+
+Add a variable.
+
+";
+
+%feature("docstring")  casadi::DaeBuilder::add_variable(const std::string
+&name, int n=1) "
+
+Add a new variable: returns corresponding symbolic expression.
+
+";
+
+%feature("docstring")  casadi::DaeBuilder::add_variable(const std::string
+&name, const Sparsity &sp) "
+
+Add a new variable: returns corresponding symbolic expression.
+
+";
+
+%feature("docstring")  casadi::DaeBuilder::add_d(const std::string &name,
+const MX &new_ddef) "
+
+Add a new dependent parameter.
+
+";
+
 %feature("docstring")  casadi::DaeBuilder::add_d(const MX &new_ddef, const
 std::string &name=std::string()) "
 
-Add a new dependent parameter.
+[INTERNAL]  Add a new dependent parameter. Old syntax: Swap arguments.
 
 ";
 
@@ -14359,10 +14410,17 @@ Identify and separate the algebraic variables and equations in the DAE.
 
 ";
 
+%feature("docstring")  casadi::DaeBuilder::add_alg(const std::string &name,
+const MX &new_alg) "
+
+Add an algebraic equation.
+
+";
+
 %feature("docstring")  casadi::DaeBuilder::add_alg(const MX &new_alg, const
 std::string &name=std::string()) "
 
-Add an algebraic equation.
+[INTERNAL]  Add an algebraic equation. Old syntax: Swap arguments.
 
 ";
 
@@ -14508,10 +14566,18 @@ Scale the implicit equations.
 
 ";
 
+%feature("docstring")  casadi::DaeBuilder::add_ode(const std::string &name,
+const MX &new_ode) "
+
+Add an ordinary differential equation.
+
+";
+
 %feature("docstring")  casadi::DaeBuilder::add_ode(const MX &new_ode, const
 std::string &name=std::string()) "
 
-Add an ordinary differential equation.
+[INTERNAL]  Add an ordinary differential equation. Old syntax: Swap
+arguments.
 
 ";
 
