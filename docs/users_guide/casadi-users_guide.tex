@@ -2518,9 +2518,9 @@ m = dae.add_x('m')
 hdot = v
 vdot = (u-a*v**2)/m-g
 mdot = -b*u**2
-dae.add_ode(hdot)
-dae.add_ode(vdot)
-dae.add_ode(mdot)
+dae.add_ode('hdot', hdot)
+dae.add_ode('vdot', vdot)
+dae.add_ode('mdot', mdot)
 # Specify initial conditions
 dae.set_start('h', 0)
 dae.set_start('v', 0)
@@ -2546,9 +2546,9 @@ m = dae.add_x('m');
 hdot = v;
 vdot = (u-a*v^2)/m-g;
 mdot = -b*u^2;
-dae.add_ode(hdot);
-dae.add_ode(vdot);
-dae.add_ode(mdot);
+dae.add_ode('hdot', hdot);
+dae.add_ode('vdot', vdot);
+dae.add_ode('mdot', mdot);
 % Specify initial conditions
 dae.set_start('h', 0);
 dae.set_start('v', 0);

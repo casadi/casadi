@@ -172,22 +172,22 @@ namespace casadi {
     MX add_q(const std::string& name=std::string(), int n=1);
 
     /// Add a new dependent parameter
-    MX add_d(const MX& new_ddef, const std::string& name=std::string());
+    MX add_d(const std::string& name, const MX& new_ddef);
 
     /// Add a new output
-    MX add_y(const MX& new_ydef, const std::string& name=std::string());
+    MX add_y(const std::string& name, const MX& new_ydef);
 
     /// Add an ordinary differential equation
-    void add_ode(const MX& new_ode, const std::string& name=std::string());
+    void add_ode(const std::string& name, const MX& new_ode);
 
     /// Add a differential-algebraic equation
-    void add_dae(const MX& new_dae, const std::string& name=std::string());
+    void add_dae(const std::string& name, const MX& new_dae);
 
     /// Add an algebraic equation
-    void add_alg(const MX& new_alg, const std::string& name=std::string());
+    void add_alg(const std::string& name, const MX& new_alg);
 
     /// Add a quadrature equation
-    void add_quad(const MX& new_quad, const std::string& name=std::string());
+    void add_quad(const std::string& name, const MX& new_quad);
 
     /// Add an auxiliary variable
     MX add_aux(const std::string& name=std::string(), int n=1);
@@ -442,6 +442,26 @@ namespace casadi {
     Variable& variable(const std::string& name);
     const Variable& variable(const std::string& name) const;
     ///@}
+
+#ifdef WITH_DEPRECATED_FEATURES
+    /// Add a new dependent parameter. Old syntax: Swap arguments
+    MX add_d(const MX& new_ddef, const std::string& name=std::string());
+
+    /// Add a new output. Old syntax: Swap arguments
+    MX add_y(const MX& new_ydef, const std::string& name=std::string());
+
+    /// Add an ordinary differential equation. Old syntax: Swap arguments
+    void add_ode(const MX& new_ode, const std::string& name=std::string());
+
+    /// Add a differential-algebraic equation. Old syntax: Swap arguments
+    void add_dae(const MX& new_dae, const std::string& name=std::string());
+
+    /// Add an algebraic equation. Old syntax: Swap arguments
+    void add_alg(const MX& new_alg, const std::string& name=std::string());
+
+    /// Add a quadrature equation. Old syntax: Swap arguments
+    void add_quad(const MX& new_quad, const std::string& name=std::string());
+#endif // WITH_DEPRECATED_FEATURES
 
 #ifndef SWIG
     // Internal methods

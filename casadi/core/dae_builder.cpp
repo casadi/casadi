@@ -289,7 +289,7 @@ namespace casadi {
               MX v = read_expr(var);
 
               // Treat as an output
-              add_y(v, "mterm");
+              add_y("mterm", v);
             }
           } catch(exception& ex) {
             throw CasadiException(std::string("addObjectiveFunction failed: ") + ex.what());
@@ -307,7 +307,7 @@ namespace casadi {
 
               // Treat as a quadrature state
               add_q("lterm");
-              add_quad(v, "lterm_rhs");
+              add_quad("lterm_rhs", v);
             }
           } catch(exception& ex) {
             throw CasadiException(std::string("addIntegrandObjectiveFunction failed: ")
@@ -1007,8 +1007,39 @@ namespace casadi {
     return new_aux;
   }
 
+#ifdef WITH_DEPRECATED_FEATURES
   MX DaeBuilder::add_d(const MX& new_ddef, const std::string& name) {
     if (name.empty()) return add_d(new_ddef, "d" + to_string(this->d.size()));
+    return add_d(name, new_ddef);
+  }
+
+  MX DaeBuilder::add_y(const MX& new_ydef, const std::string& name) {
+    if (name.empty()) return add_y(new_ydef, "y" + to_string(this->y.size()));
+    return add_y(name, new_ydef);
+  }
+
+  void DaeBuilder::add_ode(const MX& new_ode, const std::string& name) {
+    if (name.empty()) return add_ode(new_ode, "ode" + to_string(this->ode.size()));
+    return add_ode(name, new_ode);
+  }
+
+  void DaeBuilder::add_dae(const MX& new_dae, const std::string& name) {
+    if (name.empty()) return add_dae(new_dae, "dae" + to_string(this->dae.size()));
+    return add_dae(name, new_dae);
+  }
+
+  void DaeBuilder::add_alg(const MX& new_alg, const std::string& name) {
+    if (name.empty()) return add_alg(new_alg, "alg" + to_string(this->alg.size()));
+    return add_alg(name, new_alg);
+  }
+
+  void DaeBuilder::add_quad(const MX& new_quad, const std::string& name) {
+    if (name.empty()) return add_quad(new_quad, "quad" + to_string(this->quad.size()));
+    return add_quad(name, new_quad);
+  }
+#endif // WITH_DEPRECATED_FEATURES
+
+  MX DaeBuilder::add_d(const std::string& name, const MX& new_ddef) {
     MX new_d = add_variable(name, new_ddef.sparsity());
     this->d.push_back(new_d);
     this->ddef.push_back(new_ddef);
@@ -1016,8 +1047,7 @@ namespace casadi {
     return new_d;
   }
 
-  MX DaeBuilder::add_y(const MX& new_ydef, const std::string& name) {
-    if (name.empty()) return add_y(new_ydef, "y" + to_string(this->y.size()));
+  MX DaeBuilder::add_y(const std::string& name, const MX& new_ydef) {
     MX new_y = add_variable(name, new_ydef.sparsity());
     this->y.push_back(new_y);
     this->ydef.push_back(new_ydef);
@@ -1025,26 +1055,22 @@ namespace casadi {
     return new_y;
   }
 
-  void DaeBuilder::add_ode(const MX& new_ode, const std::string& name) {
-    if (name.empty()) return add_ode(new_ode, "ode" + to_string(this->ode.size()));
+  void DaeBuilder::add_ode(const std::string& name, const MX& new_ode) {
     this->ode.push_back(new_ode);
     this->lam_ode.push_back(MX::sym("lam_" + name, new_ode.sparsity()));
   }
 
-  void DaeBuilder::add_dae(const MX& new_dae, const std::string& name) {
-    if (name.empty()) return add_dae(new_dae, "dae" + to_string(this->dae.size()));
+  void DaeBuilder::add_dae(const std::string& name, const MX& new_dae) {
     this->dae.push_back(new_dae);
     this->lam_dae.push_back(MX::sym("lam_" + name, new_dae.sparsity()));
   }
 
-  void DaeBuilder::add_alg(const MX& new_alg, const std::string& name) {
-    if (name.empty()) return add_alg(new_alg, "alg" + to_string(this->alg.size()));
+  void DaeBuilder::add_alg(const std::string& name, const MX& new_alg) {
     this->alg.push_back(new_alg);
     this->lam_alg.push_back(MX::sym("lam_" + name, new_alg.sparsity()));
   }
 
-  void DaeBuilder::add_quad(const MX& new_quad, const std::string& name) {
-    if (name.empty()) return add_quad(new_quad, "quad" + to_string(this->quad.size()));
+  void DaeBuilder::add_quad(const std::string& name, const MX& new_quad) {
     this->quad.push_back(new_quad);
     this->lam_quad.push_back(MX::sym("lam_" + name, new_quad.sparsity()));
   }
@@ -1986,5 +2012,6 @@ namespace casadi {
     fun.push_back(ret);
     return ret;
   }
+
 
 } // namespace casadi
