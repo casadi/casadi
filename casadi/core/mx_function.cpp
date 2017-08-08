@@ -644,8 +644,8 @@ namespace casadi {
 
     // Check if seeds need to have dimensions corrected
     for (auto&& r : fseed) {
-      if (!matchingArg(r)) {
-        return ad_forward(replaceFwdSeed(fseed), fsens);
+      if (!matching_arg(r)) {
+        return ad_forward(replace_fseed(fseed), fsens);
       }
     }
 
@@ -792,8 +792,8 @@ namespace casadi {
 
     // Check if seeds need to have dimensions corrected
     for (auto&& r : aseed) {
-      if (!matchingRes(r)) {
-        return ad_reverse(replaceAdjSeed(aseed), asens);
+      if (!matching_res(r)) {
+        return ad_reverse(replace_aseed(aseed), asens);
       }
     }
 

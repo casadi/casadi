@@ -2168,8 +2168,8 @@ namespace casadi {
 
     // Check if seeds need to have dimensions corrected
     for (auto&& r : fseed) {
-      if (!matchingArg(r)) {
-        return FunctionInternal::call_forward(arg, res, replaceFwdSeed(fseed),
+      if (!matching_arg(r)) {
+        return FunctionInternal::call_forward(arg, res, replace_fseed(fseed),
                                             fsens, always_inline, never_inline);
       }
     }
@@ -2273,8 +2273,8 @@ namespace casadi {
 
     // Check if seeds need to have dimensions corrected
     for (auto&& r : aseed) {
-      if (!matchingRes(r)) {
-        return FunctionInternal::call_reverse(arg, res, replaceAdjSeed(aseed),
+      if (!matching_res(r)) {
+        return FunctionInternal::call_reverse(arg, res, replace_aseed(aseed),
                                             asens, always_inline, never_inline);
       }
     }
@@ -2514,13 +2514,13 @@ namespace casadi {
     int n = x.size();
     bool matching=true;
     for (int i=0; i<n; ++i) {
-      matching = matchingArg(x[i]) && matching; // non-short circuiting
+      matching = matching_arg(x[i]) && matching; // non-short circuiting
     }
 
     // Replace arguments if needed
     if (!matching) {
       vector<vector<MX> > x_new(n);
-      for (int i=0; i<n; ++i) x_new[i] = replaceArg(x[i]);
+      for (int i=0; i<n; ++i) x_new[i] = replace_arg(x[i]);
       return map_mx(x_new, parallelization);
     }
 
@@ -2546,8 +2546,8 @@ namespace casadi {
     if (x.empty()) return x;
 
     // Replace arguments if needed
-    if (!matchingArg(x, true)) {
-      vector< MX > x_new = replaceArg(x, true);
+    if (!matching_arg(x, true)) {
+      vector< MX > x_new = replace_arg(x, true);
       return map_mx(x_new, parallelization);
     }
 
@@ -2581,8 +2581,8 @@ namespace casadi {
     if (x.empty()) return x;
 
     // Replace arguments if needed
-    if (!matchingArg(x, true)) {
-      vector< MX > x_new = replaceArg(x, true);
+    if (!matching_arg(x, true)) {
+      vector< MX > x_new = replace_arg(x, true);
       return mapsum_mx(x_new, parallelization);
     }
 
@@ -2604,7 +2604,7 @@ namespace casadi {
     return ms(x);
   }
 
-  bool FunctionInternal::checkMat(const Sparsity& arg, const Sparsity& inp, bool hcat) {
+  bool FunctionInternal::check_mat(const Sparsity& arg, const Sparsity& inp, bool hcat) {
     return arg.size()==inp.size() || arg.is_empty() || arg.is_scalar() ||
       (inp.size2()==arg.size1() && inp.size1()==arg.size2()
        && (arg.is_column() || inp.is_column())) ||
