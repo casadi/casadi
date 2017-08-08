@@ -2510,20 +2510,33 @@ namespace casadi {
                               const std::string& parallelization) {
     if (x.empty()) return x;
 
-    // Replace arguments if needed
-    if (!matching_arg(x, true)) {
-      vector< MX > x_new = replace_arg(x, true);
-      return mapsum_mx(x_new, parallelization);
+    // Check number of arguments
+    int n_in = this->n_in();
+    casadi_assert_message(x.size()==n_in, "mapsum_mx: Wrong number of arguments");
+
+    // Check/replace arguments
+    std::vector<MX> x_mod(x.size());
+    for (int i=0; i<n_in; ++i) {
+      if (check_mat(x[i].sparsity(), sparsity_in(i))) {
+        // Matching arguments according to normal function call rules
+        x_mod[i] = replace_mat(x[i], sparsity_in(i));
+      } else if (x[i].size1()==size1_in(i) && x[i].size2() % size2_in(i)==0) {
+        // Matching horzcat dimensions
+        x_mod[i] = x[i];
+      } else {
+        // Mismatching sparsity: The following will throw an error message
+        check_arg(x);
+      }
     }
 
     int n = 1;
-    for (int i=0;i<x.size();++i) {
-      n = max(x[i].size2()/size2_in(i), n);
+    for (int i=0;i<x_mod.size();++i) {
+      n = max(x_mod[i].size2()/size2_in(i), n);
     }
 
     vector<int> reduce_in;
-    for (int i=0;i<x.size();++i) {
-      if (x[i].size2()/size2_in(i)!=n) {
+    for (int i=0;i<x_mod.size();++i) {
+      if (x_mod[i].size2()/size2_in(i)!=n) {
         reduce_in.push_back(i);
       }
     }
@@ -2531,7 +2544,7 @@ namespace casadi {
     Function ms = self().map("mapsum", parallelization, n, reduce_in, range(n_out()));
 
     // Call the internal function
-    return ms(x);
+    return ms(x_mod);
   }
 
   bool FunctionInternal::check_mat(const Sparsity& arg, const Sparsity& inp, bool hcat) {
