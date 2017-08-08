@@ -177,36 +177,30 @@ namespace casadi {
                bool always_inline, bool never_inline) const;
 
     /** Helper function */
-    static bool check_mat(const Sparsity& arg, const Sparsity& inp, bool hcat=false);
+    static bool check_mat(const Sparsity& arg, const Sparsity& inp);
 
     /** \brief Check if input arguments have correct length and dimensions
-     *
-     * \param hcat check if horizontal repetion of the function input is allowed
      */
     template<typename M>
-      void check_arg(const std::vector<M>& arg, bool hcat=false) const;
+      void check_arg(const std::vector<M>& arg) const;
 
     /** \brief Check if output arguments have correct length and dimensions */
     template<typename M>
       void check_res(const std::vector<M>& res) const;
 
     /** \brief Check if input arguments that needs to be replaced
-     *
-     * \param hcat check if horizontal repetion of the function input is allowed
      */
     template<typename M>
-      bool matching_arg(const std::vector<M>& arg, bool hcat=false) const;
+      bool matching_arg(const std::vector<M>& arg) const;
 
     /** \brief Check if output arguments that needs to be replaced */
     template<typename M>
       bool matching_res(const std::vector<M>& arg) const;
 
     /** \brief Replace 0-by-0 inputs
-     *
-     * \param hcat check if horizontal repetion of the function input is allowed
      */
     template<typename M>
-      std::vector<M> replace_arg(const std::vector<M>& arg, bool hcat=false) const;
+      std::vector<M> replace_arg(const std::vector<M>& arg) const;
 
     /** \brief Replace 0-by-0 outputs */
     template<typename M>
@@ -891,12 +885,12 @@ namespace casadi {
   }
 
   template<typename M>
-  void FunctionInternal::check_arg(const std::vector<M>& arg, bool hcat) const {
+  void FunctionInternal::check_arg(const std::vector<M>& arg) const {
     int n_in = this->n_in();
     casadi_assert_message(arg.size()==n_in, "Incorrect number of inputs: Expected "
                           << n_in << ", got " << arg.size());
     for (int i=0; i<n_in; ++i) {
-      casadi_assert_message(check_mat(arg[i].sparsity(), sparsity_in(i), hcat),
+      casadi_assert_message(check_mat(arg[i].sparsity(), sparsity_in(i)),
                             "Input " << i << " (" << name_in(i) << ") has mismatching shape. "
                             << "Expected " << size_in(i) << ", got " << arg[i].size());
     }
@@ -915,16 +909,11 @@ namespace casadi {
   }
 
   template<typename M>
-  bool FunctionInternal::matching_arg(const std::vector<M>& arg, bool hcat) const {
-    check_arg(arg, hcat);
+  bool FunctionInternal::matching_arg(const std::vector<M>& arg) const {
+    check_arg(arg);
     int n_in = this->n_in();
     for (int i=0; i<n_in; ++i) {
-      if (hcat) {
-        if (arg.at(i).size1()!=size1_in(i)) return false;
-        if (arg.at(i).size2() % size2_in(i)!=0 || arg.at(i).size2()==0) return false;
-      } else {
-        if (arg.at(i).size()!=size_in(i)) return false;
-      }
+      if (arg.at(i).size()!=size_in(i)) return false;
     }
     return true;
   }
@@ -940,13 +929,9 @@ namespace casadi {
   }
 
   template<typename M>
-  M replace_mat(const M& arg, const Sparsity& inp, bool hcat=false) {
+  M replace_mat(const M& arg, const Sparsity& inp) {
     if (arg.size()==inp.size()) {
       // Matching dimensions already
-      return arg;
-    } else if (hcat && arg.size1()==inp.size1() && arg.size2() % inp.size2()==0
-               && arg.size2() >=0) {
-      // Matching horzcat dimensions
       return arg;
     } else if (arg.is_empty()) {
       // Empty matrix means set zero
@@ -963,9 +948,9 @@ namespace casadi {
   }
 
   template<typename M>
-  std::vector<M> FunctionInternal::replace_arg(const std::vector<M>& arg, bool hcat) const {
+  std::vector<M> FunctionInternal::replace_arg(const std::vector<M>& arg) const {
     std::vector<M> r(arg.size());
-    for (int i=0; i<r.size(); ++i) r[i] = replace_mat(arg[i], sparsity_in(i), hcat);
+    for (int i=0; i<r.size(); ++i) r[i] = replace_mat(arg[i], sparsity_in(i));
     return r;
   }
 

@@ -2547,11 +2547,18 @@ namespace casadi {
     return ms(x_mod);
   }
 
-  bool FunctionInternal::check_mat(const Sparsity& arg, const Sparsity& inp, bool hcat) {
-    return arg.size()==inp.size() || arg.is_empty() || arg.is_scalar() ||
-      (inp.size2()==arg.size1() && inp.size1()==arg.size2()
-       && (arg.is_column() || inp.is_column())) ||
-      (hcat && arg.size1()==inp.size1() && arg.size2() % inp.size2()==0);
+  bool FunctionInternal::check_mat(const Sparsity& arg, const Sparsity& inp) {
+    // Matching dimensions
+    if (arg.size()==inp.size()) return true;
+    // Calling with empty matrix - set all to zero
+    if (arg.is_empty()) return true;
+    // Calling with a scalar - set all
+    if (arg.is_scalar()) return true;
+    // Vectors that are transposes of each other
+    if (inp.size2()==arg.size1() && inp.size1()==arg.size2()
+        && (arg.is_column() || inp.is_column())) return true;
+    // No match
+    return false;
   }
 
   void FunctionInternal::setup(void* mem, const double** arg, double** res,
