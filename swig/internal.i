@@ -397,6 +397,9 @@
 %exception  casadi::FunctionInternal::adjViaJac(int nadj) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::FunctionInternal::all_scalar() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::FunctionInternal::alloc(const Function &f, bool persistent=false) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -430,13 +433,13 @@
 %exception  casadi::FunctionInternal::call_reverse(const std::vector< SX > &arg, const std::vector< SX > &res, const std::vector< std::vector< SX > > &aseed, std::vector< std::vector< SX > > &asens, bool always_inline, bool never_inline) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::FunctionInternal::checkArg(const std::vector< M > &arg, bool hcat=false) const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::FunctionInternal::checkInputs() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::FunctionInternal::checkRes(const std::vector< M > &res) const  {
+%exception  casadi::FunctionInternal::check_arg(const std::vector< M > &arg) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::FunctionInternal::check_res(const std::vector< M > &res) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::checkout() const  {
@@ -634,19 +637,13 @@
 %exception  casadi::FunctionInternal::log(const std::string &msg) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::FunctionInternal::map_mx(const std::vector< MX > &arg, const std::string &parallelization) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::FunctionInternal::map_mx(const std::vector< std::vector< MX > > &arg, const std::string &parallelization) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::FunctionInternal::mapsum_mx(const std::vector< MX > &arg, const std::string &parallelization) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::FunctionInternal::matchingArg(const std::vector< M > &arg, bool hcat=false) const  {
+%exception  casadi::FunctionInternal::matching_arg(const std::vector< M > &arg) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::FunctionInternal::matchingRes(const std::vector< M > &arg) const  {
+%exception  casadi::FunctionInternal::matching_res(const std::vector< M > &arg) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::max_in(int ind) const  {
@@ -736,16 +733,16 @@
 %exception  casadi::FunctionInternal::release(int mem) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::FunctionInternal::replaceAdjSeed(const std::vector< std::vector< M > > &aseed) const  {
+%exception  casadi::FunctionInternal::replace_arg(const std::vector< M > &arg) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::FunctionInternal::replaceArg(const std::vector< M > &arg, bool hcat=false) const  {
+%exception  casadi::FunctionInternal::replace_aseed(const std::vector< std::vector< M > > &aseed) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::FunctionInternal::replaceFwdSeed(const std::vector< std::vector< M > > &fseed) const  {
+%exception  casadi::FunctionInternal::replace_fseed(const std::vector< std::vector< M > > &fseed) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::FunctionInternal::replaceRes(const std::vector< M > &res) const  {
+%exception  casadi::FunctionInternal::replace_res(const std::vector< M > &res) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::repr(std::ostream &stream) const override {
@@ -1633,7 +1630,7 @@
 %exception  casadi::matrixName< SXElem >() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::replaceMat(const M &arg, const Sparsity &inp, bool hcat=false) {
+%exception  casadi::replace_mat(const M &arg, const Sparsity &inp) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::zip(const std::vector< std::string > &id, const std::vector< T > &mat) {
