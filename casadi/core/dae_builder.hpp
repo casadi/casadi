@@ -136,6 +136,9 @@ namespace casadi {
     std::vector<MX> d, ddef, lam_ddef;
     ///@}
 
+    /** \brief Auxiliary variables: Used e.g. to define functions */
+    std::vector<MX> aux;
+
     /** \brief Initial conditions
      * At <tt>t==0</tt>, <tt>0 == init(sdot, s, ...)</tt> holds in addition to
      * the ode and/or dae.
@@ -182,6 +185,9 @@ namespace casadi {
 
     /// Add a quadrature equation
     void add_quad(const MX& new_quad, const std::string& name=std::string());
+
+    /// Add an auxiliary variable
+    MX add_aux(const std::string& name=std::string(), int n=1);
 
     /// Check if dimensions match
     void sanity_check() const;
