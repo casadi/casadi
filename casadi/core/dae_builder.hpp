@@ -139,6 +139,9 @@ namespace casadi {
     /** \brief Auxiliary variables: Used e.g. to define functions */
     std::vector<MX> aux;
 
+    /** \brief Functions */
+    std::vector<Function> fun;
+
     /** \brief Initial conditions
      * At <tt>t==0</tt>, <tt>0 == init(sdot, s, ...)</tt> holds in addition to
      * the ode and/or dae.
@@ -188,6 +191,11 @@ namespace casadi {
 
     /// Add an auxiliary variable
     MX add_aux(const std::string& name=std::string(), int n=1);
+
+    /// Add a function
+    Function add_fun(const std::string& name,
+                     const std::vector<std::string>& arg,
+                     const std::vector<std::string>& res);
 
     /// Check if dimensions match
     void sanity_check() const;
@@ -313,7 +321,7 @@ namespace casadi {
 
     /// Add a named linear combination of output expressions
     MX add_lc(const std::string& name,
-                            const std::vector<std::string>& f_out);
+              const std::vector<std::string>& f_out);
 
     /// Construct a function object
     Function create(const std::string& fname,
@@ -322,7 +330,10 @@ namespace casadi {
     ///@}
 
     /// Get variable expression by name
-    MX operator()(const std::string& name) const;
+    MX var(const std::string& name) const;
+
+    /// Get variable expression by name
+    MX operator()(const std::string& name) const {return var(name);}
 
     /// Get a derivative expression by name
     MX der(const std::string& name) const;

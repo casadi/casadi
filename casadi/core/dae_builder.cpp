@@ -1146,7 +1146,7 @@ namespace casadi {
     return qn.str();
   }
 
-  MX DaeBuilder::operator()(const std::string& name) const {
+  MX DaeBuilder::var(const std::string& name) const {
     return variable(name).v;
   }
 
@@ -1962,8 +1962,29 @@ namespace casadi {
     }
 
     // Generate the constructed function
-    return Function(fname, ret_in, ret_out,
-                    {{"input_scheme", s_in}, {"output_scheme", s_out}});
+    return Function(fname, ret_in, ret_out, s_in, s_out);
+  }
+
+  Function DaeBuilder::add_fun(const std::string& name,
+                               const std::vector<std::string>& arg,
+                               const std::vector<std::string>& res) {
+    // Get inputs
+    vector<MX> arg_ex, res_ex;
+    for (auto&& s : arg) arg_ex.push_back(var(s));
+    for (auto&& s : res) {
+      // Find the binding expression FIXME(@jaeandersson)
+      int d_ind;
+      for (d_ind=0; d_ind<this->d.size(); ++d_ind) {
+        if (s==this->d.at(d_ind).name()) {
+          res_ex.push_back(this->ddef.at(d_ind));
+          break;
+        }
+      }
+      casadi_assert_message(d_ind<this->d.size(), "Cannot find dependent '" + s + "'");
+    }
+    Function ret(name, arg_ex, res_ex, arg, res);
+    fun.push_back(ret);
+    return ret;
   }
 
 } // namespace casadi
