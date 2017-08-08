@@ -246,13 +246,8 @@ namespace casadi {
                             bool always_inline, bool never_inline) const;
     ///@}
 
-    ///@{
     /** \brief Parallel evaluation */
-    std::vector<std::vector<MX> > map_mx(const std::vector<std::vector<MX> > &arg,
-                                         const std::string& parallelization);
-    std::vector<MX> map_mx(const std::vector<MX > &arg, const std::string& parallelization);
     std::vector<MX> mapsum_mx(const std::vector<MX > &arg, const std::string& parallelization);
-    ///@}
 
     /** \brief Do the derivative functions need nondifferentiated outputs? */
     virtual bool uses_output() const {return false;}
