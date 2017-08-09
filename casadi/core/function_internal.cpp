@@ -417,7 +417,18 @@ namespace casadi {
   }
 
   void FunctionInternal::repr(ostream &stream) const {
-    stream << name_;
+    // Print name
+    stream << name_ << ":";
+    // Print input arguments
+    for (int i=0; i<n_in(); ++i) {
+      stream << (i==0 ? "(" : ",") << name_in(i);
+    }
+    stream << ")->";
+    // Print output arguments
+    for (int i=0; i<n_out(); ++i) {
+      stream << (i==0 ? "(" : ",") << name_out(i);
+    }
+    stream << ")";
   }
 
   Function FunctionInternal::wrap() const {
