@@ -108,7 +108,7 @@ namespace casadi {
     int n_;
 
     // Dimensions
-    int n_z_, n_f_;
+    int n_z_, n_r_;
 
     // Perturbation
     double h_, h2_;

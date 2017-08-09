@@ -321,21 +321,18 @@ namespace casadi {
     s << this->auxiliaries.str();
 
     // Print integer constants
-    stringstream name;
     for (int i=0; i<integer_constants_.size(); ++i) {
-      name.str(string());
-      name << "CASADI_PREFIX(s" << i << ")";
-      print_vector(s, name.str(), integer_constants_[i]);
+      print_vector(s, "CASADI_PREFIX(s" + to_string(i) + ")", integer_constants_[i]);
       s << "#define s" << i << " CASADI_PREFIX(s" << i << ")" << endl;
     }
+    if (!integer_constants_.empty()) s << endl;
 
     // Print double constants
     for (int i=0; i<double_constants_.size(); ++i) {
-      name.str(string());
-      name << "CASADI_PREFIX(c" << i << ")";
-      print_vector(s, name.str(), double_constants_[i]);
+      print_vector(s, "CASADI_PREFIX(c" + to_string(i) + ")", double_constants_[i]);
       s << "#define c" << i << " CASADI_PREFIX(c" << i << ")" << endl;
     }
+    if (!double_constants_.empty()) s << endl;
 
     // Codegen body
     s << this->body.str();
@@ -772,7 +769,7 @@ namespace casadi {
   }
 
   std::string CodeGenerator::dot(int n, const std::string& x,
-                                        const std::string& y) {
+                                 const std::string& y) {
     addAuxiliary(AUX_DOT);
     stringstream s;
     s << "dot(" << n << ", " << x << ", " << y << ")";

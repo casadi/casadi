@@ -75,10 +75,10 @@ namespace casadi {
 
     // Allocate work vector for (perturbed) inputs and outputs
     n_z_ = derivative_of_.nnz_in();
-    n_f_ = derivative_of_.nnz_out();
+    n_r_ = derivative_of_.nnz_out();
     alloc_w(2 * n_, true); // m->x, m->x0
-    alloc_w(2 * n_f_, true); // m->f, m->f0
-    alloc_w(n_*n_f_, true); // m->J
+    alloc_w(2 * n_r_, true); // m->r, m->r0
+    alloc_w(n_*n_r_, true); // m->J
     alloc_w(n_z_, true); // z
 
     // Allocate sufficient temporary memory for function evaluation
@@ -148,10 +148,10 @@ namespace casadi {
     int n_in = derivative_of_.n_in(), n_out = derivative_of_.n_out();
 
     // Non-differentiated input
-    const double** z0 = arg; arg += n_in;
+    const double** r0 = arg; arg += n_in;
 
     // Non-differentiated output
-    double* f = w;
+    double* r = w;
     for (int j=0; j<n_out; ++j) {
       const int nnz = derivative_of_.nnz_out(j);
       casadi_copy(*arg++, nnz, w);
@@ -167,13 +167,13 @@ namespace casadi {
     // Memory structure
     casadi_central_diff_mem<double> m_tmp, *m = &m_tmp;
     m->n_x = n_;
-    m->n_f = n_f_;
+    m->n_r = n_r_;
     m->h = h_;
-    m->f = f;
+    m->r = r;
     m->x = w; w += n_;
-    m->J = w; w += n_f_*n_;
+    m->J = w; w += n_r_*n_;
     m->x0 = w; w += n_;
-    m->f0 = w; w += n_f_;
+    m->r0 = w; w += n_r_;
     m->status = 0;
 
     // central_diff only sees a function with n_ inputs, initialized at 0
@@ -186,8 +186,8 @@ namespace casadi {
       w += derivative_of_.nnz_in(j);
     }
     for (int j=0; j<n_out; ++j) {
-      res[j] = f;
-      f += derivative_of_.nnz_out(j);
+      res[j] = r;
+      r += derivative_of_.nnz_out(j);
     }
 
     // Call reverse communication algorithm
@@ -195,7 +195,7 @@ namespace casadi {
       double* z1 = z;
       for (int j=0; j<n_in; ++j) {
         int nnz = derivative_of_.nnz_in(j);
-        casadi_copy(z0[j], nnz, z1);
+        casadi_copy(r0[j], nnz, z1);
         casadi_mv_dense(seed[j], nnz, n_, m->x, z1, false);
         z1 += nnz;
       }
@@ -221,12 +221,12 @@ namespace casadi {
     int n_in = derivative_of_.n_in(), n_out = derivative_of_.n_out();
 
     g.comment("Non-differentiated input");
-    g.local("z0", "const real_t", "**");
-    g << "z0 = arg; arg += " << n_in << ";\n";
+    g.local("r0", "const real_t", "**");
+    g << "r0 = arg; arg += " << n_in << ";\n";
 
     g.comment("Non-differentiated output");
-    g.local("f", "real_t", "*");
-    g << "f = w;\n";
+    g.local("r", "real_t", "*");
+    g << "r = w;\n";
     for (int j=0; j<n_out; ++j) {
       const int nnz = derivative_of_.nnz_out(j);
       g << g.copy("*arg++", nnz, "w") << " w += " << nnz << ";\n";
@@ -245,24 +245,26 @@ namespace casadi {
     g.local("m", "central_diff_mem", "*");
     g << "m = &m_tmp;\n"
       << "m->n_x = " << n_ << ";\n"
-      << "m->n_f = " << n_f_ << ";\n"
+      << "m->n_r = " << n_r_ << ";\n"
       << "m->h = " << h_ << ";\n"
-      << "m->f = f;\n"
+      << "m->r = r;\n"
       << "m->x = w; w += " << n_ << ";\n"
-      << "m->J = w; w += " << n_f_*n_ << ";\n"
+      << "m->J = w; w += " << n_r_*n_ << ";\n"
       << "m->x0 = w; w += " << n_ << ";\n"
-      << "m->f0 = w; w += " << n_f_ << ";\n"
+      << "m->r0 = w; w += " << n_r_ << ";\n"
       << "m->status = 0;\n";
     g << g.fill("m->x", n_, "0.") << "\n";
 
-    g.comment("Setup arg, res for calling function");
+    g.comment("Setup buffers for calling function");
     g.local("z", "real_t", "*");
     g << "z = w;\n";
-    for (int j=0; j<n_in; ++j) {
-      g << "arg[" << j << "] = w; w += " << derivative_of_.nnz_in(j) << ";\n";
-    }
-    for (int j=0; j<n_out; ++j) {
-      g << "res[" << j << "] = f; f += " << derivative_of_.nnz_out(j) << ";\n";
+    if (!derivative_of_->simplifiedCall()) {
+      for (int j=0; j<n_in; ++j) {
+        g << "arg[" << j << "] = w; w += " << derivative_of_.nnz_in(j) << ";\n";
+      }
+      for (int j=0; j<n_out; ++j) {
+        g << "res[" << j << "] = r; r += " << derivative_of_.nnz_out(j) << ";\n";
+      }
     }
 
     g.comment("Invoke reverse communication algorithm");
@@ -271,12 +273,16 @@ namespace casadi {
     g << "z1 = z;\n";
     for (int j=0; j<n_in; ++j) {
       int nnz = derivative_of_.nnz_in(j);
-      g << g.copy("z0[" + to_string(j) + "]", nnz, "z1") << "\n"
+      g << g.copy("r0[" + to_string(j) + "]", nnz, "z1") << "\n"
         << g.mv("seed[" + to_string(j) + "]", nnz, n_, "m->x", "z1", false) << "\n"
         << "z1 += " << nnz << ";\n";
     }
-    g << "if (" << g(derivative_of_, "arg", "res", "iw", "w") << ") return 1;\n"
-      << "}\n"; // while (...)
+    if (derivative_of_->simplifiedCall()) {
+      g << g(derivative_of_, "z", "w") << ";\n";
+    } else {
+      g << "if (" << g(derivative_of_, "arg", "res", "iw", "w") << ") return 1;\n";
+    }
+    g << "}\n"; // while (...)
 
     g.comment("Gather sensitivities");
     g.local("i", "int");

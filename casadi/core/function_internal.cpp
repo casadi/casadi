@@ -1644,7 +1644,7 @@ namespace casadi {
   }
 
   void FunctionInternal::codegen(CodeGenerator& g,
-                                          const std::string& fname, bool decl_static) const {
+                                 const std::string& fname, bool decl_static) const {
     // Add standard math
     g.addInclude("math.h");
 
@@ -1688,7 +1688,7 @@ namespace casadi {
 
     // Finalize the function
     if (!simplifiedCall()) g << "return 0;\n";
-    g << "}\n\n";
+    g << "}\n";
 
     // Flush to function body
     g.flush(g.body);
