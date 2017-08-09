@@ -85,14 +85,27 @@ U = dae.add_x('U') # Velocity along the X axis
 V = dae.add_x('V') # Velocity along the Y axis
 phi = dae.add_x('phi') # Roll angle
 theta = dae.add_x('theta') # Yaw angle
+dphi = dae.add_x('dphi') # Time derivative of phi
+dtheta = dae.add_x('dtheta') # Time derivative of theta
+
+# Sum contributions from hull and sail (?)
+m_y = m_y_hull + m_y_sail
+Jxx = Jxx_hull + Jxx_sail
 
 # Auxiliary variables
 
 # Squared boat velocity
 V_B2 = U**2 + V**2
 
-# Misc common subexpressions
+# To avoid duplicate expressions
+cos_phi = cos(phi)
+sin_phi = sin(phi)
+cos2_phi = cos_phi**2
+sin2_phi = sin_phi**2
 phi2 = phi**2
+
+# Hull resistence in the upright position
+X_0 = 0. # Neglected
 
 # Calculate hydrodynamic forces
 beta = dae.add_aux('beta') # Leeway angle
@@ -121,10 +134,58 @@ for i,c in enumerate(['X_H', 'Y_H', 'K_H', 'N_H']):
     plt.title('log10(' + c + ')')
     plt.grid(True)
 
-# Set directory with external functions
-from os import path
-curr_dir = path.dirname(path.abspath(__file__
-dae.set_external_dir(curr_dir + '/external/')
+# Make a function call
+X_H, Y_H, K_H, N_H = H(phi, pi/4, U, V)
 
+# Hydrodynamic derivatives of the hull due to yawing motion
+X_VT = 0. # Neglected
+Y_T = 0. # Neglected
+N_T = 0. # Neglected
+
+# Derivative due to rolling
+Y_P = 0. # Neglected
+K_P = 0. # Neglected
+
+# Hydrodynamic forces on the rudder
+X_R = 0. # Neglected
+Y_R = 0. # Neglected
+K_R = 0. # Neglected
+N_R = 0. # Neglected
+
+# Sail forces
+X_S = 0. # Neglected
+Y_S = 0. # Neglected
+K_S = 0. # Neglected
+N_S = 0. # Neglected
+
+# Surge: (m+m_x)*dot(U) = F_X, cf. (3) [MF2011]
+F_X = X_0 + X_H + X_R + X_S \
+    + (m + m_y*cos2_phi + m_z*sin2_phi + X_VT)*V*dtheta
+dae.add_ode("surge", F_X / (m+m_x))
+
+# Sway: (m + m_y*cos2_phi + m_z*sin2_phi)*dot(V) = F_Y
+F_Y = Y_H + Y_P*dphi + Y_T*dtheta + Y_R + Y_S \
+    - (m + m_x)*U*dtheta \
+    - 2*(m_z - m_y)*sin_phi*cos_phi*V*dphi
+dae.add_ode("sway", F_Y / (m + m_y*cos2_phi + m_z*sin2_phi))
+
+# Roll: (Ixx + Jxx)*dot(dphi) = F_K
+F_K = K_H + K_P*dphi + K_R + K_S - m*g*GM*sin_phi \
+    + ((Iyy+Jyy)-(Izz+Jzz))*sin_phi*cos_phi*dtheta**2
+dae.add_ode("roll", F_K / (Ixx + Jxx))
+
+# Yaw: ((Iyy+Jyy)*sin2_phi + (Izz+Jzz)*cos2_phi)*dot(dtheta) = F_N
+F_N = N_H + N_T*dtheta + N_R + N_S \
+    -2*((Iyy+Jyy)-(Izz+Jzz))*sin_phi*cos_phi*dtheta*dphi
+dae.add_ode("yaw", F_N / ((Iyy+Jyy)*sin2_phi + (Izz+Jzz)*cos2_phi))
+
+# Roll angle
+dae.add_ode("roll_angle", dphi)
+
+# Yaw angle
+dae.add_ode("yaw_angle", dtheta)
+
+# Print ODE
+print(dae)
 
 plt.show()
