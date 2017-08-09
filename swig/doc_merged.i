@@ -10157,6 +10157,12 @@ simplified signature.
 
 */
 
+/*  Functions  */
+
+/* Add or load auxiliary functions
+
+*/
+
 /*  Import and export  */ %feature("docstring") casadi::DaeBuilder::add_s "
 
 Add a implicit state.
@@ -10165,7 +10171,20 @@ Add a implicit state.
 
 %feature("docstring") casadi::DaeBuilder::add_fun "
 
-Add a function.
+>  Function casadi::DaeBuilder::add_fun(const std::string &name, const std::vector< std::string > &arg, const std::vector< std::string > &res, const Dict &opts=Dict())
+------------------------------------------------------------------------
+
+Add a function from loaded expressions.
+
+>  Function casadi::DaeBuilder::add_fun(const Function &f)
+------------------------------------------------------------------------
+
+Add an already existing function.
+
+>  Function casadi::DaeBuilder::add_fun(const std::string &name, const Importer &compiler, const Dict &opts=Dict())
+------------------------------------------------------------------------
+
+Add an external function.
 
 ";
 
@@ -10319,6 +10338,12 @@ Sort the algebraic equations and algebraic states.
 
 ";
 
+%feature("docstring") casadi::DaeBuilder::fun "
+
+Get function by name.
+
+";
+
 %feature("docstring") casadi::DaeBuilder::add_dae "
 
 >  void casadi::DaeBuilder::add_dae(const std::string &name, const MX &new_dae)
@@ -10458,17 +10483,9 @@ Add a new control.
 
 ";
 
-%feature("docstring") casadi::DaeBuilder::set_guess "
+%feature("docstring") casadi::DaeBuilder::has_fun "
 
->  void casadi::DaeBuilder::set_guess(const std::string &name, double val, bool normalized=false)
-------------------------------------------------------------------------
-
-Set the initial guess by name.
-
->  void casadi::DaeBuilder::set_guess(const MX &var, const std::vector< double > &val, bool normalized=false)
-------------------------------------------------------------------------
-
-Set the initial guess(es) by expression.
+Does a particular function already exist?
 
 ";
 
@@ -10571,6 +10588,20 @@ Add a new dependent parameter. Old syntax: Swap arguments.
 %feature("docstring") casadi::DaeBuilder::split_dae "
 
 Identify and separate the algebraic variables and equations in the DAE.
+
+";
+
+%feature("docstring") casadi::DaeBuilder::set_guess "
+
+>  void casadi::DaeBuilder::set_guess(const std::string &name, double val, bool normalized=false)
+------------------------------------------------------------------------
+
+Set the initial guess by name.
+
+>  void casadi::DaeBuilder::set_guess(const MX &var, const std::vector< double > &val, bool normalized=false)
+------------------------------------------------------------------------
+
+Set the initial guess(es) by expression.
 
 ";
 

@@ -13788,6 +13788,12 @@ const  "
 
 */
 
+/*  Functions  */
+
+/* Add or load auxiliary functions
+
+*/
+
 /*  Import and export  */ %feature("docstring")
 casadi::DaeBuilder::add_s(const std::string &name=std::string(), int n=1) "
 
@@ -13797,9 +13803,22 @@ Add a implicit state.
 
 %feature("docstring")  casadi::DaeBuilder::add_fun(const std::string &name,
 const std::vector< std::string > &arg, const std::vector< std::string >
-&res) "
+&res, const Dict &opts=Dict()) "
 
-Add a function.
+Add a function from loaded expressions.
+
+";
+
+%feature("docstring")  casadi::DaeBuilder::add_fun(const Function &f) "
+
+Add an already existing function.
+
+";
+
+%feature("docstring")  casadi::DaeBuilder::add_fun(const std::string &name,
+const Importer &compiler, const Dict &opts=Dict()) "
+
+Add an external function.
 
 ";
 
@@ -13957,6 +13976,13 @@ Sort the algebraic equations and algebraic states.
 
 ";
 
+%feature("docstring")  casadi::DaeBuilder::fun(const std::string &name)
+const  "
+
+Get function by name.
+
+";
+
 %feature("docstring")  casadi::DaeBuilder::add_dae(const std::string &name,
 const MX &new_dae) "
 
@@ -14102,17 +14128,10 @@ Add a new control.
 
 ";
 
-%feature("docstring")  casadi::DaeBuilder::set_guess(const std::string
-&name, double val, bool normalized=false) "
+%feature("docstring")  casadi::DaeBuilder::has_fun(const std::string &name)
+const  "
 
-Set the initial guess by name.
-
-";
-
-%feature("docstring")  casadi::DaeBuilder::set_guess(const MX &var, const
-std::vector< double > &val, bool normalized=false) "
-
-Set the initial guess(es) by expression.
+Does a particular function already exist?
 
 ";
 
@@ -14223,6 +14242,20 @@ std::string &name=std::string()) "
 %feature("docstring")  casadi::DaeBuilder::split_dae() "
 
 Identify and separate the algebraic variables and equations in the DAE.
+
+";
+
+%feature("docstring")  casadi::DaeBuilder::set_guess(const std::string
+&name, double val, bool normalized=false) "
+
+Set the initial guess by name.
+
+";
+
+%feature("docstring")  casadi::DaeBuilder::set_guess(const MX &var, const
+std::vector< double > &val, bool normalized=false) "
+
+Set the initial guess(es) by expression.
 
 ";
 
