@@ -33,6 +33,9 @@ import numpy
 # "Tacking Simulation of Sailing Yachts with New Model of Aerodynamic
 # Force Variation During Tacking Maneuver"
 # Journal of Sailboat Technology, Article 2011-01
+#
+# Joel Andersson, UW Madison 2017
+#
 
 # Create DaeBuilder instance
 dae = DaeBuilder()

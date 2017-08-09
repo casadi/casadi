@@ -139,9 +139,6 @@ namespace casadi {
     /** \brief Auxiliary variables: Used e.g. to define functions */
     std::vector<MX> aux;
 
-    /** \brief Functions */
-    std::vector<Function> fun;
-
     /** \brief Initial conditions
      * At <tt>t==0</tt>, <tt>0 == init(sdot, s, ...)</tt> holds in addition to
      * the ode and/or dae.
@@ -335,6 +332,9 @@ namespace casadi {
     /// Get variable expression by name
     MX operator()(const std::string& name) const {return var(name);}
 
+    /// Get function by name
+    Function fun(const std::string& name) const;
+
     /// Get a derivative expression by name
     MX der(const std::string& name) const;
 
@@ -476,6 +476,9 @@ namespace casadi {
 
     /// Linear combinations of output expressions
     std::map<std::string, MX> lin_comb_;
+
+    /** \brief Functions */
+    std::vector<Function> fun_;
 
     /// Read an equation
     MX read_expr(const XmlNode& odenode);

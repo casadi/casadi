@@ -2009,8 +2009,16 @@ namespace casadi {
       casadi_assert_message(d_ind<this->d.size(), "Cannot find dependent '" + s + "'");
     }
     Function ret(name, arg_ex, res_ex, arg, res);
-    fun.push_back(ret);
+    fun_.push_back(ret);
     return ret;
+  }
+
+  Function DaeBuilder::fun(const std::string& name) const {
+    for (const Function& f : fun_) {
+      if (f.name()==name) return f;
+    }
+    casadi_error("No such function: '" + name + "'");
+    return Function();
   }
 
 
