@@ -2221,7 +2221,9 @@ namespace casadi {
       // Evaluate in batches
       casadi_assert(enable_forward_ || enable_fd_);
       int max_nfwd = 64;
-      while (!has_forward(max_nfwd)) max_nfwd/=2;
+      if (!enable_fd_) {
+        while (!has_forward(max_nfwd)) max_nfwd/=2;
+      }
       int offset = 0;
       while (offset<nfwd) {
         // Number of derivatives, in this batch
