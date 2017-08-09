@@ -121,5 +121,10 @@ for i,c in enumerate(['X_H', 'Y_H', 'K_H', 'N_H']):
     plt.title('log10(' + c + ')')
     plt.grid(True)
 
+# Set directory with external functions
+from os import path
+curr_dir = path.dirname(path.abspath(__file__
+dae.set_external_dir(curr_dir + '/external/')
+
 
 plt.show()

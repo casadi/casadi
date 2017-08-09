@@ -189,11 +189,6 @@ namespace casadi {
     /// Add an auxiliary variable
     MX add_aux(const std::string& name=std::string(), int n=1);
 
-    /// Add a function
-    Function add_fun(const std::string& name,
-                     const std::vector<std::string>& arg,
-                     const std::vector<std::string>& res);
-
     /// Check if dimensions match
     void sanity_check() const;
     ///@}
@@ -239,6 +234,30 @@ namespace casadi {
     /// Scale the implicit equations
     void scale_equations();
     ///@}
+
+    /** @name Functions
+     *  Add or load auxiliary functions
+     */
+    ///@{
+
+    /// Add a function from loaded expressions
+    Function add_fun(const std::string& name,
+                     const std::vector<std::string>& arg,
+                     const std::vector<std::string>& res, const Dict& opts=Dict());
+
+    /// Add an already existing function
+    Function add_fun(const Function& f);
+
+    /// Add an external function
+    Function add_fun(const std::string& name, const Importer& compiler,
+                     const Dict& opts=Dict());
+
+    /// Does a particular function already exist?
+    bool has_fun(const std::string& name) const;
+
+    /// Get function by name
+    Function fun(const std::string& name) const;
+  ///@}
 
     /** @name Import and export
      */
@@ -331,9 +350,6 @@ namespace casadi {
 
     /// Get variable expression by name
     MX operator()(const std::string& name) const {return var(name);}
-
-    /// Get function by name
-    Function fun(const std::string& name) const;
 
     /// Get a derivative expression by name
     MX der(const std::string& name) const;

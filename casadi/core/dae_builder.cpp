@@ -37,6 +37,7 @@
 #include "code_generator.hpp"
 #include "calculus.hpp"
 #include "xml_file.hpp"
+#include "external.hpp"
 
 using namespace std;
 namespace casadi {
@@ -1991,9 +1992,18 @@ namespace casadi {
     return Function(fname, ret_in, ret_out, s_in, s_out);
   }
 
+  Function DaeBuilder::add_fun(const Function& f) {
+    casadi_assert_message(!has_fun(f.name()), "Function '" + f.name() + "' already exists");
+    fun_.push_back(f);
+    return f;
+  }
+
   Function DaeBuilder::add_fun(const std::string& name,
                                const std::vector<std::string>& arg,
-                               const std::vector<std::string>& res) {
+                               const std::vector<std::string>& res,
+                               const Dict& opts) {
+    casadi_assert_message(!has_fun(name), "Function '" + name + "' already exists");
+
     // Get inputs
     vector<MX> arg_ex, res_ex;
     for (auto&& s : arg) arg_ex.push_back(var(s));
@@ -2008,18 +2018,29 @@ namespace casadi {
       }
       casadi_assert_message(d_ind<this->d.size(), "Cannot find dependent '" + s + "'");
     }
-    Function ret(name, arg_ex, res_ex, arg, res);
-    fun_.push_back(ret);
-    return ret;
+    Function ret(name, arg_ex, res_ex, arg, res, opts);
+    return add_fun(ret);
+  }
+
+  Function DaeBuilder::add_fun(const std::string& name, const Importer& compiler,
+                               const Dict& opts) {
+    casadi_assert_message(!has_fun(name), "Function '" + name + "' already exists");
+    return add_fun(external(name, compiler, opts));
+  }
+
+  bool DaeBuilder::has_fun(const std::string& name) const {
+    for (const Function& f : fun_) {
+      if (f.name()==name) return true;
+    }
+    return false;
   }
 
   Function DaeBuilder::fun(const std::string& name) const {
+    casadi_assert_message(has_fun(name), "No such function: '" + name + "'");
     for (const Function& f : fun_) {
       if (f.name()==name) return f;
     }
-    casadi_error("No such function: '" + name + "'");
     return Function();
   }
-
 
 } // namespace casadi
