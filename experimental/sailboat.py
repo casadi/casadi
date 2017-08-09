@@ -40,6 +40,16 @@ import numpy
 # Create DaeBuilder instance
 dae = DaeBuilder()
 
+# Load file with external functions
+from os import path
+curr_dir = path.dirname(path.abspath(__file__))
+clib = Importer(curr_dir + '/sailboat_c.c', 'none')
+
+# Options for external functions
+# NOTE: These options should become redundant once code is more stable
+external_opts = dict(enable_jacobian = False, enable_forward = False, \
+                     enable_reverse = False, enable_fd = True)
+
 # Physical constants
 g = 9.81 # [m/s^2] gravity
 rho = 1027. # p[kg/m^3] density of ocean water
@@ -88,6 +98,9 @@ theta = dae.add_x('theta') # Yaw angle
 dphi = dae.add_x('dphi') # Time derivative of phi
 dtheta = dae.add_x('dtheta') # Time derivative of theta
 
+# Controls
+beta = dae.add_u('beta')
+
 # Sum contributions from hull and sail (?)
 m_y = m_y_hull + m_y_sail
 Jxx = Jxx_hull + Jxx_sail
@@ -104,11 +117,11 @@ cos2_phi = cos_phi**2
 sin2_phi = sin_phi**2
 phi2 = phi**2
 
-# Hull resistence in the upright position
-X_0 = 0. # Neglected
+# Hull resistance in the upright position
+X_0_fun = dae.add_fun('hull_resistance', clib, external_opts)
+X_0 = X_0_fun(U)
 
 # Calculate hydrodynamic forces
-beta = dae.add_aux('beta') # Leeway angle
 V_p = sin(beta)
 V_p2 = V_p**2
 V_p3 = V_p2*V_p
@@ -135,7 +148,7 @@ for i,c in enumerate(['X_H', 'Y_H', 'K_H', 'N_H']):
     plt.grid(True)
 
 # Make a function call
-X_H, Y_H, K_H, N_H = H(phi, pi/4, U, V)
+X_H, Y_H, K_H, N_H = H(phi, beta, U, V)
 
 # Hydrodynamic derivatives of the hull due to yawing motion
 X_VT = 0. # Neglected
@@ -187,5 +200,10 @@ dae.add_ode("yaw_angle", dtheta)
 
 # Print ODE
 print(dae)
+
+# Generate Jacobian of ODE rhs w.r.t. to states and control
+Jfcn = dae.create("Jfcn", ['x', 'u'], ['jac_ode_x', 'jac_ode_u'])
+Jfcn_file = Jfcn.generate()
+print('Jacobian function saved to ' + Jfcn_file)
 
 plt.show()

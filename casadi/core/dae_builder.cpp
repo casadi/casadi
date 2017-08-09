@@ -469,6 +469,14 @@ namespace casadi {
     // Print dimensions
     repr(stream);
 
+    // Print the functions
+    if (!fun_.empty()) {
+      stream << "Functions" << endl;
+      for (const Function& f : fun_) {
+        stream << f << endl;
+      }
+    }
+
     // Print the variables
     stream << "Variables" << endl;
     stream << "{" << endl;
