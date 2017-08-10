@@ -237,11 +237,11 @@ namespace casadi {
     if (li_.inlined(eval_name())) {
       FunctionInternal::add_dependency(g);
     } else {
-      g.addExternal(signature(name_) + ";");
+      g.add_external(signature(name_) + ";");
     }
     if (has_refcount_) {
-      g.addExternal("void " + name_ + "_incref(void);");
-      g.addExternal("void " + name_ + "_decref(void);");
+      g.add_external("void " + name_ + "_incref(void);");
+      g.add_external("void " + name_ + "_decref(void);");
     }
   }
 

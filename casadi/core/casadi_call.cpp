@@ -153,7 +153,7 @@ namespace casadi {
 
   void Call::generate(CodeGenerator& g, const std::string& mem,
                       const vector<int>& arg, const vector<int>& res) const {
-    if (fcn_->simplifiedCall()) {
+    if (fcn_->simplified_call()) {
 
       // Collect input arguments
       for (int i=0; i<arg.size(); ++i) {

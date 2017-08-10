@@ -407,7 +407,7 @@ namespace casadi {
       const Function& fk = k1<f_.size() ? f_[k1] : f_def_;
       if (fk.is_null()) {
         g << "return 1;\n";
-      } else if (g.simplifiedCall(fk)) {
+      } else if (g.simplified_call(fk)) {
         casadi_error("Not implemented.");
       } else {
         // Project arguments with different sparsity

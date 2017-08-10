@@ -160,8 +160,8 @@ namespace casadi {
     void BSpline::codegen_body(CodeGenerator& g) const {
       int n_dims = offset_.size()-1;
 
-      g.addAuxiliary(CodeGenerator::AUX_ND_BOOR_EVAL);
-      g.addAuxiliary(CodeGenerator::AUX_FILL);
+      g.add_auxiliary(CodeGenerator::AUX_ND_BOOR_EVAL);
+      g.add_auxiliary(CodeGenerator::AUX_FILL);
       g << "  if (res[0]) " << g.fill("res[0]", m_, "0.0") << "\n";
 
       // Input and output buffers
@@ -321,8 +321,8 @@ namespace casadi {
     void BSplineDual::codegen_body(CodeGenerator& g) const {
       int n_dims = offset_.size()-1;
 
-      g.addAuxiliary(CodeGenerator::AUX_ND_BOOR_EVAL);
-      g.addAuxiliary(CodeGenerator::AUX_FILL);
+      g.add_auxiliary(CodeGenerator::AUX_ND_BOOR_EVAL);
+      g.add_auxiliary(CodeGenerator::AUX_FILL);
       g << "  if (res[0]) " <<
                 g.fill("res[0]", reverse_? coeffs_size_: m_*N_, "0.0") << "\n";
 

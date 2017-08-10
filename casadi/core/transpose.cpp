@@ -185,7 +185,7 @@ namespace casadi {
 
   void Transpose::generate(CodeGenerator& g, const std::string& mem,
                            const std::vector<int>& arg, const std::vector<int>& res) const {
-    g.addAuxiliary(CodeGenerator::AUX_TRANS);
+    g.add_auxiliary(CodeGenerator::AUX_TRANS);
 
     g << "trans("
       << g.work(arg[0], nnz()) << ", " << g.sparsity(dep().sparsity()) << ", "

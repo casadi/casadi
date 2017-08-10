@@ -258,7 +258,7 @@ namespace casadi {
     g.comment("Setup buffers for calling function");
     g.local("z", "real_t", "*");
     g << "z = w;\n";
-    if (!derivative_of_->simplifiedCall()) {
+    if (!derivative_of_->simplified_call()) {
       for (int j=0; j<n_in; ++j) {
         g << "arg[" << j << "] = w; w += " << derivative_of_.nnz_in(j) << ";\n";
       }
@@ -277,7 +277,7 @@ namespace casadi {
         << g.mv("seed[" + to_string(j) + "]", nnz, n_, "m->x", "z1", false) << "\n"
         << "z1 += " << nnz << ";\n";
     }
-    if (derivative_of_->simplifiedCall()) {
+    if (derivative_of_->simplified_call()) {
       g << g(derivative_of_, "z", "w") << ";\n";
     } else {
       g << "if (" << g(derivative_of_, "arg", "res", "iw", "w") << ") return 1;\n";

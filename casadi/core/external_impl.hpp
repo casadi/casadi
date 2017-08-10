@@ -152,7 +152,7 @@ namespace casadi {
     void init(const Dict& opts) override;
 
     /** \brief Use simplified signature */
-    bool simplifiedCall() const override { return true;}
+    bool simplified_call() const override { return true;}
 
     /// @{
     /** \brief Retreive sparsities */

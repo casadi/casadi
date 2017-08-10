@@ -363,7 +363,7 @@ namespace casadi {
     void codegen_meta(CodeGenerator& g, const std::string& fname) const;
 
     /** \brief Use simplified signature */
-    virtual bool simplifiedCall() const { return false;}
+    virtual bool simplified_call() const { return false;}
 
     /** \brief Generate shorthand macro */
     void codegen_shorthand(CodeGenerator& g, const std::string& name) const;

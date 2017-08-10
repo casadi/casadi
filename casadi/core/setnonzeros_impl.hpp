@@ -762,7 +762,7 @@ namespace casadi {
     }
 
     // Condegen the indices
-    int ind = g.getConstant(this->nz_, true);
+    int ind = g.get_constant(this->nz_, true);
 
     // Perform the operation inplace
     g.local("cii", "const int", "*");

@@ -61,27 +61,27 @@ namespace casadi {
     std::string generate(const std::string& prefix="") const;
 
     /// Add an include file optionally using a relative path "..." instead of an absolute path <...>
-    void addInclude(const std::string& new_include, bool relative_path=false,
+    void add_include(const std::string& new_include, bool relative_path=false,
                     const std::string& use_ifdef=std::string());
 
 #ifndef SWIG
     /// Add an external function declaration
-    void addExternal(const std::string& new_external);
+    void add_external(const std::string& new_external);
 
     // Add a sparsity pattern
     std::string sparsity(const Sparsity& sp);
 
     // Add a sparsity pattern, get index
-    int addSparsity(const Sparsity& sp);
+    int add_sparsity(const Sparsity& sp);
 
     /** \brief Get the index of an existing sparsity pattern */
     int get_sparsity(const Sparsity& sp) const;
 
     /** \brief Get or add a constant */
-    int getConstant(const std::vector<double>& v, bool allow_adding=false);
+    int get_constant(const std::vector<double>& v, bool allow_adding=false);
 
     /** \brief Get or add an integer constant */
-    int getConstant(const std::vector<int>& v, bool allow_adding=false);
+    int get_constant(const std::vector<int>& v, bool allow_adding=false);
 
     /** \brief Represent an array constant; adding it when new */
     std::string constant(const std::vector<int>& v);
@@ -90,7 +90,7 @@ namespace casadi {
     std::string constant(const std::vector<double>& v);
 
     /** \brief Use simplified signature */
-    static bool simplifiedCall(const Function& f);
+    static bool simplified_call(const Function& f);
 
     /** \brief Generate a call to a function (generic signature) */
     std::string operator()(const Function& f, const std::string& arg,
@@ -226,7 +226,7 @@ namespace casadi {
     };
 
     /** \brief Add a built-in auxiliary function */
-    void addAuxiliary(Auxiliary f, const std::vector<std::string>& inst = {"real_t"});
+    void add_auxiliary(Auxiliary f, const std::vector<std::string>& inst = {"real_t"});
 
     /** Convert in integer to a string */
     static std::string to_string(int n);

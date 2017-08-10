@@ -98,7 +98,7 @@ namespace casadi {
   void ConstantDM::generate(CodeGenerator& g, const std::string& mem,
                                  const std::vector<int>& arg, const std::vector<int>& res) const {
     // Print the constant
-    int ind = g.getConstant(x_.nonzeros(), true);
+    int ind = g.get_constant(x_.nonzeros(), true);
 
     // Copy the constant to the work vector
     g << g.copy("c"+g.to_string(ind), nnz(), g.work(res[0], nnz())) << '\n';

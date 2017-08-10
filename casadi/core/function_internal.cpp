@@ -349,7 +349,7 @@ namespace casadi {
 
   void FunctionInternal::
   _eval(const double** arg, double** res, int* iw, double* w, int mem) const {
-    if (simplifiedCall()) {
+    if (simplified_call()) {
       // Copy arguments to input buffers
       const double* arg1=w;
       for (int i=0; i<this->n_in(); ++i) {
@@ -1654,11 +1654,11 @@ namespace casadi {
   void FunctionInternal::codegen(CodeGenerator& g,
                                  const std::string& fname, bool decl_static) const {
     // Add standard math
-    g.addInclude("math.h");
+    g.add_include("math.h");
 
     // Add auxiliaries. TODO: Only add the auxiliaries that are actually used
-    g.addAuxiliary(CodeGenerator::AUX_SQ);
-    g.addAuxiliary(CodeGenerator::AUX_SIGN);
+    g.add_auxiliary(CodeGenerator::AUX_SQ);
+    g.add_auxiliary(CodeGenerator::AUX_SIGN);
 
     // Generate declarations
     codegen_declarations(g);
@@ -1696,7 +1696,7 @@ namespace casadi {
     }
 
     // Finalize the function
-    if (!simplifiedCall()) g << "return 0;\n";
+    if (!simplified_call()) g << "return 0;\n";
     g << "}\n";
 
     // Flush to function body
@@ -1704,7 +1704,7 @@ namespace casadi {
   }
 
   std::string FunctionInternal::signature(const std::string& fname) const {
-    if (simplifiedCall()) {
+    if (simplified_call()) {
       return "void " + fname + "(const real_t* arg, real_t* res)";
     } else {
       return "int " + fname + "(const real_t** arg, real_t** res, int* iw, real_t* w, int mem)";
@@ -1751,13 +1751,13 @@ namespace casadi {
       << "}\n\n";
 
     // Quick return if simplified syntax
-    if (simplifiedCall()) return;
+    if (simplified_call()) return;
 
     // Input sparsities
     g << g.declare(prefix + "const int* " + fname + "_sparsity_in(int i)") << " {\n"
       << "switch (i) {\n";
     for (int i=0; i<n_in; ++i) {
-      g << "case " << i << ": return s" << g.addSparsity(sparsity_in(i)) << ";\n";
+      g << "case " << i << ": return s" << g.add_sparsity(sparsity_in(i)) << ";\n";
     }
     g << "default: return 0;\n}\n"
       << "}\n\n";
@@ -1766,7 +1766,7 @@ namespace casadi {
     g << g.declare(prefix + "const int* " + fname + "_sparsity_out(int i)") << " {\n"
       << "switch (i) {\n";
     for (int i=0; i<n_out; ++i) {
-      g << "case " << i << ": return s" << g.addSparsity(sparsity_out(i)) << ";\n";
+      g << "case " << i << ": return s" << g.add_sparsity(sparsity_out(i)) << ";\n";
     }
     g << "default: return 0;\n}\n"
       << "}\n\n";
@@ -1942,7 +1942,7 @@ namespace casadi {
   }
 
   void FunctionInternal::codegen_shorthand(CodeGenerator& g, const string& name) const {
-    if (simplifiedCall()) {
+    if (simplified_call()) {
       g << "#define " << name << "(arg, res) "
         << "CASADI_PREFIX(" << name << ")(arg, res)\n\n";
     } else {
@@ -1952,7 +1952,7 @@ namespace casadi {
   }
 
   std::string FunctionInternal::eval_name() const {
-    if (simplifiedCall()) {
+    if (simplified_call()) {
       return name_ + "_simple";
     } else {
       return name_;

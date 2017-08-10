@@ -446,7 +446,7 @@ namespace casadi {
   void GetNonzerosVector::generate(CodeGenerator& g, const std::string& mem,
                                    const std::vector<int>& arg, const std::vector<int>& res) const {
     // Codegen the indices
-    int ind = g.getConstant(nz_, true);
+    int ind = g.get_constant(nz_, true);
 
     // Codegen the assignments
     g.local("cii", "const int", "*");

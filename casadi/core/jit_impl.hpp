@@ -66,7 +66,7 @@ namespace casadi {
     /// @}
 
     /** \brief Use simplified signature */
-    bool simplifiedCall() const override { return true;}
+    bool simplified_call() const override { return true;}
 
     /** \brief Is codegen supported? */
     bool has_codegen() const override { return true;}
