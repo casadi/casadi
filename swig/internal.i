@@ -718,19 +718,22 @@
 %exception  casadi::FunctionInternal::oracle() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::FunctionInternal::print(std::ostream &stream) const override {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::FunctionInternal::print_dimensions(std::ostream &stream) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::print_free(std::ostream &stream) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::FunctionInternal::print_long(std::ostream &stream) const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::FunctionInternal::print_option(const std::string &name, std::ostream &stream) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::print_options(std::ostream &stream) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::FunctionInternal::print_short(std::ostream &stream) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::release(int mem) const  {
@@ -748,9 +751,6 @@
 %exception  casadi::FunctionInternal::replace_res(const std::vector< M > &res) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::FunctionInternal::repr(std::ostream &stream) const override {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::FunctionInternal::reverse(int nadj) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -760,7 +760,7 @@
 %exception  casadi::FunctionInternal::signature(const std::string &fname) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::FunctionInternal::simplifiedCall() const  {
+%exception  casadi::FunctionInternal::simplified_call() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::size1_in(int ind) const  {
@@ -919,16 +919,16 @@
 %exception  casadi::ImporterInternal::plugin_name() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::ImporterInternal::print(std::ostream &stream) const override {
+%exception  casadi::ImporterInternal::print_long(std::ostream &stream) const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::ImporterInternal::print_short(std::ostream &stream) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::ImporterInternal::read_external(const std::string &sym, bool inlined, std::istream &file, int &offset) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::ImporterInternal::read_meta(std::istream &file, int &offset) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::ImporterInternal::repr(std::ostream &stream) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::ImporterInternal::to_text(const std::string &cmd, int ind=-1) const  {
@@ -1459,16 +1459,16 @@
 %exception  casadi::Scpgen::plugin_name() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::SharedObject::printPtr(std::ostream &stream=casadi::userOut()) const  {
+%exception  casadi::SharedObject::print_ptr(std::ostream &stream=casadi::userOut()) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::SharedObjectInternal::getCount() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::SharedObjectInternal::print(std::ostream &stream) const  {
+%exception  casadi::SharedObjectInternal::print_long(std::ostream &stream) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::SharedObjectInternal::repr(std::ostream &stream) const  {
+%exception  casadi::SharedObjectInternal::print_short(std::ostream &stream) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::SharedObjectInternal::weak() {
@@ -1495,7 +1495,7 @@
 %exception  casadi::SimplifiedExternal::init(const Dict &opts) override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::SimplifiedExternal::simplifiedCall() const override {
+%exception  casadi::SimplifiedExternal::simplified_call() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::SlicotDple::alloc_memory() const override {
@@ -1603,7 +1603,7 @@
 %exception  casadi::Switch::init(const Dict &opts) override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Switch::print(std::ostream &stream) const override {
+%exception  casadi::Switch::print_long(std::ostream &stream) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Switch::type_name() const override {
