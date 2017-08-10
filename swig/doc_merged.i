@@ -1234,6 +1234,11 @@ vector of symbolic variables corresponding to the outputs.
 
 ";
 
+%feature("docstring") casadi::Blocksqp::definition "[INTERNAL]  Get
+function signature: name:(inputs)->(outputs)
+
+";
+
 %feature("docstring") casadi::Blocksqp::has_derivative "[INTERNAL]  Can
 derivatives be calculated in any way?
 
@@ -2094,6 +2099,11 @@ memory block.
 ";
 
 %feature("docstring") casadi::BSpline::factory "[INTERNAL] ";
+
+%feature("docstring") casadi::BSpline::definition "[INTERNAL]  Get function
+signature: name:(inputs)->(outputs)
+
+";
 
 %feature("docstring") casadi::BSpline::_set_work "[INTERNAL]  Set the
 (persistent) work vectors.
@@ -3338,6 +3348,11 @@ Symbolic expressions for the adjoint seeds.
 
 ";
 
+%feature("docstring") casadi::BSplineCommon::alloc_memory "[INTERNAL]
+Create memory block.
+
+";
+
 %feature("docstring") casadi::BSplineCommon::get_name_in "[INTERNAL]  Names
 of function input and outputs.
 
@@ -3632,8 +3647,8 @@ if the numerical values of the supplied bounds make sense.
 
 ";
 
-%feature("docstring") casadi::BSplineCommon::alloc_memory "[INTERNAL]
-Create memory block.
+%feature("docstring") casadi::BSplineCommon::definition "[INTERNAL]  Get
+function signature: name:(inputs)->(outputs)
 
 ";
 
@@ -4580,6 +4595,11 @@ memory object.
 
 ";
 
+%feature("docstring") casadi::BSplineDual::definition "[INTERNAL]  Get
+function signature: name:(inputs)->(outputs)
+
+";
+
 %feature("docstring") casadi::BSplineDual::matching_arg "[INTERNAL]  Check
 if input arguments that needs to be replaced.
 
@@ -5398,6 +5418,11 @@ Evaluate numerically, simplied syntax.
 
 %feature("docstring") casadi::BSplineInterpolant::replace_res "[INTERNAL]
 Replace 0-by-0 outputs.
+
+";
+
+%feature("docstring") casadi::BSplineInterpolant::definition "[INTERNAL]
+Get function signature: name:(inputs)->(outputs)
 
 ";
 
@@ -7771,6 +7796,11 @@ Input/output dimensions.
 
 ";
 
+%feature("docstring") casadi::CentralDiff::definition "[INTERNAL]  Get
+function signature: name:(inputs)->(outputs)
+
+";
+
 %feature("docstring") casadi::CentralDiff::log "
 
 >  void casadi::FunctionInternal::log(const std::string &msg) const 
@@ -8360,6 +8390,11 @@ Generate a function that calculates nadj adjoint derivatives.
 
 %feature("docstring") casadi::Collocation::call "[INTERNAL]   Call a
 function, templated.
+
+";
+
+%feature("docstring") casadi::Collocation::definition "[INTERNAL]  Get
+function signature: name:(inputs)->(outputs)
 
 ";
 
@@ -9332,6 +9367,11 @@ to the object.
 
 %feature("docstring") casadi::Conic::index_in "[INTERNAL]  Get input scheme
 index by name.
+
+";
+
+%feature("docstring") casadi::Conic::definition "[INTERNAL]  Get function
+signature: name:(inputs)->(outputs)
 
 ";
 
@@ -11359,6 +11399,11 @@ dimensions of inputs and outputs.
 
 ";
 
+%feature("docstring") casadi::Dple::definition "[INTERNAL]  Get function
+signature: name:(inputs)->(outputs)
+
+";
+
 %feature("docstring") casadi::Dple::sz_work "[INTERNAL]  Get number of
 temporary variables needed.
 
@@ -12924,6 +12969,11 @@ function that calculates nadj adjoint derivatives.
 
 ";
 
+%feature("docstring") casadi::Expm::definition "[INTERNAL]  Get function
+signature: name:(inputs)->(outputs)
+
+";
+
 %feature("docstring") casadi::Expm::n_out "[INTERNAL]  Number of function
 inputs and outputs.
 
@@ -13588,6 +13638,11 @@ information there is to know about a certain option.
 
 %feature("docstring") casadi::External::has_sprev "[INTERNAL]  Is the class
 able to propagate seeds through the algorithm?
+
+";
+
+%feature("docstring") casadi::External::definition "[INTERNAL]  Get
+function signature: name:(inputs)->(outputs)
 
 ";
 
@@ -14719,6 +14774,11 @@ Verbose mode?
 ";
 
 %feature("docstring") casadi::FixedStepIntegrator::getAtomicInputReal "[INTERNAL]  Get the floating point output argument of an atomic operation.
+
+";
+
+%feature("docstring") casadi::FixedStepIntegrator::definition "[INTERNAL]
+Get function signature: name:(inputs)->(outputs)
 
 ";
 
@@ -16829,6 +16889,11 @@ function, overloaded.
 
 ";
 
+%feature("docstring") casadi::GenericExternal::definition "[INTERNAL]  Get
+function signature: name:(inputs)->(outputs)
+
+";
+
 %feature("docstring") casadi::GenericExternal::n_out "[INTERNAL]  Number of
 function inputs and outputs.
 
@@ -18686,6 +18751,10 @@ Export / Generate C code for the generated functions.
 
 ";
 
+%feature("docstring") casadi::ImplicitFixedStepIntegrator::definition "[INTERNAL]  Get function signature: name:(inputs)->(outputs)
+
+";
+
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::replace_aseed "[INTERNAL]  Replace 0-by-0 reverse seeds.
 
 ";
@@ -19489,6 +19558,11 @@ reference to the object.
 
 %feature("docstring") casadi::ImplicitToNlp::index_out "[INTERNAL]  Get
 output scheme index by name.
+
+";
+
+%feature("docstring") casadi::ImplicitToNlp::definition "[INTERNAL]  Get
+function signature: name:(inputs)->(outputs)
 
 ";
 
@@ -20756,6 +20830,11 @@ class instance.
 
 ";
 
+%feature("docstring") casadi::Integrator::definition "[INTERNAL]  Get
+function signature: name:(inputs)->(outputs)
+
+";
+
 %feature("docstring") casadi::Integrator::replace_res "[INTERNAL]  Replace
 0-by-0 outputs.
 
@@ -21824,6 +21903,11 @@ Symbolic expressions for the adjoint seeds.
 
 ";
 
+%feature("docstring") casadi::Interpolant::definition "[INTERNAL]  Get
+function signature: name:(inputs)->(outputs)
+
+";
+
 %feature("docstring") casadi::Interpolant::setup "[INTERNAL]  Set the
 (persistent and temporary) work vectors.
 
@@ -22476,6 +22560,11 @@ is available.
 
 %feature("docstring") casadi::Jit::_set_temp "[INTERNAL]  Set the
 (temporary) work vectors.
+
+";
+
+%feature("docstring") casadi::Jit::definition "[INTERNAL]  Get function
+signature: name:(inputs)->(outputs)
 
 ";
 
@@ -23350,6 +23439,11 @@ input/output nonzeros.
 
 ";
 
+%feature("docstring") casadi::LapackLu::fwd_seed "[INTERNAL]  Symbolic
+expressions for the forward seeds.
+
+";
+
 %feature("docstring") casadi::LapackLu::alloc_arg "[INTERNAL]  Ensure
 required length of arg field.
 
@@ -23919,8 +24013,8 @@ name.
 
 ";
 
-%feature("docstring") casadi::LapackLu::fwd_seed "[INTERNAL]  Symbolic
-expressions for the forward seeds.
+%feature("docstring") casadi::LapackLu::definition "[INTERNAL]  Get
+function signature: name:(inputs)->(outputs)
 
 ";
 
@@ -24789,6 +24883,11 @@ the numerical values of the supplied bounds make sense.
 
 %feature("docstring") casadi::LapackQr::alloc_w "[INTERNAL]  Ensure
 required length of w field.
+
+";
+
+%feature("docstring") casadi::LapackQr::definition "[INTERNAL]  Get
+function signature: name:(inputs)->(outputs)
 
 ";
 
@@ -25770,6 +25869,11 @@ required length of res field.
 
 ";
 
+%feature("docstring") casadi::LinearInterpolant::definition "[INTERNAL]
+Get function signature: name:(inputs)->(outputs)
+
+";
+
 %feature("docstring") casadi::LinearInterpolant::alloc_memory "[INTERNAL]
 Create memory block.
 
@@ -26673,6 +26777,11 @@ function input(s) and output(s)
 
 ";
 
+%feature("docstring") casadi::LinearInterpolantJac::definition "[INTERNAL]
+Get function signature: name:(inputs)->(outputs)
+
+";
+
 %feature("docstring") casadi::LinearInterpolantJac::numel_out "[INTERNAL]
 Number of input/output elements.
 
@@ -27444,6 +27553,11 @@ derivative functions need nondifferentiated outputs?
 
 %feature("docstring") casadi::Lsqr::index_in "[INTERNAL]  Get input scheme
 index by name.
+
+";
+
+%feature("docstring") casadi::Lsqr::definition "[INTERNAL]  Get function
+signature: name:(inputs)->(outputs)
 
 ";
 
@@ -28775,6 +28889,11 @@ functions needed for the Lifted Newton method.
 
 ";
 
+%feature("docstring") casadi::Map::definition "[INTERNAL]  Get function
+signature: name:(inputs)->(outputs)
+
+";
+
 %feature("docstring") casadi::Map::setup "[INTERNAL]  Set the (persistent
 and temporary) work vectors.
 
@@ -29890,6 +30009,11 @@ dimensions.
 
 %feature("docstring") casadi::MapOmp::size_in "[INTERNAL]  Input/output
 dimensions.
+
+";
+
+%feature("docstring") casadi::MapOmp::definition "[INTERNAL]  Get function
+signature: name:(inputs)->(outputs)
 
 ";
 
@@ -32419,6 +32543,11 @@ of options.
 
 ";
 
+%feature("docstring") casadi::Newton::definition "[INTERNAL]  Get function
+signature: name:(inputs)->(outputs)
+
+";
+
 %feature("docstring") casadi::Newton::symbolic_output "[INTERNAL]  Get a
 vector of symbolic variables corresponding to the outputs.
 
@@ -34202,6 +34331,11 @@ Are all inputs and outputs scalar.
 
 ";
 
+%feature("docstring") casadi::Nlpsol::definition "[INTERNAL]  Get function
+signature: name:(inputs)->(outputs)
+
+";
+
 %feature("docstring") casadi::Nlpsol::getAtomicInput "[INTERNAL]  Get the
 (integer) input arguments of an atomic operation.
 
@@ -34797,6 +34931,11 @@ Get sparsity of a given input.
 ------------------------------------------------------------------------
 [INTERNAL] 
 Are all inputs and outputs scalar.
+
+";
+
+%feature("docstring") casadi::OracleFunction::definition "[INTERNAL]  Get
+function signature: name:(inputs)->(outputs)
 
 ";
 
@@ -36003,6 +36142,11 @@ Generate shorthand macro.
 
 ";
 
+%feature("docstring") casadi::QpToNlp::definition "[INTERNAL]  Get function
+signature: name:(inputs)->(outputs)
+
+";
+
 %feature("docstring") casadi::QpToNlp::simplifiedCall "[INTERNAL]  Use
 simplified signature.
 
@@ -36633,6 +36777,11 @@ derivatives by multiplying the full Jacobian and multiplying.
 
 
 // File: classcasadi_1_1Rootfinder.xml
+%feature("docstring") casadi::Rootfinder::definition "[INTERNAL]  Get
+function signature: name:(inputs)->(outputs)
+
+";
+
 %feature("docstring") casadi::Rootfinder::has_derivative "[INTERNAL]  Can
 derivatives be calculated in any way?
 
@@ -38435,6 +38584,11 @@ forward problem.
 
 ";
 
+%feature("docstring") casadi::RungeKutta::definition "[INTERNAL]  Get
+function signature: name:(inputs)->(outputs)
+
+";
+
 %feature("docstring") casadi::RungeKutta::init "[INTERNAL]  Initialize
 stage.
 
@@ -39018,6 +39172,11 @@ supported?
 ";
 
 %feature("docstring") casadi::Scpgen::regularize "[INTERNAL] ";
+
+%feature("docstring") casadi::Scpgen::definition "[INTERNAL]  Get function
+signature: name:(inputs)->(outputs)
+
+";
 
 %feature("docstring") casadi::Scpgen::_set_temp "[INTERNAL]  Set the
 (temporary) work vectors.
@@ -40231,6 +40390,11 @@ if the function is of a particular type.
 
 ";
 
+%feature("docstring") casadi::SimplifiedExternal::definition "[INTERNAL]
+Get function signature: name:(inputs)->(outputs)
+
+";
+
 %feature("docstring") casadi::SimplifiedExternal::codegen_shorthand "[INTERNAL]  Generate shorthand macro.
 
 ";
@@ -41255,6 +41419,11 @@ if input arguments that needs to be replaced.
 
 ";
 
+%feature("docstring") casadi::SlicotDple::definition "[INTERNAL]  Get
+function signature: name:(inputs)->(outputs)
+
+";
+
 %feature("docstring") casadi::SlicotDple::codegen_shorthand "[INTERNAL]
 Generate shorthand macro.
 
@@ -42152,6 +42321,11 @@ derivatives by multiplying the full Jacobian and multiplying.
 
 %feature("docstring") casadi::SlicotExpm::size_out "[INTERNAL]
 Input/output dimensions.
+
+";
+
+%feature("docstring") casadi::SlicotExpm::definition "[INTERNAL]  Get
+function signature: name:(inputs)->(outputs)
 
 ";
 
@@ -44718,6 +44892,11 @@ all information there is to know about a certain option.
 
 ";
 
+%feature("docstring") casadi::Sqpmethod::definition "[INTERNAL]  Get
+function signature: name:(inputs)->(outputs)
+
+";
+
 %feature("docstring") casadi::Sqpmethod::has_derivative "[INTERNAL]  Can
 derivatives be calculated in any way?
 
@@ -45720,6 +45899,11 @@ length of arg field.
 ";
 
 %feature("docstring") casadi::Switch::memory "[INTERNAL]  Memory objects.
+
+";
+
+%feature("docstring") casadi::Switch::definition "[INTERNAL]  Get function
+signature: name:(inputs)->(outputs)
 
 ";
 
@@ -46834,6 +47018,11 @@ class able to propagate seeds through the algorithm?
 
 %feature("docstring") casadi::SymbolicQr::getAtomicInputReal "[INTERNAL]
 Get the floating point output argument of an atomic operation.
+
+";
+
+%feature("docstring") casadi::SymbolicQr::definition "[INTERNAL]  Get
+function signature: name:(inputs)->(outputs)
 
 ";
 

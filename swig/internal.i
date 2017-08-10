@@ -478,6 +478,9 @@
 %exception  casadi::FunctionInternal::default_in(int ind) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::FunctionInternal::definition() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::FunctionInternal::eval_mx(const MXVector &arg, MXVector &res, bool always_inline, bool never_inline) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }

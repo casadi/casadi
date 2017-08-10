@@ -1624,6 +1624,12 @@ std::vector< MX > &arg) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::definition() const  "
+
+[INTERNAL]  Get function signature: name:(inputs)->(outputs)
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::has_derivative() const  "
 
 [INTERNAL]  Can derivatives be calculated in any way?
@@ -2808,6 +2814,12 @@ std::string > &s_out, const Function::AuxOut &aux, const Dict &opts) const
 "
 
 [INTERNAL] ";
+
+%feature("docstring")  casadi::FunctionInternal::definition() const  "
+
+[INTERNAL]  Get function signature: name:(inputs)->(outputs)
+
+";
 
 %feature("docstring") casadi::BSpline::_set_work "
 
@@ -4371,6 +4383,12 @@ const std::vector< MatType > &v) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::alloc_memory() const  "
+
+[INTERNAL]  Create memory block.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::get_name_in(int i) "
 
 [INTERNAL]  Names of function input and outputs.
@@ -4807,9 +4825,9 @@ bool persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::alloc_memory() const  "
+%feature("docstring")  casadi::FunctionInternal::definition() const  "
 
-[INTERNAL]  Create memory block.
+[INTERNAL]  Get function signature: name:(inputs)->(outputs)
 
 ";
 
@@ -6042,6 +6060,12 @@ const std::vector< MatType > &v) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::definition() const  "
+
+[INTERNAL]  Get function signature: name:(inputs)->(outputs)
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::matching_arg(const
 std::vector< M > &arg) const  "
 
@@ -7197,6 +7221,12 @@ int oind, bool symmetric, int gr_i=1, int gr_o=1) const  "
 std::vector< M > &res) const  "
 
 [INTERNAL]  Replace 0-by-0 outputs.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::definition() const  "
+
+[INTERNAL]  Get function signature: name:(inputs)->(outputs)
 
 ";
 
@@ -10546,6 +10576,12 @@ const override "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::definition() const  "
+
+[INTERNAL]  Get function signature: name:(inputs)->(outputs)
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::log(const std::string &msg)
 const  "
 
@@ -11339,6 +11375,12 @@ override "
 &arg, std::vector< M > &res, bool always_inline, bool never_inline) const  "
 
 [INTERNAL]   Call a function, templated.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::definition() const  "
+
+[INTERNAL]  Get function signature: name:(inputs)->(outputs)
 
 ";
 
@@ -12749,6 +12791,12 @@ const  "
 &name) const  "
 
 [INTERNAL]  Get input scheme index by name.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::definition() const  "
+
+[INTERNAL]  Get function signature: name:(inputs)->(outputs)
 
 ";
 
@@ -15155,6 +15203,12 @@ casadi::FunctionInternal::print_dimensions(std::ostream &stream) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::definition() const  "
+
+[INTERNAL]  Get function signature: name:(inputs)->(outputs)
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::sz_work(size_t &sz_arg,
 size_t &sz_res, size_t &sz_iw, size_t &sz_w) const  "
 
@@ -17309,6 +17363,12 @@ std::string > &onames, const Dict &opts) const override "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::definition() const  "
+
+[INTERNAL]  Get function signature: name:(inputs)->(outputs)
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::n_out() const  "
 
 [INTERNAL]  Number of function inputs and outputs.
@@ -18258,6 +18318,12 @@ std::string &name, std::ostream &stream) const  "
 %feature("docstring")  casadi::FunctionInternal::has_sprev() const  "
 
 [INTERNAL]  Is the class able to propagate seeds through the algorithm?
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::definition() const  "
+
+[INTERNAL]  Get function signature: name:(inputs)->(outputs)
 
 ";
 
@@ -19914,6 +19980,12 @@ OracleMemory *m) const  "
 const  "
 
 [INTERNAL]  Get the floating point output argument of an atomic operation.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::definition() const  "
+
+[INTERNAL]  Get function signature: name:(inputs)->(outputs)
 
 ";
 
@@ -22815,6 +22887,12 @@ persistent=false) "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::definition() const  "
+
+[INTERNAL]  Get function signature: name:(inputs)->(outputs)
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::n_out() const  "
 
 [INTERNAL]  Number of function inputs and outputs.
@@ -25303,6 +25381,12 @@ std::string &fname, const Dict &opts) const override "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::definition() const  "
+
+[INTERNAL]  Get function signature: name:(inputs)->(outputs)
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::replace_aseed(const
 std::vector< std::vector< M > > &aseed) const  "
 
@@ -26531,6 +26615,12 @@ double **&arg, double **&res, int *&iw, double *&w) const override "
 &name) const  "
 
 [INTERNAL]  Get output scheme index by name.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::definition() const  "
+
+[INTERNAL]  Get function signature: name:(inputs)->(outputs)
 
 ";
 
@@ -28249,6 +28339,12 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::definition() const  "
+
+[INTERNAL]  Get function signature: name:(inputs)->(outputs)
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::replace_res(const
 std::vector< M > &res) const  "
 
@@ -29815,6 +29911,12 @@ const override "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::definition() const  "
+
+[INTERNAL]  Get function signature: name:(inputs)->(outputs)
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::setup(void *mem, const
 double **arg, double **res, int *iw, double *w) const  "
 
@@ -30755,6 +30857,12 @@ get_forward(int nfwd) if no cached version is available.
 %feature("docstring") casadi::Jit::_set_temp "
 
 [INTERNAL]  Set the (temporary) work vectors.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::definition() const  "
+
+[INTERNAL]  Get function signature: name:(inputs)->(outputs)
 
 ";
 
@@ -31886,6 +31994,12 @@ int oind, bool symmetric) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::fwd_seed(int nfwd) const  "
+
+[INTERNAL]  Symbolic expressions for the forward seeds.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::alloc_arg(size_t sz_arg,
 bool persistent=false) "
 
@@ -32705,9 +32819,9 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::fwd_seed(int nfwd) const  "
+%feature("docstring")  casadi::FunctionInternal::definition() const  "
 
-[INTERNAL]  Symbolic expressions for the forward seeds.
+[INTERNAL]  Get function signature: name:(inputs)->(outputs)
 
 ";
 
@@ -33736,6 +33850,12 @@ bvec_t **res, int *iw, bvec_t *w, int mem) const  "
 persistent=false) "
 
 [INTERNAL]  Ensure required length of w field.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::definition() const  "
+
+[INTERNAL]  Get function signature: name:(inputs)->(outputs)
 
 ";
 
@@ -35177,6 +35297,12 @@ std::string &fname) "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::definition() const  "
+
+[INTERNAL]  Get function signature: name:(inputs)->(outputs)
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::alloc_memory() const  "
 
 [INTERNAL]  Create memory block.
@@ -36476,6 +36602,12 @@ classes.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::definition() const  "
+
+[INTERNAL]  Get function signature: name:(inputs)->(outputs)
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::numel_out(int ind) const  "
 
 [INTERNAL]  Number of input/output elements.
@@ -37493,6 +37625,12 @@ std::vector< std::string > &onames, const Dict &opts) const  "
 &name) const  "
 
 [INTERNAL]  Get input scheme index by name.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::definition() const  "
+
+[INTERNAL]  Get function signature: name:(inputs)->(outputs)
 
 ";
 
@@ -39301,6 +39439,12 @@ const std::vector< MatType > &v) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::definition() const  "
+
+[INTERNAL]  Get function signature: name:(inputs)->(outputs)
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::setup(void *mem, const
 double **arg, double **res, int *iw, double *w) const  "
 
@@ -40893,6 +41037,12 @@ const override "
 %feature("docstring")  casadi::FunctionInternal::size_in(int ind) const  "
 
 [INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::definition() const  "
+
+[INTERNAL]  Get function signature: name:(inputs)->(outputs)
 
 ";
 
@@ -44090,6 +44240,12 @@ const override "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::definition() const  "
+
+[INTERNAL]  Get function signature: name:(inputs)->(outputs)
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::symbolic_output(const
 std::vector< MX > &arg) const  "
 
@@ -46606,6 +46762,12 @@ std::string &iname) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::definition() const  "
+
+[INTERNAL]  Get function signature: name:(inputs)->(outputs)
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::getAtomicInput(int k) const
 "
 
@@ -47425,6 +47587,12 @@ bvec_t **res, int *iw, bvec_t *w, int mem) const  "
 std::string &iname) const  "
 
 [INTERNAL]  Are all inputs and outputs scalar.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::definition() const  "
+
+[INTERNAL]  Get function signature: name:(inputs)->(outputs)
 
 ";
 
@@ -49036,6 +49204,12 @@ std::string &name) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::definition() const  "
+
+[INTERNAL]  Get function signature: name:(inputs)->(outputs)
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::simplifiedCall() const  "
 
 [INTERNAL]  Use simplified signature.
@@ -49889,6 +50063,12 @@ multiplying.
 
 
 // File: classcasadi_1_1Rootfinder.xml
+%feature("docstring")  casadi::FunctionInternal::definition() const  "
+
+[INTERNAL]  Get function signature: name:(inputs)->(outputs)
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::has_derivative() const  "
 
 [INTERNAL]  Can derivatives be calculated in any way?
@@ -52479,6 +52659,12 @@ override "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::definition() const  "
+
+[INTERNAL]  Get function signature: name:(inputs)->(outputs)
+
+";
+
 %feature("docstring")  casadi::RungeKutta::init(const Dict &opts) override "
 
 [INTERNAL]  Initialize stage.
@@ -53333,6 +53519,12 @@ std::vector< M > &arg) const  "
 %feature("docstring")  casadi::Scpgen::regularize(ScpgenMemory *m) const  "
 
 [INTERNAL] ";
+
+%feature("docstring")  casadi::FunctionInternal::definition() const  "
+
+[INTERNAL]  Get function signature: name:(inputs)->(outputs)
+
+";
 
 %feature("docstring") casadi::Scpgen::_set_temp "
 
@@ -54935,6 +55127,12 @@ std::string &name, const Importer &li) "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::definition() const  "
+
+[INTERNAL]  Get function signature: name:(inputs)->(outputs)
+
+";
+
 %feature("docstring")
 casadi::FunctionInternal::codegen_shorthand(CodeGenerator &g, const
 std::string &name) const  "
@@ -56326,6 +56524,12 @@ std::vector< M > &arg) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::definition() const  "
+
+[INTERNAL]  Get function signature: name:(inputs)->(outputs)
+
+";
+
 %feature("docstring")
 casadi::FunctionInternal::codegen_shorthand(CodeGenerator &g, const
 std::string &name) const  "
@@ -57609,6 +57813,12 @@ double **arg, double **res, int *iw, double *w) const  "
 %feature("docstring")  casadi::FunctionInternal::size_out(int ind) const  "
 
 [INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::definition() const  "
+
+[INTERNAL]  Get function signature: name:(inputs)->(outputs)
 
 ";
 
@@ -60806,6 +61016,12 @@ std::string &name, std::ostream &stream) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::definition() const  "
+
+[INTERNAL]  Get function signature: name:(inputs)->(outputs)
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::has_derivative() const  "
 
 [INTERNAL]  Can derivatives be calculated in any way?
@@ -62241,6 +62457,12 @@ class hierarchy in reverse order is run after init() has been completed.
 %feature("docstring")  casadi::FunctionInternal::memory(int ind) const  "
 
 [INTERNAL]  Memory objects.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::definition() const  "
+
+[INTERNAL]  Get function signature: name:(inputs)->(outputs)
 
 ";
 
@@ -63744,6 +63966,12 @@ const std::string &fname, bool decl_static) const  "
 const  "
 
 [INTERNAL]  Get the floating point output argument of an atomic operation.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::definition() const  "
+
+[INTERNAL]  Get function signature: name:(inputs)->(outputs)
 
 ";
 
