@@ -211,8 +211,8 @@ _object = _copyableObject
 
 _swig_repr_default = _swig_repr
 def _swig_repr(self):
-  if hasattr(self,'getRepresentation'):
-    return self.getRepresentation()
+  if hasattr(self,'get_repr'):
+    return self.get_repr()
   else:
     return _swig_repr_default(self)
 
@@ -2670,7 +2670,7 @@ class NZproxy:
 %include <casadi/core/printable_object.hpp>
 
 #ifdef SWIGPYTHON
-%rename(SWIG_STR) getDescription;
+%rename(SWIG_STR) get_str;
 #endif // SWIGPYTHON
 
 %template(PrintSharedObject) casadi::PrintableObject<casadi::SharedObject>;

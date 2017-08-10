@@ -59,14 +59,14 @@ namespace casadi {
     }
 
     /// Return a string with a description (for SWIG)
-    std::string getDescription() const {
+    std::string get_str() const {
       std::stringstream ss;
       static_cast<const Derived*>(this)->print_long(ss);
       return ss.str();
     }
 
     /// Return a string with a representation (for SWIG)
-    std::string getRepresentation() const {
+    std::string get_repr() const {
       std::stringstream ss;
       static_cast<const Derived*>(this)->print_short(ss);
       return ss.str();
@@ -88,12 +88,12 @@ namespace casadi {
 #if !defined(SWIG) || defined(DOXYGEN)
     /// Return a string with a description of the object, cf. str(Object) in Python
     inline friend std::string str(const PrintableObject<Derived>& obj) {
-      return obj.getDescription();
+      return obj.get_str();
     }
 
     /// Return a string with a representation of the object, cf. repr(Object) in Python
     inline friend std::string repr(const PrintableObject<Derived>& obj) {
-      return obj.getRepresentation();
+      return obj.get_repr();
     }
 /** @} */
 #endif //

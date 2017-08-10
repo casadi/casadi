@@ -135,7 +135,7 @@ namespace casadi {
 
     /** \brief  Print expression */
     std::string print(const std::vector<std::string>& arg) const override {
-      return x_.getDescription();
+      return x_.get_str();
     }
 
     /** \brief  Evaluate the function numerically */
