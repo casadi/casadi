@@ -96,7 +96,7 @@ namespace casadi {
     virtual bool is_smooth() const { return true; }
 
     /** \brief  print */
-    virtual void print(std::ostream &stream) const;
+    virtual void print_long(std::ostream &stream) const;
 
     /** \brief Find out which nodes can be inlined */
     void can_inline(std::map<const SXNode*, int>& nodeind) const;

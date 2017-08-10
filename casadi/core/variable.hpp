@@ -132,7 +132,7 @@ namespace casadi {
     void print_long(std::ostream &stream) const;
 
     /// Print a representation of the object
-    void repr(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
+    void print_short(std::ostream &stream) const;
   };
 } // namespace casadi
 

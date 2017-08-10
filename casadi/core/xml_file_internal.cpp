@@ -43,7 +43,7 @@ namespace casadi {
     stream << "XmlFile" << endl;
   }
 
-  void XmlFileInternal::repr(ostream &stream) const {
+  void XmlFileInternal::print_short(ostream &stream) const {
     stream << "XmlFile" << endl;
   }
 

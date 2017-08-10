@@ -57,7 +57,7 @@ namespace casadi {
     }
   }
 
-  void SharedObjectInternal::repr(std::ostream &stream) const {
+  void SharedObjectInternal::print_short(std::ostream &stream) const {
     // Print description by default
     print_long(stream);
   }

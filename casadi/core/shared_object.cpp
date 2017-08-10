@@ -92,13 +92,12 @@ namespace casadi {
     return node;
   }
 
-  void SharedObject::repr(std::ostream &stream, bool trailing_newline) const {
+  void SharedObject::print_short(std::ostream &stream) const {
     if (is_null()) {
       stream << 0;
     } else {
-      (*this)->repr(stream);
+      (*this)->print_short(stream);
     }
-    if (trailing_newline) stream << std::endl;
   }
 
   void SharedObject::print_long(std::ostream &stream) const {

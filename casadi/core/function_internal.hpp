@@ -405,7 +405,7 @@ namespace casadi {
     void print_long(std::ostream &stream) const override;
 
     /** \brief  Print */
-    void repr(std::ostream &stream) const override;
+    void print_short(std::ostream &stream) const override;
 
     /** \brief Get function signature: name:(inputs)->(outputs) */
     std::string definition() const;

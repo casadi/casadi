@@ -213,7 +213,7 @@ namespace casadi {
     return sparsity_;
   }
 
-  void MXNode::repr(std::ostream &stream) const {
+  void MXNode::print_short(std::ostream &stream) const {
     stream << "MX(";
     print_long(stream);
     stream << ")";

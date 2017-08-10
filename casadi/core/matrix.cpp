@@ -774,12 +774,10 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  void Matrix<Scalar>::repr(std::ostream &stream, bool trailing_newline) const {
+  void Matrix<Scalar>::print_short(std::ostream &stream) const {
     stream << type_name() << "(";
     print_long(stream);
     stream << ")";
-    if (trailing_newline) stream << std::endl;
-    stream << std::flush;
   }
 
   template<typename Scalar>

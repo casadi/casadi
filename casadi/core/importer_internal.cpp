@@ -39,7 +39,7 @@ namespace casadi {
     stream << "Importer" << endl;
   }
 
-  void ImporterInternal::repr(ostream &stream) const {
+  void ImporterInternal::print_short(ostream &stream) const {
     stream << "Importer" << endl;
   }
 

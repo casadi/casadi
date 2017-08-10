@@ -439,7 +439,7 @@ namespace casadi {
     void set_unit(const std::string& name, const std::string& val);
 
     ///  Print representation
-    void repr(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
+    void print_short(std::ostream &stream) const;
 
     /// Print description
     void print_long(std::ostream &stream) const;

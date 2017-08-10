@@ -69,9 +69,8 @@ namespace casadi {
     return range(start+ind1, stop+ind1, step, len+ind1);
   }
 
-  void Slice::repr(std::ostream& stream, bool trailing_newline) const {
+  void Slice::print_short(std::ostream& stream) const {
     print_long(stream);
-    if (trailing_newline) stream << std::endl;
   }
 
   void Slice::print_long(std::ostream& stream) const {

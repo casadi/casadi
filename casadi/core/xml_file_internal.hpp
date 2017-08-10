@@ -46,7 +46,7 @@ namespace casadi {
     void print_long(std::ostream &stream) const override;
 
     /** \brief  Print representation */
-    void repr(std::ostream &stream) const override;
+    void print_short(std::ostream &stream) const override;
 
     // Parse an XML file
     virtual XmlNode parse(const std::string& filename);

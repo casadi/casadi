@@ -42,9 +42,8 @@ namespace casadi {
     stream << "g = " << this->g << endl;
   }
 
-  void NlpBuilder::repr(std::ostream &stream, bool trailing_newline) const {
+  void NlpBuilder::print_short(std::ostream &stream) const {
     stream << "NLP(#x=" << this->x.size() << ", #g=" << this->g.size() << ")";
-    if (trailing_newline) stream << endl;
   }
 
   NlImporter::NlImporter(NlpBuilder& nlp, const std::string& filename, const Dict& opts)

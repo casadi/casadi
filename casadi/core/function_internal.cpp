@@ -435,7 +435,7 @@ namespace casadi {
     return s.str();
   }
 
-  void FunctionInternal::repr(ostream &stream) const {
+  void FunctionInternal::print_short(ostream &stream) const {
     stream << definition();
   }
 

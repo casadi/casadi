@@ -449,7 +449,7 @@ namespace casadi {
 
   }
 
-  void DaeBuilder::repr(std::ostream &stream, bool trailing_newline) const {
+  void DaeBuilder::print_short(std::ostream &stream) const {
     stream << "DAE("
            << "#s = " << this->s.size() << ", "
            << "#x = " << this->x.size() << ", "
@@ -459,7 +459,6 @@ namespace casadi {
            << "#p = " << this->p.size() << ", "
            << "#d = " << this->d.size() << ", "
            << "#u = " << this->u.size() << ")";
-    if (trailing_newline) stream << endl;
   }
 
   void DaeBuilder::print_long(ostream &stream) const {

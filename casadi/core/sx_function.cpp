@@ -76,7 +76,7 @@ namespace casadi {
     // Make sure no free parameters
     if (!free_vars_.empty()) {
       std::stringstream ss;
-      repr(ss);
+      print_short(ss);
       casadi_error("Cannot evaluate \"" << ss.str() << "\" since variables "
                    << free_vars_ << " are free.");
     }

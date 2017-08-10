@@ -62,7 +62,7 @@ namespace casadi {
     return size1()*size2();
   }
 
-  void SparsityInternal::repr(ostream &stream) const {
+  void SparsityInternal::print_short(ostream &stream) const {
     stream << "Compressed Column Storage: ";
     print_compact(stream);
   }
@@ -116,7 +116,7 @@ namespace casadi {
 
 
   void SparsityInternal::print_long(ostream &stream) const {
-    repr(stream);
+    print_short(stream);
     stream << endl;
     stream << "colind: " << get_colind() << endl;
     stream << "row:    " << get_row() << endl;

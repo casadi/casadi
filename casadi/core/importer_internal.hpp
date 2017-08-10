@@ -55,7 +55,7 @@ namespace casadi {
     void print_long(std::ostream &stream) const override;
 
     /** \brief Print representation */
-    void repr(std::ostream &stream) const override;
+    void print_short(std::ostream &stream) const override;
 
     // Creator function for internal class
     typedef ImporterInternal* (*Creator)(const std::string& name);

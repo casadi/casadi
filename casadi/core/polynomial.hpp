@@ -83,10 +83,10 @@ namespace casadi {
     void trim();
 
     /// Print a description of the object
-    void print(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
+    void print_long(std::ostream &stream) const;
 
     /// Print a representation of the object
-    void repr(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
+    void print_short(std::ostream &stream) const;
 
     // Add
     Polynomial operator+(const Polynomial& b) const;
@@ -121,4 +121,3 @@ namespace casadi {
 
 
 #endif // CASADI_POLYNOMIAL_HPP
-

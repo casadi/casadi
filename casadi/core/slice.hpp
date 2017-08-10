@@ -77,7 +77,7 @@ namespace casadi {
     bool operator!=(const Slice& other) const { return !(*this == other);}
 
     /// Print a representation of the object
-    void repr(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
+    void print_short(std::ostream &stream) const;
 
     /// Print a description of the object
     void print_long(std::ostream &stream) const;

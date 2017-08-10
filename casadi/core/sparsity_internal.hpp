@@ -419,7 +419,7 @@ namespace casadi {
     std::size_t hash() const;
 
     /// Print representation
-    void repr(std::ostream &stream) const override;
+    void print_short(std::ostream &stream) const override;
 
     /// Print description
     void print_long(std::ostream &stream) const override;

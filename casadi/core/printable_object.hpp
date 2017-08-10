@@ -51,6 +51,13 @@ namespace casadi {
       stream << std::flush;
     }
 
+    /// Print a representation of the object
+    void repr(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const {
+      static_cast<const Derived*>(this)->print_short(stream);
+      if (trailing_newline) stream << std::endl;
+      stream << std::flush;
+    }
+
     /// Return a string with a description (for SWIG)
     std::string getDescription() const {
       std::stringstream ss;
@@ -61,7 +68,7 @@ namespace casadi {
     /// Return a string with a representation (for SWIG)
     std::string getRepresentation() const {
       std::stringstream ss;
-      static_cast<const Derived*>(this)->repr(ss, false);
+      static_cast<const Derived*>(this)->print_short(ss);
       return ss.str();
     }
 
@@ -69,7 +76,7 @@ namespace casadi {
     /// Print a representation of the object to a stream (shorthand)
     inline friend
       std::ostream& operator<<(std::ostream &stream, const PrintableObject<Derived>& obj) {
-      static_cast<const Derived&>(obj).repr(stream, false);
+      static_cast<const Derived&>(obj).print_short(stream);
       return stream;
     }
 #endif // SWIG

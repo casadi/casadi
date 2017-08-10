@@ -77,7 +77,7 @@ namespace casadi {
     virtual bool is_binary() const { return false;}
 
     /** \brief  Print a representation */
-    void repr(std::ostream &stream) const override;
+    void print_short(std::ostream &stream) const override;
 
     /** \brief  Print a description */
     void print_long(std::ostream &stream) const override;
