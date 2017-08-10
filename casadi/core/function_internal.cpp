@@ -416,19 +416,27 @@ namespace casadi {
     print_dimensions(stream);
   }
 
-  void FunctionInternal::repr(ostream &stream) const {
+  std::string FunctionInternal::definition() const {
+    stringstream s;
+
     // Print name
-    stream << name_ << ":";
+    s << name_ << ":";
     // Print input arguments
     for (int i=0; i<n_in(); ++i) {
-      stream << (i==0 ? "(" : ",") << name_in(i);
+      s << (i==0 ? "(" : ",") << name_in(i);
     }
-    stream << ")->";
+    s << ")->";
     // Print output arguments
     for (int i=0; i<n_out(); ++i) {
-      stream << (i==0 ? "(" : ",") << name_out(i);
+      s << (i==0 ? "(" : ",") << name_out(i);
     }
-    stream << ")";
+    s << ")";
+
+    return s.str();
+  }
+
+  void FunctionInternal::repr(ostream &stream) const {
+    stream << definition();
   }
 
   Function FunctionInternal::wrap() const {

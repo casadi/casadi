@@ -407,6 +407,9 @@ namespace casadi {
     /** \brief  Print */
     void repr(std::ostream &stream) const override;
 
+    /** \brief Get function signature: name:(inputs)->(outputs) */
+    std::string definition() const;
+
     /** \brief Check if the numerical values of the supplied bounds make sense */
     virtual void checkInputs() const {}
 
