@@ -115,7 +115,7 @@ namespace casadi {
   }
 
 
-  void SparsityInternal::print(ostream &stream) const {
+  void SparsityInternal::print_long(ostream &stream) const {
     repr(stream);
     stream << endl;
     stream << "colind: " << get_colind() << endl;

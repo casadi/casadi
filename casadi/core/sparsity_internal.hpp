@@ -422,7 +422,7 @@ namespace casadi {
     void repr(std::ostream &stream) const override;
 
     /// Print description
-    void print(std::ostream &stream) const override;
+    void print_long(std::ostream &stream) const override;
 
     /** \brief Perform a unidirectional coloring
      *

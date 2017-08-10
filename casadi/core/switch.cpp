@@ -252,7 +252,7 @@ namespace casadi {
     return Function(name, arg, res, inames, onames, opts);
   }
 
-  void Switch::print(ostream &stream) const {
+  void Switch::print_long(ostream &stream) const {
     if (f_.size()==1) {
       // Print as if-then-else
       stream << "Switch(" << f_def_.name() << ", " << f_[0].name() << ")";

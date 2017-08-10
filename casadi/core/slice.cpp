@@ -70,10 +70,11 @@ namespace casadi {
   }
 
   void Slice::repr(std::ostream& stream, bool trailing_newline) const {
-    print(stream, trailing_newline);
+    print_long(stream);
+    if (trailing_newline) stream << std::endl;
   }
 
-  void Slice::print(std::ostream& stream, bool trailing_newline) const {
+  void Slice::print_long(std::ostream& stream) const {
     bool from_beginning = start == 0;
     bool till_end = stop == std::numeric_limits<int>::max();
     bool skip_none = step==1;
@@ -85,7 +86,6 @@ namespace casadi {
       if (!till_end) stream << stop;
       if (!skip_none) stream << ":" << step;
     }
-    if (trailing_newline) stream << std::endl;
   }
 
   std::vector<int> Slice::all(const Slice& outer, int len) const {
@@ -251,4 +251,3 @@ namespace casadi {
   }
 
 } // namespace casadi
-

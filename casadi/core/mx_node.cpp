@@ -215,11 +215,11 @@ namespace casadi {
 
   void MXNode::repr(std::ostream &stream) const {
     stream << "MX(";
-    print(stream);
+    print_long(stream);
     stream << ")";
   }
 
-  void MXNode::print(std::ostream &stream) const {
+  void MXNode::print_long(std::ostream &stream) const {
     // Find out which noded can be inlined
     std::map<const MXNode*, int> nodeind;
     can_inline(nodeind);

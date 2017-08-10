@@ -52,7 +52,7 @@ namespace casadi {
     ~ImporterInternal() override;
 
     /** \brief Print */
-    void print(std::ostream &stream) const override;
+    void print_long(std::ostream &stream) const override;
 
     /** \brief Print representation */
     void repr(std::ostream &stream) const override;

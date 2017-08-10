@@ -741,7 +741,7 @@ namespace casadi {
     static std::string type_name();
 
     /// Print a description of the object
-    void print(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
+    void print_long(std::ostream &stream) const;
 
     /// Get strings corresponding to the nonzeros and the interdependencies
     void print_split(std::vector<std::string>& SWIG_OUTPUT(nz),

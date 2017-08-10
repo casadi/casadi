@@ -88,7 +88,7 @@ namespace casadi {
     void eval(void* mem, const double** arg, double** res, int* iw, double* w) const override;
 
     /** \brief  Print description */
-    void print(std::ostream &stream) const override;
+    void print_long(std::ostream &stream) const override;
 
     /** \brief Get type name */
     std::string type_name() const override {return "mxfunction";}

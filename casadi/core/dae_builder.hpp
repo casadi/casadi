@@ -442,7 +442,7 @@ namespace casadi {
     void repr(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
 
     /// Print description
-    void print(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
+    void print_long(std::ostream &stream) const;
 
     /// Add a variable
     void add_variable(const std::string& name, const Variable& var);

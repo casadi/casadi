@@ -412,7 +412,7 @@ namespace casadi {
     stream << "[]";
   }
 
-  void FunctionInternal::print(ostream &stream) const {
+  void FunctionInternal::print_long(ostream &stream) const {
     print_dimensions(stream);
   }
 

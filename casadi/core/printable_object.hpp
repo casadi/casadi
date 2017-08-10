@@ -45,9 +45,16 @@ namespace casadi {
   public:
 
     /// Return a string with a description (for SWIG)
+    void print(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const {
+      static_cast<const Derived*>(this)->print_long(stream);
+      if (trailing_newline) stream << std::endl;
+      stream << std::flush;
+    }
+
+    /// Return a string with a description (for SWIG)
     std::string getDescription() const {
       std::stringstream ss;
-      static_cast<const Derived*>(this)->print(ss, false);
+      static_cast<const Derived*>(this)->print_long(ss);
       return ss.str();
     }
 

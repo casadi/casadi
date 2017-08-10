@@ -55,14 +55,13 @@ namespace casadi {
 
   void Variable::repr(ostream &stream, bool trailing_newline) const {
     stream << "Variable(";
-    print(stream, false);
+    print_long(stream);
     stream << ")";
     if (trailing_newline) stream << std::endl;
   }
 
-  void Variable::print(ostream &stream, bool trailing_newline) const {
+  void Variable::print_long(ostream &stream) const {
     stream << name();
-    if (trailing_newline) stream << std::endl;
   }
 
 } // namespace casadi

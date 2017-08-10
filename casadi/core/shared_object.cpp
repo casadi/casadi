@@ -101,16 +101,15 @@ namespace casadi {
     if (trailing_newline) stream << std::endl;
   }
 
-  void SharedObject::print(std::ostream &stream, bool trailing_newline) const {
+  void SharedObject::print_long(std::ostream &stream) const {
     if (is_null()) {
       stream << "Null pointer of class \"" << typeid(this).name() << "\"";
     } else {
-      (*this)->print(stream);
+      (*this)->print_long(stream);
     }
-    if (trailing_newline) stream << std::endl;
   }
 
-  void SharedObject::printPtr(std::ostream &stream) const {
+  void SharedObject::print_ptr(std::ostream &stream) const {
     stream << node;
   }
 

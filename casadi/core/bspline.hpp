@@ -125,7 +125,7 @@ namespace casadi {
       ///@}
 
       /** \brief  Print description */
-      void print(std::ostream &stream) const override { stream << "BSpline"; }
+      void print_long(std::ostream &stream) const override { stream << "BSpline"; }
 
       /** \brief Is codegen supported? */
       bool has_codegen() const override { return true;}
@@ -208,7 +208,7 @@ namespace casadi {
       ///@}
 
       /** \brief  Print description */
-      void print(std::ostream &stream) const override { stream << "BSplineDual"; }
+      void print_long(std::ostream &stream) const override { stream << "BSplineDual"; }
 
       /** \brief Is codegen supported? */
       bool has_codegen() const override { return true;}

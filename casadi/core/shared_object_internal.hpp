@@ -56,7 +56,7 @@ namespace casadi {
     virtual void repr(std::ostream &stream) const;
 
     /// Print a description of the object
-    virtual void print(std::ostream &stream) const;
+    virtual void print_long(std::ostream &stream) const;
 
     /** \brief Get a weak reference to the object */
     WeakRef* weak();

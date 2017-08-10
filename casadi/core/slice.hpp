@@ -80,7 +80,7 @@ namespace casadi {
     void repr(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
 
     /// Print a description of the object
-    void print(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
+    void print_long(std::ostream &stream) const;
   };
 
   /// Construct from an index vector (requires is_slice(v) to be true)

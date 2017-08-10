@@ -462,7 +462,7 @@ namespace casadi {
     if (trailing_newline) stream << endl;
   }
 
-  void DaeBuilder::print(ostream &stream, bool trailing_newline) const {
+  void DaeBuilder::print_long(ostream &stream) const {
     // Assert correctness
     sanity_check();
 
@@ -544,7 +544,6 @@ namespace casadi {
         stream << str(this->y[i]) << " == " << str(this->ydef[i]) << endl;
       stream << endl;
     }
-    if (trailing_newline) stream << endl;
   }
 
   void DaeBuilder::eliminate_quad() {

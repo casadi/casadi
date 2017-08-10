@@ -80,7 +80,7 @@ namespace casadi {
     void repr(std::ostream &stream) const override;
 
     /** \brief  Print a description */
-    void print(std::ostream &stream) const override;
+    void print_long(std::ostream &stream) const override;
 
     /** \brief Find out which nodes can be inlined */
     void can_inline(std::map<const MXNode*, int>& nodeind) const;

@@ -111,8 +111,8 @@ namespace casadi {
     return true;
   }
 
-  void SXFunction::print(ostream &stream) const {
-    FunctionInternal::print(stream);
+  void SXFunction::print_long(ostream &stream) const {
+    FunctionInternal::print_long(stream);
 
     // Iterator to free variables
     vector<SXElem>::const_iterator p_it = free_vars_.begin();

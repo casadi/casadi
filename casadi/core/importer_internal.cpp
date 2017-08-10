@@ -35,7 +35,7 @@ namespace casadi {
   ImporterInternal::~ImporterInternal() {
   }
 
-  void ImporterInternal::print(ostream &stream) const {
+  void ImporterInternal::print_long(ostream &stream) const {
     stream << "Importer" << endl;
   }
 

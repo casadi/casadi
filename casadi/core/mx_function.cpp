@@ -448,8 +448,8 @@ namespace casadi {
     return s.str();
   }
 
-  void MXFunction::print(ostream &stream) const {
-    FunctionInternal::print(stream);
+  void MXFunction::print_long(ostream &stream) const {
+    FunctionInternal::print_long(stream);
     for (auto&& e : algorithm_) {
       InterruptHandler::check();
       stream << print(e) << endl;
