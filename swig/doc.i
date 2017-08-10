@@ -26949,6 +26949,9 @@ Check if a function is inlined.
 // File: classcasadi_1_1InfSX.xml
 
 
+// File: classcasadi_1_1Input.xml
+
+
 // File: classcasadi_1_1IntegerSX.xml
 
 
@@ -29842,6 +29845,9 @@ C++ includes: casadi_interrupt.hpp ";
 
 
 // File: classcasadi_1_1Inverse.xml
+
+
+// File: classcasadi_1_1IOInstruction.xml
 
 
 // File: classcasadi_1_1IpoptUserClass.xml
@@ -43110,7 +43116,7 @@ the nonzeros along with a comment.
 
 %feature("docstring")  casadi::MX::primitives() const  "
 
-Get symbolic primitives.
+Get primitives.
 
 ";
 
@@ -43922,7 +43928,7 @@ Get operation type.
 
 %feature("docstring")  casadi::MX::n_primitives() const  "
 
-Get the number of symbolic primitive Assumes is_valid_input() returns true.
+Get the number of primitives for MXFunction inputs/outputs.
 
 ";
 
@@ -48566,6 +48572,9 @@ std::vector< MX > &arg) "
 [INTERNAL]  Get a vector of symbolic variables corresponding to the outputs.
 
 ";
+
+
+// File: classcasadi_1_1Output.xml
 
 
 // File: classcasadi_1_1ParsedFile.xml
