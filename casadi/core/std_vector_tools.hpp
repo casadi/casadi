@@ -106,11 +106,11 @@ namespace casadi {
 
   /// Print representation
   template<typename T>
-  void repr(const std::vector<T> &v, std::ostream &stream=casadi::userOut());
+  void print_short(const std::vector<T> &v, std::ostream &stream);
 
   /// Print description
   template<typename T>
-  void print(const std::vector<T> &v, std::ostream &stream=casadi::userOut());
+  void print_long(const std::vector<T> &v, std::ostream &stream);
   #endif // SWIG
 
   /// Check if for each element of v holds: v_i < upper
@@ -197,11 +197,11 @@ namespace casadi {
 #ifndef SWIG
   /// Print representation to string
   template<typename T>
-  std::string getRepresentation(const std::vector<T> &v);
+  std::string repr(const std::vector<T> &v);
 
   /// Print description to string
   template<typename T>
-  std::string getDescription(const std::vector<T> &v);
+  std::string str(const std::vector<T> &v);
 #endif //SWIG
 
   /// Print vector, matlab style
@@ -300,7 +300,7 @@ namespace std {
   /// Enables flushing an std::vector to a stream (prints representation)
   template<typename T>
   ostream& operator<<(ostream &stream, const vector<T> &v) {
-    casadi::repr(v, stream);
+    casadi::print_short(v, stream);
     return stream;
   }
 
@@ -365,7 +365,7 @@ namespace casadi {
   }
 
   template<typename T>
-  void repr(const std::vector<T> &v, std::ostream &stream) {
+  void print_short(const std::vector<T> &v, std::ostream &stream) {
     if (v.empty()) {
       stream << "[]";
     } else {
@@ -379,7 +379,7 @@ namespace casadi {
   }
 
   template<typename T>
-  void print(const std::vector<T> &v, std::ostream &stream) {
+  void print_long(const std::vector<T> &v, std::ostream &stream) {
     // print vector style
     stream << "[" << v.size() << "]"; // Print dimension
 
@@ -492,16 +492,16 @@ namespace casadi {
   }
 
   template<typename T>
-  std::string getRepresentation(const std::vector<T> &v) {
+  std::string repr(const std::vector<T> &v) {
     std::stringstream ss;
-    repr(v, ss);
+    print_short(v, ss);
     return ss.str();
   }
 
   template<typename T>
-  std::string getDescription(const std::vector<T> &v) {
+  std::string str(const std::vector<T> &v) {
     std::stringstream ss;
-    print(v, ss);
+    print_long(v, ss);
     return ss.str();
   }
 
