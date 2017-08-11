@@ -127,9 +127,9 @@ namespace casadi {
     }
 
     int nrow_x = dep(1).size1(), nrow_y = dep(2).size1(), ncol_y = dep(2).size2();
-    g.local("rr", "real_t", "*");
-    g.local("ss", "real_t", "*");
-    g.local("tt", "real_t", "*");
+    g.local("rr", "casadi_real", "*");
+    g.local("ss", "casadi_real", "*");
+    g.local("tt", "casadi_real", "*");
     g.local("i", "int");
     g.local("j", "int");
     g.local("k", "int");

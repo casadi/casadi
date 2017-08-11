@@ -1090,7 +1090,7 @@ namespace casadi {
       int n=workloc_[i+1]-workloc_[i];
       if (n==0) continue;
       if (first) {
-        g << "real_t ";
+        g << "casadi_real ";
         first = false;
       } else {
         g << ", ";

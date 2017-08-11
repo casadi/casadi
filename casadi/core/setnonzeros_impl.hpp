@@ -766,8 +766,8 @@ namespace casadi {
 
     // Perform the operation inplace
     g.local("cii", "const int", "*");
-    g.local("rr", "real_t", "*");
-    g.local("ss", "real_t", "*");
+    g.local("rr", "casadi_real", "*");
+    g.local("ss", "casadi_real", "*");
     g << "for (cii=" << ind << ", rr=" << g.work(res[0], this->nnz()) << ", "
       << "ss=" << g.work(arg[1], this->dep(1).nnz()) << "; cii!=" << ind
       << "+" << this->nz_.size() << "; ++cii, ++ss)"
@@ -785,8 +785,8 @@ namespace casadi {
     }
 
     // Perform the operation inplace
-    g.local("rr", "real_t", "*");
-    g.local("ss", "real_t", "*");
+    g.local("rr", "casadi_real", "*");
+    g.local("ss", "casadi_real", "*");
     g << "for (rr=" << g.work(res[0], this->nnz()) << "+" << s_.start << ", ss="
       << g.work(arg[1], this->dep(1).nnz()) << "; rr!="
       << g.work(res[0], this->nnz()) << "+" << s_.stop
@@ -805,9 +805,9 @@ namespace casadi {
     }
 
     // Perform the operation inplace
-    g.local("rr", "real_t", "*");
-    g.local("ss", "real_t", "*");
-    g.local("tt", "real_t", "*");
+    g.local("rr", "casadi_real", "*");
+    g.local("ss", "casadi_real", "*");
+    g.local("tt", "casadi_real", "*");
     g << "for (rr=" << g.work(res[0], this->nnz()) << "+" << outer_.start
       << ", ss=" << g.work(arg[1], this->dep(1).nnz()) << "; rr!="
       << g.work(res[0], this->nnz()) << "+" << outer_.stop

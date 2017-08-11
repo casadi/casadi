@@ -74,7 +74,7 @@ namespace casadi {
                       const std::vector<int>& arg, const std::vector<int>& res) const {
     int nnz = dep(0).nnz();
     g.local("i", "int");
-    g.local("cr", "const real_t", "*");
+    g.local("cr", "const casadi_real", "*");
     g << "for (i=0, cr=" << g.work(arg[0], nnz) << "; i<" << nnz
       << " && *cr++==0; ++i) {}\n"
       << g.workel(res[0]) << " = ";

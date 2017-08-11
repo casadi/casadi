@@ -38,7 +38,7 @@ namespace casadi {
     this->mex = false;
     this->cpp = false;
     this->main = false;
-    this->real_t = "double";
+    this->casadi_real = "double";
     this->codegen_scalars = false;
     this->with_header = false;
     this->with_mem = false;
@@ -55,8 +55,8 @@ namespace casadi {
         this->cpp = e.second;
       } else if (e.first=="main") {
         this->main = e.second;
-      } else if (e.first=="real_t") {
-        this->real_t = e.second.to_string();
+      } else if (e.first=="casadi_real") {
+        this->casadi_real = e.second.to_string();
       } else if (e.first=="codegen_scalars") {
         this->codegen_scalars = e.second;
       } else if (e.first=="with_header") {
@@ -101,7 +101,7 @@ namespace casadi {
     // Memory struct entry point
     if (this->with_mem) {
       add_include("casadi/mem.h", false);
-      this->header << "#include <casadi/mem.h>" << endl;
+      this->header << "#include <casadi/mem.h>\n";
     }
 
     // Mex
@@ -114,7 +114,7 @@ namespace casadi {
     f->codegen(*this, f.name(), false);
     if (this->with_header) {
       if (this->cpp) this->header << "extern \"C\" " ; // C linkage
-      this->header << f->signature(f.name()) << ";" << endl;
+      this->header << f->signature(f.name()) << ";\n";
     }
     f->codegen_meta(*this, f.name());
     this->exposed_fname.push_back(f.name());
@@ -145,19 +145,19 @@ namespace casadi {
   void CodeGenerator::file_close(std::ofstream& f) const {
     // C linkage
     if (!this->cpp) {
-      f << "#ifdef __cplusplus" << endl
-        << "} /* extern \"C\" */" << endl
-        << "#endif" << endl;
+      f << "#ifdef __cplusplus\n"
+        << "} /* extern \"C\" */\n"
+        << "#endif\n";
     }
 
     // Close file(s)
     f.close();
   }
 
-  void CodeGenerator::generate_real_t(std::ostream &s) const {
-    s << "#ifndef real_t" << endl
-      << "#define real_t " << this->real_t << endl
-      << "#endif" << endl << endl;
+  void CodeGenerator::generate_casadi_real(std::ostream &s) const {
+    s << "#ifndef casadi_real\n"
+      << "#define casadi_real " << this->casadi_real << endl
+      << "#endif\n\n";
   }
 
   std::string CodeGenerator::generate(const std::string& prefix) const {
@@ -189,8 +189,8 @@ namespace casadi {
       // Create a header file
       file_open(s, prefix + this->name + ".h");
 
-      // Define the real_t type (typically double)
-      generate_real_t(s);
+      // Define the casadi_real type (typically double)
+      generate_casadi_real(s);
 
       // Add declarations
       s << this->header.str();
@@ -203,10 +203,10 @@ namespace casadi {
 
   void CodeGenerator::generate_mex(std::ostream &s) const {
     // Begin conditional compilation
-    s << "#ifdef MATLAB_MEX_FILE" << endl;
+    s << "#ifdef MATLAB_MEX_FILE\n";
 
     // Function prototype
-    if (this->cpp) s << "extern \"C\"" << endl; // C linkage
+    if (this->cpp) s << "extern \"C\"\n"; // C linkage
     s << "void mexFunction(int resc, mxArray *resv[], int argc, const mxArray *argv[]) {"
       << endl;
 
@@ -215,54 +215,54 @@ namespace casadi {
     for (int i=0; i<exposed_fname.size(); ++i) {
       buf_len = std::max(buf_len, exposed_fname[i].size());
     }
-    s << "  char buf[" << (buf_len+1) << "];" << endl;
+    s << "  char buf[" << (buf_len+1) << "];\n";
 
     // Read string argument
-    s << "  int buf_ok = --argc >= 0 && !mxGetString(*argv++, buf, sizeof(buf));" << endl;
+    s << "  int buf_ok = --argc >= 0 && !mxGetString(*argv++, buf, sizeof(buf));\n";
 
     // Create switch
-    s << "  if (!buf_ok) {" << endl
-      << "    /* name error */" << endl;
+    s << "  if (!buf_ok) {\n"
+      << "    /* name error */\n";
     for (int i=0; i<exposed_fname.size(); ++i) {
-      s << "  } else if (strcmp(buf, \"" << exposed_fname[i] << "\")==0) {" << endl
-        << "    return mex_" << exposed_fname[i] << "(resc, resv, argc, argv);" << endl;
+      s << "  } else if (strcmp(buf, \"" << exposed_fname[i] << "\")==0) {\n"
+        << "    return mex_" << exposed_fname[i] << "(resc, resv, argc, argv);\n";
     }
-    s << "  }" << endl;
+    s << "  }\n";
 
     // Error
     s << "  mexErrMsgTxt(\"First input should be a command string. Possible values:";
     for (int i=0; i<exposed_fname.size(); ++i) {
       s << " '" << exposed_fname[i] << "'";
     }
-    s << "\");" << endl;
+    s << "\");\n";
 
     // End conditional compilation and function
-    s << "}" << endl
-         << "#endif" << endl;
+    s << "}\n"
+         << "#endif\n";
   }
 
   void CodeGenerator::generate_main(std::ostream &s) const {
-    s << "int main(int argc, char* argv[]) {" << endl;
+    s << "int main(int argc, char* argv[]) {\n";
 
     // Create switch
-    s << "  if (argc<2) {" << endl
-      << "    /* name error */" << endl;
+    s << "  if (argc<2) {\n"
+      << "    /* name error */\n";
     for (int i=0; i<exposed_fname.size(); ++i) {
-      s << "  } else if (strcmp(argv[1], \"" << exposed_fname[i] << "\")==0) {" << endl
-        << "    return main_" << exposed_fname[i] << "(argc-2, argv+2);" << endl;
+      s << "  } else if (strcmp(argv[1], \"" << exposed_fname[i] << "\")==0) {\n"
+        << "    return main_" << exposed_fname[i] << "(argc-2, argv+2);\n";
     }
-    s << "  }" << endl;
+    s << "  }\n";
 
     // Error
     s << "  fprintf(stderr, \"First input should be a command string. Possible values:";
     for (int i=0; i<exposed_fname.size(); ++i) {
       s << " '" << exposed_fname[i] << "'";
     }
-    s << "\\n\");" << endl;
+    s << "\\n\");\n";
 
     // End main
-    s << "  return 1;" << endl
-      << "}" << endl;
+    s << "  return 1;\n"
+      << "}\n";
   }
 
   void CodeGenerator::dump(std::ostream& s) const {
@@ -270,20 +270,20 @@ namespace casadi {
     casadi_assert(current_indent_ == 0);
 
     // Prefix internal symbols to avoid symbol collisions
-    s << "/* How to prefix internal symbols */" << endl
-      << "#ifdef CODEGEN_PREFIX" << endl
-      << "  #define NAMESPACE_CONCAT(NS, ID) _NAMESPACE_CONCAT(NS, ID)" << endl
-      << "  #define _NAMESPACE_CONCAT(NS, ID) NS ## ID" << endl
-      << "  #define CASADI_PREFIX(ID) NAMESPACE_CONCAT(CODEGEN_PREFIX, ID)" << endl
-      << "#else" << endl
-      << "  #define CASADI_PREFIX(ID) " << this->name << "_ ## ID" << endl
-      << "#endif" << endl << endl;
+    s << "/* How to prefix internal symbols */\n"
+      << "#ifdef CODEGEN_PREFIX\n"
+      << "  #define NAMESPACE_CONCAT(NS, ID) _NAMESPACE_CONCAT(NS, ID)\n"
+      << "  #define _NAMESPACE_CONCAT(NS, ID) NS ## ID\n"
+      << "  #define CASADI_PREFIX(ID) NAMESPACE_CONCAT(CODEGEN_PREFIX, ID)\n"
+      << "#else\n"
+      << "  #define CASADI_PREFIX(ID) " << this->name << "_ ## ID\n"
+      << "#endif\n\n";
 
     s << this->includes.str();
     s << endl;
 
     // Real type (usually double)
-    generate_real_t(s);
+    generate_casadi_real(s);
 
     // Type conversion
     s << "#define to_double(x) "
@@ -294,60 +294,60 @@ namespace casadi {
       << (this->cpp ? "static_cast<x>(y)" : "(x) y") << endl << endl;
 
     // Pre-C99
-    s << "/* Pre-c99 compatibility */" << endl
-      << "#if __STDC_VERSION__ < 199901L" << endl
-      << "  #define fmin CASADI_PREFIX(fmin)" << endl
-      << "  real_t fmin(real_t x, real_t y) { return x<y ? x : y;}" << endl
-      << "  #define fmax CASADI_PREFIX(fmax)" << endl
-      << "  real_t fmax(real_t x, real_t y) { return x>y ? x : y;}" << endl
-      << "#endif" << endl << endl;
+    s << "/* Pre-c99 compatibility */\n"
+      << "#if __STDC_VERSION__ < 199901L\n"
+      << "  #define fmin CASADI_PREFIX(fmin)\n"
+      << "  casadi_real fmin(casadi_real x, casadi_real y) { return x<y ? x : y;}\n"
+      << "  #define fmax CASADI_PREFIX(fmax)\n"
+      << "  casadi_real fmax(casadi_real x, casadi_real y) { return x>y ? x : y;}\n"
+      << "#endif\n\n";
 
       // CasADi extensions
-      s << "/* CasADi extensions */" << endl
-        << "#define sq CASADI_PREFIX(sq)" << endl
-        << "real_t sq(real_t x) { return x*x;}" << endl
-        << "#define sign CASADI_PREFIX(sign)" << endl
-        << "real_t CASADI_PREFIX(sign)(real_t x) { return x<0 ? -1 : x>0 ? 1 : x;}" << endl
-        << "#define twice CASADI_PREFIX(twice)" << endl
-        << "real_t twice(real_t x) { return x+x;}" << endl << endl;
+      s << "/* CasADi extensions */\n"
+        << "#define sq CASADI_PREFIX(sq)\n"
+        << "casadi_real sq(casadi_real x) { return x*x;}\n"
+        << "#define sign CASADI_PREFIX(sign)\n"
+        << "casadi_real CASADI_PREFIX(sign)(casadi_real x) { return x<0 ? -1 : x>0 ? 1 : x;}\n"
+        << "#define twice CASADI_PREFIX(twice)\n"
+        << "casadi_real twice(casadi_real x) { return x+x;}\n\n";
 
     // Macros
     if (!added_shorthands_.empty()) {
-      s << "/* Add prefix to internal symbols */" << endl;
+      s << "/* Add prefix to internal symbols */\n";
       for (auto&& i : added_shorthands_) {
-        s << "#define " << "casadi_" << i <<  " CASADI_PREFIX(" << i <<  ")" << endl;
+        s << "#define " << "casadi_" << i <<  " CASADI_PREFIX(" << i <<  ")\n";
       }
       s << endl;
     }
 
     // Printing routing
-    s << "/* Printing routine */" << endl;
+    s << "/* Printing routine */\n";
     if (this->mex) {
-      s << "#ifdef MATLAB_MEX_FILE" << endl
-        << "  #define PRINTF mexPrintf" << endl
-        << "#else" << endl
-        << "  #define PRINTF printf" << endl
-        << "#endif" << endl;
+      s << "#ifdef MATLAB_MEX_FILE\n"
+        << "  #define PRINTF mexPrintf\n"
+        << "#else\n"
+        << "  #define PRINTF printf\n"
+        << "#endif\n";
     } else {
-      s << "#define PRINTF printf" << endl;
+      s << "#define PRINTF printf\n";
     }
     s << endl;
 
     if (this->with_export) {
-      s << "/* Symbol visibility in DLLs */" << endl
-        << "#ifndef CASADI_SYMBOL_EXPORT" << endl
-        << "  #if defined(_WIN32) || defined(__WIN32__) || defined(__CYGWIN__)" << endl
-        << "    #if defined(STATIC_LINKED)" << endl
-        << "      #define CASADI_SYMBOL_EXPORT" << endl
-        << "    #else" << endl
-        << "      #define CASADI_SYMBOL_EXPORT __declspec(dllexport)" << endl
-        << "    #endif" << endl
-        << "  #elif defined(__GNUC__) && defined(GCC_HASCLASSVISIBILITY)" << endl
-        << "    #define CASADI_SYMBOL_EXPORT __attribute__ ((visibility (\"default\")))" << endl
+      s << "/* Symbol visibility in DLLs */\n"
+        << "#ifndef CASADI_SYMBOL_EXPORT\n"
+        << "  #if defined(_WIN32) || defined(__WIN32__) || defined(__CYGWIN__)\n"
+        << "    #if defined(STATIC_LINKED)\n"
+        << "      #define CASADI_SYMBOL_EXPORT\n"
+        << "    #else\n"
+        << "      #define CASADI_SYMBOL_EXPORT __declspec(dllexport)\n"
+        << "    #endif\n"
+        << "  #elif defined(__GNUC__) && defined(GCC_HASCLASSVISIBILITY)\n"
+        << "    #define CASADI_SYMBOL_EXPORT __attribute__ ((visibility (\"default\")))\n"
         << "  #else"  << endl
-        << "    #define CASADI_SYMBOL_EXPORT" << endl
-        << "  #endif" << endl
-        << "#endif" << endl << endl;
+        << "    #define CASADI_SYMBOL_EXPORT\n"
+        << "  #endif\n"
+        << "#endif\n\n";
     }
 
     // Print integer constants
@@ -368,7 +368,7 @@ namespace casadi {
 
     // External function declarations
     if (!added_externals_.empty()) {
-      s << "/* External functions */" << endl;
+      s << "/* External functions */\n";
       for (auto&& i : added_externals_) {
         s << i << endl;
       }
@@ -419,7 +419,7 @@ namespace casadi {
       s << name << "[" << len << "]";
       if (!def.empty()) s << " = " << def;
     }
-    s << ";" << endl;
+    s << ";\n";
     return s.str();
   }
 
@@ -429,7 +429,7 @@ namespace casadi {
 
   void CodeGenerator::print_vector(std::ostream &s, const std::string& name,
                                   const vector<double>& v) {
-    s << array("static const real_t", name, v.size(), initializer(v));
+    s << array("static const casadi_real", name, v.size(), initializer(v));
   }
 
   void CodeGenerator::add_include(const std::string& new_include, bool relative_path,
@@ -445,13 +445,13 @@ namespace casadi {
 
     // Print to the header section
     if (relative_path) {
-      this->includes << "#include \"" << new_include << "\"" << endl;
+      this->includes << "#include \"" << new_include << "\"\n";
     } else {
-      this->includes << "#include <" << new_include << ">" << endl;
+      this->includes << "#include <" << new_include << ">\n";
     }
 
     // Ifdef closing
-    if (!use_ifdef.empty()) this->includes << "#endif" << endl;
+    if (!use_ifdef.empty()) this->includes << "#endif\n";
   }
 
   bool CodeGenerator::simplified_call(const Function& f) {
@@ -702,13 +702,13 @@ namespace casadi {
     case AUX_TO_MEX:
       this->auxiliaries << "#ifdef MATLAB_MEX_FILE\n"
                         << sanitize_source("to_mex", casadi_to_mex_str, inst)
-                        << "#endif" << endl << endl;
+                        << "#endif\n\n";
       break;
     case AUX_FROM_MEX:
       add_auxiliary(AUX_FILL);
       this->auxiliaries << "#ifdef MATLAB_MEX_FILE\n"
                         << sanitize_source("from_mex", casadi_from_mex_str, inst)
-                        << "#endif" << endl << endl;
+                        << "#endif\n\n";
       break;
     case AUX_CENTRAL_DIFF_MEM:
       this->auxiliaries << sanitize_source("central_diff_mem", casadi_central_diff_mem_str, inst);
@@ -885,7 +885,7 @@ namespace casadi {
 
     // To header file
     if (this->with_header) {
-      this->header << s << ";" << endl;
+      this->header << s << ";\n";
     }
 
     return s;
@@ -1035,10 +1035,10 @@ namespace casadi {
   string CodeGenerator::
   sanitize_source(const std::string& symbol, const std::string& src,
                   const vector<string>& inst, bool add_shorthand) {
-    // Create suffix if templates type are not all "real_t"
+    // Create suffix if templates type are not all "casadi_real"
     string suffix;
     for (const string& s : inst) {
-      if (s!="real_t") {
+      if (s!="casadi_real") {
         for (const string& s : inst) suffix += "_" + s;
         break;
       }

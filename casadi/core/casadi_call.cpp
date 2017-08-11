@@ -171,13 +171,13 @@ namespace casadi {
       }
     } else {
       // Collect input arguments
-      g.local("arg1", "const real_t", "**");
+      g.local("arg1", "const casadi_real", "**");
       for (int i=0; i<arg.size(); ++i) {
         g << "arg1[" << i << "]=" << g.work(arg[i], fcn_.nnz_in(i)) << ";\n";
       }
 
       // Collect output arguments
-      g.local("res1", "real_t", "**");
+      g.local("res1", "casadi_real", "**");
       for (int i=0; i<res.size(); ++i) {
         g << "res1[" << i << "]=" << g.work(res[i], fcn_.nnz_out(i)) << ";\n";
       }

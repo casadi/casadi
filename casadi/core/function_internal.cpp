@@ -1701,9 +1701,10 @@ namespace casadi {
 
   std::string FunctionInternal::signature(const std::string& fname) const {
     if (simplified_call()) {
-      return "void " + fname + "(const real_t* arg, real_t* res)";
+      return "void " + fname + "(const casadi_real* arg, casadi_real* res)";
     } else {
-      return "int " + fname + "(const real_t** arg, real_t** res, int* iw, real_t* w, int mem)";
+      return "int " + fname + "(const casadi_real** arg, casadi_real** res, "
+                              "int* iw, casadi_real* w, int mem)";
     }
   }
 
@@ -1807,12 +1808,12 @@ namespace casadi {
       }
       sz_w += i_nnz + o_nnz;
       g << g.array("int", "iw", sz_iw());
-      g << g.array("real_t", "w", sz_w);
+      g << g.array("casadi_real", "w", sz_w);
       string fw = "w+" + g.to_string(i_nnz + o_nnz);
 
       // Copy inputs to buffers
       int offset=0;
-      g << g.array("const real_t*", "arg", n_in, "{0}");
+      g << g.array("const casadi_real*", "arg", n_in, "{0}");
       for (int i=0; i<n_in; ++i) {
         std::string p = "argv[" + g.to_string(i) + "]";
         g << "if (--argc>=0) arg[" << i << "] = "
@@ -1821,7 +1822,7 @@ namespace casadi {
       }
 
       // Allocate output buffers
-      g << "real_t* res[" << n_out << "] = {0};\n";
+      g << "casadi_real* res[" << n_out << "] = {0};\n";
       for (int i=0; i<n_out; ++i) {
         if (i==0) {
           // if i==0, always store output (possibly ans output)
@@ -1859,10 +1860,10 @@ namespace casadi {
       // Work vectors and input and output buffers
       size_t nr = sz_w() + nnz_in() + nnz_out();
       g << g.array("int", "iw", sz_iw())
-        << g.array("real_t", "w", nr);
+        << g.array("casadi_real", "w", nr);
 
       // Input buffers
-      g << "const real_t* arg[" << sz_arg() << "] = {";
+      g << "const casadi_real* arg[" << sz_arg() << "] = {";
       int off=0;
       for (int i=0; i<n_in; ++i) {
         if (i!=0) g << ", ";
@@ -1872,7 +1873,7 @@ namespace casadi {
       g << "};\n";
 
       // Output buffers
-      g << "real_t* res[" << sz_res() << "] = {";
+      g << "casadi_real* res[" << sz_res() << "] = {";
       for (int i=0; i<n_out; ++i) {
         if (i!=0) g << ", ";
         g << "w+" << off;
@@ -1882,7 +1883,7 @@ namespace casadi {
 
       // TODO(@jaeandersson): Read inputs from file. For now; read from stdin
       g << "int j;\n"
-        << "real_t* a = w;\n"
+        << "casadi_real* a = w;\n"
         << "for (j=0; j<" << nnz_in() << "; ++j) "
         << "scanf(\"%lf\", a++);\n";
 
@@ -1891,7 +1892,7 @@ namespace casadi {
         << "if (flag) return flag;\n";
 
       // TODO(@jaeandersson): Write outputs to file. For now: print to stdout
-      g << "const real_t* r = w+" << nnz_in() << ";\n"
+      g << "const casadi_real* r = w+" << nnz_in() << ";\n"
         << "for (j=0; j<" << nnz_out() << "; ++j) "
         << g.printf("%g ", "*r++") << "\n";
 

@@ -235,7 +235,7 @@ namespace casadi {
     };
 
     /** \brief Add a built-in auxiliary function */
-    void add_auxiliary(Auxiliary f, const std::vector<std::string>& inst = {"real_t"});
+    void add_auxiliary(Auxiliary f, const std::vector<std::string>& inst = {"casadi_real"});
 
     /** Convert in integer to a string */
     static std::string to_string(int n);
@@ -292,8 +292,8 @@ namespace casadi {
     /// Print file header
     void file_close(std::ofstream& f) const;
 
-    // Generate real_t definition
-    void generate_real_t(std::ostream &s) const;
+    // Generate casadi_real definition
+    void generate_casadi_real(std::ostream &s) const;
 
     // Generate mex entry point
     void generate_mex(std::ostream &s) const;
@@ -309,7 +309,7 @@ namespace casadi {
     std::string name, suffix;
 
     // Real-type used for the codegen
-    std::string real_t;
+    std::string casadi_real;
 
     // Should we create a memory entry point?
     bool with_mem;

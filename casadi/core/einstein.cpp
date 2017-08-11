@@ -138,9 +138,9 @@ namespace casadi {
     g << "for (i=0; i<" << n_iter_ << "; ++i) {\n";
 
     // Data pointers
-    g.local("cr", "const real_t", "*");
-    g.local("cs", "const real_t", "*");
-    g.local("rr", "real_t", "*");
+    g.local("cr", "const casadi_real", "*");
+    g.local("cs", "const casadi_real", "*");
+    g.local("rr", "casadi_real", "*");
     g << "cr = " << g.work(arg[1], dep(1).nnz()) << "+" << strides_a_[0] << ";\n";
     g << "cs = " << g.work(arg[2], dep(2).nnz()) << "+" << strides_b_[0] << ";\n";
     g << "rr = " << g.work(res[0], dep(0).nnz()) << "+" << strides_c_[0] << ";\n";

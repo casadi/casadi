@@ -173,7 +173,7 @@ namespace casadi {
       } else {
         // Declare result if not already declared
         if (!declared[a.i0]) {
-          g << "real_t ";
+          g << "casadi_real ";
           declared[a.i0]=true;
         }
 

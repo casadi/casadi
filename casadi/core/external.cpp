@@ -230,7 +230,7 @@ namespace casadi {
                          bool decl_static) const {
     g << "/* " << name_ << " */\n";
     g << "static " << signature(fname) << " {\n"
-      << li_.body(eval_name());
+      << li_.body(eval_name()) << "\n";
   }
 
   void External::add_dependency(CodeGenerator& g) const {

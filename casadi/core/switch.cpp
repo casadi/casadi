@@ -369,7 +369,7 @@ namespace casadi {
     if (project_in_) {
       // Project one or more argument
       g.local("i", "int");
-      g << "const real_t** arg1 = arg + " << (1 + n_in) << ";\n"
+      g << "const casadi_real** arg1 = arg + " << (1 + n_in) << ";\n"
         << "for(i=0; i<" << n_in << "; ++i) arg1[i]=arg[i+1];\n";
     }
 
@@ -377,7 +377,7 @@ namespace casadi {
     if (project_out_) {
       // Project one or more results
       g.local("i", "int");
-      g << "real_t** res1 = res + " << n_out << ";\n"
+      g << "casadi_real** res1 = res + " << n_out << ";\n"
         << "for (i=0; i<" << n_out << "; ++i) res1[i]=res[i];\n";
     }
 
@@ -418,7 +418,7 @@ namespace casadi {
             if (f_sp.nnz()==0) {
               g << "arg1[" << i << "]=0;\n";
             } else {
-              g.local("t", "real_t", "*");
+              g.local("t", "casadi_real", "*");
               g << "t=w, w+=" << f_sp.nnz() << ";\n"
                 << g.project("arg1[" + to_string(i) + "]", sp, "t", f_sp, "w") << "\n"
                 << "arg1[" << i << "]=t;\n";

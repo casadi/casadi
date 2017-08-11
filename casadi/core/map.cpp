@@ -110,10 +110,10 @@ namespace casadi {
     int n_in = this->n_in(), n_out = this->n_out();
     g << "int i;\n";
     // Input buffer
-    g << "const real_t** arg1 = arg+" << n_in << ";\n"
+    g << "const casadi_real** arg1 = arg+" << n_in << ";\n"
       << "for (i=0; i<" << n_in << "; ++i) arg1[i]=arg[i];\n";
     // Output buffer
-    g << "real_t** res1 = res+" << n_out << ";\n"
+    g << "casadi_real** res1 = res+" << n_out << ";\n"
       << "for (i=0; i<" << n_out << "; ++i) res1[i]=res[i];\n"
       << "for (i=0; i<" << n_ << "; ++i) {\n";
     // Evaluate

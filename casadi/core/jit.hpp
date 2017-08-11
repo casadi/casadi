@@ -36,12 +36,12 @@ namespace casadi {
    * scalar-valued.
    * Only specify the function body, assuming that the inputs are stored in an array
    * named 'arg' and the outputs stored in an array named 'res'. The data type
-   * used must be 'real_t', which is typically equal to 'double` or another data
+   * used must be 'casadi_real', which is typically equal to 'double` or another data
    * type with the same API as 'double'.
    *
    * The final generated function will have a structure similar to:
    *
-   * void fname(const real_t* arg, real_t* res) {
+   * void fname(const casadi_real* arg, casadi_real* res) {
    *   <FUNCTION_BODY>
    * }
    *

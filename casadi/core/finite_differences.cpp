@@ -221,11 +221,11 @@ namespace casadi {
     int n_in = derivative_of_.n_in(), n_out = derivative_of_.n_out();
 
     g.comment("Non-differentiated input");
-    g.local("r0", "const real_t", "**");
+    g.local("r0", "const casadi_real", "**");
     g << "r0 = arg; arg += " << n_in << ";\n";
 
     g.comment("Non-differentiated output");
-    g.local("r", "real_t", "*");
+    g.local("r", "casadi_real", "*");
     g << "r = w;\n";
     for (int j=0; j<n_out; ++j) {
       const int nnz = derivative_of_.nnz_out(j);
@@ -233,11 +233,11 @@ namespace casadi {
     }
 
     g.comment("Forward seeds");
-    g.local("seed", "const real_t", "**");
+    g.local("seed", "const casadi_real", "**");
     g << "seed = arg; arg += " << n_in << ";\n";
 
     g.comment("Forward sensitivities");
-    g.local("sens", "real_t", "**");
+    g.local("sens", "casadi_real", "**");
     g << "sens = res; res += " << n_out << ";\n";
 
     g.comment("Memory structure");
@@ -256,7 +256,7 @@ namespace casadi {
     g << g.fill("m->x", n_, "0.") << "\n";
 
     g.comment("Setup buffers for calling function");
-    g.local("z", "real_t", "*");
+    g.local("z", "casadi_real", "*");
     g << "z = w;\n";
     if (!derivative_of_->simplified_call()) {
       for (int j=0; j<n_in; ++j) {
@@ -269,7 +269,7 @@ namespace casadi {
 
     g.comment("Invoke reverse communication algorithm");
     g << "while (" << g.central_diff("m") << ") {\n";
-    g.local("z1", "real_t", "*");
+    g.local("z1", "casadi_real", "*");
     g << "z1 = z;\n";
     for (int j=0; j<n_in; ++j) {
       int nnz = derivative_of_.nnz_in(j);

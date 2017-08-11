@@ -37,19 +37,19 @@ namespace casadi {
   class CASADI_EXPORT Polynomial : public PrintableObject<Polynomial> {
   public:
     /// Floating point type
-    typedef double real_t;
+    typedef double casadi_real;
 
     /// Construct a constant polynomial
-    Polynomial(real_t scalar=1);
+    Polynomial(casadi_real scalar=1);
 
     /// Construct a linear polynomial
-    Polynomial(real_t p0, real_t p1);
+    Polynomial(casadi_real p0, casadi_real p1);
 
     /// Construct a quadratic polynomial
-    Polynomial(real_t p0, real_t p1, real_t p2);
+    Polynomial(casadi_real p0, casadi_real p1, casadi_real p2);
 
     /// Construct a cubic polynomial
-    Polynomial(real_t p0, real_t p1, real_t p2, real_t p3);
+    Polynomial(casadi_real p0, casadi_real p1, casadi_real p2, casadi_real p3);
 
     /// Construct from a vector of polynomial coefficients
     template<typename T>
@@ -71,7 +71,7 @@ namespace casadi {
     int degree() const;
 
     /// Get scalar value (error if degree()!=0)
-    real_t scalar() const;
+    casadi_real scalar() const;
 
     /// Create a new polynomial for the derivative
     Polynomial derivative() const;
@@ -107,14 +107,14 @@ namespace casadi {
     Polynomial& operator*=(const Polynomial& b);
 
     // Divide by constant
-    Polynomial operator/(real_t b) const;
+    Polynomial operator/(casadi_real b) const;
 
     // Divide by constant (in-place)
-    Polynomial& operator/=(real_t b);
+    Polynomial& operator/=(casadi_real b);
 
 
   protected:
-    std::vector<real_t> p_;
+    std::vector<casadi_real> p_;
   };
 
 } // namespace casadi

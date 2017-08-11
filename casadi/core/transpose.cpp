@@ -191,8 +191,8 @@ namespace casadi {
 
   void DenseTranspose::generate(CodeGenerator& g, const std::string& mem,
                                 const std::vector<int>& arg, const std::vector<int>& res) const {
-    g.local("cs", "const real_t", "*");
-    g.local("rr", "real_t", "*");
+    g.local("cs", "const casadi_real", "*");
+    g.local("rr", "casadi_real", "*");
     g.local("i", "int");
     g.local("j", "int");
     g << "for (i=0, rr=" << g.work(res[0], nnz()) << ", "
