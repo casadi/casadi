@@ -48555,27 +48555,28 @@ Create a new polynomial for the derivative.
 
 ";
 
-%feature("docstring") casadi::Polynomial::Polynomial(real_t scalar=1) "
+%feature("docstring") casadi::Polynomial::Polynomial(casadi_real scalar=1) "
 
 Construct a constant polynomial.
 
 ";
 
-%feature("docstring") casadi::Polynomial::Polynomial(real_t p0, real_t p1) "
+%feature("docstring") casadi::Polynomial::Polynomial(casadi_real p0,
+casadi_real p1) "
 
 Construct a linear polynomial.
 
 ";
 
-%feature("docstring") casadi::Polynomial::Polynomial(real_t p0, real_t p1,
-real_t p2) "
+%feature("docstring") casadi::Polynomial::Polynomial(casadi_real p0,
+casadi_real p1, casadi_real p2) "
 
 Construct a quadratic polynomial.
 
 ";
 
-%feature("docstring") casadi::Polynomial::Polynomial(real_t p0, real_t p1,
-real_t p2, real_t p3) "
+%feature("docstring") casadi::Polynomial::Polynomial(casadi_real p0,
+casadi_real p1, casadi_real p2, casadi_real p3) "
 
 Construct a cubic polynomial.
 
@@ -67232,12 +67233,12 @@ Create a just-in-time compiled function from a C/C++ language string The
 function can an arbitrary number of inputs and outputs that must all be
 scalar-valued. Only specify the function body, assuming that the inputs are
 stored in an array named 'arg' and the outputs stored in an array named
-'res'. The data type used must be 'real_t', which is typically equal to
+'res'. The data type used must be 'casadi_real', which is typically equal to
 'double` or another data type with the same API as 'double'.
 
 The final generated function will have a structure similar to:
 
-void fname(const real_t* arg, real_t* res) { <FUNCTION_BODY> }
+void fname(const casadi_real* arg, casadi_real* res) { <FUNCTION_BODY> }
 
 ";
 
