@@ -781,11 +781,6 @@ Generate code for the declarations of the C function.
 
 ";
 
-%feature("docstring") casadi::Blocksqp::codegen_shorthand "[INTERNAL]
-Generate shorthand macro.
-
-";
-
 %feature("docstring") casadi::Blocksqp::alloc_arg "[INTERNAL]  Ensure
 required length of arg field.
 
@@ -1698,11 +1693,6 @@ Method to return the gradient of the objective
 
 ";
 
-%feature("docstring") casadi::BSpline::alloc_w "[INTERNAL]  Ensure required
-length of w field.
-
-";
-
 %feature("docstring") casadi::BSpline::get_sparsity_in "
 
 Sparsities of function inputs and outputs.
@@ -2311,8 +2301,8 @@ decref for dependencies.
 
 ";
 
-%feature("docstring") casadi::BSpline::codegen_shorthand "[INTERNAL]
-Generate shorthand macro.
+%feature("docstring") casadi::BSpline::alloc_w "[INTERNAL]  Ensure required
+length of w field.
 
 ";
 
@@ -3706,11 +3696,6 @@ scheme name by index.
 
 ";
 
-%feature("docstring") casadi::BSplineCommon::codegen_shorthand "[INTERNAL]
-Generate shorthand macro.
-
-";
-
 %feature("docstring") casadi::BSplineCommon::replace_arg "[INTERNAL]
 Replace 0-by-0 inputs.
 
@@ -3945,8 +3930,8 @@ Propagate sparsity backwards.
 
 ";
 
-%feature("docstring") casadi::BSplineDual::codegen_shorthand "[INTERNAL]
-Generate shorthand macro.
+%feature("docstring") casadi::BSplineDual::clear_memory "[INTERNAL]  Clear
+all memory (called from destructor)
 
 ";
 
@@ -4587,11 +4572,6 @@ variables (SX)
 
 %feature("docstring") casadi::BSplineDual::wrap "[INTERNAL]  Wrap in an
 Function instance consisting of only one MX call.
-
-";
-
-%feature("docstring") casadi::BSplineDual::clear_memory "[INTERNAL]  Clear
-all memory (called from destructor)
 
 ";
 
@@ -5638,10 +5618,6 @@ the class able to propagate seeds through the algorithm?
 
 %feature("docstring") casadi::BSplineInterpolant::has_free "[INTERNAL]
 Does the function have free variables.
-
-";
-
-%feature("docstring") casadi::BSplineInterpolant::codegen_shorthand "[INTERNAL]  Generate shorthand macro.
 
 ";
 
@@ -6820,11 +6796,6 @@ Are all inputs and outputs scalar.
 
 %feature("docstring") casadi::CentralDiff::uses_output "[INTERNAL]  Is the
 scheme using the (nondifferentiated) output?
-
-";
-
-%feature("docstring") casadi::CentralDiff::codegen_shorthand "[INTERNAL]
-Generate shorthand macro.
 
 ";
 
@@ -8314,11 +8285,6 @@ Forward mode AD, virtual functions overloaded in derived classes.
 
 ";
 
-%feature("docstring") casadi::Collocation::codegen_shorthand "[INTERNAL]
-Generate shorthand macro.
-
-";
-
 %feature("docstring") casadi::Collocation::fwd_seed "[INTERNAL]  Symbolic
 expressions for the forward seeds.
 
@@ -9154,11 +9120,6 @@ Parameters:
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
-
-";
-
-%feature("docstring") casadi::Conic::codegen_shorthand "[INTERNAL]
-Generate shorthand macro.
 
 ";
 
@@ -11639,11 +11600,6 @@ able to propagate seeds through the algorithm?
 
 ";
 
-%feature("docstring") casadi::Dple::codegen_shorthand "[INTERNAL]  Generate
-shorthand macro.
-
-";
-
 %feature("docstring") casadi::Dple::reverse "[INTERNAL]  Return function
 that calculates adjoint derivatives reverse(nadj) returns a cached instance
 if available, and calls  Function get_reverse(int nadj) if no cached version
@@ -12398,11 +12354,6 @@ function when initialized.
 
 %feature("docstring") casadi::Expm::free_mx "[INTERNAL]  Get free variables
 ( MX)
-
-";
-
-%feature("docstring") casadi::Expm::codegen_shorthand "[INTERNAL]  Generate
-shorthand macro.
 
 ";
 
@@ -13723,11 +13674,6 @@ dimensions.
 
 ";
 
-%feature("docstring") casadi::External::codegen_shorthand "[INTERNAL]
-Generate shorthand macro.
-
-";
-
 %feature("docstring") casadi::External::get_fd "[INTERNAL]  Get directional
 derivatives using finite differencing.
 
@@ -14229,10 +14175,6 @@ returns a new function with a selection of inputs/outputs of the original
 
 %feature("docstring") casadi::FixedStepIntegrator::memory "[INTERNAL]
 Memory objects.
-
-";
-
-%feature("docstring") casadi::FixedStepIntegrator::codegen_shorthand "[INTERNAL]  Generate shorthand macro.
 
 ";
 
@@ -16046,7 +15988,7 @@ Absolute value: x -> abs(x)
 
 %feature("docstring") friendwrap_sq "
 
-Square root: x -> sqrt(x)
+Square: x -> x^2.
 
 ";
 
@@ -16235,7 +16177,7 @@ Logical greater than: (x,y) -> x > y.
 
 %feature("docstring") casadi::GenericExpression::sq "
 
-Square root: x -> sqrt(x)
+Square: x -> x^2.
 
 ";
 
@@ -17098,10 +17040,6 @@ all statistics
 
 %feature("docstring") casadi::GenericExternal::adjViaJac "[INTERNAL]
 Calculate derivatives by multiplying the full Jacobian and multiplying.
-
-";
-
-%feature("docstring") casadi::GenericExternal::codegen_shorthand "[INTERNAL]  Generate shorthand macro.
 
 ";
 
@@ -18495,8 +18433,7 @@ C++ includes: integrator_impl.hpp ";
 
 ";
 
-%feature("docstring") casadi::ImplicitFixedStepIntegrator::codegen_shorthand
-"[INTERNAL]  Generate shorthand macro.
+%feature("docstring") casadi::ImplicitFixedStepIntegrator::alloc "[INTERNAL]  Ensure work vectors long enough to evaluate function.
 
 ";
 
@@ -18701,10 +18638,6 @@ Wrap in an Function instance consisting of only one MX call.
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::monitored "[INTERNAL] ";
 
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::sz_arg "[INTERNAL]  Get required length of arg field.
-
-";
-
-%feature("docstring") casadi::ImplicitFixedStepIntegrator::alloc "[INTERNAL]  Ensure work vectors long enough to evaluate function.
 
 ";
 
@@ -19415,11 +19348,6 @@ required length of res field.
 
 %feature("docstring") casadi::ImplicitToNlp::replace_arg "[INTERNAL]
 Replace 0-by-0 inputs.
-
-";
-
-%feature("docstring") casadi::ImplicitToNlp::codegen_shorthand "[INTERNAL]
-Generate shorthand macro.
 
 ";
 
@@ -20249,11 +20177,6 @@ if output arguments that needs to be replaced.
 
 %feature("docstring") casadi::Integrator::eval_name "[INTERNAL]  Get name
 of the evaluation function.
-
-";
-
-%feature("docstring") casadi::Integrator::codegen_shorthand "[INTERNAL]
-Generate shorthand macro.
 
 ";
 
@@ -21277,11 +21200,6 @@ Jacobian of all input elements with respect to all output elements.
 
 %feature("docstring") casadi::Interpolant::numel_out "[INTERNAL]  Number of
 input/output elements.
-
-";
-
-%feature("docstring") casadi::Interpolant::codegen_shorthand "[INTERNAL]
-Generate shorthand macro.
 
 ";
 
@@ -22652,11 +22570,6 @@ Export / Generate C code for the dependency function.
 
 ";
 
-%feature("docstring") casadi::Jit::codegen_shorthand "[INTERNAL]  Generate
-shorthand macro.
-
-";
-
 %feature("docstring") casadi::Jit::print_option "[INTERNAL]  Print all
 information there is to know about a certain option.
 
@@ -23378,11 +23291,6 @@ the (integer) output argument of an atomic operation.
 
 ";
 
-%feature("docstring") casadi::LapackLu::alloc_iw "[INTERNAL]  Ensure
-required length of iw field.
-
-";
-
 %feature("docstring") casadi::LapackLu::LapackLu "[INTERNAL] ";
 
 %feature("docstring") casadi::LapackLu::finalize "[INTERNAL]  Finalize the
@@ -23695,8 +23603,8 @@ length of res field.
 
 ";
 
-%feature("docstring") casadi::LapackLu::codegen_shorthand "[INTERNAL]
-Generate shorthand macro.
+%feature("docstring") casadi::LapackLu::alloc_iw "[INTERNAL]  Ensure
+required length of iw field.
 
 ";
 
@@ -25212,11 +25120,6 @@ Jacobian of all input elements with respect to all output elements.
 
 ";
 
-%feature("docstring") casadi::LapackQr::codegen_shorthand "[INTERNAL]
-Generate shorthand macro.
-
-";
-
 %feature("docstring") casadi::LapackQr::sz_work "[INTERNAL]  Get number of
 temporary variables needed.
 
@@ -26061,10 +25964,6 @@ Do the derivative functions need nondifferentiated outputs?
 
 %feature("docstring") casadi::LinearInterpolant::index_in "[INTERNAL]  Get
 input scheme index by name.
-
-";
-
-%feature("docstring") casadi::LinearInterpolant::codegen_shorthand "[INTERNAL]  Generate shorthand macro.
 
 ";
 
@@ -26964,10 +26863,6 @@ Get free variables ( MX)
 
 ";
 
-%feature("docstring") casadi::LinearInterpolantJac::codegen_shorthand "[INTERNAL]  Generate shorthand macro.
-
-";
-
 %feature("docstring") casadi::LinearInterpolantJac::~LinearInterpolantJac "[INTERNAL]  Destructor.
 
 ";
@@ -27796,11 +27691,6 @@ the function.
 
 %feature("docstring") casadi::Lsqr::symbolicAdjSeed "[INTERNAL]  Symbolic
 expressions for the adjoint seeds.
-
-";
-
-%feature("docstring") casadi::Lsqr::codegen_shorthand "[INTERNAL]  Generate
-shorthand macro.
 
 ";
 
@@ -29142,11 +29032,6 @@ AD, virtual functions overloaded in derived classes.
 
 ";
 
-%feature("docstring") casadi::Map::codegen_shorthand "[INTERNAL]  Generate
-shorthand macro.
-
-";
-
 %feature("docstring") casadi::Map::get_function "[INTERNAL] ";
 
 %feature("docstring") casadi::Map::matching_arg "[INTERNAL]  Check if input
@@ -29897,11 +29782,6 @@ input value.
 
 %feature("docstring") casadi::MapOmp::check_res "[INTERNAL]  Check if
 output arguments have correct length and dimensions.
-
-";
-
-%feature("docstring") casadi::MapOmp::codegen_shorthand "[INTERNAL]
-Generate shorthand macro.
 
 ";
 
@@ -30699,7 +30579,7 @@ Get the number of columns, Octave-style syntax.
 
 %feature("docstring") casadi::Matrix::sq "
 
-Square root: x -> sqrt(x)
+Square: x -> x^2.
 
 ";
 
@@ -31828,7 +31708,7 @@ Set a set of nonzeros
 
 %feature("docstring") casadi::MX::sq "
 
-Square root: x -> sqrt(x)
+Square: x -> x^2.
 
 ";
 
@@ -32834,11 +32714,6 @@ symbolic scalars.
 
 %feature("docstring") casadi::Newton::expand "[INTERNAL] ";
 
-%feature("docstring") casadi::Newton::codegen_shorthand "[INTERNAL]
-Generate shorthand macro.
-
-";
-
 %feature("docstring") casadi::Newton::codegen_body "[INTERNAL]  Generate
 code for the function body.
 
@@ -33694,11 +33569,6 @@ input(s) and output(s)
 ";
 
 %feature("docstring") casadi::Nlpsol::get_function "[INTERNAL] ";
-
-%feature("docstring") casadi::Nlpsol::codegen_shorthand "[INTERNAL]
-Generate shorthand macro.
-
-";
 
 %feature("docstring") casadi::Nlpsol::signature "[INTERNAL]  Code generate
 the function.
@@ -34824,11 +34694,6 @@ a memory object.
 
 ";
 
-%feature("docstring") casadi::OracleFunction::codegen_shorthand "[INTERNAL]
-Generate shorthand macro.
-
-";
-
 %feature("docstring") casadi::OracleFunction::all_scalar "[INTERNAL]  Are
 all inputs and outputs scalar.
 
@@ -35860,22 +35725,22 @@ Create a new polynomial for the derivative.
 
 %feature("docstring") casadi::Polynomial::Polynomial "
 
->  casadi::Polynomial::Polynomial(real_t scalar=1)
+>  casadi::Polynomial::Polynomial(casadi_real scalar=1)
 ------------------------------------------------------------------------
 
 Construct a constant polynomial.
 
->  casadi::Polynomial::Polynomial(real_t p0, real_t p1)
+>  casadi::Polynomial::Polynomial(casadi_real p0, casadi_real p1)
 ------------------------------------------------------------------------
 
 Construct a linear polynomial.
 
->  casadi::Polynomial::Polynomial(real_t p0, real_t p1, real_t p2)
+>  casadi::Polynomial::Polynomial(casadi_real p0, casadi_real p1, casadi_real p2)
 ------------------------------------------------------------------------
 
 Construct a quadratic polynomial.
 
->  casadi::Polynomial::Polynomial(real_t p0, real_t p1, real_t p2, real_t p3)
+>  casadi::Polynomial::Polynomial(casadi_real p0, casadi_real p1, casadi_real p2, casadi_real p3)
 ------------------------------------------------------------------------
 
 Construct a cubic polynomial.
@@ -36263,11 +36128,6 @@ dimensions.
 
 %feature("docstring") casadi::QpToNlp::add_dependency "[INTERNAL]  Add a
 dependent function.
-
-";
-
-%feature("docstring") casadi::QpToNlp::codegen_shorthand "[INTERNAL]
-Generate shorthand macro.
 
 ";
 
@@ -36930,11 +36790,6 @@ Codegen incref for dependencies.
 
 %feature("docstring") casadi::Rootfinder::has_free "[INTERNAL]  Does the
 function have free variables.
-
-";
-
-%feature("docstring") casadi::Rootfinder::codegen_shorthand "[INTERNAL]
-Generate shorthand macro.
 
 ";
 
@@ -37993,18 +37848,13 @@ function inputs and outputs.
 
 ";
 
-%feature("docstring") casadi::RungeKutta::getCount "[INTERNAL]  Get the
-reference count.
-
-";
-
 %feature("docstring") casadi::RungeKutta::n_mem "[INTERNAL]  Maximum number
 of memory objects.
 
 ";
 
-%feature("docstring") casadi::RungeKutta::codegen_shorthand "[INTERNAL]
-Generate shorthand macro.
+%feature("docstring") casadi::RungeKutta::getCount "[INTERNAL]  Get the
+reference count.
 
 ";
 
@@ -39408,11 +39258,6 @@ mode AD, virtual functions overloaded in derived classes.
 
 ";
 
-%feature("docstring") casadi::Scpgen::codegen_shorthand "[INTERNAL]
-Generate shorthand macro.
-
-";
-
 %feature("docstring") casadi::Scpgen::get_sparsity_in "[INTERNAL]
 Sparsities of function inputs and outputs.
 
@@ -40532,10 +40377,6 @@ Get function signature: name:(inputs)->(outputs)
 
 ";
 
-%feature("docstring") casadi::SimplifiedExternal::codegen_shorthand "[INTERNAL]  Generate shorthand macro.
-
-";
-
 %feature("docstring") casadi::SimplifiedExternal::eval_sx "[INTERNAL]
 Evaluate with symbolic scalars.
 
@@ -41588,11 +41429,6 @@ function signature: name:(inputs)->(outputs)
 
 ";
 
-%feature("docstring") casadi::SlicotDple::codegen_shorthand "[INTERNAL]
-Generate shorthand macro.
-
-";
-
 %feature("docstring") casadi::SlicotDple::checkout "[INTERNAL]  Checkout a
 memory object.
 
@@ -42443,11 +42279,6 @@ length of w field.
 
 ";
 
-%feature("docstring") casadi::SlicotExpm::get_partition "[INTERNAL]  Get
-the unidirectional or bidirectional partition.
-
-";
-
 %feature("docstring") casadi::SlicotExpm::getJacSparsityHierarchical "[INTERNAL]  A flavor of getJacSparsity that does hierarchical block
 structure recognition.
 
@@ -42874,8 +42705,8 @@ expressions for the forward seeds.
 
 ";
 
-%feature("docstring") casadi::SlicotExpm::codegen_shorthand "[INTERNAL]
-Generate shorthand macro.
+%feature("docstring") casadi::SlicotExpm::get_partition "[INTERNAL]  Get
+the unidirectional or bidirectional partition.
 
 ";
 
@@ -44285,11 +44116,6 @@ memory block.
 
 ";
 
-%feature("docstring") casadi::Sqpmethod::codegen_shorthand "[INTERNAL]
-Generate shorthand macro.
-
-";
-
 %feature("docstring") casadi::Sqpmethod::size2_in "[INTERNAL]  Input/output
 dimensions.
 
@@ -45531,11 +45357,6 @@ function that calculates nfwd forward derivatives.
 
 ";
 
-%feature("docstring") casadi::Switch::codegen_shorthand "[INTERNAL]
-Generate shorthand macro.
-
-";
-
 %feature("docstring") casadi::Switch::log "
 
 >  void casadi::FunctionInternal::log(const std::string &msg) const 
@@ -46168,11 +45989,6 @@ inputs and outputs scalar.
 // File: classcasadi_1_1SymbolicQr.xml
 %feature("docstring") casadi::SymbolicQr::has_derivative "[INTERNAL]  Can
 derivatives be calculated in any way?
-
-";
-
-%feature("docstring") casadi::SymbolicQr::codegen_shorthand "[INTERNAL]
-Generate shorthand macro.
 
 ";
 
@@ -50271,12 +50087,12 @@ Create a just-in-time compiled function from a C/C++ language string The
 function can an arbitrary number of inputs and outputs that must all be
 scalar-valued. Only specify the function body, assuming that the inputs are
 stored in an array named 'arg' and the outputs stored in an array named
-'res'. The data type used must be 'real_t', which is typically equal to
+'res'. The data type used must be 'casadi_real', which is typically equal to
 'double` or another data type with the same API as 'double'.
 
 The final generated function will have a structure similar to:
 
-void fname(const real_t* arg, real_t* res) { <FUNCTION_BODY> }
+void fname(const casadi_real* arg, casadi_real* res) { <FUNCTION_BODY> }
 
 ";
 

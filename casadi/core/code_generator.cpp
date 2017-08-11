@@ -736,7 +736,7 @@ namespace casadi {
   std::string CodeGenerator::to_mex(const Sparsity& sp, const std::string& arg) {
     add_auxiliary(AUX_TO_MEX);
     stringstream s;
-    s << "to_mex(" << sparsity(sp) << ", " << arg << ");";
+    s << "casadi_to_mex(" << sparsity(sp) << ", " << arg << ");";
     return s.str();
   }
 
@@ -748,7 +748,7 @@ namespace casadi {
 
     add_auxiliary(AUX_FROM_MEX);
     stringstream s;
-    s << "from_mex(" << arg
+    s << "casadi_from_mex(" << arg
       << ", " << res << ", " << sparsity(sp_res) << ", " << w << ");";
     return s.str();
   }
