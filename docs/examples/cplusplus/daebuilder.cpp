@@ -22,5 +22,51 @@
  *
  */
 
-// redirection
-#include "sx_function.hpp"
+
+#include <casadi/casadi.hpp>
+
+using namespace std;
+using namespace casadi;
+
+int main(){
+
+  // Example on how to use the DaeBuilder class
+  // Joel Andersson, UW Madison 2017
+
+  // Start with an empty DaeBuilder instance
+  DaeBuilder dae;
+
+  // Add input expressions
+  auto a = dae.add_p("a");
+  auto b = dae.add_p("b");
+  auto u = dae.add_u("u");
+  auto h = dae.add_x("h");
+  auto v = dae.add_x("v");
+  auto m = dae.add_x("m");
+
+  // Constants
+  double g = 9.81; // gravity
+
+  // Add output expressions
+  auto hdot = v;
+  auto vdot = (u-a*pow(v,2))/m-g;
+  auto mdot = -b*pow(u,2);
+  dae.add_ode("hdot", hdot);
+  dae.add_ode("vdot", vdot);
+  dae.add_ode("mdot", mdot);
+
+  // Specify initial conditions
+  dae.set_start("h", 0);
+  dae.set_start("v", 0);
+  dae.set_start("m", 1);
+
+  // Add meta information
+  dae.set_unit("h","m");
+  dae.set_unit("v","m/s");
+  dae.set_unit("m","kg");
+
+  // Print DAE
+  cout << str(dae);
+
+  return 0;
+}

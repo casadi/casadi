@@ -40,51 +40,51 @@ namespace casadi {
     Dple(const std::string& name, const SpDict &st);
 
     // Destructor
-    virtual ~Dple() = 0;
+    ~Dple() override = 0;
 
     ///@{
     /** \brief Number of function inputs and outputs */
-    virtual size_t get_n_in() { return DPLE_NUM_IN;}
-    virtual size_t get_n_out() { return DPLE_NUM_OUT;}
+    size_t get_n_in() override { return DPLE_NUM_IN;}
+    size_t get_n_out() override { return DPLE_NUM_OUT;}
     ///@}
 
     /// @{
     /** \brief Sparsities of function inputs and outputs */
-    virtual Sparsity get_sparsity_in(int i);
-    virtual Sparsity get_sparsity_out(int i);
+    Sparsity get_sparsity_in(int i) override;
+    Sparsity get_sparsity_out(int i) override;
     /// @}
 
     ///@{
     /** \brief Names of function input and outputs */
-    virtual std::string get_name_in(int i) { return dple_in(i);}
-    virtual std::string get_name_out(int i) { return dple_out(i);}
+    std::string get_name_in(int i) override { return dple_in(i);}
+    std::string get_name_out(int i) override { return dple_out(i);}
     /// @}
 
     ///@{
     /** \brief Options */
     static Options options_;
-    virtual const Options& get_options() const { return options_;}
+    const Options& get_options() const override { return options_;}
     ///@}
 
     // Initialize
-    virtual void init(const Dict& opts);
+    void init(const Dict& opts) override;
 
     ///@{
     /** \brief Generate a function that calculates \a nfwd forward derivatives */
-    virtual Function get_forward(const std::string& name, int nfwd,
-                                 const std::vector<std::string>& i_names,
-                                 const std::vector<std::string>& o_names,
-                                 const Dict& opts) const;
-    virtual int get_n_forward() const { return 64;}
+    bool has_forward(int nfwd) const override { return true;}
+    Function get_forward(int nfwd, const std::string& name,
+                         const std::vector<std::string>& inames,
+                         const std::vector<std::string>& onames,
+                         const Dict& opts) const override;
     ///@}
 
     ///@{
     /** \brief Generate a function that calculates \a nadj adjoint derivatives */
-    virtual Function get_reverse(const std::string& name, int nadj,
-                                 const std::vector<std::string>& i_names,
-                                 const std::vector<std::string>& o_names,
-                                 const Dict& opts) const;
-    virtual int get_n_reverse() const { return 64;}
+    bool has_reverse(int nadj) const override { return true;}
+    Function get_reverse(int nadj, const std::string& name,
+                         const std::vector<std::string>& inames,
+                         const std::vector<std::string>& onames,
+                         const Dict& opts) const override;
     ///@}
 
     // Creator function for internal class
@@ -104,12 +104,12 @@ namespace casadi {
     static std::string shortname() { return "dple";}
 
     /** \brief Get type name */
-    virtual std::string type_name() const {
+    std::string type_name() const override {
       return std::string("dple_") + plugin_name();
     }
 
     /** \brief Get default input value */
-    virtual double default_in(int ind) const;
+    double default_in(int ind) const override;
 
   protected:
 

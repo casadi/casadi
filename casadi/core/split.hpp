@@ -44,33 +44,33 @@ namespace casadi {
     Split(const MX& x, const std::vector<int>& offset);
 
     /// Destructor
-    virtual ~Split() = 0;
+    ~Split() override = 0;
 
     /** \brief  Number of outputs */
-    virtual int nout() const { return output_sparsity_.size(); }
+    int nout() const override { return output_sparsity_.size(); }
 
     /** \brief  Get the sparsity of output oind */
-    virtual const Sparsity& sparsity(int oind) const { return output_sparsity_.at(oind);}
+    const Sparsity& sparsity(int oind) const override { return output_sparsity_.at(oind);}
 
     /// Evaluate the function (template)
     template<typename T>
     void evalGen(const T** arg, T** res, int* iw, T* w, int mem) const;
 
     /// Evaluate the function numerically
-    virtual void eval(const double** arg, double** res, int* iw, double* w, int mem) const;
+    void eval(const double** arg, double** res, int* iw, double* w, int mem) const override;
 
     /// Evaluate the function symbolically (SX)
-    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const;
+    void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const override;
 
     /** \brief  Propagate sparsity forward */
-    virtual void sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const;
+    void sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
 
     /** \brief  Propagate sparsity backwards */
-    virtual void sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const;
+    void sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
 
     /** \brief Generate code for the operation */
-    virtual void generate(CodeGenerator& g, const std::string& mem,
-                          const std::vector<int>& arg, const std::vector<int>& res) const;
+    void generate(CodeGenerator& g, const std::string& mem,
+                          const std::vector<int>& arg, const std::vector<int>& res) const override;
 
     // Sparsity pattern of the outputs
     std::vector<int> offset_;
@@ -88,27 +88,27 @@ namespace casadi {
     Horzsplit(const MX& x, const std::vector<int>& offset);
 
     /// Destructor
-    virtual ~Horzsplit() {}
+    ~Horzsplit() override {}
 
     /** \brief  Evaluate symbolically (MX) */
-    virtual void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const;
+    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
 
     /** \brief Calculate forward mode directional derivatives */
-    virtual void eval_forward(const std::vector<std::vector<MX> >& fseed,
-                         std::vector<std::vector<MX> >& fsens) const;
+    void ad_forward(const std::vector<std::vector<MX> >& fseed,
+                         std::vector<std::vector<MX> >& fsens) const override;
 
     /** \brief Calculate reverse mode directional derivatives */
-    virtual void eval_reverse(const std::vector<std::vector<MX> >& aseed,
-                         std::vector<std::vector<MX> >& asens) const;
+    void ad_reverse(const std::vector<std::vector<MX> >& aseed,
+                         std::vector<std::vector<MX> >& asens) const override;
 
     /** \brief  Print expression */
-    virtual std::string print(const std::vector<std::string>& arg) const;
+    std::string print(const std::vector<std::string>& arg) const override;
 
     /** \brief Get the operation */
-    virtual int op() const { return OP_HORZSPLIT;}
+    int op() const override { return OP_HORZSPLIT;}
 
     /// Create a horizontal concatenation node
-    virtual MX getHorzcat(const std::vector<MX>& x) const;
+    MX get_horzcat(const std::vector<MX>& x) const override;
   };
 
   /** \brief Diag split, x -> x0, x1, ...
@@ -122,27 +122,27 @@ namespace casadi {
     Diagsplit(const MX& x, const std::vector<int>& offset1, const std::vector<int>& offset2);
 
     /// Destructor
-    virtual ~Diagsplit() {}
+    ~Diagsplit() override {}
 
     /** \brief  Evaluate symbolically (MX) */
-    virtual void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const;
+    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
 
     /** \brief Calculate forward mode directional derivatives */
-    virtual void eval_forward(const std::vector<std::vector<MX> >& fseed,
-                         std::vector<std::vector<MX> >& fsens) const;
+    void ad_forward(const std::vector<std::vector<MX> >& fseed,
+                         std::vector<std::vector<MX> >& fsens) const override;
 
     /** \brief Calculate reverse mode directional derivatives */
-    virtual void eval_reverse(const std::vector<std::vector<MX> >& aseed,
-                         std::vector<std::vector<MX> >& asens) const;
+    void ad_reverse(const std::vector<std::vector<MX> >& aseed,
+                         std::vector<std::vector<MX> >& asens) const override;
 
     /** \brief  Print expression */
-    virtual std::string print(const std::vector<std::string>& arg) const;
+    std::string print(const std::vector<std::string>& arg) const override;
 
     /** \brief Get the operation */
-    virtual int op() const { return OP_DIAGSPLIT;}
+    int op() const override { return OP_DIAGSPLIT;}
 
     /// Create a diagonal concatenation node
-    virtual MX get_diagcat(const std::vector<MX>& x) const;
+    MX get_diagcat(const std::vector<MX>& x) const override;
   };
 
   /** \brief Vertical split of vectors, x -> x0, x1, ...
@@ -156,27 +156,27 @@ namespace casadi {
     Vertsplit(const MX& x, const std::vector<int>& offset);
 
     /// Destructor
-    virtual ~Vertsplit() {}
+    ~Vertsplit() override {}
 
     /** \brief  Evaluate symbolically (MX) */
-    virtual void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const;
+    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
 
     /** \brief Calculate forward mode directional derivatives */
-    virtual void eval_forward(const std::vector<std::vector<MX> >& fseed,
-                         std::vector<std::vector<MX> >& fsens) const;
+    void ad_forward(const std::vector<std::vector<MX> >& fseed,
+                         std::vector<std::vector<MX> >& fsens) const override;
 
     /** \brief Calculate reverse mode directional derivatives */
-    virtual void eval_reverse(const std::vector<std::vector<MX> >& aseed,
-                         std::vector<std::vector<MX> >& asens) const;
+    void ad_reverse(const std::vector<std::vector<MX> >& aseed,
+                         std::vector<std::vector<MX> >& asens) const override;
 
     /** \brief  Print expression */
-    virtual std::string print(const std::vector<std::string>& arg) const;
+    std::string print(const std::vector<std::string>& arg) const override;
 
     /** \brief Get the operation */
-    virtual int op() const { return OP_VERTSPLIT;}
+    int op() const override { return OP_VERTSPLIT;}
 
     /// Create a vertical concatenation node (vectors only)
-    virtual MX getVertcat(const std::vector<MX>& x) const;
+    MX get_vertcat(const std::vector<MX>& x) const override;
   };
 
 } // namespace casadi

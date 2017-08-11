@@ -52,7 +52,7 @@ namespace casadi {
 #ifdef WITH_OPENCL
     kernel_ = 0;
     program_ = 0;
-    sp_fwd_kernel_ = 0;
+    sp_forward_kernel_ = 0;
     sp_adj_kernel_ = 0;
     sp_program_ = 0;
 #endif // WITH_OPENCL
@@ -76,7 +76,7 @@ namespace casadi {
     // Make sure no free parameters
     if (!free_vars_.empty()) {
       std::stringstream ss;
-      repr(ss);
+      print_short(ss);
       casadi_error("Cannot evaluate \"" << ss.str() << "\" since variables "
                    << free_vars_ << " are free.");
     }
@@ -101,30 +101,6 @@ namespace casadi {
     casadi_msg("SXFunction::eval():end " << name_);
   }
 
-
-  SX SXFunction::hess(int iind, int oind) {
-    casadi_assert_message(sparsity_out(oind).is_scalar(false), "Function must be scalar");
-    SX g = densify(grad(iind, oind));
-    if (verbose())  userOut() << "SXFunction::hess: calculating gradient done " << endl;
-
-    // Create function
-    Dict opts;
-    opts["verbose"] = verbose_;
-    Function gfcn("gfcn", {in_.at(iind)}, {g}, opts);
-
-    // Calculate jacobian of gradient
-    if (verbose()) {
-      userOut() << "SXFunction::hess: calculating Jacobian " << endl;
-    }
-    SX ret = gfcn->jac_sx(0, 0, {{"symmetric", true}});
-    if (verbose()) {
-      userOut() << "SXFunction::hess: calculating Jacobian done" << endl;
-    }
-
-    // Return jacobian of the gradient
-    return ret;
-  }
-
   bool SXFunction::is_smooth() const {
     // Go through all nodes and check if any node is non-smooth
     for (auto&& a : algorithm_) {
@@ -135,8 +111,8 @@ namespace casadi {
     return true;
   }
 
-  void SXFunction::print(ostream &stream) const {
-    FunctionInternal::print(stream);
+  void SXFunction::print_long(ostream &stream) const {
+    FunctionInternal::print_long(stream);
 
     // Iterator to free variables
     vector<SXElem>::const_iterator p_it = free_vars_.begin();
@@ -175,7 +151,7 @@ namespace casadi {
     }
   }
 
-  void SXFunction::generateDeclarations(CodeGenerator& g) const {
+  void SXFunction::codegen_declarations(CodeGenerator& g) const {
 
     // Make sure that there are no free variables
     if (!free_vars_.empty()) {
@@ -184,7 +160,7 @@ namespace casadi {
     }
   }
 
-  void SXFunction::generateBody(CodeGenerator& g) const {
+  void SXFunction::codegen_body(CodeGenerator& g) const {
 
     // Which variables have been declared
     vector<bool> declared(sz_w(), false);
@@ -197,7 +173,7 @@ namespace casadi {
       } else {
         // Declare result if not already declared
         if (!declared[a.i0]) {
-          g << "real_t ";
+          g << "casadi_real ";
           declared[a.i0]=true;
         }
 
@@ -572,9 +548,9 @@ namespace casadi {
     if (verbose()) userOut() << "SXFunction::eval_sx end" << endl;
   }
 
-  void SXFunction::eval_forward(const vector<vector<SX> >& fseed,
+  void SXFunction::ad_forward(const vector<vector<SX> >& fseed,
                                 vector<vector<SX> >& fsens) const {
-    if (verbose()) userOut() << "SXFunction::eval_forward begin" << endl;
+    if (verbose()) userOut() << "SXFunction::ad_forward begin" << endl;
 
     // Number of forward seeds
     int nfwd = fseed.size();
@@ -589,8 +565,8 @@ namespace casadi {
 
     // Check if seeds need to have dimensions corrected
     for (auto&& r : fseed) {
-      if (!matchingArg(r)) {
-        return eval_forward(replaceFwdSeed(fseed), fsens);
+      if (!matching_arg(r)) {
+        return ad_forward(replace_fseed(fseed), fsens);
       }
     }
 
@@ -604,7 +580,7 @@ namespace casadi {
           for (auto&& r : fseed2) {
             for (int i=0; i<n_in; ++i) r[i] = project(r[i], sparsity_in(i));
           }
-          return eval_forward(fseed2, fsens);
+          return ad_forward(fseed2, fsens);
         }
       }
     }
@@ -625,7 +601,7 @@ namespace casadi {
     vector<TapeEl<SXElem> >::iterator it1 = s_pdwork.begin();
 
     // Evaluate algorithm
-    if (verbose()) userOut() << "SXFunction::eval_forward evaluating algorithm forward" << endl;
+    if (verbose()) userOut() << "SXFunction::ad_forward evaluating algorithm forward" << endl;
     for (auto&& e : algorithm_) {
       switch (e.op) {
       case OP_INPUT:
@@ -648,7 +624,7 @@ namespace casadi {
 
     // Calculate forward sensitivities
     if (verbose())
-      userOut() << "SXFunction::eval_forward calculating forward derivatives" << endl;
+      userOut() << "SXFunction::ad_forward calculating forward derivatives" << endl;
     for (int dir=0; dir<nfwd; ++dir) {
       vector<TapeEl<SXElem> >::const_iterator it2 = s_pdwork.begin();
       for (auto&& a : algorithm_) {
@@ -668,12 +644,12 @@ namespace casadi {
         }
       }
     }
-    if (verbose()) userOut() << "SXFunction::eval_forward end" << endl;
+    if (verbose()) userOut() << "SXFunction::ad_forward end" << endl;
   }
 
-  void SXFunction::eval_reverse(const vector<vector<SX> >& aseed,
+  void SXFunction::ad_reverse(const vector<vector<SX> >& aseed,
                                 vector<vector<SX> >& asens) const {
-    if (verbose()) userOut() << "SXFunction::eval_reverse begin" << endl;
+    if (verbose()) userOut() << "SXFunction::ad_reverse begin" << endl;
 
     // number of adjoint seeds
     int nadj = aseed.size();
@@ -688,8 +664,8 @@ namespace casadi {
 
     // Check if seeds need to have dimensions corrected
     for (auto&& r : aseed) {
-      if (!matchingRes(r)) {
-        return eval_reverse(replaceAdjSeed(aseed), asens);
+      if (!matching_res(r)) {
+        return ad_reverse(replace_aseed(aseed), asens);
       }
     }
 
@@ -708,7 +684,7 @@ namespace casadi {
         for (int i=0; i<n_out; ++i)
           if (aseed2[d][i].sparsity()!=sparsity_out(i))
             aseed2[d][i] = project(aseed2[d][i], sparsity_out(i));
-      return eval_reverse(aseed2, asens);
+      return ad_reverse(aseed2, asens);
     }
 
     // Allocate results if needed
@@ -731,7 +707,7 @@ namespace casadi {
     vector<TapeEl<SXElem> >::iterator it1 = s_pdwork.begin();
 
     // Evaluate algorithm
-    if (verbose()) userOut() << "SXFunction::eval_forward evaluating algorithm forward" << endl;
+    if (verbose()) userOut() << "SXFunction::ad_forward evaluating algorithm forward" << endl;
     for (auto&& a : algorithm_) {
       switch (a.op) {
       case OP_INPUT:
@@ -750,7 +726,7 @@ namespace casadi {
     }
 
     // Calculate adjoint sensitivities
-    if (verbose()) userOut() << "SXFunction::eval_reverse calculating adjoint derivatives"
+    if (verbose()) userOut() << "SXFunction::ad_reverse calculating adjoint derivatives"
                        << endl;
 
     // Work vector
@@ -787,10 +763,10 @@ namespace casadi {
         }
       }
     }
-    if (verbose()) userOut() << "SXFunction::eval_reverse end" << endl;
+    if (verbose()) userOut() << "SXFunction::ad_reverse end" << endl;
   }
 
-  void SXFunction::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  void SXFunction::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     // Propagate sparsity forward
     for (auto&& e : algorithm_) {
       switch (e.op) {
@@ -798,16 +774,18 @@ namespace casadi {
       case OP_PARAMETER:
         w[e.i0] = 0; break;
       case OP_INPUT:
-        w[e.i0] = arg[e.i1]==0 ? 0 : arg[e.i1][e.i2]; break;
+        w[e.i0] = arg[e.i1]==0 ? 0 : arg[e.i1][e.i2];
+        break;
       case OP_OUTPUT:
-        if (res[e.i0]!=0) res[e.i0][e.i2] = w[e.i1]; break;
+        if (res[e.i0]!=0) res[e.i0][e.i2] = w[e.i1];
+        break;
       default: // Unary or binary operation
         w[e.i0] = w[e.i1] | w[e.i2]; break;
       }
     }
   }
 
-  void SXFunction::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  void SXFunction::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     fill_n(w, sz_w(), 0);
 
     // Propagate sparsity backward
@@ -840,12 +818,26 @@ namespace casadi {
     }
   }
 
-  Function SXFunction::getFullJacobian(const std::string& name,
-                                       const std::vector<std::string>& i_names,
-                                       const std::vector<std::string>& o_names,
-                                       const Dict& opts) {
+  Function SXFunction::get_jacobian(const std::string& name,
+                                       const std::vector<std::string>& inames,
+                                       const std::vector<std::string>& onames,
+                                       const Dict& opts) const {
+    // Jacobian expression
     SX J = SX::jacobian(veccat(out_), veccat(in_));
-    return Function(name, in_, {J}, i_names, o_names, opts);
+
+    // Number inputs and outputs
+    int n_in = this->n_in();
+    int n_out = this->n_out();
+
+    // All inputs of the return function
+    std::vector<SX> ret_in(inames.size());
+    copy(in_.begin(), in_.end(), ret_in.begin());
+    for (int i=0; i<n_out; ++i) {
+      ret_in.at(n_in+i) = SX::sym(inames[n_in+i], Sparsity(out_.at(i).size()));
+    }
+
+    // Assemble function and return
+    return Function(name, ret_in, {J}, inames, onames, opts);
   }
 
 
@@ -1003,7 +995,7 @@ namespace casadi {
     compileProgram(sp_program_);
 
     // Create OpenCL kernel for forward propatation
-    sp_fwd_kernel_ = clCreateKernel(sp_program_, fcn_name[0], &ret);
+    sp_forward_kernel_ = clCreateKernel(sp_program_, fcn_name[0], &ret);
     casadi_assert(ret == CL_SUCCESS);
 
     // Create OpenCL kernel for backward propatation
@@ -1036,7 +1028,7 @@ namespace casadi {
     cl_int ret;
 
     // Select a kernel
-    cl_kernel kernel = fwd ? sp_fwd_kernel_ : sp_adj_kernel_;
+    cl_kernel kernel = fwd ? sp_forward_kernel_ : sp_adj_kernel_;
 
     // Set OpenCL Kernel Parameters
     int kernel_arg = 0;
@@ -1100,10 +1092,10 @@ namespace casadi {
     sp_output_memobj_.clear();
 
     // Free opencl forward propagation kernel
-    if (sp_fwd_kernel_!=0) {
-      ret = clReleaseKernel(sp_fwd_kernel_);
+    if (sp_forward_kernel_!=0) {
+      ret = clReleaseKernel(sp_forward_kernel_);
       casadi_assert_warning(ret == CL_SUCCESS, "Freeing OpenCL memory failed");
-      sp_fwd_kernel_ = 0;
+      sp_forward_kernel_ = 0;
     }
 
     // Free opencl backward propagation kernel
@@ -1133,7 +1125,7 @@ namespace casadi {
 
     // Generate the function
     CodeGenerator gen;
-    generateFunction(ss, "evaluate", "__global const double*", "__global double*", "double", gen);
+    codegen(ss, "evaluate", "__global const double*", "__global double*", "double", gen);
 
     // Form c-string
     std::string s = ss.str();
@@ -1375,22 +1367,6 @@ namespace casadi {
   }
 
 #endif // WITH_OPENCL
-
-  SX SXFunction::grad_sx(int iind, int oind) {
-    return grad(iind, oind);
-  }
-
-  SX SXFunction::tang_sx(int iind, int oind) {
-    return tang(iind, oind);
-  }
-
-  SX SXFunction::jac_sx(int iind, int oind, const Dict& opts) {
-    return jac(iind, oind, opts);
-  }
-
-  SX SXFunction::hess_sx(int iind, int oind) {
-    return hess(iind, oind);
-  }
 
   const SX SXFunction::sx_in(int ind) const {
     return in_.at(ind);

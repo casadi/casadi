@@ -35,10 +35,7 @@ namespace casadi {
 
   Function jit(const std::string& name, int n_in, int n_out,
                const std::string& body, const Dict& opts) {
-    Function ret;
-    ret.assignNode(new Jit(name, n_in, n_out, body, opts));
-    ret->construct(opts);
-    return ret;
+    return Function::create(new Jit(name, n_in, n_out, body, opts), opts);
   }
 
   Function jit(const ParsedFile& file) {
@@ -103,24 +100,24 @@ namespace casadi {
   Jit::~Jit() {
   }
 
-  void Jit::generateBody(CodeGenerator& g) const {
+  void Jit::codegen_body(CodeGenerator& g) const {
     g << body_;
   }
 
-  bool Jit::hasFullJacobian() const {
+  bool Jit::has_jacobian() const {
     return !jac_body_.empty();
   }
 
-  Function Jit::getFullJacobian(const std::string& name,
-                                const std::vector<std::string>& i_names,
-                                const std::vector<std::string>& o_names,
-                                const Dict& opts) {
+  Function Jit::get_jacobian(const std::string& name,
+                                const std::vector<std::string>& inames,
+                                const std::vector<std::string>& onames,
+                                const Dict& opts) const {
     // Create a JIT-function for the Jacobian
     Dict jit_opts;
     if (!hess_body_.empty()) jit_opts["jac"] = hess_body_;
-    Function fcn = jit(name + "_jit", n_in_, n_in_*n_out_, jac_body_, jit_opts);
+    Function fcn = jit(name + "_jit", n_in_ + n_out_, n_in_*n_out_, jac_body_, jit_opts);
 
-    // Wrap in an MX function
+    // Wrap in an MX function FIXME(@jaeandersson)
     std::vector<MX> arg = fcn.mx_in();
     std::vector<MX> res = fcn(arg);
     MX J = reshape(vertcat(res), n_in_, n_out_);

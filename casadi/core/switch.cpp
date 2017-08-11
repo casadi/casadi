@@ -195,9 +195,9 @@ namespace casadi {
   }
 
   Function Switch
-  ::get_forward(const std::string& name, int nfwd,
-                const std::vector<std::string>& i_names,
-                const std::vector<std::string>& o_names,
+  ::get_forward(int nfwd, const std::string& name,
+                const std::vector<std::string>& inames,
+                const std::vector<std::string>& onames,
                 const Dict& opts) const {
     // Derivative of each case
     vector<Function> der(f_.size());
@@ -220,13 +220,13 @@ namespace casadi {
     arg.insert(arg.begin() + n_in() + n_out(), MX(1, nfwd));
 
     // Create wrapper
-    return Function(name, arg, res, i_names, o_names, opts);
+    return Function(name, arg, res, inames, onames, opts);
   }
 
   Function Switch
-  ::get_reverse(const std::string& name, int nadj,
-                const std::vector<std::string>& i_names,
-                const std::vector<std::string>& o_names,
+  ::get_reverse(int nadj, const std::string& name,
+                const std::vector<std::string>& inames,
+                const std::vector<std::string>& onames,
                 const Dict& opts) const {
     // Derivative of each case
     vector<Function> der(f_.size());
@@ -249,10 +249,10 @@ namespace casadi {
     res.insert(res.begin(), MX(1, nadj));
 
     // Create wrapper
-    return Function(name, arg, res, i_names, o_names, opts);
+    return Function(name, arg, res, inames, onames, opts);
   }
 
-  void Switch::print(ostream &stream) const {
+  void Switch::print_long(ostream &stream) const {
     if (f_.size()==1) {
       // Print as if-then-else
       stream << "Switch(" << f_def_.name() << ", " << f_[0].name() << ")";
@@ -267,10 +267,10 @@ namespace casadi {
     }
   }
 
-  void Switch::generateDeclarations(CodeGenerator& g) const {
+  void Switch::codegen_declarations(CodeGenerator& g) const {
     for (int k=0; k<=f_.size(); ++k) {
       const Function& fk = k<f_.size() ? f_[k] : f_def_;
-      fk->addDependency(g);
+      fk->add_dependency(g);
     }
   }
 
@@ -361,7 +361,7 @@ namespace casadi {
 
   }
 
-  void Switch::generateBody(CodeGenerator& g) const {
+  void Switch::codegen_body(CodeGenerator& g) const {
     // Shorthands
     int n_in=this->n_in()-1, n_out=this->n_out();
 
@@ -369,7 +369,7 @@ namespace casadi {
     if (project_in_) {
       // Project one or more argument
       g.local("i", "int");
-      g << "const real_t** arg1 = arg + " << (1 + n_in) << ";\n"
+      g << "const casadi_real** arg1 = arg + " << (1 + n_in) << ";\n"
         << "for(i=0; i<" << n_in << "; ++i) arg1[i]=arg[i+1];\n";
     }
 
@@ -377,7 +377,7 @@ namespace casadi {
     if (project_out_) {
       // Project one or more results
       g.local("i", "int");
-      g << "real_t** res1 = res + " << n_out << ";\n"
+      g << "casadi_real** res1 = res + " << n_out << ";\n"
         << "for (i=0; i<" << n_out << "; ++i) res1[i]=res[i];\n";
     }
 
@@ -407,7 +407,7 @@ namespace casadi {
       const Function& fk = k1<f_.size() ? f_[k1] : f_def_;
       if (fk.is_null()) {
         g << "return 1;\n";
-      } else if (g.simplifiedCall(fk)) {
+      } else if (g.simplified_call(fk)) {
         casadi_error("Not implemented.");
       } else {
         // Project arguments with different sparsity
@@ -418,7 +418,7 @@ namespace casadi {
             if (f_sp.nnz()==0) {
               g << "arg1[" << i << "]=0;\n";
             } else {
-              g.local("t", "real_t", "*");
+              g.local("t", "casadi_real", "*");
               g << "t=w, w+=" << f_sp.nnz() << ";\n"
                 << g.project("arg1[" + to_string(i) + "]", sp, "t", f_sp, "w") << "\n"
                 << "arg1[" << i << "]=t;\n";

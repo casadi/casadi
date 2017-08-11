@@ -1,6 +1,6 @@
 // NOLINT(legal/copyright)
 template<typename T1>
-void CASADI_PREFIX(project)(const T1* x, const int* sp_x, T1* y, const int* sp_y, T1* w) {
+void casadi_project(const T1* x, const int* sp_x, T1* y, const int* sp_y, T1* w) {
   int ncol_x = sp_x[1];
   const int *colind_x = sp_x+2, *row_x = sp_x + 2 + ncol_x+1;
   int ncol_y = sp_y[1];

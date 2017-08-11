@@ -43,34 +43,34 @@ namespace casadi {
                            const Function& f, int n);
 
     /** \brief Destructor */
-    virtual ~Map();
+    ~Map() override;
 
     /** \brief Get type name */
-    virtual std::string type_name() const {return "map";}
+    std::string type_name() const override {return "map";}
 
     /// @{
     /** \brief Sparsities of function inputs and outputs */
-    virtual Sparsity get_sparsity_in(int i) {
+    Sparsity get_sparsity_in(int i) override {
       return repmat(f_.sparsity_in(i), 1, n_);
     }
-    virtual Sparsity get_sparsity_out(int i) {
+    Sparsity get_sparsity_out(int i) override {
       return repmat(f_.sparsity_out(i), 1, n_);
     }
     /// @}
 
     /** \brief Get default input value */
-    virtual double default_in(int ind) const { return f_.default_in(ind);}
+    double default_in(int ind) const override { return f_.default_in(ind);}
 
     ///@{
     /** \brief Number of function inputs and outputs */
-    virtual size_t get_n_in() { return f_.n_in();}
-    virtual size_t get_n_out() { return f_.n_out();}
+    size_t get_n_in() override { return f_.n_in();}
+    size_t get_n_out() override { return f_.n_out();}
     ///@}
 
     ///@{
     /** \brief Names of function input and outputs */
-    virtual std::string get_name_in(int i) { return f_.name_in(i);}
-    virtual std::string get_name_out(int i) { return f_.name_out(i);}
+    std::string get_name_in(int i) override { return f_.name_in(i);}
+    std::string get_name_out(int i) override { return f_.name_out(i);}
     /// @}
 
     /** \brief  Evaluate or propagate sparsities */
@@ -78,54 +78,54 @@ namespace casadi {
     void evalGen(const T** arg, T** res, int* iw, T* w) const;
 
     /// Evaluate the function numerically
-    virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
+    void eval(void* mem, const double** arg, double** res, int* iw, double* w) const override;
 
     /// Type of parallellization
     virtual std::string parallelization() const { return "serial"; }
 
     /** \brief  evaluate symbolically while also propagating directional derivatives */
-    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const;
+    void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const override;
 
     /** \brief  Propagate sparsity forward */
-    virtual void sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const;
+    void sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
 
     /** \brief  Propagate sparsity backwards */
-    virtual void sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const;
+    void sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
 
     ///@{
     /// Is the class able to propagate seeds through the algorithm?
-    virtual bool has_spfwd() const { return true;}
-    virtual bool has_sprev() const { return true;}
+    bool has_spfwd() const override { return true;}
+    bool has_sprev() const override { return true;}
     ///@}
 
-    /** \brief Generate code for the declarations of the C function */
-    virtual void generateDeclarations(CodeGenerator& g) const;
-
     /** \brief Is codegen supported? */
-    virtual bool has_codegen() const { return true;}
+    bool has_codegen() const override { return true;}
+
+    /** \brief Generate code for the declarations of the C function */
+    void codegen_declarations(CodeGenerator& g) const override;
 
     /** \brief Generate code for the body of the C function */
-    virtual void generateBody(CodeGenerator& g) const;
+    void codegen_body(CodeGenerator& g) const override;
 
     /** \brief  Initialize */
-    virtual void init(const Dict& opts);
+    void init(const Dict& opts) override;
 
     ///@{
     /** \brief Generate a function that calculates \a nfwd forward derivatives */
-    virtual Function get_forward(const std::string& name, int nfwd,
-                                 const std::vector<std::string>& i_names,
-                                 const std::vector<std::string>& o_names,
-                                 const Dict& opts) const;
-    virtual int get_n_forward() const { return 64;}
+    bool has_forward(int nfwd) const override { return true;}
+    Function get_forward(int nfwd, const std::string& name,
+                         const std::vector<std::string>& inames,
+                         const std::vector<std::string>& onames,
+                         const Dict& opts) const override;
     ///@}
 
     ///@{
     /** \brief Generate a function that calculates \a nadj adjoint derivatives */
-    virtual Function get_reverse(const std::string& name, int nadj,
-                                 const std::vector<std::string>& i_names,
-                                 const std::vector<std::string>& o_names,
-                                 const Dict& opts) const;
-    virtual int get_n_reverse() const { return 64;}
+    bool has_reverse(int nadj) const override { return true;}
+    Function get_reverse(int nadj, const std::string& name,
+                         const std::vector<std::string>& inames,
+                         const std::vector<std::string>& onames,
+                         const Dict& opts) const override;
     ///@}
 
   protected:
@@ -153,19 +153,19 @@ namespace casadi {
     MapOmp(const std::string& name, const Function& f, int n) : Map(name, f, n) {}
 
     /** \brief  Destructor */
-    virtual ~MapOmp();
+    ~MapOmp() override;
 
     /// Evaluate the function numerically
-    virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
+    void eval(void* mem, const double** arg, double** res, int* iw, double* w) const override;
 
     /** \brief  Initialize */
-    virtual void init(const Dict& opts);
+    void init(const Dict& opts) override;
 
     /// Type of parallellization
-    virtual std::string parallelization() const { return "openmp"; }
+    std::string parallelization() const override { return "openmp"; }
 
     /** \brief Generate code for the body of the C function */
-    virtual void generateBody(CodeGenerator& g) const;
+    void codegen_body(CodeGenerator& g) const override;
   };
 
 } // namespace casadi

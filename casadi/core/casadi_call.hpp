@@ -33,115 +33,89 @@
 
 namespace casadi {
 
-  /** Base class for nodes involving function calls
-      \author Joel Andersson
-      \date 2015
-  */
-  class CASADI_EXPORT GenericCall : public MultipleOutput {
-  public:
-
-    /** \brief Constructor */
-    GenericCall() {}
-
-    /** \brief Destructor */
-    virtual ~GenericCall() {}
-
-    /** \brief  Number of functions */
-    virtual int numFunctions() const = 0;
-
-    /** \brief  Get function reference */
-    virtual const Function& getFunction(int i) const = 0;
-
-    /** \brief Project a function input to a particular sparsity */
-    static MX projectArg(const MX& x, const Sparsity& sp, int i);
-  };
-
   /** Embeds a function call in an expression graph
       \author Joel Andersson
       \date 2010-2015
   */
-  class CASADI_EXPORT Call : public GenericCall {
+  class CASADI_EXPORT Call : public MultipleOutput {
   public:
     /** \brief  Create function call node */
     static std::vector<MX> create(const Function& fcn, const std::vector<MX>& arg);
 
     /** \brief  Destructor */
-    virtual ~Call() {}
+    ~Call() override {}
+
+    /** \brief Project a function input to a particular sparsity */
+    static MX projectArg(const MX& x, const Sparsity& sp, int i);
 
     /** \brief  Print expression */
-    virtual std::string print(const std::vector<std::string>& arg) const;
+    std::string print(const std::vector<std::string>& arg) const override;
 
     /** \brief Add a dependent function */
-    virtual void addDependency(CodeGenerator& g) const;
+    void add_dependency(CodeGenerator& g) const override;
 
     /** \brief Is reference counting needed in codegen? */
-    virtual bool has_refcount() const;
+    bool has_refcount() const override;
 
     /** \brief Codegen incref */
-    virtual void codegen_incref(CodeGenerator& g, std::set<void*>& added) const;
+    void codegen_incref(CodeGenerator& g, std::set<void*>& added) const override;
 
     /** \brief Codegen decref */
-    virtual void codegen_decref(CodeGenerator& g, std::set<void*>& added) const;
+    void codegen_decref(CodeGenerator& g, std::set<void*>& added) const override;
 
     /** \brief Generate code for the operation */
-    virtual void generate(CodeGenerator& g, const std::string& mem,
-                          const std::vector<int>& arg, const std::vector<int>& res) const;
+    void generate(CodeGenerator& g, const std::string& mem,
+                          const std::vector<int>& arg, const std::vector<int>& res) const override;
 
     /// Evaluate the function numerically
-    virtual void eval(const double** arg, double** res, int* iw, double* w, int mem) const;
+    void eval(const double** arg, double** res, int* iw, double* w, int mem) const override;
 
     /// Evaluate the function symbolically (SX)
-    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const;
+    void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const override;
 
     /** \brief  Evaluate symbolically (MX) */
-    virtual void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const;
+    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
 
     /** \brief Calculate forward mode directional derivatives */
-    virtual void eval_forward(const std::vector<std::vector<MX> >& fseed,
-                         std::vector<std::vector<MX> >& fsens) const;
+    void ad_forward(const std::vector<std::vector<MX> >& fseed,
+                         std::vector<std::vector<MX> >& fsens) const override;
 
     /** \brief Calculate reverse mode directional derivatives */
-    virtual void eval_reverse(const std::vector<std::vector<MX> >& aseed,
-                         std::vector<std::vector<MX> >& asens) const;
+    void ad_reverse(const std::vector<std::vector<MX> >& aseed,
+                         std::vector<std::vector<MX> >& asens) const override;
 
     /** \brief  Propagate sparsity forward */
-    virtual void sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const;
+    void sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
 
     /** \brief  Propagate sparsity backwards */
-    virtual void sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const;
+    void sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
 
-    /** \brief  Number of functions */
-    virtual int numFunctions() const {return 1;}
-
-    /** \brief  Get function reference */
-    virtual const Function& getFunction(int i) const { return fcn_;}
-
-    /** \brief  Get function input */
-    virtual int getFunction_input() const { return -1;}
+    /** \brief  Get called function */
+    const Function& which_function() const override { return fcn_;}
 
     /** \brief  Get function output */
-    virtual int getFunctionOutput() const { return -1;}
+    int which_output() const override { return -1;}
 
     /** \brief  Number of outputs */
-    virtual int nout() const;
+    int nout() const override;
 
     /** \brief  Get the sparsity of output oind */
-    virtual const Sparsity& sparsity(int oind) const;
+    const Sparsity& sparsity(int oind) const override;
 
     /** \brief Get the operation */
-    virtual int op() const { return OP_CALL;}
+    int op() const override { return OP_CALL;}
 
     /** \brief Get required length of arg field */
-    virtual size_t sz_arg() const;
+    size_t sz_arg() const override;
 
     /** \brief Get required length of res field */
-    virtual size_t sz_res() const;
+    size_t sz_res() const override;
 
     /** \brief Get required length of iw field */
-    virtual size_t sz_iw() const;
+    size_t sz_iw() const override;
 
     /** \brief Get required length of w field */
-    virtual size_t sz_w() const;
+    size_t sz_w() const override;
 
   protected:
     /** \brief  Constructor (should not be used directly) */

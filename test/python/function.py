@@ -105,7 +105,7 @@ class Functiontests(casadiTestCase):
 
     f = Function("f", [x,y],[x**2,y,x*y[0]])
 
-    g = f.jacobian(0,0)
+    g = f.jacobian_old(0, 0)
 
     self.assertEqual(g.n_in(),f.n_in())
     self.assertEqual(g.n_out(),f.n_out()+1)
@@ -226,7 +226,7 @@ class Functiontests(casadiTestCase):
       x = SX.sym("x",sp.size2())
       self.assertTrue(sp==sp.T)
       f = Function("f", [x],[mtimes([x.T,DM.ones(sp),x])])
-      J = f.hessian()
+      J = f.hessian_old(0, 0)
       sp2 = J.sparsity_out(0)
       self.checkarray(sp.row(),sp2.row())
       self.checkarray(sp.colind(),sp2.colind())
@@ -340,7 +340,7 @@ class Functiontests(casadiTestCase):
 
     Pf = Function("P", [X, P], [mtimes(M_X,P)])
 
-    P_P = Pf.jacobian(1)
+    P_P = Pf.jacobian_old(1, 0)
 
     self.assertFalse("derivative" in str(P_P))
 
@@ -381,11 +381,11 @@ class Functiontests(casadiTestCase):
       for i in range(2):
         f = XFunction("nlp",[V],[vertcat(*g)],{"ad_weight_sp":i})
 
-        assert f.sparsity_jac().nnz()==162
+        assert f.sparsity_jac(0, 0).nnz()==162
 
         f2 = XFunction("nlp",[V],[vertcat(*g2)],{"ad_weight_sp":i})
 
-        assert f2.sparsity_jac().nnz()==162
+        assert f2.sparsity_jac(0, 0).nnz()==162
 
   def test_callback(self):
     class mycallback(Callback):
@@ -591,39 +591,6 @@ class Functiontests(casadiTestCase):
 
             for f in [F,toSX_fun(F)]:
               self.checkfunction(f,Fref,inputs=inputs,sparsity_mod=args.run_slow)
-
-  def test_issue1522(self):
-    V = MX.sym("X",2)
-    P = MX.sym("X",0)
-
-    x =  V[0]
-    y =  V[1]
-
-    obj = (x-(x+y))**2
-
-    nlp = Function("nlp", [V, P], [obj, MX()], ['x', 'p'], ['f', 'g'])
-
-    self.assertTrue(nlp.hessian(0,0).sparsity_out(0).is_symmetric())
-
-    V = MX.sym("X",6)
-
-    xs =      [ V[0:2], V[2:4] ]
-    travels = [ V[4],   V[5]   ]
-
-    dist = 0
-
-    for j in range(2):
-      dist+=sum1((xs[0]-(xs[j]+travels[j]))**2)
-
-    nlp = Function("nlp", [V, P], [-dist, MX()], ['x', 'p'], ['f', 'g'])
-
-    hs = []
-    for n in [nlp, nlp.expand('nlp_expanded')]:
-        H = n.reverse(1).jacobian(0,0,False,True)
-
-        h = H(der_x=1,adj_f=1)[H.name_out(0)]
-        hs.append(h)
-    self.checkarray(*hs)
 
   def test_repmatnode(self):
     x = MX.sym("x",2)
@@ -863,18 +830,18 @@ class Functiontests(casadiTestCase):
       (0.4,0.4),
       (-.6,-0.6)
     ]
-    
+
     X = MX.sym("x")
-    
+
     J = Function("F",[X],[F(X)])
-    
+
     for a,r in pairs:
       self.assertTrue(same(F(a), r))
       self.check_codegen(F,inputs=[a])
 
-    
+
     X = MX.sym("x")
-    
+
     J = Function("F",[X],[jacobian(F(X),X)])
 
     pairs = [
@@ -884,7 +851,7 @@ class Functiontests(casadiTestCase):
       (1.4,2),
       (0.4,1),
       (-.6,1),
-      
+
       (1,2),
       (0.99,1),
     ]
@@ -896,13 +863,13 @@ class Functiontests(casadiTestCase):
   def test_2d_interpolant(self):
     grid = [[0, 1, 4, 5],
             [0, 2, 3]]
-    
+
     values = [0,   1,  8,  3,
               10, -11, 12, 13,
               20, 31, -42, 53]
     F = interpolant('F', 'linear', grid, values)
-    
-    
+
+
     a0 = -11+0.4*(31+11)
     a1 = 12+0.4*(-42-12)
     pairs = [
@@ -916,24 +883,24 @@ class Functiontests(casadiTestCase):
 
       (vertcat(3,2), -11+2.0/3*(12+11)),
       (vertcat(3,3), 31+2.0/3*(-42-31)),
-      
+
       (vertcat(3,2.4), a0+2.0/3*(a1-a0))
     ]
-    
+
     for a,r in pairs:
       self.checkarray(F(a), r)
       self.check_codegen(F,inputs=[a])
 
-    
+
     X = MX.sym("x",2)
-    
-    J = Function("F",[X],[jacobian(F(X),X)])
-    
+
+    J = Function("J",[X],[jacobian(F(X),X)])
+
     jx0 = (12+11)/3.0
     jx1 = (-42-31)/3.0
     jx2 = (13-12)
     jx3 = (53+42)
-    
+
     jy0 = 31+11
     jy1 = -42-12
 
@@ -948,11 +915,11 @@ class Functiontests(casadiTestCase):
 
       (vertcat(3,2), vertcat(jx0,jy0+(jy1-jy0)*2.0/3)),
       (vertcat(3,3), vertcat(jx1,jy0+(jy1-jy0)*2.0/3)),
-      
+
       (vertcat(3,2.4), vertcat(jx0+(jx1-jx0)*0.4,jy0+(jy1-jy0)*2.0/3)),
-      
+
     ]
-    
+
     for a,r in pairs:
       self.checkarray(J(a).T, r)
       self.check_codegen(J,inputs=[a])
@@ -971,9 +938,9 @@ class Functiontests(casadiTestCase):
       self.assertTrue(same(F(6), 6))
       self.assertTrue(same(F(0.4), 0.4))
       self.assertTrue(same(F(-.6), -.6))
-      
+
       F = interpolant('F', 'linear', [np.linspace(0,1,7)], list(range(7)), {"lookup_mode": ["exact"]})
-    
+
     grid = [[2, 4, 6]]
     values = [10, 7, 1]
     for opts in [{"lookup_mode": ["linear"]},{"lookup_mode": ["exact"]}]:
@@ -986,9 +953,9 @@ class Functiontests(casadiTestCase):
       self.assertTrue(same(F(5), 4))
       self.assertTrue(same(F(6), 1))
       self.assertTrue(same(F(7), -2))
-      
+
       F = interpolant('F', 'linear', [np.linspace(0,1,7)], list(range(7)), {"lookup_mode": ["exact"]})
-    
+
   def test_2d_interpolant_uniform(self):
     grid = [[0, 1, 2], [0, 1, 2]]
     values = [0, 1, 2, 10, 11, 12, 20, 21, 22]
@@ -1011,19 +978,19 @@ class Functiontests(casadiTestCase):
   def test_2d_bspline(self):
     import scipy.interpolate
     np.random.seed(0)
-    
+
     d_knots = [list(np.linspace(0,1,5)),list(np.linspace(0,1,6))]
 
     data = np.random.random([len(e) for e in d_knots])
     r = np.meshgrid(*d_knots,indexing='ij')
 
     xyz = np.vstack(e.ravel(order='F') for e in r).ravel(order='F')
-    
+
     d_flat = data.ravel(order='F')
 
     LUT = casadi.interpolant('name','bspline',d_knots,d_flat)
-    LUTJ = LUT.jacobian()
-    LUTH = LUT.hessian()
+    LUTJ = LUT.jacobian_old(0, 0)
+    LUTH = LUT.hessian_old(0, 0)
 
     self.check_codegen(LUT, [vertcat(0.2,0.3)])
     #scipy.interpolate.interpn(d_knots, data, [0.2,0.3], method='splinef2d')
@@ -1034,7 +1001,7 @@ class Functiontests(casadiTestCase):
         m = LUT([x,y])
         r = interp.ev(x,y)
         self.checkarray(m,r)
-        
+
         m = LUTJ([x,y])[0]
         try:
           r = [interp.ev(x,y, 1, 0), interp.ev(x,y, 0, 1)]
@@ -1055,27 +1022,27 @@ class Functiontests(casadiTestCase):
   def test_1d_bspline(self):
     import scipy.interpolate
     np.random.seed(0)
-    
+
     d_knots = [list(np.linspace(0,1,5))]
 
     data = np.random.random([len(e) for e in d_knots])
     r = np.array(d_knots)
 
     xyz = np.vstack(e.ravel(order='F') for e in r).ravel(order='F')
-    
+
     d_flat = data.ravel(order='F')
 
     LUT = casadi.interpolant('name','bspline',d_knots,d_flat)
     self.check_codegen(LUT, [0.2])
-    LUTJ = LUT.jacobian()
-    LUTH = LUT.hessian()
+    LUTJ = LUT.jacobian_old(0, 0)
+    LUTH = LUT.hessian_old(0, 0)
 
     interp = scipy.interpolate.InterpolatedUnivariateSpline(d_knots[0], data)
     for x in [0,0.01,0.1,0.2,0.9,0.99,1]:
       m = LUT(x)
       r = interp(x)
       self.checkarray(m,r)
-      
+
       m = LUTJ(x)[0]
       try:
         r = interp(x, 1)
@@ -1117,15 +1084,16 @@ class Functiontests(casadiTestCase):
           z2 = sin(z1)
           return [z2]
 
-        def get_n_forward(self): return 0
-        def get_n_reverse(self): return 0
+        def has_forward(self,nfwd): return False
+        def has_reverse(self,nadj): return False
 
         def has_jacobian(self): return True
 
-        def get_jacobian(self, name, opts):
+        def get_jacobian(self, name, inames, onames, opts):
           x = SX.sym("x")
           y = SX.sym("y")
-          J = Function(name, [x,y],[horzcat(cos(x+3*y),3*cos(x+3*y))], opts)
+          out_g = SX.sym('out_g', Sparsity(1,1))
+          J = Function(name, [x,y,out_g],[horzcat(cos(x+3*y),3*cos(x+3*y))], inames, onames, opts)
           return J
 
     f = Fun()
@@ -1209,7 +1177,7 @@ class Functiontests(casadiTestCase):
         f.gradient()
 
       with self.assertRaises(Exception):
-        f.jacobian()
+        f.jacobian_old(0, 0)
 
       with self.assertRaises(Exception):
         f.forward(1)
@@ -1296,8 +1264,8 @@ class Functiontests(casadiTestCase):
           return [z2]
 
         if has_fwd:
-          def get_n_forward(self): return 1
-          def get_forward(self,name,nfwd,inames,onames,opts):
+          def has_forward(self,nfwd): return nfwd==1
+          def get_forward(self,nfwd,name,inames,onames,opts):
             assert(nfwd==1)
             class ForwardFun(Callback):
               # sin(x+3*y)
@@ -1333,8 +1301,8 @@ class Functiontests(casadiTestCase):
             return ffun
 
         if has_adj:
-          def get_n_reverse(self): return 1
-          def get_reverse(self,name,nadj,inames,onames,opts):
+          def has_reverse(self,nadj): return nadj==1
+          def get_reverse(self,nadj,name,inames,onames,opts):
             assert(nadj==1)
             class BackwardFun(Callback):
               # sin(x+3*y)
@@ -1439,8 +1407,8 @@ class Functiontests(casadiTestCase):
       self.assertTrue("nlp_g" in out[1])
       with self.assertRaises(Exception):
         solver = nlpsol("solver","ipopt",nlp,{"specific_options":{ "nlp_foo" : 3}})
-   
-  @requires_expm("slicot")     
+
+  @requires_expm("slicot")
   @memory_heavy()
   def test_expm(self):
       eps = 1e-6
@@ -1456,7 +1424,7 @@ class Functiontests(casadiTestCase):
 
       dA = np.random.random((n,n))
       Yb = np.random.random((n,2))
-      
+
       def expm(A):
 
         n = A.shape[0]
@@ -1471,28 +1439,28 @@ class Functiontests(casadiTestCase):
         out = Intg(x0=DM.eye(n),p=vec(As))
         expmF = Function('expm',[As],[out["xf"]])
         return expmF(A)
-      
+
       A = MX.sym("A",n,n)
       t = MX.sym("t")
       fr = Function('fr',[A,t],[expm(A*t)])
       f = Function('f',[A,t],[casadi.expm(A*t)])
-      
+
       self.checkfunction(fr,f,inputs=[Anum, 1.1],digits=8)
-      
+
       fr = Function('fr',[t],[expm(Anum*t)])
       f = Function('f',[t],[casadi.expm_const(Anum,t)])
-      
+
       self.checkfunction(fr,f,inputs=[1.1],digits=8)
-      
+
       JA = jacobian(casadi.expm(A*t),A)
       Jt = jacobian(casadi.expm(A*t),t)
-      
+
       self.assertTrue(JA.nnz()==n**4)
       self.assertTrue(Jt.nnz()==n**2)
-            
+
       JA = jacobian(casadi.expm_const(A,t),A)
       Jt = jacobian(casadi.expm_const(A,t),t)
-      
+
       self.assertTrue(JA.nnz()==0)
       self.assertTrue(Jt.nnz()==n**2)
 

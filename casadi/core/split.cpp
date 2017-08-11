@@ -32,8 +32,8 @@ using namespace std;
 namespace casadi {
 
   Split::Split(const MX& x, const std::vector<int>& offset) : offset_(offset) {
-    setDependencies(x);
-    setSparsity(Sparsity::scalar());
+    set_dep(x);
+    set_sparsity(Sparsity::scalar());
   }
 
   Split::~Split() {
@@ -61,7 +61,7 @@ namespace casadi {
     }
   }
 
-  void Split::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  void Split::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     int nx = offset_.size()-1;
     for (int i=0; i<nx; ++i) {
       if (res[i]!=0) {
@@ -75,7 +75,7 @@ namespace casadi {
     }
   }
 
-  void Split::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  void Split::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     int nx = offset_.size()-1;
     for (int i=0; i<nx; ++i) {
       if (res[i]!=0) {
@@ -146,7 +146,7 @@ namespace casadi {
     res = horzsplit(arg[0], col_offset);
   }
 
-  void Horzsplit::eval_forward(const std::vector<std::vector<MX> >& fseed,
+  void Horzsplit::ad_forward(const std::vector<std::vector<MX> >& fseed,
                           std::vector<std::vector<MX> >& fsens) const {
     int nfwd = fsens.size();
 
@@ -164,7 +164,7 @@ namespace casadi {
     }
   }
 
-  void Horzsplit::eval_reverse(const std::vector<std::vector<MX> >& aseed,
+  void Horzsplit::ad_reverse(const std::vector<std::vector<MX> >& aseed,
                           std::vector<std::vector<MX> >& asens) const {
     int nadj = aseed.size();
 
@@ -218,7 +218,7 @@ namespace casadi {
     res = diagsplit(arg[0], offset1, offset2);
   }
 
-  void Diagsplit::eval_forward(const std::vector<std::vector<MX> >& fseed,
+  void Diagsplit::ad_forward(const std::vector<std::vector<MX> >& fseed,
                           std::vector<std::vector<MX> >& fsens) const {
     int nfwd = fsens.size();
     // Get offsets
@@ -239,7 +239,7 @@ namespace casadi {
     }
   }
 
-  void Diagsplit::eval_reverse(const std::vector<std::vector<MX> >& aseed,
+  void Diagsplit::ad_reverse(const std::vector<std::vector<MX> >& aseed,
                           std::vector<std::vector<MX> >& asens) const {
     int nadj = asens.size();
 
@@ -288,7 +288,7 @@ namespace casadi {
     res = vertsplit(arg[0], row_offset);
   }
 
-  void Vertsplit::eval_forward(const std::vector<std::vector<MX> >& fseed,
+  void Vertsplit::ad_forward(const std::vector<std::vector<MX> >& fseed,
                           std::vector<std::vector<MX> >& fsens) const {
     int nfwd = fsens.size();
 
@@ -305,7 +305,7 @@ namespace casadi {
     }
   }
 
-  void Vertsplit::eval_reverse(const std::vector<std::vector<MX> >& aseed,
+  void Vertsplit::ad_reverse(const std::vector<std::vector<MX> >& aseed,
                           std::vector<std::vector<MX> >& asens) const {
     int nadj = aseed.size();
 
@@ -322,16 +322,16 @@ namespace casadi {
     }
   }
 
-  MX Horzsplit::getHorzcat(const std::vector<MX>& x) const {
+  MX Horzsplit::get_horzcat(const std::vector<MX>& x) const {
     // Check x length
     if (x.size()!=nout()) {
-      return MXNode::getHorzcat(x);
+      return MXNode::get_horzcat(x);
     }
 
     // Check x content
     for (int i=0; i<x.size(); ++i) {
-      if (!(x[i]->isOutputNode() && x[i]->getFunctionOutput()==i && x[i]->dep().get()==this)) {
-        return MXNode::getHorzcat(x);
+      if (!(x[i]->is_output() && x[i]->which_output()==i && x[i]->dep().get()==this)) {
+        return MXNode::get_horzcat(x);
       }
     }
 
@@ -339,16 +339,16 @@ namespace casadi {
     return dep();
   }
 
-  MX Vertsplit::getVertcat(const std::vector<MX>& x) const {
+  MX Vertsplit::get_vertcat(const std::vector<MX>& x) const {
     // Check x length
     if (x.size()!=nout()) {
-      return MXNode::getVertcat(x);
+      return MXNode::get_vertcat(x);
     }
 
     // Check x content
     for (int i=0; i<x.size(); ++i) {
-      if (!(x[i]->isOutputNode() && x[i]->getFunctionOutput()==i && x[i]->dep().get()==this)) {
-        return MXNode::getVertcat(x);
+      if (!(x[i]->is_output() && x[i]->which_output()==i && x[i]->dep().get()==this)) {
+        return MXNode::get_vertcat(x);
       }
     }
 
@@ -364,7 +364,7 @@ namespace casadi {
 
     // Check x content
     for (int i=0; i<x.size(); ++i) {
-      if (!(x[i]->isOutputNode() && x[i]->getFunctionOutput()==i && x[i]->dep().get()==this)) {
+      if (!(x[i]->is_output() && x[i]->which_output()==i && x[i]->dep().get()==this)) {
         return MXNode::get_diagcat(x);
       }
     }

@@ -61,7 +61,7 @@ p = B
 for i in range(ns):
   R.append(p)
   p = mtimes([A,p])
-  
+
 R = horzcat(*R)
 
 # R must be of full rank
@@ -97,7 +97,7 @@ p = SX.sym('p')
 # sim.setInput(u_,'u')
 # sim.evaluate()
 
-# tf = sim.getMinorT()
+# tf = sim.minorT()
 
 # figure(1)
 # plot(tf,sim.getOutput().T)
@@ -114,14 +114,14 @@ p = SX.sym('p')
 # sim.setInput(u_,'u')
 # sim.evaluate()
 
-# tf = list(sim.getMinorT())
+# tf = list(sim.minorT())
 
 # figure(2)
 # title('Deviation from reference simulation, with perturbed initial condition')
 # plot(tf,sim.getOutput().T-out.T,linewidth=3)
 
 # # Not supported in current revision, cf. #929
-# # jacsim = sim.jacobian(CONTROLSIMULATOR_X0,0)
+# # jacsim = sim.jacobian_old(CONTROLSIMULATOR_X0,0)
 # # jacsim.setInput(x0,'x0')
 # # jacsim.setInput(u_,'u')
 
@@ -163,7 +163,7 @@ p = SX.sym('p')
 
 
 # # Not supported in current revision, cf. #929
-# # jacsim = sim.jacobian(CONTROLSIMULATOR_U,0)
+# # jacsim = sim.jacobian_old(CONTROLSIMULATOR_U,0)
 # # jacsim.setInput(x0,'x0')
 # # jacsim.setInput(u_,'u')
 
@@ -183,8 +183,8 @@ p = SX.sym('p')
 # #
 # #  Our goal is to reach a particular end-state xref_e
 # #  We can find the necessary controls explicitly in continuous time
-# #  with the controllability Gramian 
-# #  
+# #  with the controllability Gramian
+# #
 # #  http://www-control.eng.cam.ac.uk/jmm/3f2/handout4.pdf
 # #  http://www.ece.rutgers.edu/~gajic/psfiles/chap5.pdf
 
@@ -195,7 +195,7 @@ p = SX.sym('p')
 #            entry('eAt',shape=(ns,ns)),
 #            entry('Wt',shape=(ns,ns))
 #          ])
-         
+
 # eAt = states['eAt']
 # Wt  = states['Wt']
 
@@ -266,7 +266,7 @@ p = SX.sym('p')
 # e = sim.getOutput()[states.i['y'],-1] - xref_e
 # assert(max(fabs(e))/max(fabs(xref_e))<1e-6)
 
-# tf = sim.getMinorT()
+# tf = sim.minorT()
 # # This will be our reference trajectory for tracking
 
 # figure(4)
@@ -309,7 +309,7 @@ p = SX.sym('p')
 #   print 'it. %02d - deviation from steady state: %.2e' % (i, e)
 #   if e < 1e-11:
 #     break
-  
+
 # # Obtain the solution of the ricatti equation
 # P_ = xe.reshape((ns,ns))
 # print 'P=', P_
@@ -398,7 +398,7 @@ p = SX.sym('p')
 #   #sim.setInput(yref_,'u')
 #   sim.evaluate()
 
-#   tf = sim.getMinorT()
+#   tf = sim.minorT()
 
 #   subplot(3,3,1+k*3)
 #   plot(tf,sim.getOutput(0).T)
@@ -460,10 +460,10 @@ p = SX.sym('p')
 # sim = ControlSimulator('sim', cdae, out, tn, opts)
 
 # # Not supported in current revision, cf. #929
-# # jacsim = sim.jacobian(CONTROLSIMULATOR_X0,0)
+# # jacsim = sim.jacobian_old(CONTROLSIMULATOR_X0,0)
 
 # figure(7)
-  
+
 # for k,(caption,K_) in enumerate([('K: zero',DM.zeros((nu,ns))),('K: LQR',K)]):
 #   param_['K'] = K_
 
@@ -472,8 +472,8 @@ p = SX.sym('p')
 #   sim.evaluate()
 #   sim.getOutput()
 
-#   tf = sim.getMinorT()
-  
+#   tf = sim.minorT()
+
 #   subplot(2,2,2*k+1)
 #   title('states (%s)' % caption)
 #   for i,c in enumerate(['b','g','r']):
@@ -491,11 +491,11 @@ p = SX.sym('p')
 #   # jacsim.setInput(param_,'p')
 #   # jacsim.evaluate()
 #   # M = jacsim.getOutput()[-states.size:,:][list(states.i['y']),list(states.i['y'])]
-  
+
 #   # # Inspect the eigenvalues of M
 #   # [D,V] = linalg.eig(M)
 #   # print 'Spectral radius of monodromy (%s): ' % caption
-  
+
 #   # print max(abs(D))
 
 # print 'Spectral radius of exp((A-BK)*te): '
@@ -542,7 +542,7 @@ p = SX.sym('p')
 # sim.setInput(u_,'u')
 # sim.evaluate()
 
-# tf = sim.getMinorT()
+# tf = sim.minorT()
 
 # figure(8)
 # subplot(2,1,1)
@@ -556,8 +556,8 @@ p = SX.sym('p')
 #   plot(tf,sim.getOutput(2)[i,:].T,c+'--')
 # title('controls (%s)' % caption)
 
-# # Not supported in current revision, cf. #929  
-# # jacsim = sim.jacobian(CONTROLSIMULATOR_X0,0)
+# # Not supported in current revision, cf. #929
+# # jacsim = sim.jacobian_old(CONTROLSIMULATOR_X0,0)
 
 # # # Calculate monodromy matrix
 # # jacsim.setInput(x0,'x0')
@@ -571,7 +571,7 @@ p = SX.sym('p')
 # # print 'Spectral radius of monodromy, discrete reference, continous control'
 
 # # print max(abs(D))
-  
+
 # # Simulation of the controller:
 # # discrete reference, discrete control action
 # # -----------------------------------------------------------
@@ -597,7 +597,7 @@ p = SX.sym('p')
 # sim.setInput(u_,'u')
 # sim.evaluate()
 
-# tf = sim.getMinorT()
+# tf = sim.minorT()
 
 # figure(9)
 # subplot(2,1,1)
@@ -611,8 +611,8 @@ p = SX.sym('p')
 #   plot(tf,sim.getOutput(2)[i,:].T,c+'--')
 # title('controls (%s)' % caption)
 
-# # Not supported in current revision, cf. #929  
-# # jacsim = sim.jacobian(CONTROLSIMULATOR_X0,0)
+# # Not supported in current revision, cf. #929
+# # jacsim = sim.jacobian_old(CONTROLSIMULATOR_X0,0)
 
 # # # Calculate monodromy matrix
 # # jacsim.setInput(x0,'x0')

@@ -35,16 +35,13 @@ namespace casadi {
 
   Function external(const string& name, const Importer& li,
                     const Dict& opts) {
-    Function ret;
     if (li.has_function(name + "_simple")) {
       // Simplified, lower overhead external
-      ret.assignNode(new SimplifiedExternal(name, li));
+      return Function::create(new SimplifiedExternal(name, li), opts);
     } else {
       // Full information external
-      ret.assignNode(new GenericExternal(name, li));
+      return Function::create(new GenericExternal(name, li), opts);
     }
-    ret->construct(opts);
-    return ret;
   }
 
   Function external(const string& name, const Dict& opts) {
@@ -229,21 +226,22 @@ namespace casadi {
     }
   }
 
-  void External::generateFunction(CodeGenerator& g, const std::string& fname,
-                                  bool decl_static) const {
-    g << signature(fname) << " {\n"
+  void External::codegen(CodeGenerator& g, const std::string& fname,
+                         bool decl_static) const {
+    g << "/* " << name_ << " */\n";
+    g << "static " << signature(fname) << " {\n"
       << li_.body(eval_name()) << "\n";
   }
 
-  void External::addDependency(CodeGenerator& g) const {
+  void External::add_dependency(CodeGenerator& g) const {
     if (li_.inlined(eval_name())) {
-      FunctionInternal::addDependency(g);
+      FunctionInternal::add_dependency(g);
     } else {
-      g.addExternal(signature(name_) + ";");
+      g.add_external(signature(name_) + ";");
     }
     if (has_refcount_) {
-      g.addExternal("void " + name_ + "_incref(void);");
-      g.addExternal("void " + name_ + "_decref(void);");
+      g.add_external("void " + name_ + "_incref(void);");
+      g.add_external("void " + name_ + "_decref(void);");
     }
   }
 
@@ -255,32 +253,32 @@ namespace casadi {
     }
   }
 
-  bool External::hasFullJacobian() const {
-    if (FunctionInternal::hasFullJacobian()) return true;
-    return li_.has_function(name_ + "_jac");
+  bool External::has_jacobian() const {
+    if (FunctionInternal::has_jacobian()) return true;
+    return li_.has_function("jac_" + name_);
   }
 
   Function External
-  ::getFullJacobian(const std::string& name,
-                    const std::vector<std::string>& i_names,
-                    const std::vector<std::string>& o_names,
-                    const Dict& opts) {
-    if (hasFullJacobian()) {
+  ::get_jacobian(const std::string& name,
+                    const std::vector<std::string>& inames,
+                    const std::vector<std::string>& onames,
+                    const Dict& opts) const {
+    if (has_jacobian()) {
       return external(name, li_, opts);
     } else {
-      return FunctionInternal::getFullJacobian(name, i_names, o_names, opts);
+      return FunctionInternal::get_jacobian(name, inames, onames, opts);
     }
   }
 
   Function External
-  ::get_forward(const std::string& name, int nfwd,
-                const std::vector<std::string>& i_names,
-                const std::vector<std::string>& o_names,
+  ::get_forward(int nfwd, const std::string& name,
+                const std::vector<std::string>& inames,
+                const std::vector<std::string>& onames,
                 const Dict& opts) const {
     // Consistency check
     int n=1;
     while (n<nfwd) n*=2;
-    if (n!=nfwd || nfwd>get_n_forward()) {
+    if (n!=nfwd || !has_forward(nfwd)) {
       // Inefficient code to be replaced later
       Function fwd1 = forward(1);
       return fwd1.map(name, "serial", nfwd, range(n_in()+n_out()), std::vector<int>(), opts);
@@ -289,25 +287,19 @@ namespace casadi {
     return external(name, li_, opts);
   }
 
-  int External::get_n_forward() const {
-    // Will try 64, 32, 16, 8, 4, 2, 1 directions
-    for (int i=64; i>0; i/=2) {
-      stringstream ss;
-      ss << "fwd" << i << "_" << name_;
-      if (li_.has_function(ss.str())) return i;
-    }
-    return 0;
+  bool External::has_forward(int nfwd) const {
+    return li_.has_function("fwd" + to_string(nfwd) + "_" + name_);
   }
 
   Function External
-  ::get_reverse(const std::string& name, int nadj,
-                const std::vector<std::string>& i_names,
-                const std::vector<std::string>& o_names,
+  ::get_reverse(int nadj, const std::string& name,
+                const std::vector<std::string>& inames,
+                const std::vector<std::string>& onames,
                 const Dict& opts) const {
     // Consistency check
     int n=1;
     while (n<nadj) n*=2;
-    if (n!=nadj || nadj>get_n_reverse()) {
+    if (n!=nadj || !has_reverse(nadj)) {
       // Inefficient code to be replaced later
       Function adj1 = reverse(1);
       return adj1.map(name, "serial", nadj, range(n_in()+n_out()), std::vector<int>(), opts);
@@ -316,14 +308,8 @@ namespace casadi {
     return external(name, li_, opts);
   }
 
-  int External::get_n_reverse() const {
-    // Will try 64, 32, 16, 8, 4, 2, 1 directions
-    for (int i=64; i>0; i/=2) {
-      stringstream ss;
-      ss << "adj" << i << "_" << name_;
-      if (li_.has_function(ss.str())) return i;
-    }
-    return 0;
+  bool External::has_reverse(int nadj) const {
+    return li_.has_function("adj" + to_string(nadj) + "_" + name_);
   }
 
   Function External::factory(const std::string& name,

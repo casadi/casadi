@@ -55,10 +55,10 @@ namespace casadi {
                       const std::vector<double>& values);
 
     // Destructor
-    virtual ~LinearInterpolant();
+    ~LinearInterpolant() override;
 
     // Get name of the plugin
-    virtual const char* plugin_name() const { return "linear";}
+    const char* plugin_name() const override { return "linear";}
 
     /** \brief  Create a new Interpolant */
     static Interpolant* creator(const std::string& name,
@@ -69,25 +69,25 @@ namespace casadi {
     }
 
     // Initialize
-    virtual void init(const Dict& opts);
+    void init(const Dict& opts) override;
 
     /// Evaluate numerically
-    virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
+    void eval(void* mem, const double** arg, double** res, int* iw, double* w) const override;
 
     ///@{
     /** \brief Full Jacobian */
-    virtual bool hasFullJacobian() const { return true;}
-    virtual Function getFullJacobian(const std::string& name,
-                                      const std::vector<std::string>& i_names,
-                                      const std::vector<std::string>& o_names,
-                                      const Dict& opts);
+    bool has_jacobian() const override { return true;}
+    Function get_jacobian(const std::string& name,
+                                      const std::vector<std::string>& inames,
+                                      const std::vector<std::string>& onames,
+                                      const Dict& opts) const override;
     ///@}
 
     /** \brief Is codegen supported? */
-    virtual bool has_codegen() const { return true;}
+    bool has_codegen() const override { return true;}
 
     /** \brief Generate code for the body of the C function */
-    virtual void generateBody(CodeGenerator& g) const;
+    void codegen_body(CodeGenerator& g) const override;
 
     /// A documentation string
     static const std::string meta_doc;
@@ -95,7 +95,7 @@ namespace casadi {
     ///@{
     /** \brief Options */
     static Options options_;
-    virtual const Options& get_options() const { return options_;}
+    const Options& get_options() const override { return options_;}
     ///@}
 
     std::vector<int> lookup_mode_;
@@ -108,22 +108,22 @@ namespace casadi {
     LinearInterpolantJac(const std::string& name) : FunctionInternal(name) {}
 
     /// Destructor
-    virtual ~LinearInterpolantJac() {}
+    ~LinearInterpolantJac() override {}
 
     /** \brief Get type name */
-    virtual std::string type_name() const { return "interpolant_linear_jac";}
+    std::string type_name() const override { return "interpolant_linear_jac";}
 
     /** \brief Is codegen supported? */
-    virtual bool has_codegen() const { return true;}
+    bool has_codegen() const override { return true;}
 
     /** \brief Generate code for the body of the C function */
-    virtual void generateBody(CodeGenerator& g) const;
+    void codegen_body(CodeGenerator& g) const override;
 
     // Initialize
-    virtual void init(const Dict& opts);
+    void init(const Dict& opts) override;
 
     /// Evaluate numerically
-    virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
+    void eval(void* mem, const double** arg, double** res, int* iw, double* w) const override;
   };
 
 } // namespace casadi

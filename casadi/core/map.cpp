@@ -32,17 +32,13 @@ namespace casadi {
   Function Map::create(const std::string& parallelization, const Function& f, int n) {
     // Create instance of the right class
     string name = f.name() + "_" + to_string(n);
-    Function ret;
     if (parallelization == "serial") {
-      ret.assignNode(new Map(name, f, n));
+      return Function::create(new Map(name, f, n), Dict());
     } else if (parallelization== "openmp") {
-      ret.assignNode(new MapOmp(name, f, n));
+      return Function::create(new MapOmp(name, f, n), Dict());
     } else {
       casadi_error("Unknown parallelization: " + parallelization);
     }
-    // Finalize creation
-    ret->construct(Dict());
-    return ret;
   }
 
   Map::Map(const std::string& name, const Function& f, int n)
@@ -85,18 +81,18 @@ namespace casadi {
     evalGen(arg, res, iw, w);
   }
 
-  void Map::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  void Map::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     evalGen(arg, res, iw, w);
   }
 
-  void Map::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  void Map::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     int n_in = this->n_in(), n_out = this->n_out();
     bvec_t** arg1 = arg+n_in;
     copy_n(arg, n_in, arg1);
     bvec_t** res1 = res+n_out;
     copy_n(res, n_out, res1);
     for (int i=0; i<n_; ++i) {
-      f_->sp_rev(arg1, res1, iw, w, 0);
+      f_->sp_reverse(arg1, res1, iw, w, 0);
       for (int j=0; j<n_in; ++j) {
         if (arg1[j]) arg1[j] += f_.nnz_in(j);
       }
@@ -106,18 +102,18 @@ namespace casadi {
     }
   }
 
-  void Map::generateDeclarations(CodeGenerator& g) const {
-    f_->addDependency(g);
+  void Map::codegen_declarations(CodeGenerator& g) const {
+    f_->add_dependency(g);
   }
 
-  void Map::generateBody(CodeGenerator& g) const {
+  void Map::codegen_body(CodeGenerator& g) const {
     int n_in = this->n_in(), n_out = this->n_out();
     g << "int i;\n";
     // Input buffer
-    g << "const real_t** arg1 = arg+" << n_in << ";\n"
+    g << "const casadi_real** arg1 = arg+" << n_in << ";\n"
       << "for (i=0; i<" << n_in << "; ++i) arg1[i]=arg[i];\n";
     // Output buffer
-    g << "real_t** res1 = res+" << n_out << ";\n"
+    g << "casadi_real** res1 = res+" << n_out << ";\n"
       << "for (i=0; i<" << n_out << "; ++i) res1[i]=res[i];\n"
       << "for (i=0; i<" << n_ << "; ++i) {\n";
     // Evaluate
@@ -134,9 +130,9 @@ namespace casadi {
   }
 
   Function Map
-  ::get_forward(const std::string& name, int nfwd,
-                const std::vector<std::string>& i_names,
-                const std::vector<std::string>& o_names,
+  ::get_forward(int nfwd, const std::string& name,
+                const std::vector<std::string>& inames,
+                const std::vector<std::string>& onames,
                 const Dict& opts) const {
     // Shorthands
     int n_in = this->n_in(), n_out = this->n_out();
@@ -184,13 +180,13 @@ namespace casadi {
     }
 
     // Construct return function
-    return Function(name, arg, res, i_names, o_names, opts);
+    return Function(name, arg, res, inames, onames, opts);
   }
 
   Function Map
-  ::get_reverse(const std::string& name, int nadj,
-                const std::vector<std::string>& i_names,
-                const std::vector<std::string>& o_names,
+  ::get_reverse(int nadj, const std::string& name,
+                const std::vector<std::string>& inames,
+                const std::vector<std::string>& onames,
                 const Dict& opts) const {
     // Shorthands
     int n_in = this->n_in(), n_out = this->n_out();
@@ -238,7 +234,7 @@ namespace casadi {
     }
 
     // Construct return function
-    return Function(name, arg, res, i_names, o_names, opts);
+    return Function(name, arg, res, inames, onames, opts);
   }
 
   void Map::eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
@@ -283,7 +279,7 @@ namespace casadi {
 #endif  // WITH_OPENMP
   }
 
-  void MapOmp::generateBody(CodeGenerator& g) const {
+  void MapOmp::codegen_body(CodeGenerator& g) const {
     int n_in = this->n_in(), n_out = this->n_out();
     size_t sz_arg, sz_res, sz_iw, sz_w;
     f_.sz_work(sz_arg, sz_res, sz_iw, sz_w);

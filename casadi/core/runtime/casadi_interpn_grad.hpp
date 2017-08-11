@@ -1,6 +1,6 @@
 // NOLINT(legal/copyright)
 template<typename T1>
-void CASADI_PREFIX(interpn_grad)(T1* grad, int ndim, const T1* grid, const int* offset, const T1* values, const T1* x, const int* lookup_mode, int* iw, T1* w) { // NOLINT(whitespace/line_length)
+void casadi_interpn_grad(T1* grad, int ndim, const T1* grid, const int* offset, const T1* values, const T1* x, const int* lookup_mode, int* iw, T1* w) { // NOLINT(whitespace/line_length)
   // Quick return
   if (!grad) return;
   // Work vectors
@@ -9,13 +9,13 @@ void CASADI_PREFIX(interpn_grad)(T1* grad, int ndim, const T1* grid, const int* 
   int* index = iw; iw += ndim;
   int* corner = iw; iw += ndim;
   // Left index and fraction of interval
-  CASADI_PREFIX(interpn_weights)(ndim, grid, offset, x, alpha, index, lookup_mode);
+  casadi_interpn_weights(ndim, grid, offset, x, alpha, index, lookup_mode);
   // Loop over all corners, add contribution to output
-  CASADI_PREFIX(fill_int)(corner, ndim, 0);
-  CASADI_PREFIX(fill)(grad, ndim, 0.);
+  casadi_fill_int(corner, ndim, 0);
+  casadi_fill(grad, ndim, 0.);
   do {
     // Get coefficients
-    T1 v = CASADI_PREFIX(interpn_interpolate)(ndim, offset, values,
+    T1 v = casadi_interpn_interpolate(ndim, offset, values,
       alpha, index, corner, coeff);
     // Propagate to alpha
     int i;
@@ -28,7 +28,7 @@ void CASADI_PREFIX(interpn_grad)(T1* grad, int ndim, const T1* grid, const int* 
         v *= 1-alpha[i];
       }
     }
-  } while (CASADI_PREFIX(flip)(corner, ndim));
+  } while (casadi_flip(corner, ndim));
   // Propagate to x
   int i;
   for (i=0; i<ndim; ++i) {

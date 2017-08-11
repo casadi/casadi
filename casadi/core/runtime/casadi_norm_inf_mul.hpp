@@ -1,6 +1,6 @@
 // NOLINT(legal/copyright)
 template<typename T1>
-T1 CASADI_PREFIX(norm_inf_mul)(const T1* x, const int* sp_x, const T1* y, const int* sp_y, T1* dwork, int* iwork) { // NOLINT(whitespace/line_length)
+T1 casadi_norm_inf_mul(const T1* x, const int* sp_x, const T1* y, const int* sp_y, T1* dwork, int* iwork) { // NOLINT(whitespace/line_length)
   T1 res = 0;
   // Get sparsities
   int nrow_x = sp_x[0], ncol_x = sp_x[1];

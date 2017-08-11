@@ -47,60 +47,48 @@ namespace casadi {
     explicit SymbolicMX(const std::string& name, const Sparsity & sp);
 
     /// Destructor
-    virtual ~SymbolicMX() {}
+    ~SymbolicMX() override {}
 
     /** \brief  Print expression */
-    virtual std::string print(const std::vector<std::string>& arg) const;
+    std::string print(const std::vector<std::string>& arg) const override;
 
     /// Evaluate the function numerically
-    virtual void eval(const double** arg, double** res, int* iw, double* w, int mem) const;
+    void eval(const double** arg, double** res, int* iw, double* w, int mem) const override;
 
     /// Evaluate the function symbolically (SX)
-    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const;
+    void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const override;
 
     /** \brief  Evaluate symbolically (MX) */
-    virtual void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const;
+    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
 
     /** \brief Calculate forward mode directional derivatives */
-    virtual void eval_forward(const std::vector<std::vector<MX> >& fseed,
-                         std::vector<std::vector<MX> >& fsens) const;
+    void ad_forward(const std::vector<std::vector<MX> >& fseed,
+                         std::vector<std::vector<MX> >& fsens) const override;
 
     /** \brief Calculate reverse mode directional derivatives */
-    virtual void eval_reverse(const std::vector<std::vector<MX> >& aseed,
-                         std::vector<std::vector<MX> >& asens) const;
+    void ad_reverse(const std::vector<std::vector<MX> >& aseed,
+                         std::vector<std::vector<MX> >& asens) const override;
 
     /** \brief  Propagate sparsity forward */
-    virtual void sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const;
+    void sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
 
     /** \brief  Propagate sparsity backwards */
-    virtual void sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const;
+    void sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
 
     /** \brief  Get the name */
-    virtual const std::string& name() const;
+    const std::string& name() const override;
 
     /** \brief Get the operation */
-    virtual int op() const { return OP_PARAMETER;}
+    int op() const override { return OP_PARAMETER;}
 
     /** \brief  Check if valid function input */
-    virtual bool is_valid_input() const { return true;}
-
-    /** \brief Get the number of symbolic primitives */
-    virtual int n_primitives() const { return 1;}
-
-    /** \brief Get symbolic primitives */
-    virtual void primitives(std::vector<MX>::iterator& it) const;
-
-    /** \brief Split up an expression along symbolic primitives */
-    virtual void split_primitives(const MX& x, std::vector<MX>::iterator& it) const;
-
-    /** \brief Join an expression along symbolic primitives */
-    virtual MX join_primitives(std::vector<MX>::const_iterator& it) const;
+    bool is_valid_input() const override { return true;}
 
     /** \brief Detect duplicate symbolic expressions */
-    virtual bool has_duplicates() const;
+    bool has_duplicates() const override;
 
     /** \brief Reset the marker for an input expression */
-    virtual void reset_input() const;
+    void reset_input() const override;
 
   protected:
     // Name of the variable

@@ -266,6 +266,8 @@ namespace casadi {
     ///@{
     /// Functions called by friend functions defined for GenericExpression
     static bool is_equal(const Matrix<Scalar> &x, const Matrix<Scalar> &y, int depth=0);
+    static Matrix<Scalar> mmin(const Matrix<Scalar> &x);
+    static Matrix<Scalar> mmax(const Matrix<Scalar> &x);
     ///@}
 
     ///@{
@@ -298,6 +300,10 @@ namespace casadi {
     static Matrix<Scalar> solve(const Matrix<Scalar> &A, const Matrix<Scalar>& b);
     static Matrix<Scalar> solve(const Matrix<Scalar> &A, const Matrix<Scalar>& b,
                                   const std::string& lsolver, const Dict& opts);
+    static Matrix<Scalar> inv(const Matrix<Scalar> &A);
+    static Matrix<Scalar> inv(const Matrix<Scalar> &A,
+                                  const std::string& lsolver, const Dict& opts);
+
     static int n_nodes(const Matrix<Scalar> &x);
     static std::string print_operator(const Matrix<Scalar> &x,
                                       const std::vector<std::string>& args);
@@ -322,12 +328,11 @@ namespace casadi {
                                         const Matrix<Scalar> &x_default,
                                         bool short_circuit=false);
     static bool depends_on(const Matrix<Scalar> &x, const Matrix<Scalar> &arg);
-    static Matrix<Scalar> mpower(const Matrix<Scalar> &x, const Matrix<Scalar> &y);
     static Matrix<Scalar> mrdivide(const Matrix<Scalar> &x, const Matrix<Scalar> &y);
     static Matrix<Scalar> mldivide(const Matrix<Scalar> &x, const Matrix<Scalar> &y);
     static std::vector<Matrix<Scalar> > symvar(const Matrix<Scalar> &x);
     static Matrix<Scalar> det(const Matrix<Scalar> &x);
-    static Matrix<Scalar> inv(const Matrix<Scalar> &x);
+    static Matrix<Scalar> inv_minor(const Matrix<Scalar> &x);
     static Matrix<Scalar> trace(const Matrix<Scalar> &x);
     static Matrix<Scalar> norm_1(const Matrix<Scalar> &x);
     static Matrix<Scalar> norm_2(const Matrix<Scalar> &x);
@@ -425,7 +430,7 @@ namespace casadi {
     static Matrix<Scalar> all(const Matrix<Scalar>& x);
     static Matrix<Scalar> any(const Matrix<Scalar>& x);
     static Matrix<Scalar> adj(const Matrix<Scalar>& x);
-    static Matrix<Scalar> getMinor(const Matrix<Scalar>& x, int i, int j);
+    static Matrix<Scalar> minor(const Matrix<Scalar>& x, int i, int j);
     static Matrix<Scalar> cofactor(const Matrix<Scalar>& A, int i, int j);
     static Matrix<Scalar> chol(const Matrix<Scalar>& A);
     static Matrix<Scalar> norm_inf_mul(const Matrix<Scalar>& x, const Matrix<Scalar> &y);
@@ -452,8 +457,8 @@ namespace casadi {
 
     /** \brief Get the (i,j) minor matrix
      */
-    friend inline Matrix<Scalar> getMinor(const Matrix<Scalar> &x, int i, int j) {
-      return Matrix<Scalar>::getMinor(x, i, j);
+    friend inline Matrix<Scalar> minor(const Matrix<Scalar> &x, int i, int j) {
+      return Matrix<Scalar>::minor(x, i, j);
     }
 
     /** \brief Get the (i,j) cofactor matrix
@@ -726,18 +731,6 @@ namespace casadi {
     /** \brief Get the depth to which equalities are being checked for simplifications */
     static int get_max_depth();
 
-#ifdef WITH_DEPRECATED_FEATURES
-    /** \brief [DEPRECATED] Renamed set_max_depth */
-    static void setEqualityCheckingDepth(int eq_depth=1) {
-      set_max_depth(eq_depth);
-    }
-
-    /** \brief [DEPRECATED] Renamed get_max_depth */
-    static int getEqualityCheckingDepth() {
-      return get_max_depth();
-    }
-#endif // WITH_DEPRECATED_FEATURES
-
     /** \brief Get function input */
     static std::vector<Matrix<Scalar> > get_input(const Function& f);
 
@@ -748,14 +741,14 @@ namespace casadi {
     static std::string type_name();
 
     /// Print a description of the object
-    void print(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
+    void print_long(std::ostream &stream) const;
 
     /// Get strings corresponding to the nonzeros and the interdependencies
     void print_split(std::vector<std::string>& SWIG_OUTPUT(nz),
                     std::vector<std::string>& SWIG_OUTPUT(inter)) const;
 
     /// Print a representation of the object
-    void repr(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
+    void print_short(std::ostream &stream) const;
 
     /// Print scalar
     void print_scalar(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
@@ -909,7 +902,7 @@ namespace casadi {
 
     /** \brief  check if the matrix is an identity matrix (note that false negative answers
      * are possible)*/
-    bool is_identity() const;
+    bool is_eye() const;
 
     /** \brief  Check if the matrix has any zero entries which are not structural zeros */
     bool has_zeros() const;

@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.6)
 project(casadi C CXX)
 
 set(CASADI_MAJOR_VERSION 3)
-set(CASADI_MINOR_VERSION 1)
+set(CASADI_MINOR_VERSION 2)
 set(CASADI_PATCH_VERSION 0)
 set(CASADI_IS_RELEASE 0)
 
@@ -12,7 +12,7 @@ if(NOT CASADI_IS_RELEASE)
 endif()
 set(PACKAGE_NAME "CasADi")
 set(PACKAGE_VERSION ${CASADI_VERSION})
-set(PACKAGE_SO_VERSION "3.2")
+set(PACKAGE_SO_VERSION "3.3")
 set(PACKAGE_DESCRIPTION "CasADi is a symbolic framework for automatic differentation and numeric optimization")
 set(PACKAGE_AUTHOR "Joel Andersson and Joris Gillis")
 set(PACKAGE_MAINTAINER "Joel Andersson and Joris Gillis")
@@ -59,12 +59,18 @@ endif()
 ########################################################################
 ############################# Fortran ##################################
 ########################################################################
+option(FORTRAN_REQUIRED "Make fortran a required dependency" OFF)
+
 # http://public.kitware.com/Bug/print_bug_page.php?bug_id=9220
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 include(language_support)
 workaround_9220(Fortran Fortran_language_works)
-if(Fortran_language_works)
-  enable_language(Fortran OPTIONAL)
+if(FORTRAN_REQUIRED)
+  enable_language(Fortran)
+else()
+  if(Fortran_language_works)
+    enable_language(Fortran OPTIONAL)
+  endif()  
 endif()
 
 ########################################################################
@@ -244,6 +250,9 @@ if(WITH_REFCOUNT_WARNINGS)
   add_definitions(-DWITH_REFCOUNT_WARNINGS)
 endif()
 
+# Have an so version?
+option(WITH_SO_VERSION "Use an so version for the library (version suffix) when applicable" ON)
+
 ############################################################
 ################# Installation location ####################
 ############################################################
@@ -315,32 +324,32 @@ option(WITH_EXTRA_WARNINGS "Add extra warnings (like -Wall -Wextra)" OFF)
 option(WITH_WERROR "Add -Werror" OFF)
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
   if(WITH_EXTRA_WARNINGS)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-unused-parameter -Wno-sign-compare")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Wformat-security -Wno-unused-parameter -Wno-maybe-uninitialized -Wno-unused-but-set-variable -Wno-unused-function -Wno-unused-value")
+    set(EXTRA_CASADI_CXX_FLAGS "-Wall -Wextra -Wno-unused-parameter -Wno-sign-compare")
+    set(EXTRA_CASADI_C_FLAGS "-Wall -Wextra -Wformat-security -Wno-unused-parameter -Wno-maybe-uninitialized -Wno-unused-but-set-variable -Wno-unused-function -Wno-unused-value")
   endif()
   if(WITH_WERROR)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror")
+    set(EXTRA_CASADI_CXX_FLAGS "-Werror")
+    set(EXTRA_CASADI_C_FLAGS "-Werror")
   endif()
 
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
   if(WITH_EXTRA_WARNINGS)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-unused-parameter -Wno-sign-compare -Wno-mismatched-tags -Wno-tautological-compare")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Wformat-security -Wno-unused-parameter -Wno-unused-function -Wno-unused-value")
+    set(EXTRA_CASADI_CXX_FLAGS "-Wall -Wextra -Wno-unused-parameter -Wno-sign-compare -Wno-mismatched-tags -Wno-tautological-compare")
+    set(EXTRA_CASADI_C_FLAGS "-Wall -Wextra -Wformat-security -Wno-unused-parameter -Wno-unused-function -Wno-unused-value")
   endif()
   if(WITH_WERROR)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror")
+    set(EXTRA_CASADI_CXX_FLAGS "-Werror")
+    set(EXTRA_CASADI_C_FLAGS "-Werror")
   endif()
 
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
   if(WITH_EXTRA_WARNINGS)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-unused-parameter -Wno-sign-compare")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Wformat-security -Wno-unused-parameter -Wno-maybe-uninitialized -Wno-unused-but-set-variable -Wno-unused-function -Wno-unused-value")
+    set(EXTRA_CASADI_CXX_FLAGS "-Wall -Wextra -Wno-unused-parameter -Wno-sign-compare")
+    set(EXTRA_CASADI_C_FLAGS "-Wall -Wextra -Wformat-security -Wno-unused-parameter -Wno-maybe-uninitialized -Wno-unused-but-set-variable -Wno-unused-function -Wno-unused-value")
   endif()
   if(WITH_WERROR)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror")
+    set(EXTRA_CASADI_CXX_FLAGS "-Werror")
+    set(EXTRA_CASADI_C_FLAGS "-Werror")
   endif()
 
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
@@ -662,12 +671,12 @@ endif()
 
 option(WITH_LINT "Compile with support for linting (syntax checking)" OFF)
 if(WITH_LINT)
-  include(CppLint)
+  include(CppLint REQUIRED)
 endif()
 
 option(WITH_SPELL "Compile with support for spell-checking" OFF)
 if(WITH_SPELL)
-  include(SpellCheck)
+  include(SpellCheck REQUIRED)
 endif()
 
 include(embed_resources)

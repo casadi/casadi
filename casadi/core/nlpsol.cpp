@@ -80,10 +80,7 @@ namespace casadi {
 
   Function nlpsol(const string& name, const string& solver,
                   const Function& nlp, const Dict& opts) {
-    Function ret;
-    ret.assignNode(Nlpsol::instantiatePlugin(name, solver, nlp));
-    ret->construct(opts);
-    return ret;
+    return Function::create(Nlpsol::instantiate(name, solver, nlp), opts);
   }
 
   vector<string> nlpsol_in() {
@@ -189,7 +186,7 @@ namespace casadi {
   Sparsity Nlpsol::get_sparsity_out(int i) {
     switch (static_cast<NlpsolOutput>(i)) {
     case NLPSOL_F:
-      return Sparsity::scalar();
+      return oracle_.sparsity_out(NL_F);
     case NLPSOL_X:
     case NLPSOL_LAM_X:
       return oracle_.sparsity_in(NL_X);
@@ -272,6 +269,16 @@ namespace casadi {
     np_ = nnz_in(NLPSOL_P);
     ng_ = nnz_out(NLPSOL_G);
 
+    // Dimension checks
+    casadi_assert_message(sparsity_out(NLPSOL_G).is_dense() && sparsity_out(NLPSOL_G).is_vector(),
+        "Expected a dense vector 'g', but got " + sparsity_out(NLPSOL_G).dim() + ".");
+
+    casadi_assert_message(sparsity_out(NLPSOL_F).is_dense(),
+        "Expected a dense 'f', but got " + sparsity_out(NLPSOL_F).dim() + ".");
+
+    casadi_assert_message(sparsity_out(NLPSOL_X).is_dense() && sparsity_out(NLPSOL_X).is_vector(),
+      "Expected a dense vector 'x', but got " + sparsity_out(NLPSOL_X).dim() + ".");
+
     // Discrete marker
     mi_ = false;
     if (!discrete_.empty()) {
@@ -331,32 +338,40 @@ namespace casadi {
 
     // Detect ill-posed problems (simple bounds)
     for (int i=0; i<nx_; ++i) {
-      double lbx = m->lbx ? m->lbx[i] : 0;
-      double ubx = m->ubx ? m->ubx[i] : 0;
+      double lb = m->lbx ? m->lbx[i] : 0;
+      double ub = m->ubx ? m->ubx[i] : 0;
       double x0 = m->x0 ? m->x0[i] : 0;
-      casadi_assert_message(!(lbx==inf || lbx>ubx || ubx==-inf),
-                            "Ill-posed problem detected (x bounds)");
-      if (warn_initial_bounds_ && (x0>ubx || x0<lbx)) {
+      casadi_assert_message(lb <= ub && lb!=inf && ub!=-inf,
+                            "Ill-posed problem detected: " <<
+                            "LBX[" << i << "] <= UBX[" << i << "] was violated. "
+                            << "Got LBX[" << i << "]=" << lb <<
+                            " and UBX[" << i << "] = " << ub << ".");
+      if (warn_initial_bounds_ && (x0>ub || x0<lb)) {
         casadi_warning("Nlpsol: The initial guess does not satisfy LBX and UBX. "
                        "Option 'warn_initial_bounds' controls this warning.");
         break;
       }
-      if (lbx==ubx) n_eq++;
+      if (lb==ub) n_eq++;
     }
 
     // Detect ill-posed problems (nonlinear bounds)
     for (int i=0; i<ng_; ++i) {
-      double lbg = m->lbg ? m->lbg[i] : 0;
-      double ubg = m->ubg ? m->ubg[i] : 0;
-      casadi_assert_message(!(lbg==inf || lbg>ubg || ubg==-inf),
-                            "Ill-posed problem detected (g bounds)");
-      if (lbg==ubg) n_eq++;
+      double lb = m->lbg ? m->lbg[i] : 0;
+      double ub = m->ubg ? m->ubg[i] : 0;
+      casadi_assert_message(lb <= ub && lb!=inf && ub!=-inf,
+                            "Ill-posed problem detected: " <<
+                            "LBG[" << i << "] <= UBG[" << i << "] was violated. "
+                            << "Got LBG[" << i << "] = " << lb <<
+                            " and UBG[" << i << "] = " << ub << ".");
+      if (lb==ub) n_eq++;
     }
 
     // Make sure enough degrees of freedom
     using casadi::to_string; // Workaround, MingGW bug, cf. CasADi issue #890
-    casadi_assert_message(n_eq <= nx_, "NLP is overconstrained: There are " + to_string(n_eq)
+    if (n_eq> nx_) {
+      casadi_warning("NLP is overconstrained: There are " + to_string(n_eq)
                          + " equality constraints but only " + to_string(nx_) + " variables.");
+    }
   }
 
   std::map<std::string, Nlpsol::Plugin> Nlpsol::solvers_;

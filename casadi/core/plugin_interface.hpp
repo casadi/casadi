@@ -120,7 +120,7 @@ namespace casadi {
 
     // Create solver instance
     template<class Problem>
-      static Derived* instantiatePlugin(const std::string& fname,
+      static Derived* instantiate(const std::string& fname,
                                         const std::string& pname, Problem problem);
     // Get name of the plugin
     virtual const char* plugin_name() const = 0;
@@ -374,7 +374,7 @@ namespace casadi {
   template<class Derived>
   template<class Problem>
   Derived* PluginInterface<Derived>::
-  instantiatePlugin(const std::string& fname,
+  instantiate(const std::string& fname,
                     const std::string& pname, Problem problem) {
 
     // Assert the plugin exists (needed for adaptors)

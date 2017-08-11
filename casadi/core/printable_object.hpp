@@ -45,16 +45,30 @@ namespace casadi {
   public:
 
     /// Return a string with a description (for SWIG)
-    std::string getDescription() const {
+    void print(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const {
+      static_cast<const Derived*>(this)->print_long(stream);
+      if (trailing_newline) stream << std::endl;
+      stream << std::flush;
+    }
+
+    /// Print a representation of the object
+    void repr(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const {
+      static_cast<const Derived*>(this)->print_short(stream);
+      if (trailing_newline) stream << std::endl;
+      stream << std::flush;
+    }
+
+    /// Return a string with a description (for SWIG)
+    std::string get_str() const {
       std::stringstream ss;
-      static_cast<const Derived*>(this)->print(ss, false);
+      static_cast<const Derived*>(this)->print_long(ss);
       return ss.str();
     }
 
     /// Return a string with a representation (for SWIG)
-    std::string getRepresentation() const {
+    std::string get_repr() const {
       std::stringstream ss;
-      static_cast<const Derived*>(this)->repr(ss, false);
+      static_cast<const Derived*>(this)->print_short(ss);
       return ss.str();
     }
 
@@ -62,7 +76,7 @@ namespace casadi {
     /// Print a representation of the object to a stream (shorthand)
     inline friend
       std::ostream& operator<<(std::ostream &stream, const PrintableObject<Derived>& obj) {
-      static_cast<const Derived&>(obj).repr(stream, false);
+      static_cast<const Derived&>(obj).print_short(stream);
       return stream;
     }
 #endif // SWIG
@@ -74,12 +88,12 @@ namespace casadi {
 #if !defined(SWIG) || defined(DOXYGEN)
     /// Return a string with a description of the object, cf. str(Object) in Python
     inline friend std::string str(const PrintableObject<Derived>& obj) {
-      return obj.getDescription();
+      return obj.get_str();
     }
 
     /// Return a string with a representation of the object, cf. repr(Object) in Python
     inline friend std::string repr(const PrintableObject<Derived>& obj) {
-      return obj.getRepresentation();
+      return obj.get_repr();
     }
 /** @} */
 #endif //

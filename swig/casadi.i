@@ -211,8 +211,8 @@ _object = _copyableObject
 
 _swig_repr_default = _swig_repr
 def _swig_repr(self):
-  if hasattr(self,'getRepresentation'):
-    return self.getRepresentation()
+  if hasattr(self,'get_repr'):
+    return self.get_repr()
   else:
     return _swig_repr_default(self)
 
@@ -2407,8 +2407,6 @@ arccosh = lambda x: _casadi.acosh(x)
 %rename(logic_all) casadi_all;
 %rename(logic_any) casadi_any;
 %rename(fabs) casadi_abs;
-%rename(fmin) casadi_min;
-%rename(fmax) casadi_max;
 
 // Concatenations
 %rename(_veccat) casadi_veccat;
@@ -2420,6 +2418,7 @@ def veccat(*args): return _veccat(args)
 def vertcat(*args): return _vertcat(args)
 def horzcat(*args): return _horzcat(args)
 def diagcat(*args): return _diagcat(args)
+def vvcat(args): return _veccat(args)
 def vcat(args): return _vertcat(args)
 def hcat(args): return _horzcat(args)
 def dcat(args): return _diagcat(args)
@@ -2450,6 +2449,7 @@ def dcat(args): return _diagcat(args)
 %rename(uplus) operator+;
 %feature("varargin","1") casadi_vertcat;
 %feature("varargin","1") casadi_horzcat;
+%feature("varargin","1") casadi_diagcat;
 %feature("varargin","1") casadi_veccat;
 %feature("optionalunpack","1") size;
 
@@ -2670,7 +2670,7 @@ class NZproxy:
 %include <casadi/core/printable_object.hpp>
 
 #ifdef SWIGPYTHON
-%rename(SWIG_STR) getDescription;
+%rename(SWIG_STR) get_str;
 #endif // SWIGPYTHON
 
 %template(PrintSharedObject) casadi::PrintableObject<casadi::SharedObject>;
@@ -2938,8 +2938,17 @@ DECL M casadi_det(const M& A) {
   return det(A);
 }
 
+DECL M casadi_inv_minor(const M& A) {
+  return inv_minor(A);
+}
+
 DECL M casadi_inv(const M& A) {
   return inv(A);
+}
+
+DECL M casadi_inv(const M& A, const std::string& lsolver,
+                      const casadi::Dict& opts = casadi::Dict()) {
+  return inv(A, lsolver, opts);
 }
 
 DECL M casadi_trace(const M& a) {
@@ -3055,6 +3064,10 @@ DECL M casadi_jtimes(const M& ex, const M& arg, const M& v, bool tr=false) {
   return jtimes(ex, arg, v, tr);
 }
 
+DECL M casadi_linearize(const M& f, const M& x, const M& x0) {
+  return linearize(f, x, x0);
+}
+
 DECL std::vector<bool> casadi_which_depends(const M& expr, const M& var,
                                             int order=1, bool tr=false) {
   return which_depends(expr, var, order, tr);
@@ -3093,6 +3106,8 @@ DECL M casadi_einstein(const M& A, const M& B,
   const std::vector<int>& a, const std::vector<int>& b, const std::vector<int>& c) {
   return einstein(A, B, dim_a, dim_b, dim_c, a, b, c);
 }
+DECL M casadi_mmin(const M& x) { return mmin(x); }
+DECL M casadi_mmax(const M& x) { return mmax(x); }
 #endif // FLAG & IS_MEMBER
 
 #if FLAG & IS_GLOBAL
@@ -3187,8 +3202,8 @@ DECL M casadi_sign(const M& x) { using casadi::sign; return sign(x); }
 DECL M casadi_power(const M& x, const M& n) { return pow(x, n); }
 DECL M casadi_mod(const M& x, const M& y) { return fmod(x, y); }
 DECL M casadi_atan2(const M& x, const M& y) { return atan2(x, y); }
-DECL M casadi_min(const M& x, const M& y) { return fmin(x, y); }
-DECL M casadi_max(const M& x, const M& y) { return fmax(x, y); }
+DECL M casadi_fmin(const M& x, const M& y) { return fmin(x, y); }
+DECL M casadi_fmax(const M& x, const M& y) { return fmax(x, y); }
 DECL M casadi_simplify(const M& x) { using casadi::simplify; return simplify(x); }
 DECL bool casadi_is_equal(const M& x, const M& y, int depth=0) { using casadi::is_equal; return is_equal(x, y, depth); }
 DECL M casadi_copysign(const M& x, const M& y) { return copysign(x, y); }
@@ -3218,8 +3233,8 @@ DECL M casadi_adj(const M& A) {
   return adj(A);
 }
 
-DECL M casadi_getMinor(const M& x, int i, int j) {
-  return getMinor(x, i, j);
+DECL M casadi_minor(const M& x, int i, int j) {
+  return minor(x, i, j);
 }
 
 DECL M casadi_cofactor(const M& x, int i, int j) {
@@ -3321,6 +3336,9 @@ MATRIX_FUN(DECL, (FLAG | IS_SX), Matrix<SXElem>)
 #if FLAG & IS_MEMBER
 DECL M casadi_find(const M& x) {
   return find(x);
+}
+DECL M casadi_inv_node(const M& x) {
+  return inv_node(x);
 }
 #endif // FLAG & IS_MEMBER
 
@@ -3729,7 +3747,7 @@ namespace casadi{
       end
     end
     function out = sum(self,varargin)
-      narginchk(1,2);
+      narginchk(1,3);
       if nargin==1
         if is_vector(self)
           if is_column(self)
@@ -3782,6 +3800,22 @@ namespace casadi{
           otherwise
             error(sprintf('Unknown norm argument: ''%s''', ind))
         end
+      end
+    end
+    function out = min(varargin)
+      narginchk(1,2);
+      if nargin==1
+        out = mmin(varargin{1});
+      else
+        out = fmin(varargin{1}, varargin{2});
+      end
+    end
+    function out = max(varargin)
+      narginchk(1,2);
+      if nargin==1
+        out = mmax(varargin{1});
+      else
+        out = fmax(varargin{1}, varargin{2});
       end
     end
     function b = isrow(self)

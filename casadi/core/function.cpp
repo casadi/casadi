@@ -208,14 +208,14 @@ namespace casadi {
   void Function::construct(const string& name,
                            const vector<SX>& arg, const vector<SX>& res,
                            const Dict& opts) {
-    assignNode(new SXFunction(name, arg, res));
+    own(new SXFunction(name, arg, res));
     (*this)->construct(opts);
   }
 
   void Function::construct(const string& name,
                            const vector<MX>& arg, const vector<MX>& res,
                            const Dict& opts) {
-    assignNode(new MXFunction(name, arg, res));
+    own(new MXFunction(name, arg, res));
     (*this)->construct(opts);
   }
 
@@ -247,7 +247,13 @@ namespace casadi {
 
   Function Function::create(FunctionInternal* node) {
     Function ret;
-    ret.assignNode(node);
+    ret.own(node);
+    return ret;
+  }
+
+  Function Function::create(FunctionInternal* node, const Dict& opts) {
+    Function ret = create(node);
+    ret->construct(opts);
     return ret;
   }
 
@@ -561,10 +567,7 @@ namespace casadi {
 
   Function Function::conditional(const string& name, const vector<Function>& f,
                                  const Function& f_def, const Dict& opts) {
-    Function ret;
-    ret.assignNode(new Switch(name, f, f_def));
-    ret->construct(opts);
-    return ret;
+    return create(new Switch(name, f, f_def), opts);
   }
 
   Function Function::bspline(const std::string &name,
@@ -581,10 +584,7 @@ namespace casadi {
 
   Function Function::if_else(const string& name, const Function& f_true,
                              const Function& f_false, const Dict& opts) {
-    Function ret;
-    ret.assignNode(new Switch(name, vector<Function>(1, f_false), f_true));
-    ret->construct(opts);
-    return ret;
+    return create(new Switch(name, vector<Function>(1, f_false), f_true), opts);
   }
 
   int Function::n_in() const {
@@ -651,34 +651,30 @@ namespace casadi {
     return (*this)->numel_out(ind);
   }
 
-  Function Function::jacobian(int iind, int oind, bool compact, bool symmetric) {
-    return (*this)->jacobian(iind, oind, compact, symmetric);
+  bool Function::uses_output() const {
+    return (*this)->uses_output();
   }
 
-  #ifdef WITH_DEPRECATED_FEATURES
-  void Function::setJacobian(const Function& jac, int iind, int oind, bool compact) {
-    (*this)->setJacobian(jac, iind, oind, compact);
+  Function Function::jacobian_old(int iind, int oind) const {
+    // Redirect to factory class
+    vector<string> s_in = name_in();
+    vector<string> s_out = name_out();
+    s_out.insert(s_out.begin(), "jac:" + name_out(oind) + ":" + name_in(iind));
+    return factory("jac_" + name(), s_in, s_out);
   }
 
-  Function Function::gradient(int iind, int oind) {
-    return (*this)->gradient(iind, oind);
+  Function Function::hessian_old(int iind, int oind) const {
+    // Redirect to factory class
+    vector<string> s_in = name_in();
+    vector<string> s_out = name_out();
+    s_out.insert(s_out.begin(), "grad:" + name_out(oind) + ":" + name_in(iind));
+    s_out.insert(s_out.begin(),
+                 "sym:hess:" + name_out(oind) + ":" + name_in(iind) + ":" + name_in(iind));
+    return factory("hess_" + name(), s_in, s_out);
   }
 
-  Function Function::tangent(int iind, int oind) {
-    return (*this)->tangent(iind, oind);
-  }
-#endif // WITH_DEPRECATED_FEATURES
-
-  Function Function::hessian(int iind, int oind) {
-    return (*this)->hessian(iind, oind);
-  }
-
-  Function Function::fullJacobian() {
-    return (*this)->fullJacobian();
-  }
-
-  void Function::setFullJacobian(const Function& jac) {
-    (*this)->full_jacobian_ = jac;
+  Function Function::jacobian() const {
+    return (*this)->jacobian();
   }
 
   bool Function::test_cast(const SharedObjectInternal* ptr) {
@@ -693,12 +689,6 @@ namespace casadi {
   sparsity_jac(int iind, int oind, bool compact, bool symmetric) const {
     return (*this)->sparsity_jac(iind, oind, compact, symmetric);
   }
-
-#ifdef WITH_DEPRECATED_FEATURES
-  void Function::set_jac_sparsity(const Sparsity& sp, int iind, int oind, bool compact) {
-    (*this)->set_jac_sparsity(sp, iind, oind, compact);
-  }
-#endif // WITH_DEPRECATED_FEATURES
 
   vector<string> Function::name_in() const {
     return (*this)->ischeme_;
@@ -753,11 +743,11 @@ namespace casadi {
   size_t Function::sz_w() const { return (*this)->sz_w();}
 
   void Function::operator()(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
-    (*const_cast<Function*>(this))->sp_fwd(arg, res, iw, w, mem);
+    (*this)->sp_forward(arg, res, iw, w, mem);
   }
 
   void Function::rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
-    (*this)->sp_rev(arg, res, iw, w, mem);
+    (*this)->sp_reverse(arg, res, iw, w, mem);
   }
 
   void Function::set_work(const double**& arg, double**& res, int*& iw, double*& w,
@@ -974,6 +964,14 @@ namespace casadi {
 
   double Function::default_in(int ind) const {
     return (*this)->default_in(ind);
+  }
+
+  double Function::max_in(int ind) const {
+    return (*this)->max_in(ind);
+  }
+
+  double Function::min_in(int ind) const {
+    return (*this)->min_in(ind);
   }
 
   void Function::operator()(const double** arg, double** res, int* iw, double* w, int mem) const {

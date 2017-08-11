@@ -65,7 +65,7 @@ class BinarySX : public SXNode {
     This is a rather complex destructor which is necessary since the default destructor
     can cause stack overflow due to recursive calling.
     */
-    virtual ~BinarySX() {
+    ~BinarySX() override {
       // Start destruction method if any of the dependencies has dependencies
       for (int c1=0; c1<2; ++c1) {
         // Get the node of the dependency and remove it from the smart pointer
@@ -75,7 +75,7 @@ class BinarySX : public SXNode {
         if (n1->count==0) {
 
           // Check if binary
-          if (!n1->hasDep()) { // n1 is not binary
+          if (!n1->n_dep()) { // n1 is not binary
 
             delete n1; // Delete straight away
 
@@ -95,7 +95,7 @@ class BinarySX : public SXNode {
 
               // Check if the top element has dependencies with dependencies
               bool added_to_stack = false;
-              for (int c2=0; c2<t->ndep(); ++c2) { // for all dependencies of the dependency
+              for (int c2=0; c2<t->n_dep(); ++c2) { // for all dependencies of the dependency
 
                 // Get the node of the dependency of the top element
                 // and remove it from the smart pointer
@@ -105,7 +105,7 @@ class BinarySX : public SXNode {
                 if (n2->count == 0) {
 
                   // Check if binary
-                  if (!n2->hasDep()) {
+                  if (!n2->n_dep()) {
 
                     // Delete straight away if not binary
                     delete n2;
@@ -130,12 +130,12 @@ class BinarySX : public SXNode {
       }
     }
 
-    virtual bool is_smooth() const { return operation_checker<SmoothChecker>(op_);}
+    bool is_smooth() const override { return operation_checker<SmoothChecker>(op_);}
 
-    virtual bool hasDep() const { return true; }
+    bool is_op(int op) const override { return op_==op; }
 
     /** \brief Check if two nodes are equivalent up to a given depth */
-    virtual bool is_equal(const SXNode* node, int depth) const {
+    bool is_equal(const SXNode* node, int depth) const override {
       const BinarySX* n = dynamic_cast<const BinarySX*>(node);
       if (n==0) return false;
       if (n->op_ != op_) return false;
@@ -148,17 +148,17 @@ class BinarySX : public SXNode {
     }
 
     /** \brief  Number of dependencies */
-    virtual int ndep() const { return 2;}
+    int n_dep() const override { return 2;}
 
     /** \brief  get the reference of a dependency */
-    virtual const SXElem& dep(int i) const { return i==0 ? dep0_ : dep1_;}
-    virtual SXElem& dep(int i) { return i==0 ? dep0_ : dep1_;}
+    const SXElem& dep(int i) const override { return i==0 ? dep0_ : dep1_;}
+    SXElem& dep(int i) override { return i==0 ? dep0_ : dep1_;}
 
     /** \brief  Get the operation */
-    virtual int op() const { return op_;}
+    int op() const override { return op_;}
 
     /** \brief  Print expression */
-    virtual std::string print(const std::string& arg1, const std::string& arg2) const {
+    std::string print(const std::string& arg1, const std::string& arg2) const override {
       return casadi_math<double>::print(op_, arg1, arg2);
     }
 

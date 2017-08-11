@@ -57,12 +57,12 @@ namespace casadi {
     }
   }
 
-  void SharedObjectInternal::repr(std::ostream &stream) const {
+  void SharedObjectInternal::print_short(std::ostream &stream) const {
     // Print description by default
-    print(stream);
+    print_long(stream);
   }
 
-  void SharedObjectInternal::print(std::ostream &stream) const {
+  void SharedObjectInternal::print_long(std::ostream &stream) const {
     // Print the name of the object by default
     stream << typeid(this).name();
   }

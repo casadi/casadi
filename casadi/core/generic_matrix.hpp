@@ -93,8 +93,14 @@ namespace casadi {
     /** \brief Get the first dimension (i.e. number of rows) */
     int size1() const;
 
+    /** \brief Get the number of rows, Octave-style syntax */
+    int rows() const {return size1();}
+
     /** \brief Get the second dimension (i.e. number of columns) */
     int size2() const;
+
+    /** \brief Get the number of columns, Octave-style syntax */
+    int columns() const {return size2();}
 
     /** \brief Get string representation of dimensions.
         The representation is (nrow x ncol = numel | size)
@@ -333,7 +339,19 @@ namespace casadi {
     inline friend MatType det(const MatType& A) { return MatType::det(A);}
 
     /** \brief Matrix inverse (experimental) */
-    inline friend MatType inv(const MatType& A) { return MatType::inv(A);}
+    inline friend MatType inv_minor(const MatType& A) { return MatType::inv_minor(A);}
+
+    /** \brief Matrix inverse */
+    inline friend MatType inv(const MatType& A) {
+        return MatType::inv(A);
+    }
+
+    /** \brief Matrix inverse */
+    inline friend MatType inv(const MatType& A,
+      const std::string& lsolver,
+      const Dict& options=Dict()) {
+        return MatType::inv(A, lsolver, options);
+    }
 
     /** \brief Matrix trace */
     inline friend MatType trace(const MatType& x) { return MatType::trace(x);}
@@ -499,6 +517,11 @@ namespace casadi {
       return MatType::solve(A, b, lsolver, dict);
     }
 
+    /** \brief Linearize an expression */
+    friend inline MatType linearize(const MatType& f, const MatType& x, const MatType& x0) {
+      return MatType::linearize(f, x, x0);
+    }
+
     /** \brief Computes the Moore-Penrose pseudo-inverse
      *
      * If the matrix A is fat (size1<size2), mul(A, pinv(A)) is unity.
@@ -635,11 +658,26 @@ namespace casadi {
       return MatType::repsum(A, n, m);
     }
 
+    ///@{
+    /** \brief Smallest element in a matrix */
+    friend inline MatType mmin(const MatType& x) {
+      return MatType::mmin(x);
+    }
+    ///@}
+
+    ///@{
+    /** \brief Largest element in a matrix */
+    friend inline MatType mmax(const MatType& x) {
+      return MatType::mmax(x);
+    }
+    ///@}
 
     ///@{
     /// Functions called by friend functions defined here
     static MatType jtimes(const MatType &ex, const MatType &arg,
                           const MatType &v, bool tr=false);
+    static MatType linearize(const MatType& f, const MatType& x, const MatType& x0);
+    static MatType mpower(const MatType &x, const MatType &y);
     ///@}
 
 /** @} */
@@ -971,6 +1009,42 @@ namespace casadi {
     for (int i=0; i<w.size(); ++i) w[i] = ww[i][0];
     return horzcat(w);
   }
+
+  template<typename MatType>
+  MatType GenericMatrix<MatType>::
+  linearize(const MatType& f, const MatType& x, const MatType& x0) {
+    MatType x_lin = MatType::sym("x_lin", x.sparsity());
+    // mismatching dimensions
+    if (x0.size() != x.size()) {
+      // Scalar x0 is ok
+      if (x0.sparsity().is_scalar()) {
+        return linearize(f, x, MatType(x.sparsity(), x0));
+      }
+      casadi_error("Dimension mismatch in 'linearize'");
+    }
+    return substitute(f + jtimes(f, x, x_lin),
+      MatType::vertcat({x_lin, x}), MatType::vertcat({x, x0}));
+  }
+
+  template<typename MatType>
+  MatType GenericMatrix<MatType>::mpower(const MatType& a,
+                                            const MatType& b) {
+    if (a.is_scalar() && b.is_scalar()) return pow(a, b);
+    casadi_assert_message(a.is_square() && b.is_constant() && b.is_scalar(), "Not Implemented");
+    double bv = static_cast<double>(b);
+    int N = bv;
+    casadi_assert_message(bv==N, "Not Implemented");
+    if (N<0) return inv(mpower(a, -N));
+    if (N==0) return MatType::eye(a.size1());
+    if (N==1) return a;
+    if (N % 2 == 0) {
+      MatType h = mpower(a, N/2);
+      return MatType::mtimes(h, h);
+    } else {
+      return MatType::mtimes(mpower(a, N-1), a);
+    }
+  }
+
 
 
 } // namespace casadi

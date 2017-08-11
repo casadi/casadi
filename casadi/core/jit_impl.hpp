@@ -39,48 +39,48 @@ namespace casadi {
         const std::string& body, const Dict& opts);
 
     /** \brief Get type name */
-    virtual std::string type_name() const { return "jit";}
+    std::string type_name() const override { return "jit";}
 
     /** \brief Destructor */
-    virtual ~Jit();
+    ~Jit() override;
 
     ///@{
     /** \brief Options */
     static Options options_;
-    virtual const Options& get_options() const { return options_;}
+    const Options& get_options() const override { return options_;}
     ///@}
 
     /** \brief Initialize */
-    virtual void init(const Dict& opts);
+    void init(const Dict& opts) override;
 
     ///@{
     /** \brief Number of function inputs and outputs */
-    virtual size_t get_n_in() { return n_in_;}
-    virtual size_t get_n_out() { return n_out_;}
+    size_t get_n_in() override { return n_in_;}
+    size_t get_n_out() override { return n_out_;}
     ///@}
 
     /// @{
     /** \brief All inputs and outputs are scalars */
-    virtual Sparsity get_sparsity_in(int i) { return Sparsity::scalar();}
-    virtual Sparsity get_sparsity_out(int i) { return Sparsity::scalar();}
+    Sparsity get_sparsity_in(int i) override { return Sparsity::scalar();}
+    Sparsity get_sparsity_out(int i) override { return Sparsity::scalar();}
     /// @}
 
     /** \brief Use simplified signature */
-    virtual bool simplifiedCall() const { return true;}
+    bool simplified_call() const override { return true;}
 
     /** \brief Is codegen supported? */
-    virtual bool has_codegen() const { return true;}
+    bool has_codegen() const override { return true;}
 
     /** \brief Generate code for the function body */
-    virtual void generateBody(CodeGenerator& g) const;
+    void codegen_body(CodeGenerator& g) const override;
 
     ///@{
     /** \brief Jacobian of all outputs with respect to all inputs */
-    bool hasFullJacobian() const;
-    virtual Function getFullJacobian(const std::string& name,
-                                     const std::vector<std::string>& i_names,
-                                     const std::vector<std::string>& o_names,
-                                     const Dict& opts);
+    bool has_jacobian() const override;
+    Function get_jacobian(const std::string& name,
+                                     const std::vector<std::string>& inames,
+                                     const std::vector<std::string>& onames,
+                                     const Dict& opts) const override;
     ///@}
 
   private:

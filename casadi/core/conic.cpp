@@ -44,24 +44,30 @@ namespace casadi {
 
   Function conic(const string& name, const string& solver,
                 const SpDict& qp, const Dict& opts) {
-    Function ret;
-    ret.assignNode(Conic::instantiatePlugin(name, solver, qp));
-    ret->construct(opts);
-    return ret;
+    return Function::create(Conic::instantiate(name, solver, qp), opts);
   }
 
-  void Function::conic_debug(const string &filename) const {
+  void conic_debug(const Function& f, const std::string &filename) {
     ofstream file;
     file.open(filename.c_str());
-    conic_debug(file);
+    conic_debug(f, file);
+  }
+
+  void conic_debug(const Function& f, std::ostream &file) {
+    casadi_assert(!f.is_null());
+    const Conic* n = f.get<Conic>();
+    return n->generateNativeCode(file);
+  }
+
+#ifdef WITH_DEPRECATED_FEATURES
+  void Function::conic_debug(const string &filename) const {
+    casadi::conic_debug(*this, filename);
   }
 
   void Function::conic_debug(ostream &file) const {
-    casadi_assert(!is_null());
-    const Conic* n = dynamic_cast<const Conic*>(get());
-    casadi_assert_message(n!=0, "Not a QP solver");
-    return n->generateNativeCode(file);
+    casadi::conic_debug(*this, file);
   }
+#endif // WITH_DEPRECATED_FEATURES
 
   vector<string> conic_in() {
     vector<string> ret(conic_n_in());
@@ -131,6 +137,20 @@ namespace casadi {
         casadi_error("No such field: " + i.first);
       }
     }
+
+    if (f.is_empty()) f = 0;
+    if (g.is_empty()) g = M(0, 1);
+
+    // Dimension checks
+    casadi_assert_message(g.is_dense() && g.is_vector(),
+      "Expected a dense vector 'g', but got " + g.dim() + ".");
+
+    casadi_assert_message(f.is_dense() && f.is_scalar(),
+      "Expected a dense scalar 'f', but got " + f.dim() + ".");
+
+    casadi_assert_message(x.is_dense() && x.is_vector(),
+      "Expected a dense vector 'x', but got " + x.dim() + ".");
+
     if (g.is_empty(true)) g = M(0, 1); // workaround
 
     // Gradient of the objective: gf == Hx + g
@@ -246,6 +266,8 @@ namespace casadi {
 
     nx_ = A_.size2();
     na_ = A_.size1();
+
+    print_time_ = false;
   }
 
   Sparsity Conic::get_sparsity_in(int i) {
@@ -319,14 +341,16 @@ namespace casadi {
                           const double* lba, const double* uba) const {
     for (int i=0; i<nx_; ++i) {
       double lb = lbx ? lbx[i] : 0., ub = ubx ? ubx[i] : 0.;
-      casadi_assert_message(lb <= ub,
+      casadi_assert_message(lb <= ub && lb!=inf && ub!=-inf,
+                            "Ill-posed problem detected: " <<
                             "LBX[" << i << "] <= UBX[" << i << "] was violated. "
                             << "Got LBX[" << i << "]=" << lb <<
                             " and UBX[" << i << "] = " << ub << ".");
     }
     for (int i=0; i<na_; ++i) {
       double lb = lba ? lba[i] : 0., ub = uba ? uba[i] : 0.;
-      casadi_assert_message(lb <= ub,
+      casadi_assert_message(lb <= ub && lb!=inf && ub!=-inf,
+                            "Ill-posed problem detected: " <<
                             "LBA[" << i << "] <= UBA[" << i << "] was violated. "
                             << "Got LBA[" << i << "] = " << lb <<
                             " and UBA[" << i << "] = " << ub << ".");
@@ -392,6 +416,18 @@ namespace casadi {
     }
     print_stats_line(maxNameLen, "all previous", -1, t_proc_all_previous, t_wall_all_previous);
 
+  }
+
+  std::vector<std::string> conic_options(const std::string& name) {
+    return Conic::plugin_options(name).all();
+  }
+
+  std::string conic_option_type(const std::string& name, const std::string& op) {
+    return Conic::plugin_options(name).type(op);
+  }
+
+  std::string conic_option_info(const std::string& name, const std::string& op) {
+    return Conic::plugin_options(name).info(op);
   }
 
 } // namespace casadi

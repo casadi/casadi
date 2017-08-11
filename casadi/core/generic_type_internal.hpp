@@ -44,9 +44,9 @@ namespace casadi {
   class CASADI_EXPORT GenericTypeInternal : public GenericTypeBase {
   public:
     explicit GenericTypeInternal(const T& d) : d_(d) {}
-    virtual ~GenericTypeInternal() {}
-    virtual void print(std::ostream &stream) const { stream << d_; }
-    virtual TypeID getType() const { return ID;}
+    ~GenericTypeInternal() override {}
+    void print_long(std::ostream &stream) const override { stream << d_; }
+    TypeID getType() const override { return ID;}
     T d_;
   };
 

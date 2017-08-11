@@ -34,7 +34,7 @@ import itertools
 solvers= []
 
 if has_nlpsol("worhp")  and not args.ignore_memory_heavy:
-  solvers.append(("worhp",{"worhp": {"TolOpti":1e-20}}))
+  solvers.append(("worhp",{"worhp": {"TolOpti":1e-9}}))
   #solvers.append(("worhp",{"TolOpti":1e-20,"TolFeas":1e-20,"UserHM": False}))
   pass
 
@@ -71,6 +71,60 @@ except:
 """
 
 class NLPtests(casadiTestCase):
+
+  def test_nan(self):
+    x=SX.sym("x")
+    nlp={'x':x, 'f':-x,'g':x}
+
+    for Solver, nlp_options in solvers:
+      solver = nlpsol("mysolver", Solver, nlp, nlp_options)
+      
+      for x in ["x","g"]:
+        lb = "lb"+x
+        ub = "ub"+x
+        for data in [{lb:3,ub:-3},
+                     {lb:np.inf,ub:np.inf},
+                     {lb:-np.inf,ub:-np.inf},
+                     {lb:np.nan},
+                     {ub:np.nan},
+                     ]:
+          print(data)
+          with self.assertInException("Ill-posed"):
+            solver(**data)
+            
+  def test_wrongdims(self):
+    x=SX.sym("x",2)
+    nlp={'x':x, 'f':-x[0],'g':diag(x)}
+
+    for Solver, solver_options in solvers:
+      with self.assertInException("dense vector"):
+        solver = nlpsol("mysolver", Solver, nlp, solver_options)
+    nlp={'x':x, 'f':-x[0],'g':mtimes(x,x.T)}
+
+    for Solver, solver_options in solvers:
+      with self.assertInException("dense vector"):
+        solver = nlpsol("mysolver", Solver, nlp, solver_options)
+
+    nlp={'x':x, 'f':SX(1,1),'g':x}
+
+    for Solver, solver_options in solvers:
+      with self.assertInException("dense"):
+        solver = nlpsol("mysolver", Solver, nlp, solver_options)
+
+    nlp={'x':x, 'f':SX.zeros(0,0),'g':x}
+
+    for Solver, solver_options in solvers:
+      solver = nlpsol("mysolver", Solver, nlp, solver_options)
+
+    nlp={'x':x, 'g':x}
+    for Solver, solver_options in solvers:
+      solver = nlpsol("mysolver", Solver, nlp, solver_options)
+
+    x = vec(diag(SX.sym("x",2)))
+    nlp={'x':x, 'f':mtimes(x.T,x),'g':x[0]}
+    for Solver, solver_options in solvers:
+      with self.assertInException("dense vector"):
+        solver = nlpsol("mysolver", Solver, nlp, solver_options)
 
 
   def test_initialcond(self):
@@ -356,6 +410,8 @@ class NLPtests(casadiTestCase):
       self.message(str(Solver))
       if "worhp"==Solver:
         continue
+      if "sqpmethod"==Solver:
+        continue
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
       solver_in = {}
       solver_in["x0"]=[0.5,0.5]
@@ -424,8 +480,8 @@ class NLPtests(casadiTestCase):
       solver_in["ubx"]=[10]*2
       solver_out = solver(**solver_in)
       self.assertAlmostEqual(solver_out["f"][0],0,10,str(Solver))
-      self.assertAlmostEqual(solver_out["x"][0],1,9,str(Solver))
-      self.assertAlmostEqual(solver_out["x"][1],1,9,str(Solver))
+      self.assertAlmostEqual(solver_out["x"][0],1,7,str(Solver))
+      self.assertAlmostEqual(solver_out["x"][1],1,7,str(Solver))
       if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_x"][0],0,8,str(Solver))
       if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_x"][1],0,8,str(Solver))
 
@@ -480,8 +536,8 @@ class NLPtests(casadiTestCase):
       solver_in["p"]=1
       solver_out = solver(**solver_in)
       self.assertAlmostEqual(solver_out["f"][0],0,10,str(Solver))
-      self.assertAlmostEqual(solver_out["x"][0],1,9,str(Solver))
-      self.assertAlmostEqual(solver_out["x"][1],1,9,str(Solver))
+      self.assertAlmostEqual(solver_out["x"][0],1,7,str(Solver))
+      self.assertAlmostEqual(solver_out["x"][1],1,7,str(Solver))
 
   @memory_heavy()
   def testIPOPTnorm(self):
@@ -527,7 +583,7 @@ class NLPtests(casadiTestCase):
       solver_in["ubx"]=[10]
       solver_out = solver(**solver_in)
       self.assertAlmostEqual(solver_out["f"][0],0,10,str(Solver))
-      self.assertAlmostEqual(solver_out["x"][0],1,9,str(Solver))
+      self.assertAlmostEqual(solver_out["x"][0],1,7,str(Solver))
 
   def testIPOPTmx(self):
     self.message("trivial IPOPT, using MX")
@@ -923,6 +979,7 @@ class NLPtests(casadiTestCase):
     f_call = f(a, b)
     nlp = {'x':aa, 'f':f_call}
     for Solver, solver_options in solvers:
+      if "worhp" in Solver: continue
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
       solver_in = {}
 

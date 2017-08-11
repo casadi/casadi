@@ -403,7 +403,7 @@ class Matrixtests(casadiTestCase):
     s_ = DM.ones(sp)
     s_[:,:int(n/2)+1] = 1
 
-    I_ = DM.ones(inv(x).sparsity())
+    I_ = DM.ones(inv_minor(x).sparsity())
 
     s_ = densify(s_)
     T_ = densify(I_)
@@ -888,7 +888,7 @@ class Matrixtests(casadiTestCase):
 
     f = Function("f", [vec(P.T),A,B],[vec(mtimes([A,P,B]).T)])
 
-    J = f.jacobian()
+    J = f.jacobian_old(0, 0)
     J_in = []
     J_in.append(numpy.random.rand(*vec(P.T).shape))
     J_in.append(numpy.random.rand(*A.shape))
@@ -993,14 +993,14 @@ class Matrixtests(casadiTestCase):
       DM([DM([1,2]),DM([1,2])])
     a = DM([DM([1]),DM([2])])
     self.checkarray(a,DM([1,2]))
-    
+
   def test_sparsity_operation(self):
     L = [DM(1), DM(Sparsity(1,1),1), DM(Sparsity(2,1),1), DM(Sparsity.dense(2,1),1)]
-    
+
     for a in L:
       for b in L:
         c = a*b
-        
+
         if a.nnz()==0 or b.nnz()==0:
           self.assertTrue(c.nnz()==0)
         else:

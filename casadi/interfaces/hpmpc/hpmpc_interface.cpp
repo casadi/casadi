@@ -573,6 +573,10 @@ namespace casadi {
 
   void HpmpcInterface::
   eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
+    if (inputs_check_) {
+      checkInputs(arg[CONIC_LBX], arg[CONIC_UBX], arg[CONIC_LBA], arg[CONIC_UBA]);
+    }
+
     auto m = static_cast<HpmpcMemory*>(mem);
     // Statistics
     for (auto&& s : m->fstats) s.second.reset();
@@ -617,8 +621,6 @@ namespace casadi {
     casadi_project(arg[CONIC_X0], sparsity_in(CONIC_X0), get_ptr(m->x), xsp_, pv);
 
     m->iter_count = -1;
-
-    int N = N_;
 
     // Deal with non-unity I block
     for (int k=0;k<N_;++k) {

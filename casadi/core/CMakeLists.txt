@@ -101,6 +101,7 @@ set(CASADI_INTERNAL
   # More general graph representation with sparse matrix expressions and function evaluations
   mx.cpp                  # Symbolic expression class (matrix-valued atomics)
   mx_node.hpp             mx_node.cpp             # Base class for all the MX nodes
+  io_instruction.hpp      io_instruction.cpp      # Input and output MX instructions
   constant_mx.hpp         constant_mx.cpp         # A constant MX node
   symbolic_mx.hpp         symbolic_mx.cpp         # A symbolic MX variable
   unary_mx.hpp            unary_mx.cpp            # Unary operation
@@ -119,6 +120,7 @@ set(CASADI_INTERNAL
   subassign.hpp           subassign.cpp           # Submatrix assignment
   getnonzeros.hpp         getnonzeros.cpp         # Get the nonzeros of matrix
   setnonzeros.hpp         setnonzeros_impl.hpp    # Assign the nonzeros of a matrix to another matrix
+  get_elements.hpp        get_elements.cpp        # Get elements of matrix by a symbolic slice
   project.hpp             project.cpp             # Sparse copy to another sparsity pattern
   determinant.hpp         determinant.cpp         # Determinant
   inverse.hpp             inverse.cpp             # Matrix inverse
@@ -155,6 +157,7 @@ set(CASADI_INTERNAL
   switch.hpp              switch.cpp
   bspline.hpp             bspline.cpp
   map.hpp                 map.cpp
+  finite_differences.hpp  finite_differences.cpp
   importer.cpp            importer_internal.hpp importer_internal.cpp
 
   # MISC useful stuff

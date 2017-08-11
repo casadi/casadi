@@ -53,10 +53,7 @@ namespace casadi {
 
   Function integrator(const string& name, const string& solver,
                       const Function& dae, const Dict& opts) {
-    Function ret;
-    ret.assignNode(Integrator::getPlugin(solver).creator(name, dae));
-    ret->construct(opts);
-    return ret;
+    return Function::create(Integrator::getPlugin(solver).creator(name, dae), opts);
   }
 
   vector<string> integrator_in() {
@@ -114,6 +111,7 @@ namespace casadi {
     // Default options
     print_stats_ = false;
     output_t0_ = false;
+    print_time_ = false;
   }
 
   Integrator::~Integrator() {
@@ -148,6 +146,11 @@ namespace casadi {
   void Integrator::
   eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
     auto m = static_cast<IntegratorMemory*>(mem);
+
+    // Statistics
+    for (auto&& s : m->fstats) s.second.reset();
+
+    m->fstats.at("mainloop").tic();
 
     // Read inputs
     const double* x0 = arg[INTEGRATOR_X0];
@@ -194,8 +197,13 @@ namespace casadi {
       retreat(m, grid_.front(), rx, rz, rq);
     }
 
+    m->fstats.at("mainloop").toc();
+
     // Print statistics
     if (print_stats_) print_stats(m, userOut());
+
+    // Show statistics
+    if (print_time_)  print_fstats(static_cast<OracleMemory*>(mem));
   }
 
   Options Integrator::options_
@@ -323,6 +331,9 @@ namespace casadi {
 
   void Integrator::init_memory(void* mem) const {
     OracleFunction::init_memory(mem);
+
+    auto m = static_cast<IntegratorMemory*>(mem);
+    m->fstats["mainloop"] = FStats();
   }
 
   template<typename MatType>
@@ -489,8 +500,8 @@ namespace casadi {
     return ret;
   }
 
-  void Integrator::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
-    log("Integrator::sp_fwd", "begin");
+  void Integrator::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+    log("Integrator::sp_forward", "begin");
 
     // Work vectors
     bvec_t *tmp_x = w; w += nx_;
@@ -567,11 +578,11 @@ namespace casadi {
         oracle_(arg1, res1, iw, w, 0);
       }
     }
-    log("Integrator::sp_fwd", "end");
+    log("Integrator::sp_forward", "end");
   }
 
-  void Integrator::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
-    log("Integrator::sp_rev", "begin");
+  void Integrator::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+    log("Integrator::sp_reverse", "begin");
 
     // Work vectors
     bvec_t** arg1 = arg+n_in();
@@ -680,13 +691,13 @@ namespace casadi {
     arg1[DE_Z] = 0; // arg[INTEGRATOR_Z0] is a guess, no dependency
     oracle_.rev(arg1, res1, iw, w, 0);
 
-    log("Integrator::sp_rev", "end");
+    log("Integrator::sp_reverse", "end");
   }
 
   Function Integrator::
-  get_forward(const std::string& name, int nfwd,
-              const std::vector<std::string>& i_names,
-              const std::vector<std::string>& o_names,
+  get_forward(int nfwd, const std::string& name,
+              const std::vector<std::string>& inames,
+              const std::vector<std::string>& onames,
               const Dict& opts) const {
     log("Integrator::get_forward", "begin");
 
@@ -805,13 +816,13 @@ namespace casadi {
     log("Integrator::get_forward", "end");
 
     // Create derivative function and return
-    return Function(name, ret_in, ret_out, i_names, o_names, opts);
+    return Function(name, ret_in, ret_out, inames, onames, opts);
   }
 
   Function Integrator::
-  get_reverse(const std::string& name, int nadj,
-              const std::vector<std::string>& i_names,
-              const std::vector<std::string>& o_names,
+  get_reverse(int nadj, const std::string& name,
+              const std::vector<std::string>& inames,
+              const std::vector<std::string>& onames,
               const Dict& opts) const {
     log("Integrator::get_reverse", "begin");
 
@@ -955,7 +966,7 @@ namespace casadi {
     log("Integrator::getDerivative", "end");
 
     // Create derivative function and return
-    return Function(name, ret_in, ret_out, i_names, o_names, opts);
+    return Function(name, ret_in, ret_out, inames, onames, opts);
   }
 
   Dict Integrator::getDerivativeOptions(bool fwd) const {

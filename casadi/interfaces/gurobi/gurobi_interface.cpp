@@ -110,11 +110,58 @@ namespace casadi {
     // Load environment
     int flag = GRBloadenv(&m->env, 0); // no log file
     casadi_assert_message(!flag && m->env, "Failed to create GUROBI environment");
+
+    m->fstats["preprocessing"]  = FStats();
+    m->fstats["solver"]         = FStats();
+    m->fstats["postprocessing"] = FStats();
+  }
+
+  inline const char* return_status_string(int status) {
+    switch (status) {
+    case GRB_LOADED:
+      return "LOADED";
+    case GRB_OPTIMAL:
+      return "OPTIMAL";
+    case GRB_INFEASIBLE:
+      return "INFEASIBLE";
+    case GRB_INF_OR_UNBD:
+      return "INF_OR_UNBD";
+    case GRB_UNBOUNDED:
+      return "UNBOUNDED";
+    case GRB_CUTOFF:
+      return "CUTOFF";
+    case GRB_ITERATION_LIMIT:
+      return "ITERATION_LIMIT";
+    case GRB_NODE_LIMIT:
+      return "NODE_LIMIT";
+    case GRB_TIME_LIMIT:
+      return "TIME_LIMIT";
+    case GRB_SOLUTION_LIMIT:
+      return "SOLUTION_LIMIT";
+    case GRB_INTERRUPTED:
+      return "INTERRUPTED";
+    case GRB_NUMERIC:
+      return "NUMERIC";
+    case GRB_SUBOPTIMAL:
+      return "SUBOPTIMAL";
+    case GRB_INPROGRESS:
+      return "INPROGRESS";
+    }
+    return "Unknown";
   }
 
   void GurobiInterface::
   eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
     auto m = static_cast<GurobiMemory*>(mem);
+
+    // Statistics
+    for (auto&& s : m->fstats) s.second.reset();
+
+    m->fstats.at("preprocessing").tic();
+
+    if (inputs_check_) {
+      checkInputs(arg[CONIC_LBX], arg[CONIC_UBX], arg[CONIC_LBA], arg[CONIC_UBA]);
+    }
 
     // Inputs
     const double *h=arg[CONIC_H],
@@ -245,33 +292,47 @@ namespace casadi {
         }
       }
 
+      m->fstats.at("preprocessing").toc();
+      m->fstats.at("solver").tic();
+
       // Solve the optimization problem
       flag = GRBoptimize(model);
       casadi_assert_message(!flag, GRBgeterrormsg(m->env));
+
+      m->fstats.at("solver").toc();
+      m->fstats.at("postprocessing").tic();
+
       int optimstatus;
       flag = GRBgetintattr(model, GRB_INT_ATTR_STATUS, &optimstatus);
       casadi_assert_message(!flag, GRBgeterrormsg(m->env));
 
+      if (verbose_) userOut() << "return status: " << return_status_string(optimstatus) <<
+        " (" << optimstatus <<")" << std::endl;
+
       // Get the objective value, if requested
       if (cost) {
         flag = GRBgetdblattr(model, GRB_DBL_ATTR_OBJVAL, cost);
-        casadi_assert_message(!flag, GRBgeterrormsg(m->env));
+        if (flag) cost[0] = casadi::nan;
       }
 
       // Get the optimal solution, if requested
       if (x) {
         flag = GRBgetdblattrarray(model, GRB_DBL_ATTR_X, 0, nx_, x);
-        casadi_assert_message(!flag, GRBgeterrormsg(m->env));
+        if (flag) fill_n(x, nx_, casadi::nan);
       }
 
       // Free memory
       GRBfreemodel(model);
+      m->fstats.at("postprocessing").toc();
 
     } catch (...) {
       // Free memory
       if (model) GRBfreemodel(model);
       throw;
     }
+
+    // Show statistics
+    if (print_time_)  print_fstats(static_cast<ConicMemory*>(mem));
   }
 
   GurobiMemory::GurobiMemory() {

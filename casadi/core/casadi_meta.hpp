@@ -41,31 +41,6 @@ namespace casadi {
       /// No instances are allowed
       CasadiMeta();
     public:
-#ifdef WITH_DEPRECATED_FEATURES
-  /** \brief [DEPRECATED] Renamed version */
-  static std::string getVersion() { return version(); }
-  /** \brief [DEPRECATED] Renamed git_revision */
-  static std::string getGitRevision() { return git_revision(); }
-  /** \brief [DEPRECATED] Renamed git_describe */
-  static std::string getGitDescribe() { return git_describe(); }
-  /** \brief [DEPRECATED] Renamed feature_list */
-  static std::string getFeatureList() { return feature_list(); }
-  /** \brief [DEPRECATED] Renamed build_type */
-  static std::string getBuildType() { return build_type(); }
-  /** \brief [DEPRECATED] Renamed compiler_id */
-  static std::string getCompilerId() { return compiler_id(); }
-  /** \brief [DEPRECATED] Renamed compiler */
-  static std::string getCompiler() { return compiler(); }
-  /** \brief [DEPRECATED] Renamed compiler_flags */
-  static std::string getCompilerFlags() { return compiler_flags(); }
-  /** \brief [DEPRECATED] Renamed modules */
-  static std::string getModules() { return modules(); }
-  /** \brief [DEPRECATED] Renamed plugins */
-  static std::string getPlugins() { return plugins(); }
-  /** \brief [DEPRECATED] Renamed install_prefix */
-  static std::string getInstallPrefix() { return install_prefix(); }
-#endif // WITH_DEPRECATED_FEATURES
-
     /** \brief Obtain the version number of CasADi
     *  The format is 'x.y.z' or 'x.y.z+'
     *

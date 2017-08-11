@@ -49,13 +49,13 @@ namespace casadi {
     explicit ImporterInternal(const std::string& name);
 
     /// Destructor
-    virtual ~ImporterInternal();
+    ~ImporterInternal() override;
 
     /** \brief Print */
-    virtual void print(std::ostream &stream) const;
+    void print_long(std::ostream &stream) const override;
 
     /** \brief Print representation */
-    virtual void repr(std::ostream &stream) const;
+    void print_short(std::ostream &stream) const override;
 
     // Creator function for internal class
     typedef ImporterInternal* (*Creator)(const std::string& name);
@@ -87,7 +87,7 @@ namespace casadi {
     static std::string shortname() { return "importer";}
 
     /// Queery plugin name
-    virtual const char* plugin_name() const { return "none";}
+    const char* plugin_name() const override { return "none";}
 
     /// Get a function pointer for numerical evaluation
     virtual signal_t get_function(const std::string& symname) { return 0;}
@@ -135,6 +135,9 @@ namespace casadi {
 
     /// External functions
     std::map<std::string, std::pair<bool, std::string> > external_;
+
+    /** \brief  Verbose -- for debugging purposes */
+    bool verbose_;
   };
 
   /** \brief Dynamically linked library
@@ -156,13 +159,13 @@ namespace casadi {
     explicit DllLibrary(const std::string& bin_name);
 
     // Destructor
-    virtual ~DllLibrary();
+    ~DllLibrary() override;
 
     // Dummy type
-    virtual signal_t get_function(const std::string& symname);
+    signal_t get_function(const std::string& symname) override;
 
     /// Can meta information be read?
-    virtual bool can_have_meta() const { return false;}
+    bool can_have_meta() const override { return false;}
   };
 
 } // namespace casadi

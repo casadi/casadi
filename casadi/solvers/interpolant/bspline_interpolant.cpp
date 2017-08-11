@@ -146,7 +146,7 @@ namespace casadi {
     Function B = Function::bspline_dual("spline", knots, meshgrid(grid), degree_, 1, false,
       opts_dual);
 
-    Function Jf = B.jacobian();
+    Function Jf = B.jacobian_old(0, 0);
 
     MX C = MX::sym("C", B.size_in(0));
 
@@ -174,16 +174,16 @@ namespace casadi {
     S_->eval(mem, arg, res, iw, w);
   }
 
-  void BSplineInterpolant::generateBody(CodeGenerator& g) const {
-    S_->generateBody(g);
+  void BSplineInterpolant::codegen_body(CodeGenerator& g) const {
+    S_->codegen_body(g);
   }
 
   Function BSplineInterpolant::
-  getFullJacobian(const std::string& name,
-                  const std::vector<std::string>& i_names,
-                  const std::vector<std::string>& o_names,
-                  const Dict& opts) {
-    return S_->getFullJacobian(name, i_names, o_names, opts);
+  get_jacobian(const std::string& name,
+                  const std::vector<std::string>& inames,
+                  const std::vector<std::string>& onames,
+                  const Dict& opts) const {
+    return S_->get_jacobian(name, inames, onames, opts);
   }
 
 } // namespace casadi

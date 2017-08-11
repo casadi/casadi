@@ -139,17 +139,17 @@ namespace casadi {
     public:
       Streambuf() {}
     protected:
-      virtual int_type overflow(int_type ch) {
+      int_type overflow(int_type ch) override {
         if (ch != traits_type::eof()) {
           writeCh<Err, PL>(static_cast<char>(ch));
         }
         return ch;
       }
-      virtual std::streamsize xsputn(const char* s, std::streamsize num) {
+      std::streamsize xsputn(const char* s, std::streamsize num) override {
         write<Err, PL>(s, num);
         return num;
       }
-      virtual int sync() {
+      int sync() override {
         flush(Err);
         return 0;
       }

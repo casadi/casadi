@@ -34,7 +34,7 @@ namespace casadi {
 
   Linsol::Linsol(const std::string& name, const std::string& solver,
                  const Dict& opts) {
-    assignNode(LinsolInternal::getPlugin(solver).creator(name));
+    own(LinsolInternal::getPlugin(solver).creator(name));
     (*this)->construct(opts);
   }
 
@@ -87,7 +87,7 @@ namespace casadi {
   }
 
   MX Linsol::solve(const MX& A, const MX& B, bool tr) const {
-    return A->getSolve(B, tr, *this);
+    return A->get_solve(B, tr, *this);
   }
 
   void Linsol::solve_cholesky(double* x, int nrhs, bool tr) const {

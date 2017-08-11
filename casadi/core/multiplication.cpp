@@ -41,8 +41,8 @@ namespace casadi {
       << x.dim() << " with " << y.dim()
       << " and add the result to " << z.dim());
 
-    setDependencies(z, x, y);
-    setSparsity(z.sparsity());
+    set_dep(z, x, y);
+    set_sparsity(z.sparsity());
   }
 
   std::string Multiplication::print(const std::vector<std::string>& arg) const {
@@ -66,7 +66,7 @@ namespace casadi {
                res[0], sparsity(), w, false);
   }
 
-  void Multiplication::eval_forward(const std::vector<std::vector<MX> >& fseed,
+  void Multiplication::ad_forward(const std::vector<std::vector<MX> >& fseed,
                                std::vector<std::vector<MX> >& fsens) const {
     for (int d=0; d<fsens.size(); ++d) {
       fsens[d][0] = fseed[d][0]
@@ -75,7 +75,7 @@ namespace casadi {
     }
   }
 
-  void Multiplication::eval_reverse(const std::vector<std::vector<MX> >& aseed,
+  void Multiplication::ad_reverse(const std::vector<std::vector<MX> >& aseed,
                                std::vector<std::vector<MX> >& asens) const {
     for (int d=0; d<aseed.size(); ++d) {
       asens[d][1] += mac(aseed[d][0], dep(2).T(), MX::zeros(dep(1).sparsity()));
@@ -88,18 +88,20 @@ namespace casadi {
     res[0] = mac(arg[1], arg[2], arg[0]);
   }
 
-  void Multiplication::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
-    copyFwd(arg[0], res[0], nnz());
+  void Multiplication::
+  sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+    copy_fwd(arg[0], res[0], nnz());
     Sparsity::mul_sparsityF(arg[1], dep(1).sparsity(),
                             arg[2], dep(2).sparsity(),
                             res[0], sparsity(), w);
   }
 
-  void Multiplication::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  void Multiplication::
+  sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     Sparsity::mul_sparsityR(arg[1], dep(1).sparsity(),
                             arg[2], dep(2).sparsity(),
                             res[0], sparsity(), w);
-    copyAdj(arg[0], res[0], nnz());
+    copy_rev(arg[0], res[0], nnz());
   }
 
   void Multiplication::generate(CodeGenerator& g, const std::string& mem,
@@ -125,9 +127,9 @@ namespace casadi {
     }
 
     int nrow_x = dep(1).size1(), nrow_y = dep(2).size1(), ncol_y = dep(2).size2();
-    g.local("rr", "real_t", "*");
-    g.local("ss", "real_t", "*");
-    g.local("tt", "real_t", "*");
+    g.local("rr", "casadi_real", "*");
+    g.local("ss", "casadi_real", "*");
+    g.local("tt", "casadi_real", "*");
     g.local("i", "int");
     g.local("j", "int");
     g.local("k", "int");

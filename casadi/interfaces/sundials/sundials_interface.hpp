@@ -63,10 +63,12 @@ namespace casadi {
     long nsteps, nfevals, nlinsetups, netfails;
     int qlast, qcur;
     double hinused, hlast, hcur, tcur;
+    long nniters, nncfails;
 
     long nstepsB, nfevalsB, nlinsetupsB, netfailsB;
     int qlastB, qcurB;
     double hinusedB, hlastB, hcurB, tcurB;
+    long nnitersB, nncfailsB;
 
     // Temporaries for [x;z] or [rx;rz]
     double *v1, *v2;
@@ -87,36 +89,36 @@ namespace casadi {
     SundialsInterface(const std::string& name, const Function& dae);
 
     /** \brief  Destructor */
-    virtual ~SundialsInterface()=0;
+    ~SundialsInterface() override=0;
 
     ///@{
     /** \brief Options */
     static Options options_;
-    virtual const Options& get_options() const { return options_;}
+    const Options& get_options() const override { return options_;}
     ///@}
 
     /** \brief  Initialize */
-    virtual void init(const Dict& opts);
+    void init(const Dict& opts) override;
 
     /** \brief Initalize memory block */
-    virtual void init_memory(void* mem) const;
+    void init_memory(void* mem) const override;
 
     // Get system Jacobian
     virtual Function getJ(bool backward) const = 0;
 
     /// Get all statistics
-    virtual Dict get_stats(void* mem) const;
+    Dict get_stats(void* mem) const override;
 
     /** \brief  Print solver statistics */
-    virtual void print_stats(IntegratorMemory* mem, std::ostream &stream) const;
+    void print_stats(IntegratorMemory* mem, std::ostream &stream) const override;
 
     /** \brief  Reset the forward problem and bring the time back to t0 */
-    virtual void reset(IntegratorMemory* mem, double t, const double* x,
-                       const double* z, const double* p) const;
+    void reset(IntegratorMemory* mem, double t, const double* x,
+                       const double* z, const double* p) const override;
 
     /** \brief  Reset the backward problem and take time to tf */
-    virtual void resetB(IntegratorMemory* mem, double t, const double* rx,
-                        const double* rz, const double* rp) const;
+    void resetB(IntegratorMemory* mem, double t, const double* rx,
+                        const double* rz, const double* rp) const override;
 
     /** \brief Cast to memory object */
     static SundialsMemory* to_mem(void *mem) {
@@ -139,6 +141,9 @@ namespace casadi {
     int max_krylov_;
     bool use_precon_;
     bool second_order_correction_;
+    double step0_;
+    double nonlin_conv_coeff_;
+    double max_order_;
     ///@}
 
     /// Linear solver
@@ -154,8 +159,8 @@ namespace casadi {
     struct LinSolDataDense {};
 
     /** \brief Set the (persistent) work vectors */
-    virtual void set_work(void* mem, const double**& arg, double**& res,
-                          int*& iw, double*& w) const;
+    void set_work(void* mem, const double**& arg, double**& res,
+                          int*& iw, double*& w) const override;
 
     // Print a variable
     static void printvar(const std::string& id, double v) {

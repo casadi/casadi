@@ -30,7 +30,7 @@ using namespace std;
 namespace casadi {
 
   SubAssign::SubAssign(const MX& x, const MX& y, const Slice& i, const Slice& j) : i_(i), j_(j) {
-    setDependencies(x, y);
+    set_dep(x, y);
     casadi_error("not ready");
   }
 
@@ -47,11 +47,11 @@ namespace casadi {
     casadi_error("not ready");
   }
 
-  void SubAssign::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  void SubAssign::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     casadi_error("not ready");
   }
 
-  void SubAssign::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  void SubAssign::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     casadi_error("not ready");
   }
 
@@ -65,12 +65,12 @@ namespace casadi {
     casadi_error("not ready");
   }
 
-  void SubAssign::eval_forward(const std::vector<std::vector<MX> >& fseed,
+  void SubAssign::ad_forward(const std::vector<std::vector<MX> >& fseed,
                           std::vector<std::vector<MX> >& fsens) const {
     casadi_error("not ready");
   }
 
-  void SubAssign::eval_reverse(const std::vector<std::vector<MX> >& aseed,
+  void SubAssign::ad_reverse(const std::vector<std::vector<MX> >& aseed,
                           std::vector<std::vector<MX> >& asens) const {
     casadi_error("not ready");
   }

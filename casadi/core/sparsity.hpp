@@ -236,8 +236,14 @@ namespace casadi {
     /// Get the number of rows
     int size1() const;
 
+    /// Get the number of rows, Octave-style syntax
+    int rows() const {return size1();}
+
     /// Get the number of columns
     int size2() const;
+
+    /// Get the number of columns, Octave-style syntax
+    int columns() const {return size2();}
 
     /** \brief The total number of elements, including structural zeros, i.e. size2()*size1()
         \see nnz()  */
@@ -383,7 +389,7 @@ namespace casadi {
     bool is_transpose(const Sparsity& y) const;
 
     /// Check if the sparsity is a reshape of another
-    bool isReshape(const Sparsity& y) const;
+    bool is_reshape(const Sparsity& y) const;
 
     /// @{
     /** \brief Combine two sparsity patterns
@@ -605,16 +611,6 @@ namespace casadi {
     int scc(std::vector<int>& SWIG_OUTPUT(index),
             std::vector<int>& SWIG_OUTPUT(offset)) const;
 
-#ifndef SWIG
-    /** \brief Structure to hold the block triangular form */
-    struct Btf {
-      int nb;
-      std::vector<int> rowperm, colperm;
-      std::vector<int> rowblock, colblock;
-      std::vector<int> coarse_rowblock, coarse_colblock;
-    };
-#endif // SWIG
-
     /// @{
     /** \brief Calculate the block triangular form (BTF)
         See Direct Methods for Sparse Linear Systems by Davis (2006).
@@ -634,11 +630,7 @@ namespace casadi {
     int btf(std::vector<int>& SWIG_OUTPUT(rowperm), std::vector<int>& SWIG_OUTPUT(colperm),
             std::vector<int>& SWIG_OUTPUT(rowblock), std::vector<int>& SWIG_OUTPUT(colblock),
             std::vector<int>& SWIG_OUTPUT(coarse_rowblock),
-            std::vector<int>& SWIG_OUTPUT(coarse_colblock),
-            int seed=0) const;
-#ifndef SWIG
-    const Btf& btf() const;
-#endif // SWIG
+            std::vector<int>& SWIG_OUTPUT(coarse_colblock)) const;
     /// @}
 
 #ifndef SWIG

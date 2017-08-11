@@ -101,13 +101,13 @@ namespace casadi {
 
     /// \cond INTERNAL
     /// Assign the node to a node class pointer (or null)
-    void assignNode(SharedObjectInternal* node);
+    void own(SharedObjectInternal* node);
 
     /** \brief Assign the node to a node class pointer without reference counting
      *
      * improper use will cause memory leaks!
      */
-    void assignNodeNoCount(SharedObjectInternal* node);
+    void assign(SharedObjectInternal* node);
 
     /// Get a const pointer to the node
     SharedObjectInternal* get() const;
@@ -124,14 +124,14 @@ namespace casadi {
 #endif // SWIG
 
     /// Print a representation of the object
-    void repr(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
+    void print_short(std::ostream &stream) const;
 
     /// Print a description of the object
-    void print(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
+    void print_long(std::ostream &stream) const;
 
     /// \cond INTERNAL
     /// Print the pointer to the internal class
-    void printPtr(std::ostream &stream=casadi::userOut()) const;
+    void print_ptr(std::ostream &stream=casadi::userOut()) const;
     /// \endcond
 
     /// Is a null pointer?
@@ -210,7 +210,7 @@ namespace casadi {
     if (!B::test_cast(ptr)) return ret;
 
     /// Assign node of B and return
-    ret.assignNode(ptr);
+    ret.own(ptr);
     return ret;
   }
 

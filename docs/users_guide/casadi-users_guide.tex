@@ -1972,7 +1972,7 @@ MEX completed successfully.
 ''')
 \end{pytexoutput}
 
-Note that the result of the execution is always a MATLAB sparse matrix.
+Note that the result of the execution is always a MATLAB sparse matrix by default. Compiler flags \texttt{-DCASASI\_MEX\_ALWAYS\_DENSE} and \texttt{-DCASASI\_MEX\_ALLOW\_DENSE} may be set to influence this behaviour.
 
 \subsection*{Calling generated code from the command line}
 \label{sec:codegen_commandline}
@@ -2087,7 +2087,8 @@ The integer field pointed to is structured as follows:
 \begin{itemize}
   \item The first two entries are the number of rows and columns, respectively.
   In the following referred to as \texttt{nrow} and \texttt{ncol}.
-  \item The subsequent $\texttt{ncol}+1$ entries are the nonzero offsets
+  \item If the third entry is \texttt{1}, the pattern is dense and any remaining entries are discarded.
+  \item If the third entry is \texttt{0}, that entry plus subsequent $\texttt{ncol}$ entries form the nonzero offsets
   for each column, \texttt{colind} in the following. E.g. column $i$ will consist
   of the nonzero indices ranging from $\texttt{colind}[i]$ to $\texttt{colind}[i+1]$.
   The last entry, $\texttt{colind}[\texttt{ncol}]$, will be equal to the number
@@ -2199,7 +2200,7 @@ The derived class consists of the following parts:
   and their sparsity patterns \verb|get_sparsity_in| and \verb|get_sparsity_out|.
   \item An optional \verb|init| function called when the construction is complete.
   \item A function for numerical evaluation.
-  \item Optional functions for derivatives. You can choose to supply a full Jacobian (\verb|has_jacobian|, \verb|get_jacobian|), or choose to supply forward/reverse sensitivities (\verb|get_n_forward|, \verb|get_forward|,  \verb|get_n_reverse|, \verb|get_reverse|).
+  \item Optional functions for derivatives. You can choose to supply a full Jacobian (\verb|has_jacobian|, \verb|get_jacobian|), or choose to supply forward/reverse sensitivities (\verb|has_forward|, \verb|get_forward|,  \verb|has_reverse|, \verb|get_reverse|).
 \end{itemize}
 
 For a complete list of functions, see the C++ API documentation for
@@ -2517,9 +2518,9 @@ m = dae.add_x('m')
 hdot = v
 vdot = (u-a*v**2)/m-g
 mdot = -b*u**2
-dae.add_ode(hdot)
-dae.add_ode(vdot)
-dae.add_ode(mdot)
+dae.add_ode('hdot', hdot)
+dae.add_ode('vdot', vdot)
+dae.add_ode('mdot', mdot)
 # Specify initial conditions
 dae.set_start('h', 0)
 dae.set_start('v', 0)
@@ -2545,9 +2546,9 @@ m = dae.add_x('m');
 hdot = v;
 vdot = (u-a*v^2)/m-g;
 mdot = -b*u^2;
-dae.add_ode(hdot);
-dae.add_ode(vdot);
-dae.add_ode(mdot);
+dae.add_ode('hdot', hdot);
+dae.add_ode('vdot', vdot);
+dae.add_ode('mdot', mdot);
 % Specify initial conditions
 dae.set_start('h', 0);
 dae.set_start('v', 0);

@@ -46,7 +46,7 @@ namespace casadi {
     if (own_) {
       // Make self a null-pointer and then delete
       // No ownership since reference counter was decreased in Callback::transfer_ownership
-      self_->assignNodeNoCount(0);
+      self_->assign(0);
       delete self_;
     }
   }
@@ -103,37 +103,41 @@ namespace casadi {
     TRY_CALL(eval_sx, self_, arg, res, iw, w, mem);
   }
 
-  bool CallbackInternal::hasFullJacobian() const {
+  bool CallbackInternal::uses_output() const {
+    TRY_CALL(uses_output, self_);
+  }
+
+  bool CallbackInternal::has_jacobian() const {
     TRY_CALL(has_jacobian, self_);
   }
 
   Function CallbackInternal::
-  getFullJacobian(const std::string& name,
-                  const std::vector<std::string>& i_names,
-                  const std::vector<std::string>& o_names,
-                  const Dict& opts) {
-    TRY_CALL(get_jacobian, self_, name, opts);
+  get_jacobian(const std::string& name,
+                  const std::vector<std::string>& inames,
+                  const std::vector<std::string>& onames,
+                  const Dict& opts) const {
+    TRY_CALL(get_jacobian, self_, name, inames, onames, opts);
   }
 
   Function CallbackInternal::
-  get_forward(const std::string& name, int nfwd,
-              const std::vector<std::string>& i_names,
-              const std::vector<std::string>& o_names, const Dict& opts) const {
-    TRY_CALL(get_forward, self_, name, nfwd, i_names, o_names, opts);
+  get_forward(int nfwd, const std::string& name,
+              const std::vector<std::string>& inames,
+              const std::vector<std::string>& onames, const Dict& opts) const {
+    TRY_CALL(get_forward, self_, nfwd, name, inames, onames, opts);
   }
 
-  int CallbackInternal::get_n_forward() const {
-    TRY_CALL(get_n_forward, self_);
+  bool CallbackInternal::has_forward(int nfwd) const {
+    TRY_CALL(has_forward, self_, nfwd);
   }
 
   Function CallbackInternal::
-  get_reverse(const std::string& name, int nadj,
-              const std::vector<std::string>& i_names,
-              const std::vector<std::string>& o_names, const Dict& opts) const {
-    TRY_CALL(get_reverse, self_, name, nadj, i_names, o_names, opts);
+  get_reverse(int nadj, const std::string& name,
+              const std::vector<std::string>& inames,
+              const std::vector<std::string>& onames, const Dict& opts) const {
+    TRY_CALL(get_reverse, self_, nadj, name, inames, onames, opts);
   }
 
-  int CallbackInternal::get_n_reverse() const {
-    TRY_CALL(get_n_reverse, self_);
+  bool CallbackInternal::has_reverse(int nadj) const {
+    TRY_CALL(has_reverse, self_, nadj);
   }
 } // namespace casadi

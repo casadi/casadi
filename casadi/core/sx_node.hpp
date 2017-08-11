@@ -56,17 +56,17 @@ namespace casadi {
 
     ///@{
     /** \brief  check properties of a node */
-    virtual bool is_constant() const; // check if constant
-    virtual bool is_integer() const; // check if integer
-    virtual bool is_symbolic() const; // check if symbolic
-    virtual bool hasDep() const; // check if binary
-    virtual bool is_zero() const; // check if zero
-    virtual bool isAlmostZero(double tol) const; // check if almost zero
-    virtual bool is_one() const; // check if one
-    virtual bool is_minus_one() const; // check if minus one
-    virtual bool isNan() const; // check if not a number
-    virtual bool isInf() const; // check if infinity
-    virtual bool isMinusInf() const; // check if minus infinity
+    virtual bool is_constant() const { return false; }
+    virtual bool is_integer() const { return false; }
+    virtual bool is_symbolic() const { return false; }
+    virtual bool is_zero() const { return false; }
+    virtual bool is_op(int op) const { return false; }
+    virtual bool is_almost_zero(double tol) const { return false; }
+    virtual bool is_one() const { return false; }
+    virtual bool is_minus_one() const { return false; }
+    virtual bool is_nan() const { return false; }
+    virtual bool is_inf() const { return false; }
+    virtual bool is_minus_inf() const { return false; }
     ///@}
 
     ///@{
@@ -84,7 +84,7 @@ namespace casadi {
     virtual bool is_equal(const SXNode* node, int depth) const;
 
     /** \brief  Number of dependencies */
-    virtual int ndep() const { return 0;}
+    virtual int n_dep() const { return 0;}
 
     /** \brief  get the reference of a child */
     virtual const SXElem& dep(int i) const;
@@ -93,10 +93,10 @@ namespace casadi {
     virtual SXElem& dep(int i);
 
     /** \brief  Check if smooth */
-    virtual bool is_smooth() const;
+    virtual bool is_smooth() const { return true; }
 
     /** \brief  print */
-    virtual void print(std::ostream &stream) const;
+    virtual void print_long(std::ostream &stream) const;
 
     /** \brief Find out which nodes can be inlined */
     void can_inline(std::map<const SXNode*, int>& nodeind) const;

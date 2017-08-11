@@ -1,6 +1,6 @@
 // NOLINT(legal/copyright)
 template<typename T1>
-void CASADI_PREFIX(rank1)(T1* A, const int* sp_A, T1 alpha, const T1* x, const T1* y) {
+void casadi_rank1(T1* A, const int* sp_A, T1 alpha, const T1* x, const T1* y) {
   // Get sparsities
   int ncol_A = sp_A[1];
   const int *colind_A = sp_A+2, *row_A = sp_A + 2 + ncol_A+1;

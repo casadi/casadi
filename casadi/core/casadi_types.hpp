@@ -100,6 +100,10 @@ namespace casadi {
 
 #endif // _MSC_VER
 
+  // Macro "minor" is sometimes defined, cf.
+  // https://stackoverflow.com/questions/22240973/major-and-minor-macros-defined-in-sys-sysmacros-h-pulled-in-by-iterator
+#undef minor
+
   // Workarond for MinGW bug
 #if defined(__MINGW32__) || defined(__MINGW64__) || defined(_MSC_VER)
   template<typename T>

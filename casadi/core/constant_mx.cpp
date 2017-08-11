@@ -33,17 +33,49 @@ using namespace std;
 namespace casadi {
 
   ConstantMX::ConstantMX(const Sparsity& sp) {
-    setSparsity(sp);
+    set_sparsity(sp);
   }
 
   ConstantMX::~ConstantMX() {
+  }
+
+  bool ConstantMX::is_valid_input() const {
+    return nnz()==0;
+  }
+
+  int ConstantMX::n_primitives() const {
+    if (nnz()==0) {
+      return 0;
+    } else {
+      return MXNode::n_primitives();
+    }
+  }
+
+  void ConstantMX::primitives(std::vector<MX>::iterator& it) const {
+    if (nnz()!=0) {
+      MXNode::primitives(it);
+    }
+  }
+
+  void ConstantMX::split_primitives(const MX& x, std::vector<MX>::iterator& it) const {
+    if (nnz()!=0) {
+      MXNode::split_primitives(x, it);
+    }
+  }
+
+  MX ConstantMX::join_primitives(std::vector<MX>::const_iterator& it) const {
+    if (nnz()==0) {
+      return MX(sparsity());
+    } else {
+      return MXNode::join_primitives(it);
+    }
   }
 
   void ConstantMX::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
     res[0] = shared_from_this<MX>();
   }
 
- void ConstantMX::eval_forward(const std::vector<std::vector<MX> >& fseed,
+ void ConstantMX::ad_forward(const std::vector<std::vector<MX> >& fseed,
                           std::vector<std::vector<MX> >& fsens) const {
    MX zero_sens(size1(), size2());
    for (int d=0; d<fsens.size(); ++d) {
@@ -51,25 +83,25 @@ namespace casadi {
    }
  }
 
-  void ConstantMX::eval_reverse(const std::vector<std::vector<MX> >& aseed,
+  void ConstantMX::ad_reverse(const std::vector<std::vector<MX> >& aseed,
                            std::vector<std::vector<MX> >& asens) const {
   }
 
-  void ConstantMX::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  void ConstantMX::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     fill_n(res[0], nnz(), 0);
   }
 
-  void ConstantMX::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  void ConstantMX::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     fill_n(res[0], nnz(), 0);
   }
 
   void ConstantDM::generate(CodeGenerator& g, const std::string& mem,
                                  const std::vector<int>& arg, const std::vector<int>& res) const {
     // Print the constant
-    int ind = g.getConstant(x_.nonzeros(), true);
+    string ind = g.constant(x_.nonzeros());
 
     // Copy the constant to the work vector
-    g << g.copy("c"+g.to_string(ind), nnz(), g.work(res[0], nnz())) << '\n';
+    g << g.copy(ind, nnz(), g.work(res[0], nnz())) << '\n';
   }
 
   bool ConstantMX::__nonzero__() const {
@@ -137,29 +169,29 @@ namespace casadi {
     return x_.is_minus_one();
   }
 
-  bool ConstantDM::is_identity() const {
-    return x_.is_identity();
+  bool ConstantDM::is_eye() const {
+    return x_.is_eye();
   }
 
-  // MX ConstantMX::getMultiplication(const MX& y) const {
+  // MX ConstantMX::get_mac(const MX& y) const {
   //   if (y.is_constant()) {
   //     // Constant folding
-  //     DM xv = getMatrixValue();
-  //     DM yv = y->getMatrixValue();
+  //     DM xv = get_DM();
+  //     DM yv = y->get_DM();
   //     return mul(xv, yv);
   //   } else {
-  //     return MXNode::getMultiplication(y);
+  //     return MXNode::get_mac(y);
   //   }
   // }
 
-  MX ConstantMX::getDot(const MX& y) const {
+  MX ConstantMX::get_dot(const MX& y) const {
     if (y.is_constant()) {
       // Constant folding
-      DM xv = getMatrixValue();
-      DM yv = y->getMatrixValue();
+      DM xv = get_DM();
+      DM yv = y->get_DM();
       return dot(xv, yv);
     } else {
-      return MXNode::getDot(y);
+      return MXNode::get_dot(y);
     }
   }
 
@@ -181,32 +213,32 @@ namespace casadi {
     return "0x0";
   }
 
-  MX ZeroByZero::getProject(const Sparsity& sp) const {
+  MX ZeroByZero::get_project(const Sparsity& sp) const {
     return shared_from_this<MX>();
   }
 
-  MX ZeroByZero::getGetNonzeros(const Sparsity& sp, const std::vector<int>& nz) const {
+  MX ZeroByZero::get_nzref(const Sparsity& sp, const std::vector<int>& nz) const {
     casadi_assert(nz.empty());
     return MX::zeros(sp);
   }
 
-  MX ZeroByZero::getSetNonzeros(const MX& y, const std::vector<int>& nz) const {
+  MX ZeroByZero::get_nzassign(const MX& y, const std::vector<int>& nz) const {
     return shared_from_this<MX>();
   }
 
-  MX ZeroByZero::getTranspose() const {
+  MX ZeroByZero::get_transpose() const {
     return shared_from_this<MX>();
   }
 
-  MX ZeroByZero::getUnary(int op) const {
+  MX ZeroByZero::get_unary(int op) const {
     return shared_from_this<MX>();
   }
 
-  MX ZeroByZero::getBinary(int op, const MX& y, bool ScX, bool ScY) const {
+  MX ZeroByZero::_get_binary(int op, const MX& y, bool ScX, bool ScY) const {
     return shared_from_this<MX>();
   }
 
-  MX ZeroByZero::getReshape(const Sparsity& sp) const {
+  MX ZeroByZero::get_reshape(const Sparsity& sp) const {
     casadi_assert(sp.is_empty());
     return MX::zeros(sp);
   }

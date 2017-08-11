@@ -262,11 +262,20 @@ namespace casadi {
     casadi_assert(m->lp==0);
     m->lp = CPXcreateprob(m->env, &status, "QP from CasADi");
     casadi_assert_message(m->lp!=0, "CPXcreateprob failed");
+
+    m->fstats["preprocessing"]  = FStats();
+    m->fstats["solver"]         = FStats();
+    m->fstats["postprocessing"] = FStats();
   }
 
   void CplexInterface::
   eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
     auto m = static_cast<CplexMemory*>(mem);
+
+    // Statistics
+    for (auto&& s : m->fstats) s.second.reset();
+
+    m->fstats.at("preprocessing").tic();
 
     if (inputs_check_) {
       checkInputs(arg[CONIC_LBX], arg[CONIC_UBX], arg[CONIC_LBA], arg[CONIC_UBA]);
@@ -374,10 +383,14 @@ namespace casadi {
         casadi_error("CPXcopyctype failed");
       }
 
+      m->fstats.at("preprocessing").toc();
+      m->fstats.at("solver").tic();
       // Optimize
       if (CPXmipopt(m->env, m->lp)) {
         casadi_error("CPXmipopt failed");
       }
+      m->fstats.at("solver").toc();
+      m->fstats.at("postprocessing").tic();
 
       // Get objective value
       if (CPXgetobjval(m->env, m->lp, &f)) {
@@ -401,10 +414,14 @@ namespace casadi {
       casadi_fill(lam_x, nx_, nan);
 
     } else {
+      m->fstats.at("preprocessing").toc();
+      m->fstats.at("solver").tic();
       // Optimize
       if (CPXqpopt(m->env, m->lp)) {
         casadi_error("CPXqpopt failed");
       }
+      m->fstats.at("solver").toc();
+      m->fstats.at("postprocessing").tic();
 
       // Retrieving solution
       if (CPXsolution(m->env, m->lp, &solstat, &f, x, lam_a, get_ptr(slack), lam_x)) {
@@ -466,6 +483,11 @@ namespace casadi {
     casadi_copy(lam_a, na_, res[CONIC_LAM_A]);
     casadi_copy(lam_x, nx_, res[CONIC_LAM_X]);
     casadi_copy(x, nx_, res[CONIC_X]);
+
+    m->fstats.at("postprocessing").toc();
+
+    // Show statistics
+    if (print_time_)  print_fstats(static_cast<ConicMemory*>(mem));
   }
 
   CplexInterface::~CplexInterface() {

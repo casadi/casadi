@@ -133,10 +133,16 @@ namespace casadi {
      */
     virtual std::string get_name_out(int i);
 
+    /** \brief Do the derivative functions need nondifferentiated outputs? */
+    virtual bool uses_output() const;
+
     ///@{
     /** \brief Return Jacobian of all input elements with respect to all output elements */
     virtual bool has_jacobian() const;
-    virtual Function get_jacobian(const std::string& name, const Dict& opts);
+    virtual Function get_jacobian(const std::string& name,
+                                  const std::vector<std::string>& inames,
+                                  const std::vector<std::string>& onames,
+                                  const Dict& opts) const;
     ///@}
 
     ///@{
@@ -145,11 +151,11 @@ namespace casadi {
      *    and calls <tt>Function get_forward(int nfwd)</tt>
      *    if no cached version is available.
      */
-    virtual Function get_forward(const std::string& name, int nfwd,
-                                     const std::vector<std::string>& i_names,
-                                     const std::vector<std::string>& o_names,
-                                     const Dict& opts) const;
-    virtual int get_n_forward() const;
+    virtual bool has_forward(int nfwd) const;
+    virtual Function get_forward(int nfwd, const std::string& name,
+                                 const std::vector<std::string>& inames,
+                                 const std::vector<std::string>& onames,
+                                 const Dict& opts) const;
     ///@}
 
     ///@{
@@ -158,11 +164,11 @@ namespace casadi {
      *    and calls <tt>Function get_reverse(int nadj)</tt>
      *    if no cached version is available.
      */
-    virtual Function get_reverse(const std::string& name, int nadj,
-                                     const std::vector<std::string>& i_names,
-                                     const std::vector<std::string>& o_names,
-                                     const Dict& opts) const;
-    virtual int get_n_reverse() const;
+    virtual bool has_reverse(int nadj) const;
+    virtual Function get_reverse(int nadj, const std::string& name,
+                                 const std::vector<std::string>& inames,
+                                 const std::vector<std::string>& onames,
+                                 const Dict& opts) const;
     ///@}
 
     ///@{

@@ -41,7 +41,7 @@ namespace casadi {
   public:
     EmptySparsity() {
       const int colind[1] = {0};
-      assignNode(new SparsityInternal(0, 0, colind, 0));
+      own(new SparsityInternal(0, 0, colind, 0));
     }
   };
 
@@ -50,7 +50,7 @@ namespace casadi {
     ScalarSparsity() {
       const int colind[2] = {0, 1};
       const int row[1] = {0};
-      assignNode(new SparsityInternal(1, 1, colind, row));
+      own(new SparsityInternal(1, 1, colind, row));
     }
   };
 
@@ -59,7 +59,7 @@ namespace casadi {
     ScalarSparseSparsity() {
       const int colind[2] = {0, 0};
       const int row[1] = {0};
-      assignNode(new SparsityInternal(1, 1, colind, row));
+      own(new SparsityInternal(1, 1, colind, row));
     }
   };
   /// \endcond
@@ -70,7 +70,7 @@ namespace casadi {
 
   Sparsity Sparsity::create(SparsityInternal *node) {
     Sparsity ret;
-    ret.assignNode(node);
+    ret.own(node);
     return ret;
   }
 
@@ -248,7 +248,7 @@ namespace casadi {
   }
 
   Sparsity Sparsity::reshape(const Sparsity& x, const Sparsity& sp) {
-    casadi_assert(x.isReshape(sp));
+    casadi_assert(x.is_reshape(sp));
     return sp;
   }
 
@@ -573,13 +573,9 @@ namespace casadi {
   int Sparsity::btf(std::vector<int>& rowperm, std::vector<int>& colperm,
                                   std::vector<int>& rowblock, std::vector<int>& colblock,
                                   std::vector<int>& coarse_rowblock,
-                                  std::vector<int>& coarse_colblock, int seed) const {
+                                  std::vector<int>& coarse_colblock) const {
     return (*this)->btf(rowperm, colperm, rowblock, colblock,
-                        coarse_rowblock, coarse_colblock, seed);
-  }
-
-  const Sparsity::Btf& Sparsity::btf() const {
-    return (*this)->btf();
+                        coarse_rowblock, coarse_colblock);
   }
 
   void Sparsity::spsolve(bvec_t* X, const bvec_t* B, bool tr) const {
@@ -645,8 +641,8 @@ namespace casadi {
     return (*this)->is_transpose(*y);
   }
 
-  bool Sparsity::isReshape(const Sparsity& y) const {
-    return (*this)->isReshape(*y);
+  bool Sparsity::is_reshape(const Sparsity& y) const {
+    return (*this)->is_reshape(*y);
   }
 
   std::size_t Sparsity::hash() const {
@@ -709,7 +705,7 @@ namespace casadi {
           if (ref.is_equal(nrow, ncol, colind, row)) {
 
             // Found match!
-            assignNode(ref.get());
+            own(ref.get());
             return;
 
           } else { // There is a hash rowision (unlikely, but possible)
@@ -729,14 +725,14 @@ namespace casadi {
 
               // Match found if sparsity matches
               if (ref.is_equal(nrow, ncol, colind, row)) {
-                assignNode(ref.get());
+                own(ref.get());
                 return;
               }
             }
           }
 
           // The cached entry has been deleted, create a new one
-          assignNode(new SparsityInternal(nrow, ncol, colind, row));
+          own(new SparsityInternal(nrow, ncol, colind, row));
 
           // Cache this pattern
           wref = *this;
@@ -748,7 +744,7 @@ namespace casadi {
     }
 
     // No matching sparsity pattern could be found, create a new one
-    assignNode(new SparsityInternal(nrow, ncol, colind, row));
+    own(new SparsityInternal(nrow, ncol, colind, row));
 
     // Cache this pattern
     cache.insert(std::pair<std::size_t, WeakRef>(h, *this));
@@ -1103,6 +1099,10 @@ namespace casadi {
     int nrow = v[0];
     int ncol = v[1];
     const int *colind = v+2;
+    if (colind[0]==1) {
+      // Dense matrix
+      return Sparsity::dense(nrow, ncol);
+    }
     int nnz = colind[ncol];
     if (nrow*ncol == nnz) {
       // Dense matrix

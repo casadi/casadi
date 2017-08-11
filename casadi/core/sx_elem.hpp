@@ -108,10 +108,10 @@ namespace casadi {
     operator Matrix<SXElem>() const;
 
     /// Print a representation of the object
-    void repr(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
+    void print_short(std::ostream &stream) const;
 
     /// Print a description of the object
-    void print(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
+    void print_long(std::ostream &stream) const;
 
     /// \cond INTERNAL
     /** \brief  Get a pointer to the node */
@@ -140,16 +140,15 @@ namespace casadi {
     bool is_constant() const;
     bool is_integer() const;
     bool is_symbolic() const;
-    bool hasDep() const;
     /** \brief Check whether a binary SXElem is commutative*/
     bool is_commutative() const;
     bool is_zero() const;
-    bool isAlmostZero(double tol) const;
+    bool is_almost_zero(double tol) const;
     bool is_one() const;
     bool is_minus_one() const;
-    bool isNan() const;
-    bool isInf() const;
-    bool isMinusInf() const;
+    bool is_nan() const;
+    bool is_inf() const;
+    bool is_minus_inf() const;
     const std::string& name() const;
     int op() const;
     bool is_op(int op) const;
@@ -158,7 +157,7 @@ namespace casadi {
     bool is_regular() const;
 
     /** \brief Check if a value is always nonnegative (false negatives are allowed) */
-    bool isNonNegative() const;
+    bool is_nonnegative() const;
     SXElem dep(int ch=0) const;
 
     /// Type conversion to double
@@ -232,14 +231,14 @@ namespace casadi {
   public:
     static bool is_zero(const SXElem& val);
     static bool is_equal(const SXElem& x, const SXElem& y, int depth);
-    static bool isAlmostZero(const SXElem& val, double tol);
+    static bool is_almost_zero(const SXElem& val, double tol);
     static bool is_one(const SXElem& val);
     static bool is_minus_one(const SXElem& val);
     static bool is_constant(const SXElem& val);
     static bool is_integer(const SXElem& val);
-    static bool isInf(const SXElem& val);
-    static bool isMinusInf(const SXElem& val);
-    static bool isNaN(const SXElem& val);
+    static bool is_inf(const SXElem& val);
+    static bool is_minus_inf(const SXElem& val);
+    static bool is_nan(const SXElem& val);
 
     static const SXElem zero;
     static const SXElem one;

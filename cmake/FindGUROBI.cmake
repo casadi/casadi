@@ -24,6 +24,7 @@ find_path(GUROBI_INCLUDE_DIR
 find_library( GUROBI_LIBRARY 
               NAMES gurobi
               gurobi65
+              gurobi70
               PATHS "$ENV{GUROBI_HOME}/lib" 
                     "/Library/gurobi650/mac64/lib"
                     "C:\\libs\\gurobi650\\lib"

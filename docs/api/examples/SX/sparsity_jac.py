@@ -39,7 +39,6 @@ print(y[:5])
 f = Function("f", [x],[y])
 
 #! And we visualize the sparsity of the jacobian
-spy(f.sparsity_jac())
+spy(f.sparsity_jac(0, 0))
 
 show()
-

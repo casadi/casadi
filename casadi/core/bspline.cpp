@@ -125,11 +125,7 @@ namespace casadi {
       vector<int> offset;
       vector<double> stacked;
       BSplineCommon::from_knots(knots, offset, stacked);
-
-      Function ret;
-      ret.assignNode(new BSpline(name, stacked, offset, coeffs, degree, m));
-      ret->construct(opts);
-      return ret;
+      return Function::create(new BSpline(name, stacked, offset, coeffs, degree, m), opts);
     }
 
     BSplineCommon::BSplineCommon(const std::string &name, const std::vector<double>& knots,
@@ -161,11 +157,11 @@ namespace casadi {
         false, iw, w);
     }
 
-    void BSpline::generateBody(CodeGenerator& g) const {
+    void BSpline::codegen_body(CodeGenerator& g) const {
       int n_dims = offset_.size()-1;
 
-      g.addAuxiliary(CodeGenerator::AUX_ND_BOOR_EVAL);
-      g.addAuxiliary(CodeGenerator::AUX_FILL);
+      g.add_auxiliary(CodeGenerator::AUX_ND_BOOR_EVAL);
+      g.add_auxiliary(CodeGenerator::AUX_FILL);
       g << "  if (res[0]) " << g.fill("res[0]", m_, "0.0") << "\n";
 
       // Input and output buffers
@@ -175,9 +171,9 @@ namespace casadi {
         <<  g.constant(lookup_mode_) << ", 0, iw, w);\n";
     }
 
-    Function BSpline::get_forward(const std::string& name, int nfwd,
-                  const std::vector<std::string>& i_names,
-                  const std::vector<std::string>& o_names,
+    Function BSpline::get_forward(int nfwd, const std::string& name,
+                  const std::vector<std::string>& inames,
+                  const std::vector<std::string>& onames,
                   const Dict& opts) const {
       MX x = MX::sym("x", degree_.size());
       MX J = jac(x);
@@ -192,9 +188,9 @@ namespace casadi {
       return Function(name, {x, dummy, horzcat(seed)}, {horzcat(sens)}, opts);
     }
 
-    Function BSpline::get_reverse(const std::string& name, int nadj,
-                  const std::vector<std::string>& i_names,
-                  const std::vector<std::string>& o_names,
+    Function BSpline::get_reverse(int nadj, const std::string& name,
+                  const std::vector<std::string>& inames,
+                  const std::vector<std::string>& onames,
                   const Dict& opts) const {
 
       MX x = MX::sym("x", degree_.size());
@@ -268,12 +264,12 @@ namespace casadi {
     }
 
 
-    Function BSpline::getFullJacobian(const std::string& name,
-          const std::vector<std::string>& i_names,
-          const std::vector<std::string>& o_names, const Dict& opts) {
-
-      MX x = MX::sym("x", degree_.size());
-      return Function(name, {x}, {jac(x)}, opts);
+    Function BSpline::get_jacobian(const std::string& name,
+          const std::vector<std::string>& inames,
+          const std::vector<std::string>& onames, const Dict& opts) const {
+      MX x = MX::sym(inames.at(0), degree_.size());
+      MX dummy = MX::sym(inames.at(1), Sparsity(m_, 1));
+      return Function(name, {x, dummy}, {jac(x)}, opts);
     }
 
     Sparsity BSplineDual::get_sparsity_in(int i) {
@@ -292,11 +288,7 @@ namespace casadi {
       vector<int> offset;
       vector<double> stacked;
       BSplineCommon::from_knots(knots, offset, stacked);
-
-      Function ret;
-      ret.assignNode(new BSplineDual(name, stacked, offset, x, degree, m, reverse));
-      ret->construct(opts);
-      return ret;
+      return Function::create(new BSplineDual(name, stacked, offset, x, degree, m, reverse), opts);
     }
 
     BSplineDual::BSplineDual(const std::string &name, const std::vector<double>& knots,
@@ -326,11 +318,11 @@ namespace casadi {
       }
     }
 
-    void BSplineDual::generateBody(CodeGenerator& g) const {
+    void BSplineDual::codegen_body(CodeGenerator& g) const {
       int n_dims = offset_.size()-1;
 
-      g.addAuxiliary(CodeGenerator::AUX_ND_BOOR_EVAL);
-      g.addAuxiliary(CodeGenerator::AUX_FILL);
+      g.add_auxiliary(CodeGenerator::AUX_ND_BOOR_EVAL);
+      g.add_auxiliary(CodeGenerator::AUX_FILL);
       g << "  if (res[0]) " <<
                 g.fill("res[0]", reverse_? coeffs_size_: m_*N_, "0.0") << "\n";
 
@@ -343,9 +335,9 @@ namespace casadi {
         << ", 0, iw, w);\n";
     }
 
-    Function BSplineDual::get_forward(const std::string& name, int nfwd,
-                  const std::vector<std::string>& i_names,
-                  const std::vector<std::string>& o_names,
+    Function BSplineDual::get_forward(int nfwd, const std::string& name,
+                  const std::vector<std::string>& inames,
+                  const std::vector<std::string>& onames,
                   const Dict& opts) const {
 
       MX C = MX::sym("C", sparsity_in(0));
@@ -356,27 +348,26 @@ namespace casadi {
       for (int i=0;i<nfwd;++i) {
         sens.push_back(self(seed[i])[0]);
       }
-      Function ret = Function(name, {C, dummy, horzcat(seed)}, {horzcat(sens)}, i_names, o_names);
+      Function ret = Function(name, {C, dummy, horzcat(seed)}, {horzcat(sens)}, inames, onames);
       return ret;
 
     }
 
-    Function BSplineDual::get_reverse(const std::string& name, int nadj,
-                  const std::vector<std::string>& i_names,
-                  const std::vector<std::string>& o_names,
+    Function BSplineDual::get_reverse(int nadj, const std::string& name,
+                  const std::vector<std::string>& inames,
+                  const std::vector<std::string>& onames,
                   const Dict& opts) const {
 
       MX C = MX::sym("C", sparsity_in(0));
       MX dummy = MX(size_out(0));
       std::vector<MX> seed = MX::sym("seed", sparsity_out(0), nadj);
       std::vector<MX> sens;
-      Function rev;
-      rev.assignNode(new BSplineDual(name, knots_, offset_, x_, degree_, m_, !reverse_));
-      rev->construct(opts);
+      Function rev = Function::create(new BSplineDual(name, knots_, offset_, x_,
+                                                      degree_, m_, !reverse_), opts);
       for (int i=0;i<nadj;++i) {
         sens.push_back(rev(seed[i])[0]);
       }
-      Function ret = Function(name, {C, dummy, horzcat(seed)}, {horzcat(sens)}, i_names, o_names);
+      Function ret = Function(name, {C, dummy, horzcat(seed)}, {horzcat(sens)}, inames, onames);
       return ret;
 
     }
@@ -455,7 +446,8 @@ namespace casadi {
       }
     }
 
-    void BSplineDual::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+    void BSplineDual::
+    sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
       if (!res[0]) return;
       casadi_fill(res[0], reverse_? coeffs_size_: m_*N_, bvec_t(0));
 
@@ -467,7 +459,8 @@ namespace casadi {
       }
     }
 
-    void BSplineDual::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+    void BSplineDual::
+    sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
       if (!res[0]) return;
 
       int n_dims = degree_.size();

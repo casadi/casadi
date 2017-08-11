@@ -149,6 +149,15 @@ namespace casadi {
     // Maximum number of steps
     THROWING(CVodeSetMaxNumSteps, m->mem, max_num_steps_);
 
+    // Initial step size
+    if (step0_) THROWING(CVodeSetInitStep, m->mem, step0_);
+
+    // Maximum order of method
+    if (max_order_) THROWING(CVodeSetMaxOrd, m->mem, max_order_);
+
+    // Coeff. in the nonlinear convergence test
+    if (nonlin_conv_coeff_) THROWING(CVodeSetNonlinConvCoef, m->mem, nonlin_conv_coeff_);
+
     // attach a linear solver
     if (newton_scheme_==SD_DIRECT) {
       // Direct scheme
@@ -280,6 +289,8 @@ namespace casadi {
     THROWING(CVodeGetIntegratorStats, m->mem, &m->nsteps, &m->nfevals, &m->nlinsetups,
              &m->netfails, &m->qlast, &m->qcur, &m->hinused,
              &m->hlast, &m->hcur, &m->tcur);
+
+    THROWING(CVodeGetNonlinSolvStats, m->mem, &m->nniters, &m->nncfails);
 
     casadi_msg("CvodesInterface::integrate(" << t << ") end");
   }

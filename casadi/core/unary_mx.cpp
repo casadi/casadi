@@ -39,8 +39,8 @@ namespace casadi {
       x = densify(x);
     }
 
-    setDependencies(x);
-    setSparsity(x->sparsity());
+    set_dep(x);
+    set_sparsity(x->sparsity());
   }
 
   std::string UnaryMX::print(const std::vector<std::string>& arg) const {
@@ -62,7 +62,7 @@ namespace casadi {
     casadi_math<MX>::fun(op_, arg[0], dummy, res[0]);
   }
 
-  void UnaryMX::eval_forward(const std::vector<std::vector<MX> >& fseed,
+  void UnaryMX::ad_forward(const std::vector<std::vector<MX> >& fseed,
                      std::vector<std::vector<MX> >& fsens) const {
     // Get partial derivatives
     MX pd[2];
@@ -75,7 +75,7 @@ namespace casadi {
     }
   }
 
-  void UnaryMX::eval_reverse(const std::vector<std::vector<MX> >& aseed,
+  void UnaryMX::ad_reverse(const std::vector<std::vector<MX> >& aseed,
                      std::vector<std::vector<MX> >& asens) const {
     // Get partial derivatives
     MX pd[2];
@@ -88,12 +88,12 @@ namespace casadi {
     }
   }
 
-  void UnaryMX::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
-    copyFwd(arg[0], res[0], nnz());
+  void UnaryMX::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+    copy_fwd(arg[0], res[0], nnz());
   }
 
-  void UnaryMX::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
-    copyAdj(arg[0], res[0], nnz());
+  void UnaryMX::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+    copy_rev(arg[0], res[0], nnz());
   }
 
   void UnaryMX::generate(CodeGenerator& g, const std::string& mem,
@@ -105,8 +105,8 @@ namespace casadi {
       x = g.workel(arg[0]);
     } else {
       // Vector assignment
-      g.local("cs", "const real_t", "*");
-      g.local("rr", "real_t", "*");
+      g.local("cs", "const casadi_real", "*");
+      g.local("rr", "casadi_real", "*");
       g.local("i", "int");
       g << "for (i=0, rr=" << g.work(res[0], nnz()) << ", cs=" << g.work(arg[0], nnz())
         << "; i<" << sparsity().nnz() << "; ++i) ";
@@ -118,22 +118,22 @@ namespace casadi {
     g << r << " = " << casadi_math<double>::print(op_, " " + x + " ") << ";\n";
   }
 
-  MX UnaryMX::getUnary(int op) const {
-    if (!GlobalOptions::simplification_on_the_fly) return MXNode::getUnary(op);
+  MX UnaryMX::get_unary(int op) const {
+    if (!GlobalOptions::simplification_on_the_fly) return MXNode::get_unary(op);
 
     switch (op_) {
     case OP_NEG:
       if (op==OP_NEG) return dep();
-      else if (op==OP_SQ) return dep()->getUnary(OP_SQ);
-      else if (op==OP_FABS) return dep()->getUnary(OP_FABS);
-      else if (op==OP_COS) return dep()->getUnary(OP_COS);
+      else if (op==OP_SQ) return dep()->get_unary(OP_SQ);
+      else if (op==OP_FABS) return dep()->get_unary(OP_FABS);
+      else if (op==OP_COS) return dep()->get_unary(OP_COS);
       break;
     case OP_SQRT:
       if (op==OP_SQ) return dep();
       else if (op==OP_FABS) return shared_from_this<MX>();
       break;
     case OP_SQ:
-      if (op==OP_SQRT) return dep()->getUnary(OP_FABS);
+      if (op==OP_SQRT) return dep()->get_unary(OP_FABS);
       else if (op==OP_FABS) return shared_from_this<MX>();
       break;
     case OP_EXP:
@@ -145,8 +145,8 @@ namespace casadi {
       break;
     case OP_FABS:
       if (op==OP_FABS) return shared_from_this<MX>();
-      else if (op==OP_SQ) return dep()->getUnary(OP_SQ);
-      else if (op==OP_COS) return dep()->getUnary(OP_COS);
+      else if (op==OP_SQ) return dep()->get_unary(OP_SQ);
+      else if (op==OP_COS) return dep()->get_unary(OP_COS);
       break;
     case OP_INV:
       if (op==OP_INV) return dep();
@@ -155,18 +155,18 @@ namespace casadi {
     }
 
     // Fallback to default implementation
-    return MXNode::getUnary(op);
+    return MXNode::get_unary(op);
   }
 
-  MX UnaryMX::getBinary(int op, const MX& y, bool scX, bool scY) const {
+  MX UnaryMX::_get_binary(int op, const MX& y, bool scX, bool scY) const {
     switch (op_) {
     case OP_NEG:
-      if (op==OP_ADD) return y->getBinary(OP_SUB, dep(), scY, scX);
-      else if (op==OP_MUL) return -dep()->getBinary(OP_MUL, y, scX, scY);
-      else if (op==OP_DIV) return -dep()->getBinary(OP_DIV, y, scX, scY);
+      if (op==OP_ADD) return y->_get_binary(OP_SUB, dep(), scY, scX);
+      else if (op==OP_MUL) return -dep()->_get_binary(OP_MUL, y, scX, scY);
+      else if (op==OP_DIV) return -dep()->_get_binary(OP_DIV, y, scX, scY);
       break;
     case OP_INV:
-      if (op==OP_MUL) return y->getBinary(OP_DIV, dep(), scY, scX);
+      if (op==OP_MUL) return y->_get_binary(OP_DIV, dep(), scY, scX);
       break;
     case OP_TWICE:
       if (op==OP_SUB && MX::is_equal(y, dep(), maxDepth())) return dep();
@@ -182,7 +182,7 @@ namespace casadi {
     }
 
     // Fallback to default implementation
-    return MXNode::getBinary(op, y, scX, scY);
+    return MXNode::_get_binary(op, y, scX, scY);
   }
 
 } // namespace casadi

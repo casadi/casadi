@@ -37,6 +37,7 @@
 #include "code_generator.hpp"
 #include "calculus.hpp"
 #include "xml_file.hpp"
+#include "external.hpp"
 
 using namespace std;
 namespace casadi {
@@ -289,7 +290,7 @@ namespace casadi {
               MX v = read_expr(var);
 
               // Treat as an output
-              add_y(v, "mterm");
+              add_y("mterm", v);
             }
           } catch(exception& ex) {
             throw CasadiException(std::string("addObjectiveFunction failed: ") + ex.what());
@@ -307,7 +308,7 @@ namespace casadi {
 
               // Treat as a quadrature state
               add_q("lterm");
-              add_quad(v, "lterm_rhs");
+              add_quad("lterm_rhs", v);
             }
           } catch(exception& ex) {
             throw CasadiException(std::string("addIntegrandObjectiveFunction failed: ")
@@ -448,7 +449,7 @@ namespace casadi {
 
   }
 
-  void DaeBuilder::repr(std::ostream &stream, bool trailing_newline) const {
+  void DaeBuilder::print_short(std::ostream &stream) const {
     stream << "DAE("
            << "#s = " << this->s.size() << ", "
            << "#x = " << this->x.size() << ", "
@@ -458,15 +459,22 @@ namespace casadi {
            << "#p = " << this->p.size() << ", "
            << "#d = " << this->d.size() << ", "
            << "#u = " << this->u.size() << ")";
-    if (trailing_newline) stream << endl;
   }
 
-  void DaeBuilder::print(ostream &stream, bool trailing_newline) const {
+  void DaeBuilder::print_long(ostream &stream) const {
     // Assert correctness
     sanity_check();
 
     // Print dimensions
     repr(stream);
+
+    // Print the functions
+    if (!fun_.empty()) {
+      stream << "Functions" << endl;
+      for (const Function& f : fun_) {
+        stream << f << endl;
+      }
+    }
 
     // Print the variables
     stream << "Variables" << endl;
@@ -535,7 +543,6 @@ namespace casadi {
         stream << str(this->y[i]) << " == " << str(this->ydef[i]) << endl;
       stream << endl;
     }
-    if (trailing_newline) stream << endl;
   }
 
   void DaeBuilder::eliminate_quad() {
@@ -605,7 +612,7 @@ namespace casadi {
 
     // Find out which intermediates depends on which other
     Function f("tmp", {vertcat(this->d)}, {vertcat(this->d) - vertcat(this->ddef)});
-    Sparsity sp = f.sparsity_jac();
+    Sparsity sp = f.sparsity_jac(0, 0);
     casadi_assert(sp.is_square());
 
     // BLT transformation
@@ -680,7 +687,7 @@ namespace casadi {
 
     // Find out which differential equation depends on which differential state
     Function f("tmp", {vertcat(this->sdot)}, {vertcat(this->dae)});
-    Sparsity sp = f.sparsity_jac();
+    Sparsity sp = f.sparsity_jac(0, 0);
     casadi_assert(sp.is_square());
 
     // BLT transformation
@@ -708,7 +715,7 @@ namespace casadi {
 
     // Find out which algebraic equation depends on which algebraic state
     Function f("tmp", {vertcat(this->z)}, {vertcat(this->alg)});
-    Sparsity sp = f.sparsity_jac();
+    Sparsity sp = f.sparsity_jac(0, 0);
     casadi_assert(sp.is_square());
 
     // BLT transformation
@@ -743,7 +750,7 @@ namespace casadi {
 
     // Get the sparsity of the Jacobian which can be used to determine which
     // variable can be calculated from which other
-    Sparsity sp = f.sparsity_jac();
+    Sparsity sp = f.sparsity_jac(0, 0);
     casadi_assert(sp.is_square());
 
     // BLT transformation
@@ -824,7 +831,7 @@ namespace casadi {
 
     // Get the sparsity of the Jacobian which can be used to determine which
     // variable can be calculated from which other
-    Sparsity sp = f.sparsity_jac();
+    Sparsity sp = f.sparsity_jac(0, 0);
     casadi_assert(sp.is_square());
 
     // BLT transformation
@@ -957,24 +964,21 @@ namespace casadi {
   }
 
   MX DaeBuilder::add_x(const std::string& name, int n) {
-    if (name.empty()) // Generate a name
-      return add_x("x" + CodeGenerator::to_string(this->x.size()), n);
+    if (name.empty()) return add_x("x" + to_string(this->x.size()), n);
     MX new_x = add_variable(name, n);
     this->x.push_back(new_x);
     return new_x;
   }
 
   MX DaeBuilder::add_q(const std::string& name, int n) {
-    if (name.empty()) // Generate a name
-      return add_q("q" + CodeGenerator::to_string(this->q.size()), n);
+    if (name.empty()) return add_q("q" + to_string(this->q.size()), n);
     MX new_q = add_variable(name, n);
     this->q.push_back(new_q);
     return new_q;
   }
 
   std::pair<MX, MX> DaeBuilder::add_s(const std::string& name, int n) {
-    if (name.empty()) // Generate a name
-      return add_s("s" + CodeGenerator::to_string(this->s.size()), n);
+    if (name.empty()) return add_s("s" + to_string(this->s.size()), n);
     Variable v(name, Sparsity::dense(n));
     add_variable(name, v);
     this->s.push_back(v.v);
@@ -983,32 +987,66 @@ namespace casadi {
   }
 
   MX DaeBuilder::add_z(const std::string& name, int n) {
-    if (name.empty()) // Generate a name
-      return add_z("z" + CodeGenerator::to_string(this->z.size()), n);
+    if (name.empty()) return add_z("z" + to_string(this->z.size()), n);
     MX new_z = add_variable(name, n);
     this->z.push_back(new_z);
     return new_z;
   }
 
   MX DaeBuilder::add_p(const std::string& name, int n) {
-    if (name.empty()) // Generate a name
-      return add_p("p" + CodeGenerator::to_string(this->p.size()), n);
+    if (name.empty()) return add_p("p" + to_string(this->p.size()), n);
     MX new_p = add_variable(name, n);
     this->p.push_back(new_p);
     return new_p;
   }
 
   MX DaeBuilder::add_u(const std::string& name, int n) {
-    if (name.empty()) // Generate a name
-      return add_u("u" + CodeGenerator::to_string(this->u.size()), n);
+    if (name.empty()) return add_u("u" + to_string(this->u.size()), n);
     MX new_u = add_variable(name, n);
     this->u.push_back(new_u);
     return new_u;
   }
 
+  MX DaeBuilder::add_aux(const std::string& name, int n) {
+    if (name.empty()) return add_aux("aux" + to_string(this->aux.size()), n);
+    MX new_aux = add_variable(name, n);
+    this->aux.push_back(new_aux);
+    return new_aux;
+  }
+
+#ifdef WITH_DEPRECATED_FEATURES
   MX DaeBuilder::add_d(const MX& new_ddef, const std::string& name) {
-    if (name.empty()) // Generate a name
-      return add_d(new_ddef, "d" + CodeGenerator::to_string(this->d.size()));
+    if (name.empty()) return add_d(new_ddef, "d" + to_string(this->d.size()));
+    return add_d(name, new_ddef);
+  }
+
+  MX DaeBuilder::add_y(const MX& new_ydef, const std::string& name) {
+    if (name.empty()) return add_y(new_ydef, "y" + to_string(this->y.size()));
+    return add_y(name, new_ydef);
+  }
+
+  void DaeBuilder::add_ode(const MX& new_ode, const std::string& name) {
+    if (name.empty()) return add_ode(new_ode, "ode" + to_string(this->ode.size()));
+    return add_ode(name, new_ode);
+  }
+
+  void DaeBuilder::add_dae(const MX& new_dae, const std::string& name) {
+    if (name.empty()) return add_dae(new_dae, "dae" + to_string(this->dae.size()));
+    return add_dae(name, new_dae);
+  }
+
+  void DaeBuilder::add_alg(const MX& new_alg, const std::string& name) {
+    if (name.empty()) return add_alg(new_alg, "alg" + to_string(this->alg.size()));
+    return add_alg(name, new_alg);
+  }
+
+  void DaeBuilder::add_quad(const MX& new_quad, const std::string& name) {
+    if (name.empty()) return add_quad(new_quad, "quad" + to_string(this->quad.size()));
+    return add_quad(name, new_quad);
+  }
+#endif // WITH_DEPRECATED_FEATURES
+
+  MX DaeBuilder::add_d(const std::string& name, const MX& new_ddef) {
     MX new_d = add_variable(name, new_ddef.sparsity());
     this->d.push_back(new_d);
     this->ddef.push_back(new_ddef);
@@ -1016,9 +1054,7 @@ namespace casadi {
     return new_d;
   }
 
-  MX DaeBuilder::add_y(const MX& new_ydef, const std::string& name) {
-    if (name.empty()) // Generate a name
-      return add_y(new_ydef, "y" + CodeGenerator::to_string(this->y.size()));
+  MX DaeBuilder::add_y(const std::string& name, const MX& new_ydef) {
     MX new_y = add_variable(name, new_ydef.sparsity());
     this->y.push_back(new_y);
     this->ydef.push_back(new_ydef);
@@ -1026,30 +1062,22 @@ namespace casadi {
     return new_y;
   }
 
-  void DaeBuilder::add_ode(const MX& new_ode, const std::string& name) {
-    if (name.empty()) // Generate a name
-      return add_ode(new_ode, "ode" + CodeGenerator::to_string(this->ode.size()));
+  void DaeBuilder::add_ode(const std::string& name, const MX& new_ode) {
     this->ode.push_back(new_ode);
     this->lam_ode.push_back(MX::sym("lam_" + name, new_ode.sparsity()));
   }
 
-  void DaeBuilder::add_dae(const MX& new_dae, const std::string& name) {
-    if (name.empty()) // Generate a name
-      return add_dae(new_dae, "dae" + CodeGenerator::to_string(this->dae.size()));
+  void DaeBuilder::add_dae(const std::string& name, const MX& new_dae) {
     this->dae.push_back(new_dae);
     this->lam_dae.push_back(MX::sym("lam_" + name, new_dae.sparsity()));
   }
 
-  void DaeBuilder::add_alg(const MX& new_alg, const std::string& name) {
-    if (name.empty()) // Generate a name
-      return add_alg(new_alg, "alg" + CodeGenerator::to_string(this->alg.size()));
+  void DaeBuilder::add_alg(const std::string& name, const MX& new_alg) {
     this->alg.push_back(new_alg);
     this->lam_alg.push_back(MX::sym("lam_" + name, new_alg.sparsity()));
   }
 
-  void DaeBuilder::add_quad(const MX& new_quad, const std::string& name) {
-    if (name.empty()) // Generate a name
-      return add_quad(new_quad, "quad" + CodeGenerator::to_string(this->quad.size()));
+  void DaeBuilder::add_quad(const std::string& name, const MX& new_quad) {
     this->quad.push_back(new_quad);
     this->lam_quad.push_back(MX::sym("lam_" + name, new_quad.sparsity()));
   }
@@ -1151,7 +1179,7 @@ namespace casadi {
     return qn.str();
   }
 
-  MX DaeBuilder::operator()(const std::string& name) const {
+  MX DaeBuilder::var(const std::string& name) const {
     return variable(name).v;
   }
 
@@ -1967,8 +1995,58 @@ namespace casadi {
     }
 
     // Generate the constructed function
-    return Function(fname, ret_in, ret_out,
-                    {{"input_scheme", s_in}, {"output_scheme", s_out}});
+    return Function(fname, ret_in, ret_out, s_in, s_out);
+  }
+
+  Function DaeBuilder::add_fun(const Function& f) {
+    casadi_assert_message(!has_fun(f.name()), "Function '" + f.name() + "' already exists");
+    fun_.push_back(f);
+    return f;
+  }
+
+  Function DaeBuilder::add_fun(const std::string& name,
+                               const std::vector<std::string>& arg,
+                               const std::vector<std::string>& res,
+                               const Dict& opts) {
+    casadi_assert_message(!has_fun(name), "Function '" + name + "' already exists");
+
+    // Get inputs
+    vector<MX> arg_ex, res_ex;
+    for (auto&& s : arg) arg_ex.push_back(var(s));
+    for (auto&& s : res) {
+      // Find the binding expression FIXME(@jaeandersson)
+      int d_ind;
+      for (d_ind=0; d_ind<this->d.size(); ++d_ind) {
+        if (s==this->d.at(d_ind).name()) {
+          res_ex.push_back(this->ddef.at(d_ind));
+          break;
+        }
+      }
+      casadi_assert_message(d_ind<this->d.size(), "Cannot find dependent '" + s + "'");
+    }
+    Function ret(name, arg_ex, res_ex, arg, res, opts);
+    return add_fun(ret);
+  }
+
+  Function DaeBuilder::add_fun(const std::string& name, const Importer& compiler,
+                               const Dict& opts) {
+    casadi_assert_message(!has_fun(name), "Function '" + name + "' already exists");
+    return add_fun(external(name, compiler, opts));
+  }
+
+  bool DaeBuilder::has_fun(const std::string& name) const {
+    for (const Function& f : fun_) {
+      if (f.name()==name) return true;
+    }
+    return false;
+  }
+
+  Function DaeBuilder::fun(const std::string& name) const {
+    casadi_assert_message(has_fun(name), "No such function: '" + name + "'");
+    for (const Function& f : fun_) {
+      if (f.name()==name) return f;
+    }
+    return Function();
   }
 
 } // namespace casadi

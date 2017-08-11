@@ -7,7 +7,6 @@
 #  CPLEX_FOUND              - Set to false, or undefined, if cplex isn't found.
 #  CPLEX_INCLUDE_DIRS       - include directory
 #  CPLEX_LIBRARIES          - library files
-set(CPLEX_ROOT_DIR $ENV{CPLEX})
 # if(WIN32)
 #   execute_process(COMMAND cmd /C set CPLEX_STUDIO_DIR OUTPUT_VARIABLE CPLEX_STUDIO_DIR_VAR ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
   
@@ -60,7 +59,11 @@ set(CPLEX_ROOT_DIR $ENV{CPLEX})
 
 # else()
 
-  set(CPLEX_ROOT_DIR "" CACHE PATH "CPLEX root directory.")
+  if( "$ENV{CPLEX}" STREQUAL "" )
+    set(CPLEX_ROOT_DIR "" CACHE PATH "CPLEX root directory.")
+  else()
+    set(CPLEX_ROOT_DIR $ENV{CPLEX})
+  endif()
   set(CPLEX_WIN_PLATFORM "")
   
 # endif()

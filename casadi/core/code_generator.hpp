@@ -61,27 +61,33 @@ namespace casadi {
     std::string generate(const std::string& prefix="") const;
 
     /// Add an include file optionally using a relative path "..." instead of an absolute path <...>
-    void addInclude(const std::string& new_include, bool relative_path=false,
+    void add_include(const std::string& new_include, bool relative_path=false,
                     const std::string& use_ifdef=std::string());
 
 #ifndef SWIG
     /// Add an external function declaration
-    void addExternal(const std::string& new_external);
+    void add_external(const std::string& new_external);
+
+    /// Get a shorthand
+    std::string shorthand(const std::string& name) const;
+
+    /// Add/get a shorthand
+    std::string shorthand(const std::string& name, bool allow_adding=true);
 
     // Add a sparsity pattern
     std::string sparsity(const Sparsity& sp);
 
     // Add a sparsity pattern, get index
-    int addSparsity(const Sparsity& sp);
+    int add_sparsity(const Sparsity& sp);
 
     /** \brief Get the index of an existing sparsity pattern */
     int get_sparsity(const Sparsity& sp) const;
 
     /** \brief Get or add a constant */
-    int getConstant(const std::vector<double>& v, bool allow_adding=false);
+    int get_constant(const std::vector<double>& v, bool allow_adding=false);
 
     /** \brief Get or add an integer constant */
-    int getConstant(const std::vector<int>& v, bool allow_adding=false);
+    int get_constant(const std::vector<int>& v, bool allow_adding=false);
 
     /** \brief Represent an array constant; adding it when new */
     std::string constant(const std::vector<int>& v);
@@ -90,7 +96,7 @@ namespace casadi {
     std::string constant(const std::vector<double>& v);
 
     /** \brief Use simplified signature */
-    static bool simplifiedCall(const Function& f);
+    static bool simplified_call(const Function& f);
 
     /** \brief Generate a call to a function (generic signature) */
     std::string operator()(const Function& f, const std::string& arg,
@@ -137,12 +143,21 @@ namespace casadi {
     static std::string initializer(const std::vector<int>& v);
 
     /** \brief Sanitize source files for codegen */
-    static std::string sanitize_source(const std::string& src,
-                                       const std::vector<std::string>& inst,
-                                       bool shorthand=true);
+    std::string sanitize_source(const std::string& symbol,
+                                const std::string& src,
+                                const std::vector<std::string>& inst,
+                                bool add_shorthand=true);
 
     /** \brief Codegen inner product */
     std::string dot(int n, const std::string& x, const std::string& y);
+
+    /** \brief Codegen sparse matrix-vector multiplication */
+    std::string mv(const std::string& x, const Sparsity& sp_x,
+                   const std::string& y, const std::string& z, bool tr);
+
+    /** \brief Codegen dense matrix-vector multiplication */
+    std::string mv(const std::string& x, int nrow_x, int ncol_x,
+                   const std::string& y, const std::string& z, bool tr);
 
     /** \brief Codegen sparse matrix-matrix multiplication */
     std::string mtimes(const std::string& x, const Sparsity& sp_x,
@@ -158,20 +173,32 @@ namespace casadi {
     std::string rank1(const std::string& A, const Sparsity& sp_A, const std::string& alpha,
                       const std::string& x, const std::string& y);
 
+    /** \brief Multilinear interpolation */
     std::string interpn(int ndim, const std::string& grid, const std::string& offset,
-                                         const std::string& values, const std::string& x,
-                                         const std::string& lookup_mode,
-                                         const std::string& iw, const std::string& w);
+                        const std::string& values, const std::string& x,
+                        const std::string& lookup_mode,
+                        const std::string& iw, const std::string& w);
 
+    /** \brief Multilinear interpolation - calculate gradient */
     std::string interpn_grad(const std::string& grad,
-                                     int ndim, const std::string& grid,
-                                     const std::string& offset,
-                                     const std::string& values, const std::string& x,
-                                     const std::string& lookup_mode,
-                                     const std::string& iw, const std::string& w);
+      int ndim, const std::string& grid,
+      const std::string& offset,
+      const std::string& values, const std::string& x,
+      const std::string& lookup_mode,
+      const std::string& iw, const std::string& w);
+
+    /** \brief Central differences */
+    std::string central_diff(const std::string& m);
+
+    /** \brief Transpose */
+    std::string trans(const std::string& x, const Sparsity& sp_x,
+      const std::string& y, const Sparsity& sp_y, const std::string& iw);
 
     /** \brief Declare a function */
     std::string declare(std::string s);
+
+    /** \brief Write a comment line (ignored if not verbose) */
+    void comment(const std::string& s);
 
     /** \brief Auxiliary functions */
     enum Auxiliary {
@@ -187,10 +214,11 @@ namespace casadi {
       AUX_NORM_INF,
       AUX_IAMAX,
       AUX_FILL,
-      AUX_SQ,
-      AUX_SIGN,
+      AUX_MV,
+      AUX_MV_DENSE,
       AUX_MTIMES,
       AUX_PROJECT,
+      AUX_DENSIFY,
       AUX_TRANS,
       AUX_TO_MEX,
       AUX_FROM_MEX,
@@ -201,11 +229,13 @@ namespace casadi {
       AUX_LOW,
       AUX_INTERPN_INTERPOLATE,
       AUX_DE_BOOR,
-      AUX_ND_BOOR_EVAL
+      AUX_ND_BOOR_EVAL,
+      AUX_CENTRAL_DIFF_MEM,
+      AUX_CENTRAL_DIFF
     };
 
     /** \brief Add a built-in auxiliary function */
-    void addAuxiliary(Auxiliary f, const std::vector<std::string>& inst = {"real_t"});
+    void add_auxiliary(Auxiliary f, const std::vector<std::string>& inst = {"casadi_real"});
 
     /** Convert in integer to a string */
     static std::string to_string(int n);
@@ -262,20 +292,14 @@ namespace casadi {
     /// Print file header
     void file_close(std::ofstream& f) const;
 
-    // Generate real_t definition
-    void generate_real_t(std::ostream &s) const;
+    // Generate casadi_real definition
+    void generate_casadi_real(std::ostream &s) const;
 
     // Generate mex entry point
     void generate_mex(std::ostream &s) const;
 
     // Generate main entry point
     void generate_main(std::ostream &s) const;
-
-    /// SQUARE
-    void auxSq();
-
-    /// SIGN
-    void auxSign();
 
     //  private:
   public:
@@ -285,7 +309,7 @@ namespace casadi {
     std::string name, suffix;
 
     // Real-type used for the codegen
-    std::string real_t;
+    std::string casadi_real;
 
     // Should we create a memory entry point?
     bool with_mem;
@@ -311,6 +335,9 @@ namespace casadi {
      */
     bool codegen_scalars;
 
+    // Have a flag for exporting symbols
+    bool with_export;
+
     // Stringstreams holding the different parts of the file being generated
     std::stringstream includes;
     std::stringstream auxiliaries;
@@ -332,6 +359,7 @@ namespace casadi {
     typedef std::map<const void*, int> PointerMap;
     std::set<std::string> added_includes_;
     std::set<std::string> added_externals_;
+    std::set<std::string> added_shorthands_;
     std::multimap<Auxiliary, std::vector<std::string>> added_auxiliaries_;
     PointerMap added_sparsities_;
     PointerMap added_dependencies_;

@@ -565,6 +565,9 @@ namespace casadi {
   void Blocksqp::solve(void* mem) const {
     auto m = static_cast<BlocksqpMemory*>(mem);
 
+    // Check the provided inputs
+    checkInputs(mem);
+
     int ret = 0;
 
     // Create problem evaluation object
@@ -1843,9 +1846,9 @@ namespace casadi {
       for (int k=0; k<dim; k++)
         Bdelta[i] += B[i+k*dim] * delta[k];
 
-        h1 += delta[i] * Bdelta[i];
-        //h2 += delta[i] * gamma[i];
-      }
+      h1 += delta[i] * Bdelta[i];
+      //h2 += delta[i] * gamma[i];
+    }
     h2 = m->delta_gamma[b];
 
     /* Powell's damping strategy to maintain pos. def. (Nocedal/Wright p.537; SNOPT paper)

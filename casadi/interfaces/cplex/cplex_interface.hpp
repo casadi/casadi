@@ -42,7 +42,7 @@
 
 namespace casadi {
 
-  struct CASADI_CONIC_CPLEX_EXPORT CplexMemory {
+  struct CASADI_CONIC_CPLEX_EXPORT CplexMemory : public ConicMemory {
     /// Indicates if we have to warm-start
     bool is_warm;
 
@@ -102,34 +102,34 @@ namespace casadi {
                             const std::map<std::string, Sparsity>& st);
 
     /// Destructor
-    virtual ~CplexInterface();
+    ~CplexInterface() override;
 
     // Get name of the plugin
-    virtual const char* plugin_name() const { return "cplex";}
+    const char* plugin_name() const override { return "cplex";}
 
     ///@{
     /** \brief Options */
     static Options options_;
-    virtual const Options& get_options() const { return options_;}
+    const Options& get_options() const override { return options_;}
     ///@}
 
     // Initialize the solver
-    virtual void init(const Dict& opts);
+    void init(const Dict& opts) override;
 
     /** \brief Create memory block */
-    virtual void* alloc_memory() const { return new CplexMemory();}
+    void* alloc_memory() const override { return new CplexMemory();}
 
     /** \brief Free memory block */
-    virtual void free_memory(void *mem) const { delete static_cast<CplexMemory*>(mem);}
+    void free_memory(void *mem) const override { delete static_cast<CplexMemory*>(mem);}
 
     /** \brief Initalize memory block */
-    virtual void init_memory(void* mem) const;
+    void init_memory(void* mem) const override;
 
     // Solve the QP
-    virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
+    void eval(void* mem, const double** arg, double** res, int* iw, double* w) const override;
 
     /// Can discrete variables be treated
-    virtual bool integer_support() const { return true;}
+    bool integer_support() const override { return true;}
 
     /// All CPLEX options
     Dict opts_;

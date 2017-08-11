@@ -30,8 +30,8 @@ using namespace std;
 namespace casadi {
 
   Transpose::Transpose(const MX& x) {
-    setDependencies(x);
-    setSparsity(x.sparsity().T());
+    set_dep(x);
+    set_sparsity(x.sparsity().T());
   }
 
   void Transpose::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
@@ -88,7 +88,8 @@ namespace casadi {
     }
   }
 
-  void Transpose::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  void Transpose::
+  sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     // Shortands
     const bvec_t *x = arg[0];
     bvec_t *xT = res[0];
@@ -106,7 +107,8 @@ namespace casadi {
     }
   }
 
-  void Transpose::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  void Transpose::
+  sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     // Shortands
     bvec_t *x = arg[0];
     bvec_t *xT = res[0];
@@ -126,7 +128,8 @@ namespace casadi {
     }
   }
 
-  void DenseTranspose::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  void DenseTranspose::
+  sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     // Shorthands
     const bvec_t *x = arg[0];
     bvec_t *xT = res[0];
@@ -141,7 +144,8 @@ namespace casadi {
     }
   }
 
-  void DenseTranspose::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  void DenseTranspose::
+  sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     // Shorthands
     bvec_t *x = arg[0];
     bvec_t *xT = res[0];
@@ -165,14 +169,14 @@ namespace casadi {
     res[0] = arg[0].T();
   }
 
-  void Transpose::eval_forward(const std::vector<std::vector<MX> >& fseed,
+  void Transpose::ad_forward(const std::vector<std::vector<MX> >& fseed,
                           std::vector<std::vector<MX> >& fsens) const {
     for (int d=0; d<fsens.size(); ++d) {
       fsens[d][0] = fseed[d][0].T();
     }
   }
 
-  void Transpose::eval_reverse(const std::vector<std::vector<MX> >& aseed,
+  void Transpose::ad_reverse(const std::vector<std::vector<MX> >& aseed,
                           std::vector<std::vector<MX> >& asens) const {
     for (int d=0; d<aseed.size(); ++d) {
       asens[d][0] += aseed[d][0].T();
@@ -181,17 +185,14 @@ namespace casadi {
 
   void Transpose::generate(CodeGenerator& g, const std::string& mem,
                            const std::vector<int>& arg, const std::vector<int>& res) const {
-    g.addAuxiliary(CodeGenerator::AUX_TRANS);
-
-    g << "trans("
-      << g.work(arg[0], nnz()) << ", " << g.sparsity(dep().sparsity()) << ", "
-      << g.work(res[0], nnz()) << ", " << g.sparsity(sparsity()) << ", iw);\n";
+    g << g.trans(g.work(arg[0], nnz()), dep().sparsity(),
+                 g.work(res[0], nnz()), sparsity(), "iw") <<  ";\n";
   }
 
   void DenseTranspose::generate(CodeGenerator& g, const std::string& mem,
                                 const std::vector<int>& arg, const std::vector<int>& res) const {
-    g.local("cs", "const real_t", "*");
-    g.local("rr", "real_t", "*");
+    g.local("cs", "const casadi_real", "*");
+    g.local("rr", "casadi_real", "*");
     g.local("i", "int");
     g.local("j", "int");
     g << "for (i=0, rr=" << g.work(res[0], nnz()) << ", "

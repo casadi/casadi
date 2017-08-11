@@ -40,8 +40,8 @@ namespace casadi {
     const std::vector<int>& c, const std::vector<int>& a, const std::vector<int>& b):
       dim_c_(dim_c), dim_a_(dim_a), dim_b_(dim_b), c_(c), a_(a), b_(b) {
 
-    setDependencies(C, A, B);
-    setSparsity(C.sparsity());
+    set_dep(C, A, B);
+    set_sparsity(C.sparsity());
 
     n_iter_ = einstein_process(A, B, C, dim_a, dim_b, dim_c, a, b, c,
       iter_dims_, strides_a_, strides_b_, strides_c_);
@@ -68,7 +68,7 @@ namespace casadi {
 
   }
 
-  void Einstein::eval_forward(const std::vector<std::vector<MX> >& fseed,
+  void Einstein::ad_forward(const std::vector<std::vector<MX> >& fseed,
                                std::vector<std::vector<MX> >& fsens) const {
     for (int d=0; d<fsens.size(); ++d) {
       fsens[d][0] = fseed[d][0]
@@ -77,7 +77,7 @@ namespace casadi {
     }
   }
 
-  void Einstein::eval_reverse(const std::vector<std::vector<MX> >& aseed,
+  void Einstein::ad_reverse(const std::vector<std::vector<MX> >& aseed,
                                std::vector<std::vector<MX> >& asens) const {
     for (int d=0; d<aseed.size(); ++d) {
       asens[d][1] += MX::einstein(aseed[d][0], dep(2), dim_c_, dim_b_, dim_a_, c_, b_, a_);
@@ -88,11 +88,11 @@ namespace casadi {
 
 
 
-  void Einstein::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  void Einstein::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     evalGen<bvec_t>(arg, res, iw, w, mem);
   }
 
-  void Einstein::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  void Einstein::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     //int* ind = iw;
     //int cumprod;
 
@@ -118,7 +118,7 @@ namespace casadi {
       Contraction<bvec_t>(*c, 0, *a);
       Contraction<bvec_t>(0, *c, *b);
     }
-    copyAdj(arg[0], res[0], nnz());
+    copy_rev(arg[0], res[0], nnz());
   }
 
   void Einstein::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
@@ -138,9 +138,9 @@ namespace casadi {
     g << "for (i=0; i<" << n_iter_ << "; ++i) {\n";
 
     // Data pointers
-    g.local("cr", "const real_t", "*");
-    g.local("cs", "const real_t", "*");
-    g.local("rr", "real_t", "*");
+    g.local("cr", "const casadi_real", "*");
+    g.local("cs", "const casadi_real", "*");
+    g.local("rr", "casadi_real", "*");
     g << "cr = " << g.work(arg[1], dep(1).nnz()) << "+" << strides_a_[0] << ";\n";
     g << "cs = " << g.work(arg[2], dep(2).nnz()) << "+" << strides_b_[0] << ";\n";
     g << "rr = " << g.work(res[0], dep(0).nnz()) << "+" << strides_c_[0] << ";\n";

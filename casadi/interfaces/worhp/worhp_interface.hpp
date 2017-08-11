@@ -43,6 +43,9 @@
 #undef Q
 /**\defgroup plugin_Nlpsol_worhp
  WORHP interface
+
+ Designed for Worhp 1.10
+
 */
 /** \pluginsection{Nlpsol,worhp} **/
 
@@ -90,10 +93,10 @@ namespace casadi {
     explicit WorhpInterface(const std::string& name, const Function& nlp);
 
     // Destructor
-    virtual ~WorhpInterface();
+    ~WorhpInterface() override;
 
     // Get name of the plugin
-    virtual const char* plugin_name() const { return "worhp";}
+    const char* plugin_name() const override { return "worhp";}
 
     /** \brief  Create a new NLP Solver */
     static Nlpsol* creator(const std::string& name, const Function& nlp) {
@@ -106,32 +109,33 @@ namespace casadi {
     ///@{
     /** \brief Options */
     static Options options_;
-    virtual const Options& get_options() const { return options_;}
+    const Options& get_options() const override { return options_;}
     ///@}
 
     // Initialize the solver
-    virtual void init(const Dict& opts);
+    void init(const Dict& opts) override;
 
     /** \brief Create memory block */
-    virtual void* alloc_memory() const { return new WorhpMemory();}
+    void* alloc_memory() const override { return new WorhpMemory();}
 
     /** \brief Free memory block */
-    virtual void free_memory(void *mem) const { delete static_cast<WorhpMemory*>(mem);}
+    void free_memory(void *mem) const override { delete static_cast<WorhpMemory*>(mem);}
 
     /** \brief Initalize memory block */
-    virtual void init_memory(void* mem) const;
+    void init_memory(void* mem) const override;
 
     /** \brief Set the (persistent) work vectors */
-    virtual void set_work(void* mem, const double**& arg, double**& res,
-                          int*& iw, double*& w) const;
+    void set_work(void* mem, const double**& arg, double**& res,
+                          int*& iw, double*& w) const override;
 
     // Solve the NLP
-    virtual void solve(void* mem) const;
+    void solve(void* mem) const override;
 
     // Options
     std::map<std::string, bool> bool_opts_;
     std::map<std::string, int> int_opts_;
     std::map<std::string, double> double_opts_;
+    Dict qp_opts_;
 
     // WORHP return codes
     static const char* return_codes(int flag);

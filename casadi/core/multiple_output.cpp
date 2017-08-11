@@ -37,16 +37,16 @@ namespace casadi {
   MultipleOutput::~MultipleOutput() {
   }
 
-  MX MultipleOutput::getOutput(int oind) const {
+  MX MultipleOutput::get_output(int oind) const {
     MX this_ = shared_from_this<MX>();
     return MX::create(new OutputNode(this_, oind));
   }
 
   OutputNode::OutputNode(const MX& parent, int oind) : oind_(oind) {
-    setDependencies(parent);
+    set_dep(parent);
 
     // Save the sparsity pattern
-    setSparsity(dep(0)->sparsity(oind));
+    set_sparsity(dep(0)->sparsity(oind));
   }
 
   OutputNode::~OutputNode() {

@@ -37,8 +37,8 @@ namespace casadi {
   Solve<Tr>::Solve(const MX& r, const MX& A, const Linsol& linear_solver) :
       linsol_(linear_solver) {
     casadi_assert_message(r.size1() == A.size2(), "Solve::Solve: dimension mismatch.");
-    setDependencies(r, A);
-    setSparsity(r.sparsity());
+    set_dep(r, A);
+    set_sparsity(r.sparsity());
   }
 
   template<bool Tr>
@@ -75,13 +75,13 @@ namespace casadi {
   }
 
   template<bool Tr>
-  void Solve<Tr>::eval_forward(const std::vector<std::vector<MX> >& fseed,
+  void Solve<Tr>::ad_forward(const std::vector<std::vector<MX> >& fseed,
                           std::vector<std::vector<MX> >& fsens) const {
     // Nondifferentiated inputs and outputs
-    vector<MX> arg(ndep());
+    vector<MX> arg(n_dep());
     for (int i=0; i<arg.size(); ++i) arg[i] = dep(i);
     vector<MX> res(nout());
-    for (int i=0; i<res.size(); ++i) res[i] = getOutput(i);
+    for (int i=0; i<res.size(); ++i) res[i] = get_output(i);
 
     // Number of derivatives
     int nfwd = fseed.size();
@@ -108,13 +108,13 @@ namespace casadi {
   }
 
   template<bool Tr>
-  void Solve<Tr>::eval_reverse(const std::vector<std::vector<MX> >& aseed,
+  void Solve<Tr>::ad_reverse(const std::vector<std::vector<MX> >& aseed,
                           std::vector<std::vector<MX> >& asens) const {
     // Nondifferentiated inputs and outputs
-    vector<MX> arg(ndep());
+    vector<MX> arg(n_dep());
     for (int i=0; i<arg.size(); ++i) arg[i] = dep(i);
     vector<MX> res(nout());
-    for (int i=0; i<res.size(); ++i) res[i] = getOutput(i);
+    for (int i=0; i<res.size(); ++i) res[i] = get_output(i);
 
     // Number of derivatives
     int nadj = aseed.size();
@@ -158,7 +158,7 @@ namespace casadi {
   }
 
   template<bool Tr>
-  void Solve<Tr>::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  void Solve<Tr>::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     // Number of right-hand-sides
     int nrhs = dep(0).size2();
 
@@ -197,7 +197,7 @@ namespace casadi {
   }
 
   template<bool Tr>
-  void Solve<Tr>::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  void Solve<Tr>::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     // Number of right-hand-sides
     int nrhs = dep(0).size2();
 
@@ -239,7 +239,7 @@ namespace casadi {
 
   template<bool Tr>
   size_t Solve<Tr>::sz_arg() const {
-    return ndep() + linsol_->sz_arg();
+    return n_dep() + linsol_->sz_arg();
   }
 
   template<bool Tr>

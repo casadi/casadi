@@ -36,7 +36,7 @@ namespace casadi {
   }
 
   void Callback::construct(const std::string& name, const Dict& opts) {
-    assignNode(new CallbackInternal(name, this));
+    own(new CallbackInternal(name, this));
     (*this)->construct(opts);
   }
 
@@ -124,37 +124,44 @@ namespace casadi {
     return (*this)->FunctionInternal::get_name_out(i);
   }
 
+  bool Callback::uses_output() const {
+    return (*this)->FunctionInternal::uses_output();
+  }
+
   bool Callback::has_jacobian() const {
-    return (*this)->FunctionInternal::hasFullJacobian();
-  }
-
-  Function Callback::get_jacobian(const std::string& name, const Dict& opts) {
-    return (*this)->
-    FunctionInternal::getFullJacobian(name, name_in(), {"jac"}, opts);
+    return (*this)->FunctionInternal::has_jacobian();
   }
 
   Function Callback::
-  get_forward(const std::string& name, int nfwd,
-                  const std::vector<std::string>& i_names,
-                  const std::vector<std::string>& o_names,
-                  const Dict& opts) const {
-    return (*this)->FunctionInternal::get_forward(name, nfwd, i_names, o_names, opts);
-  }
-
-  int Callback::get_n_forward() const {
-    return (*this)->FunctionInternal::get_n_forward();
+  get_jacobian(const std::string& name,
+               const std::vector<std::string>& inames,
+               const std::vector<std::string>& onames,
+               const Dict& opts) const {
+    return (*this)->FunctionInternal::get_jacobian(name, inames, onames, opts);
   }
 
   Function Callback::
-  get_reverse(const std::string& name, int nadj,
-                  const std::vector<std::string>& i_names,
-                  const std::vector<std::string>& o_names,
-                  const Dict& opts) const {
-    return (*this)->FunctionInternal::get_reverse(name, nadj, i_names, o_names, opts);
+  get_forward(int nfwd, const std::string& name,
+              const std::vector<std::string>& inames,
+              const std::vector<std::string>& onames,
+              const Dict& opts) const {
+    return (*this)->FunctionInternal::get_forward(nfwd, name, inames, onames, opts);
   }
 
-  int Callback::get_n_reverse() const {
-    return (*this)->FunctionInternal::get_n_reverse();
+  bool Callback::has_forward(int nfwd) const {
+    return (*this)->FunctionInternal::has_forward(nfwd);
+  }
+
+  Function Callback::
+  get_reverse(int nadj, const std::string& name,
+              const std::vector<std::string>& inames,
+              const std::vector<std::string>& onames,
+              const Dict& opts) const {
+    return (*this)->FunctionInternal::get_reverse(nadj, name, inames, onames, opts);
+  }
+
+  bool Callback::has_reverse(int nadj) const {
+    return (*this)->FunctionInternal::has_reverse(nadj);
   }
 
   void Callback::alloc_w(size_t sz_w, bool persist) {

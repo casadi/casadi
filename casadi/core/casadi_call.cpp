@@ -31,7 +31,7 @@ using namespace std;
 
 namespace casadi {
 
-  MX GenericCall::projectArg(const MX& x, const Sparsity& sp, int i) {
+  MX Call::projectArg(const MX& x, const Sparsity& sp, int i) {
     if (x.size()==sp.size()) {
       // Insert sparsity projection nodes if needed
       return project(x, sp);
@@ -68,14 +68,14 @@ namespace casadi {
     for (int i=0; i<num_in; ++i) {
       arg1[i] = projectArg(arg[i], fcn_.sparsity_in(i), i);
     }
-    setDependencies(arg1);
-    setSparsity(Sparsity::scalar());
+    set_dep(arg1);
+    set_sparsity(Sparsity::scalar());
   }
 
   std::string Call::print(const std::vector<std::string>& arg) const {
     stringstream ss;
     ss << fcn_.name() << "(";
-    for (int i=0; i<ndep(); ++i) {
+    for (int i=0; i<n_dep(); ++i) {
       if (i!=0) ss << ", ";
       ss << arg.at(i);
     }
@@ -103,25 +103,25 @@ namespace casadi {
     res = create(fcn_, arg);
   }
 
-  void Call::eval_forward(const vector<vector<MX> >& fseed,
+  void Call::ad_forward(const vector<vector<MX> >& fseed,
                      vector<vector<MX> >& fsens) const {
     // Nondifferentiated inputs and outputs
-    vector<MX> arg(ndep());
+    vector<MX> arg(n_dep());
     for (int i=0; i<arg.size(); ++i) arg[i] = dep(i);
     vector<MX> res(nout());
-    for (int i=0; i<res.size(); ++i) res[i] = getOutput(i);
+    for (int i=0; i<res.size(); ++i) res[i] = get_output(i);
 
     // Call the cached functions
     fcn_->call_forward(arg, res, fseed, fsens, false, false);
   }
 
-  void Call::eval_reverse(const vector<vector<MX> >& aseed,
+  void Call::ad_reverse(const vector<vector<MX> >& aseed,
                      vector<vector<MX> >& asens) const {
     // Nondifferentiated inputs and outputs
-    vector<MX> arg(ndep());
+    vector<MX> arg(n_dep());
     for (int i=0; i<arg.size(); ++i) arg[i] = dep(i);
     vector<MX> res(nout());
-    for (int i=0; i<res.size(); ++i) res[i] = getOutput(i);
+    for (int i=0; i<res.size(); ++i) res[i] = get_output(i);
 
     // Call the cached functions
     vector<vector<MX> > v;
@@ -135,16 +135,16 @@ namespace casadi {
     }
   }
 
-  void Call::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  void Call::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     fcn_(arg, res, iw, w, mem);
   }
 
-  void Call::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  void Call::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     fcn_.rev(arg, res, iw, w, mem);
   }
 
-  void Call::addDependency(CodeGenerator& g) const {
-    fcn_->addDependency(g);
+  void Call::add_dependency(CodeGenerator& g) const {
+    fcn_->add_dependency(g);
   }
 
   bool Call::has_refcount() const {
@@ -153,7 +153,7 @@ namespace casadi {
 
   void Call::generate(CodeGenerator& g, const std::string& mem,
                       const vector<int>& arg, const vector<int>& res) const {
-    if (fcn_->simplifiedCall()) {
+    if (fcn_->simplified_call()) {
 
       // Collect input arguments
       for (int i=0; i<arg.size(); ++i) {
@@ -171,13 +171,13 @@ namespace casadi {
       }
     } else {
       // Collect input arguments
-      g.local("arg1", "const real_t", "**");
+      g.local("arg1", "const casadi_real", "**");
       for (int i=0; i<arg.size(); ++i) {
         g << "arg1[" << i << "]=" << g.work(arg[i], fcn_.nnz_in(i)) << ";\n";
       }
 
       // Collect output arguments
-      g.local("res1", "real_t", "**");
+      g.local("res1", "casadi_real", "**");
       for (int i=0; i<res.size(); ++i) {
         g << "res1[" << i << "]=" << g.work(res[i], fcn_.nnz_out(i)) << ";\n";
       }

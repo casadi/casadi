@@ -40,14 +40,15 @@ f = Function("f", [a,b],[d])
 #! 13 is an identifier of choice, 7 is the numerical value of c
 f(4,3)
 
-J = f.jacobian(0,0)
+dd_da = jacobian(d, a)
+J = Function('J', [a,b], [dd_da])
 
 #! The first derivative still depends on c
 #! Printout reads '|> 13: 11'
 J(2,9)
 
-
-J = J.jacobian(0,0)
+d2d_da2 = jacobian(dd_da, a)
+J = Function('J', [a,b], [d2d_da2])
 
 #! second derivative doesn't, so we don't get a printout
 J(2,9)

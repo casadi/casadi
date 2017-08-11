@@ -31,13 +31,6 @@
 
 #include <exception>
 
-/*
-  NOTE: The order of includes is as follows:
-  1. Forward declaration of Function (in casadi_types.hpp)
-  2. Declaration of Matrix class (in matrix.hpp), Function only as references or return values
-  3. Definition of Function (this file), requires Matrix to be complete type
-*/
-
 namespace casadi {
 
 #ifndef SWIG
@@ -46,58 +39,18 @@ namespace casadi {
 
 #endif // SWIG
 
-  /** \brief General function
+  /** \brief Function object
+      A Function instance is a general multiple-input, multiple-output function
+      where each input and output can be a sparse matrix.\n
 
-      A general function \f$f\f$ in casadi can be multi-input, multi-output.\n
-      Number of inputs:  \a nin    n_in()\n
-      Number of outputs: \a nout   n_out()\n
+      For an introduction to this class, see the CasADi user guide.\n
 
-      We can view this function as a being composed of a (\a nin, \a nout) grid of single-input,
-      single-output primitive functions.\n
-      Each such primitive function \f$f_ {i, j} \forall i \in [0, nin-1], j \in [0, nout-1]\f$ can
-      map as \f$\mathbf {R}^{n, m}\to\mathbf{R}^{p, q}\f$,
-      in which n, m, p, q can take different values for every (i, j) pair.\n
-
-      When passing input, you specify which partition \f$i\f$ is active.
-      You pass the numbers vectorized, as a vector of size \f$(n*m)\f$.\n
-      When requesting output, you specify which partition \f$j\f$ is active.
-      You get the numbers vectorized, as a vector of size \f$(p*q)\f$.\n
-
-      To calculate Jacobians, you need to have \f$(m=1, q=1)\f$.
-
-      Write the Jacobian as \f$J_ {i, j} = \nabla f_{i, j} =
-      \frac {\partial f_{i, j}(\vec{x})}{\partial \vec{x}}\f$.
-
-      We have the following relationships for function mapping from a row vector to a row vector:
-
-      \f$ \vec {s}_f = \nabla f_{i, j} . \vec{v}\f$ \n
-      \f$ \vec {s}_a = (\nabla f_{i, j})^T . \vec{w}\f$
-
-      Some quantities in these formulas must be transposed: \n
-      input  col: transpose \f$ \vec {v} \f$ and \f$\vec{s}_a\f$ \n
-      output col: transpose \f$ \vec {w} \f$ and \f$\vec{s}_f\f$ \n
-
-      NOTE: Functions are allowed to modify their input arguments when evaluating:
-            implicitFunction, IDAS solver
-      Further releases may disallow this.
-
-      \internal
-      \section Notes for developers
-
-      Each function consists of 4 files:\n
-      1. public class header file: imported in python\n
-      2. public class implementation\n
-      3. internal class header file: should only be used by derived classes\n
-      4. internal class implementation\n
-
-      python and c++ should be 1-to-1\n
-      There should be no extra features in 1.\n
-      All the functionality should exist in 1.\n
-      If it means that c++ will be more "pythonic", so be it.
-      \endinternal
+      Function is a reference counted and immutable class; copying a class instance
+      is very cheap and its behavior (with some exceptions) is not affected by
+      calling its member functions.\n
 
       \author Joel Andersson
-      \date 2010
+      \date 2010-2017
   */
   class CASADI_EXPORT Function : public SharedObject {
   public:
@@ -174,6 +127,9 @@ namespace casadi {
 #ifndef SWIG
     /** \brief  Create from node */
     static Function create(FunctionInternal* node);
+
+    /** \brief  Create from node and initialize */
+    static Function create(FunctionInternal* node, const Dict& opts);
 #endif // SWIG
     /// \endcond
 
@@ -271,8 +227,14 @@ namespace casadi {
      */
     int index_out(const std::string &name) const;
 
-    /** \brief Get default input value (NOTE: constant reference) */
+    /** \brief Get default input value */
     double default_in(int ind) const;
+
+    /** \brief Get largest input value */
+    double max_in(int ind) const;
+
+    /** \brief Get smallest input value */
+    double min_in(int ind) const;
 
     /** \brief Get sparsity of a given input */
     /// @{
@@ -323,93 +285,35 @@ namespace casadi {
     /** \brief Print free variables */
     void print_free(std::ostream &stream=casadi::userOut()) const;
 
+    /** \brief Do the derivative functions need nondifferentiated outputs? */
+    bool uses_output() const;
+
     ///@{
     /** \brief Generate a Jacobian function of output \a oind with respect to input \a iind
      * \param iind The index of the input
      * \param oind The index of the output
-     *
-     * The default behavior of this class is defined by the derived class.
-     * If compact is set to true, only the nonzeros of the input and output expressions are
-     * considered.
-     * If symmetric is set to true, the Jacobian being calculated is known to be symmetric
-     * (usually a Hessian),
-     * which can be exploited by the algorithm.
-     *
-     * The generated Jacobian has one more output than the calling function corresponding
-     * to the Jacobian and the same number of inputs.
-     *
+     * Legacy function: To be deprecated in a future version of CasADi.
+     * Exists only for compatibility with Function::jacobian pre-CasADi 3.2
      */
-    Function jacobian(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
-    Function jacobian(const std::string& iind,  int oind=0, bool compact=false,
-                      bool symmetric=false) {
-        return jacobian(index_in(iind), oind, compact, symmetric);
-    }
-    Function jacobian(int iind, const std::string& oind, bool compact=false, bool symmetric=false) {
-        return jacobian(iind, index_out(oind), compact, symmetric);
-    }
-    Function jacobian(const std::string& iind, const std::string& oind, bool compact=false,
-                      bool symmetric=false) {
-        return jacobian(index_in(iind), index_out(oind), compact, symmetric);
-    }
-    ///@}
+    Function jacobian_old(int iind, int oind) const;
 
-    #ifdef WITH_DEPRECATED_FEATURES
-    /** [DEPRECATED] Set the Jacobian function of output \a oind with respect to input \a iind
-     NOTE: Does _not_ take ownership, only weak references to the Jacobians are kept internally */
-    void setJacobian(const Function& jac, int iind=0, int oind=0, bool compact=false);
-
-    ///@{
-    /** \brief [DEPRECATED] Use Function::factory instead */
-    Function gradient(int iind=0, int oind=0);
-    Function gradient(const std::string& iind, int oind=0) {
-        return gradient(index_in(iind), oind);
-    }
-    Function gradient(int iind, const std::string& oind) {
-        return gradient(iind, index_out(oind));
-    }
-    Function gradient(const std::string& iind, const std::string& oind) {
-        return gradient(index_in(iind), index_out(oind));
-    }
-    ///@}
-
-    ///@{
-    /** \brief [DEPRECATED] Use Function::factory instead */
-    Function tangent(int iind=0, int oind=0);
-    Function tangent(const std::string& iind, int oind=0)
-    { return tangent(index_in(iind), oind); }
-    Function tangent(int iind, const std::string& oind)
-    { return tangent(iind, index_out(oind)); }
-    Function tangent(const std::string& iind, const std::string& oind)
-    { return tangent(index_in(iind), index_out(oind)); }
-    ///@}
-#endif // WITH_DEPRECATED_FEATURES
-
-    ///@{
     /** \brief Generate a Hessian function of output \a oind with respect to input \a iind
      * \param iind The index of the input
      * \param oind The index of the output
-     *
-     * The generated Hessian has two more outputs than the calling function corresponding
-     * to the Hessian and the gradients.
-     *
+     * Legacy function: To be deprecated in a future version of CasADi.
+     * Exists only for compatibility with Function::hessian pre-CasADi 3.2
      */
-    Function hessian(int iind=0, int oind=0);
-    Function hessian(const std::string& iind, int oind=0)
-    { return hessian(index_in(iind), oind); }
-    Function hessian(int iind, const std::string& oind)
-    { return hessian(iind, index_out(oind)); }
-    Function hessian(const std::string& iind, const std::string& oind)
-    { return hessian(index_in(iind), index_out(oind)); }
-    ///@}
+    Function hessian_old(int iind, int oind) const;
 
     /** \brief Generate a Jacobian function of all the inputs elements with respect to all
      * the output elements).
      */
-    Function fullJacobian();
+    Function jacobian() const;
 
-    /** Set the Jacobian of all the input nonzeros with respect to all output nonzeros
-     NOTE: Does _not_ take ownership, only weak references to the Jacobian are kept internally */
-    void setFullJacobian(const Function& jac);
+#ifdef WITH_DEPRECATED_FEATURES
+    /** \brief [DEPRECATED] Alias of Function::jacobian */
+    Function fullJacobian() const {return jacobian();}
+#endif // WITH_DEPRECATED_FEATURES
 
     ///@{
     /** \brief Evaluate the function symbolically or numerically  */
@@ -660,7 +564,7 @@ namespace casadi {
 
     ///@{
     /// Get, if necessary generate, the sparsity of a Jacobian block
-    const Sparsity sparsity_jac(int iind=0, int oind=0,
+    const Sparsity sparsity_jac(int iind, int oind,
                                 bool compact=false, bool symmetric=false) const;
     const Sparsity sparsity_jac(const std::string &iind, int oind=0,
                                 bool compact=false, bool symmetric=false) const {
@@ -675,25 +579,6 @@ namespace casadi {
       return sparsity_jac(index_in(iind), index_out(oind), compact, symmetric);
     }
     ///@}
-
-#ifdef WITH_DEPRECATED_FEATURES
-    ///@{
-    /// [DEPRECATED] Generate the sparsity of a Jacobian block
-    void set_jac_sparsity(const Sparsity& sp, int iind, int oind, bool compact=false);
-    void set_jac_sparsity(const Sparsity& sp, const std::string &iind, int oind,
-                          bool compact=false) {
-      set_jac_sparsity(sp, index_in(iind), oind, compact);
-    }
-    void set_jac_sparsity(const Sparsity& sp, int iind, const std::string &oind,
-                          bool compact=false) {
-      set_jac_sparsity(sp, iind, index_out(oind), compact);
-    }
-    void set_jac_sparsity(const Sparsity& sp, const std::string &iind, const std::string &oind,
-                          bool compact=false) {
-      set_jac_sparsity(sp, index_in(iind), index_out(oind), compact);
-    }
-    ///@}
-#endif // WITH_DEPRECATED_FEATURES
 
     /** \brief Export / Generate C code for the function */
     std::string generate(const std::string& fname, const Dict& opts=Dict()) const;
@@ -892,15 +777,12 @@ namespace casadi {
     bool has_function(const std::string& fname) const;
 
 #ifdef WITH_DEPRECATED_FEATURES
-    /** [DEPRECATED] Use oracle() instead */
-    Function rootfinder_fun() const { return oracle();}
-#endif // WITH_DEPRECATED_FEATURES
-
     /** Generate native code in the interfaced language for debugging */
     void conic_debug(const std::string &filename) const;
 
     /** Generate native code in the interfaced language for debugging */
     void conic_debug(std::ostream &file) const;
+#endif // WITH_DEPRECATED_FEATURES
 
 #ifndef SWIG
     protected:

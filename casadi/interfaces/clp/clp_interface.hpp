@@ -45,7 +45,7 @@
 
 namespace casadi {
 
-  struct CASADI_CONIC_CLP_EXPORT ClpMemory {
+  struct CASADI_CONIC_CLP_EXPORT ClpMemory : public ConicMemory {
     /// Constructor
     ClpMemory();
 
@@ -74,25 +74,25 @@ namespace casadi {
                             const std::map<std::string, Sparsity>& st);
 
     /// Destructor
-    virtual ~ClpInterface();
+    ~ClpInterface() override;
 
     // Get name of the plugin
-    virtual const char* plugin_name() const { return "clp";}
+    const char* plugin_name() const override { return "clp";}
 
     // Initialize the solver
-    virtual void init(const Dict& opts);
+    void init(const Dict& opts) override;
 
     /** \brief Create memory block */
-    virtual void* alloc_memory() const { return new ClpMemory();}
+    void* alloc_memory() const override { return new ClpMemory();}
 
     /** \brief Free memory block */
-    virtual void free_memory(void *mem) const { delete static_cast<ClpMemory*>(mem);}
+    void free_memory(void *mem) const override { delete static_cast<ClpMemory*>(mem);}
 
     /** \brief Initalize memory block */
-    virtual void init_memory(void* mem) const;
+    void init_memory(void* mem) const override;
 
     // Solve the QP
-    virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
+    void eval(void* mem, const double** arg, double** res, int* iw, double* w) const override;
 
     /// A documentation string
     static const std::string meta_doc;

@@ -49,19 +49,19 @@ namespace casadi {
     MultipleOutput();
 
     /** \brief  Destructor */
-    virtual ~MultipleOutput();
+    ~MultipleOutput() override;
 
     /** \brief  Number of outputs */
-    virtual int nout() const=0;
+    int nout() const override=0;
 
     /** \brief  Get an output */
-    virtual MX getOutput(int oind) const;
+    MX get_output(int oind) const override;
 
     /** \brief  Get the sparsity of output oind */
-    virtual const Sparsity& sparsity(int oind) const=0;
+    const Sparsity& sparsity(int oind) const override=0;
 
     /** \brief  Check if a multiple output node */
-    virtual bool isMultipleOutput() const {return true;}
+    bool has_output() const override {return true;}
 
   };
 
@@ -72,31 +72,25 @@ namespace casadi {
     OutputNode(const MX& parent, int oind);
 
     /** \brief  Destructor */
-    virtual ~OutputNode();
+    ~OutputNode() override;
 
     /** \brief  Print expression */
-    virtual std::string print(const std::vector<std::string>& arg) const;
-
-    /** \brief Is the node nonlinear */
-    virtual bool isNonLinear() {return true;}
+    std::string print(const std::vector<std::string>& arg) const override;
 
     /** \brief  Check if evaluation output */
-    virtual bool isOutputNode() const {return true;}
-
-    /** \brief  Get function input */
-    virtual int getFunction_input() const { return -1;}
+    bool is_output() const override {return true;}
 
     /** \brief  Get function output */
-    virtual int getFunctionOutput() const { return oind_;}
+    int which_output() const override { return oind_;}
 
     /** \brief Get the operation */
-    virtual int op() const { return -1;}
+    int op() const override { return -1;}
 
     /// Create a horizontal concatenation node
-    virtual MX getHorzcat(const std::vector<MX>& x) const { return dep()->getHorzcat(x);}
+    MX get_horzcat(const std::vector<MX>& x) const override { return dep()->get_horzcat(x);}
 
     /// Create a vertical concatenation node (vectors only)
-    virtual MX getVertcat(const std::vector<MX>& x) const { return dep()->getVertcat(x);}
+    MX get_vertcat(const std::vector<MX>& x) const override { return dep()->get_vertcat(x);}
 
     /** \brief  Output index */
     int oind_;

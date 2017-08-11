@@ -10,19 +10,20 @@ env:
     - MATLABRELEASE=R2014a
     - SLURP_OS=trusty
     - PYTHONPATH=/usr/local/python
+    - TRAVIS_PYTHON_VERSION=2.7
+    - NUMPYVERSION=1.11
 
 before_script:
   - set -e
   - set -o pipefail  # otherwise, piping with grep discards exit statuses
 
-
+language: generic
 
 matrix:
   include:
     - compiler: gcc
       os: linux
       dist: trusty
-      language: generic
       env: TESTMODE=valgrind
       script:
         - sudo apt-get install valgrind libgomp1 -y
@@ -42,7 +43,6 @@ matrix:
     - compiler: gcc
       os: linux
       dist: trusty
-      language: generic
       env: TESTMODE=full
       script:
         - sudo apt-get install valgrind libgomp1 -y
@@ -53,8 +53,8 @@ matrix:
         - make -j2
         - sudo make -j2 install
         - popd
-        - sudo apt-get install python-ipdb graphviz python-lxml texlive-science texlive-latex-base texlive-latex-recommended texlive-latex-extra -y
-        - sudo pip install pydot2
+        - sudo apt-get install python-ipdb graphviz texlive-science texlive-latex-base texlive-latex-recommended texlive-latex-extra -y
+        - pip install pydot2 lxml
         # travis-wait seems to stop at 20 mins, regardless if output is being generated
         - (while true ; do sleep 60 ; echo "ping" ; done ) &
 
@@ -65,27 +65,26 @@ matrix:
         - cd build
         - git clone https://github.com/jgillis/cpp-coveralls.git
         - pushd cpp-coveralls && sudo python setup.py install && popd
-        - coveralls --verbose --root .. --exclude swig -E '.*cxx' -E '.*CMakeFiles.*' -E '.*casadiPYTHON_wrap.*' -E '.*lib.*' -E '.*_export.*'  --exclude experimental --exclude _temp.cc --exclude docs --exclude codegen --exclude external_packages --exclude cmake --exclude test --gcov-options '\-lp'
+        - coveralls --verbose --root .. --exclude swig -E '.*cxx' -E '.*CMakeFiles.*' -E '.*casadiPYTHON_wrap.*' -E '.*lib.*' -E '.*_export.*'  --exclude experimental --exclude _temp.cc --exclude docs --exclude codegen --exclude external_packages --exclude cmake --exclude test --gcov-options '\-lp' >/dev/null
     - compiler: gcc
       os: linux
       dist: trusty
-      language: generic
       env:
         - TESTMODE=full-py3
         - WITH_PYTHON3=ON
+        - TRAVIS_PYTHON_VERSION=3.5
       script:
-        - sudo apt-get install cmake valgrind libgomp1 python3-dev python3-numpy python3-scipy python3-matplotlib python3-setuptools -y
-        - sudo easy_install3 pip==7.1.2
+        - sudo apt-get install cmake valgrind libgomp1 -y
         - mkdir build
         - pushd build
         - cmake --version
-        - python3 --version
+        - python --version
         - cmake -DWITH_OPENMP=OFF $casadi_build_flags -DWITH_SLICOT=OFF -DCMAKE_BUILD_TYPE=Debug -DWITH_PROFILING=ON -DWITH_DOC=ON -DWITH_EXAMPLES=ON -DWITH_EXTRA_WARNINGS=ON -DWITH_PYTHON=ON -DWITH_PYTHON3=ON -DWITH_JSON=ON ..
 
         - make -j2
         - sudo make -j2 install
         - popd
-        - python3 -c "from casadi.tools import *;loadAllCompiledPlugins()"
+        - python -c "from casadi.tools import *;loadAllCompiledPlugins()"
         
         #- (while true ; do sleep 60 ; echo "ping" ; done ) &
         #- source /home/travis/build/testbot/restricted/env.sh
@@ -94,14 +93,15 @@ matrix:
         #- echo "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA3mEl1i8wiojyJdJnwrmC3RTWCIGgUM4lmtWNWu4p4QyiBry2iB7y2qno48pZqkV/EFRsyWWeEDvbdA4etYlceKZaGJFAdqJig/247qPbamU5W5++d7zkGwA5nQDH147/+JMYk4na9RoGl2iOHMyxi7Wq0WkN11u0Slp2awluvV9UXpBl/XD74eYmUfOFop6y+Hkg/K2hyytg8vAkp33x/vy8JxSK93vbnLGsrVOVjp6Epf7Jo2C8ZHX9eVL2sfi7icjNbt6s9AnU076tBURBIEQbg+Sa8nK7v6zzJNZbn9G85t0M64BKMvcRH1BXf0VvIeBQs/yv9uZLaC9SFvj+4Q== u0052373@xen-vm03.mech.kuleuven.be" >> ~/.ssh/authorized_keys
         #- ssh -i /home/travis/build/testbot/id_rsa_travis $USER_GATE@$GATE_SERVER -R 19922:localhost:22 -N
         #- pushd test && make unittests_py_valgrind && popd
-        - sudo apt-get install graphviz python3-lxml texlive-science texlive-latex-base texlive-latex-recommended texlive-latex-extra -y
-        - sudo pip3 install pydot3
+        - sudo apt-get install graphviz texlive-science texlive-latex-base texlive-latex-recommended texlive-latex-extra -y
+        - pip install pydot3 lxml
         # travis-wait seems to stop at 20 mins, regardless if output is being generated
         - (while true ; do sleep 60 ; echo "ping" ; done ) &
 
         #- pushd test && make trunktesterbot_no_unittests_py && popd
         #- pushd test && make unittests_py_slow && popd
         #- pushd build && make json && popd
+        - rm docs/api/examples/solvers/callback.py
         - pushd test && make unittests_py && popd
         - pushd test && make unittests_py_slow && popd
         - pushd test && make examples_code_py && popd
@@ -111,7 +111,6 @@ matrix:
     - compiler: gcc
       os: linux
       dist: trusty
-      language: generic
       env: TESTMODE=docs
       script:
         - set -e
@@ -121,9 +120,8 @@ matrix:
         - make -j2
         - sudo make -j2 install
         - popd
-        - sudo pip install texttable
-        - sudo pip install pydot2
-        - sudo apt-get install graphviz python-lxml python-ipdb python-docutils doxygen -y
+        - pip install texttable pydot2 lxml ipdb docutils
+        - sudo apt-get install graphviz doxygen -y
         - pushd docs/api && make doxexport_old | grep -v "file loc from" && popd
         
         # Let's verify that we can still compile
@@ -137,7 +135,6 @@ matrix:
     - compiler: clang
       os: linux
       dist: trusty
-      language: generic
       env: TESTMODE=minimal
       script:
         - mkdir build
@@ -151,7 +148,6 @@ matrix:
     - compiler: gcc
       os: linux
       dist: trusty
-      language: generic
       env: TESTMODE=minimal
       script:
         - mkdir build
@@ -165,7 +161,6 @@ matrix:
     - compiler: gcc
       os: linux
       dist: trusty
-      language: generic
       env: TESTMODE=minimal
       script:
         - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
@@ -175,7 +170,7 @@ matrix:
         - export CXX=g++-6
         - mkdir build
         - pushd build
-        - cmake  $casadi_build_flags -DWITH_SLICOT=OFF -DWITH_DEPRECATED_FEATURES=OFF -DWITH_PYTHON=ON -DWITH_JSON=ON ..
+        - cmake  $casadi_build_flags -DWITH_SLICOT=OFF -DWITH_ERROR=ON -DWITH_EXTRA_WARNINGS=ON -DWITH_DEPRECATED_FEATURES=OFF -DWITH_PYTHON=ON -DWITH_JSON=ON ..
         - make
         - sudo make install
         - popd
@@ -184,13 +179,12 @@ matrix:
     - compiler: gcc
       os: linux
       dist: trusty
-      language: generic
       env: TESTMODE=quick
       script:
         - sudo add-apt-repository ppa:webupd8team/java -y
         - sudo apt-get update -qq
-        - sudo echo oracle-java7-installer shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections
-        - sudo apt-get install python-pyparsing libhunspell-dev oracle-java7-installer -y
+        #- sudo echo oracle-java7-installer shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections
+        - sudo apt-get install python-pyparsing libhunspell-dev default-jdk -y
         - sudo pip install hunspell
         - wget https://www.languagetool.org/download/LanguageTool-2.7.zip
         - unzip LanguageTool-2.7.zip
@@ -231,7 +225,7 @@ matrix:
         #- brew outdated pkg-config || brew install pkg-config
         #- brew doctor
         - sudo easy_install pip
-        - sudo pip install matplotlib numpy scipy
+        - pip install matplotlib numpy scipy
       script:
         - mkdir build
         - pushd build
@@ -245,7 +239,6 @@ matrix:
     - compiler: gcc
       os: linux
       dist: trusty
-      language: generic
       env: NEEDMATLAB=1
       script:
         - sudo apt-get install -y gcc-4.7 g++-4.7 gfortran-4.7
@@ -271,7 +264,6 @@ matrix:
     - compiler: gcc
       os: linux
       dist: trusty
-      language: generic
       env: NEEDMATLAB=1
       script:
         - sudo apt-add-repository ppa:octave/stable -y
@@ -301,6 +293,7 @@ before_install:
   - export casadi_build_flags="-DWITH_COMMON=ON "
   - pushd ../../ && git clone https://github.com/casadi/testbot.git
   - pushd testbot && git checkout merged && source recipes/setup.sh && popd
+  - python_setup
   - sudo apt-get install p7zip-full -y
   - |
     if [ $NEEDMATLAB ]
@@ -320,10 +313,11 @@ before_install:
   - slurp bonmin
   - slurp ipopt
   - slurp worhp
+  - slurp slicot
   - popd
   - sudo apt-get update -qq
-  - sudo apt-get install -q -y binutils gcc g++ gfortran git cmake liblapack-dev liblapack3 libblas3 ipython python-dev python-numpy python-scipy python-matplotlib coinor-libipopt-dev libmumps-seq-dev libxml2-dev
-  - sudo pip install github3.py
+  - sudo apt-get install -q -y binutils gcc g++ gfortran git cmake liblapack-dev liblapack3 libblas3 coinor-libipopt-dev libmumps-seq-dev libxml2-dev
+  - pip install github3.py
  
 after_failure:
   - pushd /home/travis/build/testbot/ && python -c "from github3 import login;from testbotcredentials import TestBotCredentials;tbc = TestBotCredentials();login(*tbc.github).repository('casadi','casadi').create_comment(sha='$TRAVIS_COMMIT',body='Failure reported by [travis](https://travis-ci.org/casadi/casadi/jobs/$TRAVIS_JOB_ID) in $TRAVIS_COMMIT_RANGE -- $TRAVIS_TEST_RESULT')" && popd

@@ -758,7 +758,7 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  void Matrix<Scalar>::print(std::ostream &stream, bool trailing_newline) const {
+  void Matrix<Scalar>::print_long(std::ostream &stream) const {
     if (is_empty()) {
       stream << "[]";
     } else if (numel()==1) {
@@ -771,16 +771,13 @@ namespace casadi {
     } else {
       print_sparse(stream, false);
     }
-    if (trailing_newline) stream << std::endl;
   }
 
   template<typename Scalar>
-  void Matrix<Scalar>::repr(std::ostream &stream, bool trailing_newline) const {
+  void Matrix<Scalar>::print_short(std::ostream &stream) const {
     stream << type_name() << "(";
-    print(stream, false);
+    print_long(stream);
     stream << ")";
-    if (trailing_newline) stream << std::endl;
-    stream << std::flush;
   }
 
   template<typename Scalar>
@@ -916,24 +913,17 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  Matrix<Scalar> Matrix<Scalar>::mrdivide(const Matrix<Scalar>& a,
-                                              const Matrix<Scalar>& b) {
-    casadi_assert_message(a.is_scalar() || b.is_scalar(), "Not implemented");
-    return a/b;
+  Matrix<Scalar> Matrix<Scalar>::mrdivide(const Matrix<Scalar>& b,
+                                              const Matrix<Scalar>& a) {
+    if (a.is_scalar() || b.is_scalar()) return b/a;
+    return solve(a.T(), b.T()).T();
   }
 
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::mldivide(const Matrix<Scalar>& a,
                                               const Matrix<Scalar>& b) {
-    casadi_assert_message(a.is_scalar() || b.is_scalar(), "Not implemented");
-    return b/a;
-  }
-
-  template<typename Scalar>
-  Matrix<Scalar> Matrix<Scalar>::mpower(const Matrix<Scalar>& a,
-                                            const Matrix<Scalar>& b) {
-    casadi_assert_message(a.is_scalar() && b.is_scalar(), "Not implemented");
-    return pow(a, b);
+    if (a.is_scalar() || b.is_scalar()) return b/a;
+    return solve(a, b);
   }
 
   template<typename Scalar>
@@ -1045,9 +1035,9 @@ namespace casadi {
                           << mtimes(x, y).dim() << " and rhs is " << z.dim() << ".");
 
     // Check if we can simplify the product
-    if (x.is_identity()) {
+    if (x.is_eye()) {
       return y + z;
-    } else if (y.is_identity()) {
+    } else if (y.is_eye()) {
       return x + z;
     } else if (x.is_zero() || y.is_zero()) {
       return z;
@@ -1414,7 +1404,7 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  bool Matrix<Scalar>::is_identity() const {
+  bool Matrix<Scalar>::is_eye() const {
 
     // Make sure that the matrix is diagonal
     if (!sparsity().is_diag()) return false;
@@ -1446,6 +1436,56 @@ namespace casadi {
     return true;
   }
 
+  // To avoid overloaded function name conflicts
+  template<typename Scalar>
+  inline Matrix<Scalar> mmin_nonstatic(const Matrix<Scalar> &x) {
+    Scalar ret;
+    const Scalar* nz = x.ptr();
+    int nnz = x.nnz();
+    for (int i=0; i<nnz; ++i) {
+      if (i==0) {
+        if (x.sparsity().is_dense()) {
+          ret = *nz++;
+        } else {
+          ret = fmin(Scalar(0), *nz++);
+        }
+      } else {
+        ret = fmin(ret, *nz++);
+      }
+    }
+    return ret;
+  }
+
+  template<typename Scalar>
+  Matrix<Scalar> Matrix<Scalar>::mmin(const Matrix<Scalar> &x) {
+    return mmin_nonstatic(x);
+  }
+
+  // To avoid overloaded function name conflicts
+  template<typename Scalar>
+  inline Matrix<Scalar> mmax_nonstatic(const Matrix<Scalar> &x) {
+    Scalar ret;
+    const Scalar* nz = x.ptr();
+    int nnz = x.nnz();
+    for (int i=0; i<nnz; ++i) {
+      if (i==0) {
+        if (x.sparsity().is_dense()) {
+          ret = *nz++;
+        } else {
+          ret = fmax(Scalar(0), *nz++);
+        }
+      } else {
+        ret = fmax(ret, *nz++);
+      }
+    }
+    return ret;
+  }
+
+  template<typename Scalar>
+  Matrix<Scalar> Matrix<Scalar>::mmax(const Matrix<Scalar> &x) {
+    return mmax_nonstatic(x);
+  }
+
   template<typename Scalar>
   bool Matrix<Scalar>::has_zeros() const {
     // Check if the structural nonzero is known to be zero
@@ -1472,10 +1512,11 @@ namespace casadi {
 
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::project(const Matrix<Scalar>& x,
-                                             const Sparsity& sp, bool intersect) {
+                                         const Sparsity& sp, bool intersect) {
     if (intersect) {
       return project(x, sp.intersect(x.sparsity()), false);
     } else {
+      casadi_assert_message(sp.size()==x.size(), "Dimension mismatch");
       Matrix<Scalar> ret = Matrix<Scalar>::zeros(sp);
       std::vector<Scalar> w(x.size1());
       casadi_project(x.ptr(), x.sparsity(), ret.ptr(), sp, get_ptr(w));
@@ -1572,10 +1613,10 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  Matrix<Scalar> Matrix<Scalar>::getMinor(const Matrix<Scalar>& x,
+  Matrix<Scalar> Matrix<Scalar>::minor(const Matrix<Scalar>& x,
                                               int i, int j) {
     int n = x.size2();
-    casadi_assert_message(n == x.size1(), "getMinor: matrix must be square");
+    casadi_assert_message(n == x.size1(), "minor: matrix must be square");
 
     // Trivial return if scalar
     if (n==1) return 1;
@@ -1604,7 +1645,7 @@ namespace casadi {
   Matrix<Scalar> Matrix<Scalar>::cofactor(const Matrix<Scalar>& A, int i, int j) {
 
     // Calculate the i, j minor
-    Matrix<Scalar> minor_ij = getMinor(A, i, j);
+    Matrix<Scalar> minor_ij = minor(A, i, j);
     // Calculate the cofactor
     int sign_i = 1-2*((i+j) % 2);
 
@@ -1631,7 +1672,7 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  Matrix<Scalar> Matrix<Scalar>::inv(const Matrix<Scalar>& x) {
+  Matrix<Scalar> Matrix<Scalar>::inv_minor(const Matrix<Scalar>& x) {
     // laplace formula
     return adj(x)/det(x);
   }
@@ -1648,7 +1689,7 @@ namespace casadi {
     if (sp==x.sparsity()) return x;
 
     // make sure that the patterns match
-    casadi_assert(sp.isReshape(x.sparsity()));
+    casadi_assert(sp.is_reshape(x.sparsity()));
 
     return Matrix<Scalar>(sp, x.nonzeros(), false);
   }
@@ -2010,7 +2051,7 @@ namespace casadi {
       } else if (a.size2()<=3) {
 
         // Form inverse by minor expansion and multiply if very small (up to 3-by-3)
-        xperm = mtimes(inv(Aperm), bperm);
+        xperm = mtimes(inv_minor(Aperm), bperm);
 
       } else {
 
@@ -2037,7 +2078,21 @@ namespace casadi {
   Matrix<Scalar> Matrix<Scalar>::
   solve(const Matrix<Scalar>& a, const Matrix<Scalar>& b,
            const std::string& lsolver, const Dict& dict) {
-    casadi_error("'solve' not defined for " + type_name());
+    casadi_error("'solve' with plugin not defined for " + type_name());
+    return Matrix<Scalar>();
+  }
+
+  template<typename Scalar>
+  Matrix<Scalar> Matrix<Scalar>::
+  inv(const Matrix<Scalar>& a) {
+    return solve(a, Matrix<Scalar>::eye(a.size1()));
+  }
+
+  template<typename Scalar>
+  Matrix<Scalar> Matrix<Scalar>::
+  inv(const Matrix<Scalar>& a,
+           const std::string& lsolver, const Dict& dict) {
+    casadi_error("'inv' with plugin not defined for " + type_name());
     return Matrix<Scalar>();
   }
 
@@ -2450,7 +2505,7 @@ namespace casadi {
     // Quick return if there are no entries to be removed
     bool remove_nothing = true;
     for (auto it=x.nonzeros().begin(); it!=x.nonzeros().end() && remove_nothing; ++it) {
-      remove_nothing = !casadi_limits<Scalar>::isAlmostZero(*it, tol);
+      remove_nothing = !casadi_limits<Scalar>::is_almost_zero(*it, tol);
     }
     if (remove_nothing) return x;
 
@@ -2469,7 +2524,7 @@ namespace casadi {
       // Loop over existing nonzeros
       for (int el=colind[cc]; el<colind[cc+1]; ++el) {
         // If it is not known to be a zero
-        if (!casadi_limits<Scalar>::isAlmostZero(x->at(el), tol)) {
+        if (!casadi_limits<Scalar>::is_almost_zero(x->at(el), tol)) {
           // Save the nonzero in its new location
           new_data.push_back(x->at(el));
 
@@ -2548,6 +2603,13 @@ namespace casadi {
         const string& lsolver, const Dict& dict) {
     Linsol mysolver("tmp", lsolver, dict);
     return mysolver.solve(A, b, false);
+  }
+
+  template<>
+  Matrix<double> Matrix<double>::
+  inv(const Matrix<double>& A,
+        const string& lsolver, const Dict& dict) {
+    return solve(A, DM::eye(A.size1()), lsolver, dict);
   }
 
   template<>
@@ -2645,7 +2707,7 @@ namespace casadi {
     for (int i=0; i<nnz(); ++i) {
       const SXElem& x = nonzeros().at(i);
       if (x.is_constant()) {
-        if (x.isNan() || x.isInf() || x.isMinusInf()) return false;
+        if (x.is_nan() || x.is_inf() || x.is_minus_inf()) return false;
       }
     }
     // Second pass: don't ignore symbolics
@@ -2661,7 +2723,7 @@ namespace casadi {
     Function temp("temp", {SX()}, {*this});
 
     // Run the function on the temporary variable
-    auto *t = dynamic_cast<SXFunction *>(temp.get());
+    SXFunction* t = temp.get<SXFunction>();
     return t->is_smooth();
   }
 
@@ -2766,9 +2828,9 @@ namespace casadi {
         // symbolic nodes have weight one and itself as factor
         w.push_back(1);
         f.push_back(to_be_expanded.top());
-      } else { // binary node
+      } else { // unary or binary node
 
-        casadi_assert(to_be_expanded.top()->hasDep()); // make sure that the node is binary
+        casadi_assert(to_be_expanded.top()->n_dep()); // make sure that the node is binary
 
         // Check if addition, subtracton or multiplication
         SXNode* node = to_be_expanded.top();
@@ -2924,19 +2986,19 @@ namespace casadi {
 
     // Gauss points
     vector<double> xi;
-    xi.push_back(-sqrt(5 + 2*sqrt(10.0/7))/3);
-    xi.push_back(-sqrt(5 - 2*sqrt(10.0/7))/3);
+    xi.push_back(-std::sqrt(5 + 2*std::sqrt(10.0/7))/3);
+    xi.push_back(-std::sqrt(5 - 2*std::sqrt(10.0/7))/3);
     xi.push_back(0);
-    xi.push_back(sqrt(5 - 2*sqrt(10.0/7))/3);
-    xi.push_back(sqrt(5 + 2*sqrt(10.0/7))/3);
+    xi.push_back(std::sqrt(5 - 2*std::sqrt(10.0/7))/3);
+    xi.push_back(std::sqrt(5 + 2*std::sqrt(10.0/7))/3);
 
     // Gauss weights
     vector<double> wi;
-    wi.push_back((322-13*sqrt(70.0))/900.0);
-    wi.push_back((322+13*sqrt(70.0))/900.0);
+    wi.push_back((322-13*std::sqrt(70.0))/900.0);
+    wi.push_back((322+13*std::sqrt(70.0))/900.0);
     wi.push_back(128/225.0);
-    wi.push_back((322+13*sqrt(70.0))/900.0);
-    wi.push_back((322-13*sqrt(70.0))/900.0);
+    wi.push_back((322+13*std::sqrt(70.0))/900.0);
+    wi.push_back((322-13*std::sqrt(70.0))/900.0);
 
     // Evaluate at the Gauss points
     Function fcn("gauss_quadrature", {x}, {f});
@@ -3037,7 +3099,7 @@ namespace casadi {
     Function f("tmp", f_in, f_out);
 
     // Get references to the internal data structures
-    auto *ff = dynamic_cast<SXFunction *>(f.get());
+    SXFunction *ff = f.get<SXFunction>();
     const vector<ScalarAtomic>& algorithm = ff->algorithm_;
     vector<SXElem> work(f.getWorkSize());
 
@@ -3107,19 +3169,19 @@ namespace casadi {
   template<>
   SX SX::jacobian(const SX &ex, const SX &arg, const Dict& opts) {
     Function temp("temp", {arg}, {ex});
-    return temp->jac_sx(0, 0, opts);
+    return temp.get<SXFunction>()->jac(0, 0, opts);
   }
 
   template<>
   SX SX::gradient(const SX &ex, const SX &arg) {
     Function temp("temp", {arg}, {ex});
-    return temp->grad_sx(0, 0);
+    return temp.get<SXFunction>()->grad(0, 0);
   }
 
   template<>
   SX SX::tangent(const SX &ex, const SX &arg) {
     Function temp("temp", {arg}, {ex});
-    return temp->tang_sx(0, 0);
+    return temp.get<SXFunction>()->tang(0, 0);
   }
 
   template<>
@@ -3280,7 +3342,7 @@ namespace casadi {
 
     // Sort the expression
     Function f("tmp", vector<SX>(), ex);
-    auto *ff = dynamic_cast<SXFunction *>(f.get());
+    SXFunction *ff = f.get<SXFunction>();
 
     // Get references to the internal data structures
     const vector<ScalarAtomic>& algorithm = ff->algorithm_;

@@ -113,7 +113,7 @@ namespace casadi {
     }
   }
 
-  void LinearInterpolant::generateBody(CodeGenerator& g) const {
+  void LinearInterpolant::codegen_body(CodeGenerator& g) const {
     g << "  if (res[0]) {\n"
       << "    res[0][0] = " << g.interpn(ndim_, g.constant(grid_), g.constant(offset_),
       g.constant(values_), "arg[0]", g.constant(lookup_mode_), "iw", "w") << "\n"
@@ -121,12 +121,12 @@ namespace casadi {
   }
 
   Function LinearInterpolant::
-  getFullJacobian(const std::string& name,
-                  const std::vector<std::string>& i_names,
-                  const std::vector<std::string>& o_names,
-                  const Dict& opts) {
+  get_jacobian(const std::string& name,
+                  const std::vector<std::string>& inames,
+                  const std::vector<std::string>& onames,
+                  const Dict& opts) const {
     Function ret;
-    ret.assignNode(new LinearInterpolantJac(name));
+    ret.own(new LinearInterpolantJac(name));
     ret->construct(opts);
     return ret;
   }
@@ -149,7 +149,7 @@ namespace casadi {
   }
 
 
-  void LinearInterpolantJac::generateBody(CodeGenerator& g) const {
+  void LinearInterpolantJac::codegen_body(CodeGenerator& g) const {
 
     auto m = derivative_of_.get<LinearInterpolant>();
 

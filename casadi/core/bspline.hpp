@@ -83,7 +83,7 @@ namespace casadi {
         const std::vector<int>& degree, int m);
 
       /** \brief  Destructor */
-      virtual ~BSpline() {}
+      ~BSpline() override {}
 
       /// @{
       /** \brief Sparsities of function inputs and outputs */
@@ -99,36 +99,40 @@ namespace casadi {
 
       ///@{
       /** \brief Generate a function that calculates \a nfwd forward derivatives */
-      Function get_forward(const std::string& name, int nfwd,
-                                   const std::vector<std::string>& i_names,
-                                   const std::vector<std::string>& o_names,
-                                   const Dict& opts) const override;
-      int get_n_forward() const override { return 64;}
+      bool has_forward(int nfwd) const override { return true;}
+      Function get_forward(int nfwd, const std::string& name,
+                           const std::vector<std::string>& inames,
+                           const std::vector<std::string>& onames,
+                           const Dict& opts) const override;
       ///@}
 
       ///@{
       /** \brief Generate a function that calculates \a nadj adjoint derivatives */
-      virtual Function get_reverse(const std::string& name, int nadj,
-                                   const std::vector<std::string>& i_names,
-                                   const std::vector<std::string>& o_names,
-                                   const Dict& opts) const override;
-      int get_n_reverse() const override { return 64;}
+      bool has_reverse(int nadj) const override { return true;}
+      Function get_reverse(int nadj, const std::string& name,
+                           const std::vector<std::string>& inames,
+                           const std::vector<std::string>& onames,
+                           const Dict& opts) const override;
       ///@}
 
-      bool hasFullJacobian() const override { return true;}
-      Function getFullJacobian(const std::string& name,
-            const std::vector<std::string>& i_names,
-            const std::vector<std::string>& o_names, const Dict& opts) override;
+      ///@{
+      /** \brief Return Jacobian of all input elements with respect to all output elements */
+      bool has_jacobian() const override { return true;}
+      Function get_jacobian(const std::string& name,
+                            const std::vector<std::string>& inames,
+                            const std::vector<std::string>& onames,
+                            const Dict& opts) const override;
+      ///@}
 
       /** \brief  Print description */
-      void print(std::ostream &stream) const override { stream << "BSpline"; }
+      void print_long(std::ostream &stream) const override { stream << "BSpline"; }
 
       /** \brief Is codegen supported? */
       bool has_codegen() const override { return true;}
 
       /** \brief Generate code for the body of the C function */
-      void generateBody(CodeGenerator& g) const override;
-      void generateDeclarations(CodeGenerator& g) const override {};
+      void codegen_body(CodeGenerator& g) const override;
+      void codegen_declarations(CodeGenerator& g) const override {};
 
       std::string type_name() const override { return "BSpline"; }
 
@@ -152,7 +156,7 @@ namespace casadi {
         const std::vector<int>& degree, int m, bool reverse);
 
       /** \brief  Destructor */
-      virtual ~BSplineDual() {}
+      ~BSplineDual() override {}
 
       ///@{
       /** \brief Number of function inputs and outputs */
@@ -174,28 +178,28 @@ namespace casadi {
 
       ///@{
       /** \brief Generate a function that calculates \a nfwd forward derivatives */
-      Function get_forward(const std::string& name, int nfwd,
-                             const std::vector<std::string>& i_names,
-                             const std::vector<std::string>& o_names,
-                             const Dict& opts) const override;
-      int get_n_forward() const override { return 64;}
+      bool has_forward(int nfwd) const override { return true;}
+      Function get_forward(int nfwd, const std::string& name,
+                           const std::vector<std::string>& inames,
+                           const std::vector<std::string>& onames,
+                           const Dict& opts) const override;
       ///@}
 
       ///@{
       /** \brief Generate a function that calculates \a nadj adjoint derivatives */
-      Function get_reverse(const std::string& name, int nadj,
-                                   const std::vector<std::string>& i_names,
-                                   const std::vector<std::string>& o_names,
-                                   const Dict& opts) const override;
-      int get_n_reverse() const override { return 64;}
+      bool has_reverse(int nadj) const override { return true;}
+      Function get_reverse(int nadj, const std::string& name,
+                           const std::vector<std::string>& inames,
+                           const std::vector<std::string>& onames,
+                           const Dict& opts) const override;
       ///@}
 
 
       /** \brief  Propagate sparsity forward */
-      void sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
+      void sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
 
       /** \brief  Propagate sparsity backwards */
-      void sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
+      void sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
 
       ///@{
       /// Is the class able to propagate seeds through the algorithm?
@@ -204,14 +208,14 @@ namespace casadi {
       ///@}
 
       /** \brief  Print description */
-      void print(std::ostream &stream) const override { stream << "BSplineDual"; }
+      void print_long(std::ostream &stream) const override { stream << "BSplineDual"; }
 
       /** \brief Is codegen supported? */
       bool has_codegen() const override { return true;}
 
       /** \brief Generate code for the body of the C function */
-      void generateBody(CodeGenerator& g) const override;
-      void generateDeclarations(CodeGenerator& g) const override {};
+      void codegen_body(CodeGenerator& g) const override;
+      void codegen_declarations(CodeGenerator& g) const override {};
 
       std::string type_name() const override { return "BSplineDual"; }
 

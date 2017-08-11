@@ -29,8 +29,8 @@ using namespace std;
 namespace casadi {
 
   Norm::Norm(const MX& x) {
-    setDependencies(x);
-    setSparsity(Sparsity::scalar());
+    set_dep(x);
+    set_sparsity(Sparsity::scalar());
   }
 
   std::string NormF::print(const std::vector<std::string>& arg) const {
@@ -51,18 +51,18 @@ namespace casadi {
   }
 
   void NormF::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
-    res[0] = arg[0]->getNormF();
+    res[0] = arg[0]->get_norm_fro();
   }
 
-  void NormF::eval_forward(const std::vector<std::vector<MX> >& fseed,
+  void NormF::ad_forward(const std::vector<std::vector<MX> >& fseed,
                       std::vector<std::vector<MX> >& fsens) const {
     MX self = shared_from_this<MX>();
     for (int d=0; d<fsens.size(); ++d) {
-      fsens[d][0] = dep(0)->getDot(fseed[d][0]) / self;
+      fsens[d][0] = dep(0)->get_dot(fseed[d][0]) / self;
     }
   }
 
-  void NormF::eval_reverse(const std::vector<std::vector<MX> >& aseed,
+  void NormF::ad_reverse(const std::vector<std::vector<MX> >& aseed,
                       std::vector<std::vector<MX> >& asens) const {
     MX self = shared_from_this<MX>();
     for (int d=0; d<aseed.size(); ++d) {

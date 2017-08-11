@@ -181,55 +181,55 @@ namespace casadi {
     if (ref.is_null()) {
       stream << "None";
     } else {
-      ref->print(stream);
+      ref->print_long(stream);
     }
     return stream;
   }
 
   GenericType::GenericType(bool b) {
-    assignNode(new BoolType(b));
+    own(new BoolType(b));
   }
 
   GenericType::GenericType(int i) {
-    assignNode(new IntType(i));
+    own(new IntType(i));
   }
 
   GenericType::GenericType(double d) {
-    assignNode(new DoubleType(d));
+    own(new DoubleType(d));
   }
 
   GenericType::GenericType(const vector<int>& iv) {
-    assignNode(new IntVectorType(iv));
+    own(new IntVectorType(iv));
   }
 
   GenericType::GenericType(const vector<vector<int> >& ivv) {
-    assignNode(new IntVectorVectorType(ivv));
+    own(new IntVectorVectorType(ivv));
   }
 
   GenericType::GenericType(const vector<bool>& b_vec) {
     vector<int> i_vec(b_vec.size());
     copy(b_vec.begin(), b_vec.end(), i_vec.begin());
-    assignNode(new IntVectorType(i_vec));
+    own(new IntVectorType(i_vec));
   }
 
   GenericType::GenericType(const vector<double>& dv) {
-    assignNode(new DoubleVectorType(dv));
+    own(new DoubleVectorType(dv));
   }
 
   GenericType::GenericType(const vector<string>& sv) {
-    assignNode(new StringVectorType(sv));
+    own(new StringVectorType(sv));
   }
 
   GenericType::GenericType(const string& s) {
-    assignNode(new StringType(s));
+    own(new StringType(s));
   }
 
   GenericType::GenericType(const char s[]) {
-    assignNode(new StringType(s));
+    own(new StringType(s));
   }
 
   GenericType::GenericType(const Function& f) {
-    assignNode(new FunctionType(f));
+    own(new FunctionType(f));
   }
 
   const bool& GenericType::as_bool() const {
@@ -432,7 +432,7 @@ namespace casadi {
   }
 
   GenericType::GenericType(const Dict& dict) {
-    assignNode(new DictType(dict));
+    own(new DictType(dict));
   }
 
   void* GenericType::to_void_pointer() const {
@@ -441,7 +441,7 @@ namespace casadi {
   }
 
   GenericType::GenericType(void* ptr) {
-    assignNode(new VoidPointerType(ptr));
+    own(new VoidPointerType(ptr));
   }
 
   TypeID GenericType::getType() const {

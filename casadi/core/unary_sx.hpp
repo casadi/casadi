@@ -60,30 +60,30 @@ class UnarySX : public SXNode {
     }
 
     /** \brief Destructor */
-    virtual ~UnarySX() {}
+    ~UnarySX() override {}
 
-    virtual bool is_smooth() const { return operation_checker<SmoothChecker>(op_);}
+    bool is_smooth() const override { return operation_checker<SmoothChecker>(op_);}
 
-    virtual bool hasDep() const { return true; }
+    bool is_op(int op) const override { return op_==op; }
 
     /** \brief Check if two nodes are equivalent up to a given depth */
-    virtual bool is_equal(const SXNode* node, int depth) const {
+    bool is_equal(const SXNode* node, int depth) const override {
       const UnarySX* n = dynamic_cast<const UnarySX*>(node);
       return n && n->op_ == op_ &&  SXElem::is_equal(n->dep_, dep_, depth-1);
     }
 
     /** \brief  Number of dependencies */
-    virtual int ndep() const { return 1;}
+    int n_dep() const override { return 1;}
 
     /** \brief  get the reference of a dependency */
-    virtual const SXElem& dep(int i) const { return dep_; }
-    virtual SXElem& dep(int i) { return dep_; }
+    const SXElem& dep(int i) const override { return dep_; }
+    SXElem& dep(int i) override { return dep_; }
 
     /** \brief  Get the operation */
-    virtual int op() const { return op_;}
+    int op() const override { return op_;}
 
     /** \brief  Print expression */
-    virtual std::string print(const std::string& arg1, const std::string& arg2) const {
+    std::string print(const std::string& arg1, const std::string& arg2) const  override {
       return casadi_math<double>::print(op_, arg1);
     }
 
