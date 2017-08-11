@@ -469,9 +469,6 @@
 %exception  casadi::FunctionInternal::codegen_name(const CodeGenerator &g) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::FunctionInternal::codegen_shorthand(CodeGenerator &g, const std::string &name) const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::FunctionInternal::construct(const Dict &opts) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }

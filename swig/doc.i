@@ -950,14 +950,6 @@ casadi::FunctionInternal::codegen_declarations(CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::codegen_shorthand(CodeGenerator &g, const
-std::string &name) const  "
-
-[INTERNAL]  Generate shorthand macro.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::alloc_arg(size_t sz_arg,
 bool persistent=false) "
 
@@ -2258,13 +2250,6 @@ std::vector< std::vector< M > > &aseed) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::alloc_w(size_t sz_w, bool
-persistent=false) "
-
-[INTERNAL]  Ensure required length of w field.
-
-";
-
 %feature("docstring")  casadi::BSpline::get_sparsity_in(int i) override "
 
 Sparsities of function inputs and outputs.
@@ -3115,11 +3100,10 @@ casadi::FunctionInternal::codegen_decref(CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::codegen_shorthand(CodeGenerator &g, const
-std::string &name) const  "
+%feature("docstring")  casadi::FunctionInternal::alloc_w(size_t sz_w, bool
+persistent=false) "
 
-[INTERNAL]  Generate shorthand macro.
+[INTERNAL]  Ensure required length of w field.
 
 ";
 
@@ -4900,14 +4884,6 @@ elements.
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::codegen_shorthand(CodeGenerator &g, const
-std::string &name) const  "
-
-[INTERNAL]  Generate shorthand macro.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::replace_arg(const
 std::vector< M > &arg) const  "
 
@@ -5233,11 +5209,9 @@ Propagate sparsity backwards.
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::codegen_shorthand(CodeGenerator &g, const
-std::string &name) const  "
+%feature("docstring")  casadi::FunctionInternal::clear_memory() "
 
-[INTERNAL]  Generate shorthand macro.
+[INTERNAL]  Clear all memory (called from destructor)
 
 ";
 
@@ -6051,12 +6025,6 @@ get_forward(int nfwd) if no cached version is available.
 %feature("docstring")  casadi::FunctionInternal::wrap() const  "
 
 [INTERNAL]  Wrap in an Function instance consisting of only one MX call.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::clear_memory() "
-
-[INTERNAL]  Clear all memory (called from destructor)
 
 ";
 
@@ -7531,14 +7499,6 @@ const  "
 %feature("docstring")  casadi::FunctionInternal::has_free() const  "
 
 [INTERNAL]  Does the function have free variables.
-
-";
-
-%feature("docstring")
-casadi::FunctionInternal::codegen_shorthand(CodeGenerator &g, const
-std::string &name) const  "
-
-[INTERNAL]  Generate shorthand macro.
 
 ";
 
@@ -9254,14 +9214,6 @@ std::string &iname) const  "
 %feature("docstring")  casadi::CentralDiff::uses_output() const override "
 
 [INTERNAL]  Is the scheme using the (nondifferentiated) output?
-
-";
-
-%feature("docstring")
-casadi::FunctionInternal::codegen_shorthand(CodeGenerator &g, const
-std::string &name) const  "
-
-[INTERNAL]  Generate shorthand macro.
 
 ";
 
@@ -11265,14 +11217,6 @@ classes.
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::codegen_shorthand(CodeGenerator &g, const
-std::string &name) const  "
-
-[INTERNAL]  Generate shorthand macro.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::fwd_seed(int nfwd) const  "
 
 [INTERNAL]  Symbolic expressions for the forward seeds.
@@ -12465,14 +12409,6 @@ Parameters:
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
-
-";
-
-%feature("docstring")
-casadi::FunctionInternal::codegen_shorthand(CodeGenerator &g, const
-std::string &name) const  "
-
-[INTERNAL]  Generate shorthand macro.
 
 ";
 
@@ -15543,14 +15479,6 @@ generated function.
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::codegen_shorthand(CodeGenerator &g, const
-std::string &name) const  "
-
-[INTERNAL]  Generate shorthand macro.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::reverse(int nadj) const  "
 
 [INTERNAL]  Return function that calculates adjoint derivatives
@@ -16650,14 +16578,6 @@ constructor), this class should invoke this function when initialized.
 %feature("docstring")  casadi::FunctionInternal::free_mx() const  "
 
 [INTERNAL]  Get free variables ( MX)
-
-";
-
-%feature("docstring")
-casadi::FunctionInternal::codegen_shorthand(CodeGenerator &g, const
-std::string &name) const  "
-
-[INTERNAL]  Generate shorthand macro.
 
 ";
 
@@ -18431,14 +18351,6 @@ structure recognition.
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::codegen_shorthand(CodeGenerator &g, const
-std::string &name) const  "
-
-[INTERNAL]  Generate shorthand macro.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::get_fd(int nfwd, const
 std::string &name, const std::vector< std::string > &inames, const
 std::vector< std::string > &onames, const Dict &opts) const  "
@@ -19198,14 +19110,6 @@ original
 %feature("docstring")  casadi::FunctionInternal::memory(int ind) const  "
 
 [INTERNAL]  Memory objects.
-
-";
-
-%feature("docstring")
-casadi::FunctionInternal::codegen_shorthand(CodeGenerator &g, const
-std::string &name) const  "
-
-[INTERNAL]  Generate shorthand macro.
 
 ";
 
@@ -21819,7 +21723,7 @@ Absolute value: x -> abs(x)
 
 %feature("docstring")  sq(const ExType &x) "
 
-Square root: x -> sqrt(x)
+Square: x -> x^2.
 
 ";
 
@@ -22027,7 +21931,7 @@ Logical greater than: (x,y) -> x > y.
 %feature("docstring")  casadi::GenericExpression< ExType >::sq(const ExType
 &x) "
 
-Square root: x -> sqrt(x)
+Square: x -> x^2.
 
 ";
 
@@ -23172,14 +23076,6 @@ structure recognition for symmetric Jacobians
 
 [INTERNAL]  Calculate derivatives by multiplying the full Jacobian and
 multiplying.
-
-";
-
-%feature("docstring")
-casadi::FunctionInternal::codegen_shorthand(CodeGenerator &g, const
-std::string &name) const  "
-
-[INTERNAL]  Generate shorthand macro.
 
 ";
 
@@ -24941,11 +24837,10 @@ const std::string &fname, bool decl_static) const  "
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::codegen_shorthand(CodeGenerator &g, const
-std::string &name) const  "
+%feature("docstring")  casadi::FunctionInternal::alloc(const Function &f,
+bool persistent=false) "
 
-[INTERNAL]  Generate shorthand macro.
+[INTERNAL]  Ensure work vectors long enough to evaluate function.
 
 ";
 
@@ -25291,13 +25186,6 @@ SXElem **res, int *iw, SXElem *w, int mem) const  "
 %feature("docstring")  casadi::FunctionInternal::sz_arg() const  "
 
 [INTERNAL]  Get required length of arg field.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::alloc(const Function &f,
-bool persistent=false) "
-
-[INTERNAL]  Ensure work vectors long enough to evaluate function.
 
 ";
 
@@ -26410,14 +26298,6 @@ std::vector< M > &arg) const  "
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::codegen_shorthand(CodeGenerator &g, const
-std::string &name) const  "
-
-[INTERNAL]  Generate shorthand macro.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::print_free(std::ostream
 &stream) const  "
 
@@ -27525,14 +27405,6 @@ std::vector< M > &arg) const  "
 %feature("docstring")  casadi::FunctionInternal::eval_name() const  "
 
 [INTERNAL]  Get name of the evaluation function.
-
-";
-
-%feature("docstring")
-casadi::FunctionInternal::codegen_shorthand(CodeGenerator &g, const
-std::string &name) const  "
-
-[INTERNAL]  Generate shorthand macro.
 
 ";
 
@@ -28997,14 +28869,6 @@ elements.
 %feature("docstring")  casadi::FunctionInternal::numel_out() const  "
 
 [INTERNAL]  Number of input/output elements.
-
-";
-
-%feature("docstring")
-casadi::FunctionInternal::codegen_shorthand(CodeGenerator &g, const
-std::string &name) const  "
-
-[INTERNAL]  Generate shorthand macro.
 
 ";
 
@@ -30979,14 +30843,6 @@ std::string &fname, const Dict &opts) const  "
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::codegen_shorthand(CodeGenerator &g, const
-std::string &name) const  "
-
-[INTERNAL]  Generate shorthand macro.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::print_option(const
 std::string &name, std::ostream &stream) const  "
 
@@ -31892,13 +31748,6 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::alloc_iw(size_t sz_iw, bool
-persistent=false) "
-
-[INTERNAL]  Ensure required length of iw field.
-
-";
-
 %feature("docstring") casadi::LapackLu::LapackLu(const std::string &name) "
 
 [INTERNAL] ";
@@ -32345,11 +32194,10 @@ std::vector< M > &arg) const  "
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::codegen_shorthand(CodeGenerator &g, const
-std::string &name) const  "
+%feature("docstring")  casadi::FunctionInternal::alloc_iw(size_t sz_iw, bool
+persistent=false) "
 
-[INTERNAL]  Generate shorthand macro.
+[INTERNAL]  Ensure required length of iw field.
 
 ";
 
@@ -34327,14 +34175,6 @@ elements.
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::codegen_shorthand(CodeGenerator &g, const
-std::string &name) const  "
-
-[INTERNAL]  Generate shorthand macro.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::sz_work(size_t &sz_arg,
 size_t &sz_res, size_t &sz_iw, size_t &sz_w) const  "
 
@@ -35550,14 +35390,6 @@ std::string > &s_out, const Function::AuxOut &aux, const Dict &opts) const
 &name) const  "
 
 [INTERNAL]  Get input scheme index by name.
-
-";
-
-%feature("docstring")
-casadi::FunctionInternal::codegen_shorthand(CodeGenerator &g, const
-std::string &name) const  "
-
-[INTERNAL]  Generate shorthand macro.
 
 ";
 
@@ -36870,14 +36702,6 @@ allow_forward, bool allow_reverse) const  "
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::codegen_shorthand(CodeGenerator &g, const
-std::string &name) const  "
-
-[INTERNAL]  Generate shorthand macro.
-
-";
-
 %feature("docstring") casadi::LinearInterpolantJac::~LinearInterpolantJac "
 
 [INTERNAL]  Destructor.
@@ -37940,14 +37764,6 @@ const std::string &msg) const  "
 const std::vector< MatType > &v) const  "
 
 [INTERNAL]  Symbolic expressions for the adjoint seeds.
-
-";
-
-%feature("docstring")
-casadi::FunctionInternal::codegen_shorthand(CodeGenerator &g, const
-std::string &name) const  "
-
-[INTERNAL]  Generate shorthand macro.
 
 ";
 
@@ -39781,14 +39597,6 @@ classes.
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::codegen_shorthand(CodeGenerator &g, const
-std::string &name) const  "
-
-[INTERNAL]  Generate shorthand macro.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::get_function() const  "
 
 [INTERNAL] ";
@@ -40858,14 +40666,6 @@ std::vector< std::string > &onames, const Dict &opts) const  "
 std::vector< M > &res) const  "
 
 [INTERNAL]  Check if output arguments have correct length and dimensions.
-
-";
-
-%feature("docstring")
-casadi::FunctionInternal::codegen_shorthand(CodeGenerator &g, const
-std::string &name) const  "
-
-[INTERNAL]  Generate shorthand macro.
 
 ";
 
@@ -41979,7 +41779,7 @@ Get the number of columns, Octave-style syntax.
 %feature("docstring")  casadi::GenericExpression< Matrix< Scalar >
 >::sq(const Matrix< Scalar > &x) "
 
-Square root: x -> sqrt(x)
+Square: x -> x^2.
 
 ";
 
@@ -43366,7 +43166,7 @@ Set a set of nonzeros
 
 %feature("docstring")  casadi::GenericExpression< MX  >::sq(const MX &x) "
 
-Square root: x -> sqrt(x)
+Square: x -> x^2.
 
 ";
 
@@ -44631,14 +44431,6 @@ SXElem **res, int *iw, SXElem *w, int mem) const  "
 
 [INTERNAL] ";
 
-%feature("docstring")
-casadi::FunctionInternal::codegen_shorthand(CodeGenerator &g, const
-std::string &name) const  "
-
-[INTERNAL]  Generate shorthand macro.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::codegen_body(CodeGenerator
 &g) const  "
 
@@ -45862,14 +45654,6 @@ std::vector< M > &arg) const  "
 std::string &name) const override "
 
 [INTERNAL] ";
-
-%feature("docstring")
-casadi::FunctionInternal::codegen_shorthand(CodeGenerator &g, const
-std::string &name) const  "
-
-[INTERNAL]  Generate shorthand macro.
-
-";
 
 %feature("docstring")  casadi::FunctionInternal::signature(const std::string
 &fname) const  "
@@ -47422,14 +47206,6 @@ persistent=false) "
 %feature("docstring")  casadi::FunctionInternal::release(int mem) const  "
 
 [INTERNAL]  Release a memory object.
-
-";
-
-%feature("docstring")
-casadi::FunctionInternal::codegen_shorthand(CodeGenerator &g, const
-std::string &name) const  "
-
-[INTERNAL]  Generate shorthand macro.
 
 ";
 
@@ -49355,14 +49131,6 @@ casadi::FunctionInternal::add_dependency(CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::codegen_shorthand(CodeGenerator &g, const
-std::string &name) const  "
-
-[INTERNAL]  Generate shorthand macro.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::definition() const  "
 
 [INTERNAL]  Get function signature: name:(inputs)->(outputs)
@@ -50257,14 +50025,6 @@ casadi::FunctionInternal::codegen_incref(CodeGenerator &g) const  "
 %feature("docstring")  casadi::FunctionInternal::has_free() const  "
 
 [INTERNAL]  Does the function have free variables.
-
-";
-
-%feature("docstring")
-casadi::FunctionInternal::codegen_shorthand(CodeGenerator &g, const
-std::string &name) const  "
-
-[INTERNAL]  Generate shorthand macro.
 
 ";
 
@@ -51774,23 +51534,15 @@ std::vector< M > &arg) const  "
 
 ";
 
-%feature("docstring")  casadi::SharedObjectInternal::getCount() const  "
-
-[INTERNAL]  Get the reference count.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::n_mem() const  "
 
 [INTERNAL]  Maximum number of memory objects.
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::codegen_shorthand(CodeGenerator &g, const
-std::string &name) const  "
+%feature("docstring")  casadi::SharedObjectInternal::getCount() const  "
 
-[INTERNAL]  Generate shorthand macro.
+[INTERNAL]  Get the reference count.
 
 ";
 
@@ -53838,14 +53590,6 @@ classes.
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::codegen_shorthand(CodeGenerator &g, const
-std::string &name) const  "
-
-[INTERNAL]  Generate shorthand macro.
-
-";
-
 %feature("docstring")  casadi::Nlpsol::get_sparsity_in(int i) override "
 
 [INTERNAL]  Sparsities of function inputs and outputs.
@@ -55296,14 +55040,6 @@ std::string &name, const Importer &li) "
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::codegen_shorthand(CodeGenerator &g, const
-std::string &name) const  "
-
-[INTERNAL]  Generate shorthand macro.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::eval_sx(const SXElem **arg,
 SXElem **res, int *iw, SXElem *w, int mem) const  "
 
@@ -56730,14 +56466,6 @@ std::vector< M > &arg) const  "
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::codegen_shorthand(CodeGenerator &g, const
-std::string &name) const  "
-
-[INTERNAL]  Generate shorthand macro.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::checkout() const  "
 
 [INTERNAL]  Checkout a memory object.
@@ -57954,14 +57682,6 @@ get_forward(int nfwd) if no cached version is available.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::get_partition(int iind, int
-oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
-allow_forward, bool allow_reverse) const  "
-
-[INTERNAL]  Get the unidirectional or bidirectional partition.
-
-";
-
 %feature("docstring")
 casadi::FunctionInternal::getJacSparsityHierarchical(int iind, int oind)
 const  "
@@ -58573,11 +58293,11 @@ oind, bool compact, bool symmetric) const  "
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::codegen_shorthand(CodeGenerator &g, const
-std::string &name) const  "
+%feature("docstring")  casadi::FunctionInternal::get_partition(int iind, int
+oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
+allow_forward, bool allow_reverse) const  "
 
-[INTERNAL]  Generate shorthand macro.
+[INTERNAL]  Get the unidirectional or bidirectional partition.
 
 ";
 
@@ -60174,14 +59894,6 @@ int oind, bool symmetric, int gr_i=1, int gr_o=1) const  "
 %feature("docstring")  casadi::Sqpmethod::alloc_memory() const override "
 
 [INTERNAL]  Create memory block.
-
-";
-
-%feature("docstring")
-casadi::FunctionInternal::codegen_shorthand(CodeGenerator &g, const
-std::string &name) const  "
-
-[INTERNAL]  Generate shorthand macro.
 
 ";
 
@@ -61896,14 +61608,6 @@ const  "
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::codegen_shorthand(CodeGenerator &g, const
-std::string &name) const  "
-
-[INTERNAL]  Generate shorthand macro.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::log(const std::string &msg)
 const  "
 
@@ -62808,14 +62512,6 @@ std::vector< std::string > &onames, const Dict &opts) const override "
 %feature("docstring")  casadi::FunctionInternal::has_derivative() const  "
 
 [INTERNAL]  Can derivatives be calculated in any way?
-
-";
-
-%feature("docstring")
-casadi::FunctionInternal::codegen_shorthand(CodeGenerator &g, const
-std::string &name) const  "
-
-[INTERNAL]  Generate shorthand macro.
 
 ";
 
