@@ -19,7 +19,7 @@ T1* casadi_from_mex(const mxArray* p, T1* y, const int* sp, T1* w) {
   const double* p_data = (const double*)mxGetData(p);
   if (p_nrow==1 && p_ncol==1) {
     double v = is_sparse && Jc[1]==0 ? 0 : *p_data;
-    fill(y, nnz, v);
+    casadi_fill(y, nnz, v);
   } else {
     int tr = 0;
     if (nrow!=p_nrow || ncol!=p_ncol) {
