@@ -762,14 +762,14 @@ namespace casadi {
     }
 
     // Condegen the indices
-    int ind = g.get_constant(this->nz_, true);
+    std::string ind = g.constant(this->nz_);
 
     // Perform the operation inplace
     g.local("cii", "const int", "*");
     g.local("rr", "real_t", "*");
     g.local("ss", "real_t", "*");
-    g << "for (cii=s" << ind << ", rr=" << g.work(res[0], this->nnz()) << ", "
-      << "ss=" << g.work(arg[1], this->dep(1).nnz()) << "; cii!=s" << ind
+    g << "for (cii=" << ind << ", rr=" << g.work(res[0], this->nnz()) << ", "
+      << "ss=" << g.work(arg[1], this->dep(1).nnz()) << "; cii!=" << ind
       << "+" << this->nz_.size() << "; ++cii, ++ss)"
       << " if (*cii>=0) rr[*cii] " << (Add?"+=":"=") << " *ss;\n";
   }

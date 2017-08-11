@@ -241,8 +241,8 @@ namespace casadi {
     g << "sens = res; res += " << n_out << ";\n";
 
     g.comment("Memory structure");
-    g.local("m_tmp", "central_diff_mem");
-    g.local("m", "central_diff_mem", "*");
+    g.local("m_tmp", "struct casadi_central_diff_mem");
+    g.local("m", "struct casadi_central_diff_mem", "*");
     g << "m = &m_tmp;\n"
       << "m->n_x = " << n_ << ";\n"
       << "m->n_r = " << n_r_ << ";\n"

@@ -68,6 +68,12 @@ namespace casadi {
     /// Add an external function declaration
     void add_external(const std::string& new_external);
 
+    /// Get a shorthand
+    std::string shorthand(const std::string& name) const;
+
+    /// Add/get a shorthand
+    std::string shorthand(const std::string& name, bool allow_adding=true);
+
     // Add a sparsity pattern
     std::string sparsity(const Sparsity& sp);
 
@@ -137,9 +143,10 @@ namespace casadi {
     static std::string initializer(const std::vector<int>& v);
 
     /** \brief Sanitize source files for codegen */
-    static std::string sanitize_source(const std::string& src,
-                                       const std::vector<std::string>& inst,
-                                       bool shorthand=true);
+    std::string sanitize_source(const std::string& symbol,
+                                const std::string& src,
+                                const std::vector<std::string>& inst,
+                                bool add_shorthand=true);
 
     /** \brief Codegen inner product */
     std::string dot(int n, const std::string& x, const std::string& y);
@@ -174,14 +181,18 @@ namespace casadi {
 
     /** \brief Multilinear interpolation - calculate gradient */
     std::string interpn_grad(const std::string& grad,
-                             int ndim, const std::string& grid,
-                             const std::string& offset,
-                             const std::string& values, const std::string& x,
-                             const std::string& lookup_mode,
-                             const std::string& iw, const std::string& w);
+      int ndim, const std::string& grid,
+      const std::string& offset,
+      const std::string& values, const std::string& x,
+      const std::string& lookup_mode,
+      const std::string& iw, const std::string& w);
 
-    /** \brief Codegen central differences */
+    /** \brief Central differences */
     std::string central_diff(const std::string& m);
+
+    /** \brief Transpose */
+    std::string trans(const std::string& x, const Sparsity& sp_x,
+      const std::string& y, const Sparsity& sp_y, const std::string& iw);
 
     /** \brief Declare a function */
     std::string declare(std::string s);
@@ -203,8 +214,6 @@ namespace casadi {
       AUX_NORM_INF,
       AUX_IAMAX,
       AUX_FILL,
-      AUX_SQ,
-      AUX_SIGN,
       AUX_MV,
       AUX_MV_DENSE,
       AUX_MTIMES,
@@ -292,12 +301,6 @@ namespace casadi {
     // Generate main entry point
     void generate_main(std::ostream &s) const;
 
-    /// SQUARE
-    void auxSq();
-
-    /// SIGN
-    void auxSign();
-
     //  private:
   public:
     /// \cond INTERNAL
@@ -356,6 +359,7 @@ namespace casadi {
     typedef std::map<const void*, int> PointerMap;
     std::set<std::string> added_includes_;
     std::set<std::string> added_externals_;
+    std::set<std::string> added_shorthands_;
     std::multimap<Auxiliary, std::vector<std::string>> added_auxiliaries_;
     PointerMap added_sparsities_;
     PointerMap added_dependencies_;

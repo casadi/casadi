@@ -1,6 +1,6 @@
 // NOLINT(legal/copyright)
 template<typename T1>
-void CASADI_PREFIX(mtimes)(const T1* x, const int* sp_x, const T1* y, const int* sp_y, T1* z, const int* sp_z, T1* w, int tr) { // NOLINT(whitespace/line_length)
+void casadi_mtimes(const T1* x, const int* sp_x, const T1* y, const int* sp_y, T1* z, const int* sp_z, T1* w, int tr) { // NOLINT(whitespace/line_length)
   // Get sparsities
   int ncol_x = sp_x[1];
   const int *colind_x = sp_x+2, *row_x = sp_x + 2 + ncol_x+1;

@@ -36,78 +36,78 @@
 namespace casadi {
   /// COPY: y <-x
   template<typename T1>
-  void CASADI_PREFIX(copy)(const T1* x, int n, T1* y);
+  void casadi_copy(const T1* x, int n, T1* y);
 
   /// SWAP: x <-> y
   template<typename T1>
-  void CASADI_PREFIX(swap)(int n, T1* x, int inc_x, T1* y, int inc_y);
+  void casadi_swap(int n, T1* x, int inc_x, T1* y, int inc_y);
 
   /// Sparse copy: y <- x, w work vector (length >= number of rows)
   template<typename T1>
-  void CASADI_PREFIX(project)(const T1* x, const int* sp_x, T1* y, const int* sp_y, T1* w);
+  void casadi_project(const T1* x, const int* sp_x, T1* y, const int* sp_y, T1* w);
 
   /// Convert sparse to dense
   template<typename T1, typename T2>
-  void CASADI_PREFIX(densify)(const T1* x, const int* sp_x, T2* y, int tr);
+  void casadi_densify(const T1* x, const int* sp_x, T2* y, int tr);
 
   /// Convert dense to sparse
   template<typename T1, typename T2>
-  void CASADI_PREFIX(sparsify)(const T1* x, T2* y, const int* sp_y, int tr);
+  void casadi_sparsify(const T1* x, T2* y, const int* sp_y, int tr);
 
   /// SCAL: x <- alpha*x
   template<typename T1>
-  void CASADI_PREFIX(scal)(int n, T1 alpha, T1* x);
+  void casadi_scal(int n, T1 alpha, T1* x);
 
   /// AXPY: y <- a*x + y
   template<typename T1>
-  void CASADI_PREFIX(axpy)(int n, T1 alpha, const T1* x, T1* y);
+  void casadi_axpy(int n, T1 alpha, const T1* x, T1* y);
 
   /// Inner product
   template<typename T1>
-  T1 CASADI_PREFIX(dot)(int n, const T1* x, const T1* y);
+  T1 casadi_dot(int n, const T1* x, const T1* y);
 
   /// Largest bound violation
   template<typename T1>
-  T1 CASADI_PREFIX(max_viol)(int n, const T1* x, const T1* lb, const T1* ub);
+  T1 casadi_max_viol(int n, const T1* x, const T1* lb, const T1* ub);
 
   /// Sum of bound violations
   template<typename T1>
-  T1 CASADI_PREFIX(sum_viol)(int n, const T1* x, const T1* lb, const T1* ub);
+  T1 casadi_sum_viol(int n, const T1* x, const T1* lb, const T1* ub);
 
   /// IAMAX: index corresponding to the entry with the largest absolute value
   template<typename T1>
-  int CASADI_PREFIX(iamax)(int n, const T1* x, int inc_x);
+  int casadi_iamax(int n, const T1* x, int inc_x);
 
   /// FILL: x <- alpha
   template<typename T1>
-  void CASADI_PREFIX(fill)(T1* x, int n, T1 alpha);
+  void casadi_fill(T1* x, int n, T1 alpha);
 
   /// Sparse matrix-matrix multiplication: z <- z + x*y
   template<typename T1>
-  void CASADI_PREFIX(mtimes)(const T1* x, const int* sp_x, const T1* y, const int* sp_y,
+  void casadi_mtimes(const T1* x, const int* sp_x, const T1* y, const int* sp_y,
                              T1* z, const int* sp_z, T1* w, int tr);
 
   /// Sparse matrix-vector multiplication: z <- z + x*y
   template<typename T1>
-  void CASADI_PREFIX(mv)(const T1* x, const int* sp_x, const T1* y, T1* z, int tr);
+  void casadi_mv(const T1* x, const int* sp_x, const T1* y, T1* z, int tr);
 
   /// TRANS: y <- trans(x) , w work vector (length >= rows x)
   template<typename T1>
-  void CASADI_PREFIX(trans)(const T1* x, const int* sp_x, T1* y, const int* sp_y, int* tmp);
+  void casadi_trans(const T1* x, const int* sp_x, T1* y, const int* sp_y, int* tmp);
 
   /// NORM_1: ||x||_1 -> return
   template<typename T1>
-  T1 CASADI_PREFIX(norm_1)(int n, const T1* x);
+  T1 casadi_norm_1(int n, const T1* x);
 
   /// NORM_2: ||x||_2 -> return
   template<typename T1>
-  T1 CASADI_PREFIX(norm_2)(int n, const T1* x);
+  T1 casadi_norm_2(int n, const T1* x);
 
   /** Inf-norm of a vector *
       Returns the largest element in absolute value
    */
   template<typename T1>
-  T1 CASADI_PREFIX(norm_inf)(int n, const T1* x);
+  T1 casadi_norm_inf(int n, const T1* x);
 
   /** Inf-norm of a Matrix-matrix product,*
    * \param dwork  A real work vector that you must allocate
@@ -116,70 +116,70 @@ namespace casadi {
    *               Minimum size: y.size1()+x.size2()+1
    */
   template<typename T1>
-  T1 CASADI_PREFIX(norm_inf_mul)(const T1* x, const int* sp_x, const T1* y, const int* sp_y,
+  T1 casadi_norm_inf_mul(const T1* x, const int* sp_x, const T1* y, const int* sp_y,
                              T1* dwork, int* iwork);
 
   /** Calculates dot(x, mul(A, y)) */
   template<typename T1>
-  T1 CASADI_PREFIX(bilin)(const T1* A, const int* sp_A, const T1* x, const T1* y);
+  T1 casadi_bilin(const T1* A, const int* sp_A, const T1* x, const T1* y);
 
   /// Adds a multiple alpha/2 of the outer product mul(x, trans(x)) to A
   template<typename T1>
-  void CASADI_PREFIX(rank1)(T1* A, const int* sp_A, T1 alpha, const T1* x);
+  void casadi_rank1(T1* A, const int* sp_A, T1 alpha, const T1* x);
 
   /// Get the nonzeros for the upper triangular half
   template<typename T1>
-  void CASADI_PREFIX(getu)(const T1* x, const int* sp_x, T1* v);
+  void casadi_getu(const T1* x, const int* sp_x, T1* v);
 
   /// Evaluate a polynomial
   template<typename T1>
-  T1 CASADI_PREFIX(polyval)(const T1* p, int n, T1 x);
+  T1 casadi_polyval(const T1* p, int n, T1 x);
 
   // Loop over corners of a hypercube
-  int CASADI_PREFIX(flip)(int* corner, int ndim);
+  int casadi_flip(int* corner, int ndim);
 
   // Find the interval to which a value belongs
   template<typename T1>
-  int CASADI_PREFIX(low)(T1 x, const double* grid, int ng, int lookup_mode);
+  int casadi_low(T1 x, const double* grid, int ng, int lookup_mode);
 
   // Get weights for the multilinear interpolant
   template<typename T1>
-  void CASADI_PREFIX(interpn_weights)(int ndim, const T1* grid, const int* offset,
+  void casadi_interpn_weights(int ndim, const T1* grid, const int* offset,
                                       const T1* x, T1* alpha, int* index);
 
   // Get coefficients for the multilinear interpolant
   template<typename T1>
-  T1 CASADI_PREFIX(interpn_interpolate)(int ndim, const int* offset, const T1* values,
+  T1 casadi_interpn_interpolate(int ndim, const int* offset, const T1* values,
                                         const T1* alpha, const int* index,
                                         const int* corner, T1* coeff);
 
   // Multilinear interpolant
   template<typename T1>
-  T1 CASADI_PREFIX(interpn)(int ndim, const T1* grid, const int* offset, const T1* values,
+  T1 casadi_interpn(int ndim, const T1* grid, const int* offset, const T1* values,
                             const T1* x, int* iw, T1* w);
 
   // Multilinear interpolant - calculate gradient
   template<typename T1>
-  void CASADI_PREFIX(interpn_grad)(T1* grad, int ndim, const T1* grid, const int* offset,
+  void casadi_interpn_grad(T1* grad, int ndim, const T1* grid, const int* offset,
                                    const T1* values, const T1* x, int* iw, T1* w);
 
   // De boor single basis evaluation
   template<typename T1>
-  void CASADI_PREFIX(de_boor)(T1 x, const T1* knots, int n_knots, int degree, T1* boor);
+  void casadi_de_boor(T1 x, const T1* knots, int n_knots, int degree, T1* boor);
 
   // De boor nd evaluation
   template<typename T1>
-  void CASADI_PREFIX(nd_boor_eval)(T1* ret, int n_dims, const T1* knots, const int* offset,
+  void casadi_nd_boor_eval(T1* ret, int n_dims, const T1* knots, const int* offset,
                                    const int* degree, const int* strides, const T1* c, int m,
                                    const T1* x, const int* lookup_mode, int reverse, int* iw,
                                    T1* w);
 
   // Alias names
-  inline void CASADI_PREFIX(copy_int)(const int* x, int n, int* y) {
-    CASADI_PREFIX(copy)(x, n, y);
+  inline void casadi_copy_int(const int* x, int n, int* y) {
+    casadi_copy(x, n, y);
   }
-  inline void CASADI_PREFIX(fill_int)(int* x, int n, int alpha) {
-    CASADI_PREFIX(fill)(x, n, alpha);
+  inline void casadi_fill_int(int* x, int n, int alpha) {
+    casadi_fill(x, n, alpha);
   }
 
   // Dense matrix multiplication

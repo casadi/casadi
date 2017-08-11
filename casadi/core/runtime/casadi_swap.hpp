@@ -1,6 +1,6 @@
 // NOLINT(legal/copyright)
 template<typename T1>
-void CASADI_PREFIX(swap)(int n, T1* x, int inc_x, T1* y, int inc_y) {
+void casadi_swap(int n, T1* x, int inc_x, T1* y, int inc_y) {
   T1 t;
   int i;
   for (i=0; i<n; ++i) {

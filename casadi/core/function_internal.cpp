@@ -1656,10 +1656,6 @@ namespace casadi {
     // Add standard math
     g.add_include("math.h");
 
-    // Add auxiliaries. TODO: Only add the auxiliaries that are actually used
-    g.add_auxiliary(CodeGenerator::AUX_SQ);
-    g.add_auxiliary(CodeGenerator::AUX_SIGN);
-
     // Generate declarations
     codegen_declarations(g);
 
@@ -1697,7 +1693,7 @@ namespace casadi {
 
     // Finalize the function
     if (!simplified_call()) g << "return 0;\n";
-    g << "}\n";
+    g << "}\n\n";
 
     // Flush to function body
     g.flush(g.body);
@@ -1757,7 +1753,7 @@ namespace casadi {
     g << g.declare(prefix + "const int* " + fname + "_sparsity_in(int i)") << " {\n"
       << "switch (i) {\n";
     for (int i=0; i<n_in; ++i) {
-      g << "case " << i << ": return s" << g.add_sparsity(sparsity_in(i)) << ";\n";
+      g << "case " << i << ": return " << g.sparsity(sparsity_in(i)) << ";\n";
     }
     g << "default: return 0;\n}\n"
       << "}\n\n";
@@ -1766,7 +1762,7 @@ namespace casadi {
     g << g.declare(prefix + "const int* " + fname + "_sparsity_out(int i)") << " {\n"
       << "switch (i) {\n";
     for (int i=0; i<n_out; ++i) {
-      g << "case " << i << ": return s" << g.add_sparsity(sparsity_out(i)) << ";\n";
+      g << "case " << i << ": return " << g.sparsity(sparsity_out(i)) << ";\n";
     }
     g << "default: return 0;\n}\n"
       << "}\n\n";
@@ -1936,19 +1932,7 @@ namespace casadi {
     int f = it->second;
 
     // Construct the name
-    stringstream ss;
-    ss << "f" << f;
-    return ss.str();
-  }
-
-  void FunctionInternal::codegen_shorthand(CodeGenerator& g, const string& name) const {
-    if (simplified_call()) {
-      g << "#define " << name << "(arg, res) "
-        << "CASADI_PREFIX(" << name << ")(arg, res)\n\n";
-    } else {
-      g << "#define " << name << "(arg, res, iw, w, mem) "
-        << "CASADI_PREFIX(" << name << ")(arg, res, iw, w, mem)\n\n";
-    }
+    return g.shorthand("f" + to_string(f));
   }
 
   std::string FunctionInternal::eval_name() const {
@@ -1975,26 +1959,19 @@ namespace casadi {
       string name = "f" + CodeGenerator::to_string(ind);
 
       // Print to file
-      codegen(g, "CASADI_PREFIX(" + name + ")", true);
-
-      // Shorthand
-      codegen_shorthand(g, name);
+      codegen(g, g.shorthand(name), true);
 
       // Codegen reference count functions, if needed
       if (has_refcount_) {
         // Increase reference counter
-        g << "void CASADI_PREFIX(" << name << "_incref)(void) {\n";
+        g << "void " << g.shorthand(name) << "_incref(void) {\n";
         codegen_incref(g);
-        g << "}\n"
-          << "#define " << name << "_incref() "
-          << "CASADI_PREFIX(" << name << "_incref)()\n\n";
+        g << "}\n\n";
 
         // Decrease reference counter
-        g << "void CASADI_PREFIX(" << name << "_decref)(void) {\n";
+        g << "void " << g.shorthand(name) << "_decref(void) {\n";
         codegen_decref(g);
-        g << "}\n"
-          << "#define " << name << "_decref() "
-          << "CASADI_PREFIX(" << name << "_decref)()\n\n";
+        g << "}\n\n";
       }
     }
   }

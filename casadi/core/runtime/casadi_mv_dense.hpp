@@ -1,6 +1,6 @@
 // NOLINT(legal/copyright)
 template<typename T1>
-void CASADI_PREFIX(mv_dense)(const T1* x, int nrow_x, int ncol_x, const T1* y, T1* z, int tr) {
+void casadi_mv_dense(const T1* x, int nrow_x, int ncol_x, const T1* y, T1* z, int tr) {
   if (!x || !y || !z) return;
   int i, j;
   if (tr) {

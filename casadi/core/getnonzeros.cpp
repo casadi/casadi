@@ -446,15 +446,15 @@ namespace casadi {
   void GetNonzerosVector::generate(CodeGenerator& g, const std::string& mem,
                                    const std::vector<int>& arg, const std::vector<int>& res) const {
     // Codegen the indices
-    int ind = g.get_constant(nz_, true);
+    string ind = g.constant(nz_);
 
     // Codegen the assignments
     g.local("cii", "const int", "*");
     g.local("rr", "real_t", "*");
     g.local("ss", "real_t", "*");
-    g << "for (cii=s" << ind << ", rr=" << g.work(res[0], nnz())
+    g << "for (cii=" << ind << ", rr=" << g.work(res[0], nnz())
       << ", ss=" << g.work(arg[0], dep(0).nnz())
-      << "; cii!=s" << ind << "+" << nz_.size()
+      << "; cii!=" << ind << "+" << nz_.size()
       << "; ++cii) *rr++ = *cii>=0 ? ss[*cii] : 0;\n";
   }
 

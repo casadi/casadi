@@ -1,6 +1,6 @@
 // NOLINT(legal/copyright)
 template<typename T1, typename T2>
-void CASADI_PREFIX(sparsify)(const T1* x, T2* y, const int* sp_y, int tr) {
+void casadi_sparsify(const T1* x, T2* y, const int* sp_y, int tr) {
   int nrow_y = sp_y[0], ncol_y = sp_y[1];
   const int *colind_y = sp_y+2, *row_y = sp_y+ncol_y+3;
   int i, el;

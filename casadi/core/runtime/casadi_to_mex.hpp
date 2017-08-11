@@ -1,6 +1,6 @@
 // NOLINT(legal/copyright)
 template<typename T1>
-mxArray* CASADI_PREFIX(to_mex)(const int* sp, const T1* x) {
+mxArray* casadi_to_mex(const int* sp, const T1* x) {
   int nrow = *sp++, ncol = *sp++, nnz = sp[ncol];
   const int *colind = sp, *row = sp+ncol+1;
 #ifndef CASADI_MEX_NO_SPARSE

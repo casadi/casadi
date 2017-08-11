@@ -265,7 +265,7 @@ class CASADI_EXPORT GenericExpression : public GenericExpressionCommon {
     ///@}
 
     ///@{
-    /** \brief Square root: x -> sqrt(x) */
+    /** \brief Square: x -> x^2 */
     static ExType sq(const ExType& x) {
       return ExType::unary(OP_SQ, x);
     }

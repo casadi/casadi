@@ -185,11 +185,8 @@ namespace casadi {
 
   void Transpose::generate(CodeGenerator& g, const std::string& mem,
                            const std::vector<int>& arg, const std::vector<int>& res) const {
-    g.add_auxiliary(CodeGenerator::AUX_TRANS);
-
-    g << "trans("
-      << g.work(arg[0], nnz()) << ", " << g.sparsity(dep().sparsity()) << ", "
-      << g.work(res[0], nnz()) << ", " << g.sparsity(sparsity()) << ", iw);\n";
+    g << g.trans(g.work(arg[0], nnz()), dep().sparsity(),
+                 g.work(res[0], nnz()), sparsity(), "iw") <<  ";\n";
   }
 
   void DenseTranspose::generate(CodeGenerator& g, const std::string& mem,

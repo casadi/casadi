@@ -1,6 +1,6 @@
 // NOLINT(legal/copyright)
 template<typename T1>
-struct CASADI_PREFIX(central_diff_mem) {
+struct casadi_central_diff_mem {
   // Dimensions
   int n_x, n_r;
   // Perturbation size

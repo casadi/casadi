@@ -1466,7 +1466,7 @@ namespace casadi {
     case OP_OUTPUT:         return "output";
     case OP_PARAMETER:      return "parameter";
     case OP_CALL:           return "call";
-    case OP_MTIMES:         return "matmul";
+    case OP_MTIMES:         return "mtimes";
     case OP_SOLVE:          return "solve";
     case OP_TRANSPOSE:      return "transpose";
     case OP_DETERMINANT:    return "determinant";
