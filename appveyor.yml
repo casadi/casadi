@@ -14,10 +14,11 @@ environment:
   
 build_script:
   - python --version
-  - conda create --yes -n condaenv_build python=$PYTHONVERSION requests pyyaml numpy=$NUMPYVERSION scipy matplotlib
+  - conda create --yes -n condaenv_build python=%PYTHONVERSION% requests pyyaml numpy=%NUMPYVERSION% scipy matplotlib
   - conda install --yes -n condaenv_build pip
   - source activate condaenv
   - python --version
+  - python-config --cflags
   - cmake "-GVisual Studio 12 Win64" -H. -B_builds
-  - cmake --build _builds --config "Debug"
+  - cmake --build _builds --config "Debug" -DWITH_PYTHON=ON
 
