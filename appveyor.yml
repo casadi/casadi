@@ -4,9 +4,9 @@ branches:
 
 environment:
   - matrix:
-      - PYTHONVERSION: 2.7
+      - PYTHONVERSION: "2.7"
         PYTHON: "C:\\Miniconda-x64"
-        NUMPYVERSION: 1.9
+        NUMPYVERSION: "1.9"
   
 build_script:
   - python --version
