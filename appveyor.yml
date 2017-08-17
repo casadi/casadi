@@ -3,7 +3,7 @@ branches:
     - /.*travis.*/
 
 environment:
-  - matrix:
+  matrix:
       - PYTHONVERSION: "2.7"
         PYTHON: "C:\\Miniconda-x64"
         NUMPYVERSION: "1.9"
