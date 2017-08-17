@@ -2,6 +2,9 @@ branches:
   except:
     - /.*travis.*/
 
+install:
+  - set PATH=C:\Miniconda-x64;C:\Miniconda-x64\Scripts;%PATH%
+
 environment:
   matrix:
       - PYTHONVERSION: "2.7"
