@@ -2216,10 +2216,17 @@ import_array();
 
 #ifndef SWIGXML
 
- // std::ostream & is not typemapped to anything useful and should be ignored
- // (or possibly turned into a string output)
-%typemap(in, noblock=1, numinputs=0) std::ostream &stream ""
+// std::ostream & is redirected to casadi::userOut()
+%typemap(in, noblock=1, numinputs=0) std::ostream &stream {
+  $1 = &casadi::userOut();
+}
 
+// Add trailing newline in MATLAB and Octave
+#if defined(SWIGMATLAB) || defined(SWIGOCTAVE)
+%typemap(argout, noblock=1) std::ostream &stream {
+  *$1 << "\n";
+}
+#endif
 
 #define L_INT "int"
 #define L_BOOL "bool"
