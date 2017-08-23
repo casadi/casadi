@@ -41845,7 +41845,7 @@ Check if the matrix expression is dense.
 ";
 
 %feature("docstring")  casadi::Matrix< T >::print_sparse(std::ostream
-&stream) const  "
+&stream, bool truncate=true) const  "
 
 Print sparse matrix style.
 
@@ -41933,7 +41933,7 @@ triangle function
 ";
 
 %feature("docstring")  casadi::Matrix< T >::print_vector(std::ostream
-&stream) const  "
+&stream, bool truncate=true) const  "
 
 Print vector-style.
 
@@ -42175,7 +42175,7 @@ Get the sparsity pattern. See the Sparsity class for details.
 ";
 
 %feature("docstring")  casadi::Matrix< T >::print_dense(std::ostream
-&stream) const  "
+&stream, bool truncate=true) const  "
 
 Print dense matrix-stype.
 
