@@ -653,9 +653,6 @@ namespace casadi {
 
   template<typename Scalar>
   void Matrix<Scalar>::print_dense(std::ostream &stream) const {
-    // Print as a single line
-    bool oneliner=this->size1()<=1;
-
     // Get components
     std::vector<std::string> nz, inter;
     print_split(nz, inter);
@@ -665,13 +662,20 @@ namespace casadi {
       stream << "@" << (i+1) << "=" << inter[i] << ", ";
     inter.clear();
 
+    // Access data structures
+    int size1 = this->size1();
+    int size2 = this->size2();
+    const int* colind = this->colind();
+    const int* row = this->row();
+
     // Index counter for each column
-    const int* cptr = this->colind();
-    int ncol = size2();
-    std::vector<int> cind(cptr, cptr+ncol+1);
+    std::vector<int> ind(colind, colind+size2+1);
+
+    // Print as a single line?
+    bool oneliner=size1<=1;
 
     // Loop over rows
-    for (int rr=0; rr<size1(); ++rr) {
+    for (int rr=0; rr<size1; ++rr) {
       // Beginning of row
       if (rr==0) {
         if (!oneliner) stream << std::endl;
@@ -681,20 +685,18 @@ namespace casadi {
       }
 
       // Loop over columns
-      for (int cc=0; cc<ncol; ++cc) {
-        // Separating comma
-        if (cc>0) stream << ", ";
+      for (int cc=0; cc<size2; ++cc) {
+        // String representation of element
+        std::string s = ind[cc]<colind[cc+1] && row[ind[cc]]==rr
+          ? nz.at(ind[cc]++) : "00";
 
-        // Check if nonzero
-        if (cind[cc]<colind(cc+1) && row(cind[cc])==rr) {
-          stream << nz.at(cind[cc]++);
-        } else {
-          stream << "00";
-        }
+        // Print element
+        if (cc!=0) stream << ", ";
+        stream << s;
       }
 
       // End of row
-      if (rr<size1()-1) {
+      if (rr<size1-1) {
         stream << "], ";
         if (!oneliner) stream << std::endl;
       } else {
