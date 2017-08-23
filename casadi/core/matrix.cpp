@@ -652,7 +652,7 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  void Matrix<Scalar>::print_dense(std::ostream &stream) const {
+  void Matrix<Scalar>::print_dense(std::ostream &stream, bool truncate) const {
     // Get components
     std::vector<std::string> nz, inter;
     print_split(nz, inter);
@@ -668,6 +668,14 @@ namespace casadi {
     const int* colind = this->colind();
     const int* row = this->row();
 
+    // No need to truncate if less than 1000 entries
+    const int max_numel = 1000;
+    if (truncate && size1*size2<=max_numel) truncate=false;
+
+    // Truncate rows and/or columns
+    bool truncate_rows = truncate && size1>=7;
+    bool truncate_columns = truncate && size2>=7;
+
     // Index counter for each column
     std::vector<int> ind(colind, colind+size2+1);
 
@@ -676,11 +684,14 @@ namespace casadi {
 
     // Loop over rows
     for (int rr=0; rr<size1; ++rr) {
+      // Print row?
+      bool print_row = !(truncate_rows && rr>=3 && rr<size1-3);
+
       // Beginning of row
       if (rr==0) {
         if (!oneliner) stream << std::endl;
         stream << "[[";
-      } else {
+      } else if (print_row) {
         stream << " [";
       }
 
@@ -690,20 +701,33 @@ namespace casadi {
         std::string s = ind[cc]<colind[cc+1] && row[ind[cc]]==rr
           ? nz.at(ind[cc]++) : "00";
 
+        // Skip whole row?
+        if (!print_row) continue;
+
+        // Print column?
+        bool print_column = !(truncate_columns && cc>=3 && cc<size2-3);
+
         // Print element
-        if (cc!=0) stream << ", ";
-        stream << s;
+        if (print_column) {
+          if (cc!=0) stream << ", ";
+          stream << s;
+        } else if (cc==3) {
+          stream << ", ...";
+        }
       }
 
       // End of row
       if (rr<size1-1) {
-        stream << "], ";
-        if (!oneliner) stream << std::endl;
+        if (print_row) {
+          stream << "], ";
+          if (!oneliner) stream << std::endl;
+        } else if (rr==3) {
+          stream << " ...," << std::endl;
+        }
       } else {
         stream << "]]";
       }
     }
-
     stream << std::flush;
   }
 

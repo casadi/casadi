@@ -757,7 +757,7 @@ namespace casadi {
     void print_vector(std::ostream &stream, bool truncate=true) const;
 
     /// Print dense matrix-stype
-    void print_dense(std::ostream &stream) const;
+    void print_dense(std::ostream &stream, bool truncate=true) const;
 
     /// Print sparse matrix style
     void print_sparse(std::ostream &stream) const;
