@@ -754,7 +754,7 @@ namespace casadi {
     void print_scalar(std::ostream &stream) const;
 
     /// Print vector-style
-    void print_vector(std::ostream &stream) const;
+    void print_vector(std::ostream &stream, bool truncate=true) const;
 
     /// Print dense matrix-stype
     void print_dense(std::ostream &stream) const;

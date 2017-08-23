@@ -608,7 +608,7 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  void Matrix<Scalar>::print_vector(std::ostream &stream) const {
+  void Matrix<Scalar>::print_vector(std::ostream &stream, bool truncate) const {
     casadi_assert_message(is_column(), "Not a vector");
 
     // Get components
@@ -621,27 +621,34 @@ namespace casadi {
     inter.clear();
 
     // Access data structures
-    const int* r = row();
-    int sz = nnz();
+    const int* row = this->row();
+    int nnz = this->nnz();
+    int size1 = this->size1();
+
+    // No need to truncate if less than 1000 entries
+    const int max_numel = 1000;
+    if (truncate && size1<=max_numel) truncate=false;
 
     // Nonzero
     int el=0;
 
     // Loop over rows
     stream << "[";
-    for (int rr=0; rr<size1(); ++rr) {
-      // Add delimiter
-      if (rr!=0) stream << ", ";
+    for (int rr=0; rr<size1; ++rr) {
+      // String representation
+      std::string s = el<nnz && rr==row[el] ? nz.at(el++) : "00";
 
-      // Check if nonzero
-      if (el<sz && rr==r[el]) {
-        stream << nz.at(el++);
+      // Truncate?
+      if (truncate && rr>=3 && rr<size1-3) {
+        // Do not print
+        if (rr==3) stream << ", ...";
       } else {
-        stream << "00";
+        // Print
+        if (rr!=0) stream << ", ";
+        stream << s;
       }
     }
-    stream << "]";
-    stream << std::flush;
+    stream << "]" << std::flush;
   }
 
   template<typename Scalar>
