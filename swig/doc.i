@@ -7992,8 +7992,7 @@ CasADi 3.2
 ";
 
 %feature("docstring")  casadi::PrintableObject< SharedObject
->::print(std::ostream &stream=casadi::userOut(), bool trailing_newline=true)
-const "
+>::print(std::ostream &stream) const "
 
 Return a string with a description (for SWIG)
 
@@ -8335,8 +8334,7 @@ Print a representation of the object.
 ";
 
 %feature("docstring")  casadi::PrintableObject< SharedObject
->::repr(std::ostream &stream=casadi::userOut(), bool trailing_newline=true)
-const "
+>::repr(std::ostream &stream) const "
 
 Print a representation of the object.
 
@@ -13964,8 +13962,7 @@ Sort dependent parameters.
 ";
 
 %feature("docstring")  casadi::PrintableObject< DaeBuilder
->::print(std::ostream &stream=casadi::userOut(), bool trailing_newline=true)
-const "
+>::print(std::ostream &stream) const "
 
 Return a string with a description (for SWIG)
 
@@ -14380,8 +14377,7 @@ identical)
 ";
 
 %feature("docstring")  casadi::PrintableObject< DaeBuilder
->::repr(std::ostream &stream=casadi::userOut(), bool trailing_newline=true)
-const "
+>::repr(std::ostream &stream) const "
 
 Print a representation of the object.
 
@@ -20222,8 +20218,7 @@ C++ includes: timing.hpp ";
 
 // File: classcasadi_1_1Function.xml
 %feature("docstring")  casadi::PrintableObject< SharedObject
->::repr(std::ostream &stream=casadi::userOut(), bool trailing_newline=true)
-const "
+>::repr(std::ostream &stream) const "
 
 Print a representation of the object.
 
@@ -20828,8 +20823,7 @@ Get, if necessary generate, the sparsity of a Jacobian block
 ";
 
 %feature("docstring")  casadi::PrintableObject< SharedObject
->::print(std::ostream &stream=casadi::userOut(), bool trailing_newline=true)
-const "
+>::print(std::ostream &stream) const "
 
 Return a string with a description (for SWIG)
 
@@ -27157,8 +27151,7 @@ always_inline, bool never_inline) const  "
 
 // File: classcasadi_1_1Importer.xml
 %feature("docstring")  casadi::PrintableObject< SharedObject
->::repr(std::ostream &stream=casadi::userOut(), bool trailing_newline=true)
-const "
+>::repr(std::ostream &stream) const "
 
 Print a representation of the object.
 
@@ -27338,8 +27331,7 @@ Get entry as a text.
 ";
 
 %feature("docstring")  casadi::PrintableObject< SharedObject
->::print(std::ostream &stream=casadi::userOut(), bool trailing_newline=true)
-const "
+>::print(std::ostream &stream) const "
 
 Return a string with a description (for SWIG)
 
@@ -37159,8 +37151,7 @@ Create a solve node.
 ";
 
 %feature("docstring")  casadi::PrintableObject< SharedObject
->::print(std::ostream &stream=casadi::userOut(), bool trailing_newline=true)
-const "
+>::print(std::ostream &stream) const "
 
 Return a string with a description (for SWIG)
 
@@ -37351,8 +37342,7 @@ Joel Andersson
 C++ includes: linsol.hpp ";
 
 %feature("docstring")  casadi::PrintableObject< SharedObject
->::repr(std::ostream &stream=casadi::userOut(), bool trailing_newline=true)
-const "
+>::repr(std::ostream &stream) const "
 
 Print a representation of the object.
 
@@ -41297,7 +41287,7 @@ Return a string with a representation (for SWIG)
 ";
 
 %feature("docstring")  casadi::Matrix< T >::print_scalar(std::ostream
-&stream=casadi::userOut(), bool trailing_newline=true) const  "
+&stream) const  "
 
 Print scalar.
 
@@ -41325,8 +41315,7 @@ Get the (i,j) minor matrix.
 ";
 
 %feature("docstring")  casadi::PrintableObject< Matrix< Scalar >
->::repr(std::ostream &stream=casadi::userOut(), bool trailing_newline=true)
-const "
+>::repr(std::ostream &stream) const "
 
 Print a representation of the object.
 
@@ -41856,7 +41845,7 @@ Check if the matrix expression is dense.
 ";
 
 %feature("docstring")  casadi::Matrix< T >::print_sparse(std::ostream
-&stream=casadi::userOut(), bool trailing_newline=true) const  "
+&stream) const  "
 
 Print sparse matrix style.
 
@@ -41944,7 +41933,7 @@ triangle function
 ";
 
 %feature("docstring")  casadi::Matrix< T >::print_vector(std::ostream
-&stream=casadi::userOut(), bool trailing_newline=true) const  "
+&stream) const  "
 
 Print vector-style.
 
@@ -42186,7 +42175,7 @@ Get the sparsity pattern. See the Sparsity class for details.
 ";
 
 %feature("docstring")  casadi::Matrix< T >::print_dense(std::ostream
-&stream=casadi::userOut(), bool trailing_newline=true) const  "
+&stream) const  "
 
 Print dense matrix-stype.
 
@@ -42816,8 +42805,7 @@ Get the sparsity pattern. See the Sparsity class for details.
 ";
 
 %feature("docstring")  casadi::PrintableObject< Matrix< Scalar >
->::print(std::ostream &stream=casadi::userOut(), bool trailing_newline=true)
-const "
+>::print(std::ostream &stream) const "
 
 Return a string with a description (for SWIG)
 
@@ -43190,8 +43178,7 @@ Get the number of rows, Octave-style syntax.
 ";
 
 %feature("docstring")  casadi::PrintableObject< SharedObject
->::print(std::ostream &stream=casadi::userOut(), bool trailing_newline=true)
-const "
+>::print(std::ostream &stream) const "
 
 Return a string with a description (for SWIG)
 
@@ -43802,8 +43789,7 @@ Conditional assignment: (x,y) -> x ? y : 0.
 ";
 
 %feature("docstring")  casadi::PrintableObject< SharedObject
->::repr(std::ostream &stream=casadi::userOut(), bool trailing_newline=true)
-const "
+>::repr(std::ostream &stream) const "
 
 Print a representation of the object.
 
@@ -45519,16 +45505,14 @@ Print a description of the object.
 ";
 
 %feature("docstring")  casadi::PrintableObject< NlpBuilder
->::repr(std::ostream &stream=casadi::userOut(), bool trailing_newline=true)
-const "
+>::repr(std::ostream &stream) const "
 
 Print a representation of the object.
 
 ";
 
 %feature("docstring")  casadi::PrintableObject< NlpBuilder
->::print(std::ostream &stream=casadi::userOut(), bool trailing_newline=true)
-const "
+>::print(std::ostream &stream) const "
 
 Return a string with a description (for SWIG)
 
@@ -48590,8 +48574,7 @@ Construct from a vector of polynomial coefficients.
 ";
 
 %feature("docstring")  casadi::PrintableObject< Polynomial
->::print(std::ostream &stream=casadi::userOut(), bool trailing_newline=true)
-const "
+>::print(std::ostream &stream) const "
 
 Return a string with a description (for SWIG)
 
@@ -48650,8 +48633,7 @@ Print a description of the object.
 ";
 
 %feature("docstring")  casadi::PrintableObject< Polynomial
->::repr(std::ostream &stream=casadi::userOut(), bool trailing_newline=true)
-const "
+>::repr(std::ostream &stream) const "
 
 Print a representation of the object.
 
@@ -48667,8 +48649,7 @@ Return a string with a representation (for SWIG)
 ";
 
 %feature("docstring")  casadi::PrintableObject< Derived
->::print(std::ostream &stream=casadi::userOut(), bool trailing_newline=true)
-const  "
+>::print(std::ostream &stream) const  "
 
 Return a string with a description (for SWIG)
 
@@ -48696,7 +48677,7 @@ Return a string with a description of the object, cf. str(Object) in Python.
 ";
 
 %feature("docstring")  casadi::PrintableObject< Derived >::repr(std::ostream
-&stream=casadi::userOut(), bool trailing_newline=true) const  "
+&stream) const  "
 
 Print a representation of the object.
 
@@ -54262,8 +54243,7 @@ double reg, int ls_trials, bool ls_success) const  "
 
 // File: classcasadi_1_1SharedObject.xml
 %feature("docstring")  casadi::PrintableObject< SharedObject
->::print(std::ostream &stream=casadi::userOut(), bool trailing_newline=true)
-const "
+>::print(std::ostream &stream) const "
 
 Return a string with a description (for SWIG)
 
@@ -54357,8 +54337,7 @@ Print a representation of the object.
 ";
 
 %feature("docstring")  casadi::PrintableObject< SharedObject
->::repr(std::ostream &stream=casadi::userOut(), bool trailing_newline=true)
-const "
+>::repr(std::ostream &stream) const "
 
 Print a representation of the object.
 
@@ -55815,7 +55794,7 @@ Get scalar (if is_scalar)
 ";
 
 %feature("docstring")  casadi::PrintableObject< Slice  >::print(std::ostream
-&stream=casadi::userOut(), bool trailing_newline=true) const "
+&stream) const "
 
 Return a string with a description (for SWIG)
 
@@ -55876,7 +55855,7 @@ A slice.
 ";
 
 %feature("docstring")  casadi::PrintableObject< Slice  >::repr(std::ostream
-&stream=casadi::userOut(), bool trailing_newline=true) const "
+&stream) const "
 
 Print a representation of the object.
 
@@ -58660,8 +58639,7 @@ the spy command.
 ";
 
 %feature("docstring")  casadi::PrintableObject< SharedObject
->::repr(std::ostream &stream=casadi::userOut(), bool trailing_newline=true)
-const "
+>::repr(std::ostream &stream) const "
 
 Print a representation of the object.
 
@@ -58962,8 +58940,7 @@ Get the row of a non-zero element.
 ";
 
 %feature("docstring")  casadi::PrintableObject< SharedObject
->::print(std::ostream &stream=casadi::userOut(), bool trailing_newline=true)
-const "
+>::print(std::ostream &stream) const "
 
 Return a string with a description (for SWIG)
 
@@ -64076,8 +64053,7 @@ point to any node, \"0\" is returned.
 ";
 
 %feature("docstring")  casadi::PrintableObject< SharedObject
->::print(std::ostream &stream=casadi::userOut(), bool trailing_newline=true)
-const "
+>::print(std::ostream &stream) const "
 
 Return a string with a description (for SWIG)
 
@@ -64116,8 +64092,7 @@ Print a description of the object.
 ";
 
 %feature("docstring")  casadi::PrintableObject< SharedObject
->::repr(std::ostream &stream=casadi::userOut(), bool trailing_newline=true)
-const "
+>::repr(std::ostream &stream) const "
 
 Print a representation of the object.
 
@@ -64157,8 +64132,7 @@ Joel Andersson
 C++ includes: xml_file.hpp ";
 
 %feature("docstring")  casadi::PrintableObject< SharedObject
->::print(std::ostream &stream=casadi::userOut(), bool trailing_newline=true)
-const "
+>::print(std::ostream &stream) const "
 
 Return a string with a description (for SWIG)
 
@@ -64186,8 +64160,7 @@ Print a description of the object.
 ";
 
 %feature("docstring")  casadi::PrintableObject< SharedObject
->::repr(std::ostream &stream=casadi::userOut(), bool trailing_newline=true)
-const "
+>::repr(std::ostream &stream) const "
 
 Print a representation of the object.
 
