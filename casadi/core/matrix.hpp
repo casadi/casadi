@@ -751,16 +751,16 @@ namespace casadi {
     void print_short(std::ostream &stream) const;
 
     /// Print scalar
-    void print_scalar(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
+    void print_scalar(std::ostream &stream) const;
 
     /// Print vector-style
-    void print_vector(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
+    void print_vector(std::ostream &stream) const;
 
     /// Print dense matrix-stype
-    void print_dense(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
+    void print_dense(std::ostream &stream) const;
 
     /// Print sparse matrix style
-    void print_sparse(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
+    void print_sparse(std::ostream &stream) const;
 
     void clear();
     void resize(int nrow, int ncol);

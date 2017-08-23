@@ -115,7 +115,7 @@ namespace casadi {
       userOut() << "CsparseInterface::prepare: numeric factorization" << endl;
       userOut() << "linear system to be factorized = " << endl;
       Sparsity sp = Sparsity::compressed(m->sparsity);
-      DM(sp, vector<double>(A, A+m->nnz())).print_sparse();
+      DM(sp, vector<double>(A, A+m->nnz())).print_sparse(userOut());
     }
 
     double tol = 1e-8;

@@ -2224,7 +2224,7 @@ import_array();
 // Add trailing newline in MATLAB and Octave
 #if defined(SWIGMATLAB) || defined(SWIGOCTAVE)
 %typemap(argout, noblock=1) std::ostream &stream {
-  *$1 << "\n";
+  *$1 << "\n" << std::flush;
 }
 #endif
 

@@ -581,7 +581,7 @@ namespace casadi {
   std::string Matrix<Scalar>::type_name() { return matrixName<Scalar>(); }
 
   template<typename Scalar>
-  void Matrix<Scalar>::print_scalar(std::ostream &stream, bool trailing_newline) const {
+  void Matrix<Scalar>::print_scalar(std::ostream &stream) const {
     casadi_assert_message(numel()==1, "Not a scalar");
 
     std::streamsize precision = stream.precision();
@@ -601,8 +601,6 @@ namespace casadi {
     } else {
       stream << scalar();
     }
-
-    if (trailing_newline) stream << std::endl;
     stream << std::flush;
     stream.precision(precision);
     stream.width(width);
@@ -610,7 +608,7 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  void Matrix<Scalar>::print_vector(std::ostream &stream, bool trailing_newline) const {
+  void Matrix<Scalar>::print_vector(std::ostream &stream) const {
     casadi_assert_message(is_column(), "Not a vector");
 
     // Get components
@@ -643,13 +641,11 @@ namespace casadi {
       }
     }
     stream << "]";
-
-    if (trailing_newline) stream << std::endl;
     stream << std::flush;
   }
 
   template<typename Scalar>
-  void Matrix<Scalar>::print_dense(std::ostream &stream, bool trailing_newline) const {
+  void Matrix<Scalar>::print_dense(std::ostream &stream) const {
     // Print as a single line
     bool oneliner=this->size1()<=1;
 
@@ -699,12 +695,11 @@ namespace casadi {
       }
     }
 
-    if (trailing_newline) stream << std::endl;
     stream << std::flush;
   }
 
   template<typename Scalar>
-  void Matrix<Scalar>::print_sparse(std::ostream &stream, bool trailing_newline) const {
+  void Matrix<Scalar>::print_sparse(std::ostream &stream) const {
     if (nnz()==0) {
       stream << "all zero sparse: " << size1() << "-by-" << size2();
     } else {
@@ -729,7 +724,6 @@ namespace casadi {
         }
       }
     }
-    if (trailing_newline) stream << std::endl;
     stream << std::flush;
   }
 
@@ -762,14 +756,14 @@ namespace casadi {
     if (is_empty()) {
       stream << "[]";
     } else if (numel()==1) {
-      print_scalar(stream, false);
+      print_scalar(stream);
     } else if (is_column()) {
-      print_vector(stream, false);
+      print_vector(stream);
     } else if (std::max(size1(), size2())<=10 || static_cast<double>(nnz())/numel()>=0.5) {
       // if "small" or "dense"
-      print_dense(stream, false);
+      print_dense(stream);
     } else {
-      print_sparse(stream, false);
+      print_sparse(stream);
     }
   }
 
