@@ -732,27 +732,43 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  void Matrix<Scalar>::print_sparse(std::ostream &stream) const {
-    if (nnz()==0) {
-      stream << "all zero sparse: " << size1() << "-by-" << size2();
-    } else {
-      // Print header
-      stream << "sparse: " << size1() << "-by-" << size2() << ", " << nnz() << " nnz";
+  void Matrix<Scalar>::print_sparse(std::ostream &stream, bool truncate) const {
+    // Access data structures
+    int size1 = this->size1();
+    int size2 = this->size2();
+    const int* colind = this->colind();
+    const int* row = this->row();
+    int nnz = this->nnz();
 
-      // Get components
-      std::vector<std::string> nz, inter;
-      print_split(nz, inter);
+    // Quick return if all zero sparse
+    if (nnz==0) {
+      stream << "all zero sparse: " << size1 << "-by-" << size2 << std::flush;
+      return;
+    }
 
-      // Print intermediate expressions
-      for (int i=0; i<inter.size(); ++i)
-        stream << std::endl << " @" << (i+1) << "=" << inter[i] << ",";
-      inter.clear();
+    // Print header
+    stream << "sparse: " << size1 << "-by-" << size2 << ", " << nnz << " nnz";
 
-      // Print nonzeros
-      for (int cc=0; cc<size2(); ++cc) {
-        for (int el=colind(cc); el<colind(cc+1); ++el) {
-          int rr=row(el);
-          stream << std::endl << " (" << rr << ", " << cc << ") -> " << nz.at(el);
+    // Get components
+    std::vector<std::string> nz, inter;
+    print_split(nz, inter);
+
+    // Print intermediate expressions
+    for (int i=0; i<inter.size(); ++i)
+      stream << std::endl << " @" << (i+1) << "=" << inter[i] << ",";
+    inter.clear();
+
+    // No need to truncate if less than 1000 nonzeros
+    const int max_nnz = 1000;
+    if (truncate && nnz<=max_nnz) truncate=false;
+
+    // Print nonzeros
+    for (int cc=0; cc<size2; ++cc) {
+      for (int el=colind[cc]; el<colind[cc+1]; ++el) {
+        if (truncate && el>=3 && el<nnz-3) {
+          if (el==3) stream << std::endl << " ...";
+        } else {
+          stream << std::endl << " (" << row[el] << ", " << cc << ") -> " << nz.at(el);
           InterruptHandler::check();
         }
       }
