@@ -41744,6 +41744,68 @@ Get string representation of dimensions. The representation is (nrow x ncol
 
 ";
 
+%feature("docstring") casadi::Matrix< T >::Matrix() "
+
+constructors
+
+empty 0-by-0 matrix constructor
+
+";
+
+%feature("docstring") casadi::Matrix< T >::Matrix(const Matrix< Scalar > &m)
+"
+
+Copy constructor.
+
+";
+
+%feature("docstring") casadi::Matrix< T >::Matrix(int nrow, int ncol) "
+
+Create a sparse matrix with all structural zeros.
+
+";
+
+%feature("docstring") casadi::Matrix< T >::Matrix(const Sparsity &sp) "
+
+Create a sparse matrix from a sparsity pattern. Same as
+Matrix::ones(sparsity)
+
+";
+
+%feature("docstring") casadi::Matrix< T >::Matrix(const Sparsity &sp, const
+Matrix< Scalar > &d) "
+
+Construct matrix with a given sparsity and nonzeros.
+
+";
+
+%feature("docstring") casadi::Matrix< T >::Matrix(double val) "
+
+This constructor enables implicit type conversion from a numeric type.
+
+";
+
+%feature("docstring") casadi::Matrix< T >::Matrix(const std::vector<
+std::vector< double > > &m) "
+
+Dense matrix constructor with data given as vector of vectors.
+
+";
+
+%feature("docstring") casadi::Matrix< T >::Matrix(const std::vector< A > &x)
+"
+
+Create an expression from a vector.
+
+";
+
+%feature("docstring") casadi::Matrix< T >::Matrix(const Matrix< A > &x) "
+
+Create a matrix from another matrix with a different entry type Assumes that
+the scalar conversion is valid.
+
+";
+
 %feature("docstring")  casadi::Matrix< T >::get_nz(Matrix< Scalar >
 &output_m, bool ind1, const Slice &k) const  "
 
@@ -41981,65 +42043,22 @@ Elementwise power with const power
 
 ";
 
-%feature("docstring") casadi::Matrix< T >::Matrix() "
+%feature("docstring")  casadi::Matrix< T >::rand(int nrow=1, int ncol=1) "
 
-constructors
-
-empty 0-by-0 matrix constructor
+Create a matrix with uniformly distributed random numbers.
 
 ";
 
-%feature("docstring") casadi::Matrix< T >::Matrix(const Matrix< Scalar > &m)
-"
+%feature("docstring")  casadi::Matrix< T >::rand(const Sparsity &sp) "
 
-Copy constructor.
-
-";
-
-%feature("docstring") casadi::Matrix< T >::Matrix(int nrow, int ncol) "
-
-Create a sparse matrix with all structural zeros.
+Create a matrix with uniformly distributed random numbers.
 
 ";
 
-%feature("docstring") casadi::Matrix< T >::Matrix(const Sparsity &sp) "
+%feature("docstring")  casadi::Matrix< T >::rand(const std::pair< int, int >
+&rc) "
 
-Create a sparse matrix from a sparsity pattern. Same as
-Matrix::ones(sparsity)
-
-";
-
-%feature("docstring") casadi::Matrix< T >::Matrix(const Sparsity &sp, const
-Matrix< Scalar > &d) "
-
-Construct matrix with a given sparsity and nonzeros.
-
-";
-
-%feature("docstring") casadi::Matrix< T >::Matrix(double val) "
-
-This constructor enables implicit type conversion from a numeric type.
-
-";
-
-%feature("docstring") casadi::Matrix< T >::Matrix(const std::vector<
-std::vector< double > > &m) "
-
-Dense matrix constructor with data given as vector of vectors.
-
-";
-
-%feature("docstring") casadi::Matrix< T >::Matrix(const std::vector< A > &x)
-"
-
-Create an expression from a vector.
-
-";
-
-%feature("docstring") casadi::Matrix< T >::Matrix(const Matrix< A > &x) "
-
-Create a matrix from another matrix with a different entry type Assumes that
-the scalar conversion is valid.
+Create a matrix with uniformly distributed random numbers.
 
 ";
 
