@@ -27,6 +27,7 @@
 #include "sx_node.hpp"
 #include "linsol.hpp"
 #include "expm.hpp"
+#include <chrono>
 
 using namespace std;
 
@@ -46,6 +47,16 @@ namespace casadi {
   int Matrix<Scalar>::stream_width_ = 0;
   template<typename Scalar>
   bool Matrix<Scalar>::stream_scientific_ = false;
+
+  template<typename Scalar>
+  std::default_random_engine Matrix<Scalar>::rng_(
+    // Seed with current time
+    std::chrono::system_clock::now().time_since_epoch().count());
+
+  template<typename Scalar>
+  void Matrix<Scalar>::rng(int seed) {
+    rng_.seed(seed);
+  }
 
   template<typename Scalar>
   bool Matrix<Scalar>::__nonzero__() const {
@@ -2614,6 +2625,12 @@ namespace casadi {
     casadi_error("'sym' not defined for " + type_name());
   }
 
+  template<typename Scalar>
+  Matrix<Scalar> Matrix<Scalar>::rand(const Sparsity& sp) { // NOLINT(runtime/threadsafe_fn)
+
+    casadi_error("'rand' not defined for " + type_name());
+  }
+
   // Template specializations
   template<>
   CASADI_EXPORT Matrix<double> Matrix<double>::
@@ -2623,6 +2640,10 @@ namespace casadi {
   template<>
   CASADI_EXPORT Matrix<double> Matrix<double>::
   pinv(const Matrix<double>& A, const std::string& lsolver, const Dict& dict);
+
+  template<>
+  CASADI_EXPORT Matrix<double> Matrix<double>::
+  rand(const Sparsity& sp); // NOLINT(runtime/threadsafe_fn)
 
   template<>
   CASADI_EXPORT Matrix<double> Matrix<double>::
@@ -2664,6 +2685,18 @@ namespace casadi {
     } else {
       return solve(mtimes(A, A.T()), A, lsolver, dict).T();
     }
+  }
+
+  template<>
+  CASADI_EXPORT Matrix<double> Matrix<double>::
+  rand(const Sparsity& sp) { // NOLINT(runtime/threadsafe_fn)
+    // C++11 random number generator
+    std::uniform_real_distribution<double> distribution(0., 1.);
+    // Nonzeros
+    std::vector<double> nz(sp.nnz());
+    for (double& e : nz) e = distribution(rng_);
+    // Construct return object
+    return Matrix<double>(sp, nz, false);
   }
 
   template<>

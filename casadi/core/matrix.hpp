@@ -35,6 +35,7 @@
 #include "runtime/casadi_runtime.hpp"
 #include "generic_matrix.hpp"
 #include "generic_expression.hpp"
+#include <random>
 
 namespace casadi {
 
@@ -949,6 +950,20 @@ namespace casadi {
     static void set_scientific(bool scientific);
     // @}
 
+    /// Seed the random number generator
+    static void rng(int seed);
+
+    ///@{
+    /** \brief Create a matrix with uniformly distributed random numbers */
+    static Matrix<Scalar> rand(int nrow=1, int ncol=1) { // NOLINT(runtime/threadsafe_fn)
+      return rand(Sparsity::dense(nrow, ncol)); // NOLINT(runtime/threadsafe_fn)
+    }
+    static Matrix<Scalar> rand(const Sparsity& sp); // NOLINT(runtime/threadsafe_fn)
+    static Matrix<Scalar> rand(const std::pair<int, int>& rc) { // NOLINT(runtime/threadsafe_fn)
+      return rand(rc.first, rc.second); // NOLINT(runtime/threadsafe_fn)
+    }
+    ///@}
+
 #ifndef SWIG
     /// Sparse matrix with a given sparsity with all values same
     Matrix(const Sparsity& sp, const Scalar& val, bool dummy);
@@ -971,6 +986,10 @@ namespace casadi {
     static int stream_precision_;
     static int stream_width_;
     static bool stream_scientific_;
+
+    /// Random number generator
+    static std::default_random_engine rng_;
+
 #endif // SWIG
   };
 
