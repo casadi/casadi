@@ -143,7 +143,7 @@ namespace casadi {
     alloc_iw(na_); // casadi_trans
   }
 
-  void OoqpInterface::
+  int OoqpInterface::
   eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
     if (inputs_check_) {
       checkInputs(arg[CONIC_LBX], arg[CONIC_UBX], arg[CONIC_LBA], arg[CONIC_UBA]);
@@ -466,6 +466,7 @@ namespace casadi {
 
     // Save dual solution (simple bounds)
     casadi_copy(gamma_, nx_, res[CONIC_LAM_X]);
+    return 0;
   }
 
   const char* OoqpInterface::errFlag(int flag) {

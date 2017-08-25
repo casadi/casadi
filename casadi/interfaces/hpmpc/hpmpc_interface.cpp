@@ -571,7 +571,7 @@ namespace casadi {
     }
   }
 
-  void HpmpcInterface::
+  int HpmpcInterface::
   eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
     if (inputs_check_) {
       checkInputs(arg[CONIC_LBX], arg[CONIC_UBX], arg[CONIC_LBA], arg[CONIC_UBA]);
@@ -725,6 +725,7 @@ namespace casadi {
 
     // Show statistics
     if (print_time_)  print_fstats(static_cast<ConicMemory*>(mem));
+    return 0;
   }
 
   Dict HpmpcInterface::get_stats(void* mem) const {

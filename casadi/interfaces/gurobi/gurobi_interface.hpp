@@ -97,7 +97,7 @@ namespace casadi {
     void init_memory(void* mem) const override;
 
     /// Solve the QP
-    void eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;
+    int eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;
 
     /// Can discrete variables be treated
     bool integer_support() const override { return true;}
@@ -113,4 +113,3 @@ namespace casadi {
 
 /// \endcond
 #endif // CASADI_GUROBI_INTERFACE_HPP
-

@@ -96,7 +96,7 @@ namespace casadi {
 
   }
 
-  void SlicotExpm::eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
+  int SlicotExpm::eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
     auto m = static_cast<SlicotExpmMemory*>(mem);
 
     setup(mem, arg, res, iw, w);
@@ -106,7 +106,7 @@ namespace casadi {
       tol, m->iwork, m->dwork, 2*n_*n_);
 
     if (res[0]) std::copy(m->A, m->A+n_*n_, res[0]);
-
+    return 0;
   }
 
 

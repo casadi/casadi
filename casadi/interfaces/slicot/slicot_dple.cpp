@@ -205,7 +205,7 @@ namespace casadi {
   }
   /// \endcond
 
-  void SlicotDple::eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
+  int SlicotDple::eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
     auto m = static_cast<SlicotDpleMemory*>(mem);
 
     setup(mem, arg, res, iw, w);
@@ -396,7 +396,7 @@ namespace casadi {
       }
 
     }
-
+    return 0;
   }
 
 

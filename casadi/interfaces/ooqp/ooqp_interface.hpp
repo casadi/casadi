@@ -75,7 +75,7 @@ namespace casadi {
     void init(const Dict& opts) override;
 
     /// Solve the QP
-    void eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;
+    int eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;
 
     /// Throw error
     static const char* errFlag(int flag);
@@ -111,4 +111,3 @@ namespace casadi {
 
 /// \endcond
 #endif // CASADI_OOQP_INTERFACE_HPP
-
