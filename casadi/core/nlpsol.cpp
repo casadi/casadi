@@ -389,7 +389,7 @@ namespace casadi {
                  << typeid(*this).name());
   }
 
-  void Nlpsol::eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
+  int Nlpsol::eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
     // Reset the solver, prepare for solution
     setup(mem, arg, res, iw, w);
 
@@ -398,6 +398,7 @@ namespace casadi {
 
     // Show statistics
     if (print_time_)  print_fstats(static_cast<OracleMemory*>(mem));
+    return 0;
   }
 
   void Nlpsol::set_work(void* mem, const double**& arg, double**& res,

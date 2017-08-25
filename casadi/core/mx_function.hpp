@@ -85,7 +85,7 @@ namespace casadi {
     ~MXFunction() override;
 
     /** \brief  Evaluate numerically, work vectors given */
-    void eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;
+    int eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;
 
     /** \brief  Print description */
     void print_long(std::ostream &stream) const override;
@@ -125,7 +125,7 @@ namespace casadi {
     bool should_inline(bool always_inline, bool never_inline) const override;
 
     /** \brief Evaluate symbolically, SX type*/
-    void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const override;
+    int eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const override;
 
     /** \brief Evaluate symbolically, MX type */
     void eval_mx(const MXVector& arg, MXVector& res,
@@ -146,7 +146,7 @@ namespace casadi {
     std::vector<MX> symbolic_output(const std::vector<MX>& arg) const override;
 
     /** \brief  Propagate sparsity forward */
-    void sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
+    int sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
 
     /** \brief  Propagate sparsity backwards */
     void sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;

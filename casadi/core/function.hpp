@@ -394,15 +394,15 @@ namespace casadi {
     ///@}
 
     /** \brief Evaluate memory-less, numerically */
-    void operator()(const double** arg, double** res, int* iw, double* w, int mem=0) const;
+    int operator()(const double** arg, double** res, int* iw, double* w, int mem=0) const;
 
     /** \brief Evaluate memory-less SXElem
         Same syntax as the double version, allowing use in templated code
      */
-    void operator()(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem=0) const;
+    int operator()(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem=0) const;
 
     /** \brief  Propagate sparsity forward */
-    void operator()(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem=0) const;
+    int operator()(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem=0) const;
 
     /** \brief  Propagate sparsity backward */
     void rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem=0) const;

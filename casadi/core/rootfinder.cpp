@@ -163,12 +163,13 @@ namespace casadi {
     linsol_.reset(sp_jac_);
   }
 
-  void Rootfinder::eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
+  int Rootfinder::eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
     // Reset the solver, prepare for solution
     setup(mem, arg, res, iw, w);
 
     // Solve the NLP
     solve(mem);
+    return 0;
   }
 
   void Rootfinder::set_work(void* mem, const double**& arg, double**& res,
@@ -239,7 +240,7 @@ namespace casadi {
     return Function(name, arg, res, inames, onames, opts);
   }
 
-  void Rootfinder::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  int Rootfinder::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     int num_out = n_out();
     int num_in = n_in();
     bvec_t* tmp1 = w; w += n_;
@@ -266,6 +267,7 @@ namespace casadi {
       res1[iout_] = 0;
       oracle_(arg1, res1, iw, w, 0);
     }
+    return 0;
   }
 
   void Rootfinder::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {

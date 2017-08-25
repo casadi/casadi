@@ -148,13 +148,14 @@ namespace casadi {
         "Expected coefficient size " << coeffs_size_ << ", got " << coeffs_.size() << " instead.");
     }
 
-    void BSpline::eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
-      if (!res[0]) return;
+    int BSpline::eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
+      if (!res[0]) return 0;
 
       casadi_fill(res[0], m_, 0.0);
       casadi_nd_boor_eval(res[0], degree_.size(), get_ptr(knots_), get_ptr(offset_),
         get_ptr(degree_), get_ptr(strides_), get_ptr(coeffs_), m_, arg[0], get_ptr(lookup_mode_),
         false, iw, w);
+      return 0;
     }
 
     void BSpline::codegen_body(CodeGenerator& g) const {
@@ -305,8 +306,8 @@ namespace casadi {
       BSplineCommon::init(opts);
     }
 
-    void BSplineDual::eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
-      if (!res[0]) return;
+    int BSplineDual::eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
+      if (!res[0]) return 0;
       casadi_fill(res[0], reverse_? coeffs_size_: m_*N_, 0.0);
 
       int n_dims = degree_.size();
@@ -316,6 +317,7 @@ namespace casadi {
         get_ptr(degree_), get_ptr(strides_), arg[0]+(reverse_? i*m_ : 0), m_, get_ptr(x_)+i*n_dims,
         get_ptr(lookup_mode_), reverse_, iw, w);
       }
+      return 0;
     }
 
     void BSplineDual::codegen_body(CodeGenerator& g) const {
@@ -446,9 +448,9 @@ namespace casadi {
       }
     }
 
-    void BSplineDual::
+    int BSplineDual::
     sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
-      if (!res[0]) return;
+      if (!res[0]) return 0;
       casadi_fill(res[0], reverse_? coeffs_size_: m_*N_, bvec_t(0));
 
       int n_dims = degree_.size();
@@ -457,6 +459,7 @@ namespace casadi {
           get_ptr(degree_), get_ptr(strides_), arg[0]+(reverse_? i*m_ : 0), m_,
           get_ptr(x_)+i*n_dims, get_ptr(lookup_mode_), reverse_, iw, w);
       }
+      return 0;
     }
 
     void BSplineDual::

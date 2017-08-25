@@ -347,7 +347,7 @@ namespace casadi {
     casadi_assert(mem==0);
   }
 
-  void FunctionInternal::
+  int FunctionInternal::
   _eval(const double** arg, double** res, int* iw, double* w, int mem) const {
     if (simplified_call()) {
       // Copy arguments to input buffers
@@ -368,23 +368,26 @@ namespace casadi {
         if (res[i]) *res[i] = *w;
         ++w;
       }
+
+      // Successful return
+      return 0;
     } else {
       if (eval_) {
-        eval_(arg, res, iw, w, mem);
+        return eval_(arg, res, iw, w, mem);
       } else {
-        eval(arg, res, iw, w, memory(mem));
+        return eval(arg, res, iw, w, memory(mem));
       }
     }
   }
 
-  void FunctionInternal::
+  int FunctionInternal::
   _eval(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
-    eval_sx(arg, res, iw, w, mem);
+    return eval_sx(arg, res, iw, w, mem);
   }
 
-  void FunctionInternal::
+  int FunctionInternal::
   _eval(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
-    sp_forward(arg, res, iw, w, mem);
+    return sp_forward(arg, res, iw, w, mem);
   }
 
   void FunctionInternal::print_dimensions(ostream &stream) const {
@@ -1337,7 +1340,7 @@ namespace casadi {
     log("FunctionInternal::get_partition end");
   }
 
-  void FunctionInternal::
+  int FunctionInternal::
   eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
     casadi_error("'eval' not defined for " + type_name());
   }
@@ -1346,7 +1349,7 @@ namespace casadi {
     casadi_error("'simple' not defined for " + type_name());
   }
 
-  void FunctionInternal::
+  int FunctionInternal::
   eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
     casadi_error("'eval_sx' not defined for " + type_name());
   }
@@ -1993,7 +1996,7 @@ namespace casadi {
     casadi_error("'generate_dependencies' not defined for " + type_name());
   }
 
-  void FunctionInternal::
+  int FunctionInternal::
   sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     // Get the number of inputs and outputs
     int n_in = this->n_in();
@@ -2026,6 +2029,7 @@ namespace casadi {
         }
       }
     }
+    return 0;
   }
 
   void FunctionInternal::

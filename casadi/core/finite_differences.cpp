@@ -143,7 +143,7 @@ namespace casadi {
     return Function::create(new CentralDiff(name, nfwd), opts_mod);
   }
 
-  void CentralDiff::eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
+  int CentralDiff::eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
     // Shorthands
     int n_in = derivative_of_.n_in(), n_out = derivative_of_.n_out();
 
@@ -199,7 +199,7 @@ namespace casadi {
         casadi_mv_dense(seed[j], nnz, n_, m->x, z1, false);
         z1 += nnz;
       }
-      derivative_of_(arg, res, iw, w, 0);
+      if (derivative_of_(arg, res, iw, w, 0)) return 1;
     }
 
     // Gather sensitivities
@@ -210,6 +210,7 @@ namespace casadi {
         m->J += nnz;
       }
     }
+    return 0;
   }
 
   void CentralDiff::codegen_declarations(CodeGenerator& g) const {

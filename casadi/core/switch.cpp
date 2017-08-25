@@ -133,7 +133,7 @@ namespace casadi {
     alloc_w(sz_buf, true);
   }
 
-  void Switch::eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
+  int Switch::eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
     // Shorthands
     int n_in=this->n_in()-1, n_out=this->n_out();
 
@@ -180,7 +180,7 @@ namespace casadi {
     }
 
     // Evaluate the corresponding function
-    fk(arg1, res1, iw, w, 0);
+    if (fk(arg1, res1, iw, w, 0)) return 1;
 
     // Project results with different sparsity
     if (project_out_) {
@@ -192,6 +192,7 @@ namespace casadi {
         }
       }
     }
+    return 0;
   }
 
   Function Switch
@@ -274,7 +275,7 @@ namespace casadi {
     }
   }
 
-  void Switch::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
+  int Switch::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
 
     // Shorthands
     int n_in=this->n_in()-1, n_out=this->n_out();
@@ -335,7 +336,7 @@ namespace casadi {
       }
 
       // Evaluate the corresponding function
-      fk(arg1, res1, iw, wl, 0);
+      if (fk(arg1, res1, iw, wl, 0)) return 1;
 
       // Project results with different sparsity
       for (int i=0; i<n_out; ++i) {
@@ -358,7 +359,7 @@ namespace casadi {
       }
 
     }
-
+    return 0;
   }
 
   void Switch::codegen_body(CodeGenerator& g) const {

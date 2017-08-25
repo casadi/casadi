@@ -143,7 +143,7 @@ namespace casadi {
     return Sparsity();
   }
 
-  void Integrator::
+  int Integrator::
   eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
     auto m = static_cast<IntegratorMemory*>(mem);
 
@@ -204,6 +204,7 @@ namespace casadi {
 
     // Show statistics
     if (print_time_)  print_fstats(static_cast<OracleMemory*>(mem));
+    return 0;
   }
 
   Options Integrator::options_
@@ -500,7 +501,7 @@ namespace casadi {
     return ret;
   }
 
-  void Integrator::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  int Integrator::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     log("Integrator::sp_forward", "begin");
 
     // Work vectors
@@ -579,6 +580,7 @@ namespace casadi {
       }
     }
     log("Integrator::sp_forward", "end");
+    return 0;
   }
 
   void Integrator::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {

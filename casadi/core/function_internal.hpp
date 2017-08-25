@@ -138,15 +138,15 @@ namespace casadi {
 
     ///@{
     /** \brief  Evaluate numerically */
-    void _eval(const double** arg, double** res, int* iw, double* w, int mem) const;
-    virtual void eval(const double** arg, double** res, int* iw, double* w, void* mem) const;
+    int _eval(const double** arg, double** res, int* iw, double* w, int mem) const;
+    virtual int eval(const double** arg, double** res, int* iw, double* w, void* mem) const;
     ///@}
 
     /** \brief  Evaluate numerically, simplied syntax */
     virtual void simple(const double* arg, double* res) const;
 
     /** \brief  Evaluate with symbolic scalars */
-    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const;
+    virtual int eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const;
 
     ///@{
     /** \brief  Evaluate with symbolic matrices */
@@ -156,8 +156,8 @@ namespace casadi {
 
     ///@{
     /** \brief Evaluate a function, overloaded */
-    void _eval(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const;
-    void _eval(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const;
+    int _eval(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const;
+    int _eval(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const;
     ///@}
 
     ///@{
@@ -570,7 +570,7 @@ namespace casadi {
     void log(const std::string& fcn, const std::string& msg) const;
 
     /** \brief  Propagate sparsity forward */
-    virtual void sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const;
+    virtual int sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const;
 
     /** \brief  Propagate sparsity backwards */
     virtual void sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const;
@@ -913,7 +913,7 @@ namespace casadi {
     for (int i=0; i<n_out; ++i) resp[i]=get_ptr(res[i]);
 
     // Call memory-less
-    _eval(get_ptr(argp), get_ptr(resp), get_ptr(iw_tmp), get_ptr(w_tmp), 0);
+    (void)_eval(get_ptr(argp), get_ptr(resp), get_ptr(iw_tmp), get_ptr(w_tmp), 0);
   }
 
   template<typename M>

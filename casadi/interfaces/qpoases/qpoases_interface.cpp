@@ -330,7 +330,7 @@ namespace casadi {
     m->fstats["postprocessing"] = FStats();
   }
 
-  void QpoasesInterface::
+  int QpoasesInterface::
   eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
     auto m = static_cast<QpoasesMemory*>(mem);
 
@@ -456,6 +456,7 @@ namespace casadi {
 
     // Show statistics
     if (print_time_)  print_fstats(static_cast<ConicMemory*>(mem));
+    return 0;
   }
 
   std::string QpoasesInterface::getErrorMessage(int flag) {

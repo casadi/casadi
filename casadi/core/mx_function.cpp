@@ -354,7 +354,7 @@ namespace casadi {
     log("MXFunction::init end");
   }
 
-  void MXFunction::eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
+  int MXFunction::eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
     casadi_msg("MXFunction::eval():begin "  << name_);
     // Work vector and temporaries to hold pointers to operation input and outputs
     const double** arg1 = arg+n_in();
@@ -402,6 +402,7 @@ namespace casadi {
     }
 
     casadi_msg("MXFunction::eval():end "  << name_);
+    return 0;
   }
 
   string MXFunction::print(const AlgEl& el) const {
@@ -456,7 +457,7 @@ namespace casadi {
     }
   }
 
-  void MXFunction::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  int MXFunction::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     // Temporaries to hold pointers to operation input and outputs
     const bvec_t** arg1=arg+n_in();
     bvec_t** res1=res+n_out();
@@ -494,6 +495,7 @@ namespace casadi {
         e.data->sp_forward(arg1, res1, iw, w, 0);
       }
     }
+    return 0;
   }
 
   void MXFunction::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
@@ -965,7 +967,7 @@ namespace casadi {
     log("MXFunction::ad_reverse end");
   }
 
-  void MXFunction::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
+  int MXFunction::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
     // Work vector and temporaries to hold pointers to operation input and outputs
     vector<const SXElem*> argp(sz_arg());
     vector<SXElem*> resp(sz_res());
@@ -1004,6 +1006,7 @@ namespace casadi {
         a.data->eval_sx(get_ptr(argp), get_ptr(resp), iw, w, 0);
       }
     }
+    return 0;
   }
 
   Function MXFunction::expand(const std::vector<SX>& inputvsx) {

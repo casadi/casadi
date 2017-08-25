@@ -95,10 +95,10 @@ class CASADI_EXPORT SXFunction :
   ~SXFunction() override;
 
   /** \brief  Evaluate numerically, work vectors given */
-  void eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;
+  int eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;
 
   /** \brief  evaluate symbolically while also propagating directional derivatives */
-  void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const override;
+  int eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const override;
 
   /** Inline calls? */
   bool should_inline(bool always_inline, bool never_inline) const override {
@@ -220,7 +220,7 @@ class CASADI_EXPORT SXFunction :
   void codegen_body(CodeGenerator& g) const override;
 
   /** \brief  Propagate sparsity forward */
-  void sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
+  int sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
 
   /** \brief  Propagate sparsity backwards */
   void sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;

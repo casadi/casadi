@@ -742,8 +742,8 @@ namespace casadi {
 
   size_t Function::sz_w() const { return (*this)->sz_w();}
 
-  void Function::operator()(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
-    (*this)->sp_forward(arg, res, iw, w, mem);
+  int Function::operator()(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+    return (*this)->sp_forward(arg, res, iw, w, mem);
   }
 
   void Function::rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
@@ -974,12 +974,12 @@ namespace casadi {
     return (*this)->min_in(ind);
   }
 
-  void Function::operator()(const double** arg, double** res, int* iw, double* w, int mem) const {
-    (*this)->_eval(arg, res, iw, w, mem);
+  int Function::operator()(const double** arg, double** res, int* iw, double* w, int mem) const {
+    return (*this)->_eval(arg, res, iw, w, mem);
   }
 
-  void Function::operator()(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
-    (*this)->eval_sx(arg, res, iw, w, mem);
+  int Function::operator()(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
+    return (*this)->eval_sx(arg, res, iw, w, mem);
   }
 
   const SX Function::sx_in(int ind) const {

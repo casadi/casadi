@@ -105,12 +105,13 @@ namespace casadi {
     alloc_iw(2*ndim_, true);
   }
 
-  void LinearInterpolant::
+  int LinearInterpolant::
   eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
     if (res[0]) {
       res[0][0] = casadi_interpn(ndim_, get_ptr(grid_), get_ptr(offset_),
                                  get_ptr(values_), arg[0], get_ptr(lookup_mode_), iw, w);
     }
+    return 0;
   }
 
   void LinearInterpolant::codegen_body(CodeGenerator& g) const {
@@ -141,11 +142,12 @@ namespace casadi {
     alloc_iw(2*m->ndim_, true);
   }
 
-  void LinearInterpolantJac::
+  int LinearInterpolantJac::
   eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
     auto m = derivative_of_.get<LinearInterpolant>();
     casadi_interpn_grad(res[0], m->ndim_, get_ptr(m->grid_), get_ptr(m->offset_),
                         get_ptr(m->values_), arg[0], get_ptr(m->lookup_mode_), iw, w);
+    return 0;
   }
 
 

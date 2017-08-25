@@ -60,14 +60,14 @@ namespace casadi {
   }
 
   template<typename T>
-  void Map::evalGen(const T** arg, T** res, int* iw, T* w) const {
+  int Map::evalGen(const T** arg, T** res, int* iw, T* w) const {
     int n_in = this->n_in(), n_out = this->n_out();
     const T** arg1 = arg+n_in;
     copy_n(arg, n_in, arg1);
     T** res1 = res+n_out;
     copy_n(res, n_out, res1);
     for (int i=0; i<n_; ++i) {
-      f_(arg1, res1, iw, w, 0);
+      if (f_(arg1, res1, iw, w, 0)) return 1;
       for (int j=0; j<n_in; ++j) {
         if (arg1[j]) arg1[j] += f_.nnz_in(j);
       }
@@ -75,14 +75,15 @@ namespace casadi {
         if (res1[j]) res1[j] += f_.nnz_out(j);
       }
     }
+    return 0;
   }
 
-  void Map::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
-    evalGen(arg, res, iw, w);
+  int Map::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
+    return evalGen(arg, res, iw, w);
   }
 
-  void Map::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
-    evalGen(arg, res, iw, w);
+  int Map::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+    return evalGen(arg, res, iw, w);
   }
 
   void Map::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
@@ -237,14 +238,14 @@ namespace casadi {
     return Function(name, arg, res, inames, onames, opts);
   }
 
-  void Map::eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
-    evalGen(arg, res, iw, w);
+  int Map::eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
+    return evalGen(arg, res, iw, w);
   }
 
   MapOmp::~MapOmp() {
   }
 
-  void MapOmp::eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
+  int MapOmp::eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
 #ifndef WITH_OPENMP
     return Map::eval(arg, res, iw, w, mem);
 #else // WITH_OPENMP

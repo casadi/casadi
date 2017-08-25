@@ -108,7 +108,7 @@ namespace casadi {
     alloc_w(solver_.nnz_in(NLPSOL_P), true);
   }
 
-  void QpToNlp::
+  int QpToNlp::
   eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
     // Inputs
     const double *h_, *g_, *a_, *lba_, *uba_, *lbx_, *ubx_, *x0_;
@@ -181,7 +181,7 @@ namespace casadi {
     res1[NLPSOL_LAM_G] = lam_a_;
 
     // Solve the NLP
-    solver_(arg1, res1, iw, w, 0);
+    return solver_(arg1, res1, iw, w, 0);
   }
 
 } // namespace casadi

@@ -70,7 +70,7 @@ namespace casadi {
 #endif // WITH_OPENCL
   }
 
-  void SXFunction::eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
+  int SXFunction::eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
     casadi_msg("SXFunction::eval():begin  " << name_);
 
     // Make sure no free parameters
@@ -99,6 +99,7 @@ namespace casadi {
     }
 
     casadi_msg("SXFunction::eval():end " << name_);
+    return 0;
   }
 
   bool SXFunction::is_smooth() const {
@@ -496,7 +497,7 @@ namespace casadi {
     }
   }
 
-  void SXFunction::
+  int SXFunction::
   eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
     if (verbose()) userOut() << "SXFunction::eval_sxsparse begin" << endl;
 
@@ -546,6 +547,7 @@ namespace casadi {
       }
     }
     if (verbose()) userOut() << "SXFunction::eval_sx end" << endl;
+    return 0;
   }
 
   void SXFunction::ad_forward(const vector<vector<SX> >& fseed,
@@ -766,7 +768,7 @@ namespace casadi {
     if (verbose()) userOut() << "SXFunction::ad_reverse end" << endl;
   }
 
-  void SXFunction::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  int SXFunction::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     // Propagate sparsity forward
     for (auto&& e : algorithm_) {
       switch (e.op) {
@@ -783,6 +785,7 @@ namespace casadi {
         w[e.i0] = w[e.i1] | w[e.i2]; break;
       }
     }
+    return 0;
   }
 
   void SXFunction::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {

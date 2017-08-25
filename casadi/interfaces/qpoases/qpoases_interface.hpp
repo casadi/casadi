@@ -126,7 +126,7 @@ namespace casadi {
     void init_memory(void* mem) const override;
 
     /** \brief  Evaluate numerically */
-    void eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;
+    int eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;
 
     /// A documentation string
     static const std::string meta_doc;
