@@ -752,17 +752,17 @@ namespace casadi {
 
   void Function::set_work(const double**& arg, double**& res, int*& iw, double*& w,
                           int mem) const {
-    (*this)->_set_work(arg, res, iw, w, mem);
+    (*this)->set_work(memory(mem), arg, res, iw, w);
   }
 
   void Function::set_temp(const double** arg, double** res, int* iw, double* w,
                           int mem) const {
-    (*this)->_set_temp(arg, res, iw, w, mem);
+    (*this)->set_temp(memory(mem), arg, res, iw, w);
   }
 
   void Function::setup(const double** arg, double** res, int* iw, double* w,
                           int mem) const {
-    (*this)->_setup(arg, res, iw, w, mem);
+    (*this)->setup(memory(mem), arg, res, iw, w);
   }
 
   bool Function::spCanEvaluate(bool fwd) {
