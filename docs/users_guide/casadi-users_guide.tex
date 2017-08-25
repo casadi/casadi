@@ -2100,9 +2100,9 @@ The integer field pointed to is structured as follows:
 
 Upon failure, these functions will return a null pointer.
 
-\subsection*{Maximum number of memory objects}
+\subsection*{Number of available memory objects}
 \begin{lstlisting}[language=C]
-int fname_n_mem(void);
+int fname_n_memory(void);
 \end{lstlisting}
 
 A function may contain some mutable memory, e.g. for caching the latest
@@ -2112,8 +2112,8 @@ a different memory object. This is especially important for evaluation in
 parallel on a shared memory architecture, in which case each thread should access
 a different memory object.
 
-The function \verb|fname_n_mem| returns the maximum number of memory objects
-or 0 if there is no upper bound.
+The function \verb|fname_n_mem| returns the number of available memory objects
+or -1 if there is no upper bound.
 
 \subsection*{Work vectors}
 \begin{lstlisting}[language=C]

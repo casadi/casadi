@@ -89,10 +89,11 @@ namespace casadi {
     sparsity_in_ = (sparsity_t)li_.get_function(name + "_sparsity_in");
     sparsity_out_ = (sparsity_t)li_.get_function(name + "_sparsity_out");
 
+    // Maximum number of memory objects
+    n_memory_ = (getint_t)li_.get_function(name_ + "_n_memory");
+
     // Function for numerical evaluation
     eval_ = (eval_t)li_.get_function(name_);
-
-    n_mem_ = 0;
   }
 
   External::~External() {
@@ -176,6 +177,15 @@ namespace casadi {
     }
   }
 
+  int GenericExternal::n_memory() const {
+    if (n_memory_) {
+      return n_memory_();
+    } else {
+      return FunctionInternal::n_memory();
+    }
+  }
+
+
   void External::init(const Dict& opts) {
     // Call the initialization method of the base class
     FunctionInternal::init(opts);
@@ -216,14 +226,6 @@ namespace casadi {
   void GenericExternal::init(const Dict& opts) {
     // Call recursively
     External::init(opts);
-
-    // Maximum number of memory objects
-    getint_t n_mem = (getint_t)li_.get_function(name_ + "_n_mem");
-    if (n_mem) {
-      n_mem_ = n_mem();
-    } else if (li_.has_meta(name_ + "_N_MEM")) {
-      n_mem_ = li_.meta_int(name_ + "_N_MEM");
-    }
   }
 
   void External::codegen(CodeGenerator& g, const std::string& fname,

@@ -165,8 +165,8 @@ namespace casadi {
     // Sparsities
     sparsity_t sparsity_in_, sparsity_out_;
 
-    // Maximum number of memory objects
-    int n_mem_;
+    // Number of available memory objects
+    getint_t n_memory_;
 
   public:
     /** \brief Constructor */
@@ -185,7 +185,7 @@ namespace casadi {
     /// @}
 
     /** \brief Maximum number of memory objects */
-    int n_mem() const override { return n_mem_;}
+    int n_memory() const override;
   };
 
 
