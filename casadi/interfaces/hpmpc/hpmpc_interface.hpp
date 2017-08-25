@@ -157,7 +157,7 @@ namespace casadi {
     void init_memory(void* mem) const override;
 
     /** \brief  Evaluate numerically */
-    void eval(void* mem, const double** arg, double** res, int* iw, double* w) const override;
+    void eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;
 
     /** \brief Helper function */
     static void mproject(double factor, const double* x, const int* sp_x,

@@ -139,7 +139,7 @@ namespace casadi {
     ///@{
     /** \brief  Evaluate numerically */
     void _eval(const double** arg, double** res, int* iw, double* w, int mem) const;
-    virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
+    virtual void eval(const double** arg, double** res, int* iw, double* w, void* mem) const;
     ///@}
 
     /** \brief  Evaluate numerically, simplied syntax */

@@ -94,7 +94,7 @@ namespace casadi {
   }
 
   void CallbackInternal::
-  eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
+  eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
     TRY_CALL(eval, self_, arg, res, iw, w, 0);
   }
 

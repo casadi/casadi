@@ -92,7 +92,7 @@ namespace casadi {
     void init_memory(void* mem) const override;
 
     // Solve the QP
-    void eval(void* mem, const double** arg, double** res, int* iw, double* w) const override;
+    void eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;
 
     /// A documentation string
     static const std::string meta_doc;

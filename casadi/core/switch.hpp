@@ -65,7 +65,7 @@ namespace casadi {
     void init(const Dict& opts) override;
 
     /** \brief  Evaluate numerically, work vectors given */
-    void eval(void* mem, const double** arg, double** res, int* iw, double* w) const override;
+    void eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;
 
     /** \brief  evaluate symbolically while also propagating directional derivatives */
     void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const override;

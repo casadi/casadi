@@ -372,7 +372,7 @@ namespace casadi {
       if (eval_) {
         eval_(arg, res, iw, w, mem);
       } else {
-        eval(memory(mem), arg, res, iw, w);
+        eval(arg, res, iw, w, memory(mem));
       }
     }
   }
@@ -1337,8 +1337,8 @@ namespace casadi {
     log("FunctionInternal::get_partition end");
   }
 
-  void FunctionInternal::eval(void* mem,
-                              const double** arg, double** res, int* iw, double* w) const {
+  void FunctionInternal::
+  eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
     casadi_error("'eval' not defined for " + type_name());
   }
 

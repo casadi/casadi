@@ -78,7 +78,7 @@ namespace casadi {
     void evalGen(const T** arg, T** res, int* iw, T* w) const;
 
     /// Evaluate the function numerically
-    void eval(void* mem, const double** arg, double** res, int* iw, double* w) const override;
+    void eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;
 
     /// Type of parallellization
     virtual std::string parallelization() const { return "serial"; }
@@ -156,7 +156,7 @@ namespace casadi {
     ~MapOmp() override;
 
     /// Evaluate the function numerically
-    void eval(void* mem, const double** arg, double** res, int* iw, double* w) const override;
+    void eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;
 
     /** \brief  Initialize */
     void init(const Dict& opts) override;

@@ -237,16 +237,16 @@ namespace casadi {
     return Function(name, arg, res, inames, onames, opts);
   }
 
-  void Map::eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
+  void Map::eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
     evalGen(arg, res, iw, w);
   }
 
   MapOmp::~MapOmp() {
   }
 
-  void MapOmp::eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
+  void MapOmp::eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
 #ifndef WITH_OPENMP
-    return Map::eval(mem, arg, res, iw, w);
+    return Map::eval(arg, res, iw, w, mem);
 #else // WITH_OPENMP
     int n_in = this->n_in(), n_out = this->n_out();
     size_t sz_arg, sz_res, sz_iw, sz_w;

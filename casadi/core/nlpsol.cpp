@@ -389,7 +389,7 @@ namespace casadi {
                  << typeid(*this).name());
   }
 
-  void Nlpsol::eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
+  void Nlpsol::eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
     // Reset the solver, prepare for solution
     setup(mem, arg, res, iw, w);
 

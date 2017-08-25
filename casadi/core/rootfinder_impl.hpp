@@ -95,7 +95,7 @@ namespace casadi {
                           int*& iw, double*& w) const override;
 
     // Evaluate numerically
-    void eval(void* mem, const double** arg, double** res, int* iw, double* w) const override;
+    void eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;
 
     // Solve the NLP
     virtual void solve(void* mem) const = 0;

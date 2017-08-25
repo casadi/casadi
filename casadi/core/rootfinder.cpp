@@ -163,7 +163,7 @@ namespace casadi {
     linsol_.reset(sp_jac_);
   }
 
-  void Rootfinder::eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
+  void Rootfinder::eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
     // Reset the solver, prepare for solution
     setup(mem, arg, res, iw, w);
 

@@ -144,7 +144,7 @@ namespace casadi {
   }
 
   void OoqpInterface::
-  eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
+  eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
     if (inputs_check_) {
       checkInputs(arg[CONIC_LBX], arg[CONIC_UBX], arg[CONIC_LBA], arg[CONIC_UBA]);
     }

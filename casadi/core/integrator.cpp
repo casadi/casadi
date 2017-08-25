@@ -144,7 +144,7 @@ namespace casadi {
   }
 
   void Integrator::
-  eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
+  eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
     auto m = static_cast<IntegratorMemory*>(mem);
 
     // Statistics

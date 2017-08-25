@@ -95,7 +95,7 @@ namespace casadi {
       void init(const Dict& opts) override;
 
       /** \brief  Evaluate numerically, work vectors given */
-      void eval(void* mem, const double** arg, double** res, int* iw, double* w) const override;
+      void eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;
 
       ///@{
       /** \brief Generate a function that calculates \a nfwd forward derivatives */
@@ -174,7 +174,7 @@ namespace casadi {
       void init(const Dict& opts) override;
 
       /** \brief  Evaluate numerically, work vectors given */
-      void eval(void* mem, const double** arg, double** res, int* iw, double* w) const override;
+      void eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;
 
       ///@{
       /** \brief Generate a function that calculates \a nfwd forward derivatives */

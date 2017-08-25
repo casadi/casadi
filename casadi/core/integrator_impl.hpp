@@ -105,7 +105,7 @@ namespace casadi {
                          double* rx, double* rz, double* rq) const = 0;
 
     /** \brief  evaluate */
-    void eval(void* mem, const double** arg, double** res, int* iw, double* w) const override;
+    void eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;
 
     /** \brief  Print solver statistics */
     virtual void print_stats(IntegratorMemory* mem, std::ostream &stream) const {}

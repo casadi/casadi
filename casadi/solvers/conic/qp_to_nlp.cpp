@@ -109,7 +109,7 @@ namespace casadi {
   }
 
   void QpToNlp::
-  eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
+  eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
     // Inputs
     const double *h_, *g_, *a_, *lba_, *uba_, *lbx_, *ubx_, *x0_;
     // Outputs

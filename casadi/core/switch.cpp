@@ -133,7 +133,7 @@ namespace casadi {
     alloc_w(sz_buf, true);
   }
 
-  void Switch::eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
+  void Switch::eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
     // Shorthands
     int n_in=this->n_in()-1, n_out=this->n_out();
 
