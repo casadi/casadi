@@ -223,7 +223,7 @@ class CASADI_EXPORT SXFunction :
   int sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
 
   /** \brief  Propagate sparsity backwards */
-  void sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
+  int sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
 
   /** \brief Return Jacobian of all input elements with respect to all output elements */
   Function get_jacobian(const std::string& name,

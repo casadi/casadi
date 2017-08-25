@@ -498,7 +498,7 @@ namespace casadi {
     return 0;
   }
 
-  void MXFunction::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  int MXFunction::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     // Temporaries to hold pointers to operation input and outputs
     bvec_t** arg1=arg+n_in();
     bvec_t** res1=res+n_out();
@@ -539,6 +539,7 @@ namespace casadi {
         it->data->sp_reverse(arg1, res1, iw, w, 0);
       }
     }
+    return 0;
   }
 
   std::vector<MX> MXFunction::symbolic_output(const std::vector<MX>& arg) const {

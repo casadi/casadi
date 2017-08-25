@@ -462,16 +462,16 @@ namespace casadi {
       return 0;
     }
 
-    void BSplineDual::
+    int BSplineDual::
     sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
-      if (!res[0]) return;
-
+      if (!res[0]) return 0;
       int n_dims = degree_.size();
       for (int i=0;i<N_;++i) {
         nd_boor_eval_sp(arg[0]+(!reverse_? 0 : i*m_), n_dims, get_ptr(knots_), get_ptr(offset_),
           get_ptr(degree_), get_ptr(strides_), res[0]+(!reverse_? i*m_ : 0), m_,
           get_ptr(x_)+i*n_dims, get_ptr(lookup_mode_), !reverse_, iw, w);
       }
+      return 0;
     }
 
 } // namespace casadi

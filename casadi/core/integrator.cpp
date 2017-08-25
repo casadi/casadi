@@ -540,7 +540,7 @@ namespace casadi {
       arg1[DE_Z] = tmp_z;
       res1[DE_ODE] = res1[DE_ALG] = 0;
       res1[DE_QUAD] = res[INTEGRATOR_QF];
-      oracle_(arg1, res1, iw, w, 0);
+      if (oracle_(arg1, res1, iw, w, 0)) return 1;
     }
 
     if (nrx_>0) {
@@ -576,14 +576,14 @@ namespace casadi {
         arg1[DE_RZ] = tmp_rz;
         res1[DE_RODE] = res1[DE_RALG] = 0;
         res1[DE_RQUAD] = res[INTEGRATOR_RQF];
-        oracle_(arg1, res1, iw, w, 0);
+        if (oracle_(arg1, res1, iw, w, 0)) return 1;
       }
     }
     log("Integrator::sp_forward", "end");
     return 0;
   }
 
-  void Integrator::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  int Integrator::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     log("Integrator::sp_reverse", "begin");
 
     // Work vectors
@@ -649,7 +649,7 @@ namespace casadi {
       arg1[DE_RX] = tmp_rx;
       arg1[DE_RZ] = tmp_rz;
       arg1[DE_RP] = rp;
-      oracle_.rev(arg1, res1, iw, w, 0);
+      if (oracle_.rev(arg1, res1, iw, w, 0)) return 1;
 
       // Propagate interdependencies
       fill_n(w, nrx_+nrz_, 0);
@@ -665,7 +665,7 @@ namespace casadi {
       res1[DE_RQUAD] = 0;
       arg1[DE_RX] = rx0;
       arg1[DE_RZ] = 0; // arg[INTEGRATOR_RZ0] is a guess, no dependency
-      oracle_.rev(arg1, res1, iw, w, 0);
+      if (oracle_.rev(arg1, res1, iw, w, 0)) return 1;
     }
 
     // Get dependencies from forward quadratures
@@ -675,7 +675,9 @@ namespace casadi {
     arg1[DE_X] = tmp_x;
     arg1[DE_Z] = tmp_z;
     arg1[DE_P] = p;
-    if (qf && nq_>0) oracle_.rev(arg1, res1, iw, w, 0);
+    if (qf && nq_>0) {
+      if (oracle_.rev(arg1, res1, iw, w, 0)) return 1;
+    }
 
     // Propagate interdependencies
     fill_n(w, nx_+nz_, 0);
@@ -691,9 +693,10 @@ namespace casadi {
     res1[DE_QUAD] = 0;
     arg1[DE_X] = x0;
     arg1[DE_Z] = 0; // arg[INTEGRATOR_Z0] is a guess, no dependency
-    oracle_.rev(arg1, res1, iw, w, 0);
+    if (oracle_.rev(arg1, res1, iw, w, 0)) return 1;
 
     log("Integrator::sp_reverse", "end");
+    return 0;
   }
 
   Function Integrator::

@@ -270,7 +270,7 @@ namespace casadi {
     return 0;
   }
 
-  void Rootfinder::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  int Rootfinder::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     int num_out = n_out();
     int num_in = n_in();
     bvec_t* tmp1 = w; w += n_;
@@ -292,7 +292,7 @@ namespace casadi {
     copy(arg, arg+num_in, arg1);
     arg1[iin_] = tmp1;
     if (num_out>1) {
-      oracle_.rev(arg1, res1, iw, w, 0);
+      if (oracle_.rev(arg1, res1, iw, w, 0)) return 1;
     }
 
     // "Solve" in order to get seed
@@ -303,7 +303,8 @@ namespace casadi {
     for (int i=0; i<num_out; ++i) res1[i] = 0;
     res1[iout_] = tmp2;
     arg1[iin_] = 0; // just a guess
-    oracle_.rev(arg1, res1, iw, w, 0);
+    if (oracle_.rev(arg1, res1, iw, w, 0)) return 1;
+    return 0;
   }
 
   std::map<std::string, Rootfinder::Plugin> Rootfinder::solvers_;

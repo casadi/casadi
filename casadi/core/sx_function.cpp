@@ -788,7 +788,7 @@ namespace casadi {
     return 0;
   }
 
-  void SXFunction::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  int SXFunction::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     fill_n(w, sz_w(), 0);
 
     // Propagate sparsity backward
@@ -819,6 +819,7 @@ namespace casadi {
         w[it->i2] |= seed;
       }
     }
+    return 0;
   }
 
   Function SXFunction::get_jacobian(const std::string& name,

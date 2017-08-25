@@ -388,7 +388,7 @@ namespace casadi {
     return _call(arg, res);
   }
 
-  void Function::rev(std::vector<bvec_t*> arg, std::vector<bvec_t*> res) const {
+  int Function::rev(std::vector<bvec_t*> arg, std::vector<bvec_t*> res) const {
     // Input buffer
     casadi_assert(arg.size()>=n_in());
     arg.resize(sz_arg());
@@ -402,7 +402,7 @@ namespace casadi {
     vector<bvec_t> w(sz_w());
 
     // Evaluate memoryless
-    rev(get_ptr(arg), get_ptr(res), get_ptr(iw), get_ptr(w), 0);
+    return rev(get_ptr(arg), get_ptr(res), get_ptr(iw), get_ptr(w), 0);
   }
 
   Function Function::mapaccum(const string& name, int n, int n_accum,
@@ -746,8 +746,8 @@ namespace casadi {
     return (*this)->sp_forward(arg, res, iw, w, mem);
   }
 
-  void Function::rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
-    (*this)->sp_reverse(arg, res, iw, w, mem);
+  int Function::rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+    return (*this)->sp_reverse(arg, res, iw, w, mem);
   }
 
   void Function::set_work(const double**& arg, double**& res, int*& iw, double*& w,

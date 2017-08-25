@@ -2032,7 +2032,7 @@ namespace casadi {
     return 0;
   }
 
-  void FunctionInternal::
+  int FunctionInternal::
   sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     // Get the number of inputs and outputs
     int n_in = this->n_in();
@@ -2065,6 +2065,7 @@ namespace casadi {
       // Clear seeds
       casadi_fill(res[oind], nnz_out(oind), bvec_t(0));
     }
+    return 0;
   }
 
   void FunctionInternal::sz_work(size_t& sz_arg, size_t& sz_res,
