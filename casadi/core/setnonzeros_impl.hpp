@@ -464,21 +464,21 @@ namespace casadi {
   }
 
   template<bool Add>
-  void SetNonzerosVector<Add>::
+  int SetNonzerosVector<Add>::
   eval(const double** arg, double** res, int* iw, double* w, int mem) const {
-    evalGen<double>(arg, res, iw, w, mem);
+    return eval_gen<double>(arg, res, iw, w, mem);
   }
 
   template<bool Add>
-  void SetNonzerosVector<Add>::
+  int SetNonzerosVector<Add>::
   eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
-    evalGen<SXElem>(arg, res, iw, w, mem);
+    return eval_gen<SXElem>(arg, res, iw, w, mem);
   }
 
   template<bool Add>
   template<typename T>
-  void SetNonzerosVector<Add>::
-  evalGen(const T** arg, T** res, int* iw, T* w, int mem) const {
+  int SetNonzerosVector<Add>::
+  eval_gen(const T** arg, T** res, int* iw, T* w, int mem) const {
     const T* idata0 = arg[0];
     const T* idata = arg[1];
     T* odata = res[0];
@@ -492,24 +492,25 @@ namespace casadi {
         if (*k>=0) odata[*k] = *idata;
       }
     }
+    return 0;
   }
 
   template<bool Add>
-  void SetNonzerosSlice<Add>::
+  int SetNonzerosSlice<Add>::
   eval(const double** arg, double** res, int* iw, double* w, int mem) const {
-    evalGen<double>(arg, res, iw, w, mem);
+    return eval_gen<double>(arg, res, iw, w, mem);
   }
 
   template<bool Add>
-  void SetNonzerosSlice<Add>::
+  int SetNonzerosSlice<Add>::
   eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
-    evalGen<SXElem>(arg, res, iw, w, mem);
+    return eval_gen<SXElem>(arg, res, iw, w, mem);
   }
 
   template<bool Add>
   template<typename T>
-  void SetNonzerosSlice<Add>::
-  evalGen(const T** arg, T** res, int* iw, T* w, int mem) const {
+  int SetNonzerosSlice<Add>::
+  eval_gen(const T** arg, T** res, int* iw, T* w, int mem) const {
     const T* idata0 = arg[0];
     const T* idata = arg[1];
     T* odata = res[0];
@@ -524,24 +525,25 @@ namespace casadi {
         *odata = *idata++;
       }
     }
+    return 0;
   }
 
   template<bool Add>
-  void SetNonzerosSlice2<Add>::
+  int SetNonzerosSlice2<Add>::
   eval(const double** arg, double** res, int* iw, double* w, int mem) const {
-    evalGen<double>(arg, res, iw, w, mem);
+    return eval_gen<double>(arg, res, iw, w, mem);
   }
 
   template<bool Add>
-  void SetNonzerosSlice2<Add>::
+  int SetNonzerosSlice2<Add>::
   eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
-    evalGen<SXElem>(arg, res, iw, w, mem);
+    return eval_gen<SXElem>(arg, res, iw, w, mem);
   }
 
   template<bool Add>
   template<typename T>
-  void SetNonzerosSlice2<Add>::
-  evalGen(const T** arg, T** res, int* iw, T* w, int mem) const {
+  int SetNonzerosSlice2<Add>::
+  eval_gen(const T** arg, T** res, int* iw, T* w, int mem) const {
     const T* idata0 = arg[0];
     const T* idata = arg[1];
     T* odata = res[0];
@@ -561,10 +563,11 @@ namespace casadi {
         }
       }
     }
+    return 0;
   }
 
   template<bool Add>
-  void SetNonzerosVector<Add>::
+  int SetNonzerosVector<Add>::
   sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     const bvec_t *a0 = arg[0];
     const bvec_t *a = arg[1];
@@ -580,10 +583,11 @@ namespace casadi {
         if (*k>=0) r[*k] = *a;
       }
     }
+    return 0;
   }
 
   template<bool Add>
-  void SetNonzerosVector<Add>::
+  int SetNonzerosVector<Add>::
   sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     bvec_t *a = arg[1];
     bvec_t *r = res[0];
@@ -596,10 +600,11 @@ namespace casadi {
       }
     }
     MXNode::copy_rev(arg[0], r, this->nnz());
+    return 0;
   }
 
   template<bool Add>
-  void SetNonzerosSlice<Add>::
+  int SetNonzerosSlice<Add>::
   sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     const bvec_t *a0 = arg[0];
     const bvec_t *a = arg[1];
@@ -615,10 +620,11 @@ namespace casadi {
         r[k] = *a++;
       }
     }
+    return 0;
   }
 
   template<bool Add>
-  void SetNonzerosSlice<Add>::
+  int SetNonzerosSlice<Add>::
   sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     bvec_t *a = arg[1];
     bvec_t *r = res[0];
@@ -629,10 +635,11 @@ namespace casadi {
       }
     }
     MXNode::copy_rev(arg[0], r, this->nnz());
+    return 0;
   }
 
   template<bool Add>
-  void SetNonzerosSlice2<Add>::
+  int SetNonzerosSlice2<Add>::
   sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     const bvec_t *a0 = arg[0];
     const bvec_t *a = arg[1];
@@ -650,10 +657,11 @@ namespace casadi {
         }
       }
     }
+    return 0;
   }
 
   template<bool Add>
-  void SetNonzerosSlice2<Add>::
+  int SetNonzerosSlice2<Add>::
   sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     bvec_t *a = arg[1];
     bvec_t *r = res[0];
@@ -666,6 +674,7 @@ namespace casadi {
       }
     }
     MXNode::copy_rev(arg[0], r, this->nnz());
+    return 0;
   }
 
   template<bool Add>

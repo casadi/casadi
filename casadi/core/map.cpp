@@ -60,7 +60,7 @@ namespace casadi {
   }
 
   template<typename T>
-  int Map::evalGen(const T** arg, T** res, int* iw, T* w) const {
+  int Map::eval_gen(const T** arg, T** res, int* iw, T* w) const {
     int n_in = this->n_in(), n_out = this->n_out();
     const T** arg1 = arg+n_in;
     copy_n(arg, n_in, arg1);
@@ -79,11 +79,11 @@ namespace casadi {
   }
 
   int Map::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
-    return evalGen(arg, res, iw, w);
+    return eval_gen(arg, res, iw, w);
   }
 
   int Map::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
-    return evalGen(arg, res, iw, w);
+    return eval_gen(arg, res, iw, w);
   }
 
   int Map::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
@@ -240,7 +240,7 @@ namespace casadi {
   }
 
   int Map::eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
-    return evalGen(arg, res, iw, w);
+    return eval_gen(arg, res, iw, w);
   }
 
   MapOmp::~MapOmp() {

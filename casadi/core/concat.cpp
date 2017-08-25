@@ -37,25 +37,26 @@ namespace casadi {
   Concat::~Concat() {
   }
 
-  void Concat::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
-    evalGen<double>(arg, res, iw, w);
+  int Concat::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
+    return eval_gen<double>(arg, res, iw, w);
   }
 
-  void Concat::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
-    evalGen<SXElem>(arg, res, iw, w);
+  int Concat::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
+    return eval_gen<SXElem>(arg, res, iw, w);
   }
 
   template<typename T>
-  void Concat::evalGen(const T* const* arg, T* const* res, int* iw, T* w) const {
+  int Concat::eval_gen(const T* const* arg, T* const* res, int* iw, T* w) const {
     T* r = res[0];
     for (int i=0; i<n_dep(); ++i) {
       int n = dep(i).nnz();
       copy(arg[i], arg[i]+n, r);
       r += n;
     }
+    return 0;
   }
 
-  void Concat::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  int Concat::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     bvec_t *res_ptr = res[0];
     for (int i=0; i<n_dep(); ++i) {
       int n_i = dep(i).nnz();
@@ -63,9 +64,10 @@ namespace casadi {
       copy(arg_i_ptr, arg_i_ptr+n_i, res_ptr);
       res_ptr += n_i;
     }
+    return 0;
   }
 
-  void Concat::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  int Concat::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     bvec_t *res_ptr = res[0];
     for (int i=0; i<n_dep(); ++i) {
       int n_i = dep(i).nnz();
@@ -75,6 +77,7 @@ namespace casadi {
         *res_ptr++ = 0;
       }
     }
+    return 0;
   }
 
   void Concat::generate(CodeGenerator& g, const std::string& mem,

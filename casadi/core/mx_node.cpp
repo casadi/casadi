@@ -290,12 +290,14 @@ namespace casadi {
     casadi_error("'which_output' not defined for class " + type_name());
   }
 
-  void MXNode::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
+  int MXNode::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
     casadi_error("'eval' not defined for class " + type_name());
+    return 1;
   }
 
-  void MXNode::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
+  int MXNode::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
     casadi_error("'eval_sx' not defined for class " + type_name());
+    return 1;
   }
 
   void MXNode::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
@@ -312,7 +314,7 @@ namespace casadi {
     casadi_error("'ad_reverse' not defined for class " + type_name());
   }
 
-  void MXNode::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  int MXNode::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     // By default, everything depends on everything
     bvec_t all_depend(0);
 
@@ -331,9 +333,10 @@ namespace casadi {
         v[i] = all_depend;
       }
     }
+    return 0;
   }
 
-  void MXNode::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  int MXNode::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     // By default, everything depends on everything
     bvec_t all_depend(0);
 
@@ -353,6 +356,7 @@ namespace casadi {
         v[i] |= all_depend;
       }
     }
+    return 0;
   }
 
   MX MXNode::get_output(int oind) const {

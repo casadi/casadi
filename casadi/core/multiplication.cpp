@@ -49,21 +49,22 @@ namespace casadi {
     return "mac(" + arg.at(1) + "," + arg.at(2) + "," + arg.at(0) + ")";
   }
 
-  void Multiplication::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
-    evalGen<double>(arg, res, iw, w, mem);
+  int Multiplication::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
+    return eval_gen<double>(arg, res, iw, w, mem);
   }
 
-  void Multiplication::
+  int Multiplication::
   eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
-    evalGen<SXElem>(arg, res, iw, w, mem);
+    return eval_gen<SXElem>(arg, res, iw, w, mem);
   }
 
   template<typename T>
-  void Multiplication::evalGen(const T** arg, T** res, int* iw, T* w, int mem) const {
+  int Multiplication::eval_gen(const T** arg, T** res, int* iw, T* w, int mem) const {
     if (arg[0]!=res[0]) copy(arg[0], arg[0]+dep(0).nnz(), res[0]);
     casadi_mtimes(arg[1], dep(1).sparsity(),
                arg[2], dep(2).sparsity(),
                res[0], sparsity(), w, false);
+    return 0;
   }
 
   void Multiplication::ad_forward(const std::vector<std::vector<MX> >& fseed,
@@ -88,20 +89,22 @@ namespace casadi {
     res[0] = mac(arg[1], arg[2], arg[0]);
   }
 
-  void Multiplication::
+  int Multiplication::
   sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     copy_fwd(arg[0], res[0], nnz());
     Sparsity::mul_sparsityF(arg[1], dep(1).sparsity(),
                             arg[2], dep(2).sparsity(),
                             res[0], sparsity(), w);
+    return 0;
   }
 
-  void Multiplication::
+  int Multiplication::
   sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     Sparsity::mul_sparsityR(arg[1], dep(1).sparsity(),
                             arg[2], dep(2).sparsity(),
                             res[0], sparsity(), w);
     copy_rev(arg[0], res[0], nnz());
+    return 0;
   }
 
   void Multiplication::generate(CodeGenerator& g, const std::string& mem,

@@ -61,13 +61,14 @@ namespace casadi {
     }
   }
 
-  void Monitor::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
+  int Monitor::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
     if (arg[0]!=res[0]) {
       copy(arg[0], arg[0]+nnz(), res[0]);
     }
+    return 0;
   }
 
-  void Monitor::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
+  int Monitor::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
     // Print comment
     userOut() << comment_ << ":" << endl;
     userOut() << "[";
@@ -82,15 +83,17 @@ namespace casadi {
     if (arg[0]!=res[0]) {
       copy(arg[0], arg[0]+n, res[0]);
     }
+    return 0;
   }
 
-  void Monitor::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  int Monitor::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     if (arg[0]!=res[0]) {
       copy(arg[0], arg[0]+nnz(), res[0]);
     }
+    return 0;
   }
 
-  void Monitor::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  int Monitor::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     bvec_t *a = arg[0];
     bvec_t *r = res[0];
     int n = nnz();
@@ -100,6 +103,7 @@ namespace casadi {
         *r++ = 0;
       }
     }
+    return 0;
   }
 
   void Monitor::generate(CodeGenerator& g, const std::string& mem,

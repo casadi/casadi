@@ -83,8 +83,8 @@ namespace casadi {
     return ss.str();
   }
 
-  void Call::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
-    fcn_(arg, res, iw, w, mem);
+  int Call::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
+    return fcn_(arg, res, iw, w, mem);
   }
 
   int Call::nout() const {
@@ -95,8 +95,8 @@ namespace casadi {
     return fcn_.sparsity_out(oind);
   }
 
-  void Call::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
-    fcn_(arg, res, iw, w, mem);
+  int Call::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
+    return fcn_(arg, res, iw, w, mem);
   }
 
   void Call::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
@@ -135,12 +135,12 @@ namespace casadi {
     }
   }
 
-  void Call::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
-    fcn_(arg, res, iw, w, mem);
+  int Call::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+    return fcn_(arg, res, iw, w, mem);
   }
 
-  void Call::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
-    fcn_.rev(arg, res, iw, w, mem);
+  int Call::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+    return fcn_.rev(arg, res, iw, w, mem);
   }
 
   void Call::add_dependency(CodeGenerator& g) const {

@@ -60,29 +60,33 @@ namespace casadi {
     }
   }
 
-  void Assertion::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
+  int Assertion::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
     if (arg[0]!=res[0]) {
       copy(arg[0], arg[0]+nnz(), res[0]);
     }
+    return 0;
   }
 
-  void Assertion::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
+  int Assertion::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
     if (arg[1][0]!=1) {
       casadi_error("Assertion error: " << fail_message_);
+      return 1;
     }
 
     if (arg[0]!=res[0]) {
       copy(arg[0], arg[0]+nnz(), res[0]);
     }
+    return 0;
   }
 
-  void Assertion::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  int Assertion::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     if (arg[0]!=res[0]) {
       copy(arg[0], arg[0]+nnz(), res[0]);
     }
+    return 0;
   }
 
-  void Assertion::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  int Assertion::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     bvec_t *a = arg[0];
     bvec_t *r = res[0];
     int n = nnz();
@@ -92,6 +96,7 @@ namespace casadi {
         *r++ = 0;
       }
     }
+    return 0;
   }
 
   void Assertion::generate(CodeGenerator& g, const std::string& mem,

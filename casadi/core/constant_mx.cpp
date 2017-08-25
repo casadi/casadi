@@ -87,12 +87,14 @@ namespace casadi {
                            std::vector<std::vector<MX> >& asens) const {
   }
 
-  void ConstantMX::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  int ConstantMX::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     fill_n(res[0], nnz(), 0);
+    return 0;
   }
 
-  void ConstantMX::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  int ConstantMX::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     fill_n(res[0], nnz(), 0);
+    return 0;
   }
 
   void ConstantDM::generate(CodeGenerator& g, const std::string& mem,

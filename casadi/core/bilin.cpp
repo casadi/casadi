@@ -61,20 +61,21 @@ namespace casadi {
     }
   }
 
-  void Bilin::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
-    evalGen<double>(arg, res, iw, w, mem);
+  int Bilin::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
+    return eval_gen<double>(arg, res, iw, w, mem);
   }
 
-  void Bilin::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
-    evalGen<SXElem>(arg, res, iw, w, mem);
+  int Bilin::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
+    return eval_gen<SXElem>(arg, res, iw, w, mem);
   }
 
   template<typename T>
-  void Bilin::evalGen(const T** arg, T** res, int* iw, T* w, int mem) const {
+  int Bilin::eval_gen(const T** arg, T** res, int* iw, T* w, int mem) const {
     *res[0] = casadi_bilin(arg[0], dep(0).sparsity(), arg[1], arg[2]);
+    return 0;
   }
 
-  void Bilin::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  int Bilin::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     /* Get sparsities */
     int ncol_A = sparsity().size2();
     const int *colind_A = dep(0).colind(), *row_A = dep(0).row();
@@ -95,9 +96,10 @@ namespace casadi {
       }
     }
     *res[0] = r;
+    return 0;
   }
 
-  void Bilin::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  int Bilin::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     /* Get sparsities */
     int ncol_A = sparsity().size2();
     const int *colind_A = dep(0).colind(), *row_A = dep(0).row();
@@ -120,6 +122,7 @@ namespace casadi {
         arg[2][cc] |= s;
       }
     }
+    return 0;
   }
 
   void Bilin::generate(CodeGenerator& g, const std::string& mem,

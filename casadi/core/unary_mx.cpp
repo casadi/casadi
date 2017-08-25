@@ -47,14 +47,16 @@ namespace casadi {
     return casadi_math<double>::print(op_, arg.at(0));
   }
 
-  void UnaryMX::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
+  int UnaryMX::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
     double dummy = numeric_limits<double>::quiet_NaN();
     casadi_math<double>::fun(op_, arg[0], dummy, res[0], nnz());
+    return 0;
   }
 
-  void UnaryMX::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
+  int UnaryMX::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
     SXElem dummy = 0;
     casadi_math<SXElem>::fun(op_, arg[0], dummy, res[0], nnz());
+    return 0;
   }
 
   void UnaryMX::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
@@ -88,12 +90,14 @@ namespace casadi {
     }
   }
 
-  void UnaryMX::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  int UnaryMX::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     copy_fwd(arg[0], res[0], nnz());
+    return 0;
   }
 
-  void UnaryMX::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  int UnaryMX::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     copy_rev(arg[0], res[0], nnz());
+    return 0;
   }
 
   void UnaryMX::generate(CodeGenerator& g, const std::string& mem,

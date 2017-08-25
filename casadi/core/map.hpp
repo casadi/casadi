@@ -75,7 +75,7 @@ namespace casadi {
 
     /** \brief  Evaluate or propagate sparsities */
     template<typename T>
-    int evalGen(const T** arg, T** res, int* iw, T* w) const;
+    int eval_gen(const T** arg, T** res, int* iw, T* w) const;
 
     /// Evaluate the function numerically
     int eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;

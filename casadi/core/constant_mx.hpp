@@ -60,10 +60,10 @@ namespace casadi {
     static ConstantMX* create(const Matrix<double>& val);
 
     /// Evaluate the function numerically
-    void eval(const double** arg, double** res, int* iw, double* w, int mem) const override = 0;
+    int eval(const double** arg, double** res, int* iw, double* w, int mem) const override = 0;
 
     /// Evaluate the function symbolically (SX)
-    void eval_sx(const SXElem** arg, SXElem** res,
+    int eval_sx(const SXElem** arg, SXElem** res,
                          int* iw, SXElem* w, int mem) const override = 0;
 
     /** \brief  Evaluate symbolically (MX) */
@@ -78,10 +78,10 @@ namespace casadi {
                          std::vector<std::vector<MX> >& asens) const override;
 
     /** \brief  Propagate sparsity forward */
-    void sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
+    int sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
 
     /** \brief  Propagate sparsity backwards */
-    void sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
+    int sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
 
     /** \brief Get the operation */
     int op() const override { return OP_CONST;}
@@ -139,14 +139,16 @@ namespace casadi {
     }
 
     /** \brief  Evaluate the function numerically */
-    void eval(const double** arg, double** res, int* iw, double* w, int mem) const override {
+    int eval(const double** arg, double** res, int* iw, double* w, int mem) const override {
       std::copy(x_->begin(), x_->end(), res[0]);
+      return 0;
     }
 
     /** \brief  Evaluate the function symbolically (SX) */
-    void eval_sx(const SXElem** arg, SXElem** res,
+    int eval_sx(const SXElem** arg, SXElem** res,
                          int* iw, SXElem* w, int mem) const override {
       std::copy(x_->begin(), x_->end(), res[0]);
+      return 0;
     }
 
     /** \brief Generate code for the operation */
@@ -197,11 +199,15 @@ namespace casadi {
 
     /** \brief  Evaluate the function numerically */
     /// Evaluate the function numerically
-    void eval(const double** arg, double** res, int* iw, double* w, int mem) const override {}
+    int eval(const double** arg, double** res, int* iw, double* w, int mem) const override {
+      return 0;
+    }
 
     /// Evaluate the function symbolically (SX)
-    void eval_sx(const SXElem** arg, SXElem** res,
-                         int* iw, SXElem* w, int mem) const override {}
+    int eval_sx(const SXElem** arg, SXElem** res,
+                         int* iw, SXElem* w, int mem) const override {
+      return 0;
+    }
 
     /** \brief Generate code for the operation */
     void generate(CodeGenerator& g, const std::string& mem,
@@ -274,10 +280,10 @@ namespace casadi {
 
     /** \brief  Evaluate the function numerically */
     /// Evaluate the function numerically
-    void eval(const double** arg, double** res, int* iw, double* w, int mem) const override;
+    int eval(const double** arg, double** res, int* iw, double* w, int mem) const override;
 
     /// Evaluate the function symbolically (SX)
-    void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const override;
+    int eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const override;
 
     /** \brief Generate code for the operation */
     void generate(CodeGenerator& g, const std::string& mem,
@@ -463,14 +469,16 @@ namespace casadi {
   }
 
   template<typename Value>
-  void Constant<Value>::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
+  int Constant<Value>::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
     std::fill(res[0], res[0]+nnz(), static_cast<double>(v_.value));
+    return 0;
   }
 
   template<typename Value>
-  void Constant<Value>::
+  int Constant<Value>::
   eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
     std::fill(res[0], res[0]+nnz(), SXElem(v_.value));
+    return 0;
   }
 
   template<typename Value>

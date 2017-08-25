@@ -39,7 +39,7 @@ namespace casadi {
     set_dep(ind, x);
   }
 
-  void GetElements::
+  int GetElements::
   eval(const double** arg, double** res, int* iw, double* w, int mem) const {
     // Get input and output arguments
     const double* ind = arg[0];
@@ -57,6 +57,7 @@ namespace casadi {
       // Make assignment if in bounds, else NaN
       *ret++ = index>=0 && index<max_ind ? x[index] : nan;
     }
+    return 0;
   }
 
   std::string GetElements::print(const std::vector<std::string>& arg) const {

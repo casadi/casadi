@@ -42,10 +42,12 @@ namespace casadi {
     return name_;
   }
 
-  void SymbolicMX::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
+  int SymbolicMX::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
+    return 0;
   }
 
-  void SymbolicMX::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
+  int SymbolicMX::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
+    return 0;
   }
 
   void SymbolicMX::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
@@ -63,12 +65,14 @@ namespace casadi {
     return name_;
   }
 
-  void SymbolicMX::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  int SymbolicMX::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     fill_n(res[0], nnz(), 0);
+    return 0;
   }
 
-  void SymbolicMX::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  int SymbolicMX::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     fill_n(res[0], nnz(), 0);
+    return 0;
   }
 
   bool SymbolicMX::has_duplicates() const {

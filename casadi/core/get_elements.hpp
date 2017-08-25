@@ -59,7 +59,7 @@ namespace casadi {
     int n_inplace() const override { return 1;}
 
     /// Evaluate the function numerically
-    void eval(const double** arg, double** res, int* iw, double* w, int mem) const override;
+    int eval(const double** arg, double** res, int* iw, double* w, int mem) const override;
   };
 
 } // namespace casadi
