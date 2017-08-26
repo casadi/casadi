@@ -2142,12 +2142,13 @@ The return value of the function is nonzero upon failure.
 \subsection*{Numerical evaluation}
 \begin{lstlisting}[language=C]
 int fname(const double** arg, double** res,
-          int* iw, double* w, int mem);
+          int* iw, double* w, void* mem);
 \end{lstlisting}
 
 Finally, the function \verb|fname|, performs the actual evaluation. It takes
-as input arguments the four work vectors and the index of the chosen memory
-object. The length of the work vectors must be at least the lengths provided
+as input arguments the four work vectors and a memory object created using \verb|fname_alloc_mem|
+(or NULL if absent).
+The length of the work vectors must be at least the lengths provided
 by the \cxx{fname_work} command and the index of the memory object must be strictly
 smaller than the value returned by \cxx{fname_n_mem}.
 

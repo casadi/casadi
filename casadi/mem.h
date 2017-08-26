@@ -47,7 +47,7 @@ typedef const int* (*casadi_sparsity_t)(int i);
 typedef const char* (*casadi_name_t)(int i);
 typedef int (*casadi_work_t)(int* sz_arg, int* sz_res, int* sz_iw, int* sz_w);
 typedef int (*casadi_eval_t)(const casadi_real** arg, casadi_real** res,
-                             int* iw, casadi_real* w, int mem);
+                             int* iw, casadi_real* w, void* mem);
 
 /* Structure to hold meta information about an input or output */
 typedef struct {

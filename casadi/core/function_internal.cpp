@@ -348,7 +348,7 @@ namespace casadi {
   }
 
   int FunctionInternal::
-  _eval(const double** arg, double** res, int* iw, double* w, int mem) const {
+  _eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
     if (simplified_call()) {
       // Copy arguments to input buffers
       const double* arg1=w;
@@ -375,7 +375,7 @@ namespace casadi {
       if (eval_) {
         return eval_(arg, res, iw, w, mem);
       } else {
-        return eval(arg, res, iw, w, memory(mem));
+        return eval(arg, res, iw, w, mem);
       }
     }
   }
@@ -1707,7 +1707,7 @@ namespace casadi {
       return "void " + fname + "(const casadi_real* arg, casadi_real* res)";
     } else {
       return "int " + fname + "(const casadi_real** arg, casadi_real** res, "
-                              "int* iw, casadi_real* w, int mem)";
+                              "int* iw, casadi_real* w, void* mem)";
     }
   }
 

@@ -26,8 +26,8 @@
 /**
  *  Example program demonstrating the usage of C-code generated from CasADi
  *  Generated code is encapsulated in self-contained code with the entry points
- *  defined below. 
- *  Note that other usage, e.g. accessing the internal data structures in the 
+ *  defined below.
+ *  Note that other usage, e.g. accessing the internal data structures in the
  *  generated files is not recommended and subject to change.
  *
  *  We show how the generated code can be used from C (or C++), without requiring
@@ -49,9 +49,9 @@ int usage_c(){
   void* handle;
 
   /* Load the dll */
-  handle = dlopen("./f.so", RTLD_LAZY);  
+  handle = dlopen("./f.so", RTLD_LAZY);
   if(handle==0){
-    printf("Cannot open f.so, error %s\n", dlerror()); 
+    printf("Cannot open f.so, error %s\n", dlerror());
     return 1;
   }
 
@@ -63,7 +63,7 @@ int usage_c(){
   typedef int (*getint_t)(void);
   typedef int (*work_t)(int* sz_arg, int* sz_res, int* sz_iw, int* sz_w);
   typedef const int* (*sparsity_t)(int ind);
-  typedef int (*eval_t)(const double** arg, double** res, int* iw, double* w, int mem);
+  typedef int (*eval_t)(const double** arg, double** res, int* iw, double* w, void* mem);
 
   /* Memory management -- increase reference counter */
   signal_t incref = (signal_t)dlsym(handle, "f_incref");
@@ -125,7 +125,7 @@ int usage_c(){
     for(cc=0; cc<ncol; ++cc){                    /* loop over columns */
       for(el=colind[cc]; el<colind[cc+1]; ++el){ /* loop over the nonzeros entries of the column */
         if(el!=0) printf(", ");                  /* Separate the entries */
-        rr = row[el];                            /* Get the row */        
+        rr = row[el];                            /* Get the row */
         printf("{%d,%d}",rr,cc);                 /* Print the nonzero */
       }
     }
@@ -198,7 +198,7 @@ void usage_cplusplus(){
 }
 
 int main(){
-    
+
   // Variables
   SX x = SX::sym("x", 2, 2);
   SX y = SX::sym("y");
