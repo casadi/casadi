@@ -330,11 +330,12 @@ namespace casadi {
     alloc_w(nx_ + nz_ + nrx_ + nrz_, true);
   }
 
-  void Integrator::init_memory(void* mem) const {
-    OracleFunction::init_memory(mem);
+  int Integrator::init_mem(void* mem) const {
+    if (OracleFunction::init_mem(mem)) return 1;
 
     auto m = static_cast<IntegratorMemory*>(mem);
     m->fstats["mainloop"] = FStats();
+    return 0;
   }
 
   template<typename MatType>
@@ -1032,7 +1033,7 @@ namespace casadi {
   }
 
   FixedStepIntegrator::~FixedStepIntegrator() {
-    clear_memory();
+    clear_mem();
   }
 
   Options FixedStepIntegrator::options_
@@ -1066,8 +1067,8 @@ namespace casadi {
     nRZ_ =  G_.is_null() ? 0 : G_.nnz_in(RDAE_RZ);
   }
 
-  void FixedStepIntegrator::init_memory(void* mem) const {
-    Integrator::init_memory(mem);
+  int FixedStepIntegrator::init_mem(void* mem) const {
+    if (Integrator::init_mem(mem)) return 1;
     auto m = static_cast<FixedStepMemory*>(mem);
 
     // Discrete time algebraic variable
@@ -1095,6 +1096,7 @@ namespace casadi {
     m->rx_prev.resize(nrx_);
     m->RZ_prev.resize(nRZ_);
     m->rq_prev.resize(nrq_);
+    return 0;
   }
 
   void FixedStepIntegrator::advance(IntegratorMemory* mem, double t,

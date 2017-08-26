@@ -59,7 +59,7 @@ namespace casadi {
   }
 
   Sqpmethod::~Sqpmethod() {
-    clear_memory();
+    clear_mem();
   }
 
   Options Sqpmethod::options_

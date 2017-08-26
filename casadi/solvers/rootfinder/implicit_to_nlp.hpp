@@ -84,10 +84,10 @@ namespace casadi {
     void init(const Dict& opts) override;
 
     /** \brief Create memory block */
-    void* alloc_memory() const override { return new ImplicitToNlpMemory();}
+    void* alloc_mem() const override { return new ImplicitToNlpMemory();}
 
     /** \brief Free memory block */
-    void free_memory(void *mem) const override { delete static_cast<ImplicitToNlpMemory*>(mem);}
+    void free_mem(void *mem) const override { delete static_cast<ImplicitToNlpMemory*>(mem);}
 
     /** \brief Set the (persistent) work vectors */
     void set_work(void* mem, const double**& arg, double**& res,

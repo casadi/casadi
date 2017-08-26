@@ -101,7 +101,7 @@ namespace casadi {
     void init(const Dict& opts) override;
 
     /** \brief Initalize memory block */
-    void init_memory(void* mem) const override;
+    int init_mem(void* mem) const override;
 
     // Get system Jacobian
     virtual Function getJ(bool backward) const = 0;

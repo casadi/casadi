@@ -51,7 +51,7 @@ namespace casadi {
   }
 
   Ma27Interface::~Ma27Interface() {
-    clear_memory();
+    clear_mem();
   }
 
   void Ma27Interface::init(const Dict& opts) {
@@ -68,8 +68,8 @@ namespace casadi {
     LinsolInternal::set_work(mem, arg, res, iw, w);
   }
 
-  void Ma27Interface::init_memory(void* mem) const {
-    LinsolInternal::init_memory(mem);
+  int Ma27Interface::init_mem(void* mem) const {
+    if (LinsolInternal::init_mem(mem)) return 1;
     auto m = static_cast<Ma27Memory*>(mem);
 
     // Set default options for MA27
@@ -77,6 +77,7 @@ namespace casadi {
     m->icntl[0] = 0;       // Suppress error messages
     m->icntl[1] = 0;       // Suppress diagnostic messages
     m->cntl[0] = 1e-8;     // Set pivot tolerance
+    return 0;
   }
 
   void Ma27Interface::reset(void* mem, const int* sp) const {

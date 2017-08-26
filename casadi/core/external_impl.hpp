@@ -146,7 +146,7 @@ namespace casadi {
     SimplifiedExternal(const std::string& name, const Importer& li);
 
     /** \brief  Destructor */
-    ~SimplifiedExternal() override { this->clear_memory();}
+    ~SimplifiedExternal() override { this->clear_mem();}
 
     /// Initialize
     void init(const Dict& opts) override;
@@ -165,15 +165,17 @@ namespace casadi {
     // Sparsities
     sparsity_t sparsity_in_, sparsity_out_;
 
-    // Number of available memory objects
-    getint_t n_memory_;
+    // Memory allocation
+    alloc_mem_t alloc_mem_;
+    init_mem_t init_mem_;
+    free_mem_t free_mem_;
 
   public:
     /** \brief Constructor */
     GenericExternal(const std::string& name, const Importer& li);
 
     /** \brief  Destructor */
-    ~GenericExternal() override { this->clear_memory();}
+    ~GenericExternal() override { this->clear_mem();}
 
     /// Initialize
     void init(const Dict& opts) override;
@@ -184,8 +186,14 @@ namespace casadi {
     Sparsity get_sparsity_out(int i) override;
     /// @}
 
-    /** \brief Maximum number of memory objects */
-    int n_memory() const override;
+    /** \brief Create memory block */
+    void* alloc_mem() const override;
+
+    /** \brief Initalize memory block */
+    int init_mem(void* mem) const override;
+
+    /** \brief Free memory block */
+    void free_mem(void *mem) const override;
   };
 
 

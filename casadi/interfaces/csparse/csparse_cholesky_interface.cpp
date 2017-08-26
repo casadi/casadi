@@ -51,7 +51,7 @@ namespace casadi {
   }
 
   CSparseCholeskyInterface::~CSparseCholeskyInterface() {
-    clear_memory();
+    clear_mem();
   }
 
   CsparseCholMemory::~CsparseCholMemory() {
@@ -64,8 +64,8 @@ namespace casadi {
     LinsolInternal::init(opts);
   }
 
-  void CSparseCholeskyInterface::init_memory(void* mem) const {
-    LinsolInternal::init_memory(mem);
+  int CSparseCholeskyInterface::init_mem(void* mem) const {
+    return LinsolInternal::init_mem(mem);
   }
 
   void CSparseCholeskyInterface::reset(void* mem, const int* sp) const {

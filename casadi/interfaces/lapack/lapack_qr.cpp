@@ -50,7 +50,7 @@ namespace casadi {
   }
 
   LapackQr::~LapackQr() {
-    clear_memory();
+    clear_mem();
   }
 
   Options LapackQr::options_
@@ -75,8 +75,8 @@ namespace casadi {
     }
   }
 
-  void LapackQr::init_memory(void* mem) const {
-    LinsolInternal::init_memory(mem);
+  int LapackQr::init_mem(void* mem) const {
+    return LinsolInternal::init_mem(mem);
   }
 
   void LapackQr::reset(void* mem, const int* sp) const {

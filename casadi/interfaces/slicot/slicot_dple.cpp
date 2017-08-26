@@ -76,7 +76,7 @@ namespace casadi {
   }
 
   SlicotDple::~SlicotDple() {
-    clear_memory();
+    clear_mem();
   }
 
   void SlicotDple::init(const Dict& opts) {
@@ -170,8 +170,8 @@ namespace casadi {
 
 
   /** \brief Initalize memory block */
-  void SlicotDple::init_memory(void* mem) const {
-    Dple::init_memory(mem);
+  int SlicotDple::init_mem(void* mem) const {
+    if (Dple::init_mem(mem)) return 1;
     auto m = static_cast<SlicotDpleMemory*>(mem);
 
     // Construct linear solvers for low-order Discrete Periodic Sylvester Equations
@@ -196,6 +196,7 @@ namespace casadi {
         m->dpse_solvers[i][k].reset(sp);
       }
     }
+    return 0;
   }
 
   /// \cond INTERNAL

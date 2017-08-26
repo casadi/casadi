@@ -2100,11 +2100,7 @@ The integer field pointed to is structured as follows:
 
 Upon failure, these functions will return a null pointer.
 
-\subsection*{Number of available memory objects}
-\begin{lstlisting}[language=C]
-int fname_n_memory(void);
-\end{lstlisting}
-
+\subsection*{Memory objects}
 A function may contain some mutable memory, e.g. for caching the latest
 factorization or keeping track of evaluation statistics. When multiple functions
 need to call the same function without conflicting, they each need to work with
@@ -2112,8 +2108,23 @@ a different memory object. This is especially important for evaluation in
 parallel on a shared memory architecture, in which case each thread should access
 a different memory object.
 
-The function \verb|fname_n_mem| returns the number of available memory objects
-or -1 if there is no upper bound.
+\begin{lstlisting}[language=C]
+void* fname_alloc_mem(void);
+\end{lstlisting}
+
+Allocates a memory object which will be passed to the numerical evaluation.
+
+\begin{lstlisting}[language=C]
+int fname_init_mem(void);
+\end{lstlisting}
+
+(Re)initializes a memory object. Returns 0 upon successful return;
+
+\begin{lstlisting}[language=C]
+int fname_free_mem(void);
+\end{lstlisting}
+
+Frees a memory object. Returns 0 upon successful return;
 
 \subsection*{Work vectors}
 \begin{lstlisting}[language=C]

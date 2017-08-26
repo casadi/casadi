@@ -93,17 +93,17 @@ namespace casadi {
     void init(const Dict& opts) override;
 
     /** \brief Create memory block */
-    void* alloc_memory() const override { return new SlicotExpmMemory();}
+    void* alloc_mem() const override { return new SlicotExpmMemory();}
+
+    /** \brief Initalize memory block */
+    int init_mem(void* mem) const override;
 
     /** \brief Free memory block */
-    void free_memory(void *mem) const override { delete static_cast<SlicotExpmMemory*>(mem);}
+    void free_mem(void *mem) const override { delete static_cast<SlicotExpmMemory*>(mem);}
 
     /** \brief Set the (persistent) work vectors */
     void set_work(void* mem, const double**& arg, double**& res,
                           int*& iw, double*& w) const override;
-
-    /** \brief Initalize memory block */
-    void init_memory(void* mem) const override;
 
     /** \brief  Evaluate numerically */
     int eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;

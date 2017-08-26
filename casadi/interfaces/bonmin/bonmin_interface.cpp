@@ -60,7 +60,7 @@ namespace casadi {
   }
 
   BonminInterface::~BonminInterface() {
-    clear_memory();
+    clear_mem();
   }
 
   Options BonminInterface::options_
@@ -209,9 +209,8 @@ namespace casadi {
     }
   }
 
-  void BonminInterface::init_memory(void* mem) const {
-    Nlpsol::init_memory(mem);
-    //auto m = static_cast<BonminMemory*>(mem);
+  void BonminInterface::init_mem(void* mem) const {
+    return Nlpsol::init_mem(mem);
   }
 
   void BonminInterface::set_work(void* mem, const double**& arg, double**& res,

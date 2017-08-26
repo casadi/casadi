@@ -61,7 +61,7 @@ namespace casadi {
   }
 
   IpoptInterface::~IpoptInterface() {
-    clear_memory();
+    clear_mem();
   }
 
   Options IpoptInterface::options_
@@ -194,8 +194,8 @@ namespace casadi {
     }
   }
 
-  void IpoptInterface::init_memory(void* mem) const {
-    Nlpsol::init_memory(mem);
+  int IpoptInterface::init_mem(void* mem) const {
+    if (Nlpsol::init_mem(mem)) return 1;
     auto m = static_cast<IpoptMemory*>(mem);
 
     // Start an IPOPT application
@@ -267,6 +267,7 @@ namespace casadi {
     // Intialize the IpoptApplication and process the options
     Ipopt::ApplicationReturnStatus status = (*app)->Initialize();
     casadi_assert_message(status == Solve_Succeeded, "Error during IPOPT initialization");
+    return 0;
   }
 
   void IpoptInterface::set_work(void* mem, const double**& arg, double**& res,

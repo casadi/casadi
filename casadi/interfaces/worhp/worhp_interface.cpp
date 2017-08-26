@@ -54,7 +54,7 @@ namespace casadi {
   }
 
   WorhpInterface::~WorhpInterface() {
-    clear_memory();
+    clear_mem();
   }
 
   Options WorhpInterface::options_
@@ -142,8 +142,8 @@ namespace casadi {
     }
   }
 
-  void WorhpInterface::init_memory(void* mem) const {
-    Nlpsol::init_memory(mem);
+  int WorhpInterface::init_mem(void* mem) const {
+    if (Nlpsol::init_mem(mem)) return 1;
     auto m = static_cast<WorhpMemory*>(mem);
 
     SetWorhpPrint(&worhp_print);
@@ -237,6 +237,7 @@ namespace casadi {
 
     // Mark the parameters as set
     m->worhp_p.initialised = true;
+    return 0;
   }
 
   void WorhpInterface::set_work(void* mem, const double**& arg, double**& res,

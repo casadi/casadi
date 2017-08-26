@@ -119,10 +119,10 @@ namespace casadi {
     void init(const Dict& opts) override;
 
     /** \brief Create memory block */
-    void* alloc_memory() const override { return new SqpmethodMemory();}
+    void* alloc_mem() const override { return new SqpmethodMemory();}
 
     /** \brief Free memory block */
-    void free_memory(void *mem) const override { delete static_cast<SqpmethodMemory*>(mem);}
+    void free_mem(void *mem) const override { delete static_cast<SqpmethodMemory*>(mem);}
 
     /** \brief Set the (persistent) work vectors */
     void set_work(void* mem, const double**& arg, double**& res,

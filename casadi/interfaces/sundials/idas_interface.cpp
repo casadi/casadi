@@ -54,7 +54,7 @@ namespace casadi {
   }
 
   IdasInterface::~IdasInterface() {
-    clear_memory();
+    clear_mem();
   }
 
   Options IdasInterface::options_
@@ -257,8 +257,8 @@ namespace casadi {
     }
   }
 
-  void IdasInterface::init_memory(void* mem) const {
-    SundialsInterface::init_memory(mem);
+  int IdasInterface::init_mem(void* mem) const {
+    if (SundialsInterface::init_mem(mem)) return 1;
     auto m = to_mem(mem);
 
     // Create IDAS memory block
@@ -377,6 +377,7 @@ namespace casadi {
     }
 
     m->first_callB = true;
+    return 0;
   }
 
   void IdasInterface::reset(IntegratorMemory* mem, double t, const double* _x,

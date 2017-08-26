@@ -54,7 +54,7 @@ namespace casadi {
   }
 
   QpoasesInterface::~QpoasesInterface() {
-    clear_memory();
+    clear_mem();
   }
 
   Options QpoasesInterface::options_
@@ -307,7 +307,7 @@ namespace casadi {
     alloc_w(nx_+na_, true); // dual
   }
 
-  void QpoasesInterface::init_memory(void* mem) const {
+  int QpoasesInterface::init_mem(void* mem) const {
     auto m = static_cast<QpoasesMemory*>(mem);
     m->called_once = false;
 
@@ -328,6 +328,7 @@ namespace casadi {
     m->fstats["preprocessing"]  = FStats();
     m->fstats["solver"]         = FStats();
     m->fstats["postprocessing"] = FStats();
+    return 0;
   }
 
   int QpoasesInterface::

@@ -153,13 +153,13 @@ namespace casadi {
     static const std::string meta_doc;
 
     /** \brief Create memory block */
-    void* alloc_memory() const override { return new KinsolMemory(*this);}
-
-    /** \brief Free memory block */
-    void free_memory(void *mem) const override { delete static_cast<KinsolMemory*>(mem);}
+    void* alloc_mem() const override { return new KinsolMemory(*this);}
 
     /** \brief Initalize memory block */
-    void init_memory(void* mem) const override;
+    int init_mem(void* mem) const override;
+
+    /** \brief Free memory block */
+    void free_mem(void *mem) const override { delete static_cast<KinsolMemory*>(mem);}
 
     /** \brief Set the (persistent) work vectors */
     void set_work(void* mem, const double**& arg, double**& res,

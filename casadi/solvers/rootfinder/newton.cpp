@@ -50,7 +50,7 @@ namespace casadi {
   }
 
   Newton::~Newton() {
-    clear_memory();
+    clear_mem();
   }
 
   Options Newton::options_
@@ -213,11 +213,12 @@ namespace casadi {
     stream.unsetf(std::ios::floatfield);
   }
 
-  void Newton::init_memory(void* mem) const {
-    Rootfinder::init_memory(mem);
+  int Newton::init_mem(void* mem) const {
+    if (Rootfinder::init_mem(mem)) return 1;
     auto m = static_cast<NewtonMemory*>(mem);
     m->return_status = 0;
     m->iter = 0;
+    return 0;
   }
 
 } // namespace casadi

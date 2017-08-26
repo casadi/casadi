@@ -2575,13 +2575,13 @@ namespace casadi {
     set_temp(mem, arg, res, iw, w);
   }
 
-  void FunctionInternal::free_memory(void *mem) const {
-    casadi_warning("'free_memory' not defined for " + type_name());
+  void FunctionInternal::free_mem(void *mem) const {
+    casadi_warning("'free_mem' not defined for " + type_name());
   }
 
-  void FunctionInternal::clear_memory() {
+  void FunctionInternal::clear_mem() {
     for (auto&& i : mem_) {
-      if (i!=0) free_memory(i);
+      if (i!=0) free_mem(i);
     }
     mem_.clear();
   }
@@ -2644,11 +2644,11 @@ namespace casadi {
   int FunctionInternal::checkout() const {
     if (unused_.empty()) {
       // Allocate a new memory object
-      int n_memory = this->n_memory();
-      casadi_assert_message(n_memory!=0, "No memory objects available");
-      void* m = alloc_memory();
+      void* m = alloc_mem();
       mem_.push_back(m);
-      if (m) init_memory(m);
+      if (init_mem(m)) {
+        casadi_error("Failed to create or initialize memory object");
+      }
       return mem_.size()-1;
     } else {
       // Use an unused memory object

@@ -59,7 +59,7 @@ namespace casadi {
   }
 
   Scpgen::~Scpgen() {
-    clear_memory();
+    clear_mem();
   }
 
   Options Scpgen::options_
@@ -701,8 +701,8 @@ namespace casadi {
     alloc(qpsol_);
   }
 
-  void Scpgen::init_memory(void* mem) const {
-    Nlpsol::init_memory(mem);
+  int Scpgen::init_mem(void* mem) const {
+    if (Nlpsol::init_mem(mem)) return 1;
     auto m = static_cast<ScpgenMemory*>(mem);
 
     // Lifted memory
@@ -713,6 +713,7 @@ namespace casadi {
 
     // Line-search memory
     m->merit_mem.resize(merit_memsize_);
+    return 0;
   }
 
   void Scpgen::set_work(void* mem, const double**& arg, double**& res,

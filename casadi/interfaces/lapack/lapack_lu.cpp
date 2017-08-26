@@ -54,7 +54,7 @@ namespace casadi {
   }
 
   LapackLu::~LapackLu() {
-    clear_memory();
+    clear_mem();
   }
 
   Options LapackLu::options_
@@ -82,8 +82,8 @@ namespace casadi {
     }
   }
 
-  void LapackLu::init_memory(void* mem) const {
-    LinsolInternal::init_memory(mem);
+  int LapackLu::init_mem(void* mem) const {
+    return LinsolInternal::init_mem(mem);
   }
 
   void LapackLu::reset(void* mem, const int* sp) const {

@@ -54,7 +54,7 @@ namespace casadi {
 
 
   KnitroInterface::~KnitroInterface() {
-    clear_memory();
+    clear_mem();
   }
 
   Options KnitroInterface::options_
@@ -105,9 +105,9 @@ namespace casadi {
     alloc_w(ng_, true); // wubg_
   }
 
-  void KnitroInterface::init_memory(void* mem) const {
-    Nlpsol::init_memory(mem);
-    auto m = static_cast<KnitroMemory*>(mem);
+  void KnitroInterface::init_mem(void* mem) const {
+    return Nlpsol::init_mem(mem);
+    //auto m = static_cast<KnitroMemory*>(mem);
 
     // Commented out since I have not found out how to change the bounds
     // Allocate KNITRO memory block

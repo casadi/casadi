@@ -106,13 +106,13 @@ namespace casadi {
     void initTaping(IdasMemory* m) const;
 
     /** \brief Create memory block */
-    void* alloc_memory() const override { return new IdasMemory(*this);}
-
-    /** \brief Free memory block */
-    void free_memory(void *mem) const override { delete static_cast<IdasMemory*>(mem);}
+    void* alloc_mem() const override { return new IdasMemory(*this);}
 
     /** \brief Initalize memory block */
-    void init_memory(void* mem) const override;
+    int init_mem(void* mem) const override;
+
+    /** \brief Free memory block */
+    void free_mem(void *mem) const override { delete static_cast<IdasMemory*>(mem);}
 
     /** \brief  Reset the forward problem and bring the time back to t0 */
     void reset(IntegratorMemory* mem, double t, const double* x,

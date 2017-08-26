@@ -162,7 +162,7 @@ namespace casadi {
   }
 
   Nlpsol::~Nlpsol() {
-    clear_memory();
+    clear_mem();
   }
 
   Sparsity Nlpsol::get_sparsity_in(int i) {
@@ -316,13 +316,14 @@ namespace casadi {
     }
   }
 
-  void Nlpsol::init_memory(void* mem) const {
-    OracleFunction::init_memory(mem);
+  int Nlpsol::init_mem(void* mem) const {
+    if (OracleFunction::init_mem(mem)) return 1;
     auto m = static_cast<NlpsolMemory*>(mem);
 
     m->fstats["mainloop"] = FStats();
     m->fstats["callback_fun"] = FStats();
     m->fstats["callback_prep"] = FStats();
+    return 0;
   }
 
   void Nlpsol::checkInputs(void* mem) const {

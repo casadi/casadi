@@ -53,7 +53,7 @@ namespace casadi {
   }
 
   CvodesInterface::~CvodesInterface() {
-    clear_memory();
+    clear_mem();
   }
 
   Options CvodesInterface::options_
@@ -125,8 +125,8 @@ namespace casadi {
     }
   }
 
-  void CvodesInterface::init_memory(void* mem) const {
-    SundialsInterface::init_memory(mem);
+  int CvodesInterface::init_mem(void* mem) const {
+    if (SundialsInterface::init_mem(mem)) return 1;
     auto m = to_mem(mem);
 
     // Create CVodes memory block
@@ -201,6 +201,7 @@ namespace casadi {
     }
 
     m->first_callB = true;
+    return 0;
   }
 
   int CvodesInterface::rhs(double t, N_Vector x, N_Vector xdot, void *user_data) {

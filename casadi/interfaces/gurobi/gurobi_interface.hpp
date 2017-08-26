@@ -88,13 +88,13 @@ namespace casadi {
     void init(const Dict& opts) override;
 
     /** \brief Create memory block */
-    void* alloc_memory() const override { return new GurobiMemory();}
-
-    /** \brief Free memory block */
-    void free_memory(void *mem) const override { delete static_cast<GurobiMemory*>(mem);}
+    void* alloc_mem() const override { return new GurobiMemory();}
 
     /** \brief Initalize memory block */
-    void init_memory(void* mem) const override;
+    int init_mem(void* mem) const override;
+
+    /** \brief Free memory block */
+    void free_mem(void *mem) const override { delete static_cast<GurobiMemory*>(mem);}
 
     /// Solve the QP
     int eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;

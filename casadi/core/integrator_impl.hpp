@@ -77,7 +77,7 @@ namespace casadi {
     /// @}
 
     /** \brief Initalize memory block */
-    void init_memory(void* mem) const override;
+    int init_mem(void* mem) const override;
 
     ///@{
     /** \brief Options */
@@ -263,13 +263,13 @@ namespace casadi {
     void init(const Dict& opts) override;
 
     /** \brief Create memory block */
-    void* alloc_memory() const override { return new FixedStepMemory();}
-
-    /** \brief Free memory block */
-    void free_memory(void *mem) const override { delete static_cast<FixedStepMemory*>(mem);}
+    void* alloc_mem() const override { return new FixedStepMemory();}
 
     /** \brief Initalize memory block */
-    void init_memory(void* mem) const override;
+    int init_mem(void* mem) const override;
+
+    /** \brief Free memory block */
+    void free_mem(void *mem) const override { delete static_cast<FixedStepMemory*>(mem);}
 
     /// Setup F and G
     virtual void setupFG() = 0;

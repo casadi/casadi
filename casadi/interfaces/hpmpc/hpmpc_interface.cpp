@@ -50,7 +50,7 @@ namespace casadi {
   }
 
   HpmpcInterface::~HpmpcInterface() {
-    clear_memory();
+    clear_mem();
   }
 
   Options HpmpcInterface::options_
@@ -443,8 +443,8 @@ namespace casadi {
   }
 
 
-  void HpmpcInterface::init_memory(void* mem) const {
-    Conic::init_memory(mem);
+  int HpmpcInterface::init_mem(void* mem) const {
+    if (Conic::init_mem(mem)) return 1;
     auto m = static_cast<HpmpcMemory*>(mem);
 
     m->nx = nxs_;
@@ -548,6 +548,7 @@ namespace casadi {
     m->fstats["preprocessing"]  = FStats();
     m->fstats["solver"]         = FStats();
     m->fstats["postprocessing"] = FStats();
+    return 0;
   }
 
   void HpmpcInterface::mproject(double factor, const double* x, const int* sp_x,

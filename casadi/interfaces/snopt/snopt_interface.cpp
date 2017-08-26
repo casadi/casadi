@@ -55,7 +55,7 @@ namespace casadi {
   }
 
   SnoptInterface::~SnoptInterface() {
-    clear_memory();
+    clear_mem();
   }
 
   Options SnoptInterface::options_
@@ -169,13 +169,13 @@ namespace casadi {
     }
   }
 
-  void SnoptInterface::init_memory(void* mem) const {
-    Nlpsol::init_memory(mem);
+  void SnoptInterface::init_mem(void* mem) const {
+    if (Nlpsol::init_mem(mem)) return 1;
     auto m = static_cast<SnoptMemory*>(mem);
 
     // Allocate data structures needed in evaluate
     m->A_data.resize(A_structure_.nnz());
-
+    return 0;
   }
 
   std::string SnoptInterface::formatStatus(int status) const {

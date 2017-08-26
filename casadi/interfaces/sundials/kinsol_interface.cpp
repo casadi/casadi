@@ -83,7 +83,7 @@ namespace casadi {
   KinsolInterface::~KinsolInterface() {
     if (u_scale_) N_VDestroy_Serial(u_scale_);
     if (f_scale_) N_VDestroy_Serial(f_scale_);
-    clear_memory();
+    clear_mem();
   }
 
   Options KinsolInterface::options_
@@ -684,8 +684,8 @@ namespace casadi {
     if (this->mem) KINFree(&this->mem);
   }
 
-  void KinsolInterface::init_memory(void* mem) const {
-    Rootfinder::init_memory(mem);
+  int KinsolInterface::init_mem(void* mem) const {
+    if (Rootfinder::init_mem(mem)) return 1;
     auto m = static_cast<KinsolMemory*>(mem);
 
     // Current solution
@@ -790,6 +790,7 @@ namespace casadi {
     // Set stop criterion
     flag = KINSetFuncNormTol(m->mem, abstol_);
     casadi_assert(flag==KIN_SUCCESS);
+    return 0;
   }
 
 } // namespace casadi

@@ -139,7 +139,8 @@ namespace casadi {
     alloc_w(na_, true); // lam_a
   }
 
-  void CplexInterface::init_memory(void* mem) const {
+  int CplexInterface::init_mem(void* mem) const {
+    if (!mem) return 1;
     auto m = static_cast<CplexMemory*>(mem);
 
     // Start CPLEX
@@ -266,6 +267,7 @@ namespace casadi {
     m->fstats["preprocessing"]  = FStats();
     m->fstats["solver"]         = FStats();
     m->fstats["postprocessing"] = FStats();
+    return 0;
   }
 
   int CplexInterface::
@@ -492,7 +494,7 @@ namespace casadi {
   }
 
   CplexInterface::~CplexInterface() {
-    clear_memory();
+    clear_mem();
   }
 
   CplexMemory::CplexMemory() {

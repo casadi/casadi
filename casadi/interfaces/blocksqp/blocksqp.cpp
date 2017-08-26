@@ -52,7 +52,7 @@ namespace casadi {
 
 
   Blocksqp::~Blocksqp() {
-    clear_memory();
+    clear_mem();
   }
 
   Options Blocksqp::options_
@@ -501,14 +501,15 @@ namespace casadi {
     alloc_iw(nnz_H_ + (nx_+1) + nx_, true); // hessIndRow
   }
 
-  void Blocksqp::init_memory(void* mem) const {
-    Nlpsol::init_memory(mem);
+  int Blocksqp::init_mem(void* mem) const {
+    if (Nlpsol::init_mem(mem)) return 1;
     auto m = static_cast<BlocksqpMemory*>(mem);
 
     // Create qpOASES memory
     if (schur_) {
       m->qpoases_mem = new QpoasesMemory(linsol_);
     }
+    return 0;
   }
 
   void Blocksqp::set_work(void* mem, const double**& arg, double**& res,

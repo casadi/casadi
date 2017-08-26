@@ -53,7 +53,7 @@ namespace casadi {
   }
 
   SymbolicQr::~SymbolicQr() {
-    clear_memory();
+    clear_mem();
   }
 
   Options SymbolicQr::options_
@@ -90,8 +90,8 @@ namespace casadi {
     }
   }
 
-  void SymbolicQr::init_memory(void* mem) const {
-    LinsolInternal::init_memory(mem);
+  int SymbolicQr::init_mem(void* mem) const {
+    return LinsolInternal::init_mem(mem);
   }
 
   void SymbolicQr::reset(void* mem, const int* sp) const {

@@ -70,12 +70,14 @@ namespace casadi {
     alloc_w(nnz_in(CONIC_A), true); // A
   }
 
-  void ClpInterface::init_memory(void* mem) const {
+  int ClpInterface::init_mem(void* mem) const {
+    if (!mem) return 1;
     auto m = static_cast<ClpMemory*>(mem);
 
     m->fstats["preprocessing"]  = FStats();
     m->fstats["solver"]         = FStats();
     m->fstats["postprocessing"] = FStats();
+    return 0;
   }
 
   int ClpInterface::
@@ -150,7 +152,7 @@ namespace casadi {
   }
 
   ClpInterface::~ClpInterface() {
-    clear_memory();
+    clear_mem();
   }
 
   ClpMemory::ClpMemory() {

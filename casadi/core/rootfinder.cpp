@@ -157,10 +157,11 @@ namespace casadi {
     alloc_w(sz_w + 2*static_cast<size_t>(n_));
   }
 
-  void Rootfinder::init_memory(void* mem) const {
-    OracleFunction::init_memory(mem);
+  int Rootfinder::init_mem(void* mem) const {
+    if (OracleFunction::init_mem(mem)) return 1;
     //auto m = static_cast<RootfinderMemory*>(mem);
     linsol_.reset(sp_jac_);
+    return 0;
   }
 
   int Rootfinder::eval(const double** arg, double** res, int* iw, double* w, void* mem) const {

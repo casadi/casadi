@@ -51,7 +51,7 @@ namespace casadi {
   }
 
   GurobiInterface::~GurobiInterface() {
-    clear_memory();
+    clear_mem();
   }
 
   Options GurobiInterface::options_
@@ -104,7 +104,7 @@ namespace casadi {
     alloc_iw(nx_, true); // tr_ind
   }
 
-  void GurobiInterface::init_memory(void* mem) const {
+  int GurobiInterface::init_mem(void* mem) const {
     auto m = static_cast<GurobiMemory*>(mem);
 
     // Load environment
@@ -114,6 +114,7 @@ namespace casadi {
     m->fstats["preprocessing"]  = FStats();
     m->fstats["solver"]         = FStats();
     m->fstats["postprocessing"] = FStats();
+    return 0;
   }
 
   inline const char* return_status_string(int status) {

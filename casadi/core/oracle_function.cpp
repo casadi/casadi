@@ -384,13 +384,15 @@ namespace casadi {
     return stats;
   }
 
-  void OracleFunction::init_memory(void* mem) const {
+  int OracleFunction::init_mem(void* mem) const {
+    if (!mem) return 1;
     auto m = static_cast<OracleMemory*>(mem);
 
     // Create statistics
     for (auto&& e : all_functions_) {
       m->fstats[e.first] = FStats();
     }
+    return 0;
   }
 
   void OracleFunction::set_temp(void* mem, const double** arg, double** res,

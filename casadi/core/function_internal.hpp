@@ -609,19 +609,16 @@ namespace casadi {
     void* memory(int ind) const;
 
     /** \brief Create memory block */
-    virtual void* alloc_memory() const {return 0;}
+    virtual void* alloc_mem() const {return 0;}
 
     /** \brief Initalize memory block */
-    virtual void init_memory(void* mem) const {}
+    virtual int init_mem(void* mem) const { return 0;}
 
     /** \brief Free memory block */
-    virtual void free_memory(void *mem) const;
-
-    /** \brief Number of available memory blocks */
-    virtual int n_memory() const {return -1;}
+    virtual void free_mem(void *mem) const;
 
     /** \brief Clear all memory (called from destructor) */
-    void clear_memory();
+    void clear_mem();
 
     ///@{
     /// Get all statistics
