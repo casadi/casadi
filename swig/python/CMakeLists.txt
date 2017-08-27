@@ -34,7 +34,6 @@ else()
 set(MINPYVERSION "")
 endif()
 find_package(PythonInterp ${MINPYVERSION} REQUIRED)
-find_package(PythonLibs ${MINPYVERSION} REQUIRED)
 find_package(NUMPY REQUIRED)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
@@ -97,7 +96,7 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
   set_target_properties(_casadi PROPERTIES COMPILE_FLAGS "-Wno-dynamic-class-memaccess -Wno-self-assign -Wno-maybe-uninitialized ${MAYBE_WERROR}")
 endif()
 
-target_link_libraries(_casadi ${PYTHON_LIBRARIES} casadi)
+target_link_libraries(_casadi casadi)
 
 # Custom installation command for Python
 add_custom_target(install_python
@@ -147,7 +146,7 @@ install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/__init__.py
 if (WITH_EXTENDING_CASADI)
   set_source_files_properties(../extending_casadi/extending_casadi.i  PROPERTIES  CPLUSPLUS ON)
   swig_add_module(extending_casadi python ../extending_casadi/extending_casadi.i)
-  swig_link_libraries(extending_casadi ${PYTHON_LIBRARIES} extending_casadi)
+  swig_link_libraries(extending_casadi extending_casadi)
   if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     set_target_properties(_extending_casadi PROPERTIES COMPILE_FLAGS "-Wno-dynamic-class-memaccess -Wno-self-assign ${MAYBE_WERROR} -fno-builtin-strdup -fno-builtin-strndup")
   elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
