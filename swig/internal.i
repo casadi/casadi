@@ -19,7 +19,7 @@
 %exception  casadi::BSplineInterpolant::plugin_name() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Blocksqp::alloc_memory() const override {
+%exception  casadi::Blocksqp::alloc_mem() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Blocksqp::get_options() const override {
@@ -346,7 +346,7 @@
 %exception  casadi::Factory< MatType >::request_output(const std::string &s) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::FixedStepIntegrator::alloc_memory() const override {
+%exception  casadi::FixedStepIntegrator::alloc_mem() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FixedStepIntegrator::getExplicit() const  {
@@ -409,7 +409,7 @@
 %exception  casadi::FunctionInternal::alloc_iw(size_t sz_iw, bool persistent=false) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::FunctionInternal::alloc_memory() const  {
+%exception  casadi::FunctionInternal::alloc_mem() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::alloc_res(size_t sz_res, bool persistent=false) {
@@ -445,7 +445,7 @@
 %exception  casadi::FunctionInternal::checkout() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::FunctionInternal::clear_memory() {
+%exception  casadi::FunctionInternal::clear_mem() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::codegen(CodeGenerator &g, const std::string &fname, bool decl_static) const  {
@@ -670,9 +670,6 @@
 %exception  casadi::FunctionInternal::n_in() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::FunctionInternal::n_mem() const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::FunctionInternal::n_nodes() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -847,6 +844,9 @@
 %exception  casadi::FunctionInternal::wrap() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::GenericExternal::alloc_mem() const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::GenericExternal::get_sparsity_in(int i) override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -854,9 +854,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::GenericExternal::init(const Dict &opts) override {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::GenericExternal::n_mem() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::GenericTypeBase::getType() const  {
@@ -874,7 +871,7 @@
 %exception  casadi::ImplicitFixedStepIntegrator::init(const Dict &opts) override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::ImplicitToNlp::alloc_memory() const override {
+%exception  casadi::ImplicitToNlp::alloc_mem() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::ImplicitToNlp::get_options() const override {
@@ -1051,7 +1048,7 @@
 %exception  casadi::IpoptUserClass::get_var_con_metadata(Index n, StringMetaDataMapType &var_string_md, IntegerMetaDataMapType &var_integer_md, NumericMetaDataMapType &var_numeric_md, Index m, StringMetaDataMapType &con_string_md, IntegerMetaDataMapType &con_integer_md, NumericMetaDataMapType &con_numeric_md) override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::LapackLu::alloc_memory() const override {
+%exception  casadi::LapackLu::alloc_mem() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::LapackLu::get_options() const override {
@@ -1060,7 +1057,7 @@
 %exception  casadi::LapackLu::init(const Dict &opts) override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::LapackQr::alloc_memory() const override {
+%exception  casadi::LapackQr::alloc_mem() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::LapackQr::get_options() const override {
@@ -1114,7 +1111,7 @@
 %exception  casadi::LinsolInternal::type_name() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Lsqr::alloc_memory() const override {
+%exception  casadi::Lsqr::alloc_mem() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Lsqr::get_options() const override {
@@ -1210,7 +1207,7 @@
 %exception  casadi::Matrix< T >::unary(int op, const Matrix< Scalar > &x) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Newton::alloc_memory() const override {
+%exception  casadi::Newton::alloc_mem() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Newton::get_options() const override {
@@ -1222,7 +1219,7 @@
 %exception  casadi::Newton::plugin_name() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Nlpsol::alloc_memory() const override {
+%exception  casadi::Nlpsol::alloc_mem() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Nlpsol::default_in(int ind) const override {
@@ -1264,7 +1261,7 @@
 %exception  casadi::Nlpsol::type_name() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::OracleFunction::alloc_memory() const override {
+%exception  casadi::OracleFunction::alloc_mem() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::OracleFunction::create_function(const std::string &fname, const std::vector< std::string > &s_in, const std::vector< std::string > &s_out, const Function::AuxOut &aux=Function::AuxOut()) {
@@ -1441,7 +1438,7 @@
 %exception  casadi::SX::reset_input() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Scpgen::alloc_memory() const override {
+%exception  casadi::Scpgen::alloc_mem() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Scpgen::getConic() const  {
@@ -1495,7 +1492,7 @@
 %exception  casadi::SimplifiedExternal::simplified_call() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::SlicotDple::alloc_memory() const override {
+%exception  casadi::SlicotDple::alloc_mem() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::SlicotDple::get_options() const override {
@@ -1507,7 +1504,7 @@
 %exception  casadi::SlicotDple::plugin_name() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::SlicotExpm::alloc_memory() const override {
+%exception  casadi::SlicotExpm::alloc_mem() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::SlicotExpm::init(const Dict &opts) override {
@@ -1543,7 +1540,7 @@
 %exception  casadi::SparseStorage< DataType >::sparsity() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Sqpmethod::alloc_memory() const override {
+%exception  casadi::Sqpmethod::alloc_mem() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Sqpmethod::getConic() const  {
@@ -1606,7 +1603,7 @@
 %exception  casadi::Switch::type_name() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::SymbolicQr::alloc_memory() const override {
+%exception  casadi::SymbolicQr::alloc_mem() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::SymbolicQr::get_options() const override {
