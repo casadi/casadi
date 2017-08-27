@@ -35,11 +35,9 @@ set(MINPYVERSION "")
 endif()
 find_package(PythonInterp ${MINPYVERSION} REQUIRED)
 find_package(PythonLibs ${MINPYVERSION} REQUIRED)
-find_package(NUMPY REQUIRED)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${PYTHON_INCLUDE_PATH})
-include_directories(${NUMPY_INCLUDED_DIRS})
 
 # a python library is built in the build directory inside swig/python
 make_directory(${PROJECT_BINARY_DIR}/python/casadi)
