@@ -84,6 +84,9 @@ namespace casadi {
     /// Temporary file
     std::string bin_name_;
 
+    /// Temporary file
+    std::string obj_name_;
+
     /// Cleanup temporary files when unloading
     bool cleanup_;
 
