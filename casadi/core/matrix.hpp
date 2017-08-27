@@ -906,6 +906,9 @@ namespace casadi {
     /** \brief Get all nonzeros */
     std::vector<Scalar> get_nonzeros() const { return nonzeros_;}
 
+    /** \brief Get all elements */
+    std::vector<Scalar> get_elements() const { return static_cast< std::vector<Scalar> >(*this);}
+
 #ifndef SWIG
     /** \brief Get all nonzeros */
     template<typename A>
