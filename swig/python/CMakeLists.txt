@@ -1,8 +1,5 @@
 cmake_minimum_required(VERSION 2.8.6)
 
-# Python front-end
-add_custom_target(python DEPENDS _casadi)
-
 # Workaround for OS X
 if(APPLE)
   if(WITH_PYTHON3)
@@ -59,13 +56,30 @@ set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-DWITH_PYTHON3")
 endif()
 # Generate SWIG wrapper
 set_source_files_properties(../casadi.i  PROPERTIES  CPLUSPLUS ON)
-swig_add_module(casadi python ../casadi.i)
-swig_link_libraries(casadi ${PYTHON_LIBRARIES} casadi)
+swig_module_initialize(casadi python)
+swig_add_source_to_module(casadi FALSE PYTHON_FILE ../casadi.i)
+get_directory_property(swig_extra_clean_files ADDITIONAL_MAKE_CLEAN_FILES)
+set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${PYTHON_FILE}")
+
+add_custom_target(python_source DEPENDS ${PYTHON_FILE})
+
+# Make target
+add_custom_target(python DEPENDS _casadi)
+
+add_library(_casadi MODULE ${PYTHON_FILE})
+
+set_target_properties(_casadi PROPERTIES PREFIX "")
+if(WIN32 AND NOT CYGWIN)
+  set_target_properties(_casadi PROPERTIES SUFFIX ".pyd")
+endif()
+
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
   set_target_properties(_casadi PROPERTIES COMPILE_FLAGS "-Wno-dynamic-class-memaccess -Wno-self-assign ${MAYBE_WERROR}")
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
   set_target_properties(_casadi PROPERTIES COMPILE_FLAGS "-Wno-dynamic-class-memaccess -Wno-self-assign -Wno-maybe-uninitialized ${MAYBE_WERROR}")
 endif()
+
+target_link_libraries(_casadi ${PYTHON_LIBRARIES} casadi)
 
 # the name used for the shared module for the python interface is determined
 get_target_property(CASADI_PYTHON_LIBRARY_SUFFIX ${SWIG_MODULE_casadi_REAL_NAME} SUFFIX)
