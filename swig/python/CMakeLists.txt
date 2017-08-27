@@ -48,20 +48,35 @@ if(WITH_PYTHON_INTERRUPTS)
   set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-DWITH_PYTHON_INTERRUPTS")
 endif()
 
+set(PYTHONFLAG "")
 set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-DPy_USING_UNICODE")
 set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-noproxydel")
 if("${PYTHON_VERSION_MAJOR}" STREQUAL "3")
+set(PYTHONFLAG "3")
 set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-py3")
 set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-DWITH_PYTHON3")
 endif()
-# Generate SWIG wrapper
-set_source_files_properties(../casadi.i  PROPERTIES  CPLUSPLUS ON)
-swig_module_initialize(casadi python)
-swig_add_source_to_module(casadi FALSE PYTHON_FILE ../casadi.i)
-get_directory_property(swig_extra_clean_files ADDITIONAL_MAKE_CLEAN_FILES)
-set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${PYTHON_FILE}")
 
-add_custom_target(python_source DEPENDS ${PYTHON_FILE})
+if(SWIG_EXPORT)
+  set(CMAKE_SWIG_OUTDIR ${CMAKE_CURRENT_SOURCE_DIR}/target${PYTHONFLAG}/extra)
+  set(CMAKE_SWIG_WRAP_OUTDIR ${CMAKE_CURRENT_SOURCE_DIR}/target${PYTHONFLAG}/source/dummy)
+endif()
+
+if(SWIG_IMPORT)
+  set(PYTHON_FILE ${CMAKE_CURRENT_SOURCE_DIR}/target${PYTHONFLAG}/source/casadiPYTHON_wrap.cxx)
+  set_source_files_properties(${PYTHON_FILE}  PROPERTIES  CPLUSPLUS ON)
+else()
+  # Generate SWIG wrapper
+  set_source_files_properties(../casadi.i  PROPERTIES  CPLUSPLUS ON)
+  swig_module_initialize(casadi python)
+  swig_add_source_to_module(casadi FALSE PYTHON_FILE ../casadi.i)
+  get_directory_property(swig_extra_clean_files ADDITIONAL_MAKE_CLEAN_FILES)
+  set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${PYTHON_FILE}")
+endif()
+
+if(SWIG_EXPORT)
+  add_custom_target(python_source DEPENDS ${PYTHON_FILE})
+endif()
 
 # Make target
 add_custom_target(python DEPENDS _casadi)
@@ -71,6 +86,9 @@ add_library(_casadi MODULE ${PYTHON_FILE})
 set_target_properties(_casadi PROPERTIES PREFIX "")
 if(WIN32 AND NOT CYGWIN)
   set_target_properties(_casadi PROPERTIES SUFFIX ".pyd")
+  set(CASADI_PYTHON_LIBRARY_SUFFIX ".pyd")
+else()
+  set(CASADI_PYTHON_LIBRARY_SUFFIX ${CMAKE_SHARED_MODULE_SUFFIX})
 endif()
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
@@ -80,17 +98,6 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 endif()
 
 target_link_libraries(_casadi ${PYTHON_LIBRARIES} casadi)
-
-# the name used for the shared module for the python interface is determined
-get_target_property(CASADI_PYTHON_LIBRARY_SUFFIX ${SWIG_MODULE_casadi_REAL_NAME} SUFFIX)
-if(NOT ${CASADI_PYTHON_LIBRARY_SUFFIX})
-  if( WIN32 )
-    set(CASADI_PYTHON_LIBRARY_SUFFIX ".pyd")
-  else()
-    set(CASADI_PYTHON_LIBRARY_SUFFIX ${CMAKE_SHARED_MODULE_SUFFIX})
-  endif()
-endif()
-set(CASADI_PYTHON_LIBRARY ${SWIG_MODULE_casadi_REAL_NAME}${CASADI_PYTHON_LIBRARY_SUFFIX})
 
 # Custom installation command for Python
 add_custom_target(install_python
@@ -107,11 +114,19 @@ install(TARGETS _casadi
   COMPONENT install_python
 )
 
+if (SWIG_IMPORT)
+# Install Python proxy classes
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/target${PYTHONFLAG}/extra/casadi.py
+  DESTINATION "${PYTHON_PREFIX}/casadi"
+  COMPONENT install_python
+)
+else()
 # Install Python proxy classes
 install(FILES ${PROJECT_BINARY_DIR}/swig/python/casadi.py
   DESTINATION "${PYTHON_PREFIX}/casadi"
   COMPONENT install_python
 )
+endif()
 
 # Install Python tools
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tools

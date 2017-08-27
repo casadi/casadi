@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.8.6)
 
-find_package(SWIG REQUIRED)
+if (NOT SWIG_IMPORT)
+  find_package(SWIG REQUIRED)
+endif()
 
 if (WITH_EXTENDING_CASADI)
    add_subdirectory(extending_casadi)
