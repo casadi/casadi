@@ -61,13 +61,13 @@ namespace casadi {
 
     /// Evaluate the function (template)
     template<typename T>
-    int eval_gen(const T** arg, T** res, int* iw, T* w, int mem) const;
+    int eval_gen(const T** arg, T** res, int* iw, T* w) const;
 
     /// Evaluate the function numerically
-    int eval(const double** arg, double** res, int* iw, double* w, int mem) const override;
+    int eval(const double** arg, double** res, int* iw, double* w) const override;
 
     /// Evaluate the function symbolically (SX)
-    int eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const override;
+    int eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w) const override;
 
     /** \brief  Evaluate symbolically (MX) */
     void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;

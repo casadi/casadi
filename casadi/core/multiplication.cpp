@@ -49,17 +49,17 @@ namespace casadi {
     return "mac(" + arg.at(1) + "," + arg.at(2) + "," + arg.at(0) + ")";
   }
 
-  int Multiplication::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
-    return eval_gen<double>(arg, res, iw, w, mem);
+  int Multiplication::eval(const double** arg, double** res, int* iw, double* w) const {
+    return eval_gen<double>(arg, res, iw, w);
   }
 
   int Multiplication::
-  eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
-    return eval_gen<SXElem>(arg, res, iw, w, mem);
+  eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w) const {
+    return eval_gen<SXElem>(arg, res, iw, w);
   }
 
   template<typename T>
-  int Multiplication::eval_gen(const T** arg, T** res, int* iw, T* w, int mem) const {
+  int Multiplication::eval_gen(const T** arg, T** res, int* iw, T* w) const {
     if (arg[0]!=res[0]) copy(arg[0], arg[0]+dep(0).nnz(), res[0]);
     casadi_mtimes(arg[1], dep(1).sparsity(),
                arg[2], dep(2).sparsity(),
@@ -90,7 +90,7 @@ namespace casadi {
   }
 
   int Multiplication::
-  sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
     copy_fwd(arg[0], res[0], nnz());
     Sparsity::mul_sparsityF(arg[1], dep(1).sparsity(),
                             arg[2], dep(2).sparsity(),
@@ -99,7 +99,7 @@ namespace casadi {
   }
 
   int Multiplication::
-  sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
     Sparsity::mul_sparsityR(arg[1], dep(1).sparsity(),
                             arg[2], dep(2).sparsity(),
                             res[0], sparsity(), w);

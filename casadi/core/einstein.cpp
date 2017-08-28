@@ -52,16 +52,16 @@ namespace casadi {
     return "einstein(" + arg.at(0) + "," + arg.at(1) + "," + arg.at(2) + ")";
   }
 
-  int Einstein::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
-    return eval_gen<double>(arg, res, iw, w, mem);
+  int Einstein::eval(const double** arg, double** res, int* iw, double* w) const {
+    return eval_gen<double>(arg, res, iw, w);
   }
 
-  int Einstein::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
-    return eval_gen<SXElem>(arg, res, iw, w, mem);
+  int Einstein::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w) const {
+    return eval_gen<SXElem>(arg, res, iw, w);
   }
 
   template<typename T>
-  int Einstein::eval_gen(const T** arg, T** res, int* iw, T* w, int mem) const {
+  int Einstein::eval_gen(const T** arg, T** res, int* iw, T* w) const {
     if (arg[0]!=res[0]) copy(arg[0], arg[0]+dep(0).nnz(), res[0]);
 
     einstein_eval(n_iter_, iter_dims_, strides_a_, strides_b_, strides_c_, arg[1], arg[2], res[0]);
@@ -88,11 +88,11 @@ namespace casadi {
 
 
 
-  int Einstein::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
-    return eval_gen<bvec_t>(arg, res, iw, w, mem);
+  int Einstein::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
+    return eval_gen<bvec_t>(arg, res, iw, w);
   }
 
-  int Einstein::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  int Einstein::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
     //int* ind = iw;
     //int cumprod;
 

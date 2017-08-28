@@ -397,7 +397,7 @@ namespace casadi {
           res1[i] = e.res[i]>=0 ? w+workloc_[e.res[i]] : 0;
 
         // Evaluate
-        if (e.data->eval(arg1, res1, iw, w, 0)) return 1;
+        if (e.data->eval(arg1, res1, iw, w)) return 1;
       }
     }
 
@@ -493,7 +493,7 @@ namespace casadi {
           res1[i] = e.res[i]>=0 ? w+workloc_[e.res[i]] : 0;
 
         // Propagate sparsity forwards
-        if (e.data->sp_forward(arg1, res1, iw, w, 0)) return 1;
+        if (e.data->sp_forward(arg1, res1, iw, w)) return 1;
       }
     }
     return 0;
@@ -537,7 +537,7 @@ namespace casadi {
           res1[i] = it->res[i]>=0 ? w+workloc_[it->res[i]] : 0;
 
         // Propagate sparsity backwards
-        if (it->data->sp_reverse(arg1, res1, iw, w, 0)) return 1;
+        if (it->data->sp_reverse(arg1, res1, iw, w)) return 1;
       }
     }
     return 0;
@@ -1005,7 +1005,7 @@ namespace casadi {
           resp[i] = a.res[i]>=0 ? w+workloc_[a.res[i]] : 0;
 
         // Evaluate
-        if (a.data->eval_sx(get_ptr(argp), get_ptr(resp), iw, w, 0)) return 1;
+        if (a.data->eval_sx(get_ptr(argp), get_ptr(resp), iw, w)) return 1;
       }
     }
     return 0;

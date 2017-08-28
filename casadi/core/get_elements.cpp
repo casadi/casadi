@@ -40,7 +40,7 @@ namespace casadi {
   }
 
   int GetElements::
-  eval(const double** arg, double** res, int* iw, double* w, int mem) const {
+  eval(const double** arg, double** res, int* iw, double* w) const {
     // Get input and output arguments
     const double* ind = arg[0];
     const double* x = arg[1];

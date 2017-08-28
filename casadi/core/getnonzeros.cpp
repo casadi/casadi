@@ -60,12 +60,12 @@ namespace casadi {
   }
 
   int GetNonzerosVector::
-  eval(const double** arg, double** res, int* iw, double* w, int mem) const {
+  eval(const double** arg, double** res, int* iw, double* w) const {
     return eval_gen<double>(arg, res, iw, w);
   }
 
   int GetNonzerosVector::
-  eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
+  eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w) const {
     return eval_gen<SXElem>(arg, res, iw, w);
   }
 
@@ -81,12 +81,12 @@ namespace casadi {
   }
 
   int GetNonzerosSlice::
-  eval(const double** arg, double** res, int* iw, double* w, int mem) const {
+  eval(const double** arg, double** res, int* iw, double* w) const {
     return eval_gen<double>(arg, res, iw, w);
   }
 
   int GetNonzerosSlice::
-  eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
+  eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w) const {
     return eval_gen<SXElem>(arg, res, iw, w);
   }
 
@@ -103,12 +103,12 @@ namespace casadi {
   }
 
   int GetNonzerosSlice2::
-  eval(const double** arg, double** res, int* iw, double* w, int mem) const {
+  eval(const double** arg, double** res, int* iw, double* w) const {
     return eval_gen<double>(arg, res, iw, w);
   }
 
   int GetNonzerosSlice2::
-  eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
+  eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w) const {
     return eval_gen<SXElem>(arg, res, iw, w);
   }
 
@@ -129,7 +129,7 @@ namespace casadi {
   }
 
   int GetNonzerosVector::
-  sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
     const bvec_t *a = arg[0];
     bvec_t *r = res[0];
     for (auto&& k : nz_) *r++ = k>=0 ? a[k] : 0;
@@ -137,7 +137,7 @@ namespace casadi {
   }
 
   int GetNonzerosVector::
-  sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
     bvec_t *a = arg[0];
     bvec_t *r = res[0];
     for (auto&& k : nz_) {
@@ -148,7 +148,7 @@ namespace casadi {
   }
 
   int GetNonzerosSlice::
-  sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
     const bvec_t *a = arg[0];
     bvec_t *r = res[0];
     for (int k=s_.start; k!=s_.stop; k+=s_.step) {
@@ -158,7 +158,7 @@ namespace casadi {
   }
 
   int GetNonzerosSlice::
-  sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
     bvec_t *a = arg[0];
     bvec_t *r = res[0];
     for (int k=s_.start; k!=s_.stop; k+=s_.step) {
@@ -169,7 +169,7 @@ namespace casadi {
   }
 
   int GetNonzerosSlice2::
-  sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
     const bvec_t *a = arg[0];
     bvec_t *r = res[0];
     for (int k1=outer_.start; k1!=outer_.stop; k1+=outer_.step) {
@@ -181,7 +181,7 @@ namespace casadi {
   }
 
   int GetNonzerosSlice2::
-  sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
     bvec_t *a = arg[0];
     bvec_t *r = res[0];
     for (int k1=outer_.start; k1!=outer_.stop; k1+=outer_.step) {

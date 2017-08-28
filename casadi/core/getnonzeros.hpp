@@ -90,20 +90,20 @@ namespace casadi {
     std::vector<int> all() const override { return nz_;}
 
     /** \brief  Propagate sparsity forward */
-    int sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
+    int sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const override;
 
     /** \brief  Propagate sparsity backwards */
-    int sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
+    int sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const override;
 
     /// Evaluate the function (template)
     template<typename T>
     int eval_gen(const T* const* arg, T* const* res, int* iw, T* w) const;
 
     /// Evaluate the function numerically
-    int eval(const double** arg, double** res, int* iw, double* w, int mem) const override;
+    int eval(const double** arg, double** res, int* iw, double* w) const override;
 
     /// Evaluate the function symbolically (SX)
-    int eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const override;
+    int eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w) const override;
 
     /** \brief  Print expression */
     std::string print(const std::vector<std::string>& arg) const override;
@@ -133,20 +133,20 @@ namespace casadi {
     std::vector<int> all() const override { return s_.all(s_.stop);}
 
     /** \brief  Propagate sparsity forward */
-    int sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
+    int sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const override;
 
     /** \brief  Propagate sparsity backwards */
-    int sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
+    int sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const override;
 
     /// Evaluate the function (template)
     template<typename T>
     int eval_gen(const T* const* arg, T* const* res, int* iw, T* w) const;
 
     /// Evaluate the function numerically
-    int eval(const double** arg, double** res, int* iw, double* w, int mem) const override;
+    int eval(const double** arg, double** res, int* iw, double* w) const override;
 
     /// Evaluate the function symbolically (SX)
-    int eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const override;
+    int eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w) const override;
 
     /** \brief  Print expression */
     std::string print(const std::vector<std::string>& arg) const override;
@@ -177,20 +177,20 @@ namespace casadi {
     std::vector<int> all() const override { return inner_.all(outer_, outer_.stop);}
 
     /** \brief  Propagate sparsity forward */
-    int sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
+    int sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const override;
 
     /** \brief  Propagate sparsity backwards */
-    int sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
+    int sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const override;
 
     /// Evaluate the function (template)
     template<typename T>
     int eval_gen(const T* const* arg, T* const* res, int* iw, T* w) const;
 
     /// Evaluate the function numerically
-    int eval(const double** arg, double** res, int* iw, double* w, int mem) const override;
+    int eval(const double** arg, double** res, int* iw, double* w) const override;
 
     /// Evaluate the function symbolically (SX)
-    int eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const override;
+    int eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w) const override;
 
     /** \brief  Print expression */
     std::string print(const std::vector<std::string>& arg) const override;

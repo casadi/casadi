@@ -34,21 +34,21 @@ namespace casadi {
     set_sparsity(x.sparsity().T());
   }
 
-  int Transpose::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
+  int Transpose::eval(const double** arg, double** res, int* iw, double* w) const {
     return eval_gen<double>(arg, res, iw, w);
   }
 
- int DenseTranspose::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
+ int DenseTranspose::eval(const double** arg, double** res, int* iw, double* w) const {
     return eval_gen<double>(arg, res, iw, w);
   }
 
   int Transpose::
-  eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
+  eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w) const {
     return eval_gen<SXElem>(arg, res, iw, w);
   }
 
   int DenseTranspose::
-  eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
+  eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w) const {
     return eval_gen<SXElem>(arg, res, iw, w);
   }
 
@@ -91,7 +91,7 @@ namespace casadi {
   }
 
   int Transpose::
-  sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
     // Shortands
     const bvec_t *x = arg[0];
     bvec_t *xT = res[0];
@@ -111,7 +111,7 @@ namespace casadi {
   }
 
   int Transpose::
-  sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
     // Shortands
     bvec_t *x = arg[0];
     bvec_t *xT = res[0];
@@ -133,7 +133,7 @@ namespace casadi {
   }
 
   int DenseTranspose::
-  sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
     // Shorthands
     const bvec_t *x = arg[0];
     bvec_t *xT = res[0];
@@ -150,7 +150,7 @@ namespace casadi {
   }
 
   int DenseTranspose::
-  sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
     // Shorthands
     bvec_t *x = arg[0];
     bvec_t *xT = res[0];

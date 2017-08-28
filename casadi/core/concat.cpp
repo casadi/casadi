@@ -37,11 +37,11 @@ namespace casadi {
   Concat::~Concat() {
   }
 
-  int Concat::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
+  int Concat::eval(const double** arg, double** res, int* iw, double* w) const {
     return eval_gen<double>(arg, res, iw, w);
   }
 
-  int Concat::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
+  int Concat::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w) const {
     return eval_gen<SXElem>(arg, res, iw, w);
   }
 
@@ -56,7 +56,7 @@ namespace casadi {
     return 0;
   }
 
-  int Concat::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  int Concat::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
     bvec_t *res_ptr = res[0];
     for (int i=0; i<n_dep(); ++i) {
       int n_i = dep(i).nnz();
@@ -67,7 +67,7 @@ namespace casadi {
     return 0;
   }
 
-  int Concat::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  int Concat::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
     bvec_t *res_ptr = res[0];
     for (int i=0; i<n_dep(); ++i) {
       int n_i = dep(i).nnz();
