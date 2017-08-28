@@ -133,7 +133,7 @@ namespace casadi {
     auto m = static_cast<KnitroMemory*>(mem);
 
     // Check the provided inputs
-    checkInputs(mem);
+    check_inputs(mem);
 
     // Allocate KNITRO memory block (move back to init!)
     casadi_assert(m->kc==0);

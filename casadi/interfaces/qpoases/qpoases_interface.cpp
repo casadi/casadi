@@ -341,7 +341,7 @@ namespace casadi {
     m->fstats.at("preprocessing").tic();
 
     if (inputs_check_) {
-      checkInputs(arg[CONIC_LBX], arg[CONIC_UBX], arg[CONIC_LBA], arg[CONIC_UBA]);
+      check_inputs(arg[CONIC_LBX], arg[CONIC_UBX], arg[CONIC_LBA], arg[CONIC_UBA]);
     }
 
     // Maxiumum number of working set changes

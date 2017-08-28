@@ -347,7 +347,7 @@ namespace casadi {
     void operator()(std::vector<const double*> arg, std::vector<double*> res) const;
     void operator()(std::vector<const bvec_t*> arg, std::vector<bvec_t*> res) const;
     void operator()(std::vector<const SXElem*> arg, std::vector<SXElem*> res) const;
-    template<typename D> void _call(std::vector<const D*> arg, std::vector<D*> res) const;
+    template<typename D> void call_gen(std::vector<const D*> arg, std::vector<D*> res) const;
     ///@}
 
     ///@{
@@ -709,14 +709,10 @@ namespace casadi {
 
     /** \brief Set the (persistent and temporary) work vectors */
     void setup(const double** arg, double** res, int* iw, double* w, int mem=0) const;
-#endif // SWIG
 
-    /** \brief Check if the numerical values of the supplied bounds make sense */
-    void checkInputs() const;
-#ifndef SWIG
     /** \brief Call using a map */
     template<typename M>
-    void _call(const std::map<std::string, M>& arg, std::map<std::string, M>& res,
+    void call_gen(const std::map<std::string, M>& arg, std::map<std::string, M>& res,
                bool always_inline, bool never_inline) const;
 #endif // SWIG
     /// \endcond

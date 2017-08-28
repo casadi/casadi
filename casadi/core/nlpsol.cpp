@@ -326,7 +326,7 @@ namespace casadi {
     return 0;
   }
 
-  void Nlpsol::checkInputs(void* mem) const {
+  void Nlpsol::check_inputs(void* mem) const {
     auto m = static_cast<NlpsolMemory*>(mem);
 
     // Skip check?

@@ -82,7 +82,7 @@ namespace casadi {
     void init(const Dict& opts) override;
 
     /// \brief Check if the numerical values of the supplied bounds make sense
-    virtual void checkInputs(const double* lbx, const double* ubx,
+    virtual void check_inputs(const double* lbx, const double* ubx,
                              const double* lba, const double* uba) const;
 
     /** Generate native code in the interfaced language for debugging */

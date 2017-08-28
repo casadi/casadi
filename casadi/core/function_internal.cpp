@@ -348,7 +348,7 @@ namespace casadi {
   }
 
   int FunctionInternal::
-  _eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
+  eval_gen(const double** arg, double** res, int* iw, double* w, void* mem) const {
     if (simplified_call()) {
       // Copy arguments to input buffers
       const double* arg1=w;
@@ -378,16 +378,6 @@ namespace casadi {
         return eval(arg, res, iw, w, mem);
       }
     }
-  }
-
-  int FunctionInternal::
-  _eval(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) const {
-    return eval_sx(arg, res, iw, w, mem);
-  }
-
-  int FunctionInternal::
-  _eval(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) const {
-    return sp_forward(arg, res, iw, w, mem);
   }
 
   void FunctionInternal::print_dimensions(ostream &stream) const {

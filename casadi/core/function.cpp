@@ -358,7 +358,7 @@ namespace casadi {
   }
 
   template<typename D>
-  void Function::_call(vector<const D*> arg, vector<D*> res) const {
+  void Function::call_gen(vector<const D*> arg, vector<D*> res) const {
     // Input buffer
     casadi_assert(arg.size()>=n_in());
     arg.resize(sz_arg());
@@ -377,15 +377,15 @@ namespace casadi {
 
 
   void Function::operator()(vector<const double*> arg, vector<double*> res) const {
-    return _call(arg, res);
+    return call_gen(arg, res);
   }
 
   void Function::operator()(vector<const bvec_t*> arg, vector<bvec_t*> res) const {
-    return _call(arg, res);
+    return call_gen(arg, res);
   }
 
   void Function::operator()(vector<const SXElem*> arg, vector<SXElem*> res) const {
-    return _call(arg, res);
+    return call_gen(arg, res);
   }
 
   int Function::rev(std::vector<bvec_t*> arg, std::vector<bvec_t*> res) const {
@@ -682,7 +682,7 @@ namespace casadi {
   }
 
   Dict Function::stats(int mem) const {
-    return (*this)->_get_stats(mem);
+    return (*this)->get_stats(memory(mem));
   }
 
   const Sparsity Function::
@@ -811,10 +811,6 @@ namespace casadi {
     return (*this)->generate_dependencies(fname, opts);
   }
 
-  void Function::checkInputs() const {
-    return (*this)->checkInputs();
-  }
-
   string Function::name() const {
     if (is_null()) {
       return "null";
@@ -905,7 +901,7 @@ namespace casadi {
   }
 
   template<typename M>
-  void Function::_call(const std::map<string, M>& arg, std::map<string, M>& res,
+  void Function::call_gen(const std::map<string, M>& arg, std::map<string, M>& res,
                        bool always_inline, bool never_inline) const {
     // Get default inputs
     vector<M> arg_v(n_in());
@@ -949,17 +945,17 @@ namespace casadi {
 
   void Function::call(const DMDict& arg, DMDict& res,
                       bool always_inline, bool never_inline) const {
-    return _call(arg, res, always_inline, never_inline);
+    return call_gen(arg, res, always_inline, never_inline);
   }
 
   void Function::call(const SXDict& arg, SXDict& res,
                       bool always_inline, bool never_inline) const {
-    return _call(arg, res, always_inline, never_inline);
+    return call_gen(arg, res, always_inline, never_inline);
   }
 
   void Function::call(const MXDict& arg, MXDict& res,
                       bool always_inline, bool never_inline) const {
-    return _call(arg, res, always_inline, never_inline);
+    return call_gen(arg, res, always_inline, never_inline);
   }
 
   double Function::default_in(int ind) const {
@@ -975,7 +971,7 @@ namespace casadi {
   }
 
   int Function::operator()(const double** arg, double** res, int* iw, double* w, int mem) const {
-    return (*this)->_eval(arg, res, iw, w, memory(mem));
+    return (*this)->eval_gen(arg, res, iw, w, memory(mem));
   }
 
   int Function::operator()(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {

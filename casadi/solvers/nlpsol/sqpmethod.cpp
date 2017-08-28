@@ -335,7 +335,7 @@ namespace casadi {
     auto m = static_cast<SqpmethodMemory*>(mem);
 
     // Check the provided inputs
-    checkInputs(mem);
+    check_inputs(mem);
 
     // Statistics
     for (auto&& s : m->fstats) s.second.reset();

@@ -340,7 +340,7 @@ namespace casadi {
     for (auto&& s : m->fstats) s.second.reset();
 
     // Check the provided inputs
-    checkInputs(mem);
+    check_inputs(mem);
 
     m->fstats.at("mainloop").tic();
 

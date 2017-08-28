@@ -133,7 +133,7 @@ namespace casadi {
     void free_mem(void *mem) const override { delete static_cast<NlpsolMemory*>(mem);}
 
     /** \brief Check if the inputs correspond to a well-posed problem */
-    virtual void checkInputs(void* mem) const;
+    virtual void check_inputs(void* mem) const;
 
     /** \brief Get default input value */
     double default_in(int ind) const override { return nlpsol_default_in(ind);}

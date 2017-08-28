@@ -138,7 +138,7 @@ namespace casadi {
 
     ///@{
     /** \brief  Evaluate numerically */
-    int _eval(const double** arg, double** res, int* iw, double* w, void* mem) const;
+    int eval_gen(const double** arg, double** res, int* iw, double* w, void* mem) const;
     virtual int eval(const double** arg, double** res, int* iw, double* w, void* mem) const;
     ///@}
 
@@ -156,18 +156,22 @@ namespace casadi {
 
     ///@{
     /** \brief Evaluate a function, overloaded */
-    int _eval(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) const;
-    int _eval(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) const;
+    int eval_gen(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) const {
+      return eval_sx(arg, res, iw, w, mem);
+    }
+    int eval_gen(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) const {
+      return sp_forward(arg, res, iw, w, mem);
+    }
     ///@}
 
     ///@{
     /** \brief Call a function, overloaded */
-    void _call(const MXVector& arg, MXVector& res,
+    void call_gen(const MXVector& arg, MXVector& res,
                bool always_inline, bool never_inline) const {
       eval_mx(arg, res, always_inline, never_inline);
     }
     template<typename D>
-    void _call(const std::vector<Matrix<D> >& arg, std::vector<Matrix<D> >& res,
+    void call_gen(const std::vector<Matrix<D> >& arg, std::vector<Matrix<D> >& res,
                bool always_inline, bool never_inline) const;
     ///@}
 
@@ -407,9 +411,6 @@ namespace casadi {
     /** \brief Get function signature: name:(inputs)->(outputs) */
     std::string definition() const;
 
-    /** \brief Check if the numerical values of the supplied bounds make sense */
-    virtual void checkInputs() const {}
-
     /** \brief Print dimensions of inputs and outputs */
     void print_dimensions(std::ostream &stream) const;
 
@@ -620,11 +621,8 @@ namespace casadi {
     /** \brief Clear all memory (called from destructor) */
     void clear_mem();
 
-    ///@{
     /// Get all statistics
     virtual Dict get_stats(void* mem) const { return Dict();}
-    virtual Dict _get_stats(int mem) const { return get_stats(memory(mem));}
-    ///@}
 
     /** \brief Set the (persistent) work vectors */
     virtual void set_work(void* mem, const double**& arg, double**& res,
@@ -862,11 +860,11 @@ namespace casadi {
     }
 
     // Call the type-specific method
-    _call(arg, res, always_inline, never_inline);
+    call_gen(arg, res, always_inline, never_inline);
   }
 
   template<typename D>
-  void FunctionInternal::_call(const std::vector<Matrix<D> >& arg, std::vector<Matrix<D> >& res,
+  void FunctionInternal::call_gen(const std::vector<Matrix<D> >& arg, std::vector<Matrix<D> >& res,
                                bool always_inline, bool never_inline) const {
     casadi_assert_message(!never_inline, "Call-nodes only possible in MX expressions");
 
@@ -886,7 +884,7 @@ namespace casadi {
       for (int i=0; i<n_in; ++i)
         if (arg2[i].sparsity()!=sparsity_in(i))
           arg2[i] = project(arg2[i], sparsity_in(i));
-      return _call(arg2, res, always_inline, never_inline);
+      return call_gen(arg2, res, always_inline, never_inline);
     }
 
     // Allocate results
@@ -910,7 +908,7 @@ namespace casadi {
     for (int i=0; i<n_out; ++i) resp[i]=get_ptr(res[i]);
 
     // Call memory-less
-    (void)_eval(get_ptr(argp), get_ptr(resp),
+    (void)eval_gen(get_ptr(argp), get_ptr(resp),
                 get_ptr(iw_tmp), get_ptr(w_tmp), memory(0));
   }
 

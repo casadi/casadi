@@ -337,7 +337,7 @@ namespace casadi {
   Conic::~Conic() {
   }
 
-  void Conic::checkInputs(const double* lbx, const double* ubx,
+  void Conic::check_inputs(const double* lbx, const double* ubx,
                           const double* lba, const double* uba) const {
     for (int i=0; i<nx_; ++i) {
       double lb = lbx ? lbx[i] : 0., ub = ubx ? ubx[i] : 0.;

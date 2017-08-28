@@ -60,7 +60,7 @@ namespace casadi {
 
   void SqicInterface::evaluate() {
     if (inputs_check_) {
-      checkInputs(input(CONIC_LBX).ptr(), input(CONIC_UBX).ptr(),
+      check_inputs(input(CONIC_LBX).ptr(), input(CONIC_UBX).ptr(),
                   input(CONIC_LBA).ptr(), input(CONIC_UBA).ptr());
     }
 

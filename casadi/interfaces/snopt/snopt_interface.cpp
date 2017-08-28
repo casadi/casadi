@@ -210,7 +210,7 @@ namespace casadi {
     auto m = static_cast<SnoptMemory*>(mem);
 
     // Check the provided inputs
-    checkInputs(mem);
+    check_inputs(mem);
 
     m->fstats.at("mainloop").tic();
 

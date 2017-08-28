@@ -337,7 +337,7 @@ namespace casadi {
     auto m = static_cast<IpoptMemory*>(mem);
 
     // Check the provided inputs
-    checkInputs(mem);
+    check_inputs(mem);
 
     // Reset statistics
     m->inf_pr.clear();

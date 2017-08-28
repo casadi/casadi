@@ -293,7 +293,7 @@ namespace casadi {
     auto m = static_cast<BonminMemory*>(mem);
 
     // Check the provided inputs
-    checkInputs(mem);
+    check_inputs(mem);
 
     // Reset statistics
     m->inf_pr.clear();
