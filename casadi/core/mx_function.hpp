@@ -125,7 +125,7 @@ namespace casadi {
     bool should_inline(bool always_inline, bool never_inline) const override;
 
     /** \brief Evaluate symbolically, SX type*/
-    int eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const override;
+    int eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) const override;
 
     /** \brief Evaluate symbolically, MX type */
     void eval_mx(const MXVector& arg, MXVector& res,
@@ -146,10 +146,10 @@ namespace casadi {
     std::vector<MX> symbolic_output(const std::vector<MX>& arg) const override;
 
     /** \brief  Propagate sparsity forward */
-    int sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
+    int sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) const override;
 
     /** \brief  Propagate sparsity backwards */
-    int sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
+    int sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) const override;
 
     // print an element of an algorithm
     std::string print(const AlgEl& el) const;

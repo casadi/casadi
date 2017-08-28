@@ -59,7 +59,7 @@ namespace casadi {
     return std::vector<DM>();
   }
 
-  int Callback::eval(const double** arg, double** res, int* iw, double* w, int mem) {
+  int Callback::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
     // Allocate input matrices
     int n_in = this->n_in();
     std::vector<DM> argv(n_in);
@@ -89,7 +89,7 @@ namespace casadi {
     return 0;
   }
 
-  int Callback::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
+  int Callback::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) const {
     casadi_error("Cannot expand");
     return 0;
   }

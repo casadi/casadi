@@ -275,7 +275,7 @@ namespace casadi {
     }
   }
 
-  int Switch::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
+  int Switch::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) const {
 
     // Shorthands
     int n_in=this->n_in()-1, n_out=this->n_out();

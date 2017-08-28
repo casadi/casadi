@@ -67,7 +67,7 @@ namespace casadi {
     T** res1 = res+n_out;
     copy_n(res, n_out, res1);
     for (int i=0; i<n_; ++i) {
-      if (f_(arg1, res1, iw, w, 0)) return 1;
+      if (f_(arg1, res1, iw, w)) return 1;
       for (int j=0; j<n_in; ++j) {
         if (arg1[j]) arg1[j] += f_.nnz_in(j);
       }
@@ -78,22 +78,22 @@ namespace casadi {
     return 0;
   }
 
-  int Map::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
+  int Map::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) const {
     return eval_gen(arg, res, iw, w);
   }
 
-  int Map::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  int Map::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) const {
     return eval_gen(arg, res, iw, w);
   }
 
-  int Map::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  int Map::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) const {
     int n_in = this->n_in(), n_out = this->n_out();
     bvec_t** arg1 = arg+n_in;
     copy_n(arg, n_in, arg1);
     bvec_t** res1 = res+n_out;
     copy_n(res, n_out, res1);
     for (int i=0; i<n_; ++i) {
-      if (f_->sp_reverse(arg1, res1, iw, w, 0)) return 1;
+      if (f_.rev(arg1, res1, iw, w)) return 1;
       for (int j=0; j<n_in; ++j) {
         if (arg1[j]) arg1[j] += f_.nnz_in(j);
       }

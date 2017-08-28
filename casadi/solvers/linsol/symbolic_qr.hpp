@@ -112,8 +112,8 @@ namespace casadi {
     void solve(void* mem, double* x, int nrhs, bool tr) const override;
 
     /** \brief Evaluate symbolically (SX) */
-    void linsol_eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem,
-                               bool tr, int nrhs) const override;
+    void linsol_eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem,
+                        bool tr, int nrhs) const override;
 
     /// A documentation string
     static const std::string meta_doc;

@@ -241,7 +241,8 @@ namespace casadi {
     return Function(name, arg, res, inames, onames, opts);
   }
 
-  int Rootfinder::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  int Rootfinder::
+  sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) const {
     int num_out = n_out();
     int num_in = n_in();
     bvec_t* tmp1 = w; w += n_;
@@ -271,7 +272,7 @@ namespace casadi {
     return 0;
   }
 
-  int Rootfinder::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  int Rootfinder::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) const {
     int num_out = n_out();
     int num_in = n_in();
     bvec_t* tmp1 = w; w += n_;

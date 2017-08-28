@@ -207,9 +207,9 @@ namespace casadi {
     }
   }
 
-  void SymbolicQr::linsol_eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem,
+  void SymbolicQr::linsol_eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem,
                                  bool tr, int nrhs) const {
-    auto m = static_cast<SymbolicQrMemory*>(memory(mem));
+    auto m = static_cast<SymbolicQrMemory*>(mem);
     casadi_assert(arg[0]!=0);
     casadi_assert(arg[1]!=0);
     casadi_assert(res[0]!=0);

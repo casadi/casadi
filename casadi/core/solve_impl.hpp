@@ -63,7 +63,7 @@ namespace casadi {
   template<bool Tr>
   int Solve<Tr>::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
     linsol_.reset(dep(1).sparsity());
-    linsol_->linsol_eval_sx(arg, res, iw, w, mem, Tr, dep(0).size2());
+    linsol_->linsol_eval_sx(arg, res, iw, w, linsol_->memory(0), Tr, dep(0).size2());
     return 0;
   }
 

@@ -86,7 +86,7 @@ namespace casadi {
     void free_mem(void *mem) const override { delete static_cast<LinsolMemory*>(mem);}
 
     /// Evaluate SX, possibly transposed
-    virtual void linsol_eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem,
+    virtual void linsol_eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem,
                                bool tr, int nrhs) const;
 
     /// Solve Cholesky

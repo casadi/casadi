@@ -498,7 +498,7 @@ namespace casadi {
   }
 
   int SXFunction::
-  eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
+  eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) const {
     if (verbose()) userOut() << "SXFunction::eval_sxsparse begin" << endl;
 
     // Iterator to the binary operations
@@ -768,7 +768,8 @@ namespace casadi {
     if (verbose()) userOut() << "SXFunction::ad_reverse end" << endl;
   }
 
-  int SXFunction::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  int SXFunction::
+  sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) const {
     // Propagate sparsity forward
     for (auto&& e : algorithm_) {
       switch (e.op) {
@@ -788,7 +789,7 @@ namespace casadi {
     return 0;
   }
 
-  int SXFunction::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  int SXFunction::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) const {
     fill_n(w, sz_w(), 0);
 
     // Propagate sparsity backward

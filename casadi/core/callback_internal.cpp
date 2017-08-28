@@ -99,7 +99,7 @@ namespace casadi {
   }
 
   int CallbackInternal::
-  eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
+  eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) const {
     TRY_CALL(eval_sx, self_, arg, res, iw, w, mem);
   }
 

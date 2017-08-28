@@ -743,11 +743,11 @@ namespace casadi {
   size_t Function::sz_w() const { return (*this)->sz_w();}
 
   int Function::operator()(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
-    return (*this)->sp_forward(arg, res, iw, w, mem);
+    return (*this)->sp_forward(arg, res, iw, w, memory(mem));
   }
 
   int Function::rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
-    return (*this)->sp_reverse(arg, res, iw, w, mem);
+    return (*this)->sp_reverse(arg, res, iw, w, memory(mem));
   }
 
   void Function::set_work(const double**& arg, double**& res, int*& iw, double*& w,
@@ -975,11 +975,11 @@ namespace casadi {
   }
 
   int Function::operator()(const double** arg, double** res, int* iw, double* w, int mem) const {
-    return (*this)->_eval(arg, res, iw, w, mem);
+    return (*this)->_eval(arg, res, iw, w, memory(mem));
   }
 
   int Function::operator()(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
-    return (*this)->eval_sx(arg, res, iw, w, mem);
+    return (*this)->eval_sx(arg, res, iw, w, memory(mem));
   }
 
   const SX Function::sx_in(int ind) const {

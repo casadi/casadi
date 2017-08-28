@@ -348,7 +348,7 @@ namespace casadi {
   }
 
   int FunctionInternal::
-  _eval(const double** arg, double** res, int* iw, double* w, int mem) const {
+  _eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
     if (simplified_call()) {
       // Copy arguments to input buffers
       const double* arg1=w;
@@ -373,20 +373,20 @@ namespace casadi {
       return 0;
     } else {
       if (eval_) {
-        return eval_(arg, res, iw, w, memory(mem));
+        return eval_(arg, res, iw, w, mem);
       } else {
-        return eval(arg, res, iw, w, memory(mem));
+        return eval(arg, res, iw, w, mem);
       }
     }
   }
 
   int FunctionInternal::
-  _eval(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
+  _eval(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) const {
     return eval_sx(arg, res, iw, w, mem);
   }
 
   int FunctionInternal::
-  _eval(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  _eval(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) const {
     return sp_forward(arg, res, iw, w, mem);
   }
 
@@ -514,7 +514,7 @@ namespace casadi {
     typedef const bvec_t* arg_t;
     static inline void sp(const FunctionInternal *f,
                           const bvec_t** arg, bvec_t** res,
-                          int* iw, bvec_t* w, int mem) {
+                          int* iw, bvec_t* w, void* mem) {
       f->sp_forward(arg, res, iw, w, mem);
     }
   };
@@ -522,7 +522,7 @@ namespace casadi {
     typedef bvec_t* arg_t;
     static inline void sp(const FunctionInternal *f,
                           bvec_t** arg, bvec_t** res,
-                          int* iw, bvec_t* w, int mem) {
+                          int* iw, bvec_t* w, void* mem) {
       f->sp_reverse(arg, res, iw, w, mem);
     }
   };
@@ -588,7 +588,8 @@ namespace casadi {
       }
 
       // Propagate the dependencies
-      JacSparsityTraits<fwd>::sp(this, get_ptr(arg), get_ptr(res), get_ptr(iw), get_ptr(w), 0);
+      JacSparsityTraits<fwd>::sp(this, get_ptr(arg), get_ptr(res),
+                                  get_ptr(iw), get_ptr(w), memory(0));
 
       // Loop over the nonzeros of the output
       for (int el=0; el<sens.size(); ++el) {
@@ -1072,10 +1073,10 @@ namespace casadi {
 
             // Propagate the dependencies
             if (use_fwd) {
-              sp_forward(get_ptr(arg_fwd), get_ptr(res), get_ptr(iw), get_ptr(w), 0);
+              sp_forward(get_ptr(arg_fwd), get_ptr(res), get_ptr(iw), get_ptr(w), memory(0));
             } else {
               fill(w.begin(), w.end(), 0);
-              sp_reverse(get_ptr(arg_adj), get_ptr(res), get_ptr(iw), get_ptr(w), 0);
+              sp_reverse(get_ptr(arg_adj), get_ptr(res), get_ptr(iw), get_ptr(w), memory(0));
             }
 
             // Temporary bit work vector
@@ -1350,7 +1351,7 @@ namespace casadi {
   }
 
   int FunctionInternal::
-  eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
+  eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) const {
     casadi_error("'eval_sx' not defined for " + type_name());
   }
 
@@ -1997,7 +1998,7 @@ namespace casadi {
   }
 
   int FunctionInternal::
-  sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) const {
     // Get the number of inputs and outputs
     int n_in = this->n_in();
     int n_out = this->n_out();
@@ -2033,7 +2034,7 @@ namespace casadi {
   }
 
   int FunctionInternal::
-  sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) const {
     // Get the number of inputs and outputs
     int n_in = this->n_in();
     int n_out = this->n_out();

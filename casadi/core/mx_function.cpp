@@ -457,7 +457,8 @@ namespace casadi {
     }
   }
 
-  int MXFunction::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  int MXFunction::
+  sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) const {
     // Temporaries to hold pointers to operation input and outputs
     const bvec_t** arg1=arg+n_in();
     bvec_t** res1=res+n_out();
@@ -498,7 +499,7 @@ namespace casadi {
     return 0;
   }
 
-  int MXFunction::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  int MXFunction::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) const {
     // Temporaries to hold pointers to operation input and outputs
     bvec_t** arg1=arg+n_in();
     bvec_t** res1=res+n_out();
@@ -968,7 +969,7 @@ namespace casadi {
     log("MXFunction::ad_reverse end");
   }
 
-  int MXFunction::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
+  int MXFunction::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) const {
     // Work vector and temporaries to hold pointers to operation input and outputs
     vector<const SXElem*> argp(sz_arg());
     vector<SXElem*> resp(sz_res());
