@@ -39,7 +39,7 @@ namespace casadi {
     return s.str();
   }
 
-  void Input::generate(CodeGenerator& g, const string& mem,
+  void Input::generate(CodeGenerator& g,
                        const vector<int>& arg, const vector<int>& res) const {
     int nnz = this->nnz();
     if (nnz==0) return; // quick return
@@ -66,7 +66,7 @@ namespace casadi {
     return s.str();
   }
 
-  void Output::generate(CodeGenerator& g, const string& mem,
+  void Output::generate(CodeGenerator& g,
                        const vector<int>& arg, const vector<int>& res) const {
     int nnz = dep().nnz();
     if (nnz==0) return; // quick return

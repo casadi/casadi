@@ -151,7 +151,7 @@ namespace casadi {
     return fcn_->has_refcount_;
   }
 
-  void Call::generate(CodeGenerator& g, const std::string& mem,
+  void Call::generate(CodeGenerator& g,
                       const vector<int>& arg, const vector<int>& res) const {
     if (fcn_->simplified_call()) {
 

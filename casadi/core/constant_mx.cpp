@@ -97,7 +97,7 @@ namespace casadi {
     return 0;
   }
 
-  void ConstantDM::generate(CodeGenerator& g, const std::string& mem,
+  void ConstantDM::generate(CodeGenerator& g,
                                  const std::vector<int>& arg, const std::vector<int>& res) const {
     // Print the constant
     string ind = g.constant(x_.nonzeros());

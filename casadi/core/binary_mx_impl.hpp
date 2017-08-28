@@ -101,7 +101,7 @@ namespace casadi {
 
   template<bool ScX, bool ScY>
   void BinaryMX<ScX, ScY>::
-  generate(CodeGenerator& g, const std::string& mem,
+  generate(CodeGenerator& g,
            const std::vector<int>& arg, const std::vector<int>& res) const {
     // Quick return if nothing to do
     if (nnz()==0) return;

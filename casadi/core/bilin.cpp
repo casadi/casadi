@@ -125,7 +125,7 @@ namespace casadi {
     return 0;
   }
 
-  void Bilin::generate(CodeGenerator& g, const std::string& mem,
+  void Bilin::generate(CodeGenerator& g,
                        const std::vector<int>& arg, const std::vector<int>& res) const {
     g << g.workel(res[0]) << " = "
       << g.bilin(g.work(arg[0], dep(0).nnz()), sparsity(),

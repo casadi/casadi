@@ -93,7 +93,7 @@ namespace casadi {
     }
   }
 
-  void HorzRepmat::generate(CodeGenerator& g, const std::string& mem,
+  void HorzRepmat::generate(CodeGenerator& g,
                             const std::vector<int>& arg, const std::vector<int>& res) const {
     int nnz = dep(0).nnz();
     g.local("i", "int");
@@ -173,7 +173,7 @@ namespace casadi {
     }
   }
 
-  void HorzRepsum::generate(CodeGenerator& g, const std::string& mem,
+  void HorzRepsum::generate(CodeGenerator& g,
                             const std::vector<int>& arg, const std::vector<int>& res) const {
     int nnz = sparsity().nnz();
     g.local("i", "int");

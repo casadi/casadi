@@ -105,7 +105,7 @@ namespace casadi {
     virtual void codegen_decref(CodeGenerator& g, std::set<void*>& added) const {}
 
     /** \brief Generate code for the operation */
-    virtual void generate(CodeGenerator& g, const std::string& mem,
+    virtual void generate(CodeGenerator& g,
                           const std::vector<int>& arg, const std::vector<int>& res) const;
 
     /** \brief  Evaluate numerically */

@@ -364,7 +364,7 @@ namespace casadi {
     return shared_from_this<MX>();
   }
 
-  void MXNode::generate(CodeGenerator& g, const std::string& mem,
+  void MXNode::generate(CodeGenerator& g,
                         const vector<int>& arg, const vector<int>& res) const {
     casadi_warning("Cannot code generate MX nodes of type " + type_name() +
                    "The generation will proceed, but compilation of the code will "

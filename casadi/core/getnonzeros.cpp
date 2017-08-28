@@ -452,7 +452,7 @@ namespace casadi {
     return Matrix<int>(sparsity(), nz, false);
   }
 
-  void GetNonzerosVector::generate(CodeGenerator& g, const std::string& mem,
+  void GetNonzerosVector::generate(CodeGenerator& g,
                                    const std::vector<int>& arg, const std::vector<int>& res) const {
     // Codegen the indices
     string ind = g.constant(nz_);
@@ -479,7 +479,7 @@ namespace casadi {
     return dep()->get_nzref(sp, nz_new);
   }
 
-  void GetNonzerosSlice::generate(CodeGenerator& g, const std::string& mem,
+  void GetNonzerosSlice::generate(CodeGenerator& g,
                                   const std::vector<int>& arg, const std::vector<int>& res) const {
     g.local("rr", "casadi_real", "*");
     g.local("ss", "casadi_real", "*");
@@ -488,7 +488,7 @@ namespace casadi {
       << "; ss+=" << s_.step << ") *rr++ = *ss;\n";
   }
 
-  void GetNonzerosSlice2::generate(CodeGenerator& g, const std::string& mem,
+  void GetNonzerosSlice2::generate(CodeGenerator& g,
                                    const std::vector<int>& arg, const std::vector<int>& res) const {
     g.local("rr", "casadi_real", "*");
     g.local("ss", "casadi_real", "*");

@@ -90,7 +90,7 @@ namespace casadi {
     return 0;
   }
 
-  void Project::generate(CodeGenerator& g, const std::string& mem,
+  void Project::generate(CodeGenerator& g,
                          const std::vector<int>& arg, const std::vector<int>& res) const {
     g << g.project(g.work(arg.front(), dep().nnz()), dep(0).sparsity(),
                            g.work(res.front(), nnz()), sparsity(), "w") << "\n";

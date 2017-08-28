@@ -99,7 +99,7 @@ namespace casadi {
     return 0;
   }
 
-  void Assertion::generate(CodeGenerator& g, const std::string& mem,
+  void Assertion::generate(CodeGenerator& g,
                            const std::vector<int>& arg, const std::vector<int>& res) const {
     // Generate assertion
     g << "if (" << g.workel(arg[1]) << "!=1.) {\n"

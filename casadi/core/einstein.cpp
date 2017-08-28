@@ -126,7 +126,7 @@ namespace casadi {
     res[0] = einstein(arg[1], arg[2], arg[0], dim_a_, dim_b_, dim_c_, a_, b_, c_);
   }
 
-  void Einstein::generate(CodeGenerator& g, const std::string& mem,
+  void Einstein::generate(CodeGenerator& g,
                           const std::vector<int>& arg, const std::vector<int>& res) const {
 
     // Copy first argument if not inplace

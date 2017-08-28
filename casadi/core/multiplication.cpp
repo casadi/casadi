@@ -107,7 +107,7 @@ namespace casadi {
     return 0;
   }
 
-  void Multiplication::generate(CodeGenerator& g, const std::string& mem,
+  void Multiplication::generate(CodeGenerator& g,
                                 const std::vector<int>& arg, const std::vector<int>& res) const {
     // Copy first argument if not inplace
     if (arg[0]!=res[0]) {
@@ -121,7 +121,7 @@ namespace casadi {
   }
 
   void DenseMultiplication::
-  generate(CodeGenerator& g, const std::string& mem,
+  generate(CodeGenerator& g,
            const std::vector<int>& arg, const std::vector<int>& res) const {
     // Copy first argument if not inplace
     if (arg[0]!=res[0]) {

@@ -1151,7 +1151,7 @@ namespace casadi {
       }
 
       // Generate operation
-      e.data->generate(g, "0", arg, res);
+      e.data->generate(g, arg, res);
     }
   }
 

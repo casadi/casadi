@@ -125,7 +125,7 @@ namespace casadi {
     return 0;
   }
 
-  void Rank1::generate(CodeGenerator& g, const std::string& mem,
+  void Rank1::generate(CodeGenerator& g,
                        const std::vector<int>& arg, const std::vector<int>& res) const {
     // Copy first argument if not inplace
     if (arg[0]!=res[0]) {

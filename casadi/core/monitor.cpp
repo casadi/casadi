@@ -106,7 +106,7 @@ namespace casadi {
     return 0;
   }
 
-  void Monitor::generate(CodeGenerator& g, const std::string& mem,
+  void Monitor::generate(CodeGenerator& g,
                          const std::vector<int>& arg, const std::vector<int>& res) const {
     // Print comment
     g.local("rr", "casadi_real", "*");

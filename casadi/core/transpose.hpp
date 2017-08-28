@@ -77,7 +77,7 @@ namespace casadi {
     std::string print(const std::vector<std::string>& arg) const override;
 
     /** \brief Generate code for the operation */
-    void generate(CodeGenerator& g, const std::string& mem,
+    void generate(CodeGenerator& g,
                           const std::vector<int>& arg, const std::vector<int>& res) const override;
 
     /** \brief Get the operation */
@@ -129,7 +129,7 @@ namespace casadi {
     int sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const override;
 
     /** \brief Generate code for the operation */
-    void generate(CodeGenerator& g, const std::string& mem,
+    void generate(CodeGenerator& g,
                           const std::vector<int>& arg, const std::vector<int>& res) const override;
 
     /** \brief Get required length of iw field */

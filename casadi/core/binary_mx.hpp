@@ -84,7 +84,7 @@ namespace casadi {
     int n_inplace() const override { return 2;}
 
     /** \brief Generate code for the operation */
-    void generate(CodeGenerator& g, const std::string& mem,
+    void generate(CodeGenerator& g,
                   const std::vector<int>& arg, const std::vector<int>& res) const override;
 
     /// Get a unary operation

@@ -80,7 +80,7 @@ namespace casadi {
     return 0;
   }
 
-  void Concat::generate(CodeGenerator& g, const std::string& mem,
+  void Concat::generate(CodeGenerator& g,
                         const std::vector<int>& arg, const std::vector<int>& res) const {
     g.local("rr", "casadi_real", "*");
     g << "rr=" << g.work(res[0], nnz()) << ";\n";

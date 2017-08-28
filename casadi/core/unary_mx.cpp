@@ -100,7 +100,7 @@ namespace casadi {
     return 0;
   }
 
-  void UnaryMX::generate(CodeGenerator& g, const std::string& mem,
+  void UnaryMX::generate(CodeGenerator& g,
                          const std::vector<int>& arg, const std::vector<int>& res) const {
     string r, x;
     if (nnz()==1) {

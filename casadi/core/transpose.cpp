@@ -189,13 +189,13 @@ namespace casadi {
     }
   }
 
-  void Transpose::generate(CodeGenerator& g, const std::string& mem,
+  void Transpose::generate(CodeGenerator& g,
                            const std::vector<int>& arg, const std::vector<int>& res) const {
     g << g.trans(g.work(arg[0], nnz()), dep().sparsity(),
                  g.work(res[0], nnz()), sparsity(), "iw") <<  ";\n";
   }
 
-  void DenseTranspose::generate(CodeGenerator& g, const std::string& mem,
+  void DenseTranspose::generate(CodeGenerator& g,
                                 const std::vector<int>& arg, const std::vector<int>& res) const {
     g.local("cs", "const casadi_real", "*");
     g.local("rr", "casadi_real", "*");

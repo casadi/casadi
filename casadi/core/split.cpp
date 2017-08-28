@@ -93,7 +93,7 @@ namespace casadi {
     return 0;
   }
 
-  void Split::generate(CodeGenerator& g, const std::string& mem,
+  void Split::generate(CodeGenerator& g,
                        const std::vector<int>& arg, const std::vector<int>& res) const {
     int nx = nout();
     for (int i=0; i<nx; ++i) {

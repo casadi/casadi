@@ -152,7 +152,7 @@ namespace casadi {
     }
 
     /** \brief Generate code for the operation */
-    void generate(CodeGenerator& g, const std::string& mem,
+    void generate(CodeGenerator& g,
                           const std::vector<int>& arg, const std::vector<int>& res) const override;
 
     /** \brief  Check if a particular integer value */
@@ -210,7 +210,7 @@ namespace casadi {
     }
 
     /** \brief Generate code for the operation */
-    void generate(CodeGenerator& g, const std::string& mem,
+    void generate(CodeGenerator& g,
                       const std::vector<int>& arg, const std::vector<int>& res) const override {}
 
     /// Get the value (only for scalar constant nodes)
@@ -286,7 +286,7 @@ namespace casadi {
     int eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w) const override;
 
     /** \brief Generate code for the operation */
-    void generate(CodeGenerator& g, const std::string& mem,
+    void generate(CodeGenerator& g,
                           const std::vector<int>& arg, const std::vector<int>& res) const override;
 
     /** \brief  Check if a particular integer value */
@@ -482,7 +482,7 @@ namespace casadi {
   }
 
   template<typename Value>
-  void Constant<Value>::generate(CodeGenerator& g, const std::string& mem,
+  void Constant<Value>::generate(CodeGenerator& g,
                                  const std::vector<int>& arg, const std::vector<int>& res) const {
     if (nnz()==0) {
       // Quick return

@@ -73,7 +73,7 @@ namespace casadi {
     return 0;
   }
 
-  void Find::generate(CodeGenerator& g, const std::string& mem,
+  void Find::generate(CodeGenerator& g,
                       const std::vector<int>& arg, const std::vector<int>& res) const {
     int nnz = dep(0).nnz();
     g.local("i", "int");
