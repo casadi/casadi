@@ -820,7 +820,7 @@ Read options from parameter xml.
 
 %feature("docstring") casadi::Blocksqp::_eval "
 
->  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, int mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
@@ -1977,7 +1977,7 @@ dimensions.
 
 %feature("docstring") casadi::BSpline::_eval "
 
->  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, int mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
@@ -3607,7 +3607,7 @@ Print.
 
 %feature("docstring") casadi::BSplineCommon::_eval "
 
->  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, int mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
@@ -4801,7 +4801,7 @@ Obtain solver name from Adaptor.
 
 %feature("docstring") casadi::BSplineDual::_eval "
 
->  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, int mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
@@ -5564,7 +5564,7 @@ smallest input value.
 
 %feature("docstring") casadi::BSplineInterpolant::_eval "
 
->  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, int mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
@@ -7208,7 +7208,7 @@ cached version is available.
 
 %feature("docstring") casadi::CentralDiff::_eval "
 
->  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, int mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
@@ -8112,7 +8112,7 @@ solver statistics.
 
 %feature("docstring") casadi::Collocation::_eval "
 
->  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, int mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
@@ -9361,7 +9361,7 @@ is available.
 
 %feature("docstring") casadi::Conic::_eval "
 
->  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, int mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
@@ -11522,7 +11522,7 @@ for chosing forward/reverse mode.
 
 %feature("docstring") casadi::Dple::_eval "
 
->  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, int mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
@@ -11979,7 +11979,7 @@ inputs.
 
 %feature("docstring") casadi::Expm::_eval "
 
->  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, int mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
@@ -13197,7 +13197,7 @@ dimensions.
 
 %feature("docstring") casadi::External::_eval "
 
->  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, int mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
@@ -14394,7 +14394,7 @@ Print.
 
 %feature("docstring") casadi::FixedStepIntegrator::_eval "
 
->  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, int mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
@@ -16429,7 +16429,7 @@ new function with a selection of inputs/outputs of the original
 
 %feature("docstring") casadi::GenericExternal::_eval "
 
->  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, int mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
@@ -17989,7 +17989,7 @@ Get required length of w field.
 
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::_eval "
 
->  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, int mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
@@ -19559,7 +19559,7 @@ statistics.
 
 %feature("docstring") casadi::ImplicitToNlp::_eval "
 
->  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, int mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
@@ -20596,7 +20596,7 @@ Sparsities of function inputs and outputs.
 
 %feature("docstring") casadi::Integrator::_eval "
 
->  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, int mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
@@ -21323,7 +21323,7 @@ required length of iw field.
 
 %feature("docstring") casadi::Interpolant::_eval "
 
->  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, int mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
@@ -21777,7 +21777,7 @@ NULL)
 // File: classcasadi_1_1Jit.xml
 %feature("docstring") casadi::Jit::_eval "
 
->  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, int mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
@@ -23330,7 +23330,7 @@ scheme index by name.
 
 %feature("docstring") casadi::LapackLu::_eval "
 
->  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, int mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
@@ -24532,7 +24532,7 @@ variables ( MX)
 
 %feature("docstring") casadi::LapackQr::_eval "
 
->  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, int mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
@@ -25164,7 +25164,7 @@ function input(s) and output(s)
 
 %feature("docstring") casadi::LinearInterpolant::_eval "
 
->  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, int mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
@@ -25943,7 +25943,7 @@ Check if input arguments have correct length and dimensions.
 
 %feature("docstring") casadi::LinearInterpolantJac::_eval "
 
->  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, int mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
@@ -27929,7 +27929,7 @@ templated.
 
 %feature("docstring") casadi::Lsqr::_eval "
 
->  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, int mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
@@ -28580,7 +28580,7 @@ block.
 
 %feature("docstring") casadi::Map::_eval "
 
->  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, int mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
@@ -29004,7 +29004,7 @@ function with a selection of inputs/outputs of the original
 
 %feature("docstring") casadi::MapOmp::_eval "
 
->  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, int mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
@@ -32493,7 +32493,7 @@ the floating point output argument of an atomic operation.
 
 %feature("docstring") casadi::Newton::_eval "
 
->  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, int mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
@@ -33478,7 +33478,7 @@ cached version is available.
 
 %feature("docstring") casadi::Nlpsol::_eval "
 
->  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, int mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
@@ -34130,7 +34130,7 @@ Options.
 
 %feature("docstring") casadi::OracleFunction::_eval "
 
->  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, int mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
@@ -35316,7 +35316,7 @@ Python.
 // File: classcasadi_1_1QpToNlp.xml
 %feature("docstring") casadi::QpToNlp::_eval "
 
->  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, int mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
@@ -36816,7 +36816,7 @@ name.
 
 %feature("docstring") casadi::Rootfinder::_eval "
 
->  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, int mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
@@ -37844,7 +37844,7 @@ Print dimensions of inputs and outputs.
 
 %feature("docstring") casadi::RungeKutta::_eval "
 
->  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, int mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
@@ -38673,7 +38673,7 @@ Export / Generate C code for the generated functions.
 
 %feature("docstring") casadi::Scpgen::_eval "
 
->  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, int mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
@@ -40028,7 +40028,7 @@ Input/output dimensions.
 
 %feature("docstring") casadi::SimplifiedExternal::_eval "
 
->  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, int mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
@@ -40516,7 +40516,7 @@ Are all inputs and outputs scalar.
 
 %feature("docstring") casadi::SlicotDple::_eval "
 
->  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, int mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
@@ -41651,7 +41651,7 @@ with symbolic matrices.
 
 %feature("docstring") casadi::SlicotExpm::_eval "
 
->  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, int mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
@@ -43922,7 +43922,7 @@ input arguments have correct length and dimensions.
 
 %feature("docstring") casadi::Sqpmethod::_eval "
 
->  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, int mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
@@ -44598,7 +44598,7 @@ dependencies.
 
 %feature("docstring") casadi::Switch::_eval "
 
->  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, int mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
@@ -45685,7 +45685,7 @@ directional derivatives using finite differencing.
 
 %feature("docstring") casadi::SymbolicQr::_eval "
 
->  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::_eval(const double **arg, double **res, int *iw, double *w, int mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
