@@ -975,7 +975,7 @@ namespace casadi {
   }
 
   int Function::operator()(const double** arg, double** res, int* iw, double* w, int mem) const {
-    return (*this)->_eval(arg, res, iw, w, memory(mem));
+    return (*this)->_eval(arg, res, iw, w, mem);
   }
 
   int Function::operator()(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
