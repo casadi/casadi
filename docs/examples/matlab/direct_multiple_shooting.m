@@ -109,13 +109,13 @@ for k=0:N-1
 
     % New NLP variable for state at end of interval
     Xk = MX.sym(['X_' num2str(k+1)], 2);
-    w = {w{:}, Xk};
+    w = [w, {Xk}];
     lbw = [lbw; -0.25; -inf];
     ubw = [ubw;  inf;  inf];
     w0 = [w0; 0; 0];
 
     % Add equality constraint
-    g = {g{:}, Xk_end-Xk};
+    g = [g, {Xk_end-Xk}];
     lbg = [lbg; 0; 0];
     ubg = [ubg; 0; 0];
 end
