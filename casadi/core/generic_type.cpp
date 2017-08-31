@@ -181,7 +181,7 @@ namespace casadi {
     if (ref.is_null()) {
       stream << "NULL";
     } else {
-      ref->print_new(stream, false);
+      ref->print(stream, false);
     }
     return stream;
   }

@@ -449,7 +449,7 @@ namespace casadi {
 
   }
 
-  void DaeBuilder::print_new(std::ostream &stream, bool more) const {
+  void DaeBuilder::print(std::ostream &stream, bool more) const {
     // Assert correctness
     if (more) sanity_check();
 

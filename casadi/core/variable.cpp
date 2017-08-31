@@ -53,7 +53,7 @@ namespace casadi {
     return this->v.name();
   }
 
-  void Variable::print_new(ostream &stream, bool more) const {
+  void Variable::print(ostream &stream, bool more) const {
     stream << name();
   }
 

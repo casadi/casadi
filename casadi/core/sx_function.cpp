@@ -78,7 +78,7 @@ namespace casadi {
     // Make sure no free parameters
     if (!free_vars_.empty()) {
       std::stringstream ss;
-      print_new(ss, false);
+      print(ss, false);
       casadi_error("Cannot evaluate \"" << ss.str() << "\" since variables "
                    << free_vars_ << " are free.");
     }
@@ -114,8 +114,8 @@ namespace casadi {
     return true;
   }
 
-  void SXFunction::print_new(ostream &stream, bool more) const {
-    FunctionInternal::print_new(stream, more);
+  void SXFunction::print(ostream &stream, bool more) const {
+    FunctionInternal::print(stream, more);
     if (!more) return;
 
     // Iterator to free variables

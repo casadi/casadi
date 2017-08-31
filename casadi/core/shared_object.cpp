@@ -100,11 +100,11 @@ namespace casadi {
     return (*this)->type_name();
   }
 
-  void SharedObject::print_new(std::ostream &stream, bool more) const {
+  void SharedObject::print(std::ostream &stream, bool more) const {
     if (is_null()) {
       stream << "NULL";
     } else {
-      (*this)->print_new(stream, more);
+      (*this)->print(stream, more);
     }
   }
 

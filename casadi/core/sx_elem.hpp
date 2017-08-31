@@ -111,7 +111,7 @@ namespace casadi {
     static std::string type_name() {return "SXElem";}
 
     /// Print a description of the object
-    void print_new(std::ostream &stream, bool more) const;
+    void print(std::ostream &stream, bool more) const;
 
     /// \cond INTERNAL
     /** \brief  Get a pointer to the node */

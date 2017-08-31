@@ -130,7 +130,7 @@ namespace casadi {
     std::string type_name() const;
 
     /// Print a description of the object
-    void print_new(std::ostream &stream, bool more) const;
+    void print(std::ostream &stream, bool more) const;
 
     /// \cond INTERNAL
     /// Print the pointer to the internal class

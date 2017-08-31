@@ -746,7 +746,7 @@ namespace casadi {
                     std::vector<std::string>& SWIG_OUTPUT(inter)) const;
 
     /// Print a representation of the object
-    void print_new(std::ostream &stream, bool more=false) const;
+    void print(std::ostream &stream, bool more=false) const;
 
     /// Print scalar
     void print_scalar(std::ostream &stream) const;

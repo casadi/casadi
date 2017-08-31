@@ -80,7 +80,7 @@ namespace casadi {
     std::string type_name() const {return "Slice";}
 
     /// Print a description of the object
-    void print_new(std::ostream &stream, bool more=false) const;
+    void print(std::ostream &stream, bool more=false) const;
   };
 
   /// Construct from an index vector (requires is_slice(v) to be true)

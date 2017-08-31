@@ -35,7 +35,7 @@ namespace casadi {
     NlImporter(*this, filename, opts);
   }
 
-  void NlpBuilder::print_new(std::ostream &stream, bool more) const {
+  void NlpBuilder::print(std::ostream &stream, bool more) const {
     stream << "#x=" << this->x.size() << ", #g=" << this->g.size();
     if (more) {
       stream << endl;

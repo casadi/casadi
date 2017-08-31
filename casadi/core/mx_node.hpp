@@ -135,7 +135,7 @@ namespace casadi {
     virtual std::string class_name() const override;
 
     /** \brief  Print a description */
-    void print_new(std::ostream &stream, bool more) const override;
+    void print(std::ostream &stream, bool more) const override;
 
     /** \brief  Check if valid function input */
     virtual bool is_valid_input() const { return false;}

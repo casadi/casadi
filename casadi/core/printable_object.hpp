@@ -44,24 +44,18 @@ namespace casadi {
   class CASADI_EXPORT PrintableObject {
   public:
 
-    /// Return a string with a description (for SWIG)
-    void print(std::ostream &stream) const {
-      static_cast<const Derived*>(this)->print_new(stream, true);
-      stream << std::flush;
-    }
-
     /// Print a representation of the object
     void repr(std::ostream &stream) const {
       stream << static_cast<const Derived*>(this)->type_name() << "(";
-      static_cast<const Derived*>(this)->print_new(stream, false);
+      static_cast<const Derived*>(this)->print(stream, false);
       stream << ")";
       stream << std::flush;
     }
 
     /// Return a string with a description (for SWIG)
-    std::string get_str() const {
+    std::string get_str(bool more=false) const {
       std::stringstream ss;
-      print(ss);
+      static_cast<const Derived*>(this)->print(ss, more);
       return ss.str();
     }
 
@@ -76,7 +70,7 @@ namespace casadi {
     /// Print a representation of the object to a stream (shorthand)
     inline friend
       std::ostream& operator<<(std::ostream &stream, const PrintableObject<Derived>& obj) {
-      static_cast<const Derived&>(obj).print_new(stream, false);
+      static_cast<const Derived&>(obj).print(stream, false);
       return stream;
     }
 #endif // SWIG

@@ -132,7 +132,7 @@ namespace casadi {
     std::string type_name() const {return "Variable";}
 
     /// Print a description of the object
-    void print_new(std::ostream &stream, bool more=false) const;
+    void print(std::ostream &stream, bool more=false) const;
   };
 } // namespace casadi
 

@@ -73,11 +73,11 @@ namespace casadi {
   WeakRefInternal::~WeakRefInternal() {
   }
 
-  void WeakRefInternal::print_new(std::ostream &stream, bool more) const {
+  void WeakRefInternal::print(std::ostream &stream, bool more) const {
     if (raw_==0) {
       stream << "NULL";
     } else {
-      raw_->print_new(stream, more);
+      raw_->print(stream, more);
     }
   }
 

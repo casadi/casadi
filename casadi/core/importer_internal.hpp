@@ -58,7 +58,7 @@ namespace casadi {
     std::string class_name() const override { return "ImporterInternal";}
 
     /** \brief Print */
-    void print_new(std::ostream &stream, bool more) const override;
+    void print(std::ostream &stream, bool more) const override;
 
     // Creator function for internal class
     typedef ImporterInternal* (*Creator)(const std::string& name);

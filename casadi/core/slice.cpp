@@ -69,7 +69,7 @@ namespace casadi {
     return range(start+ind1, stop+ind1, step, len+ind1);
   }
 
-  void Slice::print_new(std::ostream& stream, bool more) const {
+  void Slice::print(std::ostream& stream, bool more) const {
     bool from_beginning = start == 0;
     bool till_end = stop == std::numeric_limits<int>::max();
     bool skip_none = step==1;
