@@ -30,11 +30,6 @@ temporary variables needed.
 
 ";
 
-%feature("docstring") casadi::Blocksqp::type_name "[INTERNAL]  Get type
-name.
-
-";
-
 %feature("docstring") casadi::Blocksqp::memory "[INTERNAL]  Memory objects.
 
 ";
@@ -105,6 +100,9 @@ simplified signature.
 %feature("docstring") casadi::Blocksqp::mx_out "[INTERNAL]  Get function
 input(s) and output(s)
 
+";
+
+%feature("docstring") casadi::Blocksqp::secondOrderCorrection "[INTERNAL]
 ";
 
 %feature("docstring") casadi::Blocksqp::clear_mem "[INTERNAL]  Clear all
@@ -784,7 +782,9 @@ required length of arg field.
 
 ";
 
-%feature("docstring") casadi::Blocksqp::secondOrderCorrection "[INTERNAL]
+%feature("docstring") casadi::Blocksqp::type_name "[INTERNAL]  Get type
+name.
+
 ";
 
 %feature("docstring") casadi::Blocksqp::solve "[INTERNAL] ";
@@ -817,6 +817,11 @@ function.
 
 %feature("docstring") casadi::Blocksqp::setOptionsFromFile "[INTERNAL]
 Read options from parameter xml.
+
+";
+
+%feature("docstring") casadi::Blocksqp::class_name "[INTERNAL]  Readable
+name of the internal class.
 
 ";
 
@@ -1752,8 +1757,9 @@ unidirectional or bidirectional partition.
 
 ";
 
-%feature("docstring") casadi::BSpline::check_res "[INTERNAL]  Check if
-output arguments have correct length and dimensions.
+%feature("docstring") casadi::BSpline::class_name "
+
+Readable name of the internal class.
 
 ";
 
@@ -1949,9 +1955,8 @@ Sparsities of function inputs and outputs.
 
 ";
 
-%feature("docstring") casadi::BSpline::type_name "
-
-Get type name.
+%feature("docstring") casadi::BSpline::type_name "[INTERNAL]  Get type
+name.
 
 ";
 
@@ -2249,6 +2254,11 @@ sparsity of a given output.
 
 %feature("docstring") casadi::BSpline::max_in "[INTERNAL]  Get largest
 input value.
+
+";
+
+%feature("docstring") casadi::BSpline::check_res "[INTERNAL]  Check if
+output arguments have correct length and dimensions.
 
 ";
 
@@ -3442,8 +3452,8 @@ variables ( MX)
 
 ";
 
-%feature("docstring") casadi::BSplineCommon::codegen_incref "[INTERNAL]
-Codegen incref for dependencies.
+%feature("docstring") casadi::BSplineCommon::type_name "[INTERNAL]  Get
+type name.
 
 ";
 
@@ -3530,6 +3540,11 @@ Function instance consisting of only one MX call.
 
 ";
 
+%feature("docstring") casadi::BSplineCommon::class_name "[INTERNAL]
+Readable name of the internal class.
+
+";
+
 %feature("docstring") casadi::BSplineCommon::alloc_iw "[INTERNAL]  Ensure
 required length of iw field.
 
@@ -3587,8 +3602,8 @@ Print.
 
 ";
 
-%feature("docstring") casadi::BSplineCommon::type_name "[INTERNAL]  Get
-type name.
+%feature("docstring") casadi::BSplineCommon::codegen_incref "[INTERNAL]
+Codegen incref for dependencies.
 
 ";
 
@@ -3829,8 +3844,8 @@ reverse order is run after init() has been completed.
 
 ";
 
-%feature("docstring") casadi::BSplineDual::default_in "[INTERNAL]  Get
-default input value.
+%feature("docstring") casadi::BSplineDual::type_name "[INTERNAL]  Get type
+name.
 
 ";
 
@@ -3873,8 +3888,8 @@ Jacobian of all input elements with respect to all output elements.
 
 ";
 
-%feature("docstring") casadi::BSplineDual::self "[INTERNAL]  Get a public
-class instance.
+%feature("docstring") casadi::BSplineDual::call_forward "[INTERNAL]
+Forward mode AD, virtual functions overloaded in derived classes.
 
 ";
 
@@ -3907,8 +3922,8 @@ vectors long enough to evaluate function.
 
 ";
 
-%feature("docstring") casadi::BSplineDual::call_forward "[INTERNAL]
-Forward mode AD, virtual functions overloaded in derived classes.
+%feature("docstring") casadi::BSplineDual::self "[INTERNAL]  Get a public
+class instance.
 
 ";
 
@@ -3922,10 +3937,18 @@ the (integer) output argument of an atomic operation.
 
 ";
 
-%feature("docstring") casadi::BSplineDual::has_function "[INTERNAL] ";
+%feature("docstring") casadi::BSplineDual::numel_in "[INTERNAL]  Number of
+input/output elements.
+
+";
 
 %feature("docstring") casadi::BSplineDual::index_in "[INTERNAL]  Get input
 scheme index by name.
+
+";
+
+%feature("docstring") casadi::BSplineDual::getAtomicOperation "[INTERNAL]
+Get an atomic operation operator index.
 
 ";
 
@@ -4012,11 +4035,6 @@ length of res field.
 
 ";
 
-%feature("docstring") casadi::BSplineDual::numel_in "[INTERNAL]  Number of
-input/output elements.
-
-";
-
 %feature("docstring") casadi::BSplineDual::nnz_out "[INTERNAL]  Number of
 input/output nonzeros.
 
@@ -4074,9 +4092,8 @@ function inputs and outputs.
 
 ";
 
-%feature("docstring") casadi::BSplineDual::type_name "
-
-Get type name.
+%feature("docstring") casadi::BSplineDual::default_in "[INTERNAL]  Get
+default input value.
 
 ";
 
@@ -4435,10 +4452,7 @@ structure recognition.
 
 ";
 
-%feature("docstring") casadi::BSplineDual::getAtomicOperation "[INTERNAL]
-Get an atomic operation operator index.
-
-";
+%feature("docstring") casadi::BSplineDual::has_function "[INTERNAL] ";
 
 %feature("docstring") casadi::BSplineDual::size1_in "[INTERNAL]
 Input/output dimensions.
@@ -4611,6 +4625,12 @@ Print dimensions of inputs and outputs.
 
 %feature("docstring") casadi::BSplineDual::sz_iw "[INTERNAL]  Get required
 length of iw field.
+
+";
+
+%feature("docstring") casadi::BSplineDual::class_name "
+
+Readable name of the internal class.
 
 ";
 
@@ -4986,6 +5006,11 @@ Construct Prepares the function for evaluation.
 
 ";
 
+%feature("docstring") casadi::BSplineInterpolant::definition "[INTERNAL]
+Get function signature: name:(inputs)->(outputs)
+
+";
+
 %feature("docstring") casadi::BSplineInterpolant::alloc_iw "[INTERNAL]
 Ensure required length of iw field.
 
@@ -5267,8 +5292,8 @@ Initalize memory block.
 
 ";
 
-%feature("docstring") casadi::BSplineInterpolant::definition "[INTERNAL]
-Get function signature: name:(inputs)->(outputs)
+%feature("docstring") casadi::BSplineInterpolant::wrap "[INTERNAL]  Wrap in
+an Function instance consisting of only one MX call.
 
 ";
 
@@ -5584,8 +5609,8 @@ the class able to propagate seeds through the algorithm?
 
 ";
 
-%feature("docstring") casadi::BSplineInterpolant::wrap "[INTERNAL]  Wrap in
-an Function instance consisting of only one MX call.
+%feature("docstring") casadi::BSplineInterpolant::class_name "[INTERNAL]
+Readable name of the internal class.
 
 ";
 
@@ -6120,6 +6145,12 @@ Get output dimension.
 class able to propagate seeds through the algorithm?
 
 (for usage, see the example propagating_sparsity.cpp)
+
+";
+
+%feature("docstring") casadi::Callback::class_name "
+
+Get class name.
 
 ";
 
@@ -7194,8 +7225,8 @@ expressions for the forward seeds.
 
 ";
 
-%feature("docstring") casadi::CentralDiff::sparsity_out "[INTERNAL]  Get
-sparsity of a given output.
+%feature("docstring") casadi::CentralDiff::class_name "[INTERNAL]  Get type
+name.
 
 ";
 
@@ -7362,6 +7393,11 @@ input(s) and output(s)
 
 %feature("docstring") casadi::CentralDiff::sx_in "[INTERNAL]  Get function
 input(s) and output(s)
+
+";
+
+%feature("docstring") casadi::CentralDiff::sparsity_out "[INTERNAL]  Get
+sparsity of a given output.
 
 ";
 
@@ -7624,32 +7660,25 @@ Constructor.
 
 ";
 
-%feature("docstring") casadi::ClangCompiler::init "[INTERNAL]  Initialize.
+%feature("docstring") casadi::ClangCompiler::can_have_meta "[INTERNAL]  Can
+meta information be read?
+
+";
+
+%feature("docstring") casadi::ClangCompiler::inlined "[INTERNAL] ";
+
+%feature("docstring") casadi::ClangCompiler::get_function "[INTERNAL]  Get
+a function pointer for numerical evaluation.
+
+";
+
+%feature("docstring") casadi::ClangCompiler::construct "[INTERNAL]
+Construct Prepares the function for evaluation.
 
 ";
 
 %feature("docstring") casadi::ClangCompiler::read_external "[INTERNAL]  Get
 an external function declaration.
-
-";
-
-%feature("docstring") casadi::ClangCompiler::body "[INTERNAL]  Get the
-function body, if inlined.
-
-";
-
-%feature("docstring") casadi::ClangCompiler::weak "[INTERNAL]  Get a weak
-reference to the object.
-
-";
-
-%feature("docstring") casadi::ClangCompiler::get_options "[INTERNAL]
-Options.
-
-";
-
-%feature("docstring") casadi::ClangCompiler::has_meta "[INTERNAL]  Does an
-entry exist?
 
 ";
 
@@ -7700,6 +7729,36 @@ Diagrams
 
 C++ includes: clang_compiler.hpp ";
 
+%feature("docstring") casadi::ClangCompiler::type_name "[INTERNAL]  Get
+type name.
+
+";
+
+%feature("docstring") casadi::ClangCompiler::weak "[INTERNAL]  Get a weak
+reference to the object.
+
+";
+
+%feature("docstring") casadi::ClangCompiler::~ClangCompiler "[INTERNAL]
+Destructor.
+
+";
+
+%feature("docstring") casadi::ClangCompiler::plugin_name "[INTERNAL]  Get
+name of plugin.
+
+";
+
+%feature("docstring") casadi::ClangCompiler::get_options "[INTERNAL]
+Options.
+
+";
+
+%feature("docstring") casadi::ClangCompiler::read_meta "[INTERNAL]  Get
+meta information.
+
+";
+
 %feature("docstring") casadi::ClangCompiler::print_short "[INTERNAL]  Print
 representation.
 
@@ -7710,24 +7769,26 @@ as a text.
 
 ";
 
+%feature("docstring") casadi::ClangCompiler::class_name "[INTERNAL]  Get
+type name.
+
+";
+
+%feature("docstring") casadi::ClangCompiler::has_meta "[INTERNAL]  Does an
+entry exist?
+
+";
+
+%feature("docstring") casadi::ClangCompiler::init "[INTERNAL]  Initialize.
+
+";
+
+%feature("docstring") casadi::ClangCompiler::body "[INTERNAL]  Get the
+function body, if inlined.
+
+";
+
 %feature("docstring") casadi::ClangCompiler::print_long "[INTERNAL]  Print.
-
-";
-
-%feature("docstring") casadi::ClangCompiler::can_have_meta "[INTERNAL]  Can
-meta information be read?
-
-";
-
-%feature("docstring") casadi::ClangCompiler::construct "[INTERNAL]
-Construct Prepares the function for evaluation.
-
-";
-
-%feature("docstring") casadi::ClangCompiler::inlined "[INTERNAL] ";
-
-%feature("docstring") casadi::ClangCompiler::read_meta "[INTERNAL]  Get
-meta information.
 
 ";
 
@@ -7736,23 +7797,8 @@ entry as a text.
 
 ";
 
-%feature("docstring") casadi::ClangCompiler::get_function "[INTERNAL]  Get
-a function pointer for numerical evaluation.
-
-";
-
-%feature("docstring") casadi::ClangCompiler::~ClangCompiler "[INTERNAL]
-Destructor.
-
-";
-
 %feature("docstring") casadi::ClangCompiler::getCount "[INTERNAL]  Get the
 reference count.
-
-";
-
-%feature("docstring") casadi::ClangCompiler::plugin_name "[INTERNAL]  Get
-name of plugin.
 
 ";
 
@@ -7817,6 +7863,11 @@ Propagate sparsity backwards.
 
 %feature("docstring") casadi::Collocation::print_option "[INTERNAL]  Print
 all information there is to know about a certain option.
+
+";
+
+%feature("docstring") casadi::Collocation::class_name "[INTERNAL]  Readable
+name of the internal class.
 
 ";
 
@@ -8921,6 +8972,11 @@ Generate native code in the interfaced language for debugging
 
 %feature("docstring") casadi::Conic::codegen_decref "[INTERNAL]  Codegen
 decref for dependencies.
+
+";
+
+%feature("docstring") casadi::Conic::class_name "[INTERNAL]  Readable name
+of the internal class.
 
 ";
 
@@ -10524,6 +10580,12 @@ Get a derivative expression by non-differentiated expression.
 
 ";
 
+%feature("docstring") casadi::DaeBuilder::type_name "
+
+Readable name of the class.
+
+";
+
 %feature("docstring") casadi::DaeBuilder::scale_equations "
 
 Scale the implicit equations.
@@ -10567,8 +10629,8 @@ Add an ordinary differential equation. Old syntax: Swap arguments.
 
 
 // File: classcasadi_1_1DllLibrary.xml
-%feature("docstring") casadi::DllLibrary::construct "[INTERNAL]  Construct
-Prepares the function for evaluation.
+%feature("docstring") casadi::DllLibrary::plugin_name "[INTERNAL]  Queery
+plugin name.
 
 ";
 
@@ -10576,6 +10638,50 @@ Prepares the function for evaluation.
 
 %feature("docstring") casadi::DllLibrary::getCount "[INTERNAL]  Get the
 reference count.
+
+";
+
+%feature("docstring") casadi::DllLibrary::get_function "[INTERNAL]  Get a
+function pointer for numerical evaluation.
+
+";
+
+%feature("docstring") casadi::DllLibrary::get_options "[INTERNAL]  Options.
+
+";
+
+%feature("docstring") casadi::DllLibrary::to_text "[INTERNAL]  Get entry as
+a text.
+
+";
+
+%feature("docstring") casadi::DllLibrary::weak "[INTERNAL]  Get a weak
+reference to the object.
+
+";
+
+%feature("docstring") casadi::DllLibrary::get_meta "[INTERNAL]  Get entry
+as a text.
+
+";
+
+%feature("docstring") casadi::DllLibrary::body "[INTERNAL]  Get the
+function body, if inlined.
+
+";
+
+%feature("docstring") casadi::DllLibrary::print_short "[INTERNAL]  Print
+representation.
+
+";
+
+%feature("docstring") casadi::DllLibrary::has_function "[INTERNAL]  Get a
+function pointer for numerical evaluation.
+
+";
+
+%feature("docstring") casadi::DllLibrary::construct "[INTERNAL]  Construct
+Prepares the function for evaluation.
 
 ";
 
@@ -10601,42 +10707,29 @@ Diagrams
 
 C++ includes: importer_internal.hpp ";
 
-%feature("docstring") casadi::DllLibrary::get_function "[INTERNAL]  Get a
-function pointer for numerical evaluation.
-
-";
-
-%feature("docstring") casadi::DllLibrary::weak "[INTERNAL]  Get a weak
-reference to the object.
-
-";
-
-%feature("docstring") casadi::DllLibrary::get_options "[INTERNAL]  Options.
-
-";
-
 %feature("docstring") casadi::DllLibrary::read_meta "[INTERNAL]  Get meta
 information.
 
 ";
 
+%feature("docstring") casadi::DllLibrary::class_name "[INTERNAL]  Get type
+name.
+
+";
+
+%feature("docstring") casadi::DllLibrary::init "[INTERNAL]  Initialize.
+
+";
+
+%feature("docstring") casadi::DllLibrary::~DllLibrary "[INTERNAL] ";
+
+%feature("docstring") casadi::DllLibrary::type_name "[INTERNAL]  Get type
+name.
+
+";
+
 %feature("docstring") casadi::DllLibrary::can_have_meta "[INTERNAL]  Can
 meta information be read?
-
-";
-
-%feature("docstring") casadi::DllLibrary::plugin_name "[INTERNAL]  Queery
-plugin name.
-
-";
-
-%feature("docstring") casadi::DllLibrary::to_text "[INTERNAL]  Get entry as
-a text.
-
-";
-
-%feature("docstring") casadi::DllLibrary::get_meta "[INTERNAL]  Get entry
-as a text.
 
 ";
 
@@ -10649,31 +10742,10 @@ external function declaration.
 
 ";
 
-%feature("docstring") casadi::DllLibrary::init "[INTERNAL]  Initialize.
-
-";
-
-%feature("docstring") casadi::DllLibrary::~DllLibrary "[INTERNAL] ";
-
-%feature("docstring") casadi::DllLibrary::print_short "[INTERNAL]  Print
-representation.
-
-";
-
 %feature("docstring") casadi::DllLibrary::inlined "[INTERNAL] ";
-
-%feature("docstring") casadi::DllLibrary::has_function "[INTERNAL]  Get a
-function pointer for numerical evaluation.
-
-";
 
 %feature("docstring") casadi::DllLibrary::has_meta "[INTERNAL]  Does an
 entry exist?
-
-";
-
-%feature("docstring") casadi::DllLibrary::body "[INTERNAL]  Get the
-function body, if inlined.
 
 ";
 
@@ -11459,6 +11531,11 @@ floating point output argument of an atomic operation.
 
 ";
 
+%feature("docstring") casadi::Dple::class_name "[INTERNAL]  Readable name
+of the internal class.
+
+";
+
 %feature("docstring") casadi::Dple::check_arg "[INTERNAL]  Check if input
 arguments have correct length and dimensions.
 
@@ -11875,6 +11952,11 @@ dependencies.
 
 %feature("docstring") casadi::Expm::has_jacobian "[INTERNAL]  Return
 Jacobian of all input elements with respect to all output elements.
+
+";
+
+%feature("docstring") casadi::Expm::class_name "[INTERNAL]  Readable name
+of the internal class.
 
 ";
 
@@ -12844,6 +12926,11 @@ mode AD, virtual functions overloaded in derived classes.
 
 ";
 
+%feature("docstring") casadi::External::class_name "[INTERNAL]  Get type
+name.
+
+";
+
 %feature("docstring") casadi::External::getWorkSize "[INTERNAL]  Get the
 length of the work vector.
 
@@ -13597,6 +13684,11 @@ Get the reference count.
 
 %feature("docstring") casadi::FixedStepIntegrator::alloc_iw "[INTERNAL]
 Ensure required length of iw field.
+
+";
+
+%feature("docstring") casadi::FixedStepIntegrator::class_name "[INTERNAL]
+Readable name of the internal class.
 
 ";
 
@@ -14902,6 +14994,12 @@ Get output dimension.
 
 ";
 
+%feature("docstring") casadi::Function::class_name "
+
+Get class name.
+
+";
+
 %feature("docstring") casadi::Function::slice "
 
 returns a new function with a selection of inputs/outputs of the original
@@ -16190,8 +16288,8 @@ Get a vector of symbolic variables corresponding to the outputs.
 
 ";
 
-%feature("docstring") casadi::GenericExternal::sparsity_out "[INTERNAL]
-Get sparsity of a given output.
+%feature("docstring") casadi::GenericExternal::class_name "[INTERNAL]  Get
+type name.
 
 ";
 
@@ -16603,6 +16701,11 @@ required length of w field.
 
 %feature("docstring") casadi::GenericExternal::fwd_seed "[INTERNAL]
 Symbolic expressions for the forward seeds.
+
+";
+
+%feature("docstring") casadi::GenericExternal::sparsity_out "[INTERNAL]
+Get sparsity of a given output.
 
 ";
 
@@ -17648,6 +17751,11 @@ reference to the object.
 
 ";
 
+%feature("docstring") casadi::GenericTypeBase::class_name "[INTERNAL]
+Readable name of the internal class.
+
+";
+
 %feature("docstring") casadi::GenericTypeBase::getType "[INTERNAL] ";
 
 %feature("docstring") casadi::GenericTypeBase::getCount "[INTERNAL]  Get
@@ -17665,6 +17773,11 @@ Print a description of the object.
 
 %feature("docstring") casadi::GenericTypeBase::print_short "[INTERNAL]
 Print a representation of the object.
+
+";
+
+%feature("docstring") casadi::GenericTypeBase::type_name "[INTERNAL]
+Readable name of the public class.
 
 ";
 
@@ -17726,6 +17839,10 @@ the floating point output argument of an atomic operation.
 ";
 
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::call_gen "[INTERNAL]   Call a function, overloaded.
+
+";
+
+%feature("docstring") casadi::ImplicitFixedStepIntegrator::class_name "[INTERNAL]  Readable name of the internal class.
 
 ";
 
@@ -18992,6 +19109,11 @@ Are all inputs and outputs scalar.
 
 ";
 
+%feature("docstring") casadi::ImplicitToNlp::class_name "[INTERNAL]
+Readable name of the internal class.
+
+";
+
 %feature("docstring") casadi::ImplicitToNlp::verbose "[INTERNAL]  Verbose
 mode?
 
@@ -19516,6 +19638,12 @@ Get the function body, if inlined.
 
 ";
 
+%feature("docstring") casadi::Importer::class_name "
+
+Get class name.
+
+";
+
 %feature("docstring") casadi::Importer::print_long "
 
 Print a description of the object.
@@ -19530,6 +19658,12 @@ pointer to the internal class
 %feature("docstring") casadi::Importer::has_meta "
 
 Does a meta entry exist?
+
+";
+
+%feature("docstring") casadi::Importer::type_name "
+
+Readable name of the class.
 
 ";
 
@@ -20219,6 +20353,11 @@ Input/output dimensions.
 
 %feature("docstring") casadi::Integrator::getDerivativeOptions "[INTERNAL]
 Set solver specific options to generated augmented integrators.
+
+";
+
+%feature("docstring") casadi::Integrator::class_name "[INTERNAL]  Readable
+name of the internal class.
 
 ";
 
@@ -21351,6 +21490,11 @@ Generate code for the function body.
 
 ";
 
+%feature("docstring") casadi::Interpolant::class_name "[INTERNAL]  Readable
+name of the internal class.
+
+";
+
 %feature("docstring") casadi::Interpolant::symbolicAdjSeed "[INTERNAL]
 Symbolic expressions for the adjoint seeds.
 
@@ -21624,14 +21768,13 @@ dimensions.
 
 ";
 
-%feature("docstring") casadi::Jit::type_name "
-
-Get type name.
+%feature("docstring") casadi::Jit::type_name "[INTERNAL]  Get type name.
 
 ";
 
-%feature("docstring") casadi::Jit::n_out "[INTERNAL]  Number of function
-inputs and outputs.
+%feature("docstring") casadi::Jit::class_name "
+
+Get type name.
 
 ";
 
@@ -21798,6 +21941,11 @@ Get sparsity of a given input.
 ------------------------------------------------------------------------
 [INTERNAL] 
 Are all inputs and outputs scalar.
+
+";
+
+%feature("docstring") casadi::Jit::n_out "[INTERNAL]  Number of function
+inputs and outputs.
 
 ";
 
@@ -24521,6 +24669,11 @@ function have free variables.
 
 ";
 
+%feature("docstring") casadi::LapackQr::sz_arg "[INTERNAL]  Get required
+length of arg field.
+
+";
+
 %feature("docstring") casadi::LapackQr::get_sparsity_out "[INTERNAL]  Get
 sparsity of a given output.
 
@@ -24760,8 +24913,8 @@ Export / Generate C code for the dependency function.
 
 ";
 
-%feature("docstring") casadi::LapackQr::sz_arg "[INTERNAL]  Get required
-length of arg field.
+%feature("docstring") casadi::LapackQr::class_name "[INTERNAL]  Readable
+name of the internal class.
 
 ";
 
@@ -25205,6 +25358,8 @@ Code generate the function.
 
 ";
 
+%feature("docstring") casadi::LinearInterpolant::LinearInterpolant "[INTERNAL] ";
+
 %feature("docstring") casadi::LinearInterpolant::sz_res "[INTERNAL]  Get
 required length of res field.
 
@@ -25233,8 +25388,8 @@ Log the status of the solver, function given.
 
 ";
 
-%feature("docstring") casadi::LinearInterpolant::replace_aseed "[INTERNAL]
-Replace 0-by-0 reverse seeds.
+%feature("docstring") casadi::LinearInterpolant::replace_arg "[INTERNAL]
+Replace 0-by-0 inputs.
 
 ";
 
@@ -25477,7 +25632,10 @@ Evaluate with symbolic scalars.
 
 ";
 
-%feature("docstring") casadi::LinearInterpolant::LinearInterpolant "[INTERNAL] ";
+%feature("docstring") casadi::LinearInterpolant::class_name "[INTERNAL]
+Readable name of the internal class.
+
+";
 
 %feature("docstring") casadi::LinearInterpolant::getAdaptorSolverName "[INTERNAL]  Obtain solver name from Adaptor.
 
@@ -25561,8 +25719,8 @@ Checkout a memory object.
 
 ";
 
-%feature("docstring") casadi::LinearInterpolant::replace_arg "[INTERNAL]
-Replace 0-by-0 inputs.
+%feature("docstring") casadi::LinearInterpolant::replace_aseed "[INTERNAL]
+Replace 0-by-0 reverse seeds.
 
 ";
 
@@ -25763,6 +25921,11 @@ Call a function, overloaded.
 ";
 
 %feature("docstring") casadi::LinearInterpolantJac::getAtomicInputReal "[INTERNAL]  Get the floating point output argument of an atomic operation.
+
+";
+
+%feature("docstring") casadi::LinearInterpolantJac::class_name "[INTERNAL]
+Get type name.
 
 ";
 
@@ -26494,15 +26657,20 @@ Obtain a numeric Cholesky factorization Only for Cholesky solvers.
 
 ";
 
+%feature("docstring") casadi::Linsol::print_ptr "[INTERNAL]  Print the
+pointer to the internal class
+
+";
+
 %feature("docstring") casadi::Linsol::neig "
 
 Number of negative eigenvalues Not available for all solvers.
 
 ";
 
-%feature("docstring") casadi::Linsol::print_long "
+%feature("docstring") casadi::Linsol::class_name "
 
-Print a description of the object.
+Get class name.
 
 ";
 
@@ -26532,9 +26700,9 @@ Create a solve node.
 
 ";
 
-%feature("docstring") casadi::Linsol::print "
+%feature("docstring") casadi::Linsol::print_long "
 
-Return a string with a description (for SWIG)
+Print a description of the object.
 
 ";
 
@@ -26562,6 +26730,12 @@ Importer factory.
 
 Returns a number that is unique for a given Node. If the Object does not
 point to any node, \"0\" is returned.
+
+";
+
+%feature("docstring") casadi::Linsol::get_str "
+
+Return a string with a description (for SWIG)
 
 ";
 
@@ -26722,9 +26896,9 @@ Joel Andersson
 
 C++ includes: linsol.hpp ";
 
-%feature("docstring") casadi::Linsol::repr "
+%feature("docstring") casadi::Linsol::print "
 
-Print a representation of the object.
+Return a string with a description (for SWIG)
 
 ";
 
@@ -26734,9 +26908,9 @@ Matrix rank Not available for all solvers.
 
 ";
 
-%feature("docstring") casadi::Linsol::get_str "
+%feature("docstring") casadi::Linsol::repr "
 
-Return a string with a description (for SWIG)
+Print a representation of the object.
 
 ";
 
@@ -26752,8 +26926,9 @@ Query plugin name.
 
 ";
 
-%feature("docstring") casadi::Linsol::print_ptr "[INTERNAL]  Print the
-pointer to the internal class
+%feature("docstring") casadi::Linsol::type_name "
+
+Readable name of the class.
 
 ";
 
@@ -27736,6 +27911,11 @@ decref for dependencies.
 
 ";
 
+%feature("docstring") casadi::Lsqr::class_name "[INTERNAL]  Readable name
+of the internal class.
+
+";
+
 %feature("docstring") casadi::Lsqr::call_reverse "[INTERNAL]  Reverse mode,
 virtual functions overloaded in derived classes.
 
@@ -28190,6 +28370,10 @@ Are all inputs and outputs scalar.
 
 %feature("docstring") casadi::Map::getAtomicInput "[INTERNAL]  Get the
 (integer) input arguments of an atomic operation.
+
+";
+
+%feature("docstring") casadi::Map::class_name "[INTERNAL]  Get type name.
 
 ";
 
@@ -31330,6 +31514,12 @@ node using MX::set_temp. Make sure to call reset_input() after usage.
 
 ";
 
+%feature("docstring") casadi::MX::class_name "
+
+Get class name.
+
+";
+
 %feature("docstring") casadi::MX::logic_not "
 
 Logical not x -> !x Returns (an expression evaluating to) 1 if expression is
@@ -31704,6 +31894,12 @@ Get the nth dependency as MX.
 
 ";
 
+%feature("docstring") casadi::MX::type_name "
+
+Readable name of the class.
+
+";
+
 %feature("docstring") casadi::MX::get_sparsity "
 
 Get an owning reference to the sparsity pattern.
@@ -31846,6 +32042,11 @@ length of iw field.
 
 %feature("docstring") casadi::Newton::sparsity_jac "[INTERNAL]  Get, if
 necessary generate, the sparsity of a Jacobian block.
+
+";
+
+%feature("docstring") casadi::Newton::class_name "[INTERNAL]  Readable name
+of the internal class.
 
 ";
 
@@ -32676,7 +32877,19 @@ information there is to know about a certain option.
 
 /* Data members
 
-*/ %feature("docstring") casadi::NlpBuilder "
+*/ %feature("docstring") casadi::NlpBuilder::type_name "
+
+Readable name of the class.
+
+";
+
+%feature("docstring") casadi::NlpBuilder::repr "
+
+Print a representation of the object.
+
+";
+
+%feature("docstring") casadi::NlpBuilder "
 
 A symbolic NLP representation.
 
@@ -32708,7 +32921,7 @@ Print a description of the object.
 
 ";
 
-%feature("docstring") casadi::NlpBuilder::repr "
+%feature("docstring") casadi::NlpBuilder::print_short "
 
 Print a representation of the object.
 
@@ -32717,12 +32930,6 @@ Print a representation of the object.
 %feature("docstring") casadi::NlpBuilder::print "
 
 Return a string with a description (for SWIG)
-
-";
-
-%feature("docstring") casadi::NlpBuilder::print_short "
-
-Print a representation of the object.
 
 ";
 
@@ -33464,6 +33671,11 @@ scheme index by name.
 
 ";
 
+%feature("docstring") casadi::Nlpsol::class_name "[INTERNAL]  Readable name
+of the internal class.
+
+";
+
 %feature("docstring") casadi::Nlpsol::setup "[INTERNAL]  Set the
 (persistent and temporary) work vectors.
 
@@ -33817,6 +34029,11 @@ Print list of options.
 
 %feature("docstring") casadi::OracleFunction::alloc_arg "[INTERNAL]  Ensure
 required length of arg field.
+
+";
+
+%feature("docstring") casadi::OracleFunction::class_name "[INTERNAL]
+Readable name of the internal class.
 
 ";
 
@@ -35078,8 +35295,8 @@ output arguments that needs to be replaced.
 
 ";
 
-%feature("docstring") casadi::QpToNlp::nnz_in "[INTERNAL]  Number of
-input/output nonzeros.
+%feature("docstring") casadi::QpToNlp::construct "[INTERNAL]  Construct
+Prepares the function for evaluation.
 
 ";
 
@@ -35395,8 +35612,8 @@ C++ includes: qp_to_nlp.hpp ";
 
 ";
 
-%feature("docstring") casadi::QpToNlp::construct "[INTERNAL]  Construct
-Prepares the function for evaluation.
+%feature("docstring") casadi::QpToNlp::nnz_in "[INTERNAL]  Number of
+input/output nonzeros.
 
 ";
 
@@ -35473,6 +35690,11 @@ is available.
 ";
 
 %feature("docstring") casadi::QpToNlp::get_function "[INTERNAL] ";
+
+%feature("docstring") casadi::QpToNlp::class_name "[INTERNAL]  Readable
+name of the internal class.
+
+";
 
 %feature("docstring") casadi::QpToNlp::get_forward "[INTERNAL]  Return
 function that calculates forward derivatives forward(nfwd) returns a cached
@@ -36453,6 +36675,11 @@ memory block.
 
 ";
 
+%feature("docstring") casadi::Rootfinder::class_name "[INTERNAL]  Readable
+name of the internal class.
+
+";
+
 %feature("docstring") casadi::Rootfinder::is_a "[INTERNAL]  Check if the
 function is of a particular type.
 
@@ -36892,6 +37119,11 @@ dependent function.
 
 %feature("docstring") casadi::RungeKutta::size2_in "[INTERNAL]
 Input/output dimensions.
+
+";
+
+%feature("docstring") casadi::RungeKutta::class_name "[INTERNAL]  Readable
+name of the internal class.
 
 ";
 
@@ -38154,6 +38386,11 @@ derivatives using finite differencing.
 
 %feature("docstring") casadi::Scpgen::dualInfeasibility "[INTERNAL] ";
 
+%feature("docstring") casadi::Scpgen::class_name "[INTERNAL]  Readable name
+of the internal class.
+
+";
+
 %feature("docstring") casadi::Scpgen::index_in "[INTERNAL]  Get input
 scheme index by name.
 
@@ -38822,6 +39059,12 @@ input value.
 
 
 // File: classcasadi_1_1SharedObject.xml
+%feature("docstring") casadi::SharedObject::class_name "
+
+Get class name.
+
+";
+
 %feature("docstring") casadi::SharedObject::print "
 
 Return a string with a description (for SWIG)
@@ -38836,6 +39079,12 @@ Is a null pointer?
 
 %feature("docstring") casadi::SharedObject::print_ptr "[INTERNAL]  Print
 the pointer to the internal class
+
+";
+
+%feature("docstring") casadi::SharedObject::repr "
+
+Print a representation of the object.
 
 ";
 
@@ -38909,9 +39158,9 @@ Print a representation of the object.
 
 ";
 
-%feature("docstring") casadi::SharedObject::repr "
+%feature("docstring") casadi::SharedObject::type_name "
 
-Print a representation of the object.
+Readable name of the class.
 
 ";
 
@@ -38922,17 +39171,8 @@ an external function declaration.
 
 ";
 
-%feature("docstring") casadi::ShellCompiler::print_long "[INTERNAL]  Print.
-
-";
-
 %feature("docstring") casadi::ShellCompiler::print_short "[INTERNAL]  Print
 representation.
-
-";
-
-%feature("docstring") casadi::ShellCompiler::to_text "[INTERNAL]  Get entry
-as a text.
 
 ";
 
@@ -38941,13 +39181,28 @@ reference to the object.
 
 ";
 
-%feature("docstring") casadi::ShellCompiler::get_options "[INTERNAL]
-Options.
+%feature("docstring") casadi::ShellCompiler::~ShellCompiler "[INTERNAL]
+Destructor.
 
 ";
 
-%feature("docstring") casadi::ShellCompiler::~ShellCompiler "[INTERNAL]
-Destructor.
+%feature("docstring") casadi::ShellCompiler::plugin_name "[INTERNAL]  Get
+name of plugin.
+
+";
+
+%feature("docstring") casadi::ShellCompiler::construct "[INTERNAL]
+Construct Prepares the function for evaluation.
+
+";
+
+%feature("docstring") casadi::ShellCompiler::to_text "[INTERNAL]  Get entry
+as a text.
+
+";
+
+%feature("docstring") casadi::ShellCompiler::get_options "[INTERNAL]
+Options.
 
 ";
 
@@ -38957,6 +39212,20 @@ a function pointer for numerical evaluation.
 ";
 
 %feature("docstring") casadi::ShellCompiler::init "[INTERNAL]  Initialize.
+
+";
+
+%feature("docstring") casadi::ShellCompiler::getCount "[INTERNAL]  Get the
+reference count.
+
+";
+
+%feature("docstring") casadi::ShellCompiler::print_long "[INTERNAL]  Print.
+
+";
+
+%feature("docstring") casadi::ShellCompiler::class_name "[INTERNAL]  Get
+type name.
 
 ";
 
@@ -38970,10 +39239,18 @@ a function pointer for numerical evaluation.
 
 ";
 
-%feature("docstring") casadi::ShellCompiler::inlined "[INTERNAL] ";
+%feature("docstring") casadi::ShellCompiler::body "[INTERNAL]  Get the
+function body, if inlined.
 
-%feature("docstring") casadi::ShellCompiler::read_meta "[INTERNAL]  Get
-meta information.
+";
+
+%feature("docstring") casadi::ShellCompiler::has_meta "[INTERNAL]  Does an
+entry exist?
+
+";
+
+%feature("docstring") casadi::ShellCompiler::type_name "[INTERNAL]  Get
+type name.
 
 ";
 
@@ -39073,18 +39350,8 @@ Diagrams
 
 C++ includes: shell_compiler.hpp ";
 
-%feature("docstring") casadi::ShellCompiler::construct "[INTERNAL]
-Construct Prepares the function for evaluation.
-
-";
-
-%feature("docstring") casadi::ShellCompiler::body "[INTERNAL]  Get the
-function body, if inlined.
-
-";
-
-%feature("docstring") casadi::ShellCompiler::getCount "[INTERNAL]  Get the
-reference count.
+%feature("docstring") casadi::ShellCompiler::read_meta "[INTERNAL]  Get
+meta information.
 
 ";
 
@@ -39093,15 +39360,7 @@ meta information be read?
 
 ";
 
-%feature("docstring") casadi::ShellCompiler::has_meta "[INTERNAL]  Does an
-entry exist?
-
-";
-
-%feature("docstring") casadi::ShellCompiler::plugin_name "[INTERNAL]  Get
-name of plugin.
-
-";
+%feature("docstring") casadi::ShellCompiler::inlined "[INTERNAL] ";
 
 %feature("docstring") casadi::ShellCompiler::ShellCompiler "[INTERNAL]
 Constructor.
@@ -39735,6 +39994,11 @@ Input/output dimensions.
 
 ";
 
+%feature("docstring") casadi::SimplifiedExternal::class_name "[INTERNAL]
+Get type name.
+
+";
+
 %feature("docstring") casadi::SimplifiedExternal::nnz_in "[INTERNAL]
 Number of input/output nonzeros.
 
@@ -39910,6 +40174,12 @@ Return a string with a representation (for SWIG)
 
 ";
 
+%feature("docstring") casadi::Slice::get_str "
+
+Return a string with a description (for SWIG)
+
+";
+
 %feature("docstring") casadi::Slice::print_short "
 
 Print a representation of the object.
@@ -39928,9 +40198,9 @@ Return a string with a description (for SWIG)
 
 ";
 
-%feature("docstring") casadi::Slice::get_str "
+%feature("docstring") casadi::Slice::type_name "
 
-Return a string with a description (for SWIG)
+Get name of the class.
 
 ";
 
@@ -40504,6 +40774,11 @@ the (integer) input arguments of an atomic operation.
 
 %feature("docstring") casadi::SlicotDple::get_sparsity_in "[INTERNAL]
 Sparsities of function inputs and outputs.
+
+";
+
+%feature("docstring") casadi::SlicotDple::class_name "[INTERNAL]  Readable
+name of the internal class.
 
 ";
 
@@ -41170,6 +41445,11 @@ required length of w field.
 
 %feature("docstring") casadi::SlicotExpm::codegen_decref "[INTERNAL]
 Codegen decref for dependencies.
+
+";
+
+%feature("docstring") casadi::SlicotExpm::class_name "[INTERNAL]  Readable
+name of the internal class.
 
 ";
 
@@ -41872,6 +42152,12 @@ Is scalar?
 
 ";
 
+%feature("docstring") casadi::Sparsity::type_name "
+
+Readable name of the class.
+
+";
+
 %feature("docstring") casadi::Sparsity::rowsSequential "
 
 Do the rows appear sequentially on each column.
@@ -42287,6 +42573,12 @@ As an alternative, P can be transposed (inverted).
 %feature("docstring") casadi::Sparsity::is_diag "
 
 Is diagonal?
+
+";
+
+%feature("docstring") casadi::Sparsity::class_name "
+
+Get class name.
 
 ";
 
@@ -43565,6 +43857,11 @@ input arguments have correct length and dimensions.
 
 ";
 
+%feature("docstring") casadi::Sqpmethod::setOptionsFromFile "[INTERNAL]
+Read options from parameter xml.
+
+";
+
 %feature("docstring") casadi::Sqpmethod::print_long "[INTERNAL]  Print.
 
 ";
@@ -43708,8 +44005,8 @@ memory (called from destructor)
 
 ";
 
-%feature("docstring") casadi::Sqpmethod::getJacSparsity "[INTERNAL]
-Generate the sparsity of a Jacobian block.
+%feature("docstring") casadi::Sqpmethod::type_name "[INTERNAL]  Get type
+name.
 
 ";
 
@@ -43761,8 +44058,8 @@ discrete variables be treated.
 
 ";
 
-%feature("docstring") casadi::Sqpmethod::type_name "[INTERNAL]  Get type
-name.
+%feature("docstring") casadi::Sqpmethod::getJacSparsity "[INTERNAL]
+Generate the sparsity of a Jacobian block.
 
 ";
 
@@ -43840,6 +44137,11 @@ derivative functions need nondifferentiated outputs?
 
 %feature("docstring") casadi::Sqpmethod::getAlgorithmSize "[INTERNAL]  Get
 the number of atomic operations.
+
+";
+
+%feature("docstring") casadi::Sqpmethod::sz_arg "[INTERNAL]  Get required
+length of arg field.
 
 ";
 
@@ -43957,8 +44259,8 @@ function input and outputs.
 
 ";
 
-%feature("docstring") casadi::Sqpmethod::setOptionsFromFile "[INTERNAL]
-Read options from parameter xml.
+%feature("docstring") casadi::Sqpmethod::sx_in "[INTERNAL]  Get function
+input(s) and output(s)
 
 ";
 
@@ -43974,13 +44276,8 @@ objects.
 
 ";
 
-%feature("docstring") casadi::Sqpmethod::sx_in "[INTERNAL]  Get function
-input(s) and output(s)
-
-";
-
-%feature("docstring") casadi::Sqpmethod::sz_arg "[INTERNAL]  Get required
-length of arg field.
+%feature("docstring") casadi::Sqpmethod::class_name "[INTERNAL]  Readable
+name of the internal class.
 
 ";
 
@@ -44577,6 +44874,11 @@ factor for chosing forward/reverse mode, sparsity propagation.
 
 ";
 
+%feature("docstring") casadi::Switch::class_name "[INTERNAL]  Get type
+name.
+
+";
+
 %feature("docstring") casadi::Switch::eval_name "[INTERNAL]  Get name of
 the evaluation function.
 
@@ -45069,6 +45371,11 @@ negative eigenvalues.
 
 %feature("docstring") casadi::SymbolicQr::setup "[INTERNAL]  Set the
 (persistent and temporary) work vectors.
+
+";
+
+%feature("docstring") casadi::SymbolicQr::class_name "[INTERNAL]  Readable
+name of the internal class.
 
 ";
 
@@ -46056,6 +46363,18 @@ Print a description of the object.
 
 ";
 
+%feature("docstring") casadi::WeakRef::type_name "
+
+Readable name of the class.
+
+";
+
+%feature("docstring") casadi::WeakRef::class_name "
+
+Get class name.
+
+";
+
 %feature("docstring") casadi::WeakRef::repr "
 
 Print a representation of the object.
@@ -46093,6 +46412,12 @@ Joel Andersson
 
 C++ includes: xml_file.hpp ";
 
+%feature("docstring") casadi::XmlFile::type_name "
+
+Readable name of the class.
+
+";
+
 %feature("docstring") casadi::XmlFile::print "
 
 Return a string with a description (for SWIG)
@@ -46115,6 +46440,12 @@ point to any node, \"0\" is returned.
 %feature("docstring") casadi::XmlFile::print_long "
 
 Print a description of the object.
+
+";
+
+%feature("docstring") casadi::XmlFile::class_name "
+
+Get class name.
 
 ";
 
