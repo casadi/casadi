@@ -92,6 +92,10 @@ namespace casadi {
     return node;
   }
 
+  std::string SharedObject::class_name() const {
+    return (*this)->class_name();
+  }
+
   std::string SharedObject::type_name() const {
     return (*this)->type_name();
   }

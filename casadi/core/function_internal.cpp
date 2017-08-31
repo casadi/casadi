@@ -1333,16 +1333,16 @@ namespace casadi {
 
   int FunctionInternal::
   eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
-    casadi_error("'eval' not defined for " + type_name());
+    casadi_error("'eval' not defined for " + class_name());
   }
 
   void FunctionInternal::simple(const double* arg, double* res) const {
-    casadi_error("'simple' not defined for " + type_name());
+    casadi_error("'simple' not defined for " + class_name());
   }
 
   int FunctionInternal::
   eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) const {
-    casadi_error("'eval_sx' not defined for " + type_name());
+    casadi_error("'eval_sx' not defined for " + class_name());
   }
 
   Function FunctionInternal::forward(int nfwd) const {
@@ -1486,7 +1486,7 @@ namespace casadi {
               const std::vector<std::string>& inames,
               const std::vector<std::string>& onames,
               const Dict& opts) const {
-    casadi_error("'get_forward' not defined for " + type_name());
+    casadi_error("'get_forward' not defined for " + class_name());
   }
 
   Function FunctionInternal::
@@ -1494,7 +1494,7 @@ namespace casadi {
               const std::vector<std::string>& inames,
               const std::vector<std::string>& onames,
               const Dict& opts) const {
-    casadi_error("'get_reverse' not defined for " + type_name());
+    casadi_error("'get_reverse' not defined for " + class_name());
   }
 
   Function FunctionInternal::
@@ -1642,7 +1642,7 @@ namespace casadi {
                   const std::vector<std::string>& inames,
                   const std::vector<std::string>& onames,
                   const Dict& opts) const {
-    casadi_error("'get_jacobian' not defined for " + type_name());
+    casadi_error("'get_jacobian' not defined for " + class_name());
   }
 
   void FunctionInternal::codegen(CodeGenerator& g,
@@ -1977,14 +1977,14 @@ namespace casadi {
 
   void FunctionInternal::codegen_body(CodeGenerator& g) const {
     casadi_warning("The function \"" + name() + "\", which is of type \""
-                   + type_name() + "\" cannot be code generated. The generation "
+                   + class_name() + "\" cannot be code generated. The generation "
                    "will proceed, but compilation of the code will not be possible.");
-    g << "#error Code generation not supported for " << type_name() << "\n";
+    g << "#error Code generation not supported for " << class_name() << "\n";
   }
 
   std::string FunctionInternal::
   generate_dependencies(const std::string& fname, const Dict& opts) const {
-    casadi_error("'generate_dependencies' not defined for " + type_name());
+    casadi_error("'generate_dependencies' not defined for " + class_name());
   }
 
   int FunctionInternal::
@@ -2149,7 +2149,7 @@ namespace casadi {
              std::vector<std::vector<MX> >& fsens,
              bool always_inline, bool never_inline) const {
     casadi_assert_message(!(always_inline && never_inline), "Inconsistent options");
-    casadi_assert_message(!always_inline, "Class " + type_name() +
+    casadi_assert_message(!always_inline, "Class " + class_name() +
                           " cannot be inlined in an MX expression");
 
     // Derivative information must be available
@@ -2256,7 +2256,7 @@ namespace casadi {
              std::vector<std::vector<MX> >& asens,
              bool always_inline, bool never_inline) const {
     casadi_assert_message(!(always_inline && never_inline), "Inconsistent options");
-    casadi_assert_message(!always_inline, "Class " + type_name() +
+    casadi_assert_message(!always_inline, "Class " + class_name() +
                           " cannot be inlined in an MX expression");
 
     // Derivative information must be available
@@ -2373,7 +2373,7 @@ namespace casadi {
       fsens.clear();
       return;
     }
-    casadi_error("'forward' (SX) not defined for " + type_name());
+    casadi_error("'forward' (SX) not defined for " + class_name());
   }
 
   void FunctionInternal::
@@ -2386,7 +2386,7 @@ namespace casadi {
       asens.clear();
       return;
     }
-    casadi_error("'reverse' (SX) not defined for " + type_name());
+    casadi_error("'reverse' (SX) not defined for " + class_name());
   }
 
   double FunctionInternal::ad_weight() const {
@@ -2460,7 +2460,7 @@ namespace casadi {
   }
 
   bool FunctionInternal::is_a(const std::string& type, bool recursive) const {
-    return type == "Function";
+    return type == "FunctionInternal";
   }
 
   std::vector<MX> FunctionInternal::free_mx() const {
@@ -2477,31 +2477,31 @@ namespace casadi {
   }
 
   int FunctionInternal::getAlgorithmSize() const {
-    casadi_error("'getAlgorithmSize' not defined for " + type_name());
+    casadi_error("'getAlgorithmSize' not defined for " + class_name());
   }
 
   int FunctionInternal::getWorkSize() const {
-    casadi_error("'getWorkSize' not defined for " + type_name());
+    casadi_error("'getWorkSize' not defined for " + class_name());
   }
 
   int FunctionInternal::getAtomicOperation(int k) const {
-    casadi_error("'getAtomicOperation' not defined for " + type_name());
+    casadi_error("'getAtomicOperation' not defined for " + class_name());
   }
 
   std::pair<int, int> FunctionInternal::getAtomicInput(int k) const {
-    casadi_error("'getAtomicInput' not defined for " + type_name());
+    casadi_error("'getAtomicInput' not defined for " + class_name());
   }
 
   double FunctionInternal::getAtomicInputReal(int k) const {
-    casadi_error("'getAtomicInputReal' not defined for " + type_name());
+    casadi_error("'getAtomicInputReal' not defined for " + class_name());
   }
 
   int FunctionInternal::getAtomicOutput(int k) const {
-    casadi_error("'getAtomicOutput' not defined for " + type_name());
+    casadi_error("'getAtomicOutput' not defined for " + class_name());
   }
 
   int FunctionInternal::n_nodes() const {
-    casadi_error("'n_nodes' not defined for " + type_name());
+    casadi_error("'n_nodes' not defined for " + class_name());
   }
 
   std::vector<MX>
@@ -2567,7 +2567,7 @@ namespace casadi {
   }
 
   void FunctionInternal::free_mem(void *mem) const {
-    casadi_warning("'free_mem' not defined for " + type_name());
+    casadi_warning("'free_mem' not defined for " + class_name());
   }
 
   void FunctionInternal::clear_mem() {
@@ -2668,19 +2668,19 @@ namespace casadi {
   }
 
   const Function& FunctionInternal::get_function(const std::string &name) const {
-    casadi_error("'get_function' not defined for " + type_name());
+    casadi_error("'get_function' not defined for " + class_name());
     static Function singleton;
     return singleton;
   }
 
   vector<bool> FunctionInternal::
   which_depends(const string& s_in, const vector<string>& s_out, int order, bool tr) const {
-    casadi_error("'which_depends' not defined for " + type_name());
+    casadi_error("'which_depends' not defined for " + class_name());
     return vector<bool>();
   }
 
   const Function& FunctionInternal::oracle() const {
-    casadi_error("'oracle' not defined for " + type_name());
+    casadi_error("'oracle' not defined for " + class_name());
     static Function singleton;
     return singleton;
   }

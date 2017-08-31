@@ -1383,10 +1383,6 @@ namespace casadi {
     return in_;
   }
 
-  std::string SXFunction::type_name() const {
-    return "SXFunction";
-  }
-
   bool SXFunction::is_a(const std::string& type, bool recursive) const {
     return type=="SXFunction" || (recursive && XFunction<SXFunction,
                                   SX, SXNode>::is_a(type, recursive));

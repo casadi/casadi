@@ -123,6 +123,9 @@ namespace casadi {
     /// \endcond
 #endif // SWIG
 
+    /** \brief Get class name */
+    std::string class_name() const;
+
     /// Readable name of the class
     std::string type_name() const;
 

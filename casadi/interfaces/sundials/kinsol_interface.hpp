@@ -105,6 +105,9 @@ namespace casadi {
     // Get name of the plugin
     const char* plugin_name() const override { return "kinsol";}
 
+    // Get name of the class
+    std::string class_name() const override { return "KinsolInterface";}
+
     // Scaling
     N_Vector u_scale_, f_scale_;
 

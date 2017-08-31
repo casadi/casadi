@@ -71,6 +71,9 @@ namespace casadi {
     // Get name of the plugin
     const char* plugin_name() const override { return "collocation";}
 
+    // Get name of the class
+    std::string class_name() const override { return "Collocation";}
+
     ///@{
     /** \brief Options */
     static Options options_;

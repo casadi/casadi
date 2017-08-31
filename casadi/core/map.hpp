@@ -46,7 +46,7 @@ namespace casadi {
     ~Map() override;
 
     /** \brief Get type name */
-    std::string type_name() const override {return "Map";}
+    std::string class_name() const override {return "Map";}
 
     /// @{
     /** \brief Sparsities of function inputs and outputs */
@@ -154,6 +154,9 @@ namespace casadi {
 
     /** \brief  Destructor */
     ~MapOmp() override;
+
+    /** \brief Get type name */
+    std::string class_name() const override {return "MapOmp";}
 
     /// Evaluate the function numerically
     int eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;

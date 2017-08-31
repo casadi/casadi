@@ -85,7 +85,7 @@ namespace casadi {
                              const Dict& opts) const override;
 
     /** \brief Get type name */
-    std::string type_name() const override { return "external";}
+    std::string class_name() const override { return "External";}
 
     /// Initialize
     void init(const Dict& opts) override;

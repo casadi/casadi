@@ -53,11 +53,6 @@ namespace casadi {
     /** \brief  Destructor */
     ~Integrator() override=0;
 
-    /** \brief Get type name */
-    std::string type_name() const override {
-      return std::string("integrator_") + plugin_name();
-    }
-
     ///@{
     /** \brief Number of function inputs and outputs */
     size_t get_n_in() override { return INTEGRATOR_NUM_IN;}

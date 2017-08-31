@@ -79,6 +79,9 @@ namespace casadi {
     // Get name of the plugin
     const char* plugin_name() const override { return "clp";}
 
+    // Get name of the class
+    std::string class_name() const override { return "ClpInterface";}
+
     // Initialize the solver
     void init(const Dict& opts) override;
 

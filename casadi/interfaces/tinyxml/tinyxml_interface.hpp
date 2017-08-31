@@ -56,6 +56,9 @@ namespace casadi {
     // Get name of the plugin
     const char* plugin_name() const override { return "tinyxml";}
 
+    // Get name of the class
+    std::string class_name() const override { return "TinyXmlInterface";}
+
     // Parse an XML file
     XmlNode parse(const std::string& filename) override;
 

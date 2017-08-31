@@ -128,8 +128,11 @@ namespace casadi {
     /** \brief  Get the name */
     virtual const std::string& name() const;
 
-    /** \brief Get type name */
-    virtual std::string type_name() const override;
+    /** \brief Get name of public class */
+    virtual std::string type_name() const override {return "MX";}
+
+    /** \brief Get name of public class */
+    virtual std::string class_name() const override;
 
     /** \brief  Print a representation */
     void print_short(std::ostream &stream) const override;

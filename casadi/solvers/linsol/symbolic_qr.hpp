@@ -79,6 +79,9 @@ namespace casadi {
     // Get name of the plugin
     const char* plugin_name() const override { return "symbolicqr";}
 
+    // Name of the class
+    std::string class_name() const override { return "SymbolicQr";}
+
     /** \brief  Create a new Linsol */
     static LinsolInternal* creator(const std::string& name) {
       return new SymbolicQr(name);

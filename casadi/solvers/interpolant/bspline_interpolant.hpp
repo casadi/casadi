@@ -63,6 +63,9 @@ namespace casadi {
     // Get name of the plugin
     const char* plugin_name() const override { return "bspline";}
 
+    // Get name of the class
+    std::string class_name() const override { return "BSplineInterpolant";}
+
     /** \brief  Create a new Interpolant */
     static Interpolant* creator(const std::string& name,
                                 const std::vector<double>& grid,

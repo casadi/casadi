@@ -130,9 +130,7 @@ namespace casadi {
 
     // Get name of the plugin
     const char* plugin_name() const override = 0;
-
   };
-
 
 } // namespace casadi
 /// \endcond

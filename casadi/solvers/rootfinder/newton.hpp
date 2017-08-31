@@ -72,6 +72,9 @@ namespace casadi {
     // Get name of the plugin
     const char* plugin_name() const override { return "newton";}
 
+    // Name of the class
+    std::string class_name() const override { return "Newton";}
+
     /** \brief  Create a new Rootfinder */
     static Rootfinder* creator(const std::string& name, const Function& f) {
       return new Newton(name, f);

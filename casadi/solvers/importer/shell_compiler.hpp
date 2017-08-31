@@ -75,6 +75,9 @@ namespace casadi {
     /// Get name of plugin
     const char* plugin_name() const override { return "shell";}
 
+    // Get name of the class
+    std::string class_name() const override { return "ShellCompiler";}
+
     /// Get a function pointer for numerical evaluation
     signal_t get_function(const std::string& symname) override;
   protected:

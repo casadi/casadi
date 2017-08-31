@@ -91,9 +91,6 @@ namespace casadi {
     /// Destructor
     ~Nlpsol() override = 0;
 
-    /** \brief Get type name */
-    std::string type_name() const override { return "Nlpsol";}
-
     ///@{
     /** \brief Number of function inputs and outputs */
     size_t get_n_in() override { return NLPSOL_NUM_IN;}

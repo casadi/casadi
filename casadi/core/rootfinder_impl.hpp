@@ -55,11 +55,6 @@ namespace casadi {
     /// Destructor
     ~Rootfinder() override = 0;
 
-    /** \brief Get type name */
-    std::string type_name() const override {
-      return std::string("rootfinder_") + plugin_name();
-    }
-
     ///@{
     /** \brief Number of function inputs and outputs */
     size_t get_n_in() override { return oracle_.n_in();}

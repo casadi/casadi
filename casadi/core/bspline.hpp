@@ -132,7 +132,7 @@ namespace casadi {
     void codegen_body(CodeGenerator& g) const override;
     void codegen_declarations(CodeGenerator& g) const override {};
 
-    std::string type_name() const override { return "BSpline"; }
+    std::string class_name() const override { return "BSpline"; }
 
     std::vector<double> coeffs_;
 
@@ -215,7 +215,7 @@ namespace casadi {
     void codegen_body(CodeGenerator& g) const override;
     void codegen_declarations(CodeGenerator& g) const override {};
 
-    std::string type_name() const override { return "BSplineDual"; }
+    std::string class_name() const override { return "BSplineDual"; }
 
     std::vector<double> x_;
     bool reverse_;

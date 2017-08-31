@@ -54,6 +54,9 @@ namespace casadi {
     /** \brief Get type name */
     std::string type_name() const override { return "Importer";}
 
+    /** \brief Get type name */
+    std::string class_name() const override { return "ImporterInternal";}
+
     /** \brief Print */
     void print_long(std::ostream &stream) const override;
 
@@ -163,6 +166,9 @@ namespace casadi {
 
     // Destructor
     ~DllLibrary() override;
+
+    /** \brief Get type name */
+    std::string class_name() const override { return "DllLibrary";}
 
     // Dummy type
     signal_t get_function(const std::string& symname) override;

@@ -104,6 +104,9 @@ namespace casadi {
     // Get name of the plugin
     const char* plugin_name() const override { return "sqpmethod";}
 
+    // Name of the class
+    std::string class_name() const override { return "Sqpmethod";}
+
     /** \brief  Create a new NLP Solver */
     static Nlpsol* creator(const std::string& name, const Function& nlp) {
       return new Sqpmethod(name, nlp);

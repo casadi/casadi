@@ -25,7 +25,6 @@
 
 #include "mx_node.hpp"
 #include "std_vector_tools.hpp"
-#include <typeinfo>
 #include "transpose.hpp"
 #include "reshape.hpp"
 #include "multiplication.hpp"
@@ -55,6 +54,8 @@
 #include "setnonzeros_impl.hpp"
 #include "solve_impl.hpp"
 #include "binary_mx_impl.hpp"
+
+#include <typeinfo>
 
 using namespace std;
 
@@ -128,11 +129,11 @@ namespace casadi {
   }
 
   bool MXNode::has_duplicates() const {
-    casadi_error("'has_duplicates' not defined for class " + type_name());
+    casadi_error("'has_duplicates' not defined for class " + class_name());
   }
 
   void MXNode::reset_input() const {
-    casadi_error("'reset_input' not defined for class " + type_name());
+    casadi_error("'reset_input' not defined for class " + class_name());
   }
 
   void MXNode::primitives(vector<MX>::iterator& it) const {
@@ -154,16 +155,16 @@ namespace casadi {
   }
 
   const string& MXNode::name() const {
-    casadi_error("'name' not defined for class " + type_name());
+    casadi_error("'name' not defined for class " + class_name());
   }
 
-  std::string MXNode::type_name() const {
-    return "MX";
+  std::string MXNode::class_name() const {
+    // Lazy solution
+    return typeid(*this).name();
   }
 
   bool MXNode::__nonzero__() const {
     casadi_error("Can only determine truth value of a numeric MX.");
-
   }
 
   int MXNode::n_dep() const {
@@ -171,15 +172,15 @@ namespace casadi {
   }
 
   int MXNode::ind() const {
-    casadi_error("'ind' not defined for class " + type_name());
+    casadi_error("'ind' not defined for class " + class_name());
   }
 
   int MXNode::segment() const {
-    casadi_error("'segment' not defined for class " + type_name());
+    casadi_error("'segment' not defined for class " + class_name());
   }
 
   int MXNode::offset() const {
-    casadi_error("'offset' not defined for class " + type_name());
+    casadi_error("'offset' not defined for class " + class_name());
   }
 
   void MXNode::set_sparsity(const Sparsity& sparsity) {
@@ -281,35 +282,35 @@ namespace casadi {
   }
 
   const Function& MXNode::which_function() const {
-    casadi_error("'which_function' not defined for class " + type_name());
+    casadi_error("'which_function' not defined for class " + class_name());
   }
 
   int MXNode::which_output() const {
-    casadi_error("'which_output' not defined for class " + type_name());
+    casadi_error("'which_output' not defined for class " + class_name());
   }
 
   int MXNode::eval(const double** arg, double** res, int* iw, double* w) const {
-    casadi_error("'eval' not defined for class " + type_name());
+    casadi_error("'eval' not defined for class " + class_name());
     return 1;
   }
 
   int MXNode::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w) const {
-    casadi_error("'eval_sx' not defined for class " + type_name());
+    casadi_error("'eval_sx' not defined for class " + class_name());
     return 1;
   }
 
   void MXNode::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
-    casadi_error("'eval_mx' not defined for class " + type_name());
+    casadi_error("'eval_mx' not defined for class " + class_name());
   }
 
   void MXNode::ad_forward(const vector<vector<MX> >& fseed,
                        vector<vector<MX> >& fsens) const {
-    casadi_error("'ad_forward' not defined for class " + type_name());
+    casadi_error("'ad_forward' not defined for class " + class_name());
   }
 
   void MXNode::ad_reverse(const vector<vector<MX> >& aseed,
                        vector<vector<MX> >& asens) const {
-    casadi_error("'ad_reverse' not defined for class " + type_name());
+    casadi_error("'ad_reverse' not defined for class " + class_name());
   }
 
   int MXNode::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
@@ -364,18 +365,18 @@ namespace casadi {
 
   void MXNode::generate(CodeGenerator& g,
                         const vector<int>& arg, const vector<int>& res) const {
-    casadi_warning("Cannot code generate MX nodes of type " + type_name() +
+    casadi_warning("Cannot code generate MX nodes of type " + class_name() +
                    "The generation will proceed, but compilation of the code will "
                    "not be possible.");
-    g << "#error " <<  type_name() << ": " << arg << " => " << res << '\n';
+    g << "#error " <<  class_name() << ": " << arg << " => " << res << '\n';
   }
 
   double MXNode::to_double() const {
-    casadi_error("'to_double' not defined for class " + type_name());
+    casadi_error("'to_double' not defined for class " + class_name());
   }
 
   DM MXNode::get_DM() const {
-    casadi_error("'get_DM' not defined for class " + type_name());
+    casadi_error("'get_DM' not defined for class " + class_name());
   }
 
   MX MXNode::get_transpose() const {
@@ -678,7 +679,7 @@ namespace casadi {
   }
 
   Matrix<int> MXNode::mapping() const {
-    casadi_error("'mapping' not defined for class " + type_name());
+    casadi_error("'mapping' not defined for class " + class_name());
   }
 
   bool MXNode::sameOpAndDeps(const MXNode* node, int depth) const {

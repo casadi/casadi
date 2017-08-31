@@ -78,6 +78,9 @@ namespace casadi {
     // Get name of the plugin
     const char* plugin_name() const override { return "gurobi";}
 
+    // Get name of the class
+    std::string class_name() const override { return "GurobiInterface";}
+
     ///@{
     /** \brief Options */
     static Options options_;

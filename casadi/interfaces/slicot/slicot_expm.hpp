@@ -89,6 +89,9 @@ namespace casadi {
     // Get name of the plugin
     const char* plugin_name() const override { return "slicot";}
 
+    // Get name of the class
+    std::string class_name() const override { return "SlicotExpm";}
+
     /** \brief  Initialize */
     void init(const Dict& opts) override;
 

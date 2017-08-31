@@ -106,6 +106,9 @@ namespace casadi {
     /// Get name of plugin
     const char* plugin_name() const override { return "clang";}
 
+    // Get name of the class
+    std::string class_name() const override { return "ClangCompiler";}
+
     /// Get a function pointer for numerical evaluation
     virtual signal_t get_function(const std::string& symname);
 
