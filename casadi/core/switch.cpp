@@ -253,18 +253,23 @@ namespace casadi {
     return Function(name, arg, res, inames, onames, opts);
   }
 
-  void Switch::print_long(ostream &stream) const {
+  void Switch::print_new(ostream &stream, bool more) const {
+    FunctionInternal::print_new(stream, more);
+    if (!more) return;
+
+    // Print more
+    stream << endl;
     if (f_.size()==1) {
       // Print as if-then-else
-      stream << "Switch(" << f_def_.name() << ", " << f_[0].name() << ")";
+      stream << f_def_.name() << ", " << f_[0].name();
     } else {
       // Print generic
-      stream << "Switch([";
+      stream << "[";
       for (int k=0; k<f_.size(); ++k) {
         if (k!=0) stream << ", ";
         stream << f_[k].name();
       }
-      stream << "], " << f_def_.name() << ")";
+      stream << "], " << f_def_.name();
     }
   }
 

@@ -134,11 +134,8 @@ namespace casadi {
     /** \brief Get name of public class */
     virtual std::string class_name() const override;
 
-    /** \brief  Print a representation */
-    void print_short(std::ostream &stream) const override;
-
     /** \brief  Print a description */
-    void print_long(std::ostream &stream) const override;
+    void print_new(std::ostream &stream, bool more) const override;
 
     /** \brief  Check if valid function input */
     virtual bool is_valid_input() const { return false;}

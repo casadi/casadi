@@ -442,10 +442,7 @@ namespace casadi {
     std::string type_name() const {return "DaeBuilder";}
 
     ///  Print representation
-    void print_short(std::ostream &stream) const;
-
-    /// Print description
-    void print_long(std::ostream &stream) const;
+    void print_new(std::ostream &stream, bool more=false) const;
 
     /// Add a variable
     void add_variable(const std::string& name, const Variable& var);

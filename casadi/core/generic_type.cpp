@@ -179,9 +179,9 @@ namespace casadi {
 
   ostream& operator<<(ostream &stream, const GenericType& ref) {
     if (ref.is_null()) {
-      stream << "None";
+      stream << "NULL";
     } else {
-      ref->print_long(stream);
+      ref->print_new(stream, false);
     }
     return stream;
   }

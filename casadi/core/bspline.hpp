@@ -122,9 +122,6 @@ namespace casadi {
                           const Dict& opts) const override;
     ///@}
 
-    /** \brief  Print description */
-    void print_long(std::ostream &stream) const override { stream << "BSpline"; }
-
     /** \brief Is codegen supported? */
     bool has_codegen() const override { return true;}
 
@@ -204,9 +201,6 @@ namespace casadi {
     bool has_spfwd() const override { return true;}
     bool has_sprev() const override { return true;}
     ///@}
-
-    /** \brief  Print description */
-    void print_long(std::ostream &stream) const override { stream << "BSplineDual"; }
 
     /** \brief Is codegen supported? */
     bool has_codegen() const override { return true;}

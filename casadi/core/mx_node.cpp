@@ -214,11 +214,7 @@ namespace casadi {
     return sparsity_;
   }
 
-  void MXNode::print_short(std::ostream &stream) const {
-    print_long(stream);
-  }
-
-  void MXNode::print_long(std::ostream &stream) const {
+  void MXNode::print_new(std::ostream &stream, bool more) const {
     // Find out which noded can be inlined
     std::map<const MXNode*, int> nodeind;
     can_inline(nodeind);

@@ -104,13 +104,10 @@ namespace casadi {
   template<typename T>
   std::vector<T> reverse(const std::vector<T> &v);
 
-  /// Print representation
-  template<typename T>
-  void print_short(const std::vector<T> &v, std::ostream &stream);
-
   /// Print description
   template<typename T>
-  void print_long(const std::vector<T> &v, std::ostream &stream);
+  void print_new(const std::vector<T> &v, std::ostream &stream, bool more=false);
+
   #endif // SWIG
 
   /// Check if for each element of v holds: v_i < upper
@@ -300,13 +297,13 @@ namespace std {
   /// Enables flushing an std::vector to a stream (prints representation)
   template<typename T>
   ostream& operator<<(ostream &stream, const vector<T> &v) {
-    casadi::print_short(v, stream);
+    casadi::print_new(v, stream);
     return stream;
   }
 
   template<typename T1, typename T2>
   ostream& operator<<(ostream &stream, const pair<T1, T2> &p) {
-    stream << "(" << p.first << ", " << p.second << ")";
+    stream << "[" << p.first << "," << p.second << "]";
     return stream;
   }
 
@@ -365,7 +362,7 @@ namespace casadi {
   }
 
   template<typename T>
-  void print_short(const std::vector<T> &v, std::ostream &stream) {
+  void print_new(const std::vector<T> &v, std::ostream &stream, bool more) {
     if (v.empty()) {
       stream << "[]";
     } else {
@@ -375,23 +372,6 @@ namespace casadi {
       for (unsigned int i=1; i<v.size(); ++i)
         stream << ", " << v[i];
       stream << "]";
-    }
-  }
-
-  template<typename T>
-  void print_long(const std::vector<T> &v, std::ostream &stream) {
-    // print vector style
-    stream << "[" << v.size() << "]"; // Print dimension
-
-    if (v.empty()) {
-      stream << "()";
-    } else {
-      // Print elements, ublas stype
-      stream << "(";
-      for (unsigned int i=0; i<v.size()-1; ++i)
-        stream << v[i] << ", ";
-      if (!v.empty()) stream << v.back();
-      stream << ")";
     }
   }
 
@@ -494,14 +474,14 @@ namespace casadi {
   template<typename T>
   std::string repr(const std::vector<T> &v) {
     std::stringstream ss;
-    print_short(v, ss);
+    print_new(v, ss, false);
     return ss.str();
   }
 
   template<typename T>
-  std::string str(const std::vector<T> &v) {
+  std::string str(const std::vector<T> &v, bool more=false) {
     std::stringstream ss;
-    print_long(v, ss);
+    print_new(v, ss, more);
     return ss.str();
   }
 

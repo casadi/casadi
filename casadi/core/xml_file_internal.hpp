@@ -45,11 +45,8 @@ namespace casadi {
     /// Readable name of the class
     std::string type_name() const override {return "XmlFile";}
 
-    /** \brief  Print */
-    void print_long(std::ostream &stream) const override;
-
-    /** \brief  Print representation */
-    void print_short(std::ostream &stream) const override;
+    /** \brief  Print a description */
+    void print_new(std::ostream &stream, bool more=false) const override;
 
     // Parse an XML file
     virtual XmlNode parse(const std::string& filename);

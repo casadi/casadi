@@ -107,11 +107,11 @@ namespace casadi {
     /// Convert to a 1-by-1 Matrix
     operator Matrix<SXElem>() const;
 
-    /// Print a representation of the object
-    void print_short(std::ostream &stream) const;
+    /// Type name
+    static std::string type_name() {return "SXElem";}
 
     /// Print a description of the object
-    void print_long(std::ostream &stream) const;
+    void print_new(std::ostream &stream, bool more) const;
 
     /// \cond INTERNAL
     /** \brief  Get a pointer to the node */

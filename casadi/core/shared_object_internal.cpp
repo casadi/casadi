@@ -23,7 +23,6 @@
  */
 
 #include "shared_object_internal.hpp"
-#include <typeinfo>
 
 using namespace std;
 namespace casadi {
@@ -57,20 +56,6 @@ namespace casadi {
     }
   }
 
-  std::string SharedObjectInternal::class_name() const {
-    return typeid(*this).name();
-  }
-
-  void SharedObjectInternal::print_short(std::ostream &stream) const {
-    // Print description by default
-    print_long(stream);
-  }
-
-  void SharedObjectInternal::print_long(std::ostream &stream) const {
-    // Print the name of the object by default
-    stream << typeid(this).name();
-  }
-
   int SharedObjectInternal::getCount() const {
     return count;
   }
@@ -87,5 +72,14 @@ namespace casadi {
 
   WeakRefInternal::~WeakRefInternal() {
   }
+
+  void WeakRefInternal::print_new(std::ostream &stream, bool more) const {
+    if (raw_==0) {
+      stream << "NULL";
+    } else {
+      raw_->print_new(stream, more);
+    }
+  }
+
 
 } // namespace casadi

@@ -405,10 +405,6 @@ namespace casadi {
     stream << "[]";
   }
 
-  void FunctionInternal::print_long(ostream &stream) const {
-    print_dimensions(stream);
-  }
-
   std::string FunctionInternal::definition() const {
     stringstream s;
 
@@ -416,19 +412,19 @@ namespace casadi {
     s << name_ << ":";
     // Print input arguments
     for (int i=0; i<n_in(); ++i) {
-      s << (i==0 ? "(" : ",") << name_in(i);
+      s << (i==0 ? "(" : ",") << name_in(i) << size_in(i);
     }
     s << ")->";
     // Print output arguments
     for (int i=0; i<n_out(); ++i) {
-      s << (i==0 ? "(" : ",") << name_out(i);
+      s << (i==0 ? "(" : ",") << name_out(i) << size_out(i);
     }
     s << ")";
 
     return s.str();
   }
 
-  void FunctionInternal::print_short(ostream &stream) const {
+  void FunctionInternal::print_new(ostream &stream, bool more) const {
     stream << definition();
   }
 

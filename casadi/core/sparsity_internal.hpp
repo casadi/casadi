@@ -424,11 +424,8 @@ namespace casadi {
     /// Readable name of the internal class
     std::string class_name() const override {return "SparsityInternal";}
 
-    /// Print representation
-    void print_short(std::ostream &stream) const override;
-
     /// Print description
-    void print_long(std::ostream &stream) const override;
+    void print_new(std::ostream &stream, bool more) const override;
 
     /** \brief Perform a unidirectional coloring
      *

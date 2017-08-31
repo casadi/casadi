@@ -72,10 +72,7 @@ namespace casadi {
     std::string type_name() const {return "NlpBuilder";}
 
     /// Print a description of the object
-    void print_long(std::ostream &stream) const;
-
-    /// Print a representation of the object
-    void print_short(std::ostream &stream) const;
+    void print_new(std::ostream &stream, bool more=false) const;
   };
 
 #ifndef SWIG

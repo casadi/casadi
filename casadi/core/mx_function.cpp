@@ -364,7 +364,7 @@ namespace casadi {
     // Make sure that there are no free variables
     if (!free_vars_.empty()) {
       std::stringstream ss;
-      print_short(ss);
+      print_new(ss, false);
       casadi_error("Cannot evaluate \"" << ss.str() << "\" since variables "
                    << free_vars_ << " are free.");
     }
@@ -450,8 +450,8 @@ namespace casadi {
     return s.str();
   }
 
-  void MXFunction::print_long(ostream &stream) const {
-    FunctionInternal::print_long(stream);
+  void MXFunction::print_new(ostream &stream, bool more) const {
+    FunctionInternal::print_new(stream, more);
     for (auto&& e : algorithm_) {
       InterruptHandler::check();
       stream << print(e) << endl;

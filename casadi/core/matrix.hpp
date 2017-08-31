@@ -741,15 +741,12 @@ namespace casadi {
     /// Get name of the class
     static std::string type_name();
 
-    /// Print a description of the object
-    void print_long(std::ostream &stream) const;
-
     /// Get strings corresponding to the nonzeros and the interdependencies
     void print_split(std::vector<std::string>& SWIG_OUTPUT(nz),
                     std::vector<std::string>& SWIG_OUTPUT(inter)) const;
 
     /// Print a representation of the object
-    void print_short(std::ostream &stream) const;
+    void print_new(std::ostream &stream, bool more=false) const;
 
     /// Print scalar
     void print_scalar(std::ostream &stream) const;

@@ -54,21 +54,20 @@ namespace casadi {
     p_[3] = p3;
   }
 
-  void Polynomial::print_short(std::ostream &stream) const {
-    userOut() << "poly(" << p_ << ")" << endl;
-  }
-
-  void Polynomial::print_long(std::ostream &stream) const {
-    for (int d=0; d<p_.size(); ++d) {
-      if (d==0) {
-        stream << p_[d];
-      } else if (d==1) {
-        stream << " + " << p_[d] << "*x";
-      } else {
-        stream << " + " << p_[d] << "*x^" << d;
+  void Polynomial::print_new(std::ostream &stream, bool more) const {
+    if (more) {
+      for (int d=0; d<p_.size(); ++d) {
+        if (d==0) {
+          stream << p_[d];
+        } else if (d==1) {
+          stream << " + " << p_[d] << "*x";
+        } else {
+          stream << " + " << p_[d] << "*x^" << d;
+        }
       }
+    } else {
+      stream << p_;
     }
-    stream << endl;
   }
 
   int Polynomial::degree() const {

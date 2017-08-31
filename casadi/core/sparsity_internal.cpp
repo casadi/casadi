@@ -62,10 +62,6 @@ namespace casadi {
     return size1()*size2();
   }
 
-  void SparsityInternal::print_short(ostream &stream) const {
-    print_compact(stream);
-  }
-
   void SparsityInternal::print_compact(std::ostream &stream) const {
     // Print dimensions
     stream << size1() << "x" << size2();
@@ -113,12 +109,13 @@ namespace casadi {
     }
   }
 
-
-  void SparsityInternal::print_long(ostream &stream) const {
-    print_short(stream);
-    stream << endl;
-    stream << "colind: " << get_colind() << endl;
-    stream << "row:    " << get_row() << endl;
+  void SparsityInternal::print_new(ostream &stream, bool more) const {
+    print_compact(stream);
+    if (more) {
+      stream << endl;
+      stream << "colind: " << get_colind() << endl;
+      stream << "row:    " << get_row() << endl;
+    }
   }
 
   vector<int> SparsityInternal::get_col() const {

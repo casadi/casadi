@@ -78,7 +78,7 @@ namespace casadi {
     // Make sure no free parameters
     if (!free_vars_.empty()) {
       std::stringstream ss;
-      print_short(ss);
+      print_new(ss, false);
       casadi_error("Cannot evaluate \"" << ss.str() << "\" since variables "
                    << free_vars_ << " are free.");
     }
@@ -114,8 +114,9 @@ namespace casadi {
     return true;
   }
 
-  void SXFunction::print_long(ostream &stream) const {
-    FunctionInternal::print_long(stream);
+  void SXFunction::print_new(ostream &stream, bool more) const {
+    FunctionInternal::print_new(stream, more);
+    if (!more) return;
 
     // Iterator to free variables
     vector<SXElem>::const_iterator p_it = free_vars_.begin();
@@ -123,6 +124,7 @@ namespace casadi {
     // Normal, interpreted output
     for (auto&& a : algorithm_) {
       InterruptHandler::check();
+      stream << endl;
       if (a.op==OP_OUTPUT) {
         stream << "output[" << a.i0 << "][" << a.i2 << "] = @" << a.i1;
       } else {
@@ -150,7 +152,7 @@ namespace casadi {
           }
         }
       }
-      stream << ";" << endl;
+      stream << ";";
     }
   }
 

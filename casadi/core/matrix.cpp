@@ -812,7 +812,7 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  void Matrix<Scalar>::print_long(std::ostream &stream) const {
+  void Matrix<Scalar>::print_new(std::ostream &stream, bool more) const {
     if (is_empty()) {
       stream << "[]";
     } else if (numel()==1) {
@@ -825,11 +825,6 @@ namespace casadi {
     } else {
       print_sparse(stream);
     }
-  }
-
-  template<typename Scalar>
-  void Matrix<Scalar>::print_short(std::ostream &stream) const {
-    print_long(stream);
   }
 
   template<typename Scalar>

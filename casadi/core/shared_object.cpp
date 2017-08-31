@@ -100,19 +100,11 @@ namespace casadi {
     return (*this)->type_name();
   }
 
-  void SharedObject::print_short(std::ostream &stream) const {
+  void SharedObject::print_new(std::ostream &stream, bool more) const {
     if (is_null()) {
-      stream << 0;
+      stream << "NULL";
     } else {
-      (*this)->print_short(stream);
-    }
-  }
-
-  void SharedObject::print_long(std::ostream &stream) const {
-    if (is_null()) {
-      stream << "Null pointer of class \"" << typeid(this).name() << "\"";
-    } else {
-      (*this)->print_long(stream);
+      (*this)->print_new(stream, more);
     }
   }
 

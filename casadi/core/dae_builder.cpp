@@ -449,7 +449,11 @@ namespace casadi {
 
   }
 
-  void DaeBuilder::print_short(std::ostream &stream) const {
+  void DaeBuilder::print_new(std::ostream &stream, bool more) const {
+    // Assert correctness
+    if (more) sanity_check();
+
+    // Print dimensions
     stream << "#s = " << this->s.size() << ", "
            << "#x = " << this->x.size() << ", "
            << "#z = " << this->z.size() << ", "
@@ -458,14 +462,9 @@ namespace casadi {
            << "#p = " << this->p.size() << ", "
            << "#d = " << this->d.size() << ", "
            << "#u = " << this->u.size();
-  }
 
-  void DaeBuilder::print_long(ostream &stream) const {
-    // Assert correctness
-    sanity_check();
-
-    // Print dimensions
-    repr(stream);
+    // Quick return?
+    if (!more) return;
 
     // Print the functions
     if (!fun_.empty()) {

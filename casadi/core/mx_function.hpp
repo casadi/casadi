@@ -90,7 +90,7 @@ namespace casadi {
     int eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;
 
     /** \brief  Print description */
-    void print_long(std::ostream &stream) const override;
+    void print_new(std::ostream &stream, bool more) const override;
 
     /** \brief Get type name */
     std::string class_name() const override {return "MXFunction";}
