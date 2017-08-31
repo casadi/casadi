@@ -43,9 +43,11 @@ namespace casadi {
 
 
   SXFunction::SXFunction(const std::string& name,
-                                         const vector<SX >& inputv,
-                                         const vector<SX >& outputv)
-    : XFunction<SXFunction, SX, SXNode>(name, inputv, outputv) {
+                         const vector<SX >& inputv,
+                         const vector<SX >& outputv,
+                         const vector<std::string>& name_in,
+                         const vector<std::string>& name_out)
+    : XFunction<SXFunction, SX, SXNode>(name, inputv, outputv, name_in, name_out) {
     casadi_assert(!out_.empty()); // NOTE: Remove?
 
     // Reset OpenCL memory

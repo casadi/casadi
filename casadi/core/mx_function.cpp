@@ -38,10 +38,11 @@ namespace casadi {
 
   MXFunction::MXFunction(const std::string& name,
                          const std::vector<MX>& inputv,
-                         const std::vector<MX>& outputv) :
-    XFunction<MXFunction, MX, MXNode>(name, inputv, outputv) {
+                         const std::vector<MX>& outputv,
+                         const std::vector<std::string>& name_in,
+                         const std::vector<std::string>& name_out) :
+    XFunction<MXFunction, MX, MXNode>(name, inputv, outputv, name_in, name_out) {
   }
-
 
   MXFunction::~MXFunction() {
   }

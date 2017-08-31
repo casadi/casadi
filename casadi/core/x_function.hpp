@@ -50,8 +50,10 @@ namespace casadi {
 
     /** \brief  Constructor  */
     XFunction(const std::string& name,
-              const std::vector<MatType>& inputv,
-              const std::vector<MatType>& outputv);
+              const std::vector<MatType>& ex_in,
+              const std::vector<MatType>& ex_out,
+              const std::vector<std::string>& name_in,
+              const std::vector<std::string>& name_out);
 
     /** \brief  Destructor */
     ~XFunction() override {}
@@ -138,7 +140,7 @@ namespace casadi {
     /** \brief Is codegen supported? */
     bool has_codegen() const override { return true;}
 
-    /** \brief Helper function: Check if a vector equals inputv */
+    /** \brief Helper function: Check if a vector equals ex_in */
     virtual bool isInput(const std::vector<MatType>& arg) const;
 
     /** Inline calls? */
@@ -184,9 +186,23 @@ namespace casadi {
   template<typename DerivedType, typename MatType, typename NodeType>
   XFunction<DerivedType, MatType, NodeType>::
   XFunction(const std::string& name,
-            const std::vector<MatType>& inputv,
-            const std::vector<MatType>& outputv)
-    : FunctionInternal(name), in_(inputv),  out_(outputv) {
+            const std::vector<MatType>& ex_in,
+            const std::vector<MatType>& ex_out,
+            const std::vector<std::string>& name_in,
+            const std::vector<std::string>& name_out)
+    : FunctionInternal(name), in_(ex_in),  out_(ex_out) {
+    // Names of inputs
+    if (!name_in.empty()) {
+      casadi_assert_message(ex_in.size()==name_in.size(),
+      "Mismatching number of input names");
+      ischeme_ = name_in;
+    }
+    // Names of outputs
+    if (!name_out.empty()) {
+      casadi_assert_message(ex_out.size()==name_out.size(),
+      "Mismatching number of output names");
+      oscheme_ = name_out;
+    }
   }
 
   template<typename DerivedType, typename MatType, typename NodeType>

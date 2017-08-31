@@ -92,142 +92,138 @@ namespace casadi {
   }
 
   Function::Function(const string& name,
-                     const std::vector<SX>& arg, const std::vector<SX>& res,
+                     const std::vector<SX>& ex_in, const std::vector<SX>& ex_out,
                      const Dict& opts) {
-    construct(name, arg, res, opts);
+    construct(name, ex_in, ex_out, {}, {}, opts);
   }
 
   Function::Function(const string& name,
-                     const std::vector<SX>& arg, const std::vector<SX>& res,
-                     const std::vector<string>& argn, const std::vector<string>& resn,
+                     const std::vector<SX>& ex_in, const std::vector<SX>& ex_out,
+                     const std::vector<string>& name_in,
+                     const std::vector<string>& name_out,
                      const Dict& opts) {
-    construct(name, arg, res, argn, resn, opts);
+    construct(name, ex_in, ex_out, name_in, name_out, opts);
   }
 
   Function::Function(const string& name,
-                     const std::vector<MX>& arg, const std::vector<MX>& res,
+                     const std::vector<MX>& ex_in, const std::vector<MX>& ex_out,
                      const Dict& opts) {
-    construct(name, arg, res, opts);
+    construct(name, ex_in, ex_out, {}, {}, opts);
   }
 
   Function::Function(const string& name,
-                     const std::vector<MX>& arg, const std::vector<MX>& res,
-                     const std::vector<string>& argn, const std::vector<string>& resn,
+                     const std::vector<MX>& ex_in, const std::vector<MX>& ex_out,
+                     const std::vector<string>& name_in,
+                     const std::vector<string>& name_out,
                      const Dict& opts) {
-    construct(name, arg, res, argn, resn, opts);
+    construct(name, ex_in, ex_out, name_in, name_out, opts);
   }
 
-  Function::Function(const string& name, SXIList arg, const SXVector& res, const Dict& opts) {
-    construct(name, SXVector(arg), res, opts);
+  Function::Function(const string& name, SXIList ex_in, const SXVector& ex_out, const Dict& opts) {
+    construct(name, SXVector(ex_in), ex_out, {}, {}, opts);
   }
 
-  Function::Function(const string& name, const SXVector& arg, SXIList res, const Dict& opts) {
-    construct(name, arg, SXVector(res), opts);
+  Function::Function(const string& name, const SXVector& ex_in, SXIList ex_out, const Dict& opts) {
+    construct(name, ex_in, SXVector(ex_out), {}, {}, opts);
   }
 
-  Function::Function(const string& name, SXIList arg, SXIList res, const Dict& opts) {
-    construct(name, SXVector(arg), SXVector(res), opts);
+  Function::Function(const string& name, SXIList ex_in, SXIList ex_out, const Dict& opts) {
+    construct(name, SXVector(ex_in), SXVector(ex_out), {}, {}, opts);
   }
 
-  Function::Function(const string& name, SXIList arg, const SXVector& res,
-                     const StringVector& argn, const StringVector& resn, const Dict& opts) {
-    construct(name, SXVector(arg), res, argn, resn, opts);
+  Function::Function(const string& name, SXIList ex_in, const SXVector& ex_out,
+                     const StringVector& name_in,
+                     const StringVector& name_out, const Dict& opts) {
+    construct(name, SXVector(ex_in), ex_out, name_in, name_out, opts);
   }
 
-  Function::Function(const string& name, const SXVector& arg, SXIList res,
-                     const StringVector& argn, const StringVector& resn, const Dict& opts) {
-    construct(name, arg, SXVector(res), argn, resn, opts);
+  Function::Function(const string& name, const SXVector& ex_in, SXIList ex_out,
+                     const StringVector& name_in, const StringVector& name_out, const Dict& opts) {
+    construct(name, ex_in, SXVector(ex_out), name_in, name_out, opts);
   }
 
-  Function::Function(const string& name, SXIList arg, SXIList res,
-                     const StringVector& argn, const StringVector& resn, const Dict& opts) {
-    construct(name, SXVector(arg), SXVector(res), argn, resn, opts);
+  Function::Function(const string& name, SXIList ex_in, SXIList ex_out,
+                     const StringVector& name_in, const StringVector& name_out, const Dict& opts) {
+    construct(name, SXVector(ex_in), SXVector(ex_out), name_in, name_out, opts);
   }
 
-  Function::Function(const string& name, MXIList arg, const MXVector& res, const Dict& opts) {
-    construct(name, MXVector(arg), res, opts);
+  Function::Function(const string& name, MXIList ex_in, const MXVector& ex_out, const Dict& opts) {
+    construct(name, MXVector(ex_in), ex_out, {}, {}, opts);
   }
 
-  Function::Function(const string& name, const MXVector& arg, MXIList res, const Dict& opts) {
-    construct(name, arg, MXVector(res), opts);
+  Function::Function(const string& name, const MXVector& ex_in, MXIList ex_out, const Dict& opts) {
+    construct(name, ex_in, MXVector(ex_out), {}, {}, opts);
   }
 
-  Function::Function(const string& name, MXIList arg, MXIList res, const Dict& opts) {
-    construct(name, MXVector(arg), MXVector(res), opts);
+  Function::Function(const string& name, MXIList ex_in, MXIList ex_out, const Dict& opts) {
+    construct(name, MXVector(ex_in), MXVector(ex_out), {}, {}, opts);
   }
 
-  Function::Function(const string& name, MXIList arg, const MXVector& res,
-                     const StringVector& argn, const StringVector& resn, const Dict& opts) {
-    construct(name, MXVector(arg), res, argn, resn, opts);
+  Function::Function(const string& name, MXIList ex_in, const MXVector& ex_out,
+                     const StringVector& name_in, const StringVector& name_out, const Dict& opts) {
+    construct(name, MXVector(ex_in), ex_out, name_in, name_out, opts);
   }
 
-  Function::Function(const string& name, const MXVector& arg, MXIList res,
-                     const StringVector& argn, const StringVector& resn, const Dict& opts) {
-    construct(name, arg, MXVector(res), argn, resn, opts);
+  Function::Function(const string& name, const MXVector& ex_in, MXIList ex_out,
+                     const StringVector& name_in, const StringVector& name_out, const Dict& opts) {
+    construct(name, ex_in, MXVector(ex_out), name_in, name_out, opts);
   }
 
-  Function::Function(const string& name, MXIList arg, MXIList res,
-                     const StringVector& argn, const StringVector& resn, const Dict& opts) {
-    construct(name, MXVector(arg), MXVector(res), argn, resn, opts);
+  Function::Function(const string& name, MXIList ex_in, MXIList ex_out,
+                     const StringVector& name_in, const StringVector& name_out, const Dict& opts) {
+    construct(name, MXVector(ex_in), MXVector(ex_out), name_in, name_out, opts);
   }
 
   Function::Function(const string& name, const std::map<string, SX>& dict,
-                     const vector<string>& argn, const vector<string>& resn,
+                     const vector<string>& name_in, const vector<string>& name_out,
                      const Dict& opts) {
-    construct(name, dict, argn, resn, opts);
+    construct(name, dict, name_in, name_out, opts);
   }
 
   Function::Function(const string& name, const std::map<string, MX>& dict,
-                     const vector<string>& argn, const vector<string>& resn,
+                     const vector<string>& name_in, const vector<string>& name_out,
                      const Dict& opts) {
-    construct(name, dict, argn, resn, opts);
+    construct(name, dict, name_in, name_out, opts);
   }
 
   template<typename M>
   void Function::construct(const string& name, const std::map<string, M>& dict,
-                           const vector<string>& argn,
-                           const vector<string>& resn,
+                           const vector<string>& name_in,
+                           const vector<string>& name_out,
                            const Dict& opts) {
-    vector<M> arg(argn.size()), res(resn.size());
+    vector<M> ex_in(name_in.size()), ex_out(name_out.size());
     for (auto&& i : dict) {
       vector<string>::const_iterator it;
-      if ((it=find(argn.begin(), argn.end(), i.first))!=argn.end()) {
+      if ((it=find(name_in.begin(), name_in.end(), i.first))!=name_in.end()) {
         // Input expression
-        arg[it-argn.begin()] = i.second;
-      } else if ((it=find(resn.begin(), resn.end(), i.first))!=resn.end()) {
+        ex_in[it-name_in.begin()] = i.second;
+      } else if ((it=find(name_out.begin(), name_out.end(), i.first))!=name_out.end()) {
         // Output expression
-        res[it-resn.begin()] = i.second;
+        ex_out[it-name_out.begin()] = i.second;
       } else {
         // Neither
         casadi_error("Unknown dictionary entry: '" + i.first + "'");
       }
     }
-    construct(name, arg, res, argn, resn, opts);
+    construct(name, ex_in, ex_out, name_in, name_out, opts);
   }
 
   void Function::construct(const string& name,
-                           const vector<SX>& arg, const vector<SX>& res,
+                           const vector<SX>& ex_in, const vector<SX>& ex_out,
+                           const vector<string>& name_in,
+                           const vector<string>& name_out,
                            const Dict& opts) {
-    own(new SXFunction(name, arg, res));
+    own(new SXFunction(name, ex_in, ex_out, name_in, name_out));
     (*this)->construct(opts);
   }
 
   void Function::construct(const string& name,
-                           const vector<MX>& arg, const vector<MX>& res,
+                           const vector<MX>& ex_in, const vector<MX>& ex_out,
+                           const vector<string>& name_in,
+                           const vector<string>& name_out,
                            const Dict& opts) {
-    own(new MXFunction(name, arg, res));
+    own(new MXFunction(name, ex_in, ex_out, name_in, name_out));
     (*this)->construct(opts);
-  }
-
-  template<typename M>
-  void Function::construct(const string& name,
-                           const vector<M>& arg, const vector<M>& res,
-                           const vector<string>& argn, const vector<string>& resn,
-                           const Dict& opts) {
-    Dict opts2 = opts;
-    opts2["input_scheme"] = argn;
-    opts2["output_scheme"] = resn;
-    construct(name, arg, res, opts2);
   }
 
   Function Function::expand() const {
@@ -235,14 +231,9 @@ namespace casadi {
   }
 
   Function Function::expand(const string& name, const Dict& opts) const {
-    vector<SX> arg = sx_in();
-    vector<SX> res = Function(*this)(arg);
-    vector<string> name_in = this->name_in();
-    vector<string> name_out = this->name_out();
-    Dict opts2(opts);
-    if (!name_in.empty() && !opts.count("input_scheme")) opts2["input_scheme"]=name_in;
-    if (!name_out.empty() && !opts.count("output_scheme")) opts2["output_scheme"]=name_out;
-    return Function(name, arg, res, opts2);
+    vector<SX> ex_in = sx_in();
+    vector<SX> ex_out = Function(*this)(ex_in);
+    return Function(name, ex_in, ex_out, name_in(), name_out(), opts);
   }
 
   Function Function::create(FunctionInternal* node) {

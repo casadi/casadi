@@ -88,8 +88,10 @@ class CASADI_EXPORT SXFunction :
   public:
     /** \brief Constructor */
     SXFunction(const std::string& name,
-                       const std::vector<Matrix<SXElem> >& inputv,
-                       const std::vector<Matrix<SXElem> >& outputv);
+               const std::vector<Matrix<SXElem> >& inputv,
+               const std::vector<Matrix<SXElem> >& outputv,
+               const std::vector<std::string>& name_in,
+               const std::vector<std::string>& name_out);
 
   /** \brief  Destructor */
   ~SXFunction() override;

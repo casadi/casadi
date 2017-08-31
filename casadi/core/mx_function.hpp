@@ -78,8 +78,10 @@ namespace casadi {
     std::vector<double> default_in_;
 
     /** \brief Constructor */
-    MXFunction(const std::string& name, const std::vector<MX>& input,
-                       const std::vector<MX>& output);
+    MXFunction(const std::string& name,
+      const std::vector<MX>& input, const std::vector<MX>& output,
+      const std::vector<std::string>& name_in,
+      const std::vector<std::string>& name_out);
 
     /** \brief  Destructor */
     ~MXFunction() override;
