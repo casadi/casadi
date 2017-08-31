@@ -158,9 +158,7 @@ x = SX.sym('x');
 p = SX.sym('p');
 f = x^2;
 g = log(x)-p;
-opts = struct('input_scheme', char('x','p'),...
-              'output_scheme', char('f','g'));
-nlp = Function('nlp', {x,p}, {f,g}, opts);
+nlp = Function('nlp', {x,p}, {f,g}, char('x','p'), char('f','g'));
 
 % Evaluate with numbered inputs and outputs
 [res_vec{1:2}] = nlp(1.1, 3.3);
@@ -396,13 +394,13 @@ assert(~issparse(b));
 Xs = {SX, MX};
 for j=1:2;
   X = Xs{j};
-  
+
   for sA=[1,3]
      for sy=[3]
-        
+
         A = X.sym('A',sA,sA);
         y = X.sym('y',sy);
-        
+
         yv = [7;2;4];
         Av = [13 0.2 1;1 9 2;0.1 1 3];
         yv = yv(1:sy);
@@ -412,7 +410,7 @@ for j=1:2;
         for i=1:numel(out)
           assert(norm(Av\yv-full(out{i}),1)<=1e-12);
         end
-        
+
         yv = yv';
         y = y';
         F = Function('f',{A,y},{y/A, yv/A, y/Av, DM(yv)/A, y/DM(Av), DM(yv)/DM(Av)});
