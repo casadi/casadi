@@ -73,6 +73,12 @@ namespace casadi {
       static_cast<const Derived&>(obj).print(stream, false);
       return stream;
     }
+
+    /// Get string
+    inline friend std::string str(const PrintableObject<Derived>& obj, bool more=false) {
+      return obj.get_str(more);
+    }
+
 #endif // SWIG
 /**
 \ingroup expression_tools

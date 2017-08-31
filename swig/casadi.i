@@ -184,17 +184,6 @@
 #define SWIG_REPR __repr__
 #endif
 
-// Print description
-#ifdef SWIGMATLAB
-#define SWIG_STR print
-#else
-#define SWIG_STR __str__
-#endif
-
-
-//#endif // SWIGPYTHON
-
-
 #ifdef SWIGPYTHON
 %pythoncode %{
 
@@ -2677,7 +2666,9 @@ class NZproxy:
 %include <casadi/core/printable_object.hpp>
 
 #ifdef SWIGPYTHON
-%rename(SWIG_STR) get_str;
+%rename(__str__) get_str;
+#endif
+
 #endif // SWIGPYTHON
 
 %template(PrintSharedObject) casadi::PrintableObject<casadi::SharedObject>;
