@@ -592,13 +592,8 @@ namespace casadi {
     /** \brief Get free variables */
     static std::vector<MX> get_free(const Function& f);
 
-    /// Get name of the class
-    static std::string type_name();
-
-    ///@{
-    /// Readability typedefs
+    /// Readability typedef
     typedef std::map<std::string, MX> MXDict;
-    ///@}
 
 #ifndef SWIG
     /// Construct constant matrix with a given sparsity and values

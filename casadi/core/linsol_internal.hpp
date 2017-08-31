@@ -65,7 +65,7 @@ namespace casadi {
     ~LinsolInternal() override;
 
     /** \brief Get type name */
-    std::string type_name() const override {return std::string("linsol_") + plugin_name();}
+    std::string type_name() const override {return "Linsol";}
 
     ///@{
     /** \brief Number of function inputs and outputs */

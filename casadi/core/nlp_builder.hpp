@@ -68,6 +68,9 @@ namespace casadi {
     /// Import an .nl file
     void import_nl(const std::string& filename, const Dict& opts = Dict());
 
+    /// Readable name of the class
+    std::string type_name() const {return "NlpBuilder";}
+
     /// Print a description of the object
     void print_long(std::ostream &stream) const;
 

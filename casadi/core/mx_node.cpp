@@ -158,7 +158,7 @@ namespace casadi {
   }
 
   std::string MXNode::type_name() const {
-    return typeid(*this).name();
+    return "MX";
   }
 
   bool MXNode::__nonzero__() const {
@@ -214,9 +214,7 @@ namespace casadi {
   }
 
   void MXNode::print_short(std::ostream &stream) const {
-    stream << "MX(";
     print_long(stream);
-    stream << ")";
   }
 
   void MXNode::print_long(std::ostream &stream) const {

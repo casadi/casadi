@@ -1257,7 +1257,7 @@ namespace casadi {
   }
 
   bool MXFunction::is_a(const std::string& type, bool recursive) const {
-    return type=="mxfunction"
+    return type=="MXFunction"
       || (recursive && XFunction<MXFunction,
           MX, MXNode>::is_a(type, recursive));
   }

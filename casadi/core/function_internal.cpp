@@ -2460,20 +2460,20 @@ namespace casadi {
   }
 
   bool FunctionInternal::is_a(const std::string& type, bool recursive) const {
-    return type == "function";
+    return type == "Function";
   }
 
   std::vector<MX> FunctionInternal::free_mx() const {
-    casadi_error("'free_mx' only defined for 'mxfunction'");
+    casadi_error("'free_mx' only defined for 'MXFunction'");
   }
 
   std::vector<SX> FunctionInternal::free_sx() const {
-    casadi_error("'free_sx' only defined for 'sxfunction'");
+    casadi_error("'free_sx' only defined for 'SXFunction'");
   }
 
   void FunctionInternal::generate_lifted(Function& vdef_fcn,
                                          Function& vinit_fcn) const {
-    casadi_error("'generate_lifted' only defined for 'mxfunction'");
+    casadi_error("'generate_lifted' only defined for 'MXFunction'");
   }
 
   int FunctionInternal::getAlgorithmSize() const {

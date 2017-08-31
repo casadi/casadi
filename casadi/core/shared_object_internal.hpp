@@ -52,6 +52,9 @@ namespace casadi {
     /// Get the reference count
     int getCount() const;
 
+    /// Readable name of the class
+    virtual std::string type_name() const = 0;
+
     /// Print a representation of the object
     virtual void print_short(std::ostream &stream) const;
 
@@ -95,7 +98,10 @@ namespace casadi {
     WeakRefInternal(SharedObjectInternal* raw);
 
     // Destructor
-    ~WeakRefInternal();
+    ~WeakRefInternal() override;
+
+    /// Readable name of the class
+    std::string type_name() const override {return "WeakRef";}
 
     // Raw pointer to the cached object
     SharedObjectInternal* raw_;

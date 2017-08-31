@@ -719,9 +719,6 @@ namespace casadi {
     // Finite difference step
     Dict fd_options_;
 
-    /** \brief Get type name */
-    virtual std::string type_name() const = 0;
-
     /** \brief Check if the function is of a particular type */
     virtual bool is_a(const std::string& type, bool recursive) const;
 

@@ -76,12 +76,6 @@ namespace casadi {
     /** \brief Check if binary operation */
     virtual bool is_binary() const { return false;}
 
-    /** \brief  Print a representation */
-    void print_short(std::ostream &stream) const override;
-
-    /** \brief  Print a description */
-    void print_long(std::ostream &stream) const override;
-
     /** \brief Find out which nodes can be inlined */
     void can_inline(std::map<const MXNode*, int>& nodeind) const;
 
@@ -135,7 +129,13 @@ namespace casadi {
     virtual const std::string& name() const;
 
     /** \brief Get type name */
-    virtual std::string type_name() const;
+    virtual std::string type_name() const override;
+
+    /** \brief  Print a representation */
+    void print_short(std::ostream &stream) const override;
+
+    /** \brief  Print a description */
+    void print_long(std::ostream &stream) const override;
 
     /** \brief  Check if valid function input */
     virtual bool is_valid_input() const { return false;}

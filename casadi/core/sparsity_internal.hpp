@@ -418,6 +418,9 @@ namespace casadi {
     /// Hash the sparsity pattern
     std::size_t hash() const;
 
+    /// Readable name of the class
+    std::string type_name() const override {return "Sparsity";}
+
     /// Print representation
     void print_short(std::ostream &stream) const override;
 

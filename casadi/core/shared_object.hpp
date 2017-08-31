@@ -123,6 +123,9 @@ namespace casadi {
     /// \endcond
 #endif // SWIG
 
+    /// Readable name of the class
+    std::string type_name() const;
+
     /// Print a representation of the object
     void print_short(std::ostream &stream) const;
 

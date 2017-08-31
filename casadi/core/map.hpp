@@ -46,7 +46,7 @@ namespace casadi {
     ~Map() override;
 
     /** \brief Get type name */
-    std::string type_name() const override {return "map";}
+    std::string type_name() const override {return "Map";}
 
     /// @{
     /** \brief Sparsities of function inputs and outputs */

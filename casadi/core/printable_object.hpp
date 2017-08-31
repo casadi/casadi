@@ -52,7 +52,9 @@ namespace casadi {
 
     /// Print a representation of the object
     void repr(std::ostream &stream) const {
+      stream << static_cast<const Derived*>(this)->type_name() << "(";
       static_cast<const Derived*>(this)->print_short(stream);
+      stream << ")";
       stream << std::flush;
     }
 

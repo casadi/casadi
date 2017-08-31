@@ -50,9 +50,7 @@ namespace casadi {
     ~Conic() override = 0;
 
     /** \brief Get type name */
-    std::string type_name() const override {
-      return std::string("conic_") + plugin_name();
-    }
+    std::string type_name() const override { return "Conic";}
 
     ///@{
     /** \brief Number of function inputs and outputs */

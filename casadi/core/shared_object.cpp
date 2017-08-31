@@ -92,6 +92,10 @@ namespace casadi {
     return node;
   }
 
+  std::string SharedObject::type_name() const {
+    return (*this)->type_name();
+  }
+
   void SharedObject::print_short(std::ostream &stream) const {
     if (is_null()) {
       stream << 0;

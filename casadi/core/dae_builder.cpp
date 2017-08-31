@@ -450,15 +450,14 @@ namespace casadi {
   }
 
   void DaeBuilder::print_short(std::ostream &stream) const {
-    stream << "DAE("
-           << "#s = " << this->s.size() << ", "
+    stream << "#s = " << this->s.size() << ", "
            << "#x = " << this->x.size() << ", "
            << "#z = " << this->z.size() << ", "
            << "#q = " << this->q.size() << ", "
            << "#y = " << this->y.size() << ", "
            << "#p = " << this->p.size() << ", "
            << "#d = " << this->d.size() << ", "
-           << "#u = " << this->u.size() << ")";
+           << "#u = " << this->u.size();
   }
 
   void DaeBuilder::print_long(ostream &stream) const {

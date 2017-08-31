@@ -51,6 +51,9 @@ namespace casadi {
     /// Destructor
     ~ImporterInternal() override;
 
+    /** \brief Get type name */
+    std::string type_name() const override { return "Importer";}
+
     /** \brief Print */
     void print_long(std::ostream &stream) const override;
 

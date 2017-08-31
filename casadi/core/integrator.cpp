@@ -719,7 +719,7 @@ namespace casadi {
     string aug_prefix = "fsens" + to_string(nfwd) + "_";
     string dae_name = aug_prefix + oracle_.name();
     Dict dae_opts = {{"derivative_of", oracle_}};
-    if (oracle_.is_a("sxfunction")) {
+    if (oracle_.is_a("SXFunction")) {
       aug_dae = map2oracle(dae_name, aug_fwd<SX>(nfwd));
     } else {
       aug_dae = map2oracle(dae_name, aug_fwd<MX>(nfwd));
@@ -843,7 +843,7 @@ namespace casadi {
     Function aug_dae;
     string aug_prefix = "asens" + to_string(nadj) + "_";
     string dae_name = aug_prefix + oracle_.name();
-    if (oracle_.is_a("sxfunction")) {
+    if (oracle_.is_a("SXFunction")) {
       aug_dae = map2oracle(dae_name, aug_adj<SX>(nadj));
     } else {
       aug_dae = map2oracle(dae_name, aug_adj<MX>(nadj));

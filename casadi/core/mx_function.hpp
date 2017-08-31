@@ -93,7 +93,7 @@ namespace casadi {
     void print_long(std::ostream &stream) const override;
 
     /** \brief Get type name */
-    std::string type_name() const override {return "mxfunction";}
+    std::string type_name() const override {return "MXFunction";}
 
     /** \brief Check if the function is of a particular type */
     bool is_a(const std::string& type, bool recursive) const override;

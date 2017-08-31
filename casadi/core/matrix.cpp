@@ -829,9 +829,7 @@ namespace casadi {
 
   template<typename Scalar>
   void Matrix<Scalar>::print_short(std::ostream &stream) const {
-    stream << type_name() << "(";
     print_long(stream);
-    stream << ")";
   }
 
   template<typename Scalar>

@@ -63,7 +63,6 @@ namespace casadi {
   }
 
   void SparsityInternal::print_short(ostream &stream) const {
-    stream << "Compressed Column Storage: ";
     print_compact(stream);
   }
 

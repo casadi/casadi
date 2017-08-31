@@ -76,6 +76,9 @@ namespace casadi {
     /// Check inequality
     bool operator!=(const Slice& other) const { return !(*this == other);}
 
+    /// Get name of the class
+    std::string type_name() const {return "Slice";}
+
     /// Print a representation of the object
     void print_short(std::ostream &stream) const;
 

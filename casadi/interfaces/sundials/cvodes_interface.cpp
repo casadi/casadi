@@ -819,7 +819,7 @@ namespace casadi {
   }
 
   Function CvodesInterface::getJ(bool b) const {
-    return oracle_.is_a("sxfunction") ? getJ<SX>(b) : getJ<MX>(b);
+    return oracle_.is_a("SXFunction") ? getJ<SX>(b) : getJ<MX>(b);
   }
 
   template<typename MatType>

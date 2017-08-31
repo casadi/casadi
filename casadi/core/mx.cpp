@@ -1784,10 +1784,6 @@ namespace casadi {
     return f.free_mx();
   }
 
-  std::string MX::type_name() {
-    return "MX";
-  }
-
   MX MX::_bilin(const MX& A, const MX& x, const MX& y) {
    return A->get_bilin(x, y);
  }
