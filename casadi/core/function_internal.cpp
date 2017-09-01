@@ -425,7 +425,7 @@ namespace casadi {
   }
 
   void FunctionInternal::disp(ostream &stream, bool more) const {
-    stream << definition();
+    stream << definition() << " " << class_name();
   }
 
   Function FunctionInternal::wrap() const {
