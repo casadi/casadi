@@ -426,7 +426,7 @@ namespace casadi {
             } else {
               g.local("t", "casadi_real", "*");
               g << "t=w, w+=" << f_sp.nnz() << ";\n"
-                << g.project("arg1[" + to_string(i) + "]", sp, "t", f_sp, "w") << "\n"
+                << g.project("arg1[" + str(i) + "]", sp, "t", f_sp, "w") << "\n"
                 << "arg1[" << i << "]=t;\n";
             }
           }
@@ -455,8 +455,8 @@ namespace casadi {
           const Sparsity& f_sp = fk.sparsity_out(i);
           const Sparsity& sp = sparsity_out(i);
           if (f_sp!=sp) {
-            g << g.project("res1[" + to_string(i) + "]", f_sp,
-                           "res[" + to_string(i) + "]", sp, "w") << "\n";
+            g << g.project("res1[" + str(i) + "]", f_sp,
+                           "res[" + str(i) + "]", sp, "w") << "\n";
           }
         }
 

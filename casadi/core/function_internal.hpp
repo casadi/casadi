@@ -771,7 +771,7 @@ namespace casadi {
     for (int dir=0; dir<nfwd; ++dir) {
       fseed[dir].resize(n_in);
       for (int iind=0; iind<n_in; ++iind) {
-        std::string n = "f" + to_string(dir) + "_" +  name_in(iind);
+        std::string n = "f" + str(dir) + "_" +  name_in(iind);
         fseed[dir][iind] = MatType::sym(n, sparsity_in(iind));
       }
     }

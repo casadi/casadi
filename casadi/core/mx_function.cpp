@@ -416,8 +416,8 @@ namespace casadi {
         s << "@" << el.res.front() << " = @" << el.arg.at(0) << "; ";
       }
       vector<string> arg(2);
-      arg[0] = "@" + CodeGenerator::to_string(el.res.front());
-      arg[1] = "@" + CodeGenerator::to_string(el.arg.at(1));
+      arg[0] = "@" + str(el.res.front());
+      arg[1] = "@" + str(el.arg.at(1));
       s << el.data->disp(arg);
     } else {
       if (el.res.size()==1) {
@@ -439,7 +439,7 @@ namespace casadi {
         arg.resize(el.arg.size());
         for (int i=0; i<el.arg.size(); ++i) {
           if (el.arg[i]>=0) {
-            arg[i] = "@" + CodeGenerator::to_string(el.arg[i]);
+            arg[i] = "@" + str(el.arg[i]);
           } else {
             arg[i] = "NULL";
           }
@@ -1087,8 +1087,8 @@ namespace casadi {
 
   void MXFunction::codegen_body(CodeGenerator& g) const {
     // Temporary variables and vectors
-    g.init_local("arg1", "arg+" + to_string(n_in()));
-    g.init_local("res1", "res+" + to_string(n_out()));
+    g.init_local("arg1", "arg+" + str(n_in()));
+    g.init_local("res1", "res+" + str(n_out()));
 
     // Declare scalar work vector elements as local variables
     bool first = true;

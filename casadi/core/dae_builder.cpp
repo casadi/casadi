@@ -950,21 +950,21 @@ namespace casadi {
   }
 
   MX DaeBuilder::add_x(const std::string& name, int n) {
-    if (name.empty()) return add_x("x" + to_string(this->x.size()), n);
+    if (name.empty()) return add_x("x" + str(this->x.size()), n);
     MX new_x = add_variable(name, n);
     this->x.push_back(new_x);
     return new_x;
   }
 
   MX DaeBuilder::add_q(const std::string& name, int n) {
-    if (name.empty()) return add_q("q" + to_string(this->q.size()), n);
+    if (name.empty()) return add_q("q" + str(this->q.size()), n);
     MX new_q = add_variable(name, n);
     this->q.push_back(new_q);
     return new_q;
   }
 
   std::pair<MX, MX> DaeBuilder::add_s(const std::string& name, int n) {
-    if (name.empty()) return add_s("s" + to_string(this->s.size()), n);
+    if (name.empty()) return add_s("s" + str(this->s.size()), n);
     Variable v(name, Sparsity::dense(n));
     add_variable(name, v);
     this->s.push_back(v.v);
@@ -973,28 +973,28 @@ namespace casadi {
   }
 
   MX DaeBuilder::add_z(const std::string& name, int n) {
-    if (name.empty()) return add_z("z" + to_string(this->z.size()), n);
+    if (name.empty()) return add_z("z" + str(this->z.size()), n);
     MX new_z = add_variable(name, n);
     this->z.push_back(new_z);
     return new_z;
   }
 
   MX DaeBuilder::add_p(const std::string& name, int n) {
-    if (name.empty()) return add_p("p" + to_string(this->p.size()), n);
+    if (name.empty()) return add_p("p" + str(this->p.size()), n);
     MX new_p = add_variable(name, n);
     this->p.push_back(new_p);
     return new_p;
   }
 
   MX DaeBuilder::add_u(const std::string& name, int n) {
-    if (name.empty()) return add_u("u" + to_string(this->u.size()), n);
+    if (name.empty()) return add_u("u" + str(this->u.size()), n);
     MX new_u = add_variable(name, n);
     this->u.push_back(new_u);
     return new_u;
   }
 
   MX DaeBuilder::add_aux(const std::string& name, int n) {
-    if (name.empty()) return add_aux("aux" + to_string(this->aux.size()), n);
+    if (name.empty()) return add_aux("aux" + str(this->aux.size()), n);
     MX new_aux = add_variable(name, n);
     this->aux.push_back(new_aux);
     return new_aux;
@@ -1002,32 +1002,32 @@ namespace casadi {
 
 #ifdef WITH_DEPRECATED_FEATURES
   MX DaeBuilder::add_d(const MX& new_ddef, const std::string& name) {
-    if (name.empty()) return add_d(new_ddef, "d" + to_string(this->d.size()));
+    if (name.empty()) return add_d(new_ddef, "d" + str(this->d.size()));
     return add_d(name, new_ddef);
   }
 
   MX DaeBuilder::add_y(const MX& new_ydef, const std::string& name) {
-    if (name.empty()) return add_y(new_ydef, "y" + to_string(this->y.size()));
+    if (name.empty()) return add_y(new_ydef, "y" + str(this->y.size()));
     return add_y(name, new_ydef);
   }
 
   void DaeBuilder::add_ode(const MX& new_ode, const std::string& name) {
-    if (name.empty()) return add_ode(new_ode, "ode" + to_string(this->ode.size()));
+    if (name.empty()) return add_ode(new_ode, "ode" + str(this->ode.size()));
     return add_ode(name, new_ode);
   }
 
   void DaeBuilder::add_dae(const MX& new_dae, const std::string& name) {
-    if (name.empty()) return add_dae(new_dae, "dae" + to_string(this->dae.size()));
+    if (name.empty()) return add_dae(new_dae, "dae" + str(this->dae.size()));
     return add_dae(name, new_dae);
   }
 
   void DaeBuilder::add_alg(const MX& new_alg, const std::string& name) {
-    if (name.empty()) return add_alg(new_alg, "alg" + to_string(this->alg.size()));
+    if (name.empty()) return add_alg(new_alg, "alg" + str(this->alg.size()));
     return add_alg(name, new_alg);
   }
 
   void DaeBuilder::add_quad(const MX& new_quad, const std::string& name) {
-    if (name.empty()) return add_quad(new_quad, "quad" + to_string(this->quad.size()));
+    if (name.empty()) return add_quad(new_quad, "quad" + str(this->quad.size()));
     return add_quad(name, new_quad);
   }
 #endif // WITH_DEPRECATED_FEATURES

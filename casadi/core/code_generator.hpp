@@ -237,9 +237,6 @@ namespace casadi {
     /** \brief Add a built-in auxiliary function */
     void add_auxiliary(Auxiliary f, const std::vector<std::string>& inst = {"casadi_real"});
 
-    /** Convert in integer to a string */
-    static std::string to_string(int n);
-
     /** Get work vector name from index */
     std::string work(int n, int sz) const;
 

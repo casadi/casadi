@@ -454,8 +454,8 @@ namespace casadi {
       nnz_H_ += dim_[i]*dim_[i];
     }
 
-    log(std::string("BlockSqp::init: working with ") + to_string(nblocks_) +
-          " blocks of max size " + to_string(max_size) + ".");
+    log(std::string("BlockSqp::init: working with ") + str(nblocks_) +
+          " blocks of max size " + str(max_size) + ".");
 
     // Allocate a QP solver
     //casadi_assert_message(!qpsol_plugin.empty(), "'qpsol' option has not been set");

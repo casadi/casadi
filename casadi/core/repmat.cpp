@@ -99,7 +99,7 @@ namespace casadi {
     g.local("i", "int");
     g << "for (i=0;i<" << n_ << ";++i) {\n"
       << "    " << g.copy(g.work(arg[0], dep(0).nnz()), nnz,
-                          g.work(res[0], sparsity().nnz()) + "+ i*" + g.to_string(nnz)) << "\n"
+                          g.work(res[0], sparsity().nnz()) + "+ i*" + str(nnz)) << "\n"
       << "  }\n";
   }
 

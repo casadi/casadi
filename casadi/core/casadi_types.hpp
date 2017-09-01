@@ -104,18 +104,6 @@ namespace casadi {
   // https://stackoverflow.com/questions/22240973/major-and-minor-macros-defined-in-sys-sysmacros-h-pulled-in-by-iterator
 #undef minor
 
-  // Workarond for MinGW bug
-#if defined(__MINGW32__) || defined(__MINGW64__) || defined(_MSC_VER)
-  template<typename T>
-  std::string to_string(const T& n) {
-    std::stringstream s;
-    s << n;
-    return s.str();
-  }
-#else
-  using std::to_string;
-#endif
-
   // The number of derivative directions for which the tool has been optimized
   const int optimized_num_dir = 64;
 

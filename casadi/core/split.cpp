@@ -114,7 +114,7 @@ namespace casadi {
         } else {
           // assign vector
           std::string r = g.work(arg[0], dep(0).nnz());
-          if (nz_first!=0) r = r + "+" + g.to_string(nz_first);
+          if (nz_first!=0) r = r + "+" + str(nz_first);
           g << g.copy(r, nz, g.work(res[i], nnz(i))) << "\n";
         }
       }

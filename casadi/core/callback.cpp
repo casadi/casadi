@@ -72,8 +72,8 @@ namespace casadi {
     std::vector<DM> resv = eval(argv);
 
     casadi_assert_message(resv.size()==n_out(),
-      "Callback::eval: expected " + to_string(n_out()) + " outputs, got "
-      + to_string(resv.size()) +".");
+      "Callback::eval: expected " + str(n_out()) + " outputs, got "
+      + str(resv.size()) +".");
 
     for (int i=0; i<n_out(); ++i) {
       casadi_assert_message(resv[i].sparsity()==sparsity_out(i),

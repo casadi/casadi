@@ -161,7 +161,7 @@ namespace casadi {
       }
 
       // Call function
-      g << g(fcn_, "w", "w+"+g.to_string(arg.size())) << ";\n";
+      g << g(fcn_, "w", "w+"+str(arg.size())) << ";\n";
 
       // Collect output arguments
       for (int i=0; i<res.size(); ++i) {

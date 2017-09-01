@@ -312,14 +312,14 @@ namespace casadi {
     sp_jac_dae_ = sp_jac_dae();
     casadi_assert_message(!sp_jac_dae_.is_singular(),
                           "Jacobian of the forward problem is structurally rank-deficient. "
-                          "sprank(J)=" + to_string(sprank(sp_jac_dae_)) + "<"
-                          + to_string(nx_+nz_));
+                          "sprank(J)=" + str(sprank(sp_jac_dae_)) + "<"
+                          + str(nx_+nz_));
     if (nrx_>0) {
       sp_jac_rdae_ = sp_jac_rdae();
       casadi_assert_message(!sp_jac_rdae_.is_singular(),
                             "Jacobian of the backward problem is structurally rank-deficient. "
-                            "sprank(J)=" + to_string(sprank(sp_jac_rdae_)) + "<"
-                            + to_string(nrx_+nrz_));
+                            "sprank(J)=" + str(sprank(sp_jac_rdae_)) + "<"
+                            + str(nrx_+nrz_));
     }
 
     // Consistency check
@@ -370,7 +370,7 @@ namespace casadi {
     vector<vector<MatType>> seed(nfwd, vector<MatType>(DE_NUM_IN));
     for (int d=0; d<nfwd; ++d) {
       seed[d][DE_T] = zero_t;
-      string pref = "aug" + to_string(d) + "_";
+      string pref = "aug" + str(d) + "_";
       aug_x.push_back(vec(seed[d][DE_X] = MatType::sym(pref + "x", x())));
       aug_z.push_back(vec(seed[d][DE_Z] = MatType::sym(pref + "z", z())));
       aug_p.push_back(vec(seed[d][DE_P] = MatType::sym(pref + "p", p())));
@@ -443,7 +443,7 @@ namespace casadi {
     // Reverse mode directional derivatives
     vector<vector<MatType>> seed(nadj, vector<MatType>(DE_NUM_OUT));
     for (int d=0; d<nadj; ++d) {
-      string pref = "aug" + to_string(d) + "_";
+      string pref = "aug" + str(d) + "_";
       aug_rx.push_back(vec(seed[d][DE_ODE] = MatType::sym(pref + "ode", x())));
       aug_rz.push_back(vec(seed[d][DE_ALG] = MatType::sym(pref + "alg", z())));
       aug_rp.push_back(vec(seed[d][DE_QUAD] = MatType::sym(pref + "quad", q())));
@@ -716,7 +716,7 @@ namespace casadi {
 
     // Create integrator for augmented DAE
     Function aug_dae;
-    string aug_prefix = "fsens" + to_string(nfwd) + "_";
+    string aug_prefix = "fsens" + str(nfwd) + "_";
     string dae_name = aug_prefix + oracle_.name();
     Dict dae_opts = {{"derivative_of", oracle_}};
     if (oracle_.is_a("SXFunction")) {
@@ -739,7 +739,7 @@ namespace casadi {
     for (int dir=-1; dir<nfwd; ++dir) {
       // Suffix
       string suff;
-      if (dir>=0) suff = "_" + to_string(dir);
+      if (dir>=0) suff = "_" + str(dir);
 
       // Augmented problem
       vector<MX> din(INTEGRATOR_NUM_IN);
@@ -841,7 +841,7 @@ namespace casadi {
 
     // Create integrator for augmented DAE
     Function aug_dae;
-    string aug_prefix = "asens" + to_string(nadj) + "_";
+    string aug_prefix = "asens" + str(nadj) + "_";
     string dae_name = aug_prefix + oracle_.name();
     if (oracle_.is_a("SXFunction")) {
       aug_dae = map2oracle(dae_name, aug_adj<SX>(nadj));
@@ -886,7 +886,7 @@ namespace casadi {
     for (int dir=0; dir<nadj; ++dir) {
       // Suffix
       string suff;
-      if (dir>=0) suff = "_" + to_string(dir);
+      if (dir>=0) suff = "_" + str(dir);
 
       // Augmented problem
       rx0_aug.push_back(vec(dd[INTEGRATOR_XF] = MX::sym("xf" + suff, x())));

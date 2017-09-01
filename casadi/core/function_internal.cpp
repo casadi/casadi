@@ -308,11 +308,11 @@ namespace casadi {
   }
 
   std::string FunctionInternal::get_name_in(int i) {
-    return "i" + CodeGenerator::to_string(i);
+    return "i" + str(i);
   }
 
   std::string FunctionInternal::get_name_out(int i) {
-    return "o" + CodeGenerator::to_string(i);
+    return "o" + str(i);
   }
 
   void FunctionInternal::finalize(const Dict& opts) {
@@ -1367,7 +1367,7 @@ namespace casadi {
     int n_out = this->n_out();
 
     // Give it a suitable name
-    string name = "fwd" + to_string(nfwd) + "_" + name_;
+    string name = "fwd" + str(nfwd) + "_" + name_;
 
     // Names of inputs
     std::vector<std::string> inames;
@@ -1438,7 +1438,7 @@ namespace casadi {
     int n_out = this->n_out();
 
     // Give it a suitable name
-    string name = "adj" + to_string(nadj) + "_" + name_;
+    string name = "adj" + str(nadj) + "_" + name_;
 
     // Names of inputs
     std::vector<std::string> inames;
@@ -1799,13 +1799,13 @@ namespace casadi {
       sz_w += i_nnz + o_nnz;
       g << g.array("int", "iw", sz_iw());
       g << g.array("casadi_real", "w", sz_w);
-      string fw = "w+" + g.to_string(i_nnz + o_nnz);
+      string fw = "w+" + str(i_nnz + o_nnz);
 
       // Copy inputs to buffers
       int offset=0;
       g << g.array("const casadi_real*", "arg", n_in, "{0}");
       for (int i=0; i<n_in; ++i) {
-        std::string p = "argv[" + g.to_string(i) + "]";
+        std::string p = "argv[" + str(i) + "]";
         g << "if (--argc>=0) arg[" << i << "] = "
           << g.from_mex(p, "w", offset, sparsity_in(i), fw) << "\n";
         offset += nnz_in(i);
@@ -1822,7 +1822,7 @@ namespace casadi {
           g << "if (--resc>=0) ";
         }
         // Create and get pointer
-        g << "res[" << i << "] = w+" << g.to_string(offset) << ";\n";
+        g << "res[" << i << "] = w+" << str(offset) << ";\n";
         offset += nnz_out(i);
       }
 
@@ -1833,7 +1833,7 @@ namespace casadi {
 
       // Save results
       for (int i=0; i<n_out; ++i) {
-        string res_i = "res[" + g.to_string(i) + "]";
+        string res_i = "res[" + str(i) + "]";
         g << "if (" << res_i << ") resv[" << i << "] = "
           << g.to_mex(sparsity_out(i), res_i) << "\n";
       }
@@ -1923,7 +1923,7 @@ namespace casadi {
     int f = it->second;
 
     // Construct the name
-    return g.shorthand("f" + to_string(f));
+    return g.shorthand("f" + str(f));
   }
 
   std::string FunctionInternal::eval_name() const {
@@ -1947,7 +1947,7 @@ namespace casadi {
       ind = num_f_before;
 
       // Give it a name
-      string name = "f" + CodeGenerator::to_string(ind);
+      string name = "f" + str(ind);
 
       // Print to file
       codegen(g, g.shorthand(name), true);
@@ -2408,11 +2408,11 @@ namespace casadi {
   }
 
   const SX FunctionInternal::sx_in(int ind) const {
-    return SX::sym("x_" + CodeGenerator::to_string(ind), sparsity_in(ind));
+    return SX::sym("x_" + str(ind), sparsity_in(ind));
   }
 
   const SX FunctionInternal::sx_out(int ind) const {
-    return SX::sym("r_" + CodeGenerator::to_string(ind), sparsity_out(ind));
+    return SX::sym("r_" + str(ind), sparsity_out(ind));
   }
 
   const std::vector<SX> FunctionInternal::sx_in() const {
@@ -2432,11 +2432,11 @@ namespace casadi {
   }
 
   const MX FunctionInternal::mx_in(int ind) const {
-    return MX::sym("x_" + CodeGenerator::to_string(ind), sparsity_in(ind));
+    return MX::sym("x_" + str(ind), sparsity_in(ind));
   }
 
   const MX FunctionInternal::mx_out(int ind) const {
-    return MX::sym("r_" + CodeGenerator::to_string(ind), sparsity_out(ind));
+    return MX::sym("r_" + str(ind), sparsity_out(ind));
   }
 
   const std::vector<MX> FunctionInternal::mx_in() const {

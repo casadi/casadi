@@ -31,7 +31,7 @@ namespace casadi {
 
   Function Map::create(const std::string& parallelization, const Function& f, int n) {
     // Create instance of the right class
-    string name = f.name() + "_" + to_string(n);
+    string name = f.name() + "_" + str(n);
     if (parallelization == "serial") {
       return Function::create(new Map(name, f, n), Dict());
     } else if (parallelization== "openmp") {
@@ -306,8 +306,8 @@ namespace casadi {
       g << "res1[" << j << "] = res[" << j << "] ?"
         << "res[" << j << "]+i*" << f_.nnz_out(j) << ": 0;\n";
     }
-    g << "flag = " << g(f_, "arg1", "res1",
-           "iw+i*" + to_string(sz_iw), "w+i*" + to_string(sz_w)) << " || flag;\n"
+    g << "flag = "
+      << g(f_, "arg1", "res1", "iw+i*" + str(sz_iw), "w+i*" + str(sz_w)) << " || flag;\n"
       << "}\n"
       << "if (flag) return 1;\n";
   }

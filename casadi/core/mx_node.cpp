@@ -254,7 +254,7 @@ namespace casadi {
     int& ind = nodeind[this];
 
     // If positive, already in intermediate expressions
-    if (ind>0) return "@" + CodeGenerator::to_string(ind);
+    if (ind>0) return "@" + str(ind);
 
     // Get expressions for dependencies
     vector<string> arg(n_dep());
@@ -273,7 +273,7 @@ namespace casadi {
       // Add to list of intermediate expressions and return reference
       intermed.push_back(s);
       ind = intermed.size(); // For subsequent references
-      return "@" + CodeGenerator::to_string(ind);
+      return "@" + str(ind);
     }
   }
 

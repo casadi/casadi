@@ -353,7 +353,7 @@ namespace casadi {
     // Print integer constants
     if (!integer_constants_.empty()) {
       for (int i=0; i<integer_constants_.size(); ++i) {
-        print_vector(s, "casadi_s" + to_string(i), integer_constants_[i]);
+        print_vector(s, "casadi_s" + str(i), integer_constants_[i]);
       }
       s << endl;
     }
@@ -361,7 +361,7 @@ namespace casadi {
     // Print double constants
     if (!double_constants_.empty()) {
       for (int i=0; i<double_constants_.size(); ++i) {
-        print_vector(s, "casadi_c" + to_string(i), double_constants_[i]);
+        print_vector(s, "casadi_c" + str(i), double_constants_[i]);
       }
       s << endl;
     }
@@ -385,19 +385,13 @@ namespace casadi {
     s << endl;
   }
 
-  std::string CodeGenerator::to_string(int n) {
-    stringstream ss;
-    ss << n;
-    return ss.str();
-  }
-
   std::string CodeGenerator::work(int n, int sz) const {
     if (n<0 || sz==0) {
       return "0";
     } else if (sz==1 && !this->codegen_scalars) {
-      return "(&w" + to_string(n) + ")";
+      return "(&w" + str(n) + ")";
     } else {
-      return "w" + to_string(n);
+      return "w" + str(n);
     }
   }
 
@@ -510,7 +504,7 @@ namespace casadi {
   }
 
   std::string CodeGenerator::sparsity(const Sparsity& sp) {
-    return shorthand("s" + to_string(add_sparsity(sp)));
+    return shorthand("s" + str(add_sparsity(sp)));
   }
 
   int CodeGenerator::get_sparsity(const Sparsity& sp) const {
@@ -586,11 +580,11 @@ namespace casadi {
   }
 
   std::string CodeGenerator::constant(const std::vector<int>& v) {
-    return shorthand("s" + to_string(get_constant(v, true)));
+    return shorthand("s" + str(get_constant(v, true)));
   }
 
   std::string CodeGenerator::constant(const std::vector<double>& v) {
-    return shorthand("c" + to_string(get_constant(v, true)));
+    return shorthand("c" + str(get_constant(v, true)));
   }
 
   void CodeGenerator::add_auxiliary(Auxiliary f, const vector<string>& inst) {
@@ -744,7 +738,7 @@ namespace casadi {
                                       const std::string& res, std::size_t res_off,
                                       const Sparsity& sp_res, const std::string& w) {
     // Handle offset with recursion
-    if (res_off!=0) return from_mex(arg, res+"+"+to_string(res_off), 0, sp_res, w);
+    if (res_off!=0) return from_mex(arg, res+"+"+str(res_off), 0, sp_res, w);
 
     add_auxiliary(AUX_FROM_MEX);
     stringstream s;
@@ -948,7 +942,7 @@ namespace casadi {
   std::string CodeGenerator::mv(const std::string& x, int nrow_x, int ncol_x,
                                 const std::string& y, const std::string& z, bool tr) {
     add_auxiliary(AUX_MV_DENSE);
-    return "casadi_mv_dense(" + x + ", " + to_string(nrow_x) + ", " + to_string(ncol_x) + ", "
+    return "casadi_mv_dense(" + x + ", " + str(nrow_x) + ", " + str(ncol_x) + ", "
            + y + ", " + z + ", " +  (tr ? "1" : "0") + ");";
   }
 
@@ -1049,7 +1043,7 @@ namespace casadi {
 
     // Construct map of name replacements
     std::map<std::string, std::string> rep;
-    for (int i=0; i<inst.size(); ++i) rep["T" + to_string(i+1)] = inst[i];
+    for (int i=0; i<inst.size(); ++i) rep["T" + str(i+1)] = inst[i];
     if (!suffix.empty()) rep[symbol] = symbol + suffix;
 
     // Return object

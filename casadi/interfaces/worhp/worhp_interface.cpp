@@ -110,7 +110,7 @@ namespace casadi {
         int_opts_[op.first] = op.second;
         break;
       default:
-        casadi_error("Cannot handle WORHP option \"" + op.first + "\": Unknown type " + to_string(WorhpGetParamType(ind)) + ".");
+        casadi_error("Cannot handle WORHP option \"" + op.first + "\": Unknown type " + str(WorhpGetParamType(ind)) + ".");
         break;
       }
     }

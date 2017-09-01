@@ -307,7 +307,7 @@ namespace casadi {
   }
 
   bool External::has_forward(int nfwd) const {
-    return li_.has_function("fwd" + to_string(nfwd) + "_" + name_);
+    return li_.has_function("fwd" + str(nfwd) + "_" + name_);
   }
 
   Function External
@@ -328,7 +328,7 @@ namespace casadi {
   }
 
   bool External::has_reverse(int nadj) const {
-    return li_.has_function("adj" + to_string(nadj) + "_" + name_);
+    return li_.has_function("adj" + str(nadj) + "_" + name_);
   }
 
   Function External::factory(const std::string& name,

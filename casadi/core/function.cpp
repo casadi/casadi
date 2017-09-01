@@ -415,7 +415,7 @@ namespace casadi {
     for (int iter=0; iter<n; ++iter) {
       // Stacked input expressions
       for (int i=n_accum; i<n_in; ++i) {
-        arg[i] = MX::sym(name_in(i) + "_" + to_string(i), sparsity_in(i));
+        arg[i] = MX::sym(name_in(i) + "_" + str(i), sparsity_in(i));
         varg[i].push_back(arg[i]);
       }
       // Call f
@@ -525,7 +525,7 @@ namespace casadi {
       std::vector<MX> tmp(n);
       for (int i=0; i<arg.size(); ++i) {
         for (int k=0; k<n; ++k) {
-          tmp[k] = v[k][i] = MX::sym(name_in(i)+"_"+to_string(k), sparsity_in(i));
+          tmp[k] = v[k][i] = MX::sym(name_in(i)+"_"+str(k), sparsity_in(i));
         }
         arg[i] = horzcat(tmp);
       }
@@ -538,7 +538,7 @@ namespace casadi {
         res[i] = horzcat(tmp);
       }
       // Construct function
-      return Function(name() + "_" + to_string(n), arg, res,
+      return Function(name() + "_" + str(n), arg, res,
                       name_in(), name_out());
     } else {
       // Create Map object
