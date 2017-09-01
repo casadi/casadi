@@ -1291,7 +1291,7 @@ namespace casadi {
                           "horzsplit(Sparsity, std::vector<int>): Last elements of offset "
                           "(" << offset.back() << ") must equal the number of columns "
                           "(" << x.size2() << ")");
-    casadi_assert(isMonotone(offset));
+    casadi_assert(is_monotone(offset));
 
     // Number of outputs
     int n = offset.size()-1;
@@ -1358,8 +1358,8 @@ namespace casadi {
                           "diagsplit(Sparsity, offset1, offset2): Last elements of offset2 "
                           "(" << offset2.back() << ") must equal the number of rows "
                           "(" << x.size2() << ")");
-    casadi_assert(isMonotone(offset1));
-    casadi_assert(isMonotone(offset2));
+    casadi_assert(is_monotone(offset1));
+    casadi_assert(is_monotone(offset2));
     casadi_assert(offset1.size()==offset2.size());
 
     // Number of outputs

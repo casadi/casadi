@@ -41,7 +41,7 @@ namespace casadi {
     return ret;
   }
 
-  bool isEquallySpaced(const std::vector<double> &v) {
+  bool is_equally_spaced(const std::vector<double> &v) {
     if (v.size()<=1) return true;
 
     double margin = (v[v.size()-1]-v[0])*1e-14;
@@ -58,7 +58,7 @@ namespace casadi {
   }
 
   std::vector<int> complement(const std::vector<int> &v, int size) {
-    casadi_assert_message(inBounds(v, size),
+    casadi_assert_message(in_bounds(v, size),
                           "complement: out of bounds. Some elements in v fall out of [0, size[");
     std::vector<int> lookup(size, 0);
     std::vector<int> ret;
@@ -76,7 +76,7 @@ namespace casadi {
   }
 
   std::vector<int> lookupvector(const std::vector<int> &v, int size) {
-    casadi_assert_message(inBounds(v, size),
+    casadi_assert_message(in_bounds(v, size),
                           "lookupvector: out of bounds. Some elements in v fall out of [0, size[");
     std::vector<int> lookup(size, -1);
 
@@ -87,7 +87,7 @@ namespace casadi {
   }
 
   std::vector<int> lookupvector(const std::vector<int> &v) {
-    casadi_assert(!hasNegative(v));
+    casadi_assert(!has_negative(v));
     return lookupvector(v, (*std::max_element(v.begin(), v.end()))+1);
   }
 

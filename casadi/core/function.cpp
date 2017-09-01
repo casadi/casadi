@@ -447,8 +447,8 @@ namespace casadi {
     // Shorthands
     int n_in = this->n_in(), n_out = this->n_out();
     // Consistency checks
-    casadi_assert(inBounds(accum_in, n_in) && isUnique(accum_in));
-    casadi_assert(inBounds(accum_out, n_out) && isUnique(accum_out));
+    casadi_assert(in_bounds(accum_in, n_in) && isUnique(accum_in));
+    casadi_assert(in_bounds(accum_out, n_out) && isUnique(accum_out));
     casadi_assert(accum_in.size()==accum_out.size());
     int n_accum=accum_in.size();
 

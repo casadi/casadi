@@ -62,18 +62,13 @@ namespace casadi {
 #ifndef SWIG
     /// Print a string representation of the object to a stream
     inline friend
-      std::ostream& operator<<(std::ostream &stream, const PrintableObject<Derived>& obj) {
-      static_cast<const Derived&>(obj).disp(stream, false);
+      std::ostream& operator<<(std::ostream &stream, const Derived& obj) {
+      obj.disp(stream, false);
       return stream;
     }
 
-    /// Get string representation
-    inline friend std::string str(const PrintableObject<Derived>& obj, bool more=false) {
-      return obj.get_str(more);
-    }
-
     /// Get string representation with type information
-    inline friend std::string repr(const PrintableObject<Derived>& obj) {
+    inline friend std::string repr(const Derived& obj) {
       return obj.get_repr();
     }
 #endif // SWIG

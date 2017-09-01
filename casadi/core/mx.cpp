@@ -239,13 +239,13 @@ namespace casadi {
     int sz1 = size1(), sz2 = size2();
 
     // Report out-of-bounds
-    if (!inBounds(rr.nonzeros(), -sz1+ind1, sz1+ind1)) {
+    if (!in_bounds(rr.nonzeros(), -sz1+ind1, sz1+ind1)) {
       casadi_error("set[., rr, cc] out of bounds. Your rr contains "
                    << *std::min_element(rr->begin(), rr->end()) << " up to "
                    << *std::max_element(rr->begin(), rr->end())
                    << ", which is outside the range [" << -sz1+ind1 << ","<< sz1+ind1 <<  ").");
     }
-    if (!inBounds(cc.nonzeros(), -sz2+ind1, sz2+ind1)) {
+    if (!in_bounds(cc.nonzeros(), -sz2+ind1, sz2+ind1)) {
       casadi_error("set [., rr, cc] out of bounds. Your cc contains "
                    << *std::min_element(cc->begin(), cc->end()) << " up to "
                    << *std::max_element(cc->begin(), cc->end())
@@ -314,7 +314,7 @@ namespace casadi {
     if (rrsz==0) return;
 
     // Check bounds
-    if (!inBounds(rr.nonzeros(), -nel+ind1, nel+ind1)) {
+    if (!in_bounds(rr.nonzeros(), -nel+ind1, nel+ind1)) {
       casadi_error("set[rr] out of bounds. Your rr contains "
                    << *std::min_element(rr->begin(), rr->end()) << " up to "
                    << *std::max_element(rr->begin(), rr->end())
@@ -379,7 +379,7 @@ namespace casadi {
 
     // Check bounds
     int sz = nnz();
-    if (!inBounds(kk.nonzeros(), -sz+ind1, sz+ind1)) {
+    if (!in_bounds(kk.nonzeros(), -sz+ind1, sz+ind1)) {
       casadi_error("get_nz[kk] out of bounds. Your kk contains "
                    << *std::min_element(kk->begin(), kk->end()) << " up to "
                    << *std::max_element(kk->begin(), kk->end())
@@ -443,7 +443,7 @@ namespace casadi {
 
     // Check bounds
     int sz = nnz();
-    if (!inBounds(kk.nonzeros(), -sz+ind1, sz+ind1)) {
+    if (!in_bounds(kk.nonzeros(), -sz+ind1, sz+ind1)) {
       casadi_error("set_nz[kk] out of bounds. Your kk contains "
                    << *std::min_element(kk->begin(), kk->end()) << " up to "
                    << *std::max_element(kk->begin(), kk->end())
@@ -1008,7 +1008,7 @@ namespace casadi {
     casadi_assert(offset.size()>=1);
     casadi_assert(offset.front()==0);
     casadi_assert(offset.back()==x.size2());
-    casadi_assert(isMonotone(offset));
+    casadi_assert(is_monotone(offset));
 
     // Trivial return if possible
     if (offset.size()==1) {
@@ -1026,13 +1026,13 @@ namespace casadi {
     casadi_assert(offset1.size()>=1);
     casadi_assert(offset1.front()==0);
     casadi_assert(offset1.back()==x.size1());
-    casadi_assert(isMonotone(offset1));
+    casadi_assert(is_monotone(offset1));
 
     // Consistency check
     casadi_assert(offset2.size()>=1);
     casadi_assert(offset2.front()==0);
     casadi_assert(offset2.back()==x.size2());
-    casadi_assert(isMonotone(offset2));
+    casadi_assert(is_monotone(offset2));
 
     return x->get_diagsplit(offset1, offset2);
   }
@@ -1043,7 +1043,7 @@ namespace casadi {
       casadi_assert(offset.size()>=1);
       casadi_assert(offset.front()==0);
       casadi_assert(offset.back()==x.size1());
-      casadi_assert(isMonotone(offset));
+      casadi_assert(is_monotone(offset));
 
       // Trivial return if possible
       if (offset.size()==1) {

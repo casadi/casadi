@@ -67,7 +67,7 @@ namespace casadi {
           std::vector<double> grid(
               knots_.begin()+offset_[i]+degree_[i],
               knots_.begin()+offset_[i+1]-degree_[i]);
-          casadi_assert(isIncreasing(grid) && isEquallySpaced(grid));
+          casadi_assert(is_increasing(grid) && is_equally_spaced(grid));
         } else {
           casadi_error("Unknown lookup_mode option '" + lookup_mode[i] + ". "
                        "Allowed values: linear, exact.");

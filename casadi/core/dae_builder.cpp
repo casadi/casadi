@@ -42,18 +42,6 @@
 using namespace std;
 namespace casadi {
 
-  inline string str(const vector<MX>& v) {
-    // TODO(@jaeandersson) Move to std_vector_tools.hpp
-    stringstream s;
-    s << "[";
-    for (int i=0; i<v.size(); ++i) {
-      if (i>0) s << ", ";
-      s << str(v[i]);
-    }
-    s << "]";
-    return s.str();
-  }
-
   DaeBuilder::DaeBuilder() {
     this->t = MX::sym("t");
   }
