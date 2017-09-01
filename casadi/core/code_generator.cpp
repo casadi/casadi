@@ -1060,7 +1060,7 @@ namespace casadi {
     string line;
     istringstream stream(src);
     while (std::getline(stream, line)) {
-      size_t n1, n2;
+      size_t n1;
 
       // C++ template declaration
       if (line.find("template")==0) {
