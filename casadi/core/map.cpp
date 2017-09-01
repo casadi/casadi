@@ -254,12 +254,15 @@ namespace casadi {
     size_t sz_arg, sz_res, sz_iw, sz_w;
     f_.sz_work(sz_arg, sz_res, sz_iw, sz_w);
 
+    // Error flag
+    int flag = 0;
+
     // Checkout memory objects
     int* ind = iw; iw += n_;
     for (int i=0; i<n_; ++i) ind[i] = f_.checkout();
 
     // Evaluate in parallel
-#pragma omp parallel for
+#pragma omp parallel for reduction(||:flag)
     for (int i=0; i<n_; ++i) {
       // Input buffers
       const double** arg1 = arg + n_in + i*sz_arg;
@@ -274,12 +277,13 @@ namespace casadi {
       }
 
       // Evaluation
-      if (f_(arg1, res1, iw + i*sz_iw, w + i*sz_w, ind[i])) return 1;
+      flag = f_(arg1, res1, iw + i*sz_iw, w + i*sz_w, ind[i]) || flag;
     }
     // Release memory objects
     for (int i=0; i<n_; ++i) f_.release(ind[i]);
+    // Return error flag
+    return flag;
 #endif  // WITH_OPENMP
-    return 0;
   }
 
   void MapOmp::codegen_body(CodeGenerator& g) const {
@@ -289,7 +293,8 @@ namespace casadi {
     g << "int i;\n"
       << "const double** arg1;\n"
       << "double** res1;\n"
-      << "#pragma omp parallel for private(i,arg1,res1)\n"
+      << "int flag = 0;\n"
+      << "#pragma omp parallel for private(i,arg1,res1) reduction(||:flag)\n"
       << "for (i=0; i<" << n_ << "; ++i) {\n"
       << "arg1 = arg + " << n_in << "+i*" << sz_arg << ";\n";
     for (int j=0; j<n_in; ++j) {
@@ -301,9 +306,10 @@ namespace casadi {
       g << "res1[" << j << "] = res[" << j << "] ?"
         << "res[" << j << "]+i*" << f_.nnz_out(j) << ": 0;\n";
     }
-    g << g(f_, "arg1", "res1",
-           "iw+i*" + to_string(sz_iw), "w+i*" + to_string(sz_w)) << ";\n"
-      << "}\n";
+    g << "flag = " << g(f_, "arg1", "res1",
+           "iw+i*" + to_string(sz_iw), "w+i*" + to_string(sz_w)) << " || flag;\n"
+      << "}\n"
+      << "if (flag) return 1;\n";
   }
 
   void MapOmp::init(const Dict& opts) {
