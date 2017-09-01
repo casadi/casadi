@@ -274,11 +274,12 @@ namespace casadi {
       }
 
       // Evaluation
-      f_(arg1, res1, iw + i*sz_iw, w + i*sz_w, ind[i]);
+      if (f_(arg1, res1, iw + i*sz_iw, w + i*sz_w, ind[i])) return 1;
     }
     // Release memory objects
     for (int i=0; i<n_; ++i) f_.release(ind[i]);
 #endif  // WITH_OPENMP
+    return 0;
   }
 
   void MapOmp::codegen_body(CodeGenerator& g) const {
