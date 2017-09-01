@@ -35,7 +35,7 @@ namespace casadi {
     set_sparsity(repmat(x.sparsity(), 1, n));
   }
 
-  std::string HorzRepmat::print(const std::vector<std::string>& arg) const {
+  std::string HorzRepmat::disp(const std::vector<std::string>& arg) const {
     std::stringstream ss;
     ss << "repmat("  << arg.at(0) << ", " << n_ << ")";
     return ss.str();
@@ -115,7 +115,7 @@ namespace casadi {
     set_sparsity(block);
   }
 
-  std::string HorzRepsum::print(const std::vector<std::string>& arg) const {
+  std::string HorzRepsum::disp(const std::vector<std::string>& arg) const {
     std::stringstream ss;
     ss << "repsum("  << arg.at(0) << ", " << n_ << ")";
     return ss.str();

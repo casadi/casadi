@@ -32,7 +32,7 @@ namespace casadi {
     set_sparsity(A.sparsity());
   }
 
-  std::string Rank1::print(const std::vector<std::string>& arg) const {
+  std::string Rank1::disp(const std::vector<std::string>& arg) const {
     return "rank1(" + arg.at(0) + ", " + arg.at(1)
       + ", " + arg.at(2) + ", " + arg.at(3) + ")";
   }

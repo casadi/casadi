@@ -72,7 +72,7 @@ namespace casadi {
     casadi_error("child() not defined for class " << typeid(*this).name());
   }
 
-  void SXNode::print(std::ostream &stream, bool more) const {
+  void SXNode::disp(std::ostream& stream, bool more) const {
     // Find out which noded can be inlined
     std::map<const SXNode*, int> nodeind;
     can_inline(nodeind);
@@ -133,7 +133,7 @@ namespace casadi {
     }
 
     // Get expression for this
-    string s = print(arg[0], arg[1]);
+    string s = disp(arg[0], arg[1]);
 
     // Decide what to do with the expression
     if (ind==0) {

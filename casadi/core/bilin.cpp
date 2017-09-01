@@ -33,7 +33,7 @@ namespace casadi {
     set_sparsity(Sparsity::scalar());
   }
 
-  std::string Bilin::print(const std::vector<std::string>& arg) const {
+  std::string Bilin::disp(const std::vector<std::string>& arg) const {
     return "bilin(" + arg.at(0) + ", " + arg.at(1) + ", " + arg.at(2) + ")";
   }
 

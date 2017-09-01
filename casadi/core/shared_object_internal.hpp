@@ -59,7 +59,7 @@ namespace casadi {
     virtual std::string class_name() const = 0;
 
     /// Print a description of the object
-    virtual void print(std::ostream &stream, bool more) const = 0;
+    virtual void disp(std::ostream& stream, bool more) const = 0;
 
     /** \brief Get a weak reference to the object */
     WeakRef* weak();
@@ -107,7 +107,7 @@ namespace casadi {
     std::string class_name() const override {return "WeakRefInternal";}
 
     /// Print a description of the object
-    void print(std::ostream &stream, bool more) const override;
+    void disp(std::ostream& stream, bool more) const override;
 
     // Raw pointer to the cached object
     SharedObjectInternal* raw_;

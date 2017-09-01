@@ -1247,7 +1247,7 @@ namespace casadi {
   }
 
   std::string MX::print_operator(const MX& x, const std::vector<std::string>& args) {
-    return x->print(args);
+    return x->disp(args);
   }
 
   void MX::substitute_inplace(const std::vector<MX>& v, std::vector<MX>& vdef,

@@ -364,7 +364,7 @@ namespace casadi {
     // Make sure that there are no free variables
     if (!free_vars_.empty()) {
       std::stringstream ss;
-      print(ss, false);
+      disp(ss, false);
       casadi_error("Cannot evaluate \"" << ss.str() << "\" since variables "
                    << free_vars_ << " are free.");
     }
@@ -406,7 +406,7 @@ namespace casadi {
     return 0;
   }
 
-  string MXFunction::print(const AlgEl& el) const {
+  string MXFunction::disp(const AlgEl& el) const {
     stringstream s;
     if (el.op==OP_OUTPUT) {
       s << "output[" << el.data->ind() << "][" << el.data->segment() << "]"
@@ -418,7 +418,7 @@ namespace casadi {
       vector<string> arg(2);
       arg[0] = "@" + CodeGenerator::to_string(el.res.front());
       arg[1] = "@" + CodeGenerator::to_string(el.arg.at(1));
-      s << el.data->print(arg);
+      s << el.data->disp(arg);
     } else {
       if (el.res.size()==1) {
         s << "@" << el.res.front() << " = ";
@@ -445,16 +445,16 @@ namespace casadi {
           }
         }
       }
-      s << el.data->print(arg);
+      s << el.data->disp(arg);
     }
     return s.str();
   }
 
-  void MXFunction::print(ostream &stream, bool more) const {
-    FunctionInternal::print(stream, more);
+  void MXFunction::disp(ostream &stream, bool more) const {
+    FunctionInternal::disp(stream, more);
     for (auto&& e : algorithm_) {
       InterruptHandler::check();
-      stream << print(e) << endl;
+      stream << disp(e) << endl;
     }
   }
 
@@ -1126,7 +1126,7 @@ namespace casadi {
     for (auto&& e : algorithm_) {
       // Generate comment
       if (g.verbose) {
-        g << "/* #" << k++ << ": " << print(e) << " */\n";
+        g << "/* #" << k++ << ": " << disp(e) << " */\n";
       }
 
       // Get the names of the operation arguments

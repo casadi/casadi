@@ -90,7 +90,7 @@ namespace casadi {
     int eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;
 
     /** \brief  Print description */
-    void print(std::ostream &stream, bool more) const override;
+    void disp(std::ostream& stream, bool more) const override;
 
     /** \brief Get type name */
     std::string class_name() const override {return "MXFunction";}
@@ -154,7 +154,7 @@ namespace casadi {
     int sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) const override;
 
     // print an element of an algorithm
-    std::string print(const AlgEl& el) const;
+    std::string disp(const AlgEl& el) const;
 
     ///@{
     /** \brief Get function input(s) and output(s)  */

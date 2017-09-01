@@ -403,7 +403,7 @@ namespace casadi {
     virtual void jit_dependencies(const std::string& fname) {}
 
     /** \brief  Print */
-    void print(std::ostream &stream, bool more) const override;
+    void disp(std::ostream& stream, bool more) const override;
 
     /** \brief Get function signature: name:(inputs)->(outputs) */
     std::string definition() const;

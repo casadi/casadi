@@ -130,7 +130,7 @@ namespace casadi {
     alloc_w(nx_); // for fetching diagonal entries form Hessian
   }
 
-  void worhp_print(int mode, const char message[]) {
+  void worhp_disp(int mode, const char message[]) {
     if (mode & WORHP_PRINT_MESSAGE) {
       userOut() << message << std::endl;
     }

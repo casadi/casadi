@@ -1072,9 +1072,9 @@ namespace casadi {
     static inline int ndeps(unsigned char op);
 
     /** \brief Print */
-    static inline std::string print(unsigned char op, const std::string& x,
+    static inline std::string disp(unsigned char op, const std::string& x,
                              const std::string& y);
-    static inline std::string print(unsigned char op, const std::string& x);
+    static inline std::string disp(unsigned char op, const std::string& x);
     static inline std::string name(unsigned char op);
     static inline std::string pre(unsigned char op);
     static inline std::string sep(unsigned char op);
@@ -1141,12 +1141,12 @@ namespace casadi {
     }
 
     /** \brief Print */
-    static inline std::string print(unsigned char op, const std::string& x,
+    static inline std::string disp(unsigned char op, const std::string& x,
                                     const std::string& y) {
-      return casadi_math<double>::print(op, x, y);
+      return casadi_math<double>::disp(op, x, y);
     }
-    static inline std::string print(unsigned char op, const std::string& x) {
-      return casadi_math<double>::print(op, x);
+    static inline std::string disp(unsigned char op, const std::string& x) {
+      return casadi_math<double>::disp(op, x);
     }
     static inline std::string pre(unsigned char op) {
       return casadi_math<double>::pre(op);
@@ -1401,7 +1401,7 @@ namespace casadi {
 
   template<typename T>
   inline std::string
-  casadi_math<T>::print(unsigned char op,
+  casadi_math<T>::disp(unsigned char op,
                         const std::string& x, const std::string& y) {
     casadi_assert(ndeps(op)==2);
     return pre(op) + x + sep(op) + y + post(op);
@@ -1409,7 +1409,7 @@ namespace casadi {
 
   template<typename T>
   inline std::string
-  casadi_math<T>::print(unsigned char op, const std::string& x) {
+  casadi_math<T>::disp(unsigned char op, const std::string& x) {
     casadi_assert(ndeps(op)==1);
     return pre(op) + x + post(op);
   }

@@ -72,7 +72,7 @@ namespace casadi {
     set_sparsity(Sparsity::scalar());
   }
 
-  std::string Call::print(const std::vector<std::string>& arg) const {
+  std::string Call::disp(const std::vector<std::string>& arg) const {
     stringstream ss;
     ss << fcn_.name() << "(";
     for (int i=0; i<n_dep(); ++i) {

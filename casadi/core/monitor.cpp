@@ -35,7 +35,7 @@ namespace casadi {
     set_sparsity(x.sparsity());
   }
 
-  std::string Monitor::print(const std::vector<std::string>& arg) const {
+  std::string Monitor::disp(const std::vector<std::string>& arg) const {
     return "monitor(" + arg.at(0) + ", " + comment_ + ")";
   }
 

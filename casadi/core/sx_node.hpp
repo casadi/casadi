@@ -96,7 +96,7 @@ namespace casadi {
     virtual bool is_smooth() const { return true; }
 
     /** \brief  print */
-    virtual void print(std::ostream &stream, bool more) const;
+    virtual void disp(std::ostream& stream, bool more) const;
 
     /** \brief Find out which nodes can be inlined */
     void can_inline(std::map<const SXNode*, int>& nodeind) const;
@@ -106,7 +106,7 @@ namespace casadi {
                              std::vector<std::string>& intermed) const;
 
     /** \brief  Print expression */
-    virtual std::string print(const std::string& arg1, const std::string& arg2) const = 0;
+    virtual std::string disp(const std::string& arg1, const std::string& arg2) const = 0;
 
     // Check if marked (i.e. temporary is negative)
     bool marked() const;

@@ -44,7 +44,7 @@ namespace casadi {
     ~Project() override {}
 
     /** \brief  Print expression */
-    std::string print(const std::vector<std::string>& arg) const override;
+    std::string disp(const std::vector<std::string>& arg) const override;
 
     /// Evaluate the function (template)
     template<typename T>

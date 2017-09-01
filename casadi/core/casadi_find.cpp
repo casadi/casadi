@@ -35,7 +35,7 @@ namespace casadi {
     set_sparsity(Sparsity::scalar());
   }
 
-  std::string Find::print(const std::vector<std::string>& arg) const {
+  std::string Find::disp(const std::vector<std::string>& arg) const {
     return "find(" + arg.at(0) + ")";
   }
 

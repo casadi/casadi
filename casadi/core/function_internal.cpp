@@ -424,7 +424,7 @@ namespace casadi {
     return s.str();
   }
 
-  void FunctionInternal::print(ostream &stream, bool more) const {
+  void FunctionInternal::disp(ostream &stream, bool more) const {
     stream << definition();
   }
 

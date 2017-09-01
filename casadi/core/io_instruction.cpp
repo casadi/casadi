@@ -33,7 +33,7 @@ namespace casadi {
     set_sparsity(sp);
   }
 
-  string Input::print(const vector<string>& arg) const {
+  string Input::disp(const vector<string>& arg) const {
     stringstream s;
     s << "input[" << ind_ << "][" << segment_ << "]";
     return s.str();
@@ -60,7 +60,7 @@ namespace casadi {
     set_dep(x);
   }
 
-  string Output::print(const vector<string>& arg) const {
+  string Output::disp(const vector<string>& arg) const {
     stringstream s;
     s << "output[" << ind_ << "][" << segment_ << "]";
     return s.str();

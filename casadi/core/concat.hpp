@@ -105,7 +105,7 @@ namespace casadi {
     ~Horzcat() override {}
 
     /** \brief  Print expression */
-    std::string print(const std::vector<std::string>& arg) const override;
+    std::string disp(const std::vector<std::string>& arg) const override;
 
     /** \brief  Evaluate symbolically (MX) */
     void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
@@ -145,7 +145,7 @@ namespace casadi {
     ~Vertcat() override {}
 
     /** \brief  Print expression */
-    std::string print(const std::vector<std::string>& arg) const override;
+    std::string disp(const std::vector<std::string>& arg) const override;
 
     /** \brief  Evaluate symbolically (MX) */
     void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
@@ -185,7 +185,7 @@ namespace casadi {
     ~Diagcat() override {}
 
     /** \brief  Print expression */
-    std::string print(const std::vector<std::string>& arg) const override;
+    std::string disp(const std::vector<std::string>& arg) const override;
 
     /** \brief  Evaluate symbolically (MX) */
     void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;

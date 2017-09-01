@@ -38,7 +38,7 @@ namespace casadi {
     set_sparsity(sp);
   }
 
-  std::string SymbolicMX::print(const std::vector<std::string>& arg) const {
+  std::string SymbolicMX::disp(const std::vector<std::string>& arg) const {
     return name_;
   }
 

@@ -39,7 +39,7 @@ namespace casadi {
 
   const std::string XmlFileInternal::infix_ = "xmlfile";
 
-  void XmlFileInternal::print(ostream &stream, bool more) const {
+  void XmlFileInternal::disp(ostream &stream, bool more) const {
   }
 
   XmlNode XmlFileInternal::parse(const std::string& filename) {

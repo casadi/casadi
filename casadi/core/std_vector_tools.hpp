@@ -106,7 +106,7 @@ namespace casadi {
 
   /// Print description
   template<typename T>
-  void print(const std::vector<T> &v, std::ostream &stream, bool more=false);
+  void disp(const std::vector<T> &v, std::ostream &stream, bool more=false);
 
   #endif // SWIG
 
@@ -297,7 +297,7 @@ namespace std {
   /// Enables flushing an std::vector to a stream (prints representation)
   template<typename T>
   ostream& operator<<(ostream &stream, const vector<T> &v) {
-    casadi::print(v, stream);
+    casadi::disp(v, stream);
     return stream;
   }
 
@@ -362,7 +362,7 @@ namespace casadi {
   }
 
   template<typename T>
-  void print(const std::vector<T> &v, std::ostream &stream, bool more) {
+  void disp(const std::vector<T> &v, std::ostream &stream, bool more) {
     if (v.empty()) {
       stream << "[]";
     } else {
@@ -474,14 +474,14 @@ namespace casadi {
   template<typename T>
   std::string repr(const std::vector<T> &v) {
     std::stringstream ss;
-    print(v, ss, false);
+    disp(v, ss, false);
     return ss.str();
   }
 
   template<typename T>
   std::string str(const std::vector<T> &v, bool more=false) {
     std::stringstream ss;
-    print(v, ss, more);
+    disp(v, ss, more);
     return ss.str();
   }
 

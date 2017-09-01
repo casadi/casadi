@@ -193,19 +193,19 @@ namespace casadi {
     return 0;
   }
 
-  std::string GetNonzerosVector::print(const std::vector<std::string>& arg) const {
+  std::string GetNonzerosVector::disp(const std::vector<std::string>& arg) const {
     stringstream ss;
     ss << arg.at(0) << nz_;
     return ss.str();
   }
 
-  std::string GetNonzerosSlice::print(const std::vector<std::string>& arg) const {
+  std::string GetNonzerosSlice::disp(const std::vector<std::string>& arg) const {
     stringstream ss;
     ss << arg.at(0) << "[" << s_ << "]";
     return ss.str();
   }
 
-  std::string GetNonzerosSlice2::print(const std::vector<std::string>& arg) const {
+  std::string GetNonzerosSlice2::disp(const std::vector<std::string>& arg) const {
     stringstream ss;
     ss << arg.at(0) << "[" << outer_ << ";" << inner_ << "]";
     return ss.str();

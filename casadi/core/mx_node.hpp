@@ -84,7 +84,7 @@ namespace casadi {
                              std::vector<std::string>& intermed) const;
 
     /** \brief  Print expression */
-    virtual std::string print(const std::vector<std::string>& arg) const = 0;
+    virtual std::string disp(const std::vector<std::string>& arg) const = 0;
 
     /** \brief Add a dependent function */
     virtual void add_dependency(CodeGenerator& g) const {}
@@ -135,7 +135,7 @@ namespace casadi {
     virtual std::string class_name() const override;
 
     /** \brief  Print a description */
-    void print(std::ostream &stream, bool more) const override;
+    void disp(std::ostream& stream, bool more) const override;
 
     /** \brief  Check if valid function input */
     virtual bool is_valid_input() const { return false;}

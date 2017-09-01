@@ -146,7 +146,7 @@ namespace casadi {
     set_sparsity(diagcat(sp));
   }
 
-  std::string Diagcat::print(const std::vector<std::string>& arg) const {
+  std::string Diagcat::disp(const std::vector<std::string>& arg) const {
     stringstream ss;
     ss << "diagcat(" << arg.at(0);
     for (int i=1; i<n_dep(); ++i) ss << ", " << arg.at(i);
@@ -199,7 +199,7 @@ namespace casadi {
     set_sparsity(horzcat(sp));
   }
 
-  std::string Horzcat::print(const std::vector<std::string>& arg) const {
+  std::string Horzcat::disp(const std::vector<std::string>& arg) const {
     stringstream ss;
     ss << "horzcat(" << arg.at(0);
     for (int i=1; i<n_dep(); ++i) ss << ", " << arg.at(i);
@@ -250,7 +250,7 @@ namespace casadi {
     set_sparsity(vertcat(sp));
   }
 
-  std::string Vertcat::print(const std::vector<std::string>& arg) const {
+  std::string Vertcat::disp(const std::vector<std::string>& arg) const {
     stringstream ss;
     ss << "vertcat(" << arg.at(0);
     for (int i=1; i<n_dep(); ++i) ss << ", " << arg.at(i);

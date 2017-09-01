@@ -167,7 +167,7 @@ namespace casadi {
     return 0;
   }
 
-  std::string Transpose::print(const std::vector<std::string>& arg) const {
+  std::string Transpose::disp(const std::vector<std::string>& arg) const {
     return arg.at(0) + "'";
   }
 

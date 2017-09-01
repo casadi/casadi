@@ -78,7 +78,7 @@ namespace casadi {
                   const std::vector<int>& arg, const std::vector<int>& res) const override;
 
     /** \brief  Print expression */
-    std::string print(const std::vector<std::string>& arg) const override;
+    std::string disp(const std::vector<std::string>& arg) const override;
 
     /** \brief Get the operation */
     int op() const override { return OP_BILIN;}

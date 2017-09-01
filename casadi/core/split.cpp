@@ -133,7 +133,7 @@ namespace casadi {
     }
   }
 
-  std::string Horzsplit::print(const std::vector<std::string>& arg) const {
+  std::string Horzsplit::disp(const std::vector<std::string>& arg) const {
     return "horzsplit(" + arg.at(0) + ")";
   }
 
@@ -201,7 +201,7 @@ namespace casadi {
       "DiagSplit:: the presence of nonzeros outside the diagonal blocks in unsupported.");
   }
 
-  std::string Diagsplit::print(const std::vector<std::string>& arg) const {
+  std::string Diagsplit::disp(const std::vector<std::string>& arg) const {
     return "diagsplit(" + arg.at(0) + ")";
   }
 
@@ -275,7 +275,7 @@ namespace casadi {
     }
   }
 
-  std::string Vertsplit::print(const std::vector<std::string>& arg) const {
+  std::string Vertsplit::disp(const std::vector<std::string>& arg) const {
     return "vertsplit(" + arg.at(0) + ")";
   }
 

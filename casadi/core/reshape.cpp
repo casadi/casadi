@@ -60,7 +60,7 @@ namespace casadi {
     return 0;
   }
 
-  std::string Reshape::print(const std::vector<std::string>& arg) const {
+  std::string Reshape::disp(const std::vector<std::string>& arg) const {
     // For vectors, reshape is also a transpose
     if (dep().is_vector() && sparsity().is_vector()) {
       // Print as transpose: X'

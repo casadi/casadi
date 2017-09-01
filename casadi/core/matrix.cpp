@@ -812,7 +812,7 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  void Matrix<Scalar>::print(std::ostream &stream, bool more) const {
+  void Matrix<Scalar>::disp(std::ostream& stream, bool more) const {
     if (is_empty()) {
       stream << "[]";
     } else if (numel()==1) {
@@ -1236,7 +1236,7 @@ namespace casadi {
 
     if (!(x.size2() == y.size2() && x.size1() == y.size1())) {
       std::stringstream ss;
-      ss << casadi_math<Scalar>::print(op, "lhs", "rhs");
+      ss << casadi_math<Scalar>::disp(op, "lhs", "rhs");
       casadi_error("matrix_matrix: dimension mismatch in element-wise matrix operation "
                    << ss.str() <<"." << std::endl << "Left argument has shape " << x.dim()
                    << ", right has shape " << y.dim() << ". They should be equal.");
@@ -3390,9 +3390,9 @@ namespace casadi {
     casadi_assert_message(ndeps==1 || ndeps==2, "Not a unary or binary operator");
     casadi_assert_message(args.size()==ndeps, "Wrong number of arguments");
     if (ndeps==1) {
-      return casadi_math<double>::print(x.op(), args.at(0));
+      return casadi_math<double>::disp(x.op(), args.at(0));
     } else {
-      return casadi_math<double>::print(x.op(), args.at(0), args.at(1));
+      return casadi_math<double>::disp(x.op(), args.at(0), args.at(1));
     }
   }
 

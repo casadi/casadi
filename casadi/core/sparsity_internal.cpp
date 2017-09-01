@@ -109,7 +109,7 @@ namespace casadi {
     }
   }
 
-  void SparsityInternal::print(ostream &stream, bool more) const {
+  void SparsityInternal::disp(ostream &stream, bool more) const {
     print_compact(stream);
     if (more) {
       stream << endl;

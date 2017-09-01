@@ -73,7 +73,7 @@ namespace casadi {
     int sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const override;
 
     /** \brief  Print expression */
-    std::string print(const std::vector<std::string>& arg) const override;
+    std::string disp(const std::vector<std::string>& arg) const override;
 
     /** \brief Generate code for the operation */
     void generate(CodeGenerator& g,

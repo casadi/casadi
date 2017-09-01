@@ -43,61 +43,40 @@ namespace casadi {
   template<class Derived>
   class CASADI_EXPORT PrintableObject {
   public:
-
-    /// Print a representation of the object
-    void repr(std::ostream &stream) const {
-      stream << static_cast<const Derived*>(this)->type_name() << "(";
-      static_cast<const Derived*>(this)->print(stream, false);
-      stream << ")";
-      stream << std::flush;
-    }
-
-    /// Return a string with a description (for SWIG)
+    /// Get string representation
     std::string get_str(bool more=false) const {
       std::stringstream ss;
-      static_cast<const Derived*>(this)->print(ss, more);
+      static_cast<const Derived*>(this)->disp(ss, more);
       return ss.str();
     }
 
-    /// Return a string with a representation (for SWIG)
+    /// Get string representation with type information
     std::string get_repr() const {
       std::stringstream ss;
-      repr(ss);
+      ss << static_cast<const Derived*>(this)->type_name() << "(";
+      static_cast<const Derived*>(this)->disp(ss, false);
+      ss << ")";
       return ss.str();
     }
 
 #ifndef SWIG
-    /// Print a representation of the object to a stream (shorthand)
+    /// Print a string representation of the object to a stream
     inline friend
       std::ostream& operator<<(std::ostream &stream, const PrintableObject<Derived>& obj) {
-      static_cast<const Derived&>(obj).print(stream, false);
+      static_cast<const Derived&>(obj).disp(stream, false);
       return stream;
     }
 
-    /// Get string
+    /// Get string representation
     inline friend std::string str(const PrintableObject<Derived>& obj, bool more=false) {
       return obj.get_str(more);
     }
 
-#endif // SWIG
-/**
-\ingroup expression_tools
-@{
-*/
-
-#if !defined(SWIG) || defined(DOXYGEN)
-    /// Return a string with a description of the object, cf. str(Object) in Python
-    inline friend std::string str(const PrintableObject<Derived>& obj) {
-      return obj.get_str();
-    }
-
-    /// Return a string with a representation of the object, cf. repr(Object) in Python
+    /// Get string representation with type information
     inline friend std::string repr(const PrintableObject<Derived>& obj) {
       return obj.get_repr();
     }
-/** @} */
-#endif //
-
+#endif // SWIG
   };
 } // namespace casadi
 

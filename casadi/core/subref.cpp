@@ -57,7 +57,7 @@ namespace casadi {
     return 1;
   }
 
-  std::string SubRef::print(const std::vector<std::string>& arg) const {
+  std::string SubRef::disp(const std::vector<std::string>& arg) const {
     stringstream ss;
     ss << arg.at(0) << "[" << i_ << ", " << j_ << "]";
     return ss.str();

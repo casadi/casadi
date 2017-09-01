@@ -54,7 +54,7 @@ namespace casadi {
     p_[3] = p3;
   }
 
-  void Polynomial::print(std::ostream &stream, bool more) const {
+  void Polynomial::disp(std::ostream& stream, bool more) const {
     if (more) {
       for (int d=0; d<p_.size(); ++d) {
         if (d==0) {

@@ -36,7 +36,7 @@ namespace casadi {
     set_sparsity(Sparsity::dense(x.size1(), x.size2()));
   }
 
-  std::string Inverse::print(const std::vector<std::string>& arg) const {
+  std::string Inverse::disp(const std::vector<std::string>& arg) const {
     return "inv(" + arg.at(0) + ")";
   }
 

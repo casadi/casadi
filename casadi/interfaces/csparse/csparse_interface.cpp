@@ -135,7 +135,7 @@ namespace casadi {
             " sprank: " << sprank(temp.sparsity()) << " <-> " << temp.size2() << endl;
         if (verbose()) {
           ss << "Sparsity of the linear system: " << endl;
-          sp.print(ss, true); // print detailed
+          sp.disp(ss, true); // print detailed
         }
         throw CasadiException(ss.str());
       } else {
@@ -144,7 +144,7 @@ namespace casadi {
            << endl;
         if (verbose()) {
           ss << "Sparsity of the linear system: " << endl;
-          sp.print(ss, true); // print detailed
+          sp.disp(ss, true); // print detailed
         }
         throw CasadiException(ss.str());
       }

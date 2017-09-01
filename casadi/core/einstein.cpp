@@ -48,7 +48,7 @@ namespace casadi {
 
   }
 
-  std::string Einstein::print(const std::vector<std::string>& arg) const {
+  std::string Einstein::disp(const std::vector<std::string>& arg) const {
     return "einstein(" + arg.at(0) + "," + arg.at(1) + "," + arg.at(2) + ")";
   }
 

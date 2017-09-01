@@ -134,7 +134,7 @@ namespace casadi {
     ~ConstantDM() override {}
 
     /** \brief  Print expression */
-    std::string print(const std::vector<std::string>& arg) const override {
+    std::string disp(const std::vector<std::string>& arg) const override {
       return x_.get_str();
     }
 
@@ -195,7 +195,7 @@ namespace casadi {
     }
 
     /** \brief  Print expression */
-    std::string print(const std::vector<std::string>& arg) const override;
+    std::string disp(const std::vector<std::string>& arg) const override;
 
     /** \brief  Evaluate the function numerically */
     /// Evaluate the function numerically
@@ -276,7 +276,7 @@ namespace casadi {
     ~Constant() override {}
 
     /** \brief  Print expression */
-    std::string print(const std::vector<std::string>& arg) const override;
+    std::string disp(const std::vector<std::string>& arg) const override;
 
     /** \brief  Evaluate the function numerically */
     /// Evaluate the function numerically
@@ -530,7 +530,7 @@ namespace casadi {
 
   template<typename Value>
   std::string
-  Constant<Value>::print(const std::vector<std::string>& arg) const {
+  Constant<Value>::disp(const std::vector<std::string>& arg) const {
     std::stringstream ss;
     if (sparsity().is_scalar()) {
       // Print scalar

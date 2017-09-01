@@ -158,8 +158,8 @@ class BinarySX : public SXNode {
     int op() const override { return op_;}
 
     /** \brief  Print expression */
-    std::string print(const std::string& arg1, const std::string& arg2) const override {
-      return casadi_math<double>::print(op_, arg1, arg2);
+    std::string disp(const std::string& arg1, const std::string& arg2) const override {
+      return casadi_math<double>::disp(op_, arg1, arg2);
     }
 
     /** \brief  The binary operation as an 1 byte integer (allows 256 values) */

@@ -55,7 +55,7 @@ public:
 protected:
 
   /** \brief  Print expression */
-  std::string print(const std::string& arg1, const std::string& arg2) const override {
+  std::string disp(const std::string& arg1, const std::string& arg2) const override {
     return name_;
   }
 };

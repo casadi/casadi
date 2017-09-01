@@ -211,7 +211,7 @@ namespace casadi {
     return true;
   }
 
-  std::string ZeroByZero::print(const std::vector<std::string>& arg) const {
+  std::string ZeroByZero::disp(const std::vector<std::string>& arg) const {
     return "0x0";
   }
 

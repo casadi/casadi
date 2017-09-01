@@ -52,7 +52,7 @@ namespace casadi {
   OutputNode::~OutputNode() {
   }
 
-  std::string OutputNode::print(const std::vector<std::string>& arg) const {
+  std::string OutputNode::disp(const std::vector<std::string>& arg) const {
     return arg.at(0) + "{" + CodeGenerator::to_string(oind_) + "}";
   }
 

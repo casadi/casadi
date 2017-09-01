@@ -49,7 +49,7 @@ namespace casadi {
     static MX projectArg(const MX& x, const Sparsity& sp, int i);
 
     /** \brief  Print expression */
-    std::string print(const std::vector<std::string>& arg) const override;
+    std::string disp(const std::vector<std::string>& arg) const override;
 
     /** \brief Add a dependent function */
     void add_dependency(CodeGenerator& g) const override;

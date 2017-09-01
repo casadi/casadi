@@ -37,7 +37,7 @@ namespace casadi {
     set_sparsity(Sparsity(sp));
   }
 
-  std::string Project::print(const std::vector<std::string>& arg) const {
+  std::string Project::disp(const std::vector<std::string>& arg) const {
     if (sparsity().is_dense()) {
       return "dense(" + arg.at(0) + ")";
     } else {

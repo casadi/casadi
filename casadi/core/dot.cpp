@@ -33,7 +33,7 @@ namespace casadi {
     set_sparsity(Sparsity::scalar());
   }
 
-  std::string Dot::print(const std::vector<std::string>& arg) const {
+  std::string Dot::disp(const std::vector<std::string>& arg) const {
     return "dot(" + arg.at(0) + ", " + arg.at(1) + ")";
   }
 

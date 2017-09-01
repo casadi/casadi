@@ -60,7 +60,7 @@ namespace casadi {
     return 0;
   }
 
-  std::string GetElements::print(const std::vector<std::string>& arg) const {
+  std::string GetElements::disp(const std::vector<std::string>& arg) const {
     return arg.at(1) + "(" + arg.at(0) + ")";
   }
 

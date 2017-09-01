@@ -42,7 +42,7 @@ namespace casadi {
   }
 
   template<bool Tr>
-  std::string Solve<Tr>::print(const std::vector<std::string>& arg) const {
+  std::string Solve<Tr>::disp(const std::vector<std::string>& arg) const {
     std::stringstream ss;
     ss << "(" << arg.at(1);
     if (Tr) ss << "'";

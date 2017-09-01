@@ -38,7 +38,7 @@ namespace casadi {
     set_sparsity(x.sparsity());
   }
 
-  std::string Assertion::print(const std::vector<std::string>& arg) const {
+  std::string Assertion::disp(const std::vector<std::string>& arg) const {
     return "assertion(" + arg.at(0) + ", " + arg.at(1) + ")";
   }
 

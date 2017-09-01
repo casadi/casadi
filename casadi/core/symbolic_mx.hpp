@@ -50,7 +50,7 @@ namespace casadi {
     ~SymbolicMX() override {}
 
     /** \brief  Print expression */
-    std::string print(const std::vector<std::string>& arg) const override;
+    std::string disp(const std::vector<std::string>& arg) const override;
 
     /// Evaluate the function numerically
     int eval(const double** arg, double** res, int* iw, double* w) const override;

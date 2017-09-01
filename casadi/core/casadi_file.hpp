@@ -60,7 +60,7 @@ namespace casadi {
     void parse(const std::vector<std::string>& lines, int offset);
 
     /** \brief Print parsed file */
-    void print(std::ostream &stream=casadi::userOut()) const;
+    void disp(std::ostream& stream=casadi::userOut()) const;
 
     /** \brief Does an entry exist? */
     bool has(const std::string& cmd, int ind=-1) const;

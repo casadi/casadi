@@ -33,7 +33,7 @@ namespace casadi {
     set_sparsity(Sparsity::scalar());
   }
 
-  std::string NormF::print(const std::vector<std::string>& arg) const {
+  std::string NormF::disp(const std::vector<std::string>& arg) const {
     return "||" + arg.at(0) + "||_F";
   }
 
@@ -79,15 +79,15 @@ namespace casadi {
       << ");\n";
   }
 
-  std::string Norm2::print(const std::vector<std::string>& arg) const {
+  std::string Norm2::disp(const std::vector<std::string>& arg) const {
     return "||" + arg.at(0) + "||_2";
   }
 
-  std::string Norm1::print(const std::vector<std::string>& arg) const {
+  std::string Norm1::disp(const std::vector<std::string>& arg) const {
     return "||" + arg.at(0) + "||_1";
   }
 
-  std::string NormInf::print(const std::vector<std::string>& arg) const {
+  std::string NormInf::disp(const std::vector<std::string>& arg) const {
     return "||" + arg.at(0) + "||_inf";
   }
 

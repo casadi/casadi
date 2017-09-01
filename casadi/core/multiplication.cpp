@@ -45,7 +45,7 @@ namespace casadi {
     set_sparsity(z.sparsity());
   }
 
-  std::string Multiplication::print(const std::vector<std::string>& arg) const {
+  std::string Multiplication::disp(const std::vector<std::string>& arg) const {
     return "mac(" + arg.at(1) + "," + arg.at(2) + "," + arg.at(0) + ")";
   }
 
