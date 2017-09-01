@@ -1486,7 +1486,7 @@ namespace casadi {
   // To avoid overloaded function name conflicts
   template<typename Scalar>
   inline Matrix<Scalar> mmin_nonstatic(const Matrix<Scalar> &x) {
-    Scalar ret;
+    Matrix<Scalar> ret;
     const Scalar* nz = x.ptr();
     int nnz = x.nnz();
     for (int i=0; i<nnz; ++i) {
@@ -1511,7 +1511,7 @@ namespace casadi {
   // To avoid overloaded function name conflicts
   template<typename Scalar>
   inline Matrix<Scalar> mmax_nonstatic(const Matrix<Scalar> &x) {
-    Scalar ret;
+    Matrix<Scalar> ret;
     const Scalar* nz = x.ptr();
     int nnz = x.nnz();
     for (int i=0; i<nnz; ++i) {
