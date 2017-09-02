@@ -657,7 +657,8 @@ namespace casadi {
       Sparsity D = r.star_coloring();
 
       if (verbose_) {
-        casadi_message("Star coloring on " + str(r.dim()) + ": " + str(D.size2()) + " <-> " + str(D.size1()));
+        casadi_message("Star coloring on " + str(r.dim()) + ": "
+          + str(D.size2()) + " <-> " + str(D.size1()));
       }
 
       // Clear the seeds
@@ -1244,7 +1245,8 @@ namespace casadi {
       if (verbose_) casadi_message("FunctionInternal::getPartition star_coloring");
       D1 = A.star_coloring();
       if (verbose_) {
-        casadi_message("Star coloring completed: " + str(D1.size2()) + " directional derivatives needed ("
+        casadi_message("Star coloring completed: " + str(D1.size2())
+          + " directional derivatives needed ("
                  + str(A.size1()) + " without coloring).");
       }
 
@@ -1291,7 +1293,7 @@ namespace casadi {
             best_coloring = w*D1.size2();
           }
         } else {
-          if (verbose_) casadi_message("FunctionInternal::get_partition unidirectional coloring (adjoint mode)");
+          if (verbose_) casadi_message("Unidirectional coloring (adjoint mode)");
           int max_colorings_to_test = best_coloring>=(1-w)*A.size2() ? A.size2() :
             floor(best_coloring/(1-w));
 
