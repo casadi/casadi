@@ -98,6 +98,8 @@ namespace casadi {
     std::vector<MX> v_;
     // Number of objectives and constraints
     int n_var_, n_con_, n_obj_, n_eq_, n_lcon_;
+    // objective sign
+    MX sign_;
     // Parse the file
     void parse();
     // Imported function description
