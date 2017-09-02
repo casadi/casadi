@@ -143,10 +143,11 @@ inline std::string trim_path(const std::string& full_path) {
 #endif
 
 // This is for warnings to be issued when casadi is not in release mode and an assertion fails
-#define casadi_assert_warning(x, msg)                                   \
-  if ((x)==false) {                                                     \
+#define casadi_assert_warning(x, msg) \
+  if ((x)==false) { \
     casadi::userOut<true, casadi::PL_WARN>() \
-      << "Assertion \"" CASADI_ASSERT_STR(x) "\" at " + CASADI_WHERE + " failed: " << msg;\
+      << "CasADi warning at " + CASADI_WHERE + ": Assertion \"" CASADI_ASSERT_STR(x) "\" failed: "\
+      << msg << "\n";\
   }
 
 // Formatted message
