@@ -114,8 +114,9 @@ namespace casadi {
                                    const std::vector<std::string>& s_out,
                                    const Function::AuxOut& aux) {
     // Print progress
-    if (verbose_) casadi_message(name_ + "::create_function");
-    if (verbose_) casadi_message("Creating \"" + fname + "\"");
+    if (verbose_) {
+      casadi_message(name_ + "::create_function " + fname + ":" + str(s_in) + "->" + str(s_out));
+    }
 
     // Retrieve specific set of options if available
     Dict specific_options;
@@ -128,9 +129,6 @@ namespace casadi {
     // Generate the function
     Function ret = oracle_.factory(fname, s_in, s_out, aux, opt);
     set_function(ret, fname, true);
-
-    // Print progress
-    if (verbose_) casadi_message("Creating \"" + fname + "\" done");
 
     return ret;
   }

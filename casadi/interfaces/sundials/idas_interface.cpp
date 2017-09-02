@@ -28,7 +28,7 @@
 
 // Macro for error handling
 #define THROWING(fcn, ...) \
-idas_error(CASADI_WHERE ":\n" CASADI_ASSERT_STR(fcn), fcn(__VA_ARGS__))
+idas_error(CASADI_ASSERT_STR(fcn), fcn(__VA_ARGS__))
 
 using namespace std;
 namespace casadi {

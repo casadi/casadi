@@ -87,12 +87,24 @@ class CasadiException : public std::exception {
   std::string msg_;
 };
 
+// Strip path prefix
+inline std::string trim_path(const std::string& full_path) {
+  size_t found = full_path.rfind("/casadi/");
+  if (found == std::string::npos) {
+    return full_path;
+  } else {
+    std::string ret = full_path;
+    ret.replace(0, found, "...");
+    return ret;
+  }
+}
+
 // Convert to string
 #define CASADI_ASSERT_STR1(x) #x
 #define CASADI_ASSERT_STR(x) CASADI_ASSERT_STR1(x)
 
 // String denoting where the assertion is situated
-#define CASADI_WHERE __FILE__ ":" CASADI_ASSERT_STR(__LINE__)
+#define CASADI_WHERE casadi::trim_path(__FILE__ ":" CASADI_ASSERT_STR(__LINE__))
 
 // TODO(@jaeandersson) Refactor #890
 #define casadi_error(msg) {\
@@ -110,12 +122,12 @@ class CasadiException : public std::exception {
   } catch(std::exception& ex) { \
       throw casadi::CasadiException(\
         std::string("Assertion \"" CASADI_ASSERT_STR(x) "\" at "\
-        CASADI_WHERE " raised: ")+ex.what()); \
+        + CASADI_WHERE + " raised: ")+ex.what()); \
   } \
  if (!is_ok) { \
      std::stringstream ss_internal_;\
      ss_internal_ << "Assertion \"" CASADI_ASSERT_STR(x) "\" at "\
-     CASADI_WHERE " failed: " << msg;\
+     + CASADI_WHERE + " failed: " << msg;\
      throw casadi::CasadiException(ss_internal_.str());\
  }\
 } \
@@ -135,7 +147,7 @@ class CasadiException : public std::exception {
 #define casadi_assert_warning(x, msg)                                   \
   if ((x)==false) {                                                     \
     casadi::userOut<true, casadi::PL_WARN>() \
-      << "Assertion \"" CASADI_ASSERT_STR(x) "\" at " CASADI_WHERE " failed: " << msg;\
+      << "Assertion \"" CASADI_ASSERT_STR(x) "\" at " + CASADI_WHERE + " failed: " << msg;\
   }
 
 // Formatted message
@@ -146,10 +158,10 @@ class CasadiException : public std::exception {
     is_ok = x; \
   } catch(std::exception& ex) { \
       throw casadi::CasadiException(std::string("Assertion \"" \
-        CASADI_ASSERT_STR(x) "\" at " CASADI_WHERE " raised:\n")+ex.what()); \
+        CASADI_ASSERT_STR(x) "\" at " + CASADI_WHERE + " raised:\n")+ex.what()); \
   } \
  if (!is_ok) { \
-   std::string m = "Assertion \"" CASADI_ASSERT_STR(x) "\" at " CASADI_WHERE " failed: %s";\
+   std::string m = "Assertion \"" CASADI_ASSERT_STR(x) "\" at " + CASADI_WHERE + " failed: %s";\
    int sz = snprintf(0, 0, msg, __VA_ARGS__);\
    char* buf = new char[sz+1];\
    (void)snprintf(buf, sz+1, msg, __VA_ARGS__);\
@@ -162,12 +174,12 @@ class CasadiException : public std::exception {
 // Issue a warning, including location in the source code
 #define casadi_warning(msg) \
   casadi::userOut<true, casadi::PL_WARN>() \
-    << "CasADi warning at " CASADI_WHERE ": " << msg << "\n";
+    << "CasADi warning at " << CASADI_WHERE << ": " << msg << "\n";
 
 // Issue a message, including location in the source code
 #define casadi_message(msg) \
   casadi::userOut() \
-    << "CasADi message at " CASADI_WHERE ": " << msg << "\n";
+    << "CasADi message at " << CASADI_WHERE << ": " << msg << "\n";
 
 // http://stackoverflow.com/questions/303562/c-format-macro-inline-ostringstream
 #define STRING(ITEMS) \
