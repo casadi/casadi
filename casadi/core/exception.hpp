@@ -87,18 +87,6 @@ class CasadiException : public std::exception {
   std::string msg_;
 };
 
-// Assertion similar to the standard C assert statement, with the difference
-// that it throws an exception with the same information
-#ifdef CASADI_NDEBUG
-// Release mode
-#define casadi_assert(x)
-#define casadi_assert_message(x, msg)
-#define casadi_assert_warning(x, msg)
-#define casadi_warning(msg)
-#define casadi_error(msg)
-
-#else // CASADI_NDEBUG
-// Debug mode
 // Convert to string
 #define CASADI_ASSERT_STR1(x) #x
 #define CASADI_ASSERT_STR(x) CASADI_ASSERT_STR1(x)
@@ -172,16 +160,18 @@ class CasadiException : public std::exception {
 }
 
 // This is for warnings to be issued when casadi is not in release mode
-#define casadi_warning(msg)                                                       \
-  casadi::userOut<true, casadi::PL_WARN>() << "CasADi warning: \"" << msg << "\" issued " \
-  CASADI_ASSERT_WHERE ". " << std::endl;
+#define casadi_warning(msg) \
+  casadi::userOut<true, casadi::PL_WARN>() \
+    << "CasADi warning (" << CASADI_ASSERT_WHERE << "):\n   " << msg << "\n";
+
+#define casadi_message(msg) \
+  casadi::userOut() \
+    << "CasADi message (" << CASADI_ASSERT_WHERE << "):\n   " << msg << "\n";
 
 // http://stackoverflow.com/questions/303562/c-format-macro-inline-ostringstream
 #define STRING(ITEMS) \
   ((dynamic_cast<std::ostringstream &>(std::ostringstream() \
    . seekp(0, std::ios_base::cur) << ITEMS)) . str())
-
-#endif // CASADI_NDEBUG
 
 } // namespace casadi
 
