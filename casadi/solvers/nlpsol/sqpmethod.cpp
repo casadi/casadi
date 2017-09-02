@@ -465,7 +465,7 @@ namespace casadi {
       // Start a new iteration
       iter++;
 
-      log("Formulating QP");
+      if (verbose_) casadi_message("Formulating QP");
       // Formulate the QP
       transform(m->lbx, m->lbx + nx_, m->xk, m->qp_LBX, std::minus<double>());
       transform(m->ubx, m->ubx + nx_, m->xk, m->qp_UBX, std::minus<double>());
@@ -475,7 +475,7 @@ namespace casadi {
       // Solve the QP
       solve_QP(m, m->Bk, m->gf, m->qp_LBX, m->qp_UBX, m->Jk, m->qp_LBA,
                m->qp_UBA, m->dx, m->qp_DUAL_X, m->qp_DUAL_A);
-      log("QP solved");
+      if (verbose_) casadi_message("QP solved");
 
       // Detecting indefiniteness
       double gain = casadi_bilin(m->Bk, Hsp_, m->dx, m->dx);
@@ -511,7 +511,7 @@ namespace casadi {
       ls_success = true;
 
       // Line-search
-      log("Starting line-search");
+      if (verbose_) casadi_message("Starting line-search");
       if (max_iter_ls_>0) { // max_iter_ls_== 0 disables line-search
 
         // Line-search loop
@@ -541,14 +541,14 @@ namespace casadi {
           double meritmax = *max_element(m->merit_mem.begin(), m->merit_mem.end());
           if (L1merit_cand <= meritmax + t * c1_ * L1dir) {
             // Accepting candidate
-            log("Line-search completed, candidate accepted");
+            if (verbose_) casadi_message("Line-search completed, candidate accepted");
             break;
           }
 
           // Line-search not successful, but we accept it.
           if (ls_iter == max_iter_ls_) {
             ls_success = false;
-            log("Line-search completed, maximum number of iterations");
+            if (verbose_) casadi_message("Line-search completed, maximum number of iterations");
             break;
           }
 
@@ -582,11 +582,11 @@ namespace casadi {
       }
 
       // Evaluate the constraint Jacobian
-      log("Evaluating jac_g");
+      if (verbose_) casadi_message("Evaluating jac_g");
       eval_jac_g(m, m->xk, m->gk, m->Jk);
 
       // Evaluate the gradient of the objective function
-      log("Evaluating grad_f");
+      if (verbose_) casadi_message("Evaluating grad_f");
       eval_grad_f(m, m->xk, &m->fk, m->gf);
 
       // Evaluate the gradient of the Lagrangian with the new x and new mu
@@ -598,7 +598,7 @@ namespace casadi {
 
       // Updating Lagrange Hessian
       if (!exact_hessian_) {
-        log("Updating Hessian (BFGS)");
+        if (verbose_) casadi_message("Updating Hessian (BFGS)");
         // BFGS with careful updates and restarts
         if (iter % lbfgs_memory_ == 0) {
           // Reset Hessian approximation by dropping all off-diagonal entries
@@ -626,7 +626,7 @@ namespace casadi {
 
       } else {
         // Exact Hessian
-        log("Evaluating hessian");
+        if (verbose_) casadi_message("Evaluating hessian");
         eval_h(m, m->xk, m->mu, 1.0, m->Bk);
       }
     }

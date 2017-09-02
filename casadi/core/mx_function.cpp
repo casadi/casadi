@@ -59,7 +59,7 @@ namespace casadi {
   };
 
   void MXFunction::init(const Dict& opts) {
-    log("MXFunction::init begin");
+    if (verbose_) casadi_message(name_ + "::init");
 
     // Call the init function of the base class
     XFunction<MXFunction, MX, MXNode>::init(opts);
@@ -351,12 +351,10 @@ namespace casadi {
         break;
       }
     }
-
-    log("MXFunction::init end");
   }
 
   int MXFunction::eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
-    if (verbose_) log("MXFunction::eval():begin "  + name_);
+    if (verbose_) casadi_message(name_ + "::eval");
     // Work vector and temporaries to hold pointers to operation input and outputs
     const double** arg1 = arg+n_in();
     double** res1 = res+n_out();
@@ -401,8 +399,6 @@ namespace casadi {
         if (e.data->eval(arg1, res1, iw, w)) return 1;
       }
     }
-
-    if (verbose_) log("MXFunction::eval():end "  + name_);
     return 0;
   }
 
@@ -564,7 +560,7 @@ namespace casadi {
 
   void MXFunction::eval_mx(const MXVector& arg, MXVector& res,
                            bool always_inline, bool never_inline) const {
-    log("MXFunction::eval_mx begin");
+    if (verbose_) casadi_message(name_ + "::eval_mx");
 
     // Resize the number of outputs
     casadi_assert_message(arg.size()==n_in(), "Wrong number of input arguments");
@@ -583,7 +579,7 @@ namespace casadi {
 
     // Symbolic work, non-differentiated
     vector<MX> swork(workloc_.size()-1);
-    log("MXFunction::eval_mx allocated work vector");
+    if (verbose_) casadi_message("Allocated work vector");
 
     // Split up inputs analogous to symbolic primitives
     vector<vector<MX> > arg_split(in_.size());
@@ -629,13 +625,11 @@ namespace casadi {
 
     // Join split outputs
     for (int i=0; i<res.size(); ++i) res[i] = out_[i].join_primitives(res_split[i]);
-
-    log("MXFunction::eval_mx end");
   }
 
   void MXFunction::ad_forward(const std::vector<std::vector<MX> >& fseed,
                                 std::vector<std::vector<MX> >& fsens) const {
-    log("MXFunction::ad_forward begin");
+    if (verbose_) casadi_message(name_ + "::ad_forward");
 
     // Allocate results
     int nfwd = fseed.size();
@@ -686,7 +680,7 @@ namespace casadi {
     // Work vector, forward derivatives
     std::vector<std::vector<MX> > dwork(workloc_.size()-1);
     fill(dwork.begin(), dwork.end(), std::vector<MX>(nfwd));
-    log("MXFunction::ad_forward allocated derivative work vector (forward mode)");
+    if (verbose_) casadi_message("Allocated derivative work vector (forward mode)");
 
     // Split up fseed analogous to symbolic primitives
     vector<vector<vector<MX> > > fseed_split(nfwd);
@@ -777,13 +771,11 @@ namespace casadi {
         fsens[d][i] = out_[i].join_primitives(fsens_split[d][i]);
       }
     }
-
-    log("MXFunction::ad_forward end");
   }
 
   void MXFunction::ad_reverse(const std::vector<std::vector<MX> >& aseed,
                                 std::vector<std::vector<MX> >& asens) const {
-    log("MXFunction::ad_reverse begin");
+    if (verbose_) casadi_message(name_ + "::ad_reverse");
 
     // Allocate results
     int nadj = aseed.size();
@@ -859,7 +851,7 @@ namespace casadi {
     // Work vector, adjoint derivatives
     std::vector<std::vector<MX> > dwork(workloc_.size()-1);
     fill(dwork.begin(), dwork.end(), std::vector<MX>(nadj));
-    log("MXFunction::ad_reverse allocated derivative work vector (adjoint mode)");
+    if (verbose_) casadi_message("Allocated derivative work vector (adjoint mode)");
 
     // Loop over computational nodes in reverse order
     for (auto it=algorithm_.rbegin(); it!=algorithm_.rend(); ++it) {
@@ -966,8 +958,6 @@ namespace casadi {
         asens[d][i] = in_[i].join_primitives(asens_split[d][i]);
       }
     }
-
-    log("MXFunction::ad_reverse end");
   }
 
   int MXFunction::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) const {

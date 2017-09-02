@@ -386,7 +386,7 @@ namespace casadi {
                         int ls_trials, bool full_callback) const {
     m->n_iter += 1;
     try {
-      log("intermediate_callback started");
+      if (verbose_) casadi_message("intermediate_callback started");
       m->inf_pr.push_back(inf_pr);
       m->inf_du.push_back(inf_du);
       m->mu.push_back(mu);

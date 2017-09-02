@@ -114,7 +114,8 @@ namespace casadi {
                                    const std::vector<std::string>& s_out,
                                    const Function::AuxOut& aux) {
     // Print progress
-    if (verbose_) userOut() << "Creating \"" << fname << "\"... " << flush;
+    if (verbose_) casadi_message(name_ + "::create_function");
+    if (verbose_) casadi_message("Creating \"" + fname + "\"");
 
     // Retrieve specific set of options if available
     Dict specific_options;
@@ -129,7 +130,7 @@ namespace casadi {
     set_function(ret, fname, true);
 
     // Print progress
-    if (verbose_) userOut() << "done" << endl;
+    if (verbose_) casadi_message("Creating \"" + fname + "\" done");
 
     return ret;
   }
@@ -267,7 +268,7 @@ namespace casadi {
 
   void OracleFunction::jit_dependencies(const std::string& fname) {
     if (verbose_)
-      log("compiling to "+ fname+"'.");
+      if (verbose_) casadi_message("compiling to "+ fname+"'.");
     // JIT dependent functions
     compiler_ = Importer(generate_dependencies(fname, Dict()),
                          compilerplugin_, jit_options_);
@@ -275,7 +276,7 @@ namespace casadi {
     // Replace the Oracle functions with generated functions
     for (auto&& e : all_functions_) {
       if (verbose_)
-        log("loading '" + e.second.f.name() + "' from '" + fname + "'.");
+        if (verbose_) casadi_message("loading '" + e.second.f.name() + "' from '" + fname + "'.");
       if (e.second.jit) e.second.f = external(e.second.f.name(), compiler_);
     }
   }

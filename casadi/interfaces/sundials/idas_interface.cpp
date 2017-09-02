@@ -28,7 +28,7 @@
 
 // Macro for error handling
 #define THROWING(fcn, ...) \
-idas_error(CASADI_WHERE CASADI_ASSERT_STR(fcn), fcn(__VA_ARGS__))
+idas_error(CASADI_WHERE ":\n" CASADI_ASSERT_STR(fcn), fcn(__VA_ARGS__))
 
 using namespace std;
 namespace casadi {
@@ -88,7 +88,7 @@ namespace casadi {
   };
 
   void IdasInterface::init(const Dict& opts) {
-    if (verbose_) log(name_ + "::init");
+    if (verbose_) casadi_message(name_ + "::init");
 
     // Call the base class init
     SundialsInterface::init(opts);
@@ -277,7 +277,7 @@ namespace casadi {
     N_VConst(0.0, m->xz);
     N_VConst(0.0, m->xzdot);
     IDAInit(m->mem, res, t0, m->xz, m->xzdot);
-    if (verbose_) log("IDA initialized");
+    if (verbose_) casadi_message("IDA initialized");
 
     // Include algebraic variables in error testing
     THROWING(IDASetSuppressAlg, m->mem, suppress_algebraic_);
@@ -358,7 +358,7 @@ namespace casadi {
       }
     }
 
-    if (verbose_) log("Attached linear solver");
+    if (verbose_) casadi_message("Attached linear solver");
 
     // Adjoint sensitivity problem
     if (nrx_>0) {
@@ -366,7 +366,7 @@ namespace casadi {
       N_VConst(0.0, m->rxz);
       N_VConst(0.0, m->rxzdot);
     }
-    if (verbose_) log("Initialized adjoint sensitivities");
+    if (verbose_) casadi_message("Initialized adjoint sensitivities");
 
     // Initialize adjoint sensitivities
     if (nrx_>0) {
@@ -380,7 +380,7 @@ namespace casadi {
 
   void IdasInterface::reset(IntegratorMemory* mem, double t, const double* _x,
                             const double* _z, const double* _p) const {
-    if (verbose_) log(name_ + "::reset");
+    if (verbose_) casadi_message(name_ + "::reset");
     auto m = to_mem(mem);
 
     // Reset the base classes
@@ -450,7 +450,7 @@ namespace casadi {
 
   void IdasInterface::resetB(IntegratorMemory* mem, double t, const double* rx,
                              const double* rz, const double* rp) const {
-    if (verbose_) log(name_ + "::resetB");
+    if (verbose_) casadi_message(name_ + "::resetB");
     auto m = to_mem(mem);
 
     // Reset the base classes

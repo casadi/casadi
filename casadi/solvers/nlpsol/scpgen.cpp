@@ -421,14 +421,14 @@ namespace casadi {
 
     // Jacobian of the constraints
     MX jac = MX::jacobian(mfcn_out[mod_g_], mfcn_in[mod_x_]);
-    log("Formed Jacobian of the constraints.");
+    if (verbose_) casadi_message("Formed Jacobian of the constraints.");
 
     // Hessian of the Lagrangian
     MX hes = MX::jacobian(mfcn_out[mod_gl_], mfcn_in[mod_x_], {{"symmetric", !gauss_newton_}});
     if (gauss_newton_) {
-      log("Formed square root of Gauss-Newton Hessian.");
+      if (verbose_) casadi_message("Formed square root of Gauss-Newton Hessian.");
     } else {
-      log("Formed Hessian of the Lagrangian.");
+      if (verbose_) casadi_message("Formed Hessian of the Lagrangian.");
     }
 
     // Matrices in the reduced QP
@@ -1244,7 +1244,7 @@ namespace casadi {
     ls_success = false;
 
     // Line-search
-    //log("Starting line-search");
+    //if (verbose_) casadi_message("Starting line-search");
 
     // Line-search loop
     while (true) {
@@ -1275,13 +1275,13 @@ namespace casadi {
 
         // Accepting candidate
         ls_success = true;
-        //log("Line-search completed, candidate accepted");
+        //if (verbose_) casadi_message("Line-search completed, candidate accepted");
         break;
       }
 
       // Line-search not successful, but we accept it.
       if (ls_iter == max_iter_ls_) {
-        //log("Line-search completed, maximum number of iterations");
+        //if (verbose_) casadi_message("Line-search completed, maximum number of iterations");
         break;
       }
 

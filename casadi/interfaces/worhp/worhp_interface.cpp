@@ -362,7 +362,7 @@ namespace casadi {
     for (int i=0; i<ng_; ++i) if (m->worhp_o.GL[i]==-inf) m->worhp_o.GL[i] = -m->worhp_p.Infty;
     for (int i=0; i<ng_; ++i) if (m->worhp_o.GU[i]== inf) m->worhp_o.GU[i] =  m->worhp_p.Infty;
 
-    log("WorhpInterface::starting iteration");
+    if (verbose_) casadi_message("WorhpInterface::starting iteration");
 
     bool firstIteration = true;
 

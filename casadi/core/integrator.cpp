@@ -340,7 +340,7 @@ namespace casadi {
 
   template<typename MatType>
   map<string, MatType> Integrator::aug_fwd(int nfwd) const {
-    log(name_ + "::aug_fwd");
+    if (verbose_) casadi_message(name_ + "::aug_fwd");
 
     // Get input expressions
     vector<MatType> arg = MatType::get_input(oracle_);
@@ -415,7 +415,7 @@ namespace casadi {
 
   template<typename MatType>
   map<string, MatType> Integrator::aug_adj(int nadj) const {
-    log(name_ + "::aug_adj");
+    if (verbose_) casadi_message(name_ + "::aug_adj");
 
     // Get input expressions
     vector<MatType> arg = MatType::get_input(oracle_);
@@ -505,7 +505,7 @@ namespace casadi {
 
   int Integrator::
   sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) const {
-    log(name_ + "::sp_forward");
+    if (verbose_) casadi_message(name_ + "::sp_forward");
 
     // Work vectors
     bvec_t *tmp_x = w; w += nx_;
@@ -586,7 +586,7 @@ namespace casadi {
   }
 
   int Integrator::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) const {
-    log(name_ + "::sp_reverse");
+    if (verbose_) casadi_message(name_ + "::sp_reverse");
 
     // Work vectors
     bvec_t** arg1 = arg+n_in();
@@ -704,7 +704,7 @@ namespace casadi {
               const std::vector<std::string>& inames,
               const std::vector<std::string>& onames,
               const Dict& opts) const {
-    log(name_ + "::get_forward");
+    if (verbose_) casadi_message(name_ + "::get_forward");
 
     // Integrator options
     Dict aug_opts = getDerivativeOptions(true);
@@ -827,7 +827,7 @@ namespace casadi {
               const std::vector<std::string>& inames,
               const std::vector<std::string>& onames,
               const Dict& opts) const {
-    log(name_ + "::get_reverse");
+    if (verbose_) casadi_message(name_ + "::get_reverse");
 
     // Integrator options
     Dict aug_opts = getDerivativeOptions(false);

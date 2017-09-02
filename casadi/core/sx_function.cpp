@@ -73,7 +73,7 @@ namespace casadi {
   }
 
   int SXFunction::eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
-    if (verbose_) log("SXFunction::eval():begin  " + name_);
+    if (verbose_) casadi_message(name_ + "::eval");
 
     // Make sure no free parameters
     if (!free_vars_.empty()) {
@@ -99,8 +99,6 @@ namespace casadi {
         casadi_error("SXFunction::eval: Unknown operation" << e.op);
       }
     }
-
-    if (verbose_) log("SXFunction::eval():end " + name_);
     return 0;
   }
 
@@ -495,15 +493,12 @@ namespace casadi {
     }
 
     // Print
-    if (verbose_) {
-      userOut() << "SXFunction::init Initialized " << name_ << " ("
-           << algorithm_.size() << " elementary operations)" << endl;
-    }
+    if (verbose_) casadi_message(str(algorithm_.size()) + " elementary operations");
   }
 
   int SXFunction::
   eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) const {
-    if (verbose_) userOut() << "SXFunction::eval_sxsparse begin" << endl;
+    if (verbose_) casadi_message(name_ + "::eval_sx");
 
     // Iterator to the binary operations
     vector<SXElem>::const_iterator b_it=operations_.begin();
@@ -515,9 +510,7 @@ namespace casadi {
     vector<SXElem>::const_iterator p_it = free_vars_.begin();
 
     // Evaluate algorithm
-    if (verbose_) {
-      userOut() << "SXFunction::eval_sxsparse evaluating algorithm forward" << endl;
-    }
+    if (verbose_) casadi_message("Evaluating algorithm forward");
     for (auto&& a : algorithm_) {
       switch (a.op) {
       case OP_INPUT:
@@ -550,13 +543,12 @@ namespace casadi {
         }
       }
     }
-    if (verbose_) userOut() << "SXFunction::eval_sx end" << endl;
     return 0;
   }
 
   void SXFunction::ad_forward(const vector<vector<SX> >& fseed,
                                 vector<vector<SX> >& fsens) const {
-    if (verbose_) userOut() << "SXFunction::ad_forward begin" << endl;
+    if (verbose_) casadi_message(name_ + "::ad_forward");
 
     // Number of forward seeds
     int nfwd = fseed.size();
@@ -607,7 +599,7 @@ namespace casadi {
     vector<TapeEl<SXElem> >::iterator it1 = s_pdwork.begin();
 
     // Evaluate algorithm
-    if (verbose_) userOut() << "SXFunction::ad_forward evaluating algorithm forward" << endl;
+    if (verbose_) casadi_message("Evaluating algorithm forward");
     for (auto&& e : algorithm_) {
       switch (e.op) {
       case OP_INPUT:
@@ -629,8 +621,7 @@ namespace casadi {
     vector<SXElem> w(worksize_);
 
     // Calculate forward sensitivities
-    if (verbose_)
-      userOut() << "SXFunction::ad_forward calculating forward derivatives" << endl;
+    if (verbose_) casadi_message("Calculating forward derivatives");
     for (int dir=0; dir<nfwd; ++dir) {
       vector<TapeEl<SXElem> >::const_iterator it2 = s_pdwork.begin();
       for (auto&& a : algorithm_) {
@@ -650,12 +641,11 @@ namespace casadi {
         }
       }
     }
-    if (verbose_) userOut() << "SXFunction::ad_forward end" << endl;
   }
 
   void SXFunction::ad_reverse(const vector<vector<SX> >& aseed,
                                 vector<vector<SX> >& asens) const {
-    if (verbose_) userOut() << "SXFunction::ad_reverse begin" << endl;
+    if (verbose_) casadi_message(name_ + "::ad_reverse");
 
     // number of adjoint seeds
     int nadj = aseed.size();
@@ -713,7 +703,7 @@ namespace casadi {
     vector<TapeEl<SXElem> >::iterator it1 = s_pdwork.begin();
 
     // Evaluate algorithm
-    if (verbose_) userOut() << "SXFunction::ad_forward evaluating algorithm forward" << endl;
+    if (verbose_) casadi_message("Evaluating algorithm forward");
     for (auto&& a : algorithm_) {
       switch (a.op) {
       case OP_INPUT:
@@ -732,8 +722,7 @@ namespace casadi {
     }
 
     // Calculate adjoint sensitivities
-    if (verbose_) userOut() << "SXFunction::ad_reverse calculating adjoint derivatives"
-                       << endl;
+    if (verbose_) casadi_message("Calculating adjoint derivatives");
 
     // Work vector
     vector<SXElem> w(worksize_, 0);
@@ -769,7 +758,6 @@ namespace casadi {
         }
       }
     }
-    if (verbose_) userOut() << "SXFunction::ad_reverse end" << endl;
   }
 
   int SXFunction::

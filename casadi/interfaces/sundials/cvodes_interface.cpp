@@ -27,7 +27,7 @@
 #include "casadi/core/std_vector_tools.hpp"
 
 #define THROWING(fcn, ...) \
-cvodes_error(CASADI_WHERE CASADI_ASSERT_STR(fcn), fcn(__VA_ARGS__))
+cvodes_error(CASADI_WHERE ":\n" CASADI_ASSERT_STR(fcn), fcn(__VA_ARGS__))
 
 using namespace std;
 namespace casadi {
@@ -71,7 +71,7 @@ namespace casadi {
   };
 
   void CvodesInterface::init(const Dict& opts) {
-    if (verbose_) log(name_ + "::init");
+    if (verbose_) casadi_message(name_ + "::init");
 
     // Initialize the base classes
     SundialsInterface::init(opts);
@@ -225,7 +225,7 @@ namespace casadi {
 
   void CvodesInterface::reset(IntegratorMemory* mem, double t, const double* x,
                               const double* z, const double* _p) const {
-    if (verbose_) log(name_ + "::reset");
+    if (verbose_) casadi_message(name_ + "::reset");
     auto m = to_mem(mem);
 
     // Reset the base classes

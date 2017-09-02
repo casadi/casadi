@@ -319,16 +319,13 @@ namespace casadi {
     if (jit_) {
       string jit_name = "jit_tmp";
       if (has_codegen()) {
-        if (verbose_)
-          log("Codegenerating function '" + name() + "'.");
+        if (verbose_) casadi_message("Codegenerating function '" + name() + "'.");
         // JIT everything
         CodeGenerator gen(jit_name);
         gen.add(self());
-        if (verbose_)
-          log("Compiling function '" + name() + "'..");
+        if (verbose_) casadi_message("Compiling function '" + name() + "'..");
         compiler_ = Importer(gen.generate(), compilerplugin_, jit_options_);
-        if (verbose_)
-          log("Compiling function '" + name() + "' done.");
+        if (verbose_) casadi_message("Compiling function '" + name() + "' done.");
         // Try to load with simplified syntax
         simple_ = (simple_t)compiler_.get_function(name() + "_simple");
         // If not succesful, try generic syntax
@@ -450,12 +447,6 @@ namespace casadi {
       // Cache it for reuse and return
       wrap_ = ret;
       return ret;
-    }
-  }
-
-  void FunctionInternal::log(const string& msg) const {
-    if (verbose_) {
-      userOut() << "CasADi log message: " << msg << endl;
     }
   }
 
@@ -604,9 +595,8 @@ namespace casadi {
     if (!fwd) swap(jrow, jcol);
     Sparsity ret = Sparsity::triplet(nz_out, nz_in, jcol, jrow);
     if (verbose_) {
-      log("Formed Jacobian sparsity pattern (dimension " + str(ret.size()) + ", "
+      casadi_message("Formed Jacobian sparsity pattern (dimension " + str(ret.size()) + ", "
           + str(ret.nnz()) + " nonzeros, " + str((100.0*ret.nnz())/ret.numel()) + " % nonzeros).");
-      log("FunctionInternal::getJacSparsity end ");
     }
     return ret;
   }
@@ -655,7 +645,7 @@ namespace casadi {
     bool hasrun = false;
 
     while (!hasrun || coarse.size()!=nz+1) {
-      if (verbose_) log("Block size: " + str(granularity));
+      if (verbose_) casadi_message("Block size: " + str(granularity));
 
       // Clear the sparsity triplet acccumulator
       jcol.clear();
@@ -667,7 +657,7 @@ namespace casadi {
       Sparsity D = r.star_coloring();
 
       if (verbose_) {
-        log("Star coloring on " + str(r.dim()) + ": " + str(D.size2()) + " <-> " + str(D.size1()));
+        casadi_message("Star coloring on " + str(r.dim()) + ": " + str(D.size2()) + " <-> " + str(D.size1()));
       }
 
       // Clear the seeds
@@ -830,8 +820,8 @@ namespace casadi {
       hasrun = true;
     }
     if (verbose_) {
-      log("Number of sweeps: " + str(nsweeps));
-      log("Formed Jacobian sparsity pattern (dimension " + str(r.size()) +
+      casadi_message("Number of sweeps: " + str(nsweeps));
+      casadi_message("Formed Jacobian sparsity pattern (dimension " + str(r.size()) +
           ", " + str(r.nnz()) + " nonzeros, " + str((100.0*r.nnz())/r.numel()) + " % nonzeros).");
     }
 
@@ -900,7 +890,7 @@ namespace casadi {
 
     while (!hasrun || coarse_col.size()!=nz_out+1 || coarse_row.size()!=nz_in+1) {
       if (verbose_) {
-        log("Block size: " + str(granularity_col) + " x " + str(granularity_row));
+        casadi_message("Block size: " + str(granularity_col) + " x " + str(granularity_row));
       }
 
       // Clear the sparsity triplet acccumulator
@@ -921,7 +911,7 @@ namespace casadi {
       // Adjoint mode
       Sparsity D2 = r.uni_coloring(rT);
       if (verbose_) {
-        log("Coloring on " + str(r.dim()) + " (fwd seeps: " + str(D1.size2()) +
+        casadi_message("Coloring on " + str(r.dim()) + " (fwd seeps: " + str(D1.size2()) +
                  " , adj sweeps: " + str(D2.size1()) + ")");
       }
 
@@ -930,7 +920,7 @@ namespace casadi {
       double adj_cost = (use_fwd ? granularity_col : granularity_row) * (1-sp_w)*D2.size2();
       use_fwd = fwd_cost <= adj_cost;
       if (verbose_) {
-        log(string(use_fwd ? "Forward" : "Reverse") + " mode chosen "
+        casadi_message(string(use_fwd ? "Forward" : "Reverse") + " mode chosen "
             "(fwd cost: " + str(fwd_cost) + ", adj cost: " + str(adj_cost) + ")");
       }
 
@@ -1124,8 +1114,8 @@ namespace casadi {
       hasrun = true;
     }
     if (verbose_) {
-      log("Number of sweeps: " + str(nsweeps));
-      log("Formed Jacobian sparsity pattern (dimension " + str(r.size()) + ", " +
+      casadi_message("Number of sweeps: " + str(nsweeps));
+      casadi_message("Formed Jacobian sparsity pattern (dimension " + str(r.size()) + ", " +
           str(r.nnz()) + " nonzeros, " + str((100.0*r.nnz())/r.numel()) + " % nonzeros).");
     }
 
@@ -1238,7 +1228,7 @@ namespace casadi {
   void FunctionInternal::get_partition(int iind, int oind, Sparsity& D1, Sparsity& D2,
                                        bool compact, bool symmetric,
                                        bool allow_forward, bool allow_reverse) const {
-    log("FunctionInternal::get_partition begin");
+    if (verbose_) casadi_message(name_ + "::get_partition");
     casadi_assert_message(allow_forward || allow_reverse, "Inconsistent options");
 
     // Sparsity pattern with transpose
@@ -1251,10 +1241,10 @@ namespace casadi {
       casadi_assert(allow_forward);
 
       // Star coloring if symmetric
-      log("FunctionInternal::getPartition star_coloring");
+      if (verbose_) casadi_message("FunctionInternal::getPartition star_coloring");
       D1 = A.star_coloring();
       if (verbose_) {
-        log("Star coloring completed: " + str(D1.size2()) + " directional derivatives needed ("
+        casadi_message("Star coloring completed: " + str(D1.size2()) + " directional derivatives needed ("
                  + str(A.size1()) + " without coloring).");
       }
 
@@ -1286,7 +1276,7 @@ namespace casadi {
 
         // Perform the coloring
         if (fwd) {
-          log("FunctionInternal::get_partition unidirectional coloring (forward mode)");
+          if (verbose_) casadi_message("Unidirectional coloring (forward mode)");
           int max_colorings_to_test = best_coloring>=w*A.size1() ? A.size1() :
             floor(best_coloring/w);
           D1 = AT.uni_coloring(A, max_colorings_to_test);
@@ -1301,7 +1291,7 @@ namespace casadi {
             best_coloring = w*D1.size2();
           }
         } else {
-          log("FunctionInternal::get_partition unidirectional coloring (adjoint mode)");
+          if (verbose_) casadi_message("FunctionInternal::get_partition unidirectional coloring (adjoint mode)");
           int max_colorings_to_test = best_coloring>=(1-w)*A.size2() ? A.size2() :
             floor(best_coloring/(1-w));
 
@@ -1320,7 +1310,6 @@ namespace casadi {
       }
 
     }
-    log("FunctionInternal::get_partition end");
   }
 
   int FunctionInternal::

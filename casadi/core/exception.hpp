@@ -159,14 +159,15 @@ class CasadiException : public std::exception {
  }\
 }
 
-// This is for warnings to be issued when casadi is not in release mode
+// Issue a warning, including location in the source code
 #define casadi_warning(msg) \
   casadi::userOut<true, casadi::PL_WARN>() \
-    << "CasADi warning at " CASADI_WHERE ":\n" << (msg) << "\n";
+    << "CasADi warning at " CASADI_WHERE ":\n" << msg << "\n";
 
+// Issue a message, including location in the source code
 #define casadi_message(msg) \
   casadi::userOut() \
-    << "CasADi message at " CASADI_WHERE ":" << << (msg) << "\n";
+    << "CasADi message at " CASADI_WHERE ":\n" << msg << "\n";
 
 // http://stackoverflow.com/questions/303562/c-format-macro-inline-ostringstream
 #define STRING(ITEMS) \

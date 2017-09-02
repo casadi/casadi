@@ -222,7 +222,7 @@ namespace casadi {
         std::stringstream ss;
         ss << "HPMPC detected structure:" <<
         " N " << N_ << ", nx " << nx << ", nu " << nu << ", ng " << ng << ".";
-        log(ss.str());
+        casadi_message(ss.str());
       }
     }
 

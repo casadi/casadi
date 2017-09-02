@@ -126,7 +126,7 @@ namespace casadi {
     while (true) {
       // Break if maximum number of iterations already reached
       if (m->iter >= max_iter_) {
-        log("Max iterations reached.");
+        if (verbose_) casadi_message("Max iterations reached.");
         m->return_status = "max_iteration_reached";
         success = false;
         break;
@@ -150,7 +150,7 @@ namespace casadi {
           abstol = max(abstol, fabs(m->f[i]));
         }
         if (abstol <= abstol_) {
-          if (verbose_) log("Converged to acceptable tolerance - abstol: " + str(abstol_));
+          if (verbose_) if (verbose_) casadi_message("Converged to acceptable tolerance - abstol: " + str(abstol_));
           break;
         }
       }
@@ -166,7 +166,7 @@ namespace casadi {
           abstolStep = max(abstolStep, fabs(m->f[i]));
         }
         if (abstolStep <= abstolStep_) {
-          if (verbose_) log("Converged to acceptable tolerance: " + str(abstolStep_));
+          if (verbose_) if (verbose_) casadi_message("Converged to acceptable tolerance: " + str(abstolStep_));
           break;
         }
       }
@@ -190,7 +190,7 @@ namespace casadi {
 
     // Store the iteration count
     if (success) m->return_status = "success";
-    if (verbose_) log("Newton algorithm took " + str(m->iter) + " steps");
+    if (verbose_) if (verbose_) casadi_message("Newton algorithm took " + str(m->iter) + " steps");
   }
 
   void Newton::printIteration(std::ostream &stream) const {
