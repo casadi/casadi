@@ -640,12 +640,6 @@
 %exception  casadi::FunctionInternal::jit_dependencies(const std::string &fname) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::FunctionInternal::log(const std::string &fcn, const std::string &msg) const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::FunctionInternal::log(const std::string &msg) const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::FunctionInternal::mapsum_mx(const std::vector< MX > &arg, const std::string &parallelization) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -836,9 +830,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::uses_output() const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::FunctionInternal::verbose() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::which_depends(const std::string &s_in, const std::vector< std::string > &s_out, int order, bool tr=false) const  {

@@ -78,20 +78,6 @@ input value.
 
 %feature("docstring") casadi::Blocksqp::plugin_name "[INTERNAL] ";
 
-%feature("docstring") casadi::Blocksqp::log "
-
->  void casadi::FunctionInternal::log(const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver.
-
->  void casadi::FunctionInternal::log(const std::string &fcn, const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver, function given.
-
-";
-
 %feature("docstring") casadi::Blocksqp::simplified_call "[INTERNAL]  Use
 simplified signature.
 
@@ -797,10 +783,6 @@ name.
 
 %feature("docstring") casadi::Blocksqp::getAtomicOperation "[INTERNAL]  Get
 an atomic operation operator index.
-
-";
-
-%feature("docstring") casadi::Blocksqp::verbose "[INTERNAL]  Verbose mode?
 
 ";
 
@@ -1845,20 +1827,6 @@ derivatives by multiplying the full Jacobian and multiplying.
 
 ";
 
-%feature("docstring") casadi::BSpline::log "
-
->  void casadi::FunctionInternal::log(const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver.
-
->  void casadi::FunctionInternal::log(const std::string &fcn, const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver, function given.
-
-";
-
 %feature("docstring") casadi::BSpline::get_jacobian "
 
 Return Jacobian of all input elements with respect to all output elements.
@@ -2650,10 +2618,6 @@ temporary variables needed.
 
 ";
 
-%feature("docstring") casadi::BSpline::verbose "[INTERNAL]  Verbose mode?
-
-";
-
 %feature("docstring") casadi::BSpline::sparsity_in "
 
 >  const Sparsity& casadi::FunctionInternal::sparsity_in(int ind) const 
@@ -2796,11 +2760,6 @@ class able to propagate seeds through the algorithm?
 ";
 
 %feature("docstring") casadi::BSplineCommon::getAdaptorSolverName "[INTERNAL]  Obtain solver name from Adaptor.
-
-";
-
-%feature("docstring") casadi::BSplineCommon::verbose "[INTERNAL]  Verbose
-mode?
 
 ";
 
@@ -3506,17 +3465,8 @@ Parallel evaluation.
 
 ";
 
-%feature("docstring") casadi::BSplineCommon::log "
-
->  void casadi::FunctionInternal::log(const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver.
-
->  void casadi::FunctionInternal::log(const std::string &fcn, const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver, function given.
+%feature("docstring") casadi::BSplineCommon::getCount "[INTERNAL]  Get the
+reference count.
 
 ";
 
@@ -3581,11 +3531,6 @@ function signature: name:(inputs)->(outputs)
 ";
 
 %feature("docstring") casadi::BSplineCommon::BSplineCommon "";
-
-%feature("docstring") casadi::BSplineCommon::getCount "[INTERNAL]  Get the
-reference count.
-
-";
 
 %feature("docstring") casadi::BSplineCommon::codegen_incref "[INTERNAL]
 Codegen incref for dependencies.
@@ -4123,11 +4068,6 @@ Evaluate numerically, work vectors given.
 
 ";
 
-%feature("docstring") casadi::BSplineDual::verbose "[INTERNAL]  Verbose
-mode?
-
-";
-
 %feature("docstring") casadi::BSplineDual::clear_mem "[INTERNAL]  Clear all
 memory (called from destructor)
 
@@ -4640,20 +4580,6 @@ if output arguments that needs to be replaced.
 
 %feature("docstring") casadi::BSplineDual::size2_out "[INTERNAL]
 Input/output dimensions.
-
-";
-
-%feature("docstring") casadi::BSplineDual::log "
-
->  void casadi::FunctionInternal::log(const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver.
-
->  void casadi::FunctionInternal::log(const std::string &fcn, const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver, function given.
 
 ";
 
@@ -5413,20 +5339,6 @@ input scheme name by index.
 
 ";
 
-%feature("docstring") casadi::BSplineInterpolant::log "
-
->  void casadi::FunctionInternal::log(const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver.
-
->  void casadi::FunctionInternal::log(const std::string &fcn, const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver, function given.
-
-";
-
 %feature("docstring") casadi::BSplineInterpolant::alloc_arg "[INTERNAL]
 Ensure required length of arg field.
 
@@ -5589,11 +5501,6 @@ Readable name of the internal class.
 
 %feature("docstring") casadi::BSplineInterpolant::size1_in "[INTERNAL]
 Input/output dimensions.
-
-";
-
-%feature("docstring") casadi::BSplineInterpolant::verbose "[INTERNAL]
-Verbose mode?
 
 ";
 
@@ -7103,11 +7010,6 @@ Codegen incref for dependencies.
 
 ";
 
-%feature("docstring") casadi::CentralDiff::verbose "[INTERNAL]  Verbose
-mode?
-
-";
-
 %feature("docstring") casadi::CentralDiff::get_name_out "[INTERNAL]  Names
 of function input and outputs.
 
@@ -7582,20 +7484,6 @@ Input/output dimensions.
 
 %feature("docstring") casadi::CentralDiff::definition "[INTERNAL]  Get
 function signature: name:(inputs)->(outputs)
-
-";
-
-%feature("docstring") casadi::CentralDiff::log "
-
->  void casadi::FunctionInternal::log(const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver.
-
->  void casadi::FunctionInternal::log(const std::string &fcn, const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver, function given.
 
 ";
 
@@ -8517,11 +8405,6 @@ JIT for dependencies.
 
 ";
 
-%feature("docstring") casadi::Collocation::verbose "[INTERNAL]  Verbose
-mode?
-
-";
-
 %feature("docstring") casadi::Collocation::finalize "[INTERNAL]  Finalize
 initialization.
 
@@ -8695,20 +8578,6 @@ the (integer) input arguments of an atomic operation.
 
 %feature("docstring") casadi::Collocation::wrap "[INTERNAL]  Wrap in an
 Function instance consisting of only one MX call.
-
-";
-
-%feature("docstring") casadi::Collocation::log "
-
->  void casadi::FunctionInternal::log(const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver.
-
->  void casadi::FunctionInternal::log(const std::string &fcn, const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver, function given.
 
 ";
 
@@ -9261,10 +9130,6 @@ function.
 ";
 
 %feature("docstring") casadi::Conic::disp "[INTERNAL]  Print.
-
-";
-
-%feature("docstring") casadi::Conic::verbose "[INTERNAL]  Verbose mode?
 
 ";
 
@@ -9826,20 +9691,6 @@ Diagrams
 
 
 C++ includes: conic_impl.hpp ";
-
-%feature("docstring") casadi::Conic::log "
-
->  void casadi::FunctionInternal::log(const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver.
-
->  void casadi::FunctionInternal::log(const std::string &fcn, const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver, function given.
-
-";
 
 %feature("docstring") casadi::Conic::memory "[INTERNAL]  Memory objects.
 
@@ -11139,20 +10990,6 @@ function that calculates nfwd forward derivatives.
 
 ";
 
-%feature("docstring") casadi::Dple::log "
-
->  void casadi::FunctionInternal::log(const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver.
-
->  void casadi::FunctionInternal::log(const std::string &fcn, const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver, function given.
-
-";
-
 %feature("docstring") casadi::Dple::call_reverse "[INTERNAL]  Reverse mode,
 virtual functions overloaded in derived classes.
 
@@ -11394,10 +11231,6 @@ derivatives be calculated in any way?
 
 %feature("docstring") casadi::Dple::sx_out "[INTERNAL]  Get function
 input(s) and output(s)
-
-";
-
-%feature("docstring") casadi::Dple::verbose "[INTERNAL]  Verbose mode?
 
 ";
 
@@ -11779,20 +11612,6 @@ length of w field.
 
 %feature("docstring") casadi::Expm::getAtomicOutput "[INTERNAL]  Get the
 (integer) output argument of an atomic operation.
-
-";
-
-%feature("docstring") casadi::Expm::log "
-
->  void casadi::FunctionInternal::log(const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver.
-
->  void casadi::FunctionInternal::log(const std::string &fcn, const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver, function given.
 
 ";
 
@@ -12269,10 +12088,6 @@ dimensions.
 
 %feature("docstring") casadi::Expm::size_out "[INTERNAL]  Input/output
 dimensions.
-
-";
-
-%feature("docstring") casadi::Expm::verbose "[INTERNAL]  Verbose mode?
 
 ";
 
@@ -13161,20 +12976,6 @@ function with a selection of inputs/outputs of the original
 
 ";
 
-%feature("docstring") casadi::External::log "
-
->  void casadi::FunctionInternal::log(const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver.
-
->  void casadi::FunctionInternal::log(const std::string &fcn, const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver, function given.
-
-";
-
 %feature("docstring") casadi::External::sparsity_jac "[INTERNAL]  Get, if
 necessary generate, the sparsity of a Jacobian block.
 
@@ -13522,10 +13323,6 @@ length of iw field.
 
 ";
 
-%feature("docstring") casadi::External::verbose "[INTERNAL]  Verbose mode?
-
-";
-
 %feature("docstring") casadi::External::wrap "[INTERNAL]  Wrap in an
 Function instance consisting of only one MX call.
 
@@ -13723,20 +13520,6 @@ Options.
 
 %feature("docstring") casadi::FixedStepIntegrator::matching_res "[INTERNAL]
 Check if output arguments that needs to be replaced.
-
-";
-
-%feature("docstring") casadi::FixedStepIntegrator::log "
-
->  void casadi::FunctionInternal::log(const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver.
-
->  void casadi::FunctionInternal::log(const std::string &fcn, const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver, function given.
 
 ";
 
@@ -14356,11 +14139,6 @@ Release a memory object.
 
 %feature("docstring") casadi::FixedStepIntegrator::fwd_seed "[INTERNAL]
 Symbolic expressions for the forward seeds.
-
-";
-
-%feature("docstring") casadi::FixedStepIntegrator::verbose "[INTERNAL]
-Verbose mode?
 
 ";
 
@@ -16306,11 +16084,6 @@ Input/output dimensions.
 
 ";
 
-%feature("docstring") casadi::GenericExternal::verbose "[INTERNAL]  Verbose
-mode?
-
-";
-
 %feature("docstring") casadi::GenericExternal::check_res "[INTERNAL]  Check
 if output arguments have correct length and dimensions.
 
@@ -16318,20 +16091,6 @@ if output arguments have correct length and dimensions.
 
 %feature("docstring") casadi::GenericExternal::memory "[INTERNAL]  Memory
 objects.
-
-";
-
-%feature("docstring") casadi::GenericExternal::log "
-
->  void casadi::FunctionInternal::log(const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver.
-
->  void casadi::FunctionInternal::log(const std::string &fcn, const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver, function given.
 
 ";
 
@@ -17825,11 +17584,6 @@ elements.
 
 ";
 
-%feature("docstring") casadi::ImplicitFixedStepIntegrator::sz_w "[INTERNAL]
-Get required length of w field.
-
-";
-
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::print_fstats "[INTERNAL]  Print statistics.
 
 ";
@@ -18039,7 +17793,8 @@ Print.
 
 ";
 
-%feature("docstring") casadi::ImplicitFixedStepIntegrator::verbose "[INTERNAL]  Verbose mode?
+%feature("docstring") casadi::ImplicitFixedStepIntegrator::sz_w "[INTERNAL]
+Get required length of w field.
 
 ";
 
@@ -18368,20 +18123,6 @@ Obtain solver name from Adaptor.
 ";
 
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::has_function "[INTERNAL] ";
-
-%feature("docstring") casadi::ImplicitFixedStepIntegrator::log "
-
->  void casadi::FunctionInternal::log(const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver.
-
->  void casadi::FunctionInternal::log(const std::string &fcn, const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver, function given.
-
-";
 
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::call_reverse "[INTERNAL]  Reverse mode, virtual functions overloaded in derived classes.
 
@@ -18983,11 +18724,6 @@ Readable name of the internal class.
 
 ";
 
-%feature("docstring") casadi::ImplicitToNlp::verbose "[INTERNAL]  Verbose
-mode?
-
-";
-
 %feature("docstring") casadi::ImplicitToNlp::symbolicAdjSeed "[INTERNAL]
 Symbolic expressions for the adjoint seeds.
 
@@ -19150,20 +18886,6 @@ Get the floating point output argument of an atomic operation.
 
 %feature("docstring") casadi::ImplicitToNlp::eval "[INTERNAL]  Evaluate
 numerically.
-
-";
-
-%feature("docstring") casadi::ImplicitToNlp::log "
-
->  void casadi::FunctionInternal::log(const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver.
-
->  void casadi::FunctionInternal::log(const std::string &fcn, const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver, function given.
 
 ";
 
@@ -20009,20 +19731,6 @@ if input arguments that needs to be replaced.
 
 ";
 
-%feature("docstring") casadi::Integrator::log "
-
->  void casadi::FunctionInternal::log(const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver.
-
->  void casadi::FunctionInternal::log(const std::string &fcn, const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver, function given.
-
-";
-
 %feature("docstring") casadi::Integrator "
 
 Internal storage for integrator related data.
@@ -20172,11 +19880,6 @@ Get sparsity of a given input.
 ------------------------------------------------------------------------
 [INTERNAL] 
 Are all inputs and outputs scalar.
-
-";
-
-%feature("docstring") casadi::Integrator::verbose "[INTERNAL]  Verbose
-mode?
 
 ";
 
@@ -20891,20 +20594,6 @@ the (integer) input arguments of an atomic operation.
 
 ";
 
-%feature("docstring") casadi::Interpolant::log "
-
->  void casadi::FunctionInternal::log(const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver.
-
->  void casadi::FunctionInternal::log(const std::string &fcn, const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver, function given.
-
-";
-
 %feature("docstring") casadi::Interpolant::codegen_decref "[INTERNAL]
 Codegen decref for dependencies.
 
@@ -21073,11 +20762,6 @@ generate the function.
 
 %feature("docstring") casadi::Interpolant::sparsity_jac "[INTERNAL]  Get,
 if necessary generate, the sparsity of a Jacobian block.
-
-";
-
-%feature("docstring") casadi::Interpolant::sz_arg "[INTERNAL]  Get required
-length of arg field.
 
 ";
 
@@ -21305,8 +20989,8 @@ output scheme index by name.
 
 ";
 
-%feature("docstring") casadi::Interpolant::verbose "[INTERNAL]  Verbose
-mode?
+%feature("docstring") casadi::Interpolant::sz_arg "[INTERNAL]  Get required
+length of arg field.
 
 ";
 
@@ -22034,10 +21718,6 @@ Jacobian of all outputs with respect to all inputs.
 
 ";
 
-%feature("docstring") casadi::Jit::verbose "[INTERNAL]  Verbose mode?
-
-";
-
 %feature("docstring") casadi::Jit::index_in "[INTERNAL]  Get input scheme
 index by name.
 
@@ -22266,20 +21946,6 @@ object.
 
 %feature("docstring") casadi::Jit::get_name_in "[INTERNAL]  Names of
 function input and outputs.
-
-";
-
-%feature("docstring") casadi::Jit::log "
-
->  void casadi::FunctionInternal::log(const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver.
-
->  void casadi::FunctionInternal::log(const std::string &fcn, const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver, function given.
 
 ";
 
@@ -22848,10 +22514,6 @@ input value.
 
 %feature("docstring") casadi::LapackLu::get_function "[INTERNAL] ";
 
-%feature("docstring") casadi::LapackLu::verbose "[INTERNAL]  Verbose mode?
-
-";
-
 %feature("docstring") casadi::LapackLu::numel_in "[INTERNAL]  Number of
 input/output elements.
 
@@ -23054,20 +22716,6 @@ necessary generate, the sparsity of a Jacobian block.
 
 %feature("docstring") casadi::LapackLu::codegen_incref "[INTERNAL]  Codegen
 incref for dependencies.
-
-";
-
-%feature("docstring") casadi::LapackLu::log "
-
->  void casadi::FunctionInternal::log(const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver.
-
->  void casadi::FunctionInternal::log(const std::string &fcn, const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver, function given.
 
 ";
 
@@ -24151,20 +23799,6 @@ the number of atomic operations.
 
 ";
 
-%feature("docstring") casadi::LapackQr::log "
-
->  void casadi::FunctionInternal::log(const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver.
-
->  void casadi::FunctionInternal::log(const std::string &fcn, const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver, function given.
-
-";
-
 %feature("docstring") casadi::LapackQr::get_options "[INTERNAL]  Options.
 
 ";
@@ -24346,7 +23980,8 @@ function inputs and outputs.
 
 ";
 
-%feature("docstring") casadi::LapackQr::verbose "[INTERNAL]  Verbose mode?
+%feature("docstring") casadi::LapackQr::checkout "[INTERNAL]  Checkout a
+memory object.
 
 ";
 
@@ -24616,11 +24251,6 @@ dimensions of inputs and outputs.
 
 %feature("docstring") casadi::LapackQr::check_arg "[INTERNAL]  Check if
 input arguments have correct length and dimensions.
-
-";
-
-%feature("docstring") casadi::LapackQr::checkout "[INTERNAL]  Checkout a
-memory object.
 
 ";
 
@@ -25190,20 +24820,6 @@ Get function signature: name:(inputs)->(outputs)
 
 ";
 
-%feature("docstring") casadi::LinearInterpolant::log "
-
->  void casadi::FunctionInternal::log(const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver.
-
->  void casadi::FunctionInternal::log(const std::string &fcn, const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver, function given.
-
-";
-
 %feature("docstring") casadi::LinearInterpolant::replace_arg "[INTERNAL]
 Replace 0-by-0 inputs.
 
@@ -25434,11 +25050,6 @@ Number of input/output elements.
 %feature("docstring") casadi::LinearInterpolant::finalize "[INTERNAL]
 Finalize the object creation This function, which visits the class hierarchy
 in reverse order is run after init() has been completed.
-
-";
-
-%feature("docstring") casadi::LinearInterpolant::verbose "[INTERNAL]
-Verbose mode?
 
 ";
 
@@ -25943,20 +25554,6 @@ Input/output dimensions.
 
 ";
 
-%feature("docstring") casadi::LinearInterpolantJac::log "
-
->  void casadi::FunctionInternal::log(const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver.
-
->  void casadi::FunctionInternal::log(const std::string &fcn, const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver, function given.
-
-";
-
 %feature("docstring") casadi::LinearInterpolantJac::has_spfwd "[INTERNAL]
 Is the class able to propagate seeds through the algorithm?
 
@@ -26098,11 +25695,6 @@ Number of function inputs and outputs.
 
 %feature("docstring") casadi::LinearInterpolantJac::n_nodes "[INTERNAL]
 Number of nodes in the algorithm.
-
-";
-
-%feature("docstring") casadi::LinearInterpolantJac::verbose "[INTERNAL]
-Verbose mode?
 
 ";
 
@@ -26959,20 +26551,6 @@ count.
 
 ";
 
-%feature("docstring") casadi::Lsqr::log "
-
->  void casadi::FunctionInternal::log(const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver.
-
->  void casadi::FunctionInternal::log(const std::string &fcn, const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver, function given.
-
-";
-
 %feature("docstring") casadi::Lsqr::signature "[INTERNAL]  Code generate
 the function.
 
@@ -27715,10 +27293,6 @@ input/output nonzeros.
 
 ";
 
-%feature("docstring") casadi::Lsqr::verbose "[INTERNAL]  Verbose mode?
-
-";
-
 %feature("docstring") casadi::Lsqr::size2_out "[INTERNAL]  Input/output
 dimensions.
 
@@ -28091,10 +27665,6 @@ derivatives be calculated in any way?
 
 %feature("docstring") casadi::Map::index_out "[INTERNAL]  Get output scheme
 index by name.
-
-";
-
-%feature("docstring") casadi::Map::verbose "[INTERNAL]  Verbose mode?
 
 ";
 
@@ -28476,20 +28046,6 @@ is available.
 
 %feature("docstring") casadi::Map::max_in "[INTERNAL]  Get largest input
 value.
-
-";
-
-%feature("docstring") casadi::Map::log "
-
->  void casadi::FunctionInternal::log(const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver.
-
->  void casadi::FunctionInternal::log(const std::string &fcn, const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver, function given.
 
 ";
 
@@ -29048,25 +28604,7 @@ Jacobian of all input elements with respect to all output elements.
 
 ";
 
-%feature("docstring") casadi::MapOmp::verbose "[INTERNAL]  Verbose mode?
-
-";
-
 %feature("docstring") casadi::MapOmp::memory "[INTERNAL]  Memory objects.
-
-";
-
-%feature("docstring") casadi::MapOmp::log "
-
->  void casadi::FunctionInternal::log(const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver.
-
->  void casadi::FunctionInternal::log(const std::string &fcn, const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver, function given.
 
 ";
 
@@ -31959,20 +31497,6 @@ input(s) and output(s)
 
 ";
 
-%feature("docstring") casadi::Newton::log "
-
->  void casadi::FunctionInternal::log(const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver.
-
->  void casadi::FunctionInternal::log(const std::string &fcn, const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver, function given.
-
-";
-
 %feature("docstring") casadi::Newton::oracle "[INTERNAL]  Get oracle.
 
 ";
@@ -32315,10 +31839,6 @@ inputs and outputs scalar.
 
 %feature("docstring") casadi::Newton::codegen_name "[INTERNAL]  Get name in
 codegen.
-
-";
-
-%feature("docstring") casadi::Newton::verbose "[INTERNAL]  Verbose mode?
 
 ";
 
@@ -32866,20 +32386,6 @@ an atomic operation operator index.
 
 ";
 
-%feature("docstring") casadi::Nlpsol::log "
-
->  void casadi::FunctionInternal::log(const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver.
-
->  void casadi::FunctionInternal::log(const std::string &fcn, const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver, function given.
-
-";
-
 %feature("docstring") casadi::Nlpsol::is_a "[INTERNAL]  Check if the
 function is of a particular type.
 
@@ -33366,10 +32872,6 @@ inputs and outputs.
 
 ";
 
-%feature("docstring") casadi::Nlpsol::verbose "[INTERNAL]  Verbose mode?
-
-";
-
 %feature("docstring") casadi::Nlpsol::index_in "[INTERNAL]  Get input
 scheme index by name.
 
@@ -33828,11 +33330,6 @@ Input/output dimensions.
 
 ";
 
-%feature("docstring") casadi::OracleFunction::verbose "[INTERNAL]  Verbose
-mode?
-
-";
-
 %feature("docstring") casadi::OracleFunction::eval_mx "[INTERNAL]  Evaluate
 with symbolic matrices.
 
@@ -33917,20 +33414,6 @@ Replace 0-by-0 outputs.
 
 %feature("docstring") casadi::OracleFunction::eval "[INTERNAL]  Evaluate
 numerically.
-
-";
-
-%feature("docstring") casadi::OracleFunction::log "
-
->  void casadi::FunctionInternal::log(const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver.
-
->  void casadi::FunctionInternal::log(const std::string &fcn, const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver, function given.
 
 ";
 
@@ -35546,7 +35029,8 @@ temporary variables needed.
 
 ";
 
-%feature("docstring") casadi::QpToNlp::verbose "[INTERNAL]  Verbose mode?
+%feature("docstring") casadi::QpToNlp::sz_w "[INTERNAL]  Get required
+length of w field.
 
 ";
 
@@ -35675,11 +35159,6 @@ in codegen.
 
 ";
 
-%feature("docstring") casadi::QpToNlp::sz_w "[INTERNAL]  Get required
-length of w field.
-
-";
-
 %feature("docstring") casadi::QpToNlp::n_out "[INTERNAL]  Number of
 function inputs and outputs.
 
@@ -35761,20 +35240,6 @@ factor for chosing forward/reverse mode.
 
 %feature("docstring") casadi::QpToNlp::check_arg "[INTERNAL]  Check if
 input arguments have correct length and dimensions.
-
-";
-
-%feature("docstring") casadi::QpToNlp::log "
-
->  void casadi::FunctionInternal::log(const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver.
-
->  void casadi::FunctionInternal::log(const std::string &fcn, const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver, function given.
 
 ";
 
@@ -36324,20 +35789,6 @@ sparsity forward.
 
 ";
 
-%feature("docstring") casadi::Rootfinder::log "
-
->  void casadi::FunctionInternal::log(const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver.
-
->  void casadi::FunctionInternal::log(const std::string &fcn, const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver, function given.
-
-";
-
 %feature("docstring") casadi::Rootfinder::alloc_mem "[INTERNAL]  Create
 memory block.
 
@@ -36685,11 +36136,6 @@ a function that calculates nadj adjoint derivatives.
 
 ";
 
-%feature("docstring") casadi::Rootfinder::verbose "[INTERNAL]  Verbose
-mode?
-
-";
-
 %feature("docstring") casadi::Rootfinder::getAlgorithmSize "[INTERNAL]  Get
 the number of atomic operations.
 
@@ -36977,11 +36423,6 @@ evaluation.
 
 ";
 
-%feature("docstring") casadi::RungeKutta::verbose "[INTERNAL]  Verbose
-mode?
-
-";
-
 %feature("docstring") casadi::RungeKutta::create_function "[INTERNAL]
 Create an oracle function
 
@@ -37074,20 +36515,6 @@ mode AD, virtual functions overloaded in derived classes.
 
 %feature("docstring") casadi::RungeKutta::ad_weight "[INTERNAL]  Weighting
 factor for chosing forward/reverse mode.
-
-";
-
-%feature("docstring") casadi::RungeKutta::log "
-
->  void casadi::FunctionInternal::log(const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver.
-
->  void casadi::FunctionInternal::log(const std::string &fcn, const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver, function given.
 
 ";
 
@@ -37992,20 +37419,6 @@ Evaluate a function, overloaded.
 
 ";
 
-%feature("docstring") casadi::Scpgen::log "
-
->  void casadi::FunctionInternal::log(const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver.
-
->  void casadi::FunctionInternal::log(const std::string &fcn, const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver, function given.
-
-";
-
 %feature("docstring") casadi::Scpgen::sz_work "[INTERNAL]  Get number of
 temporary variables needed.
 
@@ -38323,10 +37736,6 @@ sparsity forward.
 
 %feature("docstring") casadi::Scpgen::codegen_name "[INTERNAL]  Get name in
 codegen.
-
-";
-
-%feature("docstring") casadi::Scpgen::verbose "[INTERNAL]  Verbose mode?
 
 ";
 
@@ -39072,20 +38481,6 @@ Full Jacobian.
 
 ";
 
-%feature("docstring") casadi::SimplifiedExternal::log "
-
->  void casadi::FunctionInternal::log(const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver.
-
->  void casadi::FunctionInternal::log(const std::string &fcn, const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver, function given.
-
-";
-
 %feature("docstring") casadi::SimplifiedExternal::size_out "[INTERNAL]
 Input/output dimensions.
 
@@ -39252,11 +38647,6 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 %feature("docstring") casadi::SimplifiedExternal::has_reverse "[INTERNAL]
 Reverse mode derivatives.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::verbose "[INTERNAL]
-Verbose mode?
 
 ";
 
@@ -40517,11 +39907,6 @@ statistics.
 
 ";
 
-%feature("docstring") casadi::SlicotDple::verbose "[INTERNAL]  Verbose
-mode?
-
-";
-
 %feature("docstring") casadi::SlicotDple::max_in "[INTERNAL]  Get largest
 input value.
 
@@ -40703,20 +40088,6 @@ output arguments have correct length and dimensions.
 
 ";
 
-%feature("docstring") casadi::SlicotDple::log "
-
->  void casadi::FunctionInternal::log(const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver.
-
->  void casadi::FunctionInternal::log(const std::string &fcn, const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver, function given.
-
-";
-
 %feature("docstring") casadi::SlicotDple::alloc_mem "[INTERNAL]  Create
 memory block.
 
@@ -40796,20 +40167,6 @@ objects.
 
 %feature("docstring") casadi::SlicotExpm::type_name "[INTERNAL]  Get type
 name.
-
-";
-
-%feature("docstring") casadi::SlicotExpm::log "
-
->  void casadi::FunctionInternal::log(const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver.
-
->  void casadi::FunctionInternal::log(const std::string &fcn, const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver, function given.
 
 ";
 
@@ -41153,11 +40510,6 @@ Function instance consisting of only one MX call.
 
 %feature("docstring") casadi::SlicotExpm::symbolicAdjSeed "[INTERNAL]
 Symbolic expressions for the adjoint seeds.
-
-";
-
-%feature("docstring") casadi::SlicotExpm::verbose "[INTERNAL]  Verbose
-mode?
 
 ";
 
@@ -42876,10 +42228,6 @@ input/output elements.
 
 ";
 
-%feature("docstring") casadi::Sqpmethod::verbose "[INTERNAL]  Verbose mode?
-
-";
-
 %feature("docstring") casadi::Sqpmethod::disp "[INTERNAL]  Print.
 
 ";
@@ -43355,20 +42703,6 @@ memory object.
 
 %feature("docstring") casadi::Sqpmethod::get_sparsity_in "[INTERNAL]
 Sparsities of function inputs and outputs.
-
-";
-
-%feature("docstring") casadi::Sqpmethod::log "
-
->  void casadi::FunctionInternal::log(const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver.
-
->  void casadi::FunctionInternal::log(const std::string &fcn, const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver, function given.
 
 ";
 
@@ -44149,20 +43483,6 @@ function that calculates nfwd forward derivatives.
 
 ";
 
-%feature("docstring") casadi::Switch::log "
-
->  void casadi::FunctionInternal::log(const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver.
-
->  void casadi::FunctionInternal::log(const std::string &fcn, const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver, function given.
-
-";
-
 %feature("docstring") casadi::Switch::adjViaJac "[INTERNAL]  Calculate
 derivatives by multiplying the full Jacobian and multiplying.
 
@@ -44243,11 +43563,6 @@ input(s) and output(s)
 
 ";
 
-%feature("docstring") casadi::Switch::get_stats "[INTERNAL]  Get all
-statistics.
-
-";
-
 %feature("docstring") casadi::Switch::codegen_body "[INTERNAL]  Generate
 code for the body of the C function.
 
@@ -44308,7 +43623,8 @@ function.
 
 ";
 
-%feature("docstring") casadi::Switch::verbose "[INTERNAL]  Verbose mode?
+%feature("docstring") casadi::Switch::get_stats "[INTERNAL]  Get all
+statistics.
 
 ";
 
@@ -44763,11 +44079,6 @@ derivatives be calculated in any way?
 
 ";
 
-%feature("docstring") casadi::SymbolicQr::verbose "[INTERNAL]  Verbose
-mode?
-
-";
-
 %feature("docstring") casadi::SymbolicQr::getJacSparsityGen "[INTERNAL]
 Get the sparsity pattern, forward mode.
 
@@ -45035,20 +44346,6 @@ Parameters:
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
-
-";
-
-%feature("docstring") casadi::SymbolicQr::log "
-
->  void casadi::FunctionInternal::log(const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver.
-
->  void casadi::FunctionInternal::log(const std::string &fcn, const std::string &msg) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Log the status of the solver, function given.
 
 ";
 
@@ -46842,6 +46139,8 @@ Generate a hash value incrementally, array.
 ";
 
 %feature("docstring") casadi::casadi_copy_int "[INTERNAL] ";
+
+%feature("docstring") casadi::trim_path "";
 
 %feature("docstring") casadi::in_bounds "
 
