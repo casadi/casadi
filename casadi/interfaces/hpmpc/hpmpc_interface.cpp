@@ -218,7 +218,7 @@ namespace casadi {
       ngs_.push_back(cN);
 
       N_ = nus_.size();
-      if (verbose()) {
+      if (verbose_) {
         std::stringstream ss;
         ss << "HPMPC detected structure:" <<
         " N " << N_ << ", nx " << nx << ", nu " << nu << ", ng " << ng << ".";

@@ -262,7 +262,7 @@ namespace casadi {
       }
     }
 
-    if (verbose()) {
+    if (verbose_) {
       if (live_variables) {
         userOut() << "Using live variables: work array is "
              <<  worksize << " instead of "

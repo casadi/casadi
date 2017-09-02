@@ -416,7 +416,7 @@ namespace casadi {
       }
     }
 
-    if (verbose()) {
+    if (verbose_) {
       if (live_variables) {
         userOut() << "Using live variables: work array is "
              <<  worksize_ << " instead of " << nodes.size() << endl;
@@ -495,7 +495,7 @@ namespace casadi {
     }
 
     // Print
-    if (verbose()) {
+    if (verbose_) {
       userOut() << "SXFunction::init Initialized " << name_ << " ("
            << algorithm_.size() << " elementary operations)" << endl;
     }
@@ -503,7 +503,7 @@ namespace casadi {
 
   int SXFunction::
   eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) const {
-    if (verbose()) userOut() << "SXFunction::eval_sxsparse begin" << endl;
+    if (verbose_) userOut() << "SXFunction::eval_sxsparse begin" << endl;
 
     // Iterator to the binary operations
     vector<SXElem>::const_iterator b_it=operations_.begin();
@@ -515,7 +515,7 @@ namespace casadi {
     vector<SXElem>::const_iterator p_it = free_vars_.begin();
 
     // Evaluate algorithm
-    if (verbose()) {
+    if (verbose_) {
       userOut() << "SXFunction::eval_sxsparse evaluating algorithm forward" << endl;
     }
     for (auto&& a : algorithm_) {
@@ -550,13 +550,13 @@ namespace casadi {
         }
       }
     }
-    if (verbose()) userOut() << "SXFunction::eval_sx end" << endl;
+    if (verbose_) userOut() << "SXFunction::eval_sx end" << endl;
     return 0;
   }
 
   void SXFunction::ad_forward(const vector<vector<SX> >& fseed,
                                 vector<vector<SX> >& fsens) const {
-    if (verbose()) userOut() << "SXFunction::ad_forward begin" << endl;
+    if (verbose_) userOut() << "SXFunction::ad_forward begin" << endl;
 
     // Number of forward seeds
     int nfwd = fseed.size();
@@ -607,7 +607,7 @@ namespace casadi {
     vector<TapeEl<SXElem> >::iterator it1 = s_pdwork.begin();
 
     // Evaluate algorithm
-    if (verbose()) userOut() << "SXFunction::ad_forward evaluating algorithm forward" << endl;
+    if (verbose_) userOut() << "SXFunction::ad_forward evaluating algorithm forward" << endl;
     for (auto&& e : algorithm_) {
       switch (e.op) {
       case OP_INPUT:
@@ -629,7 +629,7 @@ namespace casadi {
     vector<SXElem> w(worksize_);
 
     // Calculate forward sensitivities
-    if (verbose())
+    if (verbose_)
       userOut() << "SXFunction::ad_forward calculating forward derivatives" << endl;
     for (int dir=0; dir<nfwd; ++dir) {
       vector<TapeEl<SXElem> >::const_iterator it2 = s_pdwork.begin();
@@ -650,12 +650,12 @@ namespace casadi {
         }
       }
     }
-    if (verbose()) userOut() << "SXFunction::ad_forward end" << endl;
+    if (verbose_) userOut() << "SXFunction::ad_forward end" << endl;
   }
 
   void SXFunction::ad_reverse(const vector<vector<SX> >& aseed,
                                 vector<vector<SX> >& asens) const {
-    if (verbose()) userOut() << "SXFunction::ad_reverse begin" << endl;
+    if (verbose_) userOut() << "SXFunction::ad_reverse begin" << endl;
 
     // number of adjoint seeds
     int nadj = aseed.size();
@@ -713,7 +713,7 @@ namespace casadi {
     vector<TapeEl<SXElem> >::iterator it1 = s_pdwork.begin();
 
     // Evaluate algorithm
-    if (verbose()) userOut() << "SXFunction::ad_forward evaluating algorithm forward" << endl;
+    if (verbose_) userOut() << "SXFunction::ad_forward evaluating algorithm forward" << endl;
     for (auto&& a : algorithm_) {
       switch (a.op) {
       case OP_INPUT:
@@ -732,7 +732,7 @@ namespace casadi {
     }
 
     // Calculate adjoint sensitivities
-    if (verbose()) userOut() << "SXFunction::ad_reverse calculating adjoint derivatives"
+    if (verbose_) userOut() << "SXFunction::ad_reverse calculating adjoint derivatives"
                        << endl;
 
     // Work vector
@@ -769,7 +769,7 @@ namespace casadi {
         }
       }
     }
-    if (verbose()) userOut() << "SXFunction::ad_reverse end" << endl;
+    if (verbose_) userOut() << "SXFunction::ad_reverse end" << endl;
   }
 
   int SXFunction::
@@ -986,7 +986,7 @@ namespace casadi {
 
     // Form c-string
     std::string s = ss.str();
-    if (verbose()) {
+    if (verbose_) {
       userOut() << "Kernel source code for sparsity propagation:" << endl;
       userOut() << " ***** " << endl;
       userOut() << s;
@@ -1138,7 +1138,7 @@ namespace casadi {
 
     // Form c-string
     std::string s = ss.str();
-    if (verbose()) {
+    if (verbose_) {
       userOut() << "Kernel source code for numerical evaluation:" << endl;
       userOut() << " ***** " << endl;
       userOut() << s;

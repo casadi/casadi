@@ -319,15 +319,15 @@ namespace casadi {
     if (jit_) {
       string jit_name = "jit_tmp";
       if (has_codegen()) {
-        if (verbose())
+        if (verbose_)
           log("FunctionInternal::finalize", "Codegenerating function '" + name() + "'.");
         // JIT everything
         CodeGenerator gen(jit_name);
         gen.add(self());
-        if (verbose())
+        if (verbose_)
           log("FunctionInternal::finalize", "Compiling function '" + name() + "'..");
         compiler_ = Importer(gen.generate(), compilerplugin_, jit_options_);
-        if (verbose())
+        if (verbose_)
           log("FunctionInternal::finalize", "Compiling function '" + name() + "' done.");
         // Try to load with simplified syntax
         simple_ = (simple_t)compiler_.get_function(name() + "_simple");
@@ -454,19 +454,15 @@ namespace casadi {
   }
 
   void FunctionInternal::log(const string& msg) const {
-    if (verbose()) {
+    if (verbose_) {
       userOut() << "CasADi log message: " << msg << endl;
     }
   }
 
   void FunctionInternal::log(const string& fcn, const string& msg) const {
-    if (verbose()) {
+    if (verbose_) {
       userOut() << "CasADi log message: In \"" << fcn << "\" --- " << msg << endl;
     }
-  }
-
-  bool FunctionInternal::verbose() const {
-    return verbose_;
   }
 
   std::vector<MX> FunctionInternal::symbolic_output(const std::vector<MX>& arg) const {
@@ -538,7 +534,7 @@ namespace casadi {
     if (seed.size() % bvec_size) nsweep++;
 
     // Print
-    if (verbose()) {
+    if (verbose_) {
       userOut() << "FunctionInternal::getJacSparsityGen<" << fwd << ">: "
                 << nsweep << " sweeps needed for " << seed.size() << " directions" << endl;
     }
@@ -553,7 +549,7 @@ namespace casadi {
     for (int s=0; s<nsweep; ++s) {
 
       // Print progress
-      if (verbose()) {
+      if (verbose_) {
         int progress_new = (s*100)/nsweep;
         // Print when entering a new decade
         if (progress_new / 10 > progress / 10) {
@@ -1301,10 +1297,10 @@ namespace casadi {
             floor(best_coloring/w);
           D1 = AT.uni_coloring(A, max_colorings_to_test);
           if (D1.is_null()) {
-            if (verbose()) userOut() << "Forward mode coloring interrupted (more than "
+            if (verbose_) userOut() << "Forward mode coloring interrupted (more than "
                                << max_colorings_to_test << " needed)." << endl;
           } else {
-            if (verbose()) userOut() << "Forward mode coloring completed: "
+            if (verbose_) userOut() << "Forward mode coloring completed: "
                                << D1.size2() << " directional derivatives needed ("
                                << A.size1() << " without coloring)." << endl;
             D2 = Sparsity();
@@ -1317,10 +1313,10 @@ namespace casadi {
 
           D2 = A.uni_coloring(AT, max_colorings_to_test);
           if (D2.is_null()) {
-            if (verbose()) userOut() << "Adjoint mode coloring interrupted (more than "
+            if (verbose_) userOut() << "Adjoint mode coloring interrupted (more than "
                                << max_colorings_to_test << " needed)." << endl;
           } else {
-            if (verbose()) userOut() << "Adjoint mode coloring completed: "
+            if (verbose_) userOut() << "Adjoint mode coloring completed: "
                                << D2.size2() << " directional derivatives needed ("
                                << A.size2() << " without coloring)." << endl;
             D1 = Sparsity();

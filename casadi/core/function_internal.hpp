@@ -425,9 +425,6 @@ namespace casadi {
                       bool compact, bool symmetric,
                       bool allow_forward, bool allow_reverse) const;
 
-    /// Verbose mode?
-    bool verbose() const;
-
     ///@{
     /** \brief Number of function inputs and outputs */
     inline int n_in() const { return isp_.size();}

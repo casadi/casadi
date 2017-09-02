@@ -111,7 +111,7 @@ namespace casadi {
       casadi_assert_message(!isinf(A[k]), "Nonzero " << k << " is infinite");
     }
 
-    if (verbose()) {
+    if (verbose_) {
       userOut() << "CsparseInterface::prepare: numeric factorization" << endl;
       userOut() << "linear system to be factorized = " << endl;
       Sparsity sp = Sparsity::compressed(m->sparsity);
@@ -133,7 +133,7 @@ namespace casadi {
             "structurally non-zero. Promoting these zeros to be structural "
             "zeros, the matrix was found to be structurally rank deficient."
             " sprank: " << sprank(temp.sparsity()) << " <-> " << temp.size2() << endl;
-        if (verbose()) {
+        if (verbose_) {
           ss << "Sparsity of the linear system: " << endl;
           sp.disp(ss, true); // print detailed
         }
@@ -142,7 +142,7 @@ namespace casadi {
         stringstream ss;
         ss << "CsparseInterface::prepare: factorization failed, check if Jacobian is singular"
            << endl;
-        if (verbose()) {
+        if (verbose_) {
           ss << "Sparsity of the linear system: " << endl;
           sp.disp(ss, true); // print detailed
         }

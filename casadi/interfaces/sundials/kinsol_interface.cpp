@@ -273,7 +273,7 @@ namespace casadi {
     if (flag<KIN_SUCCESS) kinsol_error("KINSol", flag);
 
     // Warn if not successful return
-    if (verbose()) {
+    if (verbose_) {
       if (flag!=KIN_SUCCESS) kinsol_error("KINSol", flag, false);
     }
 
@@ -308,7 +308,7 @@ namespace casadi {
       } catch(exception& ex) {
         stringstream ss;
         ss << ex.what() << endl;
-        if (verbose()) {
+        if (verbose_) {
           userOut() << "u = ";
           N_VPrint_Serial(u);
         }

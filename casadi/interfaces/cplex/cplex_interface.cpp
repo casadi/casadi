@@ -443,7 +443,7 @@ namespace casadi {
     int solnstat = CPXgetstat(m->env, m->lp);
     stringstream errormsg;
     // NOTE: Why not print directly to userOut() and userOut<true, PL_WARN>()?
-    if (verbose()) {
+    if (verbose_) {
       if (solnstat == CPX_STAT_OPTIMAL) {
         errormsg << "CPLEX: solution status: Optimal solution found.\n";
       } else if (solnstat == CPX_STAT_UNBOUNDED) {
