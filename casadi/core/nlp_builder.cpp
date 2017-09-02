@@ -106,6 +106,9 @@ namespace casadi {
 
     // Read segments
     parse();
+
+    // multiple the objective sign
+    nlp_.f = sign_*nlp_.f;
   }
 
   NlImporter::~NlImporter() {
@@ -378,10 +381,10 @@ namespace casadi {
     // Should the objective be maximized
     int sigma;
     s_ >> sigma;
-    MX sign = sigma!=0 ? -1 : 1;
+    sign_ = sigma!=0 ? -1 : 1;
 
     // Parse and save expression
-    nlp_.f += sign*expr();
+    nlp_.f += expr();
   }
 
   void NlImporter::d_segment() {
