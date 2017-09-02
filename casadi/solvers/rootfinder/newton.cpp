@@ -150,7 +150,7 @@ namespace casadi {
           abstol = max(abstol, fabs(m->f[i]));
         }
         if (abstol <= abstol_) {
-          casadi_msg("Converged to acceptable tolerance - abstol: " << abstol_);
+          if (verbose_) log("Converged to acceptable tolerance - abstol: " + str(abstol_));
           break;
         }
       }
@@ -166,7 +166,7 @@ namespace casadi {
           abstolStep = max(abstolStep, fabs(m->f[i]));
         }
         if (abstolStep <= abstolStep_) {
-          casadi_msg("Converged to acceptable tolerance - abstolStep: " << abstolStep_);
+          if (verbose_) log("Converged to acceptable tolerance: " + str(abstolStep_));
           break;
         }
       }
@@ -191,7 +191,7 @@ namespace casadi {
     // Store the iteration count
     if (success) m->return_status = "success";
 
-    casadi_msg("Newton::solveNonLinear():end after " << m->iter << " steps");
+    if (verbose_) log("Newton::solveNonLinear():end after " + str(m->iter) + " steps");
   }
 
   void Newton::printIteration(std::ostream &stream) const {

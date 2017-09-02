@@ -613,9 +613,11 @@ namespace casadi {
     // Construct sparsity pattern and return
     if (!fwd) swap(jrow, jcol);
     Sparsity ret = Sparsity::triplet(nz_out, nz_in, jcol, jrow);
-    casadi_msg("Formed Jacobian sparsity pattern (dimension " << ret.size() << ", "
-               << ret.nnz() << " nonzeros, " << (100.0*ret.nnz())/ret.numel() << " % nonzeros).");
-    casadi_msg("FunctionInternal::getJacSparsity end ");
+    if (verbose_) {
+      log("Formed Jacobian sparsity pattern (dimension " + str(ret.size()) + ", "
+          + str(ret.nnz()) + " nonzeros, " + str((100.0*ret.nnz())/ret.numel()) + " % nonzeros).");
+      log("FunctionInternal::getJacSparsity end ");
+    }
     return ret;
   }
 
@@ -663,7 +665,7 @@ namespace casadi {
     bool hasrun = false;
 
     while (!hasrun || coarse.size()!=nz+1) {
-      casadi_msg("Block size: " << granularity);
+      if (verbose_) log("Block size: " + str(granularity));
 
       // Clear the sparsity triplet acccumulator
       jcol.clear();
@@ -674,7 +676,9 @@ namespace casadi {
 
       Sparsity D = r.star_coloring();
 
-      casadi_msg("Star coloring on " << r.dim() << ": " << D.size2() << " <-> " << D.size1());
+      if (verbose_) {
+        log("Star coloring on " + str(r.dim()) + ": " + str(D.size2()) + " <-> " + str(D.size1()));
+      }
 
       // Clear the seeds
       fill(seed.begin(), seed.end(), 0);
@@ -835,10 +839,11 @@ namespace casadi {
       coarse = fine;
       hasrun = true;
     }
-
-    casadi_msg("Number of sweeps: " << nsweeps);
-    casadi_msg("Formed Jacobian sparsity pattern (dimension " << r.size() <<
-               ", " << r.nnz() << " nonzeros, " << (100.0*r.nnz())/r.numel() << " % nonzeros).");
+    if (verbose_) {
+      log("Number of sweeps: " + str(nsweeps));
+      log("Formed Jacobian sparsity pattern (dimension " + str(r.size()) +
+          ", " + str(r.nnz()) + " nonzeros, " + str((100.0*r.nnz())/r.numel()) + " % nonzeros).");
+    }
 
     return r.T();
   }
@@ -904,7 +909,9 @@ namespace casadi {
     }
 
     while (!hasrun || coarse_col.size()!=nz_out+1 || coarse_row.size()!=nz_in+1) {
-      casadi_msg("Block size: " << granularity_col << " x " << granularity_row);
+      if (verbose_) {
+        log("Block size: " + str(granularity_col) + " x " + str(granularity_row));
+      }
 
       // Clear the sparsity triplet acccumulator
       jcol.clear();
@@ -923,23 +930,18 @@ namespace casadi {
       Sparsity D1 = rT.uni_coloring(r);
       // Adjoint mode
       Sparsity D2 = r.uni_coloring(rT);
-
-      casadi_msg("Coloring on " << r.dim() << " (fwd seeps: " << D1.size2() <<
-                 " , adj sweeps: " << D2.size1() << ")");
-
-      // Use forward mode?
-      int fwd_cost = use_fwd ? granularity_row: granularity_col;
-      int adj_cost = use_fwd ? granularity_col: granularity_row;
+      if (verbose_) {
+        log("Coloring on " + str(r.dim()) + " (fwd seeps: " + str(D1.size2()) +
+                 " , adj sweeps: " + str(D2.size1()) + ")");
+      }
 
       // Use whatever required less colors if we tried both (with preference to forward mode)
-      if ((sp_w*D1.size2()*fwd_cost <= (1-sp_w)*D2.size2()*adj_cost)) {
-        use_fwd = true;
-        casadi_msg("Forward mode chosen (fwd cost: " << sp_w*D1.size2()*fwd_cost << ", adj cost: "
-                   << (1-sp_w)*D2.size2()*adj_cost << ")");
-      } else {
-        use_fwd = false;
-        casadi_msg("Adjoint mode chosen (adj cost: " << sp_w*D1.size2()*fwd_cost << ", adj cost: "
-                   << (1-sp_w)*D2.size2()*adj_cost << ")");
+      double fwd_cost = (use_fwd ? granularity_row : granularity_col) * sp_w*D1.size2();
+      double adj_cost = (use_fwd ? granularity_col : granularity_row) * (1-sp_w)*D2.size2();
+      use_fwd = fwd_cost <= adj_cost;
+      if (verbose_) {
+        log(string(use_fwd ? "Forward" : "Reverse") + " mode chosen "
+            "(fwd cost: " + str(fwd_cost) + ", adj cost: " + str(adj_cost) + ")");
       }
 
       // Get seeds and sensitivities
@@ -1131,9 +1133,11 @@ namespace casadi {
       }
       hasrun = true;
     }
-    casadi_msg("Number of sweeps: " << nsweeps);
-    casadi_msg("Formed Jacobian sparsity pattern (dimension " << r.size() <<
-               ", " << r.nnz() << " nonzeros, " << (100.0*r.nnz())/r.numel() << " % nonzeros).");
+    if (verbose_) {
+      log("Number of sweeps: " + str(nsweeps));
+      log("Formed Jacobian sparsity pattern (dimension " + str(r.size()) + ", " +
+          str(r.nnz()) + " nonzeros, " + str((100.0*r.nnz())/r.numel()) + " % nonzeros).");
+    }
 
     return r.T();
   }
@@ -1259,8 +1263,10 @@ namespace casadi {
       // Star coloring if symmetric
       log("FunctionInternal::getPartition star_coloring");
       D1 = A.star_coloring();
-      casadi_msg("Star coloring completed: " << D1.size2() << " directional derivatives needed ("
-                 << A.size1() << " without coloring).");
+      if (verbose_) {
+        log("Star coloring completed: " + str(D1.size2()) + " directional derivatives needed ("
+                 + str(A.size1()) + " without coloring).");
+      }
 
     } else {
       casadi_assert(enable_forward_ || enable_fd_ || enable_reverse_);

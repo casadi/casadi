@@ -107,14 +107,6 @@ class CasadiException : public std::exception {
 #define CASADI_ASSERT_WHERE " on line " CASADI_ASSERT_STR(__LINE__) \
     " of file " CASADI_ASSERT_STR(__FILE__)
 
-  // Should be removed, cf. #890
-#define casadi_msg(msg)                                                 \
-  if (verbose()) {                                                      \
-    std::stringstream ss;                                               \
-    ss << msg;                                                          \
-    log(ss.str());                                                      \
-  }
-
 #define casadi_error(msg)                                               \
   {                                                                     \
     std::stringstream ss_internal_;                                     \

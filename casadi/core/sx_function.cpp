@@ -73,7 +73,7 @@ namespace casadi {
   }
 
   int SXFunction::eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
-    casadi_msg("SXFunction::eval():begin  " << name_);
+    if (verbose_) log("SXFunction::eval():begin  " + name_);
 
     // Make sure no free parameters
     if (!free_vars_.empty()) {
@@ -100,7 +100,7 @@ namespace casadi {
       }
     }
 
-    casadi_msg("SXFunction::eval():end " << name_);
+    if (verbose_) log("SXFunction::eval():end " + name_);
     return 0;
   }
 
