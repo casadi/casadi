@@ -81,7 +81,7 @@ namespace casadi {
     case OT_STRINGVECTOR:
       return std::vector<std::string>();
     default:
-      casadi_error("empty_from_type. Unsupported type " << type);
+      casadi_error("empty_from_type. Unsupported type " + str(type));
     }
   }
 

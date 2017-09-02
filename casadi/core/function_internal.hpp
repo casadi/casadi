@@ -498,7 +498,7 @@ namespace casadi {
         if (i->compare(0, col, name)==0) return i-v.begin();
       }
       casadi_error("FunctionInternal::index_in: could not find entry \""
-                   << name << "\". Available names are: " << v << ".");
+                   + name + "\". Available names are: " + str(v) + ".");
       return -1;
     }
 
@@ -510,7 +510,7 @@ namespace casadi {
         if (i->compare(0, col, name)==0) return i-v.begin();
       }
       casadi_error("FunctionInternal::index_out: could not find entry \""
-                   << name << "\". Available names are: " << v << ".");
+                   + name + "\". Available names are: " + str(v) + ".");
       return -1;
     }
 
@@ -910,11 +910,11 @@ namespace casadi {
   void FunctionInternal::check_arg(const std::vector<M>& arg) const {
     int n_in = this->n_in();
     casadi_assert_message(arg.size()==n_in, "Incorrect number of inputs: Expected "
-                          << n_in << ", got " << arg.size());
+                          + str(n_in) + ", got " + str(arg.size()));
     for (int i=0; i<n_in; ++i) {
       casadi_assert_message(check_mat(arg[i].sparsity(), sparsity_in(i)),
-                            "Input " << i << " (" << name_in(i) << ") has mismatching shape. "
-                            << "Expected " << size_in(i) << ", got " << arg[i].size());
+                            "Input " + str(i) + " (" + name_in(i) + ") has mismatching shape. "
+                            "Expected " + str(size_in(i)) + ", got " + str(arg[i].size()));
     }
   }
 
@@ -922,11 +922,11 @@ namespace casadi {
   void FunctionInternal::check_res(const std::vector<M>& res) const {
     int n_out = this->n_out();
     casadi_assert_message(res.size()==n_out, "Incorrect number of outputs: Expected "
-                          << n_out << ", got " << res.size());
+                          + str(n_out) + ", got " + str(res.size()));
     for (int i=0; i<n_out; ++i) {
       casadi_assert_message(check_mat(res[i].sparsity(), sparsity_out(i)),
-                            "Output " << i << " (" << name_out(i) << ") has mismatching shape. "
-                            "Expected " << size_out(i) << ", got " << res[i].size());
+                            "Output " + str(i) + " (" + name_out(i) + ") has mismatching shape. "
+                            "Expected " + str(size_out(i)) + ", got " + str(res[i].size()));
     }
   }
 

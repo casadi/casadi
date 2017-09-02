@@ -27,7 +27,7 @@
 #include "casadi/core/std_vector_tools.hpp"
 
 #define THROWING(fcn, ...) \
-cvodes_error(CASADI_ASSERT_STR(fcn) CASADI_ASSERT_WHERE, fcn(__VA_ARGS__))
+cvodes_error(CASADI_WHERE CASADI_ASSERT_STR(fcn), fcn(__VA_ARGS__))
 
 using namespace std;
 namespace casadi {
@@ -377,10 +377,9 @@ namespace casadi {
     // Successfull return or warning
     if (flag>=CV_SUCCESS) return;
     // Construct error message
-    stringstream ss;
     char* flagname = CVodeGetReturnFlagName(flag);
-    ss << module << " returned \"" << flagname << "\"."
-       << " Consult CVODES documentation.";
+    stringstream ss;
+    ss << module << " returned \"" << flagname << "\". Consult CVODES documentation.";
     free(flagname);
     casadi_error(ss.str());
   }

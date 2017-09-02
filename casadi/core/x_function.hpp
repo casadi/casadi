@@ -213,9 +213,8 @@ namespace casadi {
     // Make sure that inputs are symbolic
     for (int i=0; i<n_in(); ++i) {
       if (in_.at(i).nnz()>0 && !in_.at(i).is_valid_input()) {
-        casadi_error("XFunction::XFunction: Xfunction input arguments must be"
-                     " purely symbolic." << std::endl
-                     << "Argument " << i << "(" << name_in(i) << ") is not symbolic.");
+        casadi_error("XFunction::XFunction: Xfunction input arguments must be purely symbolic. \n"
+                     << "Argument " + str(i) + "(" + name_in(i) + ") is not symbolic.");
       }
     }
 
@@ -1051,7 +1050,7 @@ namespace casadi {
 
     // Create a function for calculating a forward-mode derivative
     casadi_assert_message(order==1 || order==2,
-      "which_depends: order argument must be 1 or 2, got " << order << " instead.");
+      "which_depends: order argument must be 1 or 2, got " + str(order) + " instead.");
 
     MatType v = MatType::sym("v", var.sparsity());
     for (int i=1;i<order;++i) {

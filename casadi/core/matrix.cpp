@@ -239,8 +239,8 @@ namespace casadi {
         return set(m.T(), ind1, rr, cc);
       } else {
         // Error otherwise
-        casadi_error("Dimension mismatch." << "lhs is " << rr.size1() << "-by-"
-                     << cc.size1() << ", while rhs is " << m.size());
+        casadi_error("Dimension mismatch. lhs is " + str(rr.size1()) + "-by-"
+                     + str(cc.size1()) + ", while rhs is " + str(m.size()));
       }
     }
 
@@ -250,15 +250,17 @@ namespace casadi {
     // Report out-of-bounds
     if (!in_bounds(rr.nonzeros(), -sz1+ind1, sz1+ind1)) {
       casadi_error("set[., r, c] out of bounds. Your rr contains "
-                   << *std::min_element(rr->begin(), rr->end()) << " up to "
-                   << *std::max_element(rr->begin(), rr->end())
-                   << ", which is outside the range [" << -sz1+ind1 << ","<< sz1+ind1 <<  ").");
+                   + str(*std::min_element(rr->begin(), rr->end())) + " up to "
+                   + str(*std::max_element(rr->begin(), rr->end()))
+                   + ", which is outside the range [" + str(-sz1+ind1)
+                   + "," + str(sz1+ind1) + ").");
     }
     if (!in_bounds(cc.nonzeros(), -sz2+ind1, sz2+ind1)) {
       casadi_error("set [., r, c] out of bounds. Your cc contains "
-                   << *std::min_element(cc->begin(), cc->end()) << " up to "
-                   << *std::max_element(cc->begin(), cc->end())
-                   << ", which is outside the range [" << -sz2+ind1 << ","<< sz2+ind1 <<  ").");
+                   + str(*std::min_element(cc->begin(), cc->end())) + " up to "
+                   + str(*std::max_element(cc->begin(), cc->end()))
+                   + ", which is outside the range [" + str(-sz2+ind1)
+                   + "," + str(sz2+ind1) +  ").");
     }
 
     // If we are assigning with something sparse, first remove existing entries
@@ -331,8 +333,8 @@ namespace casadi {
         return set(m.T(), ind1, rr);
       } else {
         // Error otherwise
-        casadi_error("Dimension mismatch." << "lhs is " << rr.size()
-                     << ", while rhs is " << m.size());
+        casadi_error("Dimension mismatch. lhs is " + str(rr.size())
+                     + ", while rhs is " + str(m.size()));
       }
     }
 
@@ -345,9 +347,10 @@ namespace casadi {
     // Check bounds
     if (!in_bounds(rr.nonzeros(), -nel+ind1, nel+ind1)) {
       casadi_error("set[rr] out of bounds. Your rr contains "
-                   << *std::min_element(rr->begin(), rr->end()) << " up to "
-                   << *std::max_element(rr->begin(), rr->end())
-                   << ", which is outside the range [" << -nel+ind1 << ","<< nel+ind1 <<  ").");
+                   + str(*std::min_element(rr->begin(), rr->end())) + " up to "
+                   + str(*std::max_element(rr->begin(), rr->end()))
+                   + ", which is outside the range [" + str(-nel+ind1) + ","
+                   + str(nel+ind1) + ").");
     }
 
     // Dense mode
@@ -384,8 +387,8 @@ namespace casadi {
   void Matrix<Scalar>::set(const Matrix<Scalar>& m, bool ind1, const Sparsity& sp) {
     casadi_assert_message(size()==sp.size(),
                           "set(Sparsity sp): shape mismatch. This matrix has shape "
-                          << size() << ", but supplied sparsity index has shape "
-                          << sp.size() << ".");
+                          + str(size()) + ", but supplied sparsity index has shape "
+                          + str(sp.size()) + ".");
     std::vector<int> ii = sp.find();
     if (m.is_scalar()) {
       (*this)(ii) = densify(m);
@@ -420,9 +423,10 @@ namespace casadi {
     // Check bounds
     if (!in_bounds(k, -sz+ind1, sz+ind1)) {
       casadi_error("get_nz[kk] out of bounds. Your kk contains "
-                   << *std::min_element(k.begin(), k.end()) << " up to "
-                   << *std::max_element(k.begin(), k.end())
-                   << ", which is outside the range [" << -sz+ind1 << ","<< sz+ind1 <<  ").");
+                   + str(*std::min_element(k.begin(), k.end())) + " up to "
+                   + str(*std::max_element(k.begin(), k.end()))
+                   + ", which is outside the range [" + str(-sz+ind1)
+                   + "," + str(sz+ind1) +  ").");
     }
 
     // If indexed matrix was a row/column vector, make sure that the result is too
@@ -431,9 +435,9 @@ namespace casadi {
     // Copy nonzeros
     m = zeros(tr ? kk.sparsity().T() : kk.sparsity());
     for (int el=0; el<k.size(); ++el) {
-      casadi_assert_message(!(ind1 && k[el]<=0), "Matlab is 1-based, but requested index " <<
-                                                k[el] <<  ". Note that negative slices are" <<
-                                                " disabled in the Matlab interface. " <<
+      casadi_assert_message(!(ind1 && k[el]<=0), "Matlab is 1-based, but requested index "
+                                                + str(k[el]) + ". Note that negative slices are"
+                                                " disabled in the Matlab interface. "
                                                 "Possibly you may want to use 'end'.");
       int k_el = k[el]-ind1;
       m->at(el) = nonzeros().at(k_el>=0 ? k_el : k_el+sz);
@@ -474,8 +478,8 @@ namespace casadi {
         return set_nz(m.T(), ind1, kk);
       } else {
         // Error otherwise
-        casadi_error("Dimension mismatch." << "lhs is " << kk.size()
-                     << ", while rhs is " << m.size());
+        casadi_error("Dimension mismatch. lhs is " + str(kk.size())
+                     + ", while rhs is " + str(m.size()));
       }
     }
 
@@ -1231,15 +1235,15 @@ namespace casadi {
 
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::matrix_matrix(int op,
-                                                   const Matrix<Scalar> &x,
-                                                   const Matrix<Scalar> &y) {
+                                               const Matrix<Scalar> &x,
+                                               const Matrix<Scalar> &y) {
 
     if (!(x.size2() == y.size2() && x.size1() == y.size1())) {
       std::stringstream ss;
-      ss << casadi_math<Scalar>::disp(op, "lhs", "rhs");
-      casadi_error("matrix_matrix: dimension mismatch in element-wise matrix operation "
-                   << ss.str() <<"." << std::endl << "Left argument has shape " << x.dim()
-                   << ", right has shape " << y.dim() << ". They should be equal.");
+      ss << "matrix_matrix: dimension mismatch in element-wise matrix operation "
+         << casadi_math<Scalar>::disp(op, "lhs", "rhs") << ".\n Left argument has shape " << x.dim()
+         << ", right has shape " << y.dim() << ". They should be equal.";
+      casadi_error(ss.str());
     }
 
     // Get the sparsity pattern of the result
@@ -1312,7 +1316,7 @@ namespace casadi {
     casadi_assert_message(col.size()==row.size() && col.size()==d.nnz(),
                           "Argument error in Matrix<Scalar>::triplet(row, col, d): "
                           "supplied lists must all be of equal length, but got: "
-                          << row.size() << ", " << col.size()  << " and " << d.nnz());
+                          + str(row.size()) + ", " + str(col.size()) + " and " + str(d.nnz()));
     std::vector<int> mapping;
     Sparsity sp = Sparsity::triplet(nrow, ncol, row, col, mapping, false);
     return Matrix<Scalar>(sp, d.nz(mapping));
@@ -1958,7 +1962,7 @@ namespace casadi {
     int n = X.size1();
     int m = X.size2();
     casadi_assert_message(m>=n, "nullspace(): expecting a flat matrix (more columns than rows), "
-                          "but got " << X.dim() << ".");
+                          "but got " + str(X.dim()) + ".");
 
     Matrix<Scalar> seed = DM::eye(m)(Slice(0, m), Slice(n, m));
 
@@ -2001,7 +2005,7 @@ namespace casadi {
 
     // check dimensions
     casadi_assert_message(A.size1() == A.size2(), "Cholesky decomposition requires square matrix."
-                                              "Got " << A.dim() << " instead.");
+                                              "Got " + str(A.dim()) + " instead.");
 
     Matrix<Scalar> ret = Matrix<Scalar>(Sparsity::lower(A.size1()));
 
@@ -2030,8 +2034,8 @@ namespace casadi {
   Matrix<Scalar> Matrix<Scalar>::solve(const Matrix<Scalar>& a, const Matrix<Scalar>& b) {
     // check dimensions
     casadi_assert_message(a.size1() == b.size1(), "solve Ax=b: dimension mismatch: b has "
-                          << b.size1() << " rows while A has " << a.size1() << ".");
-    casadi_assert_message(a.size1() == a.size2(), "solve: A not square but " << a.dim());
+                          + str(b.size1()) + " rows while A has " + str(a.size1()) + ".");
+    casadi_assert_message(a.size1() == a.size2(), "solve: A not square but " + str(a.dim()));
 
     if (a.is_tril()) {
       // forward substitution if lower triangular

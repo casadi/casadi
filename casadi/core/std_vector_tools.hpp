@@ -310,10 +310,10 @@ namespace casadi {
        int j = i[k];
        casadi_assert_message(j>=0,
          "vector_slice: Indices should be larger than zero."
-         << "You have " << j << " at location " << k << ".");
+         "You have " + str(j) + " at location " + str(k) + ".");
        casadi_assert_message(j<v.size(),
          "vector_slice: Indices should be larger than zero."
-         << "You have " << j << " at location " << k << ".");
+         "You have " + str(j) + " at location " + str(k) + ".");
        ret.push_back(v[j]);
     }
     return ret;

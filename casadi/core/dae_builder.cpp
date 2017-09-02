@@ -315,7 +315,7 @@ namespace casadi {
         } else if (onode.checkName("opt:PathConstraints")) {
           casadi_warning("opt:PointConstraints not supported, ignored");
         } else {
-          casadi_warning("DaeBuilder::addOptimization: Unknown node " << onode.name());
+          casadi_warning("DaeBuilder::addOptimization: Unknown node " + str(onode.name()));
         }
       }
     }

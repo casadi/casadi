@@ -92,31 +92,31 @@ class CasadiException : public std::exception {
 #define CASADI_ASSERT_STR(x) CASADI_ASSERT_STR1(x)
 
 // String denoting where the assertion is situated
-#define CASADI_ASSERT_WHERE " on line " CASADI_ASSERT_STR(__LINE__) \
-    " of file " CASADI_ASSERT_STR(__FILE__)
+#define CASADI_WHERE __FILE__ ":" CASADI_ASSERT_STR(__LINE__)
 
-#define casadi_error(msg)                                               \
-  {                                                                     \
-    std::stringstream ss_internal_;                                     \
-    ss_internal_ << CASADI_ASSERT_WHERE << std::endl << msg  <<  std::endl; \
-    throw casadi::CasadiException(ss_internal_.str());                  \
-  }
+// TODO(@jaeandersson) Refactor #890
+#define casadi_error(msg) {\
+  std::stringstream ss_internal_;\
+  ss_internal_ << CASADI_WHERE << ":\n" << msg;\
+  throw casadi::CasadiException(ss_internal_.str()); \
+}\
 
-// This assertion checks for illegal user inputs. It will not be checked if CASADI_NDEBUG is defined
+// This assertion checks for illegal user inputs TODO(@jaeandersson) Refactor #890
 #define casadi_assert_message(x, msg) \
 { \
   bool is_ok; \
   try { \
     is_ok = x; \
   } catch(std::exception& ex) { \
-      throw casadi::CasadiException(std::string("When trying to check the assertion \"" \
-        CASADI_ASSERT_STR(x) "\"" CASADI_ASSERT_WHERE ", caught: \n")+ex.what()); \
+      throw casadi::CasadiException(\
+        std::string("Assertion \"" CASADI_ASSERT_STR(x) "\" at "\
+        CASADI_WHERE " raised:\n")+ex.what()); \
   } \
  if (!is_ok) { \
-  std::stringstream ss_internal_; \
-  ss_internal_ << "The assertion \"" CASADI_ASSERT_STR(x) "\"" CASADI_ASSERT_WHERE \
-      " failed. " << std::endl << msg  <<  std::endl;   \
-  throw casadi::CasadiException(ss_internal_.str()); \
+     std::stringstream ss_internal_;\
+     ss_internal_ << "Assertion \"" CASADI_ASSERT_STR(x) "\" at "\
+     CASADI_WHERE " failed:\n" << msg;\
+     throw casadi::CasadiException(ss_internal_.str());\
  }\
 } \
 
@@ -127,15 +127,15 @@ class CasadiException : public std::exception {
 #else
 #define casadi_assert(x) casadi_assert_message(x, \
     "(Hint for developers: GlobalOptions.setCatchErrorsSwig(False)" \
-    " to obtain gdb stacktrace in python.)" \
-    << std::endl << "Please notify the CasADi developers.")
+    " to obtain gdb stacktrace in python.)\n" \
+    " Please notify the CasADi developers.")
 #endif
 
 // This is for warnings to be issued when casadi is not in release mode and an assertion fails
 #define casadi_assert_warning(x, msg)                                   \
   if ((x)==false) {                                                     \
-    casadi::userOut<true, casadi::PL_WARN>() << "CasADi warning: \"" << msg << "\" (assertion \"" \
-      CASADI_ASSERT_STR(x) "\"" CASADI_ASSERT_WHERE " failed.)" << std::endl; \
+    casadi::userOut<true, casadi::PL_WARN>() \
+      << "Assertion \"" CASADI_ASSERT_STR(x) "\" at " CASADI_WHERE " failed:\n" << msg;\
   }
 
 // Formatted message
@@ -145,11 +145,11 @@ class CasadiException : public std::exception {
   try { \
     is_ok = x; \
   } catch(std::exception& ex) { \
-      throw casadi::CasadiException(std::string("When trying to check the assertion \"" \
-        CASADI_ASSERT_STR(x) "\"" CASADI_ASSERT_WHERE ", caught: \n")+ex.what()); \
+      throw casadi::CasadiException(std::string("Assertion \"" \
+        CASADI_ASSERT_STR(x) "\" at " CASADI_WHERE " raised:\n")+ex.what()); \
   } \
  if (!is_ok) { \
-   std::string m = "The assertion \"" CASADI_ASSERT_STR(x) "\"" CASADI_ASSERT_WHERE " failed. %s";\
+   std::string m = "Assertion \"" CASADI_ASSERT_STR(x) "\" at " CASADI_WHERE " failed: %s";\
    int sz = snprintf(0, 0, msg, __VA_ARGS__);\
    char* buf = new char[sz+1];\
    (void)snprintf(buf, sz+1, msg, __VA_ARGS__);\
@@ -162,11 +162,11 @@ class CasadiException : public std::exception {
 // This is for warnings to be issued when casadi is not in release mode
 #define casadi_warning(msg) \
   casadi::userOut<true, casadi::PL_WARN>() \
-    << "CasADi warning (" << CASADI_ASSERT_WHERE << "):\n   " << msg << "\n";
+    << "CasADi warning at " CASADI_WHERE ":\n" << (msg) << "\n";
 
 #define casadi_message(msg) \
   casadi::userOut() \
-    << "CasADi message (" << CASADI_ASSERT_WHERE << "):\n   " << msg << "\n";
+    << "CasADi message at " CASADI_WHERE ":" << << (msg) << "\n";
 
 // http://stackoverflow.com/questions/303562/c-format-macro-inline-ostringstream
 #define STRING(ITEMS) \

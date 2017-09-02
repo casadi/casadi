@@ -28,7 +28,7 @@
 
 // Macro for error handling
 #define THROWING(fcn, ...) \
-idas_error(CASADI_ASSERT_STR(fcn) CASADI_ASSERT_WHERE, fcn(__VA_ARGS__))
+idas_error(CASADI_WHERE CASADI_ASSERT_STR(fcn), fcn(__VA_ARGS__))
 
 using namespace std;
 namespace casadi {
@@ -559,10 +559,9 @@ namespace casadi {
     // Successfull return or warning
     if (flag>=IDA_SUCCESS) return;
     // Construct error message
-    stringstream ss;
     char* flagname = IDAGetReturnFlagName(flag);
-    ss << module << " returned \"" << flagname << "\"."
-       << " Consult IDAS documentation.";
+    stringstream ss;
+    ss << module << " returned \"" << flagname << "\". Consult IDAS documentation.";
     free(flagname);
     casadi_error(ss.str());
   }

@@ -860,7 +860,7 @@ namespace casadi {
     } else {
       // Make sure that dimension matches
       casadi_error("Sparsity::set<DataType>: shape mismatch. lhs is matrix of shape "
-                   << dim() << ", while rhs is shape " << val_sp.dim() << ".");
+                   + str(dim()) + ", while rhs is shape " + str(val_sp.dim()) + ".");
     }
   }
 
@@ -902,8 +902,7 @@ namespace casadi {
       // Make sure that dimension matches
       casadi_assert_message(sz2==val_sz2 && sz1==val_sz1,
                             "Sparsity::add<DataType>: shape mismatch. lhs is matrix of shape "
-                            << dim() << ", while rhs is shape "
-                            << val_sp.dim() << ".");
+                            + str(dim()) + ", while rhs is shape " + str(val_sp.dim()) + ".");
 
       // Sparsity
       const int* c = row();
@@ -983,7 +982,7 @@ namespace casadi {
       // Make sure that dimension matches
       casadi_assert_message(sz2==val_sz2 && sz1==val_sz1,
                             "Sparsity::add<DataType>: shape mismatch. lhs is matrix of shape "
-                            << dim() << ", while rhs is shape " << val_sp.dim() << ".");
+                            + str(dim()) + ", while rhs is shape " + str(val_sp.dim()) + ".");
 
       // Sparsity
       const int* c = row();
