@@ -212,7 +212,6 @@ namespace casadi {
   };
 
   void FunctionInternal::init(const Dict& opts) {
-
     // Read options
     for (auto&& op : opts) {
       if (op.first=="verbose") {
@@ -259,6 +258,9 @@ namespace casadi {
         fd_options_ = op.second;
       }
     }
+
+    // Verbose?
+    if (verbose_) casadi_message(name_ + "::init");
 
     // Get the number of inputs and outputs
     isp_.resize(get_n_in());

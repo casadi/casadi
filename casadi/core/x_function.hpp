@@ -209,6 +209,7 @@ namespace casadi {
   void XFunction<DerivedType, MatType, NodeType>::init(const Dict& opts) {
     // Call the init function of the base class
     FunctionInternal::init(opts);
+    if (verbose_) casadi_message(name_ + "::init");
 
     // Make sure that inputs are symbolic
     for (int i=0; i<n_in(); ++i) {

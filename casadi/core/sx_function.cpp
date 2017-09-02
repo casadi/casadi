@@ -224,9 +224,9 @@ namespace casadi {
   };
 
   void SXFunction::init(const Dict& opts) {
-
     // Call the init function of the base class
     XFunction<SXFunction, SX, SXNode>::init(opts);
+    if (verbose_) casadi_message(name_ + "::init");
 
     // Default (temporary) options
     bool live_variables = true;
@@ -416,10 +416,10 @@ namespace casadi {
 
     if (verbose_) {
       if (live_variables) {
-        userOut() << "Using live variables: work array is "
-             <<  worksize_ << " instead of " << nodes.size() << endl;
+        casadi_message("Using live variables: work array is " + str(worksize_)
+         + " instead of " + str(nodes.size()));
       } else {
-        userOut() << "Live variables disabled." << endl;
+        casadi_message("Live variables disabled.");
       }
     }
 

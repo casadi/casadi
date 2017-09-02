@@ -59,10 +59,9 @@ namespace casadi {
   };
 
   void MXFunction::init(const Dict& opts) {
-    if (verbose_) casadi_message(name_ + "::init");
-
     // Call the init function of the base class
     XFunction<MXFunction, MX, MXNode>::init(opts);
+    if (verbose_) casadi_message(name_ + "::init");
 
     // Default (temporary) options
     bool live_variables = true;
