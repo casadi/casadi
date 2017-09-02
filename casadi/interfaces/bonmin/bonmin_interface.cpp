@@ -273,7 +273,7 @@ namespace casadi {
   public:
     BonMinMessageHandler(): CoinMessageHandler() { }
     /// Core of the class: the method that directs the messages
-    int disp() override {
+    int print() override {
       userOut() << messageBuffer_ << std::endl;
       return 0;
     }
