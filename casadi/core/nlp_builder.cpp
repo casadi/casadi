@@ -84,6 +84,21 @@ namespace casadi {
       << ", n_eq = " << n_eq_ << ", n_lcon = " << n_lcon_ << endl;
     }
 
+    // Get the number of nonlinear vars in constraints, objectives, both
+    stringstream ss4(header[4]);
+    ss4 >> nlvc_ >> nlvo_ >> nlvb_;
+    if (verbose_) {
+      userOut() << "nlvc = " << nlvc_ << ", nlvo  = " << nlvo_ << ", nlvb = " << nlvb_  << endl;
+    }
+
+    // Get the number of discrete variables
+    stringstream ss6(header[6]);
+    ss6 >> nbv_ >> niv_ >> nlvbi_ >> nlvci_ >> nlvoi_;
+    if (verbose_) {
+      userOut() << "nbv = " << nbv_ << ", niv  = " << niv_ << ", nlvbi = " << nlvbi_
+      << ", nlvci = " << nlvci_ << ", nlvoi = " << nlvoi_ << endl;
+    }
+
     // Allocate variables
     nlp_.x = MX::sym("x", 1, 1, n_var_);
 
@@ -100,6 +115,59 @@ namespace casadi {
     nlp_.g_lb.resize(n_con_, -inf);
     nlp_.g_ub.resize(n_con_,  inf);
     nlp_.lambda_init.resize(n_con_, 0);
+
+    // Allocate binary variables vector
+    nlp_.discrete.resize(n_var_, false);
+
+    //D. M. Gay and M. Hill, 'Hooking Your Solver to AMPL' October, 1997.
+    int k = 0;
+    // continuous in an objective and in a constraint
+    for(int j = 0; j < nlvb_-nlvbi_;j++){
+        nlp_.discrete.at(k) = false;
+        k = k + 1;
+    }
+    // integer in an objective and in a constraint
+    for(int j = 0; j < nlvbi_;j++){
+        nlp_.discrete.at(k) = true;
+        k = k + 1;
+    }
+    // continuous just in constraints
+    for(int j = 0; j < nlvc_ - (nlvb_ + nlvci_);j++){
+        nlp_.discrete.at(k) = false;
+        k = k + 1;
+    }
+    // integer just in constraints
+    for(int j = 0; j < nlvci_ ;j++){
+        nlp_.discrete.at(k) = true;
+        k = k + 1;
+    }
+    // continuous just in objectives
+    for(int j = 0; j < nlvo_ - (nlvc_ + nlvoi_) ;j++){
+        nlp_.discrete.at(k) = false;
+        k = k + 1;
+    }
+    // integer just in objectives
+    for(int j = 0; j < nlvoi_ ;j++){
+        nlp_.discrete.at(k) = true;
+        k = k + 1;
+    }
+    // linear
+    int max_nlvc_nlvo = (nlvc_<nlvo_)?nlvo_:nlvc_;
+    for(int j = 0; j < n_var_-(max_nlvc_nlvo+niv_+nbv_);j++){
+        nlp_.discrete.at(k) = false;
+        k = k + 1;
+    }
+    // binary
+    for(int j = 0; j < nbv_;j++){
+        nlp_.discrete.at(k) = true;
+        k = k + 1;
+    }
+    // other integer
+    for(int j = 0; j < niv_;j++){
+        nlp_.discrete.at(k) = true;
+        k = k + 1;
+    }
+    casadi_assert_message(k==n_var_, "Number of variables in the header don't match");
 
     // All variables, including dependent
     v_ = nlp_.x;
