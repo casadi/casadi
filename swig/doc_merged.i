@@ -159,6 +159,10 @@ dimensions.
 
 ";
 
+%feature("docstring") casadi::Blocksqp::disp "[INTERNAL]  Print.
+
+";
+
 %feature("docstring") casadi::Blocksqp::codegen_name "[INTERNAL]  Get name
 in codegen.
 
@@ -875,11 +879,6 @@ templated.
 
 %feature("docstring") casadi::Blocksqp::augmentFilter "[INTERNAL] ";
 
-%feature("docstring") casadi::Blocksqp::print_option "[INTERNAL]  Print all
-information there is to know about a certain option.
-
-";
-
 %feature("docstring") casadi::Blocksqp::numel_out "[INTERNAL]  Number of
 input/output elements.
 
@@ -1233,10 +1232,6 @@ Generate the sparsity of a Jacobian block.
 
 ";
 
-%feature("docstring") casadi::Blocksqp::print_long "[INTERNAL]  Print.
-
-";
-
 %feature("docstring") casadi::Blocksqp::forward "[INTERNAL]  Return
 function that calculates forward derivatives forward(nfwd) returns a cached
 instance if available, and calls  Function get_forward(int nfwd) if no
@@ -1375,7 +1370,8 @@ variables (SX)
 
 %feature("docstring") casadi::Blocksqp::feasibilityRestorationHeuristic "[INTERNAL] ";
 
-%feature("docstring") casadi::Blocksqp::print_short "[INTERNAL]  Print.
+%feature("docstring") casadi::Blocksqp::print_option "[INTERNAL]  Print all
+information there is to know about a certain option.
 
 ";
 
@@ -1712,6 +1708,10 @@ dimensions.
 
 ";
 
+%feature("docstring") casadi::BSpline::disp "[INTERNAL]  Print.
+
+";
+
 %feature("docstring") casadi::BSpline::slice "[INTERNAL]  returns a new
 function with a selection of inputs/outputs of the original
 
@@ -1811,11 +1811,6 @@ in the algorithm.
 
 %feature("docstring") casadi::BSpline::construct "[INTERNAL]  Construct
 Prepares the function for evaluation.
-
-";
-
-%feature("docstring") casadi::BSpline::setup "[INTERNAL]  Set the
-(persistent and temporary) work vectors.
 
 ";
 
@@ -1987,9 +1982,8 @@ the number of atomic operations.
 
 ";
 
-%feature("docstring") casadi::BSpline::print_long "
-
-Print description.
+%feature("docstring") casadi::BSpline::setup "[INTERNAL]  Set the
+(persistent and temporary) work vectors.
 
 ";
 
@@ -2145,10 +2139,6 @@ input/output nonzeros.
 %feature("docstring") casadi::BSpline::codegen_declarations "
 
 Generate code for the declarations of the C function.
-
-";
-
-%feature("docstring") casadi::BSpline::print_short "[INTERNAL]  Print.
 
 ";
 
@@ -3367,10 +3357,6 @@ function.
 
 ";
 
-%feature("docstring") casadi::BSplineCommon::print_long "[INTERNAL]  Print.
-
-";
-
 %feature("docstring") casadi::BSplineCommon::getAtomicOutput "[INTERNAL]
 Get the (integer) output argument of an atomic operation.
 
@@ -3414,6 +3400,10 @@ smallest input value.
 
 %feature("docstring") casadi::BSplineCommon::matching_res "[INTERNAL]
 Check if output arguments that needs to be replaced.
+
+";
+
+%feature("docstring") casadi::BSplineCommon::disp "[INTERNAL]  Print.
 
 ";
 
@@ -3594,11 +3584,6 @@ function signature: name:(inputs)->(outputs)
 
 %feature("docstring") casadi::BSplineCommon::getCount "[INTERNAL]  Get the
 reference count.
-
-";
-
-%feature("docstring") casadi::BSplineCommon::print_short "[INTERNAL]
-Print.
 
 ";
 
@@ -3867,12 +3852,6 @@ Propagate sparsity backwards.
 
 ";
 
-%feature("docstring") casadi::BSplineDual::print_long "
-
-Print description.
-
-";
-
 %feature("docstring") casadi::BSplineDual::alloc_res "[INTERNAL]  Ensure
 required length of res field.
 
@@ -3908,10 +3887,6 @@ structure recognition for symmetric Jacobians
 
 ";
 
-%feature("docstring") casadi::BSplineDual::print_short "[INTERNAL]  Print.
-
-";
-
 %feature("docstring") casadi::BSplineDual::eval_sx "[INTERNAL]  Evaluate
 with symbolic scalars.
 
@@ -3924,6 +3899,10 @@ vectors long enough to evaluate function.
 
 %feature("docstring") casadi::BSplineDual::self "[INTERNAL]  Get a public
 class instance.
+
+";
+
+%feature("docstring") casadi::BSplineDual::disp "[INTERNAL]  Print.
 
 ";
 
@@ -4847,11 +4826,6 @@ Check if input arguments have correct length and dimensions.
 
 ";
 
-%feature("docstring") casadi::BSplineInterpolant::print_short "[INTERNAL]
-Print.
-
-";
-
 %feature("docstring") casadi::BSplineInterpolant::sparsity_jac "[INTERNAL]
 Get, if necessary generate, the sparsity of a Jacobian block.
 
@@ -5230,6 +5204,10 @@ function input(s) and output(s)
 
 ";
 
+%feature("docstring") casadi::BSplineInterpolant::disp "[INTERNAL]  Print.
+
+";
+
 %feature("docstring") casadi::BSplineInterpolant::has_jacobian "[INTERNAL]
 Full Jacobian.
 
@@ -5406,8 +5384,8 @@ Evaluate a function, overloaded.
 
 ";
 
-%feature("docstring") casadi::BSplineInterpolant::print_long "[INTERNAL]
-Print.
+%feature("docstring") casadi::BSplineInterpolant::clear_mem "[INTERNAL]
+Clear all memory (called from destructor)
 
 ";
 
@@ -5456,11 +5434,6 @@ Ensure required length of arg field.
 
 %feature("docstring") casadi::BSplineInterpolant::nnz_out "[INTERNAL]
 Number of input/output nonzeros.
-
-";
-
-%feature("docstring") casadi::BSplineInterpolant::clear_mem "[INTERNAL]
-Clear all memory (called from destructor)
 
 ";
 
@@ -5811,12 +5784,6 @@ CasADi 3.2
 
 ";
 
-%feature("docstring") casadi::Callback::print "
-
-Return a string with a description (for SWIG)
-
-";
-
 %feature("docstring") casadi::Callback::has_function "";
 
 %feature("docstring") casadi::Callback::nnz_out "
@@ -6048,18 +6015,6 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
-%feature("docstring") casadi::Callback::print_short "
-
-Print a representation of the object.
-
-";
-
-%feature("docstring") casadi::Callback::repr "
-
-Print a representation of the object.
-
-";
-
 %feature("docstring") casadi::Callback::index_out "
 
 Find the index for a string describing a particular entry of an output
@@ -6111,15 +6066,9 @@ Get, if necessary generate, the sparsity of a Jacobian block
 
 ";
 
-%feature("docstring") casadi::Callback::print_long "
-
-Print a description of the object.
-
-";
-
 %feature("docstring") casadi::Callback::get_str "
 
-Return a string with a description (for SWIG)
+Get string representation.
 
 ";
 
@@ -6131,7 +6080,7 @@ Allocate work vectors.
 
 %feature("docstring") casadi::Callback::get_repr "
 
-Return a string with a representation (for SWIG)
+Get string representation with type information.
 
 ";
 
@@ -6247,6 +6196,12 @@ Assert that an input dimension is equal so some given value.
 %feature("docstring") casadi::Callback::get_sparsity_in "
 
 Get the sparsity of an input This function is called during construction.
+
+";
+
+%feature("docstring") casadi::Callback::disp "
+
+Print a description of the object.
 
 ";
 
@@ -6855,6 +6810,10 @@ if necessary generate, the sparsity of a Jacobian block.
 
 ";
 
+%feature("docstring") casadi::CentralDiff::disp "[INTERNAL]  Print.
+
+";
+
 %feature("docstring") casadi::CentralDiff::get_function "[INTERNAL] ";
 
 %feature("docstring") casadi::CentralDiff::mx_in "[INTERNAL]  Get function
@@ -7144,10 +7103,6 @@ Codegen incref for dependencies.
 
 ";
 
-%feature("docstring") casadi::CentralDiff::print_long "[INTERNAL]  Print.
-
-";
-
 %feature("docstring") casadi::CentralDiff::verbose "[INTERNAL]  Verbose
 mode?
 
@@ -7304,10 +7259,6 @@ statistics.
 
 %feature("docstring") casadi::CentralDiff::has_spfwd "[INTERNAL]  Is the
 class able to propagate seeds through the algorithm?
-
-";
-
-%feature("docstring") casadi::CentralDiff::print_short "[INTERNAL]  Print.
 
 ";
 
@@ -7682,6 +7633,10 @@ an external function declaration.
 
 ";
 
+%feature("docstring") casadi::ClangCompiler::disp "[INTERNAL]  Print.
+
+";
+
 %feature("docstring") casadi::ClangCompiler "
 
 'clang' plugin for Importer
@@ -7759,11 +7714,6 @@ meta information.
 
 ";
 
-%feature("docstring") casadi::ClangCompiler::print_short "[INTERNAL]  Print
-representation.
-
-";
-
 %feature("docstring") casadi::ClangCompiler::to_text "[INTERNAL]  Get entry
 as a text.
 
@@ -7785,10 +7735,6 @@ entry exist?
 
 %feature("docstring") casadi::ClangCompiler::body "[INTERNAL]  Get the
 function body, if inlined.
-
-";
-
-%feature("docstring") casadi::ClangCompiler::print_long "[INTERNAL]  Print.
 
 ";
 
@@ -7946,10 +7892,6 @@ variables ( MX)
 
 ";
 
-%feature("docstring") casadi::Collocation::print_long "[INTERNAL]  Print.
-
-";
-
 %feature("docstring") casadi::Collocation::get_sparsity_in "[INTERNAL]
 Sparsities of function inputs and outputs.
 
@@ -8050,10 +7992,6 @@ input arguments have correct length and dimensions.
 ";
 
 %feature("docstring") casadi::Collocation::plugin_name "[INTERNAL] ";
-
-%feature("docstring") casadi::Collocation::print_short "[INTERNAL]  Print.
-
-";
 
 %feature("docstring") casadi::Collocation::print_options "[INTERNAL]  Print
 list of options.
@@ -8157,6 +8095,10 @@ simplified signature.
 
 %feature("docstring") casadi::Collocation::alloc_res "[INTERNAL]  Ensure
 required length of res field.
+
+";
+
+%feature("docstring") casadi::Collocation::disp "[INTERNAL]  Print.
 
 ";
 
@@ -8892,10 +8834,6 @@ Get the sparsity pattern, forward mode.
 
 ";
 
-%feature("docstring") casadi::Conic::print_short "[INTERNAL]  Print.
-
-";
-
 %feature("docstring") casadi::Conic::call_forward "[INTERNAL]  Forward mode
 AD, virtual functions overloaded in derived classes.
 
@@ -9159,10 +9097,6 @@ this function when initialized.
 
 ";
 
-%feature("docstring") casadi::Conic::print_long "[INTERNAL]  Print.
-
-";
-
 %feature("docstring") casadi::Conic::check_res "[INTERNAL]  Check if output
 arguments have correct length and dimensions.
 
@@ -9323,6 +9257,10 @@ expressions for the forward seeds.
 
 %feature("docstring") casadi::Conic::name "[INTERNAL]  Name of the
 function.
+
+";
+
+%feature("docstring") casadi::Conic::disp "[INTERNAL]  Print.
 
 ";
 
@@ -10074,12 +10012,6 @@ Get the lower bound(s) by expression.
 
 ";
 
-%feature("docstring") casadi::DaeBuilder::print_long "
-
-Print description.
-
-";
-
 %feature("docstring") casadi::DaeBuilder::add_quad "
 
 >  void casadi::DaeBuilder::add_quad(const std::string &name, const MX &new_quad)
@@ -10151,12 +10083,6 @@ Add a named linear combination of output expressions.
 %feature("docstring") casadi::DaeBuilder::sort_d "
 
 Sort dependent parameters.
-
-";
-
-%feature("docstring") casadi::DaeBuilder::print "
-
-Return a string with a description (for SWIG)
 
 ";
 
@@ -10283,7 +10209,7 @@ C++ includes: dae_builder.hpp ";
 
 %feature("docstring") casadi::DaeBuilder::get_repr "
 
-Return a string with a representation (for SWIG)
+Get string representation with type information.
 
 ";
 
@@ -10447,12 +10373,6 @@ Add an algebraic equation. Old syntax: Swap arguments.
 
 ";
 
-%feature("docstring") casadi::DaeBuilder::print_short "
-
-Print representation.
-
-";
-
 %feature("docstring") casadi::DaeBuilder::create "
 
 Construct a function object.
@@ -10542,12 +10462,6 @@ identical)
 
 ";
 
-%feature("docstring") casadi::DaeBuilder::repr "
-
-Print a representation of the object.
-
-";
-
 %feature("docstring") casadi::DaeBuilder::scale_variables "
 
 Scale the variables.
@@ -10563,6 +10477,12 @@ Eliminate interdependencies amongst dependent parameters.
 %feature("docstring") casadi::DaeBuilder::eliminate_d "
 
 Eliminate dependent parameters.
+
+";
+
+%feature("docstring") casadi::DaeBuilder::disp "
+
+Print representation.
 
 ";
 
@@ -10594,7 +10514,7 @@ Scale the implicit equations.
 
 %feature("docstring") casadi::DaeBuilder::get_str "
 
-Return a string with a description (for SWIG)
+Get string representation.
 
 ";
 
@@ -10655,23 +10575,22 @@ a text.
 
 ";
 
-%feature("docstring") casadi::DllLibrary::weak "[INTERNAL]  Get a weak
-reference to the object.
-
-";
-
 %feature("docstring") casadi::DllLibrary::get_meta "[INTERNAL]  Get entry
 as a text.
 
 ";
 
-%feature("docstring") casadi::DllLibrary::body "[INTERNAL]  Get the
-function body, if inlined.
+%feature("docstring") casadi::DllLibrary::weak "[INTERNAL]  Get a weak
+reference to the object.
 
 ";
 
-%feature("docstring") casadi::DllLibrary::print_short "[INTERNAL]  Print
-representation.
+%feature("docstring") casadi::DllLibrary::disp "[INTERNAL]  Print.
+
+";
+
+%feature("docstring") casadi::DllLibrary::body "[INTERNAL]  Get the
+function body, if inlined.
 
 ";
 
@@ -10735,10 +10654,6 @@ meta information be read?
 
 %feature("docstring") casadi::DllLibrary::read_external "[INTERNAL]  Get an
 external function declaration.
-
-";
-
-%feature("docstring") casadi::DllLibrary::print_long "[INTERNAL]  Print.
 
 ";
 
@@ -11144,10 +11059,6 @@ name by index.
 
 ";
 
-%feature("docstring") casadi::Dple::print_short "[INTERNAL]  Print.
-
-";
-
 %feature("docstring") casadi::Dple::sparsity_in "
 
 >  const Sparsity& casadi::FunctionInternal::sparsity_in(int ind) const 
@@ -11382,11 +11293,6 @@ input/output nonzeros.
 
 %feature("docstring") casadi::Dple::sp_forward "[INTERNAL]  Propagate
 sparsity forward.
-
-";
-
-%feature("docstring") casadi::Dple::get_partition "[INTERNAL]  Get the
-unidirectional or bidirectional partition.
 
 ";
 
@@ -11667,7 +11573,8 @@ value.
 
 ";
 
-%feature("docstring") casadi::Dple::print_long "[INTERNAL]  Print.
+%feature("docstring") casadi::Dple::get_partition "[INTERNAL]  Get the
+unidirectional or bidirectional partition.
 
 ";
 
@@ -11701,6 +11608,10 @@ function inputs and outputs.
 
 %feature("docstring") casadi::Dple::symbolicAdjSeed "[INTERNAL]  Symbolic
 expressions for the adjoint seeds.
+
+";
+
+%feature("docstring") casadi::Dple::disp "[INTERNAL]  Print.
 
 ";
 
@@ -11859,7 +11770,8 @@ outputs.
 
 ";
 
-%feature("docstring") casadi::Expm::print_long "[INTERNAL]  Print.
+%feature("docstring") casadi::Expm::alloc_w "[INTERNAL]  Ensure required
+length of w field.
 
 ";
 
@@ -11926,10 +11838,6 @@ function input and outputs.
 
 %feature("docstring") casadi::Expm::uses_output "[INTERNAL]  Do the
 derivative functions need nondifferentiated outputs?
-
-";
-
-%feature("docstring") casadi::Expm::print_short "[INTERNAL]  Print.
 
 ";
 
@@ -12175,8 +12083,8 @@ unidirectional or bidirectional partition.
 
 ";
 
-%feature("docstring") casadi::Expm::alloc_w "[INTERNAL]  Ensure required
-length of w field.
+%feature("docstring") casadi::Expm::clear_mem "[INTERNAL]  Clear all memory
+(called from destructor)
 
 ";
 
@@ -12309,11 +12217,6 @@ is available.
 
 ";
 
-%feature("docstring") casadi::Expm::clear_mem "[INTERNAL]  Clear all memory
-(called from destructor)
-
-";
-
 %feature("docstring") casadi::Expm::check_res "[INTERNAL]  Check if output
 arguments have correct length and dimensions.
 
@@ -12375,6 +12278,10 @@ dimensions.
 
 %feature("docstring") casadi::Expm::codegen_body "[INTERNAL]  Generate code
 for the function body.
+
+";
+
+%feature("docstring") casadi::Expm::disp "[INTERNAL]  Print.
 
 ";
 
@@ -12922,10 +12829,6 @@ mode AD, virtual functions overloaded in derived classes.
 
 ";
 
-%feature("docstring") casadi::External::print_long "[INTERNAL]  Print.
-
-";
-
 %feature("docstring") casadi::External::class_name "[INTERNAL]  Get type
 name.
 
@@ -13002,6 +12905,10 @@ length of arg field.
 
 %feature("docstring") casadi::External::codegen_name "[INTERNAL]  Get name
 in codegen.
+
+";
+
+%feature("docstring") casadi::External::disp "[INTERNAL]  Print.
 
 ";
 
@@ -13329,10 +13236,6 @@ scheme name by index.
 
 %feature("docstring") casadi::External::alloc_mem "[INTERNAL]  Create
 memory block.
-
-";
-
-%feature("docstring") casadi::External::print_short "[INTERNAL]  Print.
 
 ";
 
@@ -13793,11 +13696,6 @@ Evaluate a function, overloaded.
 ";
 
 %feature("docstring") casadi::FixedStepIntegrator::expand "[INTERNAL] ";
-
-%feature("docstring") casadi::FixedStepIntegrator::print_long "[INTERNAL]
-Print.
-
-";
 
 %feature("docstring") casadi::FixedStepIntegrator::default_in "[INTERNAL]
 Get default input value.
@@ -14375,11 +14273,6 @@ input scheme name by index.
 
 ";
 
-%feature("docstring") casadi::FixedStepIntegrator::print_short "[INTERNAL]
-Print.
-
-";
-
 %feature("docstring") casadi::FixedStepIntegrator::nnz_in "[INTERNAL]
 Number of input/output nonzeros.
 
@@ -14567,6 +14460,10 @@ Is the class able to propagate seeds through the algorithm?
 
 ";
 
+%feature("docstring") casadi::FixedStepIntegrator::disp "[INTERNAL]  Print.
+
+";
+
 %feature("docstring") casadi::FixedStepIntegrator::is_a "[INTERNAL]  Check
 if the function is of a particular type.
 
@@ -14670,12 +14567,6 @@ C++ includes: timing.hpp ";
 
 
 // File: classcasadi_1_1Function.xml
-%feature("docstring") casadi::Function::repr "
-
-Print a representation of the object.
-
-";
-
 %feature("docstring") casadi::Function::nnz_in "
 
 Get number of input nonzeros.
@@ -14761,7 +14652,7 @@ Print dimensions of inputs and outputs.
 
 %feature("docstring") casadi::Function::get_str "
 
-Return a string with a description (for SWIG)
+Get string representation.
 
 ";
 
@@ -14906,12 +14797,6 @@ Is a null pointer?
 
 ";
 
-%feature("docstring") casadi::Function::print_short "
-
-Print a representation of the object.
-
-";
-
 %feature("docstring") casadi::Function::forward "
 
 Get a function that calculates nfwd forward derivatives.
@@ -14972,6 +14857,12 @@ Destructor
 
 ";
 
+%feature("docstring") casadi::Function::disp "
+
+Print a description of the object.
+
+";
+
 %feature("docstring") casadi::Function::index_out "
 
 Find the index for a string describing a particular entry of an output
@@ -15028,18 +14919,6 @@ For a particular output or for all of the outputs
 %feature("docstring") casadi::Function::sparsity_jac "
 
 Get, if necessary generate, the sparsity of a Jacobian block
-
-";
-
-%feature("docstring") casadi::Function::print "
-
-Return a string with a description (for SWIG)
-
-";
-
-%feature("docstring") casadi::Function::print_long "
-
-Print a description of the object.
 
 ";
 
@@ -15176,7 +15055,7 @@ matches one of the base classes (default true)
 
 %feature("docstring") casadi::Function::get_repr "
 
-Return a string with a representation (for SWIG)
+Get string representation with type information.
 
 ";
 
@@ -16381,6 +16260,11 @@ output scheme index by name.
 
 ";
 
+%feature("docstring") casadi::GenericExternal::sz_arg "[INTERNAL]  Get
+required length of arg field.
+
+";
+
 %feature("docstring") casadi::GenericExternal::eval_gen "
 
 >  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, int *iw, double *w, void *mem) const 
@@ -16419,11 +16303,6 @@ new function with a selection of inputs/outputs of the original
 
 %feature("docstring") casadi::GenericExternal::size_out "[INTERNAL]
 Input/output dimensions.
-
-";
-
-%feature("docstring") casadi::GenericExternal::get_partition "[INTERNAL]
-Get the unidirectional or bidirectional partition.
 
 ";
 
@@ -16644,11 +16523,6 @@ function input(s) and output(s)
 
 ";
 
-%feature("docstring") casadi::GenericExternal::print_long "[INTERNAL]
-Print.
-
-";
-
 %feature("docstring") casadi::GenericExternal::free_sx "[INTERNAL]  Get
 free variables (SX)
 
@@ -16735,8 +16609,8 @@ cached version is available.
 
 ";
 
-%feature("docstring") casadi::GenericExternal::print_short "[INTERNAL]
-Print.
+%feature("docstring") casadi::GenericExternal::get_partition "[INTERNAL]
+Get the unidirectional or bidirectional partition.
 
 ";
 
@@ -17010,8 +16884,7 @@ Initialize.
 
 ";
 
-%feature("docstring") casadi::GenericExternal::sz_arg "[INTERNAL]  Get
-required length of arg field.
+%feature("docstring") casadi::GenericExternal::disp "[INTERNAL]  Print.
 
 ";
 
@@ -17758,6 +17631,11 @@ Readable name of the internal class.
 
 %feature("docstring") casadi::GenericTypeBase::getType "[INTERNAL] ";
 
+%feature("docstring") casadi::GenericTypeBase::disp "[INTERNAL]  Print a
+description of the object.
+
+";
+
 %feature("docstring") casadi::GenericTypeBase::getCount "[INTERNAL]  Get
 the reference count.
 
@@ -17765,16 +17643,6 @@ the reference count.
 
 %feature("docstring") casadi::GenericTypeBase "[INTERNAL] C++ includes:
 generic_type_internal.hpp ";
-
-%feature("docstring") casadi::GenericTypeBase::print_long "[INTERNAL]
-Print a description of the object.
-
-";
-
-%feature("docstring") casadi::GenericTypeBase::print_short "[INTERNAL]
-Print a representation of the object.
-
-";
 
 %feature("docstring") casadi::GenericTypeBase::type_name "[INTERNAL]
 Readable name of the public class.
@@ -18035,10 +17903,6 @@ Call a function, templated.
 
 ";
 
-%feature("docstring") casadi::ImplicitFixedStepIntegrator::print_short "[INTERNAL]  Print.
-
-";
-
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::ad_weight "[INTERNAL]  Weighting factor for chosing forward/reverse mode.
 
 ";
@@ -18169,6 +18033,11 @@ casadi::ImplicitFixedStepIntegrator::~ImplicitFixedStepIntegrator "[INTERNAL]  D
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::z "[INTERNAL] ";
 
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::x "[INTERNAL] ";
+
+%feature("docstring") casadi::ImplicitFixedStepIntegrator::disp "[INTERNAL]
+Print.
+
+";
 
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::verbose "[INTERNAL]  Verbose mode?
 
@@ -18699,10 +18568,6 @@ casadi::ImplicitFixedStepIntegrator::ImplicitFixedStepIntegrator "[INTERNAL]  Co
 
 ";
 
-%feature("docstring") casadi::ImplicitFixedStepIntegrator::print_long "[INTERNAL]  Print.
-
-";
-
 
 // File: classcasadi_1_1ImplicitToNlp.xml
 %feature("docstring") casadi::ImplicitToNlp::create_function "[INTERNAL]
@@ -18904,6 +18769,10 @@ required length of res field.
 
 %feature("docstring") casadi::ImplicitToNlp::sx_out "[INTERNAL]  Get
 function input(s) and output(s)
+
+";
+
+%feature("docstring") casadi::ImplicitToNlp::disp "[INTERNAL]  Print.
 
 ";
 
@@ -19259,11 +19128,6 @@ Propagate sparsity backwards.
 
 ";
 
-%feature("docstring") casadi::ImplicitToNlp::print_short "[INTERNAL]
-Print.
-
-";
-
 %feature("docstring") casadi::ImplicitToNlp::get_reverse "[INTERNAL]
 Generate a function that calculates nadj adjoint derivatives.
 
@@ -19323,7 +19187,8 @@ expressions for the forward seeds.
 
 ";
 
-%feature("docstring") casadi::ImplicitToNlp::print_long "[INTERNAL]  Print.
+%feature("docstring") casadi::ImplicitToNlp::sz_arg "[INTERNAL]  Get
+required length of arg field.
 
 ";
 
@@ -19417,11 +19282,6 @@ Generate the sparsity of a Jacobian block.
 ";
 
 %feature("docstring") casadi::ImplicitToNlp::get_function "[INTERNAL] ";
-
-%feature("docstring") casadi::ImplicitToNlp::sz_arg "[INTERNAL]  Get
-required length of arg field.
-
-";
 
 %feature("docstring") casadi::ImplicitToNlp::simple "[INTERNAL]  Evaluate
 numerically, simplied syntax.
@@ -19620,15 +19480,9 @@ Reverse mode, virtual functions overloaded in derived classes.
 
 
 // File: classcasadi_1_1Importer.xml
-%feature("docstring") casadi::Importer::repr "
-
-Print a representation of the object.
-
-";
-
 %feature("docstring") casadi::Importer::get_str "
 
-Return a string with a description (for SWIG)
+Get string representation.
 
 ";
 
@@ -19644,12 +19498,6 @@ Get class name.
 
 ";
 
-%feature("docstring") casadi::Importer::print_long "
-
-Print a description of the object.
-
-";
-
 %feature("docstring") casadi::Importer::print_ptr "[INTERNAL]  Print the
 pointer to the internal class
 
@@ -19658,6 +19506,12 @@ pointer to the internal class
 %feature("docstring") casadi::Importer::has_meta "
 
 Does a meta entry exist?
+
+";
+
+%feature("docstring") casadi::Importer::disp "
+
+Print a description of the object.
 
 ";
 
@@ -19802,15 +19656,9 @@ Get entry as a text.
 
 ";
 
-%feature("docstring") casadi::Importer::print "
-
-Return a string with a description (for SWIG)
-
-";
-
 %feature("docstring") casadi::Importer::get_repr "
 
-Return a string with a representation (for SWIG)
+Get string representation with type information.
 
 ";
 
@@ -19818,12 +19666,6 @@ Return a string with a representation (for SWIG)
 
 Returns a number that is unique for a given Node. If the Object does not
 point to any node, \"0\" is returned.
-
-";
-
-%feature("docstring") casadi::Importer::print_short "
-
-Print a representation of the object.
 
 ";
 
@@ -19990,10 +19832,6 @@ required length of iw field.
 
 ";
 
-%feature("docstring") casadi::Integrator::print_short "[INTERNAL]  Print.
-
-";
-
 %feature("docstring") casadi::Integrator::sx_out "[INTERNAL]  Get function
 input(s) and output(s)
 
@@ -20063,10 +19901,6 @@ input arguments have correct length and dimensions.
 
 %feature("docstring") casadi::Integrator::alloc_w "[INTERNAL]  Ensure
 required length of w field.
-
-";
-
-%feature("docstring") casadi::Integrator::print_long "[INTERNAL]  Print.
 
 ";
 
@@ -20534,6 +20368,10 @@ Sparsities of function inputs and outputs.
 
 ";
 
+%feature("docstring") casadi::Integrator::disp "[INTERNAL]  Print.
+
+";
+
 %feature("docstring") casadi::Integrator::~Integrator "[INTERNAL]
 Destructor.
 
@@ -20926,10 +20764,6 @@ a vector of symbolic variables corresponding to the outputs.
 
 ";
 
-%feature("docstring") casadi::Interpolant::print_short "[INTERNAL]  Print.
-
-";
-
 %feature("docstring") casadi::Interpolant::has_jacobian "[INTERNAL]  Return
 Jacobian of all input elements with respect to all output elements.
 
@@ -21163,10 +20997,6 @@ function have free variables.
 
 ";
 
-%feature("docstring") casadi::Interpolant::print_long "[INTERNAL]  Print.
-
-";
-
 %feature("docstring") casadi::Interpolant::has_function "[INTERNAL] ";
 
 %feature("docstring") casadi::Interpolant::n_out "[INTERNAL]  Number of
@@ -21305,6 +21135,11 @@ numerically.
 
 %feature("docstring") casadi::Interpolant::fwd_seed "[INTERNAL]  Symbolic
 expressions for the forward seeds.
+
+";
+
+%feature("docstring") casadi::Interpolant::release "[INTERNAL]  Release a
+memory object.
 
 ";
 
@@ -21530,8 +21365,7 @@ the (integer) output argument of an atomic operation.
 
 ";
 
-%feature("docstring") casadi::Interpolant::release "[INTERNAL]  Release a
-memory object.
+%feature("docstring") casadi::Interpolant::disp "[INTERNAL]  Print.
 
 ";
 
@@ -21751,10 +21585,6 @@ recognition.
 %feature("docstring") casadi::Jit::~Jit "
 
 Destructor.
-
-";
-
-%feature("docstring") casadi::Jit::print_short "[INTERNAL]  Print.
 
 ";
 
@@ -22331,7 +22161,8 @@ value.
 
 ";
 
-%feature("docstring") casadi::Jit::print_long "[INTERNAL]  Print.
+%feature("docstring") casadi::Jit::alloc "[INTERNAL]  Ensure work vectors
+long enough to evaluate function.
 
 ";
 
@@ -22395,11 +22226,6 @@ the algorithm.
 
 %feature("docstring") casadi::Jit::replace_aseed "[INTERNAL]  Replace
 0-by-0 reverse seeds.
-
-";
-
-%feature("docstring") casadi::Jit::alloc "[INTERNAL]  Ensure work vectors
-long enough to evaluate function.
 
 ";
 
@@ -22792,6 +22618,10 @@ derivative functions need nondifferentiated outputs?
 
 ";
 
+%feature("docstring") casadi::Jit::disp "[INTERNAL]  Print.
+
+";
+
 %feature("docstring") casadi::Jit::check_res "[INTERNAL]  Check if output
 arguments have correct length and dimensions.
 
@@ -23138,10 +22968,6 @@ required length of res field.
 
 ";
 
-%feature("docstring") casadi::LapackLu::print_long "[INTERNAL]  Print.
-
-";
-
 %feature("docstring") casadi::LapackLu::check_arg "[INTERNAL]  Check if
 input arguments have correct length and dimensions.
 
@@ -23285,8 +23111,7 @@ scheme index by name.
 
 ";
 
-%feature("docstring") casadi::LapackLu::sz_arg "[INTERNAL]  Get required
-length of arg field.
+%feature("docstring") casadi::LapackLu::disp "[INTERNAL]  Print.
 
 ";
 
@@ -23398,6 +23223,11 @@ supported?
 function that calculates forward derivatives forward(nfwd) returns a cached
 instance if available, and calls  Function get_forward(int nfwd) if no
 cached version is available.
+
+";
+
+%feature("docstring") casadi::LapackLu::sz_arg "[INTERNAL]  Get required
+length of arg field.
 
 ";
 
@@ -23522,10 +23352,6 @@ unidirectional or bidirectional partition.
 
 %feature("docstring") casadi::LapackLu::uses_output "[INTERNAL]  Do the
 derivative functions need nondifferentiated outputs?
-
-";
-
-%feature("docstring") casadi::LapackLu::print_short "[INTERNAL]  Print.
 
 ";
 
@@ -23920,10 +23746,6 @@ function input and outputs.
 
 ";
 
-%feature("docstring") casadi::LapackQr::print_long "[INTERNAL]  Print.
-
-";
-
 %feature("docstring") casadi::LapackQr::has_function "[INTERNAL] ";
 
 %feature("docstring") casadi::LapackQr::print_option "[INTERNAL]  Print all
@@ -24279,10 +24101,6 @@ mode AD, virtual functions overloaded in derived classes.
 
 ";
 
-%feature("docstring") casadi::LapackQr::print_short "[INTERNAL]  Print.
-
-";
-
 %feature("docstring") casadi::LapackQr::uses_output "[INTERNAL]  Do the
 derivative functions need nondifferentiated outputs?
 
@@ -24428,6 +24246,10 @@ meta-information allowing a user to evaluate a generated function.
 
 %feature("docstring") casadi::LapackQr::free_mem "[INTERNAL]  Free memory
 block.
+
+";
+
+%feature("docstring") casadi::LapackQr::disp "[INTERNAL]  Print.
 
 ";
 
@@ -24992,8 +24814,7 @@ the sparsity pattern, forward mode.
 
 ";
 
-%feature("docstring") casadi::LinearInterpolant::is_a "[INTERNAL]  Check if
-the function is of a particular type.
+%feature("docstring") casadi::LinearInterpolant::disp "[INTERNAL]  Print.
 
 ";
 
@@ -25309,11 +25130,6 @@ the class able to propagate seeds through the algorithm?
 
 ";
 
-%feature("docstring") casadi::LinearInterpolant::print_long "[INTERNAL]
-Print.
-
-";
-
 %feature("docstring") casadi::LinearInterpolant::sx_out "[INTERNAL]  Get
 function input(s) and output(s)
 
@@ -25583,6 +25399,11 @@ Propagate sparsity backwards.
 
 ";
 
+%feature("docstring") casadi::LinearInterpolant::is_a "[INTERNAL]  Check if
+the function is of a particular type.
+
+";
+
 %feature("docstring") casadi::LinearInterpolant::codegen_decref "[INTERNAL]
 Codegen decref for dependencies.
 
@@ -25807,11 +25628,6 @@ the (temporary) work vectors.
 
 ";
 
-%feature("docstring") casadi::LinearInterpolant::print_short "[INTERNAL]
-Print.
-
-";
-
 %feature("docstring") casadi::LinearInterpolant::alloc_w "[INTERNAL]
 Ensure required length of w field.
 
@@ -25977,11 +25793,6 @@ Input/output dimensions.
 
 ";
 
-%feature("docstring") casadi::LinearInterpolantJac::print_short "[INTERNAL]
-Print.
-
-";
-
 %feature("docstring") casadi::LinearInterpolantJac::alloc_iw "[INTERNAL]
 Ensure required length of iw field.
 
@@ -26005,11 +25816,6 @@ Names of function input and outputs.
 ";
 
 %feature("docstring") casadi::LinearInterpolantJac::call_reverse "[INTERNAL]  Reverse mode, virtual functions overloaded in derived classes.
-
-";
-
-%feature("docstring") casadi::LinearInterpolantJac::print_long "[INTERNAL]
-Print.
 
 ";
 
@@ -26056,6 +25862,11 @@ generated function.
 ";
 
 %feature("docstring") casadi::LinearInterpolantJac::has_derivative "[INTERNAL]  Can derivatives be calculated in any way?
+
+";
+
+%feature("docstring") casadi::LinearInterpolantJac::disp "[INTERNAL]
+Print.
 
 ";
 
@@ -26700,15 +26511,9 @@ Create a solve node.
 
 ";
 
-%feature("docstring") casadi::Linsol::print_long "
-
-Print a description of the object.
-
-";
-
 %feature("docstring") casadi::Linsol::get_repr "
 
-Return a string with a representation (for SWIG)
+Get string representation with type information.
 
 ";
 
@@ -26730,12 +26535,6 @@ Importer factory.
 
 Returns a number that is unique for a given Node. If the Object does not
 point to any node, \"0\" is returned.
-
-";
-
-%feature("docstring") casadi::Linsol::get_str "
-
-Return a string with a description (for SWIG)
 
 ";
 
@@ -26896,27 +26695,21 @@ Joel Andersson
 
 C++ includes: linsol.hpp ";
 
-%feature("docstring") casadi::Linsol::print "
-
-Return a string with a description (for SWIG)
-
-";
-
 %feature("docstring") casadi::Linsol::rank "
 
 Matrix rank Not available for all solvers.
 
 ";
 
-%feature("docstring") casadi::Linsol::repr "
+%feature("docstring") casadi::Linsol::disp "
 
-Print a representation of the object.
+Print a description of the object.
 
 ";
 
-%feature("docstring") casadi::Linsol::print_short "
+%feature("docstring") casadi::Linsol::get_str "
 
-Print a representation of the object.
+Get string representation.
 
 ";
 
@@ -26988,10 +26781,6 @@ sparsity pattern, forward mode.
 
 %feature("docstring") casadi::Lsqr::get_stats "[INTERNAL]  Get all
 statistics.
-
-";
-
-%feature("docstring") casadi::Lsqr::print_long "[INTERNAL]  Print.
 
 ";
 
@@ -27124,6 +26913,10 @@ is available.
 ";
 
 %feature("docstring") casadi::Lsqr::name "[INTERNAL]  Name of the function.
+
+";
+
+%feature("docstring") casadi::Lsqr::disp "[INTERNAL]  Print.
 
 ";
 
@@ -27283,11 +27076,6 @@ cached version is available.
 
 ";
 
-%feature("docstring") casadi::Lsqr::sp_reverse "[INTERNAL]  Propagate
-sparsity backwards.
-
-";
-
 %feature("docstring") casadi::Lsqr::slice "[INTERNAL]  returns a new
 function with a selection of inputs/outputs of the original
 
@@ -27429,7 +27217,8 @@ function input and outputs.
 
 ";
 
-%feature("docstring") casadi::Lsqr::print_short "[INTERNAL]  Print.
+%feature("docstring") casadi::Lsqr::sp_reverse "[INTERNAL]  Propagate
+sparsity backwards.
 
 ";
 
@@ -28136,7 +27925,7 @@ count.
 
 ";
 
-%feature("docstring") casadi::Map::print_long "[INTERNAL]  Print.
+%feature("docstring") casadi::Map::disp "[INTERNAL]  Print.
 
 ";
 
@@ -28632,10 +28421,6 @@ of function inputs and outputs.
 
 ";
 
-%feature("docstring") casadi::Map::print_short "[INTERNAL]  Print.
-
-";
-
 %feature("docstring") casadi::Map::has_jacobian "[INTERNAL]  Return
 Jacobian of all input elements with respect to all output elements.
 
@@ -28870,6 +28655,10 @@ Obtain solver name from Adaptor.
 
 ";
 
+%feature("docstring") casadi::MapOmp::disp "[INTERNAL]  Print.
+
+";
+
 %feature("docstring") casadi::MapOmp::sz_w "[INTERNAL]  Get required length
 of w field.
 
@@ -29022,10 +28811,6 @@ reference to the object.
 
 ";
 
-%feature("docstring") casadi::MapOmp::print_short "[INTERNAL]  Print.
-
-";
-
 %feature("docstring") casadi::MapOmp::getAtomicOutput "[INTERNAL]  Get the
 (integer) output argument of an atomic operation.
 
@@ -29158,10 +28943,6 @@ input(s) and output(s)
 
 %feature("docstring") casadi::MapOmp::print_options "[INTERNAL]  Print list
 of options.
-
-";
-
-%feature("docstring") casadi::MapOmp::print_long "[INTERNAL]  Print.
 
 ";
 
@@ -29646,7 +29427,7 @@ primitive.
 
 */ %feature("docstring") casadi::Matrix::get_repr "
 
-Return a string with a representation (for SWIG)
+Get string representation with type information.
 
 ";
 
@@ -29672,12 +29453,6 @@ sign(NaN) := NaN.
 %feature("docstring") friendwrap_minor "
 
 Get the (i,j) minor matrix.
-
-";
-
-%feature("docstring") casadi::Matrix::repr "
-
-Print a representation of the object.
 
 ";
 
@@ -30206,12 +29981,6 @@ one.
 
 ";
 
-%feature("docstring") casadi::Matrix::print_short "
-
-Print a representation of the object.
-
-";
-
 %feature("docstring") casadi::Matrix::constpow "
 
 Elementwise power with const power
@@ -30543,12 +30312,6 @@ Functions called by friend functions defined here
 
 ";
 
-%feature("docstring") casadi::Matrix::print_long "
-
-Print a description of the object.
-
-";
-
 %feature("docstring") casadi::Matrix::reset_input "[INTERNAL]  Reset the
 marker for an input expression.
 
@@ -30662,7 +30425,7 @@ keeping the existing non-zeros.
 
 %feature("docstring") casadi::Matrix::get_str "
 
-Return a string with a description (for SWIG)
+Get string representation.
 
 ";
 
@@ -30817,6 +30580,12 @@ Implementation of Matrix::get_nonzeros (in public API)
 
 ";
 
+%feature("docstring") casadi::Matrix::disp "
+
+Print a representation of the object.
+
+";
+
 %feature("docstring") casadi::Matrix::rdivide "
 
 Elementwise division: (x,y) -> x ./ y.
@@ -30854,12 +30623,6 @@ Get the sparsity pattern. See the Sparsity class for details.
 
 ";
 
-%feature("docstring") casadi::Matrix::print "
-
-Return a string with a description (for SWIG)
-
-";
-
 
 // File: classcasadi_1_1MinusInfSX.xml
 
@@ -30888,6 +30651,12 @@ primitive.
 */ %feature("docstring") casadi::MX::get_output "
 
 Get an output.
+
+";
+
+%feature("docstring") casadi::MX::disp "
+
+Print a description of the object.
 
 ";
 
@@ -30990,7 +30759,7 @@ Remainder after division: (x,y) -> mod(x,y)
 
 %feature("docstring") casadi::MX::get_repr "
 
-Return a string with a representation (for SWIG)
+Get string representation with type information.
 
 ";
 
@@ -31167,12 +30936,6 @@ Get the number of rows, Octave-style syntax.
 
 ";
 
-%feature("docstring") casadi::MX::print "
-
-Return a string with a description (for SWIG)
-
-";
-
 %feature("docstring") casadi::MX::exp "
 
 Elementwise exponential: x -> exp(x)
@@ -31226,12 +30989,6 @@ Hyperbolic tangent: x -> tanh(x)
 %feature("docstring") casadi::MX::is_binary "
 
 Is binary operation.
-
-";
-
-%feature("docstring") casadi::MX::print_long "
-
-Print a description of the object.
 
 ";
 
@@ -31443,7 +31200,7 @@ check if zero (note that false negative answers are possible)
 
 %feature("docstring") casadi::MX::get_str "
 
-Return a string with a description (for SWIG)
+Get string representation.
 
 ";
 
@@ -31654,12 +31411,6 @@ Conditional assignment: (x,y) -> x ? y : 0.
 
 ";
 
-%feature("docstring") casadi::MX::repr "
-
-Print a representation of the object.
-
-";
-
 %feature("docstring") casadi::MX::einstein "
 
 Computes an einstein dense tensor contraction.
@@ -31775,12 +31526,6 @@ Create sparse matrix constant (also implicit type conversion)
 %feature("docstring") casadi::MX::size2 "
 
 Get the second dimension (i.e. number of columns)
-
-";
-
-%feature("docstring") casadi::MX::print_short "
-
-Print a representation of the object.
 
 ";
 
@@ -32489,10 +32234,6 @@ able to propagate seeds through the algorithm?
 
 ";
 
-%feature("docstring") casadi::Newton::print_short "[INTERNAL]  Print.
-
-";
-
 %feature("docstring") casadi::Newton::index_in "[INTERNAL]  Get input
 scheme index by name.
 
@@ -32554,10 +32295,6 @@ input/output nonzeros.
 
 %feature("docstring") casadi::Newton::check_res "[INTERNAL]  Check if
 output arguments have correct length and dimensions.
-
-";
-
-%feature("docstring") casadi::Newton::print_long "[INTERNAL]  Print.
 
 ";
 
@@ -32732,6 +32469,10 @@ input arguments that needs to be replaced.
 
 ";
 
+%feature("docstring") casadi::Newton::disp "[INTERNAL]  Print.
+
+";
+
 %feature("docstring") casadi::Newton::size1_in "[INTERNAL]  Input/output
 dimensions.
 
@@ -32883,12 +32624,6 @@ Readable name of the class.
 
 ";
 
-%feature("docstring") casadi::NlpBuilder::repr "
-
-Print a representation of the object.
-
-";
-
 %feature("docstring") casadi::NlpBuilder "
 
 A symbolic NLP representation.
@@ -32905,31 +32640,19 @@ Import an .nl file.
 
 %feature("docstring") casadi::NlpBuilder::get_repr "
 
-Return a string with a representation (for SWIG)
+Get string representation with type information.
 
 ";
 
 %feature("docstring") casadi::NlpBuilder::get_str "
 
-Return a string with a description (for SWIG)
+Get string representation.
 
 ";
 
-%feature("docstring") casadi::NlpBuilder::print_long "
+%feature("docstring") casadi::NlpBuilder::disp "
 
 Print a description of the object.
-
-";
-
-%feature("docstring") casadi::NlpBuilder::print_short "
-
-Print a representation of the object.
-
-";
-
-%feature("docstring") casadi::NlpBuilder::print "
-
-Return a string with a description (for SWIG)
 
 ";
 
@@ -33199,10 +32922,6 @@ length of res field.
 
 %feature("docstring") casadi::Nlpsol::getAtomicOutput "[INTERNAL]  Get the
 (integer) output argument of an atomic operation.
-
-";
-
-%feature("docstring") casadi::Nlpsol::print_short "[INTERNAL]  Print.
 
 ";
 
@@ -33598,12 +33317,12 @@ is available.
 
 ";
 
-%feature("docstring") casadi::Nlpsol::size_out "[INTERNAL]  Input/output
-dimensions.
+%feature("docstring") casadi::Nlpsol::disp "[INTERNAL]  Print.
 
 ";
 
-%feature("docstring") casadi::Nlpsol::print_long "[INTERNAL]  Print.
+%feature("docstring") casadi::Nlpsol::size_out "[INTERNAL]  Input/output
+dimensions.
 
 ";
 
@@ -33965,11 +33684,6 @@ Get a vector of symbolic variables corresponding to the outputs.
 
 ";
 
-%feature("docstring") casadi::OracleFunction::sz_arg "[INTERNAL]  Get
-required length of arg field.
-
-";
-
 %feature("docstring") casadi::OracleFunction::has_codegen "[INTERNAL]  Is
 codegen supported?
 
@@ -34274,6 +33988,10 @@ function signature: name:(inputs)->(outputs)
 
 ";
 
+%feature("docstring") casadi::OracleFunction::disp "[INTERNAL]  Print.
+
+";
+
 %feature("docstring") casadi::OracleFunction::get_function "[INTERNAL] ";
 
 %feature("docstring") casadi::OracleFunction::getAtomicOutput "[INTERNAL]
@@ -34402,11 +34120,6 @@ work vectors.
 ";
 
 %feature("docstring") casadi::OracleFunction::calc_function "[INTERNAL] ";
-
-%feature("docstring") casadi::OracleFunction::print_short "[INTERNAL]
-Print.
-
-";
 
 %feature("docstring") casadi::OracleFunction::mx_in "[INTERNAL]  Get
 function input(s) and output(s)
@@ -34877,8 +34590,8 @@ number of temporary variables needed.
 
 ";
 
-%feature("docstring") casadi::OracleFunction::print_long "[INTERNAL]
-Print.
+%feature("docstring") casadi::OracleFunction::sz_arg "[INTERNAL]  Get
+required length of arg field.
 
 ";
 
@@ -35013,15 +34726,21 @@ Construct from a file.
 
 ";
 
-%feature("docstring") casadi::ParsedFile::print "
+%feature("docstring") casadi::ParsedFile::to_string "
 
-Print parsed file.
+Get entry as a string.
 
 ";
 
 %feature("docstring") casadi::ParsedFile::to "
 
 Convert to a type.
+
+";
+
+%feature("docstring") casadi::ParsedFile::to_set "
+
+Get entry as a set.
 
 ";
 
@@ -35063,15 +34782,9 @@ Get entry as a text.
 
 ";
 
-%feature("docstring") casadi::ParsedFile::to_string "
+%feature("docstring") casadi::ParsedFile::disp "
 
-Get entry as a string.
-
-";
-
-%feature("docstring") casadi::ParsedFile::to_set "
-
-Get entry as a set.
+Print parsed file.
 
 ";
 
@@ -35128,9 +34841,9 @@ Construct from a vector of polynomial coefficients.
 
 ";
 
-%feature("docstring") casadi::Polynomial::print "
+%feature("docstring") casadi::Polynomial::type_name "
 
-Return a string with a description (for SWIG)
+Readable name of the class.
 
 ";
 
@@ -35148,13 +34861,7 @@ Get scalar value (error if degree()!=0)
 
 %feature("docstring") casadi::Polynomial::get_repr "
 
-Return a string with a representation (for SWIG)
-
-";
-
-%feature("docstring") casadi::Polynomial::print_short "
-
-Print a representation of the object.
+Get string representation with type information.
 
 ";
 
@@ -35166,7 +34873,13 @@ Degree of the polynomial.
 
 %feature("docstring") casadi::Polynomial::get_str "
 
-Return a string with a description (for SWIG)
+Get string representation.
+
+";
+
+%feature("docstring") casadi::Polynomial::disp "
+
+Print a description of the object.
 
 ";
 
@@ -35176,29 +34889,17 @@ Remove excess zeros.
 
 ";
 
-%feature("docstring") casadi::Polynomial::print_long "
-
-Print a description of the object.
-
-";
-
-%feature("docstring") casadi::Polynomial::repr "
-
-Print a representation of the object.
-
-";
-
 
 // File: classcasadi_1_1PrintableObject.xml
-%feature("docstring") casadi::PrintableObject::get_repr "
+%feature("docstring") casadi::PrintableObject::get_str "
 
-Return a string with a representation (for SWIG)
+Get string representation.
 
 ";
 
-%feature("docstring") casadi::PrintableObject::print "
+%feature("docstring") casadi::PrintableObject::get_repr "
 
-Return a string with a description (for SWIG)
+Get string representation with type information.
 
 ";
 
@@ -35209,31 +34910,6 @@ Base class for objects that have a natural string representation.
 Joel Andersson
 
 C++ includes: printable_object.hpp ";
-
-%feature("docstring") casadi::PrintableObject::get_str "
-
-Return a string with a description (for SWIG)
-
-";
-
-%feature("docstring") friendwrap_str "
-
-Return a string with a description of the object, cf. str(Object) in Python.
-
-";
-
-%feature("docstring") casadi::PrintableObject::repr "
-
-Print a representation of the object.
-
-";
-
-%feature("docstring") friendwrap_repr "
-
-Return a string with a representation of the object, cf. repr(Object) in
-Python.
-
-";
 
 
 // File: classcasadi_1_1Project.xml
@@ -35555,7 +35231,8 @@ input(s) and output(s)
 
 ";
 
-%feature("docstring") casadi::QpToNlp::print_short "[INTERNAL]  Print.
+%feature("docstring") casadi::QpToNlp::alloc_res "[INTERNAL]  Ensure
+required length of res field.
 
 ";
 
@@ -35829,10 +35506,6 @@ Export / Generate C code for the dependency function.
 
 ";
 
-%feature("docstring") casadi::QpToNlp::print_long "[INTERNAL]  Print.
-
-";
-
 %feature("docstring") casadi::QpToNlp::sp_weight "[INTERNAL]  Weighting
 factor for chosing forward/reverse mode, sparsity propagation.
 
@@ -35983,6 +35656,10 @@ Symbolic expressions for the adjoint seeds.
 
 ";
 
+%feature("docstring") casadi::QpToNlp::disp "[INTERNAL]  Print.
+
+";
+
 %feature("docstring") casadi::QpToNlp::get_n_in "[INTERNAL]  Number of
 function inputs and outputs.
 
@@ -36098,11 +35775,6 @@ Log the status of the solver.
 ------------------------------------------------------------------------
 [INTERNAL] 
 Log the status of the solver, function given.
-
-";
-
-%feature("docstring") casadi::QpToNlp::alloc_res "[INTERNAL]  Ensure
-required length of res field.
 
 ";
 
@@ -36339,10 +36011,6 @@ of function input and outputs.
 
 %feature("docstring") casadi::Rootfinder::sz_work "[INTERNAL]  Get number
 of temporary variables needed.
-
-";
-
-%feature("docstring") casadi::Rootfinder::print_short "[INTERNAL]  Print.
 
 ";
 
@@ -36834,10 +36502,6 @@ with symbolic matrices.
 
 ";
 
-%feature("docstring") casadi::Rootfinder::print_long "[INTERNAL]  Print.
-
-";
-
 %feature("docstring") casadi::Rootfinder::has_function "[INTERNAL] ";
 
 %feature("docstring") casadi::Rootfinder::mx_out "[INTERNAL]  Get function
@@ -36963,6 +36627,10 @@ simplified signature.
 
 %feature("docstring") casadi::Rootfinder::set_temp "[INTERNAL]  Set the
 work vectors.
+
+";
+
+%feature("docstring") casadi::Rootfinder::disp "[INTERNAL]  Print.
 
 ";
 
@@ -37141,6 +36809,10 @@ objects.
 
 %feature("docstring") casadi::RungeKutta::simple "[INTERNAL]  Evaluate
 numerically, simplied syntax.
+
+";
+
+%feature("docstring") casadi::RungeKutta::disp "[INTERNAL]  Print.
 
 ";
 
@@ -37429,10 +37101,6 @@ structure recognition.
 
 ";
 
-%feature("docstring") casadi::RungeKutta::print_long "[INTERNAL]  Print.
-
-";
-
 %feature("docstring") casadi::RungeKutta::size2_out "[INTERNAL]
 Input/output dimensions.
 
@@ -37447,10 +37115,6 @@ G.
 function that calculates forward derivatives forward(nfwd) returns a cached
 instance if available, and calls  Function get_forward(int nfwd) if no
 cached version is available.
-
-";
-
-%feature("docstring") casadi::RungeKutta::print_short "[INTERNAL]  Print.
 
 ";
 
@@ -38093,10 +37757,6 @@ derivatives by multiplying the full Jacobian and multiplying.
 
 ";
 
-%feature("docstring") casadi::Scpgen::print_short "[INTERNAL]  Print.
-
-";
-
 %feature("docstring") casadi::Scpgen::setup "[INTERNAL]  Set the
 (persistent and temporary) work vectors.
 
@@ -38328,6 +37988,10 @@ Evaluate a function, overloaded.
 
 ";
 
+%feature("docstring") casadi::Scpgen::disp "[INTERNAL]  Print.
+
+";
+
 %feature("docstring") casadi::Scpgen::log "
 
 >  void casadi::FunctionInternal::log(const std::string &msg) const 
@@ -38412,10 +38076,6 @@ function with a selection of inputs/outputs of the original
 ";
 
 %feature("docstring") casadi::Scpgen::solve_qp "[INTERNAL] ";
-
-%feature("docstring") casadi::Scpgen::print_long "[INTERNAL]  Print.
-
-";
 
 %feature("docstring") casadi::Scpgen::free_sx "[INTERNAL]  Get free
 variables (SX)
@@ -39065,12 +38725,6 @@ Get class name.
 
 ";
 
-%feature("docstring") casadi::SharedObject::print "
-
-Return a string with a description (for SWIG)
-
-";
-
 %feature("docstring") casadi::SharedObject::is_null "
 
 Is a null pointer?
@@ -39082,27 +38736,21 @@ the pointer to the internal class
 
 ";
 
-%feature("docstring") casadi::SharedObject::repr "
+%feature("docstring") casadi::SharedObject::disp "
 
-Print a representation of the object.
+Print a description of the object.
 
 ";
 
 %feature("docstring") casadi::SharedObject::get_repr "
 
-Return a string with a representation (for SWIG)
+Get string representation with type information.
 
 ";
 
 %feature("docstring") casadi::SharedObject::get_str "
 
-Return a string with a description (for SWIG)
-
-";
-
-%feature("docstring") casadi::SharedObject::print_long "
-
-Print a description of the object.
+Get string representation.
 
 ";
 
@@ -39152,12 +38800,6 @@ point to any node, \"0\" is returned.
 
 ";
 
-%feature("docstring") casadi::SharedObject::print_short "
-
-Print a representation of the object.
-
-";
-
 %feature("docstring") casadi::SharedObject::type_name "
 
 Readable name of the class.
@@ -39171,11 +38813,6 @@ an external function declaration.
 
 ";
 
-%feature("docstring") casadi::ShellCompiler::print_short "[INTERNAL]  Print
-representation.
-
-";
-
 %feature("docstring") casadi::ShellCompiler::weak "[INTERNAL]  Get a weak
 reference to the object.
 
@@ -39183,6 +38820,10 @@ reference to the object.
 
 %feature("docstring") casadi::ShellCompiler::~ShellCompiler "[INTERNAL]
 Destructor.
+
+";
+
+%feature("docstring") casadi::ShellCompiler::disp "[INTERNAL]  Print.
 
 ";
 
@@ -39217,10 +38858,6 @@ a function pointer for numerical evaluation.
 
 %feature("docstring") casadi::ShellCompiler::getCount "[INTERNAL]  Get the
 reference count.
-
-";
-
-%feature("docstring") casadi::ShellCompiler::print_long "[INTERNAL]  Print.
 
 ";
 
@@ -39454,11 +39091,6 @@ Input/output dimensions.
 
 ";
 
-%feature("docstring") casadi::SimplifiedExternal::print_short "[INTERNAL]
-Print.
-
-";
-
 %feature("docstring") casadi::SimplifiedExternal::call_gen "[INTERNAL]
 Call a function, overloaded.
 
@@ -39674,6 +39306,10 @@ Evaluate with symbolic scalars.
 
 ";
 
+%feature("docstring") casadi::SimplifiedExternal::disp "[INTERNAL]  Print.
+
+";
+
 %feature("docstring") casadi::SimplifiedExternal::codegen_incref "[INTERNAL]  Codegen incref for dependencies.
 
 ";
@@ -39779,11 +39415,6 @@ required length of w field.
 
 %feature("docstring") casadi::SimplifiedExternal::replace_aseed "[INTERNAL]
 Replace 0-by-0 reverse seeds.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::print_long "[INTERNAL]
-Print.
 
 ";
 
@@ -40170,31 +39801,19 @@ Is the slice a scalar.
 
 %feature("docstring") casadi::Slice::get_repr "
 
-Return a string with a representation (for SWIG)
+Get string representation with type information.
 
 ";
 
-%feature("docstring") casadi::Slice::get_str "
+%feature("docstring") casadi::Slice::disp "
 
-Return a string with a description (for SWIG)
-
-";
-
-%feature("docstring") casadi::Slice::print_short "
-
-Print a representation of the object.
+Print a description of the object.
 
 ";
 
 %feature("docstring") casadi::Slice::scalar "
 
 Get scalar (if is_scalar)
-
-";
-
-%feature("docstring") casadi::Slice::print "
-
-Return a string with a description (for SWIG)
 
 ";
 
@@ -40227,12 +39846,6 @@ Get a vector of indices (nested slice)
 
 ";
 
-%feature("docstring") casadi::Slice::print_long "
-
-Print a description of the object.
-
-";
-
 %feature("docstring") casadi::Slice::Slice "
 
 >  casadi::Slice::Slice()
@@ -40252,9 +39865,9 @@ A slice.
 
 ";
 
-%feature("docstring") casadi::Slice::repr "
+%feature("docstring") casadi::Slice::get_str "
 
-Print a representation of the object.
+Get string representation.
 
 ";
 
@@ -40437,10 +40050,6 @@ Get sparsity of a given input.
 ------------------------------------------------------------------------
 [INTERNAL] 
 Are all inputs and outputs scalar.
-
-";
-
-%feature("docstring") casadi::SlicotDple::print_long "[INTERNAL]  Print.
 
 ";
 
@@ -40750,10 +40359,6 @@ Codegen decref for dependencies.
 
 %feature("docstring") casadi::SlicotDple::sparsity_out "[INTERNAL]  Get
 sparsity of a given output.
-
-";
-
-%feature("docstring") casadi::SlicotDple::print_short "[INTERNAL]  Print.
 
 ";
 
@@ -41147,6 +40752,10 @@ input/output elements.
 
 ";
 
+%feature("docstring") casadi::SlicotDple::disp "[INTERNAL]  Print.
+
+";
+
 %feature("docstring") casadi::SlicotDple::has_sprev "[INTERNAL]  Is the
 class able to propagate seeds through the algorithm?
 
@@ -41280,10 +40889,6 @@ Get an atomic operation operator index.
 
 ";
 
-%feature("docstring") casadi::SlicotExpm::print_long "[INTERNAL]  Print.
-
-";
-
 %feature("docstring") casadi::SlicotExpm::n_out "[INTERNAL]  Number of
 function inputs and outputs.
 
@@ -41322,10 +40927,6 @@ a function that calculates nadj adjoint derivatives.
 
 %feature("docstring") casadi::SlicotExpm::sz_arg "[INTERNAL]  Get required
 length of arg field.
-
-";
-
-%feature("docstring") casadi::SlicotExpm::print_short "[INTERNAL]  Print.
 
 ";
 
@@ -41873,6 +41474,10 @@ input(s) and output(s)
 
 ";
 
+%feature("docstring") casadi::SlicotExpm::disp "[INTERNAL]  Print.
+
+";
+
 %feature("docstring") casadi::SlicotExpm::size2_in "[INTERNAL]
 Input/output dimensions.
 
@@ -42229,6 +41834,12 @@ Resize.
 
 ";
 
+%feature("docstring") casadi::Sparsity::disp "
+
+Print a description of the object.
+
+";
+
 %feature("docstring") casadi::Sparsity::find "
 
 Get the location of all non-zero elements as they would appear in a Dense
@@ -42243,12 +41854,6 @@ k = A.find() A[k] will contain the elements of A that are non-zero in B
 
 Generate a script for Matlab or Octave which visualizes the sparsity using
 the spy command.
-
-";
-
-%feature("docstring") casadi::Sparsity::repr "
-
-Print a representation of the object.
 
 ";
 
@@ -42352,12 +41957,6 @@ Is square?
 
 ";
 
-%feature("docstring") casadi::Sparsity::print_short "
-
-Print a representation of the object.
-
-";
-
 %feature("docstring") casadi::Sparsity::appendColumns "
 
 Append another sparsity patten horizontally.
@@ -42366,7 +41965,7 @@ Append another sparsity patten horizontally.
 
 %feature("docstring") casadi::Sparsity::get_repr "
 
-Return a string with a representation (for SWIG)
+Get string representation with type information.
 
 ";
 
@@ -42396,7 +41995,7 @@ optionally both dimensions)
 
 %feature("docstring") casadi::Sparsity::get_str "
 
-Return a string with a description (for SWIG)
+Get string representation.
 
 ";
 
@@ -42509,12 +42108,6 @@ Get the row of a non-zero element.
 
 ";
 
-%feature("docstring") casadi::Sparsity::print "
-
-Return a string with a description (for SWIG)
-
-";
-
 %feature("docstring") casadi::Sparsity::is_column "
 
 Check if the pattern is a column vector (i.e. size2()==1)
@@ -42600,12 +42193,6 @@ Get nonzeros in lower triangular part.
 %feature("docstring") casadi::Sparsity::is_singular "
 
 Check whether the sparsity-pattern indicates structural singularity.
-
-";
-
-%feature("docstring") casadi::Sparsity::print_long "
-
-Print a description of the object.
 
 ";
 
@@ -43293,6 +42880,10 @@ input/output elements.
 
 ";
 
+%feature("docstring") casadi::Sqpmethod::disp "[INTERNAL]  Print.
+
+";
+
 %feature("docstring") casadi::Sqpmethod::sz_work "[INTERNAL]  Get number of
 temporary variables needed.
 
@@ -43862,10 +43453,6 @@ Read options from parameter xml.
 
 ";
 
-%feature("docstring") casadi::Sqpmethod::print_long "[INTERNAL]  Print.
-
-";
-
 %feature("docstring") casadi::Sqpmethod::replace_fseed "[INTERNAL]  Replace
 0-by-0 forward seeds.
 
@@ -44142,10 +43729,6 @@ the number of atomic operations.
 
 %feature("docstring") casadi::Sqpmethod::sz_arg "[INTERNAL]  Get required
 length of arg field.
-
-";
-
-%feature("docstring") casadi::Sqpmethod::print_short "[INTERNAL]  Print.
 
 ";
 
@@ -44590,11 +44173,6 @@ scheme name by index.
 
 ";
 
-%feature("docstring") casadi::Switch::print_long "[INTERNAL]  Print
-description.
-
-";
-
 %feature("docstring") casadi::Switch::free_sx "[INTERNAL]  Get free
 variables (SX)
 
@@ -44643,6 +44221,8 @@ length of the work vector.
 block.
 
 ";
+
+%feature("docstring") casadi::Switch::factory "[INTERNAL] ";
 
 %feature("docstring") casadi::Switch::getJacSparsityGen "[INTERNAL]  Get
 the sparsity pattern, forward mode.
@@ -44847,7 +44427,9 @@ length of w field.
 
 ";
 
-%feature("docstring") casadi::Switch::factory "[INTERNAL] ";
+%feature("docstring") casadi::Switch::disp "[INTERNAL]  Print description.
+
+";
 
 %feature("docstring") casadi::Switch::wrap "[INTERNAL]  Wrap in an Function
 instance consisting of only one MX call.
@@ -45008,10 +44590,6 @@ is available.
 
 %feature("docstring") casadi::Switch::mx_out "[INTERNAL]  Get function
 input(s) and output(s)
-
-";
-
-%feature("docstring") casadi::Switch::print_short "[INTERNAL]  Print.
 
 ";
 
@@ -45423,10 +45001,6 @@ input(s) and output(s)
 
 ";
 
-%feature("docstring") casadi::SymbolicQr::print_long "[INTERNAL]  Print.
-
-";
-
 %feature("docstring") casadi::SymbolicQr::eval_name "[INTERNAL]  Get name
 of the evaluation function.
 
@@ -45682,6 +45256,10 @@ nodes in the algorithm.
 ";
 
 %feature("docstring") casadi::SymbolicQr::linsol_cholesky_sparsity "[INTERNAL]   Sparsity pattern of the cholesky factors.
+
+";
+
+%feature("docstring") casadi::SymbolicQr::disp "[INTERNAL]  Print.
 
 ";
 
@@ -46185,10 +45763,6 @@ structure recognition.
 
 ";
 
-%feature("docstring") casadi::SymbolicQr::print_short "[INTERNAL]  Print.
-
-";
-
 %feature("docstring") casadi::SymbolicQr::sx_out "[INTERNAL]  Get function
 input(s) and output(s)
 
@@ -46295,13 +45869,7 @@ structure recognition for symmetric Jacobians
 // File: classcasadi_1_1WeakRef.xml
 %feature("docstring") casadi::WeakRef::get_str "
 
-Return a string with a description (for SWIG)
-
-";
-
-%feature("docstring") casadi::WeakRef::print_short "
-
-Print a representation of the object.
+Get string representation.
 
 ";
 
@@ -46326,12 +45894,6 @@ point to any node, \"0\" is returned.
 
 ";
 
-%feature("docstring") casadi::WeakRef::print "
-
-Return a string with a description (for SWIG)
-
-";
-
 %feature("docstring") casadi::WeakRef::print_ptr "[INTERNAL]  Print the
 pointer to the internal class
 
@@ -46351,15 +45913,15 @@ Construct from a shared object (also implicit type conversion)
 
 ";
 
-%feature("docstring") casadi::WeakRef::is_null "
+%feature("docstring") casadi::WeakRef::disp "
 
-Is a null pointer?
+Print a description of the object.
 
 ";
 
-%feature("docstring") casadi::WeakRef::print_long "
+%feature("docstring") casadi::WeakRef::is_null "
 
-Print a description of the object.
+Is a null pointer?
 
 ";
 
@@ -46375,12 +45937,6 @@ Get class name.
 
 ";
 
-%feature("docstring") casadi::WeakRef::repr "
-
-Print a representation of the object.
-
-";
-
 %feature("docstring") casadi::WeakRef::alive "
 
 Check if alive.
@@ -46389,7 +45945,7 @@ Check if alive.
 
 %feature("docstring") casadi::WeakRef::get_repr "
 
-Return a string with a representation (for SWIG)
+Get string representation with type information.
 
 ";
 
@@ -46398,12 +45954,6 @@ Return a string with a representation (for SWIG)
 
 
 // File: classcasadi_1_1XmlFile.xml
-%feature("docstring") casadi::XmlFile::print_short "
-
-Print a representation of the object.
-
-";
-
 %feature("docstring") casadi::XmlFile "
 
 XML parser Can be used for parsing XML files into CasADi data structures.
@@ -46418,28 +45968,18 @@ Readable name of the class.
 
 ";
 
-%feature("docstring") casadi::XmlFile::print "
-
-Return a string with a description (for SWIG)
-
-";
-
 %feature("docstring") casadi::XmlFile::get_str "
 
-Return a string with a description (for SWIG)
+Get string representation.
 
 ";
+
+%feature("docstring") casadi::XmlFile::XmlFile "";
 
 %feature("docstring") casadi::XmlFile::__hash__ "
 
 Returns a number that is unique for a given Node. If the Object does not
 point to any node, \"0\" is returned.
-
-";
-
-%feature("docstring") casadi::XmlFile::print_long "
-
-Print a description of the object.
 
 ";
 
@@ -46449,23 +45989,21 @@ Get class name.
 
 ";
 
-%feature("docstring") casadi::XmlFile::repr "
-
-Print a representation of the object.
-
-";
-
 %feature("docstring") casadi::XmlFile::is_null "
 
 Is a null pointer?
 
 ";
 
-%feature("docstring") casadi::XmlFile::XmlFile "";
+%feature("docstring") casadi::XmlFile::disp "
+
+Print a description of the object.
+
+";
 
 %feature("docstring") casadi::XmlFile::get_repr "
 
-Return a string with a representation (for SWIG)
+Get string representation with type information.
 
 ";
 
@@ -46487,7 +46025,13 @@ pointer to the internal class
 
 
 // File: namespacecasadi.xml
+%feature("docstring") casadi::is_nondecreasing "
+Check if the vector is non-decreasing.
+
+";
+
 %feature("docstring") casadi::matrixName< double > "
+
 Get typename.
 
 ";
@@ -46505,20 +46049,6 @@ to be monotonously increasing
 %feature("docstring") casadi::conic_option_type "
 
 Get type info for a particular option.
-
-";
-
-%feature("docstring") casadi::inBounds "
-
->  bool casadi::inBounds(const std::vector< T > &v, int upper)
-------------------------------------------------------------------------
-
-Check if for each element of v holds: v_i < upper.
-
->  bool casadi::inBounds(const std::vector< T > &v, int lower, int upper)
-------------------------------------------------------------------------
-
-Check if for each element of v holds: lower <= v_i < upper.
 
 ";
 
@@ -46540,29 +46070,7 @@ Adds a multiple alpha/2 of the outer product mul(x, trans(x)) to A.
 [INTERNAL] 
 ";
 
-%feature("docstring") casadi::swapIndices "
-
-swap inner and outer indices of list of lists
-
-
-
-::
-
-  * [[apple0,apple1,...],[pear0,pear1,...]] ->
-  *   [[apple0,pear0],[apple1,pear1],...]
-  * 
-
-
-
-";
-
 %feature("docstring") casadi::dense_mul_nt_stride "[INTERNAL] ";
-
-%feature("docstring") casadi::isNon_increasing "
-
-Check if the vector is non-increasing.
-
-";
 
 %feature("docstring") casadi::dense_mul_tn "[INTERNAL] ";
 
@@ -46860,6 +46368,12 @@ Get the number of integrator outputs.
 
 %feature("docstring") casadi::slicot_periodic_schur "[INTERNAL] ";
 
+%feature("docstring") casadi::has_negative "
+
+Check if the vector has negative entries.
+
+";
+
 %feature("docstring") casadi::external "
 
 >  Function casadi::external(const std::string &name, const Dict &opts=Dict())
@@ -46882,12 +46396,6 @@ Load a just-in-time compiled external function File name given.
 %feature("docstring") casadi::nlpsol_n_out "
 
 Number of NLP solver outputs.
-
-";
-
-%feature("docstring") casadi::isDecreasing "
-
-Check if the vector is strictly decreasing.
 
 ";
 
@@ -46918,6 +46426,12 @@ violations.
 %feature("docstring") casadi::load_nlpsol "
 
 Explicitly load a plugin dynamically.
+
+";
+
+%feature("docstring") casadi::is_increasing "
+
+Check if the vector is strictly increasing.
 
 ";
 
@@ -46964,12 +46478,6 @@ Get all options for a plugin.
 ";
 
 %feature("docstring") casadi::einstein_eval "";
-
-%feature("docstring") casadi::hasNegative "
-
-Check if the vector has negative entries.
-
-";
 
 %feature("docstring") casadi::conic_option_info "
 
@@ -47239,12 +46747,6 @@ Joel Andersson
 
 ";
 
-%feature("docstring") casadi::isStrictlyMonotone "
-
-Check if the vector is strictly monotone.
-
-";
-
 %feature("docstring") casadi::dple_n_in "
 
 Get the number of QP solver inputs.
@@ -47341,6 +46843,20 @@ Generate a hash value incrementally, array.
 
 %feature("docstring") casadi::casadi_copy_int "[INTERNAL] ";
 
+%feature("docstring") casadi::in_bounds "
+
+>  bool casadi::in_bounds(const std::vector< T > &v, int upper)
+------------------------------------------------------------------------
+
+Check if for each element of v holds: v_i < upper.
+
+>  bool casadi::in_bounds(const std::vector< T > &v, int lower, int upper)
+------------------------------------------------------------------------
+
+Check if for each element of v holds: lower <= v_i < upper.
+
+";
+
 %feature("docstring") casadi::has_integrator "
 
 Check if a particular plugin is available.
@@ -47348,12 +46864,6 @@ Check if a particular plugin is available.
 ";
 
 %feature("docstring") casadi::casadi_central_diff "[INTERNAL] ";
-
-%feature("docstring") casadi::isNonDecreasing "
-
-Check if the vector is non-decreasing.
-
-";
 
 %feature("docstring") casadi::integrator "
 
@@ -48617,6 +48127,12 @@ violation.
 
 ";
 
+%feature("docstring") casadi::is_strictly_monotone "
+
+Check if the vector is strictly monotone.
+
+";
+
 %feature("docstring") casadi::collocation_interpolators "
 
 Obtain collocation interpolating matrices.
@@ -48645,9 +48161,9 @@ D:  interpolating coefficients to obtain end state Length: order+1
 
 ";
 
-%feature("docstring") casadi::isMonotone "
+%feature("docstring") casadi::is_nonincreasing "
 
-Check if the vector is monotone.
+Check if the vector is non-increasing.
 
 ";
 
@@ -49238,9 +48754,9 @@ Check if an index vector can be represented more efficiently as a slice.
 
 ";
 
-%feature("docstring") casadi::isIncreasing "
+%feature("docstring") casadi::is_decreasing "
 
-Check if the vector is strictly increasing.
+Check if the vector is strictly decreasing.
 
 ";
 
@@ -50255,6 +49771,12 @@ A textbook SQPMethod
 
 
 Joel Andersson
+
+";
+
+%feature("docstring") casadi::is_monotone "
+
+Check if the vector is monotone.
 
 ";
 

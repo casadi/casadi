@@ -220,6 +220,13 @@ std::vector< std::vector< M > > &fseed) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::disp(std::ostream &stream,
+bool more) const override "
+
+[INTERNAL]  Print.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::codegen_name(const
 CodeGenerator &g) const  "
 
@@ -1112,13 +1119,6 @@ double cNorm, double obj) const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::FunctionInternal::print_option(const
-std::string &name, std::ostream &stream) const  "
-
-[INTERNAL]  Print all information there is to know about a certain option.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::numel_out(int ind) const  "
 
 [INTERNAL]  Number of input/output elements.
@@ -1646,13 +1646,6 @@ int oind, bool symmetric) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_long(std::ostream
-&stream) const override "
-
-[INTERNAL]  Print.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::forward(int nfwd) const  "
 
 [INTERNAL]  Return function that calculates forward derivatives
@@ -1856,10 +1849,10 @@ casadi::Blocksqp::feasibilityRestorationHeuristic(BlocksqpMemory *m) const
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::FunctionInternal::print_short(std::ostream
-&stream) const override "
+%feature("docstring")  casadi::FunctionInternal::print_option(const
+std::string &name, std::ostream &stream) const  "
 
-[INTERNAL]  Print.
+[INTERNAL]  Print all information there is to know about a certain option.
 
 ";
 
@@ -2286,6 +2279,13 @@ std::vector< M > &arg) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::disp(std::ostream &stream,
+bool more) const override "
+
+[INTERNAL]  Print.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::slice(const std::string
 &name, const std::vector< int > &order_in, const std::vector< int >
 &order_out, const Dict &opts) const  "
@@ -2436,13 +2436,6 @@ const  "
 "
 
 [INTERNAL]  Construct Prepares the function for evaluation.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::setup(void *mem, const
-double **arg, double **res, int *iw, double *w) const  "
-
-[INTERNAL]  Set the (persistent and temporary) work vectors.
 
 ";
 
@@ -2674,10 +2667,10 @@ std::string &fname) const  "
 
 ";
 
-%feature("docstring")  casadi::BSpline::print_long(std::ostream &stream)
-const override "
+%feature("docstring")  casadi::FunctionInternal::setup(void *mem, const
+double **arg, double **res, int *iw, double *w) const  "
 
-Print description.
+[INTERNAL]  Set the (persistent and temporary) work vectors.
 
 ";
 
@@ -2898,13 +2891,6 @@ elements.
 &g) const override "
 
 Generate code for the declarations of the C function.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::print_short(std::ostream
-&stream) const override "
-
-[INTERNAL]  Print.
 
 ";
 
@@ -4432,13 +4418,6 @@ casadi::FunctionInternal::add_dependency(CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_long(std::ostream
-&stream) const override "
-
-[INTERNAL]  Print.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::getAtomicOutput(int k)
 const  "
 
@@ -4507,6 +4486,13 @@ always_inline, bool never_inline) const  "
 std::vector< M > &arg) const  "
 
 [INTERNAL]  Check if output arguments that needs to be replaced.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::disp(std::ostream &stream,
+bool more) const override "
+
+[INTERNAL]  Print.
 
 ";
 
@@ -4774,13 +4760,6 @@ const std::vector< int > &degree, int m) "
 %feature("docstring")  casadi::SharedObjectInternal::getCount() const  "
 
 [INTERNAL]  Get the reference count.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::print_short(std::ostream
-&stream) const override "
-
-[INTERNAL]  Print.
 
 ";
 
@@ -5161,13 +5140,6 @@ Propagate sparsity backwards.
 
 ";
 
-%feature("docstring")  casadi::BSplineDual::print_long(std::ostream &stream)
-const override "
-
-Print description.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::alloc_res(size_t sz_res,
 bool persistent=false) "
 
@@ -5230,13 +5202,6 @@ structure recognition for symmetric Jacobians
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_short(std::ostream
-&stream) const override "
-
-[INTERNAL]  Print.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::eval_sx(const SXElem **arg,
 SXElem **res, int *iw, SXElem *w, void *mem) const  "
 
@@ -5254,6 +5219,13 @@ bool persistent=false) "
 %feature("docstring")  casadi::FunctionInternal::self() const  "
 
 [INTERNAL]  Get a public class instance.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::disp(std::ostream &stream,
+bool more) const override "
+
+[INTERNAL]  Print.
 
 ";
 
@@ -6456,13 +6428,6 @@ std::vector< M > &arg) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_short(std::ostream
-&stream) const override "
-
-[INTERNAL]  Print.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::sparsity_jac(int iind, int
 oind, bool compact, bool symmetric) const  "
 
@@ -6992,6 +6957,13 @@ get_forward(int nfwd) if no cached version is available.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::disp(std::ostream &stream,
+bool more) const override "
+
+[INTERNAL]  Print.
+
+";
+
 %feature("docstring")  casadi::BSplineInterpolant::has_jacobian() const
 override "
 
@@ -7257,10 +7229,9 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_long(std::ostream
-&stream) const override "
+%feature("docstring")  casadi::FunctionInternal::clear_mem() "
 
-[INTERNAL]  Print.
+[INTERNAL]  Clear all memory (called from destructor)
 
 ";
 
@@ -7333,12 +7304,6 @@ bool persistent=false) "
 %feature("docstring")  casadi::FunctionInternal::nnz_out(int ind) const  "
 
 [INTERNAL]  Number of input/output nonzeros.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::clear_mem() "
-
-[INTERNAL]  Clear all memory (called from destructor)
 
 ";
 
@@ -7877,13 +7842,6 @@ CasADi 3.2
 
 ";
 
-%feature("docstring")  casadi::PrintableObject< SharedObject
->::print(std::ostream &stream) const "
-
-Return a string with a description (for SWIG)
-
-";
-
 %feature("docstring")  casadi::Function::has_function(const std::string
 &fname) const  "
 
@@ -8206,20 +8164,6 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
-%feature("docstring")  casadi::SharedObject::print_short(std::ostream
-&stream) const  "
-
-Print a representation of the object.
-
-";
-
-%feature("docstring")  casadi::PrintableObject< SharedObject
->::repr(std::ostream &stream) const "
-
-Print a representation of the object.
-
-";
-
 %feature("docstring")  casadi::Function::index_out(const std::string &name)
 const  "
 
@@ -8313,17 +8257,10 @@ Get, if necessary generate, the sparsity of a Jacobian block
 
 ";
 
-%feature("docstring")  casadi::SharedObject::print_long(std::ostream
-&stream) const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::get_str(bool more=false) const "
 
-Print a description of the object.
-
-";
-
-%feature("docstring")  casadi::PrintableObject< SharedObject  >::get_str()
-const "
-
-Return a string with a description (for SWIG)
+Get string representation.
 
 ";
 
@@ -8337,7 +8274,7 @@ Allocate work vectors.
 %feature("docstring")  casadi::PrintableObject< SharedObject  >::get_repr()
 const "
 
-Return a string with a representation (for SWIG)
+Get string representation with type information.
 
 ";
 
@@ -8485,6 +8422,13 @@ Assert that an input dimension is equal so some given value.
 %feature("docstring")  casadi::Callback::get_sparsity_in(int i) "
 
 Get the sparsity of an input This function is called during construction.
+
+";
+
+%feature("docstring")  casadi::SharedObject::disp(std::ostream &stream, bool
+more=false) const  "
+
+Print a description of the object.
 
 ";
 
@@ -9379,6 +9323,13 @@ oind, bool compact, bool symmetric) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::disp(std::ostream &stream,
+bool more) const override "
+
+[INTERNAL]  Print.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::get_function() const  "
 
 [INTERNAL] ";
@@ -9697,13 +9648,6 @@ casadi::FunctionInternal::codegen_incref(CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_long(std::ostream
-&stream) const override "
-
-[INTERNAL]  Print.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::verbose() const  "
 
 [INTERNAL]  Verbose mode?
@@ -9922,13 +9866,6 @@ elements.
 %feature("docstring")  casadi::FunctionInternal::has_spfwd() const  "
 
 [INTERNAL]  Is the class able to propagate seeds through the algorithm?
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::print_short(std::ostream
-&stream) const override "
-
-[INTERNAL]  Print.
 
 ";
 
@@ -10473,6 +10410,13 @@ std::string &sym, bool inlined, std::istream &file, int &offset) "
 
 ";
 
+%feature("docstring")  casadi::ImporterInternal::disp(std::ostream &stream,
+bool more) const override "
+
+[INTERNAL]  Print.
+
+";
+
 %feature("docstring") casadi::ClangCompiler "
 
 'clang' plugin for Importer
@@ -10558,13 +10502,6 @@ C++ includes: clang_compiler.hpp ";
 
 ";
 
-%feature("docstring")  casadi::ImporterInternal::print_short(std::ostream
-&stream) const override "
-
-[INTERNAL]  Print representation.
-
-";
-
 %feature("docstring")  casadi::ImporterInternal::to_text(const std::string
 &cmd, int ind=-1) const  "
 
@@ -10596,13 +10533,6 @@ override "
 &symname) const  "
 
 [INTERNAL]  Get the function body, if inlined.
-
-";
-
-%feature("docstring")  casadi::ImporterInternal::print_long(std::ostream
-&stream) const override "
-
-[INTERNAL]  Print.
 
 ";
 
@@ -10815,13 +10745,6 @@ override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_long(std::ostream
-&stream) const override "
-
-[INTERNAL]  Print.
-
-";
-
 %feature("docstring")  casadi::Integrator::get_sparsity_in(int i) override "
 
 [INTERNAL]  Sparsities of function inputs and outputs.
@@ -10967,13 +10890,6 @@ std::vector< M > &arg) const  "
 %feature("docstring")  casadi::Collocation::plugin_name() const override "
 
 [INTERNAL] ";
-
-%feature("docstring")  casadi::FunctionInternal::print_short(std::ostream
-&stream) const override "
-
-[INTERNAL]  Print.
-
-";
 
 %feature("docstring")  casadi::FunctionInternal::print_options(std::ostream
 &stream) const  "
@@ -11131,6 +11047,13 @@ std::string &fname, const Dict &opts) const override "
 bool persistent=false) "
 
 [INTERNAL]  Ensure required length of res field.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::disp(std::ostream &stream,
+bool more) const override "
+
+[INTERNAL]  Print.
 
 ";
 
@@ -12152,13 +12075,6 @@ std::vector< std::vector< M > > &fseed) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_short(std::ostream
-&stream) const override "
-
-[INTERNAL]  Print.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::call_forward(const
 std::vector< MX > &arg, const std::vector< MX > &res, const std::vector<
 std::vector< MX > > &fseed, std::vector< std::vector< MX > > &fsens, bool
@@ -12563,13 +12479,6 @@ constructor), this class should invoke this function when initialized.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_long(std::ostream
-&stream) const override "
-
-[INTERNAL]  Print.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::check_res(const
 std::vector< M > &res) const  "
 
@@ -12794,6 +12703,13 @@ double **arg, double **res, int *iw, double *w) const  "
 %feature("docstring")  casadi::FunctionInternal::name() const  "
 
 [INTERNAL]  Name of the function.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::disp(std::ostream &stream,
+bool more) const override "
+
+[INTERNAL]  Print.
 
 ";
 
@@ -13710,13 +13626,6 @@ Get the lower bound(s) by expression.
 
 ";
 
-%feature("docstring")  casadi::DaeBuilder::print_long(std::ostream &stream)
-const  "
-
-Print description.
-
-";
-
 %feature("docstring")  casadi::DaeBuilder::add_quad(const std::string &name,
 const MX &new_quad) "
 
@@ -13788,13 +13697,6 @@ Add a named linear combination of output expressions.
 %feature("docstring")  casadi::DaeBuilder::sort_d() "
 
 Sort dependent parameters.
-
-";
-
-%feature("docstring")  casadi::PrintableObject< DaeBuilder
->::print(std::ostream &stream) const "
-
-Return a string with a description (for SWIG)
 
 ";
 
@@ -13924,7 +13826,7 @@ C++ includes: dae_builder.hpp ";
 %feature("docstring")  casadi::PrintableObject< DaeBuilder  >::get_repr()
 const "
 
-Return a string with a representation (for SWIG)
+Get string representation with type information.
 
 ";
 
@@ -14101,13 +14003,6 @@ std::string &name=std::string()) "
 
 ";
 
-%feature("docstring")  casadi::DaeBuilder::print_short(std::ostream &stream)
-const  "
-
-Print representation.
-
-";
-
 %feature("docstring")  casadi::DaeBuilder::create(const std::string &fname,
 const std::vector< std::string > &s_in, const std::vector< std::string >
 &s_out) const  "
@@ -14206,13 +14101,6 @@ identical)
 
 ";
 
-%feature("docstring")  casadi::PrintableObject< DaeBuilder
->::repr(std::ostream &stream) const "
-
-Print a representation of the object.
-
-";
-
 %feature("docstring")  casadi::DaeBuilder::scale_variables() "
 
 Scale the variables.
@@ -14228,6 +14116,13 @@ Eliminate interdependencies amongst dependent parameters.
 %feature("docstring")  casadi::DaeBuilder::eliminate_d() "
 
 Eliminate dependent parameters.
+
+";
+
+%feature("docstring")  casadi::DaeBuilder::disp(std::ostream &stream, bool
+more=false) const  "
+
+Print representation.
 
 ";
 
@@ -14256,10 +14151,10 @@ Scale the implicit equations.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject< DaeBuilder  >::get_str()
-const "
+%feature("docstring")  casadi::PrintableObject< DaeBuilder  >::get_str(bool
+more=false) const "
 
-Return a string with a description (for SWIG)
+Get string representation.
 
 ";
 
@@ -14333,12 +14228,6 @@ override "
 
 ";
 
-%feature("docstring")  casadi::SharedObjectInternal::weak() "
-
-[INTERNAL]  Get a weak reference to the object.
-
-";
-
 %feature("docstring")  casadi::ImporterInternal::get_meta(const std::string
 &cmd, int ind=-1) const  "
 
@@ -14346,17 +14235,23 @@ override "
 
 ";
 
+%feature("docstring")  casadi::SharedObjectInternal::weak() "
+
+[INTERNAL]  Get a weak reference to the object.
+
+";
+
+%feature("docstring")  casadi::ImporterInternal::disp(std::ostream &stream,
+bool more) const override "
+
+[INTERNAL]  Print.
+
+";
+
 %feature("docstring")  casadi::ImporterInternal::body(const std::string
 &symname) const  "
 
 [INTERNAL]  Get the function body, if inlined.
-
-";
-
-%feature("docstring")  casadi::ImporterInternal::print_short(std::ostream
-&stream) const override "
-
-[INTERNAL]  Print representation.
 
 ";
 
@@ -14436,13 +14331,6 @@ C++ includes: importer_internal.hpp ";
 std::string &sym, bool inlined, std::istream &file, int &offset) "
 
 [INTERNAL]  Get an external function declaration.
-
-";
-
-%feature("docstring")  casadi::ImporterInternal::print_long(std::ostream
-&stream) const override "
-
-[INTERNAL]  Print.
 
 ";
 
@@ -14923,13 +14811,6 @@ std::vector< std::string > &onames, const Dict &opts) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_short(std::ostream
-&stream) const override "
-
-[INTERNAL]  Print.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::sparsity_in(int ind) const
 "
 
@@ -15255,14 +15136,6 @@ std::string &name, std::ostream &stream) const  "
 **arg, bvec_t **res, int *iw, bvec_t *w, void *mem) const  "
 
 [INTERNAL]  Propagate sparsity forward.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::get_partition(int iind, int
-oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
-allow_forward, bool allow_reverse) const  "
-
-[INTERNAL]  Get the unidirectional or bidirectional partition.
 
 ";
 
@@ -15674,10 +15547,11 @@ class hierarchy in reverse order is run after init() has been completed.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_long(std::ostream
-&stream) const override "
+%feature("docstring")  casadi::FunctionInternal::get_partition(int iind, int
+oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
+allow_forward, bool allow_reverse) const  "
 
-[INTERNAL]  Print.
+[INTERNAL]  Get the unidirectional or bidirectional partition.
 
 ";
 
@@ -15721,6 +15595,13 @@ constructor), this class should invoke this function when initialized.
 const std::vector< MatType > &v) const  "
 
 [INTERNAL]  Symbolic expressions for the adjoint seeds.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::disp(std::ostream &stream,
+bool more) const override "
+
+[INTERNAL]  Print.
 
 ";
 
@@ -15949,10 +15830,10 @@ std::vector< M > &res) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_long(std::ostream
-&stream) const override "
+%feature("docstring")  casadi::FunctionInternal::alloc_w(size_t sz_w, bool
+persistent=false) "
 
-[INTERNAL]  Print.
+[INTERNAL]  Ensure required length of w field.
 
 ";
 
@@ -16049,13 +15930,6 @@ std::string &iname) const  "
 %feature("docstring")  casadi::FunctionInternal::uses_output() const  "
 
 [INTERNAL]  Do the derivative functions need nondifferentiated outputs?
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::print_short(std::ostream
-&stream) const override "
-
-[INTERNAL]  Print.
 
 ";
 
@@ -16431,10 +16305,9 @@ allow_forward, bool allow_reverse) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::alloc_w(size_t sz_w, bool
-persistent=false) "
+%feature("docstring")  casadi::FunctionInternal::clear_mem() "
 
-[INTERNAL]  Ensure required length of w field.
+[INTERNAL]  Clear all memory (called from destructor)
 
 ";
 
@@ -16610,12 +16483,6 @@ get_reverse(int nadj) if no cached version is available.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::clear_mem() "
-
-[INTERNAL]  Clear all memory (called from destructor)
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::check_res(const
 std::vector< M > &res) const  "
 
@@ -16719,6 +16586,13 @@ double **&arg, double **&res, int *&iw, double *&w) const  "
 &g) const  "
 
 [INTERNAL]  Generate code for the function body.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::disp(std::ostream &stream,
+bool more) const override "
+
+[INTERNAL]  Print.
 
 ";
 
@@ -17430,13 +17304,6 @@ classes.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_long(std::ostream
-&stream) const override "
-
-[INTERNAL]  Print.
-
-";
-
 %feature("docstring")  casadi::External::class_name() const override "
 
 [INTERNAL]  Get type name.
@@ -17533,6 +17400,13 @@ double **arg, double **res, int *iw, double *w) const  "
 &g) const override "
 
 [INTERNAL]  Get name in codegen.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::disp(std::ostream &stream,
+bool more) const override "
+
+[INTERNAL]  Print.
 
 ";
 
@@ -17989,13 +17863,6 @@ persistent=false) "
 %feature("docstring")  casadi::FunctionInternal::alloc_mem() const  "
 
 [INTERNAL]  Create memory block.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::print_short(std::ostream
-&stream) const override "
-
-[INTERNAL]  Print.
 
 ";
 
@@ -18690,13 +18557,6 @@ CodeGenerator &g) const  "
 %feature("docstring")  casadi::OracleFunction::expand() "
 
 [INTERNAL] ";
-
-%feature("docstring")  casadi::FunctionInternal::print_long(std::ostream
-&stream) const override "
-
-[INTERNAL]  Print.
-
-";
 
 %feature("docstring")  casadi::FunctionInternal::default_in(int ind) const
 "
@@ -19534,13 +19394,6 @@ std::vector< M > &res) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_short(std::ostream
-&stream) const override "
-
-[INTERNAL]  Print.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::nnz_in() const  "
 
 [INTERNAL]  Number of input/output nonzeros.
@@ -19828,6 +19681,13 @@ std::vector< std::vector< M > > &fseed) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::disp(std::ostream &stream,
+bool more) const override "
+
+[INTERNAL]  Print.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::is_a(const std::string
 &type, bool recursive) const  "
 
@@ -19974,13 +19834,6 @@ C++ includes: timing.hpp ";
 
 
 // File: classcasadi_1_1Function.xml
-%feature("docstring")  casadi::PrintableObject< SharedObject
->::repr(std::ostream &stream) const "
-
-Print a representation of the object.
-
-";
-
 %feature("docstring")  casadi::Function::nnz_in() const  "
 
 Get number of input nonzeros.
@@ -20108,10 +19961,10 @@ Print dimensions of inputs and outputs.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject< SharedObject  >::get_str()
-const "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::get_str(bool more=false) const "
 
-Return a string with a description (for SWIG)
+Get string representation.
 
 ";
 
@@ -20401,13 +20254,6 @@ Is a null pointer?
 
 ";
 
-%feature("docstring")  casadi::SharedObject::print_short(std::ostream
-&stream) const  "
-
-Print a representation of the object.
-
-";
-
 %feature("docstring")  casadi::Function::forward(int nfwd) const  "
 
 Get a function that calculates nfwd forward derivatives.
@@ -20468,6 +20314,13 @@ Assert that an output dimension is equal so some given value.
 To resolve ambiguity on some compilers.
 
 Destructor
+
+";
+
+%feature("docstring")  casadi::SharedObject::disp(std::ostream &stream, bool
+more=false) const  "
+
+Print a description of the object.
 
 ";
 
@@ -20578,20 +20431,6 @@ Get, if necessary generate, the sparsity of a Jacobian block
 const  "
 
 Get, if necessary generate, the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::PrintableObject< SharedObject
->::print(std::ostream &stream) const "
-
-Return a string with a description (for SWIG)
-
-";
-
-%feature("docstring")  casadi::SharedObject::print_long(std::ostream
-&stream) const  "
-
-Print a description of the object.
 
 ";
 
@@ -20778,7 +20617,7 @@ matches one of the base classes (default true)
 %feature("docstring")  casadi::PrintableObject< SharedObject  >::get_repr()
 const "
 
-Return a string with a representation (for SWIG)
+Get string representation with type information.
 
 ";
 
@@ -22258,6 +22097,12 @@ elements.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::sz_arg() const  "
+
+[INTERNAL]  Get required length of arg field.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::eval_gen(const double
 **arg, double **res, int *iw, double *w, void *mem) const  "
 
@@ -22310,14 +22155,6 @@ original
 %feature("docstring")  casadi::FunctionInternal::size_out(int ind) const  "
 
 [INTERNAL]  Input/output dimensions.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::get_partition(int iind, int
-oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
-allow_forward, bool allow_reverse) const  "
-
-[INTERNAL]  Get the unidirectional or bidirectional partition.
 
 ";
 
@@ -22657,13 +22494,6 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_long(std::ostream
-&stream) const override "
-
-[INTERNAL]  Print.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::free_sx() const  "
 
 [INTERNAL]  Get free variables (SX)
@@ -22792,10 +22622,11 @@ get_reverse(int nadj) if no cached version is available.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_short(std::ostream
-&stream) const override "
+%feature("docstring")  casadi::FunctionInternal::get_partition(int iind, int
+oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
+allow_forward, bool allow_reverse) const  "
 
-[INTERNAL]  Print.
+[INTERNAL]  Get the unidirectional or bidirectional partition.
 
 ";
 
@@ -23165,9 +22996,10 @@ override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sz_arg() const  "
+%feature("docstring")  casadi::FunctionInternal::disp(std::ostream &stream,
+bool more) const override "
 
-[INTERNAL]  Get required length of arg field.
+[INTERNAL]  Print.
 
 ";
 
@@ -24031,6 +23863,13 @@ C++ includes: generic_type.hpp ";
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::SharedObjectInternal::disp(std::ostream
+&stream, bool more) const  "
+
+[INTERNAL]  Print a description of the object.
+
+";
+
 %feature("docstring")  casadi::SharedObjectInternal::getCount() const  "
 
 [INTERNAL]  Get the reference count.
@@ -24040,20 +23879,6 @@ C++ includes: generic_type.hpp ";
 %feature("docstring") casadi::GenericTypeBase "
 
 [INTERNAL] C++ includes: generic_type_internal.hpp ";
-
-%feature("docstring")  casadi::SharedObjectInternal::print_long(std::ostream
-&stream) const  "
-
-[INTERNAL]  Print a description of the object.
-
-";
-
-%feature("docstring")
-casadi::SharedObjectInternal::print_short(std::ostream &stream) const  "
-
-[INTERNAL]  Print a representation of the object.
-
-";
 
 %feature("docstring")  casadi::SharedObjectInternal::type_name() const  "
 
@@ -24443,13 +24268,6 @@ allow_forward, bool allow_reverse) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_short(std::ostream
-&stream) const override "
-
-[INTERNAL]  Print.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::ad_weight() const  "
 
 [INTERNAL]  Weighting factor for chosing forward/reverse mode.
@@ -24624,6 +24442,13 @@ casadi::ImplicitFixedStepIntegrator::~ImplicitFixedStepIntegrator "
 %feature("docstring")  casadi::Integrator::x() const  "
 
 [INTERNAL] ";
+
+%feature("docstring")  casadi::FunctionInternal::disp(std::ostream &stream,
+bool more) const override "
+
+[INTERNAL]  Print.
+
+";
 
 %feature("docstring")  casadi::FunctionInternal::verbose() const  "
 
@@ -25529,13 +25354,6 @@ std::string &name, const Function &dae) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_long(std::ostream
-&stream) const override "
-
-[INTERNAL]  Print.
-
-";
-
 
 // File: classcasadi_1_1ImplicitToNlp.xml
 %feature("docstring")  casadi::OracleFunction::create_function(const
@@ -25861,6 +25679,13 @@ bool persistent=false) "
 %feature("docstring")  casadi::FunctionInternal::sx_out() const  "
 
 [INTERNAL]  Get function input(s) and output(s)
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::disp(std::ostream &stream,
+bool more) const override "
+
+[INTERNAL]  Print.
 
 ";
 
@@ -26324,13 +26149,6 @@ std::string > &s_out, const Function::AuxOut &aux, const Dict &opts) const
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_short(std::ostream
-&stream) const override "
-
-[INTERNAL]  Print.
-
-";
-
 %feature("docstring")  casadi::Rootfinder::get_reverse(int nadj, const
 std::string &name, const std::vector< std::string > &inames, const
 std::vector< std::string > &onames, const Dict &opts) const override "
@@ -26409,10 +26227,9 @@ original
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_long(std::ostream
-&stream) const override "
+%feature("docstring")  casadi::FunctionInternal::sz_arg() const  "
 
-[INTERNAL]  Print.
+[INTERNAL]  Get required length of arg field.
 
 ";
 
@@ -26552,12 +26369,6 @@ int oind, bool symmetric) const  "
 std::string &name) const override "
 
 [INTERNAL] ";
-
-%feature("docstring")  casadi::FunctionInternal::sz_arg() const  "
-
-[INTERNAL]  Get required length of arg field.
-
-";
 
 %feature("docstring")  casadi::FunctionInternal::simple(const double *arg,
 double *res) const  "
@@ -26852,16 +26663,9 @@ always_inline, bool never_inline) const  "
 
 // File: classcasadi_1_1Importer.xml
 %feature("docstring")  casadi::PrintableObject< SharedObject
->::repr(std::ostream &stream) const "
+>::get_str(bool more=false) const "
 
-Print a representation of the object.
-
-";
-
-%feature("docstring")  casadi::PrintableObject< SharedObject  >::get_str()
-const "
-
-Return a string with a description (for SWIG)
+Get string representation.
 
 ";
 
@@ -26878,13 +26682,6 @@ Get class name.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::print_long(std::ostream
-&stream) const  "
-
-Print a description of the object.
-
-";
-
 %feature("docstring")  casadi::SharedObject::print_ptr(std::ostream
 &stream=casadi::userOut()) const  "
 
@@ -26896,6 +26693,13 @@ Print a description of the object.
 int ind=-1) const  "
 
 Does a meta entry exist?
+
+";
+
+%feature("docstring")  casadi::SharedObject::disp(std::ostream &stream, bool
+more=false) const  "
+
+Print a description of the object.
 
 ";
 
@@ -27043,17 +26847,10 @@ Get entry as a text.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject< SharedObject
->::print(std::ostream &stream) const "
-
-Return a string with a description (for SWIG)
-
-";
-
 %feature("docstring")  casadi::PrintableObject< SharedObject  >::get_repr()
 const "
 
-Return a string with a representation (for SWIG)
+Get string representation with type information.
 
 ";
 
@@ -27061,13 +26858,6 @@ Return a string with a representation (for SWIG)
 
 Returns a number that is unique for a given Node. If the Object does not
 point to any node, \"0\" is returned.
-
-";
-
-%feature("docstring")  casadi::SharedObject::print_short(std::ostream
-&stream) const  "
-
-Print a representation of the object.
 
 ";
 
@@ -27303,13 +27093,6 @@ persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_short(std::ostream
-&stream) const override "
-
-[INTERNAL]  Print.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::sx_out(int ind) const  "
 
 [INTERNAL]  Get function input(s) and output(s)
@@ -27417,13 +27200,6 @@ std::vector< M > &arg) const  "
 persistent=false) "
 
 [INTERNAL]  Ensure required length of w field.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::print_long(std::ostream
-&stream) const override "
-
-[INTERNAL]  Print.
 
 ";
 
@@ -28036,6 +27812,13 @@ allow_forward, bool allow_reverse) const  "
 "
 
 [INTERNAL]  Sparsities of function inputs and outputs.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::disp(std::ostream &stream,
+bool more) const override "
+
+[INTERNAL]  Print.
 
 ";
 
@@ -28668,13 +28451,6 @@ std::vector< MX > &arg) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_short(std::ostream
-&stream) const override "
-
-[INTERNAL]  Print.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::has_jacobian() const  "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
@@ -29006,13 +28782,6 @@ std::string &name, std::ostream &stream) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_long(std::ostream
-&stream) const override "
-
-[INTERNAL]  Print.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::has_function(const
 std::string &fname) const  "
 
@@ -29204,6 +28973,12 @@ double **res, int *iw, double *w, void *mem) const  "
 %feature("docstring")  casadi::FunctionInternal::fwd_seed(int nfwd) const  "
 
 [INTERNAL]  Symbolic expressions for the forward seeds.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::release(int mem) const  "
+
+[INTERNAL]  Release a memory object.
 
 ";
 
@@ -29522,9 +29297,10 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::release(int mem) const  "
+%feature("docstring")  casadi::FunctionInternal::disp(std::ostream &stream,
+bool more) const override "
 
-[INTERNAL]  Release a memory object.
+[INTERNAL]  Print.
 
 ";
 
@@ -29850,13 +29626,6 @@ structure recognition.
 %feature("docstring") casadi::Jit::~Jit "
 
 Destructor.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::print_short(std::ostream
-&stream) const override "
-
-[INTERNAL]  Print.
 
 ";
 
@@ -30699,10 +30468,10 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_long(std::ostream
-&stream) const override "
+%feature("docstring")  casadi::FunctionInternal::alloc(const Function &f,
+bool persistent=false) "
 
-[INTERNAL]  Print.
+[INTERNAL]  Ensure work vectors long enough to evaluate function.
 
 ";
 
@@ -30793,13 +30562,6 @@ double **arg, double **res, int *iw, double *w) const  "
 std::vector< std::vector< M > > &aseed) const  "
 
 [INTERNAL]  Replace 0-by-0 reverse seeds.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::alloc(const Function &f,
-bool persistent=false) "
-
-[INTERNAL]  Ensure work vectors long enough to evaluate function.
 
 ";
 
@@ -31233,6 +30995,13 @@ get_reverse(int nadj) if no cached version is available.
 %feature("docstring")  casadi::FunctionInternal::uses_output() const  "
 
 [INTERNAL]  Do the derivative functions need nondifferentiated outputs?
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::disp(std::ostream &stream,
+bool more) const override "
+
+[INTERNAL]  Print.
 
 ";
 
@@ -31736,13 +31505,6 @@ bool persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_long(std::ostream
-&stream) const override "
-
-[INTERNAL]  Print.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::check_arg(const
 std::vector< M > &arg) const  "
 
@@ -31952,9 +31714,10 @@ size_t &sz_res, size_t &sz_iw, size_t &sz_w) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sz_arg() const  "
+%feature("docstring")  casadi::FunctionInternal::disp(std::ostream &stream,
+bool more) const override "
 
-[INTERNAL]  Get required length of arg field.
+[INTERNAL]  Print.
 
 ";
 
@@ -32107,6 +31870,12 @@ std::vector< MX > &arg, const std::string &parallelization) "
 [INTERNAL]  Return function that calculates forward derivatives
 forward(nfwd) returns a cached instance if available, and calls  Function
 get_forward(int nfwd) if no cached version is available.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::sz_arg() const  "
+
+[INTERNAL]  Get required length of arg field.
 
 ";
 
@@ -32302,13 +32071,6 @@ allow_forward, bool allow_reverse) const  "
 %feature("docstring")  casadi::FunctionInternal::uses_output() const  "
 
 [INTERNAL]  Do the derivative functions need nondifferentiated outputs?
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::print_short(std::ostream
-&stream) const override "
-
-[INTERNAL]  Print.
 
 ";
 
@@ -32761,13 +32523,6 @@ SXElem **res, int *iw, SXElem *w, void *mem) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_long(std::ostream
-&stream) const override "
-
-[INTERNAL]  Print.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::has_function(const
 std::string &fname) const  "
 
@@ -33181,13 +32936,6 @@ classes.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_short(std::ostream
-&stream) const override "
-
-[INTERNAL]  Print.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::uses_output() const  "
 
 [INTERNAL]  Do the derivative functions need nondifferentiated outputs?
@@ -33383,6 +33131,13 @@ generated function.
 "
 
 [INTERNAL]  Free memory block.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::disp(std::ostream &stream,
+bool more) const override "
+
+[INTERNAL]  Print.
 
 ";
 
@@ -34217,10 +33972,10 @@ int oind, bool symmetric, int gr_i=1, int gr_o=1) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::is_a(const std::string
-&type, bool recursive) const  "
+%feature("docstring")  casadi::FunctionInternal::disp(std::ostream &stream,
+bool more) const override "
 
-[INTERNAL]  Check if the function is of a particular type.
+[INTERNAL]  Print.
 
 ";
 
@@ -34678,13 +34433,6 @@ bool persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_long(std::ostream
-&stream) const override "
-
-[INTERNAL]  Print.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::sx_out(int ind) const  "
 
 [INTERNAL]  Get function input(s) and output(s)
@@ -35069,6 +34817,13 @@ bvec_t **res, int *iw, bvec_t *w, void *mem) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::is_a(const std::string
+&type, bool recursive) const  "
+
+[INTERNAL]  Check if the function is of a particular type.
+
+";
+
 %feature("docstring")
 casadi::FunctionInternal::codegen_decref(CodeGenerator &g) const  "
 
@@ -35394,13 +35149,6 @@ double **arg, double **res, int *iw, double *w) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_short(std::ostream
-&stream) const override "
-
-[INTERNAL]  Print.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::alloc_w(size_t sz_w, bool
 persistent=false) "
 
@@ -35662,13 +35410,6 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_short(std::ostream
-&stream) const override "
-
-[INTERNAL]  Print.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::alloc_iw(size_t sz_iw, bool
 persistent=false) "
 
@@ -35713,13 +35454,6 @@ std::vector< SX > > &aseed, std::vector< std::vector< SX > > &asens, bool
 always_inline, bool never_inline) const  "
 
 [INTERNAL]  Reverse mode, virtual functions overloaded in derived classes.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::print_long(std::ostream
-&stream) const override "
-
-[INTERNAL]  Print.
 
 ";
 
@@ -35783,6 +35517,13 @@ generated function.
 %feature("docstring")  casadi::FunctionInternal::has_derivative() const  "
 
 [INTERNAL]  Can derivatives be calculated in any way?
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::disp(std::ostream &stream,
+bool more) const override "
+
+[INTERNAL]  Print.
 
 ";
 
@@ -36700,17 +36441,10 @@ Create a solve node.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::print_long(std::ostream
-&stream) const  "
-
-Print a description of the object.
-
-";
-
 %feature("docstring")  casadi::PrintableObject< SharedObject  >::get_repr()
 const "
 
-Return a string with a representation (for SWIG)
+Get string representation with type information.
 
 ";
 
@@ -36731,13 +36465,6 @@ Importer factory.
 
 Returns a number that is unique for a given Node. If the Object does not
 point to any node, \"0\" is returned.
-
-";
-
-%feature("docstring")  casadi::PrintableObject< SharedObject  >::get_str()
-const "
-
-Return a string with a description (for SWIG)
 
 ";
 
@@ -36898,30 +36625,23 @@ Joel Andersson
 
 C++ includes: linsol.hpp ";
 
-%feature("docstring")  casadi::PrintableObject< SharedObject
->::print(std::ostream &stream) const "
-
-Return a string with a description (for SWIG)
-
-";
-
 %feature("docstring")  casadi::Linsol::rank() const  "
 
 Matrix rank Not available for all solvers.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject< SharedObject
->::repr(std::ostream &stream) const "
+%feature("docstring")  casadi::SharedObject::disp(std::ostream &stream, bool
+more=false) const  "
 
-Print a representation of the object.
+Print a description of the object.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::print_short(std::ostream
-&stream) const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::get_str(bool more=false) const "
 
-Print a representation of the object.
+Get string representation.
 
 ";
 
@@ -37020,13 +36740,6 @@ int oind, bool symmetric, int gr_i=1, int gr_o=1) const  "
 "
 
 [INTERNAL]  Get all statistics.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::print_long(std::ostream
-&stream) const override "
-
-[INTERNAL]  Print.
 
 ";
 
@@ -37208,6 +36921,13 @@ get_forward(int nfwd) if no cached version is available.
 %feature("docstring")  casadi::FunctionInternal::name() const  "
 
 [INTERNAL]  Name of the function.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::disp(std::ostream &stream,
+bool more) const override "
+
+[INTERNAL]  Print.
 
 ";
 
@@ -37441,13 +37161,6 @@ get_reverse(int nadj) if no cached version is available.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sp_reverse(bvec_t **arg,
-bvec_t **res, int *iw, bvec_t *w, void *mem) const  "
-
-[INTERNAL]  Propagate sparsity backwards.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::slice(const std::string
 &name, const std::vector< int > &order_in, const std::vector< int >
 &order_out, const Dict &opts) const  "
@@ -37645,10 +37358,10 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_short(std::ostream
-&stream) const override "
+%feature("docstring")  casadi::FunctionInternal::sp_reverse(bvec_t **arg,
+bvec_t **res, int *iw, bvec_t *w, void *mem) const  "
 
-[INTERNAL]  Print.
+[INTERNAL]  Propagate sparsity backwards.
 
 ";
 
@@ -38572,8 +38285,8 @@ persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_long(std::ostream
-&stream) const override "
+%feature("docstring")  casadi::FunctionInternal::disp(std::ostream &stream,
+bool more) const override "
 
 [INTERNAL]  Print.
 
@@ -39305,13 +39018,6 @@ std::vector< M > &arg) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_short(std::ostream
-&stream) const override "
-
-[INTERNAL]  Print.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::has_jacobian() const  "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
@@ -39638,6 +39344,13 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::disp(std::ostream &stream,
+bool more) const override "
+
+[INTERNAL]  Print.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::sz_w() const  "
 
 [INTERNAL]  Get required length of w field.
@@ -39857,13 +39570,6 @@ std::vector< std::vector< M > > &fseed) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_short(std::ostream
-&stream) const override "
-
-[INTERNAL]  Print.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::getAtomicOutput(int k)
 const  "
 
@@ -40066,13 +39772,6 @@ propagation.
 &stream) const  "
 
 [INTERNAL]  Print list of options.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::print_long(std::ostream
-&stream) const override "
-
-[INTERNAL]  Print.
 
 ";
 
@@ -40762,7 +40461,7 @@ primitive.
 */ %feature("docstring")  casadi::PrintableObject< Matrix< Scalar >
 >::get_repr() const "
 
-Return a string with a representation (for SWIG)
+Get string representation with type information.
 
 ";
 
@@ -40791,13 +40490,6 @@ sign(NaN) := NaN.
 %feature("docstring")  minor(const Matrix< Scalar > &x, int i, int j) "
 
 Get the (i,j) minor matrix.
-
-";
-
-%feature("docstring")  casadi::PrintableObject< Matrix< Scalar >
->::repr(std::ostream &stream) const "
-
-Print a representation of the object.
 
 ";
 
@@ -41505,13 +41197,6 @@ one.
 
 ";
 
-%feature("docstring")  casadi::Matrix< T >::print_short(std::ostream
-&stream) const  "
-
-Print a representation of the object.
-
-";
-
 %feature("docstring")  casadi::GenericExpression< Matrix< Scalar >
 >::constpow(const Matrix< Scalar > &x, const Matrix< Scalar > &y) "
 
@@ -41942,13 +41627,6 @@ Functions called by friend functions defined here
 
 ";
 
-%feature("docstring")  casadi::Matrix< T >::print_long(std::ostream &stream)
-const  "
-
-Print a description of the object.
-
-";
-
 %feature("docstring")  casadi::SX::reset_input() const  "
 
 [INTERNAL]  Reset the marker for an input expression.
@@ -42078,9 +41756,9 @@ keeping the existing non-zeros.
 ";
 
 %feature("docstring")  casadi::PrintableObject< Matrix< Scalar >
->::get_str() const "
+>::get_str(bool more=false) const "
 
-Return a string with a description (for SWIG)
+Get string representation.
 
 ";
 
@@ -42260,6 +41938,13 @@ Implementation of Matrix::get_nonzeros (in public API)
 
 ";
 
+%feature("docstring")  casadi::Matrix< T >::disp(std::ostream &stream, bool
+more=false) const  "
+
+Print a representation of the object.
+
+";
+
 %feature("docstring")  casadi::GenericExpression< Matrix< Scalar >
 >::rdivide(const Matrix< Scalar > &x, const Matrix< Scalar > &y) "
 
@@ -42303,13 +41988,6 @@ Get the sparsity pattern. See the Sparsity class for details.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject< Matrix< Scalar >
->::print(std::ostream &stream) const "
-
-Return a string with a description (for SWIG)
-
-";
-
 
 // File: classcasadi_1_1MinusInfSX.xml
 
@@ -42338,6 +42016,13 @@ primitive.
 */ %feature("docstring")  casadi::MX::get_output(int oind) const  "
 
 Get an output.
+
+";
+
+%feature("docstring")  casadi::SharedObject::disp(std::ostream &stream, bool
+more=false) const  "
+
+Print a description of the object.
 
 ";
 
@@ -42448,7 +42133,7 @@ Remainder after division: (x,y) -> mod(x,y)
 %feature("docstring")  casadi::PrintableObject< SharedObject  >::get_repr()
 const "
 
-Return a string with a representation (for SWIG)
+Get string representation with type information.
 
 ";
 
@@ -42676,13 +42361,6 @@ Get the number of rows, Octave-style syntax.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject< SharedObject
->::print(std::ostream &stream) const "
-
-Return a string with a description (for SWIG)
-
-";
-
 %feature("docstring")  casadi::GenericExpression< MX  >::exp(const MX &x) "
 
 Elementwise exponential: x -> exp(x)
@@ -42762,13 +42440,6 @@ Hyperbolic tangent: x -> tanh(x)
 %feature("docstring")  casadi::MX::is_binary() const  "
 
 Is binary operation.
-
-";
-
-%feature("docstring")  casadi::SharedObject::print_long(std::ostream
-&stream) const  "
-
-Print a description of the object.
 
 ";
 
@@ -43025,10 +42696,10 @@ check if zero (note that false negative answers are possible)
 
 ";
 
-%feature("docstring")  casadi::PrintableObject< SharedObject  >::get_str()
-const "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::get_str(bool more=false) const "
 
-Return a string with a description (for SWIG)
+Get string representation.
 
 ";
 
@@ -43293,13 +42964,6 @@ Conditional assignment: (x,y) -> x ? y : 0.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject< SharedObject
->::repr(std::ostream &stream) const "
-
-Print a representation of the object.
-
-";
-
 %feature("docstring")  casadi::MX::einstein(const MX &A, const MX &B, const
 MX &C, const std::vector< int > &dim_a, const std::vector< int > &dim_b,
 const std::vector< int > &dim_c, const std::vector< int > &a, const
@@ -43441,13 +43105,6 @@ Create sparse matrix constant (also implicit type conversion)
 %feature("docstring")  casadi::GenericMatrix< MX  >::size2() const "
 
 Get the second dimension (i.e. number of columns)
-
-";
-
-%feature("docstring")  casadi::SharedObject::print_short(std::ostream
-&stream) const  "
-
-Print a representation of the object.
 
 ";
 
@@ -44363,13 +44020,6 @@ casadi::FunctionInternal::add_dependency(CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_short(std::ostream
-&stream) const override "
-
-[INTERNAL]  Print.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::index_in(const std::string
 &name) const  "
 
@@ -44458,13 +44108,6 @@ multiplying.
 std::vector< M > &res) const  "
 
 [INTERNAL]  Check if output arguments have correct length and dimensions.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::print_long(std::ostream
-&stream) const override "
-
-[INTERNAL]  Print.
 
 ";
 
@@ -44736,6 +44379,13 @@ std::vector< M > &arg) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::disp(std::ostream &stream,
+bool more) const override "
+
+[INTERNAL]  Print.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::size1_in(int ind) const  "
 
 [INTERNAL]  Input/output dimensions.
@@ -44960,13 +44610,6 @@ Readable name of the class.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject< NlpBuilder
->::repr(std::ostream &stream) const "
-
-Print a representation of the object.
-
-";
-
 %feature("docstring") casadi::NlpBuilder "
 
 A symbolic NLP representation.
@@ -44985,35 +44628,21 @@ Import an .nl file.
 %feature("docstring")  casadi::PrintableObject< NlpBuilder  >::get_repr()
 const "
 
-Return a string with a representation (for SWIG)
+Get string representation with type information.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject< NlpBuilder  >::get_str()
-const "
+%feature("docstring")  casadi::PrintableObject< NlpBuilder  >::get_str(bool
+more=false) const "
 
-Return a string with a description (for SWIG)
+Get string representation.
 
 ";
 
-%feature("docstring")  casadi::NlpBuilder::print_long(std::ostream &stream)
-const  "
+%feature("docstring")  casadi::NlpBuilder::disp(std::ostream &stream, bool
+more=false) const  "
 
 Print a description of the object.
-
-";
-
-%feature("docstring")  casadi::NlpBuilder::print_short(std::ostream &stream)
-const  "
-
-Print a representation of the object.
-
-";
-
-%feature("docstring")  casadi::PrintableObject< NlpBuilder
->::print(std::ostream &stream) const "
-
-Return a string with a description (for SWIG)
 
 ";
 
@@ -45418,13 +45047,6 @@ std::vector< M > &res) const  "
 const  "
 
 [INTERNAL]  Get the (integer) output argument of an atomic operation.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::print_short(std::ostream
-&stream) const override "
-
-[INTERNAL]  Print.
 
 ";
 
@@ -45975,16 +45597,16 @@ get_forward(int nfwd) if no cached version is available.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::size_out(int ind) const  "
+%feature("docstring")  casadi::FunctionInternal::disp(std::ostream &stream,
+bool more) const override "
 
-[INTERNAL]  Input/output dimensions.
+[INTERNAL]  Print.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_long(std::ostream
-&stream) const override "
+%feature("docstring")  casadi::FunctionInternal::size_out(int ind) const  "
 
-[INTERNAL]  Print.
+[INTERNAL]  Input/output dimensions.
 
 ";
 
@@ -46468,12 +46090,6 @@ std::vector< MX > &arg) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sz_arg() const  "
-
-[INTERNAL]  Get required length of arg field.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::has_codegen() const  "
 
 [INTERNAL]  Is codegen supported?
@@ -46905,6 +46521,13 @@ std::string &iname) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::disp(std::ostream &stream,
+bool more) const override "
+
+[INTERNAL]  Print.
+
+";
+
 %feature("docstring")  casadi::OracleFunction::get_function() const override
 "
 
@@ -47104,13 +46727,6 @@ double **arg, double **res, int *iw, double *w) const override "
 *m, const std::string &fcn, const double *const *arg=0) const  "
 
 [INTERNAL] ";
-
-%feature("docstring")  casadi::FunctionInternal::print_short(std::ostream
-&stream) const override "
-
-[INTERNAL]  Print.
-
-";
 
 %feature("docstring")  casadi::FunctionInternal::mx_in(int ind) const  "
 
@@ -47693,10 +47309,9 @@ size_t &sz_res, size_t &sz_iw, size_t &sz_w) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_long(std::ostream
-&stream) const override "
+%feature("docstring")  casadi::FunctionInternal::sz_arg() const  "
 
-[INTERNAL]  Print.
+[INTERNAL]  Get required length of arg field.
 
 ";
 
@@ -47889,10 +47504,10 @@ Construct from a file.
 
 ";
 
-%feature("docstring")  casadi::ParsedFile::print(std::ostream
-&stream=casadi::userOut()) const  "
+%feature("docstring")  casadi::ParsedFile::to_string(const std::string &cmd,
+int ind=-1) const  "
 
-Print parsed file.
+Get entry as a string.
 
 ";
 
@@ -47900,6 +47515,13 @@ Print parsed file.
 ind=-1) const  "
 
 Convert to a type.
+
+";
+
+%feature("docstring")  casadi::ParsedFile::to_set(const std::string &cmd,
+int ind=-1) const  "
+
+Get entry as a set.
 
 ";
 
@@ -47944,17 +47566,10 @@ Get entry as a text.
 
 ";
 
-%feature("docstring")  casadi::ParsedFile::to_string(const std::string &cmd,
-int ind=-1) const  "
+%feature("docstring")  casadi::ParsedFile::disp(std::ostream
+&stream=casadi::userOut()) const  "
 
-Get entry as a string.
-
-";
-
-%feature("docstring")  casadi::ParsedFile::to_set(const std::string &cmd,
-int ind=-1) const  "
-
-Get entry as a set.
+Print parsed file.
 
 ";
 
@@ -48016,10 +47631,9 @@ Construct from a vector of polynomial coefficients.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject< Polynomial
->::print(std::ostream &stream) const "
+%feature("docstring")  casadi::Polynomial::type_name() const  "
 
-Return a string with a description (for SWIG)
+Readable name of the class.
 
 ";
 
@@ -48038,14 +47652,7 @@ Get scalar value (error if degree()!=0)
 %feature("docstring")  casadi::PrintableObject< Polynomial  >::get_repr()
 const "
 
-Return a string with a representation (for SWIG)
-
-";
-
-%feature("docstring")  casadi::Polynomial::print_short(std::ostream &stream)
-const  "
-
-Print a representation of the object.
+Get string representation with type information.
 
 ";
 
@@ -48055,10 +47662,17 @@ Degree of the polynomial.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject< Polynomial  >::get_str()
-const "
+%feature("docstring")  casadi::PrintableObject< Polynomial  >::get_str(bool
+more=false) const "
 
-Return a string with a description (for SWIG)
+Get string representation.
+
+";
+
+%feature("docstring")  casadi::Polynomial::disp(std::ostream &stream, bool
+more=false) const  "
+
+Print a description of the object.
 
 ";
 
@@ -48068,33 +47682,19 @@ Remove excess zeros.
 
 ";
 
-%feature("docstring")  casadi::Polynomial::print_long(std::ostream &stream)
-const  "
-
-Print a description of the object.
-
-";
-
-%feature("docstring")  casadi::PrintableObject< Polynomial
->::repr(std::ostream &stream) const "
-
-Print a representation of the object.
-
-";
-
 
 // File: classcasadi_1_1PrintableObject.xml
+%feature("docstring")  casadi::PrintableObject< Derived >::get_str(bool
+more=false) const  "
+
+Get string representation.
+
+";
+
 %feature("docstring")  casadi::PrintableObject< Derived >::get_repr() const
 "
 
-Return a string with a representation (for SWIG)
-
-";
-
-%feature("docstring")  casadi::PrintableObject< Derived
->::print(std::ostream &stream) const  "
-
-Return a string with a description (for SWIG)
+Get string representation with type information.
 
 ";
 
@@ -48105,33 +47705,6 @@ Base class for objects that have a natural string representation.
 Joel Andersson
 
 C++ includes: printable_object.hpp ";
-
-%feature("docstring")  casadi::PrintableObject< Derived >::get_str() const
-"
-
-Return a string with a description (for SWIG)
-
-";
-
-%feature("docstring")  str(const PrintableObject< Derived > &obj) "
-
-Return a string with a description of the object, cf. str(Object) in Python.
-
-";
-
-%feature("docstring")  casadi::PrintableObject< Derived >::repr(std::ostream
-&stream) const  "
-
-Print a representation of the object.
-
-";
-
-%feature("docstring")  repr(const PrintableObject< Derived > &obj) "
-
-Return a string with a representation of the object, cf. repr(Object) in
-Python.
-
-";
 
 
 // File: classcasadi_1_1Project.xml
@@ -48610,10 +48183,10 @@ get_reverse(int nadj) if no cached version is available.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_short(std::ostream
-&stream) const override "
+%feature("docstring")  casadi::FunctionInternal::alloc_res(size_t sz_res,
+bool persistent=false) "
 
-[INTERNAL]  Print.
+[INTERNAL]  Ensure required length of res field.
 
 ";
 
@@ -48982,13 +48555,6 @@ std::string &fname, const Dict &opts) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_long(std::ostream
-&stream) const override "
-
-[INTERNAL]  Print.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::sp_weight() const  "
 
 [INTERNAL]  Weighting factor for chosing forward/reverse mode, sparsity
@@ -49202,6 +48768,13 @@ const std::vector< MatType > &v) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::disp(std::ostream &stream,
+bool more) const override "
+
+[INTERNAL]  Print.
+
+";
+
 %feature("docstring")  casadi::Conic::get_n_in() override "
 
 [INTERNAL]  Number of function inputs and outputs.
@@ -49363,13 +48936,6 @@ const  "
 const std::string &msg) const  "
 
 [INTERNAL]  Log the status of the solver, function given.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::alloc_res(size_t sz_res,
-bool persistent=false) "
-
-[INTERNAL]  Ensure required length of res field.
 
 ";
 
@@ -49707,13 +49273,6 @@ const std::vector< MatType > &v) const  "
 size_t &sz_res, size_t &sz_iw, size_t &sz_w) const  "
 
 [INTERNAL]  Get number of temporary variables needed.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::print_short(std::ostream
-&stream) const override "
-
-[INTERNAL]  Print.
 
 ";
 
@@ -50409,13 +49968,6 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_long(std::ostream
-&stream) const override "
-
-[INTERNAL]  Print.
-
-";
-
 %feature("docstring")  casadi::OracleFunction::has_function(const
 std::string &fname) const override "
 
@@ -50591,6 +50143,13 @@ std::vector< std::string > &onames, const Dict &opts) const override "
 double **arg, double **res, int *iw, double *w) const override "
 
 [INTERNAL]  Set the work vectors.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::disp(std::ostream &stream,
+bool more) const override "
+
+[INTERNAL]  Print.
 
 ";
 
@@ -50863,6 +50422,13 @@ bool persistent=false) "
 double *res) const  "
 
 [INTERNAL]  Evaluate numerically, simplied syntax.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::disp(std::ostream &stream,
+bool more) const override "
+
+[INTERNAL]  Print.
 
 ";
 
@@ -51297,13 +50863,6 @@ double **&arg, double **&res, int *&iw, double *&w) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_long(std::ostream
-&stream) const override "
-
-[INTERNAL]  Print.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::size2_out(int ind) const  "
 
 [INTERNAL]  Input/output dimensions.
@@ -51321,13 +50880,6 @@ double **&arg, double **&res, int *&iw, double *&w) const  "
 [INTERNAL]  Return function that calculates forward derivatives
 forward(nfwd) returns a cached instance if available, and calls  Function
 get_forward(int nfwd) if no cached version is available.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::print_short(std::ostream
-&stream) const override "
-
-[INTERNAL]  Print.
 
 ";
 
@@ -52246,13 +51798,6 @@ multiplying.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_short(std::ostream
-&stream) const override "
-
-[INTERNAL]  Print.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::setup(void *mem, const
 double **arg, double **res, int *iw, double *w) const  "
 
@@ -52611,6 +52156,13 @@ casadi::FunctionInternal::add_dependency(CodeGenerator &g) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::disp(std::ostream &stream,
+bool more) const override "
+
+[INTERNAL]  Print.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::log(const std::string &msg)
 const  "
 
@@ -52737,13 +52289,6 @@ original
 %feature("docstring")  casadi::Scpgen::solve_qp(ScpgenMemory *m) const  "
 
 [INTERNAL] ";
-
-%feature("docstring")  casadi::FunctionInternal::print_long(std::ostream
-&stream) const override "
-
-[INTERNAL]  Print.
-
-";
 
 %feature("docstring")  casadi::FunctionInternal::free_sx() const  "
 
@@ -53596,13 +53141,6 @@ Get class name.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject< SharedObject
->::print(std::ostream &stream) const "
-
-Return a string with a description (for SWIG)
-
-";
-
 %feature("docstring")  casadi::SharedObject::is_null() const  "
 
 Is a null pointer?
@@ -53616,31 +53154,24 @@ Is a null pointer?
 
 ";
 
-%feature("docstring")  casadi::PrintableObject< SharedObject
->::repr(std::ostream &stream) const "
+%feature("docstring")  casadi::SharedObject::disp(std::ostream &stream, bool
+more=false) const  "
 
-Print a representation of the object.
+Print a description of the object.
 
 ";
 
 %feature("docstring")  casadi::PrintableObject< SharedObject  >::get_repr()
 const "
 
-Return a string with a representation (for SWIG)
+Get string representation with type information.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject< SharedObject  >::get_str()
-const "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::get_str(bool more=false) const "
 
-Return a string with a description (for SWIG)
-
-";
-
-%feature("docstring")  casadi::SharedObject::print_long(std::ostream
-&stream) const  "
-
-Print a description of the object.
+Get string representation.
 
 ";
 
@@ -53690,13 +53221,6 @@ point to any node, \"0\" is returned.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::print_short(std::ostream
-&stream) const  "
-
-Print a representation of the object.
-
-";
-
 %feature("docstring")  casadi::SharedObject::type_name() const  "
 
 Readable name of the class.
@@ -53712,13 +53236,6 @@ std::string &sym, bool inlined, std::istream &file, int &offset) "
 
 ";
 
-%feature("docstring")  casadi::ImporterInternal::print_short(std::ostream
-&stream) const override "
-
-[INTERNAL]  Print representation.
-
-";
-
 %feature("docstring")  casadi::SharedObjectInternal::weak() "
 
 [INTERNAL]  Get a weak reference to the object.
@@ -53728,6 +53245,13 @@ std::string &sym, bool inlined, std::istream &file, int &offset) "
 %feature("docstring") casadi::ShellCompiler::~ShellCompiler "
 
 [INTERNAL]  Destructor.
+
+";
+
+%feature("docstring")  casadi::ImporterInternal::disp(std::ostream &stream,
+bool more) const override "
+
+[INTERNAL]  Print.
 
 ";
 
@@ -53774,13 +53298,6 @@ override "
 %feature("docstring")  casadi::SharedObjectInternal::getCount() const  "
 
 [INTERNAL]  Get the reference count.
-
-";
-
-%feature("docstring")  casadi::ImporterInternal::print_long(std::ostream
-&stream) const override "
-
-[INTERNAL]  Print.
 
 ";
 
@@ -54057,13 +53574,6 @@ const std::string &msg) const  "
 %feature("docstring")  casadi::FunctionInternal::size_out(int ind) const  "
 
 [INTERNAL]  Input/output dimensions.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::print_short(std::ostream
-&stream) const override "
-
-[INTERNAL]  Print.
 
 ";
 
@@ -54393,6 +53903,13 @@ SXElem **res, int *iw, SXElem *w, void *mem) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::disp(std::ostream &stream,
+bool more) const override "
+
+[INTERNAL]  Print.
+
+";
+
 %feature("docstring")
 casadi::FunctionInternal::codegen_incref(CodeGenerator &g) const  "
 
@@ -54549,13 +54066,6 @@ casadi::FunctionInternal::codegen_decref(CodeGenerator &g) const  "
 std::vector< std::vector< M > > &aseed) const  "
 
 [INTERNAL]  Replace 0-by-0 reverse seeds.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::print_long(std::ostream
-&stream) const override "
-
-[INTERNAL]  Print.
 
 ";
 
@@ -55126,33 +54636,20 @@ Is the slice a scalar.
 
 %feature("docstring")  casadi::PrintableObject< Slice  >::get_repr() const "
 
-Return a string with a representation (for SWIG)
+Get string representation with type information.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject< Slice  >::get_str() const "
+%feature("docstring")  casadi::Slice::disp(std::ostream &stream, bool
+more=false) const  "
 
-Return a string with a description (for SWIG)
-
-";
-
-%feature("docstring")  casadi::Slice::print_short(std::ostream &stream)
-const  "
-
-Print a representation of the object.
+Print a description of the object.
 
 ";
 
 %feature("docstring")  casadi::Slice::scalar(int len) const  "
 
 Get scalar (if is_scalar)
-
-";
-
-%feature("docstring")  casadi::PrintableObject< Slice  >::print(std::ostream
-&stream) const "
-
-Return a string with a description (for SWIG)
 
 ";
 
@@ -55184,13 +54681,6 @@ Get a vector of indices (nested slice)
 
 ";
 
-%feature("docstring")  casadi::Slice::print_long(std::ostream &stream) const
-"
-
-Print a description of the object.
-
-";
-
 %feature("docstring") casadi::Slice::Slice() "
 
 Default constructor - all elements.
@@ -55210,10 +54700,10 @@ A slice.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject< Slice  >::repr(std::ostream
-&stream) const "
+%feature("docstring")  casadi::PrintableObject< Slice  >::get_str(bool
+more=false) const "
 
-Print a representation of the object.
+Get string representation.
 
 ";
 
@@ -55486,13 +54976,6 @@ std::string &name, std::ostream &stream) const  "
 std::string &iname) const  "
 
 [INTERNAL]  Are all inputs and outputs scalar.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::print_long(std::ostream
-&stream) const override "
-
-[INTERNAL]  Print.
 
 ";
 
@@ -55879,13 +55362,6 @@ casadi::FunctionInternal::codegen_decref(CodeGenerator &g) const  "
 std::string &iname) const  "
 
 [INTERNAL]  Get sparsity of a given output.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::print_short(std::ostream
-&stream) const override "
-
-[INTERNAL]  Print.
 
 ";
 
@@ -56449,6 +55925,13 @@ const std::vector< MatType > &v) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::disp(std::ostream &stream,
+bool more) const override "
+
+[INTERNAL]  Print.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::has_sprev() const  "
 
 [INTERNAL]  Is the class able to propagate seeds through the algorithm?
@@ -56639,13 +56122,6 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_long(std::ostream
-&stream) const override "
-
-[INTERNAL]  Print.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::n_out() const  "
 
 [INTERNAL]  Number of function inputs and outputs.
@@ -56690,13 +56166,6 @@ std::string > &onames, const Dict &opts) const override "
 %feature("docstring")  casadi::FunctionInternal::sz_arg() const  "
 
 [INTERNAL]  Get required length of arg field.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::print_short(std::ostream
-&stream) const override "
-
-[INTERNAL]  Print.
 
 ";
 
@@ -57505,6 +56974,13 @@ std::string &name) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::disp(std::ostream &stream,
+bool more) const override "
+
+[INTERNAL]  Print.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::size2_in(int ind) const  "
 
 [INTERNAL]  Input/output dimensions.
@@ -57936,6 +57412,13 @@ Resize.
 
 ";
 
+%feature("docstring")  casadi::SharedObject::disp(std::ostream &stream, bool
+more=false) const  "
+
+Print a description of the object.
+
+";
+
 %feature("docstring")  casadi::Sparsity::find(bool ind1=false) const  "
 
 Get the location of all non-zero elements as they would appear in a Dense
@@ -57951,13 +57434,6 @@ k = A.find() A[k] will contain the elements of A that are non-zero in B
 
 Generate a script for Matlab or Octave which visualizes the sparsity using
 the spy command.
-
-";
-
-%feature("docstring")  casadi::PrintableObject< SharedObject
->::repr(std::ostream &stream) const "
-
-Print a representation of the object.
 
 ";
 
@@ -58065,13 +57541,6 @@ Is square?
 
 ";
 
-%feature("docstring")  casadi::SharedObject::print_short(std::ostream
-&stream) const  "
-
-Print a representation of the object.
-
-";
-
 %feature("docstring")  casadi::Sparsity::appendColumns(const Sparsity &sp) "
 
 Append another sparsity patten horizontally.
@@ -58081,7 +57550,7 @@ Append another sparsity patten horizontally.
 %feature("docstring")  casadi::PrintableObject< SharedObject  >::get_repr()
 const "
 
-Return a string with a representation (for SWIG)
+Get string representation with type information.
 
 ";
 
@@ -58111,10 +57580,10 @@ optionally both dimensions)
 
 ";
 
-%feature("docstring")  casadi::PrintableObject< SharedObject  >::get_str()
-const "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::get_str(bool more=false) const "
 
-Return a string with a description (for SWIG)
+Get string representation.
 
 ";
 
@@ -58255,13 +57724,6 @@ Get the row of a non-zero element.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject< SharedObject
->::print(std::ostream &stream) const "
-
-Return a string with a description (for SWIG)
-
-";
-
 %feature("docstring")  casadi::Sparsity::is_column() const  "
 
 Check if the pattern is a column vector (i.e. size2()==1)
@@ -58359,13 +57821,6 @@ Get nonzeros in lower triangular part.
 %feature("docstring")  casadi::Sparsity::is_singular() const  "
 
 Check whether the sparsity-pattern indicates structural singularity.
-
-";
-
-%feature("docstring")  casadi::SharedObject::print_long(std::ostream
-&stream) const  "
-
-Print a description of the object.
 
 ";
 
@@ -59106,6 +58561,13 @@ bool never_inline) const  "
 %feature("docstring")  casadi::FunctionInternal::verbose() const  "
 
 [INTERNAL]  Verbose mode?
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::disp(std::ostream &stream,
+bool more) const override "
+
+[INTERNAL]  Print.
 
 ";
 
@@ -59858,13 +59320,6 @@ std::vector< M > &arg) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_long(std::ostream
-&stream) const override "
-
-[INTERNAL]  Print.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::replace_fseed(const
 std::vector< std::vector< M > > &fseed) const  "
 
@@ -60263,13 +59718,6 @@ std::string &name, std::ostream &stream) const  "
 %feature("docstring")  casadi::FunctionInternal::sz_arg() const  "
 
 [INTERNAL]  Get required length of arg field.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::print_short(std::ostream
-&stream) const override "
-
-[INTERNAL]  Print.
 
 ";
 
@@ -60909,13 +60357,6 @@ multiplying.
 
 ";
 
-%feature("docstring")  casadi::Switch::print_long(std::ostream &stream)
-const override "
-
-[INTERNAL]  Print description.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::free_sx() const  "
 
 [INTERNAL]  Get free variables (SX)
@@ -60979,6 +60420,13 @@ std::string &name, std::ostream &stream) const  "
 [INTERNAL]  Free memory block.
 
 ";
+
+%feature("docstring")  casadi::FunctionInternal::factory(const std::string
+&name, const std::vector< std::string > &s_in, const std::vector<
+std::string > &s_out, const Function::AuxOut &aux, const Dict &opts) const
+"
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::FunctionInternal::getJacSparsityGen(int iind,
 int oind, bool symmetric, int gr_i=1, int gr_o=1) const  "
@@ -61273,12 +60721,12 @@ persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::factory(const std::string
-&name, const std::vector< std::string > &s_in, const std::vector<
-std::string > &s_out, const Function::AuxOut &aux, const Dict &opts) const
-"
+%feature("docstring")  casadi::Switch::disp(std::ostream &stream, bool more)
+const override "
 
-[INTERNAL] ";
+[INTERNAL]  Print description.
+
+";
 
 %feature("docstring")  casadi::FunctionInternal::wrap() const  "
 
@@ -61514,13 +60962,6 @@ get_reverse(int nadj) if no cached version is available.
 %feature("docstring")  casadi::FunctionInternal::mx_out() const  "
 
 [INTERNAL]  Get function input(s) and output(s)
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::print_short(std::ostream
-&stream) const override "
-
-[INTERNAL]  Print.
 
 ";
 
@@ -62125,13 +61566,6 @@ const std::vector< MatType > &v) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_long(std::ostream
-&stream) const override "
-
-[INTERNAL]  Print.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::eval_name() const  "
 
 [INTERNAL]  Get name of the evaluation function.
@@ -62479,6 +61913,13 @@ std::vector< M > &arg) const  "
 *mem, bool tr) const  "
 
 [INTERNAL]   Sparsity pattern of the cholesky factors.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::disp(std::ostream &stream,
+bool more) const override "
+
+[INTERNAL]  Print.
 
 ";
 
@@ -63119,13 +62560,6 @@ structure recognition.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_short(std::ostream
-&stream) const override "
-
-[INTERNAL]  Print.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::sx_out(int ind) const  "
 
 [INTERNAL]  Get function input(s) and output(s)
@@ -63268,17 +62702,10 @@ structure recognition for symmetric Jacobians
 
 
 // File: classcasadi_1_1WeakRef.xml
-%feature("docstring")  casadi::PrintableObject< SharedObject  >::get_str()
-const "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::get_str(bool more=false) const "
 
-Return a string with a description (for SWIG)
-
-";
-
-%feature("docstring")  casadi::SharedObject::print_short(std::ostream
-&stream) const  "
-
-Print a representation of the object.
+Get string representation.
 
 ";
 
@@ -63303,13 +62730,6 @@ point to any node, \"0\" is returned.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject< SharedObject
->::print(std::ostream &stream) const "
-
-Return a string with a description (for SWIG)
-
-";
-
 %feature("docstring")  casadi::SharedObject::print_ptr(std::ostream
 &stream=casadi::userOut()) const  "
 
@@ -63329,16 +62749,16 @@ Construct from a shared object (also implicit type conversion)
 
 ";
 
-%feature("docstring")  casadi::SharedObject::is_null() const  "
+%feature("docstring")  casadi::SharedObject::disp(std::ostream &stream, bool
+more=false) const  "
 
-Is a null pointer?
+Print a description of the object.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::print_long(std::ostream
-&stream) const  "
+%feature("docstring")  casadi::SharedObject::is_null() const  "
 
-Print a description of the object.
+Is a null pointer?
 
 ";
 
@@ -63354,13 +62774,6 @@ Get class name.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject< SharedObject
->::repr(std::ostream &stream) const "
-
-Print a representation of the object.
-
-";
-
 %feature("docstring")  casadi::WeakRef::alive() const  "
 
 Check if alive.
@@ -63370,7 +62783,7 @@ Check if alive.
 %feature("docstring")  casadi::PrintableObject< SharedObject  >::get_repr()
 const "
 
-Return a string with a representation (for SWIG)
+Get string representation with type information.
 
 ";
 
@@ -63379,13 +62792,6 @@ Return a string with a representation (for SWIG)
 
 
 // File: classcasadi_1_1XmlFile.xml
-%feature("docstring")  casadi::SharedObject::print_short(std::ostream
-&stream) const  "
-
-Print a representation of the object.
-
-";
-
 %feature("docstring") casadi::XmlFile "
 
 XML parser Can be used for parsing XML files into CasADi data structures.
@@ -63401,49 +62807,9 @@ Readable name of the class.
 ";
 
 %feature("docstring")  casadi::PrintableObject< SharedObject
->::print(std::ostream &stream) const "
+>::get_str(bool more=false) const "
 
-Return a string with a description (for SWIG)
-
-";
-
-%feature("docstring")  casadi::PrintableObject< SharedObject  >::get_str()
-const "
-
-Return a string with a description (for SWIG)
-
-";
-
-%feature("docstring") casadi::XmlFile::__hash__ "
-
-Returns a number that is unique for a given Node. If the Object does not
-point to any node, \"0\" is returned.
-
-";
-
-%feature("docstring")  casadi::SharedObject::print_long(std::ostream
-&stream) const  "
-
-Print a description of the object.
-
-";
-
-%feature("docstring")  casadi::SharedObject::class_name() const  "
-
-Get class name.
-
-";
-
-%feature("docstring")  casadi::PrintableObject< SharedObject
->::repr(std::ostream &stream) const "
-
-Print a representation of the object.
-
-";
-
-%feature("docstring")  casadi::SharedObject::is_null() const  "
-
-Is a null pointer?
+Get string representation.
 
 ";
 
@@ -63455,10 +62821,36 @@ Is a null pointer?
 
 ";
 
+%feature("docstring") casadi::XmlFile::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
+
+";
+
+%feature("docstring")  casadi::SharedObject::class_name() const  "
+
+Get class name.
+
+";
+
+%feature("docstring")  casadi::SharedObject::is_null() const  "
+
+Is a null pointer?
+
+";
+
+%feature("docstring")  casadi::SharedObject::disp(std::ostream &stream, bool
+more=false) const  "
+
+Print a description of the object.
+
+";
+
 %feature("docstring")  casadi::PrintableObject< SharedObject  >::get_repr()
 const "
 
-Return a string with a representation (for SWIG)
+Get string representation with type information.
 
 ";
 
@@ -63484,7 +62876,13 @@ Return a string with a representation (for SWIG)
 
 
 // File: namespacecasadi.xml
+%feature("docstring")  casadi::is_nondecreasing(const std::vector< T > &v) "
+Check if the vector is non-decreasing.
+
+";
+
 %feature("docstring")  casadi::matrixName< double >() "
+
 Get typename.
 
 ";
@@ -63507,20 +62905,6 @@ Get type info for a particular option.
 
 ";
 
-%feature("docstring")  casadi::inBounds(const std::vector< T > &v, int
-upper) "
-
-Check if for each element of v holds: v_i < upper.
-
-";
-
-%feature("docstring")  casadi::inBounds(const std::vector< T > &v, int
-lower, int upper) "
-
-Check if for each element of v holds: lower <= v_i < upper.
-
-";
-
 %feature("docstring")  casadi::load_expm(const std::string &name) "
 
 Explicitly load a plugin dynamically.
@@ -63540,34 +62924,11 @@ alpha, const T1 *x, const T1 *y) "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::swapIndices(const std::vector< std::vector< T
-> > &m) "
-
-swap inner and outer indices of list of lists
-
-
-
-::
-
-  * [[apple0,apple1,...],[pear0,pear1,...]] ->
-  *   [[apple0,pear0],[apple1,pear1],...]
-  * 
-
-
-
-";
-
 %feature("docstring")  casadi::dense_mul_nt_stride(int n, int m, int l,
 const double *A, const double *B, double *C, int strideA, int strideB, int
 strideC) "
 
 [INTERNAL] ";
-
-%feature("docstring")  casadi::isNon_increasing(const std::vector< T > &v) "
-
-Check if the vector is non-increasing.
-
-";
 
 %feature("docstring")  casadi::dense_mul_tn(int n, int m, int l, const
 double *A, const double *B, double *C) "
@@ -63879,6 +63240,12 @@ double *a, double *t, double *z, double *dwork, double *eig_real, double
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::has_negative(const std::vector< T > &v) "
+
+Check if the vector has negative entries.
+
+";
+
 %feature("docstring")  casadi::external(const std::string &name, const Dict
 &opts=Dict()) "
 
@@ -63903,12 +63270,6 @@ Load a just-in-time compiled external function File name given.
 %feature("docstring")  casadi::nlpsol_n_out() "
 
 Number of NLP solver outputs.
-
-";
-
-%feature("docstring")  casadi::isDecreasing(const std::vector< T > &v) "
-
-Check if the vector is strictly decreasing.
 
 ";
 
@@ -63941,6 +63302,12 @@ Get the number of expm solver outputs.
 %feature("docstring")  casadi::load_nlpsol(const std::string &name) "
 
 Explicitly load a plugin dynamically.
+
+";
+
+%feature("docstring")  casadi::is_increasing(const std::vector< T > &v) "
+
+Check if the vector is strictly increasing.
 
 ";
 
@@ -64020,12 +63387,6 @@ Get all options for a plugin.
 int > &iter_dims, const std::vector< int > &strides_a, const std::vector<
 int > &strides_b, const std::vector< int > &strides_c, const T *a_in, const
 T *b_in, T *c_in) "
-
-";
-
-%feature("docstring")  casadi::hasNegative(const std::vector< T > &v) "
-
-Check if the vector has negative entries.
 
 ";
 
@@ -64318,13 +63679,6 @@ Joel Andersson
 
 ";
 
-%feature("docstring")  casadi::isStrictlyMonotone(const std::vector< T > &v)
-"
-
-Check if the vector is strictly monotone.
-
-";
-
 %feature("docstring")  casadi::dple_n_in() "
 
 Get the number of QP solver inputs.
@@ -64436,6 +63790,20 @@ Generate a hash value incrementally (function taken from boost)
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::in_bounds(const std::vector< T > &v, int
+upper) "
+
+Check if for each element of v holds: v_i < upper.
+
+";
+
+%feature("docstring")  casadi::in_bounds(const std::vector< T > &v, int
+lower, int upper) "
+
+Check if for each element of v holds: lower <= v_i < upper.
+
+";
+
 %feature("docstring")  casadi::has_integrator(const std::string &name) "
 
 Check if a particular plugin is available.
@@ -64446,12 +63814,6 @@ Check if a particular plugin is available.
 T1 > *m) "
 
 [INTERNAL] ";
-
-%feature("docstring")  casadi::isNonDecreasing(const std::vector< T > &v) "
-
-Check if the vector is non-decreasing.
-
-";
 
 %feature("docstring")  casadi::integrator(const std::string &name, const
 std::string &solver, const SXDict &dae, const Dict &opts=Dict()) "
@@ -65754,6 +65116,13 @@ ldwork=0) "
 
 ";
 
+%feature("docstring")  casadi::is_strictly_monotone(const std::vector< T >
+&v) "
+
+Check if the vector is strictly monotone.
+
+";
+
 %feature("docstring")  casadi::collocation_interpolators(const std::vector<
 double > &tau_root, std::vector< std::vector< double > > &output_C,
 std::vector< double > &output_D) "
@@ -65784,9 +65153,9 @@ D:  interpolating coefficients to obtain end state Length: order+1
 
 ";
 
-%feature("docstring")  casadi::isMonotone(const std::vector< T > &v) "
+%feature("docstring")  casadi::is_nonincreasing(const std::vector< T > &v) "
 
-Check if the vector is monotone.
+Check if the vector is non-increasing.
 
 ";
 
@@ -66439,9 +65808,9 @@ Check if an index vector can be represented more efficiently as a slice.
 
 ";
 
-%feature("docstring")  casadi::isIncreasing(const std::vector< T > &v) "
+%feature("docstring")  casadi::is_decreasing(const std::vector< T > &v) "
 
-Check if the vector is strictly increasing.
+Check if the vector is strictly decreasing.
 
 ";
 
@@ -67504,6 +66873,12 @@ std::string &solver, const Importer &compiler, const Dict &opts=Dict()) "
 
 %feature("docstring")  casadi::nlpsol(const std::string &name, const
 std::string &solver, const NlpBuilder &nl, const Dict &opts=Dict()) "
+
+";
+
+%feature("docstring")  casadi::is_monotone(const std::vector< T > &v) "
+
+Check if the vector is monotone.
 
 ";
 
