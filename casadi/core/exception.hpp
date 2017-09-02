@@ -97,7 +97,7 @@ class CasadiException : public std::exception {
 // TODO(@jaeandersson) Refactor #890
 #define casadi_error(msg) {\
   std::stringstream ss_internal_;\
-  ss_internal_ << CASADI_WHERE << ":\n" << msg;\
+  ss_internal_ << CASADI_WHERE << ": " << msg;\
   throw casadi::CasadiException(ss_internal_.str()); \
 }\
 
@@ -110,12 +110,12 @@ class CasadiException : public std::exception {
   } catch(std::exception& ex) { \
       throw casadi::CasadiException(\
         std::string("Assertion \"" CASADI_ASSERT_STR(x) "\" at "\
-        CASADI_WHERE " raised:\n")+ex.what()); \
+        CASADI_WHERE " raised: ")+ex.what()); \
   } \
  if (!is_ok) { \
      std::stringstream ss_internal_;\
      ss_internal_ << "Assertion \"" CASADI_ASSERT_STR(x) "\" at "\
-     CASADI_WHERE " failed:\n" << msg;\
+     CASADI_WHERE " failed: " << msg;\
      throw casadi::CasadiException(ss_internal_.str());\
  }\
 } \
@@ -135,7 +135,7 @@ class CasadiException : public std::exception {
 #define casadi_assert_warning(x, msg)                                   \
   if ((x)==false) {                                                     \
     casadi::userOut<true, casadi::PL_WARN>() \
-      << "Assertion \"" CASADI_ASSERT_STR(x) "\" at " CASADI_WHERE " failed:\n" << msg;\
+      << "Assertion \"" CASADI_ASSERT_STR(x) "\" at " CASADI_WHERE " failed: " << msg;\
   }
 
 // Formatted message
@@ -162,12 +162,12 @@ class CasadiException : public std::exception {
 // Issue a warning, including location in the source code
 #define casadi_warning(msg) \
   casadi::userOut<true, casadi::PL_WARN>() \
-    << "CasADi warning at " CASADI_WHERE ":\n" << msg << "\n";
+    << "CasADi warning at " CASADI_WHERE ": " << msg << "\n";
 
 // Issue a message, including location in the source code
 #define casadi_message(msg) \
   casadi::userOut() \
-    << "CasADi message at " CASADI_WHERE ":\n" << msg << "\n";
+    << "CasADi message at " CASADI_WHERE ": " << msg << "\n";
 
 // http://stackoverflow.com/questions/303562/c-format-macro-inline-ostringstream
 #define STRING(ITEMS) \

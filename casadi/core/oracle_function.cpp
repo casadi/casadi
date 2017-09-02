@@ -147,17 +147,17 @@ namespace casadi {
   int OracleFunction::
   calc_function(OracleMemory* m, const std::string& fcn,
                 const double* const* arg) const {
+    // Is the function monitored?
+    bool monitored = this->monitored(fcn);
+
     // Print progress
-    if (verbose_) userOut() << "Calling \"" << fcn << "\"... " << flush;
+    if (monitored) userOut() << "Calling \"" << fcn << "\"\n";
 
     // Respond to a possible Crl+C signals
     InterruptHandler::check();
 
     // Get function
     const Function& f = get_function(fcn);
-
-    // Is the function monitored?
-    bool monitored = this->monitored(fcn);
 
     // Get statistics structure
     FStats& fstats = m->fstats.at(fcn);
@@ -248,9 +248,6 @@ namespace casadi {
 
     // Update stats
     fstats.toc();
-
-    // Print progress
-    if (verbose_) userOut() << "done" << endl;
 
     // Success
     return 0;
