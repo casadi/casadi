@@ -59,4 +59,4 @@ dae.set_unit('v','m/s');
 dae.set_unit('m','kg');
 
 % Print DAE
-print(dae);
+disp(dae, true);
