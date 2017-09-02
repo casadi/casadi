@@ -122,7 +122,7 @@ inline std::string trim_path(const std::string& full_path) {
   } catch(std::exception& ex) { \
       throw casadi::CasadiException(\
         std::string("Assertion \"" CASADI_ASSERT_STR(x) "\" at "\
-        + CASADI_WHERE + " raised: ")+ex.what()); \
+        + CASADI_WHERE + " raised:\n")+ex.what()); \
   } \
  if (!is_ok) { \
      std::stringstream ss_internal_;\
@@ -137,10 +137,9 @@ inline std::string trim_path(const std::string& full_path) {
 #if NDEBUG
 #define casadi_assert(x) casadi_assert_message(x, "Please notify the CasADi developers.")
 #else
-#define casadi_assert(x) casadi_assert_message(x, \
-    "(Hint for developers: GlobalOptions.setCatchErrorsSwig(False)" \
-    " to obtain gdb stacktrace in python.)\n" \
-    " Please notify the CasADi developers.")
+#define casadi_assert(x) casadi_assert_message(x, "Please notify the CasADi developers.\n"\
+    "Hint for developers: GlobalOptions.setCatchErrorsSwig(False)" \
+    " to obtain gdb stacktrace in python.")
 #endif
 
 // This is for warnings to be issued when casadi is not in release mode and an assertion fails
