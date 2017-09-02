@@ -71,7 +71,7 @@ namespace casadi {
   };
 
   void CvodesInterface::init(const Dict& opts) {
-    log("CvodesInterface::init", "begin");
+    if (verbose_) log(name_ + "::init");
 
     // Initialize the base classes
     SundialsInterface::init(opts);
@@ -225,7 +225,7 @@ namespace casadi {
 
   void CvodesInterface::reset(IntegratorMemory* mem, double t, const double* x,
                               const double* z, const double* _p) const {
-    if (verbose_) log("CvodesInterface::reset begin");
+    if (verbose_) log(name_ + "::reset");
     auto m = to_mem(mem);
 
     // Reset the base classes
@@ -247,7 +247,6 @@ namespace casadi {
 
     // Set the stop time of the integration -- don't integrate past this point
     if (stop_at_end_) setStopTime(m, grid_.back());
-    if (verbose_) log("CvodesInterface::reset end");
   }
 
   void CvodesInterface::advance(IntegratorMemory* mem, double t, double* x,
@@ -292,8 +291,6 @@ namespace casadi {
              &m->hlast, &m->hcur, &m->tcur);
 
     THROWING(CVodeGetNonlinSolvStats, m->mem, &m->nniters, &m->nncfails);
-
-    if (verbose_) log("CvodesInterface::integrate(" + str(t) + ") end");
   }
 
   void CvodesInterface::resetB(IntegratorMemory* mem, double t, const double* rx,
@@ -345,7 +342,6 @@ namespace casadi {
       THROWING(CVodeReInitB, m->mem, m->whichB, grid_.back(), m->rxz);
       THROWING(CVodeQuadReInitB, m->mem, m->whichB, m->rq);
     }
-    if (verbose_) log("CvodesInterface::resetB end");
   }
 
   void CvodesInterface::retreat(IntegratorMemory* mem, double t,

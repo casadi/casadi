@@ -88,7 +88,7 @@ namespace casadi {
   };
 
   void IdasInterface::init(const Dict& opts) {
-    log("IdasInterface::init", "begin");
+    if (verbose_) log(name_ + "::init");
 
     // Call the base class init
     SundialsInterface::init(opts);
@@ -158,8 +158,6 @@ namespace casadi {
           {"fwd:rode", "fwd:ralg"});
       }
     }
-
-    log("IdasInterface::init", "end");
   }
 
   int IdasInterface::res(double t, N_Vector xz, N_Vector xzdot,
@@ -279,7 +277,7 @@ namespace casadi {
     N_VConst(0.0, m->xz);
     N_VConst(0.0, m->xzdot);
     IDAInit(m->mem, res, t0, m->xz, m->xzdot);
-    log("IdasInterface::init", "IDA initialized");
+    if (verbose_) log("IDA initialized");
 
     // Include algebraic variables in error testing
     THROWING(IDASetSuppressAlg, m->mem, suppress_algebraic_);
@@ -360,7 +358,7 @@ namespace casadi {
       }
     }
 
-    log("IdasInterface::init", "attached linear solver");
+    if (verbose_) log("Attached linear solver");
 
     // Adjoint sensitivity problem
     if (nrx_>0) {
@@ -368,7 +366,7 @@ namespace casadi {
       N_VConst(0.0, m->rxz);
       N_VConst(0.0, m->rxzdot);
     }
-    log("IdasInterface::init", "initialized adjoint sensitivities");
+    if (verbose_) log("Initialized adjoint sensitivities");
 
     // Initialize adjoint sensitivities
     if (nrx_>0) {
@@ -382,7 +380,7 @@ namespace casadi {
 
   void IdasInterface::reset(IntegratorMemory* mem, double t, const double* _x,
                             const double* _z, const double* _p) const {
-    log("IdasInterface::reset", "begin");
+    if (verbose_) log(name_ + "::reset");
     auto m = to_mem(mem);
 
     // Reset the base classes
@@ -406,8 +404,6 @@ namespace casadi {
 
     // Set the stop time of the integration -- don't integrate past this point
     if (stop_at_end_) setStopTime(m, grid_.back());
-
-    log("IdasInterface::reset", "end");
   }
 
   void IdasInterface::
@@ -454,7 +450,7 @@ namespace casadi {
 
   void IdasInterface::resetB(IntegratorMemory* mem, double t, const double* rx,
                              const double* rz, const double* rp) const {
-    log("IdasInterface::resetB", "begin");
+    if (verbose_) log(name_ + "::resetB");
     auto m = to_mem(mem);
 
     // Reset the base classes
@@ -523,9 +519,6 @@ namespace casadi {
       THROWING(IDACalcICB, m->mem, m->whichB, grid_.front(), m->xz, m->xzdot);
       THROWING(IDAGetConsistentICB, m->mem, m->whichB, m->rxz, m->rxzdot);
     }
-
-    log("IdasInterface::resetB", "end");
-
   }
 
   void IdasInterface::retreat(IntegratorMemory* mem, double t, double* rx,

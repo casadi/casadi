@@ -267,7 +267,7 @@ namespace casadi {
 
   void OracleFunction::jit_dependencies(const std::string& fname) {
     if (verbose_)
-      log("OracleFunction::jit_dependencies", "compiling to "+ fname+"'.");
+      log("compiling to "+ fname+"'.");
     // JIT dependent functions
     compiler_ = Importer(generate_dependencies(fname, Dict()),
                          compilerplugin_, jit_options_);
@@ -275,8 +275,7 @@ namespace casadi {
     // Replace the Oracle functions with generated functions
     for (auto&& e : all_functions_) {
       if (verbose_)
-        log("OracleFunction::jit_dependencies",
-            "loading '" + e.second.f.name() + "' from '" + fname + "'.");
+        log("loading '" + e.second.f.name() + "' from '" + fname + "'.");
       if (e.second.jit) e.second.f = external(e.second.f.name(), compiler_);
     }
   }

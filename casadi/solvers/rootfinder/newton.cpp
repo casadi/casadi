@@ -126,7 +126,7 @@ namespace casadi {
     while (true) {
       // Break if maximum number of iterations already reached
       if (m->iter >= max_iter_) {
-        log("eval", "Max. iterations reached.");
+        log("Max iterations reached.");
         m->return_status = "max_iteration_reached";
         success = false;
         break;
@@ -190,8 +190,7 @@ namespace casadi {
 
     // Store the iteration count
     if (success) m->return_status = "success";
-
-    if (verbose_) log("Newton::solveNonLinear():end after " + str(m->iter) + " steps");
+    if (verbose_) log("Newton algorithm took " + str(m->iter) + " steps");
   }
 
   void Newton::printIteration(std::ostream &stream) const {

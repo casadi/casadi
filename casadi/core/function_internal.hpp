@@ -564,9 +564,6 @@ namespace casadi {
     /** \brief  Log the status of the solver */
     void log(const std::string& msg) const;
 
-    /** \brief  Log the status of the solver, function given */
-    void log(const std::string& fcn, const std::string& msg) const;
-
     /** \brief  Propagate sparsity forward */
     virtual int sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) const;
 

@@ -320,15 +320,15 @@ namespace casadi {
       string jit_name = "jit_tmp";
       if (has_codegen()) {
         if (verbose_)
-          log("FunctionInternal::finalize", "Codegenerating function '" + name() + "'.");
+          log("Codegenerating function '" + name() + "'.");
         // JIT everything
         CodeGenerator gen(jit_name);
         gen.add(self());
         if (verbose_)
-          log("FunctionInternal::finalize", "Compiling function '" + name() + "'..");
+          log("Compiling function '" + name() + "'..");
         compiler_ = Importer(gen.generate(), compilerplugin_, jit_options_);
         if (verbose_)
-          log("FunctionInternal::finalize", "Compiling function '" + name() + "' done.");
+          log("Compiling function '" + name() + "' done.");
         // Try to load with simplified syntax
         simple_ = (simple_t)compiler_.get_function(name() + "_simple");
         // If not succesful, try generic syntax
@@ -456,12 +456,6 @@ namespace casadi {
   void FunctionInternal::log(const string& msg) const {
     if (verbose_) {
       userOut() << "CasADi log message: " << msg << endl;
-    }
-  }
-
-  void FunctionInternal::log(const string& fcn, const string& msg) const {
-    if (verbose_) {
-      userOut() << "CasADi log message: In \"" << fcn << "\" --- " << msg << endl;
     }
   }
 

@@ -340,7 +340,7 @@ namespace casadi {
 
   template<typename MatType>
   map<string, MatType> Integrator::aug_fwd(int nfwd) const {
-    log("Integrator::aug_fwd", "call");
+    log(name_ + "::aug_fwd");
 
     // Get input expressions
     vector<MatType> arg = MatType::get_input(oracle_);
@@ -415,7 +415,8 @@ namespace casadi {
 
   template<typename MatType>
   map<string, MatType> Integrator::aug_adj(int nadj) const {
-    log("Integrator::aug_adj", "call");
+    log(name_ + "::aug_adj");
+
     // Get input expressions
     vector<MatType> arg = MatType::get_input(oracle_);
     vector<MatType> aug_x, aug_z, aug_p, aug_rx, aug_rz, aug_rp;
@@ -504,7 +505,7 @@ namespace casadi {
 
   int Integrator::
   sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) const {
-    log("Integrator::sp_forward", "begin");
+    log(name_ + "::sp_forward");
 
     // Work vectors
     bvec_t *tmp_x = w; w += nx_;
@@ -581,12 +582,11 @@ namespace casadi {
         if (oracle_(arg1, res1, iw, w, 0)) return 1;
       }
     }
-    log("Integrator::sp_forward", "end");
     return 0;
   }
 
   int Integrator::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) const {
-    log("Integrator::sp_reverse", "begin");
+    log(name_ + "::sp_reverse");
 
     // Work vectors
     bvec_t** arg1 = arg+n_in();
@@ -696,8 +696,6 @@ namespace casadi {
     arg1[DE_X] = x0;
     arg1[DE_Z] = 0; // arg[INTEGRATOR_Z0] is a guess, no dependency
     if (oracle_.rev(arg1, res1, iw, w, 0)) return 1;
-
-    log("Integrator::sp_reverse", "end");
     return 0;
   }
 
@@ -706,7 +704,7 @@ namespace casadi {
               const std::vector<std::string>& inames,
               const std::vector<std::string>& onames,
               const Dict& opts) const {
-    log("Integrator::get_forward", "begin");
+    log(name_ + "::get_forward");
 
     // Integrator options
     Dict aug_opts = getDerivativeOptions(true);
@@ -820,8 +818,6 @@ namespace casadi {
     }
     ret_out.resize(n_out());
 
-    log("Integrator::get_forward", "end");
-
     // Create derivative function and return
     return Function(name, ret_in, ret_out, inames, onames, opts);
   }
@@ -831,7 +827,7 @@ namespace casadi {
               const std::vector<std::string>& inames,
               const std::vector<std::string>& onames,
               const Dict& opts) const {
-    log("Integrator::get_reverse", "begin");
+    log(name_ + "::get_reverse");
 
     // Integrator options
     Dict aug_opts = getDerivativeOptions(false);
@@ -969,8 +965,6 @@ namespace casadi {
       *r_it++ = horzcat(v);
     }
     ret_out.resize(n_in());
-
-    log("Integrator::getDerivative", "end");
 
     // Create derivative function and return
     return Function(name, ret_in, ret_out, inames, onames, opts);
