@@ -63,6 +63,8 @@ namespace casadi {
     /// Dual initial guess
     std::vector<double> lambda_init;
 
+    /// Discrete variables
+    std::vector<bool> discrete;
     ///@}
 
     /// Import an .nl file
@@ -98,6 +100,10 @@ namespace casadi {
     std::vector<MX> v_;
     // Number of objectives and constraints
     int n_var_, n_con_, n_obj_, n_eq_, n_lcon_;
+    // nonlinear vars in constraints, objectives, both // see JuliaOpt/AmplNLWriter.jl/src/nl_write.jl
+    int nlvc_, nlvo_, nlvb_;
+    // Number of discrete variables // see JuliaOpt/AmplNLWriter.jl/src/nl_write.jl
+    int nbv_, niv_, nlvbi_, nlvci_, nlvoi_;
     // objective sign
     MX sign_;
     // Parse the file
