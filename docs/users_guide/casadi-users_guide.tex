@@ -2235,7 +2235,7 @@ class MyCallback(Callback):
 
   # Initialize the object
   def init(self):
-     print 'initializing object'
+     print('initializing object')
 
   # Evaluate numerically
   def eval(self, arg):
@@ -2820,8 +2820,9 @@ but is also even sparser.
     \hline
       & Python & C++ & MATLAB/Octave \\ \hline
     Starting \CasADi & \verb|from casadi import *| & \verb|#include \| \verb|"casadi/casadi.hpp"| \verb|using namespace casadi;| & \verb|import casadi.*| \\ \hline
-    Printing the \emph{representation} (string representation intended to be \emph{unambiguous}) & \verb|A <ENTER>| (interactive), \verb|print repr(A)| (in scripts) & \verb|std::cout << A;|& \verb|A <ENTER>| or \verb|disp A|\\ \hline
-    Printing the \emph{description} (string representation intended to be \emph{readable}) & \verb|print A| & \verb|A.print();| or \verb|A.print(stream);|& \verb|A.print()| \\ \hline
+    Printing object & \verb|print(A)| & \verb|std::cout << A;|& \verb|disp(A)| \\ \hline
+    Printing with type information & \verb|A <ENTER>| (interactive), \verb|print(repr(A))| & \verb|std::cout << repr(A);|& \verb|A <ENTER>| (interactive), \verb|disp(repr(A))|\\ \hline
+    Get (extended) representation, \verb|more=false| by default& \verb|A.str(more)| & \verb|str(A, more);|& \verb|str(A, more)| \\ \hline
     Calling a class function & \verb|SX.zeros(3,4)| & \verb|SX::zeros(3,4)| & \verb|SX.zeros(3,4)|\\ \hline
     Creating a dictionary (e.g. for options) & \verb|d = {'opt1':opt1}| or \verb|d = {}; a['opt1'] = opt1| & \verb|a = Dict();| \verb|a['opt1'] = opt1;| & \verb|a = struct;| \verb|a.opt1 = opt1;| \\ \hline
     Creating a symbol & \verb|MX.sym("x",2,2)| & \verb|MX::sym("x",2,2)| & \verb|MX.sym('x',2,2)|\\ \hline

@@ -50,6 +50,9 @@ namespace casadi {
       return ss.str();
     }
 
+    /// Python __str__
+    std::string python_str() const { return get_str();}
+
     /// Get string representation with type information
     std::string get_repr() const {
       std::stringstream ss;

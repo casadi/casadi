@@ -166,9 +166,11 @@
 
 %ignore *::operator->;
 
+%rename(str) get_str;
+%rename(repr) get_repr;
 #ifdef SWIGPYTHON
-%rename(__str__) get_str;
-#endif // SWIGPYTHON
+%rename(__str__) python_str;
+#endif // WITH_SWIGPYTHON
 
 %begin %{
 #define SWIG_PYTHON_OUTPUT_TUPLE
@@ -190,8 +192,8 @@ _object = _copyableObject
 
 _swig_repr_default = _swig_repr
 def _swig_repr(self):
-  if hasattr(self,'get_repr'):
-    return self.get_repr()
+  if hasattr(self,'repr'):
+    return self.repr()
   else:
     return _swig_repr_default(self)
 
