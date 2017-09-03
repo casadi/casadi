@@ -6165,6 +6165,12 @@ Get oracle.
 
 ";
 
+%feature("docstring") casadi::Callback::python_str "
+
+Python str
+
+";
+
 %feature("docstring") casadi::Callback::eval "
 
 Evaluate numerically, temporary matrices and work vectors.
@@ -10151,6 +10157,12 @@ Set the nominal value by name.
 ------------------------------------------------------------------------
 
 Set the nominal value(s) by expression.
+
+";
+
+%feature("docstring") casadi::DaeBuilder::python_str "
+
+Python str
 
 ";
 
@@ -15222,6 +15234,12 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
+%feature("docstring") casadi::Function::python_str "
+
+Python str
+
+";
+
 %feature("docstring") casadi::Function::getWorkSize "
 
 Get the length of the work vector.
@@ -19240,6 +19258,12 @@ Print a description of the object.
 %feature("docstring") casadi::Importer::type_name "
 
 Readable name of the class.
+
+";
+
+%feature("docstring") casadi::Importer::python_str "
+
+Python str
 
 ";
 
@@ -26305,6 +26329,12 @@ Get string representation.
 
 ";
 
+%feature("docstring") casadi::Linsol::python_str "
+
+Python str
+
+";
+
 %feature("docstring") casadi::Linsol::plugin_name "
 
 Query plugin name.
@@ -29844,6 +29874,12 @@ optionally both dimensions)
 
 ";
 
+%feature("docstring") casadi::Matrix::python_str "
+
+Python str
+
+";
+
 %feature("docstring") casadi::Matrix::linearize "
 
 Functions called by friend functions defined here
@@ -31067,6 +31103,12 @@ Get the second dimension (i.e. number of columns)
 
 ";
 
+%feature("docstring") casadi::MX::python_str "
+
+Python str
+
+";
+
 %feature("docstring") casadi::MX::rank1 "
 
 Make a rank-1 update to a matrix A Calculates A + 1/2 * alpha * x*y'.
@@ -32167,6 +32209,12 @@ Get string representation with type information.
 %feature("docstring") casadi::NlpBuilder::get_str "
 
 Get string representation.
+
+";
+
+%feature("docstring") casadi::NlpBuilder::python_str "
+
+Python str
 
 ";
 
@@ -34372,11 +34420,23 @@ Remove excess zeros.
 
 ";
 
+%feature("docstring") casadi::Polynomial::python_str "
+
+Python str
+
+";
+
 
 // File: classcasadi_1_1PrintableObject.xml
 %feature("docstring") casadi::PrintableObject::get_str "
 
 Get string representation.
+
+";
+
+%feature("docstring") casadi::PrintableObject::python_str "
+
+Python str
 
 ";
 
@@ -38215,6 +38275,12 @@ Readable name of the class.
 
 ";
 
+%feature("docstring") casadi::SharedObject::python_str "
+
+Python str
+
+";
+
 
 // File: classcasadi_1_1ShellCompiler.xml
 %feature("docstring") casadi::ShellCompiler::read_external "[INTERNAL]  Get
@@ -39258,6 +39324,12 @@ A slice.
 %feature("docstring") casadi::Slice::get_str "
 
 Get string representation.
+
+";
+
+%feature("docstring") casadi::Slice::python_str "
+
+Python str
 
 ";
 
@@ -41106,6 +41178,12 @@ copy object if it's not unique.
 %feature("docstring") casadi::Sparsity::is_scalar "
 
 Is scalar?
+
+";
+
+%feature("docstring") casadi::Sparsity::python_str "
+
+Python str
 
 ";
 
@@ -45222,6 +45300,12 @@ Is a null pointer?
 
 ";
 
+%feature("docstring") casadi::WeakRef::python_str "
+
+Python str
+
+";
+
 %feature("docstring") casadi::WeakRef::type_name "
 
 Readable name of the class.
@@ -45301,6 +45385,12 @@ Print a description of the object.
 %feature("docstring") casadi::XmlFile::get_repr "
 
 Get string representation with type information.
+
+";
+
+%feature("docstring") casadi::XmlFile::python_str "
+
+Python str
 
 ";
 

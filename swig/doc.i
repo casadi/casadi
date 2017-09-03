@@ -8397,6 +8397,13 @@ Get oracle.
 
 ";
 
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::python_str() const "
+
+Python str
+
+";
+
 %feature("docstring")  casadi::Callback::eval(const std::vector< DM > &arg)
 "
 
@@ -13764,6 +13771,13 @@ Set the nominal value by name.
 std::vector< double > &val) "
 
 Set the nominal value(s) by expression.
+
+";
+
+%feature("docstring")  casadi::PrintableObject< DaeBuilder  >::python_str()
+const "
+
+Python str
 
 ";
 
@@ -20879,6 +20893,13 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::python_str() const "
+
+Python str
+
+";
+
 %feature("docstring")  casadi::Function::getWorkSize() const  "
 
 Get the length of the work vector.
@@ -26406,6 +26427,13 @@ Print a description of the object.
 %feature("docstring")  casadi::SharedObject::type_name() const  "
 
 Readable name of the class.
+
+";
+
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::python_str() const "
+
+Python str
 
 ";
 
@@ -36205,6 +36233,13 @@ Get string representation.
 
 ";
 
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::python_str() const "
+
+Python str
+
+";
+
 %feature("docstring")  casadi::Linsol::plugin_name() const  "
 
 Query plugin name.
@@ -41119,6 +41154,13 @@ optionally both dimensions)
 
 ";
 
+%feature("docstring")  casadi::PrintableObject< Matrix< Scalar >
+>::python_str() const "
+
+Python str
+
+";
+
 %feature("docstring")  casadi::GenericMatrix< Matrix< Scalar >
 >::linearize(const Matrix< Scalar > &f, const Matrix< Scalar > &x, const
 Matrix< Scalar > &x0) "
@@ -42605,6 +42647,13 @@ Create sparse matrix constant (also implicit type conversion)
 %feature("docstring")  casadi::GenericMatrix< MX  >::size2() const "
 
 Get the second dimension (i.e. number of columns)
+
+";
+
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::python_str() const "
+
+Python str
 
 ";
 
@@ -44116,6 +44165,13 @@ Get string representation with type information.
 more=false) const "
 
 Get string representation.
+
+";
+
+%feature("docstring")  casadi::PrintableObject< NlpBuilder  >::python_str()
+const "
+
+Python str
 
 ";
 
@@ -47122,12 +47178,26 @@ Remove excess zeros.
 
 ";
 
+%feature("docstring")  casadi::PrintableObject< Polynomial  >::python_str()
+const "
+
+Python str
+
+";
+
 
 // File: classcasadi_1_1PrintableObject.xml
 %feature("docstring")  casadi::PrintableObject< Derived >::get_str(bool
 more=false) const  "
 
 Get string representation.
+
+";
+
+%feature("docstring")  casadi::PrintableObject< Derived >::python_str()
+const  "
+
+Python str
 
 ";
 
@@ -52587,6 +52657,13 @@ Readable name of the class.
 
 ";
 
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::python_str() const "
+
+Python str
+
+";
+
 
 // File: classcasadi_1_1ShellCompiler.xml
 %feature("docstring")  casadi::ImporterInternal::read_external(const
@@ -54044,6 +54121,13 @@ A slice.
 more=false) const "
 
 Get string representation.
+
+";
+
+%feature("docstring")  casadi::PrintableObject< Slice  >::python_str() const
+"
+
+Python str
 
 ";
 
@@ -56622,6 +56706,13 @@ copy object if it's not unique.
 scalar_and_dense=false) const  "
 
 Is scalar?
+
+";
+
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::python_str() const "
+
+Python str
 
 ";
 
@@ -62002,6 +62093,13 @@ Is a null pointer?
 
 ";
 
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::python_str() const "
+
+Python str
+
+";
+
 %feature("docstring")  casadi::SharedObject::type_name() const  "
 
 Readable name of the class.
@@ -62091,6 +62189,13 @@ Print a description of the object.
 const "
 
 Get string representation with type information.
+
+";
+
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::python_str() const "
+
+Python str
 
 ";
 
