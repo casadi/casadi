@@ -117,57 +117,39 @@ namespace casadi {
     nlp_.lambda_init.resize(n_con_, 0);
 
     // Allocate binary variables vector
-    nlp_.discrete.resize(n_var_, false);
+    nlp_.discrete.clear();
 
     //D. M. Gay and M. Hill, 'Hooking Your Solver to AMPL' October, 1997.
-    int k = 0;
     // continuous in an objective and in a constraint
-    for(int j = 0; j < nlvb_-nlvbi_;j++){
-        nlp_.discrete.at(k) = false;
-        k = k + 1;
-    }
+    for (int j=0; j<nlvb_-nlvbi_; ++j) nlp_.discrete.push_back(false);
+
     // integer in an objective and in a constraint
-    for(int j = 0; j < nlvbi_;j++){
-        nlp_.discrete.at(k) = true;
-        k = k + 1;
-    }
+    for (int j=0; j<nlvbi_; ++j) nlp_.discrete.push_back(true);
+
     // continuous just in constraints
-    for(int j = 0; j < nlvc_ - (nlvb_ + nlvci_);j++){
-        nlp_.discrete.at(k) = false;
-        k = k + 1;
-    }
+    for (int j=0; j<nlvc_ - (nlvb_ + nlvci_); ++j) nlp_.discrete.push_back(false);
+
     // integer just in constraints
-    for(int j = 0; j < nlvci_ ;j++){
-        nlp_.discrete.at(k) = true;
-        k = k + 1;
-    }
+    for (int j=0; j<nlvci_; ++j) nlp_.discrete.push_back(true);
+
     // continuous just in objectives
-    for(int j = 0; j < nlvo_ - (nlvc_ + nlvoi_) ;j++){
-        nlp_.discrete.at(k) = false;
-        k = k + 1;
-    }
+    for (int j=0; j<nlvo_ - (nlvc_ + nlvoi_); ++j) nlp_.discrete.push_back(false);
+
     // integer just in objectives
-    for(int j = 0; j < nlvoi_ ;j++){
-        nlp_.discrete.at(k) = true;
-        k = k + 1;
-    }
+    for (int j=0; j < nlvoi_; ++j) nlp_.discrete.push_back(true);
+
     // linear
-    int max_nlvc_nlvo = (nlvc_<nlvo_)?nlvo_:nlvc_;
-    for(int j = 0; j < n_var_-(max_nlvc_nlvo+niv_+nbv_);j++){
-        nlp_.discrete.at(k) = false;
-        k = k + 1;
-    }
+    int max_nlvc_nlvo = (nlvc_ < nlvo_) ? nlvo_ : nlvc_;
+    for (int j=0; j<n_var_-(max_nlvc_nlvo+niv_+nbv_); ++j) nlp_.discrete.push_back(false);
+
     // binary
-    for(int j = 0; j < nbv_;j++){
-        nlp_.discrete.at(k) = true;
-        k = k + 1;
-    }
+    for (int j = 0; j<nbv_; ++j) nlp_.discrete.push_back(true);
+
     // other integer
-    for(int j = 0; j < niv_;j++){
-        nlp_.discrete.at(k) = true;
-        k = k + 1;
-    }
-    casadi_assert_message(k==n_var_, "Number of variables in the header don't match");
+    for (int j = 0; j<niv_; ++j) nlp_.discrete.push_back(true);
+
+    casadi_assert_message(nlp_.discrete.size()==n_var_,
+      "Number of variables in the header don't match");
 
     // All variables, including dependent
     v_ = nlp_.x;
