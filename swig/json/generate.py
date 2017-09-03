@@ -55,8 +55,8 @@ for event, elem in e:
       while elem.getprevious() is not None:
         del elem.getparent()[0]
 
-print bag
-print removed
+print(bag)
+print(removed)
 
 #r = e.getroot()
 
@@ -84,9 +84,9 @@ def is_internal(d,msg=None):
 #  return "[INTERNAL]" in v
 #  return not (("_EXPORT" in v) and ("CASADI_" in v))
 
-print "elpased", time.time()-t0
+print("elpased", time.time()-t0)
 t0 = time.time()
-print "get all the enums"
+print("get all the enums")
 # get all the enums
 enums = {}
 for d in r.findall('*//enum'):
@@ -172,13 +172,13 @@ def getCanonicalParams(d,debug=""):
   params = []
   if d.find('attributelist/parmlist') is not None:
     for x in d.findall('attributelist/parmlist/parm/attributelist/attribute[@name="type"]'):
-      	name = x.findall('../attribute[@name="name"]')[0].attrib['value']
-	params.append( (getCanonicalType(x.attrib['value']),"Output" if name=="OUTPUT" else "Normal") )
+       name = x.findall('../attribute[@name="name"]')[0].attrib['value']
+    params.append( (getCanonicalType(x.attrib['value']),"Output" if name=="OUTPUT" else "Normal") )
 
   return params
-print "elpased", time.time()-t0
+print("elpased", time.time()-t0)
 t0 = time.time()
-print "classes0"
+print("classes0")
 for name,c in classes0.items():
   docs = getDocstring(c)
   if name in classes:
@@ -251,9 +251,9 @@ for name,c in classes0.items():
     base = d.attrib["name"]
     #if is_internal(d,msg="bases"): continue
     data["bases"].append( getCanonicalType( base ) )
-print "elpased", time.time()-t0
+print("elpased", time.time()-t0)
 t0 = time.time()
-print "classes"
+print("classes")
 for n,c in classes.items():
   new_bases = []
   for base in c['bases']:
@@ -311,8 +311,8 @@ for d in r.findall('*//namespace/cdecl'):
 
 treedata = {"treeClasses": [],"treeFunctions": [], "treeEnums": {}}
 
-code = sum([filter(lambda i: len(i.rstrip())> 0 ,x.attrib["value"].split("\n")) for x in r.findall("*//insert/attributelist/attribute[@name='code']")],[])
-treedata['treeIncludes'] = sorted(set(map(lambda x: x.rstrip(), filter(lambda y: re.search("^\s*#include ",y),code))))
+code = sum([list(filter(lambda i: len(i.rstrip())> 0 ,x.attrib["value"].split("\n"))) for x in r.findall("*//insert/attributelist/attribute[@name='code']")],[])
+treedata['treeIncludes'] = sorted(set(map(lambda x: x.rstrip(), list(filter(lambda y: re.search("^\s*#include ",y),code)))))
 
 def getAllMethods(name,base=None):
   if base is None:
@@ -325,15 +325,15 @@ def getAllMethods(name,base=None):
   if name!=base:
     #ret = [(dname,params,base if mkind=="Constructor" else rettype,mkind) for (dname,params,rettype,mkind) in ret]
     # Omit baseclass constructors
-    ret = filter(lambda x: x[3]!="Constructor", ret)
+    ret = list(filter(lambda x: x[3]!="Constructor", ret))
 
   for b in c["bases"]:
     ret = ret + getAllMethods(b,base)
 
   return ret
-print "elpased", time.time()-t0
+print("elpased", time.time()-t0)
 t0 = time.time()
-print "classes2"
+print("classes2")
 myclasses = []
 for k,v in classes.items():
   methods = []
@@ -342,13 +342,13 @@ for k,v in classes.items():
       methods.append({"methodName": name, "methodReturn": rettype, "methodParams": pars, "methodKind": mkind,"methodDocs":"","methodDocslink":""})
 
   treedata["treeClasses"].append({"classType": k, "classMethods": methods, "classDocs": v['docs'],"classDocslink":""})
-print "elpased", time.time()-t0
+print("elpased", time.time()-t0)
 t0 = time.time()
-print "functions"
+print("functions")
 treedata["treeFunctions"] = functions
-print "elpased", time.time()-t0
+print("elpased", time.time()-t0)
 t0 = time.time()
-print "enums"
+print("enums")
 for k,v in enums.items():
   treedata["treeEnums"][k] = {
     "enumDocs": v['docs'],
@@ -357,9 +357,9 @@ for k,v in enums.items():
        (kk , {"enumEntryDocs": vv["docs"],"enumEntryDocslink":"","enumEntryVal": vv["ev"]})
           for kk,vv in v["entries"].items())
   }
-print "%5d classes %5d functions %5d enums" % (len(treedata['treeClasses']),
+print("%5d classes %5d functions %5d enums" % (len(treedata['treeClasses']),
                                                len(treedata['treeFunctions']),
-                                               len(treedata['treeEnums']))
+                                               len(treedata['treeEnums'])))
 
 #print "classes:      %5d exposed %5d internal" % (len(classes),           len(internalClasses))
 #print "methods:      %5d exposed %5d internal" % (numExposedMethods,      numInternalMethods)
@@ -367,10 +367,11 @@ print "%5d classes %5d functions %5d enums" % (len(treedata['treeClasses']),
 #print "functions:    %5d exposed %5d internal" % (len(functions),         numInternalFunctions)
 
 treedata["treeInheritance"] = dict((k, [i for i in v["bases"]]) for k,v in classes.items())
-print "elpased", time.time()-t0
+print("elpased", time.time()-t0)
 t0 = time.time()
 
-print "dump"
-json.dump(treedata,file(my_module+'.json','w'),indent=True)
-print "elpased", time.time()-t0
+print("dump")
+with open(my_module+'.json', 'w') as outfile:
+    json.dump(data, outfile, indent=True)
+print("elpased", time.time()-t0)
 t0 = time.time()

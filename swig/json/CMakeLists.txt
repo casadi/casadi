@@ -3,8 +3,13 @@ cmake_minimum_required(VERSION 2.8.6)
 # Generate SWIG wrapper
 set_source_files_properties(../casadi.i  PROPERTIES  CPLUSPLUS ON)
 swig_add_module_xml(casadi_xml ../casadi.i)
+if(WITH_PYTHON3)
+set(PYTHON_CMD python3)
+else()
+set(PYTHON_CMD python)
+endif()
 add_custom_target(json
-  COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/generate.py ${PROJECT_BINARY_DIR}/swig/json/../casadiXML_wrap.xml casadi
+  COMMAND ${PYTHON_CMD} ${CMAKE_CURRENT_SOURCE_DIR}/generate.py ${PROJECT_BINARY_DIR}/swig/json/../casadiXML_wrap.xml casadi
   COMMAND ${CMAKE_COMMAND} -E remove ${PROJECT_BINARY_DIR}/swig/casadiXML_wrap.xml
   DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/generate.py ${PROJECT_BINARY_DIR}/swig/json/../casadiXML_wrap.xml
 )
