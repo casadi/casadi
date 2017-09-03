@@ -32,6 +32,7 @@ namespace casadi {
 
   ///@{
   /** \brief Obtain collocation points of specific order and scheme
+  \param order Which order (1 to 9 supported)
   \param scheme  'radau' or 'legendre'
   **/
   CASADI_EXPORT
@@ -44,14 +45,14 @@ namespace casadi {
 
   /** \brief Obtain collocation interpolating matrices
   \param tau_root  location of collocation points, as obtained from collocation_points
-  \param[out] C interpolating coefficients to obtain derivatives
+  \param[out] output_C interpolating coefficients to obtain derivatives
       Length: order+1, order + 1
 
     \verbatim
       dX/dt @collPoint(j) ~ Sum_i C[j][i]*X@collPoint(i)
     \endverbatim
 
-  \param[out] D interpolating coefficients to obtain end state
+  \param[out] output_D interpolating coefficients to obtain end state
       Length: order+1
   */
   CASADI_EXPORT void
@@ -82,6 +83,8 @@ namespace casadi {
    * \param N      Number of integrator steps
    * \param order  Order of interpolating polynomials
    * \param scheme Collocation scheme, as excepted by collocationPoints function.
+   * \param solver Solver plugin
+   * \param solver_options Options to be passed to the solver plugin
   */
   CASADI_EXPORT
   Function simpleIRK(Function f, int N=10, int order=4, const std::string& scheme="radau",

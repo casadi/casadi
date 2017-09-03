@@ -115,7 +115,8 @@ namespace casadi {
     virtual bool has_function(const std::string& fname) const {return false;}
 
     /** \brief Which variables enter with some order
-    *
+    * \param[in] s_in Input name
+    * \param[in] s_out Output name(s)
     * \param[in] order Only 1 (linear) and 2 (nonlinear) allowed
     * \param[in] tr   Flip the relationship. Return which expressions contain the variables
     */
