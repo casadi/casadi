@@ -82,7 +82,7 @@ class CASADI_EXPORT SXFunction :
   bool is_smooth() const;
 
   /** \brief  Print the algorithm */
-  void disp(std::ostream& stream, bool more) const override;
+  void disp_more(std::ostream& stream) const override;
 
   /** \brief Get type name */
   std::string class_name() const override {return "SXFunction";}

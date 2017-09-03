@@ -401,7 +401,7 @@ namespace casadi {
     return 0;
   }
 
-  string MXFunction::disp(const AlgEl& el) const {
+  string MXFunction::print(const AlgEl& el) const {
     stringstream s;
     if (el.op==OP_OUTPUT) {
       s << "output[" << el.data->ind() << "][" << el.data->segment() << "]"
@@ -445,11 +445,11 @@ namespace casadi {
     return s.str();
   }
 
-  void MXFunction::disp(ostream &stream, bool more) const {
-    FunctionInternal::disp(stream, more);
+  void MXFunction::disp_more(ostream &stream) const {
+    stream << "Algorithm:" << endl;
     for (auto&& e : algorithm_) {
       InterruptHandler::check();
-      stream << disp(e) << endl;
+      stream << print(e) << endl;
     }
   }
 
@@ -1115,7 +1115,7 @@ namespace casadi {
     for (auto&& e : algorithm_) {
       // Generate comment
       if (g.verbose) {
-        g << "/* #" << k++ << ": " << disp(e) << " */\n";
+        g << "/* #" << k++ << ": " << print(e) << " */\n";
       }
 
       // Get the names of the operation arguments

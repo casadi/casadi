@@ -89,7 +89,7 @@ namespace casadi {
     ///@}
 
     /** \brief  Print description */
-    void disp(std::ostream& stream, bool more) const override;
+    void disp_more(std::ostream& stream) const override;
 
     /** \brief Generate code for the declarations of the C function */
     void codegen_declarations(CodeGenerator& g) const override;

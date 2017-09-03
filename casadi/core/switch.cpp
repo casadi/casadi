@@ -253,12 +253,8 @@ namespace casadi {
     return Function(name, arg, res, inames, onames, opts);
   }
 
-  void Switch::disp(ostream &stream, bool more) const {
-    FunctionInternal::disp(stream, more);
-    if (!more) return;
-
+  void Switch::disp_more(ostream &stream) const {
     // Print more
-    stream << endl;
     if (f_.size()==1) {
       // Print as if-then-else
       stream << f_def_.name() << ", " << f_[0].name();
