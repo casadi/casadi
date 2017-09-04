@@ -321,7 +321,7 @@ namespace casadi {
     std::vector<int> get_upper() const;
 
     /// Get the dimension as a string
-    std::string dim() const;
+    std::string dim(bool with_nz=false) const;
 
     /// Describe the nonzero location k as a string
     std::string repr_el(int k) const;
@@ -453,9 +453,6 @@ namespace casadi {
 
     /** \brief Print a textual representation of sparsity */
     void spy(std::ostream &stream) const;
-
-    /** \brief Print a compact description of the sparsity pattern */
-    void print_compact(std::ostream &stream) const;
 
     /// Generate a script for Matlab or Octave which visualizes the sparsity using the spy command
     void spy_matlab(const std::string& mfile) const;

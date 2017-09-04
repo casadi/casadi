@@ -103,9 +103,9 @@ namespace casadi {
     int columns() const {return size2();}
 
     /** \brief Get string representation of dimensions.
-        The representation is (nrow x ncol = numel | size)
+        The representation is e.g. "4x5" or  "4x5,10nz"
     */
-    std::string dim() const;
+    std::string dim(bool with_nz=false) const;
 
     /** \brief  Get the shape */
     std::pair<int, int> size() const;
@@ -796,8 +796,8 @@ namespace casadi {
   }
 
   template<typename MatType>
-  std::string GenericMatrix<MatType>::dim() const {
-    return sparsity().dim();
+  std::string GenericMatrix<MatType>::dim(bool with_nz) const {
+    return sparsity().dim(with_nz);
   }
 
   template<typename MatType>

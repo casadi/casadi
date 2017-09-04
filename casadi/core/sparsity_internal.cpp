@@ -62,16 +62,6 @@ namespace casadi {
     return size1()*size2();
   }
 
-  void SparsityInternal::print_compact(std::ostream &stream) const {
-    // Print dimensions
-    stream << size1() << "x" << size2();
-
-    // Print shape unless dense
-    if (!is_dense()) {
-      stream << "," << nnz() << "nz";
-    }
-  }
-
   void SparsityInternal::sanity_check(bool complete) const {
     int nrow = size1();
     int ncol = size2();
@@ -106,7 +96,7 @@ namespace casadi {
   }
 
   void SparsityInternal::disp(ostream &stream, bool more) const {
-    print_compact(stream);
+    stream << dim(!is_dense());
     if (more) {
       stream << endl;
       stream << "colind: " << get_colind() << endl;
@@ -1894,14 +1884,10 @@ namespace casadi {
     }
   }
 
-  std::string SparsityInternal::dim() const {
-    std::stringstream ss;
-    if (numel()==nnz()) {
-      ss << size1() << "-by-" << size2() << " (dense)";
-    } else {
-      ss << size1() << "-by-" << size2() << " (" << nnz() << "/" << numel() << " nz)";
-    }
-    return ss.str();
+  std::string SparsityInternal::dim(bool with_nz) const {
+    std::string ret = str(size1()) + "x" + str(size2());
+    if (with_nz) ret += "," + str(nnz()) + "nz";
+    return ret;
   }
 
   std::string SparsityInternal::repr_el(int k) const {

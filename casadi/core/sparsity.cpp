@@ -542,8 +542,8 @@ namespace casadi {
     return (*this)->makeDense(mapping);
   }
 
-  std::string Sparsity::dim() const {
-    return (*this)->dim();
+  std::string Sparsity::dim(bool with_nz) const {
+    return (*this)->dim(with_nz);
   }
 
   std::string Sparsity::repr_el(int k) const {
@@ -1112,10 +1112,6 @@ namespace casadi {
                       vector<int>(colind, colind+ncol+1),
                       vector<int>(row, row+nnz));
     }
-  }
-
-  void Sparsity::print_compact(std::ostream &stream) const {
-    (*this)->print_compact(stream);
   }
 
   int Sparsity::bw_upper() const {

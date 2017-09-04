@@ -421,12 +421,12 @@ namespace casadi {
     s << name_ << ":";
     // Print input arguments
     for (int i=0; i<n_in(); ++i) {
-      s << (i==0 ? "(" : ",") << name_in(i) << size_in(i);
+      s << (i==0 ? "(" : ",") << name_in(i) << "[" << sparsity_in(i) << "]";
     }
     s << ")->";
     // Print output arguments
     for (int i=0; i<n_out(); ++i) {
-      s << (i==0 ? "(" : ",") << name_out(i) << size_out(i);
+      s << (i==0 ? "(" : ",") << name_out(i) << "[" << sparsity_out(i) << "]";
     }
     s << ")";
 
