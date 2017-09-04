@@ -425,9 +425,38 @@ namespace casadi {
       m->fstats.at("solver").toc();
       m->fstats.at("postprocessing").tic();
 
-      // Retrieving solution
-      if (CPXsolution(m->env, m->lp, &solstat, &f, x, lam_a, get_ptr(slack), lam_x)) {
-        casadi_error("CPXsolution failed");
+      int problem_type = CPXgetprobtype(m->env, m->lp);
+
+      // The solver switched to a MIQP
+      if (problem_type == CPXPROB_MIQP){
+
+          // Get objective value
+          if (CPXgetobjval(m->env, m->lp, &f)) {
+            casadi_error("CPXgetobjval failed");
+          }
+
+          // Get primal solution
+          int cur_numcols = CPXgetnumcols(m->env, m->lp);
+          if (CPXgetx(m->env, m->lp, x, 0, cur_numcols-1)) {
+            casadi_error("CPXgetx failed");
+          }
+
+          // Slacks are not available
+
+          // Not a number as dual variables (not calculated with MIQP algorithm)
+          casadi_fill(lam_a, na_, nan);
+          casadi_fill(lam_x, nx_, nan);
+
+          if (verbose()) {
+              userOut() << "CPLEX does not compute dual variables for nonconvex qp's" << endl;
+          }
+
+      } else {
+
+          // Retrieving solution
+          if (CPXsolution(m->env, m->lp, &solstat, &f, x, lam_a, get_ptr(slack), lam_x)) {
+            casadi_error("CPXsolution failed");
+          }
       }
     }
 
