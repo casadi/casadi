@@ -219,14 +219,10 @@ namespace casadi {
 
       N_ = nus_.size();
       if (verbose_) {
-        std::stringstream ss;
-        ss << "HPMPC detected structure:" <<
-        " N " << N_ << ", nx " << nx << ", nu " << nu << ", ng " << ng << ".";
-        casadi_message(ss.str());
+        casadi_message("Detected structure: N " + str(N_) + ", nx " + str(nx) + ", "
+          "nu " + str(nu) + ", ng " + str(ng) + ".");
       }
     }
-
-
 
     casadi_assert(nx.size()==N_+1);
     casadi_assert(nu.size()==N_);
@@ -234,12 +230,14 @@ namespace casadi {
 
     casadi_assert_message(nx_ == std::accumulate(nx.begin(), nx.end(), 0) +
       std::accumulate(nu.begin(), nu.end(), 0),
-      "sum(nx)+sum(nu) = must equal total size of variables (" << nx_ << "). "
-      "Structure is: N " << N_ << ", nx " << nx << ", nu " << nu << ", ng " << ng << ".");
+      "sum(nx)+sum(nu) = must equal total size of variables (" + str(nx_) + "). "
+      "Structure is: N " + str(N_) + ", nx " + str(nx) + ", "
+      "nu " + str(nu) + ", ng " + str(ng) + ".");
     casadi_assert_message(na_ == std::accumulate(nx.begin()+1, nx.end(), 0) +
       std::accumulate(ng.begin(), ng.end(), 0),
-      "sum(nx+1)+sum(ng) = must equal total size of constraints (" << na_ << "). "
-      "Structure is: N " << N_ << ", nx " << nx << ", nu " << nu << ", ng " << ng << ".");
+      "sum(nx+1)+sum(ng) = must equal total size of constraints (" + str(na_) + "). "
+      "Structure is: N " + str(N_) + ", nx " + str(nx) + ", "
+      "nu " + str(nu) + ", ng " + str(ng) + ".");
     // Load library HPMPC when applicable
     std::string searchpath;
 
@@ -313,7 +311,8 @@ namespace casadi {
     Sparsity total = Asp_ + Bsp_ + Csp_ + Dsp_ + Isp_;
     casadi_assert_message((sparsity_in(CONIC_A) + total).nnz() == total.nnz(),
       "HPMPC: specified structure of A does not correspond to what the interface can handle. "
-      "Structure is: N " << N_ << ", nx " << nx << ", nu " << nu << ", ng " << ng << ".");
+      "Structure is: N " + str(N_) + ", nx " + str(nx) + ", nu " + str(nu) + ", "
+      "ng " + str(ng) + ".");
     casadi_assert(total.nnz() == Asp_.nnz() + Bsp_.nnz() + Csp_.nnz() + Dsp_.nnz() + Isp_.nnz());
 
     /* Disassemble H input into:
@@ -340,7 +339,8 @@ namespace casadi {
     total = Rsp_ + Ssp_ + Qsp_ + Ssp_.T();
     casadi_assert_message((sparsity_in(CONIC_H) + total).nnz() == total.nnz(),
       "HPMPC: specified structure of H does not correspond to what the interface can handle. "
-      "Structure is: N " << N_ << ", nx " << nx << ", nu " << nu << ", ng " << ng << ".");
+      "Structure is: N " + str(N_) + ", nx " + str(nx) + ", nu " + str(nu) + ", "
+      "ng " + str(ng) + ".");
     casadi_assert(total.nnz() == Rsp_.nnz() + 2*Ssp_.nnz() + Qsp_.nnz());
 
     /* Disassemble LBA/UBA input into:
