@@ -2084,14 +2084,7 @@ namespace casadi {
       mapping = range(nnz());
       return shared_from_this<Sparsity>();
     }
-
-    if (!in_bounds(rr, -numel()+ind1, numel()+ind1)) {
-      casadi_error("Slicing [rr] out of bounds. Your rr contains " <<
-                   *std::min_element(rr.begin(), rr.end()) << " up to " <<
-                   *std::max_element(rr.begin(), rr.end()) <<
-                   ", which is outside the range [" << -numel()+ind1 << ","<<
-                   numel()+ind1 <<  ").");
-    }
+    casadi_assert_in_range(rr, -numel()+ind1, numel()+ind1);
 
     // Handle index-1, negative indices
     if (ind1 || has_negative(rr)) {
@@ -2173,20 +2166,8 @@ namespace casadi {
 
   Sparsity SparsityInternal::_erase(const vector<int>& rr, const vector<int>& cc,
                                       bool ind1, std::vector<int>& mapping) const {
-    if (!in_bounds(rr, -size1()+ind1, size1()+ind1)) {
-      casadi_error("Slicing [rr, cc] out of bounds. Your rr contains " <<
-                   *std::min_element(rr.begin(), rr.end()) << " up to " <<
-                   *std::max_element(rr.begin(), rr.end()) <<
-                   ", which is outside the range [" << -size1()+ind1 << ","<<
-                   size1()+ind1 <<  ").");
-    }
-    if (!in_bounds(cc, -size2()+ind1, size2()+ind1)) {
-      casadi_error("Slicing [rr, cc] out of bounds. Your cc contains "
-                   << *std::min_element(cc.begin(), cc.end()) << " up to "
-                   << *std::max_element(cc.begin(), cc.end())
-                   << ", which is outside the range [" << -size2()+ind1 << ","
-                   << size2()+ind1 <<  ").");
-    }
+    casadi_assert_in_range(rr, -size1()+ind1, size1()+ind1);
+    casadi_assert_in_range(cc, -size2()+ind1, size2()+ind1);
 
     // Handle index-1, negative indices, non-monotone rr and cc
     if (ind1 || has_negative(rr) || has_negative(cc)
@@ -2291,18 +2272,8 @@ namespace casadi {
   }
 
   vector<int> SparsityInternal::get_nz(const vector<int>& rr, const vector<int>& cc) const {
-    if (!in_bounds(rr, size1())) {
-      casadi_error("Slicing [rr, cc] out of bounds. Your rr contains "
-                   << *std::min_element(rr.begin(), rr.end()) << " up to "
-                   << *std::max_element(rr.begin(), rr.end())
-                   << ", which is outside of the matrix shape " << dim() << ".");
-    }
-    if (!in_bounds(cc, size2())) {
-      casadi_error("Slicing [rr, cc] out of bounds. Your cc contains "
-                   << *std::min_element(cc.begin(), cc.end()) << " up to "
-                   << *std::max_element(cc.begin(), cc.end())
-                   << ", which is outside of the matrix shape " << dim() << ".");
-    }
+    casadi_assert_bounded(rr, size1());
+    casadi_assert_bounded(cc, size2());
 
     std::vector<int> rr_sorted;
     std::vector<int> rr_sorted_index;
@@ -2338,13 +2309,7 @@ namespace casadi {
     casadi_assert(rr.size()==sp.nnz());
 
     // Check bounds
-    if (!in_bounds(rr, -numel()+ind1, numel()+ind1)) {
-      casadi_error("Slicing [rr, cc] out of bounds. Your rr contains "
-                   << *std::min_element(rr.begin(), rr.end()) << " up to "
-                   << *std::max_element(rr.begin(), rr.end())
-                   << ", which is outside the range [" << -numel()+ind1
-                   << ","<< numel()+ind1 <<  ").");
-    }
+    casadi_assert_in_range(rr, -numel()+ind1, numel()+ind1);
 
     // Handle index-1, negative indices
     if (ind1 || has_negative(rr)) {
@@ -2385,20 +2350,8 @@ namespace casadi {
 
   Sparsity SparsityInternal::sub(const vector<int>& rr, const vector<int>& cc,
                                  vector<int>& mapping, bool ind1) const {
-    if (!in_bounds(rr, -size1()+ind1, size1()+ind1)) {
-      casadi_error("Slicing [rr, cc] out of bounds. Your rr contains "
-                   << *std::min_element(rr.begin(), rr.end()) << " up to "
-                   << *std::max_element(rr.begin(), rr.end())
-                   << ", which is outside the range [" << -size1()+ind1 << ","
-                   << size1()+ind1 <<  ").");
-    }
-    if (!in_bounds(cc, -size2()+ind1, size2()+ind1)) {
-      casadi_error("Slicing [rr, cc] out of bounds. Your cc contains "
-                   << *std::min_element(cc.begin(), cc.end()) << " up to "
-                   << *std::max_element(cc.begin(), cc.end())
-                   << ", which is outside the range [" << -size2()+ind1 << ","
-                   << size2()+ind1 <<  ").");
-    }
+    casadi_assert_in_range(rr, -size1()+ind1, size1()+ind1);
+    casadi_assert_in_range(cc, -size2()+ind1, size2()+ind1);
 
     // Handle index-1, negative indices in rr
     std::vector<int> tmp = rr;
@@ -2749,12 +2702,7 @@ namespace casadi {
 
   Sparsity SparsityInternal::_enlargeColumns(int ncol, const std::vector<int>& cc,
                                                bool ind1) const {
-    if (!in_bounds(cc, -ncol+ind1, ncol+ind1)) {
-      casadi_error("enlargeColumns: out of bounds. Your cc contains "
-                   << *std::min_element(cc.begin(), cc.end()) << " up to "
-                   << *std::max_element(cc.begin(), cc.end())
-                   << ", which is outside the range [" << -ncol+ind1 << ","<< ncol+ind1 <<  ").");
-    }
+    casadi_assert_in_range(cc, -ncol+ind1, ncol+ind1);
 
     // Handle index-1, negative indices
     if (ind1 || has_negative(cc)) {
@@ -2793,12 +2741,7 @@ namespace casadi {
   }
 
   Sparsity SparsityInternal::_enlargeRows(int nrow, const std::vector<int>& rr, bool ind1) const {
-    if (!in_bounds(rr, -nrow+ind1, nrow+ind1)) {
-      casadi_error("enlargeRows: out of bounds. Your rr contains " <<
-                   *std::min_element(rr.begin(), rr.end()) << " up to " <<
-                   *std::max_element(rr.begin(), rr.end()) <<
-                   ", which is outside the range [" << -nrow+ind1 << ","<< nrow+ind1 <<  ").");
-    }
+    casadi_assert_in_range(rr, -nrow+ind1, nrow+ind1);
 
     // Handle index-1, negative indices
     if (ind1 || has_negative(rr)) {

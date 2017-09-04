@@ -60,8 +60,10 @@ namespace casadi {
 
   template<typename Scalar>
   bool Matrix<Scalar>::__nonzero__() const {
-    if (numel()!=1) {casadi_error("Only scalar Matrix could have a truth value, but you "
-                                  "provided a shape" << dim());}
+    if (numel()!=1) {
+      casadi_error("Only scalar Matrix could have a truth value, but you "
+                   "provided a shape" + str(dim()));
+    }
     return nonzeros().at(0)!=0;
   }
 
@@ -248,20 +250,8 @@ namespace casadi {
     int sz1 = size1(), sz2 = size2();
 
     // Report out-of-bounds
-    if (!in_bounds(rr.nonzeros(), -sz1+ind1, sz1+ind1)) {
-      casadi_error("set[., r, c] out of bounds. Your rr contains "
-                   + str(*std::min_element(rr->begin(), rr->end())) + " up to "
-                   + str(*std::max_element(rr->begin(), rr->end()))
-                   + ", which is outside the range [" + str(-sz1+ind1)
-                   + "," + str(sz1+ind1) + ").");
-    }
-    if (!in_bounds(cc.nonzeros(), -sz2+ind1, sz2+ind1)) {
-      casadi_error("set [., r, c] out of bounds. Your cc contains "
-                   + str(*std::min_element(cc->begin(), cc->end())) + " up to "
-                   + str(*std::max_element(cc->begin(), cc->end()))
-                   + ", which is outside the range [" + str(-sz2+ind1)
-                   + "," + str(sz2+ind1) +  ").");
-    }
+    casadi_assert_in_range(rr.nonzeros(), -sz1+ind1, sz1+ind1);
+    casadi_assert_in_range(cc.nonzeros(), -sz2+ind1, sz2+ind1);
 
     // If we are assigning with something sparse, first remove existing entries
     if (!m.is_dense()) {
@@ -345,13 +335,7 @@ namespace casadi {
     if (rrsz==0) return;
 
     // Check bounds
-    if (!in_bounds(rr.nonzeros(), -nel+ind1, nel+ind1)) {
-      casadi_error("set[rr] out of bounds. Your rr contains "
-                   + str(*std::min_element(rr->begin(), rr->end())) + " up to "
-                   + str(*std::max_element(rr->begin(), rr->end()))
-                   + ", which is outside the range [" + str(-nel+ind1) + ","
-                   + str(nel+ind1) + ").");
-    }
+    casadi_assert_in_range(rr.nonzeros(), -nel+ind1, nel+ind1);
 
     // Dense mode
     if (is_dense() && m.is_dense()) {
@@ -421,13 +405,7 @@ namespace casadi {
     int sz = nnz();
 
     // Check bounds
-    if (!in_bounds(k, -sz+ind1, sz+ind1)) {
-      casadi_error("get_nz[kk] out of bounds. Your kk contains "
-                   + str(*std::min_element(k.begin(), k.end())) + " up to "
-                   + str(*std::max_element(k.begin(), k.end()))
-                   + ", which is outside the range [" + str(-sz+ind1)
-                   + "," + str(sz+ind1) +  ").");
-    }
+    casadi_assert_in_range(k, -sz+ind1, sz+ind1);
 
     // If indexed matrix was a row/column vector, make sure that the result is too
     bool tr = (is_column() && kk.is_row()) || (is_row() && kk.is_column());
@@ -488,19 +466,14 @@ namespace casadi {
     int sz = nnz();
 
     // Check bounds
-    if (!in_bounds(k, -sz+ind1, sz+ind1)) {
-      casadi_error("set_nz[kk] out of bounds. Your kk contains "
-                   << *std::min_element(k.begin(), k.end()) << " up to "
-                   << *std::max_element(k.begin(), k.end())
-                   << ", which is outside the range [" << -sz+ind1 << ","<< sz+ind1 <<  ").");
-    }
+    casadi_assert_in_range(k, -sz+ind1, sz+ind1);
 
     // Set nonzeros, ignoring negative indices
     for (int el=0; el<k.size(); ++el) {
-      casadi_assert_message(!(ind1 && k[el]<=0), "Matlab is 1-based, but requested index " <<
-                                                k[el] <<  ". Note that negative slices are" <<
-                                                " disabled in the Matlab interface. " <<
-                                                "Possibly you may want to use 'end'.");
+      casadi_assert_message(!(ind1 && k[el]<=0),
+        "Matlab is 1-based, but requested index " + str(k[el])
+        +  ". Note that negative slices are disabled in the Matlab interface. "
+           "Possibly you may want to use 'end'.");
       int k_el = k[el]-ind1;
       nonzeros().at(k_el>=0 ? k_el : k_el+sz) = m->at(el);
     }
@@ -1010,18 +983,8 @@ namespace casadi {
 
   template<typename Scalar>
   void Matrix<Scalar>::remove(const std::vector<int>& rr, const std::vector<int>& cc) {
-    if (!in_bounds(rr, size1())) {
-      casadi_error("Remove(rr, cc) out of bounds. Your rr contains "
-                   << *std::min_element(rr.begin(), rr.end()) << " up to "
-                   << *std::max_element(rr.begin(), rr.end())
-                   << ", which is outside of the matrix shape " << dim() << ".");
-    }
-    if (!in_bounds(cc, size2())) {
-      casadi_error("Remove(rr, cc) out of bounds. Your cc contains "
-                   << *std::min_element(cc.begin(), cc.end()) << " up to "
-                   << *std::max_element(cc.begin(), cc.end())
-                   << ", which is outside of the matrix shape " << dim() << ".");
-    }
+    casadi_assert_bounded(rr, size1());
+    casadi_assert_bounded(cc, size2());
 
     // Remove by performing a complementary slice
     std::vector<int> rrc = complement(rr, size1());
@@ -2711,8 +2674,9 @@ namespace casadi {
 
   template<>
   bool Matrix<SXElem>::__nonzero__() const {
-    if (numel()!=1) {casadi_error("Only scalar Matrix could have a truth value, but you "
-                                  "provided a shape" << dim());}
+    casadi_assert_message(numel()==1,
+      "Only scalar Matrix could have a truth value, but you "
+      "provided a shape" + str(dim()));
     return nonzeros().at(0).__nonzero__();
   }
 
@@ -3135,7 +3099,7 @@ namespace casadi {
           return substitute(ex, v, vdef_mod);
         } else {
           casadi_error("subsitute(ex, v, vdef): sparsities of v and vdef must match. Got v: "
-                       << v[k].dim() << " and " << "vdef: " << vdef[k].dim() << ".");
+                       + str(v[k].dim()) + " and vdef: " + str(vdef[k].dim()) + ".");
         }
       }
     }
@@ -3634,7 +3598,7 @@ namespace casadi {
       return ret;
     } else {
       casadi_error("poly_root(): can only solve cases for first or second order polynomial. "
-                   "Got order " << p.size1()-1 << ".");
+                   "Got order " + str(p.size1()-1) + ".");
     }
 
   }

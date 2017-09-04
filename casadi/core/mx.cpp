@@ -239,13 +239,13 @@ namespace casadi {
     int sz1 = size1(), sz2 = size2();
 
     // Report out-of-bounds
-    if (!in_bounds(rr.nonzeros(), -sz1+ind1, sz1+ind1)) {
+    if (!in_range(rr.nonzeros(), -sz1+ind1, sz1+ind1)) {
       casadi_error("set[., rr, cc] out of bounds. Your rr contains "
                    << *std::min_element(rr->begin(), rr->end()) << " up to "
                    << *std::max_element(rr->begin(), rr->end())
                    << ", which is outside the range [" << -sz1+ind1 << ","<< sz1+ind1 <<  ").");
     }
-    if (!in_bounds(cc.nonzeros(), -sz2+ind1, sz2+ind1)) {
+    if (!in_range(cc.nonzeros(), -sz2+ind1, sz2+ind1)) {
       casadi_error("set [., rr, cc] out of bounds. Your cc contains "
                    << *std::min_element(cc->begin(), cc->end()) << " up to "
                    << *std::max_element(cc->begin(), cc->end())
@@ -314,7 +314,7 @@ namespace casadi {
     if (rrsz==0) return;
 
     // Check bounds
-    if (!in_bounds(rr.nonzeros(), -nel+ind1, nel+ind1)) {
+    if (!in_range(rr.nonzeros(), -nel+ind1, nel+ind1)) {
       casadi_error("set[rr] out of bounds. Your rr contains "
                    << *std::min_element(rr->begin(), rr->end()) << " up to "
                    << *std::max_element(rr->begin(), rr->end())
@@ -379,7 +379,7 @@ namespace casadi {
 
     // Check bounds
     int sz = nnz();
-    if (!in_bounds(kk.nonzeros(), -sz+ind1, sz+ind1)) {
+    if (!in_range(kk.nonzeros(), -sz+ind1, sz+ind1)) {
       casadi_error("get_nz[kk] out of bounds. Your kk contains "
                    << *std::min_element(kk->begin(), kk->end()) << " up to "
                    << *std::max_element(kk->begin(), kk->end())
@@ -443,7 +443,7 @@ namespace casadi {
 
     // Check bounds
     int sz = nnz();
-    if (!in_bounds(kk.nonzeros(), -sz+ind1, sz+ind1)) {
+    if (!in_range(kk.nonzeros(), -sz+ind1, sz+ind1)) {
       casadi_error("set_nz[kk] out of bounds. Your kk contains "
                    << *std::min_element(kk->begin(), kk->end()) << " up to "
                    << *std::max_element(kk->begin(), kk->end())

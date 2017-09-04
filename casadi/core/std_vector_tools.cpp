@@ -58,7 +58,7 @@ namespace casadi {
   }
 
   std::vector<int> complement(const std::vector<int> &v, int size) {
-    casadi_assert_message(in_bounds(v, size),
+    casadi_assert_message(in_range(v, size),
                           "complement: out of bounds. Some elements in v fall out of [0, size[");
     std::vector<int> lookup(size, 0);
     std::vector<int> ret;
@@ -76,7 +76,7 @@ namespace casadi {
   }
 
   std::vector<int> lookupvector(const std::vector<int> &v, int size) {
-    casadi_assert_message(in_bounds(v, size),
+    casadi_assert_message(in_range(v, size),
                           "lookupvector: out of bounds. Some elements in v fall out of [0, size[");
     std::vector<int> lookup(size, -1);
 

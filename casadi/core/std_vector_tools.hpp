@@ -89,11 +89,27 @@ namespace casadi {
 
   /// Check if for each element of v holds: v_i < upper
   template<typename T>
-  bool in_bounds(const std::vector<T> &v, int upper);
+  bool in_range(const std::vector<T> &v, int upper);
 
   /// Check if for each element of v holds: lower <= v_i < upper
   template<typename T>
-  bool in_bounds(const std::vector<T> &v, int lower, int upper);
+  bool in_range(const std::vector<T> &v, int lower, int upper);
+
+  // Assert that a indices are in a range
+  #define casadi_assert_in_range(v, lower, upper) \
+   casadi_assert_message(in_range(v, lower, upper),\
+    "Out of bounds error. Got elements in range [" \
+    + str(*std::min_element(v.begin(), v.end())) + ","\
+    + str(*std::max_element(v.begin(), v.end())) + "], which is outside the range ["\
+    + str(lower) + "," + str(upper) + ").")
+
+    // Assert that a indices are bounded
+    #define casadi_assert_bounded(v, upper) \
+     casadi_assert_message(in_range(v, upper),\
+      "Out of bounds error. Got elements in range [" \
+      + str(*std::min_element(v.begin(), v.end())) + ","\
+      + str(*std::max_element(v.begin(), v.end())) + "], which exceeds the upper bound "\
+      + str(upper) + ".")
 
   /** \brief Returns the list of all i in [0, size[ not found in supplied list
   *
@@ -341,12 +357,12 @@ namespace casadi {
 #endif //SWIG
 
   template<typename T>
-  bool in_bounds(const std::vector<T> &v, int upper) {
-    return in_bounds(v, 0, upper);
+  bool in_range(const std::vector<T> &v, int upper) {
+    return in_range(v, 0, upper);
   }
 
   template<typename T>
-  bool in_bounds(const std::vector<T> &v, int lower, int upper) {
+  bool in_range(const std::vector<T> &v, int lower, int upper) {
     if (v.size()==0) return true;
     int max = *std::max_element(v.begin(), v.end());
     if (max >= upper) return false;
