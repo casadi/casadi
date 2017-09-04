@@ -130,6 +130,9 @@ class BinarySX : public SXNode {
       }
     }
 
+    // Class name
+    std::string class_name() const override {return "BinarySX";}
+
     bool is_smooth() const override { return operation_checker<SmoothChecker>(op_);}
 
     bool is_op(int op) const override { return op_==op; }

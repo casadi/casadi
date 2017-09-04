@@ -375,11 +375,11 @@ namespace casadi {
   template<class Problem>
   Derived* PluginInterface<Derived>::
   instantiate(const std::string& fname,
-                    const std::string& pname, Problem problem) {
+              const std::string& pname, Problem problem) {
 
     // Assert the plugin exists (needed for adaptors)
     if (!has_plugin(pname, true)) {
-      casadi_error("Plugin '" << pname << "' is not found.");
+      casadi_error("Plugin '" + pname + "' is not found.");
     }
     return getPlugin(pname).creator(fname, problem);
   }

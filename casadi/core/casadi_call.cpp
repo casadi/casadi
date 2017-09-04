@@ -49,8 +49,8 @@ namespace casadi {
       } else {
         // Mismatching dimensions
         casadi_error("Cannot create function call node: Dimension mismatch for argument "
-                     << i << ". Argument has shape " << x.size()
-                     << " but function input has shape " << sp.size());
+                     + str(i) + ". Argument has shape " + str(x.size())
+                     + " but function input has shape " + str(sp.size()));
       }
     }
   }
@@ -59,9 +59,9 @@ namespace casadi {
 
     // Number inputs and outputs
     int num_in = fcn.n_in();
-    casadi_assert_message(arg.size()==num_in, "Argument list length (" << arg.size()
-                          << ") does not match number of inputs (" << num_in << ")"
-                          << " for function " << fcn.name());
+    casadi_assert_message(arg.size()==num_in, "Argument list length (" + str(arg.size())
+                          + ") does not match number of inputs (" + str(num_in)
+                          + ") for function " + fcn.name());
 
     // Create arguments of the right dimensions and sparsity
     vector<MX> arg1(num_in);

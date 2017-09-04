@@ -362,8 +362,8 @@ namespace casadi {
     if (!free_vars_.empty()) {
       std::stringstream ss;
       disp(ss, false);
-      casadi_error("Cannot evaluate \"" << ss.str() << "\" since variables "
-                   << free_vars_ << " are free.");
+      casadi_error("Cannot evaluate \"" + ss.str() + "\" since variables "
+                   + str(free_vars_) + " are free.");
     }
 
     // Evaluate all of the nodes of the algorithm:
@@ -1051,7 +1051,7 @@ namespace casadi {
     // Make sure that there are no free variables
     if (!free_vars_.empty()) {
       casadi_error("Code generation is not possible since variables "
-                   << free_vars_ << " are free.");
+                   + str(free_vars_) + " are free.");
     }
 
     // Generate code for the embedded functions

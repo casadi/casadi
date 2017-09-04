@@ -1,4 +1,4 @@
-/*
+ /*
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
@@ -65,8 +65,8 @@ namespace casadi {
     if (!free_vars_.empty()) {
       std::stringstream ss;
       disp(ss, false);
-      casadi_error("Cannot evaluate \"" << ss.str() << "\" since variables "
-                   << free_vars_ << " are free.");
+      casadi_error("Cannot evaluate \"" + ss.str() + "\" since variables "
+                   + str(free_vars_) + " are free.");
     }
 
     // NOTE: The implementation of this function is very delicate. Small changes in the
@@ -82,7 +82,7 @@ namespace casadi {
       case OP_INPUT: w[e.i0] = arg[e.i1]==0 ? 0 : arg[e.i1][e.i2]; break;
       case OP_OUTPUT: if (res[e.i0]!=0) res[e.i0][e.i2] = w[e.i1]; break;
       default:
-        casadi_error("SXFunction::eval: Unknown operation" << e.op);
+        casadi_error("Unknown operation" + str(e.op));
       }
     }
     return 0;
@@ -143,7 +143,7 @@ namespace casadi {
     // Make sure that there are no free variables
     if (!free_vars_.empty()) {
       casadi_error("Code generation is not possible since variables "
-                   << free_vars_ << " are free.");
+                   + str(free_vars_) + " are free.");
     }
   }
 

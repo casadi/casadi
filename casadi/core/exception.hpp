@@ -106,12 +106,9 @@ inline std::string trim_path(const std::string& full_path) {
 // String denoting where the assertion is situated
 #define CASADI_WHERE casadi::trim_path(__FILE__ ":" CASADI_ASSERT_STR(__LINE__))
 
-// TODO(@jaeandersson) Refactor #890
-#define casadi_error(msg) {\
-  std::stringstream ss_internal_;\
-  ss_internal_ << CASADI_WHERE << ": " << msg;\
-  throw casadi::CasadiException(ss_internal_.str()); \
-}\
+// Throw an exception with information about source code location
+#define casadi_error(msg) \
+  throw casadi::CasadiException((CASADI_WHERE + ": ") + msg);
 
 // This assertion checks for illegal user inputs TODO(@jaeandersson) Refactor #890
 #define casadi_assert_message(x, msg) \

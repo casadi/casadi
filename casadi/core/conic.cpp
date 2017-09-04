@@ -25,7 +25,6 @@
 
 #include "conic_impl.hpp"
 #include "nlpsol_impl.hpp"
-#include <typeinfo>
 
 using namespace std;
 namespace casadi {
@@ -237,7 +236,7 @@ namespace casadi {
       } else if (i->first=="h") {
         H_ = i->second;
       } else {
-        casadi_error("Unrecognized field in QP structure: " << i->first);
+        casadi_error("Unrecognized field in QP structure: " + str(i->first));
       }
     }
 
@@ -358,8 +357,7 @@ namespace casadi {
   }
 
   void Conic::generateNativeCode(std::ostream& file) const {
-    casadi_error("Conic::generateNativeCode not defined for class "
-                 << typeid(*this).name());
+    casadi_error("generateNativeCode not defined for class " + class_name());
   }
 
   std::map<std::string, Conic::Plugin> Conic::solvers_;

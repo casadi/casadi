@@ -75,7 +75,11 @@ namespace casadi {
     virtual int to_int() const;  // only works for integer nodes
     ///@}
 
-    virtual const std::string& name() const; // get the name
+    // get the name
+    virtual const std::string& name() const;
+
+    /** \brief Get type name */
+    virtual std::string class_name() const = 0;
 
     /** \brief get the operation */
     virtual int op() const=0;

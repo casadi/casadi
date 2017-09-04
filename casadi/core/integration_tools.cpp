@@ -115,7 +115,7 @@ namespace casadi {
       return std::vector<RealT>(legendre_points[order], legendre_points[order]+order);
     } else {
       casadi_error("Error in collocationPoints(order, scheme): unknown scheme '"
-                   << scheme << "'. Select one of 'radau', 'legendre'.");
+                   + scheme + "'. Select one of 'radau', 'legendre'.");
     }
   }
 

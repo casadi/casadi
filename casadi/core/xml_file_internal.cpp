@@ -24,7 +24,6 @@
 
 
 #include "xml_file_internal.hpp"
-#include <typeinfo>
 
 using namespace std;
 namespace casadi {
@@ -43,7 +42,7 @@ namespace casadi {
   }
 
   XmlNode XmlFileInternal::parse(const std::string& filename) {
-    casadi_error("FunctionInternal::parse not defined for class " << typeid(*this).name());
+    casadi_error("parse not defined for " + class_name()); 
     return XmlNode();
   }
 

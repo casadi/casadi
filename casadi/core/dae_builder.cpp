@@ -342,7 +342,7 @@ namespace casadi {
     const string& fullname = node.name();
     if (fullname.find("exp:")== string::npos) {
       casadi_error("DaeBuilder::read_expr: unknown - expression is supposed to "
-                   "start with 'exp:' , got " << fullname);
+                   "start with 'exp:' , got " + fullname);
     }
 
     // Chop the 'exp:'
@@ -921,7 +921,7 @@ namespace casadi {
     // Find the variable
     VarMap::iterator it = varmap_.find(name);
     if (it==varmap_.end()) {
-      casadi_error("No such variable: \"" << name << "\".");
+      casadi_error("No such variable: \"" + name + "\".");
     }
 
     // Return the variable
@@ -932,7 +932,7 @@ namespace casadi {
     // Try to find the component
     if (varmap_.find(name)!=varmap_.end()) {
       stringstream ss;
-      casadi_error("Variable \"" << name << "\" has already been added.");
+      casadi_error("Variable \"" + name + "\" has already been added.");
     }
 
     // Add to the map of all variables
@@ -1965,7 +1965,7 @@ namespace casadi {
     for (int i=0; i<s_out.size(); ++i) {
       // Make sure all outputs have been assigned
       if (!assigned[i]) {
-        casadi_error("DaeBuilder::function: Cannot treat output expression " << s_out[i]);
+        casadi_error("DaeBuilder::function: Cannot treat output expression " + s_out[i]);
       }
 
       // Apply attributes starting from the right-most one

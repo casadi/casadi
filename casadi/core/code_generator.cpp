@@ -69,7 +69,7 @@ namespace casadi {
         indent_ = e.second;
         casadi_assert(indent_>=0);
       } else {
-        casadi_error("Unrecongnized option: " << e.first);
+        casadi_error("Unrecongnized option: " + str(e.first));
       }
     }
 

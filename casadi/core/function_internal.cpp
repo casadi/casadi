@@ -2692,8 +2692,8 @@ namespace casadi {
       if (ret1.length() != totalWidth)
         casadi_error(
           "ipopt timing formatting fallback is bugged, sorry about that."
-          << "expected " << totalWidth <<  " digits, but got " << ret1.length()
-          << ", string: \"" << ret1 << "\", number: " << x);
+          "expected " + str(totalWidth) +  " digits, but got " + str(ret1.length())
+          + ", string: \"" + str(ret1) + "\", number: " + str(x));
       return ret1;
     } else {
       casadi_error("ipopt timing formatting is bugged, sorry about that.");

@@ -230,8 +230,8 @@ namespace casadi {
         return set(m.T(), ind1, rr, cc);
       } else {
         // Error otherwise
-        casadi_error("Dimension mismatch." << "lhs is " << rr.size1() << "-by-"
-                     << cc.size1() << ", while rhs is " << m.size());
+        casadi_error("Dimension mismatch. lhs is " + str(rr.size1()) + "-by-"
+                     + str(cc.size1()) + ", while rhs is " + str(m.size()));
       }
     }
 
@@ -239,18 +239,8 @@ namespace casadi {
     int sz1 = size1(), sz2 = size2();
 
     // Report out-of-bounds
-    if (!in_range(rr.nonzeros(), -sz1+ind1, sz1+ind1)) {
-      casadi_error("set[., rr, cc] out of bounds. Your rr contains "
-                   << *std::min_element(rr->begin(), rr->end()) << " up to "
-                   << *std::max_element(rr->begin(), rr->end())
-                   << ", which is outside the range [" << -sz1+ind1 << ","<< sz1+ind1 <<  ").");
-    }
-    if (!in_range(cc.nonzeros(), -sz2+ind1, sz2+ind1)) {
-      casadi_error("set [., rr, cc] out of bounds. Your cc contains "
-                   << *std::min_element(cc->begin(), cc->end()) << " up to "
-                   << *std::max_element(cc->begin(), cc->end())
-                   << ", which is outside the range [" << -sz2+ind1 << ","<< sz2+ind1 <<  ").");
-    }
+    casadi_assert_in_range(rr.nonzeros(), -sz1+ind1, sz1+ind1);
+    casadi_assert_in_range(cc.nonzeros(), -sz2+ind1, sz2+ind1);
 
     // If we are assigning with something sparse, first remove existing entries
     if (!m.is_dense()) {
@@ -302,8 +292,8 @@ namespace casadi {
         return set(m.T(), ind1, rr);
       } else {
         // Error otherwise
-        casadi_error("Dimension mismatch." << "lhs is " << rr.size()
-                     << ", while rhs is " << m.size());
+        casadi_error("Dimension mismatch. lhs is " + str(rr.size())
+                     + ", while rhs is " + str(m.size()));
       }
     }
 
@@ -314,12 +304,7 @@ namespace casadi {
     if (rrsz==0) return;
 
     // Check bounds
-    if (!in_range(rr.nonzeros(), -nel+ind1, nel+ind1)) {
-      casadi_error("set[rr] out of bounds. Your rr contains "
-                   << *std::min_element(rr->begin(), rr->end()) << " up to "
-                   << *std::max_element(rr->begin(), rr->end())
-                   << ", which is outside the range [" << -nel+ind1 << ","<< nel+ind1 <<  ").");
-    }
+    casadi_assert_in_range(rr.nonzeros(), -nel+ind1, nel+ind1);
 
     // Dense mode
     if (is_dense() && m.is_dense()) {
@@ -379,12 +364,7 @@ namespace casadi {
 
     // Check bounds
     int sz = nnz();
-    if (!in_range(kk.nonzeros(), -sz+ind1, sz+ind1)) {
-      casadi_error("get_nz[kk] out of bounds. Your kk contains "
-                   << *std::min_element(kk->begin(), kk->end()) << " up to "
-                   << *std::max_element(kk->begin(), kk->end())
-                   << ", which is outside the range [" << -sz+ind1 << "," << sz+ind1 <<  ").");
-    }
+    casadi_assert_in_range(kk.nonzeros(), -sz+ind1, sz+ind1);
 
     // Handle index-1, negative indices
     if (ind1 || *std::min_element(kk->begin(), kk->end())<0) {
@@ -430,8 +410,8 @@ namespace casadi {
         return set_nz(m.T(), ind1, kk);
       } else {
         // Error otherwise
-        casadi_error("Dimension mismatch." << "lhs is " << kk.size()
-                     << ", while rhs is " << m.size());
+        casadi_error("Dimension mismatch. lhs is " + str(kk.size())
+                     + ", while rhs is " + str(m.size()));
       }
     }
 
@@ -443,12 +423,7 @@ namespace casadi {
 
     // Check bounds
     int sz = nnz();
-    if (!in_range(kk.nonzeros(), -sz+ind1, sz+ind1)) {
-      casadi_error("set_nz[kk] out of bounds. Your kk contains "
-                   << *std::min_element(kk->begin(), kk->end()) << " up to "
-                   << *std::max_element(kk->begin(), kk->end())
-                   << ", which is outside the range [" << -sz+ind1 << ","<< sz+ind1 <<  ").");
-    }
+    casadi_assert_in_range(kk.nonzeros(), -sz+ind1, sz+ind1);
 
     // Quick return if no assignments to be made
     if (kk.nnz()==0) return;

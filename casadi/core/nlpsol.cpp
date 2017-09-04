@@ -380,14 +380,12 @@ namespace casadi {
   const std::string Nlpsol::infix_ = "nlpsol";
 
   DM Nlpsol::getReducedHessian() {
-    casadi_error("Nlpsol::getReducedHessian not defined for class "
-                 << typeid(*this).name());
+    casadi_error("getReducedHessian not defined for class " + class_name());
     return DM();
   }
 
   void Nlpsol::setOptionsFromFile(const std::string & file) {
-    casadi_error("Nlpsol::setOptionsFromFile not defined for class "
-                 << typeid(*this).name());
+    casadi_error("setOptionsFromFile not defined for class " + class_name());
   }
 
   int Nlpsol::eval(const double** arg, double** res, int* iw, double* w, void* mem) const {

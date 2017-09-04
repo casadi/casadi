@@ -146,7 +146,7 @@ namespace casadi {
       } else if (i->first=="v") {
         V_ = i->second;
       } else {
-        casadi_error("Unrecognized field in Dple structure: " << i->first);
+        casadi_error("Unrecognized field in Dple structure: " + str(i->first));
       }
     }
 

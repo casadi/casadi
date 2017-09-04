@@ -25,7 +25,6 @@
 
 #include "sx_node.hpp"
 #include <limits>
-#include <typeinfo>
 
 using namespace std;
 namespace casadi {
@@ -48,12 +47,10 @@ namespace casadi {
 
   double SXNode::to_double() const {
     return numeric_limits<double>::quiet_NaN();
-    /*  userOut<true, PL_WARN>() << "to_double() not defined for class " << typeid(*this).name() << std::endl;
-        throw "SXNode::to_double()";*/
   }
 
   int SXNode::to_int() const {
-    throw CasadiException(string("to_int() not defined for class ") + typeid(*this).name());
+    casadi_error("to_int not defined for " + class_name());
   }
 
   bool SXNode::is_equal(const SXNode* node, int depth) const {
@@ -61,15 +58,15 @@ namespace casadi {
   }
 
   const std::string& SXNode::name() const {
-    throw CasadiException("SXNode::name failed, the node must be symbolic");
+    casadi_error("'name' not defined for " + class_name());
   }
 
   const SXElem& SXNode::dep(int i) const {
-    casadi_error("child() not defined for class " << typeid(*this).name());
+    casadi_error("'dep' not defined for " + class_name());
   }
 
   SXElem& SXNode::dep(int i) {
-    casadi_error("child() not defined for class " << typeid(*this).name());
+    casadi_error("'dep' not defined for " + class_name());
   }
 
   void SXNode::disp(std::ostream& stream, bool more) const {

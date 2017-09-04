@@ -47,6 +47,9 @@ public:
 // Destructor
 ~ConstantSX() override {}
 
+// Class name
+std::string class_name() const override {return "ConstantSX";}
+
 /** \brief  Get the value must be defined */
 double to_double() const override = 0;
 

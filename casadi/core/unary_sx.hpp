@@ -62,6 +62,9 @@ class UnarySX : public SXNode {
     /** \brief Destructor */
     ~UnarySX() override {}
 
+    // Class name
+    std::string class_name() const override {return "UnarySX";}
+
     bool is_smooth() const override { return operation_checker<SmoothChecker>(op_);}
 
     bool is_op(int op) const override { return op_==op; }

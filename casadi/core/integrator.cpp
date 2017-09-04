@@ -1016,8 +1016,7 @@ namespace casadi {
   const std::string Integrator::infix_ = "integrator";
 
   void Integrator::setStopTime(IntegratorMemory* mem, double tf) const {
-    casadi_error("Integrator::setStopTime not defined for class "
-                 << typeid(*this).name());
+    casadi_error("setStopTime not defined for class " + class_name());
   }
 
   FixedStepIntegrator::FixedStepIntegrator(const std::string& name, const Function& dae)

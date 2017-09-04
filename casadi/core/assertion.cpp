@@ -69,7 +69,7 @@ namespace casadi {
 
   int Assertion::eval(const double** arg, double** res, int* iw, double* w) const {
     if (arg[1][0]!=1) {
-      casadi_error("Assertion error: " << fail_message_);
+      casadi_error("Assertion error: " + fail_message_);
       return 1;
     }
 
