@@ -111,10 +111,20 @@ namespace casadi {
     get_options().check(opts);
 
     // Initialize the class hierarchy
-    init(opts);
+    try {
+      init(opts);
+    } catch (exception& e) {
+      casadi_error("Error calling " + class_name() + "::init for '" + name() + "':\n"
+        + string(e.what()));
+    }
 
     // Revisit class hierarchy in reverse order
-    finalize(opts);
+    try {
+      finalize(opts);
+    } catch (exception& e) {
+      casadi_error("Error calling " + class_name() + "::finalize for '" + name() + "':\n"
+        + string(e.what()));
+    }
   }
 
   Options FunctionInternal::options_
