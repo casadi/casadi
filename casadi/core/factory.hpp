@@ -200,39 +200,37 @@ namespace casadi {
       fwd_out_.push_back(ss.second);
     } else if (ss.first=="adj") {
       // Reverse mode directional derivative
-      casadi_assert_message(has_in(ss.second), "Cannot process \"" + ss.second + "\""
-                                               " (from \"" + s + "\") as input."
-                                               " Available: " + join(name_in()) + ".");
+      casadi_assert_message(has_in(ss.second),
+        "Cannot process \"" + ss.second + "\" (from \"" + s + "\") as input. "
+        "Available: " + join(name_in()) + ".");
       adj_out_.push_back(ss.second);
     } else if (ss.first=="jac") {
       jac_.push_back(ss.second);
-      casadi_assert_message(has_out(jac_.back().ex), "Cannot process \"" + jac_.back().ex + "\""
-                                                " (from \"" + s + "\") as output."
-                                                " Available: " + join(name_out()) + ".");
-      casadi_assert_message(has_in(jac_.back().arg), "Cannot process \"" + jac_.back().arg + "\""
-                                               " (from \"" << s << "\") as input."
-                                               " Available: " + join(name_in()) + ".");
+      casadi_assert_message(has_out(jac_.back().ex),
+        "Cannot process \"" + jac_.back().ex + "\" (from \"" + s + "\") as output. "
+        "Available: " + join(name_out()) + ".");
+      casadi_assert_message(has_in(jac_.back().arg),
+        "Cannot process \"" + jac_.back().arg + "\" (from \"" + s + "\") as input. "
+        "Available: " + join(name_in()) + ".");
     } else if (ss.first=="grad") {
       grad_.push_back(ss.second);
-      casadi_assert_message(has_out(grad_.back().ex), "Cannot process \"" + grad_.back().ex + "\""
-                                                " (from \"" << s << "\") as output."
-                                                " Available: " + join(name_out()) + ".");
-      casadi_assert_message(has_in(grad_.back().arg), "Cannot process \"" + grad_.back().arg + "\""
-                                               " (from \"" + s + "\") as input."
-                                               " Available: " + join(name_in()) + ".");
+      casadi_assert_message(has_out(grad_.back().ex),
+        "Cannot process \"" + grad_.back().ex + "\" (from \"" + s + "\") as output. "
+        "Available: " + join(name_out()) + ".");
+      casadi_assert_message(has_in(grad_.back().arg),
+        "Cannot process \"" + grad_.back().arg + "\" (from \"" + s + "\") as input. "
+        "Available: " + join(name_in()) + ".");
     } else if (ss.first=="hess") {
       hess_.push_back(ss.second);
-      casadi_assert_message(has_out(hess_.back().ex), "Cannot process \"" + hess_.back().ex + "\""
-                                                " (from \"" + s + "\") as output."
-                                                " Available: " + join(name_out()) + ".");
+      casadi_assert_message(has_out(hess_.back().ex),
+        "Cannot process \"" + hess_.back().ex + "\" (from \"" + s + "\") as output. "
+        "Available: " + join(name_out()) + ".");
       casadi_assert_message(has_in(hess_.back().arg1),
-                                               "Cannot process \"" + hess_.back().arg1 + "\""
-                                               " (from \"" + s + "\") as input."
-                                               " Available: " + join(name_in()) + ".");
+        "Cannot process \"" + hess_.back().arg1 + "\" (from \"" + s + "\") as input. "
+        "Available: " + join(name_in()) + ".");
       casadi_assert_message(has_in(hess_.back().arg2),
-                                               "Cannot process \"" + hess_.back().arg2 + "\""
-                                               " (from \"" + s + "\") as input."
-                                               " Available: " + join(name_in()) + ".");
+        "Cannot process \"" + hess_.back().arg2 + "\" (from \"" + s + "\") as input. "
+        "Available: " + join(name_in()) + ".");
     } else {
       // Assume attribute
       request_output(ss.second);

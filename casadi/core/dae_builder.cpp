@@ -780,7 +780,7 @@ namespace casadi {
       // If Jb depends on xb, then the state derivative does not enter linearly
       // in the ODE and we cannot solve for the state derivative
       casadi_assert_message(!depends_on(Jb, vertcat(xdotb)),
-                            "Cannot find an explicit expression for variable(s) " << xb);
+        "Cannot find an explicit expression for variable(s) " + str(xb));
 
       // Divide fb into a part which depends on vb and a part which doesn't according to
       // "fb == mul(Jb, vb) + fb_res"
@@ -1643,10 +1643,10 @@ namespace casadi {
     for (int i=0; i<f_out.size(); ++i) {
       DaeBuilderOut oind = enum_out(f_out[i]);
       casadi_assert_message(oind!=DAE_BUILDER_NUM_OUT,
-                            "DaeBuilder::add_lc: No output expression " << f_out[i]
-                            << ". Valid expressions are " << name_out());
+        "DaeBuilder::add_lc: No output expression " + f_out[i] + ". "
+        "Valid expressions are " + name_out());
       casadi_assert_message(!in_use[oind],
-                            "DaeBuilder::add_lc: Duplicate expression " << f_out[i]);
+        "DaeBuilder::add_lc: Duplicate expression " + f_out[i]);
       in_use[oind] = true;
 
       // Add linear combination of expressions
@@ -1672,7 +1672,7 @@ namespace casadi {
       DaeBuilderIn iind = enum_in(*s_in_it);
       if (iind!=DAE_BUILDER_NUM_IN) {
         casadi_assert_message(!input_used[iind],
-                              "DaeBuilder::function: Duplicate expression " << *s_in_it);
+          "DaeBuilder::function: Duplicate expression " + *s_in_it);
         input_used[iind] = true;
         ret_in[s_in_it-s_in.begin()] = vertcat(input(iind));
         continue;
@@ -1683,7 +1683,7 @@ namespace casadi {
         DaeBuilderOut oind = enum_out(s_in_it->substr(4, string::npos));
         if (oind!=DAE_BUILDER_NUM_OUT) {
           casadi_assert_message(!output_used[oind],
-                                "DaeBuilder::function: Duplicate expression " << *s_in_it);
+            "DaeBuilder::function: Duplicate expression " + *s_in_it);
           output_used[oind] = true;
           ret_in[s_in_it-s_in.begin()] = vertcat(multiplier(oind));
           continue;
@@ -1755,7 +1755,7 @@ namespace casadi {
       DaeBuilderOut oind = enum_out(s_out_noatt[i]);
       if (oind!=DAE_BUILDER_NUM_OUT) {
         casadi_assert_message(!output_used[oind],
-                              "DaeBuilder::function: Duplicate expression " << s_out_noatt[i]);
+          "DaeBuilder::function: Duplicate expression " + s_out_noatt[i]);
         output_used[oind] = true;
         ret_out[i] = vertcat(output(oind));
         assigned[i] = true;
@@ -1802,7 +1802,7 @@ namespace casadi {
 
       // Check if duplicate
       casadi_assert_message(wanted[oind][iind]==-1,
-                            "DaeBuilder::function: Duplicate Jacobian " << so);
+        "DaeBuilder::function: Duplicate Jacobian " + so);
       wanted[oind][iind] = i;
     }
 
@@ -1895,7 +1895,7 @@ namespace casadi {
 
         // Check if duplicate
         casadi_assert_message(wanted[iind1][iind2]==-1,
-                              "DaeBuilder::function: Duplicate Hessian " << so);
+          "DaeBuilder::function: Duplicate Hessian " + so);
         wanted[iind1][iind2] = i;
       }
 

@@ -303,8 +303,10 @@ namespace casadi {
     double *fdata = NV_DATA_S(fval);
     for (int k=0; k<n_; ++k) {
       try {
-        casadi_assert_message(!isnan(fdata[k]), "Nonzero " << k << " is not-a-number");
-        casadi_assert_message(!isinf(fdata[k]), "Nonzero " << k << " is infinite");
+        casadi_assert_message(!isnan(fdata[k]),
+          "Nonzero " + str(k) + " is not-a-number");
+        casadi_assert_message(!isinf(fdata[k]),
+          "Nonzero " + str(k) + " is infinite");
       } catch(exception& ex) {
         stringstream ss;
         ss << ex.what() << endl;

@@ -252,16 +252,16 @@ namespace casadi {
     } else {
       // Consistency check
       casadi_assert_message(A_.size2()==H_.size2(),
-        "Got incompatible dimensions.   min          x'Hx + G'x s.t.   LBA <= Ax <= UBA :"
-        << std::endl <<
-        "H: " << H_.dim() << " - A: " << A_.dim() << std::endl <<
-        "We need: H_.size2()==A_.size2()" << std::endl);
+        "Got incompatible dimensions.\n"
+        "min x'Hx + G'x s.t. LBA <= Ax <= UBA :\n"
+        "H: " + H_.dim() + " - A: " + A_.dim() + "\n"
+        "We need: H.size2()==A.size2()");
     }
 
     casadi_assert_message(H_.is_symmetric(),
-      "Got incompatible dimensions.   min          x'Hx + G'x" << std::endl <<
-      "H: " << H_.dim() <<
-      "We need H square & symmetric" << std::endl);
+      "Got incompatible dimensions. min x'Hx + G'x\n"
+      "H: " + H_.dim() +
+      "We need H square & symmetric");
 
     nx_ = A_.size2();
     na_ = A_.size1();
@@ -341,18 +341,16 @@ namespace casadi {
     for (int i=0; i<nx_; ++i) {
       double lb = lbx ? lbx[i] : 0., ub = ubx ? ubx[i] : 0.;
       casadi_assert_message(lb <= ub && lb!=inf && ub!=-inf,
-                            "Ill-posed problem detected: " <<
-                            "LBX[" << i << "] <= UBX[" << i << "] was violated. "
-                            << "Got LBX[" << i << "]=" << lb <<
-                            " and UBX[" << i << "] = " << ub << ".");
+        "Ill-posed problem detected: "
+        "LBX[" + str(i) + "] <= UBX[" + str(i) + "] was violated. "
+        "Got LBX[" + str(i) + "]=" + str(lb) + " and UBX[" + str(i) + "] = " + str(ub) + ".");
     }
     for (int i=0; i<na_; ++i) {
       double lb = lba ? lba[i] : 0., ub = uba ? uba[i] : 0.;
       casadi_assert_message(lb <= ub && lb!=inf && ub!=-inf,
-                            "Ill-posed problem detected: " <<
-                            "LBA[" << i << "] <= UBA[" << i << "] was violated. "
-                            << "Got LBA[" << i << "] = " << lb <<
-                            " and UBA[" << i << "] = " << ub << ".");
+        "Ill-posed problem detected: "
+        "LBA[" + str(i) + "] <= UBA[" + str(i) + "] was violated. "
+        "Got LBA[" + str(i) + "] = " + str(lb) + " and UBA[" + str(i) + "] = " + str(ub) + ".");
     }
   }
 

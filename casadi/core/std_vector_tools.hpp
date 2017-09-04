@@ -97,7 +97,7 @@ namespace casadi {
 
   // Assert that a indices are in a range
   #define casadi_assert_in_range(v, lower, upper) \
-   casadi_assert_message(in_range(v, lower, upper),\
+   casadi_assert_message(in_range(v, lower, upper), \
     "Out of bounds error. Got elements in range [" \
     + str(*std::min_element(v.begin(), v.end())) + ","\
     + str(*std::max_element(v.begin(), v.end())) + "], which is outside the range ["\
@@ -105,7 +105,7 @@ namespace casadi {
 
     // Assert that a indices are bounded
     #define casadi_assert_bounded(v, upper) \
-     casadi_assert_message(in_range(v, upper),\
+     casadi_assert_message(in_range(v, upper), \
       "Out of bounds error. Got elements in range [" \
       + str(*std::min_element(v.begin(), v.end())) + ","\
       + str(*std::max_element(v.begin(), v.end())) + "], which exceeds the upper bound "\

@@ -79,31 +79,27 @@ namespace casadi {
     const int* row = this->row();
     int nnz = this->nnz();
     casadi_assert_message(nrow >=0,
-                          "SparsityInternal: number of rows must be positive, but got "
-                          << nrow << ".");
+                          "number of rows must be positive, but got " + str(nrow) + ".");
     casadi_assert_message(ncol>=0 ,
-                          "SparsityInternal: number of columns must be positive, but got "
-                          << ncol << ".");
+                          "number of columns must be positive, but got " + str(ncol) + ".");
     if (complete) {
 
       for (int k=0; k<ncol; k++) {
         casadi_assert_message(colind[k+1]>=colind[k],
-                              "SparsityInternal:Compressed Column Storage is not sane. "
+                              "Compressed Column Storage is not sane. "
                               "colind must be monotone.");
       }
 
       casadi_assert_message(colind[0]==0,
-                            "SparsityInternal:Compressed Column Storage is not sane. "
+                            "Compressed Column Storage is not sane. "
                             "First element of colind must be zero.");
 
       for (int k=0; k<nnz; k++) {
         if (row[k]>=nrow || row[k] < 0) {
-          std::stringstream s;
-          s << "SparsityInternal:Compressed Column Storage is not sane. The following must hold:"
-            << std::endl;
-          s << "  0 <= row[i] < nrow for each i, but got   row[i] = " << row[k]
-            << "   and   nrow = "  << nrow << std::endl;
-          casadi_error(s.str());
+          casadi_error("Compressed Column Storage is not sane.\n"
+            "The following must hold: 0 <= row[i] < nrow for each i, "
+            "but got row[" + str(k) + "] = " + str(row[k])
+            + " and nrow = " + str(nrow));
         }
       }
     }
@@ -2315,10 +2311,10 @@ namespace casadi {
     if (ind1 || has_negative(rr)) {
       std::vector<int> rr_mod = rr;
       for (vector<int>::iterator i=rr_mod.begin(); i!=rr_mod.end(); ++i) {
-        casadi_assert_message(!(ind1 && (*i)<=0), "Matlab is 1-based, but requested index " <<
-                                                (*i) <<  ". Note that negative slices are" <<
-                                                " disabled in the Matlab interface. " <<
-                                                "Possibly you may want to use 'end'.");
+        casadi_assert_message(!(ind1 && (*i)<=0),
+          "Matlab is 1-based, but requested index " + str(*i) +  ". "
+          "Note that negative slices are disabled in the Matlab interface. "
+          "Possibly you may want to use 'end'.");
         if (ind1) (*i)--;
         if (*i<0) *i += numel();
       }
@@ -2661,8 +2657,8 @@ namespace casadi {
 
   Sparsity SparsityInternal::_appendVector(const SparsityInternal& sp) const {
     casadi_assert_message(size2() == 1 && sp.size2() == 1,
-      "SparsityInternal::_appendVector(sp): Both arguments must be vectors but got "
-       << size2() << " columns for lhs, and " << sp.size2() << " columns for rhs.");
+      "_appendVector(sp): Both arguments must be vectors but got "
+       + str(size2()) + " columns for lhs, and " + str(sp.size2()) + " columns for rhs.");
 
     // Get current number of non-zeros
     int sz = nnz();
@@ -2682,8 +2678,8 @@ namespace casadi {
 
   Sparsity SparsityInternal::_appendColumns(const SparsityInternal& sp) const {
     casadi_assert_message(size1()== sp.size1(),
-      "SparsityInternal::_appendColumns(sp): row sizes must match but got " << size1()
-                          << " for lhs, and " << sp.size1() << " for rhs.");
+      "_appendColumns(sp): row sizes must match but got " + str(size1())
+                          + " for lhs, and " + str(sp.size1()) + " for rhs.");
 
     // Append rows
     vector<int> new_row = get_row();
@@ -2786,10 +2782,10 @@ namespace casadi {
     const int* row = this->row();
 
     // Check consistency
-    casadi_assert_message(rr>=0 && rr<size1(), "Row index " << rr
-                          << " out of bounds [0, " << size1() << ")");
-    casadi_assert_message(cc>=0 && cc<size2(), "Column index " << cc
-                          << " out of bounds [0, " << size2() << ")");
+    casadi_assert_message(rr>=0 && rr<size1(), "Row index " + str(rr)
+                          + " out of bounds [0, " + str(size1()) + ")");
+    casadi_assert_message(cc>=0 && cc<size2(), "Column index " + str(cc)
+                          + " out of bounds [0, " + str(size2()) + ")");
 
     // Quick return if matrix is dense
     if (is_dense()) return rr+cc*size1();
@@ -2818,8 +2814,8 @@ namespace casadi {
 
     casadi_assert_message(numel() == nrow*ncol,
                           "reshape: number of elements must remain the same. Old shape is "
-                          << dim() << ". New shape is " << nrow << "x" << ncol
-                          << "=" << nrow*ncol << ".");
+                          + dim() + ". New shape is " + str(nrow) + "x" + str(ncol)
+                          + "=" + str(nrow*ncol) + ".");
     std::vector<int> ret_col(nnz());
     std::vector<int> ret_row(nnz());
     const int* colind = this->colind();

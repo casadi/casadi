@@ -228,7 +228,7 @@ namespace casadi {
       llvm::EngineBuilder(std::move(module)).setEngineKind(llvm::EngineKind::JIT)
       .setErrorStr(&ErrStr).create();
     if (!executionEngine_) {
-      casadi_error("Could not create ExecutionEngine: " << ErrStr);
+      casadi_error("Could not create ExecutionEngine: " + ErrStr);
     }
 
     executionEngine_->finalizeObject();

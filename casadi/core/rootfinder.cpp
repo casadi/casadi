@@ -122,10 +122,8 @@ namespace casadi {
                           "Unknown must be a dense vector");
     n_ = oracle_.nnz_out(iout_);
     casadi_assert_message(n_ == oracle_.nnz_in(iin_),
-                          "Dimension mismatch. Input size is "
-                          << oracle_.nnz_in(iin_)
-                          << ", while output size is "
-                          << oracle_.nnz_out(iout_));
+      "Dimension mismatch. Input size is " + str(oracle_.nnz_in(iin_)) + ", "
+      "while output size is " + str(oracle_.nnz_out(iout_)));
 
     // Call the base class initializer
     OracleFunction::init(opts);
@@ -138,15 +136,15 @@ namespace casadi {
     // Check for structural singularity in the Jacobian
     casadi_assert_message(!sp_jac_.is_singular(),
       "Rootfinder::init: singularity - the jacobian is structurally rank-deficient. "
-      "sprank(J)=" << sprank(sp_jac_) << " (instead of "<< sp_jac_.size1() << ")");
+      "sprank(J)=" + str(sprank(sp_jac_)) + " (instead of " + str(sp_jac_.size1()) + ")");
 
     // Get the linear solver creator function
     linsol_ = Linsol("linsol", linear_solver, linear_solver_options);
 
     // Constraints
     casadi_assert_message(u_c_.size()==n_ || u_c_.empty(),
-                          "Constraint vector if supplied, must be of length n, but got "
-                          << u_c_.size() << " and n = " << n_);
+      "Constraint vector if supplied, must be of length n, but got "
+      + str(u_c_.size()) + " and n = " + str(n_));
 
     // Allocate sufficiently large work vectors
     alloc(oracle_);

@@ -1067,17 +1067,17 @@ namespace casadi {
 
   void Function::assert_size_in(int i, int nrow, int ncol) const {
     casadi_assert_message(size1_in(i)==nrow && size2_in(i)==ncol,
-                          "Incorrect shape for " << *this << " input " << i << " \""
-                          << name_in(i) << "\". Expected " << nrow << "-by-" << ncol
-                          << " but got " << size1_in(i) <<  "-by-" << size2_in(i));
+      "Incorrect shape for " + str(*this) + " input " + str(i) + " \""
+      + name_in(i) + "\". Expected " + str(nrow) + "-by-" + str(ncol)
+      + " but got " + str(size1_in(i)) +  "-by-" + str(size2_in(i)));
 
   }
 
   void Function::assert_size_out(int i, int nrow, int ncol) const {
     casadi_assert_message(size1_out(i)==nrow && size2_out(i)==ncol,
-                          "Incorrect shape for " << *this << " output " << i << " \""
-                          << name_out(i) << "\". Expected " << nrow << "-by-" << ncol
-                          << " but got " << size1_out(i) <<  "-by-" << size2_out(i));
+      "Incorrect shape for " + str(*this) + " output " + str(i) + " \""
+      + name_out(i) + "\". Expected " + str(nrow) + "-by-" + str(ncol)
+      + " but got " + str(size1_out(i)) +  "-by-" + str(size2_out(i)));
   }
 
   Function Function::

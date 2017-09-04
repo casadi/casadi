@@ -32,8 +32,7 @@ namespace casadi {
   Assertion::Assertion(const MX& x, const MX& y, const std::string & fail_message)
       : fail_message_(fail_message) {
     casadi_assert_message(y.is_scalar(),
-                          "Assertion:: assertion expression y must be scalar, but got "
-                          << y.dim());
+      "Assertion:: assertion expression y must be scalar, but got " + y.dim());
     set_dep(x, y);
     set_sparsity(x.sparsity());
   }

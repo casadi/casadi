@@ -130,7 +130,7 @@ namespace casadi {
     }
 
     // Get expression for this
-    string s = disp(arg[0], arg[1]);
+    string s = print(arg[0], arg[1]);
 
     // Decide what to do with the expression
     if (ind==0) {

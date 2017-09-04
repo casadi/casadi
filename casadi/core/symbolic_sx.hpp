@@ -56,7 +56,7 @@ public:
   std::string class_name() const override {return "SymbolicSX";}
 
   /** \brief  Print expression */
-  std::string disp(const std::string& arg1, const std::string& arg2) const override {
+  std::string print(const std::string& arg1, const std::string& arg2) const override {
     return name_;
   }
 };

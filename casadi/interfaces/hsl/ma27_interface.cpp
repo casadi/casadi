@@ -137,8 +137,8 @@ namespace casadi {
     int ierror = info[1];  // Error flag
     //int nrlnec = info[4];  // recommended value for la
     int nirnec = info[5];  // recommended value for liw
-    casadi_assert_message(iflag==0, "ma27ad_ returns iflag = " <<
-                          iflag << " with ierror = " << ierror);
+    casadi_assert_message(iflag==0,
+      "ma27ad_ returns iflag = " + str(iflag) + " with ierror = " + str(ierror));
 
     // Allocate more memory?
     double la_init_factor = 20.0; // This could be an option.
@@ -163,8 +163,8 @@ namespace casadi {
       //DJ: I think this is more severe. Can this actually happen?
       m->rank = -1;
     } else if (iflag != 0) {
-      casadi_error("ma2bd_ returns iflag = " <<
-                   iflag << " with ierror = " << ierror);
+      casadi_error("ma2bd_ returns iflag = " + str(iflag)
+        + " with ierror = " + str(ierror));
     } else {
       m->rank = N;
     }

@@ -224,7 +224,7 @@ namespace casadi {
                                  static_cast<CPXLONG>(static_cast<int>(op.second)));
         break;
         default:
-          casadi_error("Unknown CPLEX parameter type (" << paramtype << ") for " + op.first);
+          casadi_error("Unknown CPLEX parameter type (" + str(paramtype) + ") for " + op.first);
       }
       // Error handling
       if (status) {

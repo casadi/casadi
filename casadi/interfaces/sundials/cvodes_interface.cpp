@@ -97,7 +97,7 @@ namespace casadi {
 
     // Algebraic variables not supported
     casadi_assert_message(nz_==0 && nrz_==0,
-                          "CVODES does not support algebraic variables");
+      "CVODES does not support algebraic variables");
 
     if (linear_multistep_method=="adams") {
       lmm_ = CV_ADAMS;
@@ -254,13 +254,12 @@ namespace casadi {
     auto m = to_mem(mem);
 
     casadi_assert_message(t>=grid_.front(),
-                          "CvodesInterface::integrate(" << t << "): "
-                          "Cannot integrate to a time earlier than t0 ("
-                          << grid_.front() << ")");
-    casadi_assert_message(t<=grid_.back() || !stop_at_end_, "CvodesInterface::integrate("
-                          << t << "):"
-                          " Cannot integrate past a time later than tf (" << grid_.back() << ") "
-                          "unless stop_at_end is set to False.");
+      "CvodesInterface::integrate(" + str(t) + "): "
+      "Cannot integrate to a time earlier than t0 (" + str(grid_.front()) + ")");
+    casadi_assert_message(t<=grid_.back() || !stop_at_end_,
+      "CvodesInterface::integrate(" + str(t) + "): "
+      "Cannot integrate past a time later than tf (" + str(grid_.back()) + ") "
+      "unless stop_at_end is set to False.");
 
     // Integrate, unless already at desired time
     const double ttol = 1e-9;

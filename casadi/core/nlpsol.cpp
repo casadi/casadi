@@ -294,21 +294,20 @@ namespace casadi {
       // Consistency checks
       casadi_assert(!fcallback_.is_null());
       casadi_assert_message(fcallback_.n_out()==1 && fcallback_.numel_out()==1,
-                            "Callback function must return a scalar.");
+        "Callback function must return a scalar.");
       casadi_assert_message(fcallback_.n_in()==n_out(),
-                            "Callback input signature must match the NLP solver output signature");
+        "Callback input signature must match the NLP solver output signature");
       for (int i=0; i<n_out(); ++i) {
         casadi_assert_message(fcallback_.size_in(i)==size_out(i),
-                              "Callback function input size mismatch. " <<
-                              "For argument '" << nlpsol_out(i) << "', callback has shape "
-                              << fcallback_.sparsity_in(i).dim() << " while NLP has " <<
-                              sparsity_out(i).dim() << ".");
+          "Callback function input size mismatch. For argument '" + nlpsol_out(i) + "', "
+          "callback has shape " + fcallback_.sparsity_in(i).dim() + " while NLP has " +
+          sparsity_out(i).dim() + ".");
         // TODO(@jaeandersson): Wrap fcallback_ in a function with correct sparsity
         casadi_assert_message(fcallback_.sparsity_in(i)==sparsity_out(i),
-                              "Callback function input size mismatch. " <<
-                              "For argument " << nlpsol_out(i) << "', callback has shape "
-                              << fcallback_.sparsity_in(i).dim() << " while NLP has " <<
-                              sparsity_out(i).dim() << ".");
+          "Callback function input size mismatch. "
+          "For argument " + nlpsol_out(i) + "', callback has shape " +
+          fcallback_.sparsity_in(i).dim() + " while NLP has " +
+          sparsity_out(i).dim() + ".");
       }
 
       // Allocate temporary memory
@@ -343,13 +342,12 @@ namespace casadi {
       double ub = m->ubx ? m->ubx[i] : 0;
       double x0 = m->x0 ? m->x0[i] : 0;
       casadi_assert_message(lb <= ub && lb!=inf && ub!=-inf,
-                            "Ill-posed problem detected: " <<
-                            "LBX[" << i << "] <= UBX[" << i << "] was violated. "
-                            << "Got LBX[" << i << "]=" << lb <<
-                            " and UBX[" << i << "] = " << ub << ".");
+          "Ill-posed problem detected: "
+          "LBX[" + str(i) + "] <= UBX[" + str(i) + "] was violated. "
+          "Got LBX[" + str(i) + "]=" + str(lb) + " and UBX[" + str(i) + "] = " + str(ub) + ".");
       if (warn_initial_bounds_ && (x0>ub || x0<lb)) {
         casadi_warning("Nlpsol: The initial guess does not satisfy LBX and UBX. "
-                       "Option 'warn_initial_bounds' controls this warning.");
+          "Option 'warn_initial_bounds' controls this warning.");
         break;
       }
       if (lb==ub) n_eq++;
@@ -360,18 +358,17 @@ namespace casadi {
       double lb = m->lbg ? m->lbg[i] : 0;
       double ub = m->ubg ? m->ubg[i] : 0;
       casadi_assert_message(lb <= ub && lb!=inf && ub!=-inf,
-                            "Ill-posed problem detected: " <<
-                            "LBG[" << i << "] <= UBG[" << i << "] was violated. "
-                            << "Got LBG[" << i << "] = " << lb <<
-                            " and UBG[" << i << "] = " << ub << ".");
+        "Ill-posed problem detected: "
+        "LBG[" + str(i) + "] <= UBG[" + str(i) + "] was violated. "
+        "Got LBG[" + str(i) + "] = " + str(lb) + " and UBG[" + str(i) + "] = " + str(ub) + ".");
       if (lb==ub) n_eq++;
     }
 
     // Make sure enough degrees of freedom
     using casadi::str; // Workaround, MingGW bug, cf. CasADi issue #890
     if (n_eq> nx_) {
-      casadi_warning("NLP is overconstrained: There are " + str(n_eq)
-                         + " equality constraints but only " + str(nx_) + " variables.");
+      casadi_warning("NLP is overconstrained: There are " + str(n_eq) +
+      " equality constraints but only " + str(nx_) + " variables.");
     }
   }
 

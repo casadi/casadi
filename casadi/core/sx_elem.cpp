@@ -505,7 +505,7 @@ namespace casadi {
   }
 
   SXElem SXElem::dep(int ch) const {
-    casadi_assert(ch==0 || ch==1;)
+    casadi_assert(ch==0 || ch==1)
     return node->dep(ch);
   }
 

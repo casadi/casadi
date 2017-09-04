@@ -108,26 +108,11 @@ inline std::string trim_path(const std::string& full_path) {
 
 // Throw an exception with information about source code location
 #define casadi_error(msg) \
-  throw casadi::CasadiException((CASADI_WHERE + ": ") + msg);
+  throw casadi::CasadiException(CASADI_WHERE + ": " + std::string(msg));
 
-// This assertion checks for illegal user inputs TODO(@jaeandersson) Refactor #890
+// This assertion checks for illegal user inputs
 #define casadi_assert_message(x, msg) \
-{ \
-  bool is_ok; \
-  try { \
-    is_ok = x; \
-  } catch(std::exception& ex) { \
-      throw casadi::CasadiException(\
-        std::string("Assertion \"" CASADI_ASSERT_STR(x) "\" at "\
-        + CASADI_WHERE + " raised:\n")+ex.what()); \
-  } \
- if (!is_ok) { \
-     std::stringstream ss_internal_;\
-     ss_internal_ << "Assertion \"" CASADI_ASSERT_STR(x) "\" at "\
-     + CASADI_WHERE + " failed: " << msg;\
-     throw casadi::CasadiException(ss_internal_.str());\
- }\
-} \
+  if (!(x)) casadi_error("Assertion \"" CASADI_ASSERT_STR(x) "\" failed:\n" + std::string(msg));
 
 // This assertion if for errors caused by bugs in CasADi, use it instead of C:s assert(),
 // but never in destructors
@@ -139,49 +124,19 @@ inline std::string trim_path(const std::string& full_path) {
     " to obtain gdb stacktrace in python.")
 #endif
 
-// This is for warnings to be issued when casadi is not in release mode and an assertion fails
-#define casadi_assert_warning(x, msg) \
-  if ((x)==false) { \
-    casadi::userOut<true, casadi::PL_WARN>() \
-      << "CasADi warning at " + CASADI_WHERE + ": Assertion \"" CASADI_ASSERT_STR(x) "\" failed: "\
-      << msg << "\n";\
-  }
-
-// Formatted message
-#define casadi_assert_message1(x, msg, ...) \
-{ \
-  bool is_ok; \
-  try { \
-    is_ok = x; \
-  } catch(std::exception& ex) { \
-      throw casadi::CasadiException(std::string("Assertion \"" \
-        CASADI_ASSERT_STR(x) "\" at " + CASADI_WHERE + " raised:\n")+ex.what()); \
-  } \
- if (!is_ok) { \
-   std::string m = "Assertion \"" CASADI_ASSERT_STR(x) "\" at " + CASADI_WHERE + " failed: %s";\
-   int sz = snprintf(0, 0, msg, __VA_ARGS__);\
-   char* buf = new char[sz+1];\
-   (void)snprintf(buf, sz+1, msg, __VA_ARGS__);\
-   m += buf;\
-   delete[] buf;\
-   throw casadi::CasadiException(m); \
- }\
-}
-
 // Issue a warning, including location in the source code
 #define casadi_warning(msg) \
   casadi::userOut<true, casadi::PL_WARN>() \
     << "CasADi warning at " << CASADI_WHERE << ": " << msg << "\n";
 
+// Issue a warning if an assertion fails
+#define casadi_assert_warning(x, msg) \
+  if (!(x)) casadi_warning("Assertion \"" CASADI_ASSERT_STR(x) "\" failed.");
+
 // Issue a message, including location in the source code
 #define casadi_message(msg) \
   casadi::userOut() \
     << "CasADi message at " << CASADI_WHERE << ": " << msg << "\n";
-
-// http://stackoverflow.com/questions/303562/c-format-macro-inline-ostringstream
-#define STRING(ITEMS) \
-  ((dynamic_cast<std::ostringstream &>(std::ostringstream() \
-   . seekp(0, std::ios_base::cur) << ITEMS)) . str())
 
 } // namespace casadi
 

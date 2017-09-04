@@ -349,7 +349,7 @@ namespace casadi {
     // Check if the solver name is in use
     typename std::map<std::string, Plugin>::iterator it=Derived::solvers_.find(plugin.name);
     casadi_assert_message(it==Derived::solvers_.end(),
-                          "Solver " << plugin.name << " is already in use");
+      "Solver " + str(plugin.name) + " is already in use");
 
     // Add to list of solvers
     Derived::solvers_[plugin.name] = plugin;

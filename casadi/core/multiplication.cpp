@@ -35,11 +35,11 @@ using namespace std;
 namespace casadi {
 
   Multiplication::Multiplication(const MX& z, const MX& x, const MX& y) {
-    casadi_assert_message(
-      x.size2() == y.size1() && x.size1() == z.size1() && y.size2() == z.size2(),
+    casadi_assert_message(x.size2() == y.size1() && x.size1() == z.size1()
+      && y.size2() == z.size2(),
       "Multiplication::Multiplication: dimension mismatch. Attempting to multiply "
-      << x.dim() << " with " << y.dim()
-      << " and add the result to " << z.dim());
+      + x.dim() + " with " + y.dim()
+      + " and add the result to " + z.dim());
 
     set_dep(z, x, y);
     set_sparsity(z.sparsity());

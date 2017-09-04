@@ -597,7 +597,7 @@ namespace casadi {
   std::vector< MatType >
   SparsityInterface<MatType>::diagsplit(const MatType& x, const std::vector<int>& output_offset) {
     casadi_assert_message(x.is_square(), "diagsplit(x,incr)::input must be square but got "
-                          << x.dim()  << ".");
+                          + x.dim()  + ".");
     return MatType::diagsplit(x, output_offset, output_offset);
   }
 
@@ -606,7 +606,7 @@ namespace casadi {
   SparsityInterface<MatType>::diagsplit(const MatType& x, int incr) {
     casadi_assert(incr>=1);
     casadi_assert_message(x.is_square(), "diagsplit(x,incr)::input must be square but got "
-                          << x.dim()  << ".");
+                          + x.dim()  + ".");
     std::vector<int> offset2 = range(0, x.size2(), incr);
     offset2.push_back(x.size2());
     return MatType::diagsplit(x, offset2);

@@ -68,7 +68,7 @@ bool is_equal(const SXNode* node, int depth) const override {
 protected:
 
 /** \brief  Print expression */
-std::string disp(const std::string& arg1, const std::string& arg2) const override {
+std::string print(const std::string& arg1, const std::string& arg2) const override {
    std::stringstream ss;
    ss << to_double();
    return ss.str();

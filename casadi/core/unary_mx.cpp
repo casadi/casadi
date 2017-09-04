@@ -44,7 +44,7 @@ namespace casadi {
   }
 
   std::string UnaryMX::disp(const std::vector<std::string>& arg) const {
-    return casadi_math<double>::disp(op_, arg.at(0));
+    return casadi_math<double>::print(op_, arg.at(0));
   }
 
   int UnaryMX::eval(const double** arg, double** res, int* iw, double* w) const {
@@ -119,7 +119,7 @@ namespace casadi {
     }
 
     // Output the operation
-    g << r << " = " << casadi_math<double>::disp(op_, " " + x + " ") << ";\n";
+    g << r << " = " << casadi_math<double>::print(op_, " " + x + " ") << ";\n";
   }
 
   MX UnaryMX::get_unary(int op) const {

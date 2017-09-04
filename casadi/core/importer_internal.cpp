@@ -217,12 +217,14 @@ namespace casadi {
 #ifdef WITH_DL
 #ifdef _WIN32
     handle_ = LoadLibrary(TEXT(name_.c_str()));
-    casadi_assert_message(handle_!=0, "CommonExternal: Cannot open \""
-                          << name_ << "\". Error code (WIN32): "<< GetLastError());
+    casadi_assert_message(handle_!=0,
+      "CommonExternal: Cannot open \"" + name_ + "\". "
+      "Error code (WIN32): " + str(GetLastError()));
 #else // _WIN32
     handle_ = dlopen(name_.c_str(), RTLD_LAZY);
-    casadi_assert_message(handle_!=0, "CommonExternal: Cannot open \""
-                          << name_ << "\". Error code: "<< dlerror());
+    casadi_assert_message(handle_!=0,
+      "CommonExternal: Cannot open \"" + name_ + "\". "
+      "Error code: " + str(dlerror()));
     // reset error
     dlerror();
 #endif // _WIN32

@@ -208,8 +208,9 @@ namespace casadi {
 
     // Load shared library
     handle_ = dlopen(bin_name_.c_str(), RTLD_LAZY);
-    casadi_assert_message(handle_!=0, "CommonExternal: Cannot open function: "
-                          << bin_name_ << ". error code: "<< dlerror());
+    casadi_assert_message(handle_!=0,
+      "CommonExternal: Cannot open function: " + bin_name_ + ". error code: " +
+      str(dlerror()));
     // reset error
     dlerror();
   }

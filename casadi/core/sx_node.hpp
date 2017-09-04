@@ -110,7 +110,7 @@ namespace casadi {
                              std::vector<std::string>& intermed) const;
 
     /** \brief  Print expression */
-    virtual std::string disp(const std::string& arg1, const std::string& arg2) const = 0;
+    virtual std::string print(const std::string& arg1, const std::string& arg2) const = 0;
 
     // Check if marked (i.e. temporary is negative)
     bool marked() const;

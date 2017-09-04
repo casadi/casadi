@@ -401,12 +401,12 @@ namespace casadi {
     // Get reference to transposed first argument
     MX x = shared_from_this<MX>();
 
-    casadi_assert_message(y.size2()==z.size2(), "Dimension error. Got y=" << y.size2()
-                          << " and z=" << z.dim() << ".");
-    casadi_assert_message(x.size1()==z.size1(), "Dimension error. Got x="
-                          << x.dim() << " and z=" << z.dim() << ".");
-    casadi_assert_message(y.size1()==x.size2(), "Dimension error. Got y=" << y.size1()
-                          << " and x" << x.dim() << ".");
+    casadi_assert_message(y.size2()==z.size2(),
+      "Dimension error. Got y=" + str(y.size2()) + " and z=" + z.dim() + ".");
+    casadi_assert_message(x.size1()==z.size1(),
+      "Dimension error. Got x=" + x.dim() + " and z=" + z.dim() + ".");
+    casadi_assert_message(y.size1()==x.size2(),
+      "Dimension error. Got y=" + str(y.size1()) + " and x" + x.dim() + ".");
     if (x.is_dense() && y.is_dense() && z.is_dense()) {
       return MX::create(new DenseMultiplication(z, x, y));
     } else {
@@ -506,8 +506,7 @@ namespace casadi {
   MX MXNode::get_binary(int op, const MX& y) const {
     // Make sure that dimensions match
     casadi_assert_message(sparsity().is_scalar() || y.is_scalar() || sparsity().size()==y.size(),
-                          "Dimension mismatch." << "lhs is " << sparsity().dim()
-                          << ", while rhs is " << y.dim());
+      "Dimension mismatch. lhs is " + sparsity().dim() + ", while rhs is " + y.dim());
 
     // Create binary node
     if (sparsity().is_scalar(false)) {
@@ -718,8 +717,8 @@ namespace casadi {
       size2()==y.size2() && size1()==y.size1(),
       "MXNode::dot: Dimension mismatch. dot requires its "
       "two arguments to have equal shapes, but got ("
-      << size2() << ", " << size1() << ") and ("
-      << y.size2() << ", " << y.size1() << ").");
+      + str(size2()) + ", " + str(size1()) + ") and ("
+      + str(y.size2()) + ", " + str(y.size1()) + ").");
     if (sparsity()==y.sparsity()) {
       if (sparsity().nnz()==0) {
         return 0;

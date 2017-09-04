@@ -409,9 +409,9 @@ namespace casadi {
     }
 
     if (ierr>0) {
-      casadi_warning("Unable to solve problem: " << errFlag(ierr));
+      casadi_warning("Unable to solve problem: " + str(errFlag(ierr)));
     } else if (ierr<0) {
-      casadi_error("Fatal error: " << errFlag(ierr));
+      casadi_error("Fatal error: " + str(errFlag(ierr)));
     }
 
     // Retrieve eliminated decision variables

@@ -42,7 +42,7 @@ namespace casadi {
   }
 
   XmlNode XmlFileInternal::parse(const std::string& filename) {
-    casadi_error("parse not defined for " + class_name()); 
+    casadi_error("parse not defined for " + class_name());
     return XmlNode();
   }
 

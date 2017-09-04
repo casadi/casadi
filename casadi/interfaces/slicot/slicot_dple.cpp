@@ -222,11 +222,10 @@ namespace casadi {
         double modulus = sqrt(m->eig_real[i]*m->eig_real[i]+m->eig_imag[i]*m->eig_imag[i]);
         casadi_assert_message(modulus+eps_unstable_ <= 1,
           "SlicotDple: system is unstable."
-          "Found an eigenvalue " << m->eig_real[i] << " + " <<
-          m->eig_imag[i] << "j, with modulus " << modulus <<
-          " (corresponding eps= " << 1-modulus << ")." <<
-          std::endl << "Use options and 'error_unstable'"
-          "and 'eps_unstable' to influence this message.");
+          "Found an eigenvalue " + str(m->eig_real[i]) + " + " +
+          str(m->eig_imag[i]) + "j, with modulus " + str(modulus) +
+          " (corresponding eps= " + str(1-modulus) + ").\n" +
+          "Use options and 'error_unstable' and 'eps_unstable' to influence this message.");
       }
     }
 
@@ -414,11 +413,11 @@ namespace casadi {
     int ret;
 
     ret = slicot_mb03vd(n, K, 1, n, z, n, n, dwork+mem_base, n-1, dwork);
-    casadi_assert_message(ret==0, "mb03vd return code "<< ret);
+    casadi_assert_message(ret==0, "mb03vd return code " + str(ret));
     std::copy(z, z+n*n*K, t);
 
     ret = slicot_mb03vy(n, K, 1, n, z, n, n, dwork+mem_base, n-1, dwork, mem_needed);
-    casadi_assert_message(ret==0, "mb03vy return code "<< ret);
+    casadi_assert_message(ret==0, "mb03vy return code " + str(ret));
     // Set numerical zeros to zero
     if (num_zero>0) {
       for (int k = 0;k<n*n*K;++k) {
@@ -429,7 +428,7 @@ namespace casadi {
 
     ret = slicot_mb03wd('S', 'V', n, K, 1, n, 1, n, t, n, n, z, n, n,
                   eig_real, eig_imag, dwork, mem_needed);
-    casadi_assert_message(ret==0, "mb03wd return code "<< ret);
+    casadi_assert_message(ret==0, "mb03wd return code " + str(ret));
   }
 
 } // namespace casadi
