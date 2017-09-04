@@ -33,7 +33,7 @@ namespace casadi {
     casadi_assert_message((OBJ)!=0, "Callback object has been deleted"); \
     return (OBJ)->FCN(__VA_ARGS__);\
   } catch (std::exception& ex) { \
-    casadi_error("Error calling \"" CASADI_ASSERT_STR(FCN) "\" for object " \
+    casadi_error("Error calling \"" CASADI_STR(FCN) "\" for object " \
                  + name_ + ":\n" + std::string(ex.what())); \
   }
 

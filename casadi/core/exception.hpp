@@ -100,11 +100,11 @@ inline std::string trim_path(const std::string& full_path) {
 }
 
 // Convert to string
-#define CASADI_ASSERT_STR1(x) #x
-#define CASADI_ASSERT_STR(x) CASADI_ASSERT_STR1(x)
+#define CASADI_STR1(x) #x
+#define CASADI_STR(x) CASADI_STR1(x)
 
 // String denoting where the assertion is situated
-#define CASADI_WHERE casadi::trim_path(__FILE__ ":" CASADI_ASSERT_STR(__LINE__))
+#define CASADI_WHERE casadi::trim_path(__FILE__ ":" CASADI_STR(__LINE__))
 
 // Throw an exception with information about source code location
 #define casadi_error(msg) \
@@ -112,7 +112,7 @@ inline std::string trim_path(const std::string& full_path) {
 
 // This assertion checks for illegal user inputs
 #define casadi_assert_message(x, msg) \
-  if (!(x)) casadi_error("Assertion \"" CASADI_ASSERT_STR(x) "\" failed:\n" + std::string(msg));
+  if (!(x)) casadi_error("Assertion \"" CASADI_STR(x) "\" failed:\n" + std::string(msg));
 
 // This assertion if for errors caused by bugs in CasADi, use it instead of C:s assert(),
 // but never in destructors
@@ -131,7 +131,7 @@ inline std::string trim_path(const std::string& full_path) {
 
 // Issue a warning if an assertion fails
 #define casadi_assert_warning(x, msg) \
-  if (!(x)) casadi_warning("Assertion \"" CASADI_ASSERT_STR(x) "\" failed.");
+  if (!(x)) casadi_warning("Assertion \"" CASADI_STR(x) "\" failed.");
 
 // Issue a message, including location in the source code
 #define casadi_message(msg) \

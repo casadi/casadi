@@ -42,6 +42,11 @@
 using namespace std;
 
 namespace casadi {
+  // Throw informative error message
+  #define THROW_ERROR(FNAME, WHAT) \
+  throw CasadiException("Error in Function::" FNAME " for '" + this->name() + "' "\
+    "[" + this->class_name() + "] at " + CASADI_WHERE + ":\n"\
+    + string(WHAT));
 
   Function::Function() {
   }
@@ -665,7 +670,11 @@ namespace casadi {
   }
 
   Function Function::jacobian() const {
-    return (*this)->jacobian();
+    try {
+      return (*this)->jacobian();
+    } catch (exception& e) {
+      THROW_ERROR("jacobian", e.what());
+    }
   }
 
   bool Function::test_cast(const SharedObjectInternal* ptr) {
@@ -690,35 +699,67 @@ namespace casadi {
   }
 
   int Function::index_in(const string &name) const {
-    return (*this)->index_in(name);
+    try {
+      return (*this)->index_in(name);
+    } catch (exception& e) {
+      THROW_ERROR("index_in", e.what());
+    }
   }
 
   int Function::index_out(const string &name) const {
-    return (*this)->index_out(name);
+    try {
+      return (*this)->index_out(name);
+    } catch (exception& e) {
+      THROW_ERROR("index_out", e.what());
+    }
   }
 
   string Function::name_in(int ind) const {
-    return (*this)->name_in(ind);
+    try {
+      return (*this)->name_in(ind);
+    } catch (exception& e) {
+      THROW_ERROR("name_in", e.what());
+    }
   }
 
   string Function::name_out(int ind) const {
-    return (*this)->name_out(ind);
+    try {
+      return (*this)->name_out(ind);
+    } catch (exception& e) {
+      THROW_ERROR("name_out", e.what());
+    }
   }
 
   const Sparsity& Function::sparsity_in(int ind) const {
-    return (*this)->sparsity_in(ind);
+    try {
+      return (*this)->sparsity_in(ind);
+    } catch (exception& e) {
+      THROW_ERROR("sparsity_in", e.what());
+    }
   }
 
   const Sparsity& Function::sparsity_in(const string &iname) const {
-    return (*this)->sparsity_in(iname);
+    try {
+      return (*this)->sparsity_in(iname);
+    } catch (exception& e) {
+      THROW_ERROR("sparsity_in", e.what());
+    }
   }
 
   const Sparsity& Function::sparsity_out(int ind) const {
-    return (*this)->sparsity_out(ind);
+    try {
+      return (*this)->sparsity_out(ind);
+    } catch (exception& e) {
+      THROW_ERROR("sparsity_out", e.what());
+    }
   }
 
   const Sparsity& Function::sparsity_out(const string &iname) const {
-    return (*this)->sparsity_out(iname);
+    try {
+      return (*this)->sparsity_out(iname);
+    } catch (exception& e) {
+      THROW_ERROR("sparsity_out", e.what());
+    }
   }
 
   void Function::sz_work(size_t& sz_arg, size_t& sz_res, size_t& sz_iw, size_t& sz_w) const {

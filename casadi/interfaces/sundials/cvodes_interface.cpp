@@ -27,7 +27,7 @@
 #include "casadi/core/std_vector_tools.hpp"
 
 #define THROWING(fcn, ...) \
-cvodes_error(CASADI_ASSERT_STR(fcn), fcn(__VA_ARGS__))
+cvodes_error(CASADI_STR(fcn), fcn(__VA_ARGS__))
 
 using namespace std;
 namespace casadi {
