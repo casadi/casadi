@@ -699,11 +699,17 @@ namespace casadi {
     /** \brief Number of nodes in the algorithm */
     int n_nodes() const;
 
+    ///@{
+    /** \brief  Is the class able to propagate seeds through the algorithm? */
+    bool has_spfwd() const;
+    bool has_sprev() const;
+    ///@}
+
     /// \cond INTERNAL
-    /** \brief Is the class able to propagate seeds through the algorithm?
-     *
-     * (for usage, see the example propagating_sparsity.cpp) */
-    bool spCanEvaluate(bool fwd);
+#ifdef WITH_DEPRECATED_FEATURES
+    /** \brief [DEPRECATED] Use has_spfwd, has_sprev */
+    bool spCanEvaluate(bool fwd) const { return fwd ? has_spfwd() : has_sprev();}
+#endif // WITH_DEPRECATED_FEATURES
 
     /** \brief Get required length of arg field */
     size_t sz_arg() const;

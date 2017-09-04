@@ -830,14 +830,6 @@ namespace casadi {
     }
   }
 
-  bool Function::spCanEvaluate(bool fwd) {
-    if (fwd) {
-      return (*this)->has_spfwd();
-    } else {
-      return (*this)->has_sprev();
-    }
-  }
-
   Function Function::forward(int nfwd) const {
     try {
       return (*this)->forward(nfwd);
@@ -1129,6 +1121,14 @@ namespace casadi {
     } catch (exception& e) {
       THROW_ERROR("free_mx", e.what());
     }
+  }
+
+  bool Function::has_spfwd() const {
+    return (*this)->has_spfwd();
+  }
+
+  bool Function::has_sprev() const {
+    return (*this)->has_sprev();
   }
 
   bool Function::has_free() const {
