@@ -551,14 +551,23 @@ namespace casadi {
     }
   }
 
-  Function Function::slice(const std::string& name, const std::vector<int>& order_in,
-                           const std::vector<int>& order_out, const Dict& opts) const {
-    return (*this)->slice(name, order_in, order_out, opts);
+  Function Function::
+  slice(const std::string& name, const std::vector<int>& order_in,
+        const std::vector<int>& order_out, const Dict& opts) const {
+    try {
+      return (*this)->slice(name, order_in, order_out, opts);
+    } catch (exception& e) {
+      THROW_ERROR("slice", e.what());
+    }
   }
 
   vector<MX> Function::mapsum(const vector< MX > &x,
                               const string& parallelization) const {
-    return (*this)->mapsum_mx(x, parallelization);
+    try {
+      return (*this)->mapsum_mx(x, parallelization);
+    } catch (exception& e) {
+      THROW_ERROR("mapsum", e.what());
+    }
   }
 
   Function Function::conditional(const string& name, const vector<Function>& f,
@@ -687,7 +696,11 @@ namespace casadi {
 
   const Sparsity Function::
   sparsity_jac(int iind, int oind, bool compact, bool symmetric) const {
-    return (*this)->sparsity_jac(iind, oind, compact, symmetric);
+    try {
+      return (*this)->sparsity_jac(iind, oind, compact, symmetric);
+    } catch (exception& e) {
+      THROW_ERROR("sparsity_jac", e.what());
+    }
   }
 
   vector<string> Function::name_in() const {
@@ -775,26 +788,46 @@ namespace casadi {
   size_t Function::sz_w() const { return (*this)->sz_w();}
 
   int Function::operator()(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
-    return (*this)->sp_forward(arg, res, iw, w, memory(mem));
+    try {
+      return (*this)->sp_forward(arg, res, iw, w, memory(mem));
+    } catch (exception& e) {
+      THROW_ERROR("operator()", e.what());
+    }
   }
 
   int Function::rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
-    return (*this)->sp_reverse(arg, res, iw, w, memory(mem));
+    try {
+      return (*this)->sp_reverse(arg, res, iw, w, memory(mem));
+    } catch (exception& e) {
+      THROW_ERROR("rev", e.what());
+    }
   }
 
   void Function::set_work(const double**& arg, double**& res, int*& iw, double*& w,
                           int mem) const {
-    (*this)->set_work(memory(mem), arg, res, iw, w);
+    try {
+      (*this)->set_work(memory(mem), arg, res, iw, w);
+    } catch (exception& e) {
+      THROW_ERROR("set_work", e.what());
+    }
   }
 
   void Function::set_temp(const double** arg, double** res, int* iw, double* w,
                           int mem) const {
-    (*this)->set_temp(memory(mem), arg, res, iw, w);
+    try {
+      (*this)->set_temp(memory(mem), arg, res, iw, w);
+    } catch (exception& e) {
+      THROW_ERROR("set_temp", e.what());
+    }
   }
 
   void Function::setup(const double** arg, double** res, int* iw, double* w,
                           int mem) const {
-    (*this)->setup(memory(mem), arg, res, iw, w);
+    try {
+      (*this)->setup(memory(mem), arg, res, iw, w);
+    } catch (exception& e) {
+      THROW_ERROR("setup", e.what());
+    }
   }
 
   bool Function::spCanEvaluate(bool fwd) {
@@ -806,11 +839,19 @@ namespace casadi {
   }
 
   Function Function::forward(int nfwd) const {
-    return (*this)->forward(nfwd);
+    try {
+      return (*this)->forward(nfwd);
+    } catch (exception& e) {
+      THROW_ERROR("forward", e.what());
+    }
   }
 
   Function Function::reverse(int nadj) const {
-    return (*this)->reverse(nadj);
+    try {
+      return (*this)->reverse(nadj);
+    } catch (exception& e) {
+      THROW_ERROR("reverse", e.what());
+    }
   }
 
   void Function::print_dimensions(ostream &stream) const {
@@ -1003,27 +1044,51 @@ namespace casadi {
   }
 
   int Function::operator()(const double** arg, double** res, int* iw, double* w, int mem) const {
-    return (*this)->eval_gen(arg, res, iw, w, memory(mem));
+    try {
+      return (*this)->eval_gen(arg, res, iw, w, memory(mem));
+    } catch (exception& e) {
+      THROW_ERROR("operator()", e.what());
+    }
   }
 
   int Function::operator()(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
-    return (*this)->eval_sx(arg, res, iw, w, memory(mem));
+    try {
+      return (*this)->eval_sx(arg, res, iw, w, memory(mem));
+    } catch (exception& e) {
+      THROW_ERROR("operator()", e.what());
+    }
   }
 
   const SX Function::sx_in(int ind) const {
-    return (*this)->sx_in(ind);
+    try {
+      return (*this)->sx_in(ind);
+    } catch (exception& e) {
+      THROW_ERROR("sx_in", e.what());
+    }
   }
 
   const SX Function::sx_out(int ind) const {
-    return (*this)->sx_out(ind);
+    try {
+      return (*this)->sx_out(ind);
+    } catch (exception& e) {
+      THROW_ERROR("sx_out", e.what());
+    }
   }
 
   const vector<SX> Function::sx_in() const {
-    return (*this)->sx_in();
+    try {
+      return (*this)->sx_in();
+    } catch (exception& e) {
+      THROW_ERROR("sx_in", e.what());
+    }
   }
 
   const vector<SX> Function::sx_out() const {
-    return (*this)->sx_out();
+    try {
+      return (*this)->sx_out();
+    } catch (exception& e) {
+      THROW_ERROR("sx_out", e.what());
+    }
   }
 
   const MX Function::mx_in(int ind) const {
@@ -1051,11 +1116,19 @@ namespace casadi {
   }
 
   vector<SX> Function::free_sx() const {
-    return (*this)->free_sx();
+    try {
+      return (*this)->free_sx();
+    } catch (exception& e) {
+      THROW_ERROR("free_sx", e.what());
+    }
   }
 
   vector<MX> Function::free_mx() const {
-    return (*this)->free_mx();
+    try {
+      return (*this)->free_mx();
+    } catch (exception& e) {
+      THROW_ERROR("free_mx", e.what());
+    }
   }
 
   bool Function::has_free() const {
@@ -1063,7 +1136,11 @@ namespace casadi {
   }
 
   void Function::generate_lifted(Function& vdef_fcn, Function& vinit_fcn) const {
-    (*this)->generate_lifted(vdef_fcn, vinit_fcn);
+    try {
+      (*this)->generate_lifted(vdef_fcn, vinit_fcn);
+    } catch (exception& e) {
+      THROW_ERROR("generate_lifted", e.what());
+    }
   }
 
   int Function::getAlgorithmSize() const {
@@ -1091,7 +1168,11 @@ namespace casadi {
   }
 
   int Function::n_nodes() const {
-    return (*this)->n_nodes();
+    try {
+      return (*this)->n_nodes();
+    } catch (exception& e) {
+      THROW_ERROR("n_nodes", e.what());
+    }
   }
 
   int Function::checkout() const {
@@ -1127,20 +1208,36 @@ namespace casadi {
           const std::vector<std::string>& s_out,
           const AuxOut& aux,
           const Dict& opts) const {
-     return (*this)->factory(name, s_in, s_out, aux, opts);
+     try {
+       return (*this)->factory(name, s_in, s_out, aux, opts);
+     } catch (exception& e) {
+       THROW_ERROR("factory", e.what());
+     }
   }
 
-  vector<bool> Function::which_depends(const string& s_in,
-                                const vector<string>& s_out, int order, bool tr) const {
-    return (*this)->which_depends(s_in, s_out, order, tr);
+  vector<bool> Function::
+  which_depends(const string& s_in, const vector<string>& s_out, int order, bool tr) const {
+    try {
+      return (*this)->which_depends(s_in, s_out, order, tr);
+    } catch (exception& e) {
+      THROW_ERROR("which_depends", e.what());
+    }
   }
 
   std::vector<std::string> Function::get_function() const {
-    return (*this)->get_function();
+    try {
+      return (*this)->get_function();
+    } catch (exception& e) {
+      THROW_ERROR("get_function", e.what());
+    }
   }
 
   Function Function::get_function(const std::string &name) const {
-    return (*this)->get_function(name);
+    try {
+      return (*this)->get_function(name);
+    } catch (exception& e) {
+      THROW_ERROR("get_function", e.what());
+    }
   }
 
   bool Function::has_function(const std::string& fname) const {
@@ -1148,7 +1245,11 @@ namespace casadi {
   }
 
   Function Function::oracle() const {
-    return (*this)->oracle();
+    try {
+      return (*this)->oracle();
+    } catch (exception& e) {
+      THROW_ERROR("oracle", e.what());
+    }
   }
 
   Function Function::wrap() const {
