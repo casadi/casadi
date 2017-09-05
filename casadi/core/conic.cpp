@@ -207,12 +207,13 @@ namespace casadi {
     w = conic_f(w);
 
     // Get expressions for the solution
-    ret_out[NLPSOL_X] = w[CONIC_X];
+    ret_out[NLPSOL_X] = reshape(w[CONIC_X], x.size());
     ret_out[NLPSOL_F] = w[CONIC_COST];
-    ret_out[NLPSOL_G] = mtimes(v.at(2), w[CONIC_X]) + v.at(3);
-    ret_out[NLPSOL_LAM_X] = w[CONIC_LAM_X];
-    ret_out[NLPSOL_LAM_G] = w[CONIC_LAM_A];
+    ret_out[NLPSOL_G] = reshape(mtimes(v.at(2), w[CONIC_X]), g.size()) + v.at(3);
+    ret_out[NLPSOL_LAM_X] = reshape(w[CONIC_LAM_X], x.size());
+    ret_out[NLPSOL_LAM_G] = reshape(w[CONIC_LAM_A], g.size());
     ret_out[NLPSOL_LAM_P] = MX::nan(p.sparsity());
+
     return Function(name, ret_in, ret_out, nlpsol_in(), nlpsol_out(),
                     {{"default_in", nlpsol_default_in()}});
   }
