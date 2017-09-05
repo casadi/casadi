@@ -115,9 +115,6 @@ namespace casadi {
     const Options& get_options() const override { return options_;}
     ///@}
 
-    /** \brief  Print description */
-    void disp_more(std::ostream& stream) const override;
-
     /// Initialize
     void init(const Dict& opts) override;
 

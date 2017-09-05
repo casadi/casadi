@@ -434,9 +434,4 @@ namespace casadi {
     return Nlpsol::plugin_options(name).info(op);
   }
 
-  void Nlpsol::disp_more(std::ostream& stream) const {
-    stream << "minimize f(x;p) subject to lbx<=x<=ubx, lbg<=g(x;p)<=ubg defined by:\n";
-    oracle_.disp(stream, true);
-  }
-
 } // namespace casadi
