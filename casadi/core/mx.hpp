@@ -399,8 +399,6 @@ namespace casadi {
     ///@{
     /// Functions called by friend functions defined for GenericMatrix
     static MX jacobian(const MX& f, const MX& x, const Dict& opts = Dict());
-    static MX gradient(const MX& f, const MX& x);
-    static MX tangent(const MX& f, const MX& x);
     static MX hessian(const MX& f, const MX& x);
     static MX hessian(const MX& f, const MX& x, MX& g);
     static std::vector<std::vector<MX> >

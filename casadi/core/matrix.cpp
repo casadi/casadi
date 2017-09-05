@@ -2383,20 +2383,6 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  Matrix<Scalar> Matrix<Scalar>::gradient(const Matrix<Scalar> &f,
-                                              const Matrix<Scalar> &x) {
-    casadi_error("'gradient' not defined for " + type_name());
-    return Matrix<Scalar>();
-  }
-
-  template<typename Scalar>
-  Matrix<Scalar> Matrix<Scalar>::tangent(const Matrix<Scalar> &f,
-                                                const Matrix<Scalar> &x) {
-    casadi_error("'tangent' not defined for " + type_name());
-    return Matrix<Scalar>();
-  }
-
-  template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::hessian(const Matrix<Scalar> &f,
                                              const Matrix<Scalar> &x) {
     casadi_error("'hessian' not defined for " + type_name());
@@ -3202,18 +3188,6 @@ namespace casadi {
   SX SX::jacobian(const SX &ex, const SX &arg, const Dict& opts) {
     Function temp("temp", {arg}, {ex});
     return temp.get<SXFunction>()->jac(0, 0, opts);
-  }
-
-  template<>
-  SX SX::gradient(const SX &ex, const SX &arg) {
-    Function temp("temp", {arg}, {ex});
-    return temp.get<SXFunction>()->grad(0, 0);
-  }
-
-  template<>
-  SX SX::tangent(const SX &ex, const SX &arg) {
-    Function temp("temp", {arg}, {ex});
-    return temp.get<SXFunction>()->tang(0, 0);
   }
 
   template<>

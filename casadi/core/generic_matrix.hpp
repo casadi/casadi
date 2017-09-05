@@ -676,6 +676,8 @@ namespace casadi {
     /// Functions called by friend functions defined here
     static MatType jtimes(const MatType &ex, const MatType &arg,
                           const MatType &v, bool tr=false);
+    static MatType gradient(const MatType &ex, const MatType &arg);
+    static MatType tangent(const MatType &ex, const MatType &arg);
     static MatType linearize(const MatType& f, const MatType& x, const MatType& x0);
     static MatType mpower(const MatType &x, const MatType &y);
     ///@}
@@ -981,7 +983,6 @@ namespace casadi {
     return MatType::_rank1(A, alpha, x, y);
   }
 
-
   template<typename MatType>
   MatType GenericMatrix<MatType>::jtimes(const MatType &ex, const MatType &arg,
                                          const MatType &v, bool tr) {
@@ -1002,6 +1003,20 @@ namespace casadi {
     // Get results
     for (int i=0; i<w.size(); ++i) w[i] = ww[i][0];
     return horzcat(w);
+  }
+
+  template<typename MatType>
+  MatType GenericMatrix<MatType>::gradient(const MatType &ex, const MatType &arg) {
+    casadi_assert_message(ex.is_scalar(),
+                          "'gradient' only defined for scalar outputs: Use 'jacobian' instead.");
+    return project(jtimes(ex, arg, MatType::ones(ex.sparsity()), true), arg.sparsity());
+  }
+
+  template<typename MatType>
+  MatType GenericMatrix<MatType>::tangent(const MatType &ex, const MatType &arg) {
+    casadi_assert_message(arg.is_scalar(),
+                          "'tangent' only defined for scalar inputs: Use 'jacobian' instead.");
+    return project(jtimes(ex, arg, MatType::ones(arg.sparsity()), false), ex.sparsity());
   }
 
   template<typename MatType>

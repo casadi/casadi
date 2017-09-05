@@ -70,12 +70,6 @@ namespace casadi {
     /** \brief  Topological sorting of the nodes based on Depth-First Search (DFS) */
     static void sort_depth_first(std::stack<NodeType*>& s, std::vector<NodeType*>& nodes);
 
-    /** \brief Gradient via source code transformation */
-    MatType grad(int iind=0, int oind=0);
-
-    /** \brief Tangent via source code transformation */
-    MatType tang(int iind=0, int oind=0);
-
     /** \brief  Construct a complete Jacobian by compression */
     MatType jac(int iind, int oind, const Dict& opts) const;
 
@@ -286,75 +280,6 @@ namespace casadi {
         s.pop();
       }
     }
-  }
-
-  template<typename DerivedType, typename MatType, typename NodeType>
-  MatType XFunction<DerivedType, MatType, NodeType>::grad(int iind, int oind) {
-    casadi_assert_message(sparsity_out(oind).is_scalar(),
-                          "Only gradients of scalar functions allowed. Use jacobian instead.");
-
-    // Quick return if trivially empty
-    if (nnz_in(iind)==0 || nnz_out(oind)==0 ||
-       sparsity_jac(iind, oind, true, false).nnz()==0) {
-      return MatType(size_in(iind));
-    }
-
-    // Adjoint seeds
-    typename std::vector<std::vector<MatType> > aseed(1, std::vector<MatType>(out_.size()));
-    for (int i=0; i<out_.size(); ++i) {
-      if (i==oind) {
-        aseed[0][i] = MatType::ones(out_[i].sparsity());
-      } else {
-        aseed[0][i] = MatType::zeros(out_[i].sparsity());
-      }
-    }
-
-    // Adjoint sensitivities
-    std::vector<std::vector<MatType> > asens(1, std::vector<MatType>(in_.size()));
-    for (int i=0; i<in_.size(); ++i) {
-      asens[0][i] = MatType::zeros(in_[i].sparsity());
-    }
-
-    // Calculate with adjoint mode AD
-    call_reverse(in_, out_, aseed, asens, true, false);
-
-    int dir = 0;
-    for (int i=0; i<n_in(); ++i) { // Correct sparsities #1025
-      if (asens[dir][i].sparsity()!=in_[i].sparsity()) {
-        asens[dir][i] = project(asens[dir][i], in_[i].sparsity());
-      }
-    }
-
-    // Return adjoint directional derivative
-    return asens[0].at(iind);
-  }
-
-  template<typename DerivedType, typename MatType, typename NodeType>
-  MatType XFunction<DerivedType, MatType, NodeType>::tang(int iind, int oind) {
-    casadi_assert_message(sparsity_in(iind).is_scalar(),
-                          "Only tangent of scalar input functions allowed. Use jacobian instead.");
-
-    // Forward seeds
-    typename std::vector<std::vector<MatType> > fseed(1, std::vector<MatType>(in_.size()));
-    for (int i=0; i<in_.size(); ++i) {
-      if (i==iind) {
-        fseed[0][i] = MatType::ones(in_[i].sparsity());
-      } else {
-        fseed[0][i] = MatType::zeros(in_[i].sparsity());
-      }
-    }
-
-    // Forward sensitivities
-    std::vector<std::vector<MatType> > fsens(1, std::vector<MatType>(out_.size()));
-    for (int i=0; i<out_.size(); ++i) {
-      fsens[0][i] = MatType::zeros(out_[i].sparsity());
-    }
-
-    // Calculate with forward mode AD
-    static_cast<const DerivedType*>(this)->ad_forward(fseed, fsens);
-
-    // Return adjoint directional derivative
-    return fsens[0].at(oind);
   }
 
   template<typename DerivedType, typename MatType, typename NodeType>
