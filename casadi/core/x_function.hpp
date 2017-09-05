@@ -950,27 +950,6 @@ namespace casadi {
   }
 
   template<typename MatType>
-  MatType _jtimes(const MatType &ex, const MatType &arg, const MatType &v, bool tr) {
-    // Seeds as a vector of vectors
-    int seed_dim = tr ? ex.size2() : arg.size2();
-    casadi_assert(v.size2() % seed_dim == 0);
-    std::vector<MatType> w = horzsplit(v, seed_dim);
-    std::vector<std::vector<MatType> > ww(w.size(), std::vector<MatType>(1));
-    for (int i=0; i<w.size(); ++i) ww[i][0] = w[i];
-
-    // Calculate directional derivatives
-    if (tr) {
-      ww = MatType::reverse({ex}, {arg}, ww);
-    } else {
-      ww = MatType::forward({ex}, {arg}, ww);
-    }
-
-    // Get results
-    for (int i=0; i<w.size(); ++i) w[i] = ww[i][0];
-    return horzcat(w);
-  }
-
-  template<typename MatType>
   std::vector<bool> _which_depends(const MatType &expr, const MatType &var, int order, bool tr) {
     MatType e = expr;
 
