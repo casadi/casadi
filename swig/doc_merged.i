@@ -16980,6 +16980,12 @@ Make a rank-1 update to a matrix A Calculates A + 1/2 * alpha * x*y'.
 
 ";
 
+%feature("docstring") casadi::GenericMatrix::gradient "
+
+Functions called by friend functions defined here
+
+";
+
 %feature("docstring") friendwrap_n_nodes "
 
 Count number of nodes
@@ -17419,6 +17425,12 @@ The sparsity pattern, which is reference counted and cached, can be accessed
 with Sparsity& sparsity() Joel Andersson
 
 C++ includes: generic_matrix.hpp ";
+
+%feature("docstring") casadi::GenericMatrix::tangent "
+
+Functions called by friend functions defined here
+
+";
 
 %feature("docstring") friendwrap_polyval "
 
@@ -29514,6 +29526,12 @@ Get get the number of non-zeros on the diagonal.
 
 ";
 
+%feature("docstring") casadi::Matrix::gradient "
+
+Functions called by friend functions defined here
+
+";
+
 %feature("docstring") casadi::Matrix::cosh "
 
 Hyperbolic cosine: x -> cosh(x)
@@ -29978,6 +29996,12 @@ Get the size along a particular dimensions.
 
 ";
 
+%feature("docstring") casadi::Matrix::log10 "
+
+Base-10 logarithm: x -> log10(x)
+
+";
+
 %feature("docstring") casadi::Matrix::erfinv "
 
 Inverse error function: x -> erfinv(x)
@@ -30071,9 +30095,9 @@ Check if the matrix expression is square.
 
 ";
 
-%feature("docstring") casadi::Matrix::log10 "
+%feature("docstring") casadi::Matrix::tangent "
 
-Base-10 logarithm: x -> log10(x)
+Functions called by friend functions defined here
 
 ";
 
@@ -30632,6 +30656,12 @@ Set a submatrix, single argument
 
 ";
 
+%feature("docstring") casadi::MX::is_multiplication "
+
+Check if multiplication.
+
+";
+
 %feature("docstring") casadi::MX::is_valid_input "
 
 Check if matrix can be used to define function inputs. Valid inputs for
@@ -30654,6 +30684,12 @@ Get the sparsity pattern.
 %feature("docstring") friendwrap_lift "
 
 Lift the expression Experimental feature.
+
+";
+
+%feature("docstring") casadi::MX::gradient "
+
+Functions called by friend functions defined here
 
 ";
 
@@ -30887,9 +30923,9 @@ Calculate bilinear form x^T A y.
 
 ";
 
-%feature("docstring") casadi::MX::is_multiplication "
+%feature("docstring") casadi::MX::tangent "
 
-Check if multiplication.
+Functions called by friend functions defined here
 
 ";
 
@@ -47079,8 +47115,6 @@ Check if a particular plugin is available.
 ";
 
 %feature("docstring") casadi::replace_mat "[INTERNAL] ";
-
-%feature("docstring") casadi::_jtimes "[INTERNAL] ";
 
 %feature("docstring") casadi::dense_mul_nn "[INTERNAL] ";
 

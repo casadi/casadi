@@ -23117,6 +23117,13 @@ Make a rank-1 update to a matrix A Calculates A + 1/2 * alpha * x*y'.
 
 ";
 
+%feature("docstring")  casadi::GenericMatrix< MatType >::gradient(const
+MatType &ex, const MatType &arg) "
+
+Functions called by friend functions defined here
+
+";
+
 %feature("docstring")  n_nodes(const MatType &A) "
 
 Count number of nodes
@@ -23212,7 +23219,8 @@ Check if the matrix is upper triangular.
 
 ";
 
-%feature("docstring")  gradient(const MatType &ex, const MatType &arg) "
+%feature("docstring")  casadi::GenericMatrix< MatType >::gradient(const
+MatType &ex, const MatType &arg) "
 
 Calculate Jacobian.
 
@@ -23395,7 +23403,8 @@ Generate the 3-vector progenitor of a skew symmetric matrix.
 
 ";
 
-%feature("docstring")  tangent(const MatType &ex, const MatType &arg) "
+%feature("docstring")  casadi::GenericMatrix< MatType >::tangent(const
+MatType &ex, const MatType &arg) "
 
 Calculate Jacobian.
 
@@ -23618,6 +23627,13 @@ The sparsity pattern, which is reference counted and cached, can be accessed
 with Sparsity& sparsity() Joel Andersson
 
 C++ includes: generic_matrix.hpp ";
+
+%feature("docstring")  casadi::GenericMatrix< MatType >::tangent(const
+MatType &ex, const MatType &arg) "
+
+Functions called by friend functions defined here
+
+";
 
 %feature("docstring")  polyval(const MatType &p, const MatType &x) "
 
@@ -40677,6 +40693,13 @@ Get get the number of non-zeros on the diagonal.
 
 ";
 
+%feature("docstring")  casadi::GenericMatrix< Matrix< Scalar >
+>::gradient(const Matrix< Scalar > &ex, const Matrix< Scalar > &arg) "
+
+Functions called by friend functions defined here
+
+";
+
 %feature("docstring")  casadi::GenericExpression< Matrix< Scalar >
 >::cosh(const Matrix< Scalar > &x) "
 
@@ -41285,6 +41308,13 @@ Get the size along a particular dimensions.
 ";
 
 %feature("docstring")  casadi::GenericExpression< Matrix< Scalar >
+>::log10(const Matrix< Scalar > &x) "
+
+Base-10 logarithm: x -> log10(x)
+
+";
+
+%feature("docstring")  casadi::GenericExpression< Matrix< Scalar >
 >::erfinv(const Matrix< Scalar > &x) "
 
 Inverse error function: x -> erfinv(x)
@@ -41407,10 +41437,10 @@ Check if the matrix expression is square.
 
 ";
 
-%feature("docstring")  casadi::GenericExpression< Matrix< Scalar >
->::log10(const Matrix< Scalar > &x) "
+%feature("docstring")  casadi::GenericMatrix< Matrix< Scalar >
+>::tangent(const Matrix< Scalar > &ex, const Matrix< Scalar > &arg) "
 
-Base-10 logarithm: x -> log10(x)
+Functions called by friend functions defined here
 
 ";
 
@@ -42069,6 +42099,12 @@ int > &rr, const Matrix< int > &cc) "
 
 ";
 
+%feature("docstring")  casadi::MX::is_multiplication() const  "
+
+Check if multiplication.
+
+";
+
 %feature("docstring")  casadi::MX::is_valid_input() const  "
 
 Check if matrix can be used to define function inputs. Valid inputs for
@@ -42092,6 +42128,13 @@ Get the sparsity pattern.
 %feature("docstring")  lift(const MX &x, const MX &x_guess) "
 
 Lift the expression Experimental feature.
+
+";
+
+%feature("docstring")  casadi::GenericMatrix< MX  >::gradient(const MX &ex,
+const MX &arg) "
+
+Functions called by friend functions defined here
 
 ";
 
@@ -42395,9 +42438,10 @@ Calculate bilinear form x^T A y.
 
 ";
 
-%feature("docstring")  casadi::MX::is_multiplication() const  "
+%feature("docstring")  casadi::GenericMatrix< MX  >::tangent(const MX &ex,
+const MX &arg) "
 
-Check if multiplication.
+Functions called by friend functions defined here
 
 ";
 
@@ -64081,10 +64125,6 @@ Check if a particular plugin is available.
 
 %feature("docstring")  casadi::replace_mat(const M &arg, const Sparsity
 &inp) "
-
-[INTERNAL] ";
-
-%feature("docstring") casadi::_jtimes "
 
 [INTERNAL] ";
 
