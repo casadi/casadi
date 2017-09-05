@@ -160,6 +160,13 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::Nlpsol::disp_more(std::ostream &stream) const
+override "
+
+[INTERNAL]  Print description.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::alloc_w(size_t sz_w, bool
 persistent=false) "
 
@@ -1423,6 +1430,10 @@ tr=false) const  "
 Parameters:
 -----------
 
+s_in:   Input name
+
+s_out:   Output name(s)
+
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
@@ -2491,6 +2502,10 @@ tr=false) const  "
 Parameters:
 -----------
 
+s_in:   Input name
+
+s_out:   Output name(s)
+
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
@@ -2863,6 +2878,13 @@ Generate code for the declarations of the C function.
 %feature("docstring")  casadi::FunctionInternal::name_out(int ind) const  "
 
 [INTERNAL]  Get output scheme name by index.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::disp_more(std::ostream
+&stream) const  "
+
+[INTERNAL]  Print more.
 
 ";
 
@@ -4019,6 +4041,10 @@ tr=false) const  "
 Parameters:
 -----------
 
+s_in:   Input name
+
+s_out:   Output name(s)
+
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
@@ -4279,6 +4305,13 @@ const std::vector< MatType > &v) const  "
 "
 
 [INTERNAL]  Free memory block.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::disp_more(std::ostream
+&stream) const  "
+
+[INTERNAL]  Print more.
 
 ";
 
@@ -5435,10 +5468,10 @@ multiplying.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_option(const
-std::string &name, std::ostream &stream) const  "
+%feature("docstring")  casadi::FunctionInternal::disp_more(std::ostream
+&stream) const  "
 
-[INTERNAL]  Print all information there is to know about a certain option.
+[INTERNAL]  Print more.
 
 ";
 
@@ -5958,6 +5991,13 @@ std::vector< M > &res) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::print_option(const
+std::string &name, std::ostream &stream) const  "
+
+[INTERNAL]  Print all information there is to know about a certain option.
+
+";
+
 %feature("docstring")  casadi::BSplineDual::codegen_body(CodeGenerator &g)
 const override "
 
@@ -6309,6 +6349,10 @@ tr=false) const  "
 
 Parameters:
 -----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
 
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
@@ -6779,6 +6823,13 @@ allow_forward, bool allow_reverse) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::disp_more(std::ostream
+&stream) const  "
+
+[INTERNAL]  Print more.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::matching_arg(const
 std::vector< M > &arg) const  "
 
@@ -7121,6 +7172,10 @@ tr=false) const  "
 
 Parameters:
 -----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
 
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
@@ -7930,6 +7985,14 @@ Is a null pointer?
 
 ";
 
+%feature("docstring")  casadi::Callback::has_reverse(int nadj) const  "
+
+Return function that calculates adjoint derivatives reverse(nadj) returns a
+cached instance if available, and calls  Function get_reverse(int nadj) if
+no cached version is available.
+
+";
+
 %feature("docstring")  casadi::Function::type_name() const  "
 
 Get type name.
@@ -8027,11 +8090,9 @@ Do the derivative functions need nondifferentiated outputs?
 
 ";
 
-%feature("docstring")  casadi::Callback::has_reverse(int nadj) const  "
+%feature("docstring")  casadi::Function::has_spfwd() const  "
 
-Return function that calculates adjoint derivatives reverse(nadj) returns a
-cached instance if available, and calls  Function get_reverse(int nadj) if
-no cached version is available.
+Is the class able to propagate seeds through the algorithm?
 
 ";
 
@@ -8081,6 +8142,12 @@ const Dict &opts=Dict()) "
 Construct internal object This is the step that actually construct the
 internal object, as the class constructor only creates a null pointer. It
 should be called from the user constructor.
+
+";
+
+%feature("docstring")  casadi::Function::has_sprev() const  "
+
+Is the class able to propagate seeds through the algorithm?
 
 ";
 
@@ -8191,11 +8258,9 @@ Get output dimension.
 
 ";
 
-%feature("docstring")  casadi::Function::spCanEvaluate(bool fwd) "
+%feature("docstring")  casadi::Function::spCanEvaluate(bool fwd) const  "
 
-[INTERNAL]  Is the class able to propagate seeds through the algorithm?
-
-(for usage, see the example propagating_sparsity.cpp)
+[DEPRECATED] Use has_spfwd, has_sprev
 
 ";
 
@@ -9521,6 +9586,13 @@ Diagrams
 
 C++ includes: finite_differences.hpp ";
 
+%feature("docstring")  casadi::FunctionInternal::disp_more(std::ostream
+&stream) const  "
+
+[INTERNAL]  Print more.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::setup(void *mem, const
 double **arg, double **res, int *iw, double *w) const  "
 
@@ -9729,6 +9801,10 @@ tr=false) const  "
 
 Parameters:
 -----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
 
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
@@ -10675,6 +10751,13 @@ original
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::disp_more(std::ostream
+&stream) const  "
+
+[INTERNAL]  Print more.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::size_out(int ind) const  "
 
 [INTERNAL]  Input/output dimensions.
@@ -10992,6 +11075,10 @@ tr=false) const  "
 
 Parameters:
 -----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
 
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
@@ -12034,6 +12121,10 @@ tr=false) const  "
 Parameters:
 -----------
 
+s_in:   Input name
+
+s_out:   Output name(s)
+
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
@@ -12174,6 +12265,13 @@ std::string &name, std::ostream &stream) const  "
 oind, bool compact, bool symmetric) const  "
 
 [INTERNAL]  Get, if necessary generate, the sparsity of a Jacobian block.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::disp_more(std::ostream
+&stream) const  "
+
+[INTERNAL]  Print more.
 
 ";
 
@@ -15460,6 +15558,12 @@ CodeGenerator &g) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::fwd_seed(int nfwd) const  "
+
+[INTERNAL]  Symbolic expressions for the forward seeds.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::has_spfwd() const  "
 
 [INTERNAL]  Is the class able to propagate seeds through the algorithm?
@@ -15514,6 +15618,10 @@ tr=false) const  "
 Parameters:
 -----------
 
+s_in:   Input name
+
+s_out:   Output name(s)
+
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
@@ -15533,9 +15641,10 @@ int oind, bool symmetric, int gr_i=1, int gr_o=1) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::fwd_seed(int nfwd) const  "
+%feature("docstring")  casadi::FunctionInternal::disp_more(std::ostream
+&stream) const  "
 
-[INTERNAL]  Symbolic expressions for the forward seeds.
+[INTERNAL]  Print more.
 
 ";
 
@@ -16186,6 +16295,10 @@ tr=false) const  "
 Parameters:
 -----------
 
+s_in:   Input name
+
+s_out:   Output name(s)
+
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
@@ -16688,6 +16801,13 @@ bool never_inline) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::disp_more(std::ostream
+&stream) const  "
+
+[INTERNAL]  Print more.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::generate_dependencies(const
 std::string &fname, const Dict &opts) const  "
 
@@ -17121,6 +17241,13 @@ classes.
 %feature("docstring")  casadi::External::class_name() const override "
 
 [INTERNAL]  Get type name.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::disp_more(std::ostream
+&stream) const  "
+
+[INTERNAL]  Print more.
 
 ";
 
@@ -18036,6 +18163,10 @@ tr=false) const  "
 Parameters:
 -----------
 
+s_in:   Input name
+
+s_out:   Output name(s)
+
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
@@ -18369,6 +18500,13 @@ int oind, bool symmetric) const  "
 %feature("docstring")  casadi::FunctionInternal::uses_output() const  "
 
 [INTERNAL]  Do the derivative functions need nondifferentiated outputs?
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::disp_more(std::ostream
+&stream) const  "
+
+[INTERNAL]  Print more.
 
 ";
 
@@ -18865,6 +19003,10 @@ tr=false) const  "
 
 Parameters:
 -----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
 
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
@@ -19633,9 +19775,9 @@ For a particular input or for all of the inputs
 
 ";
 
-%feature("docstring")  casadi::Function::sz_res() const  "
+%feature("docstring")  casadi::Function::has_spfwd() const  "
 
-[INTERNAL]  Get required length of res field.
+Is the class able to propagate seeds through the algorithm?
 
 ";
 
@@ -19689,11 +19831,9 @@ Get an atomic operation operator index.
 
 ";
 
-%feature("docstring")  casadi::Function::spCanEvaluate(bool fwd) "
+%feature("docstring")  casadi::Function::spCanEvaluate(bool fwd) const  "
 
-[INTERNAL]  Is the class able to propagate seeds through the algorithm?
-
-(for usage, see the example propagating_sparsity.cpp)
+[DEPRECATED] Use has_spfwd, has_sprev
 
 ";
 
@@ -20019,6 +20159,12 @@ For a particular input or for all of the inputs
 
 %feature("docstring")  casadi::Function::get_function(const std::string
 &name) const  "
+
+";
+
+%feature("docstring")  casadi::Function::sz_res() const  "
+
+[INTERNAL]  Get required length of res field.
 
 ";
 
@@ -20945,6 +21091,12 @@ Get input dimension.
 const  "
 
 Get input dimension.
+
+";
+
+%feature("docstring")  casadi::Function::has_sprev() const  "
+
+Is the class able to propagate seeds through the algorithm?
 
 ";
 
@@ -22541,6 +22693,13 @@ override "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::disp_more(std::ostream
+&stream) const  "
+
+[INTERNAL]  Print more.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::name_in(int ind) const  "
 
 [INTERNAL]  Get input scheme name by index.
@@ -22573,6 +22732,10 @@ tr=false) const  "
 
 Parameters:
 -----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
 
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
@@ -23061,10 +23224,11 @@ Unite two matrices no overlapping sparsity.
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< MatType >::dim() const  "
+%feature("docstring")  casadi::GenericMatrix< MatType >::dim(bool
+with_nz=false) const  "
 
-Get string representation of dimensions. The representation is (nrow x ncol
-= numel | size)
+Get string representation of dimensions. The representation is e.g. \"4x5\"
+or \"4x5,10nz\".
 
 ";
 
@@ -23707,6 +23871,13 @@ const  "
 double **&arg, double **&res, int *&iw, double *&w) const  "
 
 [INTERNAL]  Set the (persistent) work vectors.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::disp_more(std::ostream
+&stream) const  "
+
+[INTERNAL]  Print more.
 
 ";
 
@@ -24579,6 +24750,10 @@ tr=false) const  "
 Parameters:
 -----------
 
+s_in:   Input name
+
+s_out:   Output name(s)
+
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
@@ -25185,6 +25360,10 @@ tr=false) const  "
 
 Parameters:
 -----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
 
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
@@ -25881,6 +26060,13 @@ std::string > &s_out, const Function::AuxOut &aux, const Dict &opts) const
 **res, int *iw, bvec_t *w, void *mem) const override "
 
 [INTERNAL]  Propagate sparsity backwards.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::disp_more(std::ostream
+&stream) const  "
+
+[INTERNAL]  Print more.
 
 ";
 
@@ -27306,6 +27492,13 @@ bool persistent=false) "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::disp_more(std::ostream
+&stream) const  "
+
+[INTERNAL]  Print more.
+
+";
+
 %feature("docstring")
 casadi::FunctionInternal::getJacSparsityHierarchicalSymm(int iind, int oind)
 const  "
@@ -27836,6 +28029,10 @@ tr=false) const  "
 Parameters:
 -----------
 
+s_in:   Input name
+
+s_out:   Output name(s)
+
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
@@ -28112,6 +28309,13 @@ generated function.
 %feature("docstring")  casadi::FunctionInternal::alloc_mem() const  "
 
 [INTERNAL]  Create memory block.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::disp_more(std::ostream
+&stream) const  "
+
+[INTERNAL]  Print more.
 
 ";
 
@@ -28766,6 +28970,10 @@ tr=false) const  "
 
 Parameters:
 -----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
 
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
@@ -29992,10 +30200,10 @@ std::vector< M > &arg) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::alloc_res(size_t sz_res,
-bool persistent=false) "
+%feature("docstring")  casadi::FunctionInternal::disp_more(std::ostream
+&stream) const  "
 
-[INTERNAL]  Ensure required length of res field.
+[INTERNAL]  Print more.
 
 ";
 
@@ -30132,6 +30340,10 @@ tr=false) const  "
 Parameters:
 -----------
 
+s_in:   Input name
+
+s_out:   Output name(s)
+
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
@@ -30231,6 +30443,13 @@ casadi::FunctionInternal::codegen_incref(CodeGenerator &g) const  "
 double **arg, double **res, int *iw, double *w) const  "
 
 [INTERNAL]  Set the (persistent and temporary) work vectors.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::alloc_res(size_t sz_res,
+bool persistent=false) "
+
+[INTERNAL]  Ensure required length of res field.
 
 ";
 
@@ -31101,6 +31320,10 @@ tr=false) const  "
 Parameters:
 -----------
 
+s_in:   Input name
+
+s_out:   Output name(s)
+
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
@@ -31436,6 +31659,13 @@ structure recognition.
 %feature("docstring")  casadi::FunctionInternal::numel_out() const  "
 
 [INTERNAL]  Number of input/output elements.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::disp_more(std::ostream
+&stream) const  "
+
+[INTERNAL]  Print more.
 
 ";
 
@@ -32953,6 +33183,13 @@ double **&arg, double **&res, int *&iw, double *&w) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::disp_more(std::ostream
+&stream) const  "
+
+[INTERNAL]  Print more.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::get_stats(void *mem) const
 "
 
@@ -33507,6 +33744,10 @@ tr=false) const  "
 Parameters:
 -----------
 
+s_in:   Input name
+
+s_out:   Output name(s)
+
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
@@ -33927,6 +34168,10 @@ tr=false) const  "
 Parameters:
 -----------
 
+s_in:   Input name
+
+s_out:   Output name(s)
+
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
@@ -34000,6 +34245,13 @@ const  "
 **arg, bvec_t **res, int *iw, bvec_t *w, void *mem) const  "
 
 [INTERNAL]  Evaluate a function, overloaded.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::disp_more(std::ostream
+&stream) const  "
+
+[INTERNAL]  Print more.
 
 ";
 
@@ -35018,6 +35270,13 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::disp_more(std::ostream
+&stream) const  "
+
+[INTERNAL]  Print more.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::alloc_iw(size_t sz_iw, bool
 persistent=false) "
 
@@ -35201,6 +35460,10 @@ tr=false) const  "
 
 Parameters:
 -----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
 
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
@@ -36557,6 +36820,10 @@ tr=false) const  "
 Parameters:
 -----------
 
+s_in:   Input name
+
+s_out:   Output name(s)
+
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
@@ -36781,6 +37048,13 @@ casadi::FunctionInternal::print_dimensions(std::ostream &stream) const  "
 std::vector< M > &arg) const  "
 
 [INTERNAL]  Replace 0-by-0 inputs.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::disp_more(std::ostream
+&stream) const  "
+
+[INTERNAL]  Print more.
 
 ";
 
@@ -37926,6 +38200,10 @@ tr=false) const  "
 Parameters:
 -----------
 
+s_in:   Input name
+
+s_out:   Output name(s)
+
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
@@ -38480,6 +38758,13 @@ elements.
 %feature("docstring")  casadi::FunctionInternal::getAlgorithmSize() const  "
 
 [INTERNAL]  Get the number of atomic operations.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::disp_more(std::ostream
+&stream) const  "
+
+[INTERNAL]  Print more.
 
 ";
 
@@ -39352,6 +39637,13 @@ CodeGenerator &g) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::disp_more(std::ostream
+&stream) const  "
+
+[INTERNAL]  Print more.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::jit_dependencies(const
 std::string &fname) "
 
@@ -39396,6 +39688,10 @@ tr=false) const  "
 
 Parameters:
 -----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
 
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
@@ -40443,11 +40739,11 @@ Functions called by friend functions defined here
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< Matrix< Scalar >  >::dim()
-const "
+%feature("docstring")  casadi::GenericMatrix< Matrix< Scalar >  >::dim(bool
+with_nz=false) const "
 
-Get string representation of dimensions. The representation is (nrow x ncol
-= numel | size)
+Get string representation of dimensions. The representation is e.g. \"4x5\"
+or \"4x5,10nz\".
 
 ";
 
@@ -42117,10 +42413,11 @@ Hyperbolic sin: x -> sinh(x)
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< MX  >::dim() const "
+%feature("docstring")  casadi::GenericMatrix< MX  >::dim(bool with_nz=false)
+const "
 
-Get string representation of dimensions. The representation is (nrow x ncol
-= numel | size)
+Get string representation of dimensions. The representation is e.g. \"4x5\"
+or \"4x5,10nz\".
 
 ";
 
@@ -43089,6 +43386,10 @@ tr=false) const  "
 Parameters:
 -----------
 
+s_in:   Input name
+
+s_out:   Output name(s)
+
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
@@ -43505,6 +43806,13 @@ const  "
 std::string &iname) const  "
 
 [INTERNAL]  Are all inputs and outputs scalar.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::disp_more(std::ostream
+&stream) const  "
+
+[INTERNAL]  Print more.
 
 ";
 
@@ -44328,6 +44636,13 @@ Function &oracle) "
 
 ";
 
+%feature("docstring")  casadi::Nlpsol::disp_more(std::ostream &stream) const
+override "
+
+[INTERNAL]  Print description.
+
+";
+
 %feature("docstring")  casadi::Nlpsol::alloc_mem() const override "
 
 [INTERNAL]  Create memory block.
@@ -44365,9 +44680,10 @@ int oind, bool symmetric) const  "
 
 ";
 
-%feature("docstring")  casadi::Nlpsol::get_sparsity_out(int i) override "
+%feature("docstring")  casadi::OracleFunction::print_fstats(const
+OracleMemory *m) const  "
 
-[INTERNAL]  Sparsities of function inputs and outputs.
+[INTERNAL]  Print statistics.
 
 ";
 
@@ -44428,10 +44744,9 @@ elements.
 
 ";
 
-%feature("docstring")  casadi::OracleFunction::print_fstats(const
-OracleMemory *m) const  "
+%feature("docstring")  casadi::Nlpsol::get_sparsity_out(int i) override "
 
-[INTERNAL]  Print statistics.
+[INTERNAL]  Sparsities of function inputs and outputs.
 
 ";
 
@@ -45068,6 +45383,10 @@ tr=false) const  "
 
 Parameters:
 -----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
 
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
@@ -46658,6 +46977,10 @@ tr=false) const  "
 Parameters:
 -----------
 
+s_in:   Input name
+
+s_out:   Output name(s)
+
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
@@ -46826,6 +47149,13 @@ size_t &sz_res, size_t &sz_iw, size_t &sz_w) const  "
 %feature("docstring")  casadi::FunctionInternal::get_n_out() "
 
 [INTERNAL]  Number of function inputs and outputs.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::disp_more(std::ostream
+&stream) const  "
+
+[INTERNAL]  Print more.
 
 ";
 
@@ -47961,6 +48291,10 @@ tr=false) const  "
 Parameters:
 -----------
 
+s_in:   Input name
+
+s_out:   Output name(s)
+
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
@@ -48349,6 +48683,13 @@ const  "
 casadi::FunctionInternal::codegen_declarations(CodeGenerator &g) const  "
 
 [INTERNAL]  Generate code for the declarations of the C function.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::disp_more(std::ostream
+&stream) const  "
+
+[INTERNAL]  Print more.
 
 ";
 
@@ -48888,6 +49229,13 @@ casadi::FunctionInternal::print_dimensions(std::ostream &stream) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::disp_more(std::ostream
+&stream) const  "
+
+[INTERNAL]  Print more.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::alloc_iw(size_t sz_iw, bool
 persistent=false) "
 
@@ -49177,6 +49525,10 @@ tr=false) const  "
 
 Parameters:
 -----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
 
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
@@ -50182,6 +50534,13 @@ elements.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::disp_more(std::ostream
+&stream) const  "
+
+[INTERNAL]  Print more.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::codegen_body(CodeGenerator
 &g) const  "
 
@@ -50458,6 +50817,10 @@ tr=false) const  "
 
 Parameters:
 -----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
 
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
@@ -51110,6 +51473,10 @@ tr=false) const  "
 Parameters:
 -----------
 
+s_in:   Input name
+
+s_out:   Output name(s)
+
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
@@ -51252,6 +51619,13 @@ multiplying.
 double **arg, double **res, int *iw, double *w) const  "
 
 [INTERNAL]  Set the (persistent and temporary) work vectors.
+
+";
+
+%feature("docstring")  casadi::Nlpsol::disp_more(std::ostream &stream) const
+override "
+
+[INTERNAL]  Print description.
 
 ";
 
@@ -53242,6 +53616,10 @@ tr=false) const  "
 Parameters:
 -----------
 
+s_in:   Input name
+
+s_out:   Output name(s)
+
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
@@ -53290,6 +53668,13 @@ std::string &name, const Importer &li) "
 &g) const  "
 
 [INTERNAL]  Generate code for the function body.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::disp_more(std::ostream
+&stream) const  "
+
+[INTERNAL]  Print more.
 
 ";
 
@@ -54438,6 +54823,10 @@ tr=false) const  "
 Parameters:
 -----------
 
+s_in:   Input name
+
+s_out:   Output name(s)
+
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
@@ -55005,6 +55394,13 @@ std::string &name) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::disp_more(std::ostream
+&stream) const  "
+
+[INTERNAL]  Print more.
+
+";
+
 %feature("docstring")  casadi::SlicotDple::free_mem(void *mem) const
 override "
 
@@ -55556,6 +55952,13 @@ std::string > &onames, const Dict &opts) const override "
 %feature("docstring")  casadi::FunctionInternal::sz_arg() const  "
 
 [INTERNAL]  Get required length of arg field.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::disp_more(std::ostream
+&stream) const  "
+
+[INTERNAL]  Print more.
 
 ";
 
@@ -56505,6 +56908,10 @@ tr=false) const  "
 Parameters:
 -----------
 
+s_in:   Input name
+
+s_out:   Output name(s)
+
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
@@ -56682,7 +57089,7 @@ Order the columns by decreasing degree.
 
 ";
 
-%feature("docstring")  casadi::Sparsity::dim() const  "
+%feature("docstring")  casadi::Sparsity::dim(bool with_nz=false) const  "
 
 Get the dimension as a string.
 
@@ -57218,7 +57625,7 @@ Check whether the sparsity-pattern indicates structural singularity.
 %feature("docstring")  casadi::Sparsity::print_compact(std::ostream
 &stream=casadi::userOut()) const  "
 
-Print a compact description of the sparsity pattern.
+[DEPRECATED] Alias for disp
 
 ";
 
@@ -58854,6 +59261,10 @@ tr=false) const  "
 Parameters:
 -----------
 
+s_in:   Input name
+
+s_out:   Output name(s)
+
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
@@ -58943,6 +59354,13 @@ std::vector< std::string > &s_out, const Function::AuxOut
 bool persistent=false) "
 
 [INTERNAL]  Ensure required length of arg field.
+
+";
+
+%feature("docstring")  casadi::Nlpsol::disp_more(std::ostream &stream) const
+override "
+
+[INTERNAL]  Print description.
 
 ";
 
@@ -59542,18 +59960,10 @@ int oind, bool symmetric) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::which_depends(const
-std::string &s_in, const std::vector< std::string > &s_out, int order, bool
-tr=false) const  "
+%feature("docstring")  casadi::Switch::disp_more(std::ostream &stream) const
+override "
 
-[INTERNAL]  Which variables enter with some order.
-
-Parameters:
------------
-
-order:  Only 1 (linear) and 2 (nonlinear) allowed
-
-tr:  Flip the relationship. Return which expressions contain the variables
+[INTERNAL]  Print description.
 
 ";
 
@@ -59778,13 +60188,6 @@ std::string &name, std::ostream &stream) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::factory(const std::string
-&name, const std::vector< std::string > &s_in, const std::vector<
-std::string > &s_out, const Function::AuxOut &aux, const Dict &opts) const
-"
-
-[INTERNAL] ";
-
 %feature("docstring")  casadi::FunctionInternal::getJacSparsityGen(int iind,
 int oind, bool symmetric, int gr_i=1, int gr_o=1) const  "
 
@@ -59927,15 +60330,22 @@ bool persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sx_out(int ind) const  "
+%feature("docstring")  casadi::FunctionInternal::which_depends(const
+std::string &s_in, const std::vector< std::string > &s_out, int order, bool
+tr=false) const  "
 
-[INTERNAL]  Get function input(s) and output(s)
+[INTERNAL]  Which variables enter with some order.
 
-";
+Parameters:
+-----------
 
-%feature("docstring")  casadi::FunctionInternal::sx_out() const  "
+s_in:   Input name
 
-[INTERNAL]  Get function input(s) and output(s)
+s_out:   Output name(s)
+
+order:  Only 1 (linear) and 2 (nonlinear) allowed
+
+tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
@@ -60072,12 +60482,12 @@ persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::Switch::disp(std::ostream &stream, bool more)
-const override "
+%feature("docstring")  casadi::FunctionInternal::factory(const std::string
+&name, const std::vector< std::string > &s_in, const std::vector<
+std::string > &s_out, const Function::AuxOut &aux, const Dict &opts) const
+"
 
-[INTERNAL]  Print description.
-
-";
+[INTERNAL] ";
 
 %feature("docstring")  casadi::FunctionInternal::wrap() const  "
 
@@ -60145,6 +60555,18 @@ propagation.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::sx_out(int ind) const  "
+
+[INTERNAL]  Get function input(s) and output(s)
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::sx_out() const  "
+
+[INTERNAL]  Get function input(s) and output(s)
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::getAtomicInput(int k) const
 "
 
@@ -60162,6 +60584,13 @@ propagation.
 casadi::FunctionInternal::add_dependency(CodeGenerator &g) const  "
 
 [INTERNAL]  Add a dependent function.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::disp(std::ostream &stream,
+bool more) const override "
+
+[INTERNAL]  Print.
 
 ";
 
@@ -60952,6 +61381,10 @@ tr=false) const  "
 Parameters:
 -----------
 
+s_in:   Input name
+
+s_out:   Output name(s)
+
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
@@ -61544,6 +61977,13 @@ casadi::FunctionInternal::codegen_declarations(CodeGenerator &g) const  "
 "
 
 [INTERNAL]  Get all statistics.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::disp_more(std::ostream
+&stream) const  "
+
+[INTERNAL]  Print more.
 
 ";
 
@@ -62625,6 +63065,20 @@ true)
 
 ";
 
+%feature("docstring")  casadi::in_range(const std::vector< T > &v, int
+upper) "
+
+Check if for each element of v holds: v_i < upper.
+
+";
+
+%feature("docstring")  casadi::in_range(const std::vector< T > &v, int
+lower, int upper) "
+
+Check if for each element of v holds: lower <= v_i < upper.
+
+";
+
 %feature("docstring")  casadi::load_integrator(const std::string &name) "
 
 Explicitly load a plugin dynamically.
@@ -63136,20 +63590,6 @@ Generate a hash value incrementally (function taken from boost)
 [INTERNAL] ";
 
 %feature("docstring")  casadi::trim_path(const std::string &full_path) "
-
-";
-
-%feature("docstring")  casadi::in_bounds(const std::vector< T > &v, int
-upper) "
-
-Check if for each element of v holds: v_i < upper.
-
-";
-
-%feature("docstring")  casadi::in_bounds(const std::vector< T > &v, int
-lower, int upper) "
-
-Check if for each element of v holds: lower <= v_i < upper.
 
 ";
 
@@ -63676,6 +64116,8 @@ Obtain collocation points of specific order and scheme.
 
 Parameters:
 -----------
+
+order:  Which order (1 to 9 supported)
 
 scheme:  'radau' or 'legendre'
 
@@ -64401,6 +64843,10 @@ order:  Order of interpolating polynomials
 
 scheme:   Collocation scheme, as excepted by collocationPoints function.
 
+solver:  Solver plugin
+
+solver_options:  Options to be passed to the solver plugin
+
 ";
 
 %feature("docstring")  casadi::nlpsol_option_type(const std::string &name,
@@ -64484,8 +64930,8 @@ Parameters:
 tau_root:  location of collocation points, as obtained from
 collocation_points
 
-C:  interpolating coefficients to obtain derivatives Length: order+1, order
-+ 1
+output_C:  interpolating coefficients to obtain derivatives Length: order+1,
+order + 1
 
 
 
@@ -64498,7 +64944,7 @@ dX/dt @collPoint(j) ~ Sum_i C[j][i]*X@collPoint(i)
 Parameters:
 -----------
 
-D:  interpolating coefficients to obtain end state Length: order+1
+output_D:  interpolating coefficients to obtain end state Length: order+1
 
 ";
 

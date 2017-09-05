@@ -111,6 +111,11 @@ Function instance consisting of only one MX call.
 
 ";
 
+%feature("docstring") casadi::Blocksqp::disp_more "[INTERNAL]  Print
+description.
+
+";
+
 %feature("docstring") casadi::Blocksqp::alloc_w "[INTERNAL]  Ensure
 required length of w field.
 
@@ -1083,6 +1088,10 @@ variables enter with some order.
 Parameters:
 -----------
 
+s_in:   Input name
+
+s_out:   Output name(s)
+
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
@@ -1844,6 +1853,10 @@ variables enter with some order.
 Parameters:
 -----------
 
+s_in:   Input name
+
+s_out:   Output name(s)
+
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
@@ -2112,6 +2125,10 @@ Generate code for the declarations of the C function.
 
 %feature("docstring") casadi::BSpline::name_out "[INTERNAL]  Get output
 scheme name by index.
+
+";
+
+%feature("docstring") casadi::BSpline::disp_more "[INTERNAL]  Print more.
 
 ";
 
@@ -3065,6 +3082,10 @@ Which variables enter with some order.
 Parameters:
 -----------
 
+s_in:   Input name
+
+s_out:   Output name(s)
+
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
@@ -3247,6 +3268,11 @@ of function input and outputs.
 
 %feature("docstring") casadi::BSplineCommon::free_mem "[INTERNAL]  Free
 memory block.
+
+";
+
+%feature("docstring") casadi::BSplineCommon::disp_more "[INTERNAL]  Print
+more.
 
 ";
 
@@ -4031,8 +4057,8 @@ derivatives by multiplying the full Jacobian and multiplying.
 
 ";
 
-%feature("docstring") casadi::BSplineDual::print_option "[INTERNAL]  Print
-all information there is to know about a certain option.
+%feature("docstring") casadi::BSplineDual::disp_more "[INTERNAL]  Print
+more.
 
 ";
 
@@ -4481,6 +4507,11 @@ variables ( MX)
 
 ";
 
+%feature("docstring") casadi::BSplineDual::print_option "[INTERNAL]  Print
+all information there is to know about a certain option.
+
+";
+
 %feature("docstring") casadi::BSplineDual::codegen_body "
 
 Generate code for the body of the C function.
@@ -4722,6 +4753,10 @@ variables enter with some order.
 
 Parameters:
 -----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
 
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
@@ -5064,6 +5099,11 @@ Get the unidirectional or bidirectional partition.
 
 ";
 
+%feature("docstring") casadi::BSplineInterpolant::disp_more "[INTERNAL]
+Print more.
+
+";
+
 %feature("docstring") casadi::BSplineInterpolant::matching_arg "[INTERNAL]
 Check if input arguments that needs to be replaced.
 
@@ -5287,6 +5327,10 @@ Which variables enter with some order.
 
 Parameters:
 -----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
 
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
@@ -5816,6 +5860,14 @@ Is a null pointer?
 
 ";
 
+%feature("docstring") casadi::Callback::has_reverse "
+
+Return function that calculates adjoint derivatives reverse(nadj) returns a
+cached instance if available, and calls  Function get_reverse(int nadj) if
+no cached version is available.
+
+";
+
 %feature("docstring") casadi::Callback::type_name "
 
 Get type name.
@@ -5896,11 +5948,9 @@ Do the derivative functions need nondifferentiated outputs?
 
 ";
 
-%feature("docstring") casadi::Callback::has_reverse "
+%feature("docstring") casadi::Callback::has_spfwd "
 
-Return function that calculates adjoint derivatives reverse(nadj) returns a
-cached instance if available, and calls  Function get_reverse(int nadj) if
-no cached version is available.
+Is the class able to propagate seeds through the algorithm?
 
 ";
 
@@ -5937,6 +5987,12 @@ adheres to SCHEME_NLPINput
 Construct internal object This is the step that actually construct the
 internal object, as the class constructor only creates a null pointer. It
 should be called from the user constructor.
+
+";
+
+%feature("docstring") casadi::Callback::has_sprev "
+
+Is the class able to propagate seeds through the algorithm?
 
 ";
 
@@ -5997,10 +6053,9 @@ Get output dimension.
 
 ";
 
-%feature("docstring") casadi::Callback::spCanEvaluate "[INTERNAL]  Is the
-class able to propagate seeds through the algorithm?
+%feature("docstring") casadi::Callback::spCanEvaluate "
 
-(for usage, see the example propagating_sparsity.cpp)
+[DEPRECATED] Use has_spfwd, has_sprev
 
 ";
 
@@ -6991,6 +7046,11 @@ Diagrams
 
 C++ includes: finite_differences.hpp ";
 
+%feature("docstring") casadi::CentralDiff::disp_more "[INTERNAL]  Print
+more.
+
+";
+
 %feature("docstring") casadi::CentralDiff::setup "[INTERNAL]  Set the
 (persistent and temporary) work vectors.
 
@@ -7143,6 +7203,10 @@ variables enter with some order.
 
 Parameters:
 -----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
 
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
@@ -7811,6 +7875,11 @@ Register the function for evaluation and statistics gathering
 
 ";
 
+%feature("docstring") casadi::Collocation::disp_more "[INTERNAL]  Print
+more.
+
+";
+
 %feature("docstring") casadi::Collocation::size_out "[INTERNAL]
 Input/output dimensions.
 
@@ -8027,6 +8096,10 @@ variables enter with some order.
 
 Parameters:
 -----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
 
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
@@ -8757,6 +8830,10 @@ variables enter with some order.
 Parameters:
 -----------
 
+s_in:   Input name
+
+s_out:   Output name(s)
+
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
@@ -8848,6 +8925,10 @@ information there is to know about a certain option.
 
 %feature("docstring") casadi::Conic::sparsity_jac "[INTERNAL]  Get, if
 necessary generate, the sparsity of a Jacobian block.
+
+";
+
+%feature("docstring") casadi::Conic::disp_more "[INTERNAL]  Print more.
 
 ";
 
@@ -11475,6 +11556,11 @@ the function.
 
 ";
 
+%feature("docstring") casadi::Dple::fwd_seed "[INTERNAL]  Symbolic
+expressions for the forward seeds.
+
+";
+
 %feature("docstring") casadi::Dple::has_spfwd "[INTERNAL]  Is the class
 able to propagate seeds through the algorithm?
 
@@ -11503,6 +11589,10 @@ variables enter with some order.
 Parameters:
 -----------
 
+s_in:   Input name
+
+s_out:   Output name(s)
+
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
@@ -11519,8 +11609,7 @@ name by index.
 
 ";
 
-%feature("docstring") casadi::Dple::fwd_seed "[INTERNAL]  Symbolic
-expressions for the forward seeds.
+%feature("docstring") casadi::Dple::disp_more "[INTERNAL]  Print more.
 
 ";
 
@@ -11955,6 +12044,10 @@ variables enter with some order.
 Parameters:
 -----------
 
+s_in:   Input name
+
+s_out:   Output name(s)
+
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
@@ -12375,6 +12468,10 @@ overloaded.
 
 ";
 
+%feature("docstring") casadi::Expm::disp_more "[INTERNAL]  Print more.
+
+";
+
 %feature("docstring") casadi::Expm::generate_dependencies "[INTERNAL]
 Export / Generate C code for the dependency function.
 
@@ -12658,6 +12755,10 @@ mode AD, virtual functions overloaded in derived classes.
 
 %feature("docstring") casadi::External::class_name "[INTERNAL]  Get type
 name.
+
+";
+
+%feature("docstring") casadi::External::disp_more "[INTERNAL]  Print more.
 
 ";
 
@@ -13304,6 +13405,10 @@ variables enter with some order.
 Parameters:
 -----------
 
+s_in:   Input name
+
+s_out:   Output name(s)
+
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
@@ -13517,6 +13622,11 @@ Get default input value.
 
 %feature("docstring") casadi::FixedStepIntegrator::uses_output "[INTERNAL]
 Do the derivative functions need nondifferentiated outputs?
+
+";
+
+%feature("docstring") casadi::FixedStepIntegrator::disp_more "[INTERNAL]
+Print more.
 
 ";
 
@@ -13843,6 +13953,10 @@ Get all statistics.
 
 Parameters:
 -----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
 
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
@@ -14365,8 +14479,9 @@ For a particular input or for all of the inputs
 
 ";
 
-%feature("docstring") casadi::Function::sz_res "[INTERNAL]  Get required
-length of res field.
+%feature("docstring") casadi::Function::has_spfwd "
+
+Is the class able to propagate seeds through the algorithm?
 
 ";
 
@@ -14413,10 +14528,9 @@ Get an atomic operation operator index.
 
 ";
 
-%feature("docstring") casadi::Function::spCanEvaluate "[INTERNAL]  Is the
-class able to propagate seeds through the algorithm?
+%feature("docstring") casadi::Function::spCanEvaluate "
 
-(for usage, see the example propagating_sparsity.cpp)
+[DEPRECATED] Use has_spfwd, has_sprev
 
 ";
 
@@ -14580,6 +14694,11 @@ For a particular input or for all of the inputs
 ";
 
 %feature("docstring") casadi::Function::get_function "";
+
+%feature("docstring") casadi::Function::sz_res "[INTERNAL]  Get required
+length of res field.
+
+";
 
 %feature("docstring") casadi::Function::is_null "
 
@@ -15275,6 +15394,12 @@ Print options to a stream.
 %feature("docstring") casadi::Function::size2_in "
 
 Get input dimension.
+
+";
+
+%feature("docstring") casadi::Function::has_sprev "
+
+Is the class able to propagate seeds through the algorithm?
 
 ";
 
@@ -16498,6 +16623,11 @@ Reverse mode derivatives.
 
 ";
 
+%feature("docstring") casadi::GenericExternal::disp_more "[INTERNAL]  Print
+more.
+
+";
+
 %feature("docstring") casadi::GenericExternal::name_in "[INTERNAL]  Get
 input scheme name by index.
 
@@ -16523,6 +16653,10 @@ Which variables enter with some order.
 
 Parameters:
 -----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
 
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
@@ -16942,8 +17076,8 @@ Unite two matrices no overlapping sparsity.
 
 %feature("docstring") casadi::GenericMatrix::dim "
 
-Get string representation of dimensions. The representation is (nrow x ncol
-= numel | size)
+Get string representation of dimensions. The representation is e.g. \"4x5\"
+or \"4x5,10nz\".
 
 ";
 
@@ -17480,6 +17614,10 @@ the floating point output argument of an atomic operation.
 ";
 
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::set_work "[INTERNAL]  Set the (persistent) work vectors.
+
+";
+
+%feature("docstring") casadi::ImplicitFixedStepIntegrator::disp_more "[INTERNAL]  Print more.
 
 ";
 
@@ -18043,6 +18181,10 @@ Generate code for the declarations of the C function.
 Parameters:
 -----------
 
+s_in:   Input name
+
+s_out:   Output name(s)
+
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
@@ -18384,6 +18526,10 @@ Which variables enter with some order.
 
 Parameters:
 -----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
 
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
@@ -18879,6 +19025,11 @@ Input/output dimensions.
 
 %feature("docstring") casadi::ImplicitToNlp::sp_reverse "[INTERNAL]
 Propagate sparsity backwards.
+
+";
+
+%feature("docstring") casadi::ImplicitToNlp::disp_more "[INTERNAL]  Print
+more.
 
 ";
 
@@ -19937,6 +20088,11 @@ required length of arg field.
 
 ";
 
+%feature("docstring") casadi::Integrator::disp_more "[INTERNAL]  Print
+more.
+
+";
+
 %feature("docstring") casadi::Integrator::getJacSparsityHierarchicalSymm "[INTERNAL]  A flavor of getJacSparsity that does hierarchical block
 structure recognition for symmetric Jacobians
 
@@ -20289,6 +20445,10 @@ variables enter with some order.
 Parameters:
 -----------
 
+s_in:   Input name
+
+s_out:   Output name(s)
+
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
@@ -20458,6 +20618,11 @@ Generate meta-information allowing a user to evaluate a generated function.
 
 %feature("docstring") casadi::Interpolant::alloc_mem "[INTERNAL]  Create
 memory block.
+
+";
+
+%feature("docstring") casadi::Interpolant::disp_more "[INTERNAL]  Print
+more.
 
 ";
 
@@ -20917,6 +21082,10 @@ variables enter with some order.
 
 Parameters:
 -----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
 
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
@@ -21762,8 +21931,7 @@ dimensions.
 
 ";
 
-%feature("docstring") casadi::Jit::alloc_res "[INTERNAL]  Ensure required
-length of res field.
+%feature("docstring") casadi::Jit::disp_more "[INTERNAL]  Print more.
 
 ";
 
@@ -21849,6 +22017,10 @@ variables enter with some order.
 Parameters:
 -----------
 
+s_in:   Input name
+
+s_out:   Output name(s)
+
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
@@ -21920,6 +22092,11 @@ incref for dependencies.
 
 %feature("docstring") casadi::Jit::setup "[INTERNAL]  Set the (persistent
 and temporary) work vectors.
+
+";
+
+%feature("docstring") casadi::Jit::alloc_res "[INTERNAL]  Ensure required
+length of res field.
 
 ";
 
@@ -22601,6 +22778,10 @@ variables enter with some order.
 Parameters:
 -----------
 
+s_in:   Input name
+
+s_out:   Output name(s)
+
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
@@ -22831,6 +23012,10 @@ length of w field.
 
 %feature("docstring") casadi::LapackLu::numel_out "[INTERNAL]  Number of
 input/output elements.
+
+";
+
+%feature("docstring") casadi::LapackLu::disp_more "[INTERNAL]  Print more.
 
 ";
 
@@ -24028,6 +24213,10 @@ code for the function body.
 
 ";
 
+%feature("docstring") casadi::LapackQr::disp_more "[INTERNAL]  Print more.
+
+";
+
 %feature("docstring") casadi::LapackQr::get_stats "[INTERNAL]  Get all
 statistics.
 
@@ -24400,6 +24589,10 @@ variables enter with some order.
 Parameters:
 -----------
 
+s_in:   Input name
+
+s_out:   Output name(s)
+
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
@@ -24682,6 +24875,10 @@ Which variables enter with some order.
 Parameters:
 -----------
 
+s_in:   Input name
+
+s_out:   Output name(s)
+
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
@@ -24736,6 +24933,11 @@ Evaluate numerically.
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate a function, overloaded.
+
+";
+
+%feature("docstring") casadi::LinearInterpolant::disp_more "[INTERNAL]
+Print more.
 
 ";
 
@@ -25428,6 +25630,11 @@ Input/output dimensions.
 
 ";
 
+%feature("docstring") casadi::LinearInterpolantJac::disp_more "[INTERNAL]
+Print more.
+
+";
+
 %feature("docstring") casadi::LinearInterpolantJac::alloc_iw "[INTERNAL]
 Ensure required length of iw field.
 
@@ -25548,6 +25755,10 @@ oracle.
 
 Parameters:
 -----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
 
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
@@ -26558,6 +26769,10 @@ variables enter with some order.
 Parameters:
 -----------
 
+s_in:   Input name
+
+s_out:   Output name(s)
+
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
@@ -26706,6 +26921,10 @@ dimensions of inputs and outputs.
 
 %feature("docstring") casadi::Lsqr::replace_arg "[INTERNAL]  Replace 0-by-0
 inputs.
+
+";
+
+%feature("docstring") casadi::Lsqr::disp_more "[INTERNAL]  Print more.
 
 ";
 
@@ -27568,6 +27787,10 @@ variables enter with some order.
 Parameters:
 -----------
 
+s_in:   Input name
+
+s_out:   Output name(s)
+
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
@@ -27948,6 +28171,10 @@ and output(s)
 
 %feature("docstring") casadi::Map::getAlgorithmSize "[INTERNAL]  Get the
 number of atomic operations.
+
+";
+
+%feature("docstring") casadi::Map::disp_more "[INTERNAL]  Print more.
 
 ";
 
@@ -28548,6 +28775,10 @@ codegen.
 
 ";
 
+%feature("docstring") casadi::MapOmp::disp_more "[INTERNAL]  Print more.
+
+";
+
 %feature("docstring") casadi::MapOmp::jit_dependencies "[INTERNAL]   Jit
 dependencies.
 
@@ -28578,6 +28809,10 @@ variables enter with some order.
 
 Parameters:
 -----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
 
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
@@ -29334,8 +29569,8 @@ Functions called by friend functions defined here
 
 %feature("docstring") casadi::Matrix::dim "
 
-Get string representation of dimensions. The representation is (nrow x ncol
-= numel | size)
+Get string representation of dimensions. The representation is e.g. \"4x5\"
+or \"4x5,10nz\".
 
 ";
 
@@ -30672,8 +30907,8 @@ Hyperbolic sin: x -> sinh(x)
 
 %feature("docstring") casadi::MX::dim "
 
-Get string representation of dimensions. The representation is (nrow x ncol
-= numel | size)
+Get string representation of dimensions. The representation is e.g. \"4x5\"
+or \"4x5,10nz\".
 
 ";
 
@@ -31457,6 +31692,10 @@ variables enter with some order.
 Parameters:
 -----------
 
+s_in:   Input name
+
+s_out:   Output name(s)
+
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
@@ -31762,6 +32001,10 @@ Get sparsity of a given input.
 ------------------------------------------------------------------------
 [INTERNAL] 
 Are all inputs and outputs scalar.
+
+";
+
+%feature("docstring") casadi::Newton::disp_more "[INTERNAL]  Print more.
 
 ";
 
@@ -32310,6 +32553,11 @@ memory block.
 
 ";
 
+%feature("docstring") casadi::Nlpsol::disp_more "[INTERNAL]  Print
+description.
+
+";
+
 %feature("docstring") casadi::Nlpsol::alloc_mem "[INTERNAL]  Create memory
 block.
 
@@ -32332,8 +32580,8 @@ the sparsity of a Jacobian block.
 
 ";
 
-%feature("docstring") casadi::Nlpsol::get_sparsity_out "[INTERNAL]
-Sparsities of function inputs and outputs.
+%feature("docstring") casadi::Nlpsol::print_fstats "[INTERNAL]  Print
+statistics.
 
 ";
 
@@ -32378,8 +32626,8 @@ Jacobian of all input elements with respect to all output elements.
 
 ";
 
-%feature("docstring") casadi::Nlpsol::print_fstats "[INTERNAL]  Print
-statistics.
+%feature("docstring") casadi::Nlpsol::get_sparsity_out "[INTERNAL]
+Sparsities of function inputs and outputs.
 
 ";
 
@@ -32832,6 +33080,10 @@ variables enter with some order.
 
 Parameters:
 -----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
 
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
@@ -34015,6 +34267,10 @@ Which variables enter with some order.
 Parameters:
 -----------
 
+s_in:   Input name
+
+s_out:   Output name(s)
+
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
@@ -34133,6 +34389,11 @@ input/output nonzeros.
 
 %feature("docstring") casadi::OracleFunction::get_n_out "[INTERNAL]  Number
 of function inputs and outputs.
+
+";
+
+%feature("docstring") casadi::OracleFunction::disp_more "[INTERNAL]  Print
+more.
 
 ";
 
@@ -34971,6 +35232,10 @@ variables enter with some order.
 Parameters:
 -----------
 
+s_in:   Input name
+
+s_out:   Output name(s)
+
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
@@ -35247,6 +35512,10 @@ Generate native code in the interfaced language for debugging
 
 %feature("docstring") casadi::QpToNlp::codegen_declarations "[INTERNAL]
 Generate code for the declarations of the C function.
+
+";
+
+%feature("docstring") casadi::QpToNlp::disp_more "[INTERNAL]  Print more.
 
 ";
 
@@ -35627,6 +35896,11 @@ function input and outputs.
 
 ";
 
+%feature("docstring") casadi::Rootfinder::disp_more "[INTERNAL]  Print
+more.
+
+";
+
 %feature("docstring") casadi::Rootfinder::alloc_iw "[INTERNAL]  Ensure
 required length of iw field.
 
@@ -35837,6 +36111,10 @@ variables enter with some order.
 
 Parameters:
 -----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
 
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
@@ -36503,6 +36781,11 @@ Jacobian of all input elements with respect to all output elements.
 
 ";
 
+%feature("docstring") casadi::RungeKutta::disp_more "[INTERNAL]  Print
+more.
+
+";
+
 %feature("docstring") casadi::RungeKutta::codegen_body "[INTERNAL]
 Generate code for the function body.
 
@@ -36689,6 +36972,10 @@ variables enter with some order.
 
 Parameters:
 -----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
 
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
@@ -37147,6 +37434,10 @@ variables enter with some order.
 Parameters:
 -----------
 
+s_in:   Input name
+
+s_out:   Output name(s)
+
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
@@ -37246,6 +37537,11 @@ derivatives by multiplying the full Jacobian and multiplying.
 
 %feature("docstring") casadi::Scpgen::setup "[INTERNAL]  Set the
 (persistent and temporary) work vectors.
+
+";
+
+%feature("docstring") casadi::Scpgen::disp_more "[INTERNAL]  Print
+description.
 
 ";
 
@@ -38705,6 +39001,10 @@ Which variables enter with some order.
 Parameters:
 -----------
 
+s_in:   Input name
+
+s_out:   Output name(s)
+
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
@@ -38739,6 +39039,11 @@ Number of function inputs and outputs.
 
 %feature("docstring") casadi::SimplifiedExternal::codegen_body "[INTERNAL]
 Generate code for the function body.
+
+";
+
+%feature("docstring") casadi::SimplifiedExternal::disp_more "[INTERNAL]
+Print more.
 
 ";
 
@@ -39541,6 +39846,10 @@ variables enter with some order.
 Parameters:
 -----------
 
+s_in:   Input name
+
+s_out:   Output name(s)
+
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
@@ -39959,6 +40268,11 @@ input value.
 
 ";
 
+%feature("docstring") casadi::SlicotDple::disp_more "[INTERNAL]  Print
+more.
+
+";
+
 %feature("docstring") casadi::SlicotDple::free_mem "[INTERNAL]  Free memory
 block.
 
@@ -40356,6 +40670,11 @@ a function that calculates nadj adjoint derivatives.
 
 %feature("docstring") casadi::SlicotExpm::sz_arg "[INTERNAL]  Get required
 length of arg field.
+
+";
+
+%feature("docstring") casadi::SlicotExpm::disp_more "[INTERNAL]  Print
+more.
 
 ";
 
@@ -41005,6 +41324,10 @@ variables enter with some order.
 Parameters:
 -----------
 
+s_in:   Input name
+
+s_out:   Output name(s)
+
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
@@ -41628,7 +41951,7 @@ Check whether the sparsity-pattern indicates structural singularity.
 
 %feature("docstring") casadi::Sparsity::print_compact "
 
-Print a compact description of the sparsity pattern.
+[DEPRECATED] Alias for disp
 
 ";
 
@@ -42969,6 +43292,10 @@ variables enter with some order.
 Parameters:
 -----------
 
+s_in:   Input name
+
+s_out:   Output name(s)
+
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
@@ -43031,6 +43358,11 @@ Create an oracle function
 
 %feature("docstring") casadi::Sqpmethod::alloc_arg "[INTERNAL]  Ensure
 required length of arg field.
+
+";
+
+%feature("docstring") casadi::Sqpmethod::disp_more "[INTERNAL]  Print
+description.
 
 ";
 
@@ -43452,15 +43784,8 @@ dimensions.
 
 ";
 
-%feature("docstring") casadi::Switch::which_depends "[INTERNAL]  Which
-variables enter with some order.
-
-Parameters:
------------
-
-order:  Only 1 (linear) and 2 (nonlinear) allowed
-
-tr:  Flip the relationship. Return which expressions contain the variables
+%feature("docstring") casadi::Switch::disp_more "[INTERNAL]  Print
+description.
 
 ";
 
@@ -43620,8 +43945,6 @@ block.
 
 ";
 
-%feature("docstring") casadi::Switch::factory "[INTERNAL] ";
-
 %feature("docstring") casadi::Switch::getJacSparsityGen "[INTERNAL]  Get
 the sparsity pattern, forward mode.
 
@@ -43726,8 +44049,19 @@ inputs and outputs.
 
 ";
 
-%feature("docstring") casadi::Switch::sx_out "[INTERNAL]  Get function
-input(s) and output(s)
+%feature("docstring") casadi::Switch::which_depends "[INTERNAL]  Which
+variables enter with some order.
+
+Parameters:
+-----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
+
+order:  Only 1 (linear) and 2 (nonlinear) allowed
+
+tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
@@ -43821,9 +44155,7 @@ length of w field.
 
 ";
 
-%feature("docstring") casadi::Switch::disp "[INTERNAL]  Print description.
-
-";
+%feature("docstring") casadi::Switch::factory "[INTERNAL] ";
 
 %feature("docstring") casadi::Switch::wrap "[INTERNAL]  Wrap in an Function
 instance consisting of only one MX call.
@@ -43870,6 +44202,11 @@ input(s) and output(s)
 
 ";
 
+%feature("docstring") casadi::Switch::sx_out "[INTERNAL]  Get function
+input(s) and output(s)
+
+";
+
 %feature("docstring") casadi::Switch::getAtomicInput "[INTERNAL]  Get the
 (integer) input arguments of an atomic operation.
 
@@ -43881,6 +44218,10 @@ input(s) and output(s)
 
 %feature("docstring") casadi::Switch::add_dependency "[INTERNAL]  Add a
 dependent function.
+
+";
+
+%feature("docstring") casadi::Switch::disp "[INTERNAL]  Print.
 
 ";
 
@@ -44421,6 +44762,10 @@ variables enter with some order.
 Parameters:
 -----------
 
+s_in:   Input name
+
+s_out:   Output name(s)
+
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
@@ -44813,6 +45158,11 @@ of function input and outputs.
 
 %feature("docstring") casadi::SymbolicQr::get_stats "[INTERNAL]  Get all
 statistics.
+
+";
+
+%feature("docstring") casadi::SymbolicQr::disp_more "[INTERNAL]  Print
+more.
 
 ";
 
@@ -45793,6 +46143,20 @@ true)
 
 ";
 
+%feature("docstring") casadi::in_range "
+
+>  bool casadi::in_range(const std::vector< T > &v, int upper)
+------------------------------------------------------------------------
+
+Check if for each element of v holds: v_i < upper.
+
+>  bool casadi::in_range(const std::vector< T > &v, int lower, int upper)
+------------------------------------------------------------------------
+
+Check if for each element of v holds: lower <= v_i < upper.
+
+";
+
 %feature("docstring") casadi::load_integrator "
 
 Explicitly load a plugin dynamically.
@@ -46231,20 +46595,6 @@ Generate a hash value incrementally, array.
 %feature("docstring") casadi::casadi_copy_int "[INTERNAL] ";
 
 %feature("docstring") casadi::trim_path "";
-
-%feature("docstring") casadi::in_bounds "
-
->  bool casadi::in_bounds(const std::vector< T > &v, int upper)
-------------------------------------------------------------------------
-
-Check if for each element of v holds: v_i < upper.
-
->  bool casadi::in_bounds(const std::vector< T > &v, int lower, int upper)
-------------------------------------------------------------------------
-
-Check if for each element of v holds: lower <= v_i < upper.
-
-";
 
 %feature("docstring") casadi::has_integrator "
 
@@ -46754,6 +47104,8 @@ Obtain collocation points of specific order and scheme.
 
 Parameters:
 -----------
+
+order:  Which order (1 to 9 supported)
 
 scheme:  'radau' or 'legendre'
 
@@ -47476,6 +47828,10 @@ order:  Order of interpolating polynomials
 
 scheme:   Collocation scheme, as excepted by collocationPoints function.
 
+solver:  Solver plugin
+
+solver_options:  Options to be passed to the solver plugin
+
 ";
 
 %feature("docstring") casadi::nlpsol_option_type "
@@ -47532,8 +47888,8 @@ Parameters:
 tau_root:  location of collocation points, as obtained from
 collocation_points
 
-C:  interpolating coefficients to obtain derivatives Length: order+1, order
-+ 1
+output_C:  interpolating coefficients to obtain derivatives Length: order+1,
+order + 1
 
 
 
@@ -47546,7 +47902,7 @@ dX/dt @collPoint(j) ~ Sum_i C[j][i]*X@collPoint(i)
 Parameters:
 -----------
 
-D:  interpolating coefficients to obtain end state Length: order+1
+output_D:  interpolating coefficients to obtain end state Length: order+1
 
 ";
 

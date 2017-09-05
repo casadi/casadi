@@ -376,9 +376,6 @@
 %exception  casadi::Function::conic_debug(std::ostream &file) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Function::spCanEvaluate(bool fwd) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::Function::sz_arg() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -485,6 +482,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::disp(std::ostream &stream, bool more) const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::FunctionInternal::disp_more(std::ostream &stream) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::eval_mx(const MXVector &arg, MXVector &res, bool always_inline, bool never_inline) const  {
@@ -1228,6 +1228,9 @@
 %exception  casadi::Nlpsol::default_in(int ind) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Nlpsol::disp_more(std::ostream &stream) const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::Nlpsol::getReducedHessian() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -1591,7 +1594,7 @@
 %exception  casadi::Switch::codegen_declarations(CodeGenerator &g) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Switch::disp(std::ostream &stream, bool more) const override {
+%exception  casadi::Switch::disp_more(std::ostream &stream) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Switch::get_forward(int nfwd, const std::string &name, const std::vector< std::string > &inames, const std::vector< std::string > &onames, const Dict &opts) const override {
