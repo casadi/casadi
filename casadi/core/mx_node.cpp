@@ -506,7 +506,8 @@ namespace casadi {
   MX MXNode::get_binary(int op, const MX& y) const {
     // Make sure that dimensions match
     casadi_assert_message(sparsity().is_scalar() || y.is_scalar() || sparsity().size()==y.size(),
-      "Dimension mismatch. lhs is " + sparsity().dim() + ", while rhs is " + y.dim());
+      "Dimension mismatch for " + casadi_math<double>::print(op, "lhs", "rhs") +
+      ", lhs is " + sparsity().dim() + ", while rhs is " + y.dim());
 
     // Create binary node
     if (sparsity().is_scalar(false)) {
