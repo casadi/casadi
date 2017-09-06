@@ -442,29 +442,29 @@ namespace casadi {
     if (more) sanity_check();
 
     // Print dimensions
-    stream << "#s = " << this->s.size() << ", "
-           << "#x = " << this->x.size() << ", "
-           << "#z = " << this->z.size() << ", "
-           << "#q = " << this->q.size() << ", "
-           << "#y = " << this->y.size() << ", "
-           << "#p = " << this->p.size() << ", "
-           << "#d = " << this->d.size() << ", "
-           << "#u = " << this->u.size();
+    stream << "ns = " << this->s.size() << ", "
+           << "nx = " << this->x.size() << ", "
+           << "nz = " << this->z.size() << ", "
+           << "nq = " << this->q.size() << ", "
+           << "ny = " << this->y.size() << ", "
+           << "np = " << this->p.size() << ", "
+           << "nd = " << this->d.size() << ", "
+           << "nu = " << this->u.size();
 
     // Quick return?
     if (!more) return;
+    stream << endl;
 
     // Print the functions
     if (!fun_.empty()) {
       stream << "Functions" << endl;
       for (const Function& f : fun_) {
-        stream << f << endl;
+        stream << "  " << f << endl;
       }
     }
 
     // Print the variables
     stream << "Variables" << endl;
-    stream << "{" << endl;
     stream << "  t = " << str(this->t) << endl;
     if (!this->s.empty()) stream << "  s = " << str(this->s) << endl;
     if (!this->x.empty()) stream << "  x = " << str(this->x) << endl;
@@ -474,60 +474,53 @@ namespace casadi {
     if (!this->p.empty()) stream << "  p =  " << str(this->p) << endl;
     if (!this->d.empty()) stream << "  d =  " << str(this->d) << endl;
     if (!this->u.empty()) stream << "  u =  " << str(this->u) << endl;
-    stream << "}" << endl;
 
     if (!this->d.empty()) {
       stream << "Dependent parameters" << endl;
       for (int i=0; i<this->d.size(); ++i)
-        stream << str(this->d[i]) << " == " << str(this->ddef[i]) << endl;
-      stream << endl;
+        stream << "  " << str(this->d[i]) << " == " << str(this->ddef[i]) << endl;
     }
 
     if (!this->dae.empty()) {
       stream << "Fully-implicit differential-algebraic equations" << endl;
       for (int k=0; k<this->dae.size(); ++k) {
-        stream << "0 == " << this->dae[k] << endl;
+        stream << "  0 == " << this->dae[k] << endl;
       }
-      stream << endl;
     }
 
     if (!this->x.empty()) {
       stream << "Differential equations" << endl;
       for (int k=0; k<this->x.size(); ++k) {
-        stream << str(der(this->x[k])) << " == " << str(this->ode[k]) << endl;
+        stream << "  " << str(der(this->x[k])) << " == " << str(this->ode[k]) << endl;
       }
-      stream << endl;
     }
 
     if (!this->alg.empty()) {
       stream << "Algebraic equations" << endl;
       for (int k=0; k<this->z.size(); ++k) {
-        stream << "0 == " << str(this->alg[k]) << endl;
+        stream << "  0 == " << str(this->alg[k]) << endl;
       }
-      stream << endl;
     }
 
     if (!this->q.empty()) {
       stream << "Quadrature equations" << endl;
       for (int k=0; k<this->q.size(); ++k) {
-        stream << str(der(this->q[k])) << " == " << str(this->quad[k]) << endl;
+        stream << "  " << str(der(this->q[k])) << " == " << str(this->quad[k]) << endl;
       }
-      stream << endl;
     }
 
     if (!this->init.empty()) {
       stream << "Initial equations" << endl;
       for (int k=0; k<this->init.size(); ++k) {
-        stream << "0 == " << str(this->init[k]) << endl;
+        stream << "  0 == " << str(this->init[k]) << endl;
       }
-      stream << endl;
     }
 
     if (!this->y.empty()) {
       stream << "Output variables" << endl;
-      for (int i=0; i<this->y.size(); ++i)
-        stream << str(this->y[i]) << " == " << str(this->ydef[i]) << endl;
-      stream << endl;
+      for (int i=0; i<this->y.size(); ++i) {
+        stream << "  " << str(this->y[i]) << " == " << str(this->ydef[i]) << endl;
+      }
     }
   }
 
