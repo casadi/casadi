@@ -100,7 +100,7 @@
 %exception  casadi::ClangCompiler::class_name() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::ClangCompiler::get_function(const std::string &symname) {
+%exception  casadi::ClangCompiler::get_function(const std::string &symname) override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::ClangCompiler::get_options() const override {

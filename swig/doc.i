@@ -10353,7 +10353,7 @@ bool persistent=false) "
 [INTERNAL] ";
 
 %feature("docstring")  casadi::ClangCompiler::get_function(const std::string
-&symname) "
+&symname) override "
 
 [INTERNAL]  Get a function pointer for numerical evaluation.
 
