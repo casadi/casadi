@@ -144,7 +144,9 @@ matrix:
         - sudo make install
         - popd
         - python -c "from casadi.tools import *;loadAllCompiledPlugins()"
-        - pushd test && make unittests_py examples_code_py && popd
+        - pushd test
+        - make unittests_py examples_code_py || remote_access
+        - popd
     - compiler: gcc
       os: linux
       dist: trusty
