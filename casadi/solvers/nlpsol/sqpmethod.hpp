@@ -193,23 +193,6 @@ namespace casadi {
     // Reset the Hessian or Hessian approximation
     void reset_h(SqpmethodMemory* m) const;
 
-    // Evaluate the gradient of the objective
-    virtual double eval_f(SqpmethodMemory* m, const double* x) const;
-
-    // Evaluate the gradient of the objective
-    virtual void eval_grad_f(SqpmethodMemory* m, const double* x, double* f,
-                             double* grad_f) const;
-
-    // Evaluate the constraints
-    virtual void eval_g(SqpmethodMemory* m, const double* x, double* g) const;
-
-    // Evaluate the Jacobian of the constraints
-    virtual void eval_jac_g(SqpmethodMemory* m, const double* x, double* g, double* J) const;
-
-    // Evaluate the Hessian of the Lagrangian
-    virtual void eval_h(SqpmethodMemory* m, const double* x, const double* lambda,
-                        double sigma, double* H) const;
-
     // Calculate the regularization parameter using Gershgorin theorem
     double getRegularization(const double* H) const;
 
