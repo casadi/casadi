@@ -536,8 +536,8 @@ namespace casadi {
 
     // Print
     if (verbose_) {
-      userOut() << "FunctionInternal::getJacSparsityGen<" << fwd << ">: "
-                << nsweep << " sweeps needed for " << seed.size() << " directions" << endl;
+      casadi_message(str(nsweep) + string(fwd ? "forward" : "reverse") + " sweeps "
+                     "needed for " + str(seed.size()) + " directions");
     }
 
     // Progress
@@ -555,7 +555,7 @@ namespace casadi {
         // Print when entering a new decade
         if (progress_new / 10 > progress / 10) {
           progress = progress_new;
-          userOut() << progress << " %"  << endl;
+          casadi_message(str(progress) + " %");
         }
       }
 
@@ -1299,12 +1299,16 @@ namespace casadi {
             floor(best_coloring/w);
           D1 = AT.uni_coloring(A, max_colorings_to_test);
           if (D1.is_null()) {
-            if (verbose_) userOut() << "Forward mode coloring interrupted (more than "
-                               << max_colorings_to_test << " needed)." << endl;
+            if (verbose_) {
+              casadi_message("Forward mode coloring interrupted (more than "
+                             + str(max_colorings_to_test) + " needed).");
+            }
           } else {
-            if (verbose_) userOut() << "Forward mode coloring completed: "
-                               << D1.size2() << " directional derivatives needed ("
-                               << A.size1() << " without coloring)." << endl;
+            if (verbose_) {
+              casadi_message("Forward mode coloring completed: "
+                             + str(D1.size2()) + " directional derivatives needed ("
+                             + str(A.size1()) + " without coloring).");
+            }
             D2 = Sparsity();
             best_coloring = w*D1.size2();
           }
@@ -1315,12 +1319,16 @@ namespace casadi {
 
           D2 = A.uni_coloring(AT, max_colorings_to_test);
           if (D2.is_null()) {
-            if (verbose_) userOut() << "Adjoint mode coloring interrupted (more than "
-                               << max_colorings_to_test << " needed)." << endl;
+            if (verbose_) {
+              casadi_message("Adjoint mode coloring interrupted (more than "
+                            + str(max_colorings_to_test) + " needed).");
+            }
           } else {
-            if (verbose_) userOut() << "Adjoint mode coloring completed: "
-                               << D2.size2() << " directional derivatives needed ("
-                               << A.size2() << " without coloring)." << endl;
+            if (verbose_) {
+              casadi_message("Adjoint mode coloring completed: "
+                             + str(D2.size2()) + " directional derivatives needed ("
+                             + str(A.size2()) + " without coloring).");
+            }
             D1 = Sparsity();
             best_coloring = (1-w)*D2.size2();
           }
@@ -2716,7 +2724,6 @@ namespace casadi {
     if (n_call == 0) return;
 
     std::stringstream s;
-
     s
       << setw(maxNameLen) << label << " "
       << formatFloat(t_proc, 9, 3, 3) << " [s]  "
@@ -2725,18 +2732,14 @@ namespace casadi {
       // things like main loop don't have # evals
       s << endl;
     } else {
-      s
-        << " "
-        << setw(5) << n_call;
+      s << " " << setw(5) << n_call;
       if (n_call < 2) {
-        s << endl;
+        s << "\n";
       } else {
         // only print averages if there is more than 1 eval
-        s
-          << " "
+        s << " "
           << formatFloat(1000.0*t_proc/n_call, 10, 2, 3) << " [ms]  "
-          << formatFloat(1000.0*t_wall/n_call, 10, 2, 3) << " [ms]"
-          << endl;
+          << formatFloat(1000.0*t_wall/n_call, 10, 2, 3) << " [ms]\n";
       }
     }
     userOut() << s.str();

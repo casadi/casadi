@@ -54,8 +54,6 @@ namespace casadi {
 
     // **** Add model variables ****
     {
-      //if (verbose) userOut() << "Adding model variables." << endl;
-
       // Get a reference to the ModelVariables node
       const XmlNode& modvars = document[0]["ModelVariables"];
 
@@ -202,8 +200,6 @@ namespace casadi {
 
     // **** Add binding equations ****
     {
-      //if (verbose) userOut() << "Adding binding equations." << endl;
-
       // Get a reference to the BindingEquations node
       const XmlNode& bindeqs = document[0]["equ:BindingEquations"];
 

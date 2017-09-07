@@ -62,7 +62,7 @@ namespace casadi {
     }
     // Open file for reading
     s_.open(filename.c_str());
-    if (verbose_) userOut() << "Reading file \"" << filename << "\"" << endl;
+    if (verbose_) casadi_message("Reading file \"" + filename + "\"");
 
     // Read the header of the NL-file (first 10 lines)
     const int header_sz = 10;
@@ -80,23 +80,25 @@ namespace casadi {
     stringstream ss(header[1]);
     ss >> n_var_ >> n_con_ >> n_obj_ >> n_eq_ >> n_lcon_;
     if (verbose_) {
-      userOut() << "n_var = " << n_var_ << ", n_con  = " << n_con_ << ", n_obj = " << n_obj_
-      << ", n_eq = " << n_eq_ << ", n_lcon = " << n_lcon_ << endl;
+      casadi_message("n_var=" + str(n_var_) + ", n_con =" + str(n_con_) + ", "
+                     "n_obj=" + str(n_obj_) + ", n_eq=" + str(n_eq_) + ", "
+                     "n_lcon=" + str(n_lcon_));
     }
 
     // Get the number of nonlinear vars in constraints, objectives, both
     stringstream ss4(header[4]);
     ss4 >> nlvc_ >> nlvo_ >> nlvb_;
     if (verbose_) {
-      userOut() << "nlvc = " << nlvc_ << ", nlvo  = " << nlvo_ << ", nlvb = " << nlvb_  << endl;
+      casadi_message("nlvc=" + str(nlvc_) + ", nlvo=" + str(nlvo_) + ", nlvb=" + str(nlvb_));
     }
 
     // Get the number of discrete variables
     stringstream ss6(header[6]);
     ss6 >> nbv_ >> niv_ >> nlvbi_ >> nlvci_ >> nlvoi_;
     if (verbose_) {
-      userOut() << "nbv = " << nbv_ << ", niv  = " << niv_ << ", nlvbi = " << nlvbi_
-      << ", nlvci = " << nlvci_ << ", nlvoi = " << nlvoi_ << endl;
+      casadi_message("nbv=" + str(nbv_) + ", niv =" + str(niv_) + ", "
+                     "nlvbi=" + str(nlvbi_) + ", nlvci=" + str(nlvci_) + ", "
+                     "nlvoi=" + str(nlvoi_));
     }
 
     // Allocate variables
@@ -267,7 +269,7 @@ namespace casadi {
             case 53:  return acos(x);
 
             default:
-            msg << "Unknown unary operation: \"" << i << "\"";
+            casadi_error("Unknown unary operation: " + str(i));
           }
           break;
         }
@@ -307,7 +309,7 @@ namespace casadi {
             // case 73:  return iff(x, y); // FIXME
 
             default:
-            msg << "Unknown binary operation: \"" << i << "\"";
+            casadi_error("Unknown binary operation: " + str(i));
           }
           break;
         }
@@ -345,32 +347,32 @@ namespace casadi {
             }
 
             default:
-            msg << "Unknown n-ary operation: \"" << i << "\"";
+            casadi_error("Unknown n-ary operation: " + str(i));
           }
           break;
         }
 
         // Piecewise linear terms, class 4 in Gay2005
         case 64:
-        msg << "Piecewise linear terms not supported";
+        casadi_error("Piecewise linear terms not supported");
         break;
 
         // If-then-else expressions, class 5 in Gay2005
         case 35: case 65: case 72:
-        msg << "If-then-else expressions not supported";
+        casadi_error("If-then-else expressions not supported");
         break;
 
         default:
-        msg << "Unknown operatio: \"" << i << "\"";
+        casadi_error("Unknown operatio: " + str(i));
       }
       break;
 
       default:
-      msg << "Unknown instruction: \"" << inst << "\"";
+      casadi_error("Unknown instruction: " + str(inst));
     }
 
     // Throw error message
-    throw CasadiException("Error in NlpBuilder::expr: " + msg.str());
+    casadi_error("Unknown error");
   }
 
   void NlImporter::F_segment() {

@@ -870,7 +870,7 @@ namespace casadi {
     /// \cond INTERNAL
     /** \brief Detect duplicate symbolic expressions
         If there are symbolic primitives appearing more than once, the function will return
-        true and the names of the duplicate expressions will be printed to userOut<true, PL_WARN>().
+        true and the names of the duplicate expressions will be passed to casadi_warning.
         Note: Will mark the node using SXElem::set_temp.
         Make sure to call reset_input() after usage.
     */

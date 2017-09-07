@@ -2783,7 +2783,7 @@ namespace casadi {
     for (auto&& i : nonzeros_) {
       bool is_duplicate = i.get_temp()!=0;
       if (is_duplicate) {
-        userOut<true, PL_WARN>() << "Duplicate expression: " << i << endl;
+        casadi_warning("Duplicate expression: " + str(i));
       }
       has_duplicates = has_duplicates || is_duplicate;
       i.set_temp(1);

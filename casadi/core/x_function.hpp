@@ -226,11 +226,12 @@ namespace casadi {
     for (auto&& i : in_) i.reset_input();
 
     if (has_duplicates) {
-      userOut<true, PL_WARN>() << "Input expressions:" << std::endl;
+      std::stringstream s;
+      s << "The input expressions are not independent:\n";
       for (int iind=0; iind<in_.size(); ++iind) {
-        userOut<true, PL_WARN>() << iind << ": " << in_[iind] << std::endl;
+        s << iind << ": " << in_[iind] << "\n";
       }
-      casadi_error("The input expressions are not independent (or were not reset properly).");
+      casadi_error(s.str());
     }
   }
 
@@ -286,7 +287,7 @@ namespace casadi {
   MatType XFunction<DerivedType, MatType, NodeType>
   ::jac(int iind, int oind, const Dict& opts) const {
     using namespace std;
-    if (verbose_) userOut() << "XFunction::jac begin" << std::endl;
+    if (verbose_) casadi_message(name_ + "::jac");
 
     // Read options
     bool compact = false;
@@ -321,7 +322,7 @@ namespace casadi {
 
     // Create return object
     MatType ret = MatType::zeros(sparsity_jac(iind, oind, compact, symmetric).T());
-    if (verbose_) userOut() << "XFunction::jac allocated return value" << std::endl;
+    if (verbose_) casadi_message("Allocated return value");
 
     // Quick return if empty
     if (ret.nnz()==0) {
@@ -331,7 +332,7 @@ namespace casadi {
     // Get a bidirectional partition
     Sparsity D1, D2;
     get_partition(iind, oind, D1, D2, true, symmetric, allow_forward, allow_reverse);
-    if (verbose_) userOut() << "XFunction::jac graph coloring completed" << std::endl;
+    if (verbose_) casadi_message("Graph coloring completed");
 
     // Get the number of forward and adjoint sweeps
     int nfdir = D1.is_null() ? 0 : D1.size2();
@@ -364,7 +365,7 @@ namespace casadi {
     const int* output_row = sparsity_out(oind).row();
 
     // Get transposes and mappings for jacobian sparsity pattern if we are using forward mode
-    if (verbose_)   userOut() << "XFunction::jac transposes and mapping" << std::endl;
+    if (verbose_) casadi_message("jac transposes and mapping");
     std::vector<int> mapping;
     Sparsity jsp_trans;
     if (nfdir>0) {
@@ -389,9 +390,10 @@ namespace casadi {
     int nsweep_adj = nadir/max_nadir;   // Number of sweeps needed for the adjoint mode
     if (nadir%max_nadir>0) nsweep_adj++;
     int nsweep = std::max(nsweep_fwd, nsweep_adj);
-    if (verbose_)   userOut() << "XFunction::jac " << nsweep << " sweeps needed for "
-                              << nfdir << " forward and " << nadir << " adjoint directions"
-                              << std::endl;
+    if (verbose_) {
+      casadi_message(str(nsweep) + " sweeps needed for " + str(nfdir) + " forward and "
+                     + str(nadir) + " reverse directions");
+    }
 
     // Sparsity of the seeds
     vector<int> seed_col, seed_row;
@@ -404,7 +406,7 @@ namespace casadi {
         // Print when entering a new decade
         if (progress_new / 10 > progress / 10) {
           progress = progress_new;
-          userOut() << progress << " %"  << std::endl;
+          casadi_message(str(progress) + " %");
         }
       }
 
@@ -493,12 +495,13 @@ namespace casadi {
       }
 
       // Evaluate symbolically
-      if (verbose_) userOut() << "XFunction::jac making function call" << std::endl;
       if (fseed.size()>0) {
         casadi_assert(aseed.size()==0);
+        if (verbose_) casadi_message("Calling 'ad_forward'");
         static_cast<const DerivedType*>(this)->ad_forward(fseed, fsens);
       } else if (aseed.size()>0) {
         casadi_assert(fseed.size()==0);
+        if (verbose_) casadi_message("Calling 'ad_reverse'");
         static_cast<const DerivedType*>(this)->ad_reverse(aseed, asens);
       }
 
@@ -652,7 +655,6 @@ namespace casadi {
     }
 
     // Return
-    if (verbose_) userOut() << "XFunction::jac end" << std::endl;
     return ret.T();
   }
 

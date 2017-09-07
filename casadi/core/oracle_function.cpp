@@ -149,7 +149,7 @@ namespace casadi {
     bool monitored = this->monitored(fcn);
 
     // Print progress
-    if (monitored) userOut() << "Calling \"" << fcn << "\"\n";
+    if (monitored) casadi_message("Calling \"" + fcn + "\"");
 
     // Respond to a possible Crl+C signals
     InterruptHandler::check();
@@ -174,22 +174,24 @@ namespace casadi {
 
     // Print inputs nonzeros
     if (monitored) {
-      userOut() << fcn << " input nonzeros: " << endl;
+      std::stringstream s;
+      s << fcn << " input nonzeros:\n";
       for (int i=0; i<n_in; ++i) {
-        userOut() << " " << i << " (" << f.name_in(i) << "): ";
+        s << " " << i << " (" << f.name_in(i) << "): ";
         if (m->arg[i]) {
           // Print nonzeros
-          userOut() << "[";
+          s << "[";
           for (int k=0; k<f.nnz_in(i); ++k) {
-            if (k!=0) userOut() << ", ";
-            userOut() << m->arg[i][k];
+            if (k!=0) s << ", ";
+            s << m->arg[i][k];
           }
-          userOut() << "]" << endl;
+          s << "]\n";
         } else {
           // All zero input
-          userOut() << "0" << endl;
+          s << "0\n";
         }
       }
+      casadi_message(s.str());
     }
 
     // Evaluate memory-less
@@ -197,29 +199,30 @@ namespace casadi {
       f(m->arg, m->res, m->iw, m->w, 0);
     } catch(exception& ex) {
       // Fatal error
-      userOut<true, PL_WARN>()
-        << name() << ":" << fcn << " failed:" << ex.what() << endl;
+      casadi_warning(name() + ":" + fcn + " failed:" + std::string(ex.what()));
       return 1;
     }
 
     // Print output nonzeros
     if (monitored) {
-      userOut() << fcn << " output nonzeros: " << endl;
+      std::stringstream s;
+      s << fcn << " output nonzeros:\n";
       for (int i=0; i<n_out; ++i) {
-        userOut() << " " << i << " (" << f.name_out(i) << "): ";
+        s << " " << i << " (" << f.name_out(i) << "): ";
         if (m->res[i]) {
           // Print nonzeros
-          userOut() << "[";
+          s << "[";
           for (int k=0; k<f.nnz_out(i); ++k) {
-            if (k!=0) userOut() << ", ";
-            userOut() << m->res[i][k];
+            if (k!=0) s << ", ";
+            s << m->res[i][k];
           }
-          userOut() << "]" << endl;
+          s << "]\n";
         } else {
           // Ignored output
-          userOut() << " N/A" << endl;
+          s << " N/A\n";
         }
       }
+      casadi_message(s.str());
     }
 
     // Make sure not NaN or Inf
@@ -237,9 +240,8 @@ namespace casadi {
         if (regularity_check_) {
           casadi_error(ss.str());
         } else {
-          userOut<true, PL_WARN>() << ss.str() << endl;
+          casadi_warning(ss.str());
         }
-
         return -1;
       }
     }
@@ -304,12 +306,11 @@ namespace casadi {
     // Print header
     std::stringstream s;
     std::string blankName(maxNameLen, ' ');
-    s
-      << blankName
+    s << blankName
       << "      proc           wall      num           mean             mean"
       << endl << blankName
       << "      time           time     evals       proc time        wall time";
-    userOut() << s.str() << endl;
+    casadi_message(s.str());
 
     // Sort the keys according to order
     std::vector<std::string> keys_order0;

@@ -77,7 +77,7 @@ namespace casadi {
 
   bool SymbolicMX::has_duplicates() const {
     if (this->temp!=0) {
-      userOut<true, PL_WARN>() << "Duplicate expression: " << name() << endl;
+      casadi_warning("Duplicate expression: " + name());
       return true;
     } else {
       this->temp = 1;
