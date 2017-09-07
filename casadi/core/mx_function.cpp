@@ -445,10 +445,10 @@ namespace casadi {
   }
 
   void MXFunction::disp_more(ostream &stream) const {
-    stream << "Algorithm:" << endl;
+    stream << "Algorithm:";
     for (auto&& e : algorithm_) {
       InterruptHandler::check();
-      stream << print(e) << endl;
+      stream << endl << print(e);
     }
   }
 

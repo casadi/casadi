@@ -99,7 +99,7 @@ namespace casadi {
   }
 
   void SXFunction::disp_more(ostream &stream) const {
-    stream << "Algorithm:" << endl;
+    stream << "Algorithm:";
 
     // Iterator to free variables
     vector<SXElem>::const_iterator p_it = free_vars_.begin();
@@ -107,6 +107,7 @@ namespace casadi {
     // Normal, interpreted output
     for (auto&& a : algorithm_) {
       InterruptHandler::check();
+      stream << endl;
       if (a.op==OP_OUTPUT) {
         stream << "output[" << a.i0 << "][" << a.i2 << "] = @" << a.i1;
       } else {
@@ -134,7 +135,7 @@ namespace casadi {
           }
         }
       }
-      stream << ";" << endl;
+      stream << ";";
     }
   }
 
