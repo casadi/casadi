@@ -68,8 +68,10 @@ if (WITH_OCTAVE)
                PREFIX ""
                SUFFIX .mex)
   install(TARGETS casadiOCTAVE DESTINATION ${MATLAB_PREFIX})
-  if (WITH_OCTAVE_IMPORT)
-    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../octave/import.m DESTINATION ${MATLAB_PREFIX})
+    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../octave/import.m DESTINATION ${MATLAB_PREFIX}/octave-extra)
+    if (WITH_OCTAVE_IMPORT)
+      message(WARNING "CMake option WITH_OCTAVE_IMPORT has been deprecated. 'import.m' is now copied to the octave-extra subdirectory.")
+      install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../octave/import.m DESTINATION ${MATLAB_PREFIX})
   endif()
 endif (WITH_OCTAVE)
 
