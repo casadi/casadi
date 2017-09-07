@@ -21,6 +21,8 @@ install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/swig_typename_convertor_matlab2cpp.m
               ${CMAKE_CURRENT_SOURCE_DIR}/returntypes.m
   DESTINATION ${MATLAB_PREFIX})
 
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/OptiCallbackHelper.m
+  DESTINATION ${MATLAB_PREFIX}/+casadi)
 # MATLAB specific stuff
 if (WITH_MATLAB)
   # Make target

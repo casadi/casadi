@@ -62,5 +62,6 @@
 #include "variable.hpp"
 #include "dae_builder.hpp"
 #include "xml_file.hpp"
+#include "optistack.hpp"
 
 #endif // CASADI_CORE_HPP

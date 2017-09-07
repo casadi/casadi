@@ -2620,6 +2620,7 @@ class NZproxy:
 %template(PrintNlpBuilder)     casadi::PrintableObject<casadi::NlpBuilder>;
 %template(PrintVariable)        casadi::PrintableObject<casadi::Variable>;
 %template(PrintDaeBuilder)     casadi::PrintableObject<casadi::DaeBuilder>;
+%template(PrintOptiStack)     casadi::PrintableObject<casadi::OptiStack>;
 
 %include <casadi/core/shared_object.hpp>
 %include <casadi/core/std_vector_tools.hpp>
@@ -3947,6 +3948,109 @@ namespace casadi {
 %include <casadi/core/variable.hpp>
 %include <casadi/core/dae_builder.hpp>
 %include <casadi/core/xml_file.hpp>
+
+%feature("flatnested") casadi::OptiStack::MetaCon;
+%feature("flatnested") casadi::OptiStack::MetaVar;
+%feature("flatnested") casadi::OptiStack::IndexAbstraction;
+%feature("director") casadi::OptiCallback;
+
+// Return-by-value
+%typemap(out, doc="double", noblock=1, fragment="casadi_all") casadi::native_DM {
+  if(!($result = full_or_sparse($1, true))) SWIG_exception_fail(SWIG_TypeError,"Failed to convert output to type 'double'.");
+}
+
+
+%apply int &OUTPUT { Opti::ConstraintType &OUTPUT };
+
+%typemap(argout, noblock=1,fragment="casadi_all") casadi::Opti::ConstraintType &OUTPUT {
+  %append_output(casadi::from_ptr((int *) $1));
+}
+
+%typemap(in, doc="Opti.ConstraintType", noblock=1, numinputs=0) casadi::Opti::ConstraintType &OUTPUT (casadi::Opti::ConstraintType m) {
+ $1 = &m;
+}
+
+
+#ifdef SWIGPYTHON
+
+%define make_property(class, name)
+  %rename(_ ## name) class ## :: ## name;
+  %extend class {
+    %pythoncode %{
+      @property
+      def name(self):
+        return self._ ## name()
+    %}
+  }
+%enddef
+
+
+make_property(casadi::Opti, debug);
+make_property(casadi::OptiSol, debug);
+make_property(casadi::OptiSol, opti);
+
+%define make_property_opti(name)
+  make_property(casadi::Opti, name);
+  make_property(casadi::OptiStack, name);
+%enddef
+
+make_property(casadi::OptiSol, debug);
+make_property_opti(f)
+make_property_opti(g)
+make_property_opti(x)
+make_property_opti(p)
+make_property_opti(lam_g)
+make_property_opti(nx)
+make_property_opti(np)
+make_property_opti(ng)
+
+make_property(casadi::OptiStack, casadi_solver);
+
+#endif
+
+%include <casadi/core/optistack.hpp>
+
+
+#ifdef SWIGPYTHON
+%extend casadi::Opti {
+  %pythoncode %{
+  
+    @staticmethod
+    def _callback(self,fh=None):
+      if fh is None:
+        self.callback_class();
+        return
+      class OptiCallbackHelper(OptiCallback):
+          def __init__(self, callback):
+            OptiCallback.__init__(self)
+            self.callback = callback
+
+          def call(self, i):
+            self.callback(i)
+
+      self._fh = fh
+      self._cb = OptiCallbackHelper(fh);
+      self.callback_class(self._cb);
+      
+  
+    def callback(self,fh=None):
+      self._callback(self,fh)
+      
+        
+  %}
+
+}
+#endif
+
+#ifdef SWIGMATLAB
+%extend casadi::Opti {
+  %matlabcode %{
+    function [] = callback(self, varargin)
+      casadi.OptiCallbackHelper.callback_setup(self, varargin{:})
+    end
+  %}
+}
+#endif
 
 // Cleanup for dependent modules
 %exception {

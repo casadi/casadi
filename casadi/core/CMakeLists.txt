@@ -62,6 +62,7 @@ set(CASADI_PUBLIC
   xml_file.hpp
   variable.hpp
   dae_builder.hpp
+  optistack.hpp
 
   # User include class with the most essential includes
   core.hpp
@@ -167,6 +168,7 @@ set(CASADI_INTERNAL
   xml_file.cpp                xml_file_internal.hpp                xml_file_internal.cpp
   variable.cpp
   dae_builder.cpp
+  optistack.cpp
 
   # Runtime headers
   runtime/casadi_runtime.hpp
