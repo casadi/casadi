@@ -79,6 +79,9 @@ namespace casadi {
     // Ignore errors in the iteration callbacks
     bool iteration_callback_ignore_errors_;
 
+    // Calculate multipliers in the base class
+    bool calc_multipliers_;
+
     /// Which variables are discrete?
     std::vector<bool> discrete_;
 

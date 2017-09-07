@@ -159,6 +159,7 @@ namespace casadi {
     warn_initial_bounds_ = false;
     iteration_callback_ignore_errors_ = false;
     print_time_ = true;
+    calc_multipliers_ = false;
   }
 
   Nlpsol::~Nlpsol() {
@@ -231,7 +232,10 @@ namespace casadi {
         "the different stages of initialization"}},
       {"discrete",
        {OT_BOOLVECTOR,
-        "Indicates which of the variables are discrete, i.e. integer-valued"}}
+        "Indicates which of the variables are discrete, i.e. integer-valued"}},
+      {"calc_multipliers",
+      {OT_BOOL,
+       "Calculate Lagrange multipliers in the Nlpsol base class"}}
      }
   };
 
@@ -258,6 +262,8 @@ namespace casadi {
         iteration_callback_ignore_errors_ = op.second;
       } else if (op.first=="discrete") {
         discrete_ = op.second;
+      } else if (op.first=="calc_multipliers") {
+        calc_multipliers_ = op.second;
       }
     }
 
@@ -312,6 +318,13 @@ namespace casadi {
 
       // Allocate temporary memory
       alloc(fcallback_);
+    }
+
+    // Function to calculate multiplers
+    if (calc_multipliers_) {
+      casadi_message("here");
+      create_function("nlp_mult", {"x", "p", "lam:f", "lam:g"},
+                      {"grad:gamma:x", "grad:gamma:p"}, {{"gamma", {"f", "g"}}});
     }
   }
 
@@ -386,14 +399,53 @@ namespace casadi {
   }
 
   int Nlpsol::eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
+    auto m = static_cast<NlpsolMemory*>(mem);
+
     // Reset the solver, prepare for solution
-    setup(mem, arg, res, iw, w);
+    setup(m, arg, res, iw, w);
+
+    // Set multipliers to nan
+    casadi_fill(m->lam_x, nx_, nan);
+    casadi_fill(m->lam_g, ng_, nan);
+    casadi_fill(m->lam_p, np_, nan);
 
     // Solve the NLP
-    solve(mem);
+    solve(m);
+
+    // Calculate multiplers
+    if (calc_multipliers_) {
+      casadi_assert_message(m->x!=0, "Not implemented");
+      casadi_assert_message(ng_==0 || m->lam_g!=0, "Not implemented");
+      double lam_f = 1.;
+      m->arg[0] = m->x;
+      m->arg[1] = m->p;
+      m->arg[2] = &lam_f;
+      m->arg[3] = m->lam_g;
+      m->res[0] = m->lam_x;
+      m->res[1] = m->lam_p;
+      if (calc_function(m, "nlp_mult")) {
+        casadi_warning("Failed to calculate multipliers");
+      }
+
+      if (m->lam_x) {
+        casadi_scal(nx_, -1., m->lam_x);
+        for (int i=0; i<nx_; ++i) {
+          if (m->lam_x[i]>0) {
+            // If upper bound isn't active, multiplier is zero
+            if (m->x[i] < (m->ubx ? m->ubx[i] : 0)) m->lam_x[i] = 0;
+          } else if (m->lam_x[i]<0) {
+            // If lower bound isn't active, multiplier is zero
+            if (m->x[i] > (m->lbx ? m->lbx[i] : 0)) m->lam_x[i] = 0;
+          }
+        }
+      }
+      if (m->lam_p) {
+        casadi_scal(np_, -1., m->lam_p);
+      }
+    }
 
     // Show statistics
-    if (print_time_)  print_fstats(static_cast<OracleMemory*>(mem));
+    if (print_time_)  print_fstats(m);
     return 0;
   }
 

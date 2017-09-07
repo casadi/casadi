@@ -108,7 +108,7 @@ namespace casadi {
         "Print the iterations"}},
       {"min_step_size",
        {OT_DOUBLE,
-        "The size (inf-norm) of the step size should not become smaller than this."}}
+        "The size (inf-norm) of the step size should not become smaller than this."}},
      }
   };
 
