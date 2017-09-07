@@ -41824,9 +41824,9 @@ Elementwise division: (x,y) -> x ./ y.
 
 [INTERNAL]  Detect duplicate symbolic expressions If there are symbolic
 primitives appearing more than once, the function will return true and the
-names of the duplicate expressions will be printed to userOut<true,
-PL_WARN>(). Note: Will mark the node using SXElem::set_temp. Make sure to
-call reset_input() after usage.
+names of the duplicate expressions will be passed to casadi_warning. Note:
+Will mark the node using SXElem::set_temp. Make sure to call reset_input()
+after usage.
 
 ";
 
@@ -42662,9 +42662,9 @@ Get the number of dependencies of a binary SXElem.
 
 [INTERNAL]  Detect duplicate symbolic expressions If there are symbolic
 primitives appearing more than once, the function will return true and the
-names of the duplicate expressions will be printed to userOut<true,
-PL_WARN>(). Note: Will mark the node using MX::set_temp. Make sure to call
-reset_input() after usage.
+names of the duplicate expressions will be passed to casadi_warning. Note:
+Will mark the node using MX::set_temp. Make sure to call reset_input() after
+usage.
 
 ";
 
@@ -58332,11 +58332,6 @@ Construct a matrix from 4 blocks.
 
 ";
 
-%feature("docstring")  casadi::Sqpmethod::eval_h(SqpmethodMemory *m, const
-double *x, const double *lambda, double sigma, double *H) const  "
-
-[INTERNAL] ";
-
 %feature("docstring")  casadi::FunctionInternal::name_out(int ind) const  "
 
 [INTERNAL]  Get output scheme name by index.
@@ -58349,10 +58344,17 @@ double *x, const double *lambda, double sigma, double *H) const  "
 
 ";
 
-%feature("docstring")  casadi::Sqpmethod::eval_g(SqpmethodMemory *m, const
-double *x, double *g) const  "
+%feature("docstring")  casadi::FunctionInternal::nnz_in() const  "
 
-[INTERNAL] ";
+[INTERNAL]  Number of input/output nonzeros.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::nnz_in(int ind) const  "
+
+[INTERNAL]  Number of input/output nonzeros.
+
+";
 
 %feature("docstring")  casadi::FunctionInternal::has_free() const  "
 
@@ -58433,10 +58435,11 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::Sqpmethod::eval_jac_g(SqpmethodMemory *m,
-const double *x, double *g, double *J) const  "
+%feature("docstring")  casadi::FunctionInternal::release(int mem) const  "
 
-[INTERNAL] ";
+[INTERNAL]  Release a memory object.
+
+";
 
 %feature("docstring")  casadi::FunctionInternal::sx_out(int ind) const  "
 
@@ -58450,26 +58453,9 @@ const double *x, double *g, double *J) const  "
 
 ";
 
-%feature("docstring")  casadi::Sqpmethod::eval_f(SqpmethodMemory *m, const
-double *x) const  "
-
-[INTERNAL] ";
-
 %feature("docstring")  casadi::FunctionInternal::self() const  "
 
 [INTERNAL]  Get a public class instance.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::nnz_in() const  "
-
-[INTERNAL]  Number of input/output nonzeros.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::nnz_in(int ind) const  "
-
-[INTERNAL]  Number of input/output nonzeros.
 
 ";
 
@@ -58480,22 +58466,17 @@ double **arg, double **res, int *iw, double *w) const override "
 
 ";
 
-%feature("docstring")  casadi::Sqpmethod::eval_grad_f(SqpmethodMemory *m,
-const double *x, double *f, double *grad_f) const  "
+%feature("docstring")  casadi::FunctionInternal::sp_weight() const  "
 
-[INTERNAL] ";
+[INTERNAL]  Weighting factor for chosing forward/reverse mode, sparsity
+propagation.
+
+";
 
 %feature("docstring")  casadi::FunctionInternal::getJacSparsityGen(int iind,
 int oind, bool symmetric, int gr_i=1, int gr_o=1) const  "
 
 [INTERNAL]  Get the sparsity pattern, forward mode.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::codegen_body(CodeGenerator
-&g) const  "
-
-[INTERNAL]  Generate code for the function body.
 
 ";
 
@@ -58620,12 +58601,6 @@ structure recognition.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::release(int mem) const  "
-
-[INTERNAL]  Release a memory object.
-
-";
-
 %feature("docstring")  casadi::OracleFunction::jit_dependencies(const
 std::string &fname) override "
 
@@ -58686,19 +58661,9 @@ std::string &iname) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sparsity_out(int ind) const
-"
+%feature("docstring")  casadi::OracleFunction::expand() "
 
-[INTERNAL]  Get sparsity of a given output.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::sparsity_out(const
-std::string &iname) const  "
-
-[INTERNAL]  Get sparsity of a given output.
-
-";
+[INTERNAL] ";
 
 %feature("docstring")  casadi::FunctionInternal::getAdaptorSolverName()
 const  "
@@ -59292,9 +59257,12 @@ casadi::FunctionInternal::print_dimensions(std::ostream &stream) const  "
 
 ";
 
-%feature("docstring")  casadi::OracleFunction::expand() "
+%feature("docstring")  casadi::FunctionInternal::codegen_body(CodeGenerator
+&g) const  "
 
-[INTERNAL] ";
+[INTERNAL]  Generate code for the function body.
+
+";
 
 %feature("docstring")  casadi::FunctionInternal::which_depends(const
 std::string &s_in, const std::vector< std::string > &s_out, int order, bool
@@ -59482,13 +59450,6 @@ std::vector< M > &arg) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sp_weight() const  "
-
-[INTERNAL]  Weighting factor for chosing forward/reverse mode, sparsity
-propagation.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::getAtomicOperation(int k)
 const  "
 
@@ -59551,6 +59512,20 @@ std::string &name, std::ostream &stream) const  "
 %feature("docstring")  casadi::FunctionInternal::sz_arg() const  "
 
 [INTERNAL]  Get required length of arg field.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::sparsity_out(int ind) const
+"
+
+[INTERNAL]  Get sparsity of a given output.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::sparsity_out(const
+std::string &iname) const  "
+
+[INTERNAL]  Get sparsity of a given output.
 
 ";
 

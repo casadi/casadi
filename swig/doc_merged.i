@@ -30428,8 +30428,8 @@ Elementwise division: (x,y) -> x ./ y.
 %feature("docstring") casadi::Matrix::has_duplicates "[INTERNAL]  Detect
 duplicate symbolic expressions If there are symbolic primitives appearing
 more than once, the function will return true and the names of the duplicate
-expressions will be printed to userOut<true, PL_WARN>(). Note: Will mark the
-node using SXElem::set_temp. Make sure to call reset_input() after usage.
+expressions will be passed to casadi_warning. Note: Will mark the node using
+SXElem::set_temp. Make sure to call reset_input() after usage.
 
 ";
 
@@ -31111,8 +31111,8 @@ Get the number of dependencies of a binary SXElem.
 %feature("docstring") casadi::MX::has_duplicates "[INTERNAL]  Detect
 duplicate symbolic expressions If there are symbolic primitives appearing
 more than once, the function will return true and the names of the duplicate
-expressions will be printed to userOut<true, PL_WARN>(). Note: Will mark the
-node using MX::set_temp. Make sure to call reset_input() after usage.
+expressions will be passed to casadi_warning. Note: Will mark the node using
+MX::set_temp. Make sure to call reset_input() after usage.
 
 ";
 
@@ -42627,8 +42627,6 @@ variables.
 
 ";
 
-%feature("docstring") casadi::Sqpmethod::eval_h "[INTERNAL] ";
-
 %feature("docstring") casadi::Sqpmethod::name_out "[INTERNAL]  Get output
 scheme name by index.
 
@@ -42639,7 +42637,10 @@ Sparsities of function inputs and outputs.
 
 ";
 
-%feature("docstring") casadi::Sqpmethod::eval_g "[INTERNAL] ";
+%feature("docstring") casadi::Sqpmethod::nnz_in "[INTERNAL]  Number of
+input/output nonzeros.
+
+";
 
 %feature("docstring") casadi::Sqpmethod::has_free "[INTERNAL]  Does the
 function have free variables.
@@ -42689,22 +42690,18 @@ Get the floating point output argument of an atomic operation.
 
 ";
 
-%feature("docstring") casadi::Sqpmethod::eval_jac_g "[INTERNAL] ";
+%feature("docstring") casadi::Sqpmethod::release "[INTERNAL]  Release a
+memory object.
+
+";
 
 %feature("docstring") casadi::Sqpmethod::sx_out "[INTERNAL]  Get function
 input(s) and output(s)
 
 ";
 
-%feature("docstring") casadi::Sqpmethod::eval_f "[INTERNAL] ";
-
 %feature("docstring") casadi::Sqpmethod::self "[INTERNAL]  Get a public
 class instance.
-
-";
-
-%feature("docstring") casadi::Sqpmethod::nnz_in "[INTERNAL]  Number of
-input/output nonzeros.
 
 ";
 
@@ -42713,15 +42710,13 @@ vectors.
 
 ";
 
-%feature("docstring") casadi::Sqpmethod::eval_grad_f "[INTERNAL] ";
-
-%feature("docstring") casadi::Sqpmethod::getJacSparsityGen "[INTERNAL]  Get
-the sparsity pattern, forward mode.
+%feature("docstring") casadi::Sqpmethod::sp_weight "[INTERNAL]  Weighting
+factor for chosing forward/reverse mode, sparsity propagation.
 
 ";
 
-%feature("docstring") casadi::Sqpmethod::codegen_body "[INTERNAL]  Generate
-code for the function body.
+%feature("docstring") casadi::Sqpmethod::getJacSparsityGen "[INTERNAL]  Get
+the sparsity pattern, forward mode.
 
 ";
 
@@ -42811,11 +42806,6 @@ Input/output dimensions.
 
 ";
 
-%feature("docstring") casadi::Sqpmethod::release "[INTERNAL]  Release a
-memory object.
-
-";
-
 %feature("docstring") casadi::Sqpmethod::jit_dependencies "[INTERNAL]  JIT
 for dependencies.
 
@@ -42864,10 +42854,7 @@ Are all inputs and outputs scalar.
 
 ";
 
-%feature("docstring") casadi::Sqpmethod::sparsity_out "[INTERNAL]  Get
-sparsity of a given output.
-
-";
+%feature("docstring") casadi::Sqpmethod::expand "[INTERNAL] ";
 
 %feature("docstring") casadi::Sqpmethod::getAdaptorSolverName "[INTERNAL]
 Obtain solver name from Adaptor.
@@ -43320,7 +43307,10 @@ function inputs and outputs.
 
 ";
 
-%feature("docstring") casadi::Sqpmethod::expand "[INTERNAL] ";
+%feature("docstring") casadi::Sqpmethod::codegen_body "[INTERNAL]  Generate
+code for the function body.
+
+";
 
 %feature("docstring") casadi::Sqpmethod::which_depends "[INTERNAL]  Which
 variables enter with some order.
@@ -43455,11 +43445,6 @@ function input and outputs.
 
 ";
 
-%feature("docstring") casadi::Sqpmethod::sp_weight "[INTERNAL]  Weighting
-factor for chosing forward/reverse mode, sparsity propagation.
-
-";
-
 %feature("docstring") casadi::Sqpmethod::getAtomicOperation "[INTERNAL]
 Get an atomic operation operator index.
 
@@ -43509,6 +43494,11 @@ the number of atomic operations.
 
 %feature("docstring") casadi::Sqpmethod::sz_arg "[INTERNAL]  Get required
 length of arg field.
+
+";
+
+%feature("docstring") casadi::Sqpmethod::sparsity_out "[INTERNAL]  Get
+sparsity of a given output.
 
 ";
 
