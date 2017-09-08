@@ -510,6 +510,12 @@ Dennis Janka, Joel Andersson
 | block_hess        | OT_INT        | Blockwise Hessian | casadi::Blocksqp |
 |                   |               | approximation?    |                  |
 +-------------------+---------------+-------------------+------------------+
+| calc_multipliers  | OT_BOOL       | Calculate         | casadi::Nlpsol   |
+|                   |               | Lagrange          |                  |
+|                   |               | multipliers in    |                  |
+|                   |               | the Nlpsol base   |                  |
+|                   |               | class             |                  |
++-------------------+---------------+-------------------+------------------+
 | col_eps           | OT_DOUBLE     | Epsilon for COL   | casadi::Blocksqp |
 |                   |               | scaling strategy  |                  |
 +-------------------+---------------+-------------------+------------------+
@@ -1413,6 +1419,12 @@ scheme index by name.
 +===================+===============+===================+==================+
 | bonmin            | OT_DICT       | Options to be     | casadi::BonMinMe |
 |                   |               | passed to BONMIN  | ssageHandler     |
++-------------------+---------------+-------------------+------------------+
+| calc_multipliers  | OT_BOOL       | Calculate         | casadi::Nlpsol   |
+|                   |               | Lagrange          |                  |
+|                   |               | multipliers in    |                  |
+|                   |               | the Nlpsol base   |                  |
+|                   |               | class             |                  |
 +-------------------+---------------+-------------------+------------------+
 | con_integer_md    | OT_DICT       | Integer metadata  | casadi::BonMinMe |
 |                   |               | (a dictionary     | ssageHandler     |
@@ -33009,6 +33021,12 @@ Joel Andersson
 +------------------+-----------------+------------------+------------------+
 |        Id        |      Type       |   Description    |     Used in      |
 +==================+=================+==================+==================+
+| calc_multipliers | OT_BOOL         | Calculate        | casadi::Nlpsol   |
+|                  |                 | Lagrange         |                  |
+|                  |                 | multipliers in   |                  |
+|                  |                 | the Nlpsol base  |                  |
+|                  |                 | class            |                  |
++------------------+-----------------+------------------+------------------+
 | common_options   | OT_DICT         | Options for      | casadi::OracleFu |
 |                  |                 | auto-generated   | nction           |
 |                  |                 | functions        |                  |
@@ -38348,6 +38366,12 @@ Joel Andersson, Attila Kozma and Joris Gillis
 |                   |                 | coefficient of    |                |
 |                   |                 | decrease in merit |                |
 +-------------------+-----------------+-------------------+----------------+
+| calc_multipliers  | OT_BOOL         | Calculate         | casadi::Nlpsol |
+|                   |                 | Lagrange          |                |
+|                   |                 | multipliers in    |                |
+|                   |                 | the Nlpsol base   |                |
+|                   |                 | class             |                |
++-------------------+-----------------+-------------------+----------------+
 | codegen           | OT_BOOL         | C-code generation | casadi::Scpgen |
 +-------------------+-----------------+-------------------+----------------+
 | discrete          | OT_BOOLVECTOR   | Indicates which   | casadi::Nlpsol |
@@ -42928,6 +42952,12 @@ A textbook SQPMethod
 | c1                | OT_DOUBLE     | Armijo condition, | casadi::Sqpmetho |
 |                   |               | coefficient of    | d                |
 |                   |               | decrease in merit |                  |
++-------------------+---------------+-------------------+------------------+
+| calc_multipliers  | OT_BOOL       | Calculate         | casadi::Nlpsol   |
+|                   |               | Lagrange          |                  |
+|                   |               | multipliers in    |                  |
+|                   |               | the Nlpsol base   |                  |
+|                   |               | class             |                  |
 +-------------------+---------------+-------------------+------------------+
 | discrete          | OT_BOOLVECTOR | Indicates which   | casadi::Nlpsol   |
 |                   |               | of the variables  |                  |
@@ -48839,6 +48869,12 @@ General information
 +------------------+-----------------+------------------+------------------+
 |        Id        |      Type       |   Description    |     Used in      |
 +==================+=================+==================+==================+
+| calc_multipliers | OT_BOOL         | Calculate        | casadi::Nlpsol   |
+|                  |                 | Lagrange         |                  |
+|                  |                 | multipliers in   |                  |
+|                  |                 | the Nlpsol base  |                  |
+|                  |                 | class            |                  |
++------------------+-----------------+------------------+------------------+
 | common_options   | OT_DICT         | Options for      | casadi::OracleFu |
 |                  |                 | auto-generated   | nction           |
 |                  |                 | functions        |                  |
