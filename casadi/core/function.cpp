@@ -252,6 +252,7 @@ namespace casadi {
   }
 
   FunctionInternal* Function::operator->() const {
+    casadi_assert(!is_null());
     return get();
   }
 

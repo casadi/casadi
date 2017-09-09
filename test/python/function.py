@@ -86,7 +86,10 @@ class Functiontests(casadiTestCase):
 
     self.checkarray(sin(n1)+N1,out[0],"output")
     self.checkarray(sin(n2)+N2,out[1],"output")
-
+  def test_segfault(self):
+    f = Function()
+    with self.assertRaises(Exception):
+      f.stats()
   def test_issue304(self):
     self.message("regression test for #304") # this code used to segfault
     x = SX.sym("x")
