@@ -29850,6 +29850,12 @@ x+y^3)/6 $ $ (-3 x^2 y-x^3)/6+y+x $
 
 ";
 
+%feature("docstring") casadi::Matrix::get_elements "
+
+Get all elements.
+
+";
+
 %feature("docstring") casadi::Matrix::set "
 
 >  void casadi::Matrix< T >::set(const Matrix< Scalar > &m, bool ind1, const Slice &rr)
@@ -30066,12 +30072,6 @@ Get a set of nonzeros
 
 ";
 
-%feature("docstring") casadi::Matrix::is_one "
-
-check if the matrix is 1 (note that false negative answers are possible)
-
-";
-
 %feature("docstring") casadi::Matrix::T "
 
 Transpose the matrix.
@@ -30103,6 +30103,11 @@ Attempts to find the roots of a polynomial.
 
 This will only work for polynomials up to order 3 It is assumed that the
 roots are real.
+
+";
+
+%feature("docstring") casadi::Matrix::n_dep "[INTERNAL]  Get the number of
+dependencies of a binary SXElem Only defined if symbolic scalar.
 
 ";
 
@@ -30394,8 +30399,9 @@ Functions called by friend functions defined here
 
 ";
 
-%feature("docstring") casadi::Matrix::n_dep "[INTERNAL]  Get the number of
-dependencies of a binary SXElem Only defined if symbolic scalar.
+%feature("docstring") casadi::Matrix::is_one "
+
+check if the matrix is 1 (note that false negative answers are possible)
 
 ";
 
