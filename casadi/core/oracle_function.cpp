@@ -310,7 +310,7 @@ namespace casadi {
       << "      proc           wall      num           mean             mean"
       << endl << blankName
       << "      time           time     evals       proc time        wall time";
-    casadi_message(s.str());
+    userOut() << s.str();
 
     // Sort the keys according to order
     std::vector<std::string> keys_order0;
