@@ -618,6 +618,18 @@ namespace casadi {
     auto m = static_cast<IpoptMemory*>(mem);
     stats["return_status"] = m->return_status;
     stats["iter_count"] = m->iter_count;
+    if (m->inf_pr.size()>0) {
+      Dict iterations;
+      iterations["inf_pr"] = m->inf_pr;
+      iterations["inf_du"] = m->inf_du;
+      iterations["mu"] = m->mu;
+      iterations["d_norm"] = m->d_norm;
+      iterations["regularization_size"] = m->regularization_size;
+      iterations["obj"] = m->obj;
+      iterations["alpha_pr"] = m->alpha_pr;
+      iterations["alpha_du"] = m->alpha_du;
+      stats["iterations"] = iterations;
+    }
     return stats;
   }
 
