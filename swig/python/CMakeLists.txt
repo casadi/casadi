@@ -89,13 +89,20 @@ else()
   set(CASADI_PYTHON_LIBRARY_SUFFIX ${CMAKE_SHARED_MODULE_SUFFIX})
 endif()
 
+if(APPLE AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+  set_target_properties(_casadi PROPERTIES LINK_FLAGS "-undefined dynamic_lookup")
+endif()
+
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
   set_target_properties(_casadi PROPERTIES COMPILE_FLAGS "-Wno-dynamic-class-memaccess -Wno-self-assign ${MAYBE_WERROR}")
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
   set_target_properties(_casadi PROPERTIES COMPILE_FLAGS "-Wno-dynamic-class-memaccess -Wno-self-assign -Wno-maybe-uninitialized ${MAYBE_WERROR}")
 endif()
 
-target_link_libraries(_casadi ${PYTHON_LIBRARIES} casadi)
+if(WIN32) # dlls don't allow missing symbols
+  target_link_libraries(_casadi ${PYTHON_LIBRARIES})
+endif()
+target_link_libraries(_casadi casadi)
 
 # Custom installation command for Python
 add_custom_target(install_python
@@ -145,7 +152,7 @@ install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/__init__.py
 if (WITH_EXTENDING_CASADI)
   set_source_files_properties(../extending_casadi/extending_casadi.i  PROPERTIES  CPLUSPLUS ON)
   swig_add_module(extending_casadi python ../extending_casadi/extending_casadi.i)
-  swig_link_libraries(extending_casadi ${PYTHON_LIBRARIES} extending_casadi)
+  swig_link_libraries(extending_casadi extending_casadi)
   if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     set_target_properties(_extending_casadi PROPERTIES COMPILE_FLAGS "-Wno-dynamic-class-memaccess -Wno-self-assign ${MAYBE_WERROR} -fno-builtin-strdup -fno-builtin-strndup")
   elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
