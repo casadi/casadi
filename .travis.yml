@@ -39,7 +39,27 @@ matrix:
         - git clone https://github.com/jgillis/cpp-coveralls.git
         - pushd cpp-coveralls && sudo python setup.py install && popd
         - coveralls --root .. --exclude swig -E '.*cxx' -E '.*CMakeFiles.*' -E '.*casadiPYTHON_wrap.*' -E '.*lib.*' -E '.*_export.*'  --exclude experimental --exclude _temp.cc --exclude docs --exclude codegen --exclude external_packages --exclude cmake --exclude test --gcov-options '\-lp'
-    - compiler: gcc
+  - compiler: clang
+      os: linux
+      dist: trusty
+      language: generic
+      env: TESTMODE=valgrind
+      script:
+        - sudo apt-get install valgrind libgomp1 -y
+        - mkdir build
+        - pushd build
+        - cmake -DWITH_OPENMP=ON $casadi_build_flags -DWITH_PROFILING=ON -DWITH_DOC=ON -DWITH_EXAMPLES=ON -DWITH_COVERAGE=ON -DWITH_EXTRA_WARNINGS=ON -DWITH_PYTHON=ON -DWITH_JSON=ON -DWITH_BLASFEO=ON -DWITH_BUILD_BLASFEO=ON -DWITH_HPMPC=ON -DWITH_BUILD_HPMPC=ON ..
+        - make -j2
+        - sudo make -j2 install
+        - popd
+        - python -c "from casadi.tools import *;loadAllCompiledPlugins()"
+        - pushd test && make unittests_py_valgrind && popd
+      after_success:
+        - cd build
+        - git clone https://github.com/jgillis/cpp-coveralls.git
+        - pushd cpp-coveralls && sudo python setup.py install && popd
+        - coveralls --root .. --exclude swig -E '.*cxx' -E '.*CMakeFiles.*' -E '.*casadiPYTHON_wrap.*' -E '.*lib.*' -E '.*_export.*'  --exclude experimental --exclude _temp.cc --exclude docs --exclude codegen --exclude external_packages --exclude cmake --exclude test --gcov-options '\-lp'
+  - compiler: gcc
       os: linux
       dist: trusty
       language: generic
