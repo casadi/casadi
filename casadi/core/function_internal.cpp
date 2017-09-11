@@ -1929,12 +1929,13 @@ namespace casadi {
 
   std::string FunctionInternal::codegen_name(const CodeGenerator& g) const {
     // Get the index of the function
-    auto it=g.added_dependencies_.find(this);
-    casadi_assert(it!=g.added_dependencies_.end());
-    int f = it->second;
-
-    // Construct the name
-    return g.shorthand("f" + str(f));
+    int i=0;
+    for (auto&& e : g.added_dependencies_) {
+      if (e.get()==this) break;
+      i++;
+    }
+    casadi_assert(i<g.added_dependencies_.size());
+    return g.shorthand("f" + str(i));
   }
 
   std::string FunctionInternal::eval_name() const {
@@ -1946,35 +1947,32 @@ namespace casadi {
   }
 
   void FunctionInternal::add_dependency(CodeGenerator& g) const {
-    // Get the current number of functions before looking for it
-    size_t num_f_before = g.added_dependencies_.size();
+    // Quick return if it already exists
+    for (auto&& e : g.added_dependencies_) {
+      if (e.get()==this) return;
+    }
 
-    // Get index of the pattern
-    int& ind = g.added_dependencies_[this];
+    // Add to list of patterns
+    int ind = g.added_dependencies_.size();
+    g.added_dependencies_.push_back(self());
 
-    // Generate it if it does not exist
-    if (g.added_dependencies_.size() > num_f_before) {
-      // Add at the end
-      ind = num_f_before;
+    // Give it a name
+    string name = "f" + str(ind);
 
-      // Give it a name
-      string name = "f" + str(ind);
+    // Print to file
+    codegen(g, g.shorthand(name), true);
 
-      // Print to file
-      codegen(g, g.shorthand(name), true);
+    // Codegen reference count functions, if needed
+    if (has_refcount_) {
+      // Increase reference counter
+      g << "void " << g.shorthand(name) << "_incref(void) {\n";
+      codegen_incref(g);
+      g << "}\n\n";
 
-      // Codegen reference count functions, if needed
-      if (has_refcount_) {
-        // Increase reference counter
-        g << "void " << g.shorthand(name) << "_incref(void) {\n";
-        codegen_incref(g);
-        g << "}\n\n";
-
-        // Decrease reference counter
-        g << "void " << g.shorthand(name) << "_decref(void) {\n";
-        codegen_decref(g);
-        g << "}\n\n";
-      }
+      // Decrease reference counter
+      g << "void " << g.shorthand(name) << "_decref(void) {\n";
+      codegen_decref(g);
+      g << "}\n\n";
     }
   }
 
