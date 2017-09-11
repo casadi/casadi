@@ -226,6 +226,16 @@ namespace casadi {
       sz_iw = v[2];
       sz_w = v[3];
     }
+
+    // Get information about Jacobian sparsity, if any
+    sparsity_t jac_sparsity_fcn = (sparsity_t)li_.get_function("jac_" + name_ + "_sparsity_out");
+    if (jac_sparsity_fcn) {
+      set_jac_sparsity(Sparsity::compressed(jac_sparsity_fcn(0)));
+    } else if (li_.has_meta("JAC_" + name_ + "_SPARSITY_OUT", 0)) {
+      vector<int> sp = li_.meta_vector<int>("jac_" + name_ + "_SPARSITY_OUT", 0);
+      set_jac_sparsity(Sparsity::compressed(sp));
+    }
+
     alloc_arg(sz_arg);
     alloc_res(sz_res);
     alloc_iw(sz_iw);

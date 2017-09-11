@@ -2764,5 +2764,28 @@ namespace casadi {
     return true;
   }
 
+  void FunctionInternal::set_jac_sparsity(const Sparsity& sp) {
+    // Make sure that it's of the right size
+    casadi_assert(sp.size1()==numel_out());
+    casadi_assert(sp.size2()==numel_in());
+    // Split up into the individual patterns
+    int n_out = this->n_out(), n_in = this->n_in();
+    std::vector<int> v_offset(n_out+1, 0);
+    for (int i=0; i<n_out; ++i) v_offset[i+1] = v_offset[i] + numel_out(i);
+    std::vector<int> h_offset(n_in+1, 0);
+    for (int i=0; i<n_in; ++i) h_offset[i+1] = h_offset[i] + numel_in(i);
+    vector<vector<Sparsity>> blocks = blocksplit(sp, v_offset, h_offset);
+    // Save to jac_sparsity_ and jac_sparsity_compact_
+    for (int oind=0; oind<n_out; ++oind) {
+      vector<int> row_nz = sparsity_out(oind).find();
+      for (int iind=0; iind<n_in; ++iind) {
+        vector<int> col_nz = sparsity_in(iind).find();
+        const Sparsity& sp = blocks.at(oind).at(iind);
+        jac_sparsity_.elem(oind, iind) = sp;
+        vector<int> mapping;
+        jac_sparsity_compact_.elem(oind, iind) = sp.sub(row_nz, col_nz, mapping);
+      }
+    }
+  }
 
 } // namespace casadi
