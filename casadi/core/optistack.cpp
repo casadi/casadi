@@ -131,14 +131,14 @@ MX OptiStack::variable(int n, int m, const std::string& attribute) {
 
   if (attribute=="symmetric") {
     casadi_assert_message(n==m, "You specified attribute 'symmetric', "
-      "while matrix is not even square, but " << n << "-by-" << m << ".");
+      "while matrix is not even square, but " + std::to_string(n) + "-by-" + std::to_string(m) + ".");
     symbol = MX::sym(name_prefix() + "x_" + std::to_string(count_var_), n*(n+1)/2);
     ret = tril2symm(MX(Sparsity::lower(n), symbol));
   } else if (attribute=="full") {
     symbol = MX::sym(name_prefix() + "x_" + std::to_string(count_var_), n, m);
     ret = symbol;
   } else {
-    casadi_error("Unknown attribute '" << attribute << "'. Choose from 'full' or 'symmetric'.");
+    casadi_error("Unknown attribute '" + attribute + "'. Choose from 'full' or 'symmetric'.");
   }
 
   // Store the symbol; preventing it from going ut of scope
@@ -304,13 +304,13 @@ void OptiStack::assert_has(const MX& m) const {
   if (!has(m)) {
     VariableType vt;
     if (parse_opti_name(m.name(), vt)) {
-      casadi_error("Symbol '" + m.name() + "' (a " << variable_type_to_string(vt) << ") "
-        "belongs to a different instance of Opti (this instance is #" << instance_count_ << "). "
-        << std::endl);
+      casadi_error("Symbol '" + m.name() + "' (a " + variable_type_to_string(vt) + ") "
+        "belongs to a different instance of Opti"
+        "(this instance is #" + std::to_string(instance_count_) + ").");
     } else {
-      casadi_error("MX symbol '" + m.name() + "' not declared with opti.variable/opti.parameter."
-        << std::endl << "Note: you cannot use a raw MX.sym in your Opti problem, "
-        << " only if you package it in a CasADi Function.");
+      casadi_error("MX symbol '" + m.name() + "' not declared with opti.variable/opti.parameter.\n"
+        "Note: you cannot use a raw MX.sym in your Opti problem, "
+        " only if you package it in a CasADi Function.");
     }
   }
 }
@@ -754,7 +754,7 @@ OptiSol OptiStack::solve() {
 
   casadi_assert_message(success,
     "Solver failed. You may use opti.debug.value to investigate the latest values of variables."
-    " return_status is '" << ret << "'");
+    " return_status is '" + ret + "'");
 
   return copy();
 }
@@ -935,7 +935,7 @@ void OptiStack::set_value_internal(const MX& x, const DM& v, std::vector<DM>& st
       data.push_back(v);
     } else {
       casadi_assert_message(v==e[i], "In initial/value assignment: inconsistent numerical values. "
-        "At nonzero " << i << ", lhs has " << e[i] << ", while rhs has " << v << ".");
+        "At nonzero " + std::to_string(i) + ", lhs has " + std::to_string(e[i]) + ", while rhs has " + std::to_string(v) + ".");
     }
   }
 
@@ -1009,12 +1009,7 @@ std::vector<DM> OptiStack::active_values(OptiStack::VariableType type) const {
   return ret;
 }
 
-
-void OptiStack::repr(std::ostream &stream, bool trailing_newline) const {
-  print(stream, trailing_newline);
-}
-
-void OptiStack::print(ostream &stream, bool trailing_newline) const {
+void OptiStack::disp(ostream &stream, bool more) const {
   stream << "Opti {" << std::endl;
   stream << "  instance #" << instance_number_ << std::endl;
   OptiStack mycopy = copy();
@@ -1034,24 +1029,6 @@ void OptiStack::print(ostream &stream, bool trailing_newline) const {
     stream << "  CasADi solver was called: " << return_status() << std::endl;
   }
   stream << "}";
-  if (trailing_newline) stream << endl;
 }
-
-
-/**
-void Opti::repr(std::ostream &stream, bool trailing_newline) const {
-  return OptiStack::repr(stream, trailing_newline);
-}
-void Opti::print(std::ostream &stream, bool trailing_newline) const {
-  return OptiStack::print(stream, trailing_newline);
-}
-
-void OptiSol::repr(std::ostream &stream, bool trailing_newline) const {
-  return OptiStack::repr(stream, trailing_newline);
-}
-void OptiSol::print(std::ostream &stream, bool trailing_newline) const {
-  return OptiStack::print(stream, trailing_newline);
-}
-*/
 
 } // namespace casadi

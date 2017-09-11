@@ -348,11 +348,11 @@ public:
   }
   void assert_empty() const;
 
-  ///  Print representation
-  void repr(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
+  /// Readable name of the class
+  std::string type_name() const {return "DaeBuilder";}
 
-  /// Print description
-  void print(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
+  ///  Print representation
+  void disp(std::ostream& stream, bool more=false) const;
 
   /// Fix the structure of the optimization problem
   void internal_bake();
@@ -496,10 +496,10 @@ public:
 */
 class CASADI_EXPORT Opti : private OptiStack {
   public:
-    using OptiStack::getDescription;
-    using OptiStack::getRepresentation;
-    using OptiStack::repr;
-    using OptiStack::print;
+    using OptiStack::python_str;
+    using OptiStack::get_repr;
+    using OptiStack::get_str;
+    using OptiStack::disp;
     using OptiStack::variable;
     using OptiStack::parameter;
     using OptiStack::minimize;
@@ -587,10 +587,10 @@ class CASADI_EXPORT Opti : private OptiStack {
 class CASADI_EXPORT OptiSol : private OptiStack {
   public:
     OptiSol(const OptiStack& opti) : OptiStack(opti) {}
-    using OptiStack::getDescription;
-    using OptiStack::getRepresentation;
-    using OptiStack::repr;
-    using OptiStack::print;
+    using OptiStack::python_str;
+    using OptiStack::get_repr;
+    using OptiStack::get_str;
+    using OptiStack::disp;
     using OptiStack::value;
     using OptiStack::value_variables;
     using OptiStack::value_parameters;
