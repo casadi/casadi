@@ -1211,7 +1211,8 @@ namespace casadi {
      try {
        return (*this)->factory(name, s_in, s_out, aux, opts);
      } catch (exception& e) {
-       THROW_ERROR("factory", e.what());
+       THROW_ERROR("factory", "Failed to create " + name + ":" + str(s_in) + "->" + str(s_out)
+        + " with " + str(aux) + ":\n" + str(e.what()));
      }
   }
 

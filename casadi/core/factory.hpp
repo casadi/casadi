@@ -269,7 +269,11 @@ namespace casadi {
       }
       // Calculate directional derivatives
       Dict opts = {{"always_inline", true}};
-      sens = forward(res, arg, seed, opts);
+      try {
+        sens = forward(res, arg, seed, opts);
+      } catch (exception& e) {
+        casadi_error("Forward mode AD failed:\n" + str(e.what()));
+      }
 
       // Get directional derivatives
       for (int i=0; i<fwd_out_.size(); ++i) {
@@ -294,7 +298,11 @@ namespace casadi {
       }
       // Calculate directional derivatives
       Dict opts = {{"always_inline", true}};
-      sens = reverse(res, arg, seed, opts);
+      try {
+        sens = reverse(res, arg, seed, opts);
+      } catch (exception& e) {
+        casadi_error("Reverse mode AD failed:\n" + str(e.what()));
+      }
 
       // Get directional derivatives
       for (int i=0; i<adj_out_.size(); ++i) {
@@ -315,15 +323,22 @@ namespace casadi {
     for (auto &&b : jac_) {
       const MatType& ex = out_.at(b.ex);
       const MatType& arg = in_.at(b.arg);
-      out_["jac:" + b.ex + ":" + b.arg] = MatType::jacobian(ex, arg);
+      try {
+        out_["jac:" + b.ex + ":" + b.arg] = MatType::jacobian(ex, arg);
+      } catch (exception& e) {
+        casadi_error("Jacobian generation failed:\n" + str(e.what()));
+      }
     }
 
     // Gradient blocks
     for (auto &&b : grad_) {
       const MatType& ex = out_.at(b.ex);
       const MatType& arg = in_.at(b.arg);
-      out_["grad:" + b.ex + ":" + b.arg]
-        = project(gradient(ex, arg), arg.sparsity());
+      try {
+        out_["grad:" + b.ex + ":" + b.arg] = project(gradient(ex, arg), arg.sparsity());
+      } catch (exception& e) {
+        casadi_error("Gradient generation failed:\n" + str(e.what()));
+      }
     }
 
     // Hessian blocks
@@ -332,7 +347,11 @@ namespace casadi {
       casadi_assert_message(b.arg1==b.arg2, "Mixed Hessian terms not supported");
       const MatType& arg1 = in_.at(b.arg1);
       //const MatType& arg2 = in_.at(b.arg2);
-      out_["hess:" + b.ex + ":" + b.arg1 + ":" + b.arg2] = triu(hessian(ex, arg1));
+      try {
+        out_["hess:" + b.ex + ":" + b.arg1 + ":" + b.arg2] = triu(hessian(ex, arg1));
+      } catch (exception& e) {
+        casadi_error("Hessian generation failed:\n" + str(e.what()));
+      }
     }
   }
 
