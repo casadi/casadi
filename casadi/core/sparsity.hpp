@@ -228,6 +228,9 @@ namespace casadi {
         This enables using the C runtime functions using a natural syntax.
     */
     operator const int*() const;
+
+    /** \brief Implicit or explicit type conversion to compact representation */
+    operator const std::vector<int>&() const;
 #endif // SWIG
 
     /// \name Size and element counting

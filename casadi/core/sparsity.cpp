@@ -1075,6 +1075,10 @@ namespace casadi {
     return (*this)->sp();
   }
 
+  Sparsity::operator const std::vector<int>&() const {
+    return (*this)->sp();
+  }
+
   Sparsity Sparsity::compressed(const std::vector<int>& v) {
     // Check consistency
     casadi_assert(v.size() >= 2);
