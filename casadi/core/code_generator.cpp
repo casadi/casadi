@@ -483,24 +483,7 @@ namespace casadi {
   }
 
   int CodeGenerator::add_sparsity(const Sparsity& sp) {
-    // Get the current number of patterns before looking for it
-    size_t num_patterns_before = added_sparsities_.size();
-
-    // Get index of the pattern
-    const void* h = static_cast<const void*>(sp.get());
-    int& ind = added_sparsities_[h];
-
-    // Generate it if it does not exist
-    if (added_sparsities_.size() > num_patterns_before) {
-
-      // Compact version of the sparsity pattern
-      std::vector<int> sp_compact = sp.compress();
-
-      // Codegen vector
-      ind = get_constant(sp_compact, true);
-    }
-
-    return ind;
+    return get_constant(sp, true);
   }
 
   std::string CodeGenerator::sparsity(const Sparsity& sp) {
@@ -508,10 +491,7 @@ namespace casadi {
   }
 
   int CodeGenerator::get_sparsity(const Sparsity& sp) const {
-    const void* h = static_cast<const void*>(sp.get());
-    PointerMap::const_iterator it=added_sparsities_.find(h);
-    casadi_assert(it!=added_sparsities_.end());
-    return it->second;
+    return const_cast<CodeGenerator&>(*this).get_constant(sp, false);
   }
 
   size_t CodeGenerator::hash(const std::vector<double>& v) {

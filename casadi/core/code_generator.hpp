@@ -358,7 +358,6 @@ namespace casadi {
     std::set<std::string> added_externals_;
     std::set<std::string> added_shorthands_;
     std::multimap<Auxiliary, std::vector<std::string>> added_auxiliaries_;
-    PointerMap added_sparsities_;
     PointerMap added_dependencies_;
     std::multimap<size_t, size_t> added_double_constants_;
     std::multimap<size_t, size_t> added_integer_constants_;
