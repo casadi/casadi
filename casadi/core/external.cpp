@@ -336,9 +336,12 @@ namespace casadi {
                              const std::vector<std::string>& s_out,
                              const Function::AuxOut& aux,
                              const Dict& opts) const {
+    // If not available, call base class function
+    if (!li_.has_function(name)) {
+      return FunctionInternal::factory(name, s_in, s_out, aux, opts);
+    }
+
     // Retrieve function
-    casadi_assert_message(li_.has_function(name),
-      "Cannot find \"" + name + "\"");
     Function ret = external(name, li_, opts);
 
     // Inputs consistency checks
