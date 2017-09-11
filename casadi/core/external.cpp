@@ -343,22 +343,26 @@ namespace casadi {
 
     // Inputs consistency checks
     casadi_assert_message(s_in.size() == ret.n_in(),
-      "Inconsistent #in for \"" + name + "\"");
+      "Inconsistent number of inputs. Expected " + str(s_in.size())+ "  "
+      "(" + str(s_in) + "), got " + str(ret.n_in()) + ".");
     for (int i=0; i<s_in.size(); ++i) {
       string s = s_in[i];
       replace(s.begin(), s.end(), ':', '_');
       casadi_assert_message(s == ret.name_in(i),
-        "Inconsistent input names for \"" + name + "\"");
+        "Inconsistent input name. Expected: " + str(s_in) + ", "
+        "got " + ret.name_in(i) + " for input " + str(i));
     }
 
     // Outputs consistency checks
     casadi_assert_message(s_out.size() == ret.n_out(),
-      "inconsistent #out for \"" + name + "\"");
+      "Inconsistent number of outputs. Expected " + str(s_out.size()) + " "
+      "(" + str(s_out) + "), got " + str(ret.n_out()) + ".");
     for (int i=0; i<s_out.size(); ++i) {
       string s = s_out[i];
       replace(s.begin(), s.end(), ':', '_');
       casadi_assert_message(s == ret.name_out(i),
-        "inconsistent output names for \"" + name + "\"");
+        "Inconsistent output name. Expected: " + str(s_out) + ", "
+        "got " + ret.name_out(i) + " for output " + str(i));
     }
 
     return ret;
