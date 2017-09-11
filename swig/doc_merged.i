@@ -29349,6 +29349,12 @@ x+y^3)/6 $ $ (-3 x^2 y-x^3)/6+y+x $
 
 ";
 
+%feature("docstring") casadi::Matrix::get_elements "
+
+Get all elements.
+
+";
+
 %feature("docstring") casadi::Matrix::set "
 
 >  void casadi::Matrix< T >::set(const Matrix< Scalar > &m, bool ind1, const Slice &rr)
@@ -33484,6 +33490,633 @@ C++ includes: nonzeros.hpp ";
 
 
 // File: classcasadi_1_1OneSX.xml
+
+
+// File: classcasadi_1_1Opti.xml
+%feature("docstring") casadi::Opti::subject_to "
+
+Add constraints.
+
+Examples:
+
+::
+
+  * \\\\begin{itemize}
+  * opti.subject_to( sqrt(x+y) >= 1);
+  * opti.subject_to( sqrt(x+y) > 1)}: same as above
+  * opti.subject_to( 1<= sqrt(x+y) )}: same as above
+  * opti.subject_to( 5*x+y==1 )}: equality
+  *
+  * Python
+  * opti.subject_to([x*y>=1,x==3])
+  * opti.subject_to(opti.bounded(0,x,1))
+  *
+  * MATLAB
+  * opti.subject_to({x*y>=1,x==3})
+  * opti.subject_to( 0<=x<=1 )
+  * 
+
+
+
+";
+
+%feature("docstring") casadi::Opti::set_initial "
+
+Set initial guess for decision variables
+
+::
+
+  * opti.set_initial(x, 2)
+  * opti.set_initial(10*x(1), 2)
+  * 
+
+
+
+";
+
+%feature("docstring") casadi::Opti "
+
+A simplified interface for NLP modeling/solving.
+
+This class offers a view with model description facilities The API is
+guaranteed to be stable.
+
+Joris Gillis, Erik Lambrechts
+
+C++ includes: optistack.hpp ";
+
+%feature("docstring") casadi::Opti::symvar "
+
+Get symbols present in expression.
+
+Returned vector is ordered according to the order of variable()/parameter()
+calls used to create the variables
+
+";
+
+%feature("docstring") casadi::Opti::set_value "
+
+Set value of parameter.
+
+Each parameter must be given a value before 'solve' can be called
+
+";
+
+%feature("docstring") casadi::Opti::debug "";
+
+%feature("docstring") casadi::Opti::copy "";
+
+%feature("docstring") casadi::Opti::value "
+
+Obtain value of expression at the current value
+
+In regular mode, teh current value is the converged solution In debug mode,
+the value can be non-converged
+
+Parameters:
+-----------
+
+values:  Optional assignment expressions (e.g. x==3) to overrule the current
+value
+
+";
+
+
+// File: classcasadi_1_1OptiCallback.xml
+%feature("docstring") casadi::OptiCallback::~OptiCallback "";
+
+%feature("docstring") casadi::OptiCallback "C++ includes: optistack.hpp ";
+
+%feature("docstring") casadi::OptiCallback::call "";
+
+%feature("docstring") casadi::OptiCallback::OptiCallback "";
+
+
+// File: classcasadi_1_1OptiSol.xml
+%feature("docstring") casadi::OptiSol::symvar "
+
+Get symbols present in expression.
+
+Returned vector is ordered according to the order of variable()/parameter()
+calls used to create the variables
+
+";
+
+%feature("docstring") casadi::OptiSol::opti "";
+
+%feature("docstring") casadi::OptiSol "
+
+A simplified interface for NLP modeling/solving.
+
+This class offers a view with solution retrieval facilities The API is
+guaranteed to be stable.
+
+Example NLP:
+
+::
+
+    opti = casadi.Opti();
+  
+    x = opti.variable();
+    y = opti.variable();
+  
+    opti.minimize(  (y-x^2)^2   );
+    opti.subject_to( x^2+y^2==1 );
+    opti.subject_to(     x+y>=1 );
+  
+    opti.solver('ipopt');
+    sol = opti.solve();
+  
+    sol.value(x)
+    sol.value(y)
+
+
+
+Example parametric NLP:
+
+::
+
+    opti = casadi.Opti();
+  
+    x = opti.variable(2,1);
+    p = opti.parameter();
+  
+    opti.minimize(  (p*x(2)-x(1)^2)^2   );
+    opti.subject_to( 1<=sum(x)<=2 );
+  
+    opti.solver('ipopt');
+  
+    opti.set_value(p, 3);
+    sol = opti.solve();
+    sol.value(x)
+  
+    opti.set_value(p, 5);
+    sol = opti.solve();
+    sol.value(x)
+
+
+
+Joris Gillis, Erik Lambrechts
+
+C++ includes: optistack.hpp ";
+
+%feature("docstring") casadi::OptiSol::OptiSol "";
+
+%feature("docstring") casadi::OptiSol::value "
+
+Obtain value of expression at the current value
+
+In regular mode, teh current value is the converged solution In debug mode,
+the value can be non-converged
+
+Parameters:
+-----------
+
+values:  Optional assignment expressions (e.g. x==3) to overrule the current
+value
+
+";
+
+%feature("docstring") casadi::OptiSol::debug "";
+
+%feature("docstring") casadi::OptiSol::set_value "
+
+Set value of parameter.
+
+Each parameter must be given a value before 'solve' can be called
+
+";
+
+%feature("docstring") casadi::OptiSol::set_initial "
+
+Set initial guess for decision variables
+
+::
+
+  * opti.set_initial(x, 2)
+  * opti.set_initial(10*x(1), 2)
+  * 
+
+
+
+";
+
+%feature("docstring") casadi::OptiSol::subject_to "
+
+Add constraints.
+
+Examples:
+
+::
+
+  * \\\\begin{itemize}
+  * opti.subject_to( sqrt(x+y) >= 1);
+  * opti.subject_to( sqrt(x+y) > 1)}: same as above
+  * opti.subject_to( 1<= sqrt(x+y) )}: same as above
+  * opti.subject_to( 5*x+y==1 )}: equality
+  *
+  * Python
+  * opti.subject_to([x*y>=1,x==3])
+  * opti.subject_to(opti.bounded(0,x,1))
+  *
+  * MATLAB
+  * opti.subject_to({x*y>=1,x==3})
+  * opti.subject_to( 0<=x<=1 )
+  * 
+
+
+
+";
+
+
+// File: classcasadi_1_1OptiStack.xml
+%feature("docstring") casadi::OptiStack::casadi_solver "
+
+Get the underlying CasADi solver of the Opti stack.
+
+";
+
+%feature("docstring") casadi::OptiStack::active_symvar "";
+
+%feature("docstring") casadi::OptiStack::symvar "
+
+Get symbols present in expression.
+
+Returned vector is ordered according to the order of variable()/parameter()
+calls used to create the variables
+
+";
+
+%feature("docstring") casadi::OptiStack::constraints "";
+
+%feature("docstring") casadi::OptiStack::stats "
+
+Get statistics.
+
+nlpsol stats are passed as-is. No stability can be guaranteed about this
+part of the API
+
+";
+
+%feature("docstring") casadi::OptiStack::subject_to "
+
+>  void casadi::OptiStack::subject_to(const MX &g)
+
+>  void casadi::OptiStack::subject_to(const std::vector< MX > &g)
+------------------------------------------------------------------------
+
+Add constraints.
+
+Examples:
+
+::
+
+  * \\\\begin{itemize}
+  * opti.subject_to( sqrt(x+y) >= 1);
+  * opti.subject_to( sqrt(x+y) > 1)}: same as above
+  * opti.subject_to( 1<= sqrt(x+y) )}: same as above
+  * opti.subject_to( 5*x+y==1 )}: equality
+  *
+  * Python
+  * opti.subject_to([x*y>=1,x==3])
+  * opti.subject_to(opti.bounded(0,x,1))
+  *
+  * MATLAB
+  * opti.subject_to({x*y>=1,x==3})
+  * opti.subject_to( 0<=x<=1 )
+  * 
+
+
+
+>  void casadi::OptiStack::subject_to()
+------------------------------------------------------------------------
+
+Clear constraints.
+
+";
+
+%feature("docstring") casadi::OptiStack::return_status "
+
+Get return status of solver passed as-is from nlpsol No stability can be
+guaranteed about this part of the API.
+
+";
+
+%feature("docstring") casadi::OptiStack::active_values "";
+
+%feature("docstring") casadi::OptiStack::parameter "
+
+Create a parameter (symbol); fixed during optimization.
+
+The order of creation does not matter. It is not required for parameter to
+actualy appear in the optimization problem. Parameters that do appear, must
+be given a value before the problem can be solved.
+
+Parameters:
+-----------
+
+n:  number of rows (default 1)
+
+m:  number of columnss (default 1)
+
+attribute:  'full' (default) or 'symmetric'
+
+";
+
+%feature("docstring") casadi::OptiStack::solve "
+
+Crunch the numbers; solve the problem.
+
+";
+
+%feature("docstring") casadi::OptiStack::disp "
+
+Print representation.
+
+";
+
+%feature("docstring") casadi::OptiStack::set_initial "
+
+Set initial guess for decision variables
+
+::
+
+  * opti.set_initial(x, 2)
+  * opti.set_initial(10*x(1), 2)
+  * 
+
+
+
+";
+
+%feature("docstring") casadi::OptiStack::get_meta_con "
+
+Get meta-data of symbol (for internal use only)
+
+";
+
+%feature("docstring") casadi::OptiStack::value_variables "
+
+get assignment expressions for latest values
+
+";
+
+%feature("docstring") casadi::OptiStack::type_name "
+
+Readable name of the class.
+
+";
+
+%feature("docstring") casadi::OptiStack::is_parametric "
+
+return true if expression is only dependant on Opti parameters, not
+variables
+
+";
+
+%feature("docstring") casadi::OptiStack::callback_class "";
+
+%feature("docstring") casadi::OptiStack::canon_expr "
+
+Interpret an expression (for internal use only)
+
+";
+
+%feature("docstring") casadi::OptiStack::p "
+
+Get all (scalarised) parameters as a symbolic column vector.
+
+";
+
+%feature("docstring") casadi::OptiStack::np "
+
+Number of (scalarised) parameters.
+
+";
+
+%feature("docstring") casadi::OptiStack::solver_dirty "";
+
+%feature("docstring") casadi::OptiStack::mark_solver_dirty "";
+
+%feature("docstring") casadi::OptiStack::assert_empty "";
+
+%feature("docstring") casadi::OptiStack::x "
+
+Get all (scalarised) decision variables as a symbolic column vector.
+
+";
+
+%feature("docstring") casadi::OptiStack::copy "
+
+Copy.
+
+";
+
+%feature("docstring") casadi::OptiStack::minimize "
+
+Set objective.
+
+Objective must be a scalar. Default objective: 0 When method is called
+multiple times, the last call takes effect
+
+";
+
+%feature("docstring") casadi::OptiStack::assert_active_symbol "";
+
+%feature("docstring") casadi::OptiStack::f "
+
+Get objective expression.
+
+";
+
+%feature("docstring") casadi::OptiStack::solve_actual "";
+
+%feature("docstring") casadi::OptiStack::lam_g "
+
+Get all (scalarised) dual variables as a symbolic column vector.
+
+Useful for obtaining the Lagrange Hessian:
+
+::
+
+  * sol.value(hessian(opti.f+opti.lam_g'*opti.g,opti.x)) % MATLAB
+  * sol.value(hessian(opti.f+dot(opti.lam_g,opti.g),opti.x)[0]) # Python
+  * 
+
+
+
+";
+
+%feature("docstring") casadi::OptiStack::nx "
+
+Number of (scalarised) decision variables.
+
+";
+
+%feature("docstring") casadi::OptiStack::assert_baked "";
+
+%feature("docstring") casadi::OptiStack::set_value "
+
+Set value of parameter.
+
+Each parameter must be given a value before 'solve' can be called
+
+";
+
+%feature("docstring") casadi::OptiStack::solve_prepare "";
+
+%feature("docstring") casadi::OptiStack::value "
+
+Obtain value of expression at the current value
+
+In regular mode, teh current value is the converged solution In debug mode,
+the value can be non-converged
+
+Parameters:
+-----------
+
+values:  Optional assignment expressions (e.g. x==3) to overrule the current
+value
+
+";
+
+%feature("docstring") casadi::OptiStack::set_meta "
+
+Set meta-data of an expression.
+
+";
+
+%feature("docstring") casadi::OptiStack::arg "";
+
+%feature("docstring") casadi::OptiStack::variable "
+
+Create a decision variable (symbol)
+
+The order of creation matters. The order will be reflected in the
+optimization problem. It is not required for decision variables to actualy
+appear in the optimization problem.
+
+Parameters:
+-----------
+
+n:  number of rows (default 1)
+
+m:  number of columnss (default 1)
+
+attribute:  'full' (default) or 'symmetric'
+
+";
+
+%feature("docstring") casadi::OptiStack::solver "
+
+Set a solver.
+
+Parameters:
+-----------
+
+solver:  any of the nlpsol plugins can be used here In practice, not all
+nlpsol plugins may be supported yet
+
+options:  passed on to nlpsol No stability can be guaranteed about this part
+of the API
+
+";
+
+%feature("docstring") casadi::OptiStack::res "";
+
+%feature("docstring") casadi::OptiStack::mark_problem_dirty "";
+
+%feature("docstring") casadi::OptiStack::solved "";
+
+%feature("docstring") casadi::OptiStack "
+
+A simplified interface for NLP modeling/solving.
+
+This is the low-level base class. Direct usage of this class is not
+recommended unless for debugging. There are no guaranties API stability
+
+Joris Gillis, Erik Lambrechts
+
+C++ includes: optistack.hpp ";
+
+%feature("docstring") casadi::OptiStack::internal_bake "
+
+Fix the structure of the optimization problem.
+
+";
+
+%feature("docstring") casadi::OptiStack::mark_solved "";
+
+%feature("docstring") casadi::OptiStack::assert_solved "";
+
+%feature("docstring") casadi::OptiStack::get_meta "
+
+Get meta-data of symbol (for internal use only)
+
+";
+
+%feature("docstring") casadi::OptiStack::get_str "
+
+Get string representation.
+
+";
+
+%feature("docstring") casadi::OptiStack::get_repr "
+
+Get string representation with type information.
+
+";
+
+%feature("docstring") casadi::OptiStack::problem_dirty "";
+
+%feature("docstring") casadi::OptiStack::value_parameters "";
+
+%feature("docstring") casadi::OptiStack::g "
+
+Get all (scalarised) constraint expressions as a column vector.
+
+";
+
+%feature("docstring") casadi::OptiStack::set_meta_con "
+
+Set meta-data of an expression.
+
+";
+
+%feature("docstring") casadi::OptiStack::objective "";
+
+%feature("docstring") casadi::OptiStack::python_str "
+
+Python str
+
+";
+
+%feature("docstring") casadi::OptiStack::dual "
+
+get the dual variable
+
+m must be a constraint expression. The returned value is still a symbolic
+expression. Use value on it to obtain the numerical value.
+
+";
+
+%feature("docstring") casadi::OptiStack::OptiStack "
+
+Create Opti Context.
+
+";
+
+%feature("docstring") casadi::OptiStack::ng "
+
+Number of (scalarised) constraints.
+
+";
+
+%feature("docstring") casadi::OptiStack::initial "
+
+get assignment expressions for initial values
+
+";
 
 
 // File: classcasadi_1_1OracleFunction.xml
