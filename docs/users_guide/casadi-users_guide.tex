@@ -2115,13 +2115,13 @@ void* fname_alloc_mem(void);
 Allocates a memory object which will be passed to the numerical evaluation.
 
 \begin{lstlisting}[language=C]
-int fname_init_mem(void);
+int fname_init_mem(void* mem);
 \end{lstlisting}
 
 (Re)initializes a memory object. Returns 0 upon successful return;
 
 \begin{lstlisting}[language=C]
-int fname_free_mem(void);
+int fname_free_mem(void* mem);
 \end{lstlisting}
 
 Frees a memory object. Returns 0 upon successful return;
@@ -2879,27 +2879,27 @@ The main characteristics of the Opti stack are:
 \end{itemize}
 
 
-% 
+%
 % In similar fashion, a parametric NLP can be constructed as follows:
-% 
+%
 % \begin{minipage}[t]{0.5\textwidth}
 % \begin{lstlisting}[language=Python]
 % # Python
 % from casadi import *
 % opti = Opti()
-% 
+%
 % x = opti.variable(2,1)
 % p = opti.parameter()
-% 
+%
 % opti.minimize((p*x[1]-x[0]**2)**2)
 % opti.subject_to(opti.bounded(1,sum1(x),2))
-% 
+%
 % opti.solver('ipopt')
-% 
+%
 % opti.set_value(p, 3)
 % sol = opti.solve()
 % print(sol.value(x))
-% 
+%
 % opti.set_value(p, 5)
 % sol = opti.solve()
 % sol.value(x)
@@ -2909,19 +2909,19 @@ The main characteristics of the Opti stack are:
 % \begin{lstlisting}[language=Matlab]
 % % MATLAB
 % opti = casadi.Opti();
-% 
+%
 % x = opti.variable(2,1);
 % p = opti.parameter();
-% 
+%
 % opti.minimize(  (p*x(2)-x(1)^2)^2   );
 % opti.subject_to( 1<=sum(x)<=2 );
-% 
+%
 % opti.solver('ipopt');
-% 
+%
 % opti.set_value(p, 3);
 % sol = opti.solve();
 % sol.value(x)
-% 
+%
 % opti.set_value(p, 5);
 % sol = opti.solve();
 % sol.value(x)
