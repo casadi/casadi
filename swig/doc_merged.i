@@ -16944,9 +16944,12 @@ Solve a system of equations: A*x = b.
 
 ";
 
-%feature("docstring") friendwrap_which_depends "
+%feature("docstring") friendwrap_interp1d "
 
-Find out which variables enter with some order.
+Performs 1d linear interpolation.
+
+The data-points to be interpolated are given as (x[i], v[i]). xq[j] is used
+as interplating value
 
 ";
 
@@ -17271,6 +17274,12 @@ Get the number of elements.
 
 ";
 
+%feature("docstring") friendwrap_which_depends "
+
+Find out which variables enter with some order.
+
+";
+
 %feature("docstring") friendwrap_linspace "
 
 Matlab's linspace command.
@@ -17388,7 +17397,10 @@ indictating theire tensorial dimensions.
 >  MatType einstein(const MatType &A, const MatType &B, const std::vector< int > &dim_a, const std::vector< int > &dim_b, const std::vector< int > &dim_c, const std::vector< int > &a, const std::vector< int > &b, const std::vector< int > &c)
 ------------------------------------------------------------------------
 
-Matrix power x^n.
+Performs 1d linear interpolation.
+
+The data-points to be interpolated are given as (x[i], v[i]). xq[j] is used
+as interplating value
 
 ";
 
@@ -48732,6 +48744,8 @@ vector * Returns the largest element in absolute value
 Check if a particular plugin is available.
 
 ";
+
+%feature("docstring") casadi::index_interp1d "";
 
 %feature("docstring") casadi::conic_n_out "
 

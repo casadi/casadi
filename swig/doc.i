@@ -23075,10 +23075,14 @@ Solve a system of equations: A*x = b.
 
 ";
 
-%feature("docstring")  which_depends(const MatType &expr, const MatType
-&var, int order, bool tr) "
+%feature("docstring")  casadi::GenericMatrix< MatType >::interp1d(const
+std::vector< double > &x, const MatType &v, const std::vector< double > &xq,
+const std::string &mode, bool equidistant=false) "
 
-Find out which variables enter with some order.
+Performs 1d linear interpolation.
+
+The data-points to be interpolated are given as (x[i], v[i]). xq[j] is used
+as interplating value
 
 ";
 
@@ -23455,6 +23459,13 @@ Get the number of elements.
 
 ";
 
+%feature("docstring")  which_depends(const MatType &expr, const MatType
+&var, int order, bool tr) "
+
+Find out which variables enter with some order.
+
+";
+
 %feature("docstring")  casadi::GenericMatrix< MatType >::linspace(const
 MatType &a, const MatType &b, int nsteps) "
 
@@ -23590,7 +23601,10 @@ std::vector< int > &dim_a, const std::vector< int > &dim_b, const
 std::vector< int > &dim_c, const std::vector< int > &a, const std::vector<
 int > &b, const std::vector< int > &c) "
 
-Matrix power x^n.
+Performs 1d linear interpolation.
+
+The data-points to be interpolated are given as (x[i], v[i]). xq[j] is used
+as interplating value
 
 ";
 
@@ -66207,6 +66221,11 @@ tol, int *iwork, double *dwork, int ldwork) "
 %feature("docstring")  casadi::has_rootfinder(const std::string &name) "
 
 Check if a particular plugin is available.
+
+";
+
+%feature("docstring")  casadi::index_interp1d(const std::vector< double >
+&x, double xq, bool equidistant=false) "
 
 ";
 
