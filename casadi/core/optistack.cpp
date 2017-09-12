@@ -131,11 +131,11 @@ MX OptiStack::variable(int n, int m, const std::string& attribute) {
 
   if (attribute=="symmetric") {
     casadi_assert_message(n==m, "You specified attribute 'symmetric', "
-      "while matrix is not even square, but " + std::to_string(n) + "-by-" + std::to_string(m) + ".");
-    symbol = MX::sym(name_prefix() + "x_" + std::to_string(count_var_), n*(n+1)/2);
+      "while matrix is not even square, but " + str(n) + "-by-" + str(m) + ".");
+    symbol = MX::sym(name_prefix() + "x_" + str(count_var_), n*(n+1)/2);
     ret = tril2symm(MX(Sparsity::lower(n), symbol));
   } else if (attribute=="full") {
-    symbol = MX::sym(name_prefix() + "x_" + std::to_string(count_var_), n, m);
+    symbol = MX::sym(name_prefix() + "x_" + str(count_var_), n, m);
     ret = symbol;
   } else {
     casadi_error("Unknown attribute '" + attribute + "'. Choose from 'full' or 'symmetric'.");
@@ -151,7 +151,7 @@ MX OptiStack::variable(int n, int m, const std::string& attribute) {
 }
 
 std::string OptiStack::name_prefix() const {
-  return "opti" + std::to_string(instance_number_) + "_";
+  return "opti" + str(instance_number_) + "_";
 }
 
 void OptiStack::register_dual(MetaCon& c) {
@@ -170,7 +170,7 @@ void OptiStack::register_dual(MetaCon& c) {
     symbol = MX();
     ret = MX();
   } else {
-    symbol = MX::sym(name_prefix()+"lam_g_"+std::to_string(count_dual_), c.canon.sparsity());
+    symbol = MX::sym(name_prefix()+"lam_g_"+str(count_dual_), c.canon.sparsity());
 
     casadi_assert(c.canon.is_dense());
 
@@ -219,7 +219,7 @@ MX OptiStack::parameter(int n, int m, const std::string& attribute) {
   meta_data.count = count_++;
   meta_data.i = count_par_++;
 
-  MX symbol = MX::sym(name_prefix() + "p_" + std::to_string(count_par_), n, m);
+  MX symbol = MX::sym(name_prefix() + "p_" + str(count_par_), n, m);
   symbols_.push_back(symbol);
   values_.push_back(DM::nan(symbol.sparsity()));
 
@@ -306,7 +306,7 @@ void OptiStack::assert_has(const MX& m) const {
     if (parse_opti_name(m.name(), vt)) {
       casadi_error("Symbol '" + m.name() + "' (a " + variable_type_to_string(vt) + ") "
         "belongs to a different instance of Opti"
-        "(this instance is #" + std::to_string(instance_count_) + ").");
+        "(this instance is #" + str(instance_count_) + ").");
     } else {
       casadi_error("MX symbol '" + m.name() + "' not declared with opti.variable/opti.parameter.\n"
         "Note: you cannot use a raw MX.sym in your Opti problem, "
@@ -934,8 +934,9 @@ void OptiStack::set_value_internal(const MX& x, const DM& v, std::vector<DM>& st
     if (nz) {
       data.push_back(v);
     } else {
-      casadi_assert_message(v==e[i], "In initial/value assignment: inconsistent numerical values. "
-        "At nonzero " + std::to_string(i) + ", lhs has " + std::to_string(e[i]) + ", while rhs has " + std::to_string(v) + ".");
+      casadi_assert_message(v==e[i], "In initial/value assignment: "
+        "inconsistent numerical values. At nonzero " + str(i) + ", lhs has "
+        + str(e[i]) + ", while rhs has " + str(v) + ".");
     }
   }
 

@@ -349,7 +349,7 @@ public:
   void assert_empty() const;
 
   /// Readable name of the class
-  std::string type_name() const {return "DaeBuilder";}
+  std::string type_name() const {return "OptiStack";}
 
   ///  Print representation
   void disp(std::ostream& stream, bool more=false) const;
